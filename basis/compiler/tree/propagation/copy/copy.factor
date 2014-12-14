@@ -1,12 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces sequences assocs math kernel accessors fry
-combinators sets locals columns grouping
-stack-checker.branches
-compiler.tree
-compiler.tree.def-use
-compiler.tree.combinators
-compiler.utilities ;
+USING: accessors assocs compiler.tree compiler.tree.def-use
+compiler.utilities grouping kernel namespaces sequences sets
+stack-checker.branches ;
 IN: compiler.tree.propagation.copy
 
 ! Two values are copy-equivalent if they are always identical

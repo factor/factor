@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math vectors arrays accessors namespaces ;
+USING: accessors kernel math namespaces vectors ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple

@@ -1,21 +1,13 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry locals kernel
-make namespaces sequences sequences.deep sets vectors
-cpu.architecture
-compiler.cfg.rpo
-compiler.cfg.def-use
-compiler.cfg.registers
-compiler.cfg.dominance
-compiler.cfg.instructions
-compiler.cfg.liveness
-compiler.cfg.ssa.cssa
+USING: accessors arrays assocs combinators compiler.cfg.def-use
+compiler.cfg.dominance compiler.cfg.instructions
+compiler.cfg.liveness compiler.cfg.parallel-copy
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.ssa.cssa
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference
-compiler.cfg.ssa.interference.live-ranges
-compiler.cfg.parallel-copy
-compiler.cfg.utilities
-compiler.utilities ;
+compiler.cfg.ssa.interference.live-ranges cpu.architecture
+kernel locals make namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 

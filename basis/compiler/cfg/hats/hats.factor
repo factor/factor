@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays classes.algebra
-combinators.short-circuit kernel layouts math namespaces
-sequences combinators splitting parser effects words
-cpu.architecture compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.instructions.syntax ;
+USING: accessors alien byte-arrays classes.algebra combinators
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.registers compiler.constants effects kernel layouts
+math namespaces parser sequences splitting words ;
 IN: compiler.cfg.hats
 
 <<

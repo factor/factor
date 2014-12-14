@@ -1,11 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel compiler.cfg.representations
-compiler.cfg.scheduling compiler.cfg.gc-checks
-compiler.cfg.write-barrier compiler.cfg.save-contexts
-compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
-compiler.cfg.linear-scan compiler.cfg.stacks.vacant
-compiler.cfg.utilities ;
+USING: compiler.cfg.build-stack-frame compiler.cfg.gc-checks
+compiler.cfg.linear-scan compiler.cfg.representations
+compiler.cfg.save-contexts compiler.cfg.scheduling
+compiler.cfg.ssa.destruction compiler.cfg.stacks.vacant
+compiler.cfg.utilities compiler.cfg.write-barrier ;
 IN: compiler.cfg.finalization
 
 : finalize-cfg ( cfg -- )

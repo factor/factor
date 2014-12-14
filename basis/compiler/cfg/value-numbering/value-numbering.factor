@@ -1,21 +1,20 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.def-use
-compiler.cfg.utilities
-compiler.cfg.instructions
-compiler.cfg.value-numbering.alien
-compiler.cfg.value-numbering.comparisons
-compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.rewrite
-compiler.cfg.value-numbering.slots
-compiler.cfg.value-numbering.misc
-compiler.cfg.value-numbering.expressions
-cpu.architecture kernel locals namespaces sequences sequences.deep sets
-sorting ;
+USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.utilities kernel locals namespaces sequences
+sequences.deep ;
+
+USE: compiler.cfg.value-numbering.alien
+USE: compiler.cfg.value-numbering.comparisons
+USE: compiler.cfg.value-numbering.expressions
+USE: compiler.cfg.value-numbering.folding
+USE: compiler.cfg.value-numbering.graph
+USE: compiler.cfg.value-numbering.math
+USE: compiler.cfg.value-numbering.misc
+USE: compiler.cfg.value-numbering.rewrite
+USE: compiler.cfg.value-numbering.slots
+
 IN: compiler.cfg.value-numbering
 
 GENERIC: process-instruction ( insn -- insn' )

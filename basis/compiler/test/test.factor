@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays compiler.units kernel stack-checker
-sequences vocabs words tools.test tools.test.private ;
+USING: accessors arrays compiler.units kernel sequences
+stack-checker tools.test vocabs words ;
 IN: compiler.test
 
 : decompile ( word -- )

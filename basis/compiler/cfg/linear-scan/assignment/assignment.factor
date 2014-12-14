@@ -1,19 +1,13 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math assocs namespaces sequences heaps
-fry make combinators combinators.short-circuit sets locals arrays
-cpu.architecture layouts
-compiler.cfg
-compiler.cfg.def-use
-compiler.cfg.liveness
-compiler.cfg.registers
+USING: accessors assocs combinators compiler.cfg
 compiler.cfg.instructions
-compiler.cfg.linearization
-compiler.cfg.ssa.destruction.leaders
-compiler.cfg.renaming.functor
-compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals ;
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linearization compiler.cfg.liveness
+compiler.cfg.registers compiler.cfg.renaming.functor
+compiler.cfg.ssa.destruction.leaders heaps kernel locals make
+math namespaces sequences ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.assignment
 

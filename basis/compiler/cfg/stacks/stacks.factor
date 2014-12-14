@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math sequences kernel namespaces accessors biassocs compiler.cfg
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.hats
-compiler.cfg.predecessors compiler.cfg.stacks.local
-compiler.cfg.stacks.height compiler.cfg.stacks.global
-compiler.cfg.stacks.finalize ;
+USING: accessors biassocs compiler.cfg compiler.cfg.registers
+compiler.cfg.stacks.finalize compiler.cfg.stacks.global
+compiler.cfg.stacks.height compiler.cfg.stacks.local kernel math
+namespaces sequences ;
 IN: compiler.cfg.stacks
 
 : begin-stack-analysis ( -- )

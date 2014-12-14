@@ -1,12 +1,10 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.cfg.builder.blocks
-compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.stacks.local compiler.tree.propagation.info
-compiler.cfg.instructions
-cpu.architecture effects fry generalizations
-kernel locals macros make math namespaces quotations sequences
-sequences.generalizations splitting stack-checker words ;
+USING: accessors arrays classes combinators
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks compiler.cfg.stacks.local
+compiler.tree.propagation.info cpu.architecture fry
+generalizations kernel locals macros make math quotations
+sequences sequences.generalizations ;
 IN: compiler.cfg.intrinsics.simd.backend
 
 ! Selection of implementation based on available CPU instructions

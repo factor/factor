@@ -1,10 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search combinators
-combinators.short-circuit fry hints kernel locals
-math math.order sequences sets sorting splitting namespaces
+USING: accessors binary-search combinators
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals ;
+compiler.cfg.linear-scan.live-intervals fry hints kernel locals
+math math.order namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.splitting
 
 : split-range ( live-range n -- before after )

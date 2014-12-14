@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
-cpu.architecture kernel layouts locals make math namespaces sequences
-sets vectors fry arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.rpo compiler.utilities ;
+USING: accessors assocs combinators.short-circuit compiler.cfg
+compiler.cfg.instructions compiler.cfg.rpo cpu.architecture fry
+kernel locals make math namespaces sequences sets ;
 IN: compiler.cfg.utilities
 
 : block>cfg ( bb -- cfg )

@@ -1,16 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes.algebra sequences accessors arrays fry
-math math.intervals layouts combinators namespaces locals
-stack-checker.inlining
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.copy
-compiler.tree.propagation.info
-compiler.tree.propagation.nodes
-compiler.tree.propagation.simple
-compiler.tree.propagation.branches
-compiler.tree.propagation.constraints ;
+USING: accessors classes.algebra combinators compiler.tree
+compiler.tree.combinators compiler.tree.propagation.constraints
+compiler.tree.propagation.copy compiler.tree.propagation.info
+compiler.tree.propagation.nodes compiler.tree.propagation.simple
+kernel locals math math.intervals namespaces sequences ;
 FROM: sequences.private => array-capacity ;
 IN: compiler.tree.propagation.recursive
 

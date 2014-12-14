@@ -1,6 +1,6 @@
-USING: accessors arrays assocs classes.tuple compiler.cfg.dataflow-analysis
-compiler.cfg.instructions compiler.cfg.registers fry kernel math math.order
-sequences sets ;
+USING: accessors arrays compiler.cfg.dataflow-analysis
+compiler.cfg.instructions compiler.cfg.registers fry kernel math
+math.order sequences sets ;
 IN: compiler.cfg.stacks.vacant
 
 ! Utils

@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel layouts math math.bitwise
-compiler.cfg.instructions
+USING: accessors compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite kernel layouts math
+math.bitwise ;
 IN: compiler.cfg.value-numbering.folding
 
 : binary-constant-fold? ( insn -- ? )

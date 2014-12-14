@@ -1,18 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit arrays
-fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise math.order classes generalizations
-locals make alien.c-types io.binary grouping
-math.vectors.simd.intrinsics
-compiler.cfg
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.comparisons
-compiler.cfg.instructions
+USING: accessors alien.c-types combinators
+combinators.short-circuit compiler.cfg.instructions
+compiler.cfg.utilities compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite cpu.architecture
+generalizations grouping io.binary kernel locals make math
+sequences ;
 IN: compiler.cfg.value-numbering.simd
 
 ! Some lame constant folding for SIMD intrinsics. Eventually this

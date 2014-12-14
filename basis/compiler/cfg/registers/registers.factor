@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors namespaces kernel math parser assocs sequences ;
+USING: assocs kernel math namespaces parser sequences ;
 IN: compiler.cfg.registers
 
 ! Virtual registers, used by CFG and machine IRs, are just integers

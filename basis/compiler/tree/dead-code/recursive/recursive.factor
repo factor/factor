@@ -1,12 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs sequences kernel locals fry
-combinators stack-checker.backend
-compiler.tree
-compiler.tree.recursive
+USING: accessors arrays compiler.tree
 compiler.tree.dead-code.branches
-compiler.tree.dead-code.liveness
-compiler.tree.dead-code.simple ;
+compiler.tree.dead-code.liveness compiler.tree.dead-code.simple
+compiler.tree.recursive kernel locals sequences
+stack-checker.backend ;
 IN: compiler.tree.dead-code.recursive
 
 M: #enter-recursive compute-live-values*

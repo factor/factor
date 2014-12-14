@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators sets math fry kernel math.order
-dlists deques vectors namespaces sequences sorting locals
-compiler.cfg.rpo compiler.cfg.predecessors ;
+USING: accessors assocs combinators compiler.cfg.predecessors
+compiler.cfg.rpo deques dlists fry kernel locals math math.order
+namespaces sequences sorting vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dominance
 

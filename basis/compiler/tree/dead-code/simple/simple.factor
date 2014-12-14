@@ -1,13 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors words assocs sequences arrays namespaces
-fry locals definitions classes classes.algebra generic math
-combinators math.private
-stack-checker.dependencies
-stack-checker.backend
-compiler.tree
-compiler.tree.propagation.info
-compiler.tree.dead-code.liveness ;
+USING: accessors arrays assocs classes.algebra combinators
+compiler.tree compiler.tree.dead-code.liveness
+compiler.tree.propagation.info fry kernel locals math
+math.private namespaces sequences stack-checker.backend
+stack-checker.dependencies words ;
 IN: compiler.tree.dead-code.simple
 
 : flushable-call? ( #call -- ? )

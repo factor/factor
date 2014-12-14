@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel fry accessors sequences make math locals
-combinators compiler.cfg compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.utilities compiler.cfg.rpo compiler.cfg.stacks.local
+USING: accessors assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.predecessors compiler.cfg.rpo
 compiler.cfg.stacks.global compiler.cfg.stacks.height
-compiler.cfg.predecessors ;
+compiler.cfg.stacks.local compiler.cfg.utilities fry kernel
+locals make math sequences ;
 IN: compiler.cfg.stacks.finalize
 
 ! This pass inserts peeks and replaces.

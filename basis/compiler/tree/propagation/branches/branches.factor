@@ -1,15 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel sequences assocs accessors
-math.intervals arrays classes.algebra combinators columns
-stack-checker.branches locals math namespaces
-compiler.utilities
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.tree.propagation.nodes
-compiler.tree.propagation.simple
-compiler.tree.propagation.constraints ;
+USING: accessors arrays assocs combinators compiler.tree
+compiler.tree.combinators compiler.tree.propagation.constraints
+compiler.tree.propagation.info compiler.tree.propagation.nodes
+compiler.tree.propagation.simple fry kernel locals math
+namespaces sequences stack-checker.branches ;
 FROM: sets => union ;
 FROM: assocs => change-at ;
 IN: compiler.tree.propagation.branches

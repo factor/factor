@@ -1,18 +1,13 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays combinators
-disjoint-sets fry kernel locals math math.functions
-namespaces sequences sets
-compiler.cfg
-compiler.cfg.instructions
-compiler.cfg.loop-detection
-compiler.cfg.registers
-compiler.cfg.representations.preferred
+compiler.cfg compiler.cfg.instructions
+compiler.cfg.loop-detection compiler.cfg.registers
 compiler.cfg.representations.coalescing
-compiler.cfg.rpo
-compiler.cfg.utilities
-compiler.utilities
-cpu.architecture ;
+compiler.cfg.representations.preferred compiler.cfg.rpo
+compiler.cfg.utilities compiler.utilities cpu.architecture
+disjoint-sets fry kernel locals math math.functions namespaces
+sequences sets ;
 FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.representations.selection

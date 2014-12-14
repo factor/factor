@@ -1,8 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.order namespaces accessors kernel layouts
-combinators assocs sequences cpu.architecture
-words compiler.cfg.instructions ;
+USING: accessors kernel math namespaces ;
 IN: compiler.cfg.stack-frame
 
 TUPLE: stack-frame

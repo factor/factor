@@ -1,13 +1,9 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel locals fry make namespaces
-sequences cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.utilities
-compiler.cfg.predecessors
-compiler.cfg.registers
-compiler.cfg.instructions ;
+USING: accessors assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.rpo compiler.cfg.utilities fry kernel locals make
+namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.cssa
 

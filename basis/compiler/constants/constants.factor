@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel layouts system strings words quotations byte-arrays
-alien arrays literals sequences ;
+USING: alien arrays byte-arrays kernel layouts literals math
+quotations sequences strings words ;
 IN: compiler.constants
 
 ! These constants must match vm/memory.h

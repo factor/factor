@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel combinators compiler.cfg.dataflow-analysis
-compiler.cfg.stacks.local ;
+USING: assocs combinators compiler.cfg.dataflow-analysis
+compiler.cfg.stacks.local kernel ;
 IN: compiler.cfg.stacks.global
 
 : transfer-peeked-locs ( assoc bb -- assoc' )

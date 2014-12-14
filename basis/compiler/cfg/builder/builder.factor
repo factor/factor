@@ -1,25 +1,12 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators hashtables kernel
-math fry namespaces make sequences words byte-arrays
-layouts alien.c-types
-stack-checker.inlining cpu.architecture
-compiler.tree
-compiler.tree.builder
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.cfg
-compiler.cfg.hats
-compiler.cfg.utilities
-compiler.cfg.registers
-compiler.cfg.intrinsics
-compiler.cfg.comparisons
-compiler.cfg.stack-frame
-compiler.cfg.instructions
-compiler.cfg.predecessors
-compiler.cfg.builder.blocks
-compiler.cfg.stacks
-compiler.cfg.stacks.local ;
+USING: accessors assocs combinators compiler.cfg
+compiler.cfg.builder.blocks compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.intrinsics compiler.cfg.registers
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
+cpu.architecture fry kernel make math namespaces sequences words
+;
 IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is

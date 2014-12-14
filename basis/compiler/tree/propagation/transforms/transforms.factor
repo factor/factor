@@ -1,15 +1,14 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel sequences words fry generic
-generic.single accessors classes.tuple classes classes.algebra
-definitions stack-checker.dependencies quotations
-classes.tuple.private math math.partial-dispatch math.private
-math.intervals sets.private math.floats.private
-math.integers.private layouts math.order vectors hashtables
-combinators effects generalizations sequences.generalizations
-assocs sets combinators.short-circuit sequences.private locals
-growable stack-checker namespaces compiler.tree.propagation.info
-hash-sets arrays hashtables.private ;
+USING: accessors alien.c-types assocs classes classes.algebra
+classes.tuple classes.tuple.private combinators
+combinators.short-circuit compiler.tree.propagation.info effects
+fry generalizations generic generic.single growable hash-sets
+hashtables kernel layouts locals math math.integers.private
+math.intervals math.order math.partial-dispatch math.private
+namespaces quotations sequences sequences.generalizations
+sequences.private sets sets.private stack-checker
+stack-checker.dependencies vectors words ;
 FROM: math => float ;
 FROM: sets => set members ;
 IN: compiler.tree.propagation.transforms

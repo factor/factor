@@ -1,10 +1,9 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs combinators combinators.short-circuit
-dlists deques kernel locals math math.order sequences
-sets vectors fry splitting compiler.cfg.def-use compiler.cfg
-compiler.cfg.rpo compiler.cfg.predecessors compiler.cfg.renaming
-compiler.cfg.instructions compiler.cfg.utilities ;
+USING: accessors arrays combinators combinators.short-circuit
+compiler.cfg compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.renaming compiler.cfg.rpo compiler.cfg.utilities
+deques dlists fry kernel locals math sequences sets vectors ;
 FROM: namespaces => get set ;
 IN: compiler.cfg.branch-splitting
 

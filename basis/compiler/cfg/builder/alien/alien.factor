@@ -1,16 +1,15 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays layouts math math.order
-math.parser combinators combinators.short-circuit fry make
-sequences sequences.generalizations alien alien.private
-alien.strings alien.c-types alien.libraries classes.struct
-namespaces kernel strings libc locals quotations words
-cpu.architecture compiler.utilities compiler.tree compiler.cfg
-compiler.cfg.builder compiler.cfg.builder.alien.params
-compiler.cfg.builder.alien.boxing compiler.cfg.builder.blocks
-compiler.cfg.instructions compiler.cfg.stack-frame
-compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.cfg.registers compiler.cfg.hats compiler.errors ;
+USING: accessors alien alien.c-types alien.libraries
+alien.strings arrays assocs classes.struct combinators
+compiler.cfg compiler.cfg.builder
+compiler.cfg.builder.alien.boxing
+compiler.cfg.builder.alien.params compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
+compiler.tree cpu.architecture fry kernel layouts make math
+math.parser namespaces sequences sequences.generalizations
+strings words ;
 FROM: compiler.errors => no-such-symbol no-such-library ;
 IN: compiler.cfg.builder.alien
 

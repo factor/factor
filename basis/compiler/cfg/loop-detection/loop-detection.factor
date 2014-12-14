@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators deques dlists fry kernel
-namespaces sequences sets compiler.cfg compiler.cfg.predecessors ;
+USING: accessors assocs compiler.cfg compiler.cfg.predecessors
+deques dlists fry kernel namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.loop-detection
 

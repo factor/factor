@@ -1,18 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types byte-arrays fry
-classes.algebra cpu.architecture kernel layouts math sequences
-math.vectors math.vectors.simd.intrinsics
-macros generalizations combinators combinators.short-circuit
-arrays locals compiler.tree.propagation.info
-compiler.cfg.builder.blocks
-compiler.cfg.comparisons
-compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.intrinsics
-compiler.cfg.intrinsics.alien
-compiler.cfg.intrinsics.simd.backend
-specialized-arrays ;
+USING: accessors alien.c-types arrays byte-arrays combinators
+combinators.short-circuit compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
+compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
+cpu.architecture fry kernel layouts locals math math.vectors
+math.vectors.simd.intrinsics sequences specialized-arrays ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
 SPECIALIZED-ARRAYS: char uchar short ushort int uint longlong ulonglong float double ;
 IN: compiler.cfg.intrinsics.simd

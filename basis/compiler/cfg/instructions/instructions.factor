@@ -1,9 +1,7 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors arrays kernel sequences namespaces words
-math math.order layouts classes.union compiler.units alien
-byte-arrays combinators compiler.cfg.registers
-compiler.cfg.instructions.syntax ;
+USING: accessors compiler.cfg.instructions.syntax kernel math
+namespaces ;
 IN: compiler.cfg.instructions
 
 <<

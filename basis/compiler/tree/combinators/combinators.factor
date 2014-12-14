@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators combinators.short-circuit fry kernel
-locals accessors sequences compiler.utilities arrays
-stack-checker.inlining namespaces compiler.tree math.order ;
+USING: accessors assocs combinators combinators.short-circuit
+compiler.tree compiler.utilities kernel locals namespaces
+sequences stack-checker.inlining ;
 IN: compiler.tree.combinators
 
 :: each-node ( ... nodes quot: ( ... node -- ... ) -- ... )

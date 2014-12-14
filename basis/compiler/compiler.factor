@@ -1,26 +1,14 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces arrays sequences io words fry
-continuations vocabs assocs definitions math graphs generic
-generic.single combinators macros make source-files.errors
-combinators.short-circuit classes.algebra vocabs.loader
-sets
-
-stack-checker stack-checker.dependencies stack-checker.inlining
-stack-checker.errors
-
-compiler.errors compiler.units compiler.utilities compiler.crossref
-
-compiler.tree.builder
-compiler.tree.optimizer
-
-compiler.cfg
-compiler.cfg.builder
-compiler.cfg.builder.alien
-compiler.cfg.optimizer
-compiler.cfg.finalization
-
-compiler.codegen ;
+USING: accessors assocs classes.algebra combinators
+combinators.short-circuit compiler.cfg compiler.cfg.builder
+compiler.cfg.finalization compiler.cfg.optimizer
+compiler.codegen compiler.crossref compiler.errors
+compiler.tree.builder compiler.tree.optimizer compiler.units
+compiler.utilities continuations definitions fry generic
+generic.single io kernel macros make namespaces sequences sets
+stack-checker.dependencies stack-checker.errors
+stack-checker.inlining vocabs.loader words ;
 IN: compiler
 
 SYMBOL: compiled

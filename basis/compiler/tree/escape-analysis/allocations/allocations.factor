@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs namespaces sequences kernel math
-combinators sets disjoint-sets fry stack-checker.values ;
+USING: accessors assocs combinators disjoint-sets fry kernel
+namespaces sequences stack-checker.values ;
 FROM: namespaces => set ;
 IN: compiler.tree.escape-analysis.allocations
 

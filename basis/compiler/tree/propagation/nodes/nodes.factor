@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences accessors kernel assocs
-compiler.tree
-compiler.tree.propagation.copy
-compiler.tree.propagation.info ;
+USING: accessors assocs compiler.tree
+compiler.tree.propagation.copy compiler.tree.propagation.info
+kernel sequences ;
 IN: compiler.tree.propagation.nodes
 
 SYMBOL: loop-nesting

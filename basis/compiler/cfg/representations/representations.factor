@@ -2,15 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING:
 compiler.cfg
-compiler.cfg.registers
-compiler.cfg.predecessors
 compiler.cfg.loop-detection
-compiler.cfg.representations.rewrite
-compiler.cfg.representations.peephole
-compiler.cfg.representations.selection
+compiler.cfg.predecessors
+compiler.cfg.registers
 compiler.cfg.representations.coalescing
-compiler.cfg.utilities
-kernel ;
+compiler.cfg.representations.peephole
+compiler.cfg.representations.rewrite
+compiler.cfg.representations.selection
+compiler.cfg.utilities ;
 IN: compiler.cfg.representations
 
 ! Virtual register representation selection. This is where

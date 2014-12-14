@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.registers fry kernel locals
-namespaces sequences sorting make math math.vectors sets vectors ;
+USING: accessors assocs compiler.cfg.def-use
+compiler.cfg.instructions fry kernel locals math math.vectors
+namespaces sequences sets sorting vectors ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dependence
 

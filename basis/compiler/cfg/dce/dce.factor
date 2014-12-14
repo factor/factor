@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel namespaces sequences combinators
-compiler.cfg.instructions compiler.cfg.def-use
-compiler.cfg.rpo compiler.cfg.predecessors hash-sets sets ;
+USING: accessors arrays assocs combinators compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.rpo kernel namespaces sequences sets ;
 FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dce

@@ -1,8 +1,9 @@
 ! Copyright (C) 2009, 2010 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.cfg.def-use compiler.cfg.dependence
-compiler.cfg.instructions compiler.cfg.linear-scan.numbering compiler.cfg.rpo
-cpu.architecture fry kernel make math namespaces sequences sets splitting ;
+USING: accessors arrays assocs compiler.cfg.dependence
+compiler.cfg.instructions compiler.cfg.linear-scan.numbering
+compiler.cfg.rpo fry kernel make math namespaces sequences
+splitting ;
 FROM: namespaces => set ;
 IN: compiler.cfg.scheduling
 

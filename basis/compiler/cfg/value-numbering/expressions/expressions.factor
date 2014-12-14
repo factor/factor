@@ -1,11 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes classes.algebra combinators fry
-generic.parser kernel math namespaces quotations sequences slots
-words make sets
-compiler.cfg.instructions
-compiler.cfg.instructions.syntax
-compiler.cfg.value-numbering.graph ;
+USING: accessors arrays classes.algebra combinators
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.value-numbering.graph generic.parser kernel make
+math namespaces quotations sequences sets slots words ;
 FROM: sequences.private => set-array-nth ;
 IN: compiler.cfg.value-numbering.expressions
 

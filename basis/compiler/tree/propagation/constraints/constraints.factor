@@ -1,11 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs math math.intervals kernel accessors
-sequences namespaces classes classes.algebra
-combinators words combinators.short-circuit
-compiler.tree
-compiler.tree.propagation.info
-compiler.tree.propagation.copy ;
+USING: accessors arrays assocs classes.algebra
+compiler.tree.propagation.copy compiler.tree.propagation.info
+kernel namespaces sequences ;
 IN: compiler.tree.propagation.constraints
 
 ! A constraint is a statement about a value.

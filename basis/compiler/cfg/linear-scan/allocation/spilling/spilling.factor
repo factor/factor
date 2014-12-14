@@ -1,11 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry hints kernel locals
-math sequences sets sorting splitting namespaces linked-assocs
-combinators.short-circuit compiler.utilities
-compiler.cfg.linear-scan.allocation.state
+USING: accessors assocs combinators
 compiler.cfg.linear-scan.allocation.splitting
-compiler.cfg.linear-scan.live-intervals ;
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.live-intervals compiler.utilities fry
+kernel linked-assocs locals math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 ERROR: bad-live-ranges interval ;

@@ -1,11 +1,11 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.private effects
-fry kernel kernel.private make namespaces sequences continuations
-quotations words math stack-checker stack-checker.dependencies
-combinators.short-circuit stack-checker.transforms
-compiler.tree.propagation.info
-compiler.tree.propagation.inlining compiler.units ;
+USING: accessors combinators combinators.private
+combinators.short-circuit compiler.tree.propagation.info
+compiler.tree.propagation.inlining compiler.units continuations
+effects fry kernel kernel.private namespaces quotations
+sequences stack-checker stack-checker.dependencies
+stack-checker.transforms words ;
 IN: compiler.tree.propagation.call-effect
 
 ! call( and execute( have complex expansions.

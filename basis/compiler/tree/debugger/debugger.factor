@@ -1,26 +1,18 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs match fry accessors namespaces make effects
-sequences sequences.private quotations generic macros arrays
-prettyprint prettyprint.backend prettyprint.config
-prettyprint.custom prettyprint.sections math words combinators
-combinators.short-circuit io sorting hints sets
-compiler.tree
-compiler.tree.recursive
-compiler.tree.normalization
-compiler.tree.cleanup
-compiler.tree.propagation
-compiler.tree.propagation.info
-compiler.tree.escape-analysis
-compiler.tree.tuple-unboxing
-compiler.tree.def-use
-compiler.tree.builder
-compiler.tree.optimizer
-compiler.tree.combinators
-compiler.tree.checker
-compiler.tree.identities
-compiler.tree.dead-code
-compiler.tree.modular-arithmetic ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit compiler.tree compiler.tree.builder
+compiler.tree.checker compiler.tree.cleanup
+compiler.tree.combinators compiler.tree.dead-code
+compiler.tree.def-use compiler.tree.escape-analysis
+compiler.tree.identities compiler.tree.modular-arithmetic
+compiler.tree.normalization compiler.tree.optimizer
+compiler.tree.propagation compiler.tree.propagation.info
+compiler.tree.recursive compiler.tree.tuple-unboxing effects fry
+generic hints io kernel macros make match math namespaces
+prettyprint prettyprint.config prettyprint.custom
+prettyprint.sections quotations sequences sequences.private sets
+sorting words ;
 FROM: fry => _ ;
 FROM: namespaces => set ;
 RENAME: _ match => __
