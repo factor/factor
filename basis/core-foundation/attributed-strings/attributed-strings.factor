@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax kernel destructors
-core-foundation core-foundation.dictionaries
-core-foundation.strings
-core-foundation.utilities ;
+USING: alien.c-types alien.syntax core-foundation
+core-foundation.dictionaries core-foundation.strings
+core-foundation.utilities destructors kernel ;
 IN: core-foundation.attributed-strings
 
 TYPEDEF: void* CFAttributedStringRef

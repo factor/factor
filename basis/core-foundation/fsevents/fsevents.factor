@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.strings alien.syntax
-kernel math sequences namespaces make assocs init accessors
-continuations combinators io.encodings.utf8 destructors locals
-arrays specialized-arrays classes.struct core-foundation
-core-foundation.arrays core-foundation.run-loop
-core-foundation.strings core-foundation.time unix.types ;
+USING: accessors alien alien.c-types alien.data alien.strings
+alien.syntax arrays assocs classes.struct combinators
+core-foundation core-foundation.arrays core-foundation.run-loop
+core-foundation.strings core-foundation.time destructors init
+io.encodings.utf8 kernel locals namespaces sequences
+specialized-arrays unix.types ;
 FROM: namespaces => change-global ;
 IN: core-foundation.fsevents
 

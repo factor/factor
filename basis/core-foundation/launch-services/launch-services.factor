@@ -1,10 +1,9 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.syntax classes.struct
-continuations core-foundation core-foundation.strings
-core-foundation.urls destructors kernel sequences
-specialized-arrays.instances.alien.c-types.char strings
-unix.ffi ;
+USING: alien.syntax classes.struct continuations core-foundation
+core-foundation.strings core-foundation.urls destructors kernel
+sequences specialized-arrays.instances.alien.c-types.char
+strings unix.ffi ;
 IN: core-foundation.launch-services
 
 FUNCTION: OSStatus LSFindApplicationForInfo (
