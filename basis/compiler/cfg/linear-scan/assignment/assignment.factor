@@ -77,6 +77,10 @@ SYMBOL: machine-live-outs
     H{ } clone machine-edge-live-ins set
     H{ } clone machine-live-outs set ;
 
+: heap-pop-while ( heap quot: ( key -- ? ) -- values )
+    '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
+    [ over heap-pop* ] produce 2nip ; inline
+
 : insert-spill ( live-interval -- )
     [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
 
@@ -86,16 +90,9 @@ SYMBOL: machine-live-outs
 : expire-interval ( live-interval -- )
     [ remove-pending ] [ handle-spill ] bi ;
 
-: (expire-old-intervals) ( n heap -- )
-    dup heap-empty? [ 2drop ] [
-        2dup heap-peek nip <= [ 2drop ] [
-            dup heap-pop drop expire-interval
-            (expire-old-intervals)
-        ] if
-    ] if ;
-
 : expire-old-intervals ( n -- )
-    pending-interval-heap get (expire-old-intervals) ;
+    pending-interval-heap get swap '[ _ < ] heap-pop-while
+    [ expire-interval ] each ;
 
 : insert-reload ( live-interval -- )
     [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ;
@@ -106,16 +103,9 @@ SYMBOL: machine-live-outs
 : activate-interval ( live-interval -- )
     [ add-pending ] [ handle-reload ] bi ;
 
-: (activate-new-intervals) ( n heap -- )
-    dup heap-empty? [ 2drop ] [
-        2dup heap-peek nip = [
-            dup heap-pop drop activate-interval
-            (activate-new-intervals)
-        ] [ 2drop ] if
-    ] if ;
-
 : activate-new-intervals ( n -- )
-    unhandled-intervals get (activate-new-intervals) ;
+    unhandled-intervals get swap '[ _ = ] heap-pop-while
+    [ activate-interval ] each ;
 
 : prepare-insn ( n -- )
     [ expire-old-intervals ] [ activate-new-intervals ] bi ;
