@@ -62,7 +62,7 @@ M: heap heap-size ( heap -- n )
     data>> nth-unsafe { entry } declare ; inline
 
 : data-first ( heap -- entry )
-    0 swap data-nth ; inline
+    data>> first ; inline
 
 : data-set-nth ( entry n heap -- )
     [ [ >>index ] keep ] dip data>> set-nth-unsafe ; inline
