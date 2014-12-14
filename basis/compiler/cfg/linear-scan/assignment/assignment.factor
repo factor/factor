@@ -38,9 +38,6 @@ ERROR: not-spilled-error vreg ;
 
 SYMBOL: unhandled-intervals
 
-: init-unhandled ( live-intervals -- unhandled-intervals  )
-    [ dup start>> swap 2array ] map >min-heap  ;
-
 ! Liveness info is used by resolve pass
 SYMBOL: machine-live-ins
 
@@ -70,7 +67,7 @@ SYMBOL: machine-live-outs
     [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
 
 : init-assignment ( live-intervals -- )
-    init-unhandled unhandled-intervals set
+    live-intervals>min-heap unhandled-intervals set
     <min-heap> pending-interval-heap set
     H{ } clone pending-interval-assoc set
     H{ } clone machine-live-ins set
