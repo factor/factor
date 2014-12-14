@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs combinators cpu.architecture fry
-heaps kernel math math.order namespaces layouts sequences vectors
-linked-assocs compiler.cfg compiler.cfg.registers
+USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
+cpu.architecture fry heaps kernel layouts linked-assocs math
+math.order namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
 

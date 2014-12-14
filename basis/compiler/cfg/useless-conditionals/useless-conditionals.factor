@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences math combinators
-combinators.short-circuit vectors compiler.cfg
+USING: accessors combinators.short-circuit compiler.cfg
 compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.utilities ;
+compiler.cfg.utilities kernel sequences vectors ;
 IN: compiler.cfg.useless-conditionals
 
 : delete-conditional? ( bb -- ? )

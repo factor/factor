@@ -1,13 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences words memoize combinators
-classes classes.builtin classes.tuple classes.singleton
-math.partial-dispatch fry assocs combinators.short-circuit
-stack-checker.dependencies
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.tree.late-optimizations ;
+USING: accessors assocs classes classes.builtin
+classes.singleton classes.tuple combinators
+combinators.short-circuit compiler.tree
+compiler.tree.combinators compiler.tree.late-optimizations fry
+kernel math.partial-dispatch memoize sequences
+stack-checker.dependencies words ;
 IN: compiler.tree.finalization
 
 ! This is a late-stage optimization.

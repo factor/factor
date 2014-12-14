@@ -1,19 +1,17 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words sequences quotations namespaces io vectors
-arrays hashtables classes.tuple math accessors prettyprint
-prettyprint.config assocs prettyprint.backend prettyprint.custom
-prettyprint.sections parser random compiler.tree.builder
-compiler.tree.optimizer cpu.architecture compiler.cfg.builder
-compiler.cfg.linearization compiler.cfg.registers
-compiler.cfg.stack-frame compiler.cfg.linear-scan
-compiler.cfg.optimizer compiler.cfg.finalization
-compiler.cfg.instructions compiler.cfg.utilities
-compiler.cfg.def-use compiler.cfg.rpo
-compiler.cfg.representations compiler.cfg.gc-checks
-compiler.cfg.save-contexts compiler.cfg
-compiler.cfg.representations.preferred
-compiler.cfg.scheduling compiler.units ;
+USING: accessors assocs classes.tuple compiler.cfg
+compiler.cfg.builder compiler.cfg.def-use
+compiler.cfg.finalization compiler.cfg.gc-checks
+compiler.cfg.instructions compiler.cfg.linearization
+compiler.cfg.optimizer compiler.cfg.registers
+compiler.cfg.representations
+compiler.cfg.representations.preferred compiler.cfg.rpo
+compiler.cfg.save-contexts compiler.cfg.scheduling
+compiler.cfg.utilities compiler.tree.builder
+compiler.tree.optimizer compiler.units hashtables io kernel math
+namespaces prettyprint prettyprint.backend prettyprint.custom
+prettyprint.sections quotations random sequences vectors words ;
 FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 

@@ -1,15 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry namespaces sequences math math.order accessors kernel arrays
-combinators assocs
-stack-checker.backend
-stack-checker.branches
-stack-checker.inlining
-compiler.utilities
-compiler.tree
-compiler.tree.combinators
+USING: accessors arrays assocs combinators compiler.tree
 compiler.tree.normalization.introductions
-compiler.tree.normalization.renaming ;
+compiler.tree.normalization.renaming compiler.utilities fry
+kernel math math.order namespaces sequences
+stack-checker.backend stack-checker.branches ;
 IN: compiler.tree.normalization
 
 ! A transform pass done before optimization can begin to

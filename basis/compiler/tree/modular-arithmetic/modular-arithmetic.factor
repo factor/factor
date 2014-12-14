@@ -1,14 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.intervals math.private math.partial-dispatch
-namespaces sequences sets accessors assocs words kernel memoize fry
-combinators combinators.short-circuit layouts alien.accessors
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.tree.def-use
-compiler.tree.def-use.simplified
-compiler.tree.late-optimizations ;
+USING: accessors alien.accessors assocs combinators
+combinators.short-circuit compiler.tree
+compiler.tree.combinators compiler.tree.def-use.simplified
+compiler.tree.late-optimizations compiler.tree.propagation.info
+fry kernel layouts math math.intervals math.partial-dispatch
+math.private memoize namespaces sequences sets words ;
 FROM: namespaces => set ;
 FROM: assocs => change-at ;
 IN: compiler.tree.modular-arithmetic

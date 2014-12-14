@@ -1,13 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit kernel math
-namespaces sequences fry combinators
-compiler.utilities
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.hats
-compiler.cfg.instructions
-compiler.cfg.utilities ;
+USING: accessors combinators combinators.short-circuit
+compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.utilities compiler.utilities fry kernel math
+namespaces sequences ;
 IN: compiler.cfg.tco
 
 ! Tail call optimization.

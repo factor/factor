@@ -1,18 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors assocs sequences namespaces make locals
-cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.registers
-compiler.cfg.instructions
-compiler.cfg.linear-scan.numbering
-compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.allocation
-compiler.cfg.linear-scan.allocation.state
+USING: accessors assocs compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.assignment
-compiler.cfg.linear-scan.resolve ;
-FROM: assocs => change-at ;
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.numbering
+compiler.cfg.linear-scan.resolve cpu.architecture kernel locals
+sequences ;
 IN: compiler.cfg.linear-scan
 
 ! References:

@@ -1,17 +1,14 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors kernel sequences sequences.private assocs
-words namespaces classes.algebra combinators
-combinators.short-circuit classes classes.tuple
-classes.tuple.private continuations arrays alien.c-types math
-math.private slots generic definitions stack-checker.dependencies
-classes.maybe classes.algebra.private
-compiler.tree
+USING: accessors alien.c-types arrays assocs classes
+classes.algebra classes.algebra.private classes.maybe
+classes.tuple.private combinators combinators.short-circuit
+compiler.tree compiler.tree.propagation.constraints
 compiler.tree.propagation.info
-compiler.tree.propagation.nodes
-compiler.tree.propagation.slots
 compiler.tree.propagation.inlining
-compiler.tree.propagation.constraints ;
+compiler.tree.propagation.nodes compiler.tree.propagation.slots
+continuations fry kernel sequences stack-checker.dependencies
+words ;
 IN: compiler.tree.propagation.simple
 
 ! Propagation for straight-line code.

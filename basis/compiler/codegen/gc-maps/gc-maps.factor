@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays classes.tuple combinators
-combinators.short-circuit compiler.cfg.instructions
-compiler.codegen.relocation cpu.architecture fry kernel layouts
-make math math.order namespaces sequences sequences.generalizations ;
+USING: accessors arrays assocs bit-arrays classes.tuple
+combinators compiler.codegen.relocation cpu.architecture fry
+kernel layouts make math math.order namespaces sequences
+sequences.generalizations ;
 IN: compiler.codegen.gc-maps
 
 SYMBOLS: return-addresses gc-maps ;

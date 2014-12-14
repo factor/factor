@@ -1,17 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences accessors layouts kernel math math.intervals
-namespaces combinators fry arrays
-cpu.architecture
-compiler.tree.propagation.info
-compiler.cfg
-compiler.cfg.hats
-compiler.cfg.stacks
-compiler.cfg.instructions
-compiler.cfg.utilities
-compiler.cfg.builder.blocks
-compiler.cfg.registers
-compiler.cfg.comparisons ;
+USING: accessors arrays combinators compiler.cfg.builder.blocks
+compiler.cfg.comparisons compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.stacks
+compiler.tree.propagation.info cpu.architecture fry kernel
+layouts math math.intervals namespaces sequences ;
 IN: compiler.cfg.intrinsics.fixnum
 
 : emit-both-fixnums? ( -- )

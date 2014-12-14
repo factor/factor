@@ -1,13 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences namespaces compiler.tree.builder
-compiler.tree.recursive
-compiler.tree.normalization
-compiler.tree.propagation
-compiler.tree.propagation.info
-compiler.tree.cleanup
-compiler.tree.def-use
-compiler.tree.dead-code ;
+USING: compiler.tree.builder compiler.tree.cleanup
+compiler.tree.dead-code compiler.tree.def-use
+compiler.tree.normalization compiler.tree.propagation
+compiler.tree.recursive namespaces sequences ;
 IN: compiler.tree.late-optimizations
 
 ! Late optimizations modify the tree such that stack flow
@@ -19,7 +15,7 @@ IN: compiler.tree.late-optimizations
 : splice-quot ( quot -- nodes )
     [
         build-tree
-        analyze-recursive 
+        analyze-recursive
         normalize
         propagate
         cleanup

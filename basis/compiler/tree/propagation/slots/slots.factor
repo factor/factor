@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry assocs arrays byte-arrays strings accessors sequences
-kernel slots classes.algebra classes.tuple classes.tuple.private
-combinators.short-circuit words math math.private combinators
-sequences.private namespaces slots.private classes
-compiler.tree.propagation.info ;
+USING: accessors arrays assocs byte-arrays classes
+classes.algebra classes.tuple classes.tuple.private combinators
+combinators.short-circuit compiler.tree.propagation.info kernel
+math sequences slots.private strings ;
 IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths

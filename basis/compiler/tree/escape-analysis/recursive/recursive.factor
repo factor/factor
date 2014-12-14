@@ -1,13 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math combinators accessors namespaces
-fry disjoint-sets
-compiler.tree
-compiler.tree.recursive
+USING: accessors combinators compiler.tree
 compiler.tree.combinators
-compiler.tree.escape-analysis.nodes
+compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.branches
-compiler.tree.escape-analysis.allocations ;
+compiler.tree.escape-analysis.nodes compiler.tree.recursive
+disjoint-sets fry kernel namespaces sequences ;
 IN: compiler.tree.escape-analysis.recursive
 
 : congruent? ( alloc1 alloc2 -- ? )

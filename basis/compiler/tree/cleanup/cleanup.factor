@@ -1,15 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences combinators fry
-classes.algebra namespaces assocs words math math.private
-math.partial-dispatch math.intervals classes classes.tuple
-classes.tuple.private layouts definitions stack-checker.dependencies
-stack-checker.branches
-compiler.utilities
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.tree.propagation.branches ;
+USING: accessors classes classes.algebra combinators
+compiler.tree compiler.tree.combinators
+compiler.tree.propagation.branches
+compiler.tree.propagation.info compiler.utilities fry kernel
+layouts math math.intervals math.partial-dispatch math.private
+namespaces sequences stack-checker.branches
+stack-checker.dependencies words ;
 IN: compiler.tree.cleanup
 
 GENERIC: delete-node ( node -- )

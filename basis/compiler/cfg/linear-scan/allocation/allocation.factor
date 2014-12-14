@@ -1,13 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs binary-search combinators
-combinators.short-circuit heaps kernel namespaces
-sequences fry locals math math.order arrays sorting
-compiler.utilities
-compiler.cfg.linear-scan.live-intervals
+USING: accessors assocs combinators combinators.short-circuit
 compiler.cfg.linear-scan.allocation.spilling
-compiler.cfg.linear-scan.allocation.splitting
-compiler.cfg.linear-scan.allocation.state ;
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.live-intervals compiler.utilities fry
+heaps kernel locals math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation
 
 : active-positions ( new assoc -- )

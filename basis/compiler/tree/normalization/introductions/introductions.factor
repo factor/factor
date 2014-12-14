@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces sequences accessors math kernel
-compiler.tree math.order ;
+USING: accessors compiler.tree kernel math math.order namespaces
+sequences ;
 IN: compiler.tree.normalization.introductions
 
 SYMBOL: introductions

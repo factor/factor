@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel math
-namespaces compiler.cfg.registers ;
+USING: accessors assocs compiler.cfg.registers fry kernel math
+namespaces ;
 IN: compiler.cfg.stacks.height
 
 ! Global stack height tracking done while constructing CFG.

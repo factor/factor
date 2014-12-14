@@ -1,9 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry arrays generic assocs kernel math namespaces parser
-sequences words vectors math.intervals classes
-accessors combinators stack-checker.state stack-checker.visitor
-stack-checker.inlining ;
+USING: accessors arrays assocs kernel namespaces sequences
+stack-checker.visitor vectors ;
 IN: compiler.tree
 
 ! High-level tree SSA form.

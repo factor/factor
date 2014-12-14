@@ -1,20 +1,12 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit fry kernel locals namespaces
-make math sequences hashtables
-cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.liveness
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.instructions
-compiler.cfg.predecessors
-compiler.cfg.parallel-copy
-compiler.cfg.ssa.destruction
-compiler.cfg.linear-scan.assignment
-compiler.cfg.linear-scan.allocation.state ;
+combinators.short-circuit compiler.cfg compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.assignment compiler.cfg.parallel-copy
+compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.rpo compiler.cfg.utilities cpu.architecture fry
+kernel locals make namespaces sequences ;
 IN: compiler.cfg.linear-scan.resolve
 
 TUPLE: location

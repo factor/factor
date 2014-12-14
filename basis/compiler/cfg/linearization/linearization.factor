@@ -1,10 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs deques dlists hashtables kernel
-make sorting namespaces sequences combinators
-combinators.short-circuit fry math compiler.cfg.rpo
-compiler.cfg.utilities compiler.cfg.loop-detection
-compiler.cfg.predecessors sets hash-sets ;
+USING: accessors assocs combinators combinators.short-circuit
+compiler.cfg.loop-detection compiler.cfg.predecessors
+compiler.cfg.rpo compiler.cfg.utilities deques dlists fry kernel
+make math namespaces sequences sets sorting ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linearization
 

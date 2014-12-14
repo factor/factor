@@ -1,23 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays namespaces make math math.order math.parser
-sequences accessors kernel layouts assocs words summary arrays
-combinators sets continuations.private fry
-cpu.architecture classes classes.struct locals slots parser
-generic.parser strings quotations hashtables
-sequences.generalizations
-compiler.constants
-compiler.cfg
-compiler.cfg.linearization
-compiler.cfg.instructions
-compiler.cfg.comparisons
-compiler.cfg.stack-frame
-compiler.cfg.registers
-compiler.cfg.builder
-compiler.codegen.gc-maps
-compiler.codegen.labels
-compiler.codegen.relocation
-compiler.utilities ;
+USING: accessors arrays assocs byte-arrays classes combinators
+compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.linearization compiler.cfg.stack-frame
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.constants cpu.architecture
+fry generic.parser kernel layouts locals make math namespaces
+parser quotations sequences sequences.generalizations slots
+words ;
 FROM: namespaces => set ;
 IN: compiler.codegen
 

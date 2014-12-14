@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs arrays namespaces accessors sequences deques fry
-search-deques dlists combinators.short-circuit make sets compiler.tree ;
+USING: accessors combinators.short-circuit compiler.tree fry
+kernel namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.tree.recursive
 

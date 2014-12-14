@@ -1,10 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel combinators.short-circuit accessors math sequences
-sets assocs compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.def-use compiler.cfg.linearization
-compiler.cfg.utilities compiler.cfg.finalization
-compiler.utilities ;
+USING: accessors compiler.cfg.rpo kernel sequences ;
 IN: compiler.cfg.checker
 
 ERROR: bad-successors ;

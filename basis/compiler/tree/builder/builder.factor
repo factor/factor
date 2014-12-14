@@ -1,14 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry locals accessors quotations kernel sequences namespaces
-assocs words arrays vectors hints combinators continuations
-effects compiler.tree
-stack-checker
-stack-checker.state
-stack-checker.errors
-stack-checker.visitor
-stack-checker.backend
-stack-checker.recursive-state ;
+USING: accessors combinators compiler.tree continuations hints
+kernel locals namespaces quotations sequences
+stack-checker.backend stack-checker.errors
+stack-checker.recursive-state stack-checker.state
+stack-checker.visitor vectors words ;
 IN: compiler.tree.builder
 
 <PRIVATE

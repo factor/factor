@@ -1,17 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel arrays sequences math math.order
-math.partial-dispatch generic generic.standard generic.single generic.math
-classes.algebra classes.union sets quotations assocs combinators
-combinators.short-circuit words namespaces continuations classes
-fry hints locals
-compiler.tree
-compiler.tree.builder
-compiler.tree.recursive
-compiler.tree.combinators
-compiler.tree.normalization
-compiler.tree.propagation.info
-compiler.tree.propagation.nodes ;
+USING: accessors arrays assocs classes.algebra combinators
+combinators.short-circuit compiler.tree compiler.tree.builder
+compiler.tree.normalization compiler.tree.propagation.info
+compiler.tree.propagation.nodes compiler.tree.recursive generic
+generic.math generic.single generic.standard kernel locals math
+math.partial-dispatch namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
 ! Splicing nodes

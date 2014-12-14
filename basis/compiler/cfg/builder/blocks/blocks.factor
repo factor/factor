@@ -1,8 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel make math namespaces sequences
-compiler.cfg compiler.cfg.instructions compiler.cfg.stacks
-compiler.cfg.stacks.local ;
+USING: accessors arrays compiler.cfg compiler.cfg.instructions
+compiler.cfg.stacks compiler.cfg.stacks.local kernel make math
+namespaces sequences ;
+SLOT: in-d
+SLOT: out-d
 IN: compiler.cfg.builder.blocks
 
 : set-basic-block ( basic-block -- )

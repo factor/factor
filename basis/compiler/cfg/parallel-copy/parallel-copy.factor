@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs cpu.architecture compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.ssa.destruction.leaders
-deques dlists fry kernel locals namespaces sequences hashtables ;
+USING: assocs compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders cpu.architecture deques
+dlists fry kernel locals namespaces sequences ;
 FROM: sets => conjoin ;
 IN: compiler.cfg.parallel-copy
 

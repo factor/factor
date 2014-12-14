@@ -1,13 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math math.order namespaces sets make
-sequences combinators fry
-compiler.cfg
-compiler.cfg.hats
-compiler.cfg.instructions
-compiler.cfg.registers
-compiler.cfg.stacks.height
-compiler.cfg.parallel-copy ;
+USING: accessors assocs combinators compiler.cfg
+compiler.cfg.instructions compiler.cfg.parallel-copy
+compiler.cfg.registers compiler.cfg.stacks.height kernel make
+math math.order namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.stacks.local
 

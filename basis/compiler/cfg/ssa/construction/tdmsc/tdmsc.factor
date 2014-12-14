@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays bit-sets combinators compiler.cfg
-compiler.cfg.dominance compiler.cfg.rpo compiler.cfg.utilities fry
-hashtables hints kernel locals math namespaces sequences sets ;
+USING: accessors arrays assocs bit-sets compiler.cfg
+compiler.cfg.dominance compiler.cfg.rpo compiler.cfg.utilities
+fry hashtables kernel locals math namespaces sequences sets ;
 FROM: namespaces => set ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.construction.tdmsc

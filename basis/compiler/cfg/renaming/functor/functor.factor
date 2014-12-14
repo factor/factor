@@ -1,9 +1,9 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry functors generic.parser
-kernel lexer namespaces parser sequences slots words sets
-compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.instructions.syntax ;
+USING: accessors arrays assocs compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.instructions.syntax fry
+functors generic.parser kernel lexer namespaces parser sequences
+sets slots words ;
 IN: compiler.cfg.renaming.functor
 
 ! Like compiler.cfg.def-use, but for changing operands

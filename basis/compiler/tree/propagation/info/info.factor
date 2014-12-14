@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes classes.algebra classes.tuple
-classes.tuple.private classes.singleton kernel accessors math
-math.intervals namespaces sequences sequences.private words
-combinators memoize combinators.short-circuit byte-arrays
-strings arrays layouts cpu.architecture
-compiler.tree.propagation.copy ;
+USING: accessors arrays assocs byte-arrays classes
+classes.algebra classes.singleton classes.tuple
+classes.tuple.private combinators combinators.short-circuit
+compiler.tree.propagation.copy kernel layouts math
+math.intervals namespaces sequences sequences.private strings
+words ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;

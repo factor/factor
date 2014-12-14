@@ -1,13 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences classes.tuple
-classes.tuple.private arrays math math.private slots.private
-combinators deques search-deques namespaces fry classes
-classes.algebra assocs stack-checker.state
-compiler.tree
-compiler.tree.propagation.info
+USING: accessors arrays assocs classes classes.tuple
+classes.tuple.private combinators compiler.tree
+compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.nodes
-compiler.tree.escape-analysis.allocations ;
+compiler.tree.propagation.info kernel math namespaces sequences
+slots.private ;
 IN: compiler.tree.escape-analysis.simple
 
 M: #declare escape-analysis* drop ;

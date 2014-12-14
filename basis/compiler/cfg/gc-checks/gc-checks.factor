@@ -1,15 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry grouping kernel layouts
-locals math make namespaces sequences cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.hats
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.comparisons
-compiler.cfg.instructions
-compiler.cfg.predecessors ;
+USING: accessors assocs compiler.cfg compiler.cfg.comparisons
+compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.utilities
+cpu.architecture grouping kernel layouts locals make math
+namespaces sequences ;
 IN: compiler.cfg.gc-checks
 
 <PRIVATE

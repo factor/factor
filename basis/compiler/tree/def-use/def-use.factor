@@ -1,11 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry namespaces sequences kernel generic assocs
-classes vectors accessors combinators sets
-stack-checker.state
-stack-checker.branches
-compiler.tree
-compiler.tree.combinators ;
+USING: accessors assocs compiler.tree compiler.tree.combinators
+fry kernel namespaces sequences stack-checker.branches ;
 FROM: namespaces => set ;
 FROM: sets => members ;
 IN: compiler.tree.def-use

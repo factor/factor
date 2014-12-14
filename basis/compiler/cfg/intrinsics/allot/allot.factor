@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.order sequences accessors arrays
-byte-arrays layouts classes.tuple.private fry locals
-compiler.tree.propagation.info compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.stacks
-compiler.cfg.utilities compiler.cfg.builder.blocks
-compiler.constants cpu.architecture alien.c-types ;
+USING: accessors arrays byte-arrays compiler.cfg.builder.blocks
+compiler.cfg.hats compiler.cfg.instructions compiler.cfg.stacks
+compiler.constants compiler.tree.propagation.info
+cpu.architecture fry kernel layouts locals math math.order
+sequences ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots, ( regs obj class -- )

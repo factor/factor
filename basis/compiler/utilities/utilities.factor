@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private arrays vectors fry
-math math.order namespaces assocs locals ;
+USING: arrays assocs fry kernel locals math math.order
+namespaces sequences vectors ;
 IN: compiler.utilities
 
 : flattener ( seq quot -- seq vector quot' )

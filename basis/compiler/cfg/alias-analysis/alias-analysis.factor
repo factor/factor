@@ -1,16 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces assocs hashtables sequences arrays
-accessors words vectors combinators combinators.short-circuit
-sets classes layouts fry locals cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.def-use
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.comparisons
-compiler.cfg.instructions
-compiler.cfg.representations.preferred ;
+USING: accessors arrays assocs combinators.short-circuit
+compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.representations.preferred compiler.cfg.rpo
+compiler.cfg.utilities cpu.architecture fry kernel locals math
+namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.alias-analysis
 

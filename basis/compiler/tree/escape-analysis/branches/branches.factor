@@ -1,11 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces sequences sets fry columns
-grouping stack-checker.branches
-compiler.tree
-compiler.tree.propagation.branches
+USING: accessors compiler.tree
+compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.nodes
-compiler.tree.escape-analysis.allocations ;
+compiler.tree.propagation.branches grouping kernel sequences
+stack-checker.branches ;
 IN: compiler.tree.escape-analysis.branches
 
 M: #branch escape-analysis*

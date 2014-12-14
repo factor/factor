@@ -1,16 +1,11 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel accessors sequences fry assocs
-sets math combinators deques dlists
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.def-use
-compiler.cfg.registers
-compiler.cfg.dominance
-compiler.cfg.instructions
-compiler.cfg.renaming
-compiler.cfg.renaming.functor
-compiler.cfg.ssa.construction.tdmsc ;
+USING: accessors assocs combinators compiler.cfg
+compiler.cfg.def-use compiler.cfg.dominance
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.renaming.functor compiler.cfg.rpo
+compiler.cfg.ssa.construction.tdmsc deques dlists fry kernel
+math namespaces sequences sets ;
 FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction

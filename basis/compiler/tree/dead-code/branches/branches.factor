@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences namespaces kernel accessors assocs sets fry
-arrays combinators columns stack-checker.backend
-stack-checker.branches compiler.tree compiler.tree.combinators
-compiler.tree.dead-code.liveness compiler.tree.dead-code.simple ;
+USING: accessors assocs columns combinators compiler.tree
+compiler.tree.dead-code.liveness compiler.tree.dead-code.simple
+fry kernel namespaces sequences stack-checker.backend
+stack-checker.branches ;
 FROM: namespaces => set ;
 IN: compiler.tree.dead-code.branches
 
