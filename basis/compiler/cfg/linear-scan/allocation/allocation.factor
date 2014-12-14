@@ -76,7 +76,6 @@ M: sync-point handle ( sync-point -- )
 
 : allocate-registers ( live-intervals sync-point machine-registers -- live-intervals )
     init-allocator
-    init-unhandled
     unhandled-intervals get unhandled-sync-points get (allocate-registers)
     finish-allocation
     handled-intervals get ;

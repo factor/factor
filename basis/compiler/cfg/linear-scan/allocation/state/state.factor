@@ -22,6 +22,12 @@ SYMBOL: progress
 : check-handled ( live-interval -- )
     end>> progress get > [ "check-handled" throw ] when ; inline
 
+: live-intervals>min-heap ( live-intervals -- min-heap )
+    [ [ start>> ] map ] keep zip >min-heap ;
+
+: sync-points>min-heap ( sync-points -- min-heap )
+    [ [ n>> ] map ] keep zip >min-heap ;
+
 ! Mapping from register classes to sequences of machine registers
 SYMBOL: registers
 
@@ -108,7 +114,6 @@ ERROR: register-already-used live-interval ;
         [ don't-change ]
     } process-intervals ;
 
-! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
 
 : add-unhandled ( live-interval -- )
@@ -127,7 +132,6 @@ SYMBOL: unhandled-intervals
 : align-spill-area ( align -- )
     cfg get [ max ] change-spill-area-align drop ;
 
-! Minheap of sync points which still need to be processed
 SYMBOL: unhandled-sync-points
 
 SYMBOL: spill-slots
@@ -141,10 +145,11 @@ SYMBOL: spill-slots
 : lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
     rep-size 2array spill-slots get ?at [ ] [ bad-vreg ] if ;
 
-: init-allocator ( registers -- )
+: init-allocator ( live-intervals sync-points registers -- )
     registers set
-    <min-heap> unhandled-intervals set
-    <min-heap> unhandled-sync-points set
+    [ live-intervals>min-heap unhandled-intervals set ]
+    [ sync-points>min-heap unhandled-sync-points set ] bi*
+
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
@@ -152,10 +157,6 @@ SYMBOL: spill-slots
     H{ } clone spill-slots set
     -1 progress set ;
 
-: init-unhandled ( live-intervals sync-points -- )
-    [ unhandled-intervals get '[ dup start>> _ heap-push ] each ]
-    [ unhandled-sync-points get '[ dup n>> _ heap-push ] each ]
-    bi* ;
 
 ! A utility used by register-status and spill-status words
 : free-positions ( new -- assoc )
