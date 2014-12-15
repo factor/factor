@@ -92,7 +92,6 @@ M: live-interval-state covers? ( insn# live-interval -- ? )
 
 SYMBOLS: from to ;
 
-! Mapping from vreg to live-interval
 SYMBOL: live-intervals
 
 : live-interval ( vreg -- live-interval )
@@ -161,7 +160,6 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
         [ live-interval add-range ] 2with each
     ] if ;
 
-! A location where all registers have to be spilled
 TUPLE: sync-point n keep-dst? ;
 
 C: <sync-point> sync-point
