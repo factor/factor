@@ -180,7 +180,9 @@ M: heap heap-delete
     ] if ;
 
 : >min-heap ( assoc -- min-heap )
-    <min-heap> [ heap-push-all ] keep ;
+    dup assoc-size <vector> min-heap boa
+    [ heap-push-all ] keep ;
 
 : >max-heap ( assoc -- max-heap )
-    <max-heap> [ heap-push-all ] keep ;
+    dup assoc-size <vector> max-heap boa
+    [ heap-push-all ] keep ;
