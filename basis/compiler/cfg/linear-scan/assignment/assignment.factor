@@ -67,7 +67,7 @@ SYMBOL: machine-live-outs
     [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
 
 : init-assignment ( live-intervals -- )
-    live-intervals>min-heap unhandled-intervals set
+    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals set
     <min-heap> pending-interval-heap set
     H{ } clone pending-interval-assoc set
     H{ } clone machine-live-ins set
