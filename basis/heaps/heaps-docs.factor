@@ -96,5 +96,5 @@ HELP: heap-delete
 { $side-effects "heap" } ;
 
 HELP: slurp-heap
-{ $values { "heap" heap } { "quot" { $quotation ( value key -- ) } } }
+{ $values { "heap" heap } { "quot" { $quotation ( ... value key -- ... ) } } }
 { $description "Removes entries from a heap and processes them with the quotation until the heap is empty." } ;
