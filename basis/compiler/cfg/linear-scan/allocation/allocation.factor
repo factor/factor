@@ -59,11 +59,8 @@ M: sync-point handle ( sync-point -- )
     [ n>> [ deactivate-intervals ] [ activate-intervals ] bi ]
     [ handle-sync-point ] bi ;
 
-! TODO: use slurp-heap
 : (allocate-registers) ( unhandled-min-heap -- )
-    dup heap-empty? [ drop ] [
-        [ heap-pop drop handle ] keep (allocate-registers)
-    ] if ;
+    [ drop handle ] slurp-heap ;
 
 : finish-allocation ( -- )
     active-intervals inactive-intervals
