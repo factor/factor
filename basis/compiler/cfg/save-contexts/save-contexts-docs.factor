@@ -17,7 +17,7 @@ HELP: context-save-needed
 
 HELP: save-context-offset
 { $values { "insns" sequence } { "n" integer } }
-{ $description { $link "##save-context" } " must be placed after instructions that modify the context, or instructions that read parameter registers." } ;
+{ $description { $link ##save-context } " must be placed after instructions that modify the context, or instructions that read parameter registers." } ;
 
 ARTICLE: "compiler.cfg.save-contexts" "Insert context saves"
 "Inserts " { $link ##save-context } " in blocks that need them." ;
