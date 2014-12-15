@@ -7,7 +7,7 @@ IN: ui.pens.image
 ! Image pen
 TUPLE: image-pen image fill? ;
 
-: <image-pen> ( image -- pen ) f image-pen boa ;
+: <image-pen> ( image-name -- pen ) f image-pen boa ;
 
 M: image-pen draw-interior
     [ dim>> ] [ [ image>> ] [ fill?>> ] bi ] bi*
