@@ -59,15 +59,10 @@ M: sync-point handle ( sync-point -- )
     [ n>> [ deactivate-intervals ] [ activate-intervals ] bi ]
     [ handle-sync-point ] bi ;
 
-: live-interval-or-sync-point ( intervals sync-points -- live-interval )
-    2array [ heap-empty? not ] filter [ heap-peek nip ] infimum-by
-    heap-pop drop ;
-
-: (allocate-registers) ( unhandled-intervals unhandled-sync-points -- )
-    2dup [ heap-empty? ] both? [ 2drop ] [
-        [ live-interval-or-sync-point handle ]
-        [ (allocate-registers) ]
-        2bi
+! TODO: use slurp-heap
+: (allocate-registers) ( unhandled-min-heap -- )
+    dup heap-empty? [ drop ] [
+        [ heap-pop drop handle ] keep (allocate-registers)
     ] if ;
 
 : finish-allocation ( -- )
@@ -76,6 +71,6 @@ M: sync-point handle ( sync-point -- )
 
 : allocate-registers ( live-intervals sync-point machine-registers -- live-intervals )
     init-allocator
-    unhandled-intervals get unhandled-sync-points get (allocate-registers)
+    unhandled-min-heap get (allocate-registers)
     finish-allocation
     handled-intervals get ;

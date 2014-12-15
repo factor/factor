@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg
+USING: arrays accessors assocs combinators cpu.architecture fry
+heaps kernel math math.order namespaces layouts sequences vectors
+ compiler.cfg compiler.cfg.registers
 compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture fry heaps kernel layouts linked-assocs math
-math.order namespaces sequences ;
+compiler.cfg.linear-scan.live-intervals linked-assocs slots.syntax ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
 
@@ -22,11 +22,20 @@ SYMBOL: progress
 : check-handled ( live-interval -- )
     end>> progress get > [ "check-handled" throw ] when ; inline
 
-: live-intervals>min-heap ( live-intervals -- min-heap )
-    [ [ start>> ] map ] keep zip >min-heap ;
+SYMBOL: unhandled-min-heap
 
-: sync-points>min-heap ( sync-points -- min-heap )
-    [ [ n>> ] map ] keep zip >min-heap ;
+: live-interval-key ( live-interval -- key )
+    get{ start end } ;
+
+: sync-point-key ( sync-point -- key )
+    n>> 1/0.0 2array ;
+
+: zip-keyed ( seq quot: ( elt -- key ) -- assoc )
+    dupd map swap zip ; inline
+
+: >unhandled-min-heap ( live-intervals sync-points -- min-heap )
+    [ [ live-interval-key ] zip-keyed ]
+    [ [ sync-point-key ] zip-keyed ] bi* append >min-heap ;
 
 ! Mapping from register classes to sequences of machine registers
 SYMBOL: registers
@@ -112,12 +121,11 @@ ERROR: register-already-used live-interval ;
         [ don't-change ]
     } process-intervals ;
 
-SYMBOL: unhandled-intervals
-
 : add-unhandled ( live-interval -- )
     [ check-unhandled ]
-    [ dup start>> unhandled-intervals get heap-push ]
-    bi ;
+    [
+        dup live-interval-key unhandled-min-heap get heap-push
+    ] bi ;
 
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
@@ -129,8 +137,6 @@ SYMBOL: unhandled-intervals
 
 : align-spill-area ( align -- )
     cfg get [ max ] change-spill-area-align drop ;
-
-SYMBOL: unhandled-sync-points
 
 SYMBOL: spill-slots
 
@@ -145,9 +151,7 @@ SYMBOL: spill-slots
 
 : init-allocator ( live-intervals sync-points registers -- )
     registers set
-    [ live-intervals>min-heap unhandled-intervals set ]
-    [ sync-points>min-heap unhandled-sync-points set ] bi*
-
+    >unhandled-min-heap unhandled-min-heap set
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
