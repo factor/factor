@@ -69,13 +69,5 @@ conditional-branch-insn
 : reorder ( insns -- insns' )
     split-insns first3 [ reorder-body ] dip 3append ;
 
-: schedule-block ( bb -- )
-    [ reorder ] change-instructions drop ;
-
 : schedule-instructions ( cfg --  )
-    [ number-instructions ]
-    [
-        reverse-post-order
-        [ kill-block?>> not ] filter
-        [ schedule-block ] each
-    ] bi ;
+    [ number-instructions ] [ [ reorder ] simple-optimization ] bi ;
