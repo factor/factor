@@ -1,5 +1,5 @@
-USING: compiler.cfg compiler.cfg.linearization compiler.codegen help.markup
-help.syntax kernel macros math sequences ;
+USING: compiler.cfg compiler.cfg.linearization compiler.cfg.rpo
+compiler.codegen help.markup help.syntax kernel macros math sequences ;
 IN: compiler.cfg.linearization
 
 HELP: linearization-order
@@ -8,7 +8,7 @@ HELP: linearization-order
   { "bbs" sequence }
 }
 { $description "Lists the basic blocks in linearization order. That is, the order in which they will be written in the generated assembly code." }
-{ $see-also generate } ;
+{ $see-also generate reverse-post-order } ;
 
 HELP: block-number
 { $values { "bb" basic-block } { "n" integer } }

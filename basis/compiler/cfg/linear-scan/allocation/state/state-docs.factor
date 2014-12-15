@@ -1,6 +1,19 @@
-USING: assocs compiler.cfg compiler.cfg.instructions cpu.architecture
-help.markup help.syntax math ;
+USING: assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.linear-scan.live-intervals cpu.architecture heaps help.markup
+help.syntax math vectors ;
 IN: compiler.cfg.linear-scan.allocation.state
+
+HELP: active-intervals
+{ $var-description { $link assoc } " of active live intervals. The keys are register class symbols and the values vectors of " { $link live-interval-state } "." } ;
+
+HELP: handled-intervals
+{ $var-description { $link vector } " of handled live intervals." } ;
+
+HELP: unhandled-intervals
+{ $var-description { $link min-heap } " of live intervals which still need a register allocation." } ;
+
+HELP: unhandled-sync-points
+{ $var-description { $link min-heap } " of sync points which still need to be processed." } ;
 
 HELP: init-allocator
 { $values { "registers" { $link assoc } " mapping from register class to available machine registers." } }

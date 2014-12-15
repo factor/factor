@@ -31,7 +31,6 @@ SYMBOL: progress
 ! Mapping from register classes to sequences of machine registers
 SYMBOL: registers
 
-! Vector of active live intervals
 SYMBOL: active-intervals
 
 : active-intervals-for ( live-interval -- seq )
@@ -58,7 +57,6 @@ SYMBOL: inactive-intervals
 : delete-inactive ( live-interval -- )
     dup inactive-intervals-for remove-eq! drop ;
 
-! Vector of handled live intervals
 SYMBOL: handled-intervals
 
 : add-handled ( live-interval -- )
