@@ -147,13 +147,14 @@ M: heap heap-pop*
 M: heap heap-pop
     [ data-first >entry< ] [ heap-pop* ] bi ;
 
-: heap-pop-all ( heap -- alist )
-    check-heap [ heap-size ] keep
-    '[ _ heap-pop swap 2array ] replicate ;
+: slurp-heap ( ... heap quot: ( ... value key -- ... ) -- ... )
+    [ check-heap ] dip
+    [ drop '[ _ heap-empty? ] ]
+    [ '[ _ heap-pop @ ] until ] 2bi ; inline
 
-: slurp-heap ( heap quot: ( value key -- ) -- )
-    [ check-heap [ heap-size ] keep ] dip
-    '[ _ heap-pop @ ] times ; inline
+: heap-pop-all ( heap -- alist )
+    [ heap-size <vector> ] keep
+    [ swap 2array suffix! ] slurp-heap { } like ;
 
 ERROR: bad-heap-delete ;
 
