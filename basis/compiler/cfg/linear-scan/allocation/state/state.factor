@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs combinators cpu.architecture fry
-heaps kernel math math.order namespaces layouts sequences vectors
- compiler.cfg compiler.cfg.registers
+USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals linked-assocs slots.syntax ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
+cpu.architecture fry heaps kernel layouts linked-assocs math
+math.order namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
 
@@ -25,13 +25,13 @@ SYMBOL: progress
 SYMBOL: unhandled-min-heap
 
 : live-interval-key ( live-interval -- key )
-    get{ start end } ;
+    [ start>> ] [ end>> ] bi 2array ;
 
 : sync-point-key ( sync-point -- key )
-    n>> 1/0.0 2array ;
+    n>> 1/0. 2array ;
 
-: zip-keyed ( seq quot: ( elt -- key ) -- assoc )
-    dupd map swap zip ; inline
+: zip-keyed ( seq quot: ( elt -- key ) -- alist )
+    [ keep ] curry { } map>assoc ; inline
 
 : >unhandled-min-heap ( live-intervals sync-points -- min-heap )
     [ [ live-interval-key ] zip-keyed ]
