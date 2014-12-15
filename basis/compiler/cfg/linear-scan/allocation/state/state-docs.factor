@@ -1,6 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals cpu.architecture heaps help.markup
-help.syntax math vectors ;
+compiler.cfg.linear-scan.allocation compiler.cfg.linear-scan.live-intervals
+cpu.architecture heaps help.markup help.syntax math sequences vectors ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 HELP: active-intervals
@@ -9,14 +9,15 @@ HELP: active-intervals
 HELP: handled-intervals
 { $var-description { $link vector } " of handled live intervals." } ;
 
-HELP: unhandled-intervals
-{ $var-description { $link min-heap } " of live intervals which still need a register allocation." } ;
-
-HELP: unhandled-sync-points
-{ $var-description { $link min-heap } " of sync points which still need to be processed." } ;
+HELP: unhandled-min-heap
+{ $var-description { $link min-heap } " of all live intervals and sync points which still needs processing. It is used by " { $link (allocate-registers) } ". The key of the heap is a pair of values, " { $slot "start" } " and " { $slot "end" } " for the "  { $link live-interval-state } " tuple and " { $slot "n" } " and 1/0.0 for the " { $link sync-point } " tuple. That way smaller live intervals are always processed before larger ones and all live intervals before sync points." } ;
 
 HELP: init-allocator
-{ $values { "registers" { $link assoc } " mapping from register class to available machine registers." } }
+{ $values
+  { "live-intervals" { $link sequence } " of " { $link live-interval-state } }
+  { "sync-points" { $link sequence } " of " { $link sync-point } }
+  { "registers" { $link assoc } " mapping from register class to available machine registers." }
+}
 { $description "Initializes the state for the register allocator." }
 { $see-also reg-class } ;
 
