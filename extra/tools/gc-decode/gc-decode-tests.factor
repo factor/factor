@@ -1,9 +1,9 @@
 USING: accessors arrays assocs bit-arrays classes.struct combinators
 combinators.short-circuit compiler compiler.cfg.debugger
 compiler.cfg.instructions compiler.cfg.stack-frame compiler.cfg.utilities
-compiler.codegen.gc-maps generic kernel math namespaces random sequences
-sequences.generalizations slots.syntax tools.gc-decode tools.test vm vocabs
-words compiler.cfg.linearization ;
+compiler.codegen.gc-maps compiler.units fry generic grouping kernel math
+namespaces random sequences sequences.generalizations slots.syntax
+tools.gc-decode tools.test vm vocabs words compiler.cfg.linearization ;
 QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
@@ -81,7 +81,7 @@ IN: tools.gc-decode.tests
     { [ generic? ] [ primitive? ] [ inline? ] [ no-compile? ] } 1|| not ;
 
 { { } } [
-    all-words [ normal? ] filter 20 sample
+    all-words [ normal? ] filter 50 sample
     [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? not ] filter
 ] unit-test
 
@@ -120,4 +120,19 @@ IN: tools.gc-decode.tests
 { t } [
     \ cpu.x86.features.private:(sse-version)
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+] unit-test
+
+! Ensure deterministic gc map generation.
+: recompile-word>gc-info ( word -- gc-info )
+    [ 1array compile ] keep word>gc-info ;
+
+: deterministic-gc-info? ( word -- ? )
+    20 swap '[
+        _ recompile-word>gc-info struct-slot-values
+        dup last 0 = [ drop f ] when
+    ] replicate all-equal? ;
+
+
+{ t } [
+    \ opencl:cl-queue-kernel deterministic-gc-info?
 ] unit-test
