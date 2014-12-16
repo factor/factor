@@ -1,38 +1,39 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors assocs byte-arrays combinators
-destructors fry io io.binary io.encodings.binary io.streams.byte-array
-kernel locals macros math math.ranges multiline sequences
-sequences.private vectors byte-vectors combinators.short-circuit
-math.bitwise ;
+USING: accessors byte-arrays byte-vectors
+combinators.short-circuit fry io.binary kernel locals math
+math.bitwise sequences sequences.private ;
 IN: bitstreams
 
-TUPLE: widthed { bits integer read-only } { #bits integer read-only } ;
+TUPLE: widthed
+{ bits integer read-only }
+{ #bits integer read-only } ;
 
 ERROR: invalid-widthed bits #bits ;
 
 : check-widthed ( bits #bits -- bits #bits )
-    dup 0 < [ invalid-widthed ] when
-    2dup { [ nip 0 = ] [ drop 0 = not ] } 2&& [ invalid-widthed ] when
-    over 0 = [
-        2dup [ dup 0 < [ neg ] when log2 1 + ] dip > [ invalid-widthed ] when
-    ] unless ;
+    2dup {
+        [ nip 0 < ]
+        [ { [ nip 0 = ] [ drop 0 = not ] } 2&& ]
+        [
+            swap [ drop f ] [
+                dup 0 < [ neg ] when log2 <=
+            ] if-zero
+        ]
+    } 2|| [ invalid-widthed ] when ;
 
 : <widthed> ( bits #bits -- widthed )
     check-widthed
     widthed boa ;
 
 : zero-widthed ( -- widthed ) 0 0 <widthed> ;
+
 : zero-widthed? ( widthed -- ? ) zero-widthed = ;
 
 TUPLE: bit-reader
     { bytes byte-array }
     { byte-pos array-capacity initial: 0 }
     { bit-pos array-capacity initial: 0 } ;
-
-TUPLE: bit-writer
-    { bytes byte-vector }
-    { widthed widthed } ;
 
 TUPLE: msb0-bit-reader < bit-reader ;
 TUPLE: lsb0-bit-reader < bit-reader ;
@@ -42,6 +43,10 @@ TUPLE: lsb0-bit-reader < bit-reader ;
 
 : <lsb0-bit-reader> ( bytes -- bs )
     lsb0-bit-reader new swap >>bytes ; inline
+
+TUPLE: bit-writer
+    { bytes byte-vector }
+    { widthed widthed } ;
 
 TUPLE: msb0-bit-writer < bit-writer ;
 TUPLE: lsb0-bit-writer < bit-writer ;
@@ -60,18 +65,18 @@ TUPLE: lsb0-bit-writer < bit-writer ;
 GENERIC: peek ( n bitstream -- value )
 GENERIC: poke ( value n bitstream -- )
 
-: get-abp ( bitstream -- abp ) 
+: get-abp ( bitstream -- abp )
     [ byte-pos>> 8 * ] [ bit-pos>> + ] bi ; inline
-    
-: set-abp ( abp bitstream -- ) 
+
+: set-abp ( abp bitstream -- )
     [ 8 /mod ] dip [ bit-pos<< ] [ byte-pos<< ] bi ; inline
 
 : seek ( n bitstream -- )
     [ get-abp + ] [ set-abp ] bi ; inline
-    
+
 : (align) ( n m -- n' )
     [ /mod 0 > [ 1 + ] when ] [ * ] bi ; inline
-    
+
 : align ( n bitstream -- )
     [ get-abp swap (align) ] [ set-abp ] bi ; inline
 
@@ -82,9 +87,12 @@ GENERIC: poke ( value n bitstream -- )
 
 ERROR: not-enough-bits widthed n ;
 
+: check-widthed-bits ( widthed n -- widthed n )
+    2dup { [ nip 0 < ] [ [ #bits>> ] dip < ] } 2||
+    [ not-enough-bits ] when ;
+
 : widthed-bits ( widthed n -- bits )
-    dup 0 < [ not-enough-bits ] when
-    2dup [ #bits>> ] dip < [ not-enough-bits ] when
+    check-widthed-bits
     [ [ bits>> ] [ #bits>> ] bi ] dip
     [ - neg shift ] keep <widthed> ;
 
@@ -138,7 +146,7 @@ ERROR: not-enough-bits n bit-reader ;
     bignum bs bit-pos>> neg shift n bits ;
 
 :: subseq>bits-be ( bignum n bs -- bits )
-    bignum 
+    bignum
     8 bs bit-pos>> - n - 8 mod dup 0 < [ 8 + ] when
     neg shift n bits ;
 
@@ -155,18 +163,20 @@ ERROR: not-enough-bits n bit-reader ;
 :: (peek) ( n bs endian> subseq-endian -- bits )
     n bs enough-bits? [ n bs not-enough-bits ] unless
     bs [ byte-pos>> ] [ bit-pos>> n + ] bi #bits>#bytes dupd +
-    bs bytes>> subseq endian> execute( seq -- x ) :> bignum
-    bignum n bs subseq-endian execute( bignum n bs -- bits ) ;
+    bs bytes>> subseq endian> execute( seq -- x )
+    n bs subseq-endian execute( bignum n bs -- bits ) ;
 
-M: lsb0-bit-reader peek ( n bs -- bits ) \ le> \ subseq>bits-le (peek) ;
+M: lsb0-bit-reader peek ( n bs -- bits )
+    \ le> \ subseq>bits-le (peek) ;
 
-M: msb0-bit-reader peek ( n bs -- bits ) \ be> \ subseq>bits-be (peek) ;
+M: msb0-bit-reader peek ( n bs -- bits )
+    \ be> \ subseq>bits-be (peek) ;
 
 :: bit-writer-bytes ( writer -- bytes )
     writer widthed>> #bits>> :> n
     n 0 = [
         writer widthed>> bits>> 8 n - shift
-        writer bytes>> swap push
+        writer bytes>> push
     ] unless
     writer bytes>> ;
 
