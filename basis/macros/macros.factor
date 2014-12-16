@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser effects.parser kernel sequences words effects
-combinators assocs definitions quotations namespaces memoize
-accessors fry compiler.units ;
+USING: accessors combinators compiler.units definitions effects
+effects.parser fry kernel memoize words ;
 IN: macros
 
 <PRIVATE
