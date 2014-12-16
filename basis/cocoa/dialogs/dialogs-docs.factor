@@ -14,7 +14,7 @@ HELP: open-panel
 { $description "Displays a file open panel, and outputs a sequence of selected pathnames." } ;
 
 HELP: save-panel
-{ $values { "path" "a pathname string, or " { $link f } } { "paths" "a sequence of pathname strings" } }
+{ $values { "path" "a pathname string" } { "path/f" { $maybe "a pathname string" } } }
 { $description "Displays a file save panel, and outputs the selected path, or " { $link f } " if the user cancelled the operation." } ;
 
 ARTICLE: "cocoa-dialogs" "Cocoa file dialogs"
