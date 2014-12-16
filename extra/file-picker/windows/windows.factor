@@ -1,9 +1,13 @@
-USING: file-picker windows.shell32 windows.types ;
+USING: accessors alien.c-types alien.data alien.strings
+alien.syntax classes.struct destructors file-picker
+io.encodings.string io.encodings.utf8 kernel libc literals math
+system windows windows.kernel32 windows.shell32 windows.types
+windows.user32 ;
 IN: file-picker.windows
-
 LIBRARY: shell32
 
 TYPEDEF: void* PIDLIST_ABSOLUTE
+TYPEDEF: void* PCIDLIST_ABSOLUTE
 TYPEDEF: void* BFFCALLBACK
 
 FUNCTION: HRESULT SHGetFolderLocation (
@@ -22,8 +26,7 @@ STRUCT: BROWSEINFO
   { ulFlags UINT }
   { lpfn BFFCALLBACK }
   { lParam LPARAM }
-  { iImage int }
-} ;
+  { iImage int } ;
 
 CONSTANT: BIF_RETURNONLYFSDIRS 0x00000001
 CONSTANT: BIF_DONTGOBELOWDOMAIN 0x00000002
@@ -54,16 +57,17 @@ FUNCTION: BOOL SHGetPathFromIDList (
 
 
 M: windows open-file-dialog
-    BROWSEINFO <struct>
-        GetDesktopWindow >>hwndOwner
-        0 CSIDL_PERSONAL 0 0 SHGetFolderLocation >>pidlRoot
-        "Select a file or folder" >>lpszTitle
-        BIF_BROWSEINCLUDEFILES >>ulFlags
-    SHBrowseForFolder [
-        void* <ref> [ SHGetPathFromIDList ] keep
-        alien>native-string
-    ] [
-        f
-    ] if* ;
+    [
+        BROWSEINFO <struct>
+            GetDesktopWindow >>hwndOwner
+            "Select a file or folder" utf8 malloc-string &free >>lpszTitle
+            BIF_BROWSEINCLUDEFILES >>ulFlags
+        SHBrowseForFolder [
+            MAX_UNICODE_PATH 1 + malloc &free [ SHGetPathFromIDList ] keep
+            swap [ utf8 alien>string ] [ drop f ] if
+        ] [
+            f
+        ] if*
+    ] with-destructors ;
 
 M: windows save-file-dialog ;
