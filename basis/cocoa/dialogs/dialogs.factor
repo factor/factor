@@ -34,7 +34,7 @@ CONSTANT: NSCancelButton 0
 : split-path ( path -- dir file )
     "/" split1-last [ <NSString> ] bi@ ;
 
-: save-panel ( path -- paths )
+: save-panel ( path -- path/f )
     [ <NSSavePanel> dup ] dip
     split-path -> runModalForDirectory:file: NSOKButton =
     [ -> filename CF>string ] [ drop f ] if ;
