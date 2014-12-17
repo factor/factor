@@ -5,8 +5,8 @@ USING: accessors byte-arrays colors.constants combinators
 formatting fry images images.loader images.loader.private
 images.viewer io io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.styles kernel make math
-math.parser namespaces prettyprint sequences splitting strings
-urls vocabs ;
+math.parser namespaces present prettyprint sequences splitting
+summary urls vocabs ;
 
 IN: gopher
 
@@ -45,14 +45,16 @@ CONSTANT: A_PLUS_SOUND CHAR: <
 : get-gif ( selector -- image )
     get-binary "gif" (image-class) load-image* ;
 
-: get-text ( selector query/f -- lines )
-    [ "\t" glue ] when* "\r\n" append
+: get-text ( selector -- lines )
+    "?" split1 [ "\t" glue ] when* "\r\n" append
     utf8 encode write flush
     input-stream get (stream-contents-by-block)
     utf8 decode string-lines
     "." over index [ head ] when* ;
 
 TUPLE: gopher-link type name selector host port ;
+
+M: gopher-link summary >url present ;
 
 : <gopher-link> ( item -- gopher-link )
     [ "" ] [
@@ -69,13 +71,13 @@ M: gopher-link >url
     ] if >url ;
 
 : get-menu ( selector -- lines )
-    f get-text [ <gopher-link> ] map ;
+    get-text [ <gopher-link> ] map ;
 
 : get-selector ( selector -- stuff )
     "/" split1 "" or swap
     dup length 1 > [ string>number ] [ first ] if
     {
-        { A_TEXT [ f get-text ] }
+        { A_TEXT [ get-text ] }
         { A_MENU [ get-menu ] }
         { A_INDEX [ get-menu ] }
         { A_GIF [ get-gif ] }
