@@ -84,7 +84,7 @@ TUPLE: slides < book ;
 
 : change-page ( book n -- )
     over control-value + over children>> length rem
-    swap model>> set-model ;
+    swap set-control-value ;
 
 : next-page ( book -- ) 1 change-page ;
 

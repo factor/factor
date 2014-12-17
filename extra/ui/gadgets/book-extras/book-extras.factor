@@ -11,7 +11,7 @@ IN: ui.gadgets.book-extras
 : <book-border-btn> ( label quot -- button ) (book-t) <border-button> ;
 : >>> ( gadget -- ) owner next ;
 : <<< ( gadget -- ) owner prev ;
-: go-to ( gadget number -- ) swap owner model>> set-model ;
+: go-to ( gadget number -- ) swap owner set-control-value ;
 
 : <forward-btn> ( label -- button ) [ >>> ] <button> ;
 : <backward-btn> ( label -- button ) [ <<< ] <button> ;

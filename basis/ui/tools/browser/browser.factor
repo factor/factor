@@ -28,10 +28,10 @@ M: browser-gadget set-history-value
 : show-help ( link browser-gadget -- )
     [ >link ] dip
     [
-        2dup model>> value>> =
+        2dup control-value =
         [ 2drop ] [ [ add-recent ] [ history>> add-history ] bi* ] if
     ]
-    [ model>> set-model ]
+    [ set-control-value ]
     2bi ;
 
 : <help-pane> ( browser-gadget -- gadget )
@@ -84,7 +84,7 @@ M: browser-gadget handle-gesture
     } 2|| ;
 
 M: browser-gadget definitions-changed ( set browser -- )
-    [ model>> value>> swap showing-definition? ] keep
+    [ control-value swap showing-definition? ] keep
     '[ _ [ history-value ] keep set-history-value ] when ;
 
 M: browser-gadget focusable-child* search-field>> ;
