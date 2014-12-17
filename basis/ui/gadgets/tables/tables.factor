@@ -257,19 +257,19 @@ PRIVATE>
     bi ;
 
 : update-mouse-index ( table -- )
-    dup [ model>> value>> ] [ mouse-index>> ] bi
+    dup [ control-value ] [ mouse-index>> ] bi
     dup [ swap length [ drop f ] [ 1 - min ] if-zero ] [ 2drop f ] if
     >>mouse-index drop ;
 
 : initial-selection-index ( table -- n/f )
     {
-        [ model>> value>> empty? not ]
+        [ control-value empty? not ]
         [ selection-required?>> ]
         [ drop 0 ]
     } 1&& ;
 
 : find-row-index ( value table -- n/f )
-    [ model>> value>> ] [ renderer>> ] bi
+    [ control-value ] [ renderer>> ] bi
     '[ _ row-value? ] with find drop ;
 
 : update-table-rows ( table -- )

@@ -133,13 +133,13 @@ TUPLE: error-display < track ;
         dup model>> [ [ print-error ] when* ] <pane-control> <scroller> 1 track-add ;
 
 : com-inspect ( error-display -- )
-    model>> value>> [ inspector ] when* ;
+    control-value [ inspector ] when* ;
 
 : com-help ( error-display -- )
-    model>> value>> [ error>> error-help-window ] when* ;
+    control-value [ error>> error-help-window ] when* ;
 
 : com-edit ( error-display -- )
-    model>> value>> [ edit-error ] when* ;
+    control-value [ edit-error ] when* ;
 
 error-display "toolbar" f {
     { f com-inspect }

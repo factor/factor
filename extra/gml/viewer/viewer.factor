@@ -144,7 +144,7 @@ TUPLE: gml-viewer-world < wasd-world
     drag? ;
 
 TYPED: refresh-b-rep-view ( world: gml-viewer-world -- )
-    dup model>> value>> >>b-rep
+    dup control-value >>b-rep
     dup vertex-array>> [ vertex-array-buffer dispose ] when*
     dup [ b-rep>> ] [ selected>> value>> ] bi make-b-rep-vertices {
         [
@@ -162,7 +162,7 @@ TYPED: refresh-b-rep-view ( world: gml-viewer-world -- )
 
 M: gml-viewer-world model-changed
     nip
-    [ model>> value>> ]
+    [ control-value ]
     [ b-rep<< ]
     [ dup viewable? [ refresh-b-rep-view ] [ drop ] if ] tri ;
 
