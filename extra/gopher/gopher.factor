@@ -117,5 +117,3 @@ ERROR: not-a-gopher-url url ;
             ] each
         ]
     } cond ;
-
-"gopher-ui" require
