@@ -6,7 +6,7 @@ formatting fry images images.loader images.loader.private
 images.viewer io io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.styles kernel make math
 math.parser namespaces present prettyprint sequences splitting
-summary urls vocabs ;
+summary urls urls.encoding vocabs ;
 
 IN: gopher
 
@@ -94,6 +94,7 @@ ERROR: not-a-gopher-url url ;
         [ host>> ]
         [ port>> 70 or <inet> binary ]
         [ path>> rest ]
+        [ query>> assoc>query url-decode "?" glue ]
     } cleave '[ _ get-selector ] with-client ;
 
 : gopher. ( url -- )
