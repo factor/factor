@@ -966,6 +966,11 @@ HELP: head
         "{ 1 2 3 4 5 6 7 } 2 head ."
         "{ 1 2 }"
     }
+    "When a sequence may not have enough elements:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 } 5 short head ."
+        "{ 1 2 }"
+    }
 }
 { $errors "Throws an error if the index is out of bounds." } ;
 
@@ -976,6 +981,11 @@ HELP: tail
     { $example "USING: sequences prettyprint ;"
         "{ 1 2 3 4 5 6 7 } 2 tail ."
         "{ 3 4 5 6 7 }"
+    }
+    "When a sequence may not have enough elements:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 } 5 short tail ."
+        "{ }"
     }
 }
 { $errors "Throws an error if the index is out of bounds." } ;
@@ -998,6 +1008,11 @@ HELP: head*
         "{ 1 2 3 4 5 6 7 } 2 head* ."
         "{ 1 2 3 4 5 }"
     }
+    "When a sequence may not have enough elements:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 } 5 short head* ."
+        "{ }"
+    }
 }
 { $errors "Throws an error if the index is out of bounds." } ;
 
@@ -1008,6 +1023,11 @@ HELP: tail*
     { $example "USING: sequences prettyprint ;"
         "{ 1 2 3 4 5 6 7 } 2 tail* ."
         "{ 6 7 }"
+    }
+    "When a sequence may not have enough elements:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 } 5 short tail* ."
+        "{ 1 2 }"
     }
 }
 { $errors "Throws an error if the index is out of bounds." } ;
