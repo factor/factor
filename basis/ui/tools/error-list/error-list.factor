@@ -136,7 +136,7 @@ TUPLE: error-display < track ;
     control-value [ inspector ] when* ;
 
 : com-help ( error-display -- )
-    control-value [ error>> error-help-window ] when* ;
+    control-value [ error>> help-error ] when* ;
 
 : com-edit ( error-display -- )
     control-value [ edit-error ] when* ;
