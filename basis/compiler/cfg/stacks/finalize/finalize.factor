@@ -7,22 +7,12 @@ compiler.cfg.stacks.local compiler.cfg.utilities fry kernel
 locals make math sequences ;
 IN: compiler.cfg.stacks.finalize
 
-! This pass inserts peeks and replaces.
-
 :: inserting-peeks ( from to -- assoc )
-    ! A peek is inserted on an edge if the destination anticipates
-    ! the stack location, the source does not anticipate it and
-    ! it is not available from the source in a register.
     to anticip-in
     from anticip-out from avail-out assoc-union
     assoc-diff ;
 
 :: inserting-replaces ( from to -- assoc )
-    ! A replace is inserted on an edge if two conditions hold:
-    ! - the location is not dead at the destination, OR
-    !   the location is live at the destination but not available
-    !   at the destination
-    ! - the location is pending in the source but not the destination
     from pending-out to pending-in assoc-diff
     to dead-in to live-in to anticip-in assoc-diff assoc-diff
     assoc-diff ;
