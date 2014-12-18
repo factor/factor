@@ -1,5 +1,10 @@
-USING: compiler.cfg.stacks.local help.markup help.syntax math sequences ;
+USING: compiler.cfg.stacks.local compiler.tree help.markup help.syntax math
+sequences ;
 IN: compiler.cfg.stacks
+
+HELP: ds-push
+{ $values { "vreg" "a virtual register" } }
+{ $description "Used when translating the " { $link #push } " SSA node to CFG form for pushing a literal value onto the data stack." } ;
 
 HELP: begin-stack-analysis
 { $description "Initializes a set of variables related to stack analysis of Factor words." }

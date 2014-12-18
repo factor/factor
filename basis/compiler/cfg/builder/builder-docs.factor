@@ -1,6 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.builder.blocks
 compiler.cfg.stacks.local compiler.tree help.markup help.syntax literals math
-multiline sequences words ;
+multiline sequences vectors words ;
 IN: compiler.cfg.builder
 
 <<
@@ -42,7 +42,7 @@ H{
 >>
 
 HELP: procedures
-{ $var-description "Used as a temporary storage for the current cfg during construction of all cfgs." } ;
+{ $var-description "A " { $link vector } " used as temporary storage during cfg construction for all procedures being built." } ;
 
 HELP: make-input-map
 { $values { "#shuffle" #shuffle } { "assoc" assoc } }
