@@ -7,14 +7,6 @@ math math.order namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.stacks.local
 
-! Local stack analysis. We build three sets for every basic block
-! in the CFG:
-! - peek-set: all stack locations that the block reads before writing
-! - replace-set: all stack locations that the block writes
-! - kill-set: all stack locations which become unavailable after the
-!   block ends because of the stack height being decremented
-! This is done while constructing the CFG.
-
 SYMBOLS: peek-sets replace-sets kill-sets ;
 
 SYMBOL: locs>vregs

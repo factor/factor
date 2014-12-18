@@ -31,3 +31,14 @@ HELP: emit-height-changes
     "{ T{ ##inc-d { n 4 } } T{ ##inc-r { n -2 } } }"
   }
 } ;
+
+ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
+"Local stack analysis. We build three sets for every basic block in the CFG:"
+{ $list
+  "peek-set: all stack locations that the block reads before writing"
+  "replace-set: all stack locations that the block writes"
+  "kill-set: all stack locations which become unavailable after the block ends because of the stack height being decremented" }
+"This is done while constructing the CFG." ;
+
+
+ABOUT: "compiler.cfg.stacks.local"
