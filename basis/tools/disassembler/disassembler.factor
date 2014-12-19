@@ -35,7 +35,7 @@ M: pair disassemble
 
 M: word disassemble word-code 2array disassemble ;
 
-M: quotation disassemble
+M: callable disassemble
     [ dup infer define-temp ] with-compilation-unit disassemble ;
 
 cpu x86?
