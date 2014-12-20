@@ -81,8 +81,7 @@ M: gopher-link >url
     ] if >url ;
 
 : gopher-text ( object -- lines )
-    utf8 decode string-lines
-    "." over index [ head ] when* ;
+    utf8 decode string-lines { "." } split1 drop ;
 
 : gopher-gif ( object -- image )
     "gif" (image-class) load-image* ;
