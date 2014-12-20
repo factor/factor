@@ -38,19 +38,29 @@ CONSTANT: A_PLUS_IMAGE CHAR: :
 CONSTANT: A_PLUS_MOVIE CHAR: ;
 CONSTANT: A_PLUS_SOUND CHAR: <
 
-: get-binary ( selector -- binary )
-    "\r\n" append utf8 encode write flush
-    input-stream get (stream-contents-by-block) ;
+: gopher-get ( selector -- item-type byte-array )
+    "/" split1 "" or
+    [ dup length 1 > [ string>number ] [ first ] if ]
+    [
+        "?" split1 [ "\t" glue ] when*
+        "\r\n" append utf8 encode write flush
+        input-stream get (stream-contents-by-block)
+    ] bi* ;
 
-: get-gif ( selector -- image )
-    get-binary "gif" (image-class) load-image* ;
+PRIVATE>
 
-: get-text ( selector -- lines )
-    "?" split1 [ "\t" glue ] when* "\r\n" append
-    utf8 encode write flush
-    input-stream get (stream-contents-by-block)
-    utf8 decode string-lines
-    "." over index [ head ] when* ;
+ERROR: not-a-gopher-url url ;
+
+: gopher* ( url -- item-type byte-array )
+    dup url? [ >url ] unless
+    dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
+        [ host>> ]
+        [ port>> 70 or <inet> binary ]
+        [ path>> rest [ "1/" ] when-empty ]
+        [ query>> [ assoc>query url-decode "?" glue ] when* ]
+    } cleave '[ _ gopher-get ] with-client ;
+
+<PRIVATE
 
 TUPLE: gopher-link type name selector host port ;
 
@@ -70,32 +80,26 @@ M: gopher-link >url
         } cleave "gopher://%s:%s/%s%s" sprintf
     ] if >url ;
 
-: get-menu ( selector -- lines )
-    get-text [ <gopher-link> ] map ;
+: gopher-text ( object -- lines )
+    utf8 decode string-lines
+    "." over index [ head ] when* ;
 
-: get-selector ( selector -- stuff )
-    "/" split1 "" or swap
-    dup length 1 > [ string>number ] [ first ] if
-    {
-        { A_TEXT [ get-text ] }
-        { A_MENU [ get-menu ] }
-        { A_INDEX [ get-menu ] }
-        { A_GIF [ get-gif ] }
-        [ drop get-binary ]
-    } case ;
+: gopher-gif ( object -- image )
+    "gif" (image-class) load-image* ;
+
+: gopher-menu ( object -- links )
+    gopher-text [ <gopher-link> ] map ;
 
 PRIVATE>
 
-ERROR: not-a-gopher-url url ;
-
 : gopher ( url -- object )
-    dup url? [ >url ] unless
-    dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
-        [ host>> ]
-        [ port>> 70 or <inet> binary ]
-        [ path>> rest [ "1/" ] when-empty ]
-        [ query>> [ assoc>query url-decode "?" glue ] when* ]
-    } cleave '[ _ get-selector ] with-client ;
+    gopher* swap {
+        { A_TEXT [ gopher-text ] }
+        { A_MENU [ gopher-menu ] }
+        { A_INDEX [ gopher-menu ] }
+        { A_GIF [ gopher-gif ] }
+        [ drop ]
+    } case ;
 
 : gopher. ( url -- )
     gopher {
