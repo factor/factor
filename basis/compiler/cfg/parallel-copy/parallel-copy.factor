@@ -6,10 +6,6 @@ dlists fry kernel locals namespaces sequences ;
 FROM: sets => conjoin ;
 IN: compiler.cfg.parallel-copy
 
-! Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency
-! http://hal.archives-ouvertes.fr/docs/00/34/99/25/PDF/OutSSA-RR.pdf,
-! Algorithm 1
-
 <PRIVATE
 
 SYMBOLS: locs preds to-do ready ;
@@ -35,9 +31,6 @@ SYMBOLS: locs preds to-do ready ;
     a c = a preds get at and [ a ready get push-front ] when ; inline
 
 :: process-to-do ( b temp: ( src -- dst ) quot: ( dst src -- ) -- )
-    ! Note that we check if b = loc(b), not b = loc(pred(b)) as the
-    ! paper suggests. Confirmed by one of the authors at
-    ! http://www.reddit.com/comments/93253/some_lecture_notes_on_ssa_form/c0bco4f
     b locs get at b = [
         b temp call :> temp
         temp b quot call
@@ -60,7 +53,6 @@ PRIVATE>
     ] with-scope ; inline
 
 : parallel-copy ( mapping -- )
-    ! mapping is a list of { dst src } pairs
     next-vreg '[ drop _ ] [ any-rep ##copy, ] parallel-mapping ;
 
 <PRIVATE
