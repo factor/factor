@@ -51,7 +51,7 @@ PRIVATE>
 
 ERROR: not-a-gopher-url url ;
 
-: gopher* ( url -- item-type byte-array )
+: gopher ( url -- item-type byte-array )
     dup url? [ >url ] unless
     dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
         [ host>> ]
@@ -80,6 +80,16 @@ M: gopher-link >url
         } cleave "gopher://%s:%s/%s%s" sprintf
     ] if >url ;
 
+: gopher-link. ( gopher-link -- )
+    dup type>> CHAR: i = [
+        name>> print
+    ] [
+        [ name>> ] keep [
+            presented ,,
+            COLOR: blue foreground ,,
+        ] H{ } make format nl
+    ] if ;
+
 : gopher-text ( object -- lines )
     utf8 decode string-lines { "." } split1 drop ;
 
@@ -91,33 +101,11 @@ M: gopher-link >url
 
 PRIVATE>
 
-: gopher ( url -- object )
-    gopher* swap {
-        { A_TEXT [ gopher-text ] }
-        { A_MENU [ gopher-menu ] }
-        { A_INDEX [ gopher-menu ] }
-        { A_GIF [ gopher-gif ] }
-        [ drop ]
-    } case ;
-
 : gopher. ( url -- )
-    gopher {
-        { [ dup byte-array? ] [ . ] }
-        { [ dup image? ] [ image. ] }
-        [
-            [
-                dup gopher-link? [
-                    dup type>> CHAR: i = [
-                        name>> print
-                    ] [
-                        [ name>> ] keep [
-                            presented ,,
-                            COLOR: blue foreground ,,
-                        ] H{ } make format nl
-                    ] if
-                ] [
-                    print
-                ] if
-            ] each
-        ]
-    } cond ;
+    gopher swap {
+        { A_TEXT [ gopher-text [ print ] each ] }
+        { A_MENU [ gopher-menu [ gopher-link. ] each ] }
+        { A_INDEX [ gopher-menu [ gopher-link. ] each ] }
+        { A_GIF [ gopher-gif image. ] }
+        [ drop . ]
+    } case ;
