@@ -67,9 +67,7 @@ TUPLE: gopher-link type name selector host port ;
 M: gopher-link summary >url present ;
 
 : <gopher-link> ( item -- gopher-link )
-    [ "" ] [
-        unclip swap "\t" split first4 gopher-link boa
-    ] if-empty ;
+    unclip swap "\t" split first4 gopher-link boa ;
 
 M: gopher-link >url
     dup type>> CHAR: h = [
@@ -93,19 +91,24 @@ M: gopher-link >url
 : gopher-text ( object -- lines )
     utf8 decode string-lines { "." } split1 drop ;
 
-: gopher-gif ( object -- image )
-    "gif" (image-class) load-image* ;
+: gopher-text. ( object -- )
+    gopher-text [ print ] each ;
 
-: gopher-menu ( object -- links )
-    gopher-text [ <gopher-link> ] map ;
+: gopher-gif. ( object -- )
+    "gif" (image-class) load-image* image. ;
+
+: gopher-menu. ( object -- )
+    gopher-text [
+        [ nl ] [ <gopher-link> gopher-link. ] if-empty
+    ] each ;
 
 PRIVATE>
 
 : gopher. ( url -- )
     gopher swap {
-        { A_TEXT [ gopher-text [ print ] each ] }
-        { A_MENU [ gopher-menu [ gopher-link. ] each ] }
-        { A_INDEX [ gopher-menu [ gopher-link. ] each ] }
-        { A_GIF [ gopher-gif image. ] }
+        { A_TEXT [ gopher-text. ] }
+        { A_MENU [ gopher-menu. ] }
+        { A_INDEX [ gopher-menu. ] }
+        { A_GIF [ gopher-gif. ] }
         [ drop . ]
     } case ;
