@@ -130,7 +130,7 @@ M: ##copy cleanup-insn
 M: ##parallel-copy cleanup-insn
     values>>
     [ first2 leaders 2array ] map [ first2 eq? not ] filter
-    [ parallel-copy-rep ] unless-empty ;
+    [ parallel-copy-rep % ] unless-empty ;
 
 M: ##tagged>integer cleanup-insn
     dup useful-copy? [ , ] [ drop ] if ;

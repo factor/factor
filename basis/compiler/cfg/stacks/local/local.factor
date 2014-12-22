@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg
+USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.parallel-copy
 compiler.cfg.registers compiler.cfg.stacks.height kernel make
 math math.order namespaces sequences sets ;
@@ -26,21 +26,17 @@ GENERIC: translate-local-loc ( loc -- loc' )
 M: ds-loc translate-local-loc n>> current-height get d>> - <ds-loc> ;
 M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
 
-: emit-stack-changes ( -- )
-    replace-mapping get dup assoc-empty? [ drop ] [
-        [ [ loc>vreg ] dip ] assoc-map parallel-copy
-    ] if ;
+: stack-changes ( replace-mapping -- insns )
+    [ [ loc>vreg ] dip ] assoc-map parallel-copy ;
 
-: emit-height-changes ( -- )
-    current-height get
-    [ emit-d>> dup 0 = [ drop ] [ ##inc-d, ] if ]
-    [ emit-r>> dup 0 = [ drop ] [ ##inc-r, ] if ] bi ;
+: height-changes ( current-height -- insns )
+    [ emit-d>> ] [ emit-r>> ] bi 2array
+    { ##inc-d ##inc-r } [ new swap >>n ] 2map [ n>> 0 = not ] filter ;
 
 : emit-changes ( -- )
-    ! Insert height and stack changes prior to the last instruction
     building get pop
-    emit-stack-changes
-    emit-height-changes
+    replace-mapping get stack-changes %
+    current-height get height-changes %
     , ;
 
 ! inc-d/inc-r: these emit ##inc-d/##inc-r to change the stack height later
