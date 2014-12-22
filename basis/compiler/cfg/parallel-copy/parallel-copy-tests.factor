@@ -1,4 +1,4 @@
-USING: compiler.cfg.parallel-copy tools.test make arrays
+USING: compiler.cfg.parallel-copy tools.test arrays
 compiler.cfg.registers namespaces compiler.cfg.instructions
 cpu.architecture ;
 IN: compiler.cfg.parallel-copy.tests
@@ -6,8 +6,13 @@ IN: compiler.cfg.parallel-copy.tests
 SYMBOL: temp
 
 : test-parallel-copy ( mapping -- seq )
-    3 vreg-counter set-global
-    [ parallel-copy ] { } make ;
+    3 vreg-counter set-global parallel-copy ;
+
+{
+    { }
+} [
+    H{ } test-parallel-copy
+] unit-test
 
 [
     {

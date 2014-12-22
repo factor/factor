@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders cpu.architecture deques
-dlists fry kernel locals namespaces sequences ;
+dlists fry kernel locals make namespaces sequences ;
 FROM: sets => conjoin ;
 IN: compiler.cfg.parallel-copy
 
@@ -41,7 +41,6 @@ SYMBOLS: locs preds to-do ready ;
 PRIVATE>
 
 :: parallel-mapping ( mapping temp: ( src -- dst ) quot: ( dst src -- ) -- )
-    ! mapping is a list of { dst src } pairs
     [
         mapping init
         to-do get [
@@ -52,8 +51,8 @@ PRIVATE>
         ] slurp-deque
     ] with-scope ; inline
 
-: parallel-copy ( mapping -- )
-    next-vreg '[ drop _ ] [ any-rep ##copy, ] parallel-mapping ;
+: parallel-copy ( mapping -- insns )
+    [ next-vreg '[ drop _ ] [ any-rep ##copy, ] parallel-mapping ] { } make ;
 
 <PRIVATE
 
@@ -65,7 +64,8 @@ SYMBOL: temp-vregs
 
 PRIVATE>
 
-: parallel-copy-rep ( mapping -- )
-    ! mapping is a list of { dst src } pairs
-    H{ } clone temp-vregs set
-    [ rep-of temp-vreg ] [ dup rep-of ##copy, ] parallel-mapping ;
+: parallel-copy-rep ( mapping -- insns )
+    [
+        H{ } clone temp-vregs set
+        [ rep-of temp-vreg ] [ dup rep-of ##copy, ] parallel-mapping
+    ] { } make ;
