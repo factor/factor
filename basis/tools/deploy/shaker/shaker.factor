@@ -32,7 +32,7 @@ IN: tools.deploy.shaker
 ! This file is some hairy shit.
 
 : add-command-line-hook ( -- )
-    [ (command-line) command-line set-global ] "command-line"
+    [ (command-line) rest command-line set-global ] "command-line"
     startup-hooks get set-at ;
 
 : strip-startup-hooks ( -- )
