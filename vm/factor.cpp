@@ -177,7 +177,7 @@ void factor_vm::init_factor(vm_parameters* p) {
 void factor_vm::pass_args_to_factor(int argc, vm_char** argv) {
   growable_array args(this);
 
-  for (fixnum i = 1; i < argc; i++)
+  for (fixnum i = 0; i < argc; i++)
     args.add(allot_alien(false_object, (cell)argv[i]));
 
   args.trim();
