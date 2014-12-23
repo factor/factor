@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: command-line eval io io.pathnames kernel namespaces
-system vocabs.loader ;
+sequences system vocabs.loader ;
 IN: command-line.startup
 
 : cli-usage ( -- )
@@ -28,7 +28,7 @@ from within Factor for more information.
     os windows? [ script get "/?" = ] [ f ] if or ;
 
 : command-line-startup ( -- )
-    (command-line) parse-command-line
+    (command-line) rest parse-command-line
     help? [ cli-usage ] [
         load-vocab-roots
         run-user-init
