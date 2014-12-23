@@ -65,6 +65,13 @@ ERROR: can't-deploy-library-file library ;
     "-" join "." my-arch 3append
     "staging." ".image" surround cache-file ;
 
+: delete-staging-images ( -- )
+    cache-directory [
+        [ "staging." head? ] filter
+        "." my-arch ".image" 3append [ tail? ] curry filter
+        [ delete-file ] each
+    ] with-directory-files ;
+
 : staging-command-line ( profile -- flags )
     [
         [
