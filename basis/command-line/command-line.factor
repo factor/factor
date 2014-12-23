@@ -18,6 +18,7 @@ M: user-init-error error-file file>> ;
 M: user-init-error error-line line#>> ;
 M: user-init-error error-type drop +user-init-error+ ;
 
+SYMBOL: executable
 SYMBOL: script
 SYMBOL: command-line
 
@@ -76,6 +77,7 @@ SYMBOL: command-line
 : parse-command-line ( args -- )
     command-line off
     script off
+    unclip executable set
     (parse-command-line) ;
 
 SYMBOL: main-vocab-hook
