@@ -23,10 +23,17 @@ $nl
 
 HELP: (command-line)
 { $values { "args" "a sequence of strings" } }
-{ $description "Outputs the command line parameters which were passed to the Factor VM on startup." } ;
+{ $description "Outputs the raw command line parameters which were passed to the Factor VM on startup."
+$nl
+"We recommend using the " { $link executable } " and " { $link command-line } " symbols instead." } ;
 
 HELP: command-line
-{ $var-description "When Factor is run with a script, this variable contains command line parameters which follow the name of the script on the command line. In deployed applications, it contains the entire command line. In all other cases it is set to " { $link f } "." } ;
+{ $var-description "When Factor is run with a script, this variable contains the list of command line arguments which follow the name of the script on the command line. In deployed applications, it contains the full list of command line arguments. In all other cases it is set to " { $link f } "." }
+{ $see-also executable } ;
+
+HELP: executable
+{ $var-description "Provides the path to the executable binary, typically Factor.  However, in a deployed application this will be the path to the deployed binary that is being executed." }
+{ $see-also command-line } ;
 
 HELP: main-vocab-hook
 { $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;

@@ -4,7 +4,7 @@ vocabs.loader ;
 [
     boot
     do-startup-hooks
-    (command-line) rest parse-command-line
+    (command-line) parse-command-line
     "run" get run
     output-stream get [ stream-flush ] when*
     0 exit

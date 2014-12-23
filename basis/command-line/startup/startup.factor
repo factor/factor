@@ -28,7 +28,7 @@ from within Factor for more information.
     os windows? [ script get "/?" = ] [ f ] if or ;
 
 : command-line-startup ( -- )
-    (command-line) rest parse-command-line
+    (command-line) parse-command-line
     help? [ cli-usage ] [
         load-vocab-roots
         run-user-init

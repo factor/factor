@@ -71,7 +71,7 @@ SYMBOL: bootstrap-time
 
     strip-encodings
 
-    (command-line) rest parse-command-line
+    (command-line) parse-command-line
 
     ! Set dll paths
     os windows? [ "windows" require ] when
