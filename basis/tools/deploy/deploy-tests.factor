@@ -10,11 +10,7 @@ IN: tools.deploy.tests
 ! Delete all cached staging images in case syntax or
 ! other core vocabularies have changed and staging
 ! images are stale.
-cache-directory [
-    [ "staging." head? ] filter
-    my-arch ".image" append [ tail? ] curry filter
-    [ delete-file ] each
-] with-directory-files
+delete-staging-images
 
 [ "nosuchvocab" deploy ] [ no-vocab? ] must-fail-with
 
