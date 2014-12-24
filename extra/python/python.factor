@@ -115,5 +115,5 @@ ERROR: missing-type type ;
 : with-quot>py-cfunction ( alien quot -- )
     '[ <py-cfunction> @ ] with-callback ; inline
 
-[ py-initialize ] "py-initialize" add-startup-hook
-[ py-finalize ] "py-finalize" add-shutdown-hook
+[ py-initialize ] "python" add-startup-hook
+[ py-finalize ] "python" add-shutdown-hook
