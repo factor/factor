@@ -1,6 +1,6 @@
 USING: alien alien.c-types alien.enums alien.libraries
 alien.syntax classes.struct combinators kernel math
-system unix.types words ;
+system words ;
 
 IN: curl.ffi
 
