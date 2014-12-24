@@ -148,3 +148,12 @@ IN: math.extras.test
 
 { 36100 } [ 20 iota sum-cubes ] unit-test
 { 36100 } [ 20 iota >array sum-cubes ] unit-test
+
+{
+    {
+        1 -1 -1 0 -1 1 -1 0 0 1 -1 0 -1 1 1
+        0 -1 0 -1 0 1 1 -1 0 0 1 0 0 -1 -1
+    }
+} [
+    30 [1,b] [ mobius ] map
+] unit-test
