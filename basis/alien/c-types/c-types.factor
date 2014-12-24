@@ -62,7 +62,6 @@ M: word lookup-c-type
     dup "c-type" word-prop resolve-typedef
     [ ] [ no-c-type ] ?if ;
 
-
 GENERIC: c-type-class ( name -- class )
 
 M: abstract-c-type c-type-class class>> ;
@@ -139,7 +138,7 @@ MACRO: set-alien-value ( c-type -- quot: ( value c-ptr offset -- ) )
 : set-alien-element ( value n c-ptr c-type -- )
     array-accessor set-alien-value ; inline
 
-PROTOCOL: c-type-protocol 
+PROTOCOL: c-type-protocol
     c-type-class
     c-type-boxed-class
     c-type-boxer-quot
@@ -176,7 +175,8 @@ TUPLE: long-long-type < c-type ;
 
 SYMBOLS:
     ptrdiff_t intptr_t uintptr_t size_t
-    c-string ;
+    c-string int8_t uint8_t int16_t uint16_t
+    int32_t uint32_t int64_t uint64_t ;
 
 CONSTANT: primitive-types
     {
@@ -332,7 +332,7 @@ M: pointer lookup-c-type
             "to_signed_4" >>unboxer
             [ >fixnum ] >>unboxer-quot
         \ int typedef
-    
+
         ! 64bit-vm uint
         <c-type>
             fixnum >>class
@@ -404,7 +404,7 @@ M: pointer lookup-c-type
             "to_fixnum" >>unboxer
             [ >integer ] >>unboxer-quot
         \ int typedef
-    
+
         ! 32bit-vm uint
         <c-type>
             integer >>class
@@ -461,6 +461,16 @@ M: pointer lookup-c-type
         [ c-bool> ] >>boxer-quot
         object >>boxed-class
     \ bool typedef
+
+    \ char lookup-c-type int8_t typedef
+    \ short lookup-c-type int16_t typedef
+    \ int lookup-c-type int32_t typedef
+    \ longlong lookup-c-type int64_t typedef
+
+    \ uchar lookup-c-type uint8_t typedef
+    \ ushort lookup-c-type uint16_t typedef
+    \ uint lookup-c-type uint32_t typedef
+    \ ulonglong lookup-c-type uint64_t typedef
 
 ] with-compilation-unit
 
