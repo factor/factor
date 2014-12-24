@@ -43,8 +43,7 @@ CONSTANT: A_PLUS_SOUND CHAR: <
     [ dup length 1 > [ string>number ] [ first ] if ]
     [
         "?" split1 [ "\t" glue ] when*
-        "\r\n" append utf8 encode write flush
-        input-stream get (stream-contents-by-block)
+        "\r\n" append utf8 encode write flush contents
     ] bi* ;
 
 PRIVATE>
