@@ -1,5 +1,5 @@
-USING: alien.c-types arrays accessors combinators classes.struct
-alien.syntax unix.time unix.types unix.ffi ;
+USING: alien.c-types alien.syntax classes.struct unix.time
+unix.types ;
 IN: unix.stat
 
 ! Mac OS X

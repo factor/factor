@@ -1,8 +1,7 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries
-alien.libraries.finder alien.syntax classes.struct kernel
-unix.types ;
+alien.libraries.finder alien.syntax classes.struct kernel ;
 IN: forestdb.ffi
 
 ! Functions with LIBFDB_API are exported.

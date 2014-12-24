@@ -1,7 +1,5 @@
-USING: kernel alien.c-types alien.data alien.strings sequences
-math alien.syntax unix namespaces continuations threads assocs
-io.backend.unix io.encodings.utf8 libc unix.types unix.utilities
-fry unix.ffi ;
+USING: alien.c-types alien.data alien.syntax io.encodings.utf8
+kernel libc math sequences unix unix.types unix.utilities ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used
@@ -28,13 +26,13 @@ FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp ) ;
     [ utf8 strings>alien ] tri* execve ;
 
 : exec-args ( seq -- int )
-    [ first ] [ ] bi exec ;
+    [ first ] keep exec ;
 
 : exec-args-with-path ( seq -- int )
-    [ first ] [ ] bi exec-with-path ;
+    [ first ] keep exec-with-path ;
 
 : exec-args-with-env  ( seq seq -- int )
-    [ [ first ] [ ] bi ] dip exec-with-env ;
+    [ [ first ] keep ] dip exec-with-env ;
 
 : with-fork ( child parent -- )
     [ fork-process ] 2dip if-zero ; inline

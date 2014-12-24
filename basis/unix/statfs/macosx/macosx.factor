@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.encodings.utf8 io.encodings.string
-kernel sequences unix.stat accessors unix combinators math
-grouping system alien.strings math.bitwise alien.syntax
-unix.types classes.struct unix.ffi literals ;
+USING: alien.c-types alien.syntax classes.struct literals
+unix.ffi unix.types ;
 IN: unix.statfs.macosx
 
 CONSTANT: MNT_RDONLY  0x00000001
