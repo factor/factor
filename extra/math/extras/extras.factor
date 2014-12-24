@@ -4,10 +4,10 @@
 USING: accessors arrays assocs assocs.extras byte-arrays
 combinators combinators.short-circuit compression.zlib fry
 grouping kernel locals math math.combinatorics math.constants
-math.functions math.order math.primes math.ranges
-math.ranges.private math.statistics math.vectors memoize parser
-random sequences sequences.extras sequences.private sets sorting
-sorting.extras ;
+math.functions math.order math.primes math.primes.factors
+math.ranges math.ranges.private math.statistics math.vectors
+memoize parser random sequences sequences.extras
+sequences.private sets sorting sorting.extras ;
 
 IN: math.extras
 
@@ -316,3 +316,9 @@ M: iota-tuple sum-squares
 GENERIC: sum-cubes ( seq -- n )
 M: object sum-cubes [ 3 ^ ] map-sum ;
 M: iota-tuple sum-cubes sum sq ;
+
+: mobius ( n -- x )
+    group-factors values [ 1 ] [
+        dup [ 1 > ] any?
+        [ drop 0 ] [ length even? 1 -1 ? ] if
+    ] if-empty ;
