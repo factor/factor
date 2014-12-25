@@ -53,7 +53,6 @@ M: string stream-json-print
             { CHAR: \f [ "\\f" over stream-write ] }
             { CHAR: \n [ "\\n" over stream-write ] }
             { CHAR: \r [ "\\r" over stream-write ] }
-            { CHAR: \s [ "\\s" over stream-write ] }
             { CHAR: \t [ "\\t" over stream-write ] }
             { 0x2028   [ "\\u2028" over stream-write ] }
             { 0x2029   [ "\\u2029" over stream-write ] }
