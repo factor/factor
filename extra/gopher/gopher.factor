@@ -1,12 +1,13 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors byte-arrays colors.constants combinators
-formatting fry images images.loader images.loader.private
-images.viewer io io.encodings.binary io.encodings.string
-io.encodings.utf8 io.sockets io.styles kernel make math
-math.parser namespaces present prettyprint sequences splitting
-summary urls urls.encoding vocabs ;
+USING: accessors byte-arrays calendar colors.constants
+combinators formatting fry images images.loader
+images.loader.private images.viewer io io.encodings.binary
+io.encodings.string io.encodings.utf8 io.sockets io.styles
+io.timeouts kernel make math math.parser namespaces present
+prettyprint sequences splitting summary urls urls.encoding
+vocabs ;
 
 IN: gopher
 
@@ -57,7 +58,10 @@ ERROR: not-a-gopher-url url ;
         [ port>> 70 or <inet> binary ]
         [ path>> rest [ "1/" ] when-empty ]
         [ query>> [ assoc>query url-decode "?" glue ] when* ]
-    } cleave '[ _ gopher-get ] with-client ;
+    } cleave '[
+        1 minutes input-stream get set-timeout
+        _ gopher-get
+    ] with-client ;
 
 <PRIVATE
 
