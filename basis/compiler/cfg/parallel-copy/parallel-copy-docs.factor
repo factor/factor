@@ -9,6 +9,10 @@ HELP: parallel-copy
 { $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } }
 { $description "Creates " { $link ##copy } " instructions." } ;
 
+HELP: parallel-copy-rep
+{ $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } }
+{ $description "Creates " { $link ##copy } " instructions." } ;
+
 ARTICLE: "compiler.cfg.parallel-copy" "Parallel copy"
 "Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency http://hal.archives-ouvertes.fr/docs/00/34/99/25/PDF/OutSSA-RR.pdf, Algorithm 1" ;
 

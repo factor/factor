@@ -80,3 +80,9 @@ HELP: trivial-branch?
 HELP: build-cfg
 { $values { "nodes" sequence } { "word" word } { "procedures" sequence } }
 { $description "Builds one or more cfgs from the given word." } ;
+
+ARTICLE: "compiler.cfg.builder"
+"Final stage of compilation generates machine code from dataflow IR"
+"Convert tree SSA IR to CFG IR. The result is not in SSA form; this is constructed later by calling compiler.cfg.ssa.construction:construct-ssa." ;
+
+ABOUT: "compiler.cfg.builder"
