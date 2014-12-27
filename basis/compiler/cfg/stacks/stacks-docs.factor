@@ -14,6 +14,10 @@ HELP: adjust-d
 { $values { "n" number } }
 { $description "Changes the height of the current data stack." } ;
 
+HELP: ds-store
+{ $values { "vreg" "a " { $link sequence } " of vregs." } }
+{ $description "Registers that a sequence of vregs are stored at at each corresponding index of the data stack." } ;
+
 HELP: rs-store
 { $values { "vregs" "a " { $link sequence } " of vregs." } }
 { $description "Stores one or more virtual register values on the retain stack. This modifies the " { $link current-height } " dynamic variable." } ;

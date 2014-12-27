@@ -1,13 +1,12 @@
-USING: tools.test kernel sequences words sequences.private fry
-prettyprint alien alien.accessors math.private
-compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.debugger
-compiler.cfg.optimizer compiler.cfg.rpo
-compiler.cfg.predecessors compiler.cfg.checker compiler.cfg
-arrays locals byte-arrays kernel.private math slots.private
-vectors sbufs strings math.partial-dispatch hashtables assocs
-combinators.short-circuit strings.private accessors
-compiler.cfg.instructions compiler.cfg.representations ;
+USING: accessors alien alien.accessors arrays assocs byte-arrays
+combinators.short-circuit compiler.cfg compiler.cfg.builder compiler.cfg.checker
+compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
+compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.rpo
+compiler.cfg.stacks.local compiler.tree compiler.tree.builder
+compiler.tree.optimizer compiler.cfg.representations fry hashtables kernel
+kernel.private locals make math math.partial-dispatch math.private namespaces
+prettyprint sbufs sequences sequences.private slots.private strings
+strings.private  tools.test vectors words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
@@ -144,7 +143,7 @@ IN: compiler.cfg.builder.tests
         { class } word '[ _ declare 10 _ execute ] unit-test-builder
         { class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each
-    
+
     {
         set-alien-signed-1
         set-alien-signed-2
@@ -156,13 +155,13 @@ IN: compiler.cfg.builder.tests
         { fixnum class } word '[ _ declare 10 _ execute ] unit-test-builder
         { fixnum class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each
-    
+
     { float class } \ set-alien-float '[ _ declare 10 _ execute ] unit-test-builder
     { float class fixnum } \ set-alien-float '[ _ declare _ execute ] unit-test-builder
-    
+
     { float class } \ set-alien-double '[ _ declare 10 _ execute ] unit-test-builder
     { float class fixnum } \ set-alien-double '[ _ declare _ execute ] unit-test-builder
-    
+
     { pinned-c-ptr class } \ set-alien-cell '[ _ declare 10 _ execute ] unit-test-builder
     { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-builder
 ] each
@@ -221,7 +220,7 @@ IN: compiler.cfg.builder.tests
         [ [ ##box-alien? ] contains-insn? ]
         [ [ ##allot? ] contains-insn? ] bi
     ] unit-test
-    
+
     [ 1 ] [ [ dup float+ ] [ ##load-memory-imm? ] count-insns ] unit-test
 ] when
 
@@ -235,4 +234,45 @@ IN: compiler.cfg.builder.tests
 [ f ] [
     [ tag 1 swap fixnum-shift-fast ]
     [ ##compare-integer-imm-branch? ] contains-insn?
+] unit-test
+
+! make-input-map
+{
+    H{
+        { 81 T{ ds-loc { n 1 } } }
+        { 37 T{ ds-loc { n 2 } } }
+        { 92 T{ ds-loc } }
+    }
+} [
+    T{ #shuffle { in-d { 37 81 92 } } } make-input-map
+] unit-test
+
+! emit-node
+{
+    { T{ ##load-integer { dst 78 } { val 0 } } }
+} [
+    77 vreg-counter set-global
+    current-height new current-height set
+    H{ } clone replace-mapping set
+    [
+        T{ #push { literal 0 } { out-d { 8537399 } } } emit-node
+    ] { } make
+] unit-test
+
+{
+    T{ current-height { d 1 } { emit-d 1 } }
+    H{ { D -1 4 } { D 0 4 } }
+} [
+    0 vreg-counter set-global
+    current-height new current-height set
+    H{ } clone replace-mapping set
+    4 D 0 replace-loc
+    T{ #shuffle
+       { mapping { { 2 4 } { 3 4 } } }
+       { in-d V{ 4 } }
+       { out-d V{ 2 3 } }
+    } emit-node
+
+    current-height get
+    replace-mapping get
 ] unit-test
