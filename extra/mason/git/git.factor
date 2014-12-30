@@ -55,7 +55,7 @@ IN: mason.git
     ] [ rethrow ] if ;
 
 : with-process-reader* ( desc encoding quot -- )
-    [ <process-reader*> ] dip swap [ with-input-stream ] dip
+    [ (process-reader) ] dip swap [ with-input-stream ] dip
     dup wait-for-process dup { 0 1 } member?
     [ 2drop ] [ process-failed ] if ; inline
 
