@@ -224,7 +224,7 @@ HELP: with-process-reader
   { "encoding" "an encoding descriptor" }
   { "quot" quotation }
 }
-{ $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." }
+{ $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " rebound to this pipe." }
 { $examples
   { $unchecked-example
     "USING: io.launcher prettyprint ;"
@@ -239,7 +239,7 @@ HELP: with-process-writer
   { "encoding" "an encoding descriptor" }
   { "quot" quotation }
 }
-{ $description "Launches a process and redirects its input via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." } ;
+{ $description "Launches a process and redirects its input via a pipe. The quotation is called with " { $link output-stream } " rebound to this pipe." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" object } }
