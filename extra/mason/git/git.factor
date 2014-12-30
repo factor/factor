@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit continuations
 debugger io io.directories io.directories.hierarchy
-io.encodings.utf8 io.files io.launcher io.launcher.private
-io.sockets io.streams.string kernel mason.common mason.email
-sequences splitting ;
+io.encodings.utf8 io.files io.launcher io.sockets
+io.streams.string kernel mason.common mason.email sequences
+splitting ;
 IN: mason.git
 
 : git-id ( -- id )
@@ -54,11 +54,6 @@ IN: mason.git
         if
     ] [ rethrow ] if ;
 
-: with-process-reader* ( desc encoding quot -- )
-    [ (process-reader) ] dip swap [ with-input-stream ] dip
-    dup wait-for-process dup { 0 1 } member?
-    [ 2drop ] [ process-failed ] if ; inline
-
 : git-status-cmd ( -- cmd )
     { "git" "status" } ;
 
@@ -70,6 +65,7 @@ IN: mason.git
 : git-status ( -- seq )
     [
         git-status-cmd utf8 [ lines ] with-process-reader*
+        { 0 1 } member? [ 2drop ] [ process-failed ] if
         [ "#\t" head? ] filter
     ] [ git-status-failed { } ] recover ;
 

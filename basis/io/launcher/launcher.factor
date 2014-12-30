@@ -157,8 +157,11 @@ M: process-failed error.
         "Launch descriptor:" print nl
     ] [ process>> . ] bi ;
 
+: check-success ( process status -- )
+    0 = [ drop ] [ process-failed ] if ;
+
 : wait-for-success ( process -- )
-    dup wait-for-process 0 = [ drop ] [ process-failed ] if ;
+    dup wait-for-process check-success ;
 
 : try-process ( desc -- )
     run-process wait-for-success ;
@@ -210,10 +213,12 @@ PRIVATE>
 : <process-reader> ( desc encoding -- stream )
     (process-reader) drop ; inline
 
-: with-process-reader ( desc encoding quot -- )
-    [ (process-reader) ] dip
-    '[ _ with-input-stream ] dip
-    wait-for-success ; inline
+: with-process-reader* ( ... desc encoding quot: ( ... -- ... ) -- ... process status )
+    [ (process-reader) ] dip '[ _ with-input-stream ] dip
+    dup wait-for-process ; inline
+
+: with-process-reader ( ... desc encoding quot: ( ... -- ... ) -- ... )
+    with-process-reader* check-success ; inline
 
 <PRIVATE
 
@@ -234,10 +239,12 @@ PRIVATE>
 : <process-writer> ( desc encoding -- stream )
     (process-writer) drop ; inline
 
-: with-process-writer ( desc encoding quot -- )
-    [ (process-writer) ] dip
-    '[ _ with-output-stream ] dip
-    wait-for-success ; inline
+: with-process-writer* ( ... desc encoding quot: ( ... -- ... ) -- ... process status )
+    [ (process-writer) ] dip '[ _ with-output-stream ] dip
+    dup wait-for-process ; inline
+
+: with-process-writer ( ... desc encoding quot: ( ... -- ... ) -- ... )
+    with-process-writer* check-success ; inline
 
 <PRIVATE
 
@@ -263,10 +270,12 @@ PRIVATE>
 : <process-stream> ( desc encoding -- stream )
     (process-stream) drop ; inline
 
-: with-process-stream ( desc encoding quot -- )
-    [ (process-stream) ] dip
-    '[ _ with-stream ] dip
-    wait-for-success ; inline
+: with-process-stream* ( ... desc encoding quot: ( ... -- ... ) -- ... process status )
+    [ (process-stream) ] dip '[ _ with-stream ] dip
+    dup wait-for-process ; inline
+
+: with-process-stream ( ... desc encoding quot: ( ... -- ... ) -- ... )
+    with-process-stream* check-success ; inline
 
 ERROR: output-process-error { output string } { process process } ;
 
