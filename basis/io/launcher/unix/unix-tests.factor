@@ -161,7 +161,7 @@ IN: io.launcher.unix.tests
             [ p fulfill ] [ wait-for-process s fulfill ] bi
         ] in-thread
 
-        p 1 seconds ?promise-timeout kill-process*
+        p 1 seconds ?promise-timeout (kill-process)
         s 3 seconds ?promise-timeout 0 =
     ]
 ] unit-test
@@ -173,7 +173,7 @@ IN: io.launcher.unix.tests
     "SIGPIPE" signal-names index 1 +
     kill io-error ;
 
-[ ] [ current-process-handle send-sigpipe ] unit-test
+[ ] [ (current-process) send-sigpipe ] unit-test
 
 ! Spawn a process
 [ T{ signal f 13 } ] [

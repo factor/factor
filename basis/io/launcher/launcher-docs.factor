@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar help.markup help.syntax io io.files kernel literals math
-quotations sequences ;
+USING: assocs calendar help.markup help.syntax io io.files
+io.launcher.private kernel literals quotations sequences ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"
@@ -93,21 +93,21 @@ ARTICLE: "io.launcher.timeouts" "Process run-time timeouts"
 "The " { $snippet "timeout" } " slot of a " { $link process } " can be set to a " { $link duration } " specifying a maximum running time for the process. If " { $link wait-for-process } " is called and the process does not exit before the duration expires, it will be killed." ;
 
 HELP: get-environment
-{ $values { "process" process } { "env" "an association" } }
+{ $values { "process" process } { "env" assoc } }
 { $description "Combines the current environment with the value of the " { $snippet "environment" } " slot of the " { $link process } " using the " { $snippet "environment-mode" } " slot." } ;
 
-HELP: current-process-handle
+HELP: (current-process)
 { $values { "handle" "a process handle" } }
 { $description "Returns the handle of the current process." }
 { $examples
   { $example
     "USING: io.launcher math prettyprint ;"
-    "current-process-handle number? ."
+    "(current-process) number? ."
     "t"
   }
 } ;
 
-HELP: run-process*
+HELP: (run-process)
 { $values { "process" process } { "handle" "a process handle" } }
 { $contract "Launches a process." }
 { $notes "User code should call " { $link run-process } " instead." } ;
@@ -176,7 +176,7 @@ HELP: kill-process
   }
 } ;
 
-HELP: kill-process*
+HELP: (kill-process)
 { $values { "process" "process" } }
 { $contract "Kills a running process." }
 { $notes "User code should call " { $link kill-process } " instead." } ;

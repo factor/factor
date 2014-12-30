@@ -4,11 +4,12 @@ USING: accessors alien alien.c-types alien.data arrays assocs
 classes classes.struct combinators concurrency.flags
 continuations debugger destructors init io io.backend
 io.backend.windows io.files io.files.private io.files.windows
-io.launcher io.pathnames io.pipes io.pipes.windows io.ports
-kernel libc locals make math namespaces prettyprint sequences
-specialized-arrays splitting splitting.monotonic
-strings system threads windows windows.errors windows.handles
-windows.kernel32 windows.types combinators.short-circuit ;
+io.launcher io.launcher.private io.pathnames io.pipes
+io.pipes.windows io.ports kernel libc locals make math
+namespaces prettyprint sequences specialized-arrays splitting
+splitting.monotonic strings system threads windows
+windows.errors windows.handles windows.kernel32 windows.types
+combinators.short-circuit ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
@@ -132,7 +133,7 @@ TUPLE: CreateProcess-args
     fill-startup-info
     nip ;
 
-M: windows current-process-handle ( -- handle )
+M: windows (current-process) ( -- handle )
     GetCurrentProcessId ;
 
 ERROR: launch-error process error ;
@@ -143,7 +144,7 @@ M: launch-error error.
     "Launch descriptor:" print nl
     process>> . ;
 
-M: windows kill-process* ( process -- )
+M: windows (kill-process) ( process -- )
     handle>> hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
@@ -162,7 +163,7 @@ M: windows kill-process* ( process -- )
     over handle>> dispose-process
     notify-exit ;
 
-M: windows wait-for-processes ( -- ? )
+M: windows (wait-for-processes) ( -- ? )
     processes get keys dup
     [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
@@ -264,14 +265,14 @@ M: windows wait-for-processes ( -- ? )
     OPEN_EXISTING
     redirect
     STD_INPUT_HANDLE GetStdHandle or ;
-    
+
 : fill-redirection ( process args -- )
     dup lpStartupInfo>>
     [ [ redirect-stdout ] dip hStdOutput<< ]
     [ [ redirect-stderr ] dip hStdError<< ]
     [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;
 
-M: windows run-process* ( process -- handle )
+M: windows (run-process) ( process -- handle )
     [
         [
             dup make-CreateProcess-args
@@ -280,4 +281,4 @@ M: windows run-process* ( process -- handle )
             dup call-CreateProcess
             lpProcessInformation>>
         ] with-destructors
-    ] [ launch-error ] recover ;    
+    ] [ launch-error ] recover ;
