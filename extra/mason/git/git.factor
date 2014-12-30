@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit continuations
 debugger io io.directories io.directories.hierarchy
-io.encodings.utf8 io.files io.launcher io.sockets
-io.streams.string kernel mason.common mason.email sequences
-splitting ;
+io.encodings.utf8 io.files io.launcher io.launcher.private
+io.sockets io.streams.string kernel mason.common mason.email
+sequences splitting ;
 IN: mason.git
 
 : git-id ( -- id )
