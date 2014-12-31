@@ -5,12 +5,8 @@ compiler.cfg.builder.blocks compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
-cpu.architecture fry kernel make math namespaces sequences words
-;
+cpu.architecture fry kernel make math namespaces sequences words ;
 IN: compiler.cfg.builder
-
-! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is
-! constructed later by calling compiler.cfg.ssa.construction:construct-ssa.
 
 SYMBOL: procedures
 SYMBOL: loops
@@ -51,6 +47,7 @@ GENERIC: emit-node ( node -- )
 
 : (build-cfg) ( nodes word label -- )
     [
+
         begin-word
         emit-nodes
     ] with-cfg-builder ;
@@ -164,8 +161,9 @@ M: #push emit-node
 ! we try not to introduce useless ##peeks here, since this reduces
 ! the accuracy of global stack analysis.
 
+
+
 : make-input-map ( #shuffle -- assoc )
-    ! Assoc maps high-level IR values to stack locations.
     [
         [ in-d>> <reversed> [ <ds-loc> swap ,, ] each-index ]
         [ in-r>> <reversed> [ <rs-loc> swap ,, ] each-index ] bi
