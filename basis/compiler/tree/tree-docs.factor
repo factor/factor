@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax kernel sequences stack-checker.alien
-stack-checker.visitor words ;
+USING: assocs help.markup help.syntax kernel quotations sequences
+stack-checker.alien stack-checker.visitor words ;
 IN: compiler.tree
 
 HELP: node
@@ -29,7 +29,7 @@ HELP: #introduce
 
 HELP: #push
 { $class-description "SSA tree node that puts a literal value on the stack." }
-{ $notes "A quotation is also a literal." } ;
+{ $notes "A " { $link quotation } " is also a literal." } ;
 
 HELP: #shuffle
 { $class-description "SSA tree node that represents a stack shuffling operation such as " { $link swap } ". It has the following slots:"

@@ -51,7 +51,7 @@ HELP: height-changes
 } ;
 
 HELP: emit-changes
-{ $description "! Insert height and stack changes prior to the last instruction." } ;
+{ $description "Insert height and stack changes prior to the last instruction." } ;
 
 HELP: inc-d
 { $values { "n" number } }

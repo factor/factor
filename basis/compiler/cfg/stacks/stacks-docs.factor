@@ -10,9 +10,15 @@ HELP: begin-stack-analysis
 { $description "Initializes a set of variables related to stack analysis of Factor words." }
 { $see-also current-height } ;
 
+HELP: end-stack-analysis
+{ $description "Ends the stack analysis of the current cfg." } ;
+
 HELP: adjust-d
 { $values { "n" number } }
 { $description "Changes the height of the current data stack." } ;
+
+HELP: ds-drop
+{ $description "Used to signal to the stack analysis that the datastacks height is decreased by one." } ;
 
 HELP: ds-store
 { $values { "vreg" "a " { $link sequence } " of vregs." } }

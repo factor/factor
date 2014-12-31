@@ -4,7 +4,6 @@ USING: accessors assocs compiler.cfg.registers fry kernel math
 namespaces ;
 IN: compiler.cfg.stacks.height
 
-! Global stack height tracking done while constructing CFG.
 SYMBOLS: ds-heights rs-heights ;
 
 : record-stack-heights ( ds-height rs-height bb -- )
