@@ -1,6 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.builder.blocks
 compiler.cfg.stacks.local compiler.tree help.markup help.syntax literals math
-multiline sequences words ;
+multiline sequences vectors words ;
 IN: compiler.cfg.builder
 
 <<
@@ -42,7 +42,7 @@ H{
 >>
 
 HELP: procedures
-{ $var-description "Used as a temporary storage for the current cfg during construction of all cfgs." } ;
+{ $var-description "A " { $link vector } " used as temporary storage during cfg construction for all procedures being built." } ;
 
 HELP: make-input-map
 { $values { "#shuffle" #shuffle } { "assoc" assoc } }
@@ -80,3 +80,9 @@ HELP: trivial-branch?
 HELP: build-cfg
 { $values { "nodes" sequence } { "word" word } { "procedures" sequence } }
 { $description "Builds one or more cfgs from the given word." } ;
+
+ARTICLE: "compiler.cfg.builder"
+"Final stage of compilation generates machine code from dataflow IR"
+"Convert tree SSA IR to CFG IR. The result is not in SSA form; this is constructed later by calling compiler.cfg.ssa.construction:construct-ssa." ;
+
+ABOUT: "compiler.cfg.builder"

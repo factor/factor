@@ -1,13 +1,28 @@
-USING: compiler.cfg.stacks.local help.markup help.syntax math sequences ;
+USING: compiler.cfg.stacks.local compiler.tree help.markup help.syntax math
+sequences ;
 IN: compiler.cfg.stacks
+
+HELP: ds-push
+{ $values { "vreg" "a virtual register" } }
+{ $description "Used when translating the " { $link #push } " SSA node to CFG form for pushing a literal value onto the data stack." } ;
 
 HELP: begin-stack-analysis
 { $description "Initializes a set of variables related to stack analysis of Factor words." }
 { $see-also current-height } ;
 
+HELP: end-stack-analysis
+{ $description "Ends the stack analysis of the current cfg." } ;
+
 HELP: adjust-d
 { $values { "n" number } }
 { $description "Changes the height of the current data stack." } ;
+
+HELP: ds-drop
+{ $description "Used to signal to the stack analysis that the datastacks height is decreased by one." } ;
+
+HELP: ds-store
+{ $values { "vreg" "a " { $link sequence } " of vregs." } }
+{ $description "Registers that a sequence of vregs are stored at at each corresponding index of the data stack." } ;
 
 HELP: rs-store
 { $values { "vregs" "a " { $link sequence } " of vregs." } }
