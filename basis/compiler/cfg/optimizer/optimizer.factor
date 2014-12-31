@@ -6,7 +6,6 @@ compiler.cfg.block-joining
 compiler.cfg.branch-splitting
 compiler.cfg.copy-prop
 compiler.cfg.dce
-compiler.cfg.height
 compiler.cfg.ssa.construction
 compiler.cfg.tco
 compiler.cfg.useless-conditionals
@@ -21,7 +20,6 @@ IN: compiler.cfg.optimizer
         delete-useless-conditionals
         split-branches
         join-blocks
-        normalize-height
         construct-ssa
         alias-analysis
         value-numbering
