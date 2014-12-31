@@ -46,13 +46,3 @@ M: dead-analysis transfer-set
     drop
     [ kill-set assoc-union ]
     [ replace-set assoc-union ] bi ;
-
-! Main word
-: compute-global-sets ( cfg -- )
-    {
-        [ compute-anticip-sets ]
-        [ compute-live-sets ]
-        [ compute-pending-sets ]
-        [ compute-dead-sets ]
-        [ compute-avail-sets ]
-    } cleave ;

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors biassocs compiler.cfg compiler.cfg.registers
 compiler.cfg.stacks.finalize compiler.cfg.stacks.global
-compiler.cfg.stacks.height compiler.cfg.stacks.local kernel math
-namespaces sequences ;
+compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.utilities
+kernel math namespaces sequences ;
 IN: compiler.cfg.stacks
 
 : begin-stack-analysis ( -- )
@@ -17,8 +17,14 @@ IN: compiler.cfg.stacks
 
 : end-stack-analysis ( -- )
     cfg get
-    [ compute-global-sets ]
-    [ finalize-stack-shuffling ] bi ;
+    {
+        compute-anticip-sets
+        compute-live-sets
+        compute-pending-sets
+        compute-dead-sets
+        compute-avail-sets
+        finalize-stack-shuffling
+    } apply-passes ;
 
 : ds-drop ( -- ) -1 inc-d ;
 
