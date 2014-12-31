@@ -65,7 +65,7 @@ IN: mason.git
 : git-status ( -- seq )
     [
         git-status-cmd utf8 [ lines ] with-process-reader*
-        { 0 1 } member? [ 2drop ] [ process-failed ] if
+        { 0 1 } member? [ drop ] [ process-failed ] if
         [ "#\t" head? ] filter
     ] [ git-status-failed { } ] recover ;
 
