@@ -4,12 +4,12 @@ compiler.cfg.stacks.map kernel math sequences ;
 IN: compiler.cfg.stacks.clearing
 
 : state>replaces ( state -- replaces )
-    state>vacancies first2
+    [ stack>vacant ] map first2
     [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi* append
     [ 17 swap f ##replace-imm boa ] map ;
 
 : dangerous-insn? ( state insn -- ? )
-    { [ nip ##peek? ] [ dangerous-peek? ] } 2&& ;
+    { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ;
 
 : clearing-replaces ( assoc insn -- insns' )
     [ of ] keep 2dup dangerous-insn? [

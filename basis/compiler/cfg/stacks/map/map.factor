@@ -1,4 +1,4 @@
-USING: accessors arrays assocs compiler.cfg.dataflow-analysis
+USING: accessors arrays assocs combinators compiler.cfg.dataflow-analysis
 compiler.cfg.instructions compiler.cfg.registers fry kernel math math.order
 namespaces sequences ;
 QUALIFIED: sets
@@ -14,6 +14,9 @@ IN: compiler.cfg.stacks.map
 : stack>vacant ( stack -- seq )
     first2 [ 0 max iota ] dip sets:diff ;
 
+: classify-read ( stack n -- val )
+    swap 2dup second member? [ 2drop 0 ] [ first >= [ 1 ] [ 2 ] if ] if ;
+
 CONSTANT: initial-state { { 0 { } } { 0 { } } }
 
 : insn>location ( insn -- n ds? )
@@ -23,11 +26,8 @@ CONSTANT: initial-state { { 0 { } } { 0 { } } }
     [ first2 ] dip insn>location
     [ rot register-write swap ] [ swap register-write ] if 2array ;
 
-: state>vacancies ( state -- vacants )
-    [ stack>vacant ] map ;
-
 : fill-vacancies ( state -- state' )
-    dup state>vacancies [ [ first2 ] dip append 2array ] 2map ;
+    [ [ first2 ] [ stack>vacant ] bi append 2array ] map ;
 
 GENERIC: visit-insn ( state insn -- state' )
 
@@ -45,11 +45,14 @@ M: ##call visit-insn ( state insn -- state' )
     ! to contain valid pointers anymore.
     drop [ first2 [ 0 >= ] filter 2array ] map ;
 
-: dangerous-peek? ( state peek -- ? )
-    loc>> [ ds-loc? 0 1 ? swap nth first ] keep n>> <= ;
+ERROR: vacant-peek insn ;
+
+: underflowable-peek? ( state peek -- ? )
+    2dup insn>location swap [ 0 1 ? swap nth ] dip classify-read
+    dup 2 = [ drop vacant-peek ] [ 2nip 1 = ] if ;
 
 M: ##peek visit-insn ( state insn -- state' )
-    2dup dangerous-peek? [ [ fill-vacancies ] dip ] when mark-location ;
+    2dup underflowable-peek? [ [ fill-vacancies ] dip ] when mark-location ;
 
 M: insn visit-insn ( state insn -- state' )
     drop ;
