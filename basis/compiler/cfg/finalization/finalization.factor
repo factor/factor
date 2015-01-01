@@ -3,7 +3,8 @@
 USING: compiler.cfg.build-stack-frame compiler.cfg.gc-checks
 compiler.cfg.linear-scan compiler.cfg.representations
 compiler.cfg.save-contexts compiler.cfg.ssa.destruction
-compiler.cfg.stacks.vacant compiler.cfg.utilities compiler.cfg.write-barrier ;
+compiler.cfg.stacks.clearing compiler.cfg.stacks.vacant compiler.cfg.utilities
+compiler.cfg.write-barrier ;
 IN: compiler.cfg.finalization
 
 : finalize-cfg ( cfg -- )
@@ -11,7 +12,8 @@ IN: compiler.cfg.finalization
         select-representations
         insert-gc-checks
         eliminate-write-barriers
-        compute-vacant-sets
+        clear-uninitialized
+        fill-gc-maps
         insert-save-contexts
         destruct-ssa
         linear-scan
