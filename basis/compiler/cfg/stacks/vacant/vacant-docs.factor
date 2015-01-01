@@ -12,8 +12,8 @@ ARTICLE: "compiler.cfg.stacks.vacant" "Uninitialized/overinitialized stack locat
 }
 "The GC check runs before stack locations 0 and 1 have been initialized, and so the GC needs to scrub them so that they don't get traced. This is achieved by computing uninitialized locations with a dataflow analysis, and recording the information in GC maps. The call_frame_slot_visitor object in vm/slot_visitor.hpp reads this information from GC maps and performs the scrubbing." ;
 
-HELP: initial-state
-{ $description "Initially the stack bottom is at 0 for both the data and retain stacks and no replaces have been registered." } ;
+! HELP: initial-state
+! { $description "Initially the stack bottom is at 0 for both the data and retain stacks and no replaces have been registered." } ;
 
 HELP: vacant>bits
 { $values
