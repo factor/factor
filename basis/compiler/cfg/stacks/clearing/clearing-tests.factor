@@ -6,9 +6,10 @@ IN: compiler.cfg.stacks.clearing.tests
     { { 0 { } } { 0 { } } } state>replaces
 ] unit-test
 
-{ t f } [
+{ t f f } [
     { { 0 { } } { 0 { } } } T{ ##peek { loc D 0 } } dangerous-insn?
-    { { 0 { } } { 0 { } } } T{ ##peek { loc D -1 } } dangerous-insn?
+    { { 1 { 0 } } { 0 { } } } T{ ##peek { loc D 0 } } dangerous-insn?
+    { { 0 { -1 } } { 0 { } } } T{ ##peek { loc D -1 } } dangerous-insn?
 ] unit-test
 
 {
