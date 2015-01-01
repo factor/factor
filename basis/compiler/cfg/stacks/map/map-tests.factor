@@ -5,27 +5,63 @@ compiler.cfg.utilities compiler.cfg.stacks.map kernel math namespaces
 sequences sorting tools.test vectors ;
 IN: compiler.cfg.stacks.map.tests
 
-! Utils
-: output-stack-map ( cfg -- map )
-    H{ } clone stack-record set
-    map-analysis run-dataflow-analysis
-    nip [ [ number>> ] dip ] assoc-map >alist natural-sort last second ;
+! classify-read: vacant locations
+{ 2 2 2 } [
+    { 3 { } } 2 classify-read
+    { 0 { } } -1 classify-read
+    { 3 { } } -1 classify-read
+] unit-test
 
-! Initially both the d and r stacks are empty.
+! classify-read: over locations
+{ 1 1 1 1 1 } [
+    { 1 { 0 } } 1 classify-read
+    { 0 { } } 0 classify-read
+    { 3 { } } 4 classify-read
+    { 0 { } } 4 classify-read
+    { 1 { 0 } } 4 classify-read
+] unit-test
+
+! classify-read: initialized locations
+{ 0 0 0 } [
+    { 1 { 0 } } 0 classify-read
+    { 2 { 0 1 2 } } 0 classify-read
+    { 0 { 0 1 2 } } 0 classify-read
+] unit-test
+
+! fill-vacancies
 {
-    { { 0 { } } { 0 { } } }
-} [ V{ } insns>cfg output-stack-map ] unit-test
+    { { 0 { } } { 2 { 0 1 } } }
+    { { 0 { } } { 2 { 0 1 } } }
+    { { 0 { -1 -2 } } { 2 { 0 1 } } }
+} [
+    { { 0 { } } { 2 { } } } fill-vacancies
+    { { 0 { } } { 2 { 0 } } } fill-vacancies
+    { { 0 { -1 -2 } } { 2 { 0 } } } fill-vacancies
+] unit-test
 
-! Raise d stack.
+! visit-insn
+
+! After a ##peek that can cause a stack underflow, it is certain that
+! all stack locations are initialized.
 {
-    { { 1 { } } { 0 { } } }
-} [ V{ T{ ##inc-d f 1 } } insns>cfg output-stack-map ] unit-test
+    { { 2 { 0 1 2 } } { 0 { } } }
+} [
+    { { 2 { } } { 0 { } } } T{ ##peek f f D 2 } visit-insn
+] unit-test
 
-! Raise r stack.
-{
-    { { 0 { } } { 1 { } } }
-} [ V{ T{ ##inc-r f 1 } } insns>cfg output-stack-map ] unit-test
+! If the ##peek can't cause a stack underflow, then we don't have the
+! same guarantees.
+[
+    { { 2 { } } { 0 { } } } T{ ##peek f f D 0 } visit-insn
+] [ vacant-peek? ] must-fail-with
 
+! verboten peek
+[
+    { { 1 { } } { 0 { } } } T{ ##peek { loc D 0 } } visit-insn
+] [ vacant-peek? ] must-fail-with
+
+
+! trace-stack-state
 {
     H{
         {
@@ -40,7 +76,6 @@ IN: compiler.cfg.stacks.map.tests
             T{ ##inc-d { n 0 } }
             { { 2 { 0 1 2 } } { 0 { } } }
         }
-
     }
 } [
     {
@@ -50,38 +85,72 @@ IN: compiler.cfg.stacks.map.tests
     } insns>cfg trace-stack-state
 ] unit-test
 
-! Here the peek refers to a parameter of the word.
-[ ] [
-    V{
-        T{ ##peek { dst 0 } { loc D 25 } }
-    } insns>cfg
-    compute-map-sets
-] unit-test
+! Runs the analysis and check what the resulting stack map becomes.
 
-! Replace -1 then peek is ok.
-[ ] [
-    V{
-        T{ ##replace { src 10 } { loc D -1 } }
-        T{ ##peek { dst 0 } { loc D -1 } }
-    } insns>cfg
-    compute-map-sets
-] unit-test
+: output-stack-map ( cfg -- map )
+    H{ } clone stack-record set
+    map-analysis run-dataflow-analysis
+    nip [ [ number>> ] dip ] assoc-map >alist natural-sort last second ;
 
-! Should be ok because the value was at 0 when the gc ran.
-{ { -1 { -1 } } } [
-    V{
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
-        T{ ##inc-d f -1 }
-        T{ ##peek { dst 0 } { loc D -1 } }
-    } insns>cfg output-stack-map first
-] unit-test
+! Initially both the d and r stacks are empty.
+{
+    { { 0 { } } { 0 { } } }
+} [ V{ } insns>cfg output-stack-map ] unit-test
 
 {
     { { 0 { } } { 0 { } } }
 } [
     V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } }
     insns>cfg output-stack-map
+] unit-test
+
+{
+    { { 1 { } } { 0 { } } }
+} [ V{ T{ ##inc-d f 1 } } insns>cfg output-stack-map ] unit-test
+
+{
+    { { 0 { } } { 1 { } } }
+} [ V{ T{ ##inc-r f 1 } } insns>cfg output-stack-map ] unit-test
+
+! Here the peek refers to a parameter of the word.
+{
+    { { 0 { 25 } } { 0 { } } }
+} [
+    V{
+        T{ ##peek { loc D 25 } }
+    } insns>cfg output-stack-map
+] unit-test
+
+! The peek "causes" the vacant locations to become populated.
+{
+    { { 3 { 0 1 2 3 } } { 0 { } } }
+} [
+    V{
+        T{ ##inc-d f 3 }
+        T{ ##peek { loc D 3 } }
+    } insns>cfg output-stack-map
+] unit-test
+
+! Replace -1 then peek is ok.
+{
+    { { 0 { -1 } } { 0 { } } }
+} [
+    V{
+        T{ ##replace { src 10 } { loc D -1 } }
+        T{ ##peek { loc D -1 } }
+    } insns>cfg output-stack-map
+] unit-test
+
+! Should be ok because the value was at 0 when the gc ran.
+{
+    { { -1 { -1 } } { 0 { } } }
+} [
+    V{
+        T{ ##replace { src 10 } { loc D 0 } }
+        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+        T{ ##inc-d f -1 }
+        T{ ##peek { loc D -1 } }
+    } insns>cfg output-stack-map
 ] unit-test
 
 {
@@ -105,36 +174,59 @@ IN: compiler.cfg.stacks.map.tests
 ] unit-test
 
 {
-    { 0 { 0 -1 } }
+    { { 0 { 0 -1 } } { 0 { } } }
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f 1 }
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f -1 }
-    } insns>cfg output-stack-map first
+    } insns>cfg output-stack-map
 ] unit-test
 
 {
-    { 0 { -1 } }
+    { { 0 { -1 } } { 0 { } } }
 } [
     V{
         T{ ##inc-d f 1 }
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f -1 }
-    } insns>cfg output-stack-map first
+    } insns>cfg output-stack-map
 ] unit-test
 
 ! ##call clears the overinitialized slots.
 {
-    { -1 { } }
+    { { -1 { } } { 0 { } } }
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc-d f -1 }
         T{ ##call }
-    } insns>cfg output-stack-map first
+    } insns>cfg output-stack-map
 ] unit-test
+
+! Should not be ok because the value wasn't initialized when gc ran.
+[
+    V{
+        T{ ##inc-d f 1 }
+        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+        T{ ##peek { loc D 0 } }
+    } insns>cfg output-stack-map
+] [ vacant-peek? ] must-fail-with
+
+[
+    V{
+        T{ ##inc-d f 1 }
+        T{ ##peek { loc D 0 } }
+    } insns>cfg output-stack-map
+] [ vacant-peek? ] must-fail-with
+
+[
+    V{
+        T{ ##inc-r f 1 }
+        T{ ##peek { loc R 0 } }
+    } insns>cfg output-stack-map
+] [ vacant-peek? ] must-fail-with
 
 : cfg1 ( -- cfg )
     V{
@@ -147,7 +239,9 @@ IN: compiler.cfg.stacks.map.tests
     } 1 insns>block
     1vector >>successors block>cfg ;
 
-{ { 0 { -1 } } } [ cfg1 output-stack-map first ] unit-test
+{
+    { { 0 { -1 } } { 0 { } } }
+} [ cfg1 output-stack-map ] unit-test
 
 ! Same cfg structure as the bug1021:run-test word but with
 ! non-datastack instructions mostly omitted.
@@ -199,35 +293,4 @@ IN: compiler.cfg.stacks.map.tests
 
 { { 4 { 3 2 1 -3 0 -2 -1 } } } [
     bug1021-cfg output-stack-map first
-] unit-test
-
-
-! After a ##peek that can cause a stack underflow, it is certain that
-! all stack locations are initialized.
-{
-    { { 2 { 0 1 2 } } { 0 { } } }
-} [
-    { { 2 { } } { 0 { } } } T{ ##peek f f D 2 } visit-insn
-] unit-test
-
-! If the ##peek can't cause a stack underflow, then we don't have the
-! same guarantees.
-{
-    { { 2 { 0 } } { 0 { } } }
-} [
-    { { 2 { } } { 0 { } } } T{ ##peek f f D 0 } visit-insn
-] unit-test
-
-{ t f t } [
-    { { 0 { } } { 0 { } } } T{ ##peek { loc D 0 } } dangerous-peek?
-    { { 0 { } } { 0 { } } } T{ ##peek { loc D -1 } } dangerous-peek?
-    { { 2 { 0 1 2 } } { 0 { } } } T{ ##peek { loc D 2 } } dangerous-peek?
-] unit-test
-
-{
-    { { 0 { } } { 2 { 0 1 } } }
-    { { 0 { } } { 2 { 0 1 } } }
-} [
-    { { 0 { } } { 2 { } } } fill-vacancies
-    { { 0 { } } { 2 { 0 } } } fill-vacancies
 ] unit-test
