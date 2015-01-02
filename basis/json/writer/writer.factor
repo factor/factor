@@ -94,7 +94,7 @@ M: integer stream-json-print
 
 : float>json ( float -- string )
     dup fp-special? [
-        json-allow-fp-special? get [ json-error ] unless
+        json-allow-fp-special? get [ json-fp-special-error ] unless
         {
             { [ dup fp-nan? ] [ drop "NaN" ] }
             { [ dup 1/0. = ] [ drop "Infinity" ] }
