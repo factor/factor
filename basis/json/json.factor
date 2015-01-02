@@ -1,9 +1,12 @@
-USING: kernel vocabs ;
+USING: kernel vocabs summary debugger io ;
 IN: json
 
 SINGLETON: json-null
 
 ERROR: json-error ;
+
+ERROR: json-fp-special-error value ;
+M: json-fp-special-error summary drop "JSON serialization: illegal float:" ;
 
 : if-json-null ( x if-null else -- )
     [ dup json-null? ]
