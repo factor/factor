@@ -1,8 +1,9 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs combinators fry hashtables io
-io.streams.string json kernel locals math math.parser mirrors
-namespaces sequences strings tr words ;
+USING: accessors ascii assocs combinators formatting fry
+hashtables io io.encodings.utf16.private io.streams.string json
+kernel locals math math.parser mirrors namespaces sequences
+strings tr words ;
 IN: json.writer
 
 SYMBOL: json-allow-fp-special?
@@ -39,6 +40,26 @@ M: t stream-json-print
 M: json-null stream-json-print
     [ drop "null" ] [ stream-write ] bi* ;
 
+<PRIVATE
+
+: json-print-generic-escape-surrogate-pair ( stream char -- stream )
+    0x10000 - [ encode-first ] [ encode-second ] bi
+    "\\u%x%x\\u%x%x" sprintf over stream-write ;
+
+: json-print-generic-escape-bmp ( stream char -- stream )
+    "\\u" pick stream-write
+    >hex 4 CHAR: 0 pad-head
+    over stream-write ;
+
+: json-print-generic-escape ( stream char -- stream )
+    dup 0xffff > [
+        json-print-generic-escape-surrogate-pair
+    ] [
+        json-print-generic-escape-bmp
+    ] if ;
+
+PRIVATE>
+
 M: string stream-json-print
     CHAR: " over stream-write1 swap [
         {
@@ -62,10 +83,7 @@ M: string stream-json-print
                     { [ dup control? ] [ t ] }
                     [ json-escape-unicode? get ]
                 } cond [
-                    dup 0xffff > [ json-error ] when
-                    "\\u" pick stream-write
-                    >hex 4 CHAR: 0 pad-head
-                    over stream-write
+                    json-print-generic-escape
                 ] [
                     over stream-write1
                 ] if
