@@ -22,8 +22,8 @@ void factor_vm::collect_to_tenured() {
 
   mark_stack.clear();
 
-  collector.trace_roots();
-  collector.trace_contexts();
+  collector.data_visitor.visit_roots();
+  collector.data_visitor.visit_contexts();
 
   gc_event* event = current_gc->event;
 

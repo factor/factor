@@ -107,24 +107,10 @@ template <typename TargetGeneration, typename Policy> struct collector {
         decks_scanned(0),
         code_blocks_scanned(0) {}
 
-  void trace_handle(cell* handle) { data_visitor.visit_handle(handle); }
-
   void trace_object(object* ptr) {
     data_visitor.visit_slots(ptr);
     if (ptr->type() == ALIEN_TYPE)
       ((alien*)ptr)->update_address();
-  }
-
-  void trace_roots() { data_visitor.visit_roots(); }
-
-  void trace_contexts() { data_visitor.visit_contexts(); }
-
-  void trace_code_block_objects(code_block* compiled) {
-    data_visitor.visit_code_block_objects(compiled);
-  }
-
-  void trace_embedded_literals(code_block* compiled) {
-    data_visitor.visit_embedded_literals(compiled);
   }
 
   void trace_code_heap_roots(std::set<code_block*>* remembered_set) {
@@ -133,8 +119,8 @@ template <typename TargetGeneration, typename Policy> struct collector {
 
     for (; iter != end; iter++) {
       code_block* compiled = *iter;
-      trace_code_block_objects(compiled);
-      trace_embedded_literals(compiled);
+      data_visitor.visit_code_block_objects(compiled);
+      data_visitor.visit_embedded_literals(compiled);
       compiled->flush_icache();
       code_blocks_scanned++;
     }

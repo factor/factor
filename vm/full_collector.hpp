@@ -27,9 +27,6 @@ struct full_collector : collector<tenured_space, full_policy> {
 
   explicit full_collector(factor_vm* parent);
   void trace_code_block(code_block* compiled);
-  void trace_context_code_blocks();
-  void trace_code_roots();
-  void trace_object_code_block(object* obj);
 };
 
 }

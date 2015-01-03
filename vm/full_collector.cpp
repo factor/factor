@@ -13,16 +13,6 @@ void full_collector::trace_code_block(code_block* compiled) {
   code_visitor.visit_embedded_code_pointers(compiled);
 }
 
-void full_collector::trace_context_code_blocks() {
-  code_visitor.visit_context_code_blocks();
-}
-
-void full_collector::trace_code_roots() { code_visitor.visit_code_roots(); }
-
-void full_collector::trace_object_code_block(object* obj) {
-  code_visitor.visit_object_code_block(obj);
-}
-
 /* After a sweep, invalidate any code heap roots which are not marked,
    so that if a block makes a tail call to a generic word, and the PIC
    compiler triggers a GC, and the caller block gets gets GCd as a result,
@@ -49,11 +39,11 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
   code->clear_mark_bits();
   data->tenured->clear_mark_bits();
 
-  collector.trace_roots();
+  collector.data_visitor.visit_roots();
   if (trace_contexts_p) {
-    collector.trace_contexts();
-    collector.trace_context_code_blocks();
-    collector.trace_code_roots();
+    collector.data_visitor.visit_contexts();
+    collector.code_visitor.visit_context_code_blocks();
+    collector.code_visitor.visit_code_roots();
   }
 
   while (!mark_stack.empty()) {
@@ -66,7 +56,7 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
     } else {
       object* obj = (object*)ptr;
       collector.trace_object(obj);
-      collector.trace_object_code_block(obj);
+      collector.code_visitor.visit_object_code_block(obj);
     }
   }
 
