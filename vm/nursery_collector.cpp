@@ -9,8 +9,8 @@ void factor_vm::collect_nursery() {
                                                            this->data->aging,
                                                            nursery_policy(this));
 
-  collector.trace_roots();
-  collector.trace_contexts();
+  collector.data_visitor.visit_roots();
+  collector.data_visitor.visit_contexts();
 
   gc_event* event = current_gc->event;
 
