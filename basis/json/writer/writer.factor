@@ -44,12 +44,10 @@ M: json-null stream-json-print
 
 : json-print-generic-escape-surrogate-pair ( stream char -- stream )
     0x10000 - [ encode-first ] [ encode-second ] bi
-    "\\u%x%x\\u%x%x" sprintf over stream-write ;
+    "\\u%02x%02x\\u%02x%02x" sprintf over stream-write ;
 
 : json-print-generic-escape-bmp ( stream char -- stream )
-    "\\u" pick stream-write
-    >hex 4 CHAR: 0 pad-head
-    over stream-write ;
+    "\\u%04x" sprintf over stream-write ;
 
 : json-print-generic-escape ( stream char -- stream )
     dup 0xffff > [
