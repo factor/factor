@@ -44,7 +44,13 @@ HELP: set-retainstack
 
 HELP: callstack
 { $values { "callstack" callstack } }
-{ $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
+{ $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included. Each group of three elements in the callstack is frame:"
+  { $list
+    "The first element is the executing word or quotation."
+    "The second element is the executing quotation."
+    "The third element is the offset in the executing quotation, or -1 if the offset can't be determined."
+  }
+} ;
 
 HELP: set-callstack
 { $values { "callstack" callstack } }
