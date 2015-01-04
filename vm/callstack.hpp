@@ -17,7 +17,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
 
   while (frame_offset < frame_length) {
     void* frame_top = stack->frame_top_at(frame_offset);
-    void* addr = frame_return_address(frame_top);
+    void* addr = *(void**)frame_top;
 
     void* fixed_addr = Fixup::translated_code_block_map
                            ? (void*)fixup.translate_code((code_block*)addr)
@@ -42,13 +42,11 @@ inline void factor_vm::iterate_callstack_object(callstack* stack,
 template <typename Iterator, typename Fixup>
 inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
                                          Fixup& fixup) {
-  if (ctx->callstack_top == ctx->callstack_bottom)
-    return;
 
   char* frame_top = (char*)ctx->callstack_top;
 
   while (frame_top < (char*)ctx->callstack_bottom) {
-    void* addr = frame_return_address((void*)frame_top);
+    void* addr = *(void**)frame_top;
     FACTOR_ASSERT(addr != 0);
     void* fixed_addr = Fixup::translated_code_block_map
                            ? (void*)fixup.translate_code((code_block*)addr)
