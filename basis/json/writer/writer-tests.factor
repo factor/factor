@@ -71,3 +71,7 @@ TUPLE: person first-name age ;
 
 { "\"\\ud834\\udd1e\"" }
 [ t json-escape-unicode? [ "𝄞" >json ] with-variable ] unit-test
+
+{ "\"\\ud800\\udc01\"" }
+[ t json-escape-unicode? [ "𐀁" >json ] with-variable ] unit-test
+
