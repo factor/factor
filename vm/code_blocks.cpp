@@ -9,26 +9,21 @@ cell code_block::owner_quot() const {
   return executing.value();
 }
 
+/* If the code block is an unoptimized quotation, we can calculate the
+   scan offset. In all other cases -1 is returned. */
 cell code_block::scan(factor_vm* vm, void* addr) const {
-  switch (type()) {
-    case code_block_unoptimized: {
-      tagged<object> obj(owner);
-      if (obj.type_p(WORD_TYPE))
-        obj = obj.as<word>()->def;
-
-      if (obj.type_p(QUOTATION_TYPE))
-        return tag_fixnum(
-            vm->quot_code_offset_to_scan(obj.value(), offset(addr)));
-      else
-        return false_object;
-    }
-    case code_block_optimized:
-    case code_block_pic:
-      return false_object;
-    default:
-      critical_error("Bad frame type", type());
-      return false_object;
+  if (type() != code_block_unoptimized) {
+    return tag_fixnum(-1);
   }
+
+  tagged<object> obj(owner);
+  if (obj.type_p(WORD_TYPE))
+    obj = obj.as<word>()->def;
+  if (!obj.type_p(QUOTATION_TYPE))
+    return tag_fixnum(-1);
+
+  cell ofs = offset(addr);
+  return tag_fixnum(vm->quot_code_offset_to_scan(obj.value(), ofs));
 }
 
 cell factor_vm::compute_entry_point_address(cell obj) {
