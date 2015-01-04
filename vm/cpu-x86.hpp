@@ -1,14 +1,5 @@
 namespace factor {
 
-inline static void* frame_return_address(void* frame_top) {
-  return *(void**)frame_top;
-}
-
-inline static void set_frame_return_address(void* frame_top,
-                                            void* return_address) {
-  *(void**)frame_top = return_address;
-}
-
 #define CALLSTACK_BOTTOM(ctx) \
   (void*)(ctx->callstack_seg->end - sizeof(cell) * 5)
 

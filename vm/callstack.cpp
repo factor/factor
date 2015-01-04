@@ -50,7 +50,7 @@ void factor_vm::primitive_callstack_for() {
 }
 
 void* factor_vm::frame_predecessor(void* frame_top) {
-  void* addr = frame_return_address((void*)frame_top);
+  void* addr = *(void**)frame_top;
   FACTOR_ASSERT(addr != 0);
   code_block* owner = code->code_block_for_address((cell)addr);
   cell frame_size = owner->stack_frame_size_for_address((cell)addr);
@@ -106,14 +106,14 @@ Used by the single stepper. */
 void factor_vm::primitive_innermost_stack_frame_executing() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   void* frame = stack->top();
-  void* addr = frame_return_address(frame);
+  void* addr = *(void**)frame;
   ctx->replace(code->code_block_for_address((cell)addr)->owner_quot());
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   void* frame = stack->top();
-  void* addr = frame_return_address(frame);
+  void* addr = *(void**)frame;
   ctx->replace(code->code_block_for_address((cell)addr)->scan(this, addr));
 }
 
@@ -128,10 +128,10 @@ void factor_vm::primitive_set_innermost_stack_frame_quot() {
   jit_compile_quot(quot.value(), true);
 
   void* inner = stack->top();
-  void* addr = frame_return_address(inner);
+  void* addr = *(void**)inner;
   code_block* block = code->code_block_for_address((cell)addr);
   cell offset = block->offset(addr);
-  set_frame_return_address(inner, (char*)quot->entry_point + offset);
+  *(void**)inner = (char*)quot->entry_point + offset;
 }
 
 /* Allocates memory (allot_alien) */

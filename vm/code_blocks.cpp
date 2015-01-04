@@ -474,7 +474,7 @@ struct find_symbol_at_address_visitor {
    image load. It finds the symbol and library, and throws an error. */
 void factor_vm::undefined_symbol() {
   void* frame = ctx->callstack_top;
-  void* return_address = frame_return_address(frame);
+  void* return_address = *(void**)frame;
   code_block* compiled = code->code_block_for_address((cell)return_address);
   find_symbol_at_address_visitor visitor(this, (cell)return_address);
   compiled->each_instruction_operand(visitor);

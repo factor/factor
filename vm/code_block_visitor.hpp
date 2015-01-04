@@ -44,7 +44,8 @@ template <typename Fixup> struct call_frame_code_block_visitor {
     code_block* compiled =
         Fixup::translated_code_block_map ? owner : fixup.fixup_code(owner);
     void* fixed_addr = compiled->address_for_offset(owner->offset(addr));
-    set_frame_return_address(frame_top, fixed_addr);
+
+    *(void**)frame_top = fixed_addr;
   }
 };
 
