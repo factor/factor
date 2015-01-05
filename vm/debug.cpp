@@ -190,10 +190,9 @@ struct stack_frame_printer {
   factor_vm* parent;
 
   explicit stack_frame_printer(factor_vm* parent) : parent(parent) {}
-  void operator()(void* frame_top, cell frame_size, code_block* owner,
-                  void* addr) {
+  void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     std::cout << std::endl;
-    std::cout << "frame: " << frame_top << " size " << frame_size << std::endl;
+    std::cout << "frame: " << (void*)frame_top << " size " << size << std::endl;
     std::cout << "executing: ";
     parent->print_obj(owner->owner);
     std::cout << std::endl;
@@ -207,7 +206,7 @@ struct stack_frame_printer {
     std::cout << std::hex << (cell)owner->entry_point() << std::dec;
     std::cout << std::endl;
     std::cout << "return address: ";
-    std::cout << std::hex << (cell)addr << std::dec;
+    std::cout << std::hex << addr << std::dec;
     std::cout << std::endl;
   }
 };

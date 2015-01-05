@@ -47,8 +47,7 @@ struct record_callstack_sample_iterator {
                                    bool prolog_p)
       : sample_callstacks(sample_callstacks), skip_p(prolog_p) {}
 
-  void operator()(void* frame_top, cell frame_size, code_block* owner,
-                  void* addr) {
+  void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     if (skip_p)
       skip_p = false;
     else

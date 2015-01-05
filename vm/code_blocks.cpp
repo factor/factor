@@ -11,7 +11,7 @@ cell code_block::owner_quot() const {
 
 /* If the code block is an unoptimized quotation, we can calculate the
    scan offset. In all other cases -1 is returned. */
-cell code_block::scan(factor_vm* vm, void* addr) const {
+cell code_block::scan(factor_vm* vm, cell addr) const {
   if (type() != code_block_unoptimized) {
     return tag_fixnum(-1);
   }
@@ -22,7 +22,7 @@ cell code_block::scan(factor_vm* vm, void* addr) const {
   if (!obj.type_p(QUOTATION_TYPE))
     return tag_fixnum(-1);
 
-  cell ofs = offset(addr);
+  cell ofs = offset((void*)addr);
   return tag_fixnum(vm->quot_code_offset_to_scan(obj.value(), ofs));
 }
 

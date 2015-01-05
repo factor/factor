@@ -16,14 +16,14 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
   fixnum frame_offset = 0;
 
   while (frame_offset < frame_length) {
-    void* frame_top = stack->frame_top_at(frame_offset);
-    void* addr = *(void**)frame_top;
+    cell frame_top = (cell)stack->frame_top_at(frame_offset);
+    cell addr = *(cell*)frame_top;
+    cell fixed_addr = Fixup::translated_code_block_map
+                          ? (cell)fixup.translate_code((code_block*)addr)
+                          : addr;
+    code_block* owner = code->code_block_for_address(fixed_addr);
 
-    void* fixed_addr = Fixup::translated_code_block_map
-                           ? (void*)fixup.translate_code((code_block*)addr)
-                           : addr;
-    code_block* owner = code->code_block_for_address((cell)fixed_addr);
-    cell frame_size = owner->stack_frame_size_for_address((cell)fixed_addr);
+    cell frame_size = owner->stack_frame_size_for_address(fixed_addr);
 
     iterator(frame_top, frame_size, owner, fixed_addr);
     frame_offset += frame_size;
@@ -46,23 +46,22 @@ inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
   cell frame_top = ctx->callstack_top;
 
   while (frame_top < ctx->callstack_bottom) {
-    void* addr = *(void**)frame_top;
+    cell addr = *(cell*)frame_top;
     FACTOR_ASSERT(addr != 0);
-    void* fixed_addr = Fixup::translated_code_block_map
-                           ? (void*)fixup.translate_code((code_block*)addr)
-                           : addr;
+    cell fixed_addr = Fixup::translated_code_block_map
+                          ? (cell)fixup.translate_code((code_block*)addr)
+                          : addr;
 
-    code_block* owner = code->code_block_for_address((cell)fixed_addr);
+    code_block* owner = code->code_block_for_address(fixed_addr);
     code_block* fixed_owner =
         Fixup::translated_code_block_map ? owner : fixup.translate_code(owner);
 
-    cell frame_size =
-        fixed_owner->stack_frame_size_for_address((cell)fixed_addr);
+    cell frame_size = fixed_owner->stack_frame_size_for_address(fixed_addr);
 
-    void* fixed_addr_for_iter =
+    cell fixed_addr_for_iter =
         Fixup::translated_code_block_map ? fixed_addr : addr;
 
-    iterator((void*)frame_top, frame_size, owner, fixed_addr_for_iter);
+    iterator(frame_top, frame_size, owner, fixed_addr_for_iter);
     frame_top += frame_size;
   }
 }
