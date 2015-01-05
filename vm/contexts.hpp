@@ -19,8 +19,8 @@ struct context {
   // First 4 fields accessed directly by compiler. See basis/vm/vm.factor
 
   /* Factor callstack pointers */
-  void* callstack_top;
-  void* callstack_bottom;
+  cell callstack_top;
+  cell callstack_bottom;
 
   /* current datastack top pointer */
   cell datastack;

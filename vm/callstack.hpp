@@ -43,9 +43,9 @@ template <typename Iterator, typename Fixup>
 inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
                                          Fixup& fixup) {
 
-  char* frame_top = (char*)ctx->callstack_top;
+  cell frame_top = ctx->callstack_top;
 
-  while (frame_top < (char*)ctx->callstack_bottom) {
+  while (frame_top < ctx->callstack_bottom) {
     void* addr = *(void**)frame_top;
     FACTOR_ASSERT(addr != 0);
     void* fixed_addr = Fixup::translated_code_block_map
@@ -62,7 +62,7 @@ inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
     void* fixed_addr_for_iter =
         Fixup::translated_code_block_map ? fixed_addr : addr;
 
-    iterator(frame_top, frame_size, owner, fixed_addr_for_iter);
+    iterator((void*)frame_top, frame_size, owner, fixed_addr_for_iter);
     frame_top += frame_size;
   }
 }

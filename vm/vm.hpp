@@ -638,11 +638,11 @@ struct factor_vm {
   void iterate_callstack_object(callstack* stack_, Iterator& iterator);
 
   callstack* allot_callstack(cell size);
-  void* second_from_top_stack_frame(context* ctx);
+  cell second_from_top_stack_frame(context* ctx);
   cell capture_callstack(context* ctx);
   void primitive_callstack();
   void primitive_callstack_for();
-  void* frame_predecessor(void* frame);
+  cell frame_predecessor(cell frame_top);
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
   void primitive_innermost_stack_frame_scan();
@@ -716,7 +716,7 @@ struct factor_vm {
   // entry points
   void c_to_factor(cell quot);
   template <typename Func> Func get_entry_point(cell n);
-  void unwind_native_frames(cell quot, void* to);
+  void unwind_native_frames(cell quot, cell to);
   cell get_fpu_state();
   void set_fpu_state(cell state);
 

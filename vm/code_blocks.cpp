@@ -473,14 +473,13 @@ struct find_symbol_at_address_visitor {
 /* References to undefined symbols are patched up to call this function on
    image load. It finds the symbol and library, and throws an error. */
 void factor_vm::undefined_symbol() {
-  void* frame = ctx->callstack_top;
-  void* return_address = *(void**)frame;
-  code_block* compiled = code->code_block_for_address((cell)return_address);
-  find_symbol_at_address_visitor visitor(this, (cell)return_address);
+  cell frame = ctx->callstack_top;
+  cell return_address = *(cell*)frame;
+  code_block* compiled = code->code_block_for_address(return_address);
+  find_symbol_at_address_visitor visitor(this, return_address);
   compiled->each_instruction_operand(visitor);
   if (!to_boolean(visitor.symbol))
-    critical_error("Can't find RT_DLSYM at return address",
-                   (cell)return_address);
+    critical_error("Can't find RT_DLSYM at return address", return_address);
   else
     general_error(ERROR_UNDEFINED_SYMBOL, visitor.symbol, visitor.library);
 }

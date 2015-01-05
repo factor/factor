@@ -4,8 +4,8 @@ namespace factor {
 
 context::context(cell datastack_size, cell retainstack_size,
                  cell callstack_size)
-    : callstack_top(NULL),
-      callstack_bottom(NULL),
+    : callstack_top(0),
+      callstack_bottom(0),
       datastack(0),
       retainstack(0),
       callstack_save(0),
