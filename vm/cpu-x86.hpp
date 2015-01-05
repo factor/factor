@@ -1,7 +1,7 @@
 namespace factor {
 
 #define CALLSTACK_BOTTOM(ctx) \
-  (void*)(ctx->callstack_seg->end - sizeof(cell) * 5)
+  (ctx->callstack_seg->end - sizeof(cell) * 5)
 
 inline static void flush_icache(cell start, cell len) {}
 

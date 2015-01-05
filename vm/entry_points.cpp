@@ -22,7 +22,7 @@ template <typename Func> Func factor_vm::get_entry_point(cell n) {
   return (Func) entry_point_word->entry_point;
 }
 
-void factor_vm::unwind_native_frames(cell quot, void* to) {
+void factor_vm::unwind_native_frames(cell quot, cell to) {
   tagged<word> entry_point_word(special_objects[UNWIND_NATIVE_FRAMES_WORD]);
   void* func = entry_point_word->entry_point;
   CODE_TO_FUNCTION_POINTER(func);

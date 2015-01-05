@@ -17,10 +17,10 @@ This means that if 'callstack' is called in tail position, we
 will have popped a necessary frame... however this word is only
 called by continuation implementation, and user code shouldn't
 be calling it at all, so we leave it as it is for now. */
-void* factor_vm::second_from_top_stack_frame(context* ctx) {
-  void* frame_top = ctx->callstack_top;
+cell factor_vm::second_from_top_stack_frame(context* ctx) {
+  cell frame_top = ctx->callstack_top;
   for (cell i = 0; i < 2; ++i) {
-    void* pred = frame_predecessor(frame_top);
+    cell pred = frame_predecessor(frame_top);
     if (pred >= ctx->callstack_bottom)
       return frame_top;
     frame_top = pred;
@@ -30,13 +30,13 @@ void* factor_vm::second_from_top_stack_frame(context* ctx) {
 
 /* Allocates memory (allot_callstack) */
 cell factor_vm::capture_callstack(context* ctx) {
-  void* top = second_from_top_stack_frame(ctx);
-  void* bottom = ctx->callstack_bottom;
+  cell top = second_from_top_stack_frame(ctx);
+  cell bottom = ctx->callstack_bottom;
 
-  fixnum size = std::max((fixnum)0, (fixnum)bottom - (fixnum)top);
+  fixnum size = std::max((cell)0, bottom - top);
 
   callstack* stack = allot_callstack(size);
-  memcpy(stack->top(), top, size);
+  memcpy(stack->top(), (void *)top, size);
   return tag<callstack>(stack);
 }
 
@@ -49,12 +49,12 @@ void factor_vm::primitive_callstack_for() {
   ctx->replace(capture_callstack(other_ctx));
 }
 
-void* factor_vm::frame_predecessor(void* frame_top) {
-  void* addr = *(void**)frame_top;
+cell factor_vm::frame_predecessor(cell frame_top) {
+  cell addr = *(cell*)frame_top;
   FACTOR_ASSERT(addr != 0);
-  code_block* owner = code->code_block_for_address((cell)addr);
-  cell frame_size = owner->stack_frame_size_for_address((cell)addr);
-  return (void*)((char*)frame_top + frame_size);
+  code_block* owner = code->code_block_for_address(addr);
+  cell frame_size = owner->stack_frame_size_for_address(addr);
+  return frame_top + frame_size;
 }
 
 struct stack_frame_accumulator {
