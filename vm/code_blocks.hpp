@@ -94,11 +94,11 @@ struct code_block {
 
   cell offset(void* addr) const { return (char*)addr - (char*)entry_point(); }
 
-  void* address_for_offset(cell offset) const {
-    return (void*)((char*)entry_point() + offset);
+  cell address_for_offset(cell offset) const {
+    return (cell)((char*)entry_point() + offset);
   }
 
-  cell scan(factor_vm* vm, void* addr) const;
+  cell scan(factor_vm* vm, cell addr) const;
   cell owner_quot() const;
 };
 

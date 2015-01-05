@@ -39,13 +39,12 @@ template <typename Fixup> struct call_frame_code_block_visitor {
   call_frame_code_block_visitor(factor_vm* parent, Fixup fixup)
       : parent(parent), fixup(fixup) {}
 
-  void operator()(void* frame_top, cell frame_size, code_block* owner,
-                  void* addr) {
+  void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     code_block* compiled =
         Fixup::translated_code_block_map ? owner : fixup.fixup_code(owner);
-    void* fixed_addr = compiled->address_for_offset(owner->offset(addr));
+    cell fixed_addr = compiled->address_for_offset(owner->offset((void*)addr));
 
-    *(void**)frame_top = fixed_addr;
+    *(cell*)frame_top = fixed_addr;
   }
 };
 

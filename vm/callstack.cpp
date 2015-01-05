@@ -67,8 +67,7 @@ struct stack_frame_accumulator {
 
 
   /* Allocates memory (frames.add()) */
-  void operator()(void* frame_top, cell frame_size, code_block* owner,
-                  void* addr) {
+  void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     data_root<object> executing_quot(owner->owner_quot(), parent);
     data_root<object> executing(owner->owner, parent);
     data_root<object> scan(owner->scan(parent, addr), parent);
@@ -113,7 +112,7 @@ void factor_vm::primitive_innermost_stack_frame_executing() {
 void factor_vm::primitive_innermost_stack_frame_scan() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   void* frame = stack->top();
-  void* addr = *(void**)frame;
+  cell addr = *(cell*)frame;
   ctx->replace(code->code_block_for_address((cell)addr)->scan(this, addr));
 }
 
