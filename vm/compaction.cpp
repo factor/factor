@@ -188,8 +188,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p) {
   data_forwarding_map->compute_forwarding();
   code_forwarding_map->compute_forwarding();
 
-  const object* data_finger = tenured->first_block();
-  const code_block* code_finger = code->allocator->first_block();
+  const object* data_finger = (object*)tenured->start;
+  const code_block* code_finger = (code_block*)code->allocator->start;
 
   {
     compaction_fixup fixup(data_forwarding_map, code_forwarding_map, &data_finger,
@@ -285,7 +285,7 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p) {
   mark_bits* code_forwarding_map = &code->allocator->state;
   code_forwarding_map->compute_forwarding();
 
-  const code_block* code_finger = code->allocator->first_block();
+  const code_block* code_finger = (code_block*)code->allocator->start;
 
   code_compaction_fixup fixup(code_forwarding_map, &code_finger);
   slot_visitor<code_compaction_fixup> data_forwarder(this, fixup);
