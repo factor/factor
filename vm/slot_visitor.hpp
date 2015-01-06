@@ -295,7 +295,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
 	             [size]
 	*/
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
-    cell return_address = owner->offset((void*)addr);
+    cell return_address = owner->offset(addr);
 
     code_block* compiled =
         Fixup::translated_code_block_map ? owner

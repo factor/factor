@@ -22,7 +22,7 @@ cell code_block::scan(factor_vm* vm, cell addr) const {
   if (!obj.type_p(QUOTATION_TYPE))
     return tag_fixnum(-1);
 
-  cell ofs = offset((void*)addr);
+  cell ofs = offset(addr);
   return tag_fixnum(vm->quot_code_offset_to_scan(obj.value(), ofs));
 }
 

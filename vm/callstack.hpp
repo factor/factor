@@ -16,7 +16,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
   fixnum frame_offset = 0;
 
   while (frame_offset < frame_length) {
-    cell frame_top = (cell)stack->frame_top_at(frame_offset);
+    cell frame_top = stack->frame_top_at(frame_offset);
     cell addr = *(cell*)frame_top;
     cell fixed_addr = Fixup::translated_code_block_map
                           ? (cell)fixup.translate_code((code_block*)addr)

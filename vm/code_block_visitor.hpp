@@ -40,7 +40,7 @@ template <typename Fixup> struct call_frame_code_block_visitor {
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     code_block* compiled =
         Fixup::translated_code_block_map ? owner : fixup.fixup_code(owner);
-    cell fixed_addr = compiled->address_for_offset(owner->offset((void*)addr));
+    cell fixed_addr = compiled->address_for_offset(owner->offset(addr));
 
     *(cell*)frame_top = fixed_addr;
   }

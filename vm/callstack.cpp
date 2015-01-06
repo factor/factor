@@ -127,8 +127,8 @@ void factor_vm::primitive_set_innermost_stack_frame_quot() {
   jit_compile_quot(quot.value(), true);
 
   void* inner = stack->top();
-  void* addr = *(void**)inner;
-  code_block* block = code->code_block_for_address((cell)addr);
+  cell addr = *(cell*)inner;
+  code_block* block = code->code_block_for_address(addr);
   cell offset = block->offset(addr);
   *(void**)inner = (char*)quot->entry_point + offset;
 }

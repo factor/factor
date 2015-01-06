@@ -92,7 +92,7 @@ struct code_block {
     }
   }
 
-  cell offset(void* addr) const { return (char*)addr - (char*)entry_point(); }
+  cell offset(cell addr) const { return addr - (cell)entry_point(); }
 
   cell address_for_offset(cell offset) const {
     return (cell)((char*)entry_point() + offset);
