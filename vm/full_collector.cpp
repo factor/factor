@@ -43,7 +43,7 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
   if (trace_contexts_p) {
     collector.data_visitor.visit_contexts();
     collector.code_visitor.visit_context_code_blocks();
-    collector.code_visitor.visit_code_roots();
+    collector.code_visitor.visit_uninitialized_code_blocks();
   }
 
   while (!mark_stack.empty()) {

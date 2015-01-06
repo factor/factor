@@ -23,8 +23,6 @@ template <typename Fixup> struct code_block_visitor {
   void visit_embedded_code_pointers(code_block* compiled);
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
-
-  void visit_code_roots();
 };
 
 template <typename Fixup>
@@ -115,10 +113,6 @@ void code_block_visitor<Fixup>::visit_uninitialized_code_blocks() {
   }
 
   parent->code->uninitialized_blocks = new_uninitialized_blocks;
-}
-
-template <typename Fixup> void code_block_visitor<Fixup>::visit_code_roots() {
-  visit_uninitialized_code_blocks();
 }
 
 }
