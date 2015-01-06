@@ -58,7 +58,7 @@ void object_start_map::update_card_for_sweep(cell index, uint16_t mask) {
   }
 }
 
-void object_start_map::update_for_sweep(mark_bits<object>* state) {
+void object_start_map::update_for_sweep(mark_bits* state) {
   for (cell index = 0; index < state->bits_size; index++) {
     cell mask = state->marked[index];
 #ifdef FACTOR_64

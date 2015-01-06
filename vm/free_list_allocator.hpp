@@ -13,7 +13,7 @@ template <typename Block> struct free_list_allocator {
   cell start;
   cell end;
   free_list free_blocks;
-  mark_bits<Block> state;
+  mark_bits state;
 
   free_list_allocator(cell size, cell start);
   void initial_free_list(cell occupied);
@@ -44,7 +44,7 @@ free_list_allocator<Block>::free_list_allocator(cell size, cell start)
     : size(size),
       start(start),
       end(start + size),
-      state(mark_bits<Block>(size, start)) {
+      state(mark_bits(size, start)) {
   initial_free_list(0);
 }
 
@@ -128,8 +128,8 @@ template <typename Iterator>
 void free_list_allocator<Block>::sweep(Iterator& iter) {
   free_blocks.clear_free_list();
 
-  Block* start = this->first_block();
-  Block* end = this->last_block();
+  cell start = (cell)this->first_block();
+  cell end = (cell)this->last_block();
 
   while (start != end) {
     /* find next unmarked block */
@@ -143,9 +143,9 @@ void free_list_allocator<Block>::sweep(Iterator& iter) {
       free_heap_block* free_block = (free_heap_block*)start;
       free_block->make_free(size);
       free_blocks.add_to_free_list(free_block);
-      iter(start, size);
+      iter((Block*)start, size);
 
-      start = (Block*)((char*)start + size);
+      start = start + size;
     }
   }
 }
@@ -160,17 +160,17 @@ template <typename Block> void free_list_allocator<Block>::sweep() {
 }
 
 template <typename Block, typename Iterator> struct heap_compactor {
-  mark_bits<Block>* state;
+  mark_bits* state;
   char* address;
   Iterator& iter;
   const Block** finger;
 
-  heap_compactor(mark_bits<Block>* state, Block* address,
+  heap_compactor(mark_bits* state, Block* address,
                  Iterator& iter, const Block** finger)
       : state(state), address((char*)address), iter(iter), finger(finger) {}
 
   void operator()(Block* block, cell size) {
-    if (this->state->marked_p(block)) {
+    if (this->state->marked_p((cell)block)) {
       *finger = (Block*)((char*)block + size);
       memmove((Block*)address, block, size);
       iter(block, (Block*)address, size);

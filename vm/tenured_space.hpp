@@ -27,9 +27,13 @@ struct tenured_space : free_list_allocator<object> {
 
   void clear_mark_bits() { state.clear_mark_bits(); }
 
-  bool marked_p(object* obj) { return this->state.marked_p(obj); }
+  bool marked_p(object* obj) {
+    return this->state.marked_p((cell)obj);
+  }
 
-  void set_marked_p(object* obj) { this->state.set_marked_p(obj); }
+  void set_marked_p(object* obj) {
+    this->state.set_marked_p((cell)obj, obj->size());
+  }
 
   void sweep() {
     free_list_allocator<object>::sweep();

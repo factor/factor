@@ -5,13 +5,13 @@ namespace factor {
 struct compaction_fixup {
   static const bool translated_code_block_map = false;
 
-  mark_bits<object>* data_forwarding_map;
-  mark_bits<code_block>* code_forwarding_map;
+  mark_bits* data_forwarding_map;
+  mark_bits* code_forwarding_map;
   const object** data_finger;
   const code_block** code_finger;
 
-  compaction_fixup(mark_bits<object>* data_forwarding_map,
-                   mark_bits<code_block>* code_forwarding_map,
+  compaction_fixup(mark_bits* data_forwarding_map,
+                   mark_bits* code_forwarding_map,
                    const object** data_finger,
                    const code_block** code_finger)
       : data_forwarding_map(data_forwarding_map),
@@ -20,11 +20,11 @@ struct compaction_fixup {
         code_finger(code_finger) {}
 
   object* fixup_data(object* obj) {
-    return data_forwarding_map->forward_block(obj);
+    return (object*)data_forwarding_map->forward_block((cell)obj);
   }
 
   code_block* fixup_code(code_block* compiled) {
-    return code_forwarding_map->forward_block(compiled);
+    return (code_block*)code_forwarding_map->forward_block((cell)compiled);
   }
 
   object* translate_data(const object* obj) {
@@ -42,17 +42,17 @@ struct compaction_fixup {
   }
 
   cell size(object* obj) {
-    if (data_forwarding_map->marked_p(obj))
+    if (data_forwarding_map->marked_p((cell)obj))
       return obj->size(*this);
     else
-      return data_forwarding_map->unmarked_block_size(obj);
+      return data_forwarding_map->unmarked_block_size((cell)obj);
   }
 
   cell size(code_block* compiled) {
-    if (code_forwarding_map->marked_p(compiled))
+    if (code_forwarding_map->marked_p((cell)compiled))
       return compiled->size(*this);
     else
-      return code_forwarding_map->unmarked_block_size(compiled);
+      return code_forwarding_map->unmarked_block_size((cell)compiled);
   }
 };
 
@@ -152,18 +152,18 @@ void factor_vm::update_code_roots_for_compaction() {
   std::vector<code_root*>::const_iterator iter = code_roots.begin();
   std::vector<code_root*>::const_iterator end = code_roots.end();
 
-  mark_bits<code_block>* state = &code->allocator->state;
+  mark_bits* state = &code->allocator->state;
 
   for (; iter < end; iter++) {
     code_root* root = *iter;
-    code_block* block = (code_block*)(root->value & (~data_alignment + 1));
+    cell block = root->value & (~data_alignment + 1);
 
     /* Offset of return address within 16-byte allocation line */
-    cell offset = root->value - (cell)block;
+    cell offset = root->value - block;
 
     if (root->valid && state->marked_p(block)) {
       block = state->forward_block(block);
-      root->value = (cell)block + offset;
+      root->value = block + offset;
     } else
       root->valid = false;
   }
@@ -181,8 +181,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p) {
     event->started_compaction();
 
   tenured_space* tenured = data->tenured;
-  mark_bits<object>* data_forwarding_map = &tenured->state;
-  mark_bits<code_block>* code_forwarding_map = &code->allocator->state;
+  mark_bits* data_forwarding_map = &tenured->state;
+  mark_bits* code_forwarding_map = &code->allocator->state;
 
   /* Figure out where blocks are going to go */
   data_forwarding_map->compute_forwarding();
@@ -237,17 +237,17 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p) {
 struct code_compaction_fixup {
   static const bool translated_code_block_map = false;
 
-  mark_bits<code_block>* code_forwarding_map;
+  mark_bits* code_forwarding_map;
   const code_block** code_finger;
 
-  code_compaction_fixup(mark_bits<code_block>* code_forwarding_map,
+  code_compaction_fixup(mark_bits* code_forwarding_map,
                         const code_block** code_finger)
       : code_forwarding_map(code_forwarding_map), code_finger(code_finger) {}
 
   object* fixup_data(object* obj) { return obj; }
 
   code_block* fixup_code(code_block* compiled) {
-    return code_forwarding_map->forward_block(compiled);
+    return (code_block*)code_forwarding_map->forward_block((cell)compiled);
   }
 
   object* translate_data(const object* obj) { return fixup_data((object*)obj); }
@@ -262,10 +262,10 @@ struct code_compaction_fixup {
   cell size(object* obj) { return obj->size(); }
 
   cell size(code_block* compiled) {
-    if (code_forwarding_map->marked_p(compiled))
+    if (code_forwarding_map->marked_p((cell)compiled))
       return compiled->size(*this);
     else
-      return code_forwarding_map->unmarked_block_size(compiled);
+      return code_forwarding_map->unmarked_block_size((cell)compiled);
   }
 };
 
@@ -282,7 +282,7 @@ struct object_grow_heap_updater {
 /* Compact just the code heap, after growing the data heap */
 void factor_vm::collect_compact_code_impl(bool trace_contexts_p) {
   /* Figure out where blocks are going to go */
-  mark_bits<code_block>* code_forwarding_map = &code->allocator->state;
+  mark_bits* code_forwarding_map = &code->allocator->state;
   code_forwarding_map->compute_forwarding();
 
   const code_block* code_finger = code->allocator->first_block();
