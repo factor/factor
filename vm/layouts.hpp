@@ -305,8 +305,8 @@ struct callstack : public object {
   /* tagged */
   cell length;
 
-  void* frame_top_at(cell offset) const {
-    return (void*)((char*)(this + 1) + offset);
+  cell frame_top_at(cell offset) const {
+    return (cell)(this + 1) + offset;
   }
 
   void* top() const { return (void*)(this + 1); }
