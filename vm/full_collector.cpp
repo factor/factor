@@ -21,11 +21,11 @@ void factor_vm::update_code_roots_for_sweep() {
   std::vector<code_root*>::const_iterator iter = code_roots.begin();
   std::vector<code_root*>::const_iterator end = code_roots.end();
 
-  mark_bits<code_block>* state = &code->allocator->state;
+  mark_bits* state = &code->allocator->state;
 
   for (; iter < end; iter++) {
     code_root* root = *iter;
-    code_block* block = (code_block*)(root->value & (~data_alignment - 1));
+    cell block = root->value & (~data_alignment - 1);
     if (root->valid && !state->marked_p(block))
       root->valid = false;
   }

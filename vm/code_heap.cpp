@@ -40,11 +40,11 @@ bool code_heap::uninitialized_p(code_block* compiled) {
 }
 
 bool code_heap::marked_p(code_block* compiled) {
-  return allocator->state.marked_p(compiled);
+  return allocator->state.marked_p((cell)compiled);
 }
 
 void code_heap::set_marked_p(code_block* compiled) {
-  allocator->state.set_marked_p(compiled);
+  allocator->state.set_marked_p((cell)compiled, compiled->size());
 }
 
 void code_heap::clear_mark_bits() { allocator->state.clear_mark_bits(); }
