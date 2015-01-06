@@ -37,7 +37,7 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
 
   if (h->code_size != 0) {
     size_t bytes_read =
-        safe_fread(code->allocator->first_block(), 1, h->code_size, file);
+        safe_fread((void*)code->allocator->start, 1, h->code_size, file);
     if (bytes_read != h->code_size) {
       std::cout << "truncated image: " << bytes_read << " bytes read, ";
       std::cout << h->code_size << " bytes expected\n";
@@ -306,7 +306,7 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     ok = false;
   if (safe_fwrite((void*)data->tenured->start, h.data_size, 1, file) != 1)
     ok = false;
-  if (safe_fwrite(code->allocator->first_block(), h.code_size, 1, file) != 1)
+  if (safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
     ok = false;
   safe_fclose(file);
 
