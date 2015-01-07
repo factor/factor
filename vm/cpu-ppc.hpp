@@ -37,13 +37,13 @@ inline static void* get_call_target(cell return_address) {
   return (void*)(signed_addr + return_address);
 }
 
-inline static void set_call_target(cell return_address, void* target) {
+inline static void set_call_target(cell return_address, cell target) {
   return_address -= 4;
   check_call_site(return_address);
 
   uint32_t insn = *(uint32_t*)return_address;
 
-  fixnum relative_address = ((cell)target - return_address);
+  fixnum relative_address = target - return_address;
   insn = ((insn & ~b_mask) | (relative_address & b_mask));
   *(uint32_t*)return_address = insn;
 

@@ -200,10 +200,10 @@ struct stack_frame_printer {
     parent->print_obj(owner->scan(parent, addr));
     std::cout << std::endl;
     std::cout << "word/quot addr: ";
-    std::cout << std::hex << (cell)owner->owner << std::dec;
+    std::cout << std::hex << owner->owner << std::dec;
     std::cout << std::endl;
     std::cout << "word/quot xt: ";
-    std::cout << std::hex << (cell)owner->entry_point() << std::dec;
+    std::cout << std::hex << owner->entry_point() << std::dec;
     std::cout << std::endl;
     std::cout << "return address: ";
     std::cout << std::hex << addr << std::dec;

@@ -331,7 +331,7 @@ void factor_vm::jit_compile_quot(cell quot_, bool relocating) {
 /* Allocates memory */
 void factor_vm::primitive_jit_compile() { jit_compile_quot(ctx->pop(), true); }
 
-void* factor_vm::lazy_jit_compile_entry_point() {
+cell factor_vm::lazy_jit_compile_entry_point() {
   return untag<word>(special_objects[LAZY_JIT_COMPILE_WORD])->entry_point;
 }
 
@@ -352,7 +352,7 @@ void factor_vm::primitive_array_to_quotation() {
 void factor_vm::primitive_quotation_code() {
   data_root<quotation> quot(ctx->pop(), this);
 
-  ctx->push(from_unsigned_cell((cell)quot->entry_point));
+  ctx->push(from_unsigned_cell(quot->entry_point));
   ctx->push(from_unsigned_cell((cell)quot->code() + quot->code()->size()));
 }
 
@@ -387,7 +387,7 @@ VM_C_API cell lazy_jit_compile(cell quot, factor_vm* parent) {
 }
 
 bool factor_vm::quot_compiled_p(quotation* quot) {
-  return quot->entry_point != NULL &&
+  return quot->entry_point != 0 &&
          quot->entry_point != lazy_jit_compile_entry_point();
 }
 

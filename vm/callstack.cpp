@@ -105,15 +105,15 @@ Used by the single stepper. */
 void factor_vm::primitive_innermost_stack_frame_executing() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   void* frame = stack->top();
-  void* addr = *(void**)frame;
-  ctx->replace(code->code_block_for_address((cell)addr)->owner_quot());
+  cell addr = *(cell*)frame;
+  ctx->replace(code->code_block_for_address(addr)->owner_quot());
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   void* frame = stack->top();
   cell addr = *(cell*)frame;
-  ctx->replace(code->code_block_for_address((cell)addr)->scan(this, addr));
+  ctx->replace(code->code_block_for_address(addr)->scan(this, addr));
 }
 
 /* Allocates memory (jit_compile_quot) */
@@ -130,7 +130,7 @@ void factor_vm::primitive_set_innermost_stack_frame_quot() {
   cell addr = *(cell*)inner;
   code_block* block = code->code_block_for_address(addr);
   cell offset = block->offset(addr);
-  *(void**)inner = (char*)quot->entry_point + offset;
+  *(cell*)inner = quot->entry_point + offset;
 }
 
 /* Allocates memory (allot_alien) */

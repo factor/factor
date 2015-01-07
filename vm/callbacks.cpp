@@ -60,7 +60,7 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 
 void callback_heap::update(code_block* stub) {
   store_callback_operand(stub, setup_seh_p() ? 2 : 1,
-                         (cell)callback_entry_point(stub));
+                         callback_entry_point(stub));
   stub->flush_icache();
 }
 
@@ -82,7 +82,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   stub->parameters = false_object;
   stub->relocation = false_object;
 
-  memcpy(stub->entry_point(), insns->data<void>(), size);
+  memcpy((void*)stub->entry_point(), insns->data<void>(), size);
 
   /* Store VM pointer */
   store_callback_operand(stub, 0, (cell)parent);
@@ -131,9 +131,9 @@ void factor_vm::primitive_callback() {
 
   w.untag_check(this);
 
-  void* func = callbacks->add(w.value(), return_rewind)->entry_point();
+  cell func = callbacks->add(w.value(), return_rewind)->entry_point();
   CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);
-  ctx->push(allot_alien(func));
+  ctx->push(allot_alien((void*)func));
 }
 
 void factor_vm::primitive_free_callback() {

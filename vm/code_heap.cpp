@@ -103,10 +103,10 @@ code_block* code_heap::code_block_for_address(cell address) {
   FACTOR_ASSERT(blocki != all_blocks.begin());
   --blocki;
   code_block* found_block = (code_block*)*blocki;
-  FACTOR_ASSERT((cell)found_block->entry_point() <=
+  FACTOR_ASSERT(found_block->entry_point() <=
                 address /* XXX this isn't valid during fixup. should store the
                                size in the map
-                              && address - (cell)found_block->entry_point() <
+                              && address - found_block->entry_point() <
                                  found_block->size()*/);
   return found_block;
 }
@@ -251,7 +251,7 @@ struct code_block_accumulator {
        from_unsigned_cell() here. It is OK, however, to add it as
        if it were a fixnum, and have library code shift it to the
        left by 4. */
-    cell entry_point = (cell)compiled->entry_point();
+    cell entry_point = compiled->entry_point();
     FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
     FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);
     objects.push_back(entry_point);
