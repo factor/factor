@@ -29,9 +29,9 @@ cell code_block::scan(factor_vm* vm, cell addr) const {
 cell factor_vm::compute_entry_point_address(cell obj) {
   switch (tagged<object>(obj).type()) {
     case WORD_TYPE:
-      return (cell)untag<word>(obj)->entry_point;
+      return untag<word>(obj)->entry_point;
     case QUOTATION_TYPE:
-      return (cell)untag<quotation>(obj)->entry_point;
+      return untag<quotation>(obj)->entry_point;
     default:
       critical_error("Expected word or quotation", obj);
       return 0;
@@ -40,13 +40,13 @@ cell factor_vm::compute_entry_point_address(cell obj) {
 
 cell factor_vm::compute_entry_point_pic_address(word* w, cell tagged_quot) {
   if (!to_boolean(tagged_quot) || max_pic_size == 0)
-    return (cell)w->entry_point;
+    return w->entry_point;
   else {
     quotation* quot = untag<quotation>(tagged_quot);
     if (quot_compiled_p(quot))
-      return (cell)quot->entry_point;
+      return quot->entry_point;
     else
-      return (cell)w->entry_point;
+      return w->entry_point;
   }
 }
 
@@ -241,7 +241,7 @@ void factor_vm::store_external_address(instruction_operand op) {
       op.store_value(compute_dlsym_address(parameters, index));
       break;
     case RT_THIS:
-      op.store_value((cell)compiled->entry_point());
+      op.store_value(compiled->entry_point());
       break;
     case RT_MEGAMORPHIC_CACHE_HITS:
       op.store_value((cell)&dispatch_stats.megamorphic_cache_hits);
@@ -281,9 +281,9 @@ cell factor_vm::compute_here_address(cell arg, cell offset,
                                      code_block* compiled) {
   fixnum n = untag_fixnum(arg);
   if (n >= 0)
-    return (cell)compiled->entry_point() + offset + n;
+    return compiled->entry_point() + offset + n;
   else
-    return (cell)compiled->entry_point() - n;
+    return compiled->entry_point() - n;
 }
 
 struct initial_code_block_visitor {
@@ -359,7 +359,7 @@ void factor_vm::fixup_labels(array* labels, code_block* compiled) {
     relocation_entry new_entry(RT_HERE, rel_class, offset);
 
     instruction_operand op(new_entry, compiled, 0);
-    op.store_value(target + (cell)compiled->entry_point());
+    op.store_value(target + compiled->entry_point());
   }
 }
 

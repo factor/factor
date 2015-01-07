@@ -44,7 +44,7 @@ void safepoint_state::handle_safepoint(factor_vm* parent, cell pc) volatile {
   } else if (atomic::load(&parent->sampling_profiler_p)) {
     FACTOR_ASSERT(parent->code->seg->in_segment_p(pc));
     code_block* block = parent->code->code_block_for_address(pc);
-    bool prolog_p = (cell)block->entry_point() == pc;
+    bool prolog_p = block->entry_point() == pc;
 
     parent->record_sample(prolog_p);
   }

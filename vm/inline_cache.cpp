@@ -164,7 +164,7 @@ void factor_vm::update_pic_transitions(cell pic_size) {
    also, the block containing the return address may now be dead. Use a
    code_root to take care of the details. */
 /* Allocates memory */
-void* factor_vm::inline_cache_miss(cell return_address_) {
+cell factor_vm::inline_cache_miss(cell return_address_) {
   code_root return_address(return_address_, this);
   bool tail_call_site = tail_call_site_p(return_address.value);
 
@@ -185,7 +185,7 @@ void* factor_vm::inline_cache_miss(cell return_address_) {
 
   update_pic_transitions(pic_size);
 
-  void* xt;
+  cell xt;
 
   if (pic_size >= max_pic_size)
     xt = generic_word->entry_point;
@@ -221,7 +221,7 @@ void* factor_vm::inline_cache_miss(cell return_address_) {
 }
 
 /* Allocates memory */
-VM_C_API void* inline_cache_miss(cell return_address, factor_vm* parent) {
+VM_C_API cell inline_cache_miss(cell return_address, factor_vm* parent) {
   return parent->inline_cache_miss(return_address);
 }
 

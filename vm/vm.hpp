@@ -673,7 +673,7 @@ struct factor_vm {
 
   // quotations
   void primitive_jit_compile();
-  void* lazy_jit_compile_entry_point();
+  cell lazy_jit_compile_entry_point();
   void primitive_array_to_quotation();
   void primitive_quotation_code();
   code_block* jit_compile_quot(cell owner_, cell quot_, bool relocating);
@@ -711,7 +711,7 @@ struct factor_vm {
   cell inline_cache_size(cell cache_entries);
   cell add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_);
   void update_pic_transitions(cell pic_size);
-  void* inline_cache_miss(cell return_address);
+  cell inline_cache_miss(cell return_address);
 
   // entry points
   void c_to_factor(cell quot);

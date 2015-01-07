@@ -52,7 +52,7 @@ struct code_block {
        and a leaf procedure code block will record a frame size of zero.
        If we're seeing a stack frame in either of these cases, it's a
        fake "leaf frame" set up by the signal handler. */
-    if (natural_frame_size == 0 || (void*)addr == entry_point())
+    if (natural_frame_size == 0 || addr == entry_point())
       return LEAF_FRAME_SIZE;
     else
       return natural_frame_size;
@@ -68,7 +68,7 @@ struct code_block {
 
   template <typename Fixup> cell size(Fixup fixup) const { return size(); }
 
-  void* entry_point() const { return (void*)(this + 1); }
+  cell entry_point() const { return (cell)(this + 1); }
 
   /* GC info is stored at the end of the block */
   gc_info* block_gc_info() const {
@@ -92,10 +92,10 @@ struct code_block {
     }
   }
 
-  cell offset(cell addr) const { return addr - (cell)entry_point(); }
+  cell offset(cell addr) const { return addr - entry_point(); }
 
   cell address_for_offset(cell offset) const {
-    return (cell)((char*)entry_point() + offset);
+    return entry_point() + offset;
   }
 
   cell scan(factor_vm* vm, cell addr) const;
@@ -105,12 +105,12 @@ struct code_block {
 VM_C_API void undefined_symbol(void);
 
 inline code_block* word::code() const {
-  FACTOR_ASSERT(entry_point != NULL);
+  FACTOR_ASSERT(entry_point != 0);
   return (code_block*)entry_point - 1;
 }
 
 inline code_block* quotation::code() const {
-  FACTOR_ASSERT(entry_point != NULL);
+  FACTOR_ASSERT(entry_point != 0);
   return (code_block*)entry_point - 1;
 }
 

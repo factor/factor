@@ -31,7 +31,7 @@ struct callback_heap {
   callback_heap(cell size, factor_vm* parent);
   ~callback_heap();
 
-  void* callback_entry_point(code_block* stub) {
+  cell callback_entry_point(code_block* stub) {
     word* w = (word*)UNTAG(stub->owner);
     return w->entry_point;
   }

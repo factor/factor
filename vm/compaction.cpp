@@ -88,7 +88,7 @@ template <typename Fixup> struct code_block_compaction_relocation_visitor {
       : parent(parent), old_address(old_address), fixup(fixup) {}
 
   void operator()(instruction_operand op) {
-    cell old_offset = op.rel_offset() + (cell)old_address->entry_point();
+    cell old_offset = op.rel_offset() + old_address->entry_point();
 
     switch (op.rel_type()) {
       case RT_LITERAL: {

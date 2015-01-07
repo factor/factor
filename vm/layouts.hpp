@@ -228,7 +228,7 @@ struct word : public object {
   /* TAGGED machine code for sub-primitive */
   cell subprimitive;
   /* UNTAGGED entry point: jump here to execute word */
-  void* entry_point;
+  cell entry_point;
   /* UNTAGGED compiled code block */
 
   /* defined in code_blocks.hpp */
@@ -266,7 +266,7 @@ struct quotation : public object {
   /* tagged */
   cell cache_counter;
   /* UNTAGGED entry point; jump here to call quotation */
-  void* entry_point;
+  cell entry_point;
 
   /* defined in code_blocks.hpp */
   code_block* code() const;
