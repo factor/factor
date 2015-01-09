@@ -36,8 +36,8 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
 
   mark_stack.clear();
 
-  code->clear_mark_bits();
-  data->tenured->clear_mark_bits();
+  code->allocator->state.clear_mark_bits();
+  data->tenured->state.clear_mark_bits();
 
   collector.data_visitor.visit_roots();
   if (trace_contexts_p) {
