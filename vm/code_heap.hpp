@@ -39,7 +39,6 @@ struct code_heap {
   bool uninitialized_p(code_block* compiled);
   bool marked_p(code_block* compiled);
   void set_marked_p(code_block* compiled);
-  void clear_mark_bits();
   void free(code_block* compiled);
   void flush_icache();
   void guard_safepoint();

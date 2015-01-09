@@ -25,8 +25,6 @@ struct tenured_space : free_list_allocator<object> {
     return (cell)next_allocated_block_after(next);
   }
 
-  void clear_mark_bits() { state.clear_mark_bits(); }
-
   bool marked_p(object* obj) {
     return this->state.marked_p((cell)obj);
   }
