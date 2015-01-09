@@ -65,10 +65,6 @@ SYMBOL: current-fdb-kvs-handle
 : fdb-open-default-config ( path -- file-handle handle )
     fdb_get_default_config get-kvs-default-config fdb-open ;
 
-: ret>string ( void** len -- string )
-    [ void* deref ] [ size_t deref ] bi*
-    [ memory>byte-array utf8 decode ] [ drop (free) ] 2bi ;
-
 : get-file-handle ( -- handle )
     current-fdb-file-handle get handle>> ;
 
@@ -110,6 +106,10 @@ SYMBOL: current-fdb-kvs-handle
 
 : fdb-del ( doc -- )
     [ get-kvs-handle ] dip fdb_del fdb-check-error ;
+
+: ret>string ( void** len -- string )
+    [ void* deref ] [ size_t deref ] bi*
+    memory>byte-array utf8 decode ;
 
 : fdb-get-kv ( key -- value/f )
     [ get-kvs-handle ] dip
