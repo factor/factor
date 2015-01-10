@@ -31,7 +31,7 @@ void factor_vm::collect_nursery() {
 
   collector.cheneys_algorithm();
 
-  data->reset_generation(&nursery);
+  data->reset_nursery();
   code->points_to_nursery.clear();
 }
 

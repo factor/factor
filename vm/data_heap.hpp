@@ -29,9 +29,9 @@ struct data_heap {
   data_heap* grow(bump_allocator* vm_nursery, cell requested_size);
   template <typename Generation> void clear_cards(Generation* gen);
   template <typename Generation> void clear_decks(Generation* gen);
-  void reset_generation(bump_allocator* gen);
-  void reset_generation(aging_space* gen);
-  void reset_generation(tenured_space* gen);
+  void reset_nursery();
+  void reset_aging();
+  void reset_tenured();
   bool high_fragmentation_p();
   bool low_memory_p();
   void mark_all_cards();

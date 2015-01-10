@@ -77,20 +77,20 @@ template <typename Generation> void data_heap::clear_decks(Generation* gen) {
   memset(&decks[first_deck], 0, last_deck - first_deck);
 }
 
-void data_heap::reset_generation(bump_allocator* gen) {
-  gen->flush();
+void data_heap::reset_nursery() {
+  nursery->flush();
 }
 
-void data_heap::reset_generation(aging_space* gen) {
-  gen->flush();
-  clear_cards(gen);
-  clear_decks(gen);
-  gen->starts.clear_object_start_offsets();
+void data_heap::reset_aging() {
+  aging->flush();
+  clear_cards(aging);
+  clear_decks(aging);
+  aging->starts.clear_object_start_offsets();
 }
 
-void data_heap::reset_generation(tenured_space* gen) {
-  clear_cards(gen);
-  clear_decks(gen);
+void data_heap::reset_tenured() {
+  clear_cards(tenured);
+  clear_decks(tenured);
 }
 
 bool data_heap::high_fragmentation_p() {

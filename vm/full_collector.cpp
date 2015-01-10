@@ -59,10 +59,9 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
       code_visitor.visit_object_code_block(obj);
     }
   }
-
-  data->reset_generation(data->tenured);
-  data->reset_generation(data->aging);
-  data->reset_generation(&nursery);
+  data->reset_tenured();
+  data->reset_aging();
+  data->reset_nursery();
   code->clear_remembered_set();
 }
 
