@@ -95,7 +95,11 @@ void code_block_visitor<Fixup>::visit_embedded_code_pointers(
 template <typename Fixup>
 void code_block_visitor<Fixup>::visit_context_code_blocks() {
   call_frame_code_block_visitor<Fixup> call_frame_visitor(parent, fixup);
-  parent->iterate_active_callstacks(call_frame_visitor, fixup);
+  std::set<context*>::const_iterator begin = parent->active_contexts.begin();
+  std::set<context*>::const_iterator end = parent->active_contexts.end();
+  while (begin != end) {
+    parent->iterate_callstack(*begin++, call_frame_visitor, fixup);
+  }
 }
 
 template <typename Fixup>

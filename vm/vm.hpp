@@ -177,15 +177,6 @@ struct factor_vm {
   void primitive_check_datastack();
   void primitive_load_locals();
 
-  template <typename Iterator, typename Fixup>
-  void iterate_active_callstacks(Iterator& iter, Fixup& fixup) {
-    std::set<context*>::const_iterator begin = active_contexts.begin();
-    std::set<context*>::const_iterator end = active_contexts.end();
-    while (begin != end) {
-      iterate_callstack(*begin++, iter, fixup);
-    }
-  }
-
   // run
   void primitive_exit();
   void primitive_nano_count();
