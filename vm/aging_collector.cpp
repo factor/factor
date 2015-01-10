@@ -33,7 +33,7 @@ void factor_vm::collect_aging() {
     current_gc->op = collect_aging_op;
 
     std::swap(data->aging, data->aging_semispace);
-    data->reset_generation(data->aging);
+    data->reset_aging();
 
     copying_collector<aging_space, aging_policy> collector(this,
                                                            this->data->aging,
@@ -43,7 +43,7 @@ void factor_vm::collect_aging() {
 
     collector.cheneys_algorithm();
 
-    data->reset_generation(&nursery);
+    data->reset_nursery();
     code->clear_remembered_set();
   }
 }

@@ -41,8 +41,8 @@ void factor_vm::collect_to_tenured() {
 
   collector.tenure_reachable_objects();
 
-  data->reset_generation(&nursery);
-  data->reset_generation(data->aging);
+  data->reset_nursery();
+  data->reset_aging();
   code->clear_remembered_set();
 }
 
