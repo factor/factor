@@ -2,20 +2,9 @@
 
 namespace factor {
 
-full_collector::full_collector(factor_vm* parent)
-    : collector<tenured_space, full_policy>(parent, parent->data->tenured,
-                                            full_policy(parent)),
-      code_visitor(parent, workhorse) {}
-
-void full_collector::trace_code_block(code_block* compiled) {
-  data_visitor.visit_code_block_objects(compiled);
-  data_visitor.visit_embedded_literals(compiled);
-  code_visitor.visit_embedded_code_pointers(compiled);
-}
-
 /* After a sweep, invalidate any code heap roots which are not marked,
    so that if a block makes a tail call to a generic word, and the PIC
-   compiler triggers a GC, and the caller block gets gets GCd as a result,
+   compiler triggers a GC, and the caller block gets GCd as a result,
    the PIC code won't try to overwrite the call site */
 void factor_vm::update_code_roots_for_sweep() {
   std::vector<code_root*>::const_iterator iter = code_roots.begin();
@@ -32,18 +21,25 @@ void factor_vm::update_code_roots_for_sweep() {
 }
 
 void factor_vm::collect_mark_impl(bool trace_contexts_p) {
-  full_collector collector(this);
+  gc_workhorse<tenured_space, full_policy>
+      workhorse(this, this->data->tenured, full_policy(this));
+
+  slot_visitor<gc_workhorse<tenured_space, full_policy> >
+                data_visitor(this, workhorse);
+
+  code_block_visitor<gc_workhorse<tenured_space, full_policy> >
+                code_visitor(this, workhorse);
 
   mark_stack.clear();
 
   code->allocator->state.clear_mark_bits();
   data->tenured->state.clear_mark_bits();
 
-  collector.data_visitor.visit_roots();
+  data_visitor.visit_roots();
   if (trace_contexts_p) {
-    collector.data_visitor.visit_contexts();
-    collector.code_visitor.visit_context_code_blocks();
-    collector.code_visitor.visit_uninitialized_code_blocks();
+    data_visitor.visit_contexts();
+    code_visitor.visit_context_code_blocks();
+    code_visitor.visit_uninitialized_code_blocks();
   }
 
   while (!mark_stack.empty()) {
@@ -52,11 +48,15 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
 
     if (ptr & 1) {
       code_block* compiled = (code_block*)(ptr - 1);
-      collector.trace_code_block(compiled);
+      data_visitor.visit_code_block_objects(compiled);
+      data_visitor.visit_embedded_literals(compiled);
+      code_visitor.visit_embedded_code_pointers(compiled);
     } else {
       object* obj = (object*)ptr;
-      collector.trace_object(obj);
-      collector.code_visitor.visit_object_code_block(obj);
+      data_visitor.visit_slots(obj);
+      if (obj->type() == ALIEN_TYPE)
+        ((alien*)obj)->update_address();
+      code_visitor.visit_object_code_block(obj);
     }
   }
 
