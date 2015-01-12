@@ -164,7 +164,7 @@ void factor_vm::update_code_roots_for_compaction() {
 }
 
 /* Compact data and code heaps */
-void factor_vm::collect_compact_impl(bool trace_contexts_p) {
+void factor_vm::collect_compact_impl() {
   gc_event* event = current_gc->event;
 
 #ifdef FACTOR_DEBUG
@@ -212,10 +212,8 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p) {
     }
 
     forwarder.visit_roots();
-    if (trace_contexts_p) {
-      forwarder.visit_contexts();
-      forwarder.visit_context_code_blocks();
-    }
+    forwarder.visit_contexts();
+    forwarder.visit_context_code_blocks();
   }
 
   update_code_roots_for_compaction();
@@ -273,7 +271,7 @@ struct object_grow_heap_updater {
 };
 
 /* Compact just the code heap, after growing the data heap */
-void factor_vm::collect_compact_code_impl(bool trace_contexts_p) {
+void factor_vm::collect_compact_code_impl() {
   /* Figure out where blocks are going to go */
   mark_bits* code_forwarding_map = &code->allocator->state;
   code_forwarding_map->compute_forwarding();
@@ -284,9 +282,7 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p) {
   slot_visitor<code_compaction_fixup> forwarder(this, fixup);
 
   forwarder.visit_uninitialized_code_blocks();
-
-  if (trace_contexts_p)
-    forwarder.visit_context_code_blocks();
+  forwarder.visit_context_code_blocks();
 
   /* Update code heap references in data heap */
   object_grow_heap_updater object_updater(forwarder);
@@ -303,26 +299,25 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p) {
   code->initialize_all_blocks_set();
 }
 
-void factor_vm::collect_compact(bool trace_contexts_p) {
-  collect_mark_impl(trace_contexts_p);
-  collect_compact_impl(trace_contexts_p);
+void factor_vm::collect_compact() {
+  collect_mark_impl();
+  collect_compact_impl();
 
   if (data->high_fragmentation_p()) {
     /* Compaction did not free up enough memory. Grow the heap. */
     set_current_gc_op(collect_growing_heap_op);
-    collect_growing_heap(0, trace_contexts_p);
+    collect_growing_heap(0);
   }
 
   code->flush_icache();
 }
 
-void factor_vm::collect_growing_heap(cell requested_size,
-                                     bool trace_contexts_p) {
+void factor_vm::collect_growing_heap(cell requested_size) {
   /* Grow the data heap and copy all live objects to the new heap. */
   data_heap* old = data;
   set_data_heap(data->grow(&nursery, requested_size));
-  collect_mark_impl(trace_contexts_p);
-  collect_compact_code_impl(trace_contexts_p);
+  collect_mark_impl();
+  collect_compact_code_impl();
   code->flush_icache();
   delete old;
 }

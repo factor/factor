@@ -347,8 +347,12 @@ void factor_vm::primitive_save_image_and_exit() {
     if (!save_special_p(i))
       special_objects[i] = false_object;
 
-  gc(collect_compact_op, 0, /* requested size */
-     false /* discard objects only reachable from stacks */);
+  /* dont trace objects only reachable from context stacks so we don't
+     get volatile data saved in the image. */
+  active_contexts.clear();
+  code->uninitialized_blocks.clear();
+
+  gc(collect_compact_op, 0 /* requested size */);
 
   /* Save the image */
   if (save_image((vm_char*)(path1.untagged() + 1),

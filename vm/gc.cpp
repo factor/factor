@@ -111,7 +111,7 @@ void factor_vm::set_current_gc_op(gc_op op) {
     current_gc->event->op = op;
 }
 
-void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
+void factor_vm::gc(gc_op op, cell requested_size) {
   FACTOR_ASSERT(!gc_off);
   FACTOR_ASSERT(!current_gc);
 
@@ -141,7 +141,7 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
           if (data->high_fragmentation_p()) {
             /* Change GC op so that if we fail again, we crash. */
             set_current_gc_op(collect_full_op);
-            collect_full(trace_contexts_p);
+            collect_full();
           }
           break;
         case collect_to_tenured_op:
@@ -150,17 +150,17 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
           if (data->high_fragmentation_p()) {
             /* Change GC op so that if we fail again, we crash. */
             set_current_gc_op(collect_full_op);
-            collect_full(trace_contexts_p);
+            collect_full();
           }
           break;
         case collect_full_op:
-          collect_full(trace_contexts_p);
+          collect_full();
           break;
         case collect_compact_op:
-          collect_compact(trace_contexts_p);
+          collect_compact();
           break;
         case collect_growing_heap_op:
-          collect_growing_heap(requested_size, trace_contexts_p);
+          collect_growing_heap(requested_size);
           break;
         default:
           critical_error("in gc, bad GC op", current_gc->op);
@@ -187,18 +187,15 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
 }
 
 void factor_vm::primitive_minor_gc() {
-  gc(collect_nursery_op, 0, /* requested size */
-     true /* trace contexts? */);
+  gc(collect_nursery_op, 0 /* requested size */);
 }
 
 void factor_vm::primitive_full_gc() {
-  gc(collect_full_op, 0, /* requested size */
-     true /* trace contexts? */);
+  gc(collect_full_op, 0 /* requested size */);
 }
 
 void factor_vm::primitive_compact_gc() {
-  gc(collect_compact_op, 0, /* requested size */
-     true /* trace contexts? */);
+  gc(collect_compact_op, 0 /* requested size */);
 }
 
 /*
@@ -214,8 +211,7 @@ object* factor_vm::allot_large_object(cell type, cell size) {
 
     /* If it still won't fit, grow the heap */
     if (!data->tenured->can_allot_p(requested_size)) {
-      gc(collect_growing_heap_op, size, /* requested size */
-         true /* trace contexts? */);
+      gc(collect_growing_heap_op, size /* requested size */);
     }
   }
 
