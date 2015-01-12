@@ -20,7 +20,7 @@ void factor_vm::update_code_roots_for_sweep() {
   }
 }
 
-void factor_vm::collect_mark_impl(bool trace_contexts_p) {
+void factor_vm::collect_mark_impl() {
   gc_workhorse<tenured_space, full_policy>
       workhorse(this, this->data->tenured, full_policy(this));
 
@@ -33,11 +33,9 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
   data->tenured->state.clear_mark_bits();
 
   visitor.visit_roots();
-  if (trace_contexts_p) {
-    visitor.visit_contexts();
-    visitor.visit_context_code_blocks();
-    visitor.visit_uninitialized_code_blocks();
-  }
+  visitor.visit_contexts();
+  visitor.visit_context_code_blocks();
+  visitor.visit_uninitialized_code_blocks();
 
   while (!mark_stack.empty()) {
     cell ptr = mark_stack.back();
@@ -80,19 +78,19 @@ void factor_vm::collect_sweep_impl() {
     event->ended_code_sweep();
 }
 
-void factor_vm::collect_full(bool trace_contexts_p) {
-  collect_mark_impl(trace_contexts_p);
+void factor_vm::collect_full() {
+  collect_mark_impl();
   collect_sweep_impl();
 
   if (data->low_memory_p()) {
     /* Full GC did not free up enough memory. Grow the heap. */
     set_current_gc_op(collect_growing_heap_op);
-    collect_growing_heap(0, trace_contexts_p);
+    collect_growing_heap(0);
   } else if (data->high_fragmentation_p()) {
     /* Enough free memory, but it is not contiguous. Perform a
        compaction. */
     set_current_gc_op(collect_compact_op);
-    collect_compact_impl(trace_contexts_p);
+    collect_compact_impl();
   }
 
   code->flush_icache();
