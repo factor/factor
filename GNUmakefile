@@ -118,7 +118,6 @@ ifdef CONFIG
 		vm/nursery_collector.hpp \
 		vm/aging_collector.hpp \
 		vm/to_tenured_collector.hpp \
-		vm/code_block_visitor.hpp \
 		vm/full_collector.hpp \
 		vm/arrays.hpp \
 		vm/math.hpp \

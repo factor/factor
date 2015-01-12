@@ -80,19 +80,17 @@ struct startup_fixup {
 struct start_object_updater {
   factor_vm* parent;
   startup_fixup fixup;
-  slot_visitor<startup_fixup> data_visitor;
-  code_block_visitor<startup_fixup> code_visitor;
+  slot_visitor<startup_fixup> visitor;
 
   start_object_updater(factor_vm* parent, startup_fixup fixup)
       : parent(parent),
         fixup(fixup),
-        data_visitor(slot_visitor<startup_fixup>(parent, fixup)),
-        code_visitor(code_block_visitor<startup_fixup>(parent, fixup)) {}
+        visitor(slot_visitor<startup_fixup>(parent, fixup)) { }
 
   void operator()(object* obj, cell size) {
     parent->data->tenured->starts.record_object_start_offset(obj);
 
-    data_visitor.visit_slots(obj);
+    visitor.visit_slots(obj);
 
     switch (obj->type()) {
       case ALIEN_TYPE: {
@@ -110,7 +108,7 @@ struct start_object_updater {
         break;
       }
       default: {
-        code_visitor.visit_object_code_block(obj);
+        visitor.visit_object_code_block(obj);
         break;
       }
     }
