@@ -25,21 +25,18 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
       workhorse(this, this->data->tenured, full_policy(this));
 
   slot_visitor<gc_workhorse<tenured_space, full_policy> >
-                data_visitor(this, workhorse);
-
-  code_block_visitor<gc_workhorse<tenured_space, full_policy> >
-                code_visitor(this, workhorse);
+                visitor(this, workhorse);
 
   mark_stack.clear();
 
   code->allocator->state.clear_mark_bits();
   data->tenured->state.clear_mark_bits();
 
-  data_visitor.visit_roots();
+  visitor.visit_roots();
   if (trace_contexts_p) {
-    data_visitor.visit_contexts();
-    code_visitor.visit_context_code_blocks();
-    code_visitor.visit_uninitialized_code_blocks();
+    visitor.visit_contexts();
+    visitor.visit_context_code_blocks();
+    visitor.visit_uninitialized_code_blocks();
   }
 
   while (!mark_stack.empty()) {
@@ -48,15 +45,15 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p) {
 
     if (ptr & 1) {
       code_block* compiled = (code_block*)(ptr - 1);
-      data_visitor.visit_code_block_objects(compiled);
-      data_visitor.visit_embedded_literals(compiled);
-      code_visitor.visit_embedded_code_pointers(compiled);
+      visitor.visit_code_block_objects(compiled);
+      visitor.visit_embedded_literals(compiled);
+      visitor.visit_embedded_code_pointers(compiled);
     } else {
       object* obj = (object*)ptr;
-      data_visitor.visit_slots(obj);
+      visitor.visit_slots(obj);
       if (obj->type() == ALIEN_TYPE)
         ((alien*)obj)->update_address();
-      code_visitor.visit_object_code_block(obj);
+      visitor.visit_object_code_block(obj);
     }
   }
   data->reset_tenured();

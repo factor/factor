@@ -67,12 +67,9 @@ struct object_compaction_updater {
         starts(&parent->data->tenured->starts) {}
 
   void operator()(object* old_address, object* new_address, cell size) {
-    slot_visitor<compaction_fixup> slot_forwarder(parent, fixup);
-    slot_forwarder.visit_slots(new_address);
-
-    code_block_visitor<compaction_fixup> code_forwarder(parent, fixup);
-    code_forwarder.visit_object_code_block(new_address);
-
+    slot_visitor<compaction_fixup> forwarder(parent, fixup);
+    forwarder.visit_slots(new_address);
+    forwarder.visit_object_code_block(new_address);
     starts->record_object_start_offset(new_address);
   }
 };
@@ -125,19 +122,16 @@ template <typename Fixup> struct code_block_compaction_relocation_visitor {
 template <typename Fixup> struct code_block_compaction_updater {
   factor_vm* parent;
   Fixup fixup;
-  slot_visitor<Fixup> data_forwarder;
-  code_block_visitor<Fixup> code_forwarder;
+  slot_visitor<Fixup> forwarder;
 
   code_block_compaction_updater(
-      factor_vm* parent, Fixup fixup, slot_visitor<Fixup> data_forwarder,
-      code_block_visitor<Fixup> code_forwarder)
+      factor_vm* parent, Fixup fixup, slot_visitor<Fixup> forwarder)
       : parent(parent),
         fixup(fixup),
-        data_forwarder(data_forwarder),
-        code_forwarder(code_forwarder) {}
+        forwarder(forwarder) { }
 
   void operator()(code_block* old_address, code_block* new_address, cell size) {
-    data_forwarder.visit_code_block_objects(new_address);
+    forwarder.visit_code_block_objects(new_address);
 
     code_block_compaction_relocation_visitor<Fixup> visitor(parent, old_address,
                                                             fixup);
@@ -195,10 +189,9 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p) {
     compaction_fixup fixup(data_forwarding_map, code_forwarding_map, &data_finger,
                            &code_finger);
 
-    slot_visitor<compaction_fixup> data_forwarder(this, fixup);
-    code_block_visitor<compaction_fixup> code_forwarder(this, fixup);
+    slot_visitor<compaction_fixup> forwarder(this, fixup);
 
-    code_forwarder.visit_uninitialized_code_blocks();
+    forwarder.visit_uninitialized_code_blocks();
 
     /* Object start offsets get recomputed by the object_compaction_updater */
     data->tenured->starts.clear_object_start_offsets();
@@ -214,14 +207,14 @@ void factor_vm::collect_compact_impl(bool trace_contexts_p) {
        pointers inside code blocks. */
     {
       code_block_compaction_updater<compaction_fixup> code_block_updater(
-          this, fixup, data_forwarder, code_forwarder);
+          this, fixup, forwarder);
       code->allocator->compact(code_block_updater, fixup, &code_finger);
     }
 
-    data_forwarder.visit_roots();
+    forwarder.visit_roots();
     if (trace_contexts_p) {
-      data_forwarder.visit_contexts();
-      code_forwarder.visit_context_code_blocks();
+      forwarder.visit_contexts();
+      forwarder.visit_context_code_blocks();
     }
   }
 
@@ -270,13 +263,13 @@ struct code_compaction_fixup {
 };
 
 struct object_grow_heap_updater {
-  code_block_visitor<code_compaction_fixup> code_forwarder;
+  slot_visitor<code_compaction_fixup> forwarder;
 
   explicit object_grow_heap_updater(
-      code_block_visitor<code_compaction_fixup> code_forwarder)
-      : code_forwarder(code_forwarder) {}
+      slot_visitor<code_compaction_fixup> forwarder)
+      : forwarder(forwarder) {}
 
-  void operator()(object* obj) { code_forwarder.visit_object_code_block(obj); }
+  void operator()(object* obj) { forwarder.visit_object_code_block(obj); }
 };
 
 /* Compact just the code heap, after growing the data heap */
@@ -288,22 +281,21 @@ void factor_vm::collect_compact_code_impl(bool trace_contexts_p) {
   const code_block* code_finger = (code_block*)code->allocator->start;
 
   code_compaction_fixup fixup(code_forwarding_map, &code_finger);
-  slot_visitor<code_compaction_fixup> data_forwarder(this, fixup);
-  code_block_visitor<code_compaction_fixup> code_forwarder(this, fixup);
+  slot_visitor<code_compaction_fixup> forwarder(this, fixup);
 
-  code_forwarder.visit_uninitialized_code_blocks();
+  forwarder.visit_uninitialized_code_blocks();
 
   if (trace_contexts_p)
-    code_forwarder.visit_context_code_blocks();
+    forwarder.visit_context_code_blocks();
 
   /* Update code heap references in data heap */
-  object_grow_heap_updater object_updater(code_forwarder);
+  object_grow_heap_updater object_updater(forwarder);
   each_object(object_updater);
 
   /* Slide everything in the code heap up, and update code heap
 	pointers inside code blocks. */
   code_block_compaction_updater<code_compaction_fixup> code_block_updater(
-      this, fixup, data_forwarder, code_forwarder);
+      this, fixup, forwarder);
   code->allocator->compact(code_block_updater, fixup, &code_finger);
 
   update_code_roots_for_compaction();
