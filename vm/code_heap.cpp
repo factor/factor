@@ -39,14 +39,6 @@ bool code_heap::uninitialized_p(code_block* compiled) {
   return uninitialized_blocks.count(compiled) > 0;
 }
 
-bool code_heap::marked_p(code_block* compiled) {
-  return allocator->state.marked_p((cell)compiled);
-}
-
-void code_heap::set_marked_p(code_block* compiled) {
-  allocator->state.set_marked_p((cell)compiled, compiled->size());
-}
-
 void code_heap::free(code_block* compiled) {
   FACTOR_ASSERT(!uninitialized_p(compiled));
   points_to_nursery.erase(compiled);

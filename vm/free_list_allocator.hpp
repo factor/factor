@@ -59,7 +59,7 @@ template <typename Block>
 Block* free_list_allocator<Block>::next_allocated_block_after(Block* block) {
   while ((cell)block != this->end && block->free_p()) {
     free_heap_block* free_block = (free_heap_block*)block;
-    block = (object*)((cell)free_block + free_block->size());
+    block = (Block*)((cell)free_block + free_block->size());
   }
 
   if ((cell)block == this->end)

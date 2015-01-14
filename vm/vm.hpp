@@ -382,11 +382,6 @@ struct factor_vm {
     return (Type*)allot_object(Type::type_number, size);
   }
 
-  inline void check_data_pointer(object* pointer) {
-    FACTOR_ASSERT((current_gc && current_gc->op == collect_growing_heap_op) ||
-                  data->seg->in_segment_p((cell)pointer));
-  }
-
   // generic arrays
   template <typename Array> Array* allot_uninitialized_array(cell capacity);
   template <typename Array>

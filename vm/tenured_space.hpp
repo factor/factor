@@ -25,14 +25,6 @@ struct tenured_space : free_list_allocator<object> {
     return (cell)next_allocated_block_after(next);
   }
 
-  bool marked_p(object* obj) {
-    return this->state.marked_p((cell)obj);
-  }
-
-  void set_marked_p(object* obj) {
-    this->state.set_marked_p((cell)obj, obj->size());
-  }
-
   void sweep() {
     free_list_allocator<object>::sweep();
     starts.update_for_sweep(&this->state);
