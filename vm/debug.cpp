@@ -368,7 +368,7 @@ struct code_block_printer {
       reloc_size += parent->object_size(scan->relocation);
       parameter_size += parent->object_size(scan->parameters);
 
-      if (parent->code->marked_p(scan))
+      if (parent->code->allocator->state.marked_p((cell)scan))
         status = "marked";
       else
         status = "allocated";

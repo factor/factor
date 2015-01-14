@@ -15,18 +15,26 @@ struct gc_workhorse : no_fixup {
   gc_workhorse(factor_vm* parent, TargetGeneration* target, Policy policy)
       : parent(parent), target(target), policy(policy), code(parent->code) {}
 
-  object* resolve_forwarding(object* untagged) {
-    parent->check_data_pointer(untagged);
+  object* fixup_data(object* obj) {
+    FACTOR_ASSERT((parent->current_gc &&
+                   parent->current_gc->op == collect_growing_heap_op) ||
+                  parent->data->seg->in_segment_p((cell)obj));
 
+    if (!policy.should_copy_p(obj)) {
+      policy.visited_object(obj);
+      return obj;
+    }
+
+    object* untagged = obj;
     /* is there another forwarding pointer? */
     while (untagged->forwarding_pointer_p())
       untagged = untagged->forwarding_pointer();
 
-    /* we've found the destination */
-    return untagged;
-  }
+    if (!policy.should_copy_p(untagged)) {
+      policy.visited_object(untagged);
+      return untagged;
+    }
 
-  object* promote_object(object* untagged) {
     cell size = untagged->size();
     object* newpointer = target->allot(size);
     if (!newpointer)
@@ -40,29 +48,9 @@ struct gc_workhorse : no_fixup {
     return newpointer;
   }
 
-  object* fixup_data(object* obj) {
-    parent->check_data_pointer(obj);
-
-    if (!policy.should_copy_p(obj)) {
-      policy.visited_object(obj);
-      return obj;
-    }
-
-    object* forwarding = resolve_forwarding(obj);
-
-    if (forwarding == obj)
-      return promote_object(obj);
-    else if (policy.should_copy_p(forwarding))
-      return promote_object(forwarding);
-    else {
-      policy.visited_object(forwarding);
-      return forwarding;
-    }
-  }
-
   code_block* fixup_code(code_block* compiled) {
-    if (!code->marked_p(compiled)) {
-      code->set_marked_p(compiled);
+    if (!code->allocator->state.marked_p((cell)compiled)) {
+      code->allocator->state.set_marked_p((cell)compiled, compiled->size());
       parent->mark_stack.push_back((cell)compiled + 1);
     }
 
