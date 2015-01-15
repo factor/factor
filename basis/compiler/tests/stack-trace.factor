@@ -1,6 +1,7 @@
-USING: compiler tools.test namespaces sequences
-kernel.private kernel math continuations continuations.private
-words splitting grouping sorting accessors ;
+USING: accessors combinators.short-circuit compiler continuations
+continuations.private fry generic generic.hook grouping io.backend
+io.encodings.utf8 io.files io.files.temp kernel kernel.private math namespaces
+parser sequences sorting splitting tools.test vocabs words ;
 IN: compiler.tests.stack-trace
 
 : symbolic-stack-trace ( -- newseq )
@@ -29,4 +30,16 @@ IN: compiler.tests.stack-trace
     [ { "hi" } bleh ] ignore-errors
     \ + stack-trace-any?
     \ > stack-trace-any?
+] unit-test
+
+! #1265: Checks that the quotation index never is f (it's -1 instead).
+{ f } [
+    [ normalize-path ] ignore-errors error-continuation get
+    call>> callstack>array [ f = ] any?
+] unit-test
+
+! Crashes factor if compiled in debug mode.
+[ ] [
+    "USING: continuations io.backend ; [ normalize-path ] ignore-errors f"
+    "weird.factor" temp-file [ utf8 set-file-contents ] keep run-file
 ] unit-test
