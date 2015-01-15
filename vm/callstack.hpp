@@ -28,6 +28,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
     iterator(frame_top, frame_size, owner, fixed_addr);
     frame_offset += frame_size;
   }
+  FACTOR_ASSERT(frame_offset == frame_length);
 }
 
 /* Allocates memory */
@@ -40,30 +41,31 @@ inline void factor_vm::iterate_callstack_object(callstack* stack,
 
 /* Allocates memory */
 template <typename Iterator, typename Fixup>
-inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
-                                         Fixup& fixup) {
+void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
+                                  Fixup& fixup) {
 
-  cell frame_top = ctx->callstack_top;
+  FACTOR_ASSERT(!Fixup::translated_code_block_map);
+  cell top = ctx->callstack_top;
 
-  while (frame_top < ctx->callstack_bottom) {
-    cell addr = *(cell*)frame_top;
+  while (top < ctx->callstack_bottom) {
+    cell addr = *(cell*)top;
     FACTOR_ASSERT(addr != 0);
-    cell fixed_addr = Fixup::translated_code_block_map
-                          ? (cell)fixup.translate_code((code_block*)addr)
-                          : addr;
 
-    code_block* owner = code->code_block_for_address(fixed_addr);
-    code_block* fixed_owner =
-        Fixup::translated_code_block_map ? owner : fixup.translate_code(owner);
+    /* Only the address is valid, if the code heap has been compacted,
+       owner might not point to a real code block. */
+    code_block* owner = code->code_block_for_address(addr);
+    code_block* fixed_owner = fixup.translate_code(owner);
 
-    cell frame_size = fixed_owner->stack_frame_size_for_address(fixed_addr);
+    cell delta = addr - (cell)owner - sizeof(code_block);
+    cell natural_frame_size = fixed_owner->stack_frame_size();
+    cell size = LEAF_FRAME_SIZE;
+    if (natural_frame_size > 0 && delta > 0)
+      size = natural_frame_size;
 
-    cell fixed_addr_for_iter =
-        Fixup::translated_code_block_map ? fixed_addr : addr;
-
-    iterator(frame_top, frame_size, owner, fixed_addr_for_iter);
-    frame_top += frame_size;
+    iterator(top, size, owner, addr);
+    top += size;
   }
+  FACTOR_ASSERT(top == ctx->callstack_bottom);
 }
 
 /* Allocates memory */
