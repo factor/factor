@@ -234,7 +234,7 @@ M: cocoa-ui-backend system-alert
 CLASS: FactorApplicationDelegate < NSObject
 [
     METHOD: void applicationDidUpdate: id obj
-    [ reset-run-loop ]
+    [ reset-thread-timer ]
 ]
 
 : install-app-delegate ( -- )
@@ -254,7 +254,7 @@ M: cocoa-ui-backend (with-ui)
             start-ui
             stop-io-thread
             init-thread-timer
-            reset-run-loop
+            reset-thread-timer
             NSApp -> run
         ] ui-running
     ] with-cocoa ;
