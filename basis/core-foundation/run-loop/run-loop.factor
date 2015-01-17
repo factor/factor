@@ -103,13 +103,16 @@ SYMBOL: run-loop
 
 SYMBOL: thread-timer
 
-: reset-thread-timer ( timer -- )
+: (reset-thread-timer) ( timer -- )
     sleep-time
     [ 1000 /f ] [ 1,000,000 ] if* system-micros +
     >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
 
+: reset-thread-timer ( -- )
+    thread-timer get-global (reset-thread-timer) ;
+
 : thread-timer-callback ( -- callback )
-    [ drop reset-thread-timer yield ] CFRunLoopTimerCallBack ;
+    [ drop (reset-thread-timer) yield ] CFRunLoopTimerCallBack ;
 
 : init-thread-timer ( -- )
     60 thread-timer-callback <CFTimer>

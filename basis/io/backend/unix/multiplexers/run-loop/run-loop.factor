@@ -14,7 +14,7 @@ TUPLE: run-loop-mx kqueue-mx ;
         2drop
         0 mx get-global kqueue-mx>> wait-for-events
         enable-all-callbacks
-        thread-timer get-global reset-thread-timer
+        reset-thread-timer
         yield
     ] CFFileDescriptorCallBack ;
 
