@@ -159,20 +159,20 @@ ERROR: no-case object ;
 : contiguous-range? ( keys -- ? )
     dup [ fixnum? ] all? [
         dup all-unique? [
-            [ length ]
-            [ [ supremum ] [ infimum ] bi - ]
-            bi - 1 =
+            [ length ] [ supremum ] [ infimum ] tri - - 1 =
         ] [ drop f ] if
     ] [ drop f ] if ;
 
 : dispatch-case-quot ( default assoc -- quot )
     [
-        \ dup ,
-        dup keys [ infimum , ] [ supremum , ] bi \ between? ,
-        [
-            dup keys infimum , [ - >fixnum ] %
-            sort-keys values [ >quotation ] map ,
-            \ dispatch ,
+        \ dup , \ integer? , [
+            \ integer>fixnum-strict , \ dup ,
+            dup keys [ infimum , ] [ supremum , ] bi \ between? ,
+            [
+                dup keys infimum , \ - ,
+                sort-keys values [ >quotation ] map ,
+                \ dispatch ,
+            ] [ ] make , dup , \ if ,
         ] [ ] make , , \ if ,
     ] [ ] make ;
 

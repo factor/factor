@@ -236,6 +236,7 @@ CONSTANT: case-const-2 2
 [ f ] [ { 1 1 3 7 } contiguous-range? ] unit-test
 [ t ] [ { 7 6 4 8 5 } contiguous-range? ] unit-test
 
+
 : test-case-7 ( obj -- str )
     {
         { \ + [ "plus" ] }
@@ -324,3 +325,14 @@ DEFER: corner-case-1
 [ ( x x -- x x ) ] [
     [ { [ ] [ ] } spread ] infer
 ] unit-test
+
+: test-case-13 ( a -- b )
+    {
+        { 5 [ 5 ] }
+        { 6 [ 6 ] }
+        { 7 [ 7 ] }
+        { 8 [ 8 ] }
+        { 9 [ 9 ] }
+    } case ;
+
+[ 5.0 test-case-13 ] [ no-case? ] must-fail-with
