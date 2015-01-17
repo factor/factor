@@ -1,16 +1,18 @@
-USING: assocs compiler.cfg compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.parallel-copy.private help.markup help.syntax math sequences ;
+USING: assocs arrays compiler.cfg compiler.cfg.instructions
+compiler.cfg.parallel-copy.private compiler.cfg.registers
+help.markup help.syntax kernel math quotations sequences ;
 IN: compiler.cfg.parallel-copy
 
 HELP: process-to-do
+{ $values { "b" object } { "temp" quotation } { "quot" quotation } }
 { $description "Note that we check if b = loc(b), not b = loc(pred(b)) as the paper suggests. Confirmed by one of the authors at http://www.reddit.com/comments/93253/some_lecture_notes_on_ssa_form/c0bco4f" } ;
 
 HELP: parallel-copy
-{ $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } }
+{ $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } { "insns" array } }
 { $description "Creates " { $link ##copy } " instructions." } ;
 
 HELP: parallel-copy-rep
-{ $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } }
+{ $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } { "insns" array } }
 { $description "Creates " { $link ##copy } " instructions." } ;
 
 ARTICLE: "compiler.cfg.parallel-copy" "Parallel copy"

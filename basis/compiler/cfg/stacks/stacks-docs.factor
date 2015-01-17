@@ -21,7 +21,7 @@ HELP: ds-drop
 { $description "Used to signal to the stack analysis that the datastacks height is decreased by one." } ;
 
 HELP: ds-store
-{ $values { "vreg" "a " { $link sequence } " of vregs." } }
+{ $values { "vregs" "a " { $link sequence } " of vregs." } }
 { $description "Registers that a sequence of vregs are stored at at each corresponding index of the data stack." } ;
 
 HELP: rs-store

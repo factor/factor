@@ -44,7 +44,7 @@ HELP: height-changes
 { $description "Converts a " { $link current-height } " tuple to 0-2 stack height change instructions." }
 { $examples
   { $example
-    "USING: compiler.cfg.stacks.local ;"
+    "USING: compiler.cfg.stacks.local prettyprint ;"
     "T{ current-height { emit-d 4 } { emit-r -2 } } height-changes ."
     "{ T{ ##inc-d { n 4 } } T{ ##inc-r { n -2 } } }"
   }
