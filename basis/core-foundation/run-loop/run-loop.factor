@@ -3,8 +3,8 @@
 USING: accessors alien alien.c-types alien.syntax
 core-foundation core-foundation.file-descriptors
 core-foundation.strings core-foundation.time
-core-foundation.timers destructors kernel math sequences threads
-;
+core-foundation.timers destructors kernel math namespaces
+sequences threads ;
 FROM: calendar.unix => system-micros ;
 IN: core-foundation.run-loop
 
@@ -87,26 +87,13 @@ SYMBOL: run-loop
         tri
     ] with-destructors ;
 
-<PRIVATE
-
-: (reset-timer) ( timer timestamp -- )
-    >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
-
-: reset-timer ( timer -- )
-    sleep-time
-    [ 1000 /f ] [ 1,000,000 ] if* system-micros +
-    (reset-timer) ;
-
-PRIVATE>
-
 : add-timer-to-run-loop ( timer -- )
-    [ reset-timer ]
     [ get-run-loop timers>> push ]
     [
         CFRunLoopGetMain
         swap CFRunLoopDefaultMode
         CFRunLoopAddTimer
-    ] tri ;
+    ] bi ;
 
 : invalidate-run-loop-timers ( -- )
     get-run-loop [
@@ -114,16 +101,20 @@ PRIVATE>
         V{ } clone
     ] change-timers drop ;
 
-: reset-run-loop ( -- )
-    get-run-loop
-    [ timers>> [ reset-timer ] each ]
-    [ fds>> [ enable-all-callbacks ] each ] bi ;
+SYMBOL: thread-timer
 
-: timer-callback ( -- callback )
-    [ drop reset-timer yield ] CFRunLoopTimerCallBack ;
+: reset-thread-timer ( timer -- )
+    sleep-time
+    [ 1000 /f ] [ 1,000,000 ] if* system-micros +
+    >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
+
+: thread-timer-callback ( -- callback )
+    [ drop reset-thread-timer yield ] CFRunLoopTimerCallBack ;
 
 : init-thread-timer ( -- )
-    60 timer-callback <CFTimer> add-timer-to-run-loop ;
+    60 thread-timer-callback <CFTimer>
+    [ add-timer-to-run-loop ]
+    [ thread-timer set-global ] bi ;
 
 : run-one-iteration ( nanos -- handled? )
     CFRunLoopDefaultMode
