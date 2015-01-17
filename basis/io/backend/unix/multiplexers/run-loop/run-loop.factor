@@ -11,9 +11,10 @@ TUPLE: run-loop-mx kqueue-mx ;
 
 : file-descriptor-callback ( -- callback )
     [
-        3drop
+        2drop
         0 mx get-global kqueue-mx>> wait-for-events
-        reset-run-loop
+        enable-all-callbacks
+        thread-timer get-global reset-thread-timer
         yield
     ] CFFileDescriptorCallBack ;
 
