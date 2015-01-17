@@ -259,9 +259,6 @@ PRIVATE>
 : harvest! ( seq -- newseq )
     [ empty? not ] filter! ;
 
-: contains? ( seq elts -- ? )
-    [ member? ] curry any? ; inline
-
 : head-as ( seq n exemplar -- seq' )
     [ head-slice ] [ like ] bi* ; inline
 
