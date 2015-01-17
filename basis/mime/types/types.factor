@@ -16,11 +16,31 @@ MEMO: mime-db ( -- seq )
         { "fhtml"  "application/x-factor-server-page" }
     } ;
 
+! These mime types were previously in mime.types.
+! Let's keep them!
+: removed-mime-types ( -- assoc )
+    H{
+        { "pntg" "image/x-macpaint" }
+        { "m4a" "audio/mp4a-latm" }
+        { "pnt" "image/x-macpaint" }
+        { "dv" "video/x-dv" }
+        { "otm" "application/vnd.oasis.opendocument.text-master" }
+        { "mac" "image/x-macpaint" }
+        { "m4p" "audio/mp4a-latm" }
+        { "pict" "image/pict" }
+        { "scpt" "application/octet-stream" }
+        { "qti" "image/x-quicktime" }
+        { "dif" "video/x-dv" }
+        { "jp2" "image/jp2" }
+        { "qtif" "image/x-quicktime" }
+    } ;
+
 MEMO: mime-types ( -- assoc )
     [
         mime-db [ unclip '[ [ _ ] dip ,, ] each ] each
     ] H{ } make
-    nonstandard-mime-types assoc-union ;
+    nonstandard-mime-types assoc-union
+    removed-mime-types assoc-union ;
 
 : mime-type ( filename -- mime-type )
     file-extension mime-types at "application/octet-stream" or ;
