@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.syntax
 core-foundation core-foundation.file-descriptors
 core-foundation.strings core-foundation.time
-core-foundation.timers destructors kernel math namespaces
+core-foundation.timers destructors init kernel math namespaces
 sequences threads ;
 FROM: calendar.unix => system-micros ;
 IN: core-foundation.run-loop
@@ -102,6 +102,8 @@ SYMBOL: run-loop
     ] change-timers drop ;
 
 SYMBOL: thread-timer
+[ f thread-timer set-global ]
+"core-foundation.run-loop" add-startup-hook
 
 : (reset-thread-timer) ( timer -- )
     sleep-time
@@ -109,7 +111,7 @@ SYMBOL: thread-timer
     >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
 
 : reset-thread-timer ( -- )
-    thread-timer get-global (reset-thread-timer) ;
+    thread-timer get-global [ (reset-thread-timer) ] when* ;
 
 : thread-timer-callback ( -- callback )
     [ drop (reset-thread-timer) yield ] CFRunLoopTimerCallBack ;
