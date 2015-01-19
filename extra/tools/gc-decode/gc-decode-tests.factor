@@ -27,7 +27,7 @@ IN: tools.gc-decode.tests
 { t } [
     \ effects:<effect> word>gc-info scrub-bits
     {
-        ?{ t t t f t t t t } ! 64-bit
+        ?{ t t t t f t t t t } ! 64-bit
         ?{ t t t f f f f f t t t t } ! 32-bit
     } member?
 ] unit-test

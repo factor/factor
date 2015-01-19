@@ -1,5 +1,6 @@
-USING: compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stacks.clearing tools.test ;
+USING: compiler.cfg.instructions compiler.cfg.linearization
+compiler.cfg.registers compiler.cfg.stacks.clearing compiler.cfg.utilities
+kernel tools.test ;
 IN: compiler.cfg.stacks.clearing.tests
 
 { { } } [
@@ -19,4 +20,16 @@ IN: compiler.cfg.stacks.clearing.tests
     }
 } [
     { { 2 { } } { 0 { } } } state>replaces
+] unit-test
+
+{
+    V{
+        T{ ##inc-d { n 2 } { insn# 0 } }
+        T{ ##replace-imm { src 17 } { loc T{ ds-loc } } }
+        T{ ##replace-imm { src 17 } { loc T{ ds-loc { n 1 } } } }
+        T{ ##peek { loc T{ ds-loc { n 2 } } } { insn# 1 } }
+    }
+} [
+    { T{ ##inc-d f 2 } T{ ##peek f f D 2 } } insns>cfg
+    dup clear-uninitialized cfg>insns
 ] unit-test
