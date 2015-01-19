@@ -1,5 +1,5 @@
 USING: accessors arrays assocs compiler.cfg.instructions
-compiler.cfg.stacks.map fry kernel math sequences ;
+compiler.cfg.linearization compiler.cfg.stacks.map fry kernel math sequences ;
 IN: compiler.cfg.stacks.vacant
 
 ! ! Utils
@@ -31,5 +31,5 @@ IN: compiler.cfg.stacks.vacant
     { >>scrub-d >>check-d >>scrub-r >>check-r } write-slots ;
 
 : fill-gc-maps ( cfg -- )
-    trace-stack-state [ drop gc-map-insn? ] assoc-filter
-    [ swap gc-map>> set-gc-map ] assoc-each ;
+    [ trace-stack-state ] [ cfg>insns [ gc-map-insn? ] filter ] bi
+    [ [ insn#>> of ] [ gc-map>> ] bi set-gc-map ] with each ;

@@ -1,6 +1,6 @@
 USING: accessors arrays assocs combinators compiler.cfg.dataflow-analysis
-compiler.cfg.instructions compiler.cfg.registers fry kernel math math.order
-namespaces sequences ;
+compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.registers fry
+kernel math math.order namespaces sequences ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.map
 
@@ -61,9 +61,12 @@ FORWARD-ANALYSIS: map
 
 SYMBOL: stack-record
 
+: register-stack-state ( state insn -- )
+    insn#>> stack-record get 2dup at f assert= set-at ;
+
 M: map-analysis transfer-set ( in-set bb dfa -- out-set )
     drop instructions>> swap [
-        [ stack-record get set-at ] [ visit-insn ] 2bi
+        [ register-stack-state ] [ visit-insn ] 2bi
     ] reduce ;
 
 M: map-analysis ignore-block? ( bb dfa -- ? )
@@ -73,5 +76,10 @@ M: map-analysis ignore-block? ( bb dfa -- ? )
 M: map-analysis join-sets ( sets bb dfa -- set )
     2drop [ initial-state ] [ first ] if-empty ;
 
+: uniquely-number-instructions ( cfg -- )
+    cfg>insns [ swap insn#<< ] each-index ;
+
 : trace-stack-state ( cfg -- assoc )
-    H{ } clone stack-record set compute-map-sets stack-record get ;
+    H{ } clone stack-record set
+    [ uniquely-number-instructions ] [ compute-map-sets ] bi
+    stack-record get ;
