@@ -12,7 +12,7 @@ IN: compiler.cfg.stacks.clearing
     { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ;
 
 : clearing-replaces ( assoc insn -- insns' )
-    [ of ] keep 2dup dangerous-insn? [
+    [ insn#>> of ] keep 2dup dangerous-insn? [
         drop state>replaces
     ] [ 2drop { } ] if ;
 
