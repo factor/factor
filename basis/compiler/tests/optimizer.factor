@@ -464,7 +464,7 @@ STRUCT: BitmapData { Scan0 void* } ;
     ] compile-call
 ] unit-test
 
-! #1187 -- Re-enable once fixed
-! { } [
-    ! 10 [ [ minor-gc split-slice ] [ drop ] recover ] times
-! ] unit-test
+! #1187
+{ } [
+    10 [ [ minor-gc split-slice ] [ drop ] recover ] times
+] unit-test
