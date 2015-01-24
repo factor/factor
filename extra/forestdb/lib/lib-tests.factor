@@ -2,12 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
-constructors continuations destructors forestdb.ffi
-forestdb.utils fry generalizations io.directories
+combinators.short-circuit constructors continuations destructors
+forestdb.ffi forestdb.utils fry generalizations io.directories
 io.encodings.string io.encodings.utf8 io.files.temp io.pathnames
-kernel libc make math math.parser math.ranges multiline
-namespaces sequences tools.test ;
+kernel layouts libc make math math.parser math.ranges multiline
+namespaces sequences system tools.test ;
 IN: forestdb.lib
+
+{ [ cell-bits 32 = ] [ os windows? ] } 0&& [
 
 { } [ [ delete-test-db-0 ] ignore-errors ] unit-test
 { } [ [ delete-test-db-1 ] ignore-errors ] unit-test
@@ -373,3 +375,5 @@ IN: forestdb.lib
         ] { } make
     ] with-forestdb-path
 ] unit-test
+
+] unless
