@@ -75,7 +75,7 @@ M: word-completion row-color
         { [ dup not ] [ COLOR: black ] }
         { [ 2dup search-vocab-names>> in? ] [ COLOR: black ] }
         { [ over ".private" tail? ] [ COLOR: dark-red ] }
-        [ COLOR: dark-gray ]
+        [ COLOR: dark-blue ]
     } cond 2nip ;
 
 M: vocab-completion row-color
