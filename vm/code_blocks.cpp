@@ -181,8 +181,7 @@ cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
       return (cell)undefined_symbol;
     }
     default:
-      critical_error("Bad symbol specifier in compute_dlsym_address", symbol);
-      return (cell)undefined_symbol;
+      return -1;
   }
 }
 
@@ -219,8 +218,7 @@ cell factor_vm::compute_dlsym_toc_address(array* parameters, cell index) {
       return (cell)undefined_toc;
     }
     default:
-      critical_error("Bad symbol specifier in compute_dlsym_toc_address", symbol);
-      return (cell)undefined_toc;
+      return -1;
   }
 }
 #endif
@@ -229,52 +227,68 @@ cell factor_vm::compute_vm_address(cell arg) {
   return (cell)this + untag_fixnum(arg);
 }
 
-void factor_vm::store_external_address(instruction_operand op) {
-  code_block* compiled = op.compiled;
-  array* parameters =
-      (to_boolean(compiled->parameters) ? untag<array>(compiled->parameters)
-                                        : NULL);
-  cell index = op.index;
-
-  switch (op.rel_type()) {
+cell factor_vm::lookup_external_address(relocation_type rel_type,
+                                        code_block *compiled,
+                                        array* parameters,
+                                        cell index) {
+  switch (rel_type) {
     case RT_DLSYM:
-      op.store_value(compute_dlsym_address(parameters, index));
-      break;
+      return compute_dlsym_address(parameters, index);
     case RT_THIS:
-      op.store_value(compiled->entry_point());
-      break;
+      return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
-      op.store_value((cell)&dispatch_stats.megamorphic_cache_hits);
-      break;
+      return (cell)&dispatch_stats.megamorphic_cache_hits;
     case RT_VM:
-      op.store_value(compute_vm_address(array_nth(parameters, index)));
-      break;
+      return compute_vm_address(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
-      op.store_value(cards_offset);
-      break;
+      return cards_offset;
     case RT_DECKS_OFFSET:
-      op.store_value(decks_offset);
-      break;
+      return decks_offset;
 #ifdef WINDOWS
     case RT_EXCEPTION_HANDLER:
-      op.store_value((cell)&factor::exception_handler);
-      break;
+      return (cell)&factor::exception_handler;
 #endif
 #ifdef FACTOR_PPC
     case RT_DLSYM_TOC:
-      op.store_value(compute_dlsym_toc_address(parameters, index));
-      break;
+      return compute_dlsym_toc_address(parameters, index);
 #endif
     case RT_INLINE_CACHE_MISS:
-      op.store_value((cell)&factor::inline_cache_miss);
-      break;
+      return (cell)&factor::inline_cache_miss;
     case RT_SAFEPOINT:
-      op.store_value((cell)code->safepoint_page);
-      break;
+      return (cell)code->safepoint_page;
     default:
-      critical_error("Bad rel type in store_external_address()", op.rel_type());
-      break;
+      return -1;
   }
+}
+
+void factor_vm::store_external_address(instruction_operand op) {
+
+  code_block* compiled = op.compiled;
+  array* parameters = to_boolean(compiled->parameters)
+      ? untag<array>(compiled->parameters)
+      : NULL;
+  cell index = op.index;
+  relocation_type rel_type = op.rel_type();
+
+  cell ext_addr = lookup_external_address(rel_type,
+                                          compiled,
+                                          parameters,
+                                          index);
+  if (ext_addr == (cell)-1) {
+    ostringstream ss;
+    print_obj(ss, compiled->owner);
+    ss << ": ";
+    cell arg;
+    if (rel_type == RT_DLSYM || rel_type == RT_DLSYM_TOC) {
+      ss << "Bad symbol specifier in store_external_address";
+      arg = array_nth(parameters, index);
+    } else {
+      ss << "Bad rel type in store_external_address";
+      arg = rel_type;
+    }
+    critical_error(ss.str().c_str(), arg);
+  }
+  op.store_value(ext_addr);
 }
 
 cell factor_vm::compute_here_address(cell arg, cell offset,

@@ -576,6 +576,10 @@ struct factor_vm {
 #endif
   cell compute_vm_address(cell arg);
   void store_external_address(instruction_operand op);
+  cell lookup_external_address(relocation_type rel_type,
+                               code_block* compiled,
+                               array* parameters,
+                               cell index);
   cell compute_here_address(cell arg, cell offset, code_block* compiled);
   void initialize_code_block(code_block* compiled, cell literals);
   void initialize_code_block(code_block* compiled);
