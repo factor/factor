@@ -1,3 +1,5 @@
+using namespace std;
+
 namespace factor {
 
 struct growable_array;
@@ -389,29 +391,29 @@ struct factor_vm {
   template <typename Array> Array* reallot_array(Array* array_, cell capacity);
 
   // debug
-  void print_chars(string* str);
-  void print_word(word* word, cell nesting);
-  void print_factor_string(string* str);
-  void print_array(array* array, cell nesting);
-  void print_byte_array(byte_array* array, cell nesting);
-  void print_tuple(tuple* tuple, cell nesting);
-  void print_alien(alien* alien, cell nesting);
-  void print_nested_obj(cell obj, fixnum nesting);
-  void print_obj(cell obj);
-  void print_objects(cell* start, cell* end);
-  void print_datastack();
-  void print_retainstack();
-  void print_callstack();
-  void print_callstack_object(callstack* obj);
-  void dump_cell(cell x);
-  void dump_memory(cell from, cell to);
+  void print_chars(ostream& out, string* str);
+  void print_word(ostream& out, word* word, cell nesting);
+  void print_factor_string(ostream& out, string* str);
+  void print_array(ostream& out, array* array, cell nesting);
+  void print_byte_array(ostream& out, byte_array* array, cell nesting);
+  void print_tuple(ostream& out, tuple* tuple, cell nesting);
+  void print_alien(ostream& out, alien* alien, cell nesting);
+  void print_nested_obj(ostream& out, cell obj, fixnum nesting);
+  void print_obj(ostream& out, cell obj);
+  void print_objects(ostream& out, cell* start, cell* end);
+  void print_datastack(ostream& out);
+  void print_retainstack(ostream& out);
+  void print_callstack(ostream& out);
+  void print_callstack_object(ostream& out, callstack* obj);
+  void dump_cell(ostream& out, cell x);
+  void dump_memory(ostream& out, cell from, cell to);
   template <typename Generation>
-  void dump_generation(const char* name, Generation* gen);
-  void dump_generations();
-  void dump_objects(cell type);
-  void dump_edges();
-  void find_data_references(cell look_for_);
-  void dump_code_heap();
+  void dump_generation(ostream& out, const char* name, Generation* gen);
+  void dump_generations(ostream& out);
+  void dump_objects(ostream& out, cell type);
+  void dump_edges(ostream& out);
+  void find_data_references(ostream& out, cell look_for_);
+  void dump_code_heap(ostream& out);
   void factorbug_usage(bool advanced_p);
   void factorbug();
   void primitive_die();
