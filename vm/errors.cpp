@@ -32,7 +32,7 @@ void critical_error(const char* msg, cell tagged) {
 
 void out_of_memory(const char *msg) {
   std::cout << "Out of memory: " << msg << "\n\n";
-  current_vm()->dump_generations();
+  current_vm()->dump_generations(std::cout);
   abort();
 }
 
@@ -80,10 +80,10 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
     std::cout << "You have triggered a bug in Factor. Please report.\n";
     std::cout << "error: " << error << std::endl;
     std::cout << "arg 1: ";
-    print_obj(arg1.value());
+    print_obj(std::cout, arg1.value());
     std::cout << std::endl;
     std::cout << "arg 2: ";
-    print_obj(arg2.value());
+    print_obj(std::cout, arg2.value());
     std::cout << std::endl;
     factorbug();
     abort();
