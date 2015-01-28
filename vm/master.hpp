@@ -31,6 +31,7 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <sstream>
 #include <string>
 
 #define FACTOR_STRINGIZE_I(x) #x
