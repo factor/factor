@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel math namespaces math.vectors ui.gadgets
-ui.gadgets.private ui.gadgets.packs accessors
-math.rectangles combinators ;
+USING: accessors combinators kernel math.vectors namespaces
+ui.gadgets ui.gadgets.packs ui.gadgets.private ;
 IN: ui.gadgets.incremental
 
 TUPLE: incremental < pack cursor ;

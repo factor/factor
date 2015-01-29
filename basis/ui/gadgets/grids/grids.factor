@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.order namespaces make sequences
-words io math.vectors ui.gadgets ui.baseline-alignment columns
-accessors strings.tables math.rectangles fry ;
+USING: accessors arrays fry kernel make math math.order
+math.rectangles math.vectors sequences strings.tables
+ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget

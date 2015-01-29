@@ -1,9 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generic kernel math namespaces sequences
-words splitting grouping math.vectors ui.gadgets.grids
-ui.gadgets.grids.private ui.gadgets math.order math.rectangles
-fry ;
+USING: accessors fry kernel math math.order sequences ui.gadgets
+ui.gadgets.grids ui.gadgets.grids.private ;
 IN: ui.gadgets.frames
 
 TUPLE: frame < grid filled-cell ;

@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers arrays assocs calendar colors.constants
+USING: accessors arrays assocs calendar colors.constants
 combinators combinators.short-circuit documents
 documents.elements fry grouping kernel locals make math
 math.functions math.order math.ranges math.rectangles
 math.vectors models models.arrow namespaces opengl sequences
-sorting splitting ui.baseline-alignment ui.clipboards
+sorting splitting timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 ui.gestures ui.pens.solid ui.render ui.text unicode.categories ;

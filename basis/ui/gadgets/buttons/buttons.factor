@@ -1,13 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple colors
-colors.constants combinators combinators.short-circuit
-combinators.smart fry kernel locals math math.rectangles
-math.vectors models namespaces opengl opengl.gl quotations
-sequences strings ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.theme
-ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens
-ui.pens.image ui.pens.solid ui.pens.tile ;
+USING: accessors assocs classes colors.constants combinators
+combinators.short-circuit combinators.smart fry kernel locals
+math.vectors models namespaces sequences ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.theme ui.gadgets.tracks ui.gadgets.worlds ui.gestures
+ui.pens ui.pens.image ui.pens.solid ui.pens.tile ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 

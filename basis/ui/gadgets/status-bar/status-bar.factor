@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar colors colors.constants fonts kernel
-models models.arrow models.delay sequences summary ui
-ui.gadgets ui.gadgets.labels ui.gadgets.tracks
-ui.gadgets.worlds ui.pens.solid ui.private ;
+USING: accessors calendar colors.constants fonts kernel models
+models.arrow models.delay sequences summary ui ui.gadgets.labels
+ui.gadgets.tracks ui.gadgets.worlds ui.pens.solid ui.private ;
 IN: ui.gadgets.status-bar
 
 : status-bar-font ( -- font )

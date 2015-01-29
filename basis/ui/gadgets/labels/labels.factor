@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables io kernel math math.functions
-namespaces make opengl sequences strings splitting ui.gadgets
-ui.gadgets.tracks ui.gadgets.packs fonts ui.render ui.pens.solid
-ui.baseline-alignment ui.text colors colors.constants models
-combinators opengl.gl ;
+USING: accessors arrays colors.constants combinators fonts
+kernel make math.functions models namespaces sequences splitting
+strings ui.baseline-alignment ui.gadgets ui.gadgets.tracks
+ui.pens.solid ui.render ui.text ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
