@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets ui.gadgets.viewports
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.sliders
-ui.gestures kernel math namespaces sequences models models.range
-models.product combinators math.vectors classes.tuple
-math.rectangles combinators.short-circuit ;
+USING: accessors arrays combinators combinators.short-circuit
+kernel math.rectangles math.vectors models models.product
+models.range namespaces sequences ui.gadgets ui.gadgets.frames
+ui.gadgets.grids ui.gadgets.sliders ui.gadgets.viewports
+ui.gestures ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame column-header viewport x y follows ;

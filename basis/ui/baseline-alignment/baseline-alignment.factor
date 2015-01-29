@@ -1,11 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.functions math.order math.vectors
-sequences ui.gadgets accessors combinators ;
+USING: accessors combinators kernel locals math math.functions
+math.order sequences ui.gadgets ;
 IN: ui.baseline-alignment
 
 SYMBOL: +baseline+
-
 
 TUPLE: aligned-gadget < gadget baseline cap-height ;
 

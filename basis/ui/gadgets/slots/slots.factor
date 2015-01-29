@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors namespaces kernel parser prettyprint
-sequences arrays io math definitions math.vectors assocs refs
-ui.gadgets ui.gestures ui.commands ui.gadgets.scrollers
-ui.gadgets.buttons ui.gadgets.borders ui.gadgets.tracks
-ui.gadgets.editors eval continuations ;
+USING: accessors eval kernel math.vectors parser prettyprint
+refs sequences ui.commands ui.gadgets ui.gadgets.buttons
+ui.gadgets.editors ui.gadgets.scrollers ui.gadgets.tracks
+ui.gestures ;
 IN: ui.gadgets.slots
 
 TUPLE: update-object ;

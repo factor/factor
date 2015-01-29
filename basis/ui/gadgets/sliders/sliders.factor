@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math namespaces sequences
-vectors models models.range math.vectors math.functions quotations
-colors colors.constants math.rectangles fry combinators ui.gestures
-ui.pens ui.gadgets ui.gadgets.buttons ui.gadgets.tracks math.order
-ui.gadgets.icons ui.gadgets.theme ui.pens.tile ui.pens.image ;
+USING: accessors assocs combinators fry kernel math math.order
+math.vectors models models.range ui.gadgets ui.gadgets.buttons
+ui.gadgets.icons ui.gadgets.theme ui.gadgets.tracks ui.gestures
+ui.pens ui.pens.image ui.pens.tile ;
 IN: ui.gadgets.sliders
 
 TUPLE: slider < track elevator thumb saved line ;

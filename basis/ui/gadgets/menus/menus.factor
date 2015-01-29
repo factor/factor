@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors.constants kernel locals math.rectangles namespaces
-sequences ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.glass ui.gadgets.packs ui.gadgets.frames ui.gadgets.worlds
-ui.gadgets.corners ui.gestures ui.operations
-ui.render ui.pens ui.pens.solid opengl math.vectors words accessors
-math math.order sorting ;
+USING: accessors colors.constants kernel locals math.rectangles
+math.vectors namespaces opengl sequences sorting ui.commands
+ui.gadgets ui.gadgets.buttons ui.gadgets.corners
+ui.gadgets.frames ui.gadgets.glass ui.gadgets.packs
+ui.gadgets.worlds ui.gestures ui.operations ui.pens
+ui.pens.solid ui.render ;
 IN: ui.gadgets.menus
 
 : show-menu ( owner menu -- )

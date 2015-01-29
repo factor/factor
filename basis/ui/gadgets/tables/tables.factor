@@ -1,13 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables arrays colors colors.constants fry
-kernel math math.functions math.ranges math.rectangles math.order
-math.vectors namespaces opengl sequences ui.gadgets
+USING: accessors arrays colors colors.constants combinators
+combinators.short-circuit fonts fry kernel locals math
+math.functions math.order math.rectangles math.vectors models
+namespaces opengl sequences splitting strings ui.commands
+ui.gadgets ui.gadgets.line-support ui.gadgets.menus
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
-ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
-ui.gadgets.menus ui.gadgets.line-support models combinators
-combinators.short-circuit fonts locals splitting strings sets
-sorting ;
+ui.gestures ui.images ui.pens.solid ui.render ui.text ;
 FROM: sequences => change-nth ;
 IN: ui.gadgets.tables
 

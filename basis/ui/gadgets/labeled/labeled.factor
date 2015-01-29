@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences colors fonts ui.gadgets
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.icons ui.gadgets.labels
-ui.gadgets.borders ui.pens.image ui.gadgets.corners ui.render ;
+USING: accessors fonts kernel ui.gadgets ui.gadgets.borders
+ui.gadgets.corners ui.gadgets.frames ui.gadgets.grids
+ui.gadgets.labels ui.pens.image ui.render ;
 IN: ui.gadgets.labeled
 
 TUPLE: labeled-gadget < frame content ;

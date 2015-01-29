@@ -1,16 +1,15 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel namespaces sequences
-strings quotations math opengl combinators memoize math.vectors
-sorting splitting assocs classes.tuple models continuations
-destructors accessors math.rectangles fry fonts ui.pens.solid
-ui.images ui.gadgets ui.gadgets.private ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
-ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
-ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
-ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
-colors io.styles classes ;
+USING: accessors assocs classes combinators destructors fonts
+fry io io.styles kernel math.rectangles math.vectors memoize
+models namespaces sequences sorting splitting strings
+ui.baseline-alignment ui.clipboards ui.gadgets
+ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
+ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
+ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
+ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
+ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
+ui.traverse ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes

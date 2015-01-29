@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators fry kernel math math.functions math.order
-math.ranges math.vectors namespaces opengl sequences ui.gadgets
-ui.render ui.text ui.gadgets.scrollers ui.gadgets.viewports ;
+USING: accessors arrays combinators fry kernel math
+math.functions math.order math.ranges math.vectors namespaces
+opengl sequences ui.gadgets ui.gadgets.scrollers
+ui.gadgets.viewports ui.render ui.text ;
 IN: ui.gadgets.line-support
 
 ! Some code shared by table and editor gadgets
