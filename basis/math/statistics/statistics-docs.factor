@@ -1,5 +1,5 @@
 USING: assocs debugger hashtables help.markup help.syntax
-quotations sequences math ;
+kernel quotations sequences math ;
 IN: math.statistics
 
 HELP: geometric-mean
@@ -16,9 +16,9 @@ HELP: harmonic-mean
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: kth-smallest
-{ $values { "seq" sequence } { "k" integer } }
+{ $values { "seq" sequence } { "k" integer } { "elt" object } }
 { $description "Returns the kth smallest element.  This is semantically equivalent to " { $snippet "swap natural-sort nth" } ", and is therefore zero-indexed.  " { $snippet "k" } " may not be larger than the highest index of " { $snippet "sequence" } "." }
-{ $examples { $example "USING: math.statistics ;" "{ 3 1 2 } 1 kth-smallest ." "2" } } ;
+{ $examples { $example "USING: math.statistics prettyprint ;" "{ 3 1 2 } 1 kth-smallest ." "2" } } ;
 
 HELP: mean
 { $values { "seq" sequence } { "x" "a non-negative real number"} }

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax kernel math sequences ;
 IN: sequences.extras
 
 HELP: count*
@@ -7,29 +7,31 @@ HELP: count*
     { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "%" rational } }
 { $description "Outputs the fraction of elements in the sequence for which the predicate quotation matches." }
-{ $examples { $example "USING: math.ranges prettyprint sequences.extras ;" "100 [1,b] [ even? ] count*" "1/2" } } ;
+{ $examples { $example "USING: math math.ranges prettyprint sequences.extras ;" "100 [1,b] [ even? ] count* ." "1/2" } } ;
 
 HELP: collapse
 { $values
     { "seq" sequence }
     { "quot" { $quotation ( ... elt -- ... ? ) } }
+    { "elt" object }
     { "seq'" sequence } }
 { $description "Generate a new sequence where all runs of elements for which the predicate returns true are replaced by a single instance of " { $snippet "elt" } "." }
 { $see-also compact }
 { $examples
     "Collapse multiple spaces in a string down to a single space"
-    { $example "USING: sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" collapse" "\" Hello, crazy world \"" } } ;
+    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" collapse ." "\" Hello, crazy world \"" } } ;
 
 HELP: compact
 { $values
     { "seq" sequence }
     { "quot" { $quotation ( ... elt -- ... ? ) } }
+    { "elt" object }
     { "seq'" sequence } }
 { $description "Generate a new sequence where all runs of elements for which the predicate returns true are replaced by a single instance of " { $snippet "elt" } ".  Runs at the beginning or end of the sequence for which the predicate returns true are removed." }
 { $see-also collapse }
 { $examples
     "Collapse multiple spaces in a string down to a single space"
-    { $example "USING: sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" compact" "\"Hello, crazy world\"" } } ;
+    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" compact ." "\"Hello, crazy world\"" } } ;
 
 HELP: combos
 { $values
