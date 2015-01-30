@@ -15,6 +15,11 @@ HELP: harmonic-mean
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "6/11" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
+HELP: kth-smallest
+{ $values { "seq" sequence } { "k" integer } }
+{ $description "Returns the kth smallest element.  This is semantically equivalent to " { $snippet "swap natural-sort nth" } ", and is therefore zero-indexed.  " { $snippet "k" } " may not be larger than the highest index of " { $snippet "sequence" } "." }
+{ $examples { $example "USING: math.statistics ;" "{ 3 1 2 } 1 kth-smallest ." "2" } } ;
+
 HELP: mean
 { $values { "seq" sequence } { "x" "a non-negative real number"} }
 { $description "Computes the arithmetic mean of the elements in " { $snippet "seq" } "." }
