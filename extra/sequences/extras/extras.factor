@@ -124,13 +124,6 @@ PRIVATE>
 : compact ( ... seq quot: ( ... elt -- ... ? ) elt -- ... seq' )
     [ split-when harvest ] dip join ; inline
 
-: collapse ( ... seq quot: ( ... elt -- ... ? ) elt -- ... seq' )
-    [ split-when ] dip
-    [ [ harvest ] dip join ]
-    [ [ first empty? ] dip [ prepend ] curry when ]
-    [ [ last empty? ] dip [ append ] curry when ]
-    2tri ; inline
-
 :: slice-when ( seq quot: ( elt -- ? ) -- seq' )
     seq length :> len
     0 [ len dupd < ] [
