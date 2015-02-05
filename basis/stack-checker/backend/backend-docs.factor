@@ -1,6 +1,33 @@
-USING: compiler.tree effects help.markup help.syntax quotations sequences
-stack-checker.state stack-checker.visitor ;
+USING: compiler.tree effects help.markup help.syntax math quotations sequences
+stack-checker.state stack-checker.values stack-checker.visitor ;
 IN: stack-checker.backend
+
+HELP: consume-d
+{ $values { "n" integer } { "seq" sequence } }
+{ $description "Consumes 'n' items from the compile time data stack." }
+{ $examples
+  { $example
+    "USING: namespaces prettyprint stack-checker.backend ;"
+    "0 \ <value> set-global [ 3 consume-d ] with-infer 2drop ."
+    "V{ 1 2 3 }"
+  }
+} ;
+
+HELP: end-infer
+{ $description "Called to end the infer context. It outputs a " { $link #return } " node to the " { $link stack-visitor } " containing the remaining items on the data stack." } ;
+
+HELP: ensure-d
+{ $values { "n" integer } { "values" sequence } }
+{ $description "Does something important.." } ;
+
+HELP: infer-literal-quot
+{ $values { "literal" literal-tuple } }
+{ $description "Performs inferencing for a literal quotation." }
+{ $examples
+  { $unchecked-example
+    "[ 3 + * ] <literal> infer-literal-quot"
+  }
+} ;
 
 HELP: infer-quot-here
 { $values { "quot" quotation } }
@@ -10,10 +37,20 @@ HELP: introduce-values
 { $values { "values" sequence } }
 { $description "Emits an " { $link #introduce } " node to the current " { $link stack-visitor } " which pushes the given values onto the data stack." } ;
 
+HELP: pop-d
+{ $values { "obj" "object" } }
+{ $description "Pops an item from the compile time datastack. If the datastack is empty, a new value is instead introduced." }
+{ $see-also introduce-values } ;
+
+HELP: push-d
+{ $values { "obj" "object" } }
+{ $description "Pushes an item onto the compile time data stack." } ;
+
+HELP: push-literal
+{ $values { "obj" "object" } }
+{ $description "Pushes a literal onto the " { $link literals } " sequence." }
+{ $see-also commit-literals } ;
+
 HELP: with-infer
 { $values { "quot" quotation } { "effect" effect } { "visitor" "a visitor, if any" } }
 { $description "Initializes the inference engine and then runs the given quotation which is supposed to perform the inferencing." } ;
-
-HELP: push-literal
-{ $values { "obj" "something" } }
-{ $description "Pushes a literal onto the " { $link literals } " sequence." } ;
