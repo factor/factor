@@ -1,5 +1,5 @@
 USING: assocs help.markup help.syntax kernel quotations sequences
-stack-checker.alien stack-checker.visitor words ;
+stack-checker.alien stack-checker.values stack-checker.visitor words ;
 IN: compiler.tree
 
 HELP: node
@@ -25,10 +25,18 @@ HELP: #call
 } ;
 
 HELP: #introduce
-{ $class-description "SSA tree node that puts an input value from the \"outside\" on the stack." } ;
+{ $class-description "SSA tree node that puts an input value from the \"outside\" on the stack. It is used to \"introduce\" data stack parameter whenever they are needed. It has the following slots:"
+  { $table
+    { { $slot "out-d" } { "Array of values of the parameters being introduced." } }
+  }
+} ;
 
 HELP: #push
-{ $class-description "SSA tree node that puts a literal value on the stack." }
+{ $class-description "SSA tree node that puts a literal value on the stack. It has the following slots:"
+  { $table
+    { { $slot "out-d" } { "A one item array containing the " { $link <value> } " of the literal being pushed." } }
+  }
+}
 { $notes "A " { $link quotation } " is also a literal." } ;
 
 HELP: #shuffle

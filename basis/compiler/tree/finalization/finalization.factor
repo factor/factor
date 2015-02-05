@@ -8,17 +8,6 @@ kernel math.partial-dispatch memoize sequences
 stack-checker.dependencies words ;
 IN: compiler.tree.finalization
 
-! This is a late-stage optimization.
-! See the comment in compiler.tree.late-optimizations.
-
-! This pass runs after propagation, so that it can expand
-! type predicates; these cannot be expanded before
-! propagation since we need to see 'fixnum?' instead of
-! 'tag 0 eq?' and so on, for semantic reasoning.
-
-! We also delete empty stack shuffles and copies to facilitate
-! tail call optimization in the code generator.
-
 GENERIC: finalize* ( node -- nodes )
 
 : finalize ( nodes -- nodes' ) [ finalize* ] map-nodes ;
