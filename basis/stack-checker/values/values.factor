@@ -5,7 +5,6 @@ stack-checker.recursive-state stack-checker.errors
 quotations ;
 IN: stack-checker.values
 
-! Values
 : <value> ( -- value ) \ <value> counter ;
 
 SYMBOL: known-values
@@ -37,7 +36,6 @@ GENERIC: (input-value?) ( value -- ? )
 
 GENERIC: (literal) ( known -- literal )
 
-! Literal value
 TUPLE: literal-tuple < identity-tuple value recursion ;
 
 : literal ( value -- literal ) known (literal) ;
@@ -58,7 +56,6 @@ M: literal-tuple (literal) ;
     [ [ [ value>> ] bi@ ] dip call ] [ drop nip recursion>> ] 3bi
     \ literal-tuple boa ; inline
 
-! Result of curry
 TUPLE: curried obj quot ;
 
 C: <curried> curried
@@ -72,7 +69,6 @@ M: curried (literal-value?) >curried< [ literal-value? ] both? ;
 
 M: curried (literal) >curried< [ curry ] curried/composed-literal ;
 
-! Result of compose
 TUPLE: composed quot1 quot2 ;
 
 C: <composed> composed
@@ -87,7 +83,6 @@ M: composed (literal-value?) >composed< [ literal-value? ] both? ;
 
 M: composed (literal) >composed< [ compose ] curried/composed-literal ;
 
-! Input parameters
 SINGLETON: input-parameter
 
 SYMBOL: current-word
@@ -135,4 +130,3 @@ M: curried known>callable
     prefix ;
 M: declared-effect known>callable
     known>> known>callable ;
-
