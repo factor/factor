@@ -40,7 +40,6 @@ IN: stack-checker.known-words
 : infer-shuffle-word ( word -- )
     "shuffle" word-prop infer-shuffle ;
 
-! This is a hack for combinators combinators.short-circuit.smart.
 : infer-local-reader ( word -- )
     ( -- value ) apply-word/effect ;
 
