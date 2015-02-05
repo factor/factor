@@ -7,11 +7,11 @@ HELP: terminated?
 
 HELP: current-effect
 { $values { "effect" effect } }
-{ $description "Returns what the current analysis states stack effect is." }
+{ $description "Returns the current analysis states stack effect." }
 { $examples
   { $example
     "USING: namespaces prettyprint stack-checker.state ;"
-    "{ { input-count 2 } { terminated? t } { (meta-d) { 1 2 } } }"
+    "{ { input-count 2 } { terminated? t } { (meta-d) { 1 2 } } { literals V{ } } }"
     "[ current-effect ] with-variables ."
     "( x x -- x x * )"
   }
