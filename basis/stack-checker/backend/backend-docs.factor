@@ -6,8 +6,8 @@ HELP: consume-d
 { $values { "n" integer } { "seq" sequence } }
 { $description "Consumes 'n' items from the compile time data stack." }
 { $examples
-  { $example
-    "USING: namespaces prettyprint stack-checker.backend ;"
+  { $unchecked-example
+    "USING: kernel namespaces prettyprint stack-checker.backend stack-checker.values ;"
     "0 \ <value> set-global [ 3 consume-d ] with-infer 2drop ."
     "V{ 1 2 3 }"
   }

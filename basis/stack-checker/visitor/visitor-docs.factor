@@ -14,4 +14,4 @@ HELP: #>r,
 
 HELP: #drop,
 { $values { "values" sequence } }
-{ $class-description "Outputs a " { $link #shuffle } " instruction which drops one or more values from the data stack." } ;
+{ $description "Outputs a " { $link #shuffle } " instruction which drops one or more values from the data stack." } ;
