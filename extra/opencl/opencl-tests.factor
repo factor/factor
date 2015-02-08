@@ -31,10 +31,10 @@ __kernel void square(
             "" kernel-source 1array <cl-program> &dispose "square" <cl-kernel> &dispose :> kernel
             cl-read-access num-bytes in <cl-buffer> &dispose :> in-buffer
             cl-write-access num-bytes f <cl-buffer> &dispose :> out-buffer
-           
+
             kernel in-buffer out-buffer num-floats uint <ref> 3array
             { num-floats } [ ] cl-queue-kernel &dispose drop
-            
+
             cl-finish
 
             out-buffer 0 num-bytes <cl-buffer-range>
