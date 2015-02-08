@@ -18,7 +18,7 @@ ERROR: cl-error err ;
     dup f = [ cl-error ] [ drop ] if ; inline
  
 : info-data-size ( handle name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
+    [ 0 f 0 size_t <ref> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
 
 : info-data-bytes ( handle name info-quot size -- bytes )
     swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
@@ -27,7 +27,7 @@ ERROR: cl-error err ;
     [ 3dup info-data-size info-data-bytes ] dip call ; inline
 
 : 2info-data-size ( handle1 handle2 name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
+    [ 0 f 0 size_t <ref> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
 
 : 2info-data-bytes ( handle1 handle2 name info-quot size -- bytes )
     swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
@@ -63,6 +63,7 @@ ERROR: cl-error err ;
     [ [ length size_t heap-size / ] keep swap size_t <c-direct-array> ] info ; inline
 
 TUPLE: cl-handle < disposable handle ;
+
 PRIVATE>
 
 VARIANT: cl-device-type

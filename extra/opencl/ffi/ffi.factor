@@ -604,16 +604,3 @@ FUNCTION: cl_mem clCreateFromD3D11Texture2DNV ( cl_context context, cl_mem_flags
 FUNCTION: cl_mem clCreateFromD3D11Texture3DNV ( cl_context context, cl_mem_flags flags, void* id3dtexture3d_resource, uint subresource, cl_int* errcode_ret ) ;
 FUNCTION: cl_int clEnqueueAcquireD3D11ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
 FUNCTION: cl_int clEnqueueReleaseD3D11ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-
-! Utility words needed for working with the API
-: *size_t ( c-ptr -- value )
-    size_t heap-size {
-        { 4 [ 0 alien-unsigned-4 ] }
-        { 8 [ 0 alien-unsigned-8 ] }
-    } case ; inline
-
-: <size_t> ( value -- c-ptr )
-    size_t heap-size [ (byte-array) ] keep {
-        { 4 [ [ 0 set-alien-unsigned-4 ] keep ] }
-        { 8 [ [ 0 set-alien-unsigned-8 ] keep ] }
-    } case ; inline
