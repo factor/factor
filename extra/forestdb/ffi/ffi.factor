@@ -13,7 +13,7 @@ LIBRARY: forestdb
 ! Begin fdb_types.h
 
 CONSTANT: FDB_MAX_KEYLEN 3840
-CONSTANT: FDB_MAX_METALEN 65535
+CONSTANT: FDB_MAX_METALEN 65512
 CONSTANT: FDB_MAX_BODYLEN 4294967295
 CONSTANT: FDB_SNAPSHOT_INMEM -1
 
@@ -26,6 +26,7 @@ TYPEDEF: void* fdb_log_callback
 TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_kvs_handle
 TYPEDEF: void* fdb_iterator
+TYPEDEF: void* fdb_compaction_callback
 
 ENUM: fdb_open_flags
     { FDB_OPEN_FLAG_CREATE 1 }
@@ -65,6 +66,12 @@ ENUM: fdb_iterator_seek_opt_t
     { FDB_ITR_SEEK_HIGHER 0 }
     { FDB_ITR_SEEK_LOWER 1 } ;
 
+ENUM: fdb_compaction_status
+    { FDB_CS_BEGIN 0x1 }
+    { FDB_CS_MOVE_DOC 0x2 }
+    { FDB_CS_BATCH_MOVE 0x4 }
+    { FDB_CS_FLUSH_WAL 0x8 }
+    { FDB_CS_END 0x10 } ;
 
 ! cmp_fixed and cmp_variable have their own open() functions
 STRUCT: fdb_config
@@ -85,7 +92,11 @@ STRUCT: fdb_config
     { compaction_minimum_filesize uint64_t }
     { compactor_sleep_duration uint64_t }
     { multi_kv_instances bool }
-    { prefetch_duration uint64_t } ;
+    { prefetch_duration uint64_t }
+    { num_wal_partitions uint16_t }
+    { compaction_cb fdb_compaction_callback }
+    { compaction_cb_mask uint32_t }
+    { compaction_cb_ctx void* } ;
 
 STRUCT: fdb_kvs_config
     { create_if_missing bool }
@@ -123,6 +134,17 @@ STRUCT: fdb_kvs_info
 STRUCT: fdb_kvs_name_list
     { num_kvs_names size_t }
     { kvs_names char** } ;
+
+STRUCT: fdb_kvs_commit_marker_t
+    { kv_store_name char* }
+    { seqnum fdb_seqnum_t } ;
+
+TYPEDEF: uint64_t fdb_snapshot_marker_t
+
+STRUCT: fdb_snapshot_info_t
+    { marker fdb_snapshot_marker_t }
+    { num_kvs_markers int64_t }
+    { kvs_markers fdb_kvs_commit_marker_t* } ;
 
 ! end fdb_types.h
 
@@ -214,12 +236,21 @@ FUNCTION: fdb_status fdb_iterator_seek_to_max ( fdb_iterator* iterator ) ;
 FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator ) ;
 
 FUNCTION: fdb_status fdb_compact ( fdb_file_handle* handle, c-string new_filename ) ;
-FUNCTION: size_t fdb_estimate_space_used ( fdb_file_handle* fhandle ) ;
+FUNCTION: fdb_status fdb_compact_upto ( fdb_file_handle* handle, c-string new_filename, fdb_snapshot_marker_t marker ) ;
+
 FUNCTION: fdb_status fdb_get_file_info ( fdb_file_handle* handle, fdb_file_info* info ) ;
 FUNCTION: fdb_status fdb_get_kvs_info ( fdb_kvs_handle* handle, fdb_kvs_info* info ) ;
 FUNCTION: fdb_status fdb_get_kvs_seqnum ( fdb_kvs_handle* handle, fdb_seqnum_t* seqnum ) ;
 FUNCTION: fdb_status fdb_get_kvs_name_list ( fdb_kvs_handle* handle, fdb_kvs_name_list* kvs_name_list ) ;
+
+FUNCTION: fdb_status fdb_get_all_snap_markers (
+    fdb_file_handle* fhandle,
+    fdb_snapshot_info_t** markers,
+    uint64_t* size ) ;
+
+FUNCTION: fdb_status fdb_free_snap_markers ( fdb_snapshot_info_t* markers, uint64_t size ) ;
 FUNCTION: fdb_status fdb_free_kvs_name_list ( fdb_kvs_name_list* kvs_name_list ) ;
+
 
 FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_file_handle* fhandle, fdb_compaction_mode_t mode, size_t new_threshold ) ;
 FUNCTION: fdb_status fdb_close ( fdb_file_handle* fhandle ) ;
