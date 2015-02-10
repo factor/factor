@@ -10,14 +10,14 @@ IN: forestdb.lib
 
 /*
 ! Issues
-! 4) byseq iteration doesn't have bodies, weird.
-! 5) Get byseq ignores seqnum and uses key instead if key is set
+! Get byseq ignores seqnum and uses key instead if key is set
 */
 
 ERROR: fdb-error error ;
 
 : fdb-check-error ( ret -- )
     dup FDB_RESULT_SUCCESS = [ drop ] [ fdb-error ] if ;
+
 
 TUPLE: fdb-kvs-handle < disposable handle ;
 : <fdb-kvs-handle> ( handle -- obj )
@@ -36,34 +36,9 @@ TUPLE: fdb-file-handle < disposable handle ;
 M: fdb-file-handle dispose*
     handle>> fdb_close fdb-check-error ;
 
+
 SYMBOL: current-fdb-file-handle
 SYMBOL: current-fdb-kvs-handle
-
-: get-kvs-default-config ( -- kvs-config )
-    S{ fdb_kvs_config
-        { create_if_missing t }
-        { custom_cmp f }
-    } clone ;
-
-: fdb-open-kvs' ( file-handle fdb-kvs-handle kvs-config -- file-handle handle )
-    [ dup handle>> ] 2dip
-    [ handle>> ] dip
-    [ fdb_kvs_open_default fdb-check-error ] 2keep drop
-    void* deref <fdb-kvs-handle> ;
-
-: fdb-open-kvs ( fdb-file-handle kvs-config -- file-handle handle )
-    [ f void* <ref> <fdb-kvs-handle> ] dip fdb-open-kvs' ;
-
-: fdb-open ( path config kvs-config -- file-handle handle )
-    [
-        [ f void* <ref> ] 2dip
-        [ absolute-path ensure-fdb-filename-directory ] dip
-        [ fdb_open fdb-check-error ] 3keep
-        2drop void* deref <fdb-file-handle>
-    ] dip fdb-open-kvs ;
-
-: fdb-open-default-config ( path -- file-handle handle )
-    fdb_get_default_config get-kvs-default-config fdb-open ;
 
 : get-file-handle ( -- handle )
     current-fdb-file-handle get handle>> ;
@@ -174,16 +149,6 @@ SYMBOL: current-fdb-kvs-handle
 : fdb-compact-commit ( new-path -- )
     fdb-compact fdb-commit-wal-flush ;
 
-: fdb-swap-current-db ( new-path -- )
-    current-fdb-kvs-handle [ dispose f ] change
-    fdb-open-default-config
-    [ current-fdb-file-handle set ]
-    [ current-fdb-kvs-handle set ] bi* ;
-
-: fdb-compact-and-swap-db ( path -- )
-    next-vnode-version-name
-    [ fdb-compact fdb-commit-wal-flush ]
-    [ fdb-swap-current-db ] bi ;
 
 ! Call from within with-foresdb
 : fdb-open-snapshot ( seqnum -- handle )
@@ -328,6 +293,33 @@ T{ doc
 
 PRIVATE>
 
+
+: get-kvs-default-config ( -- kvs-config )
+    S{ fdb_kvs_config
+        { create_if_missing t }
+        { custom_cmp f }
+    } clone ;
+
+: fdb-open ( path config -- file-handle )
+    [ f void* <ref> ] 2dip
+    [ absolute-path ensure-fdb-filename-directory ] dip
+    [ fdb_open fdb-check-error ] 3keep
+    2drop void* deref <fdb-file-handle> ;
+
+: fdb-open-default-config ( path -- file-handle )
+    fdb_get_default_config fdb-open ;
+
+: fdb-kvs-open-config ( name config -- kvs-handle )
+    [
+        current-fdb-file-handle get handle>>
+        f void* <ref>
+    ] 2dip
+    [ fdb_kvs_open fdb-check-error ] 3keep 2drop
+    void* deref <fdb-kvs-handle> ;
+
+: fdb-kvs-open ( name -- kvs-handle )
+    get-kvs-default-config fdb-kvs-open-config ;
+
 : with-fdb-map ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
     [ execute ] 2dip
     swap
@@ -351,6 +343,27 @@ PRIVATE>
     [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb_iterator_next ] dip
     with-fdb-map ; inline
 
+
+: with-kvs ( name quot -- )
+    [
+        [ fdb-kvs-open &dispose current-fdb-kvs-handle ] dip with-variable
+    ] with-destructors ; inline
+
+
+: with-default-kvs ( quot -- )
+    [ "default" ] dip with-kvs ; inline
+
+: with-forestdb ( path quot -- )
+    [
+        [ fdb-open-default-config &dispose current-fdb-file-handle ] dip with-variable
+    ] with-destructors ; inline
+
+: with-forestdb-kvs ( path name quot -- )
+    '[
+        _ _ with-kvs
+    ] with-forestdb ; inline
+
+/*
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
 ! fdb-current is weird, it gets replaced if you call fdb-rollback
 ! Therefore, only clean up fdb-current once, and clean it up at the end
@@ -398,3 +411,4 @@ PRIVATE>
 : with-forestdb-path ( path quot -- )
     [ absolute-path fdb-open-default-config ] dip with-forestdb-handles-commit-wal ; inline
     ! [ absolute-path fdb-open-default-config ] dip with-forestdb-handle-commit-normal ; inline
+*/

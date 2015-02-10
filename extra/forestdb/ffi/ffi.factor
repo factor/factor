@@ -232,7 +232,7 @@ FUNCTION: fdb_status fdb_end_transaction ( fdb_file_handle* fhandle, fdb_commit_
 FUNCTION: fdb_status fdb_abort_transaction ( fdb_file_handle* fhandle ) ;
 FUNCTION: fdb_status fdb_kvs_open ( fdb_file_handle* fhandle,
                         fdb_kvs_handle** ptr_handle,
-                        char* kvs_name,
+                        c-string kvs_name,
                         fdb_kvs_config* config ) ;
 
 
@@ -242,5 +242,5 @@ FUNCTION: fdb_status fdb_kvs_open_default ( fdb_file_handle* fhandle,
 
 FUNCTION: fdb_status fdb_kvs_close ( fdb_kvs_handle* handle ) ;
 
-FUNCTION: fdb_status fdb_kvs_remove ( fdb_file_handle* fhandle, char* kvs_name ) ;
+FUNCTION: fdb_status fdb_kvs_remove ( fdb_file_handle* fhandle, c-string kvs_name ) ;
 FUNCTION: char* fdb_error_msg ( fdb_status err_code ) ;
