@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.syntax assocs help.markup
-help.syntax io.backend kernel namespaces strings ;
+USING: accessors alien alien.libraries.finder alien.syntax
+assocs help.markup help.syntax io.backend kernel namespaces
+strings ;
 IN: alien.libraries
 
 HELP: make-library
@@ -44,13 +45,17 @@ HELP: load-library
 
 HELP: add-library
 { $values { "name" string } { "path" string } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } }
-{ $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } " and the specified ABI. The logical library name can then be used by a " { $link POSTPONE: LIBRARY: } " form to specify the logical library for subsequent " { $link POSTPONE: FUNCTION: } " definitions." }
+{ $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } " and the specified ABI. You can find the location of the library via " { $link find-library } ". The logical library name can then be used by a " { $link POSTPONE: LIBRARY: } " form to specify the logical library for subsequent " { $link POSTPONE: FUNCTION: } " definitions." }
 { $notes "Because the entire source file is parsed before top-level forms are executed, " { $link add-library } " must be placed within a " { $snippet "<< ... >>" } " parse-time evaluation block."
 $nl
 "This ensures that if the logical library is later used in the same file, for example by a " { $link POSTPONE: FUNCTION: } " definition. Otherwise, the " { $link add-library } " call will happen too late, after compilation, and the C function calls will not refer to the correct library."
 $nl
 "For details about parse-time evaluation, see " { $link "syntax-immediate" } "." }
 { $examples "Here is a typical usage of " { $link add-library } ":"
+{ $code
+    "<< \"sqlite\" \"sqlite3\" find-library cdecl add-library >>"
+}
+"You can also explicitly specify the library name by platform, if you prefer:"
 { $code
     "<< \"freetype\" {"
     "    { [ os macosx? ] [ \"libfreetype.6.dylib\" cdecl add-library ] }"
