@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax math sequences sets ;
 IN: hash-sets
 
 ARTICLE: "hash-sets" "Hash sets"
@@ -11,7 +11,7 @@ ARTICLE: "hash-sets" "Hash sets"
 ABOUT: "hash-sets"
 
 HELP: hash-set
-{ $class-description "The class of hashtable-like sets. These implement the " { $link "sets" } "." } ;
+{ $class-description "The class of hashtable-like sets. These implement the " { $link set } " mixin." } ;
 
 HELP: <hash-set>
 { $values { "capacity" number } { "hash-set" hash-set } }
