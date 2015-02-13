@@ -1,31 +1,31 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays classes combinators
-compression.lzw endian fry grouping images io
-io.binary io.encodings.ascii io.encodings.binary
-io.encodings.string io.encodings.utf8 io.files kernel math
-math.bitwise math.order math.parser pack sequences
-strings math.vectors specialized-arrays locals
-images.loader io.streams.throwing ;
-FROM: alien.c-types => float ;
-SPECIALIZED-ARRAY: float
+USING: accessors arrays assocs byte-arrays combinators
+combinators.short-circuit compression.lzw endian fry grouping
+images images.loader io io.binary io.encodings.ascii
+io.encodings.string io.encodings.utf8 io.streams.throwing kernel
+math math.bitwise math.vectors pack sequences ;
 IN: images.tiff
 
 SINGLETON: tiff-image
 
-TUPLE: loading-tiff endianness the-answer ifd-offset ifds ;
+TUPLE: loading-tiff endianness the-answer ifd-offset ifd-offsets ifds ;
 
 : <loading-tiff> ( -- tiff )
-    loading-tiff new V{ } clone >>ifds ;
+    loading-tiff new
+        H{ } clone >>ifds ; inline
 
-TUPLE: ifd count ifd-entries next
-processed-tags strips bitmap ;
+! offset, next-offset, and count are not strictly necessary here
+! count is just the length of ifd-entries
+TUPLE: ifd offset next-offset count
+ifd-entries processed-tags strips bitmap ;
 
-: <ifd> ( count ifd-entries next -- ifd )
+: <ifd> ( offset count ifd-entries next-offset -- ifd )
     ifd new
-        swap >>next
+        swap >>next-offset
         swap >>ifd-entries
-        swap >>count ;
+        swap >>count
+        swap >>offset ;
 
 TUPLE: ifd-entry tag type count offset/value ;
 
@@ -242,20 +242,34 @@ ERROR: bad-tiff-magic bytes ;
         4 read endian> >>ifd-offset
     ] with-endianness ;
 
-: push-ifd ( tiff ifd -- tiff ) over ifds>> push ;
+: store-ifd ( tiff ifd -- tiff )
+    dup offset>> pick ifds>> set-at ;
 
-: read-ifd ( -- ifd )
+: read-ifd-entry ( -- ifd )
     2 read endian>
     2 read endian>
     4 read endian>
     4 read endian> <ifd-entry> ;
 
-: read-ifds ( tiff offset -- tiff )
-    seek-absolute seek-input
+: read-ifd ( offset -- ifd )
+    dup seek-absolute seek-input
     2 read endian>
-    dup [ read-ifd ] replicate
+    dup [ read-ifd-entry ] replicate
+
+    ! next ifd offset, 0 for stop
     4 read endian>
-    [ <ifd> push-ifd ] [ dup 0 = [ drop ] [ read-ifds ] if ] bi ;
+    <ifd> ;
+
+: read-ifds ( tiff offset -- tiff )
+    read-ifd
+    [ store-ifd ]
+    [
+        next-offset>> dup { [ 0 > ] [ pick ifds>> key? not ] } 1&& [
+            read-ifds
+        ] [
+            drop
+        ] if
+    ] bi ;
 
 ERROR: no-tag class ;
 
@@ -278,11 +292,13 @@ ERROR: no-tag class ;
         [ seek-absolute seek-input read ] { } 2map-as
     ] if >>strips ;
 
-ERROR: unknown-ifd-type n ;
+ERROR: unknown-ifd-type n where ;
 
 : bytes>bits ( n/byte-array -- n )
     dup byte-array? [ le> ] when ;
 
+! TODO: Should skip entire ifd-entry instead of throwing
+! if type is unknown (e.g. type 0 from the AFL american fuzzy loop test cases)
 : value-length ( ifd-entry -- n )
     [ count>> ] [ type>> ] bi {
         { 1 [ ] }
@@ -298,7 +314,7 @@ ERROR: unknown-ifd-type n ;
         { 11 [ 4 * ] }
         { 12 [ 8 * ] }
         { 13 [ 4 * ] }
-        [ unknown-ifd-type ]
+        [ "value-length" unknown-ifd-type ]
     } case ;
 
 ERROR: bad-small-ifd-type n ;
@@ -331,7 +347,7 @@ ERROR: bad-small-ifd-type n ;
         { 10 [ 8 group [ "ii" unpack first2 / ] map ] }
         { 11 [ 4 group [ "f" unpack ] map ] }
         { 12 [ 8 group [ "d" unpack ] map ] }
-        [ unknown-ifd-type ]
+        [ "offeset-bytes>obj" unknown-ifd-type ]
     } case ;
 
 : ifd-entry-value ( ifd-entry -- n )
@@ -430,7 +446,7 @@ ERROR: bad-small-ifd-type n ;
         [
             dup ifd-entries>>
             [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags
-        ] map
+        ] assoc-map
     ] change-ifds ;
 
 ERROR: unhandled-compression compression ;
@@ -514,7 +530,7 @@ ERROR: unknown-component-order ifd ;
     } cleave ;
 
 : tiff>image ( image -- image )
-    ifds>> [ ifd>image ] map first ;
+    ifds>> values [ ifd>image ] map first ;
 
 : with-tiff-endianness ( loading-tiff quot -- )
     [ dup endianness>> ] dip with-endianness ; inline
@@ -552,7 +568,7 @@ ERROR: unknown-component-order ifd ;
     ] if ;
 
 : process-tif-ifds ( loading-tiff -- )
-    ifds>> [ process-ifd ] each ;
+    ifds>> values [ process-ifd ] each ;
 
 : load-tiff ( -- loading-tiff )
     load-tiff-ifds dup
