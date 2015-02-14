@@ -9,7 +9,7 @@ IN: images.tiff
 
 SINGLETON: tiff-image
 
-TUPLE: loading-tiff endianness the-answer ifd-offset ifd-offsets ifds ;
+TUPLE: loading-tiff endianness the-answer ifd-offset ifds ;
 
 : <loading-tiff> ( -- tiff )
     loading-tiff new
@@ -347,7 +347,7 @@ ERROR: bad-small-ifd-type n ;
         { 10 [ 8 group [ "ii" unpack first2 / ] map ] }
         { 11 [ 4 group [ "f" unpack ] map ] }
         { 12 [ 8 group [ "d" unpack ] map ] }
-        [ "offeset-bytes>obj" unknown-ifd-type ]
+        [ "offset-bytes>obj" unknown-ifd-type ]
     } case ;
 
 : ifd-entry-value ( ifd-entry -- n )
