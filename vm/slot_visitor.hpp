@@ -144,6 +144,7 @@ template <typename Fixup> struct slot_visitor {
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
   void visit_embedded_code_pointers(code_block* compiled);
+  void visit_mark_stack(std::vector<cell>* mark_stack);
 };
 
 template <typename Fixup>
@@ -255,7 +256,6 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
 
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
-
 
   visit_contexts();
 }
@@ -533,6 +533,31 @@ void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
   if (!parent->code->uninitialized_p(compiled)) {
     embedded_code_pointers_visitor<Fixup> operand_visitor(fixup);
     compiled->each_instruction_operand(operand_visitor);
+  }
+}
+
+/* Pops items from the mark stack and visits them until the stack is
+   empty. Used when doing a full collection and when collecting to
+   tenured space. */
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
+  while (!mark_stack->empty()) {
+    cell ptr = mark_stack->back();
+    // TJaba
+    mark_stack->pop_back();
+
+    if (ptr & 1) {
+      code_block* compiled = (code_block*)(ptr - 1);
+      visit_code_block_objects(compiled);
+      visit_embedded_literals(compiled);
+      visit_embedded_code_pointers(compiled);
+    } else {
+      object* obj = (object*)ptr;
+      visit_slots(obj);
+      if (obj->type() == ALIEN_TYPE)
+        ((alien*)obj)->update_address();
+      visit_object_code_block(obj);
+    }
   }
 }
 
