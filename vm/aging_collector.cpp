@@ -26,7 +26,7 @@ void factor_vm::collect_aging() {
     if (event)
       event->ended_code_scan(collector.code_blocks_scanned);
 
-    collector.tenure_reachable_objects();
+    collector.visitor.visit_mark_stack(&mark_stack);
   }
   {
     /* If collection fails here, do a to_tenured collection. */
