@@ -7,15 +7,6 @@ to_tenured_collector::to_tenured_collector(factor_vm* parent)
                                                   parent->data->tenured,
                                                   to_tenured_policy(parent)) {}
 
-void to_tenured_collector::tenure_reachable_objects() {
-  std::vector<cell>* mark_stack = &parent->mark_stack;
-  while (!mark_stack->empty()) {
-    cell ptr = mark_stack->back();
-    mark_stack->pop_back();
-    this->trace_object((object*)ptr);
-  }
-}
-
 void factor_vm::collect_to_tenured() {
   /* Copy live objects from aging space to tenured space. */
   to_tenured_collector collector(this);
@@ -37,7 +28,7 @@ void factor_vm::collect_to_tenured() {
   if (event)
     event->ended_code_scan(collector.code_blocks_scanned);
 
-  collector.tenure_reachable_objects();
+  collector.visitor.visit_mark_stack(&mark_stack);
 
   data->reset_nursery();
   data->reset_aging();
