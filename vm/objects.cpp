@@ -88,24 +88,23 @@ struct slot_become_fixup : no_fixup {
 };
 
 struct object_become_visitor {
-  slot_visitor<slot_become_fixup>* workhorse;
+  slot_visitor<slot_become_fixup>* visitor;
 
-  explicit object_become_visitor(slot_visitor<slot_become_fixup>* workhorse)
-      : workhorse(workhorse) {}
+  explicit object_become_visitor(slot_visitor<slot_become_fixup>* visitor)
+      : visitor(visitor) {}
 
-  void operator()(object* obj) { workhorse->visit_slots(obj); }
+  void operator()(object* obj) { visitor->visit_slots(obj); }
 };
 
 struct code_block_become_visitor {
-  slot_visitor<slot_become_fixup>* workhorse;
+  slot_visitor<slot_become_fixup>* visitor;
 
   explicit code_block_become_visitor(
-      slot_visitor<slot_become_fixup>* workhorse)
-      : workhorse(workhorse) {}
+      slot_visitor<slot_become_fixup>* visitor) : visitor(visitor) {}
 
   void operator()(code_block* compiled, cell size) {
-    workhorse->visit_code_block_objects(compiled);
-    workhorse->visit_embedded_literals(compiled);
+    visitor->visit_code_block_objects(compiled);
+    visitor->visit_embedded_literals(compiled);
   }
 };
 
@@ -144,14 +143,14 @@ void factor_vm::primitive_become() {
 
   /* Update all references to old objects to point to new objects */
   {
-    slot_visitor<slot_become_fixup> workhorse(this,
-                                              slot_become_fixup(&become_map));
-    workhorse.visit_all_roots();
+    slot_visitor<slot_become_fixup> visitor(this,
+                                            slot_become_fixup(&become_map));
+    visitor.visit_all_roots();
 
-    object_become_visitor object_visitor(&workhorse);
+    object_become_visitor object_visitor(&visitor);
     each_object(object_visitor);
 
-    code_block_become_visitor code_block_visitor(&workhorse);
+    code_block_become_visitor code_block_visitor(&visitor);
     each_code_block(code_block_visitor);
   }
 
