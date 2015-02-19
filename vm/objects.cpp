@@ -146,8 +146,7 @@ void factor_vm::primitive_become() {
   {
     slot_visitor<slot_become_fixup> workhorse(this,
                                               slot_become_fixup(&become_map));
-    workhorse.visit_roots();
-    workhorse.visit_contexts();
+    workhorse.visit_all_roots();
 
     object_become_visitor object_visitor(&workhorse);
     each_object(object_visitor);

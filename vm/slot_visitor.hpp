@@ -101,9 +101,8 @@ them.
 This is used by GC's copying, sweep and compact phases, and the implementation
 of the become primitive.
 
-Iteration is driven by visit_*() methods. Some of them define GC roots:
-- visit_roots()
-- visit_contexts()
+Iteration is driven by visit_*() methods. Only one of them define GC roots:
+- visit_all_roots()
 
 Code block visitors iterate over sets of code blocks, applying a functor to
 each one. The functor returns a new code_block pointer, which may or may not
@@ -132,7 +131,7 @@ template <typename Fixup> struct slot_visitor {
   void visit_data_roots();
   void visit_callback_roots();
   void visit_literal_table_roots();
-  void visit_roots();
+  void visit_all_roots();
   void visit_callstack_object(callstack* stack);
   void visit_callstack(context* ctx);
   void visit_context(context *ctx);
@@ -242,7 +241,7 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_sample_threads() {
   }
 }
 
-template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
+template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   visit_handle(&parent->true_object);
   visit_handle(&parent->bignum_zero);
   visit_handle(&parent->bignum_pos_one);
@@ -256,6 +255,9 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
 
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
+
+
+  visit_contexts();
 }
 
 /* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in

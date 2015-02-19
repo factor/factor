@@ -32,8 +32,7 @@ void factor_vm::collect_mark_impl() {
   code->allocator->state.clear_mark_bits();
   data->tenured->state.clear_mark_bits();
 
-  visitor.visit_roots();
-  visitor.visit_contexts();
+  visitor.visit_all_roots();
   visitor.visit_context_code_blocks();
   visitor.visit_uninitialized_code_blocks();
 
