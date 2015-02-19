@@ -117,8 +117,8 @@ struct start_object_updater {
 
 void factor_vm::fixup_data(cell data_offset, cell code_offset) {
   startup_fixup fixup(data_offset, code_offset);
-  slot_visitor<startup_fixup> data_workhorse(this, fixup);
-  data_workhorse.visit_roots();
+  slot_visitor<startup_fixup> visitor(this, fixup);
+  visitor.visit_all_roots();
 
   start_object_updater updater(this, fixup);
   data->tenured->iterate(updater, fixup);
