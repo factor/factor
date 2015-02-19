@@ -211,8 +211,7 @@ void factor_vm::collect_compact_impl() {
       code->allocator->compact(code_block_updater, fixup, &code_finger);
     }
 
-    forwarder.visit_roots();
-    forwarder.visit_contexts();
+    forwarder.visit_all_roots();
     forwarder.visit_context_code_blocks();
   }
 

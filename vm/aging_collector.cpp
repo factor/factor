@@ -38,9 +38,8 @@ void factor_vm::collect_aging() {
     copying_collector<aging_space, aging_policy> collector(this,
                                                            this->data->aging,
                                                            aging_policy(this));
-    collector.data_visitor.visit_roots();
-    collector.data_visitor.visit_contexts();
 
+    collector.visitor.visit_all_roots();
     collector.cheneys_algorithm();
 
     data->reset_nursery();
