@@ -79,7 +79,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
   code_heap* code;
   TargetGeneration* target;
   gc_workhorse<TargetGeneration, Policy> workhorse;
-  slot_visitor<gc_workhorse<TargetGeneration, Policy> > data_visitor;
+  slot_visitor<gc_workhorse<TargetGeneration, Policy> > visitor;
   cell cards_scanned;
   cell decks_scanned;
   cell code_blocks_scanned;
@@ -90,13 +90,13 @@ template <typename TargetGeneration, typename Policy> struct collector {
         code(parent->code),
         target(target),
         workhorse(parent, target, policy),
-        data_visitor(parent, workhorse),
+        visitor(parent, workhorse),
         cards_scanned(0),
         decks_scanned(0),
         code_blocks_scanned(0) {}
 
   void trace_object(object* ptr) {
-    data_visitor.visit_slots(ptr);
+    visitor.visit_slots(ptr);
     if (ptr->type() == ALIEN_TYPE)
       ((alien*)ptr)->update_address();
   }
@@ -107,8 +107,8 @@ template <typename TargetGeneration, typename Policy> struct collector {
 
     for (; iter != end; iter++) {
       code_block* compiled = *iter;
-      data_visitor.visit_code_block_objects(compiled);
-      data_visitor.visit_embedded_literals(compiled);
+      visitor.visit_code_block_objects(compiled);
+      visitor.visit_embedded_literals(compiled);
       compiled->flush_icache();
       code_blocks_scanned++;
     }
@@ -148,7 +148,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
       cell* end_ptr = (cell*)end;
 
       for (; slot_ptr < end_ptr; slot_ptr++)
-        data_visitor.visit_handle(slot_ptr);
+        visitor.visit_handle(slot_ptr);
     }
   }
 
