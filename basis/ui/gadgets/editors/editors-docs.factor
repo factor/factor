@@ -1,5 +1,5 @@
 USING: documents help.markup help.syntax ui.gadgets
-ui.gadgets.scrollers models strings ui.commands
+ui.gadgets.scrollers models strings ui.commands sequences
 ui.text colors fonts help.tips ;
 IN: ui.gadgets.editors
 
@@ -57,9 +57,20 @@ HELP: remove-selection
 { $values { "editor" editor } }
 { $description "Removes currently selected text from the editor's " { $link document } "." } ;
 
+HELP: <model-field>
+{ $values { "model" model } { "gadget" editor } }
+{ $description "Creates an editor gadget which targets the specified model. The model must contain a string, or another item with a defined " { $link length } ", as this will be checked during layout." } ;
+
+HELP: <action-field>
+{ $values { "quot" "a quotation ( string -- )" } { "gadget" editor } }
+{ $description "Creates an editor gadget with a blank model. Whenever a value is entered into the editor and Return pressed, the value is pushed on the stack as a string and the specified quotation is called. Note that the quotation cannot update the value in the field. " } ;
+
+
 HELP: editor-string
 { $values { "editor" editor } { "string" string } }
 { $description "Outputs the contents of the editor's " { $link document } " as a string. Lines are separated by " { $snippet "\\n" } "." } ;
+
+
 
 HELP: set-editor-string
 { $values { "string" string } { "editor" editor } }
