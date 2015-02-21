@@ -58,21 +58,6 @@ struct gc_workhorse : no_fixup {
   }
 };
 
-struct dummy_unmarker {
-  void operator()(card* ptr) {}
-};
-
-struct simple_unmarker {
-  card unmask;
-  explicit simple_unmarker(card unmask) : unmask(unmask) {}
-  void operator()(card* ptr) { *ptr &= ~unmask; }
-};
-
-struct full_unmarker {
-  full_unmarker() {}
-  void operator()(card* ptr) { *ptr = 0; }
-};
-
 template <typename TargetGeneration, typename Policy> struct collector {
   factor_vm* parent;
   data_heap* data;
@@ -152,8 +137,8 @@ template <typename TargetGeneration, typename Policy> struct collector {
     }
   }
 
-  template <typename SourceGeneration, typename Unmarker>
-  void trace_cards(SourceGeneration* gen, card mask, Unmarker unmarker) {
+  template <typename SourceGeneration>
+  void trace_cards(SourceGeneration* gen, card mask, card unmask) {
     card_deck* decks = data->decks;
     card_deck* cards = data->cards;
 
@@ -162,7 +147,9 @@ template <typename TargetGeneration, typename Policy> struct collector {
     cell first_deck = card_deck_for_address(gen->start);
     cell last_deck = card_deck_for_address(gen->end);
 
-    cell start = 0, binary_start = 0, end = 0;
+    cell start = 0;
+    cell binary_start = 0;
+    cell end = 0;
 
     for (cell deck_index = first_deck; deck_index < last_deck; deck_index++) {
       if (decks[deck_index] & mask) {
@@ -199,14 +186,14 @@ template <typename TargetGeneration, typename Policy> struct collector {
               }
             }
 
-            unmarker(&cards[card_index]);
+            cards[card_index] &= ~unmask;
 
             if (!start)
               return;
           }
         }
 
-        unmarker(&decks[deck_index]);
+        decks[deck_index] &= ~unmask;
       }
     }
   }
