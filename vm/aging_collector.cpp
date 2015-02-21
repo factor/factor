@@ -16,7 +16,7 @@ void factor_vm::collect_aging() {
 
     if (event)
       event->started_card_scan();
-    collector.trace_cards(data->tenured, card_points_to_aging, full_unmarker());
+    collector.trace_cards(data->tenured, card_points_to_aging, 0xff);
     if (event)
       event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
 
