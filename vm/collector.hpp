@@ -99,35 +99,34 @@ template <typename TargetGeneration, typename Policy> struct collector {
     }
   }
 
-  inline cell first_card_in_deck(cell deck) {
+  cell first_card_in_deck(cell deck) {
     return deck << (deck_bits - card_bits);
   }
 
-  inline cell last_card_in_deck(cell deck) {
+  cell last_card_in_deck(cell deck) {
     return first_card_in_deck(deck + 1);
   }
 
-  inline cell card_deck_for_address(cell a) {
+  cell card_deck_for_address(cell a) {
     return addr_to_deck(a - data->start);
   }
 
-  inline cell card_start_address(cell card) {
+  cell card_start_address(cell card) {
     return (card << card_bits) + data->start;
   }
 
-  inline cell card_end_address(cell card) {
+  cell card_end_address(cell card) {
     return ((card + 1) << card_bits) + data->start;
   }
 
-  void trace_partial_objects(cell start, cell end, cell card_start,
-                             cell card_end) {
+  void trace_partial_objects(cell start, cell card_start, cell card_end) {
+    object* obj = (object*)start;
+    cell end = start + obj->binary_payload_start();
     if (card_start < end) {
       start += sizeof(cell);
 
-      if (start < card_start)
-        start = card_start;
-      if (end > card_end)
-        end = card_end;
+      start = std::max(start, card_start);
+      end = std::min(end, card_end);
 
       cell* slot_ptr = (cell*)start;
       cell* end_ptr = (cell*)end;
@@ -148,7 +147,6 @@ template <typename TargetGeneration, typename Policy> struct collector {
     cell last_deck = card_deck_for_address(gen->end);
 
     cell start = 0;
-    cell binary_start = 0;
     cell end = 0;
 
     for (cell deck_index = first_deck; deck_index < last_deck; deck_index++) {
@@ -163,34 +161,33 @@ template <typename TargetGeneration, typename Policy> struct collector {
           if (cards[card_index] & mask) {
             cards_scanned++;
 
-            if (end < card_start_address(card_index)) {
+            cell start_addr = card_start_address(card_index);
+            cell end_addr = card_end_address(card_index);
+
+            if (end < start_addr) {
+              factor_print_p = true;
               start = gen->starts
                   .find_object_containing_card(card_index - gen_start_card);
-              binary_start = start + ((object*)start)->binary_payload_start();
+
               end = start + ((object*)start)->size();
             }
 
           scan_next_object:
-            if (start < card_end_address(card_index)) {
-              trace_partial_objects(start, binary_start,
-                                    card_start_address(card_index),
-                                    card_end_address(card_index));
-              if (end < card_end_address(card_index)) {
+            if (start < end_addr) {
+              trace_partial_objects(start, start_addr, end_addr);
+              if (end < end_addr) {
                 start = gen->next_object_after(start);
                 if (start) {
-                  binary_start =
-                      start + ((object*)start)->binary_payload_start();
                   end = start + ((object*)start)->size();
                   goto scan_next_object;
                 }
               }
             }
-
-            cards[card_index] &= ~unmask;
-
-            if (!start)
+            if (!start) {
               return;
+            }
           }
+          cards[card_index] &= ~unmask;
         }
 
         decks[deck_index] &= ~unmask;
