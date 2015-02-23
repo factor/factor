@@ -16,14 +16,16 @@ static const cell card_mark_mask =
 typedef uint8_t card;
 
 static const cell card_bits = 8;
-static const cell card_size = (1 << card_bits);
-static const cell addr_card_mask = (card_size - 1);
+static const cell card_size = 1 << card_bits;
+static const cell addr_card_mask = card_size - 1;
 
 typedef uint8_t card_deck;
 
-static const cell deck_bits = (card_bits + 10);
-static const cell deck_size = (1 << deck_bits);
-static const cell addr_deck_mask = (deck_size - 1);
+static const cell deck_bits = card_bits + 10;
+/* Number of bytes on the heap a deck addresses. Each deck as 1024
+   cards. So 256 kb. */
+static const cell deck_size = 1 << deck_bits;
+static const cell cards_per_deck = 1 << 10;
 
 inline cell addr_to_card(cell a) { return a >> card_bits; }
 
