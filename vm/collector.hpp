@@ -99,18 +99,6 @@ template <typename TargetGeneration, typename Policy> struct collector {
     }
   }
 
-  cell first_card_in_deck(cell deck) {
-    return deck << (deck_bits - card_bits);
-  }
-
-  cell last_card_in_deck(cell deck) {
-    return first_card_in_deck(deck + 1);
-  }
-
-  cell card_deck_for_address(cell a) {
-    return addr_to_deck(a - data->start);
-  }
-
   void trace_partial_objects(cell start, cell card_start, cell card_end) {
     object* obj = (object*)start;
     cell end = start + obj->binary_payload_start();
@@ -160,8 +148,8 @@ template <typename TargetGeneration, typename Policy> struct collector {
     card_deck* decks = data->decks;
     card_deck* cards = data->cards;
 
-    cell first_deck = card_deck_for_address(gen->start);
-    cell last_deck = card_deck_for_address(gen->end);
+    cell first_deck = (gen->start - data->start) / deck_size;
+    cell last_deck = (gen->end - data->start) / deck_size;
 
     /* Address of last traced object. */
     cell start = 0;
@@ -171,8 +159,8 @@ template <typename TargetGeneration, typename Policy> struct collector {
         decks[deck_index] &= ~unmask;
         decks_scanned++;
 
-        cell first_card = first_card_in_deck(deck_index);
-        cell last_card = last_card_in_deck(deck_index);
+        cell first_card = cards_per_deck * deck_index;
+        cell last_card = first_card + cards_per_deck;
 
         for (cell card_index = first_card; card_index < last_card;
              card_index++) {
