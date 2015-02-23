@@ -111,14 +111,6 @@ template <typename TargetGeneration, typename Policy> struct collector {
     return addr_to_deck(a - data->start);
   }
 
-  cell card_start_address(cell card) {
-    return (card << card_bits) + data->start;
-  }
-
-  cell card_end_address(cell card) {
-    return ((card + 1) << card_bits) + data->start;
-  }
-
   void trace_partial_objects(cell start, cell card_start, cell card_end) {
     object* obj = (object*)start;
     cell end = start + obj->binary_payload_start();
@@ -137,20 +129,46 @@ template <typename TargetGeneration, typename Policy> struct collector {
   }
 
   template <typename SourceGeneration>
+  cell trace_card(SourceGeneration* gen, cell index, cell start) {
+
+    cell start_addr = data->start + index * card_size;
+    cell end_addr = start_addr + card_size;
+
+    if (!start || (start + ((object*)start)->size()) < start_addr) {
+      /* Optimization because finding the objects in a memory range is
+         expensive. It helps a lot when tracing consecutive cards. */
+      cell gen_start_card = (gen->start - data->start) / card_size;
+      start = gen->starts
+          .find_object_containing_card(index - gen_start_card);
+    }
+
+    while (start && start < end_addr) {
+      trace_partial_objects(start, start_addr, end_addr);
+      if ((start + ((object*)start)->size()) >= end_addr) {
+        /* The object can overlap the card boundary, then the
+           remainder of it will be handled in the next card
+           tracing if that card is marked. */
+        break;
+      }
+      start = gen->next_object_after(start);
+    }
+    return start;
+  }
+
+  template <typename SourceGeneration>
   void trace_cards(SourceGeneration* gen, card mask, card unmask) {
     card_deck* decks = data->decks;
     card_deck* cards = data->cards;
 
-    cell gen_start_card = addr_to_card(gen->start - data->start);
-
     cell first_deck = card_deck_for_address(gen->start);
     cell last_deck = card_deck_for_address(gen->end);
 
+    /* Address of last traced object. */
     cell start = 0;
-    cell end = 0;
 
     for (cell deck_index = first_deck; deck_index < last_deck; deck_index++) {
       if (decks[deck_index] & mask) {
+        decks[deck_index] &= ~unmask;
         decks_scanned++;
 
         cell first_card = first_card_in_deck(deck_index);
@@ -159,38 +177,16 @@ template <typename TargetGeneration, typename Policy> struct collector {
         for (cell card_index = first_card; card_index < last_card;
              card_index++) {
           if (cards[card_index] & mask) {
+            cards[card_index] &= ~unmask;
             cards_scanned++;
 
-            cell start_addr = card_start_address(card_index);
-            cell end_addr = card_end_address(card_index);
-
-            if (end < start_addr) {
-              factor_print_p = true;
-              start = gen->starts
-                  .find_object_containing_card(card_index - gen_start_card);
-
-              end = start + ((object*)start)->size();
-            }
-
-          scan_next_object:
-            if (start < end_addr) {
-              trace_partial_objects(start, start_addr, end_addr);
-              if (end < end_addr) {
-                start = gen->next_object_after(start);
-                if (start) {
-                  end = start + ((object*)start)->size();
-                  goto scan_next_object;
-                }
-              }
-            }
+            start = trace_card(gen, card_index, start);
             if (!start) {
+              /* At end of generation, no need to scan more cards. */
               return;
             }
           }
-          cards[card_index] &= ~unmask;
         }
-
-        decks[deck_index] &= ~unmask;
       }
     }
   }
