@@ -157,6 +157,10 @@ TUPLE: tag
 CONSULT: sequence-protocol tag children>> ;
 INSTANCE: tag sequence
 
+! They also follow the assoc protocol (for attributes)
+CONSULT: assoc-protocol tag attrs>> ;
+INSTANCE: tag assoc
+
 CONSULT: name tag name>> ;
 
 M: tag like
