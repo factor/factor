@@ -25,23 +25,24 @@ struct gc_workhorse : no_fixup {
       return obj;
     }
 
-    object* untagged = obj;
     /* is there another forwarding pointer? */
-    while (untagged->forwarding_pointer_p())
-      untagged = untagged->forwarding_pointer();
-
-    if (!policy.should_copy_p(untagged)) {
-      policy.visited_object(untagged);
-      return untagged;
+    while (obj->forwarding_pointer_p()) {
+      object* dest = obj->forwarding_pointer();
+      obj = dest;
     }
 
-    cell size = untagged->size();
+    if (!policy.should_copy_p(obj)) {
+      policy.visited_object(obj);
+      return obj;
+    }
+
+    cell size = obj->size();
     object* newpointer = target->allot(size);
     if (!newpointer)
       throw must_start_gc_again();
 
-    memcpy(newpointer, untagged, size);
-    untagged->forward_to(newpointer);
+    memcpy(newpointer, obj, size);
+    obj->forward_to(newpointer);
 
     policy.promoted_object(newpointer);
 
@@ -79,12 +80,6 @@ template <typename TargetGeneration, typename Policy> struct collector {
         cards_scanned(0),
         decks_scanned(0),
         code_blocks_scanned(0) {}
-
-  void trace_object(object* ptr) {
-    visitor.visit_slots(ptr);
-    if (ptr->type() == ALIEN_TYPE)
-      ((alien*)ptr)->update_address();
-  }
 
   void trace_code_heap_roots(std::set<code_block*>* remembered_set) {
     std::set<code_block*>::const_iterator iter = remembered_set->begin();
