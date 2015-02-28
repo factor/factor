@@ -144,6 +144,7 @@ template <typename Fixup> struct slot_visitor {
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
   void visit_embedded_code_pointers(code_block* compiled);
+  void visit_object(object* obj);
   void visit_mark_stack(std::vector<cell>* mark_stack);
 };
 
@@ -536,6 +537,13 @@ void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
   }
 }
 
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_object(object *ptr) {
+  visit_slots(ptr);
+  if (ptr->type() == ALIEN_TYPE)
+    ((alien*)ptr)->update_address();
+}
+
 /* Pops items from the mark stack and visits them until the stack is
    empty. Used when doing a full collection and when collecting to
    tenured space. */
@@ -553,9 +561,7 @@ void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
       visit_embedded_code_pointers(compiled);
     } else {
       object* obj = (object*)ptr;
-      visit_slots(obj);
-      if (obj->type() == ALIEN_TYPE)
-        ((alien*)obj)->update_address();
+      visit_object(obj);
       visit_object_code_block(obj);
     }
   }
