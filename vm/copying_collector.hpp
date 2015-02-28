@@ -11,7 +11,7 @@ struct copying_collector : collector<TargetGeneration, Policy> {
 
   void cheneys_algorithm() {
     while (scan && scan < this->target->here) {
-      this->trace_object((object*)scan);
+      this->visitor.visit_object((object*)scan);
       scan = this->target->next_object_after(scan);
     }
   }
