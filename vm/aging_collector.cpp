@@ -16,7 +16,7 @@ void factor_vm::collect_aging() {
 
     if (event)
       event->started_card_scan();
-    collector.trace_cards(data->tenured, card_points_to_aging, full_unmarker());
+    collector.trace_cards(data->tenured, card_points_to_aging, 0xff);
     if (event)
       event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
 
@@ -26,7 +26,7 @@ void factor_vm::collect_aging() {
     if (event)
       event->ended_code_scan(collector.code_blocks_scanned);
 
-    collector.tenure_reachable_objects();
+    collector.visitor.visit_mark_stack(&mark_stack);
   }
   {
     /* If collection fails here, do a to_tenured collection. */
@@ -38,9 +38,8 @@ void factor_vm::collect_aging() {
     copying_collector<aging_space, aging_policy> collector(this,
                                                            this->data->aging,
                                                            aging_policy(this));
-    collector.data_visitor.visit_roots();
-    collector.data_visitor.visit_contexts();
 
+    collector.visitor.visit_all_roots();
     collector.cheneys_algorithm();
 
     data->reset_nursery();

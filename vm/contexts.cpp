@@ -174,26 +174,22 @@ void factor_vm::primitive_context_object_for() {
 }
 
 /* Allocates memory */
-cell factor_vm::stack_to_array(cell bottom, cell top) {
+cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
   fixnum depth = (fixnum)(top - bottom + sizeof(cell));
 
-  if (depth < 0)
-    return false_object;
-  else {
-    array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
-    memcpy(a + 1, (void*)bottom, depth);
-    return tag<array>(a);
+  if (depth < 0) {
+    general_error(error, false_object, false_object);
   }
+  array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
+  memcpy(a + 1, (void*)bottom, depth);
+  return tag<array>(a);
 }
 
 /* Allocates memory */
 cell factor_vm::datastack_to_array(context* ctx) {
-  cell array = stack_to_array(ctx->datastack_seg->start, ctx->datastack);
-  if (array == false_object) {
-    general_error(ERROR_DATASTACK_UNDERFLOW, false_object, false_object);
-    return false_object;
-  } else
-    return array;
+  return stack_to_array(ctx->datastack_seg->start,
+                        ctx->datastack,
+                        ERROR_DATASTACK_UNDERFLOW);
 }
 
 /* Allocates memory */
@@ -207,12 +203,9 @@ void factor_vm::primitive_datastack_for() {
 
 /* Allocates memory */
 cell factor_vm::retainstack_to_array(context* ctx) {
-  cell array = stack_to_array(ctx->retainstack_seg->start, ctx->retainstack);
-  if (array == false_object) {
-    general_error(ERROR_RETAINSTACK_UNDERFLOW, false_object, false_object);
-    return false_object;
-  } else
-    return array;
+  return stack_to_array(ctx->retainstack_seg->start,
+                        ctx->retainstack,
+                        ERROR_RETAINSTACK_UNDERFLOW);
 }
 
 /* Allocates memory */

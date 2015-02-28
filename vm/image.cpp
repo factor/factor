@@ -117,8 +117,8 @@ struct start_object_updater {
 
 void factor_vm::fixup_data(cell data_offset, cell code_offset) {
   startup_fixup fixup(data_offset, code_offset);
-  slot_visitor<startup_fixup> data_workhorse(this, fixup);
-  data_workhorse.visit_roots();
+  slot_visitor<startup_fixup> visitor(this, fixup);
+  visitor.visit_all_roots();
 
   start_object_updater updater(this, fixup);
   data->tenured->iterate(updater, fixup);
@@ -127,13 +127,13 @@ void factor_vm::fixup_data(cell data_offset, cell code_offset) {
 struct startup_code_block_relocation_visitor {
   factor_vm* parent;
   startup_fixup fixup;
-  slot_visitor<startup_fixup> data_visitor;
+  slot_visitor<startup_fixup> visitor;
 
   startup_code_block_relocation_visitor(factor_vm* parent,
                                         startup_fixup fixup)
       : parent(parent),
         fixup(fixup),
-        data_visitor(slot_visitor<startup_fixup>(parent, fixup)) {}
+        visitor(slot_visitor<startup_fixup>(parent, fixup)) {}
 
   void operator()(instruction_operand op) {
     code_block* compiled = op.compiled;
@@ -177,8 +177,8 @@ struct startup_code_block_updater {
       : parent(parent), fixup(fixup) {}
 
   void operator()(code_block* compiled, cell size) {
-    slot_visitor<startup_fixup> data_visitor(parent, fixup);
-    data_visitor.visit_code_block_objects(compiled);
+    slot_visitor<startup_fixup> visitor(parent, fixup);
+    visitor.visit_code_block_objects(compiled);
 
     startup_code_block_relocation_visitor code_visitor(parent, fixup);
     compiled->each_instruction_operand(code_visitor);
