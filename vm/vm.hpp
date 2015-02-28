@@ -164,7 +164,7 @@ struct factor_vm {
   void primitive_context_object();
   void primitive_context_object_for();
   void primitive_set_context_object();
-  cell stack_to_array(cell bottom, cell top);
+  cell stack_to_array(cell bottom, cell top, vm_error_type error);
   cell datastack_to_array(context* ctx);
   void primitive_datastack();
   void primitive_datastack_for();
