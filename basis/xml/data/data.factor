@@ -214,8 +214,8 @@ M: xml like
 : <contained-tag> ( name attrs -- tag )
     f <tag> ;
 
-PREDICATE: contained-tag < tag children>> not ;
-PREDICATE: open-tag < tag children>> ;
+PREDICATE: contained-tag < tag children>> empty? ;
+PREDICATE: open-tag < tag children>> empty? not ;
 
 TUPLE: unescaped string ;
 C: <unescaped> unescaped
