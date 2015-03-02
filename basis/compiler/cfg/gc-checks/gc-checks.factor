@@ -77,7 +77,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
 : <gc-call> ( -- bb )
     <basic-block>
     [ <gc-map> ##call-gc, ##branch, ] V{ } make
-    >>instructions t >>unlikely? ;
+    >>instructions ;
 
 :: connect-gc-checks ( bbs -- )
     ! Every basic block but the last has two successors:
