@@ -7,9 +7,6 @@ compiler.cfg.representations.selection cpu.architecture kernel
 layouts locals make math namespaces sequences ;
 IN: compiler.cfg.representations.peephole
 
-! Representation selection performs some peephole optimizations
-! when inserting conversions to optimize for a few common cases
-
 GENERIC: optimize-insn ( insn -- )
 
 SYMBOL: insn-index
@@ -65,8 +62,6 @@ M: ##load-integer optimize-insn
         [ obj>> byte-array? ]
     } 1&& ;
 
-! When a literal zeroes/ones vector is unboxed, we replace the ##load-reference
-! with a ##zero-vector or ##fill-vector instruction since this is more efficient.
 : convert-to-zero-vector? ( insn -- ? )
     {
         [ dst>> rep-of vector-rep? ]
