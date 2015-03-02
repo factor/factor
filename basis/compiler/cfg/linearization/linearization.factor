@@ -67,9 +67,7 @@ SYMBOLS: work-list loop-heads visited ;
 : (linearization-order) ( cfg -- bbs )
     init-linearization-order
 
-    [ work-list get [ process-block ] slurp-deque ] { } make
-    ! [ unlikely?>> not ] partition append
-    ;
+    [ work-list get [ process-block ] slurp-deque ] { } make ;
 
 PRIVATE>
 

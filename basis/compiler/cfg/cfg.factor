@@ -9,8 +9,7 @@ number
 { instructions vector }
 { successors vector }
 { predecessors vector }
-{ kill-block? boolean }
-{ unlikely? boolean } ;
+{ kill-block? boolean } ;
 
 : <basic-block> ( -- bb )
     basic-block new
