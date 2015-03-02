@@ -23,3 +23,5 @@ HELP: next-vreg-rep
 
 HELP: loc
 { $class-description "Represents a location on the stack. 'n' is an index starting from the top of the stack going down. So 0 is the top of the stack, 1 is what would be the top of the stack after a 'drop', and so on. It has two subclasses, " { $link ds-loc } " for data stack location and " { $link rs-loc } " for locations on the retain stack." } ;
+
+ABOUT: "compiler.cfg.registers"
