@@ -41,8 +41,10 @@ M: ##replace-imm visit-insn mark-location ;
 M: ##replace visit-insn mark-location ;
 
 M: ##call visit-insn ( state insn -- state' )
-    ! After a word call, we can't trust any overinitialized locations
-    ! to contain valid pointers anymore.
+    ! A call instruction may increase the stack height. Then issue a
+    ! minor-gc with some of the stack locations scrubbed which would
+    ! overwrite the overinitialized locations we're tracking. That is
+    ! why they need to be cleared here.
     drop [ first2 [ 0 >= ] filter 2array ] map ;
 
 ERROR: vacant-peek insn ;

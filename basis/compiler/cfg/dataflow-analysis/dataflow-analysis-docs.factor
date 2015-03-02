@@ -25,7 +25,8 @@ HELP: join-sets
   { "dfa" class }
   { "set" "merged state" }
 }
-{ $description "Generic word which merges multiple states into one. A block in the cfg might have multiple predecessors and then this word is used to compute the merged input state to use to analyze the block." } ;
+{ $description "Generic word which merges multiple states into one. A block in the cfg might have multiple predecessors and then this word is used to compute the merged input state to use to analyze the block." }
+{ $see-also transfer-set } ;
 
 
 <PRIVATE
