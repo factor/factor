@@ -7,7 +7,7 @@ compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.optimizer compiler.cfg.registers
 compiler.cfg.representations
 compiler.cfg.representations.preferred compiler.cfg.rpo
-compiler.cfg.save-contexts compiler.cfg.scheduling
+compiler.cfg.save-contexts
 compiler.cfg.utilities compiler.tree.builder
 compiler.tree.optimizer compiler.units hashtables io kernel math
 namespaces prettyprint prettyprint.backend prettyprint.custom
@@ -126,8 +126,3 @@ M: rs-loc pprint* \ R pprint-loc ;
 
 : contains-insn? ( quot insn-check -- ? )
     count-insns 0 > ; inline
-
-! Random instruction scheduling exposes bugs in
-! compiler.cfg.dependencies
-: random-scheduling ( -- )
-    [ \ score [ drop 100 random ] define ] with-compilation-unit ;

@@ -36,9 +36,9 @@ HELP: ##load-reference
   }
 } ;
 
-HELP: ##inc-d
+HELP: ##inc
 { $class-description
-  "An instruction that increases or decreases the data stacks height by n. For example, " { $link 2drop } " decreases it by two and pushing an item increases it by one."
+  "An instruction that increases or decreases a stacks height by n. For example, " { $link 2drop } " decreases the datastacks height by two and pushing an item increases it by one."
 } ;
 
 HELP: ##prologue
@@ -113,6 +113,17 @@ HELP: ##set-slot-imm
 { ##set-slot-imm %set-slot-imm } related-words
 { ##set-slot-imm ##set-slot } related-words
 
+HELP: ##slot-imm
+{ $class-description
+  "Instruction for reading a slot value from an object."
+  { $table
+    { { $slot "dst" } { "Register to read the slot value into." } }
+    { { $slot "obj" } { "Register containing the object with the slot." } }
+    { { $slot "slot" } { "Slot index." } }
+    { { $slot "tag" } { "Type tag for obj." } }
+  }
+} ;
+
 HELP: ##replace-imm
 { $class-description
   "An instruction that replaces an item on the data or register stack with an " { $link immediate } " value." } ;
@@ -129,10 +140,11 @@ HELP: ##box-alien
 
 HELP: ##write-barrier
 { $class-description
-  "An instruction for inserting a write barrier. This instruction is almost always inserted after a " { $link ##set-slot } " instruction. It has the following slots:"
+  "An instruction for inserting a write barrier. This instruction is almost always inserted after a " { $link ##set-slot } " instruction. If the container object is in an older generation than the item inserted, this instruction guarantees that the item will not be garbage collected. It has the following slots:"
   { $table
-    { { $slot "src" } { "Object which the writer barrier refers." } }
+    { { $slot "src" } { "Object to which the writer barrier refers." } }
     { { $slot "slot" } { "Slot index of the object." } }
+    { { $slot "scale" } { "No idea." } }
     { { $slot "tag" } { "Type tag for obj." } }
     { { $slot "temp1" } { "First temporary register to clobber." } }
     { { $slot "temp2" } { "Second temporary register to clobber." } }
@@ -290,11 +302,11 @@ $nl
   ##slot-imm
   ##set-slot
   ##set-slot-imm
+  ##write-barrier
 }
 "Stack height manipulation:"
 { $subsections
-  ##inc-d
-  ##inc-r
+  ##inc
 } ;
 
 ABOUT: "compiler.cfg.instructions"

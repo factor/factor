@@ -46,7 +46,7 @@ HELP: height-changes
   { $example
     "USING: compiler.cfg.stacks.local prettyprint ;"
     "T{ current-height { emit-d 4 } { emit-r -2 } } height-changes ."
-    "{ T{ ##inc-d { n 4 } } T{ ##inc-r { n -2 } } }"
+    "{ T{ ##inc { loc D 4 } } T{ ##inc { loc R -2 } } }"
   }
 } ;
 

@@ -48,7 +48,7 @@ IN: compiler.cfg.branch-splitting
     [ update-successor-predecessors ]
     2bi ;
 
-UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
+UNION: irrelevant ##peek ##replace ##inc ;
 
 : split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
 

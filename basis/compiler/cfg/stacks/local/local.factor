@@ -30,8 +30,8 @@ M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
     [ [ loc>vreg ] dip ] assoc-map parallel-copy ;
 
 : height-changes ( current-height -- insns )
-    [ emit-d>> ] [ emit-r>> ] bi 2array
-    { ##inc-d ##inc-r } [ new swap >>n ] 2map [ n>> 0 = not ] filter ;
+    [ emit-d>> <ds-loc> ] [ emit-r>> <rs-loc> ] bi 2array
+    [ n>> 0 = not ] filter [ ##inc new swap >>loc ] map ;
 
 : emit-changes ( -- )
     building get pop
@@ -39,7 +39,7 @@ M: rs-loc translate-local-loc n>> current-height get r>> - <rs-loc> ;
     current-height get height-changes %
     , ;
 
-! inc-d/inc-r: these emit ##inc-d/##inc-r to change the stack height later
+! inc-d/inc-r: these emit ##inc to change the stack height later
 : inc-d ( n -- )
     current-height get
     [ [ + ] change-emit-d drop ]

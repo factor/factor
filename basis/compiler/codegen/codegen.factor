@@ -147,8 +147,7 @@ CODEGEN: ##load-vector %load-vector
 CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##replace-imm %replace-imm
-CODEGEN: ##inc-d %inc-d
-CODEGEN: ##inc-r %inc-r
+CODEGEN: ##inc %inc
 CODEGEN: ##call %call
 CODEGEN: ##jump %jump
 CODEGEN: ##return %return

@@ -9,7 +9,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##add }
         T{ ##branch }
@@ -18,7 +18,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##alien-invoke }
         T{ ##add }
@@ -28,7 +28,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 0 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##allot }
         T{ ##alien-invoke }
@@ -39,7 +39,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 0 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##allot }
         T{ ##allot }
@@ -50,7 +50,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 0 4 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##allot }
         T{ ##alien-invoke }
@@ -63,7 +63,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 3 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##alien-invoke }
         T{ ##allot }
@@ -87,7 +87,7 @@ IN: compiler.cfg.gc-checks.tests
     0 get block>cfg cfg set ;
 
 V{
-    T{ ##inc-d f 3 }
+    T{ ##inc f 3 }
     T{ ##replace f 0 D 1 }
 } 0 test-bb
 
@@ -132,7 +132,7 @@ V{
 
 V{
     T{ ##peek f 2 D 0 }
-    T{ ##inc-d f 3 }
+    T{ ##inc { loc D 3 } }
     T{ ##branch }
 } 1 test-bb
 
