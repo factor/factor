@@ -1,7 +1,8 @@
 USING: accessors arrays compiler.cfg.instructions
 compiler.cfg.linear-scan.assignment compiler.cfg.linear-scan.live-intervals
-compiler.cfg.utilities cpu.architecture cpu.x86.assembler.operands grouping
-heaps kernel make namespaces random sequences sorting tools.test ;
+compiler.cfg.registers compiler.cfg.utilities cpu.architecture
+cpu.x86.assembler.operands grouping heaps kernel make namespaces random
+sequences sorting tools.test ;
 IN: compiler.cfg.linear-scan.assignment.tests
 
 { { T{ ##spill { src RAX } } } } [
@@ -12,7 +13,9 @@ IN: compiler.cfg.linear-scan.assignment.tests
 
 { } [
     { } init-assignment
-    V{ T{ ##inc-d { n 3 } { insn# 7 } } } 0 insns>block
+    V{
+        T{ ##inc { loc D 3 } { insn# 7 } }
+    } 0 insns>block
     assign-registers-in-block
 ] unit-test
 

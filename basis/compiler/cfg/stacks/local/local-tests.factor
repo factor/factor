@@ -1,5 +1,6 @@
-USING: accessors assocs biassocs combinators compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stacks.local cpu.architecture kernel
+USING: accessors assocs biassocs combinators compiler.cfg
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.stacks.local compiler.cfg.utilities cpu.architecture kernel
 namespaces sequences tools.test ;
 IN: compiler.cfg.stacks.local.tests
 
@@ -10,7 +11,7 @@ IN: compiler.cfg.stacks.local.tests
 ] unit-test
 
 {
-    { T{ ##inc-d { n 4 } } T{ ##inc-r { n -2 } } }
+    { T{ ##inc { loc D 4 } } T{ ##inc { loc R -2 } } }
 } [
     T{ current-height { emit-d 4 } { emit-r -2 } } height-changes
 ] unit-test
@@ -33,4 +34,10 @@ IN: compiler.cfg.stacks.local.tests
     current-height new current-height set
     H{ } clone replace-mapping set 80
     D 77 replace-loc D 77 peek-loc
+] unit-test
+
+{ 0 } [
+    V{ } 0 insns>block basic-block set
+    begin-stack-analysis begin-local-analysis
+    compute-local-kill-set assoc-size
 ] unit-test

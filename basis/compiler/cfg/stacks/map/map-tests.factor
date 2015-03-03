@@ -79,9 +79,9 @@ IN: compiler.cfg.stacks.map.tests
     }
 } [
     {
-        T{ ##inc-d f 2 }
+        T{ ##inc f D 2 }
         T{ ##peek f f D 2 }
-        T{ ##inc-d f 0 }
+        T{ ##inc f D 0 }
     } insns>cfg trace-stack-state
 ] unit-test
 
@@ -108,11 +108,11 @@ IN: compiler.cfg.stacks.map.tests
 
 {
     { { 1 { } } { 0 { } } }
-} [ V{ T{ ##inc-d f 1 } } following-stack-state ] unit-test
+} [ V{ T{ ##inc f D 1 } } following-stack-state ] unit-test
 
 {
     { { 0 { } } { 1 { } } }
-} [ V{ T{ ##inc-r f 1 } } following-stack-state ] unit-test
+} [ V{ T{ ##inc f R 1 } } following-stack-state ] unit-test
 
 ! Here the peek refers to a parameter of the word.
 {
@@ -132,7 +132,7 @@ IN: compiler.cfg.stacks.map.tests
     }
 } [
     V{
-        T{ ##inc-d f 3 }
+        T{ ##inc f D 3 }
         T{ ##peek { loc D 3 } }
         T{ ##branch }
     }
@@ -162,7 +162,7 @@ IN: compiler.cfg.stacks.map.tests
     V{
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
-        T{ ##inc-d f -1 }
+        T{ ##inc f D -1 }
         T{ ##peek { loc D -1 } }
     } following-stack-state
 ] unit-test
@@ -182,7 +182,7 @@ IN: compiler.cfg.stacks.map.tests
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc-d f 1 }
+        T{ ##inc f D 1 }
         T{ ##replace { src 10 } { loc D 0 } }
     } following-stack-state
 ] unit-test
@@ -192,9 +192,9 @@ IN: compiler.cfg.stacks.map.tests
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc-d f 1 }
+        T{ ##inc f D 1 }
         T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc-d f -1 }
+        T{ ##inc f D -1 }
     } following-stack-state
 ] unit-test
 
@@ -202,9 +202,9 @@ IN: compiler.cfg.stacks.map.tests
     { { 0 { -1 } } { 0 { } } }
 } [
     V{
-        T{ ##inc-d f 1 }
+        T{ ##inc f D 1 }
         T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc-d f -1 }
+        T{ ##inc f D -1 }
     } following-stack-state
 ] unit-test
 
@@ -214,7 +214,7 @@ IN: compiler.cfg.stacks.map.tests
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc-d f -1 }
+        T{ ##inc f D -1 }
         T{ ##call }
     } following-stack-state
 ] unit-test
@@ -222,7 +222,7 @@ IN: compiler.cfg.stacks.map.tests
 ! Should not be ok because the value wasn't initialized when gc ran.
 [
     V{
-        T{ ##inc-d f 1 }
+        T{ ##inc f D 1 }
         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
         T{ ##peek { loc D 0 } }
     } following-stack-state
@@ -230,26 +230,26 @@ IN: compiler.cfg.stacks.map.tests
 
 [
     V{
-        T{ ##inc-d f 1 }
+        T{ ##inc f D 1 }
         T{ ##peek { loc D 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with
 
 [
     V{
-        T{ ##inc-r f 1 }
+        T{ ##inc f R 1 }
         T{ ##peek { loc R 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with
 
 : cfg1 ( -- cfg )
     V{
-        T{ ##inc-d f 1 }
+        T{ ##inc f D 1 }
         T{ ##replace { src 10 } { loc D 0 } }
     } 0 insns>block
     V{
         T{ ##peek { dst 37 } { loc D 0 } }
-        T{ ##inc-d f -1 }
+        T{ ##inc f D -1 }
     } 1 insns>block
     1vector >>successors block>cfg ;
 
@@ -269,7 +269,7 @@ IN: compiler.cfg.stacks.map.tests
         { 0 V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } } }
         {
             1 V{
-                T{ ##inc-d f 2 }
+                T{ ##inc f D 2 }
                 T{ ##replace { src 0 } { loc D 1 } }
                 T{ ##replace { src 0 } { loc D 0 } }
             }
@@ -281,7 +281,7 @@ IN: compiler.cfg.stacks.map.tests
         }
         {
             3 V{
-                T{ ##inc-d f 2 }
+                T{ ##inc f D 2 }
                 T{ ##peek { dst 0 } { loc D 2 } }
                 T{ ##peek { dst 0 } { loc D 3 } }
                 T{ ##replace { src 0 } { loc D 2 } }
@@ -291,7 +291,7 @@ IN: compiler.cfg.stacks.map.tests
         }
         {
             8 V{
-                T{ ##inc-d f 3 }
+                T{ ##inc f D 3 }
                 T{ ##peek { dst 0 } { loc D 5 } }
                 T{ ##replace { src 0 } { loc D 0 } }
                 T{ ##replace { src 0 } { loc D 3 } }
@@ -302,7 +302,7 @@ IN: compiler.cfg.stacks.map.tests
         }
         {
             10 V{
-                T{ ##inc-d f -3 }
+                T{ ##inc f D -3 }
                 T{ ##peek { dst 0 } { loc D -3 } }
                 T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
             }

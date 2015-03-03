@@ -31,11 +31,9 @@ CONSTANT: initial-state { { 0 { } } { 0 { } } }
 
 GENERIC: visit-insn ( state insn -- state' )
 
-M: ##inc-d visit-insn ( state insn -- state' )
-    n>> swap first2 [ adjust-stack ] dip 2array ;
-
-M: ##inc-r visit-insn ( state insn -- state' )
-    n>> swap first2 swapd adjust-stack 2array ;
+M: ##inc visit-insn ( state insn -- state' )
+    [ first2 ] dip insn>location
+    [ rot adjust-stack swap ] [ swap adjust-stack ] if 2array ;
 
 M: ##replace-imm visit-insn mark-location ;
 M: ##replace visit-insn mark-location ;
