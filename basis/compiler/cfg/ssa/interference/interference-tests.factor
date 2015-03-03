@@ -75,7 +75,7 @@ V{
 
 
 V{
-    T{ ##inc-d f -3 }
+    T{ ##inc f D -3 }
     T{ ##peek f 12 D -2 }
     T{ ##peek f 23 D -1 }
     T{ ##sar-imm f 13 23 4 }
@@ -106,7 +106,7 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##inc-d f 2 }
+    T{ ##inc f D 2 }
     T{ ##peek f 32 D 2 }
     T{ ##load-reference f 33 ##check-nursery-branch }
     T{ ##load-integer f 34 11 }
@@ -123,7 +123,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc-d f -2 }
+    T{ ##inc f D -2 }
     T{ ##slot-imm f 57 48 11 2 }
     T{ ##compare f 58 33 57 cc= 20 }
     T{ ##replace f 58 D 0 }
@@ -136,7 +136,7 @@ V{
 } 4 test-bb
 
 V{
-    T{ ##inc-d f -2 }
+    T{ ##inc f D -2 }
     T{ ##replace-imm f f D 0 }
     T{ ##branch f }
 } 5 test-bb
@@ -147,7 +147,7 @@ V{
 } 6 test-bb
 
 V{
-    T{ ##inc-d f -2 }
+    T{ ##inc f D -2 }
     T{ ##replace-imm f f D 0 }
     T{ ##branch f }
 } 7 test-bb
@@ -188,7 +188,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc-d f 1 }
+    T{ ##inc f D 1 }
     T{ ##load-reference f 37 T{ bab } }
     T{ ##load-reference f 38 { gfg 1 1 tuple 57438726 gfg 7785907 } }
     T{ ##allot f 40 12 tuple 4 }
@@ -204,8 +204,8 @@ V{
 } 4 test-bb
 
 V{
-    T{ ##inc-r f 1 }
-    T{ ##inc-d f 1 }
+    T{ ##inc f R 1 }
+    T{ ##inc f D 1 }
     T{ ##peek f 43 D 1 }
     T{ ##peek f 44 D 2 }
     T{ ##tagged>integer f 45 43 }
@@ -214,7 +214,7 @@ V{
 } 5 test-bb
 
 V{
-    T{ ##inc-d f -1 }
+    T{ ##inc f D 1 }
     T{ ##slot-imm f 58 43 1 7 }
     T{ ##slot-imm f 60 58 7 2 }
     T{ ##compare-imm-branch f 60 bab cc= }
@@ -225,8 +225,8 @@ V{
 } 7 test-bb
 
 V{
-    T{ ##inc-r f -1 }
-    T{ ##inc-d f -1 }
+    T{ ##inc f R -1 }
+    T{ ##inc f D -1 }
     T{ ##set-slot-imm f 43 44 2 7 }
     T{ ##write-barrier-imm f 44 2 7 34 35 }
     T{ ##branch }
@@ -238,7 +238,7 @@ V{
 } 9 test-bb
 
 V{
-    T{ ##inc-d f 1 }
+    T{ ##inc f D 1 }
     T{ ##replace f 44 R 0 }
     T{ ##replace-imm f bab D 0 }
     T{ ##branch }
@@ -254,12 +254,12 @@ V{
 } 12 test-bb
 
 V{
-    T{ ##inc-d f -1 }
+    T{ ##inc f D -1 }
     T{ ##branch }
 } 13 test-bb
 
 V{
-    T{ ##inc-d f 1 }
+    T{ ##inc f D 1 }
     T{ ##replace f 44 R 0 }
     T{ ##replace-imm f bab D 0 }
     T{ ##branch }
@@ -314,7 +314,8 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##inc-d f 1 }
+
+    T{ ##inc f D 1 }
     T{ ##peek f 31 D 1 }
     T{ ##sar-imm f 16 31 4 }
     T{ ##load-integer f 17 0 }
@@ -334,7 +335,7 @@ V{
 } 3 test-bb
 
 V{
-    T{ ##inc-d f -2 }
+    T{ ##inc f D -2 }
     T{ ##branch f }
 } 4 test-bb
 

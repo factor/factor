@@ -3,7 +3,6 @@
 USING: assocs kernel math namespaces parser sequences ;
 IN: compiler.cfg.registers
 
-! Virtual registers, used by CFG and machine IRs, are just integers
 SYMBOL: vreg-counter
 
 : next-vreg ( -- vreg )
@@ -22,9 +21,7 @@ ERROR: bad-vreg vreg ;
 : next-vreg-rep ( rep -- vreg )
     next-vreg [ set-rep-of ] keep ;
 
-! ##inc-d and ##inc-r affect locations as follows. Location D 0 before
-! an ##inc-d 1 becomes D 1 after ##inc-d 1.
-TUPLE: loc { n integer read-only } ;
+TUPLE: loc { n integer } ;
 
 TUPLE: ds-loc < loc ;
 C: <ds-loc> ds-loc

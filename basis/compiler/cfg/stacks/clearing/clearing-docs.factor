@@ -5,12 +5,12 @@ IN: compiler.cfg.stacks.clearing
 ARTICLE: "compiler.cfg.stacks.clearing" "Uninitialized stack location clearing"
 "A compiler pass that inserts " { $link ##replace-imm } " instructions front of unsafe " { $link ##peek } " instructions in the " { $link cfg } ". Consider the following sequence of instructions."
 { $code
-  "##inc-d 2"
+  "##inc D 2"
   "##peek RCX D 2"
 }
 "The ##peek can cause a stack underflow and then there will be two uninitialized locations on the data stack that can't be traced. To counteract that, this pass modifies the instruction sequence so that it becomes:"
 { $code
-  "##inc-d 2"
+  "##inc D 2"
   "##replace-imm 17 D 0"
   "##replace-imm 17 D 1"
   "##peek RCX D 2"

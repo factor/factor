@@ -57,11 +57,8 @@ literal: loc ;
 INSN: ##replace-imm
 literal: src loc ;
 
-INSN: ##inc-d
-literal: n ;
-
-INSN: ##inc-r
-literal: n ;
+INSN: ##inc
+literal: loc ;
 
 ! Subroutine calls
 INSN: ##call

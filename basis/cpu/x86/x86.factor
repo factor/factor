@@ -91,8 +91,9 @@ M: x86 %replace-imm
     } cond ;
 
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
-M: x86 %inc-d ( n -- ) ds-reg (%inc) ;
-M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
+
+M: x86 %inc ( loc -- )
+    [ n>> ] [ ds-loc? ds-reg rs-reg ? ] bi (%inc) ;
 
 M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
 

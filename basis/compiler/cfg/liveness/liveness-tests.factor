@@ -68,8 +68,8 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##inc-r f 2 }
-    T{ ##inc-d f -2 }
+    T{ ##inc { loc R 2 } }
+    T{ ##inc { loc D -2 } }
     T{ ##peek f 21 D -1 }
     T{ ##peek f 22 D -2 }
     T{ ##replace f 21 R 0 }
@@ -83,8 +83,8 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc-r f -1 }
-    T{ ##inc-d f 1 }
+    T{ ##inc { loc R -1 } }
+    T{ ##inc { loc D 1 } }
     T{ ##peek f 25 R -1 }
     T{ ##replace f 25 D 0 }
     T{ ##branch }
@@ -96,8 +96,8 @@ V{
 } 4 test-bb
 
 V{
-    T{ ##inc-r f -1 }
-    T{ ##inc-d f 2 }
+    T{ ##inc f R -1 }
+    T{ ##inc f D 2 }
     T{ ##peek f 27 R -1 }
     T{ ##peek f 28 D 2 }
     T{ ##peek f 29 D 3 }
@@ -107,18 +107,18 @@ V{
 } 5 test-bb
 
 V{
-    T{ ##inc-d f -1 }
+    T{ ##inc f D -1 }
     T{ ##branch }
 } 6 test-bb
 
 V{
-    T{ ##inc-d f -1 }
+    T{ ##inc f D -1 }
     T{ ##branch }
 } 7 test-bb
 
 V{
     T{ ##phi f 36 H{ { 6 30 } { 7 31 } } }
-    T{ ##inc-d f -2 }
+    T{ ##inc f D -2 }
     T{ ##unbox f 37 29 "alien_offset" int-rep }
     T{ ##unbox f 38 28 "to_double" double-rep }
     T{ ##unbox f 39 36 "to_cell" int-rep }

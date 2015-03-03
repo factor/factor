@@ -5,7 +5,7 @@ IN: compiler.cfg.stacks.vacant
 ARTICLE: "compiler.cfg.stacks.vacant" "Uninitialized/overinitialized stack location analysis"
 "Consider the following sequence of instructions:"
 { $code
-  "##inc-d 2"
+  "##inc D 2"
   "..."
   "##allot"
   "##replace ... D 0"
