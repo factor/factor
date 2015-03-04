@@ -33,17 +33,12 @@ GENERIC: visit-insn ( state insn -- state' )
 
 M: ##inc visit-insn ( state insn -- state' )
     [ first2 ] dip insn>location
-    [ rot adjust-stack swap ] [ swap adjust-stack ] if 2array ;
+    [ rot adjust-stack swap ] [ swap adjust-stack ] if 2array
+    ! Negative out-of stack locations immediately becomes garbage.
+    [ first2 [ 0 >= ] filter 2array ] map ;
 
 M: ##replace-imm visit-insn mark-location ;
 M: ##replace visit-insn mark-location ;
-
-M: ##call visit-insn ( state insn -- state' )
-    ! A call instruction may increase the stack height. Then issue a
-    ! minor-gc with some of the stack locations scrubbed which would
-    ! overwrite the overinitialized locations we're tracking. That is
-    ! why they need to be cleared here.
-    drop [ first2 [ 0 >= ] filter 2array ] map ;
 
 ERROR: vacant-peek insn ;
 
