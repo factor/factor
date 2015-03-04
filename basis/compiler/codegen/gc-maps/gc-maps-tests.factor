@@ -38,9 +38,9 @@ M: fake-cpu gc-root-offset ;
 [
     100 <byte-array> %
 
-    ! The below data is 46 bytes -- 14 bytes padding needed to
+    ! The below data is 38 bytes -- 6 bytes padding needed to
     ! align
-    14 <byte-array> %
+    6 <byte-array> %
 
     ! Bitmap - 2 bytes
     ?{
@@ -58,12 +58,10 @@ M: fake-cpu gc-root-offset ;
     ! Return addresses
     uint-array{ 100 } underlying>> %
 
-    ! GC info footer - 28 bytes
+    ! GC info footer - 20 bytes
     S{ vm:gc-info
        { scrub-d-count 5 }
        { scrub-r-count 2 }
-       { check-d-count 0 }
-       { check-r-count 0 }
        { gc-root-count 4 }
        { derived-root-count 3 }
        { return-address-count 1 }
@@ -106,8 +104,8 @@ cpu x86.64? [
         ] with-variable
     ] unit-test
 
-    ! scrub-d scrub-r check-d check-r gc-roots
-    { { 0 0 0 0 5 } } [
+    ! scrub-d scrub-r gc-roots
+    { { 0 0 5 } } [
         T{ stack-frame { spill-area-base 0 } } stack-frame [
             T{ gc-map
                { gc-roots {
@@ -119,8 +117,8 @@ cpu x86.64? [
         ] with-variable
     ] unit-test
 
-    ! scrub-d scrub-r check-d check-r gc-roots
-    { { 0 0 0 0 9 } } [
+    ! scrub-d scrub-r gc-roots
+    { { 0 0 9 } } [
         T{ stack-frame { spill-area-base 32 } } stack-frame [
             T{ gc-map
                { gc-roots {
@@ -138,7 +136,7 @@ cpu x86.64? [
 ! gc-map-needed?
 { t t } [
     T{ gc-map { scrub-d { 0 1 1 1 0 } } { scrub-r { 1 0 } } } gc-map-needed?
-    T{ gc-map { check-d { 0 1 1 1 } } } gc-map-needed?
+    T{ gc-map { scrub-d { 0 1 1 1 } } } gc-map-needed?
 ] unit-test
 
 ! emit-scrub
@@ -148,7 +146,7 @@ cpu x86.64? [
 
 ! emit-gc-info-bitmaps
 {
-    { 4 2 0 0 0 }
+    { 4 2 0 }
     V{ 1 }
 } [
     { T{ gc-map { scrub-d { 0 1 1 1 } } { scrub-r { 1 1 } } } } gc-maps set
@@ -156,10 +154,10 @@ cpu x86.64? [
 ] unit-test
 
 {
-    { 1 0 1 0 0 }
-    V{ 3 }
+    { 1 0 0 }
+    V{ 1 }
 } [
-    { T{ gc-map { scrub-d { 0 } } { check-d { 0 } } } } gc-maps set
+    { T{ gc-map { scrub-d { 0 } } } } gc-maps set
     [ emit-gc-info-bitmaps ] V{ } make
 ] unit-test
 
@@ -180,7 +178,6 @@ USING: present prettyprint ;
     [ emit-base-tables ] B{ } make
 ] unit-test
 
-
 ! serialize-gc-maps
 {
     B{ 0 0 0 0 }
@@ -189,18 +186,15 @@ USING: present prettyprint ;
 ] unit-test
 
 {
-    B{
-        17 123 0 0 0 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-        1 0 0 0
-    }
+    B{ 17 123 0 0 0 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 }
 } [
     { 123 } return-addresses set
     { T{ gc-map { scrub-d { 0 1 1 1 0 } } } } gc-maps set
     serialize-gc-maps
 ] unit-test
 
-! gc-info + ret-addr + 9bits (5+2+2) = 28 + 4 + 2 = 34
-{ 34 } [
+! gc-info + ret-addr + 9bits (5+2+2) = 20 + 4 + 2 = 26
+{ 26 } [
     {
         T{ gc-map
            { scrub-d { 0 1 1 1 0 } }
@@ -212,8 +206,8 @@ USING: present prettyprint ;
     serialize-gc-maps length
 ] unit-test
 
-! gc-info + ret-addr + 3 base-pointers + 9bits = 28 + 4 + 12 + 2 = 46
-{ 46 } [
+! gc-info + ret-addr + 3 base-pointers + 9bits = 20 + 4 + 12 + 2 = 38
+{ 38 } [
     {
         T{ gc-map
            { scrub-d { 0 1 1 1 0 } }

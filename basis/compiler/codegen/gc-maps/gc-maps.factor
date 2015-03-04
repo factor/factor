@@ -1,9 +1,8 @@
 ! Copyright (C) 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays classes.tuple
-combinators compiler.codegen.relocation cpu.architecture fry
-kernel layouts make math math.order namespaces sequences
-sequences.generalizations ;
+compiler.codegen.relocation cpu.architecture fry kernel layouts make math
+math.order namespaces sequences ;
 IN: compiler.codegen.gc-maps
 
 SYMBOLS: return-addresses gc-maps ;
@@ -30,8 +29,7 @@ SYMBOLS: return-addresses gc-maps ;
 
 : emit-gc-roots ( seqs -- n )
     ! seqs is a sequence of sequences of integers 0..n-1
-    dup largest-spill-slot
-    [ '[ _ integers>bits % ] each ] keep ;
+    dup largest-spill-slot [ '[ _ integers>bits % ] each ] keep ;
 
 : emit-uint ( n -- )
     building get push-uint ;
@@ -42,15 +40,12 @@ SYMBOLS: return-addresses gc-maps ;
 : gc-root-offsets ( gc-map -- offsets )
     gc-roots>> [ gc-root-offset ] map ;
 
-: emit-gc-info-bitmaps ( -- scrub-and-check-counts )
+: emit-gc-info-bitmaps ( -- counts )
     [
-        gc-maps get {
-            [ [ scrub-d>> ] map emit-scrub ]
-            [ [ scrub-r>> ] map emit-scrub ]
-            [ [ check-d>> ] map emit-scrub ]
-            [ [ check-r>> ] map emit-scrub ]
-            [ [ gc-root-offsets ] map emit-gc-roots ]
-        } cleave 5 narray
+        gc-maps get
+        [ [ scrub-d>> ] map emit-scrub ]
+        [ [ scrub-r>> ] map emit-scrub ]
+        [ [ gc-root-offsets ] map emit-gc-roots ] tri 3array
     ] ?{ } make underlying>> % ;
 
 : emit-base-table ( alist longest -- )
