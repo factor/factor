@@ -268,26 +268,12 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
    So for each call frame:
 
     - scrub some uninitialized locations
-    - trace some overinitialized locations
     - trace roots in spill slots
 */
 template <typename Fixup> struct call_frame_slot_visitor {
-  factor_vm* parent;
   slot_visitor<Fixup>* visitor;
   /* NULL in case we're a visitor for a callstack object. */
   context* ctx;
-
-  void check_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
-    for (uint32_t loc = 0; loc < count; loc++) {
-      if (bitmap_p(bitmap, base + loc)) {
-#ifdef DEBUG_GC_MAPS
-        std::cout << "checking stack location " << loc << std::endl;
-#endif
-        cell* value_ptr = ((cell*)stack + loc + 1);
-        visitor->visit_handle(value_ptr);
-      }
-    }
-  }
 
   void scrub_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
     for (cell loc = 0; loc < count; loc++) {
@@ -300,10 +286,8 @@ template <typename Fixup> struct call_frame_slot_visitor {
     }
   }
 
-  call_frame_slot_visitor(factor_vm* parent,
-                          slot_visitor<Fixup>* visitor,
-                          context* ctx)
-      : parent(parent), visitor(visitor), ctx(ctx) {}
+  call_frame_slot_visitor(slot_visitor<Fixup>* visitor, context* ctx)
+      : visitor(visitor), ctx(ctx) {}
 
   /*
 	frame top -> [return address]
@@ -342,16 +326,6 @@ template <typename Fixup> struct call_frame_slot_visitor {
                   bitmap,
                   info->callsite_scrub_r(callsite),
                   info->scrub_r_count);
-
-      /* Trace overinitialized stack locations. */
-      check_stack(ctx->datastack,
-                  bitmap,
-                  info->callsite_check_d(callsite),
-                  info->check_d_count);
-      check_stack(ctx->retainstack,
-                  bitmap,
-                  info->callsite_check_r(callsite),
-                  info->check_r_count);
     }
 
     /* Subtract old value of base pointer from every derived pointer. */
@@ -391,13 +365,13 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack* stack) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, NULL);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(this, NULL);
   parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context* ctx) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(parent, this, ctx);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(this, ctx);
   parent->iterate_callstack(ctx, call_frame_visitor, fixup);
 }
 
@@ -450,11 +424,10 @@ void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
 }
 
 template <typename Fixup> struct call_frame_code_block_visitor {
-  factor_vm* parent;
   Fixup fixup;
 
-  call_frame_code_block_visitor(factor_vm* parent, Fixup fixup)
-      : parent(parent), fixup(fixup) {}
+  call_frame_code_block_visitor(Fixup fixup)
+      : fixup(fixup) {}
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     code_block* compiled =
@@ -482,7 +455,7 @@ void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
     }
     case CALLSTACK_TYPE: {
       callstack* stack = (callstack*)obj;
-      call_frame_code_block_visitor<Fixup> call_frame_visitor(parent, fixup);
+      call_frame_code_block_visitor<Fixup> call_frame_visitor(fixup);
       parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
       break;
     }
@@ -491,11 +464,12 @@ void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_context_code_blocks() {
-  call_frame_code_block_visitor<Fixup> call_frame_visitor(parent, fixup);
+  call_frame_code_block_visitor<Fixup> call_frame_visitor(fixup);
   std::set<context*>::const_iterator begin = parent->active_contexts.begin();
   std::set<context*>::const_iterator end = parent->active_contexts.end();
   while (begin != end) {
-    parent->iterate_callstack(*begin++, call_frame_visitor, fixup);
+    parent->iterate_callstack(*begin, call_frame_visitor, fixup);
+    begin++;
   }
 }
 
