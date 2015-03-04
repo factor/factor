@@ -27,8 +27,8 @@ IN: tools.gc-decode.tests
 { t } [
     \ effects:<effect> word>gc-info scrub-bits
     {
-        ?{ t t t t f t t t t } ! 64-bit
-        ?{ t t t t f f f f f t t t t } ! 32-bit
+        ?{ t t t f t t t t } ! 64-bit
+        ?{ t t t t f f f f f t t t t } ! 32-bit TODO
     } member?
 ] unit-test
 
@@ -60,12 +60,10 @@ IN: tools.gc-decode.tests
     [ f ] [ {
         [ [ scrub-d>> length ] map supremum ]
         [ [ scrub-r>> length ] map supremum ]
-        [ [ check-d>> length ] map supremum ]
-        [ [ check-r>> length ] map supremum ]
         [ [ gc-root-offsets ] map largest-spill-slot ]
         [ [ derived-root-offsets ] map [ keys ] map largest-spill-slot ]
         [ length ]
-    } cleave 7 narray ] if-empty ;
+    } cleave 5 narray ] if-empty ;
 
 ! Like word>gc-info but uses the compiler
 : word>gc-info-expected ( word -- seq/f )
