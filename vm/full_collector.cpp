@@ -32,28 +32,12 @@ void factor_vm::collect_mark_impl() {
   code->allocator->state.clear_mark_bits();
   data->tenured->state.clear_mark_bits();
 
-  visitor.visit_roots();
-  visitor.visit_contexts();
+  visitor.visit_all_roots();
   visitor.visit_context_code_blocks();
   visitor.visit_uninitialized_code_blocks();
 
-  while (!mark_stack.empty()) {
-    cell ptr = mark_stack.back();
-    mark_stack.pop_back();
+  visitor.visit_mark_stack(&mark_stack);
 
-    if (ptr & 1) {
-      code_block* compiled = (code_block*)(ptr - 1);
-      visitor.visit_code_block_objects(compiled);
-      visitor.visit_embedded_literals(compiled);
-      visitor.visit_embedded_code_pointers(compiled);
-    } else {
-      object* obj = (object*)ptr;
-      visitor.visit_slots(obj);
-      if (obj->type() == ALIEN_TYPE)
-        ((alien*)obj)->update_address();
-      visitor.visit_object_code_block(obj);
-    }
-  }
   data->reset_tenured();
   data->reset_aging();
   data->reset_nursery();

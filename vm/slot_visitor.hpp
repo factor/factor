@@ -101,9 +101,8 @@ them.
 This is used by GC's copying, sweep and compact phases, and the implementation
 of the become primitive.
 
-Iteration is driven by visit_*() methods. Some of them define GC roots:
-- visit_roots()
-- visit_contexts()
+Iteration is driven by visit_*() methods. Only one of them define GC roots:
+- visit_all_roots()
 
 Code block visitors iterate over sets of code blocks, applying a functor to
 each one. The functor returns a new code_block pointer, which may or may not
@@ -132,7 +131,7 @@ template <typename Fixup> struct slot_visitor {
   void visit_data_roots();
   void visit_callback_roots();
   void visit_literal_table_roots();
-  void visit_roots();
+  void visit_all_roots();
   void visit_callstack_object(callstack* stack);
   void visit_callstack(context* ctx);
   void visit_context(context *ctx);
@@ -145,6 +144,8 @@ template <typename Fixup> struct slot_visitor {
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
   void visit_embedded_code_pointers(code_block* compiled);
+  void visit_object(object* obj);
+  void visit_mark_stack(std::vector<cell>* mark_stack);
 };
 
 template <typename Fixup>
@@ -242,7 +243,7 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_sample_threads() {
   }
 }
 
-template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
+template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   visit_handle(&parent->true_object);
   visit_handle(&parent->bignum_zero);
   visit_handle(&parent->bignum_pos_one);
@@ -256,6 +257,8 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_roots() {
 
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
+
+  visit_contexts();
 }
 
 /* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
@@ -531,6 +534,36 @@ void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
   if (!parent->code->uninitialized_p(compiled)) {
     embedded_code_pointers_visitor<Fixup> operand_visitor(fixup);
     compiled->each_instruction_operand(operand_visitor);
+  }
+}
+
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_object(object *ptr) {
+  visit_slots(ptr);
+  if (ptr->type() == ALIEN_TYPE)
+    ((alien*)ptr)->update_address();
+}
+
+/* Pops items from the mark stack and visits them until the stack is
+   empty. Used when doing a full collection and when collecting to
+   tenured space. */
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
+  while (!mark_stack->empty()) {
+    cell ptr = mark_stack->back();
+    // TJaba
+    mark_stack->pop_back();
+
+    if (ptr & 1) {
+      code_block* compiled = (code_block*)(ptr - 1);
+      visit_code_block_objects(compiled);
+      visit_embedded_literals(compiled);
+      visit_embedded_code_pointers(compiled);
+    } else {
+      object* obj = (object*)ptr;
+      visit_object(obj);
+      visit_object_code_block(obj);
+    }
   }
 }
 

@@ -23,12 +23,12 @@ data_heap::data_heap(bump_allocator* vm_nursery,
   cell total_size = young_size + 2 * aging_size + tenured_size + deck_size;
   seg = new segment(total_size, false);
 
-  cell cards_size = addr_to_card(total_size);
+  cell cards_size = total_size / card_size;
   cards = new card[cards_size];
   cards_end = cards + cards_size;
   memset(cards, 0, cards_size);
 
-  cell decks_size = addr_to_deck(total_size);
+  cell decks_size = total_size / deck_size;
   decks = new card_deck[decks_size];
   decks_end = decks + decks_size;
   memset(decks, 0, decks_size);
@@ -102,8 +102,8 @@ bool data_heap::low_memory_p() {
 }
 
 void data_heap::mark_all_cards() {
-  memset(cards, -1, cards_end - cards);
-  memset(decks, -1, decks_end - decks);
+  memset(cards, 0xff, cards_end - cards);
+  memset(decks, 0xff, decks_end - decks);
 }
 
 void factor_vm::set_data_heap(data_heap* data_) {

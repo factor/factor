@@ -44,10 +44,13 @@ template <typename Iterator, typename Fixup>
 void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
                                   Fixup& fixup) {
 
-  FACTOR_ASSERT(!Fixup::translated_code_block_map);
   cell top = ctx->callstack_top;
+  cell bottom = ctx->callstack_bottom;
+  /* When we are translating the code block maps, all callstacks must
+     be empty. */
+  FACTOR_ASSERT(!Fixup::translated_code_block_map || top == bottom);
 
-  while (top < ctx->callstack_bottom) {
+  while (top < bottom) {
     cell addr = *(cell*)top;
     FACTOR_ASSERT(addr != 0);
 
@@ -65,7 +68,7 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
     iterator(top, size, owner, addr);
     top += size;
   }
-  FACTOR_ASSERT(top == ctx->callstack_bottom);
+  FACTOR_ASSERT(top == bottom);
 }
 
 /* Allocates memory */

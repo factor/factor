@@ -75,3 +75,7 @@ IN: xml.writer.tests
     ] map [XML <h2>Timings</h2> <table><-></table> XML]
     pprint-xml
 ] unit-test
+
+{ "<test name=\"bob\"/>" } [
+    "test" { { "name" "bob" } } { } <tag> xml>string
+] unit-test
