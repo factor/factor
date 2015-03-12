@@ -63,6 +63,23 @@ IN: http.server.tests
     [ read-request ] with-string-reader
 ] unit-test
 
+! RFC 1945; Section 4.1
+! Implement a version of Simple-Request, although rather than
+! parse version 0.9, we parse 1.0 to return a Full-Response.
+[
+    T{ request
+        { method "GET" }
+        { url URL" /" }
+        { version "1.0" }
+        { header H{ } }
+        { cookies V{ } }
+        { redirects 10 }
+    }
+] [
+    "\r\n\r\n\r\nGET /\r\n\r\n"
+    [ read-request ] with-string-reader
+] unit-test
+
 ! Don't rethrow parse-errors with an empty request string. They are
 ! expected from certain browsers when the server serves a certificate
 ! that the browser can't verify.
