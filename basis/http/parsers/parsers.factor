@@ -46,8 +46,7 @@ IN: http.parsers
         { "0" "1" } one-of ,
     ] seq* [ "" concat-as ] action ;
 
-PEG: parse-request-line ( string -- triple )
-    #! Triple is { method url version }
+: 'full-request' ( -- parser )
     [ 
         'space' ,
         'http-method' ,
@@ -56,7 +55,20 @@ PEG: parse-request-line ( string -- triple )
         'space' ,
         'http-version' ,
         'space' ,
-    ] seq* just ;
+    ] seq* ;
+
+: 'simple-request' ( -- parser )
+    [
+        'space' ,
+        "GET" token ,
+        'space' ,
+        'url' ,
+        'space' ,
+    ] seq* [ "1.0" suffix! ] action ;
+
+PEG: parse-request-line ( string -- triple )
+    #! Triple is { method url version }
+    'full-request' 'simple-request' 2array choice ;
 
 : 'text' ( -- parser )
     [ control? ] except ;
