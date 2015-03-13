@@ -1,5 +1,5 @@
-USING: compiler.cfg.stacks.local compiler.tree help.markup help.syntax math
-sequences ;
+USING: compiler.cfg.instructions compiler.cfg.stacks.local compiler.tree
+help.markup help.syntax math sequences ;
 IN: compiler.cfg.stacks
 
 HELP: ds-push
@@ -15,14 +15,14 @@ HELP: end-stack-analysis
 
 HELP: adjust-d
 { $values { "n" number } }
-{ $description "Changes the height of the current data stack." } ;
+{ $description "Changes the height of the current data stack. This word is called when other instructions which internally adjust the stack height are emitted, such as " { $link ##call } " and " { $link ##alien-invoke } "." } ;
 
 HELP: ds-drop
 { $description "Used to signal to the stack analysis that the datastacks height is decreased by one." } ;
 
 HELP: ds-store
 { $values { "vregs" "a " { $link sequence } " of vregs." } }
-{ $description "Registers that a sequence of vregs are stored at at each corresponding index of the data stack." } ;
+{ $description "Registers that a sequence of vregs are stored at at each corresponding index of the data stack. It is used for compiling " { $link #shuffle } " nodes." } ;
 
 HELP: rs-store
 { $values { "vregs" "a " { $link sequence } " of vregs." } }
