@@ -8,32 +8,13 @@ sequences stack-checker stack-checker.dependencies
 stack-checker.transforms words ;
 IN: compiler.tree.propagation.call-effect
 
-! call( and execute( have complex expansions.
-
-! If the input quotation is a literal, or built up from curry and
-! compose with terminal quotations literal, it is inlined at the
-! call site.
-
-! For dynamic call sites, call( uses the following strategy:
-! - Inline caching. If the quotation is the same as last time, just call it unsafely
-! - Effect inference. Infer quotation's effect, caching it in the cached-effect slot,
-!   and compare it with declaration. If matches, call it unsafely.
-! - Fallback. If the above doesn't work, call it and compare the datastack before
-!   and after to make sure it didn't mess anything up.
-! - Inline caches and cached effects are invalidated whenever a macro is redefined, or
-!   a word's effect changes, by comparing a global counter against the counter value
-!   last observed. The counter is incremented by compiler.units.
-
-! execute( uses a similar strategy.
-
 TUPLE: inline-cache value counter ;
 
 : inline-cache-hit? ( word/quot ic -- ? )
     { [ value>> eq? ] [ nip counter>> effect-counter eq? ] } 2&& ; inline
 
 : update-inline-cache ( word/quot ic -- )
-    [ effect-counter ] dip
-    [ value<< ] [ counter<< ] bi-curry bi* ; inline
+    swap >>value effect-counter >>counter drop ; inline
 
 SINGLETON: +unknown+
 
@@ -70,17 +51,14 @@ M: compose cached-effect
     cache-counter>> effect-counter eq? ; inline
 
 : save-effect ( effect quot -- )
-    [ effect-counter ] dip
-    [ cached-effect<< ] [ cache-counter<< ] bi-curry bi* ;
+    swap >>cached-effect effect-counter >>cache-counter drop ;
 
 M: quotation cached-effect
     dup cached-effect-valid?
     [ cached-effect>> ] [ [ safe-infer dup ] keep save-effect ] if ;
 
-: call-effect-unsafe? ( quot effect -- ? )
-    [ cached-effect ] dip
-    over +unknown+ eq?
-    [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
+: call-effect-unsafe? ( cached-effect effect -- ? )
+    over +unknown+ eq? [ 2drop f ] [ effect<= ] if ;
 
 : call-effect-slow>quot ( effect -- quot )
     [ \ call-effect def>> curry ] [ add-effect-input ] bi
@@ -93,7 +71,7 @@ M: quotation cached-effect
 \ call-effect-slow t "no-compile" set-word-prop
 
 : call-effect-fast ( quot effect inline-cache -- )
-    2over call-effect-unsafe?
+    2over [ cached-effect ] dip call-effect-unsafe?
     [ [ nip update-inline-cache ] [ drop call-effect-unsafe ] 3bi ]
     [ drop call-effect-slow ]
     if ; inline

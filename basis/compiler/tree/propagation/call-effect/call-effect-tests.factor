@@ -1,9 +1,20 @@
 ! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.tree.propagation.call-effect tools.test fry math effects kernel
-compiler.tree.builder compiler.tree.optimizer compiler.tree.debugger sequences
-eval combinators ;
+USING: combinators compiler.tree.propagation.call-effect compiler.units
+math effects kernel compiler.tree.builder compiler.tree.optimizer
+compiler.tree.debugger sequences eval fry tools.test ;
 IN: compiler.tree.propagation.call-effect.tests
+
+! update-inline-cache
+{ t } [
+    [ boa ] inline-cache new [ update-inline-cache ] keep
+    [ boa ] effect-counter inline-cache boa =
+] unit-test
+
+! call-effect-slow>quot
+{ 10000 } [
+    100 [ sq ] ( a -- b ) call-effect-slow>quot call
+] unit-test
 
 [ t ] [ \ + ( a b -- c ) execute-effect-unsafe? ] unit-test
 [ t ] [ \ + ( a b c -- d e ) execute-effect-unsafe? ] unit-test
