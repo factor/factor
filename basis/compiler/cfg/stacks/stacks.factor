@@ -46,13 +46,6 @@ IN: compiler.cfg.stacks
         [ [ <ds-loc> replace-loc ] each-index ] bi
     ] unless-empty ;
 
-: rs-drop ( -- ) -1 inc-r ;
-
-: rs-load ( n -- vregs )
-    dup 0 =
-    [ drop f ]
-    [ [ <reversed> [ <rs-loc> peek-loc ] map ] [ neg inc-r ] bi ] if ;
-
 : rs-store ( vregs -- )
     [
         <reversed>
@@ -78,8 +71,4 @@ IN: compiler.cfg.stacks
 : unary-op ( quot -- )
     [ ds-pop ] dip call ds-push ; inline
 
-! adjust-d/adjust-r: these are called when other instructions which
-! internally adjust the stack height are emitted, such as ##call and
-! ##alien-invoke
 : adjust-d ( n -- ) current-height get [ + ] change-d drop ;
-: adjust-r ( n -- ) current-height get [ + ] change-r drop ;
