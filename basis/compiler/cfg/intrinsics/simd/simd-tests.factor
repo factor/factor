@@ -8,7 +8,7 @@ cpu.architecture fry hashtables kernel locals make namespaces sequences
 system tools.test words ;
 IN: compiler.cfg.intrinsics.simd.tests
 
-:: test-node ( rep -- node ) 
+:: test-node ( rep -- node )
     T{ #call
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
@@ -50,17 +50,17 @@ IN: compiler.cfg.intrinsics.simd.tests
 
 : test-compiler-env ( -- x )
     H{ } clone
-        T{ basic-block { id 0 } }
-            [ \ basic-block pick set-at ]
-            [ 0 swap associate \ ds-heights pick set-at ]
-            [ 0 swap associate \ rs-heights pick set-at ] tri
-        T{ current-height { d 0 } { r 0 } { emit-d 0 } { emit-r 0 } } \ current-height pick set-at
-        H{ } clone \ local-peek-set pick set-at
-        H{ } clone \ replace-mapping pick set-at
-        H{ } <biassoc> \ locs>vregs pick set-at
-        H{ } clone \ peek-sets pick set-at
-        H{ } clone \ replace-sets pick set-at
-        H{ } clone \ kill-sets pick set-at ;
+    T{ basic-block { id 0 } }
+    [ \ basic-block pick set-at ]
+    [ 0 swap associate \ ds-heights pick set-at ]
+    [ 0 swap associate \ rs-heights pick set-at ] tri
+    initial-height-state \ height-state pick set-at
+    H{ } clone \ local-peek-set pick set-at
+    H{ } clone \ replace-mapping pick set-at
+    H{ } <biassoc> \ locs>vregs pick set-at
+    H{ } clone \ peek-sets pick set-at
+    H{ } clone \ replace-sets pick set-at
+    H{ } clone \ kill-sets pick set-at ;
 
 : make-classes ( quot -- seq )
     { } make [ class-of ] map ; inline
@@ -253,8 +253,8 @@ unit-test
 
 [ {
     ##mul-vector
-    ##merge-vector-head ##merge-vector-tail ##add-vector 
-    ##merge-vector-head ##merge-vector-tail ##add-vector 
+    ##merge-vector-head ##merge-vector-tail ##add-vector
+    ##merge-vector-head ##merge-vector-tail ##add-vector
     ##vector>scalar
 } ]
 [ simple-ops-cpu float-4-rep [ emit-simd-v. ] test-emit ]
@@ -534,4 +534,3 @@ unit-test
 
 [ simple-ops-cpu 3 [ emit-simd-v+ ] test-emit ]
 [ bad-simd-intrinsic? ] must-fail-with
-

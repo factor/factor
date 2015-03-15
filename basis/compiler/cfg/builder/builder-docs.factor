@@ -8,21 +8,23 @@ STRING: ex-emit-call
 USING: compiler.cfg.builder compiler.cfg.builder.blocks compiler.cfg.stacks
 kernel make prettyprint ;
 begin-stack-analysis initial-basic-block \ dummy 3 [ emit-call ] { } make drop
-current-height basic-block [ get . ] bi@ .
-T{ current-height { d 3 } }
+height-state basic-block [ get . ] bi@
+{ { 3 0 } { 0 0 } }
 T{ basic-block
-    { id 134 }
+    { id 1903165 }
     { successors
         V{
             T{ basic-block
-                { id 135 }
+                { id 1903166 }
                 { instructions
                     V{
                         T{ ##call { word dummy } }
                         T{ ##branch }
                     }
                 }
-                { successors V{ T{ basic-block { id 136 } } } }
+                { successors
+                    V{ T{ basic-block { id 1903167 } } }
+                }
                 { kill-block? t }
             }
         }
@@ -51,7 +53,7 @@ HELP: make-input-map
 
 HELP: emit-call
 { $values { "word" word } { "height" number } }
-{ $description "Emits a call to the given word to the " { $link cfg } " being constructed. \"height\" is the number of items being added to or removed from the data stack. Side effects of the word is that it modifies the \"basic-block\" and " { $link current-height } " variables." }
+{ $description "Emits a call to the given word to the " { $link cfg } " being constructed. \"height\" is the number of items being added to or removed from the data stack. Side effects of the word is that it modifies the \"basic-block\" and " { $link height-state } " variables." }
 { $examples
   "In this example, a call to a dummy word is emitted which pushes three items onto the stack."
   { $unchecked-example $[ ex-emit-call ] }

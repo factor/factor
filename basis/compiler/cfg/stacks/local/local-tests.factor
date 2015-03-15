@@ -1,19 +1,27 @@
 USING: accessors assocs biassocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.stacks.local compiler.cfg.utilities cpu.architecture kernel
-namespaces sequences tools.test ;
+compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.utilities
+cpu.architecture namespaces kernel tools.test ;
 IN: compiler.cfg.stacks.local.tests
 
-{ T{ current-height f 3 0 3 0 } } [
-    current-height new current-height [
-        3 inc-d current-height get
-    ] with-variable
+{
+    { { 3 3 } { 0 0 } }
+} [
+    initial-height-state height-state set
+    3 inc-d height-state get
+] unit-test
+
+{
+    { { 5 3 } { 0 0 } }
+} [
+    { { 2 0 } { 0 0 } } height-state set
+    3 inc-d height-state get
 ] unit-test
 
 {
     { T{ ##inc { loc D 4 } } T{ ##inc { loc R -2 } } }
 } [
-    T{ current-height { emit-d 4 } { emit-r -2 } } height-changes
+    { { 0 4  } { 0 -2 } } height-state>insns
 ] unit-test
 
 { 30 } [
@@ -31,7 +39,7 @@ IN: compiler.cfg.stacks.local.tests
 ] unit-test
 
 { 80 } [
-    current-height new current-height set
+    initial-height-state height-state set
     H{ } clone replace-mapping set 80
     D 77 replace-loc D 77 peek-loc
 ] unit-test
@@ -40,4 +48,15 @@ IN: compiler.cfg.stacks.local.tests
     V{ } 0 insns>block basic-block set
     begin-stack-analysis begin-local-analysis
     compute-local-kill-set assoc-size
+] unit-test
+
+{ H{ { R -4 R -4 } } } [
+    H{ { 77 4 } } [ ds-heights set ] [ rs-heights set ] bi
+    { { 8 0 } { 3 0 } } height-state set
+    77 basic-block set
+    compute-local-kill-set
+] unit-test
+
+{ D 2 } [
+    { { 1 2 } { 3 4 } } D 3 translate-local-loc2
 ] unit-test

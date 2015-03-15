@@ -1,5 +1,5 @@
-USING: compiler.cfg compiler.tree help.markup help.syntax literals math
-multiline quotations ;
+USING: compiler.cfg compiler.cfg.stacks.local compiler.tree help.markup
+help.syntax literals math multiline quotations sequences ;
 IN: compiler.cfg.builder.blocks
 
 <<
@@ -48,8 +48,20 @@ HELP: emit-trivial-block
 { $description "Combinator that emits a trivial block, constructed by calling the supplied quotation." }
 { $examples { $unchecked-example $[ ex-emit-trivial-block ] } } ;
 
+HELP: end-branch
+{ $values { "pair/f" "two-tuple" } }
+{ $description "pair is { final-bb final-height }" } ;
+
 HELP: initial-basic-block
 { $description "Creates an initial empty " { $link basic-block } " and stores it in the basic-block dynamic variable." } ;
 
 HELP: make-kill-block
 { $description "Marks the current " { $link basic-block } " being processed as a kill block." } ;
+
+HELP: set-successors
+{ $values { "successor" basic-block } { "blocks" sequence } }
+{ $description "Set the successor of each block to " { $slot "successor" } "." } ;
+
+HELP: with-branch
+{ $values { "quot" quotation } { "pair/f" "a pair or f" } }
+{ $description "The pair is either " { $link f } " or a two-tuple containing a " { $link basic-block } " and a " { $link height-state } " two-tuple." } ;

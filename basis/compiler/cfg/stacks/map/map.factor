@@ -1,6 +1,6 @@
 USING: accessors arrays assocs combinators compiler.cfg.dataflow-analysis
-compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.registers fry
-kernel math math.order namespaces sequences ;
+compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.stacks.local
+compiler.cfg.registers fry kernel math math.order namespaces sequences ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.map
 
@@ -19,11 +19,8 @@ IN: compiler.cfg.stacks.map
 
 CONSTANT: initial-state { { 0 { } } { 0 { } } }
 
-: insn>location ( insn -- n ds? )
-    loc>> [ n>> ] [ ds-loc? ] bi ;
-
 : mark-location ( state insn -- state' )
-    [ first2 ] dip insn>location
+    [ first2 ] dip loc>> >loc<
     [ rot register-write swap ] [ swap register-write ] if 2array ;
 
 : fill-vacancies ( state -- state' )
@@ -32,7 +29,7 @@ CONSTANT: initial-state { { 0 { } } { 0 { } } }
 GENERIC: visit-insn ( state insn -- state' )
 
 M: ##inc visit-insn ( state insn -- state' )
-    [ first2 ] dip insn>location
+    [ first2 ] dip loc>> >loc<
     [ rot adjust-stack swap ] [ swap adjust-stack ] if 2array
     ! Negative out-of stack locations immediately becomes garbage.
     [ first2 [ 0 >= ] filter 2array ] map ;
@@ -43,7 +40,7 @@ M: ##replace visit-insn mark-location ;
 ERROR: vacant-peek insn ;
 
 : underflowable-peek? ( state peek -- ? )
-    2dup insn>location swap [ 0 1 ? swap nth ] dip classify-read
+    2dup loc>> >loc< swap [ 0 1 ? swap nth ] dip classify-read
     dup 2 = [ drop vacant-peek ] [ 2nip 1 = ] if ;
 
 M: ##peek visit-insn ( state insn -- state' )
