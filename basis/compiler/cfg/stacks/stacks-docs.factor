@@ -8,7 +8,7 @@ HELP: ds-push
 
 HELP: begin-stack-analysis
 { $description "Initializes a set of variables related to stack analysis of Factor words." }
-{ $see-also current-height } ;
+{ $see-also height-state } ;
 
 HELP: end-stack-analysis
 { $description "Ends the stack analysis of the current cfg." } ;
@@ -26,7 +26,7 @@ HELP: ds-store
 
 HELP: rs-store
 { $values { "vregs" "a " { $link sequence } " of vregs." } }
-{ $description "Stores one or more virtual register values on the retain stack. This modifies the " { $link current-height } " dynamic variable." } ;
+{ $description "Stores one or more virtual register values on the retain stack. This modifies the " { $link height-state } " dynamic variable." } ;
 
 HELP: 2inputs
 { $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } }

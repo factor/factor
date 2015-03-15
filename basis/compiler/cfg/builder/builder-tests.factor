@@ -2,11 +2,12 @@ USING: accessors alien alien.accessors arrays assocs byte-arrays
 combinators.short-circuit compiler.cfg compiler.cfg.builder compiler.cfg.checker
 compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
 compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.stacks.local compiler.tree compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.representations fry hashtables kernel
-kernel.private locals make math math.partial-dispatch math.private namespaces
-prettyprint sbufs sequences sequences.private slots.private strings
-strings.private  tools.test vectors words ;
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities
+compiler.tree compiler.tree.builder compiler.tree.optimizer
+compiler.cfg.representations fry hashtables kernel kernel.private locals make
+math math.partial-dispatch math.private namespaces prettyprint sbufs sequences
+sequences.private slots.private strings strings.private tools.test vectors
+words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
@@ -251,8 +252,8 @@ IN: compiler.cfg.builder.tests
 {
     { T{ ##load-integer { dst 78 } { val 0 } } }
 } [
+    initial-height-state height-state set
     77 vreg-counter set-global
-    current-height new current-height set
     H{ } clone replace-mapping set
     [
         T{ #push { literal 0 } { out-d { 8537399 } } } emit-node
@@ -260,11 +261,11 @@ IN: compiler.cfg.builder.tests
 ] unit-test
 
 {
-    T{ current-height { d 1 } { emit-d 1 } }
+    { { 1 1 } { 0 0 } }
     H{ { D -1 4 } { D 0 4 } }
 } [
     0 vreg-counter set-global
-    current-height new current-height set
+    initial-height-state height-state set
     H{ } clone replace-mapping set
     4 D 0 replace-loc
     T{ #shuffle
@@ -272,7 +273,13 @@ IN: compiler.cfg.builder.tests
        { in-d V{ 4 } }
        { out-d V{ 2 3 } }
     } emit-node
-
-    current-height get
+    height-state get
     replace-mapping get
+] unit-test
+
+{ 1 } [
+    V{ } 0 insns>block basic-block set
+    begin-stack-analysis begin-local-analysis
+    V{ } 1 insns>block [ emit-loop-call ] V{ } make drop
+    basic-block get successors>> length
 ] unit-test

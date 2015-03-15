@@ -13,7 +13,7 @@ IN: compiler.cfg.stacks
     H{ } clone peek-sets set
     H{ } clone replace-sets set
     H{ } clone kill-sets set
-    current-height new current-height set ;
+    initial-height-state height-state set ;
 
 : end-stack-analysis ( -- )
     cfg get
@@ -32,7 +32,8 @@ IN: compiler.cfg.stacks
 
 : ds-pop ( -- vreg ) ds-peek ds-drop ;
 
-: ds-push ( vreg -- ) 1 inc-d D 0 replace-loc ;
+: ds-push ( vreg -- )
+    1 inc-d D 0 replace-loc ;
 
 : ds-load ( n -- vregs )
     dup 0 =
@@ -71,4 +72,5 @@ IN: compiler.cfg.stacks
 : unary-op ( quot -- )
     [ ds-pop ] dip call ds-push ; inline
 
-: adjust-d ( n -- ) current-height get [ + ] change-d drop ;
+: adjust-d ( n -- )
+    <ds-loc> height-state get swap adjust ;

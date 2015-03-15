@@ -46,29 +46,28 @@ IN: compiler.cfg.builder.blocks
         make-kill-block
     ] emit-trivial-block ;
 
-: begin-branch ( -- ) clone-current-height (begin-basic-block) ;
+: begin-branch ( -- )
+    height-state [ clone-height-state ] change
+    (begin-basic-block) ;
 
 : end-branch ( -- pair/f )
-    ! pair is { final-bb final-height }
     basic-block get dup [
         ##branch,
         end-local-analysis
-        current-height get clone 2array
+        height-state get clone-height-state 2array
     ] when ;
 
 : with-branch ( quot -- pair/f )
     [ begin-branch call end-branch ] with-scope ; inline
 
-: set-successors ( branches -- )
-    ! Set the successor of each branch's final basic block to the
-    ! current block.
-    [ [ [ basic-block get ] dip first successors>> push ] when* ] each ;
+: set-successors ( successor blocks -- )
+    [ successors>> push ] with each ;
 
 : emit-conditional ( branches -- )
     ! branches is a sequence of pairs as above
     end-basic-block
-    dup [ ] find nip dup [
-        second current-height set
+    sift [
+        dup first second height-state set
         begin-basic-block
-        set-successors
-    ] [ 2drop ] if ;
+        [ basic-block get ] dip [ first ] map set-successors
+    ] unless-empty ;
