@@ -2,7 +2,7 @@ USING: compiler.cfg.instructions help.markup help.syntax ;
 IN: compiler.cfg.representations.peephole
 
 HELP: convert-to-zero-vector?
-{ $values { "insn" insn } }
+{ $values { "insn" insn } { "?" "a boolean" } }
 { $description "When a literal zeroes/ones vector is unboxed, we replace the " { $link ##load-reference } " with a " { $link ##zero-vector } " or " { $link ##fill-vector } " instruction since this is more efficient." } ;
 
 

@@ -18,7 +18,7 @@ HELP: fill-gc-maps
 { $description "Populates the scrub-d, check-d, scrub-r and check-r slots of all gc maps in the cfg." } ;
 
 HELP: state>gc-data
-{ $values { "state" } { "gc-data" } }
+{ $values { "state" sequence } { "gc-data" sequence } }
 { $description "Takes a stack state on the format given by " { $link trace-stack-state } " and emits an array containing two bit-patterns with locations on the data and retain stacks to scrub." } ;
 
 HELP: vacant>bits

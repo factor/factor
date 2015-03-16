@@ -95,7 +95,7 @@ M: #recursive emit-node
     dup label>> loop?>> [ emit-loop ] [ emit-recursive ] if ;
 
 ! #if
-: emit-branch ( obj -- final-bb )
+: emit-branch ( obj -- pair/f )
     [ emit-nodes ] with-branch ;
 
 : emit-if ( node -- )

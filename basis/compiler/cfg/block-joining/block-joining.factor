@@ -5,9 +5,6 @@ compiler.cfg compiler.cfg.predecessors compiler.cfg.rpo
 compiler.cfg.utilities kernel sequences ;
 IN: compiler.cfg.block-joining
 
-! Joining blocks that are not calls and are connected by a single CFG edge.
-! This pass does not update ##phi nodes and should therefore only run
-! before stack analysis.
 : join-block? ( bb -- ? )
     {
         [ kill-block?>> not ]
