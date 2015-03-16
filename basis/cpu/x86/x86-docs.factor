@@ -1,4 +1,5 @@
-USING: help.markup help.syntax math ;
+USING: cpu.x86.assembler.operands.private help.markup help.syntax layouts
+math ;
 IN: cpu.x86
 
 HELP: stack-reg
@@ -29,6 +30,24 @@ HELP: (%inc)
     "00000000615e5140: 83c140  add ecx, 0x40"
   }
 } ;
+
+HELP: (%slot)
+{ $values
+  { "obj" "a register symbol" }
+  { "slot" "a register symbol" }
+  { "scale" "number of bits required to address all bytes in a " { $link cell } "." }
+  { "tag" integer }
+  { "op" indirect }
+}
+{ $description "Creates an indirect operand for addressing a slot in a container." }
+{ $examples
+  { $unchecked-example
+    "USING: cpu.x86 ;"
+    "[ RAX RBX 3 -14 (%slot) EDI MOV ] B{ } make disassemble"
+    "0000000001dd0990: 897cd80e  mov [rax+rbx*8+0xe], edi"
+  }
+} ;
+
 
 HELP: decr-stack-reg
 { $values { "n" number } }

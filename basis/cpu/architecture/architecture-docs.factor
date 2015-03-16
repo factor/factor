@@ -5,6 +5,16 @@ QUALIFIED: vm
 IN: cpu.architecture
 
 <<
+STRING: ex-%allot
+USING: cpu.architecture make ;
+[ RAX 40 tuple RCX %allot ] B{ } make disassemble
+0000000002270cc0: 498d4d10        lea rcx, [r13+0x10]
+0000000002270cc4: 488b01          mov rax, [rcx]
+0000000002270cc7: 48c7001c000000  mov qword [rax], 0x1c
+0000000002270cce: 4883c807        or rax, 0x7
+0000000002270cd2: 48830130        add qword [rcx], 0x30
+;
+
 STRING: ex-%box-alien
 USING: compiler.codegen compiler.codegen.relocation cpu.architecture make ;
 init-fixup init-relocation [ RAX RBX RCX %box-alien ] B{ } make disassemble
@@ -22,20 +32,16 @@ init-fixup init-relocation [ RAX RBX RCX %box-alien ] B{ } make disassemble
 000000e9fcc720dd: 4889581a              mov [rax+0x1a], rbx
 ;
 
-STRING: ex-%allot
-USING: cpu.architecture make ;
-[ RAX 40 tuple RCX %allot ] B{ } make disassemble
-0000000002270cc0: 498d4d10        lea rcx, [r13+0x10]
-0000000002270cc4: 488b01          mov rax, [rcx]
-0000000002270cc7: 48c7001c000000  mov qword [rax], 0x1c
-0000000002270cce: 4883c807        or rax, 0x7
-0000000002270cd2: 48830130        add qword [rcx], 0x30
-;
-
 STRING: ex-%context
 USING: cpu.architecture make ;
 [ EAX %context ] B{ } make disassemble
 00000000010f5ed0: 418b4500  mov eax, [r13]
+;
+
+STRING: ex-%copy
+USING: cpu.architecture make ;
+RAX RBX int-rep [ %copy ] B{ } make disassemble
+000000000108a970: 4889d8  mov rax, rbx
 ;
 
 STRING: ex-%safepoint
@@ -54,10 +60,16 @@ USING: cpu.architecture make ;
 0000000000e63ac0: 4c897818    mov [rax+0x18], r15
 ;
 
-STRING: ex-%copy
-USING: cpu.architecture make ;
-RAX RBX int-rep [ %copy ] B{ } make disassemble
-000000000108a970: 4889d8  mov rax, rbx
+STRING: ex-%write-barrier
+USING: cpu.architecture make tools.disassembler ;
+init-relocation [ RAX RBX 3 -14 RCX RDX %write-barrier ] B{ } make disassemble
+000000000143f960: 488d4cd80e            lea rcx, [rax+rbx*8+0xe]
+000000000143f965: 48c1e908              shr rcx, 0x8
+000000000143f969: 48ba0000000000000000  mov rdx, 0x0
+000000000143f973: 48c60411c0            mov byte [rcx+rdx], 0xc0
+000000000143f978: 48c1e90a              shr rcx, 0xa
+000000000143f97c: 48ba0000000000000000  mov rdx, 0x0
+000000000143f986: 48c60411c0            mov byte [rcx+rdx], 0xc0
 ;
 >>
 
@@ -92,13 +104,18 @@ HELP: param-regs
 { $values { "abi" "a calling convention symbol" } { "regs" assoc } }
 { $description "Retrieves the order in which machine registers are used for parameters for the given calling convention." } ;
 
-HELP: %load-immediate
-{ $values { "reg" "a register symbol" } { "val" "a value" } }
-{ $description "Emits code for loading an immediate value into a register. On " { $link x86 } ", if val is 0, then an " { $link XOR } " instruction is emitted instead of " { $link MOV } "." } ;
-
-HELP: %call
-{ $values { "word" word } }
-{ $description "Emits code for calling a Factor word." } ;
+HELP: %allot
+{ $values
+  { "dst" "destination register symbol" }
+  { "size" "number of bytes to allocate" }
+  { "class" "one of the built-in classes listed in " { $link type-numbers } }
+  { "temp" "temporary register symbol" }
+}
+{ $description "Emits machine code for allocating memory." }
+{ $examples
+  "In this example 40 bytes is allocated and a tagged pointer to the memory is put in " { $link RAX } ":"
+  { $unchecked-example $[ ex-%allot ] }
+} ;
 
 HELP: %box
 { $values
@@ -116,6 +133,10 @@ HELP: %box-alien
 { $examples { $unchecked-example $[ ex-%box-alien ] } }
 { $see-also ##box-alien %allot } ;
 
+HELP: %call
+{ $values { "word" word } }
+{ $description "Emits code for calling a Factor word." } ;
+
 HELP: %context
 { $values { "dst" "a register symbol" } }
 { $description "Emits machine code for putting a pointer to the context field of the " { $link vm } " in a register." }
@@ -126,28 +147,10 @@ HELP: %copy
 { $description "Emits code copying a value from a register, arbitrary memory location or " { $link spill-slot } " to a destination." }
 { $examples { $unchecked-example $[ ex-%copy ] } } ;
 
-HELP: %safepoint
-{ $description "Emits a safe point to the current code sequence being generated." }
-{ $examples { $unchecked-example $[ ex-%safepoint ] } } ;
-
-HELP: %save-context
-{ $values { "temp1" "a register symbol" } { "temp2" "a register symbol" } }
-{ $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." }
-{ $examples { $unchecked-example $[ ex-%save-context ] } } ;
-
-
-HELP: %allot
-{ $values
-  { "dst" "destination register symbol" }
-  { "size" "number of bytes to allocate" }
-  { "class" "one of the built-in classes listed in " { $link type-numbers } }
-  { "temp" "temporary register symbol" }
-}
-{ $description "Emits machine code for allocating memory." }
-{ $examples
-  "In this example 40 bytes is allocated and a tagged pointer to the memory is put in " { $link RAX } ":"
-  { $unchecked-example $[ ex-%allot ] }
-} ;
+HELP: %load-immediate
+{ $values { "reg" "a register symbol" } { "val" "a value" } }
+{ $description "Emits code for loading an immediate value into a register. On " { $link x86 } ", if val is 0, then an " { $link XOR } " instruction is emitted instead of " { $link MOV } " because the former is shorter." }
+{ $see-also ##load-tagged } ;
 
 HELP: %local-allot
 { $values
@@ -157,6 +160,27 @@ HELP: %local-allot
   { "offset" "where to allocate the data, relative to the stack register" }
 }
 { $description "Emits machine code for stack \"allocating\" a chunk of memory. No memory is really allocated and instead a pointer to it is just put in the destination register." } ;
+
+HELP: %safepoint
+{ $description "Emits a safe point to the current code sequence being generated." }
+{ $examples { $unchecked-example $[ ex-%safepoint ] } } ;
+
+HELP: %save-context
+{ $values { "temp1" "a register symbol" } { "temp2" "a register symbol" } }
+{ $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." }
+{ $examples { $unchecked-example $[ ex-%save-context ] } } ;
+
+HELP: %write-barrier
+{ $values
+  { "src" "a register symbol" }
+  { "slot" "a register symbol" }
+  { "scale" integer }
+  { "tag" integer }
+  { "temp1" "a register symbol" }
+  { "temp2" "a register symbol" }
+}
+{ $description "Generates code for the " { $link ##write-barrier } " instruction." }
+{ $examples { $unchecked-example $[ ex-%write-barrier ] } } ;
 
 HELP: test-instruction?
 { $values { "?" "a boolean" } }
@@ -210,6 +234,8 @@ $nl
 }
 "Control flow code emitters:"
 { $subsections %call %jump %jump-label %return }
+"Slot access:"
+{ $subsections %write-barrier }
 "Representation metadata:"
 { $subsections
   narrow-vector-rep

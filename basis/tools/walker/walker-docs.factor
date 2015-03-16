@@ -15,7 +15,7 @@ HELP: breakpoint-if
 { $description "Annotates a word definition to enter the single stepper if the quotation yields true. The quotation has access to the datastack as it exists just before " { $snippet "word" } " is called." }
 { $examples
     "Break if the input to sq is 3:"
-    { $unchecked-example 
+    { $unchecked-example
         "USE: tools.walker \\ sq [ dup 3 = ] breakpoint-if"
         ""
     }
@@ -26,6 +26,9 @@ HELP: B
 
 HELP: B:
 { $description "A breakpoint for parsing words. When this word is executed, it copies the definition of the following parsing word, prepends a " { $link break } " to it so that it is the first word to be executed when the definition is called, and calls this new definition.\n\nWhen the walker tool opens, execution will still be inside " { $link POSTPONE: B: } ". To step out of B: and into the parsing word, do just that: jump out with O, then into with I." } ;
+
+HELP: step-into
+{ $var-description "Signal set to the walker thread to step into the word." } ;
 
 ARTICLE: "breakpoints" "Setting breakpoints"
 "In addition to invoking the walker explicitly through the UI, it is possible to set breakpoints on words using words in the " { $vocab-link "tools.walker" } " vocabulary."
