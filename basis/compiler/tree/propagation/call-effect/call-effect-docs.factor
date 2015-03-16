@@ -23,7 +23,7 @@ HELP: call-effect-unsafe?
 { $description "Checks if the given effect is safe with regards to the cached one." } ;
 
 HELP: update-inline-cache
-{ $values { "word/quot" } { "ic" inline-cache } }
+{ $values { "word/quot" "word or quotation" } { "ic" inline-cache } }
 { $description "Sets the inline caches " { $slot "value" } " to the given word/quot and updates its " { $slot "counter" } " to the value of the " { $link effect-counter } "." } ;
 
 

@@ -40,3 +40,8 @@ HELP: compiled-offset
     "t\nt"
   }
 } ;
+
+ARTICLE: "compiler.codegen.relocation" "Relocatable VM objects"
+"The " { $vocab-link "compiler.codegen.relocation" } " deals with assigning memory addresses to VM objects, such as the card table. Those objects have different addresses during each execution which is why they are \"relocatable\". The vocab is shared by the optimizing and non-optimizing compiler." ;
+
+ABOUT: "compiler.codegen.relocation"
