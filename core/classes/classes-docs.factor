@@ -84,6 +84,17 @@ HELP: classes
 HELP: update-map
 { $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
 
+HELP: predicate-def
+{ $values { "obj" "a type object" } { "quot" quotation } }
+{ $description "Outputs a quotation that can be used to check if objects are an instance of the given type." }
+{ $examples
+  { $example
+    "USING: classes math prettyprint ;"
+    "fixnum predicate-def ."
+    "[ fixnum? ]"
+  }
+} ;
+
 HELP: predicate-word
 { $values { "word" word } { "predicate" "a predicate word" } }
 { $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
@@ -165,4 +176,3 @@ HELP: forget-class
 HELP: forget-methods
 { $values { "class" class } }
 { $description "Forgets all methods defined on a class. In contrast to " { $link reset-class } ", this not only forgets accessors but also any methods at all on the class." } ;
-
