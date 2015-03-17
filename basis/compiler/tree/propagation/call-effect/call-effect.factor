@@ -57,9 +57,6 @@ M: quotation cached-effect
     dup cached-effect-valid?
     [ cached-effect>> ] [ [ safe-infer dup ] keep save-effect ] if ;
 
-: call-effect-unsafe? ( cached-effect effect -- ? )
-    over +unknown+ eq? [ 2drop f ] [ effect<= ] if ;
-
 : call-effect-slow>quot ( effect -- quot )
     [ \ call-effect def>> curry ] [ add-effect-input ] bi
     '[ _ _ call-effect-unsafe ] ;
@@ -70,8 +67,13 @@ M: quotation cached-effect
 
 \ call-effect-slow t "no-compile" set-word-prop
 
+: call-effect-unsafe? ( quot effect -- ? )
+    [ cached-effect ] dip
+    over +unknown+ eq?
+    [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
+
 : call-effect-fast ( quot effect inline-cache -- )
-    2over [ cached-effect ] dip call-effect-unsafe?
+    2over call-effect-unsafe?
     [ [ nip update-inline-cache ] [ drop call-effect-unsafe ] 3bi ]
     [ drop call-effect-slow ]
     if ; inline
