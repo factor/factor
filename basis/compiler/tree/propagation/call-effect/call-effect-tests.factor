@@ -16,6 +16,12 @@ IN: compiler.tree.propagation.call-effect.tests
     100 [ sq ] ( a -- b ) call-effect-slow>quot call
 ] unit-test
 
+! call-effect-unsafe?
+{ f t } [
+    [ ] ( m -- ) call-effect-unsafe?
+    [ ] ( x -- x ) call-effect-unsafe?
+] unit-test
+
 [ t ] [ \ + ( a b -- c ) execute-effect-unsafe? ] unit-test
 [ t ] [ \ + ( a b c -- d e ) execute-effect-unsafe? ] unit-test
 [ f ] [ \ + ( a b c -- d ) execute-effect-unsafe? ] unit-test
