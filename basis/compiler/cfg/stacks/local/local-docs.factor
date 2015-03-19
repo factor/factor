@@ -47,13 +47,9 @@ HELP: height-state>insns
 HELP: emit-changes
 { $description "Insert height and stack changes prior to the last instruction." } ;
 
-HELP: inc-d
-{ $values { "n" number } }
-{ $description "Increases or decreases the current datastacks height. An " { $link ##inc } " instruction will later be inserted." } ;
-
-HELP: inc-r
-{ $values { "n" number } }
-{ $description "Increases or decreases the current retainstacks height. An " { $link ##inc } " instruction will later be inserted." } ;
+HELP: inc-stack
+{ $values { "loc" loc } }
+{ $description "Increases or decreases the data or retain stack depending on if loc is a " { $link ds-loc } " or " { $link rs-loc } " instance. An " { $link ##inc } " instruction will later be inserted." } ;
 
 ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
 "Local stack analysis. We build three sets for every basic block in the CFG:"
@@ -61,7 +57,19 @@ ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
   "peek-set: all stack locations that the block reads before writing"
   "replace-set: all stack locations that the block writes"
   "kill-set: all stack locations which become unavailable after the block ends because of the stack height being decremented" }
-"This is done while constructing the CFG." ;
+"This is done while constructing the CFG."
+$nl
+"Words for reading the stack state:"
+{ $subsections
+  peek-loc
+  translate-local-loc }
+"Words for writing the stack state:"
+{ $subsections
+  adjust
+  inc-stack
+  modify-height
+  replace-loc
+} ;
 
 
 ABOUT: "compiler.cfg.stacks.local"
