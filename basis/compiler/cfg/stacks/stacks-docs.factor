@@ -1,5 +1,6 @@
-USING: compiler.cfg.instructions compiler.cfg.stacks.local compiler.tree
-help.markup help.syntax math sequences ;
+USING: compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks.local compiler.tree help.markup help.syntax math
+sequences ;
 IN: compiler.cfg.stacks
 
 HELP: ds-push
@@ -20,13 +21,12 @@ HELP: adjust-d
 HELP: ds-drop
 { $description "Used to signal to the stack analysis that the datastacks height is decreased by one." } ;
 
-HELP: ds-store
-{ $values { "vregs" "a " { $link sequence } " of vregs." } }
-{ $description "Registers that a sequence of vregs are stored at at each corresponding index of the data stack. It is used for compiling " { $link #shuffle } " nodes." } ;
-
-HELP: rs-store
-{ $values { "vregs" "a " { $link sequence } " of vregs." } }
-{ $description "Stores one or more virtual register values on the retain stack. This modifies the " { $link height-state } " dynamic variable." } ;
+HELP: store-vregs
+{ $values
+  { "vregs" "a " { $link sequence } " of vregs" }
+  { "loc-class" "either " { $link ds-loc } " or " { $link rs-loc } }
+}
+{ $description "Stores one or more virtual register values on the data or retain stack. The " { $link replace-mapping } " dynamic variable is modified but the " { $link height-state } " is not touched" } ;
 
 HELP: 2inputs
 { $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } }
