@@ -40,9 +40,10 @@ IN: compiler.cfg.stacks.local
     [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
     append unique ;
 
-SYMBOLS: height-state peek-sets replace-sets kill-sets ;
+SYMBOLS: height-state peek-sets replace-sets kill-sets locs>vregs ;
 
-SYMBOL: locs>vregs
+: inc-stack ( loc -- )
+    height-state get swap modify-height ;
 
 : loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
 : vreg>loc ( vreg -- loc/f ) locs>vregs get value-at ;
@@ -57,12 +58,6 @@ SYMBOLS: local-peek-set local-replace-set replace-mapping ;
     replace-mapping get stack-changes %
     height-state get height-state>insns %
     , ;
-
-: inc-d ( n -- )
-    height-state get swap <ds-loc> modify-height ;
-
-: inc-r ( n -- )
-    height-state get swap <rs-loc> modify-height ;
 
 : peek-loc ( loc -- vreg )
     height-state get swap translate-local-loc

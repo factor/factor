@@ -1,21 +1,21 @@
 USING: accessors assocs biassocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.utilities
-cpu.architecture namespaces kernel tools.test ;
+compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.stacks.tests
+compiler.cfg.utilities cpu.architecture namespaces kernel tools.test ;
 IN: compiler.cfg.stacks.local.tests
 
 {
     { { 3 3 } { 0 0 } }
 } [
-    initial-height-state height-state set
-    3 inc-d height-state get
+    test-init
+    3 <ds-loc> inc-stack height-state get
 ] unit-test
 
 {
     { { 5 3 } { 0 0 } }
 } [
     { { 2 0 } { 0 0 } } height-state set
-    3 inc-d height-state get
+    3 <ds-loc> inc-stack height-state get
 ] unit-test
 
 {
@@ -39,9 +39,8 @@ IN: compiler.cfg.stacks.local.tests
 ] unit-test
 
 { 80 } [
-    initial-height-state height-state set
-    H{ } clone replace-mapping set 80
-    D 77 replace-loc D 77 peek-loc
+    test-init
+    80 D 77 replace-loc D 77 peek-loc
 ] unit-test
 
 { 0 } [
@@ -58,5 +57,5 @@ IN: compiler.cfg.stacks.local.tests
 ] unit-test
 
 { D 2 } [
-    { { 1 2 } { 3 4 } } D 3 translate-local-loc2
+    { { 1 2 } { 3 4 } } D 3 translate-local-loc
 ] unit-test
