@@ -26,39 +26,36 @@ IN: compiler.cfg.stacks
         finalize-stack-shuffling
     } apply-passes ;
 
-: ds-drop ( -- ) -1 <ds-loc> inc-stack ;
+: stack-locs ( loc-class n -- locs )
+    iota [ swap new swap >>n ] with map <reversed> ;
+
+: (load-vregs) ( n loc-class -- vregs )
+    swap stack-locs [ peek-loc ] map ;
+
+: load-vregs ( n loc-class -- vregs )
+    [ (load-vregs) ] [ new swap neg >>n inc-stack ] 2bi ;
+
+: store-vregs ( vregs loc-class -- )
+    over length stack-locs [ replace-loc ] 2each ;
+
+! Utility
+: ds-drop ( -- ) D -1 inc-stack ;
 
 : ds-peek ( -- vreg ) D 0 peek-loc ;
 
 : ds-pop ( -- vreg ) ds-peek ds-drop ;
 
 : ds-push ( vreg -- )
-    1 <ds-loc> inc-stack D 0 replace-loc ;
-
-: stack-locs ( loc-class n -- locs )
-    iota [ swap new swap >>n ] with map <reversed> ;
-
-: vregs>stack-locs ( loc-class vregs -- locs )
-    length stack-locs ;
-
-: ds-load ( n -- vregs )
-    [ iota <reversed> [ <ds-loc> peek-loc ] map ]
-    [ neg <ds-loc> inc-stack ] bi ;
-
-: store-vregs ( vregs loc-class -- )
-    over vregs>stack-locs [ replace-loc ] 2each ;
+    D 1 inc-stack D 0 replace-loc ;
 
 : (2inputs) ( -- vreg1 vreg2 )
-    D 1 peek-loc D 0 peek-loc ;
+    2 ds-loc (load-vregs) first2 ;
 
 : 2inputs ( -- vreg1 vreg2 )
-    (2inputs) -2 <ds-loc> inc-stack ;
-
-: (3inputs) ( -- vreg1 vreg2 vreg3 )
-    D 2 peek-loc D 1 peek-loc D 0 peek-loc ;
+    2 ds-loc load-vregs first2 ;
 
 : 3inputs ( -- vreg1 vreg2 vreg3 )
-    (3inputs) -3 <ds-loc> inc-stack ;
+    3 ds-loc load-vregs first3 ;
 
 : binary-op ( quot -- )
     [ 2inputs ] dip call ds-push ; inline
