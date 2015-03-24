@@ -27,11 +27,11 @@ frame-pointer?
 post-order linear-order
 predecessors-valid? dominance-valid? loops-valid? ;
 
-: <cfg> ( entry word label -- cfg )
+: <cfg> ( word label entry -- cfg )
     cfg new
+        swap >>entry
         swap >>label
-        swap >>word
-        swap >>entry ;
+        swap >>word ;
 
 : cfg-changed ( cfg -- )
     f >>post-order

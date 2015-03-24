@@ -280,6 +280,13 @@ IN: compiler.cfg.builder.tests
     basic-block get successors>> length
 ] unit-test
 
+! begin-cfg
+SYMBOL: foo
+
+{ foo } [
+    begin-stack-analysis \ foo f begin-cfg word>>
+] unit-test
+
 ! store-shuffle
 {
     H{ { D 2 1 } }

@@ -1,12 +1,11 @@
 USING: compiler.cfg compiler.cfg.stacks.local compiler.tree help.markup
-help.syntax literals math multiline quotations sequences ;
+help.syntax literals make math multiline quotations sequences ;
 IN: compiler.cfg.builder.blocks
 
 <<
 STRING: ex-emit-trivial-block
-USING: compiler.cfg.builder.blocks prettyprint ;
-initial-basic-block [ [ gensym ##call, ] emit-trivial-block ] { } make drop
-basic-block get .
+USING: compiler.cfg.builder.blocks make prettyprint ;
+<basic-block> set-basic-block [ [ gensym ##call, ] emit-trivial-block ] { } make drop basic-block get .
 T{ basic-block
     { id 2040412 }
     { successors
@@ -52,11 +51,12 @@ HELP: end-branch
 { $values { "pair/f" "two-tuple" } }
 { $description "pair is { final-bb final-height }" } ;
 
-HELP: initial-basic-block
-{ $description "Creates an initial empty " { $link basic-block } " and stores it in the basic-block dynamic variable." } ;
-
 HELP: make-kill-block
 { $description "Marks the current " { $link basic-block } " being processed as a kill block." } ;
+
+HELP: set-basic-block
+{ $values { "basic-block" basic-block } }
+{ $description "Sets the given blocks as the current one by storing it in the basic-block dynamic variable. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;
 
 HELP: set-successors
 { $values { "successor" basic-block } { "blocks" sequence } }

@@ -12,9 +12,8 @@ SYMBOL: procedures
 SYMBOL: loops
 
 : begin-cfg ( word label -- cfg )
-    initial-basic-block
     H{ } clone loops set
-    [ basic-block get ] 2dip <cfg> dup cfg set ;
+    <basic-block> dup set-basic-block <cfg> dup cfg set ;
 
 : begin-procedure ( word label -- )
     begin-cfg procedures get push ;
