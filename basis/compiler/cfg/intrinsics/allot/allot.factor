@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays compiler.cfg.builder.blocks
-compiler.cfg.hats compiler.cfg.instructions compiler.cfg.stacks
-compiler.constants compiler.tree.propagation.info
+compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks compiler.constants compiler.tree.propagation.info
 cpu.architecture fry kernel layouts locals math math.order
 sequences ;
 IN: compiler.cfg.intrinsics.allot
@@ -12,11 +12,11 @@ IN: compiler.cfg.intrinsics.allot
 
 : emit-simple-allot ( node -- )
     [ in-d>> length ] [ node-output-infos first class>> ] bi
-    [ drop ds-load ] [ [ 1 + cells ] dip ^^allot ] [ nip ] 2tri
+    [ drop ds-loc load-vregs ] [ [ 1 + cells ] dip ^^allot ] [ nip ] 2tri
     [ ##set-slots, ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
 
 : tuple-slot-regs ( layout -- vregs )
-    [ second ds-load ] [ ^^load-literal ] bi prefix ;
+    [ second ds-loc load-vregs ] [ ^^load-literal ] bi prefix ;
 
 : ^^allot-tuple ( n -- dst )
     2 + cells tuple ^^allot ;

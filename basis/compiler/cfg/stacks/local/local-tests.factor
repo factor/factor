@@ -8,14 +8,14 @@ IN: compiler.cfg.stacks.local.tests
     { { 3 3 } { 0 0 } }
 } [
     test-init
-    3 <ds-loc> inc-stack height-state get
+    D 3 inc-stack height-state get
 ] unit-test
 
 {
     { { 5 3 } { 0 0 } }
 } [
     { { 2 0 } { 0 0 } } height-state set
-    3 <ds-loc> inc-stack height-state get
+    D 3 inc-stack height-state get
 ] unit-test
 
 {
@@ -40,7 +40,14 @@ IN: compiler.cfg.stacks.local.tests
 
 { 80 } [
     test-init
-    80 D 77 replace-loc D 77 peek-loc
+    80 D 77 replace-loc
+    D 77 peek-loc
+] unit-test
+
+{ H{ { D -1 40 } } } [
+    test-init
+    D 1 inc-stack 40 D 0 replace-loc
+    replace-mapping get
 ] unit-test
 
 { 0 } [

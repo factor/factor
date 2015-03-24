@@ -163,7 +163,7 @@ M: #push emit-node
 
 : make-input-map ( #shuffle -- assoc )
     [ in-d>> ds-loc ] [ in-r>> rs-loc ] bi
-    [ over vregs>stack-locs zip ] 2bi@ append ;
+    [ over length stack-locs zip ] 2bi@ append ;
 
 : height-changes ( #shuffle -- height-changes )
     { [ out-d>> ] [ in-d>> ] [ out-r>> ] [ in-r>> ] } cleave

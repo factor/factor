@@ -19,3 +19,19 @@ IN: compiler.cfg.stacks.tests
     replace-mapping get
     height-state get
 ] unit-test
+
+! load-vregs
+{
+    { 1 2 3 4 5 6 7 8 }
+} [
+    test-init 8 ds-loc load-vregs
+] unit-test
+
+! 2inputs
+{
+    1
+    2
+    { { -2 -2 } { 0 0 } }
+} [
+    test-init 2inputs height-state get
+] unit-test
