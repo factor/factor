@@ -7,7 +7,8 @@ IN: compiler.cfg.builder
 STRING: ex-emit-call
 USING: compiler.cfg.builder compiler.cfg.builder.blocks compiler.cfg.stacks
 kernel make prettyprint ;
-begin-stack-analysis initial-basic-block \ dummy 3 [ emit-call ] { } make drop
+begin-stack-analysis <basic-block> set-basic-block
+\ dummy 3 [ emit-call ] { } make drop
 height-state basic-block [ get . ] bi@
 { { 3 0 } { 0 0 } }
 T{ basic-block
