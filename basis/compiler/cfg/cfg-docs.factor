@@ -17,6 +17,10 @@ HELP: <basic-block>
 { $values { "bb" basic-block } }
 { $description "Creates a new empty basic block. The " { $slot "id" } " slot is initialized with the value of the basic-block " { $link counter } "." } ;
 
+HELP: <cfg>
+{ $values { "entry" basic-block } { "word" word } { "label" "label" } { "cfg" cfg } }
+{ $description "Constructor for " { $link cfg } "." } ;
+
 HELP: cfg
 { $class-description
   "Call flow graph. It has the following slots:"

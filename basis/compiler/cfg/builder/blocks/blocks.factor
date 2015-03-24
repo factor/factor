@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.stacks compiler.cfg.stacks.local kernel make math
-namespaces sequences ;
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities kernel
+make math namespaces sequences ;
 SLOT: in-d
 SLOT: out-d
 IN: compiler.cfg.builder.blocks
@@ -11,18 +11,13 @@ IN: compiler.cfg.builder.blocks
     [ basic-block set ] [ instructions>> building set ] bi
     begin-local-analysis ;
 
-: initial-basic-block ( -- )
-    <basic-block> set-basic-block ;
-
 : end-basic-block ( -- )
     basic-block get [ end-local-analysis ] when
     building off
     basic-block off ;
 
 : (begin-basic-block) ( -- )
-    <basic-block>
-    basic-block get [ dupd successors>> push ] when*
-    set-basic-block ;
+    <basic-block> basic-block get [ over connect-bbs ] when* set-basic-block ;
 
 : begin-basic-block ( -- )
     basic-block get [ end-local-analysis ] when
