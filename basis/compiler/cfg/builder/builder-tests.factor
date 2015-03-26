@@ -280,6 +280,14 @@ IN: compiler.cfg.builder.tests
     basic-block get successors>> length
 ] unit-test
 
+! emit-loop-call
+{ "bar" } [
+    V{ } "foo" insns>block basic-block set
+    begin-stack-analysis begin-local-analysis [
+        V{ } "bar" insns>block emit-loop-call
+    ] V{ } make drop basic-block get successors>> first number>>
+] unit-test
+
 ! begin-cfg
 SYMBOL: foo
 

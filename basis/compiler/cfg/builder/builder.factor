@@ -5,7 +5,8 @@ compiler.cfg.builder.blocks compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
-cpu.architecture fry kernel make math namespaces sequences words ;
+compiler.cfg.utilities cpu.architecture fry kernel make math namespaces
+sequences words ;
 IN: compiler.cfg.builder
 
 SYMBOL: procedures
@@ -61,7 +62,7 @@ GENERIC: emit-node ( node -- )
 : emit-loop-call ( basic-block -- )
     ##safepoint,
     ##branch,
-    basic-block get successors>> push
+    basic-block get swap connect-bbs
     end-basic-block ;
 
 : emit-call ( word height -- )
