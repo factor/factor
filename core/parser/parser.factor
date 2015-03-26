@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators
-compiler.units continuations definitions effects io
-io.encodings.utf8 io.files kernel lexer math math.parser namespaces
-parser.notes quotations sequences sets slots source-files
-vectors vocabs vocabs.parser words words.symbol ;
+USING: accessors arrays classes combinators compiler.units
+continuations definitions effects io io.encodings.utf8 io.files kernel
+lexer math math.parser namespaces parser.notes quotations sequences
+sets slots source-files vectors vocabs vocabs.parser words
+words.symbol ;
 FROM: sets => members ;
 IN: parser
 
