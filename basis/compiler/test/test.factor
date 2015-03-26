@@ -17,3 +17,13 @@ IN: compiler.test
 
 : compiler-test ( name -- )
     "resource:basis/compiler/tests/" ".factor" surround run-test-file ;
+
+USING: compiler.cfg.registers compiler.cfg.stacks compiler.cfg.stacks.local
+fry namespaces ;
+
+: init-cfg-test ( -- )
+    reset-vreg-counter begin-stack-analysis begin-local-analysis
+    H{ } clone replace-mapping set ;
+
+: cfg-unit-test ( result quot -- )
+    '[ init-cfg-test @ ] unit-test ; inline
