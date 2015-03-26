@@ -131,9 +131,9 @@ unit-test
 ! Regression
 : hellish-bug-1 ( a b -- ) 2drop ;
 
-: hellish-bug-2 ( i array x -- x ) 
-    2dup 1 slot eq? [ 2drop ] [ 
-        2dup array-nth tombstone? [ 
+: hellish-bug-2 ( i array x -- x )
+    2dup 1 slot eq? [ 2drop ] [
+        2dup array-nth tombstone? [
             [
                 [ array-nth ] 2keep [ 1 fixnum+fast ] dip array-nth
                 pick 2dup hellish-bug-1 3drop
@@ -141,7 +141,7 @@ unit-test
         ] unless [ 2 fixnum+fast ] dip hellish-bug-2
     ] if ; inline recursive
 
-: hellish-bug-3 ( hash array -- ) 
+: hellish-bug-3 ( hash array -- )
     0 swap hellish-bug-2 drop ;
 
 [ ] [
@@ -383,7 +383,7 @@ cell 4 = [
  [ 2 3 1 ] [ 2 3 V{ } coalescing-bug-4 ] unit-test
  [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
  [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
- 
+
 ! Global stack analysis dataflow equations are wrong
 : some-word ( a -- b ) 2 + ;
 : global-dcn-bug-1 ( a b -- c d )
@@ -532,7 +532,7 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 ! Stupid repro
 USE: compiler.cfg.registers
 
-0 vreg-counter set-global
+reset-vreg-counter
 
 { fib-count2 } compile
 
