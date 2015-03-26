@@ -1,22 +1,21 @@
 USING: accessors assocs biassocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.stacks.tests
-compiler.cfg.utilities cpu.architecture namespaces kernel tools.test ;
+compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.utilities
+compiler.test cpu.architecture namespaces kernel tools.test ;
 IN: compiler.cfg.stacks.local.tests
 
 {
     { { 3 3 } { 0 0 } }
 } [
-    test-init
     D 3 inc-stack height-state get
-] unit-test
+] cfg-unit-test
 
 {
     { { 5 3 } { 0 0 } }
 } [
     { { 2 0 } { 0 0 } } height-state set
     D 3 inc-stack height-state get
-] unit-test
+] cfg-unit-test
 
 {
     { T{ ##inc { loc D 4 } } T{ ##inc { loc R -2 } } }
@@ -25,8 +24,8 @@ IN: compiler.cfg.stacks.local.tests
 ] unit-test
 
 { 1 } [
-    test-init D 0 loc>vreg
-] unit-test
+    D 0 loc>vreg
+] cfg-unit-test
 
 {
     {
@@ -34,24 +33,22 @@ IN: compiler.cfg.stacks.local.tests
         T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
     }
 } [
-    test-init { { D 0 25 } { R 0 26 } } stack-changes
-] unit-test
+    { { D 0 25 } { R 0 26 } } stack-changes
+] cfg-unit-test
 
 { 80 } [
-    test-init
     80 D 77 replace-loc
     D 77 peek-loc
-] unit-test
+] cfg-unit-test
 
 { H{ { D -1 40 } } } [
-    test-init
-    D 1 inc-stack 40 D 0 replace-loc
-    replace-mapping get
-] unit-test
+    D 1 inc-stack 40 D 0 replace-loc replace-mapping get
+] cfg-unit-test
 
 { 0 } [
     V{ } 0 insns>block basic-block set
-    test-init compute-local-kill-set assoc-size
+    init-cfg-test
+    compute-local-kill-set assoc-size
 ] unit-test
 
 { H{ { R -4 R -4 } } } [
