@@ -3,11 +3,11 @@ combinators.short-circuit compiler.cfg compiler.cfg.builder compiler.cfg.checker
 compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
 compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.representations
 compiler.cfg.rpo compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.cfg.stacks.tests compiler.cfg.utilities compiler.tree
-compiler.tree.builder compiler.tree.optimizer fry hashtables kernel
-kernel.private locals make math math.partial-dispatch math.private namespaces
-prettyprint sbufs sequences sequences.private slots.private strings
-strings.private tools.test vectors words ;
+compiler.cfg.utilities compiler.test compiler.tree compiler.tree.builder
+compiler.tree.optimizer fry hashtables kernel kernel.private locals make math
+math.partial-dispatch math.private namespaces prettyprint sbufs sequences
+sequences.private slots.private strings strings.private tools.test vectors
+words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
@@ -248,18 +248,16 @@ IN: compiler.cfg.builder.tests
 {
     { T{ ##load-integer { dst 78 } { val 0 } } }
 } [
-    test-init
     77 vreg-counter set-global
     [
         T{ #push { literal 0 } { out-d { 8537399 } } } emit-node
     ] { } make
-] unit-test
+] cfg-unit-test
 
 {
     { { 1 1 } { 0 0 } }
     H{ { D -1 4 } { D 0 4 } }
 } [
-    test-init
     4 D 0 replace-loc
     T{ #shuffle
        { mapping { { 2 4 } { 3 4 } } }
@@ -268,46 +266,42 @@ IN: compiler.cfg.builder.tests
     } emit-node
     height-state get
     replace-mapping get
-] unit-test
+] cfg-unit-test
 
 { 1 } [
-    V{ } 0 insns>block basic-block set
-    begin-stack-analysis begin-local-analysis
+    V{ } 0 insns>block basic-block set init-cfg-test
     V{ } 1 insns>block [ emit-loop-call ] V{ } make drop
     basic-block get successors>> length
 ] unit-test
 
 ! emit-loop-call
 { "bar" } [
-    V{ } "foo" insns>block basic-block set
-    begin-stack-analysis begin-local-analysis [
-        V{ } "bar" insns>block emit-loop-call
-    ] V{ } make drop basic-block get successors>> first number>>
+    V{ } "foo" insns>block basic-block set init-cfg-test
+    [ V{ } "bar" insns>block emit-loop-call ] V{ } make drop
+    basic-block get successors>> first number>>
 ] unit-test
 
 ! begin-cfg
 SYMBOL: foo
 
 { foo } [
-    begin-stack-analysis \ foo f begin-cfg word>>
-] unit-test
+    \ foo f begin-cfg word>>
+] cfg-unit-test
 
 ! store-shuffle
 {
     H{ { D 2 1 } }
 } [
-    test-init
     T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
     emit-node replace-mapping get
-] unit-test
+] cfg-unit-test
 
 {
     H{ { D -1 1 } { D 0 1 } }
 } [
-    test-init
     T{ #shuffle
        { in-d { 7 } }
        { out-d { 55 77 } }
        { mapping { { 55 7 } { 77 7 } } }
     } emit-node replace-mapping get
-] unit-test
+] cfg-unit-test
