@@ -18,12 +18,10 @@ IN: compiler.cfg.debugger
 GENERIC: test-builder ( quot -- cfgs )
 
 M: callable test-builder
-    0 vreg-counter set-global
-    build-tree optimize-tree gensym build-cfg ;
+    reset-vreg-counter build-tree optimize-tree gensym build-cfg ;
 
 M: word test-builder
-    0 vreg-counter set-global
-    [ build-tree optimize-tree ] keep build-cfg ;
+    [ reset-vreg-counter build-tree optimize-tree ] keep build-cfg ;
 
 : test-ssa ( quot -- cfgs )
     test-builder [

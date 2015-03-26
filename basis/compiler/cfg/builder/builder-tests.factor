@@ -248,9 +248,8 @@ IN: compiler.cfg.builder.tests
 {
     { T{ ##load-integer { dst 78 } { val 0 } } }
 } [
-    initial-height-state height-state set
+    test-init
     77 vreg-counter set-global
-    H{ } clone replace-mapping set
     [
         T{ #push { literal 0 } { out-d { 8537399 } } } emit-node
     ] { } make
@@ -260,9 +259,7 @@ IN: compiler.cfg.builder.tests
     { { 1 1 } { 0 0 } }
     H{ { D -1 4 } { D 0 4 } }
 } [
-    0 vreg-counter set-global
-    initial-height-state height-state set
-    H{ } clone replace-mapping set
+    test-init
     4 D 0 replace-loc
     T{ #shuffle
        { mapping { { 2 4 } { 3 4 } } }

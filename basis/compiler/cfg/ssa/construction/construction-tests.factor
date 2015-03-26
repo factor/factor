@@ -8,8 +8,7 @@ IN: compiler.cfg.ssa.construction.tests
 
 : reset-counters ( -- )
     ! Reset counters so that results are deterministic w.r.t. hash order
-    0 vreg-counter set-global
-    0 basic-block set-global ;
+    reset-vreg-counter 0 basic-block set-global ;
 
 : test-ssa ( -- )
     0 get block>cfg

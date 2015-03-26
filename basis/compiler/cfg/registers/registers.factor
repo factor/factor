@@ -8,6 +8,9 @@ SYMBOL: vreg-counter
 : next-vreg ( -- vreg )
     vreg-counter counter ;
 
+: reset-vreg-counter ( -- )
+    0 vreg-counter set-global ;
+
 SYMBOL: representations
 
 ERROR: bad-vreg vreg ;
