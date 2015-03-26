@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.rpo
+USING: accessors assocs compiler.cfg.checker compiler.cfg
+compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.rpo
 compiler.cfg.stacks.global compiler.cfg.stacks.height
 compiler.cfg.stacks.local compiler.cfg.utilities fry kernel
 locals make math sequences ;
@@ -42,6 +42,4 @@ ERROR: bad-peek dst loc ;
     [ predecessors>> ] keep '[ _ visit-edge ] each ;
 
 : finalize-stack-shuffling ( cfg -- )
-    [ needs-predecessors ]
-    [ [ visit-block ] each-basic-block ]
-    [ cfg-changed ] tri ;
+    [ [ visit-block ] each-basic-block ] [ cfg-changed ] bi ;

@@ -90,5 +90,8 @@ IN: compiler.cfg.utilities
     [ [ successors>> ] dip suffix! drop ]
     [ predecessors>> swap suffix! drop ] 2bi ;
 
+: connect-Nto1-bbs ( froms to -- )
+    '[ _ connect-bbs ] each ;
+
 : make-edges ( block-map edgelist -- )
     [ [ of ] with map first2 connect-bbs ] with each ;
