@@ -24,8 +24,8 @@ IN: compiler.cfg.stacks.local.tests
     { { 0 4  } { 0 -2 } } height-state>insns
 ] unit-test
 
-{ 30 } [
-    29 vreg-counter set-global <bihash> locs>vregs set D 0 loc>vreg
+{ 1 } [
+    test-init D 0 loc>vreg
 ] unit-test
 
 {
@@ -34,8 +34,7 @@ IN: compiler.cfg.stacks.local.tests
         T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
     }
 } [
-    0 vreg-counter set-global <bihash> locs>vregs set
-    { { D 0 25 } { R 0 26 } } stack-changes
+    test-init { { D 0 25 } { R 0 26 } } stack-changes
 ] unit-test
 
 { 80 } [
@@ -52,8 +51,7 @@ IN: compiler.cfg.stacks.local.tests
 
 { 0 } [
     V{ } 0 insns>block basic-block set
-    begin-stack-analysis begin-local-analysis
-    compute-local-kill-set assoc-size
+    test-init compute-local-kill-set assoc-size
 ] unit-test
 
 { H{ { R -4 R -4 } } } [
