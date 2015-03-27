@@ -94,6 +94,7 @@ STRUCT: fdb_config
     { multi_kv_instances bool }
     { prefetch_duration uint64_t }
     { num_wal_partitions uint16_t }
+    { num_bcache_partitions uint16_t }
     { compaction_cb fdb_compaction_callback }
     { compaction_cb_mask uint32_t }
     { compaction_cb_ctx void* } ;
@@ -216,6 +217,7 @@ FUNCTION: fdb_status fdb_del ( fdb_kvs_handle* handle, fdb_doc* doc ) ;
 FUNCTION: fdb_status fdb_get_kv ( fdb_kvs_handle* handle, void* key, size_t keylen, void** value_out, size_t* valuelen_out ) ;
 FUNCTION: fdb_status fdb_set_kv ( fdb_kvs_handle* handle, void* key, size_t keylen, void* value, size_t valuelen ) ;
 FUNCTION: fdb_status fdb_del_kv ( fdb_kvs_handle* handle, void* key, size_t keylen ) ;
+FUNCTION: fdb_status fdb_free_block ( void *ptr ) ;
 
 FUNCTION: fdb_status fdb_commit ( fdb_file_handle* fhandle, fdb_commit_opt_t opt ) ;
 FUNCTION: fdb_status fdb_snapshot_open ( fdb_kvs_handle* handle_in, fdb_kvs_handle** handle_out, fdb_seqnum_t snapshot_seqnum ) ;
