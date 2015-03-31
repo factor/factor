@@ -84,15 +84,9 @@ SYMBOLS: local-peek-set local-replace-set replace-mapping ;
     replace-mapping get [ [ loc>vreg ] dip = not ] assoc-filter
     [ replace-mapping set ] [ keys unique local-replace-set set ] bi ;
 
-: end-local-analysis ( -- )
+: end-local-analysis ( basic-block -- )
     remove-redundant-replaces
     emit-changes
-    basic-block get {
-        [ [ local-peek-set get ] dip peek-sets get set-at ]
-        [ [ local-replace-set get ] dip replace-sets get set-at ]
-        [ [ compute-local-kill-set ] dip kill-sets get set-at ]
-    } cleave ;
-
-: peek-set ( bb -- assoc ) peek-sets get at ;
-: replace-set ( bb -- assoc ) replace-sets get at ;
-: kill-set ( bb -- assoc ) kill-sets get at ;
+    [ [ local-peek-set get ] dip peek-sets get set-at ]
+    [ [ local-replace-set get ] dip replace-sets get set-at ]
+    [ [ compute-local-kill-set ] dip kill-sets get set-at ] tri ;
