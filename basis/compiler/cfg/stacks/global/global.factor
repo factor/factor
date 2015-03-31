@@ -1,8 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators compiler.cfg.dataflow-analysis
-compiler.cfg.stacks.local kernel ;
+compiler.cfg.stacks.local kernel namespaces ;
 IN: compiler.cfg.stacks.global
+
+: peek-set ( bb -- assoc ) peek-sets get at ;
+: replace-set ( bb -- assoc ) replace-sets get at ;
+: kill-set ( bb -- assoc ) kill-sets get at ;
 
 : transfer-peeked-locs ( assoc bb -- assoc' )
     [ replace-set assoc-diff ] [ peek-set assoc-union ] bi ;
