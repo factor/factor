@@ -12,7 +12,7 @@ IN: compiler.cfg.builder.blocks
     begin-local-analysis ;
 
 : end-basic-block ( -- )
-    basic-block get [ end-local-analysis ] when
+    basic-block get [ end-local-analysis ] when*
     building off
     basic-block off ;
 
@@ -20,7 +20,7 @@ IN: compiler.cfg.builder.blocks
     <basic-block> basic-block get [ over connect-bbs ] when* set-basic-block ;
 
 : begin-basic-block ( -- )
-    basic-block get [ end-local-analysis ] when
+    basic-block get [ end-local-analysis ] when*
     (begin-basic-block) ;
 
 : emit-trivial-block ( quot -- )
@@ -50,7 +50,7 @@ IN: compiler.cfg.builder.blocks
         ##branch,
         end-local-analysis
         height-state get clone-height-state 2array
-    ] when ;
+    ] when* ;
 
 : with-branch ( quot -- pair/f )
     [ begin-branch call end-branch ] with-scope ; inline
