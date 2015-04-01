@@ -1,9 +1,9 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs combinators combinators.short-circuit
-environment io.backend io.files io.files.info io.pathnames
-kernel sequences sets splitting system unicode.case ;
+USING: arrays assocs combinators.short-circuit command-line
+environment io io.backend io.files io.files.info io.pathnames
+kernel namespaces sequences sets splitting system unicode.case ;
 
 IN: tools.which
 
@@ -40,3 +40,8 @@ PRIVATE>
 
 : which ( command -- file/f )
     "PATH" os-env (which) ;
+
+: run-which ( -- )
+    command-line get [ which [ print ] when* ] each ;
+
+MAIN: run-which
