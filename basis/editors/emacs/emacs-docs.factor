@@ -5,7 +5,7 @@ ARTICLE: "editors.emacs" "Integration with Emacs"
 "Basic Emacs integration with Factor requires the use of two executable files -- " { $snippet "emacs" } " and " { $snippet "emacsclient" } ", which act as a client/server pair. To start the server, run the " { $snippet "emacs" } " binary and execute " { $snippet "M-x server-start" } " or start " { $snippet "emacs" } " with the following line in your " { $snippet ".emacs" } " file:"
 { $code "(server-start)" }
 "On Windows, if you install Emacs to " { $snippet "Program Files" } " or " { $snippet "Program Files (x86)" } ", Factor will automatically detect the path to " { $snippet "emacsclient.exe" } ". On Unix systems, make sure that " { $snippet "emacsclient" } " is in your path. To set the path manually, use the following snippet:"
-{ $code "USE: edtiors.emacs"
+{ $code "USE: editors.emacs"
         "\"/my/crazy/bin/emacsclient\" emacsclient-path set-global"
 }
 
