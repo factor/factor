@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays dns fry io kernel math.parser sequences
-strings ;
+USING: arrays command-line dns fry io kernel math.parser
+namespaces sequences strings ;
 IN: tools.dns
 
 : a-line. ( host ip -- )
@@ -41,3 +41,8 @@ M: sequence dns-host ( servers domain -- )
 
 M: string dns-host
     [ 1array ] dip dns-host ;
+
+: run-host ( -- )
+    command-line get first host ;
+
+MAIN: run-host
