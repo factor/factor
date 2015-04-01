@@ -1,8 +1,9 @@
-USING: accessors arrays assocs calendar continuations
-environment eval hashtables io io.directories
-io.encodings.ascii io.encodings.utf8 io.files io.files.temp io.launcher
-io.launcher.windows io.pathnames kernel math namespaces parser
-sequences splitting system tools.test combinators.short-circuit ;
+USING: accessors arrays assocs calendar
+combinators.short-circuit continuations environment eval
+hashtables io io.directories io.encodings.ascii
+io.encodings.utf8 io.files io.files.temp io.files.unique
+io.launcher io.launcher.windows io.pathnames kernel math
+namespaces parser sequences splitting system tools.test ;
 IN: io.launcher.windows.tests
 
 [ "hello world" ] [ { "hello" "world" } join-arguments ] unit-test
@@ -76,15 +77,17 @@ IN: io.launcher.windows.tests
 : console-vm ( -- path )
     vm ".exe" ?tail [ ".com" append ] when ;
 
+SYMBOLS: out-path err-path ;
+
 [ ] [
     <process>
         console-vm "-run=hello-world" 2array >>command
-        "out.txt" temp-file >>stdout
+        "out.txt" unique-file [ out-path set-global ] keep >>stdout
     try-process
 ] unit-test
 
 [ "Hello world" ] [
-    "out.txt" temp-file ascii file-lines first
+    out-path get-global ascii file-lines first
 ] unit-test
 
 [ "IN: scratchpad " ] [
@@ -102,45 +105,45 @@ IN: io.launcher.windows.tests
     launcher-test-path [
         <process>
             console-vm "-script" "stderr.factor" 3array >>command
-            "out.txt" temp-file >>stdout
-            "err.txt" temp-file >>stderr
+            "out.txt" unique-file [ out-path set-global ] keep >>stdout
+            "err.txt" unique-file [ err-path set-global ] keep >>stderr
         try-process
     ] with-directory
 ] unit-test
 
 [ "output" ] [
-    "out.txt" temp-file ascii file-lines first
+    out-path get-global ascii file-lines first
 ] unit-test
 
 [ "error" ] [
-    "err.txt" temp-file ascii file-lines first
+    err-path get-global ascii file-lines first
 ] unit-test
 
 [ ] [
     launcher-test-path [
         <process>
             console-vm "-script" "stderr.factor" 3array >>command
-            "out.txt" temp-file >>stdout
+            "out.txt" unique-file [ out-path set-global ] keep >>stdout
             +stdout+ >>stderr
         try-process
     ] with-directory
 ] unit-test
 
 [ "outputerror" ] [
-    "out.txt" temp-file ascii file-lines first
+    out-path get-global ascii file-lines first
 ] unit-test
 
 [ "output" ] [
     launcher-test-path [
         <process>
             console-vm "-script" "stderr.factor" 3array >>command
-            "err2.txt" temp-file >>stderr
+            "err2.txt" unique-file [ err-path set-global ] keep >>stderr
         utf8 <process-reader> stream-lines first
     ] with-directory
 ] unit-test
 
 [ "error" ] [
-    "err2.txt" temp-file ascii file-lines first
+    err-path get-global ascii file-lines first
 ] unit-test
 
 
@@ -194,26 +197,25 @@ IN: io.launcher.windows.tests
     [ ] [
         <process>
             "cmd.exe /c dir" >>command
-            "dir.txt" temp-file >>stdout
+            "dir.txt" unique-file [ out-path set-global ] keep >>stdout
         try-process
     ] unit-test
 
-    [ ] [ "dir.txt" temp-file delete-file ] unit-test
+    [ ] [ out-path get-global delete-file ] unit-test
 ] times
 
-[ "append-test" temp-file delete-file ] ignore-errors
-
 { "Hello appender\r\nÖrjan ågren är åter\r\nHello appender\r\nÖrjan ågren är åter\r\n" } [
+    "append-test" unique-file out-path set-global
     2 [
         launcher-test-path [
             <process>
                 console-vm "-script" "append.factor" 3array >>command
-                "append-test" temp-file <appender> >>stdout
+                out-path get-global <appender> >>stdout
             try-process
         ] with-directory
     ] times
 
-    "append-test" temp-file utf8 file-contents
+    out-path get-global utf8 file-contents
 ] unit-test
 
 [ "IN: scratchpad " ] [
