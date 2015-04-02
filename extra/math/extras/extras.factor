@@ -322,3 +322,6 @@ M: iota-tuple sum-cubes sum sq ;
         dup [ 1 > ] any?
         [ drop 0 ] [ length even? 1 -1 ? ] if
     ] if-empty ;
+
+: kelly ( winning-probability odds -- fraction )
+    [ 1 + * 1 - ] [ / ] bi ;
