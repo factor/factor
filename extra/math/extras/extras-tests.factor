@@ -158,6 +158,6 @@ IN: math.extras.test
     30 [1,b] [ mobius ] map
 ] unit-test
 
-{ 0.2 } [ 0.6 1 kelly ] unit-test
-{ 0.0 } [ 0.5 1 kelly ] unit-test
-{ -0.2 } [ 0.4 1 kelly ] unit-test
+{ 1/5 } [ 3/5 1 kelly ] unit-test
+{ 0 } [ 1/2 1 kelly ] unit-test
+{ -1/5 } [ 2/5 1 kelly ] unit-test
