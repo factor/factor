@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.parallel-copy
 compiler.cfg.registers compiler.cfg.stacks.height
-kernel make math math.order namespaces sequences sets ;
+hash-sets kernel make math math.order namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.stacks.local
 
@@ -35,10 +35,10 @@ IN: compiler.cfg.stacks.local
 : kill-locations ( saved-height height -- seq )
     dupd [-] iota [ swap - ] with map ;
 
-: local-kill-set ( ds-height rs-height state -- assoc )
+: local-kill-set ( ds-height rs-height state -- set )
     first2 [ first ] bi@ swapd [ kill-locations ] 2bi@
     [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
-    append unique ;
+    append >hash-set ;
 
 SYMBOLS: height-state peek-sets replace-sets kill-sets locs>vregs ;
 
@@ -48,45 +48,43 @@ SYMBOLS: height-state peek-sets replace-sets kill-sets locs>vregs ;
 : loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
 : vreg>loc ( vreg -- loc/f ) locs>vregs get value-at ;
 
-SYMBOLS: local-peek-set local-replace-set replace-mapping ;
+SYMBOLS: local-peek-set replace-mapping ;
 
 : stack-changes ( replace-mapping -- insns )
     [ [ loc>vreg ] dip ] assoc-map parallel-copy ;
 
-: emit-changes ( -- )
-    building get pop
-    replace-mapping get stack-changes %
-    height-state get height-state>insns %
-    , ;
+: emit-changes ( replace-mapping height-state -- )
+    building get pop -rot [ stack-changes % ] [ height-state>insns % ] bi* , ;
 
 : peek-loc ( loc -- vreg )
     height-state get swap translate-local-loc
     dup replace-mapping get at
-    [ ] [ dup local-peek-set get conjoin loc>vreg ] ?if ;
+    [ ] [ dup local-peek-set get adjoin loc>vreg ] ?if ;
 
 : replace-loc ( vreg loc -- )
     height-state get swap translate-local-loc
     replace-mapping get set-at ;
 
-: compute-local-kill-set ( -- assoc )
+: compute-local-kill-set ( -- set )
     basic-block get [ rs-heights get at ] [ ds-heights get at ] bi
     height-state get local-kill-set ;
 
 : begin-local-analysis ( -- )
-    H{ } clone local-peek-set set
+    HS{ } clone local-peek-set set
     H{ } clone replace-mapping set
     height-state get
     [ reset-emits ] [
         first2 [ first ] bi@ basic-block get record-stack-heights
     ] bi ;
 
-: remove-redundant-replaces ( -- )
-    replace-mapping get [ [ loc>vreg ] dip = not ] assoc-filter
-    [ replace-mapping set ] [ keys unique local-replace-set set ] bi ;
+: remove-redundant-replaces ( replace-mapping -- replace-mapping' )
+    [ [ loc>vreg ] dip = not ] assoc-filter ;
 
 : end-local-analysis ( basic-block -- )
-    remove-redundant-replaces
-    emit-changes
+    [
+        replace-mapping get remove-redundant-replaces
+        dup height-state get emit-changes keys
+        swap replace-sets get set-at
+    ]
     [ [ local-peek-set get ] dip peek-sets get set-at ]
-    [ [ local-replace-set get ] dip replace-sets get set-at ]
     [ [ compute-local-kill-set ] dip kill-sets get set-at ] tri ;
