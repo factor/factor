@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays compiler.units kernel sequences
+USING: accessors arrays compiler.cfg compiler.units kernel sequences
 stack-checker tools.test vocabs words ;
 IN: compiler.test
 
@@ -22,8 +22,9 @@ USING: compiler.cfg.registers compiler.cfg.stacks compiler.cfg.stacks.local
 fry namespaces ;
 
 : init-cfg-test ( -- )
-    reset-vreg-counter begin-stack-analysis begin-local-analysis
-    H{ } clone replace-mapping set ;
+    reset-vreg-counter begin-stack-analysis
+    <basic-block> dup basic-block set begin-local-analysis
+    H{ } clone replaces set ;
 
 : cfg-unit-test ( result quot -- )
     '[ init-cfg-test @ ] unit-test ; inline

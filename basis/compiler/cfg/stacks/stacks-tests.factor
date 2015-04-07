@@ -8,7 +8,7 @@ IN: compiler.cfg.stacks.tests
     { { 0 0 } { 0 0 } }
 } [
     { 3 4 5 } ds-loc store-vregs
-    replace-mapping get
+    replaces get
     height-state get
 ] cfg-unit-test
 

@@ -2,7 +2,7 @@ USING: assocs compiler.cfg compiler.cfg.instructions compiler.cfg.registers
 help.markup help.syntax math sequences ;
 IN: compiler.cfg.stacks.local
 
-HELP: replace-mapping
+HELP: replaces
 { $var-description "An " { $link assoc } " that maps from stack locations to virtual registers that were put on the stack." }
 { $see-also replace-loc } ;
 
@@ -15,14 +15,15 @@ HELP: loc>vreg
 
 HELP: replace-loc
 { $values { "vreg" "virtual register" } { "loc" loc } }
-{ $description "Registers that the absolute stack location " { $snippet "loc" } " should be overwritten with the contents of the virtual register." } ;
+{ $description "Registers that the absolute stack location " { $snippet "loc" } " should be overwritten with the contents of the virtual register." }
+{ $see-also replaces } ;
 
 HELP: peek-loc
 { $values { "loc" loc } { "vreg" "virtaul register" } }
 { $description "Retrieves the virtual register at the given stack location." } ;
 
 HELP: translate-local-loc
-{ $values { "state" "height state" } { "loc" loc } { "loc'" loc } }
+{ $values { "loc" loc } { "state" "height state" }  { "loc'" loc } }
 { $description "Translates an absolute stack location to one that is relative to the given height state." }
 { $examples
   { $example
