@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators compiler.cfg.builder.blocks
 compiler.cfg.comparisons compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.stacks
-compiler.tree.propagation.info cpu.architecture fry kernel
+compiler.cfg.instructions compiler.cfg.stacks.local compiler.cfg.registers
+compiler.cfg.stacks compiler.tree.propagation.info cpu.architecture fry kernel
 layouts math math.intervals namespaces sequences ;
 IN: compiler.cfg.intrinsics.fixnum
 
@@ -41,7 +41,7 @@ IN: compiler.cfg.intrinsics.fixnum
     '[ _ ^^compare-integer ] binary-op ;
 
 : emit-no-overflow-case ( dst -- final-bb )
-    [ ds-drop ds-drop ds-push ] with-branch ;
+    [ D -2 inc-stack ds-push ] with-branch ;
 
 : emit-overflow-case ( word -- final-bb )
     [

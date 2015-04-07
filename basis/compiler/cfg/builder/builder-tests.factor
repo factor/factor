@@ -265,7 +265,7 @@ IN: compiler.cfg.builder.tests
        { out-d V{ 2 3 } }
     } emit-node
     height-state get
-    replace-mapping get
+    replaces get
 ] cfg-unit-test
 
 { 1 } [
@@ -293,7 +293,7 @@ SYMBOL: foo
     H{ { D 2 1 } }
 } [
     T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
-    emit-node replace-mapping get
+    emit-node replaces get
 ] cfg-unit-test
 
 {
@@ -303,5 +303,5 @@ SYMBOL: foo
        { in-d { 7 } }
        { out-d { 55 77 } }
        { mapping { { 55 7 } { 77 7 } } }
-    } emit-node replace-mapping get
+    } emit-node replaces get
 ] cfg-unit-test
