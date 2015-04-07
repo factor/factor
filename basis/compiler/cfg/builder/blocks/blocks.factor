@@ -8,8 +8,9 @@ SLOT: out-d
 IN: compiler.cfg.builder.blocks
 
 : set-basic-block ( basic-block -- )
-    [ basic-block set ] [ instructions>> building set ] bi
-    begin-local-analysis ;
+    [ basic-block set ]
+    [ instructions>> building set ]
+    [ begin-local-analysis ] tri ;
 
 : end-basic-block ( -- )
     basic-block get [ end-local-analysis ] when*

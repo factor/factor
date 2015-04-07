@@ -17,7 +17,7 @@ IN: compiler.cfg.stacks.local.tests
         T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
     }
 } [
-    { { D 0 25 } { R 0 26 } } stack-changes
+    { { D 0 25 } { R 0 26 } } replaces>copy-insns
 ] cfg-unit-test
 
 ! replace-loc
@@ -32,16 +32,20 @@ IN: compiler.cfg.stacks.local.tests
     { }
     HS{ }
 } [
-    "foo" [ "eh" , end-local-analysis ] V{ } make drop
-    "foo" [ peek-sets ] [ replace-sets ] [ kill-sets ] tri [ get at ] 2tri@
+    V{ } 137 insns>block
+    [ 0 0 rot record-stack-heights ]
+    [ [ "eh" , end-local-analysis ] V{ } make drop ]
+    [ [ peek-sets ] [ replace-sets ] [ kill-sets ] tri [ get at ] 2tri@ ] tri
 ] cfg-unit-test
 
 {
     { D 3 }
 } [
-    "foo" [ 3 D 3 replace-loc "eh" , end-local-analysis ] V{ } make drop
-    replace-sets get "foo" of
-] unit-test
+    V{ } 137 insns>block
+    [ 0 0 rot record-stack-heights ]
+    [ [ 3 D 3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
+    [ replace-sets get at ] tri
+] cfg-unit-test
 
 ! remove-redundant-replaces
 {
@@ -49,7 +53,7 @@ IN: compiler.cfg.stacks.local.tests
 } [
     D 0 loc>vreg D 2 loc>vreg 2drop
     2 D 2 replace-loc 7 D 3 replace-loc
-    replace-mapping get remove-redundant-replaces
+    replaces get remove-redundant-replaces
 ] cfg-unit-test
 
 ! emit-changes
@@ -58,9 +62,13 @@ IN: compiler.cfg.stacks.local.tests
 } [
     3 D 0 replace-loc [
         "eh",
-        replace-mapping get height-state get emit-changes
+        replaces get height-state get emit-changes
     ] V{ } make
 ] cfg-unit-test
+
+{ D 2 } [
+    D 3 { { 1 2 } { 3 4 } } translate-local-loc
+] unit-test
 
 ! height-state
 {
@@ -83,22 +91,16 @@ IN: compiler.cfg.stacks.local.tests
 ] unit-test
 
 { H{ { D -1 40 } } } [
-    D 1 inc-stack 40 D 0 replace-loc replace-mapping get
+    D 1 inc-stack 40 D 0 replace-loc replaces get
 ] cfg-unit-test
 
 { 0 } [
-    V{ } 0 insns>block basic-block set
-    init-cfg-test
+    V{ } 0 insns>block 0 0 pick record-stack-heights
     compute-local-kill-set sets:cardinality
 ] unit-test
 
 { HS{ R -4 } } [
-    H{ { 77 4 } } [ ds-heights set ] [ rs-heights set ] bi
+    V{ } 0 insns>block 4 4 pick record-stack-heights
     { { 8 0 } { 3 0 } } height-state set
-    77 basic-block set
     compute-local-kill-set
-] unit-test
-
-{ D 2 } [
-    { { 1 2 } { 3 4 } } D 3 translate-local-loc
 ] unit-test
