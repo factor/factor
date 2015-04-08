@@ -24,14 +24,6 @@ IN: tools.gc-decode.tests
 { ?{ t t t t t t t t } } [ B{ 255 } byte-array>bit-array ] unit-test
 
 ! scrub-bits
-{ t } [
-    \ effects:<effect> word>gc-info scrub-bits
-    {
-        ?{ t t t f t t t t } ! 64-bit
-        ?{ t t t t f f f f f t t t t } ! 32-bit TODO
-    } member?
-] unit-test
-
 {
     { }
 } [

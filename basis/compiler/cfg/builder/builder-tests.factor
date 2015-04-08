@@ -199,8 +199,7 @@ IN: compiler.cfg.builder.tests
 ] unit-test
 
 [ f ] [
-    [ 1000 [ ] times ]
-    [ [ ##peek? ] [ ##replace? ] bi or ] contains-insn?
+    [ 1000 [ ] times ] [ ##peek? ] contains-insn?
 ] unit-test
 
 [ f t ] [

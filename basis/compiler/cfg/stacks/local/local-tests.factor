@@ -58,7 +58,11 @@ IN: compiler.cfg.stacks.local.tests
 
 ! emit-changes
 {
-    V{ T{ ##copy { dst 1 } { src 3 } { rep any-rep } } "eh" }
+    V{
+        T{ ##copy { dst 1 } { src 3 } { rep any-rep } }
+        T{ ##replace { src 1 } { loc D 0 } }
+        "eh"
+    }
 } [
     3 D 0 replace-loc [
         "eh",
