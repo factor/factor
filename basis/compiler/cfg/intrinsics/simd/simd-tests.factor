@@ -55,8 +55,8 @@ IN: compiler.cfg.intrinsics.simd.tests
     [ 0 swap associate \ ds-heights pick set-at ]
     [ 0 swap associate \ rs-heights pick set-at ] tri
     initial-height-state \ height-state pick set-at
-    H{ } clone \ local-peek-set pick set-at
-    H{ } clone \ replace-mapping pick set-at
+    HS{ } clone \ local-peek-set pick set-at
+    H{ } clone \ replaces pick set-at
     H{ } <biassoc> \ locs>vregs pick set-at
     H{ } clone \ peek-sets pick set-at
     H{ } clone \ replace-sets pick set-at
