@@ -12,7 +12,7 @@ HELP: begin-stack-analysis
 { $see-also height-state } ;
 
 HELP: end-stack-analysis
-{ $description "Ends the stack analysis of the current cfg." } ;
+{ $description "Ends the stack analysis of the current cfg. This is the last step of the cfg construction (but comes before all optimization passes)." } ;
 
 HELP: adjust-d
 { $values { "n" number } }
@@ -26,7 +26,7 @@ HELP: store-vregs
   { "vregs" "a " { $link sequence } " of vregs" }
   { "loc-class" "either " { $link ds-loc } " or " { $link rs-loc } }
 }
-{ $description "Stores one or more virtual register values on the data or retain stack. The " { $link replace-mapping } " dynamic variable is modified but the " { $link height-state } " is not touched" } ;
+{ $description "Stores one or more virtual register values on the data or retain stack. The " { $link replaces } " dynamic variable is modified but the " { $link height-state } " is not touched" } ;
 
 HELP: 2inputs
 { $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } }

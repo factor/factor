@@ -29,10 +29,6 @@ M: ##allocation gc-check-offsets* 3drop t ;
 M: insn gc-check-offsets* 2drop ;
 
 : gc-check-offsets ( insns -- seq )
-    ! A basic block is divided into sections by call and phi
-    ! instructions. For every section with at least one
-    ! allocation, record the offset of its first instruction
-    ! in a sequence.
     [
         [ 0 f ] dip
         [ gc-check-offsets* ] each-index
@@ -122,9 +118,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 PRIVATE>
 
-:: insert-gc-checks ( cfg -- )
-    cfg blocks-with-gc [
-        cfg needs-predecessors
-        [ process-block ] each
-        cfg cfg-changed
-    ] unless-empty ;
+: insert-gc-checks ( cfg -- )
+    [ needs-predecessors ]
+    [ blocks-with-gc [ process-block ] each ]
+    [ cfg-changed ] tri ;
