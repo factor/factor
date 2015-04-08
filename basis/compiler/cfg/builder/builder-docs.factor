@@ -61,6 +61,10 @@ HELP: emit-call
 }
 { $see-also call-height } ;
 
+HELP: emit-loop-call
+{ $values { "basic-block" basic-block } }
+{ $description "Sets the given block as the successor of the current block. Then ends the block." } ;
+
 HELP: emit-node
 { $values { "node" node } }
 { $description "Emits CFG instructions for the given SSA node." } ;

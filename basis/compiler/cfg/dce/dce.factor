@@ -117,9 +117,6 @@ M: insn live-insn? drop t ;
 
 : eliminate-dead-code ( cfg -- )
     init-dead-code
-    ! Even though we don't use predecessors directly, we depend
-    ! on the predecessors pass updating phi nodes to remove dead
-    ! inputs.
     {
         [ needs-predecessors ]
         [ [ [ build-liveness-graph ] each ] simple-analysis ]
