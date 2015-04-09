@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ascii byte-arrays byte-vectors grouping io
-io.encodings.binary io.files io.streams.string kernel math
-math.parser namespaces sequences splitting strings ;
+USING: arrays ascii byte-arrays byte-vectors command-line
+grouping io io.encodings.binary io.files io.streams.string
+kernel math math.parser namespaces sequences splitting strings ;
 IN: tools.hexdump
 
 <PRIVATE
@@ -45,3 +45,8 @@ M: byte-vector hexdump. hexdump-bytes ;
 
 : hexdump-file ( path -- )
     binary file-contents hexdump. ;
+
+: hexdump-main ( -- )
+    command-line get [ hexdump-file ] each ;
+
+MAIN: hexdump-main
