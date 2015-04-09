@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs fry io io.streams.string kernel
-macros math peg.ebnf prettyprint sequences strings ;
+USING: accessors assocs command-line fry io io.encodings.binary
+io.files io.streams.string kernel macros math namespaces
+peg.ebnf prettyprint sequences ;
 
 IN: brainfuck
 
@@ -70,8 +71,23 @@ code  = (loop|ops|unknown)*  => [[ compose-all ]]
 PRIVATE>
 
 MACRO: run-brainfuck ( code -- )
-    [ blank? not ] filter parse-brainfuck
-    '[ <brainfuck> @ drop flush ] ;
+    parse-brainfuck '[ <brainfuck> @ drop flush ] ;
 
 : get-brainfuck ( code -- result )
     [ run-brainfuck ] with-string-writer ; inline
+
+<PRIVATE
+
+: (run-brainfuck) ( code -- )
+    [ <brainfuck> ] dip parse-brainfuck call( x -- x ) drop flush ;
+
+PRIVATE>
+
+: brainfuck-main ( -- )
+    command-line get [
+        contents (run-brainfuck)
+    ] [
+        [ binary file-contents (run-brainfuck) ] each
+    ] if-empty ;
+
+MAIN: brainfuck-main
