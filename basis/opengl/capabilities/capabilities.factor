@@ -42,7 +42,7 @@ IN: opengl.capabilities
     "Required OpenGL version " % % " not supported (" % gl-version "(null)" or % " available)" %
     os linux = [
         "\nIf you have several libGL.so installed, Factor tried the first one in: ldconfig -p | grep libGL.so$" %
-        "\nYou can change the library used like so: LD_LIBRARY_PATH=/usr/lib/fglrx ./factor" %
+        "\nYou can change the library used like so: LD_LIBRARY_PATH=/usr/lib/fglrx/ ./factor" %
     ] when ;
 
 : require-gl-version ( version -- )
