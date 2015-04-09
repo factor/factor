@@ -1,7 +1,10 @@
+! Copyright (C) 2014 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license
+
 USING: alien alien.c-types alien.data alien.destructors
-alien.syntax curl.ffi destructors io io.encodings.string
-io.encodings.utf8 io.streams.c kernel math namespaces present
-sequences ;
+alien.syntax command-line curl.ffi destructors io
+io.encodings.string io.encodings.utf8 io.streams.c kernel math
+namespaces present sequences ;
 
 IN: curl
 
@@ -38,3 +41,12 @@ PRIVATE>
         [ swap curl-set-url ]
         [ curl-perform ] tri
     ] with-destructors ;
+
+: curl-main ( -- )
+    command-line get [
+        curl-init
+        [ swap curl-set-url ]
+        [ curl-perform ] bi
+    ] each ;
+
+MAIN: curl-main
