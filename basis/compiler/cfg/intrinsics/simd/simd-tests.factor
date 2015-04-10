@@ -2,8 +2,8 @@
 USING: arrays assocs biassocs byte-arrays byte-arrays.hex
 classes compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics.simd compiler.cfg.intrinsics.simd.backend
-compiler.cfg.registers compiler.cfg.stacks.height
-compiler.cfg.stacks.local compiler.tree compiler.tree.propagation.info
+compiler.cfg.registers compiler.cfg.stacks.height compiler.cfg.stacks.local
+compiler.test compiler.tree compiler.tree.propagation.info
 cpu.architecture fry hashtables kernel locals make namespaces sequences
 system tools.test words ;
 IN: compiler.cfg.intrinsics.simd.tests
@@ -524,6 +524,104 @@ unit-test
 [ { ##shuffle-vector-imm ##vector>scalar } ]
 [ shuffle-imm-cpu 1 float-4-rep [ emit-simd-select ] test-emit-literal ]
 unit-test
+
+! ^load-neg-zero-vector
+{
+    V{
+        T{ ##load-reference
+           { dst 1 }
+           { obj B{ 0 0 0 128 0 0 0 128 0 0 0 128 0 0 0 128 } }
+        }
+        T{ ##load-reference
+           { dst 2 }
+           { obj B{ 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 128 } }
+        }
+    }
+} [
+    [
+        { float-4-rep double-2-rep } [ ^load-neg-zero-vector drop ] each
+    ] V{ } make
+] cfg-unit-test
+
+! ^load-add-sub-vector
+{
+    V{
+        T{ ##load-reference
+           { dst 1 }
+           { obj B{ 0 0 0 128 0 0 0 0 0 0 0 128 0 0 0 0 } }
+        }
+        T{ ##load-reference
+           { dst 2 }
+           { obj B{ 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 0 } }
+        }
+        T{ ##load-reference
+           { dst 3 }
+           { obj
+             B{ 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 }
+           }
+        }
+        T{ ##load-reference
+           { dst 4 }
+           { obj
+             B{ 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 0 }
+           }
+        }
+        T{ ##load-reference
+           { dst 5 }
+           { obj
+             B{ 255 255 255 255 0 0 0 0 255 255 255 255 0 0 0 0 }
+           }
+        }
+        T{ ##load-reference
+           { dst 6 }
+           { obj
+             B{ 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 }
+           }
+        }
+    }
+} [
+    [
+        {
+            float-4-rep
+            double-2-rep
+            char-16-rep
+            short-8-rep
+            int-4-rep
+            longlong-2-rep
+        } [ ^load-add-sub-vector drop ] each
+    ] V{ } make
+] cfg-unit-test
+
+! ^load-half-vector
+{
+    V{
+        T{ ##load-reference
+           { dst 1 }
+           { obj B{ 0 0 0 63 0 0 0 63 0 0 0 63 0 0 0 63 } }
+        }
+        T{ ##load-reference
+           { dst 2 }
+           { obj B{ 0 0 0 0 0 0 224 63 0 0 0 0 0 0 224 63 } }
+        }
+    }
+} [
+    [
+        { float-4-rep double-2-rep } [ ^load-half-vector drop ] each
+    ] V{ } make
+] cfg-unit-test
+
+! sign-bit-mask
+{
+    {
+        B{ 128 128 128 128 128 128 128 128 128 128 128 128 128 128 128 128 }
+        B{ 0 128 0 128 0 128 0 128 0 128 0 128 0 128 0 128 }
+        B{ 0 0 0 128 0 0 0 128 0 0 0 128 0 0 0 128 }
+        B{ 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 128 }
+    }
+} [
+    { char-16-rep short-8-rep int-4-rep longlong-2-rep } [ sign-bit-mask ] map
+] unit-test
+
 
 ! test with nonliteral/invalid reps
 [ simple-ops-cpu [ emit-simd-v+ ] test-emit-nonliteral-rep ]
