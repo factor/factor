@@ -136,9 +136,9 @@ M: insn assign-registers-in-insn drop ;
     } cleave ;
 
 :: assign-registers-in-block ( bb -- )
+    bb begin-block
     bb [
         [
-            bb begin-block
             [
                 {
                     [ insn#>> 1 - prepare-insn ]
@@ -147,11 +147,11 @@ M: insn assign-registers-in-insn drop ;
                     [ , ]
                 } cleave
             ] each
-            bb compute-live-out
         ] V{ } make
-    ] change-instructions drop ;
+    ] change-instructions drop
+    bb compute-live-out ;
 
-: assign-registers ( live-intervals cfg -- )
-    [ init-assignment ] dip
+: assign-registers ( cfg live-intervals -- )
+    init-assignment
     linearization-order [ kill-block?>> not ] filter
     [ assign-registers-in-block ] each ;
