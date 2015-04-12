@@ -1,7 +1,51 @@
 USING: combinators.extras compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals heaps kernel namespaces tools.test ;
+compiler.cfg.linear-scan.live-intervals cpu.architecture
+cpu.x86.assembler.operands heaps kernel namespaces system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.state.tests
+
+! add-active
+{
+    {
+        {
+            int-regs
+            V{
+                T{ live-interval-state
+                   { vreg 123 }
+                   { reg-class int-regs }
+                }
+            }
+        }
+        { float-regs V{ } }
+    }
+} [
+    f f machine-registers init-allocator
+    T{ live-interval-state { reg-class int-regs } { vreg 123 } } add-active
+    active-intervals get
+] unit-test
+
+! free-positions
+cpu x86.64? [
+    {
+        H{
+            { RCX 1/0. }
+            { RBX 1/0. }
+            { RAX 1/0. }
+            { R12 1/0. }
+            { RDI 1/0. }
+            { R10 1/0. }
+            { RSI 1/0. }
+            { R11 1/0. }
+            { R8 1/0. }
+            { R9 1/0. }
+            { RDX 1/0. }
+            { RBP 1/0. }
+        }
+    } [
+        f f machine-registers init-allocator
+        T{ live-interval-state { reg-class int-regs } } free-positions
+    ] unit-test
+] when
 
 {
     T{ spill-slot f 0 }
