@@ -36,4 +36,5 @@ HELP: cfg
 
 HELP: cfg-changed
 { $values { "cfg" cfg } }
-{ $description "Resets all \"calculated\" slots in the cfg which forces them to be recalculated." } ;
+{ $description "Resets all \"calculated\" slots in the cfg which forces them to be recalculated." }
+{ $see-also predecessors-changed } ;

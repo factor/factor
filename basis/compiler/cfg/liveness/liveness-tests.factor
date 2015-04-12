@@ -6,6 +6,13 @@ tools.test vectors alien math compiler.cfg.comparisons
 cpu.x86.assembler.operands assocs ;
 IN: compiler.cfg.liveness.tests
 
+! visit-insn
+{
+    H{ }
+} [
+    H{ } clone T{ ##peek f 0 D 0 } visit-insn
+] unit-test
+
 : test-liveness ( -- )
     1 get block>cfg compute-live-sets ;
 

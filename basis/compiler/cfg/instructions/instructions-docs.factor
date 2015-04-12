@@ -1,6 +1,6 @@
-USING: alien arrays assocs classes compiler.cfg compiler.codegen.gc-maps
-cpu.architecture help.markup help.syntax kernel layouts sequences
-slots.private system ;
+USING: alien arrays assocs classes compiler.cfg compiler.cfg.value-numbering
+compiler.codegen.gc-maps cpu.architecture help.markup help.syntax kernel
+layouts sequences slots.private system ;
 IN: compiler.cfg.instructions
 
 HELP: new-insn
@@ -87,6 +87,24 @@ HELP: ##call
   "An instruction for calling a Factor word."
 } ;
 
+HELP: ##check-nursery-branch
+{ $class-description
+  "Instruction that inserts a conditional branch to a " { $link basic-block } " that garbage collects the nursery. The " { $vocab-link "compiler.cfg.gc-checks" } " vocab goes through each block in the " { $link cfg } " and checks if it allocates memory. If it does, then this instruction is inserted in the cfg before that block and checks if there is enough available space in the nursery. If it isn't, then a basic block containing code for garbage collecting the nursery is executed."
+  $nl
+  "It has the following slots:"
+  { $table
+    { { $slot "size" } { "Number of bytes the next block in the cfg will allocate." } }
+    { { $slot "cc" } { "A comparison symbol." } }
+    { { $slot "temp1" } { "First register that will be clobbered." } }
+    { { $slot "temp2" } { "Second register that will be clobbered." } }
+  }
+}
+{ $see-also %check-nursery-branch } ;
+
+HELP: ##mul-vector
+{ $class-description
+  "SIMD instruction." } ;
+
 HELP: ##set-slot
 { $class-description
   "An instruction for the non-primitive, non-immediate variant of " { $link set-slot } ". It has the following slots:"
@@ -169,19 +187,6 @@ HELP: ##peek
 HELP: ##safepoint
 { $class-description "Instruction that inserts a safe point in the generated code." } ;
 
-HELP: ##check-nursery-branch
-{ $class-description
-  "Instruction that inserts a conditional branch to a " { $link basic-block } " that garbage collects the nursery. The " { $vocab-link "compiler.cfg.gc-checks" } " vocab goes through each block in the " { $link cfg } " and checks if it allocates memory. If it does, then this instruction is inserted in the cfg before that block and checks if there is enough available space in the nursery. If it isn't, then a basic block containing code for garbage collecting the nursery is executed."
-  $nl
-  "It has the following slots:"
-  { $table
-    { { $slot "size" } { "Number of bytes the next block in the cfg will allocate." } }
-    { { $slot "cc" } { "A comparison symbol." } }
-    { { $slot "temp1" } { "Register symbol." } }
-    { { $slot "temp2" } { "Register symbol." } }
-  }
-} ;
-
 HELP: ##return
 { $class-description "Instruction that returns from a procedure call." } ;
 
@@ -196,6 +201,9 @@ HELP: ##compare-integer
 
 HELP: ##spill
 { $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "." } ;
+
+HELP: ##store-memory-imm
+{ $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass." } ;
 
 HELP: gc-map-insn
 { $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory. Each of the instances has a " { $snippet "gc-map" } " slot." } ;
@@ -229,18 +237,6 @@ $nl
   ##phi
   ##return
 }
-"Comparison instructions:"
-{ $subsections
-  ##compare
-  ##compare-imm
-  ##compare-integer
-  ##compare-integer-branch
-  ##compare-integer-imm-branch
-  ##test
-  ##test-branch
-  ##test-imm
-  ##test-imm-branch
-}
 "Alien calls and FFI:"
 { $subsections
   ##alien-assembly
@@ -268,10 +264,29 @@ $nl
   gc-map-insn
   <gc-map>
 }
+"Comparison instructions:"
+{ $subsections
+  ##compare
+  ##compare-imm
+  ##compare-integer
+  ##compare-integer-branch
+  ##compare-integer-imm-branch
+  ##test
+  ##test-branch
+  ##test-imm
+  ##test-imm-branch
+}
 "Constant loading:"
 { $subsections
   ##load-integer
   ##load-reference
+}
+"Floating point instructions:"
+{ $subsections
+  ##add-float
+  ##div-float
+  ##mul-float
+  ##sub-float
 }
  "Integer arithmetic and bit operations:"
 { $subsections
@@ -303,6 +318,15 @@ $nl
   ##set-slot
   ##set-slot-imm
   ##write-barrier
+}
+"SIMD instructions"
+{ $subsections
+  ##add-vector
+  ##add-sub-vector
+  ##div-vector
+  ##mul-vector
+  ##store-memory-imm
+  ##sub-vector
 }
 "Stack height manipulation:"
 { $subsections
