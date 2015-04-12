@@ -37,3 +37,8 @@ IN: compiler.cfg.linear-scan.assignment.tests
     pending-interval-heap set 90 expire-old-intervals
     pending-interval-heap get heap-size
 ] unit-test
+
+{ } [
+    V{ T{ ##inc { loc D 3 } { insn# 7 } } } 0 insns>block block>cfg { }
+    assign-registers
+] unit-test
