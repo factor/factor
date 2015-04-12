@@ -34,11 +34,10 @@ ERROR: not-spilled-error vreg ;
     dup vreg>reg dup spill-slot? [ nip ] [ drop leader not-spilled-error ] if ;
 
 : vregs>regs ( vregs -- assoc )
-    [ f ] [ [ dup vreg>reg ] H{ } map>assoc ] if-empty ;
+    [ dup vreg>reg ] H{ } map>assoc ;
 
 SYMBOL: unhandled-intervals
 
-! Liveness info is used by resolve pass
 SYMBOL: machine-live-ins
 
 : machine-live-in ( bb -- assoc )
@@ -47,8 +46,6 @@ SYMBOL: machine-live-ins
 : compute-live-in ( bb -- )
     [ live-in keys vregs>regs ] keep machine-live-ins get set-at ;
 
-! Mapping from basic blocks to predecessors to values which are
-! live on a particular incoming edge
 SYMBOL: machine-edge-live-ins
 
 : machine-edge-live-in ( predecessor bb -- assoc )

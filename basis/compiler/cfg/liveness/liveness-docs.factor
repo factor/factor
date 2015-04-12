@@ -1,9 +1,17 @@
-USING: compiler.cfg.instructions help.markup help.syntax ;
+USING: assocs compiler.cfg compiler.cfg.instructions help.markup help.syntax ;
 IN: compiler.cfg.liveness
 
 HELP: fill-gc-map
 { $values { "live-set" "no idea" } { "insn" insn } }
 { $description "Assigns values to the " { $slot "gc-roots" } " and " { $slot "derived-roots" } " slots of an instructions " { $link gc-map } "." } ;
+
+HELP: live-in
+{ $values { "bb" basic-block } { "set" assoc } }
+{ $description "All the virtual registers that are live in a basic block." } ;
+
+HELP: live-in?
+{ $values { "vreg" "virtual register" } { "bb" basic-block } { "?" "a boolean" } }
+{ $description "Whether the vreg is live in the block or not." } ;
 
 HELP: edge-live-ins
 { $var-description "Assoc mapping basic blocks to sequences of sets of vregs; each sequence is in correspondence with a predecessor." } ;
