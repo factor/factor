@@ -4,21 +4,17 @@ USING: accessors kernel layouts math namespaces vectors ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
-{ id integer }
-number
-{ instructions vector }
-{ successors vector }
-{ predecessors vector }
-{ kill-block? boolean } ;
+    number
+    { instructions vector }
+    { successors vector }
+    { predecessors vector }
+    { kill-block? boolean } ;
 
 : <basic-block> ( -- bb )
     basic-block new
-        \ basic-block counter >>id
         V{ } clone >>instructions
         V{ } clone >>successors
         V{ } clone >>predecessors ;
-
-M: basic-block hashcode* nip id>> ;
 
 TUPLE: cfg
     { entry basic-block }

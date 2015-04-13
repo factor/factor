@@ -50,7 +50,7 @@ IN: compiler.cfg.intrinsics.simd.tests
 
 : test-compiler-env ( -- x )
     H{ } clone
-    T{ basic-block { id 0 } }
+    T{ basic-block }
     [ \ basic-block pick set-at ]
     [ 0 swap associate \ ds-heights pick set-at ]
     [ 0 swap associate \ rs-heights pick set-at ] tri
