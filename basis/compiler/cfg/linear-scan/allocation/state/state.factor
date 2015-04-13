@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture fry heaps kernel layouts linked-assocs math
+cpu.architecture fry heaps kernel linked-assocs math
 math.order namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
@@ -121,14 +121,14 @@ ERROR: register-already-used live-interval ;
     [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
     <spill-slot> ;
 
-: align-spill-area ( align -- )
-    cfg get [ max ] change-spill-area-align drop ;
+: align-spill-area ( align cfg -- )
+    [ max ] change-spill-area-align drop ;
 
 SYMBOL: spill-slots
 
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
     rep-size
-    [ align-spill-area ]
+    [ cfg get align-spill-area ]
     [ spill-slots get [ nip next-spill-slot ] 2cache ]
     bi ;
 
@@ -141,7 +141,6 @@ SYMBOL: spill-slots
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
-    cfg get 0 >>spill-area-size cell >>spill-area-align drop
     H{ } clone spill-slots set
     -1 progress set ;
 

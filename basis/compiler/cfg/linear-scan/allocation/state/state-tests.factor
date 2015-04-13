@@ -1,7 +1,7 @@
-USING: combinators.extras compiler.cfg compiler.cfg.instructions
+USING: accessors combinators.extras compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals cpu.architecture
-cpu.x86.assembler.operands heaps kernel namespaces system tools.test ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.utilities cpu.architecture
+cpu.x86.assembler.operands heaps kernel layouts namespaces system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.state.tests
 
 ! add-active
@@ -46,6 +46,12 @@ cpu x86.64? [
         T{ live-interval-state { reg-class int-regs } } free-positions
     ] unit-test
 ] when
+
+! align-spill-area
+{ t } [
+    3 f f { } 0 insns>block <cfg> [ align-spill-area ] keep
+    spill-area-align>> cell =
+] unit-test
 
 {
     T{ spill-slot f 0 }

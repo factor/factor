@@ -19,7 +19,7 @@ HELP: <basic-block>
 
 HELP: <cfg>
 { $values { "entry" basic-block } { "word" word } { "label" "label" } { "cfg" cfg } }
-{ $description "Constructor for " { $link cfg } "." } ;
+{ $description "Constructor for " { $link cfg } ". " { $slot "spill-area-size" } " and " { $slot "spill-area-align" } " are set to default values." } ;
 
 HELP: cfg
 { $class-description
