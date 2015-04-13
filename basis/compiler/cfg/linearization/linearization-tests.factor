@@ -11,4 +11,6 @@ V{ } 2 test-bb
 0 { 1 1 } edges
 1 2 edge
 
-[ t ] [ 0 get block>cfg linearization-order [ id>> ] map all-unique? ] unit-test
+{ { 0 1 2 } } [
+    0 get block>cfg linearization-order [ number>> ] map
+] unit-test
