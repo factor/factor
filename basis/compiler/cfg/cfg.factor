@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces vectors ;
+USING: accessors kernel layouts math namespaces vectors ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
@@ -20,18 +20,24 @@ number
 
 M: basic-block hashcode* nip id>> ;
 
-TUPLE: cfg { entry basic-block } word label
-spill-area-size spill-area-align
-stack-frame
-frame-pointer?
-post-order linear-order
-predecessors-valid? dominance-valid? loops-valid? ;
+TUPLE: cfg
+    { entry basic-block }
+    word
+    label
+    { spill-area-size integer }
+    { spill-area-align integer }
+    stack-frame
+    frame-pointer?
+    post-order linear-order
+    predecessors-valid? dominance-valid? loops-valid? ;
 
 : <cfg> ( word label entry -- cfg )
     cfg new
         swap >>entry
         swap >>label
-        swap >>word ;
+        swap >>word
+        0 >>spill-area-size
+        cell >>spill-area-align ;
 
 : cfg-changed ( cfg -- )
     f >>post-order
