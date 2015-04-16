@@ -28,25 +28,14 @@ SYMBOL: base-pointers
 
 GENERIC: visit-insn ( live-set insn -- live-set )
 
-! If liveness analysis is run after SSA destruction, we need to
-! kill vregs that have been coalesced with others (they won't
-! have been renamed from their original values in the CFG).
-! Otherwise, we get a bunch of stray uses that wind up
-! live-in/out when they shouldn't be.  However, we must take
-! care to still report the original vregs in the live-sets,
-! because they have information associated with them (like
-! representations) that would get lost if we just used the
-! leaders for everything.
-
 : kill-defs ( live-set insn -- live-set )
-    defs-vregs [
-        ?leader '[ drop ?leader _ eq? not ] assoc-filter!
-    ] each ; inline
+    defs-vregs [ ?leader ] map
+    '[ drop ?leader _ in? not ] assoc-filter! ; inline
 
 : gen-uses ( live-set insn -- live-set )
     uses-vregs [ over conjoin ] each ; inline
 
-M: vreg-insn visit-insn
+M: vreg-insn visit-insn ( live-set insn -- live-set )
     [ kill-defs ] [ gen-uses ] bi ;
 
 DEFER: lookup-base-pointer
@@ -81,15 +70,12 @@ M: ##sub lookup-base-pointer*
 
 M: vreg-insn lookup-base-pointer* 2drop f ;
 
-! Can't use cache here because of infinite recursion inside
-! the quotation passed to cache
-: lookup-base-pointer ( vreg -- vregs/f )
+: lookup-base-pointer ( vreg -- vreg/f )
     base-pointers get ?at [
         f over base-pointers get set-at
         [ dup ?leader insn-of lookup-base-pointer* ] keep
         dupd base-pointers get set-at
     ] unless ;
-
 
 :: visit-derived-root ( vreg derived-roots gc-roots -- )
     vreg lookup-base-pointer :> base
@@ -110,12 +96,12 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
     [ '[ drop _ _ visit-gc-root ] assoc-each ] 2keep
     members ;
 
-: fill-gc-map ( live-set insn -- live-set )
+: fill-gc-map ( live-set gc-map -- live-set )
     [ representations get [ dup gc-roots ] [ f f ] if ] dip
-    gc-map>> [ gc-roots<< ] [ derived-roots<< ] bi ;
+    [ gc-roots<< ] [ derived-roots<< ] bi ;
 
-M: gc-map-insn visit-insn
-    [ kill-defs ] [ fill-gc-map ] [ gen-uses ] tri ;
+M: gc-map-insn visit-insn ( live-set insn -- live-set )
+    [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] tri ;
 
 M: ##phi visit-insn kill-defs ;
 
