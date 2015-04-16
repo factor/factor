@@ -26,17 +26,18 @@ SYMBOL: edge-live-ins
 
 SYMBOL: base-pointers
 
-GENERIC: visit-insn ( live-set insn -- live-set )
+GENERIC: visit-insn ( live-set insn -- )
 
-: kill-defs ( live-set insn -- live-set )
+! This would be much better if live-set was a real set
+: kill-defs ( live-set insn -- )
     defs-vregs [ ?leader ] map
-    '[ drop ?leader _ in? not ] assoc-filter! ; inline
+    '[ drop ?leader _ in? not ] assoc-filter! drop ; inline
 
-: gen-uses ( live-set insn -- live-set )
-    uses-vregs [ over conjoin ] each ; inline
+: gen-uses ( live-set insn -- )
+    uses-vregs [ swap conjoin ] with each ; inline
 
-M: vreg-insn visit-insn ( live-set insn -- live-set )
-    [ kill-defs ] [ gen-uses ] bi ;
+M: vreg-insn visit-insn ( live-set insn -- )
+    [ kill-defs ] [ gen-uses ] 2bi ;
 
 DEFER: lookup-base-pointer
 
@@ -96,19 +97,19 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
     [ '[ drop _ _ visit-gc-root ] assoc-each ] 2keep
     members ;
 
-: fill-gc-map ( live-set gc-map -- live-set )
-    [ representations get [ dup gc-roots ] [ f f ] if ] dip
+: fill-gc-map ( live-set gc-map -- )
+    [ representations get [ gc-roots ] [ drop f f ] if ] dip
     [ gc-roots<< ] [ derived-roots<< ] bi ;
 
-M: gc-map-insn visit-insn ( live-set insn -- live-set )
-    [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] tri ;
+M: gc-map-insn visit-insn ( live-set insn -- )
+    [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] 2tri ;
 
 M: ##phi visit-insn kill-defs ;
 
-M: insn visit-insn drop ;
+M: insn visit-insn 2drop ;
 
-: transfer-liveness ( live-set instructions -- live-set' )
-    [ clone ] [ <reversed> ] bi* [ visit-insn ] each ;
+: transfer-liveness ( live-set insns -- )
+    <reversed> [ visit-insn ] with each ;
 
 SYMBOL: work-list
 
@@ -116,7 +117,7 @@ SYMBOL: work-list
     work-list get push-all-front ;
 
 : compute-live-in ( basic-block -- live-in )
-    [ live-out ] keep instructions>> transfer-liveness ;
+    [ live-out clone dup ] keep instructions>> transfer-liveness ;
 
 : compute-edge-live-in ( basic-block -- edge-live-in )
     H{ } clone [

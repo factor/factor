@@ -54,13 +54,12 @@ IN: compiler.cfg.liveness.tests
 ] unit-test
 
 ! fill-gc-map
-{ H{ } } [
+{ } [
     f representations set
     H{ } clone T{ gc-map } fill-gc-map
 ] unit-test
 
 {
-    H{ { 48 48 } }
     T{ gc-map { gc-roots { 48 } } { derived-roots V{ } } }
 } [
     H{ { 48 tagged-rep } } representations set
@@ -70,16 +69,12 @@ IN: compiler.cfg.liveness.tests
 
 ! kill-defs
 { H{ } } [
-    H{ } T{ ##peek f 37 D 0 0 } kill-defs
+    H{ } dup T{ ##peek f 37 D 0 0 } kill-defs
 ] unit-test
 
 { H{ { 3 3 } } } [
     H{ { 37 99 } { 99 99 } { 2 99 } } leader-map set
-    H{ { 37 37 } { 3 3 } } T{ ##peek f 2 D 0 0 } kill-defs
-] unit-test
-
-{ t } [
-    H{ { 123 123 } } clone T{ ##peek f 7 D 0 } dupd kill-defs eq?
+    H{ { 37 37 } { 3 3 } } dup T{ ##peek f 2 D 0 0 } kill-defs
 ] unit-test
 
 ! lookup-base-pointer
@@ -97,6 +92,14 @@ IN: compiler.cfg.liveness.tests
     456 T{ ##peek f 123 D 0 } lookup-base-pointer*
 ] unit-test
 
+! transfer-liveness
+{
+    H{ { 37 37 } }
+} [
+    H{ } clone dup { T{ ##replace f 37 D 1 6 } T{ ##peek f 37 D 0 0 } }
+    transfer-liveness
+] unit-test
+
 ! visit-gc-root
 { V{ } HS{ 48 } } [
     H{ { 48 tagged-rep } } representations set
@@ -112,12 +115,24 @@ IN: compiler.cfg.liveness.tests
 
 ! visit-insn
 { H{ } } [
-    H{ } clone T{ ##peek f 0 D 0 } visit-insn
+    H{ } clone [ T{ ##peek f 0 D 0 } visit-insn ] keep
 ] unit-test
 
 { H{ { 48 48 } { 37 37 } } } [
     H{ { 48 tagged-rep } } representations set
-    H{ { 48 48  } } clone T{ ##replace f 37 D 1 6 } visit-insn
+    H{ { 48 48  } } clone [ T{ ##replace f 37 D 1 6 } visit-insn ] keep
+] unit-test
+
+{
+    T{ ##call-gc
+       { gc-map
+         T{ gc-map { gc-roots { 93 } } { derived-roots V{ } } }
+       }
+    }
+} [
+    H{ { 93 tagged-rep } } representations set
+    H{ { 93 93  } } clone T{ ##call-gc f T{ gc-map } }
+    [ visit-insn ] keep
 ] unit-test
 
 : test-liveness ( -- )
