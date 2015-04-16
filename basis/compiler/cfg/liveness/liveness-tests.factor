@@ -1,16 +1,123 @@
-USING: compiler.cfg.liveness
+USING: accessors compiler.cfg.liveness
 compiler.cfg compiler.cfg.debugger compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.utilities
-cpu.architecture accessors namespaces sequences kernel
-tools.test vectors alien math compiler.cfg.comparisons
-cpu.x86.assembler.operands assocs ;
+compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
+namespaces sequences kernel tools.test vectors alien math
+compiler.cfg.comparisons cpu.x86.assembler.operands assocs ;
 IN: compiler.cfg.liveness.tests
 
-! visit-insn
+! compute-edge-live-in
+{ H{ } } [
+    { } 0 insns>block compute-edge-live-in
+] unit-test
+
 {
-    H{ }
+    H{
+        { "bl1" H{ { 7 7 } } }
+        { "bl2" H{ { 99 99 } } }
+    }
 } [
+    {
+        T{ ##phi
+           { dst 103 }
+           { inputs H{ { "bl1" 7 } { "bl2" 99 } } }
+        }
+    } 0 insns>block
+    compute-edge-live-in
+] unit-test
+
+{
+    H{
+        { "b-31" H{ { 192 192 } { 193 193 } { 194 194 } { 195 195 } } }
+        { "b-23" H{ { 181 181 } { 182 182 } { 183 183 } { 187 187 } } }
+        { "b-26" H{ { 188 188 } { 189 189 } { 190 190 } { 191 191 } } }
+    }
+} [
+    {
+        T{ ##phi
+           { dst 196 }
+           { inputs H{ { "b-26" 189 } { "b-23" 183 } { "b-31" 193 } } }
+        }
+        T{ ##phi
+           { dst 197 }
+           { inputs H{ { "b-26" 190 } { "b-23" 182 } { "b-31" 194 } } }
+        }
+        T{ ##phi
+           { dst 198 }
+           { inputs H{ { "b-26" 191 } { "b-23" 181 } { "b-31" 195 } } }
+        }
+        T{ ##phi
+           { dst 199 }
+           { inputs H{ { "b-26" 188 } { "b-23" 187 } { "b-31" 192 } } }
+        }
+    } 0 insns>block compute-edge-live-in
+] unit-test
+
+! fill-gc-map
+{ H{ } } [
+    f representations set
+    H{ } clone T{ gc-map } fill-gc-map
+] unit-test
+
+{
+    H{ { 48 48 } }
+    T{ gc-map { gc-roots { 48 } } { derived-roots V{ } } }
+} [
+    H{ { 48 tagged-rep } } representations set
+    H{ { 48 48  } } clone
+    T{ gc-map } [ fill-gc-map ] keep
+] unit-test
+
+! kill-defs
+{ H{ } } [
+    H{ } T{ ##peek f 37 D 0 0 } kill-defs
+] unit-test
+
+{ H{ { 3 3 } } } [
+    H{ { 37 99 } { 99 99 } { 2 99 } } leader-map set
+    H{ { 37 37 } { 3 3 } } T{ ##peek f 2 D 0 0 } kill-defs
+] unit-test
+
+{ t } [
+    H{ { 123 123 } } clone T{ ##peek f 7 D 0 } dupd kill-defs eq?
+] unit-test
+
+! lookup-base-pointer
+{ 84 } [
+    H{ { 84 84 } } clone base-pointers set 84 lookup-base-pointer
+] unit-test
+
+{ 15 } [
+    { T{ ##tagged>integer f 30 15 } } 0 insns>block block>cfg compute-live-sets
+    30 lookup-base-pointer
+] unit-test
+
+! lookup-base-pointer*
+{ f } [
+    456 T{ ##peek f 123 D 0 } lookup-base-pointer*
+] unit-test
+
+! visit-gc-root
+{ V{ } HS{ 48 } } [
+    H{ { 48 tagged-rep } } representations set
+    48 V{ } clone HS{ } clone [ visit-gc-root ] 2keep
+] unit-test
+
+! So the real root is 40?
+{ V{ { 48 40 } } HS{ 40 } } [
+    H{ { 48 40 } } base-pointers set
+    H{ { 48 int-rep } } representations set
+    48 V{ } clone HS{ } clone [ visit-gc-root ] 2keep
+] unit-test
+
+! visit-insn
+{ H{ } } [
     H{ } clone T{ ##peek f 0 D 0 } visit-insn
+] unit-test
+
+{ H{ { 48 48 } { 37 37 } } } [
+    H{ { 48 tagged-rep } } representations set
+    H{ { 48 48  } } clone T{ ##replace f 37 D 1 6 } visit-insn
 ] unit-test
 
 : test-liveness ( -- )
