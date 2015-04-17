@@ -5,7 +5,40 @@ math.vectors prettyprint random sequences sorting ;
 IN: rosetta-code.dice7
 
 ! http://rosettacode.org/wiki/Seven-sided_dice_from_five-sided_dice
+
+! Given an equal-probability generator of one of the integers 1
+! to 5 as dice5; create dice7 that generates a pseudo-random
+! integer from 1 to 7 in equal probability using only dice5 as a
+! source of random numbers, and check the distribution for at
+! least 1000000 calls using the function created in Simple
+! Random Distribution Checker.
+
+! Implementation suggestion: dice7 might call dice5 twice,
+! re-call if four of the 25 combinations are given, otherwise
+! split the other 21 combinations into 7 groups of three, and
+! return the group index from the rolls.
+
 ! http://rosettacode.org/wiki/Simple_Random_Distribution_Checker
+
+! Create a function to check that the random integers returned
+! from a small-integer generator function have uniform
+! distribution.
+
+! The function should take as arguments:
+
+! * The function (or object) producing random integers.
+! * The number of times to call the integer generator.
+! * A 'delta' value of some sort that indicates how close to a
+!   flat distribution is close enough.
+
+! The function should produce:
+
+! * Some indication of the distribution achieved.
+! * An 'error' if the distribution is not flat enough.
+
+! Show the distribution checker working when the produced
+! distribution is flat enough and when it is not. (Use a
+! generator from Seven-dice from Five-dice).
 
 ! Output a random integer 1..5.
 : dice5 ( -- x )
@@ -15,7 +48,7 @@ IN: rosetta-code.dice7
 : dice7 ( -- x )
     0 [ dup 21 < ] [
         drop dice5 5 * dice5 + 6 -
-   ] do until 7 rem 1 + ;
+    ] do until 7 rem 1 + ;
 
 ! Count the number of rolls for each side of the dice,
 ! inserting zeros for die rolls that never occur.
