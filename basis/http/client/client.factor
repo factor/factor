@@ -106,7 +106,7 @@ SYMBOL: redirects
         read-crlf B{ } assert= read-chunked
     ] if ; inline recursive
 
-: read-response-body ( quot response -- )
+: read-response-body ( quot: ( chunk -- ) response -- )
     binary decode-input
     "transfer-encoding" header "chunked" =
     [ read-chunked ] [ each-block ] if ; inline
