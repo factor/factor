@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: definitions namespaces make assocs sequences kernel classes splitting
-words vocabs.loader accessors strings combinators arrays
-continuations present fry urls http http.server xml.syntax xml.writer
-http.server.redirection http.server.remapping io.pathnames ;
+USING: accessors arrays assocs classes combinators continuations
+definitions fry http http.server http.server.redirection
+http.server.remapping io.pathnames kernel make namespaces
+sequences splitting strings urls words xml.syntax ;
 IN: furnace.utilities
 
 : word>string ( word -- string )
@@ -37,7 +37,7 @@ ERROR: no-such-responder responder ;
 : resolve-base-path ( string -- string' )
     "$" ?head [
         [
-            "/" split1 [ base-path [  "/" % % ] each "/" % ] dip %
+            "/" split1 [ base-path [ "/" % % ] each "/" % ] dip %
         ] "" make
     ] when ;
 
@@ -93,11 +93,11 @@ CONSTANT: nested-forms-key "__n"
 
 : referrer ( -- referrer/f )
     #! Typo is intentional, it's in the HTTP spec!
-    "referer" request get header>> at
+    request get "referer" header
     dup [ >url ensure-port [ remap-port ] change-port ] when ;
 
 : user-agent ( -- user-agent )
-    "user-agent" request get header>> at "" or ;
+    request get "user-agent" header "" or ;
 
 : same-host? ( url -- ? )
     dup [
