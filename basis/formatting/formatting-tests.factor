@@ -11,6 +11,8 @@ IN: formatting.tests
 [ "10" ] [ 10 "%d" sprintf ] unit-test
 [ "+10" ] [ 10 "%+d" sprintf ] unit-test
 [ "-10" ] [ -10 "%d" sprintf ] unit-test
+[ " 23" ] [ 23 "% d" sprintf ] unit-test
+[ "-23" ] [ -23 "% d" sprintf ] unit-test
 [ "  -10" ] [ -10 "%5d" sprintf ] unit-test
 [ "-0010" ] [ -10 "%05d" sprintf ] unit-test
 [ "+0010" ] [ 10 "%+05d" sprintf ] unit-test

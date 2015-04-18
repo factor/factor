@@ -48,7 +48,8 @@ pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0 = [ drop [ ] ] when ]]
 
-sign      = ("+")?               => [[ [ dup CHAR: - swap index [ "+" prepend ] unless ] [ ] ? ]]
+sign_     = [+ ]                 => [[ '[ dup CHAR: - swap index [ _ prefix ] unless ] ]]
+sign      = (sign_)?             => [[ [ ] or ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
 width     = (width_)?            => [[ [ ] or ]]
