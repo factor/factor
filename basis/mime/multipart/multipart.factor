@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: multiline kernel sequences io splitting fry namespaces
-http.parsers hashtables assocs combinators ascii io.files.unique
-accessors io.encodings.binary io.files byte-arrays math
-io.streams.string combinators.short-circuit strings math.order
-quoting ;
+USING: accessors ascii assocs byte-arrays combinators fry
+hashtables http http.parsers io io.encodings.binary io.files
+io.files.unique io.streams.string kernel math quoting sequences
+splitting ;
 IN: mime.multipart
 
 CONSTANT: buffer-size 65536
@@ -20,7 +19,10 @@ name name-content
 mime-parts ;
 
 TUPLE: mime-file headers filename temporary-path ;
+C: <mime-file> mime-file
+
 TUPLE: mime-variable headers key value ;
+C: <mime-variable> mime-variable
 
 : <multipart> ( mime-separator -- multipart )
     multipart new
@@ -80,7 +82,7 @@ ERROR: end-of-stream multipart ;
     dup filename>> empty-name? [
         drop
     ] [
-        [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
+        [ [ header>> ] [ filename>> ] [ temp-file>> ] tri <mime-file> ]
         [ content-disposition>> "name" of unquote ]
         [ mime-parts>> set-at ] tri
     ] if ;
@@ -129,7 +131,7 @@ ERROR: unknown-content-disposition multipart ;
 ERROR: no-content-disposition multipart ;
 
 : process-header ( multipart -- multipart )
-    "content-disposition" over header>> at ";" split1 swap {
+    dup "content-disposition" header ";" split1 swap {
         { "form-data" [
             parse-content-disposition-form-data >>content-disposition
             parse-form-data
