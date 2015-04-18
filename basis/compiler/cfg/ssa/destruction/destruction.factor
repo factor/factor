@@ -11,20 +11,6 @@ kernel locals make namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 
-! Because of the design of the register allocator, this pass
-! has three peculiar properties.
-!
-! 1) Instead of renaming vreg usages in the CFG, a map from
-! vregs to canonical representatives is computed. This allows
-! the register allocator to use the original SSA names to get
-! reaching definitions.
-! 2) Useless ##copy instructions, and all ##phi instructions,
-! are eliminated, so the register allocator does not have to
-! remove any redundant operations.
-! 3) This pass computes live sets and fills out GC maps with
-! compiler.cfg.liveness, so the linear scan register allocator
-! does not need to compute liveness again.
-
 ! Maps leaders to equivalence class elements.
 SYMBOL: class-element-map
 

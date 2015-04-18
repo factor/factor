@@ -7,10 +7,6 @@ namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.cssa
 
-! Convert SSA to conventional SSA. This pass runs after representation
-! selection, so it must keep track of representations when introducing
-! new values.
-
 SYMBOLS: edge-copies phi-copies ;
 
 : init-copies ( bb -- )
