@@ -57,11 +57,11 @@ TUPLE: stack-var n ;
 
 PRIVATE>
 
-MACRO: interpolate. ( str -- )
+MACRO: interpolate ( str -- )
     [ [ get ] ] interpolate-quot ;
 
-: interpolate ( str -- newstr )
-    [ interpolate. ] with-string-writer ; inline
+: interpolate>string ( str -- newstr )
+    [ interpolate ] with-string-writer ; inline
 
 : interpolate-locals ( str -- quot )
     [ dup search [ [ ] ] [ [ get ] ] ?if ] interpolate-quot ;
