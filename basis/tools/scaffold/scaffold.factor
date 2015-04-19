@@ -332,7 +332,7 @@ ${example-indent}    ""
 ${example-indent}    ""
 ${example-indent}}
 """
-            interpolate.
+            interpolate
         ] with-variable
     ] with-variable ;
 
