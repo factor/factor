@@ -3,9 +3,9 @@
 
 USING: accessors formatting html.entities html.parser
 html.parser.analyzer html.parser.printer http.client images.http
-images.viewer images.viewer.prettyprint io io.streams.string
-kernel parser prettyprint.custom prettyprint.sections regexp
-sequences strings ui wrap.strings ;
+images.viewer images.viewer.prettyprint io kernel parser
+prettyprint.custom prettyprint.sections regexp sequences strings
+ui wrap.strings ;
 
 IN: xkcd
 
@@ -22,8 +22,7 @@ IN: xkcd
 : comic-text ( url -- string )
     http-get nip parse-html
     "transcript" find-by-id-between
-    [ html-text. ] with-string-writer
-    html-unescape ;
+    html-text html-unescape ;
 
 : comic-text. ( url -- )
     comic-text 80 wrap-string print ;
