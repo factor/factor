@@ -44,7 +44,7 @@ TUPLE: stack-var n ;
             name>> quot call '[ _ @ present write ]
         ] [
             dup stack-var? [
-                n>> 1 + '[ _ npick present write ]
+                n>> vars swap - 1 + '[ _ npick present write ]
             ] [
                 '[ _ write ]
             ] if
