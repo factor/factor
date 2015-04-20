@@ -728,7 +728,6 @@ H{
 } representations set
 
 [ { 0 10 } ] [
-    H{ { int-regs { 0 1 } } } registers set
     H{
         { int-regs
           {
@@ -778,7 +777,7 @@ H{
         { ranges V{ T{ live-range f 8 10 } } }
         { uses V{ T{ vreg-use f 8 int-rep f } T{ vreg-use f 10 f int-rep } } }
     }
-    register-status
+    H{ { int-regs { 0 1 } } } register-status
 ] unit-test
 
 { t } [

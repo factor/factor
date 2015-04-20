@@ -5,6 +5,7 @@ compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
 namespaces sequences kernel tools.test vectors alien math
 compiler.cfg.comparisons cpu.x86.assembler.operands assocs ;
 IN: compiler.cfg.liveness.tests
+QUALIFIED: sets
 
 ! compute-edge-live-in
 { H{ } } [
@@ -54,17 +55,23 @@ IN: compiler.cfg.liveness.tests
 ] unit-test
 
 ! fill-gc-map
-{ } [
-    f representations set
-    H{ } clone T{ gc-map } fill-gc-map
-] unit-test
-
 {
     T{ gc-map { gc-roots { 48 } } { derived-roots V{ } } }
 } [
     H{ { 48 tagged-rep } } representations set
     H{ { 48 48  } } clone
     T{ gc-map } [ fill-gc-map ] keep
+] unit-test
+
+! gc-roots
+! only vregs that are tagged are real gc roots
+{ V{ } { 125 } } [
+    H{
+        { 123 double-rep }
+        { 124 double-2-rep }
+        { 125 tagged-rep }
+    } representations set
+    { 123 124 125 } sets:unique gc-roots
 ] unit-test
 
 ! kill-defs
