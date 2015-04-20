@@ -31,3 +31,8 @@ USING: simple-tokenizer tools.test ;
 ] [
     "\"Hello world.app/Contents/MacOS/hello-ui\" -i=boot.macosx-ppc.image \"-include= math compiler ui\" -deploy-vocab=hello-ui \"-output-image=Hello world.app/Contents/Resources/hello-ui.image\" -no-stack-traces -no-user-init" tokenize
 ] unit-test
+
+{ V{ "ls" "-l" } } [ "ls -l" tokenize ] unit-test
+{ V{ "ls" "-l" } } [ "ls -l\n" tokenize ] unit-test
+{ V{ "ls" "-l" } } [ "\nls -l" tokenize ] unit-test
+{ V{ "ls" "-l" } } [ "\nls -l\n" tokenize ] unit-test
