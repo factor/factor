@@ -5,7 +5,7 @@ IN: simple-tokenizer
 
 EBNF: tokenize
 space = [ \t\n\r]
-escaped-char = "\" .:ch => [[ ch ]]
+escaped-char = "\\" .:ch => [[ ch ]]
 quoted = '"' (escaped-char | [^"])*:a '"' => [[ a ]]
 unquoted = (escaped-char | [^ \t\n\r"])+
 argument = (quoted | unquoted) => [[ >string ]]
