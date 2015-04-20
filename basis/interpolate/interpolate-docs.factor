@@ -7,7 +7,7 @@ HELP: interpolate
 { $examples
     { $example
         "USING: interpolate ;"
-        "\"Bob\" \"Alice\" \"Hi ${1}, it's ${0}.\" interpolate"
+        "\"Bob\" \"Alice\" \"Hi ${0}, it's ${1}.\" interpolate"
         "Hi Bob, it's Alice."
     }
     { $example
