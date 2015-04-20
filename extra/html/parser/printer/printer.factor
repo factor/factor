@@ -1,6 +1,6 @@
 USING: accessors assocs combinators html.parser
-html.parser.utils io kernel math math.order namespaces sequences
-strings unicode.categories ;
+html.parser.utils io io.streams.string kernel math math.order
+namespaces sequences strings unicode.categories ;
 IN: html.parser.printer
 
 TUPLE: html-printer ;
@@ -35,8 +35,14 @@ ERROR: unknown-tag-error tag ;
 : html-text. ( vector -- )
     T{ text-printer } html-printer [ print-tags ] with-variable ;
 
+: html-text ( vector -- string )
+    [ html-text. ] with-string-writer ;
+
 : html-src. ( vector -- )
     T{ src-printer } html-printer [ print-tags ] with-variable ;
+
+: html-src ( vector -- string )
+    [ html-src. ] with-string-writer ;
 
 M: text-printer print-opening-tag
     name>> {
