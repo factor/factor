@@ -6,6 +6,7 @@ math.parser multiline namespaces parser peg peg.parsers
 peg.search quotations sequences splitting stack-checker strings
 summary unicode.categories words ;
 FROM: compiler.units => with-compilation-unit ;
+FROM: strings.parser => unescape-string ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
 IN: peg.ebnf
@@ -108,19 +109,6 @@ C: <ebnf> ebnf
     #! begin and end.
     [ syntax ] 2dip syntax pack ;
 
-#! Don't want to use 'replace' in an action since replace doesn't infer.
-#! Do the compilation of the peg at parse time and call (replace).
-PEG: escaper ( string -- ast )
-    [
-        "\\t" token [ drop "\t" ] action ,
-        "\\n" token [ drop "\n" ] action ,
-        "\\r" token [ drop "\r" ] action ,
-        "\\\\" token [ drop "\\" ] action ,
-    ] choice* any-char-parser 2array choice repeat0 ;
-
-: replace-escapes ( string -- string )
-    escaper sift [ [ tree-write ] each ] with-string-writer ;
-
 : insert-escapes ( string -- string )
     [
         "\t" token [ drop "\\t" ] action ,
@@ -136,7 +124,7 @@ PEG: escaper ( string -- ast )
     [
         [ CHAR: " = not ] satisfy repeat1 "\"" "\"" surrounded-by ,
         [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
-    ] choice* [ >string replace-escapes ] action ;
+    ] choice* [ >string unescape-string ] action ;
 
 : 'non-terminal' ( -- parser )
     #! A non-terminal is the name of another rule. It can
@@ -201,7 +189,7 @@ PEG: escaper ( string -- ast )
         [ "[" syntax , "[" token ensure-not , ] seq* hide ,
         [ CHAR: ] = not ] satisfy repeat1 ,
         "]" syntax ,
-    ] seq* [ first >string <ebnf-range> ] action ;
+    ] seq* [ first >string unescape-string <ebnf-range> ] action ;
 
 : ('element') ( -- parser )
     #! An element of a rule. It can be a terminal or a
@@ -243,7 +231,7 @@ DEFER: 'action'
 
 DEFER: 'choice'
 
-: grouped ( quot suffix    -- parser )
+: grouped ( quot suffix -- parser )
     #! Parse a group of choices, with a suffix indicating
     #! the type of group (repeat0, repeat1, etc) and
     #! an quot that is the action that produces the AST.
