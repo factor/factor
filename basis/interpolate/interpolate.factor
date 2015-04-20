@@ -11,6 +11,8 @@ TUPLE: named-var name ;
 
 TUPLE: stack-var n ;
 
+TUPLE: anon-var ;
+
 : (parse-interpolate) ( str -- )
     [
         "${" split1-slice [
@@ -20,15 +22,23 @@ TUPLE: stack-var n ;
                 "}" split1-slice
                 [
                     >string dup string>number
-                    [ stack-var boa ] [ named-var boa ] ?if ,
+                    [ 1 + stack-var boa ]
+                    [ [ anon-var new ] [ named-var boa ] if-empty ] ?if ,
                 ]
                 [ (parse-interpolate) ] bi*
             ] when*
         ] bi*
     ] unless-empty ;
 
+: deanonymize ( seq -- seq' )
+    0 over <reversed> [
+        dup anon-var? [
+            drop 1 + dup stack-var boa
+        ] when
+    ] map! 2drop ;
+
 : parse-interpolate ( str -- seq )
-    [ (parse-interpolate) ] { } make ;
+    [ (parse-interpolate) ] { } make deanonymize ;
 
 : max-stack-var ( seq -- n/f )
     f [
@@ -44,7 +54,7 @@ TUPLE: stack-var n ;
             name>> quot call '[ _ @ present write ]
         ] [
             dup stack-var? [
-                n>> 1 + '[ _ npick present write ]
+                n>> '[ _ npick present write ]
             ] [
                 '[ _ write ]
             ] if
@@ -52,7 +62,7 @@ TUPLE: stack-var n ;
     ] map concat
 
     vars [
-        1 + '[ _ ndrop ] append
+        '[ _ ndrop ] append
     ] when* ; inline
 
 PRIVATE>
