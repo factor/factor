@@ -28,7 +28,7 @@ HELP: translate-local-loc
 { $examples
   { $example
     "USING: compiler.cfg.stacks.local compiler.cfg.registers compiler.cfg.debugger namespaces prettyprint ;"
-    "{ { 3 0 } { 0 0 } } D 7 translate-local-loc ."
+    "D 7 { { 3 0 } { 0 0 } } translate-local-loc ."
     "D 4"
   }
 }
@@ -46,6 +46,7 @@ HELP: height-state>insns
 } ;
 
 HELP: emit-changes
+{ $values { "replaces" sequence } { "state" sequence } }
 { $description "Insert height and stack changes prior to the last instruction." } ;
 
 HELP: inc-stack

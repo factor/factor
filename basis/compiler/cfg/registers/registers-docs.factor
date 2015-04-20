@@ -15,6 +15,9 @@ HELP: rep-of
 { $description "Gets the representation for a virtual register. This word cannot be called before representation selection has run; use any-rep for " { $link ##copy } " instructions and so on." }
 { $notes "Throws " { $link bad-vreg } " if the representation for the vreg isn't known." } ;
 
+HELP: representations
+{ $var-description "Mapping from vregs to their representations." } ;
+
 HELP: set-rep-of
 { $values { "rep" representation } { "vreg" number } }
 { $description "Sets the representation for a virtual register." } ;

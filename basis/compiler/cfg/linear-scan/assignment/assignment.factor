@@ -22,7 +22,7 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
-:: vreg>reg ( vreg -- reg )
+:: vreg>reg ( vreg -- reg/spill-slot )
     vreg leader :> leader
     leader pending-interval-assoc get at* [
         drop leader vreg rep-of lookup-spill-slot
@@ -62,14 +62,6 @@ SYMBOL: machine-live-outs
 
 : compute-live-out ( bb -- )
     [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
-
-: init-assignment ( live-intervals -- )
-    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals set
-    <min-heap> pending-interval-heap set
-    H{ } clone pending-interval-assoc set
-    H{ } clone machine-live-ins set
-    H{ } clone machine-edge-live-ins set
-    H{ } clone machine-live-outs set ;
 
 : heap-pop-while ( heap quot: ( key -- ? ) -- values )
     '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
@@ -146,7 +138,16 @@ M: insn assign-registers-in-insn drop ;
             ] each
         ] V{ } make
     ] change-instructions drop
+
     bb compute-live-out ;
+
+: init-assignment ( live-intervals -- )
+    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals set
+    <min-heap> pending-interval-heap set
+    H{ } clone pending-interval-assoc set
+    H{ } clone machine-live-ins set
+    H{ } clone machine-edge-live-ins set
+    H{ } clone machine-live-outs set ;
 
 : assign-registers ( cfg live-intervals -- )
     init-assignment
