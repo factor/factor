@@ -3,9 +3,9 @@
 USING: interpolate io.streams.string namespaces tools.test locals ;
 IN: interpolate.tests
 
-{ "A B" } [ "A" "B" "${0} ${1}" interpolate>string ] unit-test
-{ "B A" } [ "A" "B" "${1} ${0}" interpolate>string ] unit-test
-{ "C A" } [ "A" "B" "C" "${2} ${0}" interpolate>string ] unit-test
+{ "A B" } [ "A" "B" "${1} ${0}" interpolate>string ] unit-test
+{ "B A" } [ "A" "B" "${0} ${1}" interpolate>string ] unit-test
+{ "C A" } [ "A" "B" "C" "${0} ${2}" interpolate>string ] unit-test
 
 { "Hello, Jane." } [
     "Jane" "name" set
