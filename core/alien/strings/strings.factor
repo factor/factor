@@ -31,7 +31,7 @@ M: c-ptr string>alien drop ;
 <PRIVATE
 
 : fast-string? ( string encoding -- ? )
-    [ aux>> not ] [ { ascii utf8 } member-eq? ] bi* and ; inline
+    swap aux>> not [ { ascii utf8 } member-eq? ] [ drop f ] if ; inline
 
 : string>alien-fast ( string encoding -- byte-array )
     { string object } declare ! aux>> must be f
