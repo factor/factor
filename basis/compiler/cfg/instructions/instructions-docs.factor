@@ -1,6 +1,6 @@
-USING: alien arrays assocs classes compiler.cfg compiler.cfg.value-numbering
-compiler.codegen.gc-maps cpu.architecture help.markup help.syntax kernel
-layouts sequences slots.private system ;
+USING: alien arrays assocs classes compiler.cfg compiler.cfg.ssa.destruction
+compiler.cfg.value-numbering compiler.codegen.gc-maps cpu.architecture
+help.markup help.syntax kernel layouts sequences slots.private system ;
 IN: compiler.cfg.instructions
 
 HELP: ##alien-invoke
@@ -112,6 +112,13 @@ HELP: ##mul-vector
 HELP: ##no-tco
 { $class-description "A dummy instruction that simply inhibits TCO." } ;
 
+HELP: ##parallel-copy
+{ $class-description "An instruction for performing multiple copies. It allows for optimizations or (or prunings) if more than one source or destination vreg is the same. They are transformed into " { $link ##copy } " instructions in " { $link destruct-ssa } ". It has the following slots:"
+  { $table
+    { { $slot "values" } { "An assoc mapping source vregs to destinations." } }
+  }
+} ;
+
 HELP: ##peek
 { $class-description
   "Copies a value from a stack location to a machine register."
@@ -192,7 +199,15 @@ HELP: ##store-memory-imm
 { $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass." } ;
 
 HELP: ##vector>scalar
-{ $class-description "This instruction is very similar to " { $link ##copy } "." }
+{ $class-description
+  "This instruction is very similar to " { $link ##copy } "."
+  { $table
+    { { $slot "dst" } { "destination vreg" } }
+    { { $slot "src" } { "source vreg" } }
+    { { $slot "rep" } { "representation for the source vreg" } }
+  }
+}
+{ $notes "The two vregs must not necessarily share the same representation." }
 { $see-also %vector>scalar } ;
 
 HELP: ##write-barrier
@@ -258,6 +273,7 @@ $nl
 "Instruction classes for moving values around:"
 { $subsections
   ##copy
+  ##parallel-copy
   ##peek
   ##reload
   ##replace
@@ -316,7 +332,7 @@ $nl
   ##load-integer
   ##load-reference
 }
-"Floating point instructions:"
+"Floating point SIMD instructions:"
 { $subsections
   ##add-float
   ##div-float
