@@ -1,10 +1,35 @@
 USING: accessors compiler.cfg compiler.cfg.debugger
 compiler.cfg.dominance compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.ssa.construction assocs
-compiler.cfg.registers compiler.cfg.utilities cpu.architecture kernel
-namespaces sequences
-tools.test vectors ;
+compiler.cfg.registers compiler.cfg.ssa.construction.private
+compiler.cfg.utilities cpu.architecture kernel namespaces sequences tools.test
+vectors ;
 IN: compiler.cfg.ssa.construction.tests
+
+! insert-phi-later
+{
+    { V{ T{ ##phi { dst 789 } { inputs H{ } } } } }
+} [
+    H{ } clone inserting-phis set
+    789 { } 0 insns>block insert-phi-later
+    inserting-phis get values
+] unit-test
+
+{ 99 55 } [
+    H{ } clone inserting-phis set
+    { } 55 insns>block { } 1 insns>block [ connect-bbs ] keep
+    99 swap insert-phi-later
+    inserting-phis get values first first
+    [ dst>> ] [ inputs>> keys first number>> ] bi
+] unit-test
+
+! live-phi?
+{ f t } [
+    HS{ 68 } live-phis set
+    T{ ##phi } live-phi?
+    T{ ##phi { dst 68 } }  live-phi?
+] unit-test
+
 
 : reset-counters ( -- )
     ! Reset counters so that results are deterministic w.r.t. hash order
