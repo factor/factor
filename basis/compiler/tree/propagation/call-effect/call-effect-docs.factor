@@ -19,8 +19,8 @@ HELP: call-effect-slow>quot
 { $description "Creates a quotation which wraps " { $link call-effect-unsafe } "." } ;
 
 HELP: call-effect-unsafe?
-{ $values { "cached-effect" "an effect or +unknown+" } { "effect" effect } { "?" "a boolean" } }
-{ $description "Checks if the given effect is safe with regards to the cached one." } ;
+{ $values { "quot" quotation } { "effect" effect } { "?" "a boolean" } }
+{ $description "Checks if the given effect is safe with regards to the quotation." } ;
 
 HELP: update-inline-cache
 { $values { "word/quot" "word or quotation" } { "ic" inline-cache } }

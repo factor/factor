@@ -1,5 +1,10 @@
-USING: compiler.cfg.instructions help.markup help.syntax ;
+USING: compiler.cfg compiler.cfg.instructions
+compiler.cfg.ssa.destruction.private help.markup help.syntax ;
 IN: compiler.cfg.ssa.destruction
+
+HELP: cleanup-cfg
+{ $values { "cfg" cfg } }
+{ $description "In this step, " { $link ##parallel-copy } " instructions are substituted with more concreete " { $link ##copy } " instructions. " { $link ##phi } " instructions are removed here." } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
 "Because of the design of the register allocator, this pass has three peculiar properties."

@@ -3,9 +3,8 @@
 USING: accessors assocs binary-search combinators
 compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.linearization compiler.cfg.liveness
-compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
-cpu.architecture fry kernel locals math math.order namespaces
-sequences ;
+compiler.cfg.registers compiler.cfg.ssa.destruction.leaders cpu.architecture
+fry kernel locals math math.intervals math.order namespaces sequences ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: live-range from to ;
@@ -164,7 +163,6 @@ TUPLE: sync-point n keep-dst? ;
 
 C: <sync-point> sync-point
 
-! Sequence of sync points
 SYMBOL: sync-points
 
 GENERIC: compute-sync-points* ( insn -- )
@@ -178,20 +176,18 @@ M: clobber-insn compute-sync-points*
 M: insn compute-sync-points* drop ;
 
 : compute-live-intervals-step ( bb -- )
-    dup kill-block?>> [ drop ] [
-        {
-            [ block-from from set ]
-            [ block-to to set ]
-            [ handle-live-out ]
-            [
-                instructions>> <reversed> [
-                    [ compute-live-intervals* ]
-                    [ compute-sync-points* ]
-                    bi
-                ] each
-            ]
-        } cleave
-    ] if ;
+    {
+        [ block-from from set ]
+        [ block-to to set ]
+        [ handle-live-out ]
+        [
+            instructions>> <reversed> [
+                [ compute-live-intervals* ]
+                [ compute-sync-points* ]
+                bi
+            ] each
+        ]
+    } cleave ;
 
 : init-live-intervals ( -- )
     H{ } clone live-intervals set
@@ -207,8 +203,6 @@ ERROR: bad-live-interval live-interval ;
     dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
 
 : finish-live-intervals ( live-intervals -- seq )
-    ! Since live intervals are computed in a backward order, we have
-    ! to reverse some sequences, and compute the start and end.
     values dup [
         {
             [ [ { } like reverse! ] change-ranges drop ]
@@ -220,7 +214,8 @@ ERROR: bad-live-interval live-interval ;
 
 : compute-live-intervals ( cfg -- live-intervals sync-points )
     init-live-intervals
-    linearization-order <reversed> [ compute-live-intervals-step ] each
+    linearization-order <reversed> [ kill-block?>> not ] filter
+    [ compute-live-intervals-step ] each
     live-intervals get finish-live-intervals
     sync-points get ;
 

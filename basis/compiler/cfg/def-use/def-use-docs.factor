@@ -4,7 +4,7 @@ IN: compiler.cfg.def-use
 
 HELP: compute-insns
 { $values { "cfg" cfg } }
-{ $description "Computes a mapping from vregs to the instructions that define them and store the result in the " { $link insns } " variable." } ;
+{ $description "Computes a mapping from vregs to the instructions that define them and store the result in the " { $link insns } " variable. The " { $link insn-of } " word can then be used to access the assoc." } ;
 
 HELP: defs-vregs
 { $values { "insn" insn } { "seq" sequence } }
