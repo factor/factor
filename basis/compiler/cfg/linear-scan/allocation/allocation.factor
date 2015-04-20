@@ -18,24 +18,22 @@ IN: compiler.cfg.linear-scan.allocation
         _ add-use-position
     ] each ;
 
-: register-status ( new -- free-pos )
-    dup free-positions
+: register-status ( new registers -- free-pos )
+    over reg-class>> free-positions
     [ inactive-positions ] [ active-positions ] [ nip ] 2tri
     >alist alist-max ;
 
 : no-free-registers? ( result -- ? )
     second 0 = ; inline
 
-: assign-register ( new -- )
-    dup register-status {
+: assign-register ( new registers -- )
+    dupd register-status {
         { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
         { [ 2dup register-available? ] [ register-available ] }
         [ drop assign-blocked-register ]
     } cond ;
 
 : spill-at-sync-point? ( sync-point live-interval -- ? )
-    ! If the live interval has a definition at a keep-dst?
-    ! sync-point, don't spill.
     {
         [ drop keep-dst?>> not ]
         [ [ n>> ] dip find-use dup [ def-rep>> ] when not ]
@@ -49,25 +47,22 @@ GENERIC: handle ( obj -- )
 
 M: live-interval-state handle
     [ start>> [ deactivate-intervals ] [ activate-intervals ] bi ]
-    [ assign-register ] bi ;
+    [ registers get assign-register ] bi ;
 
-: handle-sync-point ( sync-point -- )
-    active-intervals get values
-    [ [ spill-at-sync-point ] with filter! drop ] with each ;
+: handle-sync-point ( sync-point active-intervals -- )
+    values [ [ spill-at-sync-point ] with filter! drop ] with each ;
 
 M: sync-point handle ( sync-point -- )
     [ n>> [ deactivate-intervals ] [ activate-intervals ] bi ]
-    [ handle-sync-point ] bi ;
+    [ active-intervals get handle-sync-point ] bi ;
 
 : (allocate-registers) ( unhandled-min-heap -- )
     [ drop handle ] slurp-heap ;
 
-: finish-allocation ( -- )
-    active-intervals inactive-intervals
-    [ get values [ handled-intervals get push-all ] each ] bi@ ;
+: gather-intervals ( -- live-intervals )
+    handled-intervals get
+    active-intervals inactive-intervals [ get values concat ] bi@ 3append ;
 
-: allocate-registers ( live-intervals sync-point machine-registers -- live-intervals )
-    init-allocator
-    unhandled-min-heap get (allocate-registers)
-    finish-allocation
-    handled-intervals get ;
+: allocate-registers ( live-intervals sync-point registers -- live-intervals' )
+    init-allocator unhandled-min-heap get (allocate-registers)
+    gather-intervals ;
