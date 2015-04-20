@@ -38,9 +38,6 @@ ERROR: bad-live-ranges interval ;
     ] [ 2drop ] if ;
 
 : spill-before ( before -- before/f )
-    ! If the interval does not have any usages before the spill location,
-    ! then it is the second child of an interval that was split. We reload
-    ! the value and let the resolve pass insert a spill later.
     dup uses>> empty? [ drop f ] [
         {
             [ ]
@@ -141,7 +138,7 @@ ERROR: bad-live-ranges interval ;
     ! and spilled.
     [ first spill-intersecting ] [ register-available ] 2bi ;
 
-: spill-partially-available ( live-interval pair -- )
+: spill-partially-available ( new pair -- )
     [ second 1 - split-for-spill [ add-unhandled ] when* ] keep
     '[ _ spill-available ] when* ;
 

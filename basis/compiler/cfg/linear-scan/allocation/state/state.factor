@@ -144,11 +144,11 @@ SYMBOL: spill-slots
     H{ } clone spill-slots set
     -1 progress set ;
 
-: free-positions ( new -- assoc )
-    reg-class>> registers get at
-    [ 1/0. ] H{ } <linked-assoc> map>assoc ;
+: free-positions ( registers reg-class -- assoc )
+    of [ 1/0. ] H{ } <linked-assoc> map>assoc ;
 
-: add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;
+: add-use-position ( n reg assoc -- )
+    [ [ min ] when* ] change-at ;
 
 : register-available? ( new result -- ? )
     [ end>> ] [ second ] bi* < ; inline
