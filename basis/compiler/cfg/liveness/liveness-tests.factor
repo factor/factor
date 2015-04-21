@@ -2,7 +2,7 @@ USING: accessors compiler.cfg.liveness
 compiler.cfg compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
-namespaces sequences kernel tools.test vectors alien math
+dlists namespaces sequences kernel tools.test vectors alien math
 compiler.cfg.comparisons cpu.x86.assembler.operands assocs ;
 IN: compiler.cfg.liveness.tests
 QUALIFIED: sets
@@ -82,6 +82,13 @@ QUALIFIED: sets
 { H{ { 3 3 } } } [
     H{ { 37 99 } { 99 99 } { 2 99 } } leader-map set
     H{ { 37 37 } { 3 3 } } dup T{ ##peek f 2 D 0 0 } kill-defs
+] unit-test
+
+! liveness-step
+{ 3 } [
+    init-liveness
+    3 iota [ <basic-block> swap >>number ] map <basic-block>
+    [ connect-Nto1-bbs ] keep liveness-step length
 ] unit-test
 
 ! lookup-base-pointer
