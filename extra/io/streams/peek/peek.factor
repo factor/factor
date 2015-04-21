@@ -68,7 +68,7 @@ M: peek-stream stream-flush stream>> stream-flush ;
 M: peek-stream stream-tell stream>> stream-tell ;
 M: peek-stream stream-seek stream>> stream-seek ;
 
-: stream-peek1 ( stream -- ch )
+: stream-peek1 ( stream -- elt )
     dup peeked>> [
         dup stream>> stream-read1 [
             [ 1vector over stream-clone-resizable >>peeked drop ] keep
@@ -88,5 +88,5 @@ M: peek-stream stream-seek stream>> stream-seek ;
         [ reverse swap peeked>> push-all ] keep
     ] if ;
 
-: peek1 ( -- seq ) input-stream get stream-peek1 ; inline
+: peek1 ( -- elt ) input-stream get stream-peek1 ; inline
 : peek ( n -- seq ) input-stream get stream-peek ; inline
