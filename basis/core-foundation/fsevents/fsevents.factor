@@ -10,8 +10,8 @@ FROM: namespaces => change-global ;
 IN: core-foundation.fsevents
 
 SPECIALIZED-ARRAY: void*
-SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAY: longlong
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: ulonglong
 
 CONSTANT: kFSEventStreamCreateFlagNone 0x00000000
 CONSTANT: kFSEventStreamCreateFlagUseCFTypes 0x00000001
@@ -41,8 +41,8 @@ CONSTANT: kFSEventStreamEventFlagItemIsFile 0x00010000
 CONSTANT: kFSEventStreamEventFlagItemIsDir 0x00020000
 CONSTANT: kFSEventStreamEventFlagItemIsSymlink 0x00040000
 
-TYPEDEF: int FSEventStreamCreateFlags
-TYPEDEF: int FSEventStreamEventFlags
+TYPEDEF: uint FSEventStreamCreateFlags
+TYPEDEF: uint FSEventStreamEventFlags
 TYPEDEF: ulonglong FSEventStreamEventId
 TYPEDEF: void* FSEventStreamRef
 
@@ -182,8 +182,8 @@ SYMBOL: event-stream-callbacks
 
 :: (master-event-source-callback) ( eventStream info numEvents eventPaths eventFlags eventIds -- )
     eventPaths numEvents void* <c-direct-array> [ utf8 alien>string ] { } map-as
-    eventFlags numEvents int <c-direct-array>
-    eventIds numEvents longlong <c-direct-array>
+    eventFlags numEvents uint <c-direct-array>
+    eventIds numEvents ulonglong <c-direct-array>
     3array flip
     info event-stream-callbacks get at [ drop ] or call( changes -- ) ;
 
