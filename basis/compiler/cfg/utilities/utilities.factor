@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit compiler.cfg
-compiler.cfg.instructions compiler.cfg.rpo cpu.architecture fry
+compiler.cfg.instructions compiler.cfg.rpo cpu.architecture deques fry
 kernel locals make math namespaces sequences sets ;
 IN: compiler.cfg.utilities
 
@@ -83,9 +83,6 @@ IN: compiler.cfg.utilities
 : <copy> ( dst src -- insn )
     any-rep ##copy new-insn ;
 
-: apply-passes ( obj passes -- )
-    [ execute( x -- ) ] with each ;
-
 : connect-bbs ( from to -- )
     [ [ successors>> ] dip suffix! drop ]
     [ predecessors>> swap suffix! drop ] 2bi ;
@@ -95,3 +92,10 @@ IN: compiler.cfg.utilities
 
 : make-edges ( block-map edgelist -- )
     [ [ of ] with map first2 connect-bbs ] with each ;
+
+! Abstract generic stuff
+: apply-passes ( obj passes -- )
+    [ execute( x -- ) ] with each ;
+
+: slurp/replenish-deque ( ... deque quot: ( ... obj -- ... seq ) -- ... )
+      over '[ @ _ push-all-front ] slurp-deque ; inline
