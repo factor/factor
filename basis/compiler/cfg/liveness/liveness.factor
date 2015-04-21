@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.predecessors
+USING: accessors assocs combinators combinators.short-circuit
+compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
 cpu.architecture deques dlists fry kernel locals namespaces
@@ -93,13 +93,11 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
     } case ;
 
 : gc-roots ( live-set -- derived-roots gc-roots )
-    V{ } clone HS{ } clone
-    [ '[ drop _ _ visit-gc-root ] assoc-each ] 2keep
-    members ;
+    keys V{ } clone HS{ } clone
+    [ '[ _ _ visit-gc-root ] each ] 2keep members ;
 
 : fill-gc-map ( live-set gc-map -- )
-    [ representations get [ gc-roots ] [ drop f f ] if ] dip
-    [ gc-roots<< ] [ derived-roots<< ] bi ;
+    [ gc-roots ] dip [ gc-roots<< ] [ derived-roots<< ] bi ;
 
 M: gc-map-insn visit-insn ( live-set insn -- )
     [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] 2tri ;
@@ -110,11 +108,6 @@ M: insn visit-insn 2drop ;
 
 : transfer-liveness ( live-set insns -- )
     <reversed> [ visit-insn ] with each ;
-
-SYMBOL: work-list
-
-: add-to-work-list ( basic-blocks -- )
-    work-list get push-all-front ;
 
 : compute-live-in ( basic-block -- live-in )
     [ live-out clone dup ] keep instructions>> transfer-liveness ;
@@ -138,23 +131,23 @@ SYMBOL: work-list
     [ compute-live-out ] keep
     live-outs get maybe-set-at ;
 
-: liveness-step ( basic-block -- )
-    dup update-live-out [
-        dup update-live-in
-        [ predecessors>> add-to-work-list ] [ drop ] if
-    ] [ drop ] if ;
+: update-live-out/in ( basic-block -- changed? )
+    { [ update-live-out ] [ update-live-in ] } 1&& ;
 
-: compute-live-sets ( cfg -- )
-    <hashed-dlist> work-list set
+: liveness-step ( basic-block -- basic-blocks )
+    [ update-live-out/in ] keep predecessors>> { } ? ;
+
+: init-liveness ( -- )
     H{ } clone live-ins set
     H{ } clone edge-live-ins set
     H{ } clone live-outs set
-    H{ } clone base-pointers set
+    H{ } clone base-pointers set ;
 
-    [ needs-predecessors ]
-    [ compute-insns ]
-    [ post-order add-to-work-list ] tri
-    work-list get [ liveness-step ] slurp-deque ;
+: compute-live-sets ( cfg -- )
+    init-liveness
+    dup needs-predecessors dup compute-insns
+    post-order <hashed-dlist> [ push-all-front ] keep
+    [ liveness-step ] slurp/replenish-deque ;
 
 : live-in? ( vreg bb -- ? ) live-in key? ;
 
