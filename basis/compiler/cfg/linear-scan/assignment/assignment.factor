@@ -5,7 +5,7 @@ compiler.cfg.linearization compiler.cfg.liveness compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.renaming.functor
 compiler.cfg.ssa.destruction.leaders cpu.architecture
-fry heaps kernel locals make math namespaces sequences sets ;
+fry heaps kernel make math namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.assignment
 
@@ -22,11 +22,9 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
-:: vreg>reg ( vreg -- reg/spill-slot )
-    vreg leader :> leader
-    leader pending-interval-assoc get at* [
-        drop leader vreg rep-of lookup-spill-slot
-    ] unless ;
+: vreg>reg ( vreg -- reg/spill-slot )
+    dup leader dup pending-interval-assoc get at
+    [ 2nip ] [ swap rep-of lookup-spill-slot ] if* ;
 
 ERROR: not-spilled-error vreg ;
 
@@ -124,9 +122,9 @@ M: insn assign-registers-in-insn drop ;
         [ compute-live-in ]
     } cleave ;
 
-:: assign-registers-in-block ( bb -- )
-    bb begin-block
-    bb [
+: assign-registers-in-block ( bb -- )
+    dup begin-block
+    [
         [
             [
                 {
@@ -137,9 +135,7 @@ M: insn assign-registers-in-insn drop ;
                 } cleave
             ] each
         ] V{ } make
-    ] change-instructions drop
-
-    bb compute-live-out ;
+    ] change-instructions compute-live-out ;
 
 : init-assignment ( live-intervals -- )
     [ [ start>> ] map ] keep zip >min-heap unhandled-intervals set
