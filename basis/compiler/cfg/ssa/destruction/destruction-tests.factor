@@ -25,12 +25,3 @@ IN: compiler.cfg.ssa.destruction.tests
     T{ ##parallel-copy { values V{ } } }
     [ cleanup-insn ] V{ } make
 ] unit-test
-
-! coalesce-leaders
-{
-    H{ { 30 60 } }
-} [
-    H{ } clone leader-map set
-    30 60 coalesce-leaders
-    leader-map get
-] unit-test
