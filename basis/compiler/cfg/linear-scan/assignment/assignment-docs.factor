@@ -25,6 +25,11 @@ HELP: assign-registers-in-insn
 { $values { "insn" insn } }
 { $description "Assigns physical registers and spill slots for the virtual registers used by the instruction." } ;
 
+HELP: compute-live-in
+{ $values { "bb" basic-block } }
+{ $description "" }
+{ $see-also machine-live-ins } ;
+
 HELP: machine-edge-live-ins
 { $var-description "Mapping from basic blocks to predecessors to values which are live on a particular incoming edge." } ;
 

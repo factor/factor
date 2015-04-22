@@ -1,5 +1,11 @@
-USING: compiler.cfg.linear-scan.live-intervals help.markup help.syntax ;
+USING: compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.live-intervals help.markup help.syntax ;
 IN: compiler.cfg.linear-scan.allocation.spilling
+
+HELP: assign-spill
+{ $values { "live-interval" live-interval } }
+{ $description "Assigns a spill slot for the live interval." }
+{ $see-also assign-spill-slot } ;
 
 HELP: spill-before
 { $values

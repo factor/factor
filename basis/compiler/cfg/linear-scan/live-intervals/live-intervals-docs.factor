@@ -28,6 +28,10 @@ HELP: live-interval-state
         { "The allocated register, set in the " { $link allocate-registers } " step." }
     }
     {
+        { $slot "spill-rep" }
+        { "Representation the vreg will have when it is spilled." }
+    }
+    {
         { $slot "spill-to" }
         { { $link spill-slot } " to use for spilling, if it needs to be spilled." }
     }
