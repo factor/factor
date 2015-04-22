@@ -9,7 +9,7 @@ compiler.cfg.representations
 compiler.cfg.representations.preferred compiler.cfg.rpo
 compiler.cfg.save-contexts
 compiler.cfg.utilities compiler.tree.builder
-compiler.tree.optimizer compiler.units hashtables io kernel math
+compiler.tree.optimizer compiler.units fry hashtables io kernel math
 namespaces prettyprint prettyprint.backend prettyprint.custom
 prettyprint.sections quotations random sequences vectors words ;
 FROM: compiler.cfg.linearization => number-blocks ;
@@ -17,36 +17,32 @@ IN: compiler.cfg.debugger
 
 GENERIC: test-builder ( quot -- cfgs )
 
+: build-optimized-tree ( callable/word -- tree )
+    reset-vreg-counter
+    build-tree optimize-tree ;
+
 M: callable test-builder
-    reset-vreg-counter build-tree optimize-tree gensym build-cfg ;
+    build-optimized-tree gensym build-cfg ;
 
 M: word test-builder
-    [ reset-vreg-counter build-tree optimize-tree ] keep build-cfg ;
+    [ build-optimized-tree ] keep build-cfg ;
+
+: run-passes ( cfgs passes -- cfgs' )
+    '[ dup cfg set dup _ apply-passes ] map ;
 
 : test-ssa ( quot -- cfgs )
-    test-builder [
-        [
-            dup optimize-cfg
-        ] with-cfg
-    ] map ;
+    test-builder { optimize-cfg } run-passes ;
 
 : test-flat ( quot -- cfgs )
-    test-builder [
-        [
-            dup optimize-cfg
-            dup select-representations
-            dup insert-gc-checks
-            dup insert-save-contexts
-        ] with-cfg
-    ] map ;
+    test-builder {
+        optimize-cfg
+        select-representations
+        insert-gc-checks
+        insert-save-contexts
+    } run-passes ;
 
 : test-regs ( quot -- cfgs )
-    test-builder [
-        [
-            dup optimize-cfg
-            dup finalize-cfg
-        ] with-cfg
-    ] map ;
+    test-builder { optimize-cfg finalize-cfg } run-passes ;
 
 GENERIC: insn. ( insn -- )
 
