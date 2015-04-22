@@ -6,8 +6,8 @@ compiler.cfg.liveness compiler.cfg.parallel-copy
 compiler.cfg.registers compiler.cfg.rpo compiler.cfg.ssa.cssa
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference
-compiler.cfg.ssa.interference.live-ranges cpu.architecture
-kernel locals make namespaces sequences sets ;
+compiler.cfg.ssa.interference.live-ranges compiler.cfg.utilities
+cpu.architecture kernel locals make namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 
@@ -27,19 +27,18 @@ SYMBOL: copies
 : init-coalescing ( -- )
     defs get
     [ [ drop dup ] assoc-map leader-map set ]
-    [ [ [ dup dup value-of ] dip <vreg-info> 1array ] assoc-map class-element-map set ] bi
+    [
+        [ [ dup dup value-of ] dip <vreg-info> 1array ] assoc-map
+        class-element-map set
+    ] bi
     V{ } clone copies set ;
-
-: coalesce-leaders ( vreg1 vreg2 -- )
-    ! leader2 becomes the leader.
-    swap leader-map get set-at ;
 
 : coalesce-elements ( merged vreg1 vreg2 -- )
     ! delete leader1's class, and set leader2's class to merged.
     class-element-map get [ delete-at ] [ set-at ] bi-curry bi* ;
 
 : coalesce-vregs ( merged leader1 leader2 -- )
-    [ coalesce-leaders ] [ coalesce-elements ] 2bi ;
+    2dup swap leader-map get set-at coalesce-elements ;
 
 GENERIC: prepare-insn ( insn -- )
 
@@ -77,7 +76,7 @@ ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
 
 :: must-eliminate-copy ( vreg1 vreg2 -- )
     ! Eliminate a copy.
-    vreg1 vreg2 eq? [
+    vreg1 vreg2 = [
         vreg1 vreg2 vregs-interfere?
         [ vreg1 vreg2 vregs-shouldn't-interfere ]
         [ vreg1 vreg2 coalesce-vregs ]
@@ -97,26 +96,28 @@ M: ##phi prepare-insn
 
 :: maybe-eliminate-copy ( vreg1 vreg2 -- )
     ! Eliminate a copy if possible.
-    vreg1 vreg2 eq? [
+    vreg1 vreg2 = [
         vreg1 vreg2 vregs-interfere?
         [ drop ] [ vreg1 vreg2 coalesce-vregs ] if
     ] unless ;
 
-: process-copies ( -- )
-    copies get [ leaders maybe-eliminate-copy ] assoc-each ;
+: process-copies ( copies -- )
+    [ leaders maybe-eliminate-copy ] assoc-each ;
+
+: perform-coalescing ( cfg -- )
+    prepare-coalescing copies get process-copies ;
 
 GENERIC: cleanup-insn ( insn -- )
 
 : useful-copy? ( insn -- ? )
-    [ dst>> ] [ src>> ] bi leaders eq? not ; inline
+    [ dst>> ] [ src>> ] bi leaders = not ; inline
 
 M: ##copy cleanup-insn
     dup useful-copy? [ , ] [ drop ] if ;
 
 M: ##parallel-copy cleanup-insn
-    values>>
-    [ first2 leaders 2array ] map [ first2 eq? not ] filter
-    [ parallel-copy-rep % ] unless-empty ;
+    values>> [ leaders ] assoc-map [ first2 = not ] filter
+    parallel-copy-rep % ;
 
 M: ##tagged>integer cleanup-insn
     dup useful-copy? [ , ] [ drop ] if ;
@@ -132,14 +133,13 @@ PRIVATE>
 
 : destruct-ssa ( cfg -- )
     {
-        [ needs-dominance ]
-        [ construct-cssa ]
-        [ compute-defs ]
-        [ compute-insns ]
-        [ compute-live-sets ]
-        [ compute-live-ranges ]
-        [ prepare-coalescing ]
-        [ drop process-copies ]
-        [ cleanup-cfg ]
-        [ compute-live-sets ]
-    } cleave ;
+        needs-dominance
+        construct-cssa
+        compute-defs
+        compute-insns
+        compute-live-sets
+        compute-live-ranges
+        perform-coalescing
+        cleanup-cfg
+        compute-live-sets
+    } apply-passes ;
