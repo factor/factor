@@ -34,6 +34,10 @@ HELP: live-in?
 { $values { "vreg" "virtual register" } { "bb" basic-block } { "?" "a boolean" } }
 { $description "Whether the vreg is live in the block or not." } ;
 
+HELP: live-ins
+{ $var-description "Hash that maps from basic blocks to vregs that are live in them." }
+{ $see-also compute-live-sets } ;
+
 HELP: lookup-base-pointer
 { $values { "vreg" "vreg" } { "vreg/f" "vreg or " { $link f } } }
 { $description "Tries to figure out what the base pointer for a vreg is. Can't use cache here because of infinite recursion inside the quotation passed to cache" }

@@ -18,7 +18,7 @@ HELP: <basic-block>
 { $description "Creates a new empty basic block. The " { $slot "id" } " slot is initialized with the value of the basic-block " { $link counter } "." } ;
 
 HELP: <cfg>
-{ $values { "entry" basic-block } { "word" word } { "label" "label" } { "cfg" cfg } }
+{ $values { "word" word } { "label" "label" } { "entry" basic-block } { "cfg" cfg } }
 { $description "Constructor for " { $link cfg } ". " { $slot "spill-area-size" } " and " { $slot "spill-area-align" } " are set to default values." } ;
 
 HELP: cfg
