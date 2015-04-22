@@ -6,6 +6,14 @@ compiler.cfg.instructions compiler.cfg.registers compiler.cfg.utilities
 cpu.architecture ;
 IN: compiler.cfg.def-use.tests
 
+! compute-insns
+{
+    T{ ##peek f 123 D 0 f }
+} [
+    { T{ ##peek f 123 D 0 } } 0 insns>block block>cfg compute-insns
+    123 insn-of
+] unit-test
+
 V{
     T{ ##peek f 0 D 0 }
     T{ ##peek f 1 D 0 }
