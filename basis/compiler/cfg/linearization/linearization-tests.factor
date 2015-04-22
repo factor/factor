@@ -23,11 +23,3 @@ V{ } 2 test-bb
     V{ } 10 insns>block [ process-block ] V{ } make
     [ number>> ] map
 ] unit-test
-
-! process-successor
-{ V{ 10 } } [
-    <dlist> work-list set
-    HS{ } clone visited set
-    V{ } 10 insns>block process-successor
-    work-list get dlist>sequence [ number>> ] map
-] unit-test
