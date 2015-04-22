@@ -27,7 +27,8 @@ ERROR: bad-peek dst loc ;
     [ dup n>> 0 < [ bad-peek ] [ ##peek, ] if ] each-insertion ;
 
 : insert-replaces ( from to -- )
-    2drop ;
+    [ inserting-replaces ] keep
+    [ dup n>> 0 < [ 2drop ] [ ##replace, ] if ] each-insertion ;
 
 : visit-edge ( from to -- )
     ! If both blocks are subroutine calls, don't bother

@@ -60,7 +60,6 @@ IN: compiler.cfg.stacks.local.tests
 {
     V{
         T{ ##copy { dst 1 } { src 3 } { rep any-rep } }
-        T{ ##replace { src 1 } { loc D 0 } }
         "eh"
     }
 } [

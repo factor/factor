@@ -65,11 +65,9 @@ SYMBOLS: local-peek-set replaces ;
     [ loc>> n>> 0 >= ] filter ;
 
 : changes>insns ( replaces height-state -- insns )
-    [ drop replaces>copy-insns ]
-    [ nip height-state>insns ]
-    [ replaces>replace-insns ] 2tri 3append ;
+    [ replaces>copy-insns ] [ height-state>insns ] bi* append ;
 
-: emit-changes ( replaces height-state -- )
+: emit-changes ( replaces state -- )
     building get pop -rot changes>insns % , ;
 
 : peek-loc ( loc -- vreg )
