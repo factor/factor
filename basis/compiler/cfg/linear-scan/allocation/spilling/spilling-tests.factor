@@ -1,11 +1,11 @@
-USING: compiler.cfg.instructions compiler.cfg.linear-scan.allocation.spilling
-compiler.cfg.linear-scan.live-intervals cpu.architecture sequences tools.test ;
+USING: assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation.spilling
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.live-intervals compiler.cfg.registers cpu.architecture
+kernel namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.allocation.spilling.tests
 
-! last-use-rep
-{
-    double-rep
-} [
+: test-live-interval ( -- live-interval )
     T{ live-interval-state
        { vreg 45 }
        { spill-to T{ spill-slot { n 8 } } }
@@ -19,7 +19,7 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
             { seq
               {
                   T{ live-range { from 22 } { to 47 } }
-                        T{ live-range { from 67 } { to 68 } }
+                  T{ live-range { from 67 } { to 68 } }
                   T{ live-range { from 69 } { to 72 } }
               }
             }
@@ -33,5 +33,18 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
              }
          }
        }
-    } last-use-rep
+    } ;
+
+! assign-spill
+{ T{ spill-slot f 0 } } [
+    f f <basic-block> <cfg> cfg set
+    H{ } clone spill-slots set
+    H{ { 45 double-2-rep } } representations set
+    test-live-interval assign-spill
+    { 45 8 } spill-slots get at
+] unit-test
+
+! last-use-rep
+{ double-rep } [
+    test-live-interval last-use-rep
 ] unit-test
