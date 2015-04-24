@@ -224,7 +224,7 @@ these lines in your .emacs:
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:"
-    "C:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:" "CONSTANT:"
+    "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:"
     "CONSULT:" "call-next-method"
     "DEFER:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:"
@@ -242,7 +242,7 @@ these lines in your .emacs:
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
     "TYPEDEF:" "TYPED:" "TYPED::"
-    "UNIFORM-TUPLE:" "UNION:" "USE:"
+    "UNIFORM-TUPLE:" "USE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
 (defconst factor-parsing-words-regex
@@ -255,7 +255,7 @@ these lines in your .emacs:
   (regexp-opt factor-constant-words 'symbols))
 
 (defconst factor-bracer-words
-  '("B" "BV" "C" "CS" "H" "T" "V" "W"))
+  '("B" "BV" "C" "CS" "H" "HS" "T" "V" "W"))
 
 (defconst factor-brace-words-regex
   (format "%s{" (regexp-opt factor-bracer-words t)))
@@ -323,7 +323,7 @@ these lines in your .emacs:
 (defconst factor-symbol-definition-regex
   (factor-second-word-regex
    '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "HELP:" "LIBRARY:"
-     "SYMBOL:" "VAR:")))
+     "STRING:" "SYMBOL:" "VAR:")))
 
 (defconst factor-symbols-lines-regex "^\\(SYMBOLS\\):[ \n]+\\([^;\t]*\\);")
 
@@ -333,7 +333,7 @@ these lines in your .emacs:
 (defconst factor-type-definition-regex
   (factor-second-word-regex
    '("C-STRUCT:" "C-UNION:" "COM-INTERFACE:" "MIXIN:" "SINGLETON:"
-     "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:" "UNION-STRUCT:")))
+     "SPECIALIZED-ARRAY:" "STRUCT:" "UNION-STRUCT:")))
 
 (defconst factor-error-regex
   (factor-second-word-regex '("ERROR:")))
@@ -391,7 +391,7 @@ these lines in your .emacs:
 (defconst factor-single-liner-regex
   (regexp-opt '("ABOUT:"
                 "ALIAS:"
-                "CONSTANT:" "C:" "C-GLOBAL:" "C-TYPE:"
+                "CONSTANT:" "C-GLOBAL:" "C-TYPE:"
                 "DEFER:" "DESTRUCTOR:"
                 "FORGET:"
                 "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:"
@@ -429,7 +429,7 @@ these lines in your .emacs:
           "M[^:]*: [^ ]+ [^ ]+"))
 
 (defconst factor-constructor-decl-regex
-  "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+  "\\_<\\(C:\\)[ \n]+\\([^ ]+\\)[ \n]+\\([^ ]+\\)")
 
 (defconst factor-typedef-regex
   (format "\\_<TYPEDEF: +%s +%s\\( .*\\)?$" symbol symbol))
@@ -459,9 +459,10 @@ these lines in your .emacs:
      (2 'factor-font-lock-vocabulary-name)
      (3 'factor-font-lock-word))
     (,factor-constructor-decl-regex
-     (1 'factor-font-lock-word)
-     (2 'factor-font-lock-type-name)
-     (3 'factor-font-lock-invalid-syntax nil t))
+     (1 'factor-font-lock-parsing-word)
+     (2 'factor-font-lock-word)
+     (3 'factor-font-lock-type-name))
+    (,"\\(^\\| \\|\t\\)\\(![^\n]+\\)\n" 2 'factor-font-lock-comment)
     (,factor-typedef-regex (1 'factor-font-lock-type-name)
                            (2 'factor-font-lock-type-name)
                            (3 'factor-font-lock-invalid-syntax nil t))
@@ -498,8 +499,8 @@ these lines in your .emacs:
     ;; that are slot names which are highlighted with the face
     ;; factor-font-lock-symbol.
     (,(format
-       "\\(%s\\):[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
-       (regexp-opt '("ENUM" "PROTOCOL" "STRUCT" "TUPLE" "UNION-STRUCT"))
+       "\\(%s:\\)[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
+       (regexp-opt '("ENUM" "PROTOCOL" "STRUCT" "TUPLE" "UNION" "UNION-STRUCT"))
        symbol
        symbol)
      (1 'factor-font-lock-parsing-word)
@@ -880,9 +881,8 @@ With prefix, non-existing files will be created."
 (defvar factor-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?\" "\"" table)
-    (modify-syntax-entry ?! "< 2b" table)
-    (modify-syntax-entry ?\n "> b" table)
     (modify-syntax-entry ?# "_ 1b" table)
+    (modify-syntax-entry ?! "_" table)
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?@ "_" table)
     (modify-syntax-entry ?? "_" table)
