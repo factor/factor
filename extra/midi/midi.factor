@@ -379,33 +379,29 @@ M: midi-event write-event
         { "reset" [ 2drop 0xff dup write1 ] }
     } case ;
 
-: write-header ( header -- )
+GENERIC: write-chunk ( chunk -- )
+
+M: midi-header write-chunk
     $[ "MThd" >byte-array ] write
     $[ 6 4 >be ] write
     [ format>> ] [ #chunks>> ] [ division>> ] tri
     [ 2 >be write ] tri@ ;
 
-: write-track ( track -- )
+M: midi-track write-chunk
     $[ "MTrk" >byte-array ] write
     binary [
         events>> f swap [ write-event ] each drop
     ] with-byte-writer
     [ length 4 >be write ] [ write ] bi ;
 
-: write-chunk ( chunks -- )
-    {
-        { [ dup midi-header? ] [ write-header ] }
-        { [ dup midi-track? ] [ write-track ] }
-        [
-            [ type>> write ]
-            [ bytes>> [ length 4 >be write ] [ write ] bi ] bi
-        ]
-    } cond ;
+M: midi-chunk write-chunk
+    [ type>> write ]
+    [ bytes>> [ length 4 >be write ] [ write ] bi ] bi ;
 
 PRIVATE>
 
 : write-midi ( midi -- )
-    [ header>> write-header ]
+    [ header>> write-chunk ]
     [ chunks>> [ write-chunk ] each ] bi ;
 
 : midi> ( midi -- byte-array )
