@@ -427,13 +427,13 @@ PRIVATE>
 
 <PRIVATE
 
-: (map-find-index) ( seq quot find-quot -- result elt index )
+: (map-find-index) ( seq quot find-quot -- result i elt )
     [ [ f ] 2dip [ [ nip ] 2dip call dup ] curry ] dip call
     [ [ [ drop f ] unless ] keep ] dip ; inline
 
 PRIVATE>
 
-: map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result elt index )
+: map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-index ] (map-find-index) ; inline
 
 : filter-length ( seq n -- seq' ) '[ length _ = ] filter ;
@@ -527,3 +527,9 @@ PRIVATE>
 
 : count* ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
     over [ count ] [ length ] bi* / ; inline
+
+: find-last-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
+    [ [ 1 - ] dip find-last-integer ] (find-index) ; inline
+
+: map-find-last-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
+    [ find-last-index ] (map-find-index) ; inline
