@@ -29,9 +29,6 @@ IN: compiler.cfg.stacks.local
 : translate-local-loc ( loc state -- loc' )
     [ clone ] dip over >loc< 0 1 ? rot nth first - >>n ;
 
-: untranslate-local-loc ( loc state -- loc' )
-    [ clone ] dip over >loc< 0 1 ? rot nth first + >>n ;
-
 : clone-height-state ( state -- state' )
     [ clone ] map ;
 
@@ -58,11 +55,6 @@ SYMBOLS: local-peek-set replaces ;
 
 : replaces>copy-insns ( replaces -- insns )
     [ [ loc>vreg ] dip ] assoc-map parallel-copy ;
-
-: replaces>replace-insns ( replaces height-state -- insns )
-    [ keys ] dip
-    '[ [ loc>vreg ] [ _ untranslate-local-loc ] bi f ##replace boa ] map
-    [ loc>> n>> 0 >= ] filter ;
 
 : changes>insns ( replaces height-state -- insns )
     [ replaces>copy-insns ] [ height-state>insns ] bi* append ;
