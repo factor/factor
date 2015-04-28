@@ -16,6 +16,12 @@ SYMBOLS: loop-heads visited ;
 
 : visited? ( bb -- ? ) visited get in? ;
 
+: predecessors-ready? ( bb -- ? )
+    [ predecessors>> ] keep '[
+        _ 2dup back-edge?
+        [ 2drop t ] [ drop visited? ] if
+    ] all? ;
+
 : (find-alternate-loop-head) ( bb -- bb' )
     dup {
         [ predecessor visited? not ]
@@ -32,12 +38,6 @@ SYMBOLS: loop-heads visited ;
         nip (find-alternate-loop-head)
     ] if ;
 
-: predecessors-ready? ( bb -- ? )
-    [ predecessors>> ] keep '[
-        _ 2dup back-edge?
-        [ 2drop t ] [ drop visited? ] if
-    ] all? ;
-
 : sorted-successors ( bb -- seq )
     successors>> <reversed> [ loop-nesting-at ] sort-with ;
 
@@ -50,7 +50,7 @@ SYMBOLS: loop-heads visited ;
 : (linearization-order) ( cfg -- bbs )
     HS{ } clone visited set
     entry>> <dlist> [ push-back ] keep
-    [ [ process-block ] slurp/replenish-deque ] { } make ;
+    [ dup '[ process-block _ push-all-back ] slurp-deque ] { } make ;
 
 PRIVATE>
 
