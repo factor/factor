@@ -17,3 +17,6 @@ M: rotated virtual@ [ n>> + ] [ circular>> ] bi ;
 M: rotated virtual-exemplar circular>> ;
 
 INSTANCE: rotated virtual-sequence
+
+: all-rotations ( seq -- seq' )
+    dup length iota [ <rotated> ] with map ;
