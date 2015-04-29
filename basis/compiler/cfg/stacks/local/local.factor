@@ -70,7 +70,7 @@ SYMBOLS: local-peek-set replaces ;
     height-state get translate-local-loc replaces get set-at ;
 
 : compute-local-kill-set ( basic-block -- set )
-    [ rs-heights get at ] [ ds-heights get at ] bi
+    [ ds-heights get at ] [ rs-heights get at ] bi
     height-state get local-kill-set ;
 
 : begin-local-analysis ( basic-block -- )

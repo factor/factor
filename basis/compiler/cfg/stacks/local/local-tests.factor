@@ -69,6 +69,25 @@ IN: compiler.cfg.stacks.local.tests
     ] V{ } make
 ] cfg-unit-test
 
+! compute-local-kill-set
+{ 0 } [
+    V{ } 0 insns>block 0 0 pick record-stack-heights
+    compute-local-kill-set sets:cardinality
+] unit-test
+
+{ HS{ R -4 } } [
+    V{ } 0 insns>block 4 4 pick record-stack-heights
+    { { 8 0 } { 3 0 } } height-state set
+    compute-local-kill-set
+] unit-test
+
+{ HS{ D -1 D -2 } } [
+    V{ } 0 insns>block [ 2 0 rot record-stack-heights ] keep
+    { { 0 0 } { 0 0 } } height-state set
+    compute-local-kill-set
+] cfg-unit-test
+
+! translate-local-loc
 { D 2 } [
     D 3 { { 1 2 } { 3 4 } } translate-local-loc
 ] unit-test
@@ -96,14 +115,3 @@ IN: compiler.cfg.stacks.local.tests
 { H{ { D -1 40 } } } [
     D 1 inc-stack 40 D 0 replace-loc replaces get
 ] cfg-unit-test
-
-{ 0 } [
-    V{ } 0 insns>block 0 0 pick record-stack-heights
-    compute-local-kill-set sets:cardinality
-] unit-test
-
-{ HS{ R -4 } } [
-    V{ } 0 insns>block 4 4 pick record-stack-heights
-    { { 8 0 } { 3 0 } } height-state set
-    compute-local-kill-set
-] unit-test
