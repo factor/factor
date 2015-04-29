@@ -11,9 +11,6 @@ IN: compiler.cfg.branch-splitting
     [ clone dup rename-insn-temps ] map ;
 
 : clone-basic-block ( bb -- bb' )
-    ! The new block temporarily gets the same RPO number as the
-    ! old one, until the next time RPO is computed. This is just
-    ! to make 'back-edge?' work.
     <basic-block>
         swap
         {
@@ -51,7 +48,7 @@ IN: compiler.cfg.branch-splitting
     [ update-successor-predecessors ]
     2bi ;
 
-UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
+UNION: irrelevant ##peek ##replace ##inc ;
 
 : split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
 

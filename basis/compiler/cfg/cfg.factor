@@ -1,38 +1,39 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces vectors ;
+USING: accessors kernel layouts math namespaces vectors ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
-{ id integer }
-number
-{ instructions vector }
-{ successors vector }
-{ predecessors vector }
-{ kill-block? boolean }
-{ unlikely? boolean } ;
+    number
+    { instructions vector }
+    { successors vector }
+    { predecessors vector }
+    { kill-block? boolean } ;
 
 : <basic-block> ( -- bb )
     basic-block new
-        \ basic-block counter >>id
         V{ } clone >>instructions
         V{ } clone >>successors
         V{ } clone >>predecessors ;
 
-M: basic-block hashcode* nip id>> ;
+TUPLE: cfg
+    { entry basic-block }
+    word
+    label
+    { spill-area-size integer }
+    { spill-area-align integer }
+    stack-frame
+    frame-pointer?
+    post-order linear-order
+    predecessors-valid? dominance-valid? loops-valid? ;
 
-TUPLE: cfg { entry basic-block } word label
-spill-area-size spill-area-align
-stack-frame
-frame-pointer?
-post-order linear-order
-predecessors-valid? dominance-valid? loops-valid? ;
-
-: <cfg> ( entry word label -- cfg )
+: <cfg> ( word label entry -- cfg )
     cfg new
+        swap >>entry
         swap >>label
         swap >>word
-        swap >>entry ;
+        0 >>spill-area-size
+        cell >>spill-area-align ;
 
 : cfg-changed ( cfg -- )
     f >>post-order

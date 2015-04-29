@@ -116,13 +116,16 @@ HELP: catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs a copy of the current catchstack." } ;
 
+HELP: current-continuation
+{ $values { "continuation" continuation } }
+{ $description "Creates a continuation object from the current execution context." } ;
+
 HELP: set-catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Replaces the catchstack with a copy of the given vector." } ;
 
 HELP: continuation
-{ $values { "continuation" continuation } }
-{ $description "Reifies the current continuation from the point immediately after which the caller returns." } ;
+{ $class-description "Reifies the current continuation from the point immediately after which the caller returns." } ;
 
 HELP: >continuation<
 { $values { "continuation" continuation } { "data" vector } { "call" vector } { "retain" vector } { "name" vector } { "catch" vector } }

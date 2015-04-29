@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.predecessors
-deques dlists fry kernel namespaces sequences sets ;
+USING: accessors assocs combinators.short-circuit compiler.cfg
+compiler.cfg.predecessors compiler.cfg.utilities deques dlists fry kernel
+namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.loop-detection
 
@@ -39,18 +40,13 @@ DEFER: find-loop-headers
         2tri
     ] [ drop ] if ;
 
-SYMBOL: work-list
-
-: process-loop-block ( bb loop -- )
-    2dup blocks>> ?adjoin [
-        2dup header>> eq? [ 2drop ] [
-            drop predecessors>> work-list get push-all-front
-        ] if
-    ] [ 2drop ] if ;
+: process-loop-block ( bb loop -- bbs )
+    dupd { [ blocks>> ?adjoin ] [ header>> eq? not ] } 2&&
+    swap predecessors>> { } ? ;
 
 : process-loop-ends ( loop -- )
-    [ ends>> members <dlist> [ push-all-front ] [ work-list set ] [ ] tri ] keep
-    '[ _ process-loop-block ] slurp-deque ;
+    dup ends>> members <dlist> [ push-all-front ] keep
+    swap '[ _ process-loop-block ] slurp/replenish-deque ;
 
 : process-loop-headers ( -- )
     loops get values [ process-loop-ends ] each ;

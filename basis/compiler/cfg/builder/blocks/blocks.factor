@@ -1,31 +1,27 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.stacks compiler.cfg.stacks.local kernel make math
-namespaces sequences ;
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities fry kernel
+make math namespaces sequences ;
 SLOT: in-d
 SLOT: out-d
 IN: compiler.cfg.builder.blocks
 
 : set-basic-block ( basic-block -- )
-    [ basic-block set ] [ instructions>> building set ] bi
-    begin-local-analysis ;
-
-: initial-basic-block ( -- )
-    <basic-block> set-basic-block ;
+    [ basic-block set ]
+    [ instructions>> building set ]
+    [ begin-local-analysis ] tri ;
 
 : end-basic-block ( -- )
-    basic-block get [ end-local-analysis ] when
+    basic-block get [ end-local-analysis ] when*
     building off
     basic-block off ;
 
 : (begin-basic-block) ( -- )
-    <basic-block>
-    basic-block get [ dupd successors>> push ] when*
-    set-basic-block ;
+    <basic-block> basic-block get [ over connect-bbs ] when* set-basic-block ;
 
 : begin-basic-block ( -- )
-    basic-block get [ end-local-analysis ] when
+    basic-block get [ end-local-analysis ] when*
     (begin-basic-block) ;
 
 : emit-trivial-block ( quot -- )
@@ -46,29 +42,25 @@ IN: compiler.cfg.builder.blocks
         make-kill-block
     ] emit-trivial-block ;
 
-: begin-branch ( -- ) clone-current-height (begin-basic-block) ;
+: begin-branch ( -- )
+    height-state [ clone-height-state ] change
+    (begin-basic-block) ;
 
 : end-branch ( -- pair/f )
-    ! pair is { final-bb final-height }
     basic-block get dup [
         ##branch,
         end-local-analysis
-        current-height get clone 2array
-    ] when ;
+        height-state get clone-height-state 2array
+    ] when* ;
 
 : with-branch ( quot -- pair/f )
     [ begin-branch call end-branch ] with-scope ; inline
 
-: set-successors ( branches -- )
-    ! Set the successor of each branch's final basic block to the
-    ! current block.
-    [ [ [ basic-block get ] dip first successors>> push ] when* ] each ;
-
 : emit-conditional ( branches -- )
     ! branches is a sequence of pairs as above
     end-basic-block
-    dup [ ] find nip dup [
-        second current-height set
+    sift [
+        dup first second height-state set
         begin-basic-block
-        set-successors
-    ] [ 2drop ] if ;
+        [ first ] map basic-block get connect-Nto1-bbs
+    ] unless-empty ;

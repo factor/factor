@@ -5,7 +5,7 @@ compiler.cfg.linearization compiler.cfg.liveness compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.renaming.functor
 compiler.cfg.ssa.destruction.leaders cpu.architecture
-fry heaps kernel locals make math namespaces sequences sets ;
+fry heaps kernel make math namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.assignment
 
@@ -22,11 +22,9 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
-:: vreg>reg ( vreg -- reg )
-    vreg leader :> leader
-    leader pending-interval-assoc get at* [
-        drop leader vreg rep-of lookup-spill-slot
-    ] unless ;
+: vreg>reg ( vreg -- reg/spill-slot )
+    dup leader dup pending-interval-assoc get at
+    [ 2nip ] [ swap rep-of lookup-spill-slot ] if* ;
 
 ERROR: not-spilled-error vreg ;
 
@@ -34,11 +32,10 @@ ERROR: not-spilled-error vreg ;
     dup vreg>reg dup spill-slot? [ nip ] [ drop leader not-spilled-error ] if ;
 
 : vregs>regs ( vregs -- assoc )
-    [ f ] [ [ dup vreg>reg ] H{ } map>assoc ] if-empty ;
+    [ dup vreg>reg ] H{ } map>assoc ;
 
 SYMBOL: unhandled-intervals
 
-! Liveness info is used by resolve pass
 SYMBOL: machine-live-ins
 
 : machine-live-in ( bb -- assoc )
@@ -47,8 +44,6 @@ SYMBOL: machine-live-ins
 : compute-live-in ( bb -- )
     [ live-in keys vregs>regs ] keep machine-live-ins get set-at ;
 
-! Mapping from basic blocks to predecessors to values which are
-! live on a particular incoming edge
 SYMBOL: machine-edge-live-ins
 
 : machine-edge-live-in ( predecessor bb -- assoc )
@@ -65,14 +60,6 @@ SYMBOL: machine-live-outs
 
 : compute-live-out ( bb -- )
     [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
-
-: init-assignment ( live-intervals -- )
-    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals set
-    <min-heap> pending-interval-heap set
-    H{ } clone pending-interval-assoc set
-    H{ } clone machine-live-ins set
-    H{ } clone machine-edge-live-ins set
-    H{ } clone machine-live-outs set ;
 
 : heap-pop-while ( heap quot: ( key -- ? ) -- values )
     '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
@@ -135,10 +122,10 @@ M: insn assign-registers-in-insn drop ;
         [ compute-live-in ]
     } cleave ;
 
-:: assign-registers-in-block ( bb -- )
-    bb [
+: assign-registers-in-block ( bb -- )
+    dup begin-block
+    [
         [
-            bb begin-block
             [
                 {
                     [ insn#>> 1 - prepare-insn ]
@@ -147,11 +134,18 @@ M: insn assign-registers-in-insn drop ;
                     [ , ]
                 } cleave
             ] each
-            bb compute-live-out
         ] V{ } make
-    ] change-instructions drop ;
+    ] change-instructions compute-live-out ;
 
-: assign-registers ( live-intervals cfg -- )
-    [ init-assignment ] dip
+: init-assignment ( live-intervals -- )
+    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals set
+    <min-heap> pending-interval-heap set
+    H{ } clone pending-interval-assoc set
+    H{ } clone machine-live-ins set
+    H{ } clone machine-edge-live-ins set
+    H{ } clone machine-live-outs set ;
+
+: assign-registers ( cfg live-intervals -- )
+    init-assignment
     linearization-order [ kill-block?>> not ] filter
     [ assign-registers-in-block ] each ;

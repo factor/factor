@@ -12,23 +12,14 @@ IN: compiler.cfg.stacks.vacant
         [ '[ _ 0 -rot set-nth ] each ] keep
     ] if-empty ;
 
-: stack>overinitialized ( stack -- seq )
-    second [ 0 < ] filter ;
-
-: overinitialized>bits ( overinitialized -- bits )
-    [ neg 1 - ] map vacant>bits ;
-
-: stack>scrub-and-check ( stack -- pair )
-    [ stack>vacant vacant>bits ]
-    [ stack>overinitialized overinitialized>bits ] bi 2array ;
-
 ! Operations on the analysis state
 : state>gc-data ( state -- gc-data )
-    [ stack>scrub-and-check ] map ;
+    [ stack>vacant vacant>bits ] map ;
 
 : set-gc-map ( state gc-map -- )
-    swap state>gc-data concat
-    { >>scrub-d >>check-d >>scrub-r >>check-r } write-slots ;
+    swap state>gc-data { >>scrub-d >>scrub-r } write-slots ;
+    ! swap state>gc-data { { } { } } append
+    ! { >>scrub-d >>scrub-r >>check-d >>check-r } write-slots ;
 
 : fill-gc-maps ( cfg -- )
     [ trace-stack-state ] [ cfg>insns [ gc-map-insn? ] filter ] bi

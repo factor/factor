@@ -151,8 +151,7 @@ SYMBOL: live-phis
     [ [ live-phi? ] filter! ] dip
     [ append ] change-instructions drop ;
 
-: insert-phis ( -- )
-    inserting-phis get
+: insert-phis ( inserting-phis -- )
     [ swap insert-phis-in ] assoc-each ;
 
 PRIVATE>
@@ -160,4 +159,4 @@ PRIVATE>
 : construct-ssa ( cfg -- )
     [ compute-merge-sets ]
     [ compute-defs compute-phis ]
-    [ rename compute-live-phis insert-phis ] tri ;
+    [ rename compute-live-phis inserting-phis get insert-phis ] tri ;

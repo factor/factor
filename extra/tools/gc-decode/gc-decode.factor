@@ -18,7 +18,7 @@ IN: tools.gc-decode
     c-direct-array-constructor execute( alien len -- seq ) ;
 
 : bit-counts ( gc-info -- counts )
-    struct-slot-values 5 head ;
+    struct-slot-values 3 head ;
 
 : total-bitmap-bits ( gc-info -- n )
     [ bit-counts sum ] [ return-address-count>> ] bi * ;

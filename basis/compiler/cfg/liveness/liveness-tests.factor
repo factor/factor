@@ -1,10 +1,153 @@
-USING: compiler.cfg.liveness
+USING: accessors compiler.cfg.liveness
 compiler.cfg compiler.cfg.debugger compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.utilities
-cpu.architecture accessors namespaces sequences kernel
-tools.test vectors alien math compiler.cfg.comparisons
-cpu.x86.assembler.operands assocs ;
+compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
+dlists namespaces sequences kernel tools.test vectors alien math
+compiler.cfg.comparisons cpu.x86.assembler.operands assocs ;
 IN: compiler.cfg.liveness.tests
+QUALIFIED: sets
+
+! compute-edge-live-in
+{ H{ } } [
+    { } 0 insns>block compute-edge-live-in
+] unit-test
+
+{
+    H{
+        { "bl1" H{ { 7 7 } } }
+        { "bl2" H{ { 99 99 } } }
+    }
+} [
+    {
+        T{ ##phi
+           { dst 103 }
+           { inputs H{ { "bl1" 7 } { "bl2" 99 } } }
+        }
+    } 0 insns>block
+    compute-edge-live-in
+] unit-test
+
+{
+    H{
+        { "b-31" H{ { 192 192 } { 193 193 } { 194 194 } { 195 195 } } }
+        { "b-23" H{ { 181 181 } { 182 182 } { 183 183 } { 187 187 } } }
+        { "b-26" H{ { 188 188 } { 189 189 } { 190 190 } { 191 191 } } }
+    }
+} [
+    {
+        T{ ##phi
+           { dst 196 }
+           { inputs H{ { "b-26" 189 } { "b-23" 183 } { "b-31" 193 } } }
+        }
+        T{ ##phi
+           { dst 197 }
+           { inputs H{ { "b-26" 190 } { "b-23" 182 } { "b-31" 194 } } }
+        }
+        T{ ##phi
+           { dst 198 }
+           { inputs H{ { "b-26" 191 } { "b-23" 181 } { "b-31" 195 } } }
+        }
+        T{ ##phi
+           { dst 199 }
+           { inputs H{ { "b-26" 188 } { "b-23" 187 } { "b-31" 192 } } }
+        }
+    } 0 insns>block compute-edge-live-in
+] unit-test
+
+! fill-gc-map
+{
+    T{ gc-map { gc-roots { 48 } } { derived-roots V{ } } }
+} [
+    H{ { 48 tagged-rep } } representations set
+    H{ { 48 48  } } clone
+    T{ gc-map } [ fill-gc-map ] keep
+] unit-test
+
+! gc-roots
+! only vregs that are tagged are real gc roots
+{ V{ } { 125 } } [
+    H{
+        { 123 double-rep }
+        { 124 double-2-rep }
+        { 125 tagged-rep }
+    } representations set
+    { 123 124 125 } sets:unique gc-roots
+] unit-test
+
+! kill-defs
+{ H{ } } [
+    H{ } dup T{ ##peek f 37 D 0 0 } kill-defs
+] unit-test
+
+{ H{ { 3 3 } } } [
+    H{ { 37 99 } { 99 99 } { 2 99 } } leader-map set
+    H{ { 37 37 } { 3 3 } } dup T{ ##peek f 2 D 0 0 } kill-defs
+] unit-test
+
+! liveness-step
+{ 3 } [
+    init-liveness
+    3 iota [ <basic-block> swap >>number ] map <basic-block>
+    [ connect-Nto1-bbs ] keep liveness-step length
+] unit-test
+
+! lookup-base-pointer
+{ 84 } [
+    H{ { 84 84 } } clone base-pointers set 84 lookup-base-pointer
+] unit-test
+
+{ 15 } [
+    { T{ ##tagged>integer f 30 15 } } 0 insns>block block>cfg compute-live-sets
+    30 lookup-base-pointer
+] unit-test
+
+! lookup-base-pointer*
+{ f } [
+    456 T{ ##peek f 123 D 0 } lookup-base-pointer*
+] unit-test
+
+! transfer-liveness
+{
+    H{ { 37 37 } }
+} [
+    H{ } clone dup { T{ ##replace f 37 D 1 6 } T{ ##peek f 37 D 0 0 } }
+    transfer-liveness
+] unit-test
+
+! visit-gc-root
+{ V{ } HS{ 48 } } [
+    H{ { 48 tagged-rep } } representations set
+    48 V{ } clone HS{ } clone [ visit-gc-root ] 2keep
+] unit-test
+
+! So the real root is 40?
+{ V{ { 48 40 } } HS{ 40 } } [
+    H{ { 48 40 } } base-pointers set
+    H{ { 48 int-rep } } representations set
+    48 V{ } clone HS{ } clone [ visit-gc-root ] 2keep
+] unit-test
+
+! visit-insn
+{ H{ } } [
+    H{ } clone [ T{ ##peek f 0 D 0 } visit-insn ] keep
+] unit-test
+
+{ H{ { 48 48 } { 37 37 } } } [
+    H{ { 48 tagged-rep } } representations set
+    H{ { 48 48  } } clone [ T{ ##replace f 37 D 1 6 } visit-insn ] keep
+] unit-test
+
+{
+    T{ ##call-gc
+       { gc-map
+         T{ gc-map { gc-roots { 93 } } { derived-roots V{ } } }
+       }
+    }
+} [
+    H{ { 93 tagged-rep } } representations set
+    H{ { 93 93  } } clone T{ ##call-gc f T{ gc-map } }
+    [ visit-insn ] keep
+] unit-test
 
 : test-liveness ( -- )
     1 get block>cfg compute-live-sets ;
@@ -68,8 +211,8 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##inc-r f 2 }
-    T{ ##inc-d f -2 }
+    T{ ##inc { loc R 2 } }
+    T{ ##inc { loc D -2 } }
     T{ ##peek f 21 D -1 }
     T{ ##peek f 22 D -2 }
     T{ ##replace f 21 R 0 }
@@ -83,8 +226,8 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc-r f -1 }
-    T{ ##inc-d f 1 }
+    T{ ##inc { loc R -1 } }
+    T{ ##inc { loc D 1 } }
     T{ ##peek f 25 R -1 }
     T{ ##replace f 25 D 0 }
     T{ ##branch }
@@ -96,8 +239,8 @@ V{
 } 4 test-bb
 
 V{
-    T{ ##inc-r f -1 }
-    T{ ##inc-d f 2 }
+    T{ ##inc f R -1 }
+    T{ ##inc f D 2 }
     T{ ##peek f 27 R -1 }
     T{ ##peek f 28 D 2 }
     T{ ##peek f 29 D 3 }
@@ -107,18 +250,18 @@ V{
 } 5 test-bb
 
 V{
-    T{ ##inc-d f -1 }
+    T{ ##inc f D -1 }
     T{ ##branch }
 } 6 test-bb
 
 V{
-    T{ ##inc-d f -1 }
+    T{ ##inc f D -1 }
     T{ ##branch }
 } 7 test-bb
 
 V{
     T{ ##phi f 36 H{ { 6 30 } { 7 31 } } }
-    T{ ##inc-d f -2 }
+    T{ ##inc f D -2 }
     T{ ##unbox f 37 29 "alien_offset" int-rep }
     T{ ##unbox f 38 28 "to_double" double-rep }
     T{ ##unbox f 39 36 "to_cell" int-rep }

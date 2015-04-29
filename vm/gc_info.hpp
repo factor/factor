@@ -1,24 +1,17 @@
 namespace factor {
 
 // gc_info should be kept in sync with:
-//   core/vm/vm.factor
+//   basis/vm/vm.factor
 
 struct gc_info {
   uint32_t scrub_d_count;
   uint32_t scrub_r_count;
-  uint32_t check_d_count;
-  uint32_t check_r_count;
   uint32_t gc_root_count;
   uint32_t derived_root_count;
   uint32_t return_address_count;
 
   cell callsite_bitmap_size() {
-    return
-        scrub_d_count +
-        scrub_r_count +
-        check_d_count +
-        check_r_count +
-        gc_root_count;
+    return scrub_d_count + scrub_r_count + gc_root_count;
   }
 
   cell total_bitmap_size() {
@@ -49,27 +42,10 @@ struct gc_info {
     return base + index * scrub_r_count;
   }
 
-  cell callsite_check_d(cell index) {
-    cell base =
-        return_address_count * scrub_d_count +
-        return_address_count * scrub_r_count;
-    return base + index * check_d_count;
-  }
-
-  cell callsite_check_r(cell index) {
-    cell base =
-        return_address_count * scrub_d_count +
-        return_address_count * scrub_r_count +
-        return_address_count * check_d_count;
-    return base + index * check_r_count;
-  }
-
   cell callsite_gc_roots(cell index) {
     cell base =
         return_address_count * scrub_d_count +
-        return_address_count * scrub_r_count +
-        return_address_count * check_d_count +
-        return_address_count * check_r_count;
+        return_address_count * scrub_r_count;
     return base + index * gc_root_count;
   }
 

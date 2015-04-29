@@ -12,11 +12,6 @@ compiler.cfg.representations.selection
 compiler.cfg.utilities ;
 IN: compiler.cfg.representations
 
-! Virtual register representation selection. This is where
-! decisions about integer tagging and float and vector boxing
-! are made. The appropriate conversion operations inserted
-! after a cost analysis.
-
 : select-representations ( cfg -- )
     {
         needs-loops

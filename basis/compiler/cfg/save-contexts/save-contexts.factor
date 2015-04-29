@@ -4,7 +4,7 @@ USING: compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
 cpu.architecture kernel sequences ;
 IN: compiler.cfg.save-contexts
 
-UNION: context-modifier ##phi ##inc-d ##inc-r ##callback-inputs ;
+UNION: context-modifier ##phi ##inc ##callback-inputs ;
 UNION: context-save-needed gc-map-insn ;
 
 : save-context-offset ( insns -- n )

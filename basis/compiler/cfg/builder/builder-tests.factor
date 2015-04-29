@@ -1,12 +1,13 @@
 USING: accessors alien alien.accessors arrays assocs byte-arrays
 combinators.short-circuit compiler.cfg compiler.cfg.builder compiler.cfg.checker
 compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
-compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.stacks.local compiler.tree compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.representations fry hashtables kernel
-kernel.private locals make math math.partial-dispatch math.private namespaces
-prettyprint sbufs sequences sequences.private slots.private strings
-strings.private  tools.test vectors words ;
+compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.representations
+compiler.cfg.rpo compiler.cfg.stacks compiler.cfg.stacks.local
+compiler.cfg.utilities compiler.test compiler.tree compiler.tree.builder
+compiler.tree.optimizer fry hashtables kernel kernel.private locals make math
+math.partial-dispatch math.private namespaces prettyprint sbufs sequences
+sequences.private slots.private strings strings.private tools.test vectors
+words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
@@ -198,8 +199,7 @@ IN: compiler.cfg.builder.tests
 ] unit-test
 
 [ f ] [
-    [ 1000 [ ] times ]
-    [ [ ##peek? ] [ ##replace? ] bi or ] contains-insn?
+    [ 1000 [ ] times ] [ ##peek? ] contains-insn?
 ] unit-test
 
 [ f t ] [
@@ -238,11 +238,7 @@ IN: compiler.cfg.builder.tests
 
 ! make-input-map
 {
-    H{
-        { 81 T{ ds-loc { n 1 } } }
-        { 37 T{ ds-loc { n 2 } } }
-        { 92 T{ ds-loc } }
-    }
+    { { 37 D 2 } { 81 D 1 } { 92 D 0 } }
 } [
     T{ #shuffle { in-d { 37 81 92 } } } make-input-map
 ] unit-test
@@ -252,27 +248,59 @@ IN: compiler.cfg.builder.tests
     { T{ ##load-integer { dst 78 } { val 0 } } }
 } [
     77 vreg-counter set-global
-    current-height new current-height set
-    H{ } clone replace-mapping set
     [
         T{ #push { literal 0 } { out-d { 8537399 } } } emit-node
     ] { } make
-] unit-test
+] cfg-unit-test
 
 {
-    T{ current-height { d 1 } { emit-d 1 } }
+    { { 1 1 } { 0 0 } }
     H{ { D -1 4 } { D 0 4 } }
 } [
-    0 vreg-counter set-global
-    current-height new current-height set
-    H{ } clone replace-mapping set
     4 D 0 replace-loc
     T{ #shuffle
        { mapping { { 2 4 } { 3 4 } } }
        { in-d V{ 4 } }
        { out-d V{ 2 3 } }
     } emit-node
+    height-state get
+    replaces get
+] cfg-unit-test
 
-    current-height get
-    replace-mapping get
+{ 1 } [
+    V{ } 0 insns>block basic-block set init-cfg-test
+    V{ } 1 insns>block [ emit-loop-call ] V{ } make drop
+    basic-block get successors>> length
 ] unit-test
+
+! emit-loop-call
+{ "bar" } [
+    V{ } "foo" insns>block basic-block set init-cfg-test
+    [ V{ } "bar" insns>block emit-loop-call ] V{ } make drop
+    basic-block get successors>> first number>>
+] unit-test
+
+! begin-cfg
+SYMBOL: foo
+
+{ foo } [
+    \ foo f begin-cfg word>>
+] cfg-unit-test
+
+! store-shuffle
+{
+    H{ { D 2 1 } }
+} [
+    T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
+    emit-node replaces get
+] cfg-unit-test
+
+{
+    H{ { D -1 1 } { D 0 1 } }
+} [
+    T{ #shuffle
+       { in-d { 7 } }
+       { out-d { 55 77 } }
+       { mapping { { 55 7 } { 77 7 } } }
+    } emit-node replaces get
+] cfg-unit-test

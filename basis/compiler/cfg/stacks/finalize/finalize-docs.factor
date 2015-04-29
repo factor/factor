@@ -2,12 +2,12 @@ USING: assocs compiler.cfg help.markup help.syntax ;
 IN: compiler.cfg.stacks.finalize
 
 HELP: inserting-peeks
-{ $values { "from" basic-block } { "to" basic-block } { "assoc" assoc } }
+{ $values { "from" basic-block } { "to" basic-block } { "set" assoc } }
 { $description
   "A peek is inserted on an edge if the destination anticipates the stack location, the source does not anticipate it and it is not available from the source in a register." } ;
 
 HELP: inserting-replaces
-{ $values { "from" basic-block } { "to" basic-block } { "assoc" assoc } }
+{ $values { "from" basic-block } { "to" basic-block } { "set" assoc } }
 { $description
   "A replace is inserted on an edge if two conditions hold:"
   { $list

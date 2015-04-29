@@ -24,12 +24,12 @@ IN: compiler.cfg.stacks.clearing.tests
 
 {
     V{
-        T{ ##inc-d { n 2 } { insn# 0 } }
+        T{ ##inc { loc D 2 } { insn# 0 } }
         T{ ##replace-imm { src 17 } { loc T{ ds-loc } } }
         T{ ##replace-imm { src 17 } { loc T{ ds-loc { n 1 } } } }
-        T{ ##peek { loc T{ ds-loc { n 2 } } } { insn# 1 } }
+        T{ ##peek { loc D 2 } { insn# 1 } }
     }
 } [
-    { T{ ##inc-d f 2 } T{ ##peek f f D 2 } } insns>cfg
+    { T{ ##inc f D 2 } T{ ##peek f f D 2 } } insns>cfg
     dup clear-uninitialized cfg>insns
 ] unit-test

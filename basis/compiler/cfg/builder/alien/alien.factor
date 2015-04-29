@@ -32,7 +32,7 @@ IN: compiler.cfg.builder.alien
         [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
         2 2 mnmap [ concat ] bi@
     ]
-    [ length neg inc-d ] bi ;
+    [ length neg <ds-loc> inc-stack ] bi ;
 
 : prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
     dup large-struct? [

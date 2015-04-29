@@ -21,7 +21,7 @@ IN: bootstrap.compiler.timing
 
 : machine-passes ( -- seq ) \ compiler.cfg.finalization:finalize-cfg passes ;
 
-: linear-scan-passes ( -- seq ) \ compiler.cfg.linear-scan:(linear-scan) passes ;
+: linear-scan-passes ( -- seq ) \ compiler.cfg.linear-scan:linear-scan passes ;
 
 : all-passes ( -- seq )
     [

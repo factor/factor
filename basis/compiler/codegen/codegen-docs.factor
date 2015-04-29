@@ -95,3 +95,7 @@ HELP: init-fixup
 HELP: check-fixup
 { $values { "seq" "a " { $link sequence } " of generated machine code." } }
 { $description "Used by " { $link with-fixup } " to ensure that the generated machine code is properly aligned." } ;
+
+ARTICLE: "compiler.codegen" "Code generation from MR (machine representation)" "Code generators for cfg instructions." ;
+
+ABOUT: "compiler.codegen"

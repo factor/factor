@@ -1,6 +1,6 @@
-USING: alien alien.c-types cpu.architecture cpu.x86.64
-cpu.x86.assembler cpu.x86.assembler.operands tools.test
-assocs sequences ;
+USING: alien alien.c-types assocs compiler.cfg.registers
+cpu.architecture cpu.x86.64 cpu.x86.assembler cpu.x86.assembler.operands make
+sequences tools.test ;
 IN: cpu.x86.64.tests
 
 : assembly-test-1 ( -- x ) int { } cdecl [ RAX 3 MOV ] alien-assembly ;
@@ -14,3 +14,7 @@ IN: cpu.x86.64.tests
     ] alien-assembly ;
 
 [ 23 ] [ 17 6 assembly-test-2 ] unit-test
+
+{ B{ 73 131 198 24 } } [
+    [ T{ ds-loc { n 3 } } %inc ] B{ } make
+] unit-test

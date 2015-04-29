@@ -12,19 +12,15 @@ IN: compiler.cfg.linearization
 
 <PRIVATE
 
-SYMBOLS: work-list loop-heads visited ;
+SYMBOLS: loop-heads visited ;
 
 : visited? ( bb -- ? ) visited get in? ;
 
-: add-to-work-list ( bb -- )
-    dup visited? [ drop ] [
-        work-list get push-back
-    ] if ;
-
-: init-linearization-order ( cfg -- )
-    <dlist> work-list set
-    HS{ } clone visited set
-    entry>> add-to-work-list ;
+: predecessors-ready? ( bb -- ? )
+    [ predecessors>> ] keep '[
+        _ 2dup back-edge?
+        [ 2drop t ] [ drop visited? ] if
+    ] all? ;
 
 : (find-alternate-loop-head) ( bb -- bb' )
     dup {
@@ -42,34 +38,19 @@ SYMBOLS: work-list loop-heads visited ;
         nip (find-alternate-loop-head)
     ] if ;
 
-: predecessors-ready? ( bb -- ? )
-    [ predecessors>> ] keep '[
-        _ 2dup back-edge?
-        [ 2drop t ] [ drop visited? ] if
-    ] all? ;
-
-: process-successor ( bb -- )
-    dup predecessors-ready? [
-        dup loop-entry? [ find-alternate-loop-head ] when
-        add-to-work-list
-    ] [ drop ] if ;
-
 : sorted-successors ( bb -- seq )
     successors>> <reversed> [ loop-nesting-at ] sort-with ;
 
-: process-block ( bb -- )
-    dup visited get ?adjoin [
-        [ , ]
-        [ sorted-successors [ process-successor ] each ]
-        bi
-    ] [ drop ] if ;
+: process-block ( bb -- bbs )
+    dup visited get ?adjoin [ dup , sorted-successors ] [ drop { } ] if
+    [ predecessors-ready? ] filter
+    [ dup loop-entry? [ find-alternate-loop-head ] when ] map
+    [ visited? not ] filter ;
 
 : (linearization-order) ( cfg -- bbs )
-    init-linearization-order
-
-    [ work-list get [ process-block ] slurp-deque ] { } make
-    ! [ unlikely?>> not ] partition append
-    ;
+    HS{ } clone visited set
+    entry>> <dlist> [ push-back ] keep
+    [ dup '[ process-block _ push-all-back ] slurp-deque ] { } make ;
 
 PRIVATE>
 

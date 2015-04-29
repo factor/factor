@@ -1,36 +1,117 @@
-USING: accessors assocs biassocs combinators compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stacks.local cpu.architecture kernel
-namespaces sequences tools.test ;
+USING: accessors assocs biassocs combinators compiler.cfg
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.utilities
+compiler.test cpu.architecture make namespaces kernel tools.test ;
+QUALIFIED: sets
 IN: compiler.cfg.stacks.local.tests
 
-{ T{ current-height f 3 0 3 0 } } [
-    current-height new current-height [
-        3 inc-d current-height get
-    ] with-variable
-] unit-test
+! loc>vreg
+{ 1 } [
+    D 0 loc>vreg
+] cfg-unit-test
 
-{
-    { T{ ##inc-d { n 4 } } T{ ##inc-r { n -2 } } }
-} [
-    T{ current-height { emit-d 4 } { emit-r -2 } } height-changes
-] unit-test
-
-{ 30 } [
-    29 vreg-counter set-global <bihash> locs>vregs set D 0 loc>vreg
-] unit-test
-
+! stack-changes
 {
     {
         T{ ##copy { dst 1 } { src 25 } { rep any-rep } }
         T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
     }
 } [
-    0 vreg-counter set-global <bihash> locs>vregs set
-    { { D 0 25 } { R 0 26 } } stack-changes
+    { { D 0 25 } { R 0 26 } } replaces>copy-insns
+] cfg-unit-test
+
+! replace-loc
+{ 80 } [
+    80 D 77 replace-loc
+    D 77 peek-loc
+] cfg-unit-test
+
+! end-local-analysis
+{
+    HS{ }
+    { }
+    HS{ }
+} [
+    V{ } 137 insns>block
+    [ 0 0 rot record-stack-heights ]
+    [ [ "eh" , end-local-analysis ] V{ } make drop ]
+    [ [ peek-sets ] [ replace-sets ] [ kill-sets ] tri [ get at ] 2tri@ ] tri
+] cfg-unit-test
+
+{
+    { D 3 }
+} [
+    V{ } 137 insns>block
+    [ 0 0 rot record-stack-heights ]
+    [ [ 3 D 3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
+    [ replace-sets get at ] tri
+] cfg-unit-test
+
+! remove-redundant-replaces
+{
+    H{ { T{ ds-loc { n 3 } } 7 } }
+} [
+    D 0 loc>vreg D 2 loc>vreg 2drop
+    2 D 2 replace-loc 7 D 3 replace-loc
+    replaces get remove-redundant-replaces
+] cfg-unit-test
+
+! emit-changes
+{
+    V{
+        T{ ##copy { dst 1 } { src 3 } { rep any-rep } }
+        "eh"
+    }
+} [
+    3 D 0 replace-loc [
+        "eh",
+        replaces get height-state get emit-changes
+    ] V{ } make
+] cfg-unit-test
+
+! compute-local-kill-set
+{ 0 } [
+    V{ } 0 insns>block 0 0 pick record-stack-heights
+    compute-local-kill-set sets:cardinality
 ] unit-test
 
-{ 80 } [
-    current-height new current-height set
-    H{ } clone replace-mapping set 80
-    D 77 replace-loc D 77 peek-loc
+{ HS{ R -4 } } [
+    V{ } 0 insns>block 4 4 pick record-stack-heights
+    { { 8 0 } { 3 0 } } height-state set
+    compute-local-kill-set
 ] unit-test
+
+{ HS{ D -1 D -2 } } [
+    V{ } 0 insns>block [ 2 0 rot record-stack-heights ] keep
+    { { 0 0 } { 0 0 } } height-state set
+    compute-local-kill-set
+] cfg-unit-test
+
+! translate-local-loc
+{ D 2 } [
+    D 3 { { 1 2 } { 3 4 } } translate-local-loc
+] unit-test
+
+! height-state
+{
+    { { 3 3 } { 0 0 } }
+} [
+    D 3 inc-stack height-state get
+] cfg-unit-test
+
+{
+    { { 5 3 } { 0 0 } }
+} [
+    { { 2 0 } { 0 0 } } height-state set
+    D 3 inc-stack height-state get
+] cfg-unit-test
+
+{
+    { T{ ##inc { loc D 4 } } T{ ##inc { loc R -2 } } }
+} [
+    { { 0 4  } { 0 -2 } } height-state>insns
+] unit-test
+
+{ H{ { D -1 40 } } } [
+    D 1 inc-stack 40 D 0 replace-loc replaces get
+] cfg-unit-test

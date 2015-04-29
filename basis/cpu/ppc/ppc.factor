@@ -184,13 +184,9 @@ M:: ppc %replace-imm ( src loc -- )
     } cond
     scratch-reg reg offset %store-cell ;
 
-! Increment data stack pointer by n cells.
-M: ppc %inc-d ( n -- )
-    [ ds-reg ds-reg ] dip cells ADDI ;
-
-! Increment retain stack pointer by n cells.
-M: ppc %inc-r ( n -- )
-    [ rs-reg rs-reg ] dip cells ADDI ;
+! Increment stack pointer by n cells.
+M: ppc %inc ( loc -- )
+    [ ds-loc? [ ds-reg ds-reg ] [ rs-reg rs-reg ] if ] [ n>> ] bi cells ADDI ;
 
 M: ppc stack-frame-size ( stack-frame -- i )
     (stack-frame-size)

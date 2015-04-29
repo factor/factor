@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg.predecessors
-compiler.cfg.rpo deques dlists functors kernel lexer locals
-namespaces sequences ;
+USING: accessors assocs combinators.short-circuit compiler.cfg.predecessors
+compiler.cfg.rpo compiler.cfg.utilities deques dlists functors kernel lexer
+locals namespaces sequences ;
 IN: compiler.cfg.dataflow-analysis
 
 GENERIC: join-sets ( sets bb dfa -- set )
@@ -39,19 +39,18 @@ MIXIN: dataflow-analysis
     bb in-sets dfa compute-out-set
     bb out-sets maybe-set-at ; inline
 
-:: dfa-step ( bb in-sets out-sets dfa work-list -- )
-    bb in-sets out-sets dfa update-in-set [
-        bb in-sets out-sets dfa update-out-set [
-            bb dfa successors work-list push-all-front
-        ] when
-    ] when ; inline
+: update-in/out-set ( bb in-sets out-sets dfa -- ? )
+    { [ update-in-set ] [ update-out-set ] } 4 n&& ;
+
+:: dfa-step ( bb in-sets out-sets dfa -- bbs )
+    bb in-sets out-sets dfa update-in/out-set bb dfa successors { } ? ;
 
 :: run-dataflow-analysis ( cfg dfa -- in-sets out-sets )
-    cfg needs-predecessors
     H{ } clone :> in-sets
     H{ } clone :> out-sets
-    cfg dfa <dfa-worklist> :> work-list
-    work-list [ in-sets out-sets dfa work-list dfa-step ] slurp-deque
+    cfg needs-predecessors
+    cfg dfa <dfa-worklist>
+    [ in-sets out-sets dfa dfa-step ] slurp/replenish-deque
     in-sets
     out-sets ; inline
 

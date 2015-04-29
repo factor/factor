@@ -38,9 +38,6 @@ ERROR: bad-live-ranges interval ;
     ] [ 2drop ] if ;
 
 : spill-before ( before -- before/f )
-    ! If the interval does not have any usages before the spill location,
-    ! then it is the second child of an interval that was split. We reload
-    ! the value and let the resolve pass insert a spill later.
     dup uses>> empty? [ drop f ] [
         {
             [ ]
@@ -114,9 +111,6 @@ ERROR: bad-live-ranges interval ;
     [ [ add-unhandled ] when* ] bi* ;
 
 :: spill-intersecting-active ( new reg -- )
-    ! If there is an active interval using 'reg' (there should be at
-    ! most one) are split and spilled and removed from the inactive
-    ! set.
     new active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
     '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
 
@@ -145,13 +139,10 @@ ERROR: bad-live-ranges interval ;
     [ first spill-intersecting ] [ register-available ] 2bi ;
 
 : spill-partially-available ( new pair -- )
-    ! A register would be available for part of the new
-    ! interval's lifetime if all active and inactive intervals
-    ! using that register were split and spilled.
     [ second 1 - split-for-spill [ add-unhandled ] when* ] keep
     '[ _ spill-available ] when* ;
 
-: assign-blocked-register ( new -- )
+: assign-blocked-register ( live-interval -- )
     dup spill-status {
         { [ 2dup spill-new? ] [ spill-new ] }
         { [ 2dup register-available? ] [ spill-available ] }

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.predecessors
+USING: accessors assocs combinators combinators.short-circuit
+compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
 cpu.architecture deques dlists fry kernel locals namespaces
@@ -26,28 +26,18 @@ SYMBOL: edge-live-ins
 
 SYMBOL: base-pointers
 
-GENERIC: visit-insn ( live-set insn -- live-set )
+GENERIC: visit-insn ( live-set insn -- )
 
-! If liveness analysis is run after SSA destruction, we need to
-! kill vregs that have been coalesced with others (they won't
-! have been renamed from their original values in the CFG).
-! Otherwise, we get a bunch of stray uses that wind up
-! live-in/out when they shouldn't be.  However, we must take
-! care to still report the original vregs in the live-sets,
-! because they have information associated with them (like
-! representations) that would get lost if we just used the
-! leaders for everything.
+! This would be much better if live-set was a real set
+: kill-defs ( live-set insn -- )
+    defs-vregs [ ?leader ] map
+    '[ drop ?leader _ in? not ] assoc-filter! drop ; inline
 
-: kill-defs ( live-set insn -- live-set )
-    defs-vregs [
-        ?leader '[ drop ?leader _ eq? not ] assoc-filter!
-    ] each ; inline
+: gen-uses ( live-set insn -- )
+    uses-vregs [ swap conjoin ] with each ; inline
 
-: gen-uses ( live-set insn -- live-set )
-    uses-vregs [ over conjoin ] each ; inline
-
-M: vreg-insn visit-insn
-    [ kill-defs ] [ gen-uses ] bi ;
+M: vreg-insn visit-insn ( live-set insn -- )
+    [ kill-defs ] [ gen-uses ] 2bi ;
 
 DEFER: lookup-base-pointer
 
@@ -81,15 +71,12 @@ M: ##sub lookup-base-pointer*
 
 M: vreg-insn lookup-base-pointer* 2drop f ;
 
-! Can't use cache here because of infinite recursion inside
-! the quotation passed to cache
-: lookup-base-pointer ( vreg -- vregs/f )
+: lookup-base-pointer ( vreg -- vreg/f )
     base-pointers get ?at [
         f over base-pointers get set-at
         [ dup ?leader insn-of lookup-base-pointer* ] keep
         dupd base-pointers get set-at
     ] unless ;
-
 
 :: visit-derived-root ( vreg derived-roots gc-roots -- )
     vreg lookup-base-pointer :> base
@@ -106,31 +93,24 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
     } case ;
 
 : gc-roots ( live-set -- derived-roots gc-roots )
-    V{ } clone HS{ } clone
-    [ '[ drop _ _ visit-gc-root ] assoc-each ] 2keep
-    members ;
+    keys V{ } clone HS{ } clone
+    [ '[ _ _ visit-gc-root ] each ] 2keep members ;
 
-: fill-gc-map ( live-set insn -- live-set )
-    [ representations get [ dup gc-roots ] [ f f ] if ] dip
-    gc-map>> [ gc-roots<< ] [ derived-roots<< ] bi ;
+: fill-gc-map ( live-set gc-map -- )
+    [ gc-roots ] dip [ gc-roots<< ] [ derived-roots<< ] bi ;
 
-M: gc-map-insn visit-insn
-    [ kill-defs ] [ fill-gc-map ] [ gen-uses ] tri ;
+M: gc-map-insn visit-insn ( live-set insn -- )
+    [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] 2tri ;
 
 M: ##phi visit-insn kill-defs ;
 
-M: insn visit-insn drop ;
+M: insn visit-insn 2drop ;
 
-: transfer-liveness ( live-set instructions -- live-set' )
-    [ clone ] [ <reversed> ] bi* [ visit-insn ] each ;
-
-SYMBOL: work-list
-
-: add-to-work-list ( basic-blocks -- )
-    work-list get push-all-front ;
+: transfer-liveness ( live-set insns -- )
+    <reversed> [ visit-insn ] with each ;
 
 : compute-live-in ( basic-block -- live-in )
-    [ live-out ] keep instructions>> transfer-liveness ;
+    [ live-out clone dup ] keep instructions>> transfer-liveness ;
 
 : compute-edge-live-in ( basic-block -- edge-live-in )
     H{ } clone [
@@ -151,23 +131,23 @@ SYMBOL: work-list
     [ compute-live-out ] keep
     live-outs get maybe-set-at ;
 
-: liveness-step ( basic-block -- )
-    dup update-live-out [
-        dup update-live-in
-        [ predecessors>> add-to-work-list ] [ drop ] if
-    ] [ drop ] if ;
+: update-live-out/in ( basic-block -- changed? )
+    { [ update-live-out ] [ update-live-in ] } 1&& ;
 
-: compute-live-sets ( cfg -- )
-    <hashed-dlist> work-list set
+: liveness-step ( basic-block -- basic-blocks )
+    [ update-live-out/in ] keep predecessors>> { } ? ;
+
+: init-liveness ( -- )
     H{ } clone live-ins set
     H{ } clone edge-live-ins set
     H{ } clone live-outs set
-    H{ } clone base-pointers set
+    H{ } clone base-pointers set ;
 
-    [ needs-predecessors ]
-    [ compute-insns ]
-    [ post-order add-to-work-list ] tri
-    work-list get [ liveness-step ] slurp-deque ;
+: compute-live-sets ( cfg -- )
+    init-liveness
+    dup needs-predecessors dup compute-insns
+    post-order <hashed-dlist> [ push-all-front ] keep
+    [ liveness-step ] slurp/replenish-deque ;
 
 : live-in? ( vreg bb -- ? ) live-in key? ;
 

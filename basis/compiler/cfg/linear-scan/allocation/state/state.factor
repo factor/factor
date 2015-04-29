@@ -3,17 +3,11 @@
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture fry heaps kernel layouts linked-assocs math
+cpu.architecture fry heaps kernel linked-assocs math
 math.order namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
 
-! Start index of current live interval. We ensure that all
-! live intervals added to the unhandled set have a start index
-! strictly greater than this one. This ensures that we can catch
-! infinite loop situations. We also ensure that all live
-! intervals added to the handled set have an end index strictly
-! smaller than this one. This helps catch bugs.
 SYMBOL: progress
 
 : check-unhandled ( live-interval -- )
@@ -37,7 +31,6 @@ SYMBOL: unhandled-min-heap
     [ [ live-interval-key ] zip-keyed ]
     [ [ sync-point-key ] zip-keyed ] bi* append >min-heap ;
 
-! Mapping from register classes to sequences of machine registers
 SYMBOL: registers
 
 SYMBOL: active-intervals
@@ -54,7 +47,6 @@ SYMBOL: active-intervals
 : assign-free-register ( new registers -- )
     pop >>reg add-active ;
 
-! Vector of inactive live intervals
 SYMBOL: inactive-intervals
 
 : inactive-intervals-for ( live-interval -- seq )
@@ -101,9 +93,6 @@ ERROR: register-already-used live-interval ;
     [ get values ] dip '[ [ _ cond ] with filter! drop ] with each ; inline
 
 : deactivate-intervals ( n -- )
-    ! Any active intervals which have ended are moved to handled
-    ! Any active intervals which cover the current position
-    ! are moved to inactive
     dup progress set
     active-intervals {
         { [ 2dup finished? ] [ finish ] }
@@ -112,9 +101,6 @@ ERROR: register-already-used live-interval ;
     } process-intervals ;
 
 : activate-intervals ( n -- )
-    ! Any inactive intervals which have ended are moved to handled
-    ! Any inactive intervals which do not cover the current position
-    ! are moved to active
     inactive-intervals {
         { [ 2dup finished? ] [ finish ] }
         { [ 2dup covers? ] [ activate ] }
@@ -135,14 +121,14 @@ ERROR: register-already-used live-interval ;
     [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
     <spill-slot> ;
 
-: align-spill-area ( align -- )
-    cfg get [ max ] change-spill-area-align drop ;
+: align-spill-area ( align cfg -- )
+    [ max ] change-spill-area-align drop ;
 
 SYMBOL: spill-slots
 
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
     rep-size
-    [ align-spill-area ]
+    [ cfg get align-spill-area ]
     [ spill-slots get [ nip next-spill-slot ] 2cache ]
     bi ;
 
@@ -155,17 +141,14 @@ SYMBOL: spill-slots
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
-    cfg get 0 >>spill-area-size cell >>spill-area-align drop
     H{ } clone spill-slots set
     -1 progress set ;
 
+: free-positions ( registers reg-class -- assoc )
+    of [ 1/0. ] H{ } <linked-assoc> map>assoc ;
 
-! A utility used by register-status and spill-status words
-: free-positions ( new -- assoc )
-    reg-class>> registers get at
-    [ 1/0. ] H{ } <linked-assoc> map>assoc ;
-
-: add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;
+: add-use-position ( n reg assoc -- )
+    [ [ min ] when* ] change-at ;
 
 : register-available? ( new result -- ? )
     [ end>> ] [ second ] bi* < ; inline

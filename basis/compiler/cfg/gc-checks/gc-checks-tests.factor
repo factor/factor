@@ -9,7 +9,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##add }
         T{ ##branch }
@@ -18,7 +18,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##alien-invoke }
         T{ ##add }
@@ -28,7 +28,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 0 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##allot }
         T{ ##alien-invoke }
@@ -39,7 +39,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 0 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##allot }
         T{ ##allot }
@@ -50,7 +50,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 0 4 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##allot }
         T{ ##alien-invoke }
@@ -63,7 +63,7 @@ IN: compiler.cfg.gc-checks.tests
 
 [ { 3 } ] [
     V{
-        T{ ##inc-d }
+        T{ ##inc }
         T{ ##peek }
         T{ ##alien-invoke }
         T{ ##allot }
@@ -87,7 +87,7 @@ IN: compiler.cfg.gc-checks.tests
     0 get block>cfg cfg set ;
 
 V{
-    T{ ##inc-d f 3 }
+    T{ ##inc f 3 }
     T{ ##replace f 0 D 1 }
 } 0 test-bb
 
@@ -103,8 +103,6 @@ V{
 
 [ ] [ 1 get instructions>> allocation-size 123 <alien> size assert= ] unit-test
 
-2 vreg-counter set-global
-
 : gc-check? ( bb -- ? )
     instructions>>
     {
@@ -119,11 +117,9 @@ V{
         T{ ##branch }
     } = ;
 
-4 vreg-counter set-global
-
 [ t ] [ <gc-call> gc-call? ] unit-test
 
-30 vreg-counter set-global
+reset-vreg-counter
 
 V{
     T{ ##prologue }
@@ -132,7 +128,7 @@ V{
 
 V{
     T{ ##peek f 2 D 0 }
-    T{ ##inc-d f 3 }
+    T{ ##inc { loc D 3 } }
     T{ ##branch }
 } 1 test-bb
 

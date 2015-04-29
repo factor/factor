@@ -1,12 +1,11 @@
-USING: compiler.cfg compiler.tree help.markup help.syntax literals math
-multiline quotations ;
+USING: compiler.cfg compiler.cfg.stacks.local compiler.tree help.markup
+help.syntax literals make math multiline quotations sequences ;
 IN: compiler.cfg.builder.blocks
 
 <<
 STRING: ex-emit-trivial-block
-USING: compiler.cfg.builder.blocks prettyprint ;
-initial-basic-block [ [ gensym ##call, ] emit-trivial-block ] { } make drop
-basic-block get .
+USING: compiler.cfg.builder.blocks make prettyprint ;
+<basic-block> set-basic-block [ [ gensym ##call, ] emit-trivial-block ] { } make drop basic-block get .
 T{ basic-block
     { id 2040412 }
     { successors
@@ -48,8 +47,17 @@ HELP: emit-trivial-block
 { $description "Combinator that emits a trivial block, constructed by calling the supplied quotation." }
 { $examples { $unchecked-example $[ ex-emit-trivial-block ] } } ;
 
-HELP: initial-basic-block
-{ $description "Creates an initial empty " { $link basic-block } " and stores it in the basic-block dynamic variable." } ;
+HELP: end-branch
+{ $values { "pair/f" "two-tuple" } }
+{ $description "pair is { final-bb final-height }" } ;
 
 HELP: make-kill-block
 { $description "Marks the current " { $link basic-block } " being processed as a kill block." } ;
+
+HELP: set-basic-block
+{ $values { "basic-block" basic-block } }
+{ $description "Sets the given blocks as the current one by storing it in the basic-block dynamic variable. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;
+
+HELP: with-branch
+{ $values { "quot" quotation } { "pair/f" "a pair or f" } }
+{ $description "The pair is either " { $link f } " or a two-tuple containing a " { $link basic-block } " and a " { $link height-state } " two-tuple." } ;

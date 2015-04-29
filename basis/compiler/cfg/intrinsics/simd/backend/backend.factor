@@ -125,21 +125,21 @@ MACRO: if-literals-match ( quots -- )
     ] ;
 
 CONSTANT: [unary]        [ ds-drop  ds-pop ]
-CONSTANT: [unary/param]  [ [ -2 inc-d ds-pop ] dip ]
+CONSTANT: [unary/param]  [ [ -2 <ds-loc> inc-stack ds-pop ] dip ]
 CONSTANT: [binary]       [ ds-drop 2inputs ]
-CONSTANT: [binary/param] [ [ -2 inc-d 2inputs ] dip ]
+CONSTANT: [binary/param] [ [ -2 <ds-loc> inc-stack 2inputs ] dip ]
 CONSTANT: [quaternary]
     [
-        ds-drop 
+        ds-drop
         D 3 peek-loc
         D 2 peek-loc
         D 1 peek-loc
         D 0 peek-loc
-        -4 inc-d
+        -4 <ds-loc> inc-stack
     ]
 
 :: [emit-vector-op] ( trials params-quot op-quot literal-preds -- quot )
-    params-quot trials op-quot literal-preds 
+    params-quot trials op-quot literal-preds
     '[ [ _ dip _ @ ds-push ] _ if-literals-match ] ;
 
 MACRO: emit-v-vector-op ( trials -- )
@@ -158,6 +158,5 @@ MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- )
     '[
         dup node-input-infos 2 tail-slice* first literal>> @
         [ _ _ emit-vl-vector-op ]
-        [ _   emit-vv-vector-op ] if 
+        [ _   emit-vv-vector-op ] if
     ] ;
-

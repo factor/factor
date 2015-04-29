@@ -3155,19 +3155,19 @@ cpu x86? [
 V{ T{ ##branch } } 0 test-bb
 
 V{
-    T{ ##inc-d { n -1 } }
+    T{ ##inc { loc D -1 } }
     T{ ##peek { dst 1 } { loc D -1 } }
     T{ ##compare-imm-branch { src1 1 } { src2 f } { cc cc/= } }
 } 1 test-bb
 
 V{
-    T{ ##inc-d { n 1 } }
+    T{ ##inc { loc D 1 } }
     T{ ##load-integer { dst 2 } { val 100 } }
     T{ ##branch }
 } 2 test-bb
 
 V{
-    T{ ##inc-d { n 1 } }
+    T{ ##inc { loc D 1 } }
     T{ ##load-integer { dst 3 } { val 200 } }
     T{ ##branch }
 } 3 test-bb
@@ -3192,7 +3192,7 @@ test-diamond
 V{ T{ ##prologue } T{ ##branch } } 0 test-bb
 
 V{
-    T{ ##inc-d f 3 }
+    T{ ##inc f D 3 }
     T{ ##load-integer f 21 0 }
     T{ ##load-integer f 22 100 }
     T{ ##load-integer f 23 0 }
@@ -3227,7 +3227,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc-d f -2 }
+    T{ ##inc f D -2 }
     T{ ##replace f 29 D 0 }
     T{ ##branch }
 } 4 test-bb

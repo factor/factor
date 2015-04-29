@@ -10,13 +10,16 @@ HELP: basic-block
     { { $slot "successors" } { "A " { $link vector } " of basic blocks that may be executed directly after this block. Most blocks only have one successor but a block that checks where an if-condition should branch to would have two for example." } }
     { { $slot "predecessors" } { "The opposite of successors -- a " { $link vector } " of basic blocks from which the execution may have arrived into this block." } }
     { { $slot "instructions" } { "A " { $link vector } " of " { $link insn } " tuples which form the instructions of the basic block." } }
-    { { $slot "unlikely?" } { "Unused boolean slot." } }
   }
 } ;
 
 HELP: <basic-block>
 { $values { "bb" basic-block } }
 { $description "Creates a new empty basic block. The " { $slot "id" } " slot is initialized with the value of the basic-block " { $link counter } "." } ;
+
+HELP: <cfg>
+{ $values { "word" word } { "label" "label" } { "entry" basic-block } { "cfg" cfg } }
+{ $description "Constructor for " { $link cfg } ". " { $slot "spill-area-size" } " and " { $slot "spill-area-align" } " are set to default values." } ;
 
 HELP: cfg
 { $class-description
@@ -33,4 +36,5 @@ HELP: cfg
 
 HELP: cfg-changed
 { $values { "cfg" cfg } }
-{ $description "Resets all \"calculated\" slots in the cfg which forces them to be recalculated." } ;
+{ $description "Resets all \"calculated\" slots in the cfg which forces them to be recalculated." }
+{ $see-also predecessors-changed } ;

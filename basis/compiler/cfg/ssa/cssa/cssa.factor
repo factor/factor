@@ -7,10 +7,6 @@ namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.cssa
 
-! Convert SSA to conventional SSA. This pass runs after representation
-! selection, so it must keep track of representations when introducing
-! new values.
-
 SYMBOLS: edge-copies phi-copies ;
 
 : init-copies ( bb -- )
@@ -43,8 +39,8 @@ SYMBOLS: edge-copies phi-copies ;
         [ drop ] [ [ _ ] dip insert-edge-copies ] if-empty
     ] assoc-each ;
 
-: phi-copy-insn ( -- insn )
-    phi-copies get f \ ##parallel-copy boa ;
+: phi-copy-insn ( copies -- insn )
+    f \ ##parallel-copy boa ;
 
 : end-of-phis ( insns -- i )
     [ [ ##phi? not ] find drop ] [ length ] bi or ;
@@ -52,7 +48,9 @@ SYMBOLS: edge-copies phi-copies ;
 : insert-phi-copies ( bb -- )
     [
         [
-            [ drop phi-copy-insn ] [ end-of-phis ] [ ] tri insert-nth
+            [ drop phi-copies get phi-copy-insn ]
+            [ end-of-phis ]
+            [ ] tri insert-nth
         ] change-instructions drop
     ] if-has-phis ;
 
