@@ -1,5 +1,6 @@
-USING: alien.c-types compiler.cfg.instructions compiler.cfg.intrinsics.strings
-compiler.test cpu.architecture make tools.test ;
+USING: accessors alien.c-types compiler.cfg.instructions
+compiler.cfg.intrinsics.strings compiler.test cpu.architecture kernel make
+sequences tools.test ;
 IN: compiler.cfg.intrinsics.strings.tests
 
 {
@@ -9,11 +10,12 @@ IN: compiler.cfg.intrinsics.strings.tests
         T{ ##store-memory-imm
            { src 1 }
            { base 5 }
-           { offset 21 }
+           { offset "varies" }
            { rep int-rep }
            { c-type uchar }
         }
     }
 } [
     [ emit-set-string-nth-fast ] V{ } make
+    dup third "varies" >>offset drop
 ] cfg-unit-test
