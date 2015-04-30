@@ -1,4 +1,5 @@
-USING: help.markup help.syntax literals make multiline stack-checker.alien ;
+USING: help.markup help.syntax literals make multiline sequences
+stack-checker.alien ;
 IN: compiler.cfg.builder.alien
 
 <<
@@ -19,3 +20,7 @@ HELP: caller-return
 { $values { "params" alien-node-params } }
 { $description "If the last alien call returns a value, then this word will emit an instruction to the current sequence being constructed by " { $link make } " that boxes it." }
 { $examples { $unchecked-example $[ ex-caller-return ] } } ;
+
+HELP: unbox-parameters
+{ $values { "parameters" sequence } { "vregs" sequence } { "reps" sequence } }
+{ $description "Unboxes a sequence of parameters to send to an ffi function." } ;
