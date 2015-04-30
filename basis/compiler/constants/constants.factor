@@ -4,12 +4,10 @@ USING: alien arrays byte-arrays kernel layouts literals math
 quotations sequences strings words ;
 IN: compiler.constants
 
-! These constants must match vm/memory.h
 CONSTANT: card-bits 8
 CONSTANT: deck-bits 18
 : card-mark ( -- n ) 0x40 0x80 bitor ; inline
 
-! These constants must match vm/layouts.h
 : slot-offset ( slot tag -- n ) [ bootstrap-cells ] dip - ; inline
 
 : float-offset ( -- n ) 8 float type-number - ; inline

@@ -1,6 +1,7 @@
-USING: alien arrays assocs classes compiler.cfg compiler.cfg.ssa.destruction
-compiler.cfg.value-numbering compiler.codegen.gc-maps cpu.architecture
-help.markup help.syntax kernel layouts sequences slots.private system ;
+USING: alien arrays assocs classes compiler.cfg compiler.cfg.intrinsics.fixnum
+compiler.cfg.ssa.destruction compiler.cfg.value-numbering
+compiler.codegen.gc-maps cpu.architecture help.markup help.syntax kernel layouts
+math sequences slots.private system ;
 IN: compiler.cfg.instructions
 
 HELP: ##alien-invoke
@@ -66,7 +67,8 @@ HELP: ##compare-float-ordered-branch
 } ;
 
 HELP: ##compare-integer
-{ $class-description "This instruction is emitted for integer comparisons." } ;
+{ $class-description "This instruction is emitted for integer (" { $link fixnum } ") comparisons." }
+{ $see-also emit-fixnum-comparison } ;
 
 HELP: ##copy
 { $class-description "Instruction that copies a value from one register to another of the same type. For example, you can copy between two gprs or two simd registers but not across. It has the following slots:"
@@ -74,6 +76,10 @@ HELP: ##copy
     { { $slot "rep" } { "Value representation. Both the source and destination register must have the same representation." } }
   }
 } ;
+
+HELP: ##fixnum-add
+{ $class-description "Instruction for adding two fixnums together." }
+{ $see-also emit-fixnum+ } ;
 
 HELP: ##inc
 { $class-description
@@ -196,7 +202,17 @@ HELP: ##spill
 { $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "." } ;
 
 HELP: ##store-memory-imm
-{ $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass." } ;
+{ $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass."
+  { $table
+    { { $slot "base" } { "Vreg that contains the base address." } }
+    {
+        { $slot "offset" }
+        { "Offset in bytes from the address to where the data should be written." }
+    }
+    { { $slot "src" } { "Vreg that contains the item to set." } }
+  }
+}
+{ $see-also %store-memory-imm } ;
 
 HELP: ##vector>scalar
 { $class-description
