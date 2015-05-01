@@ -27,7 +27,6 @@ HELP: assign-registers-in-insn
 
 HELP: compute-live-in
 { $values { "bb" basic-block } }
-{ $description "" }
 { $see-also machine-live-ins } ;
 
 HELP: machine-edge-live-ins
