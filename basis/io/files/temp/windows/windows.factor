@@ -14,7 +14,9 @@ IN: io.files.temp.windows
     swap win32-error=0/f
     alien>native-string ;
 
-: (get-appdata-directory) ( -- path )
+PRIVATE>
+
+: get-appdata-directory ( -- path )
     f
     CSIDL_LOCAL_APPDATA CSIDL_FLAG_CREATE bitor
     f
@@ -23,7 +25,6 @@ IN: io.files.temp.windows
     [ SHGetFolderPath ] keep
     swap check-ole32-error alien>native-string ;
 
-PRIVATE>
 
 MEMO: (temp-directory) ( -- path )
     (get-temp-directory) "factorcode.org\\Factor" append-path dup make-directories ;
@@ -31,6 +32,6 @@ MEMO: (temp-directory) ( -- path )
 M: windows temp-directory (temp-directory) ;
 
 MEMO: (cache-directory) ( -- path )
-    (get-appdata-directory) "factorcode.org\\Factor" append-path dup make-directories ;
+    get-appdata-directory "factorcode.org\\Factor" append-path dup make-directories ;
 
 M: windows cache-directory (cache-directory) ;
