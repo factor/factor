@@ -15,8 +15,8 @@ IN: compiler.cfg.stacks.clearing.tests
 
 {
     {
-        T{ ##replace-imm { src 17 } { loc D 0 } }
         T{ ##replace-imm { src 17 } { loc D 1 } }
+        T{ ##replace-imm { src 17 } { loc D 0 } }
     }
 } [
     { { 2 { } } { 0 { } } } state>replaces
@@ -25,8 +25,8 @@ IN: compiler.cfg.stacks.clearing.tests
 {
     V{
         T{ ##inc { loc D 2 } { insn# 0 } }
-        T{ ##replace-imm { src 17 } { loc T{ ds-loc } } }
         T{ ##replace-imm { src 17 } { loc T{ ds-loc { n 1 } } } }
+        T{ ##replace-imm { src 17 } { loc T{ ds-loc } } }
         T{ ##peek { loc D 2 } { insn# 1 } }
     }
 } [
