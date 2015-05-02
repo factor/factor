@@ -46,7 +46,7 @@ ERROR: zlib-failed n string ;
 
 GENERIC: uncompress ( obj -- byte-array )
 
-M: compressed uncompress ( compressed -- byte-array )
+M: compressed uncompress
     [
         length>> [ <byte-vector> dup underlying>> ] keep
         ulong <ref>
@@ -63,6 +63,6 @@ M: compressed uncompress ( compressed -- byte-array )
         2drop ulong deref memory>byte-array
     ] with-destructors ;
 
-M: byte-array uncompress ( byte-array -- byte-array )
+M: byte-array uncompress
     [ length 5 [0,b) [ 2^ * ] with map ] keep
     '[ _ (uncompress) ] attempt-all ;
