@@ -6,13 +6,6 @@ fry kernel libc math math.functions math.ranges sequences system ;
 QUALIFIED: compression.zlib.ffi
 IN: compression.zlib
 
-TUPLE: compressed data length ;
-
-: <compressed> ( data length -- compressed )
-    compressed new
-        swap >>length
-        swap >>data ;
-
 ERROR: zlib-failed n string ;
 
 : zlib-error-message ( n -- * )
@@ -34,26 +27,13 @@ ERROR: zlib-failed n string ;
 : compressed-size ( byte-array -- n )
     length 1001/1000 * ceiling 12 + ;
 
-: compress ( byte-array -- compressed )
+: compress ( byte-array -- byte-array' )
     [
-        [
-            compressed-size
-            [ <byte-vector> dup underlying>> ] keep ulong <ref>
-        ] keep [
-            dup length compression.zlib.ffi:compress zlib-error
-        ] 2keep drop ulong deref >>length B{ } like
-    ] keep length <compressed> ;
-
-GENERIC: uncompress ( obj -- byte-array )
-
-M: compressed uncompress ( compressed -- byte-array )
-    [
-        length>> [ <byte-vector> dup underlying>> ] keep
-        ulong <ref>
-    ] [
-        data>> dup length pick
-        [ compression.zlib.ffi:uncompress zlib-error ] dip
-    ] bi ulong deref >>length B{ } like ;
+        compressed-size
+        [ <byte-vector> dup underlying>> ] keep ulong <ref>
+    ] keep [
+        dup length compression.zlib.ffi:compress zlib-error
+    ] 2keep drop ulong deref >>length B{ } like ;
 
 : (uncompress) ( length byte-array -- byte-array )
     [
@@ -63,6 +43,6 @@ M: compressed uncompress ( compressed -- byte-array )
         2drop ulong deref memory>byte-array
     ] with-destructors ;
 
-M: byte-array uncompress ( byte-array -- byte-array )
+: uncompress ( byte-array -- byte-array' )
     [ length 5 [0,b) [ 2^ * ] with map ] keep
     '[ _ (uncompress) ] attempt-all ;
