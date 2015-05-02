@@ -29,10 +29,10 @@ HELP: compressed-size
 
 HELP: uncompress
 { $values
-    { "obj" { $or compressed byte-array } }
+    { "compressed" compressed }
     { "byte-array" byte-array }
 }
-{ $description "Uncompresses, returning a byte-array of the underlying data." } ;
+{ $description "Uncompresses a compressed object, returning a byte-array of the underlying data." } ;
 
 ARTICLE: "compression.zlib" "Compression (ZLIB)"
 "The " { $vocab-link "compression.zlib" } " vocabulary provides support for ZLIB:"
