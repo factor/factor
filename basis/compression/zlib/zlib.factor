@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.syntax byte-vectors
-combinators kernel math math.functions sequences system
-accessors libc ;
+USING: accessors alien alien.c-types alien.data alien.syntax
+byte-arrays byte-vectors combinators continuations destructors
+fry kernel libc math math.functions math.ranges sequences system ;
 QUALIFIED: compression.zlib.ffi
 IN: compression.zlib
 
@@ -44,7 +44,9 @@ ERROR: zlib-failed n string ;
         ] 2keep drop ulong deref >>length B{ } like
     ] keep length <compressed> ;
 
-: uncompress ( compressed -- byte-array )
+GENERIC: uncompress ( obj -- byte-array )
+
+M: compressed uncompress ( compressed -- byte-array )
     [
         length>> [ <byte-vector> dup underlying>> ] keep
         ulong <ref>
@@ -52,3 +54,15 @@ ERROR: zlib-failed n string ;
         data>> dup length pick
         [ compression.zlib.ffi:uncompress zlib-error ] dip
     ] bi ulong deref >>length B{ } like ;
+
+: (uncompress) ( length byte-array -- byte-array )
+    [
+        [ drop [ malloc &free ] [ ulong <ref> ] bi ]
+        [ nip dup length ] 2bi
+        [ compression.zlib.ffi:uncompress zlib-error ] 4keep
+        2drop ulong deref memory>byte-array
+    ] with-destructors ;
+
+M: byte-array uncompress ( byte-array -- byte-array )
+    [ length 5 [0,b) [ 2^ * ] with map ] keep
+    '[ _ (uncompress) ] attempt-all ;
