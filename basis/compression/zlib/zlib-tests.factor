@@ -7,6 +7,5 @@ IN: compression.zlib.tests
 : compress-me ( -- byte-array ) B{ 1 2 3 4 5 } ;
 
 [ t ] [ compress-me [ compress uncompress ] keep = ] unit-test
-[ t ] [ compress-me compress compressed instance? ] unit-test
 
 [ ffi:Z_DATA_ERROR zlib-error-message ] [ string>> "data error" = ] must-fail-with
