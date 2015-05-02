@@ -26,8 +26,11 @@ IN: compiler.cfg.stacks
         finalize-stack-shuffling
     } apply-passes ;
 
+: create-locs ( loc-class seq -- locs )
+    [ swap new swap >>n ] with map <reversed> ;
+
 : stack-locs ( loc-class n -- locs )
-    iota [ swap new swap >>n ] with map <reversed> ;
+    iota create-locs ;
 
 : (load-vregs) ( n loc-class -- vregs )
     swap stack-locs [ peek-loc ] map ;

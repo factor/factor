@@ -12,6 +12,11 @@ IN: compiler.cfg.stacks.tests
     height-state get
 ] cfg-unit-test
 
+! stack-locs
+{ { D 4 D 3 D 2 D 1 D 0 } } [
+    ds-loc 5 stack-locs >array
+] unit-test
+
 ! load-vregs
 {
     { 1 2 3 4 5 6 7 8 }
