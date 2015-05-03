@@ -279,7 +279,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
     for (cell loc = 0; loc < count; loc++) {
       if (bitmap_p(bitmap, base + loc)) {
 #ifdef DEBUG_GC_MAPS
-        std::cout << "scrubbing stack location " << loc << std::endl;
+        FACTOR_PRINT("scrubbing stack location " << loc);
 #endif
         *((cell*)stack - loc) = 0;
       }
@@ -310,8 +310,8 @@ template <typename Fixup> struct call_frame_slot_visitor {
       return;
 
 #ifdef DEBUG_GC_MAPS
-    std::cout << "call frame code block " << compiled << " with offset "
-              << return_address << std::endl;
+    FACTOR_PRINT("call frame code block " << compiled << " with offset "
+                 << return_address);
 #endif
     cell* stack_pointer = (cell*)frame_top;
     uint8_t* bitmap = info->gc_info_bitmap();
@@ -334,8 +334,8 @@ template <typename Fixup> struct call_frame_slot_visitor {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
       if (base_pointer != (uint32_t)-1) {
 #ifdef DEBUG_GC_MAPS
-        std::cout << "visiting derived root " << spill_slot
-                  << " with base pointer " << base_pointer << std::endl;
+        FACTOR_PRINT("visiting derived root " << spill_slot
+                     << " with base pointer " << base_pointer);
 #endif
         stack_pointer[spill_slot] -= stack_pointer[base_pointer];
       }
@@ -347,7 +347,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
     for (cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++) {
       if (bitmap_p(bitmap, callsite_gc_roots + spill_slot)) {
 #ifdef DEBUG_GC_MAPS
-        std::cout << "visiting GC root " << spill_slot << std::endl;
+        FACTOR_PRINT("visiting GC root " << spill_slot);
 #endif
         visitor->visit_handle(stack_pointer + spill_slot);
       }

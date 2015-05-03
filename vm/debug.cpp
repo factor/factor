@@ -4,6 +4,8 @@ using namespace std;
 
 namespace factor {
 
+bool factor_print_p = true;
+
 ostream& operator<<(ostream& out, const string* str) {
   for (cell i = 0; i < string_capacity(str); i++)
     out << (char)str->data()[i];
