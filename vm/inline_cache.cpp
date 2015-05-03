@@ -169,9 +169,10 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
   bool tail_call_site = tail_call_site_p(return_address.value);
 
 #ifdef PIC_DEBUG
-  std::cout << "Inline cache miss at " << (tail_call_site ? "tail" : "non-tail")
-            << " call site 0x" << std::hex << return_address.value << std::dec
-            << std::endl;
+  FACTOR_PRINT("Inline cache miss at "
+               << (tail_call_site ? "tail" : "non-tail")
+               << " call site 0x" << std::hex << return_address.value
+               << std::dec);
   print_callstack();
 #endif
 
@@ -210,9 +211,9 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
     set_call_target(return_address.value, xt);
 
 #ifdef PIC_DEBUG
-    std::cout << "Updated " << (tail_call_site ? "tail" : "non-tail")
-              << " call site 0x" << std::hex << return_address.value << std::dec
-              << " with 0x" << std::hex << (cell)xt << std::dec << std::endl;
+    FACTOR_PRINT("Updated " << (tail_call_site ? "tail" : "non-tail")
+                 << " call site 0x" << std::hex << return_address.value << std::dec
+                 << " with 0x" << std::hex << (cell)xt << std::dec);
     print_callstack();
 #endif
   }
