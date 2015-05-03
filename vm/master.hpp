@@ -87,6 +87,7 @@ namespace factor { struct factor_vm; }
 
 /* Factor headers */
 #include "assert.hpp"
+#include "debug.hpp"
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "utilities.hpp"
