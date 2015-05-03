@@ -10,8 +10,9 @@ void factor_vm::collect_aging() {
        raised. */
     current_gc->op = collect_to_tenured_op;
 
-    to_tenured_collector collector(this);
-
+    collector<tenured_space, to_tenured_policy> collector(this,
+                                                          this->data->tenured,
+                                                          to_tenured_policy(this));
     gc_event* event = current_gc->event;
 
     if (event)
