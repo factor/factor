@@ -2,14 +2,11 @@
 
 namespace factor {
 
-to_tenured_collector::to_tenured_collector(factor_vm* parent)
-    : collector<tenured_space, to_tenured_policy>(parent,
-                                                  parent->data->tenured,
-                                                  to_tenured_policy(parent)) {}
-
 void factor_vm::collect_to_tenured() {
   /* Copy live objects from aging space to tenured space. */
-  to_tenured_collector collector(this);
+  collector<tenured_space, to_tenured_policy> collector(this,
+                                                        this->data->tenured,
+                                                        to_tenured_policy(this));
 
   mark_stack.clear();
 
