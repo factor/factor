@@ -69,6 +69,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
   cell cards_scanned;
   cell decks_scanned;
   cell code_blocks_scanned;
+  cell scan;
 
   collector(factor_vm* parent, TargetGeneration* target, Policy policy)
       : parent(parent),
@@ -79,7 +80,9 @@ template <typename TargetGeneration, typename Policy> struct collector {
         visitor(parent, workhorse),
         cards_scanned(0),
         decks_scanned(0),
-        code_blocks_scanned(0) {}
+        code_blocks_scanned(0) {
+    scan = target->start + target->occupied_space();
+  }
 
   void trace_code_heap_roots(std::set<code_block*>* remembered_set) {
     std::set<code_block*>::const_iterator iter = remembered_set->begin();
@@ -171,6 +174,13 @@ template <typename TargetGeneration, typename Policy> struct collector {
           }
         }
       }
+    }
+  }
+
+  void cheneys_algorithm() {
+    while (scan && scan < this->target->here) {
+      this->visitor.visit_object((object*)scan);
+      scan = this->target->next_object_after(scan);
     }
   }
 };

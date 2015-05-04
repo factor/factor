@@ -36,9 +36,9 @@ void factor_vm::collect_aging() {
     std::swap(data->aging, data->aging_semispace);
     data->reset_aging();
 
-    copying_collector<aging_space, aging_policy> collector(this,
-                                                           this->data->aging,
-                                                           aging_policy(this));
+    collector<aging_space, aging_policy> collector(this,
+                                                   this->data->aging,
+                                                   aging_policy(this));
 
     collector.visitor.visit_all_roots();
     collector.cheneys_algorithm();
