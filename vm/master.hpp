@@ -135,8 +135,6 @@ namespace factor { struct factor_vm; }
 #include "callstack.hpp"
 #include "slot_visitor.hpp"
 #include "collector.hpp"
-#include "nursery_collector.hpp"
-#include "aging_collector.hpp"
 #include "to_tenured_collector.hpp"
 #include "full_collector.hpp"
 #include "arrays.hpp"
