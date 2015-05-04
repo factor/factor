@@ -115,8 +115,6 @@ ifdef CONFIG
 		vm/callstack.hpp \
 		vm/slot_visitor.hpp \
 		vm/collector.hpp \
-		vm/nursery_collector.hpp \
-		vm/aging_collector.hpp \
 		vm/to_tenured_collector.hpp \
 		vm/full_collector.hpp \
 		vm/arrays.hpp \
