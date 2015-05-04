@@ -5,9 +5,9 @@ namespace factor {
 void factor_vm::collect_nursery() {
   /* Copy live objects from the nursery (as determined by the root set and
      marked cards in aging and tenured) to aging space. */
-  copying_collector<aging_space, nursery_policy> collector(this,
-                                                           this->data->aging,
-                                                           nursery_policy(this));
+  collector<aging_space, nursery_policy> collector(this,
+                                                   this->data->aging,
+                                                   nursery_policy(this));
 
   collector.visitor.visit_all_roots();
   gc_event* event = current_gc->event;
