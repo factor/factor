@@ -1,17 +1,14 @@
 ! Copyright (C) 2015 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors command-line formatting fry io io.monitors
+USING: accessors command-line formatting io io.monitors
 io.pathnames kernel namespaces sequences ;
 
 IN: file-monitor
 
 : file-monitor-loop ( monitor -- )
-    '[
-        _ next-change
-        [ changed>> ] [ path>> ] bi
-        "%u %s\n" printf flush t
-    ] loop ;
+    dup next-change [ changed>> ] [ path>> ] bi
+    "%u %s\n" printf flush file-monitor-loop ;
 
 : file-monitor-main ( -- )
     command-line get ?first current-directory get or
