@@ -87,12 +87,44 @@ ERROR: file-not-found path bfs? quot ;
 : find-file-throws ( path bfs? quot -- path )
     3dup find-file dup [ 2nip nip ] [ drop file-not-found ] if ; inline
 
+ERROR: sequence-expected obj ;
+
+: ensure-sequence-of-directories ( obj -- seq )
+    dup string? [ 1array ] when
+    dup sequence? [ sequence-expected ] unless ;
+
+! Can't make this generic# on string/sequence because of combinators
 : find-in-directories ( directories bfs? quot -- path'/f )
+    [ ensure-sequence-of-directories ] 2dip
     '[ _ [ _ _ find-file-throws ] attempt-all ]
     [ drop f ] recover ; inline
 
 : find-all-in-directories ( directories quot -- paths/f )
     '[ _ find-all-files ] map concat ; inline
+
+: ?parent-directory ( path -- path'/f )
+    dup parent-directory 2dup = [ 2drop f ] [ nip ] if ;
+
+: ?file-info ( path -- file-info/f )
+    [ file-info ] [ 2drop f ] recover ;
+
+: containing-directory ( path -- path' )
+    dup ?file-info directory? [ parent-directory ] when ;
+
+: ?qualified-directory-files ( path -- seq )
+    [ qualified-directory-files ]
+    [ drop ?parent-directory [ ?qualified-directory-files ] [ f ] if* ] recover ;
+
+: (find-up-to-root) ( path quot -- obj )
+    2dup [ ?qualified-directory-files ] dip find swap [
+        2nip
+    ] [
+        drop [ ?parent-directory ] dip over
+        [ (find-up-to-root) ] [ 2drop f ] if
+    ] if ; inline
+
+: find-up-to-root ( path quot -- obj )
+    [ normalize-path containing-directory ] dip (find-up-to-root) ; inline
 
 : link-size/0 ( path -- n )
     [ link-info size-on-disk>> ] [ 2drop 0 ] recover ;
