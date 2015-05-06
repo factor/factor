@@ -25,3 +25,8 @@ IN: tools.scaffold.tests
 { sequence t } [ "newseq" lookup-type ] unit-test
 { { $maybe sequence } t } [ "seq/f" lookup-type ] unit-test
 { f f } [ "foo" lookup-type ] unit-test
+
+
+: test-maybe ( obj -- obj/f ) ;
+
+[ ] [ \ test-maybe (help.) ] unit-test
