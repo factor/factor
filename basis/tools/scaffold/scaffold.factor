@@ -146,7 +146,13 @@ ERROR: vocab-name-contains-dot path ;
         { "url" url }
     } at* [ swap [ \ $maybe swap 2array ] when ] dip ;
 
-: add-using ( object -- )
+GENERIC: add-using ( object -- )
+
+M: array add-using [ add-using ] each ;
+
+M: string add-using drop ;
+
+M: object add-using ( object -- )
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
 
 : 4bl ( -- )
@@ -160,7 +166,7 @@ ERROR: vocab-name-contains-dot path ;
             dup array? [ first ] when
             dup lookup-type [
                 [ unparse write bl ]
-                [ [ pprint ] [ dup string? [ drop ] [ add-using ] if ] bi ] bi*
+                [ [ pprint ] [ add-using ] bi ] bi*
             ] [
                 drop unparse write bl null pprint
                 null add-using
