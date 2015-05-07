@@ -1,4 +1,4 @@
-USING: accessors kernel kernel.private math memory prettyprint
+USING: accessors effects kernel kernel.private math memory prettyprint
 io sequences tools.test words namespaces layouts classes
 classes.builtin arrays quotations system ;
 FROM: tools.memory => data-room code-room ;
@@ -72,4 +72,22 @@ SYMBOL: foo
 
     data-room tenured>> size>>
     assert=
+] unit-test
+
+! Perform one gc cycle. Then increase the stack height by 100 and
+! force a gc cycle again.
+SYMBOL: foo-var
+
+: perform ( -- )
+    { 1 2 3 } { 4 5 6 } <effect> drop ;
+
+: deep-stack-minor-gc ( n -- )
+    dup [
+        dup 0 > [ 1 - deep-stack-minor-gc ] [
+            drop 100000 [ perform ] times
+        ] if
+    ] dip foo-var set ;
+
+{ } [
+    minor-gc 100 deep-stack-minor-gc
 ] unit-test
