@@ -187,15 +187,15 @@ void factor_vm::gc(gc_op op, cell requested_size) {
 }
 
 void factor_vm::primitive_minor_gc() {
-  gc(collect_nursery_op, 0 /* requested size */);
+  gc(collect_nursery_op, 0);
 }
 
 void factor_vm::primitive_full_gc() {
-  gc(collect_full_op, 0 /* requested size */);
+  gc(collect_full_op, 0);
 }
 
 void factor_vm::primitive_compact_gc() {
-  gc(collect_compact_op, 0 /* requested size */);
+  gc(collect_compact_op, 0);
 }
 
 /*
@@ -211,7 +211,7 @@ object* factor_vm::allot_large_object(cell type, cell size) {
 
     /* If it still won't fit, grow the heap */
     if (!data->tenured->can_allot_p(requested_size)) {
-      gc(collect_growing_heap_op, size /* requested size */);
+      gc(collect_growing_heap_op, size);
     }
   }
 

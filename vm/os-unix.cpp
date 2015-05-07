@@ -87,9 +87,9 @@ segment::segment(cell size_, bool executable_p) {
 
   int prot;
   if (executable_p)
-    prot = (PROT_READ | PROT_WRITE | PROT_EXEC);
+    prot = PROT_READ | PROT_WRITE | PROT_EXEC;
   else
-    prot = (PROT_READ | PROT_WRITE);
+    prot = PROT_READ | PROT_WRITE;
 
   char* array = (char*)mmap(NULL, pagesize + size + pagesize, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
