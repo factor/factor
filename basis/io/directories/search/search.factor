@@ -109,19 +109,19 @@ ERROR: sequence-expected obj ;
     [ file-info ] [ 2drop f ] recover ;
 
 : containing-directory ( path -- path' )
-    dup ?file-info directory? [ parent-directory ] when ;
+    dup ?file-info directory? [ parent-directory ] unless ;
 
 : ?qualified-directory-files ( path -- seq )
     [ qualified-directory-files ]
     [ drop ?parent-directory [ ?qualified-directory-files ] [ f ] if* ] recover ;
 
-: (find-up-to-root) ( path quot -- obj )
-    2dup [ ?qualified-directory-files ] dip find swap [
-        2nip
+: (find-up-to-root) ( path  quot: ( path -- ? ) -- obj )
+    [ [ ?qualified-directory-files ] dip find swap ] 2keep rot [
+        2drop
     ] [
-        drop [ ?parent-directory ] dip over
+        [ nip ?parent-directory ] dip over
         [ (find-up-to-root) ] [ 2drop f ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : find-up-to-root ( path quot -- obj )
     [ normalize-path containing-directory ] dip (find-up-to-root) ; inline
