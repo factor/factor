@@ -45,9 +45,7 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-overflow-case ( word -- final-bb )
     [
-        ##call,
-        -1 adjust-d
-        make-kill-block
+        -1 emit-call-block
     ] with-branch ;
 
 : emit-fixnum-overflow-op ( quot word -- )
