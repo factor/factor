@@ -368,8 +368,6 @@ struct factor_vm {
   void collect_compact();
   void collect_growing_heap(cell requested_size);
   void gc(gc_op op, cell requested_size);
-  void scrub_context(context* ctx);
-  void scrub_contexts();
   void primitive_minor_gc();
   void primitive_full_gc();
   void primitive_compact_gc();

@@ -94,11 +94,11 @@ void data_heap::reset_tenured() {
 }
 
 bool data_heap::high_fragmentation_p() {
-  return (tenured->largest_free_block() <= high_water_mark());
+  return tenured->largest_free_block() <= high_water_mark();
 }
 
 bool data_heap::low_memory_p() {
-  return (tenured->free_space() <= high_water_mark());
+  return tenured->free_space() <= high_water_mark();
 }
 
 void data_heap::mark_all_cards() {
