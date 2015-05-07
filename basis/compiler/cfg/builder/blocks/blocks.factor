@@ -35,11 +35,12 @@ IN: compiler.cfg.builder.blocks
 : call-height ( #call -- n )
     [ out-d>> length ] [ in-d>> length ] bi - ;
 
+: emit-call-block ( word height -- )
+    dup adjust-d ##call, make-kill-block ;
+
 : emit-primitive ( node -- )
     [
-        [ word>> ##call, ]
-        [ call-height adjust-d ] bi
-        make-kill-block
+        [ word>> ] [ call-height ] bi emit-call-block
     ] emit-trivial-block ;
 
 : begin-branch ( -- )
