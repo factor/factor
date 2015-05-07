@@ -1,19 +1,56 @@
 ! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators compiler.tree.propagation.call-effect compiler.units
-math effects kernel compiler.tree.builder compiler.tree.optimizer
-compiler.tree.debugger sequences eval fry tools.test ;
+USING: accessors combinators combinators.private compiler.tree
+compiler.tree.propagation.call-effect compiler.units math effects kernel
+compiler.tree.builder compiler.tree.optimizer compiler.tree.debugger sequences
+eval fry kernel.private tools.test ;
 IN: compiler.tree.propagation.call-effect.tests
 
-! update-inline-cache
-{ t } [
-    [ boa ] inline-cache new [ update-inline-cache ] keep
-    [ boa ] effect-counter inline-cache boa =
+! cached-effect
+{ t } [ [ + ] cached-effect ( a b -- c ) effect= ] unit-test
+{ t } [ 5 [ + ] curry cached-effect ( a -- c ) effect= ] unit-test
+{ t } [ 5 [ ] curry cached-effect ( -- c ) effect= ] unit-test
+{ t } [ [ dup ] [ drop ] compose cached-effect ( a -- b ) effect= ] unit-test
+{ t } [ [ drop ] [ dup ] compose cached-effect ( a b -- c d ) effect= ] unit-test
+{ t } [ [ 2drop ] [ dup ] compose cached-effect ( a b c -- d e ) effect= ] unit-test
+{ t } [ [ 1 2 3 ] [ 2drop ] compose cached-effect ( -- a ) effect= ] unit-test
+{ t } [ [ 1 2 ] [ 3drop ] compose cached-effect ( a -- ) effect= ] unit-test
+
+! call-effect>quot
+{
+    [ drop ( a -- b ) T{ inline-cache } call-effect-ic ]
+} [
+    ( a -- b ) call-effect>quot
 ] unit-test
 
 ! call-effect-slow>quot
 { 10000 } [
     100 [ sq ] ( a -- b ) call-effect-slow>quot call
+] unit-test
+
+{
+    [
+        [
+            ( -- a b c )
+            2dup
+            [
+                [ [ datastack ] dip dip ] dip dup terminated?>>
+                [ 2drop f ] [
+                    dup in>> length swap out>> length
+                    check-datastack
+                ] if
+            ]
+            2dip
+            rot
+            [ 2drop ]
+            [ wrong-values ]
+            if
+        ]
+        ( obj -- a b c )
+        call-effect-unsafe
+    ]
+} [
+    ( -- a b c ) call-effect-slow>quot
 ] unit-test
 
 ! call-effect-unsafe?
@@ -22,19 +59,29 @@ IN: compiler.tree.propagation.call-effect.tests
     [ ] ( x -- x ) call-effect-unsafe?
 ] unit-test
 
+! call-inlining
+{
+    [ drop f T{ inline-cache } call-effect-ic ]
+} [
+    T{ #call
+       { word call-effect }
+       { in-d V{ 165186755 165186756 165186754 } }
+       { out-d { 165186757 } }
+    } call-inlining
+] unit-test
+
+! execute-effect-unsafe?
 [ t ] [ \ + ( a b -- c ) execute-effect-unsafe? ] unit-test
 [ t ] [ \ + ( a b c -- d e ) execute-effect-unsafe? ] unit-test
 [ f ] [ \ + ( a b c -- d ) execute-effect-unsafe? ] unit-test
 [ f ] [ \ call ( x -- ) execute-effect-unsafe? ] unit-test
 
-[ t ] [ [ + ] cached-effect ( a b -- c ) effect= ] unit-test
-[ t ] [ 5 [ + ] curry cached-effect ( a -- c ) effect= ] unit-test
-[ t ] [ 5 [ ] curry cached-effect ( -- c ) effect= ] unit-test
-[ t ] [ [ dup ] [ drop ] compose cached-effect ( a -- b ) effect= ] unit-test
-[ t ] [ [ drop ] [ dup ] compose cached-effect ( a b -- c d ) effect= ] unit-test
-[ t ] [ [ 2drop ] [ dup ] compose cached-effect ( a b c -- d e ) effect= ] unit-test
-[ t ] [ [ 1 2 3 ] [ 2drop ] compose cached-effect ( -- a ) effect= ] unit-test
-[ t ] [ [ 1 2 ] [ 3drop ] compose cached-effect ( a -- ) effect= ] unit-test
+! update-inline-cache
+{ t } [
+    [ boa ] inline-cache new [ update-inline-cache ] keep
+    [ boa ] effect-counter inline-cache boa =
+] unit-test
+
 
 : optimized-quot ( quot -- quot' )
     build-tree optimize-tree nodes>quot ;
