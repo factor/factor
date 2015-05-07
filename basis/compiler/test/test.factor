@@ -24,6 +24,7 @@ fry namespaces ;
 : init-cfg-test ( -- )
     reset-vreg-counter begin-stack-analysis
     <basic-block> dup basic-block set begin-local-analysis
+    H{ } clone representations set
     H{ } clone replaces set ;
 
 : cfg-unit-test ( result quot -- )

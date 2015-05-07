@@ -69,10 +69,7 @@ GENERIC: emit-node ( node -- )
     over loops get key?
     [ drop loops get at emit-loop-call ]
     [
-        [
-            [ ##call, ] [ adjust-d ] bi*
-            make-kill-block
-        ] emit-trivial-block
+        [ emit-call-block ] emit-trivial-block
     ] if ;
 
 ! #recursive

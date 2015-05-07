@@ -195,8 +195,8 @@ M: ppc stack-frame-size ( stack-frame -- i )
     factor-area-size +
     16 align ;
 
-M: ppc %call ( word -- )
-    0 BL rc-relative-ppc-3-pc rel-word-pic ;
+M: ppc %call ( word height -- )
+    drop 0 BL rc-relative-ppc-3-pc rel-word-pic ;
 
 : instrs ( n -- b ) 4 * ; inline
 
@@ -922,7 +922,7 @@ M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
     } case ;
 
 M: ppc %call-gc ( gc-map -- )
-    \ minor-gc %call gc-map-here ;
+    \ minor-gc 0 %call gc-map-here ;
 
 M:: ppc %prologue ( stack-size -- )
     0 MFLR
