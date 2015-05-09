@@ -1,4 +1,4 @@
-USING: compiler.cfg compiler.cfg.instructions compiler.cfg.stacks.map
+USING: compiler.cfg compiler.cfg.instructions compiler.cfg.stacks.padding
 help.markup help.syntax sequences strings ;
 IN: compiler.cfg.stacks.vacant
 
@@ -19,7 +19,7 @@ HELP: fill-gc-maps
 
 HELP: state>gc-data
 { $values { "state" sequence } { "gc-data" sequence } }
-{ $description "Takes a stack state on the format given by " { $link trace-stack-state } " and emits an array containing two bit-patterns with locations on the data and retain stacks to scrub." } ;
+{ $description "Takes a stack state on the format given by " { $link trace-stack-state2 } " and emits an array containing two bit-patterns with locations on the data and retain stacks to scrub." } ;
 
 HELP: vacant>bits
 { $values
