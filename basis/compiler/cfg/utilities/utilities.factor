@@ -53,13 +53,6 @@ IN: compiler.cfg.utilities
     from to bb update-predecessors
     from to bb update-successors ;
 
-: add-instructions ( bb quot -- )
-    [ instructions>> building ] dip '[
-        building get pop
-        [ @ ] dip
-        ,
-    ] with-variable ; inline
-
 : has-phis? ( bb -- ? )
     instructions>> first ##phi? ;
 
