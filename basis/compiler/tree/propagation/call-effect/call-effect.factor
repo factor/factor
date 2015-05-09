@@ -111,9 +111,6 @@ M: quotation cached-effect
 : execute-effect>quot ( effect -- quot )
     inline-cache new '[ drop _ _ execute-effect-ic ] ;
 
-! Some bookkeeping to make sure that crap like
-! [ dup curry call( quot -- ) ] dup curry call( quot -- ) ]
-! doesn't hang the compiler.
 GENERIC: already-inlined-quot? ( quot -- ? )
 
 M: curry already-inlined-quot? quot>> already-inlined-quot? ;

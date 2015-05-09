@@ -10,6 +10,7 @@ HELP: basic-block
     { { $slot "successors" } { "A " { $link vector } " of basic blocks that may be executed directly after this block. Most blocks only have one successor but a block that checks where an if-condition should branch to would have two for example." } }
     { { $slot "predecessors" } { "The opposite of successors -- a " { $link vector } " of basic blocks from which the execution may have arrived into this block." } }
     { { $slot "instructions" } { "A " { $link vector } " of " { $link insn } " tuples which form the instructions of the basic block." } }
+    { { $slot "kill-block?" } { "The first and the last block in a cfg and all blocks containing " { $link ##call } " instructions are kill blocks." } }
   }
 } ;
 

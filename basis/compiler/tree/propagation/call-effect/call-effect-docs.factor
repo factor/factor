@@ -2,6 +2,10 @@ USING: combinators.private compiler.units effects help.markup help.syntax
 quotations ;
 IN: compiler.tree.propagation.call-effect
 
+HELP: already-inlined-quot?
+{ $values { "quot" quotation } { "?" "a boolean" } }
+{ $description "Some bookkeeping to make sure that crap like [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] doesn't hang the compiler." } ;
+
 HELP: cached-effect-valid?
 { $values { "quot" quotation } { "?" "a boolean" } }
 { $description { $link t } " if the cached effect is valid." } ;
@@ -25,7 +29,6 @@ HELP: call-effect-unsafe?
 HELP: update-inline-cache
 { $values { "word/quot" "word or quotation" } { "ic" inline-cache } }
 { $description "Sets the inline caches " { $slot "value" } " to the given word/quot and updates its " { $slot "counter" } " to the value of the " { $link effect-counter } "." } ;
-
 
 ARTICLE: "compiler.tree.propagation.call-effect" "Expansions of call( and execute( words"
 "call( and execute( have complex expansions."

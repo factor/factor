@@ -8,7 +8,6 @@ generic.math generic.single generic.standard kernel locals math
 math.partial-dispatch namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
-! Splicing nodes
 : splicing-call ( #call word -- nodes )
     [ [ in-d>> ] [ out-d>> ] bi ] dip <#call> 1array ;
 
@@ -95,7 +94,7 @@ SYMBOL: history
 : never-inline-word? ( word -- ? )
     { [ deferred? ] [ "default" word-prop ] [ \ call eq? ] } 1|| ;
 
-: custom-inlining? ( word -- ? )
+: custom-inlining? ( word -- quot/f )
     "custom-inlining" word-prop ;
 
 : inline-custom ( #call word -- ? )
@@ -104,14 +103,6 @@ SYMBOL: history
     object swap eliminate-dispatch ;
 
 : (do-inlining) ( #call word -- ? )
-    #! If the generic was defined in an outer compilation unit,
-    #! then it doesn't have a definition yet; the definition
-    #! is built at the end of the compilation unit. We do not
-    #! attempt inlining at this stage since the stack discipline
-    #! is not finalized yet, so dispatch# might return an out
-    #! of bounds value. This case comes up if a parsing word
-    #! calls the compiler at parse time (doing so is
-    #! discouraged, but it should still work.)
     {
         { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup always-inline-word? ] [ inline-word ] }
