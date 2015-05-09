@@ -1,5 +1,5 @@
-USING: accessors effects kernel kernel.private math memory prettyprint
-io sequences tools.test words namespaces layouts classes
+USING: accessors byte-arrays effects kernel kernel.private math memory
+prettyprint io sequences tools.test words namespaces layouts classes
 classes.builtin arrays quotations system ;
 FROM: tools.memory => data-room code-room ;
 IN: memory.tests
@@ -90,4 +90,23 @@ SYMBOL: foo-var
 
 { } [
     minor-gc 100 deep-stack-minor-gc
+] unit-test
+
+! Bug #1289
+TUPLE: tup2 a b c d ;
+
+: inner ( k -- n )
+    20 f <array> 20 f <array> assert=
+    ! Allocates a byte array so large that the next allocation will
+    ! trigger a gc.
+    drop 2097103 <byte-array> ;
+
+: outer ( -- lag )
+    9 iota [ inner ] map
+    ! D 0 is scrubbed, but if the branch calling 'inner' was
+    ! called, then both D 0 and D 1 should have been scrubbed.
+    0 9 1 tup2 boa ;
+
+{ } [
+    outer drop
 ] unit-test
