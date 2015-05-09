@@ -1,7 +1,8 @@
-USING: compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.ssa.destruction compiler.cfg.ssa.destruction.leaders
-compiler.cfg.ssa.destruction.private cpu.architecture kernel make namespaces
-tools.test ;
+USING: alien.syntax compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.ssa.destruction
+compiler.cfg.ssa.destruction.leaders
+compiler.cfg.ssa.destruction.private compiler.cfg.utilities
+cpu.architecture cpu.x86.assembler.operands make namespaces tools.test ;
 IN: compiler.cfg.ssa.destruction.tests
 
 ! cleanup-insn
@@ -24,4 +25,40 @@ IN: compiler.cfg.ssa.destruction.tests
 { V{ } } [
     T{ ##parallel-copy { values V{ } } }
     [ cleanup-insn ] V{ } make
+] unit-test
+
+! init-coalescing
+{
+    H{ { 123 123 } { 77 77 } }
+} [
+    H{ { 123 "bb1" } { 77 "bb2" } } defs set
+    init-coalescing
+    leader-map get
+] unit-test
+
+! destruct-ssa
+{ } [
+    H{ { 36 23 } { 23 23 } } leader-map set
+    H{ { 36 int-rep } { 37 tagged-rep } } representations set
+    V{
+        T{ ##alien-invoke
+           { reg-inputs V{ { 56 int-rep RDI } } }
+           { stack-inputs V{ } }
+           { reg-outputs { { 36 int-rep RAX } } }
+           { dead-outputs { } }
+           { cleanup 0 }
+           { stack-size 0 }
+           { symbols "g_quark_to_string" }
+           { dll DLL" libglib-2.0.so" }
+           { gc-map T{ gc-map { scrub-d { } } { scrub-r { } } } }
+           { insn# 14 }
+        }
+        T{ ##call-gc { gc-map T{ gc-map { scrub-d { } } { scrub-r { } } } } }
+        T{ ##box-alien
+           { dst 37 }
+           { src 36 }
+           { temp 11 }
+           { insn# 18 }
+        }
+    } 0 insns>block block>cfg destruct-ssa
 ] unit-test
