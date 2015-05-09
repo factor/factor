@@ -8,7 +8,7 @@ sequences ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.padding
 
-ERROR: overinitialized-when-calling seq ;
+ERROR: overinitialized-when-gc seq ;
 ERROR: vacant-when-calling seq ;
 
 : safe-iota ( n -- seq )
@@ -62,7 +62,7 @@ CONSTANT: initial-state { { 0 { } } { 0 { } } }
 
 : ensure-no-overinitialized ( state -- )
     [ second [ 0 < ] filter ] map dup { { } { } } =
-    [ drop ] [ overinitialized-when-calling ] if ;
+    [ drop ] [ overinitialized-when-gc ] if ;
 
 : fill-vacancies ( state -- state' )
     [ fill-stack ] map ;
