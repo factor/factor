@@ -1,4 +1,5 @@
-USING: help.markup help.syntax kernel kernel.private sequences words ;
+USING: combinators help.markup help.syntax kernel kernel.private sequences
+words ;
 IN: stack-checker.known-words
 
 HELP: check-declaration
@@ -11,6 +12,9 @@ HELP: define-primitive
 
 HELP: infer-call
 { $description "Performs inferencing for the " { $link call } " word." } ;
+
+HELP: infer-call-effect
+{ $description "Performs inferencing for the " { $link call-effect } " word." } ;
 
 HELP: infer-local-reader
 { $values { "word" word } }
