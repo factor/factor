@@ -1,16 +1,29 @@
-USING: cpu.x86.assembler.operands.private help.markup help.syntax layouts
-math ;
+USING: cpu.x86.assembler cpu.x86.assembler.operands.private help.markup
+help.syntax layouts math ;
 IN: cpu.x86
+
+HELP: %boolean
+{ $values
+  { "dst" "register" }
+  { "cc" "comparision symbol" }
+  { "temp" "temporary register" }
+}
+{ $description "Helper word for emitting conditional move instructions." }
+{ $see-also CMOVL CMOVLE CMOVG CMOVGE CMOVE CMOVNE } ;
+
+HELP: JLE
+{ $values "dst" "destination offset (relative to the instruction pointer register)" }
+{ $description "Emits a 'jle' instruction." } ;
+
+HELP: reserved-stack-space
+{ $values { "n" integer } }
+{ $description "Size in bytes of the register parameter area. It only exists on the windows x86.64 architecture, where it is 32 bytes and allocated by the caller. On all other platforms it is 0." } ;
 
 HELP: stack-reg
 { $values { "reg" "a register symbol" } }
 { $description
   "Symbol of the machine register that holds the (cpu) stack address."
 } ;
-
-HELP: reserved-stack-space
-{ $values { "n" integer } }
-{ $description "Size in bytes of the register parameter area. It only exists on the windows x86.64 architecture, where it is 32 bytes and allocated by the caller. On all other platforms it is 0." } ;
 
 HELP: ds-reg
 { $values { "reg" "a register symbol" } }

@@ -4,6 +4,10 @@ IN: compiler.cfg.gc-checks
 
 <PRIVATE
 
+HELP: add-gc-checks
+{ $values { "insns-seq" "a sequence of instruction sequences" } }
+{ $description "Insert a GC check at the end of every chunk but the last one. This ensures that every section other than the first has a GC check in the section immediately preceeding it." } ;
+
 HELP: allocation-size
 { $values { "insns" { $link sequence } " of " { $link insn } } { "n" number } }
 { $description "Calculates the total number of bytes allocated by the instructions in a block." }

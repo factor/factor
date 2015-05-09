@@ -57,9 +57,6 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
     [ allocation-size* data-alignment get align ] map-sum ;
 
 : add-gc-checks ( insns-seq -- )
-    ! Insert a GC check at the end of every chunk but the last
-    ! one. This ensures that every section other than the first
-    ! has a GC check in the section immediately preceeding it.
     2 <clumps> [
         first2 allocation-size
         cc<= int-rep next-vreg-rep int-rep next-vreg-rep
