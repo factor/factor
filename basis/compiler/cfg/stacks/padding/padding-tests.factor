@@ -154,6 +154,11 @@ IN: compiler.cfg.stacks.padding.tests
     { { 4 { } } { 0 { } } } T{ ##call-gc } visit-insn
 ] unit-test
 
+
+[
+    { { 2 { -1 0 1 } } { 0 { } } } T{ ##call-gc } visit-insn
+] [ overinitialized-when-gc? ] must-fail-with
+
 ! visit-insn ##peek
 {
     { { 3 { 0 } } { 0 { } } }
@@ -596,16 +601,3 @@ IN: compiler.cfg.stacks.padding.tests
         T{ ##peek { loc R 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with
-
-
-
-
-
-
-
-
-
-! ! (scan-c-args) run-test flip
-
-
-! seem good: (gamma-random-float>1)
