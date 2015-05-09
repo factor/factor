@@ -35,3 +35,13 @@ IN: io.directories.search.tests
     [ [ file-name "abcd" = ] find-all-in-directories length 2 = ]
     [ [ delete-tree ] each ] tri
 ] unit-test
+
+{ t } [
+    "resource:core/math/integers/integers.factor"
+    [ "math.factor" tail? ] find-up-to-root >boolean
+] unit-test
+
+{ f } [
+    "resource:core/math/integers/integers.factor"
+    [ drop f ] find-up-to-root
+] unit-test
