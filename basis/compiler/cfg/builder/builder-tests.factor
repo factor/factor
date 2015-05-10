@@ -4,7 +4,7 @@ compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
 compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.representations
 compiler.cfg.rpo compiler.cfg.stacks compiler.cfg.stacks.local
 compiler.cfg.utilities compiler.test compiler.tree compiler.tree.builder
-compiler.tree.optimizer fry hashtables kernel kernel.private locals make math
+compiler.tree.optimizer fry hashtables io kernel kernel.private locals make math
 math.partial-dispatch math.private namespaces prettyprint sbufs sequences
 sequences.private slots.private strings strings.private tools.test vectors
 words ;
@@ -242,6 +242,14 @@ IN: compiler.cfg.builder.tests
 } [
     T{ #shuffle { in-d { 37 81 92 } } } make-input-map
 ] unit-test
+
+! emit-call
+{
+    V{ T{ ##call { word print } { height 4 } } T{ ##branch } }
+} [
+    [ \ print 4 emit-call ] V{ } make drop
+    basic-block get successors>> first instructions>>
+] cfg-unit-test
 
 ! emit-node
 {

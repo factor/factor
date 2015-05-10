@@ -11,7 +11,6 @@ cpu.architecture kernel locals make namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 
-! Maps leaders to equivalence class elements.
 SYMBOL: class-element-map
 
 : class-elements ( vreg -- elts ) class-element-map get at ;
@@ -26,7 +25,7 @@ SYMBOL: copies
 
 : init-coalescing ( -- )
     defs get
-    [ [ drop dup ] assoc-map leader-map set ]
+    [ keys unique leader-map set ]
     [
         [ [ dup dup value-of ] dip <vreg-info> 1array ] assoc-map
         class-element-map set
@@ -132,6 +131,7 @@ M: insn cleanup-insn , ;
 PRIVATE>
 
 : destruct-ssa ( cfg -- )
+    f leader-map set
     {
         needs-dominance
         construct-cssa

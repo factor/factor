@@ -2,12 +2,27 @@
 
 namespace factor {
 
+struct nursery_policy {
+  bump_allocator* nursery;
+
+  explicit nursery_policy(bump_allocator* nursery) : nursery(nursery) {}
+
+  bool should_copy_p(object* obj) {
+    return nursery->contains_p(obj);
+  }
+
+  void promoted_object(object* obj) {}
+
+  void visited_object(object* obj) {}
+};
+
 void factor_vm::collect_nursery() {
+
   /* Copy live objects from the nursery (as determined by the root set and
      marked cards in aging and tenured) to aging space. */
-  copying_collector<aging_space, nursery_policy> collector(this,
-                                                           this->data->aging,
-                                                           nursery_policy(this));
+  nursery_policy policy(this->data->nursery);
+  collector<aging_space, nursery_policy>
+      collector(this, this->data->aging, policy);
 
   collector.visitor.visit_all_roots();
   gc_event* event = current_gc->event;

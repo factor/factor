@@ -1,11 +1,10 @@
 USING: accessors arrays assocs combinators.short-circuit
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.stacks.map kernel math sequences ;
+compiler.cfg.stacks compiler.cfg.stacks.padding kernel math sequences ;
 IN: compiler.cfg.stacks.clearing
 
 : state>replaces ( state -- replaces )
-    [ stack>vacant ] map first2
-    [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi* append
+    [ stack>vacant ] map { ds-loc rs-loc } [ swap create-locs ] 2map concat
     [ 17 swap f ##replace-imm boa ] map ;
 
 : dangerous-insn? ( state insn -- ? )
@@ -20,6 +19,6 @@ IN: compiler.cfg.stacks.clearing
     [ [ clearing-replaces ] keep suffix ] with map V{ } concat-as ;
 
 : clear-uninitialized ( cfg -- )
-    [ trace-stack-state ] keep [
+    [ trace-stack-state2 ] keep [
         [ visit-insns ] change-instructions drop
     ] with each-basic-block ;

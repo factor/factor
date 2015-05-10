@@ -87,6 +87,7 @@ namespace factor { struct factor_vm; }
 
 /* Factor headers */
 #include "assert.hpp"
+#include "debug.hpp"
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "utilities.hpp"
@@ -134,9 +135,6 @@ namespace factor { struct factor_vm; }
 #include "callstack.hpp"
 #include "slot_visitor.hpp"
 #include "collector.hpp"
-#include "copying_collector.hpp"
-#include "nursery_collector.hpp"
-#include "aging_collector.hpp"
 #include "to_tenured_collector.hpp"
 #include "full_collector.hpp"
 #include "arrays.hpp"

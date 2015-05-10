@@ -355,7 +355,6 @@ struct factor_vm {
   void end_gc();
   void set_current_gc_op(gc_op op);
   void start_gc_again();
-  void update_code_heap_for_minor_gc(std::set<code_block*>* remembered_set);
   void collect_nursery();
   void collect_aging();
   void collect_to_tenured();
@@ -369,8 +368,6 @@ struct factor_vm {
   void collect_compact();
   void collect_growing_heap(cell requested_size);
   void gc(gc_op op, cell requested_size);
-  void scrub_context(context* ctx);
-  void scrub_contexts();
   void primitive_minor_gc();
   void primitive_full_gc();
   void primitive_compact_gc();

@@ -69,6 +69,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
   cell cards_scanned;
   cell decks_scanned;
   cell code_blocks_scanned;
+  cell scan;
 
   collector(factor_vm* parent, TargetGeneration* target, Policy policy)
       : parent(parent),
@@ -79,7 +80,9 @@ template <typename TargetGeneration, typename Policy> struct collector {
         visitor(parent, workhorse),
         cards_scanned(0),
         decks_scanned(0),
-        code_blocks_scanned(0) {}
+        code_blocks_scanned(0) {
+    scan = target->start + target->occupied_space();
+  }
 
   void trace_code_heap_roots(std::set<code_block*>* remembered_set) {
     std::set<code_block*>::const_iterator iter = remembered_set->begin();
@@ -97,18 +100,12 @@ template <typename TargetGeneration, typename Policy> struct collector {
   void trace_partial_objects(cell start, cell card_start, cell card_end) {
     object* obj = (object*)start;
     cell end = start + obj->binary_payload_start();
-    if (card_start < end) {
-      start += sizeof(cell);
+    start += sizeof(cell);
 
-      start = std::max(start, card_start);
-      end = std::min(end, card_end);
+    start = std::max(start, card_start);
+    end = std::min(end, card_end);
 
-      cell* slot_ptr = (cell*)start;
-      cell* end_ptr = (cell*)end;
-
-      for (; slot_ptr < end_ptr; slot_ptr++)
-        visitor.visit_handle(slot_ptr);
-    }
+    visitor.visit_object_array((cell*)start, (cell*)end);
   }
 
   template <typename SourceGeneration>
@@ -149,21 +146,20 @@ template <typename TargetGeneration, typename Policy> struct collector {
     /* Address of last traced object. */
     cell start = 0;
 
-    for (cell deck_index = first_deck; deck_index < last_deck; deck_index++) {
-      if (decks[deck_index] & mask) {
-        decks[deck_index] &= ~unmask;
+    for (cell di = first_deck; di < last_deck; di++) {
+      if (decks[di] & mask) {
+        decks[di] &= ~unmask;
         decks_scanned++;
 
-        cell first_card = cards_per_deck * deck_index;
+        cell first_card = cards_per_deck * di;
         cell last_card = first_card + cards_per_deck;
 
-        for (cell card_index = first_card; card_index < last_card;
-             card_index++) {
-          if (cards[card_index] & mask) {
-            cards[card_index] &= ~unmask;
+        for (cell ci = first_card; ci < last_card; ci++) {
+          if (cards[ci] & mask) {
+            cards[ci] &= ~unmask;
             cards_scanned++;
 
-            start = trace_card(gen, card_index, start);
+            start = trace_card(gen, ci, start);
             if (!start) {
               /* At end of generation, no need to scan more cards. */
               return;
@@ -171,6 +167,13 @@ template <typename TargetGeneration, typename Policy> struct collector {
           }
         }
       }
+    }
+  }
+
+  void cheneys_algorithm() {
+    while (scan && scan < this->target->here) {
+      this->visitor.visit_object((object*)scan);
+      scan = this->target->next_object_after(scan);
     }
   }
 };

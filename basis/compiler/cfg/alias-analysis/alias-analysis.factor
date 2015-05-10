@@ -8,60 +8,6 @@ namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.alias-analysis
 
-! We try to eliminate redundant slot operations using some
-! simple heuristics.
-!
-! All heap-allocated objects which are loaded from the stack, or
-! other object slots are pessimistically assumed to belong to
-! the same alias class.
-!
-! Freshly-allocated objects get their own alias class.
-!
-! Simple pseudo-C example showing load elimination:
-!
-! int *x, *y, z: inputs
-! int a, b, c, d, e: locals
-!
-! Before alias analysis:
-!
-! a = x[2]
-! b = x[2]
-! c = x[3]
-! y[2] = z
-! d = x[2]
-! e = y[2]
-! f = x[3]
-!
-! After alias analysis:
-!
-! a = x[2]
-! b = a /* ELIMINATED */
-! c = x[3]
-! y[2] = z
-! d = x[2] /* if x=y, d=z, if x!=y, d=b; NOT ELIMINATED */
-! e = z /* ELIMINATED */
-! f = c /* ELIMINATED */
-!
-! Simple pseudo-C example showing store elimination:
-!
-! Before alias analysis:
-!
-! x[0] = a
-! b = x[n]
-! x[0] = c
-! x[1] = d
-! e = x[0]
-! x[1] = c
-!
-! After alias analysis:
-!
-! x[0] = a /* dead if n = 0, live otherwise; NOT ELIMINATED */
-! b = x[n]
-! x[0] = c
-! /* x[1] = d */  /* ELIMINATED */
-! e = c
-! x[1] = c
-
 ! Local copy propagation
 SYMBOL: copies
 

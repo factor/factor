@@ -4,7 +4,7 @@ kernel make compiler.constants words ;
 IN: compiler.codegen.tests
 
 [ ] [ [ ] with-fixup drop ] unit-test
-[ ] [ [ \ + %call ] with-fixup drop ] unit-test
+[ ] [ [ \ + 0 %call ] with-fixup drop ] unit-test
 
 [ ] [ [ <label> dup define-label dup resolve-label %jump-label ] with-fixup drop ] unit-test
 [ ] [ [ <label> dup define-label dup resolve-label B{ 0 0 0 0 } % rc-absolute-cell label-fixup ] with-fixup drop ] unit-test

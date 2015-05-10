@@ -68,6 +68,7 @@ ifdef CONFIG
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
+		vm/debug.hpp \
 		vm/layouts.hpp \
 		vm/platform.hpp \
 		vm/primitives.hpp \
@@ -114,9 +115,6 @@ ifdef CONFIG
 		vm/callstack.hpp \
 		vm/slot_visitor.hpp \
 		vm/collector.hpp \
-		vm/copying_collector.hpp \
-		vm/nursery_collector.hpp \
-		vm/aging_collector.hpp \
 		vm/to_tenured_collector.hpp \
 		vm/full_collector.hpp \
 		vm/arrays.hpp \

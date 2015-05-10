@@ -1,12 +1,64 @@
-USING: arrays compiler.cfg.gc-checks
+USING: arrays byte-arrays compiler.cfg.gc-checks
 compiler.cfg.gc-checks.private compiler.cfg.debugger
 compiler.cfg.registers compiler.cfg.instructions compiler.cfg
 compiler.cfg.predecessors compiler.cfg.rpo cpu.architecture
 tools.test kernel vectors namespaces accessors sequences alien
-memory classes make combinators.short-circuit byte-arrays
-compiler.cfg.comparisons compiler.cfg.utilities ;
+memory classes make combinators.short-circuit
+compiler.cfg.comparisons compiler.test compiler.cfg.utilities ;
 IN: compiler.cfg.gc-checks.tests
 
+! insert-gc-check?
+{ t } [
+    V{
+        T{ ##inc } T{ ##allot }
+    } 0 insns>block insert-gc-check?
+] unit-test
+
+! allocation-size
+{ t } [
+    V{ T{ ##box-alien f 0 1 } } allocation-size 123 <alien> size =
+] unit-test
+
+! add-gc-checks
+{
+    {
+        V{
+            T{ ##inc }
+            T{ ##peek }
+            T{ ##alien-invoke }
+            T{ ##check-nursery-branch
+               { size 64 }
+               { cc cc<= }
+               { temp1 1 }
+               { temp2 2 }
+            }
+        }
+        V{
+            T{ ##allot
+               { dst 1 }
+               { size 64 }
+               { class-of byte-array }
+            }
+            T{ ##add }
+            T{ ##branch }
+        }
+    }
+} [
+    {
+        V{ T{ ##inc } T{ ##peek } T{ ##alien-invoke } }
+        V{
+            T{ ##allot
+               { dst 1 }
+               { size 64 }
+               { class-of byte-array }
+            }
+            T{ ##add }
+            T{ ##branch }
+        }
+    } [ add-gc-checks ] keep
+] cfg-unit-test
+
+! gc-check-offsets
 [ { } ] [
     V{
         T{ ##inc }
@@ -100,8 +152,6 @@ V{
 [ ] [ test-gc-checks ] unit-test
 
 [ t ] [ cfg get blocks-with-gc 1 get 1array sequence= ] unit-test
-
-[ ] [ 1 get instructions>> allocation-size 123 <alien> size assert= ] unit-test
 
 : gc-check? ( bb -- ? )
     instructions>>

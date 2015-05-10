@@ -62,7 +62,7 @@ literal: loc ;
 
 ! Subroutine calls
 INSN: ##call
-literal: word ;
+literal: word height ;
 
 INSN: ##jump
 literal: word ;
