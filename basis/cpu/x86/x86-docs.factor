@@ -12,7 +12,7 @@ HELP: %boolean
 { $see-also CMOVL CMOVLE CMOVG CMOVGE CMOVE CMOVNE } ;
 
 HELP: JLE
-{ $values "dst" "destination offset (relative to the instruction pointer register)" }
+{ $values { "dst" "destination offset (relative to the instruction pointer register)" } }
 { $description "Emits a 'jle' instruction." } ;
 
 HELP: reserved-stack-space
