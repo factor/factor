@@ -131,7 +131,7 @@ M: insn cleanup-insn , ;
 PRIVATE>
 
 : destruct-ssa ( cfg -- )
-    H{ } clone leader-map set
+    f leader-map set
     {
         needs-dominance
         construct-cssa
