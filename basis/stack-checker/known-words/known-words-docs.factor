@@ -14,6 +14,7 @@ HELP: infer-call
 { $description "Performs inferencing for the " { $link call } " word." } ;
 
 HELP: infer-call-effect
+{ $values { "word" word } }
 { $description "Performs inferencing for the " { $link call-effect } " word." } ;
 
 HELP: infer-local-reader

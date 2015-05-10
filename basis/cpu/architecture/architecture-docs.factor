@@ -137,7 +137,7 @@ HELP: %box-alien
 { $see-also ##box-alien %allot } ;
 
 HELP: %call
-{ $values { "word" word } }
+{ $values { "word" word } { "height" integer } }
 { $description "Emits code for calling a Factor word." } ;
 
 HELP: %context
