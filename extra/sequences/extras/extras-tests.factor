@@ -174,3 +174,9 @@ IN: sequences.extras.tests
 { V{ 1 3 5 7 9 } } [ 10 iota >vector [ even? ] reject! ] unit-test
 
 { 3/10 } [ 10 iota [ 3 < ] count* ] unit-test
+
+{ { 0 } } [ "ABA" "ABABA" start-all ] unit-test
+{ { 0 2 } } [ "ABA" "ABABA" start-all* ] unit-test
+{ { 0 3 } } [ "ABA" "ABAABA" start-all ] unit-test
+{ 1 } [ "ABA" "ABABA" count-subseq ] unit-test
+{ 2 } [ "ABA" "ABABA" count-subseq* ] unit-test

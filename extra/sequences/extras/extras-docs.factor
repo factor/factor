@@ -188,3 +188,46 @@ HELP: unsurround
     { "seq1" sequence } }
 { $description "Reverses the result of a " { $link surround } " call, stripping off the prefix " { $snippet "seq2" } " and suffix " { $snippet "seq3" } " to restore the original sequence " { $snippet "seq" } "." }
 { $see-also surround } ;
+
+HELP: start-all
+{ $values
+     { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
+{ $description "Outputs the starting indices of the non-overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $examples
+    { $example """USING: prettyprint sequences.extras ; "ABA" "ABABA" start-all ."""
+               "{ 0 }"
+    }
+    { $example """USING: prettyprint sequences.extras ; "ABA" "ABAABA" start-all ."""
+      "{ 0 3 }"
+    }
+ } ;
+
+HELP: start-all*
+{ $values
+    { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
+{ $description "Outputs the starting indices of the possibly overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $examples
+    { $example """USING: prettyprint sequences.extras ; "ABA" "ABABA" start-all* ."""
+               "{ 0 2 }"
+    } } ;
+
+HELP: count-subseq
+{ $values
+    { "subseq" sequence } { "seq" sequence } { "n" integer } }
+{ $description "Outputs the number of non-overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $examples
+    { $example """USING: prettyprint sequences.extras ; "ABA" "ABABA" count-subseq ."""
+               "1"
+    } } ;
+
+
+HELP: count-subseq*
+{ $values
+    { "subseq" sequence } { "seq" sequence } { "n" integer } }
+{ $description "Outputs the number of possibly overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $examples
+    { $example """USING: prettyprint sequences.extras ; "ABA" "ABABA" count-subseq* ."""
+               "2"
+    } } ;
+
+{ start-all start-all* count-subseq count-subseq* } related-words
