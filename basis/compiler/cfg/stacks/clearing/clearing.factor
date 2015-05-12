@@ -3,9 +3,11 @@ compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.stacks compiler.cfg.stacks.padding kernel math sequences ;
 IN: compiler.cfg.stacks.clearing
 
+! This step maybe is redundant.
+
 : state>replaces ( state -- replaces )
-    [ stack>vacant ] map { ds-loc rs-loc } [ swap create-locs ] 2map concat
-    [ 17 swap f ##replace-imm boa ] map ;
+    [ second ] map { ds-loc rs-loc } [ swap create-locs ] 2map concat
+    [ 297 swap f ##replace-imm boa ] map ;
 
 : dangerous-insn? ( state insn -- ? )
     { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ;

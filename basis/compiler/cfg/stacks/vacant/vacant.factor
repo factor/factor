@@ -10,7 +10,7 @@ IN: compiler.cfg.stacks.vacant
     ] if-empty ;
 
 : state>gc-data ( state -- gc-data )
-    [ stack>vacant vacant>bits ] map ;
+    [ second vacant>bits ] map ;
 
 : set-gc-map ( state gc-map -- )
     swap state>gc-data first2 -rot >>scrub-d swap >>scrub-r drop ;

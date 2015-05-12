@@ -3,9 +3,10 @@ compiler.cfg.stacks.padding compiler.cfg.utilities kernel sequences sorting
 vectors tools.test ;
 IN: compiler.cfg.stacks.padding.tests
 
-! classify-read: vacant locations
-{ 2 2 2 } [
+! classify-read: initialized locations
+{ 0 0 0 } [
     { 3 { } } 2 classify-read
+    ! Negative locations aren't tracked really.
     { 0 { } } -1 classify-read
     { 3 { } } -1 classify-read
 ] unit-test
@@ -19,42 +20,36 @@ IN: compiler.cfg.stacks.padding.tests
     { 1 { 0 } } 4 classify-read
 ] unit-test
 
-! classify-read: initialized locations
-{ 0 0 0 } [
+! classify-read: vacant locations
+{ 2 2 2 } [
     { 1 { 0 } } 0 classify-read
     { 2 { 0 1 2 } } 0 classify-read
     { 0 { 0 1 2 } } 0 classify-read
 ] unit-test
 
-! fill-stack
+! all-live
 {
-    { 2 { 4 5 0 1 } }
+    { { 0 { } } { 2 { } } }
+    { { 0 { } } { 2 { } } }
 } [
-    { 2 { 4 5 } } fill-stack
+    { { 0 { } } { 2 { } } } all-live
+    { { 0 { } } { 2 { 0 } } } all-live
 ] unit-test
 
-{
-    { -1 { 3 4 } }
-} [
-    { -1 { 3 4 } } fill-stack
-] unit-test
-
-! fill-vacancies
-{
-    { { 0 { } } { 2 { 0 1 } } }
-    { { 0 { } } { 2 { 0 1 } } }
-    { { 0 { -1 -2 } } { 2 { 0 1 } } }
-} [
-    { { 0 { } } { 2 { } } } fill-vacancies
-    { { 0 { } } { 2 { 0 } } } fill-vacancies
-    { { 0 { -1 -2 } } { 2 { 0 } } } fill-vacancies
-] unit-test
-
-! combined-state
+! combine-states
 {
     { { 4 { } } { 2 { 0 1 } } }
 } [
     V{ { { 4 { } } { 2 { 0 1 } } } } combine-states
+] unit-test
+
+{
+    { { 2 { 0 1 } } { 2 { 0 1 } } }
+} [
+    V{
+        { { 2 { 0 1 } } { 2 { } } }
+        { { 2 { } } { 2 { 0 1 } } }
+    } combine-states
 ] unit-test
 
 {
@@ -73,17 +68,6 @@ IN: compiler.cfg.stacks.padding.tests
     combine-states
 ] [ height-mismatches? ] must-fail-with
 
-! stack>vacant
-{
-    { 0 1 2 }
-    { }
-    { 1 }
-} [
-    { 3 { } } stack>vacant
-    { -2 { } } stack>vacant
-    { 3 { 0 2 } } stack>vacant
-] unit-test
-
 ! visit-insn ##inc
 
 ! We assume that overinitialized locations are always dead.
@@ -93,13 +77,18 @@ IN: compiler.cfg.stacks.padding.tests
     { { 3 { 0 } } { 0 { } } } T{ ##inc { loc D -3 } } visit-insn
 ] unit-test
 
-! visit-insn ##call
 {
     { { 3 { 0 1 2 } } { 0 { } } }
 } [
-    initial-state T{ ##call { height 3 } } visit-insn
+    { { 0 { } } { 0 { } } } T{ ##inc { loc D 3 } } visit-insn
 ] unit-test
 
+! visit-insn ##call
+{
+    { { 3 { } } { 0 { } } }
+} [
+    initial-state T{ ##call { height 3 } } visit-insn
+] unit-test
 
 {
     { { -1 { } } { 0 { } } }
@@ -107,16 +96,15 @@ IN: compiler.cfg.stacks.padding.tests
     initial-state T{ ##call { height -1 } } visit-insn
 ] unit-test
 
-
 {
-    { { 4 { 2 3 0 1 } } { 0 { } } }
+    { { 4 { } } { 0 { } } }
 } [
-    { { 2 { 0 1 } } { 0 { } } } T{ ##call { height 2 } } visit-insn
+    { { 2 { } } { 0 { } } } T{ ##call { height 2 } } visit-insn
 ] unit-test
 
 ! This looks weird but is right.
 {
-    { { 0 { 0 1 } } { 0 { } } }
+    { { 0 { } } { 0 { } } }
 } [
     { { -2 { } } { 0 { } } } T{ ##call { height 2 } } visit-insn
 ] unit-test
@@ -126,66 +114,40 @@ IN: compiler.cfg.stacks.padding.tests
 ! visisted then something is wrong. ##call might gc and the
 ! uninitialized locations would cause a crash.
 [
-    { { 3 { } } { 0 { } } } T{ ##call { height 3 } } visit-insn
+    { { 3 { 0 1 2 } } { 0 { } } } T{ ##call { height 3 } } visit-insn
 ] [ vacant-when-calling? ] must-fail-with
-
-! ! Overinitialized locations can't be live when ##call is visited. They
-! ! could be garbage collected in the called word so they maybe wouldn't
-! ! survive.
-! [
-!     { { 0 { -1 -2 } } { 0 { -1 -2 } } } T{ ##call { height 0 } } visit-insn
-! ] [ overinitialized-when-calling? ] must-fail-with
-
-! This is tricky. Normally, there should be no overinitialized
-! locations before a ##call (I think). But if they are, we can at
-! least be sure they are dead after the call.
-{
-    { { 2 { 0 1 } } { 0 { } } }
-} [
-    { { 2 { 0 1 -1 } } { 0 { } } } T{ ##call { height 0 } } visit-insn
-] unit-test
 
 ! visit-insn ##call-gc
 
-! ##call-gc ofcourse fills all uninitialized locations.
+! ##call-gc ofcourse fills all uninitialized locations. ##peek still
+! shouldn't look at them, but if we gc again we don't need to exept ##them.
 {
-    { { 4 { 0 1 2 3 } } { 0 { } } }
+    { { 4 { } } { 0 { } } }
 } [
-    { { 4 { } } { 0 { } } } T{ ##call-gc } visit-insn
+    { { 4 { 0 1 2 3 } } { 0 { } } } T{ ##call-gc } visit-insn
 ] unit-test
-
-
-[
-    { { 2 { -1 0 1 } } { 0 { } } } T{ ##call-gc } visit-insn
-] [ overinitialized-when-gc? ] must-fail-with
 
 ! visit-insn ##peek
 {
     { { 3 { 0 } } { 0 { } } }
 } [
-    { { 3 { 0 } } { 0 { } } } T{ ##peek { dst 1 } { loc D 0 } } visit-insn
+    { { 3 { 0 } } { 0 { } } } T{ ##peek { dst 1 } { loc D 1 } } visit-insn
 ] unit-test
 
 ! After a ##peek that can cause a stack underflow, it is certain that
 ! all stack locations are initialized.
 {
-    { { 0 { } } { 2 { 0 1 2 } } }
-    { { 2 { 0 1 2 } } { 0 { } } }
+    { { 0 { } } { 2 { } } }
+    { { 2 { } } { 0 { } } }
 } [
-    { { 0 { } } { 2 { } } } T{ ##peek { dst 1 } { loc R 2 } } visit-insn
-    { { 2 { } } { 0 { } } } T{ ##peek { dst 1 } { loc D 2 } } visit-insn
-] unit-test
-
-{
-    { { 2 { 0 1 } } { 2 { 0 1 2 } } }
-} [
-    { { 2 { } } { 2 { } } } T{ ##peek { dst 1 } { loc R 2 } } visit-insn
+    { { 0 { } } { 2 { 0 1 } } } T{ ##peek { dst 1 } { loc R 2 } } visit-insn
+    { { 2 { 0 1 } } { 0 { } } } T{ ##peek { dst 1 } { loc D 2 } } visit-insn
 ] unit-test
 
 ! If the ##peek can't cause a stack underflow, then we don't have the
 ! same guarantees.
 [
-    { { 3 { } } { 0 { } } } T{ ##peek { dst 1 } { loc D 0 } } visit-insn
+    { { 3 { 0 1 2 } } { 0 { } } } T{ ##peek { dst 1 } { loc D 0 } } visit-insn
 ] [ vacant-peek? ] must-fail-with
 
 : following-stack-state ( insns -- state )
@@ -201,11 +163,11 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             1
-            { { 2 { } } { 0 { } } }
+            { { 2 { 0 1 } } { 0 { } } }
         }
         {
             2
-            { { 2 { 0 1 2 } } { 0 { } } }
+            { { 2 { } } { 0 { } } }
         }
     }
 } [
@@ -231,29 +193,13 @@ IN: compiler.cfg.stacks.padding.tests
 {
     H{
         { 0 { { 0 { } } { 0 { } } } }
-        { 1 { { 3 { } } { 0 { } } } }
-        { 2 { { 3 { 0 1 2 3 } } { 0 { } } } }
+        { 1 { { 3 { 0 1 2 } } { 0 { } } } }
+        { 2 { { 3 { } } { 0 { } } } }
     }
 } [
     V{
         T{ ##inc f D 3 }
         T{ ##peek { loc D 3 } }
-        T{ ##branch }
-    }
-    insns>cfg trace-stack-state2
-] unit-test
-
-! Replace -1 then peek is ok.
-{
-    H{
-        { 0 { { 0 { } } { 0 { } } } }
-        { 1 { { 0 { -1 } } { 0 { } } } }
-        { 2 { { 0 { -1 } } { 0 { } } } }
-    }
-} [
-    V{
-        T{ ##replace { src 10 } { loc D -1 } }
-        T{ ##peek { loc D -1 } }
         T{ ##branch }
     }
     insns>cfg trace-stack-state2
@@ -273,9 +219,9 @@ IN: compiler.cfg.stacks.padding.tests
 {
     H{
         { 0 { { 0 { } } { 0 { } } } }
-        { 1 { { 1 { } } { 0 { } } } }
-        { 2 { { 1 { 0 } } { 0 { } } } }
-        { 3 { { 1 { 0 } } { 0 { } } } }
+        { 1 { { 1 { 0 } } { 0 { } } } }
+        { 2 { { 1 { } } { 0 { } } } }
+        { 3 { { 1 { } } { 0 { } } } }
     }
 } [ cfg1 trace-stack-state2 ] unit-test
 
@@ -333,25 +279,26 @@ IN: compiler.cfg.stacks.padding.tests
         { 1 { { 0 { } } { 0 { } } } }
         { 2 { { 0 { } } { 0 { } } } }
         { 3 { { 0 { } } { 0 { } } } }
-        { 4 { { 2 { } } { 0 { } } } }
-        { 5 { { 2 { 1 } } { 0 { } } } }
-        { 6 { { 2 { 1 0 } } { 0 { } } } }
-        { 7 { { 2 { 1 0 } } { 0 { } } } }
-        { 8 { { 2 { 1 0 } } { 0 { } } } }
-        { 9 { { 2 { 1 0 } } { 0 { } } } }
-        { 10 { { 4 { 3 2 } } { 0 { } } } }
-        { 11 { { 4 { 3 2 } } { 0 { } } } }
-        { 12 { { 4 { 3 2 } } { 0 { } } } }
-        { 13 { { 4 { 3 2 1 } } { 0 { } } } }
-        { 14 { { 4 { 3 2 1 } } { 0 { } } } }
-        { 15 { { 4 { 3 2 1 } } { 0 { } } } }
-        { 16 { { 7 { 6 5 4 } } { 0 { } } } }
-        { 17 { { 7 { 6 5 4 0 } } { 0 { } } } }
-        { 18 { { 7 { 6 5 4 0 1 } } { 0 { } } } }
-        { 19 { { 7 { 6 5 4 0 1 2 } } { 0 { } } } }
-        { 20 { { 7 { 6 5 4 0 1 2 3 } } { 0 { } } } }
-        { 21 { { 4 { 3 2 1 0 } } { 0 { } } } }
-        { 22 { { 4 { 3 2 1 0 } } { 0 { } } } }
+        { 4 { { 2 { 0 1 } } { 0 { } } } }
+        { 5 { { 2 { 0 } } { 0 { } } } }
+        { 6 { { 2 { } } { 0 { } } } }
+        { 7 { { 2 { } } { 0 { } } } }
+        { 8 { { 2 { } } { 0 { } } } }
+        { 9 { { 2 { } } { 0 { } } } }
+        { 10 { { 4 { 0 1 } } { 0 { } } } }
+        { 11 { { 4 { 0 1 } } { 0 { } } } }
+        { 12 { { 4 { 0 1 } } { 0 { } } } }
+        { 13 { { 4 { 0 } } { 0 { } } } }
+        { 14 { { 4 { 0 } } { 0 { } } } }
+        { 15 { { 4 { 0 } } { 0 { } } } }
+        { 16 { { 7 { 3 0 1 2 } } { 0 { } } } }
+        { 17 { { 7 { 3 1 2 } } { 0 { } } } }
+        { 18 { { 7 { 3 2 } } { 0 { } } } }
+        { 19 { { 7 { 3 } } { 0 { } } } }
+        { 20 { { 7 { } } { 0 { } } } }
+        { 21 { { 4 { } } { 0 { } } } }
+        ! gc-map here
+        { 22 { { 4 { } } { 0 { } } } }
     }
 } [
     bug1021-cfg trace-stack-state2
@@ -458,40 +405,212 @@ IN: compiler.cfg.stacks.padding.tests
 {
     H{
         { 0 { { 0 { } } { 0 { } } } }
-        { 1 { { 3 { } } { 0 { } } } }
-        { 2 { { 3 { 2 } } { 0 { } } } }
-        { 3 { { 3 { 2 0 } } { 0 { } } } }
-        { 4 { { 3 { 2 0 1 } } { 0 { } } } }
-        { 5 { { 2 { 1 0 } } { 0 { } } } }
-        { 6 { { 2 { 1 0 } } { 0 { } } } }
-        { 7 { { 2 { 1 0 } } { 0 { } } } }
-        { 8 { { 3 { 2 1 } } { 0 { } } } }
-        { 9 { { 3 { 2 1 } } { 1 { } } } }
-        { 10 { { 3 { 2 } } { 1 { 0 } } } }
-        { 11 { { 1 { 0 } } { 1 { 0 } } } }
-        { 12 { { 1 { 0 } } { 6 { 5 } } } }
-        { 13 { { 1 { 0 } } { 6 { 5 3 } } } }
-        { 14 { { 1 { 0 } } { 6 { 5 3 } } } }
-        { 15 { { 1 { 0 } } { 6 { 5 3 4 } } } }
-        { 16 { { 1 { 0 } } { 6 { 5 3 4 2 } } } }
-        { 17 { { 1 { 0 } } { 6 { 5 3 4 2 1 } } } }
-        { 18 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 19 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 20 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 21 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 22 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 23 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 24 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 25 { { 1 { 0 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 26 { { 3 { 2 } } { 6 { 5 3 4 2 1 0 } } } }
-        { 27 { { 3 { 2 } } { 1 { 0 } } } }
-        { 28 { { 3 { 2 } } { 1 { 0 } } } }
-        { 29 { { 3 { 2 } } { 1 { 0 } } } }
-        { 30 { { 0 { } } { 1 { 0 } } } }
-        { 31 { { 1 { } } { 1 { 0 } } } }
-        { 32 { { 1 { } } { 0 { } } } }
+        { 1 { { 3 { 0 1 2 } } { 0 { } } } }
+        { 2 { { 3 { 0 1 } } { 0 { } } } }
+        { 3 { { 3 { 1 } } { 0 { } } } }
+        { 4 { { 3 { } } { 0 { } } } }
+        { 5 { { 2 { } } { 0 { } } } }
+        { 6 { { 2 { } } { 0 { } } } }
+        { 7 { { 2 { } } { 0 { } } } }
+        { 8 { { 3 { 0 } } { 0 { } } } }
+        { 9 { { 3 { 0 } } { 1 { 0 } } } }
+        { 10 { { 3 { 0 1 } } { 1 { } } } }
+        { 11 { { 1 { } } { 1 { } } } }
+        { 12 { { 1 { } } { 6 { 0 1 2 3 4 } } } }
+        { 13 { { 1 { } } { 6 { 0 1 2 4 } } } }
+        { 14 { { 1 { } } { 6 { 0 1 2 4 } } } }
+        { 15 { { 1 { } } { 6 { 0 1 2 } } } }
+        { 16 { { 1 { } } { 6 { 0 1 } } } }
+        { 17 { { 1 { } } { 6 { 0 } } } }
+        { 18 { { 1 { } } { 6 { } } } }
+        { 19 { { 1 { } } { 6 { } } } }
+        { 20 { { 1 { } } { 6 { } } } }
+        { 21 { { 1 { } } { 6 { } } } }
+        { 22 { { 1 { } } { 6 { } } } }
+        { 23 { { 1 { } } { 6 { } } } }
+        { 24 { { 1 { } } { 6 { } } } }
+        { 25 { { 1 { } } { 6 { } } } }
+        { 26 { { 3 { 0 1 } } { 6 { } } } }
+        { 27 { { 3 { 0 1 } } { 1 { } } } }
+        ! gc-map here
+        { 28 { { 3 { 0 1 } } { 1 { } } } }
+        { 29 { { 3 { 0 1 } } { 1 { } } } }
+        { 30 { { 0 { } } { 1 { } } } }
+        { 31 { { 1 { 0 } } { 1 { } } } }
+        { 32 { { 1 { 0 } } { 0 { } } } }
     }
 } [ bug1289-cfg trace-stack-state2 ] unit-test
+
+: bug-benchmark-terrain-cfg ( -- cfg )
+    H{
+        { 0 V{ } }
+        {
+            1 V{
+                T{ ##peek { loc D 0 } }
+                T{ ##peek { loc D 1 } }
+                T{ ##inc { loc D -1 } }
+            }
+        }
+        {
+            2 V{
+                T{ ##inc { loc D -1 } }
+                T{ ##replace { loc D 1 } }
+                T{ ##replace { loc D 0 } }
+                T{ ##inc { loc D 1 } }
+                T{ ##replace { loc D 0 } }
+            }
+        }
+        { 3 V{ T{ ##call { height -1 } } } }
+        { 4 V{ } }
+        { 5 V{ T{ ##call { height 0 } } } }
+        { 6 V{ T{ ##peek { loc D 0 } } } }
+        { 7 V{ } }
+        {
+            8 V{
+                T{ ##replace { loc D 2 } }
+                T{ ##replace { loc D 1 } }
+                T{ ##replace { loc D 0 } }
+            }
+        }
+        { 9 V{ T{ ##call { height -1 } } } }
+        {
+            10 V{
+                T{ ##inc { loc D 1 } }
+                T{ ##replace { loc D 0 } }
+            }
+        }
+        { 11 V{ T{ ##call { height -1 } } } }
+        { 12 V{ } }
+        { 13 V{ T{ ##call { height 0 } } } }
+        { 14 V{ T{ ##peek { loc D 0 } } } }
+        { 15 V{ } }
+        {
+            16 V{
+                T{ ##inc { loc D 1 } }
+                T{ ##replace { loc D 0 } }
+            }
+        }
+        { 17 V{ T{ ##call { height 0 } } } }
+        {
+            18 V{
+                T{ ##peek { loc D 2 } }
+                T{ ##peek { loc D 1 } }
+                T{ ##peek { loc D 0 } }
+                T{ ##inc { loc D 1 } }
+            }
+        }
+        { 19 V{ } }
+        { 20 V{ } }
+        {
+            21 V{
+                T{ ##inc { loc D -3 } }
+                T{ ##replace { loc D 0 } }
+            }
+        }
+        { 22 V{ T{ ##call { height 0 } } } }
+        { 23 V{ } }
+        { 24 V{ T{ ##call { height 0 } } } }
+        {
+            25 V{
+                T{ ##peek { loc D 0 } }
+                T{ ##inc { loc D 3 } }
+            }
+        }
+        { 26 V{ } }
+        { 27 V{ } }
+        { 28 V{ } }
+        { 29 V{ } }
+        { 30 V{ T{ ##call-gc } } }
+        { 31 V{ } }
+        {
+            32 V{
+                T{ ##inc { loc D -4 } }
+                T{ ##inc { loc D 1 } }
+                T{ ##replace { loc D 0 } }
+            }
+        }
+        { 33 V{ } }
+    } [ over insns>block ] assoc-map dup
+    {
+        { 0 1 }
+        { 1 2 } { 1 8 }
+        { 2 3 }
+        { 3 4 }
+        { 4 5 }
+        { 5 6 }
+        { 7 16 }
+        { 8 9 }
+        { 9 10 }
+        { 10 11 }
+        { 11 12 }
+        { 12 13 }
+        { 13 14 }
+        { 14 15 }
+        { 15 16 }
+        { 16 17 }
+        { 17 18 }
+        { 18 19 }
+        { 19 20 }
+        { 20 27 }
+        { 21 22 }
+        { 22 23 }
+        { 23 24 }
+        { 24 25 }
+        { 25 26 }
+        { 26 27 }
+        { 27 28 } { 27 32 }
+        { 28 29 } { 28 30 }
+        { 29 21 }
+        { 20 31 }
+        { 31 21 }
+        { 32 33 }
+    } make-edges 0 of block>cfg ;
+
+{
+    H{
+        { 0 { { 0 { } } { 0 { } } } }
+        { 1 { { 0 { } } { 0 { } } } }
+        { 2 { { 0 { } } { 0 { } } } }
+        { 3 { { -1 { } } { 0 { } } } }
+        { 4 { { -1 { } } { 0 { } } } }
+        { 5 { { -1 { } } { 0 { } } } }
+        { 6 { { -1 { } } { 0 { } } } }
+        { 7 { { -2 { } } { 0 { } } } }
+        { 8 { { -1 { 0 } } { 0 { } } } }
+        { 9 { { -1 { } } { 0 { } } } }
+        { 10 { { -2 { } } { 0 { } } } }
+        { 11 { { -2 { } } { 0 { } } } }
+        { 12 { { -2 { } } { 0 { } } } }
+        { 13 { { -1 { 0 } } { 0 { } } } }
+        { 14 { { -1 { } } { 0 { } } } }
+        { 15 { { -1 { } } { 0 { } } } }
+        { 16 { { -1 { } } { 0 { } } } }
+        { 17 { { -1 { } } { 0 { } } } }
+        { 18 { { -1 { } } { 0 { } } } }
+        { 19 { { 0 { 0 1 2 } } { 0 { } } } }
+        { 20 { { -3 { } } { 0 { } } } }
+        { 21 { { -3 { } } { 0 { } } } }
+        { 22 { { -3 { } } { 0 { } } } }
+        { 23 { { -3 { } } { 0 { } } } }
+        { 24 { { -3 { } } { 0 { } } } }
+        ! gc-map here
+        { 25 { { 0 { 0 1 2 } } { 0 { } } } }
+        { 26 { { 0 { 0 1 2 } } { 0 { } } } }
+        { 27 { { -4 { } } { 0 { } } } }
+        { 28 { { -3 { 0 } } { 0 { } } } }
+        { 29 { { -1 { } } { 0 { } } } }
+        { 30 { { -2 { } } { 0 { } } } }
+        { 31 { { -2 { } } { 0 { } } } }
+        { 32 { { -2 { } } { 0 { } } } }
+        { 33 { { -1 { 0 } } { 0 { } } } }
+        { 34 { { -1 { } } { 0 { } } } }
+        { 35 { { -2 { } } { 0 { } } } }
+        { 36 { { -2 { } } { 0 { } } } }
+    }
+} [
+    bug-benchmark-terrain-cfg trace-stack-state2
+] unit-test
+
 
 ! following-stack-state
 {
@@ -499,36 +618,24 @@ IN: compiler.cfg.stacks.padding.tests
 } [ V{ } following-stack-state ] unit-test
 
 {
-    { { 1 { } } { 0 { } } }
+    { { 1 { 0 } } { 0 { } } }
 } [ V{ T{ ##inc f D 1 } } following-stack-state ] unit-test
 
 {
-    { { 0 { } } { 1 { } } }
+    { { 0 { } } { 1 { 0 } } }
 } [ V{ T{ ##inc f R 1 } } following-stack-state ] unit-test
 
 ! Here the peek refers to a parameter of the word.
 {
-    { { 0 { 25 } } { 0 { } } }
+    { { 0 { } } { 0 { } } }
 } [
     V{
         T{ ##peek { loc D 25 } }
     } following-stack-state
 ] unit-test
 
-! Should be ok because the value was at 0 when the gc ran.
 {
-    { { -1 { -1 } } { 0 { } } }
-} [
-    V{
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
-        T{ ##inc f D -1 }
-        T{ ##peek { loc D -1 } }
-    } following-stack-state
-] unit-test
-
-{
-    { { 0 { 0 1 2 } } { 0 { } } }
+    { { 0 { } } { 0 { } } }
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
@@ -538,7 +645,7 @@ IN: compiler.cfg.stacks.padding.tests
 ] unit-test
 
 {
-    { { 1 { 1 0 } } { 0 { } } }
+    { { 1 { } } { 0 { } } }
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
@@ -548,7 +655,7 @@ IN: compiler.cfg.stacks.padding.tests
 ] unit-test
 
 {
-    { { 0 { 0 } } { 0 { } } }
+    { { 0 { } } { 0 { } } }
 } [
     V{
         T{ ##replace { src 10 } { loc D 0 } }
