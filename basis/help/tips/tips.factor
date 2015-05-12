@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser arrays namespaces sequences random help.markup help.stylesheet
-kernel io io.styles colors.constants definitions accessors ;
+USING: accessors arrays colors.constants definitions help.markup
+help.stylesheet io io.styles kernel namespaces parser random
+sequences ;
 IN: help.tips
 
 SYMBOL: tips

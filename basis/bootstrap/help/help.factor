@@ -1,9 +1,13 @@
-USING: help help.topics help.syntax help.crossref
-help.definitions io io.files kernel namespaces sequences
-parser vocabs vocabs.loader vocabs.loader.private accessors assocs ;
+USING: accessors assocs kernel namespaces sequences vocabs
+vocabs.loader vocabs.loader.private ;
 IN: bootstrap.help
 
 : load-help ( -- )
+    "help" require
+    "help.topics" require
+    "help.syntax" require
+    "help.crossref" require
+    "help.definitions" require
     "help.lint" require
     "help.vocabs" require
 

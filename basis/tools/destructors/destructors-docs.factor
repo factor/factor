@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: destructors help.markup help.syntax help.tips quotations sequences ;
+USING: destructors help.markup help.syntax quotations sequences ;
 IN: tools.destructors
 
 HELP: disposables.
@@ -20,8 +20,6 @@ HELP: leaks
 { $description
   "Runs the quotation and collects all disposables leaked by it. Used by " { $link leaks. } "."
 } ;
-
-TIP: "Use the " { $link leaks. } " combinator to track down resource leaks." ;
 
 ARTICLE: "tools.destructors" "Destructor tools"
 "The " { $vocab-link "tools.destructors" } " vocabulary provides words for tracking down resource leaks."

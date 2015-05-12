@@ -1,6 +1,7 @@
+USING: debugger editors help help.apropos help.markup
+help.syntax help.vocabs memory see stack-checker
+tools.destructors tools.time ;
 IN: help.tips
-USING: help.markup help.syntax debugger prettyprint see help help.vocabs
-help.apropos tools.time stack-checker editors memory ;
 
 TIP: "To look at the most recent error, run " { $link :error } ". To look at the most recent error's callstack, run " { $link :c } "." ;
 
@@ -24,11 +25,13 @@ TIP: "Try some simple demo applications, then look at the source code in " { $sn
 
 TIP: "To save time on reloading big libraries such as the " { $vocab-link "furnace" } " web framework, save the image after loading them using the " { $link save } " word." ;
 
+TIP: "Use the " { $link leaks. } " combinator to track down resource leaks." ;
+
 HELP: TIP:
 { $syntax "TIP: content ;" }
 { $values { "content" "a markup element" } }
 { $description "Defines a new tip of the day." } ;
-  
+
 ARTICLE: "all-tips-of-the-day" "All tips of the day"
 { $tips-of-the-day } ;
 
