@@ -1,20 +1,24 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors circular kernel math sequences ;
+USING: accessors kernel math sequences ;
 IN: sequences.rotated
 
 TUPLE: rotated
-{ circular circular read-only }
+{ seq read-only }
 { n integer read-only } ;
 
-: <rotated> ( seq n -- rotated )
-    [ <circular> ] dip rotated boa ;
+C: <rotated> rotated
 
-M: rotated length circular>> length ;
+M: rotated length seq>> length ;
 
-M: rotated virtual@ [ n>> + ] [ circular>> ] bi ;
+M: rotated virtual@
+    [ n>> + ] [ seq>> ] bi [
+        length over 0 < [ + ] [
+            2dup >= [ - ] [ drop ] if
+        ] if
+    ] keep ;
 
-M: rotated virtual-exemplar circular>> ;
+M: rotated virtual-exemplar seq>> ;
 
 INSTANCE: rotated virtual-sequence
 
