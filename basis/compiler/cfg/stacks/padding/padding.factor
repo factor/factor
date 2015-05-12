@@ -1,18 +1,11 @@
 ! Copyright (C) 2015 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.dataflow-analysis
-compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.predecessors
-compiler.cfg.registers compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.cfg.stacks.global fry grouping kernel math math.order namespaces
+compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.registers
+compiler.cfg.stacks.local fry grouping kernel math math.order namespaces
 sequences ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.padding
-
-ERROR: overinitialized-when-gc seq ;
-ERROR: vacant-when-calling seq ;
-
-: safe-iota ( n -- seq )
-    0 max iota ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! !! Stack
@@ -20,30 +13,24 @@ ERROR: vacant-when-calling seq ;
 ERROR: height-mismatches seq ;
 
 : register-write ( n stack -- stack' )
-    first2 rot suffix sets:members 2array ;
-
-: adjust-stack ( n stack -- stack' )
-    first2 pick '[ _ + ] map [ + ] dip 2array ;
-
-: stack>vacant ( stack -- seq )
-    first2 [ safe-iota ] dip sets:diff ;
+    first2 swapd remove 2array ;
 
 : combine-stacks ( stacks -- stack )
     [ [ first ] map dup all-equal? [ first ] [ height-mismatches ] if ]
-    [ [ second ] map refine ] bi 2array ;
-
-: fill-stack ( stack -- stack' )
-    first2 over safe-iota sets:union 2array ;
+    [ [ second ] map sets:combine ] bi 2array ;
 
 : classify-read ( stack n -- val )
-    swap 2dup second member? [ 2drop 0 ] [ first >= [ 1 ] [ 2 ] if ] if ;
+    swap 2dup second member? [ 2drop 2 ] [ first >= [ 1 ] [ 0 ] if ] if ;
 
-: push-items ( n stack -- stack' )
-    first2 pick '[ _ + ] map pick safe-iota sets:union [ + ] dip 2array ;
+: shift-stack ( n stack -- stack' )
+    first2 pick '[ _ + ] map [ 0 >= ] filter pick 0 max iota sets:union
+    [ + ] dip 2array ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! !! States
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ERROR: vacant-when-calling seq ;
+
 CONSTANT: initial-state { { 0 { } } { 0 { } } }
 
 : apply-stack-op ( state insn quote: ( n stack -- stack' ) -- state' )
@@ -53,36 +40,29 @@ CONSTANT: initial-state { { 0 { } } { 0 { } } }
 : combine-states ( states -- state )
     [ initial-state ] [ flip [ combine-stacks ] map ] if-empty ;
 
-: mark-location ( state insn -- state' )
+: live-location ( state insn -- state' )
     [ register-write ] apply-stack-op ;
 
 : ensure-no-vacant ( state -- )
-    [ stack>vacant ] map dup { { } { } } =
-    [ drop ] [ vacant-when-calling ] if ;
+    [ second ] map dup { { } { } } = [ drop ] [ vacant-when-calling ] if ;
 
-: ensure-no-overinitialized ( state -- )
-    [ second [ 0 < ] filter ] map dup { { } { } } =
-    [ drop ] [ overinitialized-when-gc ] if ;
-
-: fill-vacancies ( state -- state' )
-    [ fill-stack ] map ;
+: all-live ( state -- state' )
+    [ first { } 2array ] map ;
 
 GENERIC: visit-insn ( state insn -- state' )
 
 M: ##inc visit-insn ( state insn -- state' )
-    [ adjust-stack ] apply-stack-op
-    [ first2 [ 0 >= ] filter 2array ] map ;
+    [ shift-stack ] apply-stack-op ;
 
-M: ##replace-imm visit-insn mark-location ;
-M: ##replace visit-insn mark-location ;
+M: ##replace-imm visit-insn live-location ;
+M: ##replace visit-insn live-location ;
 
 M: ##call visit-insn ( state insn -- state' )
-    over ensure-no-vacant
-    height>> swap first2 [ push-items ] dip 2array
-    [ first2 [ 0 >= ] filter 2array ] map ;
+    over ensure-no-vacant height>>
+    0 2array [ swap first2 [ + ] dip 2array ] 2map ;
 
 M: ##call-gc visit-insn ( state insn -- state' )
-    drop dup ensure-no-overinitialized fill-vacancies ;
+    drop all-live ;
 
 M: gc-map-insn visit-insn ( state insn -- state' )
     drop ;
@@ -94,7 +74,8 @@ ERROR: vacant-peek insn ;
     dup 2 = [ drop vacant-peek ] [ 2nip 1 = ] if ;
 
 M: ##peek visit-insn ( state insn -- state )
-    2dup underflowable-peek? [ [ fill-vacancies ] dip ] when mark-location ;
+    dup loc>> n>> 0 >= t assert=
+    dupd underflowable-peek? [ all-live ] when ;
 
 M: insn visit-insn ( state insn -- state' )
     drop ;
