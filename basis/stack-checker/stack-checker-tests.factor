@@ -409,9 +409,9 @@ DEFER: eee'
 ! Make sure all primitives are covered
 [ { } ] [
     all-words [ primitive? ] filter
-    [ "default-output-classes" word-prop not ] filter
-    [ "special" word-prop not ] filter
-    [ "shuffle" word-prop not ] filter
+    [ "default-output-classes" word-prop ] reject
+    [ "special" word-prop ] reject
+    [ "shuffle" word-prop ] reject
 ] unit-test
 
 { 1 0 } [ [ drop       ] each ] must-infer-as

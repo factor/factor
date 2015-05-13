@@ -48,7 +48,7 @@ IN: uuid
     [ CHAR: - 8 ] dip insert-nth ;
 
 : string>uuid ( string -- n )
-    [ CHAR: - = not ] filter hex> ;
+    [ CHAR: - = ] reject hex> ;
 
 PRIVATE>
 

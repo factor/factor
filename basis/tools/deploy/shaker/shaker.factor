@@ -125,7 +125,7 @@ IN: tools.deploy.shaker
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
-    [ "no-def-strip" word-prop not ] filter
+    [ "no-def-strip" word-prop ] reject
     [ [ ] >>def drop ] each ;
 
 : strip-word-props ( stripped-props words -- )

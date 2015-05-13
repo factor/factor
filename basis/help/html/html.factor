@@ -99,7 +99,7 @@ M: pathname url-of
 
 : all-vocabs-really ( -- seq )
     all-vocabs-recursive no-roots remove-redundant-prefixes
-    [ vocab-name "scratchpad" = not ] filter ;
+    [ vocab-name "scratchpad" = ] reject ;
 
 : all-topics ( -- topics )
     [

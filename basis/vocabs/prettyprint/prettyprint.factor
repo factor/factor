@@ -19,7 +19,7 @@ IN: vocabs.prettyprint
     [ vocab-name ] sort-with ;
 
 : pprint-using ( seq -- )
-    [ "syntax" lookup-vocab = not ] filter
+    [ "syntax" lookup-vocab = ] reject
     sort-vocabs [
         \ USING: pprint-word
         [ pprint-vocab ] each
@@ -65,7 +65,7 @@ M: rename pprint-qualified ( rename -- )
     ] with-pprint ;
 
 : filter-interesting ( seq -- seq' )
-    [ [ vocab? ] [ extra-words? ] bi or not ] filter ;
+    [ [ vocab? ] [ extra-words? ] bi or ] reject ;
 
 PRIVATE>
 

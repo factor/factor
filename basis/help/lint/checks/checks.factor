@@ -157,7 +157,7 @@ SYMBOL: vocab-articles
             dup struct-class? [ struct-slots ] [ all-slots ] if
             [ name>> ] map
         ] [ extract-slots ] bi*
-        [ swap member? not ] with filter [
+        [ swap member? ] with reject [
             ", " join "Described $slot does not exist: " prepend
             simple-lint-error
         ] unless-empty

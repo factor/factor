@@ -57,7 +57,7 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     [ descent>> ] map ?supremum ;
 
 : max-graphics-height ( seq -- y )
-    [ ascent>> not ] filter [ height>> ] map ?supremum 0 or ;
+    [ ascent>> ] reject [ height>> ] map ?supremum 0 or ;
 
 :: combine-metrics ( graphics-height ascent descent cap-height -- ascent' descent' )
     ascent [

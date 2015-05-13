@@ -12,7 +12,7 @@ IN: colors.constants
     [ blank? ] trim-head H{ { CHAR: \s CHAR: - } } substitute swap ;
 
 : parse-colors ( lines -- assoc )
-    [ "!" head? not ] filter
+    [ "!" head? ] reject
     [ 11 cut [ " \t" split harvest ] dip suffix ] map
     [ parse-color ] H{ } map>assoc ;
 

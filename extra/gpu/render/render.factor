@@ -229,7 +229,7 @@ DEFER: uniform-texture-accessors
     dup length 1 = [ first swap prefix ] [ [ ] 2sequence ] if ;
 
 : uniform-tuple-texture-accessors ( uniform-type -- accessors )
-    all-uniform-tuple-slots [ uniform-type>> uniform-type-texture-units zero? not ] filter
+    all-uniform-tuple-slots [ uniform-type>> uniform-type-texture-units zero? ] reject
     [ uniform-slot-texture-accessor ] map ;
 
 : uniform-texture-accessors ( uniform-type dim -- accessors )
@@ -529,7 +529,7 @@ DEFER: [bind-uniform-tuple]
     } 3cleave ;
 
 : true-subclasses ( class -- seq )
-    [ subclasses ] keep [ = not ] curry filter ;
+    [ subclasses ] keep [ = ] curry reject ;
 
 PRIVATE>
 

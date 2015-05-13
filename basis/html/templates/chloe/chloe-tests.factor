@@ -9,7 +9,7 @@ IN: html.templates.chloe.tests
 [ ] [ reset-cache ] unit-test
 
 : run-template ( quot -- string )
-    with-string-writer [ "\r\n\t" member? not ] filter
+    with-string-writer [ "\r\n\t" member? ] reject
     "?>" split1 nip ; inline
 
 : test-template ( name -- template )
@@ -97,7 +97,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 [ "<ul><li>1</li><li>2</li><li>3</li></ul>" ] [
     [
         "test7" test-template call-template
-    ] run-template [ blank? not ] filter
+    ] run-template [ blank? ] reject
 ] unit-test
 
 TUPLE: person first-name last-name ;
@@ -112,7 +112,7 @@ TUPLE: person first-name last-name ;
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
     [
         "test8" test-template call-template
-    ] run-template [ blank? not ] filter
+    ] run-template [ blank? ] reject
 ] unit-test
 
 [ ] [
@@ -125,7 +125,7 @@ TUPLE: person first-name last-name ;
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
     [
         "test8" test-template call-template
-    ] run-template [ blank? not ] filter
+    ] run-template [ blank? ] reject
 ] unit-test
 
 [ ] [ 1 "id" set-value ] unit-test
@@ -153,7 +153,7 @@ TUPLE: person first-name last-name ;
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr></table>" ] [
     [
         "test11" test-template call-template
-    ] run-template [ blank? not ] filter
+    ] run-template [ blank? ] reject
 ] unit-test
 
 [ ] [

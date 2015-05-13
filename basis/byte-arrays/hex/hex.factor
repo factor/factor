@@ -8,7 +8,7 @@ ERROR: odd-length-hex-string string ;
 
 SYNTAX: HEX{
     "}" parse-tokens concat
-    [ blank? not ] filter
+    [ blank? ] reject
     dup length even? [ odd-length-hex-string ] unless
     2 <groups> [ hex> ] B{ } map-as
     suffix! ;

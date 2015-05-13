@@ -200,7 +200,7 @@ C: <vocab-author> vocab-author
         natural-sort
         [ [ class? ] filter describe-classes ]
         [
-            [ [ class? ] [ symbol? ] bi and not ] filter
+            [ [ class? ] [ symbol? ] bi and ] reject
             [ parsing-word? ] partition
             [ generic? ] partition
             [ macro? ] partition

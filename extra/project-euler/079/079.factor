@@ -39,7 +39,7 @@ IN: project-euler.079
     [ "Topological sort failed" throw ] [ first ] if-empty ;
 
 : remove-source ( seq elt -- seq )
-    [ swap member? not ] curry filter ;
+    [ swap member? ] curry reject ;
 
 : (topological-sort) ( seq -- )
     dup length 1 > [

@@ -73,7 +73,7 @@ SYMBOLS: not-loops recursive-nesting ;
 : not-a-loop? ( label -- ? ) not-loops get in? ;
 
 : non-tail-calls ( call-graph-node -- seq )
-    calls>> [ tail?>> not ] filter ;
+    calls>> [ tail?>> ] reject ;
 
 : visit-back-edges ( call-graph -- )
     [

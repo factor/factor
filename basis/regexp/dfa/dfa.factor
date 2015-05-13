@@ -40,7 +40,7 @@ IN: regexp.dfa
 : find-transitions ( dfa-state nfa -- next-dfa-state )
     transitions>>
     '[ _ at keys [ condition-states ] map concat ] gather
-    [ tagged-epsilon? not ] filter ;
+    [ tagged-epsilon? ] reject ;
 
 : add-todo-state ( state visited-states new-states -- )
     2over ?adjoin [ nip push ] [ 3drop ] if ;

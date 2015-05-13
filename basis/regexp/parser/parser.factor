@@ -22,7 +22,7 @@ ERROR: bad-class name ;
 
 : simple ( str -- simple )
     ! Alternatively, first collation key level?
-    >case-fold [ " \t_" member? not ] filter ;
+    >case-fold [ " \t_" member? ] reject ;
 
 : simple-table ( seq -- table )
     [ [ simple ] keep ] H{ } map>assoc ;

@@ -22,7 +22,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 :: do-step ( errors summary-file details-file -- )
     errors
-    [ error-type +linkage-error+ eq? not ] filter
+    [ error-type +linkage-error+ eq? ] reject
     [ file>> ] map members natural-sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
 

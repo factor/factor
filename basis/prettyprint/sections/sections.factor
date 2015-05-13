@@ -191,7 +191,7 @@ M: block section-fits? ( section -- ? )
 
 : pprint-sections ( block advancer -- )
     [
-        sections>> [ line-break? not ] filter
+        sections>> [ line-break? ] reject
         unclip-slice pprint-section
     ] dip
     [ [ pprint-section ] bi ] curry each ; inline

@@ -904,7 +904,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     [ symtab_command? ] filter ; inline
 
 : read-array-string ( uchar-array -- string )
-    ascii decode [ 0 = not ] filter ;
+    ascii decode [ 0 = ] reject ;
 
 : segment-sections ( segment-command -- sections )
     {

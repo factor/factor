@@ -14,7 +14,7 @@ SYMBOLS: locs preds to-do ready ;
     to-do get push-all-back ;
 
 : init-ready ( bs -- )
-    locs get '[ _ key? not ] filter ready get push-all-front ;
+    locs get '[ _ key? ] reject ready get push-all-front ;
 
 : init ( mapping -- )
     <dlist> to-do set

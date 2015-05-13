@@ -179,7 +179,7 @@ ERROR: undefined-find-nth m n seq quot ;
     [ bl bl bl bl [ write "=" write ] [ write bl ] bi* nl ] assoc-each ;
 
 : form. ( vector -- )
-    [ closing?>> not ] filter
+    [ closing?>> ] reject
     [
         {
             { [ dup name>> "form" = ]
