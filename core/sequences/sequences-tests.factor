@@ -117,6 +117,8 @@ IN: sequences.tests
 { t } [ B{ 0 } { 1 } append byte-array? ] unit-test
 { t } [ B{ 0 } { 1 } prepend byte-array? ] unit-test
 
+{ "0123456789" } [ 58 iota [ 48 < ] "" reject-as ] unit-test
+
 [ [ ]       ] [ 1 [ ]           remove ] unit-test
 [ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
 [ [ 3 1 1 ] ] [ 2 [ 3 2 1 2 1 ] remove ] unit-test
@@ -151,6 +153,8 @@ IN: sequences.tests
 [ { "" "a" "aa" "aaa" } ]
 [ 4 [ CHAR: a <string> ] { } map-integers ]
 unit-test
+
+{ V{ 1 3 5 7 9 } } [ 10 iota >vector [ even? ] reject! ] unit-test
 
 [ V{ } ] [ "f" V{ } clone remove! ] unit-test
 [ V{ } ] [ "f" V{ "f" } clone remove! ] unit-test
