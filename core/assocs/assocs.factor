@@ -74,11 +74,20 @@ PRIVATE>
 : assoc-filter ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
     over assoc-filter-as ; inline
 
+: assoc-reject-as ( ... assoc quot: ( ... key value -- ... ? ) exemplar -- ... subassoc )
+    [ [ not ] compose ] [ assoc-filter-as ] bi* ; inline
+
+: assoc-reject ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
+    over assoc-reject-as ; inline
+
 : assoc-filter! ( ... assoc quot: ( ... key value -- ... ? ) -- ... assoc )
     [
         over [ [ [ drop ] 2bi ] dip [ delete-at ] 2curry unless ] 2curry
         assoc-each
     ] [ drop ] 2bi ; inline
+
+: assoc-reject! ( ... assoc quot: ( ... key value -- ... ? ) -- ... assoc )
+    [ not ] compose assoc-filter! ; inline
 
 : sift-keys ( assoc -- assoc' )
     [ drop ] assoc-filter ; inline

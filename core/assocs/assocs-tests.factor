@@ -50,6 +50,16 @@ IN: assocs.tests
     [ drop 3 >= ] assoc-filter! drop
 ] unit-test
 
+[ H{ { 1 2 } { 2 3 } } ] [
+    H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } }
+    [ drop 3 >= ] assoc-reject
+] unit-test
+
+[ H{ { 1 2 } { 2 3 } } ] [
+    H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } } clone
+    [ drop 3 >= ] assoc-reject!
+] unit-test
+
 [ 21 ] [
     0 H{
         { 1 2 }
