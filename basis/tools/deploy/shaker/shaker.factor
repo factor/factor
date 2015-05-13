@@ -132,7 +132,7 @@ IN: tools.deploy.shaker
     "Stripping word properties" show
     swap '[
         [
-            [ drop _ member? not ] assoc-filter sift-values
+            [ drop _ member? ] assoc-reject sift-values
             >alist f like
         ] change-props drop
     ] each ;
@@ -255,7 +255,7 @@ IN: tools.deploy.shaker
                 dup array? [
                     [
                         2 group
-                        [ drop _ key? not ] assoc-filter
+                        [ drop _ key? ] assoc-reject
                         concat
                     ] map
                 ] when
@@ -432,7 +432,7 @@ IN: tools.deploy.shaker
         stripped-globals :> to-strip
         cleared-globals :> to-clear
         global boxes>>
-        [ drop to-strip strip-global? not ] assoc-filter!
+        [ drop to-strip strip-global? ] assoc-reject!
         [
             [
                 swap to-clear clear-global?

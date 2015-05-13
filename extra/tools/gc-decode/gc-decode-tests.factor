@@ -82,7 +82,7 @@ IN: tools.gc-decode.tests
 
 : base-pointer-groups-decoded ( word -- seq )
     word>gc-info base-pointer-groups [
-        [ swap 2array ] map-index [ nip -1 = not ] assoc-filter
+        [ swap 2array ] map-index [ nip -1 = ] assoc-reject
     ] map ;
 
 ! base-pointer-groups

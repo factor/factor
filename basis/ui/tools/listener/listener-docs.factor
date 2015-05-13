@@ -53,7 +53,7 @@ ui.gadgets.editors ui.gestures ui.tools.listener ;
 ] change-commands drop multiline-editor update-gestures
 
 "interactor" interactor get-command-at [
-    [ drop T{ key-down f { C+ } "k" } = not ] assoc-filter
+    [ drop T{ key-down f { C+ } "k" } = ] assoc-reject
 ] change-commands drop interactor update-gestures"""
 }
 $nl

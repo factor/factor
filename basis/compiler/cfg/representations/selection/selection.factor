@@ -139,7 +139,7 @@ M: vreg-insn compute-insn-costs
 
 ! For every vreg, compute preferred representation, that minimizes costs.
 : minimize-costs ( costs -- representations )
-    [ nip assoc-empty? not ] assoc-filter
+    [ nip assoc-empty? ] assoc-reject
     [ >alist alist-min first ] assoc-map ;
 
 : compute-representations ( cfg -- )

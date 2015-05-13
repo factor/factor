@@ -31,7 +31,7 @@ GENERIC: visit-insn ( live-set insn -- )
 ! This would be much better if live-set was a real set
 : kill-defs ( live-set insn -- )
     defs-vregs [ ?leader ] map
-    '[ drop ?leader _ in? not ] assoc-filter! drop ; inline
+    '[ drop ?leader _ in? ] assoc-reject! drop ; inline
 
 : gen-uses ( live-set insn -- )
     uses-vregs [ swap conjoin ] with each ; inline

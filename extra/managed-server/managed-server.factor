@@ -32,7 +32,7 @@ M: managed-server handle-client-disconnect ;
 : client-streams ( -- assoc ) clients values ;
 : username ( -- string ) client username>> ;
 : everyone-else ( -- assoc )
-    clients [ drop username = not ] assoc-filter ;
+    clients [ drop username = ] assoc-reject ;
 : everyone-else-streams ( -- assoc ) everyone-else values ;
 
 ERROR: no-such-client username ;

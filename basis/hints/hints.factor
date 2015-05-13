@@ -26,7 +26,7 @@ M: object specializer-declaration class-of ;
 : make-specializer ( specs -- quot )
     dup length iota <reversed>
     [ (picker) 2array ] 2map
-    [ drop object eq? not ] assoc-filter
+    [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
         [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce

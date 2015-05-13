@@ -205,7 +205,7 @@ PRIVATE>
 GENERIC: update ( search-path-elt -- valid? )
 
 : trim-forgotten ( qualified-vocab -- valid? )
-    [ [ nip "forgotten" word-prop not ] assoc-filter ] change-words
+    [ [ nip "forgotten" word-prop ] assoc-reject ] change-words
     words>> assoc-empty? not ;
 
 M: from update trim-forgotten ;

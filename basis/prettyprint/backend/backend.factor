@@ -160,7 +160,7 @@ M: pathname pprint*
     ] if ; inline
 
 : filter-tuple-assoc ( slot,value -- name,value )
-    [ [ initial>> ] dip = not ] assoc-filter
+    [ [ initial>> ] dip = ] assoc-reject
     [ [ name>> ] dip ] assoc-map ;
 
 : tuple>assoc ( tuple -- assoc )

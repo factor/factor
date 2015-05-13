@@ -34,7 +34,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
 : outdated-conditional-usages ( set -- assocs )
     members H{ } clone '[
         conditional-dependencies-of
-        [ drop _ dependencies-satisfied? not ] assoc-filter
+        [ drop _ dependencies-satisfied? ] assoc-reject
     ] map ;
 
 : generic-call-sites-of ( word -- assoc )

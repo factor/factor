@@ -20,7 +20,7 @@ IN: koszul
     } cond ;
 
 : canonicalize ( assoc -- assoc' )
-    [ nip zero? not ] assoc-filter ;
+    [ nip zero? ] assoc-reject ;
 
 SYMBOL: terms
 
