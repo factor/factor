@@ -159,7 +159,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-and-remove-detached-devices ( -- )
     +controller-devices+ get-global keys
-    [ device-attached? not ] filter
+    [ device-attached? ] reject
     [ remove-controller ] each ;
 
 : ?device-interface ( dbt-broadcast-hdr -- ? )

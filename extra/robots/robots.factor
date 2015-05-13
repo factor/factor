@@ -35,7 +35,7 @@ visit-time request-rate crawl-delay unknowns ;
 : normalize-robots.txt ( string -- sitemaps seq )
     string-lines
     [ [ blank? ] trim ] map
-    [ "#" head? not ] filter harvest
+    [ "#" head? ] reject harvest
     [ ":" split1 [ [ blank? ] trim ] bi@ [ >lower ] dip  ] { } map>assoc
     [ first "sitemap" = ] partition [ values ] dip
     [

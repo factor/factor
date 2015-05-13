@@ -30,7 +30,7 @@ IN: unicode.breaks.tests
         [
             "×" split
             [ [ blank? ] trim hex> ] map
-            [ { f 0 } member? not ] filter
+            [ { f 0 } member? ] reject
             >string
         ] map
         harvest

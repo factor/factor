@@ -323,7 +323,7 @@ M: array-type field-type>c-type type>c-type ;
 : def-classes ( classes -- ) [ def-class ] each ;
 
 : def-boxeds ( boxeds -- )
-    [ find-existing-boxed-type not ] filter
+    [ find-existing-boxed-type ] reject
     [ def-boxed-type ] each ;
 
 : def-records ( records -- )

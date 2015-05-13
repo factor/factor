@@ -216,7 +216,7 @@ M: object add-using ( object -- )
 
 : interesting-words ( vocab -- array )
     words
-    [ { [ "help" word-prop ] [ predicate? ] } 1|| not ] filter
+    [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
     natural-sort ;
 
 : interesting-words. ( vocab -- )

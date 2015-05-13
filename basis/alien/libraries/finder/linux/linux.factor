@@ -20,7 +20,7 @@ CONSTANT: mach-map {
         [
             " " split1 [ "()" in? ] trim "," split
             [ [ blank? ] trim ] map
-            [ "OS ABI:" head? not ] filter
+            [ "OS ABI:" head? ] reject
         ] dip 3array
     ] map ;
 

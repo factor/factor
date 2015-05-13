@@ -72,7 +72,7 @@ IN: tools.gc-decode.tests
 
 { { } } [
     all-words [ normal? ] filter 50 sample
-    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? not ] filter
+    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
 ] unit-test
 
 : base-pointer-groups-expected ( word -- seq )

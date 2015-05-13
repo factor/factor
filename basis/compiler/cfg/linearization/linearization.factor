@@ -45,7 +45,7 @@ SYMBOLS: loop-heads visited ;
     dup visited get ?adjoin [ dup , sorted-successors ] [ drop { } ] if
     [ predecessors-ready? ] filter
     [ dup loop-entry? [ find-alternate-loop-head ] when ] map
-    [ visited? not ] filter ;
+    [ visited? ] reject ;
 
 : (linearization-order) ( cfg -- bbs )
     HS{ } clone visited set

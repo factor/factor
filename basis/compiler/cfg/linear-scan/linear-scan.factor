@@ -10,7 +10,7 @@ IN: compiler.cfg.linear-scan
 
 : admissible-registers ( cfg -- regs )
     machine-registers swap frame-pointer?>> [
-        [ [ frame-reg = not ] filter ] assoc-map
+        [ [ frame-reg = ] reject ] assoc-map
     ] when ;
 
 : allocate-and-assign-registers ( cfg -- )

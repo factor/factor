@@ -147,5 +147,5 @@ M: insn assign-registers-in-insn drop ;
 
 : assign-registers ( cfg live-intervals -- )
     init-assignment
-    linearization-order [ kill-block?>> not ] filter
+    linearization-order [ kill-block?>> ] reject
     [ assign-registers-in-block ] each ;

@@ -120,7 +120,7 @@ Token = Spaces
      ExecName |
      PathName)
 
-Tokens = Token* => [[ [ comment? not ] filter ]]
+Tokens = Token* => [[ [ comment? ] reject ]]
 
 Program = Tokens Spaces !(.) => [[ parse-proc ]]
 

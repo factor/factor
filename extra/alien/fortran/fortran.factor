@@ -442,11 +442,11 @@ MACRO: fortran-invoke ( return library function parameters -- )
 
 SYNTAX: SUBROUTINE: 
     f current-library get scan-token ";" parse-tokens
-    [ "()" subseq? not ] filter define-fortran-function ;
+    [ "()" subseq? ] reject define-fortran-function ;
 
 SYNTAX: FUNCTION:
     scan-token current-library get scan-token ";" parse-tokens
-    [ "()" subseq? not ] filter define-fortran-function ;
+    [ "()" subseq? ] reject define-fortran-function ;
 
 SYNTAX: LIBRARY:
     scan-token

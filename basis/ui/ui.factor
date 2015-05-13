@@ -29,7 +29,7 @@ SYMBOL: windows
     [ [ length 1 - dup 1 - ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    windows [ [ first = not ] with filter ] change-global ;
+    windows [ [ first = ] with reject ] change-global ;
 
 : raised-window ( world -- )
     windows get-global

@@ -86,7 +86,7 @@ SYMBOL: matrix
     [ 0 0 (echelon) ] with-matrix ;
 
 : nonzero-rows ( matrix -- matrix' )
-    [ [ zero? ] all? not ] filter ;
+    [ [ zero? ] all? ] reject ;
 
 : null/rank ( matrix -- null rank )
     echelon dup length swap nonzero-rows length [ - ] keep ;

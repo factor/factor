@@ -8,7 +8,7 @@ IN: hashtables.tests
 [ ] [ 1000 iota [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
 
 [ V{ } ]
-[ 1000 iota [ dup sq swap "testhash" get at = not ] filter ]
+[ 1000 iota [ dup sq swap "testhash" get at = ] reject ]
 unit-test
 
 [ t ]

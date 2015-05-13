@@ -62,7 +62,7 @@ M: object uses drop f ;
 : defs-to-crossref ( -- seq )
     [
         all-words
-        [ [ generic? not ] filter ]
+        [ [ generic? ] reject ]
         [ [ subwords ] map concat ] bi
 
         all-articles [ >link ] map
@@ -95,7 +95,7 @@ PRIVATE>
 
 GENERIC: smart-usage ( defspec -- seq )
 
-M: object smart-usage usage [ irrelevant? not ] filter ;
+M: object smart-usage usage [ irrelevant? ] reject ;
 
 M: method smart-usage "method-generic" word-prop smart-usage ;
 
@@ -115,7 +115,7 @@ M: f smart-usage drop \ f smart-usage ;
     [ "No usages." print ] [ sorted-definitions. ] if-empty ;
 
 : vocab-xref ( vocab quot: ( defspec -- seq ) -- vocabs )
-    [ [ vocab-name ] [ words [ generic? not ] filter ] bi ] dip map
+    [ [ vocab-name ] [ words [ generic? ] reject ] bi ] dip map
     [
         [ [ word? ] [ generic? not ] bi and ] filter [
             dup method?

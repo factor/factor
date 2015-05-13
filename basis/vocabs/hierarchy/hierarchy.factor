@@ -55,7 +55,7 @@ ERROR: vocab-root-required root ;
     [ ensure-vocab-root ] dip
     [ ((child-vocabs-recursive)) ] { } make ;
 
-: no-rooted ( seq -- seq' ) [ find-vocab-root not ] filter ;
+: no-rooted ( seq -- seq' ) [ find-vocab-root ] reject ;
 
 : one-level-only? ( name prefix -- ? )
     ?head [ "." split1 nip not ] [ drop f ] if ;
@@ -70,7 +70,7 @@ ERROR: vocab-root-required root ;
 
 PRIVATE>
 
-: no-prefixes ( seq -- seq' ) [ vocab-prefix? not ] filter ;
+: no-prefixes ( seq -- seq' ) [ vocab-prefix? ] reject ;
 
 : convert-prefixes ( seq -- seq' )
     [ dup vocab-prefix? [ name>> <vocab-link> ] when ] map ;
@@ -80,7 +80,7 @@ PRIVATE>
     [ vocab-prefix? ] partition
     [
         [ vocab-name ] map fast-set
-        '[ name>> _ in? not ] filter
+        '[ name>> _ in? ] reject
         convert-prefixes
     ] keep
     append ;
@@ -136,7 +136,7 @@ PRIVATE>
 
 : (load-from-root) ( root prefix -- failures )
     vocabs-in-root/prefix
-    [ don't-load? not ] filter no-prefixes
+    [ don't-load? ] reject no-prefixes
     require-all ;
 
 : load-from-root ( root prefix -- )

@@ -98,7 +98,7 @@ M: irc-message set-irc-command
     ] [ drop ] if* ;
 
 : define-irc-class ( class params -- )
-    [ { ":" "_" } member? not ] filter
+    [ { ":" "_" } member? ] reject
     [ irc-message ] dip define-tuple-class ;
 
 : define-irc-parameter-slots ( class params -- )

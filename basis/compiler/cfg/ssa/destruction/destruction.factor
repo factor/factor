@@ -115,7 +115,7 @@ M: ##copy cleanup-insn
     dup useful-copy? [ , ] [ drop ] if ;
 
 M: ##parallel-copy cleanup-insn
-    values>> [ leaders ] assoc-map [ first2 = not ] filter
+    values>> [ leaders ] assoc-map [ first2 = ] reject
     parallel-copy-rep % ;
 
 M: ##tagged>integer cleanup-insn

@@ -33,7 +33,7 @@ M: predicate word-help* drop \ $predicate ;
 
 : orphan-articles ( -- seq )
     articles get keys
-    [ article-parent not ] filter ;
+    [ article-parent ] reject ;
 
 : xref-help ( -- )
     all-articles [ xref-article ] each ;

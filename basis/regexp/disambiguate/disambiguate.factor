@@ -51,7 +51,7 @@ TUPLE: parts in out ;
 
 : new-transitions ( transitions -- assoc ) ! assoc is class, partition
     values [ keys ] gather
-    [ tagged-epsilon? not ] filter
+    [ tagged-epsilon? ] reject
     class-partitions ;
 
 : get-transitions ( partition state-transitions -- next-states )

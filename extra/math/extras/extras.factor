@@ -115,7 +115,7 @@ PRIVATE>
     [ <clumps> ] [ '[ _ count ] map ] bi* ; inline
 
 : nonzero ( seq -- seq' )
-    [ zero? not ] filter ;
+    [ zero? ] reject ;
 
 : bartlett ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
@@ -148,10 +148,10 @@ PRIVATE>
     0 [ dup fp-nan? [ drop ] [ + ] if ] binary-reduce ;
 
 : nan-min ( seq -- n )
-    [ fp-nan? not ] filter infimum ;
+    [ fp-nan? ] reject infimum ;
 
 : nan-max ( seq -- n )
-    [ fp-nan? not ] filter supremum ;
+    [ fp-nan? ] reject supremum ;
 
 : fill-nans ( seq -- newseq )
     [ first ] keep [

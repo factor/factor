@@ -214,7 +214,7 @@ ERROR: bad-live-interval live-interval ;
 
 : compute-live-intervals ( cfg -- live-intervals sync-points )
     init-live-intervals
-    linearization-order <reversed> [ kill-block?>> not ] filter
+    linearization-order <reversed> [ kill-block?>> ] reject
     [ compute-live-intervals-step ] each
     live-intervals get finish-live-intervals
     sync-points get ;

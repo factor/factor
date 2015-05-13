@@ -200,7 +200,7 @@ M: f fast-set drop 0 <hash-set> ;
 M: sequence fast-set >hash-set ;
 
 M: sequence duplicates
-    dup length <hash-set> [ ?adjoin not ] curry filter ;
+    dup length <hash-set> [ ?adjoin ] curry reject ;
 
 M: sequence all-unique?
     dup length <hash-set> [ ?adjoin ] curry all? ;

@@ -26,7 +26,7 @@ IN: io.encodings.utf8.tests
 
 [ 3 ] [ 2 "lápis" >utf8-index ] unit-test
 
-[ V{ } ] [ 100000 iota [ [ code-point-length ] [ 1string utf8 encode length ] bi = not ] filter ] unit-test
+[ V{ } ] [ 100000 iota [ [ code-point-length ] [ 1string utf8 encode length ] bi = ] reject ] unit-test
 
 [ { CHAR: replacement-character } ] [ { 0b110,00000 0b10,000000 } decode-utf8-w/stream ] unit-test
 [ { CHAR: replacement-character } ] [ { 0b110,00001 0b10,111111 } decode-utf8-w/stream ] unit-test

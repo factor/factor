@@ -241,7 +241,7 @@ M: word see*
 
 : seeing-implementors ( class -- seq )
     dup implementors
-    [ [ reader? ] [ writer? ] bi or not ] filter
+    [ [ reader? ] [ writer? ] bi or ] reject
     [ lookup-method ] with map
     natural-sort ;
 

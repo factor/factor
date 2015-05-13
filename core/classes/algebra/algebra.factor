@@ -19,7 +19,7 @@ ERROR: not-classoids sequence ;
 
 : check-classoids ( members -- members )
     dup [ classoid? ] all?
-    [ [ classoid? not ] filter not-classoids ] unless ;
+    [ [ classoid? ] reject not-classoids ] unless ;
 
 ERROR: not-a-classoid object ;
 
@@ -28,7 +28,7 @@ ERROR: not-a-classoid object ;
 
 : <anonymous-union> ( members -- classoid )
     check-classoids
-    [ null eq? not ] filter set-members
+    [ null eq? ] reject set-members
     dup length 1 = [ first ] [ sort-classes f like anonymous-union boa ] if ;
 
 M: anonymous-union rank-class drop 6 ;

@@ -183,7 +183,7 @@ TUPLE: simd-test-failure
 ] unit-test
 
 [ { } ] [
-    simd-classes [ '[ _ new ] compile-call [ zero? ] all? not ] filter
+    simd-classes [ '[ _ new ] compile-call [ zero? ] all? ] reject
 ] unit-test
 
 "== Checking -with constructors" print

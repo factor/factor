@@ -38,7 +38,7 @@ HOOK: (directory-entries) os ( path -- seq )
 : directory-entries ( path -- seq )
     normalize-path
     (directory-entries)
-    [ name>> { "." ".." } member? not ] filter ;
+    [ name>> { "." ".." } member? ] reject ;
 
 : directory-files ( path -- seq )
     directory-entries [ name>> ] map! ;

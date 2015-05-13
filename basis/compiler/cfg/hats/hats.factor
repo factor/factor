@@ -26,7 +26,7 @@ IN: compiler.cfg.hats
 
 : hat-effect ( insn -- effect )
     "insn-slots" word-prop
-    [ type>> { def temp } member-eq? not ] filter [ name>> ] map
+    [ type>> { def temp } member-eq? ] reject [ name>> ] map
     { "vreg" } <effect> ;
 
 : define-hat ( insn -- )

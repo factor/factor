@@ -95,7 +95,7 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
 
 :: (collect-subtrees) ( samples max-depth depth child-quot: ( samples -- child ) -- children )
     max-depth depth > [
-        samples [ sample-callstack leaf-callstack? not ] filter
+        samples [ sample-callstack leaf-callstack? ] reject
         [ f ] [ child-quot call ] if-empty
     ] [ f ] if ; inline
 
@@ -144,7 +144,7 @@ PRIVATE>
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
     samples [| sample |
-        sample sample-callstack members [ ignore-word? not ] filter [
+        sample sample-callstack members [ ignore-word? ] reject [
             per-word-samples sample counts+at
         ] each
     ] each

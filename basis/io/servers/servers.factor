@@ -243,7 +243,7 @@ PRIVATE>
     server-addrs [ secure? ] filter random ;
 
 : insecure-addr ( -- addrspec )
-    server-addrs [ secure? not ] filter random ;
+    server-addrs [ secure? ] reject random ;
     
 : server. ( threaded-server -- )
     [ [ "=== " write name>> ] [ ] bi write-object nl ]

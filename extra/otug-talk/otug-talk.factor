@@ -37,14 +37,14 @@ CONSTANT: otug-slides
         "Example:"
         { $code
             "\"/etc/passwd\" ascii file-lines"
-            "[ \"#\" head? not ] filter"
+            "[ \"#\" head? ] reject"
             "[ \":\" split first ] map"
             "."
         }
     }
     { $slide "Words"
         { "We can define new words with " { $snippet ": name ... ;" } " syntax" }
-        { $code ": remove-comments ( lines -- lines' )" "    [ \"#\" head? not ] filter ;" }
+        { $code ": remove-comments ( lines -- lines' )" "    [ \"#\" head? ] reject ;" }
         { "Words are grouped into " { $emphasis "vocabularies" } }
         { $link "vocab-index" }
         "Libraries and applications are vocabularies"
@@ -52,13 +52,13 @@ CONSTANT: otug-slides
     }
     { $slide "Constructing quotations"
         { "Suppose we want a " { $snippet "remove-comments*" } " word" }
-        { $code ": remove-comments* ( lines string -- lines' )" "    [ ??? head? not ] filter ;" }
+        { $code ": remove-comments* ( lines string -- lines' )" "    [ ??? head? ] reject ;" }
         { "We use " { $link POSTPONE: '[ } " instead of " { $link POSTPONE: [ } }
         { "Create “holes” with " { $link _ } }
         "Holes filled in left to right when quotation pushed on the stack"
     }
     { $slide "Constructing quotations"
-        { $code ": remove-comments* ( lines string -- lines' )" "    '[ _ head? not ] filter ;" "" ": remove-comments ( lines -- lines' )" "    \"#\" remove-comments* ;" }
+        { $code ": remove-comments* ( lines string -- lines' )" "    '[ _ head? ] reject ;" "" ": remove-comments ( lines -- lines' )" "    \"#\" remove-comments* ;" }
         { { $link @ } " inserts a quotation" }
         { $code ": replicate ( n quot -- seq )" "    '[ drop @ ] map ;" }
         { $code "10 [ 1 10 [a,b] random ] replicate ." }

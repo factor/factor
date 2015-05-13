@@ -15,7 +15,7 @@ IN: bootstrap.help
 
     [ dup lookup-vocab [ drop ] [ no-vocab ] if ] require-hook [
         dictionary get values
-        [ docs-loaded?>> not ] filter
+        [ docs-loaded?>> ] reject
         [ load-docs ] each
     ] with-variable ;
 

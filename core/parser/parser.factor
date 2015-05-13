@@ -32,7 +32,7 @@ SYMBOL: auto-use?
     ] [ create-in ] if ;
 
 : ignore-forwards ( seq -- seq' )
-    [ forward-reference? not ] filter ;
+    [ forward-reference? ] reject ;
 
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 

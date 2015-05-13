@@ -217,7 +217,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     dup
     [ simples>> ] [ not-simples>> ] [ and>> ] tri
     3append or-class boa
-    '[ [ _ class-member? not ] filter ] change-integers ;
+    '[ [ _ class-member? ] reject ] change-integers ;
 
 : answer-ands ( partition -- partition' )
     dup [ integers>> ] [ not-simples>> ] [ simples>> ] tri 3append

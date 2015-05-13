@@ -33,7 +33,7 @@ SYMBOL: IGNORE
 
 : filter-ignores ( tuple specs -- specs' )
     [ <mirror> [ nip IGNORE = ] assoc-filter keys ] dip
-    [ slot-name>> swap member? not ] with filter ;
+    [ slot-name>> swap member? ] with reject ;
 
 ERROR: not-persistent class ;
 
@@ -99,13 +99,13 @@ FACTOR-BLOB NULL URL ;
     dup number? [ number>string ] when ;
 
 : remove-db-assigned-id ( specs -- obj )
-    [ +db-assigned-id+? not ] filter ;
+    [ +db-assigned-id+? ] reject ;
 
 : remove-relations ( specs -- newcolumns )
-    [ relation? not ] filter ;
+    [ relation? ] reject ;
 
 : remove-id ( specs -- obj )
-    [ primary-key>> not ] filter ;
+    [ primary-key>> ] reject ;
 
 ! SQLite Types: http://www.sqlite.org/datatype3.html
 ! NULL INTEGER REAL TEXT BLOB

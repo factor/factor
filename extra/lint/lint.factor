@@ -232,7 +232,7 @@ SYMBOL: lint-definitions-keys
     lintable-words load-definitions
 
     ! Remove words that are their own definition
-    [ [ [ def>> ] [ 1quotation ] bi = not ] filter ] assoc-map
+    [ [ [ def>> ] [ 1quotation ] bi = ] reject ] assoc-map
 
     ! Add manual definitions
     manual-substitutions over '[ _ push-at ] assoc-each
@@ -284,7 +284,7 @@ GENERIC: run-lint ( obj -- obj )
 
 M: sequence run-lint ( seq -- seq )
     [ dup lint ] { } map>assoc trim-self
-    [ second empty? not ] filter filter-symbols ;
+    [ second empty? ] reject filter-symbols ;
 
 M: word run-lint ( word -- seq ) 1array run-lint ;
 

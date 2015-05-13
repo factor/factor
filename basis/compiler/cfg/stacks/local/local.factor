@@ -24,7 +24,7 @@ IN: compiler.cfg.stacks.local
 
 : height-state>insns ( state -- insns )
     [ second ] map { ds-loc rs-loc } [ new swap >>n ] 2map
-    [ n>> 0 = not ] filter [ ##inc new swap >>loc ] map ;
+    [ n>> 0 = ] reject [ ##inc new swap >>loc ] map ;
 
 : translate-local-loc ( loc state -- loc' )
     [ clone ] dip over >loc< 0 1 ? rot nth first - >>n ;

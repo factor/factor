@@ -60,5 +60,5 @@ io.files io.encodings.utf8 ;
     "vocab:porter-stemmer/test/voc.txt" utf8 file-lines
     [ stem ] map
     "vocab:porter-stemmer/test/output.txt" utf8 file-lines
-    [ 2array ] 2map [ first2 = not ] filter
+    [ 2array ] 2map [ first2 = ] reject
 ] unit-test

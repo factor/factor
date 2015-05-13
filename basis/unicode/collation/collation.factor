@@ -97,8 +97,8 @@ ducet get-global insert-helpers
     ] { } map-as concat ;
 
 : append-weights ( weights quot -- )
-    [ [ ignorable?>> not ] filter ] dip
-    map [ zero? not ] filter % 0 , ; inline
+    [ [ ignorable?>> ] reject ] dip
+    map [ zero? ] reject % 0 , ; inline
 
 : variable-weight ( weight -- )
     dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if , ;

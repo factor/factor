@@ -5,5 +5,5 @@ IN: compiler.crossref.tests
 ! in the middle of recompiling something
 [ { } ] [
     all-words dup [ subwords ] map concat append
-    H{ } clone '[ _ dependencies-satisfied? not ] filter
+    H{ } clone '[ _ dependencies-satisfied? ] reject
 ] unit-test

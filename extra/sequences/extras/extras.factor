@@ -257,7 +257,7 @@ PRIVATE>
     [ empty? not ] swap filter-as ;
 
 : harvest! ( seq -- newseq )
-    [ empty? not ] filter! ;
+    [ empty? ] reject! ;
 
 : head-as ( seq n exemplar -- seq' )
     [ head-slice ] [ like ] bi* ; inline

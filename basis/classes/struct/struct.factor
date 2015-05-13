@@ -245,7 +245,7 @@ M: struct-bit-slot-spec compute-slot-offset
     1 [ 0 >>offset type>> heap-size max ] reduce ;
 
 : struct-alignment ( slots -- align )
-    [ struct-bit-slot-spec? not ] filter
+    [ struct-bit-slot-spec? ] reject
     1 [ dup offset>> c-type-align-at max ] reduce ;
 
 PRIVATE>

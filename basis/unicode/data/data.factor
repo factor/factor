@@ -114,7 +114,7 @@ PRIVATE>
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
     [ "#" split1 drop [ blank? ] trim-tail hex> ] map
-    [ 0 = not ] filter ;
+    [ 0 = ] reject ;
 
 : remove-exclusions ( alist -- alist )
     exclusions unique assoc-diff ;
@@ -129,7 +129,7 @@ PRIVATE>
 : process-compatibility ( data -- hash )
     (process-decomposed)
     [ dup first* [ first2 rest 2array ] unless ] map
-    [ second empty? not ] filter
+    [ second empty? ] reject
     >hashtable chain-decomposed ;
 
 : process-combining ( data -- hash )
@@ -209,7 +209,7 @@ load-data {
 } cleave
 
 combine-map keys [ 2ch> nip ] map
-[ combining-class not ] filter
+[ combining-class ] reject
 [ 0 swap class-map set-at ] each
 
 load-special-casing special-casing swap assoc-union! drop

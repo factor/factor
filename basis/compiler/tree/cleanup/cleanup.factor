@@ -12,7 +12,7 @@ IN: compiler.tree.cleanup
 GENERIC: delete-node ( node -- )
 
 M: #call-recursive delete-node
-    dup label>> calls>> [ node>> eq? not ] with filter! drop ;
+    dup label>> calls>> [ node>> eq? ] with reject! drop ;
 
 M: #return-recursive delete-node
     label>> f >>return drop ;

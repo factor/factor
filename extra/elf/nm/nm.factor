@@ -19,6 +19,6 @@ IN: elf.nm
 : elf-nm ( path -- )
     [
         sections dup ".symtab" find-section
-        symbols [ name>> empty? not ] filter
+        symbols [ name>> empty? ] reject
         [ print-symbol ] with each
     ] with-mapped-elf ;
