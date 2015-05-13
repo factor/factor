@@ -11,7 +11,7 @@ TR: soundex-tr
 : remove-duplicates ( seq -- seq' )
     #! Remove _consecutive_ duplicates (unlike prune which removes
     #! all duplicates).
-    [ 2 <clumps> [ = not ] assoc-filter values ] [ first ] bi prefix ;
+    [ 2 <clumps> [ = ] assoc-reject values ] [ first ] bi prefix ;
 
 : first>upper ( seq -- seq' ) 1 head >upper ;
 : trim-first ( seq -- seq' ) dup first [ = ] curry trim-head ;

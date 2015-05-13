@@ -9,7 +9,7 @@ IN: assocs.extras
     [ nip ] assoc-filter ; inline
 
 : assoc-harvest ( assoc -- assoc' )
-    [ nip empty? not ] assoc-filter ; inline
+    [ nip empty? ] assoc-reject ; inline
 
 : deep-at ( assoc seq -- value/f )
     [ of ] each ; inline

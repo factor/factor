@@ -135,7 +135,7 @@ PRIVATE>
 : process-combining ( data -- hash )
     3 swap (process-data)
     [ string>number ] assoc-map
-    [ nip zero? not ] assoc-filter
+    [ nip zero? ] assoc-reject
     >hashtable ;
 
 ! the maximum unicode char in the first 3 planes

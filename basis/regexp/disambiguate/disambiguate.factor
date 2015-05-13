@@ -66,7 +66,7 @@ TUPLE: parts in out ;
         dup new-transitions '[
             [
                 _ swap '[ _ get-transitions ] assoc-map
-                [ nip empty? not ] assoc-filter 
+                [ nip empty? ] assoc-reject 
             ] preserving-epsilon
         ] assoc-map
     ] change-transitions ;

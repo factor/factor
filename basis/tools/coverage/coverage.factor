@@ -81,7 +81,7 @@ M: string coverage
 
 M: word coverage ( word -- seq )
     "coverage" word-prop >alist
-    [ drop executed?>> not ] assoc-filter values ;
+    [ drop executed?>> ] assoc-reject values ;
 
 GENERIC: coverage. ( object -- )
 

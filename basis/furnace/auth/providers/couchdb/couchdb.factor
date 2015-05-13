@@ -119,7 +119,7 @@ TUPLE: couchdb-auth-provider
     ((get-user)) ;
 
 : strip-hash ( hash1 -- hash2 )
-    [ drop first CHAR: _ = not ] assoc-filter ;
+    [ drop first CHAR: _ = ] assoc-reject ;
 
 : at-or-k ( key hash -- newkey )
     dupd at [ nip ] when* ;

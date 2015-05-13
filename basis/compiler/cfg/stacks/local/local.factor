@@ -80,7 +80,7 @@ SYMBOLS: local-peek-set replaces ;
     H{ } clone replaces set ;
 
 : remove-redundant-replaces ( replaces -- replaces' )
-    [ [ loc>vreg ] dip = not ] assoc-filter ;
+    [ [ loc>vreg ] dip = ] assoc-reject ;
 
 : end-local-analysis ( basic-block -- )
     [
