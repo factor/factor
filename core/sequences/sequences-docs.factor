@@ -513,6 +513,8 @@ HELP: filter!
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
+{ filter filter-as filter! } related-words
+
 HELP: reject
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence removing with the elements of the original sequence for which the quotation output a true value." } ;
@@ -525,6 +527,8 @@ HELP: reject!
 { $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a true value." }
 { $side-effects "seq" } ;
+
+{ reject reject-as reject! } related-words
 
 HELP: interleave
 { $values { "seq" sequence } { "between" quotation } { "quot" { $quotation ( ... elt -- ... ) } } }
