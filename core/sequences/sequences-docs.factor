@@ -513,6 +513,19 @@ HELP: filter!
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
+HELP: reject
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "subseq" "a new sequence" } }
+{ $description "Applies the quotation to each element in turn, and outputs a new sequence removing with the elements of the original sequence for which the quotation output a true value." } ;
+
+HELP: reject-as
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "exemplar" sequence } { "subseq" "a new sequence" } }
+{ $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " remove the elements of the original sequence for which the quotation output a true value." } ;
+
+HELP: reject!
+{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } }
+{ $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a true value." }
+{ $side-effects "seq" } ;
+
 HELP: interleave
 { $values { "seq" sequence } { "between" quotation } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }

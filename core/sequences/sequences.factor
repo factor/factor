@@ -544,6 +544,12 @@ PRIVATE>
 : filter ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-as ; inline
 
+: reject-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
+    [ [ not ] compose ] [ filter-as ] bi* ; inline
+
+: reject ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    over reject-as ; inline
+
 : push-either ( ..a elt quot: ( ..a elt -- ..b ? ) accum1 accum2 -- ..b )
     [ keep swap ] 2dip ? push ; inline
 
@@ -630,16 +636,16 @@ PRIVATE>
     [ eq? ] with any? ;
 
 : remove ( elt seq -- newseq )
-    [ = not ] with filter ;
+    [ = ] with reject ;
 
 : remove-eq ( elt seq -- newseq )
-    [ eq? not ] with filter ;
+    [ eq? ] with reject ;
 
 : sift ( seq -- newseq )
     [ ] filter ;
 
 : harvest ( seq -- newseq )
-    [ empty? not ] filter ;
+    [ empty? ] reject ;
 
 <PRIVATE
 
@@ -704,11 +710,14 @@ PRIVATE>
 : filter! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     swap [ [ 0 0 ] dip (filter!) ] keep ; inline
 
+: reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
+    [ not ] compose filter! ; inline
+
 : remove! ( elt seq -- seq )
-    [ = not ] with filter! ;
+    [ = ] with reject! ;
 
 : remove-eq! ( elt seq -- seq )
-    [ eq? not ] with filter! ;
+    [ eq? ] with reject! ;
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
