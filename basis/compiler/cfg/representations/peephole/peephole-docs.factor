@@ -1,8 +1,8 @@
-USING: compiler.cfg.instructions help.markup help.syntax ;
+USING: compiler.cfg.instructions help.markup help.syntax kernel ;
 IN: compiler.cfg.representations.peephole
 
 HELP: convert-to-zero-vector?
-{ $values { "insn" insn } { "?" "a boolean" } }
+{ $values { "insn" insn } { "?" boolean } }
 { $description "When a literal zeroes/ones vector is unboxed, we replace the " { $link ##load-reference } " with a " { $link ##zero-vector } " or " { $link ##fill-vector } " instruction since this is more efficient." } ;
 
 

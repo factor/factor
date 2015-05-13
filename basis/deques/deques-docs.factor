@@ -72,7 +72,7 @@ HELP: peek-front
 { $errors "Throws an error if the deque is empty." } ;
 
 HELP: ?peek-front
-{ $values { "deque" deque } { "obj/f" "an object or " { $link f } } }
+{ $values { "deque" deque } { "obj/f" { $maybe object } } }
 { $description "A forgiving version of " { $link peek-front } ". If the deque is empty, returns " { $link f } "." } ;
 
 HELP: pop-front
@@ -95,7 +95,7 @@ HELP: peek-back
 { $errors "Throws an error if the deque is empty." } ;
 
 HELP: ?peek-back
-{ $values { "deque" deque } { "obj/f" "an object or " { $link f } } }
+{ $values { "deque" deque } { "obj/f" { $maybe object } } }
 { $description "A forgiving version of " { $link peek-back } ". If the deque is empty, returns " { $link f } "." } ;
 
 HELP: pop-back

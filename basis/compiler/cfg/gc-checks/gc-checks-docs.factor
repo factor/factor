@@ -32,7 +32,7 @@ HELP: gc-check-offsets
 { $description "A basic block is divided into sections by " { $link ##call } " and " { $link ##phi } " instructions. For every section with at least one allocation, record the offset of its first instruction  in a sequence." } ;
 
 HELP: insert-gc-check?
-{ $values { "bb" basic-block } { "?" "a boolean" } }
+{ $values { "bb" basic-block } { "?" boolean } }
 { $description "Whether to insert a gc check in the block or not." } ;
 
 HELP: insert-gc-checks

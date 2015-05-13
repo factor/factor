@@ -14,7 +14,7 @@ HELP: num-types
 { $var-description "Number of distinct built-in types. This is one more than the maximum value from the " { $link tag } " primitive." } ;
 
 HELP: type-number
-{ $values { "class" class } { "n" "an integer or " { $link f } } }
+{ $values { "class" class } { "n" { $maybe integer  } } }
 { $description "Outputs the built-in type number instances of " { $link class } ". Will output " { $link f } " if this is not a built-in class." }
 { $see-also builtin-class } ;
 

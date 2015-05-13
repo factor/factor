@@ -40,7 +40,7 @@ HELP: <hashed-dlist>
 { $description "Creates a new " { $link search-deque } " backed by a " { $link dlist } ", with a " { $link hashtable } " for fast membership tests." } ;
 
 HELP: dlist-find
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" boolean } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } { "?" boolean } }
 { $description "Applies the quotation to each element of the " { $link dlist } " in turn, until it outputs a true value or the end of the " { $link dlist } " is reached.  Outputs either the object it found or " { $link f } ", and a boolean which is true if an object is found." }
 { $notes "Returns a boolean to allow dlists to store " { $link f } "."
     $nl
@@ -58,12 +58,12 @@ HELP: dlist-any?
 { $notes "This operation is O(n)." } ;
 
 HELP: delete-node-if*
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" boolean } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } { "?" boolean } }
 { $description "Calls " { $link dlist-find } " on the " { $link dlist } " and deletes the node returned, if any.  Returns the value of the deleted node and a boolean to allow the deleted value to distinguished from " { $link f } ", for nothing deleted." }
 { $notes "This operation is O(n)." } ;
 
 HELP: delete-node-if
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } }
 { $description "Like " { $link delete-node-if* } " but cannot distinguish from deleting a node whose value is " { $link f } " or not deleting an element." }
 { $notes "This operation is O(n)." } ;
 

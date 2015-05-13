@@ -166,16 +166,16 @@ HELP: bounds-check?
 { $description "Tests if the index is within the bounds of the sequence." } ;
 
 HELP: bounds-error
-{ $values { "n" "a positive integer" } { "seq" sequence } }
+{ $values { "n" integer } { "seq" sequence } }
 { $description "Throws a " { $link bounds-error } "." }
 { $error-description "Thrown by " { $link nth } ", " { $link set-nth } " and " { $link set-length } " if the given index lies beyond the bounds of the sequence." } ;
 
 HELP: bounds-check
-{ $values { "n" "a positive integer" } { "seq" sequence } }
+{ $values { "n" integer } { "seq" sequence } }
 { $description "Throws an error if " { $snippet "n" } " is negative or if it is greater than or equal to the length of " { $snippet "seq" } ". Otherwise the two inputs remain on the stack." } ;
 
 HELP: ?nth
-{ $values { "n" integer } { "seq" sequence } { "elt/f" "an object or " { $link f } } }
+{ $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
 HELP: ?set-nth
@@ -183,7 +183,7 @@ HELP: ?set-nth
 { $description "A forgiving version of " { $link set-nth } ".  If the index is out of bounds, does nothing." } ;
 
 HELP: ?first
-{ $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
+{ $values { "seq" sequence } { "elt/f" { $maybe object } } }
 { $description "A forgiving version of " { $link first } ". If the sequence is empty, or if the sequence is " { $link f } ", simply outputs " { $link f } "." }
 { $examples
     "On an empty sequence:"
@@ -200,11 +200,11 @@ HELP: ?first
 
 
 HELP: ?second
-{ $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
+{ $values { "seq" sequence } { "elt/f" { $maybe object } } }
 { $description "A forgiving version of " { $link second } ". If the sequence has less than two elements, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
 HELP: ?last
-{ $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
+{ $values { "seq" sequence } { "elt/f" { $maybe object } } }
 { $description "A forgiving version of " { $link last } ". If the sequence is empty, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
 HELP: nth-unsafe
@@ -456,35 +456,35 @@ HELP: find-from
 { $values { "n" "a starting index" }
           { "seq" sequence }
           { "quot" { $quotation ( ... elt -- ... ? ) } }
-          { "i" "the index of the first match, or " { $link f } }
-          { "elt" "the first matching element, or " { $link f } } }
+          { "i" { $maybe "the index of the first match" } }
+          { "elt" { $maybe "the first matching element" } } }
 { $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of " { $link f } " and " { $link f } " as the element." } ;
 
 HELP: find-last
-{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "i" { $maybe "the index of the first match" } } { "elt" { $maybe "the first matching element" } } }
 { $description "A simpler variant of " { $link find-last-from } " where the starting index is one less than the length of the sequence." } ;
 
 HELP: find-last-from
-{ $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
+{ $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "i" { $maybe "the index of the first match" } } { "elt" { $maybe "the first matching element" } } }
 { $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of " { $link f } " and " { $link f } " as the element." } ;
 
 HELP: find-index
 { $values { "seq" sequence }
           { "quot" { $quotation ( ... elt i -- ... ? ) } }
-          { "i" "the index of the first match, or " { $link f } }
-          { "elt" "the first matching element, or " { $link f } } }
+          { "i" { $maybe "the index of the first match" } }
+          { "elt" { $maybe "the first matching element" } } }
 { $description "A varient of " { $link find } " where the quotation takes both an element and its index." } ;
 
 HELP: find-index-from
 { $values { "n" "a starting index" }
           { "seq" sequence }
           { "quot" { $quotation ( ... elt i -- ... ? ) } }
-          { "i" "the index of the first match, or " { $link f } }
-          { "elt" "the first matching element, or " { $link f } } }
+          { "i" { $maybe "the index of the first match" } }
+          { "elt" { $maybe "the first matching element" } } }
 { $description "A varient of " { $link find-from } " where the quotation takes both an element and its index." } ;
 
 HELP: map-find
-{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the first non-false result of the quotation" } { "elt" "the first matching element, or " { $link f } } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the first non-false result of the quotation" } { "elt" { $maybe "the first matching element" } } }
 { $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
 
 HELP: any?
@@ -1132,12 +1132,12 @@ HELP: product
 { $description "Outputs the product of all elements of " { $snippet "seq" } ". Outputs one given an empty sequence." } ;
 
 HELP: infimum
-{ $values { "seq" "a sequence of real numbers" } { "n" number } }
+{ $values { "seq" "a sequence of real numbers" } { "elt" object } }
 { $description "Outputs the least element of " { $snippet "seq" } "." }
 { $errors "Throws an error if the sequence is empty." } ;
 
 HELP: supremum
-{ $values { "seq" "a sequence of real numbers" } { "n" number } }
+{ $values { "seq" "a sequence of real numbers" } { "elt" object } }
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
 { $errors "Throws an error if the sequence is empty." } ;
 

@@ -58,7 +58,7 @@ HELP: fclose
 { $description "Closes a C FILE* handle." } ;
 
 HELP: fgetc
-{ $values { "alien" "a C FILE* handle" } { "byte/f" "an integer from 0 to 255 or " { $link f } } }
+{ $values { "alien" "a C FILE* handle" } { "byte/f" { $maybe "an integer from 0 to 255" } } }
 { $description "Reads a single byte from a C FILE* handle, and outputs " { $link f } " on end of file." } 
 { $errors "Throws an error if the input operation failed." } ;
 

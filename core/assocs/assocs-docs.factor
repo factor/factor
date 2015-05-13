@@ -360,16 +360,16 @@ HELP: assoc-hashcode
 { $notes "Custom assoc implementations should use this word to implement a method for the " { $link hashcode* } " generic word." } ;
 
 HELP: assoc-stack
-{ $values { "key" "a key" } { "seq" "a sequence of assocs" } { "value" "a value or " { $link f } } }
+{ $values { "key" "a key" } { "seq" "a sequence of assocs" } { "value" { $maybe "a value" } } }
 { $description "Searches for the key in successive elements of the sequence, starting from the end. If an assoc containing the key is found, the associated value is output. If no assoc contains the key, outputs " { $link f } "." }
 { $notes "This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed assoc -- the innermost scope -- will be searched first." } ;
 
 HELP: value-at*
-{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } { "?" boolean } }
+{ $values { "value" object } { "assoc" assoc } { "key/f" { $maybe "the key associated to the value" } } { "?" boolean } }
 { $description "Looks up the key associated with a value. The boolean flag can decide between the case of a missing key, and a key of " { $link f } "." } ;
 
 HELP: value-at
-{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } }
+{ $values { "value" object } { "assoc" assoc } { "key/f" { $maybe "the key associated to the value" } } }
 { $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." } ;
 
 HELP: value?
@@ -377,7 +377,7 @@ HELP: value?
 { $description "Tests if an assoc contains at least one key with the given value." } ;
 
 HELP: delete-at*
-{ $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" boolean } }
+{ $values { "key" "a key" } { "assoc" assoc } { "old" { $maybe "the previous value" } } { "?" boolean } }
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
 

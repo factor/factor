@@ -259,7 +259,7 @@ HELP: %write-barrier
 { $examples { $unchecked-example $[ ex-%write-barrier ] } } ;
 
 HELP: test-instruction?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "Does the current architecture have a test instruction? Used on x86 to rewrite some " { $link CMP } " instructions to less expensive " { $link TEST } "s." } ;
 
 HELP: fused-unboxing?
@@ -271,7 +271,7 @@ HELP: return-regs
 { $description "What registers that will be used for function return values of which class." } ;
 
 HELP: return-struct-in-registers?
-{ $values { "c-type" class } { "?" "a boolean" } }
+{ $values { "c-type" class } { "?" boolean } }
 { $description "Whether the size of the struct is so small that it will be returned in registers or not." } ;
 
 HELP: stack-cleanup

@@ -1,5 +1,5 @@
 USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax
-math sequences ;
+math sequences kernel ;
 IN: compiler.cfg.save-contexts
 
 HELP: insert-save-contexts
@@ -8,7 +8,7 @@ HELP: insert-save-contexts
 { $see-also context-save-needed } ;
 
 HELP: insns-needs-save-context?
-{ $values { "insns" sequence } { "?" "a boolean" } }
+{ $values { "insns" sequence } { "?" boolean } }
 { $description "Whether to insert a " { $link ##save-context } " instruction in the given instruction sequence or not." }
 { $see-also context-save-needed } ;
 

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel prettyprint.config
+USING: help.markup help.syntax kernel math prettyprint.config
 prettyprint.custom sequences strings words ;
 IN: prettyprint.backend
 
@@ -37,7 +37,7 @@ HELP: check-recursion
 $prettyprinting-note ;
 
 HELP: do-length-limit
-{ $values { "seq" sequence } { "trimmed" "a trimmed sequence" } { "n/f" "an integer or " { $link f } } }
+{ $values { "seq" sequence } { "trimmed" "a trimmed sequence" } { "n/f" { $maybe integer } } }
 { $description "If the " { $link length-limit } " is set and the sequence length exceeds this limit, trims the sequence and outputs a the number of elements which were chopped off the end. Otherwise outputs " { $link f } "." }
 $prettyprinting-note ;
 

@@ -1,5 +1,5 @@
 USING: vocabs vocabs.loader.private help.markup help.syntax
-words strings io ;
+words strings io hashtables ;
 IN: vocabs.loader
 
 ARTICLE: "add-vocab-roots" "Working with code outside of the Factor source tree"
@@ -72,7 +72,7 @@ $nl
 ABOUT: "vocabs.loader"
 
 HELP: load-vocab
-{ $values { "name" "a string" } { "vocab" "a hashtable or " { $link f } } }
+{ $values { "name" "a string" } { "vocab" { $maybe hashtable } } }
 { $description "Attempts to load a vocabulary from disk, or looks up the vocabulary in the dictionary, and then outputs that vocabulary object." } ;
 
 HELP: vocab-main
@@ -123,9 +123,9 @@ HELP: run
 { $description "Runs a vocabulary's main entry point. The main entry point is set with the " { $link POSTPONE: MAIN: } " parsing word." } ;
 
 HELP: vocab-source-path
-{ $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
+{ $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "a pathname string" } } }
 { $description "Outputs a pathname where source code for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
 
 HELP: vocab-docs-path
-{ $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
+{ $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "a pathname string" } } }
 { $description "Outputs a pathname where the documentation for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;

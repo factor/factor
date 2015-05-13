@@ -48,7 +48,7 @@ HELP: invoke-command
 { invoke-command +nullary+ } related-words
 
 HELP: command-name
-{ $values { "command" "a command" } { "str" "a string" } }
+{ $values { "command" "a command" } { "str" string } }
 { $description "Outputs a human-readable name for the command." }
 { $examples
     { $example
@@ -61,7 +61,7 @@ HELP: command-name
 } ;
 
 HELP: command-description
-{ $values { "command" "a command" } { "str/f" "a string or " { $link f } } }
+{ $values { "command" "a command" } { "str/f" { $maybe string } } }
 { $description "Outputs the command's description." } ;
 
 { command-description +description+ } related-words
