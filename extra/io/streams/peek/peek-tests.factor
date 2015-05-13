@@ -129,3 +129,22 @@ IN: io.streams.peek.tests
         ] { } make
     ] with-destructors
 ] unit-test
+
+! Issue #1317
+{ "Red" } [
+    "resource:license.txt" binary [
+        input-stream [ <peek-stream> ] change
+        peek1 drop
+        3 read >string
+    ] with-file-reader
+] unit-test
+
+{ "ist" } [
+    "resource:license.txt" binary [
+        input-stream [ <peek-stream> ] change
+        peek1 drop
+        3 read drop
+        2 peek drop
+        3 read >string
+    ] with-file-reader
+] unit-test
