@@ -22,7 +22,7 @@ PRIVATE>
 :: erf ( x -- value )
     x 0 >= 1 -1 ? :> sign
     x abs :> x!
-    p x * 1 + 1 swap / :> t
+    p x * 1 + recip :> t
     a5 t * a4 + t * a3 + t * a2 + t * a1 + t *
     x x neg * e^ * 1 swap - :> y
     sign y * ;
@@ -34,7 +34,7 @@ PRIVATE>
 :: phi ( x -- value )
     x 0 >= 1 -1 ? :> sign
     x abs 2 sqrt / :> x!
-    p x * 1 + 1 swap / :> t
+    p x * 1 + recip :> t
     a5 t * a4 + t * a3 + t * a2 + t * a1 + t *
     x x neg * e^ * 1 swap - :> y
     sign y * 1 + 2 / ;
