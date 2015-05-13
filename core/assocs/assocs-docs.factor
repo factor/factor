@@ -151,6 +151,8 @@ $nl
     assoc-map
     assoc-filter
     assoc-filter-as
+    assoc-reject
+    assoc-reject-as
     assoc-partition
     assoc-any?
     assoc-all?
@@ -169,6 +171,7 @@ $nl
 "Destructive combinators:"
 { $subsections
     assoc-filter!
+    assoc-reject!
     cache
     2cache
 } ;
@@ -299,6 +302,21 @@ HELP: assoc-filter!
 { $side-effects "assoc" } ;
 
 { assoc-filter assoc-filter-as assoc-filter! } related-words
+
+HELP: assoc-reject
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "subassoc" "a new assoc" } }
+{ $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields false." } ;
+
+HELP: assoc-reject-as
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
+{ $description "Outputs an assoc of the same type as " { $snippet "exemplar" } " consisting of all entries for which the predicate quotation yields false." } ;
+
+HELP: assoc-reject!
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } }
+{ $description "Removes all entries for which the predicate quotation yields false." }
+{ $side-effects "assoc" } ;
+
+{ assoc-reject assoc-reject-as assoc-reject! } related-words
 
 HELP: assoc-partition
 { $values
