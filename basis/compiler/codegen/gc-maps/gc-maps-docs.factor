@@ -59,7 +59,7 @@ HELP: gc-maps
 { $var-description "Variable that holds a sequence of " { $link gc-map } " tuples." } ;
 
 HELP: gc-map-needed?
-{ $values { "gc-map/f" "a " { $link gc-map } " or f" } { "?" "a boolean" } }
+{ $values { "gc-map/f" { $maybe gc-map } } { "?" boolean } }
 { $description "If all slots in the gc-map are empty, then it doesn't need to be emitted." } ;
 
 HELP: serialize-gc-maps

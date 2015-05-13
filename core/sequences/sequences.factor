@@ -1038,9 +1038,9 @@ M: repetition sum [ elt>> ] [ len>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
-: infimum ( seq -- n ) [ ] [ min ] map-reduce ;
+: infimum ( seq -- elt ) [ ] [ min ] map-reduce ;
 
-: supremum ( seq -- n ) [ ] [ max ] map-reduce ;
+: supremum ( seq -- elt ) [ ] [ max ] map-reduce ;
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline

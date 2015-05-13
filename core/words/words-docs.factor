@@ -346,7 +346,7 @@ HELP: deprecated?
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: inline?
-{ $values { "obj" object } { "?" "a boolean" } }
+{ $values { "obj" object } { "?" boolean } }
 { $description "Tests if an object is " { $link POSTPONE: inline } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 

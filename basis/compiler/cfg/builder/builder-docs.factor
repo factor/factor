@@ -1,6 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.builder.blocks
-compiler.cfg.stacks.local compiler.tree help.markup help.syntax literals math
-multiline sequences vectors words ;
+compiler.cfg.stacks.local compiler.tree help.markup help.syntax
+kernel literals math multiline sequences vectors words ;
 IN: compiler.cfg.builder
 
 <<
@@ -72,8 +72,8 @@ HELP: emit-node
 HELP: trivial-branch?
 { $values
   { "nodes" "a " { $link sequence } " of " { $link node } " instances" }
-  { "value" "the pushed value or " { $link f } }
-  { "?" "a boolean" }
+  { "value" { $maybe "the pushed value" } }
+  { "?" boolean }
 }
 { $description "Checks whether nodes is a trivial branch or not. The branch is counted as trivial if all it does is push a literal value on the stack." }
 { $examples

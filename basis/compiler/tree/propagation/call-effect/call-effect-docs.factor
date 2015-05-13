@@ -1,13 +1,13 @@
 USING: combinators.private compiler.units effects help.markup help.syntax
-quotations ;
+kernel quotations words ;
 IN: compiler.tree.propagation.call-effect
 
 HELP: already-inlined-quot?
-{ $values { "quot" quotation } { "?" "a boolean" } }
+{ $values { "quot" quotation } { "?" boolean } }
 { $description "Some bookkeeping to make sure that crap like [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] doesn't hang the compiler." } ;
 
 HELP: cached-effect-valid?
-{ $values { "quot" quotation } { "?" "a boolean" } }
+{ $values { "quot" quotation } { "?" boolean } }
 { $description { $link t } " if the cached effect is valid." } ;
 
 HELP: call-effect-ic
@@ -23,11 +23,11 @@ HELP: call-effect-slow>quot
 { $description "Creates a quotation which wraps " { $link call-effect-unsafe } "." } ;
 
 HELP: call-effect-unsafe?
-{ $values { "quot" quotation } { "effect" effect } { "?" "a boolean" } }
+{ $values { "quot" quotation } { "effect" effect } { "?" boolean } }
 { $description "Checks if the given effect is safe with regards to the quotation." } ;
 
 HELP: update-inline-cache
-{ $values { "word/quot" "word or quotation" } { "ic" inline-cache } }
+{ $values { "word/quot" { $or word quotation } } { "ic" inline-cache } }
 { $description "Sets the inline caches " { $slot "value" } " to the given word/quot and updates its " { $slot "counter" } " to the value of the " { $link effect-counter } "." } ;
 
 ARTICLE: "compiler.tree.propagation.call-effect" "Expansions of call( and execute( words"

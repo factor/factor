@@ -389,21 +389,21 @@ HELP: struct-wrapper
 HELP: unmarshall-bool
 { $values
     { "n" number }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description "Unmarshalls a number to a boolean." } ;
 
 HELP: unmarshall-bool*
 { $values
     { "alien" alien }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description "Unmarshalls a C pointer to a boolean." } ;
 
 HELP: unmarshall-bool*-free
 { $values
     { "alien" alien }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description "Unmarshalls a C pointer to a boolean and frees the pointer." } ;
 

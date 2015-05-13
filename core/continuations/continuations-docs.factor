@@ -184,7 +184,7 @@ HELP: ignore-errors
 { $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
 
 HELP: in-callback?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "t if Factor is currently executing a callback." } ;
 
 HELP: rethrow

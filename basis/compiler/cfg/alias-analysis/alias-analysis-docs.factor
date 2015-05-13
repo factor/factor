@@ -1,10 +1,10 @@
-USING: compiler.cfg.instructions help.markup help.syntax ;
+USING: compiler.cfg.instructions help.markup help.syntax kernel ;
 IN: compiler.cfg.alias-analysis
 
 HELP: useless-compare?
 { $values
   { "insn" "a " { $link ##compare } " instruction" }
-  { "?" "a boolean" }
+  { "?" boolean }
 }
 { $description "Checks if the comparison instruction is required." } ;
 

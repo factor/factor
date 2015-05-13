@@ -65,7 +65,7 @@ $nl
 ABOUT: "namespaces"
 
 HELP: get
-{ $values { "variable" "a variable, by convention a symbol" } { "value" "the value, or " { $link f } } }
+{ $values { "variable" "a variable, by convention a symbol" } { "value" { $maybe "the value" } } }
 { $description "Searches the name stack for a namespace containing the variable, and outputs the associated value. If no such namespace is found, outputs " { $link f } "." } ;
 
 HELP: set

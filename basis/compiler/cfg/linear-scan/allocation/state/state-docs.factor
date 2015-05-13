@@ -2,7 +2,7 @@ USING: assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.live-intervals cpu.architecture heaps help.markup
-help.syntax math sequences vectors ;
+help.syntax kernel math sequences vectors ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 HELP: activate-intervals
@@ -66,7 +66,7 @@ HELP: progress
 { $see-also check-handled check-unhandled } ;
 
 HELP: register-available?
-{ $values { "new" live-interval-state } { "result" "a pair" } { "?" "a boolean" } }
+{ $values { "new" live-interval-state } { "result" "a pair" } { "?" boolean } }
 { $description "Whether the register in 'result' can be used for the given live interval." } ;
 
 HELP: registers

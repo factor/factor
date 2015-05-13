@@ -111,7 +111,7 @@ HELP: sleep-queue
 { $var-description "A " { $link min-heap } " storing the queue of sleeping threads." } ;
 
 HELP: sleep-time
-{ $values { "nanos/f" "a non-negative integer or " { $link f } } }
+{ $values { "nanos/f" { $maybe "a non-negative integer" } } }
 { $description "Returns the time until the next sleeping thread is scheduled to wake up, which could be zero if there are threads in the run queue, or threads which need to wake up right now. If there are no runnable or sleeping threads, returns " { $link f } "." } ;
 
 HELP: stop
@@ -121,7 +121,7 @@ HELP: yield
 { $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
 
 HELP: sleep-until
-{ $values { "n/f" "a non-negative integer or " { $link f } } }
+{ $values { "n/f" { $maybe "a non-negative integer" } } }
 { $description "Suspends the current thread until the given nanosecond count, returned by " { $link nano-count } ", is reached, or indefinitely if a value of " { $link f } " is passed in."
 $nl
 "Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;

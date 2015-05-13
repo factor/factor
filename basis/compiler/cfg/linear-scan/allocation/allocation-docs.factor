@@ -1,6 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals help.markup help.syntax sequences ;
+compiler.cfg.linear-scan.live-intervals help.markup help.syntax kernel sequences ;
 IN: compiler.cfg.linear-scan.allocation
 
 HELP: (allocate-registers)
@@ -27,7 +27,7 @@ HELP: spill-at-sync-point
 { $values
   { "sync-point" sync-point }
   { "live-interval" live-interval-state }
-  { "?" "a boolean" }
+  { "?" boolean }
 }
 { $description "Maybe spills the live-interval at the given sync point. If the interval was spilled, then " { $link f } " is put on the stack to indicate that the interval isn't live anymore, " { $link t } " otherwise." }
 { $see-also spill-at-sync-point? } ;
@@ -36,6 +36,6 @@ HELP: spill-at-sync-point?
 { $values
   { "sync-point" sync-point }
   { "live-interval" live-interval-state }
-  { "?" "a boolean" }
+  { "?" boolean }
 }
 { $description "If the live interval has a definition at a keep-dst? sync-point, don't spill." } ;

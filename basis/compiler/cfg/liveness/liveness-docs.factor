@@ -1,5 +1,5 @@
 USING: assocs compiler.cfg compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.representations help.markup help.syntax ;
+compiler.cfg.representations help.markup help.syntax kernel ;
 IN: compiler.cfg.liveness
 
 HELP: base-pointers
@@ -31,7 +31,7 @@ HELP: live-in
 { $description "All the virtual registers that are live in a basic block." } ;
 
 HELP: live-in?
-{ $values { "vreg" "virtual register" } { "bb" basic-block } { "?" "a boolean" } }
+{ $values { "vreg" "virtual register" } { "bb" basic-block } { "?" boolean } }
 { $description "Whether the vreg is live in the block or not." } ;
 
 HELP: live-ins
@@ -39,7 +39,7 @@ HELP: live-ins
 { $see-also compute-live-sets } ;
 
 HELP: lookup-base-pointer
-{ $values { "vreg" "vreg" } { "vreg/f" "vreg or " { $link f } } }
+{ $values { "vreg" "vreg" } { "vreg/f" { $maybe "vreg" } } }
 { $description "Tries to figure out what the base pointer for a vreg is. Can't use cache here because of infinite recursion inside the quotation passed to cache" }
 { $see-also base-pointers } ;
 
