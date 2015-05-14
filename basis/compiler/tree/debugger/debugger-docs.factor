@@ -1,4 +1,4 @@
-USING: compiler.tree help.markup help.syntax ;
+USING: compiler.tree help.markup help.syntax kernel ;
 IN: compiler.tree.debugger
 
 HELP: #>r?
