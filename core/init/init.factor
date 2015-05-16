@@ -30,9 +30,3 @@ shutdown-hooks global [ drop V{ } clone ] cache drop
 : startup-quot ( -- quot ) OBJ-STARTUP-QUOT special-object ;
 
 : set-startup-quot ( quot -- ) OBJ-STARTUP-QUOT set-special-object ;
-
-: shutdown-quot ( -- quot ) OBJ-SHUTDOWN-QUOT special-object ;
-
-: set-shutdown-quot ( quot -- ) OBJ-SHUTDOWN-QUOT set-special-object ;
-
-[ do-shutdown-hooks ] set-shutdown-quot
