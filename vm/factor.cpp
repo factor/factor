@@ -191,10 +191,6 @@ void factor_vm::start_factor(vm_parameters* p) {
   c_to_factor_toplevel(special_objects[OBJ_STARTUP_QUOT]);
 }
 
-void factor_vm::stop_factor() {
-  c_to_factor_toplevel(special_objects[OBJ_SHUTDOWN_QUOT]);
-}
-
 char* factor_vm::factor_eval_string(char* string) {
   void* func = alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
   CODE_TO_FUNCTION_POINTER(func);
