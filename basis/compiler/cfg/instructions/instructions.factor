@@ -57,6 +57,9 @@ literal: loc ;
 INSN: ##replace-imm
 literal: src loc ;
 
+INSN: ##clear
+literal: loc ;
+
 INSN: ##inc
 literal: loc ;
 

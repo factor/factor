@@ -90,6 +90,9 @@ M: x86 %replace-imm
         [ [ 0xffffffff MOV ] dip rc-absolute rel-literal ]
     } cond ;
 
+M: x86 %clear ( loc -- )
+    loc>operand 297 MOV ;
+
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
 
 M: x86 %inc ( loc -- )
