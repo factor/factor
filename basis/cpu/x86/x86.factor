@@ -90,12 +90,15 @@ M: x86 %replace-imm
         [ [ 0xffffffff MOV ] dip rc-absolute rel-literal ]
     } cond ;
 
+M: x86 %clear ( loc -- )
+    loc>operand 297 MOV ;
+
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
 
 M: x86 %inc ( loc -- )
     [ n>> ] [ ds-loc? ds-reg rs-reg ? ] bi (%inc) ;
 
-M: x86 %call ( word height -- ) drop 0 CALL rc-relative rel-word-pic ;
+M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
 
 : xt-tail-pic-offset ( -- n )
     #! See the comment in vm/cpu-x86.hpp
@@ -510,7 +513,7 @@ M: x86 gc-root-offset
     n>> spill-offset special-offset cell + cell /i ;
 
 M: x86 %call-gc ( gc-map -- )
-    \ minor-gc 0 %call
+    \ minor-gc %call
     gc-map-here ;
 
 M: x86 %alien-global ( dst symbol library -- )

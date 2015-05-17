@@ -7,8 +7,8 @@ IN: compiler.cfg.stacks.clearing.tests
 {
     V{
         T{ ##inc { loc D 2 } { insn# 0 } }
-        T{ ##replace-imm { src 17 } { loc T{ ds-loc { n 1 } } } }
-        T{ ##replace-imm { src 17 } { loc T{ ds-loc } } }
+        T{ ##clear { loc T{ ds-loc { n 1 } } } }
+        T{ ##clear { loc T{ ds-loc } } }
         T{ ##peek { loc D 2 } { insn# 1 } }
     }
 } [
@@ -17,20 +17,28 @@ IN: compiler.cfg.stacks.clearing.tests
 ] unit-test
 
 ! dangerous-insn?
-{ t f f } [
+{
+    t f t
+} [
     { { 0 { } } { 0 { } } } T{ ##peek { loc D 0 } } dangerous-insn?
-    { { 1 { 0 } } { 0 { } } } T{ ##peek { loc D 0 } } dangerous-insn?
-    { { 0 { -1 } } { 0 { } } } T{ ##peek { loc D -1 } } dangerous-insn?
+    { { 1 { } } { 0 { } } } T{ ##peek { loc D 0 } } dangerous-insn?
+    { { 2 { 0 1 } } { 0 { } } } T{ ##peek { loc D 2 } } dangerous-insn?
 ] unit-test
 
 ! state>replaces
 {
-    {
-        T{ ##replace-imm { src 17 } { loc D 1 } }
-        T{ ##replace-imm { src 17 } { loc D 0 } }
-    }
+    { }
 } [
     { { 2 { } } { 0 { } } } state>replaces
+] unit-test
+
+{
+    {
+        T{ ##replace-imm { src 297 } { loc D 1 } }
+        T{ ##replace-imm { src 297 } { loc D 0 } }
+    }
+} [
+    { { 2 { 0 1 } } { 0 { } } } state>replaces
 ] unit-test
 
 { { } } [
@@ -39,9 +47,9 @@ IN: compiler.cfg.stacks.clearing.tests
 
 {
     {
-        T{ ##replace-imm { src 17 } { loc T{ ds-loc } } }
-        T{ ##replace-imm { src 17 } { loc T{ rs-loc } } }
+        T{ ##replace-imm { src 297 } { loc T{ ds-loc } } }
+        T{ ##replace-imm { src 297 } { loc T{ rs-loc } } }
     }
 } [
-    { { 1 { } } { 1 { } } } state>replaces
+    { { 1 { 0 } } { 1 { 0 } } } state>replaces
 ] unit-test

@@ -245,7 +245,7 @@ IN: compiler.cfg.builder.tests
 
 ! emit-call
 {
-    V{ T{ ##call { word print } { height 4 } } T{ ##branch } }
+    V{ T{ ##call { word print } } T{ ##branch } }
 } [
     [ \ print 4 emit-call ] V{ } make drop
     basic-block get successors>> first instructions>>

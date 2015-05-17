@@ -57,12 +57,15 @@ literal: loc ;
 INSN: ##replace-imm
 literal: src loc ;
 
+INSN: ##clear
+literal: loc ;
+
 INSN: ##inc
 literal: loc ;
 
 ! Subroutine calls
 INSN: ##call
-literal: word height ;
+literal: word ;
 
 INSN: ##jump
 literal: word ;

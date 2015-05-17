@@ -3,20 +3,20 @@ compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.stacks compiler.cfg.stacks.padding kernel math sequences ;
 IN: compiler.cfg.stacks.clearing
 
-: state>replaces ( state -- replaces )
-    [ stack>vacant ] map { ds-loc rs-loc } [ swap create-locs ] 2map concat
-    [ 17 swap f ##replace-imm boa ] map ;
+: state>clears ( state -- clears )
+    [ second ] map { ds-loc rs-loc } [ swap create-locs ] 2map concat
+    [ f ##clear boa ] map ;
 
 : dangerous-insn? ( state insn -- ? )
     { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ;
 
-: clearing-replaces ( assoc insn -- insns' )
+: clearing-insns ( assoc insn -- insns' )
     [ insn#>> of ] keep 2dup dangerous-insn? [
-        drop state>replaces
+        drop state>clears
     ] [ 2drop { } ] if ;
 
 : visit-insns ( assoc insns -- insns' )
-    [ [ clearing-replaces ] keep suffix ] with map V{ } concat-as ;
+    [ [ clearing-insns ] keep suffix ] with map V{ } concat-as ;
 
 : clear-uninitialized ( cfg -- )
     [ trace-stack-state2 ] keep [

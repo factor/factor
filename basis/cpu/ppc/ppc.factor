@@ -184,6 +184,9 @@ M:: ppc %replace-imm ( src loc -- )
     } cond
     scratch-reg reg offset %store-cell ;
 
+M: ppc %clear ( loc -- )
+    297 swap %replace-imm ;
+
 ! Increment stack pointer by n cells.
 M: ppc %inc ( loc -- )
     [ ds-loc? [ ds-reg ds-reg ] [ rs-reg rs-reg ] if ] [ n>> ] bi cells ADDI ;
@@ -195,8 +198,8 @@ M: ppc stack-frame-size ( stack-frame -- i )
     factor-area-size +
     16 align ;
 
-M: ppc %call ( word height -- )
-    drop 0 BL rc-relative-ppc-3-pc rel-word-pic ;
+M: ppc %call ( word -- )
+    0 BL rc-relative-ppc-3-pc rel-word-pic ;
 
 : instrs ( n -- b ) 4 * ; inline
 
@@ -922,7 +925,7 @@ M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
     } case ;
 
 M: ppc %call-gc ( gc-map -- )
-    \ minor-gc 0 %call gc-map-here ;
+    \ minor-gc %call gc-map-here ;
 
 M:: ppc %prologue ( stack-size -- )
     0 MFLR
