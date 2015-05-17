@@ -25,31 +25,31 @@ IN: compiler.cfg.stacks.clearing.tests
     { { 2 { 0 1 } } { 0 { } } } T{ ##peek { loc D 2 } } dangerous-insn?
 ] unit-test
 
-! state>replaces
+! state>clears
 {
     { }
 } [
-    { { 2 { } } { 0 { } } } state>replaces
+    { { 2 { } } { 0 { } } } state>clears
 ] unit-test
 
 {
     {
-        T{ ##replace-imm { src 297 } { loc D 1 } }
-        T{ ##replace-imm { src 297 } { loc D 0 } }
+        T{ ##clear { loc T{ ds-loc { n 1 } } } }
+        T{ ##clear { loc T{ ds-loc } } }
     }
 } [
-    { { 2 { 0 1 } } { 0 { } } } state>replaces
+    { { 2 { 0 1 } } { 0 { } } } state>clears
 ] unit-test
 
 { { } } [
-    { { 0 { } } { 0 { } } } state>replaces
+    { { 0 { } } { 0 { } } } state>clears
 ] unit-test
 
 {
     {
-        T{ ##replace-imm { src 297 } { loc T{ ds-loc } } }
-        T{ ##replace-imm { src 297 } { loc T{ rs-loc } } }
+        T{ ##clear { loc T{ ds-loc } } }
+        T{ ##clear { loc T{ rs-loc } } }
     }
 } [
-    { { 1 { 0 } } { 1 { 0 } } } state>replaces
+    { { 1 { 0 } } { 1 { 0 } } } state>clears
 ] unit-test
