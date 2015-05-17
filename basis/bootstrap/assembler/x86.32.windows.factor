@@ -9,7 +9,7 @@ IN: bootstrap.x86
 : tib-segment ( -- ) FS ;
 : tib-temp ( -- reg ) EAX ;
 
-<< "vocab:cpu/x86/windows/bootstrap.factor" parse-file suffix! >> call
+<< "vocab:bootstrap/assembler/x86.windows.factor" parse-file suffix! >> call
 
 : jit-install-seh ( -- )
     ! Create a new exception record and store it in the TIB.
@@ -33,5 +33,5 @@ IN: bootstrap.x86
     ! Store exception record in TIB.
     tib-exception-list-offset [] tib-temp tib-segment MOV ;
 
-<< "vocab:cpu/x86/32/bootstrap.factor" parse-file suffix! >> call
-<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >> call
+<< "vocab:bootstrap/assembler/x86.32.factor" parse-file suffix! >> call
+<< "vocab:bootstrap/assembler/x86.factor" parse-file suffix! >> call

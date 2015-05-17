@@ -18,14 +18,14 @@ H{ } clone sub-primitives set
 "vocab:bootstrap/syntax.factor" parse-file
 
 architecture get {
-    { "windows-x86.32" "x86/32/windows" }
-    { "windows-x86.64" "x86/64/windows" }
-    { "unix-x86.32"  "x86/32/unix"  }
-    { "unix-x86.64"  "x86/64/unix"  }
-    { "linux-ppc.32" "ppc/32/linux" }
-    { "linux-ppc.64" "ppc/64/linux" }
+    { "windows-x86.32" "x86.32.windows" }
+    { "windows-x86.64" "x86.64.windows" }
+    { "unix-x86.32"  "x86.32.unix"  }
+    { "unix-x86.64"  "x86.64.unix"  }
+    { "linux-ppc.32" "ppc.32.linux" }
+    { "linux-ppc.64" "ppc.64.linux" }
 } ?at [ "Bad architecture: " prepend throw ] unless
-"vocab:cpu/" "/bootstrap.factor" surround parse-file
+"vocab:bootstrap/assembler/" ".factor" surround parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 
