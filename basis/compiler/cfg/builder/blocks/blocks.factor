@@ -36,7 +36,7 @@ IN: compiler.cfg.builder.blocks
     [ out-d>> length ] [ in-d>> length ] bi - ;
 
 : emit-call-block ( word height -- )
-    dup adjust-d ##call, make-kill-block ;
+    adjust-d ##call, make-kill-block ;
 
 : emit-primitive ( node -- )
     [

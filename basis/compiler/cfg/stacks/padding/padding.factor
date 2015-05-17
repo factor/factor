@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.dataflow-analysis
 compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.registers
-compiler.cfg.stacks.local fry grouping kernel math math.order namespaces
+compiler.cfg.stacks.local fry kernel math math.order namespaces
 sequences ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.padding
@@ -10,14 +10,12 @@ IN: compiler.cfg.stacks.padding
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! !! Stack
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-ERROR: height-mismatches seq ;
 
 : register-write ( n stack -- stack' )
     first2 swapd remove 2array ;
 
 : combine-stacks ( stacks -- stack )
-    [ [ first ] map dup all-equal? [ first ] [ height-mismatches ] if ]
-    [ [ second ] map sets:combine ] bi 2array ;
+    [ first first ] [ [ second ] map sets:combine ] bi 2array ;
 
 : classify-read ( stack n -- val )
     swap 2dup second member? [ 2drop 2 ] [ first >= [ 1 ] [ 0 ] if ] if ;
@@ -58,8 +56,7 @@ M: ##replace-imm visit-insn live-location ;
 M: ##replace visit-insn live-location ;
 
 M: ##call visit-insn ( state insn -- state' )
-    over ensure-no-vacant height>>
-    0 2array [ swap first2 [ + ] dip 2array ] 2map ;
+    drop dup ensure-no-vacant ;
 
 M: ##call-gc visit-insn ( state insn -- state' )
     drop all-live ;

@@ -58,16 +58,6 @@ IN: compiler.cfg.stacks.padding.tests
     V{ } combine-states
 ] unit-test
 
-! States can't be combined if their heights are different
-[
-    V{ { { 3 { } } { 0 { } } } { { 8 { } } { 0 { } } } } combine-states
-] [ height-mismatches? ] must-fail-with
-
-[
-    V{ { { 4 { } } { 2 { 0 1 } } } { { 5 { 4 3 2 } } { 0 { } } } }
-    combine-states
-] [ height-mismatches? ] must-fail-with
-
 ! visit-insn ##inc
 
 ! We assume that overinitialized locations are always dead.
@@ -85,36 +75,16 @@ IN: compiler.cfg.stacks.padding.tests
 
 ! visit-insn ##call
 {
-    { { 3 { } } { 0 { } } }
-} [
-    initial-state T{ ##call { height 3 } } visit-insn
-] unit-test
-
-{
-    { { -1 { } } { 0 { } } }
-} [
-    initial-state T{ ##call { height -1 } } visit-insn
-] unit-test
-
-{
-    { { 4 { } } { 0 { } } }
-} [
-    { { 2 { } } { 0 { } } } T{ ##call { height 2 } } visit-insn
-] unit-test
-
-! This looks weird but is right.
-{
     { { 0 { } } { 0 { } } }
 } [
-    { { -2 { } } { 0 { } } } T{ ##call { height 2 } } visit-insn
+    initial-state T{ ##call } visit-insn
 ] unit-test
-
 
 ! if any of the stack locations are uninitialized when ##call is
 ! visisted then something is wrong. ##call might gc and the
 ! uninitialized locations would cause a crash.
 [
-    { { 3 { 0 1 2 } } { 0 { } } } T{ ##call { height 3 } } visit-insn
+    { { 3 { 0 1 2 } } { 0 { } } } T{ ##call } visit-insn
 ] [ vacant-when-calling? ] must-fail-with
 
 ! visit-insn ##call-gc
@@ -239,7 +209,7 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             2 V{
-                T{ ##call { word <array> } { height 0 } }
+                T{ ##call { word <array> } }
             }
         }
         {
@@ -297,7 +267,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 19 { { 7 { 3 } } { 0 { } } } }
         { 20 { { 7 { } } { 0 { } } } }
         { 21 { { 4 { } } { 0 { } } } }
-        ! gc-map here
+        ! gc-map here with nothing to scrub
         { 22 { { 4 { } } { 0 { } } } }
     }
 } [
@@ -319,7 +289,7 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             2 V{
-                T{ ##call { word <array> } { height -1 } }
+                T{ ##call { word <array> } }
             }
         }
         {
@@ -348,7 +318,7 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             6 V{
-                T{ ##call { word f } { height 0 } }
+                T{ ##call { word f } }
             }
         }
         {
@@ -409,35 +379,35 @@ IN: compiler.cfg.stacks.padding.tests
         { 2 { { 3 { 0 1 } } { 0 { } } } }
         { 3 { { 3 { 1 } } { 0 { } } } }
         { 4 { { 3 { } } { 0 { } } } }
-        { 5 { { 2 { } } { 0 { } } } }
-        { 6 { { 2 { } } { 0 { } } } }
-        { 7 { { 2 { } } { 0 { } } } }
-        { 8 { { 3 { 0 } } { 0 { } } } }
-        { 9 { { 3 { 0 } } { 1 { 0 } } } }
-        { 10 { { 3 { 0 1 } } { 1 { } } } }
-        { 11 { { 1 { } } { 1 { } } } }
-        { 12 { { 1 { } } { 6 { 0 1 2 3 4 } } } }
-        { 13 { { 1 { } } { 6 { 0 1 2 4 } } } }
-        { 14 { { 1 { } } { 6 { 0 1 2 4 } } } }
-        { 15 { { 1 { } } { 6 { 0 1 2 } } } }
-        { 16 { { 1 { } } { 6 { 0 1 } } } }
-        { 17 { { 1 { } } { 6 { 0 } } } }
-        { 18 { { 1 { } } { 6 { } } } }
-        { 19 { { 1 { } } { 6 { } } } }
-        { 20 { { 1 { } } { 6 { } } } }
-        { 21 { { 1 { } } { 6 { } } } }
-        { 22 { { 1 { } } { 6 { } } } }
-        { 23 { { 1 { } } { 6 { } } } }
-        { 24 { { 1 { } } { 6 { } } } }
-        { 25 { { 1 { } } { 6 { } } } }
-        { 26 { { 3 { 0 1 } } { 6 { } } } }
-        { 27 { { 3 { 0 1 } } { 1 { } } } }
-        ! gc-map here
-        { 28 { { 3 { 0 1 } } { 1 { } } } }
-        { 29 { { 3 { 0 1 } } { 1 { } } } }
-        { 30 { { 0 { } } { 1 { } } } }
-        { 31 { { 1 { 0 } } { 1 { } } } }
-        { 32 { { 1 { 0 } } { 0 { } } } }
+        { 5 { { 3 { } } { 0 { } } } }
+        { 6 { { 3 { } } { 0 { } } } }
+        { 7 { { 3 { } } { 0 { } } } }
+        { 8 { { 4 { 0 } } { 0 { } } } }
+        { 9 { { 4 { 0 } } { 1 { 0 } } } }
+        { 10 { { 4 { 0 1 } } { 1 { } } } }
+        { 11 { { 2 { } } { 1 { } } } }
+        { 12 { { 2 { } } { 6 { 0 1 2 3 4 } } } }
+        { 13 { { 2 { } } { 6 { 0 1 2 4 } } } }
+        { 14 { { 2 { } } { 6 { 0 1 2 4 } } } }
+        { 15 { { 2 { } } { 6 { 0 1 2 } } } }
+        { 16 { { 2 { } } { 6 { 0 1 } } } }
+        { 17 { { 2 { } } { 6 { 0 } } } }
+        { 18 { { 2 { } } { 6 { } } } }
+        { 19 { { 2 { } } { 6 { } } } }
+        { 20 { { 2 { } } { 6 { } } } }
+        { 21 { { 2 { } } { 6 { } } } }
+        { 22 { { 2 { } } { 6 { } } } }
+        { 23 { { 2 { } } { 6 { } } } }
+        { 24 { { 2 { } } { 6 { } } } }
+        { 25 { { 2 { } } { 6 { } } } }
+        { 26 { { 4 { 0 1 } } { 6 { } } } }
+        { 27 { { 4 { 0 1 } } { 1 { } } } }
+        ! gc-map here scrubbing D 0 and D 1
+        { 28 { { 4 { 0 1 } } { 1 { } } } }
+        { 29 { { 4 { 0 1 } } { 1 { } } } }
+        { 30 { { 1 { } } { 1 { } } } }
+        { 31 { { 2 { 0 } } { 1 { } } } }
+        { 32 { { 2 { 0 } } { 0 { } } } }
     }
 } [ bug1289-cfg trace-stack-state2 ] unit-test
 
@@ -460,9 +430,9 @@ IN: compiler.cfg.stacks.padding.tests
                 T{ ##replace { loc D 0 } }
             }
         }
-        { 3 V{ T{ ##call { height -1 } } } }
+        { 3 V{ T{ ##call } } }
         { 4 V{ } }
-        { 5 V{ T{ ##call { height 0 } } } }
+        { 5 V{ T{ ##call } } }
         { 6 V{ T{ ##peek { loc D 0 } } } }
         { 7 V{ } }
         {
@@ -472,16 +442,16 @@ IN: compiler.cfg.stacks.padding.tests
                 T{ ##replace { loc D 0 } }
             }
         }
-        { 9 V{ T{ ##call { height -1 } } } }
+        { 9 V{ T{ ##call } } }
         {
             10 V{
                 T{ ##inc { loc D 1 } }
                 T{ ##replace { loc D 0 } }
             }
         }
-        { 11 V{ T{ ##call { height -1 } } } }
+        { 11 V{ T{ ##call } } }
         { 12 V{ } }
-        { 13 V{ T{ ##call { height 0 } } } }
+        { 13 V{ T{ ##call } } }
         { 14 V{ T{ ##peek { loc D 0 } } } }
         { 15 V{ } }
         {
@@ -490,7 +460,7 @@ IN: compiler.cfg.stacks.padding.tests
                 T{ ##replace { loc D 0 } }
             }
         }
-        { 17 V{ T{ ##call { height 0 } } } }
+        { 17 V{ T{ ##call } } }
         {
             18 V{
                 T{ ##peek { loc D 2 } }
@@ -507,9 +477,9 @@ IN: compiler.cfg.stacks.padding.tests
                 T{ ##replace { loc D 0 } }
             }
         }
-        { 22 V{ T{ ##call { height 0 } } } }
+        { 22 V{ T{ ##call } } }
         { 23 V{ } }
-        { 24 V{ T{ ##call { height 0 } } } }
+        { 24 V{ T{ ##call } } }
         {
             25 V{
                 T{ ##peek { loc D 0 } }
@@ -575,37 +545,37 @@ IN: compiler.cfg.stacks.padding.tests
         { 4 { { -1 { } } { 0 { } } } }
         { 5 { { -1 { } } { 0 { } } } }
         { 6 { { -1 { } } { 0 { } } } }
-        { 7 { { -2 { } } { 0 { } } } }
-        { 8 { { -1 { 0 } } { 0 { } } } }
-        { 9 { { -1 { } } { 0 { } } } }
-        { 10 { { -2 { } } { 0 { } } } }
-        { 11 { { -2 { } } { 0 { } } } }
-        { 12 { { -2 { } } { 0 { } } } }
-        { 13 { { -1 { 0 } } { 0 { } } } }
-        { 14 { { -1 { } } { 0 { } } } }
-        { 15 { { -1 { } } { 0 { } } } }
-        { 16 { { -1 { } } { 0 { } } } }
-        { 17 { { -1 { } } { 0 { } } } }
-        { 18 { { -1 { } } { 0 { } } } }
-        { 19 { { 0 { 0 1 2 } } { 0 { } } } }
-        { 20 { { -3 { } } { 0 { } } } }
-        { 21 { { -3 { } } { 0 { } } } }
-        { 22 { { -3 { } } { 0 { } } } }
-        { 23 { { -3 { } } { 0 { } } } }
-        { 24 { { -3 { } } { 0 { } } } }
-        ! gc-map here
-        { 25 { { 0 { 0 1 2 } } { 0 { } } } }
-        { 26 { { 0 { 0 1 2 } } { 0 { } } } }
-        { 27 { { -4 { } } { 0 { } } } }
-        { 28 { { -3 { 0 } } { 0 { } } } }
+        { 7 { { -1 { } } { 0 { } } } }
+        { 8 { { 0 { 0 } } { 0 { } } } }
+        { 9 { { 0 { } } { 0 { } } } }
+        { 10 { { 0 { } } { 0 { } } } }
+        { 11 { { 0 { } } { 0 { } } } }
+        { 12 { { 0 { } } { 0 { } } } }
+        { 13 { { 1 { 0 } } { 0 { } } } }
+        { 14 { { 1 { } } { 0 { } } } }
+        { 15 { { 1 { } } { 0 { } } } }
+        { 16 { { 1 { } } { 0 { } } } }
+        { 17 { { 1 { } } { 0 { } } } }
+        { 18 { { 1 { } } { 0 { } } } }
+        { 19 { { 2 { 0 1 2 } } { 0 { } } } }
+        { 20 { { -1 { } } { 0 { } } } }
+        { 21 { { -1 { } } { 0 { } } } }
+        { 22 { { -1 { } } { 0 { } } } }
+        { 23 { { -1 { } } { 0 { } } } }
+        { 24 { { -1 { } } { 0 { } } } }
+        ! gc-map here scrubbing D 0, D 1 and D 2
+        { 25 { { 2 { 0 1 2 } } { 0 { } } } }
+        { 26 { { 2 { 0 1 2 } } { 0 { } } } }
+        { 27 { { -2 { } } { 0 { } } } }
+        { 28 { { -1 { 0 } } { 0 { } } } }
         { 29 { { -1 { } } { 0 { } } } }
         { 30 { { -2 { } } { 0 { } } } }
         { 31 { { -2 { } } { 0 { } } } }
         { 32 { { -2 { } } { 0 { } } } }
         { 33 { { -1 { 0 } } { 0 { } } } }
         { 34 { { -1 { } } { 0 { } } } }
-        { 35 { { -2 { } } { 0 { } } } }
-        { 36 { { -2 { } } { 0 { } } } }
+        { 35 { { -1 { } } { 0 { } } } }
+        { 36 { { -1 { } } { 0 { } } } }
     }
 } [
     bug-benchmark-terrain-cfg trace-stack-state2
@@ -682,7 +652,7 @@ IN: compiler.cfg.stacks.padding.tests
     V{
         T{ ##replace { src 10 } { loc D 0 } }
         T{ ##inc f D -1 }
-        T{ ##call { height 0 } }
+        T{ ##call }
     } following-stack-state
 ] unit-test
 
