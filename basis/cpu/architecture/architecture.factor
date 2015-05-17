@@ -234,7 +234,7 @@ HOOK: %replace-imm cpu ( src loc -- )
 HOOK: %inc cpu ( loc -- )
 
 HOOK: stack-frame-size cpu ( stack-frame -- n )
-HOOK: %call cpu ( word height -- )
+HOOK: %call cpu ( word -- )
 HOOK: %jump cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 HOOK: %return cpu ( -- )

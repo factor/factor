@@ -42,6 +42,9 @@ HELP: ##box-alien
 HELP: ##call
 { $class-description
   "An instruction for calling a Factor word."
+  { $table
+    { { $slot "word" } { "The word called." } }
+  }
 } ;
 
 HELP: ##check-nursery-branch
@@ -144,13 +147,13 @@ HELP: ##reload
 { $class-description "Instruction that copies a value from a " { $link spill-slot } " to a register." } ;
 
 HELP: ##replace
-{ $class-description
-  "Copies a value from a machine register to a stack location." }
-  { $see-also ##peek ##replace-imm } ;
+{ $class-description "Copies a value from a machine register to a stack location." }
+{ $see-also ##peek ##replace-imm } ;
 
 HELP: ##replace-imm
-{ $class-description
-  "An instruction that replaces an item on the data or register stack with an " { $link immediate } " value." } ;
+{ $class-description "An instruction that replaces an item on the data or register stack with an " { $link immediate } " value. The " { $link value-numbering } " compiler optimization pass can sometimes rewrite " { $link ##replace } " instructions to ##replace-imm's." }
+{ $see-also ##replace } ;
+
 
 HELP: ##return
 { $class-description "Instruction that returns from a procedure call." } ;
