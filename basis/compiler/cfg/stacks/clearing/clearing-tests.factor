@@ -7,8 +7,8 @@ IN: compiler.cfg.stacks.clearing.tests
 {
     V{
         T{ ##inc { loc D 2 } { insn# 0 } }
-        T{ ##replace-imm { src 297 } { loc T{ ds-loc { n 1 } } } }
-        T{ ##replace-imm { src 297 } { loc T{ ds-loc } } }
+        T{ ##clear { loc T{ ds-loc { n 1 } } } }
+        T{ ##clear { loc T{ ds-loc } } }
         T{ ##peek { loc D 2 } { insn# 1 } }
     }
 } [

@@ -184,6 +184,9 @@ M:: ppc %replace-imm ( src loc -- )
     } cond
     scratch-reg reg offset %store-cell ;
 
+M: ppc %clear ( loc -- )
+    297 swap %replace-imm ;
+
 ! Increment stack pointer by n cells.
 M: ppc %inc ( loc -- )
     [ ds-loc? [ ds-reg ds-reg ] [ rs-reg rs-reg ] if ] [ n>> ] bi cells ADDI ;

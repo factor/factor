@@ -231,6 +231,7 @@ HOOK: %load-vector cpu ( reg val rep -- )
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
 HOOK: %replace-imm cpu ( src loc -- )
+HOOK: %clear cpu ( loc -- )
 HOOK: %inc cpu ( loc -- )
 
 HOOK: stack-frame-size cpu ( stack-frame -- n )
