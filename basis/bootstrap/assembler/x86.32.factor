@@ -344,7 +344,7 @@ IN: bootstrap.x86
 : jit-delete-current-context ( -- )
     jit-load-vm
     jit-load-context
-    vm-reg ctx-reg "delete_context" jit-call-2arg ;
+    vm-reg "delete_context" jit-call-1arg ;
 
 [
     jit-delete-current-context
@@ -354,7 +354,7 @@ IN: bootstrap.x86
 : jit-start-context-and-delete ( -- )
     jit-load-vm
     jit-load-context
-    vm-reg ctx-reg "reset_context" jit-call-2arg
+    vm-reg "reset_context" jit-call-1arg
 
     jit-save-quot-and-param
     ctx-reg jit-switch-context
