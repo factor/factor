@@ -1,8 +1,8 @@
-IN: cpu.x86.tests
 USING: compiler.cfg.debugger compiler.cfg.instructions
-compiler.codegen.gc-maps compiler.codegen.relocation cpu.architecture
-cpu.x86.features kernel kernel.private make math math.libm namespaces sequences
-tools.test ;
+compiler.codegen.gc-maps compiler.codegen.relocation compiler.cfg.registers
+cpu.architecture cpu.x86.features kernel kernel.private make math math.libm
+namespaces sequences system tools.test ;
+IN: cpu.x86.tests
 
 { } [
     [ { float } declare fsqrt ]
@@ -30,4 +30,10 @@ tools.test ;
         { } { } { } { } 0 0 { } "dll" T{ gc-map { scrub-d V{ 0 } } } %alien-invoke
     ] B{ } make drop
     gc-maps get length
+] unit-test
+
+! %clear
+{ t } [
+    [ D 0 %clear ] B{ } make
+    cpu x86.32? B{ 199 6 144 18 0 0 } B{ 73 199 6 144 18 0 0 } ? =
 ] unit-test
