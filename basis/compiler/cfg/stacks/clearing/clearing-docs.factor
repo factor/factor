@@ -27,7 +27,7 @@ HELP: dangerous-insn?
   }
   { $example
     "USING: compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks.clearing prettyprint ;"
-    "{ { 0 { } } { 2 { 0 1 } } } T{ ##peek { loc R 0 } } dangerous-insn? ."
+    "{ { 0 { } } { 2 { } } } T{ ##peek { loc R 0 } } dangerous-insn? ."
     "f"
   }
 } ;
