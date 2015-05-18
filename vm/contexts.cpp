@@ -100,15 +100,15 @@ void factor_vm::init_context(context* ctx) {
 }
 
 /* Allocates memory (init_context(), but not parent->new_context() */
-context* new_context(factor_vm* parent) {
+VM_C_API context* new_context(factor_vm* parent) {
   context* new_context = parent->new_context();
   parent->init_context(new_context);
   return new_context;
 }
 
-void factor_vm::delete_context(context* old_context) {
-  unused_contexts.push_back(old_context);
-  active_contexts.erase(old_context);
+void factor_vm::delete_context() {
+  unused_contexts.push_back(ctx);
+  active_contexts.erase(ctx);
 
   while (unused_contexts.size() > 10) {
     context* stale_context = unused_contexts.front();
@@ -117,14 +117,14 @@ void factor_vm::delete_context(context* old_context) {
   }
 }
 
-VM_C_API void delete_context(factor_vm* parent, context* old_context) {
-  parent->delete_context(old_context);
+VM_C_API void delete_context(factor_vm* parent) {
+  parent->delete_context();
 }
 
 /* Allocates memory (init_context()) */
-VM_C_API void reset_context(factor_vm* parent, context* ctx) {
-  ctx->reset();
-  parent->init_context(ctx);
+VM_C_API void reset_context(factor_vm* parent) {
+  parent->ctx->reset();
+  parent->init_context(parent->ctx);
 }
 
 /* Allocates memory */
@@ -147,7 +147,7 @@ cell begin_callback(factor_vm* parent, cell quot) {
 
 void factor_vm::end_callback() {
   callback_ids.pop_back();
-  delete_context(ctx);
+  delete_context();
 }
 
 void end_callback(factor_vm* parent) { parent->end_callback(); }
