@@ -62,6 +62,7 @@ IN: bootstrap.x86
     ctx-reg context-datastack-offset [+] ds-reg MOV
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
+! ctx-reg must already have been loaded
 : jit-restore-context ( -- )
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
@@ -298,8 +299,7 @@ IN: bootstrap.x86
 [ jit-start-context ] \ (start-context) define-sub-primitive
 
 : jit-delete-current-context ( -- )
-    jit-load-context
-    vm-reg ctx-reg "delete_context" jit-call-2arg ;
+    vm-reg "delete_context" jit-call-1arg ;
 
 [
     jit-delete-current-context
@@ -307,9 +307,9 @@ IN: bootstrap.x86
 ] \ (set-context-and-delete) define-sub-primitive
 
 : jit-start-context-and-delete ( -- )
-    jit-load-context
-    vm-reg ctx-reg "reset_context" jit-call-2arg
 
+    jit-load-context
+    vm-reg "reset_context" jit-call-1arg
     jit-pop-quot-and-param
     ctx-reg jit-switch-context
     jit-push-param

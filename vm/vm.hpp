@@ -154,7 +154,7 @@ struct factor_vm {
   // contexts
   context* new_context();
   void init_context(context* ctx);
-  void delete_context(context* old_context);
+  void delete_context();
   void init_contexts(cell datastack_size_, cell retainstack_size_,
                      cell callstack_size_);
   void delete_contexts();
