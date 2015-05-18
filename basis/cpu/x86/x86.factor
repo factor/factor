@@ -91,7 +91,7 @@ M: x86 %replace-imm
     } cond ;
 
 M: x86 %clear ( loc -- )
-    loc>operand 297 MOV ;
+    297 swap %replace-imm ;
 
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
 
