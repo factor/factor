@@ -820,7 +820,6 @@ IN: bootstrap.ppc
 : jit-delete-current-context ( -- )
     jit-load-context
     3 vm-reg MR
-    4 ctx-reg MR
     "delete_context" jit-call ;
 
 [
@@ -831,7 +830,6 @@ IN: bootstrap.ppc
 : jit-start-context-and-delete ( -- )
     jit-load-context
     3 vm-reg MR
-    4 ctx-reg MR
     "reset_context" jit-call
     jit-pop-quot-and-param
     ctx-reg jit-switch-context
