@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private namespaces
-system layouts vocabs parser compiler.constants
+USING: bootstrap.image.private kernel kernel.private layouts locals namespaces
+vocabs parser compiler.constants
 compiler.codegen.relocation math math.private cpu.x86.assembler
 cpu.x86.assembler.operands sequences generic.single.private
-threads.private locals ;
+threads.private ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -32,6 +32,15 @@ IN: bootstrap.x86
 : jit-call ( name -- )
     RAX 0 MOV f rc-absolute-cell rel-dlsym
     RAX CALL ;
+
+:: jit-call-1arg ( arg1s name -- )
+    arg1 arg1s MOV
+    name jit-call ;
+
+:: jit-call-2arg ( arg1s arg2s name -- )
+    arg1 arg1s MOV
+    arg2 arg2s MOV
+    name jit-call ;
 
 [
     pic-tail-reg 5 [RIP+] LEA
@@ -74,15 +83,13 @@ IN: bootstrap.x86
 
 [
     arg2 arg1 MOV
-    arg1 vm-reg MOV
-    "begin_callback" jit-call
+    vm-reg "begin_callback" jit-call-1arg
 
     ! call the quotation
     arg1 return-reg MOV
     jit-call-quot
 
-    arg1 vm-reg MOV
-    "end_callback" jit-call
+    vm-reg "end_callback" jit-call-1arg
 ] \ c-to-factor define-sub-primitive
 
 : signal-handler-save-regs ( -- regs )
@@ -280,8 +287,7 @@ IN: bootstrap.x86
     ! twice, first before calling new_context() which may GC,
     ! and again after popping the two parameters from the stack.
     jit-save-context
-    arg1 vm-reg MOV
-    "new_context" jit-call
+    vm-reg "new_context" jit-call-1arg
 
     jit-pop-quot-and-param
     jit-save-context
@@ -293,9 +299,7 @@ IN: bootstrap.x86
 
 : jit-delete-current-context ( -- )
     jit-load-context
-    arg1 vm-reg MOV
-    arg2 ctx-reg MOV
-    "delete_context" jit-call ;
+    vm-reg ctx-reg "delete_context" jit-call-2arg ;
 
 [
     jit-delete-current-context
@@ -304,9 +308,7 @@ IN: bootstrap.x86
 
 : jit-start-context-and-delete ( -- )
     jit-load-context
-    arg1 vm-reg MOV
-    arg2 ctx-reg MOV
-    "reset_context" jit-call
+    vm-reg ctx-reg "reset_context" jit-call-2arg
 
     jit-pop-quot-and-param
     ctx-reg jit-switch-context
