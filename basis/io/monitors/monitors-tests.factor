@@ -1,8 +1,8 @@
-USING: io.monitors tools.test io.files system sequences
-continuations namespaces concurrency.count-downs kernel io
-threads calendar prettyprint destructors io.timeouts
-io.files.temp io.directories io.directories.hierarchy
-io.pathnames accessors concurrency.promises ;
+USING: accessors calendar concurrency.count-downs
+concurrency.promises continuations destructors io io.directories
+io.directories.hierarchy io.files io.files.temp io.files.unique
+io.monitors io.pathnames io.timeouts kernel namespaces sequences
+system threads tools.test ;
 IN: io.monitors.tests
 
 os { windows linux macosx } member? [
@@ -93,13 +93,13 @@ os { windows linux macosx } member? [
 
             ! Non-recursive
             [ ] [ "monitor-timeout-test" temp-file f <monitor> "m" set ] unit-test
-            [ ] [ 3 seconds "m" get set-timeout ] unit-test
+            [ ] [ 100 milliseconds "m" get set-timeout ] unit-test
             [ [ t ] [ "m" get next-change drop ] while ] must-fail
             [ ] [ "m" get dispose ] unit-test
 
             ! Recursive
             [ ] [ "monitor-timeout-test" temp-file t <monitor> "m" set ] unit-test
-            [ ] [ 3 seconds "m" get set-timeout ] unit-test
+            [ ] [ 100 milliseconds "m" get set-timeout ] unit-test
             [ [ t ] [ "m" get next-change drop ] while ] must-fail
             [ ] [ "m" get dispose ] unit-test
         ] with-unique-directory delete-tree
@@ -120,7 +120,7 @@ os { windows linux macosx } member? [
                 "p" get fulfill
             ] in-thread
 
-            [ ] [ 1 seconds sleep ] unit-test
+            [ ] [ 100 milliseconds sleep ] unit-test
             [ ] [ "m" get dispose ] unit-test
             [ t ] [ "p" get 10 seconds ?promise-timeout already-disposed? ] unit-test
         ] with-unique-directory delete-tree
