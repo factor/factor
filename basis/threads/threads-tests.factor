@@ -1,7 +1,33 @@
-USING: namespaces io tools.test threads threads.private kernel
+USING: io memory namespaces tools.test threads threads.private kernel
 concurrency.combinators concurrency.promises locals math
 words calendar sequences fry ;
 IN: threads.tests
+
+! Bug #1319
+! The start-context-and-delete primitive calls reset_context which
+! causes reads to uninitialized locations in the data segment if it
+! gc:s
+
+TUPLE: tup1 a ;
+
+! This word attempts to fill the nursery so that there is less than 48
+! bytes of free space in it. The constant used to fill is volatile but
+! should work on 64 bit.
+: fill-nursery ( -- obj )
+    minor-gc 48074 [ tup1 new ] replicate ;
+
+: do-reset-context ( -- val )
+    ! "main running" print flush
+    [ "a" print ] "foo1" spawn drop
+    [ "b" print ] "foo2" spawn drop
+    [ "c" print ] "foo3"
+    [ fill-nursery ] 2dip
+    spawn drop
+    0 seconds sleep ;
+
+{ 48074 } [
+    do-reset-context length
+] unit-test
 
 3 "x" set
 [ 2 "x" set ] "Test" spawn drop
