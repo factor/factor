@@ -24,8 +24,14 @@ MACRO: call-n ( n -- )
 MACRO: nsum ( n -- )
     1 - [ + ] n*quot ;
 
+ERROR: nonpositive-npick n ;
+
 MACRO: npick ( n -- )
-    1 - [ dup ] [ '[ _ dip swap ] ] repeat ;
+    {
+        { [ dup 0 <= ] [ nonpositive-npick ] }
+        { [ dup 1 = ] [ drop [ dup ] ] }
+        [ 1 - [ dup ] [ '[ _ dip swap ] ] repeat ]
+    } cond ;
 
 MACRO: nover ( n -- )
     dup 1 + '[ _ npick ] n*quot ;
