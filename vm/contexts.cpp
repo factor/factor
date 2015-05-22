@@ -17,10 +17,12 @@ context::context(cell datastack_size, cell retainstack_size,
 
 void context::reset_datastack() {
   datastack = datastack_seg->start - sizeof(cell);
+  fill_stack_seg(datastack, datastack_seg, 0x11111111);
 }
 
 void context::reset_retainstack() {
   retainstack = retainstack_seg->start - sizeof(cell);
+  fill_stack_seg(retainstack, retainstack_seg, 0x22222222);
 }
 
 void context::reset_callstack() {
@@ -30,6 +32,14 @@ void context::reset_callstack() {
 void context::reset_context_objects() {
   memset_cell(context_objects, false_object,
               context_object_count * sizeof(cell));
+}
+
+void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
+#ifdef FACTOR_DEBUG
+  cell clear_start = top_ptr + sizeof(cell);
+  cell clear_size = seg->end - clear_start;
+  memset_cell((void*)clear_start, pattern, clear_size);
+#endif
 }
 
 void context::reset() {
@@ -100,15 +110,15 @@ void factor_vm::init_context(context* ctx) {
 }
 
 /* Allocates memory (init_context(), but not parent->new_context() */
-context* new_context(factor_vm* parent) {
+VM_C_API context* new_context(factor_vm* parent) {
   context* new_context = parent->new_context();
   parent->init_context(new_context);
   return new_context;
 }
 
-void factor_vm::delete_context(context* old_context) {
-  unused_contexts.push_back(old_context);
-  active_contexts.erase(old_context);
+void factor_vm::delete_context() {
+  unused_contexts.push_back(ctx);
+  active_contexts.erase(ctx);
 
   while (unused_contexts.size() > 10) {
     context* stale_context = unused_contexts.front();
@@ -117,13 +127,23 @@ void factor_vm::delete_context(context* old_context) {
   }
 }
 
-VM_C_API void delete_context(factor_vm* parent, context* old_context) {
-  parent->delete_context(old_context);
+VM_C_API void delete_context(factor_vm* parent) {
+  parent->delete_context();
 }
 
 /* Allocates memory (init_context()) */
-VM_C_API void reset_context(factor_vm* parent, context* ctx) {
+VM_C_API void reset_context(factor_vm* parent) {
+
+  // The function is used by (start-context-and-delete) which expects
+  // the top two datastack items to be preserved after the context has
+  // been resetted.
+
+  context* ctx = parent->ctx;
+  cell arg1 = ctx->pop();
+  cell arg2 = ctx->pop();
   ctx->reset();
+  ctx->push(arg2);
+  ctx->push(arg1);
   parent->init_context(ctx);
 }
 
@@ -147,7 +167,7 @@ cell begin_callback(factor_vm* parent, cell quot) {
 
 void factor_vm::end_callback() {
   callback_ids.pop_back();
-  delete_context(ctx);
+  delete_context();
 }
 
 void end_callback(factor_vm* parent) { parent->end_callback(); }

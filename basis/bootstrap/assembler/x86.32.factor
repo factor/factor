@@ -37,6 +37,21 @@ IN: bootstrap.x86
 : jit-call ( name -- )
     0 CALL f rc-relative rel-dlsym ;
 
+:: jit-call-1arg ( arg1s name -- )
+    ESP [] arg1s MOV
+    name jit-call ;
+
+:: jit-call-2arg ( arg1s arg2s name -- )
+    ESP [] arg1s MOV
+    ESP 4 [+] arg2s MOV
+    name jit-call ;
+
+:: jit-call-3arg ( arg1s arg2s arg3s name -- )
+    ESP [] arg1s MOV
+    ESP 4 [+] arg2s MOV
+    ESP 8 [+] arg3s MOV
+    name jit-call ;
+
 [
     pic-tail-reg 0 MOV 0 rc-absolute-cell rel-here
     0 JMP f rc-relative rel-word-pic-tail
@@ -79,16 +94,13 @@ IN: bootstrap.x86
 
 [
     jit-load-vm
-    ESP [] vm-reg MOV
     EAX EBP 8 [+] MOV
-    ESP 4 [+] EAX MOV
-    "begin_callback" jit-call
+    vm-reg EAX "begin_callback" jit-call-2arg
 
     jit-call-quot
 
     jit-load-vm
-    ESP [] vm-reg MOV
-    "end_callback" jit-call
+    vm-reg "end_callback" jit-call-1arg
 ] \ c-to-factor define-sub-primitive
 
 : signal-handler-save-regs ( -- regs )
@@ -169,12 +181,8 @@ IN: bootstrap.x86
     jit-load-vm
     jit-save-context
 
-    ! Store arguments
-    ESP [] EAX MOV
-    ESP 4 [+] vm-reg MOV
-
-    ! Call VM
-    "lazy_jit_compile" jit-call
+    ! Call VM, quotation reference is in EAX
+    EAX vm-reg "lazy_jit_compile" jit-call-2arg
 ]
 [ jit-call-quot ]
 [ jit-jump-quot ]
@@ -245,11 +253,9 @@ IN: bootstrap.x86
     [ JNO ]
     [
         EBX tag-bits get SAR
-        ESP [] EBX MOV
-        ESP 4 [+] EBP MOV
         jit-load-vm
-        ESP 8 [+] vm-reg MOV
-        "overflow_fixnum_multiply" jit-call
+
+        EBX EBP vm-reg "overflow_fixnum_multiply" jit-call-3arg
     ]
     jit-conditional
 ] \ fixnum* define-sub-primitive
@@ -312,8 +318,7 @@ IN: bootstrap.x86
     ! Create the new context in return-reg
     jit-load-vm
     jit-save-context
-    ESP [] vm-reg MOV
-    "new_context" jit-call
+    vm-reg "new_context" jit-call-1arg
 
     jit-save-quot-and-param
 
@@ -339,9 +344,7 @@ IN: bootstrap.x86
 : jit-delete-current-context ( -- )
     jit-load-vm
     jit-load-context
-    ESP [] vm-reg MOV
-    ESP 4 [+] ctx-reg MOV
-    "delete_context" jit-call ;
+    vm-reg "delete_context" jit-call-1arg ;
 
 [
     jit-delete-current-context
@@ -350,16 +353,22 @@ IN: bootstrap.x86
 
 : jit-start-context-and-delete ( -- )
     jit-load-vm
-    jit-load-context
-    ESP [] vm-reg MOV
-    ESP 4 [+] ctx-reg MOV
-    "reset_context" jit-call
 
-    jit-save-quot-and-param
+    ! Updates the context to match the values in the data and retain
+    ! stack registers. reset_context can GC.
+    jit-save-context
+
+    ! Resets the context. The top two ds item are preserved.
+    vm-reg "reset_context" jit-call-1arg
+
+    ! Switches to the same context I think, uses ctx-reg
     ctx-reg jit-switch-context
-    jit-push-param
 
-    EAX EDX [] MOV
+    ! Pops the quotation from the stack and puts it in EAX.
+    EAX ds-reg [] MOV
+    ds-reg 4 SUB
+
+    ! Jump to the quotation in EAX.
     jit-jump-quot ;
 
 [

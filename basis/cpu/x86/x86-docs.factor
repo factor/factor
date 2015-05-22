@@ -106,15 +106,3 @@ HELP: copy-register*
     "0000000533c61fe0: 0f28ca  movaps xmm1, xmm2"
   }
 } ;
-
-HELP: %mov-vm-ptr
-{ $values { "reg" "a register symbol" } }
-{ $description
-  "Emits machine code for moving the vm pointer to a register." }
-{ $examples
-  { $unchecked-example
-    "USING: cpu.x86.64 make ;"
-    "[ RAX %mov-vm-ptr ] B{ } make disassemble"
-    "0000000002290b30: 4c89e8  mov rax, r13"
-  }
-} ;

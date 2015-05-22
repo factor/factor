@@ -1,14 +1,13 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.strings arrays byte-arrays generic hashtables
-hashtables.private io io.encodings.ascii kernel math
-math.private math.order namespaces make parser sequences strings
-vectors words quotations assocs layouts classes classes.private
-classes.builtin classes.singleton classes.tuple
+USING: accessors alien alien.strings arrays assocs byte-arrays classes
+classes.intersection classes.union combinators generic hashtables
+hashtables.private io io.encodings.ascii kernel math math.private math.order
+namespaces make parser quotations sequences strings vectors words layouts
+classes.private classes.builtin classes.singleton classes.tuple
 classes.tuple.private kernel.private vocabs vocabs.loader
-source-files definitions slots classes.union
-classes.intersection classes.predicate compiler.units
-bootstrap.image.private io.files accessors combinators ;
+source-files definitions slots  classes.predicate compiler.units
+bootstrap.image.private io.files splitting ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -17,15 +16,11 @@ H{ } clone sub-primitives set
 
 "vocab:bootstrap/syntax.factor" parse-file
 
-architecture get {
-    { "windows-x86.32" "x86/32/windows" }
-    { "windows-x86.64" "x86/64/windows" }
-    { "unix-x86.32"  "x86/32/unix"  }
-    { "unix-x86.64"  "x86/64/unix"  }
-    { "linux-ppc.32" "ppc/32/linux" }
-    { "linux-ppc.64" "ppc/64/linux" }
-} ?at [ "Bad architecture: " prepend throw ] unless
-"vocab:cpu/" "/bootstrap.factor" surround parse-file
+: asm-file ( arch -- file )
+    "-" split reverse "." join
+    "vocab:bootstrap/assembler/" ".factor" surround ;
+
+architecture get asm-file parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 

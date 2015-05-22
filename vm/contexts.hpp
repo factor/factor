@@ -48,6 +48,7 @@ struct context {
   void reset_context_objects();
   void reset();
   void fix_stacks();
+  void fill_stack_seg(cell top_ptr, segment* seg, cell pattern);
 
   cell peek() { return *(cell*)datastack; }
 
@@ -66,8 +67,8 @@ struct context {
 };
 
 VM_C_API context* new_context(factor_vm* parent);
-VM_C_API void delete_context(factor_vm* parent, context* old_context);
-VM_C_API void reset_context(factor_vm* parent, context* ctx);
+VM_C_API void delete_context(factor_vm* parent);
+VM_C_API void reset_context(factor_vm* parent);
 VM_C_API cell begin_callback(factor_vm* parent, cell quot);
 VM_C_API void end_callback(factor_vm* parent);
 
