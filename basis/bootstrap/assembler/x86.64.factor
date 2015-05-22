@@ -78,7 +78,8 @@ IN: bootstrap.x86
     jit-restore-context
 ] jit-primitive jit-define
 
-: jit-jump-quot ( -- ) arg1 quot-entry-point-offset [+] JMP ;
+: jit-jump-quot ( -- )
+    arg1 quot-entry-point-offset [+] JMP ;
 
 : jit-call-quot ( -- ) arg1 quot-entry-point-offset [+] CALL ;
 
@@ -306,13 +307,24 @@ IN: bootstrap.x86
     jit-set-context
 ] \ (set-context-and-delete) define-sub-primitive
 
+! Resets the active context and instead the passed in quotation
+! becomes the new code that it executes.
 : jit-start-context-and-delete ( -- )
+    ! Updates the context to match the values in the data and retain
+    ! stack registers. reset_context can GC.
+    jit-save-context
 
-    jit-load-context
+    ! Resets the context. The top two ds items are preserved.
     vm-reg "reset_context" jit-call-1arg
-    jit-pop-quot-and-param
+
+    ! Switches to the same context I think.
     ctx-reg jit-switch-context
-    jit-push-param
+
+    ! Pops the quotation from the stack and puts it in arg1.
+    arg1 ds-reg [] MOV
+    ds-reg 8 SUB
+
+    ! Jump to quotation arg1
     jit-jump-quot ;
 
 [
