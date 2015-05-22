@@ -26,6 +26,10 @@ IN: sequences.extras.tests
     { 0 0 0 0 } { 1 3 } over [ 1 + ] change-nths
 ] unit-test
 
+{ V{ f t f } } [
+    { 1 2 3 } [ even? ] selector* [ each ] dip
+] unit-test
+
 [ { 1 3 5 } ] [ { 1 2 3 4 5 6 } [ nip even? ] filter-index ] unit-test
 
 [ V{ 1 3 5 } ] [ { 1 2 3 4 5 6 } [ nip even? ] V{ } filter-index-as ] unit-test

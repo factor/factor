@@ -92,10 +92,16 @@ IN: sequences.extras
 : push-if-index ( ..a elt i quot: ( ..a elt i -- ..b ? ) accum -- ..b )
     [ 2keep drop ] dip rot [ push ] [ 2drop ] if ; inline
 
+: push-if* ( ..a elt quot: ( ..a elt -- ..b obj/f ) accum -- ..b )
+    [ call ] dip [ push ] [ drop ] if* ; inline
+
 <PRIVATE
 
 : (index-selector-for) ( quot length exampler -- selector accum )
     new-resizable [ [ push-if-index ] 2curry ] keep ; inline
+
+: (selector-for*) ( quot length exemplar -- selector accum )
+    new-resizable [ [ push-if* ] 2curry ] keep ; inline
 
 PRIVATE>
 
@@ -104,6 +110,11 @@ PRIVATE>
 
 : index-selector ( quot -- selector accum )
     V{ } index-selector-for ; inline
+
+: selector-for* ( quot exemplar -- selector accum )
+    [ length ] keep (selector-for*) ; inline
+
+: selector* ( quot -- selector accum ) V{ } selector-for* ; inline
 
 : filter-index-as ( ... seq quot: ( ... elt i -- ... ? ) exemplar -- ... seq' )
     pick length over [ (index-selector-for) [ each-index ] dip ] 2curry dip like ; inline
