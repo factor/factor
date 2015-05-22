@@ -381,23 +381,19 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
      stacks. */
   visit_callstack(ctx);
 
-  cell* ds_ptr = (cell*)ctx->datastack;
-  cell* rs_ptr = (cell*)ctx->retainstack;
-  visit_stack_elements(ctx->datastack_seg, ds_ptr);
-  visit_stack_elements(ctx->retainstack_seg, rs_ptr);
+  cell ds_ptr = ctx->datastack;
+  cell rs_ptr = ctx->retainstack;
+  segment* ds_seg = ctx->datastack_seg;
+  segment* rs_seg = ctx->retainstack_seg;
+  visit_stack_elements(ds_seg, (cell*)ds_ptr);
+  visit_stack_elements(rs_seg, (cell*)rs_ptr);
   visit_object_array(ctx->context_objects,
                      ctx->context_objects + context_object_count);
 
   /* Clear out the space not visited with a known pattern. That makes
      it easier to see if uninitialized reads are made. */
-  #ifdef FACTOR_DEBUG
-  cell ds_clear_start = (cell)(ds_ptr + 1);
-  cell ds_clear_size = ctx->datastack_seg->end - ds_clear_start;
-  memset_cell((void*)ds_clear_start, 0xbaadbaad, ds_clear_size);
-  cell rs_clear_start = (cell)(rs_ptr + 1);
-  cell rs_clear_size = ctx->retainstack_seg->end - rs_clear_start;
-  memset_cell((void*)rs_clear_start, 0xdaabdaab, rs_clear_size);
-  #endif
+  ctx->fill_stack_seg(ds_ptr, ds_seg, 0xbaadbadd);
+  ctx->fill_stack_seg(rs_ptr, rs_seg, 0xdaabdaab);
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
