@@ -828,12 +828,16 @@ IN: bootstrap.ppc
 ] \ (set-context-and-delete) define-sub-primitive
 
 : jit-start-context-and-delete ( -- )
-    jit-load-context
+    jit-save-context
+
     3 vm-reg MR
     "reset_context" jit-call
-    jit-pop-quot-and-param
+
     ctx-reg jit-switch-context
-    jit-push-param
+
+    ! Pops the quotation from the stack and puts it in register 3
+    3 ds-reg 0 jit-load-cell
+    ds-reg ds-reg cell-size SUBI
     jit-jump-quot ;
 
 [
