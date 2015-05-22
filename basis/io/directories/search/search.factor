@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations deques dlists fry
 io.backend io.directories io.files.info io.pathnames kernel
-kernel.private locals math sequences sorting strings system
-unicode.case vocabs vocabs.loader ;
+kernel.private locals math sequences sequences.extras sorting
+strings system unicode.case vocabs ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
@@ -63,8 +63,26 @@ TUPLE: directory-iterator
 
 PRIVATE>
 
-: each-file ( path bfs? quot: ( ... name -- ... ) -- )
+: each-file ( path bfs? quot -- )
     setup-traversal iterate-directory drop ; inline
+
+: each-file-breadth ( path quot -- )
+    t swap each-file ; inline
+
+: each-file-depth ( path quot -- )
+    f swap each-file ; inline
+
+: filter-files-by-depth ( quot -- seq )
+    selector* [ each-file-depth ] dip ; inline
+
+: filter-files-by-breadth ( quot -- seq )
+    selector* [ each-file-breadth ] dip ; inline
+
+: all-files-by-depth ( quot -- seq )
+    collector [ each-file-depth ] dip ; inline
+
+: all-files-by-breadth ( quot -- seq )
+    collector [ each-file-breadth ] dip ; inline
 
 : each-directory-entry ( path bfs? quot: ( ... entry -- ... ) -- )
     setup-traversal iterate-directory-entries drop ; inline
@@ -146,5 +164,11 @@ ERROR: sequence-expected obj ;
 
 : find-by-extension ( path extension -- seq )
     1array find-by-extensions ;
+
+: find-files-larger-than ( path size -- seq )
+    '[ file-info size>> _ > ] filter-files-by-depth ;
+
+: file-info-recursive ( path -- seq )
+    [ dup ?file-info [ 2array ] [ drop f ] if* ] filter-files-by-depth ;
 
 os windows? [ "io.directories.search.windows" require ] when
