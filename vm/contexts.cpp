@@ -17,10 +17,12 @@ context::context(cell datastack_size, cell retainstack_size,
 
 void context::reset_datastack() {
   datastack = datastack_seg->start - sizeof(cell);
+  fill_stack_seg(datastack, datastack_seg, 0x11111111);
 }
 
 void context::reset_retainstack() {
   retainstack = retainstack_seg->start - sizeof(cell);
+  fill_stack_seg(retainstack, retainstack_seg, 0x22222222);
 }
 
 void context::reset_callstack() {
@@ -30,6 +32,14 @@ void context::reset_callstack() {
 void context::reset_context_objects() {
   memset_cell(context_objects, false_object,
               context_object_count * sizeof(cell));
+}
+
+void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
+#ifdef FACTOR_DEBUG
+  cell clear_start = top_ptr + sizeof(cell);
+  cell clear_size = seg->end - clear_start;
+  memset_cell((void*)clear_start, pattern, clear_size);
+#endif
 }
 
 void context::reset() {
