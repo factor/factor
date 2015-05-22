@@ -48,6 +48,7 @@ struct context {
   void reset_context_objects();
   void reset();
   void fix_stacks();
+  void fill_stack_seg(cell top_ptr, segment* seg, cell pattern);
 
   cell peek() { return *(cell*)datastack; }
 
