@@ -32,9 +32,6 @@ M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
 M:: x86.32 %load-vector ( dst val rep -- )
     dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
 
-M: x86.32 %mov-vm-ptr ( reg -- )
-    0 MOV 0 rc-absolute-cell rel-vm ;
-
 M: x86.32 %vm-field ( dst field -- )
     [ 0 [] MOV ] dip rc-absolute-cell rel-vm ;
 

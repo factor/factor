@@ -457,8 +457,6 @@ M: x86 %shl int-rep two-operand [ SHL ] emit-shift ;
 M: x86 %shr int-rep two-operand [ SHR ] emit-shift ;
 M: x86 %sar int-rep two-operand [ SAR ] emit-shift ;
 
-HOOK: %mov-vm-ptr cpu ( reg -- )
-
 HOOK: %vm-field-ptr cpu ( reg offset -- )
 
 : load-zone-offset ( nursery-ptr -- )
