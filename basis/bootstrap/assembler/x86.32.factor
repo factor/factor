@@ -353,14 +353,22 @@ IN: bootstrap.x86
 
 : jit-start-context-and-delete ( -- )
     jit-load-vm
-    jit-load-context
+
+    ! Updates the context to match the values in the data and retain
+    ! stack registers. reset_context can GC.
+    jit-save-context
+
+    ! Resets the context. The top two ds item are preserved.
     vm-reg "reset_context" jit-call-1arg
 
-    jit-save-quot-and-param
+    ! Switches to the same context I think, uses ctx-reg
     ctx-reg jit-switch-context
-    jit-push-param
 
-    EAX EDX [] MOV
+    ! Pops the quotation from the stack and puts it in EAX.
+    EAX ds-reg [] MOV
+    ds-reg 4 SUB
+
+    ! Jump to the quotation in EAX.
     jit-jump-quot ;
 
 [
