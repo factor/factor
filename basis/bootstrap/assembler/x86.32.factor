@@ -104,7 +104,7 @@ IN: bootstrap.x86
 ] \ c-to-factor define-sub-primitive
 
 : signal-handler-save-regs ( -- regs )
-    { EAX ECX EDX EBX EBP ESI EDI } ;
+    { EAX EBX ECX EDX EBP EDI ESI } ;
 
 [
     EAX ds-reg [] MOV
@@ -244,18 +244,17 @@ IN: bootstrap.x86
     ds-reg 4 SUB
     jit-load-vm
     jit-save-context
-    EBX ds-reg [] MOV
-    EAX EBX MOV
+    ECX ds-reg [] MOV
+    EAX ECX MOV
     EBP ds-reg 4 [+] MOV
     EBP tag-bits get SAR
+    ! clobbers EDX
     EBP IMUL
     ds-reg [] EAX MOV
     [ JNO ]
     [
-        EBX tag-bits get SAR
-        jit-load-vm
-
-        EBX EBP vm-reg "overflow_fixnum_multiply" jit-call-3arg
+        ECX tag-bits get SAR
+        ECX EBP vm-reg "overflow_fixnum_multiply" jit-call-3arg
     ]
     jit-conditional
 ] \ fixnum* define-sub-primitive
