@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private namespaces
-system layouts vocabs parser compiler.constants
+USING: bootstrap.image.private kernel kernel.private layouts locals namespaces
+vocabs parser compiler.constants
 compiler.codegen.relocation math math.private cpu.x86.assembler
 cpu.x86.assembler.operands sequences generic.single.private
-threads.private locals ;
+threads.private ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -33,6 +33,15 @@ IN: bootstrap.x86
     RAX 0 MOV f rc-absolute-cell rel-dlsym
     RAX CALL ;
 
+:: jit-call-1arg ( arg1s name -- )
+    arg1 arg1s MOV
+    name jit-call ;
+
+:: jit-call-2arg ( arg1s arg2s name -- )
+    arg1 arg1s MOV
+    arg2 arg2s MOV
+    name jit-call ;
+
 [
     pic-tail-reg 5 [RIP+] LEA
     0 JMP f rc-relative rel-word-pic-tail
@@ -53,6 +62,7 @@ IN: bootstrap.x86
     ctx-reg context-datastack-offset [+] ds-reg MOV
     ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
+! ctx-reg must already have been loaded
 : jit-restore-context ( -- )
     ds-reg ctx-reg context-datastack-offset [+] MOV
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
@@ -68,21 +78,20 @@ IN: bootstrap.x86
     jit-restore-context
 ] jit-primitive jit-define
 
-: jit-jump-quot ( -- ) arg1 quot-entry-point-offset [+] JMP ;
+: jit-jump-quot ( -- )
+    arg1 quot-entry-point-offset [+] JMP ;
 
 : jit-call-quot ( -- ) arg1 quot-entry-point-offset [+] CALL ;
 
 [
     arg2 arg1 MOV
-    arg1 vm-reg MOV
-    "begin_callback" jit-call
+    vm-reg "begin_callback" jit-call-1arg
 
     ! call the quotation
     arg1 return-reg MOV
     jit-call-quot
 
-    arg1 vm-reg MOV
-    "end_callback" jit-call
+    vm-reg "end_callback" jit-call-1arg
 ] \ c-to-factor define-sub-primitive
 
 : signal-handler-save-regs ( -- regs )
@@ -280,8 +289,7 @@ IN: bootstrap.x86
     ! twice, first before calling new_context() which may GC,
     ! and again after popping the two parameters from the stack.
     jit-save-context
-    arg1 vm-reg MOV
-    "new_context" jit-call
+    vm-reg "new_context" jit-call-1arg
 
     jit-pop-quot-and-param
     jit-save-context
@@ -292,25 +300,31 @@ IN: bootstrap.x86
 [ jit-start-context ] \ (start-context) define-sub-primitive
 
 : jit-delete-current-context ( -- )
-    jit-load-context
-    arg1 vm-reg MOV
-    arg2 ctx-reg MOV
-    "delete_context" jit-call ;
+    vm-reg "delete_context" jit-call-1arg ;
 
 [
     jit-delete-current-context
     jit-set-context
 ] \ (set-context-and-delete) define-sub-primitive
 
+! Resets the active context and instead the passed in quotation
+! becomes the new code that it executes.
 : jit-start-context-and-delete ( -- )
-    jit-load-context
-    arg1 vm-reg MOV
-    arg2 ctx-reg MOV
-    "reset_context" jit-call
+    ! Updates the context to match the values in the data and retain
+    ! stack registers. reset_context can GC.
+    jit-save-context
 
-    jit-pop-quot-and-param
+    ! Resets the context. The top two ds items are preserved.
+    vm-reg "reset_context" jit-call-1arg
+
+    ! Switches to the same context I think.
     ctx-reg jit-switch-context
-    jit-push-param
+
+    ! Pops the quotation from the stack and puts it in arg1.
+    arg1 ds-reg [] MOV
+    ds-reg 8 SUB
+
+    ! Jump to quotation arg1
     jit-jump-quot ;
 
 [

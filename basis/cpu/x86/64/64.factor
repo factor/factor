@@ -42,9 +42,6 @@ M: x86.64 machine-registers
 : vm-reg ( -- reg ) R13 ; inline
 : nv-reg ( -- reg ) RBX ; inline
 
-M: x86.64 %mov-vm-ptr ( reg -- )
-    vm-reg MOV ;
-
 M: x86.64 %vm-field ( dst offset -- )
     [ vm-reg ] dip [+] MOV ;
 
@@ -93,13 +90,13 @@ M: x86.64 %discard-reg-param ( rep reg -- )
 
 M:: x86.64 %unbox ( dst src func rep -- )
     param-reg-0 src tagged-rep %copy
-    param-reg-1 %mov-vm-ptr
+    param-reg-1 vm-reg MOV
     func f f %c-invoke
     dst rep %load-return ;
 
 M:: x86.64 %box ( dst src func rep gc-map -- )
     0 rep reg-class-of cdecl param-regs at nth src rep %copy
-    rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
+    rep int-rep? os windows? or param-reg-1 param-reg-0 ? vm-reg MOV
     func f gc-map %c-invoke
     dst int-rep %load-return ;
 
@@ -108,12 +105,12 @@ M: x86.64 %c-invoke
     gc-map-here ;
 
 M: x86.64 %begin-callback ( -- )
-    param-reg-0 %mov-vm-ptr
+    param-reg-0 vm-reg MOV
     param-reg-1 0 MOV
     "begin_callback" f f %c-invoke ;
 
 M: x86.64 %end-callback ( -- )
-    param-reg-0 %mov-vm-ptr
+    param-reg-0 vm-reg MOV
     "end_callback" f f %c-invoke ;
 
 M: x86.64 %prepare-var-args ( -- ) RAX RAX XOR ;

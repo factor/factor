@@ -25,6 +25,6 @@ DEFER: stack-reg
 
 : red-zone-size ( -- n ) 0 ;
 
-<< "vocab:cpu/x86/windows/bootstrap.factor" parse-file suffix! >> call
-<< "vocab:cpu/x86/64/bootstrap.factor" parse-file suffix! >> call
-<< "vocab:cpu/x86/bootstrap.factor" parse-file suffix! >> call
+<< "vocab:bootstrap/assembler/x86.windows.factor" parse-file suffix! >> call
+<< "vocab:bootstrap/assembler/x86.64.factor" parse-file suffix! >> call
+<< "vocab:bootstrap/assembler/x86.factor" parse-file suffix! >> call
