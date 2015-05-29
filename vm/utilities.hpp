@@ -1,5 +1,11 @@
 namespace factor {
 
+// Poor mans range-based for loops.
+#define FACTOR_FOR_EACH(iterable)                           \
+  for (typeof(iterable.begin()) iter = iterable.begin();    \
+       iter != iterable.end();                              \
+       iter++)
+
 inline static void memset_2(void* dst, uint16_t pattern, size_t size) {
 #ifdef __APPLE__
   cell cell_pattern = (pattern | (pattern << 16));
