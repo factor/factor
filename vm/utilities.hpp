@@ -2,8 +2,8 @@ namespace factor {
 
 // Poor mans range-based for loops.
 #define FACTOR_FOR_EACH(iterable)                           \
-  for (typeof(iterable.begin()) iter = iterable.begin();    \
-       iter != iterable.end();                              \
+  for (typeof((iterable).begin()) iter = (iterable).begin();    \
+       iter != (iterable).end();                                \
        iter++)
 
 inline static void memset_2(void* dst, uint16_t pattern, size_t size) {

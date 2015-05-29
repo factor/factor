@@ -85,10 +85,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
   }
 
   void trace_code_heap_roots(std::set<code_block*>* remembered_set) {
-    std::set<code_block*>::const_iterator iter = remembered_set->begin();
-    std::set<code_block*>::const_iterator end = remembered_set->end();
-
-    for (; iter != end; iter++) {
+    FACTOR_FOR_EACH(*remembered_set) {
       code_block* compiled = *iter;
       visitor.visit_code_block_objects(compiled);
       visitor.visit_embedded_literals(compiled);

@@ -143,12 +143,10 @@ template <typename Fixup> struct code_block_compaction_updater {
 marked, and also slide the valid roots up so that call sites can be updated
 correctly in case an inline cache compilation triggered compaction. */
 void factor_vm::update_code_roots_for_compaction() {
-  std::vector<code_root*>::const_iterator iter = code_roots.begin();
-  std::vector<code_root*>::const_iterator end = code_roots.end();
 
   mark_bits* state = &code->allocator->state;
 
-  for (; iter < end; iter++) {
+  FACTOR_FOR_EACH(code_roots) {
     code_root* root = *iter;
     cell block = root->value & (~data_alignment + 1);
 
