@@ -32,11 +32,8 @@ factor_vm::~factor_vm() {
     delete signal_callstack_seg;
     signal_callstack_seg = NULL;
   }
-  std::list<void**>::const_iterator iter = function_descriptors.begin();
-  std::list<void**>::const_iterator end = function_descriptors.end();
-  while (iter != end) {
+  FACTOR_FOR_EACH(function_descriptors) {
     delete[] * iter;
-    iter++;
   }
 }
 

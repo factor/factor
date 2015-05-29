@@ -239,10 +239,7 @@ void factor_vm::primitive_disable_gc_events() {
     std::vector<gc_event>* gc_events = this->gc_events;
     this->gc_events = NULL;
 
-    std::vector<gc_event>::const_iterator iter = gc_events->begin();
-    std::vector<gc_event>::const_iterator end = gc_events->end();
-
-    for (; iter != end; iter++) {
+    FACTOR_FOR_EACH(*gc_events) {
       gc_event event = *iter;
       byte_array* obj = byte_array_from_value(&event);
       result.add(tag<byte_array>(obj));
