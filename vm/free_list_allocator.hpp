@@ -18,7 +18,6 @@ template <typename Block> struct free_list_allocator {
   free_list_allocator(cell size, cell start);
   void initial_free_list(cell occupied);
   bool contains_p(Block* block);
-  Block* next_allocated_block_after(Block* block);
   bool can_allot_p(cell size);
   Block* allot(cell size);
   void free(Block* block);
@@ -53,19 +52,6 @@ void free_list_allocator<Block>::initial_free_list(cell occupied) {
 template <typename Block>
 bool free_list_allocator<Block>::contains_p(Block* block) {
   return ((cell)block - start) < size;
-}
-
-template <typename Block>
-Block* free_list_allocator<Block>::next_allocated_block_after(Block* block) {
-  while ((cell)block != this->end && block->free_p()) {
-    free_heap_block* free_block = (free_heap_block*)block;
-    block = (Block*)((cell)free_block + free_block->size());
-  }
-
-  if ((cell)block == this->end)
-    return NULL;
-  else
-    return block;
 }
 
 template <typename Block>
@@ -155,7 +141,7 @@ template <typename Block, typename Iterator> struct heap_compactor {
 
   void operator()(Block* block, cell size) {
     if (this->state->marked_p((cell)block)) {
-      *finger = (Block*)((char*)block + size);
+      *finger = (Block*)((cell)block + size);
       memmove((Block*)address, block, size);
       iter(block, (Block*)address, size);
       address += size;
@@ -182,15 +168,12 @@ void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
 template <typename Block>
 template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {
-  Block* scan = (Block*)this->start;
-  Block* end = (Block*)this->end;
-
-  while (scan != end) {
-    cell size = fixup.size(scan);
-    Block* next = (Block*)((cell)scan + size);
-    if (!scan->free_p())
-      iter(scan, size);
-    scan = next;
+  cell scan = this->start;
+  while (scan != this->end) {
+    cell size = fixup.size((Block*)scan);
+    if (!((Block*)scan)->free_p())
+      iter((Block*)scan, size);
+    scan += size;
   }
 }
 
