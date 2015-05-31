@@ -28,7 +28,7 @@ HELP: bitfield
         "        { 1 15 }"
         "        11"
         "        0"
-        "    } ;"
+        "    } bitfield ;"
     }
 } ;
 
