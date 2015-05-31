@@ -13,18 +13,18 @@ The Factor library provides platform-specific code for Unix and Windows
 with many more capabilities so these words are not usually used in
 normal operation. */
 
-size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
+int raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
   size_t items_read = 0;
-  size_t ret = 0;
 
   do {
-    ret = fread((void*)((int*)ptr + items_read * size), size,
-                nitems - items_read, stream);
+    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+                       nitems - items_read, stream);
     if (ret == 0) {
-      if (feof(stream))
+      if (feof(stream)) {
         break;
+      }
       else if (errno != EINTR) {
-        return 0;
+        return -1;
       }
     }
     items_read += ret;
@@ -82,10 +82,10 @@ int factor_vm::safe_fgetc(FILE* stream) {
   return c;
 }
 
-size_t factor_vm::safe_fread(void* ptr, size_t size, size_t nitems,
+int factor_vm::safe_fread(void* ptr, size_t size, size_t nitems,
                              FILE* stream) {
-  size_t ret = raw_fread(ptr, size, nitems, stream);
-  if (!ret)
+  int ret = raw_fread(ptr, size, nitems, stream);
+  if (ret == -1)
     io_error_if_not_EINTR();
   return ret;
 }
@@ -199,8 +199,7 @@ void factor_vm::primitive_fread() {
     ctx->push(from_unsigned_cell(0));
     return;
   }
-
-  size_t c = safe_fread(buf, 1, size, file);
+  int c = safe_fread(buf, 1, size, file);
   if (c == 0 || feof(file))
     clearerr(file);
   ctx->push(from_unsigned_cell(c));
