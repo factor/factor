@@ -1,4 +1,4 @@
-! Copyright (C) 2009 John Benediktsson
+! Copyright (C) 2015 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: assocs assocs.extras combinators kernel literals locals
