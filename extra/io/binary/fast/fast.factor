@@ -5,6 +5,8 @@ combinators.smart endian fry hints kernel locals macros math
 math.ranges sequences sequences.generalizations ;
 RENAME: be> io.binary => slow-be>
 RENAME: le> io.binary => slow-le>
+RENAME: signed-be> io.binary => slow-signed-be>
+RENAME: signed-le> io.binary => slow-signed-le>
 RENAME: >be io.binary => >slow-be
 RENAME: >le io.binary => >slow-le
 IN: io.binary.fast
@@ -64,6 +66,18 @@ PRIVATE>
         [ drop slow-be> ]
     } case ;
 
+: signed-be> ( bytes -- x )
+    compute-native-endianness big-endian = [
+        dup byte-array? [
+            dup length {
+                { 2 [ int16_t deref ] }
+                { 4 [ int32_t deref ] }
+                { 8 [ int64_t deref ] }
+                [ drop slow-signed-be> ]
+            } case
+        ] [ slow-signed-be> ] if
+    ] [ slow-signed-be> ] if ;
+
 : 2le> ( bytes -- x )
     little-endian [ uint16_t deref ] [ 2 n-le> ] if-endian ;
 
@@ -80,6 +94,18 @@ PRIVATE>
         { 8 [ 8le> ] }
         [ drop slow-le> ]
     } case ;
+
+: signed-le> ( bytes -- x )
+    compute-native-endianness little-endian = [
+        dup byte-array? [
+            dup length {
+                { 2 [ int16_t deref ] }
+                { 4 [ int32_t deref ] }
+                { 8 [ int64_t deref ] }
+                [ drop slow-signed-le> ]
+            } case
+        ] [ slow-signed-le> ] if
+    ] [ slow-signed-le> ] if ;
 
 : >le ( x n -- bytes )
     compute-native-endianness little-endian = [
