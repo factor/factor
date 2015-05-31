@@ -93,14 +93,21 @@ M: timestamp year. ( timestamp -- )
 : timestamp>string ( timestamp -- str )
     [ (timestamp>string) ] with-string-writer ;
 
-: (write-gmt-offset) ( duration -- )
+: write-hhmm ( duration -- )
     [ hh ] [ mm ] bi ;
 
 : write-gmt-offset ( gmt-offset -- )
     dup instant <=> {
         { +eq+ [ drop "GMT" write ] }
-        { +lt+ [ "-" write before (write-gmt-offset) ] }
-        { +gt+ [ "+" write (write-gmt-offset) ] }
+        { +lt+ [ "-" write before write-hhmm ] }
+        { +gt+ [ "+" write write-hhmm ] }
+    } case ;
+
+: write-gmt-offset-number ( gmt-offset -- )
+    dup instant <=> {
+        { +eq+ [ drop "+0000" write ] }
+        { +lt+ [ "-" write before write-hhmm ] }
+        { +gt+ [ "+" write write-hhmm ] }
     } case ;
 
 : timestamp>rfc822 ( timestamp -- str )
@@ -110,6 +117,12 @@ M: timestamp year. ( timestamp -- )
         [ (timestamp>string) bl ]
         [ gmt-offset>> write-gmt-offset ]
         bi
+    ] with-string-writer ;
+
+: timestamp>git-time ( timestamp -- str )
+    [
+        [ { DAY " " MONTH " " D " " hh ":" mm ":" ss " " YYYY " " } formatted ]
+        [ gmt-offset>> write-gmt-offset-number ] bi
     ] with-string-writer ;
 
 : timestamp>http-string ( timestamp -- str )
