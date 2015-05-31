@@ -72,8 +72,7 @@ PRIVATE>
 
 MACRO: bitfield ( bitspec -- )
     [ [ 0 ] ] [
-        [ (bitfield-quot) ] map unclip
-        [ '[ @ _ dip bitor ] ] reduce
+        [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
     ] if-empty ;
 
 ! bit-count
