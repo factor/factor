@@ -540,7 +540,7 @@ struct factor_vm {
   void io_error_if_not_EINTR();
   FILE* safe_fopen(char* filename, char* mode);
   int safe_fgetc(FILE* stream);
-  size_t safe_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
+  int safe_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
   void safe_fputc(int c, FILE* stream);
   size_t safe_fwrite(void* ptr, size_t size, size_t nitems, FILE* stream);
   int safe_ftell(FILE* stream);
