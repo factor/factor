@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.data byte-arrays combinators combinators.smart
-endian fry io.binary kernel locals macros math math.ranges
+endian fry hints kernel locals macros math math.ranges
 sequences sequences.generalizations ;
 QUALIFIED-WITH: alien.c-types c
 RENAME: be> io.binary => slow-be>
@@ -37,8 +37,11 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 :: n-le> ( bytes n -- x )
     bytes n check-length drop n firstn-unsafe n reassemble-le ; inline
 
+HINTS: n-be> { byte-array object } ;
+HINTS: n-le> { byte-array object } ;
+
 <PRIVATE
-: if-endian ( endian bytes seq -- )
+: if-endian ( endian bytes-quot seq-quot -- )
     [
         compute-native-endianness =
         [ dup byte-array? ] [ f ] if
