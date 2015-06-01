@@ -1,7 +1,8 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: editors io.pathnames io.standard-paths kernel make
-math.parser namespaces sequences system ;
+USING: combinators.short-circuit editors io.pathnames
+io.standard-paths kernel make math.parser namespaces sequences
+system ;
 IN: editors.sublime
 
 SINGLETON: sublime
@@ -19,7 +20,11 @@ M: macosx find-sublime-path
     ] if* ;
 
 M: windows find-sublime-path
-    { "Sublime Text 3" } "subl.exe" find-in-applications ;
+    {
+        [ { "Sublime Text 3" } "subl.exe" find-in-applications ]
+        [ { "Sublime Text 2" } "sublime_text.exe" find-in-applications ]
+        [ "subl.exe" ]
+    } 0|| ;
 
 : sublime-path  ( -- path )
     \ sublime-path get [
