@@ -1,4 +1,4 @@
-USING: help.markup help.syntax quotations strings ;
+USING: help.markup help.syntax io.directories quotations strings ;
 IN: io.files.unique
 
 HELP: default-temporary-directory
@@ -37,8 +37,8 @@ HELP: cleanup-unique-file
 
 HELP: unique-directory
 { $values { "path" "a pathname string" } }
-{ $description "Creates a directory in the value in " { $link current-temporary-directory } " that is guaranteed not to exist in and returns the full pathname." }
-{ $errors "Throws an error if the directory cannot be created after a number of tries. The most likely error is incorrect directory permissions on the temporary directory." } ;
+{ $description "Creates a directory in " { $link current-temporary-directory } " that is guaranteed not to exist and return the full pathname. The mechanism for the guarantee of uniqueness is retrying with a randomly generated filename until " { $link make-directory } " does not fail." }
+{ $errors "Throws an error if the directory cannot be created after a number of tries " { $link unique-retries } ". The most likely error is incorrect directory permissions on the temporary directory." } ;
 
 HELP: cleanup-unique-directory
 { $values { "quot" quotation } }
