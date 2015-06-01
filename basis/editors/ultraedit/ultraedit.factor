@@ -1,5 +1,5 @@
-USING: editors io.files io.launcher kernel math.parser
-namespaces sequences io.directories.search.windows make ;
+USING: editors io.standard-paths kernel make math.parser
+namespaces ;
 IN: editors.ultraedit
 
 SINGLETON: ultraedit
@@ -7,7 +7,7 @@ ultraedit editor-class set-global
 
 : ultraedit-path ( -- path )
     \ ultraedit-path get-global [
-        "IDM Computer Solutions" [ "uedit32.exe" tail? ] find-in-program-files
+        { "IDM Computer Solutions" } "uedit32.exe" find-in-applications
         [ "uedit32.exe" ] unless*
     ] unless* ;
 

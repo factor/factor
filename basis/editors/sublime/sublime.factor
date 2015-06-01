@@ -9,7 +9,7 @@ sublime editor-class set-global
 
 HOOK: find-sublime-path os ( -- path )
 
-M: object find-sublime-path "sublime" ;
+M: object find-sublime-path f ;
 
 M: macosx find-sublime-path
     { "com.sublimetext.3" "com.sublimetext.2" } [ find-native-bundle ] map-find drop [
@@ -18,11 +18,12 @@ M: macosx find-sublime-path
         f
     ] if* ;
 
-ERROR: editor-not-found editor ;
+M: windows find-sublime-path
+    { "Sublime Text 2" } "sublime_text.exe" find-in-applications ;
 
 : sublime-path  ( -- path )
-    \ sublime-path get-global [
-        find-sublime-path [ "sublime" editor-not-found ] unless*
+    \ sublime-path get [
+        find-sublime-path [ "subl" ?find-in-path ] unless*
     ] unless* ;
 
 M: sublime editor-command ( file line -- command )

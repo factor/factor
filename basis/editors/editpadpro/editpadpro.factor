@@ -6,7 +6,7 @@ SINGLETON: editpadpro
 editpadpro editor-class set-global
 
 : editpadpro-path ( -- path )
-    \ editpadpro-path get-global [
+    \ editpadpro-path get [
         {
             [ { "Just Great Software" "JGsoft" } "editpadpro.exe" find-in-applications ]
             [ { "Just Great Software" "JGsoft" } "editpadpro7.exe" find-in-applications ]

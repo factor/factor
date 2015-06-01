@@ -6,5 +6,5 @@ system ;
 IN: editors.visual-studio-code.windows
 
 M: windows find-visual-studio-code-path
-    get-appdata-directory 1array f
+    get-appdata-directory f
     [ file-name >lower "code.exe" = ] find-in-directories ;
