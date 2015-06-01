@@ -41,6 +41,9 @@ PRIVATE>
 : which ( command -- file/f )
     "PATH" os-env (which) ;
 
+: ?which ( command -- file/command )
+    [ which ] [ or ] bi ;
+
 : run-which ( -- )
     command-line get [ which [ print ] when* ] each ;
 
