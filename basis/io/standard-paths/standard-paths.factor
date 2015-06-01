@@ -11,9 +11,13 @@ HOOK: find-in-path* os ( string -- path/f )
 HOOK: find-in-applications os ( directories filename -- path )
 
 : find-in-path ( string -- path/f )
-    [ f ]
-    [ [ find-in-path* ] keep over [ append-path ] [ 2drop f ] if ]
-    if-empty ;
+    [ f ] [
+        [ find-in-path* ] keep over
+        [ append-path ] [ 2drop f ] if
+    ] if-empty ;
+
+: ?find-in-path ( string -- path/string )
+    [ find-in-path ] [ or ] bi ;
 
 {
     { [ os windows? ] [ "io.standard-paths.windows" ] }
