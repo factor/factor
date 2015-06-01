@@ -1,14 +1,13 @@
-USING: editors io.files io.launcher kernel math.parser
-namespaces sequences windows.shell32 make
-io.directories.search.windows ;
+USING: editors io.standard-paths kernel make math.parser
+namespaces ;
 IN: editors.editplus
 
 SINGLETON: editplus
 editplus editor-class set-global
 
 : editplus-path ( -- path )
-    \ editplus-path get-global [
-        "EditPlus 2" [ "editplus.exe" tail? ] find-in-program-files
+    \ editplus-path get [
+        { "EditPlus 2" } "editplus.exe" find-in-applications
         [ "editplus.exe" ] unless*
     ] unless* ;
 

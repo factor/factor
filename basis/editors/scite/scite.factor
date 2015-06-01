@@ -1,25 +1,30 @@
 ! Copyright (C) 2007 Clemens F. Hofreither.
 ! See http://factorcode.org/license.txt for BSD license.
 ! clemens.hofreither@gmx.net
-USING: io.files io.launcher kernel namespaces
-math math.parser editors sequences make system unicode.case
-vocabs ;
+USING: editors io.standard-paths kernel make math.parser
+namespaces sequences system ;
 IN: editors.scite
 
 SINGLETON: scite
 scite editor-class set-global
 
-HOOK: scite-path os ( -- path )
+SYMBOL: scite-path
 
-M: unix scite-path ( -- path )
-    \ scite-path get-global [ "scite" ] unless* ;
+HOOK: find-scite-path os ( -- path )
+
+M: unix find-scite-path "scite" ?find-in-path ;
+
+M: windows find-scite-path
+    {
+        "Scintilla Text Editor"
+        "SciTE Source Code Editor"
+    } "scite.exe" find-in-applications
+    [ "scite.exe" ] unless* ;
 
 M: scite editor-command ( file line -- cmd )
     swap
     [
-        scite-path ,
+        scite-path get [ find-scite-path ] unless* ,
         ,
         number>string "-goto:" prepend ,
     ] { } make ;
-
-os windows? [ "editors.scite.windows" require ] when

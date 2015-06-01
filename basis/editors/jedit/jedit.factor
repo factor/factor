@@ -12,18 +12,21 @@ ERROR: jedit-not-found ;
 
 HOOK: find-jedit-path os ( -- path )
 
-M: object find-jedit-path "jedit" ;
+M: object find-jedit-path f ;
 
 M: macosx find-jedit-path
-    "org.gjt.sp.jedit" find-native-bundle
-    dup [ "Contents/MacOS/jedit" append-path ] when ;
+    "org.gjt.sp.jedit" find-native-bundle [
+        "Contents/MacOS/jedit" append-path
+    ] [
+        f
+    ] if* ;
 
 M: windows find-jedit-path
     { "jedit" } "jedit.exe" find-in-applications ;
-    
+
 : jedit-path ( -- path )
-    \ jedit-path get-global [
-        find-jedit-path "jedit" or
+    \ jedit-path get [
+        find-jedit-path [ "jedit" ?find-in-path ] unless*
     ] unless* ;
 
 M: jedit editor-command ( file line -- command/f )

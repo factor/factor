@@ -1,16 +1,16 @@
 ! Copyright (C) 2008 Kibleur Christophe.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: editors io.files io.launcher kernel math.parser make
-namespaces sequences windows.shell32 io.directories.search.windows ;
+USING: editors io.standard-paths kernel make math.parser
+namespaces ;
 IN: editors.etexteditor
 
 SINGLETON: etexteditor
 etexteditor editor-class set-global
 
 : etexteditor-path ( -- str )
-    \ etexteditor-path get-global [
-        "e" [ "e.exe" tail? ] find-in-program-files
-        [ "e" ] unless*
+    \ etexteditor-path get [
+        { "e" } "e.exe" find-in-applications
+        [ "e.exe" ] unless*
     ] unless* ;
 
 M: etexteditor editor-command ( file line -- command )

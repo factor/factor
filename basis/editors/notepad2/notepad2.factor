@@ -6,7 +6,7 @@ SINGLETON: notepad2
 notepad2 editor-class set-global
 
 : notepad2-path ( -- path )
-    \ notepad2-path get-global [
+    \ notepad2-path get [
         windows-directory "system32\\notepad.exe" append-path
         [ "notepad.exe" ] unless*
     ] unless* ;
