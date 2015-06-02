@@ -46,10 +46,8 @@ TUPLE: material
     " \t\n" split harvest ;
 
 : line>mtl ( line -- )
-    " \t\n" split harvest
-    [
-        [ rest ] [ first ] bi
-        {
+    " \t\n" split harvest [
+        unclip {
             { "newmtl" [ first
                 [ material new swap >>name current-material set ]
                 [ cm swap md set-at ] bi
@@ -90,8 +88,7 @@ VERTEX-FORMAT: obj-vertex-format
     { "NORMAL"   float-components 3 f } ;
 
 : triangle>aos ( x -- y )
-    dup length
-    {
+    dup length {
         { 3 [
             first3
             [ 1 - vp get nth ]
@@ -107,15 +104,15 @@ VERTEX-FORMAT: obj-vertex-format
 
 : quad>aos ( x -- y z )
     [ 3 head [ triangle>aos 1array ] map ]
-    [ [ 2 swap nth ]
-      [ 3 swap nth ]
-      [ 0 swap nth ] tri 3array
-      [ triangle>aos 1array ] map ]
-    bi ;
+    [
+        [ 2 swap nth ]
+        [ 3 swap nth ]
+        [ 0 swap nth ] tri 3array
+        [ triangle>aos 1array ] map
+    ] bi ;
 
 : face>aos ( x -- y )
-    dup length
-    {
+    dup length {
         { 3 [ [ triangle>aos 1array ] map 1array ] }
         { 4 [ quad>aos 2array ] }
     } case ;
@@ -132,10 +129,8 @@ VERTEX-FORMAT: obj-vertex-format
     ] unless-empty ;
 
 : line>obj ( line -- )
-    split-string
-    [
-        [ rest ] [ first ] bi
-        {
+    split-string [
+        unclip {
             { "mtllib" [ first read-mtl material-dictionary set ] }
             { "v"      [ strings>numbers 3 head vp [ push* ] change ] }
             { "vt"     [ strings>numbers 2 head vt [ push* ] change ] }
