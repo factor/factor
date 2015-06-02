@@ -32,10 +32,10 @@ MEMO: 24-from-4 ( a b c d -- ? )
     [ some-rots do-something 24-from-3 ] [ 4drop ] if-amb ;
 
 : find-impossible-24 ( -- n )
-    1 10 [a,b] [| a |
-        1 10 [a,b] [| b |
-            1 10 [a,b] [| c |
-                1 10 [a,b] [| d |
+    10 [1,b] [| a |
+        10 [1,b] [| b |
+            10 [1,b] [| c |
+                10 [1,b] [| d |
                     a b c d 24-from-4
                 ] count
             ] map-sum
