@@ -238,18 +238,20 @@ M: complex log >polar [ flog ] dip rect> ; inline
 
 : most-negative-finite-float ( -- x )
     -0x1.ffff,ffff,ffff,fp1023 >integer ; inline
+
 : most-positive-finite-float ( -- x )
     0x1.ffff,ffff,ffff,fp1023 >integer ; inline
+
 CONSTANT: log-2   0x1.62e42fefa39efp-1
 CONSTANT: log10-2 0x1.34413509f79ffp-2
 
-: (representable-as-float?) ( x -- ? )
+: representable-as-float? ( x -- ? )
     most-negative-finite-float
     most-positive-finite-float between? ; inline
 
 : (bignum-log) ( n log-quot: ( x -- y ) log-2 -- log )
     [ dup ] dip '[
-        dup (representable-as-float?)
+        dup representable-as-float?
         [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
     ] call ; inline
 
@@ -368,8 +370,7 @@ M: real tanh >float tanh ; inline
     dup [-1,1]? [ >float fasin ] [ i* asinh -i* ] if ; inline
 
 : acos ( x -- y )
-    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ;
-    inline
+    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ; inline
 
 GENERIC: atan ( x -- y ) foldable
 
