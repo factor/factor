@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 William Schlieper
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: kernel continuations combinators sequences quotations arrays namespaces
-       fry summary assocs math math.order macros ;
+USING: assocs combinators continuations fry kernel macros math
+namespaces quotations sequences summary ;
 
 IN: backtrack
 
@@ -13,16 +13,18 @@ ERROR: amb-failure ;
 M: amb-failure summary drop "Backtracking failure" ;
 
 : fail ( -- )
-    failure get [ continue ]
-    [ amb-failure ] if* ;
+    failure get [ continue ] [ amb-failure ] if* ;
 
 : require ( ? -- )
     [ fail ] unless ;
 
 MACRO: checkpoint ( quot -- quot' )
-    '[ failure get _
-       '[ '[ failure set _ continue ] callcc0
-          _ failure set @ ] callcc0 ] ;
+    '[
+        failure get _ '[
+            '[ failure set _ continue ] callcc0
+            _ failure set @
+        ] callcc0
+    ] ;
 
 : number-from ( from -- from+n )
     [ 1 + number-from ] checkpoint ;
@@ -43,10 +45,11 @@ MACRO: checkpoint ( quot -- quot' )
     length 1 - 0 number-from-to nip ;
 
 MACRO: unsafe-amb ( seq -- quot )
-    dup length 1 =
-    [ first 1quotation ]
-    [ [ first ] [ rest ] bi
-      '[ _ [ drop _ unsafe-amb ] checkpoint ] ] if ;
+    dup length 1 = [
+        first 1quotation
+    ] [
+        unclip swap '[ _ [ drop _ unsafe-amb ] checkpoint ]
+    ] if ;
 
 PRIVATE> 
 
@@ -54,8 +57,7 @@ PRIVATE>
     [ amb-integer ] [ nth ] bi ;
 
 : amb ( seq -- elt )
-    [ fail f ]
-    [ unsafe-amb ] if-empty ; inline
+    [ fail f ] [ unsafe-amb ] if-empty ; inline
 
 MACRO: amb-execute ( seq -- quot )
     [ length 1 - ] [ <enum> [ 1quotation ] assoc-map ] bi
