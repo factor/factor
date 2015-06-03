@@ -20,7 +20,7 @@ void factor_vm::init_c_io() {
 }
 
 /* Allocates memory */
-void factor_vm::io_error() {
+void factor_vm::io_error_if_not_EINTR() {
   if (errno == EINTR)
     return;
 
@@ -32,7 +32,7 @@ FILE* factor_vm::safe_fopen(char* filename, char* mode) {
   for (;;) {
     file = fopen(filename, mode);
     if (file == NULL)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -47,7 +47,7 @@ int factor_vm::safe_fgetc(FILE* stream) {
       if (feof(stream))
         return EOF;
       else
-        io_error();
+        io_error_if_not_EINTR();
     } else
       break;
   }
@@ -66,7 +66,7 @@ size_t factor_vm::safe_fread(void* ptr, size_t size, size_t nitems,
       if (feof(stream))
         break;
       else
-        io_error();
+        io_error_if_not_EINTR();
     }
     items_read += ret;
   } while (items_read != nitems);
@@ -77,7 +77,7 @@ size_t factor_vm::safe_fread(void* ptr, size_t size, size_t nitems,
 void factor_vm::safe_fputc(int c, FILE* stream) {
   for (;;) {
     if (putc(c, stream) == EOF)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -92,7 +92,7 @@ size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
     ret = fwrite((void*)((int*)ptr + items_written * size), size,
                  nitems - items_written, stream);
     if (ret == 0)
-      io_error();
+      io_error_if_not_EINTR();
     items_written += ret;
   } while (items_written != nitems);
 
@@ -103,7 +103,7 @@ int factor_vm::safe_ftell(FILE* stream) {
   off_t offset;
   for (;;) {
     if ((offset = FTELL(stream)) == -1)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -127,7 +127,7 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
 
   for (;;) {
     if (FSEEK(stream, offset, whence) == -1)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -136,19 +136,16 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
 void factor_vm::safe_fflush(FILE* stream) {
   for (;;) {
     if (fflush(stream) == EOF)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
 }
 
+// Call fclose() once only. Issues #1335, #908.
 void factor_vm::safe_fclose(FILE* stream) {
-  for (;;) {
-    if (fclose(stream) == EOF)
-      io_error();
-    else
-      break;
-  }
+  if (fclose(stream) == EOF && errno != EINTR)
+    general_error(ERROR_IO, tag_fixnum(errno), false_object);
 }
 
 void factor_vm::primitive_fopen() {
@@ -210,7 +207,7 @@ void factor_vm::primitive_fwrite() {
 
   size_t written = safe_fwrite(text, 1, length, file);
   if (written != length)
-    io_error();
+    io_error_if_not_EINTR();
 }
 
 void factor_vm::primitive_ftell() {
