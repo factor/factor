@@ -39,11 +39,12 @@ IN: assocs.extras
 : assoc-invert ( assoc -- newassoc )
     dup assoc-invert-as ;
 
-: (assoc-merge) ( assoc1 assoc2 -- assoc1 )
+: assoc-merge! ( assoc1 assoc2 -- assoc1 )
     over [ push-at ] with-assoc assoc-each ;
 
-: assoc-merge ( seq -- merge )
-    H{ } clone [ (assoc-merge) ] reduce ;
+: assoc-merge ( assoc1 assoc2 -- newassoc )
+    [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
+    [ assoc-merge! ] bi@ ;
 
 GENERIC: delete-value-at ( value assoc -- )
 
