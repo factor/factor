@@ -1,5 +1,5 @@
 
-USING: assocs.extras kernel tools.test ;
+USING: assocs.extras kernel sequences tools.test ;
 
 IN: assocs.extras
 
@@ -12,11 +12,10 @@ IN: assocs.extras
 
 { H{ { 2 1 } { 4 3 } } } [ H{ { 1 2 } { 3 4 } } assoc-invert ] unit-test
 
-[ H{ } ] [ { } assoc-merge ] unit-test
 [ H{ { "a" V{ 2 5 } } { "b" V{ 3 } } { "c" V{ 10 } } } ]
 [
     { H{ { "a" 2 } { "b" 3 } } H{ { "a" 5 } { "c" 10 } } }
-    assoc-merge
+    [ ] [ assoc-merge ] map-reduce
 ] unit-test
 
 { H{ } } [ H{ { 1 2 } } 2 over delete-value-at ] unit-test
