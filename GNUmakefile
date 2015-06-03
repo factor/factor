@@ -6,15 +6,18 @@ ifdef CONFIG
 
 	include $(CONFIG)
 
-	CFLAGS = -Wall \
-		-DFACTOR_VERSION="$(VERSION)" \
-		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
-		$(SITE_CFLAGS)
+	CPPFLAGS = -DFACTOR_VERSION="$(VERSION)" \
+		   -DFACTOR_GIT_LABEL="$(GIT_LABEL)"
+
+	CFLAGS =  -std=c99 $(CPPFLAGS) $(SITE_CFLAGS)
+	CXXFLAGS =  -std=c++98 $(CPPFLAGS) $(SITE_CFLAGS)
 
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG
+		CXXFLAGS += -g -DFACTOR_DEBUG
 	else
 		CFLAGS += -O3 -g
+		CXXFLAGS += -O3 -g
 	endif
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
@@ -206,12 +209,21 @@ $(ENGINE): $(DLL_OBJS)
 factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
+<<<<<<< HEAD
+	$(TOOLCHAIN_PREFIX)$(CXX) $(LIBPATH) -L. $(DLL_OBJS) \
+		$(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+
+factor-console: $(EXE_OBJS) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(LIBPATH) -L. $(DLL_OBJS) \
+		$(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+=======
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+>>>>>>> dcbe85fe9cc84d35e0a40c44b414c8901071bd6c
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
@@ -225,16 +237,16 @@ vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CXXFLAGS) -o $@ $<
 
 %.o: %.cpp vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 %.o: %.S
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
 
 %.o: %.mm vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
 

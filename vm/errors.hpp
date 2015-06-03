@@ -23,8 +23,12 @@ enum vm_error_type {
   ERROR_CALLSTACK_OVERFLOW,
   ERROR_MEMORY,
   ERROR_FP_TRAP,
+<<<<<<< HEAD
+  ERROR_INTERRUPT
+=======
   ERROR_INTERRUPT,
   ERROR_CALLBACK_SPACE_OVERFLOW
+>>>>>>> dcbe85fe9cc84d35e0a40c44b414c8901071bd6c
 };
 
 void fatal_error(const char* msg, cell tagged);

@@ -29,7 +29,7 @@
 #else
 #include "os-genunix.hpp"
 
-#if defined(linux)
+#if defined(__linux__)
 #define FACTOR_OS_STRING "linux"
 #include "os-linux.hpp"
 

@@ -154,7 +154,7 @@ cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
 
   dll* d = (to_boolean(library) ? untag<dll>(library) : NULL);
 
-  void* undefined_symbol = (void*)factor::undefined_symbol;
+  void* undefined_symbol = reinterpret_cast<void*>(factor::undefined_symbol);
   undefined_symbol = FUNCTION_CODE_POINTER(undefined_symbol);
   if (d != NULL && !d->handle)
     return (cell)undefined_symbol;

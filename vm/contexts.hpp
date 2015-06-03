@@ -9,7 +9,7 @@ enum context_object {
   OBJ_NAMESTACK,
   OBJ_CATCHSTACK,
   OBJ_CONTEXT,
-  OBJ_IN_CALLBACK_P,
+  OBJ_IN_CALLBACK_P
 };
 
 static const cell stack_reserved = 1024;
