@@ -114,3 +114,7 @@ HELP: file-contents
 HELP: exists?
 { $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
+
+HELP: default-resource-path
+{ $values { "path" "a pathname string" } }
+{ $description "What path to use for resources if no '-resource-path' command line argument is passed." } ;

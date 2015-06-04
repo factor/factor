@@ -84,15 +84,14 @@ M: object cwd ( -- path ) "." ;
 
 PRIVATE>
 
+: default-resource-path ( -- path )
+    install-prefix dup "." =
+    [ drop image parent-directory ] [ "lib/factor" append-path ] if ;
+
 : init-resource-path ( -- )
     OBJ-ARGS special-object
     [ alien>native-string "-resource-path=" ?head [ drop f ] unless ] map-find drop
-    [
-        {
-            { [ os windows? ] [ image parent-directory ] }
-            { [ os unix? ] [ install-prefix "lib/factor" append-path ] }
-        } cond
-    ] unless*
+    [ default-resource-path ] unless*
     "resource-path" set-global ;
 
 [
