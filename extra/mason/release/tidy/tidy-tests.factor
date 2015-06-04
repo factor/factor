@@ -1,4 +1,4 @@
-USING: io.directories mason.config mason.release.tidy namespaces
+USING: io.directories kernel mason.config mason.release.tidy namespaces
 sequences system tools.test ;
 IN: mason.release.tidy.tests
 
@@ -6,16 +6,18 @@ IN: mason.release.tidy.tests
 ! of the build directory, and they look for a file named
 ! build-support/cleanup there. Use with-directory here to
 ! ensure we use the file from the current source tree instead.
-[
-    ! [ f ] [
-    !     macosx target-os [
-    !         "Factor.app" useless-files member?
-    !     ] with-variable
-    ! ] unit-test
+"." install-prefix = [
+    [
+        [ f ] [
+            macosx target-os [
+                "Factor.app" useless-files member?
+            ] with-variable
+        ] unit-test
 
-    ! [ t ] [
-    !     linux target-os [
-    !         "Factor.app" useless-files member?
-    !     ] with-variable
-    ! ] unit-test
-] with-resource-directory
+        [ t ] [
+            linux target-os [
+                "Factor.app" useless-files member?
+            ] with-variable
+        ] unit-test
+    ] with-resource-directory
+] when

@@ -1,4 +1,6 @@
+USING: contributors kernel system tools.test ;
 IN: contributors.tests
-USING: contributors tools.test ;
 
-! { } [ contributors ] unit-test
+"." install-prefix = [
+    { } [ contributors ] unit-test
+] when
