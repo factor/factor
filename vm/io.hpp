@@ -2,7 +2,7 @@ namespace factor {
 
 /* Safe IO functions that does not throw Factor errors. */
 int raw_fclose(FILE* stream);
-int raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
+size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
 
 /* Platform specific primitives */
 
