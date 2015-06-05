@@ -2,7 +2,7 @@ namespace factor {
 
 // Poor mans range-based for loops.
 #define FACTOR_FOR_EACH(iterable)                               \
-  for (typeof((iterable).begin()) iter = (iterable).begin(),    \
+  for (auto iter = (iterable).begin(),    \
            _end = (iterable).end();                             \
        iter != _end;                                            \
        iter++)
