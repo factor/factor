@@ -11,6 +11,8 @@ ifdef CONFIG
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
 
+	CXXFLAGS += -std=c++11
+
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
@@ -207,11 +209,11 @@ factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
@@ -225,16 +227,16 @@ vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.o: %.cpp vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.o: %.S
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.o: %.mm vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
 
