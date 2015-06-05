@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math fry ;
+USING: fry kernel sequences ;
 IN: deques
 
 GENERIC: push-front* ( obj deque -- node )
@@ -33,13 +33,13 @@ ERROR: empty-deque ;
     push-front* drop ; inline
 
 : push-all-front ( seq deque -- )
-    [ push-front ] curry each ;
+    '[ _ push-front ] each ;
 
 : push-back ( obj deque -- )
     push-back* drop ; inline
 
 : push-all-back ( seq deque -- )
-    [ push-back ] curry each ;
+    '[ _ push-back ] each ;
 
 : pop-front ( deque -- obj )
     [ peek-front ] [ pop-front* ] bi ; inline
