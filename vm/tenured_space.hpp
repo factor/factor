@@ -15,14 +15,21 @@ struct tenured_space : free_list_allocator<object> {
       return NULL;
   }
 
+  cell next_allocated_object_after(cell scan) {
+    while (scan != this->end && ((object*)scan)->free_p()) {
+      free_heap_block* free_block = (free_heap_block*)scan;
+      scan = (cell)free_block + free_block->size();
+    }
+    return scan == this->end ? 0 : scan;
+  }
+
   cell first_object() {
-    return (cell)next_allocated_block_after((object*)this->start);
+    return next_allocated_object_after(this->start);
   }
 
   cell next_object_after(cell scan) {
     cell size = ((object*)scan)->size();
-    object* next = (object*)(scan + size);
-    return (cell)next_allocated_block_after(next);
+    return next_allocated_object_after(scan + size);
   }
 
   void sweep() {

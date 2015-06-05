@@ -13,6 +13,35 @@ The Factor library provides platform-specific code for Unix and Windows
 with many more capabilities so these words are not usually used in
 normal operation. */
 
+size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
+  FACTOR_ASSERT(nitems > 0);
+  size_t items_read = 0;
+
+  do {
+    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+                       nitems - items_read, stream);
+    if (ret == 0) {
+      if (feof(stream)) {
+        break;
+      }
+      else if (errno != EINTR) {
+        return 0;
+      }
+    }
+    items_read += ret;
+  } while (items_read != nitems);
+
+  return items_read;
+}
+
+// Call fclose() once only. Issues #1335, #908.
+int raw_fclose(FILE* stream) {
+  if (fclose(stream) == EOF && errno != EINTR)
+    return -1;
+  return 0;
+}
+
+
 void factor_vm::init_c_io() {
   special_objects[OBJ_STDIN] = allot_alien(false_object, (cell)stdin);
   special_objects[OBJ_STDOUT] = allot_alien(false_object, (cell)stdout);
@@ -56,22 +85,10 @@ int factor_vm::safe_fgetc(FILE* stream) {
 
 size_t factor_vm::safe_fread(void* ptr, size_t size, size_t nitems,
                              FILE* stream) {
-  size_t items_read = 0;
-  size_t ret = 0;
-
-  do {
-    ret = fread((void*)((int*)ptr + items_read * size), size,
-                nitems - items_read, stream);
-    if (ret == 0) {
-      if (feof(stream))
-        break;
-      else
-        io_error_if_not_EINTR();
-    }
-    items_read += ret;
-  } while (items_read != nitems);
-
-  return items_read;
+  size_t ret = raw_fread(ptr, size, nitems, stream);
+  if (ret == 0 && !feof(stream))
+    io_error_if_not_EINTR();
+  return ret;
 }
 
 void factor_vm::safe_fputc(int c, FILE* stream) {
@@ -142,10 +159,9 @@ void factor_vm::safe_fflush(FILE* stream) {
   }
 }
 
-// Call fclose() once only. Issues #1335, #908.
 void factor_vm::safe_fclose(FILE* stream) {
-  if (fclose(stream) == EOF && errno != EINTR)
-    general_error(ERROR_IO, tag_fixnum(errno), false_object);
+  if (raw_fclose(stream) == -1)
+    io_error_if_not_EINTR();
 }
 
 void factor_vm::primitive_fopen() {
@@ -184,7 +200,6 @@ void factor_vm::primitive_fread() {
     ctx->push(from_unsigned_cell(0));
     return;
   }
-
   size_t c = safe_fread(buf, 1, size, file);
   if (c == 0 || feof(file))
     clearerr(file);

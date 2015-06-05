@@ -146,14 +146,10 @@ void factor_vm::update_code_heap_words(bool reset_inline_caches) {
 /* Fix up new words only.
 Fast path for compilation units that only define new words. */
 void factor_vm::initialize_code_blocks() {
-  std::map<code_block*, cell>::const_iterator iter =
-      code->uninitialized_blocks.begin();
-  std::map<code_block*, cell>::const_iterator end =
-      code->uninitialized_blocks.end();
 
-  for (; iter != end; iter++)
+  FACTOR_FOR_EACH(code->uninitialized_blocks) {
     initialize_code_block(iter->first, iter->second);
-
+  }
   code->uninitialized_blocks.clear();
 }
 

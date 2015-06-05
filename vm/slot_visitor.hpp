@@ -191,12 +191,7 @@ void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
-  std::vector<cell*>::const_iterator iter =
-      parent->data_roots.begin();
-  std::vector<cell*>::const_iterator end =
-      parent->data_roots.end();
-
-  for (; iter < end; iter++) {
+  FACTOR_FOR_EACH(parent->data_roots) {
     visit_handle(*iter);
   }
 }
@@ -218,27 +213,19 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_callback_roots() {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_literal_table_roots() {
-  std::map<code_block*, cell>* uninitialized_blocks =
-      &parent->code->uninitialized_blocks;
-  std::map<code_block*, cell>::iterator iter =
-      uninitialized_blocks->begin();
-  std::map<code_block*, cell>::iterator end = uninitialized_blocks->end();
-
-  for (; iter != end; iter++) {
+  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
     iter->second = visit_pointer(iter->second);
   }
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_sample_callstacks() {
-  for (std::vector<cell>::iterator iter = parent->sample_callstacks.begin();
-       iter != parent->sample_callstacks.end(); ++iter) {
+  FACTOR_FOR_EACH(parent->sample_callstacks) {
     visit_handle(&*iter);
   }
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_sample_threads() {
-  for (std::vector<profiling_sample>::iterator iter = parent->samples.begin();
-       iter != parent->samples.end(); ++iter) {
+  FACTOR_FOR_EACH(parent->samples) {
     visit_handle(&iter->thread);
   }
 }
@@ -397,11 +384,8 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
-  std::set<context*>::const_iterator begin = parent->active_contexts.begin();
-  std::set<context*>::const_iterator end = parent->active_contexts.end();
-  while (begin != end) {
-    visit_context(*begin);
-    begin++;
+  FACTOR_FOR_EACH(parent->active_contexts) {
+    visit_context(*iter);
   }
 }
 
@@ -474,28 +458,18 @@ void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_context_code_blocks() {
   call_frame_code_block_visitor<Fixup> call_frame_visitor(fixup);
-  std::set<context*>::const_iterator begin = parent->active_contexts.begin();
-  std::set<context*>::const_iterator end = parent->active_contexts.end();
-  while (begin != end) {
-    parent->iterate_callstack(*begin, call_frame_visitor, fixup);
-    begin++;
+  FACTOR_FOR_EACH(parent->active_contexts) {
+    parent->iterate_callstack(*iter, call_frame_visitor, fixup);
   }
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_uninitialized_code_blocks() {
-  std::map<code_block*, cell>* uninitialized_blocks =
-      &parent->code->uninitialized_blocks;
-  std::map<code_block*, cell>::const_iterator iter =
-      uninitialized_blocks->begin();
-  std::map<code_block*, cell>::const_iterator end = uninitialized_blocks->end();
-
   std::map<code_block*, cell> new_uninitialized_blocks;
-  for (; iter != end; iter++) {
+  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
     new_uninitialized_blocks.insert(
         std::make_pair(fixup.fixup_code(iter->first), iter->second));
   }
-
   parent->code->uninitialized_blocks = new_uninitialized_blocks;
 }
 

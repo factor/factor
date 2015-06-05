@@ -7,12 +7,9 @@ namespace factor {
    compiler triggers a GC, and the caller block gets GCd as a result,
    the PIC code won't try to overwrite the call site */
 void factor_vm::update_code_roots_for_sweep() {
-  std::vector<code_root*>::const_iterator iter = code_roots.begin();
-  std::vector<code_root*>::const_iterator end = code_roots.end();
-
   mark_bits* state = &code->allocator->state;
 
-  for (; iter < end; iter++) {
+  FACTOR_FOR_EACH(code_roots) {
     code_root* root = *iter;
     cell block = root->value & (~data_alignment - 1);
     if (root->valid && !state->marked_p(block))
