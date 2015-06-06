@@ -20,7 +20,7 @@ IN: compiler.tree.def-use.tests
     analyze-recursive
     normalize
     propagate
-    cleanup
+    cleanup-tree
     compute-def-use
     check-nodes ;
 

@@ -13,7 +13,7 @@ IN: compiler.tree.tuple-unboxing.tests
     analyze-recursive
     normalize
     propagate
-    cleanup
+    cleanup-tree
     escape-analysis
     unbox-tuples
     check-nodes ;

@@ -15,7 +15,7 @@ IN: compiler.tree.dead-code.tests
     analyze-recursive
     normalize
     propagate
-    cleanup
+    cleanup-tree
     escape-analysis
     unbox-tuples
     compute-def-use
@@ -67,7 +67,7 @@ IN: compiler.tree.dead-code.tests
     analyze-recursive
     normalize
     propagate
-    cleanup
+    cleanup-tree
     escape-analysis
     unbox-tuples
     compute-def-use
