@@ -840,10 +840,10 @@ M: repetition sum-lengths
     [ len>> ] [ elt>> length ] bi * ;
 
 : concat-as ( seq exemplar -- newseq )
-    swap [ { } ] [
-        [ sum-lengths over new-resizable ] keep
-        [ append! ] each
-    ] if-empty swap like ;
+    [
+        [ dup sum-lengths ] dip new-resizable
+        [ [ push-all ] curry each ] keep
+    ] keep like ; inline
 
 : concat ( seq -- newseq )
     [ { } ] [ dup first concat-as ] if-empty ;
