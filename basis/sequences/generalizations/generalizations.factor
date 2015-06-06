@@ -5,8 +5,7 @@ memoize.private generalizations ;
 IN: sequences.generalizations
 
 MACRO: nsequence ( n seq -- )
-    [ [nsequence] ] keep
-    '[ @ _ like ] ;
+    [ [nsequence] ] keep '[ @ _ like ] ;
 
 MACRO: narray ( n -- )
     '[ _ { } nsequence ] ;
@@ -36,7 +35,7 @@ MACRO: set-firstn ( n -- )
 : nappend ( n -- seq ) narray concat ; inline
 
 : nappend-as ( n exemplar -- seq )
-    [ nappend ] dip like ; inline
+    [ narray ] [ concat-as ] bi* ; inline
 
 MACRO: nmin-length ( n -- )
     dup 1 - [ min ] n*quot
