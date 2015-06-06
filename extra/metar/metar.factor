@@ -679,8 +679,7 @@ sky-condition raw ;
     [ taf-report new ] dip [ >>raw ] keep
     string-lines [ [ blank? ] trim ] map
     rest dup first "TAF" = [ rest ] when
-    harvest unclip swap
-    [ taf-body ] [ taf-partials ] bi* ;
+    harvest unclip taf-body taf-partials ;
 
 : taf-report. ( report -- )
     [
