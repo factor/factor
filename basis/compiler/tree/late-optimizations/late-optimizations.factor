@@ -12,7 +12,7 @@ IN: compiler.tree.late-optimizations
         analyze-recursive
         normalize
         propagate
-        cleanup
+        cleanup-tree
         compute-def-use
         remove-dead-code
         but-last

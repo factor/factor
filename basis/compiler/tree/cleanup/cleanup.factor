@@ -21,12 +21,12 @@ M: node delete-node drop ;
 
 : delete-nodes ( nodes -- ) [ delete-node ] each-node ;
 
-GENERIC: cleanup* ( node -- node/nodes )
+GENERIC: cleanup-tree* ( node -- node/nodes )
 
-: cleanup ( nodes -- nodes' )
+: cleanup-tree ( nodes -- nodes' )
     #! We don't recurse into children here, instead the methods
     #! do it since the logic is a bit more involved
-    [ cleanup* ] map-flat ;
+    [ cleanup-tree* ] map-flat ;
 
 ! Constant folding
 : cleanup-folding? ( #call -- ? )
@@ -77,7 +77,7 @@ GENERIC: cleanup* ( node -- node/nodes )
     [ word>> add-depends-on-definition ] if ;
 
 : cleanup-inlining ( #call -- nodes )
-    [ record-inlining ] [ body>> cleanup ] bi ;
+    [ record-inlining ] [ body>> cleanup-tree ] bi ;
 
 ! Removing overflow checks
 : (remove-overflow-check?) ( #call -- ? )
@@ -95,9 +95,9 @@ GENERIC: cleanup* ( node -- node/nodes )
     } cond ;
 
 : remove-overflow-check ( #call -- #call )
-    [ no-overflow-variant ] change-word cleanup* ;
+    [ no-overflow-variant ] change-word cleanup-tree* ;
 
-M: #call cleanup*
+M: #call cleanup-tree*
     {
         { [ dup body>> ] [ cleanup-inlining ] }
         { [ dup cleanup-folding? ] [ cleanup-folding ] }
@@ -125,9 +125,9 @@ M: #call cleanup*
 SYMBOL: live-branches
 
 : cleanup-children ( #branch -- )
-    [ [ cleanup ] map ] change-children drop ;
+    [ [ cleanup-tree ] map ] change-children drop ;
 
-M: #branch cleanup*
+M: #branch cleanup-tree*
     {
         [ delete-unreachable-branches ]
         [ cleanup-children ]
@@ -151,7 +151,7 @@ M: #branch cleanup*
         [ drop ]
     } case ;
 
-M: #phi cleanup*
+M: #phi cleanup-tree*
     #! Remove #phi function inputs which no longer exist.
     live-branches get
     [ '[ _ sift-children ] change-phi-in-d ]
@@ -169,12 +169,12 @@ M: #phi cleanup*
     unclip >copy prefix
     unclip-last >copy suffix ;
 
-M: #recursive cleanup*
+M: #recursive cleanup-tree*
     #! Inline bodies of #recursive blocks with no calls left.
-    [ cleanup ] change-child
+    [ cleanup-tree ] change-child
     dup label>> calls>> empty? [ flatten-recursive ] when ;
 
-M: #alien-callback cleanup*
-    [ cleanup ] change-child ;
+M: #alien-callback cleanup-tree*
+    [ cleanup-tree ] change-child ;
 
-M: node cleanup* ;
+M: node cleanup-tree* ;
