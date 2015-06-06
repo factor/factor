@@ -27,33 +27,18 @@ IN: formatting.tests
 
 { "foo: 1 bar: 2" } [ { 1 2 3 } "foo: %d bar: %s" vsprintf ] unit-test
 
-os windows? [
-    [ "1.234000e+008" ] [ 123400000 "%e" sprintf ] unit-test
-    [ "-1.234000e+008" ] [ -123400000 "%e" sprintf ] unit-test
-    [ "1.234567e+008" ] [ 123456700 "%e" sprintf ] unit-test
-    [ "3.625e+008" ] [ 362525200 "%.3e" sprintf ] unit-test
-    [ "2.500000e-003" ] [ 0.0025 "%e" sprintf ] unit-test
-    [ "2.500000E-003" ] [ 0.0025 "%E" sprintf ] unit-test
-    [ "   1.0E+001" ] [ 10 "%11.1E" sprintf ] unit-test
-    [ "  -1.0E+001" ] [ -10 "%11.1E" sprintf ] unit-test
-    [ "  -1.0E+001" ] [ -10 "%+11.1E" sprintf ] unit-test
-    [ "  +1.0E+001" ] [ 10 "%+11.1E" sprintf ] unit-test
-    [ "-001.0E+001" ] [ -10 "%+011.1E" sprintf ] unit-test
-    [ "+001.0E+001" ] [ 10 "%+011.1E" sprintf ] unit-test
-] [
-    [ "1.234000e+08" ] [ 123400000 "%e" sprintf ] unit-test
-    [ "-1.234000e+08" ] [ -123400000 "%e" sprintf ] unit-test
-    [ "1.234567e+08" ] [ 123456700 "%e" sprintf ] unit-test
-    [ "3.625e+08" ] [ 362525200 "%.3e" sprintf ] unit-test
-    [ "2.500000e-03" ] [ 0.0025 "%e" sprintf ] unit-test
-    [ "2.500000E-03" ] [ 0.0025 "%E" sprintf ] unit-test
-    [ "   1.0E+01" ] [ 10 "%10.1E" sprintf ] unit-test
-    [ "  -1.0E+01" ] [ -10 "%10.1E" sprintf ] unit-test
-    [ "  -1.0E+01" ] [ -10 "%+10.1E" sprintf ] unit-test
-    [ "  +1.0E+01" ] [ 10 "%+10.1E" sprintf ] unit-test
-    [ "-001.0E+01" ] [ -10 "%+010.1E" sprintf ] unit-test
-    [ "+001.0E+01" ] [ 10 "%+010.1E" sprintf ] unit-test
-] if
+[ "1.234000e+08" ] [ 123400000 "%e" sprintf ] unit-test
+[ "-1.234000e+08" ] [ -123400000 "%e" sprintf ] unit-test
+[ "1.234567e+08" ] [ 123456700 "%e" sprintf ] unit-test
+[ "3.625e+08" ] [ 362525200 "%.3e" sprintf ] unit-test
+[ "2.500000e-03" ] [ 0.0025 "%e" sprintf ] unit-test
+[ "2.500000E-03" ] [ 0.0025 "%E" sprintf ] unit-test
+[ "   1.0E+01" ] [ 10 "%10.1E" sprintf ] unit-test
+[ "  -1.0E+01" ] [ -10 "%10.1E" sprintf ] unit-test
+[ "  -1.0E+01" ] [ -10 "%+10.1E" sprintf ] unit-test
+[ "  +1.0E+01" ] [ 10 "%+10.1E" sprintf ] unit-test
+[ "-001.0E+01" ] [ -10 "%+010.1E" sprintf ] unit-test
+[ "+001.0E+01" ] [ 10 "%+010.1E" sprintf ] unit-test
 
 [ "ff" ] [ 0xff "%x" sprintf ] unit-test
 [ "FF" ] [ 0xff "%X" sprintf ] unit-test
