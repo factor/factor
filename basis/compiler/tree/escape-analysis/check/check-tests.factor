@@ -4,7 +4,7 @@ compiler.tree.propagation compiler.tree.cleanup ;
 IN: compiler.tree.escape-analysis.check.tests
 
 : test-checker ( quot -- ? )
-    build-tree normalize propagate cleanup run-escape-analysis? ;
+    build-tree normalize propagate cleanup-tree run-escape-analysis? ;
 
 [ t ] [
     [ { complex } declare [ real>> ] [ imaginary>> ] bi ]

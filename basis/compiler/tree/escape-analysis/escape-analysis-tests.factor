@@ -34,7 +34,7 @@ M: node count-unboxed-allocations* drop ;
     analyze-recursive
     normalize
     propagate
-    cleanup
+    cleanup-tree
     escape-analysis
     dup check-nodes
     compute-def-use

@@ -479,7 +479,7 @@ cell-bits 32 = [
 
 [ ] [
     [ { null } declare [ 1 ] [ 2 ] if ]
-    build-tree normalize propagate cleanup check-nodes
+    build-tree normalize propagate cleanup-tree check-nodes
 ] unit-test
 
 [ t ] [
