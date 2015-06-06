@@ -28,7 +28,7 @@ TUPLE: bit-array
     [ [ length bits>cells ] keep ] dip swap underlying>>
     '[ [ _ _ ] dip 4 * set-alien-unsigned-4 ] each-integer ; inline
 
-: clean-up ( bit-array -- bit-array )
+: zero-end-bits ( bit-array -- bit-array )
     ! Zero bits after the end.
     dup underlying>> [ ] [
         [
@@ -83,7 +83,7 @@ M: bit-array equal?
 
 M: bit-array resize
     dupd [ bits>bytes ] [ underlying>> ] bi*
-    resize-byte-array bit-array boa clean-up ; inline
+    resize-byte-array bit-array boa zero-end-bits ; inline
 
 M: bit-array byte-length length bits>bytes ; inline
 
