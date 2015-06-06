@@ -207,7 +207,7 @@ SYMBOL: node-count
         analyze-recursive
         normalize
         propagate
-        cleanup
+        cleanup-tree
         escape-analysis
         unbox-tuples
         apply-identities
