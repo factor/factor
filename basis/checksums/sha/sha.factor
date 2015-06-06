@@ -35,7 +35,7 @@ CONSTANT: K-sha1
         20 0x5a827999 <repetition>
         20 0x6ed9eba1 <repetition>
         20 0x8f1bbcdc <repetition>
-        20 0xca62c1d6 <repetition> 
+        20 0xca62c1d6 <repetition>
         4 { } nappend-as
     ]
 
