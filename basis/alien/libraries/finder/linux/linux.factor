@@ -32,7 +32,7 @@ CONSTANT: mach-map {
     mach-map cpu of { "libc6" } or ;
 
 : name-matches? ( lib triple -- ? )
-    first swap ?head [ ?first CHAR: . = ] [ drop f ] if ;
+    first swap ?head [ ?first ".-" member? ] [ drop f ] if ;
 
 : arch-matches? ( lib triple -- ? )
     [ drop ldconfig-arch ] [ second swap subset? ] bi* ;
