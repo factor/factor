@@ -462,7 +462,6 @@ these lines in your .emacs:
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-word)
      (3 'factor-font-lock-type-name))
-    (,"\\(^\\| \\|\t\\)\\(![^\n]+\\)\n" 2 'factor-font-lock-comment)
     (,factor-typedef-regex (1 'factor-font-lock-type-name)
                            (2 'factor-font-lock-type-name)
                            (3 'factor-font-lock-invalid-syntax nil t))
@@ -881,8 +880,9 @@ With prefix, non-existing files will be created."
 (defvar factor-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?\" "\"" table)
-    (modify-syntax-entry ?# "_ 1b" table)
+    (modify-syntax-entry ?# "_" table)
     (modify-syntax-entry ?! "_" table)
+    (modify-syntax-entry ?\n ">   " table)
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?@ "_" table)
     (modify-syntax-entry ?? "_" table)
@@ -925,6 +925,12 @@ With prefix, non-existing files will be created."
       (font-lock-fontify-buffer))
     (buffer-string)))
 
+(defun factor-syntax-propertize (start end)
+  (funcall
+   (syntax-propertize-rules
+    ("\\(^\\| \\|\t\\)\\(!\\|#!\\)\\($\\| \\|\t\\)" (2 "<   ")))
+   start end))
+
 ;;;###autoload
 (define-derived-mode factor-mode prog-mode "Factor"
   "A mode for editing programs written in the Factor programming language.
@@ -941,6 +947,7 @@ With prefix, non-existing files will be created."
   ;; we need to setup multiline font-lock.
   (setq-local font-lock-multiline t)
   (add-hook 'font-lock-extend-region-functions 'factor-font-lock-extend-region)
+  (setq-local syntax-propertize-function 'factor-syntax-propertize)
 
   (define-key factor-mode-map [remap ff-get-other-file]
     'factor-visit-other-file)
