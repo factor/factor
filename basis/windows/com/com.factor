@@ -92,8 +92,9 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
 : com-add-ref ( interface -- interface )
      [ IUnknown::AddRef drop ] keep ; inline
 
+ERROR: null-com-release ;
 : com-release ( interface -- )
-    IUnknown::Release drop ; inline
+    [ IUnknown::Release drop ] [ null-com-release ] if* ; inline
 
 : with-com-interface ( interface quot -- )
     over [ com-release ] curry [ ] cleanup ; inline
