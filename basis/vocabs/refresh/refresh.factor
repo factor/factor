@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs checksums checksums.crc32
-io.encodings.utf8 io.files kernel namespaces sequences sets
-source-files vocabs vocabs.errors vocabs.loader ;
+combinators.short-circuit io.encodings.utf8 io.files kernel
+namespaces sequences sets source-files vocabs vocabs.errors
+vocabs.loader ;
 FROM: namespaces => set ;
 IN: vocabs.refresh
 
@@ -25,67 +26,55 @@ SYMBOL: changed-vocabs
     dup lookup-vocab changed-vocabs get and
     [ dup changed-vocabs get set-at ] [ drop ] if ;
 
-: unchanged-vocab ( vocab -- )
+: mark-unchanged-vocab  ( vocab-name -- )
     changed-vocabs get delete-at ;
 
-: unchanged-vocabs ( vocabs -- )
-    [ unchanged-vocab ] each ;
+: mark-unchanged-vocabs  ( vocab-names -- )
+    [ mark-unchanged-vocab ] each ;
 
-: changed-vocab? ( vocab -- ? )
+: changed-vocab-by-name? ( vocab -- ? )
     changed-vocabs get [ key? ] [ drop t ] if* ;
 
-: filter-changed ( vocabs -- vocabs' )
-    [ changed-vocab? ] filter ;
-
-SYMBOL: modified-sources
-SYMBOL: modified-docs
-
-: (to-refresh) ( vocab variable loaded? path -- )
-    dup [
+: (to-refresh) ( vocab-name loaded? path -- ? )
+    [
         swap [
-            pick changed-vocab? [
-                source-modified? [ get push ] [ 2drop ] if
-            ] [ 3drop ] if
-        ] [ drop get push ] if
-    ] [ 4drop ] if ;
+            swap changed-vocab-by-name? [
+                source-modified?
+            ] [ drop f ] if
+        ] [ 2drop t ] if
+    ] [ 2drop f ] if* ;
+
+: vocab-source-modified? ( vocab-name -- ? )
+    [ ]
+    [ lookup-vocab source-loaded?>> ]
+    [ vocab-source-path ] tri (to-refresh) ;
+
+: vocab-docs-modified? ( vocab-name -- ? )
+    [ ]
+    [ lookup-vocab docs-loaded?>> ]
+    [ vocab-docs-path ] tri (to-refresh) ;
 
 : to-refresh ( prefix -- modified-sources modified-docs unchanged )
+    child-vocabs [ ".private" tail? ] reject
     [
-        V{ } clone modified-sources set
-        V{ } clone modified-docs set
-
-        child-vocabs [ ".private" tail? ] reject [
-            [
-                [
-                    [ modified-sources ]
-                    [ lookup-vocab source-loaded?>> ]
-                    [ vocab-source-path ]
-                    tri (to-refresh)
-                ] [
-                    [ modified-docs ]
-                    [ lookup-vocab docs-loaded?>> ]
-                    [ vocab-docs-path ]
-                    tri (to-refresh)
-                ] bi
-            ] each
-
-            modified-sources get
-            modified-docs get
-        ]
-        [ modified-docs get modified-sources get append diff ] bi
-    ] with-scope ;
+        [ [ vocab-source-modified? ] filter ]
+        [ [ vocab-docs-modified? ] filter ] bi
+    ] [
+        [ 2dup append ] dip swap diff
+    ] bi ;
 
 : do-refresh ( modified-sources modified-docs unchanged -- )
-    unchanged-vocabs
+    mark-unchanged-vocabs
     [
         [ [ lookup-vocab f >>source-loaded? drop ] each ]
         [ [ lookup-vocab f >>docs-loaded? drop ] each ] bi*
     ]
     [
         union
-        [ unchanged-vocabs ]
+        [ mark-unchanged-vocabs ]
         [ require-all load-failures. ] bi
     ] 2bi ;
+
 
 : refresh ( prefix -- ) to-refresh do-refresh ;
 
