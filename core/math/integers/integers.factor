@@ -51,8 +51,10 @@ M: fixnum shift integer>fixnum fixnum-shift ; inline
 
 M: fixnum bitnot fixnum-bitnot ; inline
 
-: fixnum-bit? ( n m -- b )
-    neg shift 1 bitand zero? not ; inline
+: fixnum-bit? ( x n -- ? )
+    integer>fixnum dup 0 >= [
+        neg fixnum-shift-fast even? not
+    ] [ 2drop f ] if ; inline
 
 M: fixnum bit? fixnum-bit? ; inline
 
