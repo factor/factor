@@ -481,7 +481,7 @@ tuple
     { "bignum*" "math.private" "primitive_bignum_multiply" ( x y -- z ) }
     { "bignum+" "math.private" "primitive_bignum_add" ( x y -- z ) }
     { "bignum-" "math.private" "primitive_bignum_subtract" ( x y -- z ) }
-    { "bignum-bit?" "math.private" "primitive_bignum_bitp" ( n x -- ? ) }
+    { "bignum-bit?" "math.private" "primitive_bignum_bitp" ( x n -- ? ) }
     { "bignum-bitand" "math.private" "primitive_bignum_and" ( x y -- z ) }
     { "bignum-bitnot" "math.private" "primitive_bignum_not" ( x -- y ) }
     { "bignum-bitor" "math.private" "primitive_bignum_or" ( x y -- z ) }
