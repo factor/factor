@@ -1,18 +1,15 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: accessors arrays assocs combinators combinators.short-circuit fry
-fuel.eval help help.crossref help.markup help.topics io io.streams.string
-kernel make namespaces parser prettyprint sequences summary help.vocabs
-vocabs vocabs.loader vocabs.hierarchy vocabs.metadata vocabs.parser words see
-listener sets ;
+fuel.eval help help.crossref help.markup help.markup.private help.topics io
+io.streams.string kernel make namespaces parser prettyprint sequences summary
+help.vocabs vocabs vocabs.loader vocabs.hierarchy vocabs.metadata
+vocabs.parser words see listener sets ;
 FROM: vocabs.hierarchy => child-vocabs ;
 IN: fuel.help
 
 <PRIVATE
 
-! Prefer to use search which takes the execution context into
-! account. If that fails, fall back on a search of all words.
 : fuel-find-word ( name -- word/f )
     { [ search ] [ '[ name>> _ = ] all-words swap find nip ] } 1|| ;
 
@@ -33,14 +30,22 @@ IN: fuel.help
 : fuel-parent-topics ( word -- seq )
     help-path [ dup article-title swap 2array ] map ; inline
 
-SYMBOL: $doc-path
+SYMBOLS: $doc-path $next-link $prev-link ;
+
+: next/prev-link ( link link-symbol -- 3arr )
+    swap [ name>> ] [ [ link-long-text ] with-string-writer ] bi 3array ;
 
 : (fuel-word-element) ( word -- element )
     \ article swap dup article-title swap
     [
         {
-            [ fuel-parent-topics [ \ $doc-path prefix , ] unless-empty ]
             [ \ $vocabulary swap vocabulary>> 2array , ]
+            [
+                >link
+                [ prev-article [ \ $prev-link next/prev-link , ] when* ]
+                [ next-article [ \ $next-link next/prev-link , ] when* ] bi
+            ]
+            [ fuel-parent-topics [ \ $doc-path prefix , ] unless-empty ]
             [ word-help % ]
             [ fuel-related-words [ \ $related swap 2array , ] unless-empty ]
             [ get-global [ \ $value swap fuel-value-str 2array , ] when* ]
