@@ -27,7 +27,7 @@ SYMBOLS: latest-sources last-built-sources ;
     git-pull latest-boot-image latest-counter <sources>
     latest-sources set-global ;
 
-: build? ( -- ? )
+: should-build? ( -- ? )
     latest-sources get-global last-built-sources get-global = not ;
 
 : finish-build ( -- )
