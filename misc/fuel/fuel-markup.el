@@ -128,6 +128,7 @@
     ($markup-example . fuel-markup--markup-example)
     ($maybe . fuel-markup--maybe)
     ($methods . fuel-markup--methods)
+    ($next-link . (lambda (e) (fuel-markup--prefixed-link "Next:" e)))
     ($nl . fuel-markup--newline)
     ($notes . fuel-markup--notes)
     ($operation . fuel-markup--link)
@@ -135,6 +136,7 @@
     ($parsing-note . fuel-markup--parsing-note)
     ($predicate . fuel-markup--predicate)
     ($prettyprinting-note . fuel-markup--prettyprinting-note)
+    ($prev-link . (lambda (e) (fuel-markup--prefixed-link "Prev:" e)))
     ($quotation . fuel-markup--quotation)
     ($references . fuel-markup--references)
     ($related . fuel-markup--related)
@@ -573,6 +575,11 @@
 (defun fuel-markup--prettyprinting-note (e)
   (fuel-markup--print '($notes ("This word should only be called within the "
                                 ($link with-pprint) " combinator."))))
+
+(defun fuel-markup--prefixed-link (prefix e)
+  (insert (format "  %s " prefix))
+  (fuel-markup--link e)
+  (newline))
 
 (defun fuel-markup--elem-with-heading (elem heading)
   (fuel-markup--insert-heading heading)
