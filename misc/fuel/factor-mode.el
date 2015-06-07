@@ -232,17 +232,16 @@ these lines in your .emacs:
     "GAME:" "GENERIC#" "GENERIC:" "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HINTS:" "HOOK:"
-    "IN:" "initial:" "INSTANCE:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
-    "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
+    "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
+    "M:" "M::" "MACRO:" "MACRO::" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
     "POSTPONE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
-    "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
-    "TYPEDEF:" "TYPED:" "TYPED::"
-    "UNIFORM-TUPLE:" "USE:"
+    "TYPED:" "TYPED::"
+    "UNIFORM-TUPLE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
 (defconst factor-parsing-words-regex
@@ -273,7 +272,7 @@ these lines in your .emacs:
   (regexp-opt factor-declaration-words 'symbols))
 
 (defsubst factor-second-word-regex (prefixes)
-  (format "%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
+  (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst factor-method-definition-regex
   "^M::? +\\([^ ]+\\) +\\([^ ]+\\)")
@@ -305,27 +304,28 @@ these lines in your .emacs:
 (defconst factor-word-definition-regex
   (format "\\_<\\(%s\\)?[:#] +\\(%s\\)"
           (regexp-opt
-           '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MAIN" "MATH" "POSTPONE"
-             "SYNTAX" "TYPED" "TYPED:" "RENAME"))
+           '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "POSTPONE"
+             "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:" "RENAME"))
           "\\(\\sw\\|\\s_\\|\\s(\\|\\s)\\)+"))
 
 (defconst factor-alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
 
-;; Vocabulary patterns
+;; [parsing-word] [vocab-word]
 (defconst factor-vocab-ref-regex
   (factor-second-word-regex
    '("IN:" "USE:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
 (defconst factor-using-lines-regex "^\\(USING:\\)[ \n]+\\([^;\t]*\\);")
 
-;; Symbols
+;; [parsing-word] [symbol-word]
 (defconst factor-symbol-definition-regex
   (factor-second-word-regex
    '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "HELP:" "LIBRARY:"
-     "STRING:" "SYMBOL:" "VAR:")))
+     "MAIN:" "STRING:" "SYMBOL:" "VAR:")))
 
-(defconst factor-symbols-lines-regex "^\\(SYMBOLS\\):[ \n]+\\([^;\t]*\\);")
+;; [parsing-word] [symbol-word]* ;
+(defconst factor-symbols-lines-regex "^\\(SYMBOLS:\\)[ \n]+\\([^;\t]*\\);")
 
 (defconst factor-int-constant-def-regex
   (factor-second-word-regex '("ALIEN:" "CHAR:" "NAN:")))
@@ -432,7 +432,7 @@ these lines in your .emacs:
   "\\_<\\(C:\\)[ \n]+\\([^ ]+\\)[ \n]+\\([^ ]+\\)")
 
 (defconst factor-typedef-regex
-  (format "\\_<TYPEDEF: +%s +%s\\( .*\\)?$" symbol symbol))
+  (format "\\_<\\(TYPEDEF:\\|INSTANCE:\\) +%s +%s\\( .*\\)?$" symbol symbol))
 
 (defconst factor-c-global-regex
   (format "\\_<C-GLOBAL: +%s +%s\\( .*\\)?$" symbol symbol))
@@ -448,8 +448,8 @@ these lines in your .emacs:
 
 (defconst factor-font-lock-keywords
   `((,factor-brace-words-regex 1 'factor-font-lock-parsing-word)
-    (,factor-vocab-ref-regex 2 'factor-font-lock-vocabulary-name)
-
+    (,factor-vocab-ref-regex (1 'factor-font-lock-parsing-word)
+                             (2 'factor-font-lock-vocabulary-name))
     (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
                                (2 'factor-font-lock-vocabulary-name))
     (,factor-symbols-lines-regex (1 'factor-font-lock-parsing-word)
@@ -462,9 +462,11 @@ these lines in your .emacs:
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-word)
      (3 'factor-font-lock-type-name))
-    (,factor-typedef-regex (1 'factor-font-lock-type-name)
+    (,factor-symbol-definition-regex (1 'factor-font-lock-parsing-word)
+                                     (2 'factor-font-lock-word))
+    (,factor-typedef-regex (1 'factor-font-lock-parsing-word)
                            (2 'factor-font-lock-type-name)
-                           (3 'factor-font-lock-invalid-syntax nil t))
+                           (3 'factor-font-lock-type-name))
     (,factor-c-global-regex (1 'factor-font-lock-type-name)
                             (2 'factor-font-lock-word)
                             (3 'factor-font-lock-invalid-syntax nil t))
@@ -549,8 +551,6 @@ these lines in your .emacs:
     (,factor-constructor-regex . 'factor-font-lock-constructor)
     (,factor-setter-regex . 'factor-font-lock-setter-word)
     (,factor-getter-regex . 'factor-font-lock-getter-word)
-    (,factor-symbol-definition-regex (1 'factor-font-lock-parsing-word)
-                                     (2 'factor-font-lock-word))
     (,factor-bad-string-regex . 'factor-font-lock-invalid-syntax)
     ("\\_<\\(P\\|SBUF\\|DLL\\)\"" 1 'factor-font-lock-parsing-word)
     (,factor-constant-words-regex . 'factor-font-lock-constant)
