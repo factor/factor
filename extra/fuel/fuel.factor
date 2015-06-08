@@ -83,7 +83,7 @@ PRIVATE>
     article-location fuel-eval-set-result ;
 
 : fuel-get-vocabs ( -- )
-    all-vocab-names fuel-eval-set-result ;
+    all-disk-vocab-names fuel-eval-set-result ;
 
 : fuel-get-vocabs/prefix ( prefix -- )
     get-vocabs/prefix fuel-eval-set-result ;

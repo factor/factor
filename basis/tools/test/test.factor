@@ -166,9 +166,9 @@ M: test-failure error. ( error -- )
 
 : :test-failures ( -- ) test-failures get errors. ;
 
-: test ( prefix -- ) child-vocabs test-vocabs ;
+: test ( prefix -- ) loaded-child-vocab-names test-vocabs ;
 
-: test-all ( -- ) vocabs filter-don't-test test-vocabs ;
+: test-all ( -- ) loaded-vocab-names filter-don't-test test-vocabs ;
 
 : test-main ( -- )
     command-line get [ [ load ] [ test ] bi ] each ;

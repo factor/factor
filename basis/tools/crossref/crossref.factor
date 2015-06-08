@@ -115,7 +115,7 @@ M: f smart-usage drop \ f smart-usage ;
     [ "No usages." print ] [ sorted-definitions. ] if-empty ;
 
 : vocab-xref ( vocab quot: ( defspec -- seq ) -- vocabs )
-    [ [ vocab-name ] [ words [ generic? ] reject ] bi ] dip map
+    [ [ vocab-name ] [ vocab-words [ generic? ] reject ] bi ] dip map
     [
         [ [ word? ] [ generic? not ] bi and ] filter [
             dup method?

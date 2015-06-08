@@ -25,7 +25,7 @@ gl-error-log [ V{ } clone ] initialize
     name>> { [ "glGetError" = not ] [ "gl" head? ] [ third LETTER? ] } 1&& ;
 
 : gl-functions ( -- words )
-    "opengl.gl" lookup-vocab words [ gl-function? ] filter ;
+    "opengl.gl" lookup-vocab vocab-words [ gl-function? ] filter ;
 
 : annotate-gl-functions ( quot -- )
     [

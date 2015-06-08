@@ -16,7 +16,7 @@ SYMBOL: bootstrap-time
             P" resource:core/io/encodings/utf16/utf16.factor" 
             P" resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
             "io.encodings.utf16" 
-            "io.encodings.utf16n" [ child-vocabs [ forget-vocab ] each ] bi@
+            "io.encodings.utf16n" [ loaded-child-vocab-names [ forget-vocab ] each ] bi@
         ] with-compilation-unit
     ] when ;
 

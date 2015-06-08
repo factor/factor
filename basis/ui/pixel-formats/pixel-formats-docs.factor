@@ -6,7 +6,7 @@ IN: ui.pixel-formats
 <<
     "ui.gadgets.worlds" create-vocab drop
     "world" "ui.gadgets.worlds" create drop
-    "ui.gadgets.worlds" vocab-words use-words
+    "ui.gadgets.worlds" vocab-words-assoc use-words
 >>
 
 ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"

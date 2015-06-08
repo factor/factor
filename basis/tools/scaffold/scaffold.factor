@@ -28,7 +28,7 @@ ERROR: vocab-name-contains-dot path ;
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
 : ensure-vocab-exists ( string -- string )
-    dup vocabs member? [ no-vocab ] unless ;
+    dup loaded-vocab-names member? [ no-vocab ] unless ;
 
 : check-vocab-name ( string -- string )
     [ ]
@@ -215,7 +215,7 @@ M: object add-using ( object -- )
     [ docs-header. ] [ docs-body. ] bi ;
 
 : interesting-words ( vocab -- array )
-    words
+    vocab-words
     [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
     natural-sort ;
 

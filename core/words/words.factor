@@ -67,7 +67,7 @@ PREDICATE: primitive < word "primitive" word-prop ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;
 
-: lookup-word ( name vocab -- word ) vocab-words at ;
+: lookup-word ( name vocab -- word ) vocab-words-assoc at ;
 
 : target-word ( word -- target )
     [ name>> ] [ vocabulary>> ] bi lookup-word ;
@@ -200,7 +200,7 @@ M: word reset-word
     [ gensym dup ] 2dip define-declared ;
 
 : reveal ( word -- )
-    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words
+    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words-assoc
     [ ] [ no-vocab ] ?if
     set-at ;
 
@@ -242,7 +242,7 @@ M: word set-where swap "loc" set-word-prop ;
 M: word forget*
     dup "forgotten" word-prop [ drop ] [
         [ subwords forget-all ]
-        [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
+        [ [ name>> ] [ vocabulary>> vocab-words-assoc ] bi delete-at ]
         [ t "forgotten" set-word-prop ]
         tri
     ] if ;

@@ -245,7 +245,7 @@ IN: tools.deploy.shaker
 
 : compiler-classes ( -- seq )
     { "compiler" "stack-checker" }
-    [ child-vocabs [ words ] map concat [ class? ] filter ]
+    [ loaded-child-vocab-names [ vocab-words ] map concat [ class? ] filter ]
     map concat unique ;
 
 : prune-decision-tree ( tree classes -- )
@@ -304,7 +304,7 @@ IN: tools.deploy.shaker
     ] when ;
 
 : vocab-tree-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat
+    [ loaded-child-vocab-names [ vocab-words ] map concat ] map concat
     swap [ first2 lookup-word ] map sift diff ;
 
 : stripped-globals ( -- seq )
@@ -552,7 +552,7 @@ SYMBOL: deploy-vocab
 
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
-    vocabs "VOCABS:" prefix
+    loaded-vocab-names "VOCABS:" prefix
     deploy-libraries get [ lookup-library path>> ] map members
     "LIBRARIES:" prefix append
     swap utf8 set-file-lines ;

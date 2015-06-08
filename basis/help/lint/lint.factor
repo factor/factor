@@ -4,8 +4,6 @@ USING: assocs combinators continuations fry help
 help.lint.checks help.topics io kernel namespaces parser
 sequences source-files.errors vocabs.hierarchy vocabs words
 classes locals tools.errors listener ;
-FROM: help.lint.checks => all-vocabs ;
-FROM: vocabs => child-vocabs ;
 IN: help.lint
 
 SYMBOL: lint-failures
@@ -73,7 +71,7 @@ PRIVATE>
 : check-vocab ( vocab -- )
     "Checking " write dup write "..." print flush
     [ check-about ]
-    [ words [ check-word ] each ]
+    [ vocab-words [ check-word ] each ]
     [ vocab-articles get at [ check-article ] each ]
     tri ;
 
@@ -82,9 +80,9 @@ PRIVATE>
 : help-lint ( prefix -- )
     [
         auto-use? off
-        all-vocab-names all-vocabs set
+        all-disk-vocab-names all-vocabs-list set
         group-articles vocab-articles set
-        child-vocabs
+        loaded-child-vocab-names
         [ check-vocab ] each
     ] with-scope ;
 
@@ -93,7 +91,7 @@ PRIVATE>
 : :lint-failures ( -- ) lint-failures get values errors. ;
 
 : unlinked-words ( vocab -- seq )
-    words all-word-help [ article-parent ] reject ;
+    vocab-words all-word-help [ article-parent ] reject ;
 
 : linked-undocumented-words ( -- seq )
     all-words

@@ -55,7 +55,7 @@ SYMBOL: changed-vocabs
     [ vocab-docs-path ] tri (to-refresh) ;
 
 : to-refresh ( prefix -- modified-sources modified-docs unchanged )
-    child-vocabs [ ".private" tail? ] reject
+    loaded-child-vocab-names [ ".private" tail? ] reject
     [
         [ [ vocab-source-modified? ] filter ]
         [ [ vocab-docs-modified? ] filter ] bi

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax strings words compiler.units
-vocabs.loader ;
+vocabs.loader assocs ;
 IN: vocabs
 
 ARTICLE: "vocabularies" "Vocabularies"
@@ -28,13 +28,13 @@ $nl
 "Looking up existing vocabularies and creating new vocabularies:"
 { $subsections
     lookup-vocab
-    child-vocabs
+    loaded-child-vocab-names
     create-vocab
 }
 "Getting words from a vocabulary:"
 { $subsections
+    vocab-words-assoc
     vocab-words
-    words
     all-words
     words-named
 }
@@ -47,7 +47,7 @@ ABOUT: "vocabularies"
 HELP: dictionary
 { $var-description "Holds a hashtable mapping vocabulary names to vocabularies." } ;
 
-HELP: vocabs
+HELP: loaded-vocab-names
 { $values { "seq" "a sequence of strings" } }
 { $description "Outputs a sequence of all defined vocabulary names." } ;
 
@@ -62,12 +62,12 @@ HELP: vocab-name
 { $values { "vocab-spec" "a vocabulary specifier" } { "name" string } }
 { $description "Outputs the name of a vocabulary." } ;
 
-HELP: vocab-words
-{ $values { "vocab-spec" "a vocabulary specifier" } { "words" "an assoc mapping strings to words" } }
+HELP: vocab-words-assoc
+{ $values { "vocab-spec" "a vocabulary specifier" } { "assoc/f" { $maybe assoc } } }
 { $description "Outputs the words defined in a vocabulary." } ;
 
-HELP: words
-{ $values { "vocab" string } { "seq" "a sequence of words" } }
+HELP: vocab-words
+{ $values { "vocab-spec" vocab-spec } { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of words defined in the vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
 
 HELP: all-words
@@ -95,12 +95,12 @@ HELP: create-vocab
 { $values { "name" string } { "vocab" vocab } }
 { $description "Creates a new vocabulary if one does not exist with the given name, otherwise outputs an existing vocabulary." } ;
 
-HELP: child-vocabs
-{ $values { "vocab" "a vocabulary specifier" } { "seq" "a sequence of strings" } }
+HELP: loaded-child-vocab-names
+{ $values { "vocab-spec" "a vocabulary specifier" } { "seq" "a sequence of strings" } }
 { $description "Outputs all vocabularies which are conceptually under " { $snippet "vocab" } " in the hierarchy." }
 { $examples
     { $unchecked-example
-        "\"io.streams\" child-vocabs ."
+        "\"io.streams\" loaded-child-vocab-names ."
         "{ \"io.streams.c\" \"io.streams.duplex\" \"io.streams.lines\" \"io.streams.nested\" \"io.streams.plain\" \"io.streams.string\" }"
     }
 } ;

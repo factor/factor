@@ -29,7 +29,7 @@ M: readline-reader prompt.
     all-words [ name>> ] map! prefixed ;
 
 : prefixed-vocabs ( prefix -- vocabs )
-    all-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
+    disk-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
 
 : prefixed-colors ( prefix -- colors )
     named-colors prefixed ;
