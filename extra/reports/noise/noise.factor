@@ -140,7 +140,7 @@ M: lambda-word word-noise-factor
     ] if-empty ;
 
 : noisy-vocabs ( -- alist )
-    vocabs [ dup vocab-noise-factor ] { } map>assoc
+    loaded-vocab-names [ dup vocab-noise-factor ] { } map>assoc
     sort-values reverse ;
 
 : noise-report ( -- )
