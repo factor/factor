@@ -232,7 +232,7 @@ HELP: parse-definition
 $parsing-note ;
 
 HELP: bootstrap-syntax
-{ $var-description "Only set during bootstrap. Stores a copy of the " { $link vocab-words } " of the host's syntax vocabulary; this allows the host's parsing words to be used during bootstrap source parsing, not the target's." } ;
+{ $var-description "Only set during bootstrap. Stores a copy of the " { $link vocab-words-assoc } " of the host's syntax vocabulary; this allows the host's parsing words to be used during bootstrap source parsing, not the target's." } ;
 
 HELP: with-file-vocabs
 { $values { "quot" quotation } }
