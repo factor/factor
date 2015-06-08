@@ -11,7 +11,7 @@ IN: compiler.cfg.hats
 <PRIVATE
 
 : hat-name ( insn -- word )
-    name>> "##" ?head drop "^^" prepend create-in ;
+    name>> "##" ?head drop "^^" prepend create-word-in ;
 
 : hat-quot ( insn -- quot )
     [

@@ -64,7 +64,7 @@ IN: cocoa.subclassing
 
 :: define-objc-class ( name superclass protocols methods -- )
     methods prepare-methods :> methods
-    name "cocoa.classes" create drop
+    name "cocoa.classes" create-word drop
     methods name redefine-objc-methods
     name [ methods protocols superclass name (define-objc-class) ] import-objc-class ;
 

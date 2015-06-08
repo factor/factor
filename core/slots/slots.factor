@@ -39,7 +39,7 @@ M: object reader-quot
     ] [ ] make ;
 
 : reader-word ( name -- word )
-    ">>" append "accessors" create
+    ">>" append "accessors" create-word
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
@@ -60,7 +60,7 @@ M: object reader-quot
     ] 2bi ;
 
 : writer-word ( name -- word )
-    "<<" append "accessors" create
+    "<<" append "accessors" create-word
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -107,7 +107,7 @@ M: object writer-quot
     ] 2bi ;
 
 : setter-word ( name -- word )
-    ">>" prepend "accessors" create ;
+    ">>" prepend "accessors" create-word ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
@@ -116,7 +116,7 @@ M: object writer-quot
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
-    "change-" prepend "accessors" create ;
+    "change-" prepend "accessors" create-word ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [

@@ -9,7 +9,7 @@ IN: match
 SYMBOL: _
 
 : define-match-var ( name -- )
-    create-in
+    create-word-in
     dup t "match-var" set-word-prop
     dup [ get ] curry ( -- value ) define-declared ;
 

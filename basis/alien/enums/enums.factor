@@ -39,7 +39,7 @@ M: enum-c-type c-type-setter
     [ first define-singleton-class ] each ;
 
 : define-enum-constructor ( word -- )
-    [ name>> "<" ">" surround create-in ] keep
+    [ name>> "<" ">" surround create-word-in ] keep
     [ number>enum ] curry ( number -- enum ) define-inline ;
 
 PRIVATE>

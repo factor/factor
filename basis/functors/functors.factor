@@ -129,11 +129,11 @@ PRIVATE>
 
 SYNTAX: IS [ parse-word ] (INTERPOLATE) ;
 
-SYNTAX: DEFERS [ current-vocab create ] (INTERPOLATE) ;
+SYNTAX: DEFERS [ current-vocab create-word ] (INTERPOLATE) ;
 
-SYNTAX: DEFINES [ create-in ] (INTERPOLATE) ;
+SYNTAX: DEFINES [ create-word-in ] (INTERPOLATE) ;
 
-SYNTAX: DEFINES-PRIVATE [ begin-private create-in end-private ] (INTERPOLATE) ;
+SYNTAX: DEFINES-PRIVATE [ begin-private create-word-in end-private ] (INTERPOLATE) ;
 
 SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
 

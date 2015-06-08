@@ -246,7 +246,7 @@ ERROR: no-objc-type name ;
 : define-objc-class-word ( quot name -- )
     [ class-init-hooks get set-at ]
     [
-        [ "cocoa.classes" create ] [ '[ _ objc-class ] ] bi
+        [ "cocoa.classes" create-word ] [ '[ _ objc-class ] ] bi
         ( -- class ) define-declared
     ] bi ;
 

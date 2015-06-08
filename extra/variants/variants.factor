@@ -14,7 +14,7 @@ M: variant-class initial-value*
 
 : define-tuple-class-and-boa-word ( class superclass slots -- )
     pick [ define-tuple-class ] dip
-    dup name>> "<" ">" surround create-in swap define-boa-word ;
+    dup name>> "<" ">" surround create-word-in swap define-boa-word ;
 
 : define-variant-member ( member -- class )
     dup array? [ first3 pick [ define-tuple-class-and-boa-word ] dip ] [ dup define-singleton-class ] if ;

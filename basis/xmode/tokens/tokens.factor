@@ -13,7 +13,7 @@ SYMBOL: tokens
     "KEYWORD4" "LABEL" "LITERAL1" "LITERAL2" "LITERAL3"
     "LITERAL4" "MARKUP" "OPERATOR" "END" "NULL"
 } [
-    dup create-in dup define-symbol
+    dup create-word-in dup define-symbol
 ] H{ } map>assoc tokens set-global
 >>
 

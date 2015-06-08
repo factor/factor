@@ -5,7 +5,7 @@ IN: ui.pixel-formats
 ! break circular dependency
 <<
     "ui.gadgets.worlds" create-vocab drop
-    "world" "ui.gadgets.worlds" create drop
+    "world" "ui.gadgets.worlds" create-word drop
     "ui.gadgets.worlds" vocab-words-assoc use-words
 >>
 

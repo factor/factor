@@ -9,8 +9,8 @@ $nl
 $nl
 "Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "word-search" } ")."
 { $subsections
-    create
-    create-in
+    create-word
+    create-word-in
     lookup-word
 } ;
 
@@ -246,13 +246,13 @@ $low-level-note
 
 HELP: <word>
 { $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Allocates a word with the specified name and vocabulary. User code should call " { $link <uninterned-word> } " to create uninterned words and " { $link create } " to create interned words, instead of calling this constructor directly." }
+{ $description "Allocates a word with the specified name and vocabulary. User code should call " { $link <uninterned-word> } " to create uninterned words and " { $link create-word } " to create interned words, instead of calling this constructor directly." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: <uninterned-word>
 { $values { "name" string } { "word" word } }
 { $description "Creates an uninterned word with the specified name,  that is not equal to any other word in the system." }
-{ $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
+{ $notes "Unlike " { $link create-word } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: gensym
 { $values { "word" word } }
@@ -262,7 +262,7 @@ HELP: gensym
     "( gensym )"
     }
 }
-{ $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
+{ $notes "Unlike " { $link create-word } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: bootstrapping?
 { $var-description "Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
@@ -286,17 +286,17 @@ HELP: lookup-word
 
 HELP: reveal
 { $values { "word" word } }
-{ $description "Adds a newly-created word to the dictionary. Usually this word does not need to be called directly, and is only called as part of " { $link create } "." } ;
+{ $description "Adds a newly-created word to the dictionary. Usually this word does not need to be called directly, and is only called as part of " { $link create-word } "." } ;
 
 HELP: check-create
 { $values { "name" string } { "vocab" string } }
 { $description "Throws a " { $link check-create } " error if " { $snippet "name" } " or " { $snippet "vocab" } " is not a string." }
-{ $error-description "Thrown if " { $link create } " is called with invalid parameters." } ;
+{ $error-description "Thrown if " { $link create-word } " is called with invalid parameters." } ;
 
-HELP: create
+HELP: create-word
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." }
-{ $notes "This word must be called from inside " { $link with-compilation-unit } ". Parsing words should call " { $link create-in } " instead of this word." } ;
+{ $notes "This word must be called from inside " { $link with-compilation-unit } ". Parsing words should call " { $link create-word-in } " instead of this word." } ;
 
 HELP: constructor-word
 { $values { "name" string } { "vocab" string } { "word" word } }

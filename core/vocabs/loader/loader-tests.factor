@@ -84,7 +84,7 @@ IN: vocabs.loader.tests
 
 [ ] [
     [
-        "bob" "vocabs.loader.test.b" create [ ] define
+        "bob" "vocabs.loader.test.b" create-word [ ] define
     ] with-compilation-unit
 ] unit-test
 

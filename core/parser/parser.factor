@@ -17,8 +17,8 @@ IN: parser
 
 M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
-: create-in ( str -- word )
-    current-vocab create dup set-last-word dup save-location ;
+: create-word-in ( str -- word )
+    current-vocab create-word dup set-last-word dup save-location ;
 
 SYMBOL: auto-use?
 
@@ -29,7 +29,7 @@ SYMBOL: auto-use?
         dup vocabulary>>
         [ auto-use-vocab ]
         [ "Added \"" "\" vocabulary to search path" surround note. ] bi
-    ] [ create-in ] if ;
+    ] [ create-word-in ] if ;
 
 : ignore-forwards ( seq -- seq' )
     [ forward-reference? ] reject ;
@@ -81,7 +81,7 @@ ERROR: invalid-word-name string ;
     [ invalid-word-name ] when ;
 
 : scan-new ( -- word )
-    scan-word-name create-in ;
+    scan-word-name create-word-in ;
 
 : scan-new-word ( -- word )
     scan-new dup reset-generic ;

@@ -53,11 +53,11 @@ ERROR: no-com-interface interface ;
     V{ } clone [ (parse-com-functions) ] keep >array ;
 
 : (iid-word) ( definition -- word )
-    word>> name>> "-iid" append create-in ;
+    word>> name>> "-iid" append create-word-in ;
 
 : (function-word) ( function interface -- word )
     swap [ word>> name>> "::" ] [ name>> ] bi*
-    3append create-in ;
+    3append create-word-in ;
 
 : family-tree ( definition -- definitions )
     dup parent>> [ family-tree ] [ { } ] if*

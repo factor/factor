@@ -123,7 +123,7 @@ HELP: save-location
 HELP: bad-number
 { $error-description "Indicates the parser encountered an invalid numeric literal." } ;
 
-HELP: create-in
+HELP: create-word-in
 { $values { "str" "a word name" } { "word" "a new word" } }
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;

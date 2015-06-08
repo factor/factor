@@ -127,7 +127,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "SYMBOLS:" [
-        ";" [ create-in [ reset-generic ] [ define-symbol ] bi ] each-token
+        ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
     ] define-core-syntax
 
     "SINGLETONS:" [
@@ -135,7 +135,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "DEFER:" [
-        scan-token current-vocab create
+        scan-token current-vocab create-word
         [ fake-definition ] [ set-last-word ] [ undefined-def define ] tri
     ] define-core-syntax
 

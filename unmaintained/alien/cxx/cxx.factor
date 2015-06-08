@@ -12,7 +12,7 @@ IN: alien.cxx
     create-class-in [ define-mixin-class ] keep ;
 
 : class-tuple-word ( word -- word' )
-    "#" append create-in ;
+    "#" append create-word-in ;
 
 : define-class-tuple ( word mixin -- )
     [ drop class-wrapper { } define-tuple-class ]

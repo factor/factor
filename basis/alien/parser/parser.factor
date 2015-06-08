@@ -41,7 +41,7 @@ ERROR: bad-array-type ;
         { [ dup "{" = ] [ drop \ } parse-until >array ] }
         { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
         [ parse-c-type ]
-    } cond ; 
+    } cond ;
 
 : reset-c-type ( word -- )
     dup "struct-size" word-prop
@@ -59,7 +59,7 @@ ERROR: *-in-c-type-name name ;
     [ *-in-c-type-name ] when ;
 
 : (CREATE-C-TYPE) ( word -- word )
-    validate-c-type-name current-vocab create {
+    validate-c-type-name current-vocab create-word {
         [ fake-definition ]
         [ set-last-word ]
         [ reset-c-type ]
@@ -133,7 +133,7 @@ PRIVATE>
     [ { } ] [ return-type-name 1array ] if-void <effect> ;
 
 : create-function ( name -- word )
-    create-in dup reset-generic ;
+    create-word-in dup reset-generic ;
 
 :: (make-function) ( return function library types names -- quot effect )
     return library function types function-quot
@@ -150,7 +150,7 @@ PRIVATE>
     '[ [ _ _ _ ] dip alien-callback ] ;
 
 :: make-callback-type ( lib return type-name types names -- word quot effect )
-    type-name current-vocab create :> type-word 
+    type-name current-vocab create-word :> type-word
     type-word [ reset-generic ] [ reset-c-type ] bi
     void* type-word typedef
     type-word names return function-effect "callback-effect" set-word-prop
@@ -185,7 +185,7 @@ PREDICATE: alien-callback-type-word < typedef-word
     [ nip ] [ global-quot ] 2bi ( -- value ) define-declared ;
 
 : define-global-setter ( type word -- )
-    [ nip name>> "set-" prepend create-in ]
+    [ nip name>> "set-" prepend create-word-in ]
     [ set-global-quot ] 2bi ( obj -- ) define-declared ;
 
 : define-global ( type word -- )

@@ -203,7 +203,6 @@ DEFER: foo
 [ f ] [
     "IN: parser.tests : x ( -- ) ;"
     <string-reader> "a" parse-stream drop
-    
     "y" "parser.tests" lookup-word
 ] unit-test
 
@@ -551,7 +550,7 @@ EXCLUDE: qualified.tests.bar => x ;
 [ t ] [ "was-once-a-word-bug" "parser.tests" lookup-word >boolean ] unit-test
 
 [ [ ] ] [
-    "IN: parser.tests USE: words << \"was-once-a-word-bug\" \"parser.tests\" create [ ] ( -- ) define-declared >>"
+    "IN: parser.tests USE: words << \"was-once-a-word-bug\" \"parser.tests\" create-word [ ] ( -- ) define-declared >>"
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
 
@@ -630,7 +629,7 @@ EXCLUDE: qualified.tests.bar => x ;
     [ "vocabs.loader.test.l" use-vocab ] must-fail
     [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
     [ ] [ "vocabs.loader.test.l" unuse-vocab ] unit-test
-    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test    
+    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
 ] with-file-vocabs
 
 ! Test cases for #183
