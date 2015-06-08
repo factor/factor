@@ -641,3 +641,9 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [ "GENERIC: 33 ( -- )" <string-reader> "generic identifier test" parse-stream ]
 [ error>> lexer-error? ] must-fail-with
+
+{ t } [
+    t auto-use? [
+        { private? } use-first-word?
+    ] with-variable
+] unit-test
