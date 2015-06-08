@@ -27,13 +27,13 @@ ERROR: invalid-local-name name ;
     [ [ make-local ] map ] H{ } make ;
 
 : parse-local-defs ( -- words assoc )
-    [ "|" [ make-local ] map-tokens ] H{ } make ;
+    "|" parse-tokens make-locals ;
 
 SINGLETON: lambda-parser
 
 SYMBOL: locals
 
-: ((parse-lambda)) ( assoc quot -- quot' )
+: ((parse-lambda)) ( assoc reader-quot -- quot )
     '[
         in-lambda? on
         lambda-parser quotation-parser set
@@ -51,14 +51,13 @@ SYMBOL: locals
     ?rewrite-closures ;
 
 : parse-multi-def ( locals -- multi-def )
-    [ [ ")" [ make-local ] map-tokens ] H{ } make ] dip
-    swap assoc-union! drop <multi-def> ;
+    ")" parse-tokens make-locals swapd assoc-union! drop <multi-def> ;
+
+: parse-single-def ( name locals -- def )
+    swap [ make-local ] H{ } make swapd assoc-union! drop <def> ;
 
 : parse-def ( name/paren locals -- def )
-    over "(" =
-    [ nip parse-multi-def ]
-    [ [ [ make-local ] H{ } make ] dip swap assoc-union! drop <def> ]
-    if ;
+    over "(" = [ nip parse-multi-def ] [ parse-single-def ] if ;
 
 M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
@@ -77,13 +76,13 @@ M: lambda-parser parse-quotation ( -- quotation )
     dup
     in>> [ dup pair? [ first ] when ] map make-locals ;
 
-: (parse-locals-definition) ( effect vars assoc reader -- word quot effect )
+: (parse-locals-definition) ( effect vars assoc reader-quot -- word quot effect )
     ((parse-lambda)) <lambda>
     [ nip "lambda" set-word-prop ]
     [ nip rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ]
     [ drop nip ] 3tri ; inline
 
-: parse-locals-definition ( word reader -- word quot effect )
+: parse-locals-definition ( word reader-quot -- word quot effect )
     [ parse-locals ] dip (parse-locals-definition) ; inline
 
 : parse-locals-method-definition ( word reader -- word quot effect )
