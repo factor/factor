@@ -22,7 +22,7 @@ IN: graphviz.notation
 : =attr-generic ( name -- generic )
     "=" prepend "graphviz.notation" 2dup lookup-word
     [ 2nip ] [
-        create dup
+        create-word dup
         1 <standard-combination>
         ( graphviz-obj val -- graphviz-obj' )
         define-generic
