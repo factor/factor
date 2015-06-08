@@ -174,8 +174,8 @@ def configure(ctx):
                 env.LINKFLAGS += ['/safeseh:no']
         elif cxx == 'g++':
             env.LINKFLAGS += ['-static-libgcc', '-static-libstdc++', '-s']
-            env.CXXFLAGS += ['-O2', '-fomit-frame-pointer']
-        ctx.define('_CRT_SECURE_NO_WARNINGS', None)
+            env.CXXFLAGS += ['-O2', '-fomit-frame-pointer', '-std=c++11']
+            ctx.define('_CRT_SECURE_NO_WARNINGS', None)
         # WIX checks
         ctx.find_program('candle')
         ctx.find_program('heat')
@@ -191,7 +191,7 @@ def configure(ctx):
         )
         env.append_unique('CXXFLAGS', [
             '-O3', '-fomit-frame-pointer',
-            '-Werror', '-Wall'
+            '-Werror', '-Wall', '-std=c++11'
         ])
         for lst in ('CFLAGS', 'CXXFLAGS', 'LINKFLAGS'):
             env[lst] += ['-m%d' % bits]
