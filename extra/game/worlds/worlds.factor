@@ -79,7 +79,7 @@ M: game-world apply-world-attributes
     f swap open-window* dup promise>> ?promise drop ;
 
 : define-attributes-word ( word tuple -- )
-    [ name>> "-attributes" append create-in ] dip define-constant ;
+    [ name>> "-attributes" append create-word-in ] dip define-constant ;
 
 SYNTAX: GAME:
     scan-new-word

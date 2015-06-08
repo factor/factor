@@ -210,7 +210,7 @@ ERROR: bad-create name vocab ;
     2dup [ string? ] [ [ string? ] [ vocab? ] bi or ] bi* and
     [ bad-create ] unless ;
 
-: create ( name vocab -- word )
+: create-word ( name vocab -- word )
     check-create 2dup lookup-word
     [ 2nip ] [
         vocab-name <word>
@@ -219,7 +219,7 @@ ERROR: bad-create name vocab ;
     ] if* ;
 
 : constructor-word ( name vocab -- word )
-    [ "<" ">" surround ] dip create ;
+    [ "<" ">" surround ] dip create-word ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 

@@ -207,7 +207,7 @@ C: <relation-definition> relation-definition
     ] if ;
 
 : (define-relation-word) ( id-word name>> definition -- id-word )
-    >r create-in over [ execute ] curry r> compose define ;
+    >r create-word-in over [ execute ] curry r> compose define ;
 
 : define-relation-word ( relation-definition id-word given-word-name word-type definition -- relation-definition id-word )
     >r >r [
@@ -229,7 +229,7 @@ C: <relation-definition> relation-definition
     [ ensure-context ensure-relation ] 2curry define ;
 
 : create-id-word ( relation-definition -- id-word )
-    dup id-word>> "id-word" choose-word-name create-in ;
+    dup id-word>> "id-word" choose-word-name create-word-in ;
 
 PRIVATE>
 

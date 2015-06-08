@@ -1377,7 +1377,7 @@ SYMBOL: last-opcode
     #! that would implement that instruction.
     dup " " join instruction-quotations
     [
-       "_" join [ "emulate-" % % ] "" make create-in
+       "_" join [ "emulate-" % % ] "" make create-word-in
        dup last-instruction set-global
     ] dip ( cpu -- ) define-declared ;
 

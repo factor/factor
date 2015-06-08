@@ -96,7 +96,7 @@ IN: bootstrap.syntax
         "<<<<<<<"
         "======="
         ">>>>>>>"
-    } [ "syntax" create drop ] each
+    } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
 ] with-compilation-unit

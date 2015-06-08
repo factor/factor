@@ -73,7 +73,7 @@ PRIVATE>
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 : create-predicate-word ( word -- predicate )
-    [ name>> "?" append ] [ vocabulary>> ] bi create
+    [ name>> "?" append ] [ vocabulary>> ] bi create-word
     dup predicate? [ dup reset-generic ] unless ;
 
 GENERIC: class-of ( object -- class )

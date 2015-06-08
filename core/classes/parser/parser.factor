@@ -7,7 +7,7 @@ IN: classes.parser
     location remember-class ;
 
 : create-class-in ( string -- word )
-    current-vocab create
+    current-vocab create-word
     dup t "defining-class" set-word-prop
     dup set-last-word
     dup save-class-location

@@ -6,7 +6,7 @@ IN: words.tests
 
 [ 4 ] [
     [
-        "poo" "words.tests" create [ 2 2 + ] ( -- n ) define-declared
+        "poo" "words.tests" create-word [ 2 2 + ] ( -- n ) define-declared
     ] with-compilation-unit
     "poo" "words.tests" lookup-word execute
 ] unit-test
@@ -25,7 +25,7 @@ DEFER: plist-test
     \ plist-test "sample-property" word-prop
 ] unit-test
 
-[ ] [ [ "create-test" "scratchpad" create { 1 2 } "testing" set-word-prop ] with-compilation-unit ] unit-test
+[ ] [ [ "create-test" "scratchpad" create-word { 1 2 } "testing" set-word-prop ] with-compilation-unit ] unit-test
 
 [ { 1 2 } ] [
     "create-test" "scratchpad" lookup-word "testing" word-prop
@@ -34,7 +34,7 @@ DEFER: plist-test
 [
     [ t ] [ \ array? "array?" "arrays" lookup-word = ] unit-test
 
-    [ ] [ [ "test-scope" "scratchpad" create drop ] with-compilation-unit ] unit-test
+    [ ] [ [ "test-scope" "scratchpad" create-word drop ] with-compilation-unit ] unit-test
 ] with-scope
 
 [ "test-scope" ] [
@@ -73,7 +73,7 @@ DEFER: deferred
 
 [ ] [ "IN: words.tests FORGET: not-compiled" eval( -- ) ] unit-test
 
-[ ] [ [ "no-loc" "words.tests" create drop ] with-compilation-unit ] unit-test
+[ ] [ [ "no-loc" "words.tests" create-word drop ] with-compilation-unit ] unit-test
 [ f ] [ "no-loc" "words.tests" lookup-word where ] unit-test
 
 [ ] [ "IN: words.tests : no-loc-2 ( -- ) ;" eval( -- ) ] unit-test

@@ -38,7 +38,7 @@ ERROR: unknown-constructor-parameters class effect unknown ;
     [ constructor-boa-quot ] keep define-declared ;
 
 : create-reset ( string -- word )
-    create-in dup reset-generic ;
+    create-word-in dup reset-generic ;
 
 : scan-constructor ( -- word class )
     scan-new-word scan-class ;

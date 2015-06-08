@@ -35,7 +35,7 @@ SYMBOL: current-context
 
 : make-factor-words ( module name prefix? -- call-word obj-word )
     [ [ ":" glue ] [ ":$" glue ] 2bi ] [ nip dup "$" prepend ] if
-    [ create-in ] bi@ ;
+    [ create-word-in ] bi@ ;
 
 : import-getattr ( module name -- alien )
     [ py-import ] dip getattr ;
@@ -50,10 +50,10 @@ SYMBOL: current-context
     '[ @ rot _ getattr -rot call-object-full @ ] ;
 
 : method-callable ( name effect -- )
-    [ dup create-in swap ] dip [ make-method-quot ] keep define-inline ;
+    [ dup create-word-in swap ] dip [ make-method-quot ] keep define-inline ;
 
 : method-object ( name -- )
-    [ "$" prepend create-in ] [ '[ _ getattr ] ] bi
+    [ "$" prepend create-word-in ] [ '[ _ getattr ] ] bi
     { "obj" } { "obj'" } <effect> define-inline ;
 
 : add-method ( name effect -- )

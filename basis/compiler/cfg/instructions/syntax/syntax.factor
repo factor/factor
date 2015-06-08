@@ -75,7 +75,7 @@ TUPLE: insn-slot-spec type name rep ;
     name>> "," append ;
 
 : define-insn-ctor ( class specs -- )
-    [ [ insn-ctor-name create-in ] [ '[ _ ] [ f ] [ boa , ] surround ] bi ] dip
+    [ [ insn-ctor-name create-word-in ] [ '[ _ ] [ f ] [ boa , ] surround ] bi ] dip
     [ name>> ] map { } <effect> define-declared ;
 
 : define-insn ( class superclass specs -- )

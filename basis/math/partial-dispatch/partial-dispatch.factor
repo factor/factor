@@ -84,7 +84,7 @@ M: word integer-op-input-classes
     ] [ ] make ;
 
 : integer-op-word ( triple -- word )
-    [ name>> ] map "-" join "math.partial-dispatch" create ;
+    [ name>> ] map "-" join "math.partial-dispatch" create-word ;
 
 : integer-op-quot ( fix-word big-word triple -- quot )
     [ second ] [ third ] bi 2array {

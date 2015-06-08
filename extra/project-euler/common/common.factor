@@ -158,7 +158,7 @@ PRIVATE>
 
 SYNTAX: SOLUTION:
     scan-word
-    [ name>> "-main" append create-in ] keep
+    [ name>> "-main" append create-word-in ] keep
     [ drop current-vocab main<< ]
     [ [ . ] swap prefix ( -- ) define-declared ]
     2bi ;

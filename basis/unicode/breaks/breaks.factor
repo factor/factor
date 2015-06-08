@@ -97,7 +97,7 @@ SYMBOL: table
     graphemes iota { SpacingMark } connect
     { Prepend } graphemes iota connect ;
 
-"grapheme-table" create-in
+"grapheme-table" create-word-in
 graphemes init-table table
 [ make-grapheme-table finish-table ] with-variable
 define-constant
@@ -164,7 +164,7 @@ CONSTANT: word-break-classes H{
     { "ExtendNumLet" 12 }
 }
 
-"word-break-table" create-in
+"word-break-table" create-word-in
 "vocab:unicode/data/WordBreakProperty.txt"
 load-interval-file dup array>>
 [ 2 swap [ word-break-classes at ] change-nth ] each
@@ -198,7 +198,7 @@ SYMBOL: check-number-after
         [ { { 0 [ f ] } { 1 [ t ] } [ ] } case ] map
     ] map ;
 
-"word-table" create-in
+"word-table" create-word-in
 unicode-words init-table table
 [ make-word-table finish-word-table ] with-variable
 define-constant

@@ -31,7 +31,7 @@ SYNTAX: LOG-GML:
     [let
         (GML:) :> ( word name effect def )
 
-        name "-record" append create-in :> record-class
+        name "-record" append create-word-in :> record-class
         record-class tuple effect in>> define-tuple-class
 
         record-class def effect in>> length

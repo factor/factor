@@ -106,7 +106,7 @@ MACRO: <experiment> ( word -- )
 
 SYNTAX: TEST:
     scan-token
-    [ create-in ]
+    [ create-word-in ]
     [ "(" ")" surround search '[ _ parse-test ] ] bi
     define-syntax ;
 

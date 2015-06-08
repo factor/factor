@@ -12,7 +12,7 @@ IN: gobject-introspection.ffi
 
 : defer-c-type ( c-type-name -- c-type )
     deferred-type swap (CREATE-C-TYPE) [ typedef ] keep ;
-!     create-in dup
+!     create-word-in dup
 !     [ fake-definition ] [ undefined-def define ] bi ;
 
 :: defer-types ( types type-info-class -- )

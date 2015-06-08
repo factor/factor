@@ -52,7 +52,7 @@ num-types get f <array> builtins set
 
 call( -- ) ! syntax-quot
 
-! Create some empty vocabs where the below primitives and
+! create-word some empty vocabs where the below primitives and
 ! classes will go
 {
     "alien"
@@ -118,7 +118,7 @@ call( -- ) ! syntax-quot
     tri ;
 
 : prepare-slots ( slots -- slots' )
-    [ [ dup pair? [ first2 create ] when ] map ] map ;
+    [ [ dup pair? [ first2 create-word ] when ] map ] map ;
 
 : define-builtin-slots ( class slots -- )
     prepare-slots make-slots 1 finalize-slots
@@ -130,38 +130,38 @@ call( -- ) ! syntax-quot
 : define-builtin ( symbol slotspec -- )
     [ [ define-builtin-predicate ] keep ] dip define-builtin-slots ;
 
-"fixnum" "math" create register-builtin
-"bignum" "math" create register-builtin
-"tuple" "kernel" create register-builtin
-"float" "math" create register-builtin
+"fixnum" "math" create-word register-builtin
+"bignum" "math" create-word register-builtin
+"tuple" "kernel" create-word register-builtin
+"float" "math" create-word register-builtin
 "f" "syntax" lookup-word register-builtin
-"array" "arrays" create register-builtin
-"wrapper" "kernel" create register-builtin
-"callstack" "kernel" create register-builtin
-"string" "strings" create register-builtin
-"quotation" "quotations" create register-builtin
-"dll" "alien" create register-builtin
-"alien" "alien" create register-builtin
-"word" "words" create register-builtin
-"byte-array" "byte-arrays" create register-builtin
+"array" "arrays" create-word register-builtin
+"wrapper" "kernel" create-word register-builtin
+"callstack" "kernel" create-word register-builtin
+"string" "strings" create-word register-builtin
+"quotation" "quotations" create-word register-builtin
+"dll" "alien" create-word register-builtin
+"alien" "alien" create-word register-builtin
+"word" "words" create-word register-builtin
+"byte-array" "byte-arrays" create-word register-builtin
 
 ! We need this before defining c-ptr below
 "f" "syntax" lookup-word { } define-builtin
 
-"f" "syntax" create [ not ] "predicate" set-word-prop
+"f" "syntax" create-word [ not ] "predicate" set-word-prop
 "f?" "syntax" vocab-words-assoc delete-at
 
 "t" "syntax" lookup-word define-singleton-class
 
 ! Some unions
-"c-ptr" "alien" create [
+"c-ptr" "alien" create-word [
     "alien" "alien" lookup-word ,
     "f" "syntax" lookup-word ,
     "byte-array" "byte-arrays" lookup-word ,
 ] { } make define-union-class
 
 ! A predicate class used for declarations
-"array-capacity" "sequences.private" create
+"array-capacity" "sequences.private" create-word
 "fixnum" "math" lookup-word
 [
     [ dup 0 fixnum>= ] %
@@ -175,7 +175,7 @@ define-predicate-class
 "coercer" set-word-prop
 
 ! Catch-all class for providing a default method.
-"object" "kernel" create
+"object" "kernel" create-word
 [ f f { } intersection-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
@@ -183,51 +183,51 @@ bi
 "object?" "kernel" vocab-words-assoc delete-at
 
 ! Empty class with no instances
-"null" "kernel" create
+"null" "kernel" create-word
 [ f { } f union-class define-class ]
 [ [ drop f ] "predicate" set-word-prop ]
 bi
 
 "null?" "kernel" vocab-words-assoc delete-at
 
-"fixnum" "math" create { } define-builtin
-"fixnum" "math" create "integer>fixnum-strict" "math" create 1quotation "coercer" set-word-prop
+"fixnum" "math" create-word { } define-builtin
+"fixnum" "math" create-word "integer>fixnum-strict" "math" create-word 1quotation "coercer" set-word-prop
 
-"bignum" "math" create { } define-builtin
-"bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
+"bignum" "math" create-word { } define-builtin
+"bignum" "math" create-word ">bignum" "math" create-word 1quotation "coercer" set-word-prop
 
-"float" "math" create { } define-builtin
-"float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
+"float" "math" create-word { } define-builtin
+"float" "math" create-word ">float" "math" create-word 1quotation "coercer" set-word-prop
 
-"array" "arrays" create {
+"array" "arrays" create-word {
     { "length" { "array-capacity" "sequences.private" } read-only }
 } define-builtin
 
-"wrapper" "kernel" create {
+"wrapper" "kernel" create-word {
     { "wrapped" read-only }
 } define-builtin
 
-"string" "strings" create {
+"string" "strings" create-word {
     { "length" { "array-capacity" "sequences.private" } read-only }
     "aux"
 } define-builtin
 
-"quotation" "quotations" create {
+"quotation" "quotations" create-word {
     { "array" { "array" "arrays" } read-only }
     "cached-effect"
     "cache-counter"
 } define-builtin
 
-"dll" "alien" create {
+"dll" "alien" create-word {
     { "path" { "byte-array" "byte-arrays" } read-only }
 } define-builtin
 
-"alien" "alien" create {
+"alien" "alien" create-word {
     { "underlying" { "c-ptr" "alien" } read-only }
     "expired"
 } define-builtin
 
-"word" "words" create {
+"word" "words" create-word {
     { "hashcode" { "fixnum" "math" } }
     "name"
     "vocabulary"
@@ -238,32 +238,32 @@ bi
     { "sub-primitive" read-only }
 } define-builtin
 
-"byte-array" "byte-arrays" create {
+"byte-array" "byte-arrays" create-word {
     { "length" { "array-capacity" "sequences.private" } read-only }
 } define-builtin
 
-"callstack" "kernel" create { } define-builtin
+"callstack" "kernel" create-word { } define-builtin
 
-"tuple" "kernel" create
+"tuple" "kernel" create-word
 [ { } define-builtin ]
 [ define-tuple-layout ]
 bi
 
-! Create special tombstone values
-"tombstone" "hashtables.private" create
+! create-word special tombstone values
+"tombstone" "hashtables.private" create-word
 tuple
 { "state" } define-tuple-class
 
-"((empty))" "hashtables.private" create
+"((empty))" "hashtables.private" create-word
 { f } "tombstone" "hashtables.private" lookup-word
 slots>tuple 1quotation ( -- value ) define-inline
 
-"((tombstone))" "hashtables.private" create
+"((tombstone))" "hashtables.private" create-word
 { t } "tombstone" "hashtables.private" lookup-word
 slots>tuple 1quotation ( -- value ) define-inline
 
 ! Some tuple classes
-"curry" "kernel" create
+"curry" "kernel" create-word
 tuple
 {
     { "obj" read-only }
@@ -285,7 +285,7 @@ tuple
 } cleave
 ( obj quot -- curry ) define-declared
 
-"compose" "kernel" create
+"compose" "kernel" create-word
 tuple
 {
     { "first" read-only }
@@ -311,7 +311,7 @@ tuple
 ! Sub-primitive words
 : make-sub-primitive ( word vocab effect -- )
     [
-        create
+        create-word
         dup t "primitive" set-word-prop
         dup 1quotation
     ] dip define-declared ;
@@ -385,7 +385,7 @@ tuple
 : make-primitive ( word vocab function effect -- )
     [
         [
-            create
+            create-word
             dup reset-word
             dup t "primitive" set-word-prop
         ] dip
@@ -558,6 +558,6 @@ tuple
 } [ first4 make-primitive ] each
 
 ! Bump build number
-"build" "kernel" create build 1 + [ ] curry ( -- n ) define-declared
+"build" "kernel" create-word build 1 + [ ] curry ( -- n ) define-declared
 
 ] with-compilation-unit

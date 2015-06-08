@@ -445,7 +445,7 @@ H{ } clone verify-messages set-global
 : verify-message ( n -- word ) verify-messages get-global at ;
 
 SYNTAX: X509_V_:
-    scan-token "X509_V_" prepend create-in
+    scan-token "X509_V_" prepend create-word-in
     scan-number
     [ 1quotation ( -- value ) define-inline ]
     [ verify-messages get set-at ]

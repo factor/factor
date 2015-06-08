@@ -27,7 +27,7 @@ IN: alien.marshall.structs
 
 : define-struct-constructor ( class -- )
     {
-        [ name>> "<" prepend ">" append create-in ]
+        [ name>> "<" prepend ">" append create-word-in ]
         [ '[ _ new ] ]
         [ name>> '[ _ malloc-struct >>underlying ] append ]
         [ name>> 1array ]
@@ -35,7 +35,7 @@ IN: alien.marshall.structs
 PRIVATE>
 
 :: define-struct-tuple ( name -- )
-    name create-in :> class
+    name create-word-in :> class
     class struct-wrapper { } define-tuple-class
     class define-struct-constructor
     name c-type fields>> [
