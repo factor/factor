@@ -6,7 +6,7 @@ IN: windows.messages
 
 SYMBOL: windows-messages
 
-"windows.messages" words
+"windows.messages" vocab-words
 [ name>> "windows-message" head? ] reject
 [ dup execute swap ] { } map>assoc
 windows-messages set-global
