@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators combinators.short-circuit fry
-fuel.eval help help.crossref help.markup help.markup.private help.topics io
-io.streams.string kernel make namespaces parser prettyprint sequences summary
-help.vocabs vocabs vocabs.loader vocabs.hierarchy vocabs.metadata
-vocabs.parser words see listener sets ;
-FROM: vocabs.hierarchy => child-vocabs ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit fry help help.crossref help.markup
+help.markup.private help.topics help.vocabs io io.streams.string
+kernel listener make namespaces parser prettyprint see sequences
+summary vocabs vocabs.hierarchy vocabs.metadata vocabs.parser
+words ;
 IN: fuel.help
 
 <PRIVATE
@@ -76,7 +76,7 @@ SYMBOL: describe-words
     ] { } assoc>map sift ;
 
 : fuel-vocab-children-help ( name -- element )
-    child-vocabs fuel-vocab-list ; inline
+    disk-vocabs-for-prefix fuel-vocab-list ; inline
 
 : fuel-vocab-describe-words ( name -- element )
     [ words. ] with-string-writer \ describe-words swap 2array ; inline

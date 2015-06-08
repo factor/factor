@@ -4,7 +4,6 @@ USING: accessors arrays assocs combinators.short-circuit fry
 io.directories io.files io.files.types io.pathnames kernel make
 memoize namespaces sequences sorting splitting vocabs sets
 vocabs.loader vocabs.metadata vocabs.errors ;
-RENAME: child-vocabs vocabs => vocabs:child-vocabs
 IN: vocabs.hierarchy
 
 TUPLE: vocab-prefix name ;
@@ -40,33 +39,33 @@ ERROR: vocab-root-required root ;
 : ensure-vocab-root/prefix ( root prefix -- root prefix )
     [ ensure-vocab-root ] [ check-vocab-name ] bi* ;
 
-: (child-vocabs) ( root prefix -- vocabs )
+: (disk-vocab-children) ( root prefix -- vocabs )
     check-vocab-name
     [ vocab-dir append-path dup exists? [ vocab-subdirs ] [ drop { } ] if ]
     [ nip [ "." append '[ _ prepend ] map! ] unless-empty ]
     [ drop '[ _ over vocab-dir? [ >vocab-link ] [ <vocab-prefix> ] if ] map! ]
     2tri ;
 
-: ((child-vocabs-recursive)) ( root prefix -- )
-    dupd vocab-name (child-vocabs) [ % ] keep
-    [ ((child-vocabs-recursive)) ] with each ;
+: ((disk-vocabs-recursive)) ( root prefix -- )
+    dupd vocab-name (disk-vocab-children) [ % ] keep
+    [ ((disk-vocabs-recursive)) ] with each ;
 
-: (child-vocabs-recursive) ( root prefix -- seq )
+: (disk-vocabs-recursive) ( root prefix -- seq )
     [ ensure-vocab-root ] dip
-    [ ((child-vocabs-recursive)) ] { } make ;
+    [ ((disk-vocabs-recursive)) ] { } make ;
 
 : no-rooted ( seq -- seq' ) [ find-vocab-root ] reject ;
 
 : one-level-only? ( name prefix -- ? )
     ?head [ "." split1 nip not ] [ drop f ] if ;
 
-: unrooted-child-vocabs ( prefix -- seq )
-    [ vocabs no-rooted ] dip
+: unrooted-disk-vocabs ( prefix -- seq )
+    [ loaded-vocab-names no-rooted ] dip
     dup empty? [ CHAR: . suffix ] unless
     '[ vocab-name _ one-level-only? ] filter ;
 
-: unrooted-child-vocabs-recursive ( prefix -- seq )
-    vocabs:child-vocabs no-rooted ;
+: unrooted-disk-vocabs-recursive ( prefix -- seq )
+    loaded-child-vocab-names no-rooted ;
 
 PRIVATE>
 
@@ -90,32 +89,32 @@ PRIVATE>
 : filter-vocabs ( assoc -- seq )
     no-roots no-prefixes members ;
 
-: child-vocabs ( prefix -- assoc )
-    [ [ vocab-roots get ] dip '[ dup _ (child-vocabs) ] { } map>assoc ]
-    [ unrooted-child-vocabs [ lookup-vocab ] map! f swap 2array ]
+: disk-vocabs-for-prefix ( prefix -- assoc )
+    [ [ vocab-roots get ] dip '[ dup _ (disk-vocab-children) ] { } map>assoc ]
+    [ unrooted-disk-vocabs [ lookup-vocab ] map! f swap 2array ]
     bi suffix ;
 
-: all-vocabs ( -- assoc )
-    "" child-vocabs ;
+: all-disk-vocabs-by-root ( -- assoc )
+    "" disk-vocabs-for-prefix ;
 
-: child-vocabs-recursive ( prefix -- assoc )
-    [ [ vocab-roots get ] dip '[ dup _ (child-vocabs-recursive) ] { } map>assoc ]
-    [ unrooted-child-vocabs-recursive [ lookup-vocab ] map! f swap 2array ]
+: disk-vocabs-recursive-for-prefix ( prefix -- assoc )
+    [ [ vocab-roots get ] dip '[ dup _ (disk-vocabs-recursive) ] { } map>assoc ]
+    [ unrooted-disk-vocabs-recursive [ lookup-vocab ] map! f swap 2array ]
     bi suffix ;
 
-MEMO: all-vocabs-recursive ( -- assoc )
-    "" child-vocabs-recursive ;
+MEMO: all-disk-vocabs-recursive ( -- assoc )
+    "" disk-vocabs-recursive-for-prefix ;
 
-: all-vocab-names ( -- seq )
-    all-vocabs-recursive filter-vocabs [ vocab-name ] map! ;
+: all-disk-vocab-names ( -- seq )
+    all-disk-vocabs-recursive filter-vocabs [ vocab-name ] map! ;
 
-: child-vocab-names ( prefix -- seq )
-    child-vocabs filter-vocabs [ vocab-name ] map! ;
+: disk-child-vocab-names ( prefix -- seq )
+    disk-vocabs-for-prefix filter-vocabs [ vocab-name ] map! ;
 
 <PRIVATE
 
 : collect-vocabs ( quot -- seq )
-    [ all-vocabs-recursive filter-vocabs ] dip
+    [ all-disk-vocabs-recursive filter-vocabs ] dip
     gather natural-sort ; inline
 
 : maybe-include-root/prefix ( root prefix -- vocab-link/f )
@@ -127,15 +126,15 @@ MEMO: all-vocabs-recursive ( -- assoc )
 
 PRIVATE>
 
-: vocabs-in-root/prefix ( root prefix -- seq )
-    [ (child-vocabs-recursive) ]
+: disk-vocabs-in-root/prefix ( root prefix -- seq )
+    [ (disk-vocabs-recursive) ]
     [ maybe-include-root/prefix [ prefix ] when* ] 2bi ;
 
-: vocabs-in-root ( root -- seq )
-    "" vocabs-in-root/prefix ;
+: disk-vocabs-in-root ( root -- seq )
+    "" disk-vocabs-in-root/prefix ;
 
 : (load-from-root) ( root prefix -- failures )
-    vocabs-in-root/prefix
+    disk-vocabs-in-root/prefix
     [ don't-load? ] reject no-prefixes
     require-all ;
 

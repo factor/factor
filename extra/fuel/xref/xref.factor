@@ -34,7 +34,7 @@ IN: fuel.xref
     [ drop-prefix nip empty? ] curry filter members ;
 
 MEMO: (vocab-words) ( name -- seq )
-    >vocab-link words [ name>> ] map ;
+    >vocab-link vocab-words [ name>> ] map ;
 
 : current-words ( -- seq )
     manifest get
@@ -53,7 +53,7 @@ PRIVATE>
 : apropos-xref ( str -- seq ) words-matching keys format-xrefs group-xrefs ;
 
 : vocab-xref ( vocab -- seq )
-    dup ".private" append [ words ] bi@ append
+    dup ".private" append [ vocab-words ] bi@ append
     format-xrefs group-xrefs ;
 
 : word-location ( word -- loc ) where get-loc ;
@@ -68,7 +68,7 @@ PRIVATE>
 
 : article-location ( name -- loc ) lookup-article loc>> get-loc ;
 
-: get-vocabs/prefix ( prefix -- seq ) all-vocab-names swap filter-prefix ;
+: get-vocabs/prefix ( prefix -- seq ) all-disk-vocab-names swap filter-prefix ;
 
 : get-vocabs-words/prefix ( prefix names/f -- seq )
     [ vocabs-words ] [ current-words ] if* natural-sort swap filter-prefix ;

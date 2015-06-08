@@ -99,7 +99,7 @@ PRIVATE>
     all-words name-completions ;
 
 : vocabs-matching ( str -- seq )
-    all-vocabs-recursive filter-vocabs name-completions ;
+    all-disk-vocabs-recursive filter-vocabs name-completions ;
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;

@@ -17,7 +17,7 @@ M: simple-lint-error summary message>> ;
 M: simple-lint-error error. summary print ;
 
 SYMBOL: vocabs-quot
-SYMBOL: all-vocabs
+SYMBOL: all-vocabs-list
 SYMBOL: vocab-articles
 
 : check-example ( element -- )
@@ -110,7 +110,7 @@ SYMBOL: vocab-articles
     [ "$see-also are not unique" simple-lint-error ] unless ;
 
 : vocab-exists? ( name -- ? )
-    [ lookup-vocab ] [ all-vocabs get member? ] bi or ;
+    [ lookup-vocab ] [ all-vocabs-list get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [
@@ -199,7 +199,7 @@ SYMBOL: vocab-articles
     } cleave ;
 
 : files>vocabs ( -- assoc )
-    vocabs
+    loaded-vocab-names
     [ [ [ vocab-docs-path ] keep ] H{ } map>assoc ]
     [ [ [ vocab-source-path ] keep ] H{ } map>assoc ]
     bi assoc-union ;

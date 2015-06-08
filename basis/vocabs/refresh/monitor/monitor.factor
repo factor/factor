@@ -49,7 +49,7 @@ TR: convert-separators "/\\" ".." ;
 
 : init-vocab-monitor ( -- )
     H{ } clone changed-vocabs set-global
-    vocabs [ changed-vocab ] each ;
+    loaded-vocab-names [ changed-vocab ] each ;
 
 [
     "-no-monitors" (command-line) member? [

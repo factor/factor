@@ -124,7 +124,7 @@ gc
 
     "." write flush
 
-    vocabs [ words compile-unoptimized "." write flush ] each
+    loaded-vocab-names [ vocab-words compile-unoptimized "." write flush ] each
 
     " done" print flush
 

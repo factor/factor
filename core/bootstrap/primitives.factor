@@ -27,7 +27,7 @@ architecture get asm-file parse-file
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" lookup-vocab vocab-words bootstrap-syntax set
+"syntax" lookup-vocab vocab-words-assoc bootstrap-syntax set
 
 H{ } clone dictionary set
 H{ } clone root-cache set
@@ -149,7 +149,7 @@ call( -- ) ! syntax-quot
 "f" "syntax" lookup-word { } define-builtin
 
 "f" "syntax" create [ not ] "predicate" set-word-prop
-"f?" "syntax" vocab-words delete-at
+"f?" "syntax" vocab-words-assoc delete-at
 
 "t" "syntax" lookup-word define-singleton-class
 
@@ -180,7 +180,7 @@ define-predicate-class
 [ [ drop t ] "predicate" set-word-prop ]
 bi
 
-"object?" "kernel" vocab-words delete-at
+"object?" "kernel" vocab-words-assoc delete-at
 
 ! Empty class with no instances
 "null" "kernel" create
@@ -188,7 +188,7 @@ bi
 [ [ drop f ] "predicate" set-word-prop ]
 bi
 
-"null?" "kernel" vocab-words delete-at
+"null?" "kernel" vocab-words-assoc delete-at
 
 "fixnum" "math" create { } define-builtin
 "fixnum" "math" create "integer>fixnum-strict" "math" create 1quotation "coercer" set-word-prop

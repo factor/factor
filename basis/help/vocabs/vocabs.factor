@@ -8,7 +8,6 @@ help.topics io io.pathnames io.styles kernel macros make
 namespaces sequences sorting summary vocabs vocabs.files
 vocabs.hierarchy vocabs.loader vocabs.metadata words
 words.symbol ;
-FROM: vocabs.hierarchy => child-vocabs ;
 IN: help.vocabs
 
 : about ( vocab -- )
@@ -60,7 +59,7 @@ C: <vocab-author> vocab-author
     ] unless-empty ;
 
 : describe-children ( vocab -- )
-    vocab-name child-vocabs
+    vocab-name disk-vocabs-for-prefix
     $vocab-roots ;
 
 : files. ( seq -- )
@@ -226,14 +225,14 @@ C: <vocab-author> vocab-author
 
 : describe-words ( vocab -- )
     {
-        { [ dup lookup-vocab ] [ words $words ] }
+        { [ dup lookup-vocab ] [ vocab-words $words ] }
         { [ dup find-vocab-root ] [ vocab-is-not-loaded ] }
         [ drop ]
     } cond ;
 
 : words. ( vocab -- )
     last-element off
-    [ require ] [ words $words ] bi nl ;
+    [ require ] [ vocab-words $words ] bi nl ;
 
 : describe-metadata ( vocab -- )
     [
@@ -254,7 +253,7 @@ C: <vocab-author> vocab-author
     } cleave ;
 
 : keyed-vocabs ( str quot -- seq )
-    [ all-vocabs-recursive ] 2dip '[
+    [ all-disk-vocabs-recursive ] 2dip '[
         [ _ swap @ member? ] filter no-prefixes
         [ name>> ] sort-with
     ] assoc-map ; inline

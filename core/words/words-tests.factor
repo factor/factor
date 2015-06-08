@@ -11,7 +11,7 @@ IN: words.tests
     "poo" "words.tests" lookup-word execute
 ] unit-test
 
-[ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
+[ t ] [ t loaded-vocab-names [ vocab-words [ word? and ] each ] each ] unit-test
 
 DEFER: plist-test
 
@@ -41,8 +41,8 @@ DEFER: plist-test
     "test-scope" "scratchpad" lookup-word name>>
 ] unit-test
 
-[ t ] [ vocabs array? ] unit-test
-[ t ] [ vocabs [ words [ word? ] all? ] all? ] unit-test
+[ t ] [ loaded-vocab-names array? ] unit-test
+[ t ] [ loaded-vocab-names [ vocab-words [ word? ] all? ] all? ] unit-test
 
 [ f ] [ gensym gensym = ] unit-test
 

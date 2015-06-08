@@ -12,7 +12,7 @@ IN: editors
 SYMBOL: editor-class
 
 : available-editors ( -- seq )
-    "editors" child-vocab-names ;
+    "editors" loaded-child-vocab-names ;
 
 : editor-restarts ( -- alist )
     available-editors

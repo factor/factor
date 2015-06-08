@@ -1,10 +1,10 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators
-combinators.short-circuit continuations fry io kernel math
-namespaces prettyprint quotations sequences sequences.deep
-splitting strings tools.annotations tools.test
-tools.test.private vocabs words words.symbol ;
+USING: accessors arrays assocs classes combinators.short-circuit
+continuations fry io kernel math namespaces prettyprint
+quotations sequences sequences.deep splitting strings
+tools.annotations tools.test.private vocabs vocabs.hierarchy
+words words.symbol ;
 IN: tools.coverage
 
 TUPLE: coverage-state < identity-tuple executed? ;
@@ -32,7 +32,7 @@ GENERIC: reset-coverage ( object -- )
     ".private" ?tail drop ".private" append ;
 
 : coverage-words ( string -- words )
-    words [ { [ primitive? not ] [ symbol? not ] [ predicate? not ] } 1&& ] filter ;
+    vocab-words [ { [ primitive? not ] [ symbol? not ] [ predicate? not ] } 1&& ] filter ;
 
 PRIVATE>
 
@@ -131,7 +131,7 @@ PRIVATE>
     { [ ".private" tail? ] [ ".tests" tail? ] } 1|| not ;
 
 : test-coverage-recursively ( prefix -- assoc )
-    child-vocabs [ coverage-vocab? ] filter
+    disk-vocabs-for-prefix [ coverage-vocab? ] filter
     [ dup test-coverage ] { } map>assoc ;
 
 : %coverage ( string -- x )
