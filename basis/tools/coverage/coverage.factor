@@ -3,8 +3,7 @@
 USING: accessors arrays assocs classes combinators.short-circuit
 continuations fry io kernel math namespaces prettyprint
 quotations sequences sequences.deep splitting strings
-tools.annotations tools.test.private vocabs vocabs.hierarchy
-words words.symbol ;
+tools.annotations tools.test.private vocabs words words.symbol ;
 IN: tools.coverage
 
 TUPLE: coverage-state < identity-tuple executed? ;
@@ -32,7 +31,13 @@ GENERIC: reset-coverage ( object -- )
     ".private" ?tail drop ".private" append ;
 
 : coverage-words ( string -- words )
-    vocab-words [ { [ primitive? not ] [ symbol? not ] [ predicate? not ] } 1&& ] filter ;
+    vocab-words [
+        {
+            [ primitive? not ]
+            [ symbol? not ]
+            [ predicate? not ]
+        } 1&&
+    ] filter ;
 
 PRIVATE>
 
@@ -80,7 +85,7 @@ M: string coverage
     [ dup coverage 2array ] map-words ;
 
 M: word coverage ( word -- seq )
-    "coverage" word-prop >alist
+    "coverage" word-prop
     [ drop executed?>> ] assoc-reject values ;
 
 GENERIC: coverage. ( object -- )
@@ -88,13 +93,11 @@ GENERIC: coverage. ( object -- )
 M: string coverage.
     [ coverage. ] each-word ;
 
-: pair-coverage. ( word quots -- )
-    dup empty? [
-        2drop
-    ] [
+: pair-coverage. ( word seq -- )
+    [ drop ] [
         [ name>> ":" append print ]
         [ [ "    " write . ] each ] bi*
-    ] if ;
+    ] if-empty ;
 
 M: word coverage.
     dup coverage pair-coverage. ;
@@ -110,7 +113,7 @@ M: string count-callables
     [ count-callables ] map-words sum ;
 
 M: word count-callables
-    def>> [ callable? ] deep-filter length ;
+    def>> 0 [ callable? [ 1 + ] when ] deep-reduce ;
 
 PRIVATE>
 
