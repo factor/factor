@@ -20,7 +20,7 @@ PRIVATE>
     compact-gc '[ _ run ] profile most-recent-profile-data ;
 
 : find-benchmark-vocabs ( -- seq )
-    "benchmark" loaded-child-vocab-names
+    "benchmark" disk-child-vocab-names
     [ find-vocab-root ] filter ;
 
 <PRIVATE
