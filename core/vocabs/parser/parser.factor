@@ -223,14 +223,29 @@ M: qualified update
 
 M: vocab update dup name>> lookup-vocab eq? ;
 
-: update-manifest ( manifest -- )
-    [ dup [ name>> lookup-vocab ] when ] change-current-vocab
-    [ members [ lookup-vocab ] filter dup fast-set ] change-search-vocab-names
-    swap [ lookup-vocab ] V{ } map-as >>search-vocabs
-    qualified-vocabs>> [ update ] filter! drop ;
+: update-current-vocab ( manifest -- manifest )
+    [ dup [ name>> lookup-vocab ] when ] change-current-vocab ; inline
+
+: compute-search-vocabs ( manifest -- search-vocab-names search-vocabs )
+    search-vocab-names>> members dup length <vector> [
+        [ push ] curry [ when* ] curry
+        [ lookup-vocab dup ] prepose filter fast-set
+    ] keep ; inline
+
+: update-search-vocabs ( manifest -- manifest )
+    dup compute-search-vocabs
+    [ >>search-vocab-names ] [ >>search-vocabs ] bi* ; inline
+
+: update-qualified-vocabs ( manifest -- manifest )
+    dup qualified-vocabs>> [ update ] filter! drop ; inline
+
+: update-manifest ( manifest -- manifest )
+    update-current-vocab
+    update-search-vocabs
+    update-qualified-vocabs ; inline
 
 M: manifest definitions-changed
-    nip update-manifest ;
+    nip update-manifest drop ;
 
 PRIVATE>
 
