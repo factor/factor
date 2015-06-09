@@ -353,7 +353,7 @@ M: tuple-class reset-class
         dup "slots" word-prop forget-slot-accessors
     ] [
         [ call-next-method ]
-        [ { "layout" "slots" "boa-check" "prototype" "final" } reset-props ]
+        [ { "layout" "slots" "boa-check" "prototype" "final" } remove-word-props ]
         bi
     ] bi ;
 

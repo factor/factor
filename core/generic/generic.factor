@@ -18,7 +18,7 @@ PREDICATE: generic < word
 M: generic definition drop f ;
 
 : make-generic ( word -- )
-    [ { "unannotated-def" } reset-props ]
+    [ "unannotated-def" remove-word-prop ]
     [ dup "combination" word-prop perform-combination ]
     bi ;
 

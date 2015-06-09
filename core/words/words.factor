@@ -33,6 +33,9 @@ M: word definition def>> ;
 
 : remove-word-prop ( word name -- ) swap props>> delete-at ;
 
+: remove-word-props ( word seq -- )
+    swap props>> [ delete-at ] curry each ;
+
 : set-word-prop ( word value name -- )
     over
     [ pick props>> ?set-at >>props drop ]
@@ -40,8 +43,6 @@ M: word definition def>> ;
 
 : change-word-prop ( ..a word prop quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ swap props>> ] dip change-at ; inline
-
-: reset-props ( word seq -- ) [ remove-word-prop ] with each ;
 
 <PRIVATE
 
@@ -169,7 +170,7 @@ M: word reset-word
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"
         "writer" "delimiter" "deprecated"
-    } reset-props ;
+    } remove-word-props ;
 
 : reset-generic ( word -- )
     [ subwords forget-all ]
@@ -183,7 +184,7 @@ M: word reset-word
             "default-method"
             "engines"
             "decision-tree"
-        } reset-props
+        } remove-word-props
     ] tri ;
 
 : <word> ( name vocab -- word )

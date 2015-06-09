@@ -44,13 +44,14 @@ ERROR: bad-array-type ;
     } cond ;
 
 : reset-c-type ( word -- )
-    dup "struct-size" word-prop
-    [ dup [ forget-class ] [ { "struct-size" } reset-props ] bi ] when
+    dup "struct-size" word-prop [
+        dup [ forget-class ] [ "struct-size" remove-word-prop ] bi
+    ] when
     {
         "c-type"
         "callback-effect"
         "callback-library"
-    } reset-props ;
+    } remove-word-props ;
 
 ERROR: *-in-c-type-name name ;
 

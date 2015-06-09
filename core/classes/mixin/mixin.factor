@@ -14,7 +14,7 @@ M: mixin-class (classes-intersect?)
     members [ classes-intersect? ] with any? ;
 
 M: mixin-class reset-class
-    [ call-next-method ] [ { "mixin" } reset-props ] bi ;
+    [ call-next-method ] [ "mixin" remove-word-prop ] bi ;
 
 M: mixin-class rank-class drop 8 ;
 

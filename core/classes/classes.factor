@@ -62,7 +62,7 @@ M: class reset-class
         "members"
         "participants"
         "predicate"
-    } reset-props ;
+    } remove-word-props ;
 
 M: word reset-class drop ;
 
