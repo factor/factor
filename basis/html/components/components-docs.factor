@@ -50,7 +50,7 @@ ARTICLE: "html.components.links" "Link components"
 "The generic words provide methods on the " { $link string } " and " { $link url } " classes which treat the object as a URL. New methods can be defined for rendering links to custom data types." ;
 
 HELP: comparison
-{ $description "Comparison components render diffs output by the " { $link diff } " word." } ;
+{ $description "Comparison components render diffs output by the " { $link lcs-diff } " word." } ;
 
 HELP: farkup
 { $description "Farkup components render " { $link "farkup" } "." } ;
