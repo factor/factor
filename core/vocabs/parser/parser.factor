@@ -53,9 +53,6 @@ ERROR: no-word-in-vocab word vocab ;
 
 <PRIVATE
 
-: (add-qualified) ( qualified -- )
-    manifest get qualified-vocabs>> push ;
-
 : (from) ( vocab words -- vocab words words' vocab )
     2dup swap load-vocab ;
 
@@ -72,14 +69,15 @@ ERROR: no-word-in-vocab word vocab ;
 : (lookup) ( name assoc -- word/f )
     at* [ dup forward-reference? [ drop f ] when ] when ;
 
-: (use-words) ( assoc -- extra-words seq )
-    <extra-words> manifest get qualified-vocabs>> ;
-
 PRIVATE>
+
+: qualified-vocabs ( -- qualified-vocabs )
+    manifest get qualified-vocabs>> ;
 
 : set-current-vocab ( name -- )
     create-vocab
-    [ manifest get current-vocab<< ] [ (add-qualified) ] bi ;
+    [ manifest get current-vocab<< ]
+    [ qualified-vocabs push ] bi ;
 
 : with-current-vocab ( name quot -- )
     manifest get clone manifest [
@@ -119,7 +117,8 @@ TUPLE: no-current-vocab-error ;
 : auto-use-vocab ( vocab -- )
     [ use-vocab ] [ manifest get auto-used>> push ] bi ;
 
-: auto-used? ( -- ? ) manifest get auto-used>> length 0 > ;
+: auto-used? ( -- ? )
+    manifest get auto-used>> length 0 > ;
 
 : unuse-vocab ( vocab -- )
     dup using-vocab? [
@@ -135,7 +134,7 @@ TUPLE: qualified vocab prefix words ;
     (from) qualified-words qualified boa ;
 
 : add-qualified ( vocab prefix -- )
-    <qualified> (add-qualified) ;
+    <qualified> qualified-vocabs push ;
 
 TUPLE: from vocab names words ;
 
@@ -143,7 +142,7 @@ TUPLE: from vocab names words ;
     (from) extract-words from boa ;
 
 : add-words-from ( vocab words -- )
-    <from> (add-qualified) ;
+    <from> qualified-vocabs push ;
 
 TUPLE: exclude vocab names words ;
 
@@ -151,20 +150,24 @@ TUPLE: exclude vocab names words ;
     (from) excluding-words exclude boa ;
 
 : add-words-excluding ( vocab words -- )
-    <exclude> (add-qualified) ;
+    <exclude> qualified-vocabs push ;
 
 TUPLE: rename word vocab words ;
 
 : <rename> ( word vocab new-name -- rename )
-    [ 2dup load-vocab words>> dupd at [ ] [ swap no-word-in-vocab ] ?if ] dip
-    associate rename boa ;
+    [
+        2dup load-vocab words>> dupd at
+        [ ] [ swap no-word-in-vocab ] ?if
+    ] dip associate rename boa ;
 
 : add-renamed-word ( word vocab new-name -- )
-    <rename> (add-qualified) ;
+    <rename> qualified-vocabs push ;
 
-: use-words ( assoc -- ) (use-words) push ;
+: use-words ( assoc -- )
+    <extra-words> qualified-vocabs push ;
 
-: unuse-words ( assoc -- ) (use-words) remove! drop ;
+: unuse-words ( assoc -- )
+    <extra-words> qualified-vocabs remove! drop ;
 
 TUPLE: ambiguous-use-error words ;
 
@@ -174,8 +177,7 @@ TUPLE: ambiguous-use-error words ;
 <PRIVATE
 
 : (vocab-search) ( name assocs -- words n )
-    [ words>> (lookup) ] with map
-    sift dup length ;
+    [ words>> (lookup) ] with map sift dup length ;
 
 : vocab-search ( name manifest -- word/f )
     search-vocabs>>
