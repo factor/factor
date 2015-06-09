@@ -36,20 +36,20 @@ M: dispatcher init-user-profile
 M: filter-responder init-user-profile
     responder>> init-user-profile ;
 
-: profile ( -- assoc ) logged-in-user get profile>> ;
+: current-profile ( -- assoc ) logged-in-user get profile>> ;
 
 : user-changed ( -- )
     logged-in-user get t >>changed? drop ;
 
 : uget ( key -- value )
-    profile at ;
+    current-profile at ;
 
 : uset ( value key -- )
-    profile set-at
+    current-profile set-at
     user-changed ;
 
 : uchange ( quot key -- )
-    profile swap change-at
+    current-profile swap change-at
     user-changed ; inline
 
 SYMBOL: capabilities
