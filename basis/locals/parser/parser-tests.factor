@@ -1,28 +1,42 @@
 USING: accessors assocs compiler.units kernel lexer locals.backend
-locals.parser parser prettyprint sequences tools.test ;
+locals.parser namespaces parser prettyprint sequences sorting
+tools.test vocabs vocabs.parser ;
 IN: locals.parser.tests
 
-SYMBOL: dobiedoo
+<<
+! ((parse-lambda))
+{
+    "V{ 99 :> kkk kkk }"
+} [
+    [
+        "locals" use-vocab
+        { "99 :> kkk kkk ;" } <lexer> [
+            H{ } clone [ \ ; parse-until ] ((parse-lambda))
+        ] with-lexer
+    ] with-compilation-unit unparse
+] unit-test
 
 ! (::)
 {
-    dobiedoo
+    "dobiedoo"
     [ 1 load-locals 1 drop-locals ]
     ( x -- y )
 } [
     [
         { "dobiedoo ( x -- y ) ;" } <lexer> [ (::) ] with-lexer
     ] with-compilation-unit
+    [ name>> ] 2dip
 ] unit-test
 
-! ((parse-lambda))
-{
-    "V{ 99 :> kkk kkk }"
-} [
-    [ { "99 :> kkk kkk ;" } <lexer> [
-        H{ } clone [ \ ; parse-until ] ((parse-lambda)) ] with-lexer
-    ] with-compilation-unit unparse
+! parse-def
+{ "um" t } [
+    [
+        "um" parse-def
+        local>> name>>
+        manifest get qualified-vocabs>> last words>> keys "um" swap member?
+    ] with-compilation-unit
 ] unit-test
+>>
 
 ! check-local-name
 { "hello" } [
@@ -35,12 +49,6 @@ SYMBOL: dobiedoo
     nip values [ name>> ] map
 ] unit-test
 
-! parse-def
-{ "um" { "um" } } [
-    [ "um" H{ } clone [ parse-def ] keep ] with-compilation-unit
-    [ local>> name>> ] [ keys ] bi*
-] unit-test
-
 ! parse-local-defs
 { { "tok1" "tok2" } } [
     [
@@ -51,13 +59,11 @@ SYMBOL: dobiedoo
 
 ! parse-multi-def
 {
-    { "v1" "tok1" "tok2" }
+    { "tok1" "tok2" }
     { "tok1" "tok2" }
 } [
     [
-        { "tok1 tok2 )" } <lexer> [
-            H{ { "v1" t } } clone dup parse-multi-def
-        ] with-lexer
+        { "tok1 tok2 )" } <lexer> [ parse-multi-def ] with-lexer
     ] with-compilation-unit
-    [ keys ] [ locals>> [ name>> ] map ] bi*
+    [ locals>> [ name>> ] map ] [ keys ] bi*
 ] unit-test
