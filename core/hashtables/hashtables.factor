@@ -192,9 +192,6 @@ M: hashtable assoc-like
     [ 6 fixnum-shift-fast ] [ -2 fixnum-shift-fast ] bi
     fixnum+fast fixnum+fast ; inline
 
-: 2hashcode ( obj1 obj2 -- hash )
-    [ hashcode ] bi@ hash-combine ; inline
-
 ERROR: malformed-hashtable-pair seq pair ;
 
 : check-hashtable ( seq -- seq )

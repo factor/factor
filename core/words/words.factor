@@ -188,7 +188,7 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup 2hashcode >fixnum (word) dup new-word ;
+    2dup [ hashcode ] bi@ hash-combine >fixnum (word) dup new-word ;
 
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)
