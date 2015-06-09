@@ -15,7 +15,7 @@ M: amb-failure summary drop "Backtracking failure" ;
 : fail ( -- )
     failure get [ continue ] [ amb-failure ] if* ;
 
-: require ( ? -- )
+: must-be-true ( ? -- )
     [ fail ] unless ;
 
 MACRO: checkpoint ( quot -- quot' )
@@ -66,7 +66,7 @@ MACRO: amb-execute ( seq -- quot )
 : if-amb ( true false -- ? )
     [
         [ { t f } amb ]
-        [ '[ @ require t ] ]
+        [ '[ @ must-be-true t ] ]
         [ '[ @ f ] ]
         tri* if
     ] amb-preserve ; inline
