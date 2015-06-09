@@ -131,7 +131,7 @@ PRIVATE>
     { [ ".private" tail? ] [ ".tests" tail? ] } 1|| not ;
 
 : test-coverage-recursively ( prefix -- assoc )
-    disk-vocabs-for-prefix [ coverage-vocab? ] filter
+    loaded-child-vocab-names [ coverage-vocab? ] filter
     [ dup test-coverage ] { } map>assoc ;
 
 : %coverage ( string -- x )
