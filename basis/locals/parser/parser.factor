@@ -53,7 +53,7 @@ SINGLETON: lambda-parser
     [ make-local <def> ] H{ } make ;
 
 : update-locals ( assoc -- )
-    manifest get qualified-vocabs>> last words>> swap assoc-union! drop ;
+    qualified-vocabs last words>> swap assoc-union! drop ;
 
 : parse-def ( name/paren -- def )
     dup "(" = [ drop parse-multi-def ] [ parse-single-def ] if update-locals ;
