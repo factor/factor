@@ -217,6 +217,11 @@ HELP: remove-word-prop
 { $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." }
 { $side-effects "word" } ;
 
+HELP: remove-word-props
+{ $values { "word" word } { "seq" "a sequence of word property names" } }
+{ $description "Removes all listed word properties from the word." }
+{ $side-effects "word" } ;
+
 HELP: word-code
 { $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
 { $description "Outputs the memory range containing the word's machine code." } ;
@@ -225,11 +230,6 @@ HELP: define
 { $values { "word" word } { "def" quotation } }
 { $description "Defines the word to call a quotation when executed. This is the run time equivalent of " { $link POSTPONE: : } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
-{ $side-effects "word" } ;
-
-HELP: reset-props
-{ $values { "word" word } { "seq" "a sequence of word property names" } }
-{ $description "Removes all listed word properties from the word." }
 { $side-effects "word" } ;
 
 HELP: reset-word

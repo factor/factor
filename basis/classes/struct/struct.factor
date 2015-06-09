@@ -333,7 +333,7 @@ M: struct-class reset-class
             [ forget-struct-slot-values-method ]
             [ forget-clone-method ] bi
         ]
-        [ { "c-type" "layout" "struct-size" } reset-props ]
+        [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
 

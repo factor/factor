@@ -32,7 +32,7 @@ PRIVATE>
     ] 3tri ;
 
 M: predicate-class reset-class
-    [ call-next-method ] [ { "predicate-definition" } reset-props ] bi ;
+    [ call-next-method ] [ "predicate-definition" remove-word-prop ] bi ;
 
 M: predicate-class rank-class drop 2 ;
 
