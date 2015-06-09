@@ -37,7 +37,7 @@ TUPLE: function name alien return params ;
 
 : install-function ( function -- )
     dup name>> "alien.llvm" create-vocab drop
-    "alien.llvm" create swap
+    "alien.llvm" create-word swap
     [
         dup name>> function-pointer ,
         dup return>> c:lookup-c-type ,
