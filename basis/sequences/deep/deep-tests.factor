@@ -41,3 +41,9 @@ IN: sequences.deep.tests
 
 [ t ]
 [ { 1 2 3 4 } { { 1 2 3 4 } } deep-subseq? ] unit-test
+
+{ 3 } [
+    { 1 { 2 3 { 4 } } 5 { { 6 } 7 } } 0 [
+        dup integer? [ even? [ 1 + ] when ] [ drop ] if
+    ] deep-reduce
+] unit-test
