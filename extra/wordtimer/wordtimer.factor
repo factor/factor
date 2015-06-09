@@ -1,6 +1,6 @@
-USING: kernel sequences namespaces make math assocs words arrays
-tools.annotations vocabs sorting prettyprint io system
-math.statistics accessors tools.time fry ;
+USING: accessors arrays assocs fry io kernel make math
+math.statistics namespaces prettyprint sequences sorting
+tools.annotations tools.time vocabs ;
 FROM: namespaces => change-global ;
 IN: wordtimer
 
@@ -44,10 +44,10 @@ SYMBOL: *calling*
     dup '[ [ _ ] dip (add-timer) ] annotate ;
 
 : add-timers ( vocab -- )
-    words [ add-timer ] each ;
+    vocab-words [ add-timer ] each ;
 
 : reset-vocab ( vocab -- )
-    words [ reset ] each ;
+    vocab-words [ reset ] each ;
 
 : dummy-word ( -- ) ;
 

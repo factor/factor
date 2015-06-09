@@ -21,7 +21,7 @@ CONSTANT: elements-vocab "html.elements"
 : html-word ( name def effect -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
-    [ elements-vocab create ] 2dip define-declared ;
+    [ elements-vocab create-word ] 2dip define-declared ;
 
 : <foo> ( str -- <str> ) "<" ">" surround ;
 

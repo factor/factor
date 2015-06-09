@@ -176,7 +176,7 @@ CONSTANT: standard-formats {
 }
 
 : define-graphviz-by-layout ( layout -- )
-    [ "graphviz.render" create ]
+    [ "graphviz.render" create-word ]
     [ [ graphviz ] curry ] bi
     ( graph path format -- )
     define-declared ;
@@ -184,7 +184,7 @@ CONSTANT: standard-formats {
 : define-graphviz-by-format ( format -- )
     [
         dup standard-layouts member? [ "-file" append ] when
-        "graphviz.render" create
+        "graphviz.render" create-word
     ]
     [ [ graphviz* ] curry ] bi
     ( graph path -- )

@@ -53,7 +53,7 @@ SYNTAX: hello "Hi" print ;
     ] unit-test
 ] with-file-vocabs
 
-[ "call" "scratchpad" create drop ] with-compilation-unit
+[ "call" "scratchpad" create-word drop ] with-compilation-unit
 
 [
     [ t ]

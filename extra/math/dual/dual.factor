@@ -72,7 +72,7 @@ MACRO: dual-op ( word -- )
     '[ _ @ @ <dual> ] ;
 
 : define-dual ( word -- )
-    dup name>> "d" prepend "math.dual" create
+    dup name>> "d" prepend "math.dual" create-word
     [ [ stack-effect ] dip set-stack-effect ]
     [ set-dual-help ]
     [ swap '[ _ dual-op ] define ]
