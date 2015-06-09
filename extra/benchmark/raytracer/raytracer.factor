@@ -175,13 +175,13 @@ DEFER: create
 : ray-trace ( scene -- pixels )
     pixel-grid [ [ ray-pixel ] with map ] with map ;
 
-: run ( -- string )
+: run-raytracer ( -- string )
     levels double-array{ 0.0 -1.0 0.0 } 1.0 create ray-trace [
         size size pgm-header
         [ [ oversampling sq / pgm-pixel ] each ] each
     ] B{ } make ;
 
 : raytracer-benchmark ( -- )
-    run "raytracer.pnm" temp-file binary set-file-contents ;
+    run-raytracer "raytracer.pnm" temp-file binary set-file-contents ;
 
 MAIN: raytracer-benchmark
