@@ -187,9 +187,11 @@ M: hashtable assoc-like
 ! borrowed from boost::hash_combine, but the
 ! magic number is 2^29/phi instead of 2^32/phi
 ! due to max fixnum value on 32-bit machines
-: hash-combine ( obj oldhash -- newhash )
-    [ hashcode 0x13c6ef37 + ] dip
-    [ 6 shift ] [ -2 shift ] bi + + ;
+: hash-combine ( hash1 hash2 -- newhash )
+    [ 0x13c6ef37 + ] dip [ 6 shift ] [ -2 shift ] bi + + ; inline
+
+: 2hashcode ( obj1 obj2 -- hash )
+    [ hashcode ] bi@ hash-combine ; inline
 
 ERROR: malformed-hashtable-pair seq pair ;
 

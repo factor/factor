@@ -188,7 +188,7 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup 0 hash-combine hash-combine >fixnum (word) dup new-word ;
+    2dup 2hashcode >fixnum (word) dup new-word ;
 
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)
@@ -202,8 +202,7 @@ M: word reset-word
 
 : reveal ( word -- )
     dup [ name>> ] [ vocabulary>> ] bi dup vocab-words-assoc
-    [ ] [ no-vocab ] ?if
-    set-at ;
+    [ ] [ no-vocab ] ?if set-at ;
 
 ERROR: bad-create name vocab ;
 
