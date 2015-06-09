@@ -1,18 +1,16 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations debugger definitions
-help.topics io io.backend io.files io.launcher io.pathnames
-kernel lexer math namespaces parser prettyprint sequences
-source-files source-files.errors splitting strings summary
+USING: accessors assocs calendar continuations debugger
+definitions io io.launcher io.pathnames kernel namespaces
+prettyprint sequences source-files.errors strings threads
 tools.crossref vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata calendar threads words ;
-FROM: vocabs => vocab-name >vocab-link ;
+vocabs.loader vocabs.metadata words ;
 IN: editors
 
 SYMBOL: editor-class
 
 : available-editors ( -- seq )
-    "editors" loaded-child-vocab-names ;
+    "editors" disk-child-vocab-names ;
 
 : editor-restarts ( -- alist )
     available-editors
