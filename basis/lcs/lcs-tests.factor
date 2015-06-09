@@ -22,4 +22,4 @@ USING: tools.test lcs ;
         T{ retain f CHAR: d }
         T{ insert f CHAR: e }
         T{ insert f CHAR: f }
-} ] [ "faxbcd" "abdef" diff ] unit-test
+} ] [ "faxbcd" "abdef" lcs-diff ] unit-test
