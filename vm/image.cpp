@@ -213,7 +213,7 @@ FILE* factor_vm::open_image(vm_parameters* p) {
     if (file == NULL) {
       std::cout << "Cannot open embedded image" << std::endl;
       char *msg = threadsafe_strerror(errno);
-      std::cout << "strerror: " << msg << std::endl;
+      std::cout << "strerror:1: " << msg << std::endl;
       free(msg);
       exit(1);
     }
@@ -235,7 +235,7 @@ void factor_vm::load_image(vm_parameters* p) {
   if (file == NULL) {
     std::cout << "Cannot open image file: " << p->image_path << std::endl;
     char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror: " << msg << std::endl;
+    std::cout << "strerror:2: " << msg << std::endl;
     free(msg);
     exit(1);
   }
@@ -276,7 +276,7 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   if (file == NULL) {
     std::cout << "Cannot open image file for writing: " << saving_filename << std::endl;
     char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror: " << msg << std::endl;
+    std::cout << "strerror:3: " << msg << std::endl;
     free(msg);
     return false;
   }
@@ -310,7 +310,7 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   if (!ok) {
     std::cout << "save-image failed." << std::endl;
     char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror: " << msg << std::endl;
+    std::cout << "strerror:4: " << msg << std::endl;
     free(msg);
   }
   else
