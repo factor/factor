@@ -33,8 +33,9 @@ PRIVATE>
     old-definitions get [ delete ] with each ;
 
 : remember-class ( class loc -- )
-    [ dup new-definitions get first in? [ dup throw-redefine-error ] when ] dip
-    new-definitions get second (remember-definition) ;
+    new-definitions get first2
+    [ dupd in? [ dup throw-redefine-error ] when ]
+    [ (remember-definition) ] bi-curry* bi* ;
 
 : forward-reference? ( word -- ? )
     dup old-definitions get [ in? ] with any? [
