@@ -31,15 +31,11 @@ ERROR: invalid-local-name name ;
 
 SINGLETON: lambda-parser
 
-SYMBOL: locals
-
-: ((parse-lambda)) ( assoc reader-quot -- quot )
+: ((parse-lambda)) ( assoc reader-quot: ( -- quot ) -- quot )
     '[
         in-lambda? on
         lambda-parser quotation-parser set
-        [ locals set ]
-        [ use-words @ ]
-        [ unuse-words ] tri
+        [ use-words @ ] [ unuse-words ] bi
     ] with-scope ; inline
 
 : (parse-lambda) ( assoc -- quot )
@@ -50,14 +46,17 @@ SYMBOL: locals
     (parse-lambda) <lambda>
     ?rewrite-closures ;
 
-: parse-multi-def ( locals -- multi-def )
-    ")" parse-tokens make-locals swapd assoc-union! drop <multi-def> ;
+: parse-multi-def ( -- multi-def assoc )
+    ")" parse-tokens make-locals [ <multi-def> ] dip ;
 
-: parse-single-def ( name locals -- def )
-    swap [ make-local ] H{ } make swapd assoc-union! drop <def> ;
+: parse-single-def ( name -- def assoc )
+    [ make-local <def> ] H{ } make ;
 
-: parse-def ( name/paren locals -- def )
-    over "(" = [ nip parse-multi-def ] [ parse-single-def ] if ;
+: update-locals ( assoc -- )
+    manifest get qualified-vocabs>> last words>> swap assoc-union! drop ;
+
+: parse-def ( name/paren -- def )
+    dup "(" = [ drop parse-multi-def ] [ parse-single-def ] if update-locals ;
 
 M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
