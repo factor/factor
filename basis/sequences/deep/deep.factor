@@ -16,6 +16,9 @@ M: object branch? drop f ;
     [ call ] 2keep over branch?
     [ '[ _ deep-each ] each ] [ 2drop ] if ; inline recursive
 
+: deep-reduce ( ... obj identity quot: ( ... prev elt -- ... next ) -- ... result )
+    swapd deep-each ; inline
+
 : deep-map ( ... obj quot: ( ... elt -- ... elt' ) -- ... newobj )
     [ call ] keep over branch?
     [ '[ _ deep-map ] map ] [ drop ] if ; inline recursive
