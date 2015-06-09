@@ -99,8 +99,8 @@ TUPLE: trace-state old new table i j ;
 
 PRIVATE>
 
-: diff ( old new -- diff )
+: lcs-diff ( old new -- diff )
     2dup [ lcs-initialize ] [ lcs-step ] run-lcs trace-diff ;
 
 : lcs ( seq1 seq2 -- lcs )
-    [ diff [ retain? ] filter ] keep [ item>> ] swap map-as ;
+    [ lcs-diff [ retain? ] filter ] keep [ item>> ] swap map-as ;
