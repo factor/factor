@@ -6,6 +6,11 @@ HELP: deep-each
 { $description "Execute a quotation on each nested element of an object and its children, in preorder." }
 { $see-also each } ;
 
+HELP: deep-reduce
+{ $values { "obj" object } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "result" "the final result" } }
+{ $description "Execute a quotation on each nested element of an object and its children, in preorder. The first iteration is called with " { $code "identity" } " and the first element. Subsequence iterations are called with the result of the previous iteration and the next element." }
+{ $see-also reduce } ;
+
 HELP: deep-map
 { $values { "obj" object } { "quot" { $quotation ( ... elt -- ... elt' ) } } { "newobj" "the mapped object" } }
 { $description "Execute a quotation on each nested element of an object and its children, in preorder. That is, the result of the execution of the quotation on the outer is used to map the inner elements." }
