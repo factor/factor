@@ -262,7 +262,7 @@ HELP: collect-by
     { $example
                "USING: math math.statistics prettyprint ;"
                "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-by ."
-               "H{ { f V{ 12 14 14 12 } } { t V{ 11 13 13 11 } } }"
+               "H{ { t V{ 11 13 13 11 } } { f V{ 12 14 14 12 } } }"
     }
 }
 { $notes "May be named " { $snippet "group-by" } " in other languages." } ;
@@ -278,7 +278,7 @@ HELP: collect-index-by
     { $example
                "USING: math math.statistics prettyprint ;"
                "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-index-by ."
-               "H{ { f V{ 1 3 4 6 } } { t V{ 0 2 5 7 } } }"
+               "H{ { t V{ 0 2 5 7 } } { f V{ 1 3 4 6 } } }"
     }
 } ;
 

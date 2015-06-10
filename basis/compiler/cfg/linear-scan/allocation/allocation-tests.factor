@@ -20,13 +20,13 @@ IN: compiler.cfg.linear-scan.allocation.tests
 
 cpu x86.64? [
     ! assign-registers
-    { RCX } [
+    { R8 } [
         { { int-regs V{ } } { float-regs V{ } } } active-intervals set
         unassigned-interval dup machine-registers assign-register reg>>
     ] unit-test
 
     ! register-status
-    { { RCX 1/0. } } [
+    { { R8 1/0. } } [
         { { int-regs V{ } } { float-regs V{ } } } active-intervals set
         unassigned-interval machine-registers register-status
     ] unit-test
