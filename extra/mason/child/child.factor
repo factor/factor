@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators
 combinators.short-circuit continuations fry io.directories
-io.launcher kernel macros make mason.config mason.notify
-mason.platform mason.report namespaces quotations sequences
-splitting system ;
+io.launcher io.pathnames kernel macros make mason.config
+mason.notify mason.platform mason.report namespaces quotations
+sequences splitting system ;
 IN: mason.child
 
 : nmake-cmd ( -- args )
@@ -16,37 +16,43 @@ IN: mason.child
     target-os get name>> target-cpu get name>> (platform)
     2array ;
 
-: make-cmd ( -- args )
+: mason-child-make-cmd ( -- args )
     {
         { [ target-os get windows = ] [ nmake-cmd ] }
         [ gnu-make-cmd ]
     } cond ;
 
-: make-vm ( -- )
+: make-mason-child-vm ( -- )
     "factor" [
         <process>
-            make-cmd >>command
+            mason-child-make-cmd >>command
             "../compile-log" >>stdout
             +stdout+ >>stderr
             +new-group+ >>group
         try-process
     ] with-directory ;
 
-: factor-vm ( -- string )
-    target-os get windows = "./factor.com" "./factor" ? ;
+! On windows, process launches relative to current process, ignoring
+! current-directory variables. Must pass absolute-path of factor.com
+: mason-child-vm ( -- string )
+    target-os get windows = [
+        "./factor.com" absolute-path
+    ] [
+        "./factor"
+    ] if ;
 
-: boot-cmd ( -- cmd )
+: mason-child-boot-cmd ( -- cmd )
     [
-        factor-vm ,
+        mason-child-vm ,
         "-i=" target-boot-image-name append ,
         "-no-user-init" ,
         boot-flags get %
     ] { } make ;
 
-: boot ( -- )
+: bootstrap-mason-child ( -- )
     "factor" [
         <process>
-            boot-cmd >>command
+            mason-child-boot-cmd >>command
             +closed+ >>stdin
             "../boot-log" >>stdout
             +stdout+ >>stderr
@@ -55,12 +61,12 @@ IN: mason.child
         try-process
     ] with-directory ;
 
-: test-cmd ( -- cmd ) factor-vm "-run=mason.test" 2array ;
+: mason-child-test-cmd ( -- cmd ) mason-child-vm "-run=mason.test" 2array ;
 
-: test ( -- )
+: test-mason-child ( -- )
     "factor" [
         <process>
-            test-cmd >>command
+            mason-child-test-cmd >>command
             +closed+ >>stdin
             "../test-log" >>stdout
             +stdout+ >>stderr
@@ -81,8 +87,8 @@ MACRO: recover-cond ( alist -- )
 
 : build-child ( -- status )
     {
-        { [ notify-make-vm make-vm ] [ compile-failed ] }
-        { [ notify-boot boot ] [ boot-failed ] }
-        { [ notify-test test ] [ test-failed ] }
+        { [ notify-make-vm make-mason-child-vm ] [ compile-failed ] }
+        { [ notify-boot bootstrap-mason-child ] [ boot-failed ] }
+        { [ notify-test test-mason-child ] [ test-failed ] }
         [ success ]
     } recover-cond ;
