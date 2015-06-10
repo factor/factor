@@ -44,7 +44,7 @@ TUPLE: person first-name age ;
 { """{"":4}""" }
 [ H{ { "" 2 } { "" 4 } } >json ] unit-test
 
-{ """{"":5,"false":2,"true":4}""" }
+{ """{"true":4,"false":2,"":5}""" }
 [ H{ { f 2 } { t 4 } { "" 5 } } >json ] unit-test
 
 { """{"3.1":3}""" }
