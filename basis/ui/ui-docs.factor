@@ -6,10 +6,10 @@ vocabs.loader ;
 
 IN: ui
 
-HELP: windows
+HELP: ui-windows
 { $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
 
-{ windows open-window find-window world-attributes } related-words
+{ ui-windows open-window find-window world-attributes } related-words
 
 HELP: open-window
 { $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
@@ -47,12 +47,12 @@ HELP: find-window
 
 HELP: register-window
 { $values { "world" world } { "handle" "a backend-specific handle" } }
-{ $description "Adds a window to the global " { $link windows } " variable." }
+{ $description "Adds a window to the global " { $link ui-windows } " variable." }
 { $notes "This word should only be called by the UI backend. User code can open new windows with " { $link open-window } "." } ;
 
 HELP: unregister-window
 { $values { "handle" "a backend-specific handle" } }
-{ $description "Removes a window from the global " { $link windows } " variable." }
+{ $description "Removes a window from the global " { $link ui-windows } " variable." }
 { $notes "This word should only be called only by the UI backend, and not user code." } ;
 
 HELP: (with-ui)
@@ -150,7 +150,7 @@ ARTICLE: "ui-windows" "Top-level windows"
 "Finding top-level windows:"
 { $subsections find-window }
 "Top-level windows are stored in a global variable:"
-{ $subsections windows }
+{ $subsections ui-windows }
 "When a gadget is displayed in a top-level window, or added to a parent which is already showing in a top-level window, a generic word is called allowing the gadget to perform initialization tasks:"
 { $subsections graft* }
 "When the gadget is removed from a parent shown in a top-level window, or when the top-level window is closed, a corresponding generic word is called to clean up:"

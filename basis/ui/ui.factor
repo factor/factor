@@ -13,9 +13,9 @@ IN: ui
 <PRIVATE
 
 ! Assoc mapping aliens to gadgets
-SYMBOL: windows
+SYMBOL: ui-windows
 
-: window ( handle -- world ) windows get-global at ;
+: window ( handle -- world ) ui-windows get-global at ;
 
 : register-window ( world handle -- )
     #! Add the new window just below the topmost window. Why?
@@ -24,15 +24,15 @@ SYMBOL: windows
     #! in the new window when it appears) Factor doesn't get
     #! confused and send workspace operations to the new window,
     #! etc.
-    swap 2array windows get-global push
-    windows get-global dup length 1 >
+    swap 2array ui-windows get-global push
+    ui-windows get-global dup length 1 >
     [ [ length 1 - dup 1 - ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    windows [ [ first = ] with reject ] change-global ;
+    ui-windows [ [ first = ] with reject ] change-global ;
 
 : raised-window ( world -- )
-    windows get-global
+    ui-windows get-global
     [ [ second eq? ] with find drop ] keep
     [ nth ] [ remove-nth! drop ] [ nip ] 2tri push ;
 
@@ -108,7 +108,7 @@ M: world ungraft*
     <dlist> \ graft-queue set-global
     <dlist> \ layout-queue set-global
     <dlist> \ gesture-queue set-global
-    V{ } clone windows set-global ;
+    V{ } clone ui-windows set-global ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
@@ -147,7 +147,7 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : find-window ( quot: ( world -- ? ) -- world )
-    [ windows get-global values ] dip
+    [ ui-windows get-global values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
     find-last nip ; inline
 
@@ -202,7 +202,7 @@ PRIVATE>
     find-world raise-window* ;
 
 : topmost-window ( -- world )
-    windows get-global last second ;
+    ui-windows get-global last second ;
 
 HOOK: close-window ui-backend ( gadget -- )
 
