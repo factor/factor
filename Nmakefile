@@ -24,18 +24,27 @@ CL_FLAGS = $(CL_FLAGS) /Zi /DFACTOR_DEBUG
 !IF "$(PLATFORM)" == "x86-32"
 LINK_FLAGS = $(LINK_FLAGS) /safeseh
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console,"5.01"
+SUBSYSTEM_EXE_FLAGS = windows,"5.01"
 
 !ELSEIF "$(PLATFORM)" == "x86-32-vista"
 LINK_FLAGS = $(LINK_FLAGS) /safeseh
 CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
 
 !ELSEIF "$(PLATFORM)" == "x86-64"
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console,"5.02"
+SUBSYSTEM_EXE_FLAGS = windows,"5.02"
+
 
 !ELSEIF "$(PLATFORM)" == "x86-64-vista"
 CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
 !ENDIF
 
 !IF DEFINED(DEBUG)
@@ -113,10 +122,10 @@ factor.dll.lib: $(DLL_OBJS)
 	link $(LINK_FLAGS) /implib:factor.dll.lib /out:factor.dll /dll $(DLL_OBJS)
 
 factor.com: $(EXE_OBJS) $(DLL_OBJS)
-	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:console $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:$(SUBSYSTEM_COM_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
 
 factor.exe: $(EXE_OBJS) $(DLL_OBJS)
-	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:$(SUBSYSTEM_EXE_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
 
 all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
