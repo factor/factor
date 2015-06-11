@@ -3,7 +3,8 @@
 
 USING: arrays assocs combinators fry hashtables io
 io.streams.string json kernel kernel.private math math.parser
-namespaces sbufs sequences sequences.private strings vectors ;
+namespaces sbufs sequences sequences.private strings vectors
+math.order ;
 
 IN: json.reader
 
@@ -11,9 +12,32 @@ IN: json.reader
 
 : json-number ( char stream -- num char )
     [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
-    [ append string>number ] dip ;
+    [ append {
+        { "Infinity" [ 1/0. ] }
+        { "-Infinity" [ -1/0. ] }
+        { "NaN" [ 0/0. ] }
+        [ string>number ]
+    } case ] dip ;
+
+: json-expect ( token stream -- )
+    [ dup length ] [ stream-read ] bi* = [ json-error ] unless ; inline
 
 DEFER: (read-json-string)
+
+: decode-utf16-surrogate-pair ( hex1 hex2 -- char )
+    [ 0x3ff bitand ] bi@ [ 10 shift ] dip bitor 0x10000 + ;
+
+: stream-read-4hex ( stream -- hex ) 4 swap stream-read hex> ;
+
+: first-surrogate? ( hex -- ? ) 0xd800 0xdbff between? ;
+
+: read-second-surrogate ( stream -- hex )
+    "\\u" over json-expect stream-read-4hex ;
+
+: read-json-escape-unicode ( stream -- char )
+    [ stream-read-4hex ] keep over first-surrogate? [
+        read-second-surrogate decode-utf16-surrogate-pair
+    ] [ drop ] if ;
 
 : (read-json-escape) ( stream accum -- accum )
     { sbuf } declare
@@ -26,7 +50,7 @@ DEFER: (read-json-string)
         { CHAR: n [ CHAR: \n ] }
         { CHAR: r [ CHAR: \r ] }
         { CHAR: t [ CHAR: \t ] }
-        { CHAR: u [ 4 pick stream-read hex> ] }
+        { CHAR: u [ over read-json-escape-unicode ] }
         [ ]
     } case [ suffix! (read-json-string) ] [ json-error ] if* ;
 
@@ -77,9 +101,6 @@ DEFER: (read-json-string)
 
 : json-close-hash ( accum -- accum )
     v-close dup dup [ v-pop ] bi@ swap H{ } zip-as suffix! ;
-
-: json-expect ( token stream -- )
-    [ dup length ] [ stream-read ] bi* = [ json-error ] unless ; inline
 
 : scan ( stream accum char -- stream accum )
     ! 2dup 1string swap . . ! Great for debug...
