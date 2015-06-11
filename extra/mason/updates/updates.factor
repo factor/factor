@@ -24,7 +24,7 @@ SYMBOLS: latest-sources last-built-sources ;
 
 : update-sources ( -- )
     #! Must be run from builds-dir
-    git-pull latest-boot-image latest-counter <sources>
+    git-clone-or-pull latest-boot-image latest-counter <sources>
     latest-sources set-global ;
 
 : should-build? ( -- ? )
