@@ -86,7 +86,7 @@ IN: mason.git
 
 PRIVATE>
 
-: git-pull ( -- id )
+: git-clone-or-pull ( -- id )
     #! Must be run from builds-dir.
     "factor" exists? [
         check-repository [
