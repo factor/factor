@@ -18,22 +18,12 @@ IN: mason.child.tests
 
 ! Must be an absolute path on Windows because launch directory
 ! is relative to parent directory (instead of current directory).
-
-os windows = [
-    { t } [
-        H{
-            { target-os windows }
-            { target-cpu x86.32 }
-        } [ mason-child-boot-cmd ] with-variables first absolute-path?
-    ] unit-test
-] [
-    [ { "./factor.com" "-i=boot.windows-x86.32.image" "-no-user-init" } ] [
-        H{
-            { target-os windows }
-            { target-cpu x86.32 }
-        } [ mason-child-boot-cmd ] with-variables
-    ] unit-test
-] if
+{ t } [
+    H{
+        { target-os windows }
+        { target-cpu x86.32 }
+    } [ mason-child-boot-cmd ] with-variables first absolute-path?
+] unit-test
 
 [ [ "Hi" print ] [ drop 3 ] [ 4 ] recover-else ] must-infer
 
