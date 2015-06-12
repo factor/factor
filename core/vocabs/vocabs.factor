@@ -41,12 +41,6 @@ M: vocab-link vocab-name name>> ;
 
 M: object vocab-name check-vocab-name ;
 
-: vocab-name* ( vocab-spec -- name )
-    vocab-name ".private" ?tail drop ;
-
-: private-vocab? ( vocab-spec -- ? )
-    vocab-name ".private" tail? ;
-
 GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
 M: vocab lookup-vocab ;
@@ -148,6 +142,7 @@ INSTANCE: vocab-spec definition-mixin
 GENERIC: require ( object -- )
 
 M: vocab require name>> require ;
+
 M: vocab-link require name>> require ;
 
 ! When calling "foo.private" require, load "foo" instead, but only when
