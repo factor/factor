@@ -58,9 +58,14 @@ TUPLE: float-parse
     [ store-exponent ] [ drop f ] if* ; inline
 
 : ((pow)) ( base x -- base^x )
-    iota 1 rot [ nip * ] curry reduce ; inline
+    [ 1 ] 2dip
+    [ dup zero? ] [
+        dup odd? [ [ [ * ] keep ] [ 1 - ] bi* ] when
+        [ sq ] [ 2/ ] bi*
+    ] until 2drop ; inline
 
 : (pow) ( base x -- base^x )
+    integer>fixnum-strict
     dup 0 >= [ ((pow)) ] [ [ recip ] [ neg ] bi* ((pow)) ] if ; inline
 
 : add-mantissa-digit ( float-parse i number-parse n digit quot -- float-parse' n/f )
