@@ -188,9 +188,7 @@ M: hashtable assoc-like
 ! magic number is 2^29/phi instead of 2^32/phi
 ! due to max fixnum value on 32-bit machines
 : hash-combine ( hash1 hash2 -- newhash )
-    [ >fixnum ] bi@ [ 0x13c6ef37 fixnum+fast ] dip
-    [ 6 fixnum-shift-fast ] [ -2 fixnum-shift-fast ] bi
-    fixnum+fast fixnum+fast ; inline
+    [ 0x13c6ef37 + ] dip [ 6 shift ] [ -2 shift ] bi + + ; inline
 
 ERROR: malformed-hashtable-pair seq pair ;
 
