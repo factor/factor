@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar continuations debugger
 definitions io io.launcher io.pathnames kernel namespaces
-prettyprint sequences source-files.errors strings threads
-tools.crossref vocabs vocabs.files vocabs.hierarchy
+prettyprint sequences source-files.errors splitting strings
+threads tools.crossref vocabs vocabs.files vocabs.hierarchy
 vocabs.loader vocabs.metadata words ;
 IN: editors
 
@@ -53,8 +53,15 @@ M: cannot-find-source error.
 
 DEFER: edit
 
+<PRIVATE
+
+: public-vocab-name ( vocab-spec -- name )
+    vocab-name ".private" ?tail drop ;
+
+PRIVATE>
+
 : edit-vocab ( vocab -- )
-    vocab-name* >vocab-link edit ;
+    public-vocab-name >vocab-link edit ;
 
 GENERIC: edit ( object -- )
 
@@ -89,7 +96,7 @@ M: string edit edit-vocab ;
 GENERIC: edit-docs ( object -- )
 
 M: object edit-docs
-    vocab-name* vocab-docs-path 1 edit-location ;
+    public-vocab-name vocab-docs-path 1 edit-location ;
 
 M: word edit-docs
     dup "help-loc" word-prop
@@ -100,7 +107,7 @@ M: word edit-docs
 GENERIC: edit-tests ( object -- )
 
 M: object edit-tests
-    vocab-name* vocab-tests-path 1 edit-location ;
+    public-vocab-name vocab-tests-path 1 edit-location ;
 
 M: word edit-tests vocabulary>> edit-tests ;
 
