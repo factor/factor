@@ -13,8 +13,6 @@ IN: compiler.cfg.ssa.destruction
 
 SYMBOL: class-element-map
 
-: class-elements ( vreg -- elts ) class-element-map get at ;
-
 <PRIVATE
 
 ! Sequence of vreg pairs
@@ -41,9 +39,6 @@ SYMBOL: copies
 
 GENERIC: prepare-insn ( insn -- )
 
-: maybe-eliminate-copy-later ( dst src -- )
-    2array copies get push ;
-
 M: insn prepare-insn drop ;
 
 M: alien-call-insn prepare-insn drop ;
@@ -55,26 +50,25 @@ M: vreg-insn prepare-insn
         2dup [ empty? not ] both? [
             [ first ] bi@
             2dup [ rep-of reg-class-of ] bi@ eq?
-            [ maybe-eliminate-copy-later ] [ 2drop ] if
+            [ 2array copies get push ] [ 2drop ] if
         ] [ 2drop ] if
     ] bi ;
 
 M: ##copy prepare-insn
-    [ dst>> ] [ src>> ] bi maybe-eliminate-copy-later ;
+    [ dst>> ] [ src>> ] bi 2array copies get push ;
 
 M: ##parallel-copy prepare-insn
-    values>> [ first2 maybe-eliminate-copy-later ] each ;
+    values>> copies get push-all ;
 
 : leaders ( vreg1 vreg2 -- vreg1' vreg2' )
     [ leader ] bi@ ;
 
 : vregs-interfere? ( vreg1 vreg2 -- merged/f ? )
-    [ class-elements ] bi@ sets-interfere? ;
+    [ class-element-map get at ] bi@ sets-interfere? ;
 
 ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
 
 :: must-eliminate-copy ( vreg1 vreg2 -- )
-    ! Eliminate a copy.
     vreg1 vreg2 = [
         vreg1 vreg2 vregs-interfere?
         [ vreg1 vreg2 vregs-shouldn't-interfere ]
@@ -90,11 +84,9 @@ M: ##phi prepare-insn
     [ leaders must-eliminate-copy ] with each ;
 
 : prepare-coalescing ( cfg -- )
-    init-coalescing
-    [ [ prepare-insn ] each ] simple-analysis ;
+    init-coalescing [ [ prepare-insn ] each ] simple-analysis ;
 
 :: maybe-eliminate-copy ( vreg1 vreg2 -- )
-    ! Eliminate a copy if possible.
     vreg1 vreg2 = [
         vreg1 vreg2 vregs-interfere?
         [ drop ] [ vreg1 vreg2 coalesce-vregs ] if
