@@ -2,7 +2,7 @@ USING: alien.syntax compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.ssa.destruction
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.destruction.private compiler.cfg.utilities
-cpu.architecture cpu.x86.assembler.operands make namespaces tools.test ;
+cpu.architecture cpu.x86.assembler.operands kernel make namespaces tools.test ;
 IN: compiler.cfg.ssa.destruction.tests
 
 ! cleanup-insn
@@ -61,4 +61,22 @@ IN: compiler.cfg.ssa.destruction.tests
            { insn# 18 }
         }
     } 0 insns>block block>cfg destruct-ssa
+] unit-test
+
+! must-eliminate-copy
+{ } [
+    10 10 must-eliminate-copy
+] unit-test
+
+! prepare-insn
+{ V{ { 2 1 } } } [
+    V{ } clone copies set
+    T{ ##copy { src 1 } { dst 2 } { rep int-rep } } prepare-insn
+    copies get
+] unit-test
+
+{ V{ { 3 4 } { 7 8 } } } [
+    V{ } clone copies set
+    T{ ##parallel-copy { values V{ { 3 4 } { 7 8 } } } } prepare-insn
+    copies get
 ] unit-test
