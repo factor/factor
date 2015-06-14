@@ -5,13 +5,6 @@ compiler.cfg.dominance compiler.cfg.ssa.interference.live-ranges
 kernel locals math math.order sequences sorting.slots ;
 IN: compiler.cfg.ssa.interference
 
-! Interference testing using SSA properties.
-!
-! Based on:
-!
-! Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency
-! http://hal.archives-ouvertes.fr/docs/00/34/99/25/PDF/OutSSA-RR.pdf
-
 TUPLE: vreg-info vreg value def-index bb pre-of color equal-anc-in equal-anc-out ;
 
 :: <vreg-info> ( vreg value bb -- info )

@@ -16,6 +16,9 @@ HELP: parallel-copy-rep
 { $description "Creates " { $link ##copy } " instructions. Representation selection must have been run previously." } ;
 
 ARTICLE: "compiler.cfg.parallel-copy" "Parallel copy"
-"Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency http://hal.archives-ouvertes.fr/docs/00/34/99/25/PDF/OutSSA-RR.pdf, Algorithm 1" ;
+"Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency http://hal.archives-ouvertes.fr/docs/00/34/99/25/PDF/OutSSA-RR.pdf, Algorithm 1"
+$nl
+"Generating " { $link ##copy } " instructions:"
+{ $subsections parallel-copy parallel-copy-rep } ;
 
 ABOUT: "compiler.cfg.parallel-copy"

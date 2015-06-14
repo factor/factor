@@ -1,6 +1,10 @@
-USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax
+USING: assocs compiler.cfg compiler.cfg.instructions help.markup help.syntax
 sequences ;
 IN: compiler.cfg.def-use
+
+HELP: compute-defs
+{ $values { "cfg" cfg } }
+{ $description "Computes a mapping from vregs to " { $link basic-block } " instances in which they are defined. The data is assigned to the " { $link defs } " dynamic variable." } ;
 
 HELP: compute-insns
 { $values { "cfg" cfg } }
@@ -17,9 +21,14 @@ HELP: defs-vregs
   }
 } ;
 
+HELP: insns
+{ $var-description { $link assoc } " mapping vreg integers to defining instructions." }
+{ $see-also compute-insns insn-of } ;
+
 HELP: insn-of
 { $values { "vreg" "virtual register" } { "insn" insn } }
-{ $description "Maps the vreg to the instruction that defined it." } ;
+{ $description "Maps the vreg to the instruction that defined it." }
+{ $see-also compute-insns } ;
 
 HELP: temp-vregs
 { $values { "insn" insn } { "seq" sequence } }
@@ -43,7 +52,7 @@ HELP: special-vreg-insns
 ARTICLE: "compiler.cfg.def-use" "Common code used by several passes for def-use analysis"
 "The " { $vocab-link "compiler.cfg.def-use" } " contains tools to correlate SSA instructions with virtual registers defined or used by them."
 $nl
-"Vregs for a given instruction:"
+"The def-use protocol -- vregs for a given instruction:"
 { $subsections
   defs-vregs
   temp-vregs

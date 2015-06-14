@@ -1,6 +1,10 @@
-USING: compiler.cfg.instructions compiler.cfg.ssa.construction.private
-help.markup help.syntax ;
+USING: compiler.cfg compiler.cfg.instructions
+compiler.cfg.ssa.construction.private help.markup help.syntax ;
 IN: compiler.cfg.ssa.construction
+
+HELP: <##phi>
+{ $values { "vreg" "vreg" } { "bb" basic-block } { "##phi" ##phi } }
+{ $description "Creates a new " { $link ##phi } " instruction given a vreg and a basic block." } ;
 
 HELP: phis
 { $var-description "Maps vregs to " { $link ##phi } " instructions." } ;
@@ -16,6 +20,12 @@ HELP: defs-multi
 
 HELP: inserting-phis
 { $var-description "Maps basic blocks to sequences of " { $link ##phi } " instructions." } ;
+
+HELP: pushed
+{ $var-description "Maps vregs to renaming stacks." } ;
+
+HELP: stacks
+{ $var-description "Maps vregs to renaming stacks." } ;
 
 ARTICLE: "compiler.cfg.ssa.construction" "SSA construction"
 "Iterated dominance frontiers are computed using the DJ Graph method in " { $vocab-link "compiler.cfg.ssa.construction.tdmsc" } "."
