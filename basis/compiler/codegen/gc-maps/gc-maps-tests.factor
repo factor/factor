@@ -112,7 +112,7 @@ cpu x86.64? [
                    T{ spill-slot { n 0 } }
                    T{ spill-slot { n 24 } }
                } }
-            } 1array gc-maps set
+            } 1array
             [ emit-gc-info-bitmaps ] B{ } make drop
         ] with-variable
     ] unit-test
@@ -125,13 +125,23 @@ cpu x86.64? [
                    T{ spill-slot { n 0 } }
                    T{ spill-slot { n 24 } }
                } }
-            } 1array gc-maps set
+            } 1array
             [ emit-gc-info-bitmaps ] B{ } make drop
         ] with-variable
     ] unit-test
 
     fake-cpu \ cpu set
 ] when
+
+! largest-spill-slot
+{
+    5 0 4 1
+} [
+    { { 4 } } largest-spill-slot
+    { { } } largest-spill-slot
+    { { 2 3 } { 0 } } largest-spill-slot
+    { { 0 } } largest-spill-slot
+] unit-test
 
 ! gc-map-needed?
 { t t } [
@@ -149,7 +159,7 @@ cpu x86.64? [
     { 4 2 0 }
     V{ 1 }
 } [
-    { T{ gc-map { scrub-d { 0 1 1 1 } } { scrub-r { 1 1 } } } } gc-maps set
+    { T{ gc-map { scrub-d { 0 1 1 1 } } { scrub-r { 1 1 } } } }
     [ emit-gc-info-bitmaps ] V{ } make
 ] unit-test
 
@@ -157,7 +167,7 @@ cpu x86.64? [
     { 1 0 0 }
     V{ 1 }
 } [
-    { T{ gc-map { scrub-d { 0 } } } } gc-maps set
+    { T{ gc-map { scrub-d { 0 } } } }
     [ emit-gc-info-bitmaps ] V{ } make
 ] unit-test
 
@@ -174,7 +184,7 @@ USING: present prettyprint ;
 {
     3 B{ 255 255 255 255 255 255 255 255 4 0 0 0 }
 } [
-    { T{ gc-map { derived-roots V{ { 2 4 } } } } } gc-maps set
+    { T{ gc-map { derived-roots V{ { 2 4 } } } } }
     [ emit-base-tables ] B{ } make
 ] unit-test
 
