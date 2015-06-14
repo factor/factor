@@ -26,11 +26,8 @@ M: live-interval-state interval/sync-point-key
 M: sync-point interval/sync-point-key
     n>> 1/0. 1/0. 3array ;
 
-: zip-keyed ( seq quot: ( elt -- key ) -- alist )
-    [ keep ] curry { } map>assoc ; inline
-
-: >unhandled-min-heap ( live-intervals sync-points -- min-heap )
-    append [ interval/sync-point-key ] zip-keyed >min-heap ;
+: >unhandled-min-heap ( intervals/sync-points -- min-heap )
+    [ [ interval/sync-point-key ] keep 2array ] map >min-heap ;
 
 SYMBOL: registers
 
@@ -134,7 +131,7 @@ SYMBOL: spill-slots
 : lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
     rep-size 2array spill-slots get ?at [ ] [ bad-vreg ] if ;
 
-: init-allocator ( live-intervals sync-points registers -- )
+: init-allocator ( intervals/sync-points registers -- )
     registers set
     >unhandled-min-heap unhandled-min-heap set
     [ V{ } clone ] reg-class-assoc active-intervals set
