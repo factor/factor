@@ -1,8 +1,10 @@
-USING: alien.syntax compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.ssa.destruction
-compiler.cfg.ssa.destruction.leaders
+USING: alien.syntax assocs compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.ssa.destruction compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.destruction.private compiler.cfg.utilities
-cpu.architecture cpu.x86.assembler.operands make namespaces tools.test ;
+cpu.architecture cpu.x86.assembler.operands grouping kernel make namespaces
+random sequences tools.test ;
+QUALIFIED: sets
 IN: compiler.cfg.ssa.destruction.tests
 
 ! cleanup-insn
@@ -61,4 +63,39 @@ IN: compiler.cfg.ssa.destruction.tests
            { insn# 18 }
         }
     } 0 insns>block block>cfg destruct-ssa
+] unit-test
+
+! try-eliminate-copy
+{ } [
+    10 10 f try-eliminate-copy
+] unit-test
+
+! prepare-insn
+{ V{ { 2 1 } } } [
+    V{ } clone copies set
+    T{ ##copy { src 1 } { dst 2 } { rep int-rep } } prepare-insn
+    copies get
+] unit-test
+
+{ V{ { 3 4 } { 7 8 } } } [
+    V{ } clone copies set
+    T{ ##parallel-copy { values V{ { 3 4 } { 7 8 } } } } prepare-insn
+    copies get
+] unit-test
+
+! All this work to make the 'values' order non-deterministic.
+: make-phi-inputs ( -- assoc )
+    H{ } clone [
+        { 2287 2288 } [
+            10 iota 1 sample first rot set-at
+        ] with each
+    ] keep ;
+
+{ t } [
+    10 [
+        { 2286 2287 2288 } sets:unique leader-map set
+        2286 make-phi-inputs ##phi new-insn
+        prepare-insn
+        2286 leader
+    ] replicate all-equal?
 ] unit-test

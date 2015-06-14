@@ -16,8 +16,11 @@ HELP: block-from
 { $description "The instruction number immediately preceeding this block." } ;
 
 HELP: finish-live-intervals
-{ $values { "live-intervals" sequence } { "seq" sequence } }
+{ $values { "live-intervals" sequence } }
 { $description "Since live intervals are computed in a backward order, we have to reverse some sequences, and compute the start and end." } ;
+
+HELP: from
+{ $var-description "An integer representing a sequence number one lower than all numbers in the currently processed block." } ;
 
 HELP: live-interval-state
 { $class-description "A class encoding the \"liveness\" of a virtual register. It has the following slots:"
@@ -58,6 +61,9 @@ HELP: live-interval-state
 HELP: live-intervals
 { $var-description "Mapping from vreg to " { $link live-interval-state } "." } ;
 
+HELP: live-range
+{ $class-description "Represents a range in the " { $link cfg } " in which a vreg is live." } ;
+
 HELP: sync-point
 { $class-description "A location where all registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
   { $table
@@ -68,3 +74,20 @@ HELP: sync-point
 
 HELP: sync-points
 { $var-description "Sequence of sync points." } ;
+
+HELP: to
+{ $var-description "An integer representing a sequence number equal to the highest number in the currently processed block." } ;
+
+ARTICLE: "compiler.cfg.linear-scan.live-intervals" "Live interval utilities"
+"This vocab contains words for managing live intervals."
+$nl
+"Liveness classes and constructors:"
+{ $subsections
+  <live-interval>
+  <live-range>
+  live-interval
+  live-range
+} ;
+
+
+ABOUT: "compiler.cfg.linear-scan.live-intervals"

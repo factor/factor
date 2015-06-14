@@ -16,8 +16,6 @@ compiler.tree.propagation.transforms
 kernel namespaces ;
 IN: compiler.tree.propagation
 
-! This pass must run after normalization
-
 : propagate ( nodes -- nodes )
     H{ } clone copies set
     H{ } clone 1array value-infos set

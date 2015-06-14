@@ -1,4 +1,5 @@
 USING: alien arrays assocs classes compiler.cfg compiler.cfg.intrinsics.fixnum
+compiler.cfg.linear-scan.assignment compiler.cfg.liveness
 compiler.cfg.ssa.destruction compiler.cfg.value-numbering
 compiler.codegen.gc-maps cpu.architecture help.markup help.syntax kernel layouts
 math sequences slots.private system ;
@@ -136,7 +137,12 @@ HELP: ##peek
 
 HELP: ##phi
 { $class-description
-  "A special kind of instruction used to mark control flow. It is inserted by the " { $vocab-link "compiler.cfg.ssa.construction" } " vocab." } ;
+  "A special kind of instruction used to mark control flow. It is inserted by the " { $vocab-link "compiler.cfg.ssa.construction" } " vocab. It has the following slots:"
+  { $table
+    { { $slot "inputs" } { "An assoc containing as keys the blocks where the vreg was defined and as values the vreg." } }
+    { { $slot "dst" } { "A merged vreg for the value." } }
+  }
+} ;
 
 HELP: ##prologue
 { $class-description
@@ -229,6 +235,15 @@ HELP: ##vector>scalar
 { $notes "The two vregs must not necessarily share the same representation." }
 { $see-also %vector>scalar } ;
 
+HELP: ##vm-field
+{ $class-description "Instruction for loading a pointer to a vm field."
+  { $table
+    { { $slot "dst" } { "Register to load the field into." } }
+    { { $slot "offset" } { "Offset of the field relative to the vm address." } }
+  }
+}
+{ $see-also %vm-field } ;
+
 HELP: ##write-barrier
 { $class-description
   "An instruction for inserting a write barrier. This instruction is almost always inserted after a " { $link ##set-slot } " instruction. If the container object is in an older generation than the item inserted, this instruction guarantees that the item will not be garbage collected. It has the following slots:"
@@ -278,11 +293,14 @@ HELP: gc-map-insn
 HELP: gc-map
 { $class-description "A tuple that holds info necessary for a gc cycle to figure out where the gc root pointers are. It has the following slots:"
   { $table
-    { { $slot "gc-roots" } { "A " { $link sequence } " of " { $link spill-slot } " which will be traced in a gc cycle. " } }
+    {
+        { $slot "gc-roots" }
+        { "First a " { $link sequence } " of vregs that will be spilled during a gc. It is assigned in the " { $vocab-link "compiler.cfg.liveness" } " compiler pass. Then it is converted to a sequence of " { $link spill-slot } "s in " { $link assign-registers } "." }
+    }
     { { $slot "derived-roots" } { "An " { $link assoc } " of pairs of spill slots." } }
   }
 }
-{ $see-also emit-gc-info-bitmaps } ;
+{ $see-also emit-gc-info-bitmaps fill-gc-map } ;
 
 ARTICLE: "compiler.cfg.instructions" "Basic block instructions"
 "The " { $vocab-link "compiler.cfg.instructions" } " vocab contains all instruction classes used for generating CFG:s (Call Flow Graphs)."

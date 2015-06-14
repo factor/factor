@@ -63,6 +63,6 @@ M: sync-point handle ( sync-point -- )
     handled-intervals get
     active-intervals inactive-intervals [ get values concat ] bi@ 3append ;
 
-: allocate-registers ( live-intervals sync-point registers -- live-intervals' )
+: allocate-registers ( intervals/sync-points registers -- live-intervals' )
     init-allocator unhandled-min-heap get (allocate-registers)
     gather-intervals ;

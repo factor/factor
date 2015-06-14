@@ -286,7 +286,6 @@ DEFER: (value-info-union)
         ]
     } cond ;
 
-! Assoc stack of current value --> info mapping
 SYMBOL: value-infos
 
 : value-info* ( value -- info ? )

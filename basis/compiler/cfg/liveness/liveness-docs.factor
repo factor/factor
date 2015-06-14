@@ -38,6 +38,9 @@ HELP: live-ins
 { $var-description "Hash that maps from basic blocks to vregs that are live in them." }
 { $see-also compute-live-sets } ;
 
+HELP: live-outs
+{ $var-description "Hash that maps from basic blocks to sets of vregs that are live after execution leaves the block." } ;
+
 HELP: lookup-base-pointer
 { $values { "vreg" "vreg" } { "vreg/f" { $maybe "vreg" } } }
 { $description "Tries to figure out what the base pointer for a vreg is. Can't use cache here because of infinite recursion inside the quotation passed to cache" }
@@ -53,6 +56,9 @@ $nl
 }
 $nl
 "Querying liveness data:"
-{ $subsections live-in live-in? live-out live-out? } ;
+{ $subsections
+  live-in live-in? live-ins
+  live-out live-out? live-outs
+} ;
 
 ABOUT: "compiler.cfg.liveness"
