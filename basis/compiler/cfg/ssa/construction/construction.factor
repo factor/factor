@@ -4,10 +4,10 @@ USING: accessors assocs combinators compiler.cfg
 compiler.cfg.def-use compiler.cfg.dominance
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.renaming.functor compiler.cfg.rpo
-compiler.cfg.ssa.construction.tdmsc deques dlists fry kernel
-math namespaces sequences sets ;
+compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities deques dlists fry
+kernel math sequences sets ;
 FROM: assocs => change-at ;
-FROM: namespaces => set ;
+FROM: namespaces => set get ;
 IN: compiler.cfg.ssa.construction
 
 <PRIVATE
@@ -36,9 +36,11 @@ M: vreg-insn compute-insn-defs
 
 SYMBOL: inserting-phis
 
+: <##phi> ( vreg bb -- ##phi )
+    predecessors>> over '[ _ ] H{ } map>assoc ##phi new-insn ;
+
 : insert-phi-later ( vreg bb -- )
-    [ predecessors>> over '[ _ ] H{ } map>assoc ##phi new-insn ] keep
-    inserting-phis get push-at ;
+    [ <##phi> ] keep inserting-phis get push-at ;
 
 : compute-phis-for ( vreg bbs -- )
     members merge-set [ insert-phi-later ] with each ;
@@ -52,7 +54,6 @@ SYMBOL: phis
 
 SYMBOL: used-vregs
 
-! Maps vregs to renaming stacks
 SYMBOLS: stacks pushed ;
 
 : init-renaming ( -- )
@@ -124,8 +125,7 @@ M: vreg-insn rename-insn
     pop-stacks ;
 
 : rename ( cfg -- )
-    init-renaming
-    entry>> rename-in-block ;
+    init-renaming entry>> rename-in-block ;
 
 ! Live phis
 SYMBOL: live-phis

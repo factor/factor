@@ -11,7 +11,6 @@ IN: compiler.cfg.def-use
 
 ! Utilities for iterating over instruction operands
 
-! Def-use protocol
 GENERIC: defs-vregs ( insn -- seq )
 GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
