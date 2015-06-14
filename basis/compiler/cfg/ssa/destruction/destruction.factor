@@ -7,7 +7,7 @@ compiler.cfg.registers compiler.cfg.rpo compiler.cfg.ssa.cssa
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges compiler.cfg.utilities
-cpu.architecture kernel make namespaces sequences sets ;
+cpu.architecture fry kernel make namespaces sequences sets sorting ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 
@@ -73,17 +73,23 @@ ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
         ] [ -rot coalesce-vregs drop ] if
     ] if ;
 
+: try-eliminate-copies ( pairs must? -- )
+    [ natural-sort ] dip '[ first2 _ try-eliminate-copy ] each ;
+
 M: ##tagged>integer prepare-insn
     [ dst>> ] [ src>> ] bi t try-eliminate-copy ;
 
+: zip-scalar ( scalar seq -- pairs )
+    [ 2array ] with map ;
+
 M: ##phi prepare-insn
-    [ dst>> ] [ inputs>> values ] bi [ t try-eliminate-copy ] with each ;
+    [ dst>> ] [ inputs>> values ] bi zip-scalar t try-eliminate-copies ;
 
 : prepare-coalescing ( cfg -- )
     init-coalescing [ [ prepare-insn ] each ] simple-analysis ;
 
 : process-copies ( copies -- )
-    [ f try-eliminate-copy ] assoc-each ;
+    >alist f try-eliminate-copies ;
 
 : perform-coalescing ( cfg -- )
     prepare-coalescing copies get process-copies ;
