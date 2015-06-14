@@ -16,7 +16,7 @@ HELP: block-from
 { $description "The instruction number immediately preceeding this block." } ;
 
 HELP: finish-live-intervals
-{ $values { "live-intervals" sequence } { "seq" sequence } }
+{ $values { "live-intervals" sequence } }
 { $description "Since live intervals are computed in a backward order, we have to reverse some sequences, and compute the start and end." } ;
 
 HELP: from
