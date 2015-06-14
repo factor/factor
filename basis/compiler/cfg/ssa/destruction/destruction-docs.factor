@@ -1,27 +1,31 @@
 USING: compiler.cfg compiler.cfg.instructions
-compiler.cfg.ssa.destruction.private help.markup help.syntax ;
+compiler.cfg.ssa.destruction.private compiler.cfg.ssa.interference help.markup
+help.syntax kernel ;
 IN: compiler.cfg.ssa.destruction
 
 HELP: class-element-map
-{ $var-description "Maps leaders to equivalence class elements." } ;
+{ $var-description "Maps leaders to equivalence class elements which are sequences of " { $link vreg-info } " instances." } ;
 
 HELP: cleanup-cfg
 { $values { "cfg" cfg } }
 { $description "In this step, " { $link ##parallel-copy } " instructions are substituted with more concreete " { $link ##copy } " instructions. " { $link ##phi } " instructions are removed here." } ;
 
+HELP: coalesce-elements
+{ $values { "merged" "??" } { "follower" "vreg" } { "leader" "vreg" } }
+{ $description "Delete follower's class, and set leaders's class to merged." } ;
+
+HELP: coalesce-vregs
+{ $values { "merged" "??" } { "follower" "vreg" } { "leader" "vreg" } }
+{ $description "Sets 'leader' as the leader of 'follower'." } ;
+
 HELP: copies
 { $var-description "Sequence of copies (tuples of { vreg-dst vreg-src}) that maybe can be eliminated later." }
 { $see-also init-coalescing } ;
 
-HELP: maybe-eliminate-copy
-{ $values { "vreg1" "vreg" } { "vreg2" "vreg" } }
-{ $description "Eliminate a copy if possible." }
-{ $see-also must-eliminate-copy } ;
-
-HELP: must-eliminate-copy
-{ $values { "vreg1" "vreg" } { "vreg2" "vreg" } }
-{ $description "Eliminates a copy." }
-{ $see-also maybe-eliminate-copy } ;
+HELP: try-eliminate-copy
+{ $values { "follower" "vreg" } { "leader" "vreg" } { "must?" boolean } }
+{ $description "Tries to eliminate a vreg copy from 'leader' to 'follower'. If 'must?' is " { $link t } " then a " { $link vregs-shouldn't-interfere } " error is thrown if the vregs interfere." }
+{ $see-also vregs-interfere? } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
 "Because of the design of the register allocator, this pass has three peculiar properties."
