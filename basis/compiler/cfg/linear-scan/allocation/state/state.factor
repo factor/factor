@@ -18,18 +18,19 @@ SYMBOL: progress
 
 SYMBOL: unhandled-min-heap
 
-: live-interval-key ( live-interval -- key )
-    [ start>> ] [ end>> ] bi 2array ;
+GENERIC: interval/sync-point-key ( interval/sync-point -- key )
 
-: sync-point-key ( sync-point -- key )
-    n>> 1/0. 2array ;
+M: live-interval-state interval/sync-point-key
+    [ start>> ] [ end>> ] [ vreg>> ] tri 3array ;
+
+M: sync-point interval/sync-point-key
+    n>> 1/0. 1/0. 3array ;
 
 : zip-keyed ( seq quot: ( elt -- key ) -- alist )
     [ keep ] curry { } map>assoc ; inline
 
 : >unhandled-min-heap ( live-intervals sync-points -- min-heap )
-    [ [ live-interval-key ] zip-keyed ]
-    [ [ sync-point-key ] zip-keyed ] bi* append >min-heap ;
+    append [ interval/sync-point-key ] zip-keyed >min-heap ;
 
 SYMBOL: registers
 
@@ -108,10 +109,8 @@ ERROR: register-already-used live-interval ;
     } process-intervals ;
 
 : add-unhandled ( live-interval -- )
-    [ check-unhandled ]
-    [
-        dup live-interval-key unhandled-min-heap get heap-push
-    ] bi ;
+    dup check-unhandled
+    dup interval/sync-point-key unhandled-min-heap get heap-push ;
 
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
