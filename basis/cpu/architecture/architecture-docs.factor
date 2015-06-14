@@ -292,7 +292,7 @@ HELP: stack-cleanup
 
 HELP: gc-root-offset
 { $values { "spill-slot" spill-slot } { "n" integer } }
-{ $description "Offset in the " { $link stack-frame } " for the word being constructed where the spill slot is located, in " { $link cell } " units." }
+{ $description "Offset in the " { $link stack-frame } " for the word being constructed where the spill slot is located. The value is given in " { $link cell } " units." }
 { $see-also vm:gc-info } ;
 
 ARTICLE: "cpu.architecture" "CPU architecture description model"
@@ -323,4 +323,14 @@ $nl
   widen-vector-rep
 }
 "Slot access:"
-{ $subsections %write-barrier } ;
+{ $subsections
+  %set-slot
+  %set-slot-imm
+  %slot
+  %slot-imm
+  %write-barrier
+}
+"Spilling:"
+{ $subsections gc-root-offset } ;
+
+ABOUT: "cpu.architecture"
