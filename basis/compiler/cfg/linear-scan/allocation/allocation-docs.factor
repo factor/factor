@@ -9,8 +9,7 @@ HELP: (allocate-registers)
 
 HELP: allocate-registers
 { $values
-  { "live-intervals" sequence }
-  { "sync-point" sequence }
+  { "intervals/sync-points" sequence }
   { "registers" assoc }
   { "live-intervals'" sequence }
 }

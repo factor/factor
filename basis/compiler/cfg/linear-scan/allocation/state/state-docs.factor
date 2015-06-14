@@ -50,8 +50,7 @@ HELP: inactive-intervals
 
 HELP: init-allocator
 { $values
-  { "live-intervals" { $link sequence } " of " { $link live-interval-state } }
-  { "sync-points" { $link sequence } " of " { $link sync-point } }
+  { "intervals/sync-points" { $link sequence } " of " { $link live-interval-state } " and " { $link sync-point } "." }
   { "registers" { $link assoc } " mapping from register class to available machine registers." }
 }
 { $description "Initializes the state for the register allocator." }
