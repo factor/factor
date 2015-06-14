@@ -7,7 +7,7 @@ compiler.cfg.registers compiler.cfg.rpo compiler.cfg.ssa.cssa
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges compiler.cfg.utilities
-cpu.architecture kernel locals make namespaces sequences sets ;
+cpu.architecture kernel make namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 
@@ -15,7 +15,6 @@ SYMBOL: class-element-map
 
 <PRIVATE
 
-! Sequence of vreg pairs
 SYMBOL: copies
 
 : value-of ( vreg -- value )
@@ -30,11 +29,10 @@ SYMBOL: copies
     ] bi
     V{ } clone copies set ;
 
-: coalesce-elements ( merged vreg1 vreg2 -- )
-    ! delete leader1's class, and set leader2's class to merged.
+: coalesce-elements ( merged follower leader -- )
     class-element-map get [ delete-at ] [ set-at ] bi-curry bi* ;
 
-: coalesce-vregs ( merged leader1 leader2 -- )
+: coalesce-vregs ( merged follower leader -- )
     2dup swap leader-map get set-at coalesce-elements ;
 
 GENERIC: prepare-insn ( insn -- )
@@ -68,32 +66,24 @@ M: ##parallel-copy prepare-insn
 
 ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
 
-:: must-eliminate-copy ( vreg1 vreg2 -- )
-    vreg1 vreg2 = [
-        vreg1 vreg2 vregs-interfere?
-        [ vreg1 vreg2 vregs-shouldn't-interfere ]
-        [ vreg1 vreg2 coalesce-vregs ]
-        if
-    ] unless ;
+: try-eliminate-copy ( follower leader must? -- )
+    -rot leaders 2dup = [ 3drop ] [
+        2dup vregs-interfere? [
+            drop rot [ vregs-shouldn't-interfere ] [ 2drop ] if
+        ] [ -rot coalesce-vregs drop ] if
+    ] if ;
 
 M: ##tagged>integer prepare-insn
-    [ dst>> ] [ src>> ] bi leaders must-eliminate-copy ;
+    [ dst>> ] [ src>> ] bi t try-eliminate-copy ;
 
 M: ##phi prepare-insn
-    [ dst>> ] [ inputs>> values ] bi
-    [ leaders must-eliminate-copy ] with each ;
+    [ dst>> ] [ inputs>> values ] bi [ t try-eliminate-copy ] with each ;
 
 : prepare-coalescing ( cfg -- )
     init-coalescing [ [ prepare-insn ] each ] simple-analysis ;
 
-:: maybe-eliminate-copy ( vreg1 vreg2 -- )
-    vreg1 vreg2 = [
-        vreg1 vreg2 vregs-interfere?
-        [ drop ] [ vreg1 vreg2 coalesce-vregs ] if
-    ] unless ;
-
 : process-copies ( copies -- )
-    [ leaders maybe-eliminate-copy ] assoc-each ;
+    [ f try-eliminate-copy ] assoc-each ;
 
 : perform-coalescing ( cfg -- )
     prepare-coalescing copies get process-copies ;
