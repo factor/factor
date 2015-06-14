@@ -1,6 +1,6 @@
 USING: compiler.cfg compiler.cfg.instructions
 compiler.cfg.ssa.destruction.private compiler.cfg.ssa.interference help.markup
-help.syntax kernel ;
+help.syntax kernel sequences ;
 IN: compiler.cfg.ssa.destruction
 
 HELP: class-element-map
@@ -25,7 +25,12 @@ HELP: copies
 HELP: try-eliminate-copy
 { $values { "follower" "vreg" } { "leader" "vreg" } { "must?" boolean } }
 { $description "Tries to eliminate a vreg copy from 'leader' to 'follower'. If 'must?' is " { $link t } " then a " { $link vregs-shouldn't-interfere } " error is thrown if the vregs interfere." }
-{ $see-also vregs-interfere? } ;
+{ $see-also try-eliminate-copies vregs-interfere? } ;
+
+HELP: try-eliminate-copies
+{ $values { "pairs" "a sequence of vreg pairs" } { "must?" boolean } }
+{ $description "Tries to eliminate the vreg copies in the " { $link sequence } " 'pairs'. If 'must?' is " { $link t } " then a " { $link vregs-shouldn't-interfere } " error is thrown if any of the vregs interfere. To ensure deterministic " { $link leader-map } " data, the pairs are sorted." }
+{ $see-also try-eliminate-copy } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
 "Because of the design of the register allocator, this pass has three peculiar properties."
@@ -33,6 +38,9 @@ ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
   "Instead of renaming vreg usages in the CFG, a map from vregs to canonical representatives is computed. This allows the register allocator to use the original SSA names to get reaching definitions."
   { "Useless " { $link ##copy } " instructions, and all " { $link ##phi } " instructions, are eliminated, so the register allocator does not have to remove any redundant operations." }
   { "This pass computes live sets and fills out the " { $slot "gc-roots" } " slots of GC maps with " { $vocab-link "compiler.cfg.liveness" } ", so the linear scan register allocator does not need to compute liveness again." }
-} ;
+}
+$nl
+"Main entry point:"
+{ $subsections destruct-ssa } ;
 
 ABOUT: "compiler.cfg.ssa.destruction"
