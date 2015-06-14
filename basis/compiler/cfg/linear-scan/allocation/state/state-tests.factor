@@ -9,7 +9,7 @@ IN: compiler.cfg.linear-scan.allocation.state.tests
 {
     V{ T{ live-interval-state { reg-class int-regs } { vreg 123 } } }
 } [
-    f f machine-registers init-allocator
+    f machine-registers init-allocator
     T{ live-interval-state { reg-class int-regs } { vreg 123 } }
     [ add-active ] keep active-intervals-for
 ] unit-test
@@ -29,7 +29,7 @@ IN: compiler.cfg.linear-scan.allocation.state.tests
         { float-regs V{ } }
     }
 } [
-    f f machine-registers init-allocator
+    f machine-registers init-allocator
     T{ live-interval-state { reg-class int-regs } { vreg 123 } } add-active
     active-intervals get
 ] unit-test
@@ -164,8 +164,6 @@ cpu x86.64? [
         T{ live-interval-state { start 20 } { end 30 } }
         T{ live-interval-state { start 20 } { end 28 } }
         T{ live-interval-state { start 33 } { end 999 } }
-    }
-    {
         T{ sync-point { n 5 } }
         T{ sync-point { n 33 } }
         T{ sync-point { n 100 } }
@@ -177,5 +175,5 @@ cpu x86.64? [
     {
         T{ live-interval-state { start 20 } { end 30 } }
         T{ live-interval-state { start 20 } { end 30 } }
-    } { } >unhandled-min-heap heap-size
+    } >unhandled-min-heap heap-size
 ] unit-test

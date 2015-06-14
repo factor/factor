@@ -40,7 +40,7 @@ V{
 : test-live-intervals ( -- )
     0 get block>cfg
     [ cfg set ] [ number-instructions ] [ compute-live-intervals ] tri
-    2drop ;
+    drop ;
 
 [ ] [
     H{

@@ -154,10 +154,8 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
     2tri ;
 
 : handle-live-out ( bb -- )
-    live-out dup assoc-empty? [ drop ] [
-        [ from get to get ] dip keys
-        [ live-interval add-range ] 2with each
-    ] if ;
+    [ from get to get ] dip live-out keys
+    [ live-interval add-range ] 2with each ;
 
 TUPLE: sync-point n keep-dst? ;
 
@@ -202,8 +200,8 @@ ERROR: bad-live-interval live-interval ;
 : check-start ( live-interval -- )
     dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
 
-: finish-live-intervals ( live-intervals -- seq )
-    values dup [
+: finish-live-intervals ( live-intervals -- )
+    [
         {
             [ [ { } like reverse! ] change-ranges drop ]
             [ [ { } like reverse! ] change-uses drop ]
@@ -212,12 +210,12 @@ ERROR: bad-live-interval live-interval ;
         } cleave
     ] each ;
 
-: compute-live-intervals ( cfg -- live-intervals sync-points )
+: compute-live-intervals ( cfg -- intervals/sync-points )
     init-live-intervals
-    linearization-order <reversed> [ kill-block?>> ] reject
+    linearization-order [ kill-block?>> ] reject <reversed>
     [ compute-live-intervals-step ] each
-    live-intervals get finish-live-intervals
-    sync-points get ;
+    live-intervals get values dup finish-live-intervals
+    sync-points get append ;
 
 : relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )
     [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
