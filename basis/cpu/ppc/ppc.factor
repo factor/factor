@@ -527,25 +527,23 @@ M: ppc %unbox-alien ( dst src -- )
 ! else // Assume (src & tag_mask) == BYTE_ARRAY_TYPE
 !   dst = ((byte_array*)src) + 1;
 M:: ppc %unbox-any-c-ptr ( dst src -- )
-    [
-        "end" define-label
-        ! Is the object f?
-        dst 0 LI
-        0 src \ f type-number %compare-cell-imm
-        0 "end" get BEQ
+    <label> :> end
+    ! Is the object f?
+    dst 0 LI
+    0 src \ f type-number %compare-cell-imm
+    0 end BEQ
 
-        ! Is the object an alien?
-        dst src tag-mask get ANDI.
-        ! Assume unboxing a byte-array.
-        0 dst alien type-number %compare-cell-imm
-        dst src byte-array-offset ADDI
-        0 "end" get BNE
+    ! Is the object an alien?
+    dst src tag-mask get ANDI.
+    ! Assume unboxing a byte-array.
+    0 dst alien type-number %compare-cell-imm
+    dst src byte-array-offset ADDI
+    0 end BNE
 
-        ! Unbox the alien.
-        scratch-reg alien-offset LI
-        dst src scratch-reg %load-cell-x
-        "end" resolve-label
-    ] with-scope ;
+    ! Unbox the alien.
+    scratch-reg alien-offset LI
+    dst src scratch-reg %load-cell-x
+    end resolve-label ;
 
 ! Be very careful with this. It cannot be used as an immediate
 ! offset to a load or store.
@@ -562,25 +560,23 @@ M:: ppc %unbox-any-c-ptr ( dst src -- )
 !   dst->address = src;
 ! }
 M:: ppc %box-alien ( dst src temp -- )
-    [
-        "f" define-label
+    <label> :> f-label
 
-        ! Is the object f?
-        dst \ f type-number LI
-        0 src 0 %compare-cell-imm
-        0 "f" get BEQ
+    ! Is the object f?
+    dst \ f type-number LI
+    0 src 0 %compare-cell-imm
+    0 f-label BEQ
 
-        ! Allocate and initialize an alien object.
-        dst 5 cells alien temp %allot
-        temp \ f type-number LI
-        scratch-reg dst %clear-tag-bits
-        temp scratch-reg 1 cells %store-cell
-        temp scratch-reg 2 cells %store-cell
-        src scratch-reg 3 cells %store-cell
-        src scratch-reg 4 cells %store-cell
+    ! Allocate and initialize an alien object.
+    dst 5 cells alien temp %allot
+    temp \ f type-number LI
+    scratch-reg dst %clear-tag-bits
+    temp scratch-reg 1 cells %store-cell
+    temp scratch-reg 2 cells %store-cell
+    src scratch-reg 3 cells %store-cell
+    src scratch-reg 4 cells %store-cell
 
-        "f" resolve-label
-    ] with-scope ;
+    f-label resolve-label ;
 
 ! dst->base = base;
 ! dst->displacement = displacement;
@@ -629,26 +625,26 @@ M:: ppc %box-alien ( dst src temp -- )
 !   box_displaced_alien_alien(dst, displacement, base, temp);
 ! else
 !   box_displaced_alien_byte_array(dst, displacement, base, temp);
-:: box-displaced-alien/dynamic ( dst displacement base temp -- )
-    "not-f" define-label
-    "not-alien" define-label
+:: box-displaced-alien/dynamic ( dst displacement base temp end -- )
+    <label> :> not-f
+    <label> :> not-alien
 
     ! Is base f?
     0 base \ f type-number %compare-cell-imm
-    0 "not-f" get BNE
+    0 not-f BNE
     dst displacement base box-displaced-alien/f
-    "end" get B
+    end B
 
     ! Is base an alien?
-    "not-f" resolve-label
+    not-f resolve-label
     temp base tag-mask get ANDI.
     0 temp alien type-number %compare-cell-imm
-    0 "not-alien" get BNE
+    0 not-alien BNE
     dst displacement base temp box-displaced-alien/alien
-    "end" get B
+    end B
 
     ! Assume base is a byte array.
-    "not-alien" resolve-label
+    not-alien resolve-label
     dst displacement base temp box-displaced-alien/byte-array ;
 
 ! if (displacement == 0)
@@ -666,33 +662,31 @@ M:: ppc %box-alien ( dst src temp -- )
 !      box_displaced_alien_dynamic(dst, displacement, base, temp);
 ! }
 M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
-    [
-        "end" define-label
+    <label> :> end
 
-        ! If displacement is zero, return the base.
-        dst base MR
-        0 displacement 0 %compare-cell-imm
-        0 "end" get BEQ
+    ! If displacement is zero, return the base.
+    dst base MR
+    0 displacement 0 %compare-cell-imm
+    0 end BEQ
 
-        ! Displacement is non-zero, we're going to be allocating a new
-        ! object
-        dst 5 cells alien temp %allot
+    ! Displacement is non-zero, we're going to be allocating a new
+    ! object
+    dst 5 cells alien temp %allot
 
-        ! Set expired to f
-        temp \ f type-number %load-immediate
-        scratch-reg 2 alien@ LI
-        temp dst scratch-reg %store-cell-x
+    ! Set expired to f
+    temp \ f type-number %load-immediate
+    scratch-reg 2 alien@ LI
+    temp dst scratch-reg %store-cell-x
 
-        dst displacement base temp
-        {
-            { [ base-class \ f class<= ] [ drop box-displaced-alien/f ] }
-            { [ base-class \ alien class<= ] [ box-displaced-alien/alien ] }
-            { [ base-class \ byte-array class<= ] [ box-displaced-alien/byte-array ] }
-            [ box-displaced-alien/dynamic ]
-        } cond
+    dst displacement base temp
+    {
+        { [ base-class \ f class<= ] [ drop box-displaced-alien/f ] }
+        { [ base-class \ alien class<= ] [ box-displaced-alien/alien ] }
+        { [ base-class \ byte-array class<= ] [ box-displaced-alien/byte-array ] }
+        [ end box-displaced-alien/dynamic ]
+    } cond
 
-        "end" resolve-label
-    ] with-scope ;
+    end resolve-label ;
 
 M:: ppc.32 %convert-integer ( dst src c-type -- )
     c-type {
