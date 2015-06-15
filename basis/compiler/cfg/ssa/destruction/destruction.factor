@@ -74,7 +74,7 @@ ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
     ] if ;
 
 : try-eliminate-copies ( pairs must? -- )
-    [ natural-sort ] dip '[ first2 _ try-eliminate-copy ] each ;
+    '[ first2 _ try-eliminate-copy ] each ;
 
 M: ##tagged>integer prepare-insn
     [ dst>> ] [ src>> ] bi t try-eliminate-copy ;
@@ -83,16 +83,14 @@ M: ##tagged>integer prepare-insn
     [ 2array ] with map ;
 
 M: ##phi prepare-insn
-    [ dst>> ] [ inputs>> values ] bi zip-scalar t try-eliminate-copies ;
+    [ dst>> ] [ inputs>> values ] bi zip-scalar
+    natural-sort t try-eliminate-copies ;
 
 : prepare-coalescing ( cfg -- )
     init-coalescing [ [ prepare-insn ] each ] simple-analysis ;
 
-: process-copies ( copies -- )
-    >alist f try-eliminate-copies ;
-
 : perform-coalescing ( cfg -- )
-    prepare-coalescing copies get process-copies ;
+    prepare-coalescing copies get f try-eliminate-copies ;
 
 GENERIC: cleanup-insn ( insn -- )
 
