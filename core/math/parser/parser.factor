@@ -41,7 +41,8 @@ TUPLE: number-parse
     digit> pick radix>> over > ; inline
 
 : ?make-ratio ( num denom/f -- ratio/f )
-    [ / ] [ drop f ] if* ; inline
+    ! don't use number= to allow 0. for "1/0."
+    [ dup 0 = [ 2drop f ] [ / ] if ] [ drop f ] if* ; inline
 
 TUPLE: float-parse
     { radix fixnum read-only }
