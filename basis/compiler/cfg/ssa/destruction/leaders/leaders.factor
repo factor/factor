@@ -8,3 +8,6 @@ SYMBOL: leader-map
 : leader ( vreg -- vreg' ) leader-map get compress-path ;
 
 : ?leader ( vreg -- vreg' ) [ leader ] keep or ; inline
+
+: leaders ( vreg1 vreg2 -- vreg1' vreg2' )
+    [ leader ] bi@ ;

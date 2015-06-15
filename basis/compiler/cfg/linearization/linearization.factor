@@ -74,5 +74,11 @@ SYMBOL: numbers
 : number-blocks ( bbs -- )
     H{ } zip-index-as numbers set ;
 
+: blocks>insns ( bbs -- insns )
+    [ instructions>> ] map concat ;
+
 : cfg>insns ( cfg -- insns )
-    linearization-order [ instructions>> ] map concat ;
+    linearization-order blocks>insns ;
+
+: cfg>insns-rpo ( cfg -- insns )
+    reverse-post-order blocks>insns ;
