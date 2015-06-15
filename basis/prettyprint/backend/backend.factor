@@ -83,7 +83,7 @@ M: real pprint*
 
 M: float pprint*
     dup fp-nan? [
-        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
+        \ NAN: [ double>bits >hex text ] pprint-prefix
     ] [
         call-next-method
     ] if ;
