@@ -2,8 +2,9 @@ USING: alien.syntax assocs compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.ssa.destruction compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.destruction.private compiler.cfg.utilities
-cpu.architecture cpu.x86.assembler.operands grouping kernel make namespaces
-random sequences tools.test ;
+cpu.architecture cpu.x86.assembler.operands grouping kernel make math
+math.functions math.order math.ranges namespaces random sequences
+tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.ssa.destruction.tests
 
@@ -99,3 +100,10 @@ IN: compiler.cfg.ssa.destruction.tests
         2286 leader
     ] replicate all-equal?
 ] unit-test
+
+! Test is just to ensure the my-euler word compiles. See #1345
+: my-euler-step ( min m n -- min' )
+    dup sqrt 1 mod [ - min ] [ 2drop ] if ; inline
+
+: my-euler ( -- answer )
+    33 2500 [1,b] [ dup [1,b] [ my-euler-step ] with each ] each ;

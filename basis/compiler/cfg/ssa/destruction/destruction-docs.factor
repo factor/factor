@@ -29,7 +29,7 @@ HELP: try-eliminate-copy
 
 HELP: try-eliminate-copies
 { $values { "pairs" "a sequence of vreg pairs" } { "must?" boolean } }
-{ $description "Tries to eliminate the vreg copies in the " { $link sequence } " 'pairs'. If 'must?' is " { $link t } " then a " { $link vregs-shouldn't-interfere } " error is thrown if any of the vregs interfere. To ensure deterministic " { $link leader-map } " data, the pairs are sorted." }
+{ $description "Tries to eliminate the vreg copies in the " { $link sequence } " 'pairs'. If 'must?' is " { $link t } " then a " { $link vregs-shouldn't-interfere } " error is thrown if any of the vregs interfere." }
 { $see-also try-eliminate-copy } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
@@ -41,6 +41,12 @@ ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
 }
 $nl
 "Main entry point:"
-{ $subsections destruct-ssa } ;
+{ $subsections destruct-ssa }
+"Vreg copy elimination:"
+{ $subsections
+  perform-coalescing
+  try-eliminate-copies
+  try-eliminate-copy
+} ;
 
 ABOUT: "compiler.cfg.ssa.destruction"
