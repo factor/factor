@@ -476,7 +476,7 @@ tuple
     { "bits>float" "math" "primitive_bits_float" ( n -- x ) }
     { "double>bits" "math" "primitive_double_bits" ( x -- n ) }
     { "float>bits" "math" "primitive_float_bits" ( x -- n ) }
-    { "(format-float)" "math.parser.private" "primitive_format_float" ( n format -- byte-array ) }
+    { "(format-float)" "math.parser.private" "primitive_format_float" ( n fill width precision format locale -- byte-array ) }
     { "bignum*" "math.private" "primitive_bignum_multiply" ( x y -- z ) }
     { "bignum+" "math.private" "primitive_bignum_add" ( x y -- z ) }
     { "bignum-" "math.private" "primitive_bignum_subtract" ( x y -- z ) }
