@@ -29,7 +29,7 @@ SYMBOL: class-element-map
     2dup swap leader-map get set-at coalesce-elements ;
 
 : vregs-interfere? ( vreg1 vreg2 -- merged/f ? )
-    [ class-element-map get at ] bi@ sets-interfere? ;
+    class-element-map get '[ _ at ] bi@ sets-interfere? ;
 
 ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
 
