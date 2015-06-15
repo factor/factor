@@ -19,6 +19,7 @@ IN: prettyprint.tests
 [ 8 number-base [ 8.0 unparse ] with-variable ] [ unsupported-number-base? ] must-fail-with
 { "0x1.0p3" } [ 16 number-base [ 8.0 unparse ] with-variable ] unit-test
 { "1267650600228229401496703205376" } [ 1 100 shift unparse ] unit-test
+{ "NAN: 7ff80000deafbeef" } [ NAN: 7ff80000deafbeef unparse ] unit-test
 
 { "+" } [ \ + unparse ] unit-test
 

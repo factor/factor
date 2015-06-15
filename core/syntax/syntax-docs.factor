@@ -659,8 +659,8 @@ HELP: NAN:
 { $examples
     { $example
         "USE: prettyprint"
-        "NAN: 80000deadbeef ."
-        "NAN: 80000deadbeef"
+        "NAN: 7ff80000deadbeef ."
+        "NAN: 7ff80000deadbeef"
     }
 } ;
 
