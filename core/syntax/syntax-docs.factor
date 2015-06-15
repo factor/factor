@@ -55,7 +55,6 @@ ARTICLE: "syntax-ratios" "Ratio syntax"
 { $code
     "75/33"
     "1/10"
-    "-5/-6"
     "1+1/3"
     "-10-1/7"
 }
