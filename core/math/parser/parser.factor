@@ -176,8 +176,11 @@ CONSTANT: min-magnitude-2 -1074
         ] [ neg ] if
     ] [ f ] if* ; inline
 
+: add-ratio? ( n/f -- ? )
+    dup real? [ dup >integer number= not ] [ drop f ] if ;
+
 : ?add-ratio ( m n/f -- m+n/f )
-    dup ratio? [ + ] [ 2drop f ] if ; inline
+    dup add-ratio? [ + ] [ 2drop f ] if ; inline
 
 : @abort ( i number-parse n x -- f )
     4drop f ; inline
