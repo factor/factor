@@ -82,7 +82,11 @@ M: real pprint*
 
 M: float pprint*
     dup fp-nan? [
-        \ NAN: [ double>bits >hex text ] pprint-prefix
+        dup fp-nan-payload 50 2^ 1 - bitand 0 = [
+           fp-sign "-0/0." "0/0." ? text
+        ] [
+           \ NAN: [ double>bits >hex text ] pprint-prefix
+        ] if
     ] [
         number-base get {
             { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
