@@ -100,7 +100,7 @@ PRIVATE>
 SYMBOL: return-continuation
 
 : with-return ( quot -- )
-    [ [ return-continuation set ] prepose callcc0 ] with-scope ; inline
+    [ return-continuation ] dip [ with-variable ] 2curry callcc0 ; inline
 
 : return ( -- * )
     return-continuation get continue ;
