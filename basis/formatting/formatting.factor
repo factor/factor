@@ -30,8 +30,7 @@ IN: formatting
     [ 0 ] [ string>number ] if-empty ;
 
 : format-simple ( x digits string -- string )
-    [ [ >float ] [ number>string ] bi* "%." ] dip
-    surround format-float ;
+    [ >float "" -1 ] 2dip "" format-float ;
 
 : format-scientific ( x digits -- string ) "e" format-simple ;
 

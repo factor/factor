@@ -420,7 +420,7 @@ M: object infer-call* \ call bad-macro-input ;
     { fixnum>float { fixnum } { float } }
 
     ! float
-    { (format-float) { float byte-array } { byte-array } }
+    { (format-float) { float byte-array fixnum fixnum byte-array byte-array } { byte-array } }
     { bits>float { integer } { float } }
     { float* { float float } { float } }
     { float+ { float float } { float } }
