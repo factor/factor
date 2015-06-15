@@ -193,40 +193,36 @@ M: x86 %unbox-alien ( dst src -- )
     alien-offset [+] MOV ;
 
 M:: x86 %unbox-any-c-ptr ( dst src -- )
-    [
-        "end" define-label
-        dst dst XOR
-        ! Is the object f?
-        src \ f type-number CMP
-        "end" get JE
-        ! Compute tag in dst register
-        dst src MOV
-        dst tag-mask get AND
-        ! Is the object an alien?
-        dst alien type-number CMP
-        ! Add an offset to start of byte array's data
-        dst src byte-array-offset [+] LEA
-        "end" get JNE
-        ! If so, load the offset and add it to the address
-        dst src alien-offset [+] MOV
-        "end" resolve-label
-    ] with-scope ;
+    <label> :> end
+    dst dst XOR
+    ! Is the object f?
+    src \ f type-number CMP
+    end JE
+    ! Compute tag in dst register
+    dst src MOV
+    dst tag-mask get AND
+    ! Is the object an alien?
+    dst alien type-number CMP
+    ! Add an offset to start of byte array's data
+    dst src byte-array-offset [+] LEA
+    end JNE
+    ! If so, load the offset and add it to the address
+    dst src alien-offset [+] MOV
+    end resolve-label ;
 
 : alien@ ( reg n -- op ) cells alien type-number - [+] ;
 
 M:: x86 %box-alien ( dst src temp -- )
-    [
-        "end" define-label
-        dst \ f type-number MOV
-        src src TEST
-        "end" get JE
-        dst 5 cells alien temp %allot
-        dst 1 alien@ \ f type-number MOV ! base
-        dst 2 alien@ \ f type-number MOV ! expired
-        dst 3 alien@ src MOV ! displacement
-        dst 4 alien@ src MOV ! address
-        "end" resolve-label
-    ] with-scope ;
+    <label> :> end
+    dst \ f type-number MOV
+    src src TEST
+    end JE
+    dst 5 cells alien temp %allot
+    dst 1 alien@ \ f type-number MOV ! base
+    dst 2 alien@ \ f type-number MOV ! expired
+    dst 3 alien@ src MOV ! displacement
+    dst 4 alien@ src MOV ! address
+    end resolve-label ;
 
 :: %box-displaced-alien/f ( dst displacement -- )
     dst 1 alien@ \ f type-number MOV
@@ -254,9 +250,9 @@ M:: x86 %box-alien ( dst src temp -- )
     temp base displacement byte-array-offset [++] LEA
     dst 4 alien@ temp MOV ;
 
-:: %box-displaced-alien/dynamic ( dst displacement base temp -- )
-    "not-f" define-label
-    "not-alien" define-label
+:: %box-displaced-alien/dynamic ( dst displacement base temp end -- )
+    <label> :> not-f
+    <label> :> not-alien
 
     ! Check base type
     temp base MOV
@@ -264,55 +260,53 @@ M:: x86 %box-alien ( dst src temp -- )
 
     ! Is base f?
     temp \ f type-number CMP
-    "not-f" get JNE
+    not-f JNE
 
     ! Yes, it is f. Fill in new object
     dst displacement %box-displaced-alien/f
 
-    "end" get JMP
+    end JMP
 
-    "not-f" resolve-label
+    not-f resolve-label
 
     ! Is base an alien?
     temp alien type-number CMP
-    "not-alien" get JNE
+    not-alien JNE
 
     dst displacement base temp %box-displaced-alien/alien
 
     ! We are done
-    "end" get JMP
+    end JMP
 
     ! Is base a byte array? It has to be, by now...
-    "not-alien" resolve-label
+    not-alien resolve-label
 
     dst displacement base temp %box-displaced-alien/byte-array ;
 
 M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
-    [
-        "end" define-label
+    <label> :> end
 
-        ! If displacement is zero, return the base
-        dst base MOV
-        displacement displacement TEST
-        "end" get JE
+    ! If displacement is zero, return the base
+    dst base MOV
+    displacement displacement TEST
+    end JE
 
-        ! Displacement is non-zero, we're going to be allocating a new
-        ! object
-        dst 5 cells alien temp %allot
+    ! Displacement is non-zero, we're going to be allocating a new
+    ! object
+    dst 5 cells alien temp %allot
 
-        ! Set expired to f
-        dst 2 alien@ \ f type-number MOV
+    ! Set expired to f
+    dst 2 alien@ \ f type-number MOV
 
-        dst displacement base temp
-        {
-            { [ base-class \ f class<= ] [ 2drop %box-displaced-alien/f ] }
-            { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
-            { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
-            [ %box-displaced-alien/dynamic ]
-        } cond
+    dst displacement base temp
+    {
+        { [ base-class \ f class<= ] [ 2drop %box-displaced-alien/f ] }
+        { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
+        { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
+        [ end %box-displaced-alien/dynamic ]
+    } cond
 
-        "end" resolve-label
-    ] with-scope ;
+    end resolve-label ;
 
 ! The 'small-reg' mess is pretty crappy, but its only used on x86-32.
 ! On x86-64, all registers have 8-bit versions. However, a similar
@@ -707,26 +701,20 @@ M: x86 immediate-arithmetic? ( n -- ? )
 M: x86 immediate-bitwise? ( n -- ? )
     -0x80000000 0x7fffffff between? ;
 
-: %cmov-float= ( dst src -- )
-    [
-        "no-move" define-label
+:: %cmov-float= ( dst src -- )
+    <label> :> no-move
+    no-move [ JNE ] [ JP ] bi
+    dst src MOV
+    no-move resolve-label ;
 
-        "no-move" get [ JNE ] [ JP ] bi
-        MOV
-        "no-move" resolve-label
-    ] with-scope ;
-
-: %cmov-float/= ( dst src -- )
-    [
-        "no-move" define-label
-        "move" define-label
-
-        "move" get JP
-        "no-move" get JE
-        "move" resolve-label
-        MOV
-        "no-move" resolve-label
-    ] with-scope ;
+:: %cmov-float/= ( dst src -- )
+    <label> :> no-move
+    <label> :> move
+    move JP
+    no-move JE
+    move resolve-label
+    dst src MOV
+    no-move resolve-label ;
 
 :: (%compare-float) ( dst src1 src2 cc temp compare -- )
     cc {
@@ -746,13 +734,11 @@ M: x86 immediate-bitwise? ( n -- ? )
         { cc/<>= [ src1 src2 compare call( a b -- ) dst temp \ CMOVP (%boolean) ] }
     } case ; inline
 
-: %jump-float= ( label -- )
-    [
-        "no-jump" define-label
-        "no-jump" get JP
-        JE
-        "no-jump" resolve-label
-    ] with-scope ;
+:: %jump-float= ( label -- )
+    <label> :> no-jump
+    no-jump JP
+    label JE
+    no-jump resolve-label ;
 
 : %jump-float/= ( label -- )
     [ JNE ] [ JP ] bi ;
