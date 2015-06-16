@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
+USING: accessors arrays assocs combinators combinators.short-circuit
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.utilities fry
@@ -18,10 +18,13 @@ IN: compiler.cfg.linear-scan.allocation
         _ add-use-position
     ] each ;
 
+: free-positions ( registers reg-class -- avail-registers )
+    of [ 1/0. 2array ] map ;
+
 : register-status ( new registers -- free-pos )
-    over reg-class>> free-positions
-    [ inactive-positions ] [ active-positions ] [ nip ] 2tri
-    >alist alist-max ;
+    over reg-class>> free-positions [
+        [ inactive-positions ] [ active-positions ] 2bi
+    ] keep alist-max ;
 
 : no-free-registers? ( result -- ? )
     second 0 = ; inline

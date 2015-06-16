@@ -4,7 +4,7 @@ compiler.cfg.linear-scan.live-intervals cpu.architecture
 cpu.x86.assembler.operands heaps kernel namespaces system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.tests
 
-: unassigned-interval ( -- live-interval )
+: interval-[30,46] ( -- live-interval )
     T{ live-interval-state
        { vreg 49 }
        { start 30 } { end 46 }
@@ -18,17 +18,31 @@ IN: compiler.cfg.linear-scan.allocation.tests
        { reg-class int-regs }
     } clone ;
 
+: interval-[30,60] ( -- live-interval )
+    T{ live-interval-state
+       { vreg 25 }
+       { start 30 } { end 60 }
+       { reg-class int-regs }
+       { reg RAX }
+    } ;
+
 cpu x86.64? [
     ! assign-registers
-    { R8 } [
-        { { int-regs V{ } } { float-regs V{ } } } active-intervals set
-        unassigned-interval dup machine-registers assign-register reg>>
+    { RAX } [
+        f machine-registers init-allocator
+        interval-[30,46] dup machine-registers assign-register reg>>
     ] unit-test
 
     ! register-status
-    { { R8 1/0. } } [
-        { { int-regs V{ } } { float-regs V{ } } } active-intervals set
-        unassigned-interval machine-registers register-status
+    { { RAX 1/0. } } [
+        f machine-registers init-allocator
+        interval-[30,46] machine-registers register-status
+    ] unit-test
+
+    { { RCX 1/0. } } [
+        f machine-registers init-allocator
+        interval-[30,60] add-active
+        interval-[30,46] machine-registers register-status
     ] unit-test
 ] when
 
@@ -83,7 +97,7 @@ cpu x86.64? [
     <min-heap> unhandled-min-heap set
     f f <basic-block> <cfg> cfg set
     40 progress set
-    T{ sync-point { n 40 } } unassigned-interval spill-at-sync-point
+    T{ sync-point { n 40 } } interval-[30,46] spill-at-sync-point
 ] unit-test
 
 ! spill-at-sync-point?
