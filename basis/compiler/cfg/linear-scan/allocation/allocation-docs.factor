@@ -1,11 +1,16 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals help.markup help.syntax kernel sequences ;
+compiler.cfg.linear-scan.live-intervals hashtables help.markup help.syntax
+kernel sequences ;
 IN: compiler.cfg.linear-scan.allocation
 
 HELP: (allocate-registers)
 { $values { "unhandled-min-heap" "stuff" } }
 { $description "Register allocation works by emptying the unhandled intervals and sync points." } ;
+
+HELP: active-positions
+{ $values { "new" live-interval-state } { "assoc" assoc } }
+{ $description "Looks at the " { $link active-intervals } " and sets to 0 those registers in 'assoc' that can't be used for allocation." } ;
 
 HELP: allocate-registers
 { $values
@@ -14,6 +19,15 @@ HELP: allocate-registers
   { "live-intervals'" sequence }
 }
 { $description "Performs register allocation of a " { $link sequence } " of live intervals. Each live interval is assigned a physical register and also a spill slot if it needs to be spilled." } ;
+
+HELP: assign-register
+{ $values { "new" live-interval-state } { "registers" assoc } }
+{ $description "Assigns a processor register to the live interval." } ;
+
+HELP: free-positions
+{ $values { "registers" assoc } { "reg-class" } { "avail-registers" assoc } }
+{ $description "Creates an alist mapping registers to their desirability for allocation. 'avail-registers' is an alist and not a " { $link hashtable } " because the register allocation order is significant." }
+{ $see-also register-status } ;
 
 HELP: handle-sync-point
 { $values

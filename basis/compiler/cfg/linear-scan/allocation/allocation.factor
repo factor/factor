@@ -8,8 +8,7 @@ heaps kernel locals math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation
 
 : active-positions ( new assoc -- )
-    [ active-intervals-for ] dip
-    '[ [ 0 ] dip reg>> _ add-use-position ] each ;
+    swap active-intervals-for [ reg>> 0 2array ] map assoc-union! drop ;
 
 : inactive-positions ( new assoc -- )
     [ [ inactive-intervals-for ] keep ] dip

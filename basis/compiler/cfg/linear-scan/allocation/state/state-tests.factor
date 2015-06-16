@@ -1,5 +1,6 @@
 USING: accessors arrays assocs combinators.extras compiler.cfg
-compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
+compiler.cfg.instructions compiler.cfg.linear-scan.allocation
+compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.utilities cpu.architecture
 cpu.x86.assembler.operands heaps kernel layouts namespaces sequences system
 tools.test ;
@@ -37,7 +38,7 @@ IN: compiler.cfg.linear-scan.allocation.state.tests
 ! add-use-position
 cpu x86.64? [
     {
-        H{
+        {
             { XMM0 1/0. }
             { XMM1 25 }
             { XMM2 1/0. }
@@ -48,18 +49,23 @@ cpu x86.64? [
             { XMM7 1/0. }
             { XMM8 1/0. }
             { XMM9 1/0. }
-            { XMM11 1/0. }
             { XMM10 1/0. }
-            { XMM13 1/0. }
+            { XMM11 1/0. }
             { XMM12 1/0. }
-            { XMM15 1/0. }
+            { XMM13 1/0. }
             { XMM14 1/0. }
+            { XMM15 1/0. }
         }
     } [
         25 XMM1 machine-registers float-regs free-positions
         [ add-use-position ] keep
     ] unit-test
 ] when
+
+! add-use-position
+{ { { "prutt" 12 } } } [
+    30 "prutt" { { "prutt" 12 } } [ add-use-position ] keep
+] unit-test
 
 ! assign-spill-slot
 cpu x86.32?
@@ -98,34 +104,27 @@ H{
     check-handled
 ] unit-test
 
-! free-positions
-cpu x86.64? [
-    {
-        H{
-            { RCX 1/0. }
-            { RBX 1/0. }
-            { RAX 1/0. }
-            { R12 1/0. }
-            { RDI 1/0. }
-            { R10 1/0. }
-            { RSI 1/0. }
-            { R11 1/0. }
-            { R8 1/0. }
-            { R9 1/0. }
-            { RDX 1/0. }
-            { RBP 1/0. }
-        }
-    } [
-        machine-registers int-regs free-positions
-    ] unit-test
-] when
-
 ! align-spill-area
 { t } [
     3 f f { } 0 insns>block <cfg> [ align-spill-area ] keep
     spill-area-align>> cell =
 ] unit-test
 
+! inactive-intervals-for
+{
+    V{ T{ live-interval-state { reg-class int-regs } { vreg 123 } } }
+} [
+    f machine-registers init-allocator
+    T{ live-interval-state { reg-class int-regs } { vreg 123 } }
+    [ add-inactive ] keep inactive-intervals-for
+] unit-test
+
+! interval/sync-point-key
+{ { 33 1/0.0 1/0.0 } } [
+    T{ sync-point { n 33 } } interval/sync-point-key
+] unit-test
+
+! next-spill-slot
 {
     T{ spill-slot f 0 }
     T{ spill-slot f 8 }
@@ -137,10 +136,7 @@ cpu x86.64? [
     cfg get
 ] unit-test
 
-{ { 33 1/0.0 1/0.0 } } [
-    T{ sync-point { n 33 } } interval/sync-point-key
-] unit-test
-
+! >unhandled-min-heap
 {
     {
         { { 5 1/0. 1/0. } T{ sync-point { n 5 } } }

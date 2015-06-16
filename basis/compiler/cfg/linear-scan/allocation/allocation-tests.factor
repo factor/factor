@@ -44,6 +44,26 @@ cpu x86.64? [
         interval-[30,60] add-active
         interval-[30,46] machine-registers register-status
     ] unit-test
+
+    ! free-positions
+    {
+        {
+            { RAX 1/0. }
+            { RCX 1/0. }
+            { RDX 1/0. }
+            { RBX 1/0. }
+            { RBP 1/0. }
+            { RSI 1/0. }
+            { RDI 1/0. }
+            { R8 1/0. }
+            { R9 1/0. }
+            { R10 1/0. }
+            { R11 1/0. }
+            { R12 1/0. }
+        }
+    } [
+        machine-registers int-regs free-positions
+    ] unit-test
 ] when
 
 ! handle-sync-point
