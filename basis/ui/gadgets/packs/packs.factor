@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators fry kernel math math.order
-math.vectors sequences ui.baseline-alignment
+USING: accessors arrays combinators fry grouping kernel math
+math.order math.vectors sequences ui.baseline-alignment
 ui.baseline-alignment.private ui.gadgets ;
 IN: ui.gadgets.packs
 
@@ -101,3 +101,18 @@ M: pack layout*
 
 M: pack children-on ( rect gadget -- seq )
     [ orientation>> ] [ children>> ] bi [ loc>> ] fast-children-on ;
+
+: each-chains ( seq quot -- seq' )
+    [ 3 circular-clump ] [ [ first3 ] prepose ] bi* each ; inline
+
+: link-chain ( prev cur next -- )
+  [ second ] [ first2 ] [ first ] tri*
+  [ focus-prev<< ] [ swap focus-next<< ] 2bi* ;
+: link-chains ( chains -- )
+  [ link-chain ] each-chains ;
+: first/last ( chains -- {first,last} )
+  [ f ] [ [ first first ] [ last last ] bi 2array ] if-empty ;
+
+M: pack link-focus-chain ( gadget -- {first,last} )
+    children>> [ link-focus-chain ] map sift
+    [ link-chains ] [ first/last ] bi ;

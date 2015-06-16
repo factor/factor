@@ -152,7 +152,8 @@ M: world apply-world-attributes
 
 M: world layout*
     [ call-next-method ]
-    [ dup layers>> [ as-big-as-possible ] with each ] bi ;
+    [ dup layers>> [ as-big-as-possible ] with each ]
+    [ link-focus-chain drop ] tri ;
 
 M: world focusable-child* children>> [ t ] [ first ] if-empty ;
 

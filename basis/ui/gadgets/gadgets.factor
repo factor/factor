@@ -24,7 +24,9 @@ layout-state
 graft-node
 interior
 boundary
-model ;
+model
+focus-prev
+focus-next ;
 
 M: gadget equal? 2drop f ;
 
@@ -394,6 +396,11 @@ M: f request-focus-on 2drop ;
 
 : focus-path ( gadget -- seq )
     [ focus>> ] follow ;
+
+GENERIC: link-focus-chain ( gadget -- {first,last} )
+GENERIC: focus-chainable? ( gadget -- t )
+M: gadget link-focus-chain dup focus-chainable? [ dup 2array ] [ drop f ] if ;
+M: gadget focus-chainable? drop f ;
 
 USE: vocabs.loader
 
