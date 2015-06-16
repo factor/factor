@@ -39,3 +39,5 @@ IN: math.primes.tests
 
 [ 5 t { 14 14 14 14 14 } ]
 [ 5 15 unique-primes [ length ] [ [ prime? ] all? ] [ [ log2 ] map ] tri ] unit-test
+
+{ t t } [ 11 dup >bignum [ prime? ] bi@ ] unit-test
