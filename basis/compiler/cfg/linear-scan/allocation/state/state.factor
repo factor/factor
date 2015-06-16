@@ -3,8 +3,7 @@
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture fry heaps kernel linked-assocs math
-math.order namespaces sequences ;
+cpu.architecture fry heaps kernel math math.order namespaces sequences ;
 FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
 
@@ -139,9 +138,6 @@ SYMBOL: spill-slots
     V{ } clone handled-intervals set
     H{ } clone spill-slots set
     -1 progress set ;
-
-: free-positions ( registers reg-class -- assoc )
-    of [ 1/0. ] H{ } <linked-assoc> map>assoc ;
 
 : add-use-position ( n reg assoc -- )
     [ [ min ] when* ] change-at ;
