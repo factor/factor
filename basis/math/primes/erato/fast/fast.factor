@@ -14,7 +14,7 @@ CONSTANT: wheel-2-3-5-7 B{
 }
 
 :: each-prime ( upto sieve quot -- )
-    11 upto >fixnum '[ dup _ <= ] [
+    11 upto integer>fixnum-strict '[ dup _ <= ] [
         wheel-2-3-5-7 [
             over dup 2/ sieve nth-unsafe [ drop ] quot if
             fixnum+fast
@@ -23,7 +23,7 @@ CONSTANT: wheel-2-3-5-7 B{
 
 :: mark-multiples ( i upto sieve -- )
     i 2 fixnum*fast :> step
-    i i fixnum*fast upto >fixnum '[ dup _ <= ] [
+    i i fixnum*fast upto integer>fixnum-strict '[ dup _ <= ] [
         t over 2/ sieve set-nth-unsafe
         step fixnum+fast
     ] while drop ; inline
@@ -37,7 +37,8 @@ PRIVATE>
     n sieve-bits <bit-array> :> sieve
     t 0 sieve set-nth
     t 4 sieve set-nth
-    n sqrt sieve [ n sieve mark-multiples ] each-prime
+    n sqrt >integer sieve
+    [ n sieve mark-multiples ] each-prime
     sieve ; inline
 
 :: sieve ( n -- primes )
@@ -46,5 +47,5 @@ PRIVATE>
         dup n <= [ primes push ] [ drop ] if
     ] each-prime primes ;
 
-:: sieve-prime? ( i sieve -- prime? )
-    i even? [ f ] [ i 2/ sieve nth ] if ;
+:: marked-prime? ( i sieve -- prime? )
+    i dup even? [ 2 = ] [ 2/ sieve nth not ] if ;
