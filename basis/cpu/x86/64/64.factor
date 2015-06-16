@@ -32,7 +32,7 @@ M: x86.64 frame-reg RBP ;
 
 M: x86.64 machine-registers
     {
-        { int-regs { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 } }
+        { int-regs { RAX RBX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 } }
         { float-regs {
             XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
             XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15
