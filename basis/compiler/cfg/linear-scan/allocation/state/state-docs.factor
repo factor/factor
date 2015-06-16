@@ -33,14 +33,6 @@ HELP: deactivate-intervals
 { $values { "n" integer } }
 { $description "Any active intervals which have ended are moved to handled. Any active intervals which cover the current position are moved to inactive." } ;
 
-HELP: free-positions
-{ $values
-  { "registers" assoc }
-  { "reg-class" reg-class }
-  { "assoc" assoc }
-}
-{ $description "Returns an assoc with the registers that can be used by the live interval. A utility used by " { $link register-status } " word." } ;
-
 HELP: handled-intervals
 { $var-description { $link vector } " of handled live intervals. This variable I think is only used during the " { $link allocate-registers } " step." } ;
 
