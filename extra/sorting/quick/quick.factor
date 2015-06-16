@@ -36,7 +36,7 @@ IN: sorting.quick
 PRIVATE>
 
 : sort! ( seq quot: ( obj1 obj2 -- <=> ) -- )
-    [ 0 over length 1 - ] dip quicksort ;
+    [ 0 over length 1 - ] dip quicksort ; inline
 
 : sort-with! ( seq quot: ( elt -- key ) -- )
     [ compare ] curry sort! ; inline
