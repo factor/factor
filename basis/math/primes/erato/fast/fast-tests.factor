@@ -1,4 +1,4 @@
-USING: sequences tools.test ;
+USING: fry kernel sequences tools.test ;
 IN: math.primes.erato.fast
 
 {
@@ -12,3 +12,10 @@ IN: math.primes.erato.fast
 { 1229 } [ 10,000 sieve length ] unit-test
 { 9592 } [ 100,000 sieve length ] unit-test
 { 78498 } [ 1,000,000 sieve length ] unit-test
+
+{ t } [
+    { 2 3 5 7 11 13 } 100 make-sieve '[ _ marked-prime? ] all?
+] unit-test
+{ t } [
+    { 4 6 8 9 10 12 } 100 make-sieve '[ _ marked-prime? not ] all?
+] unit-test
