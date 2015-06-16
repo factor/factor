@@ -39,7 +39,7 @@ cpu x86.64? [
         interval-[30,46] machine-registers register-status
     ] unit-test
 
-    { { RCX 1/0. } } [
+    { { RBX 1/0. } } [
         f machine-registers init-allocator
         interval-[30,60] add-active
         interval-[30,46] machine-registers register-status
@@ -49,9 +49,9 @@ cpu x86.64? [
     {
         {
             { RAX 1/0. }
+            { RBX 1/0. }
             { RCX 1/0. }
             { RDX 1/0. }
-            { RBX 1/0. }
             { RBP 1/0. }
             { RSI 1/0. }
             { RDI 1/0. }
