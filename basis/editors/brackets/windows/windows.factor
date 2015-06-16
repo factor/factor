@@ -1,9 +1,9 @@
 ! Copyright (C) 2015 Dimage Sapelkin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.data alien.strings combinators editors kernel make
-math.parser namespaces quotations sequences system
-windows.advapi32 windows.registry windows.registry.private
-windows.types windows.errors ;
+USING: alien.data alien.strings combinators editors
+editors.brackets kernel make math.parser namespaces quotations
+sequences system windows.advapi32 windows.registry
+windows.registry.private windows.types windows.errors ;
 
 IN: editors.brackets.windows
 
