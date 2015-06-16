@@ -9,12 +9,13 @@ IN: math.primes
 <PRIVATE
 
 : look-in-bitmap ( n -- ? )
-    $[ 8999999 sieve ] marked-unsafe? ; inline
+    integer>fixnum $[ 8999999 sieve ] marked-unsafe? ; inline
 
 : (prime?) ( n -- ? )
     dup 8999999 <= [ look-in-bitmap ] [ miller-rabin ] if ;
 
-: simple? ( n -- ? ) { [ even? ] [ 3 divisor? ] [ 5 divisor? ] } 1|| ;
+: simple? ( n -- ? )
+    { [ even? ] [ 3 divisor? ] [ 5 divisor? ] } 1|| ;
 
 PRIVATE>
 
@@ -37,10 +38,12 @@ PRIVATE>
 : <primes-range> ( low high -- range )
     [ 3 max dup even? [ 1 + ] when ] dip 2 <range> ;
 
-! In order not to reallocate large vectors, we compute the upper bound
-! of the number of primes in a given interval. We use a double inequality given
-! by Pierre Dusart in http://www.ams.org/mathscinet-getitem?mr=99d:11133
-! for x > 598. Under this limit, we know that there are at most 108 primes.
+! In order not to reallocate large vectors, we compute the upper
+! bound of the number of primes in a given interval. We use a
+! double inequality given by Pierre Dusart in
+! http://www.ams.org/mathscinet-getitem?mr=99d:11133 for x >
+! 598. Under this limit, we know that there are at most 108
+! primes.
 : upper-pi ( x -- y )
     dup log [ / ] [ 1.2762 swap / 1 + ] bi * ceiling ;
 
