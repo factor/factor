@@ -1,17 +1,19 @@
 ! Copyright (C) 2015 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: bit-arrays fry kernel kernel.private locals math
-math.functions math.private sequences sequences.private ;
+USING: bit-arrays fry kernel kernel.private literals locals math
+math.functions math.private math.ranges math.statistics
+sequences sequences.private ;
 
 IN: math.primes.erato.fast
 
 <PRIVATE
 
-CONSTANT: wheel-2-3-5-7 B{
-    2 4 2 4 6 2 6 4 2 4 6 6 2 6 4 2 6 4 6 8 4 2 4 2 4 8 6 4 6 2
-    4 6 2 6 6 4 2 4 6 2 6 4 2 4 2 10 2 10
-}
+CONSTANT: wheel-2-3-5-7 $[
+    11 dup 210 + [a,b] [
+        { 2 3 5 7 } [ divisor? ] with any? not
+    ] B{ } filter-as differences
+]
 
 :: each-prime ( upto sieve quot -- )
     11 upto integer>fixnum-strict '[ dup _ <= ] [
