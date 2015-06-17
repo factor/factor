@@ -156,8 +156,6 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
         } cond
     ] dip [ >>root ] [ >>tail ] bi* ;
 
-PRIVATE>
-
 M: persistent-vector ppop ( pvec -- pvec' )
     dup count>> {
         { 0 [ empty-error ] }
