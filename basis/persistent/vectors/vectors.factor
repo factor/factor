@@ -21,6 +21,8 @@ TUPLE: persistent-vector
 
 M: persistent-vector length count>> ;
 
+<PRIVATE
+
 CONSTANT: node-size 32
 
 : node-mask ( m -- n ) node-size mod ; inline
@@ -155,6 +157,8 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
             [ ]
         } cond
     ] dip [ >>root ] [ >>tail ] bi* ;
+
+PRIVATE>
 
 M: persistent-vector ppop ( pvec -- pvec' )
     dup count>> {
