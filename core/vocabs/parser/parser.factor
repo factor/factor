@@ -94,13 +94,17 @@ TUPLE: no-current-vocab-error ;
 : current-vocab ( -- vocab )
     manifest get current-vocab>> [ no-current-vocab ] unless* ;
 
+ERROR: unbalanced-private-declaration vocab ;
+
 : begin-private ( -- )
     current-vocab name>> ".private" ?tail
-    [ drop ] [ ".private" append set-current-vocab ] if ;
+    [ unbalanced-private-declaration ]
+    [ ".private" append set-current-vocab ] if ;
 
 : end-private ( -- )
     current-vocab name>> ".private" ?tail
-    [ set-current-vocab ] [ drop ] if ;
+    [ set-current-vocab ]
+    [ unbalanced-private-declaration ] if ;
 
 : using-vocab? ( vocab -- ? )
     vocab-name manifest get search-vocab-names>> in? ;
