@@ -1,7 +1,7 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals hashtables help.markup help.syntax
-kernel sequences ;
+compiler.cfg.linear-scan.live-intervals cpu.architecture hashtables help.markup
+help.syntax kernel sequences ;
 IN: compiler.cfg.linear-scan.allocation
 
 HELP: (allocate-registers)
@@ -25,7 +25,7 @@ HELP: assign-register
 { $description "Assigns a processor register to the live interval." } ;
 
 HELP: free-positions
-{ $values { "registers" assoc } { "reg-class" } { "avail-registers" assoc } }
+{ $values { "registers" assoc } { "reg-class" { $or int-regs float-regs } } { "avail-registers" assoc } }
 { $description "Creates an alist mapping registers to their desirability for allocation. 'avail-registers' is an alist and not a " { $link hashtable } " because the register allocation order is significant." }
 { $see-also register-status } ;
 
