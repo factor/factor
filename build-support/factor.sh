@@ -595,7 +595,7 @@ usage() {
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
     $ECHO "  update - git pull, recompile, download a boot image, bootstrap"
-    $ECHO "  bootstrap - recompile, bootstrap with existing boot image"
+    $ECHO "  bootstrap - bootstrap with existing boot image"
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report - print the build variables"
