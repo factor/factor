@@ -45,9 +45,11 @@ M: library dispose dll>> [ dispose ] when* ;
 : remove-library ( name -- )
     libraries get delete-at* [ dispose ] [ drop ] if ;
 
+: same-library? ( library path abi -- ? )
+    [ swap path>> = ] [ swap abi>> = ] bi-curry* bi and ;
+
 : add-library? ( name path abi -- ? )
-    [ lookup-library ] 2dip
-    '[ [ path>> _ = ] [ abi>> _ = ] bi and not ] [ t ] if* ;
+    [ lookup-library ] 2dip '[ _ _ same-library? not ] [ t ] if* ;
 
 : add-library ( name path abi -- )
     3dup add-library? [
@@ -55,6 +57,19 @@ M: library dispose dll>> [ dispose ] when* ;
         [ [ nip ] dip make-library ]
         [ 2drop libraries get set-at ] 3tri
     ] [ 3drop ] if ;
+
+: change-dll ( library path abi -- )
+    swap >>abi
+    swap >>path
+    [ dispose ]
+    [ path>> open-dll ]
+    [ swap >>dlerror swap >>dll drop ] tri ;
+
+: update-library ( name path abi -- )
+    pick lookup-library [
+        [ 2over same-library? not ] keep swap
+        [ change-dll drop ] [ 4drop ] if
+    ] [ add-library ] if* ;
 
 : library-abi ( library -- abi )
     lookup-library [ abi>> ] [ cdecl ] if* ;
