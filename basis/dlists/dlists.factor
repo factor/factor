@@ -86,8 +86,6 @@ M: dlist equal?
 : dlist-each-node ( ... dlist quot: ( ... node -- ... ) -- ... )
     '[ @ f ] dlist-find-node drop ; inline
 
-PRIVATE>
-
 : unlink-node ( dlist-node -- )
     [ prev>> ] [ next>> ] bi
     [ set-prev-when ]
