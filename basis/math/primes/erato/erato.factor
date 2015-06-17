@@ -7,6 +7,11 @@ IN: math.primes.erato
 
 <PRIVATE
 
+! This is a compressed Sieve of Eratosthenes that uses the
+! 2-3-5 wheel to check groups of 8 candidates starting with
+! { 1 7 11 13 17 19 23 29 } allowing us to use a byte-array
+! to store each group of booleans in a byte.
+
 CONSTANT: masks
 { f 128 f f f f f 64 f f f 32 f 16 f f f 8 f 4 f f f 2 f f f f f 1 }
 
@@ -28,13 +33,11 @@ CONSTANT: masks
 : upper-bound ( sieve -- n ) length 30 * 1 - ; inline
 
 :: unmark-multiples ( i upper sieve -- )
-    i sieve marked-unsafe? [
-        i 2 fixnum*fast :> step
-        i i fixnum*fast
-        [ dup upper <= ] [
-            [ sieve unmark ] [ step fixnum+fast ] bi
-        ] while drop
-    ] when ; inline
+    i 2 fixnum*fast :> step
+    i i fixnum*fast
+    [ dup upper <= ] [
+        [ sieve unmark ] [ step fixnum+fast ] bi
+    ] while drop ; inline
 
 : init-sieve ( n -- sieve )
     30 /i 1 + [ 255 ] B{ } replicate-as ; inline
@@ -44,9 +47,11 @@ PRIVATE>
 :: sieve ( n -- sieve )
     n integer>fixnum-strict init-sieve :> sieve
     sieve upper-bound >fixnum :> upper
-    3 upper sqrt 2 <range>
-    [ upper sieve unmark-multiples ] each
-    sieve ;
+    3 upper sqrt 2 <range> [| i |
+        i sieve marked-unsafe? [
+            i upper sieve unmark-multiples
+        ] when
+    ] each sieve ;
 
 : marked-prime? ( n sieve -- ? )
     [ integer>fixnum-strict ] dip
