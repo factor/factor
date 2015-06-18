@@ -52,11 +52,10 @@ M: fixnum shift integer>fixnum fixnum-shift ; inline
 M: fixnum bitnot fixnum-bitnot ; inline
 
 : fixnum-bit? ( x n -- ? )
-    integer>fixnum-strict dup 0 >= [
-        neg shift even? not
-    ] [ 2drop f ] if ; inline
+    { fixnum fixnum } declare
+    dup 0 >= [ neg shift even? not ] [ 2drop f ] if ; inline
 
-M: fixnum bit? fixnum-bit? ; inline
+M: fixnum bit? integer>fixnum-strict fixnum-bit? ; inline
 
 : fixnum-log2 ( x -- n )
     { fixnum } declare
