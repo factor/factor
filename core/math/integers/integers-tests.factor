@@ -72,29 +72,37 @@ IN: math.integers.tests
 [ 8 ] [ 257 >bignum log2 ] unit-test
 [ 0 ] [ 1   >bignum log2 ] unit-test
 
+[ f ] [ 0b1101 -1 bit? ] unit-test
 [ t ] [ 0b1101 0 bit? ] unit-test
 [ f ] [ 0b1101 1 bit? ] unit-test
 [ t ] [ 0b1101 2 bit? ] unit-test
 [ t ] [ 0b1101 3 bit? ] unit-test
 [ f ] [ 0b1101 4 bit? ] unit-test
+[ f ] [ 0b1101 1000 bit? ] unit-test
 
+[ f ] [ 0b1101 >bignum -1 bit? ] unit-test
 [ t ] [ 0b1101 >bignum 0 bit? ] unit-test
 [ f ] [ 0b1101 >bignum 1 bit? ] unit-test
 [ t ] [ 0b1101 >bignum 2 bit? ] unit-test
 [ t ] [ 0b1101 >bignum 3 bit? ] unit-test
 [ f ] [ 0b1101 >bignum 4 bit? ] unit-test
+[ f ] [ 0b1101 >bignum 1000 bit? ] unit-test
 
+[ t ] [ -0b1101 -1 bit? ] unit-test
 [ t ] [ -0b1101 0 bit? ] unit-test
 [ t ] [ -0b1101 1 bit? ] unit-test
 [ f ] [ -0b1101 2 bit? ] unit-test
 [ f ] [ -0b1101 3 bit? ] unit-test
 [ t ] [ -0b1101 4 bit? ] unit-test
+[ t ] [ -0b1101 1000 bit? ] unit-test
 
+[ t ] [ -0b1101 >bignum -1 bit? ] unit-test
 [ t ] [ -0b1101 >bignum 0 bit? ] unit-test
 [ t ] [ -0b1101 >bignum 1 bit? ] unit-test
 [ f ] [ -0b1101 >bignum 2 bit? ] unit-test
 [ f ] [ -0b1101 >bignum 3 bit? ] unit-test
 [ t ] [ -0b1101 >bignum 4 bit? ] unit-test
+[ t ] [ -0b1101 >bignum 1000 bit? ] unit-test
 
 [ t ] [ 1067811677921310779 >bignum 59 bit? ] unit-test
 
