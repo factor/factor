@@ -967,8 +967,8 @@ M: tuple-with-read-only-slot clone
 [ 1 ] [ [ 4 <reversed> [ nth-unsafe ] [ ] unless ] final-info length ] unit-test
 
 ! Optimization on bit?
-[ t ] [ [ 3 bit? ] { bit? fixnum-bit? } inlined? ] unit-test
-[ f ] [ [ 500 bit? ] { bit? fixnum-bit? } inlined? ] unit-test
+[ t ] [ [ 3 bit? ] { bit? } inlined? ] unit-test
+[ f ] [ [ 500 bit? ] { bit? } inlined? ] unit-test
 
 [ t ] [ [ { 1 } intersect ] { intersect } inlined? ] unit-test
 [ f ] [ [ { 1 } swap intersect ] { intersect } inlined? ] unit-test ! We could do this
