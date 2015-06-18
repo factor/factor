@@ -53,7 +53,7 @@ M: fixnum bitnot fixnum-bitnot ; inline
 
 : fixnum-bit? ( x n -- ? )
     { fixnum fixnum } declare
-    dup 0 >= [ neg shift even? not ] [ 2drop f ] if ; inline
+    dup 0 >= [ neg shift even? not ] [ 2drop f ] if ;
 
 M: fixnum bit? integer>fixnum-strict fixnum-bit? ; inline
 

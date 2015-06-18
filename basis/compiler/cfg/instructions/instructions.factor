@@ -224,6 +224,11 @@ FOLDABLE-INSN: ##bit-count
 def: dst/int-rep
 use: src/int-rep ;
 
+FOLDABLE-INSN: ##bit-test
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+temp: temp/int-rep ;
+
 ! Float arithmetic
 FOLDABLE-INSN: ##add-float
 def: dst/double-rep
