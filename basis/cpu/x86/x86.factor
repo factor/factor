@@ -764,6 +764,12 @@ M: x86 immediate-bitwise? ( n -- ? )
 enable-min/max
 enable-log2
 
+M:: x86 %bit-test ( dst src1 src2 temp -- )
+    src1 src2 BT
+    dst temp \ CMOVB (%boolean) ;
+
+enable-bit-test
+
 : check-sse ( -- )
     "Checking for multimedia extensions... " write flush
     sse-version

@@ -181,6 +181,7 @@ CODEGEN: ##not %not
 CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
 CODEGEN: ##bit-count %bit-count
+CODEGEN: ##bit-test %bit-test
 CODEGEN: ##copy %copy
 CODEGEN: ##tagged>integer %tagged>integer
 CODEGEN: ##add-float %add-float
