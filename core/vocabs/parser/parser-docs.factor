@@ -1,4 +1,5 @@
-USING: help.markup help.syntax parser strings words assocs vocabs ;
+USING: assocs continuations help.markup help.syntax parser sequences strings
+words vocabs ;
 IN: vocabs.parser
 
 ARTICLE: "word-search-errors" "Word lookup errors"
@@ -98,6 +99,16 @@ HELP: manifest
 HELP: <manifest>
 { $values { "manifest" manifest } }
 { $description "Creates a new manifest." } ;
+
+HELP: <no-word-error>
+{ $values
+  { "name" "name of the missing words" }
+  { "possibilities" sequence }
+  { "error" error }
+  { "restarts" sequence }
+}
+{ $description "Creates a no word error." } ;
+
 
 HELP: set-current-vocab
 { $values { "name" string } }
