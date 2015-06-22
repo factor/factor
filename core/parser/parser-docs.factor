@@ -150,8 +150,8 @@ HELP: no-word
 
 HELP: parse-word
 { $values { "string" string } { "word" word } }
-{ $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
-{ $errors "Throws an error if the token does not name a word, and does not parse as a number." }
+{ $description "The current vocabulary search path is searched for all words named by the " { $snippet "string" } ". If no words matches, an error is thrown, if one word matches, and it is already loaded, that word is returned. Otherwise throws a restartable error to let the user choose which word to use." }
+{ $errors "Throws a " { $link no-word-error } " if the string doesn't name a word." }
 { $notes "This word is used to implement " { $link scan-word } "." } ;
 
 HELP: parse-datum

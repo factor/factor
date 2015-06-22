@@ -31,15 +31,16 @@ ERROR: invalid-local-name name ;
 
 SINGLETON: lambda-parser
 
-: ((parse-lambda)) ( assoc reader-quot: ( -- quot ) -- quot )
+: with-lambda-scope ( assoc reader-quot: ( -- quot ) -- quot )
     '[
         in-lambda? on
         lambda-parser quotation-parser set
-        [ use-words @ ] [ unuse-words ] bi
+        manifest [ clone [ clone ] change-qualified-vocabs ] change
+        use-words @
     ] with-scope ; inline
 
 : (parse-lambda) ( assoc -- quot )
-    [ \ ] parse-until >quotation ] ((parse-lambda)) ;
+    [ \ ] parse-until >quotation ] with-lambda-scope ;
 
 : parse-lambda ( -- lambda )
     parse-local-defs
@@ -76,7 +77,7 @@ M: lambda-parser parse-quotation ( -- quotation )
     in>> [ dup pair? [ first ] when ] map make-locals ;
 
 : (parse-locals-definition) ( effect vars assoc reader-quot -- word quot effect )
-    ((parse-lambda)) <lambda>
+    with-lambda-scope <lambda>
     [ nip "lambda" set-word-prop ]
     [ nip rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ]
     [ drop nip ] 3tri ; inline

@@ -92,7 +92,7 @@ HELP: find-vocab-root
 { $description "Searches for a vocabulary in the vocabulary roots." } ;
 
 HELP: no-vocab
-{ $values { "name" "a vocabulary name" } } 
+{ $values { "name" "a vocabulary name" } }
 { $description "Throws a " { $link no-vocab } "." }
 { $error-description "Thrown when a " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " form refers to a non-existent vocabulary." } ;
 
@@ -124,7 +124,7 @@ HELP: run
 
 HELP: vocab-source-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "a pathname string" } } }
-{ $description "Outputs a pathname where source code for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
+{ $description "Outputs a pathname where source code for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a known directory on disk." } ;
 
 HELP: vocab-docs-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "a pathname string" } } }
