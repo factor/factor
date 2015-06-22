@@ -170,6 +170,9 @@ TUPLE: rename word vocab words ;
 : use-words ( assoc -- )
     <extra-words> qualified-vocabs push ;
 
+: unuse-words ( assoc -- )
+    <extra-words> qualified-vocabs remove! drop ;
+
 TUPLE: ambiguous-use-error words ;
 
 : <ambiguous-use-error> ( words -- error restarts )
