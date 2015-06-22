@@ -3,7 +3,6 @@ locals.parser namespaces parser prettyprint sequences sorting
 tools.test vocabs vocabs.parser ;
 IN: locals.parser.tests
 
-<<
 ! (::)
 {
     "dobiedoo"
@@ -21,10 +20,9 @@ IN: locals.parser.tests
     [
         "um" parse-def
         local>> name>>
-        manifest get qualified-vocabs>> last words>> keys "um" swap member?
+        qualified-vocabs last words>> keys "um" swap member?
     ] with-compilation-unit
 ] unit-test
->>
 
 ! check-local-name
 { "hello" } [
@@ -56,14 +54,15 @@ IN: locals.parser.tests
     [ locals>> [ name>> ] map ] [ keys ] bi*
 ] unit-test
 
-<<
 ! with-lambda-scope
 { t } [
-    qualified-vocabs length
-    H{ } clone [
-        "hey there!" qualified-vocabs push [ ]
-    ] with-lambda-scope drop
-    qualified-vocabs length =
+    [
+        qualified-vocabs length
+        H{ } clone [
+            "hey there!" qualified-vocabs push [ ]
+        ] with-lambda-scope drop
+        qualified-vocabs length =
+    ] with-compilation-unit
 ] unit-test
 
 {
@@ -76,4 +75,3 @@ IN: locals.parser.tests
         ] with-lexer
     ] with-compilation-unit unparse
 ] unit-test
->>
