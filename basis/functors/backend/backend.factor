@@ -1,6 +1,6 @@
-USING: accessors arrays assocs generic.standard kernel
-lexer locals.types namespaces parser quotations vocabs.parser
-words classes.tuple ;
+USING: accessors arrays assocs classes.tuple generic.standard
+kernel lexer locals.types namespaces parser quotations
+vocabs.parser words ;
 IN: functors.backend
 
 DEFER: functor-words

@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.mixin classes.parser
-classes.singleton classes.tuple classes.tuple.parser
-combinators effects.parser fry functors.backend generic
-generic.parser interpolate io.streams.string kernel lexer
-locals.parser locals.types macros make namespaces parser
-quotations sequences vocabs.parser words words.symbol ;
+classes.singleton classes.tuple classes.tuple.parser combinators
+effects.parser fry functors.backend generic generic.parser
+interpolate io.streams.string kernel lexer locals.parser
+locals.types macros make namespaces parser quotations sequences
+vocabs.parser words words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -146,21 +146,18 @@ DEFER: ;FUNCTOR delimiter
     [ first2 [ make-local ] dip 2array ]
     produce 2nip ;
 
-: with-bindings ( quot -- words assoc )
-    in-lambda? on H{ } make ; inline
-
 : parse-bindings ( end -- words assoc )
     [
         building get use-words
         (parse-bindings)
-    ] with-bindings ;
+    ] H{ } make ;
 
 : parse-functor-body ( -- form )
-    functor-words use-words
-    "WHERE" parse-bindings
-    [ [ swap <def> suffix ] { } assoc>map concat ]
-    [ [ \ ;FUNCTOR parse-until >quotation ] with-lambda-scope ] bi*
-    [ ] append-as ;
+    functor-words [
+        "WHERE" parse-bindings drop
+        [ swap <def> suffix ] { } assoc>map concat
+        \ ;FUNCTOR parse-until [ ] append-as
+    ] with-lambda-scope ;
 
 : (FUNCTOR:) ( -- word def effect )
     scan-new-word [ parse-functor-body ] parse-locals-definition ;
