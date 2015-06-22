@@ -141,12 +141,6 @@ DEFER: ;FUNCTOR delimiter
 
 <PRIVATE
 
-: push-functor-words ( -- )
-    functor-words use-words ;
-
-: pop-functor-words ( -- )
-    functor-words unuse-words ;
-
 : (parse-bindings) ( end -- words )
     [ dup parse-binding dup ]
     [ first2 [ make-local ] dip 2array ]
@@ -159,16 +153,14 @@ DEFER: ;FUNCTOR delimiter
     [
         building get use-words
         (parse-bindings)
-        building get unuse-words
     ] with-bindings ;
 
 : parse-functor-body ( -- form )
-    push-functor-words
+    functor-words use-words
     "WHERE" parse-bindings
     [ [ swap <def> suffix ] { } assoc>map concat ]
-    [ [ \ ;FUNCTOR parse-until >quotation ] ((parse-lambda)) ] bi*
-    [ ] append-as
-    pop-functor-words ;
+    [ [ \ ;FUNCTOR parse-until >quotation ] with-lambda-scope ] bi*
+    [ ] append-as ;
 
 : (FUNCTOR:) ( -- word def effect )
     scan-new-word [ parse-functor-body ] parse-locals-definition ;

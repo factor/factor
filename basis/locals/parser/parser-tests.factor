@@ -4,18 +4,6 @@ tools.test vocabs vocabs.parser ;
 IN: locals.parser.tests
 
 <<
-! ((parse-lambda))
-{
-    "V{ 99 :> kkk kkk }"
-} [
-    [
-        "locals" use-vocab
-        { "99 :> kkk kkk ;" } <lexer> [
-            H{ } clone [ \ ; parse-until ] ((parse-lambda))
-        ] with-lexer
-    ] with-compilation-unit unparse
-] unit-test
-
 ! (::)
 {
     "dobiedoo"
@@ -67,3 +55,25 @@ IN: locals.parser.tests
     ] with-compilation-unit
     [ locals>> [ name>> ] map ] [ keys ] bi*
 ] unit-test
+
+<<
+! with-lambda-scope
+{ t } [
+    qualified-vocabs length
+    H{ } clone [
+        "hey there!" qualified-vocabs push [ ]
+    ] with-lambda-scope drop
+    qualified-vocabs length =
+] unit-test
+
+{
+    "V{ 99 :> kkk kkk }"
+} [
+    [
+        "locals" use-vocab
+        { "99 :> kkk kkk ;" } <lexer> [
+            H{ } clone [ \ ; parse-until ] with-lambda-scope
+        ] with-lexer
+    ] with-compilation-unit unparse
+] unit-test
+>>
