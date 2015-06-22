@@ -155,11 +155,6 @@ HELP: use-words
 { $description "Adds an assoc mapping word names to words to the current manifest." }
 { $notes "This word is used by " { $link "locals" } " to implement lexically-scoped names." } ;
 
-HELP: unuse-words
-{ $values { "assoc" assoc } }
-{ $description "Removes an assoc mapping word names to words from the current manifest." }
-{ $notes "This word is used by " { $link "locals" } " to implement lexically-scoped names." } ;
-
 HELP: ambiguous-use-error
 { $error-description "Thrown when a word name referenced in source file is available in more than one vocabulary in the manifest. Such cases must be explicitly disambiguated using " { $link POSTPONE: FROM: } ", " { $link POSTPONE: EXCLUDE: } ", " { $link POSTPONE: QUALIFIED: } ", or " { $link POSTPONE: QUALIFIED-WITH: } "." } ;
 
