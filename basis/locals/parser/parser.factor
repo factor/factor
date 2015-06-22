@@ -35,7 +35,7 @@ SINGLETON: lambda-parser
     '[
         in-lambda? on
         lambda-parser quotation-parser set
-        manifest [ clone [ clone ] change-qualified-vocabs ] change
+        manifest [ clone ] change
         use-words @
     ] with-scope ; inline
 
