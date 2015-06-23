@@ -367,3 +367,9 @@ unit-test
 
 { t } [ most-positive-fixnum number>string string>number fixnum? ] unit-test
 { t } [ most-negative-fixnum number>string string>number fixnum? ] unit-test
+
+! large/small numbers/exponents correctly cancel out
+{ 1.0 } [ "1" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+{ 1.0 } [ "0x1" 1000 [ CHAR: 0 ] "" replicate-as append "p-4000" append string>number ] unit-test
+{ 1.0 } [ "0." 3000 [ CHAR: 0 ] "" replicate-as append "1e3001" append string>number ] unit-test
+{ 1.0 } [ "0x0." 1000 [ CHAR: 0 ] "" replicate-as append "1p4004" append string>number ] unit-test

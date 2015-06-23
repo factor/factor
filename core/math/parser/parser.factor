@@ -84,10 +84,18 @@ TUPLE: float-parse
 : make-float-dec-exponent ( float-parse n/f -- float/f )
     [ [ radix>> ] [ point>> ] [ exponent>> ] tri - (pow) ] [ swap /f ] bi* ; inline
 
+: base2-digits ( digits radix -- digits' )
+    {
+        { 16 [ 4 * ] }
+        { 8  [ 3 * ] }
+        { 2  [ ] }
+    } case ; inline
+
+: base2-point ( float-parse -- point )
+    [ point>> ] [ radix>> ] bi base2-digits ; inline
+
 : make-float-bin-exponent ( float-parse n/f -- float/f )
-    [ drop [ radix>> ] [ point>> ] bi (pow) ]
-    [ nip swap /f ]
-    [ drop 2.0 swap exponent>> (pow) * ] 2tri ; inline
+    [ [ drop 2 ] [ base2-point ] [ exponent>> ] tri - (pow) ] [ swap /f ] bi* ; inline
 
 : ?default-exponent ( float-parse n/f -- float-parse' n/f' )
     over exponent>> [
