@@ -99,6 +99,8 @@ unit-test
 
 { 0x1.999999999999ap-3 } [ "0.2" string>number ] unit-test
 { 0x1.3333333333333p0  } [ "1.2" string>number ] unit-test
+{ 0o1.146314631463146314p0 } [ "1.2" string>number ] unit-test
+{ 0b1.0011001100110011001100110011001100110011001100110011p0 } [ "1.2" string>number ] unit-test
 { 0x1.5555555555555p0  } [ "1.333,333,333,333,333,333" string>number ] unit-test
 { 0x1.aaaaaaaaaaaabp0  } [ "1.666,666,666,666,666,666" string>number ] unit-test
 
@@ -240,6 +242,40 @@ unit-test
 { 0.0 } [ "1.0p-1075" hex> ] unit-test
 { 1/0. } [ "1.0p1024" hex> ] unit-test
 { -1/0. } [ "-1.0p1024" hex> ] unit-test
+
+{ 1.0 } [ "1.0p0" bin> ] unit-test
+{ 1.5 } [ "1.1p0" bin> ] unit-test
+{ 1.875 } [ "1.111p0" bin> ] unit-test
+{ 1.90625 } [ "1.11101p0" bin> ] unit-test
+{ 1.03125 } [ "1.00001p0" bin> ] unit-test
+{ 15.5 } [ "1111.1p0" bin> ] unit-test
+{ 15.53125 } [ "1111.10001p0" bin> ] unit-test
+{ -15.5 } [ "-1111.1p0" bin> ] unit-test
+{ 15.5 } [ "1111.1p0" bin> ] unit-test
+{ -15.5 } [ "-1111.1p0" bin> ] unit-test
+{ 62.0 } [ "1111.1p2" bin> ] unit-test
+{ 3.875 } [ "1111.1p-2" bin> ] unit-test
+{ $[ 1 bits>double ] } [ "1.0p-1074" bin> ] unit-test
+{ 0.0 } [ "1.0p-1075" bin> ] unit-test
+{ 1/0. } [ "1.0p1024" bin> ] unit-test
+{ -1/0. } [ "-1.0p1024" bin> ] unit-test
+
+{ 1.0 } [ "1.0p0" oct> ] unit-test
+{ 1.5 } [ "1.4p0" oct> ] unit-test
+{ 1.875 } [ "1.7p0" oct> ] unit-test
+{ 1.90625 } [ "1.72p0" oct> ] unit-test
+{ 1.03125 } [ "1.02p0" oct> ] unit-test
+{ 15.5 } [ "17.4p0" oct> ] unit-test
+{ 15.53125 } [ "17.42p0" oct> ] unit-test
+{ -15.5 } [ "-17.4p0" oct> ] unit-test
+{ 15.5 } [ "17.4p0" oct> ] unit-test
+{ -15.5 } [ "-17.4p0" oct> ] unit-test
+{ 62.0 } [ "17.4p2" oct> ] unit-test
+{ 3.875 } [ "17.4p-2" oct> ] unit-test
+{ $[ 1 bits>double ] } [ "1.0p-1074" oct> ] unit-test
+{ 0.0 } [ "1.0p-1075" oct> ] unit-test
+{ 1/0. } [ "1.0p1024" oct> ] unit-test
+{ -1/0. } [ "-1.0p1024" oct> ] unit-test
 
 { 0 } [ "0" string>number ] unit-test
 { 0 } [ "00" string>number ] unit-test
