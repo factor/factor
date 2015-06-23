@@ -107,7 +107,7 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 "A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
-"Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
+"Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
     "8.0 0x1.0p3 = ."
     "t"
@@ -118,6 +118,14 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 { $example
     "10.125 0x1.44p3 = ."
+    "t"
+}
+{ $example
+    "10.125 0b1.01001p3 = ."
+    "t"
+}
+{ $example
+    "10.125 0o1.22p3 = ."
     "t"
 }
 "The normalized hex form " { $snippet "±0x1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of the binary IEEE 754 representation."
