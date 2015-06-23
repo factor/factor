@@ -373,3 +373,32 @@ unit-test
 { 1.0 } [ "0x1" 1000 [ CHAR: 0 ] "" replicate-as append "p-4000" append string>number ] unit-test
 { 1.0 } [ "0." 3000 [ CHAR: 0 ] "" replicate-as append "1e3001" append string>number ] unit-test
 { 1.0 } [ "0x0." 1000 [ CHAR: 0 ] "" replicate-as append "1p4004" append string>number ] unit-test
+{ 1.0 } [ "1" 3000 [ CHAR: 0 ] "" replicate-as append "." append
+              3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+
+! We correctly parse the biggest/smallest float correctly
+! (ie the 1/0. or 0/0. short-circuit optimization doesn't apply)
+{ 1 } [ "4.9406564584124655e-324" string>number double>bits ] unit-test
+{ 1 } [ "0x1.0p-1074" string>number double>bits ] unit-test
+{ 1 } [ "0o1.0p-1074" string>number double>bits ] unit-test
+{ 1 } [ "0b1.0p-1074" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "1.7976931348623157e+308" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "0x1.fffffffffffffp1023" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "0o1.777777777777777774p1023" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "0b1.1111111111111111111111111111111111111111111111111111p1023" string>number double>bits ] unit-test
+! Actual biggest/smallest parseable floats are a little
+! larger/smaller than IEE754 values because of rounding
+{ 0x1.0p-1074 } [ "0x0.fffffffffffffcp-1074" string>number ] unit-test
+{ 4.94065645841246544e-324 } [ "4.94065645841246517e-324" string>number ] unit-test
+{ 0x1.fffffffffffffp1023 } [ "0x1.fffffffffffff7ffffffffffffffffp1023" string>number ] unit-test
+{ 1.79769313486231571e+308 } [ "1.797693134862315807e+308" string>number ] unit-test
+
+! works with ratios
+{ 0.25 } [ "1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+{ 1.25 } [ "1+1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+
+! #1356 #1231
+{ 1/0. } [ "1e100000" string>number ] unit-test
+{ 0.0  } [ "1e-100000" string>number ] unit-test
+{ 1/0. } [ "0x1p300000" string>number ] unit-test
+{ 0.0  } [ "0x1p-300000" string>number ] unit-test

@@ -26,13 +26,19 @@ ERROR: invalid-radix radix ;
 
 <PRIVATE
 
+! magnitude is used only for floats to avoid
+! expensive computations when we know that
+! the result will overflow/underflow.
+! The computation of magnitude starts in
+! number-parse and continues in float-parse.
 TUPLE: number-parse
     { str read-only }
     { length fixnum read-only }
-    { radix fixnum } ;
+    { radix fixnum }
+    { magnitude fixnum } ;
 
 : <number-parse> ( str radix -- i number-parse n )
-    [ 0 ] 2dip [ dup length ] dip number-parse boa 0 ; inline
+    [ 0 ] 2dip [ dup length ] dip 0 number-parse boa 0 ; inline
 
 : (next-digit) ( i number-parse n digit-quot end-quot -- n/f )
     [ 2over length>> < ] 2dip
@@ -44,8 +50,20 @@ TUPLE: number-parse
 : next-digit ( i number-parse n quot -- n/f )
     [ 2nip ] (next-digit) ; inline
 
+: inc-magnitude ( number-parse -- number-parse' )
+    [ 1 + ] change-magnitude ; inline
+
+: ?inc-magnitude ( number-parse n -- number-parse' )
+    zero? [ inc-magnitude ] unless ; inline
+
+: (add-digit) ( number-parse n digit -- number-parse n' )
+    [ dup radix>> ] [ * ] [ + ] tri* ;
+
 : add-digit ( i number-parse n digit quot -- n/f )
-    [ [ dup radix>> ] [ * ] [ + ] tri* ] dip next-digit ; inline
+    [ (add-digit) [ ?inc-magnitude ] keep ] dip next-digit ; inline
+
+: add-exponent-digit ( i number-parse n digit quot -- n/f )
+    [ (add-digit) ] dip next-digit ; inline
 
 : digit-in-radix ( number-parse n char -- number-parse n digit ? )
     digit> pick radix>> over > ; inline
@@ -56,9 +74,10 @@ TUPLE: number-parse
 TUPLE: float-parse
     { radix fixnum }
     { point }
-    { exponent } ;
-
-: inc-point ( float-parse -- float-parse' )
+    { exponent }
+    { magnitude } ;
+: inc-point-?dec-magnitude ( float-parse n -- float-parse' )
+    zero? [ [ 1 - ] change-magnitude ] when
     [ 1 + ] change-point ; inline
 
 : store-exponent ( float-parse n expt -- float-parse' n )
@@ -79,10 +98,37 @@ TUPLE: float-parse
     dup 0 >= [ ((pow)) ] [ [ recip ] [ neg ] bi* ((pow)) ] if ; inline
 
 : add-mantissa-digit ( float-parse i number-parse n digit quot -- float-parse' n/f )
-    [ [ inc-point ] 4dip ] dip add-digit ; inline
+    [ (add-digit)
+        dup [ inc-point-?dec-magnitude ] curry 3dip
+    ] dip next-digit ; inline
+
+! IEE754 doubles are in the range ]10^309,10^-324[,
+! or expressed in base 2, ]2^1024, 2^-1074].
+! We don't need those ranges to be accurate as long as we are
+! excluding all the floats because they are used only to
+! optimize when we know there will be an overflow/underflow
+! We compare these numbers to the magnitude slot of float-parse,
+! which has the following behavior:
+! ... ; 0.0xxx -> -1; 0.xxx -> 0; x.xxx -> 1; xx.xxx -> 2; ...;
+! Also, take some margin as the current float parsing algorithm
+! does some rounding; For example,
+! 0x1.0p-1074 is the smallest IE754 double, but floats down to
+! 0x0.fffffffffffffcp-1074 are parsed as 0x1.0p-1074
+CONSTANT: max-magnitude-10 309
+CONSTANT: min-magnitude-10 -323
+CONSTANT: max-magnitude-2 1027
+CONSTANT: min-magnitude-2 -1074
 
 : make-float-dec-exponent ( float-parse n/f -- float/f )
-    [ [ radix>> ] [ point>> ] [ exponent>> ] tri - (pow) ] [ swap /f ] bi* ; inline
+    over [ exponent>> ] [ magnitude>> ] bi +
+    {
+        { [ dup max-magnitude-10 > ] [ 3drop 1/0. ] }
+        { [ dup min-magnitude-10 < ] [ 3drop 0.0 ] }
+        [ drop
+            [ [ radix>> ] [ point>> ] [ exponent>> ] tri - (pow) ]
+            [ swap /f ] bi*
+        ]
+    } cond ; inline
 
 : base2-digits ( digits radix -- digits' )
     {
@@ -94,8 +140,19 @@ TUPLE: float-parse
 : base2-point ( float-parse -- point )
     [ point>> ] [ radix>> ] bi base2-digits ; inline
 
+: base2-magnitude ( float-parse -- point )
+    [ magnitude>> ] [ radix>> ] bi base2-digits ; inline
+
 : make-float-bin-exponent ( float-parse n/f -- float/f )
-    [ [ drop 2 ] [ base2-point ] [ exponent>> ] tri - (pow) ] [ swap /f ] bi* ; inline
+    over [ exponent>> ] [ base2-magnitude ] bi +
+    {
+        { [ dup max-magnitude-2 > ] [ 3drop 1/0. ] }
+        { [ dup min-magnitude-2 < ] [ 3drop 0.0 ] }
+        [ drop
+            [ [ drop 2 ] [ base2-point ] [ exponent>> ] tri - (pow) ]
+            [ swap /f ] bi*
+        ]
+    } cond ; inline
 
 : ?default-exponent ( float-parse n/f -- float-parse' n/f' )
     over exponent>> [
@@ -125,14 +182,14 @@ TUPLE: float-parse
 : @abort ( i number-parse n x -- f )
     4drop f ; inline
 
-: @split ( i number-parse n -- n i number-parse n' )
-    -rot 0 ; inline
+: @split ( i number-parse n -- n i number-parse' n' )
+    -rot 0 >>magnitude 0 ; inline
 
 : @split-exponent ( i number-parse n -- n i number-parse' n' )
     -rot 10 >>radix 0 ; inline
 
 : <float-parse> ( i number-parse n -- float-parse i number-parse n )
-     [ drop nip radix>> 0 f float-parse boa ] 3keep ; inline
+     [ drop nip [ radix>> ] [ magnitude>> ] bi [ 0 f ] dip float-parse boa ] 3keep ; inline
 
 DEFER: @exponent-digit
 DEFER: @mantissa-digit
@@ -149,7 +206,7 @@ DEFER: @neg-digit
 
 : @exponent-digit ( float-parse i number-parse n char -- float-parse n/f )
     { float-parse fixnum number-parse integer fixnum } declare
-    digit-in-radix [ [ @exponent-digit-or-punc ] add-digit ] [ @abort ] if ;
+    digit-in-radix [ [ @exponent-digit-or-punc ] add-exponent-digit ] [ @abort ] if ;
 
 : @exponent-first-char ( float-parse i number-parse n char -- float-parse n/f )
     {
