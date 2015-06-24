@@ -504,21 +504,38 @@ M: ratio >base
     [ -0.0 double>bits bitnot bitand -52 shift ] bi
     mantissa-expt-normalize ;
 
-: float>hex-sign ( bits -- str )
+: bin-float-sign ( bits -- str )
     -0.0 double>bits bitand zero? "" "-" ? ;
 
-: float>hex-value ( mantissa -- str )
-    >hex 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
+: bin-float-value ( str size -- str' )
+    CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
     [ "0" ] when-empty "1." prepend ;
 
-: float>hex-expt ( mantissa -- str )
+: float>hex-value ( mantissa -- str )
+    >hex 13 bin-float-value ;
+
+: float>oct-value ( mantissa -- str )
+    4 * >oct 18 bin-float-value ;
+
+: float>bin-value ( mantissa -- str )
+    >bin 52 bin-float-value ;
+
+: bin-float-expt ( mantissa -- str )
     10 >base "p" prepend ;
 
-: float>hex ( n -- str )
+: (bin-float>base) ( value-quot n -- str )
     double>bits
-    [ float>hex-sign ] [
-        mantissa-expt [ float>hex-value ] [ float>hex-expt ] bi*
-    ] bi 3append ;
+    [ bin-float-sign swap ] [
+        mantissa-expt rot [ bin-float-expt ] bi*
+    ] bi 3append ; inline
+
+: bin-float>base ( n base -- str )
+    {
+        { 16 [ [ float>hex-value ] swap (bin-float>base) ] }
+        { 8  [ [ float>oct-value ] swap (bin-float>base) ] }
+        { 2  [ [ float>bin-value ] swap (bin-float>base) ] }
+        [ invalid-radix ]
+    } case ;
 
 : format-string ( format -- format )
     0 suffix >byte-array ; foldable
@@ -538,9 +555,8 @@ M: ratio >base
 
 : float>base ( n radix -- str )
     {
-        { 16 [ float>hex ] }
         { 10 [ "%.16g" format-float ] }
-        [ invalid-radix ]
+        [ bin-float>base ]
     } case ; inline
 
 PRIVATE>

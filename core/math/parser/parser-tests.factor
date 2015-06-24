@@ -194,8 +194,7 @@ unit-test
 [ 1 0 >base ] must-fail
 [ 1 -1 >base ] must-fail
 [ 2+1/2 -1 >base ] [ invalid-radix? ] must-fail-with
-[ 123.456 8 >base ] [ invalid-radix? ] must-fail-with
-[ 123.456 2 >base ] [ invalid-radix? ] must-fail-with
+[ 123.456 7 >base ] [ invalid-radix? ] must-fail-with
 
 { "0/0." } [ 0.0 0.0 / number>string ] unit-test
 
@@ -225,6 +224,26 @@ unit-test
 { "0.0" } [ 0.0 >hex ] unit-test
 { "1.0p-1074" } [ 1 bits>double >hex ] unit-test
 { "-0.0" } [ -0.0 >hex ] unit-test
+
+{ "1.0p0" } [ 1.0 >bin ] unit-test
+{ "1.1p2" } [ 6.0 >bin ] unit-test
+{ "1.00001p2" } [ 4.125 >bin ] unit-test
+{ "1.1p-2" } [ 0.375 >bin ] unit-test
+{ "-1.1p2" } [ -6.0 >bin ] unit-test
+{ "1.1p10" } [ 1536.0 >bin ] unit-test
+{ "0.0" } [ 0.0 >bin ] unit-test
+{ "1.0p-1074" } [ 1 bits>double >bin ] unit-test
+{ "-0.0" } [ -0.0 >bin ] unit-test
+
+{ "1.0p0" } [ 1.0 >oct ] unit-test
+{ "1.4p2" } [ 6.0 >oct ] unit-test
+{ "1.02p2" } [ 4.125 >oct ] unit-test
+{ "1.4p-2" } [ 0.375 >oct ] unit-test
+{ "-1.4p2" } [ -6.0 >oct ] unit-test
+{ "1.4p10" } [ 1536.0 >oct ] unit-test
+{ "0.0" } [ 0.0 >oct ] unit-test
+{ "1.0p-1074" } [ 1 bits>double >oct ] unit-test
+{ "-0.0" } [ -0.0 >oct ] unit-test
 
 { 1.0 } [ "1.0p0" hex> ] unit-test
 { 1.5 } [ "1.8p0" hex> ] unit-test
