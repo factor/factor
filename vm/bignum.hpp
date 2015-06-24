@@ -42,4 +42,9 @@ enum bignum_comparison {
   bignum_comparison_greater = 1
 };
 
+cell bignum_to_cell(bignum* bn);
+fixnum bignum_to_fixnum(bignum* bn);
+int64_t bignum_to_long_long(bignum* bn);
+uint64_t bignum_to_ulong_long(bignum* bn);
+
 }
