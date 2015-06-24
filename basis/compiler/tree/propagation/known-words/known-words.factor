@@ -123,14 +123,24 @@ IN: compiler.tree.propagation.known-words
 \ /i [ [ interval/i ] [ may-overflow integer-valued ] binary-op ] each-derived-op
 \ /f [ [ interval/f ] [ float-valued ] binary-op ] each-derived-op
 
-\ mod [ [ interval-mod ] [ real-valued ] binary-op ] each-derived-op
+\ mod [ interval-mod ] [ real-valued ] binary-op
+\ fmod [ interval-mod ] [ real-valued ] binary-op
+\ mod-integer-integer [ interval-mod ] [ integer-valued ] binary-op
+\ bignum-mod [ interval-mod ] [ integer-valued ] binary-op
+\ fixnum-mod [ interval-mod ] [ fixnum-valued ] binary-op
+\ mod-fixnum-integer [ interval-mod ] [ integer-valued ] binary-op
+\ mod-integer-fixnum [ interval-mod ] [ integer-valued ] binary-op
+
 \ rem [ [ interval-rem ] [ may-overflow real-valued ] binary-op ] each-derived-op
 
-{ /mod fixnum/mod } [
-    \ /i \ mod
-    [ "outputs" word-prop ] bi@
-    '[ _ _ 2bi ] "outputs" set-word-prop
-] each
+! /mod is the combination of /i and mod, fixnum/mod of /i and fixnum-mod
+\ /mod
+\ /i \ mod [ "outputs" word-prop ] bi@
+'[ _ _ 2bi ] "outputs" set-word-prop
+
+\ fixnum/mod
+\ /i \ fixnum-mod [ "outputs" word-prop ] bi@
+'[ _ _ 2bi ] "outputs" set-word-prop
 
 : shift-op-class ( info1 info2 -- newclass )
     [ class>> ] bi@
