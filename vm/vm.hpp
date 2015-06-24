@@ -232,11 +232,7 @@ struct factor_vm {
                      bignum** remainder);
   bignum* bignum_quotient(bignum* numerator, bignum* denominator);
   bignum* bignum_remainder(bignum* numerator, bignum* denominator);
-  cell bignum_to_cell(bignum* bn);
   fixnum bignum_to_fixnum_strict(bignum* bn);
-  fixnum bignum_to_fixnum(bignum* bn);
-  int64_t bignum_to_long_long(bignum* bn);
-  uint64_t bignum_to_ulong_long(bignum* bn);
   bignum* double_to_bignum(double x);
   int bignum_equal_p_unsigned(bignum* x, bignum* y);
   enum bignum_comparison bignum_compare_unsigned(bignum* x, bignum* y);

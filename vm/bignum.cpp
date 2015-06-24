@@ -369,7 +369,7 @@ FOO_TO_BIGNUM(ulong_long, uint64_t, int64_t, uint64_t)
 /* cannot allocate memory */
 /* bignum_to_cell, fixnum_to_cell, long_long_to_cell, ulong_long_to_cell */
 #define BIGNUM_TO_FOO(name, type, stype, utype)                            \
-  type factor_vm::bignum_to_##name(bignum* bn) {                           \
+  type bignum_to_##name(bignum* bn) {                                      \
     if (BIGNUM_ZERO_P(bn))                                                 \
       return (0);                                                          \
     {                                                                      \
