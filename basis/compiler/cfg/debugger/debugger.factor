@@ -11,7 +11,7 @@ compiler.cfg.save-contexts
 compiler.cfg.utilities compiler.tree.builder
 compiler.tree.optimizer compiler.units fry hashtables io kernel math
 namespaces prettyprint prettyprint.backend prettyprint.custom
-prettyprint.sections quotations random sequences vectors words ;
+prettyprint.sections quotations random sequences vectors words strings ;
 FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 
@@ -50,7 +50,13 @@ M: ##phi insn.
     clone [ [ [ number>> ] dip ] assoc-map ] change-inputs
     call-next-method ;
 
-M: insn insn. tuple>array but-last [ bl ] [ pprint ] interleave nl ;
+! XXX: pprint on a string prints the double quotes.
+! This will cause graphviz to choke, so print without quotes.
+M: insn insn. tuple>array but-last [
+        bl
+    ] [
+        dup string? [ print ] [ pprint ] if
+    ] interleave nl ;
 
 : block. ( bb -- )
     "=== Basic block #" write dup block-number . nl
