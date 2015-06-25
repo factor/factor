@@ -45,7 +45,7 @@ M: unsupported-encoding summary
 HOOK: default-graphviz-program os ( -- path/f )
 
 M: object default-graphviz-program ( -- path/f )
-    standard-layouts [ find-in-path ] find nip ;
+    standard-layouts [ find-in-standard-login-path ] map-find drop ;
 
 ERROR: cannot-find-graphviz-installation ;
 
