@@ -1,81 +1,44 @@
 USING: accessors arrays assocs compiler.tree
 compiler.tree.propagation.constraints compiler.tree.propagation.copy
-compiler.tree.propagation.info compiler.tree.propagation.simple kernel math
-math.intervals math.private namespaces sequences system tools.test words ;
+compiler.tree.propagation.info compiler.tree.propagation.simple hashtables
+kernel math math.intervals math.private namespaces sequences system tools.test
+words ;
 IN: compiler.tree.propagation.simple.tests
 
+: make-value-infos ( classes intervals -- seq )
+    [ <class/interval-info>  ] 2map ;
+
 : fixnum-value-infos ( -- infos )
-    {
-        H{
-            {
-                1
-                T{ value-info-state
-                   { class fixnum }
-                   { interval
-                     T{ interval
-                        { from { 56977 t } }
-                        { to { 56977 t } }
-                     }
-                   }
-                   { literal 56977 }
-                   { literal? t }
-                }
-            }
-            {
-                2
-                T{ value-info-state
-                   { class fixnum }
-                   { interval
-                     T{ interval
-                        { from { 8098 t } }
-                        { to { 8098 t } }
-                     }
-                   }
-                   { literal 8098 }
-                   { literal? t }
-                }
-            }
-        }
-    } ;
+    { fixnum fixnum } 56977 [a,a] 8098 [a,a] 2array make-value-infos ;
 
 : object-value-infos ( -- infos )
-    {
-        H{
-            {
-                1
-                T{ value-info-state
-                   { class object }
-                   { interval full-interval }
-                }
-            }
-            {
-                2
-                T{ value-info-state
-                   { class object }
-                   { interval full-interval }
-                }
-            }
-        }
-    } ;
+    { object object } { full-interval full-interval } make-value-infos ;
+
+: bignum-value-infos ( -- infos )
+    { bignum bignum } full-interval 20 [a,a] 2array
+    make-value-infos ;
+
+: full-interval-and-bignum-literal ( -- infos )
+    { object bignum } full-interval 20 [a,a] 2array
+    make-value-infos ;
+
+: indexize ( seq -- assoc )
+    [ swap 2array ] map-index ;
 
 : setup-value-infos ( value-infos -- )
-    value-infos set
-    H{ { 1 1 } { 2 2 } { 3 3 } } copies set ;
+    indexize >hashtable 1array value-infos set
+    H{ { 0 0 } { 1 1 } { 2 2 } } copies set ;
 
 : #call-fixnum* ( -- node )
-    T{ #call { word fixnum* } { in-d V{ 1 2 } } { out-d { 3 } } } ;
+    T{ #call { word fixnum* } { in-d V{ 0 1 } } { out-d { 3 } } } ;
 
-: #call-fixnum/mod ( -- node )
-    T{ #call { word fixnum/mod } { in-d V{ 1 2 } } { out-d { 4 5 } } } ;
+: call-outputs-quot-of-word ( inputs outputs word -- value-infos )
+    <#call> dup word>> call-outputs-quot ;
 
 { } [
     fixnum-value-infos setup-value-infos
     #call-fixnum* dup word>> "input-classes" word-prop
     propagate-input-classes
-] unit-test
-
-{ t } [
-    fixnum-value-infos setup-value-infos 1 value-info literal?>>
 ] unit-test
 
 {
@@ -97,7 +60,7 @@ IN: compiler.tree.propagation.simple.tests
     }
 } [
     fixnum-value-infos setup-value-infos
-    #call-fixnum/mod dup word>> call-outputs-quot
+    V{ 0 1 } V{ 2 3 } \ fixnum/mod call-outputs-quot-of-word
 ] unit-test
 
 ! The result of fixnum-mod should always be a fixnum.
@@ -116,7 +79,36 @@ cpu x86.64? [
         }
     } [
         object-value-infos setup-value-infos
-        T{ #call { word fixnum-mod } { in-d V{ 1 2 } } { out-d { 4 } } }
-        dup word>> call-outputs-quot
+        V{ 0 1 } V{ 2 } \ fixnum-mod call-outputs-quot-of-word
     ] unit-test
 ] when
+
+! Downgrading should do its thing here.
+{
+    {
+        T{ value-info-state
+           { class fixnum }
+           { interval
+             T{ interval { from { -19 t } } { to { 19 t } } }
+           }
+        }
+    }
+} [
+    bignum-value-infos setup-value-infos
+    V{ 0 1 } V{ 2 } \ mod call-outputs-quot-of-word
+] unit-test
+
+! But not here because the argument to mod might be a real.
+{
+    {
+        T{ value-info-state
+           { class real }
+           { interval
+             T{ interval { from { -20 f } } { to { 20 f } } }
+           }
+        }
+    }
+} [
+    full-interval-and-bignum-literal setup-value-infos
+    V{ 0 1 } V{ 2 } \ mod call-outputs-quot-of-word
+] unit-test
