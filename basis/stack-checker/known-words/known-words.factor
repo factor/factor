@@ -332,7 +332,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum-bitor { bignum bignum } { bignum } define-primitive \ bignum-bitor make-foldable
 \ bignum-bitxor { bignum bignum } { bignum } define-primitive \ bignum-bitxor make-foldable
 \ bignum-log2 { bignum } { bignum } define-primitive \ bignum-log2 make-foldable
-\ bignum-mod { bignum bignum } { bignum } define-primitive \ bignum-mod make-foldable
+\ bignum-mod { bignum bignum } { integer } define-primitive \ bignum-mod make-foldable
 \ bignum-gcd { bignum bignum } { bignum } define-primitive \ bignum-gcd make-foldable
 \ bignum-shift { bignum fixnum } { bignum } define-primitive \ bignum-shift make-foldable
 \ bignum/i { bignum bignum } { bignum } define-primitive \ bignum/i make-foldable
