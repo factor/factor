@@ -51,6 +51,10 @@ IN: compiler.tree.propagation.known-words
 : ensure-math-class ( class must-be -- class' )
     [ class<= ] most ;
 
+: maybe>fixnum ( class interval -- class' interval )
+    2dup [ integer class<= ] [ fixnum-interval interval-subset? ] bi*
+    and [ nip fixnum swap ] when ;
+
 : number-valued ( class interval -- class' interval' )
     [ number ensure-math-class ] dip ;
 
@@ -123,13 +127,13 @@ IN: compiler.tree.propagation.known-words
 \ /i [ [ interval/i ] [ may-overflow integer-valued ] binary-op ] each-derived-op
 \ /f [ [ interval/f ] [ float-valued ] binary-op ] each-derived-op
 
-\ mod [ interval-mod ] [ real-valued ] binary-op
+\ mod [ interval-mod ] [ real-valued maybe>fixnum ] binary-op
 \ fmod [ interval-mod ] [ real-valued ] binary-op
 \ mod-integer-integer [ interval-mod ] [ integer-valued ] binary-op
-\ bignum-mod [ interval-mod ] [ integer-valued ] binary-op
+\ bignum-mod [ interval-mod ] [ integer-valued maybe>fixnum ] binary-op
 \ fixnum-mod [ interval-mod ] [ fixnum-valued ] binary-op
-\ mod-fixnum-integer [ interval-mod ] [ integer-valued ] binary-op
-\ mod-integer-fixnum [ interval-mod ] [ integer-valued ] binary-op
+\ mod-fixnum-integer [ interval-mod ] [ fixnum-valued ] binary-op
+\ mod-integer-fixnum [ interval-mod ] [ fixnum-valued ] binary-op
 
 \ rem [ [ interval-rem ] [ may-overflow real-valued ] binary-op ] each-derived-op
 
@@ -232,16 +236,25 @@ generic-comparison-ops [
     { integer>fixnum-strict fixnum }
 
     { >bignum bignum }
-    { fixnum>bignum bignum }
     { float>bignum bignum }
 
     { >float float }
-    { fixnum>float float }
     { bignum>float float }
 
     { >integer integer }
 } [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
+] assoc-each
+
+! For these we limit the outputted interval
+{
+    { fixnum>bignum bignum }
+    { fixnum>float float }
+} [
+    '[
+        _ swap interval>> fixnum-interval interval-intersect
+        <class/interval-info>
+    ] "outputs" set-word-prop
 ] assoc-each
 
 {

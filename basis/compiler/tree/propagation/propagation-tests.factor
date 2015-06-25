@@ -21,6 +21,12 @@ IN: compiler.tree.propagation.tests
     ] filter
 ] unit-test
 
+! The value interval should be limited for these.
+{ t t } [
+    [ fixnum>bignum ] final-info first interval>> fixnum-interval =
+    [ fixnum>float ] final-info first interval>> fixnum-interval =
+] unit-test
+
 [ V{ } ] [ [ ] final-classes ] unit-test
 
 [ V{ fixnum } ] [ [ 1 ] final-classes ] unit-test
@@ -745,8 +751,11 @@ MIXIN: empty-mixin
     [ { float } declare 0 eq? ] final-classes
 ] unit-test
 
-[ V{ integer } ] [
+! Here we can know both that 1) mod(integer, fixnum) = fixnum and 2)
+! mod(fixnum, integer) = fixnum
+[ V{ fixnum } V{ fixnum } ] [
     [ { integer fixnum } declare mod ] final-classes
+    [ { fixnum integer } declare mod ] final-classes
 ] unit-test
 
 [ V{ integer } ] [
@@ -770,7 +779,7 @@ MIXIN: empty-mixin
 [ V{ t } ] [
     [ [ 123 bitand ] [ drop f ] if dup [ 0 >= ] [ not ] if ] final-literals
 ] unit-test
-  
+
 [ V{ bignum } ] [
     [ { bignum } declare dup 1 - bitxor ] final-classes
 ] unit-test
@@ -941,7 +950,7 @@ M: tuple-with-read-only-slot clone
 [ V{ fixnum } ] [ [ >bignum 10 mod 2^ ] final-classes ] unit-test
 [ V{ bignum } ] [ [ >bignum 10 bitand ] final-classes ] unit-test
 [ V{ bignum } ] [ [ >bignum 10 >bignum bitand ] final-classes ] unit-test
-[ V{ bignum } ] [ [ >bignum 10 mod ] final-classes ] unit-test
+[ V{ fixnum } ] [ [ >bignum 10 mod ] final-classes ] unit-test
 [ V{ bignum } ] [ [ { fixnum } declare -1 >bignum bitand ] final-classes ] unit-test
 [ V{ bignum } ] [ [ { fixnum } declare -1 >bignum swap bitand ] final-classes ] unit-test
 
@@ -1037,7 +1046,7 @@ M: f derp drop t ;
 : bitand-ratio1 ( x -- y )
     1 swap bitand zero? ;
 
-[ 2+1/2 bitand-ratio0 ] [ no-method? ] must-fail-with 
+[ 2+1/2 bitand-ratio0 ] [ no-method? ] must-fail-with
 [ 2+1/2 bitand-ratio1 ] [ no-method? ] must-fail-with
 
 : shift-test0 ( x -- y )
