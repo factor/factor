@@ -1,12 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors compiler.tree.builder compiler.cfg compiler.cfg.rpo
-compiler.cfg.dominance compiler.cfg.dominance.private
-compiler.cfg.predecessors compiler.cfg.debugger compiler.cfg.optimizer
-compiler.cfg.utilities compiler.tree.recursive images.viewer
-images.png io io.encodings.ascii io.files io.files.unique io.launcher
-kernel math.parser sequences assocs arrays make math namespaces
-quotations combinators locals words ;
+USING: accessors arrays assocs combinators compiler.cfg
+compiler.cfg.debugger compiler.cfg.dominance
+compiler.cfg.dominance.private compiler.cfg.rpo
+compiler.tree.builder compiler.tree.recursive graphviz.render io
+io.encodings.ascii io.files io.files.unique io.launcher kernel
+make math math.parser namespaces quotations sequences words ;
 FROM: assocs => change-at ;
 IN: compiler.graphviz
 
@@ -24,7 +23,7 @@ IN: compiler.graphviz
     "cfg" ".dot" make-unique-file
     dup "Wrote " prepend print
     [ [ concat ] dip ascii set-file-lines ]
-    [ { "dot" "-Tpng" "-O" } swap suffix try-process ]
+    [ [ ?default-graphviz-program "-Tpng" "-O" ] dip 4array try-process ]
     [ ".png" append ]
     tri ; inline
 
