@@ -11,6 +11,13 @@ BUILTIN: word
 { def quotation initial: [ ] } props pic-def pic-tail-def
 { sub-primitive read-only } ;
 
+PRIMITIVE: optimized? ( word -- ? )
+PRIMITIVE: word-code ( word -- start end )
+
+<PRIVATE
+PRIMITIVE: (word) ( name vocab hashcode -- word )
+PRIVATE>
+
 ! Need a dummy word here because BUILTIN: word is not a real word
 ! and parse-datum looks for things that are actually words instead of
 ! also looking for classes
@@ -67,6 +74,14 @@ M: deferred definition drop f ;
 PREDICATE: primitive < word "primitive" word-prop ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;
+
+ERROR: invalid-primitive vocabulary word effect ;
+: ensure-primitive ( vocabulary word effect -- )
+    3dup
+    [ drop vocabulary>> = ]
+    [ drop nip primitive? ]
+    [ [ nip "declared-effect" word-prop ] dip = ] 3tri and and
+    [ 3drop ] [ invalid-primitive ] if ;
 
 : lookup-word ( name vocab -- word ) vocab-words-assoc at ;
 

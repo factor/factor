@@ -5,6 +5,10 @@ io.encodings io.encodings.utf8 io.files.private io.pathnames
 kernel kernel.private namespaces sequences splitting system ;
 IN: io.files
 
+<PRIVATE
+PRIMITIVE: (exists?) ( path -- ? )
+PRIVATE>
+
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+

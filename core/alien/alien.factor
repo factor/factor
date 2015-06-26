@@ -8,6 +8,15 @@ IN: alien
 BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;
 BUILTIN: dll { path byte-array read-only initial: B{ } } ;
 
+PRIMITIVE: <callback> ( word return-rewind -- alien )
+PRIMITIVE: <displaced-alien> ( displacement c-ptr -- alien )
+PRIMITIVE: alien-address ( c-ptr -- addr )
+PRIMITIVE: free-callback ( alien -- )
+
+<PRIVATE
+PRIMITIVE: current-callback ( -- n )
+PRIVATE>
+
 PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;

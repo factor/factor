@@ -8,6 +8,8 @@ FROM: namespaces => set ;
 FROM: sets => members ;
 IN: compiler.units
 
+PRIMITIVE: modify-code-heap ( alist update-existing? reset-pics? -- )
+
 SYMBOL: old-definitions
 SYMBOL: new-definitions
 

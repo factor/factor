@@ -5,6 +5,9 @@ IN: arrays
 
 BUILTIN: array { length array-capacity read-only initial: 0 } ;
 
+PRIMITIVE: <array> ( n elt -- array )
+PRIMITIVE: resize-array ( n array -- new-array )
+
 M: array clone (clone) ; inline
 M: array length length>> ; inline
 M: array nth-unsafe [ integer>fixnum ] dip array-nth ; inline

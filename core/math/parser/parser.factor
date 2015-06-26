@@ -5,6 +5,10 @@ layouts make math math.private namespaces sbufs sequences
 sequences.private splitting strings strings.private ;
 IN: math.parser
 
+<PRIVATE
+PRIMITIVE: (format-float) ( n format -- byte-array )
+PRIVATE>
+
 : digit> ( ch -- n )
     {
         { [ dup CHAR: 9 <= ] [ CHAR: 0 -      dup  0 < [ drop 255 ] when ] }

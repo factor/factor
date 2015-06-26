@@ -31,7 +31,8 @@ IN: bootstrap.syntax
     { "]" "}" ";" ">>" } [ define-delimiter ] each
 
     "PRIMITIVE:" [
-        "Primitive definition is not supported" throw
+        current-vocab name>>
+        scan-word scan-effect ensure-primitive
     ] define-core-syntax
 
     "CS{" [
