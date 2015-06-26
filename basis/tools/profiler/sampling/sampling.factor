@@ -8,6 +8,12 @@ FROM: sequences => change-nth ;
 FROM: assocs => change-at ;
 IN: tools.profiler.sampling
 
+<PRIVATE
+PRIMITIVE: (get-samples) ( -- samples/f )
+PRIMITIVE: profiling ( ? -- )
+PRIMITIVE: (clear-samples) ( -- )
+PRIVATE>
+
 SYMBOL: samples-per-second
 
 samples-per-second [ 1,000 ] initialize

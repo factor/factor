@@ -4,6 +4,17 @@ USING: alien.strings io.backend kernel memory.private sequences
 system ;
 IN: memory
 
+PRIMITIVE: all-instances ( -- array )
+PRIMITIVE: compact-gc ( -- )
+PRIMITIVE: gc ( -- )
+PRIMITIVE: minor-gc ( -- )
+PRIMITIVE: size ( obj -- n )
+
+<PRIVATE
+PRIMITIVE: (save-image) ( path1 path2 -- )
+PRIMITIVE: (save-image-and-exit) ( path1 path2 -- )
+PRIVATE>
+
 : instances ( quot -- seq )
     [ all-instances ] dip filter ; inline
 

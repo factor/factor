@@ -7,6 +7,11 @@ make math math.private memory namespaces quotations sequences
 sequences.private slots slots.private strings words ;
 IN: classes.tuple
 
+<PRIVATE
+PRIMITIVE: <tuple> ( layout -- tuple )
+PRIMITIVE: <tuple-boa> ( slots... layout -- tuple )
+PRIVATE>
+
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 

@@ -7,6 +7,11 @@ kernel.private make math quotations sequences sequences.private
 slots.private strings words ;
 IN: slots
 
+<PRIVATE
+PRIMITIVE: set-slot ( value obj n -- )
+PRIMITIVE: slot ( obj m -- value )
+PRIVATE>
+
 TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;

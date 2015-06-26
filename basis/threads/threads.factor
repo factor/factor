@@ -9,6 +9,15 @@ FROM: assocs => change-at ;
 IN: threads
 
 <PRIVATE
+PRIMITIVE: (set-context) ( obj context -- obj' )
+PRIMITIVE: (set-context-and-delete) ( obj context -- * )
+PRIMITIVE: (sleep) ( nanos -- )
+PRIMITIVE: (start-context) ( obj quot -- obj' )
+PRIMITIVE: (start-context-and-delete) ( obj quot -- * )
+PRIMITIVE: callstack-for ( context -- array )
+PRIMITIVE: context-object-for ( n context -- obj )
+PRIMITIVE: datastack-for ( context -- array )
+PRIMITIVE: retainstack-for ( context -- array )
 
 ! Wrap sub-primitives; we don't want them inlined into callers
 ! since their behavior depends on what frames are on the callstack
