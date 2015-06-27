@@ -336,7 +336,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum-gcd { bignum bignum } { bignum } define-primitive \ bignum-gcd make-foldable
 \ bignum-shift { bignum fixnum } { bignum } define-primitive \ bignum-shift make-foldable
 \ bignum/i { bignum bignum } { bignum } define-primitive \ bignum/i make-foldable
-\ bignum/mod { bignum bignum } { bignum bignum } define-primitive \ bignum/mod make-foldable
+\ bignum/mod { bignum bignum } { bignum integer } define-primitive \ bignum/mod make-foldable
 \ bignum< { bignum bignum } { object } define-primitive \ bignum< make-foldable
 \ bignum<= { bignum bignum } { object } define-primitive \ bignum<= make-foldable
 \ bignum= { bignum bignum } { object } define-primitive \ bignum= make-foldable
