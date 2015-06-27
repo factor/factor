@@ -3,6 +3,8 @@ locals.parser namespaces parser prettyprint sequences sorting
 tools.test vocabs vocabs.parser ;
 IN: locals.parser.tests
 
+<<
+
 ! (::)
 {
     "dobiedoo"
@@ -23,6 +25,8 @@ IN: locals.parser.tests
         qualified-vocabs last words>> keys "um" swap member?
     ] with-compilation-unit
 ] unit-test
+
+>>
 
 ! check-local-name
 { "hello" } [
@@ -54,6 +58,8 @@ IN: locals.parser.tests
     [ locals>> [ name>> ] map ] [ keys ] bi*
 ] unit-test
 
+<<
+
 ! with-lambda-scope
 { t } [
     [
@@ -75,3 +81,5 @@ IN: locals.parser.tests
         ] with-lexer
     ] with-compilation-unit unparse
 ] unit-test
+
+>>
