@@ -51,10 +51,6 @@ IN: compiler.tree.propagation.known-words
 : ensure-math-class ( class must-be -- class' )
     [ class<= ] most ;
 
-: maybe>fixnum ( class interval -- class' interval )
-    2dup [ integer class<= ] [ fixnum-interval interval-subset? ] bi*
-    and [ nip fixnum swap ] when ;
-
 : number-valued ( class interval -- class' interval' )
     [ number ensure-math-class ] dip ;
 
@@ -98,11 +94,13 @@ IN: compiler.tree.propagation.known-words
 
 \ absq [ interval-absq ] [ may-overflow real-valued ] unary-op
 
-: binary-op-class ( info1 info2 -- newclass )
-    [ class>> ] bi@
+: merge-classes ( class1 class2 -- class3 )
     2dup [ null-class? ] either? [ 2drop null ] [
         [ math-closure ] bi@ math-class-max
     ] if ;
+
+: binary-op-class ( info1 info2 -- newclass )
+    [ class>> ] bi@ merge-classes ;
 
 : binary-op-interval ( info1 info2 quot -- newinterval )
     [ [ interval>> ] bi@ ] dip call ; inline
@@ -127,13 +125,30 @@ IN: compiler.tree.propagation.known-words
 \ /i [ [ interval/i ] [ may-overflow integer-valued ] binary-op ] each-derived-op
 \ /f [ [ interval/f ] [ float-valued ] binary-op ] each-derived-op
 
-\ mod [ interval-mod ] [ real-valued maybe>fixnum ] binary-op
-\ fmod [ interval-mod ] [ real-valued ] binary-op
-\ mod-integer-integer [ interval-mod ] [ integer-valued ] binary-op
-\ bignum-mod [ interval-mod ] [ integer-valued maybe>fixnum ] binary-op
-\ fixnum-mod [ interval-mod ] [ fixnum-valued ] binary-op
-\ mod-fixnum-integer [ interval-mod ] [ fixnum-valued ] binary-op
-\ mod-integer-fixnum [ interval-mod ] [ fixnum-valued ] binary-op
+: mod-merge-classes/intervals ( c1 c2 i1 i2 -- c3 i3 )
+    [ merge-classes dup bignum = [ drop integer ] when ]
+    [ interval-mod ] 2bi*
+    over integer class<= [
+        integral-closure dup fixnum-interval interval-subset? [
+            nip fixnum swap
+        ] when
+    ] when ;
+
+: mod-outputs-info ( info1 info2 fixer-word -- info3 )
+    [
+        [ [ class>> ] bi@ ] [ [ interval>> ] bi@ ] 2bi
+        mod-merge-classes/intervals
+    ] dip execute( cls int -- cls' int' ) <class/interval-info> ;
+
+{
+    { mod real-valued }
+    { fmod real-valued }
+    { mod-integer-integer integer-valued }
+    { mod-fixnum-integer integer-valued }
+    { mod-integer-fixnum integer-valued }
+    { bignum-mod integer-valued }
+    { fixnum-mod fixnum-valued }
+} [ '[ _ mod-outputs-info ] "outputs" set-word-prop ] assoc-each
 
 \ rem [ [ interval-rem ] [ may-overflow real-valued ] binary-op ] each-derived-op
 

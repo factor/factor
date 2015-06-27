@@ -1,15 +1,14 @@
-USING: kernel compiler.tree.builder compiler.tree
-compiler.tree.propagation compiler.tree.recursive
-compiler.tree.normalization tools.test math math.order accessors
-sequences arrays kernel.private vectors alien.accessors
-alien.c-types sequences.private byte-arrays classes.algebra
-classes.tuple.private math.functions math.private strings
-layouts compiler.tree.propagation.info compiler.tree.def-use
-compiler.tree.debugger compiler.tree.checker slots.private words
-hashtables classes assocs locals specialized-arrays system
-sorting math.libm math.floats.private math.integers.private
-math.intervals quotations effects alien alien.data sets
-strings.private vocabs generic.single ;
+USING: accessors alien alien.accessors alien.c-types alien.data arrays assocs
+byte-arrays classes classes.algebra classes.tuple.private compiler.tree
+compiler.tree.builder compiler.tree.checker compiler.tree.debugger
+compiler.tree.def-use compiler.tree.normalization compiler.tree.optimizer
+compiler.tree.propagation compiler.tree.propagation.info
+compiler.tree.recursive effects fry generic.single hashtables kernel
+kernel.private layouts locals math math.floats.private math.functions
+math.integers.private math.intervals math.libm math.order math.private
+quotations sets sequences sequences.private slots.private sorting
+specialized-arrays strings strings.private system tools.test vectors vocabs
+words ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -751,11 +750,42 @@ MIXIN: empty-mixin
     [ { float } declare 0 eq? ] final-classes
 ] unit-test
 
-! Here we can know both that 1) mod(integer, fixnum) = fixnum and 2)
-! mod(fixnum, integer) = fixnum
-[ V{ fixnum } V{ fixnum } ] [
-    [ { integer fixnum } declare mod ] final-classes
-    [ { fixnum integer } declare mod ] final-classes
+{
+    { fixnum integer integer fixnum }
+} [
+    {
+        { integer fixnum }
+        ! These two are tricky. Possibly, they will always be
+        ! fixnums. But that requires a better interval-mod.
+        { fixnum integer }
+        { fixnum bignum }
+        { bignum fixnum }
+    } [ '[ _ declare mod ] final-classes first ] map
+] unit-test
+
+! Due to downpromotion, we lose the type here.
+{ V{ integer } } [
+    [ { bignum bignum } declare bignum-mod ] final-classes
+] unit-test
+
+! And here
+{ V{ bignum integer } } [
+    [ { bignum bignum } declare /mod ] final-classes
+] unit-test
+
+! So this code gets worse than it was.
+{
+    [
+        bignum-mod 20 over tag 0 eq?
+        [ fixnum+ ] [ fixnum>bignum bignum+ ] if
+    ]
+} [
+    [ { bignum bignum } declare bignum-mod 20 + ]
+    build-tree optimize-tree nodes>quot
+] unit-test
+
+{ V{ fixnum } } [
+    [ fixnum-mod ] final-classes
 ] unit-test
 
 [ V{ integer } ] [
