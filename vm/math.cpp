@@ -3,6 +3,8 @@
 namespace factor {
 
 cell bignum_maybe_to_fixnum(bignum* bn) {
+  if (BIGNUM_ZERO_P(bn))
+    return tag_fixnum(0);
   fixnum len = BIGNUM_LENGTH(bn);
   bignum_digit_type *digits = BIGNUM_START_PTR(bn);
   if (len == 1 && digits[0] >= fixnum_min && digits[0] <= fixnum_max) {
@@ -143,7 +145,7 @@ void factor_vm::primitive_bignum_divmod() {
   bignum* q, *r;
   bignum_divide(x, y, &q, &r);
   *s1 = tag<bignum>(q);
-  *s0 = tag<bignum>(r);
+  *s0 = bignum_maybe_to_fixnum(r);
 }
 
 void factor_vm::primitive_bignum_mod() {
