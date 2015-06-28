@@ -11,6 +11,8 @@ HOOK: find-vim-path editor-class ( -- path )
 
 HOOK: vim-ui? editor-class ( -- ? )
 
+SYMBOL: vim-tabs?
+
 M: vim vim-ui? f ;
 
 M: vim find-vim-path "vim" ?find-in-path ;
@@ -22,8 +24,9 @@ M: vim editor-command ( file line -- command )
     [
         actual-vim-path dup string? [ , ] [ % ] if
         vim-ui? [ "-g" , ] when
-        [ , ] [ number>string "+" prepend , ] bi*
+        vim-tabs? get [ "--remote-tab-silent" , ] when
+        number>string "+" prepend ,
+        ,
     ] { } make ;
 
 M: vim editor-detached? f ;
-
