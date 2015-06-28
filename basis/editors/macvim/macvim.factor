@@ -1,5 +1,5 @@
-USING: core-foundation.launch-services editors editors.vim
-io.pathnames io.standard-paths kernel namespaces ;
+USING: editors editors.vim io.pathnames io.standard-paths kernel
+namespaces ;
 IN: editors.macvim
 
 TUPLE: macvim < vim ;
