@@ -2,17 +2,6 @@
 
 namespace factor {
 
-cell bignum_maybe_to_fixnum(bignum* bn) {
-  if (BIGNUM_ZERO_P(bn))
-    return tag_fixnum(0);
-  fixnum len = BIGNUM_LENGTH(bn);
-  bignum_digit_type *digits = BIGNUM_START_PTR(bn);
-  if (len == 1 && digits[0] >= fixnum_min && digits[0] <= fixnum_max) {
-    return tag_fixnum(bignum_to_fixnum(bn));
-  }
-  return tag<bignum>(bn);
-}
-
 void factor_vm::primitive_bignum_to_fixnum() {
   ctx->replace(tag_fixnum(bignum_to_fixnum(untag<bignum>(ctx->peek()))));
 }
