@@ -1,4 +1,4 @@
-USING: kernel math namespaces make tools.test ;
+USING: kernel layouts math math.private namespaces make tools.test ;
 IN: math.tests
 
 [ ] [ 5 [ ] times ] unit-test
@@ -96,3 +96,5 @@ IN: math.tests
 
 { t } [ 128 2^ sq 256 2^ = ] unit-test
 { t } [ 128 2^ neg sq 256 2^ = ] unit-test
+
+{ t } [ most-negative-fixnum dup >bignum bignum>fixnum-strict = ] unit-test
