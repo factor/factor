@@ -388,12 +388,28 @@ BIGNUM_TO_FOO(fixnum, fixnum, fixnum, cell)
 BIGNUM_TO_FOO(long_long, int64_t, int64_t, uint64_t)
 BIGNUM_TO_FOO(ulong_long, uint64_t, int64_t, uint64_t)
 
+bool bignum_fits_fixnum_p(bignum* bn) {
+  fixnum len = BIGNUM_LENGTH(bn);
+  if (len == 0)
+    return true;
+  if (len > 1)
+    return false;
+  bignum_digit_type dig = BIGNUM_START_PTR(bn)[0];
+  return (BIGNUM_NEGATIVE_P(bn) && dig <= -fixnum_min) ||
+      (!BIGNUM_NEGATIVE_P(bn) && dig <= fixnum_max);
+}
+
+cell bignum_maybe_to_fixnum(bignum* bn) {
+  if (bignum_fits_fixnum_p(bn))
+    return tag_fixnum(bignum_to_fixnum(bn));
+  return tag<bignum>(bn);
+}
+
 /* cannot allocate memory */
 fixnum factor_vm::bignum_to_fixnum_strict(bignum* bn) {
-  fixnum len = BIGNUM_LENGTH(bn);
-  bignum_digit_type *digits = BIGNUM_START_PTR(bn);
-  if ((len == 1 && digits[0] > fixnum_max) || (len > 1)) {
-    general_error(ERROR_OUT_OF_FIXNUM_RANGE, tag<bignum>(bn), false_object);
+
+  if (!bignum_fits_fixnum_p(bn)) {
+     general_error(ERROR_OUT_OF_FIXNUM_RANGE, tag<bignum>(bn), false_object);
   }
   fixnum fix = bignum_to_fixnum(bn);
   FACTOR_ASSERT(fix <= fixnum_max && fix >= fixnum_min);
