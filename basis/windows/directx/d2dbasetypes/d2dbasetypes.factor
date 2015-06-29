@@ -2,7 +2,7 @@ USING: alien.syntax classes.struct windows.types ;
 IN: windows.directx.d2dbasetypes
 
 STRUCT: D3DCOLORVALUE
-    { r FLOAT } 
+    { r FLOAT }
     { g FLOAT }
     { b FLOAT }
     { a FLOAT } ;

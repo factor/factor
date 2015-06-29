@@ -310,7 +310,7 @@ FUNCTION: CUresult cuDeviceComputeCapability ( int* major, int* minor, CUdevice 
 FUNCTION: CUresult cuDeviceTotalMem ( uint* bytes, CUdevice dev ) ;
 FUNCTION: CUresult cuDeviceGetProperties ( CUdevprop* prop, CUdevice dev ) ;
 FUNCTION: CUresult cuDeviceGetAttribute ( int* pi, CUdevice_attribute attrib, CUdevice dev ) ;
-        
+
 FUNCTION: CUresult cuCtxCreate ( CUcontext* pctx, uint flags, CUdevice dev ) ;
 FUNCTION: CUresult cuCtxDestroy ( CUcontext ctx ) ;
 FUNCTION: CUresult cuCtxAttach ( CUcontext* pctx, uint flags ) ;
@@ -328,14 +328,14 @@ FUNCTION: CUresult cuModuleUnload ( CUmodule hmod ) ;
 FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, c-string name ) ;
 FUNCTION: CUresult cuModuleGetGlobal ( CUdeviceptr* dptr, uint* bytes, CUmodule hmod, char* name ) ;
 FUNCTION: CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, char* name ) ;
-    
+
 FUNCTION: CUresult cuMemGetInfo ( uint* free, uint* total ) ;
 
 FUNCTION: CUresult cuMemAlloc ( CUdeviceptr* dptr, uint bytesize ) ;
-FUNCTION: CUresult cuMemAllocPitch ( CUdeviceptr* dptr, 
+FUNCTION: CUresult cuMemAllocPitch ( CUdeviceptr* dptr,
                                       uint* pPitch,
-                                      uint WidthInBytes, 
-                                      uint Height, 
+                                      uint WidthInBytes,
+                                      uint Height,
                                       uint ElementSizeBytes
                                      ) ;
 FUNCTION: CUresult cuMemFree ( CUdeviceptr dptr ) ;
@@ -345,7 +345,7 @@ FUNCTION: CUresult cuMemAllocHost ( void** pp, uint bytesize ) ;
 FUNCTION: CUresult cuMemFreeHost ( void* p ) ;
 
 FUNCTION: CUresult cuMemHostAlloc ( void** pp, size_t bytesize, uint Flags ) ;
- 
+
 FUNCTION: CUresult cuMemHostGetDevicePointer ( CUdeviceptr* pdptr, void* p, uint Flags ) ;
 FUNCTION: CUresult cuMemHostGetFlags ( uint* pFlags, void* p ) ;
 
@@ -367,17 +367,17 @@ FUNCTION: CUresult  cuMemcpy2DUnaligned ( CUDA_MEMCPY2D* pCopy ) ;
 
 FUNCTION: CUresult  cuMemcpy3D ( CUDA_MEMCPY3D* pCopy ) ;
 
-FUNCTION: CUresult  cuMemcpyHtoDAsync ( CUdeviceptr dstDevice, 
+FUNCTION: CUresult  cuMemcpyHtoDAsync ( CUdeviceptr dstDevice,
             void* srcHost, uint ByteCount, CUstream hStream ) ;
-FUNCTION: CUresult  cuMemcpyDtoHAsync ( void* dstHost, 
+FUNCTION: CUresult  cuMemcpyDtoHAsync ( void* dstHost,
             CUdeviceptr srcDevice, uint ByteCount, CUstream hStream ) ;
 
 FUNCTION: CUresult cuMemcpyDtoDAsync ( CUdeviceptr dstDevice,
             CUdeviceptr srcDevice, uint ByteCount, CUstream hStream ) ;
 
-FUNCTION: CUresult  cuMemcpyHtoAAsync ( CUarray dstArray, uint dstIndex, 
+FUNCTION: CUresult  cuMemcpyHtoAAsync ( CUarray dstArray, uint dstIndex,
             void* pSrc, uint ByteCount, CUstream hStream ) ;
-FUNCTION: CUresult  cuMemcpyAtoHAsync ( void* dstHost, CUarray srcArray, uint srcIndex, 
+FUNCTION: CUresult  cuMemcpyAtoHAsync ( void* dstHost, CUarray srcArray, uint srcIndex,
             uint ByteCount, CUstream hStream ) ;
 
 FUNCTION: CUresult  cuMemcpy2DAsync ( CUDA_MEMCPY2D* pCopy, CUstream hStream ) ;
@@ -405,7 +405,7 @@ FUNCTION: CUresult  cuArray3DGetDescriptor ( CUDA_ARRAY3D_DESCRIPTOR* pArrayDesc
 
 FUNCTION: CUresult  cuTexRefCreate ( CUtexref* pTexRef ) ;
 FUNCTION: CUresult  cuTexRefDestroy ( CUtexref hTexRef ) ;
-    
+
 FUNCTION: CUresult  cuTexRefSetArray ( CUtexref hTexRef, CUarray hArray, uint Flags ) ;
 FUNCTION: CUresult  cuTexRefSetAddress ( uint* ByteOffset, CUtexref hTexRef, CUdeviceptr dptr, uint bytes ) ;
 FUNCTION: CUresult  cuTexRefSetAddress2D ( CUtexref hTexRef, CUDA_ARRAY_DESCRIPTOR* desc, CUdeviceptr dptr, uint Pitch ) ;
@@ -446,7 +446,7 @@ FUNCTION: CUresult  cuStreamDestroy ( CUstream hStream ) ;
 FUNCTION: CUresult cuGraphicsUnregisterResource ( CUgraphicsResource resource ) ;
 FUNCTION: CUresult cuGraphicsSubResourceGetMappedArray ( CUarray* pArray, CUgraphicsResource resource, uint arrayIndex, uint mipLevel ) ;
 FUNCTION: CUresult cuGraphicsResourceGetMappedPointer ( CUdeviceptr* pDevPtr, uint* pSize, CUgraphicsResource resource ) ;
-FUNCTION: CUresult cuGraphicsResourceSetMapFlags ( CUgraphicsResource resource, uint flags ) ; 
+FUNCTION: CUresult cuGraphicsResourceSetMapFlags ( CUgraphicsResource resource, uint flags ) ;
 FUNCTION: CUresult cuGraphicsMapResources ( uint count, CUgraphicsResource* resources, CUstream hStream ) ;
 FUNCTION: CUresult cuGraphicsUnmapResources ( uint count, CUgraphicsResource* resources, CUstream hStream ) ;
 

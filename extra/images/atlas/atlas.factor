@@ -108,7 +108,7 @@ PRIVATE>
     image-placement image>> :> image
     image-placement loc>> first2 :> ( x y )
     image dim>> first2 :> ( w h )
-    
+
     x     aw /f :> left-u
     y     ah /f :> top-v
     x w + aw /f :> right-u

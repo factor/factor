@@ -29,7 +29,7 @@ TUPLE: edge < identity-tuple face vertex opposite-edge next-edge ;
 : each-face-edge ( ... edge quot: ( ... edge -- ... ) -- ... )
     [ next-edge>> ] edge-loop ; inline
 
-! 
+!
 
 : vertex-edges ( edge -- edges )
     [ ] [ each-vertex-edge ] (collect) ;
@@ -51,4 +51,3 @@ TUPLE: edge < identity-tuple face vertex opposite-edge next-edge ;
 
 : face-sides ( edge -- count )
     [ each-face-edge ] (count) ;
-

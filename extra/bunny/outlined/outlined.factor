@@ -69,7 +69,7 @@ border_factor(vec2 c)
          coord2 = c + vec2( SAMPLE_SPREAD, -SAMPLE_SPREAD),
          coord3 = c + vec2(-SAMPLE_SPREAD,  SAMPLE_SPREAD),
          coord4 = c + vec2( SAMPLE_SPREAD,  SAMPLE_SPREAD);
-    
+
     vec3 normal1 = normal_sample(coord1),
          normal2 = normal_sample(coord2),
          normal3 = normal_sample(coord3),
@@ -85,9 +85,9 @@ border_factor(vec2 c)
                            depth_sample(coord2),
                            depth_sample(coord3),
                            depth_sample(coord4));
-    
+
         vec3 ratios1 = depths.xxx/depths.yzw, ratios2 = depths.yyz/depths.zww;
-    
+
         if (are_depths_border(ratios1) || are_depths_border(ratios2)) {
             return 1.0;
         } else {
@@ -99,7 +99,7 @@ border_factor(vec2 c)
                 dot(normal2, normal4),
                 dot(normal3, normal4)
             );
-    
+
             return normal_border;
         }
     }

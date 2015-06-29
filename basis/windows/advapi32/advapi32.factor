@@ -780,7 +780,7 @@ ENUM: TOKEN_INFORMATION_CLASS
     TokenMandatoryPolicy
     TokenLogonSid
     MaxTokenInfoClass ;
-    
+
 TYPEDEF: TOKEN_INFORMATION_CLASS* PTOKEN_INFORMATION_CLASS
 
 TYPEDEF: uint ALG_ID
@@ -1568,5 +1568,3 @@ ALIAS: SetNamedSecurityInfo SetNamedSecurityInfoW
 ! : WmiSetSingleItemW ;
 ! : Wow64Win32ApiEntry ;
 ! : WriteEncryptedFileRaw ;
-
-

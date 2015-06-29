@@ -42,7 +42,7 @@ visit-time request-rate crawl-delay unknowns ;
         {
             [ [ first "user-agent" = ] both? ]
             [ nip first "user-agent" = not ]
-        } 2|| 
+        } 2||
     ] monotonic-split ;
 
 : <rules> ( -- rules )

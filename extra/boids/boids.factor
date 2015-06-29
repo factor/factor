@@ -144,7 +144,7 @@ M: range-observer model-changed
     <pile> { 2 2 } >>gap 1.0 >>fill
 
     boids-gadget simulation-panel
-    add-gadget 
+    add-gadget
 
     boids-gadget behaviours>>
     [ behavior-panel add-gadget ] each
@@ -155,4 +155,3 @@ M: range-observer model-changed
 MAIN-WINDOW: boids { { title "Boids" } }
     create-gadgets
     >>gadgets ;
-

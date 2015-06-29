@@ -156,7 +156,7 @@ error-display "toolbar" f {
 :: <error-list-gadget> ( model -- gadget )
     vertical \ error-list-gadget new-track
         <error-toggle> [ >>error-toggle ] [ >>visible-errors ] bi*
-        dup visible-errors>> model <error-model> >>model 
+        dup visible-errors>> model <error-model> >>model
         f <model> >>source-file
         f <model> >>error
         dup <source-file-table> >>source-file-table

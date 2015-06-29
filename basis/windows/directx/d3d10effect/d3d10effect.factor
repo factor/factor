@@ -267,7 +267,7 @@ COM-INTERFACE: ID3D10EffectSamplerVariable ID3D10EffectVariable {6530D5C7-07E9-4
     HRESULT GetSampler ( UINT Index, ID3D10SamplerState** ppSampler )
     HRESULT GetBackingStore ( UINT Index, D3D10_SAMPLER_DESC* pSamplerDesc ) ;
 TYPEDEF: ID3D10EffectSamplerVariable* LPD3D10EFFECTSAMPLERVARIABLE
-    
+
 STRUCT: D3D10_PASS_DESC
     { Name                 LPCSTR   }
     { Annotations          UINT     }

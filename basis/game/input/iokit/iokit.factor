@@ -158,7 +158,7 @@ CONSTANT: pov-values
 
 : record-controller ( controller-state value -- )
     dup IOHIDValueGetElement {
-        { [ dup button? ] [ record-button ] } 
+        { [ dup button? ] [ record-button ] }
         { [ dup axis? ] [ {
             { [ dup x-axis? ] [ drop axis-value >>x drop ] }
             { [ dup y-axis? ] [ drop axis-value >>y drop ] }
@@ -206,7 +206,7 @@ M: iokit-game-input-backend reset-mouse
     +mouse-state+ get-global
         0 >>dx
         0 >>dy
-        0 >>scroll-dx 
+        0 >>scroll-dx
         0 >>scroll-dy
         drop ;
 
@@ -244,7 +244,7 @@ M: iokit-game-input-backend reset-mouse
     } cleave controller-state boa ;
 
 : ?add-mouse-buttons ( device -- )
-    button-count +mouse-state+ get-global buttons>> 
+    button-count +mouse-state+ get-global buttons>>
     2dup length >
     [ set-length ] [ 2drop ] if ;
 
@@ -321,7 +321,7 @@ M: iokit-game-input-backend (reset-game-input)
 
 M: iokit-game-input-backend (close-game-input)
     +hid-manager+ get-global [
-        +hid-manager+ [ 
+        +hid-manager+ [
             [
                 CFRunLoopGetMain CFRunLoopDefaultMode
                 IOHIDManagerUnscheduleFromRunLoop

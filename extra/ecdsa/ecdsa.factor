@@ -54,7 +54,7 @@ PRIVATE>
 
 :: get-public-key ( -- bin/f )
     ec-key-handle :> KEY
-    KEY EC_KEY_get0_public_key dup 
+    KEY EC_KEY_get0_public_key dup
     [| PUB |
         KEY EC_KEY_get0_group :> GROUP
         GROUP EC_GROUP_get_degree bits>bytes 1 + :> LEN

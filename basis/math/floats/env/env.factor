@@ -159,4 +159,3 @@ PRIVATE>
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
 } cond >>
-

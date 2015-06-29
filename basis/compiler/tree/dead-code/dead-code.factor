@@ -11,4 +11,3 @@ IN: compiler.tree.dead-code
     mark-live-values
     compute-live-values
     (remove-dead-code) ;
-

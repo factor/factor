@@ -14,7 +14,7 @@ SYNTAX: slots{
 
 : >>writer-word ( name -- word )
     ">>" prepend "accessors" lookup-word ;
-    
+
 : writer-word<< ( name -- word )
     ">>" prepend "accessors" lookup-word ;
 
@@ -33,7 +33,7 @@ SYNTAX: copy-slots{
         [ writer-word<< 1quotation ] bi append
     ] map-tokens
     '[ swap _ cleave ] append! ;
-    
+
 SYNTAX: get[ POSTPONE: slots[ ;
 SYNTAX: get{ POSTPONE: slots{ ;
 SYNTAX: set[ POSTPONE: set-slots[ ;

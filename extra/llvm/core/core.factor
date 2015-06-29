@@ -411,6 +411,6 @@ LIBRARY: LLVMBitReader
 
 FUNCTION: int LLVMParseBitcode
 ( LLVMMemoryBufferRef MemBuf, LLVMModuleRef* OutModule, c-string* OutMessage ) ;
- 
+
 FUNCTION: int LLVMGetBitcodeModuleProvider
 ( LLVMMemoryBufferRef MemBuf, LLVMModuleProviderRef* OutMP, c-string* OutMessage ) ;

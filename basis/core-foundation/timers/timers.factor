@@ -51,5 +51,3 @@ FUNCTION: CFTimeInterval CFRunLoopTimerGetInterval (
 FUNCTION: CFAbsoluteTime CFRunLoopTimerGetNextFireDate (
    CFRunLoopTimerRef timer
 ) ;
-
-

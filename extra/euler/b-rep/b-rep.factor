@@ -127,7 +127,7 @@ ERROR: all-points-colinear ;
     tri ;
 
 : connect-opposite-edges ( b-rep -- )
-    edges>> 
+    edges>>
     [ [ [ next-edge>> vertex>> ] [ vertex>> 2array ] [ ] tri ] H{ } map>assoc ]
     [ swap '[ [ vertex>> ] [ next-edge>> vertex>> 2array _ at ] [ opposite-edge<< ] tri ] each ] bi ;
 

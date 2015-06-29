@@ -63,7 +63,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 ! Programs
 
 : (gl-program) ( shaders quot: ( gl-program -- ) -- program )
-    glCreateProgram 
+    glCreateProgram
     [
         [ swap [ glAttachShader ] with each ]
         [ swap call ] bi-curry bi*
@@ -74,7 +74,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 : <gl-program> ( shaders -- program )
     [ drop ] (gl-program) ;
-    
+
 : (gl-program?) ( object -- ? )
     dup integer? [ glIsProgram c-bool> ] [ drop f ] if ;
 
@@ -131,4 +131,3 @@ PREDICATE: gl-program < integer (gl-program?) ;
     [ <vertex-shader> check-gl-shader ]
     [ <fragment-shader> check-gl-shader ] bi*
     2array <gl-program> check-gl-program ;
-

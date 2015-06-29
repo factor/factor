@@ -42,7 +42,7 @@ IN: pop3.server
 ! To: username@host.com
 ! Subject: First test with mock POP3 server
 ! Content-Type: text/plain; charset=UTF-8
-! 
+!
 ! .
 ! DELE 1
 ! +OK Marked for deletion
@@ -55,7 +55,7 @@ IN: pop3.server
         {
             [ dup "USER" head? ]
             [
-                 
+
                 "+OK Password required\r\n"
                 write flush t
             ]
@@ -80,7 +80,7 @@ IN: pop3.server
                 "+OK 2 1753\r\n"
                 write flush t
             ]
-        }       
+        }
         {
             [ dup "LIST" = ]
             [

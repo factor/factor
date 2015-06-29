@@ -298,7 +298,7 @@ COM-INTERFACE: IXAudio2SourceVoice IXAudio2Voice {00000000-0000-0000-0000-000000
 
 COM-INTERFACE: IXAudio2SubmixVoice IXAudio2Voice {00000000-0000-0000-0000-000000000000} ;
 COM-INTERFACE: IXAudio2MasteringVoice IXAudio2Voice {00000000-0000-0000-0000-000000000000} ;
-    
+
 COM-INTERFACE: IXAudio2EngineCallback f {00000000-0000-0000-0000-000000000000}
     void OnProcessingPassStart (   )
     void OnProcessingPassEnd (   )

@@ -30,10 +30,10 @@ TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 
 : each-quadrant ( node quot -- )
     {
-        [ [ ll>> ] [ call ] bi* ] 
-        [ [ lr>> ] [ call ] bi* ] 
-        [ [ ul>> ] [ call ] bi* ] 
-        [ [ ur>> ] [ call ] bi* ] 
+        [ [ ll>> ] [ call ] bi* ]
+        [ [ lr>> ] [ call ] bi* ]
+        [ [ ul>> ] [ call ] bi* ]
+        [ [ ur>> ] [ call ] bi* ]
     } 2cleave ; inline
 : map-quadrant ( node quot: ( child-node -- x ) -- array )
     each-quadrant 4array ; inline
@@ -104,7 +104,7 @@ DEFER: in-rect*
 : node-in-rect* ( values rect node -- values )
     [ (node-in-rect*) ] with each-quadrant ;
 
-:: leaf-in-rect* ( values rect leaf -- values ) 
+:: leaf-in-rect* ( values rect leaf -- values )
     { [ leaf point>> ] [ leaf point>> rect contains-point? ] } 0&&
     [ values leaf value>> suffix! ] [ values ] if ;
 
@@ -155,8 +155,8 @@ DEFER: in-rect*
 : leaf-size ( leaf -- count )
     point>> [ 1 ] [ 0 ] if ;
 : node-size ( node -- count )
-    0 swap [ quadtree-size + ] each-quadrant ; 
-    
+    0 swap [ quadtree-size + ] each-quadrant ;
+
 : quadtree-size ( tree -- count )
     dup leaf?>> [ leaf-size ] [ node-size ] if ;
 
@@ -196,4 +196,3 @@ M: quadtree clear-assoc ( assoc -- )
     [ dup ] dip map
     [ zip ] [ rect-containing <quadtree> ] bi
     [ '[ first2 _ set-at ] each ] [ values ] bi ; inline
-

@@ -328,7 +328,7 @@ M: object class>questions 1array ;
     ! input table is state => class
     >alist dup table>questions make-condition ;
 
-: condition-map ( condition quot: ( obj -- obj' ) -- new-condition ) 
+: condition-map ( condition quot: ( obj -- obj' ) -- new-condition )
     over condition? [
         [ [ question>> ] [ yes>> ] [ no>> ] tri ] dip
         '[ _ condition-map ] bi@ <condition>

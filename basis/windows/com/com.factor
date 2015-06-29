@@ -100,5 +100,3 @@ ERROR: null-com-release ;
     over [ com-release ] curry [ ] cleanup ; inline
 
 DESTRUCTOR: com-release
-
-

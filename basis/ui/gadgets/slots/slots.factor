@@ -69,7 +69,7 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
         <source-editor> >>text
         dup text>> <scroller> 1 track-add
         dup revert ;
-    
+
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
 
 M: slot-editor focusable-child* text>> ;

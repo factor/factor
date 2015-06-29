@@ -54,10 +54,10 @@ CONSTANT: PQERRORS_VERBOSE                  0x2
 CONSTANT: InvalidOid 0
 
 TYPEDEF: int ConnStatusType
-TYPEDEF: int ExecStatusType 
+TYPEDEF: int ExecStatusType
 TYPEDEF: int PostgresPollingStatusType
-TYPEDEF: int PGTransactionStatusType 
-TYPEDEF: int PGVerbosity 
+TYPEDEF: int PGTransactionStatusType
+TYPEDEF: int PGVerbosity
 
 C-TYPE: PGconn
 C-TYPE: PGresult
@@ -237,7 +237,7 @@ FUNCTION: int    PQisnonblocking ( PGconn* conn ) ;
 ! Force the write buffer to be written (or at least try)
 FUNCTION: int    PQflush ( PGconn* conn ) ;
 
-! 
+!
 ! * "Fast path" interface --- not really recommended for application
 ! * use
 !
@@ -310,17 +310,17 @@ FUNCTION: void PQprint ( FILE* fout, PGresult* res, PQprintOpt* ps ) ;
 
 ! really old printing routines
 FUNCTION: void PQdisplayTuples ( PGresult* res,
-                                FILE* fp,               
+                                FILE* fp,
                                 int fillAlign,
                                 c-string fieldSep,
                                 int printHeader,
                                 int quiet ) ;
 
 FUNCTION: void PQprintTuples ( PGresult* res,
-                          FILE* fout,           
+                          FILE* fout,
                           int printAttName,
-                          int terseOutput,      
-                          int width ) ; 
+                          int terseOutput,
+                          int width ) ;
 ! === in fe-lobj.c ===
 
 ! Large-object access routines

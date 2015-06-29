@@ -35,4 +35,3 @@ IN: forestdb.utils
 
 : set-kv-range ( a b -- )
     make-kv-range [ fdb-set-kv ] assoc-each ;
-

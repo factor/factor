@@ -172,7 +172,7 @@ INSTANCE: +win32-nt-executable+ windows-executable   ! pe
 
 : program-files-common-x86 ( -- str )
     CSIDL_PROGRAM_FILES_COMMONX86 shell32-directory ;
-    
+
 
 CONSTANT: SHCONTF_FOLDERS 32
 CONSTANT: SHCONTF_NONFOLDERS 64

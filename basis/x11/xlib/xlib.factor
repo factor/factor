@@ -1339,7 +1339,7 @@ CONSTANT: XA_WM_CLASS 67
 CONSTANT: XA_WM_TRANSIENT_FOR 68
 
 CONSTANT: XA_LAST_PREDEFINED 68
-    
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! The rest of the stuff is not from the book.
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1422,7 +1422,7 @@ X-FUNCTION: XIC XCreateIC ( XIM im, c-string key1, Window value1, c-string key2,
 X-FUNCTION: void XDestroyIC ( XIC ic ) ;
 
 X-FUNCTION: void XSetICFocus ( XIC ic ) ;
-        
+
 X-FUNCTION: void XUnsetICFocus ( XIC ic ) ;
 
 X-FUNCTION: int XwcLookupString ( XIC ic, XKeyPressedEvent* event, ulong* buffer_return, int bytes_buffer, KeySym* keysym_return, Status* status_return ) ;
@@ -1446,4 +1446,3 @@ X-FUNCTION: c-string XSetLocaleModifiers ( c-string modifier_list ) ;
 ! uncategorized xlib bindings
 
 X-FUNCTION: int XQueryKeymap ( Display* display, char[32] keys_return ) ;
-

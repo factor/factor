@@ -79,7 +79,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     if ;
 
 : fold ( quot -- folded-quot )
-    [ { } [ fold-word ] reduce % ] [ ] make ; 
+    [ { } [ fold-word ] reduce % ] [ ] make ;
 
 ERROR: no-recursive-inverse ;
 
@@ -89,7 +89,7 @@ SYMBOL: visited
     { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
         [ word-prop ] with any? not
-    ] } 1&& ; 
+    ] } 1&& ;
 
 : flatten ( quot -- expanded )
     [

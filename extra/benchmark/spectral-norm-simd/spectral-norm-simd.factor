@@ -31,7 +31,7 @@ IN: benchmark.spectral-norm-simd
 
 : eval-A-times-u ( n u -- seq )
     [ (eval-A-times-u) ] inner-loop ; inline
-    
+
 :: eval4-A' ( i j -- n )
     j i 4 * 0 + eval-A
     j i 4 * 1 + eval-A

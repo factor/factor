@@ -9,12 +9,12 @@ FROM: syntax => M: ;
 IN: pong
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 
+!
 ! Inspired by this Ruby/Shoes version by why: http://gist.github.com/26431
 !
 ! Which was based on this Nodebox version: http://billmill.org/pong.html
 ! by Bill Mill.
-! 
+!
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : clamp-to-interval ( x interval -- x )
@@ -68,7 +68,7 @@ TUPLE: <ball> < <vel>
 : mouse-x ( -- x ) hand-loc get first ;
 
 :: valid-paddle-interval ( PADDLE PLAY-FIELD -- interval )
-    
+
    PLAY-FIELD [ left ] [ right ] bi PADDLE width - [a,b] ;
 
 :: align-paddle-with-mouse ( PADDLE PLAY-FIELD -- )
@@ -80,7 +80,7 @@ TUPLE: <ball> < <vel>
    clamp-to-interval
 
    PADDLE pos>> (x!) ;
-   
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! Protocol for drawing PONG objects
@@ -103,7 +103,7 @@ TUPLE: <pong> < gadget paused field ball player computer ;
 
 M: <pong> pref-dim* ( <pong> -- dim ) drop { 400 400 } ;
 M: <pong> ungraft*  ( <pong> --     ) t >>paused drop  ;
-    
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M:: <pong> draw-gadget* ( PONG -- )

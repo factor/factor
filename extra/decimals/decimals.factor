@@ -16,7 +16,7 @@ TUPLE: decimal { mantissa read-only } { exponent read-only } ;
     "." split1
     [ [ CHAR: 0 = ] trim-head [ "0" ] when-empty ]
     [ [ CHAR: 0 = ] trim-tail [ "" ] when-empty ] bi*
-    [ append string>number ] [ nip length neg ] 2bi <decimal> ; 
+    [ append string>number ] [ nip length neg ] 2bi <decimal> ;
 
 : parse-decimal ( -- decimal ) scan-token string>decimal ;
 
@@ -27,7 +27,7 @@ SYNTAX: D: parse-decimal suffix! ;
 
 : scale-mantissas ( D1 D2 -- m1 m2 exp )
     [ [ mantissa>> ] bi@ ]
-    [ 
+    [
         [ exponent>> ] bi@
         [
             - dup 0 <
@@ -79,7 +79,7 @@ M: decimal before?
     D2 >decimal< :> ( m2 e2 )
     m1 a 10^ *
     m2 /i
-    
+
     e1
     e2 a + - <decimal> ;
 

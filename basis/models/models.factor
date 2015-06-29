@@ -120,4 +120,3 @@ GENERIC: set-range-max-value ( value model -- )
 
 : pop-model ( model -- value )
     [ pop ] change-model* ;
-

@@ -113,4 +113,3 @@ PRIVATE>
 
 : local-ntp ( -- ntp )
     "localhost" <ntp> ;
-

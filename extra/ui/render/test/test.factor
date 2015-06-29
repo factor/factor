@@ -68,7 +68,7 @@ M: take-screenshot draw-boundary
             { 5 5 } >>gap
             COLOR: blue <grid-lines> >>boundary
         add-gadget ;
-    
+
 : ui-render-test ( -- )
     <ui-render-test> "Test" open-window ;
 

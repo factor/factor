@@ -63,7 +63,7 @@ M: string add-coverage
 M: string remove-coverage
     [ remove-coverage ] each-word ;
 
-M: word add-coverage 
+M: word add-coverage
     H{ } clone [ "coverage" set-word-prop ] 2keep
     '[
         \ coverage-state new [ _ set-at ] 2keep

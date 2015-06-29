@@ -25,8 +25,8 @@ USE: mongodb.operations
 CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
 
 : check-ok ( result -- errmsg ? )
-    [ [ "errmsg" ] dip at ] 
-    [ [ "ok" ] dip at ] bi ; inline 
+    [ [ "errmsg" ] dip at ]
+    [ [ "ok" ] dip at ] bi ; inline
 
 : <mdb-db> ( name nodes -- mdb-db )
     mdb-db new swap >>nodes swap >>name H{ } clone >>collections ;
@@ -39,7 +39,7 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
 
 : with-connection ( connection quot -- * )
     [ mdb-connection ] dip with-variable ; inline
-    
+
 : mdb-instance ( -- mdb )
     mdb-connection get instance>> ; inline
 
@@ -77,7 +77,7 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
     [ "nonce" of ] [ f ] if* ;
 
 : auth? ( mdb -- ? )
-    [ username>> ] [ pwd-digest>> ] bi and ; 
+    [ username>> ] [ pwd-digest>> ] bi and ;
 
 : calculate-key-digest ( nonce -- digest )
     mdb-instance
@@ -89,7 +89,7 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
     mdb-instance username>> "user" set-cmd-opt
     get-nonce [ "nonce" set-cmd-opt ] [ ] bi
     calculate-key-digest "key" set-cmd-opt ; inline
-    
+
 : perform-authentication ( --  )
     authenticate-cmd make-cmd
     build-auth-cmd send-cmd
@@ -106,7 +106,7 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
     [ >>handle ] dip >>local 4096 <byte-vector> >>buffer ;
 
 : get-ismaster ( -- result )
-    "admin.$cmd" H{ { "ismaster" 1 } } send-query-1result ; 
+    "admin.$cmd" H{ { "ismaster" 1 } } send-query-1result ;
 
 : split-host-str ( hoststr -- host port )
    ":" split [ first ] [ second string>number ] bi ; inline
@@ -139,11 +139,11 @@ PRIVATE>
         [ drop f ] if*  :> node2
         node1 [ acc push ] when*
         node2 [ acc push ] when*
-        mdb acc nodelist>table >>nodes drop 
+        mdb acc nodelist>table >>nodes drop
     ] with-destructors ;
 
 ERROR: mongod-connection-error address message ;
-              
+
 : mdb-open ( mdb -- mdb-connection )
     clone [ verify-nodes ] [ <mdb-connection> ] [ ] tri
     master-node [

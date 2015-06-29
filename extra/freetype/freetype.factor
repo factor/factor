@@ -197,4 +197,3 @@ FUNCTION: void FT_Done_Face ( face* face ) ;
 FUNCTION: void FT_Done_FreeType ( void* library ) ;
 
 FUNCTION: FT_Long FT_MulFix ( FT_Long a, FT_Long b ) ;
-

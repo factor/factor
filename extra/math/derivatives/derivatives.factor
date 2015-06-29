@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Jason W. Merrill.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.derivatives.syntax 
+USING: kernel math math.functions math.derivatives.syntax
     math.order math.parser summary accessors make combinators ;
 IN: math.derivatives
 
 ERROR: undefined-derivative point word ;
 M: undefined-derivative summary
-    [ dup "Derivative of " % word>> name>> % 
+    [ dup "Derivative of " % word>> name>> %
     " is undefined at " % point>> # "." % ]
     "" make ;
 
@@ -16,15 +16,15 @@ DERIVATIVE: * [ nip * ] [ drop * ]
 DERIVATIVE: / [ nip / ] [ sq / neg * ]
 ! Conditional checks if the epsilon-part of the exponent is 
 ! 0 to avoid getting float answers for integer powers.
-DERIVATIVE: ^ [ [ 1 - ^ ] keep * * ] 
+DERIVATIVE: ^ [ [ 1 - ^ ] keep * * ]
     [ [ dup zero? ] 2dip [ 3drop 0 ] [ [ ^ ] keep log * * ] if ]
 
-DERIVATIVE: abs 
-    [ 0 <=> 
-        { 
-            { +lt+ [ neg ] } 
-            { +eq+ [ 0 \ abs undefined-derivative ] } 
-            { +gt+ [ ] } 
+DERIVATIVE: abs
+    [ 0 <=>
+        {
+            { +lt+ [ neg ] }
+            { +eq+ [ 0 \ abs undefined-derivative ] }
+            { +gt+ [ ] }
         } case
     ]
 

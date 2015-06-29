@@ -49,14 +49,14 @@ MACRO: chain-rule ( word -- e )
     tri
     '[ [ @ _ @ ] sum-outputs ] ;
 
-: set-dual-help ( word dword -- ) 
+: set-dual-help ( word dword -- )
     [ swap
-        [ stack-effect [ in>> ] [ out>> ] bi append 
+        [ stack-effect [ in>> ] [ out>> ] bi append
             [ dual ] { } map>assoc { $values } prepend
         ]
-        [ [ { $description } % "Version of " , 
-                   { $link } swap suffix , 
-                   " extended to work on dual numbers." , ] 
+        [ [ { $description } % "Version of " ,
+                   { $link } swap suffix ,
+                   " extended to work on dual numbers." , ]
             { } make
         ]
         bi* 2array

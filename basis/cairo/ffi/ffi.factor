@@ -345,7 +345,7 @@ STRUCT: cairo_rectangle_t
     { y      double }
     { width  double }
     { height double } ;
-    
+
 STRUCT: cairo_rectangle_list_t
     { status         cairo_status_t     }
     { rectangles     cairo_rectangle_t* }
@@ -558,7 +558,7 @@ ENUM: cairo_font_type_t
 FUNCTION: cairo_font_type_t
 cairo_font_face_get_type ( cairo_font_face_t* font_face ) ;
 
-FUNCTION: void* 
+FUNCTION: void*
 cairo_font_face_get_user_data ( cairo_font_face_t* font_face, cairo_user_data_key_t* key ) ;
 
 FUNCTION: cairo_status_t
@@ -584,7 +584,7 @@ cairo_scaled_font_status ( cairo_scaled_font_t* scaled_font ) ;
 FUNCTION: cairo_font_type_t
 cairo_scaled_font_get_type ( cairo_scaled_font_t* scaled_font ) ;
 
-FUNCTION: void* 
+FUNCTION: void*
 cairo_scaled_font_get_user_data ( cairo_scaled_font_t* scaled_font, cairo_user_data_key_t* key ) ;
 
 FUNCTION: cairo_status_t
@@ -743,7 +743,7 @@ STRUCT: cairo_path_data_t-header
     { type cairo_path_data_type_t }
     { length int } ;
 
-UNION-STRUCT: cairo_path_data_t 
+UNION-STRUCT: cairo_path_data_t
     { point  cairo_path_data_t-point }
     { header cairo_path_data_t-header } ;
 
@@ -769,7 +769,7 @@ cairo_path_destroy ( cairo_path_t* path ) ;
 FUNCTION: cairo_status_t
 cairo_status ( cairo_t* cr ) ;
 
-FUNCTION: c-string 
+FUNCTION: c-string
 cairo_status_to_string ( cairo_status_t status ) ;
 
 ! Surface manipulation
@@ -822,7 +822,7 @@ cairo_surface_write_to_png ( cairo_surface_t* surface, c-string filename ) ;
 FUNCTION: cairo_status_t
 cairo_surface_write_to_png_stream ( cairo_surface_t* surface, cairo_write_func_t write_func, void* closure ) ;
 
-FUNCTION: void* 
+FUNCTION: void*
 cairo_surface_get_user_data ( cairo_surface_t* surface, cairo_user_data_key_t* key ) ;
 
 FUNCTION: cairo_status_t

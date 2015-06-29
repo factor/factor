@@ -27,7 +27,7 @@ CONSTANT: CREATE_ALWAYS     2
 CONSTANT: OPEN_EXISTING     3
 CONSTANT: OPEN_ALWAYS       4
 CONSTANT: TRUNCATE_EXISTING 5
-              
+
 CONSTANT: FILE_LIST_DIRECTORY       0x00000001
 CONSTANT: FILE_READ_DAT             0x00000001
 CONSTANT: FILE_ADD_FILE             0x00000002
@@ -1016,7 +1016,7 @@ FUNCTION: HANDLE CreateRemoteThread ( HANDLE hProcess,
                                       LPVOID lpStartAddress,
                                       LPVOID lpParameter,
                                       DWORD dwCreationFlags,
-                                      LPDWORD lpThreadId ) ; 
+                                      LPDWORD lpThreadId ) ;
 ! FUNCTION: CreateSemaphoreA
 ! FUNCTION: CreateSemaphoreW
 ! FUNCTION: CreateSocketHandle

@@ -79,4 +79,3 @@ M: mersenne-twister random-32*
 [
     default-mersenne-twister random-generator set-global
 ] "bootstrap.random" add-startup-hook
-

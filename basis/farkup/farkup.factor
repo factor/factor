@@ -152,7 +152,7 @@ DEFER: (parse-paragraph)
         '[
             _ dup ?last ?last CHAR: \\ =
             [ [ pop "|" rot 3append ] keep ] when
-            push 
+            push
         ] each
     ] keep ;
 
@@ -197,7 +197,7 @@ DEFER: (parse-paragraph)
         { CHAR: | [ parse-table ] }
         { CHAR: _ [ parse-line ] }
         { CHAR: - [ parse-ul ] }
-        { CHAR: # [ parse-ol ] } 
+        { CHAR: # [ parse-ol ] }
         { CHAR: [ [ parse-code ] }
         { f [ rest-slice f ] }
         [ drop unclip-slice make-paragraph ]
@@ -290,4 +290,3 @@ M: array (write-farkup) [ (write-farkup) ] map ;
 
 : convert-farkup ( string -- string' )
     [ write-farkup ] with-string-writer ;
-

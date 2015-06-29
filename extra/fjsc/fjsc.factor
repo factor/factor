@@ -360,4 +360,3 @@ M: quotation fjsc-parse ( object -- ast )
     [
         [ (literal) ] { } make [ write ] each
     ] with-string-writer ;
-

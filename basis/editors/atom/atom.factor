@@ -14,4 +14,3 @@ M: atom-editor editor-command ( file line -- command )
         atom-path get [ "atom" ?find-in-path ] unless* ,
         number>string ":" glue ,
     ] { } make ;
-

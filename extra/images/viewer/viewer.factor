@@ -38,7 +38,7 @@ TUPLE: image-control < image-gadget image-updated? ;
     [ GL_TEXTURE_2D ] dip glBindTexture ;
 : bind-2d-texture ( single-texture -- )
     texture>> (bind-2d-texture) ;
-: (update-texture) ( image single-texture -- ) 
+: (update-texture) ( image single-texture -- )
     bind-2d-texture tex-sub-image ;
 ! works only for single-texture
 : update-texture ( image-gadget -- )
@@ -53,7 +53,7 @@ M: single-texture texture-size dim>> ;
     ] if-empty ; inline
 : grid-dim ( grid -- dim )
     [ [ dim>> first ] grid-width ] [ flip [ dim>> second ] grid-width ] bi 2array ;
-M: multi-texture texture-size 
+M: multi-texture texture-size
     grid>> grid-dim ;
 : same-size? ( image-gadget -- ? )
     [ texture>> texture-size ] [ image>> dim>> ] bi = ;
@@ -67,7 +67,7 @@ M: multi-texture texture-size
             (texture-format)
         ] [ f ] if*
     ] [ f ] if* ;
-: same-internal-format? ( image-gadget -- ? ) 
+: same-internal-format? ( image-gadget -- ? )
    [ texture-format ] [ image>> image-format 2drop ] bi = ;
 
 ! TODO: also keep multitextures if possible ?
@@ -91,7 +91,7 @@ M: string set-image load-image >>image ;
 M: pathname set-image string>> load-image >>image ;
 M: model set-image [ value>> >>image drop ] [ >>model ] 2bi ;
 : new-image-gadget ( class -- gadget ) new ;
-: new-image-gadget* ( object class -- gadget ) 
+: new-image-gadget* ( object class -- gadget )
     new-image-gadget swap set-image ;
 : <image-gadget> ( object -- gadget )
     \ image-gadget new-image-gadget* ;

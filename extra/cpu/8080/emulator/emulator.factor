@@ -361,7 +361,7 @@ CONSTANT: sign-flag         0x80
 
 : pop-pc ( cpu -- pc )
     #! Pop the value of the PC off the stack.
-    [ sp>> ] [ read-word ] [ -2 swap decrement-sp ] tri ; 
+    [ sp>> ] [ read-word ] [ -2 swap decrement-sp ] tri ;
 
 : push-sp ( value cpu -- )
     [ 2 swap decrement-sp ] [ sp>> ] [ write-word ] tri ;

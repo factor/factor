@@ -538,7 +538,7 @@ ALIAS: -2in- -assoc-
     [ 2in- ] dip -map-as ; inline
 
 : 2map ( ... a b quot: ( ... x y -- ... z ) -- ... c )
-    pick 2map-as ; inline 
+    pick 2map-as ; inline
 
 !
 ! generalized zips
@@ -576,4 +576,3 @@ MACRO: -nin- ( n -- )
 
 MACRO: -nwith- ( n -- )
     [ -with- ] n*quot ;
-

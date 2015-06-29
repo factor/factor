@@ -103,7 +103,7 @@ M: cocoa-ui-backend set-title ( string world -- )
 
 : exit-fullscreen ( world -- )
     handle>>
-    [ view>> f -> exitFullScreenModeWithOptions: ] 
+    [ view>> f -> exitFullScreenModeWithOptions: ]
     [ [ window>> ] [ view>> ] bi -> makeFirstResponder: drop ] bi ;
 
 M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
@@ -263,4 +263,3 @@ cocoa-ui-backend ui-backend set-global
 
 M: cocoa-ui-backend ui-backend-available?
     running.app? ;
-

@@ -143,4 +143,3 @@ CONSTANT: distant 1000
 
 : bounce-off-wall ( oint segment -- )
     swap [ bounce-forward ] [ bounce-left ] [ bounce-up ] 2tri ;
-

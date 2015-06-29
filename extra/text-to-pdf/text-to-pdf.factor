@@ -138,4 +138,3 @@ PRIVATE>
 : file-to-pdf ( path encoding -- )
     [ file-contents text-to-pdf ]
     [ [ ".pdf" append ] dip set-file-contents ] 2bi ;
-

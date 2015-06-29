@@ -4,4 +4,3 @@ USING: ;
 IN: game.models
 
 TUPLE: model attribute-buffer index-buffer vertex-format material ;
-

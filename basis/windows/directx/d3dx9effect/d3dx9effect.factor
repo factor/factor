@@ -248,7 +248,7 @@ FUNCTION: HRESULT
         LPCSTR                          pSrcFile,
         D3DXMACRO*                      pDefines,
         LPD3DXINCLUDE                   pInclude,
-        LPCSTR                          pSkipConstants, 
+        LPCSTR                          pSkipConstants,
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
@@ -260,7 +260,7 @@ FUNCTION: HRESULT
         LPCWSTR                         pSrcFile,
         D3DXMACRO*                      pDefines,
         LPD3DXINCLUDE                   pInclude,
-        LPCSTR                          pSkipConstants, 
+        LPCSTR                          pSkipConstants,
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
@@ -275,7 +275,7 @@ FUNCTION: HRESULT
         LPCSTR                          pSrcResource,
         D3DXMACRO*                      pDefines,
         LPD3DXINCLUDE                   pInclude,
-        LPCSTR                          pSkipConstants, 
+        LPCSTR                          pSkipConstants,
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
@@ -288,7 +288,7 @@ FUNCTION: HRESULT
         LPCWSTR                         pSrcResource,
         D3DXMACRO*                      pDefines,
         LPD3DXINCLUDE                   pInclude,
-        LPCSTR                          pSkipConstants, 
+        LPCSTR                          pSkipConstants,
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
@@ -303,7 +303,7 @@ FUNCTION: HRESULT
         UINT                            SrcDataLen,
         D3DXMACRO*                      pDefines,
         LPD3DXINCLUDE                   pInclude,
-        LPCSTR                          pSkipConstants, 
+        LPCSTR                          pSkipConstants,
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
@@ -361,9 +361,8 @@ FUNCTION: HRESULT
         LPD3DXEFFECTCOMPILER*           ppCompiler,
         LPD3DXBUFFER*                   ppParseErrors ) ;
 
-FUNCTION: HRESULT 
+FUNCTION: HRESULT
     D3DXDisassembleEffect (
-        LPD3DXEFFECT pEffect, 
-        BOOL EnableColorCode, 
+        LPD3DXEFFECT pEffect,
+        BOOL EnableColorCode,
         LPD3DXBUFFER* ppDisassembly ) ;
-        

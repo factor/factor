@@ -85,4 +85,3 @@ CONSTANT: T_Binary_Bytes_Deprecated         0x2
 CONSTANT: T_Binary_UUID                     0x3
 CONSTANT: T_Binary_MD5                      0x5
 CONSTANT: T_Binary_Custom                   0x80
-

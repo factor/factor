@@ -11,5 +11,3 @@ M: wrapped-hash-set >pprint-sequence members ;
 M: wrapped-hash-set pprint*
     nesting-limit inc
     [ pprint-object ] [ nesting-limit dec ] [ ] cleanup ;
-
-

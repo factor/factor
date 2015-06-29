@@ -3,12 +3,12 @@
 !
 USING: 
     alien
-    alien.c-types 
+    alien.c-types
     alien.libraries
-    alien.syntax 
+    alien.syntax
     classes.struct
-    combinators 
-    kernel 
+    combinators
+    kernel
     ogg
     system
 ;
@@ -37,7 +37,7 @@ CONSTANT: TH-EIMPL      -23
 CONSTANT: TH-EBADPACKET -24
 CONSTANT: TH-DUPFRAME     1
 
-TYPEDEF: int th-colorspace 
+TYPEDEF: int th-colorspace
 CONSTANT: TH-CS-UNSPECIFIED   0
 CONSTANT: TH-CS-ITU-REC-470M  1
 CONSTANT: TH-CS-ITU-REC-470BG 2

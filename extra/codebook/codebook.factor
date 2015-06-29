@@ -44,7 +44,7 @@ TUPLE: code-file
 
 : include-file-name? ( name -- ? )
     {
-        [ path-components [ "." head? ] any? not ] 
+        [ path-components [ "." head? ] any? not ]
         [ link-info type>> +regular-file+ = ]
     } 1&& ;
 
@@ -140,7 +140,7 @@ TUPLE: code-file
         file name>> :> name
         name file-html-name :> filename
         i 2 + number>string :> istr
-        
+
         [XML <navPoint class="book" id=<-filename-> playOrder=<-istr->>
             <navLabel><text><-name-></text></navLabel>
             <content src=<-filename-> />
@@ -157,7 +157,7 @@ TUPLE: code-file
             <-file-nav-points->
         </navMap>
     </ncx> XML> ;
-    
+
 :: code>opf ( dir name files -- xml )
     "Generating OPF manifest" print flush
     name ".ncx"  append :> ncx-name

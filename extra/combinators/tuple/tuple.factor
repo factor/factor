@@ -17,7 +17,7 @@ MACRO:: nmake-tuple ( class assoc n -- )
     class all-slots [ assoc n (tuple-slot-quot) ] map :> quots
     class <wrapper> :> \class
     { quots n ncleave \class boa } >quotation ;
-    
+
 : make-tuple ( x class assoc -- tuple )
     1 nmake-tuple ; inline
 
@@ -26,4 +26,3 @@ MACRO:: nmake-tuple ( class assoc n -- )
 
 : 3make-tuple ( x y z class assoc -- tuple )
     3 nmake-tuple ; inline
-

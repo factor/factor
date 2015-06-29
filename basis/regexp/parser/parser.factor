@@ -116,7 +116,7 @@ ERROR: nonexistent-option name ;
 
 : string>options ( string -- options )
     "-" split1 parse-options ;
- 
+
 : options>string ( options -- string )
     [ on>> ] [ off>> ] bi
     [ [ option>ch ] map ] bi@

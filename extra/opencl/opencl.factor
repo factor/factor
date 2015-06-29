@@ -16,7 +16,7 @@ ERROR: cl-error err ;
 
 : cl-not-null ( err -- )
     dup f = [ cl-error ] [ drop ] if ; inline
- 
+
 : info-data-size ( handle name info-quot -- size_t )
     [ 0 f 0 size_t <ref> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
 
@@ -120,17 +120,17 @@ TUPLE: cl-platform
 
 TUPLE: cl-device
     id type vendor-id max-compute-units max-work-item-dimensions
-    max-work-item-sizes max-work-group-size preferred-vector-width-char 
-    preferred-vector-width-short preferred-vector-width-int 
-    preferred-vector-width-long preferred-vector-width-float 
-    preferred-vector-width-double max-clock-frequency address-bits 
+    max-work-item-sizes max-work-group-size preferred-vector-width-char
+    preferred-vector-width-short preferred-vector-width-int
+    preferred-vector-width-long preferred-vector-width-float
+    preferred-vector-width-double max-clock-frequency address-bits
     max-mem-alloc-size image-support max-read-image-args max-write-image-args
-    image2d-max-width image2d-max-height image3d-max-width image3d-max-height 
+    image2d-max-width image2d-max-height image3d-max-width image3d-max-height
     image3d-max-depth max-samplers max-parameter-size mem-base-addr-align
     min-data-type-align-size single-fp-config global-mem-cache-type
-    global-mem-cacheline-size global-mem-cache-size global-mem-size 
-    max-constant-buffer-size max-constant-args local-mem? local-mem-size 
-    error-correction-support profiling-timer-resolution endian-little 
+    global-mem-cacheline-size global-mem-cache-size global-mem-size
+    max-constant-buffer-size max-constant-args local-mem? local-mem-size
+    error-correction-support profiling-timer-resolution endian-little
     available compiler-available execute-kernels? execute-native-kernels?
     out-of-order-exec-available? profiling-available?
     name vendor driver-version profile version extensions ;
@@ -218,7 +218,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         [ CL_PLATFORM_VERSION    platform-info-string ]
         [ CL_PLATFORM_NAME       platform-info-string ]
         [ CL_PLATFORM_VENDOR     platform-info-string ]
-        [ CL_PLATFORM_EXTENSIONS platform-info-string ] 
+        [ CL_PLATFORM_EXTENSIONS platform-info-string ]
     } cleave ;
 
 : cl_device_fp_config>flags ( ulong -- sequence )
@@ -515,7 +515,7 @@ PRIVATE>
     [ [ CL_TRUE ] [ CL_FALSE ] if ]
     [ addressing-mode-constant ]
     [ filter-mode-constant ]
-    tri* 0 int <ref> [ clCreateSampler ] keep int deref cl-success 
+    tri* 0 int <ref> [ clCreateSampler ] keep int deref cl-success
     cl-sampler new-disposable swap >>handle ;
 
 : cl-normalized-coords? ( sampler -- ? )
@@ -581,7 +581,7 @@ PRIVATE>
 
 : cl-barrier ( -- )
     (current-cl-queue) clEnqueueBarrier cl-success ; inline
- 
+
 : cl-flush ( -- )
     (current-cl-queue) handle>> clFlush cl-success ; inline
 

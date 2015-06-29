@@ -86,7 +86,7 @@ ERROR: limit-exceeded n stream ;
 PRIVATE>
 
 M: limited-stream stream-read1
-    1 swap 
+    1 swap
     [ nip stream-read1 ] maybe-read ;
 
 M: limited-stream stream-read-unsafe

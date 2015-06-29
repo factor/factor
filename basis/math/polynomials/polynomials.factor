@@ -99,4 +99,3 @@ MACRO: polyval* ( p -- )
     [ rest [ \ * swap \ + [ ] 3sequence ] map ]
     [ first \ drop swap [ ] 2sequence ] bi
     prefix \ cleave [ ] 2sequence ;
-

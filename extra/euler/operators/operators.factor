@@ -253,7 +253,7 @@ TYPED:: kill-ef ( edge: b-edge -- )
     e1 [ f2 >>face drop ] each-face-edge
     f1 b-rep delete-face
 
-    e1 e2 incident? [ 
+    e1 e2 incident? [
         e2 next-edge>> e2p next-edge<<
 
     ] [

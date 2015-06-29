@@ -83,15 +83,15 @@ CONSTANT: morse-code-table $[
 
 : morse>ch ( str -- ch )
     morse-code-table value-at char-gap-char or ;
-    
+
 <PRIVATE
-    
+
 : word>morse ( str -- morse )
     [ ch>morse ] { } map-as " " join ;
 
 : sentence>morse ( str -- morse )
     " " split [ word>morse ] map " / " join ;
-    
+
 : trim-blanks ( str -- newstr )
     [ blank? ] trim ; inline
 
@@ -105,17 +105,17 @@ CONSTANT: morse-code-table $[
     [ dup CHAR: _ = [ drop CHAR: - ] when ] map ;
 
 PRIVATE>
-    
+
 : >morse ( str -- newstr )
     trim-blanks sentence>morse ;
-    
+
 : morse> ( morse -- plain )
     replace-underscores morse>sentence ;
 
-SYNTAX: [MORSE "MORSE]" parse-multiline-string morse> suffix! ; 
-    
+SYNTAX: [MORSE "MORSE]" parse-multiline-string morse> suffix! ;
+
 <PRIVATE
-    
+
 SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
 
 : queue ( symbol -- )

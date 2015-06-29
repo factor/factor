@@ -34,7 +34,7 @@ FUNCTION: HRESULT D3D10CreateDeviceAndSwapChain (
     UINT                  Flags,
     UINT                  SDKVersion,
     DXGI_SWAP_CHAIN_DESC* pSwapChainDesc,
-    IDXGISwapChain**      ppSwapChain,    
+    IDXGISwapChain**      ppSwapChain,
     ID3D10Device**        ppDevice ) ;
 
 FUNCTION: HRESULT D3D10CreateBlob ( SIZE_T NumBytes, LPD3D10BLOB* ppBuffer ) ;

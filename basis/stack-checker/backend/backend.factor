@@ -185,4 +185,3 @@ M: object apply-object push-literal ;
             word effect variables branches n declare-effect-d
         ] when*
     ] each-index ;
-

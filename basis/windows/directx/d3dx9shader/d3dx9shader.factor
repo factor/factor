@@ -291,9 +291,9 @@ FUNCTION: HRESULT
 
 FUNCTION: HRESULT
     D3DXDisassembleShader (
-        DWORD*                          pShader,         
-        BOOL                            EnableColorCode, 
-        LPCSTR                          pComments,       
+        DWORD*                          pShader,
+        BOOL                            EnableColorCode,
+        LPCSTR                          pComments,
         LPD3DXBUFFER*                   ppDisassembly ) ;
 
 FUNCTION: LPCSTR
@@ -310,7 +310,7 @@ FUNCTION: HRESULT
         DWORD                           FourCC,
         LPCVOID*                        ppData,
         UINT*                           pSizeInBytes ) ;
-        
+
 FUNCTION: UINT
     D3DXGetShaderSize (
         DWORD*                    pFunction ) ;
@@ -350,18 +350,18 @@ FUNCTION: HRESULT
 
 FUNCTION: HRESULT
     D3DXCreateTextureShader (
-        DWORD*                          pFunction,      
+        DWORD*                          pFunction,
         LPD3DXTEXTURESHADER*            ppTextureShader ) ;
-    
-FUNCTION: HRESULT 
+
+FUNCTION: HRESULT
     D3DXPreprocessShaderFromFileA (
         LPCSTR                       pSrcFile,
         D3DXMACRO*                   pDefines,
         LPD3DXINCLUDE                pInclude,
         LPD3DXBUFFER*                ppShaderText,
         LPD3DXBUFFER*                ppErrorMsgs ) ;
-                                             
-FUNCTION: HRESULT 
+
+FUNCTION: HRESULT
     D3DXPreprocessShaderFromFileW (
         LPCWSTR                      pSrcFile,
         D3DXMACRO*                   pDefines,
@@ -371,7 +371,7 @@ FUNCTION: HRESULT
 
 ALIAS: D3DXPreprocessShaderFromFile D3DXPreprocessShaderFromFileW
 
-FUNCTION: HRESULT 
+FUNCTION: HRESULT
     D3DXPreprocessShaderFromResourceA (
         HMODULE                      hSrcModule,
         LPCSTR                       pSrcResource,
@@ -380,7 +380,7 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*                ppShaderText,
         LPD3DXBUFFER*                ppErrorMsgs ) ;
 
-FUNCTION: HRESULT 
+FUNCTION: HRESULT
     D3DXPreprocessShaderFromResourceW (
         HMODULE                      hSrcModule,
         LPCWSTR                      pSrcResource,
@@ -391,7 +391,7 @@ FUNCTION: HRESULT
 
 ALIAS: D3DXPreprocessShaderFromResource D3DXPreprocessShaderFromResourceW
 
-FUNCTION: HRESULT 
+FUNCTION: HRESULT
     D3DXPreprocessShader (
         LPCSTR                       pSrcData,
         UINT                         SrcDataSize,
@@ -434,4 +434,3 @@ STRUCT: D3DXSHADER_STRUCTMEMBERINFO
     { Name     DWORD }
     { TypeInfo DWORD } ;
 TYPEDEF: D3DXSHADER_STRUCTMEMBERINFO* LPD3DXSHADER_STRUCTMEMBERINFO
-

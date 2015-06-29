@@ -55,7 +55,7 @@ M: word print-stack-effect? drop t ;
         [ seeing-word ]
         [ definer. ]
         [ pprint-word ]
-        [ stack-effect. ] 
+        [ stack-effect. ]
     } cleave ;
 
 M: word synopsis* word-synopsis ;

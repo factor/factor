@@ -56,7 +56,7 @@ DEFER: read-elements
     read-int32 [ f ] [ drop read-elements t ] if-zero ; inline recursive
 
 : bson-binary-read ( -- binary )
-   read-int32 read-byte 
+   read-int32 read-byte
    {
         { T_Binary_Default [ read ] }
         { T_Binary_Bytes_Deprecated [ drop read-int32 read ] }
@@ -101,7 +101,7 @@ TYPED: (read-object) ( type: integer name: string -- )
     [ element-data-read ] dip state get set-at ; inline recursive
 
 TYPED: (element-read) ( type: integer -- cont?: boolean )
-    dup T_EOO > 
+    dup T_EOO >
     [ read-cstring (read-object) t ]
     [ drop f ] if ; inline recursive
 

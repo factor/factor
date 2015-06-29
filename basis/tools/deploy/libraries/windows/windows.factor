@@ -13,4 +13,3 @@ M: windows find-library-file
             alien>native-string
         ] [ FreeLibrary drop ] bi
     ] [ f ] if* ;
-

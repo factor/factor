@@ -845,4 +845,3 @@ FUNCTION: void cpInitChipmunk ( ) ;
 FUNCTION: cpFloat cpMomentForCircle ( cpFloat m, cpFloat r1, cpFloat r2, cpVect offset ) ;
 FUNCTION: cpFloat cpMomentForSegment ( cpFloat m, cpVect a, cpVect b ) ;
 FUNCTION: cpFloat cpMomentForPoly ( cpFloat m, int numVerts, cpVect* verts, cpVect offset ) ;
-

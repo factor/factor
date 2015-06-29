@@ -15,7 +15,7 @@ IN: elf.nm
         } case "%-16s " printf
     ]
     [ name>> "%s\n" printf ] tri ;
-    
+
 : elf-nm ( path -- )
     [
         sections dup ".symtab" find-section

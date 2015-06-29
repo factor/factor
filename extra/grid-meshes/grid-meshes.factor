@@ -41,4 +41,3 @@ PRIVATE>
 M: grid-mesh dispose
     [ [ delete-gl-buffer ] when* f ] change-buffer
     drop ;
-

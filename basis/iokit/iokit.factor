@@ -11,7 +11,7 @@ IN: iokit
 
 CONSTANT: kIOKitBuildVersionKey   "IOKitBuildVersion"
 CONSTANT: kIOKitDiagnosticsKey   "IOKitDiagnostics"
- 
+
 CONSTANT: kIORegistryPlanesKey   "IORegistryPlanes"
 CONSTANT: kIOCatalogueKey    "IOCatalogue"
 
@@ -84,16 +84,16 @@ CONSTANT: kIOBundleResourceFileKey "IOBundleResourceFile"
 CONSTANT: kIOBusBadgeKey "IOBusBadge"
 CONSTANT: kIODeviceIconKey "IODeviceIcon"
 
-CONSTANT: kIOPlatformSerialNumberKey  "IOPlatformSerialNumber" 
+CONSTANT: kIOPlatformSerialNumberKey  "IOPlatformSerialNumber"
 
-CONSTANT: kIOPlatformUUIDKey  "IOPlatformUUID" 
+CONSTANT: kIOPlatformUUIDKey  "IOPlatformUUID"
 
 CONSTANT: kIONVRAMDeletePropertyKey  "IONVRAM-DELETE-PROPERTY"
 CONSTANT: kIODTNVRAMPanicInfoKey   "aapl,panic-info"
 
-CONSTANT: kIOBootDeviceKey "IOBootDevice"  
-CONSTANT: kIOBootDevicePathKey "IOBootDevicePath" 
-CONSTANT: kIOBootDeviceSizeKey "IOBootDeviceSize" 
+CONSTANT: kIOBootDeviceKey "IOBootDevice"
+CONSTANT: kIOBootDevicePathKey "IOBootDevicePath"
+CONSTANT: kIOBootDeviceSizeKey "IOBootDeviceSize"
 
 CONSTANT: kOSBuildVersionKey   "OS Build Version"
 
@@ -154,11 +154,10 @@ TUPLE: mach-error-state error-code error-string ;
 
 : io-objects-from-iterator ( i -- array )
     io-objects-from-iterator* [ release-io-object ] dip ;
-    
+
 : properties-from-io-object ( o -- o nsdictionary )
     dup f void* <ref> [
         kCFAllocatorDefault kNilOptions
         IORegistryEntryCreateCFProperties mach-error
     ]
     keep void* deref ;
-

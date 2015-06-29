@@ -46,4 +46,3 @@ DESTRUCTOR: release-alien-handle
     alien-address release-alien-handle ; inline
 
 DESTRUCTOR: release-alien-handle-ptr
-

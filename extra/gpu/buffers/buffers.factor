@@ -18,7 +18,7 @@ VARIANT: buffer-kind
     pixel-unpack-buffer pixel-pack-buffer
     transform-feedback-buffer ;
 
-TUPLE: buffer < gpu-object 
+TUPLE: buffer < gpu-object
     { upload-pattern buffer-upload-pattern }
     { usage-pattern buffer-usage-pattern }
     { kind buffer-kind } ;
@@ -67,7 +67,7 @@ PRIVATE>
 M: buffer dispose
     [ [ delete-gl-buffer ] when* f ] change-handle drop ;
 
-TUPLE: buffer-ptr 
+TUPLE: buffer-ptr
     { buffer buffer read-only }
     { offset integer read-only } ;
 C: <buffer-ptr> buffer-ptr
@@ -163,4 +163,3 @@ TYPED: grow-buffer ( buffer: buffer target-size: integer -- )
     pick buffer-ptr?
     [ with-buffer-ptr ]
     [ [ gl-target 0 glBindBuffer ] dip call ] if ; inline
-

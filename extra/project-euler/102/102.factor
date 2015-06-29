@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays grouping io.encodings.ascii io.files kernel math 
+USING: arrays grouping io.encodings.ascii io.files kernel math
 math.parser sequences splitting project-euler.common ;
 IN: project-euler.102
 

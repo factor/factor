@@ -17,4 +17,3 @@ M: image-pen draw-interior
     ] if ;
 
 M: image-pen pen-pref-dim nip image>> image-dim ;
-

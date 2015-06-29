@@ -122,7 +122,7 @@ ERROR: invalid-uniform-type uniform ;
         { uint-indexes   [ GL_UNSIGNED_INT   ] }
     } case ; inline
 
-: gl-primitive-mode ( primitive-mode -- gl-primitive-mode ) 
+: gl-primitive-mode ( primitive-mode -- gl-primitive-mode )
     {
         { points-mode         [ GL_POINTS         ] }
         { lines-mode          [ GL_LINES          ] }
@@ -153,7 +153,7 @@ M: index-range render-vertex-indexes-instanced
     [ gl-primitive-mode ] [ [ start>> ] [ count>> ] bi ] [ ] tri*
     glDrawArraysInstanced ;
 
-M: multi-index-range render-vertex-indexes 
+M: multi-index-range render-vertex-indexes
     [ gl-primitive-mode ] [ [ starts>> ] [ counts>> dup length ] bi ] bi*
     glMultiDrawArrays ;
 
@@ -287,16 +287,16 @@ GENERIC: bind-uniform-vec3  ( index sequence -- )
 GENERIC: bind-uniform-vec4  ( index sequence -- )
 
 M: object >uniform-bool-array [ >c-bool ] int-array{ } map-as ; inline
-M: binary-data >uniform-bool-array ; inline 
+M: binary-data >uniform-bool-array ; inline
 
 M: object >uniform-int-array c:int >c-array ; inline
-M: binary-data >uniform-int-array ; inline 
+M: binary-data >uniform-int-array ; inline
 
 M: object >uniform-uint-array c:uint >c-array ; inline
-M: binary-data >uniform-uint-array ; inline 
+M: binary-data >uniform-uint-array ; inline
 
 M: object >uniform-float-array c:float >c-array ; inline
-M: binary-data >uniform-float-array ; inline 
+M: binary-data >uniform-float-array ; inline
 
 M: object >uniform-bvec-array '[ _ head-slice [ >c-bool ] int-array{ } map-as ] map concat ; inline
 M: binary-data >uniform-bvec-array drop ; inline
@@ -315,7 +315,7 @@ M:: object >uniform-matrix ( sequence cols rows -- c-array )
      [ rows head-slice c:float >c-array ] { } map-as concat ; inline
 M: binary-data >uniform-matrix 2drop ; inline
 
-M: object >uniform-matrix-array 
+M: object >uniform-matrix-array
      '[ _ _ >uniform-matrix ] map concat ; inline
 M: binary-data >uniform-matrix-array 2drop ; inline
 
@@ -539,7 +539,7 @@ PRIVATE>
 SYNTAX: UNIFORM-TUPLE:
     parse-uniform-tuple-definition define-uniform-tuple ;
 
-<PRIVATE 
+<PRIVATE
 
 : bind-unnamed-output-attachments ( framebuffer attachments -- )
     [ gl-attachment ] with map
@@ -586,7 +586,7 @@ TUPLE: render-set
     { primitive-mode primitive-mode read-only }
     { vertex-array vertex-array initial: T{ vertex-array-collection } read-only }
     { uniforms uniform-tuple read-only }
-    { indexes vertex-indexes initial: T{ index-range } read-only } 
+    { indexes vertex-indexes initial: T{ index-range } read-only }
     { instances maybe{ integer } initial: f read-only }
     { framebuffer maybe{ any-framebuffer } initial: system-framebuffer read-only }
     { output-attachments sequence initial: { default-attachment } read-only }
@@ -612,7 +612,7 @@ TUPLE: render-set
             bind-uniforms
         ]
         [
-            framebuffer>> 
+            framebuffer>>
             [ GL_DRAW_FRAMEBUFFER swap framebuffer-handle glBindFramebuffer ]
             [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer GL_RASTERIZER_DISCARD glEnable ] if*
         ]
@@ -639,4 +639,3 @@ TUPLE: render-set
         [ transform-feedback-output>> [ glEndTransformFeedback ] when ]
         [ framebuffer>> [ GL_RASTERIZER_DISCARD glDisable ] unless ]
     } cleave ; inline
-

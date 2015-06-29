@@ -513,7 +513,7 @@ TYPED:: virtual-address-section ( elf: Elf32/64_Ehdr address -- section-header/f
     ] find nip ;
 
 TYPED:: elf-segment-data ( elf: Elf32/64_Ehdr header: Elf32/64_Phdr -- uchar-array/f )
-    header p_offset>> elf >c-ptr <displaced-alien> 
+    header p_offset>> elf >c-ptr <displaced-alien>
     header p_filesz>> uchar <c-direct-array> ;
 
 TYPED:: elf-section-data ( elf: Elf32/64_Ehdr header: Elf32/64_Shdr -- uchar-array/f )

@@ -89,7 +89,7 @@ IN: validators
 
 : v-mode ( str -- str )
     dup mode-names member? [
-        "not a valid syntax mode" throw 
+        "not a valid syntax mode" throw
     ] unless ;
 
 : luhn? ( str -- ? )

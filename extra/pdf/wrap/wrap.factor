@@ -41,4 +41,3 @@ PRIVATE>
 
 : visual-wrap ( line font line-width -- lines )
     [ string>elements ] dip dup wrap [ concat ] map ;
-

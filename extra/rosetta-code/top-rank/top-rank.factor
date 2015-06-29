@@ -29,7 +29,7 @@ IN: rosetta-code.top-rank
 ! Timothy Grove,E16398,29900,D190
 
 TUPLE: employee name id salary department ;
- 
+
 CONSTANT: employees {
         T{ employee f "Tyler Bennett" "E10297" 32000 "D101" }
         T{ employee f "John Rappl" "E21437" 47000 "D050" }

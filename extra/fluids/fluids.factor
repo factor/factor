@@ -29,7 +29,7 @@ CONSTANT: initial-particles
 particle_t-array{
     S{ particle_t f float-array{ 0.5 0.6 } float-array{ 0 0.1 } 1.0 }
     S{ particle_t f float-array{ 0.5 0.6 } float-array{ 0.1 0 } 3.0 }
-    
+
     S{ particle_t f float-array{ 0.5 0.5 } float-array{ 0.1 0.1 } 2.0 }
     S{ particle_t f float-array{ 0.5 0.6 } float-array{ -0.1 0 } 1.0 }
     S{ particle_t f float-array{ 0.6 0.5 } float-array{ 0 -0.1 } 3.0 }
@@ -92,8 +92,8 @@ M:: fluids-world draw-world* ( world -- )
     world particles>> [
         [ p>> [ first , ] [ second , ] bi ] each
     ] curry float-array{ } make :> verts
-    
-    [ 
+
+    [
         verts world texture>> 30.0 world dim>> { 4 4 } v/
         blended-point-sprite-batch &dispose
         blend-state new set-gpu-state

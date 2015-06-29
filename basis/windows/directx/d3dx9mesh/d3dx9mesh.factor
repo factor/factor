@@ -558,7 +558,7 @@ FUNCTION: HRESULT
         DWORD                NumBones,
         D3DXBONECOMBINATION* pBoneCombinationTable,
         LPD3DXSKININFO*      ppSkinInfo ) ;
-        
+
 FUNCTION: HRESULT
     D3DXTessellateNPatches (
         LPD3DXMESH    pMeshIn,
@@ -761,8 +761,8 @@ FUNCTION: HRESULT D3DXComputeTangent (
     DWORD      Wrap,
     DWORD*     pAdjacency ) ;
 
-C-TYPE: D3DXUVATLASCB 
-TYPEDEF: D3DXUVATLASCB* LPD3DXUVATLASCB 
+C-TYPE: D3DXUVATLASCB
+TYPEDEF: D3DXUVATLASCB* LPD3DXUVATLASCB
 
 FUNCTION: HRESULT D3DXUVAtlasCreate (
     LPD3DXMESH      pMesh,
@@ -816,7 +816,7 @@ FUNCTION: HRESULT D3DXUVAtlasPack (
     LPVOID          pUserContext,
     DWORD           dwOptions,
     LPD3DXBUFFER    pFacePartitioning ) ;
-    
+
 TYPEDEF: void* LPD3DXIMTSIGNALCALLBACK
 
 FUNCTION: HRESULT D3DXComputeIMTFromPerVertexSignal (
@@ -1128,7 +1128,7 @@ ALIAS: D3DXSavePRTBufferToFile D3DXSavePRTBufferToFileW
 
 C-TYPE: D3DXPRTCOMPBUFFER
 TYPEDEF: D3DXPRTCOMPBUFFER* LPD3DXPRTCOMPBUFFER
-    
+
 FUNCTION: HRESULT
     D3DXLoadPRTCompBufferFromFileA (
         LPCSTR                     pFilename,
@@ -1217,4 +1217,3 @@ FUNCTION: HRESULT
         UINT*                          pVertDataLength,
         UINT*                          pSCClusterList,
         D3DXSHPRTSPLITMESHCLUSTERDATA* pSCData ) ;
-

@@ -33,7 +33,7 @@ TUPLE: srt-chunk id begin-time end-time rect text ;
                 first4 swapd [ 2array ] 2dip 2array 2array
             ] if-empty
         ] bi*
-    ] 
+    ]
     [ 2 tail "\n" join ] tri srt-chunk boa ;
 
 : parse-srt-lines ( seq -- seq' )

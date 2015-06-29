@@ -567,7 +567,7 @@ SYNTAX: [EBNF
     suffix! \ call suffix! reset-tokenizer ;
 
 SYNTAX: EBNF:
-    reset-tokenizer scan-new-word dup ";EBNF" parse-multiline-string 
+    reset-tokenizer scan-new-word dup ";EBNF" parse-multiline-string
     ebnf>quot swapd
     ( input -- ast ) define-declared "ebnf-parser" set-word-prop
     reset-tokenizer ;

@@ -7,7 +7,7 @@ IN: wordtimer
 SYMBOL: *wordtimes*
 SYMBOL: *calling*
 
-: reset-word-timer ( -- ) 
+: reset-word-timer ( -- )
     H{ } clone *wordtimes* set-global
     H{ } clone *calling* set-global ;
 
@@ -38,7 +38,7 @@ SYMBOL: *calling*
     [ timed-call ] [ drop call ] if ; inline
 
 : (add-timer) ( word quot -- quot' )
-    [ swap time-unless-recursing ] 2curry ; 
+    [ swap time-unless-recursing ] 2curry ;
 
 : add-timer ( word -- )
     dup '[ [ _ ] dip (add-timer) ] annotate ;
@@ -59,7 +59,7 @@ SYMBOL: *calling*
     swap [ * - ] keep 2array ;
 
 : (correct-for-timing-overhead) ( timingshash -- timingshash )
-    time-dummy-word [ subtract-overhead ] curry assoc-map ;  
+    time-dummy-word [ subtract-overhead ] curry assoc-map ;
 
 : correct-for-timing-overhead ( -- )
     *wordtimes* [ (correct-for-timing-overhead) ] change-global ;
@@ -68,7 +68,7 @@ SYMBOL: *calling*
     *wordtimes* get-global [ swap suffix ] { } assoc>map natural-sort reverse pprint ;
 
 : wordtimer-call ( quot -- )
-    reset-word-timer 
+    reset-word-timer
     benchmark [
         correct-for-timing-overhead
         "total time:" write

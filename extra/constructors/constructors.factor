@@ -17,7 +17,7 @@ MACRO:: slots>boa ( slots class -- quot )
     slots length
     default-params length
     '[
-        _ narray slot-assoc swap zip 
+        _ narray slot-assoc swap zip
         default-params swap assoc-union values _ firstn class boa
     ] ;
 
@@ -62,4 +62,3 @@ SYNTAX: CONSTRUCTOR:
 SYNTAX: SLOT-CONSTRUCTOR:
     scan-new-word [ name>> "(" append create-reset ] keep
     '[ scan-rest-input-effect in>> _ '[ _ _ slots>boa ] append! ] define-syntax ;
-

@@ -19,4 +19,3 @@ LIBRARY: gstreamer.controller
 >>
 
 GIR: GstController-0.10.gir
-

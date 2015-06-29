@@ -2030,4 +2030,3 @@ CONSTANT: SCWMI_CLOBBER_SECURITY  0x00000001
 FUNCTION: BOOL SetupConfigureWmiFromInfSectionA ( HINF InfHandle, PCSTR SectionName, DWORD Flags ) ;
 FUNCTION: BOOL SetupConfigureWmiFromInfSectionW ( HINF InfHandle, PCWSTR SectionName, DWORD Flags ) ;
 ALIAS: SetupConfigureWmiFromInfSection SetupConfigureWmiFromInfSectionW
-

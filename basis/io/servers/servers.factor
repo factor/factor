@@ -244,7 +244,7 @@ PRIVATE>
 
 : insecure-addr ( -- addrspec )
     server-addrs [ secure? ] reject random ;
-    
+
 : server. ( threaded-server -- )
     [ [ "=== " write name>> ] [ ] bi write-object nl ]
     [ servers>> [ addr>> present print ] each ] bi ;
@@ -254,7 +254,7 @@ PRIVATE>
 
 : get-servers-named ( string -- sequence )
     [ all-servers ] dip '[ name>> _ = ] filter ;
-    
+
 : servers. ( -- )
     all-servers [ server. ] each ;
 

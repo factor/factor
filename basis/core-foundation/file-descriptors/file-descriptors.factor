@@ -19,7 +19,7 @@ FUNCTION: CFFileDescriptorRef CFFileDescriptorCreate (
     CFAllocatorRef allocator,
     CFFileDescriptorNativeDescriptor fd,
     Boolean closeOnInvalidate,
-    CFFileDescriptorCallBack callout, 
+    CFFileDescriptorCallBack callout,
     CFFileDescriptorContext* context
 ) ;
 

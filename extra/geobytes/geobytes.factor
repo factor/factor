@@ -47,7 +47,7 @@ MEMO: load-countries ( -- seq )
                 [ ]
                 [ ]
             } spread country boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;
 
 MEMO: load-regions ( -- seq )
@@ -60,7 +60,7 @@ MEMO: load-regions ( -- seq )
                 [ ]
                 [ [ blank? ] trim ]
             } spread region boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;
 
 MEMO: load-cities ( -- seq )
@@ -76,7 +76,7 @@ MEMO: load-cities ( -- seq )
                 [ ]
                 [ string>number ]
             } spread city boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;
 
 MEMO: load-version ( -- seq )
@@ -87,5 +87,5 @@ MEMO: load-version ( -- seq )
                 [ ]
                 [ string>number ]
             } spread version boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;

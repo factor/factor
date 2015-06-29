@@ -18,7 +18,7 @@ CONSTANT: default-height 20
 : <tetris> ( width height -- tetris )
     dupd <board> swap <piece-llist>
     tetris new swap >>pieces swap >>board ;
-        
+
 : <default-tetris> ( -- tetris ) default-width default-height <tetris> ;
 
 : <new-tetris> ( old -- new )

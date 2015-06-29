@@ -79,4 +79,3 @@ T{ error-type-holder
     { quot [ user-init-errors get-global values ] }
     { forget-quot [ user-init-errors get-global delete-at ] }
 } define-error-type
-

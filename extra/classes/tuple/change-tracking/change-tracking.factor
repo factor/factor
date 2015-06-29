@@ -20,4 +20,3 @@ M: change-tracking-tuple-class writer-quot ( class slot-spec -- quot )
     [ name>> "changed?" = [ '[ _ [ t >>changed? drop ] bi ] ] unless ] bi ;
 
 PRIVATE>
-

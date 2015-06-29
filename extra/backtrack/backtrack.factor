@@ -51,7 +51,7 @@ MACRO: unsafe-amb ( seq -- quot )
         unclip swap '[ _ [ drop _ unsafe-amb ] checkpoint ]
     ] if ;
 
-PRIVATE> 
+PRIVATE>
 
 : amb-lazy ( seq -- elt )
     [ amb-integer ] [ nth ] bi ;

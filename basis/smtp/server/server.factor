@@ -54,7 +54,7 @@ SYMBOL: data-mode
         {
             [ dup "DATA" = ]
             [
-                data-mode on 
+                data-mode on
                 "354 Enter message, ending with \".\" on a line by itself\r\n"
                 write flush t
             ]

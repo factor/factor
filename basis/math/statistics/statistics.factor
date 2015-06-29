@@ -133,7 +133,7 @@ PRIVATE>
         } case
     ] each ;
 
-: lower-median-index ( seq -- n )    
+: lower-median-index ( seq -- n )
     [ midpoint@ ]
     [ length odd? [ 1 - ] unless ] bi ;
 

@@ -24,4 +24,3 @@ IN: tools.cat
     command-line get [ cat-lines ] [ cat-files ] if-empty ;
 
 MAIN: run-cat
-

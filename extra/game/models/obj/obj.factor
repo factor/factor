@@ -158,4 +158,3 @@ M: obj-models stream>models
         [ line>obj ] each-stream-line push-current-model
         models get
     ] with-variables ;
-

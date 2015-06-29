@@ -55,7 +55,7 @@ MATCH-VARS: ?a ?b ?c ;
 TUPLE: shuffle-node { effect effect } ;
 
 M: shuffle-node pprint* effect>> effect>string text ;
- 
+
 : (shuffle-effect) ( in out #shuffle -- effect )
     mapping>> '[ _ at ] map [ >array ] bi@ <effect> ;
 
@@ -214,7 +214,7 @@ SYMBOL: node-count
         compute-def-use
         remove-dead-code
         compute-def-use
-        optimize-modular-arithmetic 
+        optimize-modular-arithmetic
     ] with-scope ;
 
 : inlined? ( quot seq/word -- ? )

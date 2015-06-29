@@ -31,4 +31,3 @@ DESTRUCTOR: clean-up-context
 
 : with-cuda-context ( device flags quot -- )
     [ set-up-cuda-context create-context ] dip (with-cuda-context) ; inline
-

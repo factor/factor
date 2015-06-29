@@ -138,4 +138,3 @@ CONSTANT: XI_RawMotion             17
 : XI_RawButtonPressMask   ( -- n ) XI_RawButtonPress   2^ ; inline
 : XI_RawButtonReleaseMask ( -- n ) XI_RawButtonRelease 2^ ; inline
 : XI_RawMotionMask        ( -- n ) XI_RawMotion        2^ ; inline
-

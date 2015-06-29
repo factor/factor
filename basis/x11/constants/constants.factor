@@ -59,7 +59,7 @@ CONSTANT: NotifyUngrab 2
 CONSTANT: NotifyWhileGrabbed 3
 
 CONSTANT: NotifyHint 1 ! for MotionNotify events
-                       
+
 ! Notify detail
 
 CONSTANT: NotifyAncestor 0

@@ -11,7 +11,7 @@ IN: suffix-arrays
 
 : prefix<=> ( begin seq -- <=> )
     [ <=> ] [ swap head? ] 2bi [ drop +eq+ ] when ;
- 
+
 : find-index ( begin suffix-array -- index/f )
     [ prefix<=> ] with search drop ;
 

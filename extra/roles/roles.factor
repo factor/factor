@@ -66,5 +66,3 @@ PREDICATE: role < mixin-class
 
 SYNTAX: ROLE: parse-role-definition define-role ;
 SYNTAX: TUPLE: parse-role-definition define-tuple-class-with-roles ;
-
-

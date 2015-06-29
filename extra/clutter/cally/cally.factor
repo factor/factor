@@ -2,4 +2,3 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: clutter.cally.ffi ;
 IN: clutter.cally
-

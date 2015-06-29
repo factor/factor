@@ -34,7 +34,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 :: decode-huffman-tables ( bitstream -- tables )
     5 bitstream bs:read 257 +
     5 bitstream bs:read 1 +
-    4 bitstream bs:read 4 + clen-shuffle swap head 
+    4 bitstream bs:read 4 + clen-shuffle swap head
 
     dup length [ 3 bitstream bs:read ] replicate
     get-table

@@ -25,7 +25,7 @@ CONSTANT: theta0 0.5
 : omega0 ( -- omega0 ) 2 pi * T0 / ;
 : theta ( -- theta ) current-time omega0 * cos theta0 * ;
 
-: relative-xy ( theta l -- xy ) 
+: relative-xy ( theta l -- xy )
     [ [ sin ] [ cos ] bi ]
     [ [ * ] curry ] bi* bi@ 2array ;
 : theta-to-xy ( origin theta l -- xy ) relative-xy v+ ;
@@ -36,7 +36,7 @@ TUPLE: pendulum-gadget < gadget alarm ;
 : window-l ( gadget -- l ) rect-bounds [ drop ] [ second ] bi* ;
 : gadget-xy ( gadget -- xy ) [ O ] [ drop theta ] [ window-l ] tri theta-to-xy ;
 
-M: pendulum-gadget draw-gadget* 
+M: pendulum-gadget draw-gadget*
     COLOR: black gl-color
     [ O ] [ gadget-xy ] bi gl-line ;
 
@@ -50,8 +50,8 @@ M: pendulum-gadget graft* ( gadget -- )
 M: pendulum-gadget ungraft*
     [ alarm>> stop-timer ] [ call-next-method ] bi ;
 
-: <pendulum-gadget> ( -- gadget ) 
-    pendulum-gadget new 
+: <pendulum-gadget> ( -- gadget )
+    pendulum-gadget new
     { 500 500 } >>pref-dim ;
 
 : pendulum-main ( -- )

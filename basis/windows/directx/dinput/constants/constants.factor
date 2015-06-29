@@ -851,4 +851,3 @@ MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     } [ [ rgodf>> free ] uninitialize ] each ;
 
 PRIVATE>
-

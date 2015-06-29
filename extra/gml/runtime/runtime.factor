@@ -199,7 +199,7 @@ SYNTAX: GML::
         scan-gml-name :> ( word name )
         word [ parse-definition ] parse-locals-definition :> ( word def effect )
         word name effect def define-gml-primitive
-    ] ; 
+    ] ;
 
 : <gml> ( -- gml )
     gml new

@@ -198,7 +198,7 @@ M:: streaming-audio-clip (update-audio-clip) ( audio-clip -- )
 
 : update-audio-clip ( audio-clip -- )
     [ update-source ] [
-        dup al-source>> AL_SOURCE_STATE get-source-param AL_STOPPED = 
+        dup al-source>> AL_SOURCE_STATE get-source-param AL_STOPPED =
         [ dispose ] [ (update-audio-clip) ] if
     ] bi ;
 
@@ -319,7 +319,7 @@ M: streaming-audio-clip dispose*
 : play-static-audio-clip ( audio-engine source audio loop? -- audio-clip/f )
     <static-audio-clip> dup [ play-clip ] when* ;
 
-: play-streaming-audio-clip ( audio-engine source generator buffer-count -- audio-clip/f ) 
+: play-streaming-audio-clip ( audio-engine source generator buffer-count -- audio-clip/f )
     <streaming-audio-clip> dup [ play-clip ] when* ;
 
 : pause-clip ( audio-clip -- )
@@ -341,4 +341,3 @@ M: streaming-audio-clip dispose*
         [ update-listener ]
         [ clips>> clone [ update-audio-clip ] each ]
     } cleave ;
-

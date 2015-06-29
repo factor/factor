@@ -76,7 +76,7 @@ MEMO: output-index ( program-instance output-name -- index )
     [ handle>> ] dip glGetFragDataLocation ;
 
 : vertex-format-attributes ( vertex-format -- attributes )
-    "vertex-format-attributes" word-prop ; inline    
+    "vertex-format-attributes" word-prop ; inline
 
 <PRIVATE
 
@@ -97,7 +97,7 @@ TR: hyphens>underscores "-" "_" ;
         { uint-integer-components   [ GL_UNSIGNED_INT   ] }
     } case ;
 
-: vertex-type-size ( component-type -- size ) 
+: vertex-type-size ( component-type -- size )
     {
         { ubyte-components          [ 1 ] }
         { ushort-components         [ 2 ] }
@@ -136,7 +136,7 @@ TR: hyphens>underscores "-" "_" ;
 
 :: assert-feedback-attribute ( size gl-type name vertex-attribute -- )
     {
-        [ vertex-attribute name>> name = ] 
+        [ vertex-attribute name>> name = ]
         [ size 1 = ]
         [ gl-type vertex-attribute [ component-type>> ] [ dim>> ] bi feedback-type= ]
     } 0&& [ vertex-attribute inaccurate-feedback-attribute-error ] unless ;
@@ -178,7 +178,7 @@ TR: hyphens>underscores "-" "_" ;
     stride 0 vertex-attributes [ [bind-vertex-attribute] ] { } map-as 2nip :> attributes-cleave
     { attributes-cleave 2cleave } >quotation :> with-block
 
-    { drop vertex-buffer with-block with-buffer-ptr } >quotation ; 
+    { drop vertex-buffer with-block with-buffer-ptr } >quotation ;
 
 :: [link-feedback-format] ( vertex-attributes -- quot )
     vertex-attributes [ name>> not ] any?
@@ -199,7 +199,7 @@ TR: hyphens>underscores "-" "_" ;
         [ f 0 int <ref> 0 int <ref> ] dip <byte-array>
         [ glGetTransformFeedbackVarying ] 3keep
         ascii alien>string
-        vertex-attribute assert-feedback-attribute    
+        vertex-attribute assert-feedback-attribute
     } >quotation ;
 
 :: [verify-feedback-format] ( vertex-attributes -- quot )
@@ -240,7 +240,7 @@ M: f link-feedback-format
 
 : link-vertex-formats ( program-handle formats -- )
     [ vertex-format-attributes [ name>> ] map sift ] map concat
-    swap '[ [ _ ] 2dip swap glBindAttribLocation ] each-index ; 
+    swap '[ [ _ ] 2dip swap glBindAttribLocation ] each-index ;
 
 GENERIC: link-geometry-shader-parameter ( program-handle parameter -- )
 
@@ -431,7 +431,7 @@ M: vertex-array-collection bind-vertex-array
     has-vertex-array-objects? get
     [ <multi-vertex-array-object> ]
     [ <multi-vertex-array-collection> ] if ; inline
-    
+
 : <vertex-array*> ( vertex-buffer program-instance format -- vertex-array )
     has-vertex-array-objects? get
     [ <vertex-array-object> ]
@@ -603,7 +603,7 @@ SYNTAX: GLSL-SHADER-FILE:
         scan-word execute( -- kind )
         scan-object in-word's-path
         0
-        over ascii file-contents 
+        over ascii file-contents
     ] dip
     shader boa
     over reset-generic

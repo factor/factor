@@ -40,9 +40,9 @@ PRIVATE>
     { 12 0 6 13 1 7 14 2 8 15 3 9 5 4 10 } final nths 3 group
     [ first3 [ 16 shift ] [ 8 shift ] bi* + + 4 to64 ] map concat
     11 final nth 2 to64 3append ;
-        
+
 : parse-shadow-password ( string -- magic salt password )
     "$" split harvest first3 [ "$" dup surround ] 2dip ;
-    
+
 : authenticate-password ( shadow password -- ? )
     '[ parse-shadow-password drop _ passwd-md5 ] keep = ;

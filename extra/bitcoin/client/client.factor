@@ -48,7 +48,7 @@ IN: bitcoin.client
       bitcoin-server >>host
       bitcoin-port >>port ;
 
-:: payload ( method params -- data ) 
+:: payload ( method params -- data )
     "text/plain" <post-data>
         binary >>content-encoding
         H{
@@ -58,10 +58,10 @@ IN: bitcoin.client
 
 : basic-auth ( -- string )
     bitcoin-user bitcoin-password ":" glue >base64 >string
-    "Basic " prepend ; 
+    "Basic " prepend ;
 
 : bitcoin-request ( method params -- request )
-    payload bitcoin-url <post-request> 
+    payload bitcoin-url <post-request>
     basic-auth "Authorization" set-header
     dup post-data>> data>> length "Content-Length" set-header
     http-request nip >string json> "result" of ;
@@ -137,4 +137,3 @@ PRIVATE>
 #! requires patched bitcoind
 :: list-transactions ( count include-generated -- seq )
     "listtransactions" { count include-generated } bitcoin-request ;
-

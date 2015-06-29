@@ -28,7 +28,7 @@ M: data-map-param nth-unsafe
         [ iter-length>> * >fixnum ]
         [ bytes>> ]
         [ count>> ]
-        [ c-type>> ] 
+        [ c-type>> ]
     } cleave <displaced-direct-array> ; inline
 
 INSTANCE: data-map-param immutable-sequence
@@ -55,7 +55,7 @@ INSTANCE: data-map-param immutable-sequence
 
 : [>param] ( type -- quot )
     c-type-count over c-type-name?
-    [ [>c-type-param] ] [ [>object-param] ] if ; 
+    [ [>c-type-param] ] [ [>object-param] ] if ;
 
 MACRO: >param ( in -- quot: ( array -- param ) )
     [>param] ;
@@ -75,7 +75,7 @@ MACRO: >param ( in -- quot: ( array -- param ) )
 
 : [alloc-param] ( type -- quot )
     c-type-count over c-type-name?
-    [ [alloc-c-type-param] ] [ [alloc-object-param] ] if ; 
+    [ [alloc-c-type-param] ] [ [alloc-object-param] ] if ;
 
 MACRO: alloc-param ( out -- quot: ( len -- param ) )
     [alloc-param] ;
@@ -128,4 +128,3 @@ SYNTAX: data-map(
 
 SYNTAX: data-map!(
     parse-data-map-effect \ data-map! suffix! ;
-

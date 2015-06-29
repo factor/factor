@@ -376,13 +376,13 @@ D3DXFrameRegisterNamedMatrices
     LPD3DXFRAME               pFrameRoot,
     LPD3DXANIMATIONCONTROLLER pAnimController
     ) ;
-        
+
 FUNCTION: UINT
 D3DXFrameNumNamedMatrices
     (
     D3DXFRAME* pFrameRoot
     ) ;
-        
+
 FUNCTION: HRESULT
 D3DXFrameCalculateBoundingSphere
     (

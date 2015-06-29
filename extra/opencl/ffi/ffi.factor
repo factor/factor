@@ -542,8 +542,8 @@ CONSTANT: CL_INVALID_D3D9_RESOURCE_NV           -1011
 CONSTANT: CL_D3D9_RESOURCE_ALREADY_ACQUIRED_NV  -1012
 CONSTANT: CL_D3D9_RESOURCE_NOT_ACQUIRED_NV      -1013
 
-TYPEDEF: void* cl_d3d9_device_source_nv 
-TYPEDEF: void* cl_d3d9_device_set_nv 
+TYPEDEF: void* cl_d3d9_device_source_nv
+TYPEDEF: void* cl_d3d9_device_set_nv
 
 FUNCTION: cl_int clGetDeviceIDsFromD3D9NV ( cl_platform_id platform, cl_d3d9_device_source_nv d3d_device_source, void* d3d_object, cl_d3d9_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices ) ;
 FUNCTION: cl_mem clCreateFromD3D9VertexBufferNV ( cl_context context, cl_mem_flags flags, void* id3dvb9_resource, cl_int* errcode_ret ) ;
@@ -570,8 +570,8 @@ CONSTANT: CL_INVALID_D3D10_RESOURCE_NV           -1003
 CONSTANT: CL_D3D10_RESOURCE_ALREADY_ACQUIRED_NV  -1004
 CONSTANT: CL_D3D10_RESOURCE_NOT_ACQUIRED_NV      -1005
 
-TYPEDEF: void* cl_d3d10_device_source_nv 
-TYPEDEF: void* cl_d3d10_device_set_nv 
+TYPEDEF: void* cl_d3d10_device_source_nv
+TYPEDEF: void* cl_d3d10_device_set_nv
 
 FUNCTION: cl_int clGetDeviceIDsFromD3D10NV ( cl_platform_id platform, cl_d3d10_device_source_nv d3d_device_source, void* d3d_object, cl_d3d10_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices ) ;
 FUNCTION: cl_mem clCreateFromD3D10BufferNV ( cl_context context, cl_mem_flags flags, void* id3d10buffer_resource, cl_int* errcode_ret ) ;
@@ -595,8 +595,8 @@ CONSTANT: CL_INVALID_D3D11_RESOURCE_NV           -1007
 CONSTANT: CL_D3D11_RESOURCE_ALREADY_ACQUIRED_NV  -1008
 CONSTANT: CL_D3D11_RESOURCE_NOT_ACQUIRED_NV      -1009
 
-TYPEDEF: void* cl_d3d11_device_source_nv 
-TYPEDEF: void* cl_d3d11_device_set_nv 
+TYPEDEF: void* cl_d3d11_device_source_nv
+TYPEDEF: void* cl_d3d11_device_set_nv
 
 FUNCTION: cl_int clGetDeviceIDsFromD3D11NV ( cl_platform_id platform, cl_d3d11_device_source_nv d3d_device_source, void* d3d_object, cl_d3d11_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices ) ;
 FUNCTION: cl_mem clCreateFromD3D11BufferNV ( cl_context context, cl_mem_flags flags, void* id3d11buffer_resource, cl_int* errcode_ret ) ;

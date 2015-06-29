@@ -81,4 +81,3 @@ ERROR: not-a-string-number string ;
 
 ! : path>next-vnode-version-name ( path -- path' )
     ! [ file-name ] 
-

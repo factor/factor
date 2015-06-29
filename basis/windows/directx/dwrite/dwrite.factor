@@ -495,7 +495,7 @@ STRUCT: DWRITE_LINE_METRICS
     { isTrimmed                BOOL   } ;
 
 STRUCT: DWRITE_CLUSTER_METRICS
-    { width  FLOAT  } 
+    { width  FLOAT  }
     { length USHORT }
     { data   USHORT } ;
 

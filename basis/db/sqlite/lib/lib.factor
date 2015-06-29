@@ -121,7 +121,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     over [
         NULL = [ 2drop NULL NULL ] when
     ] [
-        drop NULL 
+        drop NULL
     ] if* (sqlite-bind-type) ;
 
 : sqlite-finalize ( handle -- ) sqlite3_finalize sqlite-check-result ;

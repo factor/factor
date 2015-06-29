@@ -77,7 +77,7 @@ M: closer process
 
 : no-post-tags ( post -- post/* )
     ! this does *not* affect the contents of the stack
-    dup [ tag? ] any? [ multitags ] when ; 
+    dup [ tag? ] any? [ multitags ] when ;
 
 : assure-tags ( seq -- seq )
     ! this does *not* affect the contents of the stack

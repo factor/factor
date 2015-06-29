@@ -1,4 +1,4 @@
-USING: 
+USING:
     accessors
     combinators
     cpu.8080
@@ -6,7 +6,7 @@ USING:
     io
     io.files
     io.encodings.ascii
-    kernel 
+    kernel
     math
     math.bits
     sequences
@@ -19,8 +19,8 @@ IN: cpu.8080.test
   [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions nth call( cpu -- ) ] keep
-  [ pc>> 0xFFFF bitand ] keep 
-  [ pc<< ] keep 
+  [ pc>> 0xFFFF bitand ] keep
+  [ pc<< ] keep
   process-interrupts ;
 
 : test-step ( cpu -- cpu )

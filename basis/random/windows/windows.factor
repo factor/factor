@@ -42,7 +42,7 @@ ERROR: acquire-crypto-context-failed provider type error ;
         swap >>provider
         initialize-crypto-context ; inline
 
-M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )    
+M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
     handle>> swap [ ] [ <byte-array> ] bi
     [ CryptGenRandom win32-error=0/f ] keep ;
 

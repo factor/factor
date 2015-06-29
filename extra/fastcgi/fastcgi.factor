@@ -84,7 +84,7 @@ ENUM: fcgi-protocol-status
             t
         ] [ 2drop f ] if
     ] loop ;
-    
+
 : delete-if-exists ( file -- )
     dup exists? [ delete-file ] [ drop ] if ;
 
@@ -189,9 +189,9 @@ ENUM: fcgi-protocol-status
     [ . ] debug-print ;
 
 : fcgi-handler ( -- )
-    make-new-request parse-packets 
+    make-new-request parse-packets
     prepare-request
-    "/path" main-responder get call-responder* 
+    "/path" main-responder get call-responder*
     [ content-type>> "\n\n" append ] [ body>> ] bi append write-response ;
 
 : <fastcgi-server> ( addr -- server )
@@ -202,7 +202,7 @@ ENUM: fcgi-protocol-status
       [ fcgi-handler ] >>handler ;
 
 : test-output ( -- str )
-    "<pre>" 
+    "<pre>"
     request tget header>> [ "%s => %s\n" sprintf ] { }
     assoc>map concat append
     "</pre>" append ;

@@ -18,4 +18,3 @@ M: etexteditor editor-command ( file line -- command )
         etexteditor-path ,
         [ , ] [ "--line" , number>string , ] bi*
     ] { } make ;
-

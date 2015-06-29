@@ -24,16 +24,16 @@ FUNCTION: udev* udev_new ( ) ;
 
 
 
-CALLBACK: void udev_set_log_fn_callback ( 
-    udev* udev 
-    int priority, 
-    c-string file, 
-    int line, 
-    c-string fn, 
+CALLBACK: void udev_set_log_fn_callback (
+    udev* udev
+    int priority,
+    c-string file,
+    int line,
+    c-string fn,
     c-string format ) ;
     ! va_list args ) ;
 FUNCTION: void udev_set_log_fn (
-    udev* udev, 
+    udev* udev,
     udev_set_log_fn_callback log_fn ) ;
 
 
@@ -44,7 +44,7 @@ FUNCTION: int udev_get_log_priority (
 
 
 FUNCTION: void udev_set_log_priority (
-    udev* udev, 
+    udev* udev,
     int priority ) ;
 
 
@@ -65,7 +65,7 @@ FUNCTION: void* udev_get_userdata (
 
 
 FUNCTION: void udev_set_userdata (
-    udev* udev, 
+    udev* udev,
     void* userdata ) ;
 
 
@@ -78,7 +78,7 @@ FUNCTION: udev_list_entry* udev_list_entry_get_next (
 
 
 FUNCTION: udev_list_entry* udev_list_entry_get_by_name (
-    udev_list_entry* list_entry, 
+    udev_list_entry* list_entry,
     c-string name ) ;
 
 
@@ -122,21 +122,21 @@ FUNCTION: udev* udev_device_get_udev (
 
 
 FUNCTION: udev_device* udev_device_new_from_syspath (
-    udev* udev, 
+    udev* udev,
     c-string syspath ) ;
 
 
 
 FUNCTION: udev_device* udev_device_new_from_devnum (
-    udev* udev, 
-    char type, 
+    udev* udev,
+    char type,
     dev_t devnum ) ;
 
 
 
 FUNCTION: udev_device* udev_device_new_from_subsystem_sysname (
-    udev* udev, 
-    c-string subsystem, 
+    udev* udev,
+    c-string subsystem,
     c-string sysname ) ;
 
 
@@ -147,8 +147,8 @@ FUNCTION: udev_device* udev_device_get_parent (
 
 
 FUNCTION: udev_device* udev_device_get_parent_with_subsystem_devtype (
-    udev_device* udev_device, 
-    c-string subsystem, 
+    udev_device* udev_device,
+    c-string subsystem,
     c-string devtype ) ;
 
 
@@ -199,7 +199,7 @@ FUNCTION: udev_list_entry* udev_device_get_properties_list_entry (
 
 
 FUNCTION: c-string udev_device_get_property_value (
-    udev_device* udev_device, 
+    udev_device* udev_device,
     c-string key ) ;
 
 
@@ -225,7 +225,7 @@ FUNCTION: ulonglong udev_device_get_seqnum (
 
 
 FUNCTION: c-string udev_device_get_sysattr_value (
-    udev_device* udev_device, 
+    udev_device* udev_device,
     c-string sysattr ) ;
 
 
@@ -248,13 +248,13 @@ FUNCTION: udev* udev_monitor_get_udev (
 
 
 FUNCTION: udev_monitor* udev_monitor_new_from_netlink (
-    udev* udev, 
+    udev* udev,
     c-string name ) ;
 
 
 
 FUNCTION: udev_monitor* udev_monitor_new_from_socket (
-    udev* udev, 
+    udev* udev,
     c-string socket_path ) ;
 
 
@@ -265,7 +265,7 @@ FUNCTION: int udev_monitor_enable_receiving (
 
 
 FUNCTION: int udev_monitor_set_receive_buffer_size (
-    udev_monitor* udev_monitor, 
+    udev_monitor* udev_monitor,
     int size ) ;
 
 
@@ -281,8 +281,8 @@ FUNCTION: udev_device* udev_monitor_receive_device (
 
 
 FUNCTION: int udev_monitor_filter_add_match_subsystem_devtype (
-    udev_monitor* udev_monitor, 
-    c-string subsystem, 
+    udev_monitor* udev_monitor,
+    c-string subsystem,
     c-string devtype ) ;
 
 
@@ -320,46 +320,46 @@ FUNCTION: udev_enumerate* udev_enumerate_new (
 
 
 FUNCTION: int udev_enumerate_add_match_subsystem (
-    udev_enumerate* udev_enumerate, 
+    udev_enumerate* udev_enumerate,
     c-string subsystem ) ;
 
 
 
 FUNCTION: int udev_enumerate_add_nomatch_subsystem (
-    udev_enumerate* udev_enumerate, 
+    udev_enumerate* udev_enumerate,
     c-string subsystem ) ;
 
 
 
 FUNCTION: int udev_enumerate_add_match_sysattr (
-    udev_enumerate* udev_enumerate, 
-    c-string sysattr, 
+    udev_enumerate* udev_enumerate,
+    c-string sysattr,
     c-string value ) ;
 
 
 
 FUNCTION: int udev_enumerate_add_nomatch_sysattr (
-    udev_enumerate* udev_enumerate, 
-    c-string sysattr, 
+    udev_enumerate* udev_enumerate,
+    c-string sysattr,
     c-string value ) ;
 
 
 
 FUNCTION: int udev_enumerate_add_match_property (
-    udev_enumerate* udev_enumerate, 
-    c-string property, 
+    udev_enumerate* udev_enumerate,
+    c-string property,
     c-string value ) ;
 
 
 
 FUNCTION: int udev_enumerate_add_match_sysname (
-    udev_enumerate* udev_enumerate, 
+    udev_enumerate* udev_enumerate,
     c-string sysname ) ;
 
 
 
 FUNCTION: int udev_enumerate_add_syspath (
-    udev_enumerate* udev_enumerate, 
+    udev_enumerate* udev_enumerate,
     c-string syspath ) ;
 
 
@@ -422,14 +422,14 @@ FUNCTION: int udev_queue_get_queue_is_empty (
 
 
 FUNCTION: int udev_queue_get_seqnum_is_finished (
-    udev_queue* udev_queue, 
+    udev_queue* udev_queue,
     ulonglong seqnum ) ;
 
 
 
 FUNCTION: int udev_queue_get_seqnum_sequence_is_finished (
-    udev_queue* udev_queue, 
-    ulonglong start, 
+    udev_queue* udev_queue,
+    ulonglong start,
     ulonglong end ) ;
 
 
@@ -441,6 +441,3 @@ FUNCTION: udev_list_entry* udev_queue_get_queued_list_entry (
 
 FUNCTION: udev_list_entry* udev_queue_get_failed_list_entry (
     udev_queue* udev_queue ) ;
-
-
-

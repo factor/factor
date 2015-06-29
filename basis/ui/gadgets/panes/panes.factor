@@ -444,4 +444,3 @@ M: string content-gadget
     '[ _ write ] make-pane <scroller>
         { 450 100 } >>pref-dim
     <wrapper> ;
-

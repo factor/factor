@@ -66,7 +66,7 @@ M: object infer-known* drop f ;
 
 : output>array ( quot -- array )
     { } output>sequence ; inline
-    
+
 : cleave>array ( obj quots -- array )
     '[ _ cleave ] output>array ; inline
 

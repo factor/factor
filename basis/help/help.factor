@@ -56,7 +56,7 @@ M: word article-name name>> ;
 
 M: word article-title
     dup [ parsing-word? ] [ symbol? ] bi or [
-        name>> 
+        name>>
     ] [
         [ unparse ]
         [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi

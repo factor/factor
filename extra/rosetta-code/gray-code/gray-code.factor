@@ -43,7 +43,7 @@ IN: rosetta-code.gray-code
     ] while
     p ;
 
-: gray-code-main ( -- ) 
+: gray-code-main ( -- )
     -1 32 [a,b] [
         dup [ >bin ] [ gray-encode ] bi
         [ >bin ] [ gray-decode ] bi 4array .

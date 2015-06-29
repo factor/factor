@@ -40,7 +40,7 @@ todo "TODO"
             validate-integer-id
             "id" value <todo> select-tuple from-object
         ] >>init
-        
+
         { todo-list "view-todo" } >>template ;
 
 : validate-todo ( -- )

@@ -12,7 +12,7 @@ TUPLE: coroutine resumecc exitcc originalcc ;
     coroutine new
     dup current-coro associate
     [
-        swapd , , \ with-variables , 
+        swapd , , \ with-variables ,
         "Coroutine has terminated illegally." , \ throw ,
     ] [ ] make
     [ >>resumecc ] [ >>originalcc ] bi ;

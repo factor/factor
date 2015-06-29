@@ -79,5 +79,3 @@ M: unix send-to-trash ( path -- )
             now "%Y-%m-%dT%H:%M:%S" strftime write nl
         ] with-file-writer
     ] bi move-file ;
-
-
