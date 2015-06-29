@@ -3,12 +3,12 @@
 !
 USING: 
     alien
-    alien.c-types 
+    alien.c-types
     alien.libraries
-    alien.syntax 
+    alien.syntax
     classes.struct
-    combinators 
-    kernel 
+    combinators
+    kernel
     system
 ;
 IN: ogg
@@ -43,7 +43,7 @@ STRUCT: ogg-stream-state
     {  body_storage long }
     {  body_fill long }
     {  body_returned long }
-    {  lacing_vals int* } 
+    {  lacing_vals int* }
     {  granule_vals longlong* }
     {  lacing_storage long }
     {  lacing_fill long }
@@ -69,7 +69,7 @@ STRUCT: ogg-packet
 STRUCT: ogg-sync-state
     { data uchar* }
     { storage int }
-    { fill int }  
+    { fill int }
     { returned int }
     { unsynced int }
     { headerbytes int }
@@ -140,4 +140,3 @@ FUNCTION: int      ogg_page_serialno ( ogg-page* og ) ;
 FUNCTION: long     ogg_page_pageno ( ogg-page* og ) ;
 FUNCTION: int      ogg_page_packets ( ogg-page* og ) ;
 FUNCTION: void     ogg_packet_clear ( ogg-packet* op ) ;
-

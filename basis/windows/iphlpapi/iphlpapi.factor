@@ -58,7 +58,7 @@ STRUCT: IP_ADDR_STRING
     { IpAddress IP_ADDRESS_STRING }
     { IpMask IP_MASK_STRING }
     { Context DWORD } ;
-    
+
 TYPEDEF: IP_ADDR_STRING* PIP_ADDR_STRING
 
 STRUCT: FIXED_INFO
@@ -86,7 +86,7 @@ ENUM: IP_DAD_STATE
   IpDadStateDuplicate,
   IpDadStateDeprecated,
   IpDadStatePreferred ;
-  
+
 ENUM: IP_PREFIX_ORIGIN
     IpPrefixOriginOther,
     IpPrefixOriginManual,
@@ -94,7 +94,7 @@ ENUM: IP_PREFIX_ORIGIN
     IpPrefixOriginDhcp,
     IpPrefixOriginRouterAdvertisement,
     { IpPrefixOriginUnchanged 16 } ;
-    
+
 ENUM: IP_SUFFIX_ORIGIN
     IpSuffixOriginOther
     IpSuffixOriginManual,
@@ -103,7 +103,7 @@ ENUM: IP_SUFFIX_ORIGIN
     IpSuffixOriginLinkLayerAddress,
     IpSuffixOriginRandom,
     { IpSuffixOriginUnchanged 16 } ;
-    
+
 ENUM: IF_OPER_STATUS
     { IfOperStatusUp 1 }
     IfOperStatusDown,
@@ -118,34 +118,34 @@ ENUM: NET_IF_CONNECTION_TYPE
     NET_IF_CONNECTION_PASSIVE,
     NET_IF_CONNECTION_DEMAND,
     NET_IF_CONNECTION_MAXIMUM ;
-    
-    
+
+
 ENUM: TUNNEL_TYPE
     TUNNEL_TYPE_NONE,
     TUNNEL_TYPE_OTHER,
     TUNNEL_TYPE_DIRECT,
-    TUNNEL_TYPE_6TO4, 
+    TUNNEL_TYPE_6TO4,
     TUNNEL_TYPE_ISATAP,
     TUNNEL_TYPE_TEREDO,
     TUNNEL_TYPE_IPHTTPS ;
 
-  
-  
+
+
 STRUCT: SOCKET_ADDRESS
     { lpSockaddr LPSOCKADDR }
     { iSockaddrLength INT } ;
-    
+
 ERROR: unknown-sockaddr-length sockaddr length ;
-    
+
 : SOCKET_ADDRESS>sockaddr ( obj -- sockaddr )
     dup iSockaddrLength>> {
         { 16 [ lpSockaddr>> sockaddr-in memory>struct ] }
         { 28 [ lpSockaddr>> sockaddr-in6 memory>struct ] }
         [ unknown-sockaddr-length ]
     } case ;
-    
+
 TYPEDEF: SOCKET_ADDRESS* PSOCKET_ADDRESS
-    
+
 STRUCT: IP_ADAPTER_INFO
     { Next IP_ADAPTER_INFO* }
     { ComboIndex DWORD }
@@ -171,13 +171,13 @@ TYPEDEF: IP_ADAPTER_INFO* PIP_ADAPTER_INFO
 STRUCT: LengthIndex
     { Length ULONG }
     { IfIndex DWORD } ;
-    
+
 TYPEDEF: LengthIndex LengthFlags
 
 UNION-STRUCT: AlignmentLenIndex
     { Alignment ULONGLONG }
     { LenIndex LengthIndex } ;
-    
+
 UNION-STRUCT: AlignmentLenFlags
     { Alignment ULONGLONG }
     { LenFlags LengthFlags } ;
@@ -190,7 +190,7 @@ STRUCT: ResNetIf
 UNION-STRUCT: NET_LUID
     { Value ULONG64 }
     { Info ResNetIf } ;
-    
+
 TYPEDEF: NET_LUID* PNET_LUID
 TYPEDEF: NET_LUID IF_LUID
 
@@ -207,7 +207,7 @@ STRUCT: IP_ADAPTER_UNICAST_ADDRESS
     { PreferredLifetime ULONG }
     { LeaseLifeTime ULONG }
     { OnLinkPrefixLength UINT8 } ;
-    
+
 TYPEDEF: IP_ADAPTER_UNICAST_ADDRESS* PIP_ADAPTER_UNICAST_ADDRESS
 
 DEFER: IP_ADAPTER_ANYCAST_ADDRESS
@@ -215,7 +215,7 @@ STRUCT: IP_ADAPTER_ANYCAST_ADDRESS
     { Header AlignmentLenFlags }
     { Next IP_ADAPTER_ANYCAST_ADDRESS* }
     { Address SOCKET_ADDRESS } ;
-    
+
 TYPEDEF: IP_ADAPTER_ANYCAST_ADDRESS* PIP_ADAPTER_ANYCAST_ADDRESS
 
 
@@ -224,7 +224,7 @@ STRUCT: IP_ADAPTER_MULTICAST_ADDRESS
     { Header AlignmentLenFlags }
     { Next IP_ADAPTER_MULTICAST_ADDRESS* }
     { Address SOCKET_ADDRESS } ;
-   
+
 TYPEDEF: IP_ADAPTER_MULTICAST_ADDRESS* PIP_ADAPTER_MULTICAST_ADDRESS
 
 
@@ -233,7 +233,7 @@ STRUCT: IP_ADAPTER_DNS_SERVER_ADDRESS
     { Header AlignmentLenFlags }
     { Next IP_ADAPTER_DNS_SERVER_ADDRESS* }
     { Address SOCKET_ADDRESS } ;
-    
+
 TYPEDEF: IP_ADAPTER_DNS_SERVER_ADDRESS* PIP_ADAPTER_DNS_SERVER_ADDRESS
 
 
@@ -242,7 +242,7 @@ STRUCT: IP_ADAPTER_WINS_SERVER_ADDRESS
     { Header AlignmentLenFlags }
     { Next IP_ADAPTER_WINS_SERVER_ADDRESS* }
     { Address SOCKET_ADDRESS } ;
-    
+
 TYPEDEF: IP_ADAPTER_WINS_SERVER_ADDRESS* PIP_ADAPTER_WINS_SERVER_ADDRESS
 
 TYPEDEF: IP_ADAPTER_WINS_SERVER_ADDRESS* PIP_ADAPTER_WINS_SERVER_ADDRESS_LH
@@ -254,7 +254,7 @@ STRUCT: IP_ADAPTER_GATEWAY_ADDRESS
     { Header AlignmentLenFlags }
     { Next IP_ADAPTER_GATEWAY_ADDRESS* }
     { Address SOCKET_ADDRESS } ;
-    
+
 TYPEDEF: IP_ADAPTER_GATEWAY_ADDRESS* PIP_ADAPTER_GATEWAY_ADDRESS
 
 TYPEDEF: IP_ADAPTER_GATEWAY_ADDRESS* PIP_ADAPTER_GATEWAY_ADDRESS_LH
@@ -265,7 +265,7 @@ STRUCT: IP_ADAPTER_PREFIX
     { Next IP_ADAPTER_PREFIX* }
     { Address SOCKET_ADDRESS }
     { PrefixLength ULONG } ;
-    
+
 TYPEDEF: IP_ADAPTER_PREFIX* PIP_ADAPTER_PREFIX
 
 
@@ -273,7 +273,7 @@ DEFER: IP_ADAPTER_DNS_SUFFIX
 STRUCT: IP_ADAPTER_DNS_SUFFIX
     { Next IP_ADAPTER_DNS_SUFFIX* }
     { String WCHAR[MAX_DNS_SUFFIX_STRING_LENGTH] } ;
-    
+
 TYPEDEF: IP_ADAPTER_DNS_SUFFIX* PIP_ADAPTER_DNS_SUFFIX
 
 
@@ -336,7 +336,7 @@ STRUCT: S_un_b
     { s_b2 uchar }
     { s_b3 uchar }
     { s_b4 uchar } ;
-    
+
 STRUCT: S_un_w
     { s_w1 ushort }
     { s_w2 ushort } ;
@@ -345,12 +345,12 @@ UNION-STRUCT: IPAddr
     { S_un_b S_un_b }
     { S_un_w S_un_w }
     { S_addr ulong } ;
-    
+
 UNION-STRUCT: S_un
     { S_un_b S_un_b }
     { S_un_w S_un_w }
     { S_addr ulong } ;
-    
+
 STRUCT: IP_ADAPTER_INDEX_MAP
     { Index ULONG }
     { Name WCHAR[MAX_ADAPTER_NAME] } ;
@@ -382,13 +382,13 @@ FUNCTION: ULONG GetAdaptersAddresses (
 FUNCTION: DWORD GetAdaptersInfo (
     PIP_ADAPTER_INFO pAdapterInfo,
     PULONG pOutBufLen ) ;
-    
+
 FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen ) ;
 
 : get-fixed-info ( -- FIXED_INFO )
     FIXED_INFO <struct> dup byte-length ulong <ref>
     [ GetNetworkParams n>win32-error-check ] 2keep drop ;
-    
+
 : dns-server-ips ( -- sequence )
     get-fixed-info DnsServerList>> [
         [
@@ -396,7 +396,7 @@ FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen ) ;
             [ Next>> ] bi dup
         ] loop drop
     ] { } make ;
-    
+
 
 ! second struct starts at 720h
 
@@ -429,7 +429,7 @@ PRIVATE>
             [ [ PhysicalAddress>> ] [ PhysicalAddressLength>> ] bi head ]
         } cleave>array
     ] interfaces-map ;
-    
+
 : interface-ips ( -- seq )
     [
         {

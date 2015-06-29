@@ -100,4 +100,3 @@ os macosx? "openal.alut.macosx" "openal.alut.other" ? require
     ] [
         alGetString throw
     ] if ;
-

@@ -98,9 +98,8 @@ demo-world H{
     { T{ key-down f f "UP"    } [ KEY-ROTATE-STEP     swap pitch-demo-world ] }
     { T{ key-down f f "="     } [ dup distance-step neg swap zoom-demo-world ] }
     { T{ key-down f f "-"     } [ dup distance-step     swap zoom-demo-world ] }
-    
+
     { T{ button-down f f 1 }    [ drop reset-last-drag-rel ] }
     { T{ drag f 1 }             [ drag-yaw-pitch rot [ pitch-demo-world ] keep yaw-demo-world ] }
     { mouse-scroll              [ scroll-direction get second over distance-step * swap zoom-demo-world ] }
 } set-gestures
-

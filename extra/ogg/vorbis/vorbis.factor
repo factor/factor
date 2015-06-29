@@ -3,12 +3,12 @@
 !
 USING: 
     alien
-    alien.c-types 
+    alien.c-types
     alien.libraries
-    alien.syntax 
+    alien.syntax
     classes.struct
-    combinators 
-    kernel 
+    combinators
+    kernel
     ogg
     system
 ;
@@ -19,14 +19,14 @@ IN: ogg.vorbis
     { [ os windows? ]  [ "vorbis.dll" ] }
     { [ os macosx? ] [ "libvorbis.0.dylib" ] }
     { [ os unix? ]   [ "libvorbis.so" ] }
-} cond cdecl add-library 
+} cond cdecl add-library
 
 "vorbis" deploy-library
 >>
 
 LIBRARY: vorbis
 
-STRUCT: vorbis-info 
+STRUCT: vorbis-info
     { version int  }
     { channels int }
     { rate long }
@@ -34,7 +34,7 @@ STRUCT: vorbis-info
     { bitrate_nominal long }
     { bitrate_lower long }
     { bitrate_window long }
-    { codec_setup void* } 
+    { codec_setup void* }
     ;
 
 STRUCT: vorbis-dsp-state

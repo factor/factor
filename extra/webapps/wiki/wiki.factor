@@ -120,7 +120,7 @@ M: revision feed-entry-url id>> revision-url ;
         ] >>init
 
         { wiki "view" } >>template
-    
+
     <article-boilerplate> ;
 
 : <random-article-action> ( -- action )
@@ -244,7 +244,7 @@ M: revision feed-entry-url id>> revision-url ;
             [ add-revision ]
             [ title>> revisions-url <redirect> ] bi
         ] >>submit
-    
+
     <protected>
         "rollback wiki articles" >>description ;
 

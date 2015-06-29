@@ -70,7 +70,7 @@ FUNCTION: void* method_getTypeEncoding ( Method method ) ;
 
 FUNCTION: SEL method_getName ( Method method ) ;
 
-FUNCTION: void* method_setImplementation ( Method method, void* imp ) ; 
-FUNCTION: void* method_getImplementation ( Method method ) ; 
+FUNCTION: void* method_setImplementation ( Method method, void* imp ) ;
+FUNCTION: void* method_getImplementation ( Method method ) ;
 
 FUNCTION: Class object_getClass ( id object ) ;

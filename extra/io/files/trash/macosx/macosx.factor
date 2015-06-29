@@ -61,5 +61,3 @@ PRIVATE>
 M: macosx send-to-trash ( path -- )
     <fs-ref> f kFSFileOperationDefaultOptions
     FSMoveObjectToTrashSync check-err ;
-
-

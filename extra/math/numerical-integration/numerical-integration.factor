@@ -16,6 +16,6 @@ SYMBOL: num-steps
     { 1 4 } { 1 } surround ;
 
 : integrate-simpson ( from to quot -- x )
-    [ setup-simpson-range dup ] dip 
+    [ setup-simpson-range dup ] dip
     map dup generate-simpson-weights
     v. swap [ third ] keep first - 6 / * ; inline

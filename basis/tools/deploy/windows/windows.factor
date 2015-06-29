@@ -39,6 +39,6 @@ M: windows deploy*
                 [ drop namespace make-deploy-image-executable ]
                 [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
                 [ nip open-in-explorer ]
-            } 2cleave 
+            } 2cleave
         ] with-variables
     ] with-directory ;

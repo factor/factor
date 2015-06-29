@@ -7,11 +7,11 @@ IN: hashcash
 
 ! Hashcash implementation
 ! Reference materials listed below:
-! 
+!
 ! http://hashcash.org
 ! http://en.wikipedia.org/wiki/Hashcash
 ! http://www.ibm.com/developerworks/linux/library/l-hashcash.html?ca=dgr-lnxw01HashCash
-! 
+!
 ! And the reference implementation (in python):
 ! http://www.gnosis.cx/download/gnosis/util/hashcash.py
 
@@ -19,8 +19,8 @@ IN: hashcash
 
 ! Return a string with today's date in the form YYMMDD
 : get-date ( -- str )
-    now [ year>> 100 mod pad-00 ] 
-        [ month>> pad-00 ] 
+    now [ year>> 100 mod pad-00 ]
+        [ month>> pad-00 ]
         [ day>> pad-00 ] tri 3append ;
 
 ! Random salt is formed by ascii characters
@@ -43,7 +43,7 @@ TUPLE: hashcash version bits date resource ext salt suffix ;
         get-date >>date
         8 salt >>salt ;
 
-M: hashcash string>> 
+M: hashcash string>>
     tuple-slots [ present ] map ":" join ;
 
 <PRIVATE
@@ -67,8 +67,8 @@ M: hashcash string>>
 : valid-guess? ( checksum tuple -- ? )
     bits>> head all-char-zero? ;
 
-: (mint) ( tuple counter -- tuple ) 
-    2dup set-suffix checksummed-bits pick 
+: (mint) ( tuple counter -- tuple )
+    2dup set-suffix checksummed-bits pick
     valid-guess? [ drop ] [ 1 + (mint) ] if ;
 
 PRIVATE>
@@ -86,4 +86,3 @@ PRIVATE>
 : check-stamp ( stamp -- ? )
     dup ":" split [ sha1-checksum get-bits ] dip
     second string>number head all-char-zero? ;
-

@@ -12,4 +12,3 @@ HOOK: send-to-trash os ( path -- )
     { [ os macosx? ] [ "io.files.trash.macosx" ] }
     { [ os unix? ] [ "io.files.trash.unix" ] }
 } cond require
-

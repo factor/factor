@@ -27,7 +27,7 @@ HOOK: parse-db-error db-connection ( error -- error' )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-M: db-connection dispose ( db-connection -- ) 
+M: db-connection dispose ( db-connection -- )
     dup db-connection [
         [ dispose-statements H{ } clone ] change-insert-statements
         [ dispose-statements H{ } clone ] change-update-statements

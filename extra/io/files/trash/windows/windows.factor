@@ -68,6 +68,3 @@ M: windows send-to-trash ( path -- )
         SHFileOperationW [ throw ] unless-zero
 
     ] with-destructors ;
-
-
-

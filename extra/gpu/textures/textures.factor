@@ -259,7 +259,7 @@ M:: texture-1d-data-target texture-dim ( tdt level -- dim )
 
 M:: texture-2d-data-target texture-dim ( tdt level -- dim )
     tdt bind-tdt :> texture
-    tdt texture-data-gl-target level 
+    tdt texture-data-gl-target level
     [ GL_TEXTURE_WIDTH get-texture-int ] [ GL_TEXTURE_HEIGHT get-texture-int ] 2bi
     2array ; inline
 
@@ -356,4 +356,3 @@ PRIVATE>
     texture-1d-array <texture> ; inline
 : <texture-2d-array> ( component-order component-type parameters -- texture )
     texture-2d-array <texture> ; inline
-

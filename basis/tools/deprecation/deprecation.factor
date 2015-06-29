@@ -73,7 +73,7 @@ M: deprecation-observer definitions-changed
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;
 
-[ \ deprecation-observer add-definition-observer ] 
+[ \ deprecation-observer add-definition-observer ]
 "tools.deprecation" add-startup-hook
 
 initialize-deprecation-notes

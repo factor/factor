@@ -58,7 +58,7 @@ M: jamshred-gadget ungraft* ( gadget -- )
     hand-loc get [
         over last-hand-loc>> [
             v- (handle-mouse-motion)
-        ] [ 2drop ] if* 
+        ] [ 2drop ] if*
     ] 2keep >>last-hand-loc drop ;
 
 : handle-mouse-scroll ( jamshred-gadget -- )

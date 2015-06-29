@@ -296,7 +296,7 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
     buffer                       >>buffer
     user_data                    >>user_data
     callback                     >>callback
-    
+
     buffer [
         libusb_control_setup memory>struct wLength>> LIBUSB_CONTROL_SETUP_SIZE +
     ] [ 0 ] if* >>length drop ; inline
@@ -343,13 +343,13 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
       [ num_iso_packets>> ] bi
       libusb_iso_packet_descriptor <c-direct-array>
     ] dip [ >>length drop ] curry each ; inline
-    
+
 :: libusb_get_iso_packet_buffer ( transfer packet -- data )
     packet transfer num_iso_packets>> >=
     [ f ]
     [
         transfer
-        [ iso_packet_desc>> >c-ptr ] 
+        [ iso_packet_desc>> >c-ptr ]
         [ num_iso_packets>> ] bi
         libusb_iso_packet_descriptor <c-direct-array> 0
         [ length>> + ] reduce
@@ -361,7 +361,7 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
     [ f ]
     [
         0 transfer
-        [ iso_packet_desc>> >c-ptr ] 
+        [ iso_packet_desc>> >c-ptr ]
         [ num_iso_packets>> ] bi
         libusb_iso_packet_descriptor <c-direct-array> nth
         length>> packet *

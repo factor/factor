@@ -15,7 +15,7 @@ os {
 >>
 
 LIBRARY: glu
- 
+
 ! These are defined as structs in glu.h, but we only ever use pointers to them
 C-TYPE: GLUnurbs
 C-TYPE: GLUquadric

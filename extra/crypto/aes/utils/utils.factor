@@ -61,4 +61,3 @@ IN: crypto.aes.utils
 
 : 4th-from-end ( seq -- el )
     [ length 4 - ] keep nth ;
-

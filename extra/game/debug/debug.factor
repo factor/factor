@@ -80,21 +80,21 @@ GLSL-PROGRAM: debug-text-program debug-text-vertex-shader
 debug-text-fragment-shader debug-text-vertex-format ;
 
 CONSTANT: debug-text-font
-    T{ font 
+    T{ font
        { name       "monospace"  }
        { size       16           }
        { bold?      f            }
        { italic?    f            }
        { foreground COLOR: white }
        { background COLOR: black } }
-       
-CONSTANT: debug-text-texture-parameters       
+
+CONSTANT: debug-text-texture-parameters
     T{ texture-parameters
        { wrap              repeat-texcoord }
        { min-filter        filter-linear   }
        { min-mipmap-filter f               } }
-       
-: text>image ( string color -- image )      
+
+: text>image ( string color -- image )
     debug-text-font clone swap >>foreground swap string>image drop ;
 
 :: image>texture ( image -- texture )
@@ -119,7 +119,7 @@ CONSTANT: debug-text-texture-parameters
 : debug-text-vertex-array ( image pt dim -- vertex-array )
     screen-quad stream-upload draw-usage vertex-buffer byte-array>buffer &dispose
     debug-text-program <program-instance> <vertex-array> &dispose ;
- 
+
 : debug-text-index-buffer ( -- index-buffer )
     uint-array{ 0 1 2 2 3 0 } stream-upload draw-usage index-buffer
     byte-array>buffer &dispose 0 <buffer-ptr> 6 uint-indexes <index-elements> ;
@@ -160,10 +160,10 @@ CONSTANT: box-vertices
       { { -1  1 -1 } {  1  1 -1 } }
       { {  1 -1 -1 } {  1 -1  1 } }
       { {  1 -1 -1 } {  1  1 -1 } } }
-      
+
 CONSTANT: cylinder-vertices
     $[ 12 iota [ 2pi 12 / * [ cos ] [ drop 0.0 ] [ sin ] tri 3array ] map ]
-    
+
 :: scale-cylinder-vertices ( radius half-height verts -- bot-verts top-verts )
     verts
     [ [ radius v*n { 0 half-height 0 } v- ] map ]
@@ -183,7 +183,7 @@ PRIVATE>
     [ 1 <column> normalize over v+ COLOR: green debug-line ]
     [ 2 <column> normalize over v+ COLOR: blue debug-line ]
     2tri ; inline
-        
+
 :: debug-box ( pt half-widths color -- )
     box-vertices [
         first2 [ half-widths v* pt v+ ] bi@ color debug-line
@@ -203,7 +203,7 @@ TYPED: draw-debug-lines ( lines: float-array mvp-matrix -- )
 
 TYPED: draw-debug-points ( points: float-array mvp-matrix -- )
     [ points-mode -rot draw-debug-primitives ] with-destructors ; inline
-        
+
 TYPED: draw-text ( string color: rgba pt dim -- )
     [
         [ debug-text-uniform-variables ] 2dip

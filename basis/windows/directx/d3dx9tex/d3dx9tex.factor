@@ -116,7 +116,7 @@ FUNCTION: HRESULT
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo ) ;
-        
+
 ALIAS: D3DXLoadSurfaceFromFile D3DXLoadSurfaceFromFileW
 
 FUNCTION: HRESULT
@@ -167,7 +167,7 @@ FUNCTION: HRESULT
         RECT*                     pSrcRect,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey ) ;
-        
+
 FUNCTION: HRESULT
     D3DXLoadSurfaceFromMemory (
         LPDIRECT3DSURFACE9        pDestSurface,
@@ -217,7 +217,7 @@ FUNCTION: HRESULT
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo ) ;
-        
+
 FUNCTION: HRESULT
     D3DXLoadVolumeFromFileW (
         LPDIRECT3DVOLUME9         pDestVolume,
@@ -279,7 +279,7 @@ FUNCTION: HRESULT
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey ) ;
-        
+
 FUNCTION: HRESULT
     D3DXLoadVolumeFromMemory (
         LPDIRECT3DVOLUME9         pDestVolume,

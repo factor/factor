@@ -32,7 +32,7 @@ M:: spline-gadget draw-gadget* ( gadget -- )
         [ first x-min - x-max x-min - / gadget spline-dim>> first * ]
         [ second y-min - y-max y-min - / gadget spline-dim>> second * ] bi 2array
     ] map :> pts
-    
+
     GL_LINE_STRIP glBegin
     pts [
         first2 neg gadget spline-dim>> second + glVertex2f
@@ -42,8 +42,8 @@ M:: spline-gadget draw-gadget* ( gadget -- )
 :: <spline-gadget> ( polynomials dim steps -- gadget )
     spline-gadget new
     dim >>spline-dim
-    polynomials >>polynomials 
+    polynomials >>polynomials
     steps >>steps ;
 
 : spline. ( curve dim steps -- )
-    <spline-gadget> gadget. ; 
+    <spline-gadget> gadget. ;

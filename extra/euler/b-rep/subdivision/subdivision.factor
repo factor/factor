@@ -27,7 +27,7 @@ IN: euler.b-rep.subdivision
             [ opposite-n edge-pts set-nth-unsafe ] bi
         ] when
     ] each-index
-    
+
     edge-pts ; inline
 
 :: vertex-points ( vertices edge-indices face-indices edge-pts face-points -- vertex-pts )
@@ -47,7 +47,7 @@ IN: euler.b-rep.subdivision
     ] map ; inline
 
 TYPED:: subdivide ( brep: b-rep -- brep': b-rep )
-    brep vertices>> :> vertices 
+    brep vertices>> :> vertices
     brep edges>>    :> edges
     brep faces>>    :> faces
 
@@ -73,7 +73,7 @@ TYPED:: subdivide ( brep: b-rep -- brep': b-rep )
 
             face new
                 dup >>base-face :> fac
-            
+
             b-edge new
                 fac >>face
                 point-a >>vertex :> edg-a
@@ -104,7 +104,7 @@ TYPED:: subdivide ( brep: b-rep -- brep': b-rep )
             point-d [ edg-d or ] change-edge drop
         ] each-vertex-edge
     ] each
-    
+
     b-rep new
         sub-faces { } like >>faces
         sub-edges { } like >>edges

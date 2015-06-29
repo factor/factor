@@ -290,4 +290,3 @@ FUNCTION: HRESULT
         FLOAT*               pROut,
         FLOAT*               pGOut,
         FLOAT*               pBOut ) ;
-

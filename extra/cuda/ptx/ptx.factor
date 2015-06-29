@@ -59,7 +59,7 @@ TUPLE: ptx-variable
     { initializer maybe{ string } } ;
 
 TUPLE: ptx-negation
-    { var string } ; 
+    { var string } ;
 
 TUPLE: ptx-vector
     elements ;
@@ -367,7 +367,7 @@ GENERIC: (write-ptx-element) ( elt -- )
 
 : write-ptx-element ( elt -- )
     dup ptx-element-label [ write ":" write ] when*
-    "\t" write dup (write-ptx-element) 
+    "\t" write dup (write-ptx-element)
     ptx-semicolon? [ ";" print ] [ nl ] if ;
 
 : write-ptx ( ptx -- )

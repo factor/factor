@@ -481,4 +481,3 @@ X-FUNCTION: Status XIGetProperty (
     uchar**  data ) ;
 
 X-FUNCTION: void XIFreeDeviceInfo ( XIDeviceInfo* info ) ;
-

@@ -266,7 +266,7 @@ M: array-type field-type>c-type type>c-type ;
             user-data-parameter suffix parameter-names&types
         ]
     } cleave make-callback-type define-inline ;
-    
+
 : def-signals ( signals type -- )
     [ def-signal ] curry each ;
 
@@ -360,4 +360,3 @@ M: array-type field-type>c-type type>c-type ;
 
 : def-ffi-repository ( repository -- )
     namespace>> def-namespace ;
-     

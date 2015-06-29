@@ -26,7 +26,7 @@ GENERIC: >expr ( insn -- expr )
 : narray-quot ( length -- quot )
     [
         [ , [ f <array> ] % ]
-        [ 
+        [
             dup iota [
                 - 1 - , [ swap [ set-array-nth ] keep ] %
             ] with each

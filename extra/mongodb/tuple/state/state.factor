@@ -22,4 +22,3 @@ PRIVATE>
 
 : tuple-info? ( assoc -- ? )
    [ MDB_TUPLE_INFO ] dip key? ;
-

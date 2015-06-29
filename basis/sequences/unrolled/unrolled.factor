@@ -96,4 +96,3 @@ PRIVATE>
 
 : unrolled-map-index ( seq len quot: ( x i -- newx ) -- newseq )
     [ dup length iota ] 2dip unrolled-2map ; inline
-

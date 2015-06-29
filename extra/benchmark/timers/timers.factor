@@ -22,4 +22,3 @@ SYMBOL: loop-max
     20,000 [ outer-loop ] [ loop-max get-global assert= ] bi ;
 
 MAIN: timers-benchmark
- 

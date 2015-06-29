@@ -138,7 +138,7 @@ M: ast-class compile-ast
     nip
     [
         [ name>> ] [ superclass>> ] [ ivars>> ] tri
-        define-class <class-lexenv> 
+        define-class <class-lexenv>
     ]
     [ methods>> ] bi
     [ compile-method ] with each

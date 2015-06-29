@@ -16,7 +16,7 @@
 ! 56003, 56113, 56333, 56443, 56663, 56773, and 56993.
 ! Consequently 56003, being the first member of this family,
 ! is the smallest prime with this property.
-! 
+!
 ! Find the smallest prime which, by replacing part of the number
 ! (not necessarily adjacent digits) with the same digit,
 ! is part of an eight prime value family.
@@ -34,11 +34,11 @@ IN: project-euler.051
 <PRIVATE
 SYMBOL: family-count
 SYMBOL: large-families
-: reset-globals ( -- ) 
+: reset-globals ( -- )
     H{ } clone family-count set
     H{ } clone large-families set ;
 
-: digits-positions ( str -- positions ) 
+: digits-positions ( str -- positions )
     H{ } clone [ '[ swap _ push-at ] each-index ] keep ;
 
 : *-if-index ( char combination index -- char )
@@ -49,7 +49,7 @@ SYMBOL: large-families
     dup length [1,b] [ all-combinations ] with map concat ;
 
 : families ( stra -- seq )
-    dup digits-positions values 
+    dup digits-positions values
     [ all-positions-combinations [ replace-positions-with-* ] with map ] with map concat ;
 
 : save-family ( family -- )
@@ -61,10 +61,10 @@ SYMBOL: large-families
 
 ! Test all primes that have length n
 : n-digits-primes ( n -- primes )
-    [ 1 - 10^ ] [ 10^ ] bi primes-between ; 
+    [ 1 - 10^ ] [ 10^ ] bi primes-between ;
 : test-n-digits-primes ( n -- seq )
-    reset-globals 
-    n-digits-primes 
+    reset-globals
+    n-digits-primes
     [ number>string families [ handle-family ] each ] each
     large-families get ;
 
@@ -73,8 +73,8 @@ SYMBOL: large-families
 
 ! recursively test all primes by length until we find an answer
 : (euler051) ( i -- answer )
-    dup test-n-digits-primes 
-    dup assoc-size 0 > 
+    dup test-n-digits-primes
+    dup assoc-size 0 >
     [ nip values [ fill-*-with-ones string>number ] [ min ] map-reduce ]
     [ drop 1 + (euler051) ] if ;
 PRIVATE>

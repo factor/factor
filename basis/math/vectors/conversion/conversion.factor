@@ -88,7 +88,7 @@ ERROR: bad-vconvert-input value expected-type ;
 :: [vunpack] ( from-element to-element from-size to-size from-type to-type -- quot )
     to-size from-size /i log2 :> steps
     from-element to-element from-type to-type steps check-vunpack
-    from-type to-type [[vunpack]] ; 
+    from-type to-type [[vunpack]] ;
 
 PRIVATE>
 
@@ -96,7 +96,7 @@ MACRO:: vconvert ( from-type to-type -- )
     from-type new [ simd-element-type ] [ byte-length ] bi :> ( from-element from-length )
     to-type   new [ simd-element-type ] [ byte-length ] bi :> ( to-element   to-length   )
     from-element heap-size :> from-size
-    to-element   heap-size :> to-size   
+    to-element   heap-size :> to-size
 
     from-length to-length = [ from-type to-type bad-vconvert ] unless
 
@@ -105,4 +105,3 @@ MACRO:: vconvert ( from-type to-type -- )
         { [ from-size to-size = ] [ [vconvert] ] }
         { [ from-size to-size > ] [ [vpack] ] }
     } cond ;
-

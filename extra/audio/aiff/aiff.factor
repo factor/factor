@@ -43,7 +43,7 @@ STRUCT: sound-data-chunk
 : verify-aiff ( chunk -- )
     {
         [ FORM-MAGIC id= ]
-        [ form-chunk memory>struct form-type>> 4 memory>byte-array AIFF-MAGIC id= ] 
+        [ form-chunk memory>struct form-type>> 4 memory>byte-array AIFF-MAGIC id= ]
     } 1&&
     [ invalid-audio-file ] unless ;
 

@@ -95,4 +95,3 @@ PRIVATE>
 
 : >tnetstring ( value -- string )
     dump-tnetstring ;
-

@@ -253,7 +253,7 @@ COM-INTERFACE: IDirect3DTexture9 IDirect3DBaseTexture9 {85C31227-3DE5-4f00-9B3A-
     HRESULT GetSurfaceLevel ( UINT Level, IDirect3DSurface9** ppSurfaceLevel )
     HRESULT LockRect ( UINT Level, D3DLOCKED_RECT* pLockedRect, RECT* pRect, DWORD Flags )
     HRESULT UnlockRect ( UINT Level ) ;
-    
+
 TYPEDEF: IDirect3DTexture9* LPDIRECT3DTEXTURE9
 TYPEDEF: IDirect3DTexture9* PDIRECT3DTEXTURE9
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Chris Double. All Rights Reserved.
-USING: 
+USING:
     accessors
     fjsc
     furnace
@@ -21,7 +21,7 @@ USING:
     namespaces
     peg
     sequences
-    urls 
+    urls
     validators
 ;
 IN: webapps.fjsc
@@ -29,8 +29,8 @@ IN: webapps.fjsc
 TUPLE: fjsc < dispatcher ;
 
 : absolute-url ( url -- url )
-    "http://" request get "host" header append 
-    over "/" head? [ "/" append ] unless 
+    "http://" request get "host" header append
+    over "/" head? [ "/" append ] unless
     swap append  ;
 
 : <javascript-content> ( body -- content )
@@ -87,7 +87,7 @@ TUPLE: fjsc < dispatcher ;
             <compile-action> "compile" add-responder
             <compile-url-action> "compile-url" add-responder
             <boilerplate>
-                { fjsc "fjsc" } >>template 
+                { fjsc "fjsc" } >>template
          >>default ;
 
 : activate-fjsc ( -- )

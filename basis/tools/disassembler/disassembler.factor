@@ -22,7 +22,7 @@ M: alien (>address) alien-address ;
 
 PRIVATE>
 
-M: byte-array disassemble 
+M: byte-array disassemble
     [
         [ malloc-byte-array &free alien-address dup ]
         [ length + ] bi

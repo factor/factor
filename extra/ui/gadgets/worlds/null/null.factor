@@ -23,5 +23,3 @@ M: null-world resize-world drop ;
 
 : into-window ( world quot -- world )
     [ dup ] dip with-gl-context ; inline
-
-

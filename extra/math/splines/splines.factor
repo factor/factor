@@ -13,7 +13,7 @@ IN: math.splines
 
 :: hermite-polynomial ( p0 m0 p1 m1 -- poly )
     p0
-    m0 
+    m0
     -3 p0 * -2 m0 * + 3 p1 * + m1 neg +
     2 p0 * m0 + -2 p1 * + m1 +
     4array ;
@@ -54,7 +54,7 @@ PRIVATE>
         ] each-index
     ] each-index
     acc ;
-    
+
 :: <cubic-hermite-curve> ( p0 m0 p1 m1 -- polynomials )
     p0 length iota [
         {

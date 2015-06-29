@@ -59,11 +59,11 @@ TUPLE: triplets-count primitives total ;
 : add-triplets ( current-triples limit triplet -- stop )
     sum 2dup > [
     /i [ + ] curry change-total
-    [ 1 + ] change-primitives drop t 
+    [ 1 + ] change-primitives drop t
     ] [ 3drop f ] if ;
 
 : all-triplets ( current-triples limit seed -- triplets )
-    3dup add-triplets [ 
+    3dup add-triplets [
         candidates-triplets [ all-triplets ] with swapd reduce
     ] [ 2drop ] if ;
 
@@ -71,10 +71,8 @@ TUPLE: triplets-count primitives total ;
     <0-triplets-count> swap base all-triplets ;
 
 : pprint-triplet-count ( limit count -- )
-    [ total>> ] [ primitives>> ] bi 
+    [ total>> ] [ primitives>> ] bi
     "Up to %d: %d triples, %d primitives.\n" printf ;
 
 : pyth ( -- )
     8 [1,b] [ 10^ dup count-triplets pprint-triplet-count ] each ;
-
-

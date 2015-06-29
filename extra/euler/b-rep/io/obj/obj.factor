@@ -45,7 +45,7 @@ PRIVATE>
     V{ } clone :> edges
     faces-vertices [ vertices reconstruct-face edges push-all ] { } map-as :> faces
 
-    b-rep new 
+    b-rep new
         faces >>faces
         edges >>edges
         vertices >>vertices

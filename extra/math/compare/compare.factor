@@ -20,5 +20,3 @@ IN: math.compare
 
 : min-by ( obj1 obj2 quot: ( obj -- n ) -- obj1/obj2 )
     [ bi@ dupd min = ] curry most ; inline
-
-

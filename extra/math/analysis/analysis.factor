@@ -115,4 +115,3 @@ PRIVATE>
     [ pi 2 * * sqrt ]
     [ [ e / ] keep ^ ]
     [ 12 * recip 1 + ] tri * * ;
-

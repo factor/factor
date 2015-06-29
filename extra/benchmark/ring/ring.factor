@@ -13,13 +13,13 @@ SYMBOL: done
     ] times ;
 
 : send-messages ( messages target -- )
-    [ dup iota ] dip [ send ] curry each [ receive drop ] times ; 
+    [ dup iota ] dip [ send ] curry each [ receive drop ] times ;
 
 : destroy-ring ( target -- )
     done swap send [ done eq? ] receive-if drop ;
 
 : ring-bench ( messages processes -- )
-    create-ring [ send-messages ] keep destroy-ring ; 
+    create-ring [ send-messages ] keep destroy-ring ;
 
 : ring-benchmark ( -- )
     1000 1000 ring-bench ;

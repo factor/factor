@@ -39,4 +39,3 @@ PRIVATE>
 
 : wrap-words ( words line-max line-ideal -- lines )
     [ words>elements ] 2dip wrap [ concat ] map! ;
-

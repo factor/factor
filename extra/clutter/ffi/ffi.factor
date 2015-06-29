@@ -25,4 +25,3 @@ LIBRARY: clutter
 FOREIGN-RECORD-TYPE: cairo.Path cairo_path_t
 
 GIR: Clutter-1.0.gir
-

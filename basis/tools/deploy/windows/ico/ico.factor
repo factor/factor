@@ -79,4 +79,3 @@ PRIVATE>
 
         hUpdate 0 EndUpdateResource drop
     ] when ;
-

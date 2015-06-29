@@ -146,4 +146,3 @@ M: ppc-vmx-env (set-denormal-mode) ( register mode -- register )
             { +denormal-flush+ [ vmx-denormal-mode-bits bitor  ] }
         } case
     ] curry change-vscr ; inline
-

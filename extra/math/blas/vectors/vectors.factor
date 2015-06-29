@@ -43,7 +43,7 @@ GENERIC: (blas-direct-array) ( blas-vector -- direct-array )
                         copy-data copy-length copy-inc )
     v [ length>> ] [ data-and-inc ] bi
     v length>> element-size * <byte-array>
-    1 
+    1
     over v length>> 1 ;
 
 : (prepare-swap)

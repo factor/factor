@@ -99,7 +99,7 @@ M: scroller layout*
     [ call-next-method ] [
         dup follows>>
         [ update-scroller ] [ >>follows drop ] 2bi
-    ] bi ; 
+    ] bi ;
 
 M: scroller focusable-child*
     viewport>> ;

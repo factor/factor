@@ -15,7 +15,7 @@ IN: xml.dtd
     take-decl-contents <attlist-decl> ;
 
 : take-notation-decl ( -- notation-decl )
-    take-decl-contents <notation-decl> ; 
+    take-decl-contents <notation-decl> ;
 
 UNION: dtd-acceptable
     directive comment instruction ;

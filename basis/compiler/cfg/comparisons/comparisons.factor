@@ -6,7 +6,7 @@ IN: compiler.cfg.comparisons
 SYMBOL: +unordered+
 
 SYMBOLS:
-    cc<  cc<=  cc=  cc>  cc>=  cc<>  cc<>= 
+    cc<  cc<=  cc=  cc>  cc>=  cc<>  cc<>=
     cc/< cc/<= cc/= cc/> cc/>= cc/<> cc/<>= ;
 
 SYMBOLS:
@@ -23,12 +23,12 @@ SYMBOLS: cc-o cc/o ;
         { cc=    cc/=   }
         { cc<>   cc/<>  }
         { cc<>=  cc/<>= }
-        { cc/<   cc<    } 
+        { cc/<   cc<    }
         { cc/<=  cc<=   }
         { cc/>   cc>    }
-        { cc/>=  cc>=   } 
-        { cc/=   cc=    } 
-        { cc/<>  cc<>   } 
+        { cc/>=  cc>=   }
+        { cc/=   cc=    }
+        { cc/<>  cc<>   }
         { cc/<>= cc<>=  }
         { cc-o   cc/o   }
         { cc/o   cc-o   }
@@ -69,12 +69,12 @@ SYMBOLS: cc-o cc/o ;
         { cc=    cc=  }
         { cc<>   cc/= }
         { cc<>=  t    }
-        { cc/<   cc>= } 
+        { cc/<   cc>= }
         { cc/<=  cc>  }
         { cc/>   cc<= }
-        { cc/>=  cc<  } 
-        { cc/=   cc/= } 
-        { cc/<>  cc=  } 
+        { cc/>=  cc<  }
+        { cc/=   cc/= }
+        { cc/<>  cc=  }
         { cc/<>= f    }
     } at ;
 
@@ -95,4 +95,3 @@ SYMBOLS: cc-o cc/o ;
         { cc/<>  {      +eq+      +unordered+ } }
         { cc/<>= {                +unordered+ } }
     } at member-eq? ;
-

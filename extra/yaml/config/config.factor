@@ -14,7 +14,7 @@ SYMBOL: emitter-line-break
 ! Set this value to keep libyaml's default
 SYMBOL: +libyaml-default+
 
-{ 
+{
     emitter-canonical
     emitter-indent
     emitter-width

@@ -51,7 +51,7 @@ SYNTAX: PAIR-GENERIC: (PAIR-GENERIC:) ;
 
 : (PAIR-M:) ( -- )
     scan-word scan-word 2dup <=> +gt+ eq? [
-        ?swap scan-word parse-definition 
+        ?swap scan-word parse-definition
     ] keep ?prefix-swap define-pair-method ;
 
 SYNTAX: PAIR-M: (PAIR-M:) ;

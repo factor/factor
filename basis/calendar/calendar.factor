@@ -61,7 +61,7 @@ M: not-a-month summary
 
 PRIVATE>
 
-CONSTANT: month-names 
+CONSTANT: month-names
     {
         "January" "February" "March" "April" "May" "June"
         "July" "August" "September" "October" "November" "December"

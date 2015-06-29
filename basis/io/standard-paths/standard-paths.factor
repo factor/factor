@@ -35,4 +35,3 @@ M: object find-in-standard-login-path*
     { [ os macosx? ] [ "io.standard-paths.macosx" ] }
     { [ os unix? ] [ "io.standard-paths.unix" ] }
 } cond require
-

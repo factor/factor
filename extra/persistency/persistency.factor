@@ -24,7 +24,7 @@ SYNTAX: STORED-TUPLE: parse-tuple-definition [ drop persistent ] dip [ remove-ty
 : store-tuple ( tuple -- ) [ insert-tuple ] w/db ;
 : modify-tuple ( tuple -- ) [ update-tuple ] w/db ;
 : remove-tuples ( tuple -- ) [ delete-tuples ] w/db ;
-    
+
 TUPLE: pattern value ; C: <pattern> pattern
 SYNTAX: %" parse-string <pattern> suffix! ;
 M: pattern where value>> over column-name>> 0% " LIKE " 0% bind# ;

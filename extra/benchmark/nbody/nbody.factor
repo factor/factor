@@ -44,7 +44,7 @@ TUPLE: body
 
 : <sun> ( -- body )
     double-array{ 0 0 0 } double-array{ 0 0 0 } 1 <body> ;
-    
+
 : offset-momentum ( body offset -- body )
     vneg solar-mass v/n >>velocity ; inline
 

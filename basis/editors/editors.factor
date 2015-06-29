@@ -27,7 +27,7 @@ M: object editor-detached? t ;
 
 : run-and-wait-for-editor ( command -- )
     <process>
-        swap >>command 
+        swap >>command
         editor-detached? >>detached
     run-process
     300 milliseconds sleep

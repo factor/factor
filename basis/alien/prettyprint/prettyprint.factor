@@ -110,7 +110,7 @@ M: alien-callback-type-word synopsis*
         [ def>> first first pprint-c-type ]
         [ pprint-word ]
         [
-            <block "(" text 
+            <block "(" text
             [ def>> first second ] [ "callback-effect" word-prop in>> ] bi
             pprint-function-args
             ")" text block>

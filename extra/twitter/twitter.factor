@@ -83,7 +83,7 @@ TUPLE: twitter-user
     screen-name
     description
     location
-    profile-image-url 
+    profile-image-url
     url
     protected?
     followers-count ;
@@ -104,7 +104,7 @@ TUPLE: twitter-user
     } twitter-user keys-boa ;
 
 : <twitter-status> ( assoc -- tweet )
-    clone "user" over [ <twitter-user> ] change-at 
+    clone "user" over [ <twitter-user> ] change-at
     {
         "created_at"
         "id"

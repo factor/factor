@@ -38,7 +38,7 @@ sharp-continue ;
         e1 e0!
         edge face-ccw edge!
     ] do while
-    
+
     e-end face-ccw :> e-end
     e0 e-end make-ef drop
 

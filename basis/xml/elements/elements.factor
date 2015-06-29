@@ -57,7 +57,7 @@ IN: xml.elements
         T{ name f "" "encoding" f }
         T{ name f "" "standalone" f }
     } diff
-    [ extra-attrs ] unless-empty ; 
+    [ extra-attrs ] unless-empty ;
 
 : good-version ( version -- version )
     dup { "1.0" "1.1" } member? [ bad-version ] unless ;

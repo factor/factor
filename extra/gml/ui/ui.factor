@@ -88,7 +88,7 @@ CONSTANT: example-dir "vocab:gml/examples/"
 
 : <example-buttons> ( -- gadget )
     gml-files
-    <pile> { 5 5 } >>gap 
+    <pile> { 5 5 } >>gap
     "Examples:" <label> add-gadget
     [ <example-button> add-gadget ] reduce ;
 

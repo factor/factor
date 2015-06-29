@@ -47,7 +47,7 @@ IN: http.parsers
     ] seq* [ "" concat-as ] action ;
 
 : 'full-request' ( -- parser )
-    [ 
+    [
         'space' ,
         'http-method' ,
         'space' ,

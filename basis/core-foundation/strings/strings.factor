@@ -98,7 +98,7 @@ FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id ) ;
 : CFType>description ( cf -- description )
     CFGetTypeID [ CFCopyTypeIDDescription &CFRelease CF>string ] with-destructors ;
 
-SYNTAX: CFSTRING: 
-    scan-new-word scan-object 
+SYNTAX: CFSTRING:
+    scan-new-word scan-object
     [ drop ] [ '[ _ [ _ <CFString> ] initialize-alien ] ] 2bi
     ( -- alien ) define-declared ;

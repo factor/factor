@@ -47,4 +47,3 @@ MEMO: mime-types ( -- assoc )
 
 : mime-type-encoding ( mime-type -- encoding )
     "text/" head? utf8 binary ? ;
-

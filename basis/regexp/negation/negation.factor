@@ -41,7 +41,7 @@ CONSTANT: fail-state -1
     HS{ -2 } clone >>final-states ;
 
 : adjoin-dfa ( transition-table -- start end )
-    unify-final-state renumber-states box-transitions 
+    unify-final-state renumber-states box-transitions
     [ start-state>> ]
     [ final-states>> members first ]
     [ nfa-table get [ transitions>> ] bi@ swap assoc-union! drop ] tri ;

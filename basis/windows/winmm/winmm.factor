@@ -25,7 +25,7 @@ ERROR: mci-error n ;
 : open-command ( path -- )
     "open \"%s\" type mpegvideo alias MediaFile" sprintf f 0 f
     mciSendString check-mci-error ;
-    
+
 : play-command ( -- )
     "play MediaFile" f 0 f mciSendString check-mci-error ;
 

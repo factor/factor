@@ -108,7 +108,7 @@ deploy-gadget "toolbar" f {
       dup <toolbar> { 10 10 } >>gap add-gadget
     deploy-settings-theme
     dup com-revert ;
-    
+
 : deploy-tool ( vocab -- )
     vocab-name
     [ <deploy-gadget> { 10 10 } <border> ]

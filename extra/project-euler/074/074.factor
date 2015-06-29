@@ -65,4 +65,3 @@ PRIVATE>
 ! 25134 ms ave run time - 31.96 SD (10 trials)
 
 SOLUTION: euler074
-

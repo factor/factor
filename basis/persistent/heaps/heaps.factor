@@ -42,7 +42,7 @@ GENERIC: sift-down ( value prio left right -- heap )
         <singleton-heap> <persistent-heap> <branch>
     ] if ;
 
-M: empty-heap sift-down 
+M: empty-heap sift-down
     over singleton-heap? [ singleton-sift-down ] [ <branch> ] if ;
 
 :: reroot-left ( value prio left right -- heap )

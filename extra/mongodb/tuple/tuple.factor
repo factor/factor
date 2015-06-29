@@ -2,7 +2,7 @@ USING: accessors assocs classes.mixin classes.tuple
 classes.tuple.parser compiler.units fry kernel sequences
 hashtables
 mongodb.driver
-mongodb.msg mongodb.tuple.collection 
+mongodb.msg mongodb.tuple.collection
 mongodb.tuple.persistent mongodb.tuple.state strings ;
 FROM: mongodb.driver => update delete find count ;
 FROM: mongodb.tuple.persistent => assoc>tuple ;
@@ -12,12 +12,12 @@ IN: mongodb.tuple
 SYNTAX: MDBTUPLE:
     parse-tuple-definition
     mdb-check-slots
-    define-tuple-class ; 
+    define-tuple-class ;
 
 : define-persistent ( class collection slot-options index -- )
-    [ [ <mdb-tuple-collection> dupd link-collection ] when* ] 2dip 
+    [ [ <mdb-tuple-collection> dupd link-collection ] when* ] 2dip
     [ dup '[ _ mdb-persistent add-mixin-instance ] with-compilation-unit ] 2dip
-    [ drop set-slot-map ] 
+    [ drop set-slot-map ]
     [ nip set-index-map ] 3bi ; inline
 
 : ensure-table ( class -- )
@@ -28,7 +28,7 @@ SYNTAX: MDBTUPLE:
     ] bi ;
 
 : ensure-tables ( classes -- )
-    [ ensure-table ] each ; 
+    [ ensure-table ] each ;
 
 : drop-table ( class -- )
       tuple-collection
@@ -37,7 +37,7 @@ SYNTAX: MDBTUPLE:
       [ name>> drop-collection ] bi ;
 
 : recreate-table ( class -- )
-    [ drop-table ] 
+    [ drop-table ]
     [ ensure-table ] bi ;
 
 DEFER: tuple>query
@@ -61,10 +61,10 @@ M: mdb-persistent id-selector
     dup mdb-query-msg? [ tuple>query ] unless ;
 
 PRIVATE>
- 
+
 : save-tuple-deep ( tuple -- )
-    tuple>storable [ (save-tuples) ] assoc-each ; 
- 
+    tuple>storable [ (save-tuples) ] assoc-each ;
+
 : update-tuple ( tuple -- )
     [ tuple-collection name>> ]
     [ ensure-oid id-selector ]

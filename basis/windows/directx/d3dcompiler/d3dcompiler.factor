@@ -56,7 +56,7 @@ FUNCTION: HRESULT D3DDisassemble (
     LPD3DBLOB* ppDisassembly ) ;
 
 FUNCTION: HRESULT D3DDisassemble10Effect (
-    ID3D10Effect* pEffect,      
+    ID3D10Effect* pEffect,
     UINT          Flags,
     LPD3DBLOB*    ppDisassembly ) ;
 
@@ -86,4 +86,3 @@ FUNCTION: HRESULT D3DStripShader (
     SIZE_T     BytecodeLength,
     UINT       uStripFlags,
     LPD3DBLOB* ppStrippedBlob ) ;
-

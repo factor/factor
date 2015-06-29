@@ -52,4 +52,3 @@ SYNTAX: specialized
 
 PREDICATE: specialized-word < word
    "specialized-defs" word-prop >boolean ;
-

@@ -341,22 +341,22 @@ M: editor gadget-text* editor-string % ;
     [ drop dup extend-selection dup mark>> click-loc ]
     [ select-elt ] if ;
 
-: delete-previous-character ( editor -- ) 
+: delete-previous-character ( editor -- )
     char-elt editor-backspace ;
 
-: delete-next-character ( editor -- ) 
+: delete-next-character ( editor -- )
     char-elt editor-delete ;
 
-: delete-previous-word ( editor -- ) 
+: delete-previous-word ( editor -- )
     word-elt editor-backspace ;
 
-: delete-next-word ( editor -- ) 
+: delete-next-word ( editor -- )
     word-elt editor-delete ;
 
-: delete-to-start-of-line ( editor -- ) 
+: delete-to-start-of-line ( editor -- )
     one-line-elt editor-backspace ;
 
-: delete-to-end-of-line ( editor -- ) 
+: delete-to-end-of-line ( editor -- )
     one-line-elt editor-delete ;
 
 : delete-to-start-of-document ( editor -- )
@@ -445,28 +445,28 @@ editor "caret-motion" f {
     [ dup select-word ] unless
     gadget-selection ;
 
-: select-previous-character ( editor -- ) 
+: select-previous-character ( editor -- )
     char-elt editor-select-prev ;
 
-: select-next-character ( editor -- ) 
+: select-next-character ( editor -- )
     char-elt editor-select-next ;
 
-: select-previous-word ( editor -- ) 
+: select-previous-word ( editor -- )
     word-elt editor-select-prev ;
 
-: select-next-word ( editor -- ) 
+: select-next-word ( editor -- )
     word-elt editor-select-next ;
 
-: select-start-of-line ( editor -- ) 
+: select-start-of-line ( editor -- )
     one-line-elt editor-select-prev ;
 
-: select-end-of-line ( editor -- ) 
+: select-end-of-line ( editor -- )
     one-line-elt editor-select-next ;
 
-: select-start-of-document ( editor -- ) 
+: select-start-of-document ( editor -- )
     doc-elt editor-select-prev ;
 
-: select-end-of-document ( editor -- ) 
+: select-end-of-document ( editor -- )
     doc-elt editor-select-next ;
 
 editor "selection" f {

@@ -31,5 +31,4 @@ FUNCTION: snappy_status snappy_uncompressed_length ( char* compressed,
                                                      size_t* result ) ;
 
 FUNCTION: snappy_status snappy_validate_compressed_buffer ( char* compressed,
-                                                            size_t compressed_length ) ; 
-
+                                                            size_t compressed_length ) ;

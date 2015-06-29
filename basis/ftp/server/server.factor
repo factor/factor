@@ -221,7 +221,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
     dup can-serve-file? [
         <ftp-put> fulfill-client
     ] [
-        drop 
+        drop
         <ftp-disconnect> fulfill-client
     ] if ;
 

@@ -21,4 +21,3 @@ M: image-section short-section
 
 M: image pprint*
     <image-section> add-section ;
-

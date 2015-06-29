@@ -54,7 +54,7 @@ CONSTANT: registry-value-max-length 16384
     [ hkey quot call ]
     [ hkey close-key ]
     [ ] cleanup ; inline
-    
+
 :: with-create-registry-key ( key subkey quot -- )
     key subkey create-key :> hkey
     [ hkey quot call ]
@@ -107,7 +107,7 @@ TUPLE: registry-enum-key ;
         f ! 0 BYTE <ref> dup :> data
         f ! 0 BYTE <ref> dup :> buffer
         RegEnumKeyEx dup ERROR_SUCCESS = [
-            
+
         ] [
         ] if
     ] map ;
@@ -147,7 +147,7 @@ TUPLE: registry-enum-key ;
     [ 0 ] 3dip
     RegSetValueEx dup ERROR_SUCCESS = [
         drop
-    ] [ 
+    ] [
         "omg" throw
     ] if ;
 
@@ -189,6 +189,6 @@ PRIVATE>
 : windows-performance-data ( -- byte-array )
     HKEY_PERFORMANCE_DATA "Global" f f
     21 2^ <byte-array> reg-query-value-ex ;
-    
+
 : read-registry ( key subkey -- registry-info )
     KEY_READ [ reg-query-info-key ] with-open-registry-key ;

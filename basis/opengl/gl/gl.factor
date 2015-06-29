@@ -663,7 +663,7 @@ FUNCTION: void glReadBuffer ( GLenum mode ) ;
 FUNCTION: void glEnable ( GLenum cap ) ;
 FUNCTION: void glDisable ( GLenum cap ) ;
 FUNCTION: GLboolean glIsEnabled ( GLenum cap ) ;
- 
+
 FUNCTION: void glEnableClientState ( GLenum cap ) ;
 FUNCTION: void glDisableClientState ( GLenum cap ) ;
 FUNCTION: void glGetBooleanv ( GLenum pname, GLboolean* params ) ;
@@ -693,9 +693,9 @@ FUNCTION: void glClearAccum ( GLfloat red, GLfloat green, GLfloat blue, GLfloat 
 FUNCTION: void glAccum ( GLenum op, GLfloat value ) ;
 
 FUNCTION: void glMatrixMode ( GLenum mode ) ;
-FUNCTION: void glOrtho ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, 
+FUNCTION: void glOrtho ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top,
                          GLdouble near_val, GLdouble far_val ) ;
-FUNCTION: void glFrustum ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, 
+FUNCTION: void glFrustum ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top,
                            GLdouble near_val, GLdouble far_val ) ;
 FUNCTION: void glViewport ( GLint x, GLint y, GLsizei width, GLsizei height ) ;
 FUNCTION: void glPushMatrix ( ) ;
@@ -963,13 +963,13 @@ FUNCTION: void glGetPixelMapfv ( GLenum map, GLfloat* values ) ;
 FUNCTION: void glGetPixelMapuiv ( GLenum map, GLuint* values ) ;
 FUNCTION: void glGetPixelMapusv ( GLenum map, GLushort* values ) ;
 
-FUNCTION: void glBitmap ( GLsizei width, GLsizei height, GLfloat xorig, GLfloat yorig, 
+FUNCTION: void glBitmap ( GLsizei width, GLsizei height, GLfloat xorig, GLfloat yorig,
                           GLfloat xmove, GLfloat ymove, GLubyte* bitmap ) ;
 
-FUNCTION: void glReadPixels ( GLint x, GLint y, GLsizei width, GLsizei height, 
+FUNCTION: void glReadPixels ( GLint x, GLint y, GLsizei width, GLsizei height,
                               GLenum format, GLenum type, GLvoid* pixels ) ;
 
-FUNCTION: void glDrawPixels ( GLsizei width, GLsizei height, GLenum format, 
+FUNCTION: void glDrawPixels ( GLsizei width, GLsizei height, GLenum format,
                               GLenum type, GLvoid* pixels ) ;
 FUNCTION: void glCopyPixels ( GLint x, GLint y, GLsizei width, GLsizei height, GLenum type ) ;
 
@@ -1011,7 +1011,7 @@ FUNCTION: void glTexParameteriv ( GLenum target, GLenum pname, GLint* params ) ;
 FUNCTION: void glGetTexParameterfv ( GLenum target, GLenum pname, GLfloat* params ) ;
 FUNCTION: void glGetTexParameteriv ( GLenum target, GLenum pname, GLint* params ) ;
 
-FUNCTION: void glGetTexLevelParameterfv ( GLenum target, GLint level, 
+FUNCTION: void glGetTexLevelParameterfv ( GLenum target, GLint level,
                                           GLenum pname, GLfloat* params ) ;
 FUNCTION: void glGetTexLevelParameteriv ( GLenum target, GLint level,
                                           GLenum pname, GLint* params ) ;
@@ -1019,11 +1019,11 @@ FUNCTION: void glGetTexLevelParameteriv ( GLenum target, GLint level,
 FUNCTION: void glTexImage1D ( GLenum target, GLint level, GLint internalFormat, GLsizei width,
                               GLint border, GLenum format, GLenum type, GLvoid* pixels ) ;
 
-FUNCTION: void glTexImage2D ( GLenum target, GLint level, GLint internalFormat, 
-                              GLsizei width, GLsizei height, GLint border, 
+FUNCTION: void glTexImage2D ( GLenum target, GLint level, GLint internalFormat,
+                              GLsizei width, GLsizei height, GLint border,
                               GLenum format, GLenum type, GLvoid* pixels ) ;
 
-FUNCTION: void glGetTexImage ( GLenum target, GLint level, GLenum format, 
+FUNCTION: void glGetTexImage ( GLenum target, GLint level, GLenum format,
                                GLenum type, GLvoid* pixels ) ;
 
 
@@ -1045,17 +1045,17 @@ FUNCTION: void glTexSubImage1D ( GLenum target, GLint level, GLint xoffset, GLsi
                                  GLenum format, GLenum type, GLvoid* pixels ) ;
 
 FUNCTION: void glTexSubImage2D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
-                                 GLsizei width, GLsizei height, GLenum format, 
+                                 GLsizei width, GLsizei height, GLenum format,
                                  GLenum type, GLvoid* pixels ) ;
 
-FUNCTION: void glCopyTexImage1D ( GLenum target, GLint level, GLenum internalformat, 
+FUNCTION: void glCopyTexImage1D ( GLenum target, GLint level, GLenum internalformat,
                                   GLint x, GLint y, GLsizei width, GLint border ) ;
 
-FUNCTION: void glCopyTexImage2D ( GLenum target, GLint level, GLenum internalformat, 
+FUNCTION: void glCopyTexImage2D ( GLenum target, GLint level, GLenum internalformat,
                                   GLint x, GLint y,
                                   GLsizei width, GLsizei height, GLint border ) ;
 
-FUNCTION: void glCopyTexSubImage1D ( GLenum target, GLint level, GLint xoffset, 
+FUNCTION: void glCopyTexSubImage1D ( GLenum target, GLint level, GLint xoffset,
                                      GLint x, GLint y, GLsizei width ) ;
 
 FUNCTION: void glCopyTexSubImage2D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
@@ -2023,7 +2023,7 @@ GL-FUNCTION: void glFramebufferTexture1D { glFramebufferTexture1DEXT } ( GLenum 
 GL-FUNCTION: void glFramebufferTexture2D { glFramebufferTexture2DEXT } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level ) ;
 GL-FUNCTION: void glFramebufferTexture3D { glFramebufferTexture3DEXT } ( GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset ) ;
 GL-FUNCTION: void glFramebufferTextureLayer { glFramebufferTextureLayerEXT }
-    ( GLenum target, GLenum attachment, 
+    ( GLenum target, GLenum attachment,
       GLuint texture, GLint level, GLint layer ) ;
 GL-FUNCTION: void glGenFramebuffers { glGenFramebuffersEXT } ( GLsizei n, GLuint* framebuffers ) ;
 GL-FUNCTION: void glGenRenderbuffers { glGenRenderbuffersEXT } ( GLsizei n, GLuint* renderbuffers ) ;
@@ -2072,7 +2072,7 @@ GL-FUNCTION: void glEndTransformFeedback { glEndTransformFeedbackEXT } ( ) ;
 GL-FUNCTION: void glTransformFeedbackVaryings { glTransformFeedbackVaryingsEXT } ( GLuint program, GLsizei count,
                                       GLstring* varyings, GLenum bufferMode ) ;
 GL-FUNCTION: void glGetTransformFeedbackVarying { glGetTransformFeedbackVaryingEXT } ( GLuint program, GLuint index,
-                                        GLsizei bufSize, GLsizei* length, 
+                                        GLsizei bufSize, GLsizei* length,
                                         GLsizei* size, GLenum* type, GLstring name ) ;
 
 GL-FUNCTION: void glClearBufferiv  { } ( GLenum buffer, GLint drawbuffer, GLint* value ) ;
@@ -2570,4 +2570,3 @@ CONSTANT: GL_COMPRESSED_LUMINANCE_LATC1_EXT              0x8C70
 CONSTANT: GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT       0x8C71
 CONSTANT: GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT        0x8C72
 CONSTANT: GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT 0x8C73
-

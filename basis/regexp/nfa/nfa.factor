@@ -146,7 +146,7 @@ M: range-class modify-class
         dup cased-range? [
             [ from>> ] [ to>> ] bi
             [ [ ch>lower ] bi@ <range-class> ]
-            [ [ ch>upper ] bi@ <range-class> ] 2bi 
+            [ [ ch>upper ] bi@ <range-class> ] 2bi
             2array <or-class>
         ] when
     ] when ;

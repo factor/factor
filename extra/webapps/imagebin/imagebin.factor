@@ -3,7 +3,7 @@
 USING: accessors furnace.actions furnace.redirection
 html.forms http http.server http.server.dispatchers
 io.directories io.encodings.utf8 io.files io.pathnames
-kernel math.parser multiline namespaces sequences urls 
+kernel math.parser multiline namespaces sequences urls
 math ;
 IN: webapps.imagebin
 
@@ -15,7 +15,7 @@ TUPLE: imagebin < dispatcher path n ;
 
 : next-image-path ( -- path )
     imagebin get
-    [ path>> ] [ [ 1 + ] change-n n>> number>string ] bi append-path ; 
+    [ path>> ] [ [ 1 + ] change-n n>> number>string ] bi append-path ;
 
 M: imagebin call-responder*
     [ imagebin set ] [ call-next-method ] bi ;

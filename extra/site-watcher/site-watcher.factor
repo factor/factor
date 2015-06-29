@@ -8,7 +8,7 @@ IN: site-watcher
 
 SYMBOL: site-watcher-frequency
 5 minutes site-watcher-frequency set-global
- 
+
 SYMBOL: running-site-watcher
 [ f running-site-watcher set-global ] "site-watcher" add-startup-hook
 
@@ -42,7 +42,7 @@ PRIVATE>
     find-sites check-sites sites-to-report send-reports ;
 
 : run-site-watcher ( db -- )
-    [ running-site-watcher get ] dip '[ 
+    [ running-site-watcher get ] dip '[
         [ _ [ watch-sites ] with-db ] site-watcher-frequency get every
         running-site-watcher set
     ] unless ;

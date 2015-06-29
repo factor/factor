@@ -100,7 +100,7 @@ MACRO: nspread* ( m n -- )
 
 MACRO: cleave* ( n -- )
     [ [ ] ]
-    [ 1 - [ [ [ keep ] curry ] dip compose ] n*quot [ call ] compose ] 
+    [ 1 - [ [ [ keep ] curry ] dip compose ] n*quot [ call ] compose ]
     if-zero ;
 
 : napply ( quot n -- )

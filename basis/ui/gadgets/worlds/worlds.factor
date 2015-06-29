@@ -74,7 +74,7 @@ TUPLE: world-attributes
         f >>grab-input?
         dup focused?>> [ handle>> (ungrab-input) ] [ drop ] if
     ] [ drop ] if ;
-    
+
 : show-status ( string/f gadget -- )
     dup find-world dup [
         dup status>> [

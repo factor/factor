@@ -10,4 +10,3 @@ C: <w4> w4
 : allowance ( -- x ) 3500 ; inline
 
 : calculate-w4-allowances ( w4 -- x ) allowances>> allowance * ;
-

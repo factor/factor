@@ -83,7 +83,7 @@ DEFER: <up-ref>
         ref types get push
         ref quot call( LLVMTypeRef -- type )
         types get pop drop
-    ] if* ;   
+    ] if* ;
 
 GENERIC: (>tref)* ( type -- LLVMTypeRef )
 M: enclosing (>tref) [ (>tref)* ] push-type ;
@@ -243,4 +243,4 @@ Program = Type
 
 ;EBNF
 
-SYNTAX: TYPE: ";" parse-multiline-string parse-type suffix! ; 
+SYNTAX: TYPE: ";" parse-multiline-string parse-type suffix! ;

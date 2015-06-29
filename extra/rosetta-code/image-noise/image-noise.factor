@@ -26,7 +26,7 @@ IN: rosetta-code.image-noise
 TUPLE: bw-noise-gadget < image-control timers cnt old-cnt fps-model ;
 
 : animate-image ( control -- )
-    [ 1 + ] change-cnt 
+    [ 1 + ] change-cnt
     model>> <random-bw-image> swap set-model ;
 
 : update-cnt ( gadget -- )
@@ -55,7 +55,7 @@ M: bw-noise-gadget graft* [ call-next-method ] [ setup-timers ] bi ;
 M: bw-noise-gadget ungraft* [ stop-animation ] [ call-next-method ] bi ;
 
 : <bw-noise-gadget> ( -- gadget )
-    <random-bw-image> <model> bw-noise-gadget new-image-gadget* 
+    <random-bw-image> <model> bw-noise-gadget new-image-gadget*
     0 >>cnt 0 >>old-cnt 0 <model> >>fps-model V{ } clone >>timers ;
 
 : fps-gadget ( model -- gadget )

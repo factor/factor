@@ -110,7 +110,7 @@ TUPLE: triangle-state
     { antialias? boolean initial: f read-only } ;
 C: <triangle-state> triangle-state
 
-VARIANT: point-sprite-origin 
+VARIANT: point-sprite-origin
     origin-upper-left origin-lower-left ;
 
 TUPLE: point-state
@@ -141,13 +141,13 @@ UNION: gpu-state
 <PRIVATE
 
 : gl-triangle-face ( triangle-face -- face )
-    { 
+    {
         { face-ccw [ GL_CCW ] }
         { face-cw  [ GL_CW  ] }
     } case ;
 
 : gl-triangle-face> ( triangle-face -- face )
-    { 
+    {
         { $ GL_CCW [ face-ccw ] }
         { $ GL_CW  [ face-cw  ] }
     } case ;
@@ -194,7 +194,7 @@ UNION: gpu-state
 
 : gl-comparison ( comparison -- comparison )
     {
-        { cmp-never         [ GL_NEVER    ] } 
+        { cmp-never         [ GL_NEVER    ] }
         { cmp-always        [ GL_ALWAYS   ] }
         { cmp-less          [ GL_LESS     ] }
         { cmp-less-equal    [ GL_LEQUAL   ] }
@@ -206,7 +206,7 @@ UNION: gpu-state
 
 : gl-comparison> ( comparison -- comparison )
     {
-        { $ GL_NEVER    [ cmp-never         ] } 
+        { $ GL_NEVER    [ cmp-never         ] }
         { $ GL_ALWAYS   [ cmp-always        ] }
         { $ GL_LESS     [ cmp-less          ] }
         { $ GL_LEQUAL   [ cmp-less-equal    ] }
@@ -487,7 +487,7 @@ TYPED: get-blend-state ( -- blend-state: blend-state )
     <blend-state> ;
 
 TYPED: get-mask-state ( -- mask-state: mask-state )
-    GL_COLOR_WRITEMASK 4 get-gl-bools 
+    GL_COLOR_WRITEMASK 4 get-gl-bools
     GL_DEPTH_WRITEMASK get-gl-bool
     GL_STENCIL_WRITEMASK get-gl-int
     GL_STENCIL_BACK_WRITEMASK get-gl-int
@@ -509,7 +509,7 @@ TYPED: get-triangle-state ( -- triangle-state: triangle-state )
 TYPED: get-point-state ( -- point-state: point-state )
     GL_VERTEX_PROGRAM_POINT_SIZE gl-enabled?
     [ f ] [ GL_POINT_SIZE get-gl-float ] if
-    GL_POINT_SPRITE_COORD_ORIGIN get-gl-int gl-point-sprite-origin> 
+    GL_POINT_SPRITE_COORD_ORIGIN get-gl-int gl-point-sprite-origin>
     GL_POINT_FADE_THRESHOLD_SIZE get-gl-float
     <point-state> ;
 

@@ -41,4 +41,3 @@ INSTANCE: replacer inserter
 
 M: replacer new-sequence
     underlying>> [ set-length ] keep ; inline
-

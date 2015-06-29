@@ -36,7 +36,7 @@ IN: compression.run-length
             [ sp next 8hi-lo 2array <repetition> concat ] [ head ] bi
             [ j matrix i swap nth copy ] [ length j + j! ] bi
         ] if
-        
+
         ! j stride >= [ i 1 + i!  0 j! ] when
         j stride >= [ 0 j! ] when
         done? not
@@ -67,7 +67,7 @@ IN: compression.run-length
         ] [
             sp next <array> [ j matrix i swap nth copy ] [ length j + j! ] bi
         ] if
-        
+
         ! j stride >= [ i 1 + i!  0 j! ] when
         j stride >= [ 0 j! ] when
         done? not

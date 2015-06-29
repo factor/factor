@@ -158,4 +158,3 @@ M: linux lookup-baud ( n -- n )
         { 3500000 0o0010016 }
         { 4000000 0o0010017 }
     } ?at [ invalid-baud ] unless ;
-

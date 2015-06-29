@@ -79,15 +79,15 @@ ERROR: no-group string ;
     ] if* ;
 
 PRIVATE>
-    
+
 GENERIC: user-groups ( string/id -- seq )
 
 M: string user-groups ( string -- seq )
-    (user-groups) ; 
+    (user-groups) ;
 
 M: integer user-groups ( id -- seq )
     user-name (user-groups) ;
-    
+
 : all-groups ( -- seq )
     [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip
     endgrent ;
@@ -139,14 +139,14 @@ GENERIC: set-effective-group ( obj -- )
     [ unix.ffi:setegid ] unix-system-call drop ; inline
 
 PRIVATE>
-    
+
 M: integer set-real-group ( id -- )
     (set-real-group) ;
 
 M: string set-real-group ( string -- )
     ?group-id (set-real-group) ;
 
-M: integer set-effective-group ( id -- )    
+M: integer set-effective-group ( id -- )
     (set-effective-group) ;
 
 M: string set-effective-group ( string -- )

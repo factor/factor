@@ -159,7 +159,7 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
 
 : trim-ipv6-arpa ( string -- string' )
     dotted> ipv6-arpa-suffix ?tail drop ;
- 
+
 : arpa>ipv4 ( string -- ip ) trim-ipv4-arpa reverse-ipv4 ;
 
 : arpa>ipv6 ( string -- ip )
@@ -270,7 +270,7 @@ M: HINFO rdata>byte-array
     [ os>> >name ] bi append ;
 
 M: MX rdata>byte-array
-    drop 
+    drop
     [ preference>> 2 >be ]
     [ exchange>> >name ] bi append ;
 
@@ -384,7 +384,7 @@ M: TXT rdata>byte-array
 : message>mxs ( message -- assoc )
     answer-section>> [ rdata>> [ preference>> ] [ exchange>> ] bi 2array ] map ;
 
-: messages>names ( messages -- names ) 
+: messages>names ( messages -- names )
     [ message>names ] map concat ;
 
 : forward-confirmed-reverse-dns-ipv4? ( ipv4-string -- ? )
@@ -407,7 +407,7 @@ M: string resolve-host
         dns-A-query message>a-names [ <ipv4> ] map
     ] if ;
 *)
-    
+
 HOOK: initial-dns-servers os ( -- sequence )
 
 {
@@ -417,5 +417,5 @@ HOOK: initial-dns-servers os ( -- sequence )
 
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline
-    
+
 dns-servers [ initial-dns-servers >vector ] initialize

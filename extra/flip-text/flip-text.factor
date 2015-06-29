@@ -97,5 +97,3 @@ PRIVATE>
 
 : flip-text ( str -- str' )
     [ ch>flip ] map reverse ;
-
-

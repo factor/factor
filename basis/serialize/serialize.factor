@@ -41,7 +41,7 @@ SYMBOL: serialized
         dup 0x7e <= [
             0x80 bitor write1
         ] [
-            dup log2 8 /i 1 + 
+            dup log2 8 /i 1 +
             dup 0x7f >= [
                 0xff write1
                 dup serialize-cell

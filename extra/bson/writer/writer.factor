@@ -80,7 +80,7 @@ TYPED: write-oid ( oid: oid -- )
 
 : write-oid-field ( assoc -- )
     [ MDB_OID_FIELD dup ] dip at
-    [ dup oid? [ T_OID write-header write-oid ] [ write-pair ] if ] 
+    [ dup oid? [ T_OID write-header write-oid ] [ write-pair ] if ]
     [ drop ] if* ; inline
 
 : skip-field? ( name value -- name value boolean )
@@ -90,7 +90,7 @@ UNION: hashtables hashtable linked-assoc ;
 
 TYPED: write-assoc ( assoc: hashtables -- )
     '[ _ [ write-oid-field ] [
-            [ skip-field? [ 2drop ] [ write-pair ] if ] assoc-each 
+            [ skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
          ] bi write-eoo
     ] with-length-prefix ; inline recursive
 
@@ -102,7 +102,7 @@ TYPED: (serialize-code) ( code: code -- )
   [ T_Binary_Custom write1 write ] bi ; inline
 
 : write-string-length ( string -- )
-    [ length>> 1 + ] 
+    [ length>> 1 + ]
     [ aux>> [ length ] [ 0 ] if* ] bi + write-int32 ; inline
 
 TYPED: write-string ( string: string -- )
@@ -132,7 +132,7 @@ TYPED: write-pair ( name: string obj -- )
             [ dup integer? ]
             [ T_Integer write-header write-int32 ]
         } {
-            [ dup boolean? ] 
+            [ dup boolean? ]
             [ T_Boolean write-header write-boolean ]
         } {
             [ dup real? ]

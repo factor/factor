@@ -207,7 +207,7 @@ STRUCT: lua_Debug
 
 : luaL_getn ( L i -- int ) lua_objlen ; inline
 : luaL_setn ( L i j -- ) 3drop ; inline
- 
+
 : LUA_ERRFILE ( -- x ) LUA_ERRERR 1 + ;
 
 STRUCT: luaL_Reg

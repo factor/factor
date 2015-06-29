@@ -21,4 +21,3 @@ ERROR: format-unsupported-by-openal audio ;
         { { 2 16 } [ drop AL_FORMAT_STEREO16 ] }
         [ drop format-unsupported-by-openal ]
     } case ;
-

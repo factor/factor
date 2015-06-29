@@ -224,5 +224,3 @@ PRIVATE>
     [ swap 2array ] produce 2nip ;
 
 : m/quit ( -- ) QUIT <request> submit drop ;
-
-

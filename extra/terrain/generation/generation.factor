@@ -13,7 +13,7 @@ CONSTANT: terrain-small-noise-scale float-4{ 0.05 0.05 0.05 0.05 }
 TUPLE: terrain
     { big-noise-table byte-array }
     { small-noise-table byte-array }
-    { tiny-noise-seed integer } ; 
+    { tiny-noise-seed integer } ;
 
 : <terrain> ( -- terrain )
     <perlin-noise-table> <perlin-noise-table>
@@ -24,11 +24,11 @@ TUPLE: terrain
 
 : big-noise-segment ( terrain at -- bytes )
     [ big-noise-table>> terrain-big-noise-scale scale-matrix4 ] dip
-    terrain-segment-size-vector v* translation-matrix4 m4. 
+    terrain-segment-size-vector v* translation-matrix4 m4.
     terrain-segment-size perlin-noise-image bitmap>> ; inline
 : small-noise-segment ( terrain at -- bytes )
     [ small-noise-table>> terrain-small-noise-scale scale-matrix4 ] dip
-    terrain-segment-size-vector v* translation-matrix4 m4. 
+    terrain-segment-size-vector v* translation-matrix4 m4.
     terrain-segment-size perlin-noise-image bitmap>> ; inline
 : tiny-noise-segment ( terrain at -- bytes )
     [ tiny-noise-seed>> ] dip seed-at

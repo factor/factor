@@ -6,4 +6,3 @@ IN: io.encodings.big5
 EUC: big5 "vocab:io/encodings/big5/CP950.TXT"
 
 big5 "Big5" register-encoding
-

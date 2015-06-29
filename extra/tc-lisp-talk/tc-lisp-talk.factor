@@ -224,7 +224,7 @@ WHERE
         { $code "5 9 [ sq ] bi@" }
     }
     { $slide "Sequence combinators"
-        
+
         { $link each }
         { $code "{ 1 2 3 4 5 } [ sq . ] each" }
         { $link map }
@@ -233,7 +233,7 @@ WHERE
         { $code "{ 1 2 3 4 5 } [ even? ] filter" }
     }
     { $slide "Multiple sequence combinators"
-        
+
         { $link 2each }
         { $code "{ 1 2 3 } { 10 20 30 } [ + . ] 2each" }
         { $link 2map }

@@ -23,7 +23,7 @@ IN: math.floats.half
         dup zero? [
             dup 0x7c00 >= [ 13 shift 0x7f800000 bitor ] [
                 13 shift
-                112 23 shift + 
+                112 23 shift +
             ] if
         ] unless
     ] bi bitor bits>float ;

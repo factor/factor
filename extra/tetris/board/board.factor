@@ -18,7 +18,7 @@ TUPLE: board { width integer } { height integer } rows ;
     [ second swap rows>> nth ] keep first swap ;
 
 : set-block ( board block colour -- ) -rot board@block set-nth ;
-  
+
 : block ( board block -- colour ) board@block nth ;
 
 : block-free? ( board block -- ? ) block not ;
@@ -52,4 +52,3 @@ TUPLE: board { width integer } { height integer } rows ;
     #! remove full rows, then add blank ones at the top, returning the number
     #! of rows removed (and added)
     remove-full-rows dup height>> over rows>> length - swap top-up-rows ;
-

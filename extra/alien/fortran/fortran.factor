@@ -34,7 +34,7 @@ library-fortran-abis [ H{ } clone ] initialize
 : lowercase-name-with-underscore ( name -- name' )
     >lower "_" append ;
 : lowercase-name-with-extra-underscore ( name -- name' )
-    >lower CHAR: _ over member? 
+    >lower CHAR: _ over member?
     [ "__" append ] [ "_" append ] if ;
 
 HOOK: fortran-c-abi fortran-abi ( -- abi )
@@ -305,7 +305,7 @@ M: misc-type (fortran-result>)
 
 GENERIC: (<fortran-result>) ( type -- quot )
 
-M: fortran-type (<fortran-result>) 
+M: fortran-type (<fortran-result>)
     (fortran-type>c-type) \ heap-size \ <byte-array> [ ] 3sequence ;
 
 M: character-type (<fortran-result>)
@@ -321,14 +321,14 @@ M: character-type (<fortran-result>)
 : [fortran-args>c-args] ( parameters -- quot )
     [ [ ] ] [
         [ parse-fortran-type (fortran-arg>c-args) 2array ] map flip first2
-        [ [ \ spread [ ] 2sequence ] bi@ 2array ] [ length ] bi 
+        [ [ \ spread [ ] 2sequence ] bi@ 2array ] [ length ] bi
         \ ncleave [ ] 3sequence
     ] if-empty ;
 
-:: [fortran-invoke] ( [args>args] return library function parameters -- [args>args] quot ) 
+:: [fortran-invoke] ( [args>args] return library function parameters -- [args>args] quot )
     return parameters fortran-sig>c-sig :> ( c-return c-parameters )
     function fortran-name>symbol-name :> c-function
-    [args>args] 
+    [args>args]
     c-return library c-function c-parameters \ alien-invoke
     5 [ ] nsequence
     c-parameters length \ nkeep
@@ -396,7 +396,7 @@ PRIVATE>
 : fortran-ret-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type dup returns-by-value?
     [ (fortran-ret-type>c-type) { } ] [
-        c:void swap 
+        c:void swap
         [ added-c-args ] [ (fortran-type>c-type) <pointer> ] bi prefix
     ] if ;
 
@@ -440,7 +440,7 @@ MACRO: fortran-invoke ( return library function parameters -- )
     return library function parameters return [ c:void ] unless* parse-arglist
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
-SYNTAX: SUBROUTINE: 
+SYNTAX: SUBROUTINE:
     f current-library get scan-token ";" parse-tokens
     [ "()" subseq? ] reject define-fortran-function ;
 
@@ -452,4 +452,3 @@ SYNTAX: LIBRARY:
     scan-token
     [ current-library set ]
     [ set-fortran-abi ] bi ;
-

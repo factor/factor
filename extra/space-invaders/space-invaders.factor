@@ -36,15 +36,15 @@ CONSTANT: game-height 256
     [ [ 1 + ] dip nth ]
     [ [ 2 + ] dip nth ] 2tri 3array ;
 
-CONSTANT: SOUND-SHOT         0 
-CONSTANT: SOUND-UFO          1 
-CONSTANT: SOUND-BASE-HIT     2 
-CONSTANT: SOUND-INVADER-HIT  3 
-CONSTANT: SOUND-WALK1        4 
+CONSTANT: SOUND-SHOT         0
+CONSTANT: SOUND-UFO          1
+CONSTANT: SOUND-BASE-HIT     2
+CONSTANT: SOUND-INVADER-HIT  3
+CONSTANT: SOUND-WALK1        4
 CONSTANT: SOUND-WALK2        5
-CONSTANT: SOUND-WALK3        6 
-CONSTANT: SOUND-WALK4        7 
-CONSTANT: SOUND-UFO-HIT      8 
+CONSTANT: SOUND-WALK3        6
+CONSTANT: SOUND-WALK4        7
+CONSTANT: SOUND-UFO-HIT      8
 
 : init-sound ( index cpu filename  -- )
     absolute-path swapd [ sounds>> nth AL_BUFFER ] dip
@@ -103,8 +103,8 @@ CONSTANT: SOUND-UFO-HIT      8
 
 : read-port3 ( cpu -- byte )
     #! Used to compute a special formula
-    [ port4hi>> 8 shift ] keep 
-    [ port4lo>> bitor ] keep 
+    [ port4hi>> 8 shift ] keep
+    [ port4lo>> bitor ] keep
     port2o>> shift -8 shift 0xFF bitand ;
 
 M: space-invaders read-port
@@ -192,14 +192,14 @@ M: space-invaders reset
     0 >>port3o
     0 >>port4lo
     0 >>port4hi
-    0 >>port5o 
+    0 >>port5o
     drop ;
 
 : gui-step ( cpu -- )
     [ read-instruction ] keep ! n cpu
     over get-cycles over inc-cycles
-    [ swap instructions nth call( cpu -- ) ] keep  
-    [ pc>> 0xFFFF bitand ] keep 
+    [ swap instructions nth call( cpu -- ) ] keep
+    [ pc>> 0xFFFF bitand ] keep
     pc<< ;
 
 : gui-frame/2 ( cpu -- )
@@ -273,7 +273,7 @@ invaders-gadget H{
     { T{ key-up   f f "RIGHT" }     [ cpu>> right-up ] }
 } set-gestures
 
-: <invaders-gadget> ( cpu -- gadget ) 
+: <invaders-gadget> ( cpu -- gadget )
     invaders-gadget new
         swap >>cpu
         f >>quit? ;

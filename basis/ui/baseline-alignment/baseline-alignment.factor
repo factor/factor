@@ -61,7 +61,7 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
 
 :: combine-metrics ( graphics-height ascent descent cap-height -- ascent' descent' )
     ascent [
-        cap-height 2 / :> mid-line 
+        cap-height 2 / :> mid-line
         graphics-height 2 /
         [ ascent mid-line - max mid-line + floor >integer ]
         [ descent mid-line + max mid-line - ceiling >integer ] bi

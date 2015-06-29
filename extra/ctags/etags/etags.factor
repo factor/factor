@@ -24,7 +24,7 @@ IN: ctags.etags
   [ etag-vector ] 2keep [
     [ etag-pair ] [ ctag-path ] bi [ suffix ] dip
   ] dip set-at ;
-    
+
 : etag-hash ( seq -- hash )
   H{ } clone swap [ swap [ etag-add ] keep ] each ;
 
@@ -66,7 +66,7 @@ IN: ctags.etags
   ] each ;
 
 : etags-write ( alist path -- )
-  [ etag-strings ] dip ascii set-file-lines ; 
+  [ etag-strings ] dip ascii set-file-lines ;
 
 : etags ( path -- )
   [ (ctags) sort-values etag-hash >alist ] dip etags-write ;

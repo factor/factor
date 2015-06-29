@@ -23,7 +23,7 @@ CONSTANT: public-key 65537
 : rsa-primes ( numbits -- p q )
     2/ 2 swap unique-primes first2 ;
 
-: modulus-phi ( numbits -- n phi ) 
+: modulus-phi ( numbits -- n phi )
     #! Loop until phi is not divisible by the public key.
     dup rsa-primes [ * ] 2keep
     [ 1 - ] bi@ *

@@ -11,18 +11,18 @@ IN: parser-combinators.simple
   'digit' <!+> [ 10 digits>integer ] <@ ;
 
 : 'string' ( -- parser )
-  [ CHAR: " = ] satisfy 
+  [ CHAR: " = ] satisfy
   [ CHAR: " = not ] satisfy <*> &>
   [ CHAR: " = ] satisfy <& [ >string ] <@  ;
-  
+
 : 'bold' ( -- parser )
-  "*" token 
-  [ CHAR: * = not  ] satisfy <*> [ >string ] <@ &> 
+  "*" token
+  [ CHAR: * = not  ] satisfy <*> [ >string ] <@ &>
   "*" token <& ;
 
 : 'italic' ( -- parser )
-  "_" token 
-  [ CHAR: _ = not ] satisfy <*> [ >string ] <@ &> 
+  "_" token
+  [ CHAR: _ = not ] satisfy <*> [ >string ] <@ &>
   "_" token <& ;
 
 : comma-list ( element -- parser )

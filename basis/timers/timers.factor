@@ -6,7 +6,7 @@ IN: timers
 
 TUPLE: timer
     { quot callable initial: [ ] }
-    start-nanos 
+    start-nanos
     delay-nanos
     interval-nanos
     iteration-start-nanos

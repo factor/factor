@@ -42,4 +42,3 @@ from within Factor for more information.
 
     output-stream get [ stream-flush ] when*
     0 exit ;
-

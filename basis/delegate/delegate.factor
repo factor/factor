@@ -46,9 +46,9 @@ TUPLE: consultation group class quot loc ;
 TUPLE: broadcast < consultation ;
 
 : <consultation> ( group class quot -- consultation )
-    f consultation boa ; 
+    f consultation boa ;
 : <broadcast> ( group class quot -- consultation )
-    [ check-broadcast-group ] 2dip f broadcast boa ; 
+    [ check-broadcast-group ] 2dip f broadcast boa ;
 
 : create-consult-method ( word consultation -- method )
     [ class>> swap first create-method dup fake-definition ] keep

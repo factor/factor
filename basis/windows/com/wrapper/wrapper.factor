@@ -47,7 +47,7 @@ unless
     [ drop f ] suffix ;
 
 : (make-query-interface) ( interfaces -- quot )
-    (query-interface-cases) 
+    (query-interface-cases)
     '[
         swap _ case
         [
@@ -79,7 +79,7 @@ unless
     [ (make-add-ref) ]
     [ (make-release) ] tri
     3array ;
-    
+
 : (thunk) ( n -- quot )
     dup 0 =
     [ drop [ ] ]

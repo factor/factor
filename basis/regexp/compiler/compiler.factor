@@ -120,7 +120,7 @@ C: <box> box
     dup transitions>> keys [ gensym ] H{ } map>assoc
     [ transitions-at ]
     [ values ]
-    bi swap ; 
+    bi swap ;
 
 : dfa>main-word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;

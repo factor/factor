@@ -60,7 +60,7 @@ CONSTANT: type-tags
         [ "value" attr >>value ]
         [ child-type-tag xml>type >>type ]
     } cleave ;
-    
+
 : load-type ( type xml -- type )
     {
         [ "name" attr >>name ]
@@ -99,7 +99,7 @@ CONSTANT: type-tags
         [ child-type-tag xml>type >>type ]
         [ "transfer-ownership" attr >>transfer-ownership ]
     } cleave ;
-   
+
 : load-callable ( callable xml -- callable )
     [ "return-value" tag-named xml>return >>return ]
     [

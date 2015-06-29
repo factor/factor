@@ -367,7 +367,7 @@ DEFER: gamma
 :: log-gamma ( x -- value )
     x 0 <= [ "Invalid input" throw ] when
     x 12 < [ x gamma abs log ] [
-        1.0 x x * / :> z 
+        1.0 x x * / :> z
         7 c nth 7 iota reverse [ [ z * ] [ c nth ] bi* + ] each x / :> series
         x 0.5 - x log * x - halfLogTwoPi + series +
     ] if ;

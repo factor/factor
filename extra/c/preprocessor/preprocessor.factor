@@ -111,7 +111,7 @@ ERROR: header-file-missing path ;
     [ [ 1 + ] change-ifdef-nesting ] dip
     take-token over symbol-table>> key?
     [ t >>processing-disabled? drop ]
-    [ drop ] if ; 
+    [ drop ] if ;
 
 : handle-endif ( preprocessor-state sequence-parser -- )
     drop [ 1 - ] change-ifdef-nesting drop ;
@@ -176,7 +176,7 @@ ERROR: header-file-missing path ;
     [ swap processing-disabled?>> [ drop ] [ write-full nl ] if ] if ;
 
 : preprocess-lines ( preprocessor-state -- )
-    readln 
+    readln
     [ <sequence-parser> [ preprocess-line ] [ drop preprocess-lines ] 2bi ]
     [ drop ] if* ;
 

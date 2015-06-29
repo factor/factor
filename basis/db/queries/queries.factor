@@ -23,7 +23,7 @@ SINGLETON: retryable
     [ make-retryable ] when ;
 
 : regenerate-params ( statement -- statement )
-    dup 
+    dup
     [ bind-params>> ] [ in-params>> ] bi
     [
         dup generator-bind? [
@@ -32,13 +32,13 @@ SINGLETON: retryable
             drop
         ] if
     ] 2map >>bind-params ;
-    
+
 M: retryable execute-statement* ( statement type -- )
     drop [ retries>> iota ] [
         [
             nip
             [ query-results dispose t ]
-            [ ] 
+            [ ]
             [ regenerate-params bind-statement* f ] cleanup
         ] curry
     ] bi attempt-all drop ;

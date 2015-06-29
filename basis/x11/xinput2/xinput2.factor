@@ -14,4 +14,3 @@ IN: x11.xinput2
     } case ;
 
 : xi2-available? ( -- ? ) dpy get (xi2-available?) ; inline
-

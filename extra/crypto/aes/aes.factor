@@ -108,7 +108,7 @@ MEMO:: t-table ( -- array )
     a1 xtime :> a2
     a2 xtime :> a4
     a4 xtime :> a8
-    a8 a1 bitxor :> a9 
+    a8 a1 bitxor :> a9
     a9 a2 bitxor :> ab
     a9 a4 bitxor :> ad
     a8 a4 a2 bitxor bitxor :> ae
@@ -180,7 +180,7 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
 
 TUPLE: aes-state nrounds key state ;
 
-: <aes> ( nrounds key state -- aes-state ) \ aes-state boa ; 
+: <aes> ( nrounds key state -- aes-state ) \ aes-state boa ;
 
 #! grabs the 4n...4(n+1) words of the key
 : (key-at-nth-round) ( nth aes -- seq )
@@ -190,9 +190,9 @@ SYMBOL: aes-strategy
 HOOK: (expand-key) aes-strategy ( K Nr -- sched )
 HOOK: (first-round) aes-strategy ( aes -- aes' )
 HOOK: (counter) aes-strategy ( nrounds -- seq )
-HOOK: (round) aes-strategy ( state -- ) 
+HOOK: (round) aes-strategy ( state -- )
 HOOK: (add-key) aes-strategy ( aes -- aes' )
-HOOK: (final-round) aes-strategy ( aes -- aes' ) 
+HOOK: (final-round) aes-strategy ( aes -- aes' )
 
 SINGLETON: aes-decrypt
 SINGLETON: aes-encrypt
@@ -299,7 +299,7 @@ M: aes-decrypt (round) ( state -- )
 
 : (aes-crypt-block-inner) ( nrounds key block -- crypted-block )
     <aes> (aes-crypt) state>> ;
-    
+
 : (aes-crypt-block) ( key block -- output-block )
     [ (aes-expand-key) ] dip bytes>words (aes-crypt-block-inner) ;
 

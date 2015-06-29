@@ -68,4 +68,3 @@ M: object (match-branch)
 MACRO: match ( branches -- )
     [ dup callable? [ first2 (match-branch) 2array ] unless ] map
     [ \ dup \ ?class ] dip \ case [ ] 4sequence ;
-

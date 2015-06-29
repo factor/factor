@@ -35,7 +35,7 @@ TUPLE: trails-gadget < gadget paused points ;
 
   ! Add a valid point if the mouse is in the gadget
   ! Otherwise, add an "invisible" point
-  
+
   hand-gadget get GADGET =
     [ mouse       GADGET points>> circular-push ]
     [ { -10 -10 } GADGET points>> circular-push ]

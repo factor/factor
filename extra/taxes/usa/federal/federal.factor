@@ -48,7 +48,7 @@ M: federal withholding* ( salary w4 tax-table entity -- x )
 
 : total-withholding ( salary w4 tax-table -- x )
     dup entity>> dup federal = [
-        withholding* 
+        withholding*
     ] [
         drop
         [ drop <federal> federal withholding* ]

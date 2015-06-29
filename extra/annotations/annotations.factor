@@ -41,4 +41,3 @@ CONSTANT: annotation-tags {
 annotation-tags [ define-annotation ] each
 
 >>
-

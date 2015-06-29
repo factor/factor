@@ -18,4 +18,3 @@ M: editpadpro editor-command ( file line -- command )
     [
         editpadpro-path , number>string "/l" prepend , ,
     ] { } make ;
-

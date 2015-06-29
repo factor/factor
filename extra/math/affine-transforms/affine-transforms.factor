@@ -29,7 +29,7 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
 
 : center-rotation ( transform center -- transform )
     [ [ x>> ] [ y>> ] [ ] tri ] dip [ vneg a.v ] [ v+ ] bi <affine-transform> ;
-    
+
 : flatten-transform ( transform -- array )
     [ x>> ] [ y>> ] [ origin>> ] tri 3append ;
 

@@ -212,7 +212,7 @@ IN: tools.deploy.shaker
                 "writing"
             } %
         ] when
-        
+
         strip-prettyprint? [
             {
                 "delimiter"
@@ -226,7 +226,7 @@ IN: tools.deploy.shaker
                 "word-style"
             } %
         ] when
-        
+
         deploy-c-types? get [
             { "c-type" "struct-slots" "struct-align" } %
         ] unless
@@ -564,7 +564,7 @@ SYMBOL: deploy-vocab
             [ path>> >deployed-library-path ] [ abi>> ] bi make-library
         ] change-at
     ] each
-    
+
     [
         "deploy-libraries" "alien.libraries" lookup-word forget
         "deploy-library" "alien.libraries" lookup-word forget

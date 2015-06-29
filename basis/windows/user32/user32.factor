@@ -78,7 +78,7 @@ CONSTANT: WS_EX_APPWINDOW         0x00040000
 CONSTANT: WS_EX_OVERLAPPEDWINDOW
     flags{ WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE }
 
-CONSTANT: WS_EX_PALETTEWINDOW 
+CONSTANT: WS_EX_PALETTEWINDOW
     flags{ WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW WS_EX_TOPMOST }
 
 CONSTANT: CS_VREDRAW          0x0001
@@ -149,7 +149,7 @@ CONSTANT: PM_NOYIELD    2
 ! : PM_QS_SENDMESSAGE   (QS_SENDMESSAGE << 16) ;
 
 
-! 
+!
 ! Standard Cursor IDs
 !
 CONSTANT: IDC_ARROW           32512
@@ -1551,7 +1551,7 @@ ALIAS: MapVirtualKeyEx MapVirtualKeyExW
 ! -1 is Simple beep
 FUNCTION: BOOL MessageBeep ( UINT uType ) ;
 
-FUNCTION: int MessageBoxA ( 
+FUNCTION: int MessageBoxA (
                 HWND hWnd,
                 LPCSTR lpText,
                 LPCSTR lpCaption,
@@ -1731,7 +1731,7 @@ FUNCTION: BOOL SetForegroundWindow ( HWND hWnd ) ;
 ! FUNCTION: SetInternalWindowPos
 ! FUNCTION: SetKeyboardState
 ! type is ignored
-FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ; 
+FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ;
 : SetLastError ( errcode -- ) 0 SetLastErrorEx ; inline
 ! FUNCTION: SetLayeredWindowAttributes
 ! FUNCTION: SetLogonNotifyWindow

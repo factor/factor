@@ -49,5 +49,3 @@ PRIVATE>
 
 : <cgi-simple-form> ( -- assoc )
     <cgi-form> [ first ] assoc-map ;
-
-
