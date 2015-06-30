@@ -31,6 +31,8 @@ M: complex /i [ /i ] complex/ ; inline
 M: complex abs absq sqrt ; inline
 M: complex sqrt >polar [ sqrt ] [ 2.0 / ] bi* polar> ; inline
 
+PRIVATE>
+
 IN: syntax
 
 ERROR: malformed-complex obj ;
@@ -45,5 +47,3 @@ USE: prettyprint.custom
 M: complex pprint* pprint-object ;
 M: complex pprint-delims drop \ C{ \ } ;
 M: complex >pprint-sequence >rect 2array ;
-
-PRIVATE>
