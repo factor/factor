@@ -178,4 +178,5 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     [ last parsing-word-lexer-dump ] if-empty ;
 
 : with-lexer ( lexer quot -- newquot )
-    [ lexer set ] dip [ <lexer-error> rethrow ] recover ; inline
+    [ [ <lexer-error> rethrow ] recover ] curry
+    [ lexer ] dip with-variable ; inline
