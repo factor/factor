@@ -3,7 +3,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel kernel.private math math.order
 math.private ;
-IN: math.integers.private
+IN: math.integers
+
+<PRIVATE
 
 : fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
 : fixnum-max ( x y -- z ) [ fixnum> ] most ; foldable
@@ -186,3 +188,5 @@ M: fixnum /f
     { bignum } declare 1 >bignum bignum/f ;
 
 M: bignum >float bignum>float ; inline
+
+PRIVATE>
