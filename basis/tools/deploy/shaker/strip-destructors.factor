@@ -1,6 +1,10 @@
 USE: kernel
-IN: destructors.private
+IN: destructors
+
+<PRIVATE
 
 : register-disposable ( obj -- ) drop ; inline
 
 : unregister-disposable ( obj -- ) drop ; inline
+
+PRIVATE>

@@ -3,7 +3,9 @@
 USING: accessors kernel kernel.private math math.private
 math.functions arrays math.functions.private sequences
 sequences.private parser ;
-IN: math.complex.private
+IN: math.complex
+
+<PRIVATE
 
 M: real real-part ; inline
 M: real imaginary-part drop 0 ; inline
@@ -43,3 +45,5 @@ USE: prettyprint.custom
 M: complex pprint* pprint-object ;
 M: complex pprint-delims drop \ C{ \ } ;
 M: complex >pprint-sequence >rect 2array ;
+
+PRIVATE>
