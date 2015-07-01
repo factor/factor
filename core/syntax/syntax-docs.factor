@@ -867,6 +867,17 @@ HELP: <PRIVATE
         ""
         ": fac ( n -- n! ) 1 swap (fac) ;"
     }
+    "The above is equivalent to:"
+    { $code
+        "IN: factorial.private"
+        ""
+        ": (fac) ( accum n -- n! )"
+        "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"
+        ""
+        "IN: factorial"
+        ""
+        ": fac ( n -- n! ) 1 swap (fac) ;"
+    }
 } ;
 
 HELP: PRIVATE>
