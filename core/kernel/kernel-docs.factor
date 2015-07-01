@@ -719,7 +719,7 @@ HELP: declare
 
 HELP: tag
 { $values { "object" object } { "n" "a tag number" } }
-{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class-of } " instead." } ;
 
 HELP: special-object
 { $values { "n" "a non-negative integer" } { "obj" object } }
