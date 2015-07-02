@@ -1,7 +1,7 @@
 IN: vocabs.files.tests
 USING: tools.test vocabs.files vocabs arrays grouping ;
 
-{ t } [
+[ t ] [
     "kernel" vocab-files
     "kernel" lookup-vocab vocab-files
     "kernel" <vocab-link> vocab-files

@@ -7,7 +7,7 @@ IN: syndication.tests
     #! it as an feed tuple.
     binary file-contents parse-feed ;
 
-{ T{
+[ T{
     feed
     f
     "Meerkat"
@@ -22,8 +22,8 @@ IN: syndication.tests
             f
         }
     }
-} } [ "vocab:syndication/test/rss1.xml" load-news-file ] unit-test
-{ T{
+} ] [ "vocab:syndication/test/rss1.xml" load-news-file ] unit-test
+[ T{
     feed
     f
     "dive into mark"
@@ -39,5 +39,5 @@ IN: syndication.tests
             T{ timestamp f 2003 12 13 8 29 29 T{ duration f 0 0 0 -4 0 0 } }
         }
     }
-} } [ "vocab:syndication/test/atom.xml" load-news-file ] unit-test
-{ t } [ "vocab:syndication/test/atom.xml" load-news-file dup feed>xml xml>feed = ] unit-test
+} ] [ "vocab:syndication/test/atom.xml" load-news-file ] unit-test
+[ t ] [ "vocab:syndication/test/atom.xml" load-news-file dup feed>xml xml>feed = ] unit-test

@@ -2,7 +2,7 @@ USING: mason.config mason.platform namespaces tools.test
 strings system ;
 IN: mason.platform.tests
 
-{ t } [ platform string? ] unit-test
+[ t ] [ platform string? ] unit-test
 
 [
     linux target-os set

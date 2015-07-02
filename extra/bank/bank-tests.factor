@@ -27,7 +27,7 @@ my-account [
     ] unit-test
 ] with-variable
 
-{ 6781 } [
+[ 6781 ] [
     "..." 0.07 1 2007 4 10 <date> 4398.50 open-account
     2007 10 26 <date> 2000 "..." <transaction> 1array inserting-transactions
     2008 4 10 <date> process-to-date dup balance>> swap unpaid-interest>> + round >integer

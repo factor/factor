@@ -5,7 +5,7 @@ IN: concurrency.mailboxes.tests
 
 { 1 1 } [ [ integer? ] mailbox-get? ] must-infer-as
 
-{ V{ 1 2 3 } } [
+[ V{ 1 2 3 } ] [
     0 <vector>
     <mailbox>
     [ mailbox-get swap push ] in-thread
@@ -16,7 +16,7 @@ IN: concurrency.mailboxes.tests
     3 swap mailbox-put
 ] unit-test
 
-{ V{ 1 2 3 } } [
+[ V{ 1 2 3 } ] [
     0 <vector>
     <mailbox>
     [ [ integer? ] mailbox-get? swap push ] in-thread
@@ -27,7 +27,7 @@ IN: concurrency.mailboxes.tests
     3 swap mailbox-put
 ] unit-test
 
-{ V{ 1 "junk" 3 "junk2" } [ 456 ] } [
+[ V{ 1 "junk" 3 "junk2" } [ 456 ] ] [
     0 <vector>
     <mailbox>
     [ [ integer? ] mailbox-get? swap push ] in-thread
@@ -42,7 +42,7 @@ IN: concurrency.mailboxes.tests
     mailbox-get
 ] unit-test
 
-{ { "foo" "bar" } } [
+[ { "foo" "bar" } ] [
     <mailbox>
     "foo" over mailbox-put
     "bar" over mailbox-put

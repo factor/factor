@@ -47,7 +47,7 @@ IN: python
 
 { } [ 123 <alien> unsteal-ref ] unit-test
 
-{ t } [ Py_GetVersion string? ] unit-test
+[ t ] [ Py_GetVersion string? ] unit-test
 
 [ "os" ] [ "os" py-import PyModule_GetName ] py-test
 

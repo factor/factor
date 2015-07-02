@@ -12,9 +12,9 @@ IN: io.encodings.johab.tests
     johab euc-table word-prop value-at ;
 
 ! johab encodings
-{ 0x20 } [ 0x20 johab>unicode ] unit-test
-{ 0x3133 } [ 0x8444 johab>unicode ] unit-test
-{ 0x8A5D } [ 0xAD4F unicode>johab ] unit-test
+[ 0x20 ] [ 0x20 johab>unicode ] unit-test
+[ 0x3133 ] [ 0x8444 johab>unicode ] unit-test
+[ 0x8A5D ] [ 0xAD4F unicode>johab ] unit-test
 
 : phrase-unicode ( -- s )
     "\u00b3d9\u00d574\u00bb3c\u00acfc \u00bc31\u00b450\u00c0b0\u00c774!" ;
@@ -31,5 +31,5 @@ IN: io.encodings.johab.tests
 : phrase-unicode>johab ( -- s )
     phrase-unicode johab encode ;
 
-{ t } [ phrase-johab>unicode phrase-unicode = ] unit-test
-{ t } [ phrase-unicode>johab phrase-johab = ] unit-test
+[ t ] [ phrase-johab>unicode phrase-unicode = ] unit-test
+[ t ] [ phrase-unicode>johab phrase-johab = ] unit-test

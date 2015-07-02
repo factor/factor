@@ -9,13 +9,13 @@ IN: html.forms.tests
         call
     ] with-scope ; inline
 
-{ 14 } [
+[ 14 ] [
     [
         "14" [ v-number 13 v-min-value 100 v-max-value ] validate
     ] with-validation
 ] unit-test
 
-{ t } [
+[ t ] [
     [
         "140" [ v-number 13 v-min-value 100 v-max-value ] validate
         [ validation-error-state? ]
@@ -31,7 +31,7 @@ person {
     { "age" [ v-number 13 v-min-value 100 v-max-value ] }
 } define-validators
 
-{ t t } [
+[ t t ] [
     [
         { { "age" "" } }
         { { "age" [ v-required ] } }
@@ -44,7 +44,7 @@ person {
     ] with-validation
 ] unit-test
 
-{ H{ { "a" 123 } } f } [
+[ H{ { "a" 123 } } f ] [
     [
         H{
             { "a" "123" }
@@ -59,7 +59,7 @@ person {
     ] with-validation
 ] unit-test
 
-{ t "foo" } [
+[ t "foo" ] [
     [
         "foo" validation-error
         validation-failed?

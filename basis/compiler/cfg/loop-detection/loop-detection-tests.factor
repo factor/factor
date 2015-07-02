@@ -28,8 +28,8 @@ V{ } 2 test-bb
 : test-loop-detection ( -- )
     0 get block>cfg needs-loops ;
 
-{ } [ test-loop-detection ] unit-test
+[ ] [ test-loop-detection ] unit-test
 
-{ 1 } [ 0 get loop-nesting-at ] unit-test
-{ 0 } [ 1 get loop-nesting-at ] unit-test
-{ 1 } [ 2 get loop-nesting-at ] unit-test
+[ 1 ] [ 0 get loop-nesting-at ] unit-test
+[ 0 ] [ 1 get loop-nesting-at ] unit-test
+[ 1 ] [ 2 get loop-nesting-at ] unit-test

@@ -45,21 +45,21 @@ MEMO: my-uuid ( -- str )
         base-folder "/" my-uuid "/" _
     ] "" append-outputs-as ;
 
-{ t } [
+[ t ] [
     get-test-host <imap4ssl> [ duplex-stream? ] with-disposal
 ] unit-test
 
-{ t } [
+[ t ] [
     get-test-host <imap4ssl> [ capabilities ] with-stream
     { "IMAP4rev1" "UNSELECT" "IDLE" "NAMESPACE" "QUOTA" } swap subset?
 ] unit-test
 
-{ "NO" } [
+[ "NO" ] [
     [ get-test-host <imap4ssl> [ "dont@exist.com" "foo" login ] with-stream ]
     [ ind>> ] recover
 ] unit-test
 
-{ "BAD" } [
+[ "BAD" ] [
     [ get-test-host <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
 ] unit-test
 
@@ -75,7 +75,7 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 
-{ } [ \ imap-settings get-global [ ] with-imap-settings ] unit-test
+[ ] [ \ imap-settings get-global [ ] with-imap-settings ] unit-test
 
 ! Newly created and then selected folder is empty.
 [ 0 { } ] [
@@ -180,11 +180,11 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 ! Internal date parsing
-{ "Mon, 19 Aug 2013 23:16:36 GMT" } [
+[ "Mon, 19 Aug 2013 23:16:36 GMT" ] [
     "19-Aug-2013 23:16:36 +0000" internal-date>timestamp timestamp>rfc822
 ] unit-test
 
-{ "19-Aug-2014 23:16:36 GMT" } [
+[ "19-Aug-2014 23:16:36 GMT" ] [
     "Mon, 19 Aug 2014 23:16:36 GMT" rfc822>timestamp timestamp>internal-date
 ] unit-test
 

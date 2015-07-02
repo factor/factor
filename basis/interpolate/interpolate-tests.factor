@@ -37,9 +37,9 @@ IN: interpolate.tests
     "Sup ${name}, we heard you liked ${noun}, so we put ${noun} on your ${noun} so you can ${verb} while you ${verb}." interpolate>string
 ] unit-test
 
-{ "Oops, I accidentally the whole economy..." } {
+{ "Oops, I accidentally the whole economy..." } [
     [let
         "economy" :> noun
         "accidentally" [ I[ Oops, I ${0} the whole ${noun}...]I ] with-string-writer
-    }
+    ]
 ] unit-test

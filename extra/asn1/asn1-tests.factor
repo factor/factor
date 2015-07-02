@@ -1,14 +1,14 @@
 USING: asn1 asn1.ldap io io.streams.string tools.test ;
 
-{ 6 } [
+[ 6 ] [
     "\u000002\u000001\u000006" [ asn-syntax read-ber ] with-string-reader
 ] unit-test
 
-{ "testing" } [
+[ "testing" ] [
     "\u000004\u000007testing" [ asn-syntax read-ber ] with-string-reader
 ] unit-test
 
-{ { 1 { 3 "Administrator" "ad_is_bogus" } } } [
+[ { 1 { 3 "Administrator" "ad_is_bogus" } } ] [
     "0$\u000002\u000001\u000001`\u00001f\u000002\u000001\u000003\u000004\rAdministrator\u000080\u00000bad_is_bogus"
     [ asn-syntax read-ber ] with-string-reader
 ] unit-test

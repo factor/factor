@@ -2,7 +2,7 @@ IN: ui.backend.cocoa.views.tests
 USING: ui.backend.cocoa.views tools.test kernel math.rectangles
 namespaces ;
 
-{ t } [
+[ t ] [
     T{ rect
         { loc { 0 0 } }
         { dim { 1000 1000 } }

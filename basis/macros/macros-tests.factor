@@ -5,27 +5,27 @@ IN: macros.tests
 
 MACRO: see-test ( a b -- quot ) + ;
 
-{ t } [ \ see-test macro? ] unit-test
+[ t ] [ \ see-test macro? ] unit-test
 
-{ "USING: macros math ;\nIN: macros.tests\nMACRO: see-test ( a b -- quot ) + ;\n" }
+[ "USING: macros math ;\nIN: macros.tests\nMACRO: see-test ( a b -- quot ) + ;\n" ]
 [ [ \ see-test see ] with-string-writer ]
 unit-test
 
-{ t } [ \ see-test macro? ] unit-test
+[ t ] [ \ see-test macro? ] unit-test
 
-{ t } [
+[ t ] [
     "USING: math ;\nIN: macros.tests\n: see-test ( a b -- c ) - ;\n" dup eval( -- )
     [ \ see-test see ] with-string-writer =
 ] unit-test
 
-{ f } [ \ see-test macro? ] unit-test
+[ f ] [ \ see-test macro? ] unit-test
 
-{ } [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ;" eval( -- ) ] unit-test
-{ } [ "USING: macros kernel ; IN: hanging-macro : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
+[ ] [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ;" eval( -- ) ] unit-test
+[ ] [ "USING: macros kernel ; IN: hanging-macro : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
 
-{ } [ [ "hanging-macro" forget-vocab ] with-compilation-unit ] unit-test
+[ ] [ [ "hanging-macro" forget-vocab ] with-compilation-unit ] unit-test
 
-{ } [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ;" eval( -- ) ] unit-test
+[ ] [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ;" eval( -- ) ] unit-test
     [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ; inline" eval( -- ) ] must-fail
 
 ! The macro expander code should infer
@@ -37,4 +37,4 @@ MACRO: bad-macro ( a -- b ) 1 2 3 [ ] ;
 
 [ [ 0 bad-macro ] infer ] must-fail
 
-{ } [ [ \ bad-macro forget ] with-compilation-unit ] unit-test
+[ ] [ [ \ bad-macro forget ] with-compilation-unit ] unit-test

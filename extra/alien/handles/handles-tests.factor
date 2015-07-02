@@ -20,24 +20,24 @@ CALLBACK: int thingy-ptr-callback ( void* thingy-handle ) ;
 : invoke-test-thingy-ptr-callback ( thingy -- n )
     test-thingy-ptr-callback int { void* } cdecl alien-indirect ;
 
-{ t f } [
+[ t f ] [
     [ 5 <thingy> <alien-handle> &release-alien-handle [ alien-handle? ] keep ] with-destructors
     alien-handle?
 ] unit-test
 
-{ t f } [
+[ t f ] [
     [ 5 <thingy> <alien-handle-ptr> &release-alien-handle-ptr [ alien-handle-ptr? ] keep ] with-destructors
     alien-handle-ptr?
 ] unit-test
 
-{ 6 } [
+[ 6 ] [
     [
         5 <thingy> <alien-handle> &release-alien-handle
         invoke-test-thingy-callback
     ] with-destructors
 ] unit-test
 
-{ 6 } [
+[ 6 ] [
     [
         5 <thingy> <alien-handle-ptr> &release-alien-handle-ptr
         invoke-test-thingy-ptr-callback

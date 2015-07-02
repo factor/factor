@@ -9,9 +9,9 @@ IN: core-text.tests
 : test-font ( name -- font )
     [ >cf &CFRelease 0.0 f CTFontCreateWithName ] with-destructors ;
 
-{ } [ "Helvetica" test-font CFRelease ] unit-test
+[ ] [ "Helvetica" test-font CFRelease ] unit-test
 
-{ } [
+[ ] [
     [
         kCTFontAttributeName "Helvetica" test-font &CFRelease 2array 1array
         <CFDictionary> &CFRelease drop
@@ -30,8 +30,8 @@ IN: core-text.tests
         } cleave and and and
     ] with-destructors ;
 
-{ t } [ "Hello world" "Helvetica" test-typographic-bounds ] unit-test
+[ t ] [ "Hello world" "Helvetica" test-typographic-bounds ] unit-test
 
-{ t } [ "Hello world" "Chicago" test-typographic-bounds ] unit-test
+[ t ] [ "Hello world" "Chicago" test-typographic-bounds ] unit-test
 
-{ t } [ "日本語" "Helvetica" test-typographic-bounds ] unit-test
+[ t ] [ "日本語" "Helvetica" test-typographic-bounds ] unit-test

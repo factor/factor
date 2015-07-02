@@ -4,4 +4,4 @@ USING: calendar.holidays calendar.holidays.canada kernel
 tools.test ;
 IN: calendar.holidays.canada.tests
 
-{ } [ 2009 canada holidays drop ] unit-test
+[ ] [ 2009 canada holidays drop ] unit-test

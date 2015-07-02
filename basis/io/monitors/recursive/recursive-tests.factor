@@ -28,18 +28,18 @@ M: mock-io-backend (monitor)
 M: mock-io-backend link-info
     global [ link-info ] with-variables ;
 
-{ } [ 0 mock-counter boa dummy-monitor-created set ] unit-test
-{ } [ 0 mock-counter boa dummy-monitor-disposed set ] unit-test
+[ ] [ 0 mock-counter boa dummy-monitor-created set ] unit-test
+[ ] [ 0 mock-counter boa dummy-monitor-disposed set ] unit-test
 
-{ } [
+[ ] [
     mock-io-backend io-backend [
         "resource:core/io" resource-path <mailbox> <recursive-monitor> dispose
     ] with-variable
 ] unit-test
 
-{ t } [ dummy-monitor-created get i>> 0 > ] unit-test
+[ t ] [ dummy-monitor-created get i>> 0 > ] unit-test
 
-{ t } [ dummy-monitor-created get i>> dummy-monitor-disposed get i>> = ] unit-test
+[ t ] [ dummy-monitor-created get i>> dummy-monitor-disposed get i>> = ] unit-test
 
 [ "doesnotexist" temp-file delete-tree ] ignore-errors
 
@@ -51,11 +51,11 @@ M: mock-io-backend link-info
     ] with-variable
 ] must-fail
 
-{ } [ 0 mock-counter boa dummy-monitor-created set ] unit-test
-{ } [ 0 mock-counter boa dummy-monitor-disposed set ] unit-test
+[ ] [ 0 mock-counter boa dummy-monitor-created set ] unit-test
+[ ] [ 0 mock-counter boa dummy-monitor-disposed set ] unit-test
 
 ! Test that disposing twice is allowed
-{ } [
+[ ] [
     "resource:core/io" resource-path <mailbox> <recursive-monitor>
     [ dispose ] [ dispose ] bi
 ] unit-test

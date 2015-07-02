@@ -34,8 +34,8 @@ V{
 1 3 edge
 2 3 edge
 
-{ } [ test-scc ] unit-test
+[ ] [ test-scc ] unit-test
 
-{ t } [ 0 vreg>scc 1 vreg>scc = ] unit-test
-{ t } [ 0 vreg>scc 3 vreg>scc = ] unit-test
-{ f } [ 2 vreg>scc 3 vreg>scc = ] unit-test
+[ t ] [ 0 vreg>scc 1 vreg>scc = ] unit-test
+[ t ] [ 0 vreg>scc 3 vreg>scc = ] unit-test
+[ f ] [ 2 vreg>scc 3 vreg>scc = ] unit-test

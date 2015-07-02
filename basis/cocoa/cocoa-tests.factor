@@ -16,19 +16,19 @@ CLASS: Foo < NSObject
     dup 1.0 2.0 101.0 102.0 <CGRect> -> foo:
     -> release ;
 
-{ } [ test-foo ] unit-test
+[ ] [ test-foo ] unit-test
 
-{ 1.0 } [ "x" get CGRect-x ] unit-test
-{ 2.0 } [ "x" get CGRect-y ] unit-test
-{ 101.0 } [ "x" get CGRect-w ] unit-test
-{ 102.0 } [ "x" get CGRect-h ] unit-test
+[ 1.0 ] [ "x" get CGRect-x ] unit-test
+[ 2.0 ] [ "x" get CGRect-y ] unit-test
+[ 101.0 ] [ "x" get CGRect-w ] unit-test
+[ 102.0 ] [ "x" get CGRect-h ] unit-test
 
 CLASS: Bar < NSObject
 [
     METHOD: NSRect bar [ test-foo "x" get ]
 ]
 
-{ } [
+[ ] [
     Bar [
         -> alloc -> init
         dup -> bar "x" set
@@ -36,10 +36,10 @@ CLASS: Bar < NSObject
     ] compile-call
 ] unit-test
 
-{ 1.0 } [ "x" get CGRect-x ] unit-test
-{ 2.0 } [ "x" get CGRect-y ] unit-test
-{ 101.0 } [ "x" get CGRect-w ] unit-test
-{ 102.0 } [ "x" get CGRect-h ] unit-test
+[ 1.0 ] [ "x" get CGRect-x ] unit-test
+[ 2.0 ] [ "x" get CGRect-y ] unit-test
+[ 101.0 ] [ "x" get CGRect-w ] unit-test
+[ 102.0 ] [ "x" get CGRect-h ] unit-test
 
 ! Make sure that we can add methods
 CLASS: Bar < NSObject
@@ -49,7 +49,7 @@ CLASS: Bar < NSObject
     METHOD: int babb: int x [ x sq ]
 ]
 
-{ 144 } [
+[ 144 ] [
     Bar [
         -> alloc -> init
         dup 12 -> babb:

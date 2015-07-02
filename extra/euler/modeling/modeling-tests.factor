@@ -3,7 +3,7 @@ euler.modeling game.models.half-edge ;
 IN: euler.modeling.tests
 
 ! polygon>double-face
-{ } [
+[ ] [
     [
         { { -1 -1 0 } { 1 -1 0 } { 1 1 0 } { -1 1 0 } }
         smooth-smooth polygon>double-face
@@ -15,7 +15,7 @@ IN: euler.modeling.tests
 ] unit-test
 
 ! extrude-simple
-{ } [
+[ ] [
     [
         { { -1 -1 0 } { 1 -1 0 } { 1 1 0 } }
         smooth-smooth polygon>double-face
@@ -27,20 +27,20 @@ IN: euler.modeling.tests
 ] unit-test
 
 ! project-pt-line
-{ {  0 1 0 } } [ {  0 0 0 } { 0 1 0 } { 1 1 0 } project-pt-line ] unit-test
-{ {  0 1 0 } } [ {  0 0 0 } { 1 1 0 } { 0 1 0 } project-pt-line ] unit-test
-{ {  0 1 0 } } [ {  0 0 0 } { 2 1 0 } { 1 1 0 } project-pt-line ] unit-test
-{ { -1 1 0 } } [ { -1 0 0 } { 2 1 0 } { 1 1 0 } project-pt-line ] unit-test
-{ { 1/2 1/2 0 } } [ {  0 0 0 } { 0 1 0 } { 1 0 0 } project-pt-line ] unit-test
+[ {  0 1 0 } ] [ {  0 0 0 } { 0 1 0 } { 1 1 0 } project-pt-line ] unit-test
+[ {  0 1 0 } ] [ {  0 0 0 } { 1 1 0 } { 0 1 0 } project-pt-line ] unit-test
+[ {  0 1 0 } ] [ {  0 0 0 } { 2 1 0 } { 1 1 0 } project-pt-line ] unit-test
+[ { -1 1 0 } ] [ { -1 0 0 } { 2 1 0 } { 1 1 0 } project-pt-line ] unit-test
+[ { 1/2 1/2 0 } ] [ {  0 0 0 } { 0 1 0 } { 1 0 0 } project-pt-line ] unit-test
 
 ! project-pt-plane
-{ {  0  0  1 } } [ { 0 0 0 } { 0 0 1 } { 0 0  1 } -1 project-pt-plane ] unit-test
-{ {  0  0 -1 } } [ { 0 0 0 } { 0 0 1 } { 0 0  1 }  1 project-pt-plane ] unit-test
-{ {  0  0  3 } } [ { 0 0 0 } { 0 0 1 } { 0 0  1 } -3 project-pt-plane ] unit-test
-{ {  0  0  3 } } [ { 0 0 0 } { 0 0 1 } { 0 0 -1 }  3 project-pt-plane ] unit-test
-{ {  0  0  1 } } [ { 0 0 0 } { 0 0 1 } { 0 1  1 } -1 project-pt-plane ] unit-test
+[ {  0  0  1 } ] [ { 0 0 0 } { 0 0 1 } { 0 0  1 } -1 project-pt-plane ] unit-test
+[ {  0  0 -1 } ] [ { 0 0 0 } { 0 0 1 } { 0 0  1 }  1 project-pt-plane ] unit-test
+[ {  0  0  3 } ] [ { 0 0 0 } { 0 0 1 } { 0 0  1 } -3 project-pt-plane ] unit-test
+[ {  0  0  3 } ] [ { 0 0 0 } { 0 0 1 } { 0 0 -1 }  3 project-pt-plane ] unit-test
+[ {  0  0  1 } ] [ { 0 0 0 } { 0 0 1 } { 0 1  1 } -1 project-pt-plane ] unit-test
 
-{ { 0 2/3 1/3 } } [ { 0 0 0 } { 0 2 1 } { 0 1  1 } -1 project-pt-plane ] unit-test
+[ { 0 2/3 1/3 } ] [ { 0 0 0 } { 0 2 1 } { 0 1  1 } -1 project-pt-plane ] unit-test
 
-{ {  0  0  1 } } [ { 0 0 0 } { 0 0   1/2 } { 0 0 1 } -1 project-pt-plane ] unit-test
-{ {  0  1  1 } } [ { 0 0 0 } { 0 1/2 1/2 } { 0 0 1 } -1 project-pt-plane ] unit-test
+[ {  0  0  1 } ] [ { 0 0 0 } { 0 0   1/2 } { 0 0 1 } -1 project-pt-plane ] unit-test
+[ {  0  1  1 } ] [ { 0 0 0 } { 0 1/2 1/2 } { 0 0 1 } -1 project-pt-plane ] unit-test

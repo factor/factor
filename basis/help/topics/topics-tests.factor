@@ -5,17 +5,17 @@ IN: help.topics.tests
 
 ! Test help cross-referencing
 
-{ } [ "Test B" { "Hello world." } <article> { "test" "b" } add-article ] unit-test
+[ ] [ "Test B" { "Hello world." } <article> { "test" "b" } add-article ] unit-test
 
-{ } [ "Test A" { { $subsection { "test" "b" } } } <article> { "test" "a" } add-article ] unit-test
+[ ] [ "Test A" { { $subsection { "test" "b" } } } <article> { "test" "a" } add-article ] unit-test
 
 SYMBOL: foo
 
-{ } [ "Test A" { { $subsection foo } } <article> { "test" "a" } add-article ] unit-test
+[ ] [ "Test A" { { $subsection foo } } <article> { "test" "a" } add-article ] unit-test
 
 ! Test article location recording
 
-{ } [
+[ ] [
     {
         "USE: help.syntax"
         "ARTICLE: { \"test\" 1 } \"Hello\""
@@ -28,7 +28,7 @@ SYMBOL: foo
     ] with-scope
 ] unit-test
 
-{ { "testfile" 2 } }
+[ { "testfile" 2 } ]
 [ { "test" 1 } articles get at loc>> ] unit-test
 
-{ } [ { "test" 1 } remove-article ] unit-test
+[ ] [ { "test" 1 } remove-article ] unit-test

@@ -4,7 +4,7 @@ IN: compiler.tree.builder.tests
 
 : inline-recursive ( -- ) inline-recursive ; inline recursive
 
-{ t } [ \ inline-recursive build-tree [ #recursive? ] any? ] unit-test
+[ t ] [ \ inline-recursive build-tree [ #recursive? ] any? ] unit-test
 
 : bad-recursion-1 ( a -- b )
     dup [ drop bad-recursion-1 5 ] [ ] if ;

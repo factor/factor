@@ -63,7 +63,7 @@ M: path-check-responder call-responder*
     drop
     >array "text/plain" <content> ;
 
-{ { "c" } } [
+[ { "c" } ] [
     V{ } clone responder-nesting set
 
     { "b" "c" }
@@ -76,7 +76,7 @@ M: path-check-responder call-responder*
 ] unit-test
 
 ! Test that "" dispatcher works with default>>
-{ } [
+[ ] [
     <dispatcher>
         "" <mock-responder> "" add-responder
         "bar" <mock-responder> "bar" add-responder

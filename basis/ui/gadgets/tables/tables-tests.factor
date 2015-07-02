@@ -15,15 +15,15 @@ M: test-renderer column-titles drop { "First" "Last" } ;
         { "Don" "Stewart" }
     } <model> test-renderer <table> ;
 
-{ } [
+[ ] [
     test-table "table" set
 ] unit-test
 
-{ } [
+[ ] [
     "table" get <scroller> "scroller" set
 ] unit-test
 
-{ { "Justin" "Timberlake" } { "Britney" "Spears" } } [
+[ { "Justin" "Timberlake" } { "Britney" "Spears" } ] [
     test-table t >>selection-required? dup [
         {
             [ 1 select-row ]
@@ -55,7 +55,7 @@ M: silly-renderer column-titles drop { "Foo" } ;
 : test-table-2 ( -- table )
     { 1 2 f } <model> silly-renderer <table> ;
 
-{ f f } [
+[ f f ] [
     test-table dup [
         selected-row
     ] with-grafted-gadget

@@ -54,10 +54,10 @@ IN: concurrency.locks.tests
     c await
     v ;
 
-{ V{ 1 3 2 4 } } [ lock-test-0 ] unit-test
-{ V{ 1 2 3 4 } } [ lock-test-1 ] unit-test
+[ V{ 1 3 2 4 } ] [ lock-test-0 ] unit-test
+[ V{ 1 2 3 4 } ] [ lock-test-1 ] unit-test
 
-{ 3 } [
+[ 3 ] [
     <reentrant-lock> dup [
         [
             3
@@ -65,17 +65,17 @@ IN: concurrency.locks.tests
     ] with-lock
 ] unit-test
 
-{ } [ <rw-lock> drop ] unit-test
+[ ] [ <rw-lock> drop ] unit-test
 
-{ } [ <rw-lock> [ ] with-read-lock ] unit-test
+[ ] [ <rw-lock> [ ] with-read-lock ] unit-test
 
-{ } [ <rw-lock> dup [ [ ] with-read-lock ] with-read-lock ] unit-test
+[ ] [ <rw-lock> dup [ [ ] with-read-lock ] with-read-lock ] unit-test
 
-{ } [ <rw-lock> [ ] with-write-lock ] unit-test
+[ ] [ <rw-lock> [ ] with-write-lock ] unit-test
 
-{ } [ <rw-lock> dup [ [ ] with-write-lock ] with-write-lock ] unit-test
+[ ] [ <rw-lock> dup [ [ ] with-write-lock ] with-write-lock ] unit-test
 
-{ } [ <rw-lock> dup [ [ ] with-read-lock ] with-write-lock ] unit-test
+[ ] [ <rw-lock> dup [ [ ] with-read-lock ] with-write-lock ] unit-test
 
 :: rw-lock-test-1 ( -- v )
     <rw-lock> :> l
@@ -124,7 +124,7 @@ IN: concurrency.locks.tests
     c'' await
     v ;
 
-{ V{ 1 2 3 4 5 6 } } [ rw-lock-test-1 ] unit-test
+[ V{ 1 2 3 4 5 6 } ] [ rw-lock-test-1 ] unit-test
 
 :: rw-lock-test-2 ( -- v )
     <rw-lock> :> l
@@ -153,7 +153,7 @@ IN: concurrency.locks.tests
     c' await
     v ;
 
-{ V{ 1 2 3 } } [ rw-lock-test-2 ] unit-test
+[ V{ 1 2 3 } ] [ rw-lock-test-2 ] unit-test
 
 ! Test lock timeouts
 :: lock-timeout-test ( -- v )
@@ -187,7 +187,7 @@ IN: concurrency.locks.tests
     ] with-write-lock
 ] must-fail
 
-{ } [
+[ ] [
     <rw-lock> dup [
         dup [
             1 seconds [ ] with-read-lock-timeout

@@ -4,30 +4,30 @@ USING: accessors eval kernel lexer nested-comments tools.test ;
 IN: nested-comments.tests
 
 ! Correct
-{ } [
+[ ] [
     "USE: nested-comments (* comment *)" eval( -- )
 ] unit-test
 
-{ } [
+[ ] [
     "USE: nested-comments (* comment*)" eval( -- )
 ] unit-test
 
-{ } [
+[ ] [
     "USE: nested-comments (* comment
 *)" eval( -- )
 ] unit-test
 
-{ } [
+[ ] [
     "USE: nested-comments (* comment
 *)" eval( -- )
 ] unit-test
 
-{ } [
+[ ] [
     "USE: nested-comments (* comment
 *)" eval( -- )
 ] unit-test
 
-{ } [
+[ ] [
     "USE: nested-comments (* comment
     (* *)
 

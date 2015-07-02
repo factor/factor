@@ -6,20 +6,20 @@ accessors ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.scrollers.private ;
 IN: ui.gadgets.scrollers.tests
 
-{ } [
+[ ] [
     <gadget> "g" set
     "g" get <scroller> "s" set
 ] unit-test
 
-{ { 100 200 } } [
+[ { 100 200 } ] [
     { 100 200 } point>rect "g" get scroll>rect
     "s" get follows>> loc>>
 ] unit-test
 
-{ } [ "s" get scroll>bottom ] unit-test
-{ t } [ "s" get follows>> ] unit-test
+[ ] [ "s" get scroll>bottom ] unit-test
+[ t ] [ "s" get follows>> ] unit-test
 
-{ } [
+[ ] [
     <gadget> dup "g" set
     10 1 0 100 1 <range> 20 1 0 100 1 <range> 2array <product>
     <viewport> "v" set
@@ -31,14 +31,14 @@ IN: ui.gadgets.scrollers.tests
     [ { 10 20 } ] [ "g" get loc>> vneg ] unit-test
 ] with-grafted-gadget
 
-{ } [
+[ ] [
     <gadget> { 100 100 } >>dim
     dup "g" set <scroller> "s" set
 ] unit-test
 
-{ } [ "s" get { 50 50 } >>dim drop ] unit-test
+[ ] [ "s" get { 50 50 } >>dim drop ] unit-test
 
-{ } [ "s" get layout ] unit-test
+[ ] [ "s" get layout ] unit-test
 
 "s" get [
     [ { 31 31 } ] [ "s" get viewport>> dim>> ] unit-test
@@ -69,7 +69,7 @@ IN: ui.gadgets.scrollers.tests
 dup layout
 "s" set
 
-{ t } [
+[ t ] [
     10 iota [
         drop
         "g2" get scroll>gadget
@@ -78,23 +78,23 @@ dup layout
     ] map [ { 0 0 } = ] all?
 ] unit-test
 
-{ } [ "Hi" <label> dup "l" set <scroller> "s" set ] unit-test
+[ ] [ "Hi" <label> dup "l" set <scroller> "s" set ] unit-test
 
-{ t } [ "l" get find-scroller "s" get eq? ] unit-test
-{ t } [ "l" get dup find-scroller viewport>> swap child? ] unit-test
-{ t } [ "l" get find-scroller* "s" get eq? ] unit-test
-{ f } [ "s" get viewport>> find-scroller* ] unit-test
-{ t } [ "s" get { 1 0 } grid-child slider? ] unit-test
-{ f } [ "s" get { 1 0 } grid-child find-scroller* ] unit-test
+[ t ] [ "l" get find-scroller "s" get eq? ] unit-test
+[ t ] [ "l" get dup find-scroller viewport>> swap child? ] unit-test
+[ t ] [ "l" get find-scroller* "s" get eq? ] unit-test
+[ f ] [ "s" get viewport>> find-scroller* ] unit-test
+[ t ] [ "s" get { 1 0 } grid-child slider? ] unit-test
+[ f ] [ "s" get { 1 0 } grid-child find-scroller* ] unit-test
 
-{ } [
+[ ] [
     "Click Me" [ [ scroll>gadget ] [ unparent ] bi ] <border-button>
     [ <pile> swap add-gadget <scroller> ] keep
     dup quot>> call
     layout
 ] unit-test
 
-{ t } [
+[ t ] [
     <gadget> { 200 200 } >>dim
     [ [ scroll>gadget ] [ unparent ] bi ] <border-button>
     dup

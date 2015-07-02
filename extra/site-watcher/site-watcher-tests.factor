@@ -22,4 +22,4 @@ IN: site-watcher.tests
         f <site> select-tuples
     ] with-db ;
 
-{ f } [ fake-sites empty? ] unit-test
+[ f ] [ fake-sites empty? ] unit-test

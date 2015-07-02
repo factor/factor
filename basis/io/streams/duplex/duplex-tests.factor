@@ -16,26 +16,26 @@ TUPLE: unclosable-stream ;
 M: unclosable-stream dispose
     "Can't close me!" throw ;
 
-{ } [
+[ ] [
     <closing-stream> <closing-stream> <duplex-stream>
     dup dispose dispose
 ] unit-test
 
-{ t } [
+[ t ] [
     <unclosable-stream> <closing-stream> [
         <duplex-stream>
         [ dup dispose ] [ 2drop ] recover
     ] keep disposed>>
 ] unit-test
 
-{ t } [
+[ t ] [
     <closing-stream> [ <unclosable-stream>
         <duplex-stream>
         [ dup dispose ] [ 2drop ] recover
     ] keep disposed>>
 ] unit-test
 
-{ "Hey" } [
+[ "Hey" ] [
     "Hey\nThere" <string-reader> <string-writer> <duplex-stream>
     stream-readln
 ] unit-test

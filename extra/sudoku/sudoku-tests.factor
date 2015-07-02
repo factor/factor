@@ -1,4 +1,4 @@
 IN: sudoku.tests
 USING: tools.test sudoku ;
 
-{ } [ sudoku-demo ] unit-test
+[ ] [ sudoku-demo ] unit-test

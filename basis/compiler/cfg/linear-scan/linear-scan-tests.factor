@@ -42,7 +42,7 @@ V{
     [ cfg set ] [ number-instructions ] [ compute-live-intervals ] tri
     drop ;
 
-{ } [
+[ ] [
     H{
         { 1 int-rep }
     } representations set
@@ -52,45 +52,45 @@ V{
     test-live-intervals
 ] unit-test
 
-{ 0 0 } [
+[ 0 0 ] [
     1 live-intervals get at [ start>> ] [ end>> ] bi
 ] unit-test
 
 ! Live range and interval splitting
-{
+[
     { T{ live-range f 1 10 } T{ live-range f 15 15 } }
     { T{ live-range f 16 20 } }
-} [
+] [
     {
         T{ live-range f 1 10 }
         T{ live-range f 15 20 }
     } 15 split-ranges
 ] unit-test
 
-{
+[
     { T{ live-range f 1 10 } T{ live-range f 15 16 } }
     { T{ live-range f 17 20 } }
-} [
+] [
     {
         T{ live-range f 1 10 }
         T{ live-range f 15 20 }
     } 16 split-ranges
 ] unit-test
 
-{
+[
     { T{ live-range f 1 10 } }
     { T{ live-range f 15 20 } }
-} [
+] [
     {
         T{ live-range f 1 10 }
         T{ live-range f 15 20 }
     } 12 split-ranges
 ] unit-test
 
-{
+[
     { T{ live-range f 1 10 } T{ live-range f 15 17 } }
     { T{ live-range f 18 20 } }
-} [
+] [
     {
         T{ live-range f 1 10 }
         T{ live-range f 15 20 }
@@ -101,10 +101,10 @@ V{
     { T{ live-range f 1 10 } } 0 split-ranges
 ] must-fail
 
-{
+[
     { T{ live-range f 0 0 } }
     { T{ live-range f 1 5 } }
-} [
+] [
     { T{ live-range f 0 5 } } 0 split-ranges
 ] unit-test
 
@@ -120,7 +120,7 @@ H{
 : clean-up-split ( a b -- a b )
     [ dup [ [ >vector ] change-uses [ >vector ] change-ranges ] when ] bi@ ;
 
-{
+[
     T{ live-interval-state
        { vreg 1 }
        { reg-class float-regs }
@@ -141,7 +141,7 @@ H{
        { reload-from T{ spill-slot f 0 } }
        { reload-rep float-rep }
     }
-} [
+] [
     T{ live-interval-state
        { vreg 1 }
        { reg-class float-regs }
@@ -153,7 +153,7 @@ H{
     clean-up-split
 ] unit-test
 
-{
+[
     f
     T{ live-interval-state
        { vreg 2 }
@@ -165,7 +165,7 @@ H{
        { reload-from T{ spill-slot f 4 } }
        { reload-rep float-rep }
     }
-} [
+] [
     T{ live-interval-state
        { vreg 2 }
        { reg-class float-regs }
@@ -177,7 +177,7 @@ H{
     clean-up-split
 ] unit-test
 
-{
+[
     T{ live-interval-state
        { vreg 3 }
        { reg-class float-regs }
@@ -189,7 +189,7 @@ H{
        { spill-rep float-rep }
     }
     f
-} [
+] [
     T{ live-interval-state
        { vreg 3 }
        { reg-class float-regs }
@@ -201,7 +201,7 @@ H{
     clean-up-split
 ] unit-test
 
-{
+[
     T{ live-interval-state
        { vreg 4 }
        { reg-class float-regs }
@@ -222,7 +222,7 @@ H{
        { reload-from T{ spill-slot f 12 } }
        { reload-rep float-rep }
     }
-} [
+] [
     T{ live-interval-state
        { vreg 4 }
        { reg-class float-regs }
@@ -235,7 +235,7 @@ H{
 ] unit-test
 
 ! Don't insert reload if first usage is a def
-{
+[
     T{ live-interval-state
        { vreg 5 }
        { reg-class float-regs }
@@ -254,7 +254,7 @@ H{
        { uses V{ T{ vreg-use f 20 float-rep f } T{ vreg-use f 30 f float-rep } } }
        { ranges V{ T{ live-range f 20 30 } } }
     }
-} [
+] [
     T{ live-interval-state
        { vreg 5 }
        { reg-class float-regs }
@@ -267,7 +267,7 @@ H{
 ] unit-test
 
 ! Multiple representations
-{
+[
     T{ live-interval-state
        { vreg 6 }
        { reg-class float-regs }
@@ -288,7 +288,7 @@ H{
        { reload-from T{ spill-slot f 24 } }
        { reload-rep double-rep }
     }
-} [
+] [
     T{ live-interval-state
        { vreg 6 }
        { reg-class float-regs }
@@ -300,7 +300,7 @@ H{
     clean-up-split
 ] unit-test
 
-{
+[
     f
     T{ live-interval-state
         { vreg 7 }
@@ -310,7 +310,7 @@ H{
         { uses V{ T{ vreg-use f 8 int-rep } } }
         { reg-class int-regs }
     }
-} [
+] [
     T{ live-interval-state
         { vreg 7 }
         { start 4 }
@@ -323,7 +323,7 @@ H{
 ] unit-test
 
 ! trim-before-ranges, trim-after-ranges
-{
+[
     T{ live-interval-state
         { vreg 8 }
         { start 0 }
@@ -344,7 +344,7 @@ H{
         { reload-from T{ spill-slot f 32 } }
         { reload-rep int-rep }
     }
-} [
+] [
     T{ live-interval-state
         { vreg 8 }
         { start 0 }
@@ -362,12 +362,12 @@ H{
     { 3 int-rep }
 } representations set
 
-{
+[
     {
         3
         10
     }
-} [
+] [
     H{
         { int-regs
           V{
@@ -409,12 +409,12 @@ H{
     spill-status
 ] unit-test
 
-{
+[
     {
         1
         1/0.
     }
-} [
+] [
     H{
         { int-regs
           V{
@@ -450,7 +450,7 @@ H{
 
 H{ { 1 int-rep } { 2 int-rep } } representations set
 
-{ } [
+[ ] [
     {
         T{ live-interval-state
            { vreg 1 }
@@ -465,7 +465,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     check-linear-scan
 ] unit-test
 
-{ } [
+[ ] [
     {
         T{ live-interval-state
            { vreg 1 }
@@ -488,7 +488,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     check-linear-scan
 ] unit-test
 
-{ } [
+[ ] [
     {
         T{ live-interval-state
            { vreg 1 }
@@ -511,7 +511,7 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     check-linear-scan
 ] unit-test
 
-{ } [
+[ ] [
     {
         T{ live-interval-state
            { vreg 1 }
@@ -566,7 +566,7 @@ H{
     { 5 int-rep }
 } representations set
 
-{ } [
+[ ] [
     {
         T{ live-interval-state
            { vreg 1 }
@@ -617,7 +617,7 @@ H{
 
 ! Test spill-new code path
 
-{ } [
+[ ] [
     {
         T{ live-interval-state
            { vreg 1 }
@@ -642,37 +642,37 @@ H{
     check-linear-scan
 ] unit-test
 
-{ f } [
+[ f ] [
     T{ live-range f 0 10 }
     T{ live-range f 20 30 }
     intersect-live-range
 ] unit-test
 
-{ 10 } [
+[ 10 ] [
     T{ live-range f 0 10 }
     T{ live-range f 10 30 }
     intersect-live-range
 ] unit-test
 
-{ 5 } [
+[ 5 ] [
     T{ live-range f 0 10 }
     T{ live-range f 5 30 }
     intersect-live-range
 ] unit-test
 
-{ 5 } [
+[ 5 ] [
     T{ live-range f 5 30 }
     T{ live-range f 0 10 }
     intersect-live-range
 ] unit-test
 
-{ 5 } [
+[ 5 ] [
     T{ live-range f 5 10 }
     T{ live-range f 0 15 }
     intersect-live-range
 ] unit-test
 
-{ 50 } [
+[ 50 ] [
     {
         T{ live-range f 0 10 }
         T{ live-range f 20 30 }
@@ -686,7 +686,7 @@ H{
     intersect-live-ranges
 ] unit-test
 
-{ f } [
+[ f ] [
     {
         T{ live-range f 0 10 }
         T{ live-range f 20 30 }
@@ -700,7 +700,7 @@ H{
     intersect-live-ranges
 ] unit-test
 
-{ 5 } [
+[ 5 ] [
     T{ live-interval-state
        { start 0 }
        { reg-class int-regs }
@@ -727,7 +727,7 @@ H{
     { 4 int-rep }
 } representations set
 
-{ { 0 10 } } [
+[ { 0 10 } ] [
     H{
         { int-regs
           {

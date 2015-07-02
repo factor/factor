@@ -4,9 +4,9 @@ fry sequences make ;
 FROM: euler.b-rep => has-rings? ;
 IN: euler.operators.tests
 
-{ t } [ [ ] make-b-rep b-rep? ] unit-test
+[ t ] [ [ ] make-b-rep b-rep? ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 0 0 }
         { 0 1 0 }
@@ -21,7 +21,7 @@ IN: euler.operators.tests
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 0 0 }
         { 0 1 0 }
@@ -40,7 +40,7 @@ IN: euler.operators.tests
     ] make-b-rep
 ] [ edges-not-incident? ] must-fail-with
 
-{ } [
+[ ] [
     [
         0
         1
@@ -52,7 +52,7 @@ IN: euler.operators.tests
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 0 0 }
         { 0 1 0 }
@@ -62,7 +62,7 @@ IN: euler.operators.tests
     ] make-b-rep assert-empty-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 2 3 } smooth-smooth polygon>double-face
         dup face-cw opposite-edge>>
@@ -77,7 +77,7 @@ IN: euler.operators.tests
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 2 3 4 } smooth-smooth polygon>double-face
         [ face-ccw opposite-edge>> ]
@@ -90,7 +90,7 @@ IN: euler.operators.tests
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 0 0 }
         { 0 1 0 }
@@ -113,7 +113,7 @@ IN: euler.operators.tests
     ] make-b-rep
 ] [ edges-in-different-faces? ] must-fail-with
 
-{ } [
+[ ] [
     [
         { 1 0 0 }
         { 0 1 0 }
@@ -133,7 +133,7 @@ IN: euler.operators.tests
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 2 3 4 } smooth-smooth polygon>double-face
         { 5 6 7 8 } smooth-smooth polygon>double-face
@@ -153,12 +153,12 @@ IN: euler.operators.tests
     ] make-b-rep check-b-rep
 ] unit-test
 
-{
+[
     { 0 1 0 }
     { 1 0 0 }
     { 1 2 1 }
     { 2 1 1 }
-} [
+] [
     [
         { 1 0 0 }
         { 0 1 0 }
@@ -172,13 +172,13 @@ IN: euler.operators.tests
     ] make-b-rep check-b-rep
 ] unit-test
 
-{
+[
     {
         { 2 1 1 }
         { 1 2 1 }
         { 1 1 2 }
     }
-} [
+] [
     [
         { { 1 0 0 } { 0 1 0 } { 0 0 1 } } smooth-smooth polygon>double-face
         [ { 1 1 1 } move-f ]
@@ -188,28 +188,28 @@ IN: euler.operators.tests
 ] unit-test
 
 ! Make sure we update the face's edge when killing an edge
-{ } [
+[ ] [
     [
         { 1 2 3 4 } smooth-smooth polygon>double-face
         kill-ev
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 2 3 4 } smooth-smooth polygon>double-face
         face-ccw kill-ev
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 2 3 4 } smooth-smooth polygon>double-face
         face-ccw face-ccw kill-ev
     ] make-b-rep check-b-rep
 ] unit-test
 
-{ } [
+[ ] [
     [
         { 1 2 3 4 } smooth-smooth polygon>double-face
         face-ccw face-ccw face-ccw kill-ev

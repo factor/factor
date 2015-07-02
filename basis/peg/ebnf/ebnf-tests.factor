@@ -577,16 +577,16 @@ Tok                = Spaces (Number | Special )
     error>> [ redefined-rule? ] [ name>> "lol" = ] bi and
 ] must-fail-with
 
-{
+[
     { "a" "a" }
-} [
+] [
     EBNF: foo   Bar = "a":a1 "a":a2 => [[ a1 a2 2array ]] ;EBNF
     "aa" foo
 ] unit-test
 
-{
+[
     { "a" "a" }
-} [
+] [
     EBNF: foo2   Bar = "a":a-1 "a":a-2 => [[ a-1 a-2 2array ]] ;EBNF
     "aa" foo2
 ] unit-test

@@ -4,9 +4,9 @@ USING: tools.test core-foundation core-foundation.dictionaries
 arrays destructors core-foundation.strings kernel namespaces ;
 IN: core-foundation.dictionaries.tests
 
-{ } [ { } <CFDictionary> CFRelease ] unit-test
+[ ] [ { } <CFDictionary> CFRelease ] unit-test
 
-{ "raps in the back of cars and doesn't afraid of anything" } [
+[ "raps in the back of cars and doesn't afraid of anything" ] [
     [
         "cpst" <CFString> &CFRelease dup "key" set
         "raps in the back of cars and doesn't afraid of anything" <CFString> &CFRelease

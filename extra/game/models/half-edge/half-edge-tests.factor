@@ -44,26 +44,26 @@ CONSTANT: cube-edges
 
 connect-cube-edges
 
-{ 0 1 }
+[ 0 1 ]
 [ cube-edges first edge-vertices ] unit-test
 
-{ { 0 0 0 } }
+[ { 0 0 0 } ]
 [ cube-edges first vertex-edges [ vertex>> ] map ] unit-test
 
-{ 3 }
+[ 3 ]
 [ cube-edges first vertex-valence ] unit-test
 
-{ { 0 1 3 2 } }
+[ { 0 1 3 2 } ]
 [ cube-edges first face-edges [ vertex>> ] map ] unit-test
 
-{ 4 }
+[ 4 ]
 [ cube-edges first face-sides ] unit-test
 
-{ { 1 4 2 } }
+[ { 1 4 2 } ]
 [ cube-edges first vertex-neighbors ] unit-test
 
-{ { 3 5 6 } }
+[ { 3 5 6 } ]
 [ cube-edges first vertex-diagonals ] unit-test
 
-{ { 1 4 3 5 } }
+[ { 1 4 3 5 } ]
 [ cube-edges first face-neighbors ] unit-test

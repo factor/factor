@@ -12,7 +12,7 @@ IN: smalltalk.compiler.tests
 : test-inference ( ast -- in# out# )
     test-compilation infer [ in>> ] [ out>> ] bi [ length ] bi@ ;
 
-{ 2 1 } [
+[ 2 1 ] [
     T{ ast-block f
        { "a" "b" }
        {
@@ -25,7 +25,7 @@ IN: smalltalk.compiler.tests
     } test-inference
 ] unit-test
 
-{ 3 1 } [
+[ 3 1 ] [
     T{ ast-block f
        { "a" "b" "c" }
        {
@@ -47,7 +47,7 @@ IN: smalltalk.compiler.tests
     } test-inference
 ] unit-test
 
-{ 0 1 } [
+[ 0 1 ] [
     T{ ast-block f
        { }
        { }
@@ -78,7 +78,7 @@ IN: smalltalk.compiler.tests
     } test-inference
 ] unit-test
 
-{ "a" } [
+[ "a" ] [
     T{ ast-block f
        { }
        { }

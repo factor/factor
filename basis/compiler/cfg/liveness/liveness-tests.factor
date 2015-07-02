@@ -174,15 +174,15 @@ V{
 
 1 { 2 3 } edges
 
-{ } [ test-liveness ] unit-test
+[ ] [ test-liveness ] unit-test
 
-{
+[
     H{
         { 1 1 }
         { 2 2 }
         { 3 3 }
     }
-}
+]
 [ 1 get live-in ]
 unit-test
 
@@ -200,9 +200,9 @@ V{
 
 1 2 edge
 
-{ } [ test-liveness ] unit-test
+[ ] [ test-liveness ] unit-test
 
-{ H{ { 0 0 } } } [ 2 get live-in ] unit-test
+[ H{ { 0 0 } } ] [ 2 get live-in ] unit-test
 
 ! Regression
 V{
@@ -286,12 +286,12 @@ V{
 7 8 edge
 8 9 edge
 
-{ } [ test-liveness ] unit-test
+[ ] [ test-liveness ] unit-test
 
-{ H{ { 28 28 } { 29 29 } { 30 30 } { 31 31 } } } [ 5 get live-out ] unit-test
-{ H{ { 28 28 } { 29 29 } { 30 30 } } } [ 6 get live-in ] unit-test
-{ H{ { 28 28 } { 29 29 } { 31 31 } } } [ 7 get live-in ] unit-test
-{ H{ { 30 30 } } } [ 6 get 8 get edge-live-in ] unit-test
+[ H{ { 28 28 } { 29 29 } { 30 30 } { 31 31 } } ] [ 5 get live-out ] unit-test
+[ H{ { 28 28 } { 29 29 } { 30 30 } } ] [ 6 get live-in ] unit-test
+[ H{ { 28 28 } { 29 29 } { 31 31 } } ] [ 7 get live-in ] unit-test
+[ H{ { 30 30 } } ] [ 6 get 8 get edge-live-in ] unit-test
 
 V{
     T{ ##prologue }
@@ -339,15 +339,15 @@ V{
 5 6 edge
 6 7 edge
 
-{ } [ 0 get block>cfg dup cfg set compute-live-sets ] unit-test
+[ ] [ 0 get block>cfg dup cfg set compute-live-sets ] unit-test
 
-{ t } [ 0 get live-in assoc-empty? ] unit-test
+[ t ] [ 0 get live-in assoc-empty? ] unit-test
 
-{ H{ { 2 2 } } } [ 4 get live-out ] unit-test
+[ H{ { 2 2 } } ] [ 4 get live-out ] unit-test
 
-{ H{ { 0 0 } } } [ 2 get 4 get edge-live-in ] unit-test
+[ H{ { 0 0 } } ] [ 2 get 4 get edge-live-in ] unit-test
 
-{ H{ { 1 1 } } } [ 3 get 4 get edge-live-in ] unit-test
+[ H{ { 1 1 } } ] [ 3 get 4 get edge-live-in ] unit-test
 
 
 V{
@@ -378,12 +378,12 @@ H{
     { 1 int-rep }
 } representations set
 
-{ } [ 0 get block>cfg dup cfg set compute-live-sets ] unit-test
+[ ] [ 0 get block>cfg dup cfg set compute-live-sets ] unit-test
 
-{ V{ { 1 0 } } } [ 1 get instructions>> 2 swap nth gc-map>> derived-roots>> ] unit-test
+[ V{ { 1 0 } } ] [ 1 get instructions>> 2 swap nth gc-map>> derived-roots>> ] unit-test
 
-{ { 0 } } [ 1 get instructions>> 2 swap nth gc-map>> gc-roots>> ] unit-test
+[ { 0 } ] [ 1 get instructions>> 2 swap nth gc-map>> gc-roots>> ] unit-test
 
-{ V{ { 1 0 } } } [ 1 get instructions>> 4 swap nth gc-map>> derived-roots>> ] unit-test
+[ V{ { 1 0 } } ] [ 1 get instructions>> 4 swap nth gc-map>> derived-roots>> ] unit-test
 
-{ { 0 } } [ 1 get instructions>> 4 swap nth gc-map>> gc-roots>> ] unit-test
+[ { 0 } ] [ 1 get instructions>> 4 swap nth gc-map>> gc-roots>> ] unit-test

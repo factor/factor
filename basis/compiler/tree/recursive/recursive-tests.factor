@@ -6,10 +6,10 @@ compiler.tree.recursive
 compiler.tree.recursive.private ;
 IN: compiler.tree.recursive.tests
 
-{ { f f f f } } [ f { f t f f } (tail-calls) ] unit-test
-{ { f f f t } } [ t { f t f f } (tail-calls) ] unit-test
-{ { f t t t } } [ t { f f t t } (tail-calls) ] unit-test
-{ { f f f t } } [ t { f f t f } (tail-calls) ] unit-test
+[ { f f f f } ] [ f { f t f f } (tail-calls) ] unit-test
+[ { f f f t } ] [ t { f t f f } (tail-calls) ] unit-test
+[ { f t t t } ] [ t { f f t t } (tail-calls) ] unit-test
+[ { f f f t } ] [ t { f f t f } (tail-calls) ] unit-test
 
 : label-is-loop? ( nodes word -- ? )
     swap [
@@ -34,22 +34,22 @@ IN: compiler.tree.recursive.tests
 : loop-test-1 ( a -- )
     dup [ 1 + loop-test-1 ] [ drop ] if ; inline recursive
 
-{ t } [
+[ t ] [
     [ loop-test-1 ] build-tree analyze-recursive
     \ loop-test-1 label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ loop-test-1 1 2 3 ] build-tree analyze-recursive
     \ loop-test-1 label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ [ loop-test-1 ] each ] build-tree analyze-recursive
     \ loop-test-1 label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ [ loop-test-1 ] each ] build-tree analyze-recursive
     \ (each-integer) label-is-loop?
 ] unit-test
@@ -57,7 +57,7 @@ IN: compiler.tree.recursive.tests
 : loop-test-2 ( a b -- a' )
     dup [ 1 + loop-test-2 1 - ] [ drop ] if ; inline recursive
 
-{ t } [
+[ t ] [
     [ loop-test-2 ] build-tree analyze-recursive
     \ loop-test-2 label-is-not-loop?
 ] unit-test
@@ -65,12 +65,12 @@ IN: compiler.tree.recursive.tests
 : loop-test-3 ( a -- )
     dup [ [ loop-test-3 ] each ] [ drop ] if ; inline recursive
 
-{ t } [
+[ t ] [
     [ loop-test-3 ] build-tree analyze-recursive
     \ loop-test-3 label-is-not-loop?
 ] unit-test
 
-{ f } [
+[ f ] [
     [ [ [ ] map ] map ] build-tree analyze-recursive
     [
         dup #recursive? [ label>> loop?>> not ] [ drop f ] if
@@ -87,22 +87,22 @@ DEFER: a
 : a ( -- )
     blah [ b ] [ a ] if ; inline recursive
 
-{ t } [
+[ t ] [
     [ a ] build-tree analyze-recursive
     \ a label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ a ] build-tree analyze-recursive
     \ b label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ b ] build-tree analyze-recursive
     \ a label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ a ] build-tree analyze-recursive
     \ b label-is-loop?
 ] unit-test
@@ -115,12 +115,12 @@ DEFER: a'
 : a' ( -- )
     blah [ b' ] [ a' ] if ; inline recursive
 
-{ f } [
+[ f ] [
     [ a' ] build-tree analyze-recursive
     \ a' label-is-loop?
 ] unit-test
 
-{ f } [
+[ f ] [
     [ b' ] build-tree analyze-recursive
     \ b' label-is-loop?
 ] unit-test
@@ -129,12 +129,12 @@ DEFER: a'
 ! paper almost convinced me that a loop conversion here is
 ! sound.
 
-{ t } [
+[ t ] [
     [ b' ] build-tree analyze-recursive
     \ a' label-is-loop?
 ] unit-test
 
-{ f } [
+[ f ] [
     [ a' ] build-tree analyze-recursive
     \ b' label-is-loop?
 ] unit-test
@@ -147,22 +147,22 @@ DEFER: a''
 : a'' ( a -- b )
     dup [ b'' a'' ] when ; inline recursive
 
-{ t } [
+[ t ] [
     [ a'' ] build-tree analyze-recursive
     \ a'' label-is-not-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ a'' ] build-tree analyze-recursive
     \ b'' label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ b'' ] build-tree analyze-recursive
     \ a'' label-is-loop?
 ] unit-test
 
-{ t } [
+[ t ] [
     [ b'' ] build-tree analyze-recursive
     \ b'' label-is-not-loop?
 ] unit-test
@@ -172,7 +172,7 @@ DEFER: a''
         [ [ 1 - ] dip loop-in-non-loop ] [ call ] 2bi
     ] [ 2drop ] if ; inline recursive
 
-{ t } [
+[ t ] [
     [ 10 [ [ drop ] each-integer ] loop-in-non-loop ]
     build-tree analyze-recursive
     \ (each-integer) label-is-loop?
@@ -186,7 +186,7 @@ DEFER: a'''
 : a''' ( -- )
     blah [ b''' ] [ a''' ] if ; inline recursive
 
-{ t } [
+[ t ] [
     [ b''' ] build-tree analyze-recursive
     \ a''' label-is-loop?
 ] unit-test
@@ -197,7 +197,7 @@ DEFER: b4
 
 : b4 ( a -- b ) dup [ a4 reverse ] when ; inline recursive
 
-{ t } [ [ b4 ] build-tree analyze-recursive \ a4 label-is-loop? ] unit-test
-{ t } [ [ b4 ] build-tree analyze-recursive \ b4 label-is-not-loop? ] unit-test
-{ t } [ [ a4 ] build-tree analyze-recursive \ a4 label-is-not-loop? ] unit-test
-{ t } [ [ a4 ] build-tree analyze-recursive \ b4 label-is-loop? ] unit-test
+[ t ] [ [ b4 ] build-tree analyze-recursive \ a4 label-is-loop? ] unit-test
+[ t ] [ [ b4 ] build-tree analyze-recursive \ b4 label-is-not-loop? ] unit-test
+[ t ] [ [ a4 ] build-tree analyze-recursive \ a4 label-is-not-loop? ] unit-test
+[ t ] [ [ a4 ] build-tree analyze-recursive \ b4 label-is-loop? ] unit-test

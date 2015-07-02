@@ -2,9 +2,9 @@ USING: accessors kernel namespaces tools.test ui.gadgets
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.labels ;
 IN: ui.gadgets.frames.tests
 
-{ } [ 3 3 <frame> { 1 1 } >>filled-cell layout ] unit-test
+[ ] [ 3 3 <frame> { 1 1 } >>filled-cell layout ] unit-test
 
-{ { 1000 1000 } } [
+[ { 1000 1000 } ] [
     1 1 <frame>
     { 0 0 } >>filled-cell
     <gadget> dup "c" set { 0 0 } grid-add
@@ -13,7 +13,7 @@ IN: ui.gadgets.frames.tests
     "c" get dim>>
 ] unit-test
 
-{ t } [
+[ t ] [
     1 2 <frame>
         { 0 0 } >>filled-cell
         "Hello world" <label> { 0 0 } grid-add
@@ -26,7 +26,7 @@ IN: ui.gadgets.frames.tests
     "dim1" get "dim2" get =
 ] unit-test
 
-{ { 5 20 } { 20 20 } } [
+[ { 5 20 } { 20 20 } ] [
     2 3 <frame>
     { 0 1 } >>filled-cell
     { 5 5 } >>gap

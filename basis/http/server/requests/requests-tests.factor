@@ -130,7 +130,7 @@ hello
 ! line(s) received where a Request-Line is expected. In other words, if
 ! the server is reading the protocol stream at the beginning of a
 ! message and receives a CRLF first, it should ignore the CRLF.
-{
+[
     T{ request
         { method "GET" }
         { url URL" /" }
@@ -139,7 +139,7 @@ hello
         { cookies V{ } }
         { redirects 10 }
     }
-} [
+] [
     "\r\n\r\n\r\nGET / HTTP/1.0\r\n\r\n" [ read-request ] with-string-reader
 ] unit-test
 
@@ -147,7 +147,7 @@ hello
 ! The line terminator for message-header fields is the sequence CRLF.
 ! However, we recommend that applications, when parsing such headers,
 ! recognize a single LF as a line terminator and ignore the leading CR.
-{ t } [
+[ t ] [
     {
         "GET / HTTP/1.1"
         "connection: close"

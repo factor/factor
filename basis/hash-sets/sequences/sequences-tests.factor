@@ -6,15 +6,15 @@ tools.test ;
 
 IN: hash-sets.sequences.tests
 
-{ t } [ 0 4 "asdf" <slice> SHS{ "asdf" } in? ] unit-test
+[ t ] [ 0 4 "asdf" <slice> SHS{ "asdf" } in? ] unit-test
 
-{ SHS{ "asdf" } } [
+[ SHS{ "asdf" } ] [
     0 4 "asdf" <slice> SHS{ "asdf" } [ adjoin ] keep
 ] unit-test
 
-{ t } [
+[ t ] [
     SHS{ } clone 0 4 "asdf" <slice> over adjoin
     "asdf" swap in?
 ] unit-test
 
-{ { "asdf" } } [ SHS{ "asdf" } members ] unit-test
+[ { "asdf" } ] [ SHS{ "asdf" } members ] unit-test

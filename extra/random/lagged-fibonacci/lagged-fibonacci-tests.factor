@@ -5,14 +5,14 @@ sequences tools.test specialized-arrays alien.c-types ;
 SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci.tests
 
-{ t } [
+[ t ] [
     3 <lagged-fibonacci> [
         1000 [ random-float ] double-array{ } replicate-as
         999 swap nth 0.860072135925293 -.01 ~
     ] with-random
 ] unit-test
 
-{ t } [
+[ t ] [
     3 <lagged-fibonacci> [
         [
             1000 [ random-float ] double-array{ } replicate-as

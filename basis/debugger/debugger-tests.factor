@@ -2,12 +2,12 @@ USING: accessors alien.syntax continuations debugger kernel
 namespaces tools.test ;
 IN: debugger.tests
 
-{ } [ [ drop ] [ error. ] recover ] unit-test
+[ ] [ [ drop ] [ error. ] recover ] unit-test
 
-{ f } [ { } vm-error? ] unit-test
-{ f } [ { "A" "B" } vm-error? ] unit-test
+[ f ] [ { } vm-error? ] unit-test
+[ f ] [ { "A" "B" } vm-error? ] unit-test
 
-{ } [
+[ ] [
 T{ test-failure
     { error
         {
@@ -40,6 +40,6 @@ T{ test-failure
 } error.
 ] unit-test
 
-{ "foo" { 1 2 3 "foo" } } [
+[ "foo" { 1 2 3 "foo" } ] [
     [ 1 2 3 "foo" throw ] [ ] recover error-continuation get data>>
 ] unit-test
