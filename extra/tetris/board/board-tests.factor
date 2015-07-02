@@ -5,7 +5,7 @@ USING: accessors arrays colors colors.constants kernel tetris.board tetris.piece
 [ 1 { f f } ] [ 2 3 <board> { 1 1 } board@block ] unit-test
 [ f ] [ 2 3 <board> { 1 1 } block ] unit-test
 [ 2 3 <board> { 2 3 } block ] must-fail
-COLOR: red 1array [ 2 3 <board> dup { 1 1 } COLOR: red set-block { 1 1 } block ] unit-test
+{ COLOR: red } [ 2 3 <board> dup { 1 1 } COLOR: red set-block { 1 1 } block ] unit-test
 [ t ] [ 2 3 <board> { 1 1 } block-free? ] unit-test
 [ f ] [ 2 3 <board> dup { 1 1 } COLOR: red set-block { 1 1 } block-free? ] unit-test
 [ t ] [ 2 3 <board> dup { 1 1 } COLOR: red set-block { 1 2 } block-free? ] unit-test
