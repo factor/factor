@@ -4,7 +4,7 @@ USING: help.markup help.syntax ;
 IN: io.encodings.8-bit.windows-1252
 
 HELP: windows-1252
-{ $var-description "Windows 1252 is an 8-bit superset of ASCII which is closely related to Latin-1. Control characters in the 0x80 to 0x9F range are replaced with printable characters such as the Euro symbol." } 
+{ $var-description "Windows 1252 is an 8-bit superset of ASCII which is closely related to Latin-1. Control characters in the 0x80 to 0x9F range are replaced with printable characters such as the Euro symbol." }
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.8-bit.windows-1252" "Windows 1252 encoding"

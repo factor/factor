@@ -9,11 +9,11 @@ HELP: <coverage-state>
     { "executed?" boolean }
     { "coverage-state" coverage-state }
 }
-{ $description "Makes a coverage tuple. Users should not call this directly." } ; 
+{ $description "Makes a coverage tuple. Users should not call this directly." } ;
 
 HELP: each-word
 { $values
-    { "string" string } { "quot" quotation }    
+    { "string" string } { "quot" quotation }
 }
 { $description "Calls a quotation on every word in the vocabulary and its private vocabulary, if there is one." } ;
 
@@ -39,7 +39,7 @@ HELP: coverage-on
 
 HELP: coverage.
 { $values
-    { "object" object }    
+    { "object" object }
 }
 { $description "Calls the coverage word on all the words in a vocabalary or on a single word and prints out a report." } ;
 
@@ -52,7 +52,7 @@ HELP: %coverage
 
 HELP: add-coverage
 { $values
-    { "object" object }    
+    { "object" object }
 }
 { $description "Recompiles a vocabulary with the coverage annotation. Note that the annotation tool is still disabled until you call " { $link coverage-on } "." } ;
 
@@ -64,19 +64,19 @@ HELP: covered
 
 HELP: flag-covered
 { $values
-    { "coverage" object }    
+    { "coverage" object }
 }
 { $description "A word that sets the " { $snippet "executed?" } " slot of the coverage tuple when the covered value is true." } ;
 
 HELP: remove-coverage
 { $values
-    { "object" object }    
+    { "object" object }
 }
 { $description "Recompiles a vocabulary without the coverage annotation." } ;
 
 HELP: reset-coverage
 { $values
-    { "object" object }    
+    { "object" object }
 }
 { $description "Sets the " { $snippet "execute?" } " slot of each coverage tuple to false." } ;
 

@@ -27,12 +27,12 @@ HELP: dual-op
     { "word" word }
 }
 { $description "Similar to " { $link execute } ", but promotes word to operate on duals." }
-{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments. This can be set using " { $link POSTPONE: DERIVATIVE: } ". Once a derivative has been defined for a word, dual-op makes it easy to extend the definition to dual numbers." } 
-{ $examples 
-    { $unchecked-example "USING: math math.dual math.derivatives.syntax math.functions ;" 
-    "DERIVATIVE: sin [ cos * ]" 
+{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments. This can be set using " { $link POSTPONE: DERIVATIVE: } ". Once a derivative has been defined for a word, dual-op makes it easy to extend the definition to dual numbers." }
+{ $examples
+    { $unchecked-example "USING: math math.dual math.derivatives.syntax math.functions ;"
+    "DERIVATIVE: sin [ cos * ]"
     "M: dual sin \\sin dual-op ;" "" }
-    { $unchecked-example "USING: math math.dual math.derivatives.syntax ;" 
+    { $unchecked-example "USING: math math.dual math.derivatives.syntax ;"
     "DERIVATIVE: * [ drop ] [ nip ]"
     ": d* ( x y -- x*y ) \ * dual-op ;" "" }
 } ;

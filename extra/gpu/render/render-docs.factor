@@ -62,7 +62,7 @@ $nl
     { "Boolean vector types: " { $link bvec2-uniform } ", " { $link bvec3-uniform } ", " { $link bvec4-uniform } }
     }
 }
-{ "Matrix uniforms take their values either from row-major Factor " { $link sequence } "s of sequences of floats, or from " { $link alien } "s or " { $link float-array } "s referencing packed column-major arrays of floats. Matrix types are:" 
+{ "Matrix uniforms take their values either from row-major Factor " { $link sequence } "s of sequences of floats, or from " { $link alien } "s or " { $link float-array } "s referencing packed column-major arrays of floats. Matrix types are:"
     { $list
     { { $link mat2-uniform } ", " { $link mat2x3-uniform } ", " { $link mat2x4-uniform } }
     { { $link mat3x2-uniform } ", " { $link mat3-uniform } ", " { $link mat3x4-uniform } }
@@ -105,7 +105,7 @@ HELP: index-elements
 { $list
 { "The " { $snippet "ptr" } " slot contains a " { $link byte-array } ", " { $link alien } ", or " { $link buffer-ptr } " value referencing the beginning of the index array." }
 { "The " { $snippet "count" } " slot contains an " { $link integer } " value specifying the number of indexes to supply from the array." }
-{ "The " { $snippet "index-type" } " slot contains an " { $link index-type } " value specifying whether the array consists of " { $link ubyte-indexes } ", " { $link ushort-indexes } ", or " { $link uint-indexes } "." } 
+{ "The " { $snippet "index-type" } " slot contains an " { $link index-type } " value specifying whether the array consists of " { $link ubyte-indexes } ", " { $link ushort-indexes } ", or " { $link uint-indexes } "." }
 } } ;
 
 HELP: index-range
@@ -199,9 +199,9 @@ HELP: primitive-mode
 { { $link points-mode } " causes each element to generate a point." }
 { { $link lines-mode } " causes each pair of elements to generate a disconnected line." }
 { { $link line-strip-mode } " causes each consecutive pair of elements to generate a connected strip of lines." }
-{ { $link line-loop-mode } " causes each consecutive pair of elements to generate a connected loop of lines, with an extra line connecting the last and first elements." } 
+{ { $link line-loop-mode } " causes each consecutive pair of elements to generate a connected loop of lines, with an extra line connecting the last and first elements." }
 { { $link triangles-mode } " causes every 3 elements to generate an independent triangle." }
-{ { $link triangle-strip-mode } " causes every consecutive group of 3 elements to generate a connected strip of triangles." } 
+{ { $link triangle-strip-mode } " causes every consecutive group of 3 elements to generate a connected strip of triangles." }
 { { $link triangle-fan-mode } " causes a triangle to be generated from the first element and every subsequent consecutive pair of elements in a fan pattern." } } ;
 
 { primitive-mode points-mode lines-mode line-strip-mode line-loop-mode triangles-mode triangle-strip-mode triangle-fan-mode } related-words

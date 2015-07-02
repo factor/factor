@@ -41,4 +41,3 @@ HELP: replace
 }
 { $example "USING: math math.parser peg peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" 'integer' [ 2 * number>string ] action replace ." "\"one 246 two 912\"" }
 { $see-also search } ;
-

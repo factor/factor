@@ -20,7 +20,7 @@ HELP: <shader-instance>
 HELP: <multi-vertex-array>
 { $values
     { "vertex-formats" "a list of " { $link buffer-ptr } "/" { $link vertex-format } " pairs" }
-    { "program-instance" program-instance } 
+    { "program-instance" program-instance }
     { "vertex-array" vertex-array }
 }
 { $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } ". The first element of each pair in " { $snippet "vertex-formats" } " can be either a " { $link buffer-ptr } " or a " { $link buffer } "; in the latter case, vertex data in the associated format is read from the beginning of the buffer." } ;

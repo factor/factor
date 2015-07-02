@@ -23,7 +23,7 @@ B{ 230 136 145 231 136 177 228 189 160 } utf8 decode ."""
     }
 } ;
 
-HELP: encode 
+HELP: encode
 { $values { "string" string } { "encoding" "an encoding descriptor" } { "byte-array" byte-array } }
 { $description "Converts a string into a byte array, interpreting that string with the given encoding." }
 { $examples

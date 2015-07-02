@@ -48,4 +48,3 @@ HELP: >fraction
 HELP: 2>fraction
 { $values { "a/b" rational } { "c/d" rational } { "a" integer } { "c" integer } { "b" "a positive integer" } { "d" "a positive integer" } }
 { $description "Extracts the numerator and denominator of two rational numbers at once." } ;
-

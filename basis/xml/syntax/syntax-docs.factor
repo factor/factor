@@ -53,7 +53,7 @@ ARTICLE: { "xml.syntax" "interpolation" } "XML interpolation syntax"
 "XML interpolation has two forms for each of the words " { $link POSTPONE: <XML } " and " { $link POSTPONE: [XML } ": a fry-like form and a locals form. To splice locals in, use the syntax " { $snippet "<-variable->" } ". To splice something in from the stack, in the style of " { $vocab-link "fry" } ", use the syntax " { $snippet "<->" } ". An XML interpolation form may only use one of these styles."
 $nl
 "These forms can be used where a tag might go, as in " { $snippet "[XML <foo><-></foo> XML]" } " or where an attribute might go, as in " { $snippet "[XML <foo bar=<->/> XML]" } ". When an attribute is spliced in, it is not included if the value is " { $snippet "f" } " and if the value is not a string, the value is put through " { $link present } ". Here is an example of the fry style of XML interpolation:"
-{ $example 
+{ $example
 """USING: splitting xml.writer xml.syntax ;
 "one two three" " " split
 [ [XML <item><-></item> XML] ] map

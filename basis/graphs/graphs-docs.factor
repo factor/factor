@@ -23,7 +23,7 @@ HELP: add-vertex
 
 HELP: remove-vertex
 { $values { "vertex" object } { "edges" sequence } { "graph" "an assoc mapping vertices to sequences of edges" } }
-{ $description "Removes a vertex from a graph, using the given edges sequence." } 
+{ $description "Removes a vertex from a graph, using the given edges sequence." }
 { $notes "The " { $snippet "edges" } " sequence must equal the value passed to " { $link add-vertex } ", otherwise some vertices of the graph may continue to refer to the removed vertex." }
 { $side-effects "graph" } ;
 

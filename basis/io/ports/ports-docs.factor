@@ -54,17 +54,17 @@ $low-level-note ;
 
 HELP: <buffered-port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "class" class } { "port" "a new " { $link port } } }
-{ $description "Creates a new " { $link port } " using the specified native handle and a default-sized I/O buffer." } 
+{ $description "Creates a new " { $link port } " using the specified native handle and a default-sized I/O buffer." }
 $low-level-note ;
 
 HELP: <input-port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "input-port" "a new " { $link input-port } } }
-{ $description "Creates a new " { $link input-port } " using the specified native handle and a default-sized input buffer." } 
+{ $description "Creates a new " { $link input-port } " using the specified native handle and a default-sized input buffer." }
 $low-level-note ;
 
 HELP: <output-port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "output-port" "a new " { $link output-port } } }
-{ $description "Creates a new " { $link output-port } " using the specified native handle and a default-sized input buffer." } 
+{ $description "Creates a new " { $link output-port } " using the specified native handle and a default-sized input buffer." }
 $low-level-note ;
 
 HELP: (wait-to-read)

@@ -63,7 +63,7 @@ HELP: validate-params
 } ;
 
 { validate-params validate-values } related-words
-      
+
 HELP: validation-failed
 { $description "Stops processing the current request and takes action depending on the type of the current request:"
     { $list
@@ -107,7 +107,7 @@ ARTICLE: "furnace.actions.validation" "Form validation with actions"
 $nl
 "A word to validate parameters and make them available as HTML form values (see " { $link "html.forms.values" } "); typically this word is invoked from the " { $slot "init" } " and " { $slot "validate" } " quotations:"
 { $subsections validate-params }
-"The above word expects an association list mapping parameter names to validator quotations; validator quotations can use the words in the " 
+"The above word expects an association list mapping parameter names to validator quotations; validator quotations can use the words in the "
 "Custom validation logic can invoke a word when validation fails; " { $link validate-params } " invokes this word for you:"
 { $subsections validation-failed }
 "If validation fails, no more action code is executed, and the client is redirected back to the originating page, where validation errors can be displayed. Note that validation errors are rendered automatically by the " { $link "html.components" } " words, and in particular, " { $link "html.templates.chloe" } " use these words." ;

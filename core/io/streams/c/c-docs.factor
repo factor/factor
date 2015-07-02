@@ -59,7 +59,7 @@ HELP: fclose
 
 HELP: fgetc
 { $values { "alien" "a C FILE* handle" } { "byte/f" { $maybe "an integer from 0 to 255" } } }
-{ $description "Reads a single byte from a C FILE* handle, and outputs " { $link f } " on end of file." } 
+{ $description "Reads a single byte from a C FILE* handle, and outputs " { $link f } " on end of file." }
 { $errors "Throws an error if the input operation failed." } ;
 
 HELP: fputc

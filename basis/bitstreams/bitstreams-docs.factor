@@ -39,4 +39,3 @@ HELP: set-abp
 HELP: get-abp
 { $values { "bitstream" bit-reader } { "abp" integer } }
 { $description "Returns the current position of the bit-reader's read cursor as a number of bits from the start of the stream. The position of the cursor in terms of bytes and bits can be read directly from the bit-reader tuple using " { $link byte-pos>> } " and " { $link bit-pos>> } "." } ;
-

@@ -10,4 +10,3 @@ HELP: <ntp>
 { $description
     "Requests the time from the specified NTP time server."
 } ;
-

@@ -1,13 +1,13 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup cpu.8080.emulator ;
-IN: space-invaders 
+IN: space-invaders
 
 HELP: run-invaders
-{ $description 
+{ $description
 "Run the Space Invaders emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
-"location of the Space Invaders ROM files. See " 
+"location of the Space Invaders ROM files. See "
 { $link { "space-invaders" "space-invaders" } } "  for details."
 } ;
 
@@ -23,9 +23,9 @@ ARTICLE: { "space-invaders" "space-invaders" } "Space Invaders Emulator"
   "invaders/invaders.g"
   "invaders/invaders.h"
 }
-"These are the same ROM files as used by MAME. To run the game use the " 
+"These are the same ROM files as used by MAME. To run the game use the "
 { $link run-invaders } " word." $nl
-"Keys:" 
+"Keys:"
 { $table
   { "Backspace" "Insert Coin" }
   { "1" "1 Player" }
@@ -37,4 +37,4 @@ ARTICLE: { "space-invaders" "space-invaders" } "Space Invaders Emulator"
 "If you save the Factor image while a game is running, when you restart "
 "the image the game continues where it left off." ;
 
-ABOUT: { "space-invaders" "space-invaders" } 
+ABOUT: { "space-invaders" "space-invaders" }

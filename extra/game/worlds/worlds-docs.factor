@@ -37,7 +37,7 @@ HELP: tick-game-world
 { game-world begin-game-world end-game-world tick-game-world } related-words
 
 ARTICLE: "game.worlds" "Game worlds"
-"The " { $vocab-link "game.worlds" } " vocabulary provides a " { $link world } " subclass that integrates with " { $vocab-link "game.loop" } " and optionally " { $vocab-link "game.input" } " and " { $vocab-link "audio.engine" } " to quickly provide game infrastructure." 
+"The " { $vocab-link "game.worlds" } " vocabulary provides a " { $link world } " subclass that integrates with " { $vocab-link "game.loop" } " and optionally " { $vocab-link "game.input" } " and " { $vocab-link "audio.engine" } " to quickly provide game infrastructure."
 { $subsections
     game-world
     game-attributes

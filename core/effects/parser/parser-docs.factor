@@ -6,4 +6,3 @@ HELP: parse-effect
 { $description "Parses a stack effect from the current input line." }
 { $examples "This word is used by " { $link POSTPONE: ( } " to parse stack effect declarations." }
 $parsing-note ;
-

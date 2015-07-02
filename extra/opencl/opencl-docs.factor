@@ -100,7 +100,7 @@ HELP: cl-kernel-name
 
 HELP: cl-marker
 { $values
-    
+
     { "event" cl-event }
 }
 { $description "Inserts a marker into the current command queue." } ;
@@ -124,7 +124,7 @@ HELP: cl-platform
 
 HELP: cl-platforms
 { $values
-    
+
     { "platforms" "sequence of cl-platform"}
 }
 { $description "Returns the platforms available for OpenCL computation on this hardware." } ;

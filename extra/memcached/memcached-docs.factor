@@ -9,7 +9,7 @@ IN: memcached
 HELP: memcached-server
 { $var-description
     "Holds an " { $link inet } " object with the address of "
-    "an Memcached server." 
+    "an Memcached server."
 } ;
 
 HELP: with-memcached
@@ -120,4 +120,3 @@ HELP: m/quit
 { $description
     "Close the connection to the " { $link memcached-server } "."
 } ;
-

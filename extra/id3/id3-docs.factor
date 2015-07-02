@@ -5,8 +5,8 @@ id3.private strings ;
 IN: id3
 
 HELP: mp3>id3
-{ $values 
-    { "path" "a path string" } 
+{ $values
+    { "path" "a path string" }
     { "id3/f" "a tuple storing ID3v2 metadata or f" } }
     { $description "Return a tuple containing the ID3 information parsed out of the MP3 file, or " { $link f } " if no metadata is present. Words to access the ID3v1 information are here:"
         { $list

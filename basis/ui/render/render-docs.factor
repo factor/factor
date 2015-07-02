@@ -26,7 +26,7 @@ HELP: clip
 { $var-description "The current clipping rectangle." } ;
 
 HELP: draw-gadget*
-{ $values { "gadget" gadget } } 
+{ $values { "gadget" gadget } }
 { $contract "Draws the gadget by making OpenGL calls. The top-left corner of the gadget should be drawn at the location stored in the " { $link origin } " variable." }
 { $notes "This word should not be called directly. To force a gadget to redraw, call " { $link relayout-1 } "." } ;
 

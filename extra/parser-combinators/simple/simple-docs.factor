@@ -4,9 +4,9 @@ USING: help.syntax help.markup parser-combinators ;
 IN: parser-combinators.simple
 
 HELP: 'digit'
-{ $values 
+{ $values
   { "parser" "a parser object" } }
-{ $description 
+{ $description
     "Return a parser that consumes a single digit from "
     "the input string. The numeric value of the digit "
     " consumed is the result of the parse." }
@@ -14,18 +14,18 @@ HELP: 'digit'
 { $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'digit' parse-1 ." "1" } } ;
 
 HELP: 'integer'
-{ $values 
+{ $values
   { "parser" "a parser object" } }
-{ $description 
+{ $description
     "Return a parser that consumes an integer from "
     "the input string. The numeric value of the integer "
     " consumed is the result of the parse." }
 { $examples
 { $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'integer' parse-1 ." "123" } } ;
 HELP: 'string'
-{ $values 
+{ $values
   { "parser" "a parser object" } }
-{ $description 
+{ $description
     "Return a parser that consumes a string enclosed in "
     "quotations from the input string. The string value "
     " consumed is the result of the parse." }
@@ -33,9 +33,9 @@ HELP: 'string'
 { $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"\\\"foo\\\"\" 'string' parse-1 ." "\"foo\"" } } ;
 
 HELP: 'bold'
-{ $values 
+{ $values
   { "parser" "a parser object" } }
-{ $description 
+{ $description
     "Return a parser that consumes a string enclosed in "
     "the '*' character from the input string. This is "
     "commonly used in markup languages to indicate bold "
@@ -44,9 +44,9 @@ HELP: 'bold'
 { $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"*foo*\" 'bold' [ \"<strong>\" \"</strong>\" surround ] <@ parse-1 ." "\"<strong>foo</strong>\"" } ;
 
 HELP: 'italic'
-{ $values 
+{ $values
   { "parser" "a parser object" } }
-{ $description 
+{ $description
     "Return a parser that consumes a string enclosed in "
     "the '_' character from the input string. This is "
     "commonly used in markup languages to indicate italic "
@@ -55,9 +55,9 @@ HELP: 'italic'
 { $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"_foo_\" 'italic' parse-1 ." "\"foo\"" }
 { $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"_foo_\" 'italic' [ \"<emphasis>\" \"</emphasis>\" surround ] <@ parse-1 ." "\"<emphasis>foo</emphasis>\"" } } ;
 HELP: comma-list
-{ $values 
+{ $values
   { "element" "a parser object" } { "parser" "a parser object" } }
-{ $description 
+{ $description
     "Return a parser that parses comma separated lists of elements. "
     "'element' should be a parser that can parse the elements. The "
     "result of the parser is a sequence of the parsed elements." }

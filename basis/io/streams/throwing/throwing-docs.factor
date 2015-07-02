@@ -6,13 +6,13 @@ IN: io.streams.throwing
 
 HELP: stream-exhausted
 { $values
-    { "n" integer } { "stream" "an input stream" } { "word" word }    
+    { "n" integer } { "stream" "an input stream" } { "word" word }
 }
 { $description "The exception that gets thrown when a stream is exhausted." } ;
 
 HELP: stream-throw-on-eof
 { $values
-    { "stream" "an input stream" } { "quot" quotation }    
+    { "stream" "an input stream" } { "quot" quotation }
 }
 { $description "Wraps a stream in a " { $link <throws-on-eof-stream> } " tuple and calls the quotation with this stream as the " { $link input-stream } " variable. Causes a " { $link stream-exhausted } " exception to be thrown upon stream exhaustion. The stream is left open after this combinator returns." }
 "This example will throw a " { $link stream-exhausted } " exception:"
