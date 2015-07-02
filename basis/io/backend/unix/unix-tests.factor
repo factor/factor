@@ -23,7 +23,7 @@ IN: io.backend.unix.tests
 
 yield
 
-{ { "Hello world" "FOO" } } [
+[ { "Hello world" "FOO" } ] [
     [
         socket-server <local> ascii [
             readln ,
@@ -73,33 +73,33 @@ yield
 
 [ datagram-client delete-file ] ignore-errors
 
-{ } [ datagram-client <local> <datagram> "d" set ] unit-test
+[ ] [ datagram-client <local> <datagram> "d" set ] unit-test
 
-{ } [
+[ ] [
     "hello" >byte-array
     datagram-server <local>
     "d" get send
 ] unit-test
 
-{ "olleh" t } [
+[ "olleh" t ] [
     "d" get receive
     datagram-server <local> =
     [ >string ] dip
 ] unit-test
 
-{ } [
+[ ] [
     "hello" >byte-array
     datagram-server <local>
     "d" get send
 ] unit-test
 
-{ "hello world" t } [
+[ "hello world" t ] [
     "d" get receive
     datagram-server <local> =
     [ >string ] dip
 ] unit-test
 
-{ } [ "d" get dispose ] unit-test
+[ ] [ "d" get dispose ] unit-test
 
 ! Test error behavior
 : another-datagram ( -- path ) "unix-domain-datagram-test-3" temp-file ;
@@ -108,11 +108,11 @@ yield
 
 datagram-client delete-file
 
-{ } [ datagram-client <local> <datagram> "d" set ] unit-test
+[ ] [ datagram-client <local> <datagram> "d" set ] unit-test
 
 [ B{ 1 2 3 } another-datagram <local> "d" get send ] must-fail
 
-{ } [ "d" get dispose ] unit-test
+[ ] [ "d" get dispose ] unit-test
 
 ! See what happens on send/receive after close
 
@@ -138,7 +138,7 @@ datagram-client delete-file
 ] must-fail
 
 ! closing stdin caused some problems
-{ } [
+[ ] [
     [
         vm ,
         "-i=" image append ,

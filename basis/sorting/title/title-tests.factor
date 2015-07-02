@@ -22,7 +22,7 @@ IN: sorting.title.tests
         "on belay"
         "for the horde"
     } ;
-{
+[
     {
         "A"
         "Another"
@@ -41,6 +41,6 @@ IN: sorting.title.tests
         "The"
         "la vida loca"
     }
-} [
+] [
     sort-me { title<=> } sort-by
 ] unit-test

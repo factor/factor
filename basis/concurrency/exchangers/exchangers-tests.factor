@@ -26,4 +26,4 @@ IN: concurrency.exchangers.tests
 
     pr ?promise ;
 
-{ "Hello world, Goodbye world" } [ exchanger-test ] unit-test
+[ "Hello world, Goodbye world" ] [ exchanger-test ] unit-test

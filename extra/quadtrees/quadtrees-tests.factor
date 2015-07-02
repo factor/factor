@@ -9,33 +9,33 @@ IN: quadtrees.tests
 : delete>>key ( assoc key -- assoc )
     over delete-at ; inline
 
-{ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } {  0.0  -0.25 } "a" f f f f t } }
+[ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } {  0.0  -0.25 } "a" f f f f t } ]
 [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
 ] unit-test
 
-{ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } {  0.0  -0.25 } "b" f f f f t } }
+[ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } {  0.0  -0.25 } "b" f f f f t } ]
 [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.0  -0.25 } value>>key
 ] unit-test
 
-{ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
+[ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
     T{ quadtree f T{ rect f { -1.0 -1.0 } { 1.0 1.0 } } { -0.5  -0.75 } "c" f f f f t }
     T{ quadtree f T{ rect f {  0.0 -1.0 } { 1.0 1.0 } } {  0.0  -0.25 } "a" f f f f t }
     T{ quadtree f T{ rect f { -1.0  0.0 } { 1.0 1.0 } } f               f   f f f f t }
     T{ quadtree f T{ rect f {  0.0  0.0 } { 1.0 1.0 } } {  0.25  0.25 } "b" f f f f t }
     f
-} } [
+} ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
         "c" { -0.5  -0.75 } value>>key
 ] unit-test
 
-{ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
+[ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
     T{ quadtree f T{ rect f { -1.0 -1.0 } { 1.0 1.0 } } { -0.5  -0.75 } "c" f f f f t }
     T{ quadtree f T{ rect f {  0.0 -1.0 } { 1.0 1.0 } } {  0.0  -0.25 } "a" f f f f t }
     T{ quadtree f T{ rect f { -1.0  0.0 } { 1.0 1.0 } } f               f   f f f f t }
@@ -46,7 +46,7 @@ IN: quadtrees.tests
         T{ quadtree f T{ rect f {  0.5  0.5 } { 0.5 0.5 } } f               f   f f f f t }
     }
     f
-} } [
+} ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
@@ -54,7 +54,7 @@ IN: quadtrees.tests
         "d" {  0.75  0.25 } value>>key
 ] unit-test
 
-{ "b" t } [
+[ "b" t ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
@@ -64,7 +64,7 @@ IN: quadtrees.tests
     {  0.25  0.25 } ?of
 ] unit-test
 
-{ { 1.0 1.0 } f } [
+[ { 1.0 1.0 } f ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
@@ -74,7 +74,7 @@ IN: quadtrees.tests
     {  1.0   1.0  } ?of
 ] unit-test
 
-{ { "a" "c" } } [
+[ { "a" "c" } ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
@@ -84,13 +84,13 @@ IN: quadtrees.tests
     { -0.6 -0.8 } { 0.8 1.0 } <rect> swap in-rect natural-sort
 ] unit-test
 
-{ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
+[ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
     T{ quadtree f T{ rect f { -1.0 -1.0 } { 1.0 1.0 } } { -0.5  -0.75 } "c" f f f f t }
     T{ quadtree f T{ rect f {  0.0 -1.0 } { 1.0 1.0 } } {  0.0  -0.25 } "a" f f f f t }
     T{ quadtree f T{ rect f { -1.0  0.0 } { 1.0 1.0 } } f               f   f f f f t }
     T{ quadtree f T{ rect f {  0.0  0.0 } { 1.0 1.0 } } {  0.75  0.25 } "d" f f f f t }
     f
-} } [
+} ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
@@ -101,13 +101,13 @@ IN: quadtrees.tests
         prune-quadtree
 ] unit-test
 
-{ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
+[ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
     T{ quadtree f T{ rect f { -1.0 -1.0 } { 1.0 1.0 } } { -0.5  -0.75 } "c" f f f f t }
     T{ quadtree f T{ rect f {  0.0 -1.0 } { 1.0 1.0 } } {  0.0  -0.25 } "a" f f f f t }
     T{ quadtree f T{ rect f { -1.0  0.0 } { 1.0 1.0 } } f               f   f f f f t }
     T{ quadtree f T{ rect f {  0.0  0.0 } { 1.0 1.0 } } f               f   f f f f t }
     f
-} } [
+} ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key
         "b" {  0.25  0.25 } value>>key
@@ -119,7 +119,7 @@ IN: quadtrees.tests
         prune-quadtree
 ] unit-test
 
-{ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
+[ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
     T{ quadtree f T{ rect f { -1.0 -1.0 } { 1.0 1.0 } } f f
         T{ quadtree f T{ rect f { -1.0 -1.0 } { 0.5 0.5 } } { -0.75 -0.75 } "b" f f f f t }
         T{ quadtree f T{ rect f { -0.5 -1.0 } { 0.5 0.5 } } f               f   f f f f t }
@@ -149,7 +149,7 @@ IN: quadtrees.tests
         f
     }
     f
-} } [
+} ] [
     unit-bounds <quadtree>
         "a" { -0.25 -0.25 } value>>key
         "b" { -0.75 -0.75 } value>>key
@@ -163,7 +163,7 @@ IN: quadtrees.tests
         prune-quadtree
 ] unit-test
 
-{ 8 } [
+[ 8 ] [
     unit-bounds <quadtree>
         "a" { -0.25 -0.25 } value>>key
         "b" { -0.75 -0.75 } value>>key
@@ -177,7 +177,7 @@ IN: quadtrees.tests
         assoc-size
 ] unit-test
 
-{ {
+[ {
     { { -0.75 -0.75 } "b" }
     { { -0.75  0.75 } "d" }
     { { -0.25 -0.25 } "a" }
@@ -186,7 +186,7 @@ IN: quadtrees.tests
     { {  0.25  0.25 } "g" }
     { {  0.75 -0.75 } "f" }
     { {  0.75  0.75 } "h" }
-} } [
+} ] [
     unit-bounds <quadtree>
         "a" { -0.25 -0.25 } value>>key
         "b" { -0.75 -0.75 } value>>key
@@ -202,7 +202,7 @@ IN: quadtrees.tests
 
 TUPLE: pointy-thing center ;
 
-{ {
+[ {
     T{ pointy-thing f { 0 0 } }
     T{ pointy-thing f { 1 0 } }
     T{ pointy-thing f { 0 1 } }
@@ -219,7 +219,7 @@ TUPLE: pointy-thing center ;
     T{ pointy-thing f { 3 2 } }
     T{ pointy-thing f { 2 3 } }
     T{ pointy-thing f { 3 3 } }
-} } [
+} ] [
     {
         T{ pointy-thing f { 3 1 } }
         T{ pointy-thing f { 2 3 } }

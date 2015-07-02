@@ -12,7 +12,7 @@ IN: assocs.extras
 
 { H{ { 2 1 } { 4 3 } } } [ H{ { 1 2 } { 3 4 } } assoc-invert ] unit-test
 
-{ H{ { "a" V{ 2 5 } } { "b" V{ 3 } } { "c" V{ 10 } } } }
+[ H{ { "a" V{ 2 5 } } { "b" V{ 3 } } { "c" V{ 10 } } } ]
 [
     { H{ { "a" 2 } { "b" 3 } } H{ { "a" 5 } { "c" 10 } } }
     [ ] [ assoc-merge ] map-reduce

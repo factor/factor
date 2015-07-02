@@ -2,14 +2,14 @@ IN: math.matrices.elimination.tests
 USING: kernel math.matrices math.matrices.elimination
 tools.test sequences ;
 
-{
+[
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
         { 0 0 1 0 }
         { 0 0 0 1 }
     }
-} [
+] [
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
@@ -18,14 +18,14 @@ tools.test sequences ;
     } echelon
 ] unit-test
 
-{
+[
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
         { 0 0 1 0 }
         { 0 0 0 1 }
     }
-} [
+] [
     {
         { 1 0 0 0 }
         { 1 1 0 0 }
@@ -34,14 +34,14 @@ tools.test sequences ;
     } echelon
 ] unit-test
 
-{
+[
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
         { 0 0 1 0 }
         { 0 0 0 1 }
     }
-} [
+] [
     {
         { 1 0 0 0 }
         { 1 1 0 0 }
@@ -50,14 +50,14 @@ tools.test sequences ;
     } echelon
 ] unit-test
 
-{
+[
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
         { 0 0 1 0 }
         { 0 0 0 1 }
     }
-} [
+] [
     {
         { 1 0 0 0 }
         { 1 1 0 0 }
@@ -66,14 +66,14 @@ tools.test sequences ;
     } echelon
 ] unit-test
 
-{
+[
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
         { 0 0 0 0 }
         { 0 0 0 0 }
     }
-} [
+] [
     {
         { 0 1 0 0 }
         { 1 0 0 0 }
@@ -85,14 +85,14 @@ tools.test sequences ;
     ] with-matrix
 ] unit-test
 
-{
+[
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
         { 0 0 0 0 }
         { 0 0 0 0 }
     }
-} [
+] [
     {
         { 0 1 0 0 }
         { 1 0 0 0 }
@@ -101,14 +101,14 @@ tools.test sequences ;
     } echelon
 ] unit-test
 
-{
+[
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
         { 0 0 0 1 }
         { 0 0 0 0 }
     }
-} [
+] [
     {
         { 1 0 0 0 }
         { 0 1 0 0 }
@@ -117,14 +117,14 @@ tools.test sequences ;
     } echelon
 ] unit-test
 
-{
+[
     {
         { 1 0 0 1 }
         { 0 1 0 1 }
         { 0 0 0 -1 }
         { 0 0 0 0 }
     }
-} [
+] [
     {
         { 0 1 0 1 }
         { 1 0 0 1 }
@@ -133,18 +133,18 @@ tools.test sequences ;
     } echelon
 ] unit-test
 
-{
+[
     2
-} [
+] [
     {
         { 0 0 }
         { 0 0 }
     } nullspace length
 ] unit-test
 
-{
+[
     1 3
-} [
+] [
     {
         { 0 1 0 1 }
         { 1 0 0 1 }
@@ -153,9 +153,9 @@ tools.test sequences ;
     } null/rank
 ] unit-test
 
-{
+[
     1 3
-} [
+] [
     {
         { 0 0 0 0 0 1 0 1 }
         { 0 0 0 0 1 0 0 1 }
@@ -164,5 +164,5 @@ tools.test sequences ;
     } null/rank
 ] unit-test
 
-{ { { 1 0 -1 } { 0 1 2 } } }
+[ { { 1 0 -1 } { 0 1 2 } } ]
 [ { { 1 2 3 } { 4 5 6 } } solution ] unit-test

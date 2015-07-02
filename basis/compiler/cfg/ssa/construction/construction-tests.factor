@@ -72,38 +72,38 @@ V{
 1 3 edge
 2 3 edge
 
-{ } [ test-ssa ] unit-test
+[ ] [ test-ssa ] unit-test
 
-{
+[
     V{
         T{ ##load-integer f 1 100 }
         T{ ##add-imm f 2 1 50 }
         T{ ##add-imm f 3 2 10 }
         T{ ##branch }
     }
-} [ 0 get instructions>> ] unit-test
+] [ 0 get instructions>> ] unit-test
 
-{
+[
     V{
         T{ ##load-integer f 4 3 }
         T{ ##branch }
     }
-} [ 1 get instructions>> ] unit-test
+] [ 1 get instructions>> ] unit-test
 
-{
+[
     V{
         T{ ##load-integer f 5 4 }
         T{ ##branch }
     }
-} [ 2 get instructions>> ] unit-test
+] [ 2 get instructions>> ] unit-test
 
-{
+[
     V{
         T{ ##phi f 6 H{ { 1 4 } { 2 5 } } }
         T{ ##replace f 6 D 0 }
         T{ ##return }
     }
-} [
+] [
     3 get instructions>>
     clean-up-phis
 ] unit-test
@@ -126,14 +126,14 @@ V{ } 6 test-bb
 4 6 edge
 5 6 edge
 
-{ } [ test-ssa ] unit-test
+[ ] [ test-ssa ] unit-test
 
-{
+[
     V{
         T{ ##phi f 3 H{ { 2 1 } { 3 2 } } }
         T{ ##replace f 3 D 0 }
     }
-} [
+] [
     4 get instructions>>
     clean-up-phis
 ] unit-test
@@ -168,9 +168,9 @@ V{
 2 4 edge
 3 4 edge
 
-{ } [ test-ssa ] unit-test
+[ ] [ test-ssa ] unit-test
 
-{ V{ } } [ 4 get instructions>> [ ##phi? ] filter ] unit-test
+[ V{ } ] [ 4 get instructions>> [ ##phi? ] filter ] unit-test
 
 ! Test 4
 reset-counters
@@ -217,8 +217,8 @@ V{
 5 7 edge
 6 7 edge
 
-{ } [ test-ssa ] unit-test
+[ ] [ test-ssa ] unit-test
 
-{ V{ } } [ 5 get instructions>> [ ##phi? ] filter ] unit-test
+[ V{ } ] [ 5 get instructions>> [ ##phi? ] filter ] unit-test
 
-{ V{ } } [ 7 get instructions>> [ ##phi? ] filter ] unit-test
+[ V{ } ] [ 7 get instructions>> [ ##phi? ] filter ] unit-test

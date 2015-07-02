@@ -5,7 +5,7 @@ io.streams.string math.rectangles ui.gadgets.private sets generic ;
 FROM: namespaces => set ;
 IN: ui.gadgets.tests
 
-{ { 300 300 } }
+[ { 300 300 } ]
 [
     ! c contains b contains a
     <gadget> "a" set
@@ -37,15 +37,15 @@ IN: ui.gadgets.tests
 "g2" get "g1" get add-gadget drop
 "g3" get "g2" get add-gadget drop
 
-{ { 30 30 } } [ "g1" get screen-loc ] unit-test
-{ { 30 30 } } [ "g1" get screen-rect loc>> ] unit-test
-{ { 30 30 } } [ "g1" get screen-rect dim>> ] unit-test
-{ { 20 20 } } [ "g2" get screen-loc ] unit-test
-{ { 20 20 } } [ "g2" get screen-rect loc>> ] unit-test
-{ { 50 180 } } [ "g2" get screen-rect dim>> ] unit-test
-{ { 0 0 } } [ "g3" get screen-loc ] unit-test
-{ { 0 0 } } [ "g3" get screen-rect loc>> ] unit-test
-{ { 100 200 } } [ "g3" get screen-rect dim>> ] unit-test
+[ { 30 30 } ] [ "g1" get screen-loc ] unit-test
+[ { 30 30 } ] [ "g1" get screen-rect loc>> ] unit-test
+[ { 30 30 } ] [ "g1" get screen-rect dim>> ] unit-test
+[ { 20 20 } ] [ "g2" get screen-loc ] unit-test
+[ { 20 20 } ] [ "g2" get screen-rect loc>> ] unit-test
+[ { 50 180 } ] [ "g2" get screen-rect dim>> ] unit-test
+[ { 0 0 } ] [ "g3" get screen-loc ] unit-test
+[ { 0 0 } ] [ "g3" get screen-rect loc>> ] unit-test
+[ { 100 200 } ] [ "g3" get screen-rect dim>> ] unit-test
 
 <gadget> "g1" set
 "g1" get { 300 300 } >>dim drop
@@ -58,20 +58,20 @@ IN: ui.gadgets.tests
 "g3" get { 100 100 } >>loc
          { 20 20 } >>dim drop
 
-{ t } [ { 30 30 } "g2" get contains-point? ] unit-test
+[ t ] [ { 30 30 } "g2" get contains-point? ] unit-test
 
-{ t } [ { 30 30 } "g1" get pick-up "g2" get eq? ] unit-test
+[ t ] [ { 30 30 } "g1" get pick-up "g2" get eq? ] unit-test
 
-{ t } [ { 30 30 } "g1" get pick-up "g2" get eq? ] unit-test
+[ t ] [ { 30 30 } "g1" get pick-up "g2" get eq? ] unit-test
 
-{ t } [ { 110 110 } "g1" get pick-up "g3" get eq? ] unit-test
+[ t ] [ { 110 110 } "g1" get pick-up "g3" get eq? ] unit-test
 
 <gadget> "g4" set
 "g2" get "g4" get add-gadget drop
 "g4" get { 5 5 } >>loc
          { 1 1 } >>dim drop
 
-{ t } [ { 25 25 } "g1" get pick-up "g4" get eq? ] unit-test
+[ t ] [ { 25 25 } "g1" get pick-up "g4" get eq? ] unit-test
 
 TUPLE: mock-gadget < gadget graft-called ungraft-called ;
 

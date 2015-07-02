@@ -4,7 +4,7 @@ USING: kernel namespaces prettyprint system tools.test
 environment strings sequences ;
 IN: environment.tests
 
-{ } [ os-envs . ] unit-test
+[ ] [ os-envs . ] unit-test
 
 os unix? [
     [ ] [ os-envs "envs" set ] unit-test
@@ -14,27 +14,27 @@ os unix? [
     [ t ] [ os-envs "envs" get = ] unit-test
 ] when
 
-{ } [ "factor-test-key-1" unset-os-env ] unit-test
-{ } [ "ps3" "factor-test-key-1" set-os-env ] unit-test
-{ "ps3" } [ "factor-test-key-1" os-env ] unit-test
-{ } [ "factor-test-key-1" unset-os-env ] unit-test
-{ f } [ "factor-test-key-1" os-env ] unit-test
+[ ] [ "factor-test-key-1" unset-os-env ] unit-test
+[ ] [ "ps3" "factor-test-key-1" set-os-env ] unit-test
+[ "ps3" ] [ "factor-test-key-1" os-env ] unit-test
+[ ] [ "factor-test-key-1" unset-os-env ] unit-test
+[ f ] [ "factor-test-key-1" os-env ] unit-test
 
-{ } [
+[ ] [
     32766 CHAR: a <string> "factor-test-key-long" set-os-env
 ] unit-test
-{ 32766 } [ "factor-test-key-long" os-env length ] unit-test
-{ } [ "factor-test-key-long" unset-os-env ] unit-test
+[ 32766 ] [ "factor-test-key-long" os-env length ] unit-test
+[ ] [ "factor-test-key-long" unset-os-env ] unit-test
 
-{ "abc" } [
+[ "abc" ] [
     "a" "factor-test-key-change" set-os-env
     "factor-test-key-change" [ "bc" append ] change-os-env
     "factor-test-key-change" os-env
 ] unit-test
-{ } [ "factor-test-key-change" unset-os-env ] unit-test
+[ ] [ "factor-test-key-change" unset-os-env ] unit-test
 
 ! Issue #794, setting something to ``f`` is a memory protection fault on mac
-{ } [ f "dummy-env-variable-for-factor-test" set-os-env ] unit-test
+[ ] [ f "dummy-env-variable-for-factor-test" set-os-env ] unit-test
 
 { f "value" f } [
     "factor-test-key" os-env

@@ -37,4 +37,4 @@ V{
 5 6 edge
 
 1 get block>cfg 0 set
-{ } [ 0 get compute-defs ] unit-test
+[ ] [ 0 get compute-defs ] unit-test

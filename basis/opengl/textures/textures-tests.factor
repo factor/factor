@@ -4,12 +4,12 @@ USING: tools.test opengl.gl opengl.textures opengl.textures.private
 images kernel namespaces accessors sequences literals ;
 IN: opengl.textures.tests
 
-{
+[
     {
         { { 0 0 } { 10 0 } }
         { { 0 20 } { 10 20 } }
     }
-} [
+] [
     {
         { { 10 20 } { 30 20 } }
         { { 10 30 } { 30 300 } }

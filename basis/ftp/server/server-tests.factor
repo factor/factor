@@ -24,7 +24,7 @@ CONSTANT: test-file-contents "Files are so boring anymore."
         ] with-threaded-server
     ] cleanup-unique-directory ; inline
 
-{ t }
+[ t ]
 [
     [
         [

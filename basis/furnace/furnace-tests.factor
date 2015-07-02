@@ -16,7 +16,7 @@ M: base-path-check-responder call-responder*
     "$funny-dispatcher" resolve-base-path
     <text-content> ;
 
-{ } [
+[ ] [
     <dispatcher>
         <dispatcher>
             <funny-dispatcher>
@@ -26,17 +26,17 @@ M: base-path-check-responder call-responder*
     main-responder set
 ] unit-test
 
-{ "/a/b/" } [
+[ "/a/b/" ] [
     V{ } responder-nesting set
     "a/b/c" split-path main-responder get call-responder body>>
 ] unit-test
 
-{ "<input type=\"hidden\" value=\"&amp;&amp;&amp;\" name=\"foo\"/>" }
+[ "<input type=\"hidden\" value=\"&amp;&amp;&amp;\" name=\"foo\"/>" ]
 [ "&&&" "foo" hidden-form-field xml>string ]
 unit-test
 
-{ f } [ <request> request [ referrer ] with-variable ] unit-test
+[ f ] [ <request> request [ referrer ] with-variable ] unit-test
 
-{ t } [ URL" http://foo" dup url [ same-host? ] with-variable ] unit-test
+[ t ] [ URL" http://foo" dup url [ same-host? ] with-variable ] unit-test
 
-{ f } [ f URL" http://foo" url [ same-host? ] with-variable ] unit-test
+[ f ] [ f URL" http://foo" url [ same-host? ] with-variable ] unit-test

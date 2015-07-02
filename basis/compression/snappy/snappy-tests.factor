@@ -3,22 +3,22 @@
 USING: arrays byte-arrays compression.snappy kernel tools.test ;
 IN: compression.snappy.tests
 
-{ t } [
+[ t ] [
     1000 2 <array> >byte-array [ snappy-compress snappy-uncompress ] keep =
 ] unit-test
 
-{ t } [
+[ t ] [
     B{ } [ snappy-compress snappy-uncompress ] keep =
 ] unit-test
 
-{ t } [
+[ t ] [
     B{ 1 } [ snappy-compress snappy-uncompress ] keep =
 ] unit-test
 
-{ t } [
+[ t ] [
     B{ 1 2 } [ snappy-compress snappy-uncompress ] keep =
 ] unit-test
 
-{ t } [
+[ t ] [
     B{ 1 2 3 } [ snappy-compress snappy-uncompress ] keep =
 ] unit-test

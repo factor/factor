@@ -41,45 +41,45 @@ M: node count-unboxed-allocations* drop ;
     remove-dead-code
     0 swap [ count-unboxed-allocations* ] each-node ;
 
-{ 0 } [ [ [ + ] curry ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ [ + ] curry ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ [ + ] curry drop ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ [ + ] curry drop ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ [ + ] curry 3 slot ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ [ + ] curry 3 slot ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ [ + ] curry 3 slot drop ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ [ + ] curry 3 slot drop ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ [ + ] curry uncurry ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ [ + ] curry uncurry ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ [ + ] curry call ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ [ + ] curry call ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ [ + ] curry call ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ [ + ] curry call ] count-unboxed-allocations ] unit-test
 
-{ 0 } [ [ [ [ + ] curry ] [ drop [ ] ] if ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ [ [ + ] curry ] [ drop [ ] ] if ] count-unboxed-allocations ] unit-test
 
-{ 2 } [
+[ 2 ] [
     [ [ [ + ] curry ] [ [ * ] curry ] if uncurry ] count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [ [ [ + ] curry ] [ [ * ] curry ] if ] count-unboxed-allocations
 ] unit-test
 
-{ 3 } [
+[ 3 ] [
     [ [ [ + ] curry ] [ dup [ [ * ] curry ] [ [ / ] curry ] if ] if uncurry ] count-unboxed-allocations
 ] unit-test
 
-{ 2 } [
+[ 2 ] [
     [ [ [ + ] curry 4 ] [ dup [ [ * ] curry ] [ [ / ] curry ] if uncurry ] if ] count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [ [ [ + ] curry ] [ dup [ [ * ] curry ] [ [ / ] curry ] if ] if ] count-unboxed-allocations
 ] unit-test
 
 TUPLE: cons { car read-only } { cdr read-only } ;
 
-{ 0 } [
+[ 0 ] [
     [
         dup 0 = [
             2 cons boa
@@ -91,7 +91,7 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     ] count-unboxed-allocations
 ] unit-test
 
-{ 3 } [
+[ 3 ] [
     [
         dup 0 = [
             2 cons boa
@@ -105,7 +105,7 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     ] count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [
         dup 0 = [
             dup 1 = [
@@ -117,7 +117,7 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     ] count-unboxed-allocations
 ] unit-test
 
-{ 2 } [
+[ 2 ] [
     [
         dup 0 = [
             2 cons boa
@@ -131,7 +131,7 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     ] count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [
         dup 0 = [
             2 cons boa
@@ -145,13 +145,13 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     ] count-unboxed-allocations
 ] unit-test
 
-{ 2 } [
+[ 2 ] [
     [
         [ dup cons boa ] [ drop 1 2 cons boa ] if car>>
     ] count-unboxed-allocations
 ] unit-test
 
-{ 2 } [
+[ 2 ] [
     [
         3dup
         [ cons boa ] [ cons boa 3 cons boa ] if
@@ -159,23 +159,23 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     ] count-unboxed-allocations
 ] unit-test
 
-{ 2 } [
+[ 2 ] [
     [
         3dup [ cons boa ] [ cons boa . 1 2 cons boa ] if
         [ car>> ] [ cdr>> ] bi
     ] count-unboxed-allocations
 ] unit-test
 
-{ 1 } [
+[ 1 ] [
     [ [ 3 cons boa ] [ "A" throw ] if car>> ]
     count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [ 10 [ drop ] each-integer ] count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [
         1 2 cons boa 10 [ drop 2 cons boa ] each-integer car>>
     ] count-unboxed-allocations
@@ -183,7 +183,7 @@ TUPLE: cons { car read-only } { cdr read-only } ;
 
 : infinite-cons-loop ( a -- b ) 2 cons boa infinite-cons-loop ; inline recursive
 
-{ 0 } [
+[ 0 ] [
     [
         1 2 cons boa infinite-cons-loop
     ] count-unboxed-allocations
@@ -193,12 +193,12 @@ TUPLE: rw-box i ;
 
 C: <rw-box> rw-box
 
-{ 0 } [ [ <rw-box> i>> ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ <rw-box> i>> ] count-unboxed-allocations ] unit-test
 
 : fake-fib ( m -- n )
     dup i>> 1 <= [ drop 1 <rw-box> ] when ; inline recursive
 
-{ 0 } [ [ <rw-box> fake-fib i>> ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ <rw-box> fake-fib i>> ] count-unboxed-allocations ] unit-test
 
 TUPLE: ro-box { i read-only } ;
 
@@ -216,14 +216,14 @@ C: <ro-box> ro-box
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
 
-{ 5 } [ [ <ro-box> tuple-fib i>> ] count-unboxed-allocations ] unit-test
+[ 5 ] [ [ <ro-box> tuple-fib i>> ] count-unboxed-allocations ] unit-test
 
-{ 3 } [ [ <ro-box> tuple-fib ] count-unboxed-allocations ] unit-test
+[ 3 ] [ [ <ro-box> tuple-fib ] count-unboxed-allocations ] unit-test
 
 : tuple-fib' ( m -- n )
     dup 1 <= [ 1 - tuple-fib' i>> ] when <ro-box> ; inline recursive
 
-{ 0 } [ [ tuple-fib' ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ tuple-fib' ] count-unboxed-allocations ] unit-test
 
 : bad-tuple-fib-1 ( m -- n )
     dup i>> 1 <= [
@@ -237,7 +237,7 @@ C: <ro-box> ro-box
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
 
-{ 3 } [ [ <ro-box> bad-tuple-fib-1 i>> ] count-unboxed-allocations ] unit-test
+[ 3 ] [ [ <ro-box> bad-tuple-fib-1 i>> ] count-unboxed-allocations ] unit-test
 
 : bad-tuple-fib-2 ( m -- n )
     dup .
@@ -252,7 +252,7 @@ C: <ro-box> ro-box
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
 
-{ 2 } [ [ <ro-box> bad-tuple-fib-2 i>> ] count-unboxed-allocations ] unit-test
+[ 2 ] [ [ <ro-box> bad-tuple-fib-2 i>> ] count-unboxed-allocations ] unit-test
 
 : tuple-fib-2 ( m -- n )
     dup 1 <= [
@@ -264,7 +264,7 @@ C: <ro-box> ro-box
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
 
-{ 2 } [ [ tuple-fib-2 i>> ] count-unboxed-allocations ] unit-test
+[ 2 ] [ [ tuple-fib-2 i>> ] count-unboxed-allocations ] unit-test
 
 : tuple-fib-3 ( m -- n )
     dup 1 <= [
@@ -276,7 +276,7 @@ C: <ro-box> ro-box
         swap i>> swap i>> + <ro-box>
     ] if ; inline recursive
 
-{ 0 } [ [ tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
 
 : bad-tuple-fib-3 ( m -- n )
     dup 1 <= [
@@ -288,24 +288,24 @@ C: <ro-box> ro-box
         2drop f
     ] if ; inline recursive
 
-{ 0 } [ [ bad-tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ bad-tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ complex boa >rect ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ complex boa >rect ] count-unboxed-allocations ] unit-test
 
-{ 0 } [ [ 1 cons boa 2 cons boa ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ 1 cons boa 2 cons boa ] count-unboxed-allocations ] unit-test
 
-{ 1 } [ [ 1 cons boa 2 cons boa car>> ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ 1 cons boa 2 cons boa car>> ] count-unboxed-allocations ] unit-test
 
-{ 0 } [ [ 1 cons boa 2 cons boa dup . car>> ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ 1 cons boa 2 cons boa dup . car>> ] count-unboxed-allocations ] unit-test
 
-{ 0 } [ [ 1 cons boa "x" get slot ] count-unboxed-allocations ] unit-test
+[ 0 ] [ [ 1 cons boa "x" get slot ] count-unboxed-allocations ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [ dup -1 over >= [ 0 >= [ "A" throw ] unless ] [ drop ] if ]
     count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [ \ too-many->r boa f f \ inference-error boa ]
     count-unboxed-allocations
 ] unit-test
@@ -314,18 +314,18 @@ C: <ro-box> ro-box
 
 TUPLE: empty-tuple ;
 
-{ } [ [ empty-tuple boa layout-of ] count-unboxed-allocations drop ] unit-test
+[ ] [ [ empty-tuple boa layout-of ] count-unboxed-allocations drop ] unit-test
 
 ! New feature!
 
-{ 1 } [ [ { complex } declare real>> ] count-unboxed-allocations ] unit-test
+[ 1 ] [ [ { complex } declare real>> ] count-unboxed-allocations ] unit-test
 
-{ 1 } [
+[ 1 ] [
     [ { complex } declare [ real>> ] [ imaginary>> ] bi ]
     count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [ { vector } declare length>> ]
     count-unboxed-allocations
 ] unit-test
@@ -335,12 +335,12 @@ TUPLE: empty-tuple ;
 TUPLE: point-2d { x read-only } { y read-only } ;
 TUPLE: point-3d < point-2d { z read-only } ;
 
-{ 0 } [
+[ 0 ] [
     [ { point-2d } declare dup point-3d? [ z>> ] [ x>> ] if ]
     count-unboxed-allocations
 ] unit-test
 
-{ 0 } [
+[ 0 ] [
     [ point-2d boa dup point-3d? [ z>> ] [ x>> ] if ]
     count-unboxed-allocations
 ] unit-test

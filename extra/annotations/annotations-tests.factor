@@ -16,15 +16,15 @@ IN: annotations.tests
     !TODO return 5
     f ;
 
-{ t } [
+[ t ] [
     NOTEs {
         [ length 1 = ]
         [ first string>> file-name "annotations-tests.factor" = ]
     } 1&&
 ] unit-test
 
-{ t } [
+[ t ] [
     BROKENs { [ \ four swap member? ] [ \ three swap member? ] } 1&&
 ] unit-test
 
-{ t } [ TODOs \ five swap member? ] unit-test
+[ t ] [ TODOs \ five swap member? ] unit-test

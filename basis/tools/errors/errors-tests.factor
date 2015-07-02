@@ -3,7 +3,7 @@ IN: tools.errors
 
 DEFER: blah
 
-{ } [
+[ ] [
     {
         T{ compiler-error
            { error T{ do-not-compile f blah } }

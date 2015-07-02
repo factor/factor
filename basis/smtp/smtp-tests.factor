@@ -20,34 +20,34 @@ IN: smtp.tests
 
 [ "hello\nworld" validate-address ] must-fail
 
-{ "slava@factorcode.org" }
+[ "slava@factorcode.org" ]
 [ "slava@factorcode.org" validate-address ] unit-test
 
-{ "aGVsbG8Kd29ybGQ=\r\n.\r\n" } [
+[ "aGVsbG8Kd29ybGQ=\r\n.\r\n" ] [
     T{ email { body "hello\nworld" } } [ send-body ] with-string-writer
 ] unit-test
 
 [ { "500 syntax error" } <response> check-response ]
 [ smtp-error? ] must-fail-with
 
-{ } [ { "220 success" } <response> check-response ] unit-test
+[ ] [ { "220 success" } <response> check-response ] unit-test
 
-{ T{ response f 220 { "220 success" } } } [
+[ T{ response f 220 { "220 success" } } ] [
     "220 success" [ receive-response ] with-string-reader
 ] unit-test
 
-{
+[
     T{ response f 220 {
         "220-a multiline response"
         "250-another line"
         "220 the end"
     } }
-} [
+] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
     [ receive-response ] with-string-reader
 ] unit-test
 
-{ } [
+[ ] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
     [ get-ok ] with-string-reader
 ] unit-test
@@ -56,7 +56,7 @@ IN: smtp.tests
     "Subject:\r\nsecurity hole" validate-header
 ] must-fail
 
-{
+[
     {
         { "Content-Transfer-Encoding" "base64" }
         { "Content-Type" "text/plain; charset=UTF-8" }
@@ -67,7 +67,7 @@ IN: smtp.tests
     }
     { "slava@factorcode.org" "dharmatech@factorcode.org" }
     "erg@factorcode.org"
-} [
+] [
     [
         <email>
             "Factor rules" >>subject
@@ -90,7 +90,7 @@ IN: smtp.tests
     ] with-test-smtp-config
 ] unit-test
 
-{ } [
+[ ] [
     <secure-config> f >>verify [
         [
             <email>

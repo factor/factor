@@ -13,12 +13,12 @@ V{
 
 0 get [ insert-save-context ] change-instructions drop
 
-{
+[
     V{
         T{ ##add f 1 2 3 }
         T{ ##branch }
     }
-} [
+] [
     0 get instructions>>
 ] unit-test
 
@@ -33,7 +33,7 @@ V{
 
 0 get [ insert-save-context ] change-instructions drop
 
-{
+[
     V{
         T{ ##inc f D 3 }
         T{ ##save-context f 5 6 }
@@ -41,7 +41,7 @@ V{
             T{ gc-map { scrub-d B{ 0 0 0 } } { scrub-r B{ } } { gc-roots { } } }
         }
     }
-} [
+] [
     0 get instructions>>
 ] unit-test
 
@@ -52,13 +52,13 @@ V{
 
 0 get [ insert-save-context ] change-instructions drop
 
-{
+[
     V{
         T{ ##phi }
         T{ ##save-context f 7 8 }
         T{ ##box }
     }
-} [
+] [
     0 get instructions>>
 ] unit-test
 

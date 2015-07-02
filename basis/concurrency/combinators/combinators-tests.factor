@@ -9,28 +9,28 @@ IN: concurrency.combinators.tests
 { 2 1 } [ [ 2array ] 2parallel-map ] must-infer-as
 [ [ ] parallel-filter ] must-infer
 
-{ { 1 4 9 } } [ { 1 2 3 } [ sq ] parallel-map ] unit-test
+[ { 1 4 9 } ] [ { 1 2 3 } [ sq ] parallel-map ] unit-test
 
-{ { 1 4 9 } } [ { 1 2 3 } [ 1000000 random sleep sq ] parallel-map ] unit-test
+[ { 1 4 9 } ] [ { 1 2 3 } [ 1000000 random sleep sq ] parallel-map ] unit-test
 
 [ { 1 2 3 } [ dup 2 mod 0 = [ "Even" throw ] when ] parallel-map ]
 [ error>> "Even" = ] must-fail-with
 
-{ V{ 0 3 6 9 } }
+[ V{ 0 3 6 9 } ]
 [ 10 iota [ 3 mod zero? ] parallel-filter ] unit-test
 
-{ 10 }
+[ 10 ]
 [
     V{ } clone
     10 iota over [ push ] curry parallel-each
     length
 ] unit-test
 
-{ { 10 20 30 } } [
+[ { 10 20 30 } ] [
     { 1 4 3 } { 10 5 10 } [ * ] 2parallel-map
 ] unit-test
 
-{ { -9 -1 -7 } } [
+[ { -9 -1 -7 } ] [
     { 1 4 3 } { 10 5 10 } [ - ] 2parallel-map
 ] unit-test
 
@@ -38,7 +38,7 @@ IN: concurrency.combinators.tests
     { 1 4 3 } { 1 0 1 } [ / drop ] 2parallel-each
 ] must-fail
 
-{ 20 }
+[ 20 ]
 [
     V{ } clone
     10 iota 10 iota pick [ [ push ] [ push ] bi ] curry 2parallel-each
@@ -47,7 +47,7 @@ IN: concurrency.combinators.tests
 
 [ { f } [ "OOPS" throw ] parallel-each ] must-fail
 
-{ "1a" "4b" "3c" } [
+[ "1a" "4b" "3c" ] [
     2
     { [ 1 - ] [ sq ] [ 1 + ] } parallel-cleave
     [ number>string ] 3 parallel-napply

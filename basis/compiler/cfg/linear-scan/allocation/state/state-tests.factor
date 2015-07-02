@@ -78,7 +78,7 @@ H{
     { { 3 8 } T{ spill-slot { n 32 } } }
     { { 1234 8 } T{ spill-slot } }
     { { 45 16 } T{ spill-slot { n 16 } } }
-} ? }
+} ? 1array
 [
     H{ } clone spill-slots set
     f f <basic-block> <cfg> cfg set

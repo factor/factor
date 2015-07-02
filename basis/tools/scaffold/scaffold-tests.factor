@@ -7,7 +7,7 @@ IN: tools.scaffold.tests
 : undocumented-word ( obj1 obj2 -- obj3 obj4 )
     [ >lower ] [ >upper ] bi* ;
 
-{
+[
 """HELP: undocumented-word
 { $values
     { "obj1" object } { "obj2" object }
@@ -15,7 +15,7 @@ IN: tools.scaffold.tests
 }
 { $description "" } ;
 """
-}
+]
 [
     [ \ undocumented-word (help.) ] with-string-writer
 ] unit-test
@@ -29,4 +29,4 @@ IN: tools.scaffold.tests
 
 : test-maybe ( obj -- obj/f ) ;
 
-{ } [ \ test-maybe (help.) ] unit-test
+[ ] [ \ test-maybe (help.) ] unit-test

@@ -10,26 +10,26 @@ MEMO: fib ( m -- n )
 MEMO: x ( a b c d e -- f g h i j )
     [ 1 + ] 4 ndip ;
 
-{ 89 } [ 10 fib ] unit-test
+[ 89 ] [ 10 fib ] unit-test
 
-{
+[
     1 0 0 0 0
     1 0 0 0 0
-} [
+] [
     0 0 0 0 0 x
     0 0 0 0 0 x
 ] unit-test
 
 MEMO: see-test ( a -- b ) reverse ;
 
-{ "USING: memoize sequences ;\nIN: memoize.tests\nMEMO: see-test ( a -- b ) reverse ;\n" }
+[ "USING: memoize sequences ;\nIN: memoize.tests\nMEMO: see-test ( a -- b ) reverse ;\n" ]
 [ [ \ see-test see ] with-string-writer ]
 unit-test
 
-{ } [ "IN: memoize.tests : fib ( -- ) ;" eval( -- ) ] unit-test
+[ ] [ "IN: memoize.tests : fib ( -- ) ;" eval( -- ) ] unit-test
 
-{ "IN: memoize.tests\n: fib ( -- ) ;\n" } [ [ \ fib see ] with-string-writer ] unit-test
+[ "IN: memoize.tests\n: fib ( -- ) ;\n" ] [ [ \ fib see ] with-string-writer ] unit-test
 
 [ sq ] ( a -- b ) memoize-quot "q" set
 
-{ 9 } [ 3 "q" get call ] unit-test
+[ 9 ] [ 3 "q" get call ] unit-test

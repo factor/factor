@@ -70,5 +70,5 @@ ERROR: cl-error err ;
     queue clReleaseCommandQueue cl-success
     context clReleaseContext cl-success ;
 
-{ float-array{ 1.0 4.0 9.0 16.0 100.0 } }
+[ float-array{ 1.0 4.0 9.0 16.0 100.0 } ]
 [ float-array{ 1.0 2.0 3.0 4.0 10.0 } opencl-square ] unit-test

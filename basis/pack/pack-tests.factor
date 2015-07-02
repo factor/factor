@@ -2,36 +2,36 @@ USING: io io.streams.string kernel namespaces make
 pack strings tools.test pack.private ;
 IN: pack.tests
 
-{ B{ 1 0 2 0 0 3 0 0 0 4 0 0 0 0 0 0 0 5 } } [
+[ B{ 1 0 2 0 0 3 0 0 0 4 0 0 0 0 0 0 0 5 } ] [
     { 1 2 3 4 5 }
     "cstiq" pack-be
 ] unit-test
 
-{ { 1 2 3 4 5 } } [
+[ { 1 2 3 4 5 } ] [
     { 1 2 3 4 5 }
     "cstiq" [ pack-be ] keep unpack-be
 ] unit-test
 
-{ B{ 1 2 0 3 0 0 4 0 0 0 5 0 0 0 0 0 0 0 } } [
+[ B{ 1 2 0 3 0 0 4 0 0 0 5 0 0 0 0 0 0 0 } ] [
     { 1 2 3 4 5 } "cstiq" pack-le
 ] unit-test
 
-{ { 1 2 3 4 5 } } [
+[ { 1 2 3 4 5 } ] [
     { 1 2 3 4 5 }
     "cstiq" [ pack-le ] keep unpack-le
 ] unit-test
 
-{ { -1 -2 -3 -4 -5 } } [
+[ { -1 -2 -3 -4 -5 } ] [
     { -1 -2 -3 -4 -5 }
     "cstiq" [ pack-le ] keep unpack-le
 ] unit-test
 
-{ { -1 -2 -3 -4 -5 3.14 } } [
+[ { -1 -2 -3 -4 -5 3.14 } ] [
     { -1 -2 -3 -4 -5 3.14 }
     "cstiqd" [ pack-be ] keep unpack-be
 ] unit-test
 
-{ { -1 -2 -3 -4 -5 } } [
+[ { -1 -2 -3 -4 -5 } ] [
     { -1 -2 -3 -4 -5 }
     "cstiq" [ pack-native ] keep unpack-native
 ] unit-test
@@ -39,7 +39,7 @@ IN: pack.tests
 { B{ 1 2 3 4 5 0 0 0 } } [ { 1 2 3 4 5 } "4ci" pack-le ] unit-test
 { { 1 2 3 4 5 } } [ B{ 1 2 3 4 5 0 0 0 } "4ci" unpack-le ] unit-test
 
-{ 9 } [ "iic" packed-length ] unit-test
+[ 9 ] [ "iic" packed-length ] unit-test
 [ "iii" read-packed-le ] must-infer
 [ "iii" read-packed-be ] must-infer
 [ "iii" read-packed-native ] must-infer

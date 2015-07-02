@@ -8,13 +8,13 @@ SYMBOLS: priv-key pub-key signature ;
 
 : message ( -- msg ) "Hello world!" ;
 
-[ ] { }
+[ ] ! Generating keys
 [
     "prime256v1" [ generate-key get-private-key get-public-key ] with-ec
     pub-key set priv-key set
 ] unit-test
 
-[ ] { }
+[ ] ! Signing message
 [
     message sha-256 checksum-bytes
     priv-key get
@@ -22,7 +22,7 @@ SYMBOLS: priv-key pub-key signature ;
     signature set
 ] unit-test
 
-[ t ] { }
+[ t ] ! Verifying signature
 [
     message sha-256 checksum-bytes
     signature get pub-key get

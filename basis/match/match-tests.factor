@@ -5,20 +5,20 @@ IN: match.tests
 
 MATCH-VARS: ?a ?b ;
 
-{ f } [ { ?a ?a } { 1 2 } match ] unit-test
+[ f ] [ { ?a ?a } { 1 2 } match ] unit-test
 
-{ H{ { ?a 1 } { ?b 2 } } } [
+[ H{ { ?a 1 } { ?b 2 } } ] [
     { ?a ?b } { 1 2 } match
 ] unit-test
 
-{ { 1 2 } } [
+[ { 1 2 } ] [
     { 1 2 }
     {
         { { ?a ?b } [ ?a ?b 2array ] }
     } match-cond
 ] unit-test
 
-{ t } [
+[ t ] [
     { 1 2 }
     {
         { { 1 2 } [ t ] }
@@ -26,7 +26,7 @@ MATCH-VARS: ?a ?b ;
     } match-cond
 ] unit-test
 
-{ t } [
+[ t ] [
     { 1 3 }
     {
         { { 1 2 } [ t ] }
@@ -34,7 +34,7 @@ MATCH-VARS: ?a ?b ;
     } match-cond
 ] unit-test
 
-{ f } [
+[ f ] [
     { 1 5 }
     {
         { { 1 2 } [ t ] }
@@ -63,7 +63,7 @@ C: <foo> foo
     \ ?a \ ?a match
 ] unit-test
 
-{ "match" } [
+[ "match" ] [
     "abcd" {
         { ?a [ "match" ] }
     } match-cond
@@ -75,9 +75,9 @@ C: <foo> foo
 
 TUPLE: match-replace-test a b ;
 
-{
+[
     T{ match-replace-test f 2 1 }
-} [
+] [
     T{ match-replace-test f 1 2 }
     T{ match-replace-test f ?a ?b }
     T{ match-replace-test f ?b ?a }

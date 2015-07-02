@@ -8,7 +8,7 @@ TUPLE: model-tester hit? ;
 
 M: model-tester model-changed nip t >>hit? drop ;
 
-{ T{ model-tester f t } }
+[ T{ model-tester f t } ]
 [
     T{ model-tester f f } clone 3 <model> 2dup add-connection
     5 swap set-model
@@ -19,12 +19,12 @@ M: model-tester model-changed nip t >>hit? drop ;
 "model-a" get "model-b" get 2array <product> "model-c" set
 
 "model-c" get activate-model
-{ { 3 4 } } [ "model-c" get value>>  ] unit-test
+[ { 3 4 } ] [ "model-c" get value>>  ] unit-test
 "model-c" get deactivate-model
 
 T{ model-tester f f } "tester" set
 
-{ T{ model-tester f t } { 6 4 } }
+[ T{ model-tester f t } { 6 4 } ]
 [
     "tester" get "model-c" get add-connection
     6 "model-a" get set-model
@@ -32,13 +32,13 @@ T{ model-tester f f } "tester" set
     "model-c" get value>>
 ] unit-test
 
-{ T{ model-tester f t } V{ 5 } }
+[ T{ model-tester f t } V{ 5 } ]
 [
     T{ model-tester f f } clone V{ } clone <model> 2dup add-connection
     5 swap [ push-model ] [ value>> ] bi
 ] unit-test
 
-{ T{ model-tester f t } 5 V{ }  }
+[ T{ model-tester f t } 5 V{ }  ]
 [
     T{ model-tester f f } clone V{ 5 } clone <model> 2dup add-connection
     [ pop-model ] [ value>> ] bi

@@ -7,7 +7,7 @@ IN: io.files.links.unix.tests
     [ '[ [ 1 + ] keep [ number>string _ prepend ] bi@ make-link ] each-integer ]
     [ [ number>string ] dip prepend touch-file ] 2bi ; inline
 
-{ t } [
+[ t ] [
     [
         current-temporary-directory get [
             5 "lol" make-test-links
@@ -25,7 +25,7 @@ IN: io.files.links.unix.tests
     ] with-unique-directory
 ] [ too-many-symlinks? ] must-fail-with
 
-{ t } [
+[ t ] [
     110 symlink-depth [
         [
             current-temporary-directory get [

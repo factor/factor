@@ -10,9 +10,9 @@ IN: html.templates.fhtml.tests
     [ ".html" append utf8 file-contents ] bi
     [ . . ] [ = ] 2bi ;
 
-{ t } [ "example" test-template ] unit-test
-{ t } [ "bug" test-template ] unit-test
-{ t } [ "stack" test-template ] unit-test
+[ t ] [ "example" test-template ] unit-test
+[ t ] [ "bug" test-template ] unit-test
+[ t ] [ "stack" test-template ] unit-test
 
 [
     [ ] [ "<%\n%>" parse-template drop ] unit-test

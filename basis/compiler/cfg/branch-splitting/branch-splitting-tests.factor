@@ -30,7 +30,7 @@ V{ T{ ##branch } } 4 test-bb
 
 test-diamond
 
-{ } [ test-branch-splitting ] unit-test
+[ ] [ test-branch-splitting ] unit-test
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -50,7 +50,7 @@ V{ T{ ##branch } } 5 test-bb
 
 2 { 3 4 } edges
 
-{ } [ test-branch-splitting ] unit-test
+[ ] [ test-branch-splitting ] unit-test
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -68,7 +68,7 @@ V{ T{ ##branch } } 4 test-bb
 
 2 4 edge
 
-{ } [ test-branch-splitting ] unit-test
+[ ] [ test-branch-splitting ] unit-test
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -80,4 +80,4 @@ V{ T{ ##branch } } 2 test-bb
 
 1 2 edge
 
-{ } [ test-branch-splitting ] unit-test
+[ ] [ test-branch-splitting ] unit-test
