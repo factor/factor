@@ -1,11 +1,10 @@
-USING: compiler.cfg.value-numbering compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
-cpu.architecture tools.test kernel math combinators.short-circuit
-accessors sequences compiler.cfg.predecessors locals compiler.cfg.dce
-compiler.cfg.ssa.destruction compiler.cfg.loop-detection
-compiler.cfg.representations compiler.cfg compiler.cfg.utilities assocs vectors
-arrays layouts literals namespaces alien compiler.cfg.value-numbering.simd
-system ;
+USING: accessors alien assocs combinators.short-circuit
+compiler.cfg compiler.cfg.comparisons compiler.cfg.dce
+compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.representations
+compiler.cfg.ssa.destruction compiler.cfg.utilities
+compiler.cfg.value-numbering cpu.architecture kernel layouts
+literals math namespaces sequences system tools.test ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.value-numbering.tests
 
@@ -3039,8 +3038,8 @@ cpu x86?
 ] unit-test
 
 ! Scale fusion on ##load/store-memory
-cpu x86?
-[
+${
+    cpu x86?
     V{
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
@@ -3049,8 +3048,6 @@ cpu x86?
         T{ ##shl-imm f 4 3 2 }
         T{ ##load-memory f 5 2 3 2 0 int-rep c:uchar }
     }
-]
-[
     V{
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }
@@ -3058,9 +3055,8 @@ cpu x86?
         T{ ##tagged>integer f 3 1 }
         T{ ##shl-imm f 4 3 2 }
         T{ ##load-memory f 5 2 4 0 0 int-rep c:uchar }
-    }
-] ?
-[
+    } ?
+} [
     V{
         T{ ##peek f 0 D 0 }
         T{ ##peek f 1 D 1 }

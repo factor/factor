@@ -1,9 +1,9 @@
-USING: accessors arrays assocs combinators.extras compiler.cfg
+USING: accessors assocs combinators.extras compiler.cfg
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.cfg.utilities cpu.architecture
-cpu.x86.assembler.operands heaps kernel layouts namespaces sequences system
-tools.test ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.utilities
+cpu.architecture cpu.x86.assembler.operands heaps kernel layouts
+literals namespaces sequences system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.state.tests
 
 ! active-intervals-for
@@ -68,18 +68,19 @@ cpu x86.64? [
 ] unit-test
 
 ! assign-spill-slot
-cpu x86.32?
-H{
-    { { 3 4 } T{ spill-slot { n 32 } } }
-    { { 1234 4 } T{ spill-slot } }
-    { { 45 16 } T{ spill-slot { n 16 } } }
-}
-H{
-    { { 3 8 } T{ spill-slot { n 32 } } }
-    { { 1234 8 } T{ spill-slot } }
-    { { 45 16 } T{ spill-slot { n 16 } } }
-} ? 1array
-[
+${
+    cpu x86.32?
+    H{
+        { { 3 4 } T{ spill-slot { n 32 } } }
+        { { 1234 4 } T{ spill-slot } }
+        { { 45 16 } T{ spill-slot { n 16 } } }
+    }
+    H{
+        { { 3 8 } T{ spill-slot { n 32 } } }
+        { { 1234 8 } T{ spill-slot } }
+        { { 45 16 } T{ spill-slot { n 16 } } }
+    } ?
+} [
     H{ } clone spill-slots set
     f f <basic-block> <cfg> cfg set
     { 1234 45 3 } { int-rep double-2-rep tagged-rep }
