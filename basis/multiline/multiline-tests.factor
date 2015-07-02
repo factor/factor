@@ -1,4 +1,4 @@
-USING: accessors eval multiline sequences tools.test ;
+USING: eval multiline sequences tools.test ;
 IN: multiline.tests
 
 STRING: test-it
@@ -42,8 +42,9 @@ x
 END
 ] unit-test
 
+! there's a space after xyz
 [ "xyz \n" ] [ HEREDOC: END
-xyz
+xyz 
 END
 ] unit-test
 
