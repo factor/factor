@@ -5,40 +5,40 @@ USING: tools.test math arrays kernel sequences ;
 { { V{ 1 } } } [ { 1 } [ < ] monotonic-split ] unit-test
 { { V{ 1 2 } } } [ { 1 2 } [ < ] monotonic-split ] unit-test
 { { V{ 1 } V{ 2 } } } [ { 1 2 } [ > ] monotonic-split ] unit-test
-[ { V{ 1 } V{ -1 5 } V{ 2 4 } } ]
+{ { V{ 1 } V{ -1 5 } V{ 2 4 } } }
 [ { 1 -1 5 2 4 } [ < ] monotonic-split ] unit-test
-[ { V{ 1 1 1 1 } V{ 2 2 } V{ 3 } V{ 4 } V{ 5 } V{ 6 6 6 } } ]
+{ { V{ 1 1 1 1 } V{ 2 2 } V{ 3 } V{ 4 } V{ 5 } V{ 6 6 6 } } }
 [ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split ] unit-test
 
-[ { } ]
+{ { } }
 [ { } [ = ] slice monotonic-slice ] unit-test
 
-[ t ]
+{ t }
 [ { 1 } [ = ] slice monotonic-slice [ slice? ] all? ] unit-test
 
-[ { { 1 } } ]
+{ { { 1 } } }
 [ { 1 } [ = ] slice monotonic-slice [ >array ] map ] unit-test
 
 [ { 1 } [ = ] slice monotonic-slice ] must-infer
 
-[ t ]
+{ t }
 [ { 1 1 1 2 2 3 3 4 } [ = ] slice monotonic-slice [ slice? ] all? ] unit-test
 
-[ { { 1 1 1 } { 2 2 } { 3 3 } { 4 } } ]
+{ { { 1 1 1 } { 2 2 } { 3 3 } { 4 } } }
 [ { 1 1 1 2 2 3 3 4 } [ = ] slice monotonic-slice [ >array ] map ] unit-test
 
-[ { { 3 3 } } ]
+{ { { 3 3 } } }
 [ { 3 3 } [ = ] slice monotonic-slice [ >array ] map ] unit-test
 
-[
+{
     {
         T{ upward-slice { from 0 } { to 3 } { seq { 1 2 3 2 1 } } }
         T{ downward-slice { from 2 } { to 5 } { seq { 1 2 3 2 1 } } }
     }
-]
+}
 [ { 1 2 3 2 1 } trends ] unit-test
 
-[
+{
     {
         T{ upward-slice
             { from 0 }
@@ -56,19 +56,19 @@ USING: tools.test math arrays kernel sequences ;
             { seq { 1 2 3 3 2 1 } }
         }
     }
-] [ { 1 2 3 3 2 1 } trends ] unit-test
+} [ { 1 2 3 3 2 1 } trends ] unit-test
 
 
-[ { { 2 2 } { 3 3 3 3 } { 4 } { 5 } } ]
+{ { { 2 2 } { 3 3 3 3 } { 4 } { 5 } } }
 [
     { 2 2 3 3 3 3 4 5 }
     [ [ odd? ] same? ] slice monotonic-slice
     [ >array ] map
 ] unit-test
 
-[
+{
     { { 1 1 1 } { 2 2 2 2 } { 3 3 } }
-] [
+} [
     { 1 1 1 2 2 2 2 3 3 }
     [ [ odd? ] same? ] slice monotonic-slice
     [ >array ] map

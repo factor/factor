@@ -33,7 +33,7 @@ M: fake-cpu gc-root-offset ;
 ] B{ } make
 "result" set
 
-[ 0 ] [ "result" get length 16 mod ] unit-test
+{ 0 } [ "result" get length 16 mod ] unit-test
 
 [
     100 <byte-array> %
@@ -69,8 +69,8 @@ M: fake-cpu gc-root-offset ;
 ] B{ } make
 "expect" set
 
-[ t ] [ "result" get length "expect" get length = ] unit-test
-[ t ] [ "result" get "expect" get = ] unit-test
+{ t } [ "result" get length "expect" get length = ] unit-test
+{ t } [ "result" get "expect" get = ] unit-test
 
 ! Fix the gc root offset calculations
 SINGLETON: linux-x86.64

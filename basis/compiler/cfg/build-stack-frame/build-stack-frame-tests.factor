@@ -20,5 +20,5 @@ IN: compiler.cfg.build-stack-frame.tests
     slots[ allot-area-base spill-area-base total-size ]
     ! Exclude any reserved stack space 32 bytes on win64, 0 bytes
     ! on all other platforms.
-    reserved-stack-space -
+    reserved-stack-space }
 ] unit-test

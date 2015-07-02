@@ -8,9 +8,9 @@ IN: xml.writer.tests
 
 ! Add a test for pprint-xml with sensitive-tags
 
-[ "foo" ] [ T{ name { main "foo" } } name>string ] unit-test
-[ "foo" ] [ T{ name { space "" } { main "foo" } } name>string ] unit-test
-[ "ns:foo" ] [ T{ name { space "ns" } { main "foo" } } name>string ] unit-test
+{ "foo" } [ T{ name { main "foo" } } name>string ] unit-test
+{ "foo" } [ T{ name { space "" } { main "foo" } } name>string ] unit-test
+{ "ns:foo" } [ T{ name { space "ns" } { main "foo" } } name>string ] unit-test
 
 : reprints-as ( to from -- )
      [ ] [ string>xml xml>string ] bi-curry* unit-test ;
@@ -50,25 +50,25 @@ IN: xml.writer.tests
 ]>
 <x>&foo;</x>""" pprint-reprints-as
 
-[ t ] [ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\" >" dup string>xml-chunk xml>string = ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" ]
+{ t } [ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\" >" dup string>xml-chunk xml>string = ] unit-test
+{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" }
     [ "<a b='c'/>" string>xml xml>string ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" ]
+{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" }
 [ "<foo>bar</foo>" string>xml [ " baz" append ] map xml>string ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" ]
+{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" }
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
-[ "<foo'>" ] [ "<foo'>" <unescaped> xml>string ] unit-test
+{ "<foo'>" } [ "<foo'>" <unescaped> xml>string ] unit-test
 
 : test-file ( -- path )
     "test.xml" temp-file ;
 
-[ ] [
+{ } [
     "<?xml version='1.0' encoding='UTF-16BE'?><x/>" string>xml test-file utf8 [ write-xml ] with-file-writer
 ] unit-test
-[ "x" ] [ test-file file>xml body>> name>> main>> ] unit-test
-[ ] [ test-file delete-file ] unit-test
+{ "x" } [ test-file file>xml body>> name>> main>> ] unit-test
+{ } [ test-file delete-file ] unit-test
 
-[ ] [
+{ } [
     { 1 2 3 4 } [
         [ number>string ] [ sq number>string ] bi
         [XML <tr><td><-></td><td><-></td></tr> XML]

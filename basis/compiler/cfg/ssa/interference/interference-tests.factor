@@ -51,22 +51,22 @@ V{
 
 0 1 edge
 
-[ ] [ test-interference ] unit-test
+{ } [ test-interference ] unit-test
 
-[ f ] [ 0 1 test-vregs-intersect? ] unit-test
-[ f ] [ 1 0 test-vregs-intersect? ] unit-test
-[ f ] [ 2 3 test-vregs-intersect? ] unit-test
-[ f ] [ 3 2 test-vregs-intersect? ] unit-test
-[ t ] [ 0 2 test-vregs-intersect? ] unit-test
-[ t ] [ 2 0 test-vregs-intersect? ] unit-test
-[ f ] [ 1 3 test-vregs-intersect? ] unit-test
-[ f ] [ 3 1 test-vregs-intersect? ] unit-test
-[ t ] [ 3 4 test-vregs-intersect? ] unit-test
-[ t ] [ 4 3 test-vregs-intersect? ] unit-test
-[ t ] [ 3 5 test-vregs-intersect? ] unit-test
-[ t ] [ 5 3 test-vregs-intersect? ] unit-test
-[ f ] [ 3 6 test-vregs-intersect? ] unit-test
-[ f ] [ 6 3 test-vregs-intersect? ] unit-test
+{ f } [ 0 1 test-vregs-intersect? ] unit-test
+{ f } [ 1 0 test-vregs-intersect? ] unit-test
+{ f } [ 2 3 test-vregs-intersect? ] unit-test
+{ f } [ 3 2 test-vregs-intersect? ] unit-test
+{ t } [ 0 2 test-vregs-intersect? ] unit-test
+{ t } [ 2 0 test-vregs-intersect? ] unit-test
+{ f } [ 1 3 test-vregs-intersect? ] unit-test
+{ f } [ 3 1 test-vregs-intersect? ] unit-test
+{ t } [ 3 4 test-vregs-intersect? ] unit-test
+{ t } [ 4 3 test-vregs-intersect? ] unit-test
+{ t } [ 3 5 test-vregs-intersect? ] unit-test
+{ t } [ 5 3 test-vregs-intersect? ] unit-test
+{ f } [ 3 6 test-vregs-intersect? ] unit-test
+{ f } [ 6 3 test-vregs-intersect? ] unit-test
 
 V{
     T{ ##prologue }
@@ -96,9 +96,9 @@ V{
 0 1 edge
 1 2 edge
 
-[ ] [ test-interference ] unit-test
+{ } [ test-interference ] unit-test
 
-[ t ] [ { 15 } { 23 13 } test-sets-interfere? nip ] unit-test
+{ t } [ { 15 } { 23 13 } test-sets-interfere? nip ] unit-test
 
 V{
     T{ ##prologue f }
@@ -164,9 +164,9 @@ V{
 5 6 edge
 7 8 edge
 
-[ ] [ test-interference ] unit-test
+{ } [ test-interference ] unit-test
 
-[ f ] [ { 48 } { 32 35 } test-sets-interfere? nip ] unit-test
+{ f } [ { 48 } { 32 35 } test-sets-interfere? nip ] unit-test
 
 TUPLE: bab ;
 TUPLE: gfg { x bab } ;
@@ -289,20 +289,20 @@ V{
 14 15 edge
 15 16 edge
 
-[ ] [ test-interference ] unit-test
+{ } [ test-interference ] unit-test
 
-[ t ] [ 43 45 test-vregs-intersect? ] unit-test
-[ f ] [ 43 45 test-vregs-interfere? ] unit-test
+{ t } [ 43 45 test-vregs-intersect? ] unit-test
+{ f } [ 43 45 test-vregs-interfere? ] unit-test
 
-[ t ] [ 43 46 test-vregs-intersect? ] unit-test
-[ t ] [ 43 46 test-vregs-interfere? ] unit-test
+{ t } [ 43 46 test-vregs-intersect? ] unit-test
+{ t } [ 43 46 test-vregs-interfere? ] unit-test
 
-[ f ] [ 45 46 test-vregs-intersect? ] unit-test
-[ f ] [ 45 46 test-vregs-interfere? ] unit-test
+{ f } [ 45 46 test-vregs-intersect? ] unit-test
+{ f } [ 45 46 test-vregs-interfere? ] unit-test
 
-[ f ] [ { 43 } { 45 } test-sets-interfere? nip ] unit-test
+{ f } [ { 43 } { 45 } test-sets-interfere? nip ] unit-test
 
-[ t f ] [
+{ t f } [
     { 46 } { 43 } { 45 }
     [ [ <test-vreg-info> ] map ] tri@
     sets-interfere? [ sets-interfere? nip ] dip
@@ -350,14 +350,14 @@ V{
 3 2 edge
 4 5 edge
 
-[ ] [ test-interference ] unit-test
+{ } [ test-interference ] unit-test
 
-[ f f ] [
+{ f f } [
     { 33 } { 21 } { 32 }
     [ [ <test-vreg-info> ] map ] tri@
     sets-interfere? [ sets-interfere? nip ] dip
 ] unit-test
 
-[ f ] [ 33 21 test-vregs-intersect? ] unit-test
-[ f ] [ 32 21 test-vregs-intersect? ] unit-test
-[ f ] [ 32 33 test-vregs-intersect? ] unit-test
+{ f } [ 33 21 test-vregs-intersect? ] unit-test
+{ f } [ 32 21 test-vregs-intersect? ] unit-test
+{ f } [ 32 33 test-vregs-intersect? ] unit-test

@@ -2,14 +2,14 @@ USING: io io.pathnames kernel mason.child mason.config
 namespaces sequences system tools.test ;
 IN: mason.child.tests
 
-[ { "nmake" "/f" "nmakefile" "x86-32" } ] [
+{ { "nmake" "/f" "nmakefile" "x86-32" } } [
     H{
         { target-os windows }
         { target-cpu x86.32 }
     } [ mason-child-make-cmd ] with-variables
 ] unit-test
 
-[ { "make" "macosx-x86-32" } ] [
+{ { "make" "macosx-x86-32" } } [
     H{
         { target-os macosx }
         { target-cpu x86.32 }
@@ -27,18 +27,18 @@ IN: mason.child.tests
 
 [ [ "Hi" print ] [ drop 3 ] [ 4 ] recover-else ] must-infer
 
-[ 4 ] [ [ "Hi" print ] [ drop 3 ] [ 4 ] recover-else ] unit-test
+{ 4 } [ [ "Hi" print ] [ drop 3 ] [ 4 ] recover-else ] unit-test
 
-[ 3 ] [ [ "Hi" throw ] [ drop 3 ] [ 4 ] recover-else ] unit-test
+{ 3 } [ [ "Hi" throw ] [ drop 3 ] [ 4 ] recover-else ] unit-test
 
-[ "A" ] [
+{ "A" } [
     {
         { [ 3 throw ] [ { "X" "Y" "Z" "A" } nth ] }
         [ "B" ]
     } recover-cond
 ] unit-test
 
-[ "B" ] [
+{ "B" } [
     {
         { [ ] [ ] }
         [ "B" ]

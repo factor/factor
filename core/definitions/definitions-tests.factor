@@ -20,7 +20,7 @@ TUPLE: some-class ;
 
 M: some-class some-generic ;
 
-[ ] [
+{ } [
     [
         \ some-generic
         \ some-class

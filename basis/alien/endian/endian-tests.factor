@@ -59,41 +59,41 @@ CONSTANT: endian-bytes-f0 B{
 : endian-test-struct-f0 ( -- obj )
     endian-bytes-f0 endian-struct memory>struct ;
 
-[ 0xff00 ] [ endian-test-struct-0f a>> ] unit-test
-[ -256 ] [ endian-test-struct-0f b>> ] unit-test
-[ 0x00ff ] [ endian-test-struct-0f c>> ] unit-test
-[ 0x00ff ] [ endian-test-struct-0f d>> ] unit-test
+{ 0xff00 } [ endian-test-struct-0f a>> ] unit-test
+{ -256 } [ endian-test-struct-0f b>> ] unit-test
+{ 0x00ff } [ endian-test-struct-0f c>> ] unit-test
+{ 0x00ff } [ endian-test-struct-0f d>> ] unit-test
 
-[ 0xff000000 ] [ endian-test-struct-0f e>> ] unit-test
-[ -16777216 ] [ endian-test-struct-0f f>> ] unit-test
-[ 0x000000ff ] [ endian-test-struct-0f g>> ] unit-test
-[ 0x000000ff ] [ endian-test-struct-0f h>> ] unit-test
+{ 0xff000000 } [ endian-test-struct-0f e>> ] unit-test
+{ -16777216 } [ endian-test-struct-0f f>> ] unit-test
+{ 0x000000ff } [ endian-test-struct-0f g>> ] unit-test
+{ 0x000000ff } [ endian-test-struct-0f h>> ] unit-test
 
-[ 0xff00000000000000 ] [ endian-test-struct-0f i>> ] unit-test
-[ -72057594037927936 ] [ endian-test-struct-0f j>> ] unit-test
-[ 0x00000000000000ff ] [ endian-test-struct-0f k>> ] unit-test
-[ 0x00000000000000ff ] [ endian-test-struct-0f l>> ] unit-test
+{ 0xff00000000000000 } [ endian-test-struct-0f i>> ] unit-test
+{ -72057594037927936 } [ endian-test-struct-0f j>> ] unit-test
+{ 0x00000000000000ff } [ endian-test-struct-0f k>> ] unit-test
+{ 0x00000000000000ff } [ endian-test-struct-0f l>> ] unit-test
 
 
-[ 0xff00 ] [ endian-test-struct-f0 c>> ] unit-test
-[ -256 ] [ endian-test-struct-f0 d>> ] unit-test
-[ 0x00ff ] [ endian-test-struct-f0 a>> ] unit-test
-[ 0x00ff ] [ endian-test-struct-f0 b>> ] unit-test
+{ 0xff00 } [ endian-test-struct-f0 c>> ] unit-test
+{ -256 } [ endian-test-struct-f0 d>> ] unit-test
+{ 0x00ff } [ endian-test-struct-f0 a>> ] unit-test
+{ 0x00ff } [ endian-test-struct-f0 b>> ] unit-test
 
-[ 0xff000000 ] [ endian-test-struct-f0 g>> ] unit-test
-[ -16777216 ] [ endian-test-struct-f0 h>> ] unit-test
-[ 0x000000ff ] [ endian-test-struct-f0 e>> ] unit-test
-[ 0x000000ff ] [ endian-test-struct-f0 f>> ] unit-test
+{ 0xff000000 } [ endian-test-struct-f0 g>> ] unit-test
+{ -16777216 } [ endian-test-struct-f0 h>> ] unit-test
+{ 0x000000ff } [ endian-test-struct-f0 e>> ] unit-test
+{ 0x000000ff } [ endian-test-struct-f0 f>> ] unit-test
 
-[ 0xff00000000000000 ] [ endian-test-struct-f0 k>> ] unit-test
-[ -72057594037927936 ] [ endian-test-struct-f0 l>> ] unit-test
-[ 0x00000000000000ff ] [ endian-test-struct-f0 i>> ] unit-test
-[ 0x00000000000000ff ] [ endian-test-struct-f0 j>> ] unit-test
+{ 0xff00000000000000 } [ endian-test-struct-f0 k>> ] unit-test
+{ -72057594037927936 } [ endian-test-struct-f0 l>> ] unit-test
+{ 0x00000000000000ff } [ endian-test-struct-f0 i>> ] unit-test
+{ 0x00000000000000ff } [ endian-test-struct-f0 j>> ] unit-test
 
-[ t ]
+{ t }
 [ endian-test-struct-0f binary [ write ] with-byte-writer endian-bytes-0f = ] unit-test
 
-[ t ]
+{ t }
 [ endian-test-struct-f0 binary [ write ] with-byte-writer endian-bytes-f0 = ] unit-test
 
 LE-STRUCT: le-endian-struct
@@ -110,13 +110,13 @@ LE-STRUCT: le-endian-struct
     { k ube64 }
     { l be64 } ;
 
-[ t ]
+{ t }
 [
     endian-bytes-0f le-endian-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-0f =
 ] unit-test
 
-[ t ]
+{ t }
 [
     endian-bytes-f0 le-endian-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-f0 =
@@ -137,13 +137,13 @@ BE-STRUCT: be-endian-struct
     { k ube64 }
     { l be64 } ;
 
-[ t ]
+{ t }
 [
     endian-bytes-0f be-endian-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-0f =
 ] unit-test
 
-[ t ]
+{ t }
 [
     endian-bytes-f0 be-endian-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-f0 =
@@ -163,13 +163,13 @@ LE-STRUCT: le-override-struct
     { k ube64 }
     { l be64 } ;
 
-[ t ]
+{ t }
 [
     endian-bytes-0f le-override-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-0f =
 ] unit-test
 
-[ t ]
+{ t }
 [
     endian-bytes-f0 le-override-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-f0 =
@@ -189,13 +189,13 @@ BE-STRUCT: be-override-struct
     { k ulonglong }
     { l longlong } ;
 
-[ t ]
+{ t }
 [
     endian-bytes-0f be-override-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-0f =
 ] unit-test
 
-[ t ]
+{ t }
 [
     endian-bytes-f0 be-override-struct memory>struct
     binary [ write ] with-byte-writer endian-bytes-f0 =
@@ -206,7 +206,7 @@ LE-PACKED-STRUCT: le-packed-struct
     { a char[7] }
     { b int } ;
 
-[ t ]
+{ t }
 [
     B{ 0 0 0 0 0 0 0  3 0 0 0 } [
         le-packed-struct memory>struct
@@ -214,7 +214,7 @@ LE-PACKED-STRUCT: le-packed-struct
     ] keep =
 ] unit-test
 
-[ 3 ]
+{ 3 }
 [
     B{ 0 0 0 0 0 0 0  3 0 0 0 } le-packed-struct memory>struct
     b>>
@@ -225,7 +225,7 @@ BE-PACKED-STRUCT: be-packed-struct
     { a char[7] }
     { b int } ;
 
-[ t ]
+{ t }
 [
     B{ 0 0 0 0 0 0 0  0 0 0 3 } [
         be-packed-struct memory>struct
@@ -233,7 +233,7 @@ BE-PACKED-STRUCT: be-packed-struct
     ] keep =
 ] unit-test
 
-[ 3 ]
+{ 3 }
 [
     B{ 0 0 0 0 0 0 0  0 0 0 3 } be-packed-struct memory>struct
     b>>

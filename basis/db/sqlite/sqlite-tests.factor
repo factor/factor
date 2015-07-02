@@ -7,9 +7,9 @@ IN: db.sqlite.tests
 : db-path ( -- path ) "test-" cell number>string ".db" 3append temp-file ;
 : test.db ( -- sqlite-db ) db-path <sqlite-db> ;
 
-[ ] [ [ db-path delete-file ] ignore-errors ] unit-test
+{ } [ [ db-path delete-file ] ignore-errors ] unit-test
 
-[ ] [
+{ } [
     test.db [
         "create table person (name varchar(30), country varchar(30))" sql-command
         "insert into person values('John', 'America')" sql-command
@@ -18,29 +18,29 @@ IN: db.sqlite.tests
 ] unit-test
 
 
-[ { { "John" "America" } { "Jane" "New Zealand" } } ] [
+{ { { "John" "America" } { "Jane" "New Zealand" } } } [
     test.db [
         "select * from person" sql-query
     ] with-db
 ] unit-test
 
-[ { { "1" "John" "America" } { "2" "Jane" "New Zealand" } } ]
+{ { { "1" "John" "America" } { "2" "Jane" "New Zealand" } } }
 [ test.db [ "select rowid, * from person" sql-query ] with-db ] unit-test
 
-[ ] [
+{ } [
     test.db [
         "insert into person(name, country) values('Jimmy', 'Canada')"
         sql-command
     ] with-db
 ] unit-test
 
-[
+{
     {
         { "1" "John" "America" }
         { "2" "Jane" "New Zealand" }
         { "3" "Jimmy" "Canada" }
     }
-] [ test.db [ "select rowid, * from person" sql-query ] with-db ] unit-test
+} [ test.db [ "select rowid, * from person" sql-query ] with-db ] unit-test
 
 [
     test.db [
@@ -52,13 +52,13 @@ IN: db.sqlite.tests
     ] with-db
 ] must-fail
 
-[ 3 ] [
+{ 3 } [
     test.db [
         "select * from person" sql-query length
     ] with-db
 ] unit-test
 
-[ ] [
+{ } [
     test.db [
         [
             "insert into person(name, country) values('Jose', 'Mexico')"
@@ -69,7 +69,7 @@ IN: db.sqlite.tests
     ] with-db
 ] unit-test
 
-[ 5 ] [
+{ 5 } [
     test.db [
         "select * from person" sql-query length
     ] with-db
@@ -85,7 +85,7 @@ things "THINGS" {
     { "two" "TWO" INTEGER +not-null+ }
 } define-persistent
 
-[ { { 0 0 } { 0 1 } { 1 0 } { 1 1 } } ] [
+{ { { 0 0 } { 0 1 } { 1 0 } { 1 1 } } } [
     test.db [
        things create-table
         0 0 things boa insert-tuple
@@ -110,7 +110,7 @@ hi "HELLO" {
     { "try" "RETHROW" INTEGER { +foreign-id+ foo "SOMETHING" } }
 } define-persistent
 
-[ T{ foo { slot 1 } } T{ hi { bye 1 } { try 1 } } ] [
+{ T{ foo { slot 1 } } T{ hi { bye 1 } { try 1 } } } [
     test.db [
         foo create-table
         hi create-table
@@ -146,7 +146,7 @@ watch "WATCH" {
         { +foreign-id+ show "ID" } }
 } define-persistent
 
-[ T{ user { username "littledan" } { data "foo" } } ] [
+{ T{ user { username "littledan" } { data "foo" } } } [
     test.db [
         user create-table
         show create-table

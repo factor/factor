@@ -13,7 +13,7 @@ GET http://foo/bar?a=12&b=13 HTTP/1.1
 blah
 ;
 
-[ 25 ] [
+{ 25 } [
     action-request-test-1 lf>crlf
     [ read-request ] with-string-reader
     init-request
@@ -31,7 +31,7 @@ GET http://foo/bar/123 HTTP/1.1
 blah
 ;
 
-[ 25 ] [
+{ 25 } [
     action-request-test-2 lf>crlf
     [ read-request ] with-string-reader
     init-request

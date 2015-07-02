@@ -5,7 +5,7 @@ USING: continuations kernel tools.test strings namespaces make arrays
 sequences peg peg.private peg.parsers words math accessors ;
 IN: peg.tests
 
-[ ] [ reset-pegs ] unit-test
+{ } [ reset-pegs ] unit-test
 
 [
     "endbegin" "begin" token parse
@@ -199,13 +199,13 @@ IN: peg.tests
 
 USE: compiler
 
-[ ] [ disable-optimizer ] unit-test
+{ } [ disable-optimizer ] unit-test
 
-[ ] [ "" epsilon parse drop ] unit-test
+{ } [ "" epsilon parse drop ] unit-test
 
-[ ] [ enable-optimizer ] unit-test
+{ } [ enable-optimizer ] unit-test
 
-[ [ ] ] [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
+{ [ ] } [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
 
 {
     T{ parse-error

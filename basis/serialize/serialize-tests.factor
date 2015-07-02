@@ -14,7 +14,7 @@ IN: serialize.tests
     binary [ serialize-cell ] with-byte-writer
     binary [ deserialize-cell ] with-byte-reader = ;
 
-[ t ] [
+{ t } [
     100 [
         drop
         {
@@ -78,22 +78,22 @@ CONSTANT: objects
         first2 eq?
     ] if ;
 
-[ t ] [ objects [ check-serialize-1 ] all? ] unit-test
+{ t } [ objects [ check-serialize-1 ] all? ] unit-test
 
-[ t ] [ objects [ check-serialize-2 ] all? ] unit-test
+{ t } [ objects [ check-serialize-2 ] all? ] unit-test
 
-[ t ] [ pi check-serialize-1 ] unit-test
+{ t } [ pi check-serialize-1 ] unit-test
 [ serialize ] must-infer
 [ deserialize ] must-infer
 
-[ t ] [
+{ t } [
     V{ } dup dup push
     object>bytes
     bytes>object
     dup first eq?
 ] unit-test
 
-[ t ] [
+{ t } [
     H{ } dup dup dup set-at
     object>bytes
     bytes>object

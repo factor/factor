@@ -9,7 +9,7 @@ SYMBOL: sum
         '[ over + @ drop ] each-integer drop f
     ] bshift 2nip ; inline
 
-[ 55 ] [
+{ 55 } [
     0 sum set
     [ 1 10 range sum get + sum set f ] breset drop
     sum get

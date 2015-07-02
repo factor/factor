@@ -17,18 +17,18 @@ IN: json.writer.tests
 
 { """">json"""" } [ \ >json >json ] unit-test
 
-[ { 0.5 } ] [ { 1/2 } >json json> ] unit-test
+{ { 0.5 } } [ { 1/2 } >json json> ] unit-test
 
 TUPLE: person first-name age ;
 
-[ "{\"first-name\":\"David\",\"age\":32}" ]
+{ "{\"first-name\":\"David\",\"age\":32}" }
 [
     f json-friendly-keys?
     [ "David" 32 person boa >json ]
     with-variable
 ] unit-test
 
-[ "{\"first_name\":\"David\",\"age\":32}" ]
+{ "{\"first_name\":\"David\",\"age\":32}" }
 [
     t json-friendly-keys?
     [ "David" 32 person boa >json ]

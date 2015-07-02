@@ -6,7 +6,7 @@ html.templates.chloe.compiler ;
 IN: html.templates.chloe.tests
 
 ! So that changes to code are reflected
-[ ] [ reset-cache ] unit-test
+{ } [ reset-cache ] unit-test
 
 : run-template ( quot -- string )
     with-string-writer [ "\r\n\t" member? ] reject
@@ -16,13 +16,13 @@ IN: html.templates.chloe.tests
     "vocab:html/templates/chloe/test/"
     prepend <chloe> ;
 
-[ "Hello world" ] [
+{ "Hello world" } [
     [
         "test1" test-template call-template
     ] run-template
 ] unit-test
 
-[ "Blah blah" "Hello world" ] [
+{ "Blah blah" "Hello world" } [
     [
         <box> title set
         [
@@ -32,7 +32,7 @@ IN: html.templates.chloe.tests
     ] with-scope
 ] unit-test
 
-[ "<html><head><title>Hello world</title></head><body>Blah blah</body></html>" ] [
+{ "<html><head><title>Hello world</title></head><body>Blah blah</body></html>" } [
     [
         [
             "test2" test-template call-template
@@ -42,7 +42,7 @@ IN: html.templates.chloe.tests
 
 : test4-aux? ( -- ? ) t ;
 
-[ "True" ] [
+{ "True" } [
     [
         "test4" test-template call-template
     ] run-template
@@ -50,15 +50,15 @@ IN: html.templates.chloe.tests
 
 : test5-aux? ( -- ? ) f ;
 
-[ "" ] [
+{ "" } [
     [
         "test5" test-template call-template
     ] run-template
 ] unit-test
 
-[ ] [ begin-form ] unit-test
+{ } [ begin-form ] unit-test
 
-[ ] [ "A label" "label" set-value ] unit-test
+{ } [ "A label" "label" set-value ] unit-test
 
 SINGLETON: link-test
 
@@ -66,35 +66,35 @@ M: link-test link-title drop "<Link Title>" ;
 
 M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
-[ ] [ link-test "link" set-value ] unit-test
+{ } [ link-test "link" set-value ] unit-test
 
-[ ] [ "int x = 5;" "code" set-value ] unit-test
+{ } [ "int x = 5;" "code" set-value ] unit-test
 
-[ ] [ "c" "mode" set-value ] unit-test
+{ } [ "c" "mode" set-value ] unit-test
 
-[ ] [ { 1 2 3 } "inspector" set-value ] unit-test
+{ } [ { 1 2 3 } "inspector" set-value ] unit-test
 
-[ ] [ "<p>a paragraph</p>" "html" set-value ] unit-test
+{ } [ "<p>a paragraph</p>" "html" set-value ] unit-test
 
-[ ] [ "sheeple" "field" set-value ] unit-test
+{ } [ "sheeple" "field" set-value ] unit-test
 
-[ ] [ "a password" "password" set-value ] unit-test
+{ } [ "a password" "password" set-value ] unit-test
 
-[ ] [ "a\nb\nc" "textarea" set-value ] unit-test
+{ } [ "a\nb\nc" "textarea" set-value ] unit-test
 
-[ ] [ "new york" "choice" set-value ] unit-test
+{ } [ "new york" "choice" set-value ] unit-test
 
-[ ] [ { "new york" "detroit" "minneapolis" } "choices" set-value ] unit-test
+{ } [ { "new york" "detroit" "minneapolis" } "choices" set-value ] unit-test
 
-[ ] [
+{ } [
     [
         "test8" test-template call-template
     ] run-template drop
 ] unit-test
 
-[ ] [ { 1 2 3 } "numbers" set-value ] unit-test
+{ } [ { 1 2 3 } "numbers" set-value ] unit-test
 
-[ "<ul><li>1</li><li>2</li><li>3</li></ul>" ] [
+{ "<ul><li>1</li><li>2</li><li>3</li></ul>" } [
     [
         "test7" test-template call-template
     ] run-template [ blank? ] reject
@@ -102,67 +102,67 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 TUPLE: person first-name last-name ;
 
-[ ] [
+{ } [
     {
         T{ person f "RBaxter" "Unknown" }
         T{ person f "Doug" "Coleman" }
     } "people" set-value
 ] unit-test
 
-[ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
+{ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" } [
     [
         "test8" test-template call-template
     ] run-template [ blank? ] reject
 ] unit-test
 
-[ ] [
+{ } [
     {
         H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } }
         H{ { "first-name" "Doug"    } { "last-name" "Coleman" } }
     } "people" set-value
 ] unit-test
 
-[ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
+{ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" } [
     [
         "test8" test-template call-template
     ] run-template [ blank? ] reject
 ] unit-test
 
-[ ] [ 1 "id" set-value ] unit-test
+{ } [ 1 "id" set-value ] unit-test
 
-[ "<a name=\"1\">Hello</a>" ] [
+{ "<a name=\"1\">Hello</a>" } [
     [
         "test9" test-template call-template
     ] run-template
 ] unit-test
 
-[ ] [ H{ { "a" H{ { "b" "c" } } } } values set ] unit-test
+{ } [ H{ { "a" H{ { "b" "c" } } } } values set ] unit-test
 
-[ "<form method=\"post\" action=\"foo\"><div style=\"display: none;\"><input type=\"hidden\" value=\"a\" name=\"__n\"/></div></form>" ] [
+{ "<form method=\"post\" action=\"foo\"><div style=\"display: none;\"><input type=\"hidden\" value=\"a\" name=\"__n\"/></div></form>" } [
     [
         "test10" test-template call-template
     ] run-template
 ] unit-test
 
-[ ] [ begin-form ] unit-test
+{ } [ begin-form ] unit-test
 
-[ ] [
+{ } [
     <form> H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } >>values "person" set-value
 ] unit-test
 
-[ "<table><tr><td>RBaxter</td><td>Unknown</td></tr></table>" ] [
+{ "<table><tr><td>RBaxter</td><td>Unknown</td></tr></table>" } [
     [
         "test11" test-template call-template
     ] run-template [ blank? ] reject
 ] unit-test
 
-[ ] [
+{ } [
     begin-form
     { "a" "b" } "choices" set-value
     "true" "b" set-value
 ] unit-test
 
-[ "<input type=\"checkbox\" name=\"a\">a</input><input type=\"checkbox\" checked=\"true\" name=\"b\">b</input>" ] [
+{ "<input type=\"checkbox\" name=\"a\">a</input><input type=\"checkbox\" checked=\"true\" name=\"b\">b</input>" } [
     [
         "test12" test-template call-template
     ] run-template
@@ -174,7 +174,7 @@ TUPLE: person first-name last-name ;
     ] run-template
 ] [ error>> T{ unknown-chloe-tag f "this-tag-does-not-exist" } = ] must-fail-with
 
-[ "Hello &lt;world&gt; &amp;escaping test;" "Hello <world> &escaping test;" ] [
+{ "Hello &lt;world&gt; &amp;escaping test;" "Hello <world> &escaping test;" } [
     [
         <box> title set
         [

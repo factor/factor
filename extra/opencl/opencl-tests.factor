@@ -42,5 +42,5 @@ __kernel void square(
         ] with-cl-state
     ] with-destructors ;
 
-[ float-array{ 1.0 4.0 9.0 16.0 100.0 } ]
+{ float-array{ 1.0 4.0 9.0 16.0 100.0 } }
 [ float-array{ 1.0 2.0 3.0 4.0 10.0 } opencl-square ] unit-test
