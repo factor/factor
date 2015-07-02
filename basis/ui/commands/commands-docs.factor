@@ -97,7 +97,7 @@ HELP: $command
 { $description "Prints the keyboard shortcut associated with " { $snippet "command" } " in the command map named " { $snippet "map" } " on the class " { $snippet "class" } "." } ;
 
 HELP: define-command
-{ $values { "word" word } { "hash" hashtable } } 
+{ $values { "word" word } { "hash" hashtable } }
 { $description "Defines a command. The hashtable can contain the following keys:"
     { $list
         { { $link +nullary+ } " - if set to a true value, the word must have stack effect " { $snippet "( -- )" } "; otherwise it must have stack effect " { $snippet "( target -- )" } }

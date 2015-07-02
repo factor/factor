@@ -59,8 +59,8 @@ ARTICLE: "range-model-protocol" "Range model protocol"
     range-max-value*
     set-range-value
     set-range-page-value
-    set-range-min-value 
-    set-range-max-value 
+    set-range-min-value
+    set-range-max-value
 } ;
 
 ABOUT: "models-range"

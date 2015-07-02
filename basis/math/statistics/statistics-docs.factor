@@ -73,7 +73,7 @@ HELP: sample-var
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } sample-var ." "1" }
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } sample-var ." "1+2/3" } } ;
 
-HELP: population-cov 
+HELP: population-cov
 { $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
 { $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
 

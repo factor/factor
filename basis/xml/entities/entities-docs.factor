@@ -21,4 +21,3 @@ HELP: entities
 HELP: with-entities
 { $values { "entities" "a hash table of strings to strings" } { "quot" "a quotation ( -- )" } }
 { $description "Calls the quotation using the given table of entity values (symbolizing, eg, that " { $snippet "&foo;" } " represents " { $snippet "\"a\"" } ") on top of the default XML entities" } ;
-

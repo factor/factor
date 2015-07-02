@@ -18,7 +18,7 @@ HELP: SUPER->
 
 HELP: IMPORT:
 { $syntax "IMPORT: name" }
-{ $description "Makes an Objective C class available for use." } 
+{ $description "Makes an Objective C class available for use." }
 { $examples
     { $code "IMPORT: QTMovie" "QTMovie \"My Movie.mov\" <NSString> f -> movieWithFile:error:" }
 } ;

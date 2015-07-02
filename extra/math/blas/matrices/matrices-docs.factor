@@ -25,7 +25,7 @@ ARTICLE: "math.blas-types" "BLAS interface types"
     double-blas-matrix
     complex-float-blas-matrix
     complex-double-blas-matrix
-} 
+}
 "There are BOA constructors for all vector and matrix types, which provide the most flexibility in specifying memory layout:"
 { $subsections
     <float-blas-vector>

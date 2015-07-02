@@ -327,84 +327,84 @@ HELP: func-zero
 
 HELP: get-blend-state
 { $values
-    
+
     { "blend-state" blend-state }
 }
 { $description "Retrieves the current GPU " { $link blend-state } "." } ;
 
 HELP: get-depth-range-state
 { $values
-    
+
     { "depth-range-state" depth-range-state }
 }
 { $description "Retrieves the current GPU " { $link depth-range-state } "." } ;
 
 HELP: get-depth-state
 { $values
-    
+
     { "depth-state" depth-state }
 }
 { $description "Retrieves the current GPU " { $link depth-state } "." } ;
 
 HELP: get-line-state
 { $values
-    
+
     { "line-state" line-state }
 }
 { $description "Retrieves the current GPU " { $link line-state } "." } ;
 
 HELP: get-mask-state
 { $values
-    
+
     { "mask-state" mask-state }
 }
 { $description "Retrieves the current GPU " { $link mask-state } "." } ;
 
 HELP: get-multisample-state
 { $values
-    
+
     { "multisample-state" multisample-state }
 }
 { $description "Retrieves the current GPU " { $link multisample-state } "." } ;
 
 HELP: get-point-state
 { $values
-    
+
     { "point-state" point-state }
 }
 { $description "Retrieves the current GPU " { $link point-state } "." } ;
 
 HELP: get-scissor-state
 { $values
-    
+
     { "scissor-state" scissor-state }
 }
 { $description "Retrieves the current GPU " { $link scissor-state } "." } ;
 
 HELP: get-stencil-state
 { $values
-    
+
     { "stencil-state" stencil-state }
 }
 { $description "Retrieves the current GPU " { $link stencil-state } "." } ;
 
 HELP: get-triangle-cull-state
 { $values
-    
+
     { "triangle-cull-state" triangle-cull-state }
 }
 { $description "Retrieves the current GPU " { $link triangle-cull-state } "." } ;
 
 HELP: get-triangle-state
 { $values
-    
+
     { "triangle-state" triangle-state }
 }
 { $description "Retrieves the current GPU " { $link triangle-state } "." } ;
 
 HELP: get-viewport-state
 { $values
-    
+
     { "viewport-state" viewport-state }
 }
 { $description "Retrieves the current GPU " { $link viewport-state } "." } ;
@@ -552,8 +552,8 @@ HELP: triangle-cull
 { $class-description "The " { $snippet "cull" } " slot of the " { $link triangle-cull-state } " determines which triangle faces are culled, if any."
 { $list
 { { $link cull-all } " culls all triangles." }
-{ { $link cull-front } " culls front-facing triangles." } 
-{ { $link cull-back } " culls back-facing triangles." } 
+{ { $link cull-front } " culls front-facing triangles." }
+{ { $link cull-back } " culls back-facing triangles." }
 } } ;
 
 HELP: triangle-cull-state

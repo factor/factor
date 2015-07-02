@@ -40,7 +40,7 @@ HELP: v-max-value
 { $description "Throws an error if " { $snippet "x" } " is larger than " { $snippet "n" } "." } ;
 
 HELP: v-min-value
-{ $values { "x" integer } { "n" integer } }  
+{ $values { "x" integer } { "n" integer } }
 { $description "Throws an error if " { $snippet "x" } " is smaller than " { $snippet "n" } "." } ;
 
 HELP: v-mode

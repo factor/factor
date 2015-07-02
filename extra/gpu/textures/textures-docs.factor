@@ -123,7 +123,7 @@ HELP: cube-map-axis
 HELP: cube-map-face
 { $class-description "A " { $snippet "cube-map-face" } " tuple references a single face of a " { $link texture-cube-map } " object for use with " { $link allocate-texture } ", " { $link update-texture } ", or " { $link read-texture } "."
 { $list
-{ "The " { $snippet "texture" } " slot indicates the cube map texture being referenced." } 
+{ "The " { $snippet "texture" } " slot indicates the cube map texture being referenced." }
 { "The " { $snippet "axis" } " slot indicates which face to reference: " { $link +X } ", "  { $link +Y } ", " { $link +Z } ", " { $link -X } ", " { $link -Y } ", or " { $link -Z } "." }
 } } ;
 

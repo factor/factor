@@ -13,7 +13,7 @@ HELP: BEFORE:
 { $description "Defines a method on " { $snippet "generic" } " for " { $snippet "class" } " which executes the new " { $snippet "implementation" } " code, then invokes the parent class method on " { $snippet "generic" } "." } ;
 
 ARTICLE: "method-chains" "Method chaining syntax"
-"The " { $vocab-link "method-chains" } " vocabulary provides syntax for extending method implementations in class hierarchies." 
+"The " { $vocab-link "method-chains" } " vocabulary provides syntax for extending method implementations in class hierarchies."
 { $subsections
     POSTPONE: AFTER:
     POSTPONE: BEFORE:

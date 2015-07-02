@@ -24,4 +24,3 @@ HELP: wrap-string
 HELP: wrap-indented-string
 { $values { "string" string } { "width" integer } { "indent" "string or integer" } { "newstring" string } }
 { $description "Given a " { $snippet "string" } ", alters the whitespace in the string so that each line has no more than " { $snippet "width" } " characters, unless there is a word longer than " { $snippet "width" } ". Linear whitespace between words is converted to a single space. The " { $snippet "indent" } " can be either a " { $link string } " or a number of spaces to prepend to each line." } ;
-

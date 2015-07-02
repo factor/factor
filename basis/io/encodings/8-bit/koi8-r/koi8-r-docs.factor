@@ -4,7 +4,7 @@ USING: help.markup help.syntax ;
 IN: io.encodings.8-bit.koi8-r
 
 HELP: koi8-r
-{ $var-description "KOI8-R is an 8-bit superset of ASCII which encodes the Cyrillic alphabet, as used in Russian and Bulgarian. Characters are in such an order that, if the eight bit is stripped, text is still interpretable as ASCII. Block-building characters also exist." } 
+{ $var-description "KOI8-R is an 8-bit superset of ASCII which encodes the Cyrillic alphabet, as used in Russian and Bulgarian. Characters are in such an order that, if the eight bit is stripped, text is still interpretable as ASCII. Block-building characters also exist." }
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.8-bit.koi8-r" "KOI8-R encoding"

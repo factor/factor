@@ -5,7 +5,7 @@ IN: graphviz.dot
 
 HELP: write-dot
 { $values
-    { "graph" graph } { "path" "a pathname string" } { "encoding" "a character encoding" }    
+    { "graph" graph } { "path" "a pathname string" } { "encoding" "a character encoding" }
 }
 { $description "Converts " { $snippet "graph" } " into its equivalent DOT code, saving the file to " { $snippet "path" } " using the given character " { $snippet "encoding" } "." } ;
 

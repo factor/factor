@@ -30,7 +30,7 @@ HELP: push-new
 { $code """foo <struct>
     5 >>a
     6 >>b
-foo-vector{ } clone push""" } 
+foo-vector{ } clone push""" }
 "By using " { $snippet "push-new" } ", the new struct can be allocated directly from the vector and the intermediate copy can be avoided:"
 { $code """foo-vector{ } clone push-new
     5 >>a

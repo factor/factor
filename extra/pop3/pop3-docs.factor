@@ -6,14 +6,14 @@ IN: pop3
 
 HELP: <pop3-account>
 { $values
-    
+
     { "pop3-account" pop3-account }
 }
 { $description "creates a " { $link pop3-account } " object with defaults for the port and timeout slots." } ;
 
 HELP: account
 { $values
-    
+
     { "pop3-account" pop3-account }
 }
 { $description "You only need to call " { $link connect } " after calling this word to reconnect to the latest accessed POP3 account." }
@@ -40,7 +40,7 @@ HELP: >pwd
 
 HELP: capa
 { $values
-    
+
     { "array" array }
 }
 { $description "Queries the mail server capabilities, as described in RFC 2449. It is advised to check for command support before calling the appropriate words (e.g. TOP UIDL)." } ;
@@ -63,7 +63,7 @@ HELP: connect
 
 HELP: consolidate
 { $values
-    
+
     { "seq" sequence }
 }
 { $description "Builds a sequence of email tuples, iterating over each email top and consolidating its headers with its number, uidl, and size." } ;
@@ -76,14 +76,14 @@ HELP: delete
 
 HELP: headers
 { $values
-    
+
     { "assoc" assoc }
 }
 { $description "Gathers and associates the From:, Subject:, and To: headers of each message." } ;
 
 HELP: list
 { $values
-    
+
     { "assoc" assoc }
 }
 { $description "Lists each message with its number and size in bytes" } ;
@@ -136,7 +136,7 @@ HELP: reset
 
 HELP: count
 { $values
-    
+
     { "n" fixnum }
 }
 { $description "Gets the number of messages in the mailbox." } ;
@@ -157,7 +157,7 @@ HELP: uidl
 
 HELP: uidls
 { $values
-    
+
     { "assoc" assoc }
 }
 { $description "Gets the POP3 UIDL (Unique IDentification Listing) of every specific message in the mailbox together with its ordinal number. UIDL provides a mechanism that avoids numbering issues between POP3 sessions by assigning a permanent and unique ID for each message." } ;
@@ -299,7 +299,7 @@ $nl
     }
 }
 $nl
-"The messages marked for deletion are actually deleted only when " { $link close } " is called. This should be the last command you issue. " 
+"The messages marked for deletion are actually deleted only when " { $link close } " is called. This should be the last command you issue. "
 { $subsections close }
 { $examples
     { $code

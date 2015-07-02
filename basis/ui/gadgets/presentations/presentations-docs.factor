@@ -21,11 +21,11 @@ HELP: invoke-presentation
 { invoke-presentation invoke-primary invoke-secondary } related-words
 
 HELP: invoke-primary
-{ $values { "presentation" presentation } } 
+{ $values { "presentation" presentation } }
 { $description "Invokes the " { $link primary-operation } " associated to the " { $snippet "object" } ". This word is executed when the presentation is clicked with the left mouse button." } ;
 
 HELP: invoke-secondary
-{ $values { "presentation" presentation } } 
+{ $values { "presentation" presentation } }
 { $description "Invokes the " { $link secondary-operation } " associated to the " { $snippet "object" } ". This word is executed when a list receives a " { $snippet "RET" } " key press." } ;
 
 HELP: <presentation>

@@ -5,7 +5,7 @@ IN: json.writer
 
 HELP: >json
 { $values { "obj" object } { "string" "the object converted to JSON format" } }
-{ $description "Serializes the object into a JSON formatted string." } 
+{ $description "Serializes the object into a JSON formatted string." }
 { $see-also json-print } ;
 
 HELP: json-print

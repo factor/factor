@@ -4,10 +4,10 @@ USING: help.syntax help.markup cpu.8080.emulator ;
 IN: balloon-bomber
 
 HELP: run-balloon
-{ $description 
+{ $description
 "Run the Balloon Bomber emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
-"location of the Balloon Bomber ROM files. See " 
+"location of the Balloon Bomber ROM files. See "
 { $link { "balloon-bomber" "balloon-bomber" } } "  for details."
 } ;
 
@@ -24,9 +24,9 @@ ARTICLE: { "balloon-bomber" "balloon-bomber" } "Balloon Bomber Emulator"
   "ballbomb/tn04"
   "ballbomb/tn05-1"
 }
-"These are the same ROM files as used by MAME. To run the game use the " 
+"These are the same ROM files as used by MAME. To run the game use the "
 { $link run-balloon } " word." $nl
-"Keys:" 
+"Keys:"
 { $table
   { "Backspace" "Insert Coin" }
   { "1" "1 Player" }

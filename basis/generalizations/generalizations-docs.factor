@@ -118,11 +118,11 @@ HELP: -nrot
 
 HELP: ndip
 { $values { "n" integer } }
-{ $description "A generalization of " { $link dip } " that can work " 
+{ $description "A generalization of " { $link dip } " that can work "
 "for any stack depth. The quotation will be called with a stack that "
 "has 'n' items removed first. The 'n' items are then put back on the "
 "stack. The quotation can consume and produce any number of items."
-} 
+}
 { $examples
   { $example "USING: arrays generalizations kernel prettyprint ;" "1 2 [ dup ] 1 ndip 3array ." "{ 1 1 2 }" }
   { $example "USING: arrays generalizations kernel prettyprint ;" "1 2 3 [ drop ] 2 ndip 2array ." "{ 2 3 }" }
@@ -136,10 +136,10 @@ HELP: ndip
 
 HELP: nkeep
 { $values { "n" integer } }
-{ $description "A generalization of " { $link keep } " that can work " 
+{ $description "A generalization of " { $link keep } " that can work "
 "for any stack depth. The first " { $snippet "n" } " items after the quotation will be "
 "saved, the quotation called, and the items restored."
-} 
+}
 { $examples
   { $example
       "USING: generalizations kernel prettyprint"
@@ -159,7 +159,7 @@ HELP: nkeep
 HELP: ncurry
 { $values { "n" integer } }
 { $description "A generalization of " { $link curry } " that can work for any stack depth."
-} 
+}
 { $examples
   "Some core words expressed in terms of " { $link ncurry } ":"
     { $table
@@ -172,7 +172,7 @@ HELP: ncurry
 HELP: nwith
 { $values { "n" integer } }
 { $description "A generalization of " { $link with } " that can work for any stack depth."
-} 
+}
 { $examples
   "Some core words expressed in terms of " { $link nwith } ":"
     { $table
@@ -183,7 +183,7 @@ HELP: nwith
 HELP: napply
 { $values { "quot" quotation } { "n" integer } }
 { $description "A generalization of " { $link bi@ } " and " { $link tri@ } " that can work for any stack depth."
-} 
+}
 { $examples
   "Some core words expressed in terms of " { $link napply } ":"
     { $table
@@ -196,7 +196,7 @@ HELP: napply
 HELP: ncleave
 { $values { "quots" "a sequence of quotations" } { "n" integer } }
 { $description "A generalization of " { $link cleave } " and " { $link 2cleave } " that can work for any quotation arity."
-} 
+}
 { $examples
   "Some core words expressed in terms of " { $link ncleave } ":"
     { $table

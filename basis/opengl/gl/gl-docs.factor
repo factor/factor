@@ -87,5 +87,3 @@ ARTICLE: "opengl-modeling-transformations" "Modeling transformations"
 
 { glTranslatef glTranslated glRotatef glRotated glScalef glScaled }
 related-words
-
-

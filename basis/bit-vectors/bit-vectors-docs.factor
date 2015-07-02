@@ -35,6 +35,5 @@ HELP: >bit-vector
 HELP: ?V{
 { $syntax "?V{ elements... }" }
 { $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "?V{ t f t }" } } ;
-

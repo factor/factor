@@ -14,7 +14,7 @@ $nl
     { { $snippet "{ name attributes... }" } " - a slot which can hold any object, with optional attributes" }
     { { $snippet "{ name class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
 }
-"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." } ; 
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." } ;
 
 HELP: TUPLE:
 { $syntax """TUPLE: name slots ;
@@ -30,7 +30,7 @@ $nl
     { { $snippet "{ name attributes... }" } " - a slot which can hold any object, with optional attributes" }
     { { $snippet "{ name class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
 }
-"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." } ; 
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." } ;
 
 {
     POSTPONE: ROLE:
@@ -51,9 +51,9 @@ ARTICLE: "roles" "Roles"
 "The role superclass:"
 { $subsections role }
 "Syntax for making a new role:"
-{ $subsection POSTPONE: ROLE: } 
+{ $subsection POSTPONE: ROLE: }
 "Syntax for making tuples that use roles:"
-{ $subsection POSTPONE: TUPLE: } 
+{ $subsection POSTPONE: TUPLE: }
 "Errors with roles:"
 { $subsections multiple-inheritance-attempted role-slot-overlap } ;
 

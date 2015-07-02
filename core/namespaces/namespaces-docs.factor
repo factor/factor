@@ -95,13 +95,13 @@ HELP: change-global
 
 HELP: toggle
 { $values
-    { "variable" "a variable, by convention a symbol" }    
+    { "variable" "a variable, by convention a symbol" }
 }
 { $description "Changes the boolean value of a variable to its opposite." } ;
 
 HELP: with-global
 { $values
-    { "quot" quotation }    
+    { "quot" quotation }
 }
 { $description "Runs the quotation in the global namespace." } ;
 
