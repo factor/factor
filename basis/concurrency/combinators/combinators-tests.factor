@@ -1,4 +1,4 @@
-USING: concurrency.combinators tools.test random kernel math 
+USING: concurrency.combinators tools.test random kernel math
 concurrency.mailboxes threads sequences accessors arrays
 math.parser ;
 IN: concurrency.combinators.tests

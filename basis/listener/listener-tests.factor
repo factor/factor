@@ -61,7 +61,7 @@ SYNTAX: hello "Hi" print ;
         "call" "scratchpad" lookup-word
         [ "call" search ] with-interactive-vocabs
         eq?
-    ] unit-test 
+    ] unit-test
 ] with-file-vocabs
 
 [ "call" "scratchpad" lookup-word forget ] with-compilation-unit

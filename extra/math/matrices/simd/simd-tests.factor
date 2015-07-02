@@ -6,7 +6,7 @@ FROM: math.matrices => m~ ;
 SPECIALIZED-ARRAY: float-4
 IN: math.matrices.simd.tests
 
-[ 
+[
     S{ matrix4 f
         float-4-array{
             float-4{ 3.0 0.0 0.0 0.0 }
@@ -17,7 +17,7 @@ IN: math.matrices.simd.tests
     }
 ] [ float-4{ 3.0 4.0 2.0 0.0 } scale-matrix4 ] unit-test
 
-[ 
+[
     S{ matrix4 f
         float-4-array{
             float-4{ 1/8. 0.0  0.0  0.0 }
@@ -28,7 +28,7 @@ IN: math.matrices.simd.tests
     }
 ] [ float-4{ 8.0 4.0 2.0 0.0 } ortho-matrix4 ] unit-test
 
-[ 
+[
     S{ matrix4 f
         float-4-array{
             float-4{ 0.0 0.0 -1.0 0.0 }
@@ -48,7 +48,7 @@ IN: math.matrices.simd.tests
     } transpose-matrix4
 ] unit-test
 
-[ 
+[
     S{ matrix4 f
         float-4-array{
             float-4{ 1.0 0.0 0.0 0.0 }
@@ -69,7 +69,7 @@ IN: math.matrices.simd.tests
             float-4{  0.0  0.0  0.0 1.0 }
         }
     }
-    1.0e-7 m~ 
+    1.0e-7 m~
 ] unit-test
 
 [ t ] [
@@ -82,7 +82,7 @@ IN: math.matrices.simd.tests
             float-4{  0.0  0.0  0.0 1.0 }
         }
     }
-    1.0e-7 m~ 
+    1.0e-7 m~
 ] unit-test
 
 [
@@ -203,7 +203,7 @@ IN: math.matrices.simd.tests
         }
     }
 ] [
-    3.0 
+    3.0
     S{ matrix4 f
         float-4-array{
             float-4{ 1.0 0.0 0.0 5.0 }
@@ -262,7 +262,7 @@ IN: math.matrices.simd.tests
             float-4{ 0.0  0.0  0.0  1.0 }
         }
     }
-    1.0e-7 m~ 
+    1.0e-7 m~
 ] unit-test
 
 [ t ] [
@@ -275,5 +275,5 @@ IN: math.matrices.simd.tests
             float-4{ 0.0            0.0 0.0                1.0 }
         }
     }
-    1.0e-7 m~ 
+    1.0e-7 m~
 ] unit-test

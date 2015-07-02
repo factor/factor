@@ -43,4 +43,3 @@ T{ model-tester f f } "tester" set
     T{ model-tester f f } clone V{ 5 } clone <model> 2dup add-connection
     [ pop-model ] [ value>> ] bi
 ] unit-test
-

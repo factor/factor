@@ -374,7 +374,7 @@ cell-bits 32 = [
         1 + dup 100 fixnum> [ 1 fixnum+ ] when
     ] \ fixnum+ inlined?
 ] unit-test
- 
+
 [ t ] [
     [ [ resize-array ] keep length ] \ length inlined?
 ] unit-test

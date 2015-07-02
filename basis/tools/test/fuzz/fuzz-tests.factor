@@ -50,4 +50,3 @@ SYMBOL: generator-stack
 ] with-variable
 
 notify-error-observers
-

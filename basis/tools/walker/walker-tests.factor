@@ -90,7 +90,7 @@ IN: tools.walker.tests
 [ { "4\n" } ] [
     [ [ 2 2 + number>string print ] with-string-writer ] test-walker
 ] unit-test
-                                                            
+
 [ { 1 2 3 } ] [
     [ { 1 2 3 } set-datastack ] test-walker
 ] unit-test

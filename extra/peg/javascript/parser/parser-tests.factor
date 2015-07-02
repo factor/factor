@@ -24,7 +24,7 @@ IN: peg.javascript.parser.tests
   "123; 'hello'; foo(x);" javascript
 ] unit-test
 
-{ t } [ 
+{ t } [
 """
 var x=5
 var y=10
@@ -32,7 +32,7 @@ var y=10
 ] unit-test
 
 
-{ t } [ 
+{ t } [
 """
 function foldl(f, initial, seq) {
    for(var i=0; i< seq.length; ++i)
@@ -41,7 +41,7 @@ function foldl(f, initial, seq) {
 }""" main \ javascript rule (parse) remaining>> length zero?
 ] unit-test
 
-{ t } [ 
+{ t } [
 """
 ParseState.prototype.from = function(index) {
     var r = new ParseState(this.input, this.index + index);
@@ -50,4 +50,3 @@ ParseState.prototype.from = function(index) {
     return r;
 }""" main \ javascript rule (parse) remaining>> length zero?
 ] unit-test
-

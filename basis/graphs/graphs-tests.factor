@@ -14,7 +14,7 @@ H{
 } "g" set
 
 [ { 2 3 4 5 } ] [
-    2 [ "g" get at ] closure keys natural-sort 
+    2 [ "g" get at ] closure keys natural-sort
 ] unit-test
 
 H{ } "g" set

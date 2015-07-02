@@ -13,4 +13,3 @@ IN: machine-learning.label-binarizer.tests
     <label-binarizer> { 1 2 6 4 2 } over fit-y
     { 1 6 } over transform-y swap inverse-transform-y
 ] unit-test
-

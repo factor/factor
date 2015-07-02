@@ -25,12 +25,12 @@ USING: asn1 asn1.ldap io io.streams.string tools.test ;
     ! triggers string
     [ B{ 4 6 97 98 99 100 101 102 } ] [ "abcdef" >ber ] unit-test
 
-    [ B{ 69 6 97 98 99 100 101 102 } ] [ 
-        5 "abcdef" >ber-application-string 
+    [ B{ 69 6 97 98 99 100 101 102 } ] [
+        5 "abcdef" >ber-application-string
     ] unit-test
 
-    [ B{ 133 6 97 98 99 100 101 102 } ] [ 
-        5 "abcdef" >ber-contextspecific-string 
+    [ B{ 133 6 97 98 99 100 101 102 } ] [
+        5 "abcdef" >ber-contextspecific-string
     ] unit-test
 
     ! triggers array
@@ -40,11 +40,11 @@ USING: asn1 asn1.ldap io io.streams.string tools.test ;
 
     [ B{ 48 4 49 50 51 52 } ] [ { 1 2 3 4 } >ber-sequence ] unit-test
 
-    [ B{ 96 4 49 50 51 52 } ] [ 
+    [ B{ 96 4 49 50 51 52 } ] [
         { 1 2 3 4 } >ber-appsequence
     ] unit-test
 
-    [ B{ 160 4 49 50 51 52 } ] [ 
+    [ B{ 160 4 49 50 51 52 } ] [
         { 1 2 3 4 } >ber-contextspecific-array
     ] unit-test
 

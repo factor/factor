@@ -21,4 +21,3 @@ math.ranges sequences tools.test ;
 { t } [
     { 4 6 8 9 10 12 } 100 sieve '[ _ marked-prime? not ] all?
 ] unit-test
-

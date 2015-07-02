@@ -5,5 +5,3 @@ IN: io.standard-paths.macosx.tests
 
 [ "/System/Library/CoreServices/Finder.app" ]
 [ "com.apple.finder" find-native-bundle ] unit-test
-
-

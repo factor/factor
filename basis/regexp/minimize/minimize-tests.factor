@@ -36,7 +36,7 @@ IN: regexp.minimize.tests
         { start-state 0 }
         { final-states HS{ 3 } }
     }
-] [ 
+] [
     T{ transition-table
         { transitions H{
             { 0 H{ { CHAR: a 1 } { CHAR: b 4 } } }

@@ -19,7 +19,7 @@ CONSTANT: test-ip "127.0.0.1"
         { [ os windows? ] [ insecure-addr ] }
     } cond ;
 
-    
+
 [ ] [ [ "distributed-concurrency-test" temp-file delete-file ] ignore-errors ] unit-test
 
 test-node-server [

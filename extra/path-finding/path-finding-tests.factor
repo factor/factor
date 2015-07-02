@@ -147,4 +147,3 @@ MEMO: costs ( -- costs )
         { 4 H{ } }
     } <dijkstra> find-path
 ] unit-test
-

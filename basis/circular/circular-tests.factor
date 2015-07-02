@@ -11,7 +11,7 @@ IN: circular.tests
 [ "test"  ] [ "test" <circular> >string ] unit-test
 
 [ CHAR: e ] [ "test" <circular> 5 swap nth-unsafe ] unit-test
- 
+
 [ [ 1 2 3 ] ] [ { 1 2 3 } <circular> [ ] like ] unit-test
 [ [ 2 3 1 ] ] [ { 1 2 3 } <circular> [ rotate-circular ] keep [ ] like ] unit-test
 [ [ 3 1 2 ] ] [ { 1 2 3 } <circular> [ rotate-circular ] keep [ rotate-circular ] keep [ ] like ] unit-test

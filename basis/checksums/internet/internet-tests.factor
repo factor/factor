@@ -19,4 +19,3 @@ IN: checksums
     } ;
 
 [ B{ 34 13 } ] [ test-data internet checksum-bytes ] unit-test
-

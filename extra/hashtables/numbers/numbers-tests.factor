@@ -19,4 +19,3 @@ IN: hashtables.numbers.tests
 ] unit-test
 
 [ { { 1.0 1000 } } ] [ NH{ { 1.0 1000 } } >alist ] unit-test
-

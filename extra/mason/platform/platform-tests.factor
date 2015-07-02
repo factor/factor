@@ -8,7 +8,7 @@ IN: mason.platform.tests
     linux target-os set
     x86.32 target-cpu set
     f target-variant set
-    
+
     [ "linux-x86-32" ] [ platform ] unit-test
 ] with-scope
 

@@ -66,7 +66,7 @@ io.sockets.secure.debug ;
 [ ] [
     [
         [
-            "127.0.0.1" 0 <inet4> ascii <server> &dispose 
+            "127.0.0.1" 0 <inet4> ascii <server> &dispose
                 dup addr>> port>> "port" get fulfill
                 accept drop &dispose 1 minutes sleep
         ] with-destructors
@@ -109,7 +109,7 @@ io.sockets.secure.debug ;
 ! Until I sort out two-stage handshaking, I can't do much here
 [
     [ ] [ <promise> "port" set ] unit-test
-    
+
     [ ] [
         [
             [
@@ -122,7 +122,7 @@ io.sockets.secure.debug ;
             ] with-destructors
         ] "Silly server" spawn drop
     ] unit-test
-    
+
     [
         1 seconds secure-socket-timeout [
             <secure-config> [
@@ -131,10 +131,10 @@ io.sockets.secure.debug ;
             ] with-secure-context
         ] with-variable
     ] [ io-timeout? ] must-fail-with
-    
+
     ! Server socket shutdown timeout
     [ ] [ <promise> "port" set ] unit-test
-    
+
     [ ] [
         [
             [
@@ -145,7 +145,7 @@ io.sockets.secure.debug ;
             ] with-destructors
         ] "Silly client" spawn drop
     ] unit-test
-    
+
     [
         [
             1 seconds secure-socket-timeout [

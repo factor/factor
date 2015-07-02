@@ -6,11 +6,11 @@ IN: concurrency.futures.tests
 ] unit-test
 
 [
-    [ "this should propogate" throw ] future ?future 
+    [ "this should propogate" throw ] future ?future
 ] must-fail
 
 [ ] [
-    [ "this should not propogate" throw ] future drop 
+    [ "this should not propogate" throw ] future drop
 ] unit-test
 
 ! Race condition with futures

@@ -25,4 +25,3 @@ unit-test
 [ float-array{ 7.0 0.0 3.0 4.0 } ]
 [ test-array [ 7.0 0 rot set-nth ] [ seq>> ] bi ]
 unit-test
-

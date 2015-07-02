@@ -54,7 +54,7 @@ SYMBOLS: supported-layouts supported-formats ;
 : next! ( seq -- elt ) [ first ] [ 1 rotate! ] bi ;
 
 :: smoke-test ( graph -- pass? )
-    supported-formats get-global next! :> -T 
+    supported-formats get-global next! :> -T
     supported-layouts get-global next! :> -K
     [
         graph "smoke-test" -T -K graphviz

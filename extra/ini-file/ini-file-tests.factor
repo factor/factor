@@ -128,4 +128,3 @@ IN: ini-file.tests
     H{ { "key with \n esc\ape \r codes \""
          "value with \t esc\ape codes" } } ini>string
 ] unit-test
-

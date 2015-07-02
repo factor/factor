@@ -33,4 +33,3 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 [ t ] [
     \ + \ nth effective-method nip dup \ nth "default-method" word-prop eq? and
 ] unit-test
-

@@ -22,8 +22,8 @@ IN: morse.tests
 
 [ "morse code 123" ] [
     [MORSE
-        __ ___ ._. ... . / 
-        _._. ___ _.. . / 
+        __ ___ ._. ... . /
+        _._. ___ _.. . /
         .____ ..___ ...__
     MORSE] ] unit-test
 
@@ -31,12 +31,12 @@ IN: morse.tests
       -- --- .-. ... . /
       -.-. --- -.. .
   MORSE] ] [
-    "morse code" >morse morse> 
+    "morse code" >morse morse>
 ] unit-test
 
 [ "factor rocks!" ] [
     [MORSE
-      ..-. .- -.-. - --- .-. / 
+      ..-. .- -.-. - --- .-. /
       .-. --- -.-. -.- ... -.-.--
     MORSE] ] unit-test
 ! [ ] [ "sos" 0.075 play-as-morse* ] unit-test

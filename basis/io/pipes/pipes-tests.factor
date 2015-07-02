@@ -61,7 +61,7 @@ IN: io.pipes.tests
                     "count-down" get count-down
                 ] in-thread
             ] bi@
-            
+
             ! Give the threads enough time to start blocking on
             ! read
             1 seconds sleep

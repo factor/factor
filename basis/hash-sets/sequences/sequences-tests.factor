@@ -18,4 +18,3 @@ IN: hash-sets.sequences.tests
 ] unit-test
 
 [ { "asdf" } ] [ SHS{ "asdf" } members ] unit-test
-

@@ -148,7 +148,7 @@ unit-test
 [ f ]
 [ "." string>number ]
 unit-test
- 
+
 [ f ]
 [ ".e" string>number ]
 unit-test

@@ -35,7 +35,7 @@ IN: json.reader.tests
 { "𝄞" } [ "\"\\ud834\\udd1e\"" json> ] unit-test
 
 { H{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
-{ { } } [ "[]" json> ] unit-test 
+{ { } } [ "[]" json> ] unit-test
 { { 1 "two" 3.0 } } [ """ [1, "two", 3.0] """ json> ] unit-test
 { H{ } } [ "{}" json> ] unit-test
 

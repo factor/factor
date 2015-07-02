@@ -14,4 +14,3 @@ IN: html.parser.utils.tests
 [ "Italy" ] [ "Italy" unquote ] unit-test
 [ "Italy" ] [ "'Italy'" unquote ] unit-test
 [ "Italy" ] [ "\"Italy\"" unquote ] unit-test
-

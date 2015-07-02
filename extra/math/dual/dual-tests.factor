@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Jason W. Merrill.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test math.dual kernel accessors math math.functions 
+USING: tools.test math.dual kernel accessors math math.functions
     math.constants ;
 IN: math.dual.tests
 

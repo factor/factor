@@ -256,7 +256,7 @@ M: f generic-forget-test ;
 
     """IN: generic.standard.tests
     FORGET: boii""" eval( -- )
-    
+
     """IN: generic.standard.tests
     TUPLE: boii ;
     M: boii jeah ;""" eval( -- )

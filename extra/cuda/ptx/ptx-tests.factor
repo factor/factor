@@ -1101,4 +1101,3 @@ foo:	abs.s32 a, b;
         } }
     } ptx>string
 ] unit-test
-

@@ -34,4 +34,3 @@ f <history> "history" set
 
 [ f ] [ "history" get back>> empty? ] unit-test
 [ t ] [ "history" get forward>> empty? ] unit-test
-

@@ -3,7 +3,7 @@ IN: wordtimer.tests
 
 : testfn ( a b c d -- a+b c+d )
   + [ + ] dip ;
-    
+
 [ 3 7 ]
 [ reset-word-timer
   \ testfn [ reset ] [ add-timer ] bi

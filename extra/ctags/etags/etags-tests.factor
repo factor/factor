@@ -26,7 +26,7 @@ IN: ctags.etags.tests
   V{ if { "path" 1 } }
   { if { "path" 1 } }
   { { "path" V{ if { "path" 1 } } } } >hashtable
-  etag-vector = 
+  etag-vector =
 ] unit-test
 
 ! etag-pair 
@@ -56,7 +56,7 @@ IN: ctags.etags.tests
   17
   { "1234567890" "12345" } 2 lines>bytes =
 ] unit-test
-  
+
 ! etag
 [ t ]
 [

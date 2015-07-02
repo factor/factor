@@ -34,7 +34,7 @@ tools.test models.range ;
 [ 0 ] [ setup-range 30 over move-by -30 over move-by range-value ] unit-test
 
 ! should be able to move by a page of 10
-[ 10 ] [ 
-    setup-range 10 over set-range-page-value 
-    1 over move-by-page range-value 
+[ 10 ] [
+    setup-range 10 over set-range-page-value
+    1 over move-by-page range-value
 ] unit-test

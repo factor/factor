@@ -61,7 +61,7 @@ unit-test
 
 [ "[ \\ + ]" ] [ [ \ + ] unparse ] unit-test
 [ "[ \\ [ ]" ] [ [ \ [ ] unparse ] unit-test
-    
+
 [ t ] [
     100 \ dup <array> unparse-short
     "{" head?
@@ -273,7 +273,7 @@ M: class-see-layout class-see-layout ;
 [ [ + ] ] [ [ \ + (step-into-execute) ] (remove-breakpoints) ] unit-test
 
 [ [ (step-into-execute) ] ] [ [ (step-into-execute) ] (remove-breakpoints) ] unit-test
- 
+
 [ [ 2 2 + . ] ] [
     [ 2 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
@@ -306,7 +306,7 @@ INTERSECTION: intersection-see-test sequence number ;
 [ ] [ \ curry see ] unit-test
 
 [ "POSTPONE: [" ] [ \ [ unparse ] unit-test
-    
+
 TUPLE: started-out-hustlin' ;
 
 GENERIC: ended-up-ballin' ( a -- b )

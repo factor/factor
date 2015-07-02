@@ -37,4 +37,3 @@ IN: combinators.short-circuit.tests
 
 [ f ] [ row-|| ] unit-test
 [ f ] [ \ row-|| def>> call ] unit-test
-

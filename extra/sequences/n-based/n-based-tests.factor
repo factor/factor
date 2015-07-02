@@ -20,11 +20,11 @@ IN: sequences.n-based.tests
     } clone 1 <n-based-assoc> ; inline
 
 [ "December" t ]
-[ 12 months at* ] unit-test 
+[ 12 months at* ] unit-test
 [ f f ]
-[ 13 months at* ] unit-test 
+[ 13 months at* ] unit-test
 [ f f ]
-[ 0 months at* ] unit-test 
+[ 0 months at* ] unit-test
 
 [ 12 ] [ months assoc-size ] unit-test
 
@@ -60,5 +60,3 @@ IN: sequences.n-based.tests
 } ] [ "Smarch" 13 months [ set-at ] keep seq>> ] unit-test
 
 [ V{ } ] [ months [ clear-assoc ] keep seq>> ] unit-test
-
-

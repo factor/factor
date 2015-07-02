@@ -18,4 +18,3 @@ IN: flip-text.tests
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
     flip-text flip-text
 ] unit-test
-

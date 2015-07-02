@@ -207,4 +207,3 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
         "xmltest" html render
     ] with-string-writer
 ] unit-test
-

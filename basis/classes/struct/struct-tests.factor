@@ -40,7 +40,7 @@ STRUCT: struct-test-bar
 [ 1 2 3 t ] [
     1   2 3 t struct-test-foo <struct-boa>   struct-test-bar <struct-boa>
     {
-        [ w>> ] 
+        [ w>> ]
         [ foo>> x>> ]
         [ foo>> y>> ]
         [ foo>> z>> ]

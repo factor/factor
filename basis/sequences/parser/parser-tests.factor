@@ -21,7 +21,7 @@ IN: sequences.parser.tests
 [ "foo " "and bar" ]
 [
     "foo and bar" [
-        [ "and" take-until-sequence ] [ take-rest ] bi 
+        [ "and" take-until-sequence ] [ take-rest ] bi
     ] parse-sequence
 ] unit-test
 
@@ -92,7 +92,7 @@ IN: sequences.parser.tests
 [ "yes" ]
 [
     "yes1234f" <sequence-parser>
-    [ take-integer drop ] [ "yes" take-sequence ] bi 
+    [ take-integer drop ] [ "yes" take-sequence ] bi
 ] unit-test
 
 [ f ] [ "" <sequence-parser> 4 take-n ] unit-test

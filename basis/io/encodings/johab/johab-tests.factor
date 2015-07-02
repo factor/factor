@@ -33,4 +33,3 @@ IN: io.encodings.johab.tests
 
 [ t ] [ phrase-johab>unicode phrase-unicode = ] unit-test
 [ t ] [ phrase-unicode>johab phrase-johab = ] unit-test
-

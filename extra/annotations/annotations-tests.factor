@@ -2,7 +2,7 @@ USING: accessors annotations combinators.short-circuit
 io.pathnames kernel math sequences sorting tools.test ;
 IN: annotations.tests
 
-!NOTE testing toplevel form 
+!NOTE testing toplevel form
 
 : three ( -- x )
     !BROKEN english plz

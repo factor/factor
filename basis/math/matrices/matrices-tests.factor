@@ -195,7 +195,7 @@ IN: math.matrices.tests
     { { 1 }
        { 2 }
        { 3 } }
-    
+
     m.
 ] unit-test
 

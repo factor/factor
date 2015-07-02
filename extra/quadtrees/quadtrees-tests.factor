@@ -27,7 +27,7 @@ IN: quadtrees.tests
     T{ quadtree f T{ rect f {  0.0 -1.0 } { 1.0 1.0 } } {  0.0  -0.25 } "a" f f f f t }
     T{ quadtree f T{ rect f { -1.0  0.0 } { 1.0 1.0 } } f               f   f f f f t }
     T{ quadtree f T{ rect f {  0.0  0.0 } { 1.0 1.0 } } {  0.25  0.25 } "b" f f f f t }
-    f 
+    f
 } ] [
     unit-bounds <quadtree>
         "a" {  0.0  -0.25 } value>>key

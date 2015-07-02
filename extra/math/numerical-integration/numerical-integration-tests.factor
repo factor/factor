@@ -7,4 +7,3 @@ IN: math.numerical-integration.tests
 [ t ] [ 0 pi 2 / [ sin ] integrate-simpson 1 .000000001 ~abs ] unit-test
 [ t ] [ 0 pi [ sin ] integrate-simpson 2 .00000001 ~abs ] unit-test
 [ t ] [  0 pi 2 * [ sin ] integrate-simpson 0 .00000000001 ~abs ] unit-test
-

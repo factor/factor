@@ -14,4 +14,4 @@ IN: ui.baseline-alignment.tests
 [ 15 40 ] [ 20 10 40 10 combine-metrics ] unit-test
 [ 12 3 ] [ 0 12 3 9 combine-metrics ] unit-test
 
-[ t ] [ \ baseline \ cap-height [ order ] bi@ set= ] unit-test 
+[ t ] [ \ baseline \ cap-height [ order ] bi@ set= ] unit-test

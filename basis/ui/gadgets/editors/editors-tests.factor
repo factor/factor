@@ -66,4 +66,3 @@ IN: ui.gadgets.editors.tests
     dup pref-viewport-dim >>dim
     visible-lines
 ] unit-test
-

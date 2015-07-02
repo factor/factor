@@ -6,7 +6,7 @@ accessors arrays destructors kernel namespaces alien.data ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: opencl.tests
-    
+
 STRING: kernel-source
 __kernel void square(
     __global float* input,

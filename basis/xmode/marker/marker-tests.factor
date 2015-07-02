@@ -129,7 +129,7 @@ IN: xmode.marker.tests
 ] unit-test
 
 [
-    
+
 ] [
     f "font:75%/1.6em \"Lucida Grande\", \"Lucida Sans Unicode\", verdana, geneva, sans-serif;" "css" load-mode tokenize-line 2drop
 ] unit-test

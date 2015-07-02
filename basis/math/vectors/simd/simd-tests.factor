@@ -495,7 +495,7 @@ simd-classes [
         class random-int-vector :> src
         char-16 random-shift-vector :> perm
         { class char-16 } :> decl
-    
+
         src perm vshuffle
         src perm [ decl declare vshuffle ] compile-call
         =
@@ -534,7 +534,7 @@ TUPLE: inconsistent-vector-test bool branch ;
     [
         vector decl test-vector-tests-bool :> ( bool-none bool-any bool-all )
         vector decl test-vector-tests-branch :> ( branch-none branch-any branch-all )
-        
+
         bool-none branch-none ?inconsistent
         bool-any  branch-any  ?inconsistent
         bool-all  branch-all  ?inconsistent
@@ -693,7 +693,7 @@ STRUCT: simd-struct
 
    theta cos float-4-with :> cc
    theta sin float-4-with :> ss
-   
+
    axis cc v+ :> diagonal
 
    diagonal cc ss ; inline
@@ -707,14 +707,14 @@ STRUCT: simd-struct
 ! stack was aligned properly by the runtime
 
 : simd-spill-test-1 ( a b c -- v )
-    { float-4 float-4 float } declare 
+    { float-4 float-4 float } declare
     [ v+ ] dip sin v*n ;
 
 [ float-4{ 0 0 0 0 } ]
 [ float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-1 ] unit-test
 
 : simd-spill-test-2 ( a b d c -- v )
-    { float float-4 float-4 float } declare 
+    { float float-4 float-4 float } declare
     [ [ 3.0 + ] 2dip v+ ] dip sin v*n n*v ;
 
 [ float-4{ 0 0 0 0 } ]

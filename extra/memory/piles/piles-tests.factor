@@ -44,4 +44,3 @@ IN: memory.piles.tests
         dup 76 pile-alloc drop
     ] with-destructors
 ] [ not-enough-pile-space? ] must-fail-with
-

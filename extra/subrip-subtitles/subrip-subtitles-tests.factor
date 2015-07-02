@@ -55,6 +55,6 @@ At the left we can see..."""
 
 2
 00:00:15,000 --> 00:00:18,000  X1:53 X2:303 Y1:438 Y2:453
-<font color="cyan">At the left we can see...</font>""" 
+<font color="cyan">At the left we can see...</font>"""
     parse-srt-string
 ] unit-test

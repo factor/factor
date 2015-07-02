@@ -25,7 +25,7 @@ IN: io.servers
 [ 10 ] [
     ascii <threaded-server>
         10 >>max-connections
-    init-server semaphore>> count>> 
+    init-server semaphore>> count>>
 ] unit-test
 
 [ "Hello world." ] [

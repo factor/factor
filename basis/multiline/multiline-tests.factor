@@ -43,7 +43,7 @@ END
 ] unit-test
 
 [ "xyz \n" ] [ HEREDOC: END
-xyz 
+xyz
 END
 ] unit-test
 

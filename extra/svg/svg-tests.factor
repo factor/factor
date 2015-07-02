@@ -41,7 +41,7 @@ IN: svg.tests
     "rotate(30)" svg-transform>affine-transform
     { $[ 0.75 sqrt ] 0.5            }
     { -0.5           $[ 0.75 sqrt ] }
-    {  0.0           0.0            } <affine-transform> 
+    {  0.0           0.0            } <affine-transform>
     0.001 a~
 ] unit-test
 

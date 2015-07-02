@@ -328,11 +328,11 @@ MIXIN: empty-mixin
     [ t ] [
         20 [ random-boolean-op ] [ ] replicate-as dup .
         [ infer in>> length [ random-boolean ] replicate dup . ] keep
-        
+
         [ [ [ ] each ] dip call ] 2keep
-        
+
         [ [ boolean>class ] each ] dip [ boolean-op>class-op ] map call object class=
-        
+
         =
     ] unit-test
 ] times
@@ -357,7 +357,7 @@ TUPLE: xh < xb ;
 
 [ t ] [ { xa xb xc xd xe xf xg xh } sort-classes dup sort-classes = ] unit-test
 
-[ H{ { word word } } ] [ 
+[ H{ { word word } } ] [
     generic-class flatten-class
 ] unit-test
 
