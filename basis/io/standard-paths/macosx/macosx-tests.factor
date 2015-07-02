@@ -3,5 +3,5 @@
 USING: io.standard-paths io.standard-paths.macosx tools.test ;
 IN: io.standard-paths.macosx.tests
 
-[ "/System/Library/CoreServices/Finder.app" ]
+{ "/System/Library/CoreServices/Finder.app" }
 [ "com.apple.finder" find-native-bundle ] unit-test

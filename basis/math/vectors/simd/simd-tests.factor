@@ -13,23 +13,23 @@ SPECIALIZED-ARRAY: c:float
 IN: math.vectors.simd.tests
 
 ! Test type propagation
-[ V{ float } ] [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
+{ V{ float } } [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
 
-[ V{ float } ] [ [ { float-4 } declare norm ] final-classes ] unit-test
+{ V{ float } } [ [ { float-4 } declare norm ] final-classes ] unit-test
 
-[ V{ float-4 } ] [ [ { float-4 } declare normalize ] final-classes ] unit-test
+{ V{ float-4 } } [ [ { float-4 } declare normalize ] final-classes ] unit-test
 
-[ V{ float-4 } ] [ [ { float-4 float-4 } declare v+ ] final-classes ] unit-test
+{ V{ float-4 } } [ [ { float-4 float-4 } declare v+ ] final-classes ] unit-test
 
-[ V{ float } ] [ [ { float-4 } declare second ] final-classes ] unit-test
+{ V{ float } } [ [ { float-4 } declare second ] final-classes ] unit-test
 
-[ V{ int-4 } ] [ [ { int-4 int-4 } declare v+ ] final-classes ] unit-test
+{ V{ int-4 } } [ [ { int-4 int-4 } declare v+ ] final-classes ] unit-test
 
-[ t ] [ [ { int-4 } declare second ] final-classes first integer class<= ] unit-test
+{ t } [ [ { int-4 } declare second ] final-classes first integer class<= ] unit-test
 
-[ V{ longlong-2 } ] [ [ { longlong-2 longlong-2 } declare v+ ] final-classes ] unit-test
+{ V{ longlong-2 } } [ [ { longlong-2 longlong-2 } declare v+ ] final-classes ] unit-test
 
-[ V{ integer } ] [ [ { longlong-2 } declare second ] final-classes ] unit-test
+{ V{ integer } } [ [ { longlong-2 } declare second ] final-classes ] unit-test
 
 ! Test puns; only on x86
 cpu x86? [
@@ -178,38 +178,38 @@ TUPLE: simd-test-failure
 
 "== Checking -new constructors" print
 
-[ { } ] [
+{ { } } [
     simd-classes [ [ [ ] ] dip '[ _ new ] ] [ = ] check-optimizer
 ] unit-test
 
-[ { } ] [
+{ { } } [
     simd-classes [ '[ _ new ] compile-call [ zero? ] all? ] reject
 ] unit-test
 
 "== Checking -with constructors" print
 
-[ { } ] [
+{ { } } [
     with-ctors [
         [ 1000 random '[ _ ] ] dip '[ _ execute ]
     ] [ = ] check-optimizer
 ] unit-test
 
-[ 0xffffffff ] [ 0xffffffff uint-4-with first ] unit-test
+{ 0xffffffff } [ 0xffffffff uint-4-with first ] unit-test
 
-[ 0xffffffff ] [ 0xffffffff [ uint-4-with ] compile-call first ] unit-test
+{ 0xffffffff } [ 0xffffffff [ uint-4-with ] compile-call first ] unit-test
 
-[ 0xffffffff ] [ [ 0xffffffff uint-4-with ] compile-call first ] unit-test
+{ 0xffffffff } [ [ 0xffffffff uint-4-with ] compile-call first ] unit-test
 
 "== Checking -boa constructors" print
 
-[ { } ] [
+{ { } } [
     boa-ctors [
         [ stack-effect in>> length [ 1000 random ] [ ] replicate-as ] keep
         '[ _ execute ]
     ] [ = ] check-optimizer
 ] unit-test
 
-[ 0xffffffff ] [ 0xffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
+{ 0xffffffff } [ 0xffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
 
 "== Checking vector operations" print
 
@@ -319,14 +319,14 @@ simd-classes&reps [
 
 "== Checking vector blend" print
 
-[ char-16{ 0 1 22 33 4 5 6 77 8 99 110 121 12 143 14 15 } ]
+{ char-16{ 0 1 22 33 4 5 6 77 8 99 110 121 12 143 14 15 } }
 [
     char-16{ t  t  f  f  t  t  t  f  t  f   f   f   t   f   t   t }
     char-16{ 0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15 }
     char-16{ 0 11 22 33 44 55 66 77 88 99 110 121 132 143 154 165 } v?
 ] unit-test
 
-[ char-16{ 0 1 22 33 4 5 6 77 8 99 110 121 12 143 14 15 } ]
+{ char-16{ 0 1 22 33 4 5 6 77 8 99 110 121 12 143 14 15 } }
 [
     char-16{ t  t  f  f  t  t  t  f  t  f   f   f   t   f   t   t }
     char-16{ 0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15 }
@@ -334,19 +334,19 @@ simd-classes&reps [
     [ { char-16 char-16 char-16 } declare v? ] compile-call
 ] unit-test
 
-[ int-4{ 1 22 33 4 } ]
+{ int-4{ 1 22 33 4 } }
 [ int-4{ t f f t } int-4{ 1 2 3 4 } int-4{ 11 22 33 44 } v? ] unit-test
 
-[ int-4{ 1 22 33 4 } ]
+{ int-4{ 1 22 33 4 } }
 [
     int-4{ t f f t } int-4{ 1 2 3 4 } int-4{ 11 22 33 44 }
     [ { int-4 int-4 int-4 } declare v? ] compile-call
 ] unit-test
 
-[ float-4{ 1.0 22.0 33.0 4.0 } ]
+{ float-4{ 1.0 22.0 33.0 4.0 } }
 [ float-4{ t f f t } float-4{ 1.0 2.0 3.0 4.0 } float-4{ 11.0 22.0 33.0 44.0 } v? ] unit-test
 
-[ float-4{ 1.0 22.0 33.0 4.0 } ]
+{ float-4{ 1.0 22.0 33.0 4.0 } }
 [
     float-4{ t f f t } float-4{ 1.0 2.0 3.0 4.0 } float-4{ 11.0 22.0 33.0 44.0 }
     [ { float-4 float-4 float-4 } declare v? ] compile-call
@@ -354,45 +354,45 @@ simd-classes&reps [
 
 "== Checking shifts and permutations" print
 
-[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+{ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 hlshift ] unit-test
 
-[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+{ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hlshift ] compile-call ] unit-test
 
-[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+{ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 >bignum hlshift ] compile-call ] unit-test
 
-[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+{ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hlshift ] compile-call ] unit-test
 
-[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+{ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 hrshift ] unit-test
 
-[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+{ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hrshift ] compile-call ] unit-test
 
-[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+{ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 >bignum hrshift ] compile-call ] unit-test
 
-[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+{ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } }
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hrshift ] compile-call ] unit-test
 
-[ int-4{ 4 8 12 16 } ]
+{ int-4{ 4 8 12 16 } }
 [ int-4{ 1 2 3 4 } 2 vlshift ] unit-test
 
-[ int-4{ 4 8 12 16 } ]
+{ int-4{ 4 8 12 16 } }
 [ int-4{ 1 2 3 4 } 2 [ { int-4 fixnum } declare vlshift ] compile-call ] unit-test
 
-[ int-4{ 4 8 12 16 } ]
+{ int-4{ 4 8 12 16 } }
 [ int-4{ 1 2 3 4 } 2 >bignum [ { int-4 bignum } declare vlshift ] compile-call ] unit-test
 
 ! Invalid inputs should not cause the compiler to throw errors
-[ ] [
+{ } [
     [ [ { int-4 } declare t hrshift ] ( a -- b ) define-temp drop ] with-compilation-unit
 ] unit-test
 
-[ ] [
+{ } [
     [ [ { int-4 } declare { 3 2 1 } vshuffle ] ( a -- b ) define-temp drop ] with-compilation-unit
 ] unit-test
 
@@ -540,25 +540,25 @@ TUPLE: inconsistent-vector-test bool branch ;
         bool-all  branch-all  ?inconsistent
     ] call( -- none? any? all? ) ;
 
-[ f t t ]
+{ f t t }
 [ float-4{ t t t t } { float-4 } test-vector-tests ] unit-test
-[ f t f ]
+{ f t f }
 [ float-4{ f t t t } { float-4 } test-vector-tests ] unit-test
-[ t f f ]
+{ t f f }
 [ float-4{ f f f f } { float-4 } test-vector-tests ] unit-test
 
-[ f t t ]
+{ f t t }
 [ double-2{ t t } { double-2 } test-vector-tests ] unit-test
-[ f t f ]
+{ f t f }
 [ double-2{ f t } { double-2 } test-vector-tests ] unit-test
-[ t f f ]
+{ t f f }
 [ double-2{ f f } { double-2 } test-vector-tests ] unit-test
 
-[ f t t ]
+{ f t t }
 [ int-4{ t t t t } { int-4 } test-vector-tests ] unit-test
-[ f t f ]
+{ f t f }
 [ int-4{ f t t t } { int-4 } test-vector-tests ] unit-test
-[ t f f ]
+{ t f f }
 [ int-4{ f f f f } { int-4 } test-vector-tests ] unit-test
 
 "== Checking element access" print
@@ -568,44 +568,44 @@ TUPLE: inconsistent-vector-test bool branch ;
     [ length iota dup [ >bignum ] map append ] keep
     '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
 
-[ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
-[ { } ] [ int-4{ 0x7fffffff 3 4 -8 } test-accesses ] unit-test
-[ { } ] [ uint-4{ 0xffffffff 2 3 4 } test-accesses ] unit-test
+{ { } } [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
+{ { } } [ int-4{ 0x7fffffff 3 4 -8 } test-accesses ] unit-test
+{ { } } [ uint-4{ 0xffffffff 2 3 4 } test-accesses ] unit-test
 
-[ 0x7fffffff ] [ int-4{ 0x7fffffff 3 4 -8 } first ] unit-test
-[ -8 ] [ int-4{ 0x7fffffff 3 4 -8 } last ] unit-test
-[ 0xffffffff ] [ uint-4{ 0xffffffff 2 3 4 } first ] unit-test
+{ 0x7fffffff } [ int-4{ 0x7fffffff 3 4 -8 } first ] unit-test
+{ -8 } [ int-4{ 0x7fffffff 3 4 -8 } last ] unit-test
+{ 0xffffffff } [ uint-4{ 0xffffffff 2 3 4 } first ] unit-test
 
-[ { } ] [ double-2{ 1.0 2.0 } test-accesses ] unit-test
-[ { } ] [ longlong-2{ 1 2 } test-accesses ] unit-test
-[ { } ] [ ulonglong-2{ 1 2 } test-accesses ] unit-test
+{ { } } [ double-2{ 1.0 2.0 } test-accesses ] unit-test
+{ { } } [ longlong-2{ 1 2 } test-accesses ] unit-test
+{ { } } [ ulonglong-2{ 1 2 } test-accesses ] unit-test
 
 "== Checking broadcast" print
 : test-broadcast ( seq -- failures )
     [ length iota >array ] keep
     '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ;
 
-[ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
-[ { } ] [ int-4{ 0x7fffffff 3 4 -8 } test-broadcast ] unit-test
-[ { } ] [ uint-4{ 0xffffffff 2 3 4 } test-broadcast ] unit-test
+{ { } } [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
+{ { } } [ int-4{ 0x7fffffff 3 4 -8 } test-broadcast ] unit-test
+{ { } } [ uint-4{ 0xffffffff 2 3 4 } test-broadcast ] unit-test
 
-[ { } ] [ double-2{ 1.0 2.0 } test-broadcast ] unit-test
-[ { } ] [ longlong-2{ 1 2 } test-broadcast ] unit-test
-[ { } ] [ ulonglong-2{ 1 2 } test-broadcast ] unit-test
+{ { } } [ double-2{ 1.0 2.0 } test-broadcast ] unit-test
+{ { } } [ longlong-2{ 1 2 } test-broadcast ] unit-test
+{ { } } [ ulonglong-2{ 1 2 } test-broadcast ] unit-test
 
 ! Make sure we use the fallback in the correct situations
-[ int-4{ 3 3 3 3 } ] [ int-4{ 12 34 3 17 } 2 [ { int-4 fixnum } declare vbroadcast ] compile-call ] unit-test
+{ int-4{ 3 3 3 3 } } [ int-4{ 12 34 3 17 } 2 [ { int-4 fixnum } declare vbroadcast ] compile-call ] unit-test
 
 "== Checking alien operations" print
 
-[ float-4{ 1 2 3 4 } ] [
+{ float-4{ 1 2 3 4 } } [
     [
         float-4{ 1 2 3 4 }
         underlying>> 0 float-4-rep alien-vector
     ] compile-call float-4 boa
 ] unit-test
 
-[ B{ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 } ] [
+{ B{ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 } } [
     16 [ 1 ] B{ } replicate-as 16 <byte-array>
     [
         0 [
@@ -615,7 +615,7 @@ TUPLE: inconsistent-vector-test bool branch ;
     ] keep
 ] unit-test
 
-[ float-array{ 1 2 3 4 } ] [
+{ float-array{ 1 2 3 4 } } [
     [
         float-array{ 1 2 3 4 } underlying>>
         float-array{ 4 3 2 1 } clone
@@ -629,14 +629,14 @@ STRUCT: simd-struct
 { z double-2 }
 { w int-4 } ;
 
-[ t ] [ [ simd-struct <struct> ] compile-call >c-ptr [ 0 = ] all? ] unit-test
+{ t } [ [ simd-struct <struct> ] compile-call >c-ptr [ 0 = ] all? ] unit-test
 
-[
+{
     float-4{ 1 2 3 4 }
     longlong-2{ 2 1 }
     double-2{ 4 3 }
     int-4{ 1 2 3 4 }
-] [
+} [
     simd-struct <struct>
     float-4{ 1 2 3 4 } >>x
     longlong-2{ 2 1 } >>y
@@ -645,12 +645,12 @@ STRUCT: simd-struct
     { [ x>> ] [ y>> ] [ z>> ] [ w>> ] } cleave
 ] unit-test
 
-[
+{
     float-4{ 1 2 3 4 }
     longlong-2{ 2 1 }
     double-2{ 4 3 }
     int-4{ 1 2 3 4 }
-] [
+} [
     [
         simd-struct <struct>
         float-4{ 1 2 3 4 } >>x
@@ -663,25 +663,25 @@ STRUCT: simd-struct
 
 "== Misc tests" print
 
-[ ] [ char-16 new 1array stack. ] unit-test
+{ } [ char-16 new 1array stack. ] unit-test
 
 ! Test some sequence protocol stuff
-[ t ] [ 4 double-4{ 1 2 3 4 } new-sequence double-4? ] unit-test
-[ double-4{ 2 3 4 5 } ] [ double-4{ 1 2 3 4 } [ 1 + ] map ] unit-test
+{ t } [ 4 double-4{ 1 2 3 4 } new-sequence double-4? ] unit-test
+{ double-4{ 2 3 4 5 } } [ double-4{ 1 2 3 4 } [ 1 + ] map ] unit-test
 
 ! Test cross product
-[ float-4{ 0.0 0.0 1.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
-[ float-4{ 0.0 0.0 1.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
-[ float-4{ 0.0 -1.0 0.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
-[ float-4{ 0.0 -1.0 0.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
+{ float-4{ 0.0 0.0 1.0 0.0 } } [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+{ float-4{ 0.0 0.0 1.0 0.0 } } [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
+{ float-4{ 0.0 -1.0 0.0 0.0 } } [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
+{ float-4{ 0.0 -1.0 0.0 0.0 } } [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
 
-[ double-4{ 0.0 0.0 1.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
-[ double-4{ 0.0 0.0 1.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
-[ double-4{ 0.0 -1.0 0.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
-[ double-4{ 0.0 -1.0 0.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
+{ double-4{ 0.0 0.0 1.0 0.0 } } [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+{ double-4{ 0.0 0.0 1.0 0.0 } } [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
+{ double-4{ 0.0 -1.0 0.0 0.0 } } [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
+{ double-4{ 0.0 -1.0 0.0 0.0 } } [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
 
 ! CSSA bug
-[ 4000000 ] [
+{ 4000000 } [
     int-4{ 1000 1000 1000 1000 }
     [ { int-4 } declare dup [ * ] [ + ] 2map-reduce ] compile-call
 ] unit-test
@@ -698,7 +698,7 @@ STRUCT: simd-struct
 
    diagonal cc ss ; inline
 
-[ t ] [
+{ t } [
     float-4{ 1.0 0.0 1.0 0.0 } pi [ broken 3array ]
     [ compile-call ] [ call ] 3bi =
 ] unit-test
@@ -710,14 +710,14 @@ STRUCT: simd-struct
     { float-4 float-4 float } declare
     [ v+ ] dip sin v*n ;
 
-[ float-4{ 0 0 0 0 } ]
+{ float-4{ 0 0 0 0 } }
 [ float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-1 ] unit-test
 
 : simd-spill-test-2 ( a b d c -- v )
     { float float-4 float-4 float } declare
     [ [ 3.0 + ] 2dip v+ ] dip sin v*n n*v ;
 
-[ float-4{ 0 0 0 0 } ]
+{ float-4{ 0 0 0 0 } }
 [ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-2 ] unit-test
 
 : callback-1 ( -- c )
@@ -731,7 +731,7 @@ STRUCT: simd-struct
     [ [ 3.0 + ] 2dip v+ ] dip sin v*n n*v
     10 5 100 50 500 callback-1 indirect-1 665 assert= ;
 
-[ float-4{ 0 0 0 0 } ]
+{ float-4{ 0 0 0 0 } }
 [ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-3 ] unit-test
 
 ! Stack allocation of SIMD values -- make sure that everything is
@@ -743,7 +743,7 @@ STRUCT: simd-struct
         [ float-4{ 1 2 3 4 } swap 0 float-4 c:set-alien-value ] bi*
     ] with-out-parameters ;
 
-[ 123 float-4{ 1 2 3 4 } ] [ simd-stack-test ] unit-test
+{ 123 float-4{ 1 2 3 4 } } [ simd-stack-test ] unit-test
 
 ! Stack allocation + spilling
 
@@ -755,7 +755,7 @@ STRUCT: simd-struct
         >float (simd-stack-spill-test) float-4-with swap cos v*n
     ] with-out-parameters ;
 
-[ ] [
+{ } [
     1.047197551196598 simd-stack-spill-test
     [ float-4{ 8.5 8.5 8.5 8.5 } approx= t assert= ]
     [ 123 assert= ]

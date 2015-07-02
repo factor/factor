@@ -26,18 +26,18 @@ IN: math.primes.tests
 
 { { 2 } } [ 1.5 2.5 primes-between >array ] unit-test
 
-[ 2 ] [ 1 next-prime ] unit-test
-[ 3 ] [ 2 next-prime ] unit-test
-[ 5 ] [ 3 next-prime ] unit-test
-[ 101 ] [ 100 next-prime ] unit-test
-[ t ] [ 2135623355842621559 miller-rabin ] unit-test
-[ 100000000000031 ] [ 100000000000000 next-prime ] unit-test
+{ 2 } [ 1 next-prime ] unit-test
+{ 3 } [ 2 next-prime ] unit-test
+{ 5 } [ 3 next-prime ] unit-test
+{ 101 } [ 100 next-prime ] unit-test
+{ t } [ 2135623355842621559 miller-rabin ] unit-test
+{ 100000000000031 } [ 100000000000000 next-prime ] unit-test
 
-[ 49 ] [ 50 random-prime log2 ] unit-test
+{ 49 } [ 50 random-prime log2 ] unit-test
 
-[ t ] [ 5000077 dup find-relative-prime coprime? ] unit-test
+{ t } [ 5000077 dup find-relative-prime coprime? ] unit-test
 
-[ 5 t { 14 14 14 14 14 } ]
+{ 5 t { 14 14 14 14 14 } }
 [ 5 15 unique-primes [ length ] [ [ prime? ] all? ] [ [ log2 ] map ] tri ] unit-test
 
 { t t } [ 11 dup >bignum [ prime? ] bi@ ] unit-test

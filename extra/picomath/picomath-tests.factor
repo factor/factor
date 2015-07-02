@@ -6,7 +6,7 @@ sequences tools.test ;
 
 IN: picomath
 
-[ t ] [
+{ t } [
     {
         { -3  -0.999977909503 }
         { -1  -0.842700792950 }
@@ -17,7 +17,7 @@ IN: picomath
     supremum 1e-6 <
 ] unit-test
 
-[ t ] [
+{ t } [
     {
         { -1               -0.632120558828558 }
         { 0.0              0.0 }
@@ -28,7 +28,7 @@ IN: picomath
     supremum 1e-6 <
 ] unit-test
 
-[ t ] [
+{ t } [
     {
         { -3  0.00134989803163 }
         { -1  0.158655253931 }
@@ -41,7 +41,7 @@ IN: picomath
 
 : factorial ( n -- n! ) [ 1 ] [ [1,b] 1 [ * ] reduce ] if-zero ;
 
-[ t ] [
+{ t } [
     { 0 1 10 100 1000 10000 } [
         [ factorial log ] [ log-factorial ] bi - abs
     ] map supremum 1e-6 <
@@ -50,7 +50,7 @@ IN: picomath
 : relative-error ( approx value -- relative-error )
     [ - abs ] keep / ;
 
-[ t ] [
+{ t } [
     {
         { 1e-20 1e+20 }
         { 2.19824158876e-16 4.5490905327e+15 }   ! 0.99*DBL_EPSILON
@@ -67,7 +67,7 @@ IN: picomath
     supremum 1e-6 <
 ] unit-test
 
-[ t ] [
+{ t } [
     {
         { 1e-12 27.6310211159 }
         { 0.9999 5.77297915613e-05 }

@@ -6,16 +6,16 @@ combinators vocabs.parser grouping vocabs.files vocabs.refresh ;
 IN: vocabs.loader.tests
 
 ! This vocab should not exist, but just in case...
-[ ] [
+{ } [
     [
         "vocabs.loader.test" forget-vocab
     ] with-compilation-unit
 ] unit-test
 
-[ T{ vocab-link f "vocabs.loader.test" } ]
+{ T{ vocab-link f "vocabs.loader.test" } }
 [ "vocabs.loader.test" >vocab-link ] unit-test
 
-[ t ]
+{ t }
 [ "kernel" >vocab-link "kernel" lookup-vocab = ] unit-test
 
 IN: vocabs.loader.test.2
@@ -26,7 +26,7 @@ MAIN: hello
 
 IN: vocabs.loader.tests
 
-[ ] [
+{ } [
     "vocabs.loader.test.2" run
     "vocabs.loader.test.2" lookup-vocab run
     "vocabs.loader.test.2" <vocab-link> run
@@ -52,7 +52,7 @@ IN: vocabs.loader.tests
     ] unit-test
 ] times
 
-[ 2 ] [ "count-me" get-global ] unit-test
+{ 2 } [ "count-me" get-global ] unit-test
 
 [
     "IN: vocabs.loader.test.a v-l-t-a-hello"
@@ -63,15 +63,15 @@ IN: vocabs.loader.tests
 
 0 "count-me" set-global
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.b" forget-vocab
     ] with-compilation-unit
 ] unit-test
 
-[ f ] [ "vocabs.loader.test.b" vocab-files empty? ] unit-test
+{ f } [ "vocabs.loader.test.b" vocab-files empty? ] unit-test
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.b" vocab-files
         [ forget-source ] each
@@ -80,47 +80,47 @@ IN: vocabs.loader.tests
 
 [ "vocabs.loader.test.b" require ] must-fail
 
-[ 1 ] [ "count-me" get-global ] unit-test
+{ 1 } [ "count-me" get-global ] unit-test
 
-[ ] [
+{ } [
     [
         "bob" "vocabs.loader.test.b" create-word [ ] define
     ] with-compilation-unit
 ] unit-test
 
-[ ] [ "vocabs.loader.test.b" refresh ] unit-test
+{ } [ "vocabs.loader.test.b" refresh ] unit-test
 
-[ 2 ] [ "count-me" get-global ] unit-test
+{ 2 } [ "count-me" get-global ] unit-test
 
-[ f ] [ "fred" "vocabs.loader.test.b" lookup-word undefined-word? ] unit-test
+{ f } [ "fred" "vocabs.loader.test.b" lookup-word undefined-word? ] unit-test
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.b" vocab-files
         [ forget-source ] each
     ] with-compilation-unit
 ] unit-test
 
-[ ] [ "vocabs.loader.test.b" changed-vocab ] unit-test
+{ } [ "vocabs.loader.test.b" changed-vocab ] unit-test
 
-[ ] [ "vocabs.loader.test.b" refresh ] unit-test
+{ } [ "vocabs.loader.test.b" refresh ] unit-test
 
-[ 3 ] [ "count-me" get-global ] unit-test
+{ 3 } [ "count-me" get-global ] unit-test
 
-[ { "resource:core/kernel/kernel.factor" 1 } ]
+{ { "resource:core/kernel/kernel.factor" 1 } }
 [ "kernel" <vocab-link> where ] unit-test
 
-[ { "resource:core/kernel/kernel.factor" 1 } ]
+{ { "resource:core/kernel/kernel.factor" 1 } }
 [ "kernel" lookup-vocab where ] unit-test
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.c" forget-vocab
         "vocabs.loader.test.d" forget-vocab
     ] with-compilation-unit
 ] unit-test
 
-[ +done+ ] [
+{ +done+ } [
     [ "vocabs.loader.test.d" require ] [ :1 ] recover
     "vocabs.loader.test.d" lookup-vocab source-loaded?>>
 ] unit-test
@@ -135,7 +135,7 @@ IN: vocabs.loader.tests
 
 forget-junk
 
-[ { } ] [
+{ { } } [
     "IN: xabbabbja" eval( -- ) "xabbabbja" vocab-files
 ] unit-test
 
@@ -143,7 +143,7 @@ forget-junk
 
 forget-junk
 
-[ ] [ [ "vocabs.loader.test.e" forget-vocab ] with-compilation-unit ] unit-test
+{ } [ [ "vocabs.loader.test.e" forget-vocab ] with-compilation-unit ] unit-test
 
 0 "vocabs.loader.test.g" set-global
 
@@ -152,16 +152,16 @@ forget-junk
     "vocabs.loader.test.g" forget-vocab
 ] with-compilation-unit
 
-[ ] [ "vocabs.loader.test.g" require ] unit-test
+{ } [ "vocabs.loader.test.g" require ] unit-test
 
-[ 1 ] [ "vocabs.loader.test.g" get-global ] unit-test
+{ 1 } [ "vocabs.loader.test.g" get-global ] unit-test
 
 [
     "vocabs.loader.test.h" forget-vocab
     "vocabs.loader.test.i" forget-vocab
 ] with-compilation-unit
 
-[ ] [ "vocabs.loader.test.h" require ] unit-test
+{ } [ "vocabs.loader.test.h" require ] unit-test
 
 
 [
@@ -169,25 +169,25 @@ forget-junk
     "vocabs.loader.test.k" forget-vocab
 ] with-compilation-unit
 
-[ ] [ [ "vocabs.loader.test.j" require ] [ drop :1 ] recover ] unit-test
+{ } [ [ "vocabs.loader.test.j" require ] [ drop :1 ] recover ] unit-test
 
-[ ] [ "vocabs.loader.test.m" require ] unit-test
-[ f ] [ "vocabs.loader.test.n" lookup-vocab ] unit-test
-[ ] [ "vocabs.loader.test.o" require ] unit-test
-[ t ] [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
+{ } [ "vocabs.loader.test.m" require ] unit-test
+{ f } [ "vocabs.loader.test.n" lookup-vocab ] unit-test
+{ } [ "vocabs.loader.test.o" require ] unit-test
+{ t } [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
 
 [
     "mno" [ "vocabs.loader.test." swap suffix forget-vocab ] each
 ] with-compilation-unit
 
-[ ] [ "vocabs.loader.test.o" require ] unit-test
-[ f ] [ "vocabs.loader.test.n" lookup-vocab ] unit-test
-[ ] [ "vocabs.loader.test.m" require ] unit-test
-[ t ] [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
+{ } [ "vocabs.loader.test.o" require ] unit-test
+{ f } [ "vocabs.loader.test.n" lookup-vocab ] unit-test
+{ } [ "vocabs.loader.test.m" require ] unit-test
+{ t } [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
 
-[ f ] [ "vocabs.loader.test.p" lookup-vocab ] unit-test
-[ ] [ "vocabs.loader.test.p.private" require ] unit-test
-[ { "foo" } ] [ "vocabs.loader.test.p" vocab-words [ name>> ] map ] unit-test
+{ f } [ "vocabs.loader.test.p" lookup-vocab ] unit-test
+{ } [ "vocabs.loader.test.p.private" require ] unit-test
+{ { "foo" } } [ "vocabs.loader.test.p" vocab-words [ name>> ] map ] unit-test
 
 [
     "mnop" [ "vocabs.loader.test." swap suffix forget-vocab ] each

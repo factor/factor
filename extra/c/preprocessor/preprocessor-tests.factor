@@ -7,7 +7,7 @@ IN: c.preprocessor.tests
 [ "vocab:c/tests/test1/test1.c" start-preprocess-file ]
 [ include-nested-too-deeply? ] must-fail-with
 
-[ "yo\n\n\n\nyo4\n" ]
+{ "yo\n\n\n\nyo4\n" }
 [ "vocab:c/tests/test2/test2.c" start-preprocess-file nip ] unit-test
 
 (*
@@ -15,7 +15,7 @@ IN: c.preprocessor.tests
 [ "\"BOO\"" = ] must-fail-with
 *)
 
-[ V{ "\"omg\"" "\"lol\"" } ]
+{ V{ "\"omg\"" "\"lol\"" } }
 [ "vocab:c/tests/test4/test4.c" start-preprocess-file drop warnings>> ] unit-test
 
 

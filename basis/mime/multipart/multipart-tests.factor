@@ -16,19 +16,19 @@ CONSTANT: upload1 "------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Dispositi
    "mime" "test" make-unique-file ascii
    [ set-file-contents ] [ <file-reader> ] 2bi ;
 
-[ ] [ mime-test-stream [ ] with-input-stream ] unit-test
+{ } [ mime-test-stream [ ] with-input-stream ] unit-test
 
-[ t ] [
+{ t } [
     mime-test-stream [ separator1 parse-multipart ] with-input-stream
     "file1" swap key?
 ] unit-test
 
-[ t ] [
+{ t } [
     mime-test-stream [ separator1 parse-multipart ] with-input-stream
     "file1" swap key?
 ] unit-test
 
-[ t ] [
+{ t } [
     mime-test-stream [ separator1 parse-multipart ] with-input-stream
     "file1" of filename>> "up.txt" =
 ] unit-test
@@ -36,14 +36,14 @@ CONSTANT: upload1 "------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Dispositi
 CONSTANT: separator2 "768de80194d942619886d23f1337aa15"
 CONSTANT: upload2 "--768de80194d942619886d23f1337aa15\r\nContent-Disposition: form-data; name=\"text\"; filename=\"upload.txt\"\r\nContent-Type: text/plain\r\n\r\nhello\r\n--768de80194d942619886d23f1337aa15--\r\n"
 
-[
+{
     "upload.txt"
     H{
         { "content-disposition"
           "form-data; name=\"text\"; filename=\"upload.txt\"" }
         { "content-type" "text/plain" }
     }
-] [
+} [
     upload2 [ separator2 parse-multipart ] with-string-reader
     "text" of [ filename>> ] [ headers>> ] bi
 ] unit-test
@@ -51,9 +51,9 @@ CONSTANT: upload2 "--768de80194d942619886d23f1337aa15\r\nContent-Disposition: fo
 CONSTANT: separator3 "3f116598c7f0431b9f98148ed235c822"
 CONSTANT: upload3 "--3f116598c7f0431b9f98148ed235c822\r\nContent-Disposition: form-data; name=\"text\"; filename=\"upload.txt\"\r\n\r\nhello\r\n--3f116598c7f0431b9f98148ed235c822\r\nContent-Disposition: form-data; name=\"text2\"; filename=\"upload.txt\"\r\n\r\nhello\r\n--3f116598c7f0431b9f98148ed235c822--\r\n"
 
-[
+{
     { "text" "text2" }
-] [
+} [
     upload3 [ separator3 parse-multipart ] with-string-reader
     keys natural-sort
 ] unit-test
@@ -73,7 +73,7 @@ SYMBOL: mime-test-server
 : a-stream ( n -- stream )
     CHAR: a <string> <string-reader> ;
 
-[ ] [
+{ } [
     [
     ] with-test-server
 ] unit-test

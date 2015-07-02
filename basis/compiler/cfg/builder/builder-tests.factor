@@ -167,42 +167,42 @@ IN: compiler.cfg.builder.tests
     { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-builder
 ] each
 
-[ t ] [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
+{ t } [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
 
-[ f ] [ [ swap swap ] [ ##replace? ] contains-insn? ] unit-test
+{ f } [ [ swap swap ] [ ##replace? ] contains-insn? ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum byte-array fixnum } declare set-alien-unsigned-1 ]
     [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum byte-array fixnum } declare [ dup * dup * ] 2dip set-alien-unsigned-1 ]
     [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { byte-array fixnum } declare set-alien-unsigned-1 ]
     [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ t t ] [
+{ t t } [
     [ { byte-array fixnum } declare alien-cell ]
     [ [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn? ]
     [ [ ##box-alien? ] contains-insn? ]
     bi
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { byte-array integer } declare alien-cell ]
     [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ 1000 [ ] times ] [ ##peek? ] contains-insn?
 ] unit-test
 
-[ f t ] [
+{ f t } [
     [ { fixnum alien } declare <displaced-alien> 0 alien-cell ]
     [ [ ##unbox-any-c-ptr? ] contains-insn? ]
     [ [ ##unbox-alien? ] contains-insn? ] bi
@@ -225,13 +225,13 @@ IN: compiler.cfg.builder.tests
 ] when
 
 ! Regression. Make sure everything is inlined correctly
-[ f ] [ M\ hashtable set-at [ { [ ##call? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test
+{ f } [ M\ hashtable set-at [ { [ ##call? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test
 
 ! Regression. Make sure branch splitting works.
-[ 2 ] [ [ 1 2 ? ] [ ##return? ] count-insns ] unit-test
+{ 2 } [ [ 1 2 ? ] [ ##return? ] count-insns ] unit-test
 
 ! Make sure fast union predicates don't have conditionals.
-[ f ] [
+{ f } [
     [ tag 1 swap fixnum-shift-fast ]
     [ ##compare-integer-imm-branch? ] contains-insn?
 ] unit-test

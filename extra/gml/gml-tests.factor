@@ -1,13 +1,13 @@
 IN: gml.tests
 USING: accessors combinators gml tools.test kernel sequences euler.b-rep ;
 
-[ ] [ [ "vocab:gml/test-core.gml" run-gml-file ] make-gml 2drop ] unit-test
+{ } [ [ "vocab:gml/test-core.gml" run-gml-file ] make-gml 2drop ] unit-test
 
-[ ] [ [ "vocab:gml/test-coremath.gml" run-gml-file ] make-gml 2drop ] unit-test
+{ } [ [ "vocab:gml/test-coremath.gml" run-gml-file ] make-gml 2drop ] unit-test
 
-[ ] [ [ "vocab:gml/test-geometry.gml" run-gml-file ] make-gml 2drop ] unit-test
+{ } [ [ "vocab:gml/test-geometry.gml" run-gml-file ] make-gml 2drop ] unit-test
 
-[ ] [
+{ } [
     [ "vocab:gml/examples/cube.gml" run-gml-file ] make-gml nip
     {
         [ check-b-rep ]
@@ -18,7 +18,7 @@ USING: accessors combinators gml tools.test kernel sequences euler.b-rep ;
     } cleave
 ] unit-test
 
-[ ] [
+{ } [
     [ "vocab:gml/examples/torus.gml" run-gml-file ] make-gml nip
     {
         [ check-b-rep ]
@@ -30,7 +30,7 @@ USING: accessors combinators gml tools.test kernel sequences euler.b-rep ;
     } cleave
 ] unit-test
 
-[ ] [
+{ } [
     [ "vocab:gml/examples/mobius.gml" run-gml-file ] make-gml nip
     {
         [ check-b-rep ]

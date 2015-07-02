@@ -4,7 +4,7 @@ USING: calendar io.encodings.utf8 io.files robots tools.test
 urls ;
 IN: robots.tests
 
-[
+{
     { "http://www.chiplist.com/sitemap.txt" }
     {
         T{ rules
@@ -332,4 +332,4 @@ IN: robots.tests
             { unknowns H{ } }
         }
     }
-] [ "vocab:robots/robots.txt" utf8 file-contents parse-robots.txt ] unit-test
+} [ "vocab:robots/robots.txt" utf8 file-contents parse-robots.txt ] unit-test

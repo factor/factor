@@ -36,7 +36,7 @@ ENUM: instrument_t < ushort trombone trumpet ;
 
 ENUM: colores { rojo red } { verde green } { azul blue } { colorado rojo } ;
 
-[ { 0 3 4 0 } ] [ { rojo verde azul colorado } [ enum>number ] map ] unit-test
+{ { 0 3 4 0 } } [ { rojo verde azul colorado } [ enum>number ] map ] unit-test
 
 SYMBOLS: couleurs rouge vert bleu jaune azure ;
 
@@ -48,4 +48,4 @@ SYMBOLS: couleurs rouge vert bleu jaune azure ;
     { azure bleu }
 } define-enum >>
 
-[ { 0 3 4 14 4 } ] [ { rouge vert bleu jaune azure } [ enum>number ] map ] unit-test
+{ { 0 3 4 14 4 } } [ { rouge vert bleu jaune azure } [ enum>number ] map ] unit-test
