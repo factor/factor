@@ -4,4 +4,3 @@
 USING: pdf tools.test ;
 
 IN: pdf.tests
-

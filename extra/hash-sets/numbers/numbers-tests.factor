@@ -17,4 +17,3 @@ IN: hash-sets.numbers.tests
 ] unit-test
 
 [ { 1.5 } ] [ NHS{ 1.5 } members ] unit-test
-

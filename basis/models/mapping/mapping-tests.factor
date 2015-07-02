@@ -18,7 +18,7 @@ IN: models.mapping.tests
 ] unit-test
 
 [ ] [
-    H{ { "one" 3 } { "two" 4 } } 
+    H{ { "one" 3 } { "two" 4 } }
     "m" get set-model
 ] unit-test
 

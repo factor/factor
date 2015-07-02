@@ -10,7 +10,7 @@ IN: regexp.negation.tests
             { 0 H{ { CHAR: a 1 } { T{ not-class f CHAR: a } -1 } } }
             { 1 H{ { t -1 } } }
             { -1 H{ { t -1 } } }
-        } } 
+        } }
         { start-state 0 }
         { final-states HS{ 0 -1 } }
     }
@@ -19,7 +19,7 @@ IN: regexp.negation.tests
     T{ transition-table
         { transitions H{
             { 0 H{ { CHAR: a 1 } } }
-            { 1 H{ } } 
+            { 1 H{ } }
         } }
         { start-state 0 }
         { final-states HS{ 1 } }

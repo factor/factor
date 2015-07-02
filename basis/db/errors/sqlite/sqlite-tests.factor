@@ -15,7 +15,7 @@ sqlite-error-test-db-path <sqlite-db> [
     ] [
         { [ sql-table-missing? ] [ table>> "foo" = ] } 1&&
     ] must-fail-with
-    
+
     [
         "create table foo(id);" sql-command
         "create table foo(id);" sql-command

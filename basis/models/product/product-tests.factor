@@ -33,12 +33,12 @@ M: an-observer model-changed nip [ 1 + ] change-i drop ;
         { m1 m2 } <product> :> c
         an-observer new :> o1
         an-observer new :> o2
-        
+
         o1 m1 add-connection
         o2 m2 add-connection
 
         c activate-model
-    
+
         "OH HAI" m1 set-model
         o1 i>>
         o2 i>>

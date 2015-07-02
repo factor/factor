@@ -51,4 +51,3 @@ IN: fjsc.tests
 { T{ ast-expression f V{ T{ ast-using f V{ "foo" "bar" }  } } } } [
   "USING: foo bar ;" 'statement' parse
 ] unit-test
-

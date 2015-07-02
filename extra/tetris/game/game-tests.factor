@@ -14,4 +14,3 @@ FROM: tetris.game => level>> ;
 [ 4800 ] [ 3 4 rows-score ] unit-test
 [ 1 ] [ <default-tetris> dup 3 score-rows dup 3 score-rows dup 3 score-rows level>> ] unit-test
 [ 2 ] [ <default-tetris> dup 4 score-rows dup 4 score-rows dup 2 score-rows level>> ] unit-test
-

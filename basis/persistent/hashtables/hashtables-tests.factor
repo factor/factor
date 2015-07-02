@@ -37,7 +37,7 @@ M: hash-0-b hashcode* 2drop 0 ;
         { T{ hash-0-b } "b" }
     }
 ] [ "ph" get >hashtable ] unit-test
- 
+
 [
     H{
         { T{ hash-0-b } "b" }

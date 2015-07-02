@@ -64,13 +64,13 @@ M: dumb-writer stream-element-type drop +byte+ ; inline
 M: dumb-writer stream-write1 vector>> push ; inline
 
 { BV{ 11 22 33 } } [
-    <dumb-writer> 
+    <dumb-writer>
     [ B{ 11 22 33 } swap stream-write ]
     [ vector>> ] bi
 ] unit-test
 
 { BV{ 11 22 33 10 } } [
-    <dumb-writer> 
+    <dumb-writer>
     [ B{ 11 22 33 } swap stream-write ]
     [ stream-nl ]
     [ vector>> ] tri

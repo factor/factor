@@ -15,7 +15,7 @@ IN: crypto.xor.tests
 [ "asdf" ] [ "asdf" "key" [ xor-crypt ] [ xor-crypt ] bi >string ] unit-test
 [ "" ] [ "" "key" xor-crypt >string ] unit-test
 [ "a longer message...!" ] [
-    "a longer message...!" 
+    "a longer message...!"
     "." [ xor-crypt ] [ xor-crypt ] bi >string
 ] unit-test
 [ "a longer message...!" ] [

@@ -128,4 +128,3 @@ MACRO:: test-vconvert ( from-type to-type -- )
     longlong-2 ushort-8 test-vconvert
 ]
 [ error>> bad-vconvert? ] must-fail-with
-

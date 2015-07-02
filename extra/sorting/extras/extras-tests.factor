@@ -31,4 +31,3 @@ IN: sorting.extras
     10 iota >array randomize
     [ swap insort-right! ] each
 ] unit-test
-

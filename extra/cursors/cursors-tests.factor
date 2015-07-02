@@ -65,4 +65,3 @@ IN: cursors.tests
     H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map
     natural-sort
 ] unit-test
-

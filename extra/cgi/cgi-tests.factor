@@ -17,4 +17,3 @@ USING: cgi cgi.private kernel tools.test ;
 [ t ] [ "text/html; charset=utf-8" (content-type)
         [ H{ { "charset" { "utf-8" } } } = ]
         [ "text/html" = ] bi* and ] unit-test
-

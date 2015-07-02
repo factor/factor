@@ -175,18 +175,18 @@ ${ transitive-recursive-objects-anchored } [ transitive-recursive-objects replac
 !     { "option" t }
 !     { "but" H{ { "y" "is a string" } { "n" "is a string" } } }
 ! }
-! 
+!
 ! CONSTANT: construct-bool-str """canonical: yes
 ! answer: NO
 ! logical: True
 ! option: on
-! 
-! 
+!
+!
 ! but:
 !     y: is a string
 !     n: is a string
 ! """
-! 
+!
 ! ${ construct-bool-obj } [ $ construct-bool-str yaml> ] unit-test
 ! ${ construct-bool-obj } [ $ construct-bool-obj >yaml yaml> ] unit-test
 
@@ -209,7 +209,7 @@ ${ transitive-recursive-objects-anchored } [ transitive-recursive-objects replac
 ! binary: 0b1010_0111_0100_1010_1110
 ! sexagesimal: 190:20:30
 ! """
-! 
+!
 ! ${ construct-int-obj } [ $ construct-int-str yaml> ] unit-test
 ! ${ construct-int-obj } [ $ construct-int-obj >yaml yaml> ] unit-test
 

@@ -200,13 +200,13 @@ intel-unix-abi fortran-abi [
             [ { [ length ] [ drop ] [ drop ] [ drop ] [ drop ] } spread ]
         } 5 ncleave
         ! [fortran-invoke]
-        [ 
+        [
             c:void "funpack" "funtimes_"
             { pointer: { c:char 12 } pointer: c:longlong pointer: c:float pointer: complex-float pointer: c:short c:long }
             alien-invoke
         ] 6 nkeep
         ! [fortran-results>]
-        shuffle( aa ba ca da ea ab -- aa ab ba ca da ea ) 
+        shuffle( aa ba ca da ea ab -- aa ab ba ca da ea )
         {
             [ drop ]
             [ drop ]
@@ -230,7 +230,7 @@ intel-unix-abi fortran-abi [
         [ c:float "funpack" "fun_times_" { pointer: { c:float 0 } } alien-invoke ]
         1 nkeep
         ! [fortran-results>]
-        shuffle( reta aa -- reta aa ) 
+        shuffle( reta aa -- reta aa )
         { [ ] [ drop ] } spread
     ] ] [
         "REAL" "funpack" "FUN_TIMES" { "REAL(*)" }
@@ -245,7 +245,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { pointer: complex-float pointer: { c:float 0 } } 
+            { pointer: complex-float pointer: { c:float 0 } }
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
@@ -262,11 +262,11 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { pointer: { c:char 20 } long } 
+            { pointer: { c:char 20 } long }
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
-        shuffle( reta retb -- reta retb ) 
+        shuffle( reta retb -- reta retb )
         { [ ] [ ascii alien>nstring ] } spread
     ] ] [
         "CHARACTER*20" "funpack" "FUN_TIMES" { }
@@ -288,11 +288,11 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { pointer: { c:char 10 } long pointer: { c:char 20 } pointer: c:float pointer: { c:char 30 } c:long c:long } 
+            { pointer: { c:char 10 } long pointer: { c:char 20 } pointer: c:float pointer: { c:char 30 } c:long c:long }
             alien-invoke
         ] 7 nkeep
         ! [fortran-results>]
-        shuffle( reta retb aa ba ca ab cb -- reta retb aa ab ba ca cb ) 
+        shuffle( reta retb aa ba ca ab cb -- reta retb aa ab ba ca cb )
         {
             [ ]
             [ ascii alien>nstring ]

@@ -49,7 +49,7 @@ IN: alien.data.map.tests
 
 : float-pixels>byte-pixels* ( floats scale bias -- bytes )
     '[
-        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply 
+        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply
         [ int-4 short-8 vconvert ] 2bi@
         short-8 uchar-16 vconvert
     ] data-map( float-4[4] -- uchar-16 ) ; inline
@@ -63,7 +63,7 @@ IN: alien.data.map.tests
         255 25 51 76
         76 51 229 127
         25 255 255 255
-    } 
+    }
 ] [
     float-array{
         0.5 0.75 1.0 0.25
@@ -79,7 +79,7 @@ IN: alien.data.map.tests
         255 25 51 76
         76 51 229 127
         25 255 255 255
-    } 
+    }
 ] [
     float-array{
         0.5 0.75 1.0 0.25
@@ -95,7 +95,7 @@ IN: alien.data.map.tests
         255 25 51 76
         76 51 229 127
         25 255 255 255
-    } 
+    }
 ] [
     float-array{
         0.5 0.75 1.0 0.25
@@ -104,7 +104,7 @@ IN: alien.data.map.tests
         0.1 1.0 1.5 2.0
         5.0
     } [
-        [ 255.0 v*n float-4 int-4 vconvert ] 4 napply 
+        [ 255.0 v*n float-4 int-4 vconvert ] 4 napply
         [ int-4 short-8 vconvert ] 2bi@
         short-8 uchar-16 vconvert
     ] data-map( float-4[4] -- uchar-16 )

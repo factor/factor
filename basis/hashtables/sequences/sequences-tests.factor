@@ -19,4 +19,3 @@ IN: hashtables.sequences.tests
 ] unit-test
 
 [ { { "asdf" 1000 } } ] [ SH{ { "asdf" 1000 } } >alist ] unit-test
-

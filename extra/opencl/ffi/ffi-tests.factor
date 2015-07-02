@@ -25,16 +25,16 @@ ERROR: cl-error err ;
 
 :: cl-string-array ( str -- alien )
     str ascii encode 0 suffix :> str-buffer
-    str-buffer length malloc &free :> str-alien 
+    str-buffer length malloc &free :> str-alien
     str-alien str-buffer dup length memcpy str-alien ;
-    
+
 :: opencl-square ( in -- out )
     0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
     dup void* <c-array> [ f clGetPlatformIDs cl-success ] keep first
     CL_DEVICE_TYPE_DEFAULT 1 f void* <ref> [ f clGetDeviceIDs cl-success ] keep void* deref :> device-id
     f 1 device-id void* <ref> f f 0 int <ref> [ clCreateContext ] keep int deref cl-success   :> context
     context device-id 0 0 int <ref> [ clCreateCommandQueue ] keep int deref cl-success    :> queue
- 
+
     [
         context 1 kernel-source cl-string-array void* <ref>
         f 0 int <ref> [ clCreateProgramWithSource ] keep int deref cl-success
@@ -45,7 +45,7 @@ ERROR: cl-error err ;
 
     context CL_MEM_READ_ONLY in byte-length f
     0 int <ref> [ clCreateBuffer ] keep int deref cl-success :> input
-    
+
     context CL_MEM_WRITE_ONLY in byte-length f
     0 int <ref> [ clCreateBuffer ] keep int deref cl-success :> output
 
@@ -54,10 +54,10 @@ ERROR: cl-error err ;
     kernel 0 cl_mem heap-size input void* <ref> clSetKernelArg cl-success
     kernel 1 cl_mem heap-size output void* <ref> clSetKernelArg cl-success
     kernel 2 uint heap-size in length uint <ref> clSetKernelArg cl-success
- 
+
     queue kernel 1 f in length ulonglong <ref> f
     0 f f clEnqueueNDRangeKernel cl-success
- 
+
     queue clFinish cl-success
 
     queue output CL_TRUE 0 in byte-length in length float <c-array>

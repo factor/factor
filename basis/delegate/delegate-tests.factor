@@ -180,7 +180,7 @@ TUPLE: slot-protocol-test-3 x y ;"
 ] unit-test
 
 DEFER: seq-delegate
-    
+
 ! See if removing a consultation updates protocol-consult word prop
 [ [ ] ] [
     "IN: delegate.tests

@@ -19,7 +19,7 @@ IN: curses.tests
         "Hello Curses!" [
             8 random 8 random ccolor addch
         ] each crefresh
-        
+
         2 seconds sleep
     ] with-curses ;
 

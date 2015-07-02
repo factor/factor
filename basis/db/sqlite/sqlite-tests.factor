@@ -145,7 +145,7 @@ watch "WATCH" {
     { "show" "SHOW" BIG-INTEGER +not-null+ +user-assigned-id+
         { +foreign-id+ show "ID" } }
 } define-persistent
-    
+
 [ T{ user { username "littledan" } { data "foo" } } ] [
     test.db [
         user create-table

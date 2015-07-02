@@ -7,4 +7,3 @@ IN: shuffle.tests
 
 [ 2 3 4 1 ] [ 1 2 3 4 roll ] unit-test
 [ 1 2 3 4 ] [ 2 3 4 1 -roll ] unit-test
-

@@ -65,7 +65,7 @@ IN: unrolled-lists.tests
         10 group [
             [ [ over push-front ] each ]
             [ length [ dup pop-back ] replicate ]
-            bi 
+            bi
         ] map concat
     ] keep
     =

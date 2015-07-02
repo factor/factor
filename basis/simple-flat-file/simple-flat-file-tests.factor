@@ -19,5 +19,3 @@ MEMO: <test1> ( -- code-table )
 
 [ 0xAD31 ] [ 0x8258 <test1> at ] unit-test
 [ 0x8258 ] [ 0xAD31 <test1> value-at ] unit-test
-
-

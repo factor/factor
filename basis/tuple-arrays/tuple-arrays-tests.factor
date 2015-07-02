@@ -11,7 +11,7 @@ TUPLE-ARRAY: foo
 [ T{ foo } ] [ mat get first ] unit-test
 [ T{ foo f 2 } ] [ T{ foo f 2 } 0 mat get [ set-nth ] keep first ] unit-test
 [ t ] [ { T{ foo f 1 } T{ foo f 2 } } >foo-array dup mat set foo-array? ] unit-test
-[ T{ foo f 3 } t ] 
+[ T{ foo f 3 } t ]
 [ mat get [ bar>> 2 + <foo> ] map [ first ] keep foo-array? ] unit-test
 
 [ 2 ] [ 2 <foo-array> dup mat set length ] unit-test

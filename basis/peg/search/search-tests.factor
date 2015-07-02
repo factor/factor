@@ -16,4 +16,3 @@ IN: peg.search.tests
 { "abc 246 def 912" } [
   "abc 123 def 456" 'integer' [ 2 * number>string ] action replace
 ] unit-test
-

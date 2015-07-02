@@ -177,35 +177,35 @@ STRUCT: T-class
             { name "nemo" }
             { offset 0 }
             { class integer }
-            { initial 0 } 
+            { initial 0 }
             { type c:longlong }
         }
         T{ struct-slot-spec
             { name "x" }
             { offset 8 }
             { class object }
-            { initial f } 
+            { initial f }
             { type { c:char 4 } }
         }
         T{ struct-slot-spec
             { name "y" }
             { offset 12 }
             { class object }
-            { initial f } 
+            { initial f }
             { type { c:short 2 } }
         }
         T{ struct-slot-spec
             { name "z" }
             { offset 16 }
             { class fixnum }
-            { initial 5 } 
+            { initial 5 }
             { type c:char }
         }
         T{ struct-slot-spec
             { name "float" }
             { offset 20 }
             { class object }
-            { initial f } 
+            { initial f }
             { type { c:float 2 } }
         }
     }

@@ -120,4 +120,3 @@ IN: images.normalization.tests
     T{ image f { 1 1 } RGB ubyte-components f B{ 0 0 0 } }
     INTENSITY reorder-components
 ] must-fail
-

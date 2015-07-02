@@ -8,7 +8,7 @@ IN: concurrency.messaging.tests
 
 [ ] [ my-mailbox data>> clear-deque ] unit-test
 
-[ "received" ] [ 
+[ "received" ] [
     [
         receive "received" swap reply-synchronous
     ] "Synchronous test" spawn

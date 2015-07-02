@@ -42,4 +42,3 @@ IN: sequences.inserters.tests
     { { "Th" "ree" } { "Fo" "ur" } { "Fi" "ve" } }
     [ append ] V{ 1 2 } clone [ <replacer> assoc>map ] keep eq?
 ] unit-test
-

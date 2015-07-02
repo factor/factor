@@ -65,7 +65,7 @@ M: object my-generic ;
 ! Make sure annotations work on primitives
 \ gc reset
 \ gc watch
-   
+
 [ f ] [ [ [ gc ] with-error>output ] with-string-writer empty? ] unit-test
 
 \ gc reset

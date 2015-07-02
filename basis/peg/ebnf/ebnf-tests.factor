@@ -7,51 +7,51 @@ namespaces arrays strings eval unicode.data multiline ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
-  "abc" 'non-terminal' parse 
+  "abc" 'non-terminal' parse
 ] unit-test
 
 { T{ ebnf-terminal f "55" } } [
-  "'55'" 'terminal' parse 
+  "'55'" 'terminal' parse
 ] unit-test
 
 {
-  T{ ebnf-rule f 
+  T{ ebnf-rule f
      "digit"
      T{ ebnf-choice f
         V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
      }
-  } 
+  }
 } [
   "digit = '1' | '2'" 'rule' parse
 ] unit-test
 
 {
-  T{ ebnf-rule f 
-     "digit" 
+  T{ ebnf-rule f
+     "digit"
      T{ ebnf-sequence f
         V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
      }
-  }   
+  }
 } [
   "digit = '1' '2'" 'rule' parse
 ] unit-test
 
 {
   T{ ebnf-choice f
-     V{ 
+     V{
        T{ ebnf-sequence f
           V{ T{ ebnf-non-terminal f "one" } T{ ebnf-non-terminal f "two" } }
        }
        T{ ebnf-non-terminal f "three" }
      }
-  } 
+  }
 } [
   "one two | three" 'choice' parse
 ] unit-test
 
 {
   T{ ebnf-sequence f
-     V{ 
+     V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-whitespace f
          T{ ebnf-choice f
@@ -59,14 +59,14 @@ IN: peg.ebnf.tests
          }
        }
      }
-  } 
+  }
 } [
   "one {two | three}" 'choice' parse
 ] unit-test
 
 {
   T{ ebnf-sequence f
-     V{ 
+     V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-repeat0 f
           T{ ebnf-sequence f
@@ -79,14 +79,14 @@ IN: peg.ebnf.tests
           }
         }
      }
-  } 
+  }
 } [
   "one ((two | three) four)*" 'choice' parse
 ] unit-test
 
 {
   T{ ebnf-sequence f
-     V{ 
+     V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-ignore f
           T{ ebnf-sequence f
@@ -99,19 +99,19 @@ IN: peg.ebnf.tests
           }
         }
      }
-  } 
+  }
 } [
   "one ((two | three) four)~" 'choice' parse
 ] unit-test
 
 {
   T{ ebnf-sequence f
-     V{ 
-         T{ ebnf-non-terminal f "one" } 
+     V{
+         T{ ebnf-non-terminal f "one" }
          T{ ebnf-optional f T{ ebnf-non-terminal f "two" } }
          T{ ebnf-non-terminal f "three" }
      }
-  } 
+  }
 } [
   "one ( two )? three" 'choice' parse
 ] unit-test
@@ -133,7 +133,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { V{ "a" "b" } } [
-  "ab" [EBNF foo='a' 'b' EBNF] 
+  "ab" [EBNF foo='a' 'b' EBNF]
 ] unit-test
 
 { V{ 1 "b" } } [
@@ -153,7 +153,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 [
-  "0" [EBNF foo=[A-Z] EBNF]  
+  "0" [EBNF foo=[A-Z] EBNF]
 ] must-fail
 
 { CHAR: 0 } [
@@ -161,11 +161,11 @@ IN: peg.ebnf.tests
 ] unit-test
 
 [
-  "A" [EBNF foo=[^A-Z] EBNF]  
+  "A" [EBNF foo=[^A-Z] EBNF]
 ] must-fail
 
 [
-  "Z" [EBNF foo=[^A-Z] EBNF]  
+  "Z" [EBNF foo=[^A-Z] EBNF]
 ] must-fail
 
 { V{ "1" "+" "foo" } } [
@@ -197,7 +197,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 [
-  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF] 
+  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF]
 ] must-fail
 
 { 3 } [
@@ -205,7 +205,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 [
-  "ab" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] 
+  "ab" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF]
 ] must-fail
 
 { V{ "a" " " "b" } } [
@@ -250,22 +250,22 @@ IN: peg.ebnf.tests
 ] unit-test
 
 [
-  "axb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] 
+  "axb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF]
 ] must-fail
 
-{ V{ V{ 49 } "+" V{ 49 } } } [ 
+{ V{ V{ 49 } "+" V{ 49 } } } [
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
   "1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF]
 ] unit-test
 
-{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
+{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
   "1+1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF]
 ] unit-test
 
-{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
+{ V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [
   #! Test indirect left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
   "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF]
@@ -298,7 +298,7 @@ MethodName = "m" | "n"
 ExpressionName = Identifier
 Expression = "i" | "j"
 main = Primary
-;EBNF 
+;EBNF
 
 { "this" } [
   "this" primary
@@ -353,11 +353,11 @@ main = Primary
 ] unit-test
 
 [
-  "a bc" [EBNF a="a" "b" foo=(a "c") EBNF] 
+  "a bc" [EBNF a="a" "b" foo=(a "c") EBNF]
 ] must-fail
 
 [
-  "a bc" [EBNF a="a" "b" foo=a "c" EBNF] 
+  "a bc" [EBNF a="a" "b" foo=a "c" EBNF]
 ] must-fail
 
 [
@@ -365,7 +365,7 @@ main = Primary
 ] must-fail
 
 [
-  "ab c" [EBNF a="a" "b" foo=a "c" EBNF] 
+  "ab c" [EBNF a="a" "b" foo=a "c" EBNF]
 ] must-fail
 
 { V{ V{ "a" "b" } "c" } } [
@@ -373,19 +373,19 @@ main = Primary
 ] unit-test
 
 [
-  "ab c" [EBNF a="a" "b" foo=(a "c") EBNF] 
+  "ab c" [EBNF a="a" "b" foo=(a "c") EBNF]
 ] must-fail
 
 [
-  "a b c" [EBNF a="a" "b" foo=a "c" EBNF] 
+  "a b c" [EBNF a="a" "b" foo=a "c" EBNF]
 ] must-fail
 
 [
-  "a b c" [EBNF a="a" "b" foo=(a "c") EBNF] 
+  "a b c" [EBNF a="a" "b" foo=(a "c") EBNF]
 ] must-fail
 
 [
-  "a b c" [EBNF a="a" "b" foo={a "c"} EBNF] 
+  "a b c" [EBNF a="a" "b" foo={a "c"} EBNF]
 ] must-fail
 
 { V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
@@ -491,7 +491,7 @@ foo=<foreign any-char> 'd'
 ] unit-test
 
 { } [
- "USING: kernel peg.ebnf ; \"a\\n\" [EBNF foo='a' '\n'  => [[ drop \"\n\" ]] EBNF] drop" eval( -- ) 
+ "USING: kernel peg.ebnf ; \"a\\n\" [EBNF foo='a' '\n'  => [[ drop \"\n\" ]] EBNF] drop" eval( -- )
 ] unit-test
 
 [
@@ -530,32 +530,32 @@ Tok                = Spaces (Number | Special )
 ;EBNF
 
 { V{ CHAR: 1 T{ ast-number f 23 } ";" CHAR: x } } [
-  "123;x" [EBNF bar = . 
-                tokenizer = <foreign a-tokenizer Tok>  foo=. 
-                tokenizer=default baz=. 
-                main = bar foo foo baz 
+  "123;x" [EBNF bar = .
+                tokenizer = <foreign a-tokenizer Tok>  foo=.
+                tokenizer=default baz=.
+                main = bar foo foo baz
           EBNF]
 ] unit-test
 
 { V{ CHAR: 5 "+" CHAR: 2 } } [
-  "5+2" [EBNF 
-          space=(" " | "\n") 
-          number=[0-9] 
-          operator=("*" | "+") 
-          spaces=space* => [[ ignore ]] 
-          tokenizer=spaces (number | operator) 
-          main= . . . 
+  "5+2" [EBNF
+          space=(" " | "\n")
+          number=[0-9]
+          operator=("*" | "+")
+          spaces=space* => [[ ignore ]]
+          tokenizer=spaces (number | operator)
+          main= . . .
         EBNF]
 ] unit-test
 
 { V{ CHAR: 5 "+" CHAR: 2 } } [
-  "5 + 2" [EBNF 
-          space=(" " | "\n") 
-          number=[0-9] 
-          operator=("*" | "+") 
-          spaces=space* => [[ ignore ]] 
-          tokenizer=spaces (number | operator) 
-          main= . . . 
+  "5 + 2" [EBNF
+          space=(" " | "\n")
+          number=[0-9]
+          operator=("*" | "+")
+          spaces=space* => [[ ignore ]]
+          tokenizer=spaces (number | operator)
+          main= . . .
         EBNF]
 ] unit-test
 

@@ -52,7 +52,7 @@ IN: continuations.tests
 
 ! ! See how well callstack overflow is handled
 ! [ clear drop ] must-fail
-! 
+!
 ! : callstack-overflow callstack-overflow f ;
 ! [ callstack-overflow ] must-fail
 

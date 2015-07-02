@@ -238,4 +238,3 @@ BE-PACKED-STRUCT: be-packed-struct
     B{ 0 0 0 0 0 0 0  0 0 0 3 } be-packed-struct memory>struct
     b>>
 ] unit-test
-

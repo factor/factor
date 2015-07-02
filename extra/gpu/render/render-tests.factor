@@ -114,4 +114,3 @@ UNIFORM-TUPLE: array-of-struct-containing-array-of-texture
         } cleave ]
     } cleave
 ] ] [ array-of-textures [bind-uniform-textures] ] unit-test
-

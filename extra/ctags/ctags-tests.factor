@@ -25,4 +25,3 @@ IN: ctags.tests
   "if\t" "resource:extra/unix/unix.factor" normalize-path "\t91" 3append 1array
   { { if  { "resource:extra/unix/unix.factor" 91 } } } ctag-strings =
 ] unit-test
-

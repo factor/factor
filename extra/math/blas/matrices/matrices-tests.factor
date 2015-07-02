@@ -90,7 +90,7 @@ IN: math.blas.matrices.tests
     }
     svector{ 1.0 2.0 3.0 1.0 }
     M.V
-] unit-test 
+] unit-test
 [ svector{ -2.0 1.0 3.0 14.0 } ] [
     smatrix{
         {  0.0 1.0 0.0 1.0 }
@@ -99,7 +99,7 @@ IN: math.blas.matrices.tests
     } Mtranspose
     svector{ 1.0 2.0 3.0 }
     M.V
-] unit-test 
+] unit-test
 
 [ dvector{ 3.0 1.0 6.0 } ] [
     dmatrix{
@@ -109,7 +109,7 @@ IN: math.blas.matrices.tests
     }
     dvector{ 1.0 2.0 3.0 1.0 }
     M.V
-] unit-test 
+] unit-test
 [ dvector{ -2.0 1.0 3.0 14.0 } ] [
     dmatrix{
         {  0.0 1.0 0.0 1.0 }
@@ -118,7 +118,7 @@ IN: math.blas.matrices.tests
     } Mtranspose
     dvector{ 1.0 2.0 3.0 }
     M.V
-] unit-test 
+] unit-test
 
 [ cvector{ 3.0 C{ 1.0 2.0 } 6.0 } ] [
     cmatrix{
@@ -128,7 +128,7 @@ IN: math.blas.matrices.tests
     }
     cvector{ 1.0 2.0 3.0 1.0 }
     M.V
-] unit-test 
+] unit-test
 [ cvector{ -2.0 C{ 1.0 2.0 } 3.0 14.0 } ] [
     cmatrix{
         {  0.0 1.0          0.0 1.0 }
@@ -137,7 +137,7 @@ IN: math.blas.matrices.tests
     } Mtranspose
     cvector{ 1.0 2.0 3.0 }
     M.V
-] unit-test 
+] unit-test
 
 [ zvector{ 3.0 C{ 1.0 2.0 } 6.0 } ] [
     zmatrix{
@@ -156,7 +156,7 @@ IN: math.blas.matrices.tests
     } Mtranspose
     zvector{ 1.0 2.0 3.0 }
     M.V
-] unit-test 
+] unit-test
 
 ! V(*)
 
@@ -707,4 +707,3 @@ IN: math.blas.matrices.tests
         { 2.0 3.0 0.0          1.0 0.0 }
     } Mtranspose 2 1 3 2 Msub
 ] unit-test
-

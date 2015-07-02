@@ -33,8 +33,8 @@ IN: globs.tests
 { "foo" "bar" } path-separator join 1array
 [ { "foo" "bar" "ba?" } path-separator join glob-parent-directory ] unit-test
 
-[ "foo" ] 
+[ "foo" ]
 [ { "foo" "b?r" "bas" } path-separator join glob-parent-directory ] unit-test
 
-[ "" ] 
+[ "" ]
 [ { "f*" "bar" "bas" } path-separator join glob-parent-directory ] unit-test

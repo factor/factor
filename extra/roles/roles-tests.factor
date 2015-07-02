@@ -43,17 +43,17 @@ ROLE: bong bowl ;
 SYMBOL: spong
 
 [ [ spong { spoon bong } { } define-tuple-class-with-roles ] with-compilation-unit ]
-[ role-slot-overlap? ] must-fail-with 
+[ role-slot-overlap? ] must-fail-with
 
 [ [ spong { spoon bong } { } define-role ] with-compilation-unit ]
-[ role-slot-overlap? ] must-fail-with 
+[ role-slot-overlap? ] must-fail-with
 
 ! can't try to inherit multiple tuple classes
 TUPLE: tool blade ;
 SYMBOL: knife
 
 [ knife { utensil tool } { } define-tuple-class-with-roles ]
-[ multiple-inheritance-attempted? ] must-fail-with 
+[ multiple-inheritance-attempted? ] must-fail-with
 
 ! make sure method dispatch works
 GENERIC: poke ( pokee poker -- result )

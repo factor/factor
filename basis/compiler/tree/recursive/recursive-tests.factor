@@ -33,7 +33,7 @@ IN: compiler.tree.recursive.tests
 
 : loop-test-1 ( a -- )
     dup [ 1 + loop-test-1 ] [ drop ] if ; inline recursive
-                          
+
 [ t ] [
     [ loop-test-1 ] build-tree analyze-recursive
     \ loop-test-1 label-is-loop?

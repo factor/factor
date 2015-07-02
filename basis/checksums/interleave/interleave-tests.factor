@@ -16,4 +16,3 @@ IN: checksums.interleave.tests
     }
     sha1 interleaved-checksum
 ] unit-test
-

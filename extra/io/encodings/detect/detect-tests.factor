@@ -42,4 +42,3 @@ unit-test
 
 [ binary ] [ HEX{ 31 32 33 C2 A0 00 } detect-byte-array ] unit-test
 [ binary ] [ HEX{ 31 32 33 C2 A0 00 30 } detect-byte-array ] unit-test
-

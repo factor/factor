@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test wrap.words sequences ;
-IN: wrap.words.tests    
+IN: wrap.words.tests
 
 [
     {
@@ -78,4 +78,3 @@ IN: wrap.words.tests
         T{ word f 5 10 f }
     } 35 35 wrap-words [ { } like ] map
 ] unit-test
-

@@ -33,4 +33,3 @@ IN: units.imperial.tests
 { 1 } [ 3 inches [ palms ] undo ] unit-test
 { 1 } [ 16 nails [ yards ] undo ] unit-test
 { 1 } [ 8 fingers [ yards ] undo ] unit-test
-

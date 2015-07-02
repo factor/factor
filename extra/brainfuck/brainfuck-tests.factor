@@ -62,7 +62,7 @@ IN: brainfuck
 ! Uppercase
 
 { "A" } [ "a\n" [ ",----------[----------------------.,----------]"
-          get-brainfuck ] with-string-reader ] unit-test 
+          get-brainfuck ] with-string-reader ] unit-test
 
 ! cat
 

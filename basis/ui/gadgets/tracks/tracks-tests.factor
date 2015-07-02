@@ -5,7 +5,7 @@ IN: ui.gadgets.tracks.tests
 [ { 100 100 } ] [
     vertical <track>
         <gadget> { 100 100 } >>dim 1 track-add
-    pref-dim    
+    pref-dim
 ] unit-test
 
 [ { 100 110 } ] [

@@ -13,4 +13,3 @@ IN: sequences.complex-components.tests
 [ 0   ] [ test-array fourth ] unit-test
 
 [ { 1.0 2.0 3.0 0 5.0 6.0 } ] [ test-array >array ] unit-test
-

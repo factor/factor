@@ -30,7 +30,7 @@ IN: infix.parser.tests
     { op "+" }
 } ] [ "1+2*3" build-infix-ast ] unit-test
 
-[ T{ ast-op 
+[ T{ ast-op
     { left T{ ast-number { value 1 } } }
     { right T{ ast-number { value 2 } } }
     { op "+" }

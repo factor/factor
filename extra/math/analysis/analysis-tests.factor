@@ -31,4 +31,3 @@ CONSTANT: eps .00000001
 [ t ] [ 3 gammaln 0.6931471805599456 eps ~ ] unit-test
 [ t ] [ 11 gammaln 15.10441257307984 eps ~ ] unit-test
 [ t ] [ 9000000000000000000000000000000000000000000 gammaln 8.811521863477754e44 eps ~ ] unit-test
-

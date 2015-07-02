@@ -67,4 +67,3 @@ IN: checksums.sha.tests
     <sha-224-state> "asdf" binary <byte-reader> add-checksum-stream
     [ get-checksum ] [ get-checksum ] bi =
 ] unit-test
-

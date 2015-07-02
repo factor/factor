@@ -45,7 +45,7 @@ VECTORED-STRUCT: foo
         S{ foo { x 1 } { y 0.5 } { z 20 } { w 25 } }
         S{ foo { x 2 } { y 1.0 } { z 30 } { w 35 } }
         S{ foo { x 3 } { y 1.5 } { z 40 } { w 45 } }
-    } 
+    }
 ] [
     T{ vectored-foo
         { x int-array{     0    1    2    3   } }

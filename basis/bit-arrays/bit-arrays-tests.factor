@@ -61,7 +61,7 @@ IN: bit-arrays.tests
 [ ?{ } ] [ 0 integer>bit-array ] unit-test
 [ ?{ f t } ] [ 2 integer>bit-array ] unit-test
 [ ?{ t t t t t t t t t } ] [ 511 integer>bit-array ] unit-test
-[ ?{ 
+[ ?{
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t

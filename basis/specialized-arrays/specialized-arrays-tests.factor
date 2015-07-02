@@ -96,7 +96,7 @@ SPECIALIZED-ARRAY: test-struct
 
 [ S{ test-struct f 12 20 } ] [
     test-struct-array{
-        S{ test-struct f  4 20 } 
+        S{ test-struct f  4 20 }
         S{ test-struct f 12 20 }
         S{ test-struct f 20 20 }
     } second
@@ -177,7 +177,7 @@ SPECIALIZED-ARRAY: struct-resize-test
     [ struct-resize-test <struct> swap >>x ] map
     \ struct-resize-test >c-array
     [ x>> ] { } map-as ;
-    
+
 [ { 10 20 30 } ] [ { 10 20 30 } struct-resize-test-usage ] unit-test
 
 [ ] [ "IN: specialized-arrays.tests USE: classes.struct USE: alien.c-types STRUCT: struct-resize-test { x int } { y int } ;" eval( -- ) ] unit-test
@@ -205,4 +205,3 @@ SPECIALIZED-ARRAY: struct-resize-test
     int-array{ 1 2 3 4 5 6 7 8 }
     3 6 pick direct-slice [ 55555 1 ] dip set-nth
 ] unit-test
-

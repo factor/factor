@@ -13,4 +13,3 @@ IN: pdf.units.tests
 
 [ 72.0 ] [ "1in" string>points ] unit-test
 [ 108.0 ] [ "1.5in" string>points ] unit-test
-

@@ -100,4 +100,3 @@ IN: c.lexer.tests
 
 [ "123u" ]
 [ "123u" <sequence-parser> take-c-integer ] unit-test
-

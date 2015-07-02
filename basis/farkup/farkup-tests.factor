@@ -140,9 +140,9 @@ link-no-follow? off
 [ "<hr/>" ] [ "___" convert-farkup ] unit-test
 [ "<hr/>" ] [ "___\n" convert-farkup ] unit-test
 
-[ "<p>before:</p><pre><span class=\"OPERATOR\">{</span> <span class=\"DIGIT\">1</span> <span class=\"DIGIT\">2</span> <span class=\"DIGIT\">3</span> <span class=\"OPERATOR\">}</span> <span class=\"DIGIT\">1</span> tail</pre>" ] 
+[ "<p>before:</p><pre><span class=\"OPERATOR\">{</span> <span class=\"DIGIT\">1</span> <span class=\"DIGIT\">2</span> <span class=\"DIGIT\">3</span> <span class=\"OPERATOR\">}</span> <span class=\"DIGIT\">1</span> tail</pre>" ]
 [ "before:\n[factor{{ 1 2 3 } 1 tail}]" convert-farkup ] unit-test
- 
+
 [ "<p><a href=\"Factor\">Factor</a>-rific!</p>" ]
 [ "[[Factor]]-rific!" convert-farkup ] unit-test
 

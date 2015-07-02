@@ -32,7 +32,7 @@ IN: trees.avl.tests
 
 [ "key1" -1 "key2" 0 "key3" 0 ]
 [ T{ avl-node f "key1" f f
-        T{ avl-node f "key2" f 
+        T{ avl-node f "key2" f
             T{ avl-node f "key3" f f f 1 } f -1 } 2 }
     [ double-rotate ] go-left
     [ left>> dup key>> swap balance>> ] keep
@@ -41,7 +41,7 @@ IN: trees.avl.tests
 [ "key1" 0 "key2" 0 "key3" 0 ]
 [ T{ avl-node f "key1" f f
         T{ avl-node f "key2" f
-            T{ avl-node f "key3" f f f 0 } f -1 } 2 } 
+            T{ avl-node f "key3" f f f 0 } f -1 } 2 }
     [ double-rotate ] go-left
     [ left>> dup key>> swap balance>> ] keep
     [ right>> dup key>> swap balance>> ] keep
@@ -49,7 +49,7 @@ IN: trees.avl.tests
 [ "key1" 0 "key2" 1 "key3" 0 ]
 [ T{ avl-node f "key1" f f
         T{ avl-node f "key2" f
-            T{ avl-node f "key3" f f f -1 } f -1 } 2 } 
+            T{ avl-node f "key3" f f f -1 } f -1 } 2 }
     [ double-rotate ] go-left
     [ left>> dup key>> swap balance>> ] keep
     [ right>> dup key>> swap balance>> ] keep
@@ -95,8 +95,8 @@ IN: trees.avl.tests
     AVL{
         { 7 "seven" }
         { 9 "nine" }
-        { 4 "four" } 
-        { 4 "replaced four" } 
+        { 4 "four" }
+        { 4 "replaced four" }
         { 7 "replaced seven" }
     } clone ;
 

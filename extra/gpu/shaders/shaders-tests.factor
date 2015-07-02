@@ -9,4 +9,3 @@ NOT:A:LOG:LINE"""  ]
 """ERROR: 0:1: Bad command or filename
 INFO: 0:11: The operation completed successfully
 NOT:A:LOG:LINE""" replace-log-line-numbers ] unit-test
-

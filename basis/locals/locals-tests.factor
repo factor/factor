@@ -389,7 +389,7 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
     "USING: locals fry math ; 1 '[ [let 10 :> A A _ + ] ]"
     eval( -- ) call
 ] [ error>> >r/r>-in-fry-error? ] must-fail-with
-    
+
 :: (funny-macro-test) ( obj quot -- ? ) obj { [ quot call ] } 1&& ; inline
 : funny-macro-test ( n -- ? ) [ odd? ] (funny-macro-test) ;
 
@@ -470,13 +470,13 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
 :: erg's-:>-bug ( n ? -- n ) ? [ n :> n n ] [ n :> b b ] if ;
 
 [ 3 ] [ 3 f erg's-:>-bug ] unit-test
-    
+
 [ 3 ] [ 3 t erg's-:>-bug ] unit-test
 
 :: erg's-:>-bug-2 ( n ? -- n ) ? n '[ _ :> n n ] [ n :> b b ] if ;
 
 [ 3 ] [ 3 f erg's-:>-bug-2 ] unit-test
-    
+
 [ 3 ] [ 3 t erg's-:>-bug-2 ] unit-test
 
 ! dharmatech found this problem

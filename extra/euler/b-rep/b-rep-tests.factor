@@ -21,7 +21,7 @@ IN: euler.b-rep.tests
     e1 e0 next-edge<<
     e2 e1 next-edge<<
     e0 e2 next-edge<<
-    
+
     e0 ;
 
 [

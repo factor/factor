@@ -31,4 +31,3 @@ test-sigusr1-handler SIGUSR1 add-signal-handler
     0.5 seconds sleep
     sigusr1-count get-global swap -
 ] unit-test
-

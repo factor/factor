@@ -22,7 +22,7 @@ IN: db.errors.postgresql.tests
     ] [
         { [ sql-table-exists? ] [ table>> "ship" = ] } 1&&
     ] must-fail-with
-    
+
     [
         "create table foo(id) lol;" sql-command
     ] [

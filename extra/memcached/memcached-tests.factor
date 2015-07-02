@@ -105,7 +105,3 @@ PRIVATE>
 [ { "5" "valuex" } ] [
     [ x y z 3array m/getseq values natural-sort ] with-memcached
 ] unit-test
-
-
-
-

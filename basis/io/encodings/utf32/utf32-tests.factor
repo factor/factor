@@ -27,4 +27,3 @@ IN: io.encodings.utf32.tests
 [ { CHAR: x } ] [ B{ 0 0 0xfe 0xff 0 0 0 CHAR: x } utf32 decode >array ] unit-test
 
 [ B{ 0xff 0xfe 0 0 120 0 0 0 0x1e 0xd1 1 0 } ] [ { CHAR: x 0x1d11e } >string utf32 encode ] unit-test
-
