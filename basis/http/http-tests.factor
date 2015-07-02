@@ -60,7 +60,7 @@ some-header: 1; 2
 blah
 ;
 
-read-request-test-1' 1array [
+${ read-request-test-1' } [
     read-request-test-1 lf>crlf
     [ read-request ] with-string-reader
     [ write-request ] with-string-writer
@@ -157,7 +157,7 @@ content-type: text/html; charset=UTF-8
 
 ;
 
-read-response-test-1' 1array [
+${ read-response-test-1' } [
     URL" http://localhost/" url set
     read-response-test-1 lf>crlf
     [ read-response ] with-string-reader

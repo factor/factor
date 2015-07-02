@@ -1,5 +1,5 @@
-USING: assocs arrays json.reader kernel strings tools.test
-hashtables json io.streams.string math ;
+USING: hashtables io.streams.string json json.reader kernel
+literals math strings tools.test ;
 IN: json.reader.tests
 
 { f } [ "false" json> ] unit-test
@@ -30,8 +30,8 @@ IN: json.reader.tests
 { "while 1:\n\tpass" } [ """  "while 1:\n\tpass" """  json> ] unit-test
 ! unicode is allowed in json
 { "ß∂¬ƒ˚∆" } [ """  "ß∂¬ƒ˚∆""""  json> ] unit-test
-{ 8 9 10 12 13 34 47 92 } >string 1array [ """ "\\b\\t\\n\\f\\r\\"\\/\\\\" """ json> ] unit-test
-{ 0xabcd } >string 1array [ """ "\\uaBCd" """ json> ] unit-test
+${ { 8 9 10 12 13 34 47 92 } >string } [ """ "\\b\\t\\n\\f\\r\\"\\/\\\\" """ json> ] unit-test
+${ { 0xabcd } >string } [ """ "\\uaBCd" """ json> ] unit-test
 { "𝄞" } [ "\"\\ud834\\udd1e\"" json> ] unit-test
 
 { H{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
