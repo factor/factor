@@ -9,15 +9,15 @@ IN: html.streams.tests
 
 [ [ ] make-html-string ] must-infer
 
-[ "" ] [
+{ "" } [
     [ "" write ] make-html-string
 ] unit-test
 
-[ "a" ] [
+{ "a" } [
     [ CHAR: a write1 ] make-html-string
 ] unit-test
 
-[ "&lt;" ] [
+{ "&lt;" } [
     [ "<" write ] make-html-string
 ] unit-test
 
@@ -25,13 +25,13 @@ TUPLE: funky town ;
 
 M: funky url-of "http://www.funky-town.com/" swap town>> append ;
 
-[ "<a href=\"http://www.funky-town.com/austin\">&lt;</a>" ] [
+{ "<a href=\"http://www.funky-town.com/austin\">&lt;</a>" } [
     [
         "<" "austin" funky boa write-object
     ] make-html-string
 ] unit-test
 
-[ "<span style=\"font-family: monospace; \">car</span>" ]
+{ "<span style=\"font-family: monospace; \">car</span>" }
 [
     [
         "car"
@@ -40,7 +40,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-[ "<span style=\"color: #ff00ff; \">car</span>" ]
+{ "<span style=\"color: #ff00ff; \">car</span>" }
 [
     [
         "car"
@@ -49,7 +49,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-[ "<div style=\"background-color: #ff00ff; white-space: pre; font-family: monospace; display: inline-block;\">cdr</div>" ]
+{ "<div style=\"background-color: #ff00ff; white-space: pre; font-family: monospace; display: inline-block;\">cdr</div>" }
 [
     [
         H{ { page-color T{ rgba f 1 0 1 1 } } }
@@ -57,13 +57,13 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-[ "<div style=\"white-space: pre; font-family: monospace; display: inline-block;\"></div><br/>" ] [
+{ "<div style=\"white-space: pre; font-family: monospace; display: inline-block;\"></div><br/>" } [
     [ H{ } [ ] with-nesting nl ] make-html-string
 ] unit-test
 
-[ ] [ [ { 1 2 3 } describe ] with-html-writer drop ] unit-test
+{ } [ [ { 1 2 3 } describe ] with-html-writer drop ] unit-test
 
-[ "<img src=\"/icons/class-word.tiff\"/>" ] [
+{ "<img src=\"/icons/class-word.tiff\"/>" } [
     [
         "text"
         { { image "vocab:definitions/icons/class-word.tiff" } }

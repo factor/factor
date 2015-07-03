@@ -16,10 +16,10 @@ TUPLE: foo-gadget ;
 
 T{ foo-gadget } <toolbar> "t" set
 
-[ 2 ] [ "t" get children>> length ] unit-test
-[ "Foo A" ] [ "t" get gadget-child gadget-child string>> ] unit-test
+{ 2 } [ "t" get children>> length ] unit-test
+{ "Foo A" } [ "t" get gadget-child gadget-child string>> ] unit-test
 
-[ ] [
+{ } [
     2 <model> {
         { 0 "atheist" }
         { 1 "christian" }
@@ -28,10 +28,10 @@ T{ foo-gadget } <toolbar> "t" set
     } <radio-buttons> "religion" set
 ] unit-test
 
-[ 0 ] [
+{ 0 } [
     "religion" get gadget-child value>>
 ] unit-test
 
-[ 2 ] [
+{ 2 } [
     "religion" get gadget-child control-value
 ] unit-test

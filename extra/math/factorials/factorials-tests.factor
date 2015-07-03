@@ -1,10 +1,10 @@
 USING: kernel math.functions math.ranges sequences tools.test ;
 IN: math.factorials
 
-[ 1 ] [ -1 factorial ] unit-test ! not necessarily correct
-[ 1 ] [ 0 factorial ] unit-test
-[ 1 ] [ 1 factorial ] unit-test
-[ 3628800 ] [ 10 factorial ] unit-test
+{ 1 } [ -1 factorial ] unit-test ! not necessarily correct
+{ 1 } [ 0 factorial ] unit-test
+{ 1 } [ 1 factorial ] unit-test
+{ 3628800 } [ 10 factorial ] unit-test
 
 { { 1 1 2 6 24 120 720 5040 40320 362880 3628800 } } [
     10 factorials

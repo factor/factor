@@ -3,7 +3,7 @@
 USING: tools.test wrap.words sequences ;
 IN: wrap.words.tests
 
-[
+{
     {
         {
             T{ word f 1 10 f }
@@ -15,7 +15,7 @@ IN: wrap.words.tests
             T{ word f 5 10 f }
         }
     }
-] [
+} [
     {
         T{ word f 1 10 f }
         T{ word f 2 10 f }
@@ -25,7 +25,7 @@ IN: wrap.words.tests
     } 35 35 wrap-words [ { } like ] map
 ] unit-test
 
-[
+{
     {
         {
             T{ word f 1 10 f }
@@ -39,7 +39,7 @@ IN: wrap.words.tests
             T{ word f 5 10 f }
         }
     }
-] [
+} [
     {
         T{ word f 1 10 f }
         T{ word f 2 10 f }
@@ -51,7 +51,7 @@ IN: wrap.words.tests
     } 35 35 wrap-words [ { } like ] map
 ] unit-test
 
-[
+{
     {
         {
             T{ word f 1 10 t }
@@ -67,7 +67,7 @@ IN: wrap.words.tests
             T{ word f 5 10 f }
         }
     }
-] [
+} [
     {
         T{ word f 1 10 t }
         T{ word f 1 10 f }

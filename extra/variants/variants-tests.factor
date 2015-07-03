@@ -7,9 +7,9 @@ VARIANT: list
     cons: { { first object } { rest list } }
     ;
 
-[ t ] [ nil list? ] unit-test
-[ t ] [ 1 nil <cons> list? ] unit-test
-[ f ] [ 1 list? ] unit-test
+{ t } [ nil list? ] unit-test
+{ t } [ 1 nil <cons> list? ] unit-test
+{ f } [ 1 list? ] unit-test
 
 : list-length ( list -- length )
     {
@@ -17,18 +17,18 @@ VARIANT: list
         { cons [ nip list-length 1 + ] }
     } match ;
 
-[ 4 ]
+{ 4 }
 [ 5 6 7 8 nil <cons> <cons> <cons> <cons> list-length ] unit-test
 
-[ nil t ] [ list initial-value ] unit-test
+{ nil t } [ list initial-value ] unit-test
 
 VARIANT: list2 ;
 VARIANT-MEMBER: list2 nil2
 VARIANT-MEMBER: list2 cons2: { { first object } { rest list2 } }
 
-[ t ] [ nil2 list2? ] unit-test
-[ t ] [ 1 nil2 <cons2> list2? ] unit-test
-[ f ] [ 1 list2? ] unit-test
+{ t } [ nil2 list2? ] unit-test
+{ t } [ 1 nil2 <cons2> list2? ] unit-test
+{ f } [ 1 list2? ] unit-test
 
 : list2-length ( list2 -- length )
     {
@@ -36,5 +36,5 @@ VARIANT-MEMBER: list2 cons2: { { first object } { rest list2 } }
         { cons2 [ nip list2-length 1 + ] }
     } match ;
 
-[ 4 ]
+{ 4 }
 [ 5 6 7 8 nil2 <cons2> <cons2> <cons2> <cons2> list2-length ] unit-test

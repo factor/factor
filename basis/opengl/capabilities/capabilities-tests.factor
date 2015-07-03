@@ -9,13 +9,13 @@ CONSTANT: test-extensions
         "GL_EXT_slipgate"
     }
 
-[ t ]
+{ t }
 [ "GL_ARB_vent_core_frogblast" test-extensions (has-extension?) ] unit-test
 
-[ f ]
+{ f }
 [ "GL_ARB_wallhack" test-extensions (has-extension?) ] unit-test
 
-[ t ] [
+{ t } [
     { "GL_EXT_dimensional_portal" "GL_EXT_slipgate" }
     test-extensions (has-extension?)
 ] unit-test

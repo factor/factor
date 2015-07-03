@@ -5,7 +5,7 @@ accessors debugger math sequences threads
 concurrency.count-downs fry ;
 IN: io.pipes.tests
 
-[ "Hello" ] [
+{ "Hello" } [
     utf8 <pipe> [
         "Hello" print flush
         readln
@@ -13,15 +13,15 @@ IN: io.pipes.tests
 ] unit-test
 
 ! Test run-pipeline
-[ { } ] [ { } run-pipeline ] unit-test
-[ { f } ] [ { [ f ] } run-pipeline ] unit-test
-[ { "Hello" } ] [
+{ { } } [ { } run-pipeline ] unit-test
+{ { f } } [ { [ f ] } run-pipeline ] unit-test
+{ { "Hello" } } [
     "Hello" [
         { [ input-stream [ utf8 <decoder> ] change readln ] } run-pipeline
     ] with-string-reader
 ] unit-test
 
-[ { f "Hello" } ] [
+{ { f "Hello" } } [
     {
         [ output-stream [ utf8 <encoder> ] change "Hello" print flush f ]
         [ input-stream [ utf8 <decoder> ] change readln ]
@@ -37,7 +37,7 @@ IN: io.pipes.tests
 ] must-fail
 
 ! Test writing to a half-open pipe
-[ ] [
+{ } [
     1000 [
         utf8 <pipe> [
             [ in>> dispose ]
@@ -48,7 +48,7 @@ IN: io.pipes.tests
 ] unit-test
 
 ! Test non-blocking operation
-[ ] [
+{ } [
     [
         2 <count-down> "count-down" set
 
@@ -76,7 +76,7 @@ IN: io.pipes.tests
 ] unit-test
 
 ! 0 read should not block
-[ f ] [
+{ f } [
     [
         binary <pipe> &dispose
         in>>
