@@ -47,4 +47,4 @@ IN: lists.tests
     { 1 2 3 } sequence>list { 4 5 6 } sequence>list lappend list>array
 ] unit-test
 
-[ { 1 } { 2 } ] [ { 1 2 } sequence>list 1 lcut [ list>array ] bi@ ] unit-test
+{ { 1 } { 2 } } [ { 1 2 } sequence>list 1 lcut [ list>array ] bi@ ] unit-test

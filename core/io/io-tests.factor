@@ -79,14 +79,14 @@ M: dumb-writer stream-write1 vector>> push ; inline
 { SBUF" asdf" }
 [ "asdf" <string-reader> 4 <sbuf> [ stream-copy ] keep ] unit-test
 
-[ "asdf" ]
+{ "asdf" }
 [
     [
         [ "asdf" error-stream get stream-write ] with-error>output
     ] with-string-writer
 ] unit-test
 
-[ "asdf" ]
+{ "asdf" }
 [
     <string-writer> [
         [

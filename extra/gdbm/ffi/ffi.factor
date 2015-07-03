@@ -28,7 +28,7 @@ STRUCT: datum { dptr char* } { dsize int } ;
 C-TYPE: _GDBM_FILE
 TYPEDEF: _GDBM_FILE* GDBM_FILE
 
-CALLBACK: void fatal_func_cb ;
+CALLBACK: void fatal_func_cb ( ) ;
 FUNCTION: GDBM_FILE gdbm_open ( c-string name, int block_size, int read_write, int mode, fatal_func_cb fatal_func ) ;
 FUNCTION-ALIAS: gdbm-close void gdbm_close ( GDBM_FILE dbf ) ;
 FUNCTION: int gdbm_store ( GDBM_FILE dbf, datum key, datum content, int flag ) ;

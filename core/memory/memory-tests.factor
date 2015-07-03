@@ -11,7 +11,7 @@ IN: memory.tests
 2 [ [ [ 3 throw ] instances ] must-fail ] times
 
 ! Tests for 'become'
-[ ] [ { } { } become ] unit-test
+{ } [ { } { } become ] unit-test
 
 ! Become something when it's on the data stack.
 { "replacer" } [
@@ -34,7 +34,7 @@ IN: memory.tests
 
 ! Bug found on Windows build box, having too many words in the
 ! image breaks 'become'
-[ ] [ 100000 [ f <uninterned-word> ] replicate { } { } become drop ] unit-test
+{ } [ 100000 [ f <uninterned-word> ] replicate { } { } become drop ] unit-test
 
 ! Bug: code heap collection had to be done when data heap was
 ! full, not just when code heap was full. If the code heap
@@ -46,7 +46,7 @@ IN: memory.tests
 
 : leak-loop ( -- ) 100 [ leak-step ] times ;
 
-[ ] [ leak-loop ] unit-test
+{ } [ leak-loop ] unit-test
 
 ! Bug: allocation of large objects directly into tenured space
 ! can proceed past the high water mark.
@@ -60,7 +60,7 @@ IN: memory.tests
 ! large objects are unreachable.
 SYMBOL: foo
 
-[ ] [
+{ } [
     gc
 
     data-room tenured>> size>>

@@ -13,11 +13,11 @@ M: dispose-dummy dispose t >>disposed? drop ;
 T{ dispose-error } "a" set
 T{ dispose-dummy } "b" set
 
-[ f ] [ "b" get disposed?>> ] unit-test
+{ f } [ "b" get disposed?>> ] unit-test
 
 [ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
 
-[ t ] [ "b" get disposed?>> ] unit-test
+{ t } [ "b" get disposed?>> ] unit-test
 
 TUPLE: dummy-obj destroyed? ;
 
@@ -36,19 +36,19 @@ M: dummy-destructor dispose ( obj -- )
 : destroy-later ( obj -- )
     <dummy-destructor> |dispose drop ;
 
-[ t ] [
+{ t } [
     [
         <dummy-obj> dup destroy-always
     ] with-destructors destroyed?>>
 ] unit-test
 
-[ f ] [
+{ f } [
     [
         <dummy-obj> dup destroy-later
     ] with-destructors destroyed?>>
 ] unit-test
 
-[ t ] [
+{ t } [
     <dummy-obj> [
         [
             dup destroy-always
@@ -57,7 +57,7 @@ M: dummy-destructor dispose ( obj -- )
     ] ignore-errors destroyed?>>
 ] unit-test
 
-[ t ] [
+{ t } [
     <dummy-obj> [
         [
             dup destroy-later

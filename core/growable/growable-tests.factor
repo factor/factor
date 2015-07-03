@@ -3,7 +3,7 @@ layouts ;
 IN: growable.tests
 
 ! erg found this one
-[ fixnum ] [
+{ fixnum } [
     2 >bignum V{ } [ set-length ] keep length class-of
 ] unit-test
 
