@@ -107,6 +107,14 @@ inline static cell tag_fixnum(fixnum untagged) {
 
 struct object {
   NO_TYPE_CHECK;
+  // header format (bits indexed with least significant as zero):
+  // bit 0      : free?
+  // if not forwarding:
+  //   bit 1      : forwarding pointer?
+  //   bit 2-5    : tag
+  //   bit 7-end  : hashcode
+  // if forwarding:
+  //   bit 2-end  : forwarding pointer
   cell header;
 
   template <typename Fixup> cell base_size(Fixup fixup) const;
@@ -323,5 +331,16 @@ struct tuple : public object {
 
   cell* data() const { return (cell*)(this + 1); }
 };
+
+inline static cell tuple_size(const tuple_layout* layout) {
+  cell size = untag_fixnum(layout->size);
+  return sizeof(tuple) + size * sizeof(cell);
+}
+
+inline static cell string_capacity(const string* str) {
+  return untag_fixnum(str->length);
+}
+
+inline static cell string_size(cell size) { return sizeof(string) + size; }
 
 }

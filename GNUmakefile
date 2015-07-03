@@ -91,7 +91,6 @@ ifdef CONFIG
 		vm/mark_bits.hpp \
 		vm/free_list.hpp \
 		vm/fixup.hpp \
-		vm/tuples.hpp \
 		vm/free_list_allocator.hpp \
 		vm/write_barrier.hpp \
 		vm/object_start_map.hpp \
@@ -100,7 +99,6 @@ ifdef CONFIG
 		vm/data_heap.hpp \
 		vm/code_heap.hpp \
 		vm/gc.hpp \
-		vm/strings.hpp \
 		vm/float_bits.hpp \
 		vm/io.hpp \
 		vm/image.hpp \
