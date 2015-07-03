@@ -87,13 +87,13 @@ FUNCTION: int futimes ( int id, timeval[2] times ) ;
 FUNCTION: c-string gai_strerror ( int ecode ) ;
 FUNCTION: int getaddrinfo ( c-string hostname, c-string servname, addrinfo* hints, addrinfo** res ) ;
 FUNCTION: c-string getcwd ( c-string buf, size_t size ) ;
-FUNCTION: pid_t getpid ;
-FUNCTION: int getdtablesize ;
-FUNCTION: pid_t getpgrp ;
+FUNCTION: pid_t getpid ( ) ;
+FUNCTION: int getdtablesize ( ) ;
+FUNCTION: pid_t getpgrp ( ) ;
 FUNCTION: pid_t getpgid ( pid_t pid ) ;
-FUNCTION: gid_t getegid ;
-FUNCTION: uid_t geteuid ;
-FUNCTION: gid_t getgid ;
+FUNCTION: gid_t getegid ( ) ;
+FUNCTION: uid_t geteuid ( ) ;
+FUNCTION: gid_t getgid ( ) ;
 FUNCTION: c-string getenv ( c-string name ) ;
 
 FUNCTION: int getgrgid_r ( gid_t gid, group* grp, c-string buffer, size_t bufsize, group** result ) ;
@@ -112,7 +112,7 @@ FUNCTION: int setrlimit ( int resource, rlimit* rlp ) ;
 FUNCTION: int getpriority ( int which, id_t who ) ;
 FUNCTION: int setpriority ( int which, id_t who, int prio ) ;
 FUNCTION: int getrusage ( int who, rusage* r_usage ) ;
-FUNCTION: group* getgrent ;
+FUNCTION: group* getgrent ( ) ;
 FUNCTION: void endgrent ( ) ;
 FUNCTION: int gethostname ( c-string name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
@@ -120,7 +120,7 @@ FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_le
 FUNCTION: protoent* getprotobyname ( c-string name ) ;
 FUNCTION: servent* getservbyname ( c-string name, c-string prot ) ;
 FUNCTION: servent* getservbyport ( int port, c-string prot ) ;
-FUNCTION: uid_t getuid ;
+FUNCTION: uid_t getuid ( ) ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;
 ! FUNCTION: int issetugid ;
@@ -186,6 +186,6 @@ FUNCTION: int utimes ( c-string path, timeval[2] times ) ;
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 FUNCTION: ssize_t writev ( int fds, iovec* iov, int iovcnt ) ;
 TYPEDEF: void* sighandler_t
-FUNCTION: sighandler_t signal ( int signum, sighandler_t handler) ;
+FUNCTION: sighandler_t signal ( int signum, sighandler_t handler ) ;
 
 "librt" "librt.so" cdecl add-library
