@@ -28,7 +28,7 @@ SYNTAX: hello "Hi" print ;
     ] unit-test
 ] with-file-vocabs
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.c" forget-vocab
     ] with-compilation-unit
@@ -40,7 +40,7 @@ SYNTAX: hello "Hi" print ;
     ] must-fail
 ] with-file-vocabs
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.c" forget-vocab
     ] with-compilation-unit

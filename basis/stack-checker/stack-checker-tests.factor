@@ -144,7 +144,7 @@ SYMBOL: sym-test
 GENERIC: potential-hang ( obj -- obj )
 M: fixnum potential-hang dup [ potential-hang ] when ;
 
-[ ] [ [ 5 potential-hang ] infer drop ] unit-test
+{ } [ [ 5 potential-hang ] infer drop ] unit-test
 
 TUPLE: funny-cons car cdr ;
 GENERIC: iterate ( obj -- )
@@ -296,21 +296,21 @@ DEFER: an-inline-word
 
 ERROR: custom-error ;
 
-[ T{ effect f { } { } t } ] [
+{ T{ effect f { } { } t } } [
     [ custom-error ] infer
 ] unit-test
 
 : funny-throw ( a -- * ) throw ; inline
 
-[ T{ effect f { } { } t } ] [
+{ T{ effect f { } { } t } } [
     [ 3 funny-throw ] infer
 ] unit-test
 
-[ T{ effect f { } { } t } ] [
+{ T{ effect f { } { } t } } [
     [ custom-error inference-error ] infer
 ] unit-test
 
-[ T{ effect f { "x" } { "x" "x" } t } ] [
+{ T{ effect f { "x" } { "x" "x" } t } } [
     [ dup [ 3 throw ] dip ] infer
 ] unit-test
 
@@ -340,7 +340,7 @@ FORGET: bad-recursion-3
     dup bad-recursion-6 call ; inline recursive
 [ [ [ drop f ] bad-recursion-6 ] infer ] must-fail
 
-[ ] [ [ \ bad-recursion-6 forget ] with-compilation-unit ] unit-test
+{ } [ [ \ bad-recursion-6 forget ] with-compilation-unit ] unit-test
 
 { 3 0 } [ [ 2drop "A" throw ] [ ] if 2drop ] must-infer-as
 { 2 0 } [ drop f f [ 2drop "A" throw ] [ ] if 2drop ] must-infer-as
@@ -359,8 +359,8 @@ DEFER: eee'
 
 [ [ eee' ] infer ] [ inference-error? ] must-fail-with
 
-[ ] [ [ \ ddd' forget ] with-compilation-unit ] unit-test
-[ ] [ [ \ eee' forget ] with-compilation-unit ] unit-test
+{ } [ [ \ ddd' forget ] with-compilation-unit ] unit-test
+{ } [ [ \ eee' forget ] with-compilation-unit ] unit-test
 
 : bogus-error ( x -- )
     dup "A" throw [ bogus-error ] [ drop ] if ; inline recursive
@@ -380,7 +380,7 @@ DEFER: eee'
 : forget-test ( -- ) ;
 
 [ forget-test ] must-infer
-[ ] [ [ \ forget-test forget ] with-compilation-unit ] unit-test
+{ } [ [ \ forget-test forget ] with-compilation-unit ] unit-test
 [ forget-test ] must-infer
 
 [ [ cond ] infer ] [ T{ unknown-macro-input f cond } = ] must-fail-with
@@ -404,10 +404,10 @@ DEFER: eee'
 [ [ execute-effect ] infer ] [ T{ unknown-macro-input f execute-effect } = ] must-fail-with
 
 [ \ set-datastack def>> infer ] [ T{ do-not-compile f do-primitive } = ] must-fail-with
-[ ] [ [ \ set-datastack def>> infer ] try ] unit-test
+{ } [ [ \ set-datastack def>> infer ] try ] unit-test
 
 ! Make sure all primitives are covered
-[ { } ] [
+{ { } } [
     all-words [ primitive? ] filter
     [ "default-output-classes" word-prop ] reject
     [ "special" word-prop ] reject
@@ -544,5 +544,5 @@ USING: alien.c-types alien ;
 : inputs-test1 ( x -- n )
     [ + ] curry inputs ;
 
-[ 1 ] [ inputs-test0 ] unit-test
-[ 1 ] [ 10 inputs-test1 ] unit-test
+{ 1 } [ inputs-test0 ] unit-test
+{ 1 } [ 10 inputs-test1 ] unit-test

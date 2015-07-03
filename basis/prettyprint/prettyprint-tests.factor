@@ -8,27 +8,27 @@ strings tools.continuations tools.continuations.private
 tools.test vectors vocabs.parser words ;
 IN: prettyprint.tests
 
-[ "4" ] [ 4 unparse ] unit-test
-[ "4096" ] [ 4096 unparse ] unit-test
-[ "0b1000000000000" ] [ 2 number-base [ 4096 unparse ] with-variable ] unit-test
-[ "0o10000" ] [ 8 number-base [ 4096 unparse ] with-variable ] unit-test
-[ "0x1000" ] [ 16 number-base [ 4096 unparse ] with-variable ] unit-test
-[ "1.0" ] [ 1.0 unparse ] unit-test
-[ "8.0" ] [ 8.0 unparse ] unit-test
-[ "8.0" ] [ 2 number-base [ 8.0 unparse ] with-variable ] unit-test
-[ "8.0" ] [ 8 number-base [ 8.0 unparse ] with-variable ] unit-test
-[ "0x1.0p3" ] [ 16 number-base [ 8.0 unparse ] with-variable ] unit-test
-[ "1267650600228229401496703205376" ] [ 1 100 shift unparse ] unit-test
+{ "4" } [ 4 unparse ] unit-test
+{ "4096" } [ 4096 unparse ] unit-test
+{ "0b1000000000000" } [ 2 number-base [ 4096 unparse ] with-variable ] unit-test
+{ "0o10000" } [ 8 number-base [ 4096 unparse ] with-variable ] unit-test
+{ "0x1000" } [ 16 number-base [ 4096 unparse ] with-variable ] unit-test
+{ "1.0" } [ 1.0 unparse ] unit-test
+{ "8.0" } [ 8.0 unparse ] unit-test
+{ "8.0" } [ 2 number-base [ 8.0 unparse ] with-variable ] unit-test
+{ "8.0" } [ 8 number-base [ 8.0 unparse ] with-variable ] unit-test
+{ "0x1.0p3" } [ 16 number-base [ 8.0 unparse ] with-variable ] unit-test
+{ "1267650600228229401496703205376" } [ 1 100 shift unparse ] unit-test
 
-[ "+" ] [ \ + unparse ] unit-test
+{ "+" } [ \ + unparse ] unit-test
 
-[ "\\ +" ] [ [ \ + ] first unparse ] unit-test
+{ "\\ +" } [ [ \ + ] first unparse ] unit-test
 
-[ "{ }" ] [ { } unparse ] unit-test
+{ "{ }" } [ { } unparse ] unit-test
 
-[ "{ 1 2 3 }" ] [ { 1 2 3 } unparse ] unit-test
+{ "{ 1 2 3 }" } [ { 1 2 3 } unparse ] unit-test
 
-[ "\"hello\\\\backslash\"" ]
+{ "\"hello\\\\backslash\"" }
 [ "hello\\backslash" unparse ]
 unit-test
 
@@ -36,45 +36,45 @@ unit-test
 ! [ "\u123456" unparse ]
 ! unit-test
 
-[ "\"\\e\"" ]
+{ "\"\\e\"" }
 [ "\e" unparse ]
 unit-test
 
-[ "\"\\x01\"" ]
+{ "\"\\x01\"" }
 [ 1 1string unparse ]
 unit-test
 
-[ "f" ] [ f unparse ] unit-test
-[ "t" ] [ t unparse ] unit-test
+{ "f" } [ f unparse ] unit-test
+{ "t" } [ t unparse ] unit-test
 
-[ "SBUF\" hello world\"" ] [ SBUF" hello world" unparse ] unit-test
+{ "SBUF\" hello world\"" } [ SBUF" hello world" unparse ] unit-test
 
-[ "W{ \\ + }" ] [ [ W{ \ + } ] first unparse ] unit-test
+{ "W{ \\ + }" } [ [ W{ \ + } ] first unparse ] unit-test
 
-[ ] [ \ fixnum see ] unit-test
+{ } [ \ fixnum see ] unit-test
 
-[ ] [ \ integer see ] unit-test
+{ } [ \ integer see ] unit-test
 
-[ ] [ \ generic see ] unit-test
+{ } [ \ generic see ] unit-test
 
-[ ] [ \ duplex-stream see ] unit-test
+{ } [ \ duplex-stream see ] unit-test
 
-[ "[ \\ + ]" ] [ [ \ + ] unparse ] unit-test
-[ "[ \\ [ ]" ] [ [ \ [ ] unparse ] unit-test
+{ "[ \\ + ]" } [ [ \ + ] unparse ] unit-test
+{ "[ \\ [ ]" } [ [ \ [ ] unparse ] unit-test
 
-[ t ] [
+{ t } [
     100 \ dup <array> unparse-short
     "{" head?
 ] unit-test
 
 : foo ( a -- b ) dup * ; inline
 
-[ "USING: kernel math ;\nIN: prettyprint.tests\n: foo ( a -- b ) dup * ; inline\n" ]
+{ "USING: kernel math ;\nIN: prettyprint.tests\n: foo ( a -- b ) dup * ; inline\n" }
 [ [ \ foo see ] with-string-writer ] unit-test
 
 : bar ( x -- y ) 2 + ;
 
-[ "USING: math ;\nIN: prettyprint.tests\n: bar ( x -- y ) 2 + ;\n" ]
+{ "USING: math ;\nIN: prettyprint.tests\n: bar ( x -- y ) 2 + ;\n" }
 [ [ \ bar see ] with-string-writer ] unit-test
 
 : blah ( a a a a a a a a a a a a a a a a a a a a -- )
@@ -99,7 +99,7 @@ unit-test
     drop
     drop ;
 
-[ "drop ;" ] [
+{ "drop ;" } [
     [ \ blah see ] with-string-writer "\n" ?tail drop 6 tail*
 ] unit-test
 
@@ -126,7 +126,7 @@ M: integer method-layout ;
 
 M: object method-layout ;
 
-[
+{
     {
         "USING: kernel math prettyprint.tests ;"
         "M: complex method-layout"
@@ -144,7 +144,7 @@ M: object method-layout ;
         "M: object method-layout ;"
         ""
     }
-] [
+} [
     [ \ method-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
@@ -159,7 +159,7 @@ M: object method-layout ;
         "    ] [ 2drop f ] if ;"
     } ;
 
-[ t ] [
+{ t } [
     "soft-break-layout" soft-break-test check-see
 ] unit-test
 
@@ -174,7 +174,7 @@ DEFER: parse-error-file
         "    [ <reversed> \"hello world foo\" suffix ] [ ] make ;"
     } ;
 
-[ t ] [
+{ t } [
     "another-soft-break-layout" another-soft-break-test
     check-see
 ] unit-test
@@ -189,7 +189,7 @@ DEFER: parse-error-file
     } ;
 
 
-[ t ] [
+{ t } [
     "string-layout-test" string-layout check-see
 ] unit-test
 
@@ -205,7 +205,7 @@ DEFER: parse-error-file
         "    } cond ;"
     } ;
 
-[ t ] [
+{ t } [
     "narrow-layout" narrow-test check-see
 ] unit-test
 
@@ -224,7 +224,7 @@ DEFER: parse-error-file
         "    } ;"
     } ;
 
-[ t ] [
+{ t } [
     "another-narrow-layout" another-narrow-test check-see
 ] unit-test
 
@@ -237,7 +237,7 @@ GENERIC: class-see-layout ( x -- y )
 USING: prettyprint.tests ;
 M: class-see-layout class-see-layout ;
 
-[
+{
     {
         "IN: prettyprint.tests"
         "TUPLE: class-see-layout ;"
@@ -246,39 +246,39 @@ M: class-see-layout class-see-layout ;
         "GENERIC: class-see-layout ( x -- y )"
         ""
     }
-] [
+} [
     [ \ class-see-layout see ] with-string-writer "\n" split
 ] unit-test
 
-[
+{
     {
         "USING: prettyprint.tests ;"
         "M: class-see-layout class-see-layout ;"
         ""
     }
-] [
+} [
     [ \ class-see-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
-[ ] [ \ in>> synopsis drop ] unit-test
+{ } [ \ in>> synopsis drop ] unit-test
 
 ! Regression
-[ t ] [
+{ t } [
     "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
     dup eval( -- )
     "generic-decl-test" "prettyprint.tests" lookup-word
     [ see ] with-string-writer =
 ] unit-test
 
-[ [ + ] ] [ [ \ + (step-into-execute) ] (remove-breakpoints) ] unit-test
+{ [ + ] } [ [ \ + (step-into-execute) ] (remove-breakpoints) ] unit-test
 
-[ [ (step-into-execute) ] ] [ [ (step-into-execute) ] (remove-breakpoints) ] unit-test
+{ [ (step-into-execute) ] } [ [ (step-into-execute) ] (remove-breakpoints) ] unit-test
 
-[ [ 2 2 + . ] ] [
+{ [ 2 2 + . ] } [
     [ 2 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
-[ [ 2 2 + . ] ] [
+{ [ 2 2 + . ] } [
     [ 2 break 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
@@ -286,26 +286,26 @@ GENERIC: generic-see-test-with-f ( obj -- obj )
 
 M: f generic-see-test-with-f ;
 
-[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
+{ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" } [
     [ M\ f generic-see-test-with-f see ] with-string-writer
 ] unit-test
 
 PREDICATE: predicate-see-test < integer even? ;
 
-[ "USING: math ;\nIN: prettyprint.tests\nPREDICATE: predicate-see-test < integer even? ;\n" ] [
+{ "USING: math ;\nIN: prettyprint.tests\nPREDICATE: predicate-see-test < integer even? ;\n" } [
     [ \ predicate-see-test see ] with-string-writer
 ] unit-test
 
 INTERSECTION: intersection-see-test sequence number ;
 
-[ "USING: math sequences ;\nIN: prettyprint.tests\nINTERSECTION: intersection-see-test sequence number ;\n" ] [
+{ "USING: math sequences ;\nIN: prettyprint.tests\nINTERSECTION: intersection-see-test sequence number ;\n" } [
     [ \ intersection-see-test see ] with-string-writer
 ] unit-test
 
-[ ] [ \ compose see ] unit-test
-[ ] [ \ curry see ] unit-test
+{ } [ \ compose see ] unit-test
+{ } [ \ curry see ] unit-test
 
-[ "POSTPONE: [" ] [ \ [ unparse ] unit-test
+{ "POSTPONE: [" } [ \ [ unparse ] unit-test
 
 TUPLE: started-out-hustlin' ;
 
@@ -313,50 +313,50 @@ GENERIC: ended-up-ballin' ( a -- b )
 
 M: started-out-hustlin' ended-up-ballin' ; inline
 
-[ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" ] [
+{ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" } [
     [ M\ started-out-hustlin' ended-up-ballin' see ] with-string-writer
 ] unit-test
 
 TUPLE: tuple-with-declared-slot { x integer } ;
 
-[
+{
     {
         "USING: math ;"
         "IN: prettyprint.tests"
         "TUPLE: tuple-with-declared-slot { x integer initial: 0 } ;"
         ""
     }
-] [
+} [
     [ \ tuple-with-declared-slot see ] with-string-writer "\n" split
 ] unit-test
 
 TUPLE: tuple-with-read-only-slot { x read-only } ;
 
-[
+{
     {
         "IN: prettyprint.tests"
         "TUPLE: tuple-with-read-only-slot { x read-only } ;"
         ""
     }
-] [
+} [
     [ \ tuple-with-read-only-slot see ] with-string-writer "\n" split
 ] unit-test
 
 TUPLE: tuple-with-initial-slot { x initial: 123 } ;
 
-[
+{
     {
         "IN: prettyprint.tests"
         "TUPLE: tuple-with-initial-slot { x initial: 123 } ;"
         ""
     }
-] [
+} [
     [ \ tuple-with-initial-slot see ] with-string-writer "\n" split
 ] unit-test
 
 TUPLE: tuple-with-initial-declared-slot { x integer initial: 123 } ;
 
-[
+{
     {
         "USING: math ;"
         "IN: prettyprint.tests"
@@ -364,95 +364,95 @@ TUPLE: tuple-with-initial-declared-slot { x integer initial: 123 } ;
         "    { x integer initial: 123 } ;"
         ""
     }
-] [
+} [
     [ \ tuple-with-initial-declared-slot see ] with-string-writer "\n" split
 ] unit-test
 
 TUPLE: final-tuple ; final
 
-[
+{
     {
         "IN: prettyprint.tests"
         "TUPLE: final-tuple ; final"
         ""
     }
-] [
+} [
     [ \ final-tuple see ] with-string-writer "\n" split
 ] unit-test
 
-[ "H{ { 1 2 } }\n" ] [ [ H{ { 1 2 } } short. ] with-string-writer ] unit-test
+{ "H{ { 1 2 } }\n" } [ [ H{ { 1 2 } } short. ] with-string-writer ] unit-test
 
-[ "H{ { 1 ~array~ } }\n" ] [ [ H{ { 1 { 2 } } } short. ] with-string-writer ] unit-test
+{ "H{ { 1 ~array~ } }\n" } [ [ H{ { 1 { 2 } } } short. ] with-string-writer ] unit-test
 
-[ "{ ~array~ }\n" ] [ [ { { 1 2 } } short. ] with-string-writer ] unit-test
+{ "{ ~array~ }\n" } [ [ { { 1 2 } } short. ] with-string-writer ] unit-test
 
-[ "H{ { 1 { 2 3 } } }\n" ] [
+{ "H{ { 1 { 2 3 } } }\n" } [
     f nesting-limit [
         [ H{ { 1 { 2 3 } } } . ] with-string-writer
     ] with-variable
 ] unit-test
 
-[ "maybe{ integer }\n" ] [ [  maybe{ integer } . ] with-string-writer ] unit-test
+{ "maybe{ integer }\n" } [ [  maybe{ integer } . ] with-string-writer ] unit-test
 TUPLE: bob a b ;
-[ "maybe{ bob }\n" ] [ [ maybe{ bob } . ] with-string-writer ] unit-test
-[ "maybe{ word }\n" ] [ [ maybe{ word } . ] with-string-writer ] unit-test
+{ "maybe{ bob }\n" } [ [ maybe{ bob } . ] with-string-writer ] unit-test
+{ "maybe{ word }\n" } [ [ maybe{ word } . ] with-string-writer ] unit-test
 
 TUPLE: har a ;
 GENERIC: harhar ( obj -- obj )
 M: maybe{ har } harhar ;
 M: integer harhar M\ integer harhar drop ;
-[
+{
 """USING: prettyprint.tests ;
 M: maybe{ har } harhar ;
 
 USING: kernel math prettyprint.tests ;
 M: integer harhar M\\ integer harhar drop ;\n"""
-] [
+} [
     [ \ harhar see-methods ] with-string-writer
 ] unit-test
 
 TUPLE: mo { a union{ float integer } } ;
 TUPLE: fo { a intersection{ fixnum integer } } ;
 
-[
+{
 """USING: math ;
 IN: prettyprint.tests
 TUPLE: mo { a union{ integer float } initial: 0 } ;
 """
-] [
+} [
     [ \ mo see ] with-string-writer
 ] unit-test
 
-[
+{
 """USING: math ;
 IN: prettyprint.tests
 TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
 """
-] [
+} [
     [ \ fo see ] with-string-writer
 ] unit-test
 
-[
+{
 """union{ intersection{ string hashtable } union{ integer float } }\n"""
-] [ [ union{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
+} [ [ union{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
-[
+{
 """intersection{
     intersection{ string hashtable }
     union{ integer float }
 }
 """
-] [ [ intersection{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
+} [ [ intersection{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
-[
+{
 """maybe{ union{ integer float } }\n"""
-] [
+} [
     [ maybe{ union{ float integer } } . ] with-string-writer
 ] unit-test
 
-[
+{
 """maybe{ maybe{ integer } }\n"""
-] [
+} [
     [ maybe{ maybe{ integer } } . ] with-string-writer
 ] unit-test
 
@@ -471,15 +471,15 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
         [ CHAR: a <string> text "b" text ] with-pprint
     ] with-string-writer ;
 
-[
+{
 """aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"""
-] [ margin get 3 - margin-test ] unit-test
+} [ margin get 3 - margin-test ] unit-test
 
-[
+{
 """aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"""
-] [ margin get 2 - margin-test ] unit-test
+} [ margin get 2 - margin-test ] unit-test
 
-[
+{
 """aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 b"""
-] [ margin get 1 - margin-test ] unit-test
+} [ margin get 1 - margin-test ] unit-test

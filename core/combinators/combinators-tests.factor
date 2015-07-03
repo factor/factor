@@ -3,37 +3,37 @@ namespaces combinators words classes sequences accessors
 math.functions arrays combinators.private stack-checker ;
 IN: combinators.tests
 
-[ 3 ] [ 1 2 [ + ] call( x y -- z ) ] unit-test
+{ 3 } [ 1 2 [ + ] call( x y -- z ) ] unit-test
 [ 1 2 [ + ] call( -- z ) ] must-fail
 [ 1 2 [ + ] call( x y -- z a ) ] must-fail
-[ 1 2 3 { 1 2 3 4 } ] [ 1 2 3 4 [ datastack nip ] call( x -- y ) ] unit-test
+{ 1 2 3 { 1 2 3 4 } } [ 1 2 3 4 [ datastack nip ] call( x -- y ) ] unit-test
 [ [ + ] call( x y -- z ) ] must-infer
 
-[ 3 ] [ 1 2 \ + execute( x y -- z ) ] unit-test
+{ 3 } [ 1 2 \ + execute( x y -- z ) ] unit-test
 [ 1 2 \ + execute( -- z ) ] must-fail
 [ 1 2 \ + execute( x y -- z a ) ] must-fail
 [ \ + execute( x y -- z ) ] must-infer
 
 : compile-execute(-test-1 ( a b -- c ) \ + execute( a b -- c ) ;
 
-[ t ] [ \ compile-execute(-test-1 optimized? ] unit-test
-[ 4 ] [ 1 3 compile-execute(-test-1 ] unit-test
+{ t } [ \ compile-execute(-test-1 optimized? ] unit-test
+{ 4 } [ 1 3 compile-execute(-test-1 ] unit-test
 
 : compile-execute(-test-2 ( a b w -- c ) execute( a b -- c ) ;
 
-[ t ] [ \ compile-execute(-test-2 optimized? ] unit-test
-[ 4 ] [ 1 3 \ + compile-execute(-test-2 ] unit-test
-[ 5 ] [ 1 4 \ + compile-execute(-test-2 ] unit-test
-[ -3 ] [ 1 4 \ - compile-execute(-test-2 ] unit-test
-[ 5 ] [ 1 4 \ + compile-execute(-test-2 ] unit-test
+{ t } [ \ compile-execute(-test-2 optimized? ] unit-test
+{ 4 } [ 1 3 \ + compile-execute(-test-2 ] unit-test
+{ 5 } [ 1 4 \ + compile-execute(-test-2 ] unit-test
+{ -3 } [ 1 4 \ - compile-execute(-test-2 ] unit-test
+{ 5 } [ 1 4 \ + compile-execute(-test-2 ] unit-test
 
 : compile-call(-test-1 ( a b q -- c ) call( a b -- c ) ;
 
-[ t ] [ \ compile-call(-test-1 optimized? ] unit-test
-[ 4 ] [ 1 3 [ + ] compile-call(-test-1 ] unit-test
-[ 7 ] [ 1 3 2 [ * + ] curry compile-call(-test-1 ] unit-test
-[ 7 ] [ 1 3 [ 2 * ] [ + ] compose compile-call(-test-1 ] unit-test
-[ 4 ] [ 1 3 [ { + } [ ] like call ] compile-call(-test-1 ] unit-test
+{ t } [ \ compile-call(-test-1 optimized? ] unit-test
+{ 4 } [ 1 3 [ + ] compile-call(-test-1 ] unit-test
+{ 7 } [ 1 3 2 [ * + ] curry compile-call(-test-1 ] unit-test
+{ 7 } [ 1 3 [ 2 * ] [ + ] compose compile-call(-test-1 ] unit-test
+{ 4 } [ 1 3 [ { + } [ ] like call ] compile-call(-test-1 ] unit-test
 
 [ [ ] call( -- * ) ] must-fail
 
@@ -62,10 +62,10 @@ IN: combinators.tests
 
 \ cond-test-1 def>> must-infer
 
-[ "even" ] [ 2 cond-test-1 ] unit-test
-[ "even" ] [ 2 \ cond-test-1 def>> call ] unit-test
-[ "odd" ] [ 3 cond-test-1 ] unit-test
-[ "odd" ] [ 3 \ cond-test-1 def>> call ] unit-test
+{ "even" } [ 2 cond-test-1 ] unit-test
+{ "even" } [ 2 \ cond-test-1 def>> call ] unit-test
+{ "odd" } [ 3 cond-test-1 ] unit-test
+{ "odd" } [ 3 \ cond-test-1 def>> call ] unit-test
 
 : cond-test-2 ( obj -- str )
     {
@@ -76,12 +76,12 @@ IN: combinators.tests
 
 \ cond-test-2 def>> must-infer
 
-[ "true" ] [ t cond-test-2 ] unit-test
-[ "true" ] [ t \ cond-test-2 def>> call ] unit-test
-[ "false" ] [ f cond-test-2 ] unit-test
-[ "false" ] [ f \ cond-test-2 def>> call ] unit-test
-[ "something else" ] [ "ohio" cond-test-2 ] unit-test
-[ "something else" ] [ "ohio" \ cond-test-2 def>> call ] unit-test
+{ "true" } [ t cond-test-2 ] unit-test
+{ "true" } [ t \ cond-test-2 def>> call ] unit-test
+{ "false" } [ f cond-test-2 ] unit-test
+{ "false" } [ f \ cond-test-2 def>> call ] unit-test
+{ "something else" } [ "ohio" cond-test-2 ] unit-test
+{ "something else" } [ "ohio" \ cond-test-2 def>> call ] unit-test
 
 : cond-test-3 ( obj -- str )
     {
@@ -92,12 +92,12 @@ IN: combinators.tests
 
 \ cond-test-3 def>> must-infer
 
-[ "something else" ] [ t cond-test-3 ] unit-test
-[ "something else" ] [ t \ cond-test-3 def>> call ] unit-test
-[ "something else" ] [ f cond-test-3 ] unit-test
-[ "something else" ] [ f \ cond-test-3 def>> call ] unit-test
-[ "something else" ] [ "ohio" cond-test-3 ] unit-test
-[ "something else" ] [ "ohio" \ cond-test-3 def>> call ] unit-test
+{ "something else" } [ t cond-test-3 ] unit-test
+{ "something else" } [ t \ cond-test-3 def>> call ] unit-test
+{ "something else" } [ f cond-test-3 ] unit-test
+{ "something else" } [ f \ cond-test-3 def>> call ] unit-test
+{ "something else" } [ "ohio" cond-test-3 ] unit-test
+{ "something else" } [ "ohio" \ cond-test-3 def>> call ] unit-test
 
 : cond-test-4 ( -- )
     {
@@ -115,8 +115,8 @@ IN: combinators.tests
         { [ dup 2 mod 0 = ] [ drop "even" ] }
     } cond ;
 
-[ "early" ] [ 2 cond-test-5 ] unit-test
-[ "early" ] [ 2 \ cond-test-5 def>> call ] unit-test
+{ "early" } [ 2 cond-test-5 ] unit-test
+{ "early" } [ 2 \ cond-test-5 def>> call ] unit-test
 
 : cond-test-6 ( a -- b )
     {
@@ -125,8 +125,8 @@ IN: combinators.tests
        { [ dup 2 mod 0 = ] [ drop "even" ] }
     } cond ;
 
-[ "really early" ] [ 2 cond-test-6 ] unit-test
-[ "really early" ] [ 2 \ cond-test-6 def>> call ] unit-test
+{ "really early" } [ 2 cond-test-6 ] unit-test
+{ "really early" } [ 2 \ cond-test-6 def>> call ] unit-test
 
 ! Case
 : case-test-1 ( obj -- obj' )
@@ -139,8 +139,8 @@ IN: combinators.tests
 
 \ case-test-1 def>> must-infer
 
-[ "two" ] [ 2 case-test-1 ] unit-test
-[ "two" ] [ 2 \ case-test-1 def>> call ] unit-test
+{ "two" } [ 2 case-test-1 ] unit-test
+{ "two" } [ 2 \ case-test-1 def>> call ] unit-test
 
 [ "x" case-test-1 ] must-fail
 [ "x" \ case-test-1 def>> call ] must-fail
@@ -156,8 +156,8 @@ IN: combinators.tests
 
 \ case-test-2 def>> must-infer
 
-[ 25 ] [ 5 case-test-2 ] unit-test
-[ 25 ] [ 5 \ case-test-2 def>> call ] unit-test
+{ 25 } [ 5 case-test-2 ] unit-test
+{ 25 } [ 5 \ case-test-2 def>> call ] unit-test
 
 : case-test-3 ( obj -- obj' )
     {
@@ -172,8 +172,8 @@ IN: combinators.tests
 
 \ case-test-3 def>> must-infer
 
-[ "an array" ] [ { 1 2 3 } case-test-3 ] unit-test
-[ "an array" ] [ { 1 2 3 } \ case-test-3 def>> call ] unit-test
+{ "an array" } [ { 1 2 3 } case-test-3 ] unit-test
+{ "an array" } [ { 1 2 3 } \ case-test-3 def>> call ] unit-test
 
 CONSTANT: case-const-1 1
 CONSTANT: case-const-2 2
@@ -191,15 +191,15 @@ CONSTANT: case-const-2 2
 
 \ case-test-4 def>> must-infer
 
-[ "uno" ] [ 1 case-test-4 ] unit-test
-[ "dos" ] [ 2 case-test-4 ] unit-test
-[ "tres" ] [ 3 case-test-4 ] unit-test
-[ "demasiado" ] [ 100 case-test-4 ] unit-test
+{ "uno" } [ 1 case-test-4 ] unit-test
+{ "dos" } [ 2 case-test-4 ] unit-test
+{ "tres" } [ 3 case-test-4 ] unit-test
+{ "demasiado" } [ 100 case-test-4 ] unit-test
 
-[ "uno" ] [ 1 \ case-test-4 def>> call ] unit-test
-[ "dos" ] [ 2 \ case-test-4 def>> call ] unit-test
-[ "tres" ] [ 3 \ case-test-4 def>> call ] unit-test
-[ "demasiado" ] [ 100 \ case-test-4 def>> call ] unit-test
+{ "uno" } [ 1 \ case-test-4 def>> call ] unit-test
+{ "dos" } [ 2 \ case-test-4 def>> call ] unit-test
+{ "tres" } [ 3 \ case-test-4 def>> call ] unit-test
+{ "demasiado" } [ 100 \ case-test-4 def>> call ] unit-test
 
 : case-test-5 ( obj -- )
     {
@@ -213,8 +213,8 @@ CONSTANT: case-const-2 2
 
 \ case-test-5 def>> must-infer
 
-[ ] [ 1 case-test-5 ] unit-test
-[ ] [ 1 \ case-test-5 def>> call ] unit-test
+{ } [ 1 case-test-5 ] unit-test
+{ } [ 1 \ case-test-5 def>> call ] unit-test
 
 : do-not-call ( -- * ) "do not call" throw ;
 
@@ -226,15 +226,15 @@ CONSTANT: case-const-2 2
 
 \ test-case-6 def>> must-infer
 
-[ "three" ] [ 3 test-case-6 ] unit-test
-[ "do-not-call" ] [ \ do-not-call test-case-6 ] unit-test
+{ "three" } [ 3 test-case-6 ] unit-test
+{ "do-not-call" } [ \ do-not-call test-case-6 ] unit-test
 
-[ t ] [ { 1 3 2 } contiguous-range? ] unit-test
-[ f ] [ { 1 2 2 4 } contiguous-range? ] unit-test
-[ f ] [ { + 3 2 } contiguous-range? ] unit-test
-[ f ] [ { 1 0 7 } contiguous-range? ] unit-test
-[ f ] [ { 1 1 3 7 } contiguous-range? ] unit-test
-[ t ] [ { 7 6 4 8 5 } contiguous-range? ] unit-test
+{ t } [ { 1 3 2 } contiguous-range? ] unit-test
+{ f } [ { 1 2 2 4 } contiguous-range? ] unit-test
+{ f } [ { + 3 2 } contiguous-range? ] unit-test
+{ f } [ { 1 0 7 } contiguous-range? ] unit-test
+{ f } [ { 1 1 3 7 } contiguous-range? ] unit-test
+{ t } [ { 7 6 4 8 5 } contiguous-range? ] unit-test
 
 
 : test-case-7 ( obj -- str )
@@ -249,17 +249,17 @@ CONSTANT: case-const-2 2
 
 \ test-case-7 def>> must-infer
 
-[ "plus" ] [ \ + test-case-7 ] unit-test
-[ "plus" ] [ \ + \ test-case-7 def>> call ] unit-test
+{ "plus" } [ \ + test-case-7 ] unit-test
+{ "plus" } [ \ + \ test-case-7 def>> call ] unit-test
 
 DEFER: corner-case-1
 
 << \ corner-case-1 2 [ + ] curry 1array [ case ] curry ( a -- b ) define-declared >>
 
-[ t ] [ \ corner-case-1 optimized? ] unit-test
+{ t } [ \ corner-case-1 optimized? ] unit-test
 
-[ 4 ] [ 2 corner-case-1 ] unit-test
-[ 4 ] [ 2 \ corner-case-1 def>> call ] unit-test
+{ 4 } [ 2 corner-case-1 ] unit-test
+{ 4 } [ 2 \ corner-case-1 def>> call ] unit-test
 
 : test-case-8 ( n -- string )
     {
@@ -277,11 +277,11 @@ DEFER: corner-case-1
         { \ - [ "minus 2" ] }
     } case ;
 
-[ "plus" ] [ \ + test-case-9 ] unit-test
-[ "plus" ] [ \ + \ test-case-9 def>> call ] unit-test
+{ "plus" } [ \ + test-case-9 ] unit-test
+{ "plus" } [ \ + \ test-case-9 def>> call ] unit-test
 
-[ "minus" ] [ \ - test-case-9 ] unit-test
-[ "minus" ] [ \ - \ test-case-9 def>> call ] unit-test
+{ "minus" } [ \ - test-case-9 ] unit-test
+{ "minus" } [ \ - \ test-case-9 def>> call ] unit-test
 
 : test-case-10 ( a -- b )
     {
@@ -293,8 +293,8 @@ DEFER: corner-case-1
         { 5 [ "cinco" ] }
     } case ;
 
-[ "dos" ] [ 2 test-case-10 ] unit-test
-[ "dos" ] [ 2 \ test-case-10 def>> call ] unit-test
+{ "dos" } [ 2 test-case-10 ] unit-test
+{ "dos" } [ 2 \ test-case-10 def>> call ] unit-test
 
 : test-case-11 ( a -- b )
     {
@@ -306,8 +306,8 @@ DEFER: corner-case-1
         { 55 [ "cinco" ] }
     } case ;
 
-[ "dos" ] [ 22 test-case-11 ] unit-test
-[ "dos" ] [ 22 \ test-case-11 def>> call ] unit-test
+{ "dos" } [ 22 test-case-11 ] unit-test
+{ "dos" } [ 22 \ test-case-11 def>> call ] unit-test
 
 : test-case-12 ( a -- b )
     {
@@ -319,10 +319,10 @@ DEFER: corner-case-1
         { 55 [ "cinco" ] }
     } case ;
 
-[ "nachos" ] [ 33 test-case-12 ] unit-test
-[ "nachos" ] [ 33 \ test-case-12 def>> call ] unit-test
+{ "nachos" } [ 33 test-case-12 ] unit-test
+{ "nachos" } [ 33 \ test-case-12 def>> call ] unit-test
 
-[ ( x x -- x x ) ] [
+{ ( x x -- x x ) } [
     [ { [ ] [ ] } spread ] infer
 ] unit-test
 

@@ -63,7 +63,7 @@ FUNCTION: CGContextRef CGBitmapContextCreate (
    CGBitmapInfo bitmapInfo
 ) ;
 
-FUNCTION: CGImageRef CGBitmapContextCreateImage
+FUNCTION: CGImageRef CGBitmapContextCreateImage (
    CGContextRef c
 ) ;
 

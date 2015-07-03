@@ -70,7 +70,7 @@ CLASS: FactorServiceProvider < NSObject
     FactorServiceProvider -> alloc -> init
     -> setServicesProvider: ;
 
-FUNCTION: void NSUpdateDynamicServices ;
+FUNCTION: void NSUpdateDynamicServices ( ) ;
 
 [
     install-app-delegate
