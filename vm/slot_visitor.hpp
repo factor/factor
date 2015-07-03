@@ -1,44 +1,49 @@
 namespace factor {
 
-/* Size of the object pointed to by an untagged pointer */
-template <typename Fixup> cell object::size(Fixup fixup) const {
-  if (free_p())
-    return ((free_heap_block*)this)->size();
-
+/* Size sans alignment. */
+template <typename Fixup>
+cell object::base_size(Fixup fixup) const {
   switch (type()) {
     case ARRAY_TYPE:
-      return align(array_size((array*)this), data_alignment);
+      return array_size((array*)this);
     case BIGNUM_TYPE:
-      return align(array_size((bignum*)this), data_alignment);
+      return array_size((bignum*)this);
     case BYTE_ARRAY_TYPE:
-      return align(array_size((byte_array*)this), data_alignment);
+      return array_size((byte_array*)this);
     case STRING_TYPE:
-      return align(string_size(string_capacity((string*)this)), data_alignment);
+      return string_size(string_capacity((string*)this));
     case TUPLE_TYPE: {
       tuple_layout* layout = (tuple_layout*)fixup.translate_data(
           untag<object>(((tuple*)this)->layout));
-      return align(tuple_size(layout), data_alignment);
+      return tuple_size(layout);
     }
     case QUOTATION_TYPE:
-      return align(sizeof(quotation), data_alignment);
+      return sizeof(quotation);
     case WORD_TYPE:
-      return align(sizeof(word), data_alignment);
+      return sizeof(word);
     case FLOAT_TYPE:
-      return align(sizeof(boxed_float), data_alignment);
+      return sizeof(boxed_float);
     case DLL_TYPE:
-      return align(sizeof(dll), data_alignment);
+      return sizeof(dll);
     case ALIEN_TYPE:
-      return align(sizeof(alien), data_alignment);
+      return sizeof(alien);
     case WRAPPER_TYPE:
-      return align(sizeof(wrapper), data_alignment);
-    case CALLSTACK_TYPE:
-      return align(
-          callstack_object_size(untag_fixnum(((callstack*)this)->length)),
-          data_alignment);
+      return sizeof(wrapper);
+    case CALLSTACK_TYPE: {
+      return callstack_object_size(untag_fixnum(((callstack*)this)->length));
+    }
     default:
-      critical_error("Invalid header in size", (cell)this);
-      return 0; /* can't happen */
+      critical_error("Invalid header in base_size", (cell)this);
+      return 0;
   }
+}
+
+/* Size of the object pointed to by an untagged pointer */
+template <typename Fixup>
+cell object::size(Fixup fixup) const {
+  if (free_p())
+    return ((free_heap_block*)this)->size();
+  return align(base_size(fixup), data_alignment);
 }
 
 inline cell object::size() const { return size(no_fixup()); }

@@ -109,8 +109,9 @@ struct object {
   NO_TYPE_CHECK;
   cell header;
 
-  cell size() const;
+  template <typename Fixup> cell base_size(Fixup fixup) const;
   template <typename Fixup> cell size(Fixup fixup) const;
+  cell size() const;
 
   cell binary_payload_start() const;
   template <typename Fixup> cell binary_payload_start(Fixup fixup) const;
