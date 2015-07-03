@@ -15,16 +15,16 @@ CONSTANT: YAML_VALUE_TAG "tag:yaml.org,2002:value"
 ! http://www.yaml.org/spec/1.2/spec.html
 ! 10.3. Core Schema
 
-CONSTANT: re-null R/ null|Null|NULL|~/
-CONSTANT: re-empty R/ /
-CONSTANT: re-bool R/ true|True|TRUE|false|False|FALSE/
-CONSTANT: re-int10 R/ [-+]?[0-9]+/
-CONSTANT: re-int8 R/ 0o[0-7]+/
-CONSTANT: re-int16 R/ 0x[0-9a-fA-F]+/
-CONSTANT: re-number R/ [-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?/
-CONSTANT: re-infinity R/ [-+]?\.(inf|Inf|INF)/
-CONSTANT: re-nan R/ \.(nan|NaN|NAN)/
-CONSTANT: re-timestamp R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]|[0-9][0-9][0-9][0-9]-[0-9][0-9]?-[0-9][0-9]?([Tt]|[ \t]+)[0-9][0-9]?:[0-9][0-9]:[0-9][0-9](\.[0-9]*)?([ \t]*(Z|[-+][0-9][0-9]?(:[0-9][0-9])?))?/
+CONSTANT: re-null R" null|Null|NULL|~"
+CONSTANT: re-empty R" "
+CONSTANT: re-bool R" true|True|TRUE|false|False|FALSE"
+CONSTANT: re-int10 R" [-+]?[0-9]+"
+CONSTANT: re-int8 R" 0o[0-7]+"
+CONSTANT: re-int16 R" 0x[0-9a-fA-F]+"
+CONSTANT: re-number R" [-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?"
+CONSTANT: re-infinity R" [-+]?\.(inf|Inf|INF)"
+CONSTANT: re-nan R" \.(nan|NaN|NAN)"
+CONSTANT: re-timestamp R" [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]|[0-9][0-9][0-9][0-9]-[0-9][0-9]?-[0-9][0-9]?([Tt]|[ \t]+)[0-9][0-9]?:[0-9][0-9]:[0-9][0-9](\.[0-9]*)?([ \t]*(Z|[-+][0-9][0-9]?(:[0-9][0-9])?))?"
 
 : resolve-normal-plain-scalar ( str -- tag )
     {
@@ -41,8 +41,8 @@ CONSTANT: re-timestamp R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]|[0-9][0-9][
         [ drop YAML_STR_TAG ]
     } cond-case ;
 
-CONSTANT: re-merge R/ <</
-CONSTANT: re-value R/ =/
+CONSTANT: re-merge R" <<"
+CONSTANT: re-value R" ="
 : (resolve-mapping-key-plain-scalar) ( str -- tag )
     {
         { [ re-merge matches? ] [ YAML_MERGE_TAG ] }
@@ -87,7 +87,7 @@ CONSTANT: YAML_OMAP_TAG "tag:yaml.org,2002:omap"
 CONSTANT: YAML_PAIRS_TAG "tag:yaml.org,2002:pairs"
 CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
 
-: construct-bool ( str -- ? ) R/ true|True|TRUE/ matches? ;
+: construct-bool ( str -- ? ) R" true|True|TRUE" matches? ;
 
 : construct-int ( str -- n ) string>number ;
 
@@ -107,14 +107,14 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
 ! - months, days and hours on 1 digit
 ! preprocess to fix this mess...
 : yaml>rfc3339 ( str -- str' )
-    R/ -[0-9][^0-9]/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
-    R/ -[0-9][^0-9]/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
-    R/ [^0-9][0-9]:/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
-    R/ [ \t]+/ " " re-replace
+    R" -[0-9][^0-9]" [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
+    R" -[0-9][^0-9]" [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
+    R" [^0-9][0-9]:" [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
+    R" [ \t]+" " " re-replace
     CHAR: : over index cut CHAR: space swap remove append ;
 
 : construct-timestamp ( obj -- obj' )
-    dup R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ matches?
+    dup R" [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]" matches?
     [ ymd>timestamp ] [ yaml>rfc3339 rfc3339>timestamp ] if ;
 
 TUPLE: yaml-merge ;
