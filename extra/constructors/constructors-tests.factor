@@ -11,7 +11,7 @@ CONSTRUCTOR: <stock-spread> stock-spread ( stock spread -- stock-spread )
 
 SYMBOL: AAPL
 
-[ t ] [
+{ t } [
     AAPL 1234 <stock-spread>
     {
         [ stock>> AAPL eq? ]
@@ -33,10 +33,10 @@ CONSTRUCTOR: <ct3> ct3 ( a b c -- obj ) ;
 
 CONSTRUCTOR: <ct4> ct4 ( a b c d -- obj ) ;
 
-[ 1000 ] [ 1000 <ct1> a>> ] unit-test
-[ 0 ] [ 0 0 <ct2> a>> ] unit-test
-[ 0 ] [ 0 0 0 <ct3> a>> ] unit-test
-[ 0 ] [ 0 0 0 0 <ct4> a>> ] unit-test
+{ 1000 } [ 1000 <ct1> a>> ] unit-test
+{ 0 } [ 0 0 <ct2> a>> ] unit-test
+{ 0 } [ 0 0 0 <ct3> a>> ] unit-test
+{ 0 } [ 0 0 0 0 <ct4> a>> ] unit-test
 
 
 TUPLE: monster
@@ -61,11 +61,11 @@ SLOT-CONSTRUCTOR: a-monster
     2dup +
     { "name" "hp" "max-hp" "computed" } \ b-monster slots>boa ;
 
-[ 20 ] [ "Norm" 10 10 <a-monster> computed>> ] unit-test
-[ 18 ] [ "Norm" 10 10 <a-monster> stop>> ] unit-test
+{ 20 } [ "Norm" 10 10 <a-monster> computed>> ] unit-test
+{ 18 } [ "Norm" 10 10 <a-monster> stop>> ] unit-test
 
-[ 22 ] [ "Phil" 11 11 <b-monster> computed>> ] unit-test
-[ 18 ] [ "Phil" 11 11 <b-monster> stop>> ] unit-test
+{ 22 } [ "Phil" 11 11 <b-monster> computed>> ] unit-test
+{ 18 } [ "Phil" 11 11 <b-monster> stop>> ] unit-test
 
 [
     """USE: constructors

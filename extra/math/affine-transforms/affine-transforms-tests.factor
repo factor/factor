@@ -3,12 +3,12 @@ USING: arrays kernel literals tools.test math math.affine-transforms
 math.constants math.functions ;
 IN: math.affine-transforms.tests
 
-[ { 7.25 4.25 } ] [
+{ { 7.25 4.25 } } [
     { 0.75 0.75 } { 0.75 -0.75 } { 5.0 5.0 } <affine-transform>
     { 1.0 2.0 } a.v
 ] unit-test
 
-[ -1.125 ] [
+{ -1.125 } [
     { 0.75 0.75 } { 0.75 -0.75 } { 5.0 5.0 } <affine-transform>
     |a|
 ] unit-test
@@ -39,7 +39,7 @@ IN: math.affine-transforms.tests
     a.
 ] unit-test
 
-[ t ] [
+{ t } [
     { 0.01  0.02  } { 0.03  0.04  } { 0.05  0.06  } <affine-transform>
     { 0.011 0.021 } { 0.031 0.041 } { 0.051 0.061 } <affine-transform> 0.01 a~
 ] unit-test

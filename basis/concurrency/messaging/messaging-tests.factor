@@ -6,16 +6,16 @@ quotations concurrency.messaging concurrency.mailboxes
 concurrency.count-downs accessors ;
 IN: concurrency.messaging.tests
 
-[ ] [ my-mailbox data>> clear-deque ] unit-test
+{ } [ my-mailbox data>> clear-deque ] unit-test
 
-[ "received" ] [
+{ "received" } [
     [
         receive "received" swap reply-synchronous
     ] "Synchronous test" spawn
     "sent" swap send-synchronous
 ] unit-test
 
-[ 1 3 2 ] [
+{ 1 3 2 } [
     1 self send
     2 self send
     3 self send
@@ -45,7 +45,7 @@ SYMBOL: exit
         { exit                 [ f ] }
     } match-cond ;
 
-[ -5 ] [
+{ -5 } [
     [ 0 [ counter ] loop ] "Counter" spawn "counter" set
     { increment 10 } "counter" get send
     { decrement 15 } "counter" get send

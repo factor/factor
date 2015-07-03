@@ -1,27 +1,27 @@
 USING: cuda.ptx io.streams.string tools.test ;
 IN: cuda.ptx.tests
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20, .texmode_independent
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } { texmode .texmode_independent } } }
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_11, map_f64_to_f32
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target
@@ -31,9 +31,9 @@ IN: cuda.ptx.tests
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_11, map_f64_to_f32, .texmode_independent
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target
@@ -44,7 +44,7 @@ IN: cuda.ptx.tests
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	.global .f32 foo[9000];
 	.extern .align 16 .shared .v4.f32 bar[];
@@ -61,7 +61,7 @@ IN: cuda.ptx.tests
 	{
 	ret;
 	}
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -113,25 +113,25 @@ IN: cuda.ptx.tests
     } ptx>string
 ] unit-test
 
-[ "a" ] [ [ "a" write-ptx-operand ] with-string-writer ] unit-test
-[ "2" ] [ [ 2 write-ptx-operand ] with-string-writer ] unit-test
-[ "0d4000000000000000" ] [ [ 2.0 write-ptx-operand ] with-string-writer ] unit-test
-[ "!a" ] [ [ T{ ptx-negation f "a" } write-ptx-operand ] with-string-writer ] unit-test
-[ "{a, b, c, d}" ] [ [ T{ ptx-vector f { "a" "b" "c" "d" } } write-ptx-operand ] with-string-writer ] unit-test
-[ "[a]" ] [ [ T{ ptx-indirect f "a" 0 } write-ptx-operand ] with-string-writer ] unit-test
-[ "[a+1]" ] [ [ T{ ptx-indirect f "a" 1 } write-ptx-operand ] with-string-writer ] unit-test
-[ "[a-1]" ] [ [ T{ ptx-indirect f "a" -1 } write-ptx-operand ] with-string-writer ] unit-test
-[ "a[1]" ] [ [ T{ ptx-element f "a" 1 } write-ptx-operand ] with-string-writer ] unit-test
-[ "{a, b[2], 3, 0d4000000000000000}" ] [ [ T{ ptx-vector f { "a" T{ ptx-element f "b" 2 } 3 2.0 } } write-ptx-operand ] with-string-writer ] unit-test
+{ "a" } [ [ "a" write-ptx-operand ] with-string-writer ] unit-test
+{ "2" } [ [ 2 write-ptx-operand ] with-string-writer ] unit-test
+{ "0d4000000000000000" } [ [ 2.0 write-ptx-operand ] with-string-writer ] unit-test
+{ "!a" } [ [ T{ ptx-negation f "a" } write-ptx-operand ] with-string-writer ] unit-test
+{ "{a, b, c, d}" } [ [ T{ ptx-vector f { "a" "b" "c" "d" } } write-ptx-operand ] with-string-writer ] unit-test
+{ "[a]" } [ [ T{ ptx-indirect f "a" 0 } write-ptx-operand ] with-string-writer ] unit-test
+{ "[a+1]" } [ [ T{ ptx-indirect f "a" 1 } write-ptx-operand ] with-string-writer ] unit-test
+{ "[a-1]" } [ [ T{ ptx-indirect f "a" -1 } write-ptx-operand ] with-string-writer ] unit-test
+{ "a[1]" } [ [ T{ ptx-element f "a" 1 } write-ptx-operand ] with-string-writer ] unit-test
+{ "{a, b[2], 3, 0d4000000000000000}" } [ [ T{ ptx-vector f { "a" T{ ptx-element f "b" 2 } 3 2.0 } } write-ptx-operand ] with-string-writer ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	abs.s32 a, b;
 	@p abs.s32 a, b;
 	@!p abs.s32 a, b;
 foo:	abs.s32 a, b;
 	abs.ftz.f32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -154,7 +154,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	add.s32 a, b, c;
 	add.cc.s32 a, b, c;
@@ -163,7 +163,7 @@ foo:	abs.s32 a, b;
 	add.ftz.sat.f32 a, b, c;
 	add.rz.sat.f32 a, b, c;
 	add.rz.ftz.sat.f32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -179,11 +179,11 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	addc.s32 a, b, c;
 	addc.cc.s32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -194,10 +194,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	and.b32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -207,12 +207,12 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	atom.and.u32 a, [b], c;
 	atom.global.or.u32 a, [b], c;
 	atom.shared.cas.u32 a, [b], c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -225,7 +225,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	bar.arrive a, b;
 	bar.red.popc.u32 a, b, d;
@@ -233,7 +233,7 @@ foo:	abs.s32 a, b;
 	bar.red.popc.u32 a, b, c, !d;
 	bar.sync a;
 	bar.sync a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -248,10 +248,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	bfe.u32 a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -261,10 +261,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	bfi.u32 a, b, c, d, e;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -274,11 +274,11 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	bfind.u32 a, b;
 	bfind.shiftamt.u32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -289,11 +289,11 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	bra foo;
 	bra.uni bar;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -304,10 +304,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	brev.b32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -317,10 +317,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	brkpt;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -330,7 +330,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	call foo;
 	call.uni foo;
@@ -340,7 +340,7 @@ foo:	abs.s32 a, b;
 	call (a), foo, (b, c, d);
 	call (a[2]), foo, (b, c, d[3]);
 	call foo, (b, c, d);
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -357,10 +357,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	clz.b32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -370,10 +370,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	cnot.b32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -383,10 +383,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	copysign.f64 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -396,10 +396,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	cos.approx.f32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -409,7 +409,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	cvt.f32.s32 a, b;
 	cvt.s32.f32 a, b;
@@ -419,7 +419,7 @@ foo:	abs.s32 a, b;
 	cvt.sat.f32.f64 a, b;
 	cvt.ftz.sat.f32.f64 a, b;
 	cvt.rp.ftz.sat.f32.f64 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -436,12 +436,12 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	cvta.global.u64 a, b;
 	cvta.shared.u64 a, b;
 	cvta.to.shared.u64 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -453,7 +453,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	div.u32 a, b, c;
 	div.approx.f32 a, b, c;
@@ -466,7 +466,7 @@ foo:	abs.s32 a, b;
 	div.rz.ftz.f32 a, b, c;
 	div.f64 a, b, c;
 	div.rz.f64 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -486,10 +486,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	ex2.approx.f32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -499,10 +499,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	exit;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -512,7 +512,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	fma.f32 a, b, c, d;
 	fma.sat.f32 a, b, c, d;
@@ -520,7 +520,7 @@ foo:	abs.s32 a, b;
 	fma.ftz.sat.f32 a, b, c, d;
 	fma.rz.sat.f32 a, b, c, d;
 	fma.rz.ftz.sat.f32 a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -535,10 +535,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	isspacep.shared a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -548,7 +548,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	ld.u32 a, [b];
 	ld.v2.u32 a, [b];
@@ -557,7 +557,7 @@ foo:	abs.s32 a, b;
 	ld.lu.u32 a, [b];
 	ld.const.lu.u32 a, [b];
 	ld.volatile.const[5].u32 a, [b];
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -573,7 +573,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	ldu.u32 a, [b];
 	ldu.v2.u32 a, [b];
@@ -582,7 +582,7 @@ foo:	abs.s32 a, b;
 	ldu.lu.u32 a, [b];
 	ldu.const.lu.u32 a, [b];
 	ldu.volatile.const[5].u32 a, [b];
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -598,10 +598,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	lg2.approx.f32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -611,7 +611,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	mad.s32 a, b, c, d;
 	mad.lo.s32 a, b, c, d;
@@ -621,7 +621,7 @@ foo:	abs.s32 a, b;
 	mad.ftz.sat.f32 a, b, c, d;
 	mad.rz.sat.f32 a, b, c, d;
 	mad.rz.ftz.sat.f32 a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -638,13 +638,13 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	mad24.s32 a, b, c, d;
 	mad24.lo.s32 a, b, c, d;
 	mad24.sat.s32 a, b, c, d;
 	mad24.hi.sat.s32 a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -657,12 +657,12 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	neg.s32 a, b;
 	neg.f32 a, b;
 	neg.ftz.f32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -674,10 +674,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	not.b32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -687,10 +687,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	or.b32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -700,10 +700,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	pmevent a;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -713,10 +713,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	popc.b64 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -726,12 +726,12 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	prefetch.L1 [a];
 	prefetch.local.L2 [a];
 	prefetchu.L1 [a];
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -743,11 +743,11 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	prmt.b32 a, b, c, d;
 	prmt.b32.f4e a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -758,7 +758,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	rcp.approx.f32 a, b;
 	rcp.approx.ftz.f32 a, b;
@@ -768,7 +768,7 @@ foo:	abs.s32 a, b;
 	rcp.rz.ftz.f32 a, b;
 	rcp.f64 a, b;
 	rcp.rz.f64 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -785,11 +785,11 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	red.and.u32 [a], b;
 	red.global.and.u32 [a], b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -800,12 +800,12 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	rsqrt.approx.f32 a, b;
 	rsqrt.approx.ftz.f32 a, b;
 	rsqrt.approx.f64 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -817,12 +817,12 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	rsqrt.approx.f32 a, b;
 	rsqrt.approx.ftz.f32 a, b;
 	rsqrt.approx.f64 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -834,10 +834,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	sad.u32 a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -847,10 +847,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	selp.u32 a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -860,13 +860,13 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	set.gt.u32.s32 a, b, c;
 	set.gt.ftz.u32.f32 a, b, c;
 	set.gt.and.ftz.u32.f32 a, b, c, d;
 	set.gt.and.ftz.u32.f32 a, b, c, !d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -879,14 +879,14 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	setp.gt.s32 a, b, c;
 	setp.gt.s32 a|z, b, c;
 	setp.gt.ftz.f32 a, b, c;
 	setp.gt.and.ftz.f32 a, b, c, d;
 	setp.gt.and.ftz.f32 a, b, c, !d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -900,10 +900,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	shl.b32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -913,10 +913,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	shr.b32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -926,10 +926,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	sin.approx.f32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -939,11 +939,11 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	slct.f32.s32 a, b, c, d;
 	slct.ftz.f32.s32 a, b, c, d;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -954,7 +954,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	sqrt.approx.f32 a, b;
 	sqrt.approx.ftz.f32 a, b;
@@ -964,7 +964,7 @@ foo:	abs.s32 a, b;
 	sqrt.rz.ftz.f32 a, b;
 	sqrt.f64 a, b;
 	sqrt.rz.f64 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -981,7 +981,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	st.u32 [a], b;
 	st.v2.u32 [a], b;
@@ -990,7 +990,7 @@ foo:	abs.s32 a, b;
 	st.lu.u32 [a], b;
 	st.local.lu.u32 [a], b;
 	st.volatile.local.u32 [a], b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -1006,7 +1006,7 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	sub.s32 a, b, c;
 	sub.cc.s32 a, b, c;
@@ -1015,7 +1015,7 @@ foo:	abs.s32 a, b;
 	sub.ftz.sat.f32 a, b, c;
 	sub.rz.sat.f32 a, b, c;
 	sub.rz.ftz.sat.f32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -1031,11 +1031,11 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	subc.s32 a, b, c;
 	subc.cc.s32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -1046,10 +1046,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	testp.finite.f32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -1059,10 +1059,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	trap;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -1072,12 +1072,12 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	vote.all.pred a, b;
 	vote.all.pred a, !b;
 	vote.ballot.b32 a, b;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }
@@ -1089,10 +1089,10 @@ foo:	abs.s32 a, b;
     } ptx>string
 ] unit-test
 
-[ """	.version 2.0
+{ """	.version 2.0
 	.target sm_20
 	xor.b32 a, b, c;
-""" ] [
+""" } [
     T{ ptx
         { version "2.0" }
         { target T{ ptx-target { arch sm_20 } } }

@@ -31,13 +31,13 @@ STRUCT: struct-test-bar
     { w ushort initial: 0xffff }
     { foo struct-test-foo } ;
 
-[ 12 ] [ struct-test-foo heap-size ] unit-test
-[ 12 ] [ struct-test-foo <struct> byte-length ] unit-test
-[ 16 ] [ struct-test-bar heap-size ] unit-test
-[ 123 ] [ struct-test-foo <struct> y>> ] unit-test
-[ 123 ] [ struct-test-bar <struct> foo>> y>> ] unit-test
+{ 12 } [ struct-test-foo heap-size ] unit-test
+{ 12 } [ struct-test-foo <struct> byte-length ] unit-test
+{ 16 } [ struct-test-bar heap-size ] unit-test
+{ 123 } [ struct-test-foo <struct> y>> ] unit-test
+{ 123 } [ struct-test-bar <struct> foo>> y>> ] unit-test
 
-[ 1 2 3 t ] [
+{ 1 2 3 t } [
     1   2 3 t struct-test-foo <struct-boa>   struct-test-bar <struct-boa>
     {
         [ w>> ]
@@ -47,111 +47,111 @@ STRUCT: struct-test-bar
     } cleave
 ] unit-test
 
-[ 7654 ] [ S{ struct-test-foo f 98 7654 f } y>> ] unit-test
-[ 7654 ] [ S{ struct-test-foo { y 7654 } } y>> ] unit-test
+{ 7654 } [ S{ struct-test-foo f 98 7654 f } y>> ] unit-test
+{ 7654 } [ S{ struct-test-foo { y 7654 } } y>> ] unit-test
 
-[ {
+{ {
     { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
     { { "x" char } 98            }
     { { "y" int  } 0x7F00007F }
     { { "z" bool } f             }
-} ] [
+} } [
     B{ 98 0 0 98 127 0 0 127 0 0 0 0 } struct-test-foo memory>struct
     make-mirror >alist
 ] unit-test
 
-[ { { "underlying" f } } ] [
+{ { { "underlying" f } } } [
     f struct-test-foo memory>struct
     make-mirror >alist
 ] unit-test
 
-[ 55 t ] [ S{ struct-test-foo { x 55 } } make-mirror { "x" "char" } ?of ] unit-test
-[ 55 t ] [ S{ struct-test-foo { y 55 } } make-mirror { "y" "int"  } ?of ] unit-test
-[ t  t ] [ S{ struct-test-foo { z t  } } make-mirror { "z" "bool" } ?of ] unit-test
-[ f  t ] [ S{ struct-test-foo { z f  } } make-mirror { "z" "bool" } ?of ] unit-test
-[ { "nonexist" "bool" } f ] [ S{ struct-test-foo } make-mirror { "nonexist" "bool" } ?of ] unit-test
-[ "nonexist" f ] [ S{ struct-test-foo } make-mirror "nonexist" ?of ] unit-test
-[ f  t ] [ f struct-test-foo memory>struct make-mirror "underlying" ?of ] unit-test
+{ 55 t } [ S{ struct-test-foo { x 55 } } make-mirror { "x" "char" } ?of ] unit-test
+{ 55 t } [ S{ struct-test-foo { y 55 } } make-mirror { "y" "int"  } ?of ] unit-test
+{ t  t } [ S{ struct-test-foo { z t  } } make-mirror { "z" "bool" } ?of ] unit-test
+{ f  t } [ S{ struct-test-foo { z f  } } make-mirror { "z" "bool" } ?of ] unit-test
+{ { "nonexist" "bool" } f } [ S{ struct-test-foo } make-mirror { "nonexist" "bool" } ?of ] unit-test
+{ "nonexist" f } [ S{ struct-test-foo } make-mirror "nonexist" ?of ] unit-test
+{ f  t } [ f struct-test-foo memory>struct make-mirror "underlying" ?of ] unit-test
 
-[ S{ struct-test-foo { x 3 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 3 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror [ 3 { "x" "char" } ] dip set-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 5 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 5 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror [ 5 { "y" "int" } ] dip set-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 2 } { z t } } ] [
+{ S{ struct-test-foo { x 1 } { y 2 } { z t } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror [ t { "z" "bool" } ] dip set-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror [ "nonsense" "underlying" ] dip set-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror [ "nonsense" "nonexist" ] dip set-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror [ "nonsense" { "nonexist" "int" } ] dip set-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 123 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 123 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror { "y" "int" } swap delete-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 0 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 0 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror { "x" "char" } swap delete-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror { "nonexist" "char" } swap delete-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror "underlying" swap delete-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 1 } { y 2 } { z f } } ] [
+{ S{ struct-test-foo { x 1 } { y 2 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z f } }
     [ make-mirror "nonsense" swap delete-at ] keep
 ] unit-test
 
-[ S{ struct-test-foo { x 0 } { y 123 } { z f } } ] [
+{ S{ struct-test-foo { x 0 } { y 123 } { z f } } } [
     S{ struct-test-foo { x 1 } { y 2 } { z t } }
     [ make-mirror clear-assoc ] keep
 ] unit-test
 
-[ POSTPONE: STRUCT: ]
+{ POSTPONE: STRUCT: }
 [ struct-test-foo struct-definer-word ] unit-test
 
 UNION-STRUCT: struct-test-float-and-bits
     { f c:float }
     { bits uint } ;
 
-[ 1.0 ] [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
-[ 4 ] [ struct-test-float-and-bits heap-size ] unit-test
+{ 1.0 } [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
+{ 4 } [ struct-test-float-and-bits heap-size ] unit-test
 
-[ 123 ] [ [ struct-test-foo malloc-struct &free y>> ] with-destructors ] unit-test
+{ 123 } [ [ struct-test-foo malloc-struct &free y>> ] with-destructors ] unit-test
 
-[ POSTPONE: UNION-STRUCT: ]
+{ POSTPONE: UNION-STRUCT: }
 [ struct-test-float-and-bits struct-definer-word ] unit-test
 
 STRUCT: struct-test-string-ptr
     { x c-string } ;
 
-[ "hello world" ] [
+{ "hello world" } [
     [
         struct-test-string-ptr <struct>
         "hello world" utf8 malloc-string &free >>x
@@ -159,49 +159,49 @@ STRUCT: struct-test-string-ptr
     ] with-destructors
 ] unit-test
 
-[ "S{ struct-test-foo { x 0 } { y 7654 } { z f } }" ]
+{ "S{ struct-test-foo { x 0 } { y 7654 } { z f } }" }
 [
     H{ { boa-tuples? f } { c-object-pointers? f } } [
         struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
     ] with-variables
 ] unit-test
 
-[ "S@ struct-test-foo B{ 0 0 0 0 0 0 0 0 0 0 0 0 }" ]
+{ "S@ struct-test-foo B{ 0 0 0 0 0 0 0 0 0 0 0 0 }" }
 [
     H{ { c-object-pointers? t } } [
         12 <byte-array> struct-test-foo memory>struct [ pprint ] with-string-writer
     ] with-variables
 ] unit-test
 
-[ "S{ struct-test-foo f 0 7654 f }" ]
+{ "S{ struct-test-foo f 0 7654 f }" }
 [
     H{ { boa-tuples? t } { c-object-pointers? f } } [
         struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
     ] with-variables
 ] unit-test
 
-[ "S@ struct-test-foo f" ]
+{ "S@ struct-test-foo f" }
 [
     H{ { c-object-pointers? f } } [
         f struct-test-foo memory>struct [ pprint ] with-string-writer
     ] with-variables
 ] unit-test
 
-[ "USING: alien.c-types classes.struct ;
+{ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-test-foo
     { x char initial: 0 } { y int initial: 123 } { z bool } ;
-" ]
+" }
 [ [ struct-test-foo see ] with-string-writer ] unit-test
 
-[ "USING: alien.c-types classes.struct ;
+{ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
     { f float initial: 0.0 } { bits uint initial: 0 } ;
-" ]
+" }
 [ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
 
-[ {
+{ {
     T{ struct-slot-spec
         { name "x" }
         { offset 0 }
@@ -223,9 +223,9 @@ UNION-STRUCT: struct-test-float-and-bits
         { type bool }
         { class object }
     }
-} ] [ struct-test-foo lookup-c-type fields>> ] unit-test
+} } [ struct-test-foo lookup-c-type fields>> ] unit-test
 
-[ {
+{ {
     T{ struct-slot-spec
         { name "f" }
         { offset 0 }
@@ -240,30 +240,30 @@ UNION-STRUCT: struct-test-float-and-bits
         { class $[ cell 4 = integer fixnum ? ] }
         { initial 0 }
     }
-} ] [ struct-test-float-and-bits lookup-c-type fields>> ] unit-test
+} } [ struct-test-float-and-bits lookup-c-type fields>> ] unit-test
 
 STRUCT: struct-test-equality-1
     { x int } ;
 STRUCT: struct-test-equality-2
     { y int } ;
 
-[ 0 ] [ struct-test-equality-1 new hashcode ] unit-test
+{ 0 } [ struct-test-equality-1 new hashcode ] unit-test
 
-[ t ] [
+{ t } [
     [
         struct-test-equality-1 <struct> 5 >>x
         struct-test-equality-1 malloc-struct &free 5 >>x =
     ] with-destructors
 ] unit-test
 
-[ f ] [
+{ f } [
     [
         struct-test-equality-1 <struct> 5 >>x
         struct-test-equality-2 malloc-struct &free 5 >>y =
     ] with-destructors
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         struct-test-equality-1 <struct> 5 >>x
         struct-test-equality-1 malloc-struct &free 5 >>x
@@ -276,9 +276,9 @@ STRUCT: struct-test-array-slots
     { y ushort[6] initial: ushort-array{ 2 3 5 7 11 13 } }
     { z int } ;
 
-[ 11 ] [ struct-test-array-slots <struct> y>> 4 swap nth ] unit-test
+{ 11 } [ struct-test-array-slots <struct> y>> 4 swap nth ] unit-test
 
-[ t ] [
+{ t } [
     struct-test-array-slots <struct>
     [ y>> [ 8 3 ] dip set-nth ]
     [ y>> ushort-array{ 2 3 5 8 11 13 } sequence= ] bi
@@ -289,27 +289,27 @@ STRUCT: struct-test-optimization
 
 SPECIALIZED-ARRAY: struct-test-optimization
 
-[ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
-[ t ] [
+{ t } [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
+{ t } [
     [ 3 struct-test-optimization <c-direct-array> third y>> ]
     { <tuple> <tuple-boa> memory>struct y>> } inlined?
 ] unit-test
 
-[ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
+{ t } [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 
-[ t ] [
+{ t } [
     [ struct-test-optimization memory>struct x>> second ]
     { memory>struct x>> int <c-direct-array> <tuple> <tuple-boa> } inlined?
 ] unit-test
 
-[ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
+{ f } [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 
-[ t ] [
+{ t } [
     [ struct-test-optimization <struct> struct-test-optimization <struct> [ x>> ] bi@ ]
     { x>> } inlined?
 ] unit-test
 
-[ ] [
+{ } [
     [
         struct-test-optimization specialized-array-vocab forget-vocab
     ] with-compilation-unit
@@ -318,14 +318,14 @@ SPECIALIZED-ARRAY: struct-test-optimization
 ! Test cloning structs
 STRUCT: clone-test-struct { x int } { y char[3] } ;
 
-[ 1 char-array{ 9 1 1 } ] [
+{ 1 char-array{ 9 1 1 } } [
     clone-test-struct <struct>
     1 >>x char-array{ 9 1 1 } >>y
     clone
     [ x>> ] [ y>> char >c-array ] bi
 ] unit-test
 
-[ t 1 char-array{ 9 1 1 } ] [
+{ t 1 char-array{ 9 1 1 } } [
     [
         clone-test-struct malloc-struct &free
         1 >>x char-array{ 9 1 1 } >>y
@@ -338,7 +338,7 @@ STRUCT: struct-that's-a-word { x int } ;
 
 : struct-that's-a-word ( -- ) "OOPS" throw ;
 
-[ -77 ] [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
+{ -77 } [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
 
 ! Interactive parsing of struct slot definitions
 [
@@ -371,35 +371,35 @@ TUPLE: will-become-struct ;
 
 TUPLE: a-subclass < will-become-struct ;
 
-[ f ] [ will-become-struct struct-class? ] unit-test
+{ f } [ will-become-struct struct-class? ] unit-test
 
-[ will-become-struct ] [ a-subclass superclass ] unit-test
+{ will-become-struct } [ a-subclass superclass ] unit-test
 
-[ ] [ "IN: classes.struct.tests USING: classes.struct alien.c-types ; STRUCT: will-become-struct { x int } ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.struct.tests USING: classes.struct alien.c-types ; STRUCT: will-become-struct { x int } ;" eval( -- ) ] unit-test
 
-[ t ] [ will-become-struct struct-class? ] unit-test
+{ t } [ will-become-struct struct-class? ] unit-test
 
-[ tuple ] [ a-subclass superclass ] unit-test
+{ tuple } [ a-subclass superclass ] unit-test
 
 STRUCT: bit-field-test
     { a uint bits: 12 }
     { b int bits: 2 }
     { c char } ;
 
-[ S{ bit-field-test f 0 0 0 } ] [ bit-field-test <struct> ] unit-test
-[ S{ bit-field-test f 1 -2 3 } ] [ bit-field-test <struct> 1 >>a 2 >>b 3 >>c ] unit-test
-[ 4095 ] [ bit-field-test <struct> 8191 >>a a>> ] unit-test
-[ 1 ] [ bit-field-test <struct> 1 >>b b>> ] unit-test
-[ -2 ] [ bit-field-test <struct> 2 >>b b>> ] unit-test
-[ 1 ] [ bit-field-test <struct> 257 >>c c>> ] unit-test
-[ 3 ] [ bit-field-test heap-size ] unit-test
+{ S{ bit-field-test f 0 0 0 } } [ bit-field-test <struct> ] unit-test
+{ S{ bit-field-test f 1 -2 3 } } [ bit-field-test <struct> 1 >>a 2 >>b 3 >>c ] unit-test
+{ 4095 } [ bit-field-test <struct> 8191 >>a a>> ] unit-test
+{ 1 } [ bit-field-test <struct> 1 >>b b>> ] unit-test
+{ -2 } [ bit-field-test <struct> 2 >>b b>> ] unit-test
+{ 1 } [ bit-field-test <struct> 257 >>c c>> ] unit-test
+{ 3 } [ bit-field-test heap-size ] unit-test
 
 STRUCT: referent
     { y int } ;
 STRUCT: referrer
     { x referent* } ;
 
-[ 57 ] [
+{ 57 } [
     [
         referrer <struct>
             referent malloc-struct &free
@@ -413,7 +413,7 @@ STRUCT: self-referent
     { x self-referent* }
     { y int } ;
 
-[ 75 ] [
+{ 75 } [
     [
         self-referent <struct>
             self-referent malloc-struct &free
@@ -431,7 +431,7 @@ STRUCT: forward-referent
     { x backward-referent* }
     { y int } ;
 
-[ 41 ] [
+{ 41 } [
     [
         forward-referent <struct>
             backward-referent malloc-struct &free
@@ -441,7 +441,7 @@ STRUCT: forward-referent
     ] with-destructors
 ] unit-test
 
-[ 14 ] [
+{ 14 } [
     [
         backward-referent <struct>
             forward-referent malloc-struct &free
@@ -473,7 +473,7 @@ STRUCT: struct-test-delegator
     { b int } ;
 CONSULT: struct-test-delegate struct-test-delegator del>> ;
 
-[ S{ struct-test-delegator f S{ struct-test-delegate f 7 } 8 } ] [
+{ S{ struct-test-delegator f S{ struct-test-delegate f 7 } 8 } } [
     struct-test-delegator <struct>
         7 >>a
         8 >>b
@@ -483,7 +483,7 @@ SPECIALIZED-ARRAY: void*
 
 STRUCT: silly-array-field-test { x int*[3] } ;
 
-[ t ] [ silly-array-field-test <struct> x>> void*-array? ] unit-test
+{ t } [ silly-array-field-test <struct> x>> void*-array? ] unit-test
 
 ! Packed structs
 PACKED-STRUCT: packed-struct-test
@@ -493,53 +493,53 @@ PACKED-STRUCT: packed-struct-test
     { g c:char }
     { h c:int } ;
 
-[ 15 ] [ packed-struct-test heap-size ] unit-test
+{ 15 } [ packed-struct-test heap-size ] unit-test
 
-[ 0 ] [ "d" packed-struct-test offset-of ] unit-test
-[ 4 ] [ "e" packed-struct-test offset-of ] unit-test
-[ 6 ] [ "f" packed-struct-test offset-of ] unit-test
-[ 10 ] [ "g" packed-struct-test offset-of ] unit-test
-[ 11 ] [ "h" packed-struct-test offset-of ] unit-test
+{ 0 } [ "d" packed-struct-test offset-of ] unit-test
+{ 4 } [ "e" packed-struct-test offset-of ] unit-test
+{ 6 } [ "f" packed-struct-test offset-of ] unit-test
+{ 10 } [ "g" packed-struct-test offset-of ] unit-test
+{ 11 } [ "h" packed-struct-test offset-of ] unit-test
 
-[ POSTPONE: PACKED-STRUCT: ]
+{ POSTPONE: PACKED-STRUCT: }
 [ packed-struct-test struct-definer-word ] unit-test
 
 STRUCT: struct-1 { a c:int } ;
 PACKED-STRUCT: struct-1-packed { a c:int } ;
 UNION-STRUCT: struct-1-union { a c:int } ;
 
-[ "USING: alien.c-types classes.struct ;
+{ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-1 { a int initial: 0 } ;
-" ]
+" }
 [ \ struct-1 [ see ] with-string-writer ] unit-test
-[ "USING: alien.c-types classes.struct ;
+{ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 PACKED-STRUCT: struct-1-packed { a int initial: 0 } ;
-" ]
+" }
 [ \ struct-1-packed [ see ] with-string-writer ] unit-test
-[ "USING: alien.c-types classes.struct ;
+{ "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-1-union { a int initial: 0 } ;
-" ]
+" }
 [ \ struct-1-union [ see ] with-string-writer ] unit-test
 
 ! Bug #206
 STRUCT: going-to-redefine { a uint } ;
-[ ] [
+{ } [
     "IN: classes.struct.tests TUPLE: going-to-redefine b ;" eval( -- )
 ] unit-test
-[ f ] [ \ going-to-redefine \ clone ?lookup-method ] unit-test
-[ f ] [ \ going-to-redefine \ struct-slot-values ?lookup-method ] unit-test
+{ f } [ \ going-to-redefine \ clone ?lookup-method ] unit-test
+{ f } [ \ going-to-redefine \ struct-slot-values ?lookup-method ] unit-test
 
 ! Test reset-class on structs, which should forget all the accessors, clone, and struct-slot-values
 STRUCT: some-accessors { aaa uint } { bbb int } ;
-[ ] [ [ \ some-accessors reset-class ] with-compilation-unit ] unit-test
-[ f ] [ \ some-accessors \ a>> ?lookup-method ] unit-test
-[ f ] [ \ some-accessors \ a<< ?lookup-method ] unit-test
-[ f ] [ \ some-accessors \ b>> ?lookup-method ] unit-test
-[ f ] [ \ some-accessors \ b<< ?lookup-method ] unit-test
-[ f ] [ \ some-accessors \ clone ?lookup-method ] unit-test
-[ f ] [ \ some-accessors \ struct-slot-values ?lookup-method ] unit-test
+{ } [ [ \ some-accessors reset-class ] with-compilation-unit ] unit-test
+{ f } [ \ some-accessors \ a>> ?lookup-method ] unit-test
+{ f } [ \ some-accessors \ a<< ?lookup-method ] unit-test
+{ f } [ \ some-accessors \ b>> ?lookup-method ] unit-test
+{ f } [ \ some-accessors \ b<< ?lookup-method ] unit-test
+{ f } [ \ some-accessors \ clone ?lookup-method ] unit-test
+{ f } [ \ some-accessors \ struct-slot-values ?lookup-method ] unit-test
 
 << \ some-accessors forget >>

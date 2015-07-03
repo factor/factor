@@ -2,7 +2,7 @@ USING: io.encodings.string io.encodings.utf7 kernel sequences strings
 tools.test ;
 IN: io.encodings.utf7.tests
 
-[
+{
     {
         "~/b&AOU-g&APg-"
         "b&AOU-x"
@@ -13,7 +13,7 @@ IN: io.encodings.utf7.tests
         "~/F&APg-lder/mailb&AOU-x &- stuff + more"
         "~peter/mail/&ZeVnLIqe-/&U,BTFw-"
     }
-] [
+} [
     {
         "~/bågø"
         "båx"
@@ -26,7 +26,7 @@ IN: io.encodings.utf7.tests
     } [ utf7imap4 encode >string ] map
 ] unit-test
 
-[ t ] [
+{ t } [
     {
         "~/bågø"
         "båx"
@@ -39,7 +39,7 @@ IN: io.encodings.utf7.tests
     } dup [ utf7 encode utf7 decode ] map =
 ] unit-test
 
-[ t ] [
+{ t } [
     {
         "~/bågø"
         "båx"

@@ -3,29 +3,29 @@ USING: accessors cursors kernel make math sequences sorting tools.test ;
 FROM: cursors => each map assoc-each assoc>map ;
 IN: cursors.tests
 
-[ { 1 2 3 4 } ] [
+{ { 1 2 3 4 } } [
     [ T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> , ] -each ]
     { } make
 ] unit-test
 
-[ T{ linear-cursor f 3 1 } ] [
+{ T{ linear-cursor f 3 1 } } [
     T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> 3 mod zero? ] -find
 ] unit-test
 
-[ T{ linear-cursor f 5 1 } ] [
+{ T{ linear-cursor f 5 1 } } [
     T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> 6 = ] -find
 ] unit-test
 
-[ { 1 3 } ] [
+{ { 1 3 } } [
     [ T{ linear-cursor f 1 2 } T{ linear-cursor f 5 2 } [ value>> , ] -each ]
     { } make
 ] unit-test
 
-[ B{ 1 2 3 4 5 } ] [ [ { 1 2 3 4 5 } [ , ] each ] B{ } make ] unit-test
-[ B{ } ] [ [ { } [ , ] each ] B{ } make ] unit-test
-[ { 2 4 6 8 10 } ] [ { 1 2 3 4 5 } [ 2 * ] map ] unit-test
+{ B{ 1 2 3 4 5 } } [ [ { 1 2 3 4 5 } [ , ] each ] B{ } make ] unit-test
+{ B{ } } [ [ { } [ , ] each ] B{ } make ] unit-test
+{ { 2 4 6 8 10 } } [ { 1 2 3 4 5 } [ 2 * ] map ] unit-test
 
-[ { "roses: lutefisk" "tulips: lox" } ]
+{ { "roses: lutefisk" "tulips: lox" } }
 [
     [
         H{ { "roses" "lutefisk" } { "tulips" "lox" } }
@@ -33,7 +33,7 @@ IN: cursors.tests
     ] { } make natural-sort
 ] unit-test
 
-[ { "roses: lutefisk" "tulips: lox" } ]
+{ { "roses: lutefisk" "tulips: lox" } }
 [
     H{ { "roses" "lutefisk" } { "tulips" "lox" } }
     [ ": " glue ] { } assoc>map natural-sort
@@ -51,16 +51,16 @@ IN: cursors.tests
 : compile-test-assoc>map ( xs -- ys )
     [ ": " glue ] { } assoc>map ;
 
-[ B{ 1 2 3 4 5 } ] [ [ { 1 2 3 4 5 } compile-test-each ] B{ } make ] unit-test
-[ { 2 4 6 8 10 } ] [ { 1 2 3 4 5 } compile-test-map ] unit-test
+{ B{ 1 2 3 4 5 } } [ [ { 1 2 3 4 5 } compile-test-each ] B{ } make ] unit-test
+{ { 2 4 6 8 10 } } [ { 1 2 3 4 5 } compile-test-map ] unit-test
 
-[ { "roses: lutefisk" "tulips: lox" } ]
+{ { "roses: lutefisk" "tulips: lox" } }
 [
     [ H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc-each ]
     { } make natural-sort
 ] unit-test
 
-[ { "roses: lutefisk" "tulips: lox" } ]
+{ { "roses: lutefisk" "tulips: lox" } }
 [
     H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map
     natural-sort

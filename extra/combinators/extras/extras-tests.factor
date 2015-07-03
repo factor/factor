@@ -12,7 +12,7 @@ IN: combinators.extras.tests
 { "a b c d" }
 [ "a" "b" "c" "d" [ " " glue ] thrice ] unit-test
 
-[ { "negative" 0 "positive" } ] [
+{ { "negative" 0 "positive" } } [
     { -1 0 1 } [
         {
            { [ 0 > ] [ "positive" ] }
@@ -30,5 +30,5 @@ IN: combinators.extras.tests
 
 { 3 1 } [ 1 2 [ + ] keepd ] unit-test
 
-[ "1" "123" ] [ "1" "123" [ length ] [ > ] swap-when ] unit-test
-[ "123" "1" ] [ "1" "123" [ length ] [ < ] swap-when ] unit-test
+{ "1" "123" } [ "1" "123" [ length ] [ > ] swap-when ] unit-test
+{ "123" "1" } [ "1" "123" [ length ] [ < ] swap-when ] unit-test

@@ -8,13 +8,13 @@ IN: crypto.aes.tests
 CONSTANT: plaintext HEX{ 32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34 }
 CONSTANT: key HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c }
 
-[ {
+{ {
         0x00 0x01 0x02 0x04 0x08 0x10
         0x20 0x40 0x80 0x1b 0x36
-} ] [ rcon ] unit-test
+} } [ rcon ] unit-test
 
 
-[ {
+{ {
     0xc66363a5 0xf87c7c84 0xee777799 0xf67b7b8d 0xfff2f20d 0xd66b6bbd 0xde6f6fb1 0x91c5c554
     0x60303050 0x02010103 0xce6767a9 0x562b2b7d 0xe7fefe19 0xb5d7d762 0x4dababe6 0xec76769a
     0x8fcaca45 0x1f82829d 0x89c9c940 0xfa7d7d87 0xeffafa15 0xb25959eb 0x8e4747c9 0xfbf0f00b
@@ -143,24 +143,24 @@ CONSTANT: key HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c }
     0x9b9bb62d 0x1e1e223c 0x87879215 0xe9e920c9 0xcece4987 0x5555ffaa 0x28287850 0xdfdf7aa5
     0x8c8c8f03 0xa1a1f859 0x89898009 0x0d0d171a 0xbfbfda65 0xe6e631d7 0x4242c684 0x6868b8d0
     0x4141c382 0x9999b029 0x2d2d775a 0x0f0f111e 0xb0b0cb7b 0x5454fca8 0xbbbbd66d 0x16163a2c
-} ] [ t-table ] unit-test
+} } [ t-table ] unit-test
 
 #! NOT TESTED:
 #! ui32
 #! set-t
 #! set-d
 
-[ { 0x01020304 0x02030401 0x03040102 0x04010203 } ] [
+{ { 0x01020304 0x02030401 0x03040102 0x04010203 } } [
   { 0x01010101 0x02020202 0x03030303 0x04040404 } shift-rows
 ] unit-test
 
-[ { 0x01010101 0x02020202 0x03030303 0x04040404 } ] [
+{ { 0x01010101 0x02020202 0x03030303 0x04040404 } } [
  { 0x01020304 0x02030401 0x03040102 0x04010203 }  unshift-rows
 ] unit-test
 
-[ 0x02030401 ] [ 0x01020304 rotword ] unit-test
+{ 0x02030401 } [ 0x01020304 rotword ] unit-test
 
-[
+{
 V{ 729683222 682545830 2885096840 164581180 2700803607 2287217841
    597899577 711751173 4072838642 2056698179 1496678522 1935275647
    1031817085 1192689214 505642564 1836746811 4014253377 2823969663
@@ -169,23 +169,23 @@ V{ 729683222 682545830 2885096840 164581180 2700803607 2287217841
    2225491890 1319558223 3939660577 3045964498 824964448 2139957551
    2893506291 435870753 684796225 1465647214 3491035560 3387827593
    3779005640 3059944614 }
-] [
+} [
   HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c } #! AES-128 key expansion test vector from FIPS-197 (appendix)
         10 (expand-enc-key)
     ] unit-test
 
-[ 0x046681e5 ] [ 0x088df419 ui32> t-transform ] unit-test
+{ 0x046681e5 } [ 0x088df419 ui32> t-transform ] unit-test
 
-[ V{
+{ V{
     0x3925841d
     0x02dc09fb
     0xdc118597
     0x196a0b32
  }
-] [
+} [
     key plaintext aes-encrypt-block bytes>words
 ] unit-test
 
-[ t ] [
+{ t } [
     sbox [ dup inv-sbox nth sbox nth = ] all?
 ] unit-test

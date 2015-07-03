@@ -3,28 +3,28 @@ http.server.requests io.encodings.utf8 io.encodings.binary io.streams.string
 kernel math peg sequences tools.test urls ;
 IN: http.server.tests
 
-[ t ] [ [ \ + first ] [ <500> ] recover response? ] unit-test
+{ t } [ [ \ + first ] [ <500> ] recover response? ] unit-test
 
-[ "text/plain; charset=ASCII" ] [
+{ "text/plain; charset=ASCII" } [
     <response>
         "text/plain" >>content-type
         "ASCII" >>content-charset
     unparse-content-type
 ] unit-test
 
-[ "text/xml; charset=UTF-8" ] [
+{ "text/xml; charset=UTF-8" } [
     <response>
         "text/xml" >>content-type
     unparse-content-type
 ] unit-test
 
-[ "image/jpeg" ] [
+{ "image/jpeg" } [
     <response>
         "image/jpeg" >>content-type
     unparse-content-type
 ] unit-test
 
-[ "application/octet-stream" ] [
+{ "application/octet-stream" } [
     <response>
     unparse-content-type
 ] unit-test
@@ -33,7 +33,7 @@ IN: http.server.tests
 ! The line terminator for message-header fields is the sequence CRLF.
 ! However, we recommend that applications, when parsing such headers,
 ! recognize a single LF as a line terminator and ignore the leading CR.
-[ t ] [
+{ t } [
     {
         "GET / HTTP/1.1"
         "connection: close"
@@ -48,7 +48,7 @@ IN: http.server.tests
 ! line(s) received where a Request-Line is expected. In other words, if
 ! the server is reading the protocol stream at the beginning of a
 ! message and receives a CRLF first, it should ignore the CRLF.
-[
+{
     T{ request
         { method "GET" }
         { url URL" /" }
@@ -57,7 +57,7 @@ IN: http.server.tests
         { cookies V{ } }
         { redirects 10 }
     }
-] [
+} [
     "\r\n\r\n\r\nGET / HTTP/1.0\r\n\r\n"
     [ read-request ] with-string-reader
 ] unit-test
@@ -65,7 +65,7 @@ IN: http.server.tests
 ! RFC 1945; Section 4.1
 ! Implement a version of Simple-Request, although rather than
 ! parse version 0.9, we parse 1.0 to return a Full-Response.
-[
+{
     T{ request
         { method "GET" }
         { url URL" /" }
@@ -74,7 +74,7 @@ IN: http.server.tests
         { cookies V{ } }
         { redirects 10 }
     }
-] [
+} [
     "\r\n\r\n\r\nGET /\r\n\r\n"
     [ read-request ] with-string-reader
 ] unit-test

@@ -48,7 +48,7 @@ M: maze cost
 >>
 
 ! Existing path from s to f
-[
+{
     {
         { 1 1 }
         { 2 1 }
@@ -66,15 +66,15 @@ M: maze cost
         { 8 7 }
         { 8 6 }
     }
-] [
+} [
     { 8 6 } test1 drop
 ] unit-test
 
 ! Check that only the right positions have been considered in the s to f path
-[ 7 ] [ { 7 1 } test1 nip length ] unit-test
+{ 7 } [ { 7 1 } test1 nip length ] unit-test
 
 ! Non-existing path from s to g -- all positions must have been considered
-[ f 26 ] [ { 1 7 } test1 length ] unit-test
+{ f 26 } [ { 1 7 } test1 length ] unit-test
 
 ! Look for a path between A and C. The best path is A --> D --> C. C will be placed
 ! in the open set early because B will be examined first. This checks that the evaluation
@@ -110,16 +110,16 @@ MEMO: routes ( -- hash ) $[ { "ABD" "BC" "C" "DCE" "ECF" } [ unclip swap 2array 
 >>
 
 ! Check path from A to C -- all nodes but F must have been examined
-[ "ADC" "ABCDE" ] [ "AC" test2 [ >string ] dip ] unit-test
+{ "ADC" "ABCDE" } [ "AC" test2 [ >string ] dip ] unit-test
 
 ! No path from D to B -- all nodes reachable from D must have been examined
-[ f "CDEF" ] [ "DB" test2 ] unit-test
+{ f "CDEF" } [ "DB" test2 ] unit-test
 
 ! Find a path using BFS. There are no path from F to A, and the path from D to
 ! C does not include any other node.
 
-[ f ] [ "FA" first2 routes <bfs> find-path ] unit-test
-[ "DC" ] [ "DC" first2 routes <bfs> find-path >string ] unit-test
+{ f } [ "FA" first2 routes <bfs> find-path ] unit-test
+{ "DC" } [ "DC" first2 routes <bfs> find-path >string ] unit-test
 
 <<
 
@@ -134,12 +134,12 @@ MEMO: costs ( -- costs )
 >>
 
 ! Check path from A to C -- all nodes but F must have been examined
-[ "ADC" "ABCDE" ] [ "AC" test3 [ >string ] dip ] unit-test
+{ "ADC" "ABCDE" } [ "AC" test3 [ >string ] dip ] unit-test
 
 ! No path from D to B -- all nodes reachable from D must have been examined
-[ f "CDEF" ] [ "DB" test3 ] unit-test
+{ f "CDEF" } [ "DB" test3 ] unit-test
 
-[ { 1 3 } ] [
+{ { 1 3 } } [
     1 3 H{
         { 1 H{ { 2 0 } { 3 0 } } }
         { 2 H{ { 3 0 } { 1 0 } { 4 0 } } }

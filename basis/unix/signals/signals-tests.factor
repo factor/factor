@@ -25,7 +25,7 @@ test-sigusr1-handler SIGUSR1 add-signal-handler
 
 ] [ test-sigusr1-handler SIGUSR1 remove-signal-handler ] [ ] cleanup
 
-[ 0 ] [
+{ 0 } [
     sigusr1-count get-global
     SIGUSR1 raise drop
     0.5 seconds sleep

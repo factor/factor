@@ -12,11 +12,11 @@ CONSTANT: will
 : please-stand-up ( set obj -- ? )
     swap in? ;
 
-[ t ] [ will the-real-slim-shady please-stand-up ] unit-test
-[ t ] [ will clone the-real-slim-shady please-stand-up ] unit-test
+{ t } [ will the-real-slim-shady please-stand-up ] unit-test
+{ t } [ will clone the-real-slim-shady please-stand-up ] unit-test
 
-[ 2 ] [ will cardinality ] unit-test
-[ { "marshall mathers" } ] [
+{ 2 } [ will cardinality ] unit-test
+{ { "marshall mathers" } } [
     the-real-slim-shady will clone
     [ delete ] [ members ] bi
 ] unit-test

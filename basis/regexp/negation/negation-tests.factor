@@ -3,7 +3,7 @@
 USING: tools.test regexp.negation regexp.transition-tables regexp.classes ;
 IN: regexp.negation.tests
 
-[
+{
     ! R/ |[^a]|.+/
     T{ transition-table
         { transitions H{
@@ -14,7 +14,7 @@ IN: regexp.negation.tests
         { start-state 0 }
         { final-states HS{ 0 -1 } }
     }
-] [
+} [
     ! R/ a/
     T{ transition-table
         { transitions H{

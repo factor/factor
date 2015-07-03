@@ -3,7 +3,7 @@
 
 USING: kernel tnetstrings sequences tools.test ;
 
-[ t ] [
+{ t } [
     {
         { H{ } "0:}" }
         { { } "0:]" }

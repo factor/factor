@@ -6,35 +6,35 @@ FROM: alien.c-types => uchar short int float ;
 SPECIALIZED-ARRAYS: int float float-4 uchar-16 ;
 IN: alien.data.map.tests
 
-[ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 } ]
+{ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 } }
 [
     int-array{ 1 3 5 } [ dup ] data-map( int -- float[2] )
     float cast-array
 ] unit-test
 
-[
+{
     float-4-array{
         float-4{ 0.0 0.0 0.0 0.0 }
         float-4{ 1.0 1.0 1.0 1.0 }
         float-4{ 2.0 2.0 2.0 2.0 }
     }
-] [
+} [
     3 iota [ float-4-with ] data-map( object -- float-4 )
     float-4 cast-array
 ] unit-test
 
-[
+{
     float-4-array{
         float-4{ 0.0 1.0  2.0  3.0 }
         float-4{ 4.0 5.0  6.0  7.0 }
         float-4{ 8.0 9.0 10.0 11.0 }
     }
-] [
+} [
     12 iota [ float-4-boa ] data-map( object[4] -- float-4 )
     float-4 cast-array
 ] unit-test
 
-[ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 0.0 0.0 } ]
+{ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 0.0 0.0 } }
 [
     int-array{ 1 3 5 } float-array{ 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 }
     [ dup ] data-map!( int -- float[2] )
@@ -57,14 +57,14 @@ IN: alien.data.map.tests
 : float-pixels>byte-pixels ( floats -- bytes )
     1.0 0.0 float-pixels>byte-pixels* ;
 
-[
+{
     B{
         127 191 255 63
         255 25 51 76
         76 51 229 127
         25 255 255 255
     }
-] [
+} [
     float-array{
         0.5 0.75 1.0 0.25
         1.0 0.1 0.2 0.3
@@ -73,14 +73,14 @@ IN: alien.data.map.tests
     } 1.0 0.0 float-pixels>byte-pixels-locals
 ] unit-test
 
-[
+{
     B{
         127 191 255 63
         255 25 51 76
         76 51 229 127
         25 255 255 255
     }
-] [
+} [
     float-array{
         0.5 0.75 1.0 0.25
         1.0 0.1 0.2 0.3
@@ -89,14 +89,14 @@ IN: alien.data.map.tests
     } float-pixels>byte-pixels
 ] unit-test
 
-[
+{
     B{
         127 191 255 63
         255 25 51 76
         76 51 229 127
         25 255 255 255
     }
-] [
+} [
     float-array{
         0.5 0.75 1.0 0.25
         1.0 0.1 0.2 0.3
@@ -119,7 +119,7 @@ CONSTANT: plane-count 4
     [ vmerge-transpose vmerge-transpose ]
     data-map( uchar-16 uchar-16 uchar-16 uchar-16 -- uchar-16[plane-count] ) ;
 
-[
+{
     B{
          1  10  11  15
          2  20  22  25
@@ -138,7 +138,7 @@ CONSTANT: plane-count 4
         15 150 165 155
         16 160 176 165
     }
-] [
+} [
     B{   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16 }
     B{  10  20  30  40  50  60  70  80  90 100 110 120 130 140 150 160 }
     B{  11  22  33  44  55  66  77  88  99 110 121 132 143 154 165 176 }
@@ -150,6 +150,6 @@ CONSTANT: plane-count 4
     [ 0.0 1.0 1.0 ] dip /f <range>
     [ ] data-map( object -- float ) ;
 
-[ float-array{ 0.0 0.5 1.0 } ]
+{ float-array{ 0.0 0.5 1.0 } }
 [ 2 data-map-compiler-bug-test float cast-array ]
 unit-test

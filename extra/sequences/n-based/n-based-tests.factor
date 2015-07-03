@@ -19,16 +19,16 @@ IN: sequences.n-based.tests
         "December"
     } clone 1 <n-based-assoc> ; inline
 
-[ "December" t ]
+{ "December" t }
 [ 12 months at* ] unit-test
-[ f f ]
+{ f f }
 [ 13 months at* ] unit-test
-[ f f ]
+{ f f }
 [ 0 months at* ] unit-test
 
-[ 12 ] [ months assoc-size ] unit-test
+{ 12 } [ months assoc-size ] unit-test
 
-[ {
+{ {
     {  1 "January" }
     {  2 "February" }
     {  3 "March" }
@@ -41,9 +41,9 @@ IN: sequences.n-based.tests
     { 10 "October" }
     { 11 "November" }
     { 12 "December" }
-} ] [ months >alist ] unit-test
+} } [ months >alist ] unit-test
 
-[ V{
+{ V{
     "January"
     "February"
     "March"
@@ -57,6 +57,6 @@ IN: sequences.n-based.tests
     "November"
     "December"
     "Smarch"
-} ] [ "Smarch" 13 months [ set-at ] keep seq>> ] unit-test
+} } [ "Smarch" 13 months [ set-at ] keep seq>> ] unit-test
 
-[ V{ } ] [ months [ clear-assoc ] keep seq>> ] unit-test
+{ V{ } } [ months [ clear-assoc ] keep seq>> ] unit-test
