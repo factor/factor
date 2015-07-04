@@ -95,14 +95,13 @@ template <typename TargetGeneration, typename Policy> struct collector {
   }
 
   void trace_partial_objects(cell start, cell card_start, cell card_end) {
-    object* obj = (object*)start;
-    cell end = start + obj->binary_payload_start();
-    start += sizeof(cell);
+    cell *scan_start = (cell*)start + 1;
+    cell *scan_end = scan_start + ((object*)start)->slot_count();
 
-    start = std::max(start, card_start);
-    end = std::min(end, card_end);
+    scan_start = std::max(scan_start, (cell*)card_start);
+    scan_end = std::min(scan_end, (cell*)card_end);
 
-    visitor.visit_object_array((cell*)start, (cell*)end);
+    visitor.visit_object_array(scan_start, scan_end);
   }
 
   template <typename SourceGeneration>

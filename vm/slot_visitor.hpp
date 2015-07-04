@@ -48,49 +48,45 @@ cell object::size(Fixup fixup) const {
 
 inline cell object::size() const { return size(no_fixup()); }
 
-/* The number of cells from the start of the object which should be scanned by
-the GC. Some types have a binary payload at the end (string, word, DLL) which
-we ignore. */
-template <typename Fixup> cell object::binary_payload_start(Fixup fixup) const {
+/* The number of slots (cells) in an object which should be scanned by
+   the GC. The number can vary in arrays and tuples, in all other
+   types the number is a constant. */
+template <typename Fixup>
+inline cell object::slot_count(Fixup fixup) const {
   if (free_p())
     return 0;
 
-  switch (type()) {
-    /* these objects do not refer to other objects at all */
-    case FLOAT_TYPE:
-    case BYTE_ARRAY_TYPE:
-    case BIGNUM_TYPE:
-    case CALLSTACK_TYPE:
-      return 0;
-    /* these objects have some binary data at the end */
-    case WORD_TYPE:
-      return sizeof(word) - sizeof(cell);
-    case ALIEN_TYPE:
-      return sizeof(cell) * 3;
-    case DLL_TYPE:
-      return sizeof(cell) * 2;
-    case QUOTATION_TYPE:
-      return sizeof(quotation) - sizeof(cell);
-    case STRING_TYPE:
-      return sizeof(string);
-    /* everything else consists entirely of pointers */
-    case ARRAY_TYPE:
-      return array_size<array>(array_capacity((array*)this));
-    case TUPLE_TYPE: {
-      tuple_layout* layout = (tuple_layout*)fixup.translate_data(
-          untag<object>(((tuple*)this)->layout));
-      return tuple_size(layout);
+  cell t = type();
+  if (t == ARRAY_TYPE) {
+    /* capacity + n slots */
+    return 1 + array_capacity((array*)this);
+  } else if (t == TUPLE_TYPE) {
+    tuple_layout* layout = (tuple_layout*)fixup.translate_data(
+        untag<object>(((tuple*)this)->layout));
+    /* layout + n slots */
+    return 1 + tuple_capacity(layout);
+  } else {
+    switch (t) {
+      /* these objects do not refer to other objects at all */
+      case FLOAT_TYPE:
+      case BYTE_ARRAY_TYPE:
+      case BIGNUM_TYPE:
+      case CALLSTACK_TYPE: return 0;
+      case WORD_TYPE: return 8;
+      case ALIEN_TYPE: return 2;
+      case DLL_TYPE: return 1;
+      case QUOTATION_TYPE: return 3;
+      case STRING_TYPE: return 3;
+      case WRAPPER_TYPE: return 1;
+      default:
+        critical_error("Invalid header in slot_count", (cell)this);
+        return 0; /* can't happen */
     }
-    case WRAPPER_TYPE:
-      return sizeof(wrapper);
-    default:
-      critical_error("Invalid header in binary_payload_start", (cell)this);
-      return 0; /* can't happen */
   }
 }
 
-inline cell object::binary_payload_start() const {
-  return binary_payload_start(no_fixup());
+inline cell object::slot_count() const {
+  return slot_count(no_fixup());
 }
 
 /* Slot visitors iterate over the slots of an object, applying a functor to
@@ -130,7 +126,6 @@ template <typename Fixup> struct slot_visitor {
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
   void visit_object_array(cell* start, cell* end);
-  void visit_slots(object* ptr, cell payload_start);
   void visit_slots(object* ptr);
   void visit_stack_elements(segment* region, cell* top);
   void visit_data_roots();
@@ -172,22 +167,14 @@ void slot_visitor<Fixup>::visit_object_array(cell* start, cell* end) {
     visit_handle(start++);
 }
 
-template <typename Fixup>
-void slot_visitor<Fixup>::visit_slots(object* ptr, cell payload_start) {
-  cell* slot = (cell*)ptr;
-  cell* end = (cell*)((cell)ptr + payload_start);
-
-  if (slot != end) {
-    slot++;
-    visit_object_array(slot, end);
-  }
-}
-
 template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {
   if (obj->type() == CALLSTACK_TYPE)
     visit_callstack_object((callstack*)obj);
-  else
-    visit_slots(obj, obj->binary_payload_start(fixup));
+  else {
+    cell* start = (cell*)obj + 1;
+    cell* end = start + obj->slot_count(fixup);
+    visit_object_array(start, end);
+  }
 }
 
 template <typename Fixup>
