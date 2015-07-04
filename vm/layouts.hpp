@@ -121,8 +121,8 @@ struct object {
   template <typename Fixup> cell size(Fixup fixup) const;
   cell size() const;
 
-  cell binary_payload_start() const;
-  template <typename Fixup> cell binary_payload_start(Fixup fixup) const;
+  cell slot_count() const;
+  template <typename Fixup> cell slot_count(Fixup fixup) const;
 
   cell* slots() const { return (cell*)this; }
 
@@ -332,9 +332,12 @@ struct tuple : public object {
   cell* data() const { return (cell*)(this + 1); }
 };
 
+inline static cell tuple_capacity(const tuple_layout *layout) {
+  return untag_fixnum(layout->size);
+}
+
 inline static cell tuple_size(const tuple_layout* layout) {
-  cell size = untag_fixnum(layout->size);
-  return sizeof(tuple) + size * sizeof(cell);
+  return sizeof(tuple) + tuple_capacity(layout) * sizeof(cell);
 }
 
 inline static cell string_capacity(const string* str) {

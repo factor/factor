@@ -121,15 +121,12 @@ inline static bool save_special_p(cell i) {
 }
 
 template <typename Iterator> void object::each_slot(Iterator& iter) {
-  cell scan = (cell)this;
-  cell payload_start = binary_payload_start();
-  cell end = scan + payload_start;
+  cell* start = (cell*)this + 1;
+  cell* end = start + slot_count();
 
-  scan += sizeof(cell);
-
-  while (scan < end) {
-    iter((cell*)scan);
-    scan += sizeof(cell);
+  while (start < end) {
+    iter(start);
+    start++;
   }
 }
 
