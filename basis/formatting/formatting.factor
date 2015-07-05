@@ -30,7 +30,7 @@ IN: formatting
     [ 0 ] [ string>number ] if-empty ;
 
 : format-simple ( x digits string -- string )
-    [ >float "" -1 ] 2dip "" format-float ;
+    [ >float "" -1 ] 2dip "C" format-float ;
 
 : format-scientific ( x digits -- string ) "e" format-simple ;
 
