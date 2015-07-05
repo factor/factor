@@ -139,7 +139,7 @@ HELP: strftime
 } ;
 
 ARTICLE: "formatting" "Formatted printing"
-"The " { $vocab-link "formatting" } " vocabulary is used for formatted printing."
+"The " { $vocab-link "formatting" } " vocabulary is used for english formatted printing."
 { $subsections
     printf
     sprintf
