@@ -1,6 +1,7 @@
 #include "master.hpp"
 #include <sstream>
 #include <iomanip>
+#include <stdexcept>
 
 namespace factor {
 
@@ -220,7 +221,14 @@ void factor_vm::primitive_format_float() {
   char* fill = alien_offset(ctx->pop());
   double value = untag_float_check(ctx->peek());
   std::ostringstream localized_stream;
-  localized_stream.imbue(std::locale(locale));
+  try {
+    localized_stream.imbue(std::locale(locale));
+  } catch (const runtime_error& error) {
+    byte_array* array = allot_byte_array(1);
+    array->data<char>()[0] = '\0';
+    ctx->replace(tag<byte_array>(array));
+    return;
+  }
   switch (format[0]) {
     case 'f': localized_stream << std::fixed; break;
     case 'e': localized_stream << std::scientific; break;
