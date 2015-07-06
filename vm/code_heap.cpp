@@ -65,7 +65,7 @@ void code_heap::sweep() {
 
 void code_heap::verify_all_blocks_set() {
   auto all_blocks_set_verifier = [&](code_block* block, cell size) {
-    all_blocks.find((cell)block) != all_blocks.end();
+    FACTOR_ASSERT(all_blocks.find((cell)block) != all_blocks.end());
   };
   allocator->iterate(all_blocks_set_verifier);
 }
