@@ -90,16 +90,15 @@ struct update_word_references_relocation_visitor {
       : parent(parent), reset_inline_caches(reset_inline_caches) {}
 
   void operator()(instruction_operand op) {
+    code_block* compiled = op.load_code_block();
     switch (op.rel_type()) {
       case RT_ENTRY_POINT: {
-        code_block* compiled = op.load_code_block();
         cell owner = compiled->owner;
         if (to_boolean(owner))
           op.store_value(parent->compute_entry_point_address(owner));
         break;
       }
       case RT_ENTRY_POINT_PIC: {
-        code_block* compiled = op.load_code_block();
         if (reset_inline_caches || !compiled->pic_p()) {
           cell owner = parent->code_block_owner(compiled);
           if (to_boolean(owner))
@@ -108,7 +107,6 @@ struct update_word_references_relocation_visitor {
         break;
       }
       case RT_ENTRY_POINT_PIC_TAIL: {
-        code_block* compiled = op.load_code_block();
         if (reset_inline_caches || !compiled->pic_p()) {
           cell owner = parent->code_block_owner(compiled);
           if (to_boolean(owner))
@@ -460,42 +458,32 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   return compiled;
 }
 
-/* Find the RT_DLSYM relocation nearest to the given return address. */
-struct find_symbol_at_address_visitor {
-  factor_vm* parent;
-  cell return_address;
-  cell symbol;
-  cell library;
-
-  find_symbol_at_address_visitor(factor_vm* parent, cell return_address)
-      : parent(parent),
-        return_address(return_address),
-        symbol(false_object),
-        library(false_object) {}
-
-  void operator()(instruction_operand op) {
-    if (op.rel_type() == RT_DLSYM && op.pointer <= return_address) {
-      code_block* compiled = op.compiled;
-      array* parameters = untag<array>(compiled->parameters);
-      cell index = op.index;
-      symbol = array_nth(parameters, index);
-      library = array_nth(parameters, index + 1);
-    }
-  }
-};
-
 /* References to undefined symbols are patched up to call this function on
    image load. It finds the symbol and library, and throws an error. */
 void factor_vm::undefined_symbol() {
   cell frame = ctx->callstack_top;
   cell return_address = *(cell*)frame;
   code_block* compiled = code->code_block_for_address(return_address);
-  find_symbol_at_address_visitor visitor(this, return_address);
-  compiled->each_instruction_operand(visitor);
-  if (!to_boolean(visitor.symbol))
+
+  /* Find the RT_DLSYM relocation nearest to the given return
+     address. */
+  cell symbol = false_object;
+  cell library = false_object;
+
+  auto find_symbol_at_address_visitor = [&](instruction_operand op) {
+    if (op.rel_type() == RT_DLSYM && op.pointer <= return_address) {
+      array* parameters = untag<array>(compiled->parameters);
+      cell index = op.index;
+      symbol = array_nth(parameters, index);
+      library = array_nth(parameters, index + 1);
+    }
+  };
+  compiled->each_instruction_operand(find_symbol_at_address_visitor);
+
+  if (!to_boolean(symbol))
     critical_error("Can't find RT_DLSYM at return address", return_address);
   else
-    general_error(ERROR_UNDEFINED_SYMBOL, visitor.symbol, visitor.library);
+    general_error(ERROR_UNDEFINED_SYMBOL, symbol, library);
 }
 
 void undefined_symbol() { return current_vm()->undefined_symbol(); }

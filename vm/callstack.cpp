@@ -57,27 +57,6 @@ cell factor_vm::frame_predecessor(cell frame_top) {
   return frame_top + frame_size;
 }
 
-struct stack_frame_accumulator {
-  factor_vm* parent;
-  growable_array frames;
-
-  /* Allocates memory (frames is a growable_array, constructor allocates) */
-  explicit stack_frame_accumulator(factor_vm* parent)
-      : parent(parent), frames(parent) {}
-
-
-  /* Allocates memory (frames.add()) */
-  void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
-    data_root<object> executing_quot(owner->owner_quot(), parent);
-    data_root<object> executing(owner->owner, parent);
-    data_root<object> scan(owner->scan(parent, addr), parent);
-
-    frames.add(executing.value());
-    frames.add(executing_quot.value());
-    frames.add(scan.value());
-  }
-};
-
 struct stack_frame_in_array {
   cell cells[3];
 };
@@ -85,19 +64,30 @@ struct stack_frame_in_array {
 /* Allocates memory (frames.trim()), iterate_callstack_object() */
 void factor_vm::primitive_callstack_to_array() {
   data_root<callstack> callstack(ctx->peek(), this);
+  /* Allocates memory here. */
+  growable_array frames(this);
 
-  stack_frame_accumulator accum(this);
-  iterate_callstack_object(callstack.untagged(), accum);
+  auto stack_frame_accumulator = [&](cell frame_top,
+                                     cell size,
+                                     code_block* owner,
+                                     cell addr) {
+    data_root<object> executing_quot(owner->owner_quot(), this);
+    data_root<object> executing(owner->owner, this);
+    data_root<object> scan(owner->scan(this, addr), this);
+
+    frames.add(executing.value());
+    frames.add(executing_quot.value());
+    frames.add(scan.value());
+  };
+  iterate_callstack_object(callstack.untagged(), stack_frame_accumulator);
 
   /* The callstack iterator visits frames in reverse order (top to bottom) */
-  std::reverse((stack_frame_in_array*)accum.frames.elements->data(),
-               (stack_frame_in_array*)(accum.frames.elements->data() +
-                                       accum.frames.count));
+  std::reverse((stack_frame_in_array*)frames.elements->data(),
+               (stack_frame_in_array*)(frames.elements->data() +
+                                       frames.count));
+  frames.trim();
 
-  accum.frames.trim();
-
-  ctx->replace(accum.frames.elements.value());
-
+  ctx->replace(frames.elements.value());
 }
 
 /* Some primitives implementing a limited form of callstack mutation.

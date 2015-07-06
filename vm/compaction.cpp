@@ -257,16 +257,6 @@ struct code_compaction_fixup {
   }
 };
 
-struct object_grow_heap_updater {
-  slot_visitor<code_compaction_fixup> forwarder;
-
-  explicit object_grow_heap_updater(
-      slot_visitor<code_compaction_fixup> forwarder)
-      : forwarder(forwarder) {}
-
-  void operator()(object* obj) { forwarder.visit_object_code_block(obj); }
-};
-
 /* Compact just the code heap, after growing the data heap */
 void factor_vm::collect_compact_code_impl() {
   /* Figure out where blocks are going to go */
@@ -282,8 +272,10 @@ void factor_vm::collect_compact_code_impl() {
   forwarder.visit_context_code_blocks();
 
   /* Update code heap references in data heap */
-  object_grow_heap_updater object_updater(forwarder);
-  each_object(object_updater);
+  auto object_grow_heap_updater = [&](object* obj) {
+    forwarder.visit_object_code_block(obj);
+  };
+  each_object(object_grow_heap_updater);
 
   /* Slide everything in the code heap up, and update code heap
 	pointers inside code blocks. */
