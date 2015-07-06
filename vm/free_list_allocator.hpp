@@ -120,13 +120,9 @@ void free_list_allocator<Block>::sweep(Iterator& iter) {
   }
 }
 
-template <typename Block> struct null_sweep_iterator {
-  void operator()(Block* free_block, cell size) {}
-};
-
 template <typename Block> void free_list_allocator<Block>::sweep() {
-  null_sweep_iterator<Block> none;
-  sweep(none);
+  auto null_sweep = [](Block* free_block, cell size) { };
+  sweep(null_sweep);
 }
 
 template <typename Block, typename Iterator> struct heap_compactor {
@@ -170,9 +166,10 @@ template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {
   cell scan = this->start;
   while (scan != this->end) {
-    cell size = fixup.size((Block*)scan);
-    if (!((Block*)scan)->free_p())
-      iter((Block*)scan, size);
+    Block* block = (Block*)scan;
+    cell size = fixup.size(block);
+    if (!block->free_p())
+      iter(block, size);
     scan += size;
   }
 }

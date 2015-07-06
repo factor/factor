@@ -143,24 +143,17 @@ void factor_vm::primitive_data_room() {
   ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
-struct object_accumulator {
-  cell type;
-  std::vector<cell> objects;
-
-  explicit object_accumulator(cell type) : type(type) {}
-
-  void operator()(object* obj) {
-    if (type == TYPE_COUNT || obj->type() == type)
-      objects.push_back(tag_dynamic(obj));
-  }
-};
-
 /* Allocates memory */
 cell factor_vm::instances(cell type) {
   primitive_full_gc();
-  object_accumulator accum(type);
-  each_object(accum);
-  return std_vector_to_array(accum.objects);
+
+  std::vector<cell> objects;
+  auto object_accumulator = [&](object* obj) {
+    if (type == TYPE_COUNT || obj->type() == type)
+      objects.push_back(tag_dynamic(obj));
+  };
+  each_object(object_accumulator);
+  return std_vector_to_array(objects);
 }
 
 /* Allocates memory */
