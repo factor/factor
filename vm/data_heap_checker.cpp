@@ -74,20 +74,12 @@ struct slot_checker {
   }
 };
 
-struct object_checker {
-  factor_vm* parent;
-
-  object_checker(factor_vm* parent) : parent(parent) {}
-
-  void operator()(object* obj) {
-    generation obj_gen = generation_of(parent, obj);
-    slot_checker checker(parent, obj, obj_gen);
-    obj->each_slot(checker);
-  }
-};
-
 void factor_vm::check_data_heap() {
-  object_checker checker(this);
+  auto checker = [&](object* obj){
+    generation obj_gen = generation_of(this, obj);
+    slot_checker s_checker(this, obj, obj_gen);
+    obj->each_slot(s_checker);
+  };
   each_object(checker);
 }
 
