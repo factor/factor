@@ -49,43 +49,25 @@ void code_heap::free(code_block* compiled) {
 
 void code_heap::flush_icache() { factor::flush_icache(seg->start, seg->size); }
 
-struct clear_free_blocks_from_all_blocks_iterator {
-  code_heap* code;
-
-  clear_free_blocks_from_all_blocks_iterator(code_heap* code) : code(code) {}
-
-  void operator()(code_block* free_block, cell size) {
-    std::set<cell>::iterator erase_from =
-        code->all_blocks.lower_bound((cell)free_block);
-    std::set<cell>::iterator erase_to =
-        code->all_blocks.lower_bound((cell)free_block + size);
-
-    code->all_blocks.erase(erase_from, erase_to);
-  }
-};
-
 void code_heap::sweep() {
-  clear_free_blocks_from_all_blocks_iterator clearer(this);
-  allocator->sweep(clearer);
+  auto clear_free_blocks_from_all_blocks = [&](code_block* block, cell size) {
+    std::set<cell>::iterator erase_from =
+      all_blocks.lower_bound((cell)block);
+    std::set<cell>::iterator erase_to =
+      all_blocks.lower_bound((cell)block + size);
+    all_blocks.erase(erase_from, erase_to);
+  };
+  allocator->sweep(clear_free_blocks_from_all_blocks);
 #ifdef FACTOR_DEBUG
   verify_all_blocks_set();
 #endif
 }
 
-struct all_blocks_set_verifier {
-  std::set<cell>* all_blocks;
-
-  all_blocks_set_verifier(std::set<cell>* all_blocks)
-      : all_blocks(all_blocks) {}
-
-  void operator()(code_block* block, cell size) {
-    FACTOR_ASSERT(all_blocks->find((cell)block) != all_blocks->end());
-  }
-};
-
 void code_heap::verify_all_blocks_set() {
-  all_blocks_set_verifier verifier(&all_blocks);
-  allocator->iterate(verifier);
+  auto all_blocks_set_verifier = [&](code_block* block, cell size) {
+    all_blocks.find((cell)block) != all_blocks.end();
+  };
+  allocator->iterate(all_blocks_set_verifier);
 }
 
 code_block* code_heap::code_block_for_address(cell address) {
@@ -101,20 +83,12 @@ code_block* code_heap::code_block_for_address(cell address) {
   return found_block;
 }
 
-struct all_blocks_set_inserter {
-  code_heap* code;
-
-  all_blocks_set_inserter(code_heap* code) : code(code) {}
-
-  void operator()(code_block* block, cell size) {
-    code->all_blocks.insert((cell)block);
-  }
-};
-
 void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
-  all_blocks_set_inserter inserter(this);
-  allocator->iterate(inserter);
+  auto all_blocks_set_inserter = [&](code_block* block, cell size) {
+    all_blocks.insert((cell)block);
+  };
+  allocator->iterate(all_blocks_set_inserter);
 #ifdef FACTOR_DEBUG
   verify_all_blocks_set();
 #endif
@@ -123,24 +97,14 @@ void code_heap::initialize_all_blocks_set() {
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size) { code = new code_heap(size); }
 
-struct word_updater {
-  factor_vm* parent;
-  bool reset_inline_caches;
-
-  word_updater(factor_vm* parent, bool reset_inline_caches)
-      : parent(parent), reset_inline_caches(reset_inline_caches) {}
-
-  void operator()(code_block* compiled, cell size) {
-    parent->update_word_references(compiled, reset_inline_caches);
-  }
-};
-
 /* Update pointers to words referenced from all code blocks.
 Only needed after redefining an existing word.
 If generic words were redefined, inline caches need to be reset. */
 void factor_vm::update_code_heap_words(bool reset_inline_caches) {
-  word_updater updater(this, reset_inline_caches);
-  each_code_block(updater);
+  auto word_updater = [&](code_block* block, cell size) {
+    update_word_references(block, reset_inline_caches);
+  };
+  each_code_block(word_updater);
 }
 
 /* Fix up new words only.
@@ -207,29 +171,24 @@ void factor_vm::primitive_code_room() {
   ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
-struct stack_trace_stripper {
-  stack_trace_stripper() {}
-
-  void operator()(code_block* compiled, cell size) {
-    compiled->owner = false_object;
-  }
-};
-
 void factor_vm::primitive_strip_stack_traces() {
-  stack_trace_stripper stripper;
-  each_code_block(stripper);
+  auto stack_trace_stripper = [](code_block* block, cell size) {
+    block->owner = false_object;
+  };
+  each_code_block(stack_trace_stripper);
 }
 
-struct code_block_accumulator {
+/* Allocates memory */
+cell factor_vm::code_blocks() {
   std::vector<cell> objects;
 
-  void operator()(code_block* compiled, cell size) {
-    objects.push_back(compiled->owner);
-    objects.push_back(compiled->parameters);
-    objects.push_back(compiled->relocation);
+  auto code_block_accumulator = [&](code_block* block, cell size) {
+    objects.push_back(block->owner);
+    objects.push_back(block->parameters);
+    objects.push_back(block->relocation);
 
-    objects.push_back(tag_fixnum(compiled->type()));
-    objects.push_back(tag_fixnum(compiled->size()));
+    objects.push_back(tag_fixnum(block->type()));
+    objects.push_back(tag_fixnum(block->size()));
 
     /* Note: the entry point is always a multiple of the heap
        alignment (16 bytes). We cannot allocate while iterating
@@ -237,18 +196,13 @@ struct code_block_accumulator {
        from_unsigned_cell() here. It is OK, however, to add it as
        if it were a fixnum, and have library code shift it to the
        left by 4. */
-    cell entry_point = compiled->entry_point();
+    cell entry_point = block->entry_point();
     FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
     FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);
     objects.push_back(entry_point);
-  }
-};
-
-/* Allocates memory */
-cell factor_vm::code_blocks() {
-  code_block_accumulator accum;
-  each_code_block(accum);
-  return std_vector_to_array(accum.objects);
+  };
+  each_code_block(code_block_accumulator);
+  return std_vector_to_array(objects);
 }
 
 /* Allocates memory */

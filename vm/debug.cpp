@@ -286,27 +286,16 @@ void factor_vm::dump_generations(ostream& out) {
   out << dec;
 }
 
-struct object_dumper {
-  factor_vm* parent;
-  cell type;
-  ostream& out;
-
-  object_dumper(factor_vm* parent, cell type, ostream& out)
-      : parent(parent), type(type), out(out) {}
-
-  void operator()(object* obj) {
-    if (type == TYPE_COUNT || obj->type() == type) {
-      out << padded_address((cell)obj) << " ";
-      parent->print_nested_obj(out, tag_dynamic(obj), 2);
-      out << endl;
-    }
-  }
-};
-
 void factor_vm::dump_objects(ostream& out, cell type) {
   primitive_full_gc();
-  object_dumper dumper(this, type, out);
-  each_object(dumper);
+  auto object_dumper = [&](object* obj) {
+     if (type == TYPE_COUNT || obj->type() == type) {
+      out << padded_address((cell)obj) << " ";
+      print_nested_obj(out, tag_dynamic(obj), 2);
+      out << endl;
+    }
+  };
+  each_object(object_dumper);
 }
 
 struct find_data_reference_slot_visitor {

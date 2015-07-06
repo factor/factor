@@ -1,91 +1,92 @@
 namespace factor {
 
-/* Size of the object pointed to by an untagged pointer */
-template <typename Fixup> cell object::size(Fixup fixup) const {
-  if (free_p())
-    return ((free_heap_block*)this)->size();
-
+/* Size sans alignment. */
+template <typename Fixup>
+cell object::base_size(Fixup fixup) const {
   switch (type()) {
     case ARRAY_TYPE:
-      return align(array_size((array*)this), data_alignment);
+      return array_size((array*)this);
     case BIGNUM_TYPE:
-      return align(array_size((bignum*)this), data_alignment);
+      return array_size((bignum*)this);
     case BYTE_ARRAY_TYPE:
-      return align(array_size((byte_array*)this), data_alignment);
+      return array_size((byte_array*)this);
     case STRING_TYPE:
-      return align(string_size(string_capacity((string*)this)), data_alignment);
-    case TUPLE_TYPE: {
-      tuple_layout* layout = (tuple_layout*)fixup.translate_data(
-          untag<object>(((tuple*)this)->layout));
-      return align(tuple_size(layout), data_alignment);
-    }
-    case QUOTATION_TYPE:
-      return align(sizeof(quotation), data_alignment);
-    case WORD_TYPE:
-      return align(sizeof(word), data_alignment);
-    case FLOAT_TYPE:
-      return align(sizeof(boxed_float), data_alignment);
-    case DLL_TYPE:
-      return align(sizeof(dll), data_alignment);
-    case ALIEN_TYPE:
-      return align(sizeof(alien), data_alignment);
-    case WRAPPER_TYPE:
-      return align(sizeof(wrapper), data_alignment);
-    case CALLSTACK_TYPE:
-      return align(
-          callstack_object_size(untag_fixnum(((callstack*)this)->length)),
-          data_alignment);
-    default:
-      critical_error("Invalid header in size", (cell)this);
-      return 0; /* can't happen */
-  }
-}
-
-inline cell object::size() const { return size(no_fixup()); }
-
-/* The number of cells from the start of the object which should be scanned by
-the GC. Some types have a binary payload at the end (string, word, DLL) which
-we ignore. */
-template <typename Fixup> cell object::binary_payload_start(Fixup fixup) const {
-  if (free_p())
-    return 0;
-
-  switch (type()) {
-    /* these objects do not refer to other objects at all */
-    case FLOAT_TYPE:
-    case BYTE_ARRAY_TYPE:
-    case BIGNUM_TYPE:
-    case CALLSTACK_TYPE:
-      return 0;
-    /* these objects have some binary data at the end */
-    case WORD_TYPE:
-      return sizeof(word) - sizeof(cell);
-    case ALIEN_TYPE:
-      return sizeof(cell) * 3;
-    case DLL_TYPE:
-      return sizeof(cell) * 2;
-    case QUOTATION_TYPE:
-      return sizeof(quotation) - sizeof(cell);
-    case STRING_TYPE:
-      return sizeof(string);
-    /* everything else consists entirely of pointers */
-    case ARRAY_TYPE:
-      return array_size<array>(array_capacity((array*)this));
+      return string_size(string_capacity((string*)this));
     case TUPLE_TYPE: {
       tuple_layout* layout = (tuple_layout*)fixup.translate_data(
           untag<object>(((tuple*)this)->layout));
       return tuple_size(layout);
     }
+    case QUOTATION_TYPE:
+      return sizeof(quotation);
+    case WORD_TYPE:
+      return sizeof(word);
+    case FLOAT_TYPE:
+      return sizeof(boxed_float);
+    case DLL_TYPE:
+      return sizeof(dll);
+    case ALIEN_TYPE:
+      return sizeof(alien);
     case WRAPPER_TYPE:
       return sizeof(wrapper);
+    case CALLSTACK_TYPE: {
+      return callstack_object_size(untag_fixnum(((callstack*)this)->length));
+    }
     default:
-      critical_error("Invalid header in binary_payload_start", (cell)this);
-      return 0; /* can't happen */
+      critical_error("Invalid header in base_size", (cell)this);
+      return 0;
   }
 }
 
-inline cell object::binary_payload_start() const {
-  return binary_payload_start(no_fixup());
+/* Size of the object pointed to by an untagged pointer */
+template <typename Fixup>
+cell object::size(Fixup fixup) const {
+  if (free_p())
+    return ((free_heap_block*)this)->size();
+  return align(base_size(fixup), data_alignment);
+}
+
+inline cell object::size() const { return size(no_fixup()); }
+
+/* The number of slots (cells) in an object which should be scanned by
+   the GC. The number can vary in arrays and tuples, in all other
+   types the number is a constant. */
+template <typename Fixup>
+inline cell object::slot_count(Fixup fixup) const {
+  if (free_p())
+    return 0;
+
+  cell t = type();
+  if (t == ARRAY_TYPE) {
+    /* capacity + n slots */
+    return 1 + array_capacity((array*)this);
+  } else if (t == TUPLE_TYPE) {
+    tuple_layout* layout = (tuple_layout*)fixup.translate_data(
+        untag<object>(((tuple*)this)->layout));
+    /* layout + n slots */
+    return 1 + tuple_capacity(layout);
+  } else {
+    switch (t) {
+      /* these objects do not refer to other objects at all */
+      case FLOAT_TYPE:
+      case BYTE_ARRAY_TYPE:
+      case BIGNUM_TYPE:
+      case CALLSTACK_TYPE: return 0;
+      case WORD_TYPE: return 8;
+      case ALIEN_TYPE: return 2;
+      case DLL_TYPE: return 1;
+      case QUOTATION_TYPE: return 3;
+      case STRING_TYPE: return 3;
+      case WRAPPER_TYPE: return 1;
+      default:
+        critical_error("Invalid header in slot_count", (cell)this);
+        return 0; /* can't happen */
+    }
+  }
+}
+
+inline cell object::slot_count() const {
+  return slot_count(no_fixup());
 }
 
 /* Slot visitors iterate over the slots of an object, applying a functor to
@@ -125,7 +126,6 @@ template <typename Fixup> struct slot_visitor {
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
   void visit_object_array(cell* start, cell* end);
-  void visit_slots(object* ptr, cell payload_start);
   void visit_slots(object* ptr);
   void visit_stack_elements(segment* region, cell* top);
   void visit_data_roots();
@@ -167,22 +167,14 @@ void slot_visitor<Fixup>::visit_object_array(cell* start, cell* end) {
     visit_handle(start++);
 }
 
-template <typename Fixup>
-void slot_visitor<Fixup>::visit_slots(object* ptr, cell payload_start) {
-  cell* slot = (cell*)ptr;
-  cell* end = (cell*)((cell)ptr + payload_start);
-
-  if (slot != end) {
-    slot++;
-    visit_object_array(slot, end);
-  }
-}
-
 template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {
   if (obj->type() == CALLSTACK_TYPE)
     visit_callstack_object((callstack*)obj);
-  else
-    visit_slots(obj, obj->binary_payload_start(fixup));
+  else {
+    cell* start = (cell*)obj + 1;
+    cell* end = start + obj->slot_count(fixup);
+    visit_object_array(start, end);
+  }
 }
 
 template <typename Fixup>
@@ -196,19 +188,11 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
   }
 }
 
-template <typename Fixup> struct callback_slot_visitor {
-  slot_visitor<Fixup>* visitor;
-
-  callback_slot_visitor(slot_visitor<Fixup>* visitor) : visitor(visitor) {}
-
-  void operator()(code_block* stub, cell size) {
-    visitor->visit_handle(&stub->owner);
-  }
-};
-
 template <typename Fixup> void slot_visitor<Fixup>::visit_callback_roots() {
-  callback_slot_visitor<Fixup> callback_visitor(this);
-  parent->callbacks->allocator->iterate(callback_visitor);
+  auto callback_slot_visitor = [&](code_block* stub, cell size) {
+    visit_handle(&stub->owner);
+  };
+  parent->callbacks->allocator->iterate(callback_slot_visitor);
 }
 
 template <typename Fixup>
@@ -389,18 +373,6 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
   }
 }
 
-template <typename Fixup> struct literal_references_visitor {
-  slot_visitor<Fixup>* visitor;
-
-  explicit literal_references_visitor(slot_visitor<Fixup>* visitor)
-      : visitor(visitor) {}
-
-  void operator()(instruction_operand op) {
-    if (op.rel_type() == RT_LITERAL)
-      op.store_value(visitor->visit_pointer(op.load_value()));
-  }
-};
-
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_code_block_objects(code_block* compiled) {
   visit_handle(&compiled->owner);
@@ -410,10 +382,14 @@ void slot_visitor<Fixup>::visit_code_block_objects(code_block* compiled) {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
-  if (!parent->code->uninitialized_p(compiled)) {
-    literal_references_visitor<Fixup> visitor(this);
-    compiled->each_instruction_operand(visitor);
-  }
+  if (parent->code->uninitialized_p(compiled))
+    return;
+
+  auto update_literal_refs = [&](instruction_operand op) {
+    if (op.rel_type() == RT_LITERAL)
+      op.store_value(visit_pointer(op.load_value()));
+  };
+  compiled->each_instruction_operand(update_literal_refs);
 }
 
 template <typename Fixup> struct call_frame_code_block_visitor {
@@ -473,25 +449,18 @@ void slot_visitor<Fixup>::visit_uninitialized_code_blocks() {
   parent->code->uninitialized_blocks = new_uninitialized_blocks;
 }
 
-template <typename Fixup> struct embedded_code_pointers_visitor {
-  Fixup fixup;
-
-  explicit embedded_code_pointers_visitor(Fixup fixup) : fixup(fixup) {}
-
-  void operator()(instruction_operand op) {
-    relocation_type type = op.rel_type();
-    if (type == RT_ENTRY_POINT || type == RT_ENTRY_POINT_PIC ||
-        type == RT_ENTRY_POINT_PIC_TAIL)
-      op.store_code_block(fixup.fixup_code(op.load_code_block()));
-  }
-};
-
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
-  if (!parent->code->uninitialized_p(compiled)) {
-    embedded_code_pointers_visitor<Fixup> operand_visitor(fixup);
-    compiled->each_instruction_operand(operand_visitor);
-  }
+  if (parent->code->uninitialized_p(compiled))
+    return;
+  auto update_code_block_refs = [&](instruction_operand op){
+    relocation_type type = op.rel_type();
+    if (type == RT_ENTRY_POINT ||
+        type == RT_ENTRY_POINT_PIC ||
+        type == RT_ENTRY_POINT_PIC_TAIL)
+      op.store_code_block(fixup.fixup_code(op.load_code_block()));
+  };
+  compiled->each_instruction_operand(update_code_block_refs);
 }
 
 template <typename Fixup>
@@ -508,7 +477,6 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
   while (!mark_stack->empty()) {
     cell ptr = mark_stack->back();
-    // TJaba
     mark_stack->pop_back();
 
     if (ptr & 1) {
