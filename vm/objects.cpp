@@ -87,37 +87,6 @@ struct slot_become_fixup : no_fixup {
   }
 };
 
-struct object_become_visitor {
-  slot_visitor<slot_become_fixup>* visitor;
-
-  explicit object_become_visitor(slot_visitor<slot_become_fixup>* visitor)
-      : visitor(visitor) {}
-
-  void operator()(object* obj) { visitor->visit_slots(obj); }
-};
-
-struct code_block_become_visitor {
-  slot_visitor<slot_become_fixup>* visitor;
-
-  explicit code_block_become_visitor(
-      slot_visitor<slot_become_fixup>* visitor) : visitor(visitor) {}
-
-  void operator()(code_block* compiled, cell size) {
-    visitor->visit_code_block_objects(compiled);
-    visitor->visit_embedded_literals(compiled);
-  }
-};
-
-struct code_block_write_barrier_visitor {
-  code_heap* code;
-
-  explicit code_block_write_barrier_visitor(code_heap* code) : code(code) {}
-
-  void operator()(code_block* compiled, cell size) {
-    code->write_barrier(compiled);
-  }
-};
-
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
 /* Calls gc */
@@ -147,11 +116,16 @@ void factor_vm::primitive_become() {
                                             slot_become_fixup(&become_map));
     visitor.visit_all_roots();
 
-    object_become_visitor object_visitor(&visitor);
-    each_object(object_visitor);
+    auto object_become_visitor = [&](object* obj) {
+      visitor.visit_slots(obj);
+    };
+    each_object(object_become_visitor);
 
-    code_block_become_visitor code_block_visitor(&visitor);
-    each_code_block(code_block_visitor);
+    auto code_block_become_visitor = [&](code_block* compiled, cell size) {
+      visitor.visit_code_block_objects(compiled);
+      visitor.visit_embedded_literals(compiled);
+    };
+    each_code_block(code_block_become_visitor);
   }
 
   /* Since we may have introduced old->new references, need to revisit
@@ -159,7 +133,9 @@ void factor_vm::primitive_become() {
   data->mark_all_cards();
 
   {
-    code_block_write_barrier_visitor code_block_visitor(code);
+    auto code_block_visitor = [&](code_block* compiled, cell size) {
+      code->write_barrier(compiled);
+    };
     each_code_block(code_block_visitor);
   }
 }

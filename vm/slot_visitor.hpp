@@ -188,19 +188,11 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
   }
 }
 
-template <typename Fixup> struct callback_slot_visitor {
-  slot_visitor<Fixup>* visitor;
-
-  callback_slot_visitor(slot_visitor<Fixup>* visitor) : visitor(visitor) {}
-
-  void operator()(code_block* stub, cell size) {
-    visitor->visit_handle(&stub->owner);
-  }
-};
-
 template <typename Fixup> void slot_visitor<Fixup>::visit_callback_roots() {
-  callback_slot_visitor<Fixup> callback_visitor(this);
-  parent->callbacks->allocator->iterate(callback_visitor);
+  auto callback_slot_visitor = [&](code_block* stub, cell size) {
+    visit_handle(&stub->owner);
+  };
+  parent->callbacks->allocator->iterate(callback_slot_visitor);
 }
 
 template <typename Fixup>
@@ -381,18 +373,6 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
   }
 }
 
-template <typename Fixup> struct literal_references_visitor {
-  slot_visitor<Fixup>* visitor;
-
-  explicit literal_references_visitor(slot_visitor<Fixup>* visitor)
-      : visitor(visitor) {}
-
-  void operator()(instruction_operand op) {
-    if (op.rel_type() == RT_LITERAL)
-      op.store_value(visitor->visit_pointer(op.load_value()));
-  }
-};
-
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_code_block_objects(code_block* compiled) {
   visit_handle(&compiled->owner);
@@ -402,10 +382,14 @@ void slot_visitor<Fixup>::visit_code_block_objects(code_block* compiled) {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
-  if (!parent->code->uninitialized_p(compiled)) {
-    literal_references_visitor<Fixup> visitor(this);
-    compiled->each_instruction_operand(visitor);
-  }
+  if (parent->code->uninitialized_p(compiled))
+    return;
+
+  auto update_literal_refs = [&](instruction_operand op) {
+    if (op.rel_type() == RT_LITERAL)
+      op.store_value(visit_pointer(op.load_value()));
+  };
+  compiled->each_instruction_operand(update_literal_refs);
 }
 
 template <typename Fixup> struct call_frame_code_block_visitor {
@@ -465,25 +449,18 @@ void slot_visitor<Fixup>::visit_uninitialized_code_blocks() {
   parent->code->uninitialized_blocks = new_uninitialized_blocks;
 }
 
-template <typename Fixup> struct embedded_code_pointers_visitor {
-  Fixup fixup;
-
-  explicit embedded_code_pointers_visitor(Fixup fixup) : fixup(fixup) {}
-
-  void operator()(instruction_operand op) {
-    relocation_type type = op.rel_type();
-    if (type == RT_ENTRY_POINT || type == RT_ENTRY_POINT_PIC ||
-        type == RT_ENTRY_POINT_PIC_TAIL)
-      op.store_code_block(fixup.fixup_code(op.load_code_block()));
-  }
-};
-
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
-  if (!parent->code->uninitialized_p(compiled)) {
-    embedded_code_pointers_visitor<Fixup> operand_visitor(fixup);
-    compiled->each_instruction_operand(operand_visitor);
-  }
+  if (parent->code->uninitialized_p(compiled))
+    return;
+  auto update_code_block_refs = [&](instruction_operand op){
+    relocation_type type = op.rel_type();
+    if (type == RT_ENTRY_POINT ||
+        type == RT_ENTRY_POINT_PIC ||
+        type == RT_ENTRY_POINT_PIC_TAIL)
+      op.store_code_block(fixup.fixup_code(op.load_code_block()));
+  };
+  compiled->each_instruction_operand(update_code_block_refs);
 }
 
 template <typename Fixup>
@@ -500,7 +477,6 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
   while (!mark_stack->empty()) {
     cell ptr = mark_stack->back();
-    // TJaba
     mark_stack->pop_back();
 
     if (ptr & 1) {
