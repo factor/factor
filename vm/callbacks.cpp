@@ -108,20 +108,11 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   return stub;
 }
 
-struct callback_updater {
-  callback_heap* callbacks;
-
-  explicit callback_updater(callback_heap* callbacks)
-      : callbacks(callbacks) {}
-
-  void operator()(code_block* stub, cell size) {
-    callbacks->update(stub);
-  }
-};
-
 void callback_heap::update() {
-  callback_updater updater(this);
-  allocator->iterate(updater);
+  auto callback_updater = [&](code_block* stub, cell size) {
+    update(stub);
+  };
+  allocator->iterate(callback_updater);
 }
 
 /* Allocates memory (add(), allot_alien())*/

@@ -77,21 +77,14 @@ struct startup_fixup {
   cell size(code_block* compiled) { return compiled->size(*this); }
 };
 
-struct start_object_updater {
-  factor_vm* parent;
-  startup_fixup fixup;
-  slot_visitor<startup_fixup> visitor;
+void factor_vm::fixup_data(cell data_offset, cell code_offset) {
+  startup_fixup fixup(data_offset, code_offset);
+  slot_visitor<startup_fixup> visitor(this, fixup);
+  visitor.visit_all_roots();
 
-  start_object_updater(factor_vm* parent, startup_fixup fixup)
-      : parent(parent),
-        fixup(fixup),
-        visitor(slot_visitor<startup_fixup>(parent, fixup)) { }
-
-  void operator()(object* obj, cell size) {
-    parent->data->tenured->starts.record_object_start_offset(obj);
-
+  auto start_object_updater = [&](object *obj, cell size) {
+    data->tenured->starts.record_object_start_offset(obj);
     visitor.visit_slots(obj);
-
     switch (obj->type()) {
       case ALIEN_TYPE: {
 
@@ -100,11 +93,11 @@ struct start_object_updater {
         if (to_boolean(ptr->base))
           ptr->update_address();
         else
-          ptr->expired = parent->true_object;
+          ptr->expired = true_object;
         break;
       }
       case DLL_TYPE: {
-        parent->ffi_dlopen((dll*)obj);
+        ffi_dlopen((dll*)obj);
         break;
       }
       default: {
@@ -112,16 +105,8 @@ struct start_object_updater {
         break;
       }
     }
-  }
-};
-
-void factor_vm::fixup_data(cell data_offset, cell code_offset) {
-  startup_fixup fixup(data_offset, code_offset);
-  slot_visitor<startup_fixup> visitor(this, fixup);
-  visitor.visit_all_roots();
-
-  start_object_updater updater(this, fixup);
-  data->tenured->iterate(updater, fixup);
+  };
+  data->tenured->iterate(start_object_updater, fixup);
 }
 
 struct startup_code_block_relocation_visitor {
@@ -169,25 +154,15 @@ struct startup_code_block_relocation_visitor {
   }
 };
 
-struct startup_code_block_updater {
-  factor_vm* parent;
-  startup_fixup fixup;
-
-  startup_code_block_updater(factor_vm* parent, startup_fixup fixup)
-      : parent(parent), fixup(fixup) {}
-
-  void operator()(code_block* compiled, cell size) {
-    slot_visitor<startup_fixup> visitor(parent, fixup);
-    visitor.visit_code_block_objects(compiled);
-
-    startup_code_block_relocation_visitor code_visitor(parent, fixup);
-    compiled->each_instruction_operand(code_visitor);
-  }
-};
-
 void factor_vm::fixup_code(cell data_offset, cell code_offset) {
   startup_fixup fixup(data_offset, code_offset);
-  startup_code_block_updater updater(this, fixup);
+  auto updater = [&](code_block* compiled, cell size) {
+    slot_visitor<startup_fixup> visitor(this, fixup);
+    visitor.visit_code_block_objects(compiled);
+
+    startup_code_block_relocation_visitor code_visitor(this, fixup);
+    compiled->each_instruction_operand(code_visitor);
+  };
   code->allocator->iterate(updater, fixup);
 }
 
