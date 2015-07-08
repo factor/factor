@@ -1,6 +1,6 @@
-USING: accessors alien.c-types alien.data arrays bit-arrays classes
+USING: accessors alien alien.c-types alien.data arrays bit-arrays classes
 continuations destructors fry io io.streams.throwing kernel locals
-math namespaces sequences ;
+math namespaces sequences words ;
 IN: tools.image-analyzer.utils
 
 : class-heap-size ( instance -- n )
@@ -14,6 +14,9 @@ IN: tools.image-analyzer.utils
 
 : byte-array>bit-array ( byte-array -- bit-array )
     [ integer>bit-array 8 f pad-tail ] { } map-as concat ;
+
+: word>byte-array ( word -- byte-array )
+    word-code over - [ <alien> ] dip memory>byte-array ;
 
 : until-eof-reader ( reader-quot -- reader-quot' )
     '[
