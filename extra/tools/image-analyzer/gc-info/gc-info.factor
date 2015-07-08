@@ -26,7 +26,7 @@ IN: tools.image-analyzer.gc-info
 
 : base-pointers ( gc-info -- seq )
     [ return-address-count>> ] keep derived-root-count>>
-    '[ _ read-ints ] replicate ;
+    '[ _ read-ints ] replicate <reversed> ;
 
 : bit-counts ( gc-info -- counts )
     struct-slot-values 3 head ;
@@ -45,3 +45,6 @@ IN: tools.image-analyzer.gc-info
             swap zip zip
         ] [ { } ] if*
     ] with-input-stream ;
+
+: word>gc-maps ( word -- gc-maps )
+    word>byte-array byte-array>gc-maps ;

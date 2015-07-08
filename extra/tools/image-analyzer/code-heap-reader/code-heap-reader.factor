@@ -1,15 +1,9 @@
-USING: accessors alien alien.c-types byte-arrays classes.struct
-combinators io kernel math math.bitwise
-specialized-arrays.instances.alien.c-types.uchar
-tools.image-analyzer.gc-info tools.image-analyzer.vm vm words ;
+USING: accessors alien.c-types classes.struct combinators io kernel
+math math.bitwise tools.image-analyzer.gc-info tools.image-analyzer.vm ;
 IN: tools.image-analyzer.code-heap-reader
 QUALIFIED: layouts
 
 TUPLE: code-block-t free? owner parameters relocation gc-maps payload ;
-
-: word>byte-array ( word -- array )
-    word-code swap code-block heap-size -
-    over <alien> -rot - <direct-uchar-array> >byte-array ;
 
 : free? ( code-block -- ? )
     header>> 1 mask? ;
