@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays growable.private hash-sets
+USING: accessors arrays combinators growable.private hash-sets
 hashtables.private kernel kernel.private math math.private
 sequences sequences.private sets sets.private slots.private
 vectors ;
@@ -192,6 +192,12 @@ M: hash-set set=
             array/tester and-tombstones all?
         ] [ 2drop f ] if
     ] [ call-next-method ] if ;
+
+M: hash-set hashcode*
+    [
+        dup cardinality 1 eq?
+        [ members hashcode* ] [ nip cardinality ] if
+    ] recursive-hashcode ;
 
 ! Default methods
 

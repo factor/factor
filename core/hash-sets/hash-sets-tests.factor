@@ -38,3 +38,9 @@ IN: hash-sets.tests
 { { } } [ { 1 2 3 } duplicates ] unit-test
 { f } [ { 1 2 3 } >hash-set duplicates ] unit-test
 { { 1 } } [ { 1 2 1 } duplicates ] unit-test
+
+{ HS{ HS{ { 2 1 } { 1 2 } } } } [
+    HS{ } clone
+    HS{ { 1 2 } { 2 1 } } over adjoin
+    HS{ { 2 1 } { 1 2 } } over adjoin
+] unit-test
