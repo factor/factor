@@ -21,6 +21,9 @@ factor.com
 .DS_Store
 .gdb_history
 *.*.marks
+.*.swm
+.*.swn
+.*.swo
 .*.swp
 temp
 logs
@@ -28,7 +31,6 @@ work
 build-support/wordsize
 *.bak
 .#*
-*.swo
 checksums.txt
 *.so
 a.out
