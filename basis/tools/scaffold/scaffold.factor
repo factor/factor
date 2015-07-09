@@ -14,8 +14,6 @@ SYMBOL: developer-name
 SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
-ERROR: vocab-name-contains-separator path ;
-ERROR: vocab-name-contains-dot path ;
 
 <PRIVATE
 
@@ -29,11 +27,6 @@ ERROR: vocab-name-contains-dot path ;
 
 : ensure-vocab-exists ( string -- string )
     dup loaded-vocab-names member? [ no-vocab ] unless ;
-
-: check-vocab-name ( string -- string )
-    [ ]
-    [ contains-dot? [ vocab-name-contains-dot ] when ]
-    [ contains-separator? [ vocab-name-contains-separator ] when ] tri ;
 
 : check-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
@@ -289,7 +282,7 @@ PRIVATE>
     [ "platforms.txt" ] dip scaffold-metadata ;
 
 : scaffold-vocab ( vocab-root string -- )
-    check-vocab-name {
+    {
         [ scaffold-directory ]
         [ scaffold-main ]
         [ nip require ]
