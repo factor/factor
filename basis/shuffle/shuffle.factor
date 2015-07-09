@@ -1,16 +1,15 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators effects.parser
-generalizations sequences.generalizations hashtables kernel
-locals locals.backend macros make math parser sequences ;
+USING: accessors assocs combinators effects.parser fry
+generalizations kernel macros make sequences
+sequences.generalizations ;
 IN: shuffle
 
 MACRO: shuffle-effect ( effect -- )
-    [ out>> ] [ in>> H{ } zip-index-as ] bi
-    [
-        [ nip assoc-size , \ narray , ]
-        [ [ at \ swap \ nth [ ] 3sequence ] curry map , \ cleave , ] 2bi
-    ] [ ] make ;
+    [ in>> H{ } zip-index-as ] [ out>> ] bi
+    [ drop assoc-size '[ _ narray ] ]
+    [ [ of '[ _ swap nth ] ] with map ] 2bi
+    '[ @ _ cleave ] ;
 
 SYNTAX: shuffle(
     ")" parse-effect suffix! \ shuffle-effect suffix! ;
