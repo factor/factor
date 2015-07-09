@@ -39,6 +39,10 @@ STRUCT: byte-array
     { header cell }
     { capacity cell } ;
 
+STRUCT: callstack
+    { header cell }
+    { length cell } ;
+
 STRUCT: dll
     { header cell }
     { path cell }
@@ -111,6 +115,7 @@ UNION: array-payload
         { 7 tuple }
         { 8 wrapper }
         { 9 byte-array }
+        { 10 callstack }
         { 11 string }
         { 12 word }
         { 13 dll }
