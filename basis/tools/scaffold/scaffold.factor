@@ -289,7 +289,7 @@ PRIVATE>
     [ "platforms.txt" ] dip scaffold-metadata ;
 
 : scaffold-vocab ( vocab-root string -- )
-    {
+    check-vocab-name {
         [ scaffold-directory ]
         [ scaffold-main ]
         [ nip require ]
