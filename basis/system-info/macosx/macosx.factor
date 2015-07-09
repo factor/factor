@@ -24,6 +24,7 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { { 10 11 } "El Capitan" }
     { { 10 10 } "Yosemite" }
     { { 10 9 } "Mavericks" }
     { { 10 8 } "Mountain Lion" }
