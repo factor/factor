@@ -1,5 +1,14 @@
-USING: alien.c-types assocs classes.struct kernel.private vm ;
+USING: alien.c-types assocs classes.struct kernel kernel.private system vm
+vocabs.parser ;
 IN: tools.image-analyzer.vm
+
+<<
+! For the two annoying structs that differ on 32 and 64 bit.
+cpu x86.32?
+"tools.image-analyzer.vm.32"
+"tools.image-analyzer.vm.64"
+? use-vocab
+>>
 
 ! These structs and words correspond to vm/image.hpp
 STRUCT: image-header
@@ -34,10 +43,6 @@ STRUCT: bignum
     { header cell }
     { capacity cell } ;
 
-! Different on 32 bit
-STRUCT: byte-array
-    { header cell }
-    { capacity cell } ;
 
 STRUCT: callstack
     { header cell }
@@ -47,11 +52,6 @@ STRUCT: dll
     { header cell }
     { path cell }
     { handle void* } ;
-
-! Different on 32 bit
-STRUCT: float
-    { header cell }
-    { n double } ;
 
 STRUCT: quotation
     { header cell }
@@ -95,8 +95,8 @@ STRUCT: wrapper
 
 UNION: no-payload
     alien
+    boxed-float
     dll
-    float
     quotation
     wrapper
     word ;
@@ -108,7 +108,7 @@ UNION: array-payload
 : tag>class ( tag -- class )
     {
         { 2 array }
-        { 3 float }
+        { 3 boxed-float }
         { 4 quotation }
         { 5 bignum }
         { 6 alien }
