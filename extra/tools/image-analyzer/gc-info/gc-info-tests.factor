@@ -1,48 +1,31 @@
 USING: accessors arrays assocs bit-arrays classes.struct combinators
 combinators.short-circuit compiler compiler.cfg.debugger
-compiler.cfg.instructions compiler.cfg.stack-frame compiler.cfg.utilities
-compiler.codegen.gc-maps compiler.units fry generic grouping kernel math
-namespaces random sequences sequences.generalizations slots.syntax
-tools.gc-decode tools.test vm vocabs words compiler.cfg.linearization ;
+compiler.cfg.instructions compiler.cfg.linearization
+compiler.cfg.stack-frame compiler.codegen.gc-maps compiler.units fry generic
+grouping io io.encodings.binary io.streams.byte-array kernel math namespaces
+random sequences sequences.generalizations
+tools.image-analyzer.gc-info tools.image-analyzer.utils tools.test vm
+vocabs words ;
+IN: tools.image-analyzer.gc-info.tests
 QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
+QUALIFIED: gml.coremath
 QUALIFIED: llvm.types
 QUALIFIED: opencl
-IN: tools.gc-decode.tests
 
-! byte-array>bit-array
-{
-    ?{
-        t t t t f t t t
-        t f f f f f f f
-    }
-} [
-    B{ 239 1 } byte-array>bit-array
-] unit-test
+: normal? ( word -- ? )
+    { [ generic? ] [ primitive? ] [ inline? ] [ no-compile? ] } 1|| not ;
 
-{ ?{ t t t t t t t t } } [ B{ 255 } byte-array>bit-array ] unit-test
+: word>gc-info ( word -- gc-info )
+    word>byte-array binary <byte-reader> <backwards-reader> [
+        gc-info read-struct-safe
+    ] with-input-stream ;
 
-! scrub-bits
-{
-    { }
-} [
-    \ decode-gc-maps word>gc-info scrub-bits
-] unit-test
-
-! decode-gc-maps
-{ f } [
-    \ effects:<effect> decode-gc-maps empty?
-] unit-test
-
-{ f } [
-    \ + decode-gc-maps empty?
-] unit-test
-
-! read-gc-maps
-{ { } } [
-    \ decode-gc-maps decode-gc-maps
-] unit-test
+: word>scrub-bits ( word -- bits )
+    word>byte-array binary <byte-reader> <backwards-reader> [
+        gc-info read-struct-safe scrub-bits
+    ] with-input-stream ;
 
 : cfg>gc-maps ( cfg -- gc-maps )
     cfg>insns [ gc-map-insn? ] filter [ gc-map>> ] map
@@ -66,24 +49,54 @@ IN: tools.gc-decode.tests
     [ struct-slot-values = ]
     [ [ not ] dip return-address-count>> 0 = and ] 2bi or ;
 
-! Do it also for a bunch of random words
-: normal? ( word -- ? )
-    { [ generic? ] [ primitive? ] [ inline? ] [ no-compile? ] } 1|| not ;
-
-{ { } } [
-    all-words [ normal? ] filter 50 sample
-    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
-] unit-test
-
 : base-pointer-groups-expected ( word -- seq )
     test-regs first dup stack-frame>> stack-frame [
         cfg>gc-maps [ derived-root-offsets { } like ] { } map-as
     ] with-variable ;
 
 : base-pointer-groups-decoded ( word -- seq )
-    word>gc-info base-pointer-groups [
-        [ swap 2array ] map-index [ nip -1 = ] assoc-reject
+    word>gc-maps [
+        second second [ swap 2array ] map-index
+        [ nip -1 = ] assoc-reject
     ] map ;
+
+! byte-array>bit-array
+{
+    ?{
+        t t t t f t t t
+        t f f f f f f f
+    }
+} [
+    B{ 239 1 } byte-array>bit-array
+] unit-test
+
+{ ?{ t t t t t t t t } } [ B{ 255 } byte-array>bit-array ] unit-test
+
+! scrub-bits
+{
+    { { ?{ } ?{ } ?{ f f f f f } } }
+} [
+    \ word>scrub-bits word>scrub-bits
+] unit-test
+
+! decode-gc-maps
+{ f } [
+    \ effects:<effect> word>gc-maps empty?
+] unit-test
+
+{ f } [
+    \ + word>gc-maps empty?
+] unit-test
+
+{ { } } [
+    \ word>gc-maps word>gc-maps
+] unit-test
+
+! Big test
+{ { } } [
+    all-words [ normal? ] filter 50 sample
+    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
+] unit-test
 
 ! base-pointer-groups
 { t } [
@@ -122,7 +135,7 @@ IN: tools.gc-decode.tests
         dup last 0 = [ drop f ] when
     ] replicate all-equal? ;
 
-
-{ t } [
+{ t t } [
     \ opencl:cl-queue-kernel deterministic-gc-info?
+    \ gml.coremath:gml-determinant deterministic-gc-info?
 ] unit-test
