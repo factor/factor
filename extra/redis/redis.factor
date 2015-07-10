@@ -102,7 +102,8 @@ CONSTANT: default-redis-port 6379
 
 : redis-do-connect ( redis -- stream )
     [ host>> ] [ port>> ] [ encoding>> ] tri
-    [ <inet> ] dip <client> drop ;
+    [ <inet> ] dip <client> drop
+    1 minutes over set-timeout ;
 
 : with-redis ( redis quot -- )
     [
