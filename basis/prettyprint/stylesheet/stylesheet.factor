@@ -23,16 +23,19 @@ GENERIC: word-style ( word -- style )
 
 M: word word-style
     [ presented associate ]
-    [ "word-style" word-prop >hashtable ] bi assoc-union ;
+    [ "word-style" word-prop ] bi assoc-union! ;
 
 M: highlighted-word word-style
-    call-next-method COLOR: DarkSlateGray foreground associate
-    swap assoc-union ;
+    call-next-method
+    COLOR: DarkSlateGray foreground pick set-at ;
 
 <PRIVATE
 
 : colored-presentation-style ( obj color -- style )
-    [ presented associate ] [ foreground associate ] bi* assoc-union ;
+    H{ } clone [
+        [ presented foreground ] dip
+        [ set-at ] curry bi-curry@ bi*
+    ] keep ;
 
 PRIVATE>
 
