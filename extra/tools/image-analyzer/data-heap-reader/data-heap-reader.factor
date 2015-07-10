@@ -1,14 +1,51 @@
-USING: accessors  arrays assocs classes classes.struct io
-locals math.bitwise namespaces sequences tools.image-analyzer.utils
-tools.image-analyzer.vm vm ;
+USING: accessors assocs classes classes.struct io locals
+math.bitwise namespaces sequences system tools.image-analyzer.utils
+tools.image-analyzer.vm vm vocabs.parser ;
 IN: tools.image-analyzer.data-heap-reader
 FROM: alien.c-types => char heap-size ;
-FROM: kernel => bi dup keep nip swap ;
+FROM: arrays => 2array ;
+FROM: kernel => ? bi dup keep nip swap ;
 FROM: layouts => data-alignment ;
 FROM: math => + - * align neg shift ;
 
+<<
+! For the two annoying structs that differ on 32 and 64 bit.
+cpu x86.32?
+"tools.image-analyzer.vm.32"
+"tools.image-analyzer.vm.64"
+? use-vocab
+>>
+
+: tag>class ( tag -- class )
+    {
+        { 2 array }
+        { 3 boxed-float }
+        { 4 quotation }
+        { 5 bignum }
+        { 6 alien }
+        { 7 tuple }
+        { 8 wrapper }
+        { 9 byte-array }
+        { 10 callstack }
+        { 11 string }
+        { 12 word }
+        { 13 dll }
+    } at ;
+
 : object-tag ( object -- tag )
     header>> 5 2 bit-range ;
+
+UNION: no-payload
+    alien
+    boxed-float
+    dll
+    quotation
+    wrapper
+    word ;
+
+UNION: array-payload
+    array
+    bignum ;
 
 GENERIC: read-payload ( rel-base struct -- tuple )
 
