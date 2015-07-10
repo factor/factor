@@ -11,8 +11,7 @@
 	<key>name</key>
 	<string>[ expanded</string>
 	<key>scope</key>
-	<string>source.factor
-</string>
+	<string>source.factor</string>
 	<key>tabTrigger</key>
 	<string>“</string>
 	<key>uuid</key>
