@@ -1,14 +1,5 @@
-USING: alien.c-types assocs classes.struct kernel kernel.private system vm
-vocabs.parser ;
+USING: alien.c-types assocs classes.struct kernel kernel.private vm ;
 IN: tools.image-analyzer.vm
-
-<<
-! For the two annoying structs that differ on 32 and 64 bit.
-cpu x86.32?
-"tools.image-analyzer.vm.32"
-"tools.image-analyzer.vm.64"
-? use-vocab
->>
 
 ! These structs and words correspond to vm/image.hpp
 STRUCT: image-header
@@ -92,34 +83,6 @@ STRUCT: word
 STRUCT: wrapper
     { header cell }
     { object cell } ;
-
-UNION: no-payload
-    alien
-    boxed-float
-    dll
-    quotation
-    wrapper
-    word ;
-
-UNION: array-payload
-    array
-    bignum ;
-
-: tag>class ( tag -- class )
-    {
-        { 2 array }
-        { 3 boxed-float }
-        { 4 quotation }
-        { 5 bignum }
-        { 6 alien }
-        { 7 tuple }
-        { 8 wrapper }
-        { 9 byte-array }
-        { 10 callstack }
-        { 11 string }
-        { 12 word }
-        { 13 dll }
-    } at ;
 
 ! These structs and words correspond to vm/code_blocks.hpp
 STRUCT: code-block
