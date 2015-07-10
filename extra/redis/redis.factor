@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io io.sockets io.streams.duplex kernel
-redis.command-writer redis.response-parser io.encodings.utf8 ;
+USING: accessors calendar io io.sockets io.streams.duplex
+io.timeouts kernel redis.command-writer redis.response-parser
+io.encodings.utf8 ;
 IN: redis
 
 #! Connection
