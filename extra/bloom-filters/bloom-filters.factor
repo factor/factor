@@ -109,6 +109,7 @@ PRIVATE>
 ! See "Bloom Filters in Probabilistic Verification" by Peter C.
 ! Dillinger and Panagiotis Manolios, section 5.2, "Enhanced
 ! Double Hashing":
+! http://www.ccs.neu.edu/home/pete/research/bloom-filters-verification.html
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
 : combine-hashcodes ( index hash0 hash1 -- hash )
     { fixnum fixnum fixnum } declare
