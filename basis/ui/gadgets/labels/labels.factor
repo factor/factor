@@ -32,7 +32,7 @@ M: label string<< ( string label -- )
             { [ dup string? ] [ ?string-lines ] }
             [ not-a-string ]
         } cond
-    ] dip text<< ; inline
+    ] dip [ text<< ] [ relayout ] bi ; inline
 
 : label-theme ( gadget -- gadget )
     sans-serif-font >>font ; inline
@@ -77,7 +77,7 @@ M: label gadget-text* string>> % ;
 TUPLE: label-control < label ;
 
 M: label-control model-changed
-    swap value>> >>string relayout ;
+    [ value>> ] [ string<< ] bi* ;
 
 : <label-control> ( model -- gadget )
     "" label-control new-label
