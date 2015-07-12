@@ -22,11 +22,6 @@ QUALIFIED: opencl
         gc-info read-struct-safe
     ] with-input-stream ;
 
-: word>scrub-bits ( word -- bits )
-    word>byte-array binary <byte-reader> <backwards-reader> [
-        gc-info read-struct-safe scrub-bits
-    ] with-input-stream ;
-
 : cfg>gc-maps ( cfg -- gc-maps )
     cfg>insns [ gc-map-insn? ] filter [ gc-map>> ] map
     [ gc-map-needed? ] filter ;
@@ -72,14 +67,7 @@ QUALIFIED: opencl
 
 { ?{ t t t t t t t t } } [ B{ 255 } byte-array>bit-array ] unit-test
 
-! scrub-bits
-{
-    { { ?{ } ?{ } ?{ f f f f f } } }
-} [
-    \ word>scrub-bits word>scrub-bits
-] unit-test
-
-! decode-gc-maps
+! word>gc-maps
 { f } [
     \ effects:<effect> word>gc-maps empty?
 ] unit-test
