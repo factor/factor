@@ -291,8 +291,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ (format-float) { float byte-array } { byte-array } define-primitive \ (format-float) make-foldable
 \ (fopen) { byte-array byte-array } { alien } define-primitive
 \ (identity-hashcode) { object } { fixnum } define-primitive
-\ (save-image) { byte-array byte-array } { } define-primitive
-\ (save-image-and-exit) { byte-array byte-array } { } define-primitive
+\ (save-image) { byte-array byte-array object } { } define-primitive
 \ (set-context) { object alien } { object } define-primitive
 \ (set-context-and-delete) { object alien } { } define-primitive
 \ (sleep) { integer } { } define-primitive

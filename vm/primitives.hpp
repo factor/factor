@@ -31,12 +31,11 @@ namespace factor {
       _(quot_compiled_p) _(quotation_code) _(reset_dispatch_stats)             \
       _(resize_array) _(resize_byte_array) _(resize_string) _(retainstack)     \
       _(retainstack_for) _(sampling_profiler) _(save_image)                    \
-      _(save_image_and_exit) _(set_context_object) _(set_datastack)            \
-      _(set_innermost_stack_frame_quot) _(set_retainstack) _(set_slot)         \
-      _(set_special_object) _(set_string_nth_fast) _(size) _(sleep)            \
-      _(special_object) _(string) _(strip_stack_traces) _(tuple) _(tuple_boa)  \
-      _(unimplemented) _(uninitialized_byte_array) _(word) _(word_code)        \
-      _(wrapper)
+      _(set_context_object) _(set_datastack) _(set_innermost_stack_frame_quot) \
+      _(set_retainstack) _(set_slot) _(set_special_object)                     \
+      _(set_string_nth_fast) _(size) _(sleep) _(special_object) _(string)      \
+      _(strip_stack_traces) _(tuple) _(tuple_boa) _(unimplemented)             \
+      _(uninitialized_byte_array) _(word) _(word_code) _(wrapper)
 
 #define EACH_ALIEN_PRIMITIVE(_)                               \
   _(signed_cell, fixnum, from_signed_cell, to_fixnum)         \
