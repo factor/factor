@@ -2,7 +2,7 @@ USING: accessors assocs classes classes.struct io locals
 math.bitwise namespaces sequences system tools.image-analyzer.utils
 tools.image-analyzer.vm vm vocabs.parser ;
 IN: tools.image-analyzer.data-heap-reader
-FROM: alien.c-types => char heap-size ;
+FROM: alien.c-types => uchar heap-size ;
 FROM: arrays => 2array ;
 FROM: kernel => ? bi dup keep nip swap ;
 FROM: layouts => data-alignment ;
@@ -64,8 +64,8 @@ GENERIC: read-payload ( rel-base struct -- tuple )
 : read-array-payload ( array -- payload )
     [ capacity>> -4 shift ] keep cell read-padded-payload ;
 
-: read-char-payload ( n-bytes object -- payload )
-    char read-padded-payload ;
+: read-uchar-payload ( n-bytes object -- payload )
+    uchar read-padded-payload ;
 
 : read-no-payload ( object -- payload )
     0 swap seek-past-padding { } ;
@@ -80,13 +80,13 @@ M: no-payload read-payload ( rel-base object -- payload )
     nip read-no-payload ;
 
 M: byte-array read-payload ( rel-base object -- payload )
-    nip [ capacity>> -4 shift ] keep read-char-payload ;
+    nip [ capacity>> -4 shift ] keep read-uchar-payload ;
 
 M: callstack read-payload ( rel-base object -- payload )
-    nip [ length>> -4 shift ] keep read-char-payload ;
+    nip [ length>> -4 shift ] keep read-uchar-payload ;
 
 M: string read-payload ( rel-base string -- payload )
-    nip [ length>> -4 shift ] keep read-char-payload ;
+    nip [ length>> -4 shift ] keep read-uchar-payload ;
 
 M: tuple read-payload ( rel-base tuple -- payload )
     [
