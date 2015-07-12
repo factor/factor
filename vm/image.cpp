@@ -295,15 +295,19 @@ bool factor_vm::save_image(const vm_char* saving_filename,
 }
 
 void factor_vm::primitive_save_image() {
+  byte_array* path2 = tagged<byte_array>(ctx->pop()).untag_check(this);
+  byte_array* path1 = tagged<byte_array>(ctx->pop()).untag_check(this);
+
+  vm_char* path1_saved = safe_strdup(path1->data<vm_char>());
+  vm_char* path2_saved = safe_strdup(path2->data<vm_char>());
+
   /* do a full GC to push everything into tenured space */
   primitive_compact_gc();
 
-  data_root<byte_array> path2(ctx->pop(), this);
-  path2.untag_check(this);
-  data_root<byte_array> path1(ctx->pop(), this);
-  path1.untag_check(this);
-  save_image((vm_char*)(path1.untagged() + 1),
-             (vm_char*)(path2.untagged() + 1));
+  save_image(path1_saved, path2_saved);
+
+  free(path1_saved);
+  free(path2_saved);
 }
 
 /* Allocates memory */
@@ -311,10 +315,13 @@ void factor_vm::primitive_save_image_and_exit() {
   /* We unbox this before doing anything else. This is the only point
      where we might throw an error, so we have to throw an error here since
      later steps destroy the current image. */
-  data_root<byte_array> path2(ctx->pop(), this);
-  path2.untag_check(this);
-  data_root<byte_array> path1(ctx->pop(), this);
-  path1.untag_check(this);
+  byte_array* path2 = tagged<byte_array>(ctx->pop()).untag_check(this);
+  byte_array* path1 = tagged<byte_array>(ctx->pop()).untag_check(this);
+
+  /* Copy the paths to non-gc memory to avoid them hanging around in
+     the saved image. */
+  vm_char* path1_saved = safe_strdup(path1->data<vm_char>());
+  vm_char* path2_saved = safe_strdup(path2->data<vm_char>());
 
   /* strip out special_objects data which is set on startup anyway */
   for (cell i = 0; i < special_object_count; i++)
@@ -329,8 +336,7 @@ void factor_vm::primitive_save_image_and_exit() {
   gc(collect_compact_op, 0 /* requested size */);
 
   /* Save the image */
-  if (save_image((vm_char*)(path1.untagged() + 1),
-                 (vm_char*)(path2.untagged() + 1)))
+  if (save_image(path1_saved, path2_saved))
     exit(0);
   else
     exit(1);
