@@ -221,7 +221,7 @@ these lines in your .emacs:
 
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
-  '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
+  '(":" "::" ";" ":>" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:"
     "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:"
