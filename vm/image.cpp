@@ -294,27 +294,12 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   return ok;
 }
 
-void factor_vm::primitive_save_image() {
-  byte_array* path2 = tagged<byte_array>(ctx->pop()).untag_check(this);
-  byte_array* path1 = tagged<byte_array>(ctx->pop()).untag_check(this);
-
-  vm_char* path1_saved = safe_strdup(path1->data<vm_char>());
-  vm_char* path2_saved = safe_strdup(path2->data<vm_char>());
-
-  /* do a full GC to push everything into tenured space */
-  primitive_compact_gc();
-
-  save_image(path1_saved, path2_saved);
-
-  free(path1_saved);
-  free(path2_saved);
-}
-
 /* Allocates memory */
-void factor_vm::primitive_save_image_and_exit() {
+void factor_vm::primitive_save_image() {
   /* We unbox this before doing anything else. This is the only point
      where we might throw an error, so we have to throw an error here since
      later steps destroy the current image. */
+  bool then_die = to_boolean(ctx->pop());
   byte_array* path2 = tagged<byte_array>(ctx->pop()).untag_check(this);
   byte_array* path1 = tagged<byte_array>(ctx->pop()).untag_check(this);
 
@@ -323,23 +308,28 @@ void factor_vm::primitive_save_image_and_exit() {
   vm_char* path1_saved = safe_strdup(path1->data<vm_char>());
   vm_char* path2_saved = safe_strdup(path2->data<vm_char>());
 
-  /* strip out special_objects data which is set on startup anyway */
-  for (cell i = 0; i < special_object_count; i++)
-    if (!save_special_p(i))
-      special_objects[i] = false_object;
+  if (then_die) {
+    /* strip out special_objects data which is set on startup anyway */
+    for (cell i = 0; i < special_object_count; i++)
+      if (!save_special_p(i))
+        special_objects[i] = false_object;
 
-  /* dont trace objects only reachable from context stacks so we don't
-     get volatile data saved in the image. */
-  active_contexts.clear();
-  code->uninitialized_blocks.clear();
+    /* dont trace objects only reachable from context stacks so we don't
+       get volatile data saved in the image. */
+    active_contexts.clear();
+    code->uninitialized_blocks.clear();
+  }
 
-  gc(collect_compact_op, 0 /* requested size */);
+  /* do a full GC to push everything remaining into tenured space */
+  primitive_compact_gc();
 
   /* Save the image */
-  if (save_image(path1_saved, path2_saved))
-    exit(0);
-  else
-    exit(1);
+  bool ret = save_image(path1_saved, path2_saved);
+  if (then_die) {
+    exit(ret ? 0 : 1);
+  }
+  free(path1_saved);
+  free(path2_saved);
 }
 
 bool factor_vm::embedded_image_p() {

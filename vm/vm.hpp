@@ -608,7 +608,6 @@ struct factor_vm {
   void load_code_heap(FILE* file, image_header* h, vm_parameters* p);
   bool save_image(const vm_char* saving_filename, const vm_char* filename);
   void primitive_save_image();
-  void primitive_save_image_and_exit();
   void fixup_data(cell data_offset, cell code_offset);
   void fixup_code(cell data_offset, cell code_offset);
   FILE* open_image(vm_parameters* p);
