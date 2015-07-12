@@ -34,3 +34,4 @@ build-support/wordsize
 checksums.txt
 *.so
 a.out
+Factor.app/Contents/_CodeSignature
