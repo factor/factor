@@ -95,11 +95,6 @@ these lines in your .emacs:
   :group 'factor-faces
   :group 'faces)
 
-(defface factor-font-lock-error-form '((t (:inherit font-lock-warning-face)))
-  "ERROR: ... ; form"
-  :group 'factor-faces
-  :group 'faces)
-
 (defface factor-font-lock-parsing-word '((t (:inherit font-lock-keyword-face)))
   "parsing words"
   :group 'factor-faces
@@ -330,9 +325,6 @@ these lines in your .emacs:
    '("C-STRUCT" "C-UNION" "COM-INTERFACE" "MIXIN" "SINGLETON"
      "SPECIALIZED-ARRAY" "STRUCT" "UNION-STRUCT")))
 
-(defconst factor-error-regex
-  (factor-second-word-regex '("ERROR")))
-
 (defconst factor-constructor-regex
   "<[^ >]+>")
 
@@ -496,7 +488,6 @@ these lines in your .emacs:
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
     (,factor-type-definition-regex 2 'factor-font-lock-type-name)
-    (,factor-error-regex 2 'factor-font-lock-error-form)
     (,factor-method-definition-regex (1 'factor-font-lock-type-name)
                                      (2 'factor-font-lock-word))
     (,factor-before-definition-regex (1 'factor-font-lock-type-name)
@@ -515,6 +506,7 @@ these lines in your .emacs:
        "\\(%s:\\)[ \n]+%s\\(?:[ \n]+\\(<\\)[ \n]+%s\\)?"
        (regexp-opt '("BUILTIN"
                      "ENUM"
+                     "ERROR"
                      "PROTOCOL"
                      "STRUCT"
                      "TUPLE"
