@@ -95,16 +95,6 @@ these lines in your .emacs:
   :group 'factor-faces
   :group 'faces)
 
-(defface factor-font-lock-declaration '((t (:inherit font-lock-keyword-face)))
-  "declaration words"
-  :group 'factor-faces
-  :group 'faces)
-
-(defface factor-font-lock-ebnf-form '((t (:inherit font-lock-constant-face)))
-  "EBNF: ... ;EBNF form"
-  :group 'factor-faces
-  :group 'faces)
-
 (defface factor-font-lock-error-form '((t (:inherit font-lock-warning-face)))
   "ERROR: ... ; form"
   :group 'factor-faces
@@ -112,11 +102,6 @@ these lines in your .emacs:
 
 (defface factor-font-lock-parsing-word '((t (:inherit font-lock-keyword-face)))
   "parsing words"
-  :group 'factor-faces
-  :group 'faces)
-
-(defface factor-font-lock-postpone-body '((t (:inherit font-lock-comment-face)))
-  "postponed form"
   :group 'factor-faces
   :group 'faces)
 
