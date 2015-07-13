@@ -205,6 +205,17 @@ these lines in your .emacs:
 
 ;; Utility regexp used by other regexps to match a Factor symbol name
 (setq-local symbol "\\(\\(?:\\sw\\|\\s_\\)+\\)")
+(setq-local ws+ "[ \n\t]+")
+(setq-local symbols-to-semicolon "\\([^;\t]*\\)\\(;\\)")
+
+(defun one-symbol (content)
+  (concat "\\_<\\(" content "\\)\\_>"))
+
+(defun syntax-begin (content)
+  (one-symbol (concat (regexp-opt content) ":")))
+
+(defsubst factor-second-word-regex (prefixes)
+  (concat (syntax-begin prefixes) ws+ symbol))
 
 ;; Used to font-lock stack effect declarations with may be nested.
 (defun factor-match-brackets (limit)
@@ -237,7 +248,7 @@ these lines in your .emacs:
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
     "POSTPONE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
-    "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
+    "read-only" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
     "TYPED:" "TYPED::"
@@ -245,7 +256,7 @@ these lines in your .emacs:
     "VARIANT:" "VERTEX-FORMAT:"))
 
 (defconst factor-parsing-words-regex
-  (regexp-opt factor-parsing-words 'symbols))
+  (format "\\(?:^\\| \\)%s" (regexp-opt factor-parsing-words 'symbols)))
 
 (defconst factor-constant-words
   '("f" "t"))
@@ -270,9 +281,6 @@ these lines in your .emacs:
 
 (defconst factor-declaration-words-regex
   (regexp-opt factor-declaration-words 'symbols))
-
-(defsubst factor-second-word-regex (prefixes)
-  (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst factor-method-definition-regex
   "^M::? +\\([^ ]+\\) +\\([^ ]+\\)")
@@ -305,7 +313,7 @@ these lines in your .emacs:
   (format "\\_<\\(%s\\)?[:#] +\\(%s\\)"
           (regexp-opt
            '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "POSTPONE"
-             "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:" "RENAME"))
+             "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:"))
           "\\(\\sw\\|\\s_\\|\\s(\\|\\s)\\)+"))
 
 (defconst factor-alias-definition-regex
@@ -314,38 +322,40 @@ these lines in your .emacs:
 ;; [parsing-word] [vocab-word]
 (defconst factor-vocab-ref-regex
   (factor-second-word-regex
-   '("IN:" "USE:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
+   '("IN" "USE" "EXCLUDE" "QUALIFIED" "QUALIFIED-WITH")))
 
-(defconst factor-using-lines-regex "^\\(USING:\\)[ \n]+\\([^;\t]*\\);")
+(defconst factor-using-lines-regex
+  (concat (syntax-begin '("USING")) ws+ symbols-to-semicolon))
 
 ;; [parsing-word] [symbol-word]
 (defconst factor-symbol-definition-regex
   (factor-second-word-regex
-   '("&:" "CONSTANT:" "DESTRUCTOR:" "FORGET:" "HELP:" "LIBRARY:"
-     "MAIN:" "STRING:" "SYMBOL:" "VAR:")))
+   '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "HELP" "LIBRARY"
+     "MAIN" "STRING" "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
-(defconst factor-symbols-lines-regex "^\\(SYMBOLS:\\)[ \n]+\\([^;\t]*\\);")
+(defconst factor-symbols-lines-regex
+  (concat (syntax-begin '("SYMBOLS")) ws+ symbols-to-semicolon))
 
 (defconst factor-int-constant-def-regex
-  (factor-second-word-regex '("ALIEN:" "CHAR:" "NAN:")))
+  (factor-second-word-regex '("ALIEN" "CHAR" "NAN")))
 
 (defconst factor-type-definition-regex
   (factor-second-word-regex
-   '("C-STRUCT:" "C-UNION:" "COM-INTERFACE:" "MIXIN:" "SINGLETON:"
-     "SPECIALIZED-ARRAY:" "STRUCT:" "UNION-STRUCT:")))
+   '("C-STRUCT" "C-UNION" "COM-INTERFACE" "MIXIN" "SINGLETON"
+     "SPECIALIZED-ARRAY" "STRUCT" "UNION-STRUCT")))
 
 (defconst factor-error-regex
-  (factor-second-word-regex '("ERROR:")))
+  (factor-second-word-regex '("ERROR")))
 
 (defconst factor-constructor-regex
   "<[^ >]+>")
 
 (defconst factor-getter-regex
-  "\\_<\\(?:\\sw\\|\\s_\\)+>>\\_>")
+  (one-symbol "\\(?:\\sw\\|\\s_\\)+>>"))
 
 (defconst factor-setter-regex
-  "\\_<>>\\(?:\\sw\\|\\s_\\)+\\_>")
+  (one-symbol ">>\\(?:\\sw\\|\\s_\\)+\\|\\(?:\\sw\\|\\s_\\)+<<"))
 
 (defconst factor-stack-effect-regex
   "\\( ( [^)]* )\\)\\|\\( (( [^)]* ))\\)")
@@ -429,10 +439,10 @@ these lines in your .emacs:
           "M[^:]*: [^ ]+ [^ ]+"))
 
 (defconst factor-constructor-decl-regex
-  "\\_<\\(C:\\)[ \n]+\\([^ ]+\\)[ \n]+\\([^ ]+\\)")
+  (concat (syntax-begin '("C")) ws+ symbol ws+ symbol))
 
 (defconst factor-typedef-regex
-  (format "\\_<\\(TYPEDEF:\\|INSTANCE:\\) +%s +%s\\( .*\\)?$" symbol symbol))
+  (concat (syntax-begin '("TYPEDEF" "INSTANCE")) ws+ symbol ws+ symbol))
 
 (defconst factor-c-global-regex
   (format "\\_<C-GLOBAL: +%s +%s\\( .*\\)?$" symbol symbol))
@@ -441,27 +451,43 @@ these lines in your .emacs:
   (format "\\_<C-TYPE: +%s\\( .*\\)?$" symbol))
 
 (defconst factor-rename-regex
-  (format "\\_<RENAME: +%s +%s +=> +%s\\( .*\\)?$" symbol symbol symbol))
+  (concat (syntax-begin '("RENAME")) ws+
+          symbol ws+
+          symbol ws+
+          "\\(=>\\)" ws+ symbol))
+
+(defconst factor-from/exclude-regex
+  (concat (syntax-begin '("FROM" "EXCLUDE")) ws+
+          symbol ws+
+          "\\(=>\\)" ws+ symbols-to-semicolon))
 
 
 ;;; Font lock:
 
 (defconst factor-font-lock-keywords
-  `((,factor-brace-words-regex 1 'factor-font-lock-parsing-word)
+  `(
+    (,factor-brace-words-regex 1 'factor-font-lock-parsing-word)
     (,factor-vocab-ref-regex (1 'factor-font-lock-parsing-word)
                              (2 'factor-font-lock-vocabulary-name))
     (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
-                               (2 'factor-font-lock-vocabulary-name))
+                               (2 'factor-font-lock-vocabulary-name)
+                               (3 'factor-font-lock-parsing-word))
     (,factor-symbols-lines-regex (1 'factor-font-lock-parsing-word)
-                                 (2 'factor-font-lock-word))
-    (,(format "^\\(FROM\\|EXCLUDE\\):[ \n]+%s[ \n]+=>+\\([^;\t]*\\);" symbol)
-     (1 'factor-font-lock-parsing-word)
-     (2 'factor-font-lock-vocabulary-name)
-     (3 'factor-font-lock-word))
-    (,factor-constructor-decl-regex
-     (1 'factor-font-lock-parsing-word)
-     (2 'factor-font-lock-word)
-     (3 'factor-font-lock-type-name))
+                                 (2 'factor-font-lock-word)
+                                 (3 'factor-font-lock-parsing-word))
+    (,factor-from/exclude-regex (1 'factor-font-lock-parsing-word)
+                                (2 'factor-font-lock-vocabulary-name)
+                                (3 'factor-font-lock-parsing-word)
+                                (4 'factor-font-lock-word)
+                                (5 'factor-font-lock-parsing-word))
+    (,factor-rename-regex (1 'factor-font-lock-parsing-word)
+                          (2 'factor-font-lock-word)
+                          (3 'factor-font-lock-vocabulary-name)
+                          (4 'factor-font-lock-parsing-word)
+                          (5 'factor-font-lock-word))
+    (,factor-constructor-decl-regex (1 'factor-font-lock-parsing-word)
+                                    (2 'factor-font-lock-word)
+                                    (3 'factor-font-lock-type-name))
     (,factor-symbol-definition-regex (1 'factor-font-lock-parsing-word)
                                      (2 'factor-font-lock-word))
     (,factor-typedef-regex (1 'factor-font-lock-parsing-word)
@@ -499,14 +525,22 @@ these lines in your .emacs:
     ;; definition that is terminated with ";" is searched for words
     ;; that are slot names which are highlighted with the face
     ;; factor-font-lock-symbol.
+
     (,(format
-       "\\(%s:\\)[ \n]+%s\\(?:[ \n]+<[ \n]+%s\\)?"
-       (regexp-opt '("ENUM" "PROTOCOL" "STRUCT" "TUPLE" "UNION" "UNION-STRUCT"))
+       "\\(%s:\\)[ \n]+%s\\(?:[ \n]+\\(<\\)[ \n]+%s\\)?"
+       (regexp-opt '("BUILTIN"
+                     "ENUM"
+                     "PROTOCOL"
+                     "STRUCT"
+                     "TUPLE"
+                     "UNION"
+                     "UNION-STRUCT"))
        symbol
        symbol)
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-type-name)
-     (3 'factor-font-lock-type-name nil t)
+     (3 'factor-font-lock-parsing-word nil t)
+     (4 'factor-font-lock-type-name nil t)
      ;; A slot is either a single symbol or a sequence along the
      ;; lines: { foo initial: "bar }
      ("\\(\\(?:\\sw\\|\\s_\\)+\\)\\|\\(?:{[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[^}]+\\)"
