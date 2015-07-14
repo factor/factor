@@ -1,18 +1,22 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar colors.constants fonts kernel models
-models.arrow models.delay sequences summary ui ui.gadgets.labels
-ui.gadgets.tracks ui.gadgets.worlds ui.pens.solid ui.private ;
+models.arrow models.delay sequences summary ui
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
+ui.gadgets.worlds ui.pens.solid ui.private ;
 IN: ui.gadgets.status-bar
+
+CONSTANT: status-bar-background COLOR: FactorDarkSlateBlue
+CONSTANT: status-bar-foreground COLOR: white
 
 : status-bar-font ( -- font )
     sans-serif-font clone
-    COLOR: FactorDarkSlateBlue >>background
-    COLOR: white >>foreground ;
+    status-bar-background >>background
+    status-bar-foreground >>foreground ;
 
 : status-bar-theme ( label -- label )
     status-bar-font >>font
-    COLOR: FactorDarkSlateBlue <solid> >>interior ;
+    status-bar-background <solid> >>interior ;
 
 : <status-bar> ( model -- gadget )
     1/10 seconds <delay> [ "" like ] <arrow> <label-control>
