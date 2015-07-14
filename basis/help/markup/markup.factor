@@ -347,14 +347,11 @@ PRIVATE>
 
 GENERIC: ($instance) ( element -- )
 
-M: word ($instance)
-    dup name>> a/an write bl ($link) ;
+M: word ($instance) dup name>> a/an write bl ($link) ;
 
-M: string ($instance)
-    write ;
+M: string ($instance) write ;
 
-M: f ($instance)
-    drop { f } $link ;
+M: f ($instance) ($link) ;
 
 : $instance ( element -- ) first ($instance) ;
 
@@ -378,6 +375,23 @@ M: f ($instance)
     check-first
     { "a " { $link quotation } " with stack effect " }
     print-element $snippet ;
+
+: ($instances) ( element -- )
+     dup word? [ ($link) "s" print-element ] [ print-element ] if ;
+
+: $sequence ( element -- )
+    { "a " { $link sequence } " of " } print-element
+    dup length {
+        { 1 [ first ($instances) ] }
+        { 2 [ first2 [ ($instances) " or " print-element ] [ ($instances) ] bi* ] }
+        [
+            drop
+            unclip-last
+            [ [ ($instances) ", " print-element ] each ]
+            [ "or " print-element ($instances) ]
+            bi*
+        ]
+    } case ;
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap present 2array
