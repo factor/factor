@@ -3,7 +3,7 @@ USING: accessors io kernel multiline prettyprint sequences sorting vocabs ;
 IN: factor.vim.fgen
 
 : print-keywords ( vocab -- )
-    words [ name>> ] sort-with [
+    vocab-words [ name>> ] sort-with [
         "syn keyword factorKeyword " write
         [ bl ] [ pprint ] interleave nl
     ] when* ;
