@@ -48,7 +48,7 @@ HELP: dictionary
 { $var-description "Holds a hashtable mapping vocabulary names to vocabularies." } ;
 
 HELP: loaded-vocab-names
-{ $values { "seq" "a sequence of strings" } }
+{ $values { "seq" { $sequence string } } }
 { $description "Outputs a sequence of all defined vocabulary names." } ;
 
 HELP: lookup-vocab
@@ -67,11 +67,11 @@ HELP: vocab-words-assoc
 { $description "Outputs the words defined in a vocabulary." } ;
 
 HELP: vocab-words
-{ $values { "vocab-spec" vocab-spec } { "seq" "a sequence of words" } }
+{ $values { "vocab" string } { "seq" { $sequence word } } }
 { $description "Outputs a sequence of words defined in the vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
 
 HELP: all-words
-{ $values { "seq" "a sequence of words" } }
+{ $values { "seq" { $sequence word } } }
 { $description "Outputs a sequence of all words in the dictionary." } ;
 
 HELP: forget-vocab
@@ -88,7 +88,7 @@ HELP: require
 { $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
 
 HELP: words-named
-{ $values { "str" string } { "seq" "a sequence of words" } }
+{ $values { "str" string } { "seq" { $sequence word } } }
 { $description "Outputs a sequence of all words named " { $snippet "str" } " from the set of currently-loaded vocabularies." } ;
 
 HELP: create-vocab
@@ -96,7 +96,7 @@ HELP: create-vocab
 { $description "Creates a new vocabulary if one does not exist with the given name, otherwise outputs an existing vocabulary." } ;
 
 HELP: loaded-child-vocab-names
-{ $values { "vocab-spec" "a vocabulary specifier" } { "seq" "a sequence of strings" } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "seq" { $sequence string } } }
 { $description "Outputs all vocabularies which are conceptually under " { $snippet "vocab" } " in the hierarchy." }
 { $examples
     { $unchecked-example

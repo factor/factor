@@ -147,12 +147,12 @@ HELP: add-qualified
 { $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. See the example in " { $link POSTPONE: QUALIFIED: } " for further explanation." } ;
 
 HELP: add-words-from
-{ $values { "vocab" "a vocabulary specifier" } { "words" "a sequence of word names" } }
+{ $values { "vocab" "a vocabulary specifier" } { "words" { $sequence "word names" } } }
 { $description "Adds " { $snippet "words" } " from " { $snippet "vocab" } " to the current manifest." }
 { $notes "This word is used to implement " { $link POSTPONE: FROM: } "." } ;
 
 HELP: add-words-excluding
-{ $values { "vocab" "a vocabulary specifier" } { "words" "a sequence of word names" } }
+{ $values { "vocab" "a vocabulary specifier" } { "words" { $sequence "word names" } } }
 { $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } " to the manifest." }
 { $notes "This word is used to implement " { $link POSTPONE: EXCLUDE: } "." } ;
 

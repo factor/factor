@@ -661,7 +661,7 @@ HELP: prefix
 } ;
 
 HELP: sum-lengths
-{ $values { "seq" "a sequence of sequences" } { "n" integer } }
+{ $values { "seq" { $sequence sequence } } { "n" integer } }
 { $description "Outputs the sum of the lengths of all sequences in " { $snippet "seq" } "." } ;
 
 HELP: concat
@@ -1124,20 +1124,20 @@ HELP: unclip-last-slice
 { $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last Unlike " { $link unclip-last } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
 
 HELP: sum
-{ $values { "seq" "a sequence of numbers" } { "n" number } }
+{ $values { "seq" { $sequence number } } { "n" number } }
 { $description "Outputs the sum of all elements of " { $snippet "seq" } ". Outputs zero given an empty sequence." } ;
 
 HELP: product
-{ $values { "seq" "a sequence of numbers" } { "n" number } }
+{ $values { "seq" { $sequence number } } { "n" number } }
 { $description "Outputs the product of all elements of " { $snippet "seq" } ". Outputs one given an empty sequence." } ;
 
 HELP: infimum
-{ $values { "seq" "a sequence of real numbers" } { "elt" object } }
+{ $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the least element of " { $snippet "seq" } "." }
 { $errors "Throws an error if the sequence is empty." } ;
 
 HELP: supremum
-{ $values { "seq" "a sequence of real numbers" } { "elt" object } }
+{ $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
 { $errors "Throws an error if the sequence is empty." } ;
 
