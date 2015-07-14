@@ -47,10 +47,10 @@ PRIVATE>
 : latest-xkcd. ( -- )
     "http://xkcd.com" comic. ;
 
-TUPLE: xkcd image ;
+TUPLE: xkcd number image ;
 
 C: <xkcd> xkcd
 
-SYNTAX: XKCD: scan-number xkcd-image <xkcd> suffix! ;
+SYNTAX: XKCD: scan-number dup xkcd-image <xkcd> suffix! ;
 
 M: xkcd pprint* image>> <image-section> add-section ;
