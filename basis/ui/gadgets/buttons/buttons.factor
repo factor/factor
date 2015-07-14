@@ -56,7 +56,7 @@ button H{
 : new-button ( label quot class -- button )
     [ swap >label ] dip new-border swap >>quot ; inline
 
-: <button> ( label quot -- button )
+: <button> ( label quot: ( button -- ) -- button )
     button new-button ;
 
 TUPLE: button-pen
@@ -110,7 +110,7 @@ M: button-pen pen-foreground
 
 PRIVATE>
 
-: <roll-button> ( label quot -- button )
+: <roll-button> ( label quot: ( button -- ) -- button )
     <button> roll-button-theme ;
 
 <PRIVATE
@@ -143,7 +143,7 @@ CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
 
 PRIVATE>
 
-: <border-button> ( label quot -- button )
+: <border-button> ( label quot: ( button -- ) -- button )
     <button> border-button-theme ;
 
 TUPLE: repeat-button < button ;
@@ -154,7 +154,7 @@ repeat-button H{
     { T{ button-up } [ button-update ] }
 } set-gestures
 
-: <repeat-button> ( label quot -- button )
+: <repeat-button> ( label quot: ( button -- ) -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
     repeat-button new-button border-button-theme ;
@@ -237,9 +237,11 @@ PRIVATE>
 : gesture>tooltip ( gesture -- str/f )
     gesture>string dup [ "Shortcut: " prepend ] when ;
 
-: <command-button> ( target gesture command -- button )
-    swapd [ command-name swap ] keep command-button-quot
-    '[ drop @ ] <border-button> swap gesture>tooltip >>tooltip ;
+:: <command-button> ( target gesture command -- button )
+    command command-name
+    target command command-button-quot
+    '[ drop @ ] <border-button>
+    gesture gesture>tooltip >>tooltip ; inline
 
 : <toolbar> ( target -- toolbar )
     <shelf>
