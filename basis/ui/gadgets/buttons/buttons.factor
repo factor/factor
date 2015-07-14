@@ -25,17 +25,17 @@ TUPLE: button < border pressed? selected? quot tooltip ;
 : mouse-clicked? ( gadget -- ? )
     hand-clicked get-global child? ;
 
+: button-pressed? ( button -- ? )
+    { [ mouse-clicked? ] [ button-rollover? ] } 1&&
+    buttons-down? and ;
+
 PRIVATE>
 
 : button-update ( button -- )
-    dup
-    { [ mouse-clicked? ] [ button-rollover? ] } 1&&
-    buttons-down? and
-    >>pressed?
-    relayout-1 ;
+    dup button-pressed? >>pressed? relayout-1 ;
 
 : button-enter ( button -- )
-    dup dup tooltip>> [ swap show-status ] [ drop ] if* button-update ;
+    dup tooltip>> [ over show-status ] when* button-update ;
 
 : button-leave ( button -- )
     [ hide-status ] [ button-update ] bi ;
