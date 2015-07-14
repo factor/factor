@@ -48,3 +48,7 @@ IN: lists.tests
 ] unit-test
 
 { { 1 } { 2 } } [ { 1 2 } sequence>list 1 lcut [ list>array ] bi@ ] unit-test
+
+{ { { 1 } { { 2 } } } } [
+    1 nil cons 2 nil cons nil cons nil cons cons deeplist>array
+] unit-test
