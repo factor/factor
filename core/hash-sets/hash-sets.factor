@@ -36,7 +36,7 @@ TUPLE: hash-set
     [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
-    1 + next-power-of-2 2 * ((empty)) <array> ; inline
+    3 * 1 + 2/ next-power-of-2 ((empty)) <array> ; inline
 
 : reset-hash ( n hash -- )
     swap <hash-array> >>array init-hash ; inline
@@ -59,7 +59,7 @@ TUPLE: hash-set
     [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
     [ over [ hash-deleted- ] [ hash-count+ ] if swap or t ] [ 2drop f ] if ; inline
 
-: set-nth-item ( key seq n -- )
+: set-nth-item ( key array n -- )
     2 fixnum+fast set-slot ; inline
 
 : (adjoin) ( key hash -- ? )
@@ -69,7 +69,7 @@ TUPLE: hash-set
     [ (adjoin) drop ] curry each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast ]
+    [ count>> 1 fixnum+fast 3 fixnum*fast ]
     [ array>> length>> 1 fixnum-shift-fast ] bi fixnum>= ; inline
 
 : each-member ( ... array quot: ( ... elt -- ... ) -- ... )
@@ -88,6 +88,7 @@ TUPLE: hash-set
 PRIVATE>
 
 : <hash-set> ( capacity -- hash-set )
+    integer>fixnum-strict
     [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?

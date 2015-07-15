@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sets tools.test kernel sorting prettyprint hash-sets ;
+USING: accessors fry hash-sets kernel math prettyprint
+sequences sets sorting tools.test ;
 IN: hash-sets.tests
 
 { { 1 2 3 } } [ HS{ 1 2 3 } members natural-sort ] unit-test
@@ -44,3 +45,14 @@ IN: hash-sets.tests
     HS{ { 1 2 } { 2 1 } } over adjoin
     HS{ { 2 1 } { 1 2 } } over adjoin
 ] unit-test
+
+! make sure growth and capacity use same load-factor
+{ t } [
+    100 iota
+    [ [ <hash-set> ] map ]
+    [ [ HS{ } clone [ '[ _ adjoin ] each-integer ] keep ] map ] bi
+    [ [ array>> length ] bi@ = ] 2all?
+] unit-test
+
+! non-integer capacity not allowed
+[ 0.75 <hash-set> ] must-fail
