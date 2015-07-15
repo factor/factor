@@ -141,5 +141,3 @@ set-specializer
 M\ hashtable set-at
 { { object fixnum object } { object word object } }
 set-specializer
-
-\ encode-string { string object object } set-specializer
