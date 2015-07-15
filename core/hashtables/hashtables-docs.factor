@@ -1,5 +1,5 @@
-USING: assocs hashtables.private help.markup help.syntax kernel
-sequences ;
+USING: arrays assocs hashtables.private help.markup help.syntax
+kernel sequences ;
 IN: hashtables
 
 ARTICLE: "hashtables.private" "Hashtable implementation details"
@@ -79,7 +79,7 @@ HELP: new-key@
 { $description "Searches the hashtable for the key using a quadratic probing strategy. If the key is not present in the hashtable, outputs the index where it should be stored." } ;
 
 HELP: set-nth-pair
-{ $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "seq" sequence } { "n" "an index in the sequence" } }
+{ $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "array" array } { "n" "an index in the sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
 { $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." }
 { $side-effects "seq" } ;
