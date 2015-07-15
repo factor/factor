@@ -1,19 +1,24 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays checksums checksums.common
-checksums.stream combinators combinators.smart fry grouping
-io.binary kernel literals locals math math.bitwise math.ranges
-sequences sequences.generalizations sequences.private ;
+USING: accessors arrays checksums checksums.common combinators
+combinators.smart fry grouping io.binary kernel kernel.private
+literals locals math math.bitwise math.ranges sequences
+sequences.generalizations sequences.private ;
 IN: checksums.sha
 
+MIXIN: sha
+INSTANCE: sha checksum
+
 SINGLETON: sha1
-INSTANCE: sha1 stream-checksum
+INSTANCE: sha1 sha
 
 SINGLETON: sha-224
 SINGLETON: sha-256
 
-INSTANCE: sha-224 stream-checksum
-INSTANCE: sha-256 stream-checksum
+INSTANCE: sha-224 sha
+INSTANCE: sha-256 sha
+
+<PRIVATE
 
 TUPLE: sha1-state < checksum-state
 { K array }
@@ -56,8 +61,6 @@ M: sha2-state clone
     call-next-method
     [ clone ] change-H
     [ clone ] change-K ;
-
-<PRIVATE
 
 CONSTANT: a 0
 CONSTANT: b 1
@@ -235,6 +238,7 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
     ] [ bitxor ] reduce-outputs ; inline
 
 : prepare-M-256 ( n seq -- )
+    { array } declare
     {
         [ [ 16 - ] dip nth-unsafe ]
         [ [ 15 - ] dip nth-unsafe s0-256 ]
@@ -244,6 +248,7 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
     } 2cleave set-nth-unsafe ; inline
 
 : prepare-M-512 ( n seq -- )
+    { array } declare
     {
         [ [ 16 - ] dip nth-unsafe ]
         [ [ 15 - ] dip nth-unsafe s0-512 ]
@@ -270,9 +275,9 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
     e H nth-unsafe S1-256 w+
     h H nth-unsafe w+ ; inline
 
-: T2-256 ( H -- T2 )
-    [ a swap nth-unsafe S0-256 ]
-    [ a swap slice3 maj w+ ] bi ; inline
+:: T2-256 ( H -- T2 )
+    a H nth-unsafe S0-256
+    a H slice3 maj w+ ; inline
 
 :: T1-512 ( n M H sha2 -- T1 )
     n M nth-unsafe
@@ -281,19 +286,19 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
     e H nth-unsafe S1-512 w+
     h H nth-unsafe w+ ; inline
 
-: T2-512 ( H -- T2 )
-    [ a swap nth-unsafe S0-512 ]
-    [ a swap slice3 maj w+ ] bi ; inline
+:: T2-512 ( H -- T2 )
+    a H nth-unsafe S0-512
+    a H slice3 maj w+ ; inline
 
-: update-H ( T1 T2 H -- )
-    h g pick exchange-unsafe
-    g f pick exchange-unsafe
-    f e pick exchange-unsafe
-    pick d pick nth-unsafe w+ e pick set-nth-unsafe
-    d c pick exchange-unsafe
-    c b pick exchange-unsafe
-    b a pick exchange-unsafe
-    [ w+ a ] dip set-nth-unsafe ; inline
+:: update-H ( T1 T2 H -- )
+    h g H exchange-unsafe
+    g f H exchange-unsafe
+    f e H exchange-unsafe
+    T1 d H nth-unsafe w+ e H set-nth-unsafe
+    d c H exchange-unsafe
+    c b H exchange-unsafe
+    b a H exchange-unsafe
+    T1 T2 w+ a H set-nth-unsafe ; inline
 
 : prepare-message-schedule ( seq sha2 -- w-seq )
     [ word-size>> <groups> [ be> ] map ]
@@ -330,8 +335,6 @@ M: sha2-short checksum-block
     [ bytes>> t ] [ bytes-read>> pad-last-block ] [ ] tri
     [ checksum-block ] curry each ; inline
 
-PRIVATE>
-
 M: sha-224-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-224>checksum ] bi ;
@@ -340,15 +343,8 @@ M: sha-256-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-256>checksum ] bi ;
 
-M: sha-224 checksum-stream ( stream checksum -- byte-array )
-    drop
-    [ <sha-224-state> ] dip add-checksum-stream get-checksum ;
-
-M: sha-256 checksum-stream ( stream checksum -- byte-array )
-    drop
-    [ <sha-256-state> ] dip add-checksum-stream get-checksum ;
-
 : sha1-W ( t seq -- )
+    { array } declare
     {
         [ [ 3 - ] dip nth-unsafe ]
         [ [ 8 - ] dip nth-unsafe bitxor ]
@@ -409,6 +405,12 @@ M: sha1-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-256>checksum ] bi ;
 
-M: sha1 checksum-stream ( stream checksum -- byte-array )
-    drop
-    [ <sha1-state> ] dip add-checksum-stream get-checksum ;
+M: sha checksum-stream
+    initialize-checksum-state swap add-checksum-stream
+    get-checksum ;
+
+M: sha checksum-bytes
+    initialize-checksum-state swap add-checksum-bytes
+    get-checksum ;
+
+PRIVATE>
