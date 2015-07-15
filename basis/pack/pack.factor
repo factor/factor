@@ -116,7 +116,7 @@ MACRO: pack ( str -- quot )
 <PRIVATE
 
 : start/end ( seq -- seq1 seq2 )
-    [ cum-sum0 ] keep v+ ; inline
+    [ cum-sum0 dup ] keep v+ ; inline
 
 PRIVATE>
 
