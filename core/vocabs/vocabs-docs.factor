@@ -67,7 +67,7 @@ HELP: vocab-words-assoc
 { $description "Outputs the words defined in a vocabulary." } ;
 
 HELP: vocab-words
-{ $values { "vocab" string } { "seq" { $sequence word } } }
+{ $values { "vocab-spec" vocab-spec } { "seq" { $sequence word } } }
 { $description "Outputs a sequence of words defined in the vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
 
 HELP: all-words
