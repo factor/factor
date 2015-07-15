@@ -1,21 +1,29 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: fry kernel lexer macros math math.parser peg.ebnf random
-sequences ;
+USING: fry kernel lexer macros math math.parser namespaces
+random random.private sequences splitting ;
 IN: dice
 
-EBNF: parse-roll
+: (random-roll) ( #dice #sides obj -- n )
+    [ 0 ] 3dip '[ _ _ (random-integer) + 1 + ] times ;
 
-number = ([0-9])+    => [[ string>number ]]
-dice   = "d" number  => [[ second '[ _ random ] ]]
-roll   = number dice => [[ first2 '[ 0 _ [ @ + 1 + ] times ] ]]
-added  = "+" number  => [[ second '[ _ + ] ]]
-total  = roll added? => [[ first2 [ append ] when* ]]
-error  = .*          => [[ "unknown dice" throw ]]
-rolls  = total | error
+: random-roll ( #dice #sides -- n )
+    random-generator get (random-roll) ;
 
-;EBNF
+: random-rolls ( length #dice #sides -- seq )
+    random-generator get '[ _ _ _ (random-roll) ] replicate ;
 
-MACRO: roll ( string -- ) parse-roll ;
+: parse-roll ( string -- #dice #sides #added )
+    "d" split1 "+" split1 [ string>number ] tri@ ;
 
-SYNTAX: ROLL: scan-token parse-roll append! ;
+: roll ( string -- n )
+    parse-roll [ random-roll ] dip [ + ] when* ;
+
+: roll-quot ( string -- quot: ( -- n ) )
+    parse-roll [
+        '[ _ _ random-roll _ + ]
+    ] [
+        '[ _ _ random-roll ]
+    ] if* ;
+
+SYNTAX: ROLL: scan-token roll-quot append! ;
