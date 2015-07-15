@@ -3,12 +3,13 @@
 USING: accessors alien alien.c-types alien.data arrays
 byte-arrays combinators combinators.smart destructors
 io.encodings.ascii io.encodings.string kernel libc locals make
-math namespaces opencl.ffi sequences shuffle specialized-arrays
+math namespaces opencl.ffi sequences specialized-arrays
 variants ;
 IN: opencl
 SPECIALIZED-ARRAYS: void* char size_t ;
 
 <PRIVATE
+
 ERROR: cl-error err ;
 
 : cl-success ( err -- )
@@ -334,8 +335,10 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     CL_PROGRAM_BUILD_LOG program-build-info-string ;
 
 : strings>char*-array ( strings -- char*-array )
-    [ ascii encode dup length dup malloc [ cl-not-null ]
-      keep &free [ -rot memcpy ] keep ] void*-array{ } map-as ;
+    [
+        ascii encode dup length dup malloc
+        [ cl-not-null ] keep &free [ -rot memcpy ] keep
+    ] void*-array{ } map-as ;
 
 : (program) ( cl-context sources -- program-handle )
     [ handle>> ] dip [
@@ -499,7 +502,7 @@ PRIVATE>
         [ (current-cl-queue) handle>> ] dip
         [ buffer>> handle>> CL_FALSE ] [ offset>> ] [ size>> ] tri
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f void* <ref> [ clEnqueueReadBuffer cl-success ] keep void* <ref> cl-event
+    f void* <ref> [ clEnqueueReadBuffer cl-success ] keep void* deref cl-event
     new-disposable swap >>handle ;
 
 : cl-queue-write-buffer ( buffer-range alien dependent-events -- event )
