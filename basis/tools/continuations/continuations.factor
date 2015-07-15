@@ -39,7 +39,7 @@ M: array add-breakpoint
 
 M: object add-breakpoint ;
 
-: (step-into-quot) ( quot -- ) add-breakpoint call ;
+: (step-into-quotation) ( quot -- ) add-breakpoint call ;
 
 : (step-into-dip) ( quot -- ) add-breakpoint dip ;
 
@@ -47,9 +47,9 @@ M: object add-breakpoint ;
 
 : (step-into-3dip) ( quot -- ) add-breakpoint 3dip ;
 
-: (step-into-if) ( true false ? -- ) ? (step-into-quot) ;
+: (step-into-if) ( true false ? -- ) ? (step-into-quotation) ;
 
-: (step-into-dispatch) ( array n -- ) nth (step-into-quot) ;
+: (step-into-dispatch) ( array n -- ) nth (step-into-quotation) ;
 
 : (step-into-execute) ( word -- )
     {
@@ -57,7 +57,7 @@ M: object add-breakpoint ;
         { [ dup single-generic? ] [ effective-method (step-into-execute) ] }
         { [ dup uses \ suspend swap member? ] [ execute break ] }
         { [ dup primitive? ] [ execute break ] }
-        [ def>> (step-into-quot) ]
+        [ def>> (step-into-quotation) ]
     } cond ;
 
 \ (step-into-execute) t "step-into?" set-word-prop
@@ -66,10 +66,10 @@ M: object add-breakpoint ;
     current-continuation callstack >>call break ;
 
 : (step-into-call-next-method) ( method -- )
-    next-method-quot (step-into-quot) ;
+    next-method-quot (step-into-quotation) ;
 
 << {
-    (step-into-quot)
+    (step-into-quotation)
     (step-into-dip)
     (step-into-2dip)
     (step-into-3dip)
@@ -85,7 +85,10 @@ M: object add-breakpoint ;
 
 : (change-frame) ( callstack quot -- callstack' )
     [ dup innermost-frame-executing quotation? ] dip '[
-        clone [ >innermost-frame< @ ] [ set-innermost-frame-quot ] [ ] tri
+        clone
+        [ >innermost-frame< @ ]
+        [ set-innermost-frame-quotation ]
+        [ ] tri
     ] when ; inline
 
 : change-frame ( continuation quot -- continuation' )
@@ -108,7 +111,7 @@ PRIVATE>
     [ nip \ break suffix ] change-frame ;
 
 {
-    { call [ (step-into-quot) ] }
+    { call [ (step-into-quotation) ] }
     { dip [ (step-into-dip) ] }
     { 2dip [ (step-into-2dip) ] }
     { 3dip [ (step-into-3dip) ] }

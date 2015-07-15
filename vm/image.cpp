@@ -300,8 +300,8 @@ void factor_vm::primitive_save_image() {
      where we might throw an error, so we have to throw an error here since
      later steps destroy the current image. */
   bool then_die = to_boolean(ctx->pop());
-  byte_array* path2 = tagged<byte_array>(ctx->pop()).untag_check(this);
-  byte_array* path1 = tagged<byte_array>(ctx->pop()).untag_check(this);
+  byte_array* path2 = untag_check<byte_array>(ctx->pop());
+  byte_array* path1 = untag_check<byte_array>(ctx->pop());
 
   /* Copy the paths to non-gc memory to avoid them hanging around in
      the saved image. */

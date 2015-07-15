@@ -429,12 +429,11 @@ M: object infer-call* \ call bad-macro-input ;
 \ minor-gc { } { } define-primitive
 \ modify-code-heap { array object object } { } define-primitive
 \ nano-count { } { integer } define-primitive \ nano-count make-flushable
-\ optimized? { word } { object } define-primitive
 \ profiling { object } { } define-primitive
 \ (get-samples) { } { object } define-primitive
 \ (clear-samples) { } { } define-primitive
-\ quot-compiled? { quotation } { object } define-primitive
 \ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
+\ quotation-compiled? { quotation } { object } define-primitive
 \ reset-dispatch-stats { } { } define-primitive
 \ resize-array { integer array } { array } define-primitive
 \ resize-byte-array { integer byte-array } { byte-array } define-primitive
@@ -456,7 +455,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
 \ set-context-object { object fixnum } { } define-primitive
 \ set-fpu-state { } { } define-primitive
-\ set-innermost-frame-quot { quotation callstack } { } define-primitive
+\ set-innermost-frame-quotation { quotation callstack } { } define-primitive
 \ set-slot { object object fixnum } { } define-primitive
 \ set-special-object { object fixnum } { } define-primitive
 \ set-string-nth-fast { fixnum fixnum string } { } define-primitive
@@ -469,3 +468,4 @@ M: object infer-call* \ call bad-macro-input ;
 \ tag { object } { fixnum } define-primitive \ tag make-foldable
 \ unimplemented { } { } define-primitive
 \ word-code { word } { integer integer } define-primitive \ word-code make-flushable
+\ word-optimized? { word } { object } define-primitive

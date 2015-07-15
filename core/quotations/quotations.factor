@@ -10,8 +10,8 @@ BUILTIN: quotation
     cache-counter ;
 
 PRIMITIVE: jit-compile ( quot -- )
-PRIMITIVE: quot-compiled? ( quot -- ? )
 PRIMITIVE: quotation-code ( quot -- start end )
+PRIMITIVE: quotation-compiled? ( quot -- ? )
 
 <PRIVATE
 PRIMITIVE: array>quotation ( array -- quot )

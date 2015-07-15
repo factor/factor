@@ -11,8 +11,8 @@ BUILTIN: word
 { def quotation initial: [ ] } props pic-def pic-tail-def
 { sub-primitive read-only } ;
 
-PRIMITIVE: optimized? ( word -- ? )
 PRIMITIVE: word-code ( word -- start end )
+PRIMITIVE: word-optimized? ( word -- ? )
 
 <PRIVATE
 PRIMITIVE: (word) ( name vocab hashcode -- word )

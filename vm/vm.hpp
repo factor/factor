@@ -450,7 +450,7 @@ struct factor_vm {
   word* allot_word(cell name_, cell vocab_, cell hashcode_);
   void primitive_word();
   void primitive_word_code();
-  void primitive_optimized_p();
+  void primitive_word_optimized_p();
   void primitive_wrapper();
   void jit_compile_word(cell word_, cell def_, bool relocating);
   cell find_all_words();
@@ -630,7 +630,7 @@ struct factor_vm {
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
   void primitive_innermost_stack_frame_scan();
-  void primitive_set_innermost_stack_frame_quot();
+  void primitive_set_innermost_stack_frame_quotation();
   void primitive_callstack_bounds();
 
   template <typename Iterator, typename Fixup>
@@ -660,12 +660,12 @@ struct factor_vm {
   cell lazy_jit_compile_entry_point();
   void primitive_array_to_quotation();
   void primitive_quotation_code();
-  code_block* jit_compile_quot(cell owner_, cell quot_, bool relocating);
-  void jit_compile_quot(cell quot_, bool relocating);
+  code_block* jit_compile_quotation(cell owner_, cell quot_, bool relocating);
+  void jit_compile_quotation(cell quot_, bool relocating);
   fixnum quot_code_offset_to_scan(cell quot_, cell offset);
   cell lazy_jit_compile(cell quot);
-  bool quot_compiled_p(quotation* quot);
-  void primitive_quot_compiled_p();
+  bool quotation_compiled_p(quotation* quot);
+  void primitive_quotation_compiled_p();
   cell find_all_quotations();
   void initialize_all_quotations();
 

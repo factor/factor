@@ -43,7 +43,7 @@ cell factor_vm::compute_entry_point_pic_address(word* w, cell tagged_quot) {
     return w->entry_point;
   else {
     quotation* quot = untag<quotation>(tagged_quot);
-    if (quot_compiled_p(quot))
+    if (quotation_compiled_p(quot))
       return quot->entry_point;
     else
       return w->entry_point;
@@ -486,6 +486,7 @@ void factor_vm::undefined_symbol() {
     general_error(ERROR_UNDEFINED_SYMBOL, symbol, library);
 }
 
-void undefined_symbol() { return current_vm()->undefined_symbol(); }
-
+void undefined_symbol() {
+  return current_vm()->undefined_symbol();
+}
 }

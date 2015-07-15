@@ -32,7 +32,7 @@ gc
 
 : compile-unoptimized ( words -- )
     [ [ subwords ] map ] keep suffix concat
-    [ optimized? ] reject compile ;
+    [ word-optimized? ] reject compile ;
 
 "debug-compiler" get [
 
