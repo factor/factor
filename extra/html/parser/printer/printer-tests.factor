@@ -13,7 +13,7 @@ IN: html.parser.printer.tests
 ] unit-test
 
 {
-    " rel='nofollow' href='http://www.google.com'"
+    " href='http://www.google.com' rel='nofollow'"
 } [
     H{ { "href" "http://www.google.com" } { "rel" "nofollow" } }
         [ print-attributes ] with-string-writer

@@ -164,7 +164,7 @@ foo: 1
   <<:
     baz: 3
 " yaml> ."""
-"""H{ { "bar" 2 } { "foo" 1 } { "baz" 3 } }""" }
+"""H{ { "baz" 3 } { "foo" 1 } { "bar" 2 } }""" }
 { $heading "!!value" }
 "See " { $url "http://yaml.org/type/value.html" } $nl
 { $example """USING: yaml prettyprint ;

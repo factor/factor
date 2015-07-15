@@ -357,7 +357,7 @@ HELP: subwords
   { $example
     "USING: math.functions prettyprint words ;"
     "\\ sin subwords ."
-    "{ M\\ object sin M\\ float sin M\\ complex sin M\\ real sin }"
+    "{ M\\ object sin M\\ complex sin M\\ real sin M\\ float sin }"
   }
 }
 { $notes "Outputs " { $link f } " if the word isn't generic." } ;
