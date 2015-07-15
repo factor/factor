@@ -106,15 +106,15 @@ void factor_vm::primitive_innermost_stack_frame_scan() {
   ctx->replace(code->code_block_for_address(addr)->scan(this, addr));
 }
 
-/* Allocates memory (jit_compile_quot) */
-void factor_vm::primitive_set_innermost_stack_frame_quot() {
+/* Allocates memory (jit_compile_quotation) */
+void factor_vm::primitive_set_innermost_stack_frame_quotation() {
   data_root<callstack> stack(ctx->pop(), this);
   data_root<quotation> quot(ctx->pop(), this);
 
   stack.untag_check(this);
   quot.untag_check(this);
 
-  jit_compile_quot(quot.value(), true);
+  jit_compile_quotation(quot.value(), true);
 
   void* inner = stack->top();
   cell addr = *(cell*)inner;

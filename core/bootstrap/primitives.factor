@@ -466,7 +466,7 @@ tuple
     { "innermost-frame-scan" "kernel.private" "primitive_innermost_stack_frame_scan" ( callstack -- n ) }
     { "set-context-object" "kernel.private" "primitive_set_context_object" ( obj n -- ) }
     { "set-datastack" "kernel.private" "primitive_set_datastack" ( array -- ) }
-    { "set-innermost-frame-quot" "kernel.private" "primitive_set_innermost_stack_frame_quot" ( n callstack -- ) }
+    { "set-innermost-frame-quotation" "kernel.private" "primitive_set_innermost_stack_frame_quotation" ( n callstack -- ) }
     { "set-retainstack" "kernel.private" "primitive_set_retainstack" ( array -- ) }
     { "set-special-object" "kernel.private" "primitive_set_special_object" ( obj n -- ) }
     { "special-object" "kernel.private" "primitive_special_object" ( n -- obj ) }
@@ -532,8 +532,8 @@ tuple
     { "size" "memory" "primitive_size" ( obj -- n ) }
     { "(save-image)" "memory.private" "primitive_save_image" ( path1 path2 then-die? -- ) }
     { "jit-compile" "quotations" "primitive_jit_compile" ( quot -- ) }
-    { "quot-compiled?" "quotations" "primitive_quot_compiled_p" ( quot -- ? ) }
     { "quotation-code" "quotations" "primitive_quotation_code" ( quot -- start end ) }
+    { "quotation-compiled?" "quotations" "primitive_quotation_compiled_p" ( quot -- ? ) }
     { "array>quotation" "quotations.private" "primitive_array_to_quotation" ( array -- quot ) }
     { "set-slot" "slots.private" "primitive_set_slot" ( value obj n -- ) }
     { "<string>" "strings" "primitive_string" ( n ch -- string ) }
@@ -548,8 +548,8 @@ tuple
     { "retainstack-for" "threads.private" "primitive_retainstack_for" ( context -- array ) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" ( -- stats ) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" ( -- ) }
-    { "optimized?" "words" "primitive_optimized_p" ( word -- ? ) }
     { "word-code" "words" "primitive_word_code" ( word -- start end ) }
+    { "word-optimized?" "words" "primitive_word_optimized_p" ( word -- ? ) }
     { "(word)" "words.private" "primitive_word" ( name vocab hashcode -- word ) }
     { "profiling" "tools.profiler.sampling.private" "primitive_sampling_profiler" ( ? -- ) }
     { "(get-samples)" "tools.profiler.sampling.private" "primitive_get_samples" ( -- samples/f ) }

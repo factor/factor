@@ -15,13 +15,13 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating) {
     return;
 
   code_block* compiled =
-      jit_compile_quot(word.value(), def.value(), relocating);
+      jit_compile_quotation(word.value(), def.value(), relocating);
   word->entry_point = compiled->entry_point();
 
   if (to_boolean(word->pic_def))
-    jit_compile_quot(word->pic_def, relocating);
+    jit_compile_quotation(word->pic_def, relocating);
   if (to_boolean(word->pic_tail_def))
-    jit_compile_quot(word->pic_tail_def, relocating);
+    jit_compile_quotation(word->pic_tail_def, relocating);
 }
 
 /* Allocates memory */
@@ -81,7 +81,7 @@ void factor_vm::primitive_word_code() {
   ctx->push(from_unsigned_cell((cell)w->code() + w->code()->size()));
 }
 
-void factor_vm::primitive_optimized_p() {
+void factor_vm::primitive_word_optimized_p() {
   word* w = untag_check<word>(ctx->peek());
   ctx->replace(tag_boolean(w->code()->optimized_p()));
 }

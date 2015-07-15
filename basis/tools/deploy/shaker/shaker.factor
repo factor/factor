@@ -474,7 +474,7 @@ IN: tools.deploy.shaker
     ! Quotations which were formerly compiled must remain
     ! compiled.
     2dup [
-        2dup [ quot-compiled? ] [ quot-compiled? not ] bi* and
+        2dup [ quotation-compiled? ] [ quotation-compiled? not ] bi* and
         [ nip jit-compile ] [ 2drop ] if
     ] 2each ;
 
