@@ -156,7 +156,7 @@ void quotation_jit::emit_epilog(bool safepoint, bool stack_frame) {
 }
 
 /* Allocates memory conditionally */
-void quotation_jit::emit_quot(cell quot_) {
+void quotation_jit::emit_quotation(cell quot_) {
   data_root<quotation> quot(quot_, parent);
 
   array* elements = untag<array>(quot->array);
@@ -236,24 +236,24 @@ void quotation_jit::iterate_quotation() {
           emit_epilog(safepoint, stack_frame);
           tail_call = true;
 
-          emit_quot(array_nth(elements.untagged(), i));
-          emit_quot(array_nth(elements.untagged(), i + 1));
+          emit_quotation(array_nth(elements.untagged(), i));
+          emit_quotation(array_nth(elements.untagged(), i + 1));
           emit(parent->special_objects[JIT_IF]);
 
           i += 2;
         } /* dip */
         else if (fast_dip_p(i, length)) {
-          emit_quot(obj.value());
+          emit_quotation(obj.value());
           emit(parent->special_objects[JIT_DIP]);
           i++;
         } /* 2dip */
         else if (fast_2dip_p(i, length)) {
-          emit_quot(obj.value());
+          emit_quotation(obj.value());
           emit(parent->special_objects[JIT_2DIP]);
           i++;
         } /* 3dip */
         else if (fast_3dip_p(i, length)) {
-          emit_quot(obj.value());
+          emit_quotation(obj.value());
           emit(parent->special_objects[JIT_3DIP]);
           i++;
         } else
