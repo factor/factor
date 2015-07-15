@@ -201,7 +201,7 @@ TUPLE: my-tuple ;
     { tuple vector } 3 slot { word } declare
     dup 1 slot 0 fixnum-bitand { [ ] } dispatch ;
 
-[ t ] [ \ dispatch-alignment-regression optimized? ] unit-test
+[ t ] [ \ dispatch-alignment-regression word-optimized? ] unit-test
 
 [ vector ] [ dispatch-alignment-regression ] unit-test
 

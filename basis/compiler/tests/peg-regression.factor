@@ -22,5 +22,5 @@ pipeline = "hello" => [[ ast>pipeline-expr ]]
 
 USE: tools.test
 
-[ t ] [ \ expr optimized? ] unit-test
-[ t ] [ \ ast>pipeline-expr optimized? ] unit-test
+[ t ] [ \ expr word-optimized? ] unit-test
+[ t ] [ \ ast>pipeline-expr word-optimized? ] unit-test

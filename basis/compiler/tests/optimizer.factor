@@ -12,7 +12,7 @@ IN: compiler.tests.optimizer
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ M\ array xyz optimized? ] unit-test
+[ t ] [ M\ array xyz word-optimized? ] unit-test
 
 ! Test predicate inlining
 : pred-test-1 ( a -- b c )
@@ -97,7 +97,7 @@ TUPLE: pred-test ;
 ! regression
 GENERIC: void-generic ( obj -- * )
 : breakage ( -- * ) "hi" void-generic ;
-[ t ] [ \ breakage optimized? ] unit-test
+[ t ] [ \ breakage word-optimized? ] unit-test
 [ breakage ] must-fail
 
 ! regression
@@ -122,7 +122,7 @@ GENERIC: void-generic ( obj -- * )
 ! compiling <tuple> with a non-literal class failed
 : <tuple>-regression ( class -- tuple ) <tuple> ;
 
-[ t ] [ \ <tuple>-regression optimized? ] unit-test
+[ t ] [ \ <tuple>-regression word-optimized? ] unit-test
 
 ! regression
 : constant-fold-2 ( -- value ) f ; foldable
@@ -203,7 +203,7 @@ M: number detect-number ;
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
-[ t ] [ \ node-successor-f-bug optimized? ] unit-test
+[ t ] [ \ node-successor-f-bug word-optimized? ] unit-test
 
 [ ] [ [ new ] build-tree optimize-tree drop ] unit-test
 
@@ -217,7 +217,7 @@ M: number detect-number ;
         ] if
     ] if ;
 
-[ t ] [ \ lift-throw-tail-regression optimized? ] unit-test
+[ t ] [ \ lift-throw-tail-regression word-optimized? ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
@@ -248,7 +248,7 @@ HINTS: recursive-inline-hang array ;
 : recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
-[ t ] [ \ recursive-inline-hang-1 optimized? ] unit-test
+[ t ] [ \ recursive-inline-hang-1 word-optimized? ] unit-test
 
 DEFER: recursive-inline-hang-3
 
@@ -302,7 +302,7 @@ PREDICATE: list < improper-list
     dup "a" get { array-capacity } declare >=
     [ dup "b" get { array-capacity } declare >= [ 3 ] [ 4 ] if ] [ 5 ] if ;
 
-[ t ] [ \ interval-inference-bug optimized? ] unit-test
+[ t ] [ \ interval-inference-bug word-optimized? ] unit-test
 
 [ ] [ 1 "a" set 2 "b" set ] unit-test
 [ 2 3 ] [ 2 interval-inference-bug ] unit-test
@@ -364,7 +364,7 @@ DEFER: loop-bbb
 
 : broken-declaration ( -- ) \ + declare ;
 
-[ f ] [ \ broken-declaration optimized? ] unit-test
+[ f ] [ \ broken-declaration word-optimized? ] unit-test
 
 [ ] [ [ \ broken-declaration forget ] with-compilation-unit ] unit-test
 
