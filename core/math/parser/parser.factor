@@ -288,19 +288,19 @@ DEFER: @neg-digit
             { f [ 4drop 0 ] }
             [ swap call ]
         } case
-    ] curry require-next-digit ; inline
+    ] curry next-digit ; inline
 
 : @neg-first-digit-no-radix ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @neg-digit ] with-no-radix ] }
+        { CHAR: 0 [ [ @neg-digit-or-punc ] with-no-radix ] }
         [ @neg-digit ]
     } case ; inline
 
 : @pos-first-digit-no-radix ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @pos-digit ] with-no-radix ] }
+        { CHAR: 0 [ [ @pos-digit-or-punc ] with-no-radix ] }
         [ @pos-digit ]
     } case ; inline
 

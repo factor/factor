@@ -363,7 +363,7 @@ unit-test
 
 ! #1229, float parsing bug, and a regression
 { -0.5 } [ "-.5" dec> ] unit-test
-{ "0" } [ "0" hex> ] unit-test
+{ 0 } [ "0" hex> ] unit-test
 
 { t } [ most-positive-fixnum number>string string>number fixnum? ] unit-test
 { t } [ most-negative-fixnum number>string string>number fixnum? ] unit-test
