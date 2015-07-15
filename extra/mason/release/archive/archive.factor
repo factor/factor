@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io.directories
-io.directories.hierarchy io.files io.pathnames kernel locals
-make mason.common mason.config mason.platform namespaces
+io.directories.hierarchy io.files io.pathnames kernel literals
+locals make mason.common mason.config mason.platform namespaces
 sequences system words ;
 IN: mason.release.archive
 
@@ -38,13 +38,12 @@ IN: mason.release.archive
 : sign-factor.app? ( -- ? ) cert-path exists? ;
 
 :: sign-factor.app ( -- )
-    {
+    ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
-    }
-    cert-path suffix
-    "Factor.app/" suffix
-    short-running-process ;
+        cert-path
+        "Factor.app/"
+    } short-running-process ;
 
 ! Make the .dmg
 : make-macosx-archive ( archive-name -- )
