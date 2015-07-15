@@ -285,6 +285,7 @@ DEFER: @neg-digit
             { CHAR: b [ pick radix>> 16 = [ CHAR: b swap call ] [ @abort ] if ] }
             { CHAR: o [ @abort ] }
             { CHAR: x [ @abort ] }
+            { f [ 4drop 0 ] }
             [ swap call ]
         } case
     ] curry require-next-digit ; inline
