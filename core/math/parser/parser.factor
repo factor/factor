@@ -98,7 +98,12 @@ TUPLE: float-parse
     } cond ;
 
 : ?neg ( n/f -- -n/f )
-    [ neg ] [ f ] if* ; inline
+    [
+        dup bignum? [
+            dup first-bignum bignum=
+            [ drop most-negative-fixnum ] [ neg ] if
+        ] [ neg ] if
+    ] [ f ] if* ; inline
 
 : ?add-ratio ( m n/f -- m+n/f )
     dup ratio? [ + ] [ 2drop f ] if ; inline

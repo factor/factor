@@ -1,4 +1,5 @@
-USING: kernel literals math math.parser sequences tools.test ;
+USING: kernel layouts literals math math.parser sequences
+tools.test ;
 IN: math.parser.tests
 
 { f }
@@ -359,3 +360,6 @@ unit-test
 { f } [ "0b0" bin> ] unit-test
 { f } [ "0o0" bin> ] unit-test
 { f } [ "0x0" bin> ] unit-test
+
+{ t } [ most-positive-fixnum number>string string>number fixnum? ] unit-test
+{ t } [ most-negative-fixnum number>string string>number fixnum? ] unit-test
