@@ -118,7 +118,7 @@ IN: tools.walker.tests
 
 \ breakpoint-test don't-step-into
 
-{ f } [ \ breakpoint-test optimized? ] unit-test
+{ f } [ \ breakpoint-test word-optimized? ] unit-test
 
 { { 3 } } [ [ breakpoint-test ] test-walker ] unit-test
 
