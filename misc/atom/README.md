@@ -9,3 +9,7 @@ You can install this by copying this folder to:
 Or symlinking it:
 
   ln -sf /path/to/factor/misc/atom ~/.atom/languages-factor
+
+This was initially generated from the Textmate bundle:
+
+  apm init --package atom --convert Factor.tmbundle
