@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays io io.encodings
-io.encodings.private kernel math sequences ;
+io.encodings.private kernel math sequences strings ;
 IN: io.encodings.ascii
 
 SINGLETON: ascii
@@ -10,15 +10,20 @@ M: ascii encode-char
     drop
     over 127 <= [ stream-write1 ] [ encode-error ] if ; inline
 
+<PRIVATE
+
+GENERIC: ascii> ( string -- byte-array )
+
+M: string ascii>
+    dup aux>>
+    [ [ dup 127 <= [ encode-error ] unless ] B{ } map-as ]
+    [ string>byte-array-fast ] if ; inline
+
+PRIVATE>
+
 M: ascii encode-string
     drop
-    [
-        dup aux>>
-        [ [ dup 127 <= [ encode-error ] unless ] B{ } map-as ]
-        [ string>byte-array-fast ]
-        if
-    ] dip
-    stream-write ;
+    [ ascii> ] dip stream-write ;
 
 M: ascii decode-char
     drop
