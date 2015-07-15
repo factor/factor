@@ -793,7 +793,7 @@ IN: bootstrap.ppc
     3 jit-switch-context
     jit-push-param ;
 
-[ jit-set-context ] \ (set-context) define-sub-primitive
+[ jit-set-context ] \ set-context define-sub-primitive
 
 : jit-pop-quot-and-param ( -- )
     3 ds-reg 0 jit-load-cell
@@ -815,7 +815,7 @@ IN: bootstrap.ppc
     jit-push-param
     jit-jump-quot ;
 
-[ jit-start-context ] \ (start-context) define-sub-primitive
+[ jit-start-context ] \ start-context define-sub-primitive
 
 : jit-delete-current-context ( -- )
     jit-load-context
@@ -825,7 +825,7 @@ IN: bootstrap.ppc
 [
     jit-delete-current-context
     jit-set-context
-] \ (set-context-and-delete) define-sub-primitive
+] \ set-context-and-delete define-sub-primitive
 
 : jit-start-context-and-delete ( -- )
     jit-save-context
@@ -842,6 +842,6 @@ IN: bootstrap.ppc
 
 [
     jit-start-context-and-delete
-] \ (start-context-and-delete) define-sub-primitive
+] \ start-context-and-delete define-sub-primitive
 
 [ "bootstrap.ppc" forget-vocab ] with-compilation-unit

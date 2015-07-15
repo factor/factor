@@ -277,7 +277,7 @@ IN: bootstrap.x86
     RSP 8 ADD
     jit-push-param ;
 
-[ jit-set-context ] \ (set-context) define-sub-primitive
+[ jit-set-context ] \ set-context define-sub-primitive
 
 : jit-pop-quot-and-param ( -- )
     arg1 ds-reg [] MOV
@@ -297,7 +297,7 @@ IN: bootstrap.x86
     jit-push-param
     jit-jump-quot ;
 
-[ jit-start-context ] \ (start-context) define-sub-primitive
+[ jit-start-context ] \ start-context define-sub-primitive
 
 : jit-delete-current-context ( -- )
     vm-reg "delete_context" jit-call-1arg ;
@@ -305,7 +305,7 @@ IN: bootstrap.x86
 [
     jit-delete-current-context
     jit-set-context
-] \ (set-context-and-delete) define-sub-primitive
+] \ set-context-and-delete define-sub-primitive
 
 ! Resets the active context and instead the passed in quotation
 ! becomes the new code that it executes.
@@ -333,4 +333,4 @@ IN: bootstrap.x86
 
 [
     jit-start-context-and-delete
-] \ (start-context-and-delete) define-sub-primitive
+] \ start-context-and-delete define-sub-primitive

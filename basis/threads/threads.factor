@@ -9,34 +9,19 @@ FROM: assocs => change-at ;
 IN: threads
 
 <PRIVATE
-PRIMITIVE: (set-context) ( obj context -- obj' )
-PRIMITIVE: (set-context-and-delete) ( obj context -- * )
+PRIMITIVE: set-context ( obj context -- obj' )
+PRIMITIVE: set-context-and-delete ( obj context -- * )
 PRIMITIVE: (sleep) ( nanos -- )
-PRIMITIVE: (start-context) ( obj quot -- obj' )
-PRIMITIVE: (start-context-and-delete) ( obj quot -- * )
+PRIMITIVE: start-context ( obj quot: ( obj -- * ) -- obj' )
+PRIMITIVE: start-context-and-delete ( obj quot: ( obj -- * ) -- * )
 PRIMITIVE: callstack-for ( context -- array )
 PRIMITIVE: context-object-for ( n context -- obj )
 PRIMITIVE: datastack-for ( context -- array )
 PRIMITIVE: retainstack-for ( context -- array )
 
-! Wrap sub-primitives; we don't want them inlined into callers
-! since their behavior depends on what frames are on the callstack
 : context ( -- context )
     CONTEXT-OBJ-CONTEXT context-object ; inline
 
-: set-context ( obj context -- obj' )
-    (set-context) ; inline
-
-: start-context ( obj quot: ( obj -- * ) -- obj' )
-    (start-context) ; inline
-
-: set-context-and-delete ( obj context -- * )
-    (set-context-and-delete) ; inline
-
-: start-context-and-delete ( obj quot: ( obj -- * ) -- * )
-    (start-context-and-delete) ; inline
-
-! Context introspection
 : namestack-for ( context -- namestack )
     [ CONTEXT-OBJ-NAMESTACK ] dip context-object-for ;
 

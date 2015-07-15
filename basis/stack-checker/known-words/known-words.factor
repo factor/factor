@@ -292,11 +292,11 @@ M: object infer-call* \ call bad-macro-input ;
 \ (fopen) { byte-array byte-array } { alien } define-primitive
 \ (identity-hashcode) { object } { fixnum } define-primitive
 \ (save-image) { byte-array byte-array object } { } define-primitive
-\ (set-context) { object alien } { object } define-primitive
-\ (set-context-and-delete) { object alien } { } define-primitive
+\ set-context { object alien } { object } define-primitive
+\ set-context-and-delete { object alien } { } define-primitive
 \ (sleep) { integer } { } define-primitive
-\ (start-context) { object quotation } { object } define-primitive
-\ (start-context-and-delete) { object quotation } { } define-primitive
+\ start-context { object quotation } { object } define-primitive
+\ start-context-and-delete { object quotation } { } define-primitive
 \ (word) { object object object } { word } define-primitive \ (word) make-flushable
 \ <array> { integer object } { array } define-primitive \ <array> make-flushable
 \ <byte-array> { integer } { byte-array } define-primitive \ <byte-array> make-flushable
