@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types ascii assocs combinators combinators.smart
-endian fry io kernel macros math math.vectors sequences strings ;
+endian fry io kernel macros math math.statistics math.vectors
+sequences strings ;
 IN: pack
 
 GENERIC: >n-byte-array ( obj n -- byte-array )
@@ -115,7 +116,7 @@ MACRO: pack ( str -- quot )
 <PRIVATE
 
 : start/end ( seq -- seq1 seq2 )
-    [ 0 [ + ] accumulate nip dup ] keep v+ ; inline
+    [ cum-sum0 ] keep v+ ; inline
 
 PRIVATE>
 
