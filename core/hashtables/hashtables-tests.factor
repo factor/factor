@@ -1,5 +1,5 @@
-USING: accessors assocs continuations hashtables io kernel make
-math namespaces prettyprint sequences sequences.private
+USING: accessors assocs continuations fry hashtables io kernel
+make math namespaces prettyprint sequences sequences.private
 tools.test vectors ;
 IN: hashtables.tests
 
@@ -124,8 +124,8 @@ H{ } clone "counting" set
 H{ } "x" set
 100 [ drop "x" get clear-assoc ] each-integer
 
-! Crash discovered by erg
-{ t } [ 0.75 <hashtable> dup clone = ] unit-test
+! non-integer capacity not allowed
+[ 0.75 <hashtable> ] must-fail
 
 ! Another crash discovered by erg
 { } [
@@ -139,6 +139,14 @@ H{ } "x" set
 { H{ { -1 4 } { -3 16 } { -5 36 } } } [
     H{ { 1 2 } { 3 4 } { 5 6 } }
     [ [ neg ] dip sq ] assoc-map
+] unit-test
+
+! make sure growth and capacity use same load-factor
+{ t } [
+    100 iota
+    [ [ <hashtable> ] map ]
+    [ [ H{ } clone [ '[ dup _ set-at ] each-integer ] keep ] map ] bi
+    [ [ array>> length ] bi@ = ] 2all?
 ] unit-test
 
 ! Bug discovered by littledan

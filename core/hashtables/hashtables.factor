@@ -36,7 +36,7 @@ TUPLE: hashtable
     [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
-    1 + next-power-of-2 4 * ((empty)) <array> ; inline
+    3 * 1 + 2/ next-power-of-2 2 * ((empty)) <array> ; inline
 
 : init-hash ( hash -- )
     0 >>count 0 >>deleted drop ; inline
@@ -83,7 +83,7 @@ TUPLE: hashtable
     [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
     [ over [ hash-deleted- ] [ hash-count+ ] if swap or ] [ 2drop ] if ; inline
 
-: set-nth-pair ( value key seq n -- )
+: set-nth-pair ( value key array n -- )
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
 
@@ -94,7 +94,7 @@ TUPLE: hashtable
     [ swapd (set-at) ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast ]
+    [ count>> 1 fixnum+fast 3 fixnum*fast ]
     [ array>> length>> ] bi fixnum>= ; inline
 
 : each-pair ( ... array quot: ( ... key value -- ... ) -- ... )
@@ -119,6 +119,7 @@ TUPLE: hashtable
 PRIVATE>
 
 : <hashtable> ( n -- hash )
+    integer>fixnum-strict
     [ 0 0 ] dip <hash-array> hashtable boa ; inline
 
 M: hashtable at*
