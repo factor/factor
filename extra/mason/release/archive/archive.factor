@@ -42,7 +42,7 @@ IN: mason.release.archive
         "codesign" "--force" "--sign"
         "Developer ID Application"
         cert-path
-        "Factor.app/"
+        current-directory get "Factor.app/" append-path
     } short-running-process ;
 
 ! Make the .dmg
