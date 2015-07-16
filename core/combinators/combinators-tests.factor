@@ -336,3 +336,20 @@ DEFER: corner-case-1
     } case ;
 
 [ 5.0 test-case-13 ] [ no-case? ] must-fail-with
+
+{
+    [
+        dup 1 =
+        [ drop "one" ] [
+            dup 2 =
+            [ drop "two" ]
+            [ dup 3 = [ drop "three" ] [ drop f ] if ] if
+        ] if
+    ]
+} [
+    [ drop f ] {
+        { 1 [ "one" ] }
+        { 2 [ "two" ] }
+        { 3 [ "three" ] }
+    } linear-case-quot
+] unit-test

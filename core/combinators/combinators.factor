@@ -123,7 +123,7 @@ ERROR: no-case object ;
     [
         [ 1quotation \ dup prefix \ = suffix ]
         [ \ drop prefix ] bi*
-    ] assoc-map alist>quot ;
+    ] assoc-map reverse! alist>quot ;
 
 <PRIVATE
 
@@ -145,8 +145,9 @@ ERROR: no-case object ;
     [ first2 (distribute-buckets) ] with each ; inline
 
 : hash-case-table ( default assoc -- array )
-    V{ } [ 1array ] distribute-buckets
-    [ [ [ literalize ] dip ] assoc-map linear-case-quot ] with map ;
+    V{ } [ 1array ] distribute-buckets [
+        [ [ literalize ] dip ] assoc-map linear-case-quot
+    ] with map ;
 
 : hash-dispatch-quot ( table -- quot )
     [ length 1 - [ fixnum-bitand ] curry ] keep
@@ -179,7 +180,7 @@ ERROR: no-case object ;
 PRIVATE>
 
 : case>quot ( default assoc -- quot )
-    <reversed> dup keys {
+    dup keys {
         { [ dup empty? ] [ 2drop ] }
         { [ dup [ length 4 <= ] [ [ word? ] any? ] bi or ] [ drop linear-case-quot ] }
         { [ dup contiguous-range? ] [ drop dispatch-case-quot ] }
