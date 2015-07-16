@@ -149,8 +149,8 @@ DEFER: @neg-digit
 
 : exponent-char? ( number-parse n char -- number-parse n char ? )
     pick radix>> {
-        { 10 [ dup CHAR: e = [ t ] [ dup CHAR: E = ] if ] }
-        [ drop dup CHAR: p = [ t ] [ dup CHAR: P = ] if ]
+        { 10 [ dup "eE" member-eq? ] }
+        [ drop dup "pP" member-eq? ]
     } case ; inline
 
 : or-exponent ( i number-parse n char quot -- n/f )
