@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays classes.struct combinators destructors io.backend.unix
-io.encodings.utf8 io.files io.pathnames io.sockets.private kernel
-libc locals math namespaces sequences system unix
-unix.ffi vocabs ;
+arrays byte-arrays classes.struct combinators destructors
+io.backend.unix io.encodings.ascii io.encodings.utf8 io.files
+io.pathnames io.sockets.private kernel libc locals math
+namespaces sequences system unix unix.ffi vocabs ;
 EXCLUDE: io => read write ;
 EXCLUDE: io.sockets => accept ;
 IN: io.sockets.unix
@@ -181,5 +181,9 @@ M: local make-sockaddr
 M: local parse-sockaddr
     drop
     path>> utf8 alien>string <local> ;
+
+M: unix host-name
+    256 [ <byte-array> dup ] keep gethostname io-error
+    ascii alien>string ;
 
 os linux? [ "io.sockets.unix.linux" require ] when
