@@ -45,9 +45,9 @@ CONSTANT: alphabet
     [ 3 0 pad-tail encode3 ] [ 1 + ] bi* head-slice
     4 CHAR: = pad-tail ; inline
 
-: (encode-base64) ( stream column -- column' )
+: (encode-base64) ( stream column -- )
     3 pick stream-read dup length {
-        { 0 [ 2drop ] }
+        { 0 [ 3drop ] }
         { 3 [ encode3 write-lines (encode-base64) ] }
         [ encode-pad write-lines (encode-base64) ]
     } case ;
@@ -55,10 +55,10 @@ CONSTANT: alphabet
 PRIVATE>
 
 : encode-base64 ( -- )
-    input-stream get f (encode-base64) drop ;
+    input-stream get f (encode-base64) ;
 
 : encode-base64-lines ( -- )
-    input-stream get 0 (encode-base64) drop ;
+    input-stream get 0 (encode-base64) ;
 
 <PRIVATE
 
