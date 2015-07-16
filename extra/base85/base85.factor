@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: base64 base64.private combinators fry io io.binary
-io.encodings.binary io.streams.byte-array kernel math
+io.encodings.binary io.streams.byte-array kernel literals math
 namespaces sequences ;
 IN: base85
 
@@ -9,19 +9,15 @@ ERROR: malformed-base85 ;
 
 <PRIVATE
 
-: ch>base85 ( ch -- ch )
+CONSTANT: alphabet
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~\";"
-    nth ; inline
+
+: ch>base85 ( ch -- ch )
+    alphabet nth ; inline
 
 : base85>ch ( ch -- ch )
-    {
-        f f f f f f f f f f f f f f f f f f f f f f f f f f f f
-        f f f f f 62 f 63 64 65 66 f 67 68 69 70 f 71 f f 0 1 2
-        3 4 5 6 7 8 9 f 72 73 74 75 76 77 10 11 12 13 14 15 16
-        17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-        f f f 78 79 80 36 37 38 39 40 41 42 43 44 45 46 47 48 49
-        50 51 52 53 54 55 56 57 58 59 60 61 81 82 83 84
-    } nth [ malformed-base85 ] unless* ; inline
+    $[ alphabet alphabet-inverse ] nth
+    [ malformed-base85 ] unless* ; inline
 
 : encode4 ( seq -- )
     column output-stream get '[
