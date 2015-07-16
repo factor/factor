@@ -9,9 +9,10 @@ ERROR: malformed-base85 ;
 
 <PRIVATE
 
+<<
 CONSTANT: alphabet
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~\";"
-
+>>
 : ch>base85 ( ch -- ch )
     alphabet nth ; inline
 
