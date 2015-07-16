@@ -69,9 +69,11 @@ PRIVATE>
 : push-ignoring ( accum ch -- accum )
     dup { f 0 } member-eq? [ drop ] [ suffix! ] if ; inline
 
-: read-ignoring ( n ignoring stream -- sbuf )
-    [ [ <sbuf> ] keep ] 2dip
+: read-into-ignoring ( accum n ignoring stream -- accum )
     '[ _ _ read1-ignoring push-ignoring ] times ; inline
+
+: read-ignoring ( n ignoring stream -- accum )
+    [ [ <sbuf> ] keep ] 2dip read-into-ignoring ; inline
 
 : decode4 ( seq -- )
     [ 0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ]
