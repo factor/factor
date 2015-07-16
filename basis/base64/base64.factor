@@ -21,8 +21,10 @@ ERROR: malformed-base64 ;
     '[ _ _ read1-ignoring push-ignoring ] times
     [ f ] [ "" like ] if-empty ; inline
 
+<<
 CONSTANT: alphabet
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+>>
 
 : alphabet-inverse ( alphabet -- seq )
     dup supremum 1 + f <array> [
