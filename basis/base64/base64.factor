@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators fry io io.binary io.encodings.binary
-io.streams.byte-array kernel math namespaces sbufs
-sequences strings ;
+USING: arrays combinators fry io io.binary io.encodings.binary
+io.streams.byte-array kernel literals math namespaces sbufs
+sequences ;
 IN: base64
 
 ERROR: malformed-base64 ;
@@ -21,18 +21,20 @@ ERROR: malformed-base64 ;
     '[ _ _ read1-ignoring push-ignoring ] times
     [ f ] [ "" like ] if-empty ; inline
 
-: ch>base64 ( ch -- ch )
+CONSTANT: alphabet
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-    nth ; inline
+
+: alphabet-inverse ( alphabet -- seq )
+    dup supremum 1 + f <array> [
+        '[ swap _ set-nth ] each-index
+    ] keep ;
+
+: ch>base64 ( ch -- ch )
+    alphabet nth ; inline
 
 : base64>ch ( ch -- ch )
-    {
-        f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f
-        f f f f f f f f f f 62 f f f 63 52 53 54 55 56 57 58 59 60 61 f f
-        f 0 f f f 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
-        22 23 24 25 f f f f f f 26 27 28 29 30 31 32 33 34 35 36 37 38 39
-        40 41 42 43 44 45 46 47 48 49 50 51
-    } nth [ malformed-base64 ] unless* ; inline
+    $[ alphabet alphabet-inverse 0 CHAR: = pick set-nth ] nth
+    [ malformed-base64 ] unless* ; inline
 
 SYMBOL: column
 
