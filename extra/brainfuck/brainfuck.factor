@@ -58,7 +58,7 @@ dec-mem  = ("-")+  => [[ length '[ _ (-) ] ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
 debug    = "#"  => [[ [ (#) ] ]]
-space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]]
+space    = [ \t\n\r]+ => [[ [ ] ]]
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
