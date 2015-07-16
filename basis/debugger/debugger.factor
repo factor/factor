@@ -235,7 +235,12 @@ M: no-case summary
     drop "Fall-through in case" ;
 
 M: slice-error summary
-    drop "Cannot create slice" ;
+    "Cannot create slice" swap {
+        { [ dup from>> 0 < ] [ ": from < 0" ] }
+        { [ dup [ to>> ] [ seq>> length ] bi > ] [ ": to > length" ] }
+        { [ dup [ from>> ] [ to>> ] bi > ] [ ": from > to" ] }
+        [ f ]
+    } cond nip append ;
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 
