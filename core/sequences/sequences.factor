@@ -214,24 +214,19 @@ INSTANCE: reversed virtual-sequence
 
 ! A slice of another sequence.
 TUPLE: slice
-{ from read-only }
-{ to read-only }
-{ seq read-only } ;
+    { from integer read-only }
+    { to integer read-only }
+    { seq read-only } ;
 
 : collapse-slice ( m n slice -- m' n' seq )
     [ from>> ] [ seq>> ] bi [ [ + ] curry bi@ ] dip ; inline
 
-ERROR: slice-error from to seq reason ;
-
-: check-slice-error ( from to seq ? string -- from to seq )
-    [ slice-error ] curry when ; inline
+ERROR: slice-error from to seq ;
 
 : check-slice ( from to seq -- from to seq )
-    3dup
-    [ 2drop 0 < "start < 0" check-slice-error ]
-    [ [ drop ] 2dip length > "end > sequence" check-slice-error ]
-    [ drop > "start > end" check-slice-error ]
-    3tri ; inline
+    pick 0 < [ slice-error ] when
+    2dup length > [ slice-error ] when
+    2over > [ slice-error ] when ; inline
 
 <PRIVATE
 
