@@ -279,28 +279,15 @@ DEFER: @neg-digit
         [ @pos-first-digit ]
     } case ; inline
 
-: with-no-radix ( i number-parse n quot -- n/f )
-    [
-        swap {
-            { CHAR: b [ pick radix>> 16 = [ CHAR: b swap call ] [ @abort ] if ] }
-            { CHAR: o [ @abort ] }
-            { CHAR: x [ @abort ] }
-            { f [ 4drop 0 ] }
-            [ swap call ]
-        } case
-    ] curry next-digit ; inline
-
 : @neg-first-digit-no-radix ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @neg-digit-or-punc ] with-no-radix ] }
         [ @neg-digit ]
     } case ; inline
 
 : @pos-first-digit-no-radix ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
-        { CHAR: 0 [ [ @pos-digit-or-punc ] with-no-radix ] }
         [ @pos-digit ]
     } case ; inline
 
