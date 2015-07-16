@@ -19,17 +19,17 @@ IN: peg.javascript.parser
 #! allows us to detect newlines when we need to for the semicolon
 #! insertion rule, but ignore it in all other places.
 EBNF: javascript
-tokenizer         = default 
-nl                = "\r" "\n" | "\n"
+tokenizer         = default
+nl                = "\r\n" | "\n"
 
 tokenizer         = <foreign tokenize-javascript Tok>
 End               = !(.)
-Space             = " " | "\t" | "\n" 
+Space             = [ \t\n]
 Spaces            = Space* => [[ ignore ]]
-Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
+Name               = . ?[ ast-name?   ]?   => [[ value>> ]]
 Number             = . ?[ ast-number? ]?
 String             = . ?[ ast-string? ]?
-RegExp             = . ?[ ast-regexp? ]?   
+RegExp             = . ?[ ast-regexp? ]?
 SpacesNoNl         = (!(nl) Space)* => [[ ignore ]]
 
 Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-expr boa ]]
@@ -175,7 +175,7 @@ Switch1            =   "case" Expr:c ":" SrcElems:cs => [[ c cs ast-case boa ]]
 SwitchBody         = Switch1*
 Finally            =   "finally" Block:b => [[ b ]]
                      | Spaces => [[ "undefined" ast-get boa ]]
-Stmt               =   Block                     
+Stmt               =   Block
                      | "var" Bindings:bs Sc                   => [[ bs ast-begin boa ]]
                      | "if" "(" Expr:c ")" Stmt:t "else" Stmt:f => [[ c t f ast-if boa ]]
                      | "if" "(" Expr:c ")" Stmt:t               => [[ c t "undefined" ast-get boa ast-if boa ]]
@@ -196,5 +196,5 @@ Stmt               =   Block
 SrcElem            =   "function" Name:n FuncRest:f                  => [[ n f ast-var boa ]]
                      | Stmt
 SrcElems           = SrcElem*                                      => [[ ast-begin boa ]]
-TopLevel           = SrcElems Spaces                               
+TopLevel           = SrcElems Spaces
 ;EBNF

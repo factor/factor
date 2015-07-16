@@ -62,11 +62,11 @@ Sign = ('+' => [[ first ]]|'-' => [[ first ]])?
 
 StopChar = ('('|')'|'['|']'|'{'|'}'|'/'|'/'|';'|':'|'!'|'.')
 
-Space = ' ' | '\t' | '\r' | '\n'
+Space = [ \t\n\r]
 
 Spaces = Space* => [[ ignore ]]
 
-Newline = ('\n' | '\r')
+Newline = [\n\r]
 
 Number = Sign Digit+ ('.' => [[ first ]] Digit+)? ('e' => [[ first ]] Sign Digit+)?
     => [[ flatten sift >string string>number ]]

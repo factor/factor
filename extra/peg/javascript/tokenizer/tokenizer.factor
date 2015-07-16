@@ -14,7 +14,7 @@ Digit             = [0-9]
 Digits            = Digit+
 SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
 MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
-Space             = " " | "\t" | "\r" | "\n" | SingleLineComment | MultiLineComment
+Space             = [ \t\r\n] | SingleLineComment | MultiLineComment
 Spaces            = Space* => [[ ignore ]]
 NameFirst         = Letter | "$" => [[ CHAR: $ ]] | "_" => [[ CHAR: _ ]]
 NameRest          = NameFirst | Digit
@@ -48,7 +48,7 @@ Name              = !(Keyword) iName  => [[ ast-name boa ]]
 Number            =   Digits:ws '.' Digits:fs => [[ ws "." fs 3array "" concat-as string>number ast-number boa ]]
                     | Digits => [[ >string string>number ast-number boa ]]  
 
-EscapeChar        =   "\\n" => [[ 10 ]] 
+EscapeChar        =   "\\n" => [[ 10 ]]
                     | "\\r" => [[ 13 ]]
                     | "\\t" => [[ 9 ]]
 StringChars1       = (EscapeChar | !('"""') .)* => [[ >string ]]
@@ -58,11 +58,11 @@ Str                =   '"""' StringChars1:cs '"""' => [[ cs ast-string boa ]]
                      | '"' StringChars2:cs '"' => [[ cs ast-string boa ]]
                      | "'" StringChars3:cs "'" => [[ cs ast-string boa ]]
 RegExpFlags        = NameRest* => [[ >string ]]
-NonTerminator      = !("\n" | "\r") .
+NonTerminator      = !([\n\r]) .
 BackslashSequence  = "\\" NonTerminator => [[ second ]]
-RegExpFirstChar    =   !("*" | "\\" | "/") NonTerminator
+RegExpFirstChar    =   !([*\\/]) NonTerminator
                      | BackslashSequence
-RegExpChar         =   !("\\" | "/") NonTerminator
+RegExpChar         =   !([\\/]) NonTerminator
                      | BackslashSequence
 RegExpChars        = RegExpChar*
 RegExpBody         = RegExpFirstChar RegExpChars => [[ first2 swap prefix >string ]]
@@ -75,5 +75,5 @@ Special            =   "("    | ")"   | "{"   | "}"   | "["   | "]"   | ","   | 
                      | "||"   | "."   | "!"   | "&="  | "&"   | "|="  | "|"   | "^="
                      | "^"
 Tok                = Spaces (Name | Keyword | Number | Str | RegExp | Special )
-Toks               = Tok* Spaces 
+Toks               = Tok* Spaces
 ;EBNF
