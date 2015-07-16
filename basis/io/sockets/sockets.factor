@@ -442,10 +442,7 @@ M: object resolve-localhost
     { T{ ipv4 f "0.0.0.0" } }
     ? ;
 
-: host-name ( -- string )
-    256 <byte-array> dup dup length gethostname
-    zero? [ "gethostname failed" throw ] unless
-    ascii alien>string ;
+HOOK: host-name os ( -- string )
 
 M: inet (client) resolve-host (client) ;
 
