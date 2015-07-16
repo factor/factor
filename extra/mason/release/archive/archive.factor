@@ -37,12 +37,15 @@ IN: mason.release.archive
 
 : sign-factor.app? ( -- ? ) cert-path exists? ;
 
+: factor.app-path ( -- path )
+    build-dir get "factor/Factor.app/" append-path ;
+
 :: sign-factor.app ( -- )
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
         cert-path
-        current-directory get "Factor.app/" append-path
+        factor.app-path
     } short-running-process ;
 
 ! Make the .dmg
