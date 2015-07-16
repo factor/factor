@@ -9,18 +9,6 @@ ERROR: malformed-base64 ;
 
 <PRIVATE
 
-: read1-ignoring ( ignoring stream -- ch )
-    dup stream-read1 pick dupd member?
-    [ drop read1-ignoring ] [ 2nip ] if ; inline recursive
-
-: push-ignoring ( accum ch -- accum )
-    dup { f 0 } member-eq? [ drop ] [ suffix! ] if ; inline
-
-: read-ignoring ( n ignoring stream -- str/f )
-    [ [ <sbuf> ] keep ] 2dip
-    '[ _ _ read1-ignoring push-ignoring ] times
-    [ f ] [ "" like ] if-empty ; inline
-
 <<
 CONSTANT: alphabet
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
@@ -38,52 +26,57 @@ CONSTANT: alphabet
     $[ alphabet alphabet-inverse 0 CHAR: = pick set-nth ] nth
     [ malformed-base64 ] unless* ; inline
 
-SYMBOL: column
+: (write-lines) ( column byte-array -- column' )
+    output-stream get dup '[
+        _ stream-write1 1 + dup 76 = [
+            drop B{ CHAR: \r CHAR: \n } _ stream-write 0
+        ] when
+    ] each ; inline
 
-: write1-lines ( column/f ch stream -- column' )
-    [ stream-write1 ] keep swap [
-        1 + swap
-        '[ 76 = [ B{ CHAR: \r CHAR: \n } _ stream-write ] when ]
-        [ 76 mod ] bi
-    ] [ drop f ] if* ;
+: write-lines ( column byte-array -- column' )
+    over [ (write-lines) ] [ write ] if ; inline
 
-: write-lines ( str -- )
-    column output-stream get '[
-        swap [ _ write1-lines ] each
-    ] change ;
+: encode3 ( seq -- byte-array )
+    be> { -18 -12 -6 0 } '[
+        shift 0x3f bitand ch>base64
+    ] with B{ } map-as ; inline
 
-: encode3 ( seq -- )
-    column output-stream get '[
-        swap be> { -18 -12 -6 0 } [
-            shift 0x3f bitand ch>base64 _ write1-lines
-        ] with each
-    ] change ; inline
+: encode-pad ( seq n -- byte-array )
+    [ 3 0 pad-tail encode3 ] [ 1 + ] bi* head-slice
+    4 CHAR: = pad-tail ; inline
 
-: encode-pad ( seq n -- )
-    [ 3 0 pad-tail binary [ encode3 ] with-byte-writer ]
-    [ 1 + ] bi* head-slice 4 CHAR: = pad-tail write-lines ; inline
-
-: decode4 ( seq -- )
-    [ 0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ]
-    [ [ CHAR: = = ] count ] bi head-slice*
-    output-stream get '[ _ stream-write1 ] each ; inline
-
-: (encode-base64) ( stream -- )
-    3 over stream-read dup length {
+: (encode-base64) ( stream column -- column' )
+    3 pick stream-read dup length {
         { 0 [ 2drop ] }
-        { 3 [ encode3 (encode-base64) ] }
-        [ encode-pad (encode-base64) ]
+        { 3 [ encode3 write-lines (encode-base64) ] }
+        [ encode-pad write-lines (encode-base64) ]
     } case ;
 
 PRIVATE>
 
 : encode-base64 ( -- )
-    input-stream get (encode-base64) ;
+    input-stream get f (encode-base64) drop ;
 
 : encode-base64-lines ( -- )
-    0 column [ encode-base64 ] with-variable ;
+    input-stream get 0 (encode-base64) drop ;
 
 <PRIVATE
+
+: read1-ignoring ( ignoring stream -- ch )
+    dup stream-read1 pick dupd member?
+    [ drop read1-ignoring ] [ 2nip ] if ; inline recursive
+
+: push-ignoring ( accum ch -- accum )
+    dup { f 0 } member-eq? [ drop ] [ suffix! ] if ; inline
+
+: read-ignoring ( n ignoring stream -- sbuf )
+    [ [ <sbuf> ] keep ] 2dip
+    '[ _ _ read1-ignoring push-ignoring ] times ; inline
+
+: decode4 ( seq -- )
+    [ 0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ]
+    [ [ CHAR: = = ] count ] bi
+    [ write ] [ head-slice* write ] if-zero ; inline
 
 : (decode-base64) ( stream -- )
     4 "\n\r" pick read-ignoring dup length {
