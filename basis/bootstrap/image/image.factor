@@ -5,8 +5,8 @@ byte-arrays classes classes.builtin classes.private
 classes.tuple classes.tuple.private combinators
 combinators.short-circuit combinators.smart
 compiler.codegen.relocation compiler.units fry generic
-generic.single.private grouping hashtables hashtables.private
-io io.binary io.encodings.binary io.files io.pathnames kernel
+generic.single.private grouping hashtables hashtables.private io
+io.binary io.encodings.binary io.files io.pathnames kernel
 kernel.private layouts locals make math math.order namespaces
 namespaces.private parser parser.notes prettyprint quotations
 sequences sequences.private source-files strings system vectors
@@ -17,7 +17,7 @@ IN: bootstrap.image
     2dup [ windows? ] [ ppc? ] bi* or [
       [ drop unix ] dip
     ] unless
-    [ name>> ] [ name>> ] bi* "-" glue ;
+    [ name>> ] bi@ "-" glue ;
 
 : my-arch ( -- arch )
     os cpu arch ;
@@ -28,11 +28,11 @@ IN: bootstrap.image
 : my-boot-image-name ( -- string )
     my-arch boot-image-name ;
 
-: images ( -- seq )
+CONSTANT: images
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
-    } ;
+    }
 
 <PRIVATE
 
