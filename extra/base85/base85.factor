@@ -23,9 +23,9 @@ CONSTANT: alphabet
 : encode4 ( seq -- seq' )
     be> 5 [ 85 /mod ch>base85 ] B{ } replicate-as reverse! nip ; inline
 
-: (encode-base85) ( stream column -- column' )
+: (encode-base85) ( stream column -- )
     4 pick stream-read dup length {
-        { 0 [ 2drop ] }
+        { 0 [ 3drop ] }
         { 4 [ encode4 write-lines (encode-base85) ] }
         [ drop 4 0 pad-tail encode4 write-lines (encode-base85) ]
     } case ;
@@ -33,10 +33,10 @@ CONSTANT: alphabet
 PRIVATE>
 
 : encode-base85 ( -- )
-    input-stream get f (encode-base85) drop ;
+    input-stream get f (encode-base85) ;
 
 : encode-base85-lines ( -- )
-    input-stream get 0 (encode-base85) drop ;
+    input-stream get 0 (encode-base85) ;
 
 <PRIVATE
 
