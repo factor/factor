@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image checksums checksums.openssl io
 io.directories io.encodings.ascii io.files io.files.temp
-io.launcher io.pathnames kernel make namespaces sequences system ;
+io.launcher kernel make namespaces sequences system ;
 IN: bootstrap.image.upload
 
 SYMBOL: upload-images-destination
@@ -12,9 +12,11 @@ SYMBOL: upload-images-destination
     "slava_pestov@downloads.factorcode.org:downloads.factorcode.org/images/latest/"
     or ;
 
-: checksums ( -- temp ) "checksums.txt" temp-file ;
+: checksums ( -- temp )
+    "checksums.txt" temp-file ;
 
-: boot-image-names ( -- seq ) images [ boot-image-name ] map ;
+: boot-image-names ( -- seq )
+    images [ boot-image-name ] map ;
 
 : compute-checksums ( -- )
     checksums ascii [
@@ -42,8 +44,10 @@ M: windows scp-name "pscp" ;
     ] { } make try-process ;
 
 : new-images ( -- )
-    "" resource-path
-      [ make-images compute-checksums upload-images ]
-    with-directory ;
+    [
+        make-images
+        compute-checksums
+        upload-images
+    ] with-resource-directory ;
 
 MAIN: new-images
