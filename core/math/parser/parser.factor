@@ -240,7 +240,6 @@ DEFER: @neg-digit
             { CHAR: b [ drop  2 ->radix require-next-digit ] }
             { CHAR: o [ drop  8 ->radix require-next-digit ] }
             { CHAR: x [ drop 16 ->radix require-next-digit ] }
-            { f       [ 3drop 2drop 0 ] }
             [ [ drop ] 2dip swap call ]
         } case
     ] 2curry next-digit ; inline
