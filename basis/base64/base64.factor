@@ -24,12 +24,12 @@ ERROR: malformed-base64 ;
 <<
 CONSTANT: alphabet
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
->>
 
 : alphabet-inverse ( alphabet -- seq )
     dup supremum 1 + f <array> [
         '[ swap _ set-nth ] each-index
     ] keep ;
+>>
 
 : ch>base64 ( ch -- ch )
     alphabet nth ; inline
