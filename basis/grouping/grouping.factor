@@ -103,7 +103,10 @@ PRIVATE>
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-TUPLE: circular-slice { from read-only } { to read-only } { seq read-only } ;
+TUPLE: circular-slice
+    { from integer read-only }
+    { to integer read-only }
+    { seq read-only } ;
 
 INSTANCE: circular-slice virtual-sequence
 
