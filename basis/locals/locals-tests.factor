@@ -273,10 +273,12 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 { H{ { 10 "a" } { 20 "b" } { 30 "c" } } }
 [ 10 20 30 [| a b c | H{ { a "a" } { b "b" } { c "c" } } ] call ] unit-test
 
-{ T{ slice f 0 3 "abc" } }
-[ 0 3 "abc" [| from to seq | T{ slice f from to seq } ] call ] unit-test
+TUPLE: test-tuple a b c ;
 
-{ 3 1 } [| from to seq | T{ slice f from to seq } ] must-infer-as
+{ T{ test-tuple f 0 3 "abc" } }
+[ 0 3 "abc" [| a b c | T{ test-tuple f a b c } ] call ] unit-test
+
+{ 3 1 } [| a b c | T{ test-tuple f a b c } ] must-infer-as
 
 ERROR: punned-class x ;
 
