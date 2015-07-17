@@ -153,7 +153,7 @@ M: mixin-class see-class*
     <block \ MIXIN: pprint-word
     dup pprint-word <block
     dup members [
-        hard add-line-break
+        add-line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
     ] with each block> block> ;
 
