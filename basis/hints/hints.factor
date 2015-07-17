@@ -4,8 +4,8 @@ USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.encodings
 io.streams.string kernel kernel.private math math.parser
-namespaces parser sbufs sequences splitting splitting.private
-strings vectors words ;
+namespaces parser sbufs sequences sequences.private splitting
+splitting.private strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -95,9 +95,10 @@ set-specializer
     set-specializer
 ] each
 
-\ subseq
-{ { fixnum fixnum string } { fixnum fixnum array } }
-set-specializer
+{ subseq subseq-unsafe } [
+    { { fixnum fixnum string } { fixnum fixnum array } }
+    set-specializer
+] each
 
 \ reverse!
 { { string } { array } }
