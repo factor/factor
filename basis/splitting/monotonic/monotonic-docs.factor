@@ -3,23 +3,19 @@
 USING: help.markup help.syntax kernel quotations classes sequences ;
 IN: splitting.monotonic
 
-HELP: monotonic-slice
+HELP: monotonic-split-slice
 { $values
-     { "seq" sequence } { "quot" { $quotation ( obj1 obj2 -- ? ) } } { "slice-class" class }
-     { "slices" "a sequence of slices" }
+     { "seq" sequence } { "quot" { $quotation ( obj1 obj2 -- ? ) } }
+     { "pieces" "a sequence of slices" }
 }
-{ $description "Monotonically splits a sequence into slices of the type " { $snippet "slice-class" } "." }
+{ $description "Monotonically splits a sequence into slices." }
 { $examples
     { $example
         "USING: splitting.monotonic math prettyprint ;"
-        "{ 1 2 3 2 3 4 } [ < ] upward-slice monotonic-slice ."
+        "{ 1 2 3 2 3 4 } [ < ] monotonic-split-slice ."
         """{
-    T{ upward-slice { to 3 } { seq { 1 2 3 2 3 4 } } }
-    T{ upward-slice
-        { from 3 }
-        { to 6 }
-        { seq { 1 2 3 2 3 4 } }
-    }
+    T{ slice { to 3 } { seq { 1 2 3 2 3 4 } } }
+    T{ slice { from 3 } { to 6 } { seq { 1 2 3 2 3 4 } } }
 }"""
     }
 } ;
@@ -27,14 +23,14 @@ HELP: monotonic-slice
 HELP: monotonic-split
 { $values
      { "seq" sequence } { "quot" quotation }
-     { "newseq" "a sequence of sequences" }
+     { "pieces" "a sequence of sequences" }
 }
-{ $description "Compares pairs of elements in a sequence and collects elements into sequences while they satisfy the predicate. Once the predicate fails, a new sequence is started, and all sequences are returned in a single sequence." }
+{ $description "Monotonically splits a sequence." }
 { $examples
     { $example
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 2 3 4 } [ < ] monotonic-split ."
-        "{ V{ 1 2 3 } V{ 2 3 4 } }"
+        "{ { 1 2 3 } { 2 3 4 } }"
     }
 } ;
 
@@ -90,7 +86,7 @@ ARTICLE: "splitting.monotonic" "Splitting trending sequences"
 "Splitting into sequences:"
 { $subsections monotonic-split }
 "Splitting into slices:"
-{ $subsections monotonic-slice }
+{ $subsections monotonic-split-slice }
 "Trending:"
 { $subsections
     downward-slices

@@ -2,33 +2,33 @@ IN: splitting.monotonic
 USING: tools.test math arrays kernel sequences ;
 
 { { } } [ { } [ < ] monotonic-split ] unit-test
-{ { V{ 1 } } } [ { 1 } [ < ] monotonic-split ] unit-test
-{ { V{ 1 2 } } } [ { 1 2 } [ < ] monotonic-split ] unit-test
-{ { V{ 1 } V{ 2 } } } [ { 1 2 } [ > ] monotonic-split ] unit-test
-{ { V{ 1 } V{ -1 5 } V{ 2 4 } } }
+{ { { 1 } } } [ { 1 } [ < ] monotonic-split ] unit-test
+{ { { 1 2 } } } [ { 1 2 } [ < ] monotonic-split ] unit-test
+{ { { 1 } { 2 } } } [ { 1 2 } [ > ] monotonic-split ] unit-test
+{ { { 1 } { -1 5 } { 2 4 } } }
 [ { 1 -1 5 2 4 } [ < ] monotonic-split ] unit-test
-{ { V{ 1 1 1 1 } V{ 2 2 } V{ 3 } V{ 4 } V{ 5 } V{ 6 6 6 } } }
+{ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } }
 [ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split ] unit-test
 
 { { } }
-[ "" [ = ] slice monotonic-slice ] unit-test
+[ "" [ = ] monotonic-split-slice ] unit-test
 
 { t }
-[ { 1 } [ = ] slice monotonic-slice [ slice? ] all? ] unit-test
+[ { 1 } [ = ] monotonic-split-slice [ slice? ] all? ] unit-test
 
 { { { 1 } } }
-[ { 1 } [ = ] slice monotonic-slice [ >array ] map ] unit-test
+[ { 1 } [ = ] monotonic-split ] unit-test
 
-[ { 1 } [ = ] slice monotonic-slice ] must-infer
+[ { 1 } [ = ] monotonic-split-slice ] must-infer
 
 { t }
-[ { 1 1 1 2 2 3 3 4 } [ = ] slice monotonic-slice [ slice? ] all? ] unit-test
+[ { 1 1 1 2 2 3 3 4 } [ = ] monotonic-split-slice [ slice? ] all? ] unit-test
 
 { { { 1 1 1 } { 2 2 } { 3 3 } { 4 } } }
-[ { 1 1 1 2 2 3 3 4 } [ = ] slice monotonic-slice [ >array ] map ] unit-test
+[ { 1 1 1 2 2 3 3 4 } [ = ] monotonic-split ] unit-test
 
 { { { 3 3 } } }
-[ { 3 3 } [ = ] slice monotonic-slice [ >array ] map ] unit-test
+[ { 3 3 } [ = ] monotonic-split ] unit-test
 
 { { } } [ "" trends ] unit-test
 
@@ -64,14 +64,12 @@ USING: tools.test math arrays kernel sequences ;
 { { { 2 2 } { 3 3 3 3 } { 4 } { 5 } } }
 [
     { 2 2 3 3 3 3 4 5 }
-    [ [ odd? ] same? ] slice monotonic-slice
-    [ >array ] map
+    [ [ odd? ] same? ] monotonic-split
 ] unit-test
 
 {
     { { 1 1 1 } { 2 2 2 2 } { 3 3 } }
 } [
     { 1 1 1 2 2 2 2 3 3 }
-    [ [ odd? ] same? ] slice monotonic-slice
-    [ >array ] map
+    [ [ odd? ] same? ] monotonic-split
 ] unit-test
