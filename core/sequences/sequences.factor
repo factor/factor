@@ -276,6 +276,7 @@ INSTANCE: repetition immutable-sequence
 
 ERROR: integer-length-expected obj ;
 
+#! The check-length call forces partial dispatch
 : check-length ( n -- n )
     dup integer? [ integer-length-expected ] unless ; inline
 
@@ -308,7 +309,6 @@ C: <copy> copy-state
     [ swap length + ] dip lengthen ; inline
 
 : copy-unsafe ( src i dst -- )
-    #! The check-length call forces partial dispatch
     [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
 
 : subseq-unsafe ( from to seq -- subseq )
@@ -381,7 +381,7 @@ PRIVATE>
 <PRIVATE
 
 : ((each)) ( seq -- n quot )
-    [ length ] keep [ nth-unsafe ] curry ; inline
+    [ length check-length ] keep [ nth-unsafe ] curry ; inline
 
 : (each) ( seq quot -- n quot' )
     [ ((each)) ] dip compose ; inline
@@ -402,7 +402,7 @@ PRIVATE>
     [ nth-unsafe ] bi-curry@ bi ; inline
 
 : ((2each)) ( seq1 seq2 -- n quot )
-    [ min-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
+    [ min-length check-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
     [ ((2each)) ] dip compose ; inline
@@ -412,7 +412,7 @@ PRIVATE>
 
 : (3each) ( seq1 seq2 seq3 quot -- n quot' )
     [
-        [ [ length ] tri@ min min ]
+        [ [ length ] tri@ min min check-length ]
         [ [ 3nth-unsafe ] 3curry ] 3bi
     ] dip compose ; inline
 
