@@ -21,7 +21,7 @@ C: <word> word
     ] if ;
 
 : split-words ( seq -- half-elements )
-    [ [ break?>> ] same? ] monotonic-split ;
+    [ [ break?>> ] same? ] monotonic-split-slice ;
 
 : ?first-break ( seq -- newseq f/element )
     dup first first break?>>
