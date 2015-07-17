@@ -62,5 +62,5 @@ TUPLE: upward-slice < slice ;
         [ stable-slices ]
         [ upward-slices ] tri 3append [ from>> ] sort-with
     ] [
-        zero? [ ] [ [ 0 1 ] dip stable-slice boa ] if
+        zero? [ drop { } ] [ [ 0 1 ] dip stable-slice boa ] if
     ] if ;

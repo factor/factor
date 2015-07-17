@@ -30,6 +30,8 @@ USING: tools.test math arrays kernel sequences ;
 { { { 3 3 } } }
 [ { 3 3 } [ = ] slice monotonic-slice [ >array ] map ] unit-test
 
+{ { } } [ "" trends ] unit-test
+
 {
     {
         T{ upward-slice { from 0 } { to 3 } { seq { 1 2 3 2 1 } } }
