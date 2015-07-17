@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays circular combinators
-combinators.short-circuit compiler.utilities fry grouping
-kernel make math math.order namespaces sequences sorting ;
+USING: accessors arrays fry kernel locals make math namespaces
+sequences sorting ;
 IN: splitting.monotonic
 
 <PRIVATE
@@ -20,28 +19,28 @@ PRIVATE>
 
 <PRIVATE
 
-: (monotonic-slice) ( seq quot class -- slices )
+:: (monotonic-slice) ( seq quot: ( obj1 obj2 -- ? ) slice-class -- slices )
+    seq length :> len
     [
-        dupd '[
-            [ length iota ] [ ] [ 1 circular boa ] tri
-            [ @ not [ 1 + , ] [ drop ] if ] 3each
-        ] { } make
-        2dup {
-            [ nip empty? ]
-            [ [ length ] [ last ] bi* = not ]
-        } 2|| [ over length suffix ] when
-        0 prefix 2 <clumps>
-        swap
-    ] dip
-    '[ first2 _ _ boa ] map ; inline
+        0 ,
+
+        0 seq [ ] [
+            [ 1 + ] 2dip
+            [ quot call [ dup , ] unless ] keep
+        ] map-reduce 2drop
+
+        len building get ?last = [ len , ] unless
+
+    ] { } make dup rest-slice [ seq slice-class boa ] 2map ; inline
 
 PRIVATE>
 
-: monotonic-slice ( seq quot: ( obj1 obj2 -- ? ) class -- slices )
-    pick length dup 1 >
-    [ drop (monotonic-slice) ]
-    [ zero? [ 2drop ] [ nip [ 0 1 ] 2dip boa 1array ] if ]
-    if ; inline
+: monotonic-slice ( seq quot: ( obj1 obj2 -- ? ) slice-class -- slices )
+    pick length dup 1 > [
+        drop (monotonic-slice)
+    ] [
+        zero? [ 3drop { } ] [ nip [ 0 1 ] 2dip boa 1array ] if
+    ] if ; inline
 
 TUPLE: downward-slice < slice ;
 TUPLE: stable-slice < slice ;

@@ -5,20 +5,16 @@ IN: splitting.monotonic
 
 HELP: monotonic-slice
 { $values
-     { "seq" sequence } { "quot" quotation } { "class" class }
+     { "seq" sequence } { "quot" { $quotation ( obj1 obj2 -- ? ) } } { "slice-class" class }
      { "slices" "a sequence of slices" }
 }
-{ $description "Monotonically splits a sequence into slices of the type " { $snippet "class" } "." }
+{ $description "Monotonically splits a sequence into slices of the type " { $snippet "slice-class" } "." }
 { $examples
     { $example
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 2 3 4 } [ < ] upward-slice monotonic-slice ."
         """{
-    T{ upward-slice
-        { from 0 }
-        { to 3 }
-        { seq { 1 2 3 2 3 4 } }
-    }
+    T{ upward-slice { to 3 } { seq { 1 2 3 2 3 4 } } }
     T{ upward-slice
         { from 3 }
         { to 6 }
@@ -74,11 +70,7 @@ HELP: trends
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 3 2 1 } trends ."
         """{
-    T{ upward-slice
-        { from 0 }
-        { to 3 }
-        { seq { 1 2 3 3 2 1 } }
-    }
+    T{ upward-slice { to 3 } { seq { 1 2 3 3 2 1 } } }
     T{ stable-slice
         { from 2 }
         { to 4 }
