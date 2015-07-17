@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generic hashtables io kernel assocs math
-namespaces prettyprint prettyprint.custom prettyprint.sections
-sequences strings io.styles vectors words quotations mirrors
-splitting math.parser classes vocabs sets sorting summary
-debugger continuations fry combinators ;
+USING: accessors assocs continuations debugger fry hashtables io
+io.styles kernel math mirrors namespaces prettyprint
+prettyprint.custom prettyprint.sections sequences sets sorting
+summary ;
 FROM: namespaces => set ;
 IN: inspector
 
