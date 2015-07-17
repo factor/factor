@@ -367,4 +367,3 @@ unit-test
 
 { t } [ most-positive-fixnum number>string string>number fixnum? ] unit-test
 { t } [ most-negative-fixnum number>string string>number fixnum? ] unit-test
-
