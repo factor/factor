@@ -11,7 +11,7 @@ USING: tools.test math arrays kernel sequences ;
 [ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split ] unit-test
 
 { { } }
-[ { } [ = ] slice monotonic-slice ] unit-test
+[ "" [ = ] slice monotonic-slice ] unit-test
 
 { t }
 [ { 1 } [ = ] slice monotonic-slice [ slice? ] all? ] unit-test
