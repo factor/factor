@@ -422,20 +422,8 @@ PRIVATE>
 : (find) ( seq quot quot' -- i elt )
     pick [ [ (each) ] dip call ] dip finish-find ; inline
 
-: (find-from) ( n seq quot quot' -- i elt )
-    [ 2dup bounds-check? ] 2dip
-    [ (find) ] 2curry
-    [ 2drop f f ]
-    if ; inline
-
 : (find-index) ( seq quot quot' -- i elt )
     pick [ [ (each-index) ] dip call ] dip finish-find ; inline
-
-: (find-index-from) ( n seq quot quot' -- i elt )
-    [ 2dup bounds-check? ] 2dip
-    [ (find-index) ] 2curry
-    [ 2drop f f ]
-    if ; inline
 
 : (accumulate) ( seq identity quot -- identity seq quot )
     swapd [ curry keep ] curry ; inline
@@ -500,19 +488,19 @@ PRIVATE>
     [ pick ] dip swap 3map-as ; inline
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ (find-integer) ] (find-from) ; inline
+    [ (find-integer) ] (find) ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ find-integer ] (find) ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ nip find-last-integer ] (find-from) ; inline
+    [ nip find-last-integer ] (find) ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ [ 1 - ] dip find-last-integer ] (find) ; inline
 
 : find-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ (find-integer) ] (find-index-from) ; inline
+    [ (find-integer) ] (find-index) ; inline
 
 : find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     [ find-integer ] (find-index) ; inline
