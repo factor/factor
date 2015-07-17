@@ -311,6 +311,9 @@ C: <copy> copy-state
     #! The check-length call forces partial dispatch
     [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
 
+: subseq-unsafe ( from to seq -- subseq )
+    [ subseq>copy (copy) ] keep like ;
+
 PRIVATE>
 
 : subseq ( from to seq -- subseq )
