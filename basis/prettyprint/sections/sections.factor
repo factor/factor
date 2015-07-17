@@ -1,10 +1,9 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables io kernel math assocs
-namespaces make sequences strings io.styles vectors words
-prettyprint.config splitting classes continuations
-accessors sets vocabs.parser combinators vocabs
-classes.maybe combinators.short-circuit ;
+USING: accessors classes.maybe combinators
+combinators.short-circuit continuations hashtables io io.styles
+kernel make math namespaces prettyprint.config sequences sets
+splitting strings vocabs vocabs.parser words ;
 FROM: sets => members ;
 FROM: namespaces => set ;
 IN: prettyprint.sections
@@ -48,20 +47,23 @@ M: maybe vocabulary-name
 : do-indent ( -- ) pprinter get indent>> CHAR: \s <string> write ;
 
 : fresh-line ( n -- )
-    dup pprinter get last-newline>> = [
-        drop
+    pprinter get 2dup last-newline>> = [
+        2drop
     ] [
-        pprinter get last-newline<<
+        swap >>last-newline
         line-limit? [
-            "..." write pprinter get return
+            "..." write return
         ] when
-        pprinter get [ 1 + ] change-line-count drop
+        [ 1 + ] change-line-count drop
         nl do-indent
     ] if ;
 
 : text-fits? ( len -- ? )
-    margin get
-    [ drop t ] [ [ pprinter get indent>> + ] dip <= ] if-zero ;
+    margin get [
+        drop t
+    ] [
+        [ pprinter get indent>> + ] dip <=
+    ] if-zero ;
 
 ! Section protocol
 GENERIC: section-fits? ( section -- ? )
@@ -213,7 +215,7 @@ M: block short-section ( block -- )
 TUPLE: text-section < section string ;
 
 : <text> ( string style -- text )
-    over length 1 + \ text-section new-section
+    over length 1 + text-section new-section
         swap >>style
         swap >>string ;
 

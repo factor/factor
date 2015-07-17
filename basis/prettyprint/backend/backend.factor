@@ -1,14 +1,12 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-classes.algebra.private classes.intersection classes.maybe
-classes.tuple classes.tuple.private classes.union colors
-colors.constants combinators continuations effects generic
-hash-sets hashtables io io.pathnames io.styles kernel
-make math math.order math.parser namespaces prettyprint.config
+classes.algebra.private classes.maybe classes.private
+classes.tuple combinators continuations effects generic
+hash-sets hashtables io.pathnames io.styles kernel make math
+math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
-quotations sbufs sequences strings vectors words words.symbol
-classes.private ;
+quotations sbufs sequences strings vectors words ;
 FROM: sets => members ;
 IN: prettyprint.backend
 
