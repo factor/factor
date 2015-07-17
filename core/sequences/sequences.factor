@@ -433,6 +433,9 @@ PRIVATE>
 : each ( ... seq quot: ( ... x -- ... ) -- ... )
     (each) each-integer ; inline
 
+: each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
+    -rot (each) (each-integer) ; inline
+
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
 
@@ -465,6 +468,9 @@ PRIVATE>
 
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     (2each) each-integer ; inline
+
+: 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) i -- ... )
+    [ (2each) ] dip -rot (each-integer) ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     [ -rot ] dip 2each ; inline
@@ -572,7 +578,7 @@ PRIVATE>
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
-        [ [ bi* ] 2curry [ 1 ] 2dip (each) (each-integer) ]
+        [ [ bi* ] 2curry 1 each-from ]
         3bi
     ] if ; inline
 
@@ -964,11 +970,11 @@ PRIVATE>
 
 : map-reduce ( ..a seq map-quot: ( ..a elt -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ dup first ] dip [ call ] keep ] dip compose
-    swapd [ 1 ] 2dip (each) (each-integer) ; inline
+    swapd 1 each-from ; inline
 
 : 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ 2dup [ first ] bi@ ] dip [ call ] keep ] dip compose
-    [ -rot ] dip [ 1 ] 3dip (2each) (each-integer) ; inline
+    [ -rot ] dip 1 2each-from ; inline
 
 <PRIVATE
 
@@ -1042,9 +1048,6 @@ M: repetition sum [ elt>> ] [ len>> ] bi * ; inline
 
 : cartesian-product ( seq1 seq2 -- newseq )
     [ { } 2sequence ] cartesian-map ;
-
-: each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    -rot (each) (each-integer) ; inline
 
 <PRIVATE
 
