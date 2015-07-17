@@ -12,7 +12,7 @@ SYMBOL: num-steps
     2dup swap - num-steps get / <range> ;
 
 : generate-simpson-weights ( seq -- seq )
-    length 2 / 2 - { 2 4 } <repetition> concat
+    length 1 + 2/ 2 - { 2 4 } <repetition> concat
     { 1 4 } { 1 } surround ;
 
 : integrate-simpson ( from to quot -- x )
