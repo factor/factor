@@ -62,7 +62,7 @@ HELP: <model-field>
 { $description "Creates an editor gadget which targets the specified model. The model must contain a string, or another item with a defined " { $link length } ", as this will be checked during layout." } ;
 
 HELP: <action-field>
-{ $values { "quot" "a quotation ( string -- )" } { "gadget" editor } }
+{ $values { "quot" { $quotation ( string -- ) } } { "gadget" editor } }
 { $description "Creates an editor gadget with a blank model. Whenever a value is entered into the editor and Return pressed, the value is pushed on the stack as a string and the specified quotation is called. Note that the quotation cannot update the value in the field. " } ;
 
 

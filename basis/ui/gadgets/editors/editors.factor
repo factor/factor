@@ -648,7 +648,7 @@ M: model-field model-changed
 
 TUPLE: action-field < field quot ;
 
-: <action-field> ( quot -- gadget )
+: <action-field> ( quot: ( string -- ) -- gadget )
     action-field new-field
         swap >>quot ;
 
