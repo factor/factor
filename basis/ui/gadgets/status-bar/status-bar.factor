@@ -26,7 +26,7 @@ CONSTANT: status-bar-foreground COLOR: white
 : open-status-window ( gadget title/attributes -- )
     ?attributes f <model> >>status <world>
     dup status>> <status-bar> 
-    { 7 2 } <border> COLOR: FactorDarkSlateBlue <solid> >>interior 
+    { 7 2 } <border> status-bar-background <solid> >>interior 
     { 1 1 } >>fill 
     f track-add
     open-world-window ;
