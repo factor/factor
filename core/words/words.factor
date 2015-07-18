@@ -262,8 +262,9 @@ M: word forget*
         tri
     ] if ;
 
+! Can be foldable because the hashcode itself is immutable
 M: word hashcode*
-    nip 1 slot { integer } declare ; inline
+    nip 1 slot { fixnum } declare ; inline foldable
 
 M: word literalize <wrapper> ;
 
