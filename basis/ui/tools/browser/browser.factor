@@ -37,10 +37,12 @@ M: browser-gadget set-history-value
 : <help-header> ( browser-gadget -- gadget )
     model>> [ '[ _ $title ] try ] <pane-control> ;
     
+CONSTANT: help-header-background COLOR: FactorLightTan
+    
 : add-help-header ( track -- track )
     dup <help-header> { 3 3 } <border>
-    COLOR: FactorLightTan <solid> >>interior
-    COLOR: grey75 <solid-underlined> >>boundary
+    help-header-background <solid> >>interior
+    toolbar-border <solid-underlined> >>boundary
     { 1 0 } >>fill f track-add ;
 
 : <help-pane> ( browser-gadget -- gadget )
@@ -70,7 +72,7 @@ M: browser-gadget set-history-value
 : add-browser-toolbar ( track -- track )
     dup <browser-toolbar> { 3 3 } <border> 
     button-background <solid> >>interior
-    COLOR: grey75 <solid-underlined> >>boundary 
+    toolbar-border <solid-underlined> >>boundary 
     { 1 0 } >>fill f track-add ;
 
 : <browser-gadget> ( link -- gadget )
