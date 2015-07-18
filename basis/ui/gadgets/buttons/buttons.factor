@@ -121,7 +121,7 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
-CONSTANT: button-background COLOR: FactorTan
+CONSTANT: button-background COLOR: grey95
 CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
 
 : <border-button-pen> ( -- pen )
@@ -253,4 +253,7 @@ PRIVATE>
         bi assoc-each ;
 
 : add-toolbar ( track -- track )
-    dup <toolbar> { 3 3 } <border> align-left f track-add ;
+    dup <toolbar> { 3 3 } <border> 
+    button-background <solid> >>interior
+    COLOR: grey75 <solid-underlined> >>boundary
+    align-left f track-add ;
