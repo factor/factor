@@ -1,6 +1,5 @@
-USING: accessors assocs continuations fry hashtables io kernel
-make math namespaces prettyprint sequences sequences.private
-tools.test vectors ;
+USING: accessors assocs continuations fry hashtables kernel make
+math namespaces sequences slots.private tools.test ;
 IN: hashtables.tests
 
 { H{ } } [ { } [ dup ] H{ } map>assoc ] unit-test
@@ -186,3 +185,16 @@ H{ } "x" set
 
 ! Random test case
 { "A" } [ 100 iota [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 of ] unit-test
+
+! Bug 1392, word's hashcode was declared a fixnum
+! It fails depending on hash growth, so test in a loop
+SYMBOL: +bignum-hashcode+
+-405534154 +bignum-hashcode+ 1 set-slot
+{ t } [
+    100 iota [
+        drop
+        H{ } clone
+        f +bignum-hashcode+ pick set-at
+        +bignum-hashcode+ +bignum-hashcode+ pick set-at assoc-size 1 =
+    ] all?
+] unit-test

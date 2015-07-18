@@ -263,7 +263,7 @@ M: word forget*
     ] if ;
 
 M: word hashcode*
-    nip 1 slot { fixnum } declare ; inline foldable
+    nip 1 slot { integer } declare ; inline
 
 M: word literalize <wrapper> ;
 
