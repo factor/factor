@@ -111,23 +111,29 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         bi
     ] { } make [ ($navigation-table) ] unless-empty ;
 
-: ($navigation) ( topic -- )
-    help-path-style get [
-        [ help-path [ reverse $breadcrumbs ] unless-empty ]
-        [ $navigation-table ] bi
-    ] with-style ;
+: ($navigation-path) ( topic -- )
+    help-path-style get
+       [ help-path [ reverse $breadcrumbs ] unless-empty ]
+    with-style ;
+
+: ($navigation-prev-next) ( topic -- )
+    help-path-style get 
+       [ $navigation-table ]
+    with-style ;
 
 : $title ( topic -- )
     title-style get [
         title-style get [
-            [ ($title) ] [ ($navigation) ] bi
+            [ ($title) ] [ ($navigation-path) ] bi
         ] with-nesting
     ] with-style ;
 
 : print-topic ( topic -- )
     >link
     last-element off
-    [ $title ] [ ($blank-line) article-content print-content nl ] bi ;
+    [ nl article-content print-content nl ] 
+    [ ($blank-line) ($navigation-prev-next) ] 
+    bi ;
 
 SYMBOL: help-hook
 
