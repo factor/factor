@@ -261,13 +261,15 @@ M: slice length [ to>> ] [ from>> ] bi - ; inline
 INSTANCE: slice virtual-sequence
 
 ! One element repeated many times
-TUPLE: repetition { len read-only } { elt read-only } ;
+TUPLE: repetition
+    { length integer read-only }
+    { elt read-only } ;
 
 : <repetition> ( len elt -- repetition )
     over 0 < [ non-negative-integer-expected ] when
     repetition boa ; inline
 
-M: repetition length len>> ; inline
+M: repetition length length>> ; inline
 M: repetition nth-unsafe nip elt>> ; inline
 
 INSTANCE: repetition immutable-sequence
@@ -841,7 +843,7 @@ M: object sum-lengths
     0 [ length + ] reduce ;
 
 M: repetition sum-lengths
-    [ len>> ] [ elt>> length ] bi * ;
+    [ length>> ] [ elt>> length ] bi * ;
 
 : concat-as ( seq exemplar -- newseq )
     [
@@ -1038,7 +1040,7 @@ PRIVATE>
 GENERIC: sum ( seq -- n )
 M: object sum 0 [ + ] binary-reduce ; inline
 M: iota-tuple sum length dup 1 - * 2/ ; inline
-M: repetition sum [ elt>> ] [ len>> ] bi * ; inline
+M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
