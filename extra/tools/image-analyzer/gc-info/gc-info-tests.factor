@@ -1,6 +1,6 @@
-USING: accessors arrays assocs bit-arrays classes.struct combinators
-combinators.short-circuit compiler compiler.cfg.debugger
-compiler.cfg.instructions compiler.cfg.linearization
+USING: accessors alien.c-types alien.syntax arrays assocs bit-arrays
+classes.struct combinators combinators.short-circuit compiler
+compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.stack-frame compiler.codegen.gc-maps compiler.units fry generic
 grouping io io.encodings.binary io.streams.byte-array kernel math namespaces
 random sequences sequences.generalizations
