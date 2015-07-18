@@ -34,8 +34,21 @@ M: browser-gadget set-history-value
     [ set-control-value ]
     2bi ;
 
+: <help-header> ( browser-gadget -- gadget )
+    model>> [ '[ _ $title ] try ] <pane-control> ;
+    
+: add-help-header ( track -- track )
+    dup <help-header> { 3 3 } <border>
+    COLOR: FactorLightTan <solid> >>interior
+    COLOR: grey75 <solid-underlined> >>boundary
+    { 1 0 } >>fill f track-add ;
+
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
+    
+: add-help-pane ( track -- track )
+    dup dup <help-pane> { 10 0 } <border> { 1 1 } >>fill
+    <scroller> >>scroller scroller>> 1 track-add ;
 
 : search-browser ( string browser -- )
     '[ <apropos-search> _ show-help ] unless-empty ;
@@ -43,7 +56,8 @@ M: browser-gadget set-history-value
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
         10 >>min-cols
-        10 >>max-cols ;
+        10 >>max-cols
+        COLOR: white <solid> >>interior ;
 
 : <browser-toolbar> ( browser -- toolbar )
     horizontal <track>
@@ -51,7 +65,13 @@ M: browser-gadget set-history-value
         1/2 >>align
         { 5 5 } >>gap
         over <toolbar> f track-add
-        swap search-field>> "Search:" label-on-left 1 track-add ;
+        swap search-field>> "          Search" label-on-left 1 track-add ;
+
+: add-browser-toolbar ( track -- track )
+    dup <browser-toolbar> { 3 3 } <border> 
+    button-background <solid> >>interior
+    COLOR: grey75 <solid-underlined> >>boundary 
+    { 1 0 } >>fill f track-add ;
 
 : <browser-gadget> ( link -- gadget )
     vertical browser-gadget new-track
@@ -59,9 +79,9 @@ M: browser-gadget set-history-value
         swap >link <model> >>model
         dup <history> >>history
         dup <search-field> >>search-field
-        dup <browser-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
-        dup dup <help-pane> { 10 0 } <border> { 1 1 } >>fill
-        <scroller> >>scroller scroller>> 1 track-add ;
+        add-browser-toolbar
+        add-help-header
+        add-help-pane ;
 
 M: browser-gadget graft*
     [ add-definition-observer ] [ call-next-method ] bi ;
