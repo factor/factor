@@ -221,7 +221,9 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
     vertical listener-gadget new-track
         add-toolbar
         init-input/output
-        dup output>> <scroller> >>scroller
+        dup output>> 
+        { 7 7 } <border> { 1 1 } >>fill
+        <scroller> >>scroller
         dup scroller>> 1 track-add
         init-error-summary ;
 
