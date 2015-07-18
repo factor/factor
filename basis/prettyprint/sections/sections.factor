@@ -94,9 +94,11 @@ style overhang ;
 
 : new-section ( length class -- section )
     new
-        position get >>start
-        swap position [ + ] change
-        position get >>end
+        position [
+            [ >>start ] keep
+            swapd +
+            [ >>end ] keep
+        ] change
         0 >>overhang ; inline
 
 M: section section-fits? ( section -- ? )
@@ -157,13 +159,13 @@ M: line-break long-section drop ;
 ! Block sections
 TUPLE: block < section sections ;
 
-: new-block ( style class -- block )
+: new-block ( class -- block )
     0 swap new-section
-        V{ } clone >>sections
-        swap >>style ; inline
+        V{ } clone >>sections ; inline
 
 : <block> ( style -- block )
-    block new-block ;
+    block new-block
+        swap >>style ;
 
 : pprinter-block ( -- block ) pprinter-stack get last ;
 
@@ -232,13 +234,13 @@ M: text-section long-section short-section ;
 
 : styled-text ( string style -- ) <text> add-section ;
 
-: text ( string -- ) H{ } styled-text ;
+: text ( string -- ) f styled-text ;
 
 ! Inset section
 TUPLE: inset < block narrow? ;
 
 : <inset> ( narrow? -- block )
-    H{ } inset new-block
+    inset new-block
         2 >>overhang
         swap >>narrow? ;
 
@@ -259,7 +261,7 @@ M: inset newline-after? drop t ;
 TUPLE: flow < block ;
 
 : <flow> ( -- block )
-    H{ } flow new-block ;
+    flow new-block ;
 
 M: flow short-section? ( section -- ? )
     #! If we can make room for this entire block by inserting
@@ -276,7 +278,7 @@ M: flow short-section? ( section -- ? )
 TUPLE: colon < block ;
 
 : <colon> ( -- block )
-    H{ } colon new-block ;
+    colon new-block ;
 
 M: colon long-section short-section ;
 

@@ -32,7 +32,7 @@ M: highlighted-word word-style
 <PRIVATE
 
 : colored-presentation-style ( obj color -- style )
-    H{ } clone [
+    2 <hashtable> [
         [ presented foreground ] dip
         [ set-at ] curry bi-curry@ bi*
     ] keep ;
@@ -53,4 +53,4 @@ H{
 } stack-effect-style set-global
 
 : effect-style ( effect -- style )
-    presented associate stack-effect-style get assoc-union ;
+    presented associate stack-effect-style get assoc-union! ;
