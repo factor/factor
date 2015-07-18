@@ -22,7 +22,7 @@ SYMBOL: gl-scale-factor
 
 : error>string ( n -- string )
     H{
-        { 0x0 "No error" }
+        { 0x0000 "No error" }
         { 0x0501 "Invalid value" }
         { 0x0500 "Invalid enumerant" }
         { 0x0502 "Invalid operation" }
@@ -86,9 +86,11 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-texture-coord-pointer ( seq -- )
     [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
 
+: (line-vertices) ( a b -- vertices )
+    [ first2 [ 0.3 + ] bi@ ] bi@ 4 float-array{ } nsequence ;
+
 : line-vertices ( a b -- )
-    [ first2 [ 0.5 + ] bi@ ] bi@ 4 float-array{ } nsequence
-    gl-vertex-pointer ;
+    (line-vertices) gl-vertex-pointer ;
 
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
@@ -97,14 +99,14 @@ MACRO: all-enabled-client-state ( seq quot -- )
     #! We use GL_LINE_STRIP with a duplicated first vertex
     #! instead of GL_LINE_LOOP to work around a bug in Apple's
     #! X3100 driver.
-    loc first2 :> ( x y )
-    dim first2 :> ( w h )
+    loc first2 [ 0.3 - ] bi@ :> ( x y )
+    dim first2 [ 0.6 + ] bi@ :> ( w h )
     [
-        x 0.5 +     y 0.5 +
-        x w + 0.3 - y 0.5 +
-        x w + 0.3 - y h + 0.3 -
-        x           y h + 0.3 -
-        x 0.5 +     y 0.5 +
+        x           y
+        x w +       y
+        x w +       y h +
+        x           y h +
+        x           y
     ] float-array{ } output>sequence ;
 
 : rect-vertices ( loc dim -- )
