@@ -11,7 +11,6 @@ QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
 QUALIFIED: gml.coremath
-QUALIFIED: llvm.types
 QUALIFIED: opencl
 
 : normal? ( word -- ? )
@@ -86,15 +85,29 @@ QUALIFIED: opencl
     [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
 ] unit-test
 
+
+! Originally from llvm.types, but llvm moved to unmaintained
+TYPEDEF: void* LLVMTypeRef
+TYPEDEF: void* LLVMTypeHandleRef
+FUNCTION: LLVMTypeRef LLVMResolveTypeHandle ( LLVMTypeHandleRef TypeHandle ) ;
+FUNCTION: LLVMTypeHandleRef LLVMCreateTypeHandle ( LLVMTypeRef PotentiallyAbstractTy ) ;
+FUNCTION: void LLVMRefineType ( LLVMTypeRef AbstractTy, LLVMTypeRef ConcreteTy ) ;
+FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle ) ;
+
+: resolve-types ( typeref typeref -- typeref )
+    over LLVMCreateTypeHandle [ LLVMRefineType ] dip
+    [ LLVMResolveTypeHandle ] keep LLVMDisposeTypeHandle ;
+
 ! base-pointer-groups
 { t } [
-    \ llvm.types:resolve-types
+    \ resolve-types
     [ base-pointer-groups-expected ] [ base-pointer-groups-decoded ] bi =
 ] unit-test
 
+
 ! Tough words #1227
 { t } [
-    \ llvm.types:resolve-types
+    \ resolve-types
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
