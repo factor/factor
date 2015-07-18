@@ -123,6 +123,7 @@ PRIVATE>
 
 CONSTANT: button-background COLOR: grey95
 CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
+CONSTANT: toolbar-border COLOR: grey75
 
 : <border-button-pen> ( -- pen )
     "button" button-background button-clicked-background
@@ -255,5 +256,5 @@ PRIVATE>
 : add-toolbar ( track -- track )
     dup <toolbar> { 3 3 } <border> 
     button-background <solid> >>interior
-    COLOR: grey75 <solid-underlined> >>boundary
+    toolbar-border <solid-underlined> >>boundary
     align-left f track-add ;
