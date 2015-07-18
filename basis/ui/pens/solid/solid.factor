@@ -30,3 +30,18 @@ M: solid draw-boundary
 
 M: solid pen-background
     nip color>> dup alpha>> 1 number= [ drop transparent ] unless ;
+
+TUPLE: solid-underlined < solid ;
+
+: <solid-underlined> ( color -- solid-underlined ) 
+    solid-underlined new swap >>color ;
+
+<PRIVATE
+
+: bottom-vertices-only ( vertices -- bottom-vertices )
+    { 6 7 4 5 4 5 6 7 6 7 } swap nths ;
+
+PRIVATE>
+
+M: solid-underlined boundary-vertices>>
+    call-next-method bottom-vertices-only ;
