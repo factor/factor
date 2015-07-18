@@ -33,6 +33,7 @@ M: separator-pen draw-interior
 
 : <menu-items> ( items -- gadget )
     [ <filled-pile> ] dip add-gadgets
+    { 3 3 } <border>
     panel-background-color <solid> >>interior ;
 
 PRIVATE>
