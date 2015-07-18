@@ -65,6 +65,12 @@ M: maybe vocabulary-name
         [ pprinter get indent>> + ] dip <=
     ] if-zero ;
 
+! break only if position margin 2 / >
+SYMBOL: soft
+
+! always breaks
+SYMBOL: hard
+
 ! Section protocol
 GENERIC: section-fits? ( section -- ? )
 
@@ -88,11 +94,9 @@ style overhang ;
 
 : new-section ( length class -- section )
     new
-        position [
-            [ >>start ] keep
-            swapd +
-            [ >>end ] keep
-        ] change
+        position get >>start
+        swap position [ + ] change
+        position get >>end
         0 >>overhang ; inline
 
 M: section section-fits? ( section -- ? )
@@ -142,8 +146,9 @@ M: object short-section? section-fits? ;
 ! Break section
 TUPLE: line-break < section type ;
 
-: <line-break> ( -- section )
-    0 line-break new-section ;
+: <line-break> ( type -- section )
+    0 line-break new-section
+        swap >>type ;
 
 M: line-break short-section drop ;
 
@@ -152,13 +157,13 @@ M: line-break long-section drop ;
 ! Block sections
 TUPLE: block < section sections ;
 
-: new-block ( class -- block )
+: new-block ( style class -- block )
     0 swap new-section
-        V{ } clone >>sections ; inline
+        V{ } clone >>sections
+        swap >>style ; inline
 
 : <block> ( style -- block )
-    block new-block
-        swap >>style ;
+    block new-block ;
 
 : pprinter-block ( -- block ) pprinter-stack get last ;
 
@@ -181,7 +186,7 @@ TUPLE: block < section sections ;
         [ short-section? ]
     } 1&& [ bl ] when ;
 
-: add-line-break ( -- ) <line-break> add-section ;
+: add-line-break ( type -- ) [ <line-break> add-section ] when* ;
 
 M: block section-fits? ( section -- ? )
     line-limit? [ drop t ] [ call-next-method ] if ;
@@ -197,8 +202,10 @@ M: block short-section ( block -- )
     [ advance ] pprint-sections ;
 
 : do-break ( break -- )
-    dup end>> pprinter get last-newline>> - margin get 2/ >
-    [ <fresh-line ] [ drop ] if ;
+    [ ]
+    [ type>> hard eq? ]
+    [ end>> pprinter get last-newline>> - margin get 2/ > ] tri
+    or [ <fresh-line ] [ drop ] if ;
 
 : empty-block? ( block -- ? ) sections>> empty? ;
 
@@ -225,13 +232,13 @@ M: text-section long-section short-section ;
 
 : styled-text ( string style -- ) <text> add-section ;
 
-: text ( string -- ) f styled-text ;
+: text ( string -- ) H{ } styled-text ;
 
 ! Inset section
 TUPLE: inset < block narrow? ;
 
 : <inset> ( narrow? -- block )
-    inset new-block
+    H{ } inset new-block
         2 >>overhang
         swap >>narrow? ;
 
@@ -252,7 +259,7 @@ M: inset newline-after? drop t ;
 TUPLE: flow < block ;
 
 : <flow> ( -- block )
-    flow new-block ;
+    H{ } flow new-block ;
 
 M: flow short-section? ( section -- ? )
     #! If we can make room for this entire block by inserting
@@ -269,7 +276,7 @@ M: flow short-section? ( section -- ? )
 TUPLE: colon < block ;
 
 : <colon> ( -- block )
-    colon new-block ;
+    H{ } colon new-block ;
 
 M: colon long-section short-section ;
 

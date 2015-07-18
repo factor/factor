@@ -19,6 +19,14 @@ HELP: fresh-line
 { $values { "n" "the current column position" } }
 { $description "Advances the prettyprinter by one line unless the current line is empty. If the line limit is exceeded, escapes the prettyprinter by restoring a continuation captured in " { $link do-pprint } "." } ;
 
+HELP: soft
+{ $description "Possible input parameter to " { $link line-break } "." } ;
+
+HELP: hard
+{ $description "Possible input parameter to " { $link line-break } "." } ;
+
+{ soft hard } related-words
+
 HELP: section-fits?
 { $values { "section" section } { "?" boolean } }
 { $contract "Tests if a section fits in the space that remains on the current line." } ;
@@ -102,7 +110,8 @@ HELP: pprint-section
 $prettyprinting-note ;
 
 HELP: line-break
-{ $description "Adds a section introducing a line break to the current block. If the block is output as a " { $link short-section } ", all breaks are ignored. Otherwise, breaks introduce unconditional newlines." }
+{ $values { "type" { $link soft } " or " { $link hard } } }
+{ $description "Adds a section introducing a line break to the current block. If the block is output as a " { $link short-section } ", all breaks are ignored. Otherwise, hard breaks introduce unconditional newlines, and soft breaks introduce a newline if the position is more than half of the " { $link margin } "." }
 $prettyprinting-note ;
 
 HELP: block
