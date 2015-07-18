@@ -99,8 +99,8 @@ MACRO: all-enabled-client-state ( seq quot -- )
     #! We use GL_LINE_STRIP with a duplicated first vertex
     #! instead of GL_LINE_LOOP to work around a bug in Apple's
     #! X3100 driver.
-    loc first2 [ 0.3 - ] bi@ :> ( x y )
-    dim first2 [ 0.6 + ] bi@ :> ( w h )
+    loc first2 [ 0.3 + ] bi@ :> ( x y )
+    dim first2 [ 0.6 - ] bi@ :> ( w h )
     [
         x           y
         x w +       y
