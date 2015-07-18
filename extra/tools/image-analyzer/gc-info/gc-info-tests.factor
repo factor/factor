@@ -11,7 +11,6 @@ QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
 QUALIFIED: gml.coremath
-QUALIFIED: llvm.types
 QUALIFIED: opencl
 
 : normal? ( word -- ? )
@@ -86,18 +85,7 @@ QUALIFIED: opencl
     [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
 ] unit-test
 
-! base-pointer-groups
-{ t } [
-    \ llvm.types:resolve-types
-    [ base-pointer-groups-expected ] [ base-pointer-groups-decoded ] bi =
-] unit-test
-
 ! Tough words #1227
-{ t } [
-    \ llvm.types:resolve-types
-    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
-] unit-test
-
 { t } [
     \ opencl:cl-queue-kernel
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
