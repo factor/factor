@@ -13,7 +13,7 @@ FUNCTION: MCIERROR mciSendStringW (
   LPTSTR lpszReturnString,
   UINT cchReturn,
   HANDLE hwndCallback
-) ;
+)
 
 ALIAS: mciSendString mciSendStringW
 

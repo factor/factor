@@ -17,8 +17,8 @@ LIBRARY: libudis86
 
 TYPEDEF: void ud
 
-FUNCTION: void ud_translate_intel ( ud* u ) ;
-FUNCTION: void ud_translate_att ( ud* u ) ;
+FUNCTION: void ud_translate_intel ( ud* u )
+FUNCTION: void ud_translate_att ( ud* u )
 
 : UD_SYN_INTEL ( -- addr ) &: ud_translate_intel ; inline
 : UD_SYN_ATT ( -- addr ) &: ud_translate_att ; inline
@@ -28,22 +28,22 @@ CONSTANT: UD_INP_CACHE_SZ 32
 CONSTANT: UD_VENDOR_AMD   0
 CONSTANT: UD_VENDOR_INTEL 1
 
-FUNCTION: void ud_init ( ud* u ) ;
-FUNCTION: void ud_set_mode ( ud* u, uchar mode ) ;
-FUNCTION: void ud_set_pc ( ud* u, ulonglong pc ) ;
-FUNCTION: void ud_set_input_buffer ( ud* u, c-string offset, size_t size ) ;
-FUNCTION: void ud_set_vendor ( ud* u, uint vendor ) ;
-FUNCTION: void ud_set_syntax ( ud* u, void* syntax ) ;
-FUNCTION: void ud_input_skip ( ud* u, size_t size ) ;
-FUNCTION: int ud_input_end ( ud* u ) ;
-FUNCTION: uint ud_decode ( ud* u ) ;
-FUNCTION: uint ud_disassemble ( ud* u ) ;
-FUNCTION: c-string ud_insn_asm ( ud* u ) ;
-FUNCTION: void* ud_insn_ptr ( ud* u ) ;
-FUNCTION: ulonglong ud_insn_off ( ud* u ) ;
-FUNCTION: c-string ud_insn_hex ( ud* u ) ;
-FUNCTION: uint ud_insn_len ( ud* u ) ;
-FUNCTION: c-string ud_lookup_mnemonic ( int c ) ;
+FUNCTION: void ud_init ( ud* u )
+FUNCTION: void ud_set_mode ( ud* u, uchar mode )
+FUNCTION: void ud_set_pc ( ud* u, ulonglong pc )
+FUNCTION: void ud_set_input_buffer ( ud* u, c-string offset, size_t size )
+FUNCTION: void ud_set_vendor ( ud* u, uint vendor )
+FUNCTION: void ud_set_syntax ( ud* u, void* syntax )
+FUNCTION: void ud_input_skip ( ud* u, size_t size )
+FUNCTION: int ud_input_end ( ud* u )
+FUNCTION: uint ud_decode ( ud* u )
+FUNCTION: uint ud_disassemble ( ud* u )
+FUNCTION: c-string ud_insn_asm ( ud* u )
+FUNCTION: void* ud_insn_ptr ( ud* u )
+FUNCTION: ulonglong ud_insn_off ( ud* u )
+FUNCTION: c-string ud_insn_hex ( ud* u )
+FUNCTION: uint ud_insn_len ( ud* u )
+FUNCTION: c-string ud_lookup_mnemonic ( int c )
 
 : <ud> ( -- ud )
     1,000 malloc &free

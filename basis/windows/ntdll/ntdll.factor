@@ -160,4 +160,4 @@ FUNCTION: NTSTATUS NtQueryInformationProcess (
     PVOID ProcessInformation,
     ULONG ProcessInformationLength,
     PULONG ReturnLength
-) ;
+)

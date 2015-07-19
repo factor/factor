@@ -13,7 +13,7 @@ FUNCTION: HRESULT
         FLOAT               Length,
         UINT                Sides,
         LPD3DXMESH*         ppMesh,
-        LPD3DXBUFFER*       ppAdjacency ) ;
+        LPD3DXBUFFER*       ppAdjacency )
 
 FUNCTION: HRESULT
     D3DXCreateBox (
@@ -22,7 +22,7 @@ FUNCTION: HRESULT
         FLOAT               Height,
         FLOAT               Depth,
         LPD3DXMESH*         ppMesh,
-        LPD3DXBUFFER*       ppAdjacency ) ;
+        LPD3DXBUFFER*       ppAdjacency )
 
 FUNCTION: HRESULT
     D3DXCreateCylinder (
@@ -33,7 +33,7 @@ FUNCTION: HRESULT
         UINT                Slices,
         UINT                Stacks,
         LPD3DXMESH*         ppMesh,
-        LPD3DXBUFFER*       ppAdjacency ) ;
+        LPD3DXBUFFER*       ppAdjacency )
 
 FUNCTION: HRESULT
     D3DXCreateSphere (
@@ -42,7 +42,7 @@ FUNCTION: HRESULT
         UINT               Slices,
         UINT               Stacks,
         LPD3DXMESH*        ppMesh,
-        LPD3DXBUFFER*      ppAdjacency ) ;
+        LPD3DXBUFFER*      ppAdjacency )
 
 FUNCTION: HRESULT
     D3DXCreateTorus (
@@ -52,13 +52,13 @@ FUNCTION: HRESULT
         UINT                Sides,
         UINT                Rings,
         LPD3DXMESH*         ppMesh,
-        LPD3DXBUFFER*       ppAdjacency ) ;
+        LPD3DXBUFFER*       ppAdjacency )
 
 FUNCTION: HRESULT
     D3DXCreateTeapot (
         LPDIRECT3DDEVICE9   pDevice,
         LPD3DXMESH*         ppMesh,
-        LPD3DXBUFFER*       ppAdjacency ) ;
+        LPD3DXBUFFER*       ppAdjacency )
 
 FUNCTION: HRESULT
     D3DXCreateTextA (
@@ -69,7 +69,7 @@ FUNCTION: HRESULT
         FLOAT               Extrusion,
         LPD3DXMESH*         ppMesh,
         LPD3DXBUFFER*       ppAdjacency,
-        LPGLYPHMETRICSFLOAT pGlyphMetrics ) ;
+        LPGLYPHMETRICSFLOAT pGlyphMetrics )
 
 FUNCTION: HRESULT
     D3DXCreateTextW (
@@ -80,6 +80,6 @@ FUNCTION: HRESULT
         FLOAT               Extrusion,
         LPD3DXMESH*         ppMesh,
         LPD3DXBUFFER*       ppAdjacency,
-        LPGLYPHMETRICSFLOAT pGlyphMetrics ) ;
+        LPGLYPHMETRICSFLOAT pGlyphMetrics )
 
 ALIAS: D3DXCreateText D3DXCreateTextW

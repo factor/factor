@@ -867,7 +867,7 @@ LIBRARY: kernel32
 ! FUNCTION: AddRefActCtx
 ! FUNCTION: AddVectoredExceptionHandler
 ! FUNCTION: AllocateUserPhysicalPages
-FUNCTION: BOOL AllocConsole ( ) ;
+FUNCTION: BOOL AllocConsole ( )
 ! FUNCTION: AreFileApisANSI
 ! FUNCTION: AssignProcessToJobObject
 ! FUNCTION: AttachConsole
@@ -887,7 +887,7 @@ FUNCTION: BOOL AllocConsole ( ) ;
 ! FUNCTION: BaseUpdateAppcompatCache
 ! FUNCTION: Beep
 ! FUNCTION: BeginUpdateResourceA
-FUNCTION: HANDLE BeginUpdateResourceW ( LPCTSTR pFileName, BOOL bDeleteExistingResources ) ;
+FUNCTION: HANDLE BeginUpdateResourceW ( LPCTSTR pFileName, BOOL bDeleteExistingResources )
 ALIAS: BeginUpdateResource BeginUpdateResourceW
 ! FUNCTION: BindIoCompletionCallback
 ! FUNCTION: BuildCommDCBA
@@ -897,7 +897,7 @@ ALIAS: BeginUpdateResource BeginUpdateResourceW
 ! FUNCTION: CallNamedPipeA
 ! FUNCTION: CallNamedPipeW
 ! FUNCTION: CancelDeviceWakeupRequest
-FUNCTION: BOOL CancelIo ( HANDLE h ) ;
+FUNCTION: BOOL CancelIo ( HANDLE h )
 ! FUNCTION: CancelTimerQueueTimer
 ! FUNCTION: CancelWaitableTimer
 ! FUNCTION: ChangeTimerQueueTimer
@@ -907,7 +907,7 @@ FUNCTION: BOOL CancelIo ( HANDLE h ) ;
 ! FUNCTION: ClearCommBreak
 ! FUNCTION: ClearCommError
 ! FUNCTION: CloseConsoleHandle
-FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
+FUNCTION: BOOL CloseHandle ( HANDLE h )
 ! FUNCTION: CloseProfileUserMapping
 ! FUNCTION: CmdBatNotification
 ! FUNCTION: CommConfigDialogA
@@ -915,7 +915,7 @@ FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 ! FUNCTION: CompareFileTime
 ! FUNCTION: CompareStringA
 ! FUNCTION: CompareStringW
-FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped ) ;
+FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: ConsoleMenuControl
 ! FUNCTION: ContinueDebugEvent
 ! FUNCTION: ConvertDefaultLocale
@@ -924,7 +924,7 @@ FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: CopyFileA
 ! FUNCTION: CopyFileExA
 ! FUNCTION: CopyFileExW
-FUNCTION: BOOL CopyFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName, BOOL bFailIfExists ) ;
+FUNCTION: BOOL CopyFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName, BOOL bFailIfExists )
 ALIAS: CopyFile CopyFileW
 ! FUNCTION: CopyLZFile
 ! FUNCTION: CreateActCtxA
@@ -933,7 +933,7 @@ ALIAS: CopyFile CopyFileW
 ! FUNCTION: CreateDirectoryA
 ! FUNCTION: CreateDirectoryExA
 ! FUNCTION: CreateDirectoryExW
-FUNCTION: BOOL CreateDirectoryW ( LPCTSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttribytes ) ;
+FUNCTION: BOOL CreateDirectoryW ( LPCTSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttribytes )
 ALIAS: CreateDirectory CreateDirectoryW
 
 ! FUNCTION: CreateEventA
@@ -942,7 +942,7 @@ ALIAS: CreateDirectory CreateDirectoryW
 ! FUNCTION: CreateFiberEx
 
 
-FUNCTION: HANDLE CreateFileW ( LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
+FUNCTION: HANDLE CreateFileW ( LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile )
 ALIAS: CreateFile CreateFileW
 
 FUNCTION: HANDLE  CreateFileMappingW ( HANDLE hFile,
@@ -950,13 +950,13 @@ FUNCTION: HANDLE  CreateFileMappingW ( HANDLE hFile,
                                        DWORD flProtect,
                                        DWORD dwMaximumSizeHigh,
                                        DWORD dwMaximumSizeLow,
-                                       LPCTSTR lpName ) ;
+                                       LPCTSTR lpName )
 ALIAS: CreateFileMapping CreateFileMappingW
 
 ! FUNCTION: CreateHardLinkA
 ! FUNCTION: CreateHardLinkW
 ! FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCompletionPort, ULONG_PTR uCompletionKey, DWORD dwNumberofConcurrentThreads ) ;
-FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCompletionPort, void* uCompletionKey, DWORD dwNumberofConcurrentThreads ) ;
+FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCompletionPort, void* uCompletionKey, DWORD dwNumberofConcurrentThreads )
 ! FUNCTION: CreateJobObjectA
 ! FUNCTION: CreateJobObjectW
 ! FUNCTION: CreateJobSet
@@ -966,11 +966,11 @@ FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCo
 ! FUNCTION: CreateMutexA
 ! FUNCTION: CreateMutexW
 ! FUNCTION: CreateNamedPipeA
-FUNCTION: HANDLE CreateNamedPipeW ( LPCTSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD nMaxInstances, DWORD nOutBufferSize, DWORD nInBufferSize, DWORD nDefaultTimeOut, LPSECURITY_ATTRIBUTES lpSecurityAttributes ) ;
+FUNCTION: HANDLE CreateNamedPipeW ( LPCTSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD nMaxInstances, DWORD nOutBufferSize, DWORD nInBufferSize, DWORD nDefaultTimeOut, LPSECURITY_ATTRIBUTES lpSecurityAttributes )
 ALIAS: CreateNamedPipe CreateNamedPipeW
 
 ! FUNCTION: CreateNlsSecurityDescriptor
-FUNCTION: BOOL CreatePipe ( PHANDLE hReadPipe, PHANDLE hWritePipe, LPSECURITY_ATTRIBUTES lpPipeAttributes, DWORD nSize ) ;
+FUNCTION: BOOL CreatePipe ( PHANDLE hReadPipe, PHANDLE hWritePipe, LPSECURITY_ATTRIBUTES lpPipeAttributes, DWORD nSize )
 
 CONSTANT: DEBUG_PROCESS                   0x00000001
 CONSTANT: DEBUG_ONLY_THIS_PROCESS         0x00000002
@@ -1005,7 +1005,7 @@ FUNCTION: BOOL CreateProcessW ( LPCTSTR lpApplicationname,
                                 LPVOID lpEnvironment,
                                 LPCTSTR lpCurrentDirectory,
                                 LPSTARTUPINFO lpStartupInfo,
-                                LPPROCESS_INFORMATION lpProcessInformation ) ;
+                                LPPROCESS_INFORMATION lpProcessInformation )
 ALIAS: CreateProcess CreateProcessW
 ! FUNCTION: CreateProcessInternalA
 ! FUNCTION: CreateProcessInternalW
@@ -1016,7 +1016,7 @@ FUNCTION: HANDLE CreateRemoteThread ( HANDLE hProcess,
                                       LPVOID lpStartAddress,
                                       LPVOID lpParameter,
                                       DWORD dwCreationFlags,
-                                      LPDWORD lpThreadId ) ;
+                                      LPDWORD lpThreadId )
 ! FUNCTION: CreateSemaphoreA
 ! FUNCTION: CreateSemaphoreW
 ! FUNCTION: CreateSocketHandle
@@ -1033,7 +1033,7 @@ CONSTANT: TH32CS_SNAPPROCESS 2
 CONSTANT: TH32CS_SNAPTHREAD 4
 CONSTANT: TH32CS_SNAPALL flags{ TH32CS_SNAPHEAPLIST TH32CS_SNAPMODULE TH32CS_SNAPPROCESS TH32CS_SNAPTHREAD }
 
-FUNCTION: HANDLE CreateToolhelp32Snapshot ( DWORD dwFlags, DWORD th32ProcessID ) ;
+FUNCTION: HANDLE CreateToolhelp32Snapshot ( DWORD dwFlags, DWORD th32ProcessID )
 ! FUNCTION: CreateVirtualBuffer
 ! FUNCTION: CreateWaitableTimerA
 ! FUNCTION: CreateWaitableTimerW
@@ -1052,7 +1052,7 @@ FUNCTION: HANDLE CreateToolhelp32Snapshot ( DWORD dwFlags, DWORD th32ProcessID )
 ! FUNCTION: DeleteCriticalSection
 ! FUNCTION: DeleteFiber
 ! FUNCTION: DeleteFileA
-FUNCTION: BOOL DeleteFileW ( LPCTSTR lpFileName ) ;
+FUNCTION: BOOL DeleteFileW ( LPCTSTR lpFileName )
 ALIAS: DeleteFile DeleteFileW
 ! FUNCTION: DeleteTimerQueue
 ! FUNCTION: DeleteTimerQueueEx
@@ -1076,7 +1076,7 @@ FUNCTION: BOOL DuplicateHandle (
     LPHANDLE lpTargetHandle,
     DWORD dwDesiredAccess,
     BOOL bInheritHandle,
-    DWORD dwOptions ) ;
+    DWORD dwOptions )
 
 CONSTANT: DUPLICATE_CLOSE_SOURCE 1
 CONSTANT: DUPLICATE_SAME_ACCESS 2
@@ -1084,7 +1084,7 @@ CONSTANT: DUPLICATE_SAME_ACCESS 2
 ! FUNCTION: EncodePointer
 ! FUNCTION: EncodeSystemPointer
 ! FUNCTION: EndUpdateResourceA
-FUNCTION: BOOL EndUpdateResourceW ( HANDLE hUpdate, BOOL fDiscard ) ;
+FUNCTION: BOOL EndUpdateResourceW ( HANDLE hUpdate, BOOL fDiscard )
 ALIAS: EndUpdateResource EndUpdateResourceW
 ! FUNCTION: EnterCriticalSection
 ! FUNCTION: EnumCalendarInfoA
@@ -1140,16 +1140,16 @@ ALIAS: EndUpdateResource EndUpdateResourceW
 ! FUNCTION: FindActCtxSectionStringW
 ! FUNCTION: FindAtomA
 ! FUNCTION: FindAtomW
-FUNCTION: BOOL FindClose ( HANDLE hFindFile ) ;
-FUNCTION: BOOL FindCloseChangeNotification ( HANDLE hChangeHandle ) ;
+FUNCTION: BOOL FindClose ( HANDLE hFindFile )
+FUNCTION: BOOL FindCloseChangeNotification ( HANDLE hChangeHandle )
 FUNCTION: HANDLE FindFirstChangeNotificationW ( LPCTSTR lpPathName,
                                         BOOL bWatchSubtree,
-                                        DWORD dwNotifyFilter ) ;
+                                        DWORD dwNotifyFilter )
 ALIAS: FindFirstChangeNotification FindFirstChangeNotificationW
 ! FUNCTION: FindFirstFileA
 ! FUNCTION: FindFirstFileExA
 ! FUNCTION: FindFirstFileExW
-FUNCTION: HANDLE FindFirstFileW ( LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileData ) ;
+FUNCTION: HANDLE FindFirstFileW ( LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileData )
 ALIAS: FindFirstFile FindFirstFileW
 ! FUNCTION: FindFirstVolumeA
 ! FUNCTION: FindFirstVolumeMountPointA
@@ -1158,16 +1158,16 @@ FUNCTION: HANDLE FindFirstVolumeMountPointW (
     LPTSTR lpszRootPathName,
     LPTSTR lpszVolumeMountPoint,
     DWORD cchBufferLength
-) ;
+)
 ALIAS: FindFirstVolumeMountPoint FindFirstVolumeMountPointW
 
-FUNCTION: HANDLE FindFirstVolumeW ( LPTSTR lpszVolumeName, DWORD cchBufferLength ) ;
+FUNCTION: HANDLE FindFirstVolumeW ( LPTSTR lpszVolumeName, DWORD cchBufferLength )
 ALIAS: FindFirstVolume FindFirstVolumeW
 
-FUNCTION: BOOL FindNextChangeNotification ( HANDLE hChangeHandle ) ;
+FUNCTION: BOOL FindNextChangeNotification ( HANDLE hChangeHandle )
 
 ! FUNCTION: FindNextFileA
-FUNCTION: BOOL FindNextFileW ( HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData ) ;
+FUNCTION: BOOL FindNextFileW ( HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData )
 ALIAS: FindNextFile FindNextFileW
 
 ! FUNCTION: FindNextVolumeA
@@ -1177,18 +1177,18 @@ FUNCTION: BOOL FindNextVolumeMountPointW (
     HANDLE hFindVolumeMountPoint,
     LPTSTR lpszVolumeMountPoint,
     DWORD cchBufferLength
-) ;
+)
 ALIAS: FindNextVolumeMountPoint FindNextVolumeMountPointW
 
-FUNCTION: BOOL FindNextVolumeW ( HANDLE hFindVolume, LPTSTR lpszVolumeName, DWORD cchBufferLength ) ;
+FUNCTION: BOOL FindNextVolumeW ( HANDLE hFindVolume, LPTSTR lpszVolumeName, DWORD cchBufferLength )
 ALIAS: FindNextVolume FindNextVolumeW
 
 ! FUNCTION: FindResourceA
 ! FUNCTION: FindResourceExA
 ! FUNCTION: FindResourceExW
 ! FUNCTION: FindResourceW
-FUNCTION: BOOL FindVolumeClose ( HANDLE hFindVolume ) ;
-FUNCTION: BOOL FindVolumeMountPointClose ( HANDLE hFindVolumeMountPoint ) ;
+FUNCTION: BOOL FindVolumeClose ( HANDLE hFindVolume )
+FUNCTION: BOOL FindVolumeMountPointClose ( HANDLE hFindVolumeMountPoint )
 ! FUNCTION: FlushConsoleInputBuffer
 ! FUNCTION: FlushFileBuffers
 ! FUNCTION: FlushInstructionCache
@@ -1204,16 +1204,16 @@ FUNCTION: DWORD FormatMessageW (
         LPTSTR lpBuffer,
         DWORD nSize,
         void* Arguments
-    ) ;
+    )
 
 ALIAS: FormatMessage FormatMessageW
 
 
-FUNCTION: BOOL FreeConsole ( ) ;
+FUNCTION: BOOL FreeConsole ( )
 ! FUNCTION: FreeEnvironmentStringsA
-FUNCTION: BOOL FreeEnvironmentStringsW ( LPTCH lpszEnvironmentBlock ) ;
+FUNCTION: BOOL FreeEnvironmentStringsW ( LPTCH lpszEnvironmentBlock )
 ALIAS: FreeEnvironmentStrings FreeEnvironmentStringsW
-FUNCTION: BOOL FreeLibrary ( HMODULE hModule ) ;
+FUNCTION: BOOL FreeLibrary ( HMODULE hModule )
 ! FUNCTION: FreeLibraryAndExitThread
 ! FUNCTION: FreeResource
 ! FUNCTION: FreeUserPhysicalPages
@@ -1229,19 +1229,19 @@ FUNCTION: BOOL FreeLibrary ( HMODULE hModule ) ;
 ! FUNCTION: GetCalendarInfoW
 ! FUNCTION: GetCommandLineA
 ! FUNCTION: GetCommandLineW
-FUNCTION: BOOL GetCommConfig ( HANDLE hCommDev, LPCOMMCONFIG lpCC, LPDWORD lpdwSize ) ;
-FUNCTION: BOOL GetCommMask ( HANDLE hFile, LPDWORD lpEvtMask ) ;
-FUNCTION: BOOL GetCommModemStatus ( HANDLE hFile, LPDWORD lpModemStat ) ;
-FUNCTION: BOOL GetCommProperties ( HANDLE hFile, LPCOMMPROP lpCommProp ) ;
-FUNCTION: BOOL GetCommState ( HANDLE hFile, LPDCB lpDCB ) ;
+FUNCTION: BOOL GetCommConfig ( HANDLE hCommDev, LPCOMMCONFIG lpCC, LPDWORD lpdwSize )
+FUNCTION: BOOL GetCommMask ( HANDLE hFile, LPDWORD lpEvtMask )
+FUNCTION: BOOL GetCommModemStatus ( HANDLE hFile, LPDWORD lpModemStat )
+FUNCTION: BOOL GetCommProperties ( HANDLE hFile, LPCOMMPROP lpCommProp )
+FUNCTION: BOOL GetCommState ( HANDLE hFile, LPDCB lpDCB )
 ! FUNCTION: GetCommTimeouts
 ! FUNCTION: GetComPlusPackageInstallStatus
 ! FUNCTION: GetCompressedFileSizeA
-FUNCTION: DWORD GetCompressedFileSizeW ( LPCTSTR lpFileName, LPDWORD lpFileSizeHigh ) ;
+FUNCTION: DWORD GetCompressedFileSizeW ( LPCTSTR lpFileName, LPDWORD lpFileSizeHigh )
 ALIAS: GetCompressedFileSize GetCompressedFileSizeW
-FUNCTION: BOOL GetComputerNameW ( LPTSTR lpBuffer, LPDWORD lpnSize ) ;
+FUNCTION: BOOL GetComputerNameW ( LPTSTR lpBuffer, LPDWORD lpnSize )
 ALIAS: GetComputerName GetComputerNameW
-FUNCTION: BOOL GetComputerNameExW ( COMPUTER_NAME_FORMAT NameType, LPTSTR lpBuffer, LPDWORD lpnSize ) ;
+FUNCTION: BOOL GetComputerNameExW ( COMPUTER_NAME_FORMAT NameType, LPTSTR lpBuffer, LPDWORD lpnSize )
 ALIAS: GetComputerNameEx GetComputerNameExW
 ! FUNCTION: GetConsoleAliasA
 ! FUNCTION: GetConsoleAliasesA
@@ -1274,11 +1274,11 @@ ALIAS: GetComputerNameEx GetComputerNameExW
 ! FUNCTION: GetConsoleNlsMode
 ! FUNCTION: GetConsoleOutputCP
 ! FUNCTION: GetConsoleProcessList
-FUNCTION: BOOL GetConsoleScreenBufferInfo ( HANDLE hConsoleOutput, CONSOLE_SCREEN_BUFFER_INFO* lpConsoleScreenBufferInfo ) ;
+FUNCTION: BOOL GetConsoleScreenBufferInfo ( HANDLE hConsoleOutput, CONSOLE_SCREEN_BUFFER_INFO* lpConsoleScreenBufferInfo )
 ! FUNCTION: GetConsoleSelectionInfo
-FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
+FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize )
 ALIAS: GetConsoleTitle GetConsoleTitleW
-FUNCTION: HWND GetConsoleWindow ( ) ;
+FUNCTION: HWND GetConsoleWindow ( )
 ! FUNCTION: GetCPFileNameFromRegistry
 ! FUNCTION: GetCPInfo
 ! FUNCTION: GetCPInfoExA
@@ -1288,81 +1288,81 @@ FUNCTION: HWND GetConsoleWindow ( ) ;
 ! FUNCTION: GetCurrentActCtx
 ! FUNCTION: GetCurrentConsoleFont
 ! FUNCTION: GetCurrentDirectoryA
-FUNCTION: BOOL GetCurrentDirectoryW ( DWORD len, LPTSTR buf ) ;
+FUNCTION: BOOL GetCurrentDirectoryW ( DWORD len, LPTSTR buf )
 ALIAS: GetCurrentDirectory GetCurrentDirectoryW
-FUNCTION: HANDLE GetCurrentProcess ( ) ;
-FUNCTION: DWORD GetCurrentProcessId ( ) ;
-FUNCTION: HANDLE GetCurrentThread ( ) ;
+FUNCTION: HANDLE GetCurrentProcess ( )
+FUNCTION: DWORD GetCurrentProcessId ( )
+FUNCTION: HANDLE GetCurrentThread ( )
 ! FUNCTION: GetCurrentThreadId
 ! FUNCTION: GetDateFormatA
 ! FUNCTION: GetDateFormatW
 ! FUNCTION: GetDefaultCommConfigA
-FUNCTION: BOOL GetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize ) ;
+FUNCTION: BOOL GetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize )
 ALIAS: GetDefaultCommConfig GetDefaultCommConfigW
 ! FUNCTION: GetDefaultSortkeySize
 ! FUNCTION: GetDevicePowerState
 ! FUNCTION: GetDiskFreeSpaceA
 ! FUNCTION: GetDiskFreeSpaceExA
-FUNCTION: BOOL GetDiskFreeSpaceExW ( LPCTSTR lpDirectoryName, PULARGE_INTEGER pFreeBytesAvailable, PULARGE_INTEGER lpTotalNumberOfBytes, PULARGE_INTEGER lpTotalNumberOfFreeBytes ) ;
+FUNCTION: BOOL GetDiskFreeSpaceExW ( LPCTSTR lpDirectoryName, PULARGE_INTEGER pFreeBytesAvailable, PULARGE_INTEGER lpTotalNumberOfBytes, PULARGE_INTEGER lpTotalNumberOfFreeBytes )
 ALIAS: GetDiskFreeSpaceEx GetDiskFreeSpaceExW
 ! FUNCTION: GetDiskFreeSpaceW
 ! FUNCTION: GetDllDirectoryA
 ! FUNCTION: GetDllDirectoryW
 ! FUNCTION: GetDriveTypeA
-FUNCTION: UINT GetDriveTypeW ( LPCTSTR lpRootPathName ) ;
+FUNCTION: UINT GetDriveTypeW ( LPCTSTR lpRootPathName )
 ALIAS: GetDriveType GetDriveTypeW
-FUNCTION: void* GetEnvironmentStringsW ( ) ;
+FUNCTION: void* GetEnvironmentStringsW ( )
 ! FUNCTION: GetEnvironmentStringsA
 ALIAS: GetEnvironmentStrings GetEnvironmentStringsW
 ! FUNCTION: GetEnvironmentVariableA
-FUNCTION: DWORD GetEnvironmentVariableW ( LPCTSTR lpName, LPTSTR lpBuffer, DWORD nSize ) ;
+FUNCTION: DWORD GetEnvironmentVariableW ( LPCTSTR lpName, LPTSTR lpBuffer, DWORD nSize )
 ALIAS: GetEnvironmentVariable GetEnvironmentVariableW
-FUNCTION: BOOL GetExitCodeProcess ( HANDLE hProcess, LPDWORD lpExitCode ) ;
+FUNCTION: BOOL GetExitCodeProcess ( HANDLE hProcess, LPDWORD lpExitCode )
 ! FUNCTION: GetExitCodeThread
 ! FUNCTION: GetExpandedNameA
 ! FUNCTION: GetExpandedNameW
 ! FUNCTION: GetFileAttributesA
-FUNCTION: DWORD GetFileAttributesW ( LPCTSTR lpFileName ) ;
+FUNCTION: DWORD GetFileAttributesW ( LPCTSTR lpFileName )
 ! FUNCTION: GetFileAttributesExA
 
 CONSTANT: GetFileExInfoStandard 0
 
 
-FUNCTION: BOOL GetFileAttributesExW ( LPCTSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation ) ;
+FUNCTION: BOOL GetFileAttributesExW ( LPCTSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation )
 
 ALIAS: GetFileAttributesEx GetFileAttributesExW
 
-FUNCTION: BOOL GetFileInformationByHandle ( HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpFileInformation ) ;
-FUNCTION: DWORD GetFileSize ( HANDLE hFile, LPDWORD lpFileSizeHigh ) ;
-FUNCTION: BOOL GetFileSizeEx ( HANDLE hFile, PLARGE_INTEGER lpFileSize ) ;
-FUNCTION: BOOL GetFileTime ( HANDLE hFile, LPFILETIME lpCreationTime, LPFILETIME lpLastAccessTime, LPFILETIME lpLastWriteTime ) ;
-FUNCTION: DWORD GetFileType ( HANDLE hFile ) ;
+FUNCTION: BOOL GetFileInformationByHandle ( HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpFileInformation )
+FUNCTION: DWORD GetFileSize ( HANDLE hFile, LPDWORD lpFileSizeHigh )
+FUNCTION: BOOL GetFileSizeEx ( HANDLE hFile, PLARGE_INTEGER lpFileSize )
+FUNCTION: BOOL GetFileTime ( HANDLE hFile, LPFILETIME lpCreationTime, LPFILETIME lpLastAccessTime, LPFILETIME lpLastWriteTime )
+FUNCTION: DWORD GetFileType ( HANDLE hFile )
 ! FUNCTION: GetFirmwareEnvironmentVariableA
 ! FUNCTION: GetFirmwareEnvironmentVariableW
 ! FUNCTION: GetFullPathNameA
-FUNCTION: DWORD GetFullPathNameW ( LPCTSTR lpFileName, DWORD nBufferLength, LPTSTR lpBuffer, LPTSTR* lpFilePart ) ;
+FUNCTION: DWORD GetFullPathNameW ( LPCTSTR lpFileName, DWORD nBufferLength, LPTSTR lpBuffer, LPTSTR* lpFilePart )
 ALIAS: GetFullPathName GetFullPathNameW
 
 ! FUNCTION: GetGeoInfoA
 ! FUNCTION: GetGeoInfoW
 ! FUNCTION: GetHandleContext
-FUNCTION: BOOL GetHandleInformation ( HANDLE hObject, LPDWORD lpdwFlags ) ;
+FUNCTION: BOOL GetHandleInformation ( HANDLE hObject, LPDWORD lpdwFlags )
 ! FUNCTION: GetLargestConsoleWindowSize
-FUNCTION: DWORD GetLastError ( ) ;
+FUNCTION: DWORD GetLastError ( )
 ! FUNCTION: GetLinguistLangSize
 ! FUNCTION: GetLocaleInfoA
 ! FUNCTION: GetLocaleInfoW
 ! FUNCTION: GetLocalTime
-FUNCTION: DWORD GetLogicalDrives ( ) ;
+FUNCTION: DWORD GetLogicalDrives ( )
 ! FUNCTION: GetLogicalDriveStringsA
 ! FUNCTION: GetLogicalDriveStringsW
 ! FUNCTION: GetLongPathNameA
 ! FUNCTION: GetLongPathNameW
 ! FUNCTION: GetMailslotInfo
 ! FUNCTION: GetModuleFileNameA
-FUNCTION: DWORD GetModuleFileNameW ( HMODULE hModule, LPTSTR lpFilename, DWORD nSize ) ;
+FUNCTION: DWORD GetModuleFileNameW ( HMODULE hModule, LPTSTR lpFilename, DWORD nSize )
 ALIAS: GetModuleFileName GetModuleFileNameW
-FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
+FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName )
 ALIAS: GetModuleHandle GetModuleHandleW
 ! FUNCTION: GetModuleHandleExA
 ! FUNCTION: GetModuleHandleExW
@@ -1384,8 +1384,8 @@ ALIAS: GetModuleHandle GetModuleHandleW
 ! FUNCTION: GetNumberOfConsoleInputEvents
 ! FUNCTION: GetNumberOfConsoleMouseButtons
 ! FUNCTION: GetOEMCP
-FUNCTION: BOOL GetOverlappedResult ( HANDLE hFile, LPOVERLAPPED lpOverlapped, LPDWORD lpNumberOfBytesTransferred, BOOL bWait ) ;
-FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess ) ;
+FUNCTION: BOOL GetOverlappedResult ( HANDLE hFile, LPOVERLAPPED lpOverlapped, LPDWORD lpNumberOfBytesTransferred, BOOL bWait )
+FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess )
 ! FUNCTION: GetPrivateProfileIntA
 ! FUNCTION: GetPrivateProfileIntW
 ! FUNCTION: GetPrivateProfileSectionA
@@ -1396,7 +1396,7 @@ FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess ) ;
 ! FUNCTION: GetPrivateProfileStringW
 ! FUNCTION: GetPrivateProfileStructA
 ! FUNCTION: GetPrivateProfileStructW
-FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName ) ;
+FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName )
 ! FUNCTION: GetProcessAffinityMask
 ! FUNCTION: GetProcessHandleCount
 ! FUNCTION: GetProcessHeap
@@ -1414,12 +1414,12 @@ FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName ) ;
 ! FUNCTION: GetProfileSectionW
 ! FUNCTION: GetProfileStringA
 ! FUNCTION: GetProfileStringW
-FUNCTION: BOOL GetQueuedCompletionStatus ( HANDLE hCompletionPort, LPDWORD lpNumberOfBytes, void* lpCompletionKey, LPOVERLAPPED lpOverlapped, DWORD dwMilliseconds ) ;
+FUNCTION: BOOL GetQueuedCompletionStatus ( HANDLE hCompletionPort, LPDWORD lpNumberOfBytes, void* lpCompletionKey, LPOVERLAPPED lpOverlapped, DWORD dwMilliseconds )
 ! FUNCTION: GetShortPathNameA
 ! FUNCTION: GetShortPathNameW
 ! FUNCTION: GetStartupInfoA
 ! FUNCTION: GetStartupInfoW
-FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
+FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle )
 ! FUNCTION: GetStringTypeA
 ! FUNCTION: GetStringTypeExA
 ! FUNCTION: GetStringTypeExW
@@ -1428,17 +1428,17 @@ FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
 ! FUNCTION: GetSystemDefaultLCID
 ! FUNCTION: GetSystemDefaultUILanguage
 ! FUNCTION: GetSystemDirectoryA
-FUNCTION: UINT GetSystemDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+FUNCTION: UINT GetSystemDirectoryW ( LPTSTR lpBuffer, UINT uSize )
 ALIAS: GetSystemDirectory GetSystemDirectoryW
-FUNCTION: void GetSystemInfo ( LPSYSTEM_INFO lpSystemInfo ) ;
+FUNCTION: void GetSystemInfo ( LPSYSTEM_INFO lpSystemInfo )
 ! FUNCTION: GetSystemPowerStatus
 ! FUNCTION: GetSystemRegistryQuota
-FUNCTION: void GetSystemTime ( LPSYSTEMTIME lpSystemTime ) ;
+FUNCTION: void GetSystemTime ( LPSYSTEMTIME lpSystemTime )
 ! FUNCTION: GetSystemTimeAdjustment
-FUNCTION: void GetSystemTimeAsFileTime ( LPFILETIME lpSystemTimeAsFileTime ) ;
+FUNCTION: void GetSystemTimeAsFileTime ( LPFILETIME lpSystemTimeAsFileTime )
 ! FUNCTION: GetSystemTimes
 ! FUNCTION: GetSystemWindowsDirectoryA
-FUNCTION: UINT GetSystemWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+FUNCTION: UINT GetSystemWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize )
 ALIAS: GetSystemWindowsDirectory GetSystemWindowsDirectoryW
 ! FUNCTION: GetSystemWow64DirectoryA
 ! FUNCTION: GetSystemWow64DirectoryW
@@ -1448,26 +1448,26 @@ ALIAS: GetSystemWindowsDirectory GetSystemWindowsDirectoryW
 ! FUNCTION: GetTempFileNameA
 ! FUNCTION: GetTempFileNameW
 ! FUNCTION: GetTempPathA
-FUNCTION: DWORD GetTempPathW ( DWORD nBufferLength, LPWSTR lpBuffer ) ;
+FUNCTION: DWORD GetTempPathW ( DWORD nBufferLength, LPWSTR lpBuffer )
 ALIAS: GetTempPath GetTempPathW
 ! FUNCTION: GetThreadContext
 ! FUNCTION: GetThreadIOPendingFlag
 ! FUNCTION: GetThreadLocale
-FUNCTION: int GetThreadPriority ( HANDLE hThread ) ;
-FUNCTION: BOOL GetThreadPriorityBoost ( HANDLE hThread, PBOOL pDisablePriorityBoost ) ;
+FUNCTION: int GetThreadPriority ( HANDLE hThread )
+FUNCTION: BOOL GetThreadPriorityBoost ( HANDLE hThread, PBOOL pDisablePriorityBoost )
 ! FUNCTION: GetThreadSelectorEntry
 ! FUNCTION: GetThreadTimes
 ! FUNCTION: GetTickCount
 ! FUNCTION: GetTimeFormatA
 ! FUNCTION: GetTimeFormatW
-FUNCTION: DWORD GetTimeZoneInformation ( LPTIME_ZONE_INFORMATION lpTimeZoneInformation ) ;
+FUNCTION: DWORD GetTimeZoneInformation ( LPTIME_ZONE_INFORMATION lpTimeZoneInformation )
 ! FUNCTION: GetUserDefaultLangID
 ! FUNCTION: GetUserDefaultLCID
 ! FUNCTION: GetUserDefaultUILanguage
 ! FUNCTION: GetUserGeoID
 ! FUNCTION: GetVDMCurrentDirectories
-FUNCTION: DWORD GetVersion ( ) ;
-FUNCTION: BOOL GetVersionExW ( LPOSVERSIONINFO lpVersionInfo ) ;
+FUNCTION: DWORD GetVersion ( )
+FUNCTION: BOOL GetVersionExW ( LPOSVERSIONINFO lpVersionInfo )
 ALIAS: GetVersionEx GetVersionExW
 ! FUNCTION: GetVolumeInformationA
 FUNCTION: BOOL GetVolumeInformationW (
@@ -1479,23 +1479,23 @@ FUNCTION: BOOL GetVolumeInformationW (
     LPDWORD lpFileSystemFlags,
     LPCTSTR lpFileSystemNameBuffer,
     DWORD nFileSystemNameSize
-) ;
+)
 ALIAS: GetVolumeInformation GetVolumeInformationW
 ! FUNCTION: GetVolumeNameForVolumeMountPointA
 ! FUNCTION: GetVolumeNameForVolumeMountPointW
 ! FUNCTION: GetVolumePathNameA
 ! FUNCTION: GetVolumePathNamesForVolumeNameA
-FUNCTION: BOOL GetVolumePathNamesForVolumeNameW ( LPCTSTR lpszVolumeName, LPTSTR lpszVolumePathNames, DWORD cchBufferLength, PDWORD lpcchReturnLength ) ;
+FUNCTION: BOOL GetVolumePathNamesForVolumeNameW ( LPCTSTR lpszVolumeName, LPTSTR lpszVolumePathNames, DWORD cchBufferLength, PDWORD lpcchReturnLength )
 ALIAS: GetVolumePathNamesForVolumeName GetVolumePathNamesForVolumeNameW
 
 ! FUNCTION: GetVolumePathNameW
 ! FUNCTION: GetWindowsDirectoryA
-FUNCTION: UINT GetWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+FUNCTION: UINT GetWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize )
 ALIAS: GetWindowsDirectory GetWindowsDirectoryW
 ! FUNCTION: GetWriteWatch
 ! FUNCTION: GlobalAddAtomA
 ! FUNCTION: GlobalAddAtomW
-FUNCTION: HGLOBAL GlobalAlloc ( UINT uFlags, SIZE_T dwBytes ) ;
+FUNCTION: HGLOBAL GlobalAlloc ( UINT uFlags, SIZE_T dwBytes )
 ! FUNCTION: GlobalCompact
 ! FUNCTION: GlobalDeleteAtom
 ! FUNCTION: GlobalFindAtomA
@@ -1506,26 +1506,26 @@ FUNCTION: HGLOBAL GlobalAlloc ( UINT uFlags, SIZE_T dwBytes ) ;
 ! FUNCTION: GlobalGetAtomNameA
 ! FUNCTION: GlobalGetAtomNameW
 ! FUNCTION: GlobalHandle
-FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem ) ;
-FUNCTION: void GlobalMemoryStatus ( LPMEMORYSTATUS lpBuffer ) ;
-FUNCTION: BOOL GlobalMemoryStatusEx ( LPMEMORYSTATUSEX lpBuffer ) ;
+FUNCTION: LPVOID GlobalLock ( HGLOBAL hMem )
+FUNCTION: void GlobalMemoryStatus ( LPMEMORYSTATUS lpBuffer )
+FUNCTION: BOOL GlobalMemoryStatusEx ( LPMEMORYSTATUSEX lpBuffer )
 ! FUNCTION: GlobalReAlloc
 ! FUNCTION: GlobalSize
 ! FUNCTION: GlobalUnfix
-FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
+FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem )
 ! FUNCTION: GlobalUnWire
 ! FUNCTION: GlobalWire
 ! FUNCTION: Heap32First
 ! FUNCTION: Heap32ListFirst
 ! FUNCTION: Heap32ListNext
 ! FUNCTION: Heap32Next
-FUNCTION: LPVOID HeapAlloc ( HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes ) ;
+FUNCTION: LPVOID HeapAlloc ( HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes )
 ! FUNCTION: HeapCompact
 ! FUNCTION: HeapCreate
 ! FUNCTION: HeapCreateTagsW
 ! FUNCTION: HeapDestroy
 ! FUNCTION: HeapExtend
-FUNCTION: BOOL HeapFree ( HANDLE hHeap, DWORD dwFlags, LPVOID lpMem ) ;
+FUNCTION: BOOL HeapFree ( HANDLE hHeap, DWORD dwFlags, LPVOID lpMem )
 ! FUNCTION: HeapLock
 ! FUNCTION: HeapQueryInformation
 ! FUNCTION: HeapQueryTagW
@@ -1561,7 +1561,7 @@ FUNCTION: BOOL HeapFree ( HANDLE hHeap, DWORD dwFlags, LPVOID lpMem ) ;
 ! FUNCTION: IsDBCSLeadByteEx
 ! FUNCTION: IsDebuggerPresent
 ! FUNCTION: IsProcessInJob
-FUNCTION: BOOL IsProcessorFeaturePresent ( DWORD ProcessorFeature ) ;
+FUNCTION: BOOL IsProcessorFeaturePresent ( DWORD ProcessorFeature )
 ! FUNCTION: IsSystemResumeAutomatic
 ! FUNCTION: IsValidCodePage
 ! FUNCTION: IsValidLanguageGroup
@@ -1573,16 +1573,16 @@ FUNCTION: BOOL IsProcessorFeaturePresent ( DWORD ProcessorFeature ) ;
 ! FUNCTION: LeaveCriticalSection
 ! FUNCTION: LoadLibraryA
 ! FUNCTION: LoadLibraryExA
-FUNCTION: HMODULE LoadLibraryExW ( LPCTSTR lpFile, HANDLE hFile, DWORD flags ) ;
+FUNCTION: HMODULE LoadLibraryExW ( LPCTSTR lpFile, HANDLE hFile, DWORD flags )
 ALIAS: LoadLibraryEx LoadLibraryExW
 ! FUNCTION: LoadLibraryW
 ! FUNCTION: LoadModule
 ! FUNCTION: LoadResource
-FUNCTION: HLOCAL LocalAlloc ( UINT uFlags, SIZE_T uBytes ) ;
+FUNCTION: HLOCAL LocalAlloc ( UINT uFlags, SIZE_T uBytes )
 ! FUNCTION: LocalCompact
 ! FUNCTION: LocalFileTimeToFileTime
 ! FUNCTION: LocalFlags
-FUNCTION: HLOCAL LocalFree ( HLOCAL hMem ) ;
+FUNCTION: HLOCAL LocalFree ( HLOCAL hMem )
 ! FUNCTION: LocalHandle
 ! FUNCTION: LocalLock
 ! FUNCTION: LocalReAlloc
@@ -1627,14 +1627,14 @@ FUNCTION: LPVOID MapViewOfFile ( HANDLE hFileMappingObject,
                                  DWORD dwDesiredAccess,
                                  DWORD dwFileOffsetHigh,
                                  DWORD dwFileOffsetLow,
-                                 SIZE_T dwNumberOfBytesToMap ) ;
+                                 SIZE_T dwNumberOfBytesToMap )
 
 FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
                                  DWORD dwDesiredAccess,
                                  DWORD dwFileOffsetHigh,
                                  DWORD dwFileOffsetLow,
                                  SIZE_T dwNumberOfBytesToMap,
-                                 LPVOID lpBaseAddress ) ;
+                                 LPVOID lpBaseAddress )
 
 ! FUNCTION: Module32First
 ! FUNCTION: Module32FirstW
@@ -1643,7 +1643,7 @@ FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
 ! FUNCTION: MoveFileA
 ! FUNCTION: MoveFileExA
 ! FUNCTION: MoveFileExW
-FUNCTION: BOOL MoveFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName ) ;
+FUNCTION: BOOL MoveFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName )
 ALIAS: MoveFile MoveFileW
 ! FUNCTION: MoveFileWithProgressA
 ! FUNCTION: MoveFileWithProgressW
@@ -1661,13 +1661,13 @@ ALIAS: MoveFile MoveFileW
 ! FUNCTION: HFILE OpenFile ( LPCTSTR lpFileName, LPOFSTRUCT lpReOpenBuff, UINT uStyle ) ;
 FUNCTION: HANDLE OpenFileMappingW ( DWORD dwDesiredAccess,
                                     BOOL bInheritHandle,
-                                    LPCTSTR lpName ) ;
+                                    LPCTSTR lpName )
 ALIAS: OpenFileMapping OpenFileMappingW
 ! FUNCTION: OpenJobObjectA
 ! FUNCTION: OpenJobObjectW
 ! FUNCTION: OpenMutexA
 ! FUNCTION: OpenMutexW 
-FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId ) ;
+FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId )
 ! FUNCTION: OpenProfileUserMapping
 ! FUNCTION: OpenSemaphoreA
 ! FUNCTION: OpenSemaphoreW
@@ -1684,10 +1684,10 @@ FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD
 ! FUNCTION: PrivCopyFileExW
 ! FUNCTION: PrivMoveFileIdentityW
 ! FUNCTION: Process32First
-FUNCTION: BOOL Process32FirstW ( HANDLE hSnapshot, LPPROCESSENTRY32 lppe ) ;
+FUNCTION: BOOL Process32FirstW ( HANDLE hSnapshot, LPPROCESSENTRY32 lppe )
 ALIAS: Process32First Process32FirstW
 ! FUNCTION: Process32Next
-FUNCTION: BOOL Process32NextW ( HANDLE hSnapshot, LPPROCESSENTRY32 lppe ) ;
+FUNCTION: BOOL Process32NextW ( HANDLE hSnapshot, LPPROCESSENTRY32 lppe )
 ALIAS: Process32Next Process32NextW
 ! FUNCTION: ProcessIdToSessionId
 ! FUNCTION: PulseEvent
@@ -1698,8 +1698,8 @@ ALIAS: Process32Next Process32NextW
 ! FUNCTION: QueryDosDeviceW
 ! FUNCTION: QueryInformationJobObject
 ! FUNCTION: QueryMemoryResourceNotification
-FUNCTION: BOOL QueryPerformanceCounter ( LARGE_INTEGER* lpPerformanceCount ) ;
-FUNCTION: BOOL QueryPerformanceFrequency ( LARGE_INTEGER* lpFrequency ) ;
+FUNCTION: BOOL QueryPerformanceCounter ( LARGE_INTEGER* lpPerformanceCount )
+FUNCTION: BOOL QueryPerformanceFrequency ( LARGE_INTEGER* lpFrequency )
 ! FUNCTION: QueryWin31IniFilesMappedToRegistry
 ! FUNCTION: QueueUserAPC
 ! FUNCTION: QueueUserWorkItem
@@ -1715,12 +1715,12 @@ FUNCTION: BOOL QueryPerformanceFrequency ( LARGE_INTEGER* lpFrequency ) ;
 ! FUNCTION: ReadConsoleOutputCharacterW
 ! FUNCTION: ReadConsoleOutputW
 ! FUNCTION: ReadConsoleW
-FUNCTION: BOOL ReadDirectoryChangesW ( HANDLE hDirectory, LPVOID lpBuffer, DWORD nBufferLength, BOOL bWatchSubtree, DWORD dwNotifyFilter, LPDWORD lpBytesReturned, LPOVERLAPPED lpOverlapped, void* lpCompletionRoutine ) ;
-FUNCTION: BOOL ReadFile ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, void* lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
+FUNCTION: BOOL ReadDirectoryChangesW ( HANDLE hDirectory, LPVOID lpBuffer, DWORD nBufferLength, BOOL bWatchSubtree, DWORD dwNotifyFilter, LPDWORD lpBytesReturned, LPOVERLAPPED lpOverlapped, void* lpCompletionRoutine )
+FUNCTION: BOOL ReadFile ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, void* lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: BOOL ReadFile ( HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
-FUNCTION: BOOL ReadFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
+FUNCTION: BOOL ReadFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine )
 ! FUNCTION: ReadFileScatter
-FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesRead )  ;
+FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesRead )
 ! FUNCTION: RegisterConsoleIME
 ! FUNCTION: RegisterConsoleOS2
 ! FUNCTION: RegisterConsoleVDM
@@ -1733,7 +1733,7 @@ FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* l
 ! FUNCTION: ReleaseMutex
 ! FUNCTION: ReleaseSemaphore
 ! FUNCTION: RemoveDirectoryA
-FUNCTION: BOOL RemoveDirectoryW ( LPCTSTR lpPathName ) ;
+FUNCTION: BOOL RemoveDirectoryW ( LPCTSTR lpPathName )
 ALIAS: RemoveDirectory RemoveDirectoryW
 ! FUNCTION: RemoveLocalAlternateComputerNameA
 ! FUNCTION: RemoveLocalAlternateComputerNameW
@@ -1760,10 +1760,10 @@ ALIAS: RemoveDirectory RemoveDirectoryW
 ! FUNCTION: SetCalendarInfoA
 ! FUNCTION: SetCalendarInfoW
 ! FUNCTION: SetClientTimeZoneInformation
-FUNCTION: BOOL SetCommBreak ( HANDLE hFile ) ;
-FUNCTION: BOOL SetCommConfig ( HANDLE hCommDev, LPCOMMCONFIG lpCC, DWORD dwSize ) ;
-FUNCTION: BOOL SetCommMask ( HANDLE hFile, DWORD dwEvtMask ) ;
-FUNCTION: BOOL SetCommState ( HANDLE hFile, LPDCB lpDCB ) ;
+FUNCTION: BOOL SetCommBreak ( HANDLE hFile )
+FUNCTION: BOOL SetCommConfig ( HANDLE hCommDev, LPCOMMCONFIG lpCC, DWORD dwSize )
+FUNCTION: BOOL SetCommMask ( HANDLE hFile, DWORD dwEvtMask )
+FUNCTION: BOOL SetCommState ( HANDLE hFile, LPDCB lpDCB )
 ! FUNCTION: SetCommTimeouts
 ! FUNCTION: SetComPlusPackageInstallStatus
 ! FUNCTION: SetComputerNameA
@@ -1796,42 +1796,42 @@ FUNCTION: BOOL SetCommState ( HANDLE hFile, LPDCB lpDCB ) ;
 ! FUNCTION: SetConsoleOutputCP
 ! FUNCTION: SetConsolePalette
 ! FUNCTION: SetConsoleScreenBufferSize
-FUNCTION: BOOL SetConsoleTextAttribute ( HANDLE hConsoleOutput, WORD wAttributes ) ;
-FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
+FUNCTION: BOOL SetConsoleTextAttribute ( HANDLE hConsoleOutput, WORD wAttributes )
+FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle )
 ALIAS: SetConsoleTitle SetConsoleTitleW
 ! FUNCTION: SetConsoleWindowInfo
 ! FUNCTION: SetCPGlobal
 ! FUNCTION: SetCriticalSectionSpinCount
 ! FUNCTION: SetCurrentDirectoryA
-FUNCTION: BOOL SetCurrentDirectoryW ( LPCWSTR lpDirectory ) ;
+FUNCTION: BOOL SetCurrentDirectoryW ( LPCWSTR lpDirectory )
 ALIAS: SetCurrentDirectory SetCurrentDirectoryW
 ! FUNCTION: SetDefaultCommConfigA
-FUNCTION: BOOL SetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize ) ;
+FUNCTION: BOOL SetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize )
 ALIAS: SetDefaultCommConfig SetDefaultCommConfigW
 ! FUNCTION: SetDllDirectoryA
 ! FUNCTION: SetDllDirectoryW
-FUNCTION: BOOL SetEndOfFile ( HANDLE hFile ) ;
+FUNCTION: BOOL SetEndOfFile ( HANDLE hFile )
 ! FUNCTION: SetEnvironmentVariableA
-FUNCTION: BOOL SetEnvironmentVariableW ( LPCTSTR key, LPCTSTR value ) ;
+FUNCTION: BOOL SetEnvironmentVariableW ( LPCTSTR key, LPCTSTR value )
 ALIAS: SetEnvironmentVariable SetEnvironmentVariableW
 ! FUNCTION: SetErrorMode
 ! FUNCTION: SetEvent
 ! FUNCTION: SetFileApisToANSI
 ! FUNCTION: SetFileApisToOEM
 ! FUNCTION: SetFileAttributesA
-FUNCTION: BOOL SetFileAttributesW ( LPCTSTR lpFileName, DWORD dwFileAttributes ) ;
+FUNCTION: BOOL SetFileAttributesW ( LPCTSTR lpFileName, DWORD dwFileAttributes )
 ALIAS: SetFileAttributes SetFileAttributesW
-FUNCTION: DWORD SetFilePointer ( HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod ) ;
-FUNCTION: DWORD SetFilePointerEx ( HANDLE hFile, LARGE_INTEGER lDistanceToMove, PLARGE_INTEGER lpDistanceToMoveHigh, DWORD dwMoveMethod ) ;
+FUNCTION: DWORD SetFilePointer ( HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod )
+FUNCTION: DWORD SetFilePointerEx ( HANDLE hFile, LARGE_INTEGER lDistanceToMove, PLARGE_INTEGER lpDistanceToMoveHigh, DWORD dwMoveMethod )
 ! FUNCTION: SetFileShortNameA
 ! FUNCTION: SetFileShortNameW
-FUNCTION: BOOL SetFileTime ( HANDLE hFile, FILETIME* lpCreationTime, FILETIME* lpLastAccessTime, FILETIME* lpLastWriteTime ) ;
+FUNCTION: BOOL SetFileTime ( HANDLE hFile, FILETIME* lpCreationTime, FILETIME* lpLastAccessTime, FILETIME* lpLastWriteTime )
 ! FUNCTION: SetFileValidData
 ! FUNCTION: SetFirmwareEnvironmentVariableA
 ! FUNCTION: SetFirmwareEnvironmentVariableW
 ! FUNCTION: SetHandleContext
 ! FUNCTION: SetHandleCount
-FUNCTION: BOOL SetHandleInformation ( HANDLE hObject, DWORD dwMask, DWORD dwFlags ) ;
+FUNCTION: BOOL SetHandleInformation ( HANDLE hObject, DWORD dwMask, DWORD dwFlags )
 ! FUNCTION: SetInformationJobObject
 ! FUNCTION: SetLastConsoleEventActive
 ! FUNCTION: SetLastError
@@ -1843,14 +1843,14 @@ FUNCTION: BOOL SetHandleInformation ( HANDLE hObject, DWORD dwMask, DWORD dwFlag
 ! FUNCTION: SetMailslotInfo
 ! FUNCTION: SetMessageWaitingIndicator
 ! FUNCTION: SetNamedPipeHandleState
-FUNCTION: BOOL SetPriorityClass ( HANDLE hProcess, DWORD dwPriorityClass ) ;
+FUNCTION: BOOL SetPriorityClass ( HANDLE hProcess, DWORD dwPriorityClass )
 ! FUNCTION: SetProcessAffinityMask
-FUNCTION: BOOL SetProcessPriorityBoost ( HANDLE hProcess, BOOL disablePriorityBoost ) ;
+FUNCTION: BOOL SetProcessPriorityBoost ( HANDLE hProcess, BOOL disablePriorityBoost )
 ! FUNCTION: SetProcessShutdownParameters
 ! FUNCTION: SetProcessWorkingSetSize
 ! FUNCTION: SetStdHandle
 ! FUNCTION: SetSystemPowerState
-FUNCTION: BOOL SetSystemTime ( SYSTEMTIME* lpSystemTime ) ;
+FUNCTION: BOOL SetSystemTime ( SYSTEMTIME* lpSystemTime )
 ! FUNCTION: SetSystemTimeAdjustment
 ! FUNCTION: SetTapeParameters
 ! FUNCTION: SetTapePosition
@@ -1860,8 +1860,8 @@ FUNCTION: BOOL SetSystemTime ( SYSTEMTIME* lpSystemTime ) ;
 ! FUNCTION: SetThreadExecutionState
 ! FUNCTION: SetThreadIdealProcessor
 ! FUNCTION: SetThreadLocale
-FUNCTION: BOOL SetThreadPriority ( HANDLE hThread, int nPriority ) ;
-FUNCTION: BOOL SetThreadPriorityBoost ( HANDLE hThread, BOOL disablePriorityBoost ) ;
+FUNCTION: BOOL SetThreadPriority ( HANDLE hThread, int nPriority )
+FUNCTION: BOOL SetThreadPriorityBoost ( HANDLE hThread, BOOL disablePriorityBoost )
 ! FUNCTION: SetThreadUILanguage
 ! FUNCTION: SetTimerQueueTimer
 ! FUNCTION: SetTimeZoneInformation
@@ -1878,14 +1878,14 @@ FUNCTION: BOOL SetThreadPriorityBoost ( HANDLE hThread, BOOL disablePriorityBoos
 ! FUNCTION: SignalObjectAndWait
 ! FUNCTION: SizeofResource
 ! FUNCTION: Sleep
-FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable ) ;
+FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable )
 ! FUNCTION: SuspendThread
 ! FUNCTION: SwitchToFiber
 ! FUNCTION: SwitchToThread
-FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFileTime ) ;
+FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFileTime )
 ! FUNCTION: SystemTimeToTzSpecificLocalTime
 ! FUNCTION: TerminateJobObject
-FUNCTION: BOOL TerminateProcess ( HANDLE hProcess, DWORD uExit ) ;
+FUNCTION: BOOL TerminateProcess ( HANDLE hProcess, DWORD uExit )
 ! FUNCTION: TerminateThread
 ! FUNCTION: TermsrvAppInstallMode
 ! FUNCTION: Thread32First
@@ -1903,12 +1903,12 @@ FUNCTION: BOOL TerminateProcess ( HANDLE hProcess, DWORD uExit ) ;
 ! FUNCTION: UnhandledExceptionFilter
 ! FUNCTION: UnlockFile
 ! FUNCTION: UnlockFileEx
-FUNCTION: BOOL UnmapViewOfFile ( LPCVOID lpBaseAddress ) ;
+FUNCTION: BOOL UnmapViewOfFile ( LPCVOID lpBaseAddress )
 ! FUNCTION: UnregisterConsoleIME
 ! FUNCTION: UnregisterWait
 ! FUNCTION: UnregisterWaitEx
 ! FUNCTION: UpdateResourceA
-FUNCTION: BOOL UpdateResourceW ( HANDLE hUpdate, LPCTSTR lpType, LPCTSTR lpName, WORD wLanguage, LPVOID lpData, DWORD cbData ) ;
+FUNCTION: BOOL UpdateResourceW ( HANDLE hUpdate, LPCTSTR lpType, LPCTSTR lpName, WORD wLanguage, LPVOID lpData, DWORD cbData )
 ALIAS: UpdateResource UpdateResourceW
 ! FUNCTION: UTRegister
 ! FUNCTION: UTUnRegister
@@ -1923,21 +1923,21 @@ ALIAS: UpdateResource UpdateResourceW
 ! FUNCTION: VerLanguageNameW
 ! FUNCTION: VerSetConditionMask
 ! FUNCTION: VirtualAlloc
-FUNCTION: HANDLE VirtualAllocEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD flAllocationType, DWORD flProtect ) ;
+FUNCTION: HANDLE VirtualAllocEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD flAllocationType, DWORD flProtect )
 ! FUNCTION: VirtualBufferExceptionHandler
 ! FUNCTION: VirtualFree
-FUNCTION: BOOL VirtualFreeEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD dwFreeType ) ;
+FUNCTION: BOOL VirtualFreeEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD dwFreeType )
 ! FUNCTION: VirtualLock
 ! FUNCTION: VirtualProtect
 ! FUNCTION: VirtualProtectEx
 ! FUNCTION: VirtualQuery
-FUNCTION: BOOL VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, SIZE_T dwLength ) ;
+FUNCTION: BOOL VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, SIZE_T dwLength )
 ! FUNCTION: VirtualUnlock
 ! FUNCTION: WaitCommEvent
 ! FUNCTION: WaitForDebugEvent
-FUNCTION: DWORD WaitForMultipleObjects ( DWORD nCount, HANDLE* lpHandles, BOOL bWaitAll, DWORD dwMilliseconds ) ;
+FUNCTION: DWORD WaitForMultipleObjects ( DWORD nCount, HANDLE* lpHandles, BOOL bWaitAll, DWORD dwMilliseconds )
 ! FUNCTION: WaitForMultipleObjectsEx
-FUNCTION: BOOL WaitForSingleObject ( HANDLE hHandle, DWORD dwMilliseconds ) ;
+FUNCTION: BOOL WaitForSingleObject ( HANDLE hHandle, DWORD dwMilliseconds )
 ! FUNCTION: WaitForSingleObjectEx
 ! FUNCTION: WaitNamedPipeA
 ! FUNCTION: WaitNamedPipeW
@@ -1954,8 +1954,8 @@ FUNCTION: BOOL WaitForSingleObject ( HANDLE hHandle, DWORD dwMilliseconds ) ;
 ! FUNCTION: WriteConsoleOutputCharacterW
 ! FUNCTION: WriteConsoleOutputW
 ! FUNCTION: WriteConsoleW
-FUNCTION: BOOL WriteFile ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, void* lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped ) ;
-FUNCTION: BOOL WriteFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
+FUNCTION: BOOL WriteFile ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, void* lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped )
+FUNCTION: BOOL WriteFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine )
 ! FUNCTION: WriteFileGather
 ! FUNCTION: WritePrivateProfileSectionA
 ! FUNCTION: WritePrivateProfileSectionW
@@ -1963,7 +1963,7 @@ FUNCTION: BOOL WriteFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytes
 ! FUNCTION: WritePrivateProfileStringW
 ! FUNCTION: WritePrivateProfileStructA
 ! FUNCTION: WritePrivateProfileStructW
-FUNCTION: BOOL WriteProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesWritten )  ;
+FUNCTION: BOOL WriteProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesWritten )
 ! FUNCTION: WriteProfileSectionA
 ! FUNCTION: WriteProfileSectionW
 ! FUNCTION: WriteProfileStringA

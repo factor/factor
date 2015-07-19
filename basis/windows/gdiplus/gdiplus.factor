@@ -7,8 +7,8 @@ IN: windows.gdiplus
 
 LIBRARY: gdiplus
 
-FUNCTION: void* GdipAlloc ( SIZE_T size ) ;
-FUNCTION: void GdipFree ( void* mem ) ;
+FUNCTION: void* GdipAlloc ( SIZE_T size )
+FUNCTION: void GdipFree ( void* mem )
 
 DESTRUCTOR: GdipFree
 
@@ -38,7 +38,7 @@ ENUM: GpStatus
     { PropertyNotSupported       20 }
     { ProfileNotFound            21 } ;
 
-CALLBACK: BOOL ImageAbort ( void* data ) ;
+CALLBACK: BOOL ImageAbort ( void* data )
 TYPEDEF: ImageAbort DrawImageAbort
 TYPEDEF: ImageAbort GetThumbnailImageAbort
 
@@ -410,9 +410,9 @@ ENUM: DebugEventLevel
     DebugEventLevelFatal
     DebugEventLevelWarning ;
 
-CALLBACK: void DebugEventProc ( DebugEventLevel level, c-string msg ) ;
-CALLBACK: GpStatus NotificationHookProc ( ULONG_PTR* x ) ;
-CALLBACK: void NotificationUnhookProc ( ULONG_PTR x ) ;
+CALLBACK: void DebugEventProc ( DebugEventLevel level, c-string msg )
+CALLBACK: GpStatus NotificationHookProc ( ULONG_PTR* x )
+CALLBACK: void NotificationUnhookProc ( ULONG_PTR x )
 
 STRUCT: GdiplusStartupInput
     { GdiplusVersion UINT32 }
@@ -424,8 +424,8 @@ STRUCT: GdiplusStartupOutput
     { NotificationHook NotificationHookProc }
     { NotificationUnhook NotificationUnhookProc } ;
 
-FUNCTION: GpStatus GdiplusStartup ( ULONG_PTR* x, GdiplusStartupInput* in, GdiplusStartupOutput* out ) ;
-FUNCTION: void GdiplusShutdown ( ULONG_PTR x ) ;
+FUNCTION: GpStatus GdiplusStartup ( ULONG_PTR* x, GdiplusStartupInput* in, GdiplusStartupOutput* out )
+FUNCTION: void GdiplusShutdown ( ULONG_PTR x )
 
 TYPEDEF: DWORD ARGB
 TYPEDEF: INT PixelFormat
@@ -944,686 +944,686 @@ C-TYPE: CGpEffect
 C-TYPE: LOGFONTA
 C-TYPE: LOGFONTW
 
-FUNCTION: GpStatus GdipCreateAdjustableArrowCap ( REAL x, REAL x, BOOL x, GpAdjustableArrowCap** x ) ;
-FUNCTION: GpStatus GdipGetAdjustableArrowCapFillState ( GpAdjustableArrowCap* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipGetAdjustableArrowCapHeight ( GpAdjustableArrowCap* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetAdjustableArrowCapMiddleInset ( GpAdjustableArrowCap* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetAdjustableArrowCapWidth ( GpAdjustableArrowCap* x, REAL* x ) ;
-FUNCTION: GpStatus GdipSetAdjustableArrowCapFillState ( GpAdjustableArrowCap* x, BOOL x ) ;
-FUNCTION: GpStatus GdipSetAdjustableArrowCapHeight ( GpAdjustableArrowCap* x, REAL x ) ;
-FUNCTION: GpStatus GdipSetAdjustableArrowCapMiddleInset ( GpAdjustableArrowCap* x, REAL x ) ;
-FUNCTION: GpStatus GdipSetAdjustableArrowCapWidth ( GpAdjustableArrowCap* x, REAL x ) ;
+FUNCTION: GpStatus GdipCreateAdjustableArrowCap ( REAL x, REAL x, BOOL x, GpAdjustableArrowCap** x )
+FUNCTION: GpStatus GdipGetAdjustableArrowCapFillState ( GpAdjustableArrowCap* x, BOOL* x )
+FUNCTION: GpStatus GdipGetAdjustableArrowCapHeight ( GpAdjustableArrowCap* x, REAL* x )
+FUNCTION: GpStatus GdipGetAdjustableArrowCapMiddleInset ( GpAdjustableArrowCap* x, REAL* x )
+FUNCTION: GpStatus GdipGetAdjustableArrowCapWidth ( GpAdjustableArrowCap* x, REAL* x )
+FUNCTION: GpStatus GdipSetAdjustableArrowCapFillState ( GpAdjustableArrowCap* x, BOOL x )
+FUNCTION: GpStatus GdipSetAdjustableArrowCapHeight ( GpAdjustableArrowCap* x, REAL x )
+FUNCTION: GpStatus GdipSetAdjustableArrowCapMiddleInset ( GpAdjustableArrowCap* x, REAL x )
+FUNCTION: GpStatus GdipSetAdjustableArrowCapWidth ( GpAdjustableArrowCap* x, REAL x )
 
-FUNCTION: GpStatus GdipBitmapApplyEffect ( GpBitmap* x, CGpEffect* x, RECT* x, BOOL x, VOID** x, INT* x ) ;
-FUNCTION: GpStatus GdipBitmapCreateApplyEffect ( GpBitmap** x, INT x, CGpEffect* x, RECT* x, RECT* x, GpBitmap** x, BOOL x, VOID** x, INT* x ) ;
-FUNCTION: GpStatus GdipBitmapGetPixel ( GpBitmap* x, INT x, INT x, ARGB* x ) ;
+FUNCTION: GpStatus GdipBitmapApplyEffect ( GpBitmap* x, CGpEffect* x, RECT* x, BOOL x, VOID** x, INT* x )
+FUNCTION: GpStatus GdipBitmapCreateApplyEffect ( GpBitmap** x, INT x, CGpEffect* x, RECT* x, RECT* x, GpBitmap** x, BOOL x, VOID** x, INT* x )
+FUNCTION: GpStatus GdipBitmapGetPixel ( GpBitmap* x, INT x, INT x, ARGB* x )
 FUNCTION: GpStatus GdipBitmapLockBits ( GpBitmap* x, GpRect* x, UINT x,
-             PixelFormat x, BitmapData* x ) ;
-FUNCTION: GpStatus GdipBitmapSetPixel ( GpBitmap* x, INT x, INT x, ARGB x ) ;
-FUNCTION: GpStatus GdipBitmapSetResolution ( GpBitmap* x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipBitmapUnlockBits ( GpBitmap* x, BitmapData* x ) ;
-FUNCTION: GpStatus GdipCloneBitmapArea ( REAL x, REAL x, REAL x, REAL x, PixelFormat x, GpBitmap* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCloneBitmapAreaI ( INT x, INT x, INT x, INT x, PixelFormat x, GpBitmap* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromFile ( WCHAR* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromFileICM ( WCHAR* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromGdiDib ( BITMAPINFO* x, VOID* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromGraphics ( INT x, INT x, GpGraphics* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromHBITMAP ( HBITMAP x,  HPALETTE x,  GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromHICON ( HICON x,  GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromResource ( HINSTANCE x, WCHAR* x, GpBitmap** x ) ;
+             PixelFormat x, BitmapData* x )
+FUNCTION: GpStatus GdipBitmapSetPixel ( GpBitmap* x, INT x, INT x, ARGB x )
+FUNCTION: GpStatus GdipBitmapSetResolution ( GpBitmap* x, REAL x, REAL x )
+FUNCTION: GpStatus GdipBitmapUnlockBits ( GpBitmap* x, BitmapData* x )
+FUNCTION: GpStatus GdipCloneBitmapArea ( REAL x, REAL x, REAL x, REAL x, PixelFormat x, GpBitmap* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCloneBitmapAreaI ( INT x, INT x, INT x, INT x, PixelFormat x, GpBitmap* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromFile ( WCHAR* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromFileICM ( WCHAR* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromGdiDib ( BITMAPINFO* x, VOID* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromGraphics ( INT x, INT x, GpGraphics* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromHBITMAP ( HBITMAP x,  HPALETTE x,  GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromHICON ( HICON x,  GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromResource ( HINSTANCE x, WCHAR* x, GpBitmap** x )
 FUNCTION: GpStatus GdipCreateBitmapFromScan0 ( INT x, INT x, INT x, PixelFormat x, BYTE* x,
-             GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromStream ( IStream* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateBitmapFromStreamICM ( IStream* x, GpBitmap** x ) ;
-FUNCTION: GpStatus GdipCreateHBITMAPFromBitmap ( GpBitmap* x, HBITMAP* x, ARGB x ) ;
-FUNCTION: GpStatus GdipCreateHICONFromBitmap ( GpBitmap* x, HICON* x ) ;
-FUNCTION: GpStatus GdipDeleteEffect ( CGpEffect* x ) ;
-FUNCTION: GpStatus GdipSetEffectParameters ( CGpEffect* x, VOID* x, UINT x ) ;
+             GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromStream ( IStream* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCreateBitmapFromStreamICM ( IStream* x, GpBitmap** x )
+FUNCTION: GpStatus GdipCreateHBITMAPFromBitmap ( GpBitmap* x, HBITMAP* x, ARGB x )
+FUNCTION: GpStatus GdipCreateHICONFromBitmap ( GpBitmap* x, HICON* x )
+FUNCTION: GpStatus GdipDeleteEffect ( CGpEffect* x )
+FUNCTION: GpStatus GdipSetEffectParameters ( CGpEffect* x, VOID* x, UINT x )
 
 
-FUNCTION: GpStatus GdipCloneBrush ( GpBrush* x, GpBrush** x ) ;
-FUNCTION: GpStatus GdipDeleteBrush ( GpBrush* x ) ;
-FUNCTION: GpStatus GdipGetBrushType ( GpBrush* x, GpBrushType* x ) ;
+FUNCTION: GpStatus GdipCloneBrush ( GpBrush* x, GpBrush** x )
+FUNCTION: GpStatus GdipDeleteBrush ( GpBrush* x )
+FUNCTION: GpStatus GdipGetBrushType ( GpBrush* x, GpBrushType* x )
 
 
 FUNCTION: GpStatus GdipCreateCachedBitmap ( GpBitmap* x, GpGraphics* x,
-             GpCachedBitmap** x ) ;
-FUNCTION: GpStatus GdipDeleteCachedBitmap ( GpCachedBitmap* x ) ;
-FUNCTION: GpStatus GdipDrawCachedBitmap ( GpGraphics* x, GpCachedBitmap* x, INT x, INT x ) ;
+             GpCachedBitmap** x )
+FUNCTION: GpStatus GdipDeleteCachedBitmap ( GpCachedBitmap* x )
+FUNCTION: GpStatus GdipDrawCachedBitmap ( GpGraphics* x, GpCachedBitmap* x, INT x, INT x )
 
 
-FUNCTION: GpStatus GdipCloneCustomLineCap ( GpCustomLineCap* x, GpCustomLineCap** x ) ;
+FUNCTION: GpStatus GdipCloneCustomLineCap ( GpCustomLineCap* x, GpCustomLineCap** x )
 FUNCTION: GpStatus GdipCreateCustomLineCap ( GpPath* x, GpPath* x, GpLineCap x, REAL x,
-             GpCustomLineCap** x ) ;
-FUNCTION: GpStatus GdipDeleteCustomLineCap ( GpCustomLineCap* x ) ;
-FUNCTION: GpStatus GdipGetCustomLineCapBaseCap ( GpCustomLineCap* x, GpLineCap* x ) ;
-FUNCTION: GpStatus GdipSetCustomLineCapBaseCap ( GpCustomLineCap* x, GpLineCap x ) ;
-FUNCTION: GpStatus GdipGetCustomLineCapBaseInset ( GpCustomLineCap* x, REAL* x ) ;
-FUNCTION: GpStatus GdipSetCustomLineCapBaseInset ( GpCustomLineCap* x, REAL x ) ;
+             GpCustomLineCap** x )
+FUNCTION: GpStatus GdipDeleteCustomLineCap ( GpCustomLineCap* x )
+FUNCTION: GpStatus GdipGetCustomLineCapBaseCap ( GpCustomLineCap* x, GpLineCap* x )
+FUNCTION: GpStatus GdipSetCustomLineCapBaseCap ( GpCustomLineCap* x, GpLineCap x )
+FUNCTION: GpStatus GdipGetCustomLineCapBaseInset ( GpCustomLineCap* x, REAL* x )
+FUNCTION: GpStatus GdipSetCustomLineCapBaseInset ( GpCustomLineCap* x, REAL x )
 FUNCTION: GpStatus GdipSetCustomLineCapStrokeCaps ( GpCustomLineCap* x, GpLineCap x,
-             GpLineCap x ) ;
-FUNCTION: GpStatus GdipGetCustomLineCapStrokeJoin ( GpCustomLineCap* x, GpLineJoin* x ) ;
-FUNCTION: GpStatus GdipSetCustomLineCapStrokeJoin ( GpCustomLineCap* x, GpLineJoin x ) ;
-FUNCTION: GpStatus GdipGetCustomLineCapWidthScale ( GpCustomLineCap* x, REAL* x ) ;
-FUNCTION: GpStatus GdipSetCustomLineCapWidthScale ( GpCustomLineCap* x, REAL x ) ;
+             GpLineCap x )
+FUNCTION: GpStatus GdipGetCustomLineCapStrokeJoin ( GpCustomLineCap* x, GpLineJoin* x )
+FUNCTION: GpStatus GdipSetCustomLineCapStrokeJoin ( GpCustomLineCap* x, GpLineJoin x )
+FUNCTION: GpStatus GdipGetCustomLineCapWidthScale ( GpCustomLineCap* x, REAL* x )
+FUNCTION: GpStatus GdipSetCustomLineCapWidthScale ( GpCustomLineCap* x, REAL x )
 
-FUNCTION: GpStatus GdipCloneFont ( GpFont* x, GpFont** x ) ;
+FUNCTION: GpStatus GdipCloneFont ( GpFont* x, GpFont** x )
 FUNCTION: GpStatus GdipCreateFont ( GpFontFamily* x,  REAL x,  INT x,  GpUnit x,
-             GpFont** x ) ;
-FUNCTION: GpStatus GdipCreateFontFromDC ( HDC x, GpFont** x ) ;
-FUNCTION: GpStatus GdipCreateFontFromLogfontA ( HDC x, LOGFONTA* x, GpFont** x ) ;
-FUNCTION: GpStatus GdipCreateFontFromLogfontW ( HDC x, LOGFONTW* x, GpFont** x ) ;
-FUNCTION: GpStatus GdipDeleteFont ( GpFont* x ) ;
-FUNCTION: GpStatus GdipGetLogFontA ( GpFont* x, GpGraphics* x, LOGFONTA* x ) ;
-FUNCTION: GpStatus GdipGetLogFontW ( GpFont* x, GpGraphics* x, LOGFONTW* x ) ;
-FUNCTION: GpStatus GdipGetFamily ( GpFont* x,  GpFontFamily** x ) ;
-FUNCTION: GpStatus GdipGetFontUnit ( GpFont* x,  GpUnit* x ) ;
-FUNCTION: GpStatus GdipGetFontSize ( GpFont* x,  REAL* x ) ;
-FUNCTION: GpStatus GdipGetFontStyle ( GpFont* x,  INT* x ) ;
+             GpFont** x )
+FUNCTION: GpStatus GdipCreateFontFromDC ( HDC x, GpFont** x )
+FUNCTION: GpStatus GdipCreateFontFromLogfontA ( HDC x, LOGFONTA* x, GpFont** x )
+FUNCTION: GpStatus GdipCreateFontFromLogfontW ( HDC x, LOGFONTW* x, GpFont** x )
+FUNCTION: GpStatus GdipDeleteFont ( GpFont* x )
+FUNCTION: GpStatus GdipGetLogFontA ( GpFont* x, GpGraphics* x, LOGFONTA* x )
+FUNCTION: GpStatus GdipGetLogFontW ( GpFont* x, GpGraphics* x, LOGFONTW* x )
+FUNCTION: GpStatus GdipGetFamily ( GpFont* x,  GpFontFamily** x )
+FUNCTION: GpStatus GdipGetFontUnit ( GpFont* x,  GpUnit* x )
+FUNCTION: GpStatus GdipGetFontSize ( GpFont* x,  REAL* x )
+FUNCTION: GpStatus GdipGetFontStyle ( GpFont* x,  INT* x )
 FUNCTION: GpStatus GdipGetFontHeight ( GpFont* x,  GpGraphics* x,
-                 REAL* x ) ;
-FUNCTION: GpStatus GdipGetFontHeightGivenDPI ( GpFont* x,  REAL x,  REAL* x ) ;
+                 REAL* x )
+FUNCTION: GpStatus GdipGetFontHeightGivenDPI ( GpFont* x,  REAL x,  REAL* x )
 
 
-FUNCTION: GpStatus GdipNewInstalledFontCollection ( GpFontCollection** x ) ;
-FUNCTION: GpStatus GdipNewPrivateFontCollection ( GpFontCollection** x ) ;
-FUNCTION: GpStatus GdipDeletePrivateFontCollection ( GpFontCollection** x ) ;
-FUNCTION: GpStatus GdipPrivateAddFontFile ( GpFontCollection* x,  WCHAR* x ) ;
+FUNCTION: GpStatus GdipNewInstalledFontCollection ( GpFontCollection** x )
+FUNCTION: GpStatus GdipNewPrivateFontCollection ( GpFontCollection** x )
+FUNCTION: GpStatus GdipDeletePrivateFontCollection ( GpFontCollection** x )
+FUNCTION: GpStatus GdipPrivateAddFontFile ( GpFontCollection* x,  WCHAR* x )
 FUNCTION: GpStatus GdipPrivateAddMemoryFont ( GpFontCollection* x,
-                 void* x, INT x ) ;
-FUNCTION: GpStatus GdipGetFontCollectionFamilyCount ( GpFontCollection* x,  INT* x ) ;
+                 void* x, INT x )
+FUNCTION: GpStatus GdipGetFontCollectionFamilyCount ( GpFontCollection* x,  INT* x )
 FUNCTION: GpStatus GdipGetFontCollectionFamilyList ( GpFontCollection* x,  INT x,
-                 GpFontFamily** x,  INT* x ) ;
+                 GpFontFamily** x,  INT* x )
 
 
-FUNCTION: GpStatus GdipCloneFontFamily ( GpFontFamily* x,  GpFontFamily** x ) ;
+FUNCTION: GpStatus GdipCloneFontFamily ( GpFontFamily* x,  GpFontFamily** x )
 FUNCTION: GpStatus GdipCreateFontFamilyFromName ( WCHAR* x,
-             GpFontCollection* x,  GpFontFamily** x ) ;
-FUNCTION: GpStatus GdipDeleteFontFamily ( GpFontFamily* x ) ;
-FUNCTION: GpStatus GdipGetFamilyName ( GpFontFamily* x,  WCHAR* x,  LANGID x ) ;
-FUNCTION: GpStatus GdipGetCellAscent ( GpFontFamily* x,  INT x,  UINT16* x ) ;
-FUNCTION: GpStatus GdipGetCellDescent ( GpFontFamily* x,  INT x,  UINT16* x ) ;
-FUNCTION: GpStatus GdipGetEmHeight ( GpFontFamily* x,  INT x,  UINT16* x ) ;
-FUNCTION: GpStatus GdipGetGenericFontFamilySansSerif ( GpFontFamily** x ) ;
-FUNCTION: GpStatus GdipGetGenericFontFamilySerif ( GpFontFamily** x ) ;
-FUNCTION: GpStatus GdipGetGenericFontFamilyMonospace ( GpFontFamily** x ) ;
-FUNCTION: GpStatus GdipGetLineSpacing ( GpFontFamily* x,  INT x,  UINT16* x ) ;
-FUNCTION: GpStatus GdipIsStyleAvailable ( GpFontFamily* x,  INT x,  BOOL* x ) ;
+             GpFontCollection* x,  GpFontFamily** x )
+FUNCTION: GpStatus GdipDeleteFontFamily ( GpFontFamily* x )
+FUNCTION: GpStatus GdipGetFamilyName ( GpFontFamily* x,  WCHAR* x,  LANGID x )
+FUNCTION: GpStatus GdipGetCellAscent ( GpFontFamily* x,  INT x,  UINT16* x )
+FUNCTION: GpStatus GdipGetCellDescent ( GpFontFamily* x,  INT x,  UINT16* x )
+FUNCTION: GpStatus GdipGetEmHeight ( GpFontFamily* x,  INT x,  UINT16* x )
+FUNCTION: GpStatus GdipGetGenericFontFamilySansSerif ( GpFontFamily** x )
+FUNCTION: GpStatus GdipGetGenericFontFamilySerif ( GpFontFamily** x )
+FUNCTION: GpStatus GdipGetGenericFontFamilyMonospace ( GpFontFamily** x )
+FUNCTION: GpStatus GdipGetLineSpacing ( GpFontFamily* x,  INT x,  UINT16* x )
+FUNCTION: GpStatus GdipIsStyleAvailable ( GpFontFamily* x,  INT x,  BOOL* x )
 
 
-FUNCTION: GpStatus GdipFlush ( GpGraphics* x,  GpFlushIntention x ) ;
-FUNCTION: GpStatus GdipBeginContainer ( GpGraphics* x, GpRectF* x, GpRectF* x, GpUnit x, GraphicsContainer* x ) ;
-FUNCTION: GpStatus GdipBeginContainer2 ( GpGraphics* x, GraphicsContainer* x ) ;
-FUNCTION: GpStatus GdipBeginContainerI ( GpGraphics* x, GpRect* x, GpRect* x, GpUnit x, GraphicsContainer* x ) ;
-FUNCTION: GpStatus GdipEndContainer ( GpGraphics* x, GraphicsContainer x ) ;
-FUNCTION: GpStatus GdipComment ( GpGraphics* x, UINT x, BYTE* x ) ;
-FUNCTION: GpStatus GdipCreateFromHDC ( HDC x, GpGraphics** x ) ;
-FUNCTION: GpStatus GdipCreateFromHDC2 ( HDC x, HANDLE x, GpGraphics** x ) ;
-FUNCTION: GpStatus GdipCreateFromHWND ( HWND x, GpGraphics** x ) ;
-FUNCTION: GpStatus GdipCreateFromHWNDICM ( HWND x, GpGraphics** x ) ;
-FUNCTION: HPALETTE GdipCreateHalftonePalette ( ) ;
-FUNCTION: GpStatus GdipDeleteGraphics ( GpGraphics* x ) ;
-FUNCTION: GpStatus GdipDrawArc ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawArcI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawBezier ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawBezierI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipDrawBeziers ( GpGraphics* x, GpPen* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawBeziersI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawClosedCurve ( GpGraphics* x, GpPen* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawClosedCurveI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawClosedCurve2 ( GpGraphics* x, GpPen* x, GpPointF* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawClosedCurve2I ( GpGraphics* x, GpPen* x, GpPoint* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawCurve ( GpGraphics* x, GpPen* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawCurveI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawCurve2 ( GpGraphics* x, GpPen* x, GpPointF* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawCurve2I ( GpGraphics* x, GpPen* x, GpPoint* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawCurve3 ( GpGraphics* x, GpPen* x, GpPointF* x, INT x, INT x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawCurve3I ( GpGraphics* x, GpPen* x, GpPoint* x, INT x, INT x, INT x, REAL x ) ;
+FUNCTION: GpStatus GdipFlush ( GpGraphics* x,  GpFlushIntention x )
+FUNCTION: GpStatus GdipBeginContainer ( GpGraphics* x, GpRectF* x, GpRectF* x, GpUnit x, GraphicsContainer* x )
+FUNCTION: GpStatus GdipBeginContainer2 ( GpGraphics* x, GraphicsContainer* x )
+FUNCTION: GpStatus GdipBeginContainerI ( GpGraphics* x, GpRect* x, GpRect* x, GpUnit x, GraphicsContainer* x )
+FUNCTION: GpStatus GdipEndContainer ( GpGraphics* x, GraphicsContainer x )
+FUNCTION: GpStatus GdipComment ( GpGraphics* x, UINT x, BYTE* x )
+FUNCTION: GpStatus GdipCreateFromHDC ( HDC x, GpGraphics** x )
+FUNCTION: GpStatus GdipCreateFromHDC2 ( HDC x, HANDLE x, GpGraphics** x )
+FUNCTION: GpStatus GdipCreateFromHWND ( HWND x, GpGraphics** x )
+FUNCTION: GpStatus GdipCreateFromHWNDICM ( HWND x, GpGraphics** x )
+FUNCTION: HPALETTE GdipCreateHalftonePalette ( )
+FUNCTION: GpStatus GdipDeleteGraphics ( GpGraphics* x )
+FUNCTION: GpStatus GdipDrawArc ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawArcI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawBezier ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawBezierI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipDrawBeziers ( GpGraphics* x, GpPen* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipDrawBeziersI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipDrawClosedCurve ( GpGraphics* x, GpPen* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipDrawClosedCurveI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipDrawClosedCurve2 ( GpGraphics* x, GpPen* x, GpPointF* x, INT x, REAL x )
+FUNCTION: GpStatus GdipDrawClosedCurve2I ( GpGraphics* x, GpPen* x, GpPoint* x, INT x, REAL x )
+FUNCTION: GpStatus GdipDrawCurve ( GpGraphics* x, GpPen* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipDrawCurveI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipDrawCurve2 ( GpGraphics* x, GpPen* x, GpPointF* x, INT x, REAL x )
+FUNCTION: GpStatus GdipDrawCurve2I ( GpGraphics* x, GpPen* x, GpPoint* x, INT x, REAL x )
+FUNCTION: GpStatus GdipDrawCurve3 ( GpGraphics* x, GpPen* x, GpPointF* x, INT x, INT x, INT x, REAL x )
+FUNCTION: GpStatus GdipDrawCurve3I ( GpGraphics* x, GpPen* x, GpPoint* x, INT x, INT x, INT x, REAL x )
 FUNCTION: GpStatus GdipDrawDriverString ( GpGraphics* x, UINT16* x, INT x,
-             GpFont* x, GpBrush* x, GpPointF* x, INT x, GpMatrix* x ) ;
-FUNCTION: GpStatus GdipDrawEllipse ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawEllipseI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipDrawImage ( GpGraphics* x, GpImage* x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawImageI ( GpGraphics* x, GpImage* x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipDrawImagePointRect ( GpGraphics* x, GpImage* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, GpUnit x ) ;
-FUNCTION: GpStatus GdipDrawImagePointRectI ( GpGraphics* x, GpImage* x, INT x, INT x, INT x, INT x, INT x, INT x, GpUnit x ) ;
-FUNCTION: GpStatus GdipDrawImagePoints ( GpGraphics* x, GpImage* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawImagePointsI ( GpGraphics* x, GpImage* x, GpPoint* x, INT x ) ;
+             GpFont* x, GpBrush* x, GpPointF* x, INT x, GpMatrix* x )
+FUNCTION: GpStatus GdipDrawEllipse ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawEllipseI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipDrawImage ( GpGraphics* x, GpImage* x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawImageI ( GpGraphics* x, GpImage* x, INT x, INT x )
+FUNCTION: GpStatus GdipDrawImagePointRect ( GpGraphics* x, GpImage* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, GpUnit x )
+FUNCTION: GpStatus GdipDrawImagePointRectI ( GpGraphics* x, GpImage* x, INT x, INT x, INT x, INT x, INT x, INT x, GpUnit x )
+FUNCTION: GpStatus GdipDrawImagePoints ( GpGraphics* x, GpImage* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipDrawImagePointsI ( GpGraphics* x, GpImage* x, GpPoint* x, INT x )
 FUNCTION: GpStatus GdipDrawImagePointsRect ( GpGraphics* x, GpImage* x,
              GpPointF* x, INT x, REAL x, REAL x, REAL x, REAL x, GpUnit x,
-             GpImageAttributes* x, DrawImageAbort x, VOID* x ) ;
+             GpImageAttributes* x, DrawImageAbort x, VOID* x )
 FUNCTION: GpStatus GdipDrawImagePointsRectI ( GpGraphics* x, GpImage* x,
              GpPoint* x, INT x, INT x, INT x, INT x, INT x, GpUnit x,
-             GpImageAttributes* x, DrawImageAbort x, VOID* x ) ;
-FUNCTION: GpStatus GdipDrawImageRect ( GpGraphics* x, GpImage* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawImageRectI ( GpGraphics* x, GpImage* x, INT x, INT x, INT x, INT x ) ;
+             GpImageAttributes* x, DrawImageAbort x, VOID* x )
+FUNCTION: GpStatus GdipDrawImageRect ( GpGraphics* x, GpImage* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawImageRectI ( GpGraphics* x, GpImage* x, INT x, INT x, INT x, INT x )
 FUNCTION: GpStatus GdipDrawImageRectRect ( GpGraphics* x, GpImage* x, REAL x, REAL x, REAL x,
              REAL x, REAL x, REAL x, REAL x, REAL x, GpUnit x, GpImageAttributes* x, DrawImageAbort x,
-             VOID* x ) ;
+             VOID* x )
 FUNCTION: GpStatus GdipDrawImageRectRectI ( GpGraphics* x, GpImage* x, INT x, INT x, INT x,
              INT x, INT x, INT x, INT x, INT x, GpUnit x, GpImageAttributes* x, DrawImageAbort x,
-             VOID* x ) ;
-FUNCTION: GpStatus GdipDrawLine ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawLineI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipDrawLines ( GpGraphics* x, GpPen* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawLinesI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawPath ( GpGraphics* x, GpPen* x, GpPath* x ) ;
-FUNCTION: GpStatus GdipDrawPie ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawPieI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawPolygon ( GpGraphics* x, GpPen* x, GpPointF* x,  INT x ) ;
-FUNCTION: GpStatus GdipDrawPolygonI ( GpGraphics* x, GpPen* x, GpPoint* x,  INT x ) ;
-FUNCTION: GpStatus GdipDrawRectangle ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipDrawRectangleI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipDrawRectangles ( GpGraphics* x, GpPen* x, GpRectF* x, INT x ) ;
-FUNCTION: GpStatus GdipDrawRectanglesI ( GpGraphics* x, GpPen* x, GpRect* x, INT x ) ;
+             VOID* x )
+FUNCTION: GpStatus GdipDrawLine ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawLineI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipDrawLines ( GpGraphics* x, GpPen* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipDrawLinesI ( GpGraphics* x, GpPen* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipDrawPath ( GpGraphics* x, GpPen* x, GpPath* x )
+FUNCTION: GpStatus GdipDrawPie ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawPieI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawPolygon ( GpGraphics* x, GpPen* x, GpPointF* x,  INT x )
+FUNCTION: GpStatus GdipDrawPolygonI ( GpGraphics* x, GpPen* x, GpPoint* x,  INT x )
+FUNCTION: GpStatus GdipDrawRectangle ( GpGraphics* x, GpPen* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipDrawRectangleI ( GpGraphics* x, GpPen* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipDrawRectangles ( GpGraphics* x, GpPen* x, GpRectF* x, INT x )
+FUNCTION: GpStatus GdipDrawRectanglesI ( GpGraphics* x, GpPen* x, GpRect* x, INT x )
 FUNCTION: GpStatus GdipDrawString ( GpGraphics* x, WCHAR* x, INT x,
              GpFont* x, GpRectF* x,  GpStringFormat* x,
-             GpBrush* x ) ;
+             GpBrush* x )
 FUNCTION: GpStatus GdipFillClosedCurve2 ( GpGraphics* x, GpBrush* x, GpPointF* x, INT x,
-             REAL x, GpFillMode x ) ;
+             REAL x, GpFillMode x )
 FUNCTION: GpStatus GdipFillClosedCurve2I ( GpGraphics* x, GpBrush* x, GpPoint* x, INT x,
-             REAL x, GpFillMode x ) ;
-FUNCTION: GpStatus GdipFillEllipse ( GpGraphics* x, GpBrush* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipFillEllipseI ( GpGraphics* x, GpBrush* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipFillPath ( GpGraphics* x, GpBrush* x, GpPath* x ) ;
-FUNCTION: GpStatus GdipFillPie ( GpGraphics* x, GpBrush* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipFillPieI ( GpGraphics* x, GpBrush* x, INT x, INT x, INT x, INT x, REAL x, REAL x ) ;
+             REAL x, GpFillMode x )
+FUNCTION: GpStatus GdipFillEllipse ( GpGraphics* x, GpBrush* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipFillEllipseI ( GpGraphics* x, GpBrush* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipFillPath ( GpGraphics* x, GpBrush* x, GpPath* x )
+FUNCTION: GpStatus GdipFillPie ( GpGraphics* x, GpBrush* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipFillPieI ( GpGraphics* x, GpBrush* x, INT x, INT x, INT x, INT x, REAL x, REAL x )
 FUNCTION: GpStatus GdipFillPolygon ( GpGraphics* x, GpBrush* x, GpPointF* x,
-             INT x, GpFillMode x ) ;
+             INT x, GpFillMode x )
 FUNCTION: GpStatus GdipFillPolygonI ( GpGraphics* x, GpBrush* x, GpPoint* x,
-             INT x, GpFillMode x ) ;
-FUNCTION: GpStatus GdipFillPolygon2 ( GpGraphics* x, GpBrush* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipFillPolygon2I ( GpGraphics* x, GpBrush* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipFillRectangle ( GpGraphics* x, GpBrush* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipFillRectangleI ( GpGraphics* x, GpBrush* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipFillRectangles ( GpGraphics* x, GpBrush* x, GpRectF* x, INT x ) ;
-FUNCTION: GpStatus GdipFillRectanglesI ( GpGraphics* x, GpBrush* x, GpRect* x, INT x ) ;
-FUNCTION: GpStatus GdipFillRegion ( GpGraphics* x, GpBrush* x, GpRegion* x ) ;
-FUNCTION: GpStatus GdipGetClip ( GpGraphics* x, GpRegion* x ) ;
-FUNCTION: GpStatus GdipGetClipBounds ( GpGraphics* x, GpRectF* x ) ;
-FUNCTION: GpStatus GdipGetClipBoundsI ( GpGraphics* x, GpRect* x ) ;
-FUNCTION: GpStatus GdipGetCompositingMode ( GpGraphics* x, CompositingMode* x ) ;
-FUNCTION: GpStatus GdipGetCompositingQuality ( GpGraphics* x, CompositingQuality* x ) ;
-FUNCTION: GpStatus GdipGetDC ( GpGraphics* x, HDC* x ) ;
-FUNCTION: GpStatus GdipGetDpiX ( GpGraphics* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetDpiY ( GpGraphics* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetImageDecoders ( UINT x, UINT x, ImageCodecInfo* x ) ;
-FUNCTION: GpStatus GdipGetImageDecodersSize ( UINT* x, UINT* x ) ;
-FUNCTION: GpStatus GdipGetImageGraphicsContext ( GpImage* x, GpGraphics** x ) ;
-FUNCTION: GpStatus GdipGetInterpolationMode ( GpGraphics* x, InterpolationMode* x ) ;
-FUNCTION: GpStatus GdipGetNearestColor ( GpGraphics* x, ARGB* x ) ;
-FUNCTION: GpStatus GdipGetPageScale ( GpGraphics* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetPageUnit ( GpGraphics* x, GpUnit* x ) ;
-FUNCTION: GpStatus GdipGetPixelOffsetMode ( GpGraphics* x, PixelOffsetMode* x ) ;
-FUNCTION: GpStatus GdipGetSmoothingMode ( GpGraphics* x, SmoothingMode* x ) ;
-FUNCTION: GpStatus GdipGetTextContrast ( GpGraphics* x, UINT* x ) ;
-FUNCTION: GpStatus GdipGetTextRenderingHint ( GpGraphics* x, TextRenderingHint* x ) ;
-FUNCTION: GpStatus GdipGetWorldTransform ( GpGraphics* x, GpMatrix* x ) ;
-FUNCTION: GpStatus GdipGraphicsClear ( GpGraphics* x, ARGB x ) ;
-FUNCTION: GpStatus GdipGetVisibleClipBounds ( GpGraphics* x, GpRectF* x ) ;
-FUNCTION: GpStatus GdipGetVisibleClipBoundsI ( GpGraphics* x, GpRect* x ) ;
-FUNCTION: GpStatus GdipIsClipEmpty ( GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisiblePoint ( GpGraphics* x, REAL x, REAL x, BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisiblePointI ( GpGraphics* x, INT x, INT x, BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisibleRect ( GpGraphics* x, REAL x, REAL x, REAL x, REAL x, BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisibleRectI ( GpGraphics* x, INT x, INT x, INT x, INT x, BOOL* x ) ;
+             INT x, GpFillMode x )
+FUNCTION: GpStatus GdipFillPolygon2 ( GpGraphics* x, GpBrush* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipFillPolygon2I ( GpGraphics* x, GpBrush* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipFillRectangle ( GpGraphics* x, GpBrush* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipFillRectangleI ( GpGraphics* x, GpBrush* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipFillRectangles ( GpGraphics* x, GpBrush* x, GpRectF* x, INT x )
+FUNCTION: GpStatus GdipFillRectanglesI ( GpGraphics* x, GpBrush* x, GpRect* x, INT x )
+FUNCTION: GpStatus GdipFillRegion ( GpGraphics* x, GpBrush* x, GpRegion* x )
+FUNCTION: GpStatus GdipGetClip ( GpGraphics* x, GpRegion* x )
+FUNCTION: GpStatus GdipGetClipBounds ( GpGraphics* x, GpRectF* x )
+FUNCTION: GpStatus GdipGetClipBoundsI ( GpGraphics* x, GpRect* x )
+FUNCTION: GpStatus GdipGetCompositingMode ( GpGraphics* x, CompositingMode* x )
+FUNCTION: GpStatus GdipGetCompositingQuality ( GpGraphics* x, CompositingQuality* x )
+FUNCTION: GpStatus GdipGetDC ( GpGraphics* x, HDC* x )
+FUNCTION: GpStatus GdipGetDpiX ( GpGraphics* x, REAL* x )
+FUNCTION: GpStatus GdipGetDpiY ( GpGraphics* x, REAL* x )
+FUNCTION: GpStatus GdipGetImageDecoders ( UINT x, UINT x, ImageCodecInfo* x )
+FUNCTION: GpStatus GdipGetImageDecodersSize ( UINT* x, UINT* x )
+FUNCTION: GpStatus GdipGetImageGraphicsContext ( GpImage* x, GpGraphics** x )
+FUNCTION: GpStatus GdipGetInterpolationMode ( GpGraphics* x, InterpolationMode* x )
+FUNCTION: GpStatus GdipGetNearestColor ( GpGraphics* x, ARGB* x )
+FUNCTION: GpStatus GdipGetPageScale ( GpGraphics* x, REAL* x )
+FUNCTION: GpStatus GdipGetPageUnit ( GpGraphics* x, GpUnit* x )
+FUNCTION: GpStatus GdipGetPixelOffsetMode ( GpGraphics* x, PixelOffsetMode* x )
+FUNCTION: GpStatus GdipGetSmoothingMode ( GpGraphics* x, SmoothingMode* x )
+FUNCTION: GpStatus GdipGetTextContrast ( GpGraphics* x, UINT* x )
+FUNCTION: GpStatus GdipGetTextRenderingHint ( GpGraphics* x, TextRenderingHint* x )
+FUNCTION: GpStatus GdipGetWorldTransform ( GpGraphics* x, GpMatrix* x )
+FUNCTION: GpStatus GdipGraphicsClear ( GpGraphics* x, ARGB x )
+FUNCTION: GpStatus GdipGetVisibleClipBounds ( GpGraphics* x, GpRectF* x )
+FUNCTION: GpStatus GdipGetVisibleClipBoundsI ( GpGraphics* x, GpRect* x )
+FUNCTION: GpStatus GdipIsClipEmpty ( GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsVisiblePoint ( GpGraphics* x, REAL x, REAL x, BOOL* x )
+FUNCTION: GpStatus GdipIsVisiblePointI ( GpGraphics* x, INT x, INT x, BOOL* x )
+FUNCTION: GpStatus GdipIsVisibleRect ( GpGraphics* x, REAL x, REAL x, REAL x, REAL x, BOOL* x )
+FUNCTION: GpStatus GdipIsVisibleRectI ( GpGraphics* x, INT x, INT x, INT x, INT x, BOOL* x )
 FUNCTION: GpStatus GdipMeasureCharacterRanges ( GpGraphics* x,  WCHAR* x,
              INT x,  GpFont* x,  GpRectF* x,  GpStringFormat* x,  INT x,
-             GpRegion** x ) ;
+             GpRegion** x )
 FUNCTION: GpStatus GdipMeasureDriverString ( GpGraphics* x, UINT16* x, INT x,
-             GpFont* x, GpPointF* x, INT x, GpMatrix* x, GpRectF* x ) ;
+             GpFont* x, GpPointF* x, INT x, GpMatrix* x, GpRectF* x )
 FUNCTION: GpStatus GdipMeasureString ( GpGraphics* x, WCHAR* x, INT x,
-             GpFont* x, GpRectF* x, GpStringFormat* x, GpRectF* x, INT* x, INT* x ) ;
-FUNCTION: GpStatus GdipMultiplyWorldTransform ( GpGraphics* x, GpMatrix* x, GpMatrixOrder x ) ;
+             GpFont* x, GpRectF* x, GpStringFormat* x, GpRectF* x, INT* x, INT* x )
+FUNCTION: GpStatus GdipMultiplyWorldTransform ( GpGraphics* x, GpMatrix* x, GpMatrixOrder x )
 FUNCTION: GpStatus GdipRecordMetafileFileName ( WCHAR* x, HDC x, EmfType x,
-             GpRectF* x, MetafileFrameUnit x, WCHAR* x, GpMetafile** x ) ;
+             GpRectF* x, MetafileFrameUnit x, WCHAR* x, GpMetafile** x )
 FUNCTION: GpStatus GdipRecordMetafileFileNameI ( WCHAR* x, HDC x, EmfType x,
-             GpRect* x, MetafileFrameUnit x, WCHAR* x, GpMetafile** x ) ;
+             GpRect* x, MetafileFrameUnit x, WCHAR* x, GpMetafile** x )
 FUNCTION: GpStatus GdipRecordMetafileI ( HDC x, EmfType x, GpRect* x,
-             MetafileFrameUnit x, WCHAR* x, GpMetafile** x ) ;
-FUNCTION: GpStatus GdipReleaseDC ( GpGraphics* x, HDC x ) ;
-FUNCTION: GpStatus GdipResetClip ( GpGraphics* x ) ;
-FUNCTION: GpStatus GdipResetWorldTransform ( GpGraphics* x ) ;
-FUNCTION: GpStatus GdipRestoreGraphics ( GpGraphics* x, GraphicsState x ) ;
-FUNCTION: GpStatus GdipRotateWorldTransform ( GpGraphics* x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipSaveGraphics ( GpGraphics* x, GraphicsState* x ) ;
-FUNCTION: GpStatus GdipScaleWorldTransform ( GpGraphics* x, REAL x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipSetClipHrgn ( GpGraphics* x, HRGN x, CombineMode x ) ;
-FUNCTION: GpStatus GdipSetClipGraphics ( GpGraphics* x, GpGraphics* x, CombineMode x ) ;
-FUNCTION: GpStatus GdipSetClipPath ( GpGraphics* x, GpPath* x, CombineMode x ) ;
-FUNCTION: GpStatus GdipSetClipRect ( GpGraphics* x, REAL x, REAL x, REAL x, REAL x, CombineMode x ) ;
-FUNCTION: GpStatus GdipSetClipRectI ( GpGraphics* x, INT x, INT x, INT x, INT x, CombineMode x ) ;
-FUNCTION: GpStatus GdipSetClipRegion ( GpGraphics* x, GpRegion* x, CombineMode x ) ;
-FUNCTION: GpStatus GdipSetCompositingMode ( GpGraphics* x, CompositingMode x ) ;
-FUNCTION: GpStatus GdipSetCompositingQuality ( GpGraphics* x, CompositingQuality x ) ;
-FUNCTION: GpStatus GdipSetInterpolationMode ( GpGraphics* x, InterpolationMode x ) ;
-FUNCTION: GpStatus GdipSetPageScale ( GpGraphics* x, REAL x ) ;
-FUNCTION: GpStatus GdipSetPageUnit ( GpGraphics* x, GpUnit x ) ;
-FUNCTION: GpStatus GdipSetPixelOffsetMode ( GpGraphics* x, PixelOffsetMode x ) ;
-FUNCTION: GpStatus GdipSetRenderingOrigin ( GpGraphics* x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipSetSmoothingMode ( GpGraphics* x, SmoothingMode x ) ;
-FUNCTION: GpStatus GdipSetTextContrast ( GpGraphics* x, UINT x ) ;
-FUNCTION: GpStatus GdipSetTextRenderingHint ( GpGraphics* x, TextRenderingHint x ) ;
-FUNCTION: GpStatus GdipSetWorldTransform ( GpGraphics* x, GpMatrix* x ) ;
+             MetafileFrameUnit x, WCHAR* x, GpMetafile** x )
+FUNCTION: GpStatus GdipReleaseDC ( GpGraphics* x, HDC x )
+FUNCTION: GpStatus GdipResetClip ( GpGraphics* x )
+FUNCTION: GpStatus GdipResetWorldTransform ( GpGraphics* x )
+FUNCTION: GpStatus GdipRestoreGraphics ( GpGraphics* x, GraphicsState x )
+FUNCTION: GpStatus GdipRotateWorldTransform ( GpGraphics* x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipSaveGraphics ( GpGraphics* x, GraphicsState* x )
+FUNCTION: GpStatus GdipScaleWorldTransform ( GpGraphics* x, REAL x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipSetClipHrgn ( GpGraphics* x, HRGN x, CombineMode x )
+FUNCTION: GpStatus GdipSetClipGraphics ( GpGraphics* x, GpGraphics* x, CombineMode x )
+FUNCTION: GpStatus GdipSetClipPath ( GpGraphics* x, GpPath* x, CombineMode x )
+FUNCTION: GpStatus GdipSetClipRect ( GpGraphics* x, REAL x, REAL x, REAL x, REAL x, CombineMode x )
+FUNCTION: GpStatus GdipSetClipRectI ( GpGraphics* x, INT x, INT x, INT x, INT x, CombineMode x )
+FUNCTION: GpStatus GdipSetClipRegion ( GpGraphics* x, GpRegion* x, CombineMode x )
+FUNCTION: GpStatus GdipSetCompositingMode ( GpGraphics* x, CompositingMode x )
+FUNCTION: GpStatus GdipSetCompositingQuality ( GpGraphics* x, CompositingQuality x )
+FUNCTION: GpStatus GdipSetInterpolationMode ( GpGraphics* x, InterpolationMode x )
+FUNCTION: GpStatus GdipSetPageScale ( GpGraphics* x, REAL x )
+FUNCTION: GpStatus GdipSetPageUnit ( GpGraphics* x, GpUnit x )
+FUNCTION: GpStatus GdipSetPixelOffsetMode ( GpGraphics* x, PixelOffsetMode x )
+FUNCTION: GpStatus GdipSetRenderingOrigin ( GpGraphics* x, INT x, INT x )
+FUNCTION: GpStatus GdipSetSmoothingMode ( GpGraphics* x, SmoothingMode x )
+FUNCTION: GpStatus GdipSetTextContrast ( GpGraphics* x, UINT x )
+FUNCTION: GpStatus GdipSetTextRenderingHint ( GpGraphics* x, TextRenderingHint x )
+FUNCTION: GpStatus GdipSetWorldTransform ( GpGraphics* x, GpMatrix* x )
 FUNCTION: GpStatus GdipTransformPoints ( GpGraphics* x,  GpCoordinateSpace x,  GpCoordinateSpace x,
-                                                 GpPointF* x,  INT x ) ;
+                                                 GpPointF* x,  INT x )
 FUNCTION: GpStatus GdipTransformPointsI ( GpGraphics* x,  GpCoordinateSpace x,  GpCoordinateSpace x,
-                                                  GpPoint* x,  INT x ) ;
-FUNCTION: GpStatus GdipTranslateClip ( GpGraphics* x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipTranslateClipI ( GpGraphics* x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipTranslateWorldTransform ( GpGraphics* x, REAL x, REAL x, GpMatrixOrder x ) ;
+                                                  GpPoint* x,  INT x )
+FUNCTION: GpStatus GdipTranslateClip ( GpGraphics* x, REAL x, REAL x )
+FUNCTION: GpStatus GdipTranslateClipI ( GpGraphics* x, INT x, INT x )
+FUNCTION: GpStatus GdipTranslateWorldTransform ( GpGraphics* x, REAL x, REAL x, GpMatrixOrder x )
 
 
-FUNCTION: GpStatus GdipAddPathArc ( GpPath* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathArcI ( GpPath* x, INT x, INT x, INT x, INT x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathBezier ( GpPath* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathBezierI ( GpPath* x, INT x, INT x, INT x, INT x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathBeziers ( GpPath* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathBeziersI ( GpPath* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathClosedCurve ( GpPath* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathClosedCurveI ( GpPath* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathClosedCurve2 ( GpPath* x, GpPointF* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathClosedCurve2I ( GpPath* x, GpPoint* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathCurve ( GpPath* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathCurveI ( GpPath* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathCurve2 ( GpPath* x, GpPointF* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathCurve2I ( GpPath* x, GpPoint* x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathCurve3 ( GpPath* x, GpPointF* x, INT x, INT x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathCurve3I ( GpPath* x, GpPoint* x, INT x, INT x, INT x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathEllipse ( GpPath* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathEllipseI ( GpPath* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathLine ( GpPath* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathLineI ( GpPath* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathLine2 ( GpPath* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathLine2I ( GpPath* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathPath ( GpPath* x, GpPath* x, BOOL x ) ;
-FUNCTION: GpStatus GdipAddPathPie ( GpPath* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathPieI ( GpPath* x, INT x, INT x, INT x, INT x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathPolygon ( GpPath* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathPolygonI ( GpPath* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathRectangle ( GpPath* x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipAddPathRectangleI ( GpPath* x, INT x, INT x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathRectangles ( GpPath* x, GpRectF* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathRectanglesI ( GpPath* x, GpRect* x, INT x ) ;
-FUNCTION: GpStatus GdipAddPathString ( GpPath* x, WCHAR* x, INT x, GpFontFamily* x, INT x, REAL x, GpRectF* x, GpStringFormat* x ) ;
-FUNCTION: GpStatus GdipAddPathStringI ( GpPath* x, WCHAR* x, INT x, GpFontFamily* x, INT x, REAL x, GpRect* x, GpStringFormat* x ) ;
-FUNCTION: GpStatus GdipClearPathMarkers ( GpPath* x ) ;
-FUNCTION: GpStatus GdipClonePath ( GpPath* x, GpPath** x ) ;
-FUNCTION: GpStatus GdipClosePathFigure ( GpPath* x ) ;
-FUNCTION: GpStatus GdipClosePathFigures ( GpPath* x ) ;
-FUNCTION: GpStatus GdipCreatePath ( GpFillMode x, GpPath** x ) ;
+FUNCTION: GpStatus GdipAddPathArc ( GpPath* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathArcI ( GpPath* x, INT x, INT x, INT x, INT x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathBezier ( GpPath* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathBezierI ( GpPath* x, INT x, INT x, INT x, INT x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipAddPathBeziers ( GpPath* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipAddPathBeziersI ( GpPath* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipAddPathClosedCurve ( GpPath* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipAddPathClosedCurveI ( GpPath* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipAddPathClosedCurve2 ( GpPath* x, GpPointF* x, INT x, REAL x )
+FUNCTION: GpStatus GdipAddPathClosedCurve2I ( GpPath* x, GpPoint* x, INT x, REAL x )
+FUNCTION: GpStatus GdipAddPathCurve ( GpPath* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipAddPathCurveI ( GpPath* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipAddPathCurve2 ( GpPath* x, GpPointF* x, INT x, REAL x )
+FUNCTION: GpStatus GdipAddPathCurve2I ( GpPath* x, GpPoint* x, INT x, REAL x )
+FUNCTION: GpStatus GdipAddPathCurve3 ( GpPath* x, GpPointF* x, INT x, INT x, INT x, REAL x )
+FUNCTION: GpStatus GdipAddPathCurve3I ( GpPath* x, GpPoint* x, INT x, INT x, INT x, REAL x )
+FUNCTION: GpStatus GdipAddPathEllipse ( GpPath* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathEllipseI ( GpPath* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipAddPathLine ( GpPath* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathLineI ( GpPath* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipAddPathLine2 ( GpPath* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipAddPathLine2I ( GpPath* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipAddPathPath ( GpPath* x, GpPath* x, BOOL x )
+FUNCTION: GpStatus GdipAddPathPie ( GpPath* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathPieI ( GpPath* x, INT x, INT x, INT x, INT x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathPolygon ( GpPath* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipAddPathPolygonI ( GpPath* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipAddPathRectangle ( GpPath* x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipAddPathRectangleI ( GpPath* x, INT x, INT x, INT x, INT x )
+FUNCTION: GpStatus GdipAddPathRectangles ( GpPath* x, GpRectF* x, INT x )
+FUNCTION: GpStatus GdipAddPathRectanglesI ( GpPath* x, GpRect* x, INT x )
+FUNCTION: GpStatus GdipAddPathString ( GpPath* x, WCHAR* x, INT x, GpFontFamily* x, INT x, REAL x, GpRectF* x, GpStringFormat* x )
+FUNCTION: GpStatus GdipAddPathStringI ( GpPath* x, WCHAR* x, INT x, GpFontFamily* x, INT x, REAL x, GpRect* x, GpStringFormat* x )
+FUNCTION: GpStatus GdipClearPathMarkers ( GpPath* x )
+FUNCTION: GpStatus GdipClonePath ( GpPath* x, GpPath** x )
+FUNCTION: GpStatus GdipClosePathFigure ( GpPath* x )
+FUNCTION: GpStatus GdipClosePathFigures ( GpPath* x )
+FUNCTION: GpStatus GdipCreatePath ( GpFillMode x, GpPath** x )
 FUNCTION: GpStatus GdipCreatePath2 ( GpPointF* x, BYTE* x, INT x,
-             GpFillMode x, GpPath** x ) ;
-FUNCTION: GpStatus GdipCreatePath2I ( GpPoint* x, BYTE* x, INT x, GpFillMode x, GpPath** x ) ;
-FUNCTION: GpStatus GdipDeletePath ( GpPath* x ) ;
-FUNCTION: GpStatus GdipFlattenPath ( GpPath* x, GpMatrix* x, REAL x ) ;
+             GpFillMode x, GpPath** x )
+FUNCTION: GpStatus GdipCreatePath2I ( GpPoint* x, BYTE* x, INT x, GpFillMode x, GpPath** x )
+FUNCTION: GpStatus GdipDeletePath ( GpPath* x )
+FUNCTION: GpStatus GdipFlattenPath ( GpPath* x, GpMatrix* x, REAL x )
 FUNCTION: GpStatus GdipIsOutlineVisiblePathPoint ( GpPath* x, REAL x, REAL x, GpPen* x,
-             GpGraphics* x, BOOL* x ) ;
+             GpGraphics* x, BOOL* x )
 FUNCTION: GpStatus GdipIsOutlineVisiblePathPointI ( GpPath* x, INT x, INT x, GpPen* x,
-             GpGraphics* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisiblePathPoint ( GpPath* x, REAL x, REAL x, GpGraphics* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisiblePathPointI ( GpPath* x, INT x, INT x, GpGraphics* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipGetPathData ( GpPath* x, GpPathData* x ) ;
-FUNCTION: GpStatus GdipGetPathFillMode ( GpPath* x, GpFillMode* x ) ;
-FUNCTION: GpStatus GdipGetPathLastPoint ( GpPath* x, GpPointF* x ) ;
-FUNCTION: GpStatus GdipGetPathPoints ( GpPath* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipGetPathPointsI ( GpPath* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipGetPathTypes ( GpPath* x, BYTE* x, INT x ) ;
-FUNCTION: GpStatus GdipGetPathWorldBounds ( GpPath* x, GpRectF* x, GpMatrix* x, GpPen* x ) ;
-FUNCTION: GpStatus GdipGetPathWorldBoundsI ( GpPath* x, GpRect* x, GpMatrix* x, GpPen* x ) ;
-FUNCTION: GpStatus GdipGetPointCount ( GpPath* x, INT* x ) ;
-FUNCTION: GpStatus GdipResetPath ( GpPath* x ) ;
-FUNCTION: GpStatus GdipReversePath ( GpPath* x ) ;
-FUNCTION: GpStatus GdipSetPathFillMode ( GpPath* x, GpFillMode x ) ;
-FUNCTION: GpStatus GdipSetPathMarker ( GpPath* x ) ;
-FUNCTION: GpStatus GdipStartPathFigure ( GpPath* x ) ;
-FUNCTION: GpStatus GdipTransformPath ( GpPath* x, GpMatrix* x ) ;
+             GpGraphics* x, BOOL* x )
+FUNCTION: GpStatus GdipIsVisiblePathPoint ( GpPath* x, REAL x, REAL x, GpGraphics* x, BOOL* x )
+FUNCTION: GpStatus GdipIsVisiblePathPointI ( GpPath* x, INT x, INT x, GpGraphics* x, BOOL* x )
+FUNCTION: GpStatus GdipGetPathData ( GpPath* x, GpPathData* x )
+FUNCTION: GpStatus GdipGetPathFillMode ( GpPath* x, GpFillMode* x )
+FUNCTION: GpStatus GdipGetPathLastPoint ( GpPath* x, GpPointF* x )
+FUNCTION: GpStatus GdipGetPathPoints ( GpPath* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipGetPathPointsI ( GpPath* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipGetPathTypes ( GpPath* x, BYTE* x, INT x )
+FUNCTION: GpStatus GdipGetPathWorldBounds ( GpPath* x, GpRectF* x, GpMatrix* x, GpPen* x )
+FUNCTION: GpStatus GdipGetPathWorldBoundsI ( GpPath* x, GpRect* x, GpMatrix* x, GpPen* x )
+FUNCTION: GpStatus GdipGetPointCount ( GpPath* x, INT* x )
+FUNCTION: GpStatus GdipResetPath ( GpPath* x )
+FUNCTION: GpStatus GdipReversePath ( GpPath* x )
+FUNCTION: GpStatus GdipSetPathFillMode ( GpPath* x, GpFillMode x )
+FUNCTION: GpStatus GdipSetPathMarker ( GpPath* x )
+FUNCTION: GpStatus GdipStartPathFigure ( GpPath* x )
+FUNCTION: GpStatus GdipTransformPath ( GpPath* x, GpMatrix* x )
 FUNCTION: GpStatus GdipWarpPath ( GpPath* x, GpMatrix* x, GpPointF* x, INT x, REAL x,
-             REAL x, REAL x, REAL x, WarpMode x, REAL x ) ;
-FUNCTION: GpStatus GdipWidenPath ( GpPath* x, GpPen* x, GpMatrix* x, REAL x ) ;
+             REAL x, REAL x, REAL x, WarpMode x, REAL x )
+FUNCTION: GpStatus GdipWidenPath ( GpPath* x, GpPen* x, GpMatrix* x, REAL x )
 
 
-FUNCTION: GpStatus GdipCreateHatchBrush ( HatchStyle x, ARGB x, ARGB x, GpHatch** x ) ;
-FUNCTION: GpStatus GdipGetHatchBackgroundColor ( GpHatch* x, ARGB* x ) ;
-FUNCTION: GpStatus GdipGetHatchForegroundColor ( GpHatch* x, ARGB* x ) ;
-FUNCTION: GpStatus GdipGetHatchStyle ( GpHatch* x, HatchStyle* x ) ;
+FUNCTION: GpStatus GdipCreateHatchBrush ( HatchStyle x, ARGB x, ARGB x, GpHatch** x )
+FUNCTION: GpStatus GdipGetHatchBackgroundColor ( GpHatch* x, ARGB* x )
+FUNCTION: GpStatus GdipGetHatchForegroundColor ( GpHatch* x, ARGB* x )
+FUNCTION: GpStatus GdipGetHatchStyle ( GpHatch* x, HatchStyle* x )
 
 
-FUNCTION: GpStatus GdipCloneImage ( GpImage* x,  GpImage** x ) ;
-FUNCTION: GpStatus GdipCloneImageAttributes ( GpImageAttributes* x, GpImageAttributes** x ) ;
-FUNCTION: GpStatus GdipDisposeImage ( GpImage* x ) ;
-FUNCTION: GpStatus GdipEmfToWmfBits ( HENHMETAFILE x, UINT x, LPBYTE x, INT x, INT x ) ;
-FUNCTION: GpStatus GdipFindFirstImageItem ( GpImage* x, ImageItemData* x ) ;
-FUNCTION: GpStatus GdipFindNextImageItem ( GpImage* x, ImageItemData* x ) ;
-FUNCTION: GpStatus GdipGetAllPropertyItems ( GpImage* x, UINT x, UINT x, PropertyItem* x ) ;
-FUNCTION: GpStatus GdipGetImageBounds ( GpImage* x, GpRectF* x, GpUnit* x ) ;
-FUNCTION: GpStatus GdipGetImageDimension ( GpImage* x, REAL* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetImageFlags ( GpImage* x, UINT* x ) ;
-FUNCTION: GpStatus GdipGetImageHeight ( GpImage* x, UINT* x ) ;
-FUNCTION: GpStatus GdipGetImageHorizontalResolution ( GpImage* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetImageItemData ( GpImage* x, ImageItemData* x ) ;
-FUNCTION: GpStatus GdipGetImagePalette ( GpImage* x, ColorPalette* x, INT x ) ;
-FUNCTION: GpStatus GdipGetImagePaletteSize ( GpImage* x, INT* x ) ;
-FUNCTION: GpStatus GdipGetImagePixelFormat ( GpImage* x, PixelFormat* x ) ;
-FUNCTION: GpStatus GdipGetImageRawFormat ( GpImage* x, GUID* x ) ;
-FUNCTION: GpStatus GdipGetImageThumbnail ( GpImage* x, UINT x, UINT x, GpImage** x, GetThumbnailImageAbort x, VOID* x ) ;
-FUNCTION: GpStatus GdipGetImageType ( GpImage* x, ImageType* x ) ;
-FUNCTION: GpStatus GdipGetImageVerticalResolution ( GpImage* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetImageWidth ( GpImage* x, UINT* x ) ;
-FUNCTION: GpStatus GdipGetPropertyCount ( GpImage* x, UINT* x ) ;
-FUNCTION: GpStatus GdipGetPropertyIdList ( GpImage* x, UINT x, PROPID* x ) ;
-FUNCTION: GpStatus GdipGetPropertyItem ( GpImage* x, PROPID x, UINT x, PropertyItem* x ) ;
-FUNCTION: GpStatus GdipGetPropertyItemSize ( GpImage* x, PROPID x, UINT* x ) ;
-FUNCTION: GpStatus GdipGetPropertySize ( GpImage* x, UINT* x, UINT* x ) ;
-FUNCTION: GpStatus GdipImageForceValidation ( GpImage* x ) ;
-FUNCTION: GpStatus GdipImageGetFrameCount ( GpImage* x, GUID* x, UINT* x ) ;
-FUNCTION: GpStatus GdipImageGetFrameDimensionsCount ( GpImage* x, UINT* x ) ;
-FUNCTION: GpStatus GdipImageGetFrameDimensionsList ( GpImage* x, GUID* x, UINT x ) ;
-FUNCTION: GpStatus GdipImageRotateFlip ( GpImage* x, RotateFlipType x ) ;
-FUNCTION: GpStatus GdipImageSelectActiveFrame ( GpImage* x, GUID* x, UINT x ) ;
-FUNCTION: GpStatus GdipLoadImageFromFile ( WCHAR* x, GpImage** x ) ;
-FUNCTION: GpStatus GdipLoadImageFromFileICM ( WCHAR* x, GpImage** x ) ;
-FUNCTION: GpStatus GdipLoadImageFromStream ( IStream* x, GpImage** x ) ;
-FUNCTION: GpStatus GdipLoadImageFromStreamICM ( IStream* x, GpImage** x ) ;
-FUNCTION: GpStatus GdipRemovePropertyItem ( GpImage* x, PROPID x ) ;
-FUNCTION: GpStatus GdipSaveImageToFile ( GpImage* x, WCHAR* x, CLSID* x, EncoderParameters* x ) ;
+FUNCTION: GpStatus GdipCloneImage ( GpImage* x,  GpImage** x )
+FUNCTION: GpStatus GdipCloneImageAttributes ( GpImageAttributes* x, GpImageAttributes** x )
+FUNCTION: GpStatus GdipDisposeImage ( GpImage* x )
+FUNCTION: GpStatus GdipEmfToWmfBits ( HENHMETAFILE x, UINT x, LPBYTE x, INT x, INT x )
+FUNCTION: GpStatus GdipFindFirstImageItem ( GpImage* x, ImageItemData* x )
+FUNCTION: GpStatus GdipFindNextImageItem ( GpImage* x, ImageItemData* x )
+FUNCTION: GpStatus GdipGetAllPropertyItems ( GpImage* x, UINT x, UINT x, PropertyItem* x )
+FUNCTION: GpStatus GdipGetImageBounds ( GpImage* x, GpRectF* x, GpUnit* x )
+FUNCTION: GpStatus GdipGetImageDimension ( GpImage* x, REAL* x, REAL* x )
+FUNCTION: GpStatus GdipGetImageFlags ( GpImage* x, UINT* x )
+FUNCTION: GpStatus GdipGetImageHeight ( GpImage* x, UINT* x )
+FUNCTION: GpStatus GdipGetImageHorizontalResolution ( GpImage* x, REAL* x )
+FUNCTION: GpStatus GdipGetImageItemData ( GpImage* x, ImageItemData* x )
+FUNCTION: GpStatus GdipGetImagePalette ( GpImage* x, ColorPalette* x, INT x )
+FUNCTION: GpStatus GdipGetImagePaletteSize ( GpImage* x, INT* x )
+FUNCTION: GpStatus GdipGetImagePixelFormat ( GpImage* x, PixelFormat* x )
+FUNCTION: GpStatus GdipGetImageRawFormat ( GpImage* x, GUID* x )
+FUNCTION: GpStatus GdipGetImageThumbnail ( GpImage* x, UINT x, UINT x, GpImage** x, GetThumbnailImageAbort x, VOID* x )
+FUNCTION: GpStatus GdipGetImageType ( GpImage* x, ImageType* x )
+FUNCTION: GpStatus GdipGetImageVerticalResolution ( GpImage* x, REAL* x )
+FUNCTION: GpStatus GdipGetImageWidth ( GpImage* x, UINT* x )
+FUNCTION: GpStatus GdipGetPropertyCount ( GpImage* x, UINT* x )
+FUNCTION: GpStatus GdipGetPropertyIdList ( GpImage* x, UINT x, PROPID* x )
+FUNCTION: GpStatus GdipGetPropertyItem ( GpImage* x, PROPID x, UINT x, PropertyItem* x )
+FUNCTION: GpStatus GdipGetPropertyItemSize ( GpImage* x, PROPID x, UINT* x )
+FUNCTION: GpStatus GdipGetPropertySize ( GpImage* x, UINT* x, UINT* x )
+FUNCTION: GpStatus GdipImageForceValidation ( GpImage* x )
+FUNCTION: GpStatus GdipImageGetFrameCount ( GpImage* x, GUID* x, UINT* x )
+FUNCTION: GpStatus GdipImageGetFrameDimensionsCount ( GpImage* x, UINT* x )
+FUNCTION: GpStatus GdipImageGetFrameDimensionsList ( GpImage* x, GUID* x, UINT x )
+FUNCTION: GpStatus GdipImageRotateFlip ( GpImage* x, RotateFlipType x )
+FUNCTION: GpStatus GdipImageSelectActiveFrame ( GpImage* x, GUID* x, UINT x )
+FUNCTION: GpStatus GdipLoadImageFromFile ( WCHAR* x, GpImage** x )
+FUNCTION: GpStatus GdipLoadImageFromFileICM ( WCHAR* x, GpImage** x )
+FUNCTION: GpStatus GdipLoadImageFromStream ( IStream* x, GpImage** x )
+FUNCTION: GpStatus GdipLoadImageFromStreamICM ( IStream* x, GpImage** x )
+FUNCTION: GpStatus GdipRemovePropertyItem ( GpImage* x, PROPID x )
+FUNCTION: GpStatus GdipSaveImageToFile ( GpImage* x, WCHAR* x, CLSID* x, EncoderParameters* x )
 FUNCTION: GpStatus GdipSaveImageToStream ( GpImage* x, IStream* x,
-             CLSID* x, EncoderParameters* x ) ;
-FUNCTION: GpStatus GdipSetImagePalette ( GpImage* x, ColorPalette* x ) ;
-FUNCTION: GpStatus GdipSetPropertyItem ( GpImage* x, PropertyItem* x ) ;
+             CLSID* x, EncoderParameters* x )
+FUNCTION: GpStatus GdipSetImagePalette ( GpImage* x, ColorPalette* x )
+FUNCTION: GpStatus GdipSetPropertyItem ( GpImage* x, PropertyItem* x )
 
 
-FUNCTION: GpStatus GdipCreateImageAttributes ( GpImageAttributes** x ) ;
-FUNCTION: GpStatus GdipDisposeImageAttributes ( GpImageAttributes* x ) ;
+FUNCTION: GpStatus GdipCreateImageAttributes ( GpImageAttributes** x )
+FUNCTION: GpStatus GdipDisposeImageAttributes ( GpImageAttributes* x )
 FUNCTION: GpStatus GdipSetImageAttributesCachedBackground ( GpImageAttributes* x,
-             BOOL x ) ;
+             BOOL x )
 FUNCTION: GpStatus GdipSetImageAttributesColorKeys ( GpImageAttributes* x,
-             ColorAdjustType x, BOOL x, ARGB x, ARGB x ) ;
+             ColorAdjustType x, BOOL x, ARGB x, ARGB x )
 FUNCTION: GpStatus GdipSetImageAttributesColorMatrix ( GpImageAttributes* x,
              ColorAdjustType x, BOOL x, ColorMatrix* x, ColorMatrix* x,
-             ColorMatrixFlags x ) ;
+             ColorMatrixFlags x )
 FUNCTION: GpStatus GdipSetImageAttributesGamma ( GpImageAttributes* x,
-             ColorAdjustType x, BOOL x, REAL x ) ;
+             ColorAdjustType x, BOOL x, REAL x )
 FUNCTION: GpStatus GdipSetImageAttributesNoOp ( GpImageAttributes* x,
-             ColorAdjustType x, BOOL x ) ;
+             ColorAdjustType x, BOOL x )
 FUNCTION: GpStatus GdipSetImageAttributesOutputChannel ( GpImageAttributes* x,
-             ColorAdjustType x, BOOL x, ColorChannelFlags x ) ;
+             ColorAdjustType x, BOOL x, ColorChannelFlags x )
 FUNCTION: GpStatus GdipSetImageAttributesOutputChannelColorProfile (
-             GpImageAttributes* x, ColorAdjustType x, BOOL x, WCHAR* x ) ;
+             GpImageAttributes* x, ColorAdjustType x, BOOL x, WCHAR* x )
 FUNCTION: GpStatus GdipSetImageAttributesRemapTable ( GpImageAttributes* x,
-             ColorAdjustType x, BOOL x, UINT x, ColorMap* x ) ;
+             ColorAdjustType x, BOOL x, UINT x, ColorMap* x )
 FUNCTION: GpStatus GdipSetImageAttributesThreshold ( GpImageAttributes* x,
-             ColorAdjustType x, BOOL x, REAL x ) ;
+             ColorAdjustType x, BOOL x, REAL x )
 FUNCTION: GpStatus GdipSetImageAttributesToIdentity ( GpImageAttributes* x,
-             ColorAdjustType x ) ;
+             ColorAdjustType x )
 FUNCTION: GpStatus GdipSetImageAttributesWrapMode ( GpImageAttributes* x, GpWrapMode x,
-             ARGB x, BOOL x ) ;
+             ARGB x, BOOL x )
 
 
 FUNCTION: GpStatus GdipCreateLineBrush ( GpPointF* x, GpPointF* x,
-             ARGB x, ARGB x, GpWrapMode x, GpLineGradient** x ) ;
+             ARGB x, ARGB x, GpWrapMode x, GpLineGradient** x )
 FUNCTION: GpStatus GdipCreateLineBrushI ( GpPoint* x, GpPoint* x,
-             ARGB x, ARGB x, GpWrapMode x, GpLineGradient** x ) ;
+             ARGB x, ARGB x, GpWrapMode x, GpLineGradient** x )
 FUNCTION: GpStatus GdipCreateLineBrushFromRect ( GpRectF* x, ARGB x, ARGB x,
-             LinearGradientMode x, GpWrapMode x, GpLineGradient** x ) ;
+             LinearGradientMode x, GpWrapMode x, GpLineGradient** x )
 FUNCTION: GpStatus GdipCreateLineBrushFromRectI ( GpRect* x, ARGB x, ARGB x,
-             LinearGradientMode x, GpWrapMode x, GpLineGradient** x ) ;
+             LinearGradientMode x, GpWrapMode x, GpLineGradient** x )
 FUNCTION: GpStatus GdipCreateLineBrushFromRectWithAngle ( GpRectF* x,
-             ARGB x, ARGB x, REAL x, BOOL x, GpWrapMode x, GpLineGradient** x ) ;
+             ARGB x, ARGB x, REAL x, BOOL x, GpWrapMode x, GpLineGradient** x )
 FUNCTION: GpStatus GdipCreateLineBrushFromRectWithAngleI ( GpRect* x,
-             ARGB x, ARGB x, REAL x, BOOL x, GpWrapMode x, GpLineGradient** x ) ;
-FUNCTION: GpStatus GdipGetLineColors ( GpLineGradient* x, ARGB* x ) ;
-FUNCTION: GpStatus GdipGetLineGammaCorrection ( GpLineGradient* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipGetLineRect ( GpLineGradient* x, GpRectF* x ) ;
-FUNCTION: GpStatus GdipGetLineRectI ( GpLineGradient* x, GpRect* x ) ;
-FUNCTION: GpStatus GdipGetLineWrapMode ( GpLineGradient* x, GpWrapMode* x ) ;
+             ARGB x, ARGB x, REAL x, BOOL x, GpWrapMode x, GpLineGradient** x )
+FUNCTION: GpStatus GdipGetLineColors ( GpLineGradient* x, ARGB* x )
+FUNCTION: GpStatus GdipGetLineGammaCorrection ( GpLineGradient* x, BOOL* x )
+FUNCTION: GpStatus GdipGetLineRect ( GpLineGradient* x, GpRectF* x )
+FUNCTION: GpStatus GdipGetLineRectI ( GpLineGradient* x, GpRect* x )
+FUNCTION: GpStatus GdipGetLineWrapMode ( GpLineGradient* x, GpWrapMode* x )
 FUNCTION: GpStatus GdipSetLineBlend ( GpLineGradient* x, REAL* x,
-             REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipGetLineBlend ( GpLineGradient* x, REAL* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipGetLineBlendCount ( GpLineGradient* x, INT* x ) ;
+             REAL* x, INT x )
+FUNCTION: GpStatus GdipGetLineBlend ( GpLineGradient* x, REAL* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipGetLineBlendCount ( GpLineGradient* x, INT* x )
 FUNCTION: GpStatus GdipSetLinePresetBlend ( GpLineGradient* x, ARGB* x,
-             REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipGetLinePresetBlend ( GpLineGradient* x, ARGB* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipGetLinePresetBlendCount ( GpLineGradient* x, INT* x ) ;
-FUNCTION: GpStatus GdipResetLineTransform ( GpLineGradient* x ) ;
-FUNCTION: GpStatus GdipRotateLineTransform ( GpLineGradient* x, REAL x, GpMatrixOrder x ) ;
+             REAL* x, INT x )
+FUNCTION: GpStatus GdipGetLinePresetBlend ( GpLineGradient* x, ARGB* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipGetLinePresetBlendCount ( GpLineGradient* x, INT* x )
+FUNCTION: GpStatus GdipResetLineTransform ( GpLineGradient* x )
+FUNCTION: GpStatus GdipRotateLineTransform ( GpLineGradient* x, REAL x, GpMatrixOrder x )
 FUNCTION: GpStatus GdipScaleLineTransform ( GpLineGradient* x, REAL x, REAL x,
-             GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipSetLineColors ( GpLineGradient* x, ARGB x, ARGB x ) ;
-FUNCTION: GpStatus GdipSetLineGammaCorrection ( GpLineGradient* x, BOOL x ) ;
-FUNCTION: GpStatus GdipSetLineSigmaBlend ( GpLineGradient* x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipSetLineTransform ( GpLineGradient* x, GpMatrix* x ) ;
-FUNCTION: GpStatus GdipSetLineLinearBlend ( GpLineGradient* x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipSetLineWrapMode ( GpLineGradient* x, GpWrapMode x ) ;
+             GpMatrixOrder x )
+FUNCTION: GpStatus GdipSetLineColors ( GpLineGradient* x, ARGB x, ARGB x )
+FUNCTION: GpStatus GdipSetLineGammaCorrection ( GpLineGradient* x, BOOL x )
+FUNCTION: GpStatus GdipSetLineSigmaBlend ( GpLineGradient* x, REAL x, REAL x )
+FUNCTION: GpStatus GdipSetLineTransform ( GpLineGradient* x, GpMatrix* x )
+FUNCTION: GpStatus GdipSetLineLinearBlend ( GpLineGradient* x, REAL x, REAL x )
+FUNCTION: GpStatus GdipSetLineWrapMode ( GpLineGradient* x, GpWrapMode x )
 FUNCTION: GpStatus GdipTranslateLineTransform ( GpLineGradient* x, REAL x, REAL x,
-             GpMatrixOrder x ) ;
+             GpMatrixOrder x )
 
 
-FUNCTION: GpStatus GdipCloneMatrix ( GpMatrix* x, GpMatrix** x ) ;
-FUNCTION: GpStatus GdipCreateMatrix ( GpMatrix** x ) ;
-FUNCTION: GpStatus GdipCreateMatrix2 ( REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, GpMatrix** x ) ;
-FUNCTION: GpStatus GdipCreateMatrix3 ( GpRectF* x, GpPointF* x, GpMatrix** x ) ;
-FUNCTION: GpStatus GdipCreateMatrix3I ( GpRect* x, GpPoint* x, GpMatrix** x ) ;
-FUNCTION: GpStatus GdipDeleteMatrix ( GpMatrix* x ) ;
-FUNCTION: GpStatus GdipGetMatrixElements ( GpMatrix* x, REAL* x ) ;
-FUNCTION: GpStatus GdipInvertMatrix ( GpMatrix* x ) ;
-FUNCTION: GpStatus GdipIsMatrixEqual ( GpMatrix* x,  GpMatrix* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsMatrixIdentity ( GpMatrix* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsMatrixInvertible ( GpMatrix* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipMultiplyMatrix ( GpMatrix* x, GpMatrix* x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipRotateMatrix ( GpMatrix* x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipShearMatrix ( GpMatrix* x, REAL x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipScaleMatrix ( GpMatrix* x, REAL x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipSetMatrixElements ( GpMatrix* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipTransformMatrixPoints ( GpMatrix* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipTransformMatrixPointsI ( GpMatrix* x, GpPoint* x, INT x ) ;
-FUNCTION: GpStatus GdipTranslateMatrix ( GpMatrix* x, REAL x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipVectorTransformMatrixPoints ( GpMatrix* x, GpPointF* x, INT x ) ;
-FUNCTION: GpStatus GdipVectorTransformMatrixPointsI ( GpMatrix* x, GpPoint* x, INT x ) ;
+FUNCTION: GpStatus GdipCloneMatrix ( GpMatrix* x, GpMatrix** x )
+FUNCTION: GpStatus GdipCreateMatrix ( GpMatrix** x )
+FUNCTION: GpStatus GdipCreateMatrix2 ( REAL x, REAL x, REAL x, REAL x, REAL x, REAL x, GpMatrix** x )
+FUNCTION: GpStatus GdipCreateMatrix3 ( GpRectF* x, GpPointF* x, GpMatrix** x )
+FUNCTION: GpStatus GdipCreateMatrix3I ( GpRect* x, GpPoint* x, GpMatrix** x )
+FUNCTION: GpStatus GdipDeleteMatrix ( GpMatrix* x )
+FUNCTION: GpStatus GdipGetMatrixElements ( GpMatrix* x, REAL* x )
+FUNCTION: GpStatus GdipInvertMatrix ( GpMatrix* x )
+FUNCTION: GpStatus GdipIsMatrixEqual ( GpMatrix* x,  GpMatrix* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsMatrixIdentity ( GpMatrix* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsMatrixInvertible ( GpMatrix* x,  BOOL* x )
+FUNCTION: GpStatus GdipMultiplyMatrix ( GpMatrix* x, GpMatrix* x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipRotateMatrix ( GpMatrix* x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipShearMatrix ( GpMatrix* x, REAL x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipScaleMatrix ( GpMatrix* x, REAL x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipSetMatrixElements ( GpMatrix* x, REAL x, REAL x, REAL x, REAL x, REAL x, REAL x )
+FUNCTION: GpStatus GdipTransformMatrixPoints ( GpMatrix* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipTransformMatrixPointsI ( GpMatrix* x, GpPoint* x, INT x )
+FUNCTION: GpStatus GdipTranslateMatrix ( GpMatrix* x, REAL x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipVectorTransformMatrixPoints ( GpMatrix* x, GpPointF* x, INT x )
+FUNCTION: GpStatus GdipVectorTransformMatrixPointsI ( GpMatrix* x, GpPoint* x, INT x )
 
 
 FUNCTION: GpStatus GdipConvertToEmfPlus ( GpGraphics* x, GpMetafile* x, INT* x,
-             EmfType x, WCHAR* x, GpMetafile** x ) ;
-FUNCTION: GpStatus GdipConvertToEmfPlusToFile ( GpGraphics* x, GpMetafile* x, INT* x, WCHAR* x, EmfType x, WCHAR* x, GpMetafile** x ) ;
-FUNCTION: GpStatus GdipConvertToEmfPlusToStream ( GpGraphics* x, GpMetafile* x, INT* x, IStream* x, EmfType x, WCHAR* x, GpMetafile** x ) ;
-FUNCTION: GpStatus GdipCreateMetafileFromEmf ( HENHMETAFILE x, BOOL x, GpMetafile** x ) ;
+             EmfType x, WCHAR* x, GpMetafile** x )
+FUNCTION: GpStatus GdipConvertToEmfPlusToFile ( GpGraphics* x, GpMetafile* x, INT* x, WCHAR* x, EmfType x, WCHAR* x, GpMetafile** x )
+FUNCTION: GpStatus GdipConvertToEmfPlusToStream ( GpGraphics* x, GpMetafile* x, INT* x, IStream* x, EmfType x, WCHAR* x, GpMetafile** x )
+FUNCTION: GpStatus GdipCreateMetafileFromEmf ( HENHMETAFILE x, BOOL x, GpMetafile** x )
 FUNCTION: GpStatus GdipCreateMetafileFromWmf ( HMETAFILE x, BOOL x,
-             WmfPlaceableFileHeader* x, GpMetafile** x ) ;
+             WmfPlaceableFileHeader* x, GpMetafile** x )
 FUNCTION: GpStatus GdipCreateMetafileFromWmfFile ( WCHAR* x,  WmfPlaceableFileHeader* x,
-             GpMetafile** x ) ;
-FUNCTION: GpStatus GdipCreateMetafileFromFile ( WCHAR* x, GpMetafile** x ) ;
-FUNCTION: GpStatus GdipCreateMetafileFromStream ( IStream* x, GpMetafile** x ) ;
-FUNCTION: GpStatus GdipSetMetafileDownLevelRasterizationLimit ( GpMetafile* x, UINT x ) ;
+             GpMetafile** x )
+FUNCTION: GpStatus GdipCreateMetafileFromFile ( WCHAR* x, GpMetafile** x )
+FUNCTION: GpStatus GdipCreateMetafileFromStream ( IStream* x, GpMetafile** x )
+FUNCTION: GpStatus GdipSetMetafileDownLevelRasterizationLimit ( GpMetafile* x, UINT x )
 
 
-FUNCTION: GpStatus GdipGetMetafileHeaderFromEmf ( HENHMETAFILE x, MetafileHeader* x ) ;
-FUNCTION: GpStatus GdipGetMetafileHeaderFromFile ( WCHAR* x, MetafileHeader* x ) ;
-FUNCTION: GpStatus GdipGetMetafileHeaderFromMetafile ( GpMetafile* x, MetafileHeader* x ) ;
-FUNCTION: GpStatus GdipGetMetafileHeaderFromStream ( IStream* x, MetafileHeader* x ) ;
-FUNCTION: GpStatus GdipGetMetafileHeaderFromWmf ( HMETAFILE x, WmfPlaceableFileHeader* x, MetafileHeader* x ) ;
+FUNCTION: GpStatus GdipGetMetafileHeaderFromEmf ( HENHMETAFILE x, MetafileHeader* x )
+FUNCTION: GpStatus GdipGetMetafileHeaderFromFile ( WCHAR* x, MetafileHeader* x )
+FUNCTION: GpStatus GdipGetMetafileHeaderFromMetafile ( GpMetafile* x, MetafileHeader* x )
+FUNCTION: GpStatus GdipGetMetafileHeaderFromStream ( IStream* x, MetafileHeader* x )
+FUNCTION: GpStatus GdipGetMetafileHeaderFromWmf ( HMETAFILE x, WmfPlaceableFileHeader* x, MetafileHeader* x )
 
 
-FUNCTION: GpStatus GdiplusNotificationHook ( ULONG_PTR* x ) ;
-FUNCTION: void GdiplusNotificationUnhook ( ULONG_PTR x ) ;
+FUNCTION: GpStatus GdiplusNotificationHook ( ULONG_PTR* x )
+FUNCTION: void GdiplusNotificationUnhook ( ULONG_PTR x )
 
 
-FUNCTION: GpStatus GdipCreatePathGradient ( GpPointF* x, INT x, GpWrapMode x, GpPathGradient** x ) ;
-FUNCTION: GpStatus GdipCreatePathGradientI ( GpPoint* x, INT x, GpWrapMode x, GpPathGradient** x ) ;
+FUNCTION: GpStatus GdipCreatePathGradient ( GpPointF* x, INT x, GpWrapMode x, GpPathGradient** x )
+FUNCTION: GpStatus GdipCreatePathGradientI ( GpPoint* x, INT x, GpWrapMode x, GpPathGradient** x )
 FUNCTION: GpStatus GdipCreatePathGradientFromPath ( GpPath* x,
-             GpPathGradient** x ) ;
-FUNCTION: GpStatus GdipGetPathGradientBlend ( GpPathGradient* x, REAL* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipGetPathGradientBlendCount ( GpPathGradient* x, INT* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientCenterColor ( GpPathGradient* x, ARGB* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientCenterPoint ( GpPathGradient* x, GpPointF* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientCenterPointI ( GpPathGradient* x, GpPoint* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientFocusScales ( GpPathGradient* x, REAL* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientGammaCorrection ( GpPathGradient* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientPointCount ( GpPathGradient* x, INT* x ) ;
+             GpPathGradient** x )
+FUNCTION: GpStatus GdipGetPathGradientBlend ( GpPathGradient* x, REAL* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipGetPathGradientBlendCount ( GpPathGradient* x, INT* x )
+FUNCTION: GpStatus GdipGetPathGradientCenterColor ( GpPathGradient* x, ARGB* x )
+FUNCTION: GpStatus GdipGetPathGradientCenterPoint ( GpPathGradient* x, GpPointF* x )
+FUNCTION: GpStatus GdipGetPathGradientCenterPointI ( GpPathGradient* x, GpPoint* x )
+FUNCTION: GpStatus GdipGetPathGradientFocusScales ( GpPathGradient* x, REAL* x, REAL* x )
+FUNCTION: GpStatus GdipGetPathGradientGammaCorrection ( GpPathGradient* x, BOOL* x )
+FUNCTION: GpStatus GdipGetPathGradientPointCount ( GpPathGradient* x, INT* x )
 FUNCTION: GpStatus GdipSetPathGradientPresetBlend ( GpPathGradient* x,
-             ARGB* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipGetPathGradientRect ( GpPathGradient* x, GpRectF* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientRectI ( GpPathGradient* x, GpRect* x ) ;
+             ARGB* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipGetPathGradientRect ( GpPathGradient* x, GpRectF* x )
+FUNCTION: GpStatus GdipGetPathGradientRectI ( GpPathGradient* x, GpRect* x )
 FUNCTION: GpStatus GdipGetPathGradientSurroundColorsWithCount ( GpPathGradient* x,
-             ARGB* x, INT* x ) ;
-FUNCTION: GpStatus GdipGetPathGradientWrapMode ( GpPathGradient* x, GpWrapMode* x ) ;
-FUNCTION: GpStatus GdipSetPathGradientBlend ( GpPathGradient* x, REAL* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipSetPathGradientCenterColor ( GpPathGradient* x, ARGB x ) ;
-FUNCTION: GpStatus GdipSetPathGradientCenterPoint ( GpPathGradient* x, GpPointF* x ) ;
-FUNCTION: GpStatus GdipSetPathGradientCenterPointI ( GpPathGradient* x, GpPoint* x ) ;
-FUNCTION: GpStatus GdipSetPathGradientFocusScales ( GpPathGradient* x, REAL x, REAL x ) ;
-FUNCTION: GpStatus GdipSetPathGradientGammaCorrection ( GpPathGradient* x, BOOL x ) ;
-FUNCTION: GpStatus GdipSetPathGradientSigmaBlend ( GpPathGradient* x, REAL x, REAL x ) ;
+             ARGB* x, INT* x )
+FUNCTION: GpStatus GdipGetPathGradientWrapMode ( GpPathGradient* x, GpWrapMode* x )
+FUNCTION: GpStatus GdipSetPathGradientBlend ( GpPathGradient* x, REAL* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipSetPathGradientCenterColor ( GpPathGradient* x, ARGB x )
+FUNCTION: GpStatus GdipSetPathGradientCenterPoint ( GpPathGradient* x, GpPointF* x )
+FUNCTION: GpStatus GdipSetPathGradientCenterPointI ( GpPathGradient* x, GpPoint* x )
+FUNCTION: GpStatus GdipSetPathGradientFocusScales ( GpPathGradient* x, REAL x, REAL x )
+FUNCTION: GpStatus GdipSetPathGradientGammaCorrection ( GpPathGradient* x, BOOL x )
+FUNCTION: GpStatus GdipSetPathGradientSigmaBlend ( GpPathGradient* x, REAL x, REAL x )
 FUNCTION: GpStatus GdipSetPathGradientSurroundColorsWithCount ( GpPathGradient* x,
-             ARGB* x, INT* x ) ;
-FUNCTION: GpStatus GdipSetPathGradientWrapMode ( GpPathGradient* x, GpWrapMode x ) ;
-FUNCTION: GpStatus GdipGetPathGradientSurroundColorCount ( GpPathGradient* x, INT* x ) ;
+             ARGB* x, INT* x )
+FUNCTION: GpStatus GdipSetPathGradientWrapMode ( GpPathGradient* x, GpWrapMode x )
+FUNCTION: GpStatus GdipGetPathGradientSurroundColorCount ( GpPathGradient* x, INT* x )
 
 
-FUNCTION: GpStatus GdipCreatePathIter ( GpPathIterator** x, GpPath* x ) ;
-FUNCTION: GpStatus GdipDeletePathIter ( GpPathIterator* x ) ;
+FUNCTION: GpStatus GdipCreatePathIter ( GpPathIterator** x, GpPath* x )
+FUNCTION: GpStatus GdipDeletePathIter ( GpPathIterator* x )
 FUNCTION: GpStatus GdipPathIterCopyData ( GpPathIterator* x, INT* x, GpPointF* x, BYTE* x,
-             INT x, INT x ) ;
-FUNCTION: GpStatus GdipPathIterGetCount ( GpPathIterator* x, INT* x ) ;
-FUNCTION: GpStatus GdipPathIterGetSubpathCount ( GpPathIterator* x, INT* x ) ;
-FUNCTION: GpStatus GdipPathIterEnumerate ( GpPathIterator* x, INT* x, GpPointF* x, BYTE* x, INT x ) ;
-FUNCTION: GpStatus GdipPathIterHasCurve ( GpPathIterator* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipPathIterIsValid ( GpPathIterator* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipPathIterNextMarker ( GpPathIterator* x, INT* x, INT* x, INT* x ) ;
-FUNCTION: GpStatus GdipPathIterNextMarkerPath ( GpPathIterator* x, INT* x, GpPath* x ) ;
-FUNCTION: GpStatus GdipPathIterNextPathType ( GpPathIterator* x, INT* x, BYTE* x, INT* x, INT* x ) ;
-FUNCTION: GpStatus GdipPathIterNextSubpath ( GpPathIterator* x, INT* x, INT* x, INT* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipPathIterNextSubpathPath ( GpPathIterator* x, INT* x, GpPath* x, BOOL* x ) ;
-FUNCTION: GpStatus GdipPathIterRewind ( GpPathIterator* x ) ;
+             INT x, INT x )
+FUNCTION: GpStatus GdipPathIterGetCount ( GpPathIterator* x, INT* x )
+FUNCTION: GpStatus GdipPathIterGetSubpathCount ( GpPathIterator* x, INT* x )
+FUNCTION: GpStatus GdipPathIterEnumerate ( GpPathIterator* x, INT* x, GpPointF* x, BYTE* x, INT x )
+FUNCTION: GpStatus GdipPathIterHasCurve ( GpPathIterator* x, BOOL* x )
+FUNCTION: GpStatus GdipPathIterIsValid ( GpPathIterator* x, BOOL* x )
+FUNCTION: GpStatus GdipPathIterNextMarker ( GpPathIterator* x, INT* x, INT* x, INT* x )
+FUNCTION: GpStatus GdipPathIterNextMarkerPath ( GpPathIterator* x, INT* x, GpPath* x )
+FUNCTION: GpStatus GdipPathIterNextPathType ( GpPathIterator* x, INT* x, BYTE* x, INT* x, INT* x )
+FUNCTION: GpStatus GdipPathIterNextSubpath ( GpPathIterator* x, INT* x, INT* x, INT* x, BOOL* x )
+FUNCTION: GpStatus GdipPathIterNextSubpathPath ( GpPathIterator* x, INT* x, GpPath* x, BOOL* x )
+FUNCTION: GpStatus GdipPathIterRewind ( GpPathIterator* x )
 
 
-FUNCTION: GpStatus GdipClonePen ( GpPen* x, GpPen** x ) ;
-FUNCTION: GpStatus GdipCreatePen1 ( ARGB x, REAL x, GpUnit x, GpPen** x ) ;
-FUNCTION: GpStatus GdipCreatePen2 ( GpBrush* x, REAL x, GpUnit x, GpPen** x ) ;
-FUNCTION: GpStatus GdipDeletePen ( GpPen* x ) ;
-FUNCTION: GpStatus GdipGetPenBrushFill ( GpPen* x, GpBrush** x ) ;
-FUNCTION: GpStatus GdipGetPenColor ( GpPen* x, ARGB* x ) ;
-FUNCTION: GpStatus GdipGetPenCustomStartCap ( GpPen* x, GpCustomLineCap** x ) ;
-FUNCTION: GpStatus GdipGetPenCustomEndCap ( GpPen* x, GpCustomLineCap** x ) ;
-FUNCTION: GpStatus GdipGetPenDashArray ( GpPen* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipGetPenDashCount ( GpPen* x, INT* x ) ;
-FUNCTION: GpStatus GdipGetPenDashOffset ( GpPen* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetPenDashStyle ( GpPen* x, GpDashStyle* x ) ;
-FUNCTION: GpStatus GdipGetPenMode ( GpPen* x, GpPenAlignment* x ) ;
-FUNCTION: GpStatus GdipResetPenTransform ( GpPen* x ) ;
-FUNCTION: GpStatus GdipScalePenTransform ( GpPen* x, REAL x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipSetPenBrushFill ( GpPen* x, GpBrush* x ) ;
-FUNCTION: GpStatus GdipSetPenColor ( GpPen* x, ARGB x ) ;
-FUNCTION: GpStatus GdipSetPenCompoundArray ( GpPen* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipSetPenCustomEndCap ( GpPen* x, GpCustomLineCap* x ) ;
-FUNCTION: GpStatus GdipSetPenCustomStartCap ( GpPen* x, GpCustomLineCap* x ) ;
-FUNCTION: GpStatus GdipSetPenDashArray ( GpPen* x, REAL* x, INT x ) ;
-FUNCTION: GpStatus GdipSetPenDashCap197819 ( GpPen* x, GpDashCap x ) ;
-FUNCTION: GpStatus GdipSetPenDashOffset ( GpPen* x, REAL x ) ;
-FUNCTION: GpStatus GdipSetPenDashStyle ( GpPen* x, GpDashStyle x ) ;
-FUNCTION: GpStatus GdipSetPenEndCap ( GpPen* x, GpLineCap x ) ;
-FUNCTION: GpStatus GdipGetPenFillType ( GpPen* x, GpPenType* x ) ;
-FUNCTION: GpStatus GdipSetPenLineCap197819 ( GpPen* x, GpLineCap x, GpLineCap x, GpDashCap x ) ;
-FUNCTION: GpStatus GdipSetPenLineJoin ( GpPen* x, GpLineJoin x ) ;
-FUNCTION: GpStatus GdipSetPenMode ( GpPen* x, GpPenAlignment x ) ;
-FUNCTION: GpStatus GdipSetPenMiterLimit ( GpPen* x, REAL x ) ;
-FUNCTION: GpStatus GdipSetPenStartCap ( GpPen* x, GpLineCap x ) ;
-FUNCTION: GpStatus GdipSetPenWidth ( GpPen* x, REAL x ) ;
-FUNCTION: GpStatus GdipGetPenDashCap197819 ( GpPen* x, GpDashCap* x ) ;
-FUNCTION: GpStatus GdipGetPenEndCap ( GpPen* x, GpLineCap* x ) ;
-FUNCTION: GpStatus GdipGetPenLineJoin ( GpPen* x, GpLineJoin* x ) ;
-FUNCTION: GpStatus GdipGetPenMiterLimit ( GpPen* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetPenStartCap ( GpPen* x, GpLineCap* x ) ;
-FUNCTION: GpStatus GdipGetPenUnit ( GpPen* x, GpUnit* x ) ;
-FUNCTION: GpStatus GdipGetPenWidth ( GpPen* x, REAL* x ) ;
+FUNCTION: GpStatus GdipClonePen ( GpPen* x, GpPen** x )
+FUNCTION: GpStatus GdipCreatePen1 ( ARGB x, REAL x, GpUnit x, GpPen** x )
+FUNCTION: GpStatus GdipCreatePen2 ( GpBrush* x, REAL x, GpUnit x, GpPen** x )
+FUNCTION: GpStatus GdipDeletePen ( GpPen* x )
+FUNCTION: GpStatus GdipGetPenBrushFill ( GpPen* x, GpBrush** x )
+FUNCTION: GpStatus GdipGetPenColor ( GpPen* x, ARGB* x )
+FUNCTION: GpStatus GdipGetPenCustomStartCap ( GpPen* x, GpCustomLineCap** x )
+FUNCTION: GpStatus GdipGetPenCustomEndCap ( GpPen* x, GpCustomLineCap** x )
+FUNCTION: GpStatus GdipGetPenDashArray ( GpPen* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipGetPenDashCount ( GpPen* x, INT* x )
+FUNCTION: GpStatus GdipGetPenDashOffset ( GpPen* x, REAL* x )
+FUNCTION: GpStatus GdipGetPenDashStyle ( GpPen* x, GpDashStyle* x )
+FUNCTION: GpStatus GdipGetPenMode ( GpPen* x, GpPenAlignment* x )
+FUNCTION: GpStatus GdipResetPenTransform ( GpPen* x )
+FUNCTION: GpStatus GdipScalePenTransform ( GpPen* x, REAL x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipSetPenBrushFill ( GpPen* x, GpBrush* x )
+FUNCTION: GpStatus GdipSetPenColor ( GpPen* x, ARGB x )
+FUNCTION: GpStatus GdipSetPenCompoundArray ( GpPen* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipSetPenCustomEndCap ( GpPen* x, GpCustomLineCap* x )
+FUNCTION: GpStatus GdipSetPenCustomStartCap ( GpPen* x, GpCustomLineCap* x )
+FUNCTION: GpStatus GdipSetPenDashArray ( GpPen* x, REAL* x, INT x )
+FUNCTION: GpStatus GdipSetPenDashCap197819 ( GpPen* x, GpDashCap x )
+FUNCTION: GpStatus GdipSetPenDashOffset ( GpPen* x, REAL x )
+FUNCTION: GpStatus GdipSetPenDashStyle ( GpPen* x, GpDashStyle x )
+FUNCTION: GpStatus GdipSetPenEndCap ( GpPen* x, GpLineCap x )
+FUNCTION: GpStatus GdipGetPenFillType ( GpPen* x, GpPenType* x )
+FUNCTION: GpStatus GdipSetPenLineCap197819 ( GpPen* x, GpLineCap x, GpLineCap x, GpDashCap x )
+FUNCTION: GpStatus GdipSetPenLineJoin ( GpPen* x, GpLineJoin x )
+FUNCTION: GpStatus GdipSetPenMode ( GpPen* x, GpPenAlignment x )
+FUNCTION: GpStatus GdipSetPenMiterLimit ( GpPen* x, REAL x )
+FUNCTION: GpStatus GdipSetPenStartCap ( GpPen* x, GpLineCap x )
+FUNCTION: GpStatus GdipSetPenWidth ( GpPen* x, REAL x )
+FUNCTION: GpStatus GdipGetPenDashCap197819 ( GpPen* x, GpDashCap* x )
+FUNCTION: GpStatus GdipGetPenEndCap ( GpPen* x, GpLineCap* x )
+FUNCTION: GpStatus GdipGetPenLineJoin ( GpPen* x, GpLineJoin* x )
+FUNCTION: GpStatus GdipGetPenMiterLimit ( GpPen* x, REAL* x )
+FUNCTION: GpStatus GdipGetPenStartCap ( GpPen* x, GpLineCap* x )
+FUNCTION: GpStatus GdipGetPenUnit ( GpPen* x, GpUnit* x )
+FUNCTION: GpStatus GdipGetPenWidth ( GpPen* x, REAL* x )
 
 
-FUNCTION: GpStatus GdipCloneRegion ( GpRegion* x,  GpRegion** x ) ;
-FUNCTION: GpStatus GdipCombineRegionPath ( GpRegion* x,  GpPath* x,  CombineMode x ) ;
-FUNCTION: GpStatus GdipCombineRegionRect ( GpRegion* x,  GpRectF* x,  CombineMode x ) ;
-FUNCTION: GpStatus GdipCombineRegionRectI ( GpRegion* x,  GpRect* x,  CombineMode x ) ;
-FUNCTION: GpStatus GdipCombineRegionRegion ( GpRegion* x,  GpRegion* x,  CombineMode x ) ;
-FUNCTION: GpStatus GdipCreateRegion ( GpRegion** x ) ;
-FUNCTION: GpStatus GdipCreateRegionPath ( GpPath* x,  GpRegion** x ) ;
-FUNCTION: GpStatus GdipCreateRegionRect ( GpRectF* x,  GpRegion** x ) ;
-FUNCTION: GpStatus GdipCreateRegionRectI ( GpRect* x,  GpRegion** x ) ;
-FUNCTION: GpStatus GdipCreateRegionRgnData ( BYTE* x,  INT x,  GpRegion** x ) ;
-FUNCTION: GpStatus GdipCreateRegionHrgn ( HRGN x,  GpRegion** x ) ;
-FUNCTION: GpStatus GdipDeleteRegion ( GpRegion* x ) ;
-FUNCTION: GpStatus GdipGetRegionBounds ( GpRegion* x,  GpGraphics* x,  GpRectF* x ) ;
-FUNCTION: GpStatus GdipGetRegionBoundsI ( GpRegion* x,  GpGraphics* x,  GpRect* x ) ;
-FUNCTION: GpStatus GdipGetRegionData ( GpRegion* x,  BYTE* x,  UINT x,  UINT* x ) ;
-FUNCTION: GpStatus GdipGetRegionDataSize ( GpRegion* x,  UINT* x ) ;
-FUNCTION: GpStatus GdipGetRegionHRgn ( GpRegion* x,  GpGraphics* x,  HRGN* x ) ;
-FUNCTION: GpStatus GdipIsEmptyRegion ( GpRegion* x,  GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsEqualRegion ( GpRegion* x,  GpRegion* x,  GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsInfiniteRegion ( GpRegion* x,  GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisibleRegionPoint ( GpRegion* x,  REAL x,  REAL x,  GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisibleRegionPointI ( GpRegion* x,  INT x,  INT x,  GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisibleRegionRect ( GpRegion* x,  REAL x,  REAL x,  REAL x,  REAL x,  GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipIsVisibleRegionRectI ( GpRegion* x,  INT x,  INT x,  INT x,  INT x,  GpGraphics* x,  BOOL* x ) ;
-FUNCTION: GpStatus GdipSetEmpty ( GpRegion* x ) ;
-FUNCTION: GpStatus GdipSetInfinite ( GpRegion* x ) ;
-FUNCTION: GpStatus GdipTransformRegion ( GpRegion* x,  GpMatrix* x ) ;
-FUNCTION: GpStatus GdipTranslateRegion ( GpRegion* x,  REAL x,  REAL x ) ;
-FUNCTION: GpStatus GdipTranslateRegionI ( GpRegion* x,  INT x,  INT x ) ;
+FUNCTION: GpStatus GdipCloneRegion ( GpRegion* x,  GpRegion** x )
+FUNCTION: GpStatus GdipCombineRegionPath ( GpRegion* x,  GpPath* x,  CombineMode x )
+FUNCTION: GpStatus GdipCombineRegionRect ( GpRegion* x,  GpRectF* x,  CombineMode x )
+FUNCTION: GpStatus GdipCombineRegionRectI ( GpRegion* x,  GpRect* x,  CombineMode x )
+FUNCTION: GpStatus GdipCombineRegionRegion ( GpRegion* x,  GpRegion* x,  CombineMode x )
+FUNCTION: GpStatus GdipCreateRegion ( GpRegion** x )
+FUNCTION: GpStatus GdipCreateRegionPath ( GpPath* x,  GpRegion** x )
+FUNCTION: GpStatus GdipCreateRegionRect ( GpRectF* x,  GpRegion** x )
+FUNCTION: GpStatus GdipCreateRegionRectI ( GpRect* x,  GpRegion** x )
+FUNCTION: GpStatus GdipCreateRegionRgnData ( BYTE* x,  INT x,  GpRegion** x )
+FUNCTION: GpStatus GdipCreateRegionHrgn ( HRGN x,  GpRegion** x )
+FUNCTION: GpStatus GdipDeleteRegion ( GpRegion* x )
+FUNCTION: GpStatus GdipGetRegionBounds ( GpRegion* x,  GpGraphics* x,  GpRectF* x )
+FUNCTION: GpStatus GdipGetRegionBoundsI ( GpRegion* x,  GpGraphics* x,  GpRect* x )
+FUNCTION: GpStatus GdipGetRegionData ( GpRegion* x,  BYTE* x,  UINT x,  UINT* x )
+FUNCTION: GpStatus GdipGetRegionDataSize ( GpRegion* x,  UINT* x )
+FUNCTION: GpStatus GdipGetRegionHRgn ( GpRegion* x,  GpGraphics* x,  HRGN* x )
+FUNCTION: GpStatus GdipIsEmptyRegion ( GpRegion* x,  GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsEqualRegion ( GpRegion* x,  GpRegion* x,  GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsInfiniteRegion ( GpRegion* x,  GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsVisibleRegionPoint ( GpRegion* x,  REAL x,  REAL x,  GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsVisibleRegionPointI ( GpRegion* x,  INT x,  INT x,  GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsVisibleRegionRect ( GpRegion* x,  REAL x,  REAL x,  REAL x,  REAL x,  GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipIsVisibleRegionRectI ( GpRegion* x,  INT x,  INT x,  INT x,  INT x,  GpGraphics* x,  BOOL* x )
+FUNCTION: GpStatus GdipSetEmpty ( GpRegion* x )
+FUNCTION: GpStatus GdipSetInfinite ( GpRegion* x )
+FUNCTION: GpStatus GdipTransformRegion ( GpRegion* x,  GpMatrix* x )
+FUNCTION: GpStatus GdipTranslateRegion ( GpRegion* x,  REAL x,  REAL x )
+FUNCTION: GpStatus GdipTranslateRegionI ( GpRegion* x,  INT x,  INT x )
 
 
-FUNCTION: GpStatus GdipCreateSolidFill ( ARGB x, GpSolidFill** x ) ;
-FUNCTION: GpStatus GdipGetSolidFillColor ( GpSolidFill* x, ARGB* x ) ;
-FUNCTION: GpStatus GdipSetSolidFillColor ( GpSolidFill* x, ARGB x ) ;
+FUNCTION: GpStatus GdipCreateSolidFill ( ARGB x, GpSolidFill** x )
+FUNCTION: GpStatus GdipGetSolidFillColor ( GpSolidFill* x, ARGB* x )
+FUNCTION: GpStatus GdipSetSolidFillColor ( GpSolidFill* x, ARGB x )
 
 
-FUNCTION: GpStatus GdipCloneStringFormat ( GpStringFormat* x, GpStringFormat** x ) ;
-FUNCTION: GpStatus GdipCreateStringFormat ( INT x, LANGID x, GpStringFormat** x ) ;
-FUNCTION: GpStatus GdipDeleteStringFormat ( GpStringFormat* x ) ;
-FUNCTION: GpStatus GdipGetStringFormatAlign ( GpStringFormat* x, StringAlignment* x ) ;
+FUNCTION: GpStatus GdipCloneStringFormat ( GpStringFormat* x, GpStringFormat** x )
+FUNCTION: GpStatus GdipCreateStringFormat ( INT x, LANGID x, GpStringFormat** x )
+FUNCTION: GpStatus GdipDeleteStringFormat ( GpStringFormat* x )
+FUNCTION: GpStatus GdipGetStringFormatAlign ( GpStringFormat* x, StringAlignment* x )
 FUNCTION: GpStatus GdipGetStringFormatDigitSubstitution ( GpStringFormat* x, LANGID* x,
-                 StringDigitSubstitute* x ) ;
-FUNCTION: GpStatus GdipGetStringFormatFlags ( GpStringFormat* x,  INT* x ) ;
-FUNCTION: GpStatus GdipGetStringFormatHotkeyPrefix ( GpStringFormat* x, INT* x ) ;
-FUNCTION: GpStatus GdipGetStringFormatLineAlign ( GpStringFormat* x, StringAlignment* x ) ;
+                 StringDigitSubstitute* x )
+FUNCTION: GpStatus GdipGetStringFormatFlags ( GpStringFormat* x,  INT* x )
+FUNCTION: GpStatus GdipGetStringFormatHotkeyPrefix ( GpStringFormat* x, INT* x )
+FUNCTION: GpStatus GdipGetStringFormatLineAlign ( GpStringFormat* x, StringAlignment* x )
 FUNCTION: GpStatus GdipGetStringFormatMeasurableCharacterRangeCount (
-                 GpStringFormat* x,  INT* x ) ;
-FUNCTION: GpStatus GdipGetStringFormatTabStopCount ( GpStringFormat* x, INT* x ) ;
-FUNCTION: GpStatus GdipGetStringFormatTabStops ( GpStringFormat* x, INT x, REAL* x, REAL* x ) ;
-FUNCTION: GpStatus GdipGetStringFormatTrimming ( GpStringFormat* x, StringTrimming* x ) ;
-FUNCTION: GpStatus GdipSetStringFormatAlign ( GpStringFormat* x, StringAlignment x ) ;
-FUNCTION: GpStatus GdipSetStringFormatDigitSubstitution ( GpStringFormat* x, LANGID x, StringDigitSubstitute x ) ;
-FUNCTION: GpStatus GdipSetStringFormatHotkeyPrefix ( GpStringFormat* x, INT x ) ;
-FUNCTION: GpStatus GdipSetStringFormatLineAlign ( GpStringFormat* x, StringAlignment x ) ;
+                 GpStringFormat* x,  INT* x )
+FUNCTION: GpStatus GdipGetStringFormatTabStopCount ( GpStringFormat* x, INT* x )
+FUNCTION: GpStatus GdipGetStringFormatTabStops ( GpStringFormat* x, INT x, REAL* x, REAL* x )
+FUNCTION: GpStatus GdipGetStringFormatTrimming ( GpStringFormat* x, StringTrimming* x )
+FUNCTION: GpStatus GdipSetStringFormatAlign ( GpStringFormat* x, StringAlignment x )
+FUNCTION: GpStatus GdipSetStringFormatDigitSubstitution ( GpStringFormat* x, LANGID x, StringDigitSubstitute x )
+FUNCTION: GpStatus GdipSetStringFormatHotkeyPrefix ( GpStringFormat* x, INT x )
+FUNCTION: GpStatus GdipSetStringFormatLineAlign ( GpStringFormat* x, StringAlignment x )
 FUNCTION: GpStatus GdipSetStringFormatMeasurableCharacterRanges (
-                 GpStringFormat* x,  INT x,  CharacterRange* x ) ;
-FUNCTION: GpStatus GdipSetStringFormatTabStops ( GpStringFormat* x, REAL x, INT x, REAL* x ) ;
-FUNCTION: GpStatus GdipSetStringFormatTrimming ( GpStringFormat* x, StringTrimming x ) ;
-FUNCTION: GpStatus GdipSetStringFormatFlags ( GpStringFormat* x,  INT x ) ;
-FUNCTION: GpStatus GdipStringFormatGetGenericDefault ( GpStringFormat** x ) ;
-FUNCTION: GpStatus GdipStringFormatGetGenericTypographic ( GpStringFormat** x ) ;
+                 GpStringFormat* x,  INT x,  CharacterRange* x )
+FUNCTION: GpStatus GdipSetStringFormatTabStops ( GpStringFormat* x, REAL x, INT x, REAL* x )
+FUNCTION: GpStatus GdipSetStringFormatTrimming ( GpStringFormat* x, StringTrimming x )
+FUNCTION: GpStatus GdipSetStringFormatFlags ( GpStringFormat* x,  INT x )
+FUNCTION: GpStatus GdipStringFormatGetGenericDefault ( GpStringFormat** x )
+FUNCTION: GpStatus GdipStringFormatGetGenericTypographic ( GpStringFormat** x )
 
 
-FUNCTION: GpStatus GdipCreateTexture ( GpImage* x, GpWrapMode x, GpTexture** x ) ;
-FUNCTION: GpStatus GdipCreateTexture2 ( GpImage* x, GpWrapMode x, REAL x, REAL x, REAL x, REAL x, GpTexture** x ) ;
-FUNCTION: GpStatus GdipCreateTexture2I ( GpImage* x, GpWrapMode x, INT x, INT x, INT x, INT x, GpTexture** x ) ;
+FUNCTION: GpStatus GdipCreateTexture ( GpImage* x, GpWrapMode x, GpTexture** x )
+FUNCTION: GpStatus GdipCreateTexture2 ( GpImage* x, GpWrapMode x, REAL x, REAL x, REAL x, REAL x, GpTexture** x )
+FUNCTION: GpStatus GdipCreateTexture2I ( GpImage* x, GpWrapMode x, INT x, INT x, INT x, INT x, GpTexture** x )
 FUNCTION: GpStatus GdipCreateTextureIA ( GpImage* x, GpImageAttributes* x,
-             REAL x, REAL x, REAL x, REAL x, GpTexture** x ) ;
+             REAL x, REAL x, REAL x, REAL x, GpTexture** x )
 FUNCTION: GpStatus GdipCreateTextureIAI ( GpImage* x, GpImageAttributes* x,
-             INT x, INT x, INT x, INT x, GpTexture** x ) ;
-FUNCTION: GpStatus GdipGetTextureTransform ( GpTexture* x, GpMatrix* x ) ;
-FUNCTION: GpStatus GdipGetTextureWrapMode ( GpTexture* x,  GpWrapMode* x ) ;
+             INT x, INT x, INT x, INT x, GpTexture** x )
+FUNCTION: GpStatus GdipGetTextureTransform ( GpTexture* x, GpMatrix* x )
+FUNCTION: GpStatus GdipGetTextureWrapMode ( GpTexture* x,  GpWrapMode* x )
 FUNCTION: GpStatus GdipMultiplyTextureTransform ( GpTexture* x,
-             GpMatrix* x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipResetTextureTransform ( GpTexture* x ) ;
-FUNCTION: GpStatus GdipRotateTextureTransform ( GpTexture* x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipScaleTextureTransform ( GpTexture* x, REAL x, REAL x, GpMatrixOrder x ) ;
-FUNCTION: GpStatus GdipSetTextureTransform ( GpTexture* x, GpMatrix* x ) ;
-FUNCTION: GpStatus GdipSetTextureWrapMode ( GpTexture* x,  GpWrapMode x ) ;
+             GpMatrix* x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipResetTextureTransform ( GpTexture* x )
+FUNCTION: GpStatus GdipRotateTextureTransform ( GpTexture* x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipScaleTextureTransform ( GpTexture* x, REAL x, REAL x, GpMatrixOrder x )
+FUNCTION: GpStatus GdipSetTextureTransform ( GpTexture* x, GpMatrix* x )
+FUNCTION: GpStatus GdipSetTextureWrapMode ( GpTexture* x,  GpWrapMode x )
 FUNCTION: GpStatus GdipTranslateTextureTransform ( GpTexture* x, REAL x, REAL x,
-             GpMatrixOrder x ) ;
+             GpMatrixOrder x )
 
 
-FUNCTION: GpStatus GdipCreateStreamOnFile ( WCHAR* x, UINT x, IStream** x ) ;
-FUNCTION: GpStatus GdipGetImageEncodersSize ( UINT* numEncoders,  UINT* size ) ;
-FUNCTION: GpStatus GdipGetImageEncoders ( UINT numEncoders,  UINT size,  ImageCodecInfo* encoders ) ;
-FUNCTION: GpStatus GdipTestControl ( GpTestControlEnum x, void* x ) ;
+FUNCTION: GpStatus GdipCreateStreamOnFile ( WCHAR* x, UINT x, IStream** x )
+FUNCTION: GpStatus GdipGetImageEncodersSize ( UINT* numEncoders,  UINT* size )
+FUNCTION: GpStatus GdipGetImageEncoders ( UINT numEncoders,  UINT size,  ImageCodecInfo* encoders )
+FUNCTION: GpStatus GdipTestControl ( GpTestControlEnum x, void* x )
 
 ERROR: gdi+-error status ;
 

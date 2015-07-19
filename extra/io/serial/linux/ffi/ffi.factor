@@ -20,18 +20,18 @@ STRUCT: termios
     { ispeed speed_t }
     { ospeed speed_t } ;
 
-FUNCTION: speed_t cfgetispeed ( termios* t ) ;
-FUNCTION: speed_t cfgetospeed ( termios* t ) ;
-FUNCTION: int cfsetispeed ( termios* t, speed_t s ) ;
-FUNCTION: int cfsetospeed ( termios* t, speed_t s ) ;
-FUNCTION: int tcgetattr ( int i1, termios* t ) ;
-FUNCTION: int tcsetattr ( int i1, int i2, termios* t ) ;
-FUNCTION: int tcdrain ( int i1 ) ;
-FUNCTION: int tcflow ( int i1, int i2 ) ;
-FUNCTION: int tcflush ( int i1, int i2 ) ;
-FUNCTION: int tcsendbreak ( int i1, int i2 ) ;
-FUNCTION: void cfmakeraw ( termios* t ) ;
-FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
+FUNCTION: speed_t cfgetispeed ( termios* t )
+FUNCTION: speed_t cfgetospeed ( termios* t )
+FUNCTION: int cfsetispeed ( termios* t, speed_t s )
+FUNCTION: int cfsetospeed ( termios* t, speed_t s )
+FUNCTION: int tcgetattr ( int i1, termios* t )
+FUNCTION: int tcsetattr ( int i1, int i2, termios* t )
+FUNCTION: int tcdrain ( int i1 )
+FUNCTION: int tcflow ( int i1, int i2 )
+FUNCTION: int tcflush ( int i1, int i2 )
+FUNCTION: int tcsendbreak ( int i1, int i2 )
+FUNCTION: void cfmakeraw ( termios* t )
+FUNCTION: int cfsetspeed ( termios* t, speed_t s )
 
 CONSTANT: TCSANOW     0
 CONSTANT: TCSADRAIN   1

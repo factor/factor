@@ -819,7 +819,7 @@ TYPEDEF: DWORD REGSAM
 ! : AddAccessDeniedAce ;
 ! : AddAccessDeniedAceEx ;
 ! : AddAccessDeniedObjectAce ;
-FUNCTION: BOOL AddAce ( PACL pAcl, DWORD dwAceRevision, DWORD dwStartingAceIndex, LPVOID pAceList, DWORD nAceListLength ) ;
+FUNCTION: BOOL AddAce ( PACL pAcl, DWORD dwAceRevision, DWORD dwStartingAceIndex, LPVOID pAceList, DWORD nAceListLength )
 ! : AddAuditAccessAce ;
 ! : AddAuditAccessAceEx ;
 ! : AddAuditAccessObjectAce ;
@@ -830,7 +830,7 @@ FUNCTION: BOOL AdjustTokenPrivileges ( HANDLE TokenHandle,
                                PTOKEN_PRIVILEGES NewState,
                                DWORD BufferLength,
                                PTOKEN_PRIVILEGES PreviousState,
-                               PDWORD ReturnLength ) ;
+                               PDWORD ReturnLength )
 
 FUNCTION: BOOL AllocateAndInitializeSid (
                 PSID_IDENTIFIER_AUTHORITY pIdentifierAuthority,
@@ -843,7 +843,7 @@ FUNCTION: BOOL AllocateAndInitializeSid (
                 DWORD dwSubAuthority5,
                 DWORD dwSubAuthority6,
                 DWORD dwSubAuthority7,
-                PSID* pSid ) ;
+                PSID* pSid )
 
 ! : AllocateLocallyUniqueId ;
 ! : AreAllAccessesGranted ;
@@ -918,7 +918,7 @@ FUNCTION: BOOL AllocateAndInitializeSid (
 ! : CreateServiceA ;
 ! : CreateServiceW ;
 ! : CreateTraceInstanceId ;
-FUNCTION: BOOL CreateWellKnownSid ( WELL_KNOWN_SID_TYPE WellKnownSidType, PSID DomainSid, PSID pSid, DWORD *cbSid ) ;
+FUNCTION: BOOL CreateWellKnownSid ( WELL_KNOWN_SID_TYPE WellKnownSidType, PSID DomainSid, PSID pSid, DWORD *cbSid )
 ! : CredDeleteA ;
 ! : CredDeleteW ;
 ! : CredEnumerateA ;
@@ -953,12 +953,12 @@ FUNCTION: BOOL CryptAcquireContextW ( HCRYPTPROV* phProv,
                                       LPCTSTR pszContainer,
                                       LPCTSTR pszProvider,
                                       DWORD dwProvType,
-                                      DWORD dwFlags ) ;
+                                      DWORD dwFlags )
 
 ALIAS: CryptAcquireContext CryptAcquireContextW
 
 ! : CryptContextAddRef ;
-FUNCTION: BOOL CryptCreateHash ( HCRYPTPROV hProv, ALG_ID Algid, HCRYPTKEY hKey, DWORD dwFlags, HCRYPTHASH *pHash ) ;
+FUNCTION: BOOL CryptCreateHash ( HCRYPTPROV hProv, ALG_ID Algid, HCRYPTKEY hKey, DWORD dwFlags, HCRYPTHASH *pHash )
 ! : CryptDecrypt ;
 ! : CryptDeriveKey ;
 ! : CryptDestroyHash ;
@@ -972,7 +972,7 @@ FUNCTION: BOOL CryptCreateHash ( HCRYPTPROV hProv, ALG_ID Algid, HCRYPTKEY hKey,
 ! : CryptEnumProvidersW ;
 ! : CryptExportKey ;
 ! : CryptGenKey ;
-FUNCTION: BOOL CryptGenRandom ( HCRYPTPROV hProv, DWORD dwLen, BYTE* pbBuffer ) ;
+FUNCTION: BOOL CryptGenRandom ( HCRYPTPROV hProv, DWORD dwLen, BYTE* pbBuffer )
 ! : CryptGetDefaultProviderA ;
 ! : CryptGetDefaultProviderW ;
 ! : CryptGetHashParam ;
@@ -981,8 +981,8 @@ FUNCTION: BOOL CryptGenRandom ( HCRYPTPROV hProv, DWORD dwLen, BYTE* pbBuffer ) 
 ! : CryptGetUserKey ;
 ! : CryptHashData ;
 ! : CryptHashSessionKey ;
-FUNCTION: BOOL CryptImportKey ( HCRYPTPROV hProv, BYTE *pbData, DWORD dwDataLen, HCRYPTKEY hPubKey, DWORD dwFlags, HCRYPTKEY *phKey ) ;
-FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
+FUNCTION: BOOL CryptImportKey ( HCRYPTPROV hProv, BYTE *pbData, DWORD dwDataLen, HCRYPTKEY hPubKey, DWORD dwFlags, HCRYPTKEY *phKey )
+FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags )
 ! : CryptSetHashParam ;
 ! : CryptSetKeyParam ;
 ! : CryptSetProvParam ;
@@ -1062,7 +1062,7 @@ FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
 ! : GetExplicitEntriesFromAclA ;
 ! : GetExplicitEntriesFromAclW ;
 ! : GetFileSecurityA ;
-FUNCTION: BOOL GetFileSecurityW ( LPCTSTR lpFileName, SECURITY_INFORMATION RequestedInformation, PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD nLength, LPDWORD lpnLengthNeeded ) ;
+FUNCTION: BOOL GetFileSecurityW ( LPCTSTR lpFileName, SECURITY_INFORMATION RequestedInformation, PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD nLength, LPDWORD lpnLengthNeeded )
 ALIAS: GetFileSecurity GetFileSecurityW
 ! : GetInformationCodeAuthzLevelW ;
 ! : GetInformationCodeAuthzPolicyW ;
@@ -1081,19 +1081,19 @@ ALIAS: GetFileSecurity GetFileSecurityW
 ! : GetNamedSecurityInfoA ;
 ! : GetNamedSecurityInfoExA ;
 ! FUNCTION: DWORD GetNamedSecurityInfoExW
-FUNCTION: DWORD GetNamedSecurityInfoW ( LPTSTR pObjectName, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID* ppsidOwner, PSID* ppsidGroup, PACL* ppDacl, PACL* ppSacl, PSECURITY_DESCRIPTOR* ppSecurityDescriptor ) ;
+FUNCTION: DWORD GetNamedSecurityInfoW ( LPTSTR pObjectName, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID* ppsidOwner, PSID* ppsidGroup, PACL* ppDacl, PACL* ppSacl, PSECURITY_DESCRIPTOR* ppSecurityDescriptor )
 ALIAS: GetNamedSecurityInfo GetNamedSecurityInfoW
 ! : GetNumberOfEventLogRecords ;
 ! : GetOldestEventLogRecord ;
 ! : GetOverlappedAccessResults ;
 ! : GetPrivateObjectSecurity ;
-FUNCTION: BOOL GetSecurityDescriptorControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSECURITY_DESCRIPTOR_CONTROL pControl, LPDWORD lpdwRevision ) ;
-FUNCTION: BOOL GetSecurityDescriptorDacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbDaclPresent, PACL* pDacl, LPBOOL lpDaclDefaulted ) ;
-FUNCTION: BOOL GetSecurityDescriptorGroup ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pGroup, LPBOOL lpGroupDefaulted ) ;
-FUNCTION: BOOL GetSecurityDescriptorLength ( PSECURITY_DESCRIPTOR pSecurityDescriptor ) ;
-FUNCTION: BOOL GetSecurityDescriptorOwner ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pOwner, LPBOOL lpOwnerDefaulted ) ;
-FUNCTION: BOOL GetSecurityDescriptorRMControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PUCHAR RMControl ) ;
-FUNCTION: BOOL GetSecurityDescriptorSacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbSaclPresent, PACL* pSacl, LPBOOL lpSaclDefaulted ) ;
+FUNCTION: BOOL GetSecurityDescriptorControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSECURITY_DESCRIPTOR_CONTROL pControl, LPDWORD lpdwRevision )
+FUNCTION: BOOL GetSecurityDescriptorDacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbDaclPresent, PACL* pDacl, LPBOOL lpDaclDefaulted )
+FUNCTION: BOOL GetSecurityDescriptorGroup ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pGroup, LPBOOL lpGroupDefaulted )
+FUNCTION: BOOL GetSecurityDescriptorLength ( PSECURITY_DESCRIPTOR pSecurityDescriptor )
+FUNCTION: BOOL GetSecurityDescriptorOwner ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pOwner, LPBOOL lpOwnerDefaulted )
+FUNCTION: BOOL GetSecurityDescriptorRMControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PUCHAR RMControl )
+FUNCTION: BOOL GetSecurityDescriptorSacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbSaclPresent, PACL* pSacl, LPBOOL lpSaclDefaulted )
 ! : GetSecurityInfo ;
 ! : GetSecurityInfoExA ;
 ! : GetSecurityInfoExW ;
@@ -1105,7 +1105,7 @@ FUNCTION: BOOL GetSecurityDescriptorSacl ( PSECURITY_DESCRIPTOR pSecurityDescrip
 ! : GetSidLengthRequired ;
 ! : GetSidSubAuthority ;
 ! : GetSidSubAuthorityCount ;
-FUNCTION: BOOL GetTokenInformation ( HANDLE TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, LPVOID TokenInformation, DWORD TokenInformationLenghth, PWORD ReturnLength ) ;
+FUNCTION: BOOL GetTokenInformation ( HANDLE TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, LPVOID TokenInformation, DWORD TokenInformationLenghth, PWORD ReturnLength )
 ! : GetTraceEnableFlags ;
 ! : GetTraceEnableLevel ;
 ! : GetTraceLoggerHandle ;
@@ -1117,7 +1117,7 @@ FUNCTION: BOOL GetTokenInformation ( HANDLE TokenHandle, TOKEN_INFORMATION_CLASS
 ! : GetTrusteeTypeW ;
 
 ! : GetUserNameA ;
-FUNCTION: BOOL GetUserNameW ( LPCTSTR lpBuffer, LPDWORD lpnSize ) ;
+FUNCTION: BOOL GetUserNameW ( LPCTSTR lpBuffer, LPDWORD lpnSize )
 ALIAS: GetUserName GetUserNameW
 
 ! : GetWindowsAccountDomainSid ;
@@ -1131,8 +1131,8 @@ ALIAS: GetUserName GetUserNameW
 ! : ImpersonateLoggedOnUser ;
 ! : ImpersonateNamedPipeClient ;
 ! : ImpersonateSelf ;
-FUNCTION: BOOL InitializeAcl ( PACL pAcl, DWORD nAclLength, DWORD dwAclRevision ) ;
-FUNCTION: BOOL InitializeSecurityDescriptor ( PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision ) ;
+FUNCTION: BOOL InitializeAcl ( PACL pAcl, DWORD nAclLength, DWORD dwAclRevision )
+FUNCTION: BOOL InitializeSecurityDescriptor ( PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision )
 ! : InitializeSid ;
 ! : InitiateSystemShutdownA ;
 ! : InitiateSystemShutdownExA ;
@@ -1162,7 +1162,7 @@ FUNCTION: BOOL InitializeSecurityDescriptor ( PSECURITY_DESCRIPTOR pSecurityDesc
 ! : LookupPrivilegeValueA ;
 FUNCTION: BOOL LookupPrivilegeValueW ( LPCTSTR lpSystemName,
                                LPCTSTR lpName,
-                               PLUID lpLuid ) ;
+                               PLUID lpLuid )
 ALIAS: LookupPrivilegeValue LookupPrivilegeValueW
 
 ! : LookupSecurityDescriptorPartsA ;
@@ -1259,12 +1259,12 @@ ALIAS: LookupPrivilegeValue LookupPrivilegeValueW
 
 FUNCTION: BOOL OpenProcessToken ( HANDLE ProcessHandle,
                                   DWORD DesiredAccess,
-                                  PHANDLE TokenHandle ) ;
+                                  PHANDLE TokenHandle )
 ! : OpenSCManagerA ;
 ! : OpenSCManagerW ;
 ! : OpenServiceA ;
 ! : OpenServiceW ;
-FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL OpenAsSelf, PHANDLE TokenHandle ) ;
+FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL OpenAsSelf, PHANDLE TokenHandle )
 ! : OpenTraceA ;
 ! : OpenTraceW ;
 ! : PrivilegeCheck ;
@@ -1291,12 +1291,12 @@ FUNCTION: BOOL OpenThreadToken ( HANDLE ThreadHandle, DWORD DesiredAccess, BOOL 
 ! : ReadEncryptedFileRaw ;
 ! : ReadEventLogA ;
 ! : ReadEventLogW ;
-FUNCTION: LONG RegCloseKey ( HKEY hKey ) ;
+FUNCTION: LONG RegCloseKey ( HKEY hKey )
 ! : RegConnectRegistryA ;
 ! : RegConnectRegistryW ;
 ! : RegCreateKeyA ;
 ! : RegCreateKeyExA ;
-FUNCTION: LONG RegCreateKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD Reserved, LPTSTR lpClass, DWORD dwOptions, REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition ) ;
+FUNCTION: LONG RegCreateKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD Reserved, LPTSTR lpClass, DWORD dwOptions, REGSAM samDesired, LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition )
 ALIAS: RegCreateKeyEx RegCreateKeyExW
 ! : RegCreateKeyW
 ! : RegDeleteKeyA ;
@@ -1312,7 +1312,7 @@ FUNCTION: LONG RegDeleteKeyExW (
         LPSECURITY_ATTRIBUTES lpSecurityAttributes,
         PHKEY phkResult,
         LPDWORD lpdwDisposition
-    ) ;
+    )
 
 ALIAS: RegDeleteKeyEx RegDeleteKeyExW
 
@@ -1331,7 +1331,7 @@ FUNCTION: LONG RegEnumKeyExW (
         LPTSTR lpClass,
         LPDWORD lpcClass,
         PFILETIME lpftLastWriteTime
-    ) ;
+    )
 ALIAS: RegEnumKeyEx RegEnumKeyExW
 
 ! : RegEnumKeyW ;
@@ -1346,7 +1346,7 @@ FUNCTION: LONG RegEnumValueW (
         LPDWORD lpType,
         LPBYTE lpData,
         LPDWORD lpcbData
-    ) ;
+    )
 
 ALIAS: RegEnumValue RegEnumValueW
 
@@ -1355,10 +1355,10 @@ ALIAS: RegEnumValue RegEnumValueW
 ! : RegLoadKeyA ;
 ! : RegLoadKeyW ;
 ! : RegNotifyChangeKeyValue ;
-FUNCTION: LONG RegOpenCurrentUser ( REGSAM samDesired, PHKEY phkResult ) ;
+FUNCTION: LONG RegOpenCurrentUser ( REGSAM samDesired, PHKEY phkResult )
 ! : RegOpenKeyA ;
 ! : RegOpenKeyExA ;
-FUNCTION: LONG RegOpenKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult ) ;
+FUNCTION: LONG RegOpenKeyExW ( HKEY hKey, LPCTSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult )
 ALIAS: RegOpenKeyEx RegOpenKeyExW
 ! : RegOpenKeyW ;
 ! : RegOpenUserClassesRoot ;
@@ -1377,13 +1377,13 @@ FUNCTION: LONG RegQueryInfoKeyW (
         LPDWORD lpcMaxValueLen,
         LPDWORD lpcbSecurityDescriptor,
         PFILETIME lpftLastWriteTime
-    ) ;
+    )
 ALIAS: RegQueryInfoKey RegQueryInfoKeyW
 ! : RegQueryMultipleValuesA ;
 ! : RegQueryMultipleValuesW ;
 ! : RegQueryValueA ;
 ! : RegQueryValueExA ;
-FUNCTION: LONG RegQueryValueExW ( HKEY hKey, LPCTSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData ) ;
+FUNCTION: LONG RegQueryValueExW ( HKEY hKey, LPCTSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData )
 ALIAS: RegQueryValueEx RegQueryValueExW
 ! : RegQueryValueW ;
 ! : RegReplaceKeyA ;
@@ -1398,7 +1398,7 @@ ALIAS: RegQueryValueEx RegQueryValueExW
 ! : RegSetValueA ;
 ! : RegSetValueExA ;
 ! : RegSetValueExW ;
-FUNCTION: LONG RegSetValueExW ( HKEY hKey, LPCTSTR lpValueName, DWORD Reserved, DWORD dwType, BYTE* lpData, DWORD cbData ) ;
+FUNCTION: LONG RegSetValueExW ( HKEY hKey, LPCTSTR lpValueName, DWORD Reserved, DWORD dwType, BYTE* lpData, DWORD cbData )
 ALIAS: RegSetValueEx RegSetValueExW
 ! : RegUnLoadKeyA ;
 ! : RegUnLoadKeyW ;
@@ -1436,7 +1436,7 @@ ALIAS: RegSetValueEx RegSetValueExW
 ! : SetEntriesInAccessListA ;
 ! : SetEntriesInAccessListW ;
 ! : SetEntriesInAclA ;
-FUNCTION: DWORD SetEntriesInAclW ( ULONG cCountOfExplicitEntries, PEXPLICIT_ACCESS pListOfExplicitEntries, PACL OldAcl, PACL* NewAcl ) ;
+FUNCTION: DWORD SetEntriesInAclW ( ULONG cCountOfExplicitEntries, PEXPLICIT_ACCESS pListOfExplicitEntries, PACL OldAcl, PACL* NewAcl )
 ALIAS: SetEntriesInAcl SetEntriesInAclW
 ! : SetEntriesInAuditListA ;
 ! : SetEntriesInAuditListW ;
@@ -1448,7 +1448,7 @@ ALIAS: SetEntriesInAcl SetEntriesInAclW
 ! : SetNamedSecurityInfoA ;
 ! : SetNamedSecurityInfoExA ;
 ! : SetNamedSecurityInfoExW ;
-FUNCTION: DWORD SetNamedSecurityInfoW ( LPTSTR pObjectName, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID psidOwner, PSID psidGroup, PACL pDacl, PACL pSacl ) ;
+FUNCTION: DWORD SetNamedSecurityInfoW ( LPTSTR pObjectName, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID psidOwner, PSID psidGroup, PACL pDacl, PACL pSacl )
 ALIAS: SetNamedSecurityInfo SetNamedSecurityInfoW
 ! : SetPrivateObjectSecurity ;
 ! : SetPrivateObjectSecurityEx ;

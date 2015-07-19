@@ -16,7 +16,7 @@ FUNCTION: HRESULT SHGetFolderLocation (
     HANDLE hToken,
     DWORD dwReserved,
     PIDLIST_ABSOLUTE* ppidl
-) ;
+)
 
 STRUCT: BROWSEINFO
   { hwndOwner HWND }
@@ -48,12 +48,12 @@ CONSTANT: BIF_BROWSEFILEJUNCTIONS 0x00010000
 
 FUNCTION: PIDLIST_ABSOLUTE SHBrowseForFolder (
     BROWSEINFO* lpbi
-) ;
+)
 
 FUNCTION: BOOL SHGetPathFromIDList (
   PCIDLIST_ABSOLUTE pidl,
   LPTSTR pszPath
-) ;
+)
 
 
 M: windows open-file-dialog

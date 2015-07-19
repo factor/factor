@@ -106,11 +106,11 @@ STRUCT: dirent
     { d_type uchar }
     { d_name char[256] } ;
 
-FUNCTION: int open64 ( c-string path, int flags, int prot ) ;
-FUNCTION: dirent* readdir64 ( DIR* dirp ) ;
-FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result ) ;
+FUNCTION: int open64 ( c-string path, int flags, int prot )
+FUNCTION: dirent* readdir64 ( DIR* dirp )
+FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result )
 
-FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count ) ;
+FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count )
 
 
 CONSTANT: __UT_LINESIZE 32

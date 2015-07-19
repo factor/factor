@@ -24,7 +24,7 @@ PACKED-STRUCT: SHFILEOPSTRUCTW
     { hNameMappings LPVOID }
     { lpszProgressTitle LPCWSTR } ;
 
-FUNCTION: int SHFileOperationW ( SHFILEOPSTRUCTW* lpFileOp ) ;
+FUNCTION: int SHFileOperationW ( SHFILEOPSTRUCTW* lpFileOp )
 
 CONSTANT: FO_MOVE 0x0001
 CONSTANT: FO_COPY 0x0002

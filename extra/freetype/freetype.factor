@@ -35,7 +35,7 @@ TYPEDEF: ushort FT_UFWord
 TYPEDEF: short FT_F2Dot14
 TYPEDEF: long FT_F26Dot6
 
-FUNCTION: FT_Error FT_Init_FreeType ( void* library ) ;
+FUNCTION: FT_Error FT_Init_FreeType ( void* library )
 
 ! circular reference between glyph and face
 C-TYPE: face
@@ -168,13 +168,13 @@ STRUCT: FT_Bitmap
 
 C-TYPE: FT_Face
 
-FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face ) ;
+FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face )
 
-FUNCTION: FT_Error FT_New_Memory_Face ( void* library, FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face* aface ) ;
+FUNCTION: FT_Error FT_New_Memory_Face ( void* library, FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face* aface )
 
-FUNCTION: FT_Error FT_Set_Char_Size ( face* face, FT_F26Dot6 char_width, FT_F26Dot6 char_height, FT_UInt horizontal_dpi, FT_UInt vertical_dpi ) ;
+FUNCTION: FT_Error FT_Set_Char_Size ( face* face, FT_F26Dot6 char_width, FT_F26Dot6 char_height, FT_UInt horizontal_dpi, FT_UInt vertical_dpi )
 
-FUNCTION: FT_Error FT_Load_Char ( face* face, FT_ULong charcode, FT_Int32 load_flags ) ;
+FUNCTION: FT_Error FT_Load_Char ( face* face, FT_ULong charcode, FT_Int32 load_flags )
 
 CONSTANT: FT_RENDER_MODE_NORMAL 0
 CONSTANT: FT_RENDER_MODE_LIGHT 1
@@ -190,10 +190,10 @@ CONSTANT: FT_PIXEL_MODE_GRAY4 4
 CONSTANT: FT_PIXEL_MODE_LCD 5
 CONSTANT: FT_PIXEL_MODE_LCD_V 6
 
-FUNCTION: int FT_Render_Glyph ( glyph* slot, int render_mode ) ;
+FUNCTION: int FT_Render_Glyph ( glyph* slot, int render_mode )
 
-FUNCTION: void FT_Done_Face ( face* face ) ;
+FUNCTION: void FT_Done_Face ( face* face )
 
-FUNCTION: void FT_Done_FreeType ( void* library ) ;
+FUNCTION: void FT_Done_FreeType ( void* library )
 
-FUNCTION: FT_Long FT_MulFix ( FT_Long a, FT_Long b ) ;
+FUNCTION: FT_Long FT_MulFix ( FT_Long a, FT_Long b )
