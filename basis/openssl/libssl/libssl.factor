@@ -524,4 +524,4 @@ FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
 
 ! stack.h
 FUNCTION: int sk_num ( _STACK *s ) ;
-FUNCTION: void* sk_value ( _STACK *s, int ) ;
+FUNCTION: void* sk_value ( _STACK *s, int v ) ;
