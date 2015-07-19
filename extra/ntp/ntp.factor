@@ -87,7 +87,7 @@ orig-timestamp recv-timestamp tx-timestamp ;
         [ [ { 7 8 } ] dip nths (time) ]   ! ref-timestamp
         [ [ { 9 10 } ] dip nths (time) ]  ! orig-timestamp
         [ [ { 11 12 } ] dip nths (time) ] ! recv-timestamp
-        [ [ { 13 14 } ] dip nths (time) ] ! tx-timestamp 
+        [ [ { 13 14 } ] dip nths (time) ] ! tx-timestamp
     } cleave ntp boa
     dup stratum>> '[ _ (ref-id) ] change-ref-id
     [ dup (leap) 2array ] change-leap

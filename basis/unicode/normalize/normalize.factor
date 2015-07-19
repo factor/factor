@@ -44,7 +44,7 @@ CONSTANT: final-count 28
         medial-base - + final-count *
     ] dip final-base - + hangul-base + ;
 
-! Normalization -- Decomposition 
+! Normalization -- Decomposition
 
 : reorder-slice ( string start -- slice done? )
     2dup swap [ non-starter? not ] find-from drop

@@ -29,7 +29,7 @@ IN: images.viewer.tests
 ! test that when changing the model, the gadget updates the texture.
 ! - same size images (both smaller than 512x512) (updates)
 ! test that when changing the model, the gadget creates a new texture.
-! test different cases : 
+! test different cases :
 ! - same size images (both bigger than 512x512) (creates)
 ! - different size images (both smaller than 512x512) (creates)
 ! - different size images (both bigger than 512x512) (creates)

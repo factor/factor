@@ -80,4 +80,4 @@ ERROR: not-a-string-number string ;
     [ parent-directory make-directories ] keep ;
 
 ! : path>next-vnode-version-name ( path -- path' )
-    ! [ file-name ] 
+    ! [ file-name ]

@@ -29,7 +29,7 @@ IN: ctags.etags.tests
   etag-vector =
 ] unit-test
 
-! etag-pair 
+! etag-pair
 { t }
 [
   { if 28 }

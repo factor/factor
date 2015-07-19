@@ -94,7 +94,7 @@ CONSTANT: default-uuids-to-cache 100
 : next-uuid ( server -- uuid )
     ensure-uuids uuids>> pop ;
 
-! db 
+! db
 TUPLE: db { server server } { name string } ;
 C: <db> db
 
@@ -187,7 +187,7 @@ C: <db> db
 !     H{ } clone "name" pick set-at "content-type" pick set-at ;
 !
 ! : add-attachment ( assoc name attachment -- )
-!     pick attachments> [ H{ } clone ] unless* 
+!     pick attachments> [ H{ } clone ] unless*
 !
 ! : attach ( assoc name content-type data -- )
 !     construct-attachment H{ } clone

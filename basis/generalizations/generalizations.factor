@@ -7,7 +7,7 @@ memoize.private arrays ;
 IN: generalizations
 
 ! These words can be inline combinators the word does no math on
-! the input parameters, e.g. n. 
+! the input parameters, e.g. n.
 ! If math is done, the word needs to be a macro so the math can
 ! be done at compile-time.
 <<

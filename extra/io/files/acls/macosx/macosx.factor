@@ -129,7 +129,7 @@ ERROR: add-permission-failed permission-set permission ;
     acl-entry>flagset flagset>strings ;
 
 
-! Acl, acl entry, principal, group, 
+! Acl, acl entry, principal, group,
 ! acl_get_qualifier, acl_get_tag_type, acl_get_flagset_np,
 ! acl_get_permset
 

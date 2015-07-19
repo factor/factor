@@ -11,7 +11,7 @@ CONSTANT: NSMiniaturizableWindowMask       4
 CONSTANT: NSResizableWindowMask            8
 CONSTANT: NSTexturedBackgroundWindowMask 256
 
-! Additional panel-only styles 
+! Additional panel-only styles
 CONSTANT: NSUtilityWindowMask       16
 CONSTANT: NSDocModalWindowMask      64
 CONSTANT: NSNonactivatingPanelMask 128

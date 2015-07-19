@@ -11,7 +11,7 @@ TUPLE: dual ordinary-part epsilon-part ;
 
 C: <dual> dual
 
-! Ordinary numbers implement the dual protocol by returning 
+! Ordinary numbers implement the dual protocol by returning
 ! themselves as the ordinary part, and 0 as the epsilon part.
 M: number ordinary-part>> ;
 
@@ -28,10 +28,10 @@ MACRO: ordinary-op ( word -- o )
     [ input-length ] keep
     '[ [ ordinary-part>> ] _ napply _ execute ] ;
 
-! Takes N dual numbers <o1,e1> <o2,e2> ... <oN,eN> and weaves 
+! Takes N dual numbers <o1,e1> <o2,e2> ... <oN,eN> and weaves
 ! their ordinary and epsilon parts to produce
 ! e1 o1 o2 ... oN e2 o1 o2 ... oN ... eN o1 o2 ... oN
-! This allows a set of partial derivatives each to be evaluated 
+! This allows a set of partial derivatives each to be evaluated
 ! at the same point.
 MACRO: duals>nweave ( n -- )
    dup dup dup
