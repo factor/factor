@@ -8,7 +8,7 @@ IN: windows.com.syntax
 
 <PRIVATE
 
-MACRO: com-invoke ( n return parameters -- )
+MACRO: com-invoke ( n return parameters -- quot )
     [ 2nip length ] 3keep
     '[
         _ npick void* deref _ cell * alien-cell _ _

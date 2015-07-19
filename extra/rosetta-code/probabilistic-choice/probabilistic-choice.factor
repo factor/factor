@@ -37,7 +37,7 @@ CONSTANT: data
     { "heth"    f }
 }
 
-MACRO: case-probas ( data -- case-probas )
+MACRO: case-probas ( data -- quot )
     [ first2 [ swap 1quotation 2array ] [ 1quotation ] if* ] map 1quotation ;
 
 : expected ( name data -- float )
