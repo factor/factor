@@ -38,3 +38,6 @@ SLOT: scroller
 
 : com-scroll-down ( tool -- )
     scroller>> scroll-down-line ;
+
+: margins ( child -- border ) 
+    { 9 9 } <filled-border> ;
