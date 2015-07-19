@@ -63,6 +63,7 @@ M: ratio >float >fraction /f ;
 
 M: ratio numerator numerator>> ; inline
 M: ratio denominator denominator>> ; inline
+M: ratio >fraction [ numerator ] [ denominator ] bi ; inline
 
 M: ratio < scale < ;
 M: ratio <= scale <= ;

@@ -84,6 +84,7 @@ GENERIC: integer>fixnum-strict ( x -- y ) foldable
 
 GENERIC: numerator ( a/b -- a )
 GENERIC: denominator ( a/b -- b )
+GENERIC: >fraction ( a/b -- a b )
 
 GENERIC: real-part ( z -- x )
 GENERIC: imaginary-part ( z -- y )
