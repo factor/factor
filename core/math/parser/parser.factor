@@ -420,24 +420,19 @@ GENERIC# >base 1 ( n radix -- str )
 : >hex ( n -- str ) 16 >base ; inline
 
 M: integer >base
-    over 0 = [
-        2drop "0"
-    ] [
-        over 0 > [
-            positive>base
-        ] [
-            [ neg ] dip positive>base CHAR: - prefix
-        ] if
-    ] if ;
+    {
+        { [ over 0 = ] [ 2drop "0" ] }
+        { [ over 0 > ] [ positive>base ] }
+        [ [ neg ] dip positive>base CHAR: - prefix ]
+    } cond ;
 
 M: ratio >base
-    [ [ 0 < ] [ abs 1 /mod ] bi ]
-    [ [ positive>base ] curry ] bi*
-    [
-        [ [ numerator ] [ denominator ] bi ] dip bi@ "/" glue
-    ] keep rot [ drop ] [
-        swap call pick "-" "+" ? rot 3append
-    ] if-zero swap [ CHAR: - prefix ] when ;
+    [ >fraction [ /mod ] keep ] [ [ >base ] curry tri@ ] bi*
+    "/" glue over first-unsafe {
+        { CHAR: 0 [ nip ] }
+        { CHAR: - [ append ] }
+        [ drop "+" glue ]
+    } case ;
 
 <PRIVATE
 
