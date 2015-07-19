@@ -1119,7 +1119,7 @@ FUNCTION: BOOL SetupSetSourceListA ( DWORD Flags, PCSTR* SourceList, UINT Source
 FUNCTION: BOOL SetupSetSourceListW ( DWORD Flags, PCWSTR* SourceList, UINT SourceCount ) ;
 ALIAS: SetupSetSourceList SetupSetSourceListW
 
-FUNCTION: BOOL SetupCancelTemporarySourceList( ) ;
+FUNCTION: BOOL SetupCancelTemporarySourceList ( ) ;
 FUNCTION: BOOL SetupAddToSourceListA ( DWORD Flags, PCSTR Source ) ;
 FUNCTION: BOOL SetupAddToSourceListW ( DWORD Flags, PCWSTR Source ) ;
 ALIAS: SetupAddToSourceList SetupAddToSourceListW
@@ -1327,7 +1327,7 @@ FUNCTION: BOOL SetupUninstallOEMInfA ( PCSTR InfFileName, DWORD Flags, PVOID Res
 FUNCTION: BOOL SetupUninstallOEMInfW ( PCWSTR InfFileName, DWORD Flags, PVOID Reserved ) ;
 ALIAS: SetupUninstallOEMInf SetupUninstallOEMInfW
 
-FUNCTION: BOOL SetupUninstallNewlyCopiedInfs( HSPFILEQ FileQueue, DWORD Flags, PVOID Reserved ) ;
+FUNCTION: BOOL SetupUninstallNewlyCopiedInfs ( HSPFILEQ FileQueue, DWORD Flags, PVOID Reserved ) ;
 
 FUNCTION: HDSKSPC SetupCreateDiskSpaceListA ( PVOID Reserved1, DWORD Reserved2, UINT Flags ) ;
 FUNCTION: HDSKSPC SetupCreateDiskSpaceListW ( PVOID Reserved1, DWORD Reserved2, UINT Flags ) ;
@@ -1340,7 +1340,7 @@ FUNCTION: HDSKSPC SetupDuplicateDiskSpaceListA ( HDSKSPC DiskSpace, PVOID Reserv
 FUNCTION: HDSKSPC SetupDuplicateDiskSpaceListW ( HDSKSPC DiskSpace, PVOID Reserved1, DWORD Reserved2, UINT Flags ) ;
 ALIAS: SetupDuplicateDiskSpaceList SetupDuplicateDiskSpaceListW
 
-FUNCTION: BOOL SetupDestroyDiskSpaceList( HDSKSPC DiskSpace ) ;
+FUNCTION: BOOL SetupDestroyDiskSpaceList ( HDSKSPC DiskSpace ) ;
 FUNCTION: BOOL SetupQueryDrivesInDiskSpaceListA ( HDSKSPC DiskSpace, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
 FUNCTION: BOOL SetupQueryDrivesInDiskSpaceListW ( HDSKSPC DiskSpace, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
 ALIAS: SetupQueryDrivesInDiskSpaceList SetupQueryDrivesInDiskSpaceListW
@@ -1565,7 +1565,7 @@ FUNCTION: HDEVINFO SetupDiCreateDeviceInfoListExW ( GUID* ClassGuid, HWND hwndPa
 
 ALIAS: SetupDiCreateDeviceInfoListEx SetupDiCreateDeviceInfoListExW
 
-FUNCTION: BOOL SetupDiGetDeviceInfoListClass( HDEVINFO DeviceInfoSet, LPGUID ClassGuid ) ;
+FUNCTION: BOOL SetupDiGetDeviceInfoListClass ( HDEVINFO DeviceInfoSet, LPGUID ClassGuid ) ;
 FUNCTION: BOOL SetupDiGetDeviceInfoListDetailA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_LIST_DETAIL_DATA_A DeviceInfoSetDetailData ) ;
 FUNCTION: BOOL SetupDiGetDeviceInfoListDetailW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_LIST_DETAIL_DATA_W DeviceInfoSetDetailData ) ;
 ALIAS: SetupDiGetDeviceInfoListDetail SetupDiGetDeviceInfoListDetailW
@@ -1705,7 +1705,7 @@ FUNCTION: BOOL SetupDiSelectDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA De
 FUNCTION: BOOL SetupDiSelectBestCompatDrv ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
 FUNCTION: BOOL SetupDiInstallDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
 FUNCTION: BOOL SetupDiInstallDriverFiles ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiRegisterCoDeviceInstallers( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: BOOL SetupDiRegisterCoDeviceInstallers ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
 FUNCTION: BOOL SetupDiRemoveDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
 FUNCTION: BOOL SetupDiUnremoveDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
 FUNCTION: BOOL SetupDiRestartDevices ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
