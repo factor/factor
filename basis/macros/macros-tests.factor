@@ -20,7 +20,7 @@ unit-test
 
 { f } [ \ see-test macro? ] unit-test
 
-{ } [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ;" eval( -- ) ] unit-test
+{ } [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- quot ) infer drop [ ] ;" eval( -- ) ] unit-test
 { } [ "USING: macros kernel ; IN: hanging-macro : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
 
 { } [ [ "hanging-macro" forget-vocab ] with-compilation-unit ] unit-test

@@ -9,13 +9,18 @@ IN: macros
 : real-macro-effect ( effect -- effect' )
     in>> { "quot" } <effect> ;
 
+: check-macro-effect ( word effect -- )
+    [ real-macro-effect ] keep 2dup effect=
+    [ 3drop ] [ bad-stack-effect ] if ;
+
 PRIVATE>
 
 : define-macro ( word definition effect -- )
-    real-macro-effect {
+    {
+        [ nip check-macro-effect ]
         [
             [ '[ _ _ call-effect ] ] keep
-            [ memoize-quot '[ @ call ] ] keep
+            [ memoize-quot ] keep
             define-declared
         ]
         [ drop "macro" set-word-prop ]
