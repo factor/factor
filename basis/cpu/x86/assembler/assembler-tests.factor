@@ -164,7 +164,7 @@ cell 4 = [
 { { 0x66 0x0f 0x71 0xd0 0x05 } } [ [ XMM0 5 PSRLW ] { } make ] unit-test
 { { 0x66 0x0f 0xd1 0xc1 } } [ [ XMM0 XMM1 PSRLW ] { } make ] unit-test
 
-! sse comparison instructions 
+! sse comparison instructions
 { { 0x66 0x0f 0xc2 0xc1 0x02 } } [ [ XMM0 XMM1 CMPLEPD ] { } make ] unit-test
 
 ! unique sse instructions

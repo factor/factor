@@ -14,7 +14,7 @@ DERIVATIVE: + [ 2drop ] [ 2drop ]
 DERIVATIVE: - [ 2drop ] [ 2drop neg ]
 DERIVATIVE: * [ nip * ] [ drop * ]
 DERIVATIVE: / [ nip / ] [ sq / neg * ]
-! Conditional checks if the epsilon-part of the exponent is 
+! Conditional checks if the epsilon-part of the exponent is
 ! 0 to avoid getting float answers for integer powers.
 DERIVATIVE: ^ [ [ 1 - ^ ] keep * * ]
     [ [ dup zero? ] 2dip [ 3drop 0 ] [ [ ^ ] keep log * * ] if ]

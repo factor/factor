@@ -117,8 +117,8 @@ CONSTANT: logout-cmd
     T{ mongodb-cmd f "logout" t f f H{ { "logout" 1 } } }
 
 ! Value: { "findandmodify" collection-name }
-! Options: { { "query" selector } { "sort" sort-spec } 
-!            { "remove" t/f } { "update" modified-object } 
+! Options: { { "query" selector } { "sort" sort-spec }
+!            { "remove" t/f } { "update" modified-object }
 !            { "new" t/f } }
 CONSTANT: findandmodify-cmd
     T{ mongodb-cmd f "findandmodify" f f f H{ { "findandmodify" f } } }

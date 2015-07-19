@@ -18,7 +18,7 @@ IN: pop3.server
 ! +OK Password required
 ! PASS password
 ! +OK Logged in
-! STAT  
+! STAT
 ! +OK 2 1753
 ! LIST
 ! +OK 2 messages:

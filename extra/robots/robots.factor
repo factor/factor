@@ -7,7 +7,7 @@ regexp.combinators sequences sets splitting splitting.monotonic
 unicode.case unicode.categories urls ;
 IN: robots
 
-! visit-time is GMT, request-rate is pages/second 
+! visit-time is GMT, request-rate is pages/second
 ! crawl-rate is seconds
 
 SYMBOL: robot-identities

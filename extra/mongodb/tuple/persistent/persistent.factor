@@ -68,7 +68,7 @@ CONSTRUCTOR: <cond-value> cond-value ( value quot -- cond-value ) ;
    } cond ;
 
 : write-tuple-fields ( mirror tuple assoc quot: ( tuple -- assoc ) -- )
-   swap ! m t q q a 
+   swap ! m t q q a
    '[ _ 2over write-field?
       [ _ write-field swap _ set-at ]
       [ 2drop ] if

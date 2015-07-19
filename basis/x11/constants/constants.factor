@@ -133,7 +133,7 @@ CONSTANT: SyncBoth 7
 CONSTANT: RevertToParent 2
 
 ! *****************************************************************
-! * ERROR CODES 
+! * ERROR CODES
 ! *****************************************************************
 
 CONSTANT: Success 0 ! everything's okay
@@ -148,9 +148,9 @@ CONSTANT: BadMatch 8 ! parameter mismatch
 CONSTANT: BadDrawable 9 ! parameter not a Pixmap or Window
 CONSTANT: BadAccess 10 ! depending on context:
                        !         - key/button already grabbed
-                       !         - attempt to free an illegal 
-                       !           cmap entry 
-                       !        - attempt to store into a read-only 
+                       !         - attempt to free an illegal
+                       !           cmap entry
+                       !        - attempt to store into a read-only
                        !           color map entry.
                        !        - attempt to modify the access control
                        !           list from other than the local host.
@@ -166,7 +166,7 @@ CONSTANT: FirstExtensionError 128
 CONSTANT: LastExtensionError 255
 
 ! *****************************************************************
-! * WINDOW DEFINITIONS 
+! * WINDOW DEFINITIONS
 ! *****************************************************************
 
 ! Window classes used by CreateWindow
@@ -275,7 +275,7 @@ CONSTANT: ArcChord 0 ! join endpoints of arc
 CONSTANT: ArcPieSlice 1 ! join endpoints to center of arc
 
 ! *****************************************************************
-! * FONTS 
+! * FONTS
 ! *****************************************************************
 
 ! used in QueryFont -- draw direction
@@ -286,7 +286,7 @@ CONSTANT: FontRightToLeft 1
 CONSTANT: FontChange 255
 
 ! *****************************************************************
-! *  IMAGING 
+! *  IMAGING
 ! *****************************************************************
 
 ! ImageFormat -- PutImage, GetImage
@@ -296,7 +296,7 @@ CONSTANT: XYPixmap 1 ! depth == drawable depth
 CONSTANT: ZPixmap 2 ! depth == drawable depth
 
 ! *****************************************************************
-! *  COLOR MAP STUFF 
+! *  COLOR MAP STUFF
 ! *****************************************************************
 
 ! For CreateColormap
@@ -321,7 +321,7 @@ CONSTANT: CursorShape 0 ! largest size that can be displayed
 CONSTANT: TileShape 1 ! size tiled fastest
 CONSTANT: StippleShape 2 ! size stippled fastest
 
-! ***************************************************************** 
+! *****************************************************************
 ! * KEYBOARD/POINTER STUFF
 ! *****************************************************************
 
@@ -352,7 +352,7 @@ CONSTANT: MappingKeyboard 1
 CONSTANT: MappingPointer 2
 
 ! *****************************************************************
-! * SCREEN SAVER STUFF 
+! * SCREEN SAVER STUFF
 ! *****************************************************************
 
 CONSTANT: DontPreferBlanking 0
@@ -385,7 +385,7 @@ CONSTANT: HostDelete 1
 CONSTANT: EnableAccess 1
 CONSTANT: DisableAccess 0
 
-! Display classes  used in opening the connection 
+! Display classes  used in opening the connection
 ! Note that the statically allocated ones are even numbered and the
 ! dynamically changeable ones are odd numbered
 

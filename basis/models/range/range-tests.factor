@@ -2,7 +2,7 @@ IN: models.range.tests
 USING: arrays generic kernel math models namespaces sequences assocs
 tools.test models.range ;
 
-! Test <range> 
+! Test <range>
 : setup-range ( -- range ) 0 0 0 255 1 <range> ;
 : setup-stepped-range ( -- range ) 0 0 0 255 2 <range> ;
 

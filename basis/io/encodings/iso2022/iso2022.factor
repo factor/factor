@@ -71,7 +71,7 @@ M:: iso2022-state encode-char ( char stream encoding -- )
         ] }
         { CHAR: $ [
             dup stream-read1 {
-                { CHAR: @ [ drop jis208 get-global ] } ! want: JIS X 0208-1978 
+                { CHAR: @ [ drop jis208 get-global ] } ! want: JIS X 0208-1978
                 { CHAR: B [ drop jis208 get-global ] }
                 { CHAR: ( [
                     stream-read1 CHAR: D = jis212 get-global f ?

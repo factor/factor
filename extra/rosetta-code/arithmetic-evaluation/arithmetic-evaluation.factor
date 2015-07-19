@@ -26,7 +26,7 @@ IN: rosetta-code.arithmetic-evaluation
 
 ! * Parentheses
 ! * Multiplication/Division (left to right)
-! * Addition/Subtraction (left to right) 
+! * Addition/Subtraction (left to right)
 
 TUPLE: operator left right ;
 TUPLE: add < operator ;   C: <add> add
