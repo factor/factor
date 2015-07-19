@@ -120,7 +120,7 @@ PRIVATE>
         scan-token "," ?tail drop
         parse-pointers [ types push ] [ names push ] bi*
         scan-token
-    ] until drop ";" expect types names [ >array ] bi@ ;
+    ] until drop types names [ >array ] bi@ ;
 
 : function-quot ( return library function types -- quot )
     '[ _ _ _ _ alien-invoke ] ;
