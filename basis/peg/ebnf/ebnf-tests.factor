@@ -254,20 +254,20 @@ IN: peg.ebnf.tests
 ] must-fail
 
 { V{ V{ 49 } "+" V{ 49 } } } [
-  #! Test direct left recursion. 
-  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  #! Test direct left recursion.
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used
   "1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF]
 ] unit-test
 
 { V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [
-  #! Test direct left recursion. 
-  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  #! Test direct left recursion.
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used
   "1+1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF]
 ] unit-test
 
 { V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [
-  #! Test indirect left recursion. 
-  #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
+  #! Test indirect left recursion.
+  #! Using packrat, so first part of expr fails, causing 2nd choice to be used
   "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF]
 ] unit-test
 
