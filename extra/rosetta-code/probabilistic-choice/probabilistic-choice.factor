@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators.random io kernel macros math
-math.statistics prettyprint quotations sequences sorting formatting ;
+USING: arrays assocs combinators.random formatting fry kernel
+macros math quotations sequences ;
 IN: rosettacode.probabilistic-choice
 
 ! http://rosettacode.org/wiki/Probabilistic_choice
@@ -38,25 +38,25 @@ CONSTANT: data
 }
 
 MACRO: case-probas ( data -- quot )
-    [ first2 [ swap 1quotation 2array ] [ 1quotation ] if* ] map 1quotation ;
+    [ first2 [ 1quotation ] dip [ swap 2array ] when* ] map 1quotation ;
 
-: expected ( name data -- float )
-    2dup at [ 2nip ] [ nip values sift sum 1 swap - ] if* ;
+: expected ( data name -- float )
+    dupd of [ nip ] [ values sift sum 1 swap - ] if* ;
 
 : generate ( # case-probas -- seq )
-    H{ } clone
-    [ [ [ casep ] [ inc-at ] bi* ] 2curry times ] keep ; inline
+    H{ } clone [
+        '[ _ casep _ inc-at ] times
+    ] keep ; inline
 
 : normalize ( seq # -- seq )
-    [ clone ] dip [ /f ] curry assoc-map ;
+    [ clone ] dip '[ _ /f ] assoc-map ;
 
 : summarize1 ( name value data -- )
-    [ over ] dip expected
-    "%6s: %10f %10f\n" printf ;
+    pick expected "%6s: %10f %10f\n" printf ;
 
 : summarize ( generated data -- )
     "Key" "Value" "expected" "%6s  %10s %10s\n" printf
-    [ summarize1 ] curry assoc-each ;
+    '[ _ summarize1 ] assoc-each ;
 
 : generate-normalized ( # proba -- seq )
     [ generate ] [ drop normalize ] 2bi ; inline
