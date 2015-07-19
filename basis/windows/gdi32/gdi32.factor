@@ -1295,7 +1295,7 @@ LIBRARY: gdi32
 ! FUNCTION: CancelDC
 ! FUNCTION: cGetTTFFromFOT
 ! FUNCTION: CheckColorsInGamut
-FUNCTION: int ChoosePixelFormat ( HDC hDC, PFD* ppfd ) ;
+FUNCTION: int ChoosePixelFormat ( HDC hDC, PFD* ppfd )
 ! FUNCTION: Chord
 ! FUNCTION: ClearBitmapAttributes
 ! FUNCTION: ClearBrushAttributes
@@ -1319,13 +1319,13 @@ FUNCTION: int ChoosePixelFormat ( HDC hDC, PFD* ppfd ) ;
 ! FUNCTION: CreateColorSpaceA
 ! FUNCTION: CreateColorSpaceW
 ! FUNCTION: CreateCompatibleBitmap
-FUNCTION: HDC CreateCompatibleDC ( HDC hdc ) ;
+FUNCTION: HDC CreateCompatibleDC ( HDC hdc )
 ! FUNCTION: CreateDCA
 ! FUNCTION: CreateDCW
 ! FUNCTION: CreateDIBitmap
 ! FUNCTION: CreateDIBPatternBrush
 ! FUNCTION: CreateDIBPatternBrushPt
-FUNCTION: HBITMAP CreateDIBSection ( HDC hdc, BITMAPINFO* pbmi, UINT iUsage, void** ppvBits, HANDLE hSection, DWORD dwOffset ) ;
+FUNCTION: HBITMAP CreateDIBSection ( HDC hdc, BITMAPINFO* pbmi, UINT iUsage, void** ppvBits, HANDLE hSection, DWORD dwOffset )
 ! FUNCTION: CreateDiscardableBitmap
 ! FUNCTION: CreateEllipticRgn
 ! FUNCTION: CreateEllipticRgnIndirect
@@ -1336,7 +1336,7 @@ FUNCTION: HBITMAP CreateDIBSection ( HDC hdc, BITMAPINFO* pbmi, UINT iUsage, voi
 ! FUNCTION: CreateFontIndirectExA
 ! FUNCTION: CreateFontIndirectExW
 ! FUNCTION: CreateFontIndirectW
-FUNCTION: HFONT CreateFontW ( int nHeight, int nWidth, int nEscapement, int nOrientation, int fnWeight, DWORD fdwItalic, DWORD fdwUnderline, DWORD fdwStrikeOut, DWORD fdwCharSet, DWORD fdwOutputPrecision, DWORD fdwClipPrecision, DWORD fdwQuality, DWORD fdwPitchAndFamily, LPCTSTR lpszFace ) ;
+FUNCTION: HFONT CreateFontW ( int nHeight, int nWidth, int nEscapement, int nOrientation, int fnWeight, DWORD fdwItalic, DWORD fdwUnderline, DWORD fdwStrikeOut, DWORD fdwCharSet, DWORD fdwOutputPrecision, DWORD fdwClipPrecision, DWORD fdwQuality, DWORD fdwPitchAndFamily, LPCTSTR lpszFace )
 ALIAS: CreateFont CreateFontW
 ! FUNCTION: CreateHalftonePalette
 ! FUNCTION: CreateHatchBrush
@@ -1350,12 +1350,12 @@ ALIAS: CreateFont CreateFontW
 ! FUNCTION: CreatePenIndirect
 ! FUNCTION: CreatePolygonRgn
 ! FUNCTION: CreatePolyPolygonRgn
-FUNCTION: HRGN CreateRectRgn ( int x, int y, int w, int h ) ;
+FUNCTION: HRGN CreateRectRgn ( int x, int y, int w, int h )
 ! FUNCTION: CreateRectRgnIndirect
 ! FUNCTION: CreateRoundRectRgn
 ! FUNCTION: CreateScalableFontResourceA
 ! FUNCTION: CreateScalableFontResourceW
-FUNCTION: HBRUSH CreateSolidBrush ( COLORREF colorref ) ;
+FUNCTION: HBRUSH CreateSolidBrush ( COLORREF colorref )
 ! FUNCTION: DdEntry0
 ! FUNCTION: DdEntry1
 ! FUNCTION: DdEntry10
@@ -1414,13 +1414,13 @@ FUNCTION: HBRUSH CreateSolidBrush ( COLORREF colorref ) ;
 ! FUNCTION: DdEntry8
 ! FUNCTION: DdEntry9
 ! FUNCTION: DeleteColorSpace
-FUNCTION: BOOL DeleteDC ( HDC hdc ) ;
+FUNCTION: BOOL DeleteDC ( HDC hdc )
 DESTRUCTOR: DeleteDC
 ! FUNCTION: DeleteEnhMetaFile
 ! FUNCTION: DeleteMetaFile
-FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject ) ;
+FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject )
 DESTRUCTOR: DeleteObject
-FUNCTION: int DescribePixelFormat ( HDC hdc, int iPixelFormat, UINT nBytes, PIXELFORMATDESCRIPTOR* ppfd ) ;
+FUNCTION: int DescribePixelFormat ( HDC hdc, int iPixelFormat, UINT nBytes, PIXELFORMATDESCRIPTOR* ppfd )
 ! FUNCTION: DeviceCapabilitiesExA
 ! FUNCTION: DeviceCapabilitiesExW
 ! FUNCTION: DPtoLP
@@ -1499,7 +1499,7 @@ FUNCTION: int DescribePixelFormat ( HDC hdc, int iPixelFormat, UINT nBytes, PIXE
 ! FUNCTION: ExtFloodFill
 ! FUNCTION: ExtSelectClipRgn
 ! FUNCTION: ExtTextOutA
-FUNCTION: BOOL ExtTextOutW ( HDC hdc, int X, int Y, UINT fuOptions, RECT* lprc, LPCTSTR lpString, UINT cbCount, INT* lpDx ) ;
+FUNCTION: BOOL ExtTextOutW ( HDC hdc, int X, int Y, UINT fuOptions, RECT* lprc, LPCTSTR lpString, UINT cbCount, INT* lpDx )
 ALIAS: ExtTextOut ExtTextOutW
 ! FUNCTION: FillPath
 ! FUNCTION: FillRgn
@@ -1561,7 +1561,7 @@ ALIAS: ExtTextOut ExtTextOutW
 ! FUNCTION: GdiEntry8
 ! FUNCTION: GdiEntry9
 ! FUNCTION: GdiFixUpHandle
-FUNCTION: BOOL GdiFlush ( ) ;
+FUNCTION: BOOL GdiFlush ( )
 ! FUNCTION: GdiFullscreenControl
 ! FUNCTION: GdiGetBatchLimit
 ! FUNCTION: GdiGetCharDimensions
@@ -1700,7 +1700,7 @@ FUNCTION: BOOL GdiFlush ( ) ;
 ! FUNCTION: GetRelAbs
 ! FUNCTION: GetRgnBox
 ! FUNCTION: GetROP2
-FUNCTION: HGDIOBJ GetStockObject ( int fnObject ) ;
+FUNCTION: HGDIOBJ GetStockObject ( int fnObject )
 ! FUNCTION: GetStretchBltMode
 ! FUNCTION: GetStringBitmapA
 ! FUNCTION: GetStringBitmapW
@@ -1724,7 +1724,7 @@ FUNCTION: HGDIOBJ GetStockObject ( int fnObject ) ;
 ! FUNCTION: GetTextFaceAliasW
 ! FUNCTION: GetTextFaceW
 ! FUNCTION: GetTextMetricsA
-FUNCTION: BOOL GetTextMetricsW ( HDC hdc, LPTEXTMETRIC lptm ) ;
+FUNCTION: BOOL GetTextMetricsW ( HDC hdc, LPTEXTMETRIC lptm )
 ALIAS: GetTextMetrics GetTextMetricsW
 ! FUNCTION: GetTransform
 ! FUNCTION: GetViewportExtEx
@@ -1780,7 +1780,7 @@ ALIAS: GetTextMetrics GetTextMetricsW
 ! FUNCTION: PtVisible
 ! FUNCTION: QueryFontAssocStatus
 ! FUNCTION: RealizePalette
-FUNCTION: BOOL Rectangle ( HDC hdc, int x, int y, int w, int h ) ;
+FUNCTION: BOOL Rectangle ( HDC hdc, int x, int y, int w, int h )
 ! FUNCTION: RectInRegion
 ! FUNCTION: RectVisible
 ! FUNCTION: RemoveFontMemResourceEx
@@ -1799,24 +1799,24 @@ FUNCTION: BOOL Rectangle ( HDC hdc, int x, int y, int w, int h ) ;
 ! FUNCTION: ScaleWindowExtEx
 ! FUNCTION: SelectBrushLocal
 ! FUNCTION: SelectClipPath
-FUNCTION: int SelectClipRgn ( HDC hDC, HRGN hrgn ) ;
+FUNCTION: int SelectClipRgn ( HDC hDC, HRGN hrgn )
 ! FUNCTION: SelectFontLocal
-FUNCTION: HGDIOBJ SelectObject ( HDC hdc, HGDIOBJ hgdiobj ) ;
+FUNCTION: HGDIOBJ SelectObject ( HDC hdc, HGDIOBJ hgdiobj )
 ! FUNCTION: SelectPalette
 ! FUNCTION: SetAbortProc
 ! FUNCTION: SetArcDirection
 ! FUNCTION: SetBitmapAttributes
 ! FUNCTION: SetBitmapBits
 ! FUNCTION: SetBitmapDimensionEx
-FUNCTION: COLORREF SetBkColor ( HDC hdc, COLORREF color ) ;
+FUNCTION: COLORREF SetBkColor ( HDC hdc, COLORREF color )
 ! FUNCTION: SetBkMode
 ! FUNCTION: SetBoundsRect
 ! FUNCTION: SetBrushAttributes
 ! FUNCTION: SetBrushOrgEx
 ! FUNCTION: SetColorAdjustment
 ! FUNCTION: SetColorSpace
-FUNCTION: COLORREF SetDCBrushColor ( HDC hdc, COLORREF color ) ;
-FUNCTION: COLORREF SetDCPenColor ( HDC hdc, COLORREF color ) ;
+FUNCTION: COLORREF SetDCBrushColor ( HDC hdc, COLORREF color )
+FUNCTION: COLORREF SetDCPenColor ( HDC hdc, COLORREF color )
 ! FUNCTION: SetDeviceGammaRamp
 ! FUNCTION: SetDIBColorTable
 ! FUNCTION: SetDIBits
@@ -1837,7 +1837,7 @@ FUNCTION: COLORREF SetDCPenColor ( HDC hdc, COLORREF color ) ;
 ! FUNCTION: SetMiterLimit
 ! FUNCTION: SetPaletteEntries
 ! FUNCTION: SetPixel
-FUNCTION: BOOL SetPixelFormat ( HDC hDC, int iPixelFormat, PFD* ppfd ) ;
+FUNCTION: BOOL SetPixelFormat ( HDC hDC, int iPixelFormat, PFD* ppfd )
 ! FUNCTION: SetPixelV
 ! FUNCTION: SetPolyFillMode
 ! FUNCTION: SetRectRgn
@@ -1847,7 +1847,7 @@ FUNCTION: BOOL SetPixelFormat ( HDC hDC, int iPixelFormat, PFD* ppfd ) ;
 ! FUNCTION: SetSystemPaletteUse
 ! FUNCTION: SetTextAlign
 ! FUNCTION: SetTextCharacterExtra
-FUNCTION: COLORREF SetTextColor ( HDC hdc, COLORREF crColor ) ;
+FUNCTION: COLORREF SetTextColor ( HDC hdc, COLORREF crColor )
 ! FUNCTION: SetTextColor ( HDC hDC, 
 ! FUNCTION: SetTextJustification
 ! FUNCTION: SetViewportExtEx
@@ -1870,7 +1870,7 @@ FUNCTION: COLORREF SetTextColor ( HDC hdc, COLORREF crColor ) ;
 ! FUNCTION: STROBJ_vEnumStart
 ! FUNCTION: StrokeAndFillPath
 ! FUNCTION: StrokePath
-FUNCTION: BOOL SwapBuffers ( HDC hDC ) ;
+FUNCTION: BOOL SwapBuffers ( HDC hDC )
 ! FUNCTION: TextOutA
 ! FUNCTION: TextOutW
 ! FUNCTION: TranslateCharsetInfo

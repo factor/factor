@@ -23,4 +23,3 @@ HELP: |com-release
 { $description "Marks the given COM interface for release via " { $link com-release } " in the event of an error at the end of the enclosing " { $link with-destructors } " scope." } ;
 
 { com-release &com-release |com-release } related-words
-

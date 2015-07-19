@@ -17,7 +17,7 @@ STRUCT: statvfs64
     { f_namemax ulong }
     { __f_spare int[6] } ;
 
-FUNCTION: int statvfs64 ( c-string path, statvfs64* buf ) ;
+FUNCTION: int statvfs64 ( c-string path, statvfs64* buf )
 
 CONSTANT: ST_RDONLY 1        ! Mount read-only.
 CONSTANT: ST_NOSUID 2        ! Ignore suid and sgid bits.

@@ -172,8 +172,8 @@ CONSTANT: DIRID_PROGRAM_FILES_COMMONX86 16428
 CONSTANT: DIRID_COMMON_TEMPLATES        16429
 CONSTANT: DIRID_COMMON_DOCUMENTS        16430
 CONSTANT: DIRID_USER              0x8000
-CALLBACK: UINT PSP_FILE_CALLBACK_A ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 ) ;
-CALLBACK: UINT PSP_FILE_CALLBACK_W ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 ) ;
+CALLBACK: UINT PSP_FILE_CALLBACK_A ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 )
+CALLBACK: UINT PSP_FILE_CALLBACK_W ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 )
 TYPEDEF: PSP_FILE_CALLBACK_W PSP_FILE_CALLBACK
 CONSTANT: SPFILENOTIFY_STARTQUEUE         0x00000001
 CONSTANT: SPFILENOTIFY_ENDQUEUE           0x00000002
@@ -640,7 +640,7 @@ TYPEDEF: SP_SELECTDEVICE_PARAMS_W* PSP_SELECTDEVICE_PARAMS_W
 TYPEDEF: SP_SELECTDEVICE_PARAMS_W SP_SELECTDEVICE_PARAMS
 TYPEDEF: PSP_SELECTDEVICE_PARAMS_W PSP_SELECTDEVICE_PARAMS
 
-CALLBACK: BOOL PDETECT_PROGRESS_NOTIFY ( PVOID ProgressNotifyParam, DWORD DetectComplete ) ;
+CALLBACK: BOOL PDETECT_PROGRESS_NOTIFY ( PVOID ProgressNotifyParam, DWORD DetectComplete )
 
 STRUCT: SP_DETECTDEVICE_PARAMS
     { ClassInstallHeader                    SP_CLASSINSTALL_HEADER  }
@@ -847,7 +847,7 @@ CONSTANT: DRIVER_HARDWAREID_MASK  0x80000FFF
 CONSTANT: DRIVER_UNTRUSTED_RANK   0x80000000
 CONSTANT: DRIVER_W9X_SUSPECT_RANK 0xC0000000
 
-CALLBACK: DWORD PSP_DETSIG_CMPPROC ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA NewDeviceData, PSP_DEVINFO_DATA ExistingDeviceData, PVOID CompareContext ) ;
+CALLBACK: DWORD PSP_DETSIG_CMPPROC ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA NewDeviceData, PSP_DEVINFO_DATA ExistingDeviceData, PVOID CompareContext )
 
 STRUCT: COINSTALLER_CONTEXT_DATA
     { PostProcessing  BOOL  }
@@ -1001,8 +1001,8 @@ CONSTANT: ERROR_INTERFACE_DEVICE_REMOVED    $ ERROR_DEVICE_INTERFACE_REMOVED
 CONSTANT: ERROR_NO_SUCH_INTERFACE_DEVICE    $ ERROR_NO_SUCH_DEVICE_INTERFACE
 CONSTANT: ERROR_NOT_INSTALLED $[ APPLICATION_ERROR_MASK ERROR_SEVERITY_ERROR 0x1000 bitor bitor ]
 
-FUNCTION: BOOL SetupGetInfInformationA ( LPCVOID InfSpec, DWORD SearchControl, PSP_INF_INFORMATION ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetInfInformationW ( LPCVOID InfSpec, DWORD SearchControl, PSP_INF_INFORMATION ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetInfInformationA ( LPCVOID InfSpec, DWORD SearchControl, PSP_INF_INFORMATION ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetInfInformationW ( LPCVOID InfSpec, DWORD SearchControl, PSP_INF_INFORMATION ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 CONSTANT: INFINFO_INF_SPEC_IS_HINF        1
 CONSTANT: INFINFO_INF_NAME_IS_ABSOLUTE    2
 CONSTANT: INFINFO_DEFAULT_SEARCH          3
@@ -1010,79 +1010,79 @@ CONSTANT: INFINFO_REVERSE_DEFAULT_SEARCH  4
 CONSTANT: INFINFO_INF_PATH_LIST_SEARCH    5
 ALIAS: SetupGetInfInformation SetupGetInfInformationW
 
-FUNCTION: BOOL SetupQueryInfFileInformationA ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupQueryInfFileInformationW ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupQueryInfFileInformationA ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupQueryInfFileInformationW ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupQueryInfFileInformation SetupQueryInfFileInformationW
 
-FUNCTION: BOOL SetupQueryInfOriginalFileInformationA ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSP_ORIGINAL_FILE_INFO_A OriginalFileInfo ) ;
-FUNCTION: BOOL SetupQueryInfOriginalFileInformationW ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSP_ORIGINAL_FILE_INFO_W OriginalFileInfo ) ;
+FUNCTION: BOOL SetupQueryInfOriginalFileInformationA ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSP_ORIGINAL_FILE_INFO_A OriginalFileInfo )
+FUNCTION: BOOL SetupQueryInfOriginalFileInformationW ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSP_ORIGINAL_FILE_INFO_W OriginalFileInfo )
 ALIAS: SetupQueryInfOriginalFileInformation SetupQueryInfOriginalFileInformationW
 
-FUNCTION: BOOL SetupQueryInfVersionInformationA ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PCSTR Key, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupQueryInfVersionInformationW ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PCWSTR Key, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupQueryInfVersionInformationA ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PCSTR Key, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupQueryInfVersionInformationW ( PSP_INF_INFORMATION InfInformation, UINT InfIndex, PCWSTR Key, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupQueryInfVersionInformation SetupQueryInfVersionInformationW
 
-FUNCTION: BOOL SetupGetInfDriverStoreLocationA ( PCSTR FileName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCSTR LocaleName, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetInfDriverStoreLocationW ( PCWSTR FileName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCWSTR LocaleName, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetInfDriverStoreLocationA ( PCSTR FileName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCSTR LocaleName, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetInfDriverStoreLocationW ( PCWSTR FileName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCWSTR LocaleName, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetInfDriverStoreLocation SetupGetInfDriverStoreLocationW
 
-FUNCTION: BOOL SetupGetInfPublishedNameA ( PCSTR DriverStoreLocation, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetInfPublishedNameW ( PCWSTR DriverStoreLocation, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetInfPublishedNameA ( PCSTR DriverStoreLocation, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetInfPublishedNameW ( PCWSTR DriverStoreLocation, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetInfPublishedName SetupGetInfPublishedNameW
 
-FUNCTION: BOOL SetupGetInfFileListA ( PCSTR DirectoryPath, DWORD InfStyle, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetInfFileListW ( PCWSTR DirectoryPath, DWORD InfStyle, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetInfFileListA ( PCSTR DirectoryPath, DWORD InfStyle, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetInfFileListW ( PCWSTR DirectoryPath, DWORD InfStyle, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetInfFileList SetupGetInfFileListW
 
-FUNCTION: HINF SetupOpenInfFileW ( PCWSTR FileName, PCWSTR InfClass, DWORD InfStyle, PUINT ErrorLine ) ;
-FUNCTION: HINF SetupOpenInfFileA ( PCSTR FileName, PCSTR InfClass, DWORD InfStyle, PUINT ErrorLine ) ;
+FUNCTION: HINF SetupOpenInfFileW ( PCWSTR FileName, PCWSTR InfClass, DWORD InfStyle, PUINT ErrorLine )
+FUNCTION: HINF SetupOpenInfFileA ( PCSTR FileName, PCSTR InfClass, DWORD InfStyle, PUINT ErrorLine )
 ALIAS: SetupOpenInfFile SetupOpenInfFileW
 
-FUNCTION: HINF SetupOpenMasterInf ( ) ;
+FUNCTION: HINF SetupOpenMasterInf ( )
 
-FUNCTION: BOOL SetupOpenAppendInfFileW ( PCWSTR FileName, HINF InfHandle, PUINT ErrorLine ) ;
-FUNCTION: BOOL SetupOpenAppendInfFileA ( PCSTR FileName, HINF InfHandle, PUINT ErrorLine ) ;
+FUNCTION: BOOL SetupOpenAppendInfFileW ( PCWSTR FileName, HINF InfHandle, PUINT ErrorLine )
+FUNCTION: BOOL SetupOpenAppendInfFileA ( PCSTR FileName, HINF InfHandle, PUINT ErrorLine )
 ALIAS: SetupOpenAppendInfFile SetupOpenAppendInfFileW
 
-FUNCTION: void SetupCloseInfFile ( HINF InfHandle ) ;
-FUNCTION: BOOL SetupFindFirstLineA ( HINF InfHandle, PCSTR Section, PCSTR Key, PINFCONTEXT Context ) ;
-FUNCTION: BOOL SetupFindFirstLineW ( HINF InfHandle, PCWSTR Section, PCWSTR Key, PINFCONTEXT Context ) ;
+FUNCTION: void SetupCloseInfFile ( HINF InfHandle )
+FUNCTION: BOOL SetupFindFirstLineA ( HINF InfHandle, PCSTR Section, PCSTR Key, PINFCONTEXT Context )
+FUNCTION: BOOL SetupFindFirstLineW ( HINF InfHandle, PCWSTR Section, PCWSTR Key, PINFCONTEXT Context )
 ALIAS: SetupFindFirstLine SetupFindFirstLineW
 
-FUNCTION: BOOL SetupFindNextLine ( PINFCONTEXT ContextIn, PINFCONTEXT ContextOut ) ;
-FUNCTION: BOOL SetupFindNextMatchLineA ( PINFCONTEXT ContextIn, PCSTR Key, PINFCONTEXT ContextOut ) ;
-FUNCTION: BOOL SetupFindNextMatchLineW ( PINFCONTEXT ContextIn, PCWSTR Key, PINFCONTEXT ContextOut ) ;
+FUNCTION: BOOL SetupFindNextLine ( PINFCONTEXT ContextIn, PINFCONTEXT ContextOut )
+FUNCTION: BOOL SetupFindNextMatchLineA ( PINFCONTEXT ContextIn, PCSTR Key, PINFCONTEXT ContextOut )
+FUNCTION: BOOL SetupFindNextMatchLineW ( PINFCONTEXT ContextIn, PCWSTR Key, PINFCONTEXT ContextOut )
 ALIAS: SetupFindNextMatchLine SetupFindNextMatchLineW
 
-FUNCTION: BOOL SetupGetLineByIndexA ( HINF InfHandle, PCSTR Section, DWORD Index, PINFCONTEXT Context ) ;
-FUNCTION: BOOL SetupGetLineByIndexW ( HINF InfHandle, PCWSTR Section, DWORD Index, PINFCONTEXT Context ) ;
+FUNCTION: BOOL SetupGetLineByIndexA ( HINF InfHandle, PCSTR Section, DWORD Index, PINFCONTEXT Context )
+FUNCTION: BOOL SetupGetLineByIndexW ( HINF InfHandle, PCWSTR Section, DWORD Index, PINFCONTEXT Context )
 ALIAS: SetupGetLineByIndex SetupGetLineByIndexW
 
-FUNCTION: LONG SetupGetLineCountA ( HINF InfHandle, PCSTR Section ) ;
-FUNCTION: LONG SetupGetLineCountW ( HINF InfHandle, PCWSTR Section ) ;
+FUNCTION: LONG SetupGetLineCountA ( HINF InfHandle, PCSTR Section )
+FUNCTION: LONG SetupGetLineCountW ( HINF InfHandle, PCWSTR Section )
 ALIAS: SetupGetLineCount SetupGetLineCountW
 
-FUNCTION: BOOL SetupGetLineTextA ( PINFCONTEXT Context, HINF InfHandle, PCSTR Section, PCSTR Key, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetLineTextW ( PINFCONTEXT Context, HINF InfHandle, PCWSTR Section, PCWSTR Key, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetLineTextA ( PINFCONTEXT Context, HINF InfHandle, PCSTR Section, PCSTR Key, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetLineTextW ( PINFCONTEXT Context, HINF InfHandle, PCWSTR Section, PCWSTR Key, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetLineText SetupGetLineTextW
 
-FUNCTION: DWORD SetupGetFieldCount ( PINFCONTEXT Context ) ;
-FUNCTION: BOOL SetupGetStringFieldA ( PINFCONTEXT Context, DWORD FieldIndex, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetStringFieldW ( PINFCONTEXT Context, DWORD FieldIndex, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: DWORD SetupGetFieldCount ( PINFCONTEXT Context )
+FUNCTION: BOOL SetupGetStringFieldA ( PINFCONTEXT Context, DWORD FieldIndex, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetStringFieldW ( PINFCONTEXT Context, DWORD FieldIndex, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetStringField SetupGetStringFieldW
 
-FUNCTION: BOOL SetupGetIntField ( PINFCONTEXT Context, DWORD FieldIndex, PINT IntegerValue ) ;
-FUNCTION: BOOL SetupGetMultiSzFieldA ( PINFCONTEXT Context, DWORD FieldIndex, PSTR ReturnBuffer, DWORD ReturnBufferSize, LPDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetMultiSzFieldW ( PINFCONTEXT Context, DWORD FieldIndex, PWSTR ReturnBuffer, DWORD ReturnBufferSize, LPDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetIntField ( PINFCONTEXT Context, DWORD FieldIndex, PINT IntegerValue )
+FUNCTION: BOOL SetupGetMultiSzFieldA ( PINFCONTEXT Context, DWORD FieldIndex, PSTR ReturnBuffer, DWORD ReturnBufferSize, LPDWORD RequiredSize )
+FUNCTION: BOOL SetupGetMultiSzFieldW ( PINFCONTEXT Context, DWORD FieldIndex, PWSTR ReturnBuffer, DWORD ReturnBufferSize, LPDWORD RequiredSize )
 ALIAS: SetupGetMultiSzField SetupGetMultiSzFieldW
 
-FUNCTION: BOOL SetupGetBinaryField ( PINFCONTEXT Context, DWORD FieldIndex, PBYTE ReturnBuffer, DWORD ReturnBufferSize, LPDWORD RequiredSize ) ;
-FUNCTION: DWORD SetupGetFileCompressionInfoA ( PCSTR SourceFileName, PSTR* ActualSourceFileName, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType ) ;
-FUNCTION: DWORD SetupGetFileCompressionInfoW ( PCWSTR SourceFileName, PWSTR* ActualSourceFileName, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType ) ;
+FUNCTION: BOOL SetupGetBinaryField ( PINFCONTEXT Context, DWORD FieldIndex, PBYTE ReturnBuffer, DWORD ReturnBufferSize, LPDWORD RequiredSize )
+FUNCTION: DWORD SetupGetFileCompressionInfoA ( PCSTR SourceFileName, PSTR* ActualSourceFileName, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType )
+FUNCTION: DWORD SetupGetFileCompressionInfoW ( PCWSTR SourceFileName, PWSTR* ActualSourceFileName, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType )
 ALIAS: SetupGetFileCompressionInfo SetupGetFileCompressionInfoW
 
-FUNCTION: BOOL SetupGetFileCompressionInfoExA ( PCSTR SourceFileName, PSTR ActualSourceFileNameBuffer, DWORD ActualSourceFileNameBufferLen, PDWORD RequiredBufferLen, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType ) ;
-FUNCTION: BOOL SetupGetFileCompressionInfoExW ( PCWSTR SourceFileName, PWSTR ActualSourceFileNameBuffer, DWORD ActualSourceFileNameBufferLen, PDWORD RequiredBufferLen, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType ) ;
+FUNCTION: BOOL SetupGetFileCompressionInfoExA ( PCSTR SourceFileName, PSTR ActualSourceFileNameBuffer, DWORD ActualSourceFileNameBufferLen, PDWORD RequiredBufferLen, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType )
+FUNCTION: BOOL SetupGetFileCompressionInfoExW ( PCWSTR SourceFileName, PWSTR ActualSourceFileNameBuffer, DWORD ActualSourceFileNameBufferLen, PDWORD RequiredBufferLen, PDWORD SourceFileSize, PDWORD TargetFileSize, PUINT CompressionType )
 ALIAS: SetupGetFileCompressionInfoEx SetupGetFileCompressionInfoExW
 
 CONSTANT: FILE_COMPRESSION_NONE       0
@@ -1090,20 +1090,20 @@ CONSTANT: FILE_COMPRESSION_WINLZA     1
 CONSTANT: FILE_COMPRESSION_MSZIP      2
 CONSTANT: FILE_COMPRESSION_NTCAB      3
 
-FUNCTION: DWORD SetupDecompressOrCopyFileA ( PCSTR SourceFileName, PCSTR TargetFileName, PUINT CompressionType ) ;
-FUNCTION: DWORD SetupDecompressOrCopyFileW ( PCWSTR SourceFileName, PCWSTR TargetFileName, PUINT CompressionType ) ;
+FUNCTION: DWORD SetupDecompressOrCopyFileA ( PCSTR SourceFileName, PCSTR TargetFileName, PUINT CompressionType )
+FUNCTION: DWORD SetupDecompressOrCopyFileW ( PCWSTR SourceFileName, PCWSTR TargetFileName, PUINT CompressionType )
 ALIAS: SetupDecompressOrCopyFile SetupDecompressOrCopyFileW
 
-FUNCTION: BOOL SetupGetSourceFileLocationA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR FileName, PUINT SourceId, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetSourceFileLocationW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR FileName, PUINT SourceId, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetSourceFileLocationA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR FileName, PUINT SourceId, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetSourceFileLocationW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR FileName, PUINT SourceId, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetSourceFileLocation SetupGetSourceFileLocationW
 
-FUNCTION: BOOL SetupGetSourceFileSizeA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR FileName, PCSTR Section, PDWORD FileSize, UINT RoundingFactor ) ;
-FUNCTION: BOOL SetupGetSourceFileSizeW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR FileName, PCWSTR Section, PDWORD FileSize, UINT RoundingFactor ) ;
+FUNCTION: BOOL SetupGetSourceFileSizeA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR FileName, PCSTR Section, PDWORD FileSize, UINT RoundingFactor )
+FUNCTION: BOOL SetupGetSourceFileSizeW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR FileName, PCWSTR Section, PDWORD FileSize, UINT RoundingFactor )
 ALIAS: SetupGetSourceFileSize SetupGetSourceFileSizeW
 
-FUNCTION: BOOL SetupGetTargetPathA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR Section, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetTargetPathW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR Section, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetTargetPathA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR Section, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetTargetPathW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR Section, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetTargetPath SetupGetTargetPathW
 
 CONSTANT: SRCLIST_TEMPORARY       0x00000001
@@ -1115,45 +1115,45 @@ CONSTANT: SRCLIST_SUBDIRS         0x00000100
 CONSTANT: SRCLIST_APPEND          0x00000200
 CONSTANT: SRCLIST_NOSTRIPPLATFORM 0x00000400
 
-FUNCTION: BOOL SetupSetSourceListA ( DWORD Flags, PCSTR* SourceList, UINT SourceCount ) ;
-FUNCTION: BOOL SetupSetSourceListW ( DWORD Flags, PCWSTR* SourceList, UINT SourceCount ) ;
+FUNCTION: BOOL SetupSetSourceListA ( DWORD Flags, PCSTR* SourceList, UINT SourceCount )
+FUNCTION: BOOL SetupSetSourceListW ( DWORD Flags, PCWSTR* SourceList, UINT SourceCount )
 ALIAS: SetupSetSourceList SetupSetSourceListW
 
-FUNCTION: BOOL SetupCancelTemporarySourceList ( ) ;
-FUNCTION: BOOL SetupAddToSourceListA ( DWORD Flags, PCSTR Source ) ;
-FUNCTION: BOOL SetupAddToSourceListW ( DWORD Flags, PCWSTR Source ) ;
+FUNCTION: BOOL SetupCancelTemporarySourceList ( )
+FUNCTION: BOOL SetupAddToSourceListA ( DWORD Flags, PCSTR Source )
+FUNCTION: BOOL SetupAddToSourceListW ( DWORD Flags, PCWSTR Source )
 ALIAS: SetupAddToSourceList SetupAddToSourceListW
 
-FUNCTION: BOOL SetupRemoveFromSourceListA ( DWORD Flags, PCSTR Source ) ;
-FUNCTION: BOOL SetupRemoveFromSourceListW ( DWORD Flags, PCWSTR Source ) ;
+FUNCTION: BOOL SetupRemoveFromSourceListA ( DWORD Flags, PCSTR Source )
+FUNCTION: BOOL SetupRemoveFromSourceListW ( DWORD Flags, PCWSTR Source )
 ALIAS: SetupRemoveFromSourceList SetupRemoveFromSourceListW
 
-FUNCTION: BOOL SetupQuerySourceListA ( DWORD Flags, PCSTR** List, PUINT Count ) ;
-FUNCTION: BOOL SetupQuerySourceListW ( DWORD Flags, PCWSTR** List, PUINT Count ) ;
+FUNCTION: BOOL SetupQuerySourceListA ( DWORD Flags, PCSTR** List, PUINT Count )
+FUNCTION: BOOL SetupQuerySourceListW ( DWORD Flags, PCWSTR** List, PUINT Count )
 ALIAS: SetupQuerySourceList SetupQuerySourceListW
 
-FUNCTION: BOOL SetupFreeSourceListA ( PCSTR** List, UINT Count ) ;
-FUNCTION: BOOL SetupFreeSourceListW ( PCWSTR** List, UINT Count ) ;
+FUNCTION: BOOL SetupFreeSourceListA ( PCSTR** List, UINT Count )
+FUNCTION: BOOL SetupFreeSourceListW ( PCWSTR** List, UINT Count )
 ALIAS: SetupFreeSourceList SetupFreeSourceListW
 
-FUNCTION: UINT SetupPromptForDiskA ( HWND hwndParent, PCSTR DialogTitle, PCSTR DiskName, PCSTR PathToSource, PCSTR FileSought, PCSTR TagFile, DWORD DiskPromptStyle, PSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize ) ;
-FUNCTION: UINT SetupPromptForDiskW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR DiskName, PCWSTR PathToSource, PCWSTR FileSought, PCWSTR TagFile, DWORD DiskPromptStyle, PWSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize ) ;
+FUNCTION: UINT SetupPromptForDiskA ( HWND hwndParent, PCSTR DialogTitle, PCSTR DiskName, PCSTR PathToSource, PCSTR FileSought, PCSTR TagFile, DWORD DiskPromptStyle, PSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize )
+FUNCTION: UINT SetupPromptForDiskW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR DiskName, PCWSTR PathToSource, PCWSTR FileSought, PCWSTR TagFile, DWORD DiskPromptStyle, PWSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize )
 ALIAS: SetupPromptForDisk SetupPromptForDiskW
 
-FUNCTION: UINT SetupCopyErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR DiskName, PCSTR PathToSource, PCSTR SourceFile, PCSTR TargetPathFile, UINT Win32ErrorCode, DWORD Style, PSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize ) ;
-FUNCTION: UINT SetupCopyErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR DiskName, PCWSTR PathToSource, PCWSTR SourceFile, PCWSTR TargetPathFile, UINT Win32ErrorCode, DWORD Style, PWSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize ) ;
+FUNCTION: UINT SetupCopyErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR DiskName, PCSTR PathToSource, PCSTR SourceFile, PCSTR TargetPathFile, UINT Win32ErrorCode, DWORD Style, PSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize )
+FUNCTION: UINT SetupCopyErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR DiskName, PCWSTR PathToSource, PCWSTR SourceFile, PCWSTR TargetPathFile, UINT Win32ErrorCode, DWORD Style, PWSTR PathBuffer, DWORD PathBufferSize, PDWORD PathRequiredSize )
 ALIAS: SetupCopyError SetupCopyErrorW
 
-FUNCTION: UINT SetupRenameErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR SourceFile, PCSTR TargetFile, UINT Win32ErrorCode, DWORD Style ) ;
-FUNCTION: UINT SetupRenameErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR SourceFile, PCWSTR TargetFile, UINT Win32ErrorCode, DWORD Style ) ;
+FUNCTION: UINT SetupRenameErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR SourceFile, PCSTR TargetFile, UINT Win32ErrorCode, DWORD Style )
+FUNCTION: UINT SetupRenameErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR SourceFile, PCWSTR TargetFile, UINT Win32ErrorCode, DWORD Style )
 ALIAS: SetupRenameError SetupRenameErrorW
 
-FUNCTION: UINT SetupDeleteErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR File, UINT Win32ErrorCode, DWORD Style ) ;
-FUNCTION: UINT SetupDeleteErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR File, UINT Win32ErrorCode, DWORD Style ) ;
+FUNCTION: UINT SetupDeleteErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR File, UINT Win32ErrorCode, DWORD Style )
+FUNCTION: UINT SetupDeleteErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR File, UINT Win32ErrorCode, DWORD Style )
 ALIAS: SetupDeleteError SetupDeleteErrorW
 
-FUNCTION: UINT SetupBackupErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR SourceFile, PCSTR TargetFile, UINT Win32ErrorCode, DWORD Style ) ;
-FUNCTION: UINT SetupBackupErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR SourceFile, PCWSTR TargetFile, UINT Win32ErrorCode, DWORD Style ) ;
+FUNCTION: UINT SetupBackupErrorA ( HWND hwndParent, PCSTR DialogTitle, PCSTR SourceFile, PCSTR TargetFile, UINT Win32ErrorCode, DWORD Style )
+FUNCTION: UINT SetupBackupErrorW ( HWND hwndParent, PCWSTR DialogTitle, PCWSTR SourceFile, PCWSTR TargetFile, UINT Win32ErrorCode, DWORD Style )
 ALIAS: SetupBackupError SetupBackupErrorW
 
 CONSTANT: IDF_NOBROWSE                    0x00000001
@@ -1174,18 +1174,18 @@ CONSTANT: DPROMPT_SKIPFILE        2
 CONSTANT: DPROMPT_BUFFERTOOSMALL  3
 CONSTANT: DPROMPT_OUTOFMEMORY     4
 
-FUNCTION: BOOL SetupSetDirectoryIdA ( HINF InfHandle, DWORD Id, PCSTR Directory ) ;
-FUNCTION: BOOL SetupSetDirectoryIdW ( HINF InfHandle, DWORD Id, PCWSTR Directory ) ;
+FUNCTION: BOOL SetupSetDirectoryIdA ( HINF InfHandle, DWORD Id, PCSTR Directory )
+FUNCTION: BOOL SetupSetDirectoryIdW ( HINF InfHandle, DWORD Id, PCWSTR Directory )
 ALIAS: SetupSetDirectoryId SetupSetDirectoryIdW
 
-FUNCTION: BOOL SetupSetDirectoryIdExA ( HINF InfHandle, DWORD Id, PCSTR Directory, DWORD Flags, DWORD Reserved1, PVOID Reserved2 ) ;
-FUNCTION: BOOL SetupSetDirectoryIdExW ( HINF InfHandle, DWORD Id, PCWSTR Directory, DWORD Flags, DWORD Reserved1, PVOID Reserved2 ) ;
+FUNCTION: BOOL SetupSetDirectoryIdExA ( HINF InfHandle, DWORD Id, PCSTR Directory, DWORD Flags, DWORD Reserved1, PVOID Reserved2 )
+FUNCTION: BOOL SetupSetDirectoryIdExW ( HINF InfHandle, DWORD Id, PCWSTR Directory, DWORD Flags, DWORD Reserved1, PVOID Reserved2 )
 ALIAS: SetupSetDirectoryIdEx SetupSetDirectoryIdExW
 
 CONSTANT: SETDIRID_NOT_FULL_PATH      0x00000001
 
-FUNCTION: BOOL SetupGetSourceInfoA ( HINF InfHandle, UINT SourceId, UINT InfoDesired, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupGetSourceInfoW ( HINF InfHandle, UINT SourceId, UINT InfoDesired, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupGetSourceInfoA ( HINF InfHandle, UINT SourceId, UINT InfoDesired, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupGetSourceInfoW ( HINF InfHandle, UINT SourceId, UINT InfoDesired, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupGetSourceInfo SetupGetSourceInfoW
 
 CONSTANT: SRCINFO_PATH            1
@@ -1195,12 +1195,12 @@ CONSTANT: SRCINFO_FLAGS           4
 CONSTANT: SRCINFO_TAGFILE2        5
 CONSTANT: SRC_FLAGS_CABFILE       0x0010
 
-FUNCTION: BOOL SetupInstallFileA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR SourceFile, PCSTR SourcePathRoot, PCSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_A CopyMsgHandler, PVOID Context ) ;
-FUNCTION: BOOL SetupInstallFileW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR SourceFile, PCWSTR SourcePathRoot, PCWSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_W CopyMsgHandler, PVOID Context ) ;
+FUNCTION: BOOL SetupInstallFileA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR SourceFile, PCSTR SourcePathRoot, PCSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_A CopyMsgHandler, PVOID Context )
+FUNCTION: BOOL SetupInstallFileW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR SourceFile, PCWSTR SourcePathRoot, PCWSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_W CopyMsgHandler, PVOID Context )
 ALIAS: SetupInstallFile SetupInstallFileW
 
-FUNCTION: BOOL SetupInstallFileExA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR SourceFile, PCSTR SourcePathRoot, PCSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_A CopyMsgHandler, PVOID Context, PBOOL FileWasInUse ) ;
-FUNCTION: BOOL SetupInstallFileExW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR SourceFile, PCWSTR SourcePathRoot, PCWSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_W CopyMsgHandler, PVOID Context, PBOOL FileWasInUse ) ;
+FUNCTION: BOOL SetupInstallFileExA ( HINF InfHandle, PINFCONTEXT InfContext, PCSTR SourceFile, PCSTR SourcePathRoot, PCSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_A CopyMsgHandler, PVOID Context, PBOOL FileWasInUse )
+FUNCTION: BOOL SetupInstallFileExW ( HINF InfHandle, PINFCONTEXT InfContext, PCWSTR SourceFile, PCWSTR SourcePathRoot, PCWSTR DestinationName, DWORD CopyStyle, PSP_FILE_CALLBACK_W CopyMsgHandler, PVOID Context, PBOOL FileWasInUse )
 ALIAS: SetupInstallFileEx SetupInstallFileExW
 
 CONSTANT: SP_COPY_DELETESOURCE        0x0000001
@@ -1238,54 +1238,54 @@ CONSTANT: SP_BACKUP_DEMANDPASS        0x00000002
 CONSTANT: SP_BACKUP_SPECIAL           0x00000004
 CONSTANT: SP_BACKUP_BOOTFILE          0x00000008
 
-FUNCTION: HSPFILEQ SetupOpenFileQueue ( ) ;
-FUNCTION: BOOL SetupCloseFileQueue ( HSPFILEQ QueueHandle ) ;
-FUNCTION: BOOL SetupSetFileQueueAlternatePlatformA ( HSPFILEQ QueueHandle, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCSTR AlternateDefaultCatalogFile ) ;
-FUNCTION: BOOL SetupSetFileQueueAlternatePlatformW ( HSPFILEQ QueueHandle, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCWSTR AlternateDefaultCatalogFile ) ;
+FUNCTION: HSPFILEQ SetupOpenFileQueue ( )
+FUNCTION: BOOL SetupCloseFileQueue ( HSPFILEQ QueueHandle )
+FUNCTION: BOOL SetupSetFileQueueAlternatePlatformA ( HSPFILEQ QueueHandle, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCSTR AlternateDefaultCatalogFile )
+FUNCTION: BOOL SetupSetFileQueueAlternatePlatformW ( HSPFILEQ QueueHandle, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PCWSTR AlternateDefaultCatalogFile )
 ALIAS: SetupSetFileQueueAlternatePlatform SetupSetFileQueueAlternatePlatformW
 
-FUNCTION: BOOL SetupSetPlatformPathOverrideA ( PCSTR Override ) ;
-FUNCTION: BOOL SetupSetPlatformPathOverrideW ( PCWSTR Override ) ;
+FUNCTION: BOOL SetupSetPlatformPathOverrideA ( PCSTR Override )
+FUNCTION: BOOL SetupSetPlatformPathOverrideW ( PCWSTR Override )
 ALIAS: SetupSetPlatformPathOverride SetupSetPlatformPathOverrideW
 
-FUNCTION: BOOL SetupQueueCopyA ( HSPFILEQ QueueHandle, PCSTR SourceRootPath, PCSTR SourcePath, PCSTR SourceFilename, PCSTR SourceDescription, PCSTR SourceTagfile, PCSTR TargetDirectory, PCSTR TargetFilename, DWORD CopyStyle ) ;
-FUNCTION: BOOL SetupQueueCopyW ( HSPFILEQ QueueHandle, PCWSTR SourceRootPath, PCWSTR SourcePath, PCWSTR SourceFilename, PCWSTR SourceDescription, PCWSTR SourceTagfile, PCWSTR TargetDirectory, PCWSTR TargetFilename, DWORD CopyStyle ) ;
+FUNCTION: BOOL SetupQueueCopyA ( HSPFILEQ QueueHandle, PCSTR SourceRootPath, PCSTR SourcePath, PCSTR SourceFilename, PCSTR SourceDescription, PCSTR SourceTagfile, PCSTR TargetDirectory, PCSTR TargetFilename, DWORD CopyStyle )
+FUNCTION: BOOL SetupQueueCopyW ( HSPFILEQ QueueHandle, PCWSTR SourceRootPath, PCWSTR SourcePath, PCWSTR SourceFilename, PCWSTR SourceDescription, PCWSTR SourceTagfile, PCWSTR TargetDirectory, PCWSTR TargetFilename, DWORD CopyStyle )
 ALIAS: SetupQueueCopy SetupQueueCopyW
 
-FUNCTION: BOOL SetupQueueCopyIndirectA ( PSP_FILE_COPY_PARAMS_A CopyParams ) ;
-FUNCTION: BOOL SetupQueueCopyIndirectW ( PSP_FILE_COPY_PARAMS_W CopyParams ) ;
+FUNCTION: BOOL SetupQueueCopyIndirectA ( PSP_FILE_COPY_PARAMS_A CopyParams )
+FUNCTION: BOOL SetupQueueCopyIndirectW ( PSP_FILE_COPY_PARAMS_W CopyParams )
 ALIAS: SetupQueueCopyIndirect SetupQueueCopyIndirectW
 
-FUNCTION: BOOL SetupQueueDefaultCopyA ( HSPFILEQ QueueHandle, HINF InfHandle, PCSTR SourceRootPath, PCSTR SourceFilename, PCSTR TargetFilename, DWORD CopyStyle ) ;
-FUNCTION: BOOL SetupQueueDefaultCopyW ( HSPFILEQ QueueHandle, HINF InfHandle, PCWSTR SourceRootPath, PCWSTR SourceFilename, PCWSTR TargetFilename, DWORD CopyStyle ) ;
+FUNCTION: BOOL SetupQueueDefaultCopyA ( HSPFILEQ QueueHandle, HINF InfHandle, PCSTR SourceRootPath, PCSTR SourceFilename, PCSTR TargetFilename, DWORD CopyStyle )
+FUNCTION: BOOL SetupQueueDefaultCopyW ( HSPFILEQ QueueHandle, HINF InfHandle, PCWSTR SourceRootPath, PCWSTR SourceFilename, PCWSTR TargetFilename, DWORD CopyStyle )
 ALIAS: SetupQueueDefaultCopy SetupQueueDefaultCopyW
 
-FUNCTION: BOOL SetupQueueCopySectionA ( HSPFILEQ QueueHandle, PCSTR SourceRootPath, HINF InfHandle, HINF ListInfHandle, PCSTR Section, DWORD CopyStyle ) ;
-FUNCTION: BOOL SetupQueueCopySectionW ( HSPFILEQ QueueHandle, PCWSTR SourceRootPath, HINF InfHandle, HINF ListInfHandle, PCWSTR Section, DWORD CopyStyle ) ;
+FUNCTION: BOOL SetupQueueCopySectionA ( HSPFILEQ QueueHandle, PCSTR SourceRootPath, HINF InfHandle, HINF ListInfHandle, PCSTR Section, DWORD CopyStyle )
+FUNCTION: BOOL SetupQueueCopySectionW ( HSPFILEQ QueueHandle, PCWSTR SourceRootPath, HINF InfHandle, HINF ListInfHandle, PCWSTR Section, DWORD CopyStyle )
 ALIAS: SetupQueueCopySection SetupQueueCopySectionW
 
-FUNCTION: BOOL SetupQueueDeleteA ( HSPFILEQ QueueHandle, PCSTR PathPart1, PCSTR PathPart2 ) ;
-FUNCTION: BOOL SetupQueueDeleteW ( HSPFILEQ QueueHandle, PCWSTR PathPart1, PCWSTR PathPart2 ) ;
+FUNCTION: BOOL SetupQueueDeleteA ( HSPFILEQ QueueHandle, PCSTR PathPart1, PCSTR PathPart2 )
+FUNCTION: BOOL SetupQueueDeleteW ( HSPFILEQ QueueHandle, PCWSTR PathPart1, PCWSTR PathPart2 )
 ALIAS: SetupQueueDelete SetupQueueDeleteW
 
-FUNCTION: BOOL SetupQueueDeleteSectionA ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCSTR Section ) ;
-FUNCTION: BOOL SetupQueueDeleteSectionW ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCWSTR Section ) ;
+FUNCTION: BOOL SetupQueueDeleteSectionA ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCSTR Section )
+FUNCTION: BOOL SetupQueueDeleteSectionW ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCWSTR Section )
 ALIAS: SetupQueueDeleteSection SetupQueueDeleteSectionW
 
-FUNCTION: BOOL SetupQueueRenameA ( HSPFILEQ QueueHandle, PCSTR SourcePath, PCSTR SourceFilename, PCSTR TargetPath, PCSTR TargetFilename ) ;
-FUNCTION: BOOL SetupQueueRenameW ( HSPFILEQ QueueHandle, PCWSTR SourcePath, PCWSTR SourceFilename, PCWSTR TargetPath, PCWSTR TargetFilename ) ;
+FUNCTION: BOOL SetupQueueRenameA ( HSPFILEQ QueueHandle, PCSTR SourcePath, PCSTR SourceFilename, PCSTR TargetPath, PCSTR TargetFilename )
+FUNCTION: BOOL SetupQueueRenameW ( HSPFILEQ QueueHandle, PCWSTR SourcePath, PCWSTR SourceFilename, PCWSTR TargetPath, PCWSTR TargetFilename )
 ALIAS: SetupQueueRename SetupQueueRenameW
 
-FUNCTION: BOOL SetupQueueRenameSectionA ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCSTR Section ) ;
-FUNCTION: BOOL SetupQueueRenameSectionW ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCWSTR Section ) ;
+FUNCTION: BOOL SetupQueueRenameSectionA ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCSTR Section )
+FUNCTION: BOOL SetupQueueRenameSectionW ( HSPFILEQ QueueHandle, HINF InfHandle, HINF ListInfHandle, PCWSTR Section )
 ALIAS: SetupQueueRenameSection SetupQueueRenameSectionW
 
-FUNCTION: BOOL SetupCommitFileQueueA ( HWND Owner, HSPFILEQ QueueHandle, PSP_FILE_CALLBACK_A MsgHandler, PVOID Context ) ;
-FUNCTION: BOOL SetupCommitFileQueueW ( HWND Owner, HSPFILEQ QueueHandle, PSP_FILE_CALLBACK_W MsgHandler, PVOID Context ) ;
+FUNCTION: BOOL SetupCommitFileQueueA ( HWND Owner, HSPFILEQ QueueHandle, PSP_FILE_CALLBACK_A MsgHandler, PVOID Context )
+FUNCTION: BOOL SetupCommitFileQueueW ( HWND Owner, HSPFILEQ QueueHandle, PSP_FILE_CALLBACK_W MsgHandler, PVOID Context )
 ALIAS: SetupCommitFileQueue SetupCommitFileQueueW
 
-FUNCTION: BOOL SetupScanFileQueueA ( HSPFILEQ FileQueue, DWORD Flags, HWND Window, PSP_FILE_CALLBACK_A CallbackRoutine, PVOID CallbackContext, PDWORD Result ) ;
-FUNCTION: BOOL SetupScanFileQueueW ( HSPFILEQ FileQueue, DWORD Flags, HWND Window, PSP_FILE_CALLBACK_W CallbackRoutine, PVOID CallbackContext, PDWORD Result ) ;
+FUNCTION: BOOL SetupScanFileQueueA ( HSPFILEQ FileQueue, DWORD Flags, HWND Window, PSP_FILE_CALLBACK_A CallbackRoutine, PVOID CallbackContext, PDWORD Result )
+FUNCTION: BOOL SetupScanFileQueueW ( HSPFILEQ FileQueue, DWORD Flags, HWND Window, PSP_FILE_CALLBACK_W CallbackRoutine, PVOID CallbackContext, PDWORD Result )
 ALIAS: SetupScanFileQueue SetupScanFileQueueW
 
 CONSTANT: SPQ_SCAN_FILE_PRESENCE                  0x00000001
@@ -1301,9 +1301,9 @@ CONSTANT: SPQ_SCAN_FILE_COMPARISON                0x00000200
 CONSTANT: SPQ_SCAN_ACTIVATE_DRP                   0x00000400
 CONSTANT: SPQ_DELAYED_COPY                        0x00000001
 
-FUNCTION: BOOL SetupGetFileQueueCount ( HSPFILEQ FileQueue, UINT SubQueueFileOp, PUINT NumOperations ) ;
-FUNCTION: BOOL SetupGetFileQueueFlags ( HSPFILEQ FileQueue, PDWORD Flags ) ;
-FUNCTION: BOOL SetupSetFileQueueFlags ( HSPFILEQ FileQueue, DWORD FlagMask, DWORD Flags ) ;
+FUNCTION: BOOL SetupGetFileQueueCount ( HSPFILEQ FileQueue, UINT SubQueueFileOp, PUINT NumOperations )
+FUNCTION: BOOL SetupGetFileQueueFlags ( HSPFILEQ FileQueue, PDWORD Flags )
+FUNCTION: BOOL SetupSetFileQueueFlags ( HSPFILEQ FileQueue, DWORD FlagMask, DWORD Flags )
 
 CONSTANT: SPQ_FLAG_BACKUP_AWARE      0x00000001
 CONSTANT: SPQ_FLAG_ABORT_IF_UNSIGNED 0x00000002
@@ -1316,83 +1316,83 @@ CONSTANT: SPOST_PATH  1
 CONSTANT: SPOST_URL   2
 CONSTANT: SPOST_MAX   3
 
-FUNCTION: BOOL SetupCopyOEMInfA ( PCSTR SourceInfFileName, PCSTR OEMSourceMediaLocation, DWORD OEMSourceMediaType, DWORD CopyStyle, PSTR DestinationInfFileName, DWORD DestinationInfFileNameSize, PDWORD RequiredSize, PSTR* DestinationInfFileNameComponent ) ;
-FUNCTION: BOOL SetupCopyOEMInfW ( PCWSTR SourceInfFileName, PCWSTR OEMSourceMediaLocation, DWORD OEMSourceMediaType, DWORD CopyStyle, PWSTR DestinationInfFileName, DWORD DestinationInfFileNameSize, PDWORD RequiredSize, PWSTR* DestinationInfFileNameComponent ) ;
+FUNCTION: BOOL SetupCopyOEMInfA ( PCSTR SourceInfFileName, PCSTR OEMSourceMediaLocation, DWORD OEMSourceMediaType, DWORD CopyStyle, PSTR DestinationInfFileName, DWORD DestinationInfFileNameSize, PDWORD RequiredSize, PSTR* DestinationInfFileNameComponent )
+FUNCTION: BOOL SetupCopyOEMInfW ( PCWSTR SourceInfFileName, PCWSTR OEMSourceMediaLocation, DWORD OEMSourceMediaType, DWORD CopyStyle, PWSTR DestinationInfFileName, DWORD DestinationInfFileNameSize, PDWORD RequiredSize, PWSTR* DestinationInfFileNameComponent )
 ALIAS: SetupCopyOEMInf SetupCopyOEMInfW
 
 CONSTANT: SUOI_FORCEDELETE   0x00000001
 CONSTANT: SUOI_INTERNAL1     0x00000002
 
-FUNCTION: BOOL SetupUninstallOEMInfA ( PCSTR InfFileName, DWORD Flags, PVOID Reserved ) ;
-FUNCTION: BOOL SetupUninstallOEMInfW ( PCWSTR InfFileName, DWORD Flags, PVOID Reserved ) ;
+FUNCTION: BOOL SetupUninstallOEMInfA ( PCSTR InfFileName, DWORD Flags, PVOID Reserved )
+FUNCTION: BOOL SetupUninstallOEMInfW ( PCWSTR InfFileName, DWORD Flags, PVOID Reserved )
 ALIAS: SetupUninstallOEMInf SetupUninstallOEMInfW
 
-FUNCTION: BOOL SetupUninstallNewlyCopiedInfs ( HSPFILEQ FileQueue, DWORD Flags, PVOID Reserved ) ;
+FUNCTION: BOOL SetupUninstallNewlyCopiedInfs ( HSPFILEQ FileQueue, DWORD Flags, PVOID Reserved )
 
-FUNCTION: HDSKSPC SetupCreateDiskSpaceListA ( PVOID Reserved1, DWORD Reserved2, UINT Flags ) ;
-FUNCTION: HDSKSPC SetupCreateDiskSpaceListW ( PVOID Reserved1, DWORD Reserved2, UINT Flags ) ;
+FUNCTION: HDSKSPC SetupCreateDiskSpaceListA ( PVOID Reserved1, DWORD Reserved2, UINT Flags )
+FUNCTION: HDSKSPC SetupCreateDiskSpaceListW ( PVOID Reserved1, DWORD Reserved2, UINT Flags )
 ALIAS: SetupCreateDiskSpaceList SetupCreateDiskSpaceListW
 
 CONSTANT: SPDSL_IGNORE_DISK              0x00000001
 CONSTANT: SPDSL_DISALLOW_NEGATIVE_ADJUST 0x00000002
 
-FUNCTION: HDSKSPC SetupDuplicateDiskSpaceListA ( HDSKSPC DiskSpace, PVOID Reserved1, DWORD Reserved2, UINT Flags ) ;
-FUNCTION: HDSKSPC SetupDuplicateDiskSpaceListW ( HDSKSPC DiskSpace, PVOID Reserved1, DWORD Reserved2, UINT Flags ) ;
+FUNCTION: HDSKSPC SetupDuplicateDiskSpaceListA ( HDSKSPC DiskSpace, PVOID Reserved1, DWORD Reserved2, UINT Flags )
+FUNCTION: HDSKSPC SetupDuplicateDiskSpaceListW ( HDSKSPC DiskSpace, PVOID Reserved1, DWORD Reserved2, UINT Flags )
 ALIAS: SetupDuplicateDiskSpaceList SetupDuplicateDiskSpaceListW
 
-FUNCTION: BOOL SetupDestroyDiskSpaceList ( HDSKSPC DiskSpace ) ;
-FUNCTION: BOOL SetupQueryDrivesInDiskSpaceListA ( HDSKSPC DiskSpace, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupQueryDrivesInDiskSpaceListW ( HDSKSPC DiskSpace, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDestroyDiskSpaceList ( HDSKSPC DiskSpace )
+FUNCTION: BOOL SetupQueryDrivesInDiskSpaceListA ( HDSKSPC DiskSpace, PSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupQueryDrivesInDiskSpaceListW ( HDSKSPC DiskSpace, PWSTR ReturnBuffer, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupQueryDrivesInDiskSpaceList SetupQueryDrivesInDiskSpaceListW
 
-FUNCTION: BOOL SetupQuerySpaceRequiredOnDriveA ( HDSKSPC DiskSpace, PCSTR DriveSpec, LONGLONG* SpaceRequired, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupQuerySpaceRequiredOnDriveW ( HDSKSPC DiskSpace, PCWSTR DriveSpec, LONGLONG* SpaceRequired, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupQuerySpaceRequiredOnDriveA ( HDSKSPC DiskSpace, PCSTR DriveSpec, LONGLONG* SpaceRequired, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupQuerySpaceRequiredOnDriveW ( HDSKSPC DiskSpace, PCWSTR DriveSpec, LONGLONG* SpaceRequired, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupQuerySpaceRequiredOnDrive SetupQuerySpaceRequiredOnDriveW
 
-FUNCTION: BOOL SetupAdjustDiskSpaceListA ( HDSKSPC DiskSpace, LPCSTR DriveRoot, LONGLONG Amount, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupAdjustDiskSpaceListW ( HDSKSPC DiskSpace, LPCWSTR DriveRoot, LONGLONG Amount, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupAdjustDiskSpaceListA ( HDSKSPC DiskSpace, LPCSTR DriveRoot, LONGLONG Amount, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupAdjustDiskSpaceListW ( HDSKSPC DiskSpace, LPCWSTR DriveRoot, LONGLONG Amount, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupAdjustDiskSpaceList SetupAdjustDiskSpaceListW
 
-FUNCTION: BOOL SetupAddToDiskSpaceListA ( HDSKSPC DiskSpace, PCSTR TargetFilespec, LONGLONG FileSize, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupAddToDiskSpaceListW ( HDSKSPC DiskSpace, PCWSTR TargetFilespec, LONGLONG FileSize, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupAddToDiskSpaceListA ( HDSKSPC DiskSpace, PCSTR TargetFilespec, LONGLONG FileSize, UINT Operation, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupAddToDiskSpaceListW ( HDSKSPC DiskSpace, PCWSTR TargetFilespec, LONGLONG FileSize, UINT Operation, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupAddToDiskSpaceList SetupAddToDiskSpaceListW
 
-FUNCTION: BOOL SetupAddSectionToDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupAddSectionToDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCWSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupAddSectionToDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupAddSectionToDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCWSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupAddSectionToDiskSpaceList SetupAddSectionToDiskSpaceListW
 
-FUNCTION: BOOL SetupAddInstallSectionToDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCSTR SectionName, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupAddInstallSectionToDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCWSTR SectionName, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupAddInstallSectionToDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCSTR SectionName, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupAddInstallSectionToDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCWSTR SectionName, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupAddInstallSectionToDiskSpaceList SetupAddInstallSectionToDiskSpaceListW
 
-FUNCTION: BOOL SetupRemoveFromDiskSpaceListA ( HDSKSPC DiskSpace, PCSTR TargetFilespec, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupRemoveFromDiskSpaceListW ( HDSKSPC DiskSpace, PCWSTR TargetFilespec, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupRemoveFromDiskSpaceListA ( HDSKSPC DiskSpace, PCSTR TargetFilespec, UINT Operation, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupRemoveFromDiskSpaceListW ( HDSKSPC DiskSpace, PCWSTR TargetFilespec, UINT Operation, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupRemoveFromDiskSpaceList SetupRemoveFromDiskSpaceListW
 
-FUNCTION: BOOL SetupRemoveSectionFromDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupRemoveSectionFromDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCWSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupRemoveSectionFromDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupRemoveSectionFromDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF ListInfHandle, PCWSTR SectionName, UINT Operation, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupRemoveSectionFromDiskSpaceList SetupRemoveSectionFromDiskSpaceListW
 
-FUNCTION: BOOL SetupRemoveInstallSectionFromDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCSTR SectionName, PVOID Reserved1, UINT Reserved2 ) ;
-FUNCTION: BOOL SetupRemoveInstallSectionFromDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCWSTR SectionName, PVOID Reserved1, UINT Reserved2 ) ;
+FUNCTION: BOOL SetupRemoveInstallSectionFromDiskSpaceListA ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCSTR SectionName, PVOID Reserved1, UINT Reserved2 )
+FUNCTION: BOOL SetupRemoveInstallSectionFromDiskSpaceListW ( HDSKSPC DiskSpace, HINF InfHandle, HINF LayoutInfHandle, PCWSTR SectionName, PVOID Reserved1, UINT Reserved2 )
 ALIAS: SetupRemoveInstallSectionFromDiskSpaceList SetupRemoveInstallSectionFromDiskSpaceListW
 
-FUNCTION: BOOL SetupIterateCabinetA ( PCSTR CabinetFile, DWORD Reserved, PSP_FILE_CALLBACK_A MsgHandler, PVOID Context ) ;
-FUNCTION: BOOL SetupIterateCabinetW ( PCWSTR CabinetFile, DWORD Reserved, PSP_FILE_CALLBACK_W MsgHandler, PVOID Context ) ;
+FUNCTION: BOOL SetupIterateCabinetA ( PCSTR CabinetFile, DWORD Reserved, PSP_FILE_CALLBACK_A MsgHandler, PVOID Context )
+FUNCTION: BOOL SetupIterateCabinetW ( PCWSTR CabinetFile, DWORD Reserved, PSP_FILE_CALLBACK_W MsgHandler, PVOID Context )
 ALIAS: SetupIterateCabinet SetupIterateCabinetW
 
-FUNCTION: INT SetupPromptReboot ( HSPFILEQ FileQueue, HWND Owner, BOOL ScanOnly ) ;
+FUNCTION: INT SetupPromptReboot ( HSPFILEQ FileQueue, HWND Owner, BOOL ScanOnly )
 
 CONSTANT: SPFILEQ_FILE_IN_USE         0x00000001
 CONSTANT: SPFILEQ_REBOOT_RECOMMENDED  0x00000002
 CONSTANT: SPFILEQ_REBOOT_IN_PROGRESS  0x00000004
 
-FUNCTION: PVOID SetupInitDefaultQueueCallback ( HWND OwnerWindow ) ;
-FUNCTION: PVOID SetupInitDefaultQueueCallbackEx ( HWND OwnerWindow, HWND AlternateProgressWindow, UINT ProgressMessage, DWORD Reserved1, PVOID Reserved2 ) ;
-FUNCTION: void SetupTermDefaultQueueCallback ( PVOID Context ) ;
+FUNCTION: PVOID SetupInitDefaultQueueCallback ( HWND OwnerWindow )
+FUNCTION: PVOID SetupInitDefaultQueueCallbackEx ( HWND OwnerWindow, HWND AlternateProgressWindow, UINT ProgressMessage, DWORD Reserved1, PVOID Reserved2 )
+FUNCTION: void SetupTermDefaultQueueCallback ( PVOID Context )
 
-FUNCTION: UINT SetupDefaultQueueCallbackA ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 ) ;
-FUNCTION: UINT SetupDefaultQueueCallbackW ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 ) ;
+FUNCTION: UINT SetupDefaultQueueCallbackA ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 )
+FUNCTION: UINT SetupDefaultQueueCallbackW ( PVOID Context, UINT Notification, UINT_PTR Param1, UINT_PTR Param2 )
 ALIAS: SetupDefaultQueueCallback SetupDefaultQueueCallbackW
 
 CONSTANT: FLG_ADDREG_DELREG_BIT       0x00008000
@@ -1444,8 +1444,8 @@ CONSTANT: FLG_ADDPROPERTY_OR              0x00000008
 CONSTANT: FLG_ADDPROPERTY_AND             0x00000010
 CONSTANT: FLG_DELPROPERTY_MULTI_SZ_DELSTRING  0x00000001
 
-FUNCTION: BOOL SetupInstallFromInfSectionA ( HWND Owner, HINF InfHandle, PCSTR SectionName, UINT Flags, HKEY RelativeKeyRoot, PCSTR SourceRootPath, UINT CopyFlags, PSP_FILE_CALLBACK_A MsgHandler, PVOID Context, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupInstallFromInfSectionW ( HWND Owner, HINF InfHandle, PCWSTR SectionName, UINT Flags, HKEY RelativeKeyRoot, PCWSTR SourceRootPath, UINT CopyFlags, PSP_FILE_CALLBACK_W MsgHandler, PVOID Context, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: BOOL SetupInstallFromInfSectionA ( HWND Owner, HINF InfHandle, PCSTR SectionName, UINT Flags, HKEY RelativeKeyRoot, PCSTR SourceRootPath, UINT CopyFlags, PSP_FILE_CALLBACK_A MsgHandler, PVOID Context, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupInstallFromInfSectionW ( HWND Owner, HINF InfHandle, PCWSTR SectionName, UINT Flags, HKEY RelativeKeyRoot, PCWSTR SourceRootPath, UINT CopyFlags, PSP_FILE_CALLBACK_W MsgHandler, PVOID Context, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
 ALIAS: SetupInstallFromInfSection SetupInstallFromInfSectionW
 
 CONSTANT: SPINST_LOGCONFIG                0x00000001
@@ -1466,8 +1466,8 @@ CONSTANT: SPINST_LOGCONFIGS_ARE_OVERRIDES 0x00040000
 CONSTANT: SPINST_REGISTERCALLBACKAWARE    0x00080000
 CONSTANT: SPINST_DEVICEINSTALL            0x00100000
 
-FUNCTION: BOOL SetupInstallFilesFromInfSectionA ( HINF InfHandle, HINF LayoutInfHandle, HSPFILEQ FileQueue, PCSTR SectionName, PCSTR SourceRootPath, UINT CopyFlags ) ;
-FUNCTION: BOOL SetupInstallFilesFromInfSectionW ( HINF InfHandle, HINF LayoutInfHandle, HSPFILEQ FileQueue, PCWSTR SectionName, PCWSTR SourceRootPath, UINT CopyFlags ) ;
+FUNCTION: BOOL SetupInstallFilesFromInfSectionA ( HINF InfHandle, HINF LayoutInfHandle, HSPFILEQ FileQueue, PCSTR SectionName, PCSTR SourceRootPath, UINT CopyFlags )
+FUNCTION: BOOL SetupInstallFilesFromInfSectionW ( HINF InfHandle, HINF LayoutInfHandle, HSPFILEQ FileQueue, PCWSTR SectionName, PCWSTR SourceRootPath, UINT CopyFlags )
 ALIAS: SetupInstallFilesFromInfSection SetupInstallFilesFromInfSectionW
 
 CONSTANT: SPSVCINST_TAGTOFRONT                   0x00000001
@@ -1484,36 +1484,36 @@ CONSTANT: SPSVCINST_CLOBBER_SECURITY             0x00000400
 CONSTANT: SPSVCINST_STARTSERVICE                 0x00000800
 CONSTANT: SPSVCINST_NOCLOBBER_REQUIREDPRIVILEGES 0x00001000
 
-FUNCTION: BOOL SetupInstallServicesFromInfSectionA ( HINF InfHandle, PCSTR SectionName, DWORD Flags ) ;
-FUNCTION: BOOL SetupInstallServicesFromInfSectionW ( HINF InfHandle, PCWSTR SectionName, DWORD Flags ) ;
+FUNCTION: BOOL SetupInstallServicesFromInfSectionA ( HINF InfHandle, PCSTR SectionName, DWORD Flags )
+FUNCTION: BOOL SetupInstallServicesFromInfSectionW ( HINF InfHandle, PCWSTR SectionName, DWORD Flags )
 ALIAS: SetupInstallServicesFromInfSection SetupInstallServicesFromInfSectionW
 
-FUNCTION: BOOL SetupInstallServicesFromInfSectionExA ( HINF InfHandle, PCSTR SectionName, DWORD Flags, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PVOID Reserved1, PVOID Reserved2 ) ;
-FUNCTION: BOOL SetupInstallServicesFromInfSectionExW ( HINF InfHandle, PCWSTR SectionName, DWORD Flags, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PVOID Reserved1, PVOID Reserved2 ) ;
+FUNCTION: BOOL SetupInstallServicesFromInfSectionExA ( HINF InfHandle, PCSTR SectionName, DWORD Flags, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PVOID Reserved1, PVOID Reserved2 )
+FUNCTION: BOOL SetupInstallServicesFromInfSectionExW ( HINF InfHandle, PCWSTR SectionName, DWORD Flags, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PVOID Reserved1, PVOID Reserved2 )
 ALIAS: SetupInstallServicesFromInfSectionEx SetupInstallServicesFromInfSectionExW
 
-FUNCTION: void InstallHinfSectionA ( HWND Window, HINSTANCE ModuleHandle, PCSTR CommandLine, INT ShowCommand ) ;
-FUNCTION: void InstallHinfSectionW ( HWND Window, HINSTANCE ModuleHandle, PCWSTR CommandLine, INT ShowCommand ) ;
+FUNCTION: void InstallHinfSectionA ( HWND Window, HINSTANCE ModuleHandle, PCSTR CommandLine, INT ShowCommand )
+FUNCTION: void InstallHinfSectionW ( HWND Window, HINSTANCE ModuleHandle, PCWSTR CommandLine, INT ShowCommand )
 ALIAS: InstallHinfSection InstallHinfSectionW
 
 TYPEDEF: PVOID HSPFILELOG
 
-FUNCTION: HSPFILELOG SetupInitializeFileLogA ( PCSTR LogFileName, DWORD Flags ) ;
-FUNCTION: HSPFILELOG SetupInitializeFileLogW ( PCWSTR LogFileName, DWORD Flags ) ;
+FUNCTION: HSPFILELOG SetupInitializeFileLogA ( PCSTR LogFileName, DWORD Flags )
+FUNCTION: HSPFILELOG SetupInitializeFileLogW ( PCWSTR LogFileName, DWORD Flags )
 ALIAS: SetupInitializeFileLog SetupInitializeFileLogW
 
 CONSTANT: SPFILELOG_SYSTEMLOG     0x00000001
 CONSTANT: SPFILELOG_FORCENEW      0x00000002
 CONSTANT: SPFILELOG_QUERYONLY     0x00000004
 
-FUNCTION: BOOL SetupTerminateFileLog ( HSPFILELOG FileLogHandle ) ;
-FUNCTION: BOOL SetupLogFileA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR SourceFilename, PCSTR TargetFilename, DWORD Checksum, PCSTR DiskTagfile, PCSTR DiskDescription, PCSTR OtherInfo, DWORD Flags ) ;
-FUNCTION: BOOL SetupLogFileW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR SourceFilename, PCWSTR TargetFilename, DWORD Checksum, PCWSTR DiskTagfile, PCWSTR DiskDescription, PCWSTR OtherInfo, DWORD Flags ) ;
+FUNCTION: BOOL SetupTerminateFileLog ( HSPFILELOG FileLogHandle )
+FUNCTION: BOOL SetupLogFileA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR SourceFilename, PCSTR TargetFilename, DWORD Checksum, PCSTR DiskTagfile, PCSTR DiskDescription, PCSTR OtherInfo, DWORD Flags )
+FUNCTION: BOOL SetupLogFileW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR SourceFilename, PCWSTR TargetFilename, DWORD Checksum, PCWSTR DiskTagfile, PCWSTR DiskDescription, PCWSTR OtherInfo, DWORD Flags )
 ALIAS: SetupLogFile SetupLogFileW
 
 CONSTANT: SPFILELOG_OEMFILE   0x00000001
-FUNCTION: BOOL SetupRemoveFileLogEntryA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR TargetFilename ) ;
-FUNCTION: BOOL SetupRemoveFileLogEntryW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename ) ;
+FUNCTION: BOOL SetupRemoveFileLogEntryA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR TargetFilename )
+FUNCTION: BOOL SetupRemoveFileLogEntryW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename )
 ALIAS: SetupRemoveFileLogEntry SetupRemoveFileLogEntryW
 
 ENUM: SetupFileLogInfo
@@ -1524,8 +1524,8 @@ ENUM: SetupFileLogInfo
     SetupFileLogOtherInfo
     SetupFileLogMax ;
 
-FUNCTION: BOOL SetupQueryFileLogA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR TargetFilename, SetupFileLogInfo DesiredInfo, PSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupQueryFileLogW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename, SetupFileLogInfo DesiredInfo, PWSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupQueryFileLogA ( HSPFILELOG FileLogHandle, PCSTR LogSectionName, PCSTR TargetFilename, SetupFileLogInfo DesiredInfo, PSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupQueryFileLogW ( HSPFILELOG FileLogHandle, PCWSTR LogSectionName, PCWSTR TargetFilename, SetupFileLogInfo DesiredInfo, PWSTR DataOut, DWORD ReturnBufferSize, PDWORD RequiredSize )
 ALIAS: SetupQueryFileLog SetupQueryFileLogW
 
 TYPEDEF: DWORD LogSeverity
@@ -1535,67 +1535,67 @@ CONSTANT: LogSevError                 0x00000002
 CONSTANT: LogSevFatalError            0x00000003
 CONSTANT: LogSevMaximum               0x00000004
 
-FUNCTION: BOOL SetupOpenLog ( BOOL Erase ) ;
-FUNCTION: BOOL SetupLogErrorA ( LPCSTR MessageString, LogSeverity Severity ) ;
-FUNCTION: BOOL SetupLogErrorW ( LPCWSTR MessageString, LogSeverity Severity ) ;
+FUNCTION: BOOL SetupOpenLog ( BOOL Erase )
+FUNCTION: BOOL SetupLogErrorA ( LPCSTR MessageString, LogSeverity Severity )
+FUNCTION: BOOL SetupLogErrorW ( LPCWSTR MessageString, LogSeverity Severity )
 ALIAS: SetupLogError SetupLogErrorW
 
-FUNCTION: void SetupCloseLog ( ) ;
-FUNCTION: SP_LOG_TOKEN SetupGetThreadLogToken ( ) ;
-FUNCTION: void SetupSetThreadLogToken ( SP_LOG_TOKEN LogToken ) ;
+FUNCTION: void SetupCloseLog ( )
+FUNCTION: SP_LOG_TOKEN SetupGetThreadLogToken ( )
+FUNCTION: void SetupSetThreadLogToken ( SP_LOG_TOKEN LogToken )
 ! Unavailable until FFI to vargargs is supported.
 ! FUNCTION: void SetupWriteTextLog ( SP_LOG_TOKEN LogToken, DWORD Category, DWORD Flags, PCSTR MessageStr, ... ) ;
 ! FUNCTION: void SetupWriteTextLogError ( SP_LOG_TOKEN LogToken, DWORD Category, DWORD LogFlags, DWORD Error, PCSTR MessageStr, ... ) ;
-FUNCTION: void SetupWriteTextLogInfLine ( SP_LOG_TOKEN LogToken, DWORD Flags, HINF InfHandle, PINFCONTEXT Context ) ;
+FUNCTION: void SetupWriteTextLogInfLine ( SP_LOG_TOKEN LogToken, DWORD Flags, HINF InfHandle, PINFCONTEXT Context )
 
-FUNCTION: BOOL SetupGetBackupInformationA ( HSPFILEQ QueueHandle, PSP_BACKUP_QUEUE_PARAMS_A BackupParams ) ;
-FUNCTION: BOOL SetupGetBackupInformationW ( HSPFILEQ QueueHandle, PSP_BACKUP_QUEUE_PARAMS_W BackupParams ) ;
+FUNCTION: BOOL SetupGetBackupInformationA ( HSPFILEQ QueueHandle, PSP_BACKUP_QUEUE_PARAMS_A BackupParams )
+FUNCTION: BOOL SetupGetBackupInformationW ( HSPFILEQ QueueHandle, PSP_BACKUP_QUEUE_PARAMS_W BackupParams )
 ALIAS: SetupGetBackupInformation SetupGetBackupInformationW
 
-FUNCTION: BOOL SetupPrepareQueueForRestoreA ( HSPFILEQ QueueHandle, PCSTR BackupPath, DWORD RestoreFlags ) ;
-FUNCTION: BOOL SetupPrepareQueueForRestoreW ( HSPFILEQ QueueHandle, PCWSTR BackupPath, DWORD RestoreFlags ) ;
+FUNCTION: BOOL SetupPrepareQueueForRestoreA ( HSPFILEQ QueueHandle, PCSTR BackupPath, DWORD RestoreFlags )
+FUNCTION: BOOL SetupPrepareQueueForRestoreW ( HSPFILEQ QueueHandle, PCWSTR BackupPath, DWORD RestoreFlags )
 ALIAS: SetupPrepareQueueForRestore SetupPrepareQueueForRestoreW
 
-FUNCTION: BOOL SetupSetNonInteractiveMode ( BOOL NonInteractiveFlag ) ;
-FUNCTION: BOOL SetupGetNonInteractiveMode ( ) ;
+FUNCTION: BOOL SetupSetNonInteractiveMode ( BOOL NonInteractiveFlag )
+FUNCTION: BOOL SetupGetNonInteractiveMode ( )
 
-FUNCTION: HDEVINFO SetupDiCreateDeviceInfoList ( GUID* ClassGuid, HWND hwndParent ) ;
-FUNCTION: HDEVINFO SetupDiCreateDeviceInfoListExA ( GUID* ClassGuid, HWND hwndParent, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: HDEVINFO SetupDiCreateDeviceInfoListExW ( GUID* ClassGuid, HWND hwndParent, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: HDEVINFO SetupDiCreateDeviceInfoList ( GUID* ClassGuid, HWND hwndParent )
+FUNCTION: HDEVINFO SetupDiCreateDeviceInfoListExA ( GUID* ClassGuid, HWND hwndParent, PCSTR MachineName, PVOID Reserved )
+FUNCTION: HDEVINFO SetupDiCreateDeviceInfoListExW ( GUID* ClassGuid, HWND hwndParent, PCWSTR MachineName, PVOID Reserved )
 
 ALIAS: SetupDiCreateDeviceInfoListEx SetupDiCreateDeviceInfoListExW
 
-FUNCTION: BOOL SetupDiGetDeviceInfoListClass ( HDEVINFO DeviceInfoSet, LPGUID ClassGuid ) ;
-FUNCTION: BOOL SetupDiGetDeviceInfoListDetailA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_LIST_DETAIL_DATA_A DeviceInfoSetDetailData ) ;
-FUNCTION: BOOL SetupDiGetDeviceInfoListDetailW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_LIST_DETAIL_DATA_W DeviceInfoSetDetailData ) ;
+FUNCTION: BOOL SetupDiGetDeviceInfoListClass ( HDEVINFO DeviceInfoSet, LPGUID ClassGuid )
+FUNCTION: BOOL SetupDiGetDeviceInfoListDetailA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_LIST_DETAIL_DATA_A DeviceInfoSetDetailData )
+FUNCTION: BOOL SetupDiGetDeviceInfoListDetailW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_LIST_DETAIL_DATA_W DeviceInfoSetDetailData )
 ALIAS: SetupDiGetDeviceInfoListDetail SetupDiGetDeviceInfoListDetailW
 
 CONSTANT: DICD_GENERATE_ID        0x00000001
 CONSTANT: DICD_INHERIT_CLASSDRVS  0x00000002
 
-FUNCTION: BOOL SetupDiCreateDeviceInfoA ( HDEVINFO DeviceInfoSet, PCSTR DeviceName, GUID* ClassGuid, PCSTR DeviceDescription, HWND hwndParent, DWORD CreationFlags, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiCreateDeviceInfoW ( HDEVINFO DeviceInfoSet, PCWSTR DeviceName, GUID* ClassGuid, PCWSTR DeviceDescription, HWND hwndParent, DWORD CreationFlags, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: BOOL SetupDiCreateDeviceInfoA ( HDEVINFO DeviceInfoSet, PCSTR DeviceName, GUID* ClassGuid, PCSTR DeviceDescription, HWND hwndParent, DWORD CreationFlags, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiCreateDeviceInfoW ( HDEVINFO DeviceInfoSet, PCWSTR DeviceName, GUID* ClassGuid, PCWSTR DeviceDescription, HWND hwndParent, DWORD CreationFlags, PSP_DEVINFO_DATA DeviceInfoData )
 ALIAS: SetupDiCreateDeviceInfo SetupDiCreateDeviceInfoW
 
 CONSTANT: DIOD_INHERIT_CLASSDRVS  0x00000002
 CONSTANT: DIOD_CANCEL_REMOVE      0x00000004
 
-FUNCTION: BOOL SetupDiOpenDeviceInfoA ( HDEVINFO DeviceInfoSet, PCSTR DeviceInstanceId, HWND hwndParent, DWORD OpenFlags, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiOpenDeviceInfoW ( HDEVINFO DeviceInfoSet, PCWSTR DeviceInstanceId, HWND hwndParent, DWORD OpenFlags, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: BOOL SetupDiOpenDeviceInfoA ( HDEVINFO DeviceInfoSet, PCSTR DeviceInstanceId, HWND hwndParent, DWORD OpenFlags, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiOpenDeviceInfoW ( HDEVINFO DeviceInfoSet, PCWSTR DeviceInstanceId, HWND hwndParent, DWORD OpenFlags, PSP_DEVINFO_DATA DeviceInfoData )
 ALIAS: SetupDiOpenDeviceInfo SetupDiOpenDeviceInfoW
 
-FUNCTION: BOOL SetupDiGetDeviceInstanceIdA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSTR DeviceInstanceId, DWORD DeviceInstanceIdSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetDeviceInstanceIdW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PWSTR DeviceInstanceId, DWORD DeviceInstanceIdSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetDeviceInstanceIdA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSTR DeviceInstanceId, DWORD DeviceInstanceIdSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetDeviceInstanceIdW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PWSTR DeviceInstanceId, DWORD DeviceInstanceIdSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetDeviceInstanceId SetupDiGetDeviceInstanceIdW
 
-FUNCTION: BOOL SetupDiDeleteDeviceInfo ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiEnumDeviceInfo ( HDEVINFO DeviceInfoSet, DWORD MemberIndex, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiDestroyDeviceInfoList ( HDEVINFO DeviceInfoSet ) ;
-FUNCTION: BOOL SetupDiEnumDeviceInterfaces ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, GUID* InterfaceClassGuid, DWORD MemberIndex, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData ) ;
+FUNCTION: BOOL SetupDiDeleteDeviceInfo ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiEnumDeviceInfo ( HDEVINFO DeviceInfoSet, DWORD MemberIndex, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiDestroyDeviceInfoList ( HDEVINFO DeviceInfoSet )
+FUNCTION: BOOL SetupDiEnumDeviceInterfaces ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, GUID* InterfaceClassGuid, DWORD MemberIndex, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData )
 ALIAS: SetupDiEnumInterfaceDevice SetupDiEnumDeviceInterfaces
 
-FUNCTION: BOOL SetupDiCreateDeviceInterfaceA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, GUID* InterfaceClassGuid, PCSTR ReferenceString, DWORD CreationFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData ) ;
-FUNCTION: BOOL SetupDiCreateDeviceInterfaceW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, GUID* InterfaceClassGuid, PCWSTR ReferenceString, DWORD CreationFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData ) ;
+FUNCTION: BOOL SetupDiCreateDeviceInterfaceA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, GUID* InterfaceClassGuid, PCSTR ReferenceString, DWORD CreationFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData )
+FUNCTION: BOOL SetupDiCreateDeviceInterfaceW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, GUID* InterfaceClassGuid, PCWSTR ReferenceString, DWORD CreationFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData )
 ALIAS: SetupDiCreateDeviceInterface SetupDiCreateDeviceInterfaceW
 
 ALIAS: SetupDiCreateInterfaceDeviceW SetupDiCreateDeviceInterfaceW
@@ -1605,8 +1605,8 @@ ALIAS: SetupDiCreateInterfaceDevice SetupDiCreateDeviceInterfaceW
 
 CONSTANT: DIODI_NO_ADD    0x00000001
 
-FUNCTION: BOOL SetupDiOpenDeviceInterfaceA ( HDEVINFO DeviceInfoSet, PCSTR DevicePath, DWORD OpenFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData ) ;
-FUNCTION: BOOL SetupDiOpenDeviceInterfaceW ( HDEVINFO DeviceInfoSet, PCWSTR DevicePath, DWORD OpenFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData ) ;
+FUNCTION: BOOL SetupDiOpenDeviceInterfaceA ( HDEVINFO DeviceInfoSet, PCSTR DevicePath, DWORD OpenFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData )
+FUNCTION: BOOL SetupDiOpenDeviceInterfaceW ( HDEVINFO DeviceInfoSet, PCWSTR DevicePath, DWORD OpenFlags, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData )
 ALIAS: SetupDiOpenDeviceInterface SetupDiOpenDeviceInterfaceW
 
 ALIAS: SetupDiOpenInterfaceDeviceW SetupDiOpenDeviceInterfaceW
@@ -1614,17 +1614,17 @@ ALIAS: SetupDiOpenInterfaceDeviceA SetupDiOpenDeviceInterfaceA
 
 ALIAS: SetupDiOpenInterfaceDevice SetupDiOpenDeviceInterfaceW
 
-FUNCTION: BOOL SetupDiGetDeviceInterfaceAlias ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, GUID* AliasInterfaceClassGuid, PSP_DEVICE_INTERFACE_DATA AliasDeviceInterfaceData ) ;
+FUNCTION: BOOL SetupDiGetDeviceInterfaceAlias ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, GUID* AliasInterfaceClassGuid, PSP_DEVICE_INTERFACE_DATA AliasDeviceInterfaceData )
 ALIAS: SetupDiGetInterfaceDeviceAlias SetupDiGetDeviceInterfaceAlias
 
-FUNCTION: BOOL SetupDiDeleteDeviceInterfaceData ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData ) ;
+FUNCTION: BOOL SetupDiDeleteDeviceInterfaceData ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData )
 ALIAS: SetupDiDeleteInterfaceDeviceData SetupDiDeleteDeviceInterfaceData
 
-FUNCTION: BOOL SetupDiRemoveDeviceInterface ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData ) ;
+FUNCTION: BOOL SetupDiRemoveDeviceInterface ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData )
 ALIAS: SetupDiRemoveInterfaceDevice SetupDiRemoveDeviceInterface
 
-FUNCTION: BOOL SetupDiGetDeviceInterfaceDetailA ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, PSP_DEVICE_INTERFACE_DETAIL_DATA_A DeviceInterfaceDetailData, DWORD DeviceInterfaceDetailDataSize, PDWORD RequiredSize, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiGetDeviceInterfaceDetailW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, PSP_DEVICE_INTERFACE_DETAIL_DATA_W DeviceInterfaceDetailData, DWORD DeviceInterfaceDetailDataSize, PDWORD RequiredSize, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: BOOL SetupDiGetDeviceInterfaceDetailA ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, PSP_DEVICE_INTERFACE_DETAIL_DATA_A DeviceInterfaceDetailData, DWORD DeviceInterfaceDetailDataSize, PDWORD RequiredSize, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiGetDeviceInterfaceDetailW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, PSP_DEVICE_INTERFACE_DETAIL_DATA_W DeviceInterfaceDetailData, DWORD DeviceInterfaceDetailDataSize, PDWORD RequiredSize, PSP_DEVINFO_DATA DeviceInfoData )
 ALIAS: SetupDiGetDeviceInterfaceDetail SetupDiGetDeviceInterfaceDetailW
 
 ALIAS: SetupDiGetInterfaceDeviceDetailW SetupDiGetDeviceInterfaceDetailW
@@ -1632,38 +1632,38 @@ ALIAS: SetupDiGetInterfaceDeviceDetailA SetupDiGetDeviceInterfaceDetailA
 
 ALIAS: SetupDiGetInterfaceDeviceDetail SetupDiGetDeviceInterfaceDetailW
 
-FUNCTION: BOOL SetupDiInstallDeviceInterfaces ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: BOOL SetupDiInstallDeviceInterfaces ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
 ALIAS: SetupDiInstallInterfaceDevices SetupDiInstallDeviceInterfaces
 
-FUNCTION: BOOL SetupDiSetDeviceInterfaceDefault ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Flags, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiSetDeviceInterfaceDefault ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Flags, PVOID Reserved )
 
 CONSTANT: SPRDI_FIND_DUPS        0x00000001
 
-FUNCTION: BOOL SetupDiRegisterDeviceInfo ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Flags, PSP_DETSIG_CMPPROC CompareProc, PVOID CompareContext, PSP_DEVINFO_DATA DupDeviceInfoData ) ;
+FUNCTION: BOOL SetupDiRegisterDeviceInfo ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Flags, PSP_DETSIG_CMPPROC CompareProc, PVOID CompareContext, PSP_DEVINFO_DATA DupDeviceInfoData )
 
 CONSTANT: SPDIT_NODRIVER           0x00000000
 CONSTANT: SPDIT_CLASSDRIVER        0x00000001
 CONSTANT: SPDIT_COMPATDRIVER       0x00000002
 
-FUNCTION: BOOL SetupDiBuildDriverInfoList ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType ) ;
-FUNCTION: BOOL SetupDiCancelDriverInfoSearch ( HDEVINFO DeviceInfoSet ) ;
-FUNCTION: BOOL SetupDiEnumDriverInfoA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType, DWORD MemberIndex, PSP_DRVINFO_DATA_A DriverInfoData ) ;
-FUNCTION: BOOL SetupDiEnumDriverInfoW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType, DWORD MemberIndex, PSP_DRVINFO_DATA_W DriverInfoData ) ;
+FUNCTION: BOOL SetupDiBuildDriverInfoList ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType )
+FUNCTION: BOOL SetupDiCancelDriverInfoSearch ( HDEVINFO DeviceInfoSet )
+FUNCTION: BOOL SetupDiEnumDriverInfoA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType, DWORD MemberIndex, PSP_DRVINFO_DATA_A DriverInfoData )
+FUNCTION: BOOL SetupDiEnumDriverInfoW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType, DWORD MemberIndex, PSP_DRVINFO_DATA_W DriverInfoData )
 ALIAS: SetupDiEnumDriverInfo SetupDiEnumDriverInfoW
 
-FUNCTION: BOOL SetupDiGetSelectedDriverA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData ) ;
-FUNCTION: BOOL SetupDiGetSelectedDriverW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData ) ;
+FUNCTION: BOOL SetupDiGetSelectedDriverA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData )
+FUNCTION: BOOL SetupDiGetSelectedDriverW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData )
 ALIAS: SetupDiGetSelectedDriver SetupDiGetSelectedDriverW
 
-FUNCTION: BOOL SetupDiSetSelectedDriverA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData ) ;
-FUNCTION: BOOL SetupDiSetSelectedDriverW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData ) ;
+FUNCTION: BOOL SetupDiSetSelectedDriverA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData )
+FUNCTION: BOOL SetupDiSetSelectedDriverW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData )
 ALIAS: SetupDiSetSelectedDriver SetupDiSetSelectedDriverW
 
-FUNCTION: BOOL SetupDiGetDriverInfoDetailA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData, PSP_DRVINFO_DETAIL_DATA_A DriverInfoDetailData, DWORD DriverInfoDetailDataSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetDriverInfoDetailW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData, PSP_DRVINFO_DETAIL_DATA_W DriverInfoDetailData, DWORD DriverInfoDetailDataSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetDriverInfoDetailA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData, PSP_DRVINFO_DETAIL_DATA_A DriverInfoDetailData, DWORD DriverInfoDetailDataSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetDriverInfoDetailW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData, PSP_DRVINFO_DETAIL_DATA_W DriverInfoDetailData, DWORD DriverInfoDetailDataSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetDriverInfoDetail SetupDiGetDriverInfoDetailW
 
-FUNCTION: BOOL SetupDiDestroyDriverInfoList ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType ) ;
+FUNCTION: BOOL SetupDiDestroyDriverInfoList ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD DriverType )
 
 CONSTANT: DIGCF_DEFAULT           0x00000001
 CONSTANT: DIGCF_PRESENT           0x00000002
@@ -1672,122 +1672,122 @@ CONSTANT: DIGCF_PROFILE           0x00000008
 CONSTANT: DIGCF_DEVICEINTERFACE   0x00000010
 CONSTANT: DIGCF_INTERFACEDEVICE   $ DIGCF_DEVICEINTERFACE
 
-FUNCTION: HDEVINFO SetupDiGetClassDevsA ( GUID* ClassGuid, PCSTR Enumerator, HWND hwndParent, DWORD Flags ) ;
-FUNCTION: HDEVINFO SetupDiGetClassDevsW ( GUID* ClassGuid, PCWSTR Enumerator, HWND hwndParent, DWORD Flags ) ;
+FUNCTION: HDEVINFO SetupDiGetClassDevsA ( GUID* ClassGuid, PCSTR Enumerator, HWND hwndParent, DWORD Flags )
+FUNCTION: HDEVINFO SetupDiGetClassDevsW ( GUID* ClassGuid, PCWSTR Enumerator, HWND hwndParent, DWORD Flags )
 ALIAS: SetupDiGetClassDevs SetupDiGetClassDevsW
 
-FUNCTION: HDEVINFO SetupDiGetClassDevsExA ( GUID* ClassGuid, PCSTR Enumerator, HWND hwndParent, DWORD Flags, HDEVINFO DeviceInfoSet, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: HDEVINFO SetupDiGetClassDevsExW ( GUID* ClassGuid, PCWSTR Enumerator, HWND hwndParent, DWORD Flags, HDEVINFO DeviceInfoSet, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: HDEVINFO SetupDiGetClassDevsExA ( GUID* ClassGuid, PCSTR Enumerator, HWND hwndParent, DWORD Flags, HDEVINFO DeviceInfoSet, PCSTR MachineName, PVOID Reserved )
+FUNCTION: HDEVINFO SetupDiGetClassDevsExW ( GUID* ClassGuid, PCWSTR Enumerator, HWND hwndParent, DWORD Flags, HDEVINFO DeviceInfoSet, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetClassDevsEx SetupDiGetClassDevsExW
 
-FUNCTION: BOOL SetupDiGetINFClassA ( PCSTR InfName, LPGUID ClassGuid, PSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetINFClassW ( PCWSTR InfName, LPGUID ClassGuid, PWSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetINFClassA ( PCSTR InfName, LPGUID ClassGuid, PSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetINFClassW ( PCWSTR InfName, LPGUID ClassGuid, PWSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetINFClass SetupDiGetINFClassW
 
 CONSTANT: DIBCI_NOINSTALLCLASS   0x00000001
 CONSTANT: DIBCI_NODISPLAYCLASS   0x00000002
 
-FUNCTION: BOOL SetupDiBuildClassInfoList ( DWORD Flags, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiBuildClassInfoListExA ( DWORD Flags, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiBuildClassInfoListExW ( DWORD Flags, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiBuildClassInfoList ( DWORD Flags, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiBuildClassInfoListExA ( DWORD Flags, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiBuildClassInfoListExW ( DWORD Flags, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiBuildClassInfoListEx SetupDiBuildClassInfoListExW
 
-FUNCTION: BOOL SetupDiGetClassDescriptionA ( GUID* ClassGuid, PSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetClassDescriptionW ( GUID* ClassGuid, PWSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetClassDescriptionA ( GUID* ClassGuid, PSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetClassDescriptionW ( GUID* ClassGuid, PWSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetClassDescription SetupDiGetClassDescriptionW
 
-FUNCTION: BOOL SetupDiGetClassDescriptionExA ( GUID* ClassGuid, PSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiGetClassDescriptionExW ( GUID* ClassGuid, PWSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiGetClassDescriptionExA ( GUID* ClassGuid, PSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiGetClassDescriptionExW ( GUID* ClassGuid, PWSTR ClassDescription, DWORD ClassDescriptionSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetClassDescriptionEx SetupDiGetClassDescriptionExW
 
-FUNCTION: BOOL SetupDiCallClassInstaller ( DI_FUNCTION InstallFunction, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiSelectDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiSelectBestCompatDrv ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiInstallDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiInstallDriverFiles ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiRegisterCoDeviceInstallers ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiRemoveDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiUnremoveDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiRestartDevices ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiChangeState ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiFinishInstallAction ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: BOOL SetupDiCallClassInstaller ( DI_FUNCTION InstallFunction, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiSelectDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiSelectBestCompatDrv ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiInstallDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiInstallDriverFiles ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiRegisterCoDeviceInstallers ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiRemoveDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiUnremoveDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiRestartDevices ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiChangeState ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiFinishInstallAction ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
 
-FUNCTION: BOOL SetupDiInstallClassA ( HWND hwndParent, PCSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue ) ;
-FUNCTION: BOOL SetupDiInstallClassW ( HWND hwndParent, PCWSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue ) ;
+FUNCTION: BOOL SetupDiInstallClassA ( HWND hwndParent, PCSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue )
+FUNCTION: BOOL SetupDiInstallClassW ( HWND hwndParent, PCWSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue )
 ALIAS: SetupDiInstallClass SetupDiInstallClassW
 
-FUNCTION: BOOL SetupDiInstallClassExA ( HWND hwndParent, PCSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue, GUID* InterfaceClassGuid, PVOID Reserved1, PVOID Reserved2 ) ;
-FUNCTION: BOOL SetupDiInstallClassExW ( HWND hwndParent, PCWSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue, GUID* InterfaceClassGuid, PVOID Reserved1, PVOID Reserved2 ) ;
+FUNCTION: BOOL SetupDiInstallClassExA ( HWND hwndParent, PCSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue, GUID* InterfaceClassGuid, PVOID Reserved1, PVOID Reserved2 )
+FUNCTION: BOOL SetupDiInstallClassExW ( HWND hwndParent, PCWSTR InfFileName, DWORD Flags, HSPFILEQ FileQueue, GUID* InterfaceClassGuid, PVOID Reserved1, PVOID Reserved2 )
 ALIAS: SetupDiInstallClassEx SetupDiInstallClassExW
 
-FUNCTION: HKEY SetupDiOpenClassRegKey ( GUID* ClassGuid, REGSAM samDesired ) ;
+FUNCTION: HKEY SetupDiOpenClassRegKey ( GUID* ClassGuid, REGSAM samDesired )
 
 CONSTANT: DIOCR_INSTALLER   0x00000001
 CONSTANT: DIOCR_INTERFACE   0x00000002
 
-FUNCTION: HKEY SetupDiOpenClassRegKeyExA ( GUID* ClassGuid, REGSAM samDesired, DWORD Flags, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: HKEY SetupDiOpenClassRegKeyExW ( GUID* ClassGuid, REGSAM samDesired, DWORD Flags, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: HKEY SetupDiOpenClassRegKeyExA ( GUID* ClassGuid, REGSAM samDesired, DWORD Flags, PCSTR MachineName, PVOID Reserved )
+FUNCTION: HKEY SetupDiOpenClassRegKeyExW ( GUID* ClassGuid, REGSAM samDesired, DWORD Flags, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiOpenClassRegKeyEx SetupDiOpenClassRegKeyExW
 
-FUNCTION: HKEY SetupDiCreateDeviceInterfaceRegKeyA ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved, REGSAM samDesired, HINF InfHandle, PCSTR InfSectionName ) ;
-FUNCTION: HKEY SetupDiCreateDeviceInterfaceRegKeyW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved, REGSAM samDesired, HINF InfHandle, PCWSTR InfSectionName ) ;
+FUNCTION: HKEY SetupDiCreateDeviceInterfaceRegKeyA ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved, REGSAM samDesired, HINF InfHandle, PCSTR InfSectionName )
+FUNCTION: HKEY SetupDiCreateDeviceInterfaceRegKeyW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved, REGSAM samDesired, HINF InfHandle, PCWSTR InfSectionName )
 ALIAS: SetupDiCreateDeviceInterfaceRegKey SetupDiCreateDeviceInterfaceRegKeyW
 ALIAS: SetupDiCreateInterfaceDeviceRegKeyW SetupDiCreateDeviceInterfaceRegKeyW
 ALIAS: SetupDiCreateInterfaceDeviceRegKeyA SetupDiCreateDeviceInterfaceRegKeyA
 ALIAS: SetupDiCreateInterfaceDeviceRegKey SetupDiCreateDeviceInterfaceRegKeyW
 
-FUNCTION: HKEY SetupDiOpenDeviceInterfaceRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved, REGSAM samDesired ) ;
+FUNCTION: HKEY SetupDiOpenDeviceInterfaceRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved, REGSAM samDesired )
 ALIAS: SetupDiOpenInterfaceDeviceRegKey SetupDiOpenDeviceInterfaceRegKey
 
-FUNCTION: BOOL SetupDiDeleteDeviceInterfaceRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved ) ;
+FUNCTION: BOOL SetupDiDeleteDeviceInterfaceRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DWORD Reserved )
 ALIAS: SetupDiDeleteInterfaceDeviceRegKey SetupDiDeleteDeviceInterfaceRegKey
 
 CONSTANT: DIREG_DEV       0x00000001
 CONSTANT: DIREG_DRV       0x00000002
 CONSTANT: DIREG_BOTH      0x00000004
 
-FUNCTION: HKEY SetupDiCreateDevRegKeyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType, HINF InfHandle, PCSTR InfSectionName ) ;
-FUNCTION: HKEY SetupDiCreateDevRegKeyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType, HINF InfHandle, PCWSTR InfSectionName ) ;
+FUNCTION: HKEY SetupDiCreateDevRegKeyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType, HINF InfHandle, PCSTR InfSectionName )
+FUNCTION: HKEY SetupDiCreateDevRegKeyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType, HINF InfHandle, PCWSTR InfSectionName )
 ALIAS: SetupDiCreateDevRegKey SetupDiCreateDevRegKeyW
 
-FUNCTION: HKEY SetupDiOpenDevRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType, REGSAM samDesired ) ;
-FUNCTION: BOOL SetupDiDeleteDevRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType ) ;
-FUNCTION: BOOL SetupDiGetHwProfileList ( PDWORD HwProfileList, DWORD HwProfileListSize, PDWORD RequiredSize, PDWORD CurrentlyActiveIndex ) ;
-FUNCTION: BOOL SetupDiGetHwProfileListExA ( PDWORD HwProfileList, DWORD HwProfileListSize, PDWORD RequiredSize, PDWORD CurrentlyActiveIndex, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiGetHwProfileListExW ( PDWORD HwProfileList, DWORD HwProfileListSize, PDWORD RequiredSize, PDWORD CurrentlyActiveIndex, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: HKEY SetupDiOpenDevRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType, REGSAM samDesired )
+FUNCTION: BOOL SetupDiDeleteDevRegKey ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Scope, DWORD HwProfile, DWORD KeyType )
+FUNCTION: BOOL SetupDiGetHwProfileList ( PDWORD HwProfileList, DWORD HwProfileListSize, PDWORD RequiredSize, PDWORD CurrentlyActiveIndex )
+FUNCTION: BOOL SetupDiGetHwProfileListExA ( PDWORD HwProfileList, DWORD HwProfileListSize, PDWORD RequiredSize, PDWORD CurrentlyActiveIndex, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiGetHwProfileListExW ( PDWORD HwProfileList, DWORD HwProfileListSize, PDWORD RequiredSize, PDWORD CurrentlyActiveIndex, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetHwProfileListEx SetupDiGetHwProfileListExW
 
-FUNCTION: BOOL SetupDiGetDevicePropertyKeys ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags ) ;
-FUNCTION: BOOL SetupDiGetDevicePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags ) ;
+FUNCTION: BOOL SetupDiGetDevicePropertyKeys ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags )
+FUNCTION: BOOL SetupDiGetDevicePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags )
 ALIAS: SetupDiGetDeviceProperty SetupDiGetDevicePropertyW
 
-FUNCTION: BOOL SetupDiSetDevicePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags ) ;
+FUNCTION: BOOL SetupDiSetDevicePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags )
 ALIAS: SetupDiSetDeviceProperty SetupDiSetDevicePropertyW
 
-FUNCTION: BOOL SetupDiGetDeviceInterfacePropertyKeys ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags ) ;
-FUNCTION: BOOL SetupDiGetDeviceInterfacePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags ) ;
+FUNCTION: BOOL SetupDiGetDeviceInterfacePropertyKeys ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags )
+FUNCTION: BOOL SetupDiGetDeviceInterfacePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags )
 ALIAS: SetupDiGetDeviceInterfaceProperty SetupDiGetDeviceInterfacePropertyW
 
-FUNCTION: BOOL SetupDiSetDeviceInterfacePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags ) ;
+FUNCTION: BOOL SetupDiSetDeviceInterfacePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVICE_INTERFACE_DATA DeviceInterfaceData, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags )
 ALIAS: SetupDiSetDeviceInterfaceProperty SetupDiSetDeviceInterfacePropertyW
 
 CONSTANT: DICLASSPROP_INSTALLER   0x00000001
 CONSTANT: DICLASSPROP_INTERFACE   0x00000002
 
-FUNCTION: BOOL SetupDiGetClassPropertyKeys ( GUID* ClassGuid, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags ) ;
-FUNCTION: BOOL SetupDiGetClassPropertyKeysExW ( GUID* ClassGuid, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiGetClassPropertyKeys ( GUID* ClassGuid, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags )
+FUNCTION: BOOL SetupDiGetClassPropertyKeysExW ( GUID* ClassGuid, DEVPROPKEY* PropertyKeyArray, DWORD PropertyKeyCount, PDWORD RequiredPropertyKeyCount, DWORD Flags, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetClassPropertyKeysEx SetupDiGetClassPropertyKeysExW
 
-FUNCTION: BOOL SetupDiGetClassPropertyW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags ) ;
+FUNCTION: BOOL SetupDiGetClassPropertyW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags )
 ALIAS: SetupDiGetClassProperty SetupDiGetClassPropertyW
 
-FUNCTION: BOOL SetupDiGetClassPropertyExW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiGetClassPropertyExW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE* PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, DWORD Flags, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetClassPropertyEx SetupDiGetClassPropertyExW
 
-FUNCTION: BOOL SetupDiSetClassPropertyW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags ) ;
+FUNCTION: BOOL SetupDiSetClassPropertyW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags )
 ALIAS: SetupDiSetClassProperty SetupDiSetClassPropertyW
 
-FUNCTION: BOOL SetupDiSetClassPropertyExW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiSetClassPropertyExW ( GUID* ClassGuid, DEVPROPKEY* PropertyKey, DEVPROPTYPE PropertyType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, DWORD Flags, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiSetClassPropertyEx SetupDiSetClassPropertyExW
 
 CONSTANT: SPDRP_DEVICEDESC                  0x00000000
@@ -1837,70 +1837,70 @@ CONSTANT: SPCRP_EXCLUSIVE                   0x0000001A
 CONSTANT: SPCRP_CHARACTERISTICS             0x0000001B
 CONSTANT: SPCRP_MAXIMUM_PROPERTY            0x0000001C
 
-FUNCTION: BOOL SetupDiGetDeviceRegistryPropertyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetDeviceRegistryPropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetDeviceRegistryPropertyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetDeviceRegistryPropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetDeviceRegistryProperty SetupDiGetDeviceRegistryPropertyW
 
-FUNCTION: BOOL SetupDiGetClassRegistryPropertyA ( GUID* ClassGuid, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiGetClassRegistryPropertyW ( GUID* ClassGuid, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiGetClassRegistryPropertyA ( GUID* ClassGuid, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiGetClassRegistryPropertyW ( GUID* ClassGuid, DWORD Property, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetClassRegistryProperty SetupDiGetClassRegistryPropertyW
 
-FUNCTION: BOOL SetupDiSetDeviceRegistryPropertyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize ) ;
-FUNCTION: BOOL SetupDiSetDeviceRegistryPropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize ) ;
+FUNCTION: BOOL SetupDiSetDeviceRegistryPropertyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize )
+FUNCTION: BOOL SetupDiSetDeviceRegistryPropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize )
 ALIAS: SetupDiSetDeviceRegistryProperty SetupDiSetDeviceRegistryPropertyW
 
-FUNCTION: BOOL SetupDiSetClassRegistryPropertyA ( GUID* ClassGuid, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiSetClassRegistryPropertyW ( GUID* ClassGuid, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiSetClassRegistryPropertyA ( GUID* ClassGuid, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiSetClassRegistryPropertyW ( GUID* ClassGuid, DWORD Property, BYTE* PropertyBuffer, DWORD PropertyBufferSize, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiSetClassRegistryProperty SetupDiSetClassRegistryPropertyW
 
-FUNCTION: BOOL SetupDiGetDeviceInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_A DeviceInstallParams ) ;
-FUNCTION: BOOL SetupDiGetDeviceInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_W DeviceInstallParams ) ;
+FUNCTION: BOOL SetupDiGetDeviceInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_A DeviceInstallParams )
+FUNCTION: BOOL SetupDiGetDeviceInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_W DeviceInstallParams )
 ALIAS: SetupDiGetDeviceInstallParams SetupDiGetDeviceInstallParamsW
 
-FUNCTION: BOOL SetupDiGetClassInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetClassInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetClassInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetClassInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetClassInstallParams SetupDiGetClassInstallParamsW
 
-FUNCTION: BOOL SetupDiSetDeviceInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_A DeviceInstallParams ) ;
-FUNCTION: BOOL SetupDiSetDeviceInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_W DeviceInstallParams ) ;
+FUNCTION: BOOL SetupDiSetDeviceInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_A DeviceInstallParams )
+FUNCTION: BOOL SetupDiSetDeviceInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DEVINSTALL_PARAMS_W DeviceInstallParams )
 ALIAS: SetupDiSetDeviceInstallParams SetupDiSetDeviceInstallParamsW
 
-FUNCTION: BOOL SetupDiSetClassInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize ) ;
-FUNCTION: BOOL SetupDiSetClassInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize ) ;
+FUNCTION: BOOL SetupDiSetClassInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize )
+FUNCTION: BOOL SetupDiSetClassInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_CLASSINSTALL_HEADER ClassInstallParams, DWORD ClassInstallParamsSize )
 ALIAS: SetupDiSetClassInstallParams SetupDiSetClassInstallParamsW
 
-FUNCTION: BOOL SetupDiGetDriverInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams ) ;
-FUNCTION: BOOL SetupDiGetDriverInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams ) ;
+FUNCTION: BOOL SetupDiGetDriverInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams )
+FUNCTION: BOOL SetupDiGetDriverInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams )
 ALIAS: SetupDiGetDriverInstallParams SetupDiGetDriverInstallParamsW
 
-FUNCTION: BOOL SetupDiSetDriverInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams ) ;
-FUNCTION: BOOL SetupDiSetDriverInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams ) ;
+FUNCTION: BOOL SetupDiSetDriverInstallParamsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_A DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams )
+FUNCTION: BOOL SetupDiSetDriverInstallParamsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_DRVINFO_DATA_W DriverInfoData, PSP_DRVINSTALL_PARAMS DriverInstallParams )
 ALIAS: SetupDiSetDriverInstallParams SetupDiSetDriverInstallParamsW
 
-FUNCTION: BOOL SetupDiLoadClassIcon ( GUID* ClassGuid, HICON* LargeIcon, PINT MiniIconIndex ) ;
-FUNCTION: BOOL SetupDiLoadDeviceIcon ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, UINT cxIcon, UINT cyIcon, DWORD Flags, HICON* hIcon ) ;
+FUNCTION: BOOL SetupDiLoadClassIcon ( GUID* ClassGuid, HICON* LargeIcon, PINT MiniIconIndex )
+FUNCTION: BOOL SetupDiLoadDeviceIcon ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, UINT cxIcon, UINT cyIcon, DWORD Flags, HICON* hIcon )
 
 CONSTANT: DMI_MASK      0x00000001
 CONSTANT: DMI_BKCOLOR   0x00000002
 CONSTANT: DMI_USERECT   0x00000004
 
-FUNCTION: INT SetupDiDrawMiniIcon ( HDC hdc, RECT rc, INT MiniIconIndex, DWORD Flags ) ;
-FUNCTION: BOOL SetupDiGetClassBitmapIndex ( GUID* ClassGuid, PINT MiniIconIndex ) ;
-FUNCTION: BOOL SetupDiGetClassImageList ( PSP_CLASSIMAGELIST_DATA ClassImageListData ) ;
-FUNCTION: BOOL SetupDiGetClassImageListExA ( PSP_CLASSIMAGELIST_DATA ClassImageListData, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiGetClassImageListExW ( PSP_CLASSIMAGELIST_DATA ClassImageListData, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: INT SetupDiDrawMiniIcon ( HDC hdc, RECT rc, INT MiniIconIndex, DWORD Flags )
+FUNCTION: BOOL SetupDiGetClassBitmapIndex ( GUID* ClassGuid, PINT MiniIconIndex )
+FUNCTION: BOOL SetupDiGetClassImageList ( PSP_CLASSIMAGELIST_DATA ClassImageListData )
+FUNCTION: BOOL SetupDiGetClassImageListExA ( PSP_CLASSIMAGELIST_DATA ClassImageListData, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiGetClassImageListExW ( PSP_CLASSIMAGELIST_DATA ClassImageListData, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetClassImageListEx SetupDiGetClassImageListExW
 
-FUNCTION: BOOL SetupDiGetClassImageIndex ( PSP_CLASSIMAGELIST_DATA ClassImageListData, GUID* ClassGuid, PINT ImageIndex ) ;
-FUNCTION: BOOL SetupDiDestroyClassImageList ( PSP_CLASSIMAGELIST_DATA ClassImageListData ) ;
+FUNCTION: BOOL SetupDiGetClassImageIndex ( PSP_CLASSIMAGELIST_DATA ClassImageListData, GUID* ClassGuid, PINT ImageIndex )
+FUNCTION: BOOL SetupDiDestroyClassImageList ( PSP_CLASSIMAGELIST_DATA ClassImageListData )
 
 CONSTANT: DIGCDP_FLAG_BASIC           0x00000001
 CONSTANT: DIGCDP_FLAG_ADVANCED        0x00000002
 CONSTANT: DIGCDP_FLAG_REMOTE_BASIC    0x00000003
 CONSTANT: DIGCDP_FLAG_REMOTE_ADVANCED 0x00000004
 
-FUNCTION: BOOL SetupDiGetClassDevPropertySheetsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, LPPROPSHEETHEADERA PropertySheetHeader, DWORD PropertySheetHeaderPageListSize, PDWORD RequiredSize, DWORD PropertySheetType ) ;
-FUNCTION: BOOL SetupDiGetClassDevPropertySheetsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, LPPROPSHEETHEADERW PropertySheetHeader, DWORD PropertySheetHeaderPageListSize, PDWORD RequiredSize, DWORD PropertySheetType ) ;
+FUNCTION: BOOL SetupDiGetClassDevPropertySheetsA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, LPPROPSHEETHEADERA PropertySheetHeader, DWORD PropertySheetHeaderPageListSize, PDWORD RequiredSize, DWORD PropertySheetType )
+FUNCTION: BOOL SetupDiGetClassDevPropertySheetsW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, LPPROPSHEETHEADERW PropertySheetHeader, DWORD PropertySheetHeaderPageListSize, PDWORD RequiredSize, DWORD PropertySheetType )
 ALIAS: SetupDiGetClassDevPropertySheets SetupDiGetClassDevPropertySheetsW
 
 CONSTANT: IDI_RESOURCEFIRST           159
@@ -1915,54 +1915,54 @@ CONSTANT: IDI_PROBLEM_OVL             500
 CONSTANT: IDI_DISABLED_OVL            501
 CONSTANT: IDI_FORCED_OVL              502
 
-FUNCTION: BOOL SetupDiAskForOEMDisk ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiSelectOEMDrv ( HWND hwndParent, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiClassNameFromGuidA ( GUID* ClassGuid, PSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiClassNameFromGuidW ( GUID* ClassGuid, PWSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiAskForOEMDisk ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiSelectOEMDrv ( HWND hwndParent, HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiClassNameFromGuidA ( GUID* ClassGuid, PSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiClassNameFromGuidW ( GUID* ClassGuid, PWSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize )
 ALIAS: SetupDiClassNameFromGuid SetupDiClassNameFromGuidW
 
-FUNCTION: BOOL SetupDiClassNameFromGuidExA ( GUID* ClassGuid, PSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiClassNameFromGuidExW ( GUID* ClassGuid, PWSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiClassNameFromGuidExA ( GUID* ClassGuid, PSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiClassNameFromGuidExW ( GUID* ClassGuid, PWSTR ClassName, DWORD ClassNameSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiClassNameFromGuidEx SetupDiClassNameFromGuidExW
 
-FUNCTION: BOOL SetupDiClassGuidsFromNameA ( PCSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiClassGuidsFromNameW ( PCWSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiClassGuidsFromNameA ( PCSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiClassGuidsFromNameW ( PCWSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize )
 ALIAS: SetupDiClassGuidsFromName SetupDiClassGuidsFromNameW
 
-FUNCTION: BOOL SetupDiClassGuidsFromNameExA ( PCSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiClassGuidsFromNameExW ( PCWSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiClassGuidsFromNameExA ( PCSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiClassGuidsFromNameExW ( PCWSTR ClassName, LPGUID ClassGuidList, DWORD ClassGuidListSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiClassGuidsFromNameEx SetupDiClassGuidsFromNameExW
 
-FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameA ( DWORD HwProfile, PSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameW ( DWORD HwProfile, PWSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameA ( DWORD HwProfile, PSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameW ( DWORD HwProfile, PWSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetHwProfileFriendlyName SetupDiGetHwProfileFriendlyNameW
 
-FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameExA ( DWORD HwProfile, PSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameExW ( DWORD HwProfile, PWSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameExA ( DWORD HwProfile, PSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize, PCSTR MachineName, PVOID Reserved )
+FUNCTION: BOOL SetupDiGetHwProfileFriendlyNameExW ( DWORD HwProfile, PWSTR FriendlyName, DWORD FriendlyNameSize, PDWORD RequiredSize, PCWSTR MachineName, PVOID Reserved )
 ALIAS: SetupDiGetHwProfileFriendlyNameEx SetupDiGetHwProfileFriendlyNameExW
 
 CONSTANT: SPWPT_SELECTDEVICE      0x00000001
 CONSTANT: SPWP_USE_DEVINFO_DATA   0x00000001
 
-FUNCTION: HPROPSHEETPAGE SetupDiGetWizardPage ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_INSTALLWIZARD_DATA InstallWizardData, DWORD PageType, DWORD Flags ) ;
-FUNCTION: BOOL SetupDiGetSelectedDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
-FUNCTION: BOOL SetupDiSetSelectedDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData ) ;
+FUNCTION: HPROPSHEETPAGE SetupDiGetWizardPage ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PSP_INSTALLWIZARD_DATA InstallWizardData, DWORD PageType, DWORD Flags )
+FUNCTION: BOOL SetupDiGetSelectedDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
+FUNCTION: BOOL SetupDiSetSelectedDevice ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData )
 
-FUNCTION: BOOL SetupDiGetActualModelsSectionA ( PINFCONTEXT Context, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiGetActualModelsSectionW ( PINFCONTEXT Context, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PWSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiGetActualModelsSectionA ( PINFCONTEXT Context, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PVOID Reserved )
+FUNCTION: BOOL SetupDiGetActualModelsSectionW ( PINFCONTEXT Context, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PWSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PVOID Reserved )
 
 ALIAS: SetupDiGetActualModelsSection SetupDiGetActualModelsSectionW
 
-FUNCTION: BOOL SetupDiGetActualSectionToInstallA ( HINF InfHandle, PCSTR InfSectionName, PSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PSTR* Extension ) ;
-FUNCTION: BOOL SetupDiGetActualSectionToInstallW ( HINF InfHandle, PCWSTR InfSectionName, PWSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PWSTR* Extension ) ;
+FUNCTION: BOOL SetupDiGetActualSectionToInstallA ( HINF InfHandle, PCSTR InfSectionName, PSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PSTR* Extension )
+FUNCTION: BOOL SetupDiGetActualSectionToInstallW ( HINF InfHandle, PCWSTR InfSectionName, PWSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PWSTR* Extension )
 ALIAS: SetupDiGetActualSectionToInstall SetupDiGetActualSectionToInstallW
 
-FUNCTION: BOOL SetupDiGetActualSectionToInstallExA ( HINF InfHandle, PCSTR InfSectionName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PSTR* Extension, PVOID Reserved ) ;
-FUNCTION: BOOL SetupDiGetActualSectionToInstallExW ( HINF InfHandle, PCWSTR InfSectionName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PWSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PWSTR* Extension, PVOID Reserved ) ;
+FUNCTION: BOOL SetupDiGetActualSectionToInstallExA ( HINF InfHandle, PCSTR InfSectionName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PSTR* Extension, PVOID Reserved )
+FUNCTION: BOOL SetupDiGetActualSectionToInstallExW ( HINF InfHandle, PCWSTR InfSectionName, PSP_ALTPLATFORM_INFO AlternatePlatformInfo, PWSTR InfSectionWithExt, DWORD InfSectionWithExtSize, PDWORD RequiredSize, PWSTR* Extension, PVOID Reserved )
 ALIAS: SetupDiGetActualSectionToInstallEx SetupDiGetActualSectionToInstallExW
 
-FUNCTION: BOOL SetupEnumInfSectionsA ( HINF InfHandle, UINT Index, PSTR Buffer, UINT Size, UINT* SizeNeeded ) ;
-FUNCTION: BOOL SetupEnumInfSectionsW ( HINF InfHandle, UINT Index, PWSTR Buffer, UINT Size, UINT* SizeNeeded ) ;
+FUNCTION: BOOL SetupEnumInfSectionsA ( HINF InfHandle, UINT Index, PSTR Buffer, UINT Size, UINT* SizeNeeded )
+FUNCTION: BOOL SetupEnumInfSectionsW ( HINF InfHandle, UINT Index, PWSTR Buffer, UINT Size, UINT* SizeNeeded )
 ALIAS: SetupEnumInfSections SetupEnumInfSectionsW
 
 STRUCT: SP_INF_SIGNER_INFO_V1_A
@@ -2017,16 +2017,16 @@ TYPEDEF: PSP_INF_SIGNER_INFO_V2_W PSP_INF_SIGNER_INFO_W
 TYPEDEF: SP_INF_SIGNER_INFO_V2    SP_INF_SIGNER_INFO
 TYPEDEF: PSP_INF_SIGNER_INFO_V2   PSP_INF_SIGNER_INFO
 
-FUNCTION: BOOL SetupVerifyInfFileA ( PCSTR InfName, PSP_ALTPLATFORM_INFO AltPlatformInfo, PSP_INF_SIGNER_INFO_A InfSignerInfo ) ;
-FUNCTION: BOOL SetupVerifyInfFileW ( PCWSTR InfName, PSP_ALTPLATFORM_INFO AltPlatformInfo, PSP_INF_SIGNER_INFO_W InfSignerInfo ) ;
+FUNCTION: BOOL SetupVerifyInfFileA ( PCSTR InfName, PSP_ALTPLATFORM_INFO AltPlatformInfo, PSP_INF_SIGNER_INFO_A InfSignerInfo )
+FUNCTION: BOOL SetupVerifyInfFileW ( PCWSTR InfName, PSP_ALTPLATFORM_INFO AltPlatformInfo, PSP_INF_SIGNER_INFO_W InfSignerInfo )
 ALIAS: SetupVerifyInfFile SetupVerifyInfFileW
 
 CONSTANT: DICUSTOMDEVPROP_MERGE_MULTISZ    0x00000001
-FUNCTION: BOOL SetupDiGetCustomDevicePropertyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PCSTR CustomPropertyName, DWORD Flags, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize ) ;
-FUNCTION: BOOL SetupDiGetCustomDevicePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PCWSTR CustomPropertyName, DWORD Flags, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize ) ;
+FUNCTION: BOOL SetupDiGetCustomDevicePropertyA ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PCSTR CustomPropertyName, DWORD Flags, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize )
+FUNCTION: BOOL SetupDiGetCustomDevicePropertyW ( HDEVINFO DeviceInfoSet, PSP_DEVINFO_DATA DeviceInfoData, PCWSTR CustomPropertyName, DWORD Flags, PDWORD PropertyRegDataType, PBYTE PropertyBuffer, DWORD PropertyBufferSize, PDWORD RequiredSize )
 ALIAS: SetupDiGetCustomDeviceProperty SetupDiGetCustomDevicePropertyW
 
 CONSTANT: SCWMI_CLOBBER_SECURITY  0x00000001
-FUNCTION: BOOL SetupConfigureWmiFromInfSectionA ( HINF InfHandle, PCSTR SectionName, DWORD Flags ) ;
-FUNCTION: BOOL SetupConfigureWmiFromInfSectionW ( HINF InfHandle, PCWSTR SectionName, DWORD Flags ) ;
+FUNCTION: BOOL SetupConfigureWmiFromInfSectionA ( HINF InfHandle, PCSTR SectionName, DWORD Flags )
+FUNCTION: BOOL SetupConfigureWmiFromInfSectionW ( HINF InfHandle, PCWSTR SectionName, DWORD Flags )
 ALIAS: SetupConfigureWmiFromInfSection SetupConfigureWmiFromInfSectionW

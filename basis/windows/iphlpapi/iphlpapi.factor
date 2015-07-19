@@ -356,19 +356,19 @@ STRUCT: IP_ADAPTER_INDEX_MAP
     { Name WCHAR[MAX_ADAPTER_NAME] } ;
 TYPEDEF: IP_ADAPTER_INDEX_MAP* PIP_ADAPTER_INDEX_MAP
 
-FUNCTION: DWORD IpReleaseAddress ( PIP_ADAPTER_INDEX_MAP AdapterInfo ) ;
-FUNCTION: DWORD IpRenewAddress ( PIP_ADAPTER_INDEX_MAP AdapterInfo ) ;
+FUNCTION: DWORD IpReleaseAddress ( PIP_ADAPTER_INDEX_MAP AdapterInfo )
+FUNCTION: DWORD IpRenewAddress ( PIP_ADAPTER_INDEX_MAP AdapterInfo )
 
 
 FUNCTION: DWORD GetBestInterface (
    IPAddr dwDestAddr,
    PDWORD pdwBestIfIndex
-) ;
+)
 
 FUNCTION: DWORD GetBestInterfaceEx (
     sockaddr* pDestAddr,
     PDWORD pdwBestIfIndex
-) ;
+)
 
 FUNCTION: ULONG GetAdaptersAddresses (
     ULONG Family,
@@ -376,14 +376,14 @@ FUNCTION: ULONG GetAdaptersAddresses (
     PVOID Reserved,
     PIP_ADAPTER_ADDRESSES AdapterAddresses,
     PULONG SizePointer
-) ;
+)
 
 ! Deprecated
 FUNCTION: DWORD GetAdaptersInfo (
     PIP_ADAPTER_INFO pAdapterInfo,
-    PULONG pOutBufLen ) ;
+    PULONG pOutBufLen )
 
-FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen ) ;
+FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen )
 
 : get-fixed-info ( -- FIXED_INFO )
     FIXED_INFO <struct> dup byte-length ulong <ref>

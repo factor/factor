@@ -106,7 +106,7 @@ CONSTANT: SIGABRT_COMPAT  6
 
 LIBRARY: libc
 
-FUNCTION: int strerror_s ( char *buffer, size_t numberOfElements, int errnum ) ;
+FUNCTION: int strerror_s ( char *buffer, size_t numberOfElements, int errnum )
 
 M: windows strerror ( errno -- str )
     [

@@ -365,14 +365,14 @@ FUNCTION: NTSTATUS
 HidP_GetCaps (
    PHIDP_PREPARSED_DATA      PreparsedData,
    PHIDP_CAPS                Capabilities
-   ) ;
+   )
 
 FUNCTION: NTSTATUS
 HidP_GetLinkCollectionNodes (
    PHIDP_LINK_COLLECTION_NODE LinkCollectionNodes,
    PULONG                     LinkCollectionNodesLength,
    PHIDP_PREPARSED_DATA       PreparsedData
-   ) ;
+   )
 
 FUNCTION: NTSTATUS
 HidP_GetSpecificButtonCaps (
@@ -383,7 +383,7 @@ HidP_GetSpecificButtonCaps (
    PHIDP_BUTTON_CAPS    ButtonCaps,
    PUSHORT              ButtonCapsLength,
    PHIDP_PREPARSED_DATA PreparsedData
-   ) ;
+   )
 
 FUNCTION: NTSTATUS
 HidP_GetButtonCaps (
@@ -391,7 +391,7 @@ HidP_GetButtonCaps (
    PHIDP_BUTTON_CAPS    ButtonCaps,
    PUSHORT              ButtonCapsLength,
    PHIDP_PREPARSED_DATA PreparsedData
-) ;
+)
 
 FUNCTION: NTSTATUS
 HidP_GetSpecificValueCaps (
@@ -402,7 +402,7 @@ HidP_GetSpecificValueCaps (
    PHIDP_VALUE_CAPS     ValueCaps,
    PUSHORT              ValueCapsLength,
    PHIDP_PREPARSED_DATA PreparsedData
-   ) ;
+   )
 
 FUNCTION: NTSTATUS
 HidP_GetValueCaps (
@@ -410,7 +410,7 @@ HidP_GetValueCaps (
    PHIDP_VALUE_CAPS     ValueCaps,
    PUSHORT              ValueCapsLength,
    PHIDP_PREPARSED_DATA PreparsedData
-) ;
+)
 
 FUNCTION: NTSTATUS
 HidP_GetExtendedAttributes (
@@ -419,7 +419,7 @@ HidP_GetExtendedAttributes (
     PHIDP_PREPARSED_DATA        PreparsedData,
     PHIDP_EXTENDED_ATTRIBUTES   Attributes,
     PULONG                      LengthAttributes
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_InitializeReportForID (
@@ -428,7 +428,7 @@ HidP_InitializeReportForID (
    PHIDP_PREPARSED_DATA PreparsedData,
    PCHAR                Report,
    ULONG                ReportLength
-   ) ;
+   )
 
 FUNCTION: NTSTATUS
 HidP_SetData (
@@ -438,7 +438,7 @@ HidP_SetData (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_GetData (
@@ -448,13 +448,13 @@ HidP_GetData (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 FUNCTION: ULONG
 HidP_MaxDataListLength (
    HIDP_REPORT_TYPE      ReportType,
    PHIDP_PREPARSED_DATA  PreparsedData
-   ) ;
+   )
 
 FUNCTION: NTSTATUS
 HidP_SetUsages (
@@ -466,7 +466,7 @@ HidP_SetUsages (
    PHIDP_PREPARSED_DATA PreparsedData,
    PCHAR                Report,
    ULONG                ReportLength
-   ) ;
+   )
 ALIAS: HidP_SetButtons HidP_SetUsages
 
 FUNCTION: NTSTATUS
@@ -479,7 +479,7 @@ HidP_UnsetUsages (
    PHIDP_PREPARSED_DATA PreparsedData,
    PCHAR                Report,
    ULONG                ReportLength
-   ) ;
+   )
 ALIAS: HidP_UnsetButtons HidP_UnsetUsages
 
 FUNCTION: NTSTATUS
@@ -492,7 +492,7 @@ HidP_GetUsages (
    PHIDP_PREPARSED_DATA PreparsedData,
    PCHAR                Report,
    ULONG                ReportLength
-   ) ;
+   )
 ALIAS: HidP_GetButtons HidP_GetUsages
 
 FUNCTION: NTSTATUS
@@ -504,7 +504,7 @@ HidP_GetUsagesEx (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-   ) ;
+   )
 ALIAS: HidP_GetButtonsEx HidP_GetUsagesEx
 
 FUNCTION: ULONG
@@ -512,7 +512,7 @@ HidP_MaxUsageListLength (
    HIDP_REPORT_TYPE      ReportType,
    USAGE                 UsagePage,
    PHIDP_PREPARSED_DATA  PreparsedData
-   ) ;
+   )
 
 FUNCTION: NTSTATUS
 HidP_SetUsageValue (
@@ -524,7 +524,7 @@ HidP_SetUsageValue (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_SetScaledUsageValue (
@@ -536,7 +536,7 @@ HidP_SetScaledUsageValue (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_SetUsageValueArray (
@@ -549,7 +549,7 @@ HidP_SetUsageValueArray (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 
 FUNCTION: NTSTATUS
@@ -562,7 +562,7 @@ HidP_GetUsageValue (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_GetScaledUsageValue (
@@ -574,7 +574,7 @@ HidP_GetScaledUsageValue (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_GetUsageValueArray (
@@ -587,7 +587,7 @@ HidP_GetUsageValueArray (
     PHIDP_PREPARSED_DATA PreparsedData,
     PCHAR                Report,
     ULONG                ReportLength
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_UsageListDifference (
@@ -596,7 +596,7 @@ HidP_UsageListDifference (
    PUSAGE   BreakUsageList,
    PUSAGE   MakeUsageList,
    ULONG    UsageListLength
-    ) ;
+    )
 
 FUNCTION: NTSTATUS
 HidP_UsageAndPageListDifference (
@@ -605,7 +605,7 @@ HidP_UsageAndPageListDifference (
    PUSAGE_AND_PAGE BreakUsageList,
    PUSAGE_AND_PAGE MakeUsageList,
    ULONG           UsageListLength
-   ) ;
+   )
 
 ENUM: HIDP_KEYBOARD_DIRECTION
     HidP_Keyboard_Break
@@ -618,7 +618,7 @@ TYPEDEF: HIDP_KEYBOARD_MODIFIER_STATE* PHIDP_KEYBOARD_MODIFIER_STATE
 CALLBACK: BOOLEAN PHIDP_INSERT_SCANCODES (
     PVOID Context,
     PCHAR NewScanCodes,
-    ULONG Length ) ;
+    ULONG Length )
 
 FUNCTION: NTSTATUS
 HidP_TranslateUsageAndPagesToI8042ScanCodes (
@@ -628,7 +628,7 @@ HidP_TranslateUsageAndPagesToI8042ScanCodes (
     PHIDP_KEYBOARD_MODIFIER_STATE ModifierState,
     PHIDP_INSERT_SCANCODES        InsertCodesProcedure,
     PVOID                         InsertCodesContext
-    ) ;
+    )
 
 
 FUNCTION: NTSTATUS
@@ -639,7 +639,7 @@ HidP_TranslateUsagesToI8042ScanCodes (
     PHIDP_KEYBOARD_MODIFIER_STATE ModifierState,
     PHIDP_INSERT_SCANCODES        InsertCodesProcedure,
     PVOID                         InsertCodesContext
-    ) ;
+    )
 
 CONSTANT: FACILITY_HID_ERROR_CODE 0x11
 : HIDP_ERROR_CODES ( SEV CODE -- HRESULT )
@@ -682,103 +682,103 @@ FUNCTION: BOOLEAN
 HidD_GetAttributes (
     HANDLE              HidDeviceObject,
     PHIDD_ATTRIBUTES    Attributes
-    ) ;
+    )
 
 FUNCTION: void
 HidD_GetHidGuid (
    LPGUID   HidGuid
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetPreparsedData (
    HANDLE                HidDeviceObject,
    PHIDP_PREPARSED_DATA* PreparsedData
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_FreePreparsedData (
    PHIDP_PREPARSED_DATA PreparsedData
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_FlushQueue (
    HANDLE                HidDeviceObject
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetConfiguration (
    HANDLE               HidDeviceObject,
    PHIDD_CONFIGURATION  Configuration,
    ULONG                ConfigurationLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_SetConfiguration (
    HANDLE               HidDeviceObject,
    PHIDD_CONFIGURATION  Configuration,
    ULONG                ConfigurationLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetFeature (
    HANDLE   HidDeviceObject,
    PVOID    ReportBuffer,
    ULONG    ReportBufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_SetFeature (
    HANDLE   HidDeviceObject,
    PVOID    ReportBuffer,
    ULONG    ReportBufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetInputReport (
    HANDLE   HidDeviceObject,
    PVOID    ReportBuffer,
    ULONG    ReportBufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_SetOutputReport (
    HANDLE   HidDeviceObject,
    PVOID    ReportBuffer,
    ULONG    ReportBufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetNumInputBuffers (
     HANDLE  HidDeviceObject,
     PULONG  NumberBuffers
-    ) ;
+    )
 
 FUNCTION: BOOLEAN
 HidD_SetNumInputBuffers (
     HANDLE HidDeviceObject,
     ULONG  NumberBuffers
-    ) ;
+    )
 
 FUNCTION: BOOLEAN
 HidD_GetPhysicalDescriptor (
    HANDLE   HidDeviceObject,
    PVOID    Buffer,
    ULONG    BufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetManufacturerString (
    HANDLE   HidDeviceObject,
    PVOID    Buffer,
    ULONG    BufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetProductString (
    HANDLE   HidDeviceObject,
    PVOID    Buffer,
    ULONG    BufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetIndexedString (
@@ -786,18 +786,18 @@ HidD_GetIndexedString (
    ULONG    StringIndex,
    PVOID    Buffer,
    ULONG    BufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetSerialNumberString (
    HANDLE   HidDeviceObject,
    PVOID    Buffer,
    ULONG    BufferLength
-   ) ;
+   )
 
 FUNCTION: BOOLEAN
 HidD_GetMsGenreDescriptor (
    HANDLE   HidDeviceObject,
    PVOID    Buffer,
    ULONG    BufferLength
-   ) ;
+   )

@@ -77,4 +77,4 @@ STRUCT: FXECHO_PARAMETERS
     { Feedback  float }
     { Delay     float } ;
 
-FUNCTION: HRESULT CreateFX ( REFCLSID clsid, IUnknown** pEffect ) ;
+FUNCTION: HRESULT CreateFX ( REFCLSID clsid, IUnknown** pEffect )

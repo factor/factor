@@ -15,7 +15,7 @@ FUNCTION: GtkWidget* gtk_file_chooser_dialog_new (
     gint* first_button_response,
     gchar* second_button_text,
     gint* second_button_response,
-    void* sentinel ) ;
+    void* sentinel )
 
 : <gtk-file-chooser-dialog> ( title action -- dialog )
     [

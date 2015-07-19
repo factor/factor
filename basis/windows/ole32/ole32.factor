@@ -20,10 +20,10 @@ TYPEDEF: REFGUID LPGUID
 TYPEDEF: REFGUID REFIID
 TYPEDEF: REFGUID REFCLSID
 
-FUNCTION: HRESULT CoCreateInstance ( REFGUID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFGUID riid, LPUNKNOWN out_ppv ) ;
-FUNCTION: BOOL IsEqualGUID ( REFGUID rguid1, REFGUID rguid2 ) ;
-FUNCTION: int StringFromGUID2 ( REFGUID rguid, LPOLESTR lpsz, int cchMax ) ;
-FUNCTION: HRESULT CLSIDFromString ( LPOLESTR lpsz, REFGUID out_rguid ) ;
+FUNCTION: HRESULT CoCreateInstance ( REFGUID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFGUID riid, LPUNKNOWN out_ppv )
+FUNCTION: BOOL IsEqualGUID ( REFGUID rguid1, REFGUID rguid2 )
+FUNCTION: int StringFromGUID2 ( REFGUID rguid, LPOLESTR lpsz, int cchMax )
+FUNCTION: HRESULT CLSIDFromString ( LPOLESTR lpsz, REFGUID out_rguid )
 
 CONSTANT: S_OK 0
 CONSTANT: S_FALSE 1
@@ -111,8 +111,8 @@ CONSTANT: COINIT_APARTMENTTHREADED 2
 CONSTANT: COINIT_DISABLE_OLE1DDE   4
 CONSTANT: COINIT_SPEED_OVER_MEMORY 8
 
-FUNCTION: HRESULT OleInitialize ( void* reserved ) ;
-FUNCTION: HRESULT CoInitializeEx ( void* reserved, DWORD dwCoInit ) ;
+FUNCTION: HRESULT OleInitialize ( void* reserved )
+FUNCTION: HRESULT CoInitializeEx ( void* reserved, DWORD dwCoInit )
 
 : succeeded? ( hresult -- ? )
     0 0x7FFFFFFF between? ;

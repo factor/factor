@@ -10,7 +10,7 @@ SINGLETON: gtk-game-input-backend
 gtk-game-input-backend game-input-backend set-global
 
 LIBRARY: gdk
-FUNCTION: Display* gdk_x11_display_get_xdisplay ( GdkDisplay* display ) ;
+FUNCTION: Display* gdk_x11_display_get_xdisplay ( GdkDisplay* display )
 
 : get-dpy ( -- dpy )
     gdk_display_get_default gdk_x11_display_get_xdisplay ;

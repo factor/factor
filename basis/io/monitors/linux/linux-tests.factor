@@ -8,7 +8,7 @@ destructors io.timeouts accessors ;
 ! path name
 [
     [ ] [ "monitor-test-self" temp-file make-directories ] unit-test
-    
+
     ! Non-recursive
     [ ] [ "monitor-test-self" temp-file f <monitor> "m" set ] unit-test
     [ ] [ 3 seconds "m" get set-timeout ] unit-test
@@ -21,7 +21,7 @@ destructors io.timeouts accessors ;
     ] unit-test
 
     [ ] [ "m" get dispose ] unit-test
-    
+
     ! Recursive
     [ ] [ "monitor-test-self" temp-file t <monitor> "m" set ] unit-test
     [ ] [ 3 seconds "m" get set-timeout ] unit-test

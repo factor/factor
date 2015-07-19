@@ -21,9 +21,9 @@ STRUCT: stat
     { st_ctimespec timespec }
     { __unused0 long[3] } ;
 
-FUNCTION: int __xstat64  ( int ver, c-string pathname, stat* buf ) ;
-FUNCTION: int __lxstat64 ( int ver, c-string pathname, stat* buf ) ;
-FUNCTION: int __fxstat64 ( int ver, int fd, stat* buf ) ;
+FUNCTION: int __xstat64  ( int ver, c-string pathname, stat* buf )
+FUNCTION: int __lxstat64 ( int ver, c-string pathname, stat* buf )
+FUNCTION: int __fxstat64 ( int ver, int fd, stat* buf )
 
 :  stat-func ( pathname buf -- int ) [ 1 ] 2dip __xstat64 ;
 : lstat ( pathname buf -- int ) [ 1 ] 2dip __lxstat64 ;

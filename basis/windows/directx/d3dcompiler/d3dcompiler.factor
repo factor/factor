@@ -21,7 +21,7 @@ FUNCTION: HRESULT D3DCompile (
     UINT              Flags1,
     UINT              Flags2,
     LPD3DBLOB*        ppCode,
-    LPD3DBLOB*        ppErrorMsgs ) ;
+    LPD3DBLOB*        ppErrorMsgs )
 
 FUNCTION: HRESULT D3DPreprocess (
     LPCVOID           pSrcData,
@@ -30,18 +30,18 @@ FUNCTION: HRESULT D3DPreprocess (
     D3D_SHADER_MACRO* pDefines,
     LPD3DINCLUDE      pInclude,
     LPD3DBLOB*        ppCodeText,
-    LPD3DBLOB*        ppErrorMsgs ) ;
+    LPD3DBLOB*        ppErrorMsgs )
 
 FUNCTION: HRESULT D3DGetDebugInfo (
     LPCVOID    pSrcData,
     SIZE_T     SrcDataSize,
-    LPD3DBLOB* ppDebugInfo ) ;
+    LPD3DBLOB* ppDebugInfo )
 
 FUNCTION: HRESULT D3DReflect (
     LPCVOID    pSrcData,
     SIZE_T     SrcDataSize,
     REFIID     pInterface,
-    void**     ppReflector ) ;
+    void**     ppReflector )
 
 CONSTANT: D3D_DISASM_ENABLE_COLOR_CODE            1
 CONSTANT: D3D_DISASM_ENABLE_DEFAULT_VALUE_PRINTS  2
@@ -53,27 +53,27 @@ FUNCTION: HRESULT D3DDisassemble (
     SIZE_T     SrcDataSize,
     UINT       Flags,
     LPCSTR     szComments,
-    LPD3DBLOB* ppDisassembly ) ;
+    LPD3DBLOB* ppDisassembly )
 
 FUNCTION: HRESULT D3DDisassemble10Effect (
     ID3D10Effect* pEffect,
     UINT          Flags,
-    LPD3DBLOB*    ppDisassembly ) ;
+    LPD3DBLOB*    ppDisassembly )
 
 FUNCTION: HRESULT D3DGetInputSignatureBlob (
     LPCVOID    pSrcData,
     SIZE_T     SrcDataSize,
-    LPD3DBLOB* ppSignatureBlob ) ;
+    LPD3DBLOB* ppSignatureBlob )
 
 FUNCTION: HRESULT D3DGetOutputSignatureBlob (
     LPCVOID    pSrcData,
     SIZE_T     SrcDataSize,
-    LPD3DBLOB* ppSignatureBlob ) ;
+    LPD3DBLOB* ppSignatureBlob )
 
 FUNCTION: HRESULT D3DGetInputAndOutputSignatureBlob (
     LPCVOID    pSrcData,
     SIZE_T     SrcDataSize,
-    LPD3DBLOB* ppSignatureBlob ) ;
+    LPD3DBLOB* ppSignatureBlob )
 
 CONSTANT: D3DCOMPILER_STRIP_REFLECTION_DATA 1
 CONSTANT: D3DCOMPILER_STRIP_DEBUG_INFO      2
@@ -85,4 +85,4 @@ FUNCTION: HRESULT D3DStripShader (
     LPCVOID    pShaderBytecode,
     SIZE_T     BytecodeLength,
     UINT       uStripFlags,
-    LPD3DBLOB* ppStrippedBlob ) ;
+    LPD3DBLOB* ppStrippedBlob )

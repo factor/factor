@@ -66,12 +66,12 @@ STRUCT: D3DXIMAGE_INFO
 FUNCTION: HRESULT
     D3DXGetImageInfoFromFileA (
         LPCSTR                    pSrcFile,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXGetImageInfoFromFileW (
         LPCWSTR                   pSrcFile,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 ALIAS: D3DXGetImageInfoFromFile D3DXGetImageInfoFromFileW
 
@@ -79,13 +79,13 @@ FUNCTION: HRESULT
     D3DXGetImageInfoFromResourceA (
         HMODULE                   hSrcModule,
         LPCSTR                    pSrcResource,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXGetImageInfoFromResourceW (
         HMODULE                   hSrcModule,
         LPCWSTR                   pSrcResource,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 ALIAS: D3DXGetImageInfoFromResource D3DXGetImageInfoFromResourceW
 
@@ -93,7 +93,7 @@ FUNCTION: HRESULT
     D3DXGetImageInfoFromFileInMemory (
         LPCVOID                   pSrcData,
         UINT                      SrcDataSize,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXLoadSurfaceFromFileA (
@@ -104,7 +104,7 @@ FUNCTION: HRESULT
         RECT*                     pSrcRect,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXLoadSurfaceFromFileW (
@@ -115,7 +115,7 @@ FUNCTION: HRESULT
         RECT*                     pSrcRect,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 ALIAS: D3DXLoadSurfaceFromFile D3DXLoadSurfaceFromFileW
 
@@ -129,7 +129,7 @@ FUNCTION: HRESULT
         RECT*                     pSrcRect,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXLoadSurfaceFromResourceW (
@@ -141,7 +141,7 @@ FUNCTION: HRESULT
         RECT*                     pSrcRect,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 ALIAS: D3DXLoadSurfaceFromResource D3DXLoadSurfaceFromResourceW
 
@@ -155,7 +155,7 @@ FUNCTION: HRESULT
         RECT*                     pSrcRect,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXLoadSurfaceFromSurface (
@@ -166,7 +166,7 @@ FUNCTION: HRESULT
         PALETTEENTRY*             pSrcPalette,
         RECT*                     pSrcRect,
         DWORD                     Filter,
-        D3DCOLOR                  ColorKey ) ;
+        D3DCOLOR                  ColorKey )
 
 FUNCTION: HRESULT
     D3DXLoadSurfaceFromMemory (
@@ -179,7 +179,7 @@ FUNCTION: HRESULT
         PALETTEENTRY*             pSrcPalette,
         RECT*                     pSrcRect,
         DWORD                     Filter,
-        D3DCOLOR                  ColorKey ) ;
+        D3DCOLOR                  ColorKey )
 
 FUNCTION: HRESULT
     D3DXSaveSurfaceToFileA (
@@ -187,7 +187,7 @@ FUNCTION: HRESULT
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DSURFACE9        pSrcSurface,
         PALETTEENTRY*             pSrcPalette,
-        RECT*                     pSrcRect ) ;
+        RECT*                     pSrcRect )
 
 FUNCTION: HRESULT
     D3DXSaveSurfaceToFileW (
@@ -195,7 +195,7 @@ FUNCTION: HRESULT
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DSURFACE9        pSrcSurface,
         PALETTEENTRY*             pSrcPalette,
-        RECT*                     pSrcRect ) ;
+        RECT*                     pSrcRect )
 
 ALIAS: D3DXSaveSurfaceToFile D3DXSaveSurfaceToFileW
 
@@ -205,7 +205,7 @@ FUNCTION: HRESULT
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DSURFACE9        pSrcSurface,
         PALETTEENTRY*             pSrcPalette,
-        RECT*                     pSrcRect ) ;
+        RECT*                     pSrcRect )
 
 FUNCTION: HRESULT
     D3DXLoadVolumeFromFileA (
@@ -216,7 +216,7 @@ FUNCTION: HRESULT
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXLoadVolumeFromFileW (
@@ -227,7 +227,7 @@ FUNCTION: HRESULT
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 ALIAS: D3DXLoadVolumeFromFile D3DXLoadVolumeFromFileW
 
@@ -241,7 +241,7 @@ FUNCTION: HRESULT
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXLoadVolumeFromResourceW (
@@ -253,7 +253,7 @@ FUNCTION: HRESULT
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 ALIAS: D3DXLoadVolumeFromResource D3DXLoadVolumeFromResourceW
 
@@ -267,7 +267,7 @@ FUNCTION: HRESULT
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
         D3DCOLOR                  ColorKey,
-        D3DXIMAGE_INFO*           pSrcInfo ) ;
+        D3DXIMAGE_INFO*           pSrcInfo )
 
 FUNCTION: HRESULT
     D3DXLoadVolumeFromVolume (
@@ -278,7 +278,7 @@ FUNCTION: HRESULT
         PALETTEENTRY*             pSrcPalette,
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
-        D3DCOLOR                  ColorKey ) ;
+        D3DCOLOR                  ColorKey )
 
 FUNCTION: HRESULT
     D3DXLoadVolumeFromMemory (
@@ -292,7 +292,7 @@ FUNCTION: HRESULT
         PALETTEENTRY*             pSrcPalette,
         D3DBOX*                   pSrcBox,
         DWORD                     Filter,
-        D3DCOLOR                  ColorKey ) ;
+        D3DCOLOR                  ColorKey )
 
 FUNCTION: HRESULT
     D3DXSaveVolumeToFileA (
@@ -300,7 +300,7 @@ FUNCTION: HRESULT
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DVOLUME9         pSrcVolume,
         PALETTEENTRY*             pSrcPalette,
-        D3DBOX*                   pSrcBox ) ;
+        D3DBOX*                   pSrcBox )
 
 FUNCTION: HRESULT
     D3DXSaveVolumeToFileW (
@@ -308,7 +308,7 @@ FUNCTION: HRESULT
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DVOLUME9         pSrcVolume,
         PALETTEENTRY*             pSrcPalette,
-        D3DBOX*                   pSrcBox ) ;
+        D3DBOX*                   pSrcBox )
 
 ALIAS: D3DXSaveVolumeToFile D3DXSaveVolumeToFileW
 
@@ -318,7 +318,7 @@ FUNCTION: HRESULT
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DVOLUME9         pSrcVolume,
         PALETTEENTRY*             pSrcPalette,
-        D3DBOX*                   pSrcBox ) ;
+        D3DBOX*                   pSrcBox )
 
 FUNCTION: HRESULT
     D3DXCheckTextureRequirements (
@@ -328,7 +328,7 @@ FUNCTION: HRESULT
         UINT*                     pNumMipLevels,
         DWORD                     Usage,
         D3DFORMAT*                pFormat,
-        D3DPOOL                   Pool ) ;
+        D3DPOOL                   Pool )
 
 FUNCTION: HRESULT
     D3DXCheckCubeTextureRequirements (
@@ -337,7 +337,7 @@ FUNCTION: HRESULT
         UINT*                     pNumMipLevels,
         DWORD                     Usage,
         D3DFORMAT*                pFormat,
-        D3DPOOL                   Pool ) ;
+        D3DPOOL                   Pool )
 
 FUNCTION: HRESULT
     D3DXCheckVolumeTextureRequirements (
@@ -348,7 +348,7 @@ FUNCTION: HRESULT
         UINT*                     pNumMipLevels,
         DWORD                     Usage,
         D3DFORMAT*                pFormat,
-        D3DPOOL                   Pool ) ;
+        D3DPOOL                   Pool )
 
 FUNCTION: HRESULT
     D3DXCreateTexture (
@@ -359,7 +359,7 @@ FUNCTION: HRESULT
         DWORD                     Usage,
         D3DFORMAT                 Format,
         D3DPOOL                   Pool,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 FUNCTION: HRESULT
     D3DXCreateCubeTexture (
@@ -369,7 +369,7 @@ FUNCTION: HRESULT
         DWORD                     Usage,
         D3DFORMAT                 Format,
         D3DPOOL                   Pool,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateVolumeTexture (
@@ -381,19 +381,19 @@ FUNCTION: HRESULT
         DWORD                     Usage,
         D3DFORMAT                 Format,
         D3DPOOL                   Pool,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateTextureFromFileA (
         LPDIRECT3DDEVICE9         pDevice,
         LPCSTR                    pSrcFile,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 FUNCTION: HRESULT
     D3DXCreateTextureFromFileW (
         LPDIRECT3DDEVICE9         pDevice,
         LPCWSTR                   pSrcFile,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 ALIAS: D3DXCreateTextureFromFile D3DXCreateTextureFromFileW
 
@@ -401,13 +401,13 @@ FUNCTION: HRESULT
     D3DXCreateCubeTextureFromFileA (
         LPDIRECT3DDEVICE9         pDevice,
         LPCSTR                    pSrcFile,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateCubeTextureFromFileW (
         LPDIRECT3DDEVICE9         pDevice,
         LPCWSTR                   pSrcFile,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 ALIAS: D3DXCreateCubeTextureFromFile D3DXCreateCubeTextureFromFileW
 
@@ -415,13 +415,13 @@ FUNCTION: HRESULT
     D3DXCreateVolumeTextureFromFileA (
         LPDIRECT3DDEVICE9         pDevice,
         LPCSTR                    pSrcFile,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateVolumeTextureFromFileW (
         LPDIRECT3DDEVICE9         pDevice,
         LPCWSTR                   pSrcFile,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 ALIAS: D3DXCreateVolumeTextureFromFile D3DXCreateVolumeTextureFromFileW
 
@@ -430,14 +430,14 @@ FUNCTION: HRESULT
         LPDIRECT3DDEVICE9         pDevice,
         HMODULE                   hSrcModule,
         LPCSTR                    pSrcResource,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 FUNCTION: HRESULT
     D3DXCreateTextureFromResourceW (
         LPDIRECT3DDEVICE9         pDevice,
         HMODULE                   hSrcModule,
         LPCWSTR                   pSrcResource,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 ALIAS: D3DXCreateTextureFromResource D3DXCreateTextureFromResourceW
 
@@ -446,14 +446,14 @@ FUNCTION: HRESULT
         LPDIRECT3DDEVICE9         pDevice,
         HMODULE                   hSrcModule,
         LPCSTR                    pSrcResource,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateCubeTextureFromResourceW (
         LPDIRECT3DDEVICE9         pDevice,
         HMODULE                   hSrcModule,
         LPCWSTR                   pSrcResource,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 ALIAS: D3DXCreateCubeTextureFromResource D3DXCreateCubeTextureFromResourceW
 
@@ -462,14 +462,14 @@ FUNCTION: HRESULT
         LPDIRECT3DDEVICE9         pDevice,
         HMODULE                   hSrcModule,
         LPCSTR                    pSrcResource,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateVolumeTextureFromResourceW (
         LPDIRECT3DDEVICE9         pDevice,
         HMODULE                   hSrcModule,
         LPCWSTR                   pSrcResource,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 ALIAS: D3DXCreateVolumeTextureFromResource D3DXCreateVolumeTextureFromResourceW
 
@@ -488,7 +488,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 FUNCTION: HRESULT
     D3DXCreateTextureFromFileExW (
@@ -505,7 +505,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 ALIAS: D3DXCreateTextureFromFileEx D3DXCreateTextureFromFileExW
 
@@ -523,7 +523,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateCubeTextureFromFileExW (
@@ -539,7 +539,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 ALIAS: D3DXCreateCubeTextureFromFileEx D3DXCreateCubeTextureFromFileExW
 
@@ -559,7 +559,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateVolumeTextureFromFileExW (
@@ -577,7 +577,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 ALIAS: D3DXCreateVolumeTextureFromFileEx D3DXCreateVolumeTextureFromFileExW
 
@@ -597,7 +597,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 FUNCTION: HRESULT
     D3DXCreateTextureFromResourceExW (
@@ -615,7 +615,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 ALIAS: D3DXCreateTextureFromResourceEx D3DXCreateTextureFromResourceExW
 
@@ -634,7 +634,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateCubeTextureFromResourceExW (
@@ -651,7 +651,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 ALIAS: D3DXCreateCubeTextureFromResourceEx D3DXCreateCubeTextureFromResourceExW
 
@@ -672,7 +672,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateVolumeTextureFromResourceExW (
@@ -691,7 +691,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 ALIAS: D3DXCreateVolumeTextureFromResourceEx D3DXCreateVolumeTextureFromResourceExW
 
@@ -700,21 +700,21 @@ FUNCTION: HRESULT
         LPDIRECT3DDEVICE9         pDevice,
         LPCVOID                   pSrcData,
         UINT                      SrcDataSize,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 FUNCTION: HRESULT
     D3DXCreateCubeTextureFromFileInMemory (
         LPDIRECT3DDEVICE9         pDevice,
         LPCVOID                   pSrcData,
         UINT                      SrcDataSize,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateVolumeTextureFromFileInMemory (
         LPDIRECT3DDEVICE9         pDevice,
         LPCVOID                   pSrcData,
         UINT                      SrcDataSize,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateTextureFromFileInMemoryEx (
@@ -732,7 +732,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DTEXTURE9*       ppTexture ) ;
+        LPDIRECT3DTEXTURE9*       ppTexture )
 
 FUNCTION: HRESULT
     D3DXCreateCubeTextureFromFileInMemoryEx (
@@ -749,7 +749,7 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture ) ;
+        LPDIRECT3DCUBETEXTURE9*   ppCubeTexture )
 
 FUNCTION: HRESULT
     D3DXCreateVolumeTextureFromFileInMemoryEx (
@@ -768,21 +768,21 @@ FUNCTION: HRESULT
         D3DCOLOR                  ColorKey,
         D3DXIMAGE_INFO*           pSrcInfo,
         PALETTEENTRY*             pPalette,
-        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture ) ;
+        LPDIRECT3DVOLUMETEXTURE9* ppVolumeTexture )
 
 FUNCTION: HRESULT
     D3DXSaveTextureToFileA (
         LPCSTR                    pDestFile,
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DBASETEXTURE9    pSrcTexture,
-        PALETTEENTRY*             pSrcPalette ) ;
+        PALETTEENTRY*             pSrcPalette )
 
 FUNCTION: HRESULT
     D3DXSaveTextureToFileW (
         LPCWSTR                   pDestFile,
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DBASETEXTURE9    pSrcTexture,
-        PALETTEENTRY*             pSrcPalette ) ;
+        PALETTEENTRY*             pSrcPalette )
 
 ALIAS: D3DXSaveTextureToFile D3DXSaveTextureToFileW
 
@@ -791,14 +791,14 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*             ppDestBuf,
         D3DXIMAGE_FILEFORMAT      DestFormat,
         LPDIRECT3DBASETEXTURE9    pSrcTexture,
-        PALETTEENTRY*             pSrcPalette ) ;
+        PALETTEENTRY*             pSrcPalette )
 
 FUNCTION: HRESULT
     D3DXFilterTexture (
         LPDIRECT3DBASETEXTURE9    pBaseTexture,
         PALETTEENTRY*             pPalette,
         UINT                      SrcLevel,
-        DWORD                     Filter ) ;
+        DWORD                     Filter )
 
 ALIAS: D3DXFilterCubeTexture D3DXFilterTexture
 ALIAS: D3DXFilterVolumeTexture D3DXFilterTexture
@@ -807,35 +807,35 @@ FUNCTION: HRESULT
     D3DXFillTexture (
         LPDIRECT3DTEXTURE9        pTexture,
         LPD3DXFILL2D              pFunction,
-        LPVOID                    pData ) ;
+        LPVOID                    pData )
 
 FUNCTION: HRESULT
     D3DXFillCubeTexture (
         LPDIRECT3DCUBETEXTURE9    pCubeTexture,
         LPD3DXFILL3D              pFunction,
-        LPVOID                    pData ) ;
+        LPVOID                    pData )
 
 FUNCTION: HRESULT
     D3DXFillVolumeTexture (
         LPDIRECT3DVOLUMETEXTURE9  pVolumeTexture,
         LPD3DXFILL3D              pFunction,
-        LPVOID                    pData ) ;
+        LPVOID                    pData )
 
 FUNCTION: HRESULT
     D3DXFillTextureTX (
         LPDIRECT3DTEXTURE9        pTexture,
-        LPD3DXTEXTURESHADER       pTextureShader ) ;
+        LPD3DXTEXTURESHADER       pTextureShader )
 
 FUNCTION: HRESULT
     D3DXFillCubeTextureTX (
         LPDIRECT3DCUBETEXTURE9    pCubeTexture,
-        LPD3DXTEXTURESHADER       pTextureShader ) ;
+        LPD3DXTEXTURESHADER       pTextureShader )
 
 
 FUNCTION: HRESULT
     D3DXFillVolumeTextureTX (
         LPDIRECT3DVOLUMETEXTURE9  pVolumeTexture,
-        LPD3DXTEXTURESHADER       pTextureShader ) ;
+        LPD3DXTEXTURESHADER       pTextureShader )
 
 FUNCTION: HRESULT
     D3DXComputeNormalMap (
@@ -844,4 +844,4 @@ FUNCTION: HRESULT
         PALETTEENTRY*       pSrcPalette,
         DWORD                     Flags,
         DWORD                     Channel,
-        FLOAT                     Amplitude ) ;
+        FLOAT                     Amplitude )

@@ -4,7 +4,7 @@ IN: unix.linux.epoll
 USING: alien.c-types alien.syntax classes.struct math
 unix.types ;
 
-FUNCTION: int epoll_create ( int size ) ;
+FUNCTION: int epoll_create ( int size )
 
 UNION-STRUCT: epoll-data
     { ptr void*    }
@@ -16,9 +16,9 @@ PACKED-STRUCT: epoll-event
     { events uint32_t   }
     { data   epoll-data } ;
 
-FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll-event* event ) ;
+FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll-event* event )
 
-FUNCTION: int epoll_wait ( int epfd, epoll-event* events, int maxevents, int timeout ) ;
+FUNCTION: int epoll_wait ( int epfd, epoll-event* events, int maxevents, int timeout )
 
 CONSTANT: EPOLL_CTL_ADD 1 ! Add a file decriptor to the interface.
 CONSTANT: EPOLL_CTL_DEL 2 ! Remove a file decriptor from the interface.
