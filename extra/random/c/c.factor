@@ -7,7 +7,7 @@ IN: random.c
 
 LIBRARY: libc
 
-FUNCTION: int rand ( ) ;
+FUNCTION: int rand ( )
 
 SINGLETON: c-random
 

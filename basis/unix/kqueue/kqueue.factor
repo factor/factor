@@ -6,7 +6,7 @@ IN: unix.kqueue
 
 << "unix.kqueue." os name>> append require >>
 
-FUNCTION: int kqueue ( ) ;
+FUNCTION: int kqueue ( )
 
 ! actions
 CONSTANT: EV_ADD     0x1 ! add event to kq (implies enable)

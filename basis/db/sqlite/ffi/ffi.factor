@@ -105,36 +105,36 @@ TYPEDEF: longlong sqlite3_int64
 TYPEDEF: ulonglong sqlite3_uint64
 
 LIBRARY: sqlite
-FUNCTION: int sqlite3_open ( c-string filename, void* ppDb ) ;
-FUNCTION: int sqlite3_close ( sqlite3* pDb ) ;
-FUNCTION: c-string sqlite3_errmsg ( sqlite3* pDb ) ;
-FUNCTION: int sqlite3_prepare ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail ) ;
-FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail ) ;
-FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt ) ;
-FUNCTION: sqlite3_uint64 sqlite3_last_insert_rowid ( sqlite3* pStmt ) ;
-FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor ) ;
-FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
-FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
-FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n ) ;
+FUNCTION: int sqlite3_open ( c-string filename, void* ppDb )
+FUNCTION: int sqlite3_close ( sqlite3* pDb )
+FUNCTION: c-string sqlite3_errmsg ( sqlite3* pDb )
+FUNCTION: int sqlite3_prepare ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail )
+FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail )
+FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt )
+FUNCTION: sqlite3_uint64 sqlite3_last_insert_rowid ( sqlite3* pStmt )
+FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor )
+FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x )
+FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n )
+FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n )
 ! Bind the same function as above, but for unsigned 64bit integers
 FUNCTION-ALIAS: sqlite3-bind-uint64
-    int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_uint64 in64 ) ;
-FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n ) ;
-FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, c-string text, int len, int destructor ) ;
-FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, c-string name ) ;
-FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt ) ;
-FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
+    int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_uint64 in64 )
+FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n )
+FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, c-string text, int len, int destructor )
+FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, c-string name )
+FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt )
+FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col )
+FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col )
 ! Bind the same function as above, but for unsigned 64bit integers
 FUNCTION-ALIAS: sqlite3-column-uint64
-    sqlite3_uint64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_text ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col ) ;
+    sqlite3_uint64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col )
+FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_text ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col )

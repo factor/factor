@@ -214,7 +214,7 @@ SPECIALIZED-ARRAY: libusb_iso_packet_descriptor
 
 C-TYPE: libusb_transfer
 
-CALLBACK: void libusb_transfer_cb_fn ( libusb_transfer* transfer ) ;
+CALLBACK: void libusb_transfer_cb_fn ( libusb_transfer* transfer )
 
 STRUCT: libusb_transfer
     { dev_handle      libusb_device_handle*           }
@@ -231,42 +231,42 @@ STRUCT: libusb_transfer
     { num_iso_packets int                             }
     { iso_packet_desc libusb_iso_packet_descriptor[0] } ;
 
-FUNCTION: int libusb_init ( libusb_context** ctx ) ;
-FUNCTION: void libusb_exit ( libusb_context* ctx ) ;
-FUNCTION: void libusb_set_debug ( libusb_context* ctx, int level ) ;
+FUNCTION: int libusb_init ( libusb_context** ctx )
+FUNCTION: void libusb_exit ( libusb_context* ctx )
+FUNCTION: void libusb_set_debug ( libusb_context* ctx, int level )
 
-FUNCTION: ssize_t libusb_get_device_list ( libusb_context* ctx, libusb_device*** list ) ;
-FUNCTION: void libusb_free_device_list ( libusb_device** list, int unref_devices ) ;
-FUNCTION: libusb_device* libusb_ref_device ( libusb_device* dev ) ;
-FUNCTION: void libusb_unref_device ( libusb_device* dev ) ;
+FUNCTION: ssize_t libusb_get_device_list ( libusb_context* ctx, libusb_device*** list )
+FUNCTION: void libusb_free_device_list ( libusb_device** list, int unref_devices )
+FUNCTION: libusb_device* libusb_ref_device ( libusb_device* dev )
+FUNCTION: void libusb_unref_device ( libusb_device* dev )
 
-FUNCTION: int libusb_get_configuration ( libusb_device_handle* dev, int* config ) ;
-FUNCTION: int libusb_get_device_descriptor ( libusb_device* dev, libusb_device_descriptor* desc ) ;
-FUNCTION: int libusb_get_active_config_descriptor ( libusb_device* dev, libusb_config_descriptor** config ) ;
-FUNCTION: int libusb_get_config_descriptor ( libusb_device* dev, uint8_t config_index, libusb_config_descriptor** config ) ;
-FUNCTION: int libusb_get_config_descriptor_by_value ( libusb_device* dev, uint8_t bConfigurationValue, libusb_config_descriptor** config ) ;
-FUNCTION: void libusb_free_config_descriptor ( libusb_config_descriptor* config ) ;
-FUNCTION: uint8_t libusb_get_bus_number ( libusb_device* dev ) ;
-FUNCTION: uint8_t libusb_get_device_address ( libusb_device* dev ) ;
-FUNCTION: int libusb_get_max_packet_size ( libusb_device* dev, uchar endpoint ) ;
+FUNCTION: int libusb_get_configuration ( libusb_device_handle* dev, int* config )
+FUNCTION: int libusb_get_device_descriptor ( libusb_device* dev, libusb_device_descriptor* desc )
+FUNCTION: int libusb_get_active_config_descriptor ( libusb_device* dev, libusb_config_descriptor** config )
+FUNCTION: int libusb_get_config_descriptor ( libusb_device* dev, uint8_t config_index, libusb_config_descriptor** config )
+FUNCTION: int libusb_get_config_descriptor_by_value ( libusb_device* dev, uint8_t bConfigurationValue, libusb_config_descriptor** config )
+FUNCTION: void libusb_free_config_descriptor ( libusb_config_descriptor* config )
+FUNCTION: uint8_t libusb_get_bus_number ( libusb_device* dev )
+FUNCTION: uint8_t libusb_get_device_address ( libusb_device* dev )
+FUNCTION: int libusb_get_max_packet_size ( libusb_device* dev, uchar endpoint )
 
-FUNCTION: int libusb_open ( libusb_device* dev, libusb_device_handle** handle ) ;
-FUNCTION: void libusb_close ( libusb_device_handle* dev_handle ) ;
-FUNCTION: libusb_device* libusb_get_device ( libusb_device_handle* dev_handle ) ;
+FUNCTION: int libusb_open ( libusb_device* dev, libusb_device_handle** handle )
+FUNCTION: void libusb_close ( libusb_device_handle* dev_handle )
+FUNCTION: libusb_device* libusb_get_device ( libusb_device_handle* dev_handle )
 
-FUNCTION: int libusb_set_configuration ( libusb_device_handle* dev, int configuration ) ;
-FUNCTION: int libusb_claim_interface ( libusb_device_handle* dev, int iface ) ;
-FUNCTION: int libusb_release_interface ( libusb_device_handle* dev, int iface ) ;
+FUNCTION: int libusb_set_configuration ( libusb_device_handle* dev, int configuration )
+FUNCTION: int libusb_claim_interface ( libusb_device_handle* dev, int iface )
+FUNCTION: int libusb_release_interface ( libusb_device_handle* dev, int iface )
 
-FUNCTION: libusb_device_handle* libusb_open_device_with_vid_pid ( libusb_context* ctx, uint16_t vendor_id, uint16_t product_id ) ;
+FUNCTION: libusb_device_handle* libusb_open_device_with_vid_pid ( libusb_context* ctx, uint16_t vendor_id, uint16_t product_id )
 
-FUNCTION: int libusb_set_interface_alt_setting ( libusb_device_handle* dev, int interface_number, int alternate_setting ) ;
-FUNCTION: int libusb_clear_halt ( libusb_device_handle* dev, uchar endpoint ) ;
-FUNCTION: int libusb_reset_device ( libusb_device_handle* dev ) ;
+FUNCTION: int libusb_set_interface_alt_setting ( libusb_device_handle* dev, int interface_number, int alternate_setting )
+FUNCTION: int libusb_clear_halt ( libusb_device_handle* dev, uchar endpoint )
+FUNCTION: int libusb_reset_device ( libusb_device_handle* dev )
 
-FUNCTION: int libusb_kernel_driver_active ( libusb_device_handle* dev, int interface ) ;
-FUNCTION: int libusb_detach_kernel_driver ( libusb_device_handle* dev, int interface ) ;
-FUNCTION: int libusb_attach_kernel_driver ( libusb_device_handle* dev, int interface ) ;
+FUNCTION: int libusb_kernel_driver_active ( libusb_device_handle* dev, int interface )
+FUNCTION: int libusb_detach_kernel_driver ( libusb_device_handle* dev, int interface )
+FUNCTION: int libusb_attach_kernel_driver ( libusb_device_handle* dev, int interface )
 
 : libusb_control_transfer_get_data ( transfer -- data )
     buffer>> LIBUSB_CONTROL_SETUP_SIZE swap <displaced-alien> ; inline
@@ -282,10 +282,10 @@ FUNCTION: int libusb_attach_kernel_driver ( libusb_device_handle* dev, int inter
     wIndex libusb_cpu_to_le16  >>wIndex
     wLength libusb_cpu_to_le16 >>wLength drop ; inline
 
-FUNCTION: libusb_transfer* libusb_alloc_transfer ( int iso_packets ) ;
-FUNCTION: int libusb_submit_transfer ( libusb_transfer* transfer ) ;
-FUNCTION: int libusb_cancel_transfer ( libusb_transfer* transfer ) ;
-FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
+FUNCTION: libusb_transfer* libusb_alloc_transfer ( int iso_packets )
+FUNCTION: int libusb_submit_transfer ( libusb_transfer* transfer )
+FUNCTION: int libusb_cancel_transfer ( libusb_transfer* transfer )
+FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer )
 
 :: libusb_fill_control_transfer ( transfer dev_handle buffer callback user_data timeout -- )
     transfer
@@ -370,15 +370,15 @@ FUNCTION: void libusb_free_transfer ( libusb_transfer* transfer ) ;
 
 FUNCTION: int libusb_control_transfer ( libusb_device_handle* dev_handle,
     uint8_t request_type, uint8_t request, uint16_t value, uint16_t index,
-    uchar* data, uint16_t length, uint timeout ) ;
+    uchar* data, uint16_t length, uint timeout )
 
 FUNCTION: int libusb_bulk_transfer ( libusb_device_handle* dev_handle,
     uchar endpoint, uchar* data, int length,
-    int* actual_length, uint timeout ) ;
+    int* actual_length, uint timeout )
 
 FUNCTION: int libusb_interrupt_transfer ( libusb_device_handle* dev_handle,
     uchar endpoint, uchar* data, int length,
-    int* actual_length, int timeout ) ;
+    int* actual_length, int timeout )
 
 :: libusb_get_descriptor ( dev desc_type desc_index data length -- int )
     dev LIBUSB_ENDPOINT_IN LIBUSB_REQUEST_GET_DESCRIPTOR
@@ -393,30 +393,30 @@ FUNCTION: int libusb_interrupt_transfer ( libusb_device_handle* dev_handle,
 FUNCTION: int libusb_get_string_descriptor_ascii ( libusb_device_handle* dev,
                                                    uint8_t               index,
                                                    uchar*                data,
-                                                   int                   length ) ;
+                                                   int                   length )
 
-FUNCTION: int libusb_try_lock_events ( libusb_context* ctx ) ;
-FUNCTION: void libusb_lock_events ( libusb_context* ctx ) ;
-FUNCTION: void libusb_unlock_events ( libusb_context* ctx ) ;
-FUNCTION: int libusb_event_handling_ok ( libusb_context* ctx ) ;
-FUNCTION: int libusb_event_handler_active ( libusb_context* ctx ) ;
-FUNCTION: void libusb_lock_event_waiters ( libusb_context* ctx ) ;
-FUNCTION: void libusb_unlock_event_waiters ( libusb_context* ctx ) ;
-FUNCTION: int libusb_wait_for_event ( libusb_context* ctx, timeval* tv ) ;
-FUNCTION: int libusb_handle_events_timeout ( libusb_context* ctx, timeval* tv ) ;
-FUNCTION: int libusb_handle_events ( libusb_context* ctx ) ;
-FUNCTION: int libusb_handle_events_locked ( libusb_context* ctx, timeval* tv ) ;
-FUNCTION: int libusb_get_next_timeout ( libusb_context* ctx, timeval* tv ) ;
+FUNCTION: int libusb_try_lock_events ( libusb_context* ctx )
+FUNCTION: void libusb_lock_events ( libusb_context* ctx )
+FUNCTION: void libusb_unlock_events ( libusb_context* ctx )
+FUNCTION: int libusb_event_handling_ok ( libusb_context* ctx )
+FUNCTION: int libusb_event_handler_active ( libusb_context* ctx )
+FUNCTION: void libusb_lock_event_waiters ( libusb_context* ctx )
+FUNCTION: void libusb_unlock_event_waiters ( libusb_context* ctx )
+FUNCTION: int libusb_wait_for_event ( libusb_context* ctx, timeval* tv )
+FUNCTION: int libusb_handle_events_timeout ( libusb_context* ctx, timeval* tv )
+FUNCTION: int libusb_handle_events ( libusb_context* ctx )
+FUNCTION: int libusb_handle_events_locked ( libusb_context* ctx, timeval* tv )
+FUNCTION: int libusb_get_next_timeout ( libusb_context* ctx, timeval* tv )
 
 STRUCT: libusb_pollfd
     { fd     int   }
     { events short } ;
 
-CALLBACK: void libusb_pollfd_added_cb ( int fd, short events, void* user_data ) ;
-CALLBACK: void libusb_pollfd_removed_cb ( int fd, void* user_data ) ;
+CALLBACK: void libusb_pollfd_added_cb ( int fd, short events, void* user_data )
+CALLBACK: void libusb_pollfd_removed_cb ( int fd, void* user_data )
 
-FUNCTION: libusb_pollfd** libusb_get_pollfds ( libusb_context* ctx ) ;
+FUNCTION: libusb_pollfd** libusb_get_pollfds ( libusb_context* ctx )
 FUNCTION: void libusb_set_pollfd_notifiers ( libusb_context*          ctx,
                                              libusb_pollfd_added_cb   added_cb,
                                              libusb_pollfd_removed_cb removed_cb,
-                                             void*                    user_data ) ;
+                                             void*                    user_data )

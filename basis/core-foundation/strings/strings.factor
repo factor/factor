@@ -33,18 +33,18 @@ FUNCTION: CFStringRef CFStringCreateWithBytes (
     CFIndex numBytes,
     CFStringEncoding encoding,
     Boolean isExternalRepresentation
-) ;
+)
 
-FUNCTION: CFIndex CFStringGetLength ( CFStringRef theString ) ;
+FUNCTION: CFIndex CFStringGetLength ( CFStringRef theString )
 
-FUNCTION: void CFStringGetCharacters ( void* theString, CFIndex start, CFIndex length, void* buffer ) ;
+FUNCTION: void CFStringGetCharacters ( void* theString, CFIndex start, CFIndex length, void* buffer )
 
 FUNCTION: Boolean CFStringGetCString (
     CFStringRef theString,
     UInt8* buffer,
     CFIndex bufferSize,
     CFStringEncoding encoding
-) ;
+)
 
 FUNCTION: CFIndex CFStringGetBytes (
    CFStringRef theString,
@@ -55,16 +55,16 @@ FUNCTION: CFIndex CFStringGetBytes (
    UInt8* buffer,
    CFIndex maxBufLen,
    CFIndex* usedBufLen
-) ;
+)
 
 FUNCTION: CFStringRef CFStringCreateWithCString (
     CFAllocatorRef alloc,
     UInt8* cStr,
     CFStringEncoding encoding
-) ;
+)
 
-FUNCTION: CFStringRef CFCopyDescription ( CFTypeRef cf ) ;
-FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id ) ;
+FUNCTION: CFStringRef CFCopyDescription ( CFTypeRef cf )
+FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id )
 
 : prepare-CFString ( string -- byte-array )
     [

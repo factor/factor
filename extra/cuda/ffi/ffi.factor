@@ -299,155 +299,155 @@ CONSTANT: CU_TRSF_READ_AS_INTEGER         0x01
 CONSTANT: CU_TRSF_NORMALIZED_COORDINATES  0x02
 CONSTANT: CU_PARAM_TR_DEFAULT -1
 
-FUNCTION: CUresult cuInit ( uint Flags ) ;
+FUNCTION: CUresult cuInit ( uint Flags )
 
-FUNCTION: CUresult cuDriverGetVersion ( int* driverVersion ) ;
+FUNCTION: CUresult cuDriverGetVersion ( int* driverVersion )
 
-FUNCTION: CUresult cuDeviceGet ( CUdevice* device, int ordinal ) ;
-FUNCTION: CUresult cuDeviceGetCount ( int* count ) ;
-FUNCTION: CUresult cuDeviceGetName ( char* name, int len, CUdevice dev ) ;
-FUNCTION: CUresult cuDeviceComputeCapability ( int* major, int* minor, CUdevice dev ) ;
-FUNCTION: CUresult cuDeviceTotalMem ( uint* bytes, CUdevice dev ) ;
-FUNCTION: CUresult cuDeviceGetProperties ( CUdevprop* prop, CUdevice dev ) ;
-FUNCTION: CUresult cuDeviceGetAttribute ( int* pi, CUdevice_attribute attrib, CUdevice dev ) ;
+FUNCTION: CUresult cuDeviceGet ( CUdevice* device, int ordinal )
+FUNCTION: CUresult cuDeviceGetCount ( int* count )
+FUNCTION: CUresult cuDeviceGetName ( char* name, int len, CUdevice dev )
+FUNCTION: CUresult cuDeviceComputeCapability ( int* major, int* minor, CUdevice dev )
+FUNCTION: CUresult cuDeviceTotalMem ( uint* bytes, CUdevice dev )
+FUNCTION: CUresult cuDeviceGetProperties ( CUdevprop* prop, CUdevice dev )
+FUNCTION: CUresult cuDeviceGetAttribute ( int* pi, CUdevice_attribute attrib, CUdevice dev )
 
-FUNCTION: CUresult cuCtxCreate ( CUcontext* pctx, uint flags, CUdevice dev ) ;
-FUNCTION: CUresult cuCtxDestroy ( CUcontext ctx ) ;
-FUNCTION: CUresult cuCtxAttach ( CUcontext* pctx, uint flags ) ;
-FUNCTION: CUresult cuCtxDetach ( CUcontext ctx ) ;
-FUNCTION: CUresult cuCtxPushCurrent ( CUcontext ctx ) ;
-FUNCTION: CUresult cuCtxPopCurrent ( CUcontext* pctx ) ;
-FUNCTION: CUresult cuCtxGetDevice ( CUdevice* device ) ;
-FUNCTION: CUresult cuCtxSynchronize ( ) ;
+FUNCTION: CUresult cuCtxCreate ( CUcontext* pctx, uint flags, CUdevice dev )
+FUNCTION: CUresult cuCtxDestroy ( CUcontext ctx )
+FUNCTION: CUresult cuCtxAttach ( CUcontext* pctx, uint flags )
+FUNCTION: CUresult cuCtxDetach ( CUcontext ctx )
+FUNCTION: CUresult cuCtxPushCurrent ( CUcontext ctx )
+FUNCTION: CUresult cuCtxPopCurrent ( CUcontext* pctx )
+FUNCTION: CUresult cuCtxGetDevice ( CUdevice* device )
+FUNCTION: CUresult cuCtxSynchronize ( )
 
-FUNCTION: CUresult cuModuleLoad ( CUmodule* module, c-string fname ) ;
-FUNCTION: CUresult cuModuleLoadData ( CUmodule* module, void* image ) ;
-FUNCTION: CUresult cuModuleLoadDataEx ( CUmodule* module, void* image, uint numOptions, CUjit_option* options, void** optionValues ) ;
-FUNCTION: CUresult cuModuleLoadFatBinary ( CUmodule* module, void* fatCubin ) ;
-FUNCTION: CUresult cuModuleUnload ( CUmodule hmod ) ;
-FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, c-string name ) ;
-FUNCTION: CUresult cuModuleGetGlobal ( CUdeviceptr* dptr, uint* bytes, CUmodule hmod, char* name ) ;
-FUNCTION: CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, char* name ) ;
+FUNCTION: CUresult cuModuleLoad ( CUmodule* module, c-string fname )
+FUNCTION: CUresult cuModuleLoadData ( CUmodule* module, void* image )
+FUNCTION: CUresult cuModuleLoadDataEx ( CUmodule* module, void* image, uint numOptions, CUjit_option* options, void** optionValues )
+FUNCTION: CUresult cuModuleLoadFatBinary ( CUmodule* module, void* fatCubin )
+FUNCTION: CUresult cuModuleUnload ( CUmodule hmod )
+FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, c-string name )
+FUNCTION: CUresult cuModuleGetGlobal ( CUdeviceptr* dptr, uint* bytes, CUmodule hmod, char* name )
+FUNCTION: CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, char* name )
 
-FUNCTION: CUresult cuMemGetInfo ( uint* free, uint* total ) ;
+FUNCTION: CUresult cuMemGetInfo ( uint* free, uint* total )
 
-FUNCTION: CUresult cuMemAlloc ( CUdeviceptr* dptr, uint bytesize ) ;
+FUNCTION: CUresult cuMemAlloc ( CUdeviceptr* dptr, uint bytesize )
 FUNCTION: CUresult cuMemAllocPitch ( CUdeviceptr* dptr,
                                       uint* pPitch,
                                       uint WidthInBytes,
                                       uint Height,
                                       uint ElementSizeBytes
-                                     ) ;
-FUNCTION: CUresult cuMemFree ( CUdeviceptr dptr ) ;
-FUNCTION: CUresult cuMemGetAddressRange ( CUdeviceptr* pbase, uint* psize, CUdeviceptr dptr ) ;
+                                     )
+FUNCTION: CUresult cuMemFree ( CUdeviceptr dptr )
+FUNCTION: CUresult cuMemGetAddressRange ( CUdeviceptr* pbase, uint* psize, CUdeviceptr dptr )
 
-FUNCTION: CUresult cuMemAllocHost ( void** pp, uint bytesize ) ;
-FUNCTION: CUresult cuMemFreeHost ( void* p ) ;
+FUNCTION: CUresult cuMemAllocHost ( void** pp, uint bytesize )
+FUNCTION: CUresult cuMemFreeHost ( void* p )
 
-FUNCTION: CUresult cuMemHostAlloc ( void** pp, size_t bytesize, uint Flags ) ;
+FUNCTION: CUresult cuMemHostAlloc ( void** pp, size_t bytesize, uint Flags )
 
-FUNCTION: CUresult cuMemHostGetDevicePointer ( CUdeviceptr* pdptr, void* p, uint Flags ) ;
-FUNCTION: CUresult cuMemHostGetFlags ( uint* pFlags, void* p ) ;
+FUNCTION: CUresult cuMemHostGetDevicePointer ( CUdeviceptr* pdptr, void* p, uint Flags )
+FUNCTION: CUresult cuMemHostGetFlags ( uint* pFlags, void* p )
 
-FUNCTION: CUresult  cuMemcpyHtoD ( CUdeviceptr dstDevice, void* srcHost, uint ByteCount ) ;
-FUNCTION: CUresult  cuMemcpyDtoH ( void* dstHost, CUdeviceptr srcDevice, uint ByteCount ) ;
+FUNCTION: CUresult  cuMemcpyHtoD ( CUdeviceptr dstDevice, void* srcHost, uint ByteCount )
+FUNCTION: CUresult  cuMemcpyDtoH ( void* dstHost, CUdeviceptr srcDevice, uint ByteCount )
 
-FUNCTION: CUresult  cuMemcpyDtoD ( CUdeviceptr dstDevice, CUdeviceptr srcDevice, uint ByteCount ) ;
+FUNCTION: CUresult  cuMemcpyDtoD ( CUdeviceptr dstDevice, CUdeviceptr srcDevice, uint ByteCount )
 
-FUNCTION: CUresult  cuMemcpyDtoA ( CUarray dstArray, uint dstIndex, CUdeviceptr srcDevice, uint ByteCount ) ;
-FUNCTION: CUresult  cuMemcpyAtoD ( CUdeviceptr dstDevice, CUarray hSrc, uint SrcIndex, uint ByteCount ) ;
+FUNCTION: CUresult  cuMemcpyDtoA ( CUarray dstArray, uint dstIndex, CUdeviceptr srcDevice, uint ByteCount )
+FUNCTION: CUresult  cuMemcpyAtoD ( CUdeviceptr dstDevice, CUarray hSrc, uint SrcIndex, uint ByteCount )
 
-FUNCTION: CUresult  cuMemcpyHtoA ( CUarray dstArray, uint dstIndex, void* pSrc, uint ByteCount ) ;
-FUNCTION: CUresult  cuMemcpyAtoH ( void* dstHost, CUarray srcArray, uint srcIndex, uint ByteCount ) ;
+FUNCTION: CUresult  cuMemcpyHtoA ( CUarray dstArray, uint dstIndex, void* pSrc, uint ByteCount )
+FUNCTION: CUresult  cuMemcpyAtoH ( void* dstHost, CUarray srcArray, uint srcIndex, uint ByteCount )
 
-FUNCTION: CUresult  cuMemcpyAtoA ( CUarray dstArray, uint dstIndex, CUarray srcArray, uint srcIndex, uint ByteCount ) ;
+FUNCTION: CUresult  cuMemcpyAtoA ( CUarray dstArray, uint dstIndex, CUarray srcArray, uint srcIndex, uint ByteCount )
 
-FUNCTION: CUresult  cuMemcpy2D ( CUDA_MEMCPY2D* pCopy ) ;
-FUNCTION: CUresult  cuMemcpy2DUnaligned ( CUDA_MEMCPY2D* pCopy ) ;
+FUNCTION: CUresult  cuMemcpy2D ( CUDA_MEMCPY2D* pCopy )
+FUNCTION: CUresult  cuMemcpy2DUnaligned ( CUDA_MEMCPY2D* pCopy )
 
-FUNCTION: CUresult  cuMemcpy3D ( CUDA_MEMCPY3D* pCopy ) ;
+FUNCTION: CUresult  cuMemcpy3D ( CUDA_MEMCPY3D* pCopy )
 
 FUNCTION: CUresult  cuMemcpyHtoDAsync ( CUdeviceptr dstDevice,
-            void* srcHost, uint ByteCount, CUstream hStream ) ;
+            void* srcHost, uint ByteCount, CUstream hStream )
 FUNCTION: CUresult  cuMemcpyDtoHAsync ( void* dstHost,
-            CUdeviceptr srcDevice, uint ByteCount, CUstream hStream ) ;
+            CUdeviceptr srcDevice, uint ByteCount, CUstream hStream )
 
 FUNCTION: CUresult cuMemcpyDtoDAsync ( CUdeviceptr dstDevice,
-            CUdeviceptr srcDevice, uint ByteCount, CUstream hStream ) ;
+            CUdeviceptr srcDevice, uint ByteCount, CUstream hStream )
 
 FUNCTION: CUresult  cuMemcpyHtoAAsync ( CUarray dstArray, uint dstIndex,
-            void* pSrc, uint ByteCount, CUstream hStream ) ;
+            void* pSrc, uint ByteCount, CUstream hStream )
 FUNCTION: CUresult  cuMemcpyAtoHAsync ( void* dstHost, CUarray srcArray, uint srcIndex,
-            uint ByteCount, CUstream hStream ) ;
+            uint ByteCount, CUstream hStream )
 
-FUNCTION: CUresult  cuMemcpy2DAsync ( CUDA_MEMCPY2D* pCopy, CUstream hStream ) ;
-FUNCTION: CUresult  cuMemcpy3DAsync ( CUDA_MEMCPY3D* pCopy, CUstream hStream ) ;
+FUNCTION: CUresult  cuMemcpy2DAsync ( CUDA_MEMCPY2D* pCopy, CUstream hStream )
+FUNCTION: CUresult  cuMemcpy3DAsync ( CUDA_MEMCPY3D* pCopy, CUstream hStream )
 
-FUNCTION: CUresult  cuMemsetD8 ( CUdeviceptr dstDevice, uchar uc, uint N ) ;
-FUNCTION: CUresult  cuMemsetD16 ( CUdeviceptr dstDevice, ushort us, uint N ) ;
-FUNCTION: CUresult  cuMemsetD32 ( CUdeviceptr dstDevice, uint ui, uint N ) ;
+FUNCTION: CUresult  cuMemsetD8 ( CUdeviceptr dstDevice, uchar uc, uint N )
+FUNCTION: CUresult  cuMemsetD16 ( CUdeviceptr dstDevice, ushort us, uint N )
+FUNCTION: CUresult  cuMemsetD32 ( CUdeviceptr dstDevice, uint ui, uint N )
 
-FUNCTION: CUresult  cuMemsetD2D8 ( CUdeviceptr dstDevice, uint dstPitch, uchar uc, uint Width, uint Height ) ;
-FUNCTION: CUresult  cuMemsetD2D16 ( CUdeviceptr dstDevice, uint dstPitch, ushort us, uint Width, uint Height ) ;
-FUNCTION: CUresult  cuMemsetD2D32 ( CUdeviceptr dstDevice, uint dstPitch, uint ui, uint Width, uint Height ) ;
+FUNCTION: CUresult  cuMemsetD2D8 ( CUdeviceptr dstDevice, uint dstPitch, uchar uc, uint Width, uint Height )
+FUNCTION: CUresult  cuMemsetD2D16 ( CUdeviceptr dstDevice, uint dstPitch, ushort us, uint Width, uint Height )
+FUNCTION: CUresult  cuMemsetD2D32 ( CUdeviceptr dstDevice, uint dstPitch, uint ui, uint Width, uint Height )
 
-FUNCTION: CUresult cuFuncSetBlockShape ( CUfunction hfunc, int x, int y, int z ) ;
-FUNCTION: CUresult cuFuncSetSharedSize ( CUfunction hfunc, uint bytes ) ;
-FUNCTION: CUresult cuFuncGetAttribute ( int* pi, CUfunction_attribute attrib, CUfunction hfunc ) ;
-FUNCTION: CUresult cuFuncSetCacheConfig ( CUfunction hfunc, CUfunc_cache config ) ;
+FUNCTION: CUresult cuFuncSetBlockShape ( CUfunction hfunc, int x, int y, int z )
+FUNCTION: CUresult cuFuncSetSharedSize ( CUfunction hfunc, uint bytes )
+FUNCTION: CUresult cuFuncGetAttribute ( int* pi, CUfunction_attribute attrib, CUfunction hfunc )
+FUNCTION: CUresult cuFuncSetCacheConfig ( CUfunction hfunc, CUfunc_cache config )
 
-FUNCTION: CUresult  cuArrayCreate ( CUarray* pHandle, CUDA_ARRAY_DESCRIPTOR* pAllocateArray ) ;
-FUNCTION: CUresult  cuArrayGetDescriptor ( CUDA_ARRAY_DESCRIPTOR* pArrayDescriptor, CUarray hArray ) ;
-FUNCTION: CUresult  cuArrayDestroy ( CUarray hArray ) ;
+FUNCTION: CUresult  cuArrayCreate ( CUarray* pHandle, CUDA_ARRAY_DESCRIPTOR* pAllocateArray )
+FUNCTION: CUresult  cuArrayGetDescriptor ( CUDA_ARRAY_DESCRIPTOR* pArrayDescriptor, CUarray hArray )
+FUNCTION: CUresult  cuArrayDestroy ( CUarray hArray )
 
-FUNCTION: CUresult  cuArray3DCreate ( CUarray* pHandle, CUDA_ARRAY3D_DESCRIPTOR* pAllocateArray ) ;
-FUNCTION: CUresult  cuArray3DGetDescriptor ( CUDA_ARRAY3D_DESCRIPTOR* pArrayDescriptor, CUarray hArray ) ;
+FUNCTION: CUresult  cuArray3DCreate ( CUarray* pHandle, CUDA_ARRAY3D_DESCRIPTOR* pAllocateArray )
+FUNCTION: CUresult  cuArray3DGetDescriptor ( CUDA_ARRAY3D_DESCRIPTOR* pArrayDescriptor, CUarray hArray )
 
-FUNCTION: CUresult  cuTexRefCreate ( CUtexref* pTexRef ) ;
-FUNCTION: CUresult  cuTexRefDestroy ( CUtexref hTexRef ) ;
+FUNCTION: CUresult  cuTexRefCreate ( CUtexref* pTexRef )
+FUNCTION: CUresult  cuTexRefDestroy ( CUtexref hTexRef )
 
-FUNCTION: CUresult  cuTexRefSetArray ( CUtexref hTexRef, CUarray hArray, uint Flags ) ;
-FUNCTION: CUresult  cuTexRefSetAddress ( uint* ByteOffset, CUtexref hTexRef, CUdeviceptr dptr, uint bytes ) ;
-FUNCTION: CUresult  cuTexRefSetAddress2D ( CUtexref hTexRef, CUDA_ARRAY_DESCRIPTOR* desc, CUdeviceptr dptr, uint Pitch ) ;
-FUNCTION: CUresult  cuTexRefSetFormat ( CUtexref hTexRef, CUarray_format fmt, int NumPackedComponents ) ;
-FUNCTION: CUresult  cuTexRefSetAddressMode ( CUtexref hTexRef, int dim, CUaddress_mode am ) ;
-FUNCTION: CUresult  cuTexRefSetFilterMode ( CUtexref hTexRef, CUfilter_mode fm ) ;
-FUNCTION: CUresult  cuTexRefSetFlags ( CUtexref hTexRef, uint Flags ) ;
+FUNCTION: CUresult  cuTexRefSetArray ( CUtexref hTexRef, CUarray hArray, uint Flags )
+FUNCTION: CUresult  cuTexRefSetAddress ( uint* ByteOffset, CUtexref hTexRef, CUdeviceptr dptr, uint bytes )
+FUNCTION: CUresult  cuTexRefSetAddress2D ( CUtexref hTexRef, CUDA_ARRAY_DESCRIPTOR* desc, CUdeviceptr dptr, uint Pitch )
+FUNCTION: CUresult  cuTexRefSetFormat ( CUtexref hTexRef, CUarray_format fmt, int NumPackedComponents )
+FUNCTION: CUresult  cuTexRefSetAddressMode ( CUtexref hTexRef, int dim, CUaddress_mode am )
+FUNCTION: CUresult  cuTexRefSetFilterMode ( CUtexref hTexRef, CUfilter_mode fm )
+FUNCTION: CUresult  cuTexRefSetFlags ( CUtexref hTexRef, uint Flags )
 
-FUNCTION: CUresult  cuTexRefGetAddress ( CUdeviceptr* pdptr, CUtexref hTexRef ) ;
-FUNCTION: CUresult  cuTexRefGetArray ( CUarray* phArray, CUtexref hTexRef ) ;
-FUNCTION: CUresult  cuTexRefGetAddressMode ( CUaddress_mode* pam, CUtexref hTexRef, int dim ) ;
-FUNCTION: CUresult  cuTexRefGetFilterMode ( CUfilter_mode* pfm, CUtexref hTexRef ) ;
-FUNCTION: CUresult  cuTexRefGetFormat ( CUarray_format* pFormat, int* pNumChannels, CUtexref hTexRef ) ;
-FUNCTION: CUresult  cuTexRefGetFlags ( uint* pFlags, CUtexref hTexRef ) ;
+FUNCTION: CUresult  cuTexRefGetAddress ( CUdeviceptr* pdptr, CUtexref hTexRef )
+FUNCTION: CUresult  cuTexRefGetArray ( CUarray* phArray, CUtexref hTexRef )
+FUNCTION: CUresult  cuTexRefGetAddressMode ( CUaddress_mode* pam, CUtexref hTexRef, int dim )
+FUNCTION: CUresult  cuTexRefGetFilterMode ( CUfilter_mode* pfm, CUtexref hTexRef )
+FUNCTION: CUresult  cuTexRefGetFormat ( CUarray_format* pFormat, int* pNumChannels, CUtexref hTexRef )
+FUNCTION: CUresult  cuTexRefGetFlags ( uint* pFlags, CUtexref hTexRef )
 
-FUNCTION: CUresult  cuParamSetSize ( CUfunction hfunc, uint numbytes ) ;
-FUNCTION: CUresult  cuParamSeti    ( CUfunction hfunc, int offset, uint value ) ;
-FUNCTION: CUresult  cuParamSetf    ( CUfunction hfunc, int offset, float value ) ;
-FUNCTION: CUresult  cuParamSetv    ( CUfunction hfunc, int offset, void* ptr, uint numbytes ) ;
-FUNCTION: CUresult  cuParamSetTexRef ( CUfunction hfunc, int texunit, CUtexref hTexRef ) ;
+FUNCTION: CUresult  cuParamSetSize ( CUfunction hfunc, uint numbytes )
+FUNCTION: CUresult  cuParamSeti    ( CUfunction hfunc, int offset, uint value )
+FUNCTION: CUresult  cuParamSetf    ( CUfunction hfunc, int offset, float value )
+FUNCTION: CUresult  cuParamSetv    ( CUfunction hfunc, int offset, void* ptr, uint numbytes )
+FUNCTION: CUresult  cuParamSetTexRef ( CUfunction hfunc, int texunit, CUtexref hTexRef )
 
-FUNCTION: CUresult cuLaunch ( CUfunction f ) ;
-FUNCTION: CUresult cuLaunchGrid ( CUfunction f, int grid_width, int grid_height ) ;
-FUNCTION: CUresult cuLaunchGridAsync ( CUfunction f, int grid_width, int grid_height, CUstream hStream ) ;
+FUNCTION: CUresult cuLaunch ( CUfunction f )
+FUNCTION: CUresult cuLaunchGrid ( CUfunction f, int grid_width, int grid_height )
+FUNCTION: CUresult cuLaunchGridAsync ( CUfunction f, int grid_width, int grid_height, CUstream hStream )
 
-FUNCTION: CUresult cuEventCreate ( CUevent* phEvent, uint Flags ) ;
-FUNCTION: CUresult cuEventRecord ( CUevent hEvent, CUstream hStream ) ;
-FUNCTION: CUresult cuEventQuery ( CUevent hEvent ) ;
-FUNCTION: CUresult cuEventSynchronize ( CUevent hEvent ) ;
-FUNCTION: CUresult cuEventDestroy ( CUevent hEvent ) ;
-FUNCTION: CUresult cuEventElapsedTime ( float* pMilliseconds, CUevent hStart, CUevent hEnd ) ;
+FUNCTION: CUresult cuEventCreate ( CUevent* phEvent, uint Flags )
+FUNCTION: CUresult cuEventRecord ( CUevent hEvent, CUstream hStream )
+FUNCTION: CUresult cuEventQuery ( CUevent hEvent )
+FUNCTION: CUresult cuEventSynchronize ( CUevent hEvent )
+FUNCTION: CUresult cuEventDestroy ( CUevent hEvent )
+FUNCTION: CUresult cuEventElapsedTime ( float* pMilliseconds, CUevent hStart, CUevent hEnd )
 
-FUNCTION: CUresult  cuStreamCreate ( CUstream* phStream, uint Flags ) ;
-FUNCTION: CUresult  cuStreamQuery ( CUstream hStream ) ;
-FUNCTION: CUresult  cuStreamSynchronize ( CUstream hStream ) ;
-FUNCTION: CUresult  cuStreamDestroy ( CUstream hStream ) ;
+FUNCTION: CUresult  cuStreamCreate ( CUstream* phStream, uint Flags )
+FUNCTION: CUresult  cuStreamQuery ( CUstream hStream )
+FUNCTION: CUresult  cuStreamSynchronize ( CUstream hStream )
+FUNCTION: CUresult  cuStreamDestroy ( CUstream hStream )
 
-FUNCTION: CUresult cuGraphicsUnregisterResource ( CUgraphicsResource resource ) ;
-FUNCTION: CUresult cuGraphicsSubResourceGetMappedArray ( CUarray* pArray, CUgraphicsResource resource, uint arrayIndex, uint mipLevel ) ;
-FUNCTION: CUresult cuGraphicsResourceGetMappedPointer ( CUdeviceptr* pDevPtr, uint* pSize, CUgraphicsResource resource ) ;
-FUNCTION: CUresult cuGraphicsResourceSetMapFlags ( CUgraphicsResource resource, uint flags ) ;
-FUNCTION: CUresult cuGraphicsMapResources ( uint count, CUgraphicsResource* resources, CUstream hStream ) ;
-FUNCTION: CUresult cuGraphicsUnmapResources ( uint count, CUgraphicsResource* resources, CUstream hStream ) ;
+FUNCTION: CUresult cuGraphicsUnregisterResource ( CUgraphicsResource resource )
+FUNCTION: CUresult cuGraphicsSubResourceGetMappedArray ( CUarray* pArray, CUgraphicsResource resource, uint arrayIndex, uint mipLevel )
+FUNCTION: CUresult cuGraphicsResourceGetMappedPointer ( CUdeviceptr* pDevPtr, uint* pSize, CUgraphicsResource resource )
+FUNCTION: CUresult cuGraphicsResourceSetMapFlags ( CUgraphicsResource resource, uint flags )
+FUNCTION: CUresult cuGraphicsMapResources ( uint count, CUgraphicsResource* resources, CUstream hStream )
+FUNCTION: CUresult cuGraphicsUnmapResources ( uint count, CUgraphicsResource* resources, CUstream hStream )
 
-FUNCTION: CUresult cuGetExportTable ( void** ppExportTable, CUuuid* pExportTableId ) ;
+FUNCTION: CUresult cuGetExportTable ( void** ppExportTable, CUuuid* pExportTableId )

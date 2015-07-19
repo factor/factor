@@ -44,14 +44,14 @@ FUNCTION: CGColorRef CGColorCreateGenericRGB (
    CGFloat green,
    CGFloat blue,
    CGFloat alpha
-) ;
+)
 
 : <CGColor> ( color -- CGColor )
     >rgba-components CGColorCreateGenericRGB ;
 
 M: color (>cf) <CGColor> ;
 
-FUNCTION: CGColorSpaceRef CGColorSpaceCreateDeviceRGB ( ) ;
+FUNCTION: CGColorSpaceRef CGColorSpaceCreateDeviceRGB ( )
 
 FUNCTION: CGContextRef CGBitmapContextCreate (
    void* data,
@@ -61,17 +61,17 @@ FUNCTION: CGContextRef CGBitmapContextCreate (
    size_t bytesPerRow,
    CGColorSpaceRef colorspace,
    CGBitmapInfo bitmapInfo
-) ;
+)
 
 FUNCTION: CGImageRef CGBitmapContextCreateImage (
    CGContextRef c
-) ;
+)
 
-FUNCTION: void CGColorSpaceRelease ( CGColorSpaceRef ref ) ;
+FUNCTION: void CGColorSpaceRelease ( CGColorSpaceRef ref )
 
 DESTRUCTOR: CGColorSpaceRelease
 
-FUNCTION: void CGContextRelease ( CGContextRef ref ) ;
+FUNCTION: void CGContextRelease ( CGContextRef ref )
 
 DESTRUCTOR: CGContextRelease
 
@@ -81,7 +81,7 @@ FUNCTION: void CGContextSetRGBStrokeColor (
    CGFloat green,
    CGFloat blue,
    CGFloat alpha
-) ;
+)
 
 FUNCTION: void CGContextSetRGBFillColor (
    CGContextRef c,
@@ -89,73 +89,73 @@ FUNCTION: void CGContextSetRGBFillColor (
    CGFloat green,
    CGFloat blue,
    CGFloat alpha
-) ;
+)
 
 FUNCTION: void CGContextSetTextPosition (
    CGContextRef c,
    CGFloat x,
    CGFloat y
-) ;
+)
 
 FUNCTION: void CGContextFillRect (
    CGContextRef c,
    CGRect rect
-) ;
+)
 
 FUNCTION: void CGContextSetShouldSmoothFonts (
    CGContextRef c,
    bool shouldSmoothFonts
-) ;
+)
 
 FUNCTION: void CGContextDrawImage (
    CGContextRef c,
    CGRect rect,
    CGImageRef image
-) ;
+)
 
 FUNCTION: size_t CGImageGetWidth (
    CGImageRef image
-) ;
+)
 
 FUNCTION: size_t CGImageGetHeight (
    CGImageRef image
-) ;
+)
 
 FUNCTION: CGImageDestinationRef CGImageDestinationCreateWithURL (
    CFURLRef url,
    CFStringRef type,
    size_t count,
    CFDictionaryRef options
-) ;
+)
 
 FUNCTION: void CGImageDestinationAddImage (
    CGImageDestinationRef idst,
    CGImageRef image,
    CFDictionaryRef properties
-) ;
+)
 
 FUNCTION: bool CGImageDestinationFinalize (
    CGImageDestinationRef idst
-) ;
+)
 
-FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
+FUNCTION: void* CGBitmapContextGetData ( CGContextRef c )
 
 CONSTANT: kCGLRendererGenericFloatID 0x00020400
 
-FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
+FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params )
 
-FUNCTION: CGDirectDisplayID CGMainDisplayID ( ) ;
+FUNCTION: CGDirectDisplayID CGMainDisplayID ( )
 
-FUNCTION: CGError CGDisplayHideCursor ( CGDirectDisplayID display ) ;
-FUNCTION: CGError CGDisplayShowCursor ( CGDirectDisplayID display ) ;
+FUNCTION: CGError CGDisplayHideCursor ( CGDirectDisplayID display )
+FUNCTION: CGError CGDisplayShowCursor ( CGDirectDisplayID display )
 
-FUNCTION: CGError CGDisplayMoveCursorToPoint ( CGDirectDisplayID display, CGPoint point ) ;
+FUNCTION: CGError CGDisplayMoveCursorToPoint ( CGDirectDisplayID display, CGPoint point )
 
-FUNCTION: CGError CGAssociateMouseAndMouseCursorPosition ( boolean_t connected ) ;
+FUNCTION: CGError CGAssociateMouseAndMouseCursorPosition ( boolean_t connected )
 
-FUNCTION: CGError CGWarpMouseCursorPosition ( CGPoint newCursorPosition ) ;
+FUNCTION: CGError CGWarpMouseCursorPosition ( CGPoint newCursorPosition )
 
-FUNCTION: uint GetCurrentButtonState ( ) ;
+FUNCTION: uint GetCurrentButtonState ( )
 
 <PRIVATE
 

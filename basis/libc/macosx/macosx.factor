@@ -141,7 +141,7 @@ CONSTANT: SIGINFO   29
 CONSTANT: SIGUSR1   30
 CONSTANT: SIGUSR2   31
 
-FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen ) ;
+FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen )
 
 M: macosx strerror ( errno -- str )
     [

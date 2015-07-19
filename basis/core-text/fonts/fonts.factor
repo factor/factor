@@ -43,19 +43,19 @@ C-GLOBAL: CFStringRef kCTFontOrientationAttribute
 
 FUNCTION: CTFontDescriptorRef CTFontDescriptorCreateWithAttributes (
    CFDictionaryRef attributes
-) ;
+)
 
 FUNCTION: CTFontRef CTFontCreateWithName (
    CFStringRef name,
    CGFloat size,
    CGAffineTransform* matrix
-) ;
+)
 
 FUNCTION: CTFontRef CTFontCreateWithFontDescriptor (
    CTFontDescriptorRef descriptor,
    CGFloat size,
    CGAffineTransform* matrix
-) ;
+)
 
 FUNCTION: CTFontRef CTFontCreateCopyWithSymbolicTraits (
    CTFontRef font,
@@ -63,17 +63,17 @@ FUNCTION: CTFontRef CTFontCreateCopyWithSymbolicTraits (
    CGAffineTransform* matrix,
    uint32_t symTraitValue,
    uint32_t symTraitMask
-) ;
+)
 
-FUNCTION: CGFloat CTFontGetAscent ( CTFontRef font ) ;
+FUNCTION: CGFloat CTFontGetAscent ( CTFontRef font )
 
-FUNCTION: CGFloat CTFontGetDescent ( CTFontRef font ) ;
+FUNCTION: CGFloat CTFontGetDescent ( CTFontRef font )
 
-FUNCTION: CGFloat CTFontGetLeading ( CTFontRef font ) ;
+FUNCTION: CGFloat CTFontGetLeading ( CTFontRef font )
 
-FUNCTION: CGFloat CTFontGetCapHeight ( CTFontRef font ) ;
+FUNCTION: CGFloat CTFontGetCapHeight ( CTFontRef font )
 
-FUNCTION: CGFloat CTFontGetXHeight ( CTFontRef font ) ;
+FUNCTION: CGFloat CTFontGetXHeight ( CTFontRef font )
 
 CONSTANT: font-names
     H{

@@ -128,9 +128,9 @@ STRUCT: ASN1_STRING
     { data uchar* }
     { flags long } ;
 
-FUNCTION: int ASN1_STRING_cmp ( ASN1_STRING *a, ASN1_STRING *b ) ;
+FUNCTION: int ASN1_STRING_cmp ( ASN1_STRING *a, ASN1_STRING *b )
 
-FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar **in, long len, ASN1_ITEM *it ) ;
+FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar **in, long len, ASN1_ITEM *it )
 
 ! ===============================================
 ! ossl_typ.h
@@ -157,7 +157,7 @@ STRUCT: X509V3_EXT_METHOD
     { ext_flags int }
     { it void* } ;
 
-FUNCTION: X509V3_EXT_METHOD* X509V3_EXT_get ( X509_EXTENSION* ext ) ;
+FUNCTION: X509V3_EXT_METHOD* X509V3_EXT_get ( X509_EXTENSION* ext )
 
 UNION-STRUCT: GENERAL_NAME_st_d
     { ptr char* }
@@ -270,145 +270,145 @@ STRUCT: ssl_st
     { ctx SSL_CTX* } ;
 TYPEDEF: ssl_st SSL
 
-FUNCTION: c-string SSL_get_version ( SSL* ssl ) ;
+FUNCTION: c-string SSL_get_version ( SSL* ssl )
 
 ! Maps OpenSSL errors to strings
-FUNCTION: void SSL_load_error_strings (  ) ;
-FUNCTION: c-string SSL_state_string ( SSL* ssl ) ;
-FUNCTION: c-string SSL_rstate_string ( SSL* ssl ) ;
-FUNCTION: c-string SSL_state_string_long ( SSL* ssl ) ;
-FUNCTION: c-string SSL_rstate_string_long ( SSL* ssl ) ;
+FUNCTION: void SSL_load_error_strings (  )
+FUNCTION: c-string SSL_state_string ( SSL* ssl )
+FUNCTION: c-string SSL_rstate_string ( SSL* ssl )
+FUNCTION: c-string SSL_state_string_long ( SSL* ssl )
+FUNCTION: c-string SSL_rstate_string_long ( SSL* ssl )
 
 ! Must be called before any other action takes place
-FUNCTION: int SSL_library_init (  ) ;
+FUNCTION: int SSL_library_init (  )
 
 ! Sets the default SSL version
-FUNCTION: ssl-method SSLv2_client_method (  ) ;
+FUNCTION: ssl-method SSLv2_client_method (  )
 
-FUNCTION: ssl-method SSLv23_client_method (  ) ;
+FUNCTION: ssl-method SSLv23_client_method (  )
 
-FUNCTION: ssl-method SSLv23_server_method (  ) ;
+FUNCTION: ssl-method SSLv23_server_method (  )
 
-FUNCTION: ssl-method SSLv23_method (  ) ; ! SSLv3 but can rollback to v2
+FUNCTION: ssl-method SSLv23_method (  ) ! SSLv3 but can rollback to v2
 
-FUNCTION: ssl-method SSLv3_client_method (  ) ;
+FUNCTION: ssl-method SSLv3_client_method (  )
 
-FUNCTION: ssl-method SSLv3_server_method (  ) ;
+FUNCTION: ssl-method SSLv3_server_method (  )
 
-FUNCTION: ssl-method SSLv3_method (  ) ;
+FUNCTION: ssl-method SSLv3_method (  )
 
-FUNCTION: ssl-method TLSv1_client_method (  ) ;
+FUNCTION: ssl-method TLSv1_client_method (  )
 
-FUNCTION: ssl-method TLSv1_server_method (  ) ;
+FUNCTION: ssl-method TLSv1_server_method (  )
 
-FUNCTION: ssl-method TLSv1_method (  ) ;
+FUNCTION: ssl-method TLSv1_method (  )
 
 ! Creates the context
-FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method ) ;
+FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method )
 
 ! Load the certificates and private keys into the SSL_CTX
 FUNCTION: int SSL_CTX_use_certificate_chain_file ( SSL_CTX* ctx,
-                                                   c-string file ) ; ! PEM type
+                                                   c-string file ) ! PEM type
 
-FUNCTION: SSL* SSL_new ( SSL_CTX* ctx ) ;
+FUNCTION: SSL* SSL_new ( SSL_CTX* ctx )
 
-FUNCTION: int SSL_set_fd ( SSL* ssl, int fd ) ;
+FUNCTION: int SSL_set_fd ( SSL* ssl, int fd )
 
-FUNCTION: void SSL_set_bio ( SSL* ssl, void* rbio, void* wbio ) ;
+FUNCTION: void SSL_set_bio ( SSL* ssl, void* rbio, void* wbio )
 
-FUNCTION: int SSL_set_session ( SSL* to, SSL_SESSION* session ) ;
-FUNCTION: SSL_SESSION* SSL_get_session ( SSL* to ) ;
-FUNCTION: SSL_SESSION* SSL_get1_session ( SSL* ssl ) ;
+FUNCTION: int SSL_set_session ( SSL* to, SSL_SESSION* session )
+FUNCTION: SSL_SESSION* SSL_get_session ( SSL* to )
+FUNCTION: SSL_SESSION* SSL_get1_session ( SSL* ssl )
 
-FUNCTION: int SSL_get_error ( SSL* ssl, int ret ) ;
+FUNCTION: int SSL_get_error ( SSL* ssl, int ret )
 
-FUNCTION: void SSL_set_connect_state ( SSL* ssl ) ;
+FUNCTION: void SSL_set_connect_state ( SSL* ssl )
 
-FUNCTION: void SSL_set_accept_state ( SSL* ssl ) ;
+FUNCTION: void SSL_set_accept_state ( SSL* ssl )
 
-FUNCTION: int SSL_connect ( SSL* ssl ) ;
+FUNCTION: int SSL_connect ( SSL* ssl )
 
-FUNCTION: int SSL_accept ( SSL* ssl ) ;
+FUNCTION: int SSL_accept ( SSL* ssl )
 
-FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num ) ;
+FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
 
-FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num ) ;
+FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num )
 
-FUNCTION: int SSL_shutdown ( SSL* ssl ) ;
+FUNCTION: int SSL_shutdown ( SSL* ssl )
 
 CONSTANT: SSL_SENT_SHUTDOWN 1
 CONSTANT: SSL_RECEIVED_SHUTDOWN 2
 
-FUNCTION: int SSL_get_shutdown ( SSL* ssl ) ;
+FUNCTION: int SSL_get_shutdown ( SSL* ssl )
 
-FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, c-string sid_ctx, uint len ) ;
+FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, c-string sid_ctx, uint len )
 
-FUNCTION: void SSL_free ( SSL* ssl ) ;
+FUNCTION: void SSL_free ( SSL* ssl )
 
-FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses ) ;
+FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses )
 
-FUNCTION: int SSL_want ( SSL* ssl ) ;
+FUNCTION: int SSL_want ( SSL* ssl )
 
 CONSTANT: SSL_NOTHING 1
 CONSTANT: SSL_WRITING 2
 CONSTANT: SSL_READING 3
 CONSTANT: SSL_X509_LOOKUP 4
 
-FUNCTION: long SSL_get_verify_result ( SSL* ssl ) ;
+FUNCTION: long SSL_get_verify_result ( SSL* ssl )
 
-FUNCTION: X509* SSL_get_peer_certificate ( SSL* s ) ;
+FUNCTION: X509* SSL_get_peer_certificate ( SSL* s )
 
-FUNCTION: void SSL_CTX_free ( SSL_CTX* ctx ) ;
+FUNCTION: void SSL_CTX_free ( SSL_CTX* ctx )
 
-FUNCTION: void RAND_seed ( void* buf, int num ) ;
+FUNCTION: void RAND_seed ( void* buf, int num )
 
-FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str ) ;
+FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str )
 
-FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str ) ;
+FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str )
 
-FUNCTION: int SSL_CTX_use_RSAPrivateKey_file ( SSL_CTX* ctx, int type ) ;
+FUNCTION: int SSL_CTX_use_RSAPrivateKey_file ( SSL_CTX* ctx, int type )
 
 FUNCTION: int SSL_use_certificate_file ( SSL* ssl,
-                                         c-string str, int type ) ;
+                                         c-string str, int type )
 
 FUNCTION: int SSL_CTX_load_verify_locations ( SSL_CTX* ctx, c-string CAfile,
-                                              c-string CApath ) ;
+                                              c-string CApath )
 
-FUNCTION: int SSL_CTX_set_default_verify_paths ( SSL_CTX* ctx ) ;
+FUNCTION: int SSL_CTX_set_default_verify_paths ( SSL_CTX* ctx )
 
 CONSTANT: SSL_VERIFY_NONE 0
 CONSTANT: SSL_VERIFY_PEER 1
 CONSTANT: SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2
 CONSTANT: SSL_VERIFY_CLIENT_ONCE 4
 
-FUNCTION: void SSL_CTX_set_verify ( SSL_CTX* ctx, int mode, void* callback ) ;
+FUNCTION: void SSL_CTX_set_verify ( SSL_CTX* ctx, int mode, void* callback )
 
-FUNCTION: void SSL_CTX_set_client_CA_list ( SSL_CTX* ctx, SSL* list ) ;
+FUNCTION: void SSL_CTX_set_client_CA_list ( SSL_CTX* ctx, SSL* list )
 
-FUNCTION: SSL* SSL_load_client_CA_file ( c-string file ) ;
+FUNCTION: SSL* SSL_load_client_CA_file ( c-string file )
 
 ! Used to manipulate settings of the SSL_CTX and SSL objects.
 ! This function should never be called directly
-FUNCTION: long SSL_CTX_ctrl ( SSL_CTX* ctx, int cmd, long larg, void* parg ) ;
+FUNCTION: long SSL_CTX_ctrl ( SSL_CTX* ctx, int cmd, long larg, void* parg )
 
-FUNCTION: void SSL_CTX_set_default_passwd_cb ( SSL_CTX* ctx, void* cb ) ;
+FUNCTION: void SSL_CTX_set_default_passwd_cb ( SSL_CTX* ctx, void* cb )
 
 FUNCTION: void SSL_CTX_set_default_passwd_cb_userdata ( SSL_CTX* ctx,
-                                                        void* u ) ;
+                                                        void* u )
 
 FUNCTION: int SSL_CTX_use_PrivateKey_file ( SSL_CTX* ctx, c-string file,
-                                            int type ) ;
+                                            int type )
 
 ! Sets the maximum depth for the allowed ctx certificate chain verification
-FUNCTION: void SSL_CTX_set_verify_depth ( SSL_CTX* ctx, int depth ) ;
+FUNCTION: void SSL_CTX_set_verify_depth ( SSL_CTX* ctx, int depth )
 
 ! Sets DH parameters to be used to be dh.
 ! The key is inherited by all ssl objects created from ctx
-FUNCTION: void SSL_CTX_set_tmp_dh_callback ( SSL_CTX* ctx, void* dh ) ;
+FUNCTION: void SSL_CTX_set_tmp_dh_callback ( SSL_CTX* ctx, void* dh )
 
-FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa ) ;
+FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa )
 
-FUNCTION: void* BIO_f_ssl (  ) ;
+FUNCTION: void* BIO_f_ssl (  )
 
 : SSL_CTX_set_tmp_rsa ( ctx rsa -- n )
     [ SSL_CTRL_SET_TMP_RSA 0 ] dip SSL_CTX_ctrl ;
@@ -514,14 +514,14 @@ CONSTANT: NID_issuer_alt_name   86
 ] when >>
 
 ! x509.h
-FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
-FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos ) ;
-FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx ) ;
-FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a ) ;
-FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
-FUNCTION: int X509_check_trust ( X509* a, int id, int flags ) ;
-FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
+FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len )
+FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos )
+FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx )
+FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a )
+FUNCTION: X509_NAME* X509_get_subject_name ( X509* a )
+FUNCTION: int X509_check_trust ( X509* a, int id, int flags )
+FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc )
 
 ! stack.h
-FUNCTION: int sk_num ( _STACK *s ) ;
-FUNCTION: void* sk_value ( _STACK *s, int v ) ;
+FUNCTION: int sk_num ( _STACK *s )
+FUNCTION: void* sk_value ( _STACK *s, int v )

@@ -20,7 +20,7 @@ LIBRARY: zmq
 !
 
 ! Run-time API version detection
-FUNCTION: void zmq_version ( int* major, int* minor, int* patch ) ;
+FUNCTION: void zmq_version ( int* major, int* minor, int* patch )
 
 !
 ! 0MQ errors.
@@ -40,10 +40,10 @@ CONSTANT: EMTHREAD $[ ZMQ_HAUSNUMERO 54 + ]
 ! of this function is to make the code 100% portable, including where 0MQ
 ! compiled with certain CRT library (on Windows) is linked to an
 ! application that uses different CRT library.
-FUNCTION: int zmq_errno ( ) ;
+FUNCTION: int zmq_errno ( )
 
 ! Resolves system errors and 0MQ errors to human-readable string.
-FUNCTION: c-string zmq_strerror ( int errnum ) ;
+FUNCTION: c-string zmq_strerror ( int errnum )
 
 !
 ! 0MQ infrastructure (a.k.a. context) initialisation & termination.
@@ -58,14 +58,14 @@ CONSTANT: ZMQ_MAX_SOCKETS 2
 CONSTANT: ZMQ_IO_THREADS_DFLT  1
 CONSTANT: ZMQ_MAX_SOCKETS_DFLT 1024
 
-FUNCTION: void* zmq_ctx_new ( ) ;
-FUNCTION: int zmq_ctx_destroy ( void* context ) ;
-FUNCTION: int zmq_ctx_set ( void* context, int option, int optval ) ;
-FUNCTION: int zmq_ctx_get ( void* context, int option ) ;
+FUNCTION: void* zmq_ctx_new ( )
+FUNCTION: int zmq_ctx_destroy ( void* context )
+FUNCTION: int zmq_ctx_set ( void* context, int option, int optval )
+FUNCTION: int zmq_ctx_get ( void* context, int option )
 
 ! Old (legacy) API
-FUNCTION: void* zmq_init ( int io_threads ) ;
-FUNCTION: int zmq_term ( void* context ) ;
+FUNCTION: void* zmq_init ( int io_threads )
+FUNCTION: int zmq_term ( void* context )
 
 !
 ! 0MQ message definition.
@@ -74,19 +74,19 @@ FUNCTION: int zmq_term ( void* context ) ;
 STRUCT: zmq_msg_t
     { data uchar[32] } ;
 
-FUNCTION: int zmq_msg_init ( zmq_msg_t* msg ) ;
-FUNCTION: int zmq_msg_init_size ( zmq_msg_t* msg, size_t size ) ;
-FUNCTION: int zmq_msg_init_data ( zmq_msg_t* msg, void* data, size_t size, void* ffn, void* hint ) ;
-FUNCTION: int zmq_msg_send ( zmq_msg_t* msg, void* s, int flags ) ;
-FUNCTION: int zmq_msg_recv ( zmq_msg_t* msg, void* s, int flags ) ;
-FUNCTION: int zmq_msg_close ( zmq_msg_t* msg ) ;
-FUNCTION: int zmq_msg_move ( zmq_msg_t* dest, zmq_msg_t* src ) ;
-FUNCTION: int zmq_msg_copy ( zmq_msg_t* dest, zmq_msg_t* src ) ;
-FUNCTION: void* zmq_msg_data ( zmq_msg_t* msg ) ;
-FUNCTION: size_t zmq_msg_size ( zmq_msg_t* msg ) ;
-FUNCTION: int zmq_msg_more ( zmq_msg_t* msg ) ;
-FUNCTION: int zmq_msg_get ( zmq_msg_t* msg, int option ) ;
-FUNCTION: int zmq_msg_set ( zmq_msg_t* msg, int option, int optval ) ;
+FUNCTION: int zmq_msg_init ( zmq_msg_t* msg )
+FUNCTION: int zmq_msg_init_size ( zmq_msg_t* msg, size_t size )
+FUNCTION: int zmq_msg_init_data ( zmq_msg_t* msg, void* data, size_t size, void* ffn, void* hint )
+FUNCTION: int zmq_msg_send ( zmq_msg_t* msg, void* s, int flags )
+FUNCTION: int zmq_msg_recv ( zmq_msg_t* msg, void* s, int flags )
+FUNCTION: int zmq_msg_close ( zmq_msg_t* msg )
+FUNCTION: int zmq_msg_move ( zmq_msg_t* dest, zmq_msg_t* src )
+FUNCTION: int zmq_msg_copy ( zmq_msg_t* dest, zmq_msg_t* src )
+FUNCTION: void* zmq_msg_data ( zmq_msg_t* msg )
+FUNCTION: size_t zmq_msg_size ( zmq_msg_t* msg )
+FUNCTION: int zmq_msg_more ( zmq_msg_t* msg )
+FUNCTION: int zmq_msg_get ( zmq_msg_t* msg, int option )
+FUNCTION: int zmq_msg_set ( zmq_msg_t* msg, int option, int optval )
 
 !
 ! 0MQ socket definition.
@@ -188,24 +188,24 @@ STRUCT: zmq_event_t
     { addr c-string }
     { fd-or-err int } ;
 
-FUNCTION: void* zmq_socket ( void* ctx, int type ) ;
-FUNCTION: int zmq_close ( void* s ) ;
-FUNCTION: int zmq_setsockopt ( void* s, int option, void* optval, size_t optvallen ) ;
-FUNCTION: int zmq_getsockopt ( void* s, int option, void* optval, size_t* optvallen ) ;
-FUNCTION: int zmq_bind ( void* s, c-string addr ) ;
-FUNCTION: int zmq_connect ( void* s, c-string addr ) ;
-FUNCTION: int zmq_unbind ( void* s, c-string addr ) ;
-FUNCTION: int zmq_disconnect ( void* s, c-string addr ) ;
-FUNCTION: int zmq_send ( void* s, void* buf, size_t len, int flags ) ;
-FUNCTION: int zmq_recv ( void* s, void* buf, size_t len, int flags ) ;
-FUNCTION: int zmq_socket_monitor ( void* s, c-string addr, int events ) ;
+FUNCTION: void* zmq_socket ( void* ctx, int type )
+FUNCTION: int zmq_close ( void* s )
+FUNCTION: int zmq_setsockopt ( void* s, int option, void* optval, size_t optvallen )
+FUNCTION: int zmq_getsockopt ( void* s, int option, void* optval, size_t* optvallen )
+FUNCTION: int zmq_bind ( void* s, c-string addr )
+FUNCTION: int zmq_connect ( void* s, c-string addr )
+FUNCTION: int zmq_unbind ( void* s, c-string addr )
+FUNCTION: int zmq_disconnect ( void* s, c-string addr )
+FUNCTION: int zmq_send ( void* s, void* buf, size_t len, int flags )
+FUNCTION: int zmq_recv ( void* s, void* buf, size_t len, int flags )
+FUNCTION: int zmq_socket_monitor ( void* s, c-string addr, int events )
 
-FUNCTION: int zmq_sendmsg ( void* s, zmq_msg_t* msg, int flags ) ;
-FUNCTION: int zmq_recvmsg ( void* s, zmq_msg_t* msg, int flags ) ;
+FUNCTION: int zmq_sendmsg ( void* s, zmq_msg_t* msg, int flags )
+FUNCTION: int zmq_recvmsg ( void* s, zmq_msg_t* msg, int flags )
 
 ! Experimental
-FUNCTION: int zmq_sendiov ( void* s, void* iov, size_t count, int flags ) ;
-FUNCTION: int zmq_recviov ( void* s, void* iov, size_t* count, int flags ) ;
+FUNCTION: int zmq_sendiov ( void* s, void* iov, size_t count, int flags )
+FUNCTION: int zmq_recviov ( void* s, void* iov, size_t* count, int flags )
 
 !
 ! I/O multiplexing.
@@ -222,15 +222,15 @@ STRUCT: zmq_pollitem_t
     { events short }
     { revents short } ;
 
-FUNCTION: int zmq_poll ( zmq_pollitem_t* items, int nitems, long timeout ) ;
+FUNCTION: int zmq_poll ( zmq_pollitem_t* items, int nitems, long timeout )
 
 ! Built-in message proxy (3-way)
 
-FUNCTION: int zmq_proxy ( void* frontend, void* backend, void* capture ) ;
+FUNCTION: int zmq_proxy ( void* frontend, void* backend, void* capture )
 
 ! Deprecated aliases
 CONSTANT: ZMQ_STREAMER 1
 CONSTANT: ZMQ_FORWARDER 2
 CONSTANT: ZMQ_QUEUE 3
 ! Deprecated method
-FUNCTION: int zmq_device ( int type, void* frontend, void* backend ) ;
+FUNCTION: int zmq_device ( int type, void* frontend, void* backend )

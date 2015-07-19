@@ -6,7 +6,7 @@ IN: io.files.temp.macosx
 
 <PRIVATE
 
-FUNCTION: id NSTemporaryDirectory ( ) ;
+FUNCTION: id NSTemporaryDirectory ( )
 
 TYPEDEF: NSUInteger NSSearchPathDirectory
 CONSTANT: NSCachesDirectory 13
@@ -18,7 +18,7 @@ FUNCTION: id NSSearchPathForDirectoriesInDomains (
    NSSearchPathDirectory directory,
    NSSearchPathDomainMask domainMask,
    char expandTilde
-) ;
+)
 
 CONSTANT: factor-bundle-name "org.factorcode.Factor"
 

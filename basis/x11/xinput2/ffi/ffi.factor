@@ -274,7 +274,7 @@ X-FUNCTION: Bool XIQueryPointer (
     double*          win_y,
     XIButtonState*   buttons,
     XIModifierState* mods,
-    XIGroupState*    group ) ;
+    XIGroupState*    group )
 
 X-FUNCTION: Bool XIWarpPointer (
     Display* display,
@@ -286,65 +286,65 @@ X-FUNCTION: Bool XIWarpPointer (
     uint     src_width,
     uint     src_height,
     double   dst_x,
-    double   dst_y ) ;
+    double   dst_y )
 
 X-FUNCTION: Status XIDefineCursor (
     Display* display,
     int      deviceid,
     Window   win,
-    Cursor   cursor ) ;
+    Cursor   cursor )
 
 X-FUNCTION: Status XIUndefineCursor (
     Display* display,
     int      deviceid,
-    Window   win ) ;
+    Window   win )
 
 X-FUNCTION: Status XIChangeHierarchy (
     Display*                  display,
     XIAnyHierarchyChangeInfo* changes,
-    int                       num_changes ) ;
+    int                       num_changes )
 
 X-FUNCTION: Status XISetClientPointer (
     Display* dpy,
     Window   win,
-    int      deviceid ) ;
+    int      deviceid )
 
 X-FUNCTION: Bool XIGetClientPointer (
     Display* dpy,
     Window   win,
-    int*     deviceid ) ;
+    int*     deviceid )
 
 X-FUNCTION: int XISelectEvents (
     Display*     dpy,
     Window       win,
     XIEventMask* masks,
-    int          num_masks ) ;
+    int          num_masks )
 
 X-FUNCTION: XIEventMask* XIGetSelectedEvents (
     Display* dpy,
     Window   win,
-    int*     num_masks_return ) ;
+    int*     num_masks_return )
 
 X-FUNCTION: Status XIQueryVersion (
     Display* display,
     int*     major_version_inout,
-    int*     minor_version_inout ) ;
+    int*     minor_version_inout )
 
 X-FUNCTION: XIDeviceInfo* XIQueryDevice (
     Display* dpy,
     int      deviceid,
-    int*     ndevices_return ) ;
+    int*     ndevices_return )
 
 X-FUNCTION: Status XISetFocus (
     Display* dpy,
     int      deviceid,
     Window   focus,
-    Time     time ) ;
+    Time     time )
 
 X-FUNCTION: Status XIGetFocus (
     Display* dpy,
     int      deviceid,
-    Window*  focus_return ) ;
+    Window*  focus_return )
 
 X-FUNCTION: Status XIGrabDevice (
     Display*     dpy,
@@ -355,18 +355,18 @@ X-FUNCTION: Status XIGrabDevice (
     int          grab_mode,
     int          paired_device_mode,
     Bool         owner_events,
-    XIEventMask* mask ) ;
+    XIEventMask* mask )
 
 X-FUNCTION: Status XIUngrabDevice (
     Display* dpy,
     int      deviceid,
-    Time     time ) ;
+    Time     time )
 
 X-FUNCTION: Status XIAllowEvents (
     Display* display,
     int      deviceid,
     int      event_mode,
-    Time     time ) ;
+    Time     time )
 
 X-FUNCTION: int XIGrabButton (
     Display*         display,
@@ -379,7 +379,7 @@ X-FUNCTION: int XIGrabButton (
     int              owner_events,
     XIEventMask*     mask,
     int              num_modifiers,
-    XIGrabModifiers* modifiers_inout ) ;
+    XIGrabModifiers* modifiers_inout )
 
 X-FUNCTION: int XIGrabKeycode (
     Display*         display,
@@ -391,7 +391,7 @@ X-FUNCTION: int XIGrabKeycode (
     int              owner_events,
     XIEventMask*     mask,
     int              num_modifiers,
-    XIGrabModifiers* modifiers_inout ) ;
+    XIGrabModifiers* modifiers_inout )
 
 X-FUNCTION: int XIGrabEnter (
     Display*         display,
@@ -403,7 +403,7 @@ X-FUNCTION: int XIGrabEnter (
     int              owner_events,
     XIEventMask*     mask,
     int              num_modifiers,
-    XIGrabModifiers* modifiers_inout ) ;
+    XIGrabModifiers* modifiers_inout )
 
 X-FUNCTION: int XIGrabFocusIn (
     Display*         display,
@@ -414,7 +414,7 @@ X-FUNCTION: int XIGrabFocusIn (
     int              owner_events,
     XIEventMask*     mask,
     int              num_modifiers,
-    XIGrabModifiers* modifiers_inout ) ;
+    XIGrabModifiers* modifiers_inout )
 
 X-FUNCTION: Status XIUngrabButton (
     Display*         display,
@@ -422,7 +422,7 @@ X-FUNCTION: Status XIUngrabButton (
     int              button,
     Window           grab_window,
     int              num_modifiers,
-    XIGrabModifiers* modifiers ) ;
+    XIGrabModifiers* modifiers )
 
 X-FUNCTION: Status XIUngrabKeycode (
     Display*         display,
@@ -430,26 +430,26 @@ X-FUNCTION: Status XIUngrabKeycode (
     int              keycode,
     Window           grab_window,
     int              num_modifiers,
-    XIGrabModifiers* modifiers ) ;
+    XIGrabModifiers* modifiers )
 
 X-FUNCTION: Status XIUngrabEnter (
     Display*         display,
     int              deviceid,
     Window           grab_window,
     int              num_modifiers,
-    XIGrabModifiers* modifiers ) ;
+    XIGrabModifiers* modifiers )
 
 X-FUNCTION: Status XIUngrabFocusIn (
     Display*         display,
     int              deviceid,
     Window           grab_window,
     int              num_modifiers,
-    XIGrabModifiers* modifiers ) ;
+    XIGrabModifiers* modifiers )
 
 X-FUNCTION: Atom* XIListProperties (
     Display* display,
     int      deviceid,
-    int*     num_props_return ) ;
+    int*     num_props_return )
 
 X-FUNCTION: void XIChangeProperty (
     Display* display,
@@ -459,12 +459,12 @@ X-FUNCTION: void XIChangeProperty (
     int      format,
     int      mode,
     uchar*   data,
-    int      num_items ) ;
+    int      num_items )
 
 X-FUNCTION: void XIDeleteProperty (
     Display* display,
     int      deviceid,
-    Atom     property ) ;
+    Atom     property )
 
 X-FUNCTION: Status XIGetProperty (
     Display* display,
@@ -478,6 +478,6 @@ X-FUNCTION: Status XIGetProperty (
     int*     format_return,
     ulong*   num_items_return,
     ulong*   bytes_after_return,
-    uchar**  data ) ;
+    uchar**  data )
 
-X-FUNCTION: void XIFreeDeviceInfo ( XIDeviceInfo* info ) ;
+X-FUNCTION: void XIFreeDeviceInfo ( XIDeviceInfo* info )

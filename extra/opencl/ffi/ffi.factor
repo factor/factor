@@ -411,75 +411,75 @@ CONSTANT: CL_PROFILING_COMMAND_SUBMIT                 0x1281
 CONSTANT: CL_PROFILING_COMMAND_START                  0x1282
 CONSTANT: CL_PROFILING_COMMAND_END                    0x1283
 
-FUNCTION: cl_int clGetPlatformIDs ( cl_uint num_entries, cl_platform_id* platforms, cl_uint* num_platforms ) ;
-FUNCTION: cl_int clGetPlatformInfo ( cl_platform_id platform, cl_platform_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clGetDeviceIDs ( cl_platform_id platform, cl_device_type device_type, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices ) ;
-FUNCTION: cl_int clGetDeviceInfo ( cl_device_id device, cl_device_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-CALLBACK: void cl_create_context_cb ( char* a, void* b, size_t s, void* c ) ;
-FUNCTION: cl_context clCreateContext ( cl_context_properties*  properties, cl_uint num_devices, cl_device_id* devices, cl_create_context_cb pfn_notify, void* user_data, cl_int* errcode_ret ) ;
-FUNCTION: cl_context clCreateContextFromType ( cl_context_properties* properties, cl_device_type device_type, cl_create_context_cb pfn_notify, void* user_data, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clRetainContext ( cl_context context ) ;
-FUNCTION: cl_int clReleaseContext ( cl_context context ) ;
-FUNCTION: cl_int clGetContextInfo ( cl_context context, cl_context_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_command_queue clCreateCommandQueue ( cl_context context, cl_device_id device, cl_command_queue_properties properties, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clRetainCommandQueue ( cl_command_queue command_queue ) ;
-FUNCTION: cl_int clReleaseCommandQueue ( cl_command_queue command_queue ) ;
-FUNCTION: cl_int clGetCommandQueueInfo ( cl_command_queue command_queue, cl_command_queue_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clSetCommandQueueProperty ( cl_command_queue command_queue, cl_command_queue_properties properties, cl_bool enable, cl_command_queue_properties* old_properties ) ;
-FUNCTION: cl_mem clCreateBuffer ( cl_context context, cl_mem_flags flags, size_t size, void* host_ptr, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateImage2D ( cl_context context, cl_mem_flags flags, cl_image_format* image_format, size_t image_width, size_t image_height, size_t image_row_pitch, void* host_ptr, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateImage3D ( cl_context context, cl_mem_flags flags, cl_image_format* image_format, size_t image_width, size_t image_height, size_t image_depth, size_t image_row_pitch, size_t image_slice_pitch, void* host_ptr, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clRetainMemObject ( cl_mem memobj ) ;
-FUNCTION: cl_int clReleaseMemObject ( cl_mem memobj ) ;
-FUNCTION: cl_int clGetSupportedImageFormats ( cl_context context, cl_mem_flags flags, cl_mem_object_type image_type, cl_uint num_entries, cl_image_format* image_formats, cl_uint* num_image_formats ) ;
-FUNCTION: cl_int clGetMemObjectInfo ( cl_mem memobj, cl_mem_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clGetImageInfo ( cl_mem image, cl_image_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_sampler clCreateSampler ( cl_context context, cl_bool normalized_coords, cl_addressing_mode addressing_mode, cl_filter_mode filter_mode, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clRetainSampler ( cl_sampler sampler ) ;
-FUNCTION: cl_int clReleaseSampler ( cl_sampler sampler ) ;
-FUNCTION: cl_int clGetSamplerInfo ( cl_sampler sampler, cl_sampler_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_program clCreateProgramWithSource ( cl_context context, cl_uint count, char** strings, size_t* lengths, cl_int* errcode_ret ) ;
-FUNCTION: cl_program clCreateProgramWithBinary ( cl_context context, cl_uint num_devices, cl_device_id* device_list, size_t* lengths, char** binaries, cl_int* binary_status, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clRetainProgram ( cl_program  program ) ;
-FUNCTION: cl_int clReleaseProgram ( cl_program  program ) ;
-CALLBACK: void cl_build_program_cb ( cl_program program, void* user_data ) ;
-FUNCTION: cl_int clBuildProgram ( cl_program program, cl_uint num_devices, cl_device_id* device_list, char* options, cl_build_program_cb pfn_notify, void* user_data ) ;
-FUNCTION: cl_int clUnloadCompiler ( ) ;
-FUNCTION: cl_int clGetProgramInfo ( cl_program program, cl_program_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clGetProgramBuildInfo ( cl_program program, cl_device_id device, cl_program_build_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_kernel clCreateKernel ( cl_program program, char* kernel_name, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clCreateKernelsInProgram ( cl_program program, cl_uint num_kernels, cl_kernel* kernels, cl_uint* num_kernels_ret ) ;
-FUNCTION: cl_int clRetainKernel ( cl_kernel kernel ) ;
-FUNCTION: cl_int clReleaseKernel ( cl_kernel kernel ) ;
-FUNCTION: cl_int clSetKernelArg ( cl_kernel kernel, cl_uint arg_index, size_t arg_size, void* arg_value ) ;
-FUNCTION: cl_int clGetKernelInfo ( cl_kernel kernel, cl_kernel_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clGetKernelWorkGroupInfo ( cl_kernel kernel, cl_device_id device, cl_kernel_work_group_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clWaitForEvents ( cl_uint num_events, cl_event* event_list ) ;
-FUNCTION: cl_int clGetEventInfo ( cl_event event, cl_event_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clRetainEvent ( cl_event  event ) ;
-FUNCTION: cl_int clReleaseEvent ( cl_event  event ) ;
-FUNCTION: cl_int clGetEventProfilingInfo ( cl_event event, cl_profiling_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clFlush ( cl_command_queue command_queue ) ;
-FUNCTION: cl_int clFinish ( cl_command_queue command_queue ) ;
-FUNCTION: cl_int clEnqueueReadBuffer ( cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_read, size_t offset, size_t cb, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueWriteBuffer ( cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_write, size_t offset, size_t cb, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueCopyBuffer ( cl_command_queue command_queue, cl_mem src_buffer, cl_mem dst_buffer, size_t src_offset, size_t dst_offset, size_t cb, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueReadImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_read, size_t** origin, size_t** region, size_t row_pitch, size_t slice_pitch, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueWriteImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_write, size_t** origin, size_t** region, size_t input_row_pitch, size_t input_slice_pitch, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueCopyImage ( cl_command_queue command_queue, cl_mem src_image, cl_mem dst_image, size_t** src_origin, size_t** dst_origin, size_t** region, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueCopyImageToBuffer ( cl_command_queue command_queue, cl_mem src_image, cl_mem dst_buffer, size_t** src_origin, size_t** region, size_t dst_offset, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueCopyBufferToImage ( cl_command_queue  command_queue, cl_mem src_buffer, cl_mem dst_image, size_t src_offset, size_t** dst_origin, size_t** region, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: void* clEnqueueMapBuffer ( cl_command_queue  command_queue, cl_mem buffer, cl_bool blocking_map, cl_map_flags map_flags, size_t offset, size_t cb, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event, cl_int* errcode_ret ) ;
-FUNCTION: void* clEnqueueMapImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_map, cl_map_flags map_flags, size_t** origin, size_t** region, size_t* image_row_pitch, size_t* image_slice_pitch, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clEnqueueUnmapMemObject ( cl_command_queue  command_queue, cl_mem memobj, void* mapped_ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueNDRangeKernel ( cl_command_queue command_queue, cl_kernel kernel, cl_uint work_dim, size_t* global_work_offset, size_t* global_work_size, size_t* local_work_size, cl_uint num_events_in_wait_list, cl_event*  event_wait_list, cl_event* event ) ;
-CALLBACK: void cl_enqueue_task_cb ( void* args ) ;
-FUNCTION: cl_int clEnqueueTask ( cl_command_queue command_queue, cl_kernel kernel, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueNativeKernel ( cl_command_queue command_queue, cl_enqueue_task_cb user_func, void* args, size_t cb_args, cl_uint num_mem_objects, cl_mem* mem_list, void** args_mem_loc, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueMarker ( cl_command_queue command_queue, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueWaitForEvents ( cl_command_queue command_queue, cl_uint num_events, cl_event* event_list ) ;
-FUNCTION: cl_int clEnqueueBarrier ( cl_command_queue command_queue ) ;
-FUNCTION: void* clGetExtensionFunctionAddress ( char* func_name ) ;
+FUNCTION: cl_int clGetPlatformIDs ( cl_uint num_entries, cl_platform_id* platforms, cl_uint* num_platforms )
+FUNCTION: cl_int clGetPlatformInfo ( cl_platform_id platform, cl_platform_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clGetDeviceIDs ( cl_platform_id platform, cl_device_type device_type, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices )
+FUNCTION: cl_int clGetDeviceInfo ( cl_device_id device, cl_device_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+CALLBACK: void cl_create_context_cb ( char* a, void* b, size_t s, void* c )
+FUNCTION: cl_context clCreateContext ( cl_context_properties*  properties, cl_uint num_devices, cl_device_id* devices, cl_create_context_cb pfn_notify, void* user_data, cl_int* errcode_ret )
+FUNCTION: cl_context clCreateContextFromType ( cl_context_properties* properties, cl_device_type device_type, cl_create_context_cb pfn_notify, void* user_data, cl_int* errcode_ret )
+FUNCTION: cl_int clRetainContext ( cl_context context )
+FUNCTION: cl_int clReleaseContext ( cl_context context )
+FUNCTION: cl_int clGetContextInfo ( cl_context context, cl_context_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_command_queue clCreateCommandQueue ( cl_context context, cl_device_id device, cl_command_queue_properties properties, cl_int* errcode_ret )
+FUNCTION: cl_int clRetainCommandQueue ( cl_command_queue command_queue )
+FUNCTION: cl_int clReleaseCommandQueue ( cl_command_queue command_queue )
+FUNCTION: cl_int clGetCommandQueueInfo ( cl_command_queue command_queue, cl_command_queue_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clSetCommandQueueProperty ( cl_command_queue command_queue, cl_command_queue_properties properties, cl_bool enable, cl_command_queue_properties* old_properties )
+FUNCTION: cl_mem clCreateBuffer ( cl_context context, cl_mem_flags flags, size_t size, void* host_ptr, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateImage2D ( cl_context context, cl_mem_flags flags, cl_image_format* image_format, size_t image_width, size_t image_height, size_t image_row_pitch, void* host_ptr, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateImage3D ( cl_context context, cl_mem_flags flags, cl_image_format* image_format, size_t image_width, size_t image_height, size_t image_depth, size_t image_row_pitch, size_t image_slice_pitch, void* host_ptr, cl_int* errcode_ret )
+FUNCTION: cl_int clRetainMemObject ( cl_mem memobj )
+FUNCTION: cl_int clReleaseMemObject ( cl_mem memobj )
+FUNCTION: cl_int clGetSupportedImageFormats ( cl_context context, cl_mem_flags flags, cl_mem_object_type image_type, cl_uint num_entries, cl_image_format* image_formats, cl_uint* num_image_formats )
+FUNCTION: cl_int clGetMemObjectInfo ( cl_mem memobj, cl_mem_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clGetImageInfo ( cl_mem image, cl_image_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_sampler clCreateSampler ( cl_context context, cl_bool normalized_coords, cl_addressing_mode addressing_mode, cl_filter_mode filter_mode, cl_int* errcode_ret )
+FUNCTION: cl_int clRetainSampler ( cl_sampler sampler )
+FUNCTION: cl_int clReleaseSampler ( cl_sampler sampler )
+FUNCTION: cl_int clGetSamplerInfo ( cl_sampler sampler, cl_sampler_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_program clCreateProgramWithSource ( cl_context context, cl_uint count, char** strings, size_t* lengths, cl_int* errcode_ret )
+FUNCTION: cl_program clCreateProgramWithBinary ( cl_context context, cl_uint num_devices, cl_device_id* device_list, size_t* lengths, char** binaries, cl_int* binary_status, cl_int* errcode_ret )
+FUNCTION: cl_int clRetainProgram ( cl_program  program )
+FUNCTION: cl_int clReleaseProgram ( cl_program  program )
+CALLBACK: void cl_build_program_cb ( cl_program program, void* user_data )
+FUNCTION: cl_int clBuildProgram ( cl_program program, cl_uint num_devices, cl_device_id* device_list, char* options, cl_build_program_cb pfn_notify, void* user_data )
+FUNCTION: cl_int clUnloadCompiler ( )
+FUNCTION: cl_int clGetProgramInfo ( cl_program program, cl_program_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clGetProgramBuildInfo ( cl_program program, cl_device_id device, cl_program_build_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_kernel clCreateKernel ( cl_program program, char* kernel_name, cl_int* errcode_ret )
+FUNCTION: cl_int clCreateKernelsInProgram ( cl_program program, cl_uint num_kernels, cl_kernel* kernels, cl_uint* num_kernels_ret )
+FUNCTION: cl_int clRetainKernel ( cl_kernel kernel )
+FUNCTION: cl_int clReleaseKernel ( cl_kernel kernel )
+FUNCTION: cl_int clSetKernelArg ( cl_kernel kernel, cl_uint arg_index, size_t arg_size, void* arg_value )
+FUNCTION: cl_int clGetKernelInfo ( cl_kernel kernel, cl_kernel_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clGetKernelWorkGroupInfo ( cl_kernel kernel, cl_device_id device, cl_kernel_work_group_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clWaitForEvents ( cl_uint num_events, cl_event* event_list )
+FUNCTION: cl_int clGetEventInfo ( cl_event event, cl_event_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clRetainEvent ( cl_event  event )
+FUNCTION: cl_int clReleaseEvent ( cl_event  event )
+FUNCTION: cl_int clGetEventProfilingInfo ( cl_event event, cl_profiling_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clFlush ( cl_command_queue command_queue )
+FUNCTION: cl_int clFinish ( cl_command_queue command_queue )
+FUNCTION: cl_int clEnqueueReadBuffer ( cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_read, size_t offset, size_t cb, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueWriteBuffer ( cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_write, size_t offset, size_t cb, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueCopyBuffer ( cl_command_queue command_queue, cl_mem src_buffer, cl_mem dst_buffer, size_t src_offset, size_t dst_offset, size_t cb, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueReadImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_read, size_t** origin, size_t** region, size_t row_pitch, size_t slice_pitch, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueWriteImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_write, size_t** origin, size_t** region, size_t input_row_pitch, size_t input_slice_pitch, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueCopyImage ( cl_command_queue command_queue, cl_mem src_image, cl_mem dst_image, size_t** src_origin, size_t** dst_origin, size_t** region, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueCopyImageToBuffer ( cl_command_queue command_queue, cl_mem src_image, cl_mem dst_buffer, size_t** src_origin, size_t** region, size_t dst_offset, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueCopyBufferToImage ( cl_command_queue  command_queue, cl_mem src_buffer, cl_mem dst_image, size_t src_offset, size_t** dst_origin, size_t** region, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: void* clEnqueueMapBuffer ( cl_command_queue  command_queue, cl_mem buffer, cl_bool blocking_map, cl_map_flags map_flags, size_t offset, size_t cb, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event, cl_int* errcode_ret )
+FUNCTION: void* clEnqueueMapImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_map, cl_map_flags map_flags, size_t** origin, size_t** region, size_t* image_row_pitch, size_t* image_slice_pitch, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event, cl_int* errcode_ret )
+FUNCTION: cl_int clEnqueueUnmapMemObject ( cl_command_queue  command_queue, cl_mem memobj, void* mapped_ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueNDRangeKernel ( cl_command_queue command_queue, cl_kernel kernel, cl_uint work_dim, size_t* global_work_offset, size_t* global_work_size, size_t* local_work_size, cl_uint num_events_in_wait_list, cl_event*  event_wait_list, cl_event* event )
+CALLBACK: void cl_enqueue_task_cb ( void* args )
+FUNCTION: cl_int clEnqueueTask ( cl_command_queue command_queue, cl_kernel kernel, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueNativeKernel ( cl_command_queue command_queue, cl_enqueue_task_cb user_func, void* args, size_t cb_args, cl_uint num_mem_objects, cl_mem* mem_list, void** args_mem_loc, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueMarker ( cl_command_queue command_queue, cl_event* event )
+FUNCTION: cl_int clEnqueueWaitForEvents ( cl_command_queue command_queue, cl_uint num_events, cl_event* event_list )
+FUNCTION: cl_int clEnqueueBarrier ( cl_command_queue command_queue )
+FUNCTION: void* clGetExtensionFunctionAddress ( char* func_name )
 
 ! cl_ext.h
 CONSTANT: CL_DEVICE_DOUBLE_FP_CONFIG 0x1032
@@ -489,7 +489,7 @@ CONSTANT: CL_DEVICE_HALF_FP_CONFIG   0x1033
 CONSTANT: CL_PLATFORM_ICD_SUFFIX_KHR 0x0920
 CONSTANT: CL_PLATFORM_NOT_FOUND_KHR  -1001
 
-FUNCTION: cl_int clIcdGetPlatformIDsKHR ( cl_uint num_entries, cl_platform_id* platforms, cl_uint* num_platforms ) ;
+FUNCTION: cl_int clIcdGetPlatformIDsKHR ( cl_uint num_entries, cl_platform_id* platforms, cl_uint* num_platforms )
 
 ! cl_gl.h
 TYPEDEF: cl_uint cl_gl_object_type
@@ -503,14 +503,14 @@ CONSTANT: CL_GL_OBJECT_RENDERBUFFER       0x2003
 CONSTANT: CL_GL_TEXTURE_TARGET            0x2004
 CONSTANT: CL_GL_MIPMAP_LEVEL              0x2005
 
-FUNCTION: cl_mem clCreateFromGLBuffer ( cl_context context, cl_mem_flags flags, cl_GLuint bufobj, int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromGLTexture2D ( cl_context context, cl_mem_flags flags, cl_GLenum target, cl_GLint miplevel, cl_GLuint texture, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromGLTexture3D ( cl_context context, cl_mem_flags flags, cl_GLenum target, cl_GLint miplevel, cl_GLuint texture, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromGLRenderbuffer ( cl_context context, cl_mem_flags flags, cl_GLuint renderbuffer, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clGetGLObjectInfo ( cl_mem memobj, cl_gl_object_type* gl_object_type, cl_GLuint* gl_object_name ) ;
-FUNCTION: cl_int clGetGLTextureInfo ( cl_mem memobj, cl_gl_texture_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
-FUNCTION: cl_int clEnqueueAcquireGLObjects ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueReleaseGLObjects ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
+FUNCTION: cl_mem clCreateFromGLBuffer ( cl_context context, cl_mem_flags flags, cl_GLuint bufobj, int* errcode_ret )
+FUNCTION: cl_mem clCreateFromGLTexture2D ( cl_context context, cl_mem_flags flags, cl_GLenum target, cl_GLint miplevel, cl_GLuint texture, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromGLTexture3D ( cl_context context, cl_mem_flags flags, cl_GLenum target, cl_GLint miplevel, cl_GLuint texture, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromGLRenderbuffer ( cl_context context, cl_mem_flags flags, cl_GLuint renderbuffer, cl_int* errcode_ret )
+FUNCTION: cl_int clGetGLObjectInfo ( cl_mem memobj, cl_gl_object_type* gl_object_type, cl_GLuint* gl_object_name )
+FUNCTION: cl_int clGetGLTextureInfo ( cl_mem memobj, cl_gl_texture_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
+FUNCTION: cl_int clEnqueueAcquireGLObjects ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueReleaseGLObjects ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
 
 ! cl_khr_gl_sharing.txt
 TYPEDEF: cl_uint cl_gl_context_info
@@ -524,7 +524,7 @@ CONSTANT: CL_GLX_DISPLAY_KHR                      0x200A
 CONSTANT: CL_WGL_HDC_KHR                          0x200B
 CONSTANT: CL_CGL_SHAREGROUP_KHR                   0x200C
 
-FUNCTION: cl_int clGetGLContextInfoKHR ( cl_context_properties* properties, cl_gl_context_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret ) ;
+FUNCTION: cl_int clGetGLContextInfoKHR ( cl_context_properties* properties, cl_gl_context_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
 
 ! cl_nv_d3d9_sharing.txt
 CONSTANT: CL_D3D9_DEVICE_NV                     0x4022
@@ -545,15 +545,15 @@ CONSTANT: CL_D3D9_RESOURCE_NOT_ACQUIRED_NV      -1013
 TYPEDEF: void* cl_d3d9_device_source_nv
 TYPEDEF: void* cl_d3d9_device_set_nv
 
-FUNCTION: cl_int clGetDeviceIDsFromD3D9NV ( cl_platform_id platform, cl_d3d9_device_source_nv d3d_device_source, void* d3d_object, cl_d3d9_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices ) ;
-FUNCTION: cl_mem clCreateFromD3D9VertexBufferNV ( cl_context context, cl_mem_flags flags, void* id3dvb9_resource, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D9IndexBufferNV ( cl_context context, cl_mem_flags flags, void* id3dib9_resource, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D9SurfaceNV ( cl_context context, cl_mem_flags flags, void* id3dsurface9_resource, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D9TextureNV ( cl_context context, cl_mem_flags flags, void* id3dtexture9_resource, uint miplevel, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D9CubeTextureNV ( cl_context context, cl_mem_flags flags, void* id3dct9_resource, int facetype, uint miplevel, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D9VolumeTextureNV ( cl_context context, cl_mem_flags flags, void* id3dvt9-resource, uint miplevel, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clEnqueueAcquireD3D9ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueReleaseD3D9ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
+FUNCTION: cl_int clGetDeviceIDsFromD3D9NV ( cl_platform_id platform, cl_d3d9_device_source_nv d3d_device_source, void* d3d_object, cl_d3d9_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices )
+FUNCTION: cl_mem clCreateFromD3D9VertexBufferNV ( cl_context context, cl_mem_flags flags, void* id3dvb9_resource, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D9IndexBufferNV ( cl_context context, cl_mem_flags flags, void* id3dib9_resource, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D9SurfaceNV ( cl_context context, cl_mem_flags flags, void* id3dsurface9_resource, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D9TextureNV ( cl_context context, cl_mem_flags flags, void* id3dtexture9_resource, uint miplevel, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D9CubeTextureNV ( cl_context context, cl_mem_flags flags, void* id3dct9_resource, int facetype, uint miplevel, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D9VolumeTextureNV ( cl_context context, cl_mem_flags flags, void* id3dvt9-resource, uint miplevel, cl_int* errcode_ret )
+FUNCTION: cl_int clEnqueueAcquireD3D9ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueReleaseD3D9ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
 
 ! cl_nv_d3d10_sharing.txt
 CONSTANT: CL_D3D10_DEVICE_NV                     0x4010
@@ -573,12 +573,12 @@ CONSTANT: CL_D3D10_RESOURCE_NOT_ACQUIRED_NV      -1005
 TYPEDEF: void* cl_d3d10_device_source_nv
 TYPEDEF: void* cl_d3d10_device_set_nv
 
-FUNCTION: cl_int clGetDeviceIDsFromD3D10NV ( cl_platform_id platform, cl_d3d10_device_source_nv d3d_device_source, void* d3d_object, cl_d3d10_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices ) ;
-FUNCTION: cl_mem clCreateFromD3D10BufferNV ( cl_context context, cl_mem_flags flags, void* id3d10buffer_resource, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D10Texture2DNV ( cl_context context, cl_mem_flags flags, void* id3d10texture2d_resource, uint subresource, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D10Texture3DNV ( cl_context context, cl_mem_flags flags, void* id3d10texture3d_resource, uint subresource, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clEnqueueAcquireD3D10ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueReleaseD3D10ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
+FUNCTION: cl_int clGetDeviceIDsFromD3D10NV ( cl_platform_id platform, cl_d3d10_device_source_nv d3d_device_source, void* d3d_object, cl_d3d10_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices )
+FUNCTION: cl_mem clCreateFromD3D10BufferNV ( cl_context context, cl_mem_flags flags, void* id3d10buffer_resource, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D10Texture2DNV ( cl_context context, cl_mem_flags flags, void* id3d10texture2d_resource, uint subresource, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D10Texture3DNV ( cl_context context, cl_mem_flags flags, void* id3d10texture3d_resource, uint subresource, cl_int* errcode_ret )
+FUNCTION: cl_int clEnqueueAcquireD3D10ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueReleaseD3D10ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
 
 ! cl_nv_d3d11_sharing.txt
 CONSTANT: CL_D3D11_DEVICE_NV                     0x4019
@@ -598,9 +598,9 @@ CONSTANT: CL_D3D11_RESOURCE_NOT_ACQUIRED_NV      -1009
 TYPEDEF: void* cl_d3d11_device_source_nv
 TYPEDEF: void* cl_d3d11_device_set_nv
 
-FUNCTION: cl_int clGetDeviceIDsFromD3D11NV ( cl_platform_id platform, cl_d3d11_device_source_nv d3d_device_source, void* d3d_object, cl_d3d11_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices ) ;
-FUNCTION: cl_mem clCreateFromD3D11BufferNV ( cl_context context, cl_mem_flags flags, void* id3d11buffer_resource, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D11Texture2DNV ( cl_context context, cl_mem_flags flags, void* id3d11texture2d_resource, uint subresource, cl_int* errcode_ret ) ;
-FUNCTION: cl_mem clCreateFromD3D11Texture3DNV ( cl_context context, cl_mem_flags flags, void* id3dtexture3d_resource, uint subresource, cl_int* errcode_ret ) ;
-FUNCTION: cl_int clEnqueueAcquireD3D11ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
-FUNCTION: cl_int clEnqueueReleaseD3D11ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event ) ;
+FUNCTION: cl_int clGetDeviceIDsFromD3D11NV ( cl_platform_id platform, cl_d3d11_device_source_nv d3d_device_source, void* d3d_object, cl_d3d11_device_set_nv d3d_device_set, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices )
+FUNCTION: cl_mem clCreateFromD3D11BufferNV ( cl_context context, cl_mem_flags flags, void* id3d11buffer_resource, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D11Texture2DNV ( cl_context context, cl_mem_flags flags, void* id3d11texture2d_resource, uint subresource, cl_int* errcode_ret )
+FUNCTION: cl_mem clCreateFromD3D11Texture3DNV ( cl_context context, cl_mem_flags flags, void* id3dtexture3d_resource, uint subresource, cl_int* errcode_ret )
+FUNCTION: cl_int clEnqueueAcquireD3D11ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueReleaseD3D11ObjectsNV ( cl_command_queue command_queue, cl_uint num_objects, cl_mem* mem_objects, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
