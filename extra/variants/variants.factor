@@ -52,7 +52,7 @@ SYNTAX: VARIANT-MEMBER:
     scan-token parse-variant-member
     define-variant-class-member ;
 
-MACRO: unboa ( class -- )
+MACRO: unboa ( class -- quot )
     <wrapper> \ boa [ ] 2sequence [undo] ;
 
 GENERIC# (match-branch) 1 ( class quot -- class quot' )
@@ -65,6 +65,6 @@ M: object (match-branch)
 : ?class ( object -- class )
     dup word? [ class-of ] unless ;
 
-MACRO: match ( branches -- )
+MACRO: match ( branches -- quot )
     [ dup callable? [ first2 (match-branch) 2array ] unless ] map
     [ \ dup \ ?class ] dip \ case [ ] 4sequence ;

@@ -17,7 +17,7 @@ ERROR: unix-system-call-error args errno message word ;
         [ not ]
     } 1|| ;
 
-MACRO:: unix-system-call ( quot -- )
+MACRO:: unix-system-call ( quot -- quot )
     quot inputs :> n
     quot first :> word
     0 :> ret!
@@ -40,7 +40,7 @@ MACRO:: unix-system-call ( quot -- )
         ] if
     ] ;
 
-MACRO:: unix-system-call-allow-eintr ( quot -- )
+MACRO:: unix-system-call-allow-eintr ( quot -- quot )
     quot inputs :> n
     quot first :> word
     0 :> ret!

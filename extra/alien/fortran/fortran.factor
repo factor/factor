@@ -101,7 +101,7 @@ CONSTANT: fortran>c-types H{
 : append-dimensions ( base-c-type type -- c-type )
     dims>> [ product 2array ] when* ;
 
-MACRO: size-case-type ( cases -- )
+MACRO: size-case-type ( cases -- quot )
     [ invalid-fortran-type ] suffix
     '[ [ size>> _ case ] [ append-dimensions ] bi ] ;
 
@@ -424,7 +424,7 @@ PRIVATE>
     [ '[ _ throw ] ]
     [ drop return library function parameters ((fortran-invoke)) ] if ;
 
-MACRO: fortran-invoke ( return library function parameters -- )
+MACRO: fortran-invoke ( return library function parameters -- quot )
     { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
 
 : parse-arglist ( parameters return -- types effect )

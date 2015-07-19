@@ -138,11 +138,11 @@ M: struct-bit-slot-spec (writer-quot)
 : (unboxer-quot) ( class -- quot )
     drop [ >c-ptr ] ;
 
-MACRO: read-struct-slot ( slot -- )
+MACRO: read-struct-slot ( slot -- quot )
     dup type>> add-depends-on-c-type
     (reader-quot) ;
 
-MACRO: write-struct-slot ( slot -- )
+MACRO: write-struct-slot ( slot -- quot )
     dup type>> add-depends-on-c-type
     (writer-quot) ;
 PRIVATE>

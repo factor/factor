@@ -10,7 +10,7 @@ IN: combinators.extras
 : thrice ( quot -- ) dup dup [ call ] 2dip [ call ] dip call ; inline
 : forever ( quot -- ) [ t ] compose loop ; inline
 
-MACRO: cond-case ( assoc -- )
+MACRO: cond-case ( assoc -- quot )
     [
         dup callable? not [
             [ first [ dup ] prepose ]
@@ -18,7 +18,7 @@ MACRO: cond-case ( assoc -- )
         ] when
     ] map [ cond ] curry ;
 
-MACRO: cleave-array ( quots -- )
+MACRO: cleave-array ( quots -- quot )
     [ '[ _ cleave ] ] [ length '[ _ narray ] ] bi compose ;
 
 : 3bi* ( u v w x y z p q -- )
@@ -45,7 +45,7 @@ MACRO: cleave-array ( quots -- )
 : plox ( ... x/f quot: ( ... x -- ... ) -- ... )
     dupd when ; inline
 
-MACRO: smart-plox ( true -- )
+MACRO: smart-plox ( true -- quot )
     [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
     '[ _ _ [ _ ndrop f ] smart-if ] ;
 

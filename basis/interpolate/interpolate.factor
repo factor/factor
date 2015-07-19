@@ -67,7 +67,7 @@ TUPLE: anon-var ;
 
 PRIVATE>
 
-MACRO: interpolate ( str -- )
+MACRO: interpolate ( str -- quot )
     [ [ get ] ] interpolate-quot ;
 
 : interpolate>string ( str -- newstr )

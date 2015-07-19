@@ -70,7 +70,7 @@ code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
 PRIVATE>
 
-MACRO: run-brainfuck ( code -- )
+MACRO: run-brainfuck ( code -- quot )
     parse-brainfuck '[ <brainfuck> @ drop flush ] ;
 
 : get-brainfuck ( code -- result )

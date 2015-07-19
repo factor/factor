@@ -13,7 +13,7 @@ IN: combinators.tuple
 
 PRIVATE>
 
-MACRO:: nmake-tuple ( class assoc n -- )
+MACRO:: nmake-tuple ( class assoc n -- quot )
     class all-slots [ assoc n (tuple-slot-quot) ] map :> quots
     class <wrapper> :> \class
     { quots n ncleave \class boa } >quotation ;

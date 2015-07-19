@@ -65,10 +65,10 @@ TUPLE: gl-error-tuple function code string ;
     dip
     [ glDisableClientState ] each ; inline
 
-MACRO: all-enabled ( seq quot -- )
+MACRO: all-enabled ( seq quot -- quot )
     [ words>values ] dip '[ _ _ (all-enabled) ] ;
 
-MACRO: all-enabled-client-state ( seq quot -- )
+MACRO: all-enabled-client-state ( seq quot -- quot )
     [ words>values ] dip '[ _ _ (all-enabled-client-state) ] ;
 
 : do-matrix ( quot -- )
@@ -187,7 +187,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : (set-draw-buffers) ( buffers -- )
     [ length ] [ uint >c-array ] bi glDrawBuffers ;
 
-MACRO: set-draw-buffers ( buffers -- )
+MACRO: set-draw-buffers ( buffers -- quot )
     words>values '[ _ (set-draw-buffers) ] ;
 
 : gen-dlist ( -- id ) 1 glGenLists ;

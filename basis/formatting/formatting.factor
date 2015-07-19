@@ -102,7 +102,7 @@ text      = (formats|plain-text)* => [[ ]]
 
 PRIVATE>
 
-MACRO: printf ( format-string -- )
+MACRO: printf ( format-string -- quot )
     printf-quot '[
         @ output-stream get [ stream-write ] curry _ napply
     ] ;
@@ -197,7 +197,7 @@ text      = (formats|plain-text)* => [[ ]]
 
 PRIVATE>
 
-MACRO: strftime ( format-string -- )
+MACRO: strftime ( format-string -- quot )
     parse-strftime [
         dup string? [
             '[ _ swap push-all ]

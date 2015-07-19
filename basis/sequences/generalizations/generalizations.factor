@@ -4,28 +4,28 @@ combinators macros math.order math.ranges quotations fry effects
 memoize.private generalizations ;
 IN: sequences.generalizations
 
-MACRO: nsequence ( n seq -- )
+MACRO: nsequence ( n seq -- quot )
     [ [nsequence] ] keep '[ @ _ like ] ;
 
-MACRO: narray ( n -- )
+MACRO: narray ( n -- quot )
     '[ _ { } nsequence ] ;
 
-MACRO: firstn-unsafe ( n -- )
+MACRO: firstn-unsafe ( n -- quot )
     [firstn] ;
 
-MACRO: firstn ( n -- )
+MACRO: firstn ( n -- quot )
     [ [ drop ] ] [
         [ 1 - swap bounds-check 2drop ]
         [ firstn-unsafe ]
         bi-curry '[ _ _ bi ]
     ] if-zero ;
 
-MACRO: set-firstn-unsafe ( n -- )
+MACRO: set-firstn-unsafe ( n -- quot )
     [ 1 + ]
     [ iota [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
     '[ _ -nrot _ spread drop ] ;
 
-MACRO: set-firstn ( n -- )
+MACRO: set-firstn ( n -- quot )
     [ [ drop ] ] [
         [ 1 - swap bounds-check 2drop ]
         [ set-firstn-unsafe ]
@@ -37,7 +37,7 @@ MACRO: set-firstn ( n -- )
 : nappend-as ( n exemplar -- seq )
     [ narray ] [ concat-as ] bi* ; inline
 
-MACRO: nmin-length ( n -- )
+MACRO: nmin-length ( n -- quot )
     dup 1 - [ min ] n*quot
     '[ [ length ] _ napply @ ] ;
 
@@ -47,7 +47,7 @@ MACRO: nmin-length ( n -- )
 : nnth-unsafe ( n seq... n -- )
     [ nth-unsafe ] swap [ apply-curry ] [ cleave* ] bi ; inline
 
-MACRO: nset-nth-unsafe ( n -- )
+MACRO: nset-nth-unsafe ( n -- quot )
     [ [ drop ] ]
     [ '[ [ set-nth-unsafe ] _ [ apply-curry ] [ cleave-curry ] [ spread* ] tri ] ]
     if-zero ;
@@ -65,7 +65,7 @@ MACRO: nset-nth-unsafe ( n -- )
 : nmap ( seq... quot n -- result )
     dup '[ [ _ npick ] dip swap ] dip nmap-as ; inline
 
-MACRO: nnew-sequence ( n -- )
+MACRO: nnew-sequence ( n -- quot )
     [ [ drop ] ]
     [ dup '[ [ new-sequence ] _ apply-curry _ cleave* ] ] if-zero ;
 
@@ -78,7 +78,7 @@ MACRO: nnew-sequence ( n -- )
         _ spread*
     ] call ; inline
 
-MACRO: (ncollect) ( n -- )
+MACRO: (ncollect) ( n -- quot )
     3 dupn 1 +
     '[ [ [ keep ] _ ndip _ nset-nth-unsafe ] _ ncurry ] ;
 
