@@ -1,11 +1,11 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators compiler.units continuations
-destructors graphviz.dot images.viewer io.backend
-io.directories io.encodings.8-bit.latin1 io.encodings.utf8
-io.files io.files.unique io.launcher io.standard-paths kernel
-locals make namespaces parser sequences summary system
-unicode.case vocabs words ;
+USING: calendar combinators compiler.units continuations
+graphviz.dot images.viewer io.backend io.directories
+io.encodings.8-bit.latin1 io.encodings.utf8 io.files
+io.files.unique io.launcher io.standard-paths kernel locals make
+namespaces sequences summary system threads unicode.case vocabs
+webbrowser words ;
 IN: graphviz.render
 
 <PRIVATE
@@ -131,6 +131,9 @@ PRIVATE>
 
 : preview-window ( graph -- )
     [ image-window ] with-preview ;
+
+: preview-open ( graph -- )
+    [ open-file 1 seconds sleep ] with-preview ;
 
 <PRIVATE
 
