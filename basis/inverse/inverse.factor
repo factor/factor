@@ -132,7 +132,7 @@ M: pop-inverse inverse
 : [undo] ( quot -- undo )
     flatten fold reverse [ (undo) ] [ ] make ;
 
-MACRO: undo ( quot -- ) [undo] ;
+MACRO: undo ( quot -- quot ) [undo] ;
 
 ! Inverse of selected words
 
@@ -294,4 +294,4 @@ M: no-match summary drop "Fall through in switch" ;
     reverse [ [ [undo] ] dip compose ] { } assoc>map
     recover-chain ;
 
-MACRO: switch ( quot-alist -- ) [switch] ;
+MACRO: switch ( quot-alist -- quot ) [switch] ;

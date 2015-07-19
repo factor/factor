@@ -175,7 +175,7 @@ TUPLE: bunny-outlined
         } cleave
     ] [ drop ] if ;
 
-MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- )
+MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- quot )
     '[ _ _ (framebuffer-texture) [ @ drop ] keep ] ;
 
 : (make-framebuffer-textures) ( draw dim -- draw color normal depth )

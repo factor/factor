@@ -94,7 +94,7 @@ PRIVATE>
     [ drop ] 2bi
     '[ [ _ * ] dip + ] each ;
 
-MACRO: polyval* ( p -- )
+MACRO: polyval* ( p -- quot )
     reverse
     [ rest [ \ * swap \ + [ ] 3sequence ] map ]
     [ first \ drop swap [ ] 2sequence ] bi

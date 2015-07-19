@@ -5,7 +5,7 @@ generalizations kernel macros make sequences
 sequences.generalizations ;
 IN: shuffle
 
-MACRO: shuffle-effect ( effect -- )
+MACRO: shuffle-effect ( effect -- quot )
     [ in>> H{ } zip-index-as ] [ out>> ] bi
     [ drop assoc-size '[ _ narray ] ]
     [ [ of '[ _ swap nth ] ] with map ] 2bi

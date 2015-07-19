@@ -21,7 +21,7 @@ M: word enum>number "enum-value" word-prop ;
     { } map-as [ ] suffix '[ _ case ] ;
 PRIVATE>
 
-MACRO: number>enum ( enum-c-type -- )
+MACRO: number>enum ( enum-c-type -- quot )
     lookup-c-type members>> enum-boxer ;
 
 M: enum-c-type c-type-boxed-class drop object ;

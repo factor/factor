@@ -78,7 +78,7 @@ IN: mason.child
 : recover-else ( try catch else -- )
     [ [ '[ @ f t ] ] [ '[ @ f ] ] bi* recover ] dip '[ drop @ ] when ; inline
 
-MACRO: recover-cond ( alist -- )
+MACRO: recover-cond ( alist -- quot )
     dup { [ length 1 = ] [ first callable? ] } 1&&
     [ first ] [
         [ first first2 ] [ rest ] bi

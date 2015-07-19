@@ -9,7 +9,7 @@ ERROR: optimized-vconvert-inconsistent
     unoptimized-result
     optimized-result ;
 
-MACRO:: test-vconvert ( from-type to-type -- )
+MACRO:: test-vconvert ( from-type to-type -- quot )
     [ from-type to-type vconvert ] :> quot
     quot infer :> effect
     effect in>> length :> inputs

@@ -70,11 +70,11 @@ PRIVATE>
 
 PRIVATE>
 
-MACRO: parallel-cleave ( quots -- )
+MACRO: parallel-cleave ( quots -- quot )
     (parallel-cleave) '[ _ cleave _ spread ] ;
 
-MACRO: parallel-spread ( quots -- )
+MACRO: parallel-spread ( quots -- quot )
     (parallel-cleave) '[ _ spread _ spread ] ;
 
-MACRO: parallel-napply ( quot n -- )
+MACRO: parallel-napply ( quot n -- quot )
     [ [future] ] dip dup (parallel-spread) '[ _ _ napply _ spread ] ;

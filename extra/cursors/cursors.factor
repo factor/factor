@@ -547,13 +547,13 @@ ALIAS: -2in- -assoc-
 : -unzip- ( quot -- quot' )
     '[ [ keys>> cursor-value-unsafe ] [ values>> ] bi @ ] ; inline
 
-MACRO: nzip-cursors ( n -- ) 1 - [ zip-cursors ] n*quot ;
+MACRO: nzip-cursors ( n -- quot ) 1 - [ zip-cursors ] n*quot ;
 
 : nall ( seqs... n -- begin end ) [ [ all ] swap napply ] [ nzip-cursors ] bi ; inline
 
 : nall- ( seqs... quot n -- begin end quot ) swap [ nall ] dip ; inline
 
-MACRO: -nin- ( n -- )
+MACRO: -nin- ( n -- quot )
     1 - [ -unzip- ] n*quot [ -in- ] prepend ;
 
 : nin- ( seqs... quot n -- begin end quot ) [ nall- ] [ -nin- ] bi ; inline
@@ -574,5 +574,5 @@ MACRO: -nin- ( n -- )
 : -2with- ( invariant invariant begin end quot -- begin end quot' )
     -with- -with- ; inline
 
-MACRO: -nwith- ( n -- )
+MACRO: -nwith- ( n -- quot )
     [ -with- ] n*quot ;

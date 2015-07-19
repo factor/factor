@@ -79,7 +79,7 @@ M: did-not-fail summary drop "Did not fail" ;
     "(" ?head drop ")" ?tail drop
     H{ { CHAR: - CHAR: \s } } substitute >title ;
 
-MACRO: <experiment> ( word -- )
+MACRO: <experiment> ( word -- quot )
     [ stack-effect in>> length dup ]
     [ name>> experiment-title ] bi
     '[ _ ndup _ narray _ prefix ] ;

@@ -58,7 +58,7 @@ DEFER: smart-combo
 [ [ [ "a" "b" ] very-smart-combo "c" ] very-smart-combo ] must-infer
 
 ! Caveat found by Doug
-MACRO: curry-folding-test ( quot -- )
+MACRO: curry-folding-test ( quot -- quot )
     length \ drop <repetition> >quotation ;
 
 { 3 0 } [ [ 1 2 3 ] curry-folding-test ] must-infer-as

@@ -14,39 +14,39 @@ IN: generalizations
 
 ALIAS: n*quot (n*quot)
 
-MACRO: call-n ( n -- )
+MACRO: call-n ( n -- quot )
     [ call ] <repetition> '[ _ cleave ] ;
 
 : repeat ( n obj quot -- ) swapd times ; inline
 
 >>
 
-MACRO: nsum ( n -- )
+MACRO: nsum ( n -- quot )
     1 - [ + ] n*quot ;
 
 ERROR: nonpositive-npick n ;
 
-MACRO: npick ( n -- )
+MACRO: npick ( n -- quot )
     {
         { [ dup 0 <= ] [ nonpositive-npick ] }
         { [ dup 1 = ] [ drop [ dup ] ] }
         [ 1 - [ dup ] [ '[ _ dip swap ] ] repeat ]
     } cond ;
 
-MACRO: nover ( n -- )
+MACRO: nover ( n -- quot )
     dup 1 + '[ _ npick ] n*quot ;
 
 : ndup ( n -- )
     [ '[ _ npick ] ] keep call-n ; inline
 
-MACRO: dupn ( n -- )
+MACRO: dupn ( n -- quot )
     [ [ drop ] ]
     [ 1 - [ dup ] n*quot ] if-zero ;
 
-MACRO: nrot ( n -- )
+MACRO: nrot ( n -- quot )
     1 - [ ] [ '[ _ dip swap ] ] repeat ;
 
-MACRO: -nrot ( n -- )
+MACRO: -nrot ( n -- quot )
     1 - [ ] [ '[ swap _ dip ] ] repeat ;
 
 : ndrop ( n -- )
@@ -70,11 +70,11 @@ MACRO: -nrot ( n -- )
 : nbi ( quot1 quot2 n -- )
     [ nip nkeep ] [ drop nip call ] 3bi ; inline
 
-MACRO: ncleave ( quots n -- )
+MACRO: ncleave ( quots n -- quot )
     [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
     compose ;
 
-MACRO: nspread ( quots n -- )
+MACRO: nspread ( quots n -- quot )
     over empty? [ 2drop [ ] ] [
         [ [ but-last ] dip ]
         [ [ last ] dip ] 2bi
@@ -82,13 +82,13 @@ MACRO: nspread ( quots n -- )
         '[ [ _ _ nspread ] _ ndip @ ]
     ] if ;
 
-MACRO: spread* ( n -- )
+MACRO: spread* ( n -- quot )
     [ [ ] ] [
         [1,b) [ '[ [ [ _ ndip ] curry ] dip compose ] ] map [ ] concat-as
         [ call ] compose
     ] if-zero ;
 
-MACRO: nspread* ( m n -- )
+MACRO: nspread* ( m n -- quot )
     [ drop [ ] ] [
         [ * 0 ] [ drop neg ] 2bi
         <range> rest >array dup length iota <reversed>
@@ -98,7 +98,7 @@ MACRO: nspread* ( m n -- )
         [ ] concat-as [ call ] compose
     ] if-zero ;
 
-MACRO: cleave* ( n -- )
+MACRO: cleave* ( n -- quot )
     [ [ ] ]
     [ 1 - [ [ [ keep ] curry ] dip compose ] n*quot [ call ] compose ]
     if-zero ;
@@ -118,10 +118,10 @@ MACRO: cleave* ( n -- )
 : spread-curry ( a... quot... n -- )
     [ [curry] ] swap [ napply ] [ spread* ] bi ; inline
 
-MACRO: mnswap ( m n -- )
+MACRO: mnswap ( m n -- quot )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
 
-MACRO: nweave ( n -- )
+MACRO: nweave ( n -- quot )
     [ dup iota <reversed> [ '[ _ _ mnswap ] ] with map ] keep
     '[ _ _ ncleave ] ;
 

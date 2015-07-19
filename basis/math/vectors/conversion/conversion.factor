@@ -92,7 +92,7 @@ ERROR: bad-vconvert-input value expected-type ;
 
 PRIVATE>
 
-MACRO:: vconvert ( from-type to-type -- )
+MACRO:: vconvert ( from-type to-type -- quot )
     from-type new [ simd-element-type ] [ byte-length ] bi :> ( from-element from-length )
     to-type   new [ simd-element-type ] [ byte-length ] bi :> ( to-element   to-length   )
     from-element heap-size :> from-size

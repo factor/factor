@@ -33,7 +33,7 @@ MACRO: ordinary-op ( word -- o )
 ! e1 o1 o2 ... oN e2 o1 o2 ... oN ... eN o1 o2 ... oN
 ! This allows a set of partial derivatives each to be evaluated
 ! at the same point.
-MACRO: duals>nweave ( n -- )
+MACRO: duals>nweave ( n -- quot )
    dup dup dup
    '[
        [ [ epsilon-part>> ] _ napply ]
@@ -64,7 +64,7 @@ MACRO: chain-rule ( word -- e )
 
 PRIVATE>
 
-MACRO: dual-op ( word -- )
+MACRO: dual-op ( word -- quot )
     [ '[ _ ordinary-op ] ]
     [ input-length '[ _ nkeep ] ]
     [ '[ _ chain-rule ] ]

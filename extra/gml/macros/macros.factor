@@ -24,7 +24,7 @@ SYMBOL: current-macro
 
 : save-euler-op ( euler-op -- ) current-macro get log>> push ;
 
-MACRO:: log-euler-op ( class def inputs -- )
+MACRO:: log-euler-op ( class def inputs -- quot )
     class inputs def inputs '[ [ current-macro get [ _ boa save-euler-op ] [ _ ndrop ] if ] _ _ nbi ] ;
 
 SYNTAX: LOG-GML:

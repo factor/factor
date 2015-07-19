@@ -23,7 +23,7 @@ IN: compiler.tree.debugger
 
 GENERIC: node>quot ( node -- )
 
-MACRO: match-choose ( alist -- )
+MACRO: match-choose ( alist -- quot )
     [ '[ _ ] ] assoc-map '[ _ match-cond ] ;
 
 MATCH-VARS: ?a ?b ?c ;

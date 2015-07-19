@@ -70,7 +70,7 @@ M: pair (bitfield-quot) ( spec -- quot )
 
 PRIVATE>
 
-MACRO: bitfield ( bitspec -- )
+MACRO: bitfield ( bitspec -- quot )
     [ [ 0 ] ] [
         [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
     ] if-empty ;

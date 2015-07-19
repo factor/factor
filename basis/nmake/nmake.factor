@@ -28,7 +28,7 @@ SYMBOL: building-seq
 : 4% ( seq -- ) 4 n% ;
 : 4# ( num -- ) 4 n# ;
 
-MACRO: finish-nmake ( exemplars -- )
+MACRO: finish-nmake ( exemplars -- quot )
     length [ firstn ] curry ;
 
 :: nmake ( quot exemplars -- )

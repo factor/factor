@@ -42,7 +42,7 @@ SYNTAX: MATCH-VARS: ! vars ...
 : match ( value1 value2 -- bindings )
     [ (match) ] H{ } make swap [ drop f ] unless ;
 
-MACRO: match-cond ( assoc -- )
+MACRO: match-cond ( assoc -- quot )
     <reversed>
     [ "Fall-through in match-cond" throw ]
     [

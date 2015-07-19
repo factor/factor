@@ -162,7 +162,7 @@ MACRO: cuda-arguments ( c-types abi -- quot: ( args... function -- ) )
     [ cached-module ] dip
     2array cuda-functions get [ first2 get-function-ptr ] cache ;
 
-MACRO: cuda-invoke ( module-name function-name arguments -- )
+MACRO: cuda-invoke ( module-name function-name arguments -- quot )
     pick lookup-cuda-library abi>> '[
         _ _ cached-function
         [ nip _ _ cuda-arguments ]

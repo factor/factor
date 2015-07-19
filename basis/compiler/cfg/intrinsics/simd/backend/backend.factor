@@ -84,22 +84,22 @@ M:: pair >vector-op-cond ( pair #pick #dup -- quotpair )
     #dup '[ % _ nnip ]
     2array ;
 
-MACRO: v-vector-op ( trials -- )
+MACRO: v-vector-op ( trials -- quot )
     [ 1 2 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vl-vector-op ( trials -- )
+MACRO: vl-vector-op ( trials -- quot )
     [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vvl-vector-op ( trials -- )
+MACRO: vvl-vector-op ( trials -- quot )
     [ 1 4 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vv-vector-op ( trials -- )
+MACRO: vv-vector-op ( trials -- quot )
     [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vv-cc-vector-op ( trials -- )
+MACRO: vv-cc-vector-op ( trials -- quot )
     [ 2 4 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vvvv-vector-op ( trials -- )
+MACRO: vvvv-vector-op ( trials -- quot )
     [ 1 5 >vector-op-cond ] map '[ f f _ cond ] ;
 
 ! Intrinsic code emission
 
-MACRO: check-elements ( quots -- )
+MACRO: check-elements ( quots -- quot )
     [ length '[ _ firstn ] ]
     [ '[ _ spread ] ]
     [ length 1 - \ and <repetition> [ ] like ]
@@ -107,7 +107,7 @@ MACRO: check-elements ( quots -- )
 
 ERROR: bad-simd-intrinsic node ;
 
-MACRO: if-literals-match ( quots -- )
+MACRO: if-literals-match ( quots -- quot )
     [ length ] [ ] [ length ] tri
     ! n quots n
     '[
@@ -142,18 +142,18 @@ CONSTANT: [quaternary]
     params-quot trials op-quot literal-preds
     '[ [ _ dip _ @ ds-push ] _ if-literals-match ] ;
 
-MACRO: emit-v-vector-op ( trials -- )
+MACRO: emit-v-vector-op ( trials -- quot )
     [unary] [ v-vector-op ] { [ representation? ] } [emit-vector-op] ;
-MACRO: emit-vl-vector-op ( trials literal-pred -- )
+MACRO: emit-vl-vector-op ( trials literal-pred -- quot )
     [ [unary/param] [ vl-vector-op ] { [ representation? ] } ] dip prefix [emit-vector-op] ;
-MACRO: emit-vv-vector-op ( trials -- )
+MACRO: emit-vv-vector-op ( trials -- quot )
     [binary] [ vv-vector-op ] { [ representation? ] } [emit-vector-op] ;
-MACRO: emit-vvl-vector-op ( trials literal-pred -- )
+MACRO: emit-vvl-vector-op ( trials literal-pred -- quot )
     [ [binary/param] [ vvl-vector-op ] { [ representation? ] } ] dip prefix [emit-vector-op] ;
-MACRO: emit-vvvv-vector-op ( trials -- )
+MACRO: emit-vvvv-vector-op ( trials -- quot )
     [quaternary] [ vvvv-vector-op ] { [ representation? ] } [emit-vector-op] ;
 
-MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- )
+MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- quot )
     literal-pred imm-trials literal-pred var-trials
     '[
         dup node-input-infos 2 tail-slice* first literal>> @
