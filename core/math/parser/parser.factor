@@ -23,7 +23,7 @@ ERROR: invalid-radix radix ;
 TUPLE: number-parse
     { str read-only }
     { length fixnum read-only }
-    { radix fixnum read-only } ;
+    { radix fixnum } ;
 
 : <number-parse> ( str radix -- i number-parse n )
     [ 0 ] 2dip [ dup length ] dip number-parse boa 0 ; inline
@@ -48,15 +48,15 @@ TUPLE: number-parse
     [ / ] [ drop f ] if* ; inline
 
 TUPLE: float-parse
-    { radix fixnum read-only }
-    { point read-only }
-    { exponent read-only } ;
+    { radix fixnum }
+    { point }
+    { exponent } ;
 
 : inc-point ( float-parse -- float-parse' )
-    [ radix>> ] [ point>> 1 + ] [ exponent>> ] tri float-parse boa ; inline
+    [ 1 + ] change-point ; inline
 
 : store-exponent ( float-parse n expt -- float-parse' n )
-    swap [ [ radix>> ] [ point>> ] bi ] 2dip [ float-parse boa ] dip ; inline
+    swap [ >>exponent ] dip ; inline
 
 : ?store-exponent ( float-parse n expt/f -- float-parse' n/f )
     [ store-exponent ] [ drop f ] if* ; inline
@@ -115,7 +115,7 @@ TUPLE: float-parse
     -rot 0 ; inline
 
 : @split-exponent ( i number-parse n -- n i number-parse' n' )
-    -rot [ str>> ] [ length>> ] bi 10 number-parse boa 0 ; inline
+    -rot 10 >>radix 0 ; inline
 
 : <float-parse> ( i number-parse n -- float-parse i number-parse n )
      [ drop nip radix>> 0 f float-parse boa ] 3keep ; inline
@@ -228,11 +228,8 @@ DEFER: @neg-digit
     { fixnum number-parse integer fixnum } declare
     digit-in-radix [ [ @pos-digit-or-punc ] add-digit ] [ @abort ] if ;
 
-: (->radix) ( number-parse radix -- number-parse' )
-    [ [ str>> ] [ length>> ] bi ] dip number-parse boa ; inline
-
 : ->radix ( i number-parse n quot radix -- i number-parse n quot )
-    [ (->radix) ] curry 2dip ; inline
+    [ >>radix ] curry 2dip ; inline
 
 : with-radix-char ( i number-parse n radix-quot nonradix-quot -- n/f )
     [
