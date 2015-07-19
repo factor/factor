@@ -38,52 +38,52 @@ TYPEDEF: XID GLXFBConfigID
 TYPEDEF: void* GLXContext  ! typedef struct __GLXcontextRec *GLXContext;
 TYPEDEF: void* GLXFBConfig ! typedef struct __GLXFBConfigRec *GLXFBConfig;
 
-X-FUNCTION: XVisualInfo* glXChooseVisual ( Display* dpy, int screen, int* attribList ) ;
-X-FUNCTION: void glXCopyContext ( Display* dpy, GLXContext src, GLXContext dst, ulong mask ) ;
-X-FUNCTION: GLXContext glXCreateContext ( Display* dpy, XVisualInfo* vis, GLXContext shareList, bool direct ) ;
-X-FUNCTION: GLXPixmap glXCreateGLXPixmap ( Display* dpy, XVisualInfo* vis, Pixmap pixmap ) ;
-X-FUNCTION: void glXDestroyContext ( Display* dpy, GLXContext ctx ) ;
-X-FUNCTION: void glXDestroyGLXPixmap ( Display* dpy, GLXPixmap pix ) ;
-X-FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value ) ;
-X-FUNCTION: GLXContext glXGetCurrentContext ( ) ;
-X-FUNCTION: GLXDrawable glXGetCurrentDrawable ( ) ;
-X-FUNCTION: bool glXIsDirect ( Display* dpy, GLXContext ctx ) ;
-X-FUNCTION: bool glXMakeCurrent ( Display* dpy, GLXDrawable drawable, GLXContext ctx ) ;
-X-FUNCTION: bool glXQueryExtension ( Display* dpy, int* errorBase, int* eventBase ) ;
-X-FUNCTION: bool glXQueryVersion ( Display* dpy, int* major, int* minor ) ;
-X-FUNCTION: void glXSwapBuffers ( Display* dpy, GLXDrawable drawable ) ;
-X-FUNCTION: void glXUseXFont ( Font font, int first, int count, int listBase ) ;
-X-FUNCTION: void glXWaitGL ( ) ;
-X-FUNCTION: void glXWaitX ( ) ;
-X-FUNCTION: c-string glXGetClientString ( Display* dpy, int name ) ;
-X-FUNCTION: c-string glXQueryServerString ( Display* dpy, int screen, int name ) ;
-X-FUNCTION: c-string glXQueryExtensionsString ( Display* dpy, int screen ) ;
+X-FUNCTION: XVisualInfo* glXChooseVisual ( Display* dpy, int screen, int* attribList )
+X-FUNCTION: void glXCopyContext ( Display* dpy, GLXContext src, GLXContext dst, ulong mask )
+X-FUNCTION: GLXContext glXCreateContext ( Display* dpy, XVisualInfo* vis, GLXContext shareList, bool direct )
+X-FUNCTION: GLXPixmap glXCreateGLXPixmap ( Display* dpy, XVisualInfo* vis, Pixmap pixmap )
+X-FUNCTION: void glXDestroyContext ( Display* dpy, GLXContext ctx )
+X-FUNCTION: void glXDestroyGLXPixmap ( Display* dpy, GLXPixmap pix )
+X-FUNCTION: int glXGetConfig ( Display* dpy, XVisualInfo* vis, int attrib, int* value )
+X-FUNCTION: GLXContext glXGetCurrentContext ( )
+X-FUNCTION: GLXDrawable glXGetCurrentDrawable ( )
+X-FUNCTION: bool glXIsDirect ( Display* dpy, GLXContext ctx )
+X-FUNCTION: bool glXMakeCurrent ( Display* dpy, GLXDrawable drawable, GLXContext ctx )
+X-FUNCTION: bool glXQueryExtension ( Display* dpy, int* errorBase, int* eventBase )
+X-FUNCTION: bool glXQueryVersion ( Display* dpy, int* major, int* minor )
+X-FUNCTION: void glXSwapBuffers ( Display* dpy, GLXDrawable drawable )
+X-FUNCTION: void glXUseXFont ( Font font, int first, int count, int listBase )
+X-FUNCTION: void glXWaitGL ( )
+X-FUNCTION: void glXWaitX ( )
+X-FUNCTION: c-string glXGetClientString ( Display* dpy, int name )
+X-FUNCTION: c-string glXQueryServerString ( Display* dpy, int screen, int name )
+X-FUNCTION: c-string glXQueryExtensionsString ( Display* dpy, int screen )
 
 ! New for GLX 1.3
-X-FUNCTION: GLXFBConfig* glXGetFBConfigs ( Display* dpy, int screen, int* nelements ) ;
-X-FUNCTION: GLXFBConfig* glXChooseFBConfig ( Display* dpy, int screen, int* attrib_list, int* nelements ) ;
-X-FUNCTION: int glXGetFBConfigAttrib ( Display* dpy, GLXFBConfig config, int attribute, int* value ) ;
-X-FUNCTION: XVisualInfo* glXGetVisualFromFBConfig ( Display* dpy, GLXFBConfig config ) ;
-X-FUNCTION: GLXWindow glXCreateWindow ( Display* dpy, GLXFBConfig config, Window win, int* attrib_list ) ;
-X-FUNCTION: void glXDestroyWindow ( Display* dpy, GLXWindow win ) ;
-X-FUNCTION: GLXPixmap glXCreatePixmap ( Display* dpy, GLXFBConfig config, Pixmap pixmap, int* attrib_list ) ;
-X-FUNCTION: void glXDestroyPixmap ( Display* dpy, GLXPixmap pixmap ) ;
-X-FUNCTION: GLXPbuffer glXCreatePbuffer ( Display* dpy, GLXFBConfig config, int* attrib_list ) ;
-X-FUNCTION: void glXDestroyPbuffer ( Display* dpy, GLXPbuffer pbuf ) ;
-X-FUNCTION: void glXQueryDrawable ( Display* dpy, GLXDrawable draw, int attribute, uint* value ) ;
-X-FUNCTION: GLXContext glXCreateNewContext ( Display* dpy, GLXFBConfig config, int render_type, GLXContext share_list, bool direct ) ;
-X-FUNCTION: bool glXMakeContextCurrent ( Display* display, GLXDrawable draw, GLXDrawable read, GLXContext ctx ) ;
-X-FUNCTION: GLXDrawable glXGetCurrentReadDrawable ( ) ;
-X-FUNCTION: Display*  glXGetCurrentDisplay ( ) ;
-X-FUNCTION: int glXQueryContext ( Display* dpy, GLXContext ctx, int attribute, int* value ) ;
-X-FUNCTION: void glXSelectEvent ( Display* dpy, GLXDrawable draw, ulong event_mask ) ;
-X-FUNCTION: void glXGetSelectedEvent ( Display* dpy, GLXDrawable draw, ulong* event_mask ) ;
+X-FUNCTION: GLXFBConfig* glXGetFBConfigs ( Display* dpy, int screen, int* nelements )
+X-FUNCTION: GLXFBConfig* glXChooseFBConfig ( Display* dpy, int screen, int* attrib_list, int* nelements )
+X-FUNCTION: int glXGetFBConfigAttrib ( Display* dpy, GLXFBConfig config, int attribute, int* value )
+X-FUNCTION: XVisualInfo* glXGetVisualFromFBConfig ( Display* dpy, GLXFBConfig config )
+X-FUNCTION: GLXWindow glXCreateWindow ( Display* dpy, GLXFBConfig config, Window win, int* attrib_list )
+X-FUNCTION: void glXDestroyWindow ( Display* dpy, GLXWindow win )
+X-FUNCTION: GLXPixmap glXCreatePixmap ( Display* dpy, GLXFBConfig config, Pixmap pixmap, int* attrib_list )
+X-FUNCTION: void glXDestroyPixmap ( Display* dpy, GLXPixmap pixmap )
+X-FUNCTION: GLXPbuffer glXCreatePbuffer ( Display* dpy, GLXFBConfig config, int* attrib_list )
+X-FUNCTION: void glXDestroyPbuffer ( Display* dpy, GLXPbuffer pbuf )
+X-FUNCTION: void glXQueryDrawable ( Display* dpy, GLXDrawable draw, int attribute, uint* value )
+X-FUNCTION: GLXContext glXCreateNewContext ( Display* dpy, GLXFBConfig config, int render_type, GLXContext share_list, bool direct )
+X-FUNCTION: bool glXMakeContextCurrent ( Display* display, GLXDrawable draw, GLXDrawable read, GLXContext ctx )
+X-FUNCTION: GLXDrawable glXGetCurrentReadDrawable ( )
+X-FUNCTION: Display*  glXGetCurrentDisplay ( )
+X-FUNCTION: int glXQueryContext ( Display* dpy, GLXContext ctx, int attribute, int* value )
+X-FUNCTION: void glXSelectEvent ( Display* dpy, GLXDrawable draw, ulong event_mask )
+X-FUNCTION: void glXGetSelectedEvent ( Display* dpy, GLXDrawable draw, ulong* event_mask )
 
 ! GLX 1.4 and later
-X-FUNCTION: void* glXGetProcAddress ( c-string procname ) ;
+X-FUNCTION: void* glXGetProcAddress ( c-string procname )
 
 ! GLX_ARB_get_proc_address extension
-X-FUNCTION: void* glXGetProcAddressARB ( c-string procname ) ;
+X-FUNCTION: void* glXGetProcAddressARB ( c-string procname )
 
 ! GLX_ARB_multisample
 CONSTANT: GLX_SAMPLE_BUFFERS 100000

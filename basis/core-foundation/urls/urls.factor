@@ -8,11 +8,11 @@ CONSTANT: kCFURLPOSIXPathStyle 0
 
 TYPEDEF: void* CFURLRef
 
-FUNCTION: CFURLRef CFURLCreateWithFileSystemPath ( CFAllocatorRef allocator, CFStringRef filePath, int pathStyle, Boolean isDirectory ) ;
+FUNCTION: CFURLRef CFURLCreateWithFileSystemPath ( CFAllocatorRef allocator, CFStringRef filePath, int pathStyle, Boolean isDirectory )
 
-FUNCTION: CFURLRef CFURLCreateWithString ( CFAllocatorRef allocator, CFStringRef string, CFURLRef base ) ;
+FUNCTION: CFURLRef CFURLCreateWithString ( CFAllocatorRef allocator, CFStringRef string, CFURLRef base )
 
-FUNCTION: CFURLRef CFURLCopyFileSystemPath ( CFURLRef url, int pathStyle ) ;
+FUNCTION: CFURLRef CFURLCopyFileSystemPath ( CFURLRef url, int pathStyle )
 
 : <CFFileSystemURL> ( string dir? -- url )
     [ <CFString> f over kCFURLPOSIXPathStyle ] dip

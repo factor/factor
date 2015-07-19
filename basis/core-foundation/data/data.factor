@@ -12,9 +12,9 @@ CONSTANT: kCFPropertyListImmutable 0
 CONSTANT: kCFPropertyListMutableContainers 1
 CONSTANT: kCFPropertyListMutableContainersAndLeaves 2
 
-FUNCTION: CFDataRef CFDataCreate ( CFAllocatorRef allocator, UInt8* bytes, CFIndex length ) ;
+FUNCTION: CFDataRef CFDataCreate ( CFAllocatorRef allocator, UInt8* bytes, CFIndex length )
 
-FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
+FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf )
 
 : <CFData> ( byte-array -- alien )
     [ f ] dip dup length CFDataCreate ;

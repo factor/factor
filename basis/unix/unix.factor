@@ -64,7 +64,7 @@ HOOK: open-file os ( path flags mode -- fd )
 
 : close-file ( fd -- ) [ close ] unix-system-call-allow-eintr drop ;
 
-FUNCTION: int _exit ( int status ) ;
+FUNCTION: int _exit ( int status )
 
 M: unix open-file [ open ] unix-system-call ;
 

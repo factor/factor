@@ -12,10 +12,10 @@ HOOK: strerror os ( errno -- str )
 LIBRARY: factor
 
 FUNCTION-ALIAS: errno
-    int err_no ( ) ;
+    int err_no ( )
 
 FUNCTION-ALIAS: set-errno
-    void set_err_no ( int err-no ) ;
+    void set_err_no ( int err-no )
 
 : clear-errno ( -- )
     0 set-errno ;
@@ -26,19 +26,19 @@ FUNCTION-ALIAS: set-errno
 LIBRARY: libc
 
 FUNCTION-ALIAS: (malloc)
-    void* malloc ( size_t size ) ;
+    void* malloc ( size_t size )
 
 FUNCTION-ALIAS: (calloc)
-    void* calloc ( size_t count,  size_t size ) ;
+    void* calloc ( size_t count,  size_t size )
 
 FUNCTION-ALIAS: (free)
-    void free ( void* alien ) ;
+    void free ( void* alien )
 
 FUNCTION-ALIAS: (realloc)
-    void* realloc ( void* alien, size_t size ) ;
+    void* realloc ( void* alien, size_t size )
 
 FUNCTION-ALIAS: strerror_unsafe
-    char* strerror ( int errno ) ;
+    char* strerror ( int errno )
 
 ! Add a default strerror even though it's not threadsafe
 M: object strerror strerror_unsafe ;
@@ -107,17 +107,17 @@ PRIVATE>
 : free ( alien -- )
     >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
-FUNCTION: void memset ( void* buf, int char, size_t size ) ;
+FUNCTION: void memset ( void* buf, int char, size_t size )
 
-FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
+FUNCTION: void memcpy ( void* dst, void* src, ulong size )
 
-FUNCTION: int memcmp ( void* a, void* b, ulong size ) ;
+FUNCTION: int memcmp ( void* a, void* b, ulong size )
 
 : memory= ( a b size -- ? ) memcmp 0 = ; inline
 
-FUNCTION: size_t strlen ( c-string alien ) ;
+FUNCTION: size_t strlen ( c-string alien )
 
-FUNCTION: int system ( c-string command ) ;
+FUNCTION: int system ( c-string command )
 
 DESTRUCTOR: free
 

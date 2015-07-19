@@ -26,9 +26,9 @@ TYPEDEF: void Bytef
 TYPEDEF: ulong uLongf
 TYPEDEF: ulong uLong
 
-FUNCTION: int compress ( Bytef* dest, uLongf* destLen, Bytef* source, uLong sourceLen ) ;
-FUNCTION: int compress2 ( Bytef* dest, uLongf* destLen, Bytef* source, uLong sourceLen, int level ) ;
-FUNCTION: int uncompress ( Bytef* dest, uLongf* destLen, Bytef* source, uLong sourceLen ) ;
+FUNCTION: int compress ( Bytef* dest, uLongf* destLen, Bytef* source, uLong sourceLen )
+FUNCTION: int compress2 ( Bytef* dest, uLongf* destLen, Bytef* source, uLong sourceLen, int level )
+FUNCTION: int uncompress ( Bytef* dest, uLongf* destLen, Bytef* source, uLong sourceLen )
 
 STRUCT: z_stream
     { next_in uchar* }
@@ -71,10 +71,10 @@ TYPEDEF: gz_header* gz_headerp
 
 CONSTANT: ZLIB_VERSION "1.2.5"
 
-FUNCTION: int inflateInit_ ( z_streamp strm, c-string version, int stream_size ) ;
-FUNCTION: int inflateInit2_ ( z_streamp strm, int windowBits, c-string version, int stream_size ) ;
-FUNCTION: int inflateReset ( z_streamp strm ) ;
-FUNCTION: int inflateEnd ( z_streamp strm ) ;
+FUNCTION: int inflateInit_ ( z_streamp strm, c-string version, int stream_size )
+FUNCTION: int inflateInit2_ ( z_streamp strm, int windowBits, c-string version, int stream_size )
+FUNCTION: int inflateReset ( z_streamp strm )
+FUNCTION: int inflateEnd ( z_streamp strm )
 
 CONSTANT: Z_NO_FLUSH      0
 CONSTANT: Z_PARTIAL_FLUSH 1
@@ -84,5 +84,5 @@ CONSTANT: Z_FINISH        4
 CONSTANT: Z_BLOCK         5
 CONSTANT: Z_TREES         6
 
-FUNCTION: int inflate ( z_streamp strm, int flush ) ;
-FUNCTION: int inflateGetHeader ( z_streamp strm, gz_headerp head ) ;
+FUNCTION: int inflate ( z_streamp strm, int flush )
+FUNCTION: int inflateGetHeader ( z_streamp strm, gz_headerp head )

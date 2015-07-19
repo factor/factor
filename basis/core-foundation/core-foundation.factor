@@ -36,8 +36,8 @@ STRUCT: CFRange
 : <CFRange> ( location length -- range )
     CFRange <struct-boa> ;
 
-FUNCTION: CFTypeRef CFRetain ( CFTypeRef cf ) ;
+FUNCTION: CFTypeRef CFRetain ( CFTypeRef cf )
 
-FUNCTION: void CFRelease ( CFTypeRef cf ) ;
+FUNCTION: void CFRelease ( CFTypeRef cf )
 
 DESTRUCTOR: CFRelease

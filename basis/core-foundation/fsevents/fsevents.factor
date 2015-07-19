@@ -53,7 +53,7 @@ STRUCT: FSEventStreamContext
     { release void* }
     { copyDescription void* } ;
 
-CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds ) ;
+CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds )
 
 CONSTANT: FSEventStreamEventIdSinceNow 0xFFFFFFFFFFFFFFFF
 
@@ -64,7 +64,7 @@ FUNCTION: FSEventStreamRef FSEventStreamCreate (
     CFArrayRef               pathsToWatch,
     FSEventStreamEventId     sinceWhen,
     CFTimeInterval           latency,
-    FSEventStreamCreateFlags flags ) ;
+    FSEventStreamCreateFlags flags )
 
 FUNCTION: FSEventStreamRef FSEventStreamCreateRelativeToDevice (
     CFAllocatorRef           allocator,
@@ -74,53 +74,53 @@ FUNCTION: FSEventStreamRef FSEventStreamCreateRelativeToDevice (
     CFArrayRef               pathsToWatchRelativeToDevice,
     FSEventStreamEventId     sinceWhen,
     CFTimeInterval           latency,
-    FSEventStreamCreateFlags flags ) ;
+    FSEventStreamCreateFlags flags )
 
-FUNCTION: FSEventStreamEventId FSEventStreamGetLatestEventId ( FSEventStreamRef streamRef ) ;
+FUNCTION: FSEventStreamEventId FSEventStreamGetLatestEventId ( FSEventStreamRef streamRef )
 
-FUNCTION: dev_t FSEventStreamGetDeviceBeingWatched ( FSEventStreamRef streamRef ) ;
+FUNCTION: dev_t FSEventStreamGetDeviceBeingWatched ( FSEventStreamRef streamRef )
 
-FUNCTION: CFArrayRef FSEventStreamCopyPathsBeingWatched ( FSEventStreamRef streamRef ) ;
+FUNCTION: CFArrayRef FSEventStreamCopyPathsBeingWatched ( FSEventStreamRef streamRef )
 
-FUNCTION: FSEventStreamEventId FSEventsGetCurrentEventId ( ) ;
+FUNCTION: FSEventStreamEventId FSEventsGetCurrentEventId ( )
 
-FUNCTION: CFUUIDRef FSEventsCopyUUIDForDevice ( dev_t dev ) ;
+FUNCTION: CFUUIDRef FSEventsCopyUUIDForDevice ( dev_t dev )
 
 FUNCTION: FSEventStreamEventId FSEventsGetLastEventIdForDeviceBeforeTime (
     dev_t          dev,
-    CFAbsoluteTime time ) ;
+    CFAbsoluteTime time )
 
 FUNCTION: Boolean FSEventsPurgeEventsForDeviceUpToEventId (
     dev_t                dev,
-    FSEventStreamEventId eventId ) ;
+    FSEventStreamEventId eventId )
 
-FUNCTION: void FSEventStreamRetain ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamRetain ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamRelease ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamRelease ( FSEventStreamRef streamRef )
 
 FUNCTION: void FSEventStreamScheduleWithRunLoop (
     FSEventStreamRef streamRef,
     CFRunLoopRef     runLoop,
-    CFStringRef      runLoopMode ) ;
+    CFStringRef      runLoopMode )
 
 FUNCTION: void FSEventStreamUnscheduleFromRunLoop (
     FSEventStreamRef streamRef,
     CFRunLoopRef     runLoop,
-    CFStringRef      runLoopMode ) ;
+    CFStringRef      runLoopMode )
 
-FUNCTION: void FSEventStreamInvalidate ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamInvalidate ( FSEventStreamRef streamRef )
 
-FUNCTION: Boolean FSEventStreamStart ( FSEventStreamRef streamRef ) ;
+FUNCTION: Boolean FSEventStreamStart ( FSEventStreamRef streamRef )
 
-FUNCTION: FSEventStreamEventId FSEventStreamFlushAsync ( FSEventStreamRef streamRef ) ;
+FUNCTION: FSEventStreamEventId FSEventStreamFlushAsync ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamFlushSync ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamFlushSync ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamStop ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamStop ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef )
 
-FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef ) ;
+FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef )
 
 : make-FSEventStreamContext ( info -- alien )
     FSEventStreamContext <struct>

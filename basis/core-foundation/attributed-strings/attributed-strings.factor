@@ -11,7 +11,7 @@ FUNCTION: CFAttributedStringRef CFAttributedStringCreate (
    CFAllocatorRef alloc,
    CFStringRef str,
    CFDictionaryRef attributes
-) ;
+)
 
 : <CFAttributedString> ( string assoc -- alien )
     [

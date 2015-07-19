@@ -49,25 +49,25 @@ CONSTANT: ALUT_WAVEFORM_IMPULSE 0x104
 CONSTANT: ALUT_LOADER_BUFFER 0x300
 CONSTANT: ALUT_LOADER_MEMORY 0x301
 
-FUNCTION: ALboolean alutInit ( int* argcp, c-string* argv ) ;
-FUNCTION: ALboolean alutInitWithoutContext ( int* argcp, c-string* argv ) ;
-FUNCTION: ALboolean alutExit ( ) ;
-FUNCTION: ALenum alutGetError ( ) ;
-FUNCTION: c-string alutGetErrorString ( ALenum error ) ;
-FUNCTION: ALuint alutCreateBufferFromFile ( c-string fileName ) ;
-FUNCTION: ALuint alutCreateBufferFromFileImage ( void* data, ALsizei length ) ;
-FUNCTION: ALuint alutCreateBufferHelloWorld ( ) ;
-FUNCTION: ALuint alutCreateBufferWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration ) ;
-FUNCTION: void* alutLoadMemoryFromFile ( c-string fileName, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryFromFileImage ( void* data, ALsizei length, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryHelloWorld ( ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration, ALenum* format, ALsizei* size, ALfloat* freq ) ;
-FUNCTION: c-string alutGetMIMETypes ( ALenum loader ) ;
-FUNCTION: ALint alutGetMajorVersion ( ) ;
-FUNCTION: ALint alutGetMinorVersion ( ) ;
-FUNCTION: ALboolean alutSleep ( ALfloat duration ) ;
+FUNCTION: ALboolean alutInit ( int* argcp, c-string* argv )
+FUNCTION: ALboolean alutInitWithoutContext ( int* argcp, c-string* argv )
+FUNCTION: ALboolean alutExit ( )
+FUNCTION: ALenum alutGetError ( )
+FUNCTION: c-string alutGetErrorString ( ALenum error )
+FUNCTION: ALuint alutCreateBufferFromFile ( c-string fileName )
+FUNCTION: ALuint alutCreateBufferFromFileImage ( void* data, ALsizei length )
+FUNCTION: ALuint alutCreateBufferHelloWorld ( )
+FUNCTION: ALuint alutCreateBufferWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration )
+FUNCTION: void* alutLoadMemoryFromFile ( c-string fileName, ALenum* format, ALsizei* size, ALfloat* frequency )
+FUNCTION: void* alutLoadMemoryFromFileImage ( void* data, ALsizei length, ALenum* format, ALsizei* size, ALfloat* frequency )
+FUNCTION: void* alutLoadMemoryHelloWorld ( ALenum* format, ALsizei* size, ALfloat* frequency )
+FUNCTION: void* alutLoadMemoryWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration, ALenum* format, ALsizei* size, ALfloat* freq )
+FUNCTION: c-string alutGetMIMETypes ( ALenum loader )
+FUNCTION: ALint alutGetMajorVersion ( )
+FUNCTION: ALint alutGetMinorVersion ( )
+FUNCTION: ALboolean alutSleep ( ALfloat duration )
 
-FUNCTION: void alutUnloadWAV ( ALenum format, void* data, ALsizei size, ALsizei frequency ) ;
+FUNCTION: void alutUnloadWAV ( ALenum format, void* data, ALsizei size, ALsizei frequency )
 
 SYMBOL: init
 

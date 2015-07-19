@@ -104,79 +104,79 @@ CONSTANT: AL_LINEAR_DISTANCE_CLAMPED 0xD004
 CONSTANT: AL_EXPONENT_DISTANCE 0xD005
 CONSTANT: AL_EXPONENT_DISTANCE_CLAMPED 0xD006
 
-FUNCTION: void alEnable ( ALenum capability ) ;
-FUNCTION: void alDisable ( ALenum capability ) ;
-FUNCTION: ALboolean alIsEnabled ( ALenum capability ) ;
-FUNCTION: ALchar* alGetString ( ALenum param ) ;
-FUNCTION: void alGetBooleanv ( ALenum param, ALboolean* data ) ;
-FUNCTION: void alGetIntegerv ( ALenum param, ALint* data ) ;
-FUNCTION: void alGetFloatv ( ALenum param, ALfloat* data ) ;
-FUNCTION: void alGetDoublev ( ALenum param, ALdouble* data ) ;
-FUNCTION: ALboolean alGetBoolean ( ALenum param ) ;
-FUNCTION: ALint alGetInteger ( ALenum param ) ;
-FUNCTION: ALfloat alGetFloat ( ALenum param ) ;
-FUNCTION: ALdouble alGetDouble ( ALenum param ) ;
-FUNCTION: ALenum alGetError (  ) ;
-FUNCTION: ALboolean alIsExtensionPresent ( ALchar* extname ) ;
-FUNCTION: void* alGetProcAddress ( ALchar* fname ) ;
-FUNCTION: ALenum alGetEnumValue ( ALchar* ename ) ;
-FUNCTION: void alListenerf ( ALenum param, ALfloat value ) ;
-FUNCTION: void alListener3f ( ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 ) ;
-FUNCTION: void alListenerfv ( ALenum param, ALfloat* values ) ;
-FUNCTION: void alListeneri ( ALenum param, ALint value ) ;
-FUNCTION: void alListener3i ( ALenum param, ALint value1, ALint value2, ALint value3 ) ;
-FUNCTION: void alListeneriv ( ALenum param, ALint* values ) ;
-FUNCTION: void alGetListenerf ( ALenum param, ALfloat* value ) ;
-FUNCTION: void alGetListener3f ( ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3 ) ;
-FUNCTION: void alGetListenerfv ( ALenum param, ALfloat* values ) ;
-FUNCTION: void alGetListeneri ( ALenum param, ALint* value ) ;
-FUNCTION: void alGetListener3i ( ALenum param, ALint* value1, ALint* value2, ALint* value3 ) ;
-FUNCTION: void alGetListeneriv ( ALenum param, ALint* values ) ;
-FUNCTION: void alGenSources ( ALsizei n, ALuint* sources ) ;
-FUNCTION: void alDeleteSources ( ALsizei n, ALuint* sources ) ;
-FUNCTION: ALboolean alIsSource ( ALuint sid ) ;
-FUNCTION: void alSourcef ( ALuint sid, ALenum param, ALfloat value ) ;
-FUNCTION: void alSource3f ( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 ) ;
-FUNCTION: void alSourcefv ( ALuint sid, ALenum param, ALfloat* values ) ;
-FUNCTION: void alSourcei ( ALuint sid, ALenum param, ALint value ) ;
-FUNCTION: void alSource3i ( ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3 ) ;
-FUNCTION: void alSourceiv ( ALuint sid, ALenum param, ALint* values ) ;
-FUNCTION: void alGetSourcef ( ALuint sid, ALenum param, ALfloat* value ) ;
+FUNCTION: void alEnable ( ALenum capability )
+FUNCTION: void alDisable ( ALenum capability )
+FUNCTION: ALboolean alIsEnabled ( ALenum capability )
+FUNCTION: ALchar* alGetString ( ALenum param )
+FUNCTION: void alGetBooleanv ( ALenum param, ALboolean* data )
+FUNCTION: void alGetIntegerv ( ALenum param, ALint* data )
+FUNCTION: void alGetFloatv ( ALenum param, ALfloat* data )
+FUNCTION: void alGetDoublev ( ALenum param, ALdouble* data )
+FUNCTION: ALboolean alGetBoolean ( ALenum param )
+FUNCTION: ALint alGetInteger ( ALenum param )
+FUNCTION: ALfloat alGetFloat ( ALenum param )
+FUNCTION: ALdouble alGetDouble ( ALenum param )
+FUNCTION: ALenum alGetError (  )
+FUNCTION: ALboolean alIsExtensionPresent ( ALchar* extname )
+FUNCTION: void* alGetProcAddress ( ALchar* fname )
+FUNCTION: ALenum alGetEnumValue ( ALchar* ename )
+FUNCTION: void alListenerf ( ALenum param, ALfloat value )
+FUNCTION: void alListener3f ( ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 )
+FUNCTION: void alListenerfv ( ALenum param, ALfloat* values )
+FUNCTION: void alListeneri ( ALenum param, ALint value )
+FUNCTION: void alListener3i ( ALenum param, ALint value1, ALint value2, ALint value3 )
+FUNCTION: void alListeneriv ( ALenum param, ALint* values )
+FUNCTION: void alGetListenerf ( ALenum param, ALfloat* value )
+FUNCTION: void alGetListener3f ( ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3 )
+FUNCTION: void alGetListenerfv ( ALenum param, ALfloat* values )
+FUNCTION: void alGetListeneri ( ALenum param, ALint* value )
+FUNCTION: void alGetListener3i ( ALenum param, ALint* value1, ALint* value2, ALint* value3 )
+FUNCTION: void alGetListeneriv ( ALenum param, ALint* values )
+FUNCTION: void alGenSources ( ALsizei n, ALuint* sources )
+FUNCTION: void alDeleteSources ( ALsizei n, ALuint* sources )
+FUNCTION: ALboolean alIsSource ( ALuint sid )
+FUNCTION: void alSourcef ( ALuint sid, ALenum param, ALfloat value )
+FUNCTION: void alSource3f ( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 )
+FUNCTION: void alSourcefv ( ALuint sid, ALenum param, ALfloat* values )
+FUNCTION: void alSourcei ( ALuint sid, ALenum param, ALint value )
+FUNCTION: void alSource3i ( ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3 )
+FUNCTION: void alSourceiv ( ALuint sid, ALenum param, ALint* values )
+FUNCTION: void alGetSourcef ( ALuint sid, ALenum param, ALfloat* value )
 FUNCTION: void alGetSource3f ( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3) ;
-FUNCTION: void alGetSourcefv ( ALuint sid, ALenum param, ALfloat* values ) ;
-FUNCTION: void alGetSourcei ( ALuint sid,  ALenum param, ALint* value ) ;
+FUNCTION: void alGetSourcefv ( ALuint sid, ALenum param, ALfloat* values )
+FUNCTION: void alGetSourcei ( ALuint sid,  ALenum param, ALint* value )
 FUNCTION: void alGetSource3i ( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3) ;
-FUNCTION: void alGetSourceiv ( ALuint sid,  ALenum param, ALint* values ) ;
-FUNCTION: void alSourcePlayv ( ALsizei ns, ALuint* sids ) ;
-FUNCTION: void alSourceStopv ( ALsizei ns, ALuint* sids ) ;
-FUNCTION: void alSourceRewindv ( ALsizei ns, ALuint* sids ) ;
-FUNCTION: void alSourcePausev ( ALsizei ns, ALuint* sids ) ;
-FUNCTION: void alSourcePlay ( ALuint sid ) ;
-FUNCTION: void alSourceStop ( ALuint sid ) ;
-FUNCTION: void alSourceRewind ( ALuint sid ) ;
-FUNCTION: void alSourcePause ( ALuint sid ) ;
-FUNCTION: void alSourceQueueBuffers ( ALuint sid, ALsizei numEntries, ALuint* bids ) ;
-FUNCTION: void alSourceUnqueueBuffers ( ALuint sid, ALsizei numEntries, ALuint* bids ) ;
-FUNCTION: void alGenBuffers ( ALsizei n, ALuint* buffers ) ;
-FUNCTION: void alDeleteBuffers ( ALsizei n, ALuint* buffers ) ;
-FUNCTION: ALboolean alIsBuffer ( ALuint bid ) ;
-FUNCTION: void alBufferData ( ALuint bid, ALenum format, void* data, ALsizei size, ALsizei freq ) ;
-FUNCTION: void alBufferf ( ALuint bid, ALenum param, ALfloat value ) ;
-FUNCTION: void alBuffer3f ( ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 ) ;
-FUNCTION: void alBufferfv ( ALuint bid, ALenum param, ALfloat* values ) ;
-FUNCTION: void alBufferi ( ALuint bid, ALenum param, ALint value ) ;
-FUNCTION: void alBuffer3i ( ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3 ) ;
-FUNCTION: void alBufferiv ( ALuint bid, ALenum param, ALint* values ) ;
-FUNCTION: void alGetBufferf ( ALuint bid, ALenum param, ALfloat* value ) ;
+FUNCTION: void alGetSourceiv ( ALuint sid,  ALenum param, ALint* values )
+FUNCTION: void alSourcePlayv ( ALsizei ns, ALuint* sids )
+FUNCTION: void alSourceStopv ( ALsizei ns, ALuint* sids )
+FUNCTION: void alSourceRewindv ( ALsizei ns, ALuint* sids )
+FUNCTION: void alSourcePausev ( ALsizei ns, ALuint* sids )
+FUNCTION: void alSourcePlay ( ALuint sid )
+FUNCTION: void alSourceStop ( ALuint sid )
+FUNCTION: void alSourceRewind ( ALuint sid )
+FUNCTION: void alSourcePause ( ALuint sid )
+FUNCTION: void alSourceQueueBuffers ( ALuint sid, ALsizei numEntries, ALuint* bids )
+FUNCTION: void alSourceUnqueueBuffers ( ALuint sid, ALsizei numEntries, ALuint* bids )
+FUNCTION: void alGenBuffers ( ALsizei n, ALuint* buffers )
+FUNCTION: void alDeleteBuffers ( ALsizei n, ALuint* buffers )
+FUNCTION: ALboolean alIsBuffer ( ALuint bid )
+FUNCTION: void alBufferData ( ALuint bid, ALenum format, void* data, ALsizei size, ALsizei freq )
+FUNCTION: void alBufferf ( ALuint bid, ALenum param, ALfloat value )
+FUNCTION: void alBuffer3f ( ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 )
+FUNCTION: void alBufferfv ( ALuint bid, ALenum param, ALfloat* values )
+FUNCTION: void alBufferi ( ALuint bid, ALenum param, ALint value )
+FUNCTION: void alBuffer3i ( ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3 )
+FUNCTION: void alBufferiv ( ALuint bid, ALenum param, ALint* values )
+FUNCTION: void alGetBufferf ( ALuint bid, ALenum param, ALfloat* value )
 FUNCTION: void alGetBuffer3f ( ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3) ;
-FUNCTION: void alGetBufferfv ( ALuint bid, ALenum param, ALfloat* values ) ;
-FUNCTION: void alGetBufferi ( ALuint bid, ALenum param, ALint* value ) ;
+FUNCTION: void alGetBufferfv ( ALuint bid, ALenum param, ALfloat* values )
+FUNCTION: void alGetBufferi ( ALuint bid, ALenum param, ALint* value )
 FUNCTION: void alGetBuffer3i ( ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3) ;
-FUNCTION: void alGetBufferiv ( ALuint bid, ALenum param, ALint* values ) ;
-FUNCTION: void alDopplerFactor ( ALfloat value ) ;
-FUNCTION: void alDopplerVelocity ( ALfloat value ) ;
-FUNCTION: void alSpeedOfSound ( ALfloat value ) ;
-FUNCTION: void alDistanceModel ( ALenum distanceModel ) ;
+FUNCTION: void alGetBufferiv ( ALuint bid, ALenum param, ALint* values )
+FUNCTION: void alDopplerFactor ( ALfloat value )
+FUNCTION: void alDopplerVelocity ( ALfloat value )
+FUNCTION: void alSpeedOfSound ( ALfloat value )
+FUNCTION: void alDistanceModel ( ALenum distanceModel )
 
 C-TYPE: ALCdevice
 C-TYPE: ALCcontext
@@ -218,31 +218,31 @@ CONSTANT: ALC_CAPTURE_DEVICE_SPECIFIER             0x310
 CONSTANT: ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER     0x311
 CONSTANT: ALC_CAPTURE_SAMPLES                      0x312
 
-FUNCTION: ALCdevice* alcOpenDevice ( ALCchar* deviceSpecifier ) ;
-FUNCTION: ALCboolean alcCloseDevice ( ALCdevice* deviceHandle ) ;
+FUNCTION: ALCdevice* alcOpenDevice ( ALCchar* deviceSpecifier )
+FUNCTION: ALCboolean alcCloseDevice ( ALCdevice* deviceHandle )
 
 : alcCloseDevice* ( deviceHandle -- )
     alcCloseDevice drop ;
 
-FUNCTION: ALCcontext* alcCreateContext ( ALCdevice* deviceHandle, ALCint* attrList ) ;
-FUNCTION: ALCboolean alcMakeContextCurrent ( ALCcontext* context ) ;
-FUNCTION: void alcProcessContext ( ALCcontext* context ) ;
-FUNCTION: void alcSuspendContext ( ALCcontext* context ) ;
-FUNCTION: void alcDestroyContext ( ALCcontext* context ) ;
-FUNCTION: ALCcontext* alcGetCurrentContext ( ) ;
-FUNCTION: ALCdevice* alcGetContextsDevice ( ALCcontext* context ) ;
-FUNCTION: ALCboolean alcIsExtensionPresent ( ALCdevice* deviceHandle, ALCchar* extName ) ;
-FUNCTION: void* alcGetProcAddress ( ALCdevice* deviceHandle, ALCchar* funcName ) ;
-FUNCTION: ALCenum alcGetEnumValue ( ALCdevice* deviceHandle, ALCchar* enumName ) ;
-FUNCTION: ALCenum alcGetError ( ALCdevice* deviceHandle ) ;
-FUNCTION: ALCchar* alcGetString ( ALCdevice* deviceHandle, ALCenum token ) ;
-FUNCTION: void alcGetIntegerv ( ALCdevice* deviceHandle, ALCenum token, ALCsizei size, ALCint* dest ) ;
+FUNCTION: ALCcontext* alcCreateContext ( ALCdevice* deviceHandle, ALCint* attrList )
+FUNCTION: ALCboolean alcMakeContextCurrent ( ALCcontext* context )
+FUNCTION: void alcProcessContext ( ALCcontext* context )
+FUNCTION: void alcSuspendContext ( ALCcontext* context )
+FUNCTION: void alcDestroyContext ( ALCcontext* context )
+FUNCTION: ALCcontext* alcGetCurrentContext ( )
+FUNCTION: ALCdevice* alcGetContextsDevice ( ALCcontext* context )
+FUNCTION: ALCboolean alcIsExtensionPresent ( ALCdevice* deviceHandle, ALCchar* extName )
+FUNCTION: void* alcGetProcAddress ( ALCdevice* deviceHandle, ALCchar* funcName )
+FUNCTION: ALCenum alcGetEnumValue ( ALCdevice* deviceHandle, ALCchar* enumName )
+FUNCTION: ALCenum alcGetError ( ALCdevice* deviceHandle )
+FUNCTION: ALCchar* alcGetString ( ALCdevice* deviceHandle, ALCenum token )
+FUNCTION: void alcGetIntegerv ( ALCdevice* deviceHandle, ALCenum token, ALCsizei size, ALCint* dest )
 
-FUNCTION: ALCdevice* alcCaptureOpenDevice ( ALCchar* deviceName, ALCuint freq, ALCenum fmt, ALCsizei bufsize ) ;
-FUNCTION: ALCboolean alcCaptureCloseDevice ( ALCdevice* device ) ;
-FUNCTION: void alcCaptureStart ( ALCdevice* device ) ;
-FUNCTION: void alcCaptureStop ( ALCdevice* device ) ;
-FUNCTION: void alcCaptureSamples ( ALCdevice* device, void* buf, ALCsizei samps ) ;
+FUNCTION: ALCdevice* alcCaptureOpenDevice ( ALCchar* deviceName, ALCuint freq, ALCenum fmt, ALCsizei bufsize )
+FUNCTION: ALCboolean alcCaptureCloseDevice ( ALCdevice* device )
+FUNCTION: void alcCaptureStart ( ALCdevice* device )
+FUNCTION: void alcCaptureStop ( ALCdevice* device )
+FUNCTION: void alcCaptureSamples ( ALCdevice* device, void* buf, ALCsizei samps )
 
 DESTRUCTOR: alcCloseDevice*
 DESTRUCTOR: alcDestroyContext

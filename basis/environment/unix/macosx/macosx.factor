@@ -3,6 +3,6 @@
 USING: alien.c-types alien.syntax system environment.unix ;
 IN: environment.unix.macosx
 
-FUNCTION: void* _NSGetEnviron ( ) ;
+FUNCTION: void* _NSGetEnviron ( )
 
 M: macosx environ _NSGetEnviron ;

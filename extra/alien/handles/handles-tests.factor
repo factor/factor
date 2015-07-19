@@ -6,8 +6,8 @@ IN: alien.handles.tests
 TUPLE: thingy { x integer } ;
 C: <thingy> thingy
 
-CALLBACK: int thingy-callback ( uint thingy-handle ) ;
-CALLBACK: int thingy-ptr-callback ( void* thingy-handle ) ;
+CALLBACK: int thingy-callback ( uint thingy-handle )
+CALLBACK: int thingy-ptr-callback ( void* thingy-handle )
 
 : test-thingy-callback ( -- alien )
     [ alien-handle> x>> 1 + ] thingy-callback ;

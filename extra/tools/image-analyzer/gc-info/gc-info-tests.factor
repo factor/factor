@@ -89,10 +89,10 @@ QUALIFIED: opencl
 ! Originally from llvm.types, but llvm moved to unmaintained
 TYPEDEF: void* LLVMTypeRef
 TYPEDEF: void* LLVMTypeHandleRef
-FUNCTION: LLVMTypeRef LLVMResolveTypeHandle ( LLVMTypeHandleRef TypeHandle ) ;
-FUNCTION: LLVMTypeHandleRef LLVMCreateTypeHandle ( LLVMTypeRef PotentiallyAbstractTy ) ;
-FUNCTION: void LLVMRefineType ( LLVMTypeRef AbstractTy, LLVMTypeRef ConcreteTy ) ;
-FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle ) ;
+FUNCTION: LLVMTypeRef LLVMResolveTypeHandle ( LLVMTypeHandleRef TypeHandle )
+FUNCTION: LLVMTypeHandleRef LLVMCreateTypeHandle ( LLVMTypeRef PotentiallyAbstractTy )
+FUNCTION: void LLVMRefineType ( LLVMTypeRef AbstractTy, LLVMTypeRef ConcreteTy )
+FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 
 : resolve-types ( typeref typeref -- typeref )
     over LLVMCreateTypeHandle [ LLVMRefineType ] dip

@@ -19,17 +19,17 @@ C-GLOBAL: CFStringRef kCTUnderlineStyleAttributeName
 C-GLOBAL: CFStringRef kCTVerticalFormsAttributeName
 C-GLOBAL: CFStringRef kCTGlyphInfoAttributeName
 
-FUNCTION: CTLineRef CTLineCreateWithAttributedString ( CFAttributedStringRef string ) ;
+FUNCTION: CTLineRef CTLineCreateWithAttributedString ( CFAttributedStringRef string )
 
-FUNCTION: void CTLineDraw ( CTLineRef line, CGContextRef context ) ;
+FUNCTION: void CTLineDraw ( CTLineRef line, CGContextRef context )
 
-FUNCTION: CGFloat CTLineGetOffsetForStringIndex ( CTLineRef line, CFIndex charIndex, CGFloat* secondaryOffset ) ;
+FUNCTION: CGFloat CTLineGetOffsetForStringIndex ( CTLineRef line, CFIndex charIndex, CGFloat* secondaryOffset )
 
-FUNCTION: CFIndex CTLineGetStringIndexForPosition ( CTLineRef line, CGPoint position ) ;
+FUNCTION: CFIndex CTLineGetStringIndexForPosition ( CTLineRef line, CGPoint position )
 
-FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, CGFloat* descent, CGFloat* leading ) ;
+FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, CGFloat* descent, CGFloat* leading )
 
-FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
+FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context )
 
 SYMBOL: retina?
 

@@ -16,44 +16,44 @@ CONSTANT: kCFRunLoopRunHandledSource 4
 TYPEDEF: void* CFRunLoopRef
 TYPEDEF: void* CFRunLoopSourceRef
 
-FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;
-FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( ) ;
+FUNCTION: CFRunLoopRef CFRunLoopGetMain ( )
+FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( )
 
 FUNCTION: SInt32 CFRunLoopRunInMode (
     CFStringRef mode,
     CFTimeInterval seconds,
     Boolean returnAfterSourceHandled
-) ;
+)
 
 FUNCTION: CFRunLoopSourceRef CFFileDescriptorCreateRunLoopSource (
     CFAllocatorRef allocator,
     CFFileDescriptorRef f,
     CFIndex order
-) ;
+)
 
 FUNCTION: void CFRunLoopAddSource (
     CFRunLoopRef rl,
     CFRunLoopSourceRef source,
     CFStringRef mode
-) ;
+)
 
 FUNCTION: void CFRunLoopRemoveSource (
     CFRunLoopRef rl,
     CFRunLoopSourceRef source,
     CFStringRef mode
-) ;
+)
 
 FUNCTION: void CFRunLoopAddTimer (
     CFRunLoopRef rl,
     CFRunLoopTimerRef timer,
     CFStringRef mode
-) ;
+)
 
 FUNCTION: void CFRunLoopRemoveTimer (
     CFRunLoopRef rl,
     CFRunLoopTimerRef timer,
     CFStringRef mode
-) ;
+)
 
 CFSTRING: CFRunLoopDefaultMode "kCFRunLoopDefaultMode"
 

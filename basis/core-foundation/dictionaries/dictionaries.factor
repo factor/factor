@@ -18,12 +18,12 @@ FUNCTION: CFDictionaryRef CFDictionaryCreate (
    CFIndex numValues,
    CFDictionaryKeyCallBacks* keyCallBacks,
    CFDictionaryValueCallBacks* valueCallBacks
-) ;
+)
 
 FUNCTION: void* CFDictionaryGetValue (
    CFDictionaryRef theDict,
    void* key
-) ;
+)
 
 : <CFDictionary> ( alist -- dictionary )
     [ kCFAllocatorDefault ] dip

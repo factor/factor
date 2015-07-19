@@ -32,59 +32,59 @@ STRUCT: HISTORY_STATE
 
 CONSTANT: HS_STIFLED 1
 
-FUNCTION: void using_history ( ) ;
-FUNCTION: HISTORY_STATE* history_get_history_state ( ) ;
-FUNCTION: void history_set_history_state ( HISTORY_STATE* arg1 ) ;
-FUNCTION: void add_history ( c-string arg1 ) ;
-FUNCTION: void add_history_time ( c-string arg1 ) ;
-FUNCTION: HIST_ENTRY* remove_history ( int arg1 ) ;
-FUNCTION: histdata_t free_history_entry ( HIST_ENTRY* arg1 ) ;
+FUNCTION: void using_history ( )
+FUNCTION: HISTORY_STATE* history_get_history_state ( )
+FUNCTION: void history_set_history_state ( HISTORY_STATE* arg1 )
+FUNCTION: void add_history ( c-string arg1 )
+FUNCTION: void add_history_time ( c-string arg1 )
+FUNCTION: HIST_ENTRY* remove_history ( int arg1 )
+FUNCTION: histdata_t free_history_entry ( HIST_ENTRY* arg1 )
 FUNCTION: HIST_ENTRY* replace_history_entry ( int arg1, c-string
                                              arg2, histdata_t
-                                             arg3 ) ;
-FUNCTION: void clear_history ( ) ;
-FUNCTION: void stifle_history ( int arg1 ) ;
-FUNCTION: int unstifle_history ( ) ;
-FUNCTION: int history_is_stifled ( ) ;
-FUNCTION: HIST_ENTRY** history_list ( ) ;
-FUNCTION: int where_history ( ) ;
-FUNCTION: HIST_ENTRY* current_history ( ) ;
-FUNCTION: HIST_ENTRY* history_get ( int arg1 ) ;
-FUNCTION: time_t history_get_time ( HIST_ENTRY* arg1 ) ;
-FUNCTION: int history_total_bytes ( ) ;
-FUNCTION: int history_set_pos ( int arg1 ) ;
-FUNCTION: HIST_ENTRY* previous_history ( ) ;
-FUNCTION: HIST_ENTRY* next_history ( ) ;
-FUNCTION: int history_search ( c-string arg1, int arg2 ) ;
-FUNCTION: int history_search_prefix ( c-string arg1, int arg2 ) ;
+                                             arg3 )
+FUNCTION: void clear_history ( )
+FUNCTION: void stifle_history ( int arg1 )
+FUNCTION: int unstifle_history ( )
+FUNCTION: int history_is_stifled ( )
+FUNCTION: HIST_ENTRY** history_list ( )
+FUNCTION: int where_history ( )
+FUNCTION: HIST_ENTRY* current_history ( )
+FUNCTION: HIST_ENTRY* history_get ( int arg1 )
+FUNCTION: time_t history_get_time ( HIST_ENTRY* arg1 )
+FUNCTION: int history_total_bytes ( )
+FUNCTION: int history_set_pos ( int arg1 )
+FUNCTION: HIST_ENTRY* previous_history ( )
+FUNCTION: HIST_ENTRY* next_history ( )
+FUNCTION: int history_search ( c-string arg1, int arg2 )
+FUNCTION: int history_search_prefix ( c-string arg1, int arg2 )
 FUNCTION: int history_search_pos ( c-string arg1, int arg2, int
-                                  arg3 ) ;
-FUNCTION: int read_history ( c-string arg1 ) ;
+                                  arg3 )
+FUNCTION: int read_history ( c-string arg1 )
 FUNCTION: int read_history_range ( c-string arg1, int arg2, int
-                                  arg3 ) ;
-FUNCTION: int write_history ( c-string arg1 ) ;
-FUNCTION: int append_history ( int arg1, c-string arg2 ) ;
-FUNCTION: int history_expand ( c-string arg1, char** arg2 ) ;
+                                  arg3 )
+FUNCTION: int write_history ( c-string arg1 )
+FUNCTION: int append_history ( int arg1, c-string arg2 )
+FUNCTION: int history_expand ( c-string arg1, char** arg2 )
 FUNCTION: c-string history_arg_extract ( int arg1, int arg2,
-                                        c-string arg3 ) ;
+                                        c-string arg3 )
 FUNCTION: c-string get_history_event ( c-string arg1, int* arg2,
-                                      int arg3 ) ;
-FUNCTION: char** history_tokenize ( c-string arg1 ) ;
+                                      int arg3 )
+FUNCTION: char** history_tokenize ( c-string arg1 )
 
-CALLBACK: int rl_command_func_t ( int arg1, int arg2 ) ;
-CALLBACK: char* rl_compentry_func_t ( c-string arg1, int arg2 ) ;
+CALLBACK: int rl_command_func_t ( int arg1, int arg2 )
+CALLBACK: char* rl_compentry_func_t ( c-string arg1, int arg2 )
 CALLBACK: char** rl_completion_func_t ( c-string arg1, int arg2,
-                                       int arg3 ) ;
+                                       int arg3 )
 
 CALLBACK: c-string rl_quote_func_t ( c-string arg1, int arg2,
-                                    c-string arg3 ) ;
-CALLBACK: c-string rl_dequote_func_t ( c-string arg1, int arg2 ) ;
-CALLBACK: int rl_compignore_func_t ( char** arg1 ) ;
+                                    c-string arg3 )
+CALLBACK: c-string rl_dequote_func_t ( c-string arg1, int arg2 )
+CALLBACK: int rl_compignore_func_t ( char** arg1 )
 CALLBACK: void rl_compdisp_func_t ( char** arg1, int arg2, int
-                                   arg3 ) ;
-CALLBACK: int rl_hook_func_t ( ) ;
-CALLBACK: int rl_getc_func_t ( FILE* arg1 ) ;
-CALLBACK: int rl_linebuf_func_t ( c-string arg1, int arg2 ) ;
+                                   arg3 )
+CALLBACK: int rl_hook_func_t ( )
+CALLBACK: int rl_getc_func_t ( FILE* arg1 )
+CALLBACK: int rl_linebuf_func_t ( c-string arg1, int arg2 )
 
 STRUCT: KEYMAP_ENTRY
     { type     char               }
@@ -106,21 +106,21 @@ C-GLOBAL: KEYMAP_ENTRY_ARRAY emacs_ctlx_keymap
 C-GLOBAL: KEYMAP_ENTRY_ARRAY vi_insertion_keymap
 C-GLOBAL: KEYMAP_ENTRY_ARRAY vi_movement_keymap
 
-FUNCTION: Keymap rl_copy_keymap ( Keymap ) ;
-FUNCTION: Keymap rl_make_keymap ( ) ;
-FUNCTION: void rl_discard_keymap ( Keymap ) ;
+FUNCTION: Keymap rl_copy_keymap ( Keymap )
+FUNCTION: Keymap rl_make_keymap ( )
+FUNCTION: void rl_discard_keymap ( Keymap )
 
-CALLBACK: c-string tilde_hook_func_t ( c-string ) ;
+CALLBACK: c-string tilde_hook_func_t ( c-string )
 
 C-GLOBAL: tilde_hook_func_t* tilde_expansion_preexpansion_hook
 C-GLOBAL: tilde_hook_func_t* tilde_expansion_failure_hook
 C-GLOBAL: char**             tilde_additional_prefixes
 C-GLOBAL: char**             tilde_additional_suffixes
 
-FUNCTION: c-string tilde_expand ( c-string ) ;
-FUNCTION: c-string tilde_expand_word ( c-string ) ;
+FUNCTION: c-string tilde_expand ( c-string )
+FUNCTION: c-string tilde_expand_word ( c-string )
 FUNCTION: c-string tilde_find_word ( c-string arg1, int arg2,
-                                    int* arg3 ) ;
+                                    int* arg3 )
 
 C-GLOBAL: int history_base
 C-GLOBAL: int history_length
@@ -136,19 +136,19 @@ C-GLOBAL: int history_write_timestamps
 C-GLOBAL: int max_input_history
 C-GLOBAL: rl_linebuf_func_t* history_inhibit_expansion_function
 
-CALLBACK: int rl_intfunc_t ( int ) ;
-CALLBACK: int rl_icpfunc_t ( c-string ) ;
-CALLBACK: int rl_icppfunc_t ( char** ) ;
+CALLBACK: int rl_intfunc_t ( int )
+CALLBACK: int rl_icpfunc_t ( c-string )
+CALLBACK: int rl_icppfunc_t ( char** )
 
-CALLBACK: void rl_voidfunc_t ( ) ;
-CALLBACK: void rl_vintfunc_t ( int ) ;
-CALLBACK: void rl_vcpfunc_t ( c-string ) ;
-CALLBACK: void rl_vcppfunc_t ( char** ) ;
+CALLBACK: void rl_voidfunc_t ( )
+CALLBACK: void rl_vintfunc_t ( int )
+CALLBACK: void rl_vcpfunc_t ( c-string )
+CALLBACK: void rl_vcppfunc_t ( char** )
 
-CALLBACK: c-string rl_cpvfunc_t ( ) ;
-CALLBACK: c-string rl_cpifunc_t ( int ) ;
-CALLBACK: c-string rl_cpcpfunc_t ( c-string ) ;
-CALLBACK: c-string rl_cpcppfunc_t ( char** ) ;
+CALLBACK: c-string rl_cpvfunc_t ( )
+CALLBACK: c-string rl_cpifunc_t ( int )
+CALLBACK: c-string rl_cpcpfunc_t ( c-string )
+CALLBACK: c-string rl_cpcppfunc_t ( char** )
 
 ENUM: undo_code UNDO_DELETE UNDO_INSERT UNDO_BEGIN UNDO_END ;
 
@@ -167,340 +167,340 @@ STRUCT: FUNMAP
 
 C-GLOBAL: FUNMAP** funmap
 
-FUNCTION: int rl_digit_argument ( int arg1, int arg2 ) ;
-FUNCTION: int rl_universal_argument ( int arg, int arg ) ;
+FUNCTION: int rl_digit_argument ( int arg1, int arg2 )
+FUNCTION: int rl_universal_argument ( int arg, int arg )
 
-FUNCTION: int rl_forward_byte ( int arg1, int arg2 ) ;
-FUNCTION: int rl_forward_char ( int arg1, int arg2 ) ;
-FUNCTION: int rl_forward ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward_byte ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward_char ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward ( int arg1, int arg2 ) ;
-FUNCTION: int rl_beg_of_line ( int arg1, int arg2 ) ;
-FUNCTION: int rl_end_of_line ( int arg1, int arg2 ) ;
-FUNCTION: int rl_forward_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_refresh_line ( int arg1, int arg2 ) ;
-FUNCTION: int rl_clear_screen ( int arg1, int arg2 ) ;
-FUNCTION: int rl_skip_csi_sequence ( int arg1, int arg2 ) ;
-FUNCTION: int rl_arrow_keys ( int arg1, int arg2 ) ;
+FUNCTION: int rl_forward_byte ( int arg1, int arg2 )
+FUNCTION: int rl_forward_char ( int arg1, int arg2 )
+FUNCTION: int rl_forward ( int arg1, int arg2 )
+FUNCTION: int rl_backward_byte ( int arg1, int arg2 )
+FUNCTION: int rl_backward_char ( int arg1, int arg2 )
+FUNCTION: int rl_backward ( int arg1, int arg2 )
+FUNCTION: int rl_beg_of_line ( int arg1, int arg2 )
+FUNCTION: int rl_end_of_line ( int arg1, int arg2 )
+FUNCTION: int rl_forward_word ( int arg1, int arg2 )
+FUNCTION: int rl_backward_word ( int arg1, int arg2 )
+FUNCTION: int rl_refresh_line ( int arg1, int arg2 )
+FUNCTION: int rl_clear_screen ( int arg1, int arg2 )
+FUNCTION: int rl_skip_csi_sequence ( int arg1, int arg2 )
+FUNCTION: int rl_arrow_keys ( int arg1, int arg2 )
 
-FUNCTION: int rl_insert ( int arg1, int arg2 ) ;
-FUNCTION: int rl_quoted_insert ( int arg1, int arg2 ) ;
-FUNCTION: int rl_tab_insert ( int arg1, int arg2 ) ;
-FUNCTION: int rl_newline ( int arg1, int arg2 ) ;
-FUNCTION: int rl_do_lowercase_version ( int arg1, int arg2 ) ;
-FUNCTION: int rl_rubout ( int arg1, int arg2 ) ;
-FUNCTION: int rl_delete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_rubout_or_delete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_delete_horizontal_space ( int arg1, int arg2 ) ;
-FUNCTION: int rl_delete_or_show_completions ( int arg1, int arg2 ) ;
-FUNCTION: int rl_insert_comment ( int arg1, int arg2 ) ;
+FUNCTION: int rl_insert ( int arg1, int arg2 )
+FUNCTION: int rl_quoted_insert ( int arg1, int arg2 )
+FUNCTION: int rl_tab_insert ( int arg1, int arg2 )
+FUNCTION: int rl_newline ( int arg1, int arg2 )
+FUNCTION: int rl_do_lowercase_version ( int arg1, int arg2 )
+FUNCTION: int rl_rubout ( int arg1, int arg2 )
+FUNCTION: int rl_delete ( int arg1, int arg2 )
+FUNCTION: int rl_rubout_or_delete ( int arg1, int arg2 )
+FUNCTION: int rl_delete_horizontal_space ( int arg1, int arg2 )
+FUNCTION: int rl_delete_or_show_completions ( int arg1, int arg2 )
+FUNCTION: int rl_insert_comment ( int arg1, int arg2 )
 
-FUNCTION: int rl_upcase_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_downcase_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_capitalize_word ( int arg1, int arg2 ) ;
+FUNCTION: int rl_upcase_word ( int arg1, int arg2 )
+FUNCTION: int rl_downcase_word ( int arg1, int arg2 )
+FUNCTION: int rl_capitalize_word ( int arg1, int arg2 )
 
-FUNCTION: int rl_transpose_words ( int arg1, int arg2 ) ;
-FUNCTION: int rl_transpose_chars ( int arg1, int arg2 ) ;
+FUNCTION: int rl_transpose_words ( int arg1, int arg2 )
+FUNCTION: int rl_transpose_chars ( int arg1, int arg2 )
 
-FUNCTION: int rl_char_search ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward_char_search ( int arg1, int arg2 ) ;
+FUNCTION: int rl_char_search ( int arg1, int arg2 )
+FUNCTION: int rl_backward_char_search ( int arg1, int arg2 )
 
-FUNCTION: int rl_beginning_of_history ( int arg1, int arg2 ) ;
-FUNCTION: int rl_end_of_history ( int arg1, int arg2 ) ;
-FUNCTION: int rl_get_next_history ( int arg1, int arg2 ) ;
-FUNCTION: int rl_get_previous_history ( int arg1, int arg2 ) ;
+FUNCTION: int rl_beginning_of_history ( int arg1, int arg2 )
+FUNCTION: int rl_end_of_history ( int arg1, int arg2 )
+FUNCTION: int rl_get_next_history ( int arg1, int arg2 )
+FUNCTION: int rl_get_previous_history ( int arg1, int arg2 )
 
-FUNCTION: int rl_set_mark ( int arg1, int arg2 ) ;
-FUNCTION: int rl_exchange_point_and_mark ( int arg1, int arg2 ) ;
+FUNCTION: int rl_set_mark ( int arg1, int arg2 )
+FUNCTION: int rl_exchange_point_and_mark ( int arg1, int arg2 )
 
-FUNCTION: int rl_vi_editing_mode ( int arg1, int arg2 ) ;
-FUNCTION: int rl_emacs_editing_mode ( int arg1, int arg2 ) ;
+FUNCTION: int rl_vi_editing_mode ( int arg1, int arg2 )
+FUNCTION: int rl_emacs_editing_mode ( int arg1, int arg2 )
 
-FUNCTION: int rl_overwrite_mode ( int arg1, int arg2 ) ;
+FUNCTION: int rl_overwrite_mode ( int arg1, int arg2 )
 
-FUNCTION: int rl_re_read_init_file ( int arg1, int arg2 ) ;
-FUNCTION: int rl_dump_functions ( int arg1, int arg2 ) ;
-FUNCTION: int rl_dump_macros ( int arg1, int arg2 ) ;
-FUNCTION: int rl_dump_variables ( int arg1, int arg2 ) ;
+FUNCTION: int rl_re_read_init_file ( int arg1, int arg2 )
+FUNCTION: int rl_dump_functions ( int arg1, int arg2 )
+FUNCTION: int rl_dump_macros ( int arg1, int arg2 )
+FUNCTION: int rl_dump_variables ( int arg1, int arg2 )
 
-FUNCTION: int rl_complete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_possible_completions ( int arg1, int arg2 ) ;
-FUNCTION: int rl_insert_completions ( int arg1, int arg2 ) ;
-FUNCTION: int rl_old_menu_complete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_menu_complete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward_menu_complete ( int arg1, int arg2 ) ;
+FUNCTION: int rl_complete ( int arg1, int arg2 )
+FUNCTION: int rl_possible_completions ( int arg1, int arg2 )
+FUNCTION: int rl_insert_completions ( int arg1, int arg2 )
+FUNCTION: int rl_old_menu_complete ( int arg1, int arg2 )
+FUNCTION: int rl_menu_complete ( int arg1, int arg2 )
+FUNCTION: int rl_backward_menu_complete ( int arg1, int arg2 )
 
-FUNCTION: int rl_kill_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward_kill_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_kill_line ( int arg1, int arg2 ) ;
-FUNCTION: int rl_backward_kill_line ( int arg1, int arg2 ) ;
-FUNCTION: int rl_kill_full_line ( int arg1, int arg2 ) ;
-FUNCTION: int rl_unix_word_rubout ( int arg1, int arg2 ) ;
-FUNCTION: int rl_unix_filename_rubout ( int arg1, int arg2 ) ;
-FUNCTION: int rl_unix_line_discard ( int arg1, int arg2 ) ;
-FUNCTION: int rl_copy_region_to_kill ( int arg1, int arg2 ) ;
-FUNCTION: int rl_kill_region ( int arg1, int arg2 ) ;
-FUNCTION: int rl_copy_forward_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_copy_backward_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_yank ( int arg1, int arg2 ) ;
-FUNCTION: int rl_yank_pop ( int arg1, int arg2 ) ;
-FUNCTION: int rl_yank_nth_arg ( int arg1, int arg2 ) ;
-FUNCTION: int rl_yank_last_arg ( int arg1, int arg2 ) ;
+FUNCTION: int rl_kill_word ( int arg1, int arg2 )
+FUNCTION: int rl_backward_kill_word ( int arg1, int arg2 )
+FUNCTION: int rl_kill_line ( int arg1, int arg2 )
+FUNCTION: int rl_backward_kill_line ( int arg1, int arg2 )
+FUNCTION: int rl_kill_full_line ( int arg1, int arg2 )
+FUNCTION: int rl_unix_word_rubout ( int arg1, int arg2 )
+FUNCTION: int rl_unix_filename_rubout ( int arg1, int arg2 )
+FUNCTION: int rl_unix_line_discard ( int arg1, int arg2 )
+FUNCTION: int rl_copy_region_to_kill ( int arg1, int arg2 )
+FUNCTION: int rl_kill_region ( int arg1, int arg2 )
+FUNCTION: int rl_copy_forward_word ( int arg1, int arg2 )
+FUNCTION: int rl_copy_backward_word ( int arg1, int arg2 )
+FUNCTION: int rl_yank ( int arg1, int arg2 )
+FUNCTION: int rl_yank_pop ( int arg1, int arg2 )
+FUNCTION: int rl_yank_nth_arg ( int arg1, int arg2 )
+FUNCTION: int rl_yank_last_arg ( int arg1, int arg2 )
 
-FUNCTION: int rl_reverse_search_history ( int arg1, int arg2 ) ;
-FUNCTION: int rl_forward_search_history ( int arg1, int arg2 ) ;
+FUNCTION: int rl_reverse_search_history ( int arg1, int arg2 )
+FUNCTION: int rl_forward_search_history ( int arg1, int arg2 )
 
-FUNCTION: int rl_start_kbd_macro ( int arg1, int arg2 ) ;
-FUNCTION: int rl_end_kbd_macro ( int arg1, int arg2 ) ;
-FUNCTION: int rl_call_last_kbd_macro ( int arg1, int arg2 ) ;
+FUNCTION: int rl_start_kbd_macro ( int arg1, int arg2 )
+FUNCTION: int rl_end_kbd_macro ( int arg1, int arg2 )
+FUNCTION: int rl_call_last_kbd_macro ( int arg1, int arg2 )
 
-FUNCTION: int rl_revert_line ( int arg1, int arg2 ) ;
-FUNCTION: int rl_undo_command ( int arg1, int arg2 ) ;
+FUNCTION: int rl_revert_line ( int arg1, int arg2 )
+FUNCTION: int rl_undo_command ( int arg1, int arg2 )
 
-FUNCTION: int rl_tilde_expand ( int arg1, int arg2 ) ;
+FUNCTION: int rl_tilde_expand ( int arg1, int arg2 )
 
-FUNCTION: int rl_restart_output ( int arg1, int arg2 ) ;
-FUNCTION: int rl_stop_output ( int arg1, int arg2 ) ;
+FUNCTION: int rl_restart_output ( int arg1, int arg2 )
+FUNCTION: int rl_stop_output ( int arg1, int arg2 )
 
-FUNCTION: int rl_abort ( int arg1, int arg2 ) ;
-FUNCTION: int rl_tty_status ( int arg1, int arg2 ) ;
+FUNCTION: int rl_abort ( int arg1, int arg2 )
+FUNCTION: int rl_tty_status ( int arg1, int arg2 )
 
-FUNCTION: int rl_history_search_forward ( int arg1, int arg2 ) ;
-FUNCTION: int rl_history_search_backward ( int arg1, int arg2 ) ;
-FUNCTION: int rl_noninc_forward_search ( int arg1, int arg2 ) ;
-FUNCTION: int rl_noninc_reverse_search ( int arg1, int arg2 ) ;
-FUNCTION: int rl_noninc_forward_search_again ( int arg1, int arg2 ) ;
-FUNCTION: int rl_noninc_reverse_search_again ( int arg1, int arg2 ) ;
+FUNCTION: int rl_history_search_forward ( int arg1, int arg2 )
+FUNCTION: int rl_history_search_backward ( int arg1, int arg2 )
+FUNCTION: int rl_noninc_forward_search ( int arg1, int arg2 )
+FUNCTION: int rl_noninc_reverse_search ( int arg1, int arg2 )
+FUNCTION: int rl_noninc_forward_search_again ( int arg1, int arg2 )
+FUNCTION: int rl_noninc_reverse_search_again ( int arg1, int arg2 )
 
-FUNCTION: int rl_insert_close ( int arg1, int arg2 ) ;
+FUNCTION: int rl_insert_close ( int arg1, int arg2 )
 
 FUNCTION: void rl_callback_handler_install ( c-string arg1,
-                                            rl_vcpfunc_t* arg2 ) ;
-FUNCTION: void rl_callback_read_char ( ) ;
-FUNCTION: void rl_callback_handler_remove ( ) ;
+                                            rl_vcpfunc_t* arg2 )
+FUNCTION: void rl_callback_read_char ( )
+FUNCTION: void rl_callback_handler_remove ( )
 
-FUNCTION: int rl_vi_redo ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_undo ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_yank_arg ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_fetch_history ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_search_again ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_search ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_complete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_tilde_expand ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_prev_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_next_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_end_word ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_insert_beg ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_append_mode ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_append_eol ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_eof_maybe ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_insertion_mode ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_insert_mode ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_movement_mode ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_arg_digit ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_change_case ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_put ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_column ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_delete_to ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_change_to ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_yank_to ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_rubout ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_delete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_back_to_indent ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_first_print ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_char_search ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_match ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_change_char ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_subst ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_overstrike ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_overstrike_delete ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_replace ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_set_mark ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_goto_mark ( int arg1, int arg2 ) ;
+FUNCTION: int rl_vi_redo ( int arg1, int arg2 )
+FUNCTION: int rl_vi_undo ( int arg1, int arg2 )
+FUNCTION: int rl_vi_yank_arg ( int arg1, int arg2 )
+FUNCTION: int rl_vi_fetch_history ( int arg1, int arg2 )
+FUNCTION: int rl_vi_search_again ( int arg1, int arg2 )
+FUNCTION: int rl_vi_search ( int arg1, int arg2 )
+FUNCTION: int rl_vi_complete ( int arg1, int arg2 )
+FUNCTION: int rl_vi_tilde_expand ( int arg1, int arg2 )
+FUNCTION: int rl_vi_prev_word ( int arg1, int arg2 )
+FUNCTION: int rl_vi_next_word ( int arg1, int arg2 )
+FUNCTION: int rl_vi_end_word ( int arg1, int arg2 )
+FUNCTION: int rl_vi_insert_beg ( int arg1, int arg2 )
+FUNCTION: int rl_vi_append_mode ( int arg1, int arg2 )
+FUNCTION: int rl_vi_append_eol ( int arg1, int arg2 )
+FUNCTION: int rl_vi_eof_maybe ( int arg1, int arg2 )
+FUNCTION: int rl_vi_insertion_mode ( int arg1, int arg2 )
+FUNCTION: int rl_vi_insert_mode ( int arg1, int arg2 )
+FUNCTION: int rl_vi_movement_mode ( int arg1, int arg2 )
+FUNCTION: int rl_vi_arg_digit ( int arg1, int arg2 )
+FUNCTION: int rl_vi_change_case ( int arg1, int arg2 )
+FUNCTION: int rl_vi_put ( int arg1, int arg2 )
+FUNCTION: int rl_vi_column ( int arg1, int arg2 )
+FUNCTION: int rl_vi_delete_to ( int arg1, int arg2 )
+FUNCTION: int rl_vi_change_to ( int arg1, int arg2 )
+FUNCTION: int rl_vi_yank_to ( int arg1, int arg2 )
+FUNCTION: int rl_vi_rubout ( int arg1, int arg2 )
+FUNCTION: int rl_vi_delete ( int arg1, int arg2 )
+FUNCTION: int rl_vi_back_to_indent ( int arg1, int arg2 )
+FUNCTION: int rl_vi_first_print ( int arg1, int arg2 )
+FUNCTION: int rl_vi_char_search ( int arg1, int arg2 )
+FUNCTION: int rl_vi_match ( int arg1, int arg2 )
+FUNCTION: int rl_vi_change_char ( int arg1, int arg2 )
+FUNCTION: int rl_vi_subst ( int arg1, int arg2 )
+FUNCTION: int rl_vi_overstrike ( int arg1, int arg2 )
+FUNCTION: int rl_vi_overstrike_delete ( int arg1, int arg2 )
+FUNCTION: int rl_vi_replace ( int arg1, int arg2 )
+FUNCTION: int rl_vi_set_mark ( int arg1, int arg2 )
+FUNCTION: int rl_vi_goto_mark ( int arg1, int arg2 )
 
-FUNCTION: int rl_vi_check ( ) ;
-FUNCTION: int rl_vi_domove ( int arg1, int* arg2 ) ;
-FUNCTION: int rl_vi_bracktype ( int ) ;
+FUNCTION: int rl_vi_check ( )
+FUNCTION: int rl_vi_domove ( int arg1, int* arg2 )
+FUNCTION: int rl_vi_bracktype ( int )
 
 FUNCTION: void rl_vi_start_inserting ( int arg1, int arg2, int
-                                      arg3 ) ;
+                                      arg3 )
 
-FUNCTION: int rl_vi_fWord ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_bWord ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_eWord ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_fword ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_bword ( int arg1, int arg2 ) ;
-FUNCTION: int rl_vi_eword ( int arg1, int arg2 ) ;
+FUNCTION: int rl_vi_fWord ( int arg1, int arg2 )
+FUNCTION: int rl_vi_bWord ( int arg1, int arg2 )
+FUNCTION: int rl_vi_eWord ( int arg1, int arg2 )
+FUNCTION: int rl_vi_fword ( int arg1, int arg2 )
+FUNCTION: int rl_vi_bword ( int arg1, int arg2 )
+FUNCTION: int rl_vi_eword ( int arg1, int arg2 )
 
-FUNCTION: char* readline ( c-string ) ;
+FUNCTION: char* readline ( c-string )
 
-FUNCTION: int rl_set_prompt ( c-string ) ;
-FUNCTION: int rl_expand_prompt ( c-string ) ;
+FUNCTION: int rl_set_prompt ( c-string )
+FUNCTION: int rl_expand_prompt ( c-string )
 
-FUNCTION: int rl_initialize ( ) ;
+FUNCTION: int rl_initialize ( )
 
-FUNCTION: int rl_discard_argument ( ) ;
+FUNCTION: int rl_discard_argument ( )
 
 FUNCTION: int rl_add_defun ( c-string arg1, rl_command_func_t*
-                            arg2, int arg3 ) ;
-FUNCTION: int rl_bind_key ( int arg1, rl_command_func_t* arg2 ) ;
+                            arg2, int arg3 )
+FUNCTION: int rl_bind_key ( int arg1, rl_command_func_t* arg2 )
 FUNCTION: int rl_bind_key_in_map ( int arg1, rl_command_func_t*
-                                  arg2, Keymap arg3 ) ;
-FUNCTION: int rl_unbind_key ( int ) ;
-FUNCTION: int rl_unbind_key_in_map ( int arg1, Keymap arg2 ) ;
+                                  arg2, Keymap arg3 )
+FUNCTION: int rl_unbind_key ( int )
+FUNCTION: int rl_unbind_key_in_map ( int arg1, Keymap arg2 )
 FUNCTION: int rl_bind_key_if_unbound ( int arg1,
-                                      rl_command_func_t* arg2 ) ;
+                                      rl_command_func_t* arg2 )
 FUNCTION: int rl_bind_key_if_unbound_in_map ( int arg1,
                                              rl_command_func_t*
-                                             arg2, Keymap arg3 ) ;
+                                             arg2, Keymap arg3 )
 FUNCTION: int rl_unbind_function_in_map ( rl_command_func_t*
-                                         arg1, Keymap arg2 ) ;
+                                         arg1, Keymap arg2 )
 FUNCTION: int rl_unbind_command_in_map ( c-string arg1, Keymap
-                                        arg2 ) ;
+                                        arg2 )
 FUNCTION: int rl_bind_keyseq ( c-string arg1, rl_command_func_t*
-                              arg2 ) ;
+                              arg2 )
 FUNCTION: int rl_bind_keyseq_in_map ( c-string arg1,
                                      rl_command_func_t* arg2, Keymap
-                                     arg3 ) ;
+                                     arg3 )
 FUNCTION: int rl_bind_keyseq_if_unbound ( c-string arg1,
-                                         rl_command_func_t* arg2 ) ;
+                                         rl_command_func_t* arg2 )
 FUNCTION: int rl_bind_keyseq_if_unbound_in_map ( c-string arg1,
                                                 rl_command_func_t*
                                                 arg2, Keymap
-                                                arg3 ) ;
+                                                arg3 )
 FUNCTION: int rl_generic_bind ( int arg1, c-string arg2,
-                               c-string arg3, Keymap arg4 ) ;
+                               c-string arg3, Keymap arg4 )
 
-FUNCTION: c-string rl_variable_value ( c-string ) ;
-FUNCTION: int rl_variable_bind ( c-string arg1, c-string arg2 ) ;
+FUNCTION: c-string rl_variable_value ( c-string )
+FUNCTION: int rl_variable_bind ( c-string arg1, c-string arg2 )
 
 FUNCTION: int rl_set_key ( c-string arg1, rl_command_func_t*
-                          arg2, Keymap arg3 ) ;
+                          arg2, Keymap arg3 )
 FUNCTION: int rl_macro_bind ( c-string arg1, c-string arg2,
-                             Keymap arg3 ) ;
+                             Keymap arg3 )
 FUNCTION: int rl_translate_keyseq ( c-string arg1, c-string
-                                   arg2, int* arg3 ) ;
-FUNCTION: c-string rl_untranslate_keyseq ( int ) ;
-FUNCTION: rl_command_func_t* rl_named_function ( c-string ) ;
+                                   arg2, int* arg3 )
+FUNCTION: c-string rl_untranslate_keyseq ( int )
+FUNCTION: rl_command_func_t* rl_named_function ( c-string )
 FUNCTION: rl_command_func_t* rl_function_of_keyseq ( c-string
                                                     arg1, Keymap
                                                     arg2, int*
-                                                    arg3 ) ;
+                                                    arg3 )
 
-FUNCTION: void rl_list_funmap_names ( ) ;
+FUNCTION: void rl_list_funmap_names ( )
 FUNCTION: char** rl_invoking_keyseqs_in_map ( rl_command_func_t*
-                                             arg1, Keymap arg2 ) ;
-FUNCTION: char** rl_invoking_keyseqs ( rl_command_func_t* ) ;
+                                             arg1, Keymap arg2 )
+FUNCTION: char** rl_invoking_keyseqs ( rl_command_func_t* )
 
-FUNCTION: void rl_function_dumper ( int ) ;
-FUNCTION: void rl_macro_dumper ( int ) ;
-FUNCTION: void rl_variable_dumper ( int ) ;
+FUNCTION: void rl_function_dumper ( int )
+FUNCTION: void rl_macro_dumper ( int )
+FUNCTION: void rl_variable_dumper ( int )
 
-FUNCTION: int rl_read_init_file ( c-string ) ;
-FUNCTION: int rl_parse_and_bind ( c-string ) ;
+FUNCTION: int rl_read_init_file ( c-string )
+FUNCTION: int rl_parse_and_bind ( c-string )
 
-FUNCTION: Keymap rl_make_bare_keymap ( ) ;
+FUNCTION: Keymap rl_make_bare_keymap ( )
 
-FUNCTION: Keymap rl_get_keymap_by_name ( c-string ) ;
-FUNCTION: c-string rl_get_keymap_name ( Keymap ) ;
-FUNCTION: void rl_set_keymap ( Keymap ) ;
-FUNCTION: Keymap rl_get_keymap ( ) ;
-FUNCTION: void rl_set_keymap_from_edit_mode ( ) ;
-FUNCTION: c-string rl_get_keymap_name_from_edit_mode ( ) ;
+FUNCTION: Keymap rl_get_keymap_by_name ( c-string )
+FUNCTION: c-string rl_get_keymap_name ( Keymap )
+FUNCTION: void rl_set_keymap ( Keymap )
+FUNCTION: Keymap rl_get_keymap ( )
+FUNCTION: void rl_set_keymap_from_edit_mode ( )
+FUNCTION: c-string rl_get_keymap_name_from_edit_mode ( )
 
 FUNCTION: int rl_add_funmap_entry ( c-string arg1,
-                                   rl_command_func_t* arg2 ) ;
-FUNCTION: char** rl_funmap_names ( ) ;
-FUNCTION: void rl_initialize_funmap ( ) ;
+                                   rl_command_func_t* arg2 )
+FUNCTION: char** rl_funmap_names ( )
+FUNCTION: void rl_initialize_funmap ( )
 
-FUNCTION: void rl_push_macro_input ( c-string ) ;
+FUNCTION: void rl_push_macro_input ( c-string )
 
 FUNCTION: void rl_add_undo ( undo_code arg1, int arg2, int
-                            arga3, c-string arg4 ) ;
-FUNCTION: void rl_free_undo_list ( ) ;
-FUNCTION: int rl_do_undo ( ) ;
-FUNCTION: int rl_begin_undo_group ( ) ;
-FUNCTION: int rl_end_undo_group ( ) ;
-FUNCTION: int rl_modifying ( int arg1, int arg2 ) ;
+                            arga3, c-string arg4 )
+FUNCTION: void rl_free_undo_list ( )
+FUNCTION: int rl_do_undo ( )
+FUNCTION: int rl_begin_undo_group ( )
+FUNCTION: int rl_end_undo_group ( )
+FUNCTION: int rl_modifying ( int arg1, int arg2 )
 
-FUNCTION: void rl_redisplay ( ) ;
-FUNCTION: int rl_on_new_line ( ) ;
-FUNCTION: int rl_on_new_line_with_prompt ( ) ;
-FUNCTION: int rl_forced_update_display ( ) ;
-FUNCTION: int rl_clear_message ( ) ;
-FUNCTION: int rl_reset_line_state ( ) ;
-FUNCTION: int rl_crlf ( ) ;
+FUNCTION: void rl_redisplay ( )
+FUNCTION: int rl_on_new_line ( )
+FUNCTION: int rl_on_new_line_with_prompt ( )
+FUNCTION: int rl_forced_update_display ( )
+FUNCTION: int rl_clear_message ( )
+FUNCTION: int rl_reset_line_state ( )
+FUNCTION: int rl_crlf ( )
 
 ! FUNCTION: int rl_message ( c-string arg1, ... ) ;
-FUNCTION: int rl_show_char ( int ) ;
+FUNCTION: int rl_show_char ( int )
 
-FUNCTION: int rl_character_len ( int arg1, int arg2 ) ;
+FUNCTION: int rl_character_len ( int arg1, int arg2 )
 
-FUNCTION: void rl_save_prompt ( ) ;
-FUNCTION: void rl_restore_prompt ( ) ;
+FUNCTION: void rl_save_prompt ( )
+FUNCTION: void rl_restore_prompt ( )
 
-FUNCTION: void rl_replace_line ( c-string arg1, int arg2 ) ;
-FUNCTION: int rl_insert_text ( c-string arg1 ) ;
-FUNCTION: int rl_delete_text ( int arg1, int arg2 ) ;
-FUNCTION: int rl_kill_text ( int arg1, int arg2 ) ;
-FUNCTION: c-string rl_copy_text ( int arg1, int arg2 ) ;
+FUNCTION: void rl_replace_line ( c-string arg1, int arg2 )
+FUNCTION: int rl_insert_text ( c-string arg1 )
+FUNCTION: int rl_delete_text ( int arg1, int arg2 )
+FUNCTION: int rl_kill_text ( int arg1, int arg2 )
+FUNCTION: c-string rl_copy_text ( int arg1, int arg2 )
 
-FUNCTION: void rl_prep_terminal ( int ) ;
-FUNCTION: void rl_deprep_terminal ( ) ;
-FUNCTION: void rl_tty_set_default_bindings ( Keymap ) ;
-FUNCTION: void rl_tty_unset_default_bindings ( Keymap ) ;
+FUNCTION: void rl_prep_terminal ( int )
+FUNCTION: void rl_deprep_terminal ( )
+FUNCTION: void rl_tty_set_default_bindings ( Keymap )
+FUNCTION: void rl_tty_unset_default_bindings ( Keymap )
 
-FUNCTION: int rl_reset_terminal ( c-string ) ;
-FUNCTION: void rl_resize_terminal ( ) ;
-FUNCTION: void rl_set_screen_size ( int arg1, int arg2 ) ;
-FUNCTION: void rl_get_screen_size ( int* arg1, int* arg2 ) ;
-FUNCTION: void rl_reset_screen_size ( ) ;
+FUNCTION: int rl_reset_terminal ( c-string )
+FUNCTION: void rl_resize_terminal ( )
+FUNCTION: void rl_set_screen_size ( int arg1, int arg2 )
+FUNCTION: void rl_get_screen_size ( int* arg1, int* arg2 )
+FUNCTION: void rl_reset_screen_size ( )
 
-FUNCTION: c-string rl_get_termcap ( c-string ) ;
+FUNCTION: c-string rl_get_termcap ( c-string )
 
-FUNCTION: int rl_stuff_char ( int ) ;
-FUNCTION: int rl_execute_next ( int ) ;
-FUNCTION: int rl_clear_pending_input ( ) ;
-FUNCTION: int rl_read_key ( ) ;
-FUNCTION: int rl_getc ( FILE* ) ;
-FUNCTION: int rl_set_keyboard_input_timeout ( int ) ;
+FUNCTION: int rl_stuff_char ( int )
+FUNCTION: int rl_execute_next ( int )
+FUNCTION: int rl_clear_pending_input ( )
+FUNCTION: int rl_read_key ( )
+FUNCTION: int rl_getc ( FILE* )
+FUNCTION: int rl_set_keyboard_input_timeout ( int )
 
-FUNCTION: void rl_extend_line_buffer ( int ) ;
-FUNCTION: int rl_ding ( ) ;
-FUNCTION: int rl_alphabetic ( int ) ;
-FUNCTION: void rl_free ( void* ) ;
+FUNCTION: void rl_extend_line_buffer ( int )
+FUNCTION: int rl_ding ( )
+FUNCTION: int rl_alphabetic ( int )
+FUNCTION: void rl_free ( void* )
 
-FUNCTION: int rl_set_signals ( ) ;
-FUNCTION: int rl_clear_signals ( ) ;
-FUNCTION: void rl_cleanup_after_signal ( ) ;
-FUNCTION: void rl_reset_after_signal ( ) ;
-FUNCTION: void rl_free_line_state ( ) ;
+FUNCTION: int rl_set_signals ( )
+FUNCTION: int rl_clear_signals ( )
+FUNCTION: void rl_cleanup_after_signal ( )
+FUNCTION: void rl_reset_after_signal ( )
+FUNCTION: void rl_free_line_state ( )
 
-FUNCTION: void rl_echo_signal_char ( int ) ;
+FUNCTION: void rl_echo_signal_char ( int )
 
-FUNCTION: int rl_set_paren_blink_timeout ( int ) ;
+FUNCTION: int rl_set_paren_blink_timeout ( int )
 
-FUNCTION: int rl_maybe_save_line ( ) ;
-FUNCTION: int rl_maybe_unsave_line ( ) ;
-FUNCTION: int rl_maybe_replace_line ( ) ;
+FUNCTION: int rl_maybe_save_line ( )
+FUNCTION: int rl_maybe_unsave_line ( )
+FUNCTION: int rl_maybe_replace_line ( )
 
-FUNCTION: int rl_complete_internal ( int ) ;
+FUNCTION: int rl_complete_internal ( int )
 FUNCTION: void rl_display_match_list ( char** arg1, int arg2,
-                                      int arg3 ) ;
+                                      int arg3 )
 
 FUNCTION: char** rl_completion_matches ( c-string arg1,
                                         rl_compentry_func_t*
-                                        arg2 ) ;
+                                        arg2 )
 FUNCTION: c-string rl_username_completion_function ( c-string
                                                     arg1, int
-                                                    arg2 ) ;
+                                                    arg2 )
 FUNCTION: c-string rl_filename_completion_function ( c-string
                                                     arg1, int
-                                                    arg2 ) ;
+                                                    arg2 )
 
-FUNCTION: int rl_completion_mode ( rl_command_func_t* ) ;
+FUNCTION: int rl_completion_mode ( rl_command_func_t* )
 
 C-GLOBAL: c-string rl_library_version
 C-GLOBAL: int rl_readline_version
@@ -647,5 +647,5 @@ STRUCT: readline_state
     { catchsigwinch int                }
     { reserved      char[64]           } ;
 
-FUNCTION: int rl_save_state ( readline_state* ) ;
-FUNCTION: int rl_restore_state ( readline_state* ) ;
+FUNCTION: int rl_save_state ( readline_state* )
+FUNCTION: int rl_restore_state ( readline_state* )

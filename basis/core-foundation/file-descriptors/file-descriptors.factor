@@ -11,7 +11,7 @@ CALLBACK: void CFFileDescriptorCallBack (
    CFFileDescriptorRef f,
    CFOptionFlags callBackTypes,
    void *info
-) ;
+)
 
 C-TYPE: CFFileDescriptorContext
 
@@ -21,7 +21,7 @@ FUNCTION: CFFileDescriptorRef CFFileDescriptorCreate (
     Boolean closeOnInvalidate,
     CFFileDescriptorCallBack callout,
     CFFileDescriptorContext* context
-) ;
+)
 
 CONSTANT: kCFFileDescriptorReadCallBack 1
 CONSTANT: kCFFileDescriptorWriteCallBack 2
@@ -29,7 +29,7 @@ CONSTANT: kCFFileDescriptorWriteCallBack 2
 FUNCTION: void CFFileDescriptorEnableCallBacks (
     CFFileDescriptorRef f,
     CFOptionFlags callBackTypes
-) ;
+)
 
 : enable-all-callbacks ( fd -- )
     flags{

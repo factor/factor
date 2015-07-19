@@ -4,7 +4,7 @@ alien.syntax combinators destructors io.encodings.ascii kernel
 libc locals sequences ;
 IN: alien.cxx.demangle.libstdcxx
 
-FUNCTION: char* __cxa_demangle ( char* mangled_name, char* output_buffer, size_t* length, int* status ) ;
+FUNCTION: char* __cxa_demangle ( char* mangled_name, char* output_buffer, size_t* length, int* status )
 
 ERROR: demangle-memory-allocation-failure ;
 ERROR: invalid-mangled-name name ;

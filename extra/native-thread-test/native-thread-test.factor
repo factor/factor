@@ -5,7 +5,7 @@ io.encodings.utf8 io.files kernel sequences system threads
 unix.utilities ;
 IN: native-thread-test
 
-FUNCTION: void* start_standalone_factor_in_new_thread ( int argc, c-string* argv ) ;
+FUNCTION: void* start_standalone_factor_in_new_thread ( int argc, c-string* argv )
 
 : start-vm-in-os-thread ( args -- threadhandle )
     vm prefix

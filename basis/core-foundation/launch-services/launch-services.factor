@@ -12,13 +12,13 @@ FUNCTION: OSStatus LSFindApplicationForInfo (
    CFStringRef inName,
    FSRef *outAppRef,
    CFURLRef *outAppURL
-) ;
+)
 
 FUNCTION: OSStatus FSRefMakePath (
    FSRef *ref,
    UInt8 *path,
    UInt32 maxPathSize
-) ;
+)
 
 ! Abstract base types
 CFSTRING: kUTTypeItem "public.item"

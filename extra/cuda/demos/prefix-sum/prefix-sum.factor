@@ -5,7 +5,7 @@ IN: cuda.demos.prefix-sum
 
 CUDA-LIBRARY: prefix-sum cuda32 vocab:cuda/demos/prefix-sum/prefix-sum.ptx
 
-CUDA-FUNCTION: prefix_sum_block ( uint* in, uint* out, uint n ) ;
+CUDA-FUNCTION: prefix_sum_block ( uint* in, uint* out, uint n )
 
 :: cuda-prefix-sum ( -- )
     init-cuda

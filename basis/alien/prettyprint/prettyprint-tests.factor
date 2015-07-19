@@ -5,7 +5,7 @@ IN: alien.prettyprint.tests
 
 CONSTANT: FOO 10
 
-FUNCTION: int function_test ( float x, int[4][FOO] y, char* z, ushort *w ) ;
+FUNCTION: int function_test ( float x, int[4][FOO] y, char* z, ushort *w )
 
 { "USING: alien.c-types alien.syntax ;
 IN: alien.prettyprint.tests
@@ -16,7 +16,7 @@ FUNCTION: int function_test
 ] unit-test
 
 FUNCTION-ALIAS: function-test int function_test
-    ( float x, int[4][FOO] y, char* z, ushort *w ) ;
+    ( float x, int[4][FOO] y, char* z, ushort *w )
 
 { "USING: alien.c-types alien.syntax ;
 IN: alien.prettyprint.tests
@@ -63,7 +63,7 @@ TYPEDEF: int* pint
 
 { "pointer: int" } [ pointer: int unparse ] unit-test
 
-CALLBACK: void callback-test ( int x, float[4] y ) ;
+CALLBACK: void callback-test ( int x, float[4] y )
 
 { "USING: alien.c-types alien.syntax ;
 IN: alien.prettyprint.tests

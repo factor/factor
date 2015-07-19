@@ -13,9 +13,9 @@ LIBRARY: curl
 
 ! curl.h
 
-FUNCTION: c-string curl_version ( ) ;
+FUNCTION: c-string curl_version ( )
 
-FUNCTION: c-string curl_getenv ( c-string variable ) ;
+FUNCTION: c-string curl_getenv ( c-string variable )
 
 CONSTANT: CURL_WRITEFUNC_PAUSE 0x10000001
 
@@ -336,27 +336,27 @@ ALIAS: CURLOPT_RTSPHEADER CURLOPT_HTTPHEADER
 TYPEDEF: void CURL
 TYPEDEF: int64_t curl_off_t
 
-FUNCTION: CURL* curl_easy_init ( ) ;
+FUNCTION: CURL* curl_easy_init ( )
 
 FUNCTION-ALIAS: curl_easy_setopt_long
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, long value ) ;
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, long value )
 
 FUNCTION-ALIAS: curl_easy_setopt_string
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, c-string value ) ;
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, c-string value )
 
 FUNCTION-ALIAS: curl_easy_setopt_pointer
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, void* value ) ;
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, void* value )
 
 FUNCTION-ALIAS: curl_easy_setopt_curl_off_t
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, curl_off_t value ) ;
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, curl_off_t value )
 
-FUNCTION: CURLcode curl_easy_perform ( CURL* curl ) ;
+FUNCTION: CURLcode curl_easy_perform ( CURL* curl )
 
-FUNCTION: void curl_easy_cleanup ( CURL* curl ) ;
+FUNCTION: void curl_easy_cleanup ( CURL* curl )
 
-FUNCTION: c-string curl_easy_escape ( CURL* curl, c-string string, int length ) ;
+FUNCTION: c-string curl_easy_escape ( CURL* curl, c-string string, int length )
 
-FUNCTION: c-string curl_easy_unescape ( CURL* handle, c-string string, int length, int* outlength ) ;
+FUNCTION: c-string curl_easy_unescape ( CURL* handle, c-string string, int length, int* outlength )
 
 : curl_easy_setopt ( curl option value -- code )
     over enum>number {
@@ -366,17 +366,17 @@ FUNCTION: c-string curl_easy_unescape ( CURL* handle, c-string string, int lengt
         [ drop curl_easy_setopt_long ]
     } cond ;
 
-CALLBACK: size_t write_callback ( char *buffer, size_t size, size_t nitems, void *outstream ) ;
+CALLBACK: size_t write_callback ( char *buffer, size_t size, size_t nitems, void *outstream )
 
-CALLBACK: long chunk_bgn_callback ( void* transfer_info, void* ptr, int remains ) ;
+CALLBACK: long chunk_bgn_callback ( void* transfer_info, void* ptr, int remains )
 
-CALLBACK: long chunk_end_callback ( void* ptr ) ;
+CALLBACK: long chunk_end_callback ( void* ptr )
 
-CALLBACK: int fnmatch_callback ( void* ptr, c-string pattern, c-string string ) ;
+CALLBACK: int fnmatch_callback ( void* ptr, c-string pattern, c-string string )
 
-CALLBACK: int seek_callback ( void* instream, curl_off_t offset, int origin ) ;
+CALLBACK: int seek_callback ( void* instream, curl_off_t offset, int origin )
 
-CALLBACK: size_t read_callback ( char* buffer, size_t size, size_t nitems, void* instream ) ;
+CALLBACK: size_t read_callback ( char* buffer, size_t size, size_t nitems, void* instream )
 
 ENUM: curlsocktype
     CURLSOCKTYPE_IPCXN
@@ -390,7 +390,7 @@ CONSTANT: CURL_SOCKOPT_ALREADY_CONNECTED 2
 
 TYPEDEF: int curl_socket_t
 
-CALLBACK: int sockopt_callback ( void* clientp, curl_socket_t curlfd, curlsocktype purpose ) ;
+CALLBACK: int sockopt_callback ( void* clientp, curl_socket_t curlfd, curlsocktype purpose )
 
 STRUCT: curl_sockaddr
     { family int }
@@ -399,9 +399,9 @@ STRUCT: curl_sockaddr
     { addrlen uint }
 ;
 
-CALLBACK: curl_socket_t opensocket_callback ( void* clientp, curlsocktype purpose, curl_sockaddr* address ) ;
+CALLBACK: curl_socket_t opensocket_callback ( void* clientp, curlsocktype purpose, curl_sockaddr* address )
 
-CALLBACK: int closesocket_callback ( void* clientp, curl_socket_t item ) ;
+CALLBACK: int closesocket_callback ( void* clientp, curl_socket_t item )
 
 ENUM: curlioerr
     CURLIOE_OK
@@ -416,13 +416,13 @@ ENUM: curliocmd
     CURLIOCMD_LAST
 ;
 
-CALLBACK: curlioerr ioctl_callback ( CURL* handle, int cmd, void* clientp ) ;
+CALLBACK: curlioerr ioctl_callback ( CURL* handle, int cmd, void* clientp )
 
-CALLBACK: void* malloc_callback ( size_t size ) ;
-CALLBACK: void free_callback ( void* ptr ) ;
-CALLBACK: void* realloc_callback ( void* ptr, size_t size ) ;
-CALLBACK: char* strdup_callback ( char* str ) ;
-CALLBACK: void* calloc_callback ( size_t nmemb, size_t size ) ;
+CALLBACK: void* malloc_callback ( size_t size )
+CALLBACK: void free_callback ( void* ptr )
+CALLBACK: void* realloc_callback ( void* ptr, size_t size )
+CALLBACK: char* strdup_callback ( char* str )
+CALLBACK: void* calloc_callback ( size_t nmemb, size_t size )
 
 ENUM: curl_infotype
     CURLINFO_TEXT
@@ -435,11 +435,11 @@ ENUM: curl_infotype
     CURLINFO_END
 ;
 
-CALLBACK: int debug_callback ( CURL* handle, curl_infotype type, char* data, size_t size, void* userptr ) ;
+CALLBACK: int debug_callback ( CURL* handle, curl_infotype type, char* data, size_t size, void* userptr )
 
-CALLBACK: CURLcode conv_callback ( char* buffer, size_t length ) ;
+CALLBACK: CURLcode conv_callback ( char* buffer, size_t length )
 
-CALLBACK: CURLcode ssl_ctx_callback ( CURL* curl, void* ssl_ctx, void* userptr ) ;
+CALLBACK: CURLcode ssl_ctx_callback ( CURL* curl, void* ssl_ctx, void* userptr )
 
 ENUM: curl_proxytype
     { CURLPROXY_HTTP 0 }

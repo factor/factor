@@ -204,58 +204,58 @@ CONSTANT: GLU_TESS_WINDING_ABS_GEQ_TWO       100134
 
 LIBRARY: glu
 
-FUNCTION: void gluBeginCurve ( GLUnurbs* nurb ) ;
-FUNCTION: void gluBeginPolygon ( GLUtesselator* tess ) ;
-FUNCTION: void gluBeginSurface ( GLUnurbs* nurb ) ;
-FUNCTION: void gluBeginTrim ( GLUnurbs* nurb ) ;
+FUNCTION: void gluBeginCurve ( GLUnurbs* nurb )
+FUNCTION: void gluBeginPolygon ( GLUtesselator* tess )
+FUNCTION: void gluBeginSurface ( GLUnurbs* nurb )
+FUNCTION: void gluBeginTrim ( GLUnurbs* nurb )
 
-FUNCTION: void gluCylinder ( GLUquadric* quad, GLdouble base, GLdouble top, GLdouble height, GLint slices, GLint stacks ) ;
-FUNCTION: void gluDeleteNurbsRenderer ( GLUnurbs* nurb ) ;
-FUNCTION: void gluDeleteQuadric ( GLUquadric* quad ) ;
-FUNCTION: void gluDeleteTess ( GLUtesselator* tess ) ;
-FUNCTION: void gluDisk ( GLUquadric* quad, GLdouble inner, GLdouble outer, GLint slices, GLint loops ) ;
-FUNCTION: void gluEndCurve ( GLUnurbs* nurb ) ;
-FUNCTION: void gluEndPolygon ( GLUtesselator* tess ) ;
-FUNCTION: void gluEndSurface ( GLUnurbs* nurb ) ;
-FUNCTION: void gluEndTrim ( GLUnurbs* nurb ) ;
-FUNCTION: c-string gluErrorString ( GLenum error ) ;
-FUNCTION: void gluGetNurbsProperty ( GLUnurbs* nurb, GLenum property, GLfloat* data ) ;
-FUNCTION: c-string gluGetString ( GLenum name ) ;
-FUNCTION: void gluGetTessProperty ( GLUtesselator* tess, GLenum which, GLdouble* data ) ;
-FUNCTION: void gluLoadSamplingMatrices ( GLUnurbs* nurb, GLfloat* model, GLfloat* perspective, GLint* view ) ;
-FUNCTION: void gluLookAt ( GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ, GLdouble centerX, GLdouble centerY, GLdouble centerZ, GLdouble upX, GLdouble upY, GLdouble upZ ) ;
-FUNCTION: GLUnurbs* gluNewNurbsRenderer ( ) ;
-FUNCTION: GLUquadric* gluNewQuadric ( ) ;
-FUNCTION: GLUtesselator* gluNewTess ( ) ;
-FUNCTION: void gluNextContour ( GLUtesselator* tess, GLenum type ) ;
-FUNCTION: void gluNurbsCallback ( GLUnurbs* nurb, GLenum which, GLUfuncptr CallBackFunc ) ;
+FUNCTION: void gluCylinder ( GLUquadric* quad, GLdouble base, GLdouble top, GLdouble height, GLint slices, GLint stacks )
+FUNCTION: void gluDeleteNurbsRenderer ( GLUnurbs* nurb )
+FUNCTION: void gluDeleteQuadric ( GLUquadric* quad )
+FUNCTION: void gluDeleteTess ( GLUtesselator* tess )
+FUNCTION: void gluDisk ( GLUquadric* quad, GLdouble inner, GLdouble outer, GLint slices, GLint loops )
+FUNCTION: void gluEndCurve ( GLUnurbs* nurb )
+FUNCTION: void gluEndPolygon ( GLUtesselator* tess )
+FUNCTION: void gluEndSurface ( GLUnurbs* nurb )
+FUNCTION: void gluEndTrim ( GLUnurbs* nurb )
+FUNCTION: c-string gluErrorString ( GLenum error )
+FUNCTION: void gluGetNurbsProperty ( GLUnurbs* nurb, GLenum property, GLfloat* data )
+FUNCTION: c-string gluGetString ( GLenum name )
+FUNCTION: void gluGetTessProperty ( GLUtesselator* tess, GLenum which, GLdouble* data )
+FUNCTION: void gluLoadSamplingMatrices ( GLUnurbs* nurb, GLfloat* model, GLfloat* perspective, GLint* view )
+FUNCTION: void gluLookAt ( GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ, GLdouble centerX, GLdouble centerY, GLdouble centerZ, GLdouble upX, GLdouble upY, GLdouble upZ )
+FUNCTION: GLUnurbs* gluNewNurbsRenderer ( )
+FUNCTION: GLUquadric* gluNewQuadric ( )
+FUNCTION: GLUtesselator* gluNewTess ( )
+FUNCTION: void gluNextContour ( GLUtesselator* tess, GLenum type )
+FUNCTION: void gluNurbsCallback ( GLUnurbs* nurb, GLenum which, GLUfuncptr CallBackFunc )
 ! FUNCTION: void gluNurbsCallbackData ( GLUnurbs* nurb, GLvoid* userData ) ;
 ! FUNCTION: void gluNurbsCallbackDataEXT ( GLUnurbs* nurb, GLvoid* userData ) ;
-FUNCTION: void gluNurbsCurve ( GLUnurbs* nurb, GLint knotCount, GLfloat *knots, GLint stride, GLfloat *control, GLint order, GLenum type ) ;
-FUNCTION: void gluNurbsProperty ( GLUnurbs* nurb, GLenum property, GLfloat value ) ;
-FUNCTION: void gluNurbsSurface ( GLUnurbs* nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type ) ;
-FUNCTION: void gluOrtho2D ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top ) ;
-FUNCTION: void gluPartialDisk ( GLUquadric* quad, GLdouble inner, GLdouble outer, GLint slices, GLint loops, GLdouble start, GLdouble sweep ) ;
-FUNCTION: void gluPerspective ( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar ) ;
-FUNCTION: void gluPickMatrix ( GLdouble x, GLdouble y, GLdouble delX, GLdouble delY, GLint* viewport ) ;
-FUNCTION: GLint gluProject ( GLdouble objX, GLdouble objY, GLdouble objZ, GLdouble* model, GLdouble* proj, GLint* view, GLdouble* winX, GLdouble* winY, GLdouble* winZ ) ;
-FUNCTION: void gluPwlCurve ( GLUnurbs* nurb, GLint count, GLfloat* data, GLint stride, GLenum type ) ;
-FUNCTION: void gluQuadricCallback ( GLUquadric* quad, GLenum which, GLUfuncptr CallBackFunc ) ;
-FUNCTION: void gluQuadricDrawStyle ( GLUquadric* quad, GLenum draw ) ;
-FUNCTION: void gluQuadricNormals ( GLUquadric* quad, GLenum normal ) ;
-FUNCTION: void gluQuadricOrientation ( GLUquadric* quad, GLenum orientation ) ;
-FUNCTION: void gluQuadricTexture ( GLUquadric* quad, GLboolean texture ) ;
-FUNCTION: GLint gluScaleImage ( GLenum format, GLsizei wIn, GLsizei hIn, GLenum typeIn, void* dataIn, GLsizei wOut, GLsizei hOut, GLenum typeOut, GLvoid* dataOut ) ;
-FUNCTION: void gluSphere ( GLUquadric* quad, GLdouble radius, GLint slices, GLint stacks ) ;
-FUNCTION: void gluTessBeginContour ( GLUtesselator* tess ) ;
-FUNCTION: void gluTessBeginPolygon ( GLUtesselator* tess, GLvoid* data ) ;
-FUNCTION: void gluTessCallback ( GLUtesselator* tess, GLenum which, GLUfuncptr CallBackFunc ) ;
-FUNCTION: void gluTessEndContour ( GLUtesselator* tess ) ;
-FUNCTION: void gluTessEndPolygon ( GLUtesselator* tess ) ;
-FUNCTION: void gluTessNormal ( GLUtesselator* tess, GLdouble valueX, GLdouble valueY, GLdouble valueZ ) ;
-FUNCTION: void gluTessProperty ( GLUtesselator* tess, GLenum which, GLdouble data ) ;
-FUNCTION: void gluTessVertex ( GLUtesselator* tess, GLdouble* location, GLvoid* data ) ;
-FUNCTION: GLint gluUnProject ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble* model, GLdouble* proj, GLint* view, GLdouble* objX, GLdouble* objY, GLdouble* objZ ) ;
+FUNCTION: void gluNurbsCurve ( GLUnurbs* nurb, GLint knotCount, GLfloat *knots, GLint stride, GLfloat *control, GLint order, GLenum type )
+FUNCTION: void gluNurbsProperty ( GLUnurbs* nurb, GLenum property, GLfloat value )
+FUNCTION: void gluNurbsSurface ( GLUnurbs* nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type )
+FUNCTION: void gluOrtho2D ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top )
+FUNCTION: void gluPartialDisk ( GLUquadric* quad, GLdouble inner, GLdouble outer, GLint slices, GLint loops, GLdouble start, GLdouble sweep )
+FUNCTION: void gluPerspective ( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar )
+FUNCTION: void gluPickMatrix ( GLdouble x, GLdouble y, GLdouble delX, GLdouble delY, GLint* viewport )
+FUNCTION: GLint gluProject ( GLdouble objX, GLdouble objY, GLdouble objZ, GLdouble* model, GLdouble* proj, GLint* view, GLdouble* winX, GLdouble* winY, GLdouble* winZ )
+FUNCTION: void gluPwlCurve ( GLUnurbs* nurb, GLint count, GLfloat* data, GLint stride, GLenum type )
+FUNCTION: void gluQuadricCallback ( GLUquadric* quad, GLenum which, GLUfuncptr CallBackFunc )
+FUNCTION: void gluQuadricDrawStyle ( GLUquadric* quad, GLenum draw )
+FUNCTION: void gluQuadricNormals ( GLUquadric* quad, GLenum normal )
+FUNCTION: void gluQuadricOrientation ( GLUquadric* quad, GLenum orientation )
+FUNCTION: void gluQuadricTexture ( GLUquadric* quad, GLboolean texture )
+FUNCTION: GLint gluScaleImage ( GLenum format, GLsizei wIn, GLsizei hIn, GLenum typeIn, void* dataIn, GLsizei wOut, GLsizei hOut, GLenum typeOut, GLvoid* dataOut )
+FUNCTION: void gluSphere ( GLUquadric* quad, GLdouble radius, GLint slices, GLint stacks )
+FUNCTION: void gluTessBeginContour ( GLUtesselator* tess )
+FUNCTION: void gluTessBeginPolygon ( GLUtesselator* tess, GLvoid* data )
+FUNCTION: void gluTessCallback ( GLUtesselator* tess, GLenum which, GLUfuncptr CallBackFunc )
+FUNCTION: void gluTessEndContour ( GLUtesselator* tess )
+FUNCTION: void gluTessEndPolygon ( GLUtesselator* tess )
+FUNCTION: void gluTessNormal ( GLUtesselator* tess, GLdouble valueX, GLdouble valueY, GLdouble valueZ )
+FUNCTION: void gluTessProperty ( GLUtesselator* tess, GLenum which, GLdouble data )
+FUNCTION: void gluTessVertex ( GLUtesselator* tess, GLdouble* location, GLvoid* data )
+FUNCTION: GLint gluUnProject ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble* model, GLdouble* proj, GLint* view, GLdouble* objX, GLdouble* objY, GLdouble* objZ )
 
 ! Not present on Windows
 ! FUNCTION: GLint gluBuild1DMipmapLevels ( GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, GLint level, GLint base, GLint max, void* data ) ;
@@ -271,17 +271,17 @@ DESTRUCTOR: gluDeleteNurbsRenderer
 DESTRUCTOR: gluDeleteQuadric
 DESTRUCTOR: gluDeleteTess
 
-CALLBACK: void GLUtessBeginCallback ( GLenum type ) ;
-CALLBACK: void GLUtessBeginDataCallback ( GLenum type, void* data ) ;
-CALLBACK: void GLUtessEdgeFlagCallback ( GLboolean flag ) ;
-CALLBACK: void GLUtessEdgeFlagDataCallback ( GLboolean flag, void* data ) ;
-CALLBACK: void GLUtessVertexCallback ( void* vertex_data ) ;
-CALLBACK: void GLUtessVertexDataCallback ( void* vertex_data, void* data ) ;
-CALLBACK: void GLUtessEndCallback ( ) ;
-CALLBACK: void GLUtessEndDataCallback ( void* data ) ;
-CALLBACK: void GLUtessCombineDataCallback ( GLdouble* coords, void** vertex_data, GLfloat* weight, void** out_data, void* data ) ;
-CALLBACK: void GLUtessErrorCallback ( GLenum errno ) ;
-CALLBACK: void GLUtessErrorDataCallback ( GLenum errno, void* data ) ;
+CALLBACK: void GLUtessBeginCallback ( GLenum type )
+CALLBACK: void GLUtessBeginDataCallback ( GLenum type, void* data )
+CALLBACK: void GLUtessEdgeFlagCallback ( GLboolean flag )
+CALLBACK: void GLUtessEdgeFlagDataCallback ( GLboolean flag, void* data )
+CALLBACK: void GLUtessVertexCallback ( void* vertex_data )
+CALLBACK: void GLUtessVertexDataCallback ( void* vertex_data, void* data )
+CALLBACK: void GLUtessEndCallback ( )
+CALLBACK: void GLUtessEndDataCallback ( void* data )
+CALLBACK: void GLUtessCombineDataCallback ( GLdouble* coords, void** vertex_data, GLfloat* weight, void** out_data, void* data )
+CALLBACK: void GLUtessErrorCallback ( GLenum errno )
+CALLBACK: void GLUtessErrorDataCallback ( GLenum errno, void* data )
 
 : gl-look-at ( eye focus up -- )
     [ first3 ] tri@ gluLookAt ;

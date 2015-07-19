@@ -110,19 +110,19 @@ STRUCT: th-huff-code
 ;
 
 LIBRARY: theoradec
-FUNCTION: c-string th_version_string ( ) ;
-FUNCTION: uint th_version_number ( ) ;
+FUNCTION: c-string th_version_string ( )
+FUNCTION: uint th_version_number ( )
 FUNCTION: longlong th_granule_frame ( void* encdec, longlong granpos) ;
-FUNCTION: int th_packet_isheader ( ogg-packet* op ) ;
-FUNCTION: int th_packet_iskeyframe ( ogg-packet* op ) ;
-FUNCTION: void th_info_init ( th-info* info ) ;
-FUNCTION: void th_info_clear ( th-info* info ) ;
-FUNCTION: void th_comment_init ( th-comment* tc ) ;
-FUNCTION: void th_comment_add ( th-comment* tc, c-string comment ) ;
-FUNCTION: void th_comment_add_tag ( th-comment* tc, c-string tag, c-string value ) ;
-FUNCTION: c-string th_comment_query ( th-comment* tc, c-string tag, int count ) ;
-FUNCTION: int   th_comment_query_count ( th-comment* tc, c-string tag ) ;
-FUNCTION: void  th_comment_clear ( th-comment* tc ) ;
+FUNCTION: int th_packet_isheader ( ogg-packet* op )
+FUNCTION: int th_packet_iskeyframe ( ogg-packet* op )
+FUNCTION: void th_info_init ( th-info* info )
+FUNCTION: void th_info_clear ( th-info* info )
+FUNCTION: void th_comment_init ( th-comment* tc )
+FUNCTION: void th_comment_add ( th-comment* tc, c-string comment )
+FUNCTION: void th_comment_add_tag ( th-comment* tc, c-string tag, c-string value )
+FUNCTION: c-string th_comment_query ( th-comment* tc, c-string tag, int count )
+FUNCTION: int   th_comment_query_count ( th-comment* tc, c-string tag )
+FUNCTION: void  th_comment_clear ( th-comment* tc )
 
 CONSTANT: TH-ENCCTL-SET-HUFFMAN-CODES 0
 CONSTANT: TH-ENCCTL-SET-QUANT-PARAMS 2
@@ -145,12 +145,12 @@ CONSTANT: TH-RATECTL-CAP-UNDERFOW 4
 TYPEDEF: void* th-enc-ctx
 
 LIBRARY: theoraenc
-FUNCTION: th-enc-ctx* th_encode_alloc ( th-info* info ) ;
-FUNCTION: int th_encode_ctl ( th-enc-ctx* enc, int req, void* buf, int buf_sz ) ;
-FUNCTION: int th_encode_flushheader ( th-enc-ctx* enc, th-comment* comments, ogg-packet* op ) ;
-FUNCTION: int th_encode_ycbcr_in ( th-enc-ctx* enc, th-ycbcr-buffer ycbcr ) ;
-FUNCTION: int th_encode_packetout ( th-enc-ctx* enc, int last, ogg-packet* op ) ;
-FUNCTION: void th_encode_free ( th-enc-ctx* enc ) ;
+FUNCTION: th-enc-ctx* th_encode_alloc ( th-info* info )
+FUNCTION: int th_encode_ctl ( th-enc-ctx* enc, int req, void* buf, int buf_sz )
+FUNCTION: int th_encode_flushheader ( th-enc-ctx* enc, th-comment* comments, ogg-packet* op )
+FUNCTION: int th_encode_ycbcr_in ( th-enc-ctx* enc, th-ycbcr-buffer ycbcr )
+FUNCTION: int th_encode_packetout ( th-enc-ctx* enc, int last, ogg-packet* op )
+FUNCTION: void th_encode_free ( th-enc-ctx* enc )
 
 CONSTANT: TH-DECCTL-GET-PPLEVEL-MAX 1
 CONSTANT: TH-DECCTL-SET-PPLEVEL 3
@@ -172,10 +172,10 @@ TYPEDEF: void* th-dec-ctx
 TYPEDEF: void* th-setup-info
 
 LIBRARY: theoradec
-FUNCTION: int th_decode_headerin ( th-info* info, th-comment* tc, th-setup-info** setup, ogg-packet* op ) ;
-FUNCTION: th-dec-ctx* th_decode_alloc ( th-info* info, th-setup-info* setup ) ;
-FUNCTION: void th_setup_free ( th-setup-info* setup ) ;
-FUNCTION: int th_decode_ctl ( th-dec-ctx* dec, int req, void* buf, int buf_sz ) ;
-FUNCTION: int th_decode_packetin ( th-dec-ctx* dec, ogg-packet* op, longlong granpos ) ;
-FUNCTION: int th_decode_ycbcr_out ( th-dec-ctx* dec, th-ycbcr-buffer ycbcr ) ;
-FUNCTION: void th_decode_free ( th-dec-ctx* dec ) ;
+FUNCTION: int th_decode_headerin ( th-info* info, th-comment* tc, th-setup-info** setup, ogg-packet* op )
+FUNCTION: th-dec-ctx* th_decode_alloc ( th-info* info, th-setup-info* setup )
+FUNCTION: void th_setup_free ( th-setup-info* setup )
+FUNCTION: int th_decode_ctl ( th-dec-ctx* dec, int req, void* buf, int buf_sz )
+FUNCTION: int th_decode_packetin ( th-dec-ctx* dec, ogg-packet* op, longlong granpos )
+FUNCTION: int th_decode_ycbcr_out ( th-dec-ctx* dec, th-ycbcr-buffer ycbcr )
+FUNCTION: void th_decode_free ( th-dec-ctx* dec )

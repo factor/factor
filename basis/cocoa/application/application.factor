@@ -17,7 +17,7 @@ CONSTANT: NSApplicationDelegateReplyFailure 2
 
 CONSTANT: NSAnyEventMask 0xffffffff
 
-FUNCTION: void NSBeep ( ) ;
+FUNCTION: void NSBeep ( )
 
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ; inline
