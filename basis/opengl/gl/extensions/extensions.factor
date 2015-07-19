@@ -52,4 +52,4 @@ SYNTAX: GL-FUNCTION:
     scan-function-name
     "{" expect "}" parse-tokens over suffix
     gl-function-counter '[ _ _ gl-function-pointer ]
-    ";" scan-c-args define-indirect ;
+    scan-c-args define-indirect ;
