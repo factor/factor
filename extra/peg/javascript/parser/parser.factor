@@ -5,16 +5,16 @@ peg peg.ebnf peg.javascript.ast peg.javascript.tokenizer ;
 IN: peg.javascript.parser
 
 #! Grammar for JavaScript. Based on OMeta-JS example from:
-#! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler 
+#! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
 
 #! The interesting thing about this parser is the mixing of
 #! a default and non-default tokenizer. The JavaScript tokenizer
 #! removes all newlines. So when operating on tokens there is no
 #! need for newline and space skipping in the grammar. But JavaScript
-#! uses the newline in the 'automatic semicolon insertion' rule. 
+#! uses the newline in the 'automatic semicolon insertion' rule.
 #!
 #! If a statement ends in a newline, sometimes the semicolon can be
-#! skipped. So we define an 'nl' rule using the default tokenizer. 
+#! skipped. So we define an 'nl' rule using the default tokenizer.
 #! This operates a character at a time. Using this 'nl' in the parser
 #! allows us to detect newlines when we need to for the semicolon
 #! insertion rule, but ignore it in all other places.

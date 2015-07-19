@@ -30,7 +30,7 @@ CONSTANT: game-height 256
     color third  index 2 + bitmap set-nth ;
 
 : get-bitmap-pixel ( point array -- color )
-    #! Point is a {x y}. color is a {r g b} 
+    #! Point is a {x y}. color is a {r g b}
     [ bitmap-index ] dip
     [ nth ]
     [ [ 1 + ] dip nth ]
@@ -164,7 +164,7 @@ M: space-invaders read-port
     #! Bit 1 = invaders sound 2
     #! Bit 2 = invaders sound 3
     #! Bit 3 = invaders sound 4
-    #! Bit 4 = spaceship hit 
+    #! Bit 4 = spaceship hit
     #! Bit 5 = amplifier enabled/disabled
     2dup 0 port5-newly-set? [ dup SOUND-WALK1 play-invaders-sound ] when
     2dup 1 port5-newly-set? [ dup SOUND-WALK2 play-invaders-sound ] when
@@ -336,7 +336,7 @@ M: space-invaders update-video
     system:nano-count ;
 
 : invaders-process ( micros gadget -- )
-    #! Run a space invaders gadget inside a 
+    #! Run a space invaders gadget inside a
     #! concurrent process. Messages can be sent to
     #! signal key presses, etc.
     dup quit?>> [

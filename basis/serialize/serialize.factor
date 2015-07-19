@@ -26,7 +26,7 @@ SYMBOL: serialized
     serialized get [ assoc-size swap ] keep set-at ;
 
 : object-id ( obj -- id )
-    #! Return the id of an already serialized object 
+    #! Return the id of an already serialized object
     serialized get at ;
 
 ! Numbers are serialized as follows:
