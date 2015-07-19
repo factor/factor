@@ -1,6 +1,6 @@
+USING: accessors arrays kernel sorting tools.test ui.gadgets
+ui.gadgets.grid-lines.private ui.gadgets.grids ;
 IN: ui.gadgets.grid-lines.tests
-USING: tools.test ui.gadgets ui.gadgets.grid-lines ui.gadgets.grid-lines.private
-ui.gadgets.grids.private accessors arrays ui.gadgets.grids sorting kernel ;
 
 : 100x100 ( -- gadget )
     <gadget> { 100 100 } >>dim ;
@@ -16,7 +16,7 @@ ui.gadgets.grids.private accessors arrays ui.gadgets.grids sorting kernel ;
     100x100 1array
     1array
     <grid>
-    { 100.0 100 } >>dim
+    { 100 100 } >>dim
     compute-grid-lines natural-sort
 ] unit-test
 
