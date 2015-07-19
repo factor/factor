@@ -15,7 +15,7 @@ xinput-game-input-backend game-input-backend set-global
     255 /f ; inline
 : >vibration ( float -- short )
     65535 * >fixnum 0 65535 clamp ; inline
-MACRO: map-index-compose ( seq quot -- seq )
+MACRO: map-index-compose ( seq quot -- quot' )
     '[ '[ _ execute _ ] _ compose ] map-index 1quotation ;
 
 : fill-buttons ( button-bitmap -- button-array )

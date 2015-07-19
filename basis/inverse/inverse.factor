@@ -281,7 +281,7 @@ DEFER: __
 : [matches?] ( quot -- undoes?-quot )
     [undo] dup infer [ true-out ] [ false-recover ] bi curry ;
 
-MACRO: matches? ( quot -- ? ) [matches?] ;
+MACRO: matches? ( quot -- quot' ) [matches?] ;
 
 ERROR: no-match ;
 M: no-match summary drop "Fall through in switch" ;

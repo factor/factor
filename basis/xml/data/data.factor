@@ -169,7 +169,7 @@ M: tag like
         rot dup [ V{ } like ] when <tag>
     ] if ;
 
-MACRO: clone-slots ( class -- tuple )
+MACRO: clone-slots ( class -- quot )
     [
         "slots" word-prop
         [ name>> reader-word '[ _ execute clone ] ] map

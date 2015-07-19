@@ -107,7 +107,7 @@ MACRO: printf ( format-string -- quot )
         @ output-stream get [ stream-write ] curry _ napply
     ] ;
 
-MACRO: sprintf ( format-string -- result )
+MACRO: sprintf ( format-string -- quot )
     printf-quot '[
         @ _ "" nappend-as
     ] ;
