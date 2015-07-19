@@ -12,6 +12,7 @@ IN: math.integers
 
 M: integer numerator ; inline
 M: integer denominator drop 1 ; inline
+M: integer >fraction 1 ; inline
 
 M: fixnum >fixnum ; inline
 M: fixnum >bignum fixnum>bignum ; inline

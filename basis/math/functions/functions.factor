@@ -4,12 +4,6 @@ USING: math kernel math.constants math.private math.bits
 math.libm combinators fry math.order sequences ;
 IN: math.functions
 
-GENERIC: >fraction ( a/b -- a b )
-
-M: integer >fraction 1 ; inline
-
-M: ratio >fraction [ numerator ] [ denominator ] bi ; inline
-
 : rect> ( x y -- z )
     ! Note: an imaginary 0.0 should still create a complex
     dup 0 = [ drop ] [ complex boa ] if ; inline
