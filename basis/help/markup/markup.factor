@@ -132,7 +132,7 @@ ALIAS: $slot $snippet
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    1 cut* [ "\n" join ] bi@ over <input> [
+    unclip-last [ "\n" join ] dip over <input> [
         [ print ] [ output-style get format ] bi*
     ] ($code) ;
 
