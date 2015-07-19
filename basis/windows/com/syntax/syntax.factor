@@ -38,7 +38,7 @@ ERROR: no-com-interface interface ;
     dup word>> +com-interface-definitions+ get-global set-at ;
 
 : (parse-com-function) ( return name -- definition )
-    ")" scan-c-args
+    scan-c-args
     [ pointer: void prefix ] [ "this" prefix ] bi*
     <com-function-definition> ;
 
