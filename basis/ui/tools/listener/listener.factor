@@ -8,9 +8,10 @@ io.styles kernel lexer listener locals make math models
 models.arrow models.delay namespaces parser prettyprint
 quotations sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled ui.gadgets.lines
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.tracks ui.gestures ui.operations ui.pens.solid
+ui.gadgets.tracks ui.gadgets.toolbar 
+ui.gestures ui.operations ui.pens.solid
 ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
@@ -216,16 +217,15 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
     dup error-summary>> f track-add ;
+    
+: listener-area ( listener -- listener )
+    dup output>> margins <scroller> >>scroller
+    dup scroller>> white-interior 1 track-add ;
 
 : <listener-gadget> ( -- listener )
     vertical listener-gadget new-track
-        add-toolbar
-        init-input/output
-        dup output>> 
-        { 7 7 } <border> { 1 1 } >>fill
-        <scroller> >>scroller
-        dup scroller>> 1 track-add
-        init-error-summary ;
+    with-lines add-toolbar init-input/output listener-area
+    init-error-summary ;
 
 M: listener-gadget focusable-child*
     input>> dup popup>> or ;
