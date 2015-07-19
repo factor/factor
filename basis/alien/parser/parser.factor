@@ -112,20 +112,15 @@ PRIVATE>
 : scan-function-name ( -- return function )
     scan-c-type scan-token parse-pointers ;
 
-:: (scan-c-args) ( end-marker types names -- )
-    scan-token :> type-str
-    type-str end-marker = [
-        type-str { "(" ")" } member? [
-            type-str parse-c-type :> type
-            scan-token "," ?tail drop :> name
-            type name parse-pointers :> ( type' name' )
-            type' types push name' names push
-        ] unless
-        end-marker types names (scan-c-args)
-    ] unless ;
-
-: scan-c-args ( end-marker -- types names )
-    V{ } clone V{ } clone [ (scan-c-args) ] 2keep [ >array ] bi@ ;
+:: scan-c-args ( -- types names )
+    V{ } clone :> types
+    V{ } clone :> names
+    "(" expect scan-token [ dup ")" = ] [
+        parse-c-type
+        scan-token "," ?tail drop
+        parse-pointers [ types push ] [ names push ] bi*
+        scan-token
+    ] until drop ";" expect types names [ >array ] bi@ ;
 
 : function-quot ( return library function types -- quot )
     '[ _ _ _ _ alien-invoke ] ;
@@ -145,7 +140,7 @@ PRIVATE>
     return function library types names (make-function) ;
 
 : (FUNCTION:) ( -- return function library types names )
-    scan-function-name current-library get ";" scan-c-args ;
+    scan-function-name current-library get scan-c-args ;
 
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
@@ -160,7 +155,7 @@ PRIVATE>
 
 : (CALLBACK:) ( -- word quot effect )
     current-library get
-    scan-function-name ";" scan-c-args make-callback-type ;
+    scan-function-name scan-c-args make-callback-type ;
 
 PREDICATE: alien-function-alias-word < word
     def>> {
