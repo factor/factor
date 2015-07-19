@@ -121,9 +121,8 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
-CONSTANT: button-background COLOR: grey95
+CONSTANT: button-background COLOR: FactorLightTan
 CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
-CONSTANT: toolbar-border COLOR: grey75
 
 : <border-button-pen> ( -- pen )
     "button" button-background button-clicked-background
@@ -243,18 +242,3 @@ PRIVATE>
     target command command-button-quot
     '[ drop @ ] <border-button>
     gesture gesture>tooltip >>tooltip ; inline
-
-: <toolbar> ( target -- toolbar )
-    <shelf>
-        1 >>fill
-        { 5 5 } >>gap
-        swap
-        [ [ "toolbar" ] dip class-of get-command-at commands>> ]
-        [ '[ [ _ ] 2dip <command-button> add-gadget ] ]
-        bi assoc-each ;
-
-: add-toolbar ( track -- track )
-    dup <toolbar> { 3 3 } <border> 
-    button-background <solid> >>interior
-    toolbar-border <solid-underlined> >>boundary
-    align-left f track-add ;
