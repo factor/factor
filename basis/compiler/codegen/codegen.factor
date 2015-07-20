@@ -112,8 +112,7 @@ M: ##no-tco generate-insn drop ;
 
 M: ##prologue generate-insn
     drop
-    cfg get stack-frame>>
-    [ [ stack-frame set ] [ total-size>> %prologue ] bi ] when* ;
+    cfg get stack-frame>> [ total-size>> %prologue ] when* ;
 
 M: ##epilogue generate-insn
     drop
