@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors.constants kernel locals math.rectangles
 math.vectors namespaces opengl sequences sorting ui.commands
-ui.gadgets ui.gadgets.buttons ui.gadgets.corners
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.corners
 ui.gadgets.frames ui.gadgets.glass ui.gadgets.packs
 ui.gadgets.worlds ui.gestures ui.operations ui.pens
 ui.pens.solid ui.render ;
