@@ -1,12 +1,10 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.encodings.binary io.files io.pathnames io.directories
-io.encodings.ascii kernel namespaces
-sequences locals system splitting tools.deploy.backend
-tools.deploy.config tools.deploy.config.editor assocs hashtables
-prettyprint combinators windows.kernel32 windows.shell32 windows.user32
-alien.c-types vocabs.metadata vocabs.loader tools.deploy.windows.ico
-io.files.windows ;
+USING: combinators io.directories io.encodings.binary io.files
+io.files.windows io.pathnames kernel locals namespaces system
+tools.deploy.backend tools.deploy.config
+tools.deploy.config.editor tools.deploy.windows.ico
+vocabs.loader vocabs.metadata windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
 
 CONSTANT: app-icon-resource-id "APPICON"
