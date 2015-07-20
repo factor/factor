@@ -3,8 +3,8 @@
 USING: accessors arrays continuations fonts fry inspector
 kernel models models.arrow prettyprint sequences ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.tracks
+ui.gadgets.labeled ui.gadgets.lines ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.tools.common ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
@@ -51,19 +51,19 @@ TUPLE: traceback-gadget < tool ;
 : <traceback-gadget> ( model -- gadget )
     [
         vertical traceback-gadget new-track
-        { 3 3 } >>gap
+        with-lines
     ] dip
     [ >>model ]
     [
-        [ vertical <track> { 3 3 } >>gap ] dip
+        [ vertical <track> with-lines ] dip
         [
-            [ horizontal <track> { 3 3 } >>gap ] dip
+            [ horizontal <track> with-lines ] dip
             [ <datastack-display> 1/2 track-add ]
             [ <retainstack-display> 1/2 track-add ] bi
             1/3 track-add
         ]
         [ <callstack-display> 2/3 track-add ] bi
-        { 3 3 } <filled-border> 1 track-add
+         1 track-add
     ] bi
     add-toolbar ;
 

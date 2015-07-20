@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel concurrency.messaging inspector
-ui.tools.listener ui.tools.traceback ui.gadgets.buttons
-ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
+USING: accessors colors kernel concurrency.messaging colors.constants inspector
+ui.tools.listener ui.tools.traceback ui.gadgets.buttons ui.gadgets.lines
+ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks ui.commands ui.gadgets
 models models.arrow ui.tools.browser ui.tools.common ui.gestures
-ui.gadgets.labels ui threads namespaces make tools.walker assocs
+ui.gadgets.labels ui.pens.solid ui threads namespaces make tools.walker assocs
 combinators fry ;
 IN: ui.tools.walker
 
@@ -54,17 +54,27 @@ M: walker-gadget focusable-child*
 
 : <thread-status> ( model thread -- gadget )
     '[ _ walker-state-string ] <arrow> <label-control> ;
+    
+CONSTANT: thread-status-color
+T{ rgba { red 0.9295 } { green 0.9569 } { blue 0.8510 } { alpha 1.0 } } inline
+
+: add-thread-status ( track -- track )
+    dup status>> self <thread-status> margins
+    thread-status-color <solid> >>interior
+    f track-add ;
+    
+: add-traceback ( track -- track )
+    dup traceback>> 1 track-add ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    vertical walker-gadget new-track
+    vertical walker-gadget new-track with-lines
         swap >>thread
         swap >>continuation
         swap >>status
         dup continuation>> <traceback-gadget> >>traceback
-
         add-toolbar
-        dup status>> self <thread-status> f track-add
-        dup traceback>> 1 track-add ;
+        add-thread-status
+        add-traceback ;
 
 : walker-help ( -- ) "ui-walker" com-browse ;
 
