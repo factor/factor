@@ -19,7 +19,7 @@ IN: vocabs.prettyprint
     [ vocab-name ] sort-with ;
 
 : pprint-using ( seq -- )
-    [ "syntax" lookup-vocab = ] reject
+    "syntax" lookup-vocab '[ _ = ] reject
     sort-vocabs [
         \ USING: pprint-word
         [ pprint-vocab ] each
