@@ -63,7 +63,7 @@ PRIVATE>
 
 : image ( -- path ) \ image get-global ;
 
-: vm ( -- path ) \ vm get-global ;
+: vm-path ( -- path ) \ vm-path get-global ;
 
 : embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 

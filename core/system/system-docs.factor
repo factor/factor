@@ -10,7 +10,7 @@ ARTICLE: "system" "System interface"
 }
 "Getting the path to the Factor VM and image:"
 { $subsections
-    vm
+    vm-path
     image
 }
 "Getting a monotonically increasing nanosecond count:"
@@ -76,6 +76,6 @@ HELP: image
 { $values { "path" "a pathname string" } }
 { $description "Outputs the pathname of the currently running Factor image." } ;
 
-HELP: vm
+HELP: vm-path
 { $values { "path" "a pathname string" } }
 { $description "Outputs the pathname of the currently running Factor VM." } ;

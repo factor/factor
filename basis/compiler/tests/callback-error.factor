@@ -7,7 +7,7 @@ IN: compiler.tests.callback-error
 
 : run-vm-with-script ( -- lines )
     <process>
-        [ vm , callback-error-script , ] { } make >>command
+        [ vm-path , callback-error-script , ] { } make >>command
         +closed+ >>stdin
         +stdout+ >>stderr
     ascii <process-reader> stream-lines ;

@@ -18,4 +18,4 @@ IN: tools.deploy.embed
     swap [ copy-file ] keep embed-image ;
 
 : make-embedded-image ( from-image to-executable -- )
-    vm swap make-embedded-image* ;
+    vm-path swap make-embedded-image* ;
