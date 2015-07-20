@@ -18,7 +18,7 @@ IN: ui.backend.cocoa.tools
     open-panel [ listener-run-files ] when* ;
 
 : menu-save-image ( -- )
-    image save-panel [ save-image ] when* ;
+    image-path save-panel [ save-image ] when* ;
 
 ! Handle Open events from the Finder
 CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate

@@ -11,7 +11,7 @@ ARTICLE: "system" "System interface"
 "Getting the path to the Factor VM and image:"
 { $subsections
     vm-path
-    image
+    image-path
 }
 "Getting a monotonically increasing nanosecond count:"
 { $subsections nano-count }
@@ -72,7 +72,7 @@ HELP: nano-count
 { $description "Outputs a monotonically increasing count of nanoseconds elapsed since an arbitrary starting time. The difference of two calls to this word allows timing. This word is unaffected by system clock changes." }
 { $notes "This is a low-level word. The " { $vocab-link "tools.time" } " vocabulary defines words to time code execution time." } ;
 
-HELP: image
+HELP: image-path
 { $values { "path" "a pathname string" } }
 { $description "Outputs the pathname of the currently running Factor image." } ;
 

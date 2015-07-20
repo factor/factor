@@ -6,7 +6,7 @@ system ;
 IN: contributors
 
 : changelog ( -- authors )
-    image parent-directory [
+    image-path parent-directory [
         "git log --no-merges --pretty=format:%an"
         ascii [ lines ] with-process-reader
     ] with-directory ;

@@ -129,7 +129,7 @@ HELP: home
 } ;
 
 ARTICLE: "io.pathnames.special" "Special pathnames"
-"If a pathname begins with " { $snippet "resource:" } ", it is resolved relative to the directory containing the current image (see " { $link image } ")."
+"If a pathname begins with " { $snippet "resource:" } ", it is resolved relative to the directory containing the current image (see " { $link image-path } ")."
 $nl
 "If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")."
 $nl

@@ -27,4 +27,4 @@ PRIVATE>
 : save-image-and-exit ( path -- )
     normalize-path saving-path t (save-image) ;
 
-: save ( -- ) image save-image ;
+: save ( -- ) image-path save-image ;
