@@ -61,7 +61,7 @@ CONSTANT: string>os-hash H{
 
 PRIVATE>
 
-: image ( -- path ) \ image get-global ;
+: image-path ( -- path ) \ image-path get-global ;
 
 : vm-path ( -- path ) \ vm-path get-global ;
 

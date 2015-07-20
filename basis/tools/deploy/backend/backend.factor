@@ -129,14 +129,14 @@ DEFER: ?make-staging-image
     config [
         bootstrap-profile :> profile
         vocab "vocab-manifest-" prepend temp-file :> manifest-file
-        image vocab manifest-file profile deploy-command-line :> flags
+        image-path vocab manifest-file profile deploy-command-line :> flags
         profile ?make-staging-image
         vm-path flags run-factor
         manifest-file parse-vocab-manifest-file
     ] with-variables ;
 
-:: make-deploy-image-executable ( vm-path image vocab config -- manifest )
-    vm-path image vocab config make-deploy-image
-    image vm-path embed-image ;
+:: make-deploy-image-executable ( vm image vocab config -- manifest )
+    vm image vocab config make-deploy-image
+    image vm embed-image ;
 
 HOOK: deploy* os ( vocab -- )

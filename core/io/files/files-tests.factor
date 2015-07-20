@@ -63,7 +63,7 @@ IN: io.files.tests
 ] unit-test
 
 { } [
-    image binary [
+    image-path binary [
         10 [ 65536 read drop ] times
     ] with-file-reader
 ] unit-test
@@ -135,7 +135,7 @@ CONSTANT: pt-array-1
 
 ! Test EOF behavior
 { 10 } [
-    image binary [
+    image-path binary [
         0 read drop
         10 read length
     ] with-file-reader

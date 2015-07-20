@@ -3,6 +3,6 @@
 USING: accessors io.streams.c math.parser system ;
 IN: tools.deploy.test.18
 
-: main ( -- ) image show ;
+: main ( -- ) image-path show ;
 
 MAIN: main

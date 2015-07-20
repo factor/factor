@@ -79,11 +79,11 @@ PRIVATE>
 : init-resource-path ( -- )
     OBJ-ARGS special-object
     [ utf8 alien>string "-resource-path=" ?head [ drop f ] unless ] map-find drop
-    [ image parent-directory ] unless* "resource-path" set-global ;
+    [ image-path parent-directory ] unless* "resource-path" set-global ;
 
 [
     cwd current-directory set-global
-    OBJ-IMAGE special-object alien>native-string cwd prepend-path \ image set-global
+    OBJ-IMAGE special-object alien>native-string cwd prepend-path \ image-path set-global
     OBJ-EXECUTABLE special-object alien>native-string cwd prepend-path \ vm-path set-global
     init-resource-path
 ] "io.files" add-startup-hook
