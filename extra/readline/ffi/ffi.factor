@@ -322,7 +322,7 @@ FUNCTION: int rl_vi_goto_mark ( int arg1, int arg2 )
 
 FUNCTION: int rl_vi_check ( )
 FUNCTION: int rl_vi_domove ( int arg1, int* arg2 )
-FUNCTION: int rl_vi_bracktype ( int )
+FUNCTION: int rl_vi_bracktype ( int i )
 
 FUNCTION: void rl_vi_start_inserting ( int arg1, int arg2, int
                                       arg3 )
@@ -348,7 +348,7 @@ FUNCTION: int rl_add_defun ( c-string arg1, rl_command_func_t*
 FUNCTION: int rl_bind_key ( int arg1, rl_command_func_t* arg2 )
 FUNCTION: int rl_bind_key_in_map ( int arg1, rl_command_func_t*
                                   arg2, Keymap arg3 )
-FUNCTION: int rl_unbind_key ( int )
+FUNCTION: int rl_unbind_key ( int i )
 FUNCTION: int rl_unbind_key_in_map ( int arg1, Keymap arg2 )
 FUNCTION: int rl_bind_key_if_unbound ( int arg1,
                                       rl_command_func_t* arg2 )
@@ -382,8 +382,8 @@ FUNCTION: int rl_macro_bind ( c-string arg1, c-string arg2,
                              Keymap arg3 )
 FUNCTION: int rl_translate_keyseq ( c-string arg1, c-string
                                    arg2, int* arg3 )
-FUNCTION: c-string rl_untranslate_keyseq ( int s )
-FUNCTION: rl_command_func_t* rl_named_function ( c-string )
+FUNCTION: c-string rl_untranslate_keyseq ( int i )
+FUNCTION: rl_command_func_t* rl_named_function ( c-string s )
 FUNCTION: rl_command_func_t* rl_function_of_keyseq ( c-string arg1,
                                                     Keymap arg2,
                                                     int* arg3 )

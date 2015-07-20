@@ -34,10 +34,10 @@ FUNCTION: void* fftw_malloc ( size_t n )
 
 FUNCTION: fftw_plan fftw_plan_dft_1d ( int n, void* in, void* out, int sign, int flags )
 
-FUNCTION: void fftw_destroy_plan ( fftw_plan )
+FUNCTION: void fftw_destroy_plan ( fftw_plan p )
 
-FUNCTION: void fftw_execute ( fftw_plan )
+FUNCTION: void fftw_execute ( fftw_plan p )
 
-FUNCTION: void fftw_free ( void* )
+FUNCTION: void fftw_free ( void* p )
 
 DESTRUCTOR: fftw_free
