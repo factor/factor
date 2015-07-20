@@ -437,11 +437,11 @@ M: ratio >base
 <PRIVATE
 
 : fix-float ( str -- newstr )
-    CHAR: e over member? [
-        "e" split1 [ fix-float ] dip "e" glue
+    CHAR: e over index [
+        cut [ fix-float ] dip append
     ] [
         CHAR: . over member? [ ".0" append ] unless
-    ] if ;
+    ] if* ;
 
 : mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
     [ dup log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + neg ] bi ]
