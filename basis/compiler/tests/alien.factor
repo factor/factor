@@ -59,7 +59,7 @@ FUNCTION: float ffi_test_4 ( )
 FUNCTION: double ffi_test_5 ( )
 [ 1.5 ] [ ffi_test_5 ] unit-test
 
-FUNCTION: int ffi_test_9 )( int a, int b, int c, int d, int e, int f, int g )
+FUNCTION: int ffi_test_9 ( int a, int b, int c, int d, int e, int f, int g )
 [ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
 [ "a" 2 3 4 5 6 7 ffi_test_9 ] must-fail
 [ 1 2 3 4 5 6 "a" ffi_test_9 ] must-fail
