@@ -62,7 +62,7 @@ GENERIC: read-payload ( rel-base struct -- tuple )
     ] [ object seek-past-padding ] bi ;
 
 : read-array-payload ( array -- payload )
-    [ capacity>> -4 shift ] keep cell read-padded-payload ;
+    [ capacity>> -4 shift ] keep cell_t read-padded-payload ;
 
 : read-uchar-payload ( n-bytes object -- payload )
     uchar read-padded-payload ;
@@ -94,7 +94,7 @@ M: tuple read-payload ( rel-base tuple -- payload )
             layout-address seek-absolute seek-input
             tuple-layout read-struct size>> -4 shift
         ] save-io-excursion
-    ] keep cell read-padded-payload ;
+    ] keep cell_t read-padded-payload ;
 
 : peek-read-object ( -- object )
     [ object read-struct ] save-io-excursion ;
