@@ -22,7 +22,6 @@ expression  = {"+" | "-"}? term { {"+" | "-"} term }*
 term        = factor { {"*" | "/"} factor }*
 factor      = ident | number | "(" expression ")"
 ident       = (([a-zA-Z])+)   => [[ >string ]]
-digit       = ([0-9])         => [[ digit> ]]
-number      = (digit)+        => [[ 10 digits>integer ]]
+number      = ([0-9])+        => [[ string>number ]]
 program     = { block "." }
 ;EBNF
