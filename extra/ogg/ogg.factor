@@ -77,7 +77,7 @@ STRUCT: ogg-sync-state
 
 FUNCTION: void oggpack_writeinit ( oggpack-buffer* b )
 FUNCTION: void  oggpack_writetrunc ( oggpack-buffer* b, long bits )
-FUNCTION: void  oggpack_writealign ( oggpack-buffer* b) ;
+FUNCTION: void  oggpack_writealign ( oggpack-buffer* b )
 FUNCTION: void  oggpack_writecopy ( oggpack-buffer* b, void* source, long bits )
 FUNCTION: void  oggpack_reset ( oggpack-buffer* b )
 FUNCTION: void  oggpack_writeclear ( oggpack-buffer* b )
