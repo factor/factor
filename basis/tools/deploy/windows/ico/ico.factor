@@ -1,5 +1,7 @@
-USING: accessors alien classes.struct combinators kernel locals
-math sequences specialized-arrays windows.types ;
+USING: accessors alien alien.data alien.c-types classes.struct
+combinators io.backend kernel locals
+math sequences specialized-arrays splitting
+windows.kernel32 windows.types ;
 IN: tools.deploy.windows.ico
 
 <PRIVATE
