@@ -8,7 +8,7 @@ IN: variants
 PREDICATE: variant-class < mixin-class "variant?" word-prop ;
 
 M: variant-class initial-value*
-    members [ f f ] [
+    class-members [ f f ] [
         first dup word? [ t ] [ initial-value* ] if
     ] if-empty ;
 

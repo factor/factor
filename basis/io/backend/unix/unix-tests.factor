@@ -123,15 +123,15 @@ datagram-client delete-file
 ! Invalid parameter tests
 
 [
-    image binary [ input-stream get accept ] with-file-reader
+    image-path binary [ input-stream get accept ] with-file-reader
 ] must-fail
 
 [
-    image binary [ input-stream get receive ] with-file-reader
+    image-path binary [ input-stream get receive ] with-file-reader
 ] must-fail
 
 [
-    image binary [
+    image-path binary [
         B{ 1 2 } datagram-server <local>
         input-stream get send
     ] with-file-reader
@@ -141,7 +141,7 @@ datagram-client delete-file
 { } [
     [
         vm-path ,
-        "-i=" image append ,
+        "-i=" image-path append ,
         "-run=none" ,
         "-e=USING: destructors namespaces io calendar threads ; input-stream get dispose 1 seconds sleep" ,
     ] { } make try-process

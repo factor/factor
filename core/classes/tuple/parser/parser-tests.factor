@@ -10,7 +10,7 @@ TUPLE: test-1 ;
 TUPLE: test-2 < test-1 ;
 
 { t } [ test-2 "slots" word-prop empty? ] unit-test
-{ test-1 } [ test-2 superclass ] unit-test
+{ test-1 } [ test-2 superclass-of ] unit-test
 
 TUPLE: test-3 a ;
 
