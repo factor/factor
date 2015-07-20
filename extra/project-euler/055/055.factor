@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.ranges project-euler.common sequences ;
+USING: kernel math math.ranges project-euler.common sequences ;
 IN: project-euler.055
 
 ! http://projecteuler.net/index.php?section=problems&id=55
@@ -45,7 +45,7 @@ IN: project-euler.055
 <PRIVATE
 
 : add-reverse ( n -- m )
-    dup number>digits reverse 10 digits>integer + ;
+    dup number>digits reverse digits>number + ;
 
 : (lychrel?) ( n iteration -- ? )
     dup 50 < [

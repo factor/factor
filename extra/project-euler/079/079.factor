@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io.encodings.ascii io.files kernel make math math.parser
-    sequences sets project-euler.common ;
+USING: assocs io.encodings.ascii io.files kernel make math
+    math.parser sequences sets project-euler.common ;
 IN: project-euler.079
 
 ! http://projecteuler.net/index.php?section=problems&id=79
@@ -55,7 +55,7 @@ PRIVATE>
     combine over diff append ;
 
 : euler079 ( -- answer )
-    source-079 >edges topological-sort 10 digits>integer ;
+    source-079 >edges topological-sort digits>number ;
 
 ! [ euler079 ] 100 ave-time
 ! 1 ms ave run time - 0.46 SD (100 trials)

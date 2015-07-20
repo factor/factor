@@ -82,6 +82,9 @@ PRIVATE>
 : number>digits ( n -- seq )
     [ dup 0 = not ] [ 10 /mod ] produce reverse! nip ;
 
+: digits>number ( seq -- n )
+    0 [ [ 10 * ] [ + ] bi* ] reduce ;
+
 : number-length ( n -- m )
     abs [
         1

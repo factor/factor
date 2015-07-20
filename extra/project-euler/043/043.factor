@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit kernel math math.functions math.combinatorics
-    math.parser math.ranges project-euler.common sequences sets sorting ;
+    math.ranges project-euler.common sequences sets sorting ;
 IN: project-euler.043
 
 ! http://projecteuler.net/index.php?section=problems&id=43
@@ -36,7 +36,7 @@ IN: project-euler.043
 <PRIVATE
 
 : subseq-divisible? ( n index seq -- ? )
-    [ 1 - dup 3 + ] dip subseq 10 digits>integer swap divisor? ;
+    [ 1 - dup 3 + ] dip subseq digits>number swap divisor? ;
 
 : interesting? ( seq -- ? )
     {
@@ -54,7 +54,7 @@ PRIVATE>
 : euler043 ( -- answer )
     1234567890 number>digits 0 [
         dup interesting? [
-            10 digits>integer +
+            digits>number +
         ] [ drop ] if
     ] reduce-permutations ;
 
@@ -93,7 +93,7 @@ PRIVATE>
 PRIVATE>
 
 : euler043a ( -- answer )
-    interesting-pandigitals [ 10 digits>integer ] map-sum ;
+    interesting-pandigitals [ digits>number ] map-sum ;
 
 ! [ euler043a ] 100 ave-time
 ! 10 ms ave run time - 1.37 SD (100 trials)
