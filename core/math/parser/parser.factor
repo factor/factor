@@ -16,6 +16,12 @@ PRIVATE>
                              [ CHAR: a 10 - - dup 10 < [ drop 255 ] when ]
     } cond ; inline
 
+: string>digits ( str -- digits )
+    [ digit> ] B{ } map-as ; inline
+
+: >digit ( n -- ch )
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ; inline
+
 ERROR: invalid-radix radix ;
 
 <PRIVATE
@@ -306,25 +312,6 @@ PRIVATE>
 : oct> ( str -- n/f )  8 base> ; inline
 : dec> ( str -- n/f ) 10 base> ; inline
 : hex> ( str -- n/f ) 16 base> ; inline
-
-: string>digits ( str -- digits )
-    [ digit> ] B{ } map-as ; inline
-
-<PRIVATE
-
-: (digits>integer) ( valid? accum digit radix -- valid? accum )
-    2dup < [ swapd * + ] [ 4drop f 0 ] if ; inline
-
-: each-digit ( seq radix quot -- n/f )
-    [ t 0 ] 3dip curry each swap [ drop f ] unless ; inline
-
-PRIVATE>
-
-: digits>integer ( seq radix -- n/f )
-    [ (digits>integer) ] each-digit ; inline
-
-: >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ; inline
 
 <PRIVATE
 
