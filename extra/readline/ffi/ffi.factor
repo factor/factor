@@ -106,19 +106,19 @@ C-GLOBAL: KEYMAP_ENTRY_ARRAY emacs_ctlx_keymap
 C-GLOBAL: KEYMAP_ENTRY_ARRAY vi_insertion_keymap
 C-GLOBAL: KEYMAP_ENTRY_ARRAY vi_movement_keymap
 
-FUNCTION: Keymap rl_copy_keymap ( Keymap )
+FUNCTION: Keymap rl_copy_keymap ( Keymap k )
 FUNCTION: Keymap rl_make_keymap ( )
-FUNCTION: void rl_discard_keymap ( Keymap )
+FUNCTION: void rl_discard_keymap ( Keymap k )
 
-CALLBACK: c-string tilde_hook_func_t ( c-string )
+CALLBACK: c-string tilde_hook_func_t ( c-string s )
 
 C-GLOBAL: tilde_hook_func_t* tilde_expansion_preexpansion_hook
 C-GLOBAL: tilde_hook_func_t* tilde_expansion_failure_hook
 C-GLOBAL: char**             tilde_additional_prefixes
 C-GLOBAL: char**             tilde_additional_suffixes
 
-FUNCTION: c-string tilde_expand ( c-string )
-FUNCTION: c-string tilde_expand_word ( c-string )
+FUNCTION: c-string tilde_expand ( c-string s )
+FUNCTION: c-string tilde_expand_word ( c-string s )
 FUNCTION: c-string tilde_find_word ( c-string arg1, int arg2,
                                     int* arg3 )
 
@@ -136,19 +136,19 @@ C-GLOBAL: int history_write_timestamps
 C-GLOBAL: int max_input_history
 C-GLOBAL: rl_linebuf_func_t* history_inhibit_expansion_function
 
-CALLBACK: int rl_intfunc_t ( int )
-CALLBACK: int rl_icpfunc_t ( c-string )
-CALLBACK: int rl_icppfunc_t ( char** )
+CALLBACK: int rl_intfunc_t ( int i )
+CALLBACK: int rl_icpfunc_t ( c-string s )
+CALLBACK: int rl_icppfunc_t ( char** s )
 
 CALLBACK: void rl_voidfunc_t ( )
-CALLBACK: void rl_vintfunc_t ( int )
-CALLBACK: void rl_vcpfunc_t ( c-string )
-CALLBACK: void rl_vcppfunc_t ( char** )
+CALLBACK: void rl_vintfunc_t ( int i )
+CALLBACK: void rl_vcpfunc_t ( c-string s )
+CALLBACK: void rl_vcppfunc_t ( char** s )
 
 CALLBACK: c-string rl_cpvfunc_t ( )
-CALLBACK: c-string rl_cpifunc_t ( int )
-CALLBACK: c-string rl_cpcpfunc_t ( c-string )
-CALLBACK: c-string rl_cpcppfunc_t ( char** )
+CALLBACK: c-string rl_cpifunc_t ( int i )
+CALLBACK: c-string rl_cpcpfunc_t ( c-string s )
+CALLBACK: c-string rl_cpcppfunc_t ( char** s )
 
 ENUM: undo_code UNDO_DELETE UNDO_INSERT UNDO_BEGIN UNDO_END ;
 
@@ -334,10 +334,10 @@ FUNCTION: int rl_vi_fword ( int arg1, int arg2 )
 FUNCTION: int rl_vi_bword ( int arg1, int arg2 )
 FUNCTION: int rl_vi_eword ( int arg1, int arg2 )
 
-FUNCTION: char* readline ( c-string )
+FUNCTION: char* readline ( c-string s )
 
-FUNCTION: int rl_set_prompt ( c-string )
-FUNCTION: int rl_expand_prompt ( c-string )
+FUNCTION: int rl_set_prompt ( c-string s )
+FUNCTION: int rl_expand_prompt ( c-string s )
 
 FUNCTION: int rl_initialize ( )
 
@@ -373,7 +373,7 @@ FUNCTION: int rl_bind_keyseq_if_unbound_in_map ( c-string arg1,
 FUNCTION: int rl_generic_bind ( int arg1, c-string arg2,
                                c-string arg3, Keymap arg4 )
 
-FUNCTION: c-string rl_variable_value ( c-string )
+FUNCTION: c-string rl_variable_value ( c-string s )
 FUNCTION: int rl_variable_bind ( c-string arg1, c-string arg2 )
 
 FUNCTION: int rl_set_key ( c-string arg1, rl_command_func_t*
@@ -382,30 +382,29 @@ FUNCTION: int rl_macro_bind ( c-string arg1, c-string arg2,
                              Keymap arg3 )
 FUNCTION: int rl_translate_keyseq ( c-string arg1, c-string
                                    arg2, int* arg3 )
-FUNCTION: c-string rl_untranslate_keyseq ( int )
+FUNCTION: c-string rl_untranslate_keyseq ( int s )
 FUNCTION: rl_command_func_t* rl_named_function ( c-string )
-FUNCTION: rl_command_func_t* rl_function_of_keyseq ( c-string
-                                                    arg1, Keymap
-                                                    arg2, int*
-                                                    arg3 )
+FUNCTION: rl_command_func_t* rl_function_of_keyseq ( c-string arg1,
+                                                    Keymap arg2,
+                                                    int* arg3 )
 
 FUNCTION: void rl_list_funmap_names ( )
 FUNCTION: char** rl_invoking_keyseqs_in_map ( rl_command_func_t*
                                              arg1, Keymap arg2 )
-FUNCTION: char** rl_invoking_keyseqs ( rl_command_func_t* )
+FUNCTION: char** rl_invoking_keyseqs ( rl_command_func_t* f )
 
-FUNCTION: void rl_function_dumper ( int )
-FUNCTION: void rl_macro_dumper ( int )
-FUNCTION: void rl_variable_dumper ( int )
+FUNCTION: void rl_function_dumper ( int i )
+FUNCTION: void rl_macro_dumper ( int i )
+FUNCTION: void rl_variable_dumper ( int i )
 
-FUNCTION: int rl_read_init_file ( c-string )
-FUNCTION: int rl_parse_and_bind ( c-string )
+FUNCTION: int rl_read_init_file ( c-string s )
+FUNCTION: int rl_parse_and_bind ( c-string s )
 
 FUNCTION: Keymap rl_make_bare_keymap ( )
 
-FUNCTION: Keymap rl_get_keymap_by_name ( c-string )
-FUNCTION: c-string rl_get_keymap_name ( Keymap )
-FUNCTION: void rl_set_keymap ( Keymap )
+FUNCTION: Keymap rl_get_keymap_by_name ( c-string s )
+FUNCTION: c-string rl_get_keymap_name ( Keymap k )
+FUNCTION: void rl_set_keymap ( Keymap k )
 FUNCTION: Keymap rl_get_keymap ( )
 FUNCTION: void rl_set_keymap_from_edit_mode ( )
 FUNCTION: c-string rl_get_keymap_name_from_edit_mode ( )
@@ -415,7 +414,7 @@ FUNCTION: int rl_add_funmap_entry ( c-string arg1,
 FUNCTION: char** rl_funmap_names ( )
 FUNCTION: void rl_initialize_funmap ( )
 
-FUNCTION: void rl_push_macro_input ( c-string )
+FUNCTION: void rl_push_macro_input ( c-string s )
 
 FUNCTION: void rl_add_undo ( undo_code arg1, int arg2, int
                             arga3, c-string arg4 )
@@ -433,8 +432,8 @@ FUNCTION: int rl_clear_message ( )
 FUNCTION: int rl_reset_line_state ( )
 FUNCTION: int rl_crlf ( )
 
-! FUNCTION: int rl_message ( c-string arg1, ... ) ;
-FUNCTION: int rl_show_char ( int )
+! FUNCTION: int rl_message ( c-string arg1, ... )
+FUNCTION: int rl_show_char ( int i )
 
 FUNCTION: int rl_character_len ( int arg1, int arg2 )
 
@@ -447,30 +446,30 @@ FUNCTION: int rl_delete_text ( int arg1, int arg2 )
 FUNCTION: int rl_kill_text ( int arg1, int arg2 )
 FUNCTION: c-string rl_copy_text ( int arg1, int arg2 )
 
-FUNCTION: void rl_prep_terminal ( int )
+FUNCTION: void rl_prep_terminal ( int i )
 FUNCTION: void rl_deprep_terminal ( )
-FUNCTION: void rl_tty_set_default_bindings ( Keymap )
-FUNCTION: void rl_tty_unset_default_bindings ( Keymap )
+FUNCTION: void rl_tty_set_default_bindings ( Keymap k )
+FUNCTION: void rl_tty_unset_default_bindings ( Keymap k )
 
-FUNCTION: int rl_reset_terminal ( c-string )
+FUNCTION: int rl_reset_terminal ( c-string s )
 FUNCTION: void rl_resize_terminal ( )
 FUNCTION: void rl_set_screen_size ( int arg1, int arg2 )
 FUNCTION: void rl_get_screen_size ( int* arg1, int* arg2 )
 FUNCTION: void rl_reset_screen_size ( )
 
-FUNCTION: c-string rl_get_termcap ( c-string )
+FUNCTION: c-string rl_get_termcap ( c-string s )
 
-FUNCTION: int rl_stuff_char ( int )
-FUNCTION: int rl_execute_next ( int )
+FUNCTION: int rl_stuff_char ( int i )
+FUNCTION: int rl_execute_next ( int i )
 FUNCTION: int rl_clear_pending_input ( )
 FUNCTION: int rl_read_key ( )
-FUNCTION: int rl_getc ( FILE* )
-FUNCTION: int rl_set_keyboard_input_timeout ( int )
+FUNCTION: int rl_getc ( FILE* f )
+FUNCTION: int rl_set_keyboard_input_timeout ( int i )
 
-FUNCTION: void rl_extend_line_buffer ( int )
+FUNCTION: void rl_extend_line_buffer ( int i )
 FUNCTION: int rl_ding ( )
-FUNCTION: int rl_alphabetic ( int )
-FUNCTION: void rl_free ( void* )
+FUNCTION: int rl_alphabetic ( int i )
+FUNCTION: void rl_free ( void* p )
 
 FUNCTION: int rl_set_signals ( )
 FUNCTION: int rl_clear_signals ( )
@@ -478,15 +477,15 @@ FUNCTION: void rl_cleanup_after_signal ( )
 FUNCTION: void rl_reset_after_signal ( )
 FUNCTION: void rl_free_line_state ( )
 
-FUNCTION: void rl_echo_signal_char ( int )
+FUNCTION: void rl_echo_signal_char ( int i )
 
-FUNCTION: int rl_set_paren_blink_timeout ( int )
+FUNCTION: int rl_set_paren_blink_timeout ( int i )
 
 FUNCTION: int rl_maybe_save_line ( )
 FUNCTION: int rl_maybe_unsave_line ( )
 FUNCTION: int rl_maybe_replace_line ( )
 
-FUNCTION: int rl_complete_internal ( int )
+FUNCTION: int rl_complete_internal ( int i )
 FUNCTION: void rl_display_match_list ( char** arg1, int arg2,
                                       int arg3 )
 
@@ -500,7 +499,7 @@ FUNCTION: c-string rl_filename_completion_function ( c-string
                                                     arg1, int
                                                     arg2 )
 
-FUNCTION: int rl_completion_mode ( rl_command_func_t* )
+FUNCTION: int rl_completion_mode ( rl_command_func_t* p )
 
 C-GLOBAL: c-string rl_library_version
 C-GLOBAL: int rl_readline_version
@@ -647,5 +646,5 @@ STRUCT: readline_state
     { catchsigwinch int                }
     { reserved      char[64]           } ;
 
-FUNCTION: int rl_save_state ( readline_state* )
-FUNCTION: int rl_restore_state ( readline_state* )
+FUNCTION: int rl_save_state ( readline_state* p )
+FUNCTION: int rl_restore_state ( readline_state* p )
