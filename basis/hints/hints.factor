@@ -122,6 +122,8 @@ set-specializer
 
 \ member-eq? { { array } { string } } set-specializer
 
+\ index { { array } { string } } set-specializer
+
 \ assoc-stack { vector } set-specializer
 
 { >le >be } [
