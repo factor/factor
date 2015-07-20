@@ -1,6 +1,5 @@
-USING: accessors alien alien.c-types arrays classes.struct combinators
-io.backend kernel locals math sequences specialized-arrays
-tools.deploy.windows windows.kernel32 windows.types alien.data ;
+USING: accessors alien classes.struct combinators kernel locals
+math sequences specialized-arrays windows.types ;
 IN: tools.deploy.windows.ico
 
 <PRIVATE
