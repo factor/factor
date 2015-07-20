@@ -1238,7 +1238,7 @@ FUNCTION: BOOL EnableMenuItem ( HMENU hMenu, UINT uIDEnableItem, UINT uEnable )
 ! FUNCTION: EndDialog
 ! FUNCTION: EndMenu
 
-FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint)
+FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint )
 
 ! FUNCTION: EndTask
 ! FUNCTION: EnterReaderModeHelper
@@ -1561,14 +1561,13 @@ FUNCTION: int MessageBoxW (
                 HWND hWnd,
                 LPCWSTR lpText,
                 LPCWSTR lpCaption,
-                UINT uType) ;
+                UINT uType )
 
 FUNCTION: int MessageBoxExA ( HWND hWnd,
                 LPCSTR lpText,
                 LPCSTR lpCaption,
                 UINT uType,
-                WORD wLanguageId
-                )
+                WORD wLanguageId )
 
 FUNCTION: int MessageBoxExW (
                 HWND hWnd,
