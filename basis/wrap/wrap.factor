@@ -16,19 +16,21 @@ C: <element> element
 TUPLE: paragraph line-max line-ideal lines head-width tail-cost ;
 C: <paragraph> paragraph
 
+: if-one-line ( paragraph true false -- )
+    [ dup lines>> 1list? ] 2dip if ; inline
+
 TYPED: top-fits? ( paragraph: paragraph -- ? )
     [ head-width>> ]
-    [ dup lines>> 1list? [ line-ideal>> ] [ line-max>> ] if ] bi <= ; inline
+    [ [ line-ideal>> ] [ line-max>> ] if-one-line ] bi <= ; inline
 
 TYPED: fits? ( paragraph: paragraph -- ? )
     ! Make this not count spaces at end
     { [ lines>> car 1list? ] [ top-fits? ] } 1|| ; inline
 
 TYPED: paragraph-cost ( paragraph: paragraph -- cost )
-    dup lines>> 1list? [ drop 0 ] [
-        [ [ head-width>> ] [ line-ideal>> ] bi - sq ]
-        [ tail-cost>> ] bi +
-    ] if ; inline
+    [ drop 0 ] [
+        [ head-width>> ] [ line-ideal>> - sq ] [ tail-cost>> ] tri +
+    ] if-one-line ; inline
 
 : min-cost ( paragraphs -- paragraph )
     [ paragraph-cost ] infimum-by ; inline
@@ -42,15 +44,14 @@ TYPED: new-line ( paragraph: paragraph element: element -- paragraph )
     } 2cleave <paragraph> ; inline
 
 TYPED: add-element ( paragraph: paragraph element: element -- )
-    [ element-length [ + ] curry change-head-width ]
-    [ [ [ unswons ] dip swons swons ] curry change-lines ]
-    bi drop ; inline
+    [ '[ _ element-length + ] change-head-width ]
+    [ '[ unswons _ swons swons ] change-lines ] bi drop ; inline
 
 TYPED: wrap-step ( paragraphs: array element: element -- paragraphs )
     [ [ min-cost ] dip new-line ]
     [ dupd '[ _ add-element ] each ]
     2bi swap prefix { array } declare
-    [ fits? ] filter ;
+    [ fits? ] filter ; inline
 
 : 1paragraph ( line-max line-ideal element -- paragraph )
     [ 1list 1list ] [ black>> ] bi 0 <paragraph> ;
@@ -58,14 +59,14 @@ TYPED: wrap-step ( paragraphs: array element: element -- paragraphs )
 : post-process ( paragraph -- array )
     lines>> [ [ contents>> ] lmap>array ] lmap>array ;
 
-: initialize ( line-max line-ideal elements -- elements paragraph )
+: initial-step ( line-max line-ideal elements -- elements paragraph )
     reverse unclip [ -rot ] dip 1paragraph 1array ;
 
 PRIVATE>
 
 : wrap ( elements line-max line-ideal -- array )
     rot [ 2drop { } ] [
-        initialize
+        initial-step
         [ wrap-step ] reduce
         min-cost
         post-process
