@@ -14,7 +14,7 @@ GENERIC: predicate-quot ( class -- quot )
 M: predicate-class predicate-quot
     [
         \ dup ,
-        [ superclass predicate-def % ]
+        [ superclass-of predicate-def % ]
         [ "predicate-definition" word-prop , ] bi
         [ drop f ] , \ if ,
     ] [ ] make ;
@@ -37,12 +37,12 @@ M: predicate-class reset-class
 M: predicate-class rank-class drop 2 ;
 
 M: predicate-class instance?
-    2dup superclass instance? [
+    2dup superclass-of instance? [
         "predicate-definition" word-prop call( object -- ? )
     ] [ 2drop f ] if ;
 
 M: predicate-class (flatten-class)
-    superclass (flatten-class) ;
+    superclass-of (flatten-class) ;
 
 M: predicate-class (classes-intersect?)
-    superclass classes-intersect? ;
+    superclass-of classes-intersect? ;

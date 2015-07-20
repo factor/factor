@@ -217,7 +217,7 @@ M: uniform-tuple (bind-uniforms)
 
 : all-uniform-tuple-slots ( class -- slots )
     dup "uniform-tuple-slots" word-prop
-    [ [ superclass all-uniform-tuple-slots ] dip append ] [ drop { } ] if* ;
+    [ [ superclass-of all-uniform-tuple-slots ] dip append ] [ drop { } ] if* ;
 
 DEFER: uniform-texture-accessors
 
@@ -486,8 +486,8 @@ DEFER: [bind-uniform-tuple]
     { uniforms-cleave 2cleave } >quotation ;
 
 :: [bind-uniforms] ( superclass uniforms -- quot )
-    superclass "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
-    superclass \ (bind-uniforms) lookup-method :> next-method
+    superclass-of "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
+    superclass-of \ (bind-uniforms) lookup-method :> next-method
     first-texture-unit uniforms "" [bind-uniform-tuple] nip :> bind-quot
 
     { 2dup next-method } bind-quot [ ] append-as ;

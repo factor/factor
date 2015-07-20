@@ -31,7 +31,7 @@ ERROR: no-such-responder responder ;
 
 : base-path ( string -- seq )
     dup responder-nesting get
-    [ second class-of superclasses [ name>> = ] with any? ] with find nip
+    [ second class-of superclasses-of [ name>> = ] with any? ] with find nip
     [ first ] [ no-such-responder ] ?if ;
 
 : resolve-base-path ( string -- string' )

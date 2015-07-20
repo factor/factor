@@ -82,7 +82,7 @@ C: <vocab-author> vocab-author
         "Tuple classes" $subheading
         [
             [ <$pretty-link> ]
-            [ superclass <$pretty-link> ]
+            [ superclass-of <$pretty-link> ]
             [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
             tri 3array
         ] map
@@ -95,7 +95,7 @@ C: <vocab-author> vocab-author
         "Predicate classes" $subheading
         [
             [ <$pretty-link> ]
-            [ superclass <$pretty-link> ]
+            [ superclass-of <$pretty-link> ]
             bi 2array
         ] map
         { { $strong "Class" } { $strong "Superclass" } } prefix

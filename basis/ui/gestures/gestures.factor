@@ -9,7 +9,7 @@ FROM: namespaces => set ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )
-    class-of superclasses [ "gestures" word-prop ] map assoc-stack ;
+    class-of superclasses-of [ "gestures" word-prop ] map assoc-stack ;
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
 

@@ -18,7 +18,7 @@ PREDICATE: tuple-class < class
 ERROR: not-a-tuple object ;
 
 : all-slots ( class -- slots )
-    superclasses [ "slots" word-prop ] map concat ;
+    superclasses-of [ "slots" word-prop ] map concat ;
 
 ERROR: no-slot name tuple ;
 
@@ -153,7 +153,7 @@ M: object final-class? drop f ;
     } case define-predicate ;
 
 : class-size ( class -- n )
-    superclasses [ "slots" word-prop length ] map-sum ;
+    superclasses-of [ "slots" word-prop length ] map-sum ;
 
 : boa-check-quot ( class -- quot )
     all-slots [ class>> instance-check-quot ] map shallow-spread>quot
@@ -173,16 +173,16 @@ M: object final-class? drop f ;
     [ make-slots ] [ class-size 2 + ] bi* finalize-slots ;
 
 : define-tuple-slots ( class -- )
-    dup "slots" word-prop over superclass prepare-slots
+    dup "slots" word-prop over superclass-of prepare-slots
     define-accessors ;
 
 : make-tuple-layout ( class -- layout )
     [
         {
             [ , ]
-            [ [ superclass class-size ] [ "slots" word-prop length ] bi + , ]
-            [ superclasses length 1 - , ]
-            [ superclasses [ [ , ] [ hashcode , ] bi ] each ]
+            [ [ superclass-of class-size ] [ "slots" word-prop length ] bi + , ]
+            [ superclasses-of length 1 - , ]
+            [ superclasses-of [ [ , ] [ hashcode , ] bi ] each ]
         } cleave
     ] { } make ;
 
@@ -269,7 +269,7 @@ M: tuple-class update-class
     [ define-new-tuple-class ] 3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
-    [ [ superclass ] [ bootstrap-word ] bi* = ]
+    [ [ superclass-of ] [ bootstrap-word ] bi* = ]
     [ [ "slots" word-prop ] dip = ]
     bi-curry* bi and ;
 
