@@ -383,7 +383,7 @@ PRIVATE>
 <PRIVATE
 
 : ((each)) ( seq -- n quot )
-    [ length check-length ] keep [ nth-unsafe ] curry ; inline
+    [ length ] keep [ nth-unsafe ] curry ; inline
 
 : (each) ( seq quot -- n quot' )
     [ ((each)) ] dip compose ; inline
@@ -404,7 +404,7 @@ PRIVATE>
     [ nth-unsafe ] bi-curry@ bi ; inline
 
 : ((2each)) ( seq1 seq2 -- n quot )
-    [ min-length check-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
+    [ min-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
     [ ((2each)) ] dip compose ; inline
@@ -414,7 +414,7 @@ PRIVATE>
 
 : (3each) ( seq1 seq2 seq3 quot -- n quot' )
     [
-        [ [ length ] tri@ min min check-length ]
+        [ [ length ] tri@ min min ]
         [ [ 3nth-unsafe ] 3curry ] 3bi
     ] dip compose ; inline
 

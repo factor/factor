@@ -1,14 +1,13 @@
-USING: accessors compiler.cfg compiler.cfg.loop-detection
-compiler.cfg.loop-detection.private compiler.cfg.debugger
-compiler.cfg.predecessors compiler.cfg.utilities tools.test dlists kernel
-namespaces sequences ;
+USING: accessors compiler.cfg.debugger
+compiler.cfg.loop-detection compiler.cfg.loop-detection.private
+compiler.cfg.utilities kernel namespaces sequences sets
+tools.test ;
 IN: compiler.cfg.loop-detection.tests
-QUALIFIED: sets
 
 { V{ 0 } { 1 } } [
     V{ } 0 insns>block V{ } 1 insns>block [ connect-bbs ] keep
     f f <natural-loop> [ process-loop-block ] keep
-    blocks>> sets:members
+    blocks>> members
     [ [ number>> ] map ] bi@
 ] unit-test
 
