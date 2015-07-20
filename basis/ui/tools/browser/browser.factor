@@ -1,15 +1,15 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes combinators
+USING: accessors arrays classes colors.constants combinators
 combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.stylesheet help.topics
 kernel models sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
+ui.gadgets.glass ui.gadgets.labels ui.gadgets.lines ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures
 ui.tools.browser.history ui.tools.browser.popups ui.tools.common
-vocabs ;
+ui.pens.solid vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
