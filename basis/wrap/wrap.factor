@@ -24,12 +24,6 @@ TYPED: fits? ( paragraph: paragraph -- ? )
     ! Make this not count spaces at end
     { [ lines>> car 1list? ] [ top-fits? ] } 1|| ; inline
 
-:: min-by ( seq quot -- elt )
-    f 1/0. seq [| key value newkey |
-        newkey quot call :> newvalue
-        newvalue value < [ newkey newvalue ] [ key value ] if
-    ] each drop ; inline
-
 TYPED: paragraph-cost ( paragraph: paragraph -- cost )
     dup lines>> 1list? [ drop 0 ] [
         [ [ head-width>> ] [ line-ideal>> ] bi - sq ]
@@ -37,7 +31,7 @@ TYPED: paragraph-cost ( paragraph: paragraph -- cost )
     ] if ; inline
 
 : min-cost ( paragraphs -- paragraph )
-    [ paragraph-cost ] min-by ; inline
+    [ paragraph-cost ] infimum-by ; inline
 
 TYPED: new-line ( paragraph: paragraph element: element -- paragraph )
     {
