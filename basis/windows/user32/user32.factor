@@ -1211,7 +1211,7 @@ ALIAS: DispatchMessage DispatchMessageW
 
 
 FUNCTION: BOOL DrawAnimatedRects ( HWND hWnd, int idAni, RECT* lprcFrom, RECT* lprcTo )
-! FUNCTION: BOOL DrawCaption ( HWND hWnd, HDC hdc, LPRECT lprc, UINT uFlags ) ;
+! FUNCTION: BOOL DrawCaption ( HWND hWnd, HDC hdc, LPRECT lprc, UINT uFlags )
 
 ! FUNCTION: DrawEdge
 ! FUNCTION: DrawFocusRect
@@ -1238,7 +1238,7 @@ FUNCTION: BOOL EnableMenuItem ( HMENU hMenu, UINT uIDEnableItem, UINT uEnable )
 ! FUNCTION: EndDialog
 ! FUNCTION: EndMenu
 
-FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint) ;
+FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint)
 
 ! FUNCTION: EndTask
 ! FUNCTION: EnterReaderModeHelper
@@ -1249,7 +1249,7 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format )
 ! FUNCTION: EnumDesktopWindows
 ! FUNCTION: EnumDisplayDevicesA
 ! FUNCTION: EnumDisplayDevicesW
-! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData ) ;
+! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData )
 ! FUNCTION: EnumDisplaySettingsA
 ! FUNCTION: EnumDisplaySettingsExA
 ! FUNCTION: EnumDisplaySettingsExW
@@ -1411,7 +1411,7 @@ FUNCTION: HMENU GetSystemMenu ( HWND hWnd, BOOL bRevert )
 
 
 FUNCTION: HWND GetTopWindow ( HWND hWnd )
-! FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase ) ;
+! FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase )
 FUNCTION: int GetUpdateRgn ( HWND hWnd, HRGN hRgn, BOOL bErase )
 
 
@@ -1506,11 +1506,11 @@ FUNCTION: HACCEL LoadAcceleratorsW ( HINSTANCE hInstance, LPCTSTR lpTableName )
 ! FUNCTION: LoadCursorFromFileW
 
 
-! FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName ) ;
+! FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName )
 FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, ushort lpCursorName )
 ALIAS: LoadCursor LoadCursorW
 
-! FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
+! FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName )
 FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCTSTR lpIconName )
 ALIAS: LoadIcon LoadIconW
 
@@ -1577,8 +1577,8 @@ FUNCTION: int MessageBoxExW (
                 UINT uType,
                 WORD wLanguageId )
 
-! FUNCTION: int MessageBoxIndirectA ( MSGBOXPARAMSA* params ) ;
-! FUNCTION: int MessageBoxIndirectW ( MSGBOXPARAMSW* params ) ;
+! FUNCTION: int MessageBoxIndirectA ( MSGBOXPARAMSA* params )
+! FUNCTION: int MessageBoxIndirectW ( MSGBOXPARAMSW* params )
 
 
 ALIAS: MessageBox MessageBoxW
@@ -1695,7 +1695,7 @@ FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC )
 ! FUNCTION: SendDlgItemMessageW
 ! FUNCTION: SendIMEMessageExA
 ! FUNCTION: SendIMEMessageExW
-! FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize ) ;
+! FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize )
 FUNCTION: LRESULT SendMessageW ( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 ALIAS: SendMessage SendMessageW
 ! FUNCTION: SendMessageCallbackA
