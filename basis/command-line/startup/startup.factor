@@ -6,11 +6,11 @@ IN: command-line.startup
 
 : cli-usage ( -- )
 """
-Usage: """ write vm file-name write """ [Factor arguments] [script] [script arguments]
+Usage: """ write vm-path file-name write """ [Factor arguments] [script] [script arguments]
 
 Common arguments:
     -help            print this message and exit
-    -i=<image>       load Factor image file <image> (default """ write vm file-stem write """.image)
+    -i=<image>       load Factor image file <image> (default """ write vm-path file-stem write """.image)
     -run=<vocab>     run the MAIN: entry point of <vocab>
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI

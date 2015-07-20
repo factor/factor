@@ -12,7 +12,7 @@ IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
     running.app?
-    [ vm parent-directory parent-directory parent-directory ]
+    [ vm-path parent-directory parent-directory parent-directory ]
     [ "resource:Factor.app" ]
     if ;
 

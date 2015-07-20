@@ -84,6 +84,6 @@ PRIVATE>
 [
     cwd current-directory set-global
     OBJ-IMAGE special-object alien>native-string cwd prepend-path \ image set-global
-    OBJ-EXECUTABLE special-object alien>native-string cwd prepend-path \ vm set-global
+    OBJ-EXECUTABLE special-object alien>native-string cwd prepend-path \ vm-path set-global
     init-resource-path
 ] "io.files" add-startup-hook

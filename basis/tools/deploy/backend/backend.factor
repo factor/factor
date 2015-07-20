@@ -12,8 +12,8 @@ tools.deploy.libraries vocabs.metadata.resources
 tools.deploy.embed locals ;
 IN: tools.deploy.backend
 
-: copy-vm ( executable bundle-name -- vm )
-    prepend-path vm over copy-file ;
+: copy-vm ( executable bundle-name -- vm-path )
+    prepend-path vm-path over copy-file ;
 
 TUPLE: vocab-manifest vocabs libraries ;
 
@@ -87,14 +87,14 @@ ERROR: can't-deploy-library-file library ;
         ] bi
     ] { } make ;
 
-: run-factor ( vm flags -- )
+: run-factor ( vm-path flags -- )
     swap prefix dup . run-with-output ; inline
 
 DEFER: ?make-staging-image
 
 : make-staging-image ( profile -- )
     dup [ but-last ?make-staging-image ] unless-empty
-    vm swap staging-command-line run-factor ;
+    vm-path swap staging-command-line run-factor ;
 
 : ?make-staging-image ( profile -- )
     dup staging-image-name exists?
@@ -124,19 +124,19 @@ DEFER: ?make-staging-image
         [ "invalid vocab manifest!" throw ] if
     ] if-empty ;
 
-:: make-deploy-image ( vm image vocab config -- manifest )
+:: make-deploy-image ( vm-path image vocab config -- manifest )
     make-boot-image
     config [
         bootstrap-profile :> profile
         vocab "vocab-manifest-" prepend temp-file :> manifest-file
         image vocab manifest-file profile deploy-command-line :> flags
         profile ?make-staging-image
-        vm flags run-factor
+        vm-path flags run-factor
         manifest-file parse-vocab-manifest-file
     ] with-variables ;
 
-:: make-deploy-image-executable ( vm image vocab config -- manifest )
-    vm image vocab config make-deploy-image
-    image vm embed-image ;
+:: make-deploy-image-executable ( vm-path image vocab config -- manifest )
+    vm-path image vocab config make-deploy-image
+    image vm-path embed-image ;
 
 HOOK: deploy* os ( vocab -- )

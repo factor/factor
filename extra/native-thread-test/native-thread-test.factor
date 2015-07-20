@@ -8,7 +8,7 @@ IN: native-thread-test
 FUNCTION: void* start_standalone_factor_in_new_thread ( int argc, c-string* argv )
 
 : start-vm-in-os-thread ( args -- threadhandle )
-    vm prefix
+    vm-path prefix
     [ length ] [ native-string-encoding strings>alien ] bi
     start_standalone_factor_in_new_thread ;
 

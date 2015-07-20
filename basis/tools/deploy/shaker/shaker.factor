@@ -398,7 +398,7 @@ IN: tools.deploy.shaker
             input-stream
             output-stream
             error-stream
-            vm
+            vm-path
             image
             current-directory
         } %

@@ -9,19 +9,19 @@ IN: tools.deploy.windows
 
 CONSTANT: app-icon-resource-id "APPICON"
 
-:: copy-vm ( executable bundle-name extension -- vm )
-    vm "." split1-last drop extension append
+:: copy-vm ( executable bundle-name extension -- vm-path )
+    vm-path "." split1-last drop extension append
     bundle-name executable ".exe" append append-path
     [ copy-file ] keep ;
 
-: create-exe-dir ( vocab bundle-name -- vm )
+: create-exe-dir ( vocab bundle-name -- vm-path )
     deploy-console? get ".com" ".exe" ? copy-vm ;
 
 : open-in-explorer ( dir -- )
     [ f "open" ] dip absolute-path normalize-separators
     f f SW_SHOWNORMAL ShellExecute drop ;
 
-: embed-ico ( vm vocab -- )
+: embed-ico ( vm-path vocab -- )
     dup vocab-windows-icon-path vocab-append-path dup exists?
     [ binary file-contents app-icon-resource-id embed-icon-resource ]
     [ 2drop ] if ;

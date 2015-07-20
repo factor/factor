@@ -140,7 +140,7 @@ datagram-client delete-file
 ! closing stdin caused some problems
 { } [
     [
-        vm ,
+        vm-path ,
         "-i=" image append ,
         "-run=none" ,
         "-e=USING: destructors namespaces io calendar threads ; input-stream get dispose 1 seconds sleep" ,

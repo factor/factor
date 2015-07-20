@@ -13,7 +13,7 @@ ERROR: no-vocab-main vocab ;
     dup find-vocab-root [ check-vocab-main deploy* ] [ no-vocab ] if ;
 
 : deploy-image-only ( vocab image -- )
-    [ vm ] 2dip
+    [ vm-path ] 2dip
     swap dup deploy-config make-deploy-image drop ;
 
 {

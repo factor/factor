@@ -74,14 +74,14 @@ IN: io.launcher.windows.tests
     try-output-process
 ] must-fail
 
-: console-vm ( -- path )
-    vm ".exe" ?tail [ ".com" append ] when ;
+: console-vm-path ( -- path )
+    vm-path ".exe" ?tail [ ".com" append ] when ;
 
 SYMBOLS: out-path err-path ;
 
 [ ] [
     <process>
-        console-vm "-run=hello-world" 2array >>command
+        console-vm-path "-run=hello-world" 2array >>command
         "out.txt" unique-file [ out-path set-global ] keep >>stdout
     try-process
 ] unit-test
@@ -92,7 +92,7 @@ SYMBOLS: out-path err-path ;
 
 [ "IN: scratchpad " ] [
     <process>
-        console-vm "-run=listener" 2array >>command
+        console-vm-path "-run=listener" 2array >>command
         +closed+ >>stdin
         +stdout+ >>stderr
     utf8 [ lines last ] with-process-reader
@@ -104,7 +104,7 @@ SYMBOLS: out-path err-path ;
 [ ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "stderr.factor" 3array >>command
+            console-vm-path "-script" "stderr.factor" 3array >>command
             "out.txt" unique-file [ out-path set-global ] keep >>stdout
             "err.txt" unique-file [ err-path set-global ] keep >>stderr
         try-process
@@ -122,7 +122,7 @@ SYMBOLS: out-path err-path ;
 [ ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "stderr.factor" 3array >>command
+            console-vm-path "-script" "stderr.factor" 3array >>command
             "out.txt" unique-file [ out-path set-global ] keep >>stdout
             +stdout+ >>stderr
         try-process
@@ -136,7 +136,7 @@ SYMBOLS: out-path err-path ;
 [ "output" ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "stderr.factor" 3array >>command
+            console-vm-path "-script" "stderr.factor" 3array >>command
             "err2.txt" unique-file [ err-path set-global ] keep >>stderr
         utf8 <process-reader> stream-lines first
     ] with-directory
@@ -151,7 +151,7 @@ SYMBOLS: out-path err-path ;
 [ t ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
         utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
@@ -161,7 +161,7 @@ SYMBOLS: out-path err-path ;
 [ t ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
         utf8 [ contents ] with-process-reader
@@ -173,7 +173,7 @@ SYMBOLS: out-path err-path ;
 [ "B" ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
         utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
@@ -184,7 +184,7 @@ SYMBOLS: out-path err-path ;
 [ f ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
         utf8 [ contents ] with-process-reader
@@ -209,7 +209,7 @@ SYMBOLS: out-path err-path ;
     2 [
         launcher-test-path [
             <process>
-                console-vm "-script" "append.factor" 3array >>command
+                console-vm-path "-script" "append.factor" 3array >>command
                 out-path get-global <appender> >>stdout
             try-process
         ] with-directory
@@ -219,18 +219,18 @@ SYMBOLS: out-path err-path ;
 ] unit-test
 
 [ "IN: scratchpad " ] [
-    console-vm "-run=listener" 2array
+    console-vm-path "-run=listener" 2array
     ascii [ "USE: system 0 exit" print flush lines last ] with-process-stream
 ] unit-test
 
 [ ] [
-    console-vm "-run=listener" 2array
+    console-vm-path "-run=listener" 2array
     ascii [ "USE: system 0 exit" print ] with-process-writer
 ] unit-test
 
 [ ] [
     <process>
-    console-vm "-run=listener" 2array >>command
+    console-vm-path "-run=listener" 2array >>command
     "vocab:io/launcher/windows/test/input.txt" >>stdin
     try-process
 ] unit-test
