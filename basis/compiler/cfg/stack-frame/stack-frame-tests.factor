@@ -15,5 +15,8 @@ IN: compiler.cfg.stack-frame.tests
        { spill-area-size 16 }
     } finalize-stack-frame
     [ spill-area-base>> ]
-    [ stack-frame set 37 spill-offset ] bi
+    [
+        f f <basic-block> <cfg> swap >>stack-frame cfg set
+        37 spill-offset
+    ] bi
 ] unit-test
