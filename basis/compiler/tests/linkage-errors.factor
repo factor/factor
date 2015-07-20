@@ -5,7 +5,7 @@ FROM: alien.libraries => add-library load-library ;
 IN: compiler.tests.linkage-errors
 
 ! Regression: calling an undefined function would raise a protection fault
-FUNCTION: void this_does_not_exist ( ) ;
+FUNCTION: void this_does_not_exist ( )
 
 [ this_does_not_exist ] try
 
@@ -26,7 +26,7 @@ FUNCTION: void this_does_not_exist ( ) ;
 
 LIBRARY: no_such_library
 
-FUNCTION: void no_such_function ( ) ;
+FUNCTION: void no_such_function ( )
 
 [ no_such_function ] try
 

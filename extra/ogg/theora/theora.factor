@@ -112,7 +112,7 @@ STRUCT: th-huff-code
 LIBRARY: theoradec
 FUNCTION: c-string th_version_string ( )
 FUNCTION: uint th_version_number ( )
-FUNCTION: longlong th_granule_frame ( void* encdec, longlong granpos) ;
+FUNCTION: longlong th_granule_frame ( void* encdec, longlong granpos )
 FUNCTION: int th_packet_isheader ( ogg-packet* op )
 FUNCTION: int th_packet_iskeyframe ( ogg-packet* op )
 FUNCTION: void th_info_init ( th-info* info )
