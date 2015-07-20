@@ -1,18 +1,19 @@
-USING: accessors arrays assocs combinators compiler.cfg.dataflow-analysis
-compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.stacks.local
-compiler.cfg.registers fry kernel math math.order namespaces sequences ;
-QUALIFIED: sets
+USING: accessors arrays assocs compiler.cfg.dataflow-analysis
+compiler.cfg.instructions compiler.cfg.linearization
+compiler.cfg.stacks.local fry kernel math math.order namespaces
+sequences sets ;
+FROM: namespaces => set ;
 IN: compiler.cfg.stacks.map
 
 ! Operations on the stack info
 : register-write ( n stack -- stack' )
-    first2 rot suffix sets:members 2array ;
+    first2 rot suffix members 2array ;
 
 : adjust-stack ( n stack -- stack' )
     first2 pick '[ _ + ] map [ + ] dip 2array ;
 
 : stack>vacant ( stack -- seq )
-    first2 [ 0 max iota ] dip sets:diff ;
+    first2 [ 0 max iota ] dip diff ;
 
 : classify-read ( stack n -- val )
     swap 2dup second member? [ 2drop 0 ] [ first >= [ 1 ] [ 2 ] if ] if ;

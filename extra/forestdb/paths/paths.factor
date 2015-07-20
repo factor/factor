@@ -3,7 +3,6 @@
 USING: arrays combinators.short-circuit combinators.smart
 io.directories io.pathnames kernel math math.parser sequences
 sorting sorting.human splitting ;
-QUALIFIED: sets
 IN: forestdb.paths
 
 CONSTANT: fdb-filename-base "fq"
@@ -71,7 +70,7 @@ ERROR: not-a-string-number string ;
     [ [ fdb-filename? ] filter length ] bi = ;
 
 : path-fdb-duplicates ( path -- seq )
-    directory-files [ canonical-fdb-name ] map sets:members ;
+    directory-files [ canonical-fdb-name ] map members ;
 
 : ensure-fdb-directory ( filename -- filename )
     [ make-directories ] keep ;
