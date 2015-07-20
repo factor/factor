@@ -124,14 +124,14 @@ DEFER: ?make-staging-image
         [ "invalid vocab manifest!" throw ] if
     ] if-empty ;
 
-:: make-deploy-image ( vm-path image vocab config -- manifest )
+:: make-deploy-image ( vm image vocab config -- manifest )
     make-boot-image
     config [
         bootstrap-profile :> profile
         vocab "vocab-manifest-" prepend temp-file :> manifest-file
-        image-path vocab manifest-file profile deploy-command-line :> flags
+        image vocab manifest-file profile deploy-command-line :> flags
         profile ?make-staging-image
-        vm-path flags run-factor
+        vm flags run-factor
         manifest-file parse-vocab-manifest-file
     ] with-variables ;
 
