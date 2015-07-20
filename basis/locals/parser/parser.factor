@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators effects.parser
-generic.parser kernel lexer locals.errors fry
-locals.rewrite.closures locals.types make namespaces parser
-quotations sequences splitting words vocabs.parser ;
+USING: accessors arrays assocs assocs.private combinators
+effects.parser fry generic.parser kernel lexer locals.errors
+locals.rewrite.closures locals.types make math namespaces
+namespaces.private parser quotations sequences splitting
+vocabs.parser words ;
 IN: locals.parser
 
 SYMBOL: in-lambda?
@@ -31,13 +32,24 @@ ERROR: invalid-local-name name ;
 
 SINGLETON: lambda-parser
 
+: prev-manifest ( -- manifest )
+    manifest namestack* [ length 2 - ] keep (assoc-stack) ;
+
+: update-manifest ( manifest -- )
+    [ prev-manifest ] dip {
+        [ search-vocab-names>> >>search-vocab-names ]
+        [ search-vocabs>> >>search-vocabs ]
+        [ auto-used>> >>auto-used ]
+    } cleave drop ;
+
 : with-lambda-scope ( assoc reader-quot: ( -- quot ) -- quot )
     '[
         in-lambda? on
         lambda-parser quotation-parser set
         manifest [ clone ] change
         use-words @
-    ] with-scope ; inline
+        manifest get
+    ] with-scope update-manifest ; inline
 
 : (parse-lambda) ( assoc -- quot )
     [ \ ] parse-until >quotation ] with-lambda-scope ;
