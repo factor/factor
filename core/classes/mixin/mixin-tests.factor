@@ -117,7 +117,7 @@ MIXIN: move-instance-declaration-mixin
 
 { } [ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
 
-{ { string } } [ move-instance-declaration-mixin members ] unit-test
+{ { string } } [ move-instance-declaration-mixin class-members ] unit-test
 
 MIXIN: silly-mixin
 SYMBOL: not-a-class
@@ -147,4 +147,4 @@ M: metaclass-change-mixin metaclass-change-generic ;
 ! Forgetting a mixin member class should remove it from the mixin
 { } [ [ metaclass-change forget-class ] with-compilation-unit ] unit-test
 
-{ t } [ metaclass-change-mixin members empty? ] unit-test
+{ t } [ metaclass-change-mixin class-members empty? ] unit-test

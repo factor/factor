@@ -25,4 +25,4 @@ IN: checksums.openssl.tests
 ] [ { [ unknown-digest? ] [ name>> "no such checksum" = ] } 1&& ]
 must-fail-with
 
-{ } [ image openssl-sha1 checksum-file drop ] unit-test
+{ } [ image-path openssl-sha1 checksum-file drop ] unit-test

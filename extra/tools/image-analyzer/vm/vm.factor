@@ -3,90 +3,90 @@ IN: tools.image-analyzer.vm
 
 ! These structs and words correspond to vm/image.hpp
 STRUCT: image-header
-    { magic cell }
-    { version cell }
-    { data-relocation-base cell }
-    { data-size cell }
-    { code-relocation-base cell }
-    { code-size cell }
-    { true-object cell }
-    { bignum-zero cell }
-    { bignum-pos-one cell }
-    { bignum-neg-one cell }
-    { special-objects cell[special-object-count] } ;
+    { magic cell_t }
+    { version cell_t }
+    { data-relocation-base cell_t }
+    { data-size cell_t }
+    { code-relocation-base cell_t }
+    { code-size cell_t }
+    { true-object cell_t }
+    { bignum-zero cell_t }
+    { bignum-pos-one cell_t }
+    { bignum-neg-one cell_t }
+    { special-objects cell_t[special-object-count] } ;
 
 ! These structs and words correspond to vm/layouts.hpp
 STRUCT: object
-    { header cell } ;
+    { header cell_t } ;
 
 STRUCT: alien
-    { header cell }
-    { base cell }
-    { expired cell }
-    { displacement cell }
-    { address cell } ;
+    { header cell_t }
+    { base cell_t }
+    { expired cell_t }
+    { displacement cell_t }
+    { address cell_t } ;
 
 STRUCT: array
-    { header cell }
-    { capacity cell } ;
+    { header cell_t }
+    { capacity cell_t } ;
 
 STRUCT: bignum
-    { header cell }
-    { capacity cell } ;
+    { header cell_t }
+    { capacity cell_t } ;
 
 
 STRUCT: callstack
-    { header cell }
-    { length cell } ;
+    { header cell_t }
+    { length cell_t } ;
 
 STRUCT: dll
-    { header cell }
-    { path cell }
+    { header cell_t }
+    { path cell_t }
     { handle void* } ;
 
 STRUCT: quotation
-    { header cell }
-    { array cell }
-    { cached_effect cell }
-    { cache_counter cell }
-    { entry_point cell } ;
+    { header cell_t }
+    { array cell_t }
+    { cached_effect cell_t }
+    { cache_counter cell_t }
+    { entry_point cell_t } ;
 
 STRUCT: string
-    { header cell }
-    { length cell }
-    { aux cell }
-    { hashcode cell } ;
+    { header cell_t }
+    { length cell_t }
+    { aux cell_t }
+    { hashcode cell_t } ;
 
 STRUCT: tuple
-    { header cell }
-    { layout cell } ;
+    { header cell_t }
+    { layout cell_t } ;
 
 STRUCT: tuple-layout
-    { header cell }
-    { capacity cell }
-    { klass cell }
-    { size cell }
-    { echelon cell } ;
+    { header cell_t }
+    { capacity cell_t }
+    { klass cell_t }
+    { size cell_t }
+    { echelon cell_t } ;
 
 STRUCT: word
-    { header cell }
-    { hashcode cell }
-    { name cell }
-    { vocabulary cell }
-    { def cell }
-    { props cell }
-    { pic_def cell }
-    { pic_tail_def cell }
-    { subprimitive cell }
-    { entry_point cell } ;
+    { header cell_t }
+    { hashcode cell_t }
+    { name cell_t }
+    { vocabulary cell_t }
+    { def cell_t }
+    { props cell_t }
+    { pic_def cell_t }
+    { pic_tail_def cell_t }
+    { subprimitive cell_t }
+    { entry_point cell_t } ;
 
 STRUCT: wrapper
-    { header cell }
-    { object cell } ;
+    { header cell_t }
+    { object cell_t } ;
 
 ! These structs and words correspond to vm/code_blocks.hpp
 STRUCT: code-block
-    { header cell }
-    { owner cell }
-    { parameters cell }
-    { relocation cell } ;
+    { header cell_t }
+    { owner cell_t }
+    { parameters cell_t }
+    { relocation cell_t } ;
