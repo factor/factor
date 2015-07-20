@@ -80,9 +80,9 @@ COM-INTERFACE: IStream ISequentialStream {0000000C-0000-0000-C000-000000000046}
     HRESULT Stat ( STATSTG* pstatstg, DWORD grfStatFlag )
     HRESULT Clone ( IStream** ppstm ) ;
 
-FUNCTION: HRESULT RegisterDragDrop ( HWND hWnd, IDropTarget* pDropTarget ) ;
-FUNCTION: HRESULT RevokeDragDrop ( HWND hWnd ) ;
-FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
+FUNCTION: HRESULT RegisterDragDrop ( HWND hWnd, IDropTarget* pDropTarget )
+FUNCTION: HRESULT RevokeDragDrop ( HWND hWnd )
+FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium )
 
 : com-query-interface ( interface iid -- interface' )
     { void* }

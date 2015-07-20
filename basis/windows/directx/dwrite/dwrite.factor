@@ -649,7 +649,7 @@ COM-INTERFACE: IDWriteFactory IUnknown {b859ee5a-d838-4b5b-a2e8-1adc7d93db48}
 FUNCTION: HRESULT DWriteCreateFactory (
     DWRITE_FACTORY_TYPE factoryType,
     REFIID              iid,
-    IUnknown**          factory ) ;
+    IUnknown**          factory )
 
 CONSTANT: DWRITE_E_FILEFORMAT             0x88985000
 CONSTANT: DWRITE_E_UNEXPECTED             0x88985001

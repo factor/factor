@@ -64,16 +64,16 @@ COM-INTERFACE: ID3D10StateBlock IUnknown {0803425A-57F5-4dd6-9465-A87570834A08}
     HRESULT GetDevice ( ID3D10Device** ppDevice ) ;
 TYPEDEF: ID3D10StateBlock* LPD3D10STATEBLOCK
 
-FUNCTION: HRESULT D3D10StateBlockMaskUnion ( D3D10_STATE_BLOCK_MASK* pA, D3D10_STATE_BLOCK_MASK* pB, D3D10_STATE_BLOCK_MASK* pResult ) ;
-FUNCTION: HRESULT D3D10StateBlockMaskIntersect ( D3D10_STATE_BLOCK_MASK* pA, D3D10_STATE_BLOCK_MASK* pB, D3D10_STATE_BLOCK_MASK* pResult ) ;
-FUNCTION: HRESULT D3D10StateBlockMaskDifference ( D3D10_STATE_BLOCK_MASK* pA, D3D10_STATE_BLOCK_MASK* pB, D3D10_STATE_BLOCK_MASK* pResult ) ;
-FUNCTION: HRESULT D3D10StateBlockMaskEnableCapture ( D3D10_STATE_BLOCK_MASK* pMask, D3D10_DEVICE_STATE_TYPES StateType, UINT RangeStart, UINT RangeLength ) ;
-FUNCTION: HRESULT D3D10StateBlockMaskDisableCapture ( D3D10_STATE_BLOCK_MASK* pMask, D3D10_DEVICE_STATE_TYPES StateType, UINT RangeStart, UINT RangeLength ) ;
-FUNCTION: HRESULT D3D10StateBlockMaskEnableAll ( D3D10_STATE_BLOCK_MASK* pMask ) ;
-FUNCTION: HRESULT D3D10StateBlockMaskDisableAll ( D3D10_STATE_BLOCK_MASK* pMask ) ;
-FUNCTION: BOOL    D3D10StateBlockMaskGetSetting ( D3D10_STATE_BLOCK_MASK* pMask, D3D10_DEVICE_STATE_TYPES StateType, UINT Entry ) ;
+FUNCTION: HRESULT D3D10StateBlockMaskUnion ( D3D10_STATE_BLOCK_MASK* pA, D3D10_STATE_BLOCK_MASK* pB, D3D10_STATE_BLOCK_MASK* pResult )
+FUNCTION: HRESULT D3D10StateBlockMaskIntersect ( D3D10_STATE_BLOCK_MASK* pA, D3D10_STATE_BLOCK_MASK* pB, D3D10_STATE_BLOCK_MASK* pResult )
+FUNCTION: HRESULT D3D10StateBlockMaskDifference ( D3D10_STATE_BLOCK_MASK* pA, D3D10_STATE_BLOCK_MASK* pB, D3D10_STATE_BLOCK_MASK* pResult )
+FUNCTION: HRESULT D3D10StateBlockMaskEnableCapture ( D3D10_STATE_BLOCK_MASK* pMask, D3D10_DEVICE_STATE_TYPES StateType, UINT RangeStart, UINT RangeLength )
+FUNCTION: HRESULT D3D10StateBlockMaskDisableCapture ( D3D10_STATE_BLOCK_MASK* pMask, D3D10_DEVICE_STATE_TYPES StateType, UINT RangeStart, UINT RangeLength )
+FUNCTION: HRESULT D3D10StateBlockMaskEnableAll ( D3D10_STATE_BLOCK_MASK* pMask )
+FUNCTION: HRESULT D3D10StateBlockMaskDisableAll ( D3D10_STATE_BLOCK_MASK* pMask )
+FUNCTION: BOOL    D3D10StateBlockMaskGetSetting ( D3D10_STATE_BLOCK_MASK* pMask, D3D10_DEVICE_STATE_TYPES StateType, UINT Entry )
 
-FUNCTION: HRESULT D3D10CreateStateBlock ( ID3D10Device* pDevice, D3D10_STATE_BLOCK_MASK* pStateBlockMask, ID3D10StateBlock** ppStateBlock ) ;
+FUNCTION: HRESULT D3D10CreateStateBlock ( ID3D10Device* pDevice, D3D10_STATE_BLOCK_MASK* pStateBlockMask, ID3D10StateBlock** ppStateBlock )
 
 CONSTANT: D3D10_EFFECT_COMPILE_CHILD_EFFECT             1
 CONSTANT: D3D10_EFFECT_COMPILE_ALLOW_SLOW_OPS           2
@@ -338,12 +338,12 @@ TYPEDEF: ID3D10EffectPool* LPD3D10EFFECTPOOL
 
 FUNCTION: HRESULT D3D10CompileEffectFromMemory ( void* pData, SIZE_T DataLength, LPCSTR pSrcFileName, D3D10_SHADER_MACRO* pDefines,
     ID3D10Include* pInclude, UINT HLSLFlags, UINT FXFlags,
-    ID3D10Blob** ppCompiledEffect, ID3D10Blob** ppErrors ) ;
+    ID3D10Blob** ppCompiledEffect, ID3D10Blob** ppErrors )
 
 FUNCTION: HRESULT D3D10CreateEffectFromMemory ( void* pData, SIZE_T DataLength, UINT FXFlags, ID3D10Device* pDevice,
-    ID3D10EffectPool* pEffectPool, ID3D10Effect** ppEffect ) ;
+    ID3D10EffectPool* pEffectPool, ID3D10Effect** ppEffect )
 
 FUNCTION: HRESULT D3D10CreateEffectPoolFromMemory ( void* pData, SIZE_T DataLength, UINT FXFlags, ID3D10Device* pDevice,
-    ID3D10EffectPool** ppEffectPool ) ;
+    ID3D10EffectPool** ppEffectPool )
 
-FUNCTION: HRESULT D3D10DisassembleEffect ( ID3D10Effect* pEffect, BOOL EnableColorCode, ID3D10Blob** ppDisassembly ) ;
+FUNCTION: HRESULT D3D10DisassembleEffect ( ID3D10Effect* pEffect, BOOL EnableColorCode, ID3D10Blob** ppDisassembly )

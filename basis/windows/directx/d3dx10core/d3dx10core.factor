@@ -13,7 +13,7 @@ FUNCTION: HRESULT D3DX10CreateDevice (
     D3D10_DRIVER_TYPE DriverType,
     HMODULE           Software,
     UINT              Flags,
-    ID3D10Device**    ppDevice ) ;
+    ID3D10Device**    ppDevice )
 
 FUNCTION: HRESULT D3DX10CreateDeviceAndSwapChain (
     IDXGIAdapter*         pAdapter,
@@ -22,13 +22,13 @@ FUNCTION: HRESULT D3DX10CreateDeviceAndSwapChain (
     UINT                  Flags,
     DXGI_SWAP_CHAIN_DESC* pSwapChainDesc,
     IDXGISwapChain**      ppSwapChain,
-    ID3D10Device**        ppDevice ) ;
+    ID3D10Device**        ppDevice )
 
 C-TYPE: ID3D10Device1
 
-FUNCTION: HRESULT D3DX10GetFeatureLevel1 ( ID3D10Device* pDevice, ID3D10Device1** ppDevice1 ) ;
+FUNCTION: HRESULT D3DX10GetFeatureLevel1 ( ID3D10Device* pDevice, ID3D10Device1** ppDevice1 )
 
-FUNCTION: HRESULT D3DX10CheckVersion ( UINT D3DSdkVersion, UINT D3DX10SdkVersion ) ;
+FUNCTION: HRESULT D3DX10CheckVersion ( UINT D3DSdkVersion, UINT D3DX10SdkVersion )
 
 CONSTANT: D3DX10_SPRITE_SORT_TEXTURE              0x01
 CONSTANT: D3DX10_SPRITE_SORT_DEPTH_BACK_TO_FRONT  0x02
@@ -64,7 +64,7 @@ FUNCTION: HRESULT
     D3DX10CreateSprite (
         ID3D10Device*         pDevice,
         UINT                  cDeviceBufferSize,
-        LPD3DX10SPRITE*       ppSprite ) ;
+        LPD3DX10SPRITE*       ppSprite )
 
 COM-INTERFACE: ID3DX10DataLoader f {00000000-0000-0000-0000-000000000000}
     HRESULT Load ( )
@@ -84,7 +84,7 @@ COM-INTERFACE: ID3DX10ThreadPump IUnknown {C93FECFA-6967-478a-ABBC-402D90621FCB}
     HRESULT PurgeAllItems ( )
     HRESULT GetQueueStatus ( UINT* pIoQueue, UINT* pProcessQueue, UINT* pDeviceQueue ) ;
 
-FUNCTION: HRESULT D3DX10CreateThreadPump ( UINT cIoThreads, UINT cProcThreads, ID3DX10ThreadPump** ppThreadPump ) ;
+FUNCTION: HRESULT D3DX10CreateThreadPump ( UINT cIoThreads, UINT cProcThreads, ID3DX10ThreadPump** ppThreadPump )
 
 STRUCT: D3DX10_FONT_DESCA
     { Height          INT               }
@@ -147,7 +147,7 @@ FUNCTION: HRESULT
         UINT                    Quality,
         UINT                    PitchAndFamily,
         LPCSTR                  pFaceName,
-        LPD3DX10FONT*           ppFont ) ;
+        LPD3DX10FONT*           ppFont )
 
 FUNCTION: HRESULT
     D3DX10CreateFontW (
@@ -162,7 +162,7 @@ FUNCTION: HRESULT
         UINT                    Quality,
         UINT                    PitchAndFamily,
         LPCWSTR                 pFaceName,
-        LPD3DX10FONT*           ppFont ) ;
+        LPD3DX10FONT*           ppFont )
 
 ALIAS: D3DX10CreateFont D3DX10CreateFontW
 
@@ -170,13 +170,13 @@ FUNCTION: HRESULT
     D3DX10CreateFontIndirectA (
         ID3D10Device*             pDevice,
         D3DX10_FONT_DESCA*        pDesc,
-        LPD3DX10FONT*             ppFont ) ;
+        LPD3DX10FONT*             ppFont )
 
 FUNCTION: HRESULT
     D3DX10CreateFontIndirectW (
         ID3D10Device*             pDevice,
         D3DX10_FONT_DESCW*        pDesc,
-        LPD3DX10FONT*             ppFont ) ;
+        LPD3DX10FONT*             ppFont )
 
 ALIAS: D3DX10CreateFontIndirect D3DX10CreateFontIndirectW
 

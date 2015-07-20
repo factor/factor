@@ -107,53 +107,53 @@ COM-INTERFACE: ID3DXMatrixStack IUnknown {C7885BA7-F990-4fe7-922D-8515E477DD85}
 
 FUNCTION: HRESULT D3DXCreateMatrixStack (
         DWORD               Flags,
-        LPD3DXMATRIXSTACK*  ppStack ) ;
+        LPD3DXMATRIXSTACK*  ppStack )
 
 CONSTANT: D3DXSH_MINORDER 2
 CONSTANT: D3DXSH_MAXORDER 6
 
 FUNCTION: FLOAT* D3DXSHEvalDirection
-    ( FLOAT* Out, UINT Order, D3DXVECTOR3 *pDir ) ;
+    ( FLOAT* Out, UINT Order, D3DXVECTOR3 *pDir )
 
 FUNCTION: FLOAT* D3DXSHRotate
-    ( FLOAT* Out, UINT Order, D3DXMATRIX *pMatrix, FLOAT* In ) ;
+    ( FLOAT* Out, UINT Order, D3DXMATRIX *pMatrix, FLOAT* In )
 
 FUNCTION: FLOAT* D3DXSHRotateZ
-    ( FLOAT* Out, UINT Order, FLOAT Angle, FLOAT* In ) ;
+    ( FLOAT* Out, UINT Order, FLOAT Angle, FLOAT* In )
 
 FUNCTION: FLOAT* D3DXSHAdd
-    ( FLOAT* Out, UINT Order, FLOAT* A, FLOAT* B ) ;
+    ( FLOAT* Out, UINT Order, FLOAT* A, FLOAT* B )
 
 FUNCTION: FLOAT* D3DXSHScale
-    ( FLOAT* Out, UINT Order, FLOAT* In, FLOAT Scale ) ;
+    ( FLOAT* Out, UINT Order, FLOAT* In, FLOAT Scale )
 
-FUNCTION: FLOAT WINAPI ( UINT Order, FLOAT* A, FLOAT* B ) ;
+FUNCTION: FLOAT WINAPI ( UINT Order, FLOAT* A, FLOAT* B )
 
-FUNCTION: FLOAT* D3DXSHMultiply2 ( FLOAT* Out, FLOAT* F, FLOAT* G ) ;
-FUNCTION: FLOAT* D3DXSHMultiply3 ( FLOAT* Out, FLOAT* F, FLOAT* G ) ;
-FUNCTION: FLOAT* D3DXSHMultiply4 ( FLOAT* Out, FLOAT* F, FLOAT* G ) ;
-FUNCTION: FLOAT* D3DXSHMultiply5 ( FLOAT* Out, FLOAT* F, FLOAT* G ) ;
-FUNCTION: FLOAT* D3DXSHMultiply6 ( FLOAT* Out, FLOAT* F, FLOAT* G ) ;
+FUNCTION: FLOAT* D3DXSHMultiply2 ( FLOAT* Out, FLOAT* F, FLOAT* G )
+FUNCTION: FLOAT* D3DXSHMultiply3 ( FLOAT* Out, FLOAT* F, FLOAT* G )
+FUNCTION: FLOAT* D3DXSHMultiply4 ( FLOAT* Out, FLOAT* F, FLOAT* G )
+FUNCTION: FLOAT* D3DXSHMultiply5 ( FLOAT* Out, FLOAT* F, FLOAT* G )
+FUNCTION: FLOAT* D3DXSHMultiply6 ( FLOAT* Out, FLOAT* F, FLOAT* G )
 
 FUNCTION: HRESULT D3DXSHEvalDirectionalLight
     ( UINT Order, D3DXVECTOR3* pDir,
       FLOAT RIntensity, FLOAT GIntensity, FLOAT BIntensity,
-      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut ) ;
+      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut )
 
 FUNCTION: HRESULT D3DXSHEvalSphericalLight
     ( UINT Order, D3DXVECTOR3* pPos, FLOAT Radius,
       FLOAT RIntensity, FLOAT GIntensity, FLOAT BIntensity,
-      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut ) ;
+      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut )
 
 FUNCTION: HRESULT D3DXSHEvalConeLight
     ( UINT Order, D3DXVECTOR3* pDir, FLOAT Radius,
       FLOAT RIntensity, FLOAT GIntensity, FLOAT BIntensity,
-      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut ) ;
+      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut )
 
 FUNCTION: HRESULT D3DXSHEvalHemisphereLight
     ( UINT Order, D3DXVECTOR3* pDir, D3DXCOLOR Top, D3DXCOLOR Bottom,
-      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut ) ;
+      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut )
 
 FUNCTION: HRESULT D3DXSHProjectCubeMap
     ( UINT uOrder, LPDIRECT3DCUBETEXTURE9 pCubeMap,
-      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut ) ;
+      FLOAT* ROut, FLOAT* GOut, FLOAT* BOut )

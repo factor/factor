@@ -114,7 +114,7 @@ FUNCTION: HRESULT D3D10CreateDevice1 (
     UINT                 Flags,
     D3D10_FEATURE_LEVEL1 HardwareLevel,
     UINT                 SDKVersion,
-    ID3D10Device1**      ppDevice ) ;
+    ID3D10Device1**      ppDevice )
 
 FUNCTION: HRESULT D3D10CreateDeviceAndSwapChain1 (
     IDXGIAdapter*         pAdapter,
@@ -125,4 +125,4 @@ FUNCTION: HRESULT D3D10CreateDeviceAndSwapChain1 (
     UINT                  SDKVersion,
     DXGI_SWAP_CHAIN_DESC* pSwapChainDesc,
     IDXGISwapChain**      ppSwapChain,
-    ID3D10Device1**       ppDevice ) ;
+    ID3D10Device1**       ppDevice )
