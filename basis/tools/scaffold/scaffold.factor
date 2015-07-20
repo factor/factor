@@ -7,7 +7,6 @@ io.files io.pathnames io.streams.string kernel math math.parser
 namespaces prettyprint quotations sequences sets sorting
 splitting strings system timers unicode.categories urls vocabs
 vocabs.loader vocabs.metadata words words.symbol ;
-FROM: sets => members ;
 IN: tools.scaffold
 
 SYMBOL: developer-name

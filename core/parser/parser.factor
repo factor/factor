@@ -5,7 +5,6 @@ compiler.units continuations definitions effects io
 io.encodings.utf8 io.files kernel lexer math.parser namespaces
 parser.notes quotations sequences sets slots source-files
 vectors vocabs vocabs.parser words words.symbol ;
-FROM: sets => members ;
 IN: parser
 
 : location ( -- loc )

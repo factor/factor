@@ -5,7 +5,6 @@ combinators.smart combinators.short-circuit locals
 unicode.categories sequences fry macros arrays assocs sets
 classes unicode.script unicode.data ;
 FROM: ascii => ascii? ;
-FROM: sets => members ;
 IN: regexp.classes
 
 SINGLETONS: dot letter-class LETTER-class Letter-class digit-class

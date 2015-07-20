@@ -3,10 +3,8 @@
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.rpo compiler.units fry generic kernel namespaces
-quotations sequences sequences.generalizations sets slots words
-;
+quotations sequences sequences.generalizations sets slots words ;
 FROM: namespaces => set ;
-FROM: sets => members ;
 IN: compiler.cfg.def-use
 
 ! Utilities for iterating over instruction operands

@@ -7,7 +7,6 @@ help.markup help.topics io io.streams.string kernel macros math
 namespaces sequences sequences.deep sets splitting strings
 summary tools.destructors unicode.categories vocabs
 vocabs.loader words words.constant words.symbol ;
-FROM: sets => members ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
