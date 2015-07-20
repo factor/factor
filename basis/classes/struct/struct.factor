@@ -35,7 +35,7 @@ TUPLE: struct-bit-slot-spec < struct-slot-spec
     bits signed? ;
 
 PREDICATE: struct-class < tuple-class
-    superclass \ struct eq? ;
+    superclass-of \ struct eq? ;
 
 SLOT: fields
 

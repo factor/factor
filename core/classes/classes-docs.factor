@@ -36,8 +36,8 @@ $nl
 { $subsections instance? }
 "You can ask a class for its superclass:"
 { $subsections
-    superclass
-    superclasses
+    superclass-of
+    superclasses-of
     subclass-of?
 }
 "Class predicates can be used to test instances directly:"
@@ -104,24 +104,24 @@ HELP: define-predicate
 { $description "Defines a predicate word for a class." }
 $low-level-note ;
 
-HELP: superclass
+HELP: superclass-of
 { $values { "class" class } { "super" class } }
 { $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
 { $examples
     { $example "USING: classes prettyprint ;"
-               "t superclass ."
+               "t superclass-of ."
                "word"
     }
 } ;
 
-HELP: superclasses
+HELP: superclasses-of
 { $values
      { "class" class }
      { "supers" sequence } }
 { $description "Outputs a sequence of superclasses of a class along with the class itself." }
 { $examples
     { $example "USING: classes prettyprint ;"
-               "t superclasses ."
+               "t superclasses-of ."
                "{ word t }"
     }
 } ;
@@ -140,13 +140,13 @@ HELP: subclass-of?
     }
 } ;
 
-{ superclass superclasses subclass-of? } related-words
+{ superclass-of superclasses-of subclass-of? } related-words
 
-HELP: members
+HELP: class-members
 { $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
 { $description "If " { $snippet "class" } " is a union class, outputs a sequence of its member classes, otherwise outputs " { $link f } "." } ;
 
-HELP: participants
+HELP: class-participants
 { $values { "class" class } { "seq" "a sequence of intersection participants, or " { $link f } } }
 { $description "If " { $snippet "class" } " is an intersection class, outputs a sequence of its participant classes, otherwise outputs " { $link f } "." } ;
 

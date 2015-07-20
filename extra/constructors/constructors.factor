@@ -7,7 +7,7 @@ words alien.parser ;
 IN: constructors
 
 : all-slots-assoc ( class -- slots )
-    superclasses [
+    superclasses-of [
         [ "slots" word-prop ] keep '[ _ ] { } map>assoc
     ] map concat ;
 

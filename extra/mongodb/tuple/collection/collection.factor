@@ -63,13 +63,13 @@ GENERIC: mdb-index-map ( tuple -- sequence )
 : (mdb-collection) ( class -- mdb-collection )
     dup MDB_COLLECTION word-prop
     [ nip ]
-    [ superclass [ (mdb-collection) ] [ f ] if* ] if* ; inline recursive
+    [ superclass-of [ (mdb-collection) ] [ f ] if* ] if* ; inline recursive
 
 : (mdb-slot-map) ( class -- slot-map )
-    superclasses [ MDB_SLOTDEF_MAP word-prop ] map assoc-combine  ; inline
+    superclasses-of [ MDB_SLOTDEF_MAP word-prop ] map assoc-combine  ; inline
 
 : (mdb-index-map) ( class -- index-map )
-    superclasses [ MDB_INDEX_MAP word-prop ] map assoc-combine ; inline
+    superclasses-of [ MDB_INDEX_MAP word-prop ] map assoc-combine ; inline
 
 : split-optl ( seq -- key options )
     [ first ] [ rest ] bi ; inline

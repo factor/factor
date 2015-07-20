@@ -159,7 +159,7 @@ M: predicate-class see-class*
     <colon \ PREDICATE: pprint-word
     dup pprint-word
     "<" text
-    dup superclass pprint-word
+    dup superclass-of pprint-word
     <block
     "predicate-definition" word-prop pprint-elements
     pprint-; block> block> ;
@@ -201,7 +201,7 @@ M: array pprint-slot-name
     \ final declaration. ;
 
 : superclass. ( class -- )
-    superclass dup tuple eq? [ drop ] [ "<" text pprint-word ] if ;
+    superclass-of dup tuple eq? [ drop ] [ "<" text pprint-word ] if ;
 
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word

@@ -373,13 +373,13 @@ TUPLE: a-subclass < will-become-struct ;
 
 { f } [ will-become-struct struct-class? ] unit-test
 
-{ will-become-struct } [ a-subclass superclass ] unit-test
+{ will-become-struct } [ a-subclass superclass-of ] unit-test
 
 { } [ "IN: classes.struct.tests USING: classes.struct alien.c-types ; STRUCT: will-become-struct { x int } ;" eval( -- ) ] unit-test
 
 { t } [ will-become-struct struct-class? ] unit-test
 
-{ tuple } [ a-subclass superclass ] unit-test
+{ tuple } [ a-subclass superclass-of ] unit-test
 
 STRUCT: bit-field-test
     { a uint bits: 12 }

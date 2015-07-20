@@ -118,7 +118,7 @@ TUPLE: tuple-dispatch-engine echelons ;
     at* [ [ methods>> ] bi@ assoc-union! drop ] [ 2drop ] if ;
 
 : copy-superclasses-methods ( class engine assoc -- )
-    [ superclasses ] 2dip
+    [ superclasses-of ] 2dip
     [ swapd copy-superclass-methods ] 2curry each ;
 
 : convert-tuple-inheritance ( assoc -- assoc' )
@@ -202,7 +202,7 @@ SYMBOL: predicate-engines
     predicate-engines get [ at ] curry map-find drop ;
 
 : next-predicate-engine ( engine -- word )
-    class>> superclasses
+    class>> superclasses-of
     find-predicate-engine
     default get or ;
 

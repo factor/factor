@@ -41,7 +41,7 @@ ERROR: not-persistent class ;
     dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
 
 : db-columns ( class -- object )
-    superclasses [ "db-columns" word-prop ] map concat ;
+    superclasses-of [ "db-columns" word-prop ] map concat ;
 
 : db-relations ( class -- object )
     "db-relations" word-prop ;

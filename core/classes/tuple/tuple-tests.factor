@@ -236,7 +236,7 @@ test-laptop-slot-values
     [ \ laptop see ] with-string-writer string-lines second
 ] unit-test
 
-{ { tuple computer laptop } } [ laptop superclasses ] unit-test
+{ { tuple computer laptop } } [ laptop superclasses-of ] unit-test
 
 TUPLE: server < computer rackmount ;
 C: <server> server
@@ -755,12 +755,12 @@ TUPLE: code-heap-ref ;
 TUPLE: metaclass-change ;
 TUPLE: metaclass-change-subclass < metaclass-change ;
 
-{ metaclass-change } [ metaclass-change-subclass superclass ] unit-test
+{ metaclass-change } [ metaclass-change-subclass superclass-of ] unit-test
 
 { } [ "IN: classes.tuple.tests MIXIN: metaclass-change" eval( -- ) ] unit-test
 
 { t } [ metaclass-change-subclass tuple-class? ] unit-test
-{ tuple } [ metaclass-change-subclass superclass ] unit-test
+{ tuple } [ metaclass-change-subclass superclass-of ] unit-test
 
 ! Reshaping bug related to the above
 TUPLE: a-g ;
@@ -800,12 +800,12 @@ TUPLE: tuple-predicate-redefine-test ;
 TUPLE: final-superclass ;
 TUPLE: final-subclass < final-superclass ;
 
-{ final-superclass } [ final-subclass superclass ] unit-test
+{ final-superclass } [ final-subclass superclass-of ] unit-test
 
 ! Making the superclass final should change the superclass of the subclass
 { } [ "IN: classes.tuple.tests TUPLE: final-superclass ; final" eval( -- ) ] unit-test
 
-{ tuple } [ final-subclass superclass ] unit-test
+{ tuple } [ final-subclass superclass-of ] unit-test
 
 { f } [ \ final-subclass final-class? ] unit-test
 

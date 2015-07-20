@@ -3,7 +3,6 @@
 USING: accessors assocs combinators definitions kernel
 make namespaces quotations sequences sets words words.symbol ;
 FROM: namespaces => set ;
-QUALIFIED: sets
 IN: classes
 
 ERROR: bad-inheritance class superclass ;
@@ -102,15 +101,15 @@ M: predicate reset-word
 : define-predicate ( class quot -- )
     [ predicate-word ] dip ( object -- ? ) define-declared ;
 
-: superclass ( class -- super )
-    #! Output f for non-classes to work with algebra code
+: superclass-of ( class -- super )
+    ! Output f for non-classes to work with algebra code
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
-: superclasses ( class -- supers )
-    [ superclass ] follow reverse! ;
+: superclasses-of ( class -- supers )
+    [ superclass-of ] follow reverse! ;
 
 : superclass-of? ( class superclass -- ? )
-    superclasses member-eq? ;
+    superclasses-of member-eq? ;
 
 : subclass-of? ( class superclass -- ? )
     swap superclass-of? ;
@@ -130,12 +129,12 @@ GENERIC: implementors ( class/classes -- seq )
     [
         [ class-members % ]
         [ class-participants % ]
-        [ superclass [ , ] when* ]
+        [ superclass-of [ , ] when* ]
         tri
     ] { } make ;
 
 : class-usage ( class -- seq )
-    update-map get at sets:members ;
+    update-map get at members ;
 
 <PRIVATE
 
@@ -150,9 +149,9 @@ GENERIC: implementors ( class/classes -- seq )
 PRIVATE>
 
 : class-usages ( class -- seq )
-    [ class-usage ] closure sets:members ;
+    [ class-usage ] closure members ;
 
-M: class implementors implementors-map get at sets:members ;
+M: class implementors implementors-map get at members ;
 
 M: sequence implementors [ implementors ] gather ;
 
