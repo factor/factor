@@ -218,13 +218,15 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
     <error-summary> >>error-summary
     dup error-summary>> f track-add ;
     
-: listener-area ( listener -- listener )
+: add-listener-area ( listener -- listener )
     dup output>> margins <scroller> >>scroller
     dup scroller>> white-interior 1 track-add ;
 
 : <listener-gadget> ( -- listener )
-    vertical listener-gadget new-track
-    with-lines add-toolbar init-input/output listener-area
+    vertical listener-gadget new-track with-lines
+    add-toolbar
+    init-input/output
+    add-listener-area
     init-error-summary ;
 
 M: listener-gadget focusable-child*

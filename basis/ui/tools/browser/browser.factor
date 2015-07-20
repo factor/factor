@@ -39,7 +39,7 @@ M: browser-gadget set-history-value
 
 CONSTANT: help-header-background COLOR: FactorLightTan
 
-: help-header ( track -- track )
+: add-help-header ( track -- track )
     dup <help-header> { 3 3 } <border>
     help-header-background <solid> >>interior 
     { 1 0 } >>fill f track-add ;
@@ -47,7 +47,7 @@ CONSTANT: help-header-background COLOR: FactorLightTan
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
 
-: help-pane ( track -- track )
+: add-help-pane ( track -- track )
     dup dup <help-pane> margins
     <scroller> >>scroller scroller>> white-interior 1 track-add ;
 
@@ -68,7 +68,7 @@ CONSTANT: help-header-background COLOR: FactorLightTan
         over <toolbar> f track-add
         swap search-field>> "          Search" label-on-left 1 track-add ;
 
-: browser-toolbar ( track -- track )
+: add-browser-toolbar ( track -- track )
     dup <browser-toolbar> { 3 3 } <border>
     toolbar-background <solid> >>interior { 1 0 } >>fill
     f track-add ;
@@ -79,9 +79,9 @@ CONSTANT: help-header-background COLOR: FactorLightTan
         swap >link <model> >>model
         dup <history> >>history
         dup <search-field> >>search-field
-        browser-toolbar
-        help-header
-        help-pane ;
+        add-browser-toolbar
+        add-help-header
+        add-help-pane ;
 
 M: browser-gadget graft*
     [ add-definition-observer ] [ call-next-method ] bi ;
