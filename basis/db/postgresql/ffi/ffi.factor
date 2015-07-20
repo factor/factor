@@ -247,7 +247,7 @@ FUNCTION: PGresult* PQfn ( PGconn* conn,
      int* result_len,
      int result_is_int,
      PQArgBlock* args,
-     int nargs ) ;
+     int nargs )
 
 ! Accessor functions for PGresult objects
 FUNCTION: ExecStatusType PQresultStatus ( PGresult* res )
