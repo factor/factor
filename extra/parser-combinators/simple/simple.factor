@@ -8,7 +8,7 @@ IN: parser-combinators.simple
   [ digit? ] satisfy [ digit> ] <@ ;
 
 : 'integer' ( -- parser )
-  'digit' <!+> [ 10 digits>integer ] <@ ;
+  [ digit? ] satisfy <*> [ string>number ] <@ ;
 
 : 'string' ( -- parser )
   [ CHAR: " = ] satisfy

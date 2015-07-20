@@ -71,7 +71,7 @@ PRIVATE>
     [ digit? ] satisfy [ digit> ] action ;
 
 : 'integer' ( -- parser )
-    'digit' repeat1 [ 10 digits>integer ] action ;
+    [ digit? ] satisfy repeat1 [ string>number ] action ;
 
 : 'string' ( -- parser )
     [
