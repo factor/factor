@@ -1,7 +1,8 @@
-USING: assocs alien classes compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stack-frame cpu.x86.assembler cpu.x86.assembler.operands
-help.markup help.syntax kernel layouts literals math multiline system words ;
-QUALIFIED: vm
+USING: alien assocs classes compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stack-frame
+cpu.x86.assembler cpu.x86.assembler.operands help.markup
+help.syntax kernel layouts literals math multiline system vm
+words ;
 IN: cpu.architecture
 
 <<
@@ -293,7 +294,7 @@ HELP: stack-cleanup
 HELP: gc-root-offset
 { $values { "spill-slot" spill-slot } { "n" integer } }
 { $description "Offset in the " { $link stack-frame } " for the word being constructed where the spill slot is located. The value is given in " { $link cell } " units." }
-{ $see-also vm:gc-info } ;
+{ $see-also gc-info } ;
 
 ARTICLE: "cpu.architecture" "CPU architecture description model"
 "The " { $vocab-link "cpu.architecture" } " vocab contains generic words and hooks that serves as an api for the compiler towards the cpu architecture."
