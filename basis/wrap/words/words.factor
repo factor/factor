@@ -4,8 +4,8 @@ USING: accessors grouping kernel math sequences
 sequences.private splitting.monotonic wrap ;
 IN: wrap.words
 
-TUPLE: word key width break? ;
-C: <word> word
+TUPLE: wrapping-word key width break? ;
+C: <wrapping-word> wrapping-word
 
 <PRIVATE
 
