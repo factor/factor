@@ -38,28 +38,28 @@ IN: compiler.tests.alien
 
 LIBRARY: f-cdecl
 
-FUNCTION: void ffi_test_0 ;
+FUNCTION: void ffi_test_0 ( )
 [ ] [ ffi_test_0 ] unit-test
 
-FUNCTION: int ffi_test_1 ;
+FUNCTION: int ffi_test_1 ( )
 [ 3 ] [ ffi_test_1 ] unit-test
 
 [ ] [ \ ffi_test_1 def>> [ drop ] append compile-call ] unit-test
 
-FUNCTION: int ffi_test_2 int x int y ;
+FUNCTION: int ffi_test_2 ( int x, int y )
 [ 5 ] [ 2 3 ffi_test_2 ] unit-test
 [ "hi" 3 ffi_test_2 ] must-fail
 
-FUNCTION: int ffi_test_3 int x int y int z int t ;
+FUNCTION: int ffi_test_3 ( int x, int y, int z, int t )
 [ 25 ] [ 2 3 4 5 ffi_test_3 ] unit-test
 
-FUNCTION: float ffi_test_4 ;
+FUNCTION: float ffi_test_4 ( )
 [ 1.5 ] [ ffi_test_4 ] unit-test
 
-FUNCTION: double ffi_test_5 ;
+FUNCTION: double ffi_test_5 ( )
 [ 1.5 ] [ ffi_test_5 ] unit-test
 
-FUNCTION: int ffi_test_9 int a int b int c int d int e int f int g ;
+FUNCTION: int ffi_test_9 )( int a, int b, int c, int d, int e, int f, int g )
 [ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
 [ "a" 2 3 4 5 6 7 ffi_test_9 ] must-fail
 [ 1 2 3 4 5 6 "a" ffi_test_9 ] must-fail
@@ -69,19 +69,19 @@ STRUCT: FOO { x int } { y int } ;
 : make-FOO ( x y -- FOO )
     FOO <struct> swap >>y swap >>x ;
 
-FUNCTION: int ffi_test_11 int a FOO b int c ;
+FUNCTION: int ffi_test_11 ( int a, FOO b, int c )
 
 [ 14 ] [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
-FUNCTION: int ffi_test_13 int a int b int c int d int e int f int g int h int i int j int k ;
+FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
 
 [ 66 ] [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
 
-FUNCTION: FOO ffi_test_14 int x int y ;
+FUNCTION: FOO ffi_test_14 ( int x, int y )
 
 [ 11 6 ] [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] unit-test
 
-FUNCTION: c-string ffi_test_15 c-string x c-string y ;
+FUNCTION: c-string ffi_test_15 ( c-string x, c-string y )
 
 [ "foo" ] [ "xy" "zt" ffi_test_15 ] unit-test
 [ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test
@@ -89,7 +89,7 @@ FUNCTION: c-string ffi_test_15 c-string x c-string y ;
 
 STRUCT: BAR { x long } { y long } { z long } ;
 
-FUNCTION: BAR ffi_test_16 long x long y long z ;
+FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
 
 [ 11 6 -7 ] [
     11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
@@ -97,7 +97,7 @@ FUNCTION: BAR ffi_test_16 long x long y long z ;
 
 STRUCT: TINY { x int } ;
 
-FUNCTION: TINY ffi_test_17 int x ;
+FUNCTION: TINY ffi_test_17 ( int x )
 
 [ 11 ] [ 11 ffi_test_17 x>> ] unit-test
 
@@ -157,22 +157,22 @@ unit-test
 
 [ 25 85 ] [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
 
-FUNCTION: double ffi_test_6 float x float y ;
+FUNCTION: double ffi_test_6 ( float x, float y )
 [ 6.0 ] [ 3.0 2.0 ffi_test_6 ] unit-test
 [ "a" "b" ffi_test_6 ] must-fail
 
-FUNCTION: double ffi_test_7 double x double y ;
+FUNCTION: double ffi_test_7 ( double x, double y )
 [ 6.0 ] [ 3.0 2.0 ffi_test_7 ] unit-test
 
-FUNCTION: double ffi_test_8 double x float y double z float t int w ;
+FUNCTION: double ffi_test_8 ( double x, float y, double z, float t, int w )
 [ 19.0 ] [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
 
-FUNCTION: int ffi_test_10 int a int b double c int d float e int f int g int h ;
+FUNCTION: int ffi_test_10 ( int a, int b, double c, int d, float e, int f, int g, int h )
 [ -34 ] [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
 
-FUNCTION: void ffi_test_20 double x1, double x2, double x3,
+FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     double y1, double y2, double y3,
-    double z1, double z2, double z3 ;
+    double z1, double z2, double z3 )
 
 [ ] [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
@@ -194,12 +194,12 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 [ 861.0 ] [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
 
-FUNCTION: longlong ffi_test_21 long x long y ;
+FUNCTION: longlong ffi_test_21 ( long x, long y )
 
 [ 121932631112635269 ]
 [ 123456789 987654321 ffi_test_21 ] unit-test
 
-FUNCTION: long ffi_test_22 long x longlong y longlong z ;
+FUNCTION: long ffi_test_22 ( long x, longlong y, longlong z )
 
 [ 987655432 ]
 [ 1111 121932631112635269 123456789 ffi_test_22 ] unit-test
@@ -217,13 +217,13 @@ STRUCT: RECT
         swap >>y
         swap >>x ;
 
-FUNCTION: int ffi_test_12 int a int b RECT c int d int e int f ;
+FUNCTION: int ffi_test_12 ( int a, int b, RECT c, int d, int e, int f )
 
 [ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] unit-test
 
 [ 1 2 { 1 2 3 } 7 8 9 ffi_test_12 ] must-fail
 
-FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
+FUNCTION: float ffi_test_23 ( float[3] x, float[3] y )
 
 [ 32.0 ] [
     { 1.0 2.0 3.0 } float >c-array
@@ -234,49 +234,49 @@ FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 ! Test odd-size structs
 STRUCT: test-struct-1 { x char[1] } ;
 
-FUNCTION: test-struct-1 ffi_test_24 ;
+FUNCTION: test-struct-1 ffi_test_24 ( )
 
 [ S{ test-struct-1 { x char-array{ 1 } } } ] [ ffi_test_24 ] unit-test
 
 STRUCT: test-struct-2 { x char[2] } ;
 
-FUNCTION: test-struct-2 ffi_test_25 ;
+FUNCTION: test-struct-2 ffi_test_25 ( )
 
 [ S{ test-struct-2 { x char-array{ 1 2 } } } ] [ ffi_test_25 ] unit-test
 
 STRUCT: test-struct-3 { x char[3] } ;
 
-FUNCTION: test-struct-3 ffi_test_26 ;
+FUNCTION: test-struct-3 ffi_test_26 ( )
 
 [ S{ test-struct-3 { x char-array{ 1 2 3 } } } ] [ ffi_test_26 ] unit-test
 
 STRUCT: test-struct-4 { x char[4] } ;
 
-FUNCTION: test-struct-4 ffi_test_27 ;
+FUNCTION: test-struct-4 ffi_test_27 ( )
 
 [ S{ test-struct-4 { x char-array{ 1 2 3 4 } } } ] [ ffi_test_27 ] unit-test
 
 STRUCT: test-struct-5 { x char[5] } ;
 
-FUNCTION: test-struct-5 ffi_test_28 ;
+FUNCTION: test-struct-5 ffi_test_28 ( )
 
 [ S{ test-struct-5 { x char-array{ 1 2 3 4 5 } } } ] [ ffi_test_28 ] unit-test
 
 STRUCT: test-struct-6 { x char[6] } ;
 
-FUNCTION: test-struct-6 ffi_test_29 ;
+FUNCTION: test-struct-6 ffi_test_29 ( )
 
 [ S{ test-struct-6 { x char-array{ 1 2 3 4 5 6 } } } ] [ ffi_test_29 ] unit-test
 
 STRUCT: test-struct-7 { x char[7] } ;
 
-FUNCTION: test-struct-7 ffi_test_30 ;
+FUNCTION: test-struct-7 ffi_test_30 ( )
 
 [ S{ test-struct-7 { x char-array{ 1 2 3 4 5 6 7 } } } ] [ ffi_test_30 ] unit-test
 
 STRUCT: test-struct-8 { x double } { y double } ;
 
-FUNCTION: double ffi_test_32 test-struct-8 x int y ;
+FUNCTION: double ffi_test_32 ( test-struct-8 x, int y )
 
 [ 9.0 ] [
     test-struct-8 <struct>
@@ -287,7 +287,7 @@ FUNCTION: double ffi_test_32 test-struct-8 x int y ;
 
 STRUCT: test-struct-9 { x float } { y float } ;
 
-FUNCTION: double ffi_test_33 test-struct-9 x int y ;
+FUNCTION: double ffi_test_33 ( test-struct-9 x, int y )
 
 [ 9.0 ] [
     test-struct-9 <struct>
@@ -298,7 +298,7 @@ FUNCTION: double ffi_test_33 test-struct-9 x int y ;
 
 STRUCT: test-struct-10 { x float } { y int } ;
 
-FUNCTION: double ffi_test_34 test-struct-10 x int y ;
+FUNCTION: double ffi_test_34 ( test-struct-10 x, int y )
 
 [ 9.0 ] [
     test-struct-10 <struct>
@@ -309,7 +309,7 @@ FUNCTION: double ffi_test_34 test-struct-10 x int y ;
 
 STRUCT: test-struct-11 { x int } { y int } ;
 
-FUNCTION: double ffi_test_35 test-struct-11 x int y ;
+FUNCTION: double ffi_test_35 ( test-struct-11 x, int y )
 
 [ 9.0 ] [
     test-struct-11 <struct>
@@ -324,11 +324,11 @@ STRUCT: test-struct-12 { a int } { x double } ;
     test-struct-12 <struct>
         swap >>x ;
 
-FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
+FUNCTION: double ffi_test_36 ( test-struct-12 x )
 
 [ 1.23456 ] [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
 
-FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
+FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y )
 
 [ t ] [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
 
@@ -403,11 +403,11 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
         + + 1 +
     ] alien-callback ;
 
-FUNCTION: void ffi_test_36_point_5 ( ) ;
+FUNCTION: void ffi_test_36_point_5 ( )
 
 [ ] [ ffi_test_36_point_5 ] unit-test
 
-FUNCTION: int ffi_test_37 ( void* func ) ;
+FUNCTION: int ffi_test_37 ( void* func )
 
 [ 1 ] [ callback-9 [ ffi_test_37 ] with-callback ] unit-test
 
@@ -430,7 +430,7 @@ STRUCT: test_struct_13
         5.0 >>x5
         6.0 >>x6 ;
 
-FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s ) ;
+FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s )
 
 [ 21 ] [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test
 
@@ -477,7 +477,7 @@ STRUCT: test_struct_14
     { x1 double }
     { x2 double } ;
 
-FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
+FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 )
 
 [ 1.0 2.0 ] [
     1.0 2.0 ffi_test_40 [ x1>> ] [ x2>> ] bi
@@ -500,7 +500,7 @@ FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
     ] with-callback
 ] unit-test
 
-FUNCTION: test-struct-12 ffi_test_41 ( int a, double x ) ;
+FUNCTION: test-struct-12 ffi_test_41 ( int a, double x )
 
 [ 1 2.0 ] [
     1 2.0 ffi_test_41
@@ -528,7 +528,7 @@ STRUCT: test_struct_15
     { x float }
     { y float } ;
 
-FUNCTION: test_struct_15 ffi_test_42 ( float x, float y ) ;
+FUNCTION: test_struct_15 ffi_test_42 ( float x, float y )
 
 [ 1.0 2.0 ] [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] unit-test
 
@@ -553,7 +553,7 @@ STRUCT: test_struct_16
     { x float }
     { a int } ;
 
-FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
+FUNCTION: test_struct_16 ffi_test_43 ( float x, int a )
 
 [ 1.0 2 ] [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] unit-test
 
@@ -574,7 +574,7 @@ FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
     ] with-callback
 ] unit-test
 
-FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
+FUNCTION: test_struct_14 ffi_test_44 ( ) inline
 
 [ 1.0 2.0 ] [ ffi_test_44 [ x1>> ] [ x2>> ] bi ] unit-test
 
@@ -585,15 +585,15 @@ FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
 ! C99 tests
 os windows? [
 
-    FUNCTION: complex-float ffi_test_45 ( int x ) ;
+    FUNCTION: complex-float ffi_test_45 ( int x )
 
     [ C{ 3.0 0.0 } ] [ 3 ffi_test_45 ] unit-test
 
-    FUNCTION: complex-double ffi_test_46 ( int x ) ;
+    FUNCTION: complex-double ffi_test_46 ( int x )
 
     [ C{ 3.0 0.0 } ] [ 3 ffi_test_46 ] unit-test
 
-    FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y ) ;
+    FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y )
 
     [ C{ 4.0 4.0 } ] [
         C{ 1.0 2.0 }
@@ -606,7 +606,7 @@ os windows? [
         { on bool }
         { parents short } ;
 
-    FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
+    FUNCTION: short ffi_test_48 ( bool-field-test x )
 
     [ 123 ] [
         bool-field-test <struct>
@@ -678,8 +678,8 @@ os windows? [
     alien-invoke gc ;
 
 ! Make sure that large longlong/ulonglong are correctly dealt with
-FUNCTION: longlong ffi_test_59 ( longlong x ) ;
-FUNCTION: ulonglong ffi_test_60 ( ulonglong x ) ;
+FUNCTION: longlong ffi_test_59 ( longlong x )
+FUNCTION: ulonglong ffi_test_60 ( ulonglong x )
 
 [ t ] [ most-positive-fixnum 1 + [ ffi_test_59 ] keep = ] unit-test
 [ t ] [ most-positive-fixnum 1 + [ ffi_test_60 ] keep = ] unit-test
@@ -888,7 +888,7 @@ os windows? [
         { b bool }
         { ptr void* } ;
 
-    FUNCTION: bool-and-ptr ffi_test_61 ( ) ;
+    FUNCTION: bool-and-ptr ffi_test_61 ( )
 
     ! { S{ bool-and-ptr { b t } { ptr f } } } [ ffi_test_61 ] unit-test
     { t } [ ffi_test_61 bool-and-ptr? ] unit-test
@@ -900,7 +900,7 @@ STRUCT: uint-pair
     { a uint }
     { b uint } ;
 
-FUNCTION: uint-pair ffi_test_62 ( ) ;
+FUNCTION: uint-pair ffi_test_62 ( )
 
 {
     S{ uint-pair { a 0xabcdefab } { b 0x12345678 } }
@@ -910,13 +910,13 @@ STRUCT: ulonglong-pair
     { a ulonglong }
     { b ulonglong } ;
 
-FUNCTION: ulonglong-pair ffi_test_63 ( ) ;
+FUNCTION: ulonglong-pair ffi_test_63 ( )
 
 {
     S{ ulonglong-pair { a 0xabcdefabcdefabcd } { b 0x1234567891234567 } }
 } [ ffi_test_63 ] unit-test
 
-FUNCTION: void* bug1021_test_1 ( void* s, int x ) ;
+FUNCTION: void* bug1021_test_1 ( void* s, int x )
 
 ! Sanity test the formula: x sq s +
 { t } [
@@ -948,8 +948,8 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x ) ;
     ] times
 ] unit-test
 
-FUNCTION: int bug1021_test_2 ( int a, char* b, void* c ) ;
-FUNCTION: void* bug1021_test_3 ( c-string a ) ;
+FUNCTION: int bug1021_test_2 ( int a, char* b, void* c )
+FUNCTION: void* bug1021_test_3 ( c-string a )
 
 : doit ( a -- d )
     33 1byte-array "bar" bug1021_test_3 bug1021_test_2 ;

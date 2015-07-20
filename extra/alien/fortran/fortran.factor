@@ -441,11 +441,11 @@ MACRO: fortran-invoke ( return library function parameters -- quot )
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 SYNTAX: SUBROUTINE:
-    f current-library get scan-token ";" parse-tokens
+    f current-library get scan-token ")" parse-tokens
     [ "()" subseq? ] reject define-fortran-function ;
 
 SYNTAX: FUNCTION:
-    scan-token current-library get scan-token ";" parse-tokens
+    scan-token current-library get scan-token ")" parse-tokens
     [ "()" subseq? ] reject define-fortran-function ;
 
 SYNTAX: LIBRARY:
