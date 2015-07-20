@@ -354,7 +354,7 @@ FUNCTION: HRESULT
         DWORD              Options,
         D3DVERTEXELEMENT9* pDeclaration,
         LPDIRECT3DDEVICE9  pD3DDevice,
-        LPD3DXMESH*        ppMesh ) ;
+        LPD3DXMESH*        ppMesh )
 
 FUNCTION: HRESULT
     D3DXCreateMeshFVF (
@@ -363,7 +363,7 @@ FUNCTION: HRESULT
         DWORD             Options,
         DWORD             FVF,
         LPDIRECT3DDEVICE9 pD3DDevice,
-        LPD3DXMESH*       ppMesh ) ;
+        LPD3DXMESH*       ppMesh )
 
 FUNCTION: HRESULT
     D3DXCreateSPMesh (
@@ -371,7 +371,7 @@ FUNCTION: HRESULT
         DWORD*                pAdjacency,
         D3DXATTRIBUTEWEIGHTS* pVertexAttributeWeights,
         FLOAT*                pVertexWeights,
-        LPD3DXSPMESH*         ppSMesh ) ;
+        LPD3DXSPMESH*         ppSMesh )
 
 FUNCTION: HRESULT
     D3DXCleanMesh (
@@ -380,13 +380,13 @@ FUNCTION: HRESULT
     DWORD*        pAdjacencyIn,
     LPD3DXMESH*   ppMeshOut,
     DWORD*        pAdjacencyOut,
-    LPD3DXBUFFER* ppErrorsAndWarnings ) ;
+    LPD3DXBUFFER* ppErrorsAndWarnings )
 
 FUNCTION: HRESULT
     D3DXValidMesh (
     LPD3DXMESH    pMeshIn,
     DWORD*        pAdjacency,
-    LPD3DXBUFFER* ppErrorsAndWarnings ) ;
+    LPD3DXBUFFER* ppErrorsAndWarnings )
 
 FUNCTION: HRESULT
     D3DXGeneratePMesh (
@@ -396,7 +396,7 @@ FUNCTION: HRESULT
         FLOAT*                pVertexWeights,
         DWORD                 MinValue,
         DWORD                 Options,
-        LPD3DXPMESH*          ppPMesh ) ;
+        LPD3DXPMESH*          ppPMesh )
 
 FUNCTION: HRESULT
     D3DXSimplifyMesh (
@@ -406,7 +406,7 @@ FUNCTION: HRESULT
         FLOAT*                pVertexWeights,
         DWORD                 MinValue,
         DWORD                 Options,
-        LPD3DXMESH*           ppMesh ) ;
+        LPD3DXMESH*           ppMesh )
 
 FUNCTION: HRESULT
     D3DXComputeBoundingSphere (
@@ -414,7 +414,7 @@ FUNCTION: HRESULT
         DWORD        NumVertices,
         DWORD        dwStride,
         D3DXVECTOR3* pCenter,
-        FLOAT*       pRadius ) ;
+        FLOAT*       pRadius )
 
 FUNCTION: HRESULT
     D3DXComputeBoundingBox (
@@ -422,17 +422,17 @@ FUNCTION: HRESULT
         DWORD        NumVertices,
         DWORD        dwStride,
         D3DXVECTOR3* pMin,
-        D3DXVECTOR3* pMax ) ;
+        D3DXVECTOR3* pMax )
 
 FUNCTION: HRESULT
     D3DXComputeNormals (
         LPD3DXBASEMESH pMesh,
-        DWORD*         pAdjacency ) ;
+        DWORD*         pAdjacency )
 
 FUNCTION: HRESULT
     D3DXCreateBuffer (
         DWORD         NumBytes,
-        LPD3DXBUFFER* ppBuffer ) ;
+        LPD3DXBUFFER* ppBuffer )
 
 FUNCTION: HRESULT
     D3DXLoadMeshFromXA (
@@ -443,7 +443,7 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppMaterials,
         LPD3DXBUFFER*     ppEffectInstances,
         DWORD*            pNumMaterials,
-        LPD3DXMESH*       ppMesh ) ;
+        LPD3DXMESH*       ppMesh )
 
 FUNCTION: HRESULT
     D3DXLoadMeshFromXW (
@@ -454,7 +454,7 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppMaterials,
         LPD3DXBUFFER*     ppEffectInstances,
         DWORD*            pNumMaterials,
-        LPD3DXMESH*       ppMesh ) ;
+        LPD3DXMESH*       ppMesh )
 
 ALIAS: D3DXLoadMeshFromX D3DXLoadMeshFromXW
 
@@ -468,7 +468,7 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppMaterials,
         LPD3DXBUFFER*     ppEffectInstances,
         DWORD*            pNumMaterials,
-        LPD3DXMESH*       ppMesh ) ;
+        LPD3DXMESH*       ppMesh )
 
 FUNCTION: HRESULT
     D3DXLoadMeshFromXResource (
@@ -481,7 +481,7 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppMaterials,
         LPD3DXBUFFER*     ppEffectInstances,
         DWORD*            pNumMaterials,
-        LPD3DXMESH*       ppMesh ) ;
+        LPD3DXMESH*       ppMesh )
 
 FUNCTION: HRESULT
     D3DXSaveMeshToXA (
@@ -491,7 +491,7 @@ FUNCTION: HRESULT
         D3DXMATERIAL*       pMaterials,
         D3DXEFFECTINSTANCE* pEffectInstances,
         DWORD               NumMaterials,
-        DWORD               Format ) ;
+        DWORD               Format )
 
 FUNCTION: HRESULT
     D3DXSaveMeshToXW (
@@ -501,7 +501,7 @@ FUNCTION: HRESULT
         D3DXMATERIAL*       pMaterials,
         D3DXEFFECTINSTANCE* pEffectInstances,
         DWORD               NumMaterials,
-        DWORD               Format ) ;
+        DWORD               Format )
 
 ALIAS: D3DXSaveMeshToX D3DXSaveMeshToXW
 
@@ -513,21 +513,21 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppMaterials,
         LPD3DXBUFFER*     ppEffectInstances,
         DWORD*            pNumMaterials,
-        LPD3DXPMESH*      ppPMesh ) ;
+        LPD3DXPMESH*      ppPMesh )
 
 FUNCTION: HRESULT
     D3DXCreateSkinInfo (
         DWORD              NumVertices,
         D3DVERTEXELEMENT9* pDeclaration,
         DWORD              NumBones,
-        LPD3DXSKININFO*    ppSkinInfo ) ;
+        LPD3DXSKININFO*    ppSkinInfo )
 
 FUNCTION: HRESULT
     D3DXCreateSkinInfoFVF (
         DWORD           NumVertices,
         DWORD           FVF,
         DWORD           NumBones,
-        LPD3DXSKININFO* ppSkinInfo ) ;
+        LPD3DXSKININFO* ppSkinInfo )
 
 FUNCTION: HRESULT
     D3DXLoadMeshFromXof (
@@ -538,7 +538,7 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppMaterials,
         LPD3DXBUFFER*     ppEffectInstances,
         DWORD*            pNumMaterials,
-        LPD3DXMESH*       ppMesh ) ;
+        LPD3DXMESH*       ppMesh )
 
 FUNCTION: HRESULT
     D3DXLoadSkinMeshFromXof (
@@ -550,14 +550,14 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppEffectInstances,
         DWORD*            pMatOut,
         LPD3DXSKININFO*   ppSkinInfo,
-        LPD3DXMESH*       ppMesh ) ;
+        LPD3DXMESH*       ppMesh )
 
 FUNCTION: HRESULT
     D3DXCreateSkinInfoFromBlendedMesh (
         LPD3DXBASEMESH       pMesh,
         DWORD                NumBones,
         D3DXBONECOMBINATION* pBoneCombinationTable,
-        LPD3DXSKININFO*      ppSkinInfo ) ;
+        LPD3DXSKININFO*      ppSkinInfo )
 
 FUNCTION: HRESULT
     D3DXTessellateNPatches (
@@ -566,12 +566,12 @@ FUNCTION: HRESULT
         FLOAT         NumSegs,
         BOOL          QuadraticInterpNormals,
         LPD3DXMESH*   ppMeshOut,
-        LPD3DXBUFFER* ppAdjacencyOut ) ;
+        LPD3DXBUFFER* ppAdjacencyOut )
 
 FUNCTION: HRESULT
     D3DXGenerateOutputDecl (
         D3DVERTEXELEMENT9* pOutput,
-        D3DVERTEXELEMENT9* pInput ) ;
+        D3DVERTEXELEMENT9* pInput )
 
 FUNCTION: HRESULT
     D3DXLoadPatchMeshFromXof (
@@ -581,19 +581,19 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*     ppMaterials,
         LPD3DXBUFFER*     ppEffectInstances,
         PDWORD            pNumMaterials,
-        LPD3DXPATCHMESH*  ppMesh ) ;
+        LPD3DXPATCHMESH*  ppMesh )
 
 FUNCTION: HRESULT
     D3DXRectPatchSize (
         FLOAT* pfNumSegs,
         DWORD* pdwTriangles,
-        DWORD* pdwVertices ) ;
+        DWORD* pdwVertices )
 
 FUNCTION: HRESULT
     D3DXTriPatchSize (
         FLOAT* pfNumSegs,
         DWORD* pdwTriangles,
-        DWORD* pdwVertices ) ;
+        DWORD* pdwVertices )
 
 FUNCTION: HRESULT
     D3DXTessellateRectPatch (
@@ -601,7 +601,7 @@ FUNCTION: HRESULT
         FLOAT*                  pNumSegs,
         D3DVERTEXELEMENT9*      pdwInDecl,
         D3DRECTPATCH_INFO*      pRectPatchInfo,
-        LPD3DXMESH              pMesh ) ;
+        LPD3DXMESH              pMesh )
 
 FUNCTION: HRESULT
     D3DXTessellateTriPatch (
@@ -609,12 +609,12 @@ FUNCTION: HRESULT
       FLOAT*                  pNumSegs,
       D3DVERTEXELEMENT9*      pInDecl,
       D3DTRIPATCH_INFO*       pTriPatchInfo,
-      LPD3DXMESH              pMesh ) ;
+      LPD3DXMESH              pMesh )
 
 FUNCTION: HRESULT
     D3DXCreateNPatchMesh (
         LPD3DXMESH       pMeshSysMem,
-        LPD3DXPATCHMESH* pPatchMesh ) ;
+        LPD3DXPATCHMESH* pPatchMesh )
 
 FUNCTION: HRESULT
     D3DXCreatePatchMesh (
@@ -624,33 +624,33 @@ FUNCTION: HRESULT
         DWORD              dwOptions,
         D3DVERTEXELEMENT9* pDecl,
         LPDIRECT3DDEVICE9  pD3DDevice,
-        LPD3DXPATCHMESH*   pPatchMesh ) ;
+        LPD3DXPATCHMESH*   pPatchMesh )
 
 FUNCTION: HRESULT
     D3DXValidPatchMesh (
         LPD3DXPATCHMESH pMesh,
         DWORD*          dwcDegenerateVertices,
         DWORD*          dwcDegeneratePatches,
-        LPD3DXBUFFER*   ppErrorsAndWarnings ) ;
+        LPD3DXBUFFER*   ppErrorsAndWarnings )
 
 FUNCTION: UINT
-    D3DXGetFVFVertexSize ( DWORD FVF ) ;
+    D3DXGetFVFVertexSize ( DWORD FVF )
 
 FUNCTION: UINT
-    D3DXGetDeclVertexSize ( D3DVERTEXELEMENT9* pDecl, DWORD Stream ) ;
+    D3DXGetDeclVertexSize ( D3DVERTEXELEMENT9* pDecl, DWORD Stream )
 
 FUNCTION: UINT
-    D3DXGetDeclLength ( D3DVERTEXELEMENT9* pDecl ) ;
+    D3DXGetDeclLength ( D3DVERTEXELEMENT9* pDecl )
 
 FUNCTION: HRESULT
     D3DXDeclaratorFromFVF (
         DWORD              FVF,
-        D3DVERTEXELEMENT9* pDeclarator ) ;
+        D3DVERTEXELEMENT9* pDeclarator )
 
 FUNCTION: HRESULT
     D3DXFVFFromDeclarator (
         D3DVERTEXELEMENT9* pDeclarator,
-        DWORD*             pFVF ) ;
+        DWORD*             pFVF )
 
 FUNCTION: HRESULT
     D3DXWeldVertices (
@@ -660,7 +660,7 @@ FUNCTION: HRESULT
         DWORD*            pAdjacencyIn,
         DWORD*            pAdjacencyOut,
         DWORD*            pFaceRemap,
-        LPD3DXBUFFER*     ppVertexRemap ) ;
+        LPD3DXBUFFER*     ppVertexRemap )
 
 STRUCT: D3DXINTERSECTINFO
     { FaceIndex DWORD }
@@ -680,7 +680,7 @@ FUNCTION: HRESULT
         FLOAT*         pV,
         FLOAT*         pDist,
         LPD3DXBUFFER*  ppAllHits,
-        DWORD*         pCountOfHits ) ;
+        DWORD*         pCountOfHits )
 
 FUNCTION: HRESULT
     D3DXIntersectSubset (
@@ -694,7 +694,7 @@ FUNCTION: HRESULT
         FLOAT*         pV,
         FLOAT*         pDist,
         LPD3DXBUFFER*  ppAllHits,
-        DWORD*         pCountOfHits ) ;
+        DWORD*         pCountOfHits )
 
 FUNCTION: HRESULT D3DXSplitMesh (
     LPD3DXMESH    pMeshIn,
@@ -705,7 +705,7 @@ FUNCTION: HRESULT D3DXSplitMesh (
     LPD3DXBUFFER* ppMeshArrayOut,
     LPD3DXBUFFER* ppAdjacencyArrayOut,
     LPD3DXBUFFER* ppFaceRemapArrayOut,
-    LPD3DXBUFFER* ppVertRemapArrayOut ) ;
+    LPD3DXBUFFER* ppVertRemapArrayOut )
 
 FUNCTION: BOOL D3DXIntersectTri (
     D3DXVECTOR3* p0,
@@ -715,25 +715,25 @@ FUNCTION: BOOL D3DXIntersectTri (
     D3DXVECTOR3* pRayDir,
     FLOAT*       pU,
     FLOAT*       pV,
-    FLOAT*       pDist ) ;
+    FLOAT*       pDist )
 
 FUNCTION: BOOL
     D3DXSphereBoundProbe (
         D3DXVECTOR3* pCenter,
         FLOAT        Radius,
         D3DXVECTOR3* pRayPosition,
-        D3DXVECTOR3* pRayDirection ) ;
+        D3DXVECTOR3* pRayDirection )
 
 FUNCTION: BOOL
     D3DXBoxBoundProbe (
         D3DXVECTOR3* pMin,
         D3DXVECTOR3* pMax,
         D3DXVECTOR3* pRayPosition,
-        D3DXVECTOR3* pRayDirection ) ;
+        D3DXVECTOR3* pRayDirection )
 
 FUNCTION: HRESULT D3DXComputeTangentFrame (
     ID3DXMesh* pMesh,
-    DWORD      dwOptions ) ;
+    DWORD      dwOptions )
 
 FUNCTION: HRESULT D3DXComputeTangentFrameEx (
     ID3DXMesh*    pMesh,
@@ -751,7 +751,7 @@ FUNCTION: HRESULT D3DXComputeTangentFrameEx (
     FLOAT         fSingularPointThreshold,
     FLOAT         fNormalEdgeThreshold,
     ID3DXMesh**   ppMeshOut,
-    ID3DXBuffer** ppVertexMapping ) ;
+    ID3DXBuffer** ppVertexMapping )
 
 FUNCTION: HRESULT D3DXComputeTangent (
     LPD3DXMESH Mesh,
@@ -759,7 +759,7 @@ FUNCTION: HRESULT D3DXComputeTangent (
     DWORD      TangentIndex,
     DWORD      BinormIndex,
     DWORD      Wrap,
-    DWORD*     pAdjacency ) ;
+    DWORD*     pAdjacency )
 
 C-TYPE: D3DXUVATLASCB
 TYPEDEF: D3DXUVATLASCB* LPD3DXUVATLASCB
@@ -783,7 +783,7 @@ FUNCTION: HRESULT D3DXUVAtlasCreate (
     LPD3DXBUFFER*   ppFacePartitioning,
     LPD3DXBUFFER*   ppVertexRemapArray,
     FLOAT*          pfMaxStretchOut,
-    UINT*           puNumChartsOut ) ;
+    UINT*           puNumChartsOut )
 
 FUNCTION: HRESULT D3DXUVAtlasPartition (
     LPD3DXMESH      pMesh,
@@ -802,7 +802,7 @@ FUNCTION: HRESULT D3DXUVAtlasPartition (
     LPD3DXBUFFER*   ppVertexRemapArray,
     LPD3DXBUFFER*   ppPartitionResultAdjacency,
     FLOAT*          pfMaxStretchOut,
-    UINT*           puNumChartsOut ) ;
+    UINT*           puNumChartsOut )
 
 FUNCTION: HRESULT D3DXUVAtlasPack (
     ID3DXMesh*      pMesh,
@@ -815,7 +815,7 @@ FUNCTION: HRESULT D3DXUVAtlasPack (
     FLOAT           fCallbackFrequency,
     LPVOID          pUserContext,
     DWORD           dwOptions,
-    LPD3DXBUFFER    pFacePartitioning ) ;
+    LPD3DXBUFFER    pFacePartitioning )
 
 TYPEDEF: void* LPD3DXIMTSIGNALCALLBACK
 
@@ -827,7 +827,7 @@ FUNCTION: HRESULT D3DXComputeIMTFromPerVertexSignal (
     DWORD           dwOptions,
     LPD3DXUVATLASCB pStatusCallback,
     LPVOID          pUserContext,
-    LPD3DXBUFFER*   ppIMTData ) ;
+    LPD3DXBUFFER*   ppIMTData )
 
 FUNCTION: HRESULT D3DXComputeIMTFromSignal (
     LPD3DXMESH              pMesh,
@@ -839,7 +839,7 @@ FUNCTION: HRESULT D3DXComputeIMTFromSignal (
     VOID*                   pUserData,
     LPD3DXUVATLASCB         pStatusCallback,
     LPVOID                  pUserContext,
-    LPD3DXBUFFER*           ppIMTData ) ;
+    LPD3DXBUFFER*           ppIMTData )
 
 FUNCTION: HRESULT D3DXComputeIMTFromTexture (
     LPD3DXMESH         pMesh,
@@ -848,7 +848,7 @@ FUNCTION: HRESULT D3DXComputeIMTFromTexture (
     DWORD              dwOptions,
     LPD3DXUVATLASCB    pStatusCallback,
     LPVOID             pUserContext,
-    LPD3DXBUFFER*      ppIMTData ) ;
+    LPD3DXBUFFER*      ppIMTData )
 
 FUNCTION: HRESULT D3DXComputeIMTFromPerTexelSignal (
     LPD3DXMESH      pMesh,
@@ -861,7 +861,7 @@ FUNCTION: HRESULT D3DXComputeIMTFromPerTexelSignal (
     DWORD           dwOptions,
     LPD3DXUVATLASCB pStatusCallback,
     LPVOID          pUserContext,
-    LPD3DXBUFFER*   ppIMTData ) ;
+    LPD3DXBUFFER*   ppIMTData )
 
 FUNCTION: HRESULT
     D3DXConvertMeshSubsetToSingleStrip (
@@ -869,7 +869,7 @@ FUNCTION: HRESULT
         DWORD                   AttribId,
         DWORD                   IBOptions,
         LPDIRECT3DINDEXBUFFER9* ppIndexBuffer,
-        DWORD*                  pNumIndices ) ;
+        DWORD*                  pNumIndices )
 
 FUNCTION: HRESULT
     D3DXConvertMeshSubsetToStrips (
@@ -879,7 +879,7 @@ FUNCTION: HRESULT
         LPDIRECT3DINDEXBUFFER9* ppIndexBuffer,
         DWORD*                  pNumIndices,
         LPD3DXBUFFER*           ppStripLengths,
-        DWORD*                  pNumStrips ) ;
+        DWORD*                  pNumStrips )
 
 FUNCTION: HRESULT
     D3DXOptimizeFaces (
@@ -887,7 +887,7 @@ FUNCTION: HRESULT
         UINT    cFaces,
         UINT    cVertices,
         BOOL    b32BitIndices,
-        DWORD*  pFaceRemap ) ;
+        DWORD*  pFaceRemap )
 
 FUNCTION: HRESULT
     D3DXOptimizeVertices (
@@ -895,7 +895,7 @@ FUNCTION: HRESULT
         UINT    cFaces,
         UINT    cVertices,
         BOOL    b32BitIndices,
-        DWORD*  pVertexRemap ) ;
+        DWORD*  pVertexRemap )
 
 TYPEDEF: int D3DXSHCOMPRESSQUALITYTYPE
 CONSTANT: D3DXSHCQUAL_FASTLOWQUALITY  1
@@ -1092,7 +1092,7 @@ FUNCTION: HRESULT
         UINT             NumSamples,
         UINT             NumCoeffs,
         UINT             NumChannels,
-        LPD3DXPRTBUFFER* ppBuffer ) ;
+        LPD3DXPRTBUFFER* ppBuffer )
 
 FUNCTION: HRESULT
     D3DXCreatePRTBufferTex (
@@ -1100,29 +1100,29 @@ FUNCTION: HRESULT
         UINT             Height,
         UINT             NumCoeffs,
         UINT             NumChannels,
-        LPD3DXPRTBUFFER* ppBuffer ) ;
+        LPD3DXPRTBUFFER* ppBuffer )
 
 FUNCTION: HRESULT
     D3DXLoadPRTBufferFromFileA (
         LPCSTR                 pFilename,
-        LPD3DXPRTBUFFER*       ppBuffer ) ;
+        LPD3DXPRTBUFFER*       ppBuffer )
 
 FUNCTION: HRESULT
     D3DXLoadPRTBufferFromFileW (
         LPCWSTR                pFilename,
-        LPD3DXPRTBUFFER*       ppBuffer ) ;
+        LPD3DXPRTBUFFER*       ppBuffer )
 
 ALIAS: D3DXLoadPRTBufferFromFile D3DXLoadPRTBufferFromFileW
 
 FUNCTION: HRESULT
     D3DXSavePRTBufferToFileA (
         LPCSTR          pFileName,
-        LPD3DXPRTBUFFER pBuffer ) ;
+        LPD3DXPRTBUFFER pBuffer )
 
 FUNCTION: HRESULT
     D3DXSavePRTBufferToFileW (
         LPCWSTR         pFileName,
-        LPD3DXPRTBUFFER pBuffer ) ;
+        LPD3DXPRTBUFFER pBuffer )
 
 ALIAS: D3DXSavePRTBufferToFile D3DXSavePRTBufferToFileW
 
@@ -1132,24 +1132,24 @@ TYPEDEF: D3DXPRTCOMPBUFFER* LPD3DXPRTCOMPBUFFER
 FUNCTION: HRESULT
     D3DXLoadPRTCompBufferFromFileA (
         LPCSTR                     pFilename,
-        LPD3DXPRTCOMPBUFFER*       ppBuffer ) ;
+        LPD3DXPRTCOMPBUFFER*       ppBuffer )
 
 FUNCTION: HRESULT
     D3DXLoadPRTCompBufferFromFileW (
         LPCWSTR                    pFilename,
-        LPD3DXPRTCOMPBUFFER*       ppBuffer ) ;
+        LPD3DXPRTCOMPBUFFER*       ppBuffer )
 
 ALIAS: D3DXLoadPRTCompBufferFromFile D3DXLoadPRTCompBufferFromFileW
 
 FUNCTION: HRESULT
     D3DXSavePRTCompBufferToFileA (
         LPCSTR              pFileName,
-        LPD3DXPRTCOMPBUFFER pBuffer ) ;
+        LPD3DXPRTCOMPBUFFER pBuffer )
 
 FUNCTION: HRESULT
     D3DXSavePRTCompBufferToFileW (
         LPCWSTR             pFileName,
-        LPD3DXPRTCOMPBUFFER pBuffer ) ;
+        LPD3DXPRTCOMPBUFFER pBuffer )
 
 ALIAS: D3DXSavePRTCompBufferToFile D3DXSavePRTCompBufferToFileW
 
@@ -1161,7 +1161,7 @@ FUNCTION: HRESULT
         LPD3DXSHPRTSIMCB          pCB,
         LPVOID                    lpUserContext,
         LPD3DXPRTBUFFER           pBufferIn,
-        LPD3DXPRTCOMPBUFFER*      ppBufferOut ) ;
+        LPD3DXPRTCOMPBUFFER*      ppBufferOut )
 
 FUNCTION: HRESULT
     D3DXCreateTextureGutterHelper (
@@ -1169,7 +1169,7 @@ FUNCTION: HRESULT
         UINT                       Height,
         LPD3DXMESH                 pMesh,
         FLOAT                      GutterSize,
-        LPD3DXTEXTUREGUTTERHELPER* ppBuffer ) ;
+        LPD3DXTEXTUREGUTTERHELPER* ppBuffer )
 
 FUNCTION: HRESULT
     D3DXCreatePRTEngine (
@@ -1177,7 +1177,7 @@ FUNCTION: HRESULT
         DWORD*           pAdjacency,
         BOOL             ExtractUVs,
         LPD3DXMESH       pBlockerMesh,
-        LPD3DXPRTENGINE* ppEngine ) ;
+        LPD3DXPRTENGINE* ppEngine )
 
 FUNCTION: HRESULT
     D3DXConcatenateMeshes (
@@ -1188,7 +1188,7 @@ FUNCTION: HRESULT
         D3DXMATRIX*        pTextureXForms,
         D3DVERTEXELEMENT9* pDecl,
         LPDIRECT3DDEVICE9  pD3DDevice,
-        LPD3DXMESH*        ppMeshOut ) ;
+        LPD3DXMESH*        ppMeshOut )
 
 FUNCTION: HRESULT
     D3DXSHPRTCompSuperCluster (
@@ -1197,7 +1197,7 @@ FUNCTION: HRESULT
         UINT       MaxNumClusters,
         UINT       NumClusters,
         UINT*      pSuperClusterIDs,
-        UINT*      pNumSuperClusters ) ;
+        UINT*      pNumSuperClusters )
 
 FUNCTION: HRESULT
     D3DXSHPRTCompSplitMeshSC (
@@ -1216,4 +1216,4 @@ FUNCTION: HRESULT
         LPD3DXBUFFER*                  ppVertData,
         UINT*                          pVertDataLength,
         UINT*                          pSCClusterList,
-        D3DXSHPRTSPLITMESHCLUSTERDATA* pSCData ) ;
+        D3DXSHPRTSPLITMESHCLUSTERDATA* pSCData )

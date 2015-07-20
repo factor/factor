@@ -266,14 +266,14 @@ COM-INTERFACE: ID3D10ShaderReflection IUnknown {D40E20B6-F8F7-42ad-AB20-4BAF8F15
     HRESULT GetInputParameterDesc ( UINT ParameterIndex, D3D10_SIGNATURE_PARAMETER_DESC* pDesc )
     HRESULT GetOutputParameterDesc ( UINT ParameterIndex, D3D10_SIGNATURE_PARAMETER_DESC* pDesc ) ;
 
-FUNCTION: HRESULT D3D10CompileShader ( LPCSTR pSrcData, SIZE_T SrcDataLen, LPCSTR pFileName, D3D10_SHADER_MACRO* pDefines, ID3D10Include* pInclude, LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs ) ;
-FUNCTION: HRESULT D3D10DisassembleShader ( void* pShader, SIZE_T BytecodeLength, BOOL EnableColorCode, LPCSTR pComments, ID3D10Blob** ppDisassembly ) ;
-FUNCTION: LPCSTR D3D10GetPixelShaderProfile ( ID3D10Device* pDevice ) ;
-FUNCTION: LPCSTR D3D10GetVertexShaderProfile ( ID3D10Device* pDevice ) ;
-FUNCTION: LPCSTR D3D10GetGeometryShaderProfile ( ID3D10Device* pDevice ) ;
-FUNCTION: HRESULT D3D10ReflectShader ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10ShaderReflection** ppReflector ) ;
-FUNCTION: HRESULT D3D10PreprocessShader ( LPCSTR pSrcData, SIZE_T SrcDataSize, LPCSTR pFileName, D3D10_SHADER_MACRO* pDefines, ID3D10Include* pInclude, ID3D10Blob** ppShaderText, ID3D10Blob** ppErrorMsgs ) ;
-FUNCTION: HRESULT D3D10GetInputSignatureBlob ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppSignatureBlob ) ;
-FUNCTION: HRESULT D3D10GetOutputSignatureBlob ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppSignatureBlob ) ;
-FUNCTION: HRESULT D3D10GetInputAndOutputSignatureBlob ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppSignatureBlob ) ;
-FUNCTION: HRESULT D3D10GetShaderDebugInfo ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppDebugInfo ) ;
+FUNCTION: HRESULT D3D10CompileShader ( LPCSTR pSrcData, SIZE_T SrcDataLen, LPCSTR pFileName, D3D10_SHADER_MACRO* pDefines, ID3D10Include* pInclude, LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs )
+FUNCTION: HRESULT D3D10DisassembleShader ( void* pShader, SIZE_T BytecodeLength, BOOL EnableColorCode, LPCSTR pComments, ID3D10Blob** ppDisassembly )
+FUNCTION: LPCSTR D3D10GetPixelShaderProfile ( ID3D10Device* pDevice )
+FUNCTION: LPCSTR D3D10GetVertexShaderProfile ( ID3D10Device* pDevice )
+FUNCTION: LPCSTR D3D10GetGeometryShaderProfile ( ID3D10Device* pDevice )
+FUNCTION: HRESULT D3D10ReflectShader ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10ShaderReflection** ppReflector )
+FUNCTION: HRESULT D3D10PreprocessShader ( LPCSTR pSrcData, SIZE_T SrcDataSize, LPCSTR pFileName, D3D10_SHADER_MACRO* pDefines, ID3D10Include* pInclude, ID3D10Blob** ppShaderText, ID3D10Blob** ppErrorMsgs )
+FUNCTION: HRESULT D3D10GetInputSignatureBlob ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppSignatureBlob )
+FUNCTION: HRESULT D3D10GetOutputSignatureBlob ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppSignatureBlob )
+FUNCTION: HRESULT D3D10GetInputAndOutputSignatureBlob ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppSignatureBlob )
+FUNCTION: HRESULT D3D10GetShaderDebugInfo ( void* pShaderBytecode, SIZE_T BytecodeLength, ID3D10Blob** ppDebugInfo )

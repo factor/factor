@@ -171,8 +171,8 @@ HRESULT GetWindowAssociation ( HWND* pWindowHandle )
 HRESULT CreateSwapChain ( IUnknown* pDevice, DXGI_SWAP_CHAIN_DESC* pDesc, IDXGISwapChain** ppSwapChain )
 HRESULT CreateSoftwareAdapter ( HMODULE Module, IDXGIAdapter** ppAdapter ) ;
 
-FUNCTION: HRESULT CreateDXGIFactory ( REFIID riid, void** ppFactory ) ;
-FUNCTION: HRESULT CreateDXGIFactory1 ( REFIID riid, void** ppFactory ) ;
+FUNCTION: HRESULT CreateDXGIFactory ( REFIID riid, void** ppFactory )
+FUNCTION: HRESULT CreateDXGIFactory1 ( REFIID riid, void** ppFactory )
 
 COM-INTERFACE: IDXGIDevice IDXGIObject {54ec77fa-1377-44e6-8c32-88fd5f44c84c}
 HRESULT GetAdapter ( IDXGIAdapter** pAdapter )

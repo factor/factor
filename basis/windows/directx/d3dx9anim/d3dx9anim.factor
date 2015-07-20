@@ -298,7 +298,7 @@ D3DXLoadMeshHierarchyFromXA
     LPD3DXLOADUSERDATA         pUserDataLoader,
     LPD3DXFRAME*               ppFrameHierarchy,
     LPD3DXANIMATIONCONTROLLER* ppAnimController
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXLoadMeshHierarchyFromXW
@@ -310,7 +310,7 @@ D3DXLoadMeshHierarchyFromXW
     LPD3DXLOADUSERDATA         pUserDataLoader,
     LPD3DXFRAME*               ppFrameHierarchy,
     LPD3DXANIMATIONCONTROLLER* ppAnimController
-    ) ;
+    )
 
 ALIAS: D3DXLoadMeshHierarchyFromX D3DXLoadMeshHierarchyFromXW
 
@@ -325,7 +325,7 @@ D3DXLoadMeshHierarchyFromXInMemory
     LPD3DXLOADUSERDATA         pUserDataLoader,
     LPD3DXFRAME*               ppFrameHierarchy,
     LPD3DXANIMATIONCONTROLLER* ppAnimController
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXSaveMeshHierarchyToFileA
@@ -335,7 +335,7 @@ D3DXSaveMeshHierarchyToFileA
     D3DXFRAME*                pFrameRoot,
     LPD3DXANIMATIONCONTROLLER pAnimcontroller,
     LPD3DXSAVEUSERDATA        pUserDataSaver
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXSaveMeshHierarchyToFileW
@@ -345,7 +345,7 @@ D3DXSaveMeshHierarchyToFileW
     D3DXFRAME*                pFrameRoot,
     LPD3DXANIMATIONCONTROLLER pAnimController,
     LPD3DXSAVEUSERDATA        pUserDataSaver
-    ) ;
+    )
 
 ALIAS: D3DXSaveMeshHierarchyToFile D3DXSaveMeshHierarchyToFileW
 
@@ -354,34 +354,34 @@ D3DXFrameDestroy
     (
     LPD3DXFRAME             pFrameRoot,
     LPD3DXALLOCATEHIERARCHY pAlloc
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXFrameAppendChild
     (
     LPD3DXFRAME pFrameParent,
     D3DXFRAME*  pFrameChild
-    ) ;
+    )
 
 FUNCTION: LPD3DXFRAME
 D3DXFrameFind
     (
     D3DXFRAME* pFrameRoot,
     LPCSTR     Name
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXFrameRegisterNamedMatrices
     (
     LPD3DXFRAME               pFrameRoot,
     LPD3DXANIMATIONCONTROLLER pAnimController
-    ) ;
+    )
 
 FUNCTION: UINT
 D3DXFrameNumNamedMatrices
     (
     D3DXFRAME* pFrameRoot
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXFrameCalculateBoundingSphere
@@ -389,7 +389,7 @@ D3DXFrameCalculateBoundingSphere
     D3DXFRAME*    pFrameRoot,
     LPD3DXVECTOR3 pObjectCenter,
     FLOAT*        pObjectRadius
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXCreateKeyframedAnimationSet
@@ -401,7 +401,7 @@ D3DXCreateKeyframedAnimationSet
     UINT                         NumCallbackKeys,
     D3DXKEY_CALLBACK*            pCallbackKeys,
     LPD3DXKEYFRAMEDANIMATIONSET* ppAnimationSet
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXCreateCompressedAnimationSet
@@ -413,7 +413,7 @@ D3DXCreateCompressedAnimationSet
     UINT                          NumCallbackKeys,
     D3DXKEY_CALLBACK*             pCallbackKeys,
     LPD3DXCOMPRESSEDANIMATIONSET* ppAnimationSet
-    ) ;
+    )
 
 FUNCTION: HRESULT
 D3DXCreateAnimationController
@@ -423,4 +423,4 @@ D3DXCreateAnimationController
     UINT                       MaxNumTracks,
     UINT                       MaxNumEvents,
     LPD3DXANIMATIONCONTROLLER* ppAnimController
-    ) ;
+    )

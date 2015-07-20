@@ -95,7 +95,7 @@ FUNCTION: HRESULT
         UINT                      VertexCount,
         UINT                      FaceCount,
         UINT                      Options,
-        ID3DX10Mesh**             ppMesh        ) ;
+        ID3DX10Mesh**             ppMesh        )
 
 CONSTANT: D3DX10_MESHOPT_COMPACT            0x01000000
 CONSTANT: D3DX10_MESHOPT_ATTR_SORT          0x02000000
@@ -136,7 +136,7 @@ COM-INTERFACE: ID3DX10SkinInfo IUnknown {420BD604-1C76-4a34-A466-E45D0658A32C}
 TYPEDEF: ID3DX10SkinInfo* LPD3DX10SKININFO
 
 FUNCTION: HRESULT
-    D3DX10CreateSkinInfo ( LPD3DX10SKININFO* ppSkinInfo ) ;
+    D3DX10CreateSkinInfo ( LPD3DX10SKININFO* ppSkinInfo )
 
 STRUCT: D3DX10_ATTRIBUTE_WEIGHTS
     { Position FLOAT    }

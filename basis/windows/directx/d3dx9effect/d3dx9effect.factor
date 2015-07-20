@@ -178,7 +178,7 @@ COM-INTERFACE: ID3DXEffectCompiler ID3DXBaseEffect {51B8A949-1A31-47e6-BEA0-4B30
                             LPD3DXCONSTANTTABLE* ppConstantTable ) ;
 
 FUNCTION: HRESULT
-    D3DXCreateEffectPool ( LPD3DXEFFECTPOOL* ppPool ) ;
+    D3DXCreateEffectPool ( LPD3DXEFFECTPOOL* ppPool )
 
 FUNCTION: HRESULT
     D3DXCreateEffectFromFileA (
@@ -189,7 +189,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectFromFileW (
@@ -200,7 +200,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 ALIAS: D3DXCreateEffectFromFile D3DXCreateEffectFromFileW
 
@@ -214,7 +214,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectFromResourceW (
@@ -226,7 +226,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 ALIAS: D3DXCreateEffectFromResource D3DXCreateEffectFromResourceW
 
@@ -240,7 +240,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectFromFileExA (
@@ -252,7 +252,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectFromFileExW (
@@ -264,7 +264,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 ALIAS: D3DXCreateEffectFromFileEx D3DXCreateEffectFromFileExW
 
@@ -279,7 +279,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectFromResourceExW (
@@ -292,7 +292,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 ALIAS: D3DXCreateEffectFromResourceEx D3DXCreateEffectFromResourceExW
 
@@ -307,7 +307,7 @@ FUNCTION: HRESULT
         DWORD                           Flags,
         LPD3DXEFFECTPOOL                pPool,
         LPD3DXEFFECT*                   ppEffect,
-        LPD3DXBUFFER*                   ppCompilationErrors ) ;
+        LPD3DXBUFFER*                   ppCompilationErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectCompilerFromFileA (
@@ -316,7 +316,7 @@ FUNCTION: HRESULT
         LPD3DXINCLUDE                   pInclude,
         DWORD                           Flags,
         LPD3DXEFFECTCOMPILER*           ppCompiler,
-        LPD3DXBUFFER*                   ppParseErrors ) ;
+        LPD3DXBUFFER*                   ppParseErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectCompilerFromFileW (
@@ -325,7 +325,7 @@ FUNCTION: HRESULT
         LPD3DXINCLUDE                   pInclude,
         DWORD                           Flags,
         LPD3DXEFFECTCOMPILER*           ppCompiler,
-        LPD3DXBUFFER*                   ppParseErrors ) ;
+        LPD3DXBUFFER*                   ppParseErrors )
 
 ALIAS: D3DXCreateEffectCompilerFromFile D3DXCreateEffectCompilerFromFileW
 
@@ -337,7 +337,7 @@ FUNCTION: HRESULT
         LPD3DXINCLUDE                   pInclude,
         DWORD                           Flags,
         LPD3DXEFFECTCOMPILER*           ppCompiler,
-        LPD3DXBUFFER*                   ppParseErrors ) ;
+        LPD3DXBUFFER*                   ppParseErrors )
 
 FUNCTION: HRESULT
     D3DXCreateEffectCompilerFromResourceW (
@@ -347,7 +347,7 @@ FUNCTION: HRESULT
         LPD3DXINCLUDE                   pInclude,
         DWORD                           Flags,
         LPD3DXEFFECTCOMPILER*           ppCompiler,
-        LPD3DXBUFFER*                   ppParseErrors ) ;
+        LPD3DXBUFFER*                   ppParseErrors )
 
 ALIAS: D3DXCreateEffectCompilerFromResource D3DXCreateEffectCompilerFromResourceW
 
@@ -359,10 +359,10 @@ FUNCTION: HRESULT
         LPD3DXINCLUDE                   pInclude,
         DWORD                           Flags,
         LPD3DXEFFECTCOMPILER*           ppCompiler,
-        LPD3DXBUFFER*                   ppParseErrors ) ;
+        LPD3DXBUFFER*                   ppParseErrors )
 
 FUNCTION: HRESULT
     D3DXDisassembleEffect (
         LPD3DXEFFECT pEffect,
         BOOL EnableColorCode,
-        LPD3DXBUFFER* ppDisassembly ) ;
+        LPD3DXBUFFER* ppDisassembly )

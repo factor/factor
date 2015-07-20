@@ -546,21 +546,21 @@ FUNCTION: HRESULT D2D1CreateFactory (
         D2D1_FACTORY_TYPE     factoryType,
         REFIID                riid,
         D2D1_FACTORY_OPTIONS* pFactoryOptions,
-        void**                ppIFactory ) ;
+        void**                ppIFactory )
 
 FUNCTION: void D2D1MakeRotateMatrix (
         FLOAT              angle,
         D2D1_POINT_2F      center,
-        D2D1_MATRIX_3X2_F* matrix ) ;
+        D2D1_MATRIX_3X2_F* matrix )
 
 FUNCTION: void D2D1MakeSkewMatrix (
         FLOAT              angleX,
         FLOAT              angleY,
         D2D1_POINT_2F      center,
-        D2D1_MATRIX_3X2_F* matrix ) ;
+        D2D1_MATRIX_3X2_F* matrix )
 
 FUNCTION: BOOL D2D1IsMatrixInvertible (
-        D2D1_MATRIX_3X2_F* matrix ) ;
+        D2D1_MATRIX_3X2_F* matrix )
 
 FUNCTION: BOOL D2D1InvertMatrix (
-        D2D1_MATRIX_3X2_F* matrix ) ;
+        D2D1_MATRIX_3X2_F* matrix )
