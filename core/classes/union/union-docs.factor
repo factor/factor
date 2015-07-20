@@ -10,7 +10,7 @@ ARTICLE: "unions" "Union classes"
     define-union-class
 }
 "Union classes can be introspected:"
-{ $subsections members }
+{ $subsections class-members }
 "The set of union classes is a class:"
 { $subsections
     union-class
