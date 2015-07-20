@@ -28,7 +28,7 @@ TUPLE: paragraph < aligned-gadget margin wrapped ;
 <PRIVATE
 
 : gadget>word ( gadget -- word )
-    [ ] [ pref-dim first ] [ word-break? ] tri <word> ;
+    [ ] [ pref-dim first ] [ word-break? ] tri <wrapping-word> ;
 
 : line-width ( words -- n )
     [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
