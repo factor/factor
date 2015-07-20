@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: ascii assocs fry io.encodings.ascii io.files kernel math
-math.statistics memoize sequences sequences.extras sorting ;
-FROM: sets => members ;
+math.statistics memoize sequences sequences.extras sorting sets ;
 IN: anagrams
 
 : make-anagram-hash ( strings -- assoc )

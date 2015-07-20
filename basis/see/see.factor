@@ -9,8 +9,6 @@ prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets slots sorting strings summary
 words words.symbol words.constant words.alias vocabs ;
 FROM: namespaces => set ;
-FROM: classes => members ;
-RENAME: members sets => set-members
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -142,17 +140,17 @@ GENERIC: see-class* ( word -- )
 M: union-class see-class*
     <colon \ UNION: pprint-word
     dup pprint-word
-    members pprint-elements pprint-; block> ;
+    class-members pprint-elements pprint-; block> ;
 
 M: intersection-class see-class*
     <colon \ INTERSECTION: pprint-word
     dup pprint-word
-    participants pprint-elements pprint-; block> ;
+    class-participants pprint-elements pprint-; block> ;
 
 M: mixin-class see-class*
     <block \ MIXIN: pprint-word
     dup pprint-word <block
-    dup members [
+    dup class-members [
         hard add-line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
     ] with each block> block> ;
@@ -258,7 +256,7 @@ PRIVATE>
         dup class? [ dup seeing-implementors % ] when
         dup generic? [ dup seeing-methods % ] when
         drop
-    ] { } make set-members ;
+    ] { } make members ;
 
 : see-methods ( word -- )
     methods see-all nl ;

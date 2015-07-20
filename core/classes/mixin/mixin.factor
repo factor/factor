@@ -11,7 +11,7 @@ PREDICATE: mixin-class < union-class "mixin" word-prop ;
 M: mixin-class normalize-class ;
 
 M: mixin-class (classes-intersect?)
-    members [ classes-intersect? ] with any? ;
+    class-members [ classes-intersect? ] with any? ;
 
 M: mixin-class reset-class
     [ call-next-method ] [ "mixin" remove-word-prop ] bi ;
@@ -34,10 +34,10 @@ ERROR: check-mixin-class-error class ;
     2tri ;
 
 : if-mixin-member? ( class mixin true false -- )
-    [ check-mixin-class 2dup members member-eq? ] 2dip if ; inline
+    [ check-mixin-class 2dup class-members member-eq? ] 2dip if ; inline
 
 : change-mixin-class ( class mixin quot -- )
-    [ [ members swap bootstrap-word ] dip call ] [ drop ] 2bi
+    [ [ class-members swap bootstrap-word ] dip call ] [ drop ] 2bi
     swap redefine-mixin-class ; inline
 
 : (add-mixin-instance) ( class mixin -- )

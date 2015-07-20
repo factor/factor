@@ -3,7 +3,6 @@
 USING: accessors arrays assocs classes combinators.smart
 continuations destructors fry io io.styles kernel namespaces
 prettyprint sequences sets sorting ;
-FROM: sets => members ;
 IN: tools.destructors
 
 <PRIVATE

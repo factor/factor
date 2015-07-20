@@ -115,11 +115,11 @@ M: predicate reset-word
 : subclass-of? ( class superclass -- ? )
     swap superclass-of? ;
 
-: members ( class -- seq )
+: class-members ( class -- seq )
     #! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;
 
-: participants ( class -- seq )
+: class-participants ( class -- seq )
     #! Output f for non-classes to work with algebra code
     dup class? [ "participants" word-prop ] [ drop f ] if ;
 
@@ -128,8 +128,8 @@ GENERIC: implementors ( class/classes -- seq )
 ! update-map
 : class-uses ( class -- seq )
     [
-        [ members % ]
-        [ participants % ]
+        [ class-members % ]
+        [ class-participants % ]
         [ superclass [ , ] when* ]
         tri
     ] { } make ;

@@ -2,9 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces sequences
-sorting vectors words ;
-FROM: classes => members ;
-RENAME: members sets => set-members
+sets sorting vectors words ;
 IN: classes.algebra
 
 DEFER: sort-classes
@@ -28,7 +26,7 @@ ERROR: not-a-classoid object ;
 
 : <anonymous-union> ( members -- classoid )
     check-classoids
-    [ null eq? ] reject set-members
+    [ null eq? ] reject members
     dup length 1 = [ first ] [ sort-classes f like anonymous-union boa ] if ;
 
 M: anonymous-union rank-class drop 6 ;
@@ -39,7 +37,7 @@ INSTANCE: anonymous-intersection classoid
 
 : <anonymous-intersection> ( participants -- classoid )
     check-classoids
-    set-members dup length 1 =
+    members dup length 1 =
     [ first ] [ sort-classes f like anonymous-intersection boa ] if ;
 
 M: anonymous-intersection rank-class drop 4 ;
@@ -140,7 +138,7 @@ SYMBOL: +incomparable+
     [ members>> ] dip [ class<= ] curry all? ;
 
 : right-union<= ( first second -- ? )
-    members [ class<= ] with any? ;
+    class-members [ class<= ] with any? ;
 
 : right-anonymous-union<= ( first second -- ? )
     members>> [ class<= ] with any? ;
@@ -179,8 +177,8 @@ PREDICATE: nontrivial-anonymous-complement < anonymous-complement
     class>> {
         [ anonymous-union? ]
         [ anonymous-intersection? ]
-        [ members ]
-        [ participants ]
+        [ class-members ]
+        [ class-participants ]
     } cleave or or or ;
 
 PREDICATE: empty-union < anonymous-union members>> empty? ;
@@ -199,7 +197,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ over anonymous-union? ] [ left-anonymous-union<= ] }
                 { [ over nontrivial-anonymous-intersection? ] [ left-anonymous-intersection<= ] }
                 { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
-                { [ dup members ] [ right-union<= ] }
+                { [ dup class-members ] [ right-union<= ] }
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }

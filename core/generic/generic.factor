@@ -4,7 +4,6 @@ USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
 combinators definitions kernel make namespaces sequences sets
 words ;
-FROM: sets => members ;
 IN: generic
 
 ! Method combination protocol

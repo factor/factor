@@ -10,7 +10,7 @@ namespaces quotations sequences sequences.generalizations
 sequences.private sets sets.private stack-checker
 stack-checker.dependencies vectors words ;
 FROM: math => float ;
-FROM: sets => set members ;
+FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [

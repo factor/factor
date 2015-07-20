@@ -4,7 +4,6 @@ USING: accessors classes.maybe combinators
 combinators.short-circuit continuations hashtables io io.styles
 kernel make math namespaces prettyprint.config sequences sets
 splitting strings vocabs vocabs.parser words ;
-FROM: sets => members ;
 FROM: namespaces => set ;
 IN: prettyprint.sections
 
