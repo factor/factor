@@ -35,14 +35,14 @@ PRIVATE>
 
 <PRIVATE
 
-TUPLE: cell pref-dim baseline cap-height ;
+TUPLE: grid-cell pref-dim baseline cap-height ;
 
-: <cell> ( gadget -- cell )
-    [ pref-dim ] [ baseline ] [ cap-height ] tri cell boa ;
+: <grid-cell> ( gadget -- cell )
+    [ pref-dim ] [ baseline ] [ cap-height ] tri grid-cell boa ;
 
-M: cell baseline baseline>> ;
+M: grid-cell baseline baseline>> ;
 
-M: cell cap-height cap-height>> ;
+M: grid-cell cap-height cap-height>> ;
 
 TUPLE: grid-layout-tuple grid gap fill? row-heights column-widths ;
 
@@ -61,7 +61,7 @@ TUPLE: grid-layout-tuple grid gap fill? row-heights column-widths ;
 : <grid-layout> ( grid -- grid-layout )
     \ grid-layout-tuple new
         swap
-        [ grid>> [ [ <cell> ] map ] map >>grid ]
+        [ grid>> [ [ <grid-cell> ] map ] map >>grid ]
         [ fill?>> >>fill? ]
         [ gap>> >>gap ]
         tri
