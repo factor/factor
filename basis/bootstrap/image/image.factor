@@ -144,7 +144,7 @@ SYMBOL: sub-primitives
     sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
-SYMBOL: image
+SYMBOL: bootstrapping-image
 
 ! Image output format
 SYMBOL: big-endian
@@ -215,7 +215,7 @@ SPECIAL-OBJECT: undefined-quot 65
 : special-object-offset ( symbol -- n )
     special-objects get at header-size + ;
 
-: emit ( cell -- ) image get push ;
+: emit ( cell -- ) bootstrapping-image get push ;
 
 : emit-64 ( cell -- )
     bootstrap-cell 8 = [
@@ -224,12 +224,12 @@ SPECIAL-OBJECT: undefined-quot 65
         d>w/w big-endian get [ swap ] unless emit emit
     ] if ;
 
-: emit-seq ( seq -- ) image get push-all ;
+: emit-seq ( seq -- ) bootstrapping-image get push-all ;
 
-: fixup ( value offset -- ) image get set-nth ;
+: fixup ( value offset -- ) bootstrapping-image get set-nth ;
 
 : heap-size ( -- size )
-    image get length header-size - special-objects-size -
+    bootstrapping-image get length header-size - special-objects-size -
     bootstrap-cells ;
 
 : here ( -- size ) heap-size data-base + ;
@@ -370,7 +370,7 @@ ERROR: not-in-image vocabulary word ;
     [ ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?if ;
 
 : fixup-words ( -- )
-    image get [ dup word? [ fixup-word ] when ] map! drop ;
+    bootstrapping-image get [ dup word? [ fixup-word ] when ] map! drop ;
 
 M: word ' ;
 
@@ -549,7 +549,7 @@ M: quotation '
     ] with-compilation-unit ;
 
 : build-image ( -- image )
-    600,000 <vector> image set
+    600,000 <vector> bootstrapping-image set
     60,000 <hashtable> objects set
     emit-image-header t, 0, 1, -1,
     "Building generic words..." print flush
@@ -566,10 +566,10 @@ M: quotation '
     fixup-words
     "Performing header fixups..." print flush
     fixup-header
-    "Image length: " write image get length .
+    "Image length: " write bootstrapping-image get length .
     "Object cache size: " write objects get assoc-size .
     \ last-word global delete-at
-    image get ;
+    bootstrapping-image get ;
 
 ! Image output
 
