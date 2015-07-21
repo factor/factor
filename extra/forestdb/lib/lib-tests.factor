@@ -6,7 +6,7 @@ combinators.short-circuit constructors continuations destructors
 forestdb.ffi forestdb.utils fry generalizations io.directories
 io.encodings.string io.encodings.utf8 io.files.temp io.pathnames
 kernel layouts libc make math math.parser math.ranges multiline
-namespaces sequences system tools.test nested-comments ;
+namespaces sequences system tools.test ;
 IN: forestdb.lib
 
 { [ cell-bits 32 = ] [ os windows? ] } 0&& [
