@@ -23,7 +23,7 @@ CONSTANT: title-bar-gradient { COLOR: white COLOR: grey90 }
     f track-add ;
 
 : add-content ( content track -- track )
-    swap white-interior 1 track-add ;
+    swap 1 track-add ;
 
 : add-color-line ( track -- track )
     <shelf> { 0 1.5 } <border> 
