@@ -32,12 +32,12 @@ M: stack-entry-renderer row-value drop object>> ;
         t >>single-click? ;
 
 : <stack-display> ( model quot title -- gadget )
-    [ '[ dup _ when ] <arrow> <stack-table> <scroller> ] dip
+    [ '[ dup _ when ] <arrow> <stack-table> margins <scroller> white-interior ] dip
     <labeled-gadget> ;
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
-    <pane-control> t >>scrolls? <scroller>
+    <pane-control> t >>scrolls? margins <scroller> white-interior
     "Call stack" <labeled-gadget> ;
 
 : <datastack-display> ( model -- gadget )
