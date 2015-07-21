@@ -304,9 +304,8 @@ PRIVATE>
     [ 0.0 0.0 ] 2dip [ 2dip rot kahan+ ] curry
     [ -rot ] prepose each nip ; inline
 
-SYNTAX: .. dup pop scan-object [a,b) suffix! ;
-
-SYNTAX: ... dup pop scan-object [a,b] suffix! ;
+! SYNTAX: .. dup pop scan-object [a,b) suffix! ;
+! SYNTAX: ... dup pop scan-object [a,b] suffix! ;
 
 GENERIC: sum-squares ( seq -- n )
 M: object sum-squares [ sq ] map-sum ;
