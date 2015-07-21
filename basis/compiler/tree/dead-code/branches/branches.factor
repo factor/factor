@@ -12,7 +12,7 @@ M: #if mark-live-values* look-at-inputs ;
 M: #dispatch mark-live-values* look-at-inputs ;
 
 : look-at-phi ( value outputs inputs -- )
-    [ index ] dip swap dup [ <column> look-at-values ] [ 2drop ] if ;
+    [ index ] dip swap [ <column> look-at-values ] [ drop ] if* ;
 
 M: #phi compute-live-values*
     #! If any of the outputs of a #phi are live, then the

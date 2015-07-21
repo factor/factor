@@ -12,7 +12,7 @@ IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
     [ mouse-location ] [ drop window ] 2bi
-    dup [ move-hand fire-motion yield ] [ 2drop ] if ;
+    [ move-hand fire-motion yield ] [ drop ] if* ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -68,7 +68,7 @@ CONSTANT: key-codes
     [ event-modifiers ] [ key-code ] bi ;
 
 : send-key-event ( view gesture -- )
-    swap window dup [ propagate-key-gesture ] [ 2drop ] if ;
+    swap window [ propagate-key-gesture ] [ drop ] if* ;
 
 : interpret-key-event ( view event -- )
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
@@ -89,21 +89,21 @@ CONSTANT: key-codes
     [ mouse-location ]
     [ drop window ]
     2tri
-    dup [ send-button-down ] [ 3drop ] if ;
+    [ send-button-down ] [ 2drop ] if* ;
 
 : send-button-up$ ( view event -- )
     [ nip mouse-event>gesture <button-up> ]
     [ mouse-location ]
     [ drop window ]
     2tri
-    dup [ send-button-up ] [ 3drop ] if ;
+    [ send-button-up ] [ 2drop ] if* ;
 
 : send-scroll$ ( view event -- )
     [ nip [ -> deltaX ] [ -> deltaY ] bi [ neg ] bi@ 2array ]
     [ mouse-location ]
     [ drop window ]
     2tri
-    dup [ send-scroll ] [ 3drop ] if ;
+    [ send-scroll ] [ 2drop ] if* ;
 
 : send-action$ ( view event gesture -- )
     [ drop window ] dip over [ send-action ] [ 2drop ] if ;

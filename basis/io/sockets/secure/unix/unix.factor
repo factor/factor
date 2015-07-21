@@ -47,7 +47,7 @@ M: secure (accept)
 
 : (shutdown) ( handle -- )
     dup dup handle>> SSL_shutdown check-shutdown-response
-    dup [ dupd wait-for-fd (shutdown) ] [ 2drop ] if ;
+    [ dupd wait-for-fd (shutdown) ] [ drop ] if* ;
 
 M: ssl-handle shutdown
     dup connected>> [

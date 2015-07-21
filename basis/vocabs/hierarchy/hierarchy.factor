@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit fry
 io.directories io.files io.files.types io.pathnames kernel make
-memoize namespaces sequences sorting splitting vocabs sets
+memoize namespaces sequences sets sorting splitting vocabs
 vocabs.loader vocabs.metadata ;
 IN: vocabs.hierarchy
 
@@ -153,6 +153,8 @@ PRIVATE>
 : load-all ( -- )
     "" load ;
 
-MEMO: all-tags ( -- seq ) [ vocab-tags ] collect-vocabs ;
+MEMO: all-tags ( -- seq )
+    [ vocab-tags ] collect-vocabs ;
 
-MEMO: all-authors ( -- seq ) [ vocab-authors ] collect-vocabs ;
+MEMO: all-authors ( -- seq )
+    [ vocab-authors ] collect-vocabs ;

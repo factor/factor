@@ -132,7 +132,7 @@ SYMBOL: +incomparable+
 <PRIVATE
 
 : superclass<= ( first second -- ? )
-    swap superclass-of dup [ swap class<= ] [ 2drop f ] if ;
+    swap superclass-of [ swap class<= ] [ drop f ] if* ;
 
 : left-anonymous-union<= ( first second -- ? )
     [ members>> ] dip [ class<= ] curry all? ;

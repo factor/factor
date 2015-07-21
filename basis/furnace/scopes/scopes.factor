@@ -20,7 +20,7 @@ scope f
     t >>changed? drop ;
 
 : scope-get ( key scope -- value )
-    dup [ namespace>> at ] [ 2drop f ] if ;
+    [ namespace>> at ] [ drop f ] if* ;
 
 : scope-set ( value key scope -- )
     [ namespace>> set-at ] [ scope-changed ] bi ;

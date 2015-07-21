@@ -184,7 +184,7 @@ M: sequence implementors [ implementors ] gather ;
 GENERIC: metaclass-changed ( use class -- )
 
 : ?metaclass-changed ( class usages/f -- )
-    dup [ [ metaclass-changed ] with each ] [ 2drop ] if ;
+    [ [ metaclass-changed ] with each ] [ drop ] if* ;
 
 : check-metaclass ( class metaclass -- usages/f )
     over class? [

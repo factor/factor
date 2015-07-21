@@ -33,7 +33,7 @@ GENERIC: visit-insn ( insn -- )
 
 M: ##copy visit-insn
     [ dst>> ] [ src>> resolve ] bi
-    dup [ record-copy ] [ 2drop ] if ;
+    [ record-copy ] [ drop ] if* ;
 
 : useless-phi ( dst inputs -- ) first record-copy ;
 

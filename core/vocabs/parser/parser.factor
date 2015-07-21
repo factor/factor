@@ -201,7 +201,7 @@ TUPLE: ambiguous-use-error words ;
 PRIVATE>
 
 : search-manifest ( name manifest -- word/f )
-    2dup qualified-search dup [ 2nip ] [ drop vocab-search ] if ;
+    2dup qualified-search [ 2nip ] [ vocab-search ] if* ;
 
 : search ( name -- word/f )
     manifest get search-manifest ;

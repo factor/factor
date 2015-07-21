@@ -56,9 +56,9 @@ M: vocab-completion (word-at-caret)
     drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
 
 M: word-completion (word-at-caret)
-    manifest>> dup [
+    manifest>> [
         '[ _ _ search-manifest ] [ drop f ] recover
-    ] [ 2drop f ] if ;
+    ] [ drop f ] if* ;
 
 M: char-completion (word-at-caret) 2drop f ;
 
@@ -368,7 +368,7 @@ M: interactor stream-read-quot
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
     [ nip ] [ gesture>operation ] 2bi
-    dup [ invoke-command f ] [ 2drop t ] if ;
+    [ invoke-command f ] [ drop t ] if* ;
 
 M: interactor handle-gesture
     {
