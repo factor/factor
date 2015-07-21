@@ -203,14 +203,11 @@ PRIVATE>
     {
         { "R/ "  "/"  }
         { "R! "  "!"  }
-        { "R\" " "\"" }
         { "R# "  "#"  }
         { "R' "  "'"  }
         { "R( "  ")"  }
         { "R@ "  "@"  }
-        { "R[ "  "]"  }
         { "R` "  "`"  }
-        { "R{ "  "}"  }
         { "R| "  "|"  }
     } swap [ subseq? not nip ] curry assoc-find drop ;
 
@@ -231,15 +228,12 @@ PRIVATE>
 PRIVATE>
 
 SYNTAX: R! CHAR: ! parsing-regexp ;
-SYNTAX: R" CHAR: " parsing-regexp ;
 SYNTAX: R# CHAR: # parsing-regexp ;
 SYNTAX: R' CHAR: ' parsing-regexp ;
 SYNTAX: R( CHAR: ) parsing-regexp ;
 SYNTAX: R/ CHAR: / parsing-regexp ;
 SYNTAX: R@ CHAR: @ parsing-regexp ;
-SYNTAX: R[ CHAR: ] parsing-regexp ;
 SYNTAX: R` CHAR: ` parsing-regexp ;
-SYNTAX: R{ CHAR: } parsing-regexp ;
 SYNTAX: R| CHAR: | parsing-regexp ;
 
 USE: vocabs.loader
