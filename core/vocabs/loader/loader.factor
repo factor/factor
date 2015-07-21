@@ -133,6 +133,9 @@ PRIVATE>
 
 SYMBOL: blacklist
 
+: require-all ( vocabs -- )
+    V{ } clone blacklist [ [ require ] each ] with-variable ;
+
 <PRIVATE
 
 : add-to-blacklist ( error vocab -- )
