@@ -1,6 +1,7 @@
 USING: compiler.cfg.debugger compiler.cfg.instructions
-compiler.codegen.gc-maps compiler.codegen.relocation compiler.cfg.registers
-cpu.architecture cpu.x86.features kernel kernel.private make math math.libm
+compiler.cfg.registers compiler.codegen.gc-maps
+compiler.codegen.relocation cpu.architecture cpu.x86 cpu.x86.assembler
+cpu.x86.features kernel kernel.private layouts make math math.libm
 namespaces sequences system tools.test ;
 IN: cpu.x86.tests
 
@@ -36,4 +37,15 @@ IN: cpu.x86.tests
 { t } [
     [ D 0 %clear ] B{ } make
     cpu x86.32? B{ 199 6 144 18 0 0 } B{ 73 199 6 144 18 0 0 } ? =
+] unit-test
+
+! %prologue
+{ t } [
+    [ 2 cells %prologue ] B{ } make
+    [ pic-tail-reg PUSH ] B{ } make =
+] unit-test
+
+{ t } [
+    [ 8 cells %prologue ] B{ } make
+    [ stack-reg 7 cells SUB ] B{ } make =
 ] unit-test
