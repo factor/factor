@@ -3,7 +3,7 @@
 USING: alien.c-types byte-arrays kernel locals sequences
 windows.advapi32 windows.errors math windows
 windows.kernel32 windows.time accessors alien.data
-nested-comments windows.types classes.struct continuations ;
+windows.types classes.struct continuations ;
 IN: windows.registry
 
 ERROR: open-key-failed key subkey mode error-string ;

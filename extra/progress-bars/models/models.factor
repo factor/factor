@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar fonts fry io io.files io.files.info
-kernel math models models.arrow namespaces nested-comments
-progress-bars threads ui.gadgets.labels ui.gadgets.panes ;
+kernel math models models.arrow namespaces progress-bars
+threads ui.gadgets.labels ui.gadgets.panes ;
 IN: progress-bars.models
 
 SYMBOL: progress-bar
