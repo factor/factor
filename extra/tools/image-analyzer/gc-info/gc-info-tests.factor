@@ -36,17 +36,14 @@ QUALIFIED: opencl
 
 ! Like word>gc-info but uses the compiler
 : word>gc-info-expected ( word -- seq/f )
-    test-regs first dup stack-frame>> stack-frame
-    [ cfg>gc-maps tally-gc-maps ] with-variable ;
+    test-regs first cfg>gc-maps tally-gc-maps ;
 
 : same-gc-info? ( compiler-gc-info gc-info -- ? )
     [ struct-slot-values = ]
     [ [ not ] dip return-address-count>> 0 = and ] 2bi or ;
 
 : base-pointer-groups-expected ( word -- seq )
-    test-regs first dup stack-frame>> stack-frame [
-        cfg>gc-maps [ derived-root-offsets { } like ] { } map-as
-    ] with-variable ;
+    test-regs first cfg>gc-maps [ derived-root-offsets { } like ] { } map-as ;
 
 : base-pointer-groups-decoded ( word -- seq )
     word>gc-maps [
