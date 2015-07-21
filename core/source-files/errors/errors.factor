@@ -68,13 +68,18 @@ GENERIC: errors-changed ( observer -- )
 
 SYMBOL: error-observers
 
-[ V{ } clone error-observers set-global ] "source-files.errors" add-startup-hook
+[
+    V{ } clone error-observers set-global
+] "source-files.errors" add-startup-hook
 
-: add-error-observer ( observer -- ) error-observers get push ;
+: add-error-observer ( observer -- )
+    error-observers get push ;
 
-: remove-error-observer ( observer -- ) error-observers get remove-eq! drop ;
+: remove-error-observer ( observer -- )
+    error-observers get remove-eq! drop ;
 
-: notify-error-observers ( -- ) error-observers get [ errors-changed ] each ;
+: notify-error-observers ( -- )
+    error-observers get [ errors-changed ] each ;
 
 : delete-file-errors ( seq file type -- )
     [

@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators.short-circuit fry
 io.directories io.files io.files.types io.pathnames kernel make
 memoize namespaces sequences sorting splitting vocabs sets
-vocabs.loader vocabs.metadata vocabs.errors ;
+vocabs.loader vocabs.metadata ;
 IN: vocabs.hierarchy
 
 TUPLE: vocab-prefix name ;
@@ -133,22 +133,22 @@ PRIVATE>
 : disk-vocabs-in-root ( root -- seq )
     "" disk-vocabs-in-root/prefix ;
 
-: (load-from-root) ( root prefix -- failures )
+<PRIVATE
+
+: vocabs-to-load ( root prefix -- seq )
     disk-vocabs-in-root/prefix
-    [ don't-load? ] reject no-prefixes
-    require-all ;
+    [ don't-load? ] reject no-prefixes ;
+
+PRIVATE>
 
 : load-from-root ( root prefix -- )
-    (load-from-root) load-failures. ;
+    vocabs-to-load require-all ;
 
 : load-root ( root -- )
     "" load-from-root ;
 
-: (load) ( prefix -- failures )
-    [ vocab-roots get ] dip '[ _ (load-from-root) ] map concat ;
-
 : load ( prefix -- )
-    (load) load-failures. ;
+    [ vocab-roots get ] dip '[ _ load-from-root ] each ;
 
 : load-all ( -- )
     "" load ;
