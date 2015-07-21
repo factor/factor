@@ -1,7 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors classes.tuple compiler.units kernel qw roles sequences
 tools.test ;
-FROM: roles => TUPLE: ;
 IN: roles.tests
 
 ROLE: fork tines ;
@@ -9,11 +8,11 @@ ROLE: spoon bowl ;
 ROLE: instrument tone ;
 ROLE: tuning-fork <{ fork instrument } volume ;
 
-TUPLE: utensil handle ;
+ROLE-TUPLE: utensil handle ;
 
 ! role consumption and tuple inheritance can be mixed
-TUPLE: foon <{ utensil fork spoon } ;
-TUPLE: tuning-spork <{ utensil spoon tuning-fork } ;
+ROLE-TUPLE: foon <{ utensil fork spoon } ;
+ROLE-TUPLE: tuning-spork <{ utensil spoon tuning-fork } ;
 
 ! role class testing
 { t } [ fork role? ] unit-test
@@ -49,7 +48,7 @@ SYMBOL: spong
 [ role-slot-overlap? ] must-fail-with
 
 ! can't try to inherit multiple tuple classes
-TUPLE: tool blade ;
+ROLE-TUPLE: tool blade ;
 SYMBOL: knife
 
 [ knife { utensil tool } { } define-tuple-class-with-roles ]
