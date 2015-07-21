@@ -35,7 +35,7 @@ IN: bloom-filters.tests
 
 ! Should not generate bignum hash codes.  Enhanced double hashing may generate a
 ! lot of hash codes, and it's better to do this earlier than later.
-{ t } [ 10000 iota [ double-hashcodes [ fixnum? ] both? ] map [ ] all? ] unit-test
+{ t } [ 10000 iota [ double-hashcodes [ fixnum? ] both? ] all? ] unit-test
 
 : empty-bloom-filter ( -- bloom-filter )
     0.01 2000 <bloom-filter> ;
