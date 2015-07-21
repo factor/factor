@@ -131,7 +131,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : print-topic ( topic -- )
     >link
     last-element off
-    [ nl article-content print-content nl ] 
+    [ article-content print-content nl ] 
     [ ($blank-line) ($navigation-prev-next) ] 
     bi ;
 
