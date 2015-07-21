@@ -5,7 +5,7 @@ fry kernel lexer namespaces parser ;
 IN: cuda.syntax
 
 SYNTAX: CUDA-LIBRARY:
-    scan-token scan-word scan-token
+    scan-token scan-word scan-object
     '[ _ _ add-cuda-library ]
     [ current-cuda-library set-global ] bi ;
 
