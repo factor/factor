@@ -334,7 +334,7 @@ M: object accept-completion-hook 2drop ;
     parse-lines-interactive ;
 
 : <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger> "Error" <labeled-gadget> ;
+    over compute-restarts [ hide-glass ] <debugger> "Error" <framed-labeled-gadget> ;
 
 : debugger-popup ( interactor error continuation -- )
     [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
