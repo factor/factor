@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings kernel sequences io simple-flat-file sets math
 combinators.short-circuit io.binary arrays assocs namespaces
-locals accessors combinators biassocs byte-arrays parser ;
+locals accessors combinators biassocs byte-arrays parser literals ;
 IN: io.encodings.iso2022
 
 SINGLETON: iso2022
@@ -31,12 +31,12 @@ M: iso2022 <encoder>
 M: iso2022 <decoder>
     make-iso-coder <decoder> ;
 
-<< SYNTAX: ESC 0x16 suffix! ; >>
+CONSTANT: ESC 0x16
 
-CONSTANT: switch-ascii B{ ESC CHAR: ( CHAR: B }
-CONSTANT: switch-jis201 B{ ESC CHAR: ( CHAR: J }
-CONSTANT: switch-jis208 B{ ESC CHAR: $ CHAR: B }
-CONSTANT: switch-jis212 B{ ESC CHAR: $ CHAR: ( CHAR: D }
+CONSTANT: switch-ascii B{ $ ESC CHAR: ( CHAR: B }
+CONSTANT: switch-jis201 B{ $ ESC CHAR: ( CHAR: J }
+CONSTANT: switch-jis208 B{ $ ESC CHAR: $ CHAR: B }
+CONSTANT: switch-jis212 B{ $ ESC CHAR: $ CHAR: ( CHAR: D }
 
 : find-type ( char -- code type )
     {
@@ -90,7 +90,7 @@ M:: iso2022-state encode-char ( char stream encoding -- )
 
 M:: iso2022-state decode-char ( stream encoding -- char )
     stream stream-read1 {
-        { ESC [
+        { $ ESC [
             stream read-escape [
                 encoding type<<
                 stream encoding decode-char
