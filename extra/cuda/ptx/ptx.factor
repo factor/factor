@@ -1,7 +1,6 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors arrays combinators io io.streams.string kernel
 math math.parser roles sequences strings variants words ;
-FROM: roles => TUPLE: ;
 IN: cuda.ptx
 
 UNION: dim integer sequence ;
@@ -33,21 +32,21 @@ VARIANT: ptx-storage-space
     .shared
     .tex ;
 
-TUPLE: ptx-target
+ROLE-TUPLE: ptx-target
     { arch maybe{ ptx-arch } }
     { map_f64_to_f32? boolean }
     { texmode maybe{ ptx-texmode } } ;
 
-TUPLE: ptx
+ROLE-TUPLE: ptx
     { version string }
     { target ptx-target }
     body ;
 
-TUPLE: ptx-struct-definition
+ROLE-TUPLE: ptx-struct-definition
     { name string }
     members ;
 
-TUPLE: ptx-variable
+ROLE-TUPLE: ptx-variable
     { extern? boolean }
     { visible? boolean }
     { align maybe{ integer } }
@@ -58,54 +57,54 @@ TUPLE: ptx-variable
     { dim dim }
     { initializer maybe{ string } } ;
 
-TUPLE: ptx-negation
+ROLE-TUPLE: ptx-negation
     { var string } ;
 
-TUPLE: ptx-vector
+ROLE-TUPLE: ptx-vector
     elements ;
 
-TUPLE: ptx-element
+ROLE-TUPLE: ptx-element
     { var string }
     { index integer } ;
 
 UNION: ptx-var
     string ptx-element ;
 
-TUPLE: ptx-indirect
+ROLE-TUPLE: ptx-indirect
     { base ptx-var }
     { offset integer } ;
 
 UNION: ptx-operand
     integer float ptx-var ptx-negation ptx-vector ptx-indirect ;
 
-TUPLE: ptx-instruction
+ROLE-TUPLE: ptx-instruction
     { label maybe{ string } }
     { predicate maybe{ ptx-operand } } ;
 
-TUPLE: ptx-entry
+ROLE-TUPLE: ptx-entry
     { name string }
     params
     directives
     body ;
 
-TUPLE: ptx-func < ptx-entry
+ROLE-TUPLE: ptx-func < ptx-entry
     { return maybe{ ptx-variable } } ;
 
-TUPLE: ptx-directive ;
+ROLE-TUPLE: ptx-directive ;
 
-TUPLE: .file         < ptx-directive
+ROLE-TUPLE: .file         < ptx-directive
     { info string } ;
-TUPLE: .loc          < ptx-directive
+ROLE-TUPLE: .loc          < ptx-directive
     { info string } ;
-TUPLE: .maxnctapersm < ptx-directive
+ROLE-TUPLE: .maxnctapersm < ptx-directive
     { ncta integer } ;
-TUPLE: .minnctapersm < ptx-directive
+ROLE-TUPLE: .minnctapersm < ptx-directive
     { ncta integer } ;
-TUPLE: .maxnreg      < ptx-directive
+ROLE-TUPLE: .maxnreg      < ptx-directive
     { n integer } ;
-TUPLE: .maxntid      < ptx-directive
+ROLE-TUPLE: .maxntid      < ptx-directive
     { dim dim } ;
-TUPLE: .pragma       < ptx-directive
+ROLE-TUPLE: .pragma       < ptx-directive
     { pragma string } ;
 
 VARIANT: ptx-float-rounding-mode
@@ -116,39 +115,39 @@ VARIANT: ptx-int-rounding-mode
 UNION: ptx-rounding-mode
     ptx-float-rounding-mode ptx-int-rounding-mode ;
 
-TUPLE: ptx-typed-instruction < ptx-instruction
+ROLE-TUPLE: ptx-typed-instruction < ptx-instruction
     { type ptx-type }
     { dest ptx-operand } ;
 
-TUPLE: ptx-2op-instruction < ptx-typed-instruction
+ROLE-TUPLE: ptx-2op-instruction < ptx-typed-instruction
     { a ptx-operand } ;
 
-TUPLE: ptx-3op-instruction < ptx-typed-instruction
+ROLE-TUPLE: ptx-3op-instruction < ptx-typed-instruction
     { a ptx-operand }
     { b ptx-operand } ;
 
-TUPLE: ptx-4op-instruction < ptx-typed-instruction
+ROLE-TUPLE: ptx-4op-instruction < ptx-typed-instruction
     { a ptx-operand }
     { b ptx-operand }
     { c ptx-operand } ;
 
-TUPLE: ptx-5op-instruction < ptx-typed-instruction
+ROLE-TUPLE: ptx-5op-instruction < ptx-typed-instruction
     { a ptx-operand }
     { b ptx-operand }
     { c ptx-operand }
     { d ptx-operand } ;
 
-TUPLE: ptx-addsub-instruction < ptx-3op-instruction
+ROLE-TUPLE: ptx-addsub-instruction < ptx-3op-instruction
     { sat? boolean }
     { cc? boolean } ;
 
 VARIANT: ptx-mul-mode
     .wide ;
 
-TUPLE: ptx-mul-instruction < ptx-3op-instruction
+ROLE-TUPLE: ptx-mul-instruction < ptx-3op-instruction
     { mode maybe{ ptx-mul-mode } } ;
 
-TUPLE: ptx-mad-instruction < ptx-4op-instruction
+ROLE-TUPLE: ptx-mad-instruction < ptx-4op-instruction
     { mode maybe{ ptx-mul-mode } }
     { sat? boolean } ;
 
@@ -181,7 +180,7 @@ INSTANCE: .lo ptx-cmp-op
 INSTANCE: .hi ptx-mul-mode
 INSTANCE: .hi ptx-cmp-op
 
-TUPLE: ptx-set-instruction < ptx-3op-instruction
+ROLE-TUPLE: ptx-set-instruction < ptx-3op-instruction
     { cmp-op ptx-cmp-op }
     { bool-op maybe{ ptx-op } }
     { c maybe{ ptx-operand } }
@@ -191,7 +190,7 @@ VARIANT: ptx-cache-op
     .ca .cg .cs .lu .cv
     .wb .wt ;
 
-TUPLE: ptx-ldst-instruction < ptx-2op-instruction
+ROLE-TUPLE: ptx-ldst-instruction < ptx-2op-instruction
     { volatile? boolean }
     { storage-space maybe{ ptx-storage-space } }
     { cache-op maybe{ ptx-cache-op } } ;
@@ -199,7 +198,7 @@ TUPLE: ptx-ldst-instruction < ptx-2op-instruction
 VARIANT: ptx-cache-level
     .L1 .L2 ;
 
-TUPLE: ptx-branch-instruction < ptx-instruction
+ROLE-TUPLE: ptx-branch-instruction < ptx-instruction
     { target string }
     { uni? boolean } ;
 
@@ -209,127 +208,127 @@ VARIANT: ptx-membar-level
 VARIANT: ptx-vote-mode
     .all .any .uni .ballot ;
 
-TUPLE: ptx-instruction-not-supported-yet < ptx-instruction ;
+ROLE-TUPLE: ptx-instruction-not-supported-yet < ptx-instruction ;
 
-TUPLE: abs       <{ ptx-2op-instruction ptx-float-ftz } ;
-TUPLE: add       <{ ptx-addsub-instruction ptx-float-env } ;
-TUPLE: addc      < ptx-addsub-instruction ;
-TUPLE: and       < ptx-3op-instruction ;
-TUPLE: atom      < ptx-3op-instruction
+ROLE-TUPLE: abs       <{ ptx-2op-instruction ptx-float-ftz } ;
+ROLE-TUPLE: add       <{ ptx-addsub-instruction ptx-float-env } ;
+ROLE-TUPLE: addc      < ptx-addsub-instruction ;
+ROLE-TUPLE: and       < ptx-3op-instruction ;
+ROLE-TUPLE: atom      < ptx-3op-instruction
     { storage-space maybe{ ptx-storage-space } }
     { op ptx-op }
     { c maybe{ ptx-operand } } ;
-TUPLE: bar.arrive < ptx-instruction
+ROLE-TUPLE: bar.arrive < ptx-instruction
     { a ptx-operand }
     { b ptx-operand } ;
-TUPLE: bar.red   < ptx-2op-instruction
+ROLE-TUPLE: bar.red   < ptx-2op-instruction
     { op ptx-op }
     { b maybe{ ptx-operand } }
     { c ptx-operand } ;
-TUPLE: bar.sync  < ptx-instruction
+ROLE-TUPLE: bar.sync  < ptx-instruction
     { a ptx-operand }
     { b maybe{ ptx-operand } } ;
-TUPLE: bfe       < ptx-4op-instruction ;
-TUPLE: bfi       < ptx-5op-instruction ;
-TUPLE: bfind     < ptx-2op-instruction
+ROLE-TUPLE: bfe       < ptx-4op-instruction ;
+ROLE-TUPLE: bfi       < ptx-5op-instruction ;
+ROLE-TUPLE: bfind     < ptx-2op-instruction
     { shiftamt? boolean } ;
-TUPLE: bra       < ptx-branch-instruction ;
-TUPLE: brev      < ptx-2op-instruction ;
-TUPLE: brkpt     < ptx-instruction ;
-TUPLE: call      < ptx-branch-instruction
+ROLE-TUPLE: bra       < ptx-branch-instruction ;
+ROLE-TUPLE: brev      < ptx-2op-instruction ;
+ROLE-TUPLE: brkpt     < ptx-instruction ;
+ROLE-TUPLE: call      < ptx-branch-instruction
     { return maybe{ ptx-operand } }
     params ;
-TUPLE: clz       < ptx-2op-instruction ;
-TUPLE: cnot      < ptx-2op-instruction ;
-TUPLE: copysign  < ptx-3op-instruction ;
-TUPLE: cos       <{ ptx-2op-instruction ptx-float-env } ;
-TUPLE: cvt       < ptx-2op-instruction
+ROLE-TUPLE: clz       < ptx-2op-instruction ;
+ROLE-TUPLE: cnot      < ptx-2op-instruction ;
+ROLE-TUPLE: copysign  < ptx-3op-instruction ;
+ROLE-TUPLE: cos       <{ ptx-2op-instruction ptx-float-env } ;
+ROLE-TUPLE: cvt       < ptx-2op-instruction
     { round maybe{ ptx-rounding-mode } }
     { ftz? boolean }
     { sat? boolean }
     { dest-type ptx-type } ;
-TUPLE: cvta      < ptx-2op-instruction
+ROLE-TUPLE: cvta      < ptx-2op-instruction
     { to? boolean }
     { storage-space maybe{ ptx-storage-space } } ;
-TUPLE: div       <{ ptx-3op-instruction ptx-float-env } ;
-TUPLE: ex2       <{ ptx-2op-instruction ptx-float-env } ;
-TUPLE: exit      < ptx-instruction ;
-TUPLE: fma       <{ ptx-mad-instruction ptx-float-env } ;
-TUPLE: isspacep  < ptx-instruction
+ROLE-TUPLE: div       <{ ptx-3op-instruction ptx-float-env } ;
+ROLE-TUPLE: ex2       <{ ptx-2op-instruction ptx-float-env } ;
+ROLE-TUPLE: exit      < ptx-instruction ;
+ROLE-TUPLE: fma       <{ ptx-mad-instruction ptx-float-env } ;
+ROLE-TUPLE: isspacep  < ptx-instruction
     { storage-space ptx-storage-space }
     { dest ptx-operand }
     { a ptx-operand } ;
-TUPLE: ld        < ptx-ldst-instruction ;
-TUPLE: ldu       < ptx-ldst-instruction ;
-TUPLE: lg2       <{ ptx-2op-instruction ptx-float-env } ;
-TUPLE: mad       <{ ptx-mad-instruction ptx-float-env } ;
-TUPLE: mad24     < ptx-mad-instruction ;
-TUPLE: max       <{ ptx-3op-instruction ptx-float-ftz } ;
-TUPLE: membar    < ptx-instruction
+ROLE-TUPLE: ld        < ptx-ldst-instruction ;
+ROLE-TUPLE: ldu       < ptx-ldst-instruction ;
+ROLE-TUPLE: lg2       <{ ptx-2op-instruction ptx-float-env } ;
+ROLE-TUPLE: mad       <{ ptx-mad-instruction ptx-float-env } ;
+ROLE-TUPLE: mad24     < ptx-mad-instruction ;
+ROLE-TUPLE: max       <{ ptx-3op-instruction ptx-float-ftz } ;
+ROLE-TUPLE: membar    < ptx-instruction
     { level ptx-membar-level } ;
-TUPLE: min       <{ ptx-3op-instruction ptx-float-ftz } ;
-TUPLE: mov       < ptx-2op-instruction ;
-TUPLE: mul       <{ ptx-mul-instruction ptx-float-env } ;
-TUPLE: mul24     < ptx-mul-instruction ;
-TUPLE: neg       <{ ptx-2op-instruction ptx-float-ftz } ;
-TUPLE: not       < ptx-2op-instruction ;
-TUPLE: or        < ptx-3op-instruction ;
-TUPLE: pmevent   < ptx-instruction
+ROLE-TUPLE: min       <{ ptx-3op-instruction ptx-float-ftz } ;
+ROLE-TUPLE: mov       < ptx-2op-instruction ;
+ROLE-TUPLE: mul       <{ ptx-mul-instruction ptx-float-env } ;
+ROLE-TUPLE: mul24     < ptx-mul-instruction ;
+ROLE-TUPLE: neg       <{ ptx-2op-instruction ptx-float-ftz } ;
+ROLE-TUPLE: not       < ptx-2op-instruction ;
+ROLE-TUPLE: or        < ptx-3op-instruction ;
+ROLE-TUPLE: pmevent   < ptx-instruction
     { a ptx-operand } ;
-TUPLE: popc      < ptx-2op-instruction ;
-TUPLE: prefetch  < ptx-instruction
+ROLE-TUPLE: popc      < ptx-2op-instruction ;
+ROLE-TUPLE: prefetch  < ptx-instruction
     { a ptx-operand }
     { storage-space maybe{ ptx-storage-space } }
     { level ptx-cache-level } ;
-TUPLE: prefetchu < ptx-instruction
+ROLE-TUPLE: prefetchu < ptx-instruction
     { a ptx-operand }
     { level ptx-cache-level } ;
-TUPLE: prmt      < ptx-4op-instruction
+ROLE-TUPLE: prmt      < ptx-4op-instruction
     { mode maybe{ ptx-prmt-mode } } ;
-TUPLE: rcp       <{ ptx-2op-instruction ptx-float-env } ;
-TUPLE: red       < ptx-2op-instruction
+ROLE-TUPLE: rcp       <{ ptx-2op-instruction ptx-float-env } ;
+ROLE-TUPLE: red       < ptx-2op-instruction
     { storage-space maybe{ ptx-storage-space } }
     { op ptx-op } ;
-TUPLE: rem       < ptx-3op-instruction ;
-TUPLE: ret       < ptx-instruction ;
-TUPLE: rsqrt     <{ ptx-2op-instruction ptx-float-env } ;
-TUPLE: sad       < ptx-4op-instruction ;
-TUPLE: selp      < ptx-4op-instruction ;
-TUPLE: set       < ptx-set-instruction
+ROLE-TUPLE: rem       < ptx-3op-instruction ;
+ROLE-TUPLE: ret       < ptx-instruction ;
+ROLE-TUPLE: rsqrt     <{ ptx-2op-instruction ptx-float-env } ;
+ROLE-TUPLE: sad       < ptx-4op-instruction ;
+ROLE-TUPLE: selp      < ptx-4op-instruction ;
+ROLE-TUPLE: set       < ptx-set-instruction
     { dest-type ptx-type } ;
-TUPLE: setp      < ptx-set-instruction
+ROLE-TUPLE: setp      < ptx-set-instruction
     { |dest maybe{ ptx-operand } } ;
-TUPLE: shl       < ptx-3op-instruction ;
-TUPLE: shr       < ptx-3op-instruction ;
-TUPLE: sin       <{ ptx-2op-instruction ptx-float-env } ;
-TUPLE: slct      < ptx-4op-instruction
+ROLE-TUPLE: shl       < ptx-3op-instruction ;
+ROLE-TUPLE: shr       < ptx-3op-instruction ;
+ROLE-TUPLE: sin       <{ ptx-2op-instruction ptx-float-env } ;
+ROLE-TUPLE: slct      < ptx-4op-instruction
     { dest-type ptx-type }
     { ftz? boolean } ;
-TUPLE: sqrt      <{ ptx-2op-instruction ptx-float-env } ;
-TUPLE: st        < ptx-ldst-instruction ;
-TUPLE: sub       <{ ptx-addsub-instruction ptx-float-env } ;
-TUPLE: subc      < ptx-addsub-instruction  ;
-TUPLE: suld      < ptx-instruction-not-supported-yet ;
-TUPLE: sured     < ptx-instruction-not-supported-yet ;
-TUPLE: sust      < ptx-instruction-not-supported-yet ;
-TUPLE: suq       < ptx-instruction-not-supported-yet ;
-TUPLE: testp     < ptx-2op-instruction
+ROLE-TUPLE: sqrt      <{ ptx-2op-instruction ptx-float-env } ;
+ROLE-TUPLE: st        < ptx-ldst-instruction ;
+ROLE-TUPLE: sub       <{ ptx-addsub-instruction ptx-float-env } ;
+ROLE-TUPLE: subc      < ptx-addsub-instruction  ;
+ROLE-TUPLE: suld      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: sured     < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: sust      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: suq       < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: testp     < ptx-2op-instruction
     { op ptx-testp-op } ;
-TUPLE: tex       < ptx-instruction-not-supported-yet ;
-TUPLE: txq       < ptx-instruction-not-supported-yet ;
-TUPLE: trap      < ptx-instruction ;
-TUPLE: vabsdiff  < ptx-instruction-not-supported-yet ;
-TUPLE: vadd      < ptx-instruction-not-supported-yet ;
-TUPLE: vmad      < ptx-instruction-not-supported-yet ;
-TUPLE: vmax      < ptx-instruction-not-supported-yet ;
-TUPLE: vmin      < ptx-instruction-not-supported-yet ;
-TUPLE: vset      < ptx-instruction-not-supported-yet ;
-TUPLE: vshl      < ptx-instruction-not-supported-yet ;
-TUPLE: vshr      < ptx-instruction-not-supported-yet ;
-TUPLE: vsub      < ptx-instruction-not-supported-yet ;
-TUPLE: vote      < ptx-2op-instruction
+ROLE-TUPLE: tex       < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: txq       < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: trap      < ptx-instruction ;
+ROLE-TUPLE: vabsdiff  < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vadd      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vmad      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vmax      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vmin      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vset      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vshl      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vshr      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vsub      < ptx-instruction-not-supported-yet ;
+ROLE-TUPLE: vote      < ptx-2op-instruction
     { mode ptx-vote-mode } ;
-TUPLE: xor       < ptx-3op-instruction ;
+ROLE-TUPLE: xor       < ptx-3op-instruction ;
 
 GENERIC: ptx-element-label ( elt -- label )
 M: object ptx-element-label  drop f ;
