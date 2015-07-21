@@ -34,7 +34,7 @@ TUPLE: from-message id ;
     [
         {
             { T{ to-message f ?id ?value  }
-            [ ?value ?id get-channel dup [ to f ] [ 2drop no-channel ] if ] }
+            [ ?value ?id get-channel [ to f ] [ drop no-channel ] if* ] }
             { T{ from-message f ?id }
             [ ?id get-channel [ from ] [ no-channel ] if* ] }
         } match-cond

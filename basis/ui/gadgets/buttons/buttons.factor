@@ -77,10 +77,10 @@ C: <button-pen> button-pen
     } cond ;
 
 M: button-pen draw-interior
-    lookup-button-pen dup [ draw-interior ] [ 2drop ] if ;
+    lookup-button-pen [ draw-interior ] [ drop ] if* ;
 
 M: button-pen draw-boundary
-    lookup-button-pen dup [ draw-boundary ] [ 2drop ] if ;
+    lookup-button-pen [ draw-boundary ] [ drop ] if* ;
 
 M: button-pen pen-pref-dim
     [

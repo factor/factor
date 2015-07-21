@@ -81,7 +81,7 @@ SYMBOL: matrix
     [
         rows iota <reversed> [
             dup nth-row leading drop
-            dup [ swap dup iota clear-col ] [ 2drop ] if
+            [ swap dup iota clear-col ] [ drop ] if*
         ] each
     ] with-matrix ;
 
@@ -96,7 +96,7 @@ SYMBOL: matrix
         dup first length identity-matrix [
             [
                 dup leading drop
-                dup [ basis-vector ] [ 2drop ] if
+                [ basis-vector ] [ drop ] if*
             ] each
         ] with-matrix flip nonzero-rows
     ] unless ;

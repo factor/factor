@@ -33,7 +33,7 @@ IN: xmode.marker
         [
             dup [ digit? ] all? [
                 current-rule-set digit-re>>
-                dup [ dupd matches? ] [ drop f ] if
+                [ dupd matches? ] [ f ] if*
             ] unless*
         ]
     } 0&& nip ;
@@ -130,25 +130,25 @@ GENERIC: handle-rule-end ( match-count rule -- )
 : check-escape-rule ( rule -- ? )
     no-escape?>> [ f ] [
         find-escape-rule dup [
-            dup rule-start-matches? dup [
+            dup rule-start-matches? [
                 swap handle-rule-start
                 delegate-end-escaped? toggle
                 t
             ] [
-                2drop f
-            ] if
+                drop f
+            ] if*
         ] when
     ] if ;
 
 : check-every-rule ( -- ? )
     current-char current-rule-set get-rules
     [ rule-start-matches? ] map-find
-    dup [ handle-rule-start t ] [ 2drop f ] if ;
+    [ handle-rule-start t ] [ drop f ] if* ;
 
 : ?end-rule ( -- )
     current-rule [
         dup rule-end-matches?
-        dup [ swap handle-rule-end ] [ 2drop ] if
+        [ swap handle-rule-end ] [ drop ] if*
     ] when* ;
 
 : rule-match-token* ( rule -- id )
@@ -213,7 +213,7 @@ M: mark-previous-rule handle-rule-start
 : check-end-delegate ( -- ? )
     context get parent>> [
         in-rule>> [
-            dup rule-end-matches? dup [
+            dup rule-end-matches? [
                 [
                     swap handle-rule-end
                     ?end-rule
@@ -223,7 +223,7 @@ M: mark-previous-rule handle-rule-start
                 rule-match-token* next-token,
                 pop-context
                 seen-whitespace-end? on t
-            ] [ drop check-escape-rule ] if
+            ] [ check-escape-rule ] if*
         ] [ f ] if*
     ] [ f ] if* ;
 

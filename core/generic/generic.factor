@@ -60,7 +60,8 @@ PRIVATE>
     method-classes interesting-classes smallest-class ;
 
 : method-for-class ( class generic -- method/f )
-    [ nip ] [ nearest-class ] 2bi dup [ swap ?lookup-method ] [ 2drop f ] if ;
+    [ nip ] [ nearest-class ] 2bi
+    [ swap ?lookup-method ] [ drop f ] if* ;
 
 GENERIC: effective-method ( generic -- method )
 

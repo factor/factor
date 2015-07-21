@@ -15,7 +15,7 @@ SYMBOLS: +bottom+ +top+ ;
 : unify-inputs ( max-input-count input-count meta-d -- new-meta-d )
     ! Introduced values can be anything, and don't unify with
     ! literals.
-    dup [ [ - +top+ <repetition> ] dip append ] [ 3drop f ] if ;
+    [ [ - +top+ <repetition> ] dip append ] [ 2drop f ] if* ;
 
 : pad-with-bottom ( seq -- newseq )
     ! Terminated branches are padded with bottom values which

@@ -103,7 +103,7 @@ PRIVATE>
 ERROR: file-not-found path bfs? quot ;
 
 : find-file-throws ( path bfs? quot -- path )
-    3dup find-file dup [ 2nip nip ] [ drop file-not-found ] if ; inline
+    3dup find-file [ 2nip nip ] [ file-not-found ] if* ; inline
 
 ERROR: sequence-expected obj ;
 
