@@ -74,6 +74,7 @@ M: insn compute-stack-frame* drop ;
     bi ;
 
 : build-stack-frame ( cfg -- )
+    f frame-required? set
     0 param-area-size set
     0 allot-area-size set
     cell allot-area-align set

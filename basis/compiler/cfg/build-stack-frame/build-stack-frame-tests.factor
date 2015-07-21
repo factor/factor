@@ -1,5 +1,6 @@
-USING: compiler.cfg.build-stack-frame compiler.cfg.stack-frame
-cpu.x86 math slots.syntax tools.test ;
+USING: accessors compiler.cfg compiler.cfg.build-stack-frame
+compiler.cfg.stack-frame cpu.x86 kernel math namespaces slots.syntax
+tools.test ;
 IN: compiler.cfg.build-stack-frame.tests
 
 {
@@ -21,4 +22,9 @@ IN: compiler.cfg.build-stack-frame.tests
     ! Exclude any reserved stack space 32 bytes on win64, 0 bytes
     ! on all other platforms.
     reserved-stack-space -
+] unit-test
+
+{ f } [
+    t frame-required? set
+    f f <basic-block> <cfg> dup build-stack-frame stack-frame>>
 ] unit-test
