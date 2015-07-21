@@ -61,10 +61,13 @@ HELP: (%slot)
   }
 } ;
 
-
 HELP: decr-stack-reg
 { $values { "n" number } }
-{ $description "Emits an instruction for decrementing the stack register the given number of bytes." } ;
+{ $description "Emits an instruction for decrementing the stack register the given number of bytes. If n is equal to the " { $link cell } " size, then a " { $link PUSH } " instruction is emitted instead because it has a shorter encoding." } ;
+
+HELP: incr-stack-reg
+{ $values { "n" number } }
+{ $description "Emits an instruction for incrementing the stack register the given number of bytes. If n is equal to the " { $link cell } " size, then a " { $link POP } " instruction is emitted instead because it has a shorter encoding." } ;
 
 HELP: load-zone-offset
 { $values { "nursery-ptr" "a register symbol" } }
@@ -106,3 +109,11 @@ HELP: copy-register*
     "0000000533c61fe0: 0f28ca  movaps xmm1, xmm2"
   }
 } ;
+
+ARTICLE: "cpu.x86" "x86 compiler backend"
+"Implementation of " { $vocab-link "cpu.architecture" } " for x86 machines."
+$nl
+{ $link ADD } " and " { $link SUB } " variants:"
+{ $subsections (%inc) decr-stack-reg incr-stack-reg } ;
+
+ABOUT: "cpu.x86"

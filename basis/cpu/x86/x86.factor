@@ -30,6 +30,8 @@ HOOK: stack-reg cpu ( -- reg )
 
 HOOK: reserved-stack-space cpu ( -- n )
 
+HOOK: pic-tail-reg cpu ( -- reg )
+
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
 : special-offset ( m -- n )
@@ -37,11 +39,17 @@ HOOK: reserved-stack-space cpu ( -- n )
 
 : spill@ ( n -- op ) spill-offset special-offset stack@ ;
 
+: (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
+
 : decr-stack-reg ( n -- )
-    [ stack-reg swap SUB ] unless-zero ;
+    [
+        dup cell = [ drop pic-tail-reg PUSH ] [ stack-reg swap SUB ] if
+    ] unless-zero ;
 
 : incr-stack-reg ( n -- )
-    [ stack-reg swap ADD ] unless-zero ;
+    [
+        dup cell = [ drop pic-tail-reg POP ] [ stack-reg swap ADD ] if
+    ] unless-zero ;
 
 : align-stack ( n -- n' ) 16 align ;
 
@@ -50,8 +58,6 @@ M: x86 stack-frame-size ( stack-frame -- i )
     reserved-stack-space +
     cell +
     align-stack ;
-
-HOOK: pic-tail-reg cpu ( -- reg )
 
 M: x86 complex-addressing? t ;
 
@@ -92,8 +98,6 @@ M: x86 %replace-imm
 
 M: x86 %clear ( loc -- )
     297 swap %replace-imm ;
-
-: (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ; inline
 
 M: x86 %inc ( loc -- )
     [ n>> ] [ ds-loc? ds-reg rs-reg ? ] bi (%inc) ;
