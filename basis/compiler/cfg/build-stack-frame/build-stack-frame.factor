@@ -63,7 +63,7 @@ M: insn compute-stack-frame* drop f ;
         finalize-stack-frame ;
 
 : compute-stack-frame ( cfg -- stack-frame/f )
-    dup cfg>insns [ compute-stack-frame* ] map [ ] any?
+    dup cfg>insns f [ compute-stack-frame* or ] reduce
     [ <stack-frame> ] [ drop f ] if ;
 
 : build-stack-frame ( cfg -- )

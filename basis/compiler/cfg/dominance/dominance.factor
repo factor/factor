@@ -31,7 +31,7 @@ PRIVATE>
     [ ] [ intersect ] map-reduce ;
 
 : iterate ( rpo -- changed? )
-    [ [ compute-idom ] keep set-idom ] map [ ] any? ;
+    f [ [ compute-idom ] keep set-idom or ] reduce ;
 
 : compute-dom-parents ( cfg -- )
     H{ } clone dom-parents set
