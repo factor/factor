@@ -71,15 +71,6 @@ lol
 xyz
 ] unit-test
 
-
-{ "lol" }
-[ DELIMITED: aol
-lolaol ] unit-test
-
-{ "whoa" }
-[ DELIMITED: factor blows my mind
-whoafactor blows my mind ] unit-test
-
 <<
 SYNTAX: MULTILINE-LITERAL: parse-here suffix! ;
 >>
