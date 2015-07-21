@@ -59,17 +59,6 @@ IN: locals.parser.tests
 ] unit-test
 
 <<
-! with-lambda-scope
-{ t } [
-    [
-        qualified-vocabs length
-        H{ } clone [
-            "hey there!" qualified-vocabs push [ ]
-        ] with-lambda-scope drop
-        qualified-vocabs length =
-    ] with-compilation-unit
-] unit-test
-
 {
     "V{ 99 :> kkk kkk }"
 } [
