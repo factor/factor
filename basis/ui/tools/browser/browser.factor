@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes colors.constants combinators
+USING: accessors arrays classes colors colors.constants combinators
 combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.stylesheet help.topics
 kernel models sequences sets ui ui.commands ui.gadgets
@@ -37,7 +37,8 @@ M: browser-gadget set-history-value
 : <help-header> ( browser-gadget -- gadget )
     model>> [ '[ _ $title ] try ] <pane-control> ;
 
-CONSTANT: help-header-background COLOR: FactorLightTan
+CONSTANT: help-header-background
+T{ rgba { red 0.9568 } { green 0.9450 } { blue 0.8509 } { alpha 1.0 } } inline
 
 : add-help-header ( track -- track )
     dup <help-header> { 3 3 } <border>
