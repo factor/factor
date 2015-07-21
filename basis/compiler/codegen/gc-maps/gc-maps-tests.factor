@@ -1,5 +1,5 @@
-USING: accessors alien.c-types arrays bit-arrays classes.struct
-compiler.cfg.instructions compiler.cfg.stack-frame
+USING: accessors alien.c-types arrays bit-arrays classes.struct compiler.cfg
+compiler.cfg.instructions compiler.cfg.stack-frame compiler.cfg.utilities
 compiler.codegen.gc-maps compiler.codegen.relocation cpu.architecture
 cpu.x86 byte-arrays make namespaces kernel layouts math sequences
 specialized-arrays system tools.test ;
@@ -78,12 +78,16 @@ M: linux-x86.64 reserved-stack-space 0 ;
 M: linux-x86.64 gc-root-offset
     n>> spill-offset cell + cell /i ;
 
+: cfg-w-spill-area-base ( base -- cfg )
+    stack-frame new swap >>spill-area-base
+    { } insns>cfg swap >>stack-frame ;
+
 cpu x86.64? [
     linux-x86.64 \ cpu set
 
     ! gc-root-offsets
     { { 1 3 } } [
-        T{ stack-frame { spill-area-base 0 } } stack-frame [
+        0 cfg-w-spill-area-base cfg [
             T{ gc-map
                { gc-roots {
                    T{ spill-slot { n 0 } }
@@ -94,7 +98,7 @@ cpu x86.64? [
     ] unit-test
 
     { { 6 10 } } [
-        T{ stack-frame { spill-area-base 32 } } stack-frame [
+        32 cfg-w-spill-area-base cfg [
             T{ gc-map
                { gc-roots {
                    T{ spill-slot { n 8 } }
@@ -106,7 +110,7 @@ cpu x86.64? [
 
     ! scrub-d scrub-r gc-roots
     { { 0 0 5 } } [
-        T{ stack-frame { spill-area-base 0 } } stack-frame [
+        0 cfg-w-spill-area-base cfg [
             T{ gc-map
                { gc-roots {
                    T{ spill-slot { n 0 } }
@@ -119,7 +123,7 @@ cpu x86.64? [
 
     ! scrub-d scrub-r gc-roots
     { { 0 0 9 } } [
-        T{ stack-frame { spill-area-base 32 } } stack-frame [
+        32 cfg-w-spill-area-base cfg [
             T{ gc-map
                { gc-roots {
                    T{ spill-slot { n 0 } }

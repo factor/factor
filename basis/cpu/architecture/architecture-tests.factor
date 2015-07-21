@@ -1,10 +1,15 @@
-USING: accessors compiler.cfg.instructions compiler.cfg.stack-frame
-cpu.architecture cpu.x86 kernel layouts math namespaces system tools.test ;
+USING: accessors compiler.cfg compiler.cfg.instructions
+compiler.cfg.stack-frame compiler.cfg.utilities cpu.architecture
+cpu.x86 kernel layouts math namespaces system tools.test ;
 IN: cpu.architecture.tests
 
+: cfg-w-spill-area-base ( base -- cfg )
+    stack-frame new swap >>spill-area-base
+    { } insns>cfg swap >>stack-frame ;
+
 : expected-gc-root-offset ( slot-number spill-area-base -- offset )
-    [ spill-slot boa ] [ stack-frame new swap >>spill-area-base ] bi*
-    stack-frame [
+    [ spill-slot boa ] [ cfg-w-spill-area-base ] bi*
+    cfg [
         gc-root-offset reserved-stack-space cell / -
     ] with-variable ;
 
