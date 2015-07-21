@@ -5,9 +5,8 @@ combinators combinators.smart constructors destructors grouping
 io io.binary io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
-math.parser namespaces nested-comments random sequences
-slots.syntax splitting system vectors vocabs strings
-ascii ;
+math.parser namespaces random sequences slots.syntax splitting
+system vectors vocabs strings ascii ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -399,14 +398,13 @@ M: TXT rdata>byte-array
 : message>query-name ( message -- string )
     query>> first name>> dotted> ;
 
-(*
-M: string resolve-host
-    dup >lower "localhost" = [
-        drop resolve-localhost
-    ] [
-        dns-A-query message>a-names [ <ipv4> ] map
-    ] if ;
-*)
+! XXX: Turn on someday for nonblocking DNS lookups
+! M: string resolve-host
+    ! dup >lower "localhost" = [
+        ! drop resolve-localhost
+    ! ] [
+        ! dns-A-query message>a-names [ <ipv4> ] map
+    ! ] if ;
 
 HOOK: initial-dns-servers os ( -- sequence )
 
