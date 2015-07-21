@@ -71,6 +71,7 @@ lol
 xyz
 ] unit-test
 
+/*
 <<
 SYNTAX: MULTILINE-LITERAL: parse-here suffix! ;
 >>
@@ -83,7 +84,6 @@ bar
 } foo
 ] unit-test
 
-
 ! Make sure parse-here fails if extra crap appears on the first line
 [
     "CONSTANT: foo { MULTILINE-LITERAL: asdfasfdasdfas
@@ -91,3 +91,4 @@ bar
 ;
 }" eval
 ] must-fail
+*/
