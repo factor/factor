@@ -136,4 +136,4 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 ] unit-test
 
 ! Test that the regexp syntax works.
-{ t } [ "1234abcd" regexp:R[ ^\d+\w+$] matches? ] unit-test
+{ t } [ "1234abcd" regexp:R/ ^\d+\w+$/ matches? ] unit-test
