@@ -10,7 +10,6 @@ IN: tools.image-analyzer.gc-info.tests
 QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
-QUALIFIED: gml.coremath
 QUALIFIED: opencl
 
 : normal? ( word -- ? )
@@ -133,7 +132,6 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
         dup last 0 = [ drop f ] when
     ] replicate all-equal? ;
 
-{ t t } [
+{ t } [
     \ opencl:cl-queue-kernel deterministic-gc-info?
-    \ gml.coremath:gml-determinant deterministic-gc-info?
 ] unit-test
