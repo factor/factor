@@ -32,8 +32,8 @@ IN: scratchpad
 
 VARIANT: list ;
 
-VARIANT-MEMBER: list nil
-VARIANT-MEMBER: list cons: { { first object } { rest list } }
+VARIANT-MEMBER: list nil ;
+VARIANT-MEMBER: list cons: { { first object } { rest list } } ;
 """ } } ;
 
 HELP: match
