@@ -50,7 +50,7 @@ SYNTAX: VARIANT:
 SYNTAX: VARIANT-MEMBER:
     scan-word
     scan-token parse-variant-member
-    define-variant-class-member ;
+    define-variant-class-member ";" expect ;
 
 MACRO: unboa ( class -- quot )
     <wrapper> \ boa [ ] 2sequence [undo] ;

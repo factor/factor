@@ -23,8 +23,8 @@ VARIANT: list
 { nil t } [ list initial-value ] unit-test
 
 VARIANT: list2 ;
-VARIANT-MEMBER: list2 nil2
-VARIANT-MEMBER: list2 cons2: { { first object } { rest list2 } }
+VARIANT-MEMBER: list2 nil2 ;
+VARIANT-MEMBER: list2 cons2: { { first object } { rest list2 } } ;
 
 { t } [ nil2 list2? ] unit-test
 { t } [ 1 nil2 <cons2> list2? ] unit-test
