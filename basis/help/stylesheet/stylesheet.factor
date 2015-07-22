@@ -40,7 +40,7 @@ H{
 
 SYMBOL: help-path-style
 H{
-    { font-size 10 }
+    { font-size 12 }
     { table-gap { 5 5 } }
     { table-border COLOR: FactorLightTan }
 } help-path-style set-global
