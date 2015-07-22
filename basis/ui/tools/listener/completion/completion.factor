@@ -154,7 +154,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
     [ vertical completion-popup new-track ] 2dip
     [ [ >>interactor ] [ >>completion-mode ] bi* ] [ <completion-table> >>table ] 2bi
     dup [ <completion-scroller> ] [ completion-mode>> completion-banner ] bi
-    <labeled-gadget> 1 track-add ;
+    COLOR: yellow <labeled-gadget> 1 track-add ;
 
 completion-popup H{
     { T{ key-down f f "TAB" } [ table>> row-action ] }

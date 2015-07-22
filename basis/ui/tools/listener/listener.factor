@@ -333,8 +333,15 @@ M: object accept-completion-hook 2drop ;
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
     parse-lines-interactive ;
 
+<PRIVATE
+
+CONSTANT: debugger-color COLOR: chocolate1
+
+PRIVATE>
+
 : <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger> "Error" <framed-labeled-gadget> ;
+    over compute-restarts [ hide-glass ] <debugger> 
+    "Error" debugger-color <framed-labeled-gadget> ;
 
 : debugger-popup ( interactor error continuation -- )
     [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;

@@ -33,7 +33,7 @@ TUPLE: links-popup < wrapper ;
 
 : <links-popup> ( model quot title -- gadget )
     [ <links-table> COLOR: white <solid> >>interior ] dip
-    <labeled-gadget> links-popup new-wrapper ;
+    COLOR: yellow <labeled-gadget> links-popup new-wrapper ;
 
 links-popup H{
     { T{ key-down f f "ESC" } [ hide-glass ] }

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations fonts fry inspector
+USING: accessors arrays colors.constants continuations fonts fry inspector
 kernel models models.arrow prettyprint sequences ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labeled ui.gadgets.lines ui.gadgets.panes ui.gadgets.scrollers
@@ -21,6 +21,10 @@ M: stack-entry-renderer row-columns drop string>> 1array ;
 
 M: stack-entry-renderer row-value drop object>> ;
 
+CONSTANT: data-stack-color COLOR: DodgerBlue
+CONSTANT: retain-stack-color COLOR: HotPink
+CONSTANT: call-stack-color COLOR: GreenYellow
+
 : <stack-table> ( model -- table )
     [ [ <stack-entry> ] map ] <arrow> stack-entry-renderer <table>
         10 >>min-rows
@@ -31,20 +35,20 @@ M: stack-entry-renderer row-value drop object>> ;
         [ i:inspector ] >>action
         t >>single-click? ;
 
-: <stack-display> ( model quot title -- gadget )
-    [ '[ dup _ when ] <arrow> <stack-table> margins <scroller> white-interior ] dip
-    <labeled-gadget> ;
+: <stack-display> ( model quot title color -- gadget )
+    [ '[ dup _ when ] <arrow> <stack-table> margins <scroller> white-interior ] 2dip
+    <labeled-gadget> ; ! Il attend le titre en dernier
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
     <pane-control> t >>scrolls? margins <scroller> white-interior
-    "Call stack" <labeled-gadget> ;
+    "Call stack" call-stack-color <labeled-gadget> ;
 
 : <datastack-display> ( model -- gadget )
-    [ data>> ] "Data stack" <stack-display> ;
+    [ data>> ] "Data stack" data-stack-color <stack-display> ;
 
 : <retainstack-display> ( model -- gadget )
-    [ retain>> ] "Retain stack" <stack-display> ;
+    [ retain>> ] "Retain stack" retain-stack-color <stack-display> ;
 
 TUPLE: traceback-gadget < tool ;
 

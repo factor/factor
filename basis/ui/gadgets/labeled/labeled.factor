@@ -18,20 +18,20 @@ CONSTANT: title-bar-gradient { COLOR: white COLOR: grey90 }
 : add-title-bar ( title track -- track )
     swap >label
     [ t >>bold? ] change-font
-    { 0 5 } <border>
+    { 0 4 } <border>
     title-bar-gradient <gradient> >>interior
     f track-add ;
 
 : add-content ( content track -- track )
     swap 1 track-add ;
 
-: add-color-line ( track -- track )
-    <shelf> { 0 1.5 } <border> 
-    COLOR: yellow <solid> >>interior 
+: add-color-line ( color track -- track )
+    <shelf> { 0 1.5 } <border>
+    rot <solid> >>interior 
     f track-add ;
 
 : add-content-area ( labeled -- labeled )
-    dup content>>
+    [ ] [ content>> ] [ color>> ] tri
     vertical <track>
     add-color-line
     add-content
@@ -39,12 +39,13 @@ CONSTANT: title-bar-gradient { COLOR: white COLOR: grey90 }
 
 PRIVATE>
 
-: <labeled-gadget> ( gadget title -- labeled )
+: <labeled-gadget> ( gadget title color -- labeled )
     vertical labeled-gadget new-track with-lines
+    swap >>color
     add-title-bar
     swap >>content
     add-content-area ;
     
-: <framed-labeled-gadget> ( gadget title -- labeled )
+: <framed-labeled-gadget> ( gadget title color -- labeled )
     <labeled-gadget>
     COLOR: grey85 <solid> >>boundary ;

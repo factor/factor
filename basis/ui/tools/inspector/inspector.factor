@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors inspector namespaces kernel models fry
+USING: accessors colors inspector namespaces kernel models fry
 colors.constants models.arrow prettyprint sequences mirrors assocs
 classes io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
@@ -81,13 +81,20 @@ M: hashtable make-slot-descriptions
         40 >>min-cols
         40 >>max-cols ;
 
+<PRIVATE
+
+CONSTANT: object-color COLOR: aquamarine2
+CONSTANT: contents-color COLOR: orchid2
+
+PRIVATE>
+
 : <inspector-gadget> ( model -- gadget )
     vertical inspector-gadget new-track with-lines
         add-toolbar
         swap >>model
         dup model>> <inspector-table> >>table
-        dup model>> <summary-gadget> margins white-interior "Object" <labeled-gadget> f track-add
-        dup table>> <scroller> white-interior "Contents" <labeled-gadget> 1 track-add ;
+        dup model>> <summary-gadget> margins white-interior "Object" object-color <labeled-gadget> f track-add
+        dup table>> <scroller> white-interior "Contents" contents-color <labeled-gadget> 1 track-add ;
 
 M: inspector-gadget focusable-child*
     table>> ;
