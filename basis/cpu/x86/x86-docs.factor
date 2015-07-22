@@ -110,7 +110,7 @@ HELP: copy-register*
   }
 } ;
 
-ARTICLE: "cpu.x86" "x86 compiler backend"
+ARTICLE: "cpu.x86" "CPU x86 compiler backend"
 "Implementation of " { $vocab-link "cpu.architecture" } " for x86 machines."
 $nl
 { $link ADD } " and " { $link SUB } " variants:"
