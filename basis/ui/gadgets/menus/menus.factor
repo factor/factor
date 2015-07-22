@@ -4,7 +4,7 @@ USING: accessors colors.constants kernel locals math.rectangles
 math.vectors namespaces opengl sequences sorting ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.corners
 ui.gadgets.frames ui.gadgets.glass ui.gadgets.packs
-ui.gadgets.worlds ui.gestures ui.operations ui.pens
+ui.gadgets.worlds ui.tools.common ui.gestures ui.operations ui.pens
 ui.pens.solid ui.render ;
 IN: ui.gadgets.menus
 
@@ -22,6 +22,9 @@ M:: object <menu-item> ( target hook command -- button )
 
 <PRIVATE
 
+CONSTANT: menu-background-color COLOR: grey95
+CONSTANT: menu-border-color COLOR: grey75
+
 TUPLE: separator-pen color ;
 
 C: <separator-pen> separator-pen
@@ -32,9 +35,7 @@ M: separator-pen draw-interior
     [ v>integer ] bi@ gl-line ;
 
 : <menu-items> ( items -- gadget )
-    [ <filled-pile> ] dip add-gadgets
-    { 3 3 } <border>
-    panel-background-color <solid> >>interior ;
+    [ <filled-pile> ] dip add-gadgets ;
 
 PRIVATE>
 
@@ -44,18 +45,14 @@ M: ---- <menu-item>
     3drop
     <gadget>
         { 0 5 } >>dim
-        COLOR: black <separator-pen> >>interior ;
-
-: menu-theme ( gadget -- gadget )
-    COLOR: light-gray <solid> >>interior ;
+        menu-border-color <separator-pen> >>interior ;
 
 : <menu> ( gadgets -- menu )
     <menu-items>
-    frame "menu-background" [
-        /-----\
-        |-----|
-        \-----/
-    ] make-corners ;
+    { 0 3 } >>gap
+    margins
+    menu-border-color <solid> >>boundary 
+    menu-background-color <solid> >>interior ;
 
 : <commands-menu> ( target hook commands -- menu )
     [ <menu-item> ] 2with map <menu> ;
