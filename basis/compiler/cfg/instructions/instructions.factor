@@ -813,10 +813,10 @@ VREG-INSN: ##reload
 def: dst
 literal: rep src ;
 
-UNION: ##allocation
-##allot
-##box-alien
-##box-displaced-alien ;
+UNION: allocation-insn
+    ##allot
+    ##box-alien
+    ##box-displaced-alien ;
 
 UNION: conditional-branch-insn
 ##compare-branch

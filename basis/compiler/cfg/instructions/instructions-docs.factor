@@ -260,6 +260,9 @@ HELP: ##write-barrier
 HELP: alien-call-insn
 { $class-description "Union class of all alien call instructions." } ;
 
+HELP: allocation-insn
+{ $class-description "Union class of all instructions that allocate memory." } ;
+
 HELP: def-is-use-insn
 { $class-description "Union class of instructions that have complex expansions and require that the output registers are not equal to any of the input registers." } ;
 
@@ -336,7 +339,6 @@ $nl
   ##box-long-long
   ##callback-inputs
   ##callback-outputs
-  ##local-allot
   ##unbox
   ##unbox-alien
   ##unbox-any-c-ptr
@@ -348,6 +350,8 @@ $nl
   ##allot
   ##call-gc
   ##check-nursery-branch
+  ##local-allot
+  allocation-insn
   gc-map
   gc-map-insn
   <gc-map>
