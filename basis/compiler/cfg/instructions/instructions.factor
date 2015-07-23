@@ -834,8 +834,8 @@ UNION: conditional-branch-insn
 ##fixnum-mul ;
 
 ! For alias analysis
-UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
-UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
+UNION: read-insn ##slot ##slot-imm ##vm-field ##alien-global ;
+UNION: write-insn ##set-slot ##set-slot-imm ##set-vm-field ;
 
 UNION: alien-call-insn
     ##alien-assembly
