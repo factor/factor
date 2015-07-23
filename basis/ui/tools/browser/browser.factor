@@ -4,7 +4,7 @@ USING: accessors arrays classes colors colors.constants combinators
 combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.stylesheet help.topics
 kernel models sequences sets ui ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.colors ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.lines ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures
@@ -36,9 +36,6 @@ M: browser-gadget set-history-value
 
 : <help-header> ( browser-gadget -- gadget )
     model>> [ '[ _ $title ] try ] <pane-control> ;
-
-CONSTANT: help-header-background
-T{ rgba { red 0.9568 } { green 0.9450 } { blue 0.8509 } { alpha 1.0 } } inline
 
 : add-help-header ( track -- track )
     dup <help-header> { 3 3 } <border>
