@@ -7,7 +7,7 @@ documents.elements fry hashtables help help.markup help.tips io
 io.styles kernel lexer listener locals make math models
 models.arrow models.delay namespaces parser prettyprint
 quotations sequences source-files.errors strings system threads
-tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
+tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.colors
 ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled ui.gadgets.lines
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.tracks ui.gadgets.toolbar 
@@ -212,7 +212,7 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 : <error-summary> ( -- gadget )
     error-list-model get [ drop error-summary. ] <pane-control>
-        COLOR: light-yellow <solid> >>interior ;
+    error-summary-background <solid> >>interior ;
 
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
@@ -332,12 +332,6 @@ M: object accept-completion-hook 2drop ;
 : quot-action ( interactor -- lines )
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
     parse-lines-interactive ;
-
-<PRIVATE
-
-CONSTANT: debugger-color COLOR: chocolate1
-
-PRIVATE>
 
 : <debugger-popup> ( error continuation -- popup )
     over compute-restarts [ hide-glass ] <debugger> 
