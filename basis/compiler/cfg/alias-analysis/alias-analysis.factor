@@ -171,7 +171,7 @@ M: insn analyze-aliases ;
 M: vreg-insn analyze-aliases
     def-acs ;
 
-M: ##allocation analyze-aliases
+M: allocation-insn analyze-aliases
     #! A freshly allocated object is distinct from any other
     #! object.
     dup dst>> set-new-ac ;

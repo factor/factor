@@ -11,7 +11,7 @@ IN: compiler.cfg.gc-checks
 
 : insert-gc-check? ( bb -- ? )
     dup kill-block?>>
-    [ drop f ] [ instructions>> [ ##allocation? ] any? ] if ;
+    [ drop f ] [ instructions>> [ allocation-insn? ] any? ] if ;
 
 : blocks-with-gc ( cfg -- bbs )
     post-order [ insert-gc-check? ] filter ;
@@ -25,7 +25,7 @@ GENERIC# gc-check-offsets* 1 ( call-index seen-allocation? insn n -- call-index 
 M: ##callback-inputs gc-check-offsets* gc-check-here ;
 M: ##phi gc-check-offsets* gc-check-here ;
 M: gc-map-insn gc-check-offsets* gc-check-here ;
-M: ##allocation gc-check-offsets* 3drop t ;
+M: allocation-insn gc-check-offsets* 3drop t ;
 M: insn gc-check-offsets* 2drop ;
 
 : gc-check-offsets ( insns -- seq )
@@ -53,7 +53,7 @@ M: ##box-alien allocation-size* drop 5 cells ;
 M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 : allocation-size ( insns -- n )
-    [ ##allocation? ] filter
+    [ allocation-insn? ] filter
     [ allocation-size* data-alignment get align ] map-sum ;
 
 : add-gc-checks ( insns-seq -- )
