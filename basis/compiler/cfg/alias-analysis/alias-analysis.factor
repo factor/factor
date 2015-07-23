@@ -180,7 +180,7 @@ M: ##box-displaced-alien analyze-aliases
     [ call-next-method ]
     [ base>> heap-ac get merge-acs ] bi ;
 
-M: ##read analyze-aliases
+M: read-insn analyze-aliases
     call-next-method
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
     2dup live-slot dup
@@ -193,7 +193,7 @@ M: ##read analyze-aliases
     #! from?
     live-slot = ;
 
-M:: ##write analyze-aliases ( insn -- insn )
+M:: write-insn analyze-aliases ( insn -- insn )
     insn src>> resolve :> src
     insn insn-slot# :> slot#
     insn insn-object :> vreg
