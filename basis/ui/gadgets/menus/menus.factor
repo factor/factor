@@ -3,7 +3,7 @@
 USING: accessors colors.constants kernel locals math.rectangles
 math.vectors namespaces opengl sequences sorting ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.corners
-ui.gadgets.frames ui.gadgets.glass ui.gadgets.packs
+ui.gadgets.colors ui.gadgets.frames ui.gadgets.glass ui.gadgets.packs
 ui.gadgets.worlds ui.tools.common ui.gestures ui.operations ui.pens
 ui.pens.solid ui.render ;
 IN: ui.gadgets.menus
@@ -21,9 +21,6 @@ M:: object <menu-item> ( target hook command -- button )
     ] <roll-button> ;
 
 <PRIVATE
-
-CONSTANT: menu-background-color COLOR: grey95
-CONSTANT: menu-border-color COLOR: grey75
 
 TUPLE: separator-pen color ;
 
@@ -52,7 +49,7 @@ M: ---- <menu-item>
     { 0 3 } >>gap
     margins
     menu-border-color <solid> >>boundary 
-    menu-background-color <solid> >>interior ;
+    menu-background <solid> >>interior ;
 
 : <commands-menu> ( target hook commands -- menu )
     [ <menu-item> ] 2with map <menu> ;

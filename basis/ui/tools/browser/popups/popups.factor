@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs colors.constants
 definitions.icons fry help help.topics kernel math.rectangles
-models.arrow namespaces sequences tools.crossref ui.gadgets
+models.arrow namespaces sequences tools.crossref ui.gadgets ui.gadgets.colors
 ui.gadgets.glass ui.gadgets.labeled ui.gadgets.search-tables
 ui.gadgets.tables ui.gadgets.wrappers ui.gestures ui.images
 ui.operations ui.pens.solid ;
@@ -33,7 +33,7 @@ TUPLE: links-popup < wrapper ;
 
 : <links-popup> ( model quot title -- gadget )
     [ <links-table> COLOR: white <solid> >>interior ] dip
-    COLOR: yellow <labeled-gadget> links-popup new-wrapper ;
+    popup-color <labeled-gadget> links-popup new-wrapper ;
 
 links-popup H{
     { T{ key-down f f "ESC" } [ hide-glass ] }

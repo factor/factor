@@ -3,7 +3,7 @@
 USING: accessors colors inspector namespaces kernel models fry
 colors.constants models.arrow prettyprint sequences mirrors assocs
 classes io io.styles arrays hashtables math.order sorting refs fonts
-ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
+ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.colors ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.lines ui.gadgets.tables 
 ui.gadgets.toolbar ui.gadgets.status-bar
@@ -80,13 +80,6 @@ M: hashtable make-slot-descriptions
         15 >>max-rows
         40 >>min-cols
         40 >>max-cols ;
-
-<PRIVATE
-
-CONSTANT: object-color COLOR: aquamarine2
-CONSTANT: contents-color COLOR: orchid2
-
-PRIVATE>
 
 : <inspector-gadget> ( model -- gadget )
     vertical inspector-gadget new-track with-lines

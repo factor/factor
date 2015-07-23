@@ -2,12 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar colors.constants fonts kernel models
 models.arrow models.delay sequences summary ui
-ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
+ui.gadgets.borders ui.gadgets.colors ui.gadgets.labels ui.gadgets.tracks
 ui.gadgets.worlds ui.pens.solid ui.private ;
 IN: ui.gadgets.status-bar
-
-CONSTANT: status-bar-background COLOR: FactorDarkSlateBlue
-CONSTANT: status-bar-foreground COLOR: white
 
 : status-bar-font ( -- font )
     sans-serif-font clone

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors kernel concurrency.messaging colors.constants inspector
-ui.tools.listener ui.tools.traceback ui.gadgets.buttons ui.gadgets.lines
+ui.tools.listener ui.tools.traceback ui.gadgets.buttons ui.gadgets.colors ui.gadgets.lines
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks ui.commands ui.gadgets
 models models.arrow ui.tools.browser ui.tools.common ui.gestures
 ui.gadgets.labels ui.pens.solid ui threads namespaces make tools.walker assocs
@@ -54,13 +54,10 @@ M: walker-gadget focusable-child*
 
 : <thread-status> ( model thread -- gadget )
     '[ _ walker-state-string ] <arrow> <label-control> ;
-    
-CONSTANT: thread-status-color
-T{ rgba { red 0.9295 } { green 0.9569 } { blue 0.8510 } { alpha 1.0 } } inline
 
 : add-thread-status ( track -- track )
     dup status>> self <thread-status> margins
-    thread-status-color <solid> >>interior
+    thread-status-background <solid> >>interior
     f track-add ;
     
 : add-traceback ( track -- track )

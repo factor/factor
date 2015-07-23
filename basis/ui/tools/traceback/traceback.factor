@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors.constants continuations fonts fry inspector
 kernel models models.arrow prettyprint sequences ui.commands
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.colors
 ui.gadgets.labeled ui.gadgets.lines ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.tools.common ;
@@ -20,10 +20,6 @@ SINGLETON: stack-entry-renderer
 M: stack-entry-renderer row-columns drop string>> 1array ;
 
 M: stack-entry-renderer row-value drop object>> ;
-
-CONSTANT: data-stack-color COLOR: DodgerBlue
-CONSTANT: retain-stack-color COLOR: HotPink
-CONSTANT: call-stack-color COLOR: GreenYellow
 
 : <stack-table> ( model -- table )
     [ [ <stack-entry> ] map ] <arrow> stack-entry-renderer <table>
