@@ -34,7 +34,7 @@ T{ test-failure
         }
     }
     { asset { "Unit Test" [ ] [ dup ] } }
-    { file "resource:basis/game/input/input-tests.factor" }
+    { path "resource:basis/game/input/input-tests.factor" }
     { line# 6 }
     { continuation f }
 } error.
