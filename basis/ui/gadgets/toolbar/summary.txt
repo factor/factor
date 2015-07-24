@@ -1,0 +1,1 @@
+Toolbars contain several buttons side-by-side
