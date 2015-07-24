@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.mixin kernel namespaces
-parser ui.gadgets ui.gadgets.borders ui.gadgets.scrollers ui.gadgets.tracks
+parser ui.gadgets ui.gadgets.borders ui.gadgets.colors
+ui.pens.solid ui.gadgets.scrollers ui.gadgets.tracks
 combinators.short-circuit ;
 IN: ui.tools.common
 
