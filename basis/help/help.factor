@@ -104,21 +104,17 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : ($navigation-table) ( element -- )
     help-path-style get table-style [ $table ] with-variable ;
 
-: $navigation-table ( topic -- )
-    [
-        [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
-        [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
-        bi
-    ] { } make [ ($navigation-table) ] unless-empty ;
+: ($navigation-prev) ( topic -- )
+    [ prev-article [ 1array \ $long-link "" $navigation-row ] when* ] 
+    { } make [ ($navigation-table) ] unless-empty ;
+
+: ($navigation-next) ( topic -- )
+    [ next-article [ 1array \ $long-link "" $navigation-row ] when* ] 
+    { } make [ ($navigation-table) ] unless-empty ;
 
 : ($navigation-path) ( topic -- )
     help-path-style get
        [ help-path [ reverse $breadcrumbs ] unless-empty ]
-    with-style ;
-
-: ($navigation-prev-next) ( topic -- )
-    help-path-style get 
-       [ $navigation-table ]
     with-style ;
 
 : $title ( topic -- )
@@ -128,12 +124,20 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         ] with-nesting
     ] with-style ;
 
+: $navigation-prev ( topic -- )
+    title-style get 
+    [ help-path-style get [ ($navigation-prev) ] with-style ]
+    with-style ;
+
+: $navigation-next ( topic -- )
+    title-style get 
+    [ help-path-style get [ ($navigation-next) ] with-style ]
+    with-style ;
+
 : print-topic ( topic -- )
     >link
     last-element off
-    [ article-content print-content nl ] 
-    [ ($blank-line) ($navigation-prev-next) ] 
-    bi ;
+    article-content print-content ;
 
 SYMBOL: help-hook
 
