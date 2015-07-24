@@ -44,10 +44,12 @@ M: browser-gadget set-history-value
 
 : <help-footer-prev> ( browser-gadget -- gadget )
     model>> [ '[ _ $navigation-prev ] try ] <pane-control>
+    { 0 0 } <border> { 1/2 1/2 } >>align
     toolbar-background <solid> >>interior ;
 
 : <help-footer-next> ( browser-gadget -- gadget )
     model>> [ '[ _ $navigation-next ] try ] <pane-control>
+    { 0 0 } <border> { 1/2 1/2 } >>align
     toolbar-background <solid> >>interior ;
 
 : add-help-footer ( track -- track )
