@@ -3,7 +3,7 @@
 USING: accessors arrays hashtables io kernel math models
 colors.constants namespaces sequences words continuations
 debugger prettyprint help editors fonts ui ui.commands
-ui.debugger ui.gestures ui.gadgets ui.gadgets.lines ui.pens.solid
+ui.debugger ui.gestures ui.gadgets ui.gadgets.colors ui.pens.solid
 ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.presentations ui.gadgets.panes
 ui.gadgets.viewports ui.gadgets.tables ui.gadgets.tracks ui.gadgets.toolbar

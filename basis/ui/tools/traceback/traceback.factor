@@ -3,7 +3,7 @@
 USING: accessors arrays colors.constants continuations fonts fry inspector
 kernel models models.arrow prettyprint sequences ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.colors
-ui.gadgets.labeled ui.gadgets.lines ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.tools.common ;
 QUALIFIED-WITH: ui.tools.inspector i

@@ -1,6 +1,6 @@
 ! Copyright (C) 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors colors.constants ;
+USING: accessors colors colors.constants ui.pens.solid ;
 IN: ui.gadgets.colors
 
 CONSTANT: toolbar-background COLOR: grey95

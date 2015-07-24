@@ -5,7 +5,7 @@ combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.stylesheet help.topics
 kernel models sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.colors ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.labels ui.gadgets.lines ui.gadgets.panes
+ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures
 ui.tools.browser.history ui.tools.browser.popups ui.tools.common
