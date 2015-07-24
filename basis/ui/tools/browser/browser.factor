@@ -42,6 +42,20 @@ M: browser-gadget set-history-value
     help-header-background <solid> >>interior 
     { 1 0 } >>fill f track-add ;
 
+: <help-footer-prev> ( browser-gadget -- gadget )
+    model>> [ '[ _ $navigation-prev ] try ] <pane-control>
+    toolbar-background <solid> >>interior ;
+
+: <help-footer-next> ( browser-gadget -- gadget )
+    model>> [ '[ _ $navigation-next ] try ] <pane-control>
+    toolbar-background <solid> >>interior ;
+
+: add-help-footer ( track -- track )
+    horizontal <track> with-lines
+    dupd swap <help-footer-prev> 1 track-add
+    dupd swap <help-footer-next> 1 track-add
+    f track-add ;
+
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
 
@@ -77,7 +91,8 @@ M: browser-gadget set-history-value
         dup <search-field> >>search-field
         add-browser-toolbar
         add-help-header
-        add-help-pane ;
+        add-help-pane
+        add-help-footer ;
 
 M: browser-gadget graft*
     [ add-definition-observer ] [ call-next-method ] bi ;
