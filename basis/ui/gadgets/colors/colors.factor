@@ -38,3 +38,8 @@ T{ rgba { red 0.9295 } { green 0.9569 } { blue 0.8510 } { alpha 1.0 } } inline
 
 CONSTANT: error-summary-background
 T{ rgba { red 0.9568 } { green 0.8509 } { blue 0.8509 } { alpha 1.0 } } inline
+
+CONSTANT: content-background COLOR: white
+
+: white-interior ( track -- track )
+    content-background <solid> >>interior ;
