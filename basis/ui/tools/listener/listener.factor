@@ -8,7 +8,7 @@ io.styles kernel lexer listener locals make math models
 models.arrow models.delay namespaces parser prettyprint
 quotations sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.colors
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled ui.gadgets.lines
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.tracks ui.gadgets.toolbar 
 ui.gestures ui.operations ui.pens.solid
