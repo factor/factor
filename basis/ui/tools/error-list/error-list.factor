@@ -103,7 +103,7 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
     sort-keys values ;
 
 : file-matches? ( error pathname/f -- ? )
-    [ file>> ] [ dup [ string>> ] when ] bi* = ;
+    [ path>> ] [ dup [ string>> ] when ] bi* = ;
 
 : <error-table-model> ( error-list -- model )
     [ model>> ] [ source-file>> ] bi

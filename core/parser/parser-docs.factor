@@ -245,14 +245,14 @@ HELP: parse-fresh
 
 HELP: filter-moved
 { $values { "set1" set } { "set2" set } { "seq" "an sequence of definitions" } }
-{ $description "Removes all definitions from " { $snippet "set2" } " which are in " { $snippet "set1" } " or are no longer present in the current " { $link file } "." } ;
+{ $description "Removes all definitions from " { $snippet "set2" } " which are in " { $snippet "set1" } " or are no longer present in the " { $link current-source-file } "." } ;
 
 HELP: forget-smudged
 { $description "Forgets removed definitions." } ;
 
 HELP: finish-parsing
 { $values { "lines" "the lines of text just parsed" } { "quot" "the quotation just parsed" } }
-{ $description "Records information to the current " { $link file } "." }
+{ $description "Records information to the " { $link current-source-file } "." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
 
 HELP: parse-stream
@@ -261,12 +261,12 @@ HELP: parse-stream
 { $errors "Throws an I/O error if there was an error reading from the stream. Throws a parse error if the input is malformed." } ;
 
 HELP: parse-file
-{ $values { "file" "a pathname string" } { "quot" quotation } }
+{ $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Parses the Factor source code stored in a file. The initial vocabulary search path is used." }
 { $errors "Throws an I/O error if there was an error reading from the file. Throws a parse error if the input is malformed." } ;
 
 HELP: run-file
-{ $values { "file" "a pathname string" } }
+{ $values { "path" "a pathname string" } }
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used." }
 { $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." }  ;
 

@@ -246,7 +246,7 @@ IN: bootstrap.syntax
         scan-word
         dup ( -- ) check-stack-effect
         [ current-vocab main<< ]
-        [ file get [ main<< ] [ drop ] if* ] bi
+        [ current-source-file get [ main<< ] [ drop ] if* ] bi
     ] define-core-syntax
 
     "<<" [
