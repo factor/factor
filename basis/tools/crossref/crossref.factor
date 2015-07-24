@@ -51,7 +51,7 @@ M: link uses
     [ { $vocab-link } article-links [ >vocab-link ] map ]
     bi append ;
 
-M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
+M: pathname uses string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
 M: object uses drop f ;

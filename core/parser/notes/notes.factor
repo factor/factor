@@ -10,7 +10,7 @@ t parser-quiet? set-global
 
 : note. ( str -- )
     parser-quiet? get [
-        file get [ path>> write ":" write ] when*
+        current-source-file get [ path>> write ":" write ] when*
         lexer get [ line>> number>string write ": " write ] when*
         "Note:" print dup print
     ] unless drop ;

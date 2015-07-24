@@ -60,7 +60,7 @@ SYMBOL: command-line
 : run-script ( file -- )
     t parser-quiet? [
         [ run-file ]
-        [ source-file main>> [ execute( -- ) ] when* ] bi
+        [ path>source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
 
 : (parse-command-line) ( args -- )

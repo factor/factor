@@ -13,9 +13,9 @@ M: object error-line drop f ;
 M: condition error-file error>> error-file ;
 M: condition error-line error>> error-line ;
 
-TUPLE: source-file-error error asset file line# ;
+TUPLE: source-file-error error asset path line# ;
 
-M: source-file-error error-file [ error>> error-file ] [ file>> ] bi or ;
+M: source-file-error error-file [ error>> error-file ] [ path>> ] bi or ;
 M: source-file-error error-line [ error>> error-line ] [ line#>> ] bi or ;
 M: source-file-error compute-restarts error>> compute-restarts ;
 
@@ -23,7 +23,7 @@ M: source-file-error compute-restarts error>> compute-restarts ;
     [ [ line#>> 0 or ] sort-with ] { } assoc-map-as sort-keys ;
 
 : group-by-source-file ( errors -- assoc )
-    H{ } clone [ [ push-at ] curry [ dup file>> ] prepose each ] keep ;
+    H{ } clone [ [ push-at ] curry [ dup path>> ] prepose each ] keep ;
 
 TUPLE: error-type-holder type word plural icon quot forget-quot { fatal? initial: t } ;
 
@@ -33,7 +33,7 @@ GENERIC: error-type ( error -- type )
     new
         swap
         [ >>asset ]
-        [ where [ first2 [ >>file ] [ >>line# ] bi* ] when* ] bi
+        [ where [ first2 [ >>path ] [ >>line# ] bi* ] when* ] bi
         swap >>error ; inline
 
 SYMBOL: error-types
@@ -83,7 +83,7 @@ SYMBOL: error-observers
 
 : delete-file-errors ( seq file type -- )
     [
-        [ swap file>> = ] [ swap error-type = ]
+        [ swap path>> = ] [ swap error-type = ]
         bi-curry* bi and not
     ] 2curry filter! drop
     notify-error-observers ;

@@ -9,31 +9,31 @@ IN: source-files
 
 SYMBOL: source-files
 
-TUPLE: source-file-tuple
+TUPLE: source-file
 path
 top-level-form
 checksum
 definitions
 main ;
 
-: record-top-level-form ( quot file -- )
+: record-top-level-form ( quot source-file -- )
     top-level-form<<
     [ ] [ f notify-definition-observers ] if-bootstrapping ;
 
 : record-checksum ( lines source-file -- )
     [ crc32 checksum-lines ] dip checksum<< ;
 
-: record-definitions ( file -- )
+: record-definitions ( source-file -- )
     new-definitions get >>definitions drop ;
 
 : <source-file> ( path -- source-file )
-    source-file-tuple new
+    \ source-file new
         swap >>path
         <definitions> >>definitions ;
 
 ERROR: invalid-source-file-path path ;
 
-: source-file ( path -- source-file )
+: path>source-file ( path -- source-file )
     dup string? [ invalid-source-file-path ] unless
     source-files get [ <source-file> ] cache ;
 
@@ -53,26 +53,26 @@ M: pathname where string>> 1 2array ;
 M: pathname forget*
     string>> forget-source ;
 
-: rollback-source-file ( file -- )
+: rollback-source-file ( source-file -- )
     [
         new-definitions get [ union ] 2map
     ] change-definitions drop ;
 
-SYMBOL: file
+SYMBOL: current-source-file
 
 : wrap-source-file-error ( error -- * )
-    file get rollback-source-file
+    current-source-file get rollback-source-file
     source-file-error new
         f >>line#
-        file get path>> >>file
+        current-source-file get path>> >>path
         swap >>error rethrow ;
 
 : with-source-file ( name quot -- )
     #! Should be called from inside with-compilation-unit.
     [
         [
-            source-file
-            [ file set ]
+            path>source-file
+            [ current-source-file set ]
             [ definitions>> old-definitions set ] bi
         ] dip
         [ wrap-source-file-error ] recover

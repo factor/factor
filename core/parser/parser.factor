@@ -8,7 +8,7 @@ vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 : location ( -- loc )
-    file get lexer get line>> 2dup and
+    current-source-file get lexer get line>> 2dup and
     [ [ path>> ] dip 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
@@ -162,13 +162,13 @@ print-use-hook [ [ ] ] initialize
         auto-used? [ print-use-hook get call( -- ) ] when
     ] with-file-vocabs ;
 
-: parsing-file ( file -- )
+: parsing-file ( path -- )
     parser-quiet? get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( set1 set2 -- seq )
     swap diff members [
         {
-            { [ dup where dup [ first ] when file get path>> = not ] [ f ] }
+            { [ dup where dup [ first ] when current-source-file get path>> = not ] [ f ] }
             { [ dup reader-method? ] [ f ] }
             { [ dup writer-method? ] [ f ] }
             [ t ]
@@ -202,7 +202,7 @@ print-use-hook [ [ ] ] initialize
     fix-class-words ;
 
 : finish-parsing ( lines quot -- )
-    file get
+    current-source-file get
     [ record-top-level-form ]
     [ record-definitions ]
     [ record-checksum ]
@@ -217,10 +217,10 @@ print-use-hook [ [ ] ] initialize
         ] with-source-file
     ] with-compilation-unit ;
 
-: parse-file-restarts ( file -- restarts )
+: parse-file-restarts ( path -- restarts )
     "Load " " again" surround t 2array 1array ;
 
-: parse-file ( file -- quot )
+: parse-file ( path -- quot )
     [
         [ parsing-file ] keep
         [ utf8 <file-reader> ] keep
@@ -230,7 +230,7 @@ print-use-hook [ [ ] ] initialize
         drop parse-file
     ] recover ;
 
-: run-file ( file -- )
+: run-file ( path -- )
     parse-file call( -- ) ;
 
 : ?run-file ( path -- )

@@ -23,7 +23,7 @@ SYMBOL: foo
         "\"def\" ;"
     } "\n" join
     [
-        "testfile" source-file file set
+        "testfile" path>source-file current-source-file set
         eval( -- )
     ] with-scope
 ] unit-test
