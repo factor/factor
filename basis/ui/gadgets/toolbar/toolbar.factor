@@ -18,7 +18,7 @@ IN: ui.gadgets.toolbar
 : format-toolbar ( toolbar -- toolbar )
     { 3 3 } <border> 
     toolbar-background <solid> >>interior
-    align-left ;
+    { 1 0 } >>fill ;
 
 : add-toolbar ( track -- track )
     dup <toolbar> format-toolbar f track-add ;

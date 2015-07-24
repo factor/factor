@@ -67,9 +67,7 @@ M: browser-gadget set-history-value
         swap search-field>> "          Search" label-on-left 1 track-add ;
 
 : add-browser-toolbar ( track -- track )
-    dup <browser-toolbar> { 3 3 } <border>
-    toolbar-background <solid> >>interior { 1 0 } >>fill
-    f track-add ;
+    dup <browser-toolbar> format-toolbar f track-add ;
 
 : <browser-gadget> ( link -- gadget )
     vertical browser-gadget new-track with-lines
