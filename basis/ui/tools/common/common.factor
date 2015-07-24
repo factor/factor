@@ -41,3 +41,7 @@ SLOT: scroller
 
 : margins ( child -- border ) 
     { 9 9 } <filled-border> ;
+
+: with-lines ( track -- track )
+    dup orientation>> >>gap 
+    line-color <solid> >>interior ;
