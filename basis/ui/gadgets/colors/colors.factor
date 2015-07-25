@@ -13,6 +13,8 @@ CONSTANT: status-bar-foreground COLOR: white
 
 CONSTANT: line-color COLOR: grey75
 
+CONSTANT: column-title-background COLOR: grey95
+
 CONSTANT: source-files-color COLOR: NavajoWhite
 CONSTANT: errors-color COLOR: chocolate1
 CONSTANT: details-color COLOR: SlateGray2
