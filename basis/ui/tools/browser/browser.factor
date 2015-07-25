@@ -7,7 +7,7 @@ kernel models sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.colors ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
-ui.gadgets.viewports ui.gadgets.worlds ui.gestures
+ui.gadgets.packs ui.gadgets.viewports ui.gadgets.worlds ui.gestures
 ui.tools.browser.history ui.tools.browser.popups ui.tools.common
 ui.pens.solid vocabs ;
 IN: ui.tools.browser
@@ -80,7 +80,9 @@ M: browser-gadget set-history-value
         1/2 >>align
         { 5 5 } >>gap
         over <toolbar> f track-add
-        swap search-field>> "          Search" label-on-left 1 track-add ;
+        <pile> { 10 0 } <border> f track-add
+        swap search-field>> "Search" label-on-left 1 track-add
+        <pile> f track-add ;
 
 : add-browser-toolbar ( track -- track )
     dup <browser-toolbar> format-toolbar f track-add ;
