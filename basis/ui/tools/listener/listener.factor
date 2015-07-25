@@ -335,7 +335,7 @@ M: object accept-completion-hook 2drop ;
 
 : <debugger-popup> ( error continuation -- popup )
     over compute-restarts [ hide-glass ] <debugger> 
-    "Error" debugger-color <framed-labeled-gadget> ;
+    "Error" debugger-color <framed-labeled> ;
 
 : debugger-popup ( interactor error continuation -- )
     [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;

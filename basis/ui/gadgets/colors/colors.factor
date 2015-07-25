@@ -18,6 +18,7 @@ CONSTANT: errors-color COLOR: chocolate1
 CONSTANT: details-color COLOR: SlateGray2
 
 CONSTANT: debugger-color COLOR: chocolate1
+CONSTANT: completion-color COLOR: magenta
 
 CONSTANT: data-stack-color COLOR: DodgerBlue
 CONSTANT: retain-stack-color COLOR: HotPink
