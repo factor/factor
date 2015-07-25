@@ -37,13 +37,24 @@ M: labeled-gadget focusable-child* content>> ;
 
 PRIVATE>
 
-: <labeled-gadget> ( gadget title color -- labeled )
+: <labeled> ( gadget title color -- labeled )
     vertical labeled-gadget new-track with-lines
     swap >>color
     add-title-bar
     swap >>content
     add-content-area ;
-    
-: <framed-labeled-gadget> ( gadget title color -- labeled )
-    <labeled-gadget>
-    COLOR: grey85 <solid> >>boundary ;
+
+: <framed-labeled> ( gadget title color -- labeled )
+    <labeled> COLOR: grey85 <solid> >>boundary ;
+
+: <labeled-gadget> ( gadget title -- labeled )
+    vertical labeled-gadget new-track with-lines
+    add-title-bar
+    swap >>content dup content>>
+    vertical <track> 
+    add-content
+    { 5 5 } <border>
+    content-background <solid> >>interior
+    1 track-add
+    COLOR: grey85 <solid> >>boundary
+    { 3 3 } <border> ;

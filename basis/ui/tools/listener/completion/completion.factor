@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
 math.vectors models.delay models.arrow combinators.short-circuit
 parser present sequences tools.completion help.vocabs generic fonts
-definitions.icons ui.images ui.commands ui.operations ui.gadgets
+definitions.icons ui.images ui.commands ui.operations ui.gadgets ui.gadgets.colors
 ui.gadgets.editors ui.gadgets.glass ui.gadgets.scrollers
 ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labeled
 ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.pens.solid
@@ -154,7 +154,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
     [ vertical completion-popup new-track ] 2dip
     [ [ >>interactor ] [ >>completion-mode ] bi* ] [ <completion-table> >>table ] 2bi
     dup [ <completion-scroller> ] [ completion-mode>> completion-banner ] bi
-    COLOR: yellow <labeled-gadget> 1 track-add ;
+    completion-color <framed-labeled> 1 track-add ;
 
 completion-popup H{
     { T{ key-down f f "TAB" } [ table>> row-action ] }
