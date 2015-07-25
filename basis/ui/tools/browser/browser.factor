@@ -75,16 +75,10 @@ M: browser-gadget set-history-value
         white-interior ;
 
 : add-spacer ( track -- track )
-    <pile> { 10 0 } <border> f track-add ;
+    <pile> 1/4 track-add ;
 
 : <browser-toolbar> ( browser -- toolbar )
-    horizontal <track>
-        0 >>fill
-        1/2 >>align
-        { 5 5 } >>gap
-        over <toolbar> f track-add
-        add-spacer
-        swap search-field>> "Search" label-on-left 1 track-add ;
+    [ <toolbar> add-spacer ] [ search-field>> "Search" label-on-left 1 track-add ] bi ;
 
 : add-browser-toolbar ( track -- track )
     dup <browser-toolbar> format-toolbar f track-add ;
