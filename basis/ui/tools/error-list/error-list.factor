@@ -168,11 +168,11 @@ error-display "toolbar" f {
     error-list vertical <track> with-lines
         error-list <error-list-toolbar> f track-add
         error-list source-file-table>> margins <scroller> white-interior
-        "Source files" source-files-color <labeled-gadget> 1/4 track-add
+        "Source files" source-files-color <labeled> 1/4 track-add
         error-list error-table>> margins <scroller> white-interior
-        "Errors" errors-color <labeled-gadget> 1/4 track-add
+        "Errors" errors-color <labeled> 1/4 track-add
         error-list error-display>>
-        "Details" details-color <labeled-gadget> 1/2 track-add
+        "Details" details-color <labeled> 1/2 track-add
         1 track-add ;
 
 M: error-list-gadget focusable-child*
