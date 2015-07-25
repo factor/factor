@@ -28,9 +28,9 @@ CONSTANT: call-stack-color COLOR: GreenYellow
 
 CONSTANT: title-bar-gradient { COLOR: white COLOR: grey90 }
 
-CONSTANT: popup-color COLOR: aquamarine2
+CONSTANT: popup-color COLOR: yellow2
 
-CONSTANT: object-color COLOR: yellow2
+CONSTANT: object-color COLOR: aquamarine2
 CONSTANT: contents-color COLOR: orchid2
 
 CONSTANT: help-header-background
