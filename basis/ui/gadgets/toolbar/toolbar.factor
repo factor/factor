@@ -29,12 +29,13 @@ PRIVATE>
     gesture gesture>tooltip >>tooltip ; inline
 
 : <toolbar> ( target -- toolbar )
-    <shelf>
-        1 >>fill
+    horizontal <track>
+        0 >>fill
+        1/2 >>align
         { 5 5 } >>gap
         swap
         [ [ "toolbar" ] dip class-of get-command-at commands>> ]
-        [ '[ [ _ ] 2dip <toolbar-button> add-gadget ] ]
+        [ '[ [ _ ] 2dip <toolbar-button> f track-add ] ]
         bi assoc-each ;
 
 : format-toolbar ( toolbar -- toolbar )

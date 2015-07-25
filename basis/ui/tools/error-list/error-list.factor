@@ -149,7 +149,7 @@ error-display "toolbar" f {
 } define-command-map
 
 : <error-list-toolbar> ( error-list -- toolbar )
-    [ <toolbar> ] [ error-toggle>> "Show errors:" label-on-left add-gadget ] bi
+    [ <toolbar> ] [ error-toggle>> "Show errors:" label-on-left f track-add ] bi
     format-toolbar ;
 
 : <error-model> ( visible-errors model -- model' )
@@ -173,7 +173,7 @@ error-display "toolbar" f {
         "Errors" errors-color <labeled> 1/4 track-add
         error-list error-display>>
         "Details" details-color <labeled> 1/2 track-add
-        1 track-add ;
+    1 track-add ;
 
 M: error-list-gadget focusable-child*
     source-file-table>> ;
