@@ -3,7 +3,7 @@
 USING: accessors assocs classes colors.constants combinators
 combinators.short-circuit combinators.smart fry kernel locals
 math.vectors models namespaces sequences ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.borders ui.gadgets.colors ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.theme ui.gadgets.tracks ui.gadgets.worlds ui.gestures
 ui.pens ui.pens.image ui.pens.solid ui.pens.tile ;
 FROM: models => change-model ;
@@ -104,8 +104,8 @@ M: button-pen pen-foreground
     { 0 1/2 } >>align ; inline
 
 : roll-button-theme ( button -- button )
-    f COLOR: black <solid> dup f f <button-pen> >>boundary
-    f f COLOR: dark-gray <solid> f f <button-pen> >>interior
+    f roll-button-rollover-border <solid> dup f f <button-pen> >>boundary
+    f f roll-button-selected-background <solid> f f <button-pen> >>interior
     align-left ; inline
 
 PRIVATE>

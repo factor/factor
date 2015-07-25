@@ -15,6 +15,9 @@ CONSTANT: line-color COLOR: grey75
 
 CONSTANT: column-title-background COLOR: grey95
 
+CONSTANT: roll-button-rollover-border COLOR: gray50
+CONSTANT: roll-button-selected-background COLOR: dark-gray
+
 CONSTANT: source-files-color COLOR: NavajoWhite
 CONSTANT: errors-color COLOR: chocolate1
 CONSTANT: details-color COLOR: SlateGray2
