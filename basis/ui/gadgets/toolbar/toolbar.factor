@@ -12,14 +12,14 @@ IN: ui.gadgets.toolbar
     toolbar-background <solid> dup
     line-color <solid> dup dup
     <button-pen> ;
-    
+
 : toolbar-button-theme ( gadget -- gadget )
     dup gadget-child border-button-label-theme
     horizontal >>orientation
     <toolbar-button-pen> >>interior
     dup dup interior>> pen-pref-dim >>min-dim
     { 10 6 } >>size ; inline
-    
+
 PRIVATE>
 
 :: <toolbar-button> ( target gesture command -- button )
@@ -36,9 +36,9 @@ PRIVATE>
         [ [ "toolbar" ] dip class-of get-command-at commands>> ]
         [ '[ [ _ ] 2dip <toolbar-button> add-gadget ] ]
         bi assoc-each ;
-        
+
 : format-toolbar ( toolbar -- toolbar )
-    { 0 0 } <border> 
+    { 5 0 } <border>
     toolbar-background <solid> >>interior
     { 1 0 } >>fill ;
 
