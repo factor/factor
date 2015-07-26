@@ -5,18 +5,12 @@ namespaces sequences stack-checker.values ;
 FROM: namespaces => set ;
 IN: compiler.tree.escape-analysis.allocations
 
-! A map from values to classes. Only for #introduce outputs
 SYMBOL: value-classes
 
 : value-class ( value -- class ) value-classes get at ;
 
 : set-value-class ( class value -- ) value-classes get set-at ;
 
-! A map from values to one of the following:
-! - f -- initial status, assigned to values we have not seen yet;
-!        may potentially become an allocation later
-! - a sequence of values -- potentially unboxed tuple allocations
-! - t -- not allocated in this procedure, can never be unboxed
 SYMBOL: allocations
 
 : (allocation) ( -- allocations )
@@ -31,8 +25,6 @@ SYMBOL: allocations
 : record-allocations ( allocations values -- )
     (allocation) '[ _ set-at ] 2each ;
 
-! We track slot access to connect constructor inputs with
-! accessor outputs.
 SYMBOL: slot-accesses
 
 TUPLE: slot-access slot# value ;
@@ -42,7 +34,6 @@ C: <slot-access> slot-access
 : record-slot-access ( out slot# in -- )
     <slot-access> swap slot-accesses get set-at ;
 
-! We track escaping values with a disjoint set.
 SYMBOL: escaping-values
 
 SYMBOL: +escaping+
@@ -126,7 +117,6 @@ DEFER: copy-value
         [ nth swap copy-value ]
     } cond ;
 
-! Compute which tuples escape
 SYMBOL: escaping-allocations
 
 : compute-escaping-allocations ( -- )
