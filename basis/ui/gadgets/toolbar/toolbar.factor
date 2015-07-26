@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes fry kernel locals ui.commands
+USING: accessors assocs classes fry kernel locals ui.baseline-alignment ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.buttons.private ui.gadgets.colors ui.gadgets.packs
 ui.gadgets.tracks ui.pens ui.pens.solid ;
@@ -30,8 +30,8 @@ PRIVATE>
 
 : <toolbar> ( target -- toolbar )
     horizontal <track>
-        0 >>fill
-        1/2 >>align
+        1 >>fill
+        +baseline+ >>align
         { 5 5 } >>gap
         swap
         [ [ "toolbar" ] dip class-of get-command-at commands>> ]
