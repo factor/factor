@@ -124,10 +124,15 @@ M: bignum (log2) bignum-log2 ; inline
 : (epsilon?) ( num shift -- ? )
     dup neg? [ neg 2^ 1 - bitand zero? not ] [ 2drop f ] if ; inline
 
+: scale-numerator ( num den -- epsilon? num' scale )
+    over [ log2 ] bi@ - [
+        54 + [ (epsilon?) ] [ shift ] 2bi
+    ] keep ; inline
+
 : pre-scale ( num den -- epsilon? mantissa den' scale )
-    2dup [ log2 ] bi@ -
-    [ neg 54 + [ (epsilon?) ] [ shift ] 2bi ]
-    [ [ scale-denonimator ] dip + ] bi-curry bi* ; inline
+    scale-denonimator [
+        [ scale-numerator ] keep swap
+    ] dip swap - ; inline
 
 ! Second step: loop
 : (2/-with-epsilon) ( epsilon? num -- epsilon?' num' )
