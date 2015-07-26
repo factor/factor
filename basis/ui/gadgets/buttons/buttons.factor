@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes colors.constants combinators
+USING: accessors assocs classes colors colors.constants combinators
 combinators.short-circuit combinators.smart fry kernel locals
 math.vectors models namespaces sequences ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.colors ui.gadgets.labels ui.gadgets.packs
@@ -121,13 +121,10 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
-CONSTANT: button-background COLOR: FactorLightTan
-CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
-
 : <border-button-pen> ( -- pen )
-    "button" button-background button-clicked-background
+    "button" transparent button-text-color
     <border-button-state-pen> dup
-    "button-clicked" button-clicked-background COLOR: white
+    "button-clicked" transparent button-clicked-text-color
     <border-button-state-pen> dup dup
     <button-pen> ;
 
