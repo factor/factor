@@ -12,6 +12,9 @@ CONSTANT: menu-border-color COLOR: grey75
 CONSTANT: status-bar-background COLOR: FactorDarkSlateBlue
 CONSTANT: status-bar-foreground COLOR: white
 
+CONSTANT: button-text-color COLOR: FactorDarkSlateBlue
+CONSTANT: button-clicked-text-color COLOR: white
+
 CONSTANT: line-color COLOR: grey75
 
 CONSTANT: column-title-background COLOR: grey95
