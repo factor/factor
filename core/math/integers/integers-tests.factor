@@ -272,3 +272,10 @@ IN: math.integers.tests
 { -1/0. } [ 2048 2^ -1 /f ] unit-test
 { -1/0. } [ 2048 2^ neg 1 /f ] unit-test
 { 1/0. } [ 2048 2^ neg -1 /f ] unit-test
+
+! bignum/f had a bug for results in ]0x1.0p-1022,0x0.4p-1022]
+! these are the first subnormals...
+{ 0x0.cp-1022 } [ 12 1026 2^ /f ] unit-test
+{ 0x0.8p-1022 } [ 8 1026 2^ /f ] unit-test
+{ 0x0.6p-1022 } [ 6 1026 2^ /f ] unit-test
+{ 0x0.4p-1022 } [ 4 1026 2^ /f ] unit-test
