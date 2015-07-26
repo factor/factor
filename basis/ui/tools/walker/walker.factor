@@ -38,28 +38,38 @@ M: walker-gadget ungraft*
 M: walker-gadget focusable-child*
     traceback>> ;
 
-: walker-state-string ( status thread -- string )
-    [
-        "Thread: " %
-        dup name>> %
-        " (" %
-        swap {
-            { +stopped+ "Stopped" }
-            { +suspended+ "Suspended" }
-            { +running+ "Running" }
-        } at %
-        ")" %
-        drop
-    ] "" make ;
+: thread-status-text ( status thread -- string )
+    name>> swap {
+        { +stopped+ "Stopped" }
+        { +suspended+ "Suspended" }
+        { +running+ "Running" }
+    } at "Thread: %s (%s)" sprintf ;
+
+: thread-status-color ( status -- color )
+    {
+      { +stopped+   [ thread-status-stopped-background ] }
+      { +suspended+ [ thread-status-suspended-background ] }
+      { +running+   [ thread-status-running-background ] }
+      { f           [ content-background ] }
+    } case ;
+
+TUPLE: thread-status < label thread ;
+
+M: thread-status model-changed
+    [ value>> ] dip {
+        [ [ thread>> thread-status-text ] [ string<< ] bi ]
+        [ [ thread-status-color <solid> ] [ parent>> interior<< ] bi* ]
+    } 2cleave ;
 
 : <thread-status> ( model thread -- gadget )
-    '[ _ walker-state-string ] <arrow> <label-control> ;
+    "" thread-status new-label
+        swap >>thread
+        swap >>model ;
 
 : add-thread-status ( track -- track )
     dup status>> self <thread-status> margins
-    thread-status-background <solid> >>interior
     f track-add ;
-    
+
 : add-traceback ( track -- track )
     dup traceback>> 1 track-add ;
 
