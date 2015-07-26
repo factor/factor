@@ -1,8 +1,8 @@
-USING: alien arrays assocs classes compiler.cfg compiler.cfg.intrinsics.fixnum
-compiler.cfg.linear-scan.assignment compiler.cfg.liveness
-compiler.cfg.ssa.destruction compiler.cfg.value-numbering
-compiler.codegen.gc-maps cpu.architecture help.markup help.syntax kernel layouts
-math sequences slots.private system ;
+USING: alien arrays assocs byte-arrays classes combinators compiler.cfg
+compiler.cfg.intrinsics.fixnum compiler.cfg.linear-scan.assignment
+compiler.cfg.liveness compiler.cfg.ssa.destruction compiler.cfg.value-numbering
+compiler.codegen.gc-maps cpu.architecture help.markup help.syntax kernel
+layouts math sequences slots.private system vm ;
 IN: compiler.cfg.instructions
 
 HELP: ##alien-invoke
@@ -81,6 +81,9 @@ HELP: ##copy
   }
 } ;
 
+HELP: ##dispatch
+{ $class-description "Special instruction for implementing " { $link case } " blocks." } ;
+
 HELP: ##fixnum-add
 { $class-description "Instruction for adding two fixnums together." }
 { $see-also emit-fixnum+ } ;
@@ -100,7 +103,8 @@ HELP: ##jump
 } ;
 
 HELP: ##load-double
-{ $class-description "I dont know." } ;
+{ $class-description "Loads a " { $link float } " into a SIMD register." }
+{ $see-also %load-double } ;
 
 HELP: ##load-memory-imm
 { $class-description "Instruction for loading data from memory into an MMS register." }
@@ -114,6 +118,23 @@ HELP: ##load-reference
     { { $slot "obj" } { "A Factor object." } }
   }
 } ;
+
+HELP: ##load-vector
+{ $class-description
+  "Loads a " { $link byte-array } " into an SSE register."
+}
+{ $see-also %load-vector } ;
+
+HELP: ##local-allot
+{ $class-description
+  "An instruction for allocating memory in the words own stack frame. It's mostly used for receiving data from alien calls. It has the following slots:"
+  { $table
+    { { $slot "dst" } { "Register into which a pointer to the stack allocated memory is put." } }
+    { { $slot "size" } { "Number of bytes to allocate." } }
+    { { $slot "offset" } { } }
+  }
+}
+{ $see-also ##allot } ;
 
 HELP: ##mul-vector
 { $class-description
@@ -167,6 +188,10 @@ HELP: ##return
 HELP: ##safepoint
 { $class-description "Instruction that inserts a safe point in the generated code." } ;
 
+HELP: ##save-context
+{ $class-description "The ##save-context instructions saves the state of the data, retain and callstacks in the threads " { $link context } " struct." }
+{ $see-also %save-context } ;
+
 HELP: ##set-slot
 { $class-description
   "An instruction for the non-primitive, non-immediate variant of " { $link set-slot } ". It has the following slots:"
@@ -195,6 +220,16 @@ HELP: ##set-slot-imm
 
 HELP: ##single>double-float
 { $class-description "Converts a single precision value (32-bit usually) stored in a SIMD register to a double precision one (64-bit usually)." } ;
+
+HELP: ##shuffle-vector-imm
+{ $class-description "Shuffles the vector in a SSE register according to the given shuffle pattern. It is used to extract a given element of the vector."
+  { $table
+    { { $slot "dst" } { "Destination register to shuffle the vector to." } }
+    { { $slot "src" } { "Source register." } }
+    { { $slot "shuffle" } { "Shuffling pattern." } }
+  }
+}
+{ $see-also %shuffle-vector-imm } ;
 
 HELP: ##slot-imm
 { $class-description
@@ -351,6 +386,7 @@ $nl
   ##call-gc
   ##check-nursery-branch
   ##local-allot
+  ##save-context
   allocation-insn
   gc-map
   gc-map-insn
@@ -421,7 +457,10 @@ $nl
   ##div-vector
   ##horizontal-add-vector
   ##horizontal-sub-vector
+  ##load-double
+  ##load-vector
   ##mul-vector
+  ##shuffle-vector-imm
   ##single>double-float
   ##store-memory-imm
   ##sub-vector

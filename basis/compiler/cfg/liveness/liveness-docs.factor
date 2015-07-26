@@ -1,5 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.representations help.markup help.syntax kernel ;
+compiler.cfg.representations hash-sets help.markup help.syntax kernel
+sequences ;
 IN: compiler.cfg.liveness
 
 HELP: base-pointers
@@ -16,6 +17,10 @@ HELP: edge-live-ins
 HELP: fill-gc-map
 { $values { "live-set" assoc } { "gc-map" gc-map } }
 { $description "Assigns values to the " { $slot "gc-roots" } " and " { $slot "derived-roots" } " slots of the " { $link gc-map } ". Does nothing if the " { $link select-representations } " pass hasn't ran." } ;
+
+HELP: gc-roots
+{ $values { "live-set" assoc } { "derived-roots" hash-set } { "gc-roots" sequence } }
+{ $description "" } ;
 
 HELP: gen-uses
 { $values { "live-set" assoc } { "insn" insn } }

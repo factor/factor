@@ -20,7 +20,8 @@ HELP: <basic-block>
 
 HELP: <cfg>
 { $values { "word" word } { "label" "label" } { "entry" basic-block } { "cfg" cfg } }
-{ $description "Constructor for " { $link cfg } ". " { $slot "spill-area-size" } " and " { $slot "spill-area-align" } " are set to default values." } ;
+{ $description "Constructor for " { $link cfg } ". " { $slot "spill-area-size" } " and " { $slot "spill-area-align" } " are set to default values." }  ;
+
 
 HELP: cfg
 { $class-description
@@ -33,7 +34,7 @@ HELP: cfg
     { { $slot "frame-pointer?" } { "Whether the cfg needs a frame pointer. Only cfgs generated for " { $link #alien-callback } " nodes does need it." } }
   }
 }
-{ $see-also post-order } ;
+{ $see-also <cfg> post-order } ;
 
 HELP: cfg-changed
 { $values { "cfg" cfg } }
