@@ -10,7 +10,7 @@ IN: ui.gadgets.toolbar
 
 : <toolbar-button-pen> ( -- pen )
     toolbar-background <solid> dup
-    line-color <solid> dup dup
+    toolbar-button-pressed-background <solid> dup dup
     <button-pen> ;
 
 : toolbar-button-theme ( gadget -- gadget )
