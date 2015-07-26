@@ -15,6 +15,11 @@ HELP: block-from
 { $values { "bb" basic-block } { "n" integer } }
 { $description "The instruction number immediately preceeding this block." } ;
 
+HELP: cfg>sync-points
+{ $values { "cfg" cfg } { "sync-points" sequence } }
+{ $description "Creates a sequence of all sync points in the cfg." }
+{ $see-also sync-point } ;
+
 HELP: finish-live-intervals
 { $values { "live-intervals" sequence } }
 { $description "Since live intervals are computed in a backward order, we have to reverse some sequences, and compute the start and end." } ;
@@ -71,9 +76,6 @@ HELP: sync-point
   }
 }
 { $see-also insn } ;
-
-HELP: sync-points
-{ $var-description "Sequence of sync points." } ;
 
 HELP: to
 { $var-description "An integer representing a sequence number equal to the highest number in the currently processed block." } ;
