@@ -9,9 +9,7 @@ USE: compiler.tree.escape-analysis.simple
 
 IN: compiler.tree.escape-analysis
 
-! This pass must run after propagation
-
-: escape-analysis ( node -- node )
+: escape-analysis ( nodes -- nodes )
     init-escaping-values
     H{ } clone allocations set
     H{ } clone slot-accesses set
