@@ -142,7 +142,7 @@ M: bignum (log2) bignum-log2 ; inline
 : scale-float ( mantissa scale -- float' )
     {
         { [ dup 1024 > ] [ 2drop 1/0. ] }
-        { [ dup -1023 < ] [ 1021 + shift bits>double ] }
+        { [ dup -1021 < ] [ 1021 + shift bits>double ] }
         [ [ 52 2^ 1 - bitand ] dip 1022 + 52 shift bitor bits>double ]
     } cond ; inline
 
