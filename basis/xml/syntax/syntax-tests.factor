@@ -141,7 +141,7 @@ XML-NS: foo http://blah.com
 ] unit-test
 
 {
-    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>asdf<asdf/>asdf2</a"
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>asdf<asdf/>asdf2</a>"
 } [
     default-prolog
     "asdf"

@@ -94,10 +94,10 @@ ${ test-types } [ $ test-types >yaml yaml> ] unit-test
 ! Anchors
 CONSTANT: test-anchors "- &1 \"1\"
 - *1
-- &2 ["1","2"]
+- &2 [\"1\",\"2\"]
 - *2
 - &3
-  *1 : "one"
+  *1 : \"one\"
 - *3
 "
 CONSTANT: test-anchors-obj {
