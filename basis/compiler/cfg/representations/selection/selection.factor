@@ -12,9 +12,6 @@ FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.representations.selection
 
-! vregs which must be tagged at the definition site because
-! there is at least one usage that is not int-rep. If all usages
-! are int-rep it is safe to untag at the definition site.
 SYMBOL: tagged-vregs
 
 SYMBOL: vreg-reps
@@ -62,17 +59,12 @@ SYMBOL: possibilities
 ! For every vreg, compute the cost of keeping it in every possible
 ! representation.
 
-! Cost map maps vreg to representation to cost.
 SYMBOL: costs
 
 : init-costs ( -- )
-    ! Initialize cost as 0 for each possibility.
     possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs set ;
 
 : increase-cost ( rep scc factor -- )
-    ! Increase cost of keeping vreg in rep, making a choice of rep less
-    ! likely. If the rep is not in the cost alist, it means this
-    ! representation is prohibited.
     [ costs get at 2dup key? ] dip
     '[ [ current-loop-nesting 10^ _ * + ] change-at ] [ 2drop ] if ;
 
@@ -137,7 +129,6 @@ M: vreg-insn compute-insn-costs
         [ [ compute-insn-costs ] each-non-phi ] bi
     ] each-basic-block ;
 
-! For every vreg, compute preferred representation, that minimizes costs.
 : minimize-costs ( costs -- representations )
     [ nip assoc-empty? ] assoc-reject
     [ >alist alist-min first ] assoc-map ;
