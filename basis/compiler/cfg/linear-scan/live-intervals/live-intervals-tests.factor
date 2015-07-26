@@ -1,7 +1,9 @@
-USING: arrays compiler.cfg compiler.cfg.linear-scan.live-intervals
-compiler.cfg.liveness compiler.cfg.registers
-compiler.cfg.ssa.destruction.leaders cpu.architecture kernel namespaces
-sequences tools.test ;
+USING: arrays compiler.cfg compiler.cfg.instructions
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.numbering compiler.cfg.liveness
+compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
+compiler.cfg.utilities cpu.architecture kernel namespaces sequences
+tools.test ;
 IN: compiler.cfg.linear-scan.live-intervals.tests
 
 ! add-range
@@ -27,6 +29,14 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 } [
     5 int-rep <live-interval> dup
     { { 10 12 } { 5 10 } } [ first2 rot add-range ] with each
+] unit-test
+
+! cfg>sync-points
+{
+    V{ T{ sync-point { n 0 } } }
+} [
+    V{ T{ ##call-gc } } insns>cfg
+    [ number-instructions ] [ cfg>sync-points ] bi
 ] unit-test
 
 ! handle-live-out
@@ -68,7 +78,7 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 } [
     -10 from set
     23 to set
-    init-live-intervals
+    H{ } clone live-intervals set
     H{ { 4 4 } { 8 8 } { 9 9 } } leader-map set
     H{ { 4 int-rep } { 8 int-rep } { 9 int-rep } } representations set
     <basic-block> [ H{ { 4 4 } { 8 8 } { 9 9 } } 2array 1array live-outs set ]

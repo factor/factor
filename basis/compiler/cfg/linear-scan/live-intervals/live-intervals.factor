@@ -157,39 +157,13 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
     [ from get to get ] dip live-out keys
     [ live-interval add-range ] 2with each ;
 
-TUPLE: sync-point n keep-dst? ;
-
-C: <sync-point> sync-point
-
-SYMBOL: sync-points
-
-GENERIC: compute-sync-points* ( insn -- )
-
-M: hairy-clobber-insn compute-sync-points*
-    insn#>> f <sync-point> sync-points get push ;
-
-M: clobber-insn compute-sync-points*
-    insn#>> t <sync-point> sync-points get push ;
-
-M: insn compute-sync-points* drop ;
-
 : compute-live-intervals-step ( bb -- )
     {
         [ block-from from set ]
         [ block-to to set ]
         [ handle-live-out ]
-        [
-            instructions>> <reversed> [
-                [ compute-live-intervals* ]
-                [ compute-sync-points* ]
-                bi
-            ] each
-        ]
+        [ instructions>> <reversed> [ compute-live-intervals* ] each ]
     } cleave ;
-
-: init-live-intervals ( -- )
-    H{ } clone live-intervals set
-    V{ } clone sync-points set ;
 
 : compute-start/end ( live-interval -- )
     dup ranges>> [ first from>> ] [ last to>> ] bi
@@ -210,12 +184,30 @@ ERROR: bad-live-interval live-interval ;
         } cleave
     ] each ;
 
+TUPLE: sync-point n keep-dst? ;
+
+C: <sync-point> sync-point
+
+GENERIC: insn>sync-point ( insn -- sync-point/f )
+
+M: hairy-clobber-insn insn>sync-point
+    insn#>> f <sync-point> ;
+
+M: clobber-insn insn>sync-point
+    insn#>> t <sync-point> ;
+
+M: insn insn>sync-point drop f ;
+
+: cfg>sync-points ( cfg -- sync-points )
+    cfg>insns [ insn>sync-point ] map sift ;
+
+: cfg>live-intervals ( cfg -- live-intervals )
+    H{ } clone live-intervals set
+    linearization-order <reversed> [ compute-live-intervals-step ] each
+    live-intervals get values dup finish-live-intervals ;
+
 : compute-live-intervals ( cfg -- intervals/sync-points )
-    init-live-intervals
-    linearization-order [ kill-block?>> ] reject <reversed>
-    [ compute-live-intervals-step ] each
-    live-intervals get values dup finish-live-intervals
-    sync-points get append ;
+    [ cfg>live-intervals ] [ cfg>sync-points ] bi append ;
 
 : relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )
     [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
