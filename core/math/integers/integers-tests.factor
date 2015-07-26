@@ -279,3 +279,6 @@ IN: math.integers.tests
 { 0x0.8p-1022 } [ 8 1026 2^ /f ] unit-test
 { 0x0.6p-1022 } [ 6 1026 2^ /f ] unit-test
 { 0x0.4p-1022 } [ 4 1026 2^ /f ] unit-test
+
+! rounding triggering special case in post-scale
+{ 1.0 } [ 300 2^ 1 - 300 2^ /f ] unit-test
