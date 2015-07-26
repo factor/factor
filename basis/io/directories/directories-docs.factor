@@ -50,13 +50,13 @@ HELP: with-directory-files
 { $examples
     "Print all files in your home directory which are larger than a megabyte:"
     { $code
-        """USING: io.directories io.files.info io.pathnames ;
+        "USING: io.directories io.files.info io.pathnames ;
 home [
     [
         dup link-info size>> 20 2^ >
         [ print ] [ drop ] if
     ] each
-] with-directory-files"""
+] with-directory-files"
     }
 } ;
 

@@ -13,10 +13,10 @@ HELP: monotonic-split-slice
     { $example
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 2 3 4 } [ < ] monotonic-split-slice ."
-        """{
+        "{
     T{ slice { to 3 } { seq { 1 2 3 2 3 4 } } }
     T{ slice { from 3 } { to 6 } { seq { 1 2 3 2 3 4 } } }
-}"""
+}"
     }
 } ;
 
@@ -65,7 +65,7 @@ HELP: trends
     { $example
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 3 2 1 } trends ."
-        """{
+        "{
     T{ upward-slice { to 3 } { seq { 1 2 3 3 2 1 } } }
     T{ stable-slice
         { from 2 }
@@ -77,7 +77,7 @@ HELP: trends
         { to 6 }
         { seq { 1 2 3 3 2 1 } }
     }
-}"""
+}"
     }
 } ;
 

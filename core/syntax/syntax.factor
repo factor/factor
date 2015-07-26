@@ -8,8 +8,9 @@ classes.union combinators compiler.units definitions effects
 effects.parser generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables io.pathnames kernel lexer
 math namespaces parser quotations sbufs sequences slots
-source-files splitting strings strings.parser vectors vocabs
-vocabs.parser words words.alias words.constant words.symbol ;
+source-files splitting strings strings.parser
+strings.parser.private vectors vocabs vocabs.parser words
+words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -91,7 +92,7 @@ IN: bootstrap.syntax
         } cond suffix!
     ] define-core-syntax
 
-    "\"" [ parse-multiline-string suffix! ] define-core-syntax
+    "\"" [ "\"" parse-multiline-string-until suffix! ] define-core-syntax
 
     "SBUF\"" [
         lexer get skip-blank parse-string >sbuf suffix!

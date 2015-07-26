@@ -246,20 +246,20 @@ M: f generic-forget-test ;
 
 ! erg's regression
 { } [
-    """IN: generic.standard.tests
+    "IN: generic.standard.tests
 
     GENERIC: jeah ( a -- b )
     TUPLE: boii ;
     M: boii jeah ;
     GENERIC: jeah* ( a -- b )
-    M: boii jeah* jeah ;""" eval( -- )
+    M: boii jeah* jeah ;" eval( -- )
 
-    """IN: generic.standard.tests
-    FORGET: boii""" eval( -- )
+    "IN: generic.standard.tests
+    FORGET: boii" eval( -- )
 
-    """IN: generic.standard.tests
+    "IN: generic.standard.tests
     TUPLE: boii ;
-    M: boii jeah ;""" eval( -- )
+    M: boii jeah ;" eval( -- )
 ] unit-test
 
 ! Testing next-method

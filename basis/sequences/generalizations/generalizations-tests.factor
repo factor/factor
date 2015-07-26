@@ -42,11 +42,11 @@ IN: sequences.generalizations.tests
     [ [ 2 - ] [ ] [ 1 - ] tri ] 2 nproduce
     [ drop ] 2dip ;
 
-{ """A1a!
+{ "A1a!
 B2b@
 C3c#
 D4d$
-""" } [
+" } [
     { "A" "B" "C" "D" }
     { "1" "2" "3" "4" }
     { "a" "b" "c" "d" }
@@ -115,11 +115,11 @@ D4d$
     mnmap-1-test
 ] unit-test
 
-{ """A1a!
+{ "A1a!
 B2b@
 C3c#
 D4d$
-""" } [
+" } [
     { "A" "B" "C" "D" }
     { "1" "2" "3" "4" }
     { "a" "b" "c" "d" }

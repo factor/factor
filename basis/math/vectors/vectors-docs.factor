@@ -135,21 +135,21 @@ ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
 }
 "For an integer vector, false will manifest as " { $snippet "0" } " and true as " { $snippet "-1" } " (for signed vectors) or the largest representable value of the element type (for unsigned vectors):"
 { $example
-"""USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
+"USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
 
 int-4{ 1 2 3 0 } int-4{ 1 -2 3 4 } v=
 uchar-16{  0  1  2  3  4  5 6 7 8 9 10 11 12 13 14 15 }
 uchar-16{ 15 14 13 12 11 10 9 8 7 6  5  4  3  2  1  0 } v<
-[ . ] bi@"""
-"""int-4{ -1 0 -1 0 }
-uchar-16{ 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 }"""
+[ . ] bi@"
+"int-4{ -1 0 -1 0 }
+uchar-16{ 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 }"
 }
 "This differs from Factor's native representation of boolean values, where " { $link f } " is false and every other value (including " { $snippet "0" } " and " { $snippet "0.0" } ") is true. To make it easy to construct literal SIMD masks, " { $link t } " and " { $link f } " are accepted inside SIMD literal syntax and expand to the proper true or false representation for the underlying type:"
 { $example
-"""USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
+"USING: math.vectors math.vectors.simd prettyprint alien.c-types ;
 
-int-4{ f f t f } ."""
-"""int-4{ 0 0 -1 0 }""" }
+int-4{ f f t f } ."
+"int-4{ 0 0 -1 0 }" }
 "However, extracting an element from a boolean SIMD vector with " { $link nth } " will not yield a valid Factor boolean. This is not generally a problem, since the results of vector comparisons are meant to be consumed by subsequent vector logical and test operations, which will accept SIMD values in the native boolean format."
 $nl
 "Providing a SIMD boolean vector with element values other than the proper true and false representations as an input to the vector logical or test operations is undefined. Do not count on operations such as " { $link vall? } " or " { $link v? } " using bitwise operations to construct their results."
@@ -380,10 +380,10 @@ HELP: vmerge
 { $values { "u" sequence } { "v" sequence } { "w" sequence } }
 { $description "Creates a new sequence of the same type as and twice the length of " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples
-{ $example """USING: kernel math.vectors prettyprint ;
+{ $example "USING: kernel math.vectors prettyprint ;
 
-{ "A" "B" "C" "D" } { "1" "2" "3" "4" } vmerge ."""
-"""{ "A" "1" "B" "2" "C" "3" "D" "4" }"""
+{ \"A\" \"B\" \"C\" \"D\" } { \"1\" \"2\" \"3\" \"4\" } vmerge ."
+"{ \"A\" \"1\" \"B\" \"2\" \"C\" \"3\" \"D\" \"4\" }"
 } } ;
 
 HELP: (vmerge)
@@ -391,11 +391,11 @@ HELP: (vmerge)
 { $description "Creates two new sequences of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "For hardware-supported SIMD vector types this word compiles to a single instruction per output value." }
 { $examples
-{ $example """USING: kernel math.vectors prettyprint ;
+{ $example "USING: kernel math.vectors prettyprint ;
 
-{ "A" "B" "C" "D" } { "1" "2" "3" "4" } (vmerge) [ . ] bi@"""
-"""{ "A" "1" "B" "2" }
-{ "C" "3" "D" "4" }"""
+{ \"A\" \"B\" \"C\" \"D\" } { \"1\" \"2\" \"3\" \"4\" } (vmerge) [ . ] bi@"
+"{ \"A\" \"1\" \"B\" \"2\" }
+{ \"C\" \"3\" \"D\" \"4\" }"
 } } ;
 
 HELP: (vmerge-head)
@@ -403,10 +403,10 @@ HELP: (vmerge-head)
 { $description "Creates a new sequence of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the first half of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "For hardware-supported SIMD vector types this word compiles to a single instruction." }
 { $examples
-{ $example """USING: kernel math.vectors prettyprint ;
+{ $example "USING: kernel math.vectors prettyprint ;
 
-{ "A" "B" "C" "D" } { "1" "2" "3" "4" } (vmerge-head) ."""
-"""{ "A" "1" "B" "2" }"""
+{ \"A\" \"B\" \"C\" \"D\" } { \"1\" \"2\" \"3\" \"4\" } (vmerge-head) ."
+"{ \"A\" \"1\" \"B\" \"2\" }"
 } } ;
 
 HELP: (vmerge-tail)
@@ -414,10 +414,10 @@ HELP: (vmerge-tail)
 { $description "Creates a new sequence of the same type and size as " { $snippet "u" } " and " { $snippet "v" } " by interleaving the elements from the tail half of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "For hardware-supported SIMD vector types this word compiles to a single instruction." }
 { $examples
-{ $example """USING: kernel math.vectors prettyprint ;
+{ $example "USING: kernel math.vectors prettyprint ;
 
-{ "A" "B" "C" "D" } { "1" "2" "3" "4" } (vmerge-tail) ."""
-"""{ "C" "3" "D" "4" }"""
+{ \"A\" \"B\" \"C\" \"D\" } { \"1\" \"2\" \"3\" \"4\" } (vmerge-tail) ."
+"{ \"C\" \"3\" \"D\" \"4\" }"
 } } ;
 
 { vmerge (vmerge) (vmerge-head) (vmerge-tail) } related-words

@@ -60,11 +60,11 @@ C-TYPE: opaque
 { t } [ void* lookup-c-type pointer: opaque lookup-c-type = ] unit-test
 [ opaque lookup-c-type ] [ no-c-type? ] must-fail-with
 
-[ """
+[ "
     USING: alien.syntax ;
     IN: alien.c-types.tests
     FUNCTION: opaque return_opaque ( ) ;
-""" eval( -- ) ] [ no-c-type? ] must-fail-with
+" eval( -- ) ] [ no-c-type? ] must-fail-with
 
 C-TYPE: forward
 STRUCT: backward { x forward* } ;
@@ -78,19 +78,19 @@ DEFER: struct-redefined
 { f }
 [
 
-    """
+    "
     USING: alien.c-types classes.struct ;
     IN: alien.c-types.tests
 
     STRUCT: struct-redefined { x int } ;
-    """ eval( -- )
+    " eval( -- )
 
-    """
+    "
     USING: alien.syntax ;
     IN: alien.c-types.tests
 
     C-TYPE: struct-redefined
-    """ eval( -- )
+    " eval( -- )
 
     \ struct-redefined class?
 ] unit-test

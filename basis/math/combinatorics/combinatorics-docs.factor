@@ -88,14 +88,14 @@ HELP: all-combinations
 { $examples
     { $example "USING: math.combinatorics prettyprint ;"
         "{ \"a\" \"b\" \"c\" \"d\" } 2 all-combinations ."
-"""{
-    { "a" "b" }
-    { "a" "c" }
-    { "a" "d" }
-    { "b" "c" }
-    { "b" "d" }
-    { "c" "d" }
-}""" } } ;
+"{
+    { \"a\" \"b\" }
+    { \"a\" \"c\" }
+    { \"a\" \"d\" }
+    { \"b\" \"c\" }
+    { \"b\" \"d\" }
+    { \"c\" \"d\" }
+}" } } ;
 
 HELP: each-combination
 { $values { "seq" sequence } { "k" "a non-negative integer" } { "quot" { $quotation ( ... elt -- ... ) } } }

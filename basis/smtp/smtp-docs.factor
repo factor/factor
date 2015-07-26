@@ -89,11 +89,11 @@ ARTICLE: "smtp-gmail" "Setting up SMTP with gmail"
 { $code
     "USING: smtp namespaces io.sockets ;"
     ""
-    """default-smtp-config
-    "smtp.gmail.com" 587 <inet> >>server
+    "default-smtp-config
+    \"smtp.gmail.com\" 587 <inet> >>server
     t >>tls?
-    "my.gmail.address@gmail.com" "qwertyuiasdfghjk" <plain-auth> >>auth
-    \\ smtp-config set-global"""
+    \"my.gmail.address@gmail.com\" \"qwertyuiasdfghjk\" <plain-auth> >>auth
+    \\ smtp-config set-global"
 } ;
 
 

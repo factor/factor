@@ -3,9 +3,9 @@ USING: classes.mixin help.markup help.syntax kernel multiline roles ;
 IN: roles
 
 HELP: ROLE:
-{ $syntax """ROLE: name slots... ;
+{ $syntax "ROLE: name slots... ;
 ROLE: name < role slots... ;
-ROLE: name <{ roles... } slots... ;""" }
+ROLE: name <{ roles... } slots... ;" }
 { $description "Defines a new " { $link role } ". " { $link tuple } " classes which inherit this role will contain the specified " { $snippet "slots" } " as well as the slots associated with the optional inherited " { $snippet "roles" } "."
 $nl
 "Slot specifiers take one of the following three forms:"
@@ -17,9 +17,9 @@ $nl
 "Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." } ;
 
 HELP: ROLE-TUPLE:
-{ $syntax """ROLE-TUPLE: name slots ;
+{ $syntax "ROLE-TUPLE: name slots ;
 ROLE-TUPLE: name < estate slots ;
-ROLE-TUPLE: name <{ estates... } slots... ;""" }
+ROLE-TUPLE: name <{ estates... } slots... ;" }
 { $description "Defines a new " { $link tuple } " class."
 $nl
 "The list of inherited " { $snippet "estates" } " is optional; a single tuple superclass and/or a set of " { $link role } "s can be specified. If no superclass is provided, it defaults to " { $link tuple } "."

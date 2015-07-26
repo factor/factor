@@ -68,19 +68,19 @@ SLOT-CONSTRUCTOR: a-monster
 { 18 } [ "Phil" 11 11 <b-monster> stop>> ] unit-test
 
 [
-    """USE: constructors
+    "USE: constructors
 IN: constructors.tests
 TUPLE: foo a b ;
-CONSTRUCTOR: <foo> foo ( a a -- obj )""" eval( -- )
+CONSTRUCTOR: <foo> foo ( a a -- obj )" eval( -- )
 ] [
     error>> repeated-constructor-parameters?
 ] must-fail-with
 
 [
-    """USE: constructors
+    "USE: constructors
 IN: constructors.tests
 TUPLE: foo a b ;
-CONSTRUCTOR: <foo> foo ( a c -- obj )""" eval( -- )
+CONSTRUCTOR: <foo> foo ( a c -- obj )" eval( -- )
 ] [
     error>> unknown-constructor-parameters?
 ] must-fail-with

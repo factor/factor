@@ -16,10 +16,10 @@ HELP: with-file-reader-progress
 { $description "Opens a file for reading, displays a progress bar, and calls the quotation for processing the file. The progress bar will automtically update every 100 milliseconds, but only if the quotation yields (by calling " { $link yield } ") so that the UI has a chance to redraw." }
 { $examples
     "Loop through the Factor image file, discarding each character as it's read and updating a progress bar:"
-    { $unchecked-example """USING: system progress-bars.models prettyprint io.encodings.binary threads ;
+    { $unchecked-example "USING: system progress-bars.models prettyprint io.encodings.binary threads ;
 image binary [
     [ 4096 read yield ] loop
-] with-file-reader-progress"""
+] with-file-reader-progress"
 ""
     }
 } ;

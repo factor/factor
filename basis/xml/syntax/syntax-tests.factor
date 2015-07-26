@@ -48,13 +48,13 @@ XML-NS: foo http://blah.com
     [ extract-variables ] tri
 ] unit-test
 
-{ """<?xml version="1.0" encoding="UTF-8"?>
+{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <x>
   one
-  <b val="two"/>
+  <b val=\"two\"/>
   y
   <foo/>
-</x>""" } [
+</x>" } [
     [let "one" :> a "two" :> c "y" :> x [XML <-x-> <foo/> XML] :> d
         <XML
             <x> <-a-> <b val=<-c->/> <-d-> </x>
@@ -62,7 +62,7 @@ XML-NS: foo http://blah.com
     ]
 ] unit-test
 
-{ """<?xml version="1.0" encoding="UTF-8"?>
+{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <doc>
   <item>
     one
@@ -73,14 +73,14 @@ XML-NS: foo http://blah.com
   <item>
     three
   </item>
-</doc>""" } [
+</doc>" } [
     "one two three" " " split
     [ [XML <item><-></item> XML] ] map
     <XML <doc><-></doc> XML> pprint-xml>string
 ] unit-test
 
-{ """<?xml version="1.0" encoding="UTF-8"?>
-<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>""" }
+{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<x number=\"3\" url=\"http://factorcode.org/\" string=\"hello\" word=\"drop\"/>" }
 [ 3 f "http://factorcode.org/" "hello" \ drop
   <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
   pprint-xml>string  ] unit-test
@@ -134,14 +134,14 @@ XML-NS: foo http://blah.com
 
 ! Make sure nested XML documents interpolate correctly
 {
-    """<?xml version="1.0" encoding="UTF-8"?><color><blue>it's blue!</blue></color>"""
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><color><blue>it's blue!</blue></color>"
 } [
     "it's blue!" <XML <blue><-></blue> XML>
     <XML <color><-></color> XML> xml>string
 ] unit-test
 
 {
-    """<?xml version="1.0" encoding="UTF-8"?><a>asdf<asdf/>asdf2</a>"""
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>asdf<asdf/>asdf2</a"
 } [
     default-prolog
     "asdf"

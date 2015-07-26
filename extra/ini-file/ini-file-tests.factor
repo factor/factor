@@ -23,67 +23,67 @@ IN: ini-file.tests
 
 { H{ { "section" H{ { "foo" "abc def" } } } } }
 [
-    """
+    "
     [section]
     foo = abc def
-    """ string>ini
+    " string>ini
 ] unit-test
 
 { H{ { "section" H{ { "foo" "abc def" } } } } }
 [
-    """
+    "
     [section]
     foo = abc    \\
-          "def"
-    """ string>ini
+          \"def\"
+    " string>ini
 ] unit-test
 
 { H{ { "section" H{ { "foo" "abc def" } } } } }
 [
-    """
+    "
     [section]
-    foo = "abc " \\
+    foo = \"abc \" \\
           def
-    """ string>ini
+    " string>ini
 ] unit-test
 
 { H{ { "section" H{ { "foo" "abc def" } } } } }
 [
-    """
-    [section]   foo = "abc def"
-    """ string>ini
+    "
+    [section]   foo = \"abc def\"
+    " string>ini
 ] unit-test
 
 { H{ { "section" H{ { "foo" "abc def" } } } } }
 [
-    """
+    "
     [section]   foo = abc \\
-    "def"
-    """ string>ini
+    \"def\"
+    " string>ini
 ] unit-test
 
 { H{ { "section" H{ { "foo" "" } } } } }
 [
-    """
+    "
     [section]
     foo=
-    """ string>ini
+    " string>ini
 ] unit-test
 
 { H{ { "section" H{ { "foo" "" } } } } }
 [
-    """
+    "
     [section]
     foo
-    """ string>ini
+    " string>ini
 ] unit-test
 
 { H{ { "" H{ { "" "" } } } } }
 [
-    """
+    "
     []
     =
-    """ string>ini
+    " string>ini
 ] unit-test
 
 { H{ { "owner" H{ { "name" "John Doe" }
@@ -92,7 +92,7 @@ IN: ini-file.tests
                      { "port" "143" }
                      { "file" "payroll.dat" } } } } }
 [
-    """
+    "
     ; last modified 1 April 2001 by John Doe
     [owner]
     name=John Doe
@@ -101,29 +101,29 @@ IN: ini-file.tests
     [database]
     server=192.0.2.62     ; use IP address in case network name resolution is not working
     port=143
-    file = "payroll.dat"
-    """ string>ini
+    file = \"payroll.dat\"
+    " string>ini
 ] unit-test
 
 { H{ { "a long section name"
        H{ { "a long key name" "a long value name" } } } } }
 [
-    """
+    "
     [a long section name ]
     a long key name=  a long value name
-    """ string>ini
+    " string>ini
 ] unit-test
 
 { H{ { "key with \n esc\ape \r codes \""
        "value with \t esc\ape codes" } } }
 [
-    """
+    "
     key with \\n esc\\ape \\r codes \\\" = value with \\t esc\\ape codes
-    """ string>ini
+    " string>ini
 ] unit-test
 
 
-{ """key with \\n esc\\ape \\r codes \\\"=value with \\t esc\\ape codes\n""" }
+{ "key with \\n esc\\ape \\r codes \\\"=value with \\t esc\\ape codes\n" }
 [
     H{ { "key with \n esc\ape \r codes \""
          "value with \t esc\ape codes" } } ini>string

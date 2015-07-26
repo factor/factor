@@ -35,20 +35,20 @@ $nl
 { $examples
   { $code
     "USING: imap ; "
-    """"imap.gmail.com" "email_address@gmail.com" "password" [ list-folders ] with-imap"""
+    "\"imap.gmail.com\" \"email_address@gmail.com\" \"password\" [ list-folders ] with-imap"
   }
   { $unchecked-example
-    """USING: imap namespaces ;
+    "USING: imap namespaces ;
     \\ imap-settings get-global [
-        "factor" select-folder drop
-        "ALL" "" search-mails
-        "(BODY[HEADER.FIELDS (SUBJECT)])" fetch-mails
-    ] with-imap-settings 3 head ."""
-    """{
-    "Subject: [Factor-talk] Wiki Tutorial"
-    "Subject: Re: [Factor-talk] font-size in listener"
-    "Subject: Re: [Factor-talk] Indentation width and other style guidelines"
-}"""
+        \"factor\" select-folder drop
+        \"ALL\" \"\" search-mails
+        \"(BODY[HEADER.FIELDS (SUBJECT)])\" fetch-mails
+    ] with-imap-settings 3 head ."
+    "{
+    \"Subject: [Factor-talk] Wiki Tutorial\"
+    \"Subject: Re: [Factor-talk] font-size in listener\"
+    \"Subject: Re: [Factor-talk] Indentation width and other style guidelines\"
+}"
   }
 } ;
 
@@ -93,11 +93,11 @@ HELP: status-folder
 { $description "Requests a collection of attributes for the specified folder." }
 { $examples
   { $unchecked-example
-    """USING: imap ;
+    "USING: imap ;
     \\ imap-settings get-global [
-        "INBOX" { "MESSAGES" "UNSEEN" } status-folder
-    ] with-imap-settings"""
-    """{ { "MESSAGES" 67 } { "UNSEEN" 18 } }"""
+        \"INBOX\" { \"MESSAGES\" \"UNSEEN\" } status-folder
+    ] with-imap-settings"
+    "{ { \"MESSAGES\" 67 } { \"UNSEEN\" 18 } }"
   }
 } ;
 
@@ -159,7 +159,7 @@ HELP: imap-settings
     "Add the following settings to your bootstrap rc file:"
     { $unchecked-example
         "USING: imap namespaces ;"
-        """"imap.gmail.com" "foo@gmail.com" "password" <imap-settings> \\ imap-settings set-global"""
+        "\"imap.gmail.com\" \"foo@gmail.com\" \"password\" <imap-settings> \\ imap-settings set-global"
         ""
     }
     "Run your boot rc again:"

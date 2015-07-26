@@ -13,16 +13,16 @@ IN: compiler.tests.callback-error
     ascii <process-reader> stream-lines ;
 
 [ ] [
-    """USING: alien alien.c-types alien.syntax kernel ;
+    " USING: alien alien.c-types alien.syntax kernel ;
     IN: scratchpad
     
     : callback-death ( -- callback )
-        void { } cdecl [ "Error!" throw ] alien-callback ;
+        void { } cdecl [ \"Error!\" throw ] alien-callback ;
     
     : callback-invoke ( callback -- )
         void { } cdecl alien-indirect ;
     
-    callback-death callback-invoke"""
+    callback-death callback-invoke"
     callback-error-script ascii set-file-contents
 ] unit-test
 
@@ -30,17 +30,17 @@ IN: compiler.tests.callback-error
 [ t ] [  run-vm-with-script "\"Error!\"" swap member? ] unit-test
 
 [ ] [
-    """USING: alien alien.c-types alien.syntax kernel threads ;
+    "USING: alien alien.c-types alien.syntax kernel threads ;
     IN: scratchpad
     
     : callback-death ( -- callback )
-        void { } cdecl [ "Error!" throw ] alien-callback ;
+        void { } cdecl [ \"Error!\" throw ] alien-callback ;
     
     : callback-invoke ( callback -- )
         void { } cdecl alien-indirect ;
     
     [ callback-death callback-invoke ] in-thread
-    stop"""
+    stop"
     callback-error-script ascii set-file-contents
 ] unit-test
 

@@ -4,7 +4,7 @@ USING: 99-bottles io.streams.string tools.test ;
 IN: 99-bottles.tests
 
 {
-"""99 bottles of beer on the wall, 99 bottles of beer.
+"99 bottles of beer on the wall, 99 bottles of beer.
 Take one down, pass it around, 98 bottles of beer on the wall.
 
 98 bottles of beer on the wall, 98 bottles of beer.
@@ -303,6 +303,6 @@ Take one down, pass it around, no more bottles of beer on the wall.
 
 No more bottles of beer on the wall, no more bottles of beer.
 Go to the store and buy some more, 99 bottles of beer on the wall.
-"""
+"
 }
 [ [ 99-bottles ] with-string-writer ] unit-test

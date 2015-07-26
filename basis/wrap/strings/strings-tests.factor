@@ -4,31 +4,31 @@ USING: kernel tools.test wrap.strings ;
 IN: wrap.strings.tests
 
 {
-    """This is a
+    "This is a
 long piece
 of text
 that we
 wish to
-word wrap."""
+word wrap."
 } [
-    """This is a long piece of text that we wish to word wrap.""" 10
+    "This is a long piece of text that we wish to word wrap." 10
     wrap-string
 ] unit-test
 
 {
-    """  This is a
+    "  This is a
   long piece
   of text
   that we
   wish to
-  word wrap."""
+  word wrap."
 } [
-    """This is a long piece of text that we wish to word wrap.""" 12
+    "This is a long piece of text that we wish to word wrap." 12
     "  " wrap-indented-string
 ] unit-test
 
 { t } [
-    """This is a long piece of text that we wish to word wrap.""" 12
+    "This is a long piece of text that we wish to word wrap." 12
     [ "  " wrap-indented-string ] [ 2 wrap-indented-string ] 2bi =
 ] unit-test
 

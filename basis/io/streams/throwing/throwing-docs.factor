@@ -16,8 +16,8 @@ HELP: stream-throw-on-eof
 }
 { $description "Wraps a stream in a " { $link <throws-on-eof-stream> } " tuple and calls the quotation with this stream as the " { $link input-stream } " variable. Causes a " { $link stream-exhausted } " exception to be thrown upon stream exhaustion. The stream is left open after this combinator returns." }
 "This example will throw a " { $link stream-exhausted } " exception:"
-{ $unchecked-example """USING: io.streams.throwing prettyprint ;
-"abc" <string-reader> [ 4 read ] stream-throw-on-eof"""
+{ $unchecked-example "USING: io.streams.throwing prettyprint ;
+\"abc\" <string-reader> [ 4 read ] stream-throw-on-eof"
 ""
 } ;
 
@@ -27,8 +27,8 @@ HELP: throw-on-eof
 }
 { $description "Wraps the value stored in the " { $link input-stream } " variable and causes a stream read that exhausts the input stream to throw a " { $link stream-exhausted } " exception. The stream is left open after this combinator returns." } $nl
 "This example will throw a " { $link stream-exhausted } " exception:"
-{ $unchecked-example """USING: io.streams.throwing prettyprint ;
-"abc" [ [ 4 read ] throw-on-eof ] with-string-reader"""
+{ $unchecked-example "USING: io.streams.throwing prettyprint ;
+\"abc\" [ [ 4 read ] throw-on-eof ] with-string-reader"
 ""
 } ;
 

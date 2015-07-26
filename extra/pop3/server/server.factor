@@ -120,7 +120,7 @@ IN: pop3.server
                     {
                         [ dup "TOP 1 0" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.first@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -136,14 +136,14 @@ Subject: First test with mock POP3 server
 Content-Type: text/plain; charset=UTF-8
 
 .
-"""
+"
                             write flush t
                         ]
                     }
                     {
                         [ dup "TOP 2 0" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.second@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -159,7 +159,7 @@ Subject: Second test with mock POP3 server
 Content-Type: text/plain; charset=UTF-8
 
 .
-"""
+"
                             write flush t
                         ]
                     }
@@ -173,7 +173,7 @@ Content-Type: text/plain; charset=UTF-8
                     {
                         [ dup "RETR 1" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.first@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -190,14 +190,14 @@ Content-Type: text/plain; charset=UTF-8
 
 This is the body of the first test. 
 .
-"""
+"
                             write flush t
                         ]
                     }
                     {
                         [ dup "RETR 2" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.second@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -214,7 +214,7 @@ Content-Type: text/plain; charset=UTF-8
 
 This is the body of the second test. 
 .
-"""
+"
                             write flush t
                         ]
                     }

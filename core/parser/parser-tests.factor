@@ -25,8 +25,8 @@ unit-test
 
 { "hello world" }
 [
-"""#!/usr/bin/env factor
-"hello world" """ eval( -- string )
+"#!/usr/bin/env factor
+\"hello world\"" eval( -- string )
 ] unit-test
 
 { "hello world" }

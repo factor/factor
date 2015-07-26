@@ -157,7 +157,7 @@ ERROR: escaped-char-expected ;
         advance-char drop
     ] if ;
 
-DEFER: (parse-multiline-string)
+DEFER: (parse-multiline-string-until)
 
 : parse-found-token ( accum lexer string i token -- )
     { sbuf lexer string fixnum fixnum } declare
@@ -165,26 +165,26 @@ DEFER: (parse-multiline-string)
     CHAR: \ = [
         2over next-char swap push
         2over next-char swap push
-        (parse-multiline-string)
+        (parse-multiline-string-until)
     ] [
         2dup lexer-head? [
             end-string-parse
         ] [
             2over next-char swap push
-            (parse-multiline-string)
+            (parse-multiline-string-until)
         ] if
     ] if ;
 
 ERROR: trailing-characters string ;
 
-: (parse-multiline-string) ( accum lexer string -- )
+: (parse-multiline-string-until) ( accum lexer string -- )
     { sbuf lexer fixnum } declare
     over still-parsing? [
         2dup first find-next-token [
             parse-found-token
         ] [
             drop 2over next-line%
-            (parse-multiline-string)
+            (parse-multiline-string-until)
         ] if*
     ] [
         throw-unexpected-eof
@@ -192,13 +192,7 @@ ERROR: trailing-characters string ;
 
 PRIVATE>
 
-: parse-multiline-string ( -- string )
-    SBUF" " clone [
-        lexer get
-        dup rest-of-line "\"\"" head? [
-            [ 2 + ] change-column
-            "\"\"\""
-        ] [
-            "\""
-        ] if (parse-multiline-string)
-    ] keep unescape-string ;
+: parse-multiline-string-until ( arg -- string )
+    [ SBUF" " clone ] dip [
+        [ lexer get ] dip (parse-multiline-string-until)
+    ] curry keep unescape-string ;

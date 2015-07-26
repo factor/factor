@@ -258,7 +258,7 @@ $nl
 { $examples
     { $code
     "consolidate ."
-"""{
+"{
         T{ message
             { # 1 }
             { uidl \"000000d547ac2fc2\" }
@@ -275,7 +275,7 @@ $nl
             { subject \"Second subject\" }
             { size \"747\" }
         }
-}"""
+}"
     ""
     }
 }
