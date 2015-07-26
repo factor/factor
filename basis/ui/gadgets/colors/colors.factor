@@ -4,6 +4,7 @@ USING: accessors colors colors.constants ui.pens.solid ;
 IN: ui.gadgets.colors
 
 CONSTANT: toolbar-background COLOR: grey95
+CONSTANT: toolbar-button-pressed-background COLOR: dark-gray
 
 CONSTANT: menu-background COLOR: grey95
 CONSTANT: menu-border-color COLOR: grey75
