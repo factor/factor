@@ -18,7 +18,7 @@ CONSTANT: column-title-background COLOR: grey95
 CONSTANT: roll-button-rollover-border COLOR: gray50
 CONSTANT: roll-button-selected-background COLOR: dark-gray
 
-CONSTANT: source-files-color COLOR: NavajoWhite
+CONSTANT: source-files-color COLOR: yellow2
 CONSTANT: errors-color COLOR: chocolate1
 CONSTANT: details-color COLOR: SlateGray2
 
@@ -39,7 +39,11 @@ CONSTANT: contents-color COLOR: orchid2
 CONSTANT: help-header-background
 T{ rgba { red 0.9568 } { green 0.9450 } { blue 0.8509 } { alpha 1.0 } } inline
 
-CONSTANT: thread-status-background
+CONSTANT: thread-status-stopped-background
+T{ rgba { red 0.9568 } { green 0.8509 } { blue 0.8509 } { alpha 1.0 } } inline
+CONSTANT: thread-status-suspended-background
+T{ rgba { red 0.9568 } { green 0.9450 } { blue 0.8509 } { alpha 1.0 } } inline
+CONSTANT: thread-status-running-background
 T{ rgba { red 0.9295 } { green 0.9569 } { blue 0.8510 } { alpha 1.0 } } inline
 
 CONSTANT: error-summary-background
