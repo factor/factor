@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors.constants combinators fonts
+USING: accessors arrays colors.constants combinators fonts fry
 kernel make math.functions models namespaces sequences splitting
 strings ui.baseline-alignment ui.gadgets ui.gadgets.tracks
 ui.pens.solid ui.render ui.text ;
@@ -64,13 +64,21 @@ M: label baseline*
 M: label cap-height*
     label-metrics cap-height>> round ;
 
+<PRIVATE
+
+: label-background ( label -- color )
+    gadget-background background get or ; inline
+
+: label-foreground ( label -- color )
+    gadget-foreground foreground get or ; inline
+
+PRIVATE>
+
 M: label draw-gadget*
-    >label<
-    [
-        background get [ font-with-background ] when*
-        foreground get [ font-with-foreground ] when*
-    ] dip
-    draw-text ;
+    [ >label< ] keep
+    [ label-background [ font-with-background ] when* ]
+    [ label-foreground [ font-with-foreground ] when* ]
+    bi-curry compose dip draw-text ;
 
 M: label gadget-text* string>> % ;
 
