@@ -48,14 +48,14 @@ ERROR: bad-vconvert-input value expected-type ;
         [ from-element unsigned-type? to-element unsigned-type? not and ]
     } 0|| [ from-type to-type bad-vconvert ] when ;
 
-:: [[vpack-unsigned]] ( from-type to-type -- quot )
+:: ([vpack-unsigned]) ( from-type to-type -- quot )
     from-type new simd-rep
     '[
         [ from-type check-vconvert-type underlying>> ] bi@
         _ (simd-vpack-unsigned) to-type boa
     ] ;
 
-:: [[vpack-signed]] ( from-type to-type -- quot )
+:: ([vpack-signed]) ( from-type to-type -- quot )
     from-type new simd-rep
     '[
         [ from-type check-vconvert-type underlying>> ] bi@
@@ -68,7 +68,7 @@ ERROR: bad-vconvert-input value expected-type ;
     from-element to-element from-type to-type steps check-vpack
 
     from-type to-type to-element unsigned-type?
-    [ [[vpack-unsigned]] ] [ [[vpack-signed]] ] if ;
+    [ ([vpack-unsigned]) ] [ ([vpack-signed]) ] if ;
 
 :: check-vunpack ( from-element to-element from-type to-type steps -- )
     {
@@ -77,7 +77,7 @@ ERROR: bad-vconvert-input value expected-type ;
         [ from-element unsigned-type? not to-element unsigned-type? and ]
     } 0|| [ from-type to-type bad-vconvert ] when ;
 
-:: [[vunpack]] ( from-type to-type -- quot )
+:: ([vunpack]) ( from-type to-type -- quot )
     from-type new simd-rep
     '[
         from-type check-vconvert-type underlying>> _
@@ -88,7 +88,7 @@ ERROR: bad-vconvert-input value expected-type ;
 :: [vunpack] ( from-element to-element from-size to-size from-type to-type -- quot )
     to-size from-size /i log2 :> steps
     from-element to-element from-type to-type steps check-vunpack
-    from-type to-type [[vunpack]] ;
+    from-type to-type ([vunpack]) ;
 
 PRIVATE>
 
