@@ -1,4 +1,4 @@
-USING: cpu.x86 help.markup help.syntax layouts math ;
+USING: compiler.cfg.instructions cpu.x86 help.markup help.syntax layouts math ;
 IN: compiler.cfg.stack-frame
 
 HELP: stack-frame
@@ -25,7 +25,7 @@ HELP: stack-frame
 
 HELP: (stack-frame-size)
 { $values { "stack-frame" stack-frame } { "n" integer } }
-{ $description "Base stack frame size, without padding and alignment." } ;
+{ $description "Base stack frame size, without padding and alignment. If the size is zero, then no " { $link ##epilogue } " and " { $link ##prologue } " needs to be emitted for the word." } ;
 
 HELP: spill-offset
 { $values { "n" integer } { "offset" integer } }
