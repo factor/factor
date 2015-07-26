@@ -116,6 +116,16 @@ M: bignum (log2) bignum-log2 ; inline
 ! provided with absolutely no warranty."
 
 ! First step: pre-scaling
+! As an optimization to minimize the size of the operands of the bignum
+! divisions we will do, we start by stripping any trailing zeros from
+! the denominator and move it into the scale factor.
+! We want a result in ]2^54;2^53] to find the mantissa
+! in ]2^53,2^52] with 1 extra "guard" bit for rounding.
+! So we shift the numerator to get the result of the integer division
+! "num/den" in the range ]2^54; 2^53]; Our shift is only a guess
+! based on the magnitude of the inputs, so it
+! will actually give results in the range ]2^55; 2^53].
+! Note: epsilon is used for rounding in step 3.
 : twos ( x -- y ) dup 1 - bitxor log2 ; inline
 
 : scale-denonimator ( den -- scaled-den scale' )
@@ -124,33 +134,42 @@ M: bignum (log2) bignum-log2 ; inline
 : (epsilon?) ( num shift -- ? )
     dup neg? [ neg 2^ 1 - bitand zero? not ] [ 2drop f ] if ; inline
 
-: pre-scale ( num den -- epsilon? mantissa den' scale )
-    2dup [ log2 ] bi@ -
-    [ neg 54 + [ (epsilon?) ] [ shift ] 2bi ]
-    [ [ scale-denonimator ] dip + ] bi-curry bi* ; inline
+: scale-numerator ( num den -- epsilon? num' scale )
+    over [ log2 ] bi@ - [
+        54 + [ (epsilon?) ] [ shift ] 2bi
+    ] keep ; inline
 
-! Second step: loop
+: pre-scale ( num den -- epsilon? num' den' scale )
+    scale-denonimator [
+        [ scale-numerator ] keep swap
+    ] dip swap - ; inline
+
+! Second step: compute mantissa
+! "num/den" would be in the range ]2^55; 2^53]. After this step
+! it will be in the range ]2^54; 2^53]. Compute "num/den" and the
+! reminder used for rounding
 : (2/-with-epsilon) ( epsilon? num -- epsilon?' num' )
     [ 1 bitand zero? not or ] [ 2/ ] bi ; inline
 
-: /f-loop ( epsilon? mantissa den scale -- epsilon?' fraction-and-guard rem scale' )
-    [ 2over /i log2 53 > ]
-    [ [ (2/-with-epsilon) ] [ ] [ 1 + ] tri* ] while
+: mantissa-and-guard ( epsilon? num den scale -- epsilon?' mantissa-and-guard rem scale' )
+    2over /i log2 53 >
+    [ [ (2/-with-epsilon) ] [ ] [ 1 + ] tri* ] when
     [ /mod ] dip ; inline
 
-! Third step: post-scaling
-: scale-float ( mantissa scale -- float' )
-    {
-        { [ dup 1024 > ] [ 2drop 1/0. ] }
-        { [ dup -1023 < ] [ 1021 + shift bits>double ] }
-        [ [ 52 2^ 1 - bitand ] dip 1022 + 52 shift bitor bits>double ]
-    } cond ; inline
-
-: post-scale ( mantissa scale -- n )
-    [ 2/ ] dip over log2 52 > [ [ 2/ ] [ 1 + ] bi* ] when
-    scale-float ; inline
-
-: round-to-nearest ( epsilon? fraction-and-guard rem -- fraction-and-guard' )
+! Third step: rounding
+!
+! if the guard bit is 0, round down
+! else if the guard bit is 1 and (rem != 0 or epsilon is true), round up
+! else break the tie by alternating rounding down or up to avoid accumulating errors
+!
+! The epsilon trick works because epsilon is true if numerator bits were discarded.
+! Mathematically, (num+epsilon)/denom = (num/denum) + (epsilon/denom)
+! We have actually computed the "num/denum" part and use the "epsilon/denom"
+! to choose the correct rounding.
+!
+! Note that rounding down means doing nothing because we will
+! discard the guard bit after this
+: round-to-nearest ( epsilon? mantissa-and-guard rem -- mantissa-and-guard' )
     over odd?
     [
         zero? [
@@ -159,12 +178,28 @@ M: bignum (log2) bignum-log2 ; inline
     ] [ drop nip ] if ;
     inline
 
+! Fourth step: post-scaling
+! Because of rounding, our mantissa with guard bit is now in the
+! range [2^54;2^53], so we have to handle 2^54 specially.
+: scale-float ( mantissa scale -- float' )
+    ! At this point, the scale value is the exponent minus 1.
+    {
+        { [ dup 1024 > ] [ 2drop 1/0. ] }
+        { [ dup -1021 < ] [ 1021 + shift bits>double ] } ! subnormals and underflow
+        [ [ 52 2^ 1 - bitand ] dip 1022 + 52 shift bitor bits>double ]
+    } cond ; inline
+
+: post-scale ( mantissa scale -- n )
+    [ 2/ ] dip ! drop guard bit
+    over 53 2^ = [ [ 2/ ] [ 1 + ] bi* ] when
+    scale-float ; inline
+
 ! Main word
 : /f-abs ( m n -- f )
     over zero? [ nip zero? 0/0. 0.0 ? ] [
         [ drop 1/0. ] [
             pre-scale
-            /f-loop
+            mantissa-and-guard
             [ round-to-nearest ] dip
             post-scale
         ] if-zero
