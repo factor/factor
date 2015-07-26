@@ -144,8 +144,8 @@ SYMBOL: W-symbol
 ;FUNCTOR
 
 [ [ ] ] [
-    """IN: functors.tests
-    << "some" redefine-test >>""" <string-reader> "functors-test" parse-stream
+    "IN: functors.tests
+    << \"some\" redefine-test >>" <string-reader> "functors-test" parse-stream
 ] unit-test
 
 test-redefinition

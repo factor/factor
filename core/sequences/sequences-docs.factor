@@ -558,7 +558,7 @@ HELP: member?
     "Is a letter in a string:"
     { $example
         "USING: sequences prettyprint ;"
-        """CHAR: a "abc" member? ."""
+        "CHAR: a \"abc\" member? ."
         "t"
     } $nl
     "Is a number in a sequence:"
@@ -680,8 +680,8 @@ HELP: join
 { $examples
     "Join a list of strings:"
     { $example "USING: sequences prettyprint ;"
-        """{ "cat" "dog" "ant" } " " join ."""
-        """"cat dog ant""""
+        "{ \"cat\" \"dog\" \"ant\" } \" \" join ."
+        "\"cat dog ant\""
     }
 }
 { $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
@@ -694,8 +694,8 @@ HELP: join-as
 { $examples
     "Join a list of strings as a string buffer:"
     { $example "USING: sequences prettyprint ;"
-        """{ "a" "b" "c" } "1" SBUF" "join-as ."""
-        """SBUF" a1b1c""""
+        "{ \"a\" \"b\" \"c\" } \"1\" SBUF\" \"join-as ."
+        "SBUF\" a1b1c\""
     }
 }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." } ;

@@ -156,19 +156,19 @@ ARTICLE: "yaml-keys" "Special mapping keys"
 "See " { $url "http://yaml.org/type/merge.html" } $nl
 "As per " { $url "http://sourceforge.net/p/yaml/mailman/message/12308050" }
 ", the merge key is implemented bottom up:" $nl
-{ $example """USING: yaml prettyprint ;
-"
+{ $example "USING: yaml prettyprint ;
+\"
 foo: 1
 <<:
   bar: 2
   <<:
     baz: 3
-" yaml> ."""
-"""H{ { "baz" 3 } { "foo" 1 } { "bar" 2 } }""" }
+\" yaml> ."
+"H{ { \"baz\" 3 } { \"foo\" 1 } { \"bar\" 2 } }" }
 { $heading "!!value" }
 "See " { $url "http://yaml.org/type/value.html" } $nl
-{ $example """USING: yaml prettyprint ;
-"
+{ $example "USING: yaml prettyprint ;
+\"
 ---     # Old schema
 link with:
   - library1.dll
@@ -179,11 +179,11 @@ link with:
     version: 1.2
   - = : library2.dll
     version: 2.3
-" yaml-docs> ."""
-"""{
-    H{ { "link with" { "library1.dll" "library2.dll" } } }
-    H{ { "link with" { "library1.dll" "library2.dll" } } }
-}"""
+\" yaml-docs> ."
+"{
+    H{ { \"link with\" { \"library1.dll\" \"library2.dll\" } } }
+    H{ { \"link with\" { \"library1.dll\" \"library2.dll\" } } }
+}"
 }
 
 ;
@@ -228,18 +228,18 @@ t implicit-end set
 +libyaml-default+ emitter-line-break set
 t emitter-unicode set
 "
-"""{
+"{
   H{
-    { "name" "Mark McGwire" }
-    { "hr" 65 }
-    { "avg"  0.278 }
+    { \"name\" \"Mark McGwire\" }
+    { \"hr\" 65 }
+    { \"avg\"  0.278 }
   }
   H{
-    { "name" "Sammy Sosa" }
-    { "hr" 63 }
-    { "avg" 0.288 }
+    { \"name\" \"Sammy Sosa\" }
+    { \"hr\" 63 }
+    { \"avg\" 0.288 }
   }
-} >yaml print"""
+} >yaml print"
     "- name: Mark McGwire
   hr: 65
   avg: 0.278
@@ -250,7 +250,7 @@ t emitter-unicode set
   }
 { $heading "Output -- verbose" }
   { $example "USING: yaml yaml.config ;"
-"""f implicit-tags set
+"f implicit-tags set
 f implicit-start set
 f implicit-end set
 +libyaml-default+ emitter-canonical set
@@ -259,7 +259,7 @@ f implicit-end set
 +libyaml-default+ emitter-line-break set
 t emitter-unicode set
 
-{ t 32 "foobar" { "nested" "list" } H{ { "nested" "assoc" } } } >yaml print"""
+{ t 32 \"foobar\" { \"nested\" \"list\" } H{ { \"nested\" \"assoc\" } } } >yaml print"
     "--- !!seq\n- !!bool true\n- !!int 32\n- !!str foobar\n- !!seq\n  - !!str nested\n  - !!str list\n- !!map\n  !!str nested: !!str assoc\n...\n"
   }
 }

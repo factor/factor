@@ -8,13 +8,13 @@ IN: tools.scaffold.tests
     [ >lower ] [ >upper ] bi* ;
 
 {
-"""HELP: undocumented-word
+"HELP: undocumented-word
 { $values
-    { "obj1" object } { "obj2" object }
-    { "obj3" object } { "obj4" object }
+    { \"obj1\" object } { \"obj2\" object }
+    { \"obj3\" object } { \"obj4\" object }
 }
-{ $description "" } ;
-"""
+{ $description \"\" } ;
+"
 }
 [
     [ \ undocumented-word (help.) ] with-string-writer

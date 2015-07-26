@@ -66,7 +66,7 @@ ARTICLE: "yaml-output" "YAML serialization control"
 ;
 
 HELP: implicit-tags
-{ $var-description """When this is set, tags are omitted during serialization when it safe to do so. For example, 42 can be safely serialized as "42", but "42" must be serialized as "'42'" or ""42"" or "!!str 42". This uses the """
+{ $var-description "When this is set, tags are omitted during serialization when it safe to do so. For example, 42 can be safely serialized as \"42\", but \"42\" must be serialized as \"'42'\" or \"\"42\"\" or \"!!str 42\". This uses the "
 { $snippet "implicit" } " parameter of "
 { $link yaml_scalar_event_initialize } ", " { $link yaml_sequence_start_event_initialize } " and " { $link yaml_mapping_start_event_initialize } "."
  } ;

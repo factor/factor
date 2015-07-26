@@ -14,19 +14,19 @@ IN: io.encodings.detect.tests
 
 ! XML prolog
 { utf8 }
-[ """<?xml version="1.0"?>""" >byte-array detect-byte-array ]
+[ "<?xml version=\"1.0\"?>" >byte-array detect-byte-array ]
 unit-test
 
 { utf8 }
-[ """<?xml version="1.0" encoding="UTF-8"?>""" >byte-array detect-byte-array ]
+[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" >byte-array detect-byte-array ]
 unit-test
 
 { latin1 }
-[ """<?xml version='1.0' encoding='ISO-8859-1'?>""" >byte-array detect-byte-array ]
+[ "<?xml version='1.0' encoding='ISO-8859-1'?>" >byte-array detect-byte-array ]
 unit-test
 
 { latin1 }
-[ """<?xml version='1.0' encoding="ISO-8859-1" """ >byte-array detect-byte-array ]
+[ "<?xml version='1.0' encoding=\"ISO-8859-1\" " >byte-array detect-byte-array ]
 unit-test
 
 ! Default to utf8 if decoding succeeds and there are no nulls

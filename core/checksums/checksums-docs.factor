@@ -34,10 +34,10 @@ HELP: checksum-lines
 { $examples
     { $example
         "USING: checksums checksums.crc32 prettyprint ;"
-"""{
-    "Take me out to the ball game"
-    "Take me out with the crowd"
-} crc32 checksum-lines ."""
+"{
+    \"Take me out to the ball game\"
+    \"Take me out with the crowd\"
+} crc32 checksum-lines ."
         "B{ 111 205 9 27 }"
     }
 } ;
@@ -48,7 +48,7 @@ HELP: checksum-file
 { $examples
     { $example
         "USING: checksums checksums.crc32 prettyprint ;"
-        """"resource:license.txt" crc32 checksum-file ."""
+        "\"resource:license.txt\" crc32 checksum-file ."
         "B{ 100 139 199 92 }"
     }
 } ;

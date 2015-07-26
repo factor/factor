@@ -32,18 +32,18 @@ HELP: scaffold-examples
     "Create docs for the + word:"
     { $example "USING: math tools.scaffold prettyprint ;"
         "\\ + scaffold-examples"
-        """{ $examples
-    "Example:"
-    { $example "USING: math prettyprint ;"
-        ""
-        ""
+        "{ $examples
+    \"Example:\"
+    { $example \"USING: math prettyprint ;\"
+        \"\"
+        \"\"
     }
-    "Example:"
-    { $example "USING: math prettyprint ;"
-        ""
-        ""
+    \"Example:\"
+    { $example \"USING: math prettyprint ;\"
+        \"\"
+        \"\"
     }
-}"""
+}"
     }
 } ;
 

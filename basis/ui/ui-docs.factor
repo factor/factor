@@ -343,11 +343,11 @@ HELP: MAIN-WINDOW:
 { $examples
 "From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
 { $code
-"""USING: accessors ui ui.gadgets.labels ;
+"USING: accessors ui ui.gadgets.labels ;
 IN: hello-ui
 
-MAIN-WINDOW: hello { { title "Hi" } }
-    "Hello world" <label> >>gadgets ;"""
+MAIN-WINDOW: hello { { title \"Hi\" } }
+    \"Hello world\" <label> >>gadgets ;"
 } } ;
 
 ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"

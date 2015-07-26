@@ -402,11 +402,11 @@ GENERIC: harhar ( obj -- obj )
 M: maybe{ har } harhar ;
 M: integer harhar M\ integer harhar drop ;
 {
-"""USING: prettyprint.tests ;
+"USING: prettyprint.tests ;
 M: maybe{ har } harhar ;
 
 USING: kernel math prettyprint.tests ;
-M: integer harhar M\\ integer harhar drop ;\n"""
+M: integer harhar M\\ integer harhar drop ;\n"
 } [
     [ \ harhar see-methods ] with-string-writer
 ] unit-test
@@ -415,43 +415,43 @@ TUPLE: mo { a union{ float integer } } ;
 TUPLE: fo { a intersection{ fixnum integer } } ;
 
 {
-"""USING: math ;
+"USING: math ;
 IN: prettyprint.tests
 TUPLE: mo { a union{ integer float } initial: 0 } ;
-"""
+"
 } [
     [ \ mo see ] with-string-writer
 ] unit-test
 
 {
-"""USING: math ;
+"USING: math ;
 IN: prettyprint.tests
 TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
-"""
+"
 } [
     [ \ fo see ] with-string-writer
 ] unit-test
 
 {
-"""union{ intersection{ string hashtable } union{ integer float } }\n"""
+"union{ intersection{ string hashtable } union{ integer float } }\n"
 } [ [ union{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
 {
-"""intersection{
+"intersection{
     intersection{ string hashtable }
     union{ integer float }
 }
-"""
+"
 } [ [ intersection{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
 {
-"""maybe{ union{ integer float } }\n"""
+"maybe{ union{ integer float } }\n"
 } [
     [ maybe{ union{ float integer } } . ] with-string-writer
 ] unit-test
 
 {
-"""maybe{ maybe{ integer } }\n"""
+"maybe{ maybe{ integer } }\n"
 } [
     [ maybe{ maybe{ integer } } . ] with-string-writer
 ] unit-test
@@ -472,14 +472,14 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
     ] with-string-writer ;
 
 {
-"""aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"""
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"
 } [ margin get 3 - margin-test ] unit-test
 
 {
-"""aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"""
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"
 } [ margin get 2 - margin-test ] unit-test
 
 {
-"""aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-b"""
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+b"
 } [ margin get 1 - margin-test ] unit-test

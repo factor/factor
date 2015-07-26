@@ -24,7 +24,7 @@ HELP: every
 { $examples
     { $code
         "USING: timers io calendar ;"
-        """[ "Hi Buddy." print flush ] 10 seconds every drop"""
+        "[ \"Hi Buddy.\" print flush ] 10 seconds every drop"
     }
 } ;
 
@@ -34,7 +34,7 @@ HELP: later
 { $examples
     { $code
         "USING: timers io calendar ;"
-        """[ "Break's over!" print flush ] 15 minutes later drop"""
+        "[ \"Break's over!\" print flush ] 15 minutes later drop"
     }
 } ;
 
@@ -46,7 +46,7 @@ HELP: delayed-every
 { $examples
     { $code
         "USING: timers io calendar ;"
-        """[ "Hi Buddy." print flush ] 10 seconds every drop"""
+        "[ \"Hi Buddy.\" print flush ] 10 seconds every drop"
     }
 } ;
 

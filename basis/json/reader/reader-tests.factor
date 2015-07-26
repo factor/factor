@@ -26,42 +26,42 @@ IN: json.reader.tests
 ! feature to get
 { -0.0 } [ "-0.0" json> ] unit-test
 
-{ " fuzzy  pickles " } [ """  " fuzzy  pickles " """  json> ] unit-test
-{ "while 1:\n\tpass" } [ """  "while 1:\n\tpass" """  json> ] unit-test
+{ " fuzzy  pickles " } [ "  \" fuzzy  pickles \" "  json> ] unit-test
+{ "while 1:\n\tpass" } [ "  \"while 1:\n\tpass\" "  json> ] unit-test
 ! unicode is allowed in json
-{ "ß∂¬ƒ˚∆" } [ """  "ß∂¬ƒ˚∆""""  json> ] unit-test
-${ { 8 9 10 12 13 34 47 92 } >string } [ """ "\\b\\t\\n\\f\\r\\"\\/\\\\" """ json> ] unit-test
-${ { 0xabcd } >string } [ """ "\\uaBCd" """ json> ] unit-test
+{ "ß∂¬ƒ˚∆" } [ "  \"ß∂¬ƒ˚∆\""  json> ] unit-test
+${ { 8 9 10 12 13 34 47 92 } >string } [ " \"\\b\\t\\n\\f\\r\\\"\\/\\\\\" " json> ] unit-test
+${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { "𝄞" } [ "\"\\ud834\\udd1e\"" json> ] unit-test
 
 { H{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
 { { } } [ "[]" json> ] unit-test
-{ { 1 "two" 3.0 } } [ """ [1, "two", 3.0] """ json> ] unit-test
+{ { 1 "two" 3.0 } } [ " [1, \"two\", 3.0] " json> ] unit-test
 { H{ } } [ "{}" json> ] unit-test
 
 ! the returned hashtable should be different every time
 { H{ } } [ "key" "value" "{}" json> ?set-at "{}" json> nip ] unit-test
 
-{ H{ { "US$" 1.0 } { "EU€" 1.5 } } } [ """ { "US$":1.00, "EU\\u20AC":1.50 } """ json> ] unit-test
+{ H{ { "US$" 1.0 } { "EU€" 1.5 } } } [ " { \"US$\":1.00, \"EU\\u20AC\":1.50 } " json> ] unit-test
 { H{
     { "fib" { 1 1 2 3 5 8 H{ { "etc" "etc" } } } }
     { "prime" { 2 3 5 7 11 13 } }
-} } [ """ {
-    "fib": [1, 1,  2,   3,     5,         8,
-        { "etc":"etc" } ],
-    "prime":
+} } [ " {
+    \"fib\": [1, 1,  2,   3,     5,         8,
+        { \"etc\":\"etc\" } ],
+    \"prime\":
     [ 2,3,     5,7,
 11,
 13
 ]      }
-""" json> ] unit-test
+" json> ] unit-test
 
 { 0 } [ "      0" json> ] unit-test
 { 0 } [ "0      " json> ] unit-test
 { 0 } [ "   0   " json> ] unit-test
 
 { V{ H{ { "a" "b" } } H{ { "c" "d" } } } }
-[ """{"a": "b"} {"c": "d"}""" [ read-jsons ] with-string-reader ] unit-test
+[ "{\"a\": \"b\"} {\"c\": \"d\"}" [ read-jsons ] with-string-reader ] unit-test
 
 ! empty objects are allowed as values in objects
 { H{ { "foo" H{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test

@@ -41,11 +41,11 @@ HELP: <multi-index-range>
 { $description "Constructs a " { $link multi-index-range } " tuple." } ;
 
 HELP: UNIFORM-TUPLE:
-{ $syntax """UNIFORM-TUPLE: class-name
-    { "slot" uniform-type dimension }
-    { "slot" uniform-type dimension }
+{ $syntax "UNIFORM-TUPLE: class-name
+    { \"slot\" uniform-type dimension }
+    { \"slot\" uniform-type dimension }
     ...
-    { "slot" uniform-type dimension } ;""" }
+    { \"slot\" uniform-type dimension } ;" }
 { $description "Defines a new " { $link uniform-tuple } " class. Tuples of the new class can be used as the " { $snippet "uniforms" } " slot of a " { $link render-set } " in order to set the uniform parameters of the active shader program. The " { $link uniform-type } " of each slot defines the component type, and the " { $snippet "dimension" } " specifies an array length if not " { $link f } "."
 $nl
 "Uniform parameters are passed from Factor to the shader program through the uniform tuple as follows:"

@@ -49,8 +49,8 @@ HELP: append-path
 { $values { "path1" "a pathname string" } { "path2" "a pathname string" } { "path" "a pathname string" } }
 { $description "Appends " { $snippet "path1" } " and " { $snippet "path2" } " to form a pathname." }
 { $examples
-    { $unchecked-example """USING: io.pathnames prettyprint ;
-"first" "second.txt" append-path ."""
+    { $unchecked-example "USING: io.pathnames prettyprint ;
+\"first\" \"second.txt\" append-path ."
 "\"first/second.txt\""
     }
 } ;
@@ -59,8 +59,8 @@ HELP: prepend-path
 { $values { "path1" "a pathname string" } { "path2" "a pathname string" } { "path" "a pathname string" } }
 { $description "Appends " { $snippet "path2" } " and " { $snippet "path1" } " to form a pathname." }
 { $examples
-    { $unchecked-example """USING: io.pathnames prettyprint ;
-"second.txt" "first" prepend-path ."""
+    { $unchecked-example "USING: io.pathnames prettyprint ;
+\"second.txt\" \"first\" prepend-path ."
 "\"first/second.txt\""
     }
 } ;

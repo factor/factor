@@ -39,12 +39,12 @@ HELP: query>assoc
         "USING: prettyprint urls.encoding ;"
         "\"gender=female&agefrom=22&ageto=28&location=Omaha+NE\""
         "query>assoc ."
-        """H{
-    { "gender" "female" }
-    { "agefrom" "22" }
-    { "ageto" "28" }
-    { "location" "Omaha NE" }
-}"""
+        "H{
+    { \"gender\" \"female\" }
+    { \"agefrom\" \"22\" }
+    { \"ageto\" \"28\" }
+    { \"location\" \"Omaha NE\" }
+}"
     }
 } ;
 

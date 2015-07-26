@@ -18,17 +18,17 @@ CONSTANT: tc-lisp-slides
     { $slide "First, some examples"
         { $code "3 weeks ago noon monday ." }
         { $code "USE: roman 2009 >roman ." }
-        { $code """: average ( seq -- x )
-    [ sum ] [ length ] bi / ;""" }
+        { $code ": average ( seq -- x )
+    [ sum ] [ length ] bi / ;" }
         { $code "1 miles [ km ] undo >float ." }
         { $code "[ readln eval>string print t ] loop" }
     }
     { $slide "XML Literals"
         { $code
-        """USING: splitting xml.writer xml.syntax ;
-{ "one" "two" "three" } 
+        "USING: splitting xml.writer xml.syntax ;
+{ \"one\" \"two\" \"three\" } 
 [ [XML <item><-></item> XML] ] map
-<XML <doc><-></doc> XML> pprint-xml"""
+<XML <doc><-></doc> XML> pprint-xml"
         }
     }
     { $slide "Differences between Factor and Lisp"
@@ -82,63 +82,63 @@ CONSTANT: tc-lisp-slides
     }
     { $slide "Object system example: shape protocol"
         "In ~/factor/work/shapes/shapes.factor"
-        { $code """IN: shapes
+        { $code "IN: shapes
 
 GENERIC: area ( shape -- x )
-GENERIC: perimeter ( shape -- x )"""
+GENERIC: perimeter ( shape -- x )"
         }
     }
     { $slide "Implementing the shape protocol: circles"
         "In ~/factor/work/shapes/circle/circle.factor"
-        { $code """USING: shapes constructors math
+        { $code "USING: shapes constructors math
 math.constants ;
 IN: shapes.circle
 
 TUPLE: circle radius ;
 CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
 M: circle area radius>> sq pi * ;
-M: circle perimeter radius>> pi * 2 * ;"""
+M: circle perimeter radius>> pi * 2 * ;"
         }
     }
     { $slide "Dynamic variables"
         "Implemented as a stack of hashtables"
         { "Useful words are " { $link get } ", " { $link set } }
         "Input, output, error streams are stored in dynamic variables"
-        { $code """"Today is the first day of the rest of your life."
+        { $code "\"Today is the first day of the rest of your life.\"
 [
     readln print
-] with-string-reader"""
+] with-string-reader"
         }
     }
     { $slide "The global namespace"
         "The global namespace is just the namespace at the bottom of the namespace stack"
         { "Useful words are " { $link get-global } ", " { $link set-global } }
         "Factor idiom for changing a particular namespace"
-        { $code """SYMBOL: king
-global [ "Henry VIII" king set ] with-variables"""
+        { $code "SYMBOL: king
+global [ \"Henry VIII\" king set ] with-variables"
         }
         { $code "with-scope" }
         { $code "namestack" }
     }
     { $slide "Hooks"
         "Dispatch on a dynamic variable"
-        { $code """HOOK: computer-name os ( -- string )
+        { $code "HOOK: computer-name os ( -- string )
 M: macosx computer-name uname first ;
 macosx \ os set-global
-computer-name"""
+computer-name"
         }
     }
     { $slide "Interpolate"
         "Replaces variables in a string"
         { $code
-""""Dawg" "name" set
-"rims" "noun" set
-"bling" "verb1" set
-"roll" "verb2" set
+"\"Dawg\" \"name\" set
+\"rims\" \"noun\" set
+\"bling\" \"verb1\" set
+\"roll\" \"verb2\" set
 [
-    "Sup ${name}, we heard you liked ${noun}, so we put ${noun} on your car so you can ${verb1} while you ${verb2}."
+    \"Sup ${name}, we heard you liked ${noun}, so we put ${noun} on your car so you can ${verb1} while you ${verb2}.\"
     interpolate
-] with-string-writer print """
+] with-string-writer print "
         }
     }
     { $slide "Sequence protocol"
@@ -165,10 +165,10 @@ computer-name"""
     { $slide "Specialized arrays code"
         "One line per array/vector"
         { "In ~/factor/basis/specialized-arrays/float/float.factor"
-            { $code """<< "float" define-array >>""" }
+            { $code "<< \"float\" define-array >>" }
         }
         { "In ~/factor/basis/specialized-vectors/float/float.factor"
-            { $code """<< "float" define-vector >>""" }
+            { $code "<< \"float\" define-vector >>" }
         }
     }
 
@@ -180,7 +180,7 @@ computer-name"""
     }
     { $slide "Functor for sorting"
         { $code
-            """FUNCTOR: define-sorting ( NAME QUOT -- )
+            "FUNCTOR: define-sorting ( NAME QUOT -- )
 
 NAME<=> DEFINES ${NAME}<=>
 NAME>=< DEFINES ${NAME}>=<
@@ -191,16 +191,16 @@ WHERE
 : NAME>=< ( obj1 obj2 -- >=< )
     NAME<=> invert-comparison ;
 
-;FUNCTOR"""
+;FUNCTOR"
         }
     }
     { $slide "Example of sorting functor"
-        { $code """USING: sorting.functor ;
-<< "length" [ length ] define-sorting >>"""
+        { $code "USING: sorting.functor ;
+<< \"length\" [ length ] define-sorting >>"
         }
         { $code
-            """{ { 1 2 3 } { 1 2 } { 1 } }
-[ length<=> ] sort"""
+            "{ { 1 2 3 } { 1 2 } { 1 } }
+[ length<=> ] sort"
         }
     }
     { $slide "Combinators"
@@ -241,21 +241,21 @@ WHERE
     }
     { $slide "Control flow: if"
         { $link if }
-        { $code """10 random dup even? [ 2 / ] [ 1 - ] if""" }
+        { $code "10 random dup even? [ 2 / ] [ 1 - ] if" }
         { $link when }
-        { $code """10 random dup even? [ 2 / ] when""" }
+        { $code "10 random dup even? [ 2 / ] when" }
         { $link unless }
-        { $code """10 random dup even? [ 1 - ] unless""" }
+        { $code "10 random dup even? [ 1 - ] unless" }
     }
     { $slide "Control flow: case"
         { $link case }
-        { $code """ERROR: not-possible obj ;
+        { $code "ERROR: not-possible obj ;
 10 random 5 <=> {
-    { +lt+ [ "Less" ] }
-    { +gt+ [ "More" ] }
-    { +eq+ [ "Equal" ] }
+    { +lt+ [ \"Less\" ] }
+    { +gt+ [ \"More\" ] }
+    { +eq+ [ \"Equal\" ] }
     [ not-possible ]
-} case"""
+} case"
         }
     }
     { $slide "Fry"
@@ -272,29 +272,29 @@ WHERE
     { $slide "Locals example"
         "Area of a triangle using Heron's formula"
         { $code
-            """:: area ( a b c -- x )
+            ":: area ( a b c -- x )
     a b c + + 2 / :> p
     p
     p a - *
     p b - *
-    p c - * sqrt ;"""
+    p c - * sqrt ;"
         }
     }
     { $slide "Previous example without locals"
         "A bit unwieldy..."
         { $code
-            """: area ( a b c -- x )
+            ": area ( a b c -- x )
     [ ] [ + + 2 / ] 3bi
     [ '[ _ - ] tri@ ] [ neg ] bi
-    * * * sqrt ;""" }
+    * * * sqrt ;" }
     }
     { $slide "More idiomatic version"
         "But there's a trick: put the lengths in an array"
-        { $code """: v-n ( v n -- w ) '[ _ - ] map ;
+        { $code ": v-n ( v n -- w ) '[ _ - ] map ;
 
 : area ( seq -- x )
     [ 0 suffix ] [ sum 2 / ] bi
-    v-n product sqrt ;""" }
+    v-n product sqrt ;" }
     }
     { $slide "Implementing an abstraction"
         { "Suppose we want to get the price of the customer's first order, but any one of the steps along the way could be a nil value (" { $link f } " in Factor):" }
@@ -306,10 +306,10 @@ WHERE
     }
     { $slide "This is hard with mainstream syntax!"
         { $code
-            """var customer = ...;
+            "var customer = ...;
 var orders = (customer == null ? null : customer.orders);
 var order = (orders == null ? null : orders[0]);
-var price = (order == null ? null : order.price);""" }
+var price = (order == null ? null : order.price);" }
     }
     { $slide "An ad-hoc solution"
         "Something like..."
@@ -325,24 +325,24 @@ var price = (order == null ? null : order.price);""" }
     { $slide "A macro solution"
         "Returns a quotation to the compiler"
         "Constructed using map, fry, and concat"
-        { $code """MACRO: plox ( seq -- quot )
+        { $code "MACRO: plox ( seq -- quot )
     [
         '[ dup _ when ]
-    ] map [ ] concat-as ;"""
+    ] map [ ] concat-as ;"
         }
     }
     { $slide "Macro example"
         "Return the caaar of a sequence"
         { "Return " { $snippet f } " on failure" }
-        { $code """: caaar ( seq/f -- x/f )
+        { $code ": caaar ( seq/f -- x/f )
     {
         [ first ]
         [ first ]
         [ first ]
-    } plox ;"""
+    } plox ;"
         }
-        { $code """{ { f } } caaar""" }
-        { $code """{ { { 1 2 3 } } } caaar""" }
+        { $code "{ { f } } caaar" }
+        { $code "{ { { 1 2 3 } } } caaar" }
     }
     { $slide "Smart combinators"
         "Use stack checker to infer inputs and outputs"
@@ -354,19 +354,19 @@ var price = (order == null ? null : order.price);""" }
     { $slide "Fibonacci"
         "Not tail recursive"
         "Call tree is huge"
-        { $code """: fib ( n -- x )
+        { $code ": fib ( n -- x )
     dup 1 <= [
         [ 1 - fib ] [ 2 - fib ] bi +
-    ] unless ;"""
+    ] unless ;"
         }
         { $code "36 iota [ fib ] map ." }
     }
     { $slide "Memoized Fibonacci"
         "Change one word and it's efficient"
-        { $code """MEMO: fib ( n -- x )
+        { $code "MEMO: fib ( n -- x )
     dup 1 <= [
         [ 1 - fib ] [ 2 - fib ] bi +
-    ] unless ;"""
+    ] unless ;"
         }
         { $code "36 iota [ fib ] map ." }
     }
@@ -378,7 +378,7 @@ var price = (order == null ? null : order.price);""" }
 
     { $slide "Example in C"
         { $code
-"""void do_stuff()
+"void do_stuff()
 {
     void *obj1, *obj2;
     if(!(*obj1 = malloc(256))) goto end;
@@ -387,29 +387,29 @@ var price = (order == null ? null : order.price);""" }
 cleanup2: free(*obj2);
 cleanup1: free(*obj1);
 end: return;
-}"""
+}"
     }
     }
     { $slide "Example: allocating and disposing two buffers"
-        { $code """: do-stuff ( -- )
+        { $code ": do-stuff ( -- )
     [
         256 malloc &free
         256 malloc &free
         ... work goes here ...
-    ] with-destructors ;"""
+    ] with-destructors ;"
         }
     }
     { $slide "Example: allocating two buffers for later"
-        { $code """: do-stuff ( -- )
+        { $code ": do-stuff ( -- )
     [
         256 malloc |free
         256 malloc |free
         ... work goes here ...
-    ] with-destructors ;"""
+    ] with-destructors ;"
         }
     }
     { $slide "Example: disposing of an output port"
-        { $code """M: output-port dispose*
+        { $code "M: output-port dispose*
     [
         {
             [ handle>> &dispose drop ]
@@ -417,7 +417,7 @@ end: return;
             [ port-flush ]
             [ handle>> shutdown ]
         } cleave
-    ] with-destructors ;"""
+    ] with-destructors ;"
         }
     }
     { $slide "Rapid application development"
@@ -427,11 +427,11 @@ end: return;
     }
     { $slide "The essence of Factor"
         "Nicely named words abstract away the stack, leaving readable code"
-        { $code """: surround ( seq left right -- seq' )
-    swapd 3append ;"""
+        { $code ": surround ( seq left right -- seq' )
+    swapd 3append ;"
         }
-        { $code """: glue ( left right middle -- seq' )
-    swap 3append ;"""
+        { $code ": glue ( left right middle -- seq' )
+    swap 3append ;"
         }
         { $code HEREDOC: xyz
 "a" "b" "c" 3append
@@ -445,15 +445,15 @@ xyz
         "Handles C structures, C types, callbacks"
         "Used extensively in the Windows and Unix backends"
         { $code
-            """FUNCTION: double pow ( double x, double y ) ;
-2 5.0 pow ."""
+            "FUNCTION: double pow ( double x, double y ) ;
+2 5.0 pow ."
         }
     }
     { $slide "Windows win32 example"
         { $code
-"""M: windows gmt-offset
+"M: windows gmt-offset
     ( -- hours minutes seconds )
-    "TIME_ZONE_INFORMATION" <c-object>
+    \"TIME_ZONE_INFORMATION\" <c-object>
     dup GetTimeZoneInformation {
         { TIME_ZONE_ID_INVALID [
             win32-error-string throw
@@ -461,37 +461,37 @@ xyz
         { TIME_ZONE_ID_STANDARD [
             TIME_ZONE_INFORMATION-Bias
         ] }
-    } case neg 60 /mod 0 ;"""
+    } case neg 60 /mod 0 ;"
         }
     }
     { $slide "Struct and function"
-        { $code """C-STRUCT: TIME_ZONE_INFORMATION
-    { "LONG" "Bias" }
-    { { "WCHAR" 32 } "StandardName" }
-    { "SYSTEMTIME" "StandardDate" }
-    { "LONG" "StandardBias" }
-    { { "WCHAR" 32 } "DaylightName" }
-    { "SYSTEMTIME" "DaylightDate" }
-    { "LONG" "DaylightBias" } ;"""
+        { $code "C-STRUCT: TIME_ZONE_INFORMATION
+    { \"LONG\" \"Bias\" }
+    { { \"WCHAR\" 32 } \"StandardName\" }
+    { \"SYSTEMTIME\" \"StandardDate\" }
+    { \"LONG\" \"StandardBias\" }
+    { { \"WCHAR\" 32 } \"DaylightName\" }
+    { \"SYSTEMTIME\" \"DaylightDate\" }
+    { \"LONG\" \"DaylightBias\" } ;"
         }
-        { $code """FUNCTION: DWORD GetTimeZoneInformation (
+        { $code "FUNCTION: DWORD GetTimeZoneInformation (
     LPTIME_ZONE_INFORMATION
         lpTimeZoneInformation
-) ;"""
+) ;"
         }
 
     }
     { $slide "Cocoa FFI"
-        { $code """IMPORT: NSAlert [
+        { $code "IMPORT: NSAlert [
     NSAlert -> new
     [ -> retain ] [
-        "Raptor" <CFString> &CFRelease
+        \"Raptor\" <CFString> &CFRelease
         -> setMessageText:
     ] [
-        "Look out!" <CFString> &CFRelease
+        \"Look out!\" <CFString> &CFRelease
         -> setInformativeText:
     ] tri -> runModal drop
-] with-destructors"""
+] with-destructors"
         }
     }
     { $slide "Deployment demo"

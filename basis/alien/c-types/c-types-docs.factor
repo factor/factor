@@ -88,8 +88,8 @@ $nl
 $nl
 "In " { $link POSTPONE: TYPEDEF: } ", " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: STRUCT: } " definitions, pointer types can be created by suffixing " { $snippet "*" } " to a C type name. Outside of FFI definitions, a pointer C type can be created using the " { $link POSTPONE: pointer: } " syntax word:"
 { $unchecked-example "FUNCTION: int* foo ( char* bar ) ;" }
-{ $unchecked-example """: foo ( bar -- int* )
-    pointer: int f \"foo\" { pointer: char } alien-invoke ;""" } } ;
+{ $unchecked-example ": foo ( bar -- int* )
+    pointer: int f \"foo\" { pointer: char } alien-invoke ;" } } ;
 
 ARTICLE: "byte-arrays-gc" "Byte arrays and the garbage collector"
 "The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the garbage collector will not run while C code still has a reference to the data."

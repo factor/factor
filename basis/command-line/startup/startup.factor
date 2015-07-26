@@ -5,12 +5,12 @@ sequences system vocabs.loader ;
 IN: command-line.startup
 
 : cli-usage ( -- )
-"""
-Usage: """ write vm-path file-name write """ [Factor arguments] [script] [script arguments]
+"
+Usage: " write vm-path file-name write " [Factor arguments] [script] [script arguments]
 
 Common arguments:
     -help            print this message and exit
-    -i=<image>       load Factor image file <image> (default """ write vm-path file-stem write """.image)
+    -i=<image>       load Factor image file <image> (default " write vm-path file-stem write " .image)
     -run=<vocab>     run the MAIN: entry point of <vocab>
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI
@@ -18,10 +18,10 @@ Common arguments:
     -no-user-init    suppress loading of .factor-rc
 
 Enter
-    "command-line" help
+    \"command-line\" help
 from within Factor for more information.
 
-""" write ;
+" write ;
 
 : help? ( -- ? )
     "help" get "-help" get or "h" get or

@@ -136,22 +136,22 @@ SPECIALIZED-ARRAY: fixed-string
 SYMBOL: __does_not_exist__
 
 [
-    """
+    "
 IN: specialized-arrays.tests
 USING: specialized-arrays ;
 
-SPECIALIZED-ARRAY: __does_not_exist__ """ eval( -- )
+SPECIALIZED-ARRAY: __does_not_exist__ " eval( -- )
 ] must-fail
 
 { } [
-    """
+    "
 IN: specialized-arrays.tests
 USING: alien.c-types classes.struct specialized-arrays ;
 
 STRUCT: __does_not_exist__ { x int } ;
 
 SPECIALIZED-ARRAY: __does_not_exist__
-""" eval( -- )
+" eval( -- )
 ] unit-test
 
 { f } [

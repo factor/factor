@@ -85,9 +85,9 @@ HELP: C-TYPE:
 { $values { "type" "a new C type" } }
 { $description "Defines a new, opaque C type. Since it is opaque, " { $snippet "type" } " will not be directly usable as a parameter or return type of a " { $link POSTPONE: FUNCTION: } " or as a slot of a " { $link POSTPONE: STRUCT: } ". However, it can be used as the type of a " { $link pointer } "." $nl
 { $snippet "C-TYPE:" } " can also be used to forward declare C types, allowing circular dependencies to occur between types. For example:"
-{ $code """C-TYPE: forward 
+{ $code "C-TYPE: forward
 STRUCT: backward { x forward* } ;
-STRUCT: forward { x backward* } ; """ } }
+STRUCT: forward { x backward* } ;" } }
 { $notes "Primitive C types are displayed using " { $snippet "C-TYPE:" } " syntax when they are " { $link see } "n." } ;
 
 HELP: CALLBACK:

@@ -54,12 +54,12 @@ ARTICLE: { "xml.syntax" "interpolation" } "XML interpolation syntax"
 $nl
 "These forms can be used where a tag might go, as in " { $snippet "[XML <foo><-></foo> XML]" } " or where an attribute might go, as in " { $snippet "[XML <foo bar=<->/> XML]" } ". When an attribute is spliced in, it is not included if the value is " { $snippet "f" } " and if the value is not a string, the value is put through " { $link present } ". Here is an example of the fry style of XML interpolation:"
 { $example
-"""USING: splitting xml.writer xml.syntax ;
-"one two three" " " split
+"USING: splitting xml.writer xml.syntax ;
+\"one two three\" \" \" split
 [ [XML <item><-></item> XML] ] map
-<XML <doc><-></doc> XML> pprint-xml"""
+<XML <doc><-></doc> XML> pprint-xml"
 
-"""<?xml version="1.0" encoding="UTF-8"?>
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <doc>
   <item>
     one
@@ -70,15 +70,15 @@ $nl
   <item>
     three
   </item>
-</doc>""" }
+</doc>" }
 "Here is an example of the locals version:"
 { $example
-"""USING: locals urls xml.syntax xml.writer ;
+"USING: locals urls xml.syntax xml.writer ;
 [let
     3 :> number
     f :> false
-    URL" http://factorcode.org/" :> url
-    "hello" :> string
+    URL\" http://factorcode.org/\" :> url
+    \"hello\" :> string
     \\ drop :> word
     <XML
         <x
@@ -88,20 +88,20 @@ $nl
             string=<-string->
             word=<-word-> />
     XML> pprint-xml
-]"""
+]"
 
-"""<?xml version="1.0" encoding="UTF-8"?>
-<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>""" }
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<x number=\"3\" url=\"http://factorcode.org/\" string=\"hello\" word=\"drop\"/>" }
 "XML interpolation can also be used, in conjunction with " { $vocab-link "inverse" } " in pattern matching. For example:"
-{ $example """USING: xml.syntax inverse ;
+{ $example "USING: xml.syntax inverse ;
 : dispatch ( xml -- string )
     {
-        { [ [XML <a><-></a> XML] ] [ "a" prepend ] }
-        { [ [XML <b><-></b> XML] ] [ "b" prepend ] }
-        { [ [XML <b val='yes'/> XML] ] [ "yes" ] }
-        { [ [XML <b val=<->/> XML] ] [ "no" prepend ] }
+        { [ [XML <a><-></a> XML] ] [ \"a\" prepend ] }
+        { [ [XML <b><-></b> XML] ] [ \"b\" prepend ] }
+        { [ [XML <b val='yes'/> XML] ] [ \"yes\" ] }
+        { [ [XML <b val=<->/> XML] ] [ \"no\" prepend ] }
     } switch ;
-[XML <a>pple</a> XML] dispatch write"""
+[XML <a>pple</a> XML] dispatch write"
 "apple" } ;
 
 HELP: XML-NS:

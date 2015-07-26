@@ -65,7 +65,7 @@ TYPED: unboxy ( in: unboxable -- out: unboxable2 )
 
 { 9 }
 [
-"""
+"
 USING: kernel math ;
 IN: typed.tests
 
@@ -73,13 +73,13 @@ TUPLE: unboxable
     { x fixnum read-only }
     { y fixnum read-only }
     { z float read-only } ; final
-""" eval( -- )
+" eval( -- )
 
-"""
+"
 USING: accessors kernel math ;
 IN: typed.tests
 T{ unboxable f 12 3 4.0 } unboxy xy>>
-""" eval( -- xy )
+" eval( -- xy )
 ] unit-test
 
 TYPED: no-inputs ( -- out: integer )
@@ -185,5 +185,5 @@ TYPED: typed-intersection ( x: intersection{ integer bignum } -- ? ) >boolean ;
 [ 0 typed-intersection ] [ input-mismatch-error? ] must-fail-with
 
 [
-    """IN: test123 USE: typed TYPED: foo ( x -- y ) ;""" eval( -- )
+    "IN: test123 USE: typed TYPED: foo ( x -- y ) ;" eval( -- )
 ] [ error>> no-types-specified? ] must-fail-with

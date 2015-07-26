@@ -27,15 +27,15 @@ HELP: push-new
 { $values { "vector" "a specialized vector of structs" } { "new" "a new value of the specialized vector's type" } }
 { $description "Grows " { $snippet "vector" } ", increasing its length by one, and outputs a " { $link struct } " object wrapping the newly allocated storage." }
 { $notes "This word allows struct objects to be streamed into a struct vector efficiently without excessive copying. The typical Factor idiom for pushing a new object onto a vector, when used with struct vectors, will allocate and copy a temporary struct object:"
-{ $code """foo <struct>
+{ $code "foo <struct>
     5 >>a
     6 >>b
-foo-vector{ } clone push""" }
+foo-vector{ } clone push" }
 "By using " { $snippet "push-new" } ", the new struct can be allocated directly from the vector and the intermediate copy can be avoided:"
-{ $code """foo-vector{ } clone push-new
+{ $code "foo-vector{ } clone push-new
     5 >>a
     6 >>b
-    drop""" } } ;
+    drop" } } ;
 
 ARTICLE: "specialized-vector-c" "Passing specialized vectors to C functions"
 "Each specialized vector has a " { $slot "underlying" } " slot holding a specialized array, which in turn has an " { $slot "underlying" } " slot holding a " { $link byte-array } " with the raw data. Passing a specialized vector as a parameter to a C function call will automatically extract the underlying data. To get at the underlying data directly, call the " { $link >c-ptr } " word on a specialized vector." ;

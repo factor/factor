@@ -10,12 +10,12 @@ IN: json.writer.tests
 { "102.0" } [ 102.0 >json ] unit-test
 { "102.5" } [ 102.5 >json ] unit-test
 { "0.5" } [ 1/2 >json ] unit-test
-{ """\"hello world\"""" } [ "hello world" >json ] unit-test
+{ "\"hello world\"" } [ "hello world" >json ] unit-test
 
 { "[1,\"two\",3.0]" } [ { 1 "two" 3.0 } >json ] unit-test
-{ """{"US$":1.0,"EU€":1.5}""" } [ H{ { "US$" 1.0 } { "EU€" 1.5 } } >json ] unit-test
+{ "{\"US$\":1.0,\"EU€\":1.5}" } [ H{ { "US$" 1.0 } { "EU€" 1.5 } } >json ] unit-test
 
-{ """">json"""" } [ \ >json >json ] unit-test
+{ "\">json\"" } [ \ >json >json ] unit-test
 
 { { 0.5 } } [ { 1/2 } >json json> ] unit-test
 
@@ -35,31 +35,31 @@ TUPLE: person first-name age ;
     with-variable
 ] unit-test
 
-{ """{"1":2,"3":4}""" }
+{ "{\"1\":2,\"3\":4}" }
 [ H{ { "1" 2 } { "3" 4 } } >json ] unit-test
 
-{ """{"1":2,"3":4}""" }
+{ "{\"1\":2,\"3\":4}" }
 [ H{ { 1 2 } { 3 4 } } >json ] unit-test
 
-{ """{"":4}""" }
+{ "{\"\":4}" }
 [ H{ { "" 2 } { "" 4 } } >json ] unit-test
 
-{ """{"true":4,"false":2,"":5}""" }
+{ "{\"true\":4,\"false\":2,\"\":5}" }
 [ H{ { f 2 } { t 4 } { "" 5 } } >json ] unit-test
 
-{ """{"3.1":3}""" }
+{ "{\"3.1\":3}" }
 [ H{ { 3.1 3 } } >json ] unit-test
 
-{ """{"null":1}""" }
+{ "{\"null\":1}" }
 [ H{ { json-null 1 } } >json ] unit-test
 
-{ """{"Infinity":1}""" }
+{ "{\"Infinity\":1}" }
 [ t json-allow-fp-special? [ H{ { 1/0. 1 } } >json ] with-variable ] unit-test
 
-{ """{"-Infinity":1}""" }
+{ "{\"-Infinity\":1}" }
 [ t json-allow-fp-special? [ H{ { -1/0. 1 } } >json ] with-variable ] unit-test
 
-{ """{"NaN":1}""" }
+{ "{\"NaN\":1}" }
 [ t json-allow-fp-special? [ H{ { NAN: 333 1 } } >json ] with-variable ] unit-test
 
 {

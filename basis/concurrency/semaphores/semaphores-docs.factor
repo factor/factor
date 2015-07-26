@@ -42,19 +42,19 @@ ARTICLE: "concurrency.semaphores.examples" "Semaphore examples"
 }
 "Here is a concrete example which fetches content from 5 different web sites, making no more than 3 requests at a time:"
 { $code
-    """USING: concurrency.combinators concurrency.semaphores
+    "USING: concurrency.combinators concurrency.semaphores
 fry http.client kernel urls ;
 
 {
-    URL" http://www.apple.com"
-    URL" http://www.google.com"
-    URL" http://www.ibm.com"
-    URL" http://www.hp.com"
-    URL" http://www.oracle.com"
+    URL\" http://www.apple.com\"
+    URL\" http://www.google.com\"
+    URL\" http://www.ibm.com\"
+    URL\" http://www.hp.com\"
+    URL\" http://www.oracle.com\"
 }
 2 <semaphore> '[
     _ [ http-get nip ] with-semaphore
-] parallel-map"""
+] parallel-map"
 } ;
 
 ARTICLE: "concurrency.semaphores" "Counting semaphores"

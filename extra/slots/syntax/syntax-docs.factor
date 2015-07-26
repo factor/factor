@@ -9,8 +9,8 @@ HELP: slots[
            "IN: slots.syntax.example"
            "TUPLE: rectangle width height ;"
            "T{ rectangle { width 3 } { height 5 } } slots[ width height ] [ . ] bi@"
-           """3
-5"""
+           "3
+5"
 } ;
 
 HELP: slots{

@@ -195,22 +195,22 @@ $nl
 { $heading "Example: ls" }
 "Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"
 { $code
-    """USING: command-line namespaces io io.files
+    "USING: command-line namespaces io io.files
 io.pathnames tools.files sequences kernel ;
 
 command-line get [
     current-directory get directory.
 ] [
     dup length 1 = [ first directory. ] [
-        [ [ nl write ":" print ] [ directory. ] bi ] each
+        [ [ nl write \":\" print ] [ directory. ] bi ] each
     ] if
-] if-empty"""
+] if-empty"
 }
 "You can put it in a file named " { $snippet "ls.factor" } ", and then run it, to list the " { $snippet "/usr/bin" } " directory for example:"
 { $code "./factor ls.factor /usr/bin" }
 { $heading "Example: grep" }
 "The following is a more complicated example, implementing something like the Unix " { $snippet "grep" } " command:"
-{ $code """USING: kernel fry io io.files io.encodings.ascii sequences
+{ $code "USING: kernel fry io io.files io.encodings.ascii sequences
 regexp command-line namespaces ;
 IN: grep
 
@@ -221,7 +221,7 @@ IN: grep
     ascii [ grep-lines ] with-file-reader ;
 
 : grep-usage ( -- )
-    "Usage: factor grep.factor <pattern> [<file>...]" print ;
+    \"Usage: factor grep.factor <pattern> [<file>...]\" print ;
 
 command-line get [
     grep-usage
@@ -231,7 +231,7 @@ command-line get [
     ] [
         [ grep-file ] with each
     ] if-empty
-] if-empty""" }
+] if-empty" }
 "You can run it like so,"
 { $code "./factor grep.factor '.*hello.*' myfile.txt" }
 "You'll notice this script takes a while to start. This is because it is loading and compiling the " { $vocab-link "regexp" } " vocabulary every time. To speed up startup, load the vocabulary into your image, and save the image:"

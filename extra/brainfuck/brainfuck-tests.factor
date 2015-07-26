@@ -13,11 +13,11 @@ IN: brainfuck
 ! Hello World!
 
 { "Hello World!\n" } [
-    """
+    "
     ++++++++++[>+++++++>++++++++++>+++>+<<<<-]
     >++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.
     ------.--------.>+.>.
-    """ get-brainfuck
+    " get-brainfuck
 ] unit-test
 
 ! Addition (single-digit)
@@ -32,11 +32,11 @@ IN: brainfuck
 
 { "8\0" } [
     "24" [
-        """
+        "
         ,>,>++++++++[<------<------>>-]
         <<[>[>+>+<<-]>>[<<+>>-]<<<-]
         >>>++++++[<++++++++>-],<.>.
-        """ get-brainfuck
+        " get-brainfuck
     ] with-string-reader
 ] unit-test
 
@@ -44,7 +44,7 @@ IN: brainfuck
 
 { "3" } [
     "62" [
-        """
+        "
         ,>,>++++++[-<--------<-------->>]
         <<[
         >[->+>+<<]
@@ -55,7 +55,7 @@ IN: brainfuck
         <<<]
         >[-]>>>>[-<<<<<+>>>>>]
         <<<<++++++[-<++++++++>]<.
-        """ get-brainfuck
+        " get-brainfuck
     ] with-string-reader
 ] unit-test
 
@@ -72,19 +72,19 @@ IN: brainfuck
 
 ${ 100 [0,b] [ dup * number>string ] map "\n" join "\n" append }
 [
-    """
+    "
     ++++[>+++++<-]>[<+++++>-]+<+[
     >[>+>+<<-]++>>[<<+>>-]>>>[-]++>[-]+
     >>>+[[-]++++++>>>]<<<[[<++++++++<++>>-]+<.<[>----<-]<]
     <<[>>>>>[>>>[-]+++++++++<[>-<-]+++++++++>
     [-[<->-]+[<<<]]<[>+<-]>]<<-]<<-]
-    """ get-brainfuck
+    " get-brainfuck
 ] unit-test
 
 ! fun with numbers: 2 + 2 = 5
 
 { "5" } [
-    """
+    "
     +++++           +++++
         +               +
         +     +         +     +++++
@@ -92,5 +92,5 @@ ${ 100 [0,b] [ dup * number>string ] map "\n" join "\n" append }
     +         +     +         +++++
     +               +
     +++++           +++++.
-    """ get-brainfuck
+    " get-brainfuck
 ] unit-test

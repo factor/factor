@@ -93,14 +93,14 @@ ${
 
     T{ elliptical-arc f { 5.0 6.0 } 7.0 t f { 8.0 9.0 } f }
 } } [
-    """
+    "
     M 1.0,+1 3,-10e-1  l 2 2, 2 -2, 2 2   v -9 1 H 9 8  z 
     M 0 0  C -4.0 0.0 -8.0 4.0 -8.0 8.0  -8.0 4.0 -12.0 8.0 -16.0 8.0
     s 0.0,2.0 2.0,0.0
     Q -2 0 0 -2 -3. 0 0 3
     t 1 2 3 4
     A 5 6 7 1 0 8 9
-    """ svg-path>array
+    " svg-path>array
 ] unit-test
 
 STRING: test-svg-string

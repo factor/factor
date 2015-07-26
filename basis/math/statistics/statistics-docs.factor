@@ -132,7 +132,7 @@ HELP: sorted-histogram
 { $description "Outputs a " { $link histogram } " of a sequence sorted by number of occurrences from lowest to highest." }
 { $examples
     { $example "USING: prettyprint math.statistics ;"
-        """"abababbbbbbc" sorted-histogram ."""
+        "\"abababbbbbbc\" sorted-histogram ."
         "{ { 99 1 } { 97 3 } { 98 8 } }"
     }
 } ;
