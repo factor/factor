@@ -30,6 +30,11 @@ HELP: compute-live-in
 { $description "Computes the live in registers for a basic block." }
 { $see-also machine-live-ins } ;
 
+HELP: insert-reload
+{ $values { "live-interval" live-interval-state } }
+{ $description "Inserts a " { $link ##reload } " instruction for a live interval." }
+{ $see-also insert-spill } ;
+
 HELP: machine-edge-live-ins
 { $var-description "Mapping from basic blocks to predecessors to values which are live on a particular incoming edge." } ;
 

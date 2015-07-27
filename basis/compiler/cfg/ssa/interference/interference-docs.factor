@@ -1,11 +1,16 @@
-USING: help.markup help.syntax ;
+USING: compiler.cfg help.markup help.syntax sequences ;
 IN: compiler.cfg.ssa.interference
+
+HELP: sets-interfere?
+{ $values { "seq1" sequence } { "seq2" sequence } }
+{ $description "Checks if two sets consisting of " { $link vreg-info } " instances interfere with each other. If they interfere, then copies can not be eliminated." } ;
 
 HELP: vreg-info
 { $class-description
   "Slots:"
   { $table
     { { $slot "vreg" } { "The vreg the vreg-info is the info for." } }
+    { { $slot "bb" } { "The " { $link basic-block } " in which the vreg is defined." } }
   }
 } ;
 
