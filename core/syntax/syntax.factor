@@ -285,9 +285,9 @@ IN: bootstrap.syntax
 
     "read-only" "syntax" lookup-word define-symbol
 
-    "call(" [ \ call-effect parse-call( ] define-core-syntax
+    "call(" [ \ call-effect parse-call-paren ] define-core-syntax
 
-    "execute(" [ \ execute-effect parse-call( ] define-core-syntax
+    "execute(" [ \ execute-effect parse-call-paren ] define-core-syntax
 
     "<<<<<<<" [ version-control-merge-conflict ] define-core-syntax
     "=======" [ version-control-merge-conflict ] define-core-syntax
