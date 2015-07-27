@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private compiler.constants
-cpu.x86.assembler cpu.x86.assembler.operands kernel layouts
-locals parser sequences ;
+USING: compiler.constants cpu.x86.assembler
+cpu.x86.assembler.operands layouts locals ;
 IN: bootstrap.x86
 
 : tib-exception-list-offset ( -- n ) 0 bootstrap-cells ;

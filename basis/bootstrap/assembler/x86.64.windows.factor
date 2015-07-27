@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel namespaces system layouts
-vocabs sequences cpu.x86.assembler parser
-cpu.x86.assembler.operands ;
+USING: cpu.x86.assembler cpu.x86.assembler.operands kernel
+layouts parser sequences ;
 IN: bootstrap.x86
 
 DEFER: stack-reg
