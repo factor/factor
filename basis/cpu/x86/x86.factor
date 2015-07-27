@@ -647,26 +647,29 @@ HOOK: %prepare-var-args cpu ( -- )
 
 HOOK: %cleanup cpu ( n -- )
 
-:: emit-alien-insn ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
+M:: x86 %alien-assembly ( reg-inputs
+                         stack-inputs
+                         reg-outputs
+                         dead-outputs
+                         cleanup
+                         stack-size
+                         quot -- )
     stack-inputs [ first3 %store-stack-param ] each
     reg-inputs [ first3 %store-reg-param ] each
     %prepare-var-args
-    quot call
+    quot call( -- )
     cleanup %cleanup
     reg-outputs [ first3 %load-reg-param ] each
-    dead-outputs [ first2 %discard-reg-param ] each ; inline
+    dead-outputs [ first2 %discard-reg-param ] each ;
 
 M: x86 %alien-invoke ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map -- )
-    '[ _ _ _ %c-invoke ] emit-alien-insn ;
+    '[ _ _ _ %c-invoke ] %alien-assembly ;
 
 M:: x86 %alien-indirect ( src reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map -- )
     reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
         src ?spill-slot CALL
         gc-map gc-map-here
-    ] emit-alien-insn ;
-
-M: x86 %alien-assembly ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
-    '[ _ call( -- ) ] emit-alien-insn ;
+    ] %alien-assembly ;
 
 HOOK: %begin-callback cpu ( -- )
 
