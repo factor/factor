@@ -192,7 +192,7 @@ M: slide-button pref-dim* dup interior>> pen-pref-dim ;
     "vertical-scroller-downarrow-clicked"
     <slide-button> ;
 
-TUPLE: slider-pen-tuple enabled disabled ;
+TUPLE: slider-pen enabled disabled ;
 
 : <slider-pen> ( orientation -- pen )
     {
@@ -209,18 +209,18 @@ TUPLE: slider-pen-tuple enabled disabled ;
             "vertical-scroller-bottom-disabled" theme-image
         ] }
     } case
-    [ f f <tile-pen> ] bi-curry@ 2bi \ slider-pen-tuple boa ;
+    [ f f <tile-pen> ] bi-curry@ 2bi slider-pen boa ;
 
-: slider-pen ( slider pen -- pen )
+: current-pen ( slider pen -- pen )
     [ slider-enabled? ] [ [ enabled>> ] [ disabled>> ] bi ] bi* ? ;
 
-M: slider-pen-tuple draw-interior
-    dupd slider-pen draw-interior ;
+M: slider-pen draw-interior
+    dupd current-pen draw-interior ;
 
-M: slider-pen-tuple draw-boundary
-    dupd slider-pen draw-boundary ;
+M: slider-pen draw-boundary
+    dupd current-pen draw-boundary ;
 
-M: slider-pen-tuple pen-pref-dim
+M: slider-pen pen-pref-dim
     enabled>> pen-pref-dim ;
 
 M: slider pref-dim*
