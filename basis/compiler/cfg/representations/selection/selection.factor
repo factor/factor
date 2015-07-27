@@ -88,39 +88,37 @@ UNION: inert-arithmetic-tag-untag-insn
 ##sub-imm ;
 
 UNION: inert-bitwise-tag-untag-insn
-##and-imm
-##or-imm
-##xor-imm ;
+    ##and-imm
+    ##or-imm
+    ##xor-imm ;
 
-GENERIC: has-peephole-opts? ( insn -- ? )
-
-M: insn has-peephole-opts? drop f ;
-M: ##load-integer has-peephole-opts? drop t ;
-M: ##load-reference has-peephole-opts? drop t ;
-M: ##neg has-peephole-opts? drop t ;
-M: ##not has-peephole-opts? drop t ;
-M: inert-tag-untag-insn has-peephole-opts? drop t ;
-M: inert-arithmetic-tag-untag-insn has-peephole-opts? drop t ;
-M: inert-bitwise-tag-untag-insn has-peephole-opts? drop t ;
-M: ##mul-imm has-peephole-opts? drop t ;
-M: ##shl-imm has-peephole-opts? drop t ;
-M: ##shr-imm has-peephole-opts? drop t ;
-M: ##sar-imm has-peephole-opts? drop t ;
-M: ##compare-integer-imm has-peephole-opts? drop t ;
-M: ##compare-integer has-peephole-opts? drop t ;
-M: ##compare-integer-imm-branch has-peephole-opts? drop t ;
-M: ##compare-integer-branch has-peephole-opts? drop t ;
-M: ##test-imm has-peephole-opts? drop t ;
-M: ##test has-peephole-opts? drop t ;
-M: ##test-imm-branch has-peephole-opts? drop t ;
-M: ##test-branch has-peephole-opts? drop t ;
+UNION: peephole-optimizable
+    ##load-integer
+    ##load-reference
+    ##neg
+    ##not
+    inert-tag-untag-insn
+    inert-arithmetic-tag-untag-insn
+    inert-bitwise-tag-untag-insn
+    ##mul-imm
+    ##shl-imm
+    ##shr-imm
+    ##sar-imm
+    ##compare-integer-imm
+    ##compare-integer
+    ##compare-integer-imm-branch
+    ##compare-integer-branch
+    ##test-imm
+    ##test
+    ##test-imm-branch
+    ##test-branch ;
 
 GENERIC: compute-insn-costs ( insn -- )
 
 M: insn compute-insn-costs drop ;
 
 M: vreg-insn compute-insn-costs
-    dup has-peephole-opts? 2 5 ? '[ _ increase-costs ] each-rep ;
+    dup peephole-optimizable? 2 5 ? '[ _ increase-costs ] each-rep ;
 
 : compute-costs ( cfg -- )
     init-costs
