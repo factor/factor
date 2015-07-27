@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes combinators destructors fonts
-fry io io.styles kernel math.rectangles math.vectors memoize
-models namespaces sequences sorting splitting strings
+fry io io.styles kernel locals math.rectangles math.vectors
+memoize models namespaces sequences sorting splitting strings
 ui.baseline-alignment ui.clipboards ui.gadgets
 ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
 ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
@@ -191,32 +191,33 @@ M: pane-control model-changed ( model pane-control -- )
         swap >>quot
         swap >>model ;
 
-! Character styles
 <PRIVATE
 
-MEMO: specified-font ( assoc -- font )
+! Character styles
+
+MEMO:: specified-font ( name style size foreground background -- font )
     #! We memoize here to avoid creating lots of duplicate font objects.
-    [ monospace-font <font> ] dip
-    {
-        [ font-name of >>name ]
-        [
-            font-style of {
-                { f [ ] }
-                { plain [ ] }
-                { bold [ t >>bold? ] }
-                { italic [ t >>italic? ] }
-                { bold-italic [ t >>bold? t >>italic? ] }
-            } case
-        ]
-        [ font-size of >>size ]
-        [ foreground of >>foreground ]
-        [ background of >>background ]
-    } cleave
-    derive-font ;
+    monospace-font
+        name [ >>name ] when*
+        style {
+            { f [ ] }
+            { plain [ ] }
+            { bold [ t >>bold? ] }
+            { italic [ t >>italic? ] }
+            { bold-italic [ t >>bold? t >>italic? ] }
+        } case
+        size [ >>size ] when*
+        foreground [ >>foreground ] when*
+        background [ >>background ] when* ;
 
 : apply-font-style ( style gadget -- style gadget )
-    { font-name font-style font-size foreground background }
-    pick extract-keys specified-font >>font ;
+    over {
+        [ font-name of ]
+        [ font-style of ]
+        [ font-size of ]
+        [ foreground of ]
+        [ background of ]
+    } cleave specified-font >>font ;
 
 : apply-style ( style gadget key quot -- style gadget )
     [ pick at ] dip when* ; inline
@@ -284,12 +285,12 @@ M: pane-stream make-block-stream
     pane-block-stream new-nested-pane-stream ;
 
 ! Tables
+
 : apply-table-gap-style ( style grid -- style grid )
     table-gap [ >>gap ] apply-style ;
 
 : apply-table-border-style ( style grid -- style grid )
-    table-border [ <grid-lines> >>boundary ]
-    apply-style ;
+    table-border [ <grid-lines> >>boundary ] apply-style ;
 
 : styled-grid ( style grid -- grid )
     <grid>
