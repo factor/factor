@@ -11,8 +11,6 @@ continuations fry kernel sequences stack-checker.dependencies
 words ;
 IN: compiler.tree.propagation.simple
 
-! Propagation for straight-line code.
-
 M: #introduce propagate-before
     out-d>> [ object-info swap set-value-info ] each ;
 
@@ -46,7 +44,7 @@ M: anonymous-intersection add-depends-on-class
 M: #declare propagate-before
     #! We need to force the caller word to recompile when the
     #! classes mentioned in the declaration are redefined, since
-    #! now we're making assumptions but their definitions.
+    #! now we're making assumptions about their definitions.
     declaration>> [
         [ add-depends-on-class ]
         [ <class-info> swap refine-value-info ]

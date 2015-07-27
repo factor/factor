@@ -113,9 +113,6 @@ SYMBOL: history
     } cond ;
 
 : do-inlining ( #call word -- ? )
-    #! Note the logic here: if there's a custom inlining hook,
-    #! it is permitted to return f, which means that we try the
-    #! normal inlining heuristic.
     [
         dup custom-inlining? [ 2dup inline-custom ] [ f ] if
         [ 2drop t ] [ (do-inlining) ] if
