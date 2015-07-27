@@ -1,5 +1,5 @@
 USING: definitions help.markup help.syntax kernel parser
-quotations source-files stack-checker.errors words ;
+quotations sequences source-files stack-checker.errors words ;
 IN: compiler.units
 
 ARTICLE: "compilation-units-internals" "Compilation units internals"
@@ -72,6 +72,10 @@ HELP: with-nested-compilation-unit
 HELP: recompile
 { $values { "words" "a sequence of words" } { "alist" "an association list mapping words to compiled definitions" } }
 { $contract "Internal word which compiles words. Called at the end of " { $link with-compilation-unit } "." } ;
+
+HELP: to-recompile
+{ $values { "words" sequence } }
+{ $description "Sequence of words that will be recompiled by the compilation unit." } ;
 
 HELP: no-compilation-unit
 { $values { "word" word } }

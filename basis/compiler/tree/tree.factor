@@ -4,8 +4,6 @@ USING: accessors arrays assocs kernel namespaces sequences
 stack-checker.visitor vectors ;
 IN: compiler.tree
 
-! High-level tree SSA form.
-
 TUPLE: node < identity-tuple ;
 
 TUPLE: #introduce < node out-d ;

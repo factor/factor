@@ -63,6 +63,9 @@ HELP: build
 { $values { "n" integer } }
 { $description "The current build number. Factor increments this number whenever a new boot image is created." } ;
 
+HELP: leaf-signal-handler
+{ $description "A word called by the VM when a VM error occurs." } ;
+
 HELP: hashcode*
 { $values { "depth" integer } { "obj" object } { "code" fixnum } }
 { $contract "Outputs the hashcode of an object. The hashcode operation must satisfy the following properties:"
