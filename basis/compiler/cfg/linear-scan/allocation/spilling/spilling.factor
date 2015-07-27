@@ -3,8 +3,8 @@
 USING: accessors assocs combinators
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.utilities fry
-kernel linked-assocs locals math namespaces sequences ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
+compiler.utilities fry kernel linked-assocs locals math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 ERROR: bad-live-ranges interval ;
@@ -59,9 +59,6 @@ ERROR: bad-live-ranges interval ;
     ] [ 2drop ] if ;
 
 : spill-after ( after -- after/f )
-    ! If the interval has no more usages after the spill location,
-    ! then it is the first child of an interval that was split.  We
-    ! spill the value and let the resolve pass insert a reload later.
     dup uses>> empty? [ drop f ] [
         {
             [ ]
@@ -115,8 +112,6 @@ ERROR: bad-live-ranges interval ;
     '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
-    ! Any inactive intervals using 'reg' are split and spilled
-    ! and removed from the inactive set.
     new inactive-intervals-for [
         dup reg>> reg = [
             dup new intervals-intersect? [
@@ -126,16 +121,11 @@ ERROR: bad-live-ranges interval ;
     ] filter! drop ;
 
 : spill-intersecting ( new reg -- )
-    ! Split and spill all active and inactive intervals
-    ! which intersect 'new' and use 'reg'.
     [ spill-intersecting-active ]
     [ spill-intersecting-inactive ]
     2bi ;
 
 : spill-available ( new pair -- )
-    ! A register would become fully available if all
-    ! active and inactive intervals using it were split
-    ! and spilled.
     [ first spill-intersecting ] [ register-available ] 2bi ;
 
 : spill-partially-available ( new pair -- )
