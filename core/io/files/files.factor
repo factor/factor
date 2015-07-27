@@ -86,7 +86,7 @@ PRIVATE>
 
 : default-resource-path ( -- path )
     install-prefix dup "." =
-    [ drop image parent-directory ] [ "lib/factor" append-path ] if ;
+    [ drop image-path parent-directory ] [ "lib/factor" append-path ] if ;
 
 : init-resource-path ( -- )
     OBJ-ARGS special-object
