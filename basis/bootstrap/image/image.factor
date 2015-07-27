@@ -149,7 +149,6 @@ SYMBOL: bootstrapping-image
 ! Image output format
 SYMBOL: big-endian
 
-! Bootstrap architecture name
 SYMBOL: architecture
 
 RESET

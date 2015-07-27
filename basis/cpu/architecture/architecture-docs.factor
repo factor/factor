@@ -151,6 +151,10 @@ HELP: %copy
 { $description "Emits code copying a value from a register, arbitrary memory location or " { $link spill-slot } " to a destination." }
 { $examples { $unchecked-example $[ ex-%copy ] } } ;
 
+HELP: %dispatch
+{ $values { "src" "a register symbol" } { "temp" "a register symbol" } }
+{ $description "Code emitter for the " { $link ##dispatch } " instruction." } ;
+
 HELP: %horizontal-add-vector
 { $values
   { "dst" "destination register symbol" }
@@ -197,7 +201,8 @@ HELP: %local-allot
   { "align" "alignment" }
   { "offset" "where to allocate the data, relative to the stack register" }
 }
-{ $description "Emits machine code for stack \"allocating\" a chunk of memory. No memory is really allocated and instead a pointer to it is just put in the destination register." } ;
+{ $description "Emits machine code for stack \"allocating\" a chunk of memory. No memory is really allocated and instead a pointer to it is just put in the destination register." }
+{ $see-also ##local-allot } ;
 
 HELP: %replace-imm
 { $values

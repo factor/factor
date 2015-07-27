@@ -20,6 +20,10 @@ HELP: add-literal
 HELP: init-relocation
 { $description "Initializes the dynamic variables related to code relocation." } ;
 
+HELP: rel-decks-offset
+{ $values { "class" "a relocation class" } }
+{ $description "Adds a decks offset relocation. It is used for marking cards when emitting write barriers." } ;
+
 HELP: rel-safepoint
 { $values { "class" "a relocation class" } }
 { $description "Adds a safe point to the " { $link relocation-table } " for the current code offset. This word is used by the " { $link %safepoint } " generator." } ;
@@ -42,6 +46,9 @@ HELP: compiled-offset
 } ;
 
 ARTICLE: "compiler.codegen.relocation" "Relocatable VM objects"
-"The " { $vocab-link "compiler.codegen.relocation" } " deals with assigning memory addresses to VM objects, such as the card table. Those objects have different addresses during each execution which is why they are \"relocatable\". The vocab is shared by the optimizing and non-optimizing compiler." ;
+"The " { $vocab-link "compiler.codegen.relocation" } " deals with assigning memory addresses to VM objects, such as the card table. Those objects have different addresses during each execution which is why they are \"relocatable\". The vocab is shared by the optimizing and non-optimizing compiler."
+$nl
+"Adding relocations:"
+{ $subsections add-relocation rel-decks-offset rel-safepoint } ;
 
 ABOUT: "compiler.codegen.relocation"
