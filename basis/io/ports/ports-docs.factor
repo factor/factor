@@ -41,6 +41,10 @@ ABOUT: "io.ports"
 HELP: port
 { $class-description "Instances of this class present a blocking stream interface on top of an underlying non-blocking I/O system, giving the illusion of blocking by yielding the thread which is waiting for input or output." } ;
 
+HELP: shutdown
+{ $values { "handle" "a port handle" } }
+{ $description "Called when a port is being disposed." } ;
+
 HELP: input-port
 { $class-description "The class of ports implementing the input stream protocol." } ;
 
