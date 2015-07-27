@@ -302,43 +302,43 @@ ALIAS: std sample-std
 
 : sample-ste ( seq -- x ) 1 ste-ddof ;
 
-: ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
+: ((r)) ( x-mean y-mean x-seq y-seq -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y))
     0 [ [ [ pick ] dip swap - ] bi@ * + ] 2reduce 2nip ;
 
-: (r) ( mean(x) mean(y) {x} {y} sx sy -- r )
+: (r) ( x-mean y-mean x-seq y-seq x-std y-std -- r )
     * recip [ [ ((r)) ] keep length 1 - / ] dip * ;
 
-: [r] ( {{x,y}...} -- mean(x) mean(y) {x} {y} sx sy )
+: [r] ( xy-pairs -- x-mean y-mean x-seq y-seq x-std y-std )
     first2 [ [ [ mean ] bi@ ] 2keep ] 2keep [ population-std ] bi@ ;
 
-: r ( {{x,y}...} -- r )
+: r ( xy-pairs -- r )
     [r] (r) ;
 
-: r^2 ( {{x,y}...} -- r )
+: r^2 ( xy-pairs -- r )
     r sq ;
 
-: least-squares ( {{x,y}...} -- alpha beta )
+: least-squares ( xy-pairs -- alpha beta )
     [r] { [ 2dup ] [ ] [ ] [ ] [ ] } spread
-    ! stack is mean(x) mean(y) mean(x) mean(y) {x} {y} sx sy
+    ! stack is x-mean y-mean x-mean y-mean x-seq y-seq x-std y-std
     [ (r) ] 2keep ! stack is mean(x) mean(y) r sx sy
     swap / * ! stack is mean(x) mean(y) beta
     [ swapd * - ] keep ;
 
-: cov-ddof ( {x} {y} ddof -- cov )
+: cov-ddof ( x-seq y-seq ddof -- cov )
     [ [ demean ] bi@ v* ] dip mean-ddof ;
 
-: population-cov ( {x} {y} -- cov ) 0 cov-ddof ; inline
+: population-cov ( x-seq y-seq -- cov ) 0 cov-ddof ; inline
 
-: sample-cov ( {x} {y} -- cov ) 1 cov-ddof ; inline
+: sample-cov ( x-seq y-seq -- cov ) 1 cov-ddof ; inline
 
-: corr-ddof ( {x} {y} n -- corr )
+: corr-ddof ( x-seq y-seq n -- corr )
     [ [ population-cov ] ] dip
     '[ [ _ var-ddof ] bi@ * sqrt ] 2bi / ;
 
-: population-corr ( {x} {y} -- corr ) 0 corr-ddof ; inline
+: population-corr ( x-seq y-seq -- corr ) 0 corr-ddof ; inline
 
-: sample-corr ( {x} {y} -- corr ) 1 corr-ddof ; inline
+: sample-corr ( x-seq y-seq -- corr ) 1 corr-ddof ; inline
 
 : cum-map ( seq identity quot: ( prev elt -- next ) -- seq' )
     swapd [ dup ] compose map nip ; inline
