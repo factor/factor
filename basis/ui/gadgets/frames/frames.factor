@@ -39,7 +39,7 @@ M: glue pref-dim* drop { 0 0 } ;
 PRIVATE>
 
 M: frame layout*
-    [ grid>> ] [ <frame-layout> ] bi grid-layout ;
+    [ grid>> ] [ <frame-layout> ] bi layout-grid ;
 
 : new-frame ( cols rows class -- frame )
     [ <frame-grid> ] dip new-grid ; inline

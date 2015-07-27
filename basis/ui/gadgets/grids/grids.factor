@@ -44,7 +44,7 @@ M: grid-cell baseline baseline>> ;
 
 M: grid-cell cap-height cap-height>> ;
 
-TUPLE: grid-layout-tuple grid gap fill? row-heights column-widths ;
+TUPLE: grid-layout grid gap fill? row-heights column-widths ;
 
 : iterate-cell-dims ( cells quot -- seq )
     '[ [ pref-dim>> @ ] [ max ] map-reduce ] map ; inline
@@ -59,7 +59,7 @@ TUPLE: grid-layout-tuple grid gap fill? row-heights column-widths ;
     grid>> flip [ first ] iterate-cell-dims ;
 
 : <grid-layout> ( grid -- grid-layout )
-    \ grid-layout-tuple new
+    grid-layout new
         swap
         [ grid>> [ [ <grid-cell> ] map ] map >>grid ]
         [ fill?>> >>fill? ]
@@ -107,11 +107,11 @@ M: grid pref-dim* <grid-layout> grid-pref-dim ;
     [ grid>> [ [ pref-dim>> ] map ] map ]
     if ;
 
-: grid-layout ( children grid-layout -- )
+: layout-grid ( children grid-layout -- )
     [ cell-locs ] [ cell-dims ] bi
     [ [ <rect> swap set-rect-bounds ] 3each ] 3each ;
 
-M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
+M: grid layout* [ grid>> ] [ <grid-layout> ] bi layout-grid ;
 
 M: grid children-on ( rect gadget -- seq )
     dup children>> empty? [ 2drop f ] [
