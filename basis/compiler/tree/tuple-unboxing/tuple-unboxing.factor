@@ -9,8 +9,6 @@ sequences slots.private stack-checker.branches
 stack-checker.values vectors ;
 IN: compiler.tree.tuple-unboxing
 
-! This pass must run after escape analysis
-
 GENERIC: unbox-tuples* ( node -- node/nodes )
 
 : unbox-output? ( node -- values )
