@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private layouts locals namespaces
-vocabs parser compiler.constants
-compiler.codegen.relocation math math.private cpu.x86.assembler
-cpu.x86.assembler.operands sequences generic.single.private
-threads.private ;
+USING: bootstrap.image.private compiler.codegen.relocation
+compiler.constants cpu.x86.assembler cpu.x86.assembler.operands
+generic.single.private kernel kernel.private layouts locals math
+math.private namespaces threads.private ;
 IN: bootstrap.x86
 
 8 \ cell set
