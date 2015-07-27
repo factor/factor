@@ -22,10 +22,6 @@ M: ratio eql? over ratio? [ = ] [ 2drop f ] if ;
 M: float eql? over float? [ [ double>bits ] same? ] [ 2drop f ] if ;
 M: complex eql? over complex? [ = ] [ 2drop f ] if ;
 
-! Value info represents a set of objects. Don't mutate value infos
-! you receive, always construct new ones. We don't declare the
-! slots read-only to allow cloning followed by writing, and to
-! simplify constructors.
 TUPLE: value-info-state
 class
 interval
