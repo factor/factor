@@ -33,7 +33,8 @@ HELP: gc-check-offsets
 
 HELP: insert-gc-check?
 { $values { "bb" basic-block } { "?" boolean } }
-{ $description "Whether to insert a gc check in the block or not." } ;
+{ $description "Whether to insert a gc check in the block or not. Only blocks with allocation instructions require gc checks." }
+{ $see-also allocation-insn } ;
 
 HELP: insert-gc-checks
 { $values { "cfg" cfg }  }
