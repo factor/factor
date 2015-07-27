@@ -74,12 +74,12 @@ HELP: sample-var
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } sample-var ." "1+2/3" } } ;
 
 HELP: population-cov
-{ $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
-{ $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "cov" "a real number" } }
+{ $description "Computes the covariance of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
 
 HELP: population-corr
-{ $values { "{x}" sequence } { "{y}" sequence } { "corr" "a real number" } }
-{ $description "Computes the correlation of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "corr" "a real number" } }
+{ $description "Computes the correlation of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
 
 HELP: histogram
 { $values
