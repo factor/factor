@@ -761,3 +761,13 @@ STRUCT: simd-struct
     [ 123 assert= ]
     bi*
 ] unit-test
+
+! #1308
+: test-1308 ( a b -- c )
+    { double-4 double-4 } declare
+    v+ dup first 10 > [ first ] [ third ] if 1array ;
+
+! Before the fix, this evaluated to an uninitialized value.
+{ 33.0 } [
+    double-4{ 2 20 30 40 } double-4{ 2 4 3 2 } test-1308 first
+] unit-test
