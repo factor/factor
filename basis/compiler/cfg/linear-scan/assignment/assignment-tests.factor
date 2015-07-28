@@ -31,6 +31,19 @@ IN: compiler.cfg.linear-scan.assignment.tests
     [ assign-registers-in-block ] keep instructions>>
 ] unit-test
 
+! insert-reload
+{
+    { T{ ##reload { dst RAX } { rep int-rep } { src T{ spill-slot } } } }
+} [
+    [
+        T{ live-interval-state
+           { reg RAX }
+           { reload-from T{ spill-slot } }
+           { reload-rep int-rep }
+        } insert-reload
+    ] { } make
+] unit-test
+
 ! insert-spill
 { { T{ ##spill { src RAX } } } } [
     [
