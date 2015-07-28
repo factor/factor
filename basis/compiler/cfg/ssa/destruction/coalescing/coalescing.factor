@@ -35,44 +35,46 @@ ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
 : try-eliminate-copies ( pairs must? -- )
     '[ first2 _ try-eliminate-copy ] each ;
 
-GENERIC: coalesce-insn ( insn -- )
-
-M: insn coalesce-insn drop ;
-
-M: alien-call-insn coalesce-insn drop ;
-
-M: vreg-insn coalesce-insn
-    [ defs-vregs ] [ uses-vregs ] bi
-    2dup [ empty? not ] both? [
-        [ first ] bi@
-        2dup [ rep-of reg-class-of ] bi@ eq?
-        [ 2array , ] [ 2drop ] if
-    ] [ 2drop ] if ;
-
-M: ##copy coalesce-insn
-    [ dst>> ] [ src>> ] bi 2array , ;
-
-M: ##parallel-copy coalesce-insn
-    values>> % ;
-
-M: ##tagged>integer coalesce-insn
-    [ dst>> ] [ src>> ] bi t try-eliminate-copy ;
-
-M: ##phi coalesce-insn
-    [ dst>> ] [ inputs>> values ] bi zip-scalar
-    natural-sort t try-eliminate-copies ;
-
-: initial-leaders ( cfg -- leaders )
-    cfg>insns [ [ defs-vregs ] [ temp-vregs ] bi append ] map concat unique ;
+: initial-leaders ( insns -- leaders )
+    [ [ defs-vregs ] [ temp-vregs ] bi append ] map concat unique ;
 
 : initial-class-elements ( -- class-elements )
     defs get [ [ dup dup value-of ] dip <vreg-info> 1array ] assoc-map ;
 
-: init-coalescing ( cfg -- )
+: init-coalescing ( insns -- )
     initial-leaders leader-map set
     initial-class-elements class-element-map set ;
 
+GENERIC: coalesce-now ( insn -- )
+
+M: insn coalesce-now drop ;
+
+M: ##tagged>integer coalesce-now
+    [ dst>> ] [ src>> ] bi t try-eliminate-copy ;
+
+M: ##phi coalesce-now
+    [ dst>> ] [ inputs>> values ] bi zip-scalar
+    natural-sort t try-eliminate-copies ;
+
+GENERIC: coalesce-later ( insn -- )
+
+M: insn coalesce-later drop ;
+
+M: alien-call-insn coalesce-later drop ;
+
+M: vreg-insn coalesce-later
+    [ defs-vregs ] [ uses-vregs ] bi zip ?first [ , ] when* ;
+
+M: ##copy coalesce-later
+    [ dst>> ] [ src>> ] bi 2array , ;
+
+M: ##parallel-copy coalesce-later
+    values>> % ;
+
+: eliminatable-copy? ( vreg1 vreg2 -- ? )
+    [ rep-of ] bi@ [ [ reg-class-of ] same? ] [ [ rep-size ] same? ] 2bi and ;
+
 : coalesce-cfg ( cfg -- )
-    dup init-coalescing
-    cfg>insns-rpo [ [ coalesce-insn ] each ] V{ } make
-    f try-eliminate-copies ;
+    cfg>insns-rpo dup init-coalescing
+    [ [ [ coalesce-now ] [ coalesce-later ] bi ] each ] { } make
+    [ first2 eliminatable-copy? ] filter f try-eliminate-copies ;

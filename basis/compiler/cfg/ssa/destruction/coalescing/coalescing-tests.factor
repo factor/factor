@@ -50,15 +50,15 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
            { size 24 }
            { temp 303 }
         }
-    } insns>cfg initial-leaders
+    } initial-leaders
 ] unit-test
 
 ! init-coalescing
 {
     H{ { 118 118 } }
 } [
-    { T{ ##phi { dst 118 } { inputs H{ { 4 120 } { 2 119 } } } } } insns>cfg
-    dup compute-defs init-coalescing
+    { T{ ##phi { dst 118 } { inputs H{ { 4 120 } { 2 119 } } } } }
+    [ insns>cfg compute-defs ] [ init-coalescing ] bi
     leader-map get
 ] unit-test
 
@@ -67,16 +67,16 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
     10 10 f try-eliminate-copy
 ] unit-test
 
-! coalesce-insn
+! coalesce-later
 { V{ { 2 1 } } } [
     [
-        T{ ##copy { src 1 } { dst 2 } { rep int-rep } } coalesce-insn
+        T{ ##copy { src 1 } { dst 2 } { rep int-rep } } coalesce-later
     ] V{ } make
 ] unit-test
 
 { V{ { 3 4 } { 7 8 } } } [
     [
-        T{ ##parallel-copy { values V{ { 3 4 } { 7 8 } } } } coalesce-insn
+        T{ ##parallel-copy { values V{ { 3 4 } { 7 8 } } } } coalesce-later
     ] V{ } make
 ] unit-test
 
@@ -92,7 +92,7 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
     10 [
         { 2286 2287 2288 } sets:unique leader-map set
         2286 make-phi-inputs ##phi new-insn
-        coalesce-insn
+        coalesce-now
         2286 leader
     ] replicate all-equal?
 ] unit-test
