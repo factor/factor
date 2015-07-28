@@ -1,10 +1,24 @@
 USING: assocs compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.ssa.destruction.coalescing
+compiler.cfg.registers compiler.cfg.ssa.destruction.coalescing
 compiler.cfg.ssa.destruction.leaders compiler.cfg.ssa.interference
 compiler.cfg.utilities cpu.architecture grouping kernel make
 namespaces random sequences tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.ssa.destruction.coalescing.tests
+
+! eliminatable-copy?
+{ { f t t f } } [
+    H{
+        { 45 double-2-rep }
+        { 46 double-rep }
+        { 47 double-rep }
+        { 100 double-rep }
+        { 20 tagged-rep }
+        { 30 int-rep }
+    } representations set
+    { { 45 46 } { 47 100 } { 20 30 } { 30 100 } }
+    [ first2 eliminatable-copy? ] map
+] unit-test
 
 ! initial-class-elements
 {
