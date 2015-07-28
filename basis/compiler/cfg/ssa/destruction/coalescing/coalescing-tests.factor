@@ -1,15 +1,64 @@
 USING: assocs compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.ssa.destruction.coalescing compiler.cfg.ssa.destruction.leaders
-cpu.architecture grouping kernel make namespaces random sequences tools.test ;
+compiler.cfg.ssa.destruction.coalescing
+compiler.cfg.ssa.destruction.leaders compiler.cfg.ssa.interference
+compiler.cfg.utilities cpu.architecture grouping kernel make
+namespaces random sequences tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.ssa.destruction.coalescing.tests
 
-! init-coalescing
+! initial-class-elements
 {
-    H{ { 123 123 } { 77 77 } }
+    H{
+        {
+            77
+            { T{ vreg-info { vreg 77 } { value 77 } { bb "bb2" } } }
+        }
+        {
+            123
+            {
+                T{ vreg-info
+                   { vreg 123 }
+                   { value 123 }
+                   { bb "bb1" }
+                }
+            }
+        }
+    }
 } [
     H{ { 123 "bb1" } { 77 "bb2" } } defs set
-    init-coalescing
+    initial-class-elements
+] unit-test
+
+! initial-leaders
+{
+    H{ { 65 65 } { 99 99 } { 62 62 } { 303 303 } }
+} [
+    {
+        T{ ##load-vector
+           { dst 62 }
+           { val B{ 0 0 0 0 0 0 0 64 0 0 0 0 0 0 52 64 } }
+           { rep double-2-rep }
+        }
+        T{ ##add-vector
+           { dst 65 }
+           { src1 62 }
+           { src2 63 }
+           { rep double-2-rep }
+        }
+        T{ ##allot
+           { dst 99 }
+           { size 24 }
+           { temp 303 }
+        }
+    } insns>cfg initial-leaders
+] unit-test
+
+! init-coalescing
+{
+    H{ { 118 118 } }
+} [
+    { T{ ##phi { dst 118 } { inputs H{ { 4 120 } { 2 119 } } } } } insns>cfg
+    dup compute-defs init-coalescing
     leader-map get
 ] unit-test
 
