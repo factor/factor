@@ -1,9 +1,9 @@
-USING: accessors compiler.cfg.liveness
-compiler.cfg compiler.cfg.debugger compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.registers
+USING: accessors alien assocs compiler.cfg.comparisons compiler.cfg.liveness
+compiler.cfg compiler.cfg.debugger compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
-dlists namespaces sequences kernel tools.test vectors alien math
-compiler.cfg.comparisons cpu.x86.assembler.operands assocs ;
+cpu.x86.assembler.operands dlists math namespaces sequences kernel system
+tools.test vectors ;
 IN: compiler.cfg.liveness.tests
 QUALIFIED: sets
 
@@ -100,6 +100,14 @@ QUALIFIED: sets
     { T{ ##tagged>integer f 30 15 } } 0 insns>block block>cfg compute-live-sets
     30 lookup-base-pointer
 ] unit-test
+
+cpu x86.64? [
+    { f } [
+        H{ } base-pointers set
+        H{ { 123 T{ ##peek { dst RCX } { loc D 1 } { insn# 6 } } } } insns set
+        123 lookup-base-pointer
+    ] unit-test
+] when
 
 ! lookup-base-pointer*
 { f } [
