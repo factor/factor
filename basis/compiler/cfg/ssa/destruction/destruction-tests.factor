@@ -5,21 +5,31 @@ cpu.architecture cpu.x86.assembler.operands kernel make namespaces
 sequences tools.test ;
 IN: compiler.cfg.ssa.destruction.tests
 
-! cleanup-insn
-{
-    V{ T{ ##copy { src 45 } { dst 47 } { rep double-2-rep } } }
-} [
+: setup-leader/reps-scenario ( -- )
+    ! Note the differences in representation.
     H{ { 45 45 } { 46 45 } { 47 47 } { 100 47 } } leader-map set
-    ! how can the leader of a vreg have a different representation
-    ! than the vreg itself?
     H{
         { 45 double-2-rep }
         { 46 double-rep }
         { 47 double-rep }
         { 100 double-rep }
-    } representations set
-    T{ ##parallel-copy { values V{ { 100 46 } } } }
-    [ cleanup-insn ] V{ } make
+    } representations set ;
+
+! cleanup-insn
+{
+    V{ T{ ##copy { dst 100 } { src 46 } } }
+} [
+    setup-leader/reps-scenario
+    T{ ##copy { src 46 } { dst 100 } } [ cleanup-insn ] V{ } make
+] unit-test
+
+! I think the difference is because ##parallel-copy may encode a swap
+! between two vregs.
+{
+    V{ T{ ##copy { dst 47 } { src 45 } { rep double-2-rep } } }
+} [
+    setup-leader/reps-scenario
+    T{ ##parallel-copy { values V{ { 100 46 } } } } [ cleanup-insn ] V{ } make
 ] unit-test
 
 { V{ } } [

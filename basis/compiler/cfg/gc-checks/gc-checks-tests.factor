@@ -8,10 +8,9 @@ compiler.cfg.comparisons compiler.test compiler.cfg.utilities ;
 IN: compiler.cfg.gc-checks.tests
 
 ! insert-gc-check?
-{ t } [
-    V{
-        T{ ##inc } T{ ##allot }
-    } 0 insns>block insert-gc-check?
+{ t f } [
+    V{ T{ ##inc } T{ ##allot } } 0 insns>block insert-gc-check?
+    V{ T{ ##call } } 0 insns>block insert-gc-check?
 ] unit-test
 
 ! allocation-size

@@ -107,7 +107,7 @@ ${
 
 ! align-spill-area
 { t } [
-    3 f f { } 0 insns>block <cfg> [ align-spill-area ] keep
+    3 { } insns>cfg [ align-spill-area ] keep
     spill-area-align>> cell =
 ] unit-test
 
