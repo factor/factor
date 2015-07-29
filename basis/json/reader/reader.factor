@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: arrays assocs combinators fry hashtables io
-io.streams.string json kernel kernel.private math math.parser
-namespaces sbufs sequences sequences.private strings vectors
-math.order ;
+USING: assocs combinators fry io io.streams.string json kernel
+kernel.private math math.order math.parser namespaces sbufs
+sequences sequences.private strings vectors ;
 
 IN: json.reader
 
@@ -131,5 +130,7 @@ PRIVATE>
 : read-jsons ( -- objects )
     input-stream get stream-json-read ;
 
-: json> ( string -- object )
+GENERIC: json> ( string -- object )
+
+M: string json>
     [ read-jsons first ] with-string-reader ;
