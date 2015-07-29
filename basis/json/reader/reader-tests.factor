@@ -1,5 +1,5 @@
-USING: hashtables io.streams.string json json.reader kernel
-literals math strings tools.test ;
+USING: hashtables io.streams.string json json.reader
+json.reader.private kernel literals math strings tools.test ;
 IN: json.reader.tests
 
 { f } [ "false" json> ] unit-test
@@ -76,3 +76,6 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { 1/0. } [ "Infinity" json> ] unit-test
 { -1/0. } [ "-Infinity" json> ] unit-test
 { t } [ "NaN" json> fp-nan? ] unit-test
+
+[ "<!doctype html>\n<html>\n<head>\n   " json> ]
+[ not-a-json-number? ] must-fail-with

@@ -9,14 +9,18 @@ IN: json.reader
 
 <PRIVATE
 
+ERROR: not-a-json-number string ;
+
 : json-number ( char stream -- num char )
     [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
-    [ append {
-        { "Infinity" [ 1/0. ] }
-        { "-Infinity" [ -1/0. ] }
-        { "NaN" [ 0/0. ] }
-        [ string>number ]
-    } case ] dip ;
+    [
+        append {
+            { "Infinity" [ 1/0. ] }
+            { "-Infinity" [ -1/0. ] }
+            { "NaN" [ 0/0. ] }
+            [ dup string>number [ nip ] [ not-a-json-number ] if* ]
+        } case
+    ] dip ;
 
 : json-expect ( token stream -- )
     [ dup length ] [ stream-read ] bi* = [ json-error ] unless ; inline
