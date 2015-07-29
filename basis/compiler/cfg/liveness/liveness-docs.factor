@@ -19,8 +19,7 @@ HELP: fill-gc-map
 { $description "Assigns values to the " { $slot "gc-roots" } " and " { $slot "derived-roots" } " slots of the " { $link gc-map } ". Does nothing if the " { $link select-representations } " pass hasn't ran." } ;
 
 HELP: gc-roots
-{ $values { "live-set" assoc } { "derived-roots" hash-set } { "gc-roots" sequence } }
-{ $description "" } ;
+{ $values { "live-set" assoc } { "derived-roots" hash-set } { "gc-roots" sequence } } ;
 
 HELP: gen-uses
 { $values { "live-set" assoc } { "insn" insn } }
