@@ -1,12 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
-alien.syntax byte-vectors classes.struct combinators
-combinators.short-circuit combinators.smart continuations
-generalizations io kernel libc locals macros math namespaces
-sequences sequences.generalizations stack-checker strings system
-unix.time unix.types vocabs vocabs.loader unix.ffi ;
+USING: accessors alien.c-types alien.syntax byte-vectors
+classes.struct combinators.short-circuit combinators.smart
+generalizations kernel libc locals math sequences
+sequences.generalizations strings system unix.ffi vocabs.loader
+;
 IN: unix
 
 ERROR: unix-system-call-error args errno message word ;
@@ -88,8 +87,4 @@ M: unix open-file [ open ] unix-system-call ;
 
 : unlink-file ( path -- ) [ unlink ] unix-system-call drop ;
 
-<<
-
 { "unix" "debugger" } "unix.debugger" require-when
-
->>
