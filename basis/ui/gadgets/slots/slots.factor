@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors eval kernel math.vectors parser prettyprint
-refs sequences ui.commands ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.scrollers ui.gadgets.tracks
+refs sequences ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.scrollers ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ;
 IN: ui.gadgets.slots
 
