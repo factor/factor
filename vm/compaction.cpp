@@ -85,24 +85,6 @@ struct code_compaction_fixup {
   }
 };
 
-struct object_compaction_updater {
-  factor_vm* parent;
-  compaction_fixup fixup;
-  object_start_map* starts;
-
-  object_compaction_updater(factor_vm* parent, compaction_fixup fixup)
-      : parent(parent),
-        fixup(fixup),
-        starts(&parent->data->tenured->starts) {}
-
-  void operator()(object* old_address, object* new_address, cell size) {
-    slot_visitor<compaction_fixup> forwarder(parent, fixup);
-    forwarder.visit_slots(new_address);
-    forwarder.visit_object_code_block(new_address);
-    starts->record_object_start_offset(new_address);
-  }
-};
-
 template <typename Fixup>
 void update_relocation(factor_vm* parent,
                        cell old_entry_point,
@@ -220,10 +202,12 @@ void factor_vm::collect_compact_impl() {
 
     /* Slide everything in tenured space up, and update data and code heap
        pointers inside objects. */
-    {
-      object_compaction_updater object_updater(this, fixup);
-      tenured->compact(object_updater, fixup, &data_finger);
-    }
+    auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
+      forwarder.visit_slots(new_addr);
+      forwarder.visit_object_code_block(new_addr);
+      tenured->starts.record_object_start_offset(new_addr);
+    };
+    tenured->compact(compact_object_func, fixup, &data_finger);
 
     /* Slide everything in the code heap up, and update data and code heap
        pointers inside code blocks. */
