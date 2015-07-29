@@ -587,7 +587,6 @@ struct factor_vm {
     code->allocator->iterate(iter);
   }
 
-  void init_code_heap(cell size);
   void update_code_heap_words(bool reset_inline_caches);
   void initialize_code_blocks();
   void primitive_modify_code_heap();
