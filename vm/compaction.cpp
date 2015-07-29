@@ -52,39 +52,6 @@ struct compaction_fixup {
   }
 };
 
-struct code_compaction_fixup {
-  static const bool translated_code_block_map = false;
-
-  mark_bits* code_forwarding_map;
-  const code_block** code_finger;
-
-  code_compaction_fixup(mark_bits* code_forwarding_map,
-                        const code_block** code_finger)
-      : code_forwarding_map(code_forwarding_map), code_finger(code_finger) {}
-
-  object* fixup_data(object* obj) { return obj; }
-
-  code_block* fixup_code(code_block* compiled) {
-    return (code_block*)code_forwarding_map->forward_block((cell)compiled);
-  }
-
-  object* translate_data(const object* obj) { return fixup_data((object*)obj); }
-
-  code_block* translate_code(const code_block* compiled) {
-    if (compiled < *code_finger)
-      return fixup_code((code_block*)compiled);
-    return (code_block*)compiled;
-  }
-
-  cell size(object* obj) { return obj->size(); }
-
-  cell size(code_block* compiled) {
-    if (code_forwarding_map->marked_p((cell)compiled))
-      return compiled->size(*this);
-    return code_forwarding_map->unmarked_block_size((cell)compiled);
-  }
-};
-
 template <typename Fixup>
 void update_relocation(factor_vm* parent,
                        cell old_entry_point,
@@ -125,21 +92,18 @@ void update_relocation(factor_vm* parent,
 
 template <typename Fixup> struct code_block_compaction_updater {
   factor_vm* parent;
-  Fixup fixup;
   slot_visitor<Fixup> forwarder;
 
   code_block_compaction_updater(
-      factor_vm* parent, Fixup fixup, slot_visitor<Fixup> forwarder)
-      : parent(parent),
-        fixup(fixup),
-        forwarder(forwarder) { }
+      factor_vm* parent, slot_visitor<Fixup> forwarder)
+      : parent(parent), forwarder(forwarder) { }
 
   void operator()(code_block* old_address, code_block* new_address, cell size) {
     forwarder.visit_code_block_objects(new_address);
 
     cell old_entry_point = old_address->entry_point();
     auto update_func = [&](instruction_operand op) {
-      update_relocation(parent, old_entry_point, fixup, op);
+      update_relocation(parent, old_entry_point, forwarder.fixup, op);
     };
     new_address->each_instruction_operand(update_func);
   }
@@ -192,7 +156,6 @@ void factor_vm::collect_compact_impl() {
   {
     compaction_fixup fixup(data_forwarding_map, code_forwarding_map, &data_finger,
                            &code_finger);
-
     slot_visitor<compaction_fixup> forwarder(this, fixup);
 
     forwarder.visit_uninitialized_code_blocks();
@@ -213,7 +176,7 @@ void factor_vm::collect_compact_impl() {
        pointers inside code blocks. */
     {
       code_block_compaction_updater<compaction_fixup> code_block_updater(
-          this, fixup, forwarder);
+          this, forwarder);
       code->allocator->compact(code_block_updater, fixup, &code_finger);
     }
 
@@ -228,37 +191,6 @@ void factor_vm::collect_compact_impl() {
 
   if (event)
     event->ended_compaction();
-}
-
-/* Compact just the code heap, after growing the data heap */
-void factor_vm::collect_compact_code_impl() {
-  /* Figure out where blocks are going to go */
-  mark_bits* code_forwarding_map = &code->allocator->state;
-  code_forwarding_map->compute_forwarding();
-
-  const code_block* code_finger = (code_block*)code->allocator->start;
-
-  code_compaction_fixup fixup(code_forwarding_map, &code_finger);
-  slot_visitor<code_compaction_fixup> forwarder(this, fixup);
-
-  forwarder.visit_uninitialized_code_blocks();
-  forwarder.visit_context_code_blocks();
-
-  /* Update code heap references in data heap */
-  auto object_grow_heap_updater = [&](object* obj) {
-    forwarder.visit_object_code_block(obj);
-  };
-  each_object(object_grow_heap_updater);
-
-  /* Slide everything in the code heap up, and update code heap
-	pointers inside code blocks. */
-  code_block_compaction_updater<code_compaction_fixup> code_block_updater(
-      this, fixup, forwarder);
-  code->allocator->compact(code_block_updater, fixup, &code_finger);
-
-  update_code_roots_for_compaction();
-  callbacks->update();
-  code->initialize_all_blocks_set();
 }
 
 void factor_vm::collect_compact() {
@@ -279,7 +211,7 @@ void factor_vm::collect_growing_heap(cell requested_size) {
   data_heap* old = data;
   set_data_heap(data->grow(&nursery, requested_size));
   collect_mark_impl();
-  collect_compact_code_impl();
+  collect_compact_impl();
   code->flush_icache();
   delete old;
 }
