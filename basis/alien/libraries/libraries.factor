@@ -96,7 +96,7 @@ deploy-libraries [ V{ } clone ] initialize
 
 HOOK: >deployed-library-path os ( path -- path' )
 
-<< {
+{
     { [ os windows? ] [ "alien.libraries.windows" ] }
     { [ os unix? ] [ "alien.libraries.unix" ] }
-} cond require >>
+} cond require
