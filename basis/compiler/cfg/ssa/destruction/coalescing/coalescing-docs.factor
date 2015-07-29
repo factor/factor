@@ -28,7 +28,7 @@ HELP: coalesce-vregs
 { $description "Sets 'leader' as the leader of 'follower'." } ;
 
 HELP: eliminatable-copy?
-{ $values { "vreg1" "vreg" } { "vreg2" "vreg" } }
+{ $values { "vreg1" "vreg" } { "vreg2" "vreg" } { "?" boolean } }
 { $description "Determines if a vreg copy can be eliminated. It can be eliminated if the vregs have the same register class and same representation size." } ;
 
 HELP: try-eliminate-copy

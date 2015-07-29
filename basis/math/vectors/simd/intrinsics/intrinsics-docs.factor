@@ -2,6 +2,7 @@ USING: help.markup help.syntax sequences ;
 IN: math.vectors.simd.intrinsics
 
 HELP: (simd-select)
+{ $values { "a" object } { "n" object } { "rep" object } { "x" object } }
 { $description "Word which implements " { $link nth } " for SIMD vectors." }
 { $examples
   { $unchecked-example
