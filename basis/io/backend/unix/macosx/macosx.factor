@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init io.backend io.backend.unix
 io.backend.unix.multiplexers io.backend.unix.multiplexers.kqueue
-io.backend.unix.multiplexers.run-loop namespaces system ;
-USE: io.files.unix ! need this for deploy
+io.backend.unix.multiplexers.run-loop namespaces system vocabs ;
 IN: io.backend.unix.macosx
 
 SINGLETON: macosx-kqueue
@@ -16,4 +15,7 @@ M: macosx init-io ( -- )
 
 macosx set-io-backend
 
-[ start-signal-pipe-thread ] "io.backend.unix:signal-pipe-thread" add-startup-hook
+[ start-signal-pipe-thread ]
+"io.backend.unix:signal-pipe-thread" add-startup-hook
+
+"io.files.unix" require ! needed for deploy
