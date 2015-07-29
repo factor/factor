@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays assocs sequences math math.order cache
-opengl opengl.gl opengl.textures strings fonts colors accessors
-namespaces ui.gadgets.worlds ;
+USING: accessors arrays assocs cache combinators fonts kernel
+math math.order namespaces opengl opengl.gl opengl.textures
+sequences strings system ui.gadgets.worlds vocabs ;
 IN: ui.text
 
 <PRIVATE
@@ -78,8 +78,6 @@ M: array draw-text
             [ [ 0.0 ] 2dip string-height 0.0 glTranslated ] 2bi
         ] with each
     ] do-matrix ;
-
-USING: vocabs system combinators ;
 
 {
     { [ os macosx? ] [ "core-text" ] }
