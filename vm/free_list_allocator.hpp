@@ -125,38 +125,27 @@ template <typename Block> void free_list_allocator<Block>::sweep() {
   sweep(null_sweep);
 }
 
-template <typename Block, typename Iterator> struct heap_compactor {
-  mark_bits* state;
-  char* address;
-  Iterator& iter;
-  const Block** finger;
-
-  heap_compactor(mark_bits* state, Block* address,
-                 Iterator& iter, const Block** finger)
-      : state(state), address((char*)address), iter(iter), finger(finger) {}
-
-  void operator()(Block* block, cell size) {
-    if (this->state->marked_p((cell)block)) {
-      *finger = (Block*)((cell)block + size);
-      memmove((Block*)address, block, size);
-      iter(block, (Block*)address, size);
-      address += size;
-    }
-  }
-};
-
 /* The forwarding map must be computed first by calling
    state.compute_forwarding(). */
 template <typename Block>
 template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
                                          const Block** finger) {
-  heap_compactor<Block, Iterator> compactor(&state, (Block*)start, iter, finger);
-  iterate(compactor, fixup);
+  cell dest_addr = start;
+  auto compact_block_func = [&](Block* block, cell size) {
+    cell block_addr = (cell)block;
+    if (!state.marked_p(block_addr))
+      return;
+    *finger = (Block*)(block_addr + size);
+    memmove((Block*)dest_addr, block, size);
+    iter(block, (Block*)dest_addr, size);
+    dest_addr += size;
+  };
+  iterate(compact_block_func, fixup);
 
   /* Now update the free list; there will be a single free block at
      the end */
-  free_blocks.initial_free_list(start, end, (cell)compactor.address - start);
+  free_blocks.initial_free_list(start, end, dest_addr - start);
 }
 
 /* During compaction we have to be careful and measure object sizes
