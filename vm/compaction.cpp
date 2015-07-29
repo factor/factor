@@ -30,29 +30,58 @@ struct compaction_fixup {
   object* translate_data(const object* obj) {
     if (obj < *data_finger)
       return fixup_data((object*)obj);
-    else
-      return (object*)obj;
+    return (object*)obj;
   }
 
   code_block* translate_code(const code_block* compiled) {
     if (compiled < *code_finger)
       return fixup_code((code_block*)compiled);
-    else
-      return (code_block*)compiled;
+    return (code_block*)compiled;
   }
 
   cell size(object* obj) {
     if (data_forwarding_map->marked_p((cell)obj))
       return obj->size(*this);
-    else
-      return data_forwarding_map->unmarked_block_size((cell)obj);
+    return data_forwarding_map->unmarked_block_size((cell)obj);
   }
 
   cell size(code_block* compiled) {
     if (code_forwarding_map->marked_p((cell)compiled))
       return compiled->size(*this);
-    else
-      return code_forwarding_map->unmarked_block_size((cell)compiled);
+    return code_forwarding_map->unmarked_block_size((cell)compiled);
+  }
+};
+
+struct code_compaction_fixup {
+  static const bool translated_code_block_map = false;
+
+  mark_bits* code_forwarding_map;
+  const code_block** code_finger;
+
+  code_compaction_fixup(mark_bits* code_forwarding_map,
+                        const code_block** code_finger)
+      : code_forwarding_map(code_forwarding_map), code_finger(code_finger) {}
+
+  object* fixup_data(object* obj) { return obj; }
+
+  code_block* fixup_code(code_block* compiled) {
+    return (code_block*)code_forwarding_map->forward_block((cell)compiled);
+  }
+
+  object* translate_data(const object* obj) { return fixup_data((object*)obj); }
+
+  code_block* translate_code(const code_block* compiled) {
+    if (compiled < *code_finger)
+      return fixup_code((code_block*)compiled);
+    return (code_block*)compiled;
+  }
+
+  cell size(object* obj) { return obj->size(); }
+
+  cell size(code_block* compiled) {
+    if (code_forwarding_map->marked_p((cell)compiled))
+      return compiled->size(*this);
+    return code_forwarding_map->unmarked_block_size((cell)compiled);
   }
 };
 
@@ -74,50 +103,43 @@ struct object_compaction_updater {
   }
 };
 
-template <typename Fixup> struct code_block_compaction_relocation_visitor {
-  factor_vm* parent;
-  code_block* old_address;
-  Fixup fixup;
+template <typename Fixup>
+void update_relocation(factor_vm* parent,
+                       cell old_entry_point,
+                       Fixup fixup,
+                       instruction_operand op) {
+  cell old_offset = op.rel_offset() + old_entry_point;
 
-  code_block_compaction_relocation_visitor(factor_vm* parent,
-                                           code_block* old_address,
-                                           Fixup fixup)
-      : parent(parent), old_address(old_address), fixup(fixup) {}
-
-  void operator()(instruction_operand op) {
-    cell old_offset = op.rel_offset() + old_address->entry_point();
-
-    switch (op.rel_type()) {
-      case RT_LITERAL: {
-        cell value = op.load_value(old_offset);
-        if (immediate_p(value))
-          op.store_value(value);
-        else
-          op.store_value(
-              RETAG(fixup.fixup_data(untag<object>(value)), TAG(value)));
-        break;
-      }
-      case RT_ENTRY_POINT:
-      case RT_ENTRY_POINT_PIC:
-      case RT_ENTRY_POINT_PIC_TAIL:
-      case RT_HERE: {
-        cell value = op.load_value(old_offset);
-        cell offset = TAG(value);
-        code_block* compiled = (code_block*)UNTAG(value);
-        op.store_value((cell)fixup.fixup_code(compiled) + offset);
-        break;
-      }
-      case RT_THIS:
-      case RT_CARDS_OFFSET:
-      case RT_DECKS_OFFSET:
-        parent->store_external_address(op);
-        break;
-      default:
-        op.store_value(op.load_value(old_offset));
-        break;
+  switch (op.rel_type()) {
+    case RT_LITERAL: {
+      cell value = op.load_value(old_offset);
+      if (immediate_p(value))
+        op.store_value(value);
+      else
+        op.store_value(
+            RETAG(fixup.fixup_data(untag<object>(value)), TAG(value)));
+      break;
     }
+    case RT_ENTRY_POINT:
+    case RT_ENTRY_POINT_PIC:
+    case RT_ENTRY_POINT_PIC_TAIL:
+    case RT_HERE: {
+      cell value = op.load_value(old_offset);
+      cell offset = TAG(value);
+      code_block* compiled = (code_block*)UNTAG(value);
+      op.store_value((cell)fixup.fixup_code(compiled) + offset);
+      break;
+    }
+    case RT_THIS:
+    case RT_CARDS_OFFSET:
+    case RT_DECKS_OFFSET:
+      parent->store_external_address(op);
+      break;
+    default:
+      op.store_value(op.load_value(old_offset));
+      break;
   }
-};
+}
 
 template <typename Fixup> struct code_block_compaction_updater {
   factor_vm* parent;
@@ -133,9 +155,11 @@ template <typename Fixup> struct code_block_compaction_updater {
   void operator()(code_block* old_address, code_block* new_address, cell size) {
     forwarder.visit_code_block_objects(new_address);
 
-    code_block_compaction_relocation_visitor<Fixup> visitor(parent, old_address,
-                                                            fixup);
-    new_address->each_instruction_operand(visitor);
+    cell old_entry_point = old_address->entry_point();
+    auto update_func = [&](instruction_operand op) {
+      update_relocation(parent, old_entry_point, fixup, op);
+    };
+    new_address->each_instruction_operand(update_func);
   }
 };
 
@@ -221,41 +245,6 @@ void factor_vm::collect_compact_impl() {
   if (event)
     event->ended_compaction();
 }
-
-struct code_compaction_fixup {
-  static const bool translated_code_block_map = false;
-
-  mark_bits* code_forwarding_map;
-  const code_block** code_finger;
-
-  code_compaction_fixup(mark_bits* code_forwarding_map,
-                        const code_block** code_finger)
-      : code_forwarding_map(code_forwarding_map), code_finger(code_finger) {}
-
-  object* fixup_data(object* obj) { return obj; }
-
-  code_block* fixup_code(code_block* compiled) {
-    return (code_block*)code_forwarding_map->forward_block((cell)compiled);
-  }
-
-  object* translate_data(const object* obj) { return fixup_data((object*)obj); }
-
-  code_block* translate_code(const code_block* compiled) {
-    if (compiled < *code_finger)
-      return fixup_code((code_block*)compiled);
-    else
-      return (code_block*)compiled;
-  }
-
-  cell size(object* obj) { return obj->size(); }
-
-  cell size(code_block* compiled) {
-    if (code_forwarding_map->marked_p((cell)compiled))
-      return compiled->size(*this);
-    else
-      return code_forwarding_map->unmarked_block_size((cell)compiled);
-  }
-};
 
 /* Compact just the code heap, after growing the data heap */
 void factor_vm::collect_compact_code_impl() {
