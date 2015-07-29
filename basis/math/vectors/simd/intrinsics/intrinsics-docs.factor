@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences ;
+USING: help.markup help.syntax kernel sequences ;
 IN: math.vectors.simd.intrinsics
 
 HELP: (simd-select)
