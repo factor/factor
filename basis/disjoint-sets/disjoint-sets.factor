@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hints kernel locals math hashtables
-assocs fry sequences ;
+USING: accessors assocs fry hashtables kernel locals math
+sequences ;
 FROM: assocs => change-at ;
 IN: disjoint-sets
 
@@ -12,14 +12,8 @@ TUPLE: disjoint-set
 
 <PRIVATE
 
-: count ( a disjoint-set -- n )
-    counts>> at ; inline
-
 : add-count ( p a disjoint-set -- )
-    [ count [ + ] curry ] keep counts>> swap change-at ; inline
-
-: parent ( a disjoint-set -- p )
-    parents>> at ; inline
+    counts>> [ at '[ _ + ] ] [ swap change-at ] bi ; inline
 
 : set-parent ( p a disjoint-set -- )
     parents>> set-at ; inline
@@ -27,31 +21,28 @@ TUPLE: disjoint-set
 : link-sets ( p a disjoint-set -- )
     [ set-parent ] [ add-count ] 3bi ; inline
 
-: rank ( a disjoint-set -- r )
-    ranks>> at ; inline
-
 : inc-rank ( a disjoint-set -- )
     ranks>> [ 1 + ] change-at ; inline
-
-: representative? ( a disjoint-set -- ? )
-    dupd parent = ; inline
 
 PRIVATE>
 
 GENERIC: representative ( a disjoint-set -- p )
 
-M: disjoint-set representative
-    2dup representative? [ drop ] [
-        [ [ parent ] keep representative dup ] 2keep set-parent
+M:: disjoint-set representative ( a disjoint-set -- p )
+    a disjoint-set parents>> at :> p
+    a p = [ a ] [
+        p disjoint-set representative [
+            a disjoint-set set-parent
+        ] keep
     ] if ;
 
 <PRIVATE
 
 : representatives ( a b disjoint-set -- r r )
-    [ representative ] curry bi@ ; inline
+    '[ _ representative ] bi@ ; inline
 
 : ranks ( a b disjoint-set -- r r )
-    [ rank ] curry bi@ ; inline
+    '[ _ ranks>> at ] bi@ ; inline
 
 :: branch ( a b neg zero pos -- )
     a b = zero [ a b < neg pos if ] if ; inline
@@ -81,7 +72,8 @@ M: disjoint-set disjoint-set-members parents>> keys ;
 
 GENERIC: equiv-set-size ( a disjoint-set -- n )
 
-M: disjoint-set equiv-set-size [ representative ] keep count ;
+M: disjoint-set equiv-set-size
+    [ representative ] keep counts>> at ;
 
 GENERIC: equiv? ( a b disjoint-set -- ? )
 
@@ -106,12 +98,11 @@ M:: disjoint-set equate ( a b disjoint-set -- )
     ] if ;
 
 M: disjoint-set clone
-    [ parents>> ] [ ranks>> ] [ counts>> ] tri [ clone ] tri@
-    disjoint-set boa ;
+    [ parents>> ] [ ranks>> ] [ counts>> ] tri
+    [ clone ] tri@ disjoint-set boa ;
 
 : assoc>disjoint-set ( assoc -- disjoint-set )
-    <disjoint-set>
-    [ '[ drop _ add-atom ] assoc-each ]
-    [ '[ _ equate ] assoc-each ]
-    [ nip ]
-    2tri ;
+    <disjoint-set> [
+        [ '[ drop _ add-atom ] assoc-each ]
+        [ '[ _ equate ] assoc-each ] 2bi
+    ] keep ;
