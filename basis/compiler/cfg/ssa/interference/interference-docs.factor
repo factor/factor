@@ -1,4 +1,4 @@
-USING: compiler.cfg help.markup help.syntax sequences ;
+USING: compiler.cfg help.markup help.syntax kernel sequences ;
 IN: compiler.cfg.ssa.interference
 
 HELP: sets-interfere?
