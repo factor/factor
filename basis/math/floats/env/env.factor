@@ -154,8 +154,8 @@ PRIVATE>
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline
 
-<< {
+{
     { [ cpu x86? ] [ "math.floats.env.x86" require ] }
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
-} cond >>
+} cond
