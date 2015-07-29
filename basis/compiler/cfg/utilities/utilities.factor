@@ -6,7 +6,7 @@ kernel locals make math namespaces sequences sets ;
 IN: compiler.cfg.utilities
 
 : block>cfg ( bb -- cfg )
-    cfg new swap >>entry ;
+    f f rot <cfg> ;
 
 : insns>block ( insns n -- bb )
     <basic-block> swap >>number swap V{ } like >>instructions ;

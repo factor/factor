@@ -106,9 +106,9 @@ ${
 ] unit-test
 
 ! align-spill-area
-{ t } [
+${ cell } [
     3 { } insns>cfg [ align-spill-area ] keep
-    spill-area-align>> cell =
+    spill-area-align>>
 ] unit-test
 
 ! inactive-intervals-for
