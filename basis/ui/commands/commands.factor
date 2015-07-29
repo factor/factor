@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions kernel sequences strings
-math assocs words generic make quotations splitting
-ui.gestures unicode.case unicode.categories tr fry ;
+USING: accessors assocs fry kernel make quotations sequences
+splitting tr ui.gestures unicode.case unicode.categories words ;
 IN: ui.commands
 
 SYMBOL: +nullary+
@@ -22,7 +21,7 @@ GENERIC: command-description ( command -- str/f )
 GENERIC: command-word ( command -- word )
 
 : <command-map> ( blurb commands -- command-map )
-    { } like \ command-map boa ;
+    { } like command-map boa ;
 
 : commands ( class -- hash )
     dup "commands" word-prop [ ] [
