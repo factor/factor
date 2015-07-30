@@ -13,6 +13,8 @@ windows.types windows.winsock ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
+SLOT: file
+
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: open-append os ( path -- win32-file )
 
