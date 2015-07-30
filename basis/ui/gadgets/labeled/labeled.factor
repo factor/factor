@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov, 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors.constants fonts kernel ui.gadgets
-ui.gadgets.borders ui.gadgets.colors ui.gadgets.corners ui.gadgets.frames
+ui.gadgets.borders ui.gadgets.corners ui.gadgets.frames
 ui.gadgets.grids ui.gadgets.labels
-ui.gadgets.tracks ui.gadgets.packs ui.tools.common 
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.theme ui.tools.common 
 ui.pens.gradient ui.pens.image ui.pens.solid ui.render ;
 IN: ui.gadgets.labeled
 

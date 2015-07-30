@@ -3,9 +3,9 @@
 USING: accessors colors inspector namespaces kernel models fry
 colors.constants models.arrow prettyprint sequences mirrors assocs
 classes io io.styles arrays hashtables math.order sorting refs fonts
-ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.colors ui.gadgets.panes
+ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ui.gadgets.tables 
+ui.gadgets.buttons ui.gadgets.tables ui.gadgets.theme
 ui.gadgets.toolbar ui.gadgets.status-bar
 ui.gadgets.labeled ui.tools.common ui combinators ui.gadgets.worlds ;
 IN: ui.tools.inspector

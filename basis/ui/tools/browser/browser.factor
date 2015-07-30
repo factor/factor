@@ -4,10 +4,10 @@ USING: accessors arrays classes colors colors.constants combinators
 combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.stylesheet help.topics
 kernel models sequences sets ui ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.colors ui.gadgets.editors
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
-ui.gadgets.packs ui.gadgets.viewports ui.gadgets.worlds ui.gestures
+ui.gadgets.packs ui.gadgets.theme ui.gadgets.viewports ui.gadgets.worlds ui.gestures
 ui.tools.browser.history ui.tools.browser.popups ui.tools.common
 ui.pens.solid vocabs ;
 IN: ui.tools.browser

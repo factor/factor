@@ -4,9 +4,9 @@ USING: accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
 math.vectors models.delay models.arrow combinators.short-circuit
 parser present sequences tools.completion help.vocabs generic fonts
-definitions.icons ui.images ui.commands ui.operations ui.gadgets ui.gadgets.colors
+definitions.icons ui.images ui.commands ui.operations ui.gadgets
 ui.gadgets.editors ui.gadgets.glass ui.gadgets.scrollers
-ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labeled
+ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labeled ui.gadgets.theme
 ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.pens.solid
 ui.tools.listener.history combinators vocabs ui.tools.listener.popups ;
 IN: ui.tools.listener.completion

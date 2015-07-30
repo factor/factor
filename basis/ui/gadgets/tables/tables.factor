@@ -4,8 +4,8 @@ USING: accessors arrays colors colors.constants combinators
 combinators.short-circuit fonts fry kernel locals math
 math.functions math.order math.rectangles math.vectors models
 namespaces opengl sequences splitting strings ui.commands
-ui.gadgets ui.gadgets.colors ui.gadgets.line-support ui.gadgets.menus
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
+ui.gadgets ui.gadgets.line-support ui.gadgets.menus
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.worlds
 ui.gestures ui.images ui.pens.solid ui.render ui.text ;
 FROM: sequences => change-nth ;
 IN: ui.gadgets.tables

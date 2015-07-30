@@ -3,7 +3,7 @@
 USING: accessors colors.constants kernel locals math.rectangles
 math.vectors namespaces opengl sequences sorting ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.corners
-ui.gadgets.colors ui.gadgets.frames ui.gadgets.glass ui.gadgets.packs
+ui.gadgets.frames ui.gadgets.glass ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.worlds ui.tools.common ui.gestures ui.operations ui.pens
 ui.pens.solid ui.render ;
 IN: ui.gadgets.menus

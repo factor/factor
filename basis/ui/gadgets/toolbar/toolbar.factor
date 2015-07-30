@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes fry kernel locals ui.baseline-alignment ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.buttons.private ui.gadgets.colors ui.gadgets.packs
+ui.gadgets.buttons.private ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.tracks ui.pens ui.pens.solid ;
 IN: ui.gadgets.toolbar
 
