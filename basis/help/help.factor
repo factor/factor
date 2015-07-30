@@ -98,18 +98,21 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : ($title) ( topic -- )
     [ [ article-title ] [ >link ] bi write-object ] ($block) ;
 
-: $navigation-row ( content element -- )
-    prefix 1array , ;
+: $navigation-row-prev ( content element -- )
+    prefix 1array "<" prefix , ;
+
+: $navigation-row-next ( content element -- )
+    prefix 1array ">" suffix , ;
 
 : ($navigation-table) ( element -- )
     help-path-style get table-style [ $table ] with-variable ;
 
 : ($navigation-prev) ( topic -- )
-    [ prev-article [ 1array \ $long-link $navigation-row ] when* ] 
+    [ prev-article [ 1array \ $long-link $navigation-row-prev ] when* ] 
     { } make [ ($navigation-table) ] unless-empty ;
 
 : ($navigation-next) ( topic -- )
-    [ next-article [ 1array \ $long-link $navigation-row ] when* ] 
+    [ next-article [ 1array \ $long-link $navigation-row-next ] when* ] 
     { } make [ ($navigation-table) ] unless-empty ;
 
 : ($navigation-path) ( topic -- )
