@@ -99,6 +99,8 @@ unit-test
 
 { 0x1.999999999999ap-3 } [ "0.2" string>number ] unit-test
 { 0x1.3333333333333p0  } [ "1.2" string>number ] unit-test
+{ 0o1.146314631463146314p0 } [ "1.2" string>number ] unit-test
+{ 0b1.0011001100110011001100110011001100110011001100110011p0 } [ "1.2" string>number ] unit-test
 { 0x1.5555555555555p0  } [ "1.333,333,333,333,333,333" string>number ] unit-test
 { 0x1.aaaaaaaaaaaabp0  } [ "1.666,666,666,666,666,666" string>number ] unit-test
 
@@ -192,8 +194,7 @@ unit-test
 [ 1 0 >base ] must-fail
 [ 1 -1 >base ] must-fail
 [ 2+1/2 -1 >base ] [ invalid-radix? ] must-fail-with
-[ 123.456 8 >base ] [ invalid-radix? ] must-fail-with
-[ 123.456 2 >base ] [ invalid-radix? ] must-fail-with
+[ 123.456 7 >base ] [ invalid-radix? ] must-fail-with
 
 { "0/0." } [ 0.0 0.0 / number>string ] unit-test
 
@@ -224,6 +225,26 @@ unit-test
 { "1.0p-1074" } [ 1 bits>double >hex ] unit-test
 { "-0.0" } [ -0.0 >hex ] unit-test
 
+{ "1.0p0" } [ 1.0 >bin ] unit-test
+{ "1.1p2" } [ 6.0 >bin ] unit-test
+{ "1.00001p2" } [ 4.125 >bin ] unit-test
+{ "1.1p-2" } [ 0.375 >bin ] unit-test
+{ "-1.1p2" } [ -6.0 >bin ] unit-test
+{ "1.1p10" } [ 1536.0 >bin ] unit-test
+{ "0.0" } [ 0.0 >bin ] unit-test
+{ "1.0p-1074" } [ 1 bits>double >bin ] unit-test
+{ "-0.0" } [ -0.0 >bin ] unit-test
+
+{ "1.0p0" } [ 1.0 >oct ] unit-test
+{ "1.4p2" } [ 6.0 >oct ] unit-test
+{ "1.02p2" } [ 4.125 >oct ] unit-test
+{ "1.4p-2" } [ 0.375 >oct ] unit-test
+{ "-1.4p2" } [ -6.0 >oct ] unit-test
+{ "1.4p10" } [ 1536.0 >oct ] unit-test
+{ "0.0" } [ 0.0 >oct ] unit-test
+{ "1.0p-1074" } [ 1 bits>double >oct ] unit-test
+{ "-0.0" } [ -0.0 >oct ] unit-test
+
 { 1.0 } [ "1.0p0" hex> ] unit-test
 { 1.5 } [ "1.8p0" hex> ] unit-test
 { 1.875 } [ "1.ep0" hex> ] unit-test
@@ -240,6 +261,40 @@ unit-test
 { 0.0 } [ "1.0p-1075" hex> ] unit-test
 { 1/0. } [ "1.0p1024" hex> ] unit-test
 { -1/0. } [ "-1.0p1024" hex> ] unit-test
+
+{ 1.0 } [ "1.0p0" bin> ] unit-test
+{ 1.5 } [ "1.1p0" bin> ] unit-test
+{ 1.875 } [ "1.111p0" bin> ] unit-test
+{ 1.90625 } [ "1.11101p0" bin> ] unit-test
+{ 1.03125 } [ "1.00001p0" bin> ] unit-test
+{ 15.5 } [ "1111.1p0" bin> ] unit-test
+{ 15.53125 } [ "1111.10001p0" bin> ] unit-test
+{ -15.5 } [ "-1111.1p0" bin> ] unit-test
+{ 15.5 } [ "1111.1p0" bin> ] unit-test
+{ -15.5 } [ "-1111.1p0" bin> ] unit-test
+{ 62.0 } [ "1111.1p2" bin> ] unit-test
+{ 3.875 } [ "1111.1p-2" bin> ] unit-test
+{ $[ 1 bits>double ] } [ "1.0p-1074" bin> ] unit-test
+{ 0.0 } [ "1.0p-1075" bin> ] unit-test
+{ 1/0. } [ "1.0p1024" bin> ] unit-test
+{ -1/0. } [ "-1.0p1024" bin> ] unit-test
+
+{ 1.0 } [ "1.0p0" oct> ] unit-test
+{ 1.5 } [ "1.4p0" oct> ] unit-test
+{ 1.875 } [ "1.7p0" oct> ] unit-test
+{ 1.90625 } [ "1.72p0" oct> ] unit-test
+{ 1.03125 } [ "1.02p0" oct> ] unit-test
+{ 15.5 } [ "17.4p0" oct> ] unit-test
+{ 15.53125 } [ "17.42p0" oct> ] unit-test
+{ -15.5 } [ "-17.4p0" oct> ] unit-test
+{ 15.5 } [ "17.4p0" oct> ] unit-test
+{ -15.5 } [ "-17.4p0" oct> ] unit-test
+{ 62.0 } [ "17.4p2" oct> ] unit-test
+{ 3.875 } [ "17.4p-2" oct> ] unit-test
+{ $[ 1 bits>double ] } [ "1.0p-1074" oct> ] unit-test
+{ 0.0 } [ "1.0p-1075" oct> ] unit-test
+{ 1/0. } [ "1.0p1024" oct> ] unit-test
+{ -1/0. } [ "-1.0p1024" oct> ] unit-test
 
 { 0 } [ "0" string>number ] unit-test
 { 0 } [ "00" string>number ] unit-test
@@ -367,3 +422,38 @@ unit-test
 
 { t } [ most-positive-fixnum number>string string>number fixnum? ] unit-test
 { t } [ most-negative-fixnum number>string string>number fixnum? ] unit-test
+
+! large/small numbers/exponents correctly cancel out
+{ 1.0 } [ "1" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+{ 1.0 } [ "0x1" 1000 [ CHAR: 0 ] "" replicate-as append "p-4000" append string>number ] unit-test
+{ 1.0 } [ "0." 3000 [ CHAR: 0 ] "" replicate-as append "1e3001" append string>number ] unit-test
+{ 1.0 } [ "0x0." 1000 [ CHAR: 0 ] "" replicate-as append "1p4004" append string>number ] unit-test
+{ 1.0 } [ "1" 3000 [ CHAR: 0 ] "" replicate-as append "." append
+              3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+
+! We correctly parse the biggest/smallest float correctly
+! (ie the 1/0. or 0/0. short-circuit optimization doesn't apply)
+{ 1 } [ "4.9406564584124655e-324" string>number double>bits ] unit-test
+{ 1 } [ "0x1.0p-1074" string>number double>bits ] unit-test
+{ 1 } [ "0o1.0p-1074" string>number double>bits ] unit-test
+{ 1 } [ "0b1.0p-1074" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "1.7976931348623157e+308" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "0x1.fffffffffffffp1023" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "0o1.777777777777777774p1023" string>number double>bits ] unit-test
+{ 0x7fefffffffffffff } [ "0b1.1111111111111111111111111111111111111111111111111111p1023" string>number double>bits ] unit-test
+! Actual biggest/smallest parseable floats are a little
+! larger/smaller than IEE754 values because of rounding
+{ 0x1.0p-1074 } [ "0x0.fffffffffffffcp-1074" string>number ] unit-test
+{ 4.94065645841246544e-324 } [ "4.94065645841246517e-324" string>number ] unit-test
+{ 0x1.fffffffffffffp1023 } [ "0x1.fffffffffffff7ffffffffffffffffp1023" string>number ] unit-test
+{ 1.79769313486231571e+308 } [ "1.797693134862315807e+308" string>number ] unit-test
+
+! works with ratios
+{ 0.25 } [ "1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+{ 1.25 } [ "1+1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+
+! #1356 #1231
+{ 1/0. } [ "1e100000" string>number ] unit-test
+{ 0.0  } [ "1e-100000" string>number ] unit-test
+{ 1/0. } [ "0x1p300000" string>number ] unit-test
+{ 0.0  } [ "0x1p-300000" string>number ] unit-test
