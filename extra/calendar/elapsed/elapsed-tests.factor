@@ -13,8 +13,6 @@ IN: calendar.elapsed.test
 { "1m 1s" } [ 61 elapsed-time ] unit-test
 { "2y 1w 6d 2h 59m 23s" } [ 64033163 elapsed-time ] unit-test
 
-[ -1 relative-time ] [ "negative seconds" = ] must-fail-with
-
 { "just now" } [ 0 relative-time ] unit-test
 { "less than a minute ago" } [ 10 relative-time ] unit-test
 { "about a minute ago" } [ 60 relative-time ] unit-test
