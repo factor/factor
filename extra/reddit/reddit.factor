@@ -1,53 +1,19 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs calendar classes.tuple colors.constants
-colors.hex combinators formatting http.client io io.styles json
-json.reader kernel make math math.statistics sequences urls
-namespaces fry ;
+USING: accessors assocs calendar colors.constants colors.hex
+combinators formatting fry http.client io io.styles json
+json.reader kernel make math math.statistics sequences urls ;
 
 IN: reddit
 
 <PRIVATE
 
-TUPLE: comment approved_by author author_flair_css_class
-author_flair_text banned_by body body_html created created_utc
-downs id levenshtein likes link_id link_title name num_reports
-parent_id replies edited subreddit subreddit_id ups score_hidden
-distinguished gilded saved link_author link_url mod_reports
-report_reasons score user_reports controversiality ;
-
-TUPLE: user comment_karma created created_utc has_mail
-has_mod_mail id is_gold is_mod link_karma name is_friend
-has_verified_email over_18 ;
-
-TUPLE: story author author_flair_css_class author_flair_text
-approved_by banned_by clicked created created_utc domain downs
-gilded hidden id is_self levenshtein likes link_flair_css_class
-link_flair_text media media_embed mod_reports name edited num_comments
-num_reports over_18 permalink report_reasons saved score selftext
-selftext_html subreddit subreddit_id thumbnail title ups url
-user_reports distinguished secure_media secure_media_embed stickied
-visited ;
-
-TUPLE: subreddit accounts_active created created_utc description
-display_name id header_img header_size header_title name over18
-public_description subscribers title url ;
-
-: parse-data ( assoc -- obj )
-    [ "data" of ] [ "kind" of ] bi {
-        { "t1" [ comment ] }
-        { "t2" [ user ] }
-        { "t3" [ story ] }
-        { "t5" [ subreddit ] }
-        [ throw ]
-    } case from-slots ;
-
 TUPLE: page url data before after ;
 
 : json-page ( url -- page )
     >url dup http-get nip json> "data" of {
-        [ "children" of [ parse-data ] map ]
+        [ "children" of ]
         [ "before" of [ f ] when-json-null ]
         [ "after" of [ f ] when-json-null ]
     } cleave \ page boa ;
@@ -57,7 +23,7 @@ TUPLE: page url data before after ;
 
 : get-user-info ( username -- user )
     "http://api.reddit.com/user/%s/about" sprintf
-    http-get nip json> parse-data ;
+    http-get nip json> ;
 
 : get-url-info ( url -- page )
     "http://api.reddit.com/api/info?url=%s" sprintf json-page ;
@@ -86,25 +52,27 @@ TUPLE: page url data before after ;
 PRIVATE>
 
 : user-links ( username -- stories )
-    get-user data>> [ story? ] filter [ url>> ] map ;
+    get-user data>> [ "kind" of "t3" = ] filter
+    [ "data" of "url" of ] map ;
 
 : user-comments ( username -- comments )
-    get-user data>> [ comment? ] filter [ body>> ] map ;
+    get-user data>> [ "kind" of "t1" = ] filter
+    [ "data" of "body" of ] map ;
 
 : user-karma ( username -- karma )
-    get-user-info link_karma>> ;
+    get-user-info "data" of "link_karma" of ;
 
 : url-score ( url -- score )
-    get-url-info data>> [ score>> ] map-sum ;
+    get-url-info data>> [ "score" of ] map-sum ;
 
 : subreddit-links ( subreddit -- links )
-    get-subreddit data>> [ url>> ] map ;
+    get-subreddit data>> [ "url" of ] map ;
 
 : story>comments-url ( story -- url )
-    permalink>> "http://reddit.com" prepend >url ;
+    "permalink" of "http://reddit.com" prepend >url ;
 
 : story>author-url ( story -- url )
-    author>> "http://reddit.com/user/" prepend >url ;
+    "author" of "http://reddit.com/user/" prepend >url ;
 
 <PRIVATE
 
@@ -127,20 +95,23 @@ PRIVATE>
 
 : subreddit. ( subreddit -- )
     get-subreddit data>> [
-        1 + "%2d. " sprintf write-text {
-            [ [ title>> ] [ url>> ] bi write-title ]
-            [ domain>> " (%s)\n" sprintf write-text ]
-            [ score>> "    %d points, " sprintf write-text ]
-            [ [ num_comments>> "%d comments" sprintf ] [ story>comments-url ] bi write-link ]
+        1 + "%2d. " sprintf write-text "data" of {
+            [ [ "title" of ] [ "url" of ] bi write-title ]
+            [ "domain" of " (%s)\n" sprintf write-text ]
+            [ "score" of "    %d points, " sprintf write-text ]
             [
-                created_utc>> unix-time>timestamp now swap time-
+                [ "num_comments" of "%d comments" sprintf ]
+                [ story>comments-url ] bi write-link
+            ]
+            [
+                "created_utc" of unix-time>timestamp now swap time-
                 duration>hours ", posted %d hours ago" sprintf write-text
             ]
-            [ " by " write-text [ author>> ] [ story>author-url ] bi write-link nl nl ]
+            [ " by " write-text [ "author" of ] [ story>author-url ] bi write-link nl nl ]
         } cleave
     ] each-index ;
 
 : domain-stats ( domain -- stats )
     get-domains all-pages [
-        created>> 1000 * millis>timestamp year>>
-    ] collect-by [ [ score>> ] map-sum ] assoc-map ;
+        "created" of 1000 * millis>timestamp year>>
+    ] collect-by [ [ "score" of ] map-sum ] assoc-map ;
