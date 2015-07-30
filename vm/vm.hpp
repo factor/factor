@@ -559,6 +559,8 @@ struct factor_vm {
   cell compute_entry_point_pic_address(word* w, cell tagged_quot);
   cell compute_entry_point_pic_address(cell w_);
   cell compute_entry_point_pic_tail_address(cell w_);
+  cell compute_external_address(instruction_operand op);
+
   cell code_block_owner(code_block* compiled);
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();

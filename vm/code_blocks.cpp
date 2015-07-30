@@ -259,34 +259,34 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
   }
 }
 
-void factor_vm::store_external_address(instruction_operand op) {
-
+cell factor_vm::compute_external_address(instruction_operand op) {
   code_block* compiled = op.compiled;
   array* parameters = to_boolean(compiled->parameters)
       ? untag<array>(compiled->parameters)
       : NULL;
-  cell index = op.index;
+  cell idx = op.index;
   relocation_type rel_type = op.rel_type();
 
-  cell ext_addr = lookup_external_address(rel_type,
-                                          compiled,
-                                          parameters,
-                                          index);
+  cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
   if (ext_addr == (cell)-1) {
     ostringstream ss;
     print_obj(ss, compiled->owner);
     ss << ": ";
     cell arg;
     if (rel_type == RT_DLSYM || rel_type == RT_DLSYM_TOC) {
-      ss << "Bad symbol specifier in store_external_address";
-      arg = array_nth(parameters, index);
+      ss << "Bad symbol specifier in compute_external_address";
+      arg = array_nth(parameters, idx);
     } else {
-      ss << "Bad rel type in store_external_address";
+      ss << "Bad rel type in compute_external_address";
       arg = rel_type;
     }
     critical_error(ss.str().c_str(), arg);
   }
-  op.store_value(ext_addr);
+  return ext_addr;
+}
+
+void factor_vm::store_external_address(instruction_operand op) {
+  op.store_value(compute_external_address(op));
 }
 
 cell factor_vm::compute_here_address(cell arg, cell offset,
