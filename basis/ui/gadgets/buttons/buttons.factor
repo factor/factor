@@ -3,7 +3,7 @@
 USING: accessors assocs classes colors colors.constants combinators
 combinators.short-circuit combinators.smart fry kernel locals
 math.vectors models namespaces sequences ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.colors ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.theme ui.gadgets.tracks ui.gadgets.worlds ui.gestures
 ui.pens ui.pens.image ui.pens.solid ui.pens.tile ;
 FROM: models => change-model ;

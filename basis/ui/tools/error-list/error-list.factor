@@ -8,9 +8,9 @@ models models.arrow models.arrow.smart models.search models.mapping debugger
 namespaces summary locals ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
-ui.tools.inspector
-ui.gadgets.buttons ui.gadgets.borders ui.gadgets.colors ui.gadgets.packs
-ui.gadgets.labels ui.gadgets.toolbar ui.gadgets.status-bar ui.baseline-alignment ui.images
+ui.tools.inspector ui.gadgets.buttons ui.gadgets.borders ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.status-bar
+ui.baseline-alignment ui.images
 compiler.errors tools.errors tools.errors.model ;
 IN: ui.tools.error-list
 

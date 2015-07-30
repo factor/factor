@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors kernel concurrency.messaging colors.constants inspector formatting
-ui.tools.listener ui.tools.traceback ui.gadgets.buttons ui.gadgets.colors
-ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks ui.commands ui.gadgets
+ui.tools.listener ui.tools.traceback ui.gadgets.buttons
+ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.theme ui.gadgets.tracks
+ui.commands ui.gadgets
 models models.arrow ui.tools.browser ui.tools.common ui.gestures
 ui.gadgets.labels ui.pens.solid ui threads namespaces make tools.walker assocs
 combinators fry ;

@@ -1,1 +1,0 @@
-Common colors and gradients used by the UI
