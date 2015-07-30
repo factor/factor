@@ -12,7 +12,7 @@ CONSTANT: IC 29573
 CONSTANT: initial-seed 42
 CONSTANT: line-length 60
 
-: random ( seed -- seed n )
+: next-fasta-random ( seed -- seed n )
     IA * IC + IM mod dup IM /f ; inline
 
 CONSTANT: ALU "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA"
@@ -50,7 +50,7 @@ TYPED: make-cumulative ( freq -- chars: byte-array floats: double-array )
     [ values c:double >c-array unclip [ + ] accumulate swap suffix ] bi ;
 
 :: select-random ( seed chars floats -- seed elt )
-    seed random floats [ <= ] with find drop chars nth-unsafe ; inline
+    seed next-fasta-random floats [ <= ] with find drop chars nth-unsafe ; inline
 
 TYPED: make-random-fasta ( seed: float len: fixnum chars: byte-array floats: double-array -- seed: float )
     '[ _ _ select-random ] "" replicate-as print ;
