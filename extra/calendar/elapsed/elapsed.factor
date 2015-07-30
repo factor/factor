@@ -55,13 +55,3 @@ M: duration relative-time
 
 M: timestamp relative-time
     now swap time- relative-time ;
-
-
-GENERIC: unix-time>relative-time ( unix-seconds -- string )
-
-M: real unix-time>relative-time
-    seconds since-1970 unix-time>relative-time ;
-
-M: timestamp unix-time>relative-time
-    [ now ] dip
-    time- duration>seconds relative-time ;
