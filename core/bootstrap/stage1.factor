@@ -28,6 +28,7 @@ load-help? off
     ] %
 
     "math.integers" require
+    "math.ratios" require
     "math.floats" require
     "memory" require
 
