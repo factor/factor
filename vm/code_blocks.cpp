@@ -285,17 +285,12 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   return ext_addr;
 }
 
-void factor_vm::store_external_address(instruction_operand op) {
-  op.store_value(compute_external_address(op));
-}
-
 cell factor_vm::compute_here_address(cell arg, cell offset,
                                      code_block* compiled) {
   fixnum n = untag_fixnum(arg);
   if (n >= 0)
     return compiled->entry_point() + offset + n;
-  else
-    return compiled->entry_point() - n;
+  return compiled->entry_point() - n;
 }
 
 struct initial_code_block_visitor {
@@ -310,32 +305,28 @@ struct initial_code_block_visitor {
     return array_nth(untag<array>(literals), literal_index++);
   }
 
-  void operator()(instruction_operand op) {
+  fixnum compute_operand_value(instruction_operand op) {
     switch (op.rel_type()) {
       case RT_LITERAL:
-        op.store_value(next_literal());
-        break;
+        return next_literal();
       case RT_ENTRY_POINT:
-        op.store_value(parent->compute_entry_point_address(next_literal()));
-        break;
+        return parent->compute_entry_point_address(next_literal());
       case RT_ENTRY_POINT_PIC:
-        op.store_value(parent->compute_entry_point_pic_address(next_literal()));
-        break;
+        return parent->compute_entry_point_pic_address(next_literal());
       case RT_ENTRY_POINT_PIC_TAIL:
-        op.store_value(
-            parent->compute_entry_point_pic_tail_address(next_literal()));
-        break;
+        return parent->compute_entry_point_pic_tail_address(next_literal());
       case RT_HERE:
-        op.store_value(parent->compute_here_address(
-            next_literal(), op.rel_offset(), op.compiled));
-        break;
+        return parent->compute_here_address(
+            next_literal(), op.rel_offset(), op.compiled);
       case RT_UNTAGGED:
-        op.store_value(untag_fixnum(next_literal()));
-        break;
+        return untag_fixnum(next_literal());
       default:
-        parent->store_external_address(op);
-        break;
+        return parent->compute_external_address(op);
     }
+  }
+
+  void operator()(instruction_operand op) {
+    op.store_value(compute_operand_value(op));
   }
 };
 

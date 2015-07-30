@@ -50,7 +50,8 @@ instruction_operand callback_heap::callback_operand(code_block* stub,
 }
 
 void callback_heap::store_callback_operand(code_block* stub, cell index) {
-  parent->store_external_address(callback_operand(stub, index));
+  instruction_operand op = callback_operand(stub, index);
+  op.store_value(parent->compute_external_address(op));
 }
 
 void callback_heap::store_callback_operand(code_block* stub, cell index,

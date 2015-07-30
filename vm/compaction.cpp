@@ -53,21 +53,17 @@ struct compaction_fixup {
 };
 
 template <typename Fixup>
-void update_relocation(factor_vm* parent,
-                       cell old_entry_point,
-                       Fixup fixup,
-                       instruction_operand op) {
+fixnum compute_operand_value(factor_vm* parent,
+                             cell old_entry_point,
+                             Fixup fixup,
+                             instruction_operand op) {
   cell old_offset = op.rel_offset() + old_entry_point;
-
   switch (op.rel_type()) {
     case RT_LITERAL: {
       cell value = op.load_value(old_offset);
       if (immediate_p(value))
-        op.store_value(value);
-      else
-        op.store_value(
-            RETAG(fixup.fixup_data(untag<object>(value)), TAG(value)));
-      break;
+        return value;
+      return RETAG(fixup.fixup_data(untag<object>(value)), TAG(value));
     }
     case RT_ENTRY_POINT:
     case RT_ENTRY_POINT_PIC:
@@ -76,38 +72,16 @@ void update_relocation(factor_vm* parent,
       cell value = op.load_value(old_offset);
       cell offset = TAG(value);
       code_block* compiled = (code_block*)UNTAG(value);
-      op.store_value((cell)fixup.fixup_code(compiled) + offset);
-      break;
+      return (cell)fixup.fixup_code(compiled) + offset;
     }
     case RT_THIS:
     case RT_CARDS_OFFSET:
     case RT_DECKS_OFFSET:
-      parent->store_external_address(op);
-      break;
+      return parent->compute_external_address(op);
     default:
-      op.store_value(op.load_value(old_offset));
-      break;
+      return op.load_value(old_offset);
   }
 }
-
-template <typename Fixup> struct code_block_compaction_updater {
-  factor_vm* parent;
-  slot_visitor<Fixup> forwarder;
-
-  code_block_compaction_updater(
-      factor_vm* parent, slot_visitor<Fixup> forwarder)
-      : parent(parent), forwarder(forwarder) { }
-
-  void operator()(code_block* old_address, code_block* new_address, cell size) {
-    forwarder.visit_code_block_objects(new_address);
-
-    cell old_entry_point = old_address->entry_point();
-    auto update_func = [&](instruction_operand op) {
-      update_relocation(parent, old_entry_point, forwarder.fixup, op);
-    };
-    new_address->each_instruction_operand(update_func);
-  }
-};
 
 /* After a compaction, invalidate any code heap roots which are not
 marked, and also slide the valid roots up so that call sites can be updated
@@ -174,11 +148,20 @@ void factor_vm::collect_compact_impl() {
 
     /* Slide everything in the code heap up, and update data and code heap
        pointers inside code blocks. */
-    {
-      code_block_compaction_updater<compaction_fixup> code_block_updater(
-          this, forwarder);
-      code->allocator->compact(code_block_updater, fixup, &code_finger);
-    }
+    auto compact_data_func = [&](code_block* old_addr,
+                                 code_block* new_addr,
+                                 cell size) {
+      forwarder.visit_code_block_objects(new_addr);
+      cell old_entry_point = old_addr->entry_point();
+      auto update_func = [&](instruction_operand op) {
+        op.store_value(compute_operand_value(this,
+                                             old_entry_point,
+                                             forwarder.fixup,
+                                             op));
+      };
+      new_addr->each_instruction_operand(update_func);
+    };
+    code->allocator->compact(compact_data_func, fixup, &code_finger);
 
     forwarder.visit_all_roots();
     forwarder.visit_context_code_blocks();
