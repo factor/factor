@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors colors.constants ui.pens.solid ;
-IN: ui.gadgets.colors
+IN: ui.gadgets.theme
 
 CONSTANT: toolbar-background COLOR: grey95
 CONSTANT: toolbar-button-pressed-background COLOR: dark-gray
@@ -54,6 +54,4 @@ CONSTANT: error-summary-background
 T{ rgba { red 0.9569 } { green 0.9177 } { blue 0.8510 } { alpha 1.0 } } inline
 
 CONSTANT: content-background COLOR: white
-
-: white-interior ( track -- track )
-    content-background <solid> >>interior ;
+CONSTANT: text-color COLOR: black

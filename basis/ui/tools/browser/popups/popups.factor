@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs colors.constants
 definitions.icons fry help help.topics kernel math.rectangles
-models.arrow namespaces sequences tools.crossref ui.gadgets ui.gadgets.colors
+models.arrow namespaces sequences tools.crossref ui.gadgets
 ui.gadgets.glass ui.gadgets.labeled ui.gadgets.search-tables
-ui.gadgets.tables ui.gadgets.wrappers ui.gestures ui.images
+ui.gadgets.tables ui.gadgets.theme ui.gadgets.wrappers ui.gestures ui.images
 ui.operations ui.pens.solid ;
 FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.tools.browser.popups
