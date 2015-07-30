@@ -98,3 +98,53 @@ IN: math.tests
 { t } [ 128 2^ neg sq 256 2^ = ] unit-test
 
 { t } [ most-negative-fixnum dup >bignum bignum>fixnum-strict = ] unit-test
+
+{ 100 } [ 100 100 gcd nip ] unit-test
+{ 100 } [ 1000 100 gcd nip ] unit-test
+{ 100 } [ 100 1000 gcd nip ] unit-test
+{ 4 } [ 132 64 gcd nip ] unit-test
+{ 4 } [ -132 64 gcd nip ] unit-test
+{ 4 } [ -132 -64 gcd nip ] unit-test
+{ 4 } [ 132 -64 gcd nip ] unit-test
+{ 4 } [ -132 -64 gcd nip ] unit-test
+
+{ 100 } [ 100 >bignum 100 >bignum gcd nip ] unit-test
+{ 100 } [ 1000 >bignum 100 >bignum gcd nip ] unit-test
+{ 100 } [ 100 >bignum 1000 >bignum gcd nip ] unit-test
+{ 4 } [ 132 >bignum 64 >bignum gcd nip ] unit-test
+{ 4 } [ -132 >bignum 64 >bignum gcd nip ] unit-test
+{ 4 } [ -132 >bignum -64 >bignum gcd nip ] unit-test
+{ 4 } [ 132 >bignum -64 >bignum gcd nip ] unit-test
+{ 4 } [ -132 >bignum -64 >bignum gcd nip ] unit-test
+
+{ 6 } [
+    1326264299060955293181542400000006
+    1591517158873146351817850880000000
+    gcd nip
+] unit-test
+
+{ 11 } [
+    13262642990609552931815424
+    159151715887314635181785
+    gcd nip
+] unit-test
+
+{ 3 } [
+    13262642990609552931
+    1591517158873146351
+    gcd nip
+] unit-test
+
+{ 26525285981219 } [
+    132626429906095
+    159151715887314
+    gcd nip
+] unit-test
+
+
+: verify-gcd ( a b -- ? )
+    2dup gcd
+    [ rot * swap rem ] dip = ;
+
+{ t } [ 123 124 verify-gcd ] unit-test
+{ t } [ 50 120 verify-gcd ] unit-test

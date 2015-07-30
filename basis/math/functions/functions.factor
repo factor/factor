@@ -4,10 +4,6 @@ USING: math kernel math.constants math.private math.bits
 math.libm combinators fry math.order sequences ;
 IN: math.functions
 
-: rect> ( x y -- z )
-    ! Note: an imaginary 0.0 should still create a complex
-    dup 0 = [ drop ] [ complex boa ] if ; inline
-
 GENERIC: sqrt ( x -- y ) foldable
 
 M: real sqrt
@@ -55,12 +51,6 @@ M: complex ^n (^n) ;
 
 PRIVATE>
 
-GENERIC: >rect ( z -- x y )
-
-M: real >rect 0 ; inline
-
-M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
-
 : >float-rect ( z -- x y )
     >rect [ >float ] bi@ ; inline
 
@@ -103,13 +93,6 @@ M: complex e^ >rect [ e^ ] dip polar> ; inline
     [ make-bits 1 ] dip dup
     '[ [ over * _ mod ] when [ sq _ mod ] dip ] reduce nip ; inline
 
-: (gcd) ( b a x y -- a d )
-    swap [
-        nip
-    ] [
-        [ /mod [ over * swapd - ] dip ] keep (gcd)
-    ] if-zero ; inline recursive
-
 PRIVATE>
 
 : ^ ( x y -- z )
@@ -121,21 +104,6 @@ PRIVATE>
     } cond ; inline
 
 : nth-root ( n x -- y ) swap recip ^ ; inline
-
-: gcd ( x y -- a d )
-    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
-
-MATH: fast-gcd ( x y -- d ) foldable
-
-<PRIVATE
-
-: simple-gcd ( x y -- d ) gcd nip ; inline
-
-PRIVATE>
-
-M: real fast-gcd simple-gcd ; inline
-
-M: bignum fast-gcd bignum-gcd ; inline
 
 : lcm ( a b -- c )
     [ * ] 2keep fast-gcd /i ; foldable

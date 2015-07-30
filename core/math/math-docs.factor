@@ -235,6 +235,19 @@ HELP: sgn
     }
 } ;
 
+HELP: rect>
+{ $values { "x" real } { "y" real } { "z" number } }
+{ $description "Creates a complex number from real and imaginary components. If " { $snippet "z" } " is an integer zero, this will simply output " { $snippet "x" } "." } ;
+
+HELP: >rect
+{ $values { "z" number } { "x" real } { "y" real } }
+{ $description "Extracts the real and imaginary components of a complex number." } ;
+
+HELP: gcd
+{ $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
+{ $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
+{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
+
 HELP: 2/
 { $values { "x" integer } { "y" integer } }
 { $description "Shifts " { $snippet "x" } " to the right by one bit." }
