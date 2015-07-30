@@ -120,20 +120,16 @@ struct startup_code_block_relocation_visitor {
         fixup(fixup),
         visitor(slot_visitor<startup_fixup>(parent, fixup)) {}
 
-  void operator()(instruction_operand op) {
+  fixnum compute_operand_value(instruction_operand op) {
     code_block* compiled = op.compiled;
     cell old_offset =
         op.rel_offset() + compiled->entry_point() - fixup.code_offset;
-
     switch (op.rel_type()) {
       case RT_LITERAL: {
         cell value = op.load_value(old_offset);
         if (immediate_p(value))
-          op.store_value(value);
-        else
-          op.store_value(
-              RETAG(fixup.fixup_data(untag<object>(value)), TAG(value)));
-        break;
+          return value;
+        return RETAG(fixup.fixup_data(untag<object>(value)), TAG(value));
       }
       case RT_ENTRY_POINT:
       case RT_ENTRY_POINT_PIC:
@@ -142,15 +138,17 @@ struct startup_code_block_relocation_visitor {
         cell value = op.load_value(old_offset);
         cell offset = TAG(value);
         code_block* compiled = (code_block*)UNTAG(value);
-        op.store_value((cell)fixup.fixup_code(compiled) + offset);
-        break;
+        return (cell)fixup.fixup_code(compiled) + offset;
       }
       case RT_UNTAGGED:
-        break;
+        return op.load_value(old_offset);
       default:
-        parent->store_external_address(op);
-        break;
+        return parent->compute_external_address(op);
     }
+  }
+
+  void operator()(instruction_operand op) {
+    op.store_value(compute_operand_value(op));
   }
 };
 

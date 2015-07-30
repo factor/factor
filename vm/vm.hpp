@@ -569,7 +569,6 @@ struct factor_vm {
   cell compute_dlsym_toc_address(array* literals, cell index);
 #endif
   cell compute_vm_address(cell arg);
-  void store_external_address(instruction_operand op);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
                                array* parameters,
