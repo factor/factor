@@ -1,9 +1,10 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs calendar colors.constants colors.hex
-combinators formatting fry http.client io io.styles json
-json.reader kernel make math math.statistics sequences urls ;
+USING: accessors assocs calendar calendar.elapsed
+colors.constants colors.hex combinators formatting fry
+http.client io io.styles json json.reader kernel make math
+math.statistics sequences urls ;
 
 IN: reddit
 
@@ -104,8 +105,8 @@ PRIVATE>
                 [ story>comments-url ] bi write-link
             ]
             [
-                "created_utc" of unix-time>timestamp now swap time-
-                duration>hours ", posted %d hours ago" sprintf write-text
+                "created_utc" of now timestamp>unix-time swap -
+                relative-time ", posted " write-text write-text
             ]
             [ " by " write-text [ "author" of ] [ story>author-url ] bi write-link nl nl ]
         } cleave
