@@ -105,7 +105,7 @@ PRIVATE>
                 [ story>comments-url ] bi write-link
             ]
             [
-                "created_utc" of now timestamp>unix-time swap -
+                "created_utc" of unix-time>timestamp
                 relative-time ", posted " write-text write-text
             ]
             [ " by " write-text [ "author" of ] [ story>author-url ] bi write-link nl nl ]
