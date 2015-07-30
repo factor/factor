@@ -57,14 +57,9 @@ PRIVATE>
         [ post>url host>> " (" ")" surround write-text nl ]
         [ "score" of "    %d points" sprintf write-text ]
         [ dup "by" of [ " by " write-text [ "by" of ] [ post>user-url ] bi write-link ] [ drop ] if ]
+        [ "time" of [ " " write-text unix-time>relative-time write-text ] when* ]
         [
-            "time" of [
-                " " write-text now timestamp>unix-time
-                swap - relative-time write-text
-            ] when*
-        ]
-        [
-            dup "decendants" of [
+            dup "descendants" of [
                 " | " write-text
                 [ "descendants" of [ "discuss" ] [ "%d comments" sprintf ] if-zero ]
                 [ post>comments-url ] bi write-link
