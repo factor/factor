@@ -1,12 +1,14 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators formatting kernel make math math.parser
-sequences ;
+USING: calendar combinators formatting kernel make math
+math.parser sequences ;
 
 IN: calendar.elapsed
 
-: elapsed-time ( seconds -- string )
+GENERIC: elapsed-time ( seconds -- string )
+
+M: real elapsed-time
     dup 0 < [ "negative seconds" throw ] when [
         {
             { 60 "s" }
@@ -21,7 +23,12 @@ IN: calendar.elapsed
         ] each drop
     ] { } make [ "0s" ] [ reverse " " join ] if-empty ;
 
-: relative-time ( seconds -- string )
+M: duration elapsed-time
+    duration>seconds elapsed-time ;
+
+GENERIC: relative-time ( seconds -- string )
+
+M: real relative-time
     dup 0 < [ "negative seconds" throw ] when {
         { [ dup 1 < ] [ drop "just now" ] }
         { [ dup 60 < ] [ drop "less than a minute ago" ] }
@@ -32,3 +39,9 @@ IN: calendar.elapsed
         { [ dup 172800 < ] [ drop "1 day ago" ] }
         [ 86400 / "%d days ago" sprintf ]
     } cond ;
+
+M: duration relative-time
+    duration>seconds relative-time ;
+
+M: timestamp relative-time
+    now swap time- relative-time ;
