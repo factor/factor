@@ -51,13 +51,13 @@ TUPLE: number-parse
     [ 2nip ] (next-digit) ; inline
 
 : inc-magnitude ( number-parse -- number-parse' )
-    [ 1 + ] change-magnitude ; inline
+    [ 1 fixnum+fast ] change-magnitude ; inline
 
 : ?inc-magnitude ( number-parse n -- number-parse' )
     zero? [ inc-magnitude ] unless ; inline
 
 : (add-digit) ( number-parse n digit -- number-parse n' )
-    [ dup radix>> ] [ * ] [ + ] tri* ;
+    [ dup radix>> ] [ * ] [ + ] tri* ; inline
 
 : add-digit ( i number-parse n digit quot -- n/f )
     [ (add-digit) [ ?inc-magnitude ] keep ] dip next-digit ; inline
@@ -77,7 +77,7 @@ TUPLE: float-parse
     { exponent }
     { magnitude } ;
 : inc-point-?dec-magnitude ( float-parse n -- float-parse' )
-    zero? [ [ 1 - ] change-magnitude ] when
+    zero? [ [ 1 fixnum-fast ] change-magnitude ] when
     [ 1 + ] change-point ; inline
 
 : store-exponent ( float-parse n expt -- float-parse' n )

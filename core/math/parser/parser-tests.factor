@@ -450,7 +450,8 @@ unit-test
 
 ! works with ratios
 { 0.25 } [ "1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
-{ 1.25 } [ "1+1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+! XXX: disable for right now, see #1362 or #1408
+! { 1.25 } [ "1+1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 
 ! #1356 #1231
 { 1/0. } [ "1e100000" string>number ] unit-test
