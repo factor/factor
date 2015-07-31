@@ -73,12 +73,12 @@ TUPLE: number-parse
 
 TUPLE: float-parse
     { radix fixnum }
-    { point }
+    { point fixnum }
     { exponent }
     { magnitude } ;
 : inc-point-?dec-magnitude ( float-parse n -- float-parse' )
     zero? [ [ 1 fixnum-fast ] change-magnitude ] when
-    [ 1 + ] change-point ; inline
+    [ 1 fixnum+fast ] change-point ; inline
 
 : store-exponent ( float-parse n expt -- float-parse' n )
     swap [ >>exponent ] dip ; inline
