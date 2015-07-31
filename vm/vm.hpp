@@ -665,7 +665,6 @@ struct factor_vm {
   cell lazy_jit_compile(cell quot);
   bool quotation_compiled_p(quotation* quot);
   void primitive_quotation_compiled_p();
-  cell find_all_quotations();
   void initialize_all_quotations();
 
   // dispatch
