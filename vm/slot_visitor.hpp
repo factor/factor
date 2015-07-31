@@ -30,7 +30,8 @@ cell object::base_size(Fixup fixup) const {
     case WRAPPER_TYPE:
       return sizeof(wrapper);
     case CALLSTACK_TYPE: {
-      return callstack_object_size(untag_fixnum(((callstack*)this)->length));
+      cell callstack_length = untag_fixnum(((callstack*)this)->length);
+      return callstack_object_size(callstack_length);
     }
     default:
       critical_error("Invalid header in base_size", (cell)this);
@@ -128,18 +129,12 @@ template <typename Fixup> struct slot_visitor {
   void visit_object_array(cell* start, cell* end);
   void visit_slots(object* ptr);
   void visit_stack_elements(segment* region, cell* top);
-  void visit_data_roots();
-  void visit_callback_roots();
-  void visit_literal_table_roots();
   void visit_all_roots();
   void visit_callstack_object(callstack* stack);
   void visit_callstack(context* ctx);
   void visit_context(context *ctx);
-  void visit_contexts();
   void visit_code_block_objects(code_block* compiled);
   void visit_embedded_literals(code_block* compiled);
-  void visit_sample_callstacks();
-  void visit_sample_threads();
   void visit_object_code_block(object* obj);
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
@@ -182,54 +177,39 @@ void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
   visit_object_array((cell*)region->start, top + 1);
 }
 
-template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
-  FACTOR_FOR_EACH(parent->data_roots) {
-    visit_handle(*iter);
-  }
-}
-
-template <typename Fixup> void slot_visitor<Fixup>::visit_callback_roots() {
-  auto callback_slot_visitor = [&](code_block* stub, cell size) {
-    visit_handle(&stub->owner);
-  };
-  parent->callbacks->allocator->iterate(callback_slot_visitor);
-}
-
-template <typename Fixup>
-void slot_visitor<Fixup>::visit_literal_table_roots() {
-  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
-    iter->second = visit_pointer(iter->second);
-  }
-}
-
-template <typename Fixup> void slot_visitor<Fixup>::visit_sample_callstacks() {
-  FACTOR_FOR_EACH(parent->sample_callstacks) {
-    visit_handle(&*iter);
-  }
-}
-
-template <typename Fixup> void slot_visitor<Fixup>::visit_sample_threads() {
-  FACTOR_FOR_EACH(parent->samples) {
-    visit_handle(&iter->thread);
-  }
-}
-
 template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   visit_handle(&parent->true_object);
   visit_handle(&parent->bignum_zero);
   visit_handle(&parent->bignum_pos_one);
   visit_handle(&parent->bignum_neg_one);
 
-  visit_data_roots();
-  visit_callback_roots();
-  visit_literal_table_roots();
-  visit_sample_callstacks();
-  visit_sample_threads();
+  FACTOR_FOR_EACH(parent->data_roots) {
+    visit_handle(*iter);
+  }
+
+  auto callback_slot_visitor = [&](code_block* stub, cell size) {
+    visit_handle(&stub->owner);
+  };
+  parent->callbacks->allocator->iterate(callback_slot_visitor);
+
+  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
+    iter->second = visit_pointer(iter->second);
+  }
+
+  FACTOR_FOR_EACH(parent->sample_callstacks) {
+    visit_handle(&*iter);
+  }
+
+  FACTOR_FOR_EACH(parent->samples) {
+    visit_handle(&iter->thread);
+  }
 
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
 
-  visit_contexts();
+  FACTOR_FOR_EACH(parent->active_contexts) {
+    visit_context(*iter);
+  }
 }
 
 /* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
@@ -365,12 +345,6 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
      it easier to see if uninitialized reads are made. */
   ctx->fill_stack_seg(ds_ptr, ds_seg, 0xbaadbadd);
   ctx->fill_stack_seg(rs_ptr, rs_seg, 0xdaabdaab);
-}
-
-template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
-  FACTOR_FOR_EACH(parent->active_contexts) {
-    visit_context(*iter);
-  }
 }
 
 template <typename Fixup>
