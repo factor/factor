@@ -132,12 +132,12 @@ M: object known>callable drop \ _ ;
 M: literal-tuple known>callable value>> ;
 
 M: composed known>callable
-    [ quot1>> known known>callable ?@ ]
-    [ quot2>> known known>callable ?@ ] bi append ;
+    [ quot1>> ] [ quot2>> ] bi
+    [ known known>callable ?@ ] bi@ append ;
 
 M: curried known>callable
-    [ quot>> known known>callable ]
-    [ obj>> known known>callable ] bi prefix ;
+    [ quot>> ] [ obj>> ] bi
+    [ known known>callable ] bi@ prefix ;
 
 M: declared-effect known>callable
     known>> known>callable ;
