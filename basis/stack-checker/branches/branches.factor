@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays effects fry vectors sequences assocs math math.order accessors kernel
-combinators quotations namespaces grouping locals stack-checker.state
-stack-checker.backend stack-checker.errors stack-checker.visitor
-stack-checker.values stack-checker.recursive-state ;
+USING: accessors arrays assocs effects fry grouping kernel math
+namespaces quotations sequences stack-checker.backend
+stack-checker.errors stack-checker.recursive-state
+stack-checker.state stack-checker.values stack-checker.visitor
+vectors ;
 FROM: sequences.private => dispatch ;
 IN: stack-checker.branches
 

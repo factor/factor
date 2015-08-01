@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel destructors arrays sequences accessors combinators math
-namespaces init sets words assocs alien.libraries alien
-alien.private alien.c-types fry quotations strings
-stack-checker.backend stack-checker.errors stack-checker.visitor
+USING: accessors alien alien.c-types alien.libraries
+alien.private arrays assocs combinators effects fry kernel math
+namespaces quotations sequences stack-checker.backend
 stack-checker.dependencies stack-checker.state
-compiler.utilities effects ;
+stack-checker.visitor strings words ;
 FROM: kernel.private => declare ;
 IN: stack-checker.alien
 
@@ -129,12 +128,11 @@ wait-for-callback-hook [ [ drop ] ] initialize
 M: callable wrap-callback-quot
     swap [ callback-parameter-quot ] [ callback-return-quot ] bi surround
     wait-for-callback-hook get
-    '[ _ _ do-callback ]
-    >quotation ;
+    '[ _ _ do-callback ] >quotation ;
 
 : callback-effect ( params -- effect )
-    [ parameters>> length "x" <array> ] [ return>> void? { } { "x" } ? ] bi
-    <effect> ;
+    [ parameters>> length "x" <array> ]
+    [ return>> void? { } { "x" } ? ] bi <effect> ;
 
 : infer-callback-quot ( params quot -- child )
     [
