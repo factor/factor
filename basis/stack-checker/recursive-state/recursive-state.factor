@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces stack-checker.recursive-state.tree ;
+USING: accessors kernel namespaces
+stack-checker.recursive-state.tree ;
 IN: stack-checker.recursive-state
 
 TUPLE: recursive-state quotations inline-words ;

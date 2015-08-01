@@ -1,14 +1,11 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors arrays kernel kernel.private combinators.private
-words sequences generic math math.order namespaces quotations
-assocs combinators combinators.short-circuit classes.tuple
-classes.tuple.private effects summary hashtables classes sets
-definitions generic.standard slots.private continuations locals
-sequences.private generalizations stack-checker.backend
-stack-checker.state stack-checker.visitor stack-checker.errors
-stack-checker.values stack-checker.recursive-state
-stack-checker.dependencies ;
+USING: accessors classes.tuple classes.tuple.private combinators
+combinators.short-circuit continuations fry generic kernel
+locals namespaces quotations sequences stack-checker.backend
+stack-checker.dependencies stack-checker.errors
+stack-checker.recursive-state stack-checker.values
+stack-checker.visitor words ;
 FROM: namespaces => set ;
 IN: stack-checker.transforms
 

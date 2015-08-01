@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry arrays generic io io.streams.string kernel math namespaces
-parser sequences strings vectors words quotations effects classes
-continuations assocs combinators compiler.errors accessors math.order
-definitions locals sets hints macros stack-checker.state
-stack-checker.visitor stack-checker.errors stack-checker.values
-stack-checker.recursive-state stack-checker.dependencies summary ;
+USING: accessors arrays effects fry kernel locals math
+math.order namespaces quotations sequences
+stack-checker.dependencies stack-checker.errors
+stack-checker.recursive-state stack-checker.state
+stack-checker.values stack-checker.visitor words ;
 FROM: sequences.private => from-end ;
 FROM: namespaces => set ;
 IN: stack-checker.backend

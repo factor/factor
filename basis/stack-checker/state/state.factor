@@ -29,7 +29,8 @@ SYMBOL: literals
 : commit-literals ( -- )
     literals get [ [ (push-literal) ] each ] [ delete-all ] bi ;
 
-: current-stack-height ( -- n ) meta-d length input-count get - ;
+: current-stack-height ( -- n )
+    meta-d length input-count get - ;
 
 : current-effect ( -- effect )
     input-count get "x" <array>

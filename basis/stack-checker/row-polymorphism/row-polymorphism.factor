@@ -1,12 +1,9 @@
-! (c)2010 Joe Groff bsd license
-USING: accessors arrays assocs combinators combinators.short-circuit
-continuations effects fry kernel locals math math.order namespaces
-quotations sequences splitting
-stack-checker.backend
-stack-checker.errors
-stack-checker.state
-stack-checker.values
-stack-checker.visitor ;
+! Copyright (C) 2010 Joe Groff
+! See http://factorcode.org/license.txt for BSD license
+USING: accessors arrays assocs combinators
+combinators.short-circuit effects fry kernel locals math
+math.order namespaces sequences stack-checker.errors
+stack-checker.state stack-checker.values ;
 IN: stack-checker.row-polymorphism
 
 : with-inner-d ( quot -- inner-d )
