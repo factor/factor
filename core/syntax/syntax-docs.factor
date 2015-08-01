@@ -125,7 +125,7 @@ ARTICLE: "syntax-floats" "Float syntax"
     "t"
 }
 { $example
-    "10.125 0o1.22p3 = ."
+    "10.125 0o1.21p3 = ."
     "t"
 }
 "The normalized hex form " { $snippet "±0x1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of the binary IEEE 754 representation."
