@@ -1,21 +1,31 @@
 ! Copyright (C) 2004, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.libraries
-alien.private arrays assocs byte-arrays classes
-classes.tuple.private combinators combinators.private
-combinators.short-circuit compiler.units effects fry
-generic.single.private io.files.private io.streams.c kernel
-kernel.private locals locals.backend locals.types macros math
-math.parser.private math.private memory memory.private
-namespaces quotations quotations.private sequences
-sequences.private slots.private stack-checker.alien
-stack-checker.backend stack-checker.branches
-stack-checker.dependencies stack-checker.errors
-stack-checker.row-polymorphism stack-checker.state
-stack-checker.transforms stack-checker.values
-stack-checker.visitor strings strings.private system
-threads.private tools.dispatch.private tools.memory.private
-tools.profiler.sampling.private words words.private ;
+USING: fry accessors alien alien.accessors alien.private arrays
+byte-arrays classes continuations.private effects generic
+hashtables hashtables.private io io.backend io.files
+io.files.private io.streams.c kernel kernel.private math
+math.private math.parser.private memory memory.private
+namespaces namespaces.private parser quotations
+quotations.private sbufs sbufs.private sequences
+sequences.private slots.private strings strings.private system
+threads.private classes.tuple classes.tuple.private vectors
+vectors.private words words.private definitions assocs summary
+compiler.units system.private combinators tools.memory.private
+combinators.short-circuit locals locals.backend locals.types
+combinators.private stack-checker.values generic.single
+generic.single.private alien.libraries tools.dispatch.private
+macros tools.profiler.sampling.private classes.algebra
+stack-checker.alien
+stack-checker.state
+stack-checker.errors
+stack-checker.visitor
+stack-checker.backend
+stack-checker.branches
+stack-checker.transforms
+stack-checker.dependencies
+stack-checker.recursive-state
+stack-checker.row-polymorphism ;
+QUALIFIED-WITH: generic.single.private gsp
 IN: stack-checker.known-words
 
 : infer-special ( word -- )
@@ -415,7 +425,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ innermost-frame-scan { callstack } { fixnum } define-primitive
 \ jit-compile { quotation } { } define-primitive
 \ leaf-signal-handler { } { } define-primitive
-\ lookup-method { object array } { word } define-primitive
+\ gsp:lookup-method { object array } { word } define-primitive
 \ minor-gc { } { } define-primitive
 \ modify-code-heap { array object object } { } define-primitive
 \ nano-count { } { integer } define-primitive \ nano-count make-flushable
