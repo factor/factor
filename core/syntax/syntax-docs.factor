@@ -121,7 +121,7 @@ ARTICLE: "syntax-floats" "Float syntax"
     "t"
 }
 { $example
-    "10.125 0b1.01001p3 = ."
+    "10.125 0b1.010001p3 = ."
     "t"
 }
 { $example
