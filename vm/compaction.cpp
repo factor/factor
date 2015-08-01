@@ -52,37 +52,6 @@ struct compaction_fixup {
   }
 };
 
-template <typename Fixup>
-fixnum compute_operand_value(factor_vm* parent,
-                             cell old_entry_point,
-                             Fixup fixup,
-                             instruction_operand op) {
-  cell old_offset = op.rel_offset() + old_entry_point;
-  switch (op.rel_type()) {
-    case RT_LITERAL: {
-      cell value = op.load_value(old_offset);
-      if (immediate_p(value))
-        return value;
-      return RETAG(fixup.fixup_data(untag<object>(value)), TAG(value));
-    }
-    case RT_ENTRY_POINT:
-    case RT_ENTRY_POINT_PIC:
-    case RT_ENTRY_POINT_PIC_TAIL:
-    case RT_HERE: {
-      cell value = op.load_value(old_offset);
-      cell offset = TAG(value);
-      code_block* compiled = (code_block*)UNTAG(value);
-      return (cell)fixup.fixup_code(compiled) + offset;
-    }
-    case RT_THIS:
-    case RT_CARDS_OFFSET:
-    case RT_DECKS_OFFSET:
-      return parent->compute_external_address(op);
-    default:
-      return op.load_value(old_offset);
-  }
-}
-
 /* After a compaction, invalidate any code heap roots which are not
 marked, and also slide the valid roots up so that call sites can be updated
 correctly in case an inline cache compilation triggered compaction. */
@@ -148,20 +117,14 @@ void factor_vm::collect_compact_impl() {
 
     /* Slide everything in the code heap up, and update data and code heap
        pointers inside code blocks. */
-    auto compact_data_func = [&](code_block* old_addr,
+    auto compact_code_func = [&](code_block* old_addr,
                                  code_block* new_addr,
                                  cell size) {
       forwarder.visit_code_block_objects(new_addr);
       cell old_entry_point = old_addr->entry_point();
-      auto update_func = [&](instruction_operand op) {
-        op.store_value(compute_operand_value(this,
-                                             old_entry_point,
-                                             forwarder.fixup,
-                                             op));
-      };
-      new_addr->each_instruction_operand(update_func);
+      forwarder.visit_instruction_operands(new_addr, old_entry_point);
     };
-    code->allocator->compact(compact_data_func, fixup, &code_finger);
+    code->allocator->compact(compact_code_func, fixup, &code_finger);
 
     forwarder.visit_all_roots();
     forwarder.visit_context_code_blocks();

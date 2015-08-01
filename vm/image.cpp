@@ -109,57 +109,13 @@ void factor_vm::fixup_data(cell data_offset, cell code_offset) {
   data->tenured->iterate(start_object_updater, fixup);
 }
 
-struct startup_code_block_relocation_visitor {
-  factor_vm* parent;
-  startup_fixup fixup;
-  slot_visitor<startup_fixup> visitor;
-
-  startup_code_block_relocation_visitor(factor_vm* parent,
-                                        startup_fixup fixup)
-      : parent(parent),
-        fixup(fixup),
-        visitor(slot_visitor<startup_fixup>(parent, fixup)) {}
-
-  fixnum compute_operand_value(instruction_operand op) {
-    code_block* compiled = op.compiled;
-    cell old_offset =
-        op.rel_offset() + compiled->entry_point() - fixup.code_offset;
-    switch (op.rel_type()) {
-      case RT_LITERAL: {
-        cell value = op.load_value(old_offset);
-        if (immediate_p(value))
-          return value;
-        return RETAG(fixup.fixup_data(untag<object>(value)), TAG(value));
-      }
-      case RT_ENTRY_POINT:
-      case RT_ENTRY_POINT_PIC:
-      case RT_ENTRY_POINT_PIC_TAIL:
-      case RT_HERE: {
-        cell value = op.load_value(old_offset);
-        cell offset = TAG(value);
-        code_block* compiled = (code_block*)UNTAG(value);
-        return (cell)fixup.fixup_code(compiled) + offset;
-      }
-      case RT_UNTAGGED:
-        return op.load_value(old_offset);
-      default:
-        return parent->compute_external_address(op);
-    }
-  }
-
-  void operator()(instruction_operand op) {
-    op.store_value(compute_operand_value(op));
-  }
-};
-
 void factor_vm::fixup_code(cell data_offset, cell code_offset) {
   startup_fixup fixup(data_offset, code_offset);
   auto updater = [&](code_block* compiled, cell size) {
     slot_visitor<startup_fixup> visitor(this, fixup);
     visitor.visit_code_block_objects(compiled);
-
-    startup_code_block_relocation_visitor code_visitor(this, fixup);
-    compiled->each_instruction_operand(code_visitor);
+    cell rel_base = compiled->entry_point() - fixup.code_offset;
+    visitor.visit_instruction_operands(compiled, rel_base);
   };
   code->allocator->iterate(updater, fixup);
 }
