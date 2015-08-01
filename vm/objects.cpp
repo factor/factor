@@ -82,8 +82,7 @@ struct slot_become_fixup : no_fixup {
     std::map<object*, object*>::const_iterator iter = become_map->find(old);
     if (iter != become_map->end())
       return iter->second;
-    else
-      return old;
+    return old;
   }
 };
 
@@ -116,28 +115,22 @@ void factor_vm::primitive_become() {
                                             slot_become_fixup(&become_map));
     visitor.visit_all_roots();
 
-    auto object_become_visitor = [&](object* obj) {
+    auto object_become_func = [&](object* obj) {
       visitor.visit_slots(obj);
     };
-    each_object(object_become_visitor);
+    each_object(object_become_func);
 
-    auto code_block_become_visitor = [&](code_block* compiled, cell size) {
+    auto code_block_become_func = [&](code_block* compiled, cell size) {
       visitor.visit_code_block_objects(compiled);
       visitor.visit_embedded_literals(compiled);
+      code->write_barrier(compiled);
     };
-    each_code_block(code_block_become_visitor);
+    each_code_block(code_block_become_func);
   }
 
   /* Since we may have introduced old->new references, need to revisit
      all objects and code blocks on a minor GC. */
   data->mark_all_cards();
-
-  {
-    auto code_block_visitor = [&](code_block* compiled, cell size) {
-      code->write_barrier(compiled);
-    };
-    each_code_block(code_block_visitor);
-  }
 }
 
 }
