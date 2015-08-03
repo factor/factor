@@ -115,7 +115,6 @@ ifdef CONFIG
 		vm/slot_visitor.hpp \
 		vm/collector.hpp \
 		vm/to_tenured_collector.hpp \
-		vm/full_collector.hpp \
 		vm/arrays.hpp \
 		vm/math.hpp \
 		vm/byte_arrays.hpp \
