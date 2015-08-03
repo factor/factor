@@ -49,6 +49,7 @@ struct context {
   void reset();
   void fix_stacks();
   void fill_stack_seg(cell top_ptr, segment* seg, cell pattern);
+  vm_error_type address_to_error(cell addr);
 
   cell peek() { return *(cell*)datastack; }
 
