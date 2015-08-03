@@ -117,20 +117,10 @@ void factor_vm::verify_memory_protection_error(cell addr) {
 void factor_vm::memory_protection_error(cell pc, cell addr) {
   if (code->safepoint_p(addr))
     safepoint.handle_safepoint(this, pc);
-  else if (ctx->datastack_seg->underflow_p(addr))
-    general_error(ERROR_DATASTACK_UNDERFLOW, false_object, false_object);
-  else if (ctx->datastack_seg->overflow_p(addr))
-    general_error(ERROR_DATASTACK_OVERFLOW, false_object, false_object);
-  else if (ctx->retainstack_seg->underflow_p(addr))
-    general_error(ERROR_RETAINSTACK_UNDERFLOW, false_object, false_object);
-  else if (ctx->retainstack_seg->overflow_p(addr))
-    general_error(ERROR_RETAINSTACK_OVERFLOW, false_object, false_object);
-  else if (ctx->callstack_seg->underflow_p(addr))
-    general_error(ERROR_CALLSTACK_OVERFLOW, false_object, false_object);
-  else if (ctx->callstack_seg->overflow_p(addr))
-    general_error(ERROR_CALLSTACK_UNDERFLOW, false_object, false_object);
-  else
-    general_error(ERROR_MEMORY, from_unsigned_cell(addr), false_object);
+  else {
+    vm_error_type type = ctx->address_to_error(addr);
+    general_error(type, from_unsigned_cell(addr), false_object);
+  }
 }
 
 /* Allocates memory */
