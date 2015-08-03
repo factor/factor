@@ -455,7 +455,7 @@ void* stdin_loop(void* arg) {
   return NULL;
 }
 
-void factor_vm::open_console() {
+void open_console() {
   FACTOR_ASSERT(!stdin_thread_initialized_p);
   safe_pipe(&control_read, &control_write);
   safe_pipe(&size_read, &size_write);
@@ -468,14 +468,14 @@ void factor_vm::open_console() {
 /* This method is used to kill the stdin_loop before exiting from factor.
    A Nvidia driver bug on Linux is the reason this has to be done, see:
      http://www.nvnews.net/vbulletin/showthread.php?t=164619 */
-void factor_vm::close_console() {
+void close_console() {
   if (stdin_thread_initialized_p) {
     pthread_cancel(stdin_thread);
     pthread_join(stdin_thread, 0);
   }
 }
 
-void factor_vm::lock_console() {
+void lock_console() {
   FACTOR_ASSERT(stdin_thread_initialized_p);
   /* Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
      any read() it has in progress. When the stdin loop iterates again, it will
@@ -484,19 +484,19 @@ void factor_vm::lock_console() {
   pthread_kill(stdin_thread, SIGUSR2);
 }
 
-void factor_vm::unlock_console() {
+void unlock_console() {
   FACTOR_ASSERT(stdin_thread_initialized_p);
   pthread_mutex_unlock(&stdin_mutex);
 }
 
-void factor_vm::ignore_ctrl_c() {
+void ignore_ctrl_c() {
   sig_t ret;
   do {
     ret = signal(SIGINT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);
 }
 
-void factor_vm::handle_ctrl_c() {
+void handle_ctrl_c() {
   struct sigaction fep_sigaction;
   init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
   sigaction_safe(SIGINT, &fep_sigaction, NULL);
@@ -508,7 +508,7 @@ void abort() {
     ret = signal(SIGABRT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);
 
-  factor_vm::close_console();
+  close_console();
   ::abort();
 }
 
