@@ -737,12 +737,6 @@ struct factor_vm {
   void init_signals();
   void start_sampling_profiler_timer();
   void end_sampling_profiler_timer();
-  static void open_console();
-  static void close_console();
-  static void lock_console();
-  static void unlock_console();
-  static void ignore_ctrl_c();
-  static void handle_ctrl_c();
 
 // os-windows
 #if defined(WINDOWS)
