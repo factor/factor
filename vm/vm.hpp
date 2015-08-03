@@ -218,9 +218,7 @@ struct factor_vm {
   void not_implemented_error();
   void verify_memory_protection_error(cell addr);
   void memory_protection_error(cell pc, cell addr);
-  void signal_error(cell signal);
   void divide_by_zero_error();
-  void fp_trap_error(unsigned int fpu_status);
   void primitive_unimplemented();
   void memory_signal_handler_impl();
   void synchronous_signal_handler_impl();
