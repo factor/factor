@@ -133,7 +133,6 @@ namespace factor { struct factor_vm; }
 #include "slot_visitor.hpp"
 #include "collector.hpp"
 #include "to_tenured_collector.hpp"
-#include "full_collector.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
 #include "byte_arrays.hpp"
