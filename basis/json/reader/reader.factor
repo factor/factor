@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: assocs combinators fry io io.streams.string json kernel
-kernel.private math math.order math.parser namespaces sbufs
-sequences sequences.private strings vectors ;
-
+USING: assocs combinators fry io io.encodings.utf8 io.files
+io.streams.string json kernel kernel.private math math.order
+math.parser namespaces sbufs sequences sequences.private strings
+vectors ;
 IN: json.reader
 
 <PRIVATE
@@ -126,15 +125,23 @@ DEFER: (read-json-string)
         [ pick json-number [ suffix! ] dip [ scan ] when*  ]
     } case ;
 
-: stream-json-read ( stream -- objects )
+: json-read-input ( stream -- objects )
     V{ } clone over '[ _ stream-read1 dup ] [ scan ] while drop nip ;
+
+! If there are no json objects, return an empty hashtable
+! This happens for empty files.
+: first-json-object ( objects -- obj )
+    [ H{ } clone ] [ first ] if-empty ;
 
 PRIVATE>
 
-: read-jsons ( -- objects )
-    input-stream get stream-json-read ;
+: read-json-objects ( -- objects )
+    input-stream get json-read-input ;
 
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ read-jsons first ] with-string-reader ;
+    [ read-json-objects first-json-object ] with-string-reader ;
+
+: path>json ( path -- json )
+    utf8 [ read-json-objects first-json-object ] with-file-reader ;
