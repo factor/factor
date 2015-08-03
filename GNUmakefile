@@ -104,7 +104,6 @@ ifdef CONFIG
 		vm/image.hpp \
 		vm/callbacks.hpp \
 		vm/dispatch.hpp \
-		vm/entry_points.hpp \
 		vm/safepoints.hpp \
 		vm/vm.hpp \
 		vm/allot.hpp \
