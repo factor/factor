@@ -97,7 +97,7 @@ TUPLE: world-attributes
 
 : with-gl-context ( world quot -- )
     '[ set-gl-context @ ]
-    [ handle>> flush-gl-context gl-error ] bi ; inline
+    [ handle>> flush-gl-context gl-error-nonfatal ] bi ; inline
 
 ERROR: no-world-found ;
 
