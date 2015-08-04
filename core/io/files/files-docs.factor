@@ -90,7 +90,7 @@ HELP: file-lines
 { $errors "Throws an error if the file cannot be opened for reading." } ;
 
 HELP: change-file-lines
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Reads the file lines, transforms the file lines, and writes them back to the same file name." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
@@ -100,7 +100,7 @@ HELP: set-file-contents
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: change-file-contents
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Reads the file, transforms the file contents, and writes it back to the same file name." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
