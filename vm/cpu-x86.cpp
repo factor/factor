@@ -3,8 +3,9 @@
 namespace factor {
 
 void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
-  if (!code->seg->in_segment_p(*pc) ||
-      *sp < ctx->callstack_seg->start + stack_reserved) {
+
+  cell callstack_limit = ctx->callstack_seg->start + stack_reserved;
+  if (!code->seg->in_segment_p(*pc) || *sp < callstack_limit) {
     /* Fault came from the VM, foreign code, a callstack overflow, or
        we don't have enough callstack room to try the resumable
        handler. Cut the callstack down to the shallowest Factor stack
@@ -15,8 +16,7 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
 
     cell frame_top = ctx->callstack_top;
 
-    while (frame_top < ctx->callstack_bottom &&
-           frame_top < ctx->callstack_seg->start + stack_reserved) {
+    while (frame_top < ctx->callstack_bottom && frame_top < callstack_limit) {
       frame_top = frame_predecessor(frame_top);
     }
 

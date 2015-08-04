@@ -12,7 +12,11 @@ enum context_object {
   OBJ_IN_CALLBACK_P,
 };
 
-static const cell stack_reserved = 1024;
+/* When the callstack fills up (e.g by to deep recursion), a callstack
+   overflow error is triggered. So before continuing executing on it
+   in general_error(), we chop of this many bytes to have some space
+   to work with. */
+static const cell stack_reserved = 4096;
 
 struct context {
 
