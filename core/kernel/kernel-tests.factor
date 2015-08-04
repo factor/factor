@@ -30,14 +30,14 @@ IN: kernel.tests
 
 ! Make sure we report the correct error on stack underflow
 [ clear drop ] [
-    ${ "kernel-error" ERROR-DATASTACK-UNDERFLOW f f } =
+    2 head ${ "kernel-error" ERROR-DATASTACK-UNDERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test
 
 [
     3 [ { } set-retainstack ] dip ]
-    [ ${ "kernel-error" ERROR-RETAINSTACK-UNDERFLOW f f } =
+    [ 2 head ${ "kernel-error" ERROR-RETAINSTACK-UNDERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test
@@ -56,19 +56,19 @@ IN: kernel.tests
 >>
 
 [ overflow-d ] [
-    ${ "kernel-error" ERROR-DATASTACK-OVERFLOW f f } =
+    2 head ${ "kernel-error" ERROR-DATASTACK-OVERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test
 
 [ overflow-d-alt ] [
-    ${ "kernel-error" ERROR-DATASTACK-OVERFLOW f f } =
+    2 head ${ "kernel-error" ERROR-DATASTACK-OVERFLOW } =
 ] must-fail-with
 
 { } [ [ :c ] with-string-writer drop ] unit-test
 
 [ overflow-r ] [
-    ${ "kernel-error" ERROR-RETAINSTACK-OVERFLOW f f } =
+    2 head ${ "kernel-error" ERROR-RETAINSTACK-OVERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test
@@ -80,7 +80,7 @@ IN: kernel.tests
 ! fault handlers on an alternate callstack.
 os windows? [
     [ overflow-c ] [
-        ${ "kernel-error" ERROR-CALLSTACK-OVERFLOW f f } =
+        2 head ${ "kernel-error" ERROR-CALLSTACK-OVERFLOW } =
     ] must-fail-with
 ] unless
 
