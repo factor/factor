@@ -184,7 +184,7 @@ these lines in your .emacs:
 ;;; Regexps galore:
 
 ;; Utility regexp used by other regexps to match a Factor symbol name
-(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\)+\\)")
+(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\|\\s(\\|\\s)\\)+\\)")
 (setq-local ws+ "[ \n\t]+")
 (setq-local symbols-to-semicolon "\\([^;\t]*\\)\\(;\\)")
 
@@ -208,7 +208,7 @@ these lines in your .emacs:
                 ('scan-error nil))
           (let ((bracket-stop (point)))
             (goto-char bracket-start)
-            (re-search-forward ".+" bracket-stop 'mv)))))))
+            (re-search-forward "\\(.\\|\n\\)+" bracket-stop 'mv)))))))
 
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
