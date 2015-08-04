@@ -25,8 +25,10 @@ ARTICLE: "io.files" "Reading and writing files"
 { $subsections
     file-contents
     set-file-contents
+    change-file-contents
     file-lines
     set-file-lines
+    change-file-lines
 }
 "Utility combinators:"
 { $subsections
@@ -87,9 +89,19 @@ HELP: file-lines
 }
 { $errors "Throws an error if the file cannot be opened for reading." } ;
 
+HELP: change-file-lines
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation }
+{ $description "Reads the file lines, transforms the file lines, and writes them back to the same file name." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
 HELP: set-file-contents
 { $values { "seq" sequence } { "path" "a pathname string" } { "encoding" "an encoding descriptor" } }
 { $description "Sets the contents of a file to a sequence with the given encoding." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
+HELP: change-file-contents
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation }
+{ $description "Reads the file, transforms the file contents, and writes it back to the same file name." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: file-contents
@@ -97,7 +109,7 @@ HELP: file-contents
 { $description "Opens the file at the given path using the given encoding, and the contents of that file as a sequence." }
 { $errors "Throws an error if the file cannot be opened for reading." } ;
 
-{ set-file-lines file-lines set-file-contents file-contents } related-words
+{ set-file-lines file-lines change-file-lines set-file-contents file-contents change-file-contents } related-words
 
 HELP: exists?
 { $values { "path" "a pathname string" } { "?" boolean } }
