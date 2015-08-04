@@ -3,9 +3,9 @@
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs colors
-combinators.smart continuations fry init kernel locals macros
-math namespaces opengl.gl sequences sequences.generalizations
-specialized-arrays words ;
+combinators.smart continuations fry init io kernel locals macros
+math math.parser namespaces opengl.gl sequences
+sequences.generalizations specialized-arrays words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
@@ -45,6 +45,14 @@ TUPLE: gl-error-tuple function code string ;
 
 : gl-error ( -- )
     f (gl-error) ; inline
+
+: gl-error-nonfatal ( -- )
+    gl-error-code [
+        [
+            [ number>string ] [ error>string ] bi ": " glue
+            "OpenGL error: " prepend print flush
+        ] with-global
+    ] when* ;
 
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
