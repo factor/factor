@@ -445,8 +445,8 @@ void factor_vm::factorbug_usage(bool advanced_p) {
 }
 
 static void exit_fep(factor_vm* vm) {
-  vm->unlock_console();
-  vm->handle_ctrl_c();
+  unlock_console();
+  handle_ctrl_c();
   vm->fep_p = false;
 }
 
