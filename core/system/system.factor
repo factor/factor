@@ -1,7 +1,7 @@
 ! copyright (c) 2007, 2010 slava pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs continuations init io kernel kernel.private make
-math.parser namespaces sequences ;
+math.parser namespaces sequences splitting ;
 IN: system
 
 PRIMITIVE: (exit) ( n -- * )
@@ -23,6 +23,13 @@ UNION: unix macosx linux ;
 : vm-version ( -- string ) \ vm-version get-global ; foldable
 
 : vm-git-label ( -- string ) \ vm-git-label get-global ; foldable
+
+: split-vm-git-label ( -- ref git-id )
+    vm-git-label "-" split1-last ; foldable
+
+: vm-git-ref ( -- string ) split-vm-git-label drop ; foldable
+
+: vm-git-id ( -- string ) split-vm-git-label nip ; foldable
 
 : vm-compiler ( -- string ) \ vm-compiler get-global ; foldable
 
@@ -72,7 +79,8 @@ PRIVATE>
     [
         "Factor " % vm-version %
         " " % cpu cpu>string %
-        " (" % build # ", " % vm-git-label % ", " %
+        " (" % build # ", " %
+        split-vm-git-label [ % "-" % ] [ 10 head % ] bi* ", " %
         vm-compile-time % ")\n[" %
         vm-compiler % "] on " % os os>string %
     ] "" make ;
