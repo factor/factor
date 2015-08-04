@@ -275,3 +275,6 @@ urls [
     }
 }
 [ URL" https://google.com/" url-addr ] unit-test
+
+{ "git+https" }
+[ URL" git+https://google.com/git/factor.git" >url protocol>> ] unit-test
