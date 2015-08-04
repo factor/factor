@@ -2,6 +2,11 @@ using namespace std;
 
 namespace factor {
 
+typedef void (*c_to_factor_func_type)(cell quot);
+typedef void (*unwind_native_frames_func_type)(cell quot, cell to);
+typedef cell (*get_fpu_state_func_type)();
+typedef void (*set_fpu_state_func_type)(cell state);
+
 struct growable_array;
 struct code_root;
 
@@ -213,9 +218,7 @@ struct factor_vm {
   void not_implemented_error();
   void verify_memory_protection_error(cell addr);
   void memory_protection_error(cell pc, cell addr);
-  void signal_error(cell signal);
   void divide_by_zero_error();
-  void fp_trap_error(unsigned int fpu_status);
   void primitive_unimplemented();
   void memory_signal_handler_impl();
   void synchronous_signal_handler_impl();
@@ -360,7 +363,6 @@ struct factor_vm {
   void collect_sweep_impl();
   void collect_full();
   void collect_compact_impl();
-  void collect_compact_code_impl();
   void collect_compact();
   void collect_growing_heap(cell requested_size);
   void gc(gc_op op, cell requested_size);
@@ -560,6 +562,8 @@ struct factor_vm {
   cell compute_entry_point_pic_address(word* w, cell tagged_quot);
   cell compute_entry_point_pic_address(cell w_);
   cell compute_entry_point_pic_tail_address(cell w_);
+  cell compute_external_address(instruction_operand op);
+
   cell code_block_owner(code_block* compiled);
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
@@ -568,7 +572,6 @@ struct factor_vm {
   cell compute_dlsym_toc_address(array* literals, cell index);
 #endif
   cell compute_vm_address(cell arg);
-  void store_external_address(instruction_operand op);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
                                array* parameters,
@@ -587,7 +590,6 @@ struct factor_vm {
     code->allocator->iterate(iter);
   }
 
-  void init_code_heap(cell size);
   void update_code_heap_words(bool reset_inline_caches);
   void initialize_code_blocks();
   void primitive_modify_code_heap();
@@ -666,7 +668,6 @@ struct factor_vm {
   cell lazy_jit_compile(cell quot);
   bool quotation_compiled_p(quotation* quot);
   void primitive_quotation_compiled_p();
-  cell find_all_quotations();
   void initialize_all_quotations();
 
   // dispatch
@@ -734,12 +735,6 @@ struct factor_vm {
   void init_signals();
   void start_sampling_profiler_timer();
   void end_sampling_profiler_timer();
-  static void open_console();
-  static void close_console();
-  static void lock_console();
-  static void unlock_console();
-  static void ignore_ctrl_c();
-  static void handle_ctrl_c();
 
 // os-windows
 #if defined(WINDOWS)

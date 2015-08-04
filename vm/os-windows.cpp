@@ -295,21 +295,21 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
   }
 }
 
-void factor_vm::open_console() { handle_ctrl_c(); }
+void open_console() { handle_ctrl_c(); }
 
-void factor_vm::ignore_ctrl_c() {
+void ignore_ctrl_c() {
   SetConsoleCtrlHandler(factor::ctrl_handler, FALSE);
 }
 
-void factor_vm::handle_ctrl_c() {
+void handle_ctrl_c() {
   SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
-void factor_vm::lock_console() {}
+void lock_console() {}
 
-void factor_vm::unlock_console() {}
+void unlock_console() {}
 
-void factor_vm::close_console() {}
+void close_console() {}
 
 void factor_vm::sampler_thread_loop() {
   LARGE_INTEGER counter, new_counter, units_per_second;

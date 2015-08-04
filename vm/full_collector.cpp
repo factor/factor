@@ -2,6 +2,28 @@
 
 namespace factor {
 
+struct full_policy {
+  factor_vm* parent;
+  tenured_space* tenured;
+
+  explicit full_policy(factor_vm* parent)
+      : parent(parent), tenured(parent->data->tenured) {}
+
+  bool should_copy_p(object* untagged) {
+    return !tenured->contains_p(untagged);
+  }
+
+  void promoted_object(object* obj) {
+    tenured->state.set_marked_p((cell)obj, obj->size());
+    parent->mark_stack.push_back((cell)obj);
+  }
+
+  void visited_object(object* obj) {
+    if (!tenured->state.marked_p((cell)obj))
+      promoted_object(obj);
+  }
+};
+
 /* After a sweep, invalidate any code heap roots which are not marked,
    so that if a block makes a tail call to a generic word, and the PIC
    compiler triggers a GC, and the caller block gets GCd as a result,

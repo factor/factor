@@ -259,34 +259,30 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
   }
 }
 
-void factor_vm::store_external_address(instruction_operand op) {
-
+cell factor_vm::compute_external_address(instruction_operand op) {
   code_block* compiled = op.compiled;
   array* parameters = to_boolean(compiled->parameters)
       ? untag<array>(compiled->parameters)
       : NULL;
-  cell index = op.index;
+  cell idx = op.index;
   relocation_type rel_type = op.rel_type();
 
-  cell ext_addr = lookup_external_address(rel_type,
-                                          compiled,
-                                          parameters,
-                                          index);
+  cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
   if (ext_addr == (cell)-1) {
     ostringstream ss;
     print_obj(ss, compiled->owner);
     ss << ": ";
     cell arg;
     if (rel_type == RT_DLSYM || rel_type == RT_DLSYM_TOC) {
-      ss << "Bad symbol specifier in store_external_address";
-      arg = array_nth(parameters, index);
+      ss << "Bad symbol specifier in compute_external_address";
+      arg = array_nth(parameters, idx);
     } else {
-      ss << "Bad rel type in store_external_address";
+      ss << "Bad rel type in compute_external_address";
       arg = rel_type;
     }
     critical_error(ss.str().c_str(), arg);
   }
-  op.store_value(ext_addr);
+  return ext_addr;
 }
 
 cell factor_vm::compute_here_address(cell arg, cell offset,
@@ -294,8 +290,7 @@ cell factor_vm::compute_here_address(cell arg, cell offset,
   fixnum n = untag_fixnum(arg);
   if (n >= 0)
     return compiled->entry_point() + offset + n;
-  else
-    return compiled->entry_point() - n;
+  return compiled->entry_point() - n;
 }
 
 struct initial_code_block_visitor {
@@ -310,32 +305,28 @@ struct initial_code_block_visitor {
     return array_nth(untag<array>(literals), literal_index++);
   }
 
-  void operator()(instruction_operand op) {
+  fixnum compute_operand_value(instruction_operand op) {
     switch (op.rel_type()) {
       case RT_LITERAL:
-        op.store_value(next_literal());
-        break;
+        return next_literal();
       case RT_ENTRY_POINT:
-        op.store_value(parent->compute_entry_point_address(next_literal()));
-        break;
+        return parent->compute_entry_point_address(next_literal());
       case RT_ENTRY_POINT_PIC:
-        op.store_value(parent->compute_entry_point_pic_address(next_literal()));
-        break;
+        return parent->compute_entry_point_pic_address(next_literal());
       case RT_ENTRY_POINT_PIC_TAIL:
-        op.store_value(
-            parent->compute_entry_point_pic_tail_address(next_literal()));
-        break;
+        return parent->compute_entry_point_pic_tail_address(next_literal());
       case RT_HERE:
-        op.store_value(parent->compute_here_address(
-            next_literal(), op.rel_offset(), op.compiled));
-        break;
+        return parent->compute_here_address(
+            next_literal(), op.rel_offset(), op.compiled);
       case RT_UNTAGGED:
-        op.store_value(untag_fixnum(next_literal()));
-        break;
+        return untag_fixnum(next_literal());
       default:
-        parent->store_external_address(op);
-        break;
+        return parent->compute_external_address(op);
     }
+  }
+
+  void operator()(instruction_operand op) {
+    op.store_value(compute_operand_value(op));
   }
 };
 

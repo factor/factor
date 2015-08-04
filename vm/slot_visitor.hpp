@@ -30,7 +30,8 @@ cell object::base_size(Fixup fixup) const {
     case WRAPPER_TYPE:
       return sizeof(wrapper);
     case CALLSTACK_TYPE: {
-      return callstack_object_size(untag_fixnum(((callstack*)this)->length));
+      cell callstack_length = untag_fixnum(((callstack*)this)->length);
+      return callstack_object_size(callstack_length);
     }
     default:
       critical_error("Invalid header in base_size", (cell)this);
@@ -128,24 +129,19 @@ template <typename Fixup> struct slot_visitor {
   void visit_object_array(cell* start, cell* end);
   void visit_slots(object* ptr);
   void visit_stack_elements(segment* region, cell* top);
-  void visit_data_roots();
-  void visit_callback_roots();
-  void visit_literal_table_roots();
   void visit_all_roots();
   void visit_callstack_object(callstack* stack);
   void visit_callstack(context* ctx);
   void visit_context(context *ctx);
-  void visit_contexts();
   void visit_code_block_objects(code_block* compiled);
   void visit_embedded_literals(code_block* compiled);
-  void visit_sample_callstacks();
-  void visit_sample_threads();
   void visit_object_code_block(object* obj);
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
   void visit_embedded_code_pointers(code_block* compiled);
   void visit_object(object* obj);
   void visit_mark_stack(std::vector<cell>* mark_stack);
+  void visit_instruction_operands(code_block* block, cell rel_base);
 };
 
 template <typename Fixup>
@@ -182,54 +178,39 @@ void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
   visit_object_array((cell*)region->start, top + 1);
 }
 
-template <typename Fixup> void slot_visitor<Fixup>::visit_data_roots() {
-  FACTOR_FOR_EACH(parent->data_roots) {
-    visit_handle(*iter);
-  }
-}
-
-template <typename Fixup> void slot_visitor<Fixup>::visit_callback_roots() {
-  auto callback_slot_visitor = [&](code_block* stub, cell size) {
-    visit_handle(&stub->owner);
-  };
-  parent->callbacks->allocator->iterate(callback_slot_visitor);
-}
-
-template <typename Fixup>
-void slot_visitor<Fixup>::visit_literal_table_roots() {
-  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
-    iter->second = visit_pointer(iter->second);
-  }
-}
-
-template <typename Fixup> void slot_visitor<Fixup>::visit_sample_callstacks() {
-  FACTOR_FOR_EACH(parent->sample_callstacks) {
-    visit_handle(&*iter);
-  }
-}
-
-template <typename Fixup> void slot_visitor<Fixup>::visit_sample_threads() {
-  FACTOR_FOR_EACH(parent->samples) {
-    visit_handle(&iter->thread);
-  }
-}
-
 template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   visit_handle(&parent->true_object);
   visit_handle(&parent->bignum_zero);
   visit_handle(&parent->bignum_pos_one);
   visit_handle(&parent->bignum_neg_one);
 
-  visit_data_roots();
-  visit_callback_roots();
-  visit_literal_table_roots();
-  visit_sample_callstacks();
-  visit_sample_threads();
+  FACTOR_FOR_EACH(parent->data_roots) {
+    visit_handle(*iter);
+  }
+
+  auto callback_slot_visitor = [&](code_block* stub, cell size) {
+    visit_handle(&stub->owner);
+  };
+  parent->callbacks->allocator->iterate(callback_slot_visitor);
+
+  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
+    iter->second = visit_pointer(iter->second);
+  }
+
+  FACTOR_FOR_EACH(parent->sample_callstacks) {
+    visit_handle(&*iter);
+  }
+
+  FACTOR_FOR_EACH(parent->samples) {
+    visit_handle(&iter->thread);
+  }
 
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
 
-  visit_contexts();
+  FACTOR_FOR_EACH(parent->active_contexts) {
+    visit_context(*iter);
+  }
 }
 
 /* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
@@ -367,12 +348,6 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
   ctx->fill_stack_seg(rs_ptr, rs_seg, 0xdaabdaab);
 }
 
-template <typename Fixup> void slot_visitor<Fixup>::visit_contexts() {
-  FACTOR_FOR_EACH(parent->active_contexts) {
-    visit_context(*iter);
-  }
-}
-
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_code_block_objects(code_block* compiled) {
   visit_handle(&compiled->owner);
@@ -490,6 +465,42 @@ void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
       visit_object_code_block(obj);
     }
   }
+}
+
+/* Visits the instruction operands in a code block. If the operand is
+   a pointer to a code block or data object, then the fixup is applied
+   to it. Otherwise, if it is an external addess, that address is
+   recomputed. If it is an untagged number literal (RT_UNTAGGED) or an
+   immediate value, then nothing is done with it. */
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
+                                                     cell rel_base) {
+  auto visit_func = [&](instruction_operand op){
+    cell old_offset = rel_base + op.rel_offset();
+    cell value = op.load_value(old_offset);
+    switch (op.rel_type()) {
+      case RT_LITERAL: {
+        value = visit_pointer(value);
+        break;
+      }
+      case RT_ENTRY_POINT:
+      case RT_ENTRY_POINT_PIC:
+      case RT_ENTRY_POINT_PIC_TAIL:
+      case RT_HERE: {
+        cell offset = TAG(value);
+        code_block* compiled = (code_block*)UNTAG(value);
+        value = RETAG(fixup.fixup_code(compiled), offset);
+        break;
+      }
+      case RT_UNTAGGED:
+        break;
+      default:
+        value = parent->compute_external_address(op);
+        break;
+    }
+    op.store_value(value);
+  };
+  block->each_instruction_operand(visit_func);
 }
 
 }

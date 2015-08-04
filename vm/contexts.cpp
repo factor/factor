@@ -42,6 +42,23 @@ void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
 #endif
 }
 
+vm_error_type context::address_to_error(cell addr) {
+  if (datastack_seg->underflow_p(addr))
+    return ERROR_DATASTACK_UNDERFLOW;
+  if (datastack_seg->overflow_p(addr))
+    return ERROR_DATASTACK_OVERFLOW;
+  if (retainstack_seg->underflow_p(addr))
+    return ERROR_RETAINSTACK_UNDERFLOW;
+  if (retainstack_seg->overflow_p(addr))
+    return ERROR_RETAINSTACK_OVERFLOW;
+  /* These are flipped because the callstack grows downwards. */
+  if (callstack_seg->underflow_p(addr))
+    return ERROR_CALLSTACK_OVERFLOW;
+  if (callstack_seg->overflow_p(addr))
+    return ERROR_CALLSTACK_UNDERFLOW;
+  return ERROR_MEMORY;
+}
+
 void context::reset() {
   reset_datastack();
   reset_retainstack();

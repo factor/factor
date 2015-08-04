@@ -33,7 +33,7 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
   if (h->code_size > p->code_size)
     fatal_error("Code heap too small to fit image", h->code_size);
 
-  init_code_heap(p->code_size);
+  code = new code_heap(p->code_size);
 
   if (h->code_size != 0) {
     size_t bytes_read =
@@ -109,59 +109,13 @@ void factor_vm::fixup_data(cell data_offset, cell code_offset) {
   data->tenured->iterate(start_object_updater, fixup);
 }
 
-struct startup_code_block_relocation_visitor {
-  factor_vm* parent;
-  startup_fixup fixup;
-  slot_visitor<startup_fixup> visitor;
-
-  startup_code_block_relocation_visitor(factor_vm* parent,
-                                        startup_fixup fixup)
-      : parent(parent),
-        fixup(fixup),
-        visitor(slot_visitor<startup_fixup>(parent, fixup)) {}
-
-  void operator()(instruction_operand op) {
-    code_block* compiled = op.compiled;
-    cell old_offset =
-        op.rel_offset() + compiled->entry_point() - fixup.code_offset;
-
-    switch (op.rel_type()) {
-      case RT_LITERAL: {
-        cell value = op.load_value(old_offset);
-        if (immediate_p(value))
-          op.store_value(value);
-        else
-          op.store_value(
-              RETAG(fixup.fixup_data(untag<object>(value)), TAG(value)));
-        break;
-      }
-      case RT_ENTRY_POINT:
-      case RT_ENTRY_POINT_PIC:
-      case RT_ENTRY_POINT_PIC_TAIL:
-      case RT_HERE: {
-        cell value = op.load_value(old_offset);
-        cell offset = TAG(value);
-        code_block* compiled = (code_block*)UNTAG(value);
-        op.store_value((cell)fixup.fixup_code(compiled) + offset);
-        break;
-      }
-      case RT_UNTAGGED:
-        break;
-      default:
-        parent->store_external_address(op);
-        break;
-    }
-  }
-};
-
 void factor_vm::fixup_code(cell data_offset, cell code_offset) {
   startup_fixup fixup(data_offset, code_offset);
   auto updater = [&](code_block* compiled, cell size) {
     slot_visitor<startup_fixup> visitor(this, fixup);
     visitor.visit_code_block_objects(compiled);
-
-    startup_code_block_relocation_visitor code_visitor(this, fixup);
-    compiled->each_instruction_operand(code_visitor);
+    cell rel_base = compiled->entry_point() - fixup.code_offset;
+    visitor.visit_instruction_operands(compiled, rel_base);
   };
   code->allocator->iterate(updater, fixup);
 }

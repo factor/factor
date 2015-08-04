@@ -43,7 +43,7 @@ void quotation_jit::init_quotation(cell quot) {
 
 bool quotation_jit::primitive_call_p(cell i, cell length) {
   return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-                                  parent->special_objects[JIT_PRIMITIVE_WORD];
+      parent->special_objects[JIT_PRIMITIVE_WORD];
 }
 
 bool quotation_jit::fast_if_p(cell i, cell length) {
@@ -92,12 +92,6 @@ bool quotation_jit::special_subprimitive_p(cell obj) {
          obj == parent->special_objects[FFI_SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[FFI_LEAF_SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
-}
-
-bool quotation_jit::word_stack_frame_p(cell obj) {
-  return (to_boolean(untag<word>(obj)->subprimitive) &&
-          !special_subprimitive_p(obj)) ||
-         obj == parent->special_objects[JIT_PRIMITIVE_WORD];
 }
 
 bool quotation_jit::word_safepoint_p(cell obj) {
@@ -401,11 +395,9 @@ void factor_vm::primitive_quotation_compiled_p() {
 }
 
 /* Allocates memory */
-cell factor_vm::find_all_quotations() { return instances(QUOTATION_TYPE); }
-
-/* Allocates memory */
 void factor_vm::initialize_all_quotations() {
-  data_root<array> quotations(find_all_quotations(), this);
+  cell all_quots = instances(QUOTATION_TYPE);
+  data_root<array> quotations(all_quots, this);
 
   cell length = array_capacity(quotations.untagged());
   for (cell i = 0; i < length; i++) {

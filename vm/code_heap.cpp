@@ -94,9 +94,6 @@ void code_heap::initialize_all_blocks_set() {
 #endif
 }
 
-/* Allocate a code heap during startup */
-void factor_vm::init_code_heap(cell size) { code = new code_heap(size); }
-
 /* Update pointers to words referenced from all code blocks.
 Only needed after redefining an existing word.
 If generic words were redefined, inline caches need to be reset. */

@@ -1,6 +1,5 @@
-USING: kernel math namespaces io tools.test sequences vectors
-continuations debugger parser memory arrays words
-kernel.private accessors eval ;
+USING: accessors arrays continuations debugger eval io kernel kernel.private
+math memory namespaces parser sequences system tools.test vectors words ;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )
@@ -55,6 +54,25 @@ IN: continuations.tests
 !
 ! : callstack-overflow callstack-overflow f ;
 ! [ callstack-overflow ] must-fail
+
+! This tries to verify that enough bytes are cut off from the
+! callstack to run the error handler.
+: pre ( -- ) nano-count 0 = [ ] [ ] if ;
+
+: post ( -- ) ;
+
+: do-overflow ( -- )
+    pre do-overflow post ;
+
+: recurse ( -- ? )
+    [ do-overflow f ] [ ] recover
+    second ERROR-CALLSTACK-OVERFLOW = ;
+
+os windows? [
+    { t } [
+        10 [ recurse ] replicate [ ] all?
+    ] unit-test
+] unless
 
 : don't-compile-me ( -- ) ;
 : foo ( -- ) callstack "c" set don't-compile-me ;
