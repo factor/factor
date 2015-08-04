@@ -37,9 +37,14 @@ QUALIFIED: opencl
 : word>gc-info-expected ( word -- seq/f )
     test-regs first cfg>gc-maps tally-gc-maps ;
 
-: same-gc-info? ( compiler-gc-info gc-info -- ? )
-    [ struct-slot-values = ]
-    [ [ not ] dip return-address-count>> 0 = and ] 2bi or ;
+! Handle f f as input. Deferred words don't have any gc-info. See #1394.
+: same-gc-info? ( compiler-gc-info/f gc-info/f -- ? )
+    2dup = [
+        2drop t
+    ] [
+        [ struct-slot-values = ]
+        [ [ not ] dip return-address-count>> 0 = and ] 2bi or
+    ] if ;
 
 : base-pointer-groups-expected ( word -- seq )
     test-regs first cfg>gc-maps [ derived-root-offsets { } like ] { } map-as ;
