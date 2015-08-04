@@ -1,6 +1,6 @@
 ifdef CONFIG
 	VERSION = 0.98
-	GIT_LABEL = $(shell git describe --all --long)
+	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
 
 	BUNDLE = Factor.app
 
