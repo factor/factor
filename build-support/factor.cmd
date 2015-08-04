@@ -27,9 +27,11 @@ if not errorlevel 1 (
     ) else goto nocl
 )
 
-git describe --all --long > git_label.tmp
-set /p git_label= < git_label.tmp
+: Fun syntax
+for /f %%x in ('git describe --all') do set GIT_DESCRIBE=%%x
+for /f %%y in ('git rev-parse HEAD') do call set GIT_ID=%%y
 
+set git_label=%GIT_DESCRIBE%-%GIT_ID%
 set version=0.98
 
 if %_bootimage_version%==clean (
