@@ -17,6 +17,7 @@ IN: mason.report
     disk-usage
     build-dir
     current-git-id get git-link
+    build number>string
     [XML
     <h1>Build report for <->/<-></h1>
     <table>
@@ -24,6 +25,7 @@ IN: mason.report
     <tr><td>Disk usage:</td><td><-></td></tr>
     <tr><td>Build directory:</td><td><-></td></tr>
     <tr><td>GIT ID:</td><td><-></td></tr>
+    <tr><td>Build number:</td><td><-></td></tr>
     </table>
     XML] ;
 
