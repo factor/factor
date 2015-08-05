@@ -198,7 +198,7 @@ these lines in your .emacs:
   (concat (syntax-begin prefixes) ws+ symbol))
 
 (defun syntax-and-2-symbols (prefixes)
-  (concat (syntax-begin prefixes) ws+ symbol ws+ symbol))
+  (concat (syntax-and-1-symbol prefixes) ws+ symbol))
 
 ;; Used to font-lock stack effect declarations with may be nested.
 (defun factor-match-brackets (limit)
@@ -220,17 +220,16 @@ these lines in your .emacs:
     "B" "BEFORE:"
     "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:"
     "CONSULT:" "call-next-method"
-    "DEFER:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
-    "GAME:" "GENERIC#" "GENERIC:" "GIR:"
+    "GAME:" "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
-    "HINTS:" "HOOK:"
+    "HINTS:"
     "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
     "M:" "M::" "MACRO:" "MACRO::" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
-    "POSTPONE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
+    "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
@@ -293,16 +292,16 @@ these lines in your .emacs:
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
 (defconst factor-word-definition-regex
-  (format "\\_<\\(%s\\)?[:#] +\\(%s\\)"
-          (regexp-opt
-           '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "POSTPONE"
-             "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:"))
-          "\\(\\sw\\|\\s_\\|\\s(\\|\\s)\\)+"))
+  (concat
+   (format "\\_<\\(\\(?:%s\\)?[:#]\\)"
+           (regexp-opt
+            '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "POSTPONE"
+              "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:")))
+   ws+ symbol))
 
 ;; [parsing-word] [vocab-word]
 (defconst factor-vocab-ref-regex
-  (syntax-and-1-symbol
-   '("IN" "USE" "EXCLUDE" "QUALIFIED" "QUALIFIED-WITH")))
+  (syntax-and-1-symbol '("IN" "USE" "QUALIFIED")))
 
 (defconst factor-using-lines-regex
   (concat (syntax-begin '("USING")) ws+ symbols-to-semicolon))
@@ -424,6 +423,9 @@ these lines in your .emacs:
 (defconst factor-alias-regex
   (syntax-and-2-symbols '("ALIAS")))
 
+(defconst factor-qualified-with-regex
+  (syntax-and-2-symbols '("QUALIFIED-WITH")))
+
 (defconst factor-c-global-regex
   (format "\\_<C-GLOBAL: +%s +%s\\( .*\\)?$" symbol symbol))
 
@@ -480,10 +482,14 @@ these lines in your .emacs:
                           (3 'factor-font-lock-word)
                           (4 'factor-font-lock-invalid-syntax nil t))
     (,factor-declaration-words-regex . 'factor-font-lock-comment)
-    (,factor-word-definition-regex 2 'factor-font-lock-word)
+    (,factor-word-definition-regex (1 'factor-font-lock-parsing-word)
+                                   (2 'factor-font-lock-word))
     (,factor-alias-regex (1 'factor-font-lock-parsing-word)
                          (2 'factor-font-lock-word)
                          (3 'factor-font-lock-word))
+    (,factor-qualified-with-regex (1 'factor-font-lock-parsing-word)
+                                  (2 'factor-font-lock-vocabulary-name)
+                                  (3 'factor-font-lock-word))
     (,factor-int-constant-def-regex 2 'factor-font-lock-constant)
     (,factor-integer-regex . 'factor-font-lock-number)
     (,factor-float-regex . 'factor-font-lock-number)
