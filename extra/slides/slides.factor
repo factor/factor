@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables help.markup help.stylesheet io
-io.styles kernel math models namespaces sequences ui ui.gadgets
-ui.gadgets.books ui.gadgets.panes ui.gestures ui.pens.gradient
-parser accessors colors fry ;
+USING: accessors arrays colors fry help.markup help.stylesheet
+io.styles kernel math math.ranges models namespaces parser
+sequences ui ui.gadgets ui.gadgets.books ui.gadgets.panes
+ui.gestures ui.pens.gradient ;
 IN: slides
 
 CONSTANT: stylesheet
@@ -46,36 +46,40 @@ CONSTANT: stylesheet
     }
 
 : $title ( string -- )
-    [ H{ { font-name "sans-serif" } { font-size 48 } } format ] ($block) ;
+    [
+        H{
+            { font-name "sans-serif" }
+            { font-size 48 }
+        } format
+    ] ($block) ;
 
 : $divider ( -- )
     [
         <gadget>
-        {
-            T{ rgba f 0.25 0.25 0.25 1.0 }
-            T{ rgba f 1.0 1.0 1.0 0.0 }
-        } <gradient> >>interior
-        { 800 10 } >>dim
-        { 1 0 } >>orientation
+            {
+                T{ rgba f 0.25 0.25 0.25 1.0 }
+                T{ rgba f 1.0 1.0 1.0 0.0 }
+            } <gradient> >>interior
+            { 800 10 } >>dim
+            { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 
-: page-theme ( gadget -- )
-    { T{ rgba f 0.8 0.8 1.0 1.0 } T{ rgba f 0.8 1.0 1.0 1.0 } } <gradient>
-    >>interior drop ;
+: page-theme ( gadget -- gadget )
+    {
+        T{ rgba f 0.8 0.8 1.0 1.0 }
+        T{ rgba f 0.8 1.0 1.0 1.0 }
+    } <gradient> >>interior ;
 
 : <page> ( list -- gadget )
     [
         stylesheet clone [
             [ print-element ] with-default-style
         ] with-variables
-    ] make-pane
-    dup page-theme ;
+    ] make-pane page-theme ;
 
 : $slide ( element -- )
-    unclip $title
-    $divider
-    $list ;
+    unclip $title $divider $list ;
 
 TUPLE: slides < book ;
 
@@ -90,16 +94,11 @@ TUPLE: slides < book ;
 
 : prev-page ( book -- ) -1 change-page ;
 
-: (strip-tease) ( data n -- data )
-    [ first3 ] dip head 3array ;
-
 : strip-tease ( data -- seq )
-    dup third length 1 - iota [
-        2 + (strip-tease)
-    ] with map ;
+    first3 2 over length [a,b] [ head 3array ] with with with map ;
 
 SYNTAX: STRIP-TEASE:
-    parse-definition strip-tease [ suffix! ] each ;
+    parse-definition strip-tease append! ;
 
 \ slides H{
     { T{ button-down } [ request-focus ] }
