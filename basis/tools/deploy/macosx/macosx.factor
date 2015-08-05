@@ -72,6 +72,9 @@ IN: tools.deploy.macosx
     [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
+: ?show-in-finder ( path -- )
+    open-directory-after-deploy? get [ show-in-finder ] [ drop ] if ;
+
 : deploy.app-image-name ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
@@ -85,7 +88,7 @@ IN: tools.deploy.macosx
             bundle-name
             [ "Contents/Resources" copy-resources ]
             [ "Contents/Frameworks" copy-libraries ] 2bi
-            bundle-name show-in-finder
+            bundle-name ?show-in-finder
         ] with-variables
     ] with-directory ;
 
