@@ -10,7 +10,8 @@ IN: mason.child
 ! Make sure we call the build directory's factor.cmd
 : nmake-cmd ( -- args )
     "./build-support/factor.cmd" absolute-path
-    target-cpu get name>> "." split "-" join 2array ;
+    "latest"
+    target-cpu get name>> "." split "-" join 3array ;
 
 : gnu-make-cmd ( -- args )
     gnu-make
