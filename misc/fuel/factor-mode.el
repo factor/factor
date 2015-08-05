@@ -540,7 +540,7 @@ these lines in your .emacs:
      ;; Regexp from hell that puts every type name in the first group,
      ;; names and brackets in the second and third.
      ("\\(?:\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\(\\(?:\\sw\\|\\s_\\)+,?\\(?:[ \n]+)\\)?\\)\\|\\([()]\\)\\)"
-      (factor-find-end-of-def)
+      (factor-find-ending-bracket)
       nil
       (1 'factor-font-lock-type-in-stack-effect nil t)
       (2 'factor-font-lock-stack-effect nil t)
@@ -554,7 +554,7 @@ these lines in your .emacs:
      (3 'factor-font-lock-type-name)
      (4 'factor-font-lock-word)
      ("\\(?:\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\(\\(?:\\sw\\|\\s_\\)+,?\\(?:[ \n]+)\\)?\\)\\|\\([()]\\)\\)"
-      (factor-find-end-of-def)
+      (factor-find-ending-bracket)
       nil
       (1 'factor-font-lock-type-in-stack-effect nil t)
       (2 'factor-font-lock-stack-effect nil t)
@@ -670,6 +670,16 @@ these lines in your .emacs:
     (re-search-forward factor-end-of-def-regex nil t)
     (point)))
 
+(defun factor-find-end-of-def (&rest foo)
+  (save-excursion
+    (re-search-forward "[ \n];" nil t)
+    (1- (point))))
+
+(defun factor-find-ending-bracket (&rest foo)
+  (save-excursion
+    (re-search-forward "[ \n]\)" nil t)
+    (point)))
+
 (defun factor-beginning-of-body ()
   (let ((p (point)))
     (and (factor-beginning-of-defun)
@@ -683,11 +693,6 @@ these lines in your .emacs:
 
 (defsubst factor-beginning-of-sexp-pos ()
   (save-excursion (factor-beginning-of-sexp) (point)))
-
-(defun factor-find-end-of-def (&rest foo)
-  (save-excursion
-    (re-search-forward " ;" nil t)
-    (1- (point))))
 
 
 ;;; USING/IN:
