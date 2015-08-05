@@ -216,9 +216,9 @@ these lines in your .emacs:
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
   '(":" "::" ";" ":>" "&:" "<<" "<PRIVATE" ">>"
-    "ABOUT:" "AFTER:" "ALIEN:" "ARTICLE:"
-    "B" "BEFORE:"
-    "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:"
+    "ABOUT:" "ARTICLE:"
+    "B"
+    "COLOR:"
     "CONSULT:" "call-next-method"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
@@ -226,12 +226,11 @@ these lines in your .emacs:
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HINTS:"
     "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
-    "M:" "M::" "MACRO:" "MACRO::" "MATH:"
-    "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
-    "NAN:"
+    "MACRO:" "MACRO::" "MATH:"
+    "MEMO:" "MEMO:" "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only" "REQUIRE:"  "REQUIRES:"
-    "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:"
+    "SINGLETONS:" "SLOT:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
     "TYPED:" "TYPED::"
     "UNIFORM-TUPLE:"
@@ -263,15 +262,6 @@ these lines in your .emacs:
 
 (defconst factor-declaration-words-regex
   (regexp-opt factor-declaration-words 'symbols))
-
-(defconst factor-method-definition-regex
-  "^M::? +\\([^ ]+\\) +\\([^ ]+\\)")
-
-(defconst factor-before-definition-regex
-  "^BEFORE: +\\([^ ]+\\) +\\([^ ]+\\)")
-
-(defconst factor-after-definition-regex
-  "^AFTER: +\\([^ ]+\\) +\\([^ ]+\\)")
 
 (defconst factor-integer-regex
   "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9]+\\)\\_>")
@@ -316,16 +306,15 @@ these lines in your .emacs:
 (defconst factor-symbols-lines-regex
   (concat (syntax-begin '("SYMBOLS")) ws+ symbols-to-semicolon))
 
-(defconst factor-int-constant-def-regex
-  (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")))
+;; (defconst factor-int-constant-def-regex
+;;   (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")))
 
 (defconst factor-type-definition-regex
   (syntax-and-1-symbol
-   '("C-STRUCT" "C-UNION" "COM-INTERFACE" "MIXIN" "SINGLETON"
-     "SPECIALIZED-ARRAY" "STRUCT" "UNION-STRUCT")))
+   '("COM-INTERFACE" "C-TYPE" "MIXIN" "SINGLETON" "SPECIALIZED-ARRAY")))
 
 (defconst factor-constructor-regex
-  "<[^ >]+>")
+  (one-symbol "<[^ >]+>"))
 
 (defconst factor-getter-regex
   (one-symbol "\\(?:\\sw\\|\\s_\\)+>>"))
@@ -414,23 +403,8 @@ these lines in your .emacs:
           factor-word-signature-regex
           "M[^:]*: [^ ]+ [^ ]+"))
 
-(defconst factor-constructor-decl-regex
-  (syntax-and-2-symbols '("C")))
-
 (defconst factor-typedef-regex
   (syntax-and-2-symbols '("TYPEDEF" "INSTANCE")))
-
-(defconst factor-alias-regex
-  (syntax-and-2-symbols '("ALIAS")))
-
-(defconst factor-qualified-with-regex
-  (syntax-and-2-symbols '("QUALIFIED-WITH")))
-
-(defconst factor-c-global-regex
-  (format "\\_<C-GLOBAL: +%s +%s\\( .*\\)?$" symbol symbol))
-
-(defconst factor-c-type-regex
-  (format "\\_<C-TYPE: +%s\\( .*\\)?$" symbol))
 
 (defconst factor-rename-regex
   (concat (syntax-and-2-symbols '("RENAME")) ws+ "\\(=>\\)" ws+ symbol))
@@ -440,67 +414,56 @@ these lines in your .emacs:
           symbol ws+
           "\\(=>\\)" ws+ symbols-to-semicolon))
 
+(defconst factor-group-name-to-face
+  #s(hash-table test equal data
+                ("C" 'factor-font-lock-comment
+                 "CO" 'factor-font-lock-constructor
+                 "CT" 'factor-font-lock-constant
+                 "P" 'factor-font-lock-parsing-word
+                 "V" 'factor-font-lock-vocabulary-name
+                 "T" 'factor-font-lock-type-name
+                 "W" 'factor-font-lock-word)))
+
+(defun factor-group-name-to-face (group-name)
+  (gethash group-name factor-group-name-to-face))
+
+
+(defun factor-groups-to-font-lock (groups)
+  (let ((i 0))
+    (mapcar (lambda (x)
+              (setq i (1+ i))
+              (list i (factor-group-name-to-face x)))
+            groups)))
+
+(defun factor-syntax (regex groups)
+  (append (list regex) (factor-groups-to-font-lock groups)))
+
 
 ;;; Font lock:
 
 (defconst factor-font-lock-keywords
   `(
-    (,factor-brace-words-regex 1 'factor-font-lock-parsing-word)
-    (,factor-vocab-ref-regex (1 'factor-font-lock-parsing-word)
-                             (2 'factor-font-lock-vocabulary-name))
-    (,factor-using-lines-regex (1 'factor-font-lock-parsing-word)
-                               (2 'factor-font-lock-vocabulary-name)
-                               (3 'factor-font-lock-parsing-word))
-    (,factor-symbols-lines-regex (1 'factor-font-lock-parsing-word)
-                                 (2 'factor-font-lock-word)
-                                 (3 'factor-font-lock-parsing-word))
-    (,factor-from/exclude-regex (1 'factor-font-lock-parsing-word)
-                                (2 'factor-font-lock-vocabulary-name)
-                                (3 'factor-font-lock-parsing-word)
-                                (4 'factor-font-lock-word)
-                                (5 'factor-font-lock-parsing-word))
-    (,factor-rename-regex (1 'factor-font-lock-parsing-word)
-                          (2 'factor-font-lock-word)
-                          (3 'factor-font-lock-vocabulary-name)
-                          (4 'factor-font-lock-parsing-word)
-                          (5 'factor-font-lock-word))
-    (,factor-constructor-decl-regex (1 'factor-font-lock-parsing-word)
-                                    (2 'factor-font-lock-word)
-                                    (3 'factor-font-lock-type-name))
-    (,factor-symbol-definition-regex (1 'factor-font-lock-parsing-word)
-                                     (2 'factor-font-lock-word))
-    (,factor-typedef-regex (1 'factor-font-lock-parsing-word)
-                           (2 'factor-font-lock-type-name)
-                           (3 'factor-font-lock-type-name))
-    (,factor-c-global-regex (1 'factor-font-lock-type-name)
-                            (2 'factor-font-lock-word)
-                            (3 'factor-font-lock-invalid-syntax nil t))
-    (,factor-c-type-regex (1 'factor-font-lock-type-name)
-                          (2 'factor-font-lock-invalid-syntax nil t))
-    (,factor-rename-regex (1 'factor-font-lock-word)
-                          (2 'factor-font-lock-vocabulary-name)
-                          (3 'factor-font-lock-word)
-                          (4 'factor-font-lock-invalid-syntax nil t))
-    (,factor-declaration-words-regex . 'factor-font-lock-comment)
-    (,factor-word-definition-regex (1 'factor-font-lock-parsing-word)
-                                   (2 'factor-font-lock-word))
-    (,factor-alias-regex (1 'factor-font-lock-parsing-word)
-                         (2 'factor-font-lock-word)
-                         (3 'factor-font-lock-word))
-    (,factor-qualified-with-regex (1 'factor-font-lock-parsing-word)
-                                  (2 'factor-font-lock-vocabulary-name)
-                                  (3 'factor-font-lock-word))
-    (,factor-int-constant-def-regex 2 'factor-font-lock-constant)
+    ,(factor-syntax factor-brace-words-regex '("P"))
+    ,(factor-syntax factor-vocab-ref-regex '("P" "V"))
+    ,(factor-syntax factor-using-lines-regex '("P" "V" "P"))
+    ,(factor-syntax factor-symbols-lines-regex '("P" "W" "P"))
+    ,(factor-syntax factor-from/exclude-regex '("P" "V" "P" "W" "P"))
+    ,(factor-syntax (syntax-and-2-symbols '("C")) '("P" "W" "T"))
+    ,(factor-syntax factor-symbol-definition-regex '("P" "W"))
+    ,(factor-syntax factor-typedef-regex '("P" "T" "T"))
+    ,(factor-syntax (syntax-and-2-symbols '("C-GLOBAL")) '("P" "T" "W"))
+    ,(factor-syntax (syntax-and-2-symbols '("QUALIFIED-WITH")) '("P" "V" "W"))
+    ,(factor-syntax factor-rename-regex '("P" "W" "V" "P" "W"))
+    ,(factor-syntax factor-declaration-words-regex '("C"))
+    ,(factor-syntax factor-word-definition-regex '("P" "W"))
+    ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
+    ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
     (,factor-integer-regex . 'factor-font-lock-number)
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
-    (,factor-type-definition-regex 2 'factor-font-lock-type-name)
-    (,factor-method-definition-regex (1 'factor-font-lock-type-name)
-                                     (2 'factor-font-lock-word))
-    (,factor-before-definition-regex (1 'factor-font-lock-type-name)
-                                     (2 'factor-font-lock-word))
-    (,factor-after-definition-regex  (1 'factor-font-lock-type-name)
-                                     (2 'factor-font-lock-word))
+    ,(factor-syntax factor-type-definition-regex '("P" "T"))
+    ,(factor-syntax (syntax-and-2-symbols '("M" "M:" "BEFORE" "AFTER"))
+                    '("P" "T" "W"))
 
     ;; Highlights tuple and struct definitions. The TUPLE/STRUCT
     ;; parsing word, class name and optional parent classes are
@@ -508,7 +471,6 @@ these lines in your .emacs:
     ;; definition that is terminated with ";" is searched for words
     ;; that are slot names which are highlighted with the face
     ;; factor-font-lock-symbol.
-
     (,(format
        "\\(%s:\\)[ \n]+%s\\(?:[ \n]+\\(<\\)[ \n]+%s\\)?"
        (regexp-opt '("BUILTIN"
@@ -566,13 +528,13 @@ these lines in your .emacs:
       (2 'factor-font-lock-stack-effect nil t)
       (3 'factor-font-lock-stack-effect nil t)))
     (factor-match-brackets . 'factor-font-lock-stack-effect)
-    (,factor-constructor-regex . 'factor-font-lock-constructor)
+    ,(factor-syntax factor-constructor-regex '("CO"))
     (,factor-setter-regex . 'factor-font-lock-setter-word)
     (,factor-getter-regex . 'factor-font-lock-getter-word)
     (,factor-bad-string-regex . 'factor-font-lock-invalid-syntax)
     ("\\_<\\(P\\|SBUF\\|DLL\\)\"" 1 'factor-font-lock-parsing-word)
     (,factor-constant-words-regex . 'factor-font-lock-constant)
-    (,factor-parsing-words-regex . 'factor-font-lock-parsing-word)
+    ,(factor-syntax factor-parsing-words-regex '("P"))
     (,"\t" . 'whitespace-highlight-face)))
 
 ;; Handling of multi-line constructs
