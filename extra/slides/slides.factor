@@ -104,7 +104,7 @@ SYNTAX: STRIP-TEASE:
     { T{ button-down } [ request-focus ] }
     { T{ key-down f f "DOWN" } [ next-page ] }
     { T{ key-down f f "UP" } [ prev-page ] }
-    { T{ key-down f f "f" } [ dup fullscreen? not set-fullscreen ] }
+    { T{ key-down f f "f" } [ toggle-fullscreen ] }
 } set-gestures
 
 : slides-window ( slides -- )
