@@ -194,8 +194,11 @@ these lines in your .emacs:
 (defun syntax-begin (content)
   (one-symbol (concat (regexp-opt content) ":")))
 
-(defsubst factor-second-word-regex (prefixes)
+(defun syntax-and-1-symbol (prefixes)
   (concat (syntax-begin prefixes) ws+ symbol))
+
+(defun syntax-and-2-symbols (prefixes)
+  (concat (syntax-begin prefixes) ws+ symbol ws+ symbol))
 
 ;; Used to font-lock stack effect declarations with may be nested.
 (defun factor-match-brackets (limit)
@@ -213,7 +216,7 @@ these lines in your .emacs:
 ;; Excludes parsing words that are handled by other regexps
 (defconst factor-parsing-words
   '(":" "::" ";" ":>" "&:" "<<" "<PRIVATE" ">>"
-    "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
+    "ABOUT:" "AFTER:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:"
     "C-GLOBAL:" "C-TYPE:" "CHAR:" "COLOR:" "COM-INTERFACE:"
     "CONSULT:" "call-next-method"
@@ -296,12 +299,9 @@ these lines in your .emacs:
              "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:"))
           "\\(\\sw\\|\\s_\\|\\s(\\|\\s)\\)+"))
 
-(defconst factor-alias-definition-regex
-  "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
-
 ;; [parsing-word] [vocab-word]
 (defconst factor-vocab-ref-regex
-  (factor-second-word-regex
+  (syntax-and-1-symbol
    '("IN" "USE" "EXCLUDE" "QUALIFIED" "QUALIFIED-WITH")))
 
 (defconst factor-using-lines-regex
@@ -309,7 +309,7 @@ these lines in your .emacs:
 
 ;; [parsing-word] [symbol-word]
 (defconst factor-symbol-definition-regex
-  (factor-second-word-regex
+  (syntax-and-1-symbol
    '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "HELP" "LIBRARY"
      "MAIN" "STRING" "SYMBOL" "VAR")))
 
@@ -318,10 +318,10 @@ these lines in your .emacs:
   (concat (syntax-begin '("SYMBOLS")) ws+ symbols-to-semicolon))
 
 (defconst factor-int-constant-def-regex
-  (factor-second-word-regex '("ALIEN" "CHAR" "NAN")))
+  (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")))
 
 (defconst factor-type-definition-regex
-  (factor-second-word-regex
+  (syntax-and-1-symbol
    '("C-STRUCT" "C-UNION" "COM-INTERFACE" "MIXIN" "SINGLETON"
      "SPECIALIZED-ARRAY" "STRUCT" "UNION-STRUCT")))
 
@@ -416,10 +416,13 @@ these lines in your .emacs:
           "M[^:]*: [^ ]+ [^ ]+"))
 
 (defconst factor-constructor-decl-regex
-  (concat (syntax-begin '("C")) ws+ symbol ws+ symbol))
+  (syntax-and-2-symbols '("C")))
 
 (defconst factor-typedef-regex
-  (concat (syntax-begin '("TYPEDEF" "INSTANCE")) ws+ symbol ws+ symbol))
+  (syntax-and-2-symbols '("TYPEDEF" "INSTANCE")))
+
+(defconst factor-alias-regex
+  (syntax-and-2-symbols '("ALIAS")))
 
 (defconst factor-c-global-regex
   (format "\\_<C-GLOBAL: +%s +%s\\( .*\\)?$" symbol symbol))
@@ -428,10 +431,7 @@ these lines in your .emacs:
   (format "\\_<C-TYPE: +%s\\( .*\\)?$" symbol))
 
 (defconst factor-rename-regex
-  (concat (syntax-begin '("RENAME")) ws+
-          symbol ws+
-          symbol ws+
-          "\\(=>\\)" ws+ symbol))
+  (concat (syntax-and-2-symbols '("RENAME")) ws+ "\\(=>\\)" ws+ symbol))
 
 (defconst factor-from/exclude-regex
   (concat (syntax-begin '("FROM" "EXCLUDE")) ws+
@@ -481,8 +481,9 @@ these lines in your .emacs:
                           (4 'factor-font-lock-invalid-syntax nil t))
     (,factor-declaration-words-regex . 'factor-font-lock-comment)
     (,factor-word-definition-regex 2 'factor-font-lock-word)
-    (,factor-alias-definition-regex (1 'factor-font-lock-word)
-                                    (2 'factor-font-lock-word))
+    (,factor-alias-regex (1 'factor-font-lock-parsing-word)
+                         (2 'factor-font-lock-word)
+                         (3 'factor-font-lock-word))
     (,factor-int-constant-def-regex 2 'factor-font-lock-constant)
     (,factor-integer-regex . 'factor-font-lock-number)
     (,factor-float-regex . 'factor-font-lock-number)
