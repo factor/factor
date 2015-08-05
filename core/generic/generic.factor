@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
-combinators definitions kernel make namespaces sequences sets
-words ;
+combinators definitions kernel make math namespaces sequences
+sets words ;
 IN: generic
 
 ! Method combination protocol
@@ -186,8 +186,12 @@ M: method forget*
         [ call-next-method ] bi
     ] if ;
 
+GENERIC# check-combination-effect 1 ( combination effect -- )
+
+M: object check-combination-effect 2drop ;
+
 : define-generic ( word combination effect -- )
-    [ nip swap set-stack-effect ]
+    [ [ check-combination-effect ] keep swap set-stack-effect ]
     [
         drop
         2dup [ "combination" word-prop ] dip = [ 2drop ] [

@@ -13,6 +13,10 @@ TUPLE: standard-combination < single-combination # ;
     dup 0 < [ bad-dispatch-position ] when
     standard-combination boa ;
 
+M: standard-combination check-combination-effect
+    [ dispatch# ] [ in>> length ] bi* over >
+    [ drop ] [ bad-dispatch-position ] if ;
+
 PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
 

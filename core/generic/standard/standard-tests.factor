@@ -365,14 +365,20 @@ M: c funky* "c" , call-next-method ;
 { f } [ "xyz" "generic.standard.tests" lookup-word pic-def>> ] unit-test
 { f } [ "xyz" "generic.standard.tests" lookup-word "decision-tree" word-prop ] unit-test
 
-! Corner case
+! Corner cases
+[ "IN: generic.standard.tests GENERIC: broken-generic ( -- )" eval( -- ) ]
+[ error>> bad-dispatch-position? ]
+must-fail-with
 [ "IN: generic.standard.tests GENERIC# broken-generic# -1 ( a -- b )" eval( -- ) ]
+[ error>> bad-dispatch-position? ]
+must-fail-with
+[ "IN: generic.standard.tests GENERIC# broken-generic# 1 ( a -- b )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
 
 ! Generic words cannot be inlined
-{ } [ "IN: generic.standard.tests GENERIC: foo ( -- x )" eval( -- ) ] unit-test
-[ "IN: generic.standard.tests GENERIC: foo ( -- x ) inline" eval( -- ) ] must-fail
+{ } [ "IN: generic.standard.tests GENERIC: foo ( x -- x )" eval( -- ) ] unit-test
+[ "IN: generic.standard.tests GENERIC: foo ( x -- x ) inline" eval( -- ) ] must-fail
 
 ! Moving a method from one vocab to another didn't always work
 GENERIC: move-method-generic ( a -- b )
