@@ -80,7 +80,7 @@ PRIVATE>
         "Factor " % vm-version %
         " " % cpu cpu>string %
         " (" % build # ", " %
-        split-vm-git-label [ % "-" % ] [ 10 head % ] bi* ", " %
+        split-vm-git-label [ % "-" % ] [ 10 short head % ] bi* ", " %
         vm-compile-time % ")\n[" %
         vm-compiler % "] on " % os os>string %
     ] "" make ;
