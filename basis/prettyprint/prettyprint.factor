@@ -1,12 +1,10 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs classes colors combinators
-continuations grouping io io.streams.string io.styles kernel
-make math math.parser namespaces parser prettyprint.backend
-prettyprint.config prettyprint.custom prettyprint.sections
-quotations sequences sorting strings vocabs vocabs.prettyprint
-words sets generic ;
-FROM: namespaces => set ;
+USING: accessors arrays classes colors.constants combinators
+continuations generic grouping io io.streams.string io.styles
+kernel make math math.parser namespaces prettyprint.config
+prettyprint.custom prettyprint.sections sequences strings
+vocabs.prettyprint words ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
@@ -59,7 +57,7 @@ IN: prettyprint
 SYMBOL: ->
 
 \ ->
-{ { foreground T{ rgba f 1 1 1 1 } } { background T{ rgba f 0 0 0 1 } } }
+{ { foreground COLOR: white } { background COLOR: black } }
 "word-style" set-word-prop
 
 : remove-step-into ( word -- )
