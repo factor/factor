@@ -18,11 +18,11 @@ delete-staging-images
 
 { } [ "hello-world" shake-and-bake 550000 small-enough? ] unit-test
 
-{ "Hello world\n" } [
+{ { "Hello world" } } [
     f open-directory-after-deploy? [
         "hello-world" deploy
         "hello-world" deploy-path 1array
-        ascii [ contents ] with-process-reader
+        ascii [ lines ] with-process-reader
     ] with-variable
 ] unit-test
 
