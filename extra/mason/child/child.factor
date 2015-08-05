@@ -7,8 +7,9 @@ mason.notify mason.platform mason.report namespaces quotations
 sequences splitting system ;
 IN: mason.child
 
+! Make sure we call the build directory's factor.cmd
 : nmake-cmd ( -- args )
-    { "nmake" "/f" "nmakefile" }
+    "./build-support/factor.cmd" absolute-path
     target-cpu get name>> "." split "-" join suffix ;
 
 : gnu-make-cmd ( -- args )
