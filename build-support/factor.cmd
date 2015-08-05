@@ -29,7 +29,7 @@ if not errorlevel 1 (
 
 : Fun syntax
 for /f %%x in ('git describe --all') do set GIT_DESCRIBE=%%x
-for /f %%y in ('git rev-parse HEAD') do call set GIT_ID=%%y
+for /f %%y in ('git rev-parse HEAD') do set GIT_ID=%%y
 
 set git_label=%GIT_DESCRIBE%-%GIT_ID%
 set version=0.98
