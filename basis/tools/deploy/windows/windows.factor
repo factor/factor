@@ -22,6 +22,9 @@ CONSTANT: app-icon-resource-id "APPICON"
     [ f "open" ] dip absolute-path normalize-separators
     f f SW_SHOWNORMAL ShellExecute drop ;
 
+: ?open-in-explorer ( dir -- )
+    open-directory-after-deploy? get [ open-in-explorer ] [ drop ] if ;
+
 : embed-ico ( vm-path vocab -- )
     dup vocab-windows-icon-path vocab-append-path dup exists?
     [ binary file-contents app-icon-resource-id embed-icon-resource ]
@@ -37,7 +40,7 @@ M: windows deploy*
                 [ drop deployed-image-name ]
                 [ drop namespace make-deploy-image-executable ]
                 [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
-                [ nip open-in-explorer ]
+                [ nip ?open-in-explorer ]
             } 2cleave
         ] with-variables
     ] with-directory ;

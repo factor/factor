@@ -139,6 +139,9 @@ DEFER: ?make-staging-image
     vm image vocab config make-deploy-image
     image vm embed-image ;
 
+SYMBOL: open-directory-after-deploy?
+t open-directory-after-deploy? set-global
+
 HOOK: deploy* os ( vocab -- )
 
 HOOK: deploy-path os ( vocab -- path )
