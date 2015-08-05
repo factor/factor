@@ -2,13 +2,6 @@ USING: io io.pathnames kernel mason.child mason.config
 namespaces sequences system tools.test ;
 IN: mason.child.tests
 
-{ { "nmake" "/f" "nmakefile" "x86-32" } } [
-    H{
-        { target-os windows }
-        { target-cpu x86.32 }
-    } [ mason-child-make-cmd ] with-variables
-] unit-test
-
 { { "make" "macosx-x86-32" } } [
     H{
         { target-os macosx }
@@ -18,6 +11,13 @@ IN: mason.child.tests
 
 ! Must be an absolute path on Windows because launch directory
 ! is relative to parent directory (instead of current directory).
+{ t } [
+    H{
+        { target-os windows }
+        { target-cpu x86.32 }
+    } [ mason-child-make-cmd ] with-variables first absolute-path?
+] unit-test
+
 { t } [
     H{
         { target-os windows }
