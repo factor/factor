@@ -92,8 +92,22 @@ IN: tools.deploy.macosx
 : deploy-app-bundle? ( vocab -- ? )
     deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;
 
-M: macosx deploy* ( vocab -- )
+M: macosx deploy*
     ! pass off to M: unix deploy* if we're building a console app
-    dup deploy-app-bundle?
-    [ deploy-app-bundle ]
-    [ call-next-method ] if ;
+    dup deploy-app-bundle? [
+        deploy-app-bundle
+    ] [
+        call-next-method
+    ] if ;
+
+M: macosx deploy-path
+    dup deploy-app-bundle? [
+        deploy-directory get [
+            dup deploy-config [
+                bundle-name "Contents/MacOS/" append-path
+                swap append-path normalize-path
+            ] with-variables
+        ] with-directory
+    ] [
+        call-next-method
+    ] if ;

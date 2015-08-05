@@ -40,3 +40,12 @@ M: windows deploy*
             } 2cleave
         ] with-variables
     ] with-directory ;
+
+M: windows deploy-path
+    deploy-directory get [
+        dup deploy-config [
+            deploy-name get
+            swap ".exe" append append-path
+            normalize-path
+        ] with-variables
+    ] with-directory ;

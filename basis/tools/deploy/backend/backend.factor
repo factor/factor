@@ -140,3 +140,5 @@ DEFER: ?make-staging-image
     image vm embed-image ;
 
 HOOK: deploy* os ( vocab -- )
+
+HOOK: deploy-path os ( vocab -- path )

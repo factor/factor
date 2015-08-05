@@ -18,6 +18,12 @@ delete-staging-images
 
 { } [ "hello-world" shake-and-bake 550000 small-enough? ] unit-test
 
+{ "Hello world\n" } [
+    "hello-world" deploy
+    "hello-world" deploy-path 1array
+    ascii [ contents ] with-process-reader
+] unit-test
+
 { } [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
 
 ! [ ] [ "hello-ui" shake-and-bake 1605000 small-enough? ] unit-test
