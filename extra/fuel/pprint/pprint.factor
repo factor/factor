@@ -57,7 +57,7 @@ M: lexer-error fuel-pprint
     } cleave 4array lexer-error prefix fuel-pprint ;
 
 M: source-file-error fuel-pprint
-    [ file>> ] [ error>> ] bi 2array source-file-error prefix
+    [ path>> ] [ error>> ] bi 2array source-file-error prefix
     fuel-pprint ;
 
 M: source-file fuel-pprint path>> fuel-pprint ;
