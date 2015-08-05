@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators io.directories io.encodings.binary io.files
-io.files.windows io.pathnames kernel locals namespaces splitting
-sequences system tools.deploy.backend tools.deploy.config
+USING: combinators io.backend io.directories
+io.encodings.binary io.files io.files.windows io.pathnames
+kernel locals namespaces splitting sequences system
+tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor tools.deploy.windows.ico
 vocabs.loader vocabs.metadata windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
