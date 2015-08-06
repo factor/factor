@@ -34,7 +34,7 @@ IN: gobject-introspection.loader
 : xml>type ( xml -- type )
     dup name>> main>> {
         { "type" [ xml>simple-type ] }
-        { "array"[ xml>array-type ] }
+        { "array" [ xml>array-type ] }
         { "callback" [ xml>inner-callback-type ] }
         { "varargs" [ xml>varargs-type ] }
     } case ;

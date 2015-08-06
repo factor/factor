@@ -64,7 +64,7 @@ IN: compiler.cfg.stacks.local.tests
     }
 } [
     3 D 0 replace-loc [
-        "eh",
+        "eh" ,
         replaces get height-state get emit-changes
     ] V{ } make
 ] cfg-unit-test

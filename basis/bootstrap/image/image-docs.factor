@@ -18,7 +18,7 @@ HELP: architecture
 { $var-description "Bootstrap architecture name" } ;
 
 HELP: bootstrap-startup-quot
-{ $var-description "This image's startup quotation or " { $link f } ". "} ;
+{ $var-description "This image's startup quotation or " { $link f } ". " } ;
 
 HELP: define-sub-primitive
 { $values { "quot" quotation } { "word" word } }

@@ -16,14 +16,14 @@ HELP: gl-shader
 HELP: vertex-shader
 { $class-description { $snippet "vertex-shader" } " is the predicate class of " { $link gl-shader } " objects that refer to shaders of type " { $snippet "GL_VERTEX_SHADER" } ". In addition to the " { $snippet "gl-shader" } " words, the following vertex shader-specific functions are defined:"
     { $list
-        { { $link <vertex-shader> } " - Compile GLSL code into a vertex shader object "}
+        { { $link <vertex-shader> } " - Compile GLSL code into a vertex shader object " }
     }
 } ;
 
 HELP: fragment-shader
 { $class-description { $snippet "fragment-shader" } " is the predicate class of " { $link gl-shader } " objects that refer to shaders of type " { $snippet "GL_FRAGMENT_SHADER" } ". In addition to the " { $snippet "gl-shader" } " words, the following fragment shader-specific functions are defined:"
     { $list
-        { { $link <fragment-shader> } " - Compile GLSL code into a fragment shader object "}
+        { { $link <fragment-shader> } " - Compile GLSL code into a fragment shader object " }
     }
 } ;
 

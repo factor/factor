@@ -125,7 +125,7 @@ HELP: cl-platform
 HELP: cl-platforms
 { $values
 
-    { "platforms" "sequence of cl-platform"}
+    { "platforms" "sequence of cl-platform" }
 }
 { $description "Returns the platforms available for OpenCL computation on this hardware." } ;
 
