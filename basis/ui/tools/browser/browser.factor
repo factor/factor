@@ -3,7 +3,7 @@
 USING: accessors arrays classes colors colors.constants combinators
 combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.stylesheet help.topics
-kernel models sequences sets ui ui.commands ui.gadgets
+kernel locals models sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
@@ -42,20 +42,15 @@ M: browser-gadget set-history-value
     help-header-background <solid> >>interior 
     { 1 0 } >>fill f track-add ;
 
-: <help-footer-prev> ( browser-gadget -- gadget )
-    model>> [ '[ _ $navigation-prev ] try ] <pane-control>
-    { 0 0 } <border> { 1/2 1/2 } >>align
-    toolbar-background <solid> >>interior ;
-
-: <help-footer-next> ( browser-gadget -- gadget )
-    model>> [ '[ _ $navigation-next ] try ] <pane-control>
+: <help-footer> ( browser-gadget direction -- gadget )
+    [ model>> ] dip [ '[ _ _ $navigation ] try ] <pane-control>
     { 0 0 } <border> { 1/2 1/2 } >>align
     toolbar-background <solid> >>interior ;
 
 : add-help-footer ( track -- track )
     horizontal <track> with-lines
-    dupd swap <help-footer-prev> 1 track-add
-    dupd swap <help-footer-next> 1 track-add
+    dupd swap prev <help-footer> 1 track-add
+    dupd swap next <help-footer> 1 track-add
     f track-add ;
 
 : <help-pane> ( browser-gadget -- gadget )
