@@ -69,23 +69,23 @@ SYMBOLS: supported-layouts supported-formats ;
 
 : K_n ( n -- graph )
     <graph>
-    node[ "point" =shape ];
-    graph[ "t" =labelloc "circo" =layout ];
+    [node "point" =shape ];
+    [graph "t" =labelloc "circo" =layout ];
     over number>string "K " prepend =label
     swap iota 2 [ first2 add-edge ] each-combination ;
 
 :: partite-set ( n color -- cluster )
     color <cluster>
         color =color
-        node[ color =color ];
+        [node color =color ];
         n iota [
             number>string color prepend add-node
         ] each ;
 
 :: K_n,m ( n m -- graph )
     <graph>
-    node[ "point" =shape ];
-    graph[ "t" =labelloc "dot" =layout "LR" =rankdir ];
+    [node "point" =shape ];
+    [graph "t" =labelloc "dot" =layout "LR" =rankdir ];
     n "#FF0000" partite-set
     m "#0000FF" partite-set
     add-edge
@@ -96,15 +96,15 @@ SYMBOLS: supported-layouts supported-formats ;
 
 : C_n ( n -- graph )
     <graph>
-    graph[ "t" =labelloc "circo" =layout ];
-    node[ "point" =shape ];
+    [graph "t" =labelloc "circo" =layout ];
+    [node "point" =shape ];
     over number>string "C " prepend =label
     swap add-cycle ;
 
 : W_n ( n -- graph )
     <graph>
-    graph[ "t" =labelloc "twopi" =layout ];
-    node[ "point" =shape ];
+    [graph "t" =labelloc "twopi" =layout ];
+    [node "point" =shape ];
     over number>string "W " prepend =label
     over add-node
     over 1 - add-cycle
@@ -116,12 +116,12 @@ SYMBOLS: supported-layouts supported-formats ;
         0 <cluster>
             "filled" =style
             "lightgrey" =color
-            node[ "filled" =style "white" =color ];
+            [node "filled" =style "white" =color ];
             { "a0" "a1" "a2" "a3" } ~->
             "process #1" =label
         add
         1 <cluster>
-            node[ "filled" =style ];
+            [node "filled" =style ];
             { "b0" "b1" "b2" "b3" } ~->
             "process #2" =label
             "blue" =color
@@ -133,8 +133,8 @@ SYMBOLS: supported-layouts supported-formats ;
         "a3" "a0" ->
         "a3" "end" ->
         "b3" "end" ->
-        "start" add-node[ "Mdiamond" =shape ];
-        "end" add-node[ "Msquare" =shape ];
+        "start" [add-node "Mdiamond" =shape ];
+        "end" [add-node "Msquare" =shape ];
     ;
 
 : colored-circle ( i -- node )
@@ -145,13 +145,13 @@ SYMBOLS: supported-layouts supported-formats ;
 
 : colored-circles-example ( -- graph )
     <graph>
-    graph[ "3,3" =size "circo" =layout ];
-    node[ "filled" =style
+    [graph "3,3" =size "circo" =layout ];
+    [node "filled" =style
           "circle" =shape
           "true"   =fixedsize
           ""       =label ];
-    edge[ "invis" =style ];
-    0 add-node[ "invis" =style "none" =shape ];
+    [edge "invis" =style ];
+    0 [add-node "invis" =style "none" =shape ];
     16 iota [
         [ 0 -- ] [ colored-circle add ] bi
     ] each ;
@@ -160,87 +160,87 @@ SYMBOLS: supported-layouts supported-formats ;
     <digraph>
         "LR" =rankdir
         "8,5" =size
-        node[ "doublecircle" =shape ];
+        [node "doublecircle" =shape ];
         { "LR_0" "LR_3" "LR_4" "LR_8" } add-nodes
-        node[ "circle" =shape ];
-        "LR_0" "LR_2" ->[ "SS(B)" =label ];
-        "LR_0" "LR_1" ->[ "SS(S)" =label ];
-        "LR_1" "LR_3" ->[ "S($end)" =label ];
-        "LR_2" "LR_6" ->[ "SS(b)" =label ];
-        "LR_2" "LR_5" ->[ "SS(a)" =label ];
-        "LR_2" "LR_4" ->[ "S(A)" =label ];
-        "LR_5" "LR_7" ->[ "S(b)" =label ];
-        "LR_5" "LR_5" ->[ "S(a)" =label ];
-        "LR_6" "LR_6" ->[ "S(b)" =label ];
-        "LR_6" "LR_5" ->[ "S(a)" =label ];
-        "LR_7" "LR_8" ->[ "S(b)" =label ];
-        "LR_7" "LR_5" ->[ "S(a)" =label ];
-        "LR_8" "LR_6" ->[ "S(b)" =label ];
-        "LR_8" "LR_5" ->[ "S(a)" =label ];
+        [node "circle" =shape ];
+        "LR_0" "LR_2" [-> "SS(B)" =label ];
+        "LR_0" "LR_1" [-> "SS(S)" =label ];
+        "LR_1" "LR_3" [-> "S($end)" =label ];
+        "LR_2" "LR_6" [-> "SS(b)" =label ];
+        "LR_2" "LR_5" [-> "SS(a)" =label ];
+        "LR_2" "LR_4" [-> "S(A)" =label ];
+        "LR_5" "LR_7" [-> "S(b)" =label ];
+        "LR_5" "LR_5" [-> "S(a)" =label ];
+        "LR_6" "LR_6" [-> "S(b)" =label ];
+        "LR_6" "LR_5" [-> "S(a)" =label ];
+        "LR_7" "LR_8" [-> "S(b)" =label ];
+        "LR_7" "LR_5" [-> "S(a)" =label ];
+        "LR_8" "LR_6" [-> "S(b)" =label ];
+        "LR_8" "LR_5" [-> "S(a)" =label ];
     ;
 
 : record-example ( -- graph )
     <digraph>
-        graph[ "LR" =rankdir "8,8" =size ];
-        node[ 8 =fontsize "record" =shape ];
+        [graph "LR" =rankdir "8,8" =size ];
+        [node 8 =fontsize "record" =shape ];
 
-        "node0" add-node[
+        "node0" [add-node
             "<f0> 0x10ba8| <f1>" =label
         ];
-        "node1" add-node[
+        "node1" [add-node
             "<f0> 0xf7fc4380| <f1> | <f2> |-1" =label
         ];
-        "node2" add-node[
+        "node2" [add-node
             "<f0> 0xf7fc44b8| | |2" =label
         ];
-        "node3" add-node[
+        "node3" [add-node
             "<f0> 3.43322790286038071e-06|44.79998779296875|0" =label
         ];
-        "node4" add-node[
+        "node4" [add-node
             "<f0> 0xf7fc4380| <f1> | <f2> |2" =label
         ];
-        "node5" add-node[
+        "node5" [add-node
             "<f0> (nil)| | |-1" =label
         ];
-        "node6" add-node[
+        "node6" [add-node
             "<f0> 0xf7fc4380| <f1> | <f2> |1" =label
         ];
-        "node7" add-node[
+        "node7" [add-node
             "<f0> 0xf7fc4380| <f1> | <f2> |2" =label
         ];
-        "node8" add-node[
+        "node8" [add-node
             "<f0> (nil)| | |-1" =label
         ];
-        "node9" add-node[
+        "node9" [add-node
             "<f0> (nil)| | |-1" =label
         ];
-        "node10" add-node[
+        "node10" [add-node
             "<f0> (nil)| <f1> | <f2> |-1" =label
         ];
-        "node11" add-node[
+        "node11" [add-node
             "<f0> (nil)| <f1> | <f2> |-1" =label
         ];
-        "node12" add-node[
+        "node12" [add-node
             "<f0> 0xf7fc43e0| | |1" =label
         ];
 
-        "node0" "node1"   ->[ "f0" =tailport "f0" =headport ];
-        "node0" "node2"   ->[ "f1" =tailport "f0" =headport ];
-        "node1" "node3"   ->[ "f0" =tailport "f0" =headport ];
-        "node1" "node4"   ->[ "f1" =tailport "f0" =headport ];
-        "node1" "node5"   ->[ "f2" =tailport "f0" =headport ];
-        "node4" "node3"   ->[ "f0" =tailport "f0" =headport ];
-        "node4" "node6"   ->[ "f1" =tailport "f0" =headport ];
-        "node4" "node10"  ->[ "f2" =tailport "f0" =headport ];
-        "node6" "node3"   ->[ "f0" =tailport "f0" =headport ];
-        "node6" "node7"   ->[ "f1" =tailport "f0" =headport ];
-        "node6" "node9"   ->[ "f2" =tailport "f0" =headport ];
-        "node7" "node3"   ->[ "f0" =tailport "f0" =headport ];
-        "node7" "node1"   ->[ "f1" =tailport "f0" =headport ];
-        "node7" "node8"   ->[ "f2" =tailport "f0" =headport ];
-        "node10" "node11" ->[ "f1" =tailport "f0" =headport ];
-        "node10" "node12" ->[ "f2" =tailport "f0" =headport ];
-        "node11" "node1"  ->[ "f2" =tailport "f0" =headport ];
+        "node0" "node1"   [-> "f0" =tailport "f0" =headport ];
+        "node0" "node2"   [-> "f1" =tailport "f0" =headport ];
+        "node1" "node3"   [-> "f0" =tailport "f0" =headport ];
+        "node1" "node4"   [-> "f1" =tailport "f0" =headport ];
+        "node1" "node5"   [-> "f2" =tailport "f0" =headport ];
+        "node4" "node3"   [-> "f0" =tailport "f0" =headport ];
+        "node4" "node6"   [-> "f1" =tailport "f0" =headport ];
+        "node4" "node10"  [-> "f2" =tailport "f0" =headport ];
+        "node6" "node3"   [-> "f0" =tailport "f0" =headport ];
+        "node6" "node7"   [-> "f1" =tailport "f0" =headport ];
+        "node6" "node9"   [-> "f2" =tailport "f0" =headport ];
+        "node7" "node3"   [-> "f0" =tailport "f0" =headport ];
+        "node7" "node1"   [-> "f1" =tailport "f0" =headport ];
+        "node7" "node8"   [-> "f2" =tailport "f0" =headport ];
+        "node10" "node11" [-> "f1" =tailport "f0" =headport ];
+        "node10" "node12" [-> "f2" =tailport "f0" =headport ];
+        "node11" "node1"  [-> "f2" =tailport "f0" =headport ];
     ;
 
 :: with-global-value ( value variable quot -- )

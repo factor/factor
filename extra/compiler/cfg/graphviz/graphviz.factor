@@ -48,8 +48,8 @@ IN: compiler.cfg.graphviz
 
 : cfgviz ( cfg -- graph )
     <digraph>
-        graph[ "t" =labelloc ];
-        node[ "box" =shape "Courier" =fontname 10 =fontsize ];
+        [graph "t" =labelloc ];
+        [node "box" =shape "Courier" =fontname 10 =fontsize ];
         swap [
             [ add-cfg-vertex ] [ add-cfg-edges ] bi
         ] each-basic-block ;
