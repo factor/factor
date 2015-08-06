@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit fry
-io.directories io.files io.files.types io.pathnames kernel make
+io.directories io.files io.files.info io.pathnames kernel make
 memoize namespaces sequences sets sorting splitting vocabs
 vocabs.loader vocabs.metadata ;
 IN: vocabs.hierarchy
@@ -17,7 +17,7 @@ M: vocab-prefix vocab-name name>> ;
 : visible-dirs ( seq -- seq' )
     [
         {
-            [ type>> +directory+ = ]
+            [ directory? ]
             [ name>> "." head? not ]
         } 1&&
     ] filter ;

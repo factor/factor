@@ -30,8 +30,7 @@ DEFER: write-tree
     ] 2bi #directories [ 1 + ] change-global ;
 
 : write-entry ( entry indents -- )
-    nl over type>> +directory+ =
-    [ write-dir ] [ write-file ] if ;
+    nl over directory? [ write-dir ] [ write-file ] if ;
 
 :: write-tree ( path indents -- )
     path [

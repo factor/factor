@@ -72,7 +72,7 @@ C: <ftp-disconnect> ftp-disconnect
 : can-serve-file? ( path -- ? )
     {
         [ exists? ]
-        [ file-info type>> +regular-file+ = ]
+        [ file-info regular-file? ]
         [ serving? ]
     } 1&& ;
 

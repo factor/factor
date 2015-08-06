@@ -27,7 +27,7 @@ IN: io.files.trash.unix
     {
         [ file-info directory? ]
         [ sticky? ]
-        [ link-info type>> +symbolic-link+ = not ]
+        [ link-info symbolic-link? not ]
     } 1&& [ "invalid trash path" throw ] unless ;
 
 : trash-home ( -- path )
