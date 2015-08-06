@@ -48,12 +48,12 @@ M: object expr>str unparse ;
     basic-block get number>> ;
 
 : add-gvns ( graph -- graph' )
-    "gvns" add-node[
+    "gvns" [add-node
         congruence-classes =label
         "plaintext" =shape
     ];
-    "gvns" 0 add-edge[ "invis" =style ];
-    basic-block# add-node[ "bold" =style ];
+    "gvns" 0 [add-edge "invis" =style ];
+    basic-block# [add-node "bold" =style ];
     ;
 
 SYMBOL: iteration
