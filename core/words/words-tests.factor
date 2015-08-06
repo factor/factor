@@ -90,7 +90,7 @@ DEFER: deferred
 [ error>> undefined-word? ] must-fail-with
 
 { } [
-    "IN: words.tests GENERIC: symbol-generic ( -- )" eval( -- )
+    "IN: words.tests GENERIC: symbol-generic ( x -- x )" eval( -- )
 ] unit-test
 
 { } [
