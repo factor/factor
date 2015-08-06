@@ -10,7 +10,8 @@ ERROR: bad-dispatch-position # ;
 TUPLE: standard-combination < single-combination # ;
 
 : <standard-combination> ( # -- standard-combination )
-    dup 0 < [ bad-dispatch-position ] when
+    dup integer? [ dup 0 < ] [ t ] if
+    [ bad-dispatch-position ] when
     standard-combination boa ;
 
 M: standard-combination check-combination-effect
