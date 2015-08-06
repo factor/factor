@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.tuple
 combinators combinators.short-circuit continuations debugger
 effects generic help.crossref help.markup help.stylesheet
-help.topics io io.styles kernel make namespaces prettyprint
+help.topics io io.styles kernel locals make namespaces prettyprint
 sequences sorting vocabs words words.symbol ;
 IN: help
 
@@ -97,22 +97,22 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : ($title) ( topic -- )
     [ [ article-title ] [ >link ] bi write-object ] ($block) ;
+    
+CONSTANT: prev -1
+CONSTANT: next 1
 
-: $navigation-row-prev ( content element -- )
-    prefix 1array "<" prefix , ;
+: add-navigation-arrow ( str direction -- str )
+    prev = [ "<" prefix ] [ ">" suffix ] if ;
 
-: $navigation-row-next ( content element -- )
-    prefix 1array ">" suffix , ;
+: $navigation-row ( content element direction -- )
+    [ prefix 1array ] dip add-navigation-arrow , ;
 
 : ($navigation-table) ( element -- )
     help-path-style get table-style [ $table ] with-variable ;
 
-: ($navigation-prev) ( topic -- )
-    [ prev-article [ 1array \ $long-link $navigation-row-prev ] when* ] 
-    { } make [ ($navigation-table) ] unless-empty ;
-
-: ($navigation-next) ( topic -- )
-    [ next-article [ 1array \ $long-link $navigation-row-next ] when* ] 
+:: ($navigation) ( topic direction -- )
+    topic [ direction prev/next-article
+      [ 1array \ $long-link direction $navigation-row ] when* ] 
     { } make [ ($navigation-table) ] unless-empty ;
 
 : ($navigation-path) ( topic -- )
@@ -127,14 +127,9 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         ] with-nesting
     ] with-style ;
 
-: $navigation-prev ( topic -- )
-    title-style get 
-    [ help-path-style get [ ($navigation-prev) ] with-style ]
-    with-style ;
-
-: $navigation-next ( topic -- )
-    title-style get 
-    [ help-path-style get [ ($navigation-next) ] with-style ]
+:: $navigation ( topic direction -- )
+    topic title-style get 
+    [ help-path-style get [ direction ($navigation) ] with-style ]
     with-style ;
 
 : print-topic ( topic -- )
