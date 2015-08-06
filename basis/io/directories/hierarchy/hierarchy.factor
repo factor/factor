@@ -10,7 +10,7 @@ IN: io.directories.hierarchy
 : directory-tree-files% ( path prefix -- )
     [ dup directory-entries ] dip '[
         [ name>> [ append-path ] [ _ prepend-path ] bi ]
-        [ type>> +directory+ = ] bi over ,
+        [ directory? ] bi over ,
         [ directory-tree-files% ] [ 2drop ] if
     ] with each ;
 

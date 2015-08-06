@@ -2,11 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs colors.constants combinators
 combinators.short-circuit fry io.directories io.files
-io.files.info io.pathnames kernel locals make math math.order
-sequences sequences.private sorting splitting typed
+io.files.info io.files.types io.pathnames kernel locals make
+math math.order sequences sequences.private sorting splitting
 unicode.categories unicode.data vectors vocabs vocabs.hierarchy
 ;
-
 IN: tools.completion
 
 <PRIVATE
@@ -115,11 +114,11 @@ PRIVATE>
 : directory-paths ( directory -- alist )
     dup '[
         [
-            [ dup _ prepend-path ]
-            [ file-info directory? [ path-separator append ] when ]
+            [ name>> dup _ prepend-path ]
+            [ directory? [ path-separator append ] when ]
             bi swap
         ] { } map>assoc
-    ] with-directory-files ;
+    ] with-directory-entries ;
 
 PRIVATE>
 
