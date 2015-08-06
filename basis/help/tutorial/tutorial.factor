@@ -189,7 +189,7 @@ $nl
 "Now if you press " { $command tool "common" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
 { $code "\"palindrome\" test" }
 $nl
-"Congratulations, you have now completed " { $link "first-program" } "!";
+"Congratulations, you have now completed " { $link "first-program" } "!" ;
 
 ARTICLE: "first-program" "Your first program"
 "In this tutorial, we will write a simple Factor program which prompts the user to enter a word, and tests if it is a palindrome (that is, the word is spelled the same backwards and forwards)."

@@ -3,13 +3,13 @@ kernel quotations sequences math ;
 IN: math.statistics
 
 HELP: geometric-mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the geometric mean of all elements in " { $snippet "seq" } ". The geometric mean measures the central tendency of a data set and minimizes the effects of extreme values." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } geometric-mean ." "1.81712059283214" } }
 { $errors "Throws a " { $link signal-error. } " (square-root of 0) if the sequence is empty." } ;
 
 HELP: harmonic-mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the harmonic mean of the elements in " { $snippet "seq" } ". The harmonic mean is appropriate when the average of rates is desired." }
 { $notes "Positive reals only." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "6/11" } }
@@ -21,13 +21,13 @@ HELP: kth-smallest
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 3 1 2 } 1 kth-smallest ." "2" } } ;
 
 HELP: mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the arithmetic mean of the elements in " { $snippet "seq" } "." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } mean ." "2" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: median
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the median of " { $snippet "seq" } " by finding the middle element of the sequence using " { $link kth-smallest } ". If there is an even number of elements in the sequence, the median is not unique, so the mean of the two middle values is output." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } median ." "2" }
@@ -35,7 +35,7 @@ HELP: median
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: range
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the difference of the maximum and minimum values in " { $snippet "seq" } "." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } range ." "2" }
@@ -52,20 +52,20 @@ HELP: minmax
 } ;
 
 HELP: sample-std
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the sample standard deviation of " { $snippet "seq" } ", which is the square root of the sample variance. It measures how widely spread the values in a sequence are about the mean for a random subset of a dataset." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } sample-std ." "1.0" } } ;
 
 HELP: sample-ste
-  { $values { "seq" sequence } { "x" "a non-negative real number"} }
+  { $values { "seq" sequence } { "x" "a non-negative real number" } }
   { $description "Computes the standard error of the mean for " { $snippet "seq" } ". It's defined as the standard deviation divided by the square root of the length of the sequence, and measures uncertainty associated with the estimate of the mean." }
   { $examples
     { $example "USING: math.statistics prettyprint ;" "{ -2 2 } sample-ste ." "2.0" }
   } ;
 
 HELP: sample-var
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence." }
 { $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0." }
 { $examples

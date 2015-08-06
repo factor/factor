@@ -269,7 +269,7 @@ HELP: n*quot
                "[ + + + ]"
     }
 }
-{ $description "Construct a quotation containing the contents of " { $snippet "seq" } " repeated " { $snippet "n"} " times." } ;
+{ $description "Construct a quotation containing the contents of " { $snippet "seq" } " repeated " { $snippet "n" } " times." } ;
 
 ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
 { $subsections

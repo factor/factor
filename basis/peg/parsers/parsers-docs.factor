@@ -84,7 +84,7 @@ HELP: at-least-n
 } { $description
     "Returns a parser that matches n or more repetitions of the input parser."
 } { $examples
-    { $code "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 at-least-n parse => exception"}
+    { $code "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 at-least-n parse => exception" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 at-least-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 4 at-least-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also exactly-n at-most-n from-m-to-n } ;
@@ -174,6 +174,6 @@ HELP: range-pattern
 "range of characters from the first to the second, inclusive."
 { $examples
     { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse 1string ." "\"a\"" }
-    { $code "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse => exception"}
+    { $code "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse => exception" }
 }
 }  ;

@@ -8,7 +8,7 @@ HELP: buckets
   { "seq" "a sequence of " { $link bucket } " objects" }
 }
 { $description
-    "Returns a list of " { $link bucket } " objects containing data on the buckets available on S3."}
+    "Returns a list of " { $link bucket } " objects containing data on the buckets available on S3." }
 { $examples
   { $unchecked-example "USING: s3 ;" "buckets ." "{ }" }
 }
@@ -41,7 +41,7 @@ HELP: delete-bucket
 HELP: keys
 { $values
   { "bucket" string }
-  { "seq" "a sequence of " { $link key } " objects"}
+  { "seq" "a sequence of " { $link key } " objects" }
 }
 { $description
     "Returns a sequence of " { $link key } " objects. Each object in the sequence has information about the keys contained within the bucket."
@@ -55,8 +55,8 @@ HELP: get-object
 { $values
   { "bucket" string }
   { "key" string }
-  { "response" "The HTTP response object"}
-  { "data" "The data returned from the http request"}
+  { "response" "The HTTP response object" }
+  { "data" "The data returned from the http request" }
 }
 { $description
     "Does an HTTP request to retrieve the object in the bucket with the given key."

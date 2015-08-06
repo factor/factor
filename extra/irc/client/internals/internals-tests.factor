@@ -113,7 +113,7 @@ M: mb-writer dispose drop ;
   ] unit-test
 ] spawning-irc
 
-[ { join_ "#factortest"} [
+[ { join_ "#factortest" } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       { ":factorbot!n=factorbo@some.where JOIN :#factortest"
         ":ircserver.net 353 factorbot @ #factortest :@factorbot "

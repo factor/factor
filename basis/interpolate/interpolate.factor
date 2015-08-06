@@ -76,6 +76,6 @@ MACRO: interpolate ( str -- quot )
 : interpolate-locals ( str -- quot )
     [ dup search [ [ ] ] [ [ get ] ] ?if ] interpolate-quot ;
 
-SYNTAX: I[
-    "]I" parse-multiline-string
+SYNTAX: [I
+    "I]" parse-multiline-string
     interpolate-locals append! ;

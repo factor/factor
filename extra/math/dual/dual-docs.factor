@@ -47,7 +47,7 @@ HELP: unpack-dual
 ARTICLE: "math.dual" "Dual Numbers"
 "The " { $vocab-link "math.dual" } " vocabulary implements dual numbers, along with arithmetic methods for working with them. Many of the functions in " { $vocab-link "math.functions" } " are extended to work with dual numbers."
 $nl
-"Dual numbers are ordered pairs " { $snippet "<o,e>"} "--an ordinary part and an epsilon part--with component-wise addition and multiplication defined by "{ $snippet "<o1,e1>*<o2,e2> = <o1*o2,e1*o2 + e2*o1>" } ". They are analagous to complex numbers with " { $snippet "i^2 = 0" } "instead of " { $snippet "i^2 = -1" } ". For well-behaved functions " { $snippet "f" } ", " { $snippet "f(<o1,e1>) = f(o1) + e1*f'(o1)" } ", where " { $snippet "f'"} " is the derivative of " { $snippet "f" } "."
+"Dual numbers are ordered pairs " { $snippet "<o,e>" } "--an ordinary part and an epsilon part--with component-wise addition and multiplication defined by " { $snippet "<o1,e1>*<o2,e2> = <o1*o2,e1*o2 + e2*o1>" } ". They are analagous to complex numbers with " { $snippet "i^2 = 0" } "instead of " { $snippet "i^2 = -1" } ". For well-behaved functions " { $snippet "f" } ", " { $snippet "f(<o1,e1>) = f(o1) + e1*f'(o1)" } ", where " { $snippet "f'" } " is the derivative of " { $snippet "f" } "."
 ;
 
 ABOUT: "math.dual"

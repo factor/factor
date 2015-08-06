@@ -40,6 +40,6 @@ IN: interpolate.tests
 { "Oops, I accidentally the whole economy..." } [
     [let
         "economy" :> noun
-        "accidentally" [ I[ Oops, I ${0} the whole ${noun}...]I ] with-string-writer
+        "accidentally" [ [I Oops, I ${0} the whole ${noun}...I] ] with-string-writer
     ]
 ] unit-test

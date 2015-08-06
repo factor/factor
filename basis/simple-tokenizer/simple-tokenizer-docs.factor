@@ -7,7 +7,7 @@ HELP: tokenize
     "Tokenize a string. Supported syntax:"
     { $list
         { { $snippet "foo bar baz" } " - simple tokens" }
-        { { $snippet "foo\\ bar" } " - token with an escaped space"}
+        { { $snippet "foo\\ bar" } " - token with an escaped space" }
         { { $snippet "\"foo bar\"" } " - quoted token" }
     }
 } ;
