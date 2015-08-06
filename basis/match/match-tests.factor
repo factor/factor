@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test match namespaces arrays ;
+USING: arrays kernel match namespaces tools.test ;
 IN: match.tests
 
 MATCH-VARS: ?a ?b ;
@@ -66,6 +66,25 @@ C: <foo> foo
 { "match" } [
     "abcd" {
         { ?a [ "match" ] }
+    } match-cond
+] unit-test
+
+{ "one" } [
+    1 {
+        { 1 [ "one" ] }
+    } match-cond
+] unit-test
+
+[
+    2 {
+        { 1 [ "one" ] }
+    } match-cond
+] [ no-match-cond? ] must-fail-with
+
+{ "default" } [
+    2 {
+        { 1 [ "one" ] }
+        [ drop "default" ]
     } match-cond
 ] unit-test
 
