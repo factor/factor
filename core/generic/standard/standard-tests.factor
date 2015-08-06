@@ -375,6 +375,9 @@ must-fail-with
 [ "IN: generic.standard.tests GENERIC# broken-generic# 1 ( a -- b )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
+[ "IN: generic.standard.tests GENERIC# broken-generic# 2/3 ( a b c -- )" eval( -- ) ]
+[ error>> bad-dispatch-position? ]
+must-fail-with
 
 ! Generic words cannot be inlined
 { } [ "IN: generic.standard.tests GENERIC: foo ( x -- x )" eval( -- ) ] unit-test
