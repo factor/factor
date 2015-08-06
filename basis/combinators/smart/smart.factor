@@ -67,6 +67,13 @@ M: object infer-known* drop f ;
 : output>array ( quot -- array )
     { } output>sequence ; inline
 
+MACRO: output>sequence-n ( quot exemplar n -- quot )
+    3dup nip [ outputs ] dip - -rot
+    '[ @ [ _ _ nsequence ] _ ndip ] ;
+
+MACRO: output>array-n ( quot n -- array )
+    '[ _ { } _ output>sequence-n ] ;
+
 : cleave>array ( obj quots -- array )
     '[ _ cleave ] output>array ; inline
 
