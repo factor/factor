@@ -500,7 +500,7 @@ SYMBOLS: a b c ;
 
 DEFER: blah
 
-{ } [ "IN: parser.tests GENERIC: blah ( -- )" eval( -- ) ] unit-test
+{ } [ "IN: parser.tests GENERIC: blah ( x -- x )" eval( -- ) ] unit-test
 { } [ "IN: parser.tests SYMBOLS: blah ;" eval( -- ) ] unit-test
 
 { f } [ \ blah generic? ] unit-test
