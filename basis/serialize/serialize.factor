@@ -29,11 +29,11 @@ SYMBOL: serialized
     #! Return the id of an already serialized object
     serialized get at ;
 
-! Numbers are serialized as follows:
+! Positive numbers are serialized as follows:
 ! 0 => B{ 0 }
-! 1<=x<=126 => B{ x | 0x80 }
-! x>127 => B{ length(x) x[0] x[1] ... }
-! x>2^1024 => B{ 0xff length(x) x[0] x[1] ... }
+! 1<=x<127 => B{ x | 0x80 }
+! 127<=x<2^1024 => B{ length(x) x[0] x[1] ... }; 1<length(x)<129 fits in 1 byte
+! 2^1024<=x => B{ 0xff } + serialize(length(x)) + B{ x[0] x[1] ... }
 ! The last case is needed because a very large number would
 ! otherwise be confused with a small number.
 : serialize-cell ( n -- )
@@ -42,7 +42,7 @@ SYMBOL: serialized
             0x80 bitor write1
         ] [
             dup log2 8 /i 1 +
-            dup 0x7f >= [
+            dup 0x81 >= [
                 0xff write1
                 dup serialize-cell
             ] [
@@ -55,7 +55,7 @@ SYMBOL: serialized
 : deserialize-cell ( -- n )
     read1 {
         { [ dup 0xff = ] [ drop deserialize-cell read be> ] }
-        { [ dup 0x80 >= ] [ 0x80 bitxor ] }
+        { [ dup 0x81 >= ] [ 0x80 bitxor ] }
         [ read be> ]
     } cond ;
 
