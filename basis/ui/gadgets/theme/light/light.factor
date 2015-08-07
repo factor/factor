@@ -46,7 +46,7 @@ CONSTANT: thread-status-stopped-background HEXCOLOR: F4D9D9
 CONSTANT: thread-status-suspended-background HEXCOLOR: F4EAD9
 CONSTANT: thread-status-running-background HEXCOLOR: EDF4D9
 
-CONSTANT: error-summary-background HEXCOLOR: F4EAD9
+CONSTANT: error-summary-background HEXCOLOR: F4D9D9
 
 CONSTANT: content-background COLOR: white
 CONSTANT: text-color COLOR: black
