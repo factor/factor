@@ -43,7 +43,7 @@ M: browser-gadget set-history-value
     { 1 0 } >>fill f track-add ;
 
 : <help-footer> ( browser-gadget direction -- gadget )
-    [ model>> ] dip [ '[ _ _ $navigation ] try ] <pane-control>
+    [ model>> ] dip '[ [ _ $navigation ] try ] <pane-control>
     { 0 0 } <border> { 1/2 1/2 } >>align
     toolbar-background <solid> >>interior ;
 
