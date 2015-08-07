@@ -5,7 +5,7 @@ USING: tools.test kernel serialize io io.streams.byte-array
 alien arrays byte-arrays bit-arrays specialized-arrays
 sequences math prettyprint parser classes math.constants
 io.encodings.binary random assocs serialize.private alien.c-types
-combinators.short-circuit ;
+combinators.short-circuit literals ;
 SPECIALIZED-ARRAY: double
 IN: serialize.tests
 
@@ -107,3 +107,25 @@ CONSTANT: objects
     bytes>object
     dup keys first eq?
 ] unit-test
+
+! Changed the serialization of numbers in [2^1008;2^1024[
+! check backwards compatibility
+${ 1008 2^ } [ B{
+    255 1 127 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0
+} binary [ deserialize-cell ] with-byte-reader ] unit-test
+
+${ 1024 2^ 1 - } [ B{
+    255 1 128 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 255 255 255 255
+} binary [ deserialize-cell ] with-byte-reader ] unit-test
