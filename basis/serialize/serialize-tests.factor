@@ -9,10 +9,13 @@ combinators.short-circuit ;
 SPECIALIZED-ARRAY: double
 IN: serialize.tests
 
-: test-serialize-cell ( a -- ? )
-    2^ random dup
+: (test-serialize-cell) ( n -- ? )
+    dup
     binary [ serialize-cell ] with-byte-writer
     binary [ deserialize-cell ] with-byte-reader = ;
+
+: test-serialize-cell ( a -- ? )
+    2^ random (test-serialize-cell) ;
 
 { t } [
     100 [
@@ -23,6 +26,11 @@ IN: serialize.tests
             [  4 [ 400 *  test-serialize-cell ] all-integers? ]
             [  4 [ 4000 * test-serialize-cell ] all-integers? ]
         } 0&&
+    ] all-integers?
+] unit-test
+
+{ t } [ 2000 [
+        2^ 3 [ 1 - + (test-serialize-cell) ] with all-integers?
     ] all-integers?
 ] unit-test
 
