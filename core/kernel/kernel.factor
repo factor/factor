@@ -419,7 +419,7 @@ CONSTANT: OBJ-VM-GIT-LABEL 77
 ! Context object count and identifiers must be kept in sync with:
 !   vm/contexts.hpp
 
-CONSTANT: context-object-count 10
+CONSTANT: context-object-count 4
 
 CONSTANT: CONTEXT-OBJ-NAMESTACK 0
 CONSTANT: CONTEXT-OBJ-CATCHSTACK 1

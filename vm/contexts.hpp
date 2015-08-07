@@ -3,7 +3,7 @@ namespace factor {
 // Context object count and identifiers must be kept in sync with:
 //   core/kernel/kernel.factor
 
-static const cell context_object_count = 10;
+static const cell context_object_count = 4;
 
 enum context_object {
   OBJ_NAMESTACK,
