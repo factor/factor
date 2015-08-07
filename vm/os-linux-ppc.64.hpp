@@ -24,8 +24,6 @@ namespace factor {
 
 #define FUNCTION_TOC_POINTER(ptr) (function_descriptor_field((void*)ptr, 1))
 
-#define UAP_STACK_POINTER_TYPE unsigned long
-
 inline static unsigned int uap_fpu_status(void* uap) {
   union {
     double as_double;
