@@ -48,6 +48,9 @@ M: curses-listener-stream stream-readln
 M: curses-listener-stream stream-write
     drop cwrite ;
 
+M: curses-listener-stream stream-write1
+    drop addch ;
+
 M: curses-listener-stream stream-flush
     drop crefresh ;
 
