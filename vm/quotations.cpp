@@ -115,19 +115,11 @@ bool quotation_jit::trivial_quotation_p(array* elements) {
 }
 
 /* Allocates memory (emit) */
-void quotation_jit::emit_prolog(bool safepoint, bool stack_frame) {
-  if (safepoint)
+void quotation_jit::emit_epilog(bool needed) {
+  if (needed) {
     emit(parent->special_objects[JIT_SAFEPOINT]);
-  if (stack_frame)
-    emit(parent->special_objects[JIT_PROLOG]);
-}
-
-/* Allocates memory (emit) */
-void quotation_jit::emit_epilog(bool safepoint, bool stack_frame) {
-  if (safepoint)
-    emit(parent->special_objects[JIT_SAFEPOINT]);
-  if (stack_frame)
     emit(parent->special_objects[JIT_EPILOG]);
+  }
 }
 
 /* Allocates memory conditionally */
@@ -147,13 +139,16 @@ void quotation_jit::emit_quotation(cell quot_) {
   }
 }
 
-/* Allocates memory (parameter(), literal(), emit_prolog, emit_with_literal)*/
+/* Allocates memory (parameter(), literal(), emit_epilog, emit_with_literal)*/
 void quotation_jit::iterate_quotation() {
   bool no_non_safepoint_words = no_non_safepoint_words_p();
 
   set_position(0);
 
-  emit_prolog(no_non_safepoint_words, no_non_safepoint_words);
+  if (no_non_safepoint_words) {
+    emit(parent->special_objects[JIT_SAFEPOINT]);
+    emit(parent->special_objects[JIT_PROLOG]);
+  }
 
   cell i;
   cell length = array_capacity(elements.untagged());
@@ -173,7 +168,7 @@ void quotation_jit::iterate_quotation() {
                                         no_non_safepoint_words);    /* stack_frame_p */
         }                                                /* Everything else */
         else if (i == length - 1) {
-          emit_epilog(no_non_safepoint_words, no_non_safepoint_words);
+          emit_epilog(no_non_safepoint_words);
           tail_call = true;
           word_jump(obj.value());
         } else
@@ -207,7 +202,7 @@ void quotation_jit::iterate_quotation() {
         /* 'if' preceded by two literal quotations (this is why if and ? are
            mutually recursive in the library, but both still work) */
         if (fast_if_p(i, length)) {
-          emit_epilog(no_non_safepoint_words, no_non_safepoint_words);
+          emit_epilog(no_non_safepoint_words);
           tail_call = true;
 
           emit_quotation(array_nth(elements.untagged(), i));
@@ -240,7 +235,7 @@ void quotation_jit::iterate_quotation() {
           /* Load the object from the datastack, then remove our stack frame. */
           emit_with_literal(parent->special_objects[PIC_LOAD],
                             tag_fixnum(-index * sizeof(cell)));
-          emit_epilog(no_non_safepoint_words, no_non_safepoint_words);
+          emit_epilog(no_non_safepoint_words);
           tail_call = true;
 
           emit_mega_cache_lookup(array_nth(elements.untagged(), i), index,
@@ -260,8 +255,7 @@ void quotation_jit::iterate_quotation() {
 
   if (!tail_call) {
     set_position(length);
-
-    emit_epilog(no_non_safepoint_words, no_non_safepoint_words);
+    emit_epilog(no_non_safepoint_words);
     emit(parent->special_objects[JIT_RETURN]);
   }
 }
