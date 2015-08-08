@@ -218,6 +218,28 @@ unit-test
 ] unit-test
 
 {
+    {
+        { { 2 } 1 }
+    }
+} [
+    {
+        { { 2 } 1 }
+        { { } 3 }
+    } harvest-keys
+] unit-test
+
+{
+    {
+        { 1 { 2 } }
+    }
+} [
+    {
+        { 1 { 2 } }
+        { 3 { } }
+    } harvest-values
+] unit-test
+
+{
     { { f 2 } }
 } [
     { { 1 f } { f 2 } } sift-values

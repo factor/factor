@@ -95,6 +95,12 @@ PRIVATE>
 : sift-values ( assoc -- assoc' )
     [ nip ] assoc-filter ; inline
 
+: harvest-keys ( assoc -- assoc' )
+    [ drop empty? ] assoc-reject ; inline
+
+: harvest-values ( assoc -- assoc' )
+    [ nip empty? ] assoc-reject ; inline
+
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
     [ assoc-like ] curry bi@ ; inline

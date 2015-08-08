@@ -161,6 +161,8 @@ $nl
 { $subsections
     sift-keys
     sift-values
+    harvest-keys
+    harvest-values
 }
 "Mapping between assocs and sequences:"
 { $subsections
@@ -343,11 +345,42 @@ HELP: assoc-subset?
 
 HELP: sift-keys
 { $values { "assoc" assoc } { "assoc'" "a new assoc" } }
-{ $description "Outputs an assoc removing keys that are " { $link f } "." } ;
+{ $description "Outputs an assoc removing keys that are " { $link f } "." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 2 } { f 3 } } sift-keys ."
+        "H{ { 1 2 } }" }
+} ;
 
 HELP: sift-values
 { $values { "assoc" assoc } { "assoc'" "a new assoc" } }
-{ $description "Outputs an assoc removing values that are " { $link f } "." } ;
+{ $description "Outputs an assoc removing values that are " { $link f } "." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 f } { 3 4 } } sift-values ."
+        "H{ { 3 4 } }" }
+} ;
+
+{ sift-keys sift-values harvest-keys harvest-values } related-words
+
+HELP: harvest-keys
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing keys that are empty sequences." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { { 2 } 1 } { { } 3 } } harvest-keys ."
+        "H{ { { 2 } 1 } }" }
+} ;
+
+HELP: harvest-values
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing values that are empty sequences." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 { } } { 3 { 4 } } } harvest-values ."
+        "H{ { 3 { 4 } } }" }
+} ;
+
 
 HELP: assoc=
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
