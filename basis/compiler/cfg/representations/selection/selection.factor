@@ -128,7 +128,7 @@ M: vreg-insn compute-insn-costs
     ] each-basic-block ;
 
 : minimize-costs ( costs -- representations )
-    harvest-values
+    [ nip assoc-empty? ] assoc-reject
     [ >alist alist-min first ] assoc-map ;
 
 : compute-representations ( cfg -- )
