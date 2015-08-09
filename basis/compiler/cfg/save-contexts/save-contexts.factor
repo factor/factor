@@ -5,13 +5,12 @@ cpu.architecture kernel sequences ;
 IN: compiler.cfg.save-contexts
 
 UNION: context-modifier ##phi ##inc ##callback-inputs ;
-UNION: context-save-needed gc-map-insn ;
 
 : save-context-offset ( insns -- n )
     [ context-modifier? not ] find drop ;
 
 : insns-needs-save-context? ( insns -- ? )
-    [ context-save-needed? ] any? ;
+    [ gc-map-insn? ] any? ;
 
 : insert-save-context ( insns -- insns' )
     dup insns-needs-save-context? [
