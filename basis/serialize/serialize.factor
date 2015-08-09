@@ -38,11 +38,11 @@ SYMBOL: serialized
 ! otherwise be confused with a small number.
 : serialize-cell ( n -- )
     [ 0 write1 ] [
-        dup 0x7e <= [
+        dup 0x7f < [
             0x80 bitor write1
         ] [
             dup log2 8 /i 1 +
-            dup 0x81 >= [
+            dup 0x80 > [
                 0xff write1
                 dup serialize-cell
             ] [
@@ -55,7 +55,7 @@ SYMBOL: serialized
 : deserialize-cell ( -- n )
     read1 {
         { [ dup 0xff = ] [ drop deserialize-cell read be> ] }
-        { [ dup 0x81 >= ] [ 0x80 bitxor ] }
+        { [ dup 0x80 > ] [ 0x80 bitxor ] }
         [ read be> ]
     } cond ;
 
