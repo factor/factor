@@ -4,6 +4,17 @@ compiler.cfg.save-contexts kernel namespaces tools.test
 cpu.x86.assembler.operands cpu.architecture ;
 IN: compiler.cfg.save-contexts.tests
 
+! insns-needs-save-context?
+{ t f } [
+    {
+        T{ ##call-gc }
+    } insns-needs-save-context?
+    {
+        T{ ##add f 1 2 3 }
+        T{ ##branch }
+    } insns-needs-save-context?
+] unit-test
+
 H{ } clone representations set
 
 V{
