@@ -53,5 +53,5 @@ IN: compiler.tree.combinators
 : until-fixed-point ( ... #recursive quot: ( ... node -- ... ) -- ... )
     over label>> t >>fixed-point drop
     [ with-scope ] 2keep
-    over label>> fixed-point>> [ 2drop ] [ until-fixed-point ] if ;
-    inline recursive
+    over label>> fixed-point>>
+    [ 2drop ] [ until-fixed-point ] if ; inline recursive

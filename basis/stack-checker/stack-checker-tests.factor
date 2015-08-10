@@ -346,8 +346,9 @@ FORGET: bad-recursion-3
 { 2 0 } [ drop f f [ 2drop "A" throw ] [ ] if 2drop ] must-infer-as
 
 : unbalanced-retain-usage ( a b -- )
-    dup 10 < [ 2drop 5 1 + unbalanced-retain-usage ] [ 2drop ] if ;
-    inline recursive
+    dup 10 <
+    [ 2drop 5 1 + unbalanced-retain-usage ]
+    [ 2drop ] if ; inline recursive
 
 [ [ unbalanced-retain-usage ] infer ] [ inference-error? ] must-fail-with
 

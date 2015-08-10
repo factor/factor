@@ -248,8 +248,7 @@ SPECIAL-OBJECT: undefined-quot 65
 
 : emit-object ( class quot -- addr )
     [ type-number ] dip over here-as
-    [ swap emit-header call align-here ] dip ;
-    inline
+    [ swap emit-header call align-here ] dip ; inline
 
 ! Write an object to the image.
 GENERIC: ' ( obj -- ptr )

@@ -212,8 +212,8 @@ PRIVATE>
 : ((each-from)) ( i seq -- n quot )
     [ length over [-] swap ] keep '[ _ + _ nth-unsafe ] ; inline
 
-: (each-from) ( i seq quot -- n quot' ) [ ((each-from)) ] dip compose ;
-    inline
+: (each-from) ( i seq quot -- n quot' )
+    [ ((each-from)) ] dip compose ; inline
 
 PRIVATE>
 
