@@ -301,7 +301,7 @@ IN: bootstrap.x86
     ds-reg 4 ADD
     ds-reg [] EDX MOV ;
 
-[ jit-set-context ] \ (set-context) define-sub-primitive
+[ jit-set-context ] \ set-context define-sub-primitive
 
 : jit-save-quot-and-param ( -- )
     EDX ds-reg MOV
@@ -337,7 +337,7 @@ IN: bootstrap.x86
     EAX EDX [] MOV
     jit-jump-quot ;
 
-[ jit-start-context ] \ (start-context) define-sub-primitive
+[ jit-start-context ] \ start-context define-sub-primitive
 
 : jit-delete-current-context ( -- )
     jit-load-vm
@@ -347,7 +347,7 @@ IN: bootstrap.x86
 [
     jit-delete-current-context
     jit-set-context
-] \ (set-context-and-delete) define-sub-primitive
+] \ set-context-and-delete define-sub-primitive
 
 : jit-start-context-and-delete ( -- )
     jit-load-vm
@@ -375,4 +375,4 @@ IN: bootstrap.x86
 
 [
     jit-start-context-and-delete
-] \ (start-context-and-delete) define-sub-primitive
+] \ start-context-and-delete define-sub-primitive

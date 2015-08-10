@@ -375,10 +375,10 @@ tuple
     { "fixnum>" "math.private" ( x y -- ? ) }
     { "fixnum>=" "math.private" ( x y -- ? ) }
     { "string-nth-fast" "strings.private" ( n string -- ch ) }
-    { "(set-context)" "threads.private" ( obj context -- obj' ) }
-    { "(set-context-and-delete)" "threads.private" ( obj context -- * ) }
-    { "(start-context)" "threads.private" ( obj quot -- obj' ) }
-    { "(start-context-and-delete)" "threads.private" ( obj quot -- * ) }
+    { "set-context" "threads.private" ( obj context -- obj' ) }
+    { "set-context-and-delete" "threads.private" ( obj context -- * ) }
+    { "start-context" "threads.private" ( obj quot: ( obj -- * ) -- obj' ) }
+    { "start-context-and-delete" "threads.private" ( obj quot: ( obj -- * ) -- * ) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
