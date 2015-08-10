@@ -44,7 +44,7 @@ IN: bootstrap.x86
 [
     pic-tail-reg 5 [RIP+] LEA
     0 JMP f rc-relative rel-word-pic-tail
-] jit-word-jump jit-define
+] JIT-WORD-JUMP jit-define
 
 : jit-load-vm ( -- )
     ! no-op on x86-64. in factor contexts vm-reg always contains the
@@ -56,6 +56,9 @@ IN: bootstrap.x86
 
 : jit-save-context ( -- )
     jit-load-context
+    ! The reason for -8 I think is because we are anticipating a CALL
+    ! instruction. After the call instruction, the contexts frame_top
+    ! will point to the origin jump address.
     R11 RSP -8 [+] LEA
     ctx-reg context-callstack-top-offset [+] R11 MOV
     ctx-reg context-datastack-offset [+] ds-reg MOV
@@ -75,7 +78,7 @@ IN: bootstrap.x86
     RAX 0 MOV f f rc-absolute-cell rel-dlsym
     RAX CALL
     jit-restore-context
-] jit-primitive jit-define
+] JIT-PRIMITIVE jit-define
 
 : jit-jump-quot ( -- )
     arg1 quot-entry-point-offset [+] JMP ;
@@ -177,7 +180,7 @@ IN: bootstrap.x86
 [
     temp2 0xffffffff MOV f rc-absolute-cell rel-literal
     temp1 temp2 CMP
-] pic-check-tuple jit-define
+] PIC-CHECK-TUPLE jit-define
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
@@ -328,7 +331,7 @@ IN: bootstrap.x86
 
 [
     0 [RIP+] EAX MOV rc-relative rel-safepoint
-] \ jit-safepoint jit-define
+] JIT-SAFEPOINT jit-define
 
 [
     jit-start-context-and-delete
