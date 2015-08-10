@@ -135,8 +135,7 @@ PRIVATE>
 
 : sort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
     [ <merge> ] dip
-    [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ;
-    inline
+    [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ; inline
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 

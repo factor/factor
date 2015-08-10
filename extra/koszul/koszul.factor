@@ -242,8 +242,7 @@ DEFER: (d)
     dup length [ graded-triple ] with map ;
 
 : graded-laplacian ( generators quot -- seq )
-    [ basis graded graded-triples [ first3 ] ] dip compose map ;
-    inline
+    [ basis graded graded-triples [ first3 ] ] dip compose map ; inline
 
 : graded-laplacian-betti ( generators -- seq )
     [ laplacian-betti ] graded-laplacian ;

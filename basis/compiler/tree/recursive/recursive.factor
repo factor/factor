@@ -108,8 +108,8 @@ SYMBOL: changed?
 
 : while-changing ( ... quot: ( ... -- ... ) -- ... )
     changed? off
-    [ call ] [ changed? get [ while-changing ] [ drop ] if ] bi ;
-    inline recursive
+    [ call ]
+    [ changed? get [ while-changing ] [ drop ] if ] bi ; inline recursive
 
 : detect-loops ( call-graph -- )
     HS{ } clone not-loops set

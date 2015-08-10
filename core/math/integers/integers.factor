@@ -175,8 +175,7 @@ M: bignum (log2) bignum-log2 ; inline
         zero? [
             dup 2 bitand zero? not rot or [ 1 + ] when
         ] [ nip 1 + ] if
-    ] [ drop nip ] if ;
-    inline
+    ] [ drop nip ] if ; inline
 
 ! Fourth step: post-scaling
 ! Because of rounding, our mantissa with guard bit is now in the

@@ -28,8 +28,7 @@ IN: benchmark.beust2
     ] any? ; inline recursive
 
 :: count-numbers ( max listener -- )
-    10 iota [ 1 + 1 1 0 max listener (count-numbers) ] any? drop ;
-    inline
+    10 iota [ 1 + 1 1 0 max listener (count-numbers) ] any? drop ; inline
 
 :: beust2-benchmark ( -- )
     0 :> i!

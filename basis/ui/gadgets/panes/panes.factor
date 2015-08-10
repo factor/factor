@@ -270,8 +270,7 @@ TUPLE: nested-pane-stream < pane-stream style parent ;
 : new-nested-pane-stream ( style parent class -- stream )
     new
         swap >>parent
-        swap <pane> apply-wrap-style [ >>style ] [ >>pane ] bi* ;
-    inline
+        swap <pane> apply-wrap-style [ >>style ] [ >>pane ] bi* ; inline
 
 : unnest-pane-stream ( stream -- child parent )
     [ [ style>> ] [ pane>> smash-pane ] bi style-pane ] [ parent>> ] bi ;
