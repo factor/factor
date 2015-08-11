@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bootstrap.image.syntax
-byte-arrays classes classes.builtin classes.private
-classes.tuple classes.tuple.private combinators
+USING: accessors arrays assocs byte-arrays classes classes.builtin
+classes.private classes.tuple classes.tuple.private combinators
 combinators.short-circuit combinators.smart
 compiler.codegen.relocation compiler.units fry generic
 generic.single.private grouping hashtables hashtables.private io
@@ -106,7 +105,7 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-SYMBOL: bs-special-objects
+SYMBOL: special-objects
 
 :: jit-conditional ( test-quot false-quot -- )
     [ 0 test-quot call ] B{ } make length :> len
@@ -129,7 +128,7 @@ SYMBOL: bs-special-objects
     make-jit 2nip ;
 
 : jit-define ( quot n -- )
-    [ make-jit-no-params ] dip bs-special-objects get set-at ;
+    [ make-jit-no-params ] dip special-objects get set-at ;
 
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
@@ -152,7 +151,7 @@ SYMBOL: big-endian
 
 SYMBOL: architecture
 
-H{ } clone bs-special-objects set-global
+H{ } clone special-objects set-global
 
 : emit ( cell -- ) bootstrapping-image get push ;
 
@@ -446,7 +445,7 @@ M: quotation '
         class-and-cache class-or-cache next-method-quot-cache
     } [ H{ } clone global-box boa ] H{ } map>assoc assoc-union
     global-hashtable boa
-    OBJ-GLOBAL bs-special-objects get set-at ;
+    OBJ-GLOBAL special-objects get set-at ;
 
 : emit-jit-data ( -- )
     {
@@ -471,16 +470,14 @@ M: quotation '
         { FFI-LEAF-SIGNAL-HANDLER-WORD ffi-leaf-signal-handler }
     }
     \ OBJ-UNDEFINED undefined-def 2array suffix [
-        swap execute( -- x ) bs-special-objects get set-at
+        swap execute( -- x ) special-objects get set-at
     ] assoc-each ;
 
 : emit-special-object ( obj idx -- )
     [ ' ] [ header-size + ] bi* fixup ;
 
 : emit-special-objects ( -- )
-    bs-special-objects get [
-        swap emit-special-object
-    ] assoc-each ;
+    special-objects get [ swap emit-special-object ] assoc-each ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
