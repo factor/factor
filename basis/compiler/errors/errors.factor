@@ -57,13 +57,13 @@ T{ error-type-holder
    { fatal? f }
 } define-error-type
 
-TUPLE: no-such-library name message ;
+ERROR: no-such-library name message ;
 
 M: no-such-library summary drop "Library not found" ;
 
 : no-such-library-error ( name message word -- ) \ no-such-library set-linkage-error ;
 
-TUPLE: no-such-symbol name message ;
+ERROR: no-such-symbol name message ;
 
 M: no-such-symbol summary drop "Symbol not found" ;
 
