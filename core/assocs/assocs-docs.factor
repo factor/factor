@@ -473,7 +473,7 @@ HELP: map>assoc
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new assoc having the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: map>alist
-{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "assoc" "a new assoc" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "alist" "a new alist" } }
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new alist." } ;
 
 { map>assoc map>alist } related-words
