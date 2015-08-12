@@ -93,8 +93,6 @@ CONSTANT: image-version 4
 
 CONSTANT: data-base 1024
 
-CONSTANT: special-objects-size 80
-
 CONSTANT: header-size 10
 
 CONSTANT: data-heap-size-offset 3
@@ -167,7 +165,7 @@ H{ } clone special-objects set-global
 : fixup ( value offset -- ) bootstrapping-image get set-nth ;
 
 : heap-size ( -- size )
-    bootstrapping-image get length header-size - special-objects-size -
+    bootstrapping-image get length header-size - special-object-count -
     bootstrap-cells ;
 
 : here ( -- size ) heap-size data-base + ;
@@ -205,7 +203,7 @@ GENERIC: ' ( obj -- ptr )
     0 emit ! pointer to bignum 0
     0 emit ! pointer to bignum 1
     0 emit ! pointer to bignum -1
-    special-objects-size [ f ' emit ] times ;
+    special-object-count [ f ' emit ] times ;
 
 ! Bignums
 
