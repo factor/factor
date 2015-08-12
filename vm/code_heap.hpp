@@ -47,6 +47,7 @@ struct code_heap {
   void sweep();
 
   code_block* code_block_for_address(cell address);
+  cell frame_predecessor(cell frame_top);
 
   bool safepoint_p(cell addr) {
     cell page_mask = ~(getpagesize() - 1);

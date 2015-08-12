@@ -17,7 +17,7 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
     cell frame_top = ctx->callstack_top;
 
     while (frame_top < ctx->callstack_bottom && frame_top < callstack_limit) {
-      frame_top = frame_predecessor(frame_top);
+      frame_top = code->frame_predecessor(frame_top);
     }
 
     *sp = frame_top;
