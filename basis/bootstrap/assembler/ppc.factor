@@ -137,19 +137,6 @@ IN: bootstrap.ppc
     rs-reg ctx-reg context-retainstack-offset jit-load-cell ;
 
 [
-    12 jit-load-literal-arg
-    0 profile-count-offset LI
-    11 12 0 jit-load-cell-x
-    11 11 1 tag-fixnum ADDI
-    11 12 0 jit-save-cell-x
-    0 word-code-offset LI
-    11 12 0 jit-load-cell-x
-    11 11 compiled-header-size ADDI
-    11 MTCTR
-    BCTR
-] JIT-PROFILING jit-define
-
-[
     0 MFLR
     0 1 lr-save jit-save-cell
     0 jit-load-this-arg
