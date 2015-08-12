@@ -6,6 +6,7 @@ compiler.cfg.dominance.private compiler.cfg.rpo
 compiler.tree.builder compiler.tree.recursive graphviz.render io
 io.encodings.ascii io.files io.files.unique io.launcher kernel
 make math math.parser namespaces quotations sequences words ;
+QUALIFIED: assocs
 IN: compiler.graphviz
 
 : quotes ( str -- str' ) "\"" "\"" surround ;
@@ -106,7 +107,8 @@ SYMBOL: vertex-names
 : vertex-name ( call-graph-node -- string )
     label>> vertex-names get [
         word>> name>>
-        dup word-counts get [ 0 or 1 + dup ] change-at number>string " #" glue
+        dup word-counts get [ 0 or 1 + dup ] assocs:change-at
+        number>string " #" glue
     ] cache ;
 
 : vertex-attrs ( obj -- string )

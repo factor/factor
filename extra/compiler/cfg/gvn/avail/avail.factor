@@ -10,6 +10,7 @@ compiler.cfg.predecessors
 compiler.cfg.renaming.functor
 compiler.cfg.rpo ;
 FROM: namespaces => set ;
+QUALIFIED: assocs
 IN: compiler.cfg.gvn.avail
 
 : defined ( bb -- vregs )
@@ -39,6 +40,6 @@ M: avail-analysis transfer-set drop defined assoc-union ;
     keep swap [ available-uses? ] [ drop f ] if ; inline
 
 : make-available ( vreg -- )
-    basic-block get avail-ins get [ dupd clone ?set-at ] change-at ;
+    basic-block get avail-ins get [ dupd clone ?set-at ] assocs:change-at ;
 
 RENAMING: >avail [ ] [ dup >avail-vreg swap or ] [ ]

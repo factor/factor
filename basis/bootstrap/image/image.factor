@@ -13,22 +13,22 @@ sequences sequences.private source-files strings system vectors
 vocabs words ;
 IN: bootstrap.image
 
-: arch ( os cpu -- arch )
+: arch-name ( os cpu -- arch )
     2dup [ windows? ] [ ppc? ] bi* or [
       [ drop unix ] dip
     ] unless
     [ name>> ] bi@ "-" glue ;
 
-: my-arch ( -- arch )
-    os cpu arch ;
+: my-arch-name ( -- arch )
+    os cpu arch-name ;
 
 : boot-image-name ( arch -- string )
     "boot." ".image" surround ;
 
 : my-boot-image-name ( -- string )
-    my-arch boot-image-name ;
+    my-arch-name boot-image-name ;
 
-CONSTANT: image-strings
+CONSTANT: image-names
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
@@ -596,7 +596,7 @@ PRIVATE>
     ] with-variables ;
 
 : make-images ( -- )
-    image-strings [ make-image ] each ;
+    image-names [ make-image ] each ;
 
 : make-my-image ( -- )
-    my-arch make-image ;
+    my-arch-name make-image ;

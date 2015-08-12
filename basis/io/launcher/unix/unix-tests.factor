@@ -8,7 +8,7 @@ threads tools.test unix unix.process ;
 IN: io.launcher.unix.tests
 
 : arch-temp-file ( str -- str' )
-    "-" my-arch 3append temp-file ;
+    "-" my-arch-name 3append temp-file ;
 
 { } [
     [ "launcher-test-1" arch-temp-file delete-file ] ignore-errors

@@ -4,7 +4,7 @@ IN: update.backup
 
 : backup-boot-image ( -- )
   my-boot-image-name
-  { "boot." my-arch "-" [ "datestamp" get ] ".image" } to-string
+  { "boot." my-arch-name "-" [ "datestamp" get ] ".image" } to-string
   move-file ;
 
 : backup-image ( -- )

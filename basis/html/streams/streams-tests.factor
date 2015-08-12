@@ -66,7 +66,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
 { "<img src=\"/icons/class-word.tiff\"/>" } [
     [
         "text"
-        { { image "vocab:definitions/icons/class-word.tiff" } }
+        { { image-style "vocab:definitions/icons/class-word.tiff" } }
         format
     ] make-html-string
 ] unit-test

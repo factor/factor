@@ -5,7 +5,7 @@ tools.deploy.backend tools.deploy.config.editor ;
 IN: tools.deploy.test
 
 : test-image ( -- str )
-    my-arch "test." ".image" surround ;
+    my-arch-name "test." ".image" surround ;
 
 : shake-and-bake ( vocab -- )
     [ test-image temp-file delete-file ] ignore-errors
