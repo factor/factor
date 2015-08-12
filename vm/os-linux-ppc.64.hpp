@@ -2,8 +2,6 @@
 
 namespace factor {
 
-#define FRAME_RETURN_ADDRESS(frame, vm) \
-  *((void**)(vm->frame_successor(frame) + 1) + 2)
 #define UAP_STACK_POINTER(ucontext) \
   ((ucontext_t*)ucontext)->uc_mcontext.gp_regs[1]
 #define UAP_PROGRAM_COUNTER(ucontext) \
