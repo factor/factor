@@ -226,7 +226,7 @@ MEMO:: specified-font ( name style size foreground background -- font )
     presented [ <presentation> ] apply-style ;
 
 : apply-image-style ( style gadget -- style gadget )
-    image [ nip <image-name> <icon> ] apply-style ;
+    image-style [ nip <image-name> <icon> ] apply-style ;
 
 : apply-background-style ( style gadget -- style gadget )
     background [ <solid> >>interior ] apply-style ;
@@ -340,7 +340,7 @@ M: paragraph stream-write1
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
 : empty-output? ( string style -- ? )
-    [ empty? ] [ image swap key? not ] bi* and ;
+    [ empty? ] [ image-style swap key? not ] bi* and ;
 
 : gadget-format ( string style stream -- )
     [ [ empty-output? ] 2keep ] dip
@@ -350,7 +350,7 @@ M: pack stream-format
     gadget-format ;
 
 M: paragraph stream-format
-    over { presented image } [ swap key? ] with any? [
+    over { presented image-style } [ swap key? ] with any? [
         gadget-format
     ] [
         [ " " split ] 2dip

@@ -3,7 +3,6 @@
 USING: accessors arrays assocs definitions hashtables kernel
 kernel.private math math.order namespaces quotations sequences
 slots.private strings vocabs ;
-FROM: assocs => change-at ;
 IN: words
 
 BUILTIN: word

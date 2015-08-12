@@ -3,7 +3,7 @@
 USING: accessors assocs compiler.tree compiler.tree.combinators
 fry kernel namespaces sequences stack-checker.branches ;
 FROM: namespaces => set ;
-FROM: sets => members ;
+QUALIFIED: sets
 IN: compiler.tree.def-use
 
 SYMBOL: def-use
@@ -52,7 +52,7 @@ GENERIC: node-uses-values ( node -- values )
 
 M: #introduce node-uses-values drop f ;
 M: #push node-uses-values drop f ;
-M: #phi node-uses-values phi-in-d>> concat remove-bottom members ;
+M: #phi node-uses-values phi-in-d>> concat remove-bottom sets:members ;
 M: #declare node-uses-values drop f ;
 M: #terminate node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
 M: #shuffle node-uses-values [ in-d>> ] [ in-r>> ] bi append ;

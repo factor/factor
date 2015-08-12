@@ -3,8 +3,7 @@
 USING: accessors arrays io kernel math models namespaces make
 sequences strings splitting combinators unicode.categories
 math.order math.ranges fry locals ;
-FROM: models => change-model ;
-FROM: sequences => change-nth ;
+QUALIFIED: models
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;
@@ -132,7 +131,7 @@ PRIVATE>
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
-        new-lines from to document [ (set-doc-range) ] change-model
+        new-lines from to document [ (set-doc-range) ] models:change-model
         new-to document update-locs
     ] unless ;
 

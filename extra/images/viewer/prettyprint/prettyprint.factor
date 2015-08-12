@@ -1,7 +1,6 @@
 USING: accessors hashtables images images.viewer io io.styles
 kernel math namespaces prettyprint.custom prettyprint.sections
 sequences ui.gadgets.panes ;
-FROM: images => image ;
 IN: images.viewer.prettyprint
 
 TUPLE: image-section < section image ;

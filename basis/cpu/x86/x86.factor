@@ -16,7 +16,6 @@ compiler.codegen.gc-maps
 compiler.codegen.labels
 compiler.codegen.relocation ;
 QUALIFIED-WITH: alien.c-types c
-FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.x86
 

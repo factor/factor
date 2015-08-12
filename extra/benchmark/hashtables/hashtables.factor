@@ -3,7 +3,6 @@
 USING: accessors assocs combinators kernel locals math
 math.ranges memoize sequences strings hashtables
 math.parser grouping ;
-FROM: assocs => change-at ;
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )

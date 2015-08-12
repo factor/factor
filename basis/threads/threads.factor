@@ -5,7 +5,6 @@ USING: accessors alien.private arrays assocs boxes combinators
 continuations continuations.private deques dlists fry hashtables
 heaps init kernel kernel.private math math.order namespaces
 quotations sequences strings system ;
-FROM: assocs => change-at ;
 IN: threads
 
 <PRIVATE

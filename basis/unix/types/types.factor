@@ -1,5 +1,5 @@
 USING: accessors alien.c-types alien.syntax system vocabs ;
-FROM: sequences => append ;
+QUALIFIED: sequences
 IN: unix.types
 
 TYPEDEF: uchar u_int8_t
@@ -35,4 +35,4 @@ C-TYPE: rlimit
 C-TYPE: rusage
 C-TYPE: sockaddr
 
-"unix.types." os name>> append require
+"unix.types." os name>> sequences:append require

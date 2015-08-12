@@ -1,11 +1,10 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit continuations
-destructors images images.loader io.pathnames kernel locals
-math models opengl.gl opengl.textures opengl.textures.private
+destructors images images.loader io.pathnames kernel locals math
+models opengl.gl opengl.textures opengl.textures.private
 sequences strings ui ui.gadgets ui.gadgets.panes
 ui.gadgets.worlds ui.render ;
-FROM: images => image-dim ;
 IN: images.viewer
 
 TUPLE: image-gadget < gadget image texture ;

@@ -3,7 +3,6 @@
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros make namespaces sequences
 io.sockets.secure fry oauth urls ;
-FROM: assocs => change-at ;
 IN: twitter
 
 ! Configuration

@@ -6,7 +6,6 @@ USING: accessors arrays byte-arrays fry hints kernel lists make math
     math.primes.lists math.primes.miller-rabin math.ranges math.ratios
     math.vectors namespaces parser prettyprint quotations sequences sorting
     strings unicode.case vocabs vocabs.parser words ;
-FROM: sequences => change-nth ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution

@@ -6,7 +6,6 @@ compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.renaming.functor compiler.cfg.rpo
 compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities deques dlists fry
 kernel math sequences sets ;
-FROM: assocs => change-at ;
 FROM: namespaces => set get ;
 IN: compiler.cfg.ssa.construction
 

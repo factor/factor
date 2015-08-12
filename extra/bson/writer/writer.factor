@@ -1,13 +1,11 @@
 ! Copyright (C) 2010 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bson.constants byte-arrays
-calendar combinators.short-circuit fry hashtables io io.binary
-io.encodings.utf8 io.encodings io.streams.byte-array
-kernel linked-assocs literals math math.parser namespaces byte-vectors
-quotations sequences serialize strings vectors dlists alien.accessors ;
-FROM: words => word? word ;
-FROM: typed => TYPED: ;
-FROM: combinators => cond ;
+USING: accessors alien.accessors arrays assocs bson.constants
+byte-arrays byte-vectors calendar combinators
+combinators.short-circuit dlists fry hashtables io io.binary
+io.encodings io.encodings.utf8 io.streams.byte-array kernel
+linked-assocs literals math math.parser namespaces quotations
+sequences serialize strings typed vectors words ;
 IN: bson.writer
 
 <PRIVATE

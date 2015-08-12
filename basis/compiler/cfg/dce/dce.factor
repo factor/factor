@@ -3,7 +3,6 @@
 USING: accessors arrays assocs combinators compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.rpo kernel namespaces sequences sets ;
-FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.dce
 

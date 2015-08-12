@@ -5,7 +5,6 @@ USING: accessors arrays assocs binary-search classes.tuple
 combinators fry hints kernel kernel.private locals math
 math.order math.ranges memoize namespaces sequences
 sequences.private sorting strings vectors ;
-FROM: sequences => change-nth ;
 IN: math.combinatorics
 
 <PRIVATE

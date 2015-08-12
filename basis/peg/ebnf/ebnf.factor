@@ -4,9 +4,7 @@ USING: accessors arrays assocs combinators
 combinators.short-circuit effects io.streams.string kernel make
 math.parser multiline namespaces parser peg peg.parsers
 peg.search quotations sequences splitting stack-checker strings
-summary unicode.categories words ;
-FROM: compiler.units => with-compilation-unit ;
-FROM: strings.parser => unescape-string ;
+strings.parser summary unicode.categories words ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
 IN: peg.ebnf

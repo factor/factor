@@ -4,8 +4,6 @@ continuations formatting fry generalizations hashtables.identity
 io kernel kernel.private layouts locals math math.parser
 math.statistics math.vectors memory namespaces prettyprint
 sequences sequences.generalizations sets sorting ;
-FROM: sequences => change-nth ;
-FROM: assocs => change-at ;
 IN: tools.profiler.sampling
 
 <PRIVATE

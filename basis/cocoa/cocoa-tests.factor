@@ -1,7 +1,7 @@
-USING: cocoa cocoa.messages cocoa.subclassing cocoa.types
-compiler.test kernel namespaces cocoa.classes cocoa.runtime
-tools.test memory compiler.units math core-graphics.types ;
-FROM: alien.c-types => int void ;
+USING: alien.c-types cocoa cocoa.messages cocoa.subclassing
+cocoa.types compiler.test kernel namespaces cocoa.classes
+cocoa.runtime tools.test memory compiler.units math
+core-graphics.types ;
 IN: cocoa.tests
 
 CLASS: Foo < NSObject

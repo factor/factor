@@ -2,8 +2,7 @@
 USING: accessors alien alien.c-types alien.data alien.enums alien.strings
 assocs byte-arrays classes.struct destructors grouping images images.loader
 io kernel locals math mime.types namespaces sequences specialized-arrays
-windows.com windows.gdiplus windows.streams windows.types ;
-FROM: system => os windows? ;
+system windows.com windows.gdiplus windows.streams windows.types ;
 IN: images.loader.gdiplus
 
 SPECIALIZED-ARRAY: ImageCodecInfo

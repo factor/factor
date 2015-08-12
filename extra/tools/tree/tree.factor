@@ -4,7 +4,6 @@
 USING: accessors command-line continuations formatting io
 io.directories io.files.info io.pathnames kernel locals math
 namespaces sequences sorting ;
-FROM: namespaces => change-global ;
 IN: tools.tree
 
 SYMBOL: #files

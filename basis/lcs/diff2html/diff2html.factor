@@ -1,9 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lcs xml.syntax xml.writer kernel strings ;
-FROM: accessors => item>> ;
-FROM: io => write ;
-FROM: sequences => each if-empty when-empty map ;
+USING: accessors kernel lcs sequences strings xml.syntax
+xml.writer ;
 IN: lcs.diff2html
 
 GENERIC: diff-line ( obj -- xml )

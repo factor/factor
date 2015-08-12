@@ -7,7 +7,6 @@ namespaces opengl sequences splitting strings ui.commands
 ui.gadgets ui.gadgets.line-support ui.gadgets.menus
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.images ui.pens.solid ui.render ui.text ;
-FROM: sequences => change-nth ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol

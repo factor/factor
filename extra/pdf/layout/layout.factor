@@ -6,8 +6,6 @@ formatting fry io io.streams.string kernel literals locals make
 math math.order math.ranges pdf.canvas pdf.values pdf.wrap
 sequences sequences.extras sorting splitting ui.text
 xml.entities ;
-FROM: assocs => change-at ;
-FROM: sequences => change-nth ;
 FROM: pdf.canvas => draw-text ;
 
 IN: pdf.layout

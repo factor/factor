@@ -9,7 +9,6 @@ compiler.cfg.gvn.graph
 compiler.cfg.predecessors
 compiler.cfg.renaming.functor
 compiler.cfg.rpo ;
-FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.gvn.avail
 

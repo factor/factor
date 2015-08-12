@@ -4,7 +4,6 @@ USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 cpu.architecture fry heaps kernel math math.order namespaces sequences ;
-FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 SYMBOL: progress

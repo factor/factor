@@ -6,7 +6,6 @@ compiler.tree.propagation.info compiler.tree.propagation.nodes
 compiler.tree.propagation.simple fry kernel locals math
 namespaces sequences stack-checker.branches ;
 FROM: sets => union ;
-FROM: assocs => change-at ;
 IN: compiler.tree.propagation.branches
 
 ! For conditionals, an assoc of child node # --> constraint

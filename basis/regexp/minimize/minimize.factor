@@ -3,7 +3,6 @@
 USING: kernel sequences regexp.transition-tables fry assocs
 accessors locals math sorting arrays sets hashtables regexp.dfa
 combinators.short-circuit regexp.classes ;
-FROM: assocs => change-at ;
 IN: regexp.minimize
 
 : table>state-numbers ( table -- assoc )

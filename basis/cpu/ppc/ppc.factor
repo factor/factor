@@ -12,7 +12,6 @@ compiler.cfg.build-stack-frame compiler.units compiler.constants
 compiler.codegen vm memory fry io prettyprint ;
 QUALIFIED-WITH: alien.c-types c
 FROM: cpu.ppc.assembler => B ;
-FROM: layouts => cell ;
 FROM: math => float ;
 IN: cpu.ppc
 

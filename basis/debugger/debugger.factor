@@ -11,7 +11,6 @@ math.ratios namespaces parser prettyprint sequences
 sequences.private slots source-files.errors strings
 strings.parser summary system vocabs vocabs.loader vocabs.parser
 words ;
-FROM: namespaces => change-global ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )

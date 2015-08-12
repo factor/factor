@@ -4,7 +4,6 @@ USING: accessors combinators kernel locals math math.combinatorics
 math.polynomials opengl.gl sequences ui.gadgets ui.gadgets.panes
 ui.render arrays grouping math.vectors assocs
 ui.gestures ;
-FROM: sequences => change-nth ;
 IN: math.splines
 
 <PRIVATE
