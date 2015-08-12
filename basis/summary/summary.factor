@@ -26,7 +26,7 @@ M: assoc summary
         " entries" %
     ] "" make ;
 
-M: set summary
+M: unordered-set summary
     [
         dup class-of name>> %
         " with " %

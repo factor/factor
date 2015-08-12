@@ -3,8 +3,7 @@
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions kernel kernel.private math math.private
-quotations sequences words ;
-FROM: sets => set= ;
+quotations sequences sets words ;
 IN: classes.union
 
 PREDICATE: union-class < class

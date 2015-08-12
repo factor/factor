@@ -11,7 +11,7 @@ ARTICLE: "hash-sets" "Hash sets"
 ABOUT: "hash-sets"
 
 HELP: hash-set
-{ $class-description "The class of hashtable-like sets. These implement the " { $link set } " mixin." } ;
+{ $class-description "The class of hashtable-like sets. These implement the " { $link unordered-set } " mixin." } ;
 
 HELP: <hash-set>
 { $values { "capacity" number } { "hash-set" hash-set } }

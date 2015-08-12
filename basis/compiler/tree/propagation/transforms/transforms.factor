@@ -10,7 +10,6 @@ namespaces quotations sequences sequences.generalizations
 sequences.private sets sets.private stack-checker
 stack-checker.dependencies vectors words ;
 FROM: math => float ;
-FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -303,17 +302,17 @@ CONSTANT: lookup-table-at-max 256
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
     [ tester ] keep '[ members [ @ ] reject _ set-like ] ;
 
-M\ set diff [ diff-quot ] 1 define-partial-eval
+M\ unordered-set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
     [ tester ] keep '[ members _ filter _ set-like ] ;
 
-M\ set intersect [ intersect-quot ] 1 define-partial-eval
+M\ unordered-set intersect [ intersect-quot ] 1 define-partial-eval
 
 : intersects?-quot ( seq -- quot: ( seq' -- seq'' ) )
     tester '[ members _ any? ] ;
 
-M\ set intersects? [ intersects?-quot ] 1 define-partial-eval
+M\ unordered-set intersects? [ intersects?-quot ] 1 define-partial-eval
 
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
