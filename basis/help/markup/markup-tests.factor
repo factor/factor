@@ -1,7 +1,6 @@
 USING: accessors arrays assocs definitions fry generic help
 help.markup io.streams.string kernel math namespaces parser
 sequences sets strings tools.test words ;
-FROM: namespaces => set ;
 IN: help.markup.tests
 
 : with-markup-test ( quot -- )

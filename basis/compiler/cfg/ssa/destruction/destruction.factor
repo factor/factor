@@ -5,8 +5,7 @@ compiler.cfg.instructions compiler.cfg.liveness
 compiler.cfg.parallel-copy compiler.cfg.rpo compiler.cfg.ssa.cssa
 compiler.cfg.ssa.destruction.coalescing compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference.live-ranges compiler.cfg.utilities
-kernel make sequences ;
-FROM: namespaces => set ;
+kernel make sequences namespaces ;
 IN: compiler.cfg.ssa.destruction
 
 <PRIVATE

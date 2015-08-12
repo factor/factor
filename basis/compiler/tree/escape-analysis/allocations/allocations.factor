@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators disjoint-sets fry kernel
 namespaces sequences stack-checker.values ;
-FROM: namespaces => set ;
 IN: compiler.tree.escape-analysis.allocations
 
 SYMBOL: value-classes

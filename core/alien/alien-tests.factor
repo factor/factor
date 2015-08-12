@@ -2,7 +2,6 @@ USING: accessors alien alien.accessors alien.c-types alien.libraries
 alien.syntax arrays byte-arrays continuations fry kernel kernel.private
 layouts libc math namespaces prettyprint sequences sets system tools.memory
 tools.test ;
-FROM: namespaces => set ;
 IN: alien.tests
 
 { t } [ -1 <alien> alien-address 0 > ] unit-test

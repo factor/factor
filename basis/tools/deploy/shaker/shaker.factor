@@ -23,7 +23,6 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 QUALIFIED: vocabs.loader
-FROM: namespaces => set ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.

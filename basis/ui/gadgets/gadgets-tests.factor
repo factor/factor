@@ -2,7 +2,6 @@ USING: accessors ui.gadgets ui.gadgets.packs ui.gadgets.worlds
 tools.test namespaces models kernel dlists deques math
 math.parser ui sequences hashtables assocs io arrays prettyprint
 io.streams.string math.rectangles ui.gadgets.private sets generic ;
-FROM: namespaces => set ;
 IN: ui.gadgets.tests
 
 { { 300 300 } }

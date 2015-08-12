@@ -8,7 +8,6 @@ io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets slots sorting strings summary
 words words.symbol words.constant words.alias vocabs ;
-FROM: namespaces => set ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )

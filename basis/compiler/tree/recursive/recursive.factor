@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit compiler.tree fry
 kernel namespaces sequences sets ;
-FROM: namespaces => set ;
 IN: compiler.tree.recursive
 
 TUPLE: call-site tail? node label ;

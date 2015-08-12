@@ -5,7 +5,6 @@ io.encodings.binary io.servers io.sockets
 io.streams.duplex fry kernel locals math math.ranges multiline
 namespaces prettyprint random sequences sets splitting threads
 tools.continuations ;
-FROM: namespaces => set ;
 IN: managed-server
 
 TUPLE: managed-server < threaded-server clients ;

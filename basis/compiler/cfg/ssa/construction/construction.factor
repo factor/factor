@@ -4,9 +4,8 @@ USING: accessors assocs combinators compiler.cfg
 compiler.cfg.def-use compiler.cfg.dominance
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.renaming.functor compiler.cfg.rpo
-compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities deques dlists fry
-kernel math sequences sets ;
-FROM: namespaces => set get ;
+compiler.cfg.ssa.construction.tdmsc deques dlists fry kernel
+math namespaces sequences sets ;
 IN: compiler.cfg.ssa.construction
 
 <PRIVATE

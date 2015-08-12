@@ -9,7 +9,6 @@ quotations see sequences sequences.private sets slots sorting
 splitting strings urls vectors vocabs vocabs.loader words
 words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
-FROM: namespaces => set ;
 IN: help.markup
 
 PREDICATE: simple-element < array

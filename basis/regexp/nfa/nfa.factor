@@ -5,7 +5,6 @@ sequences fry quotations math.order math.ranges vectors
 unicode.categories regexp.transition-tables words sets hashtables
 combinators.short-circuit unicode.data regexp.ast
 regexp.classes memoize ;
-FROM: namespaces => set ;
 IN: regexp.nfa
 
 ! This uses unicode.data for ch>upper and ch>lower

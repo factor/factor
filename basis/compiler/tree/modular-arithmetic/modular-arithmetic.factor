@@ -6,7 +6,6 @@ compiler.tree.combinators compiler.tree.def-use.simplified
 compiler.tree.late-optimizations compiler.tree.propagation.info
 fry kernel layouts math math.intervals math.partial-dispatch
 math.private memoize namespaces sequences sets words ;
-FROM: namespaces => set ;
 IN: compiler.tree.modular-arithmetic
 
 ! This is a late-stage optimization.

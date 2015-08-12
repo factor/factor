@@ -6,7 +6,6 @@ locals namespaces quotations sequences stack-checker.backend
 stack-checker.dependencies stack-checker.errors
 stack-checker.recursive-state stack-checker.values
 stack-checker.visitor words ;
-FROM: namespaces => set ;
 IN: stack-checker.transforms
 
 : call-transformer ( stack quot -- newquot )

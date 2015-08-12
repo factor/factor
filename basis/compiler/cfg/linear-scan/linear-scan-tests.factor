@@ -21,7 +21,6 @@ compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.debugger
 compiler.cfg.utilities ;
-FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.tests
 
 check-allocation? on

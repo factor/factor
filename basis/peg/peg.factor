@@ -5,7 +5,6 @@ combinators.short-circuit compiler.units effects.parser fry
 generalizations kernel locals make math math.order namespaces
 quotations sequences sets splitting unicode.categories vectors
 words ;
-FROM: namespaces => set ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
