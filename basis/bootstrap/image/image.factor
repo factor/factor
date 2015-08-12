@@ -28,7 +28,7 @@ IN: bootstrap.image
 : my-boot-image-name ( -- string )
     my-arch boot-image-name ;
 
-CONSTANT: images
+CONSTANT: image-strings
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
@@ -596,7 +596,7 @@ PRIVATE>
     ] with-variables ;
 
 : make-images ( -- )
-    images [ make-image ] each ;
+    image-strings [ make-image ] each ;
 
 : make-my-image ( -- )
     my-arch make-image ;
