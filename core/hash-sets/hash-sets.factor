@@ -134,7 +134,7 @@ M: hash-set equal?
 M: hash-set set-like
     drop dup hash-set? [ ?members >hash-set ] unless ; inline
 
-INSTANCE: hash-set set
+INSTANCE: hash-set unordered-set
 
 ! Overrides for performance
 
