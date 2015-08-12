@@ -18,7 +18,7 @@ TUPLE: lexer-parsing-word word line line-text column ;
 ERROR: not-a-lexer object ;
 
 : check-lexer ( lexer -- lexer )
-    dup lexer? [ not-a-lexer ] unless ; inline
+    dup lexer? [ throw-not-a-lexer ] unless ; inline
 
 : next-line ( lexer -- )
     check-lexer

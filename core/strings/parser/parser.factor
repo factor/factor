@@ -22,7 +22,7 @@ ERROR: bad-escape char ;
         { CHAR: 0  CHAR: \0 }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } ?at [ bad-escape ] unless ;
+    } ?at [ throw-bad-escape ] unless ;
 
 SYMBOL: name>char-hook
 
@@ -116,7 +116,7 @@ ERROR: escaped-char-expected ;
     dup still-parsing-line? [
         [ current-char ] [ advance-char ] bi
     ] [
-        escaped-char-expected
+        throw-escaped-char-expected
     ] if ;
 
 : lexer-head? ( lexer string -- ? )
@@ -174,8 +174,6 @@ DEFER: (parse-multiline-string-until)
             (parse-multiline-string-until)
         ] if
     ] if ;
-
-ERROR: trailing-characters string ;
 
 : (parse-multiline-string-until) ( accum lexer string -- )
     { sbuf lexer fixnum } declare

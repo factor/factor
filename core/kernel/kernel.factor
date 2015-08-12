@@ -304,7 +304,7 @@ GENERIC: throw ( error -- * )
 
 ERROR: assert got expect ;
 
-: assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
+: assert= ( a b -- ) 2dup = [ 2drop ] [ throw-assert ] if ;
 
 <PRIVATE
 

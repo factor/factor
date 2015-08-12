@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays byte-vectors
-classes.algebra.private classes.builtin classes.intersection
-classes.maybe classes.mixin classes.parser classes.predicate
-classes.singleton classes.tuple classes.tuple.parser
+classes.algebra.private classes.builtin classes.error
+classes.intersection classes.maybe classes.mixin classes.parser
+classes.predicate classes.singleton classes.tuple classes.tuple.parser
 classes.union combinators compiler.units definitions effects
 effects.parser generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables io.pathnames kernel lexer
@@ -31,7 +31,7 @@ IN: bootstrap.syntax
 
 : define-core-syntax ( name quot -- )
     [
-        dup "syntax" lookup-word [ ] [ no-word-error ] ?if
+        dup "syntax" lookup-word [ ] [ throw-no-word-error ] ?if
         mark-top-level-syntax
     ] dip
     define-syntax ;
@@ -261,7 +261,7 @@ IN: bootstrap.syntax
             literalize suffix!
             \ (call-next-method) suffix!
         ] [
-            not-in-a-method-error
+            throw-not-in-a-method-error
         ] if*
     ] define-core-syntax
 

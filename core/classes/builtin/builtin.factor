@@ -12,7 +12,7 @@ PREDICATE: builtin-class < class
 ERROR: not-a-builtin object ;
 
 : check-builtin ( class -- )
-    dup builtin-class? [ drop ] [ not-a-builtin ] if ;
+    dup builtin-class? [ drop ] [ throw-not-a-builtin ] if ;
 
 : class>type ( class -- n ) "type" word-prop ; foldable
 

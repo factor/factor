@@ -8,4 +8,4 @@ TUPLE: strict-state code ;
 C: strict strict-state
 
 M: strict-state decode-char
-    code>> decode-char dup replacement-char = [ decode-error ] when ;
+    code>> decode-char dup replacement-char = [ throw-decode-error ] when ;

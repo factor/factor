@@ -17,12 +17,12 @@ ERROR: not-classoids sequence ;
 
 : check-classoids ( members -- members )
     dup [ classoid? ] all?
-    [ [ classoid? ] reject not-classoids ] unless ;
+    [ [ classoid? ] reject throw-not-classoids ] unless ;
 
 ERROR: not-a-classoid object ;
 
 : check-classoid ( object -- object )
-    dup classoid? [ not-a-classoid ] unless ;
+    dup classoid? [ throw-not-a-classoid ] unless ;
 
 : <anonymous-union> ( members -- classoid )
     check-classoids
@@ -47,7 +47,7 @@ TUPLE: anonymous-complement { class read-only } ;
 INSTANCE: anonymous-complement classoid
 
 : <anonymous-complement> ( object -- classoid )
-    dup classoid? [ 1array not-classoids ] unless
+    dup classoid? [ 1array throw-not-classoids ] unless
     anonymous-complement boa ;
 
 M: anonymous-complement rank-class drop 3 ;
@@ -283,7 +283,7 @@ ERROR: topological-sort-failed ;
 
 : largest-class ( seq -- n elt )
     dup [ [ class< ] with any? not ] curry find-last
-    [ topological-sort-failed ] unless* ;
+    [ throw-topological-sort-failed ] unless* ;
 
 : sort-classes ( seq -- newseq )
     [ class-name ] sort-with >vector

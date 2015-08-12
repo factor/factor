@@ -8,7 +8,7 @@ SINGLETON: ascii
 
 M: ascii encode-char
     drop
-    over 127 <= [ stream-write1 ] [ encode-error ] if ; inline
+    over 127 <= [ stream-write1 ] [ throw-encode-error ] if ; inline
 
 <PRIVATE
 
@@ -16,7 +16,7 @@ GENERIC: ascii> ( string -- byte-array )
 
 M: string ascii>
     dup aux>>
-    [ [ dup 127 <= [ encode-error ] unless ] B{ } map-as ]
+    [ [ dup 127 <= [ throw-encode-error ] unless ] B{ } map-as ]
     [ string>byte-array-fast ] if ; inline
 
 PRIVATE>

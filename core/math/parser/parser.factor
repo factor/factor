@@ -454,7 +454,7 @@ M: fixnum (positive>dec)
     1 over (count-digits) <sbuf> (fixnum>dec) "" like reverse! nip ; inline
 
 : (positive>base) ( num radix -- str )
-    dup 1 <= [ invalid-radix ] when
+    dup 1 <= [ throw-invalid-radix ] when
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     reverse! ; inline
 
@@ -534,7 +534,7 @@ M: ratio >base
         { 16 [ [ float>hex-value ] swap (bin-float>base) ] }
         { 8  [ [ float>oct-value ] swap (bin-float>base) ] }
         { 2  [ [ float>bin-value ] swap (bin-float>base) ] }
-        [ invalid-radix ]
+        [ throw-invalid-radix ]
     } case ;
 
 : format-string ( format -- format )

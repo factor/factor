@@ -25,10 +25,10 @@ ERROR: not-a-vocab-root string ;
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
 : ensure-vocab-exists ( string -- string )
-    dup loaded-vocab-names member? [ no-vocab ] unless ;
+    dup loaded-vocab-names member? [ throw-no-vocab ] unless ;
 
 : check-root ( string -- string )
-    dup vocab-root? [ not-a-vocab-root ] unless ;
+    dup vocab-root? [ throw-not-a-vocab-root ] unless ;
 
 : check-vocab-root/vocab ( vocab-root string -- vocab-root string )
     [ check-root ] [ check-vocab-name ] bi* ;

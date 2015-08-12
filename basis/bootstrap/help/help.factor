@@ -13,7 +13,7 @@ IN: bootstrap.help
 
     t load-help? set-global
 
-    [ dup lookup-vocab [ drop ] [ no-vocab ] if ] require-hook [
+    [ dup lookup-vocab [ drop ] [ throw-no-vocab ] if ] require-hook [
         dictionary get values
         [ docs-loaded?>> ] reject
         [ load-docs ] each

@@ -35,7 +35,7 @@ ERROR: no-parent-directory path ;
             drop "." swap
         ] if
         { "" "." ".." } member? [
-            no-parent-directory
+            throw-no-parent-directory
         ] when
     ] unless ;
 
@@ -57,7 +57,7 @@ ERROR: no-parent-directory path ;
         { [ dup head.? ] [
             rest trim-head-separators append-path-empty
         ] }
-        { [ dup head..? ] [ drop no-parent-directory ] }
+        { [ dup head..? ] [ drop throw-no-parent-directory ] }
         [ nip ]
     } cond ;
 

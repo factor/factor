@@ -86,22 +86,22 @@ UNION: abi stdcall thiscall fastcall cdecl mingw ;
 ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )
-    alien-callback-error ;
+    throw-alien-callback-error ;
 
 ERROR: alien-indirect-error ;
 
 : alien-indirect ( args... funcptr return parameters abi -- return... )
-    alien-indirect-error ;
+    throw-alien-indirect-error ;
 
 ERROR: alien-invoke-error library symbol ;
 
 : alien-invoke ( args... return library function parameters -- return... )
-    2over alien-invoke-error ;
+    2over throw-alien-invoke-error ;
 
 ERROR: alien-assembly-error code ;
 
 : alien-assembly ( args... return parameters abi quot -- return... )
-    dup alien-assembly-error ;
+    dup throw-alien-assembly-error ;
 
 <PRIVATE
 

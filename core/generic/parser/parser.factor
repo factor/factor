@@ -38,7 +38,7 @@ SYMBOL: current-method
 ERROR: bad-method-effect ;
 
 : check-method-effect ( effect -- )
-    last-word generic-effect method-effect= [ bad-method-effect ] unless ;
+    last-word generic-effect method-effect= [ throw-bad-method-effect ] unless ;
 
 : ?execute-parsing ( word/number -- seq )
     dup parsing-word?

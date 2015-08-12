@@ -33,7 +33,7 @@ main ;
 ERROR: invalid-source-file-path path ;
 
 : path>source-file ( path -- source-file )
-    dup string? [ invalid-source-file-path ] unless
+    dup string? [ throw-invalid-source-file-path ] unless
     source-files get [ <source-file> ] cache ;
 
 : reset-checksums ( -- )

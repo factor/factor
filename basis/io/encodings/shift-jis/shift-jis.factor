@@ -29,7 +29,7 @@ M: windows-31j <decoder> drop windows-31j-table get-global <decoder> ;
 
 TUPLE: jis assoc ;
 
-: ch>jis ( ch tuple -- jis ) assoc>> value-at [ encode-error ] unless* ;
+: ch>jis ( ch tuple -- jis ) assoc>> value-at [ throw-encode-error ] unless* ;
 : jis>ch ( jis tuple -- string ) assoc>> at replacement-char or ;
 
 : make-jis ( filename -- jis )
