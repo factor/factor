@@ -167,6 +167,7 @@ $nl
 "Mapping between assocs and sequences:"
 { $subsections
     map>assoc
+    map>alist
     assoc>map
     assoc-map-as
 }
@@ -470,6 +471,12 @@ HELP: 2cache
 HELP: map>assoc
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "exemplar" assoc } { "assoc" "a new assoc" } }
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new assoc having the same type as " { $snippet "exemplar" } "." } ;
+
+HELP: map>alist
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "assoc" "a new assoc" } }
+{ $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new alist." } ;
+
+{ map>assoc map>alist } related-words
 
 HELP: assoc>map
 { $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... elt ) } } { "exemplar" sequence } { "seq" "a new sequence" } }

@@ -201,6 +201,9 @@ M: assoc values [ nip ] { } assoc>map ;
         [ [ swapd set-at ] curry compose each ] keep
     ] if ; inline
 
+: map>alist ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... alist )
+    { } map>assoc ; inline
+
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
 
