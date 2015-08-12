@@ -148,6 +148,12 @@ unit-test
     double-array{ 1.0 2.0 } [ dup ] H{ } map>assoc
 ] unit-test
 
+{
+    { { 1.0 1.0 } { 2.0 2.0 } }
+} [
+    double-array{ 1.0 2.0 } [ dup ] { } map>assoc
+] unit-test
+
 { { 3 } } [
     [
         3
