@@ -1,15 +1,15 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes combinators
+USING: accessors arrays classes colors colors.constants combinators
 combinators.short-circuit compiler.units debugger fry help
 help.apropos help.crossref help.home help.stylesheet help.topics
-kernel models sequences sets ui ui.commands ui.gadgets
+kernel locals models sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
-ui.gadgets.viewports ui.gadgets.worlds ui.gestures
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
+ui.gadgets.packs ui.gadgets.theme ui.gadgets.viewports ui.gadgets.worlds ui.gestures
 ui.tools.browser.history ui.tools.browser.popups ui.tools.common
-vocabs ;
+ui.pens.solid vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -34,8 +34,31 @@ M: browser-gadget set-history-value
     [ set-control-value ]
     2bi ;
 
+: <help-header> ( browser-gadget -- gadget )
+    model>> [ '[ _ $title ] try ] <pane-control> ;
+
+: add-help-header ( track -- track )
+    dup <help-header> { 3 3 } <border>
+    help-header-background <solid> >>interior 
+    { 1 0 } >>fill f track-add ;
+
+: <help-footer> ( browser-gadget direction -- gadget )
+    [ model>> ] dip '[ [ _ $navigation ] try ] <pane-control>
+    { 0 0 } <border> { 1/2 1/2 } >>align
+    toolbar-background <solid> >>interior ;
+
+: add-help-footer ( track -- track )
+    horizontal <track> with-lines
+    dupd swap prev <help-footer> 1 track-add
+    dupd swap next <help-footer> 1 track-add
+    f track-add ;
+
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
+
+: add-help-pane ( track -- track )
+    dup dup <help-pane> margins
+    <scroller> >>scroller scroller>> white-interior 1 track-add ;
 
 : search-browser ( string browser -- )
     '[ <apropos-search> _ show-help ] unless-empty ;
@@ -43,25 +66,28 @@ M: browser-gadget set-history-value
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
         10 >>min-cols
-        10 >>max-cols ;
+        10 >>max-cols
+        white-interior ;
+
+: add-spacer ( track -- track )
+    <pile> 1/4 track-add ;
 
 : <browser-toolbar> ( browser -- toolbar )
-    horizontal <track>
-        0 >>fill
-        1/2 >>align
-        { 5 5 } >>gap
-        over <toolbar> f track-add
-        swap search-field>> "Search:" label-on-left 1 track-add ;
+    [ <toolbar> add-spacer ] [ search-field>> "Search" label-on-left 1 track-add ] bi ;
+
+: add-browser-toolbar ( track -- track )
+    dup <browser-toolbar> format-toolbar f track-add ;
 
 : <browser-gadget> ( link -- gadget )
-    vertical browser-gadget new-track
+    vertical browser-gadget new-track with-lines
         1 >>fill
         swap >link <model> >>model
         dup <history> >>history
         dup <search-field> >>search-field
-        dup <browser-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
-        dup dup <help-pane> { 10 0 } <border> { 1 1 } >>fill
-        <scroller> >>scroller scroller>> 1 track-add ;
+        add-browser-toolbar
+        add-help-header
+        add-help-pane
+        add-help-footer ;
 
 M: browser-gadget graft*
     [ add-definition-observer ] [ call-next-method ] bi ;

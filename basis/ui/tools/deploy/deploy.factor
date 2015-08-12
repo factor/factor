@@ -3,8 +3,7 @@
 USING: colors kernel models tools.deploy.config
 tools.deploy.config.editor tools.deploy vocabs namespaces
 models.mapping sequences system accessors fry ui.gadgets ui.render
-ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
-ui.gadgets.editors ui.gadgets.borders ui.gestures ui.commands assocs
+ui.gadgets.packs ui.gadgets.labels ui.gadgets.editors ui.gadgets.borders ui.gadgets.buttons ui.gadgets.toolbar ui.gestures ui.commands assocs
 ui.gadgets.tracks ui ui.tools.listener ui.tools.browser
 ui.gadgets.worlds ;
 IN: ui.tools.deploy

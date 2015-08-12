@@ -1,34 +1,60 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov, 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fonts kernel ui.gadgets ui.gadgets.borders
-ui.gadgets.corners ui.gadgets.frames ui.gadgets.grids
-ui.gadgets.labels ui.pens.image ui.render ;
+USING: accessors colors.constants fonts kernel ui.gadgets
+ui.gadgets.borders ui.gadgets.corners ui.gadgets.frames
+ui.gadgets.grids ui.gadgets.labels
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.theme ui.tools.common 
+ui.pens.gradient ui.pens.image ui.pens.solid ui.render ;
 IN: ui.gadgets.labeled
 
-TUPLE: labeled-gadget < frame content ;
+TUPLE: labeled-gadget < track content color ;
 
 <PRIVATE
 
-: <labeled-title> ( gadget -- label )
-    >label
-    [ panel-background-color font-with-background ] change-font
-    { 0 2 } <border>
-    "title-middle" corner-image
-    <image-pen> t >>fill? >>interior ;
-
-: /-FOO-\ ( title labeled -- labeled )
-    "title-left" corner-icon @top-left grid-add
-    swap <labeled-title> @top grid-add
-    "title-right" corner-icon @top-right grid-add ;
-
 M: labeled-gadget focusable-child* content>> ;
+
+: add-title-bar ( title track -- track )
+    swap >label
+    [ t >>bold? ] change-font
+    { 0 4 } <border>
+    title-bar-gradient <gradient> >>interior
+    f track-add ;
+
+: add-content ( content track -- track )
+    swap 1 track-add ;
+
+: add-color-line ( color track -- track )
+    <shelf> { 0 1.5 } <border>
+    rot <solid> >>interior 
+    f track-add ;
+
+: add-content-area ( labeled -- labeled )
+    [ ] [ content>> ] [ color>> ] tri
+    vertical <track>
+    add-color-line
+    add-content
+    1 track-add ;
 
 PRIVATE>
 
-: <labeled-gadget> ( gadget title -- newgadget )
-    labeled-gadget "labeled-block" [
-        pick >>content
-        /-FOO-\
-        |-----|
-        \-----/
-    ] make-corners ;
+: <labeled> ( gadget title color -- labeled )
+    vertical labeled-gadget new-track with-lines
+    swap >>color
+    add-title-bar
+    swap >>content
+    add-content-area ;
+
+: <framed-labeled> ( gadget title color -- labeled )
+    <labeled> COLOR: grey85 <solid> >>boundary ;
+
+: <labeled-gadget> ( gadget title -- labeled )
+    vertical labeled-gadget new-track with-lines
+    add-title-bar
+    swap >>content dup content>>
+    vertical <track> 
+    add-content
+    { 5 5 } <border>
+    content-background <solid> >>interior
+    1 track-add
+    COLOR: grey85 <solid> >>boundary
+    { 3 3 } <border> ;

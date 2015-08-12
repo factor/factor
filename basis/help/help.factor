@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.tuple
 combinators combinators.short-circuit continuations debugger
 effects generic help.crossref help.markup help.stylesheet
-help.topics io io.styles kernel make namespaces prettyprint
+help.topics io io.styles kernel locals make namespaces prettyprint
 sequences sorting vocabs words words.symbol ;
 IN: help
 
@@ -97,37 +97,45 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : ($title) ( topic -- )
     [ [ article-title ] [ >link ] bi write-object ] ($block) ;
+    
+CONSTANT: prev -1
+CONSTANT: next 1
 
-: $navigation-row ( content element label -- )
-    [ prefix 1array ] dip prefix , ;
+: add-navigation-arrow ( str direction -- str )
+    prev = [ "<" prefix ] [ ">" suffix ] if ;
+
+: $navigation-row ( content element direction -- )
+    [ prefix 1array ] dip add-navigation-arrow , ;
 
 : ($navigation-table) ( element -- )
     help-path-style get table-style [ $table ] with-variable ;
 
-: $navigation-table ( topic -- )
-    [
-        [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
-        [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
-        bi
-    ] { } make [ ($navigation-table) ] unless-empty ;
+:: ($navigation) ( topic direction -- )
+    topic [ direction prev/next-article
+      [ 1array \ $long-link direction $navigation-row ] when* ] 
+    { } make [ ($navigation-table) ] unless-empty ;
 
-: ($navigation) ( topic -- )
-    help-path-style get [
-        [ help-path [ reverse $breadcrumbs ] unless-empty ]
-        [ $navigation-table ] bi
-    ] with-style ;
+: ($navigation-path) ( topic -- )
+    help-path-style get
+       [ help-path [ reverse $breadcrumbs ] unless-empty ]
+    with-style ;
 
 : $title ( topic -- )
     title-style get [
         title-style get [
-            [ ($title) ] [ ($navigation) ] bi
+            [ ($title) ] [ ($navigation-path) ] bi
         ] with-nesting
     ] with-style ;
+
+:: $navigation ( topic direction -- )
+    topic title-style get 
+    [ help-path-style get [ direction ($navigation) ] with-style ]
+    with-style ;
 
 : print-topic ( topic -- )
     >link
     last-element off
-    [ $title ] [ ($blank-line) article-content print-content nl ] bi ;
+    article-content print-content ;
 
 SYMBOL: help-hook
 

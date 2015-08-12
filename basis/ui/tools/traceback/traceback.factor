@@ -1,10 +1,11 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations fonts fry inspector
+USING: accessors arrays colors.constants continuations fonts fry inspector
 kernel models models.arrow prettyprint sequences ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.tracks
+ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar
+ui.gadgets.theme ui.gadgets.tracks
 ui.gestures ui.tools.common ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
@@ -31,39 +32,39 @@ M: stack-entry-renderer row-value drop object>> ;
         [ i:inspector ] >>action
         t >>single-click? ;
 
-: <stack-display> ( model quot title -- gadget )
-    [ '[ dup _ when ] <arrow> <stack-table> <scroller> ] dip
-    <labeled-gadget> ;
+: <stack-display> ( model quot title color -- gadget )
+    [ '[ dup _ when ] <arrow> <stack-table> margins <scroller> white-interior ] 2dip
+    <labeled> ;
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
-    <pane-control> t >>scrolls? <scroller>
-    "Call stack" <labeled-gadget> ;
+    <pane-control> t >>scrolls? margins <scroller> white-interior
+    "Call stack" call-stack-color <labeled> ;
 
 : <datastack-display> ( model -- gadget )
-    [ data>> ] "Data stack" <stack-display> ;
+    [ data>> ] "Data stack" data-stack-color <stack-display> ;
 
 : <retainstack-display> ( model -- gadget )
-    [ retain>> ] "Retain stack" <stack-display> ;
+    [ retain>> ] "Retain stack" retain-stack-color <stack-display> ;
 
 TUPLE: traceback-gadget < tool ;
 
 : <traceback-gadget> ( model -- gadget )
     [
         vertical traceback-gadget new-track
-        { 3 3 } >>gap
+        with-lines
     ] dip
     [ >>model ]
     [
-        [ vertical <track> { 3 3 } >>gap ] dip
+        [ vertical <track> with-lines ] dip
         [
-            [ horizontal <track> { 3 3 } >>gap ] dip
+            [ horizontal <track> with-lines ] dip
             [ <datastack-display> 1/2 track-add ]
             [ <retainstack-display> 1/2 track-add ] bi
             1/3 track-add
         ]
         [ <callstack-display> 2/3 track-add ] bi
-        { 3 3 } <filled-border> 1 track-add
+         1 track-add
     ] bi
     add-toolbar ;
 

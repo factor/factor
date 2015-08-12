@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes colors.constants combinators
+USING: accessors assocs classes colors colors.constants combinators
 combinators.short-circuit combinators.smart fry kernel locals
 math.vectors models namespaces sequences ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.packs
@@ -104,8 +104,8 @@ M: button-pen pen-foreground
     { 0 1/2 } >>align ; inline
 
 : roll-button-theme ( button -- button )
-    f COLOR: black <solid> dup f f <button-pen> >>boundary
-    f f COLOR: dark-gray <solid> f f <button-pen> >>interior
+    f roll-button-rollover-border <solid> dup f f <button-pen> >>boundary
+    f f roll-button-selected-background <solid> f f <button-pen> >>interior
     align-left ; inline
 
 PRIVATE>
@@ -121,13 +121,10 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
-CONSTANT: button-background COLOR: FactorTan
-CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
-
 : <border-button-pen> ( -- pen )
-    "button" button-background button-clicked-background
+    "button" transparent button-text-color
     <border-button-state-pen> dup
-    "button-clicked" button-clicked-background COLOR: white
+    "button-clicked" transparent button-clicked-text-color
     <border-button-state-pen> dup dup
     <button-pen> ;
 
@@ -242,15 +239,3 @@ PRIVATE>
     target command command-button-quot
     '[ drop @ ] <border-button>
     gesture gesture>tooltip >>tooltip ; inline
-
-: <toolbar> ( target -- toolbar )
-    <shelf>
-        1 >>fill
-        { 5 5 } >>gap
-        swap
-        [ [ "toolbar" ] dip class-of get-command-at commands>> ]
-        [ '[ [ _ ] 2dip <command-button> add-gadget ] ]
-        bi assoc-each ;
-
-: add-toolbar ( track -- track )
-    dup <toolbar> { 3 3 } <border> align-left f track-add ;

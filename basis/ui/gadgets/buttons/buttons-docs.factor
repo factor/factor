@@ -1,5 +1,5 @@
 USING: help.markup help.syntax ui.gadgets ui.gadgets.labels
-ui.pens kernel models classes ;
+ui.gadgets.toolbar ui.pens kernel models classes ;
 IN: ui.gadgets.buttons
 
 HELP: button
@@ -41,10 +41,6 @@ HELP: button-pen
 HELP: <command-button>
 { $values { "target" object } { "gesture" "a gesture" } { "command" "a command" } { "button" "a new " { $link button } } }
 { $description "Creates a " { $link <border-button> } " which invokes the command on " { $snippet "target" } " when clicked." } ;
-
-HELP: <toolbar>
-{ $values { "target" object } { "toolbar" gadget } }
-{ $description "Creates a row of " { $link <command-button> } " gadgets invoking commands on " { $snippet "target" } ". The commands are taken from the " { $snippet "\"toolbar\"" } " command group of each class in " { $snippet "classes" } "." } ;
 
 ARTICLE: "ui.gadgets.buttons" "Button gadgets"
 "The " { $vocab-link "ui.gadgets.buttons" } " vocabulary implements buttons. Buttons respond to mouse clicks by invoking a quotation."

@@ -5,7 +5,7 @@ combinators.short-circuit fonts fry kernel locals math
 math.functions math.order math.rectangles math.vectors models
 namespaces opengl sequences splitting strings ui.commands
 ui.gadgets ui.gadgets.line-support ui.gadgets.menus
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.worlds
 ui.gestures ui.images ui.pens.solid ui.render ui.text ;
 IN: ui.gadgets.tables
 
@@ -80,8 +80,6 @@ M: image-name draw-cell nip draw-image ;
 
 : column-offsets ( widths gap -- x xs )
     [ 0 ] dip '[ _ + + ] accumulate ;
-
-CONSTANT: column-title-background COLOR: light-gray
 
 : column-title-font ( font -- font' )
     column-title-background font-with-background t >>bold? ;

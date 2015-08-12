@@ -10,7 +10,8 @@ quotations sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
 ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.tracks ui.gestures ui.operations ui.pens.solid
+ui.gadgets.tracks ui.gadgets.toolbar ui.gadgets.theme
+ui.gestures ui.operations ui.pens.solid
 ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
@@ -211,19 +212,22 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 : <error-summary> ( -- gadget )
     error-list-model get [ drop error-summary. ] <pane-control>
-        COLOR: light-yellow <solid> >>interior ;
+    error-summary-background <solid> >>interior ;
 
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
     dup error-summary>> f track-add ;
+    
+: add-listener-area ( listener -- listener )
+    dup output>> margins <scroller> >>scroller
+    dup scroller>> white-interior 1 track-add ;
 
 : <listener-gadget> ( -- listener )
-    vertical listener-gadget new-track
-        add-toolbar
-        init-input/output
-        dup output>> <scroller> >>scroller
-        dup scroller>> 1 track-add
-        init-error-summary ;
+    vertical listener-gadget new-track with-lines
+    add-toolbar
+    init-input/output
+    add-listener-area
+    init-error-summary ;
 
 M: listener-gadget focusable-child*
     input>> dup popup>> or ;
@@ -330,7 +334,8 @@ M: object accept-completion-hook 2drop ;
     parse-lines-interactive ;
 
 : <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger> "Error" <labeled-gadget> ;
+    over compute-restarts [ hide-glass ] <debugger> 
+    "Error" debugger-color <framed-labeled> ;
 
 : debugger-popup ( interactor error continuation -- )
     [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;

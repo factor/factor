@@ -3,11 +3,8 @@
 USING: accessors calendar colors.constants fonts kernel models
 models.arrow models.delay sequences summary ui
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
-ui.gadgets.worlds ui.pens.solid ui.private ;
+ui.gadgets.theme ui.gadgets.worlds ui.pens.solid ui.private ;
 IN: ui.gadgets.status-bar
-
-CONSTANT: status-bar-background COLOR: FactorDarkSlateBlue
-CONSTANT: status-bar-foreground COLOR: white
 
 : status-bar-font ( -- font )
     sans-serif-font clone
@@ -25,7 +22,9 @@ CONSTANT: status-bar-foreground COLOR: white
 
 : open-status-window ( gadget title/attributes -- )
     ?attributes f <model> >>status <world>
-    dup status>> <status-bar> f track-add
+    dup status>> <status-bar> 
+    { 7 2 } <filled-border> status-bar-background <solid> >>interior
+    f track-add
     open-world-window ;
 
 : show-summary ( object gadget -- )

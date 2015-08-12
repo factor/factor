@@ -123,7 +123,6 @@ M: scroller model-changed
     dup viewport>> { 0 1 } grid-add ; inline
 
 : init-scroller ( column-header scroller -- scroller )
-    { 1 1 } >>gap
     over { 0 1 } { 0 0 } ? >>filled-cell
     t >>root?
     <scroller-model> >>model

@@ -1,10 +1,11 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel concurrency.messaging inspector
+USING: accessors colors kernel concurrency.messaging colors.constants inspector formatting
 ui.tools.listener ui.tools.traceback ui.gadgets.buttons
-ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
+ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.theme ui.gadgets.tracks
+ui.commands ui.gadgets
 models models.arrow ui.tools.browser ui.tools.common ui.gestures
-ui.gadgets.labels ui threads namespaces make tools.walker assocs
+ui.gadgets.labels ui.pens.solid ui threads namespaces make tools.walker assocs
 combinators fry ;
 IN: ui.tools.walker
 
@@ -38,33 +39,50 @@ M: walker-gadget ungraft*
 M: walker-gadget focusable-child*
     traceback>> ;
 
-: walker-state-string ( status thread -- string )
-    [
-        "Thread: " %
-        dup name>> %
-        " (" %
-        swap {
-            { +stopped+ "Stopped" }
-            { +suspended+ "Suspended" }
-            { +running+ "Running" }
-        } at %
-        ")" %
-        drop
-    ] "" make ;
+: thread-status-text ( status thread -- string )
+    name>> swap {
+        { +stopped+ "Stopped" }
+        { +suspended+ "Suspended" }
+        { +running+ "Running" }
+    } at "Thread: %s (%s)" sprintf ;
+
+: thread-status-color ( status -- color )
+    {
+      { +stopped+   [ thread-status-stopped-background ] }
+      { +suspended+ [ thread-status-suspended-background ] }
+      { +running+   [ thread-status-running-background ] }
+      { f           [ content-background ] }
+    } case ;
+
+TUPLE: thread-status < label thread ;
+
+M: thread-status model-changed
+    [ value>> ] dip {
+        [ [ thread>> thread-status-text ] [ string<< ] bi ]
+        [ [ thread-status-color <solid> ] [ parent>> interior<< ] bi* ]
+    } 2cleave ;
 
 : <thread-status> ( model thread -- gadget )
-    '[ _ walker-state-string ] <arrow> <label-control> ;
+    "" thread-status new-label
+        swap >>thread
+        swap >>model ;
+
+: add-thread-status ( track -- track )
+    dup status>> self <thread-status> margins
+    f track-add ;
+
+: add-traceback ( track -- track )
+    dup traceback>> 1 track-add ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    vertical walker-gadget new-track
+    vertical walker-gadget new-track with-lines
         swap >>thread
         swap >>continuation
         swap >>status
         dup continuation>> <traceback-gadget> >>traceback
-
         add-toolbar
-        dup status>> self <thread-status> f track-add
-        dup traceback>> 1 track-add ;
+        add-thread-status
+        add-traceback ;
 
 : walker-help ( -- ) "ui-walker" com-browse ;
 

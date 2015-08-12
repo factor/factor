@@ -8,9 +8,9 @@ models models.arrow models.arrow.smart models.search models.mapping debugger
 namespaces summary locals ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
-ui.tools.inspector ui.gadgets.status-bar
-ui.gadgets.buttons ui.gadgets.borders ui.gadgets.packs
-ui.gadgets.labels ui.baseline-alignment ui.images
+ui.tools.inspector ui.gadgets.buttons ui.gadgets.borders ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.status-bar
+ui.baseline-alignment ui.images
 compiler.errors tools.errors tools.errors.model ;
 IN: ui.tools.error-list
 
@@ -127,10 +127,11 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
 TUPLE: error-display < track ;
 
 : <error-display> ( error-list -- gadget )
-    vertical error-display new-track
-        add-toolbar
+    vertical error-display new-track with-lines
         swap error>> >>model
-        dup model>> [ [ print-error ] when* ] <pane-control> <scroller> 1 track-add ;
+        dup model>> [ [ print-error ] when* ] <pane-control>
+        margins <scroller> white-interior 1 track-add 
+        add-toolbar ;
 
 : com-inspect ( error-display -- )
     control-value [ inspector ] when* ;
@@ -148,7 +149,8 @@ error-display "toolbar" f {
 } define-command-map
 
 : <error-list-toolbar> ( error-list -- toolbar )
-    [ <toolbar> ] [ error-toggle>> "Show errors:" label-on-left add-gadget ] bi ;
+    [ <toolbar> ] [ error-toggle>> "Show errors:" label-on-left f track-add ] bi
+    format-toolbar ;
 
 : <error-model> ( visible-errors model -- model' )
     [ swap '[ error-type _ at ] filter ] <smart-arrow> ;
@@ -163,13 +165,15 @@ error-display "toolbar" f {
         dup <error-table> >>error-table
         dup <error-display> >>error-display
     :> error-list
-    error-list vertical <track>
-        { 5 5 } >>gap
+    error-list vertical <track> with-lines
         error-list <error-list-toolbar> f track-add
-        error-list source-file-table>> <scroller> "Source files" <labeled-gadget> 1/4 track-add
-        error-list error-table>> <scroller> "Errors" <labeled-gadget> 1/4 track-add
-        error-list error-display>> "Details" <labeled-gadget> 1/2 track-add
-    { 5 5 } <filled-border> 1 track-add ;
+        error-list source-file-table>> margins <scroller> white-interior
+        "Source files" source-files-color <labeled> 1/4 track-add
+        error-list error-table>> margins <scroller> white-interior
+        "Errors" errors-color <labeled> 1/4 track-add
+        error-list error-display>>
+        "Details" details-color <labeled> 1/2 track-add
+    1 track-add ;
 
 M: error-list-gadget focusable-child*
     source-file-table>> ;

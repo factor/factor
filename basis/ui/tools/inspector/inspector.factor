@@ -1,11 +1,12 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors inspector namespaces kernel models fry
+USING: accessors colors inspector namespaces kernel models fry
 colors.constants models.arrow prettyprint sequences mirrors assocs
 classes io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ui.gadgets.tables ui.gadgets.status-bar
+ui.gadgets.buttons ui.gadgets.tables ui.gadgets.theme
+ui.gadgets.toolbar ui.gadgets.status-bar
 ui.gadgets.labeled ui.tools.common ui combinators ui.gadgets.worlds ;
 IN: ui.tools.inspector
 
@@ -81,13 +82,12 @@ M: hashtable make-slot-descriptions
         40 >>max-cols ;
 
 : <inspector-gadget> ( model -- gadget )
-    vertical inspector-gadget new-track
-        { 3 3 } >>gap
+    vertical inspector-gadget new-track with-lines
         add-toolbar
         swap >>model
         dup model>> <inspector-table> >>table
-        dup model>> <summary-gadget> "Object" <labeled-gadget> f track-add
-        dup table>> <scroller> "Contents" <labeled-gadget> 1 track-add ;
+        dup model>> <summary-gadget> margins white-interior "Object" object-color <labeled> f track-add
+        dup table>> <scroller> margins white-interior "Contents" contents-color <labeled> 1 track-add ;
 
 M: inspector-gadget focusable-child*
     table>> ;

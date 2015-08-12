@@ -6,9 +6,10 @@ debugger prettyprint help editors fonts ui ui.commands
 ui.debugger ui.gestures ui.gadgets ui.pens.solid
 ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.presentations ui.gadgets.panes
-ui.gadgets.viewports ui.gadgets.tables ui.gadgets.tracks
+ui.gadgets.viewports ui.gadgets.tables ui.gadgets.theme
+ui.gadgets.tracks ui.gadgets.toolbar
 ui.gadgets.scrollers ui.gadgets.borders ui.gadgets.status-bar
-ui.tools.traceback ui.tools.inspector ui.tools.browser ;
+ui.tools.traceback ui.tools.inspector ui.tools.browser ui.tools.common ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
@@ -43,16 +44,14 @@ M: restart-renderer row-columns
 PRIVATE>
 
 : <debugger> ( error continuation restarts restart-hook -- debugger )
-    vertical debugger new-track
-        { 3 3 } >>gap
+    vertical debugger new-track with-lines
         swap >>restart-hook
         swap >>restarts
         swap >>continuation
         swap >>error
-        add-toolbar
         dup <restart-list> >>restart-list
-        dup <error-display> f track-add
-        COLOR: white <solid> >>interior ;
+        dup <error-display> margins white-interior f track-add
+        add-toolbar ;
 
 M: debugger focusable-child*
     dup restart-hook>> [ restart-list>> ] [ drop t ] if ;
