@@ -3,7 +3,6 @@
 USING: accessors arrays assocs combinators compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.rpo kernel namespaces sequences sets ;
-FROM: namespaces => set ;
 IN: compiler.cfg.dce
 
 ! Maps vregs to sequences of vregs

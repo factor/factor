@@ -4,7 +4,6 @@ USING: accessors assocs combinators combinators.short-circuit
 compiler.cfg.loop-detection compiler.cfg.predecessors
 compiler.cfg.rpo compiler.cfg.utilities deques dlists fry kernel
 make math namespaces sequences sets sorting ;
-FROM: namespaces => set ;
 IN: compiler.cfg.linearization
 
 ! This is RPO except loops are rotated and unlikely blocks go

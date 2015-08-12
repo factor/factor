@@ -4,7 +4,6 @@ USING: accessors assocs calendar calendar.format
 combinators.smart io io.crlf io.encodings.utf8 kernel locals
 managed-server namespaces sequences sorting splitting
 unicode.case ;
-FROM: namespaces => set ;
 IN: managed-server.chat
 
 TUPLE: chat-server < managed-server ;

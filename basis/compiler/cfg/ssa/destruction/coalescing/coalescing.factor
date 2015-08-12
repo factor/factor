@@ -3,7 +3,6 @@ compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference cpu.architecture fry kernel make
 namespaces sequences sets sorting ;
-FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction.coalescing
 
 : zip-scalar ( scalar seq -- pairs )

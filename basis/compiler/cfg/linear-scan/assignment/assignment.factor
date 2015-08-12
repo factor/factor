@@ -6,7 +6,6 @@ compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.renaming.functor
 compiler.cfg.ssa.destruction.leaders cpu.architecture
 fry heaps kernel make math namespaces sequences sets ;
-FROM: namespaces => set ;
 IN: compiler.cfg.linear-scan.assignment
 
 ! This contains both active and inactive intervals; any interval

@@ -4,7 +4,6 @@ USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.parallel-copy
 compiler.cfg.registers compiler.cfg.stacks.height
 fry hash-sets kernel make math math.order namespaces sequences sets ;
-FROM: namespaces => set ;
 IN: compiler.cfg.stacks.local
 
 : current-height ( state -- ds rs )

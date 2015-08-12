@@ -1,8 +1,6 @@
 USING: accessors arrays compiler.cfg compiler.cfg.debugger
-compiler.cfg.dominance compiler.cfg.predecessors
-compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities kernel namespaces
-sequences sets tools.test vectors ;
-FROM: namespaces => set ;
+compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities
+kernel namespaces sequences sets tools.test ;
 IN: compiler.cfg.ssa.construction.tdmsc.tests
 
 : test-tdmsc ( -- )

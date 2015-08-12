@@ -6,7 +6,6 @@ generic kernel namespaces sequences sequences.generalizations
 sets words ;
 FROM: compiler.cfg.instructions.syntax => insn-def-slots
 insn-use-slots insn-temp-slots scalar-rep ;
-FROM: namespaces => set ;
 IN: compiler.cfg.representations.preferred
 
 GENERIC: defs-vreg-reps ( insn -- reps )

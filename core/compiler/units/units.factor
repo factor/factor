@@ -4,7 +4,6 @@ USING: accessors arrays assocs classes classes.private
 classes.tuple classes.tuple.private continuations definitions
 generic hash-sets init kernel kernel.private math namespaces
 sequences sets source-files.errors vocabs words ;
-FROM: namespaces => set ;
 IN: compiler.units
 
 PRIMITIVE: modify-code-heap ( alist update-existing? reset-pics? -- )

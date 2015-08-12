@@ -4,7 +4,6 @@ USING: sequences kernel splitting lists fry accessors assocs math.order
 math combinators namespaces urls.encoding xml.syntax xmode.code2html
 xml.data arrays strings vectors xml.writer io.streams.string locals
 unicode.categories ;
-FROM: namespaces => set ;
 IN: farkup
 
 SYMBOL: relative-link-prefix

@@ -4,7 +4,6 @@ USING: accessors assocs continuations debugger fry hashtables io
 io.styles kernel math mirrors namespaces prettyprint
 prettyprint.custom prettyprint.sections sequences sets sorting
 summary ;
-FROM: namespaces => set ;
 IN: inspector
 
 SYMBOL: +number-rows+

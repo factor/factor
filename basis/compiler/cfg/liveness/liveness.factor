@@ -6,7 +6,6 @@ compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
 cpu.architecture deques dlists fry kernel locals namespaces
 sequences sets ;
-FROM: namespaces => set ;
 IN: compiler.cfg.liveness
 
 SYMBOL: live-ins

@@ -14,7 +14,6 @@ prettyprint prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sequences.private sets
 sorting words ;
 FROM: fry => _ ;
-FROM: namespaces => set ;
 RENAME: _ match => __
 IN: compiler.tree.debugger
 

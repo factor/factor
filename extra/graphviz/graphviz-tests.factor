@@ -6,7 +6,6 @@ io.directories.hierarchy io.files io.files.unique io.launcher
 io.pathnames kernel locals make math math.combinatorics
 math.parser memoize namespaces sequences sequences.extras sets
 splitting system tools.test ;
-FROM: namespaces => set ;
 IN: graphviz.tests
 
 ! XXX hack

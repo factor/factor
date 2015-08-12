@@ -5,7 +5,6 @@ generic.standard io.streams.string kernel make math
 math.constants math.functions namespaces parser quotations
 sequences specialized-vectors strings tools.test words ;
 QUALIFIED-WITH: alien.c-types c
-FROM: namespaces => set ;
 SPECIALIZED-VECTOR: c:double
 IN: generic.standard.tests
 

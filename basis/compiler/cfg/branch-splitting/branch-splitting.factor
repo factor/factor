@@ -5,7 +5,6 @@ compiler.cfg compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.renaming compiler.cfg.rpo compiler.cfg.utilities
 deques dlists fry kernel locals math namespaces sequences sets
 vectors ;
-QUALIFIED: namespaces
 IN: compiler.cfg.branch-splitting
 
 : clone-instructions ( insns -- insns' )
@@ -86,8 +85,8 @@ SYMBOL: visited
     [ worklist get push-front ] [ drop ] if ;
 
 : init-worklist ( cfg -- )
-    <dlist> worklist namespaces:set
-    HS{ } clone visited namespaces:set
+    <dlist> worklist set
+    HS{ } clone visited set
     entry>> add-to-worklist ;
 
 : split-branches ( cfg -- )

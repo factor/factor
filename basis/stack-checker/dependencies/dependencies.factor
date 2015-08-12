@@ -4,7 +4,6 @@ USING: accessors alien.c-types arrays assocs classes
 classes.algebra classes.tuple combinators.short-circuit fry
 generic kernel math namespaces sequences sets words ;
 FROM: classes.tuple.private => tuple-layout ;
-FROM: namespaces => set ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on

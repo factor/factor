@@ -5,7 +5,6 @@ compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.representations.preferred compiler.cfg.rpo
 compiler.cfg.utilities cpu.architecture fry kernel locals math
 namespaces sequences sets ;
-QUALIFIED: namespaces
 IN: compiler.cfg.alias-analysis
 
 ! Local copy propagation
@@ -126,13 +125,13 @@ SYMBOL: ac-counter
     ] [ vreg kill-computed-set-slot ] if ;
 
 : init-alias-analysis ( -- )
-    H{ } clone vregs>acs namespaces:set
-    H{ } clone acs>vregs namespaces:set
-    H{ } clone live-slots namespaces:set
-    H{ } clone copies namespaces:set
-    H{ } clone recent-stores namespaces:set
-    HS{ } clone dead-stores namespaces:set
-    0 ac-counter namespaces:set ;
+    H{ } clone vregs>acs set
+    H{ } clone acs>vregs set
+    H{ } clone live-slots set
+    H{ } clone copies set
+    H{ } clone recent-stores set
+    HS{ } clone dead-stores set
+    0 ac-counter set ;
 
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
@@ -256,7 +255,7 @@ M: insn eliminate-dead-stores drop t ;
     copies get clear-assoc
     dead-stores get clear-set
 
-    next-ac heap-ac namespaces:set
+    next-ac heap-ac set
     ##vm-field set-new-ac
     ##alien-global set-new-ac ;
 
