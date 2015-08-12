@@ -125,7 +125,7 @@ ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
 "The following Factor types are not preserved, unless another type has precedence:"
 { $list
   { { $link assoc } " -> !!map -> " { $link hashtable } }
-  { { $link set } " -> !!set -> " { $link hash-set } }
+  { { $link unordered-set } " -> !!set -> " { $link hash-set } }
   { { $link sequence } " -> !!seq -> " { $link array } }
 }
 "Examples of type precedence which preserves type: " { $link byte-array } " over " { $link sequence } "."
