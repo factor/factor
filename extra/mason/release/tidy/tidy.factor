@@ -7,7 +7,7 @@ IN: mason.release.tidy
 
 : useless-files ( -- seq )
     "build-support/cleanup" ascii file-lines
-    images [ boot-image-name ] map append
+    image-names [ boot-image-name ] map append
     target-os get macosx? [ "Factor.app" suffix ] unless ;
 
 : tidy ( -- )

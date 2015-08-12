@@ -9,7 +9,7 @@ IN: tools.image-analyzer.tests
     dup image-path exists? [ drop ] [ make-image ] if ;
 
 : loadable-images ( -- images )
-    images cpu name>> '[ _ tail? ] filter ;
+    image-names cpu name>> '[ _ tail? ] filter ;
 
 { t } [
     loadable-images [ [ ?make-image ] each ] [

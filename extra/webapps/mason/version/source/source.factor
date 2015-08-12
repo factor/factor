@@ -20,7 +20,7 @@ IN: webapps.mason.version.source
     ".gitignore" delete-file ;
 
 : download-images ( -- )
-    images [ boot-image-name download-image ] each ;
+    image-names [ boot-image-name download-image ] each ;
 
 : prepare-source ( git-id -- )
     "factor" [

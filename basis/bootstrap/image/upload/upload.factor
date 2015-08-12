@@ -23,7 +23,7 @@ SYMBOL: build-images-destination
 : checksums-path ( -- temp ) "checksums.txt" temp-file ;
 
 : boot-image-names ( -- seq )
-    images [ boot-image-name ] map ;
+    image-names [ boot-image-name ] map ;
 
 : compute-checksums ( -- )
     checksums-path ascii [
