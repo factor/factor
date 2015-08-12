@@ -8,7 +8,7 @@ vocabs.loader words ;
 IN: vocabs.metadata
 
 : check-vocab ( vocab -- vocab )
-    dup find-vocab-root [ no-vocab ] unless ;
+    dup find-vocab-root [ throw-no-vocab ] unless ;
 
 MEMO: vocab-file-contents ( vocab name -- seq )
     vocab-append-path dup
@@ -18,7 +18,7 @@ MEMO: vocab-file-contents ( vocab name -- seq )
     dupd vocab-append-path [
         swap [ ?delete-file ] [ swap utf8 set-file-lines ] if-empty
         \ vocab-file-contents reset-memoized
-    ] [ vocab-name no-vocab ] ?if ;
+    ] [ vocab-name throw-no-vocab ] ?if ;
 
 : vocab-windows-icon-path ( vocab -- string )
     vocab-dir "icon.ico" append-path ;
@@ -92,7 +92,7 @@ ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
     dup vocab-platforms-path vocab-file-contents
-    [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
+    [ dup "system" lookup-word [ ] [ throw-bad-platform ] ?if ] map ;
 
 : set-vocab-platforms ( platforms vocab -- )
     [ [ name>> ] map ] dip

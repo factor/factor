@@ -22,7 +22,7 @@ M: f alien>string
 ERROR: invalid-c-string string ;
 
 : check-string ( string -- )
-    0 over member-eq? [ invalid-c-string ] [ drop ] if ;
+    0 over member-eq? [ throw-invalid-c-string ] [ drop ] if ;
 
 GENERIC# string>alien 1 ( string encoding -- byte-array )
 

@@ -3,8 +3,8 @@
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions effects generic kernel kernel.private
-make math math.private memory namespaces quotations sequences
-sequences.private slots slots.private strings words ;
+make math math.private memory namespaces quotations
+sequences sequences.private slots slots.private strings words ;
 IN: classes.tuple
 
 <PRIVATE
@@ -24,7 +24,7 @@ ERROR: no-slot name tuple ;
 
 : offset-of-slot ( name tuple -- n )
     2dup class-of all-slots slot-named
-    [ 2nip offset>> ] [ no-slot ] if* ;
+    [ 2nip offset>> ] [ throw-no-slot ] if* ;
 
 : get-slot-named ( name tuple -- value )
     [ nip ] [ offset-of-slot ] 2bi slot ;
@@ -59,7 +59,7 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     [ [ layout-of ] [ class-of tuple-layout ] bi eq? ] [ drop t ] if ;
 
 : check-tuple ( object -- tuple )
-    dup tuple? [ not-a-tuple ] unless ; inline
+    dup tuple? [ throw-not-a-tuple ] unless ; inline
 
 : prepare-tuple-slots ( tuple -- n tuple )
     check-tuple [ tuple-size iota ] keep ;
@@ -318,32 +318,13 @@ M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
-PREDICATE: error-class < tuple-class
-    "error-class" word-prop ;
-
-M: error-class reset-class
-    [ call-next-method ] [ "error-class" remove-word-prop ] bi ;
-
-: define-error-class ( class superclass slots -- )
-    error-slots {
-        [ define-tuple-class ]
-        [ 2drop reset-generic ]
-        [ 2drop t "error-class" set-word-prop ]
-        [
-            2drop
-            [ dup [ boa throw ] curry ]
-            [ all-slots thrower-effect ]
-            bi define-declared
-        ]
-    } 3cleave ;
-
 : boa-effect ( class -- effect )
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
 ERROR: not-a-tuple-class object ;
 
 : check-tuple-class ( class -- class )
-    dup tuple-class? [ not-a-tuple-class ] unless ; inline
+    dup tuple-class? [ throw-not-a-tuple-class ] unless ; inline
 
 : define-boa-word ( word class -- )
     check-tuple-class [ [ boa ] curry ] [ boa-effect ] bi

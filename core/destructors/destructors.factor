@@ -19,7 +19,7 @@ SLOT: continuation
     disposables get adjoin ;
 
 : unregister-disposable ( obj -- )
-    disposables get 2dup in? [ delete ] [ drop already-unregistered ] if ;
+    disposables get 2dup in? [ delete ] [ drop throw-already-unregistered ] if ;
 
 PRIVATE>
 

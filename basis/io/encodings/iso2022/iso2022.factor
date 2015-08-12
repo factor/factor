@@ -44,7 +44,7 @@ CONSTANT: switch-jis212 B{ $ ESC CHAR: $ CHAR: ( CHAR: D }
         { [ dup jis201 get-global value? ] [ drop switch-jis201 jis201 get-global ] }
         { [ dup jis208 get-global value? ] [ drop switch-jis208 jis208 get-global ] }
         { [ dup jis212 get-global value? ] [ drop switch-jis212 jis212 get-global ] }
-        [ encode-error ]
+        [ throw-encode-error ]
     } cond ;
 
 : stream-write-num ( num stream -- )

@@ -93,7 +93,7 @@ HELP: find-vocab-root
 
 HELP: no-vocab
 { $values { "name" "a vocabulary name" } }
-{ $description "Throws a " { $link no-vocab } "." }
+{ $description "A " { $link no-vocab } " error tuple. Call " { $link throw-no-vocab } " to throw it." }
 { $error-description "Thrown when a " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " form refers to a non-existent vocabulary." } ;
 
 HELP: load-help?

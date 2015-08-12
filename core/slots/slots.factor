@@ -83,7 +83,7 @@ M: object instance-check-quot
     [
         \ dup ,
         [ predicate-def % ]
-        [ [ bad-slot-value ] curry , ] bi
+        [ [ throw-bad-slot-value ] curry , ] bi
         \ unless ,
     ] [ ] make ;
 
@@ -241,7 +241,7 @@ ERROR: bad-slot-attribute key ;
         unclip {
             { initial: [ [ first >>initial ] [ rest ] bi ] }
             { read-only [ [ t >>read-only ] dip ] }
-            [ bad-slot-attribute ]
+            [ throw-bad-slot-attribute ]
         } case
     ] unless ;
 

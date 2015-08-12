@@ -7,10 +7,10 @@ IN: tools.deploy
 ERROR: no-vocab-main vocab ;
 
 : check-vocab-main ( vocab -- vocab )
-    [ require ] keep dup vocab-main [ no-vocab-main ] unless ;
+    [ require ] keep dup vocab-main [ throw-no-vocab-main ] unless ;
 
 : deploy ( vocab -- )
-    dup find-vocab-root [ check-vocab-main deploy* ] [ no-vocab ] if ;
+    dup find-vocab-root [ check-vocab-main deploy* ] [ throw-no-vocab ] if ;
 
 : deploy-image-only ( vocab image -- )
     [ vm-path ] 2dip

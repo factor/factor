@@ -602,61 +602,6 @@ must-fail-with
 
 { V{ } } [ blah ] unit-test
 
-! Test reshaping with type declarations and slot attributes
-TUPLE: reshape-test x ;
-
-T{ reshape-test f "hi" } "tuple" set
-
-{ } [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval( -- ) ] unit-test
-
-{ f } [ \ reshape-test \ x<< ?lookup-method ] unit-test
-
-[ "tuple" get 5 >>x ] must-fail
-
-{ "hi" } [ "tuple" get x>> ] unit-test
-
-{ } [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x integer read-only } ;" eval( -- ) ] unit-test
-
-{ 0 } [ "tuple" get x>> ] unit-test
-
-{ } [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x fixnum initial: 4 read-only } ;" eval( -- ) ] unit-test
-
-{ 0 } [ "tuple" get x>> ] unit-test
-
-TUPLE: boa-coercer-test { x array-capacity } ;
-
-{ fixnum } [ 0 >bignum boa-coercer-test boa x>> class-of ] unit-test
-
-{ T{ boa-coercer-test f 0 } } [ T{ boa-coercer-test } ] unit-test
-
-! Test error classes
-ERROR: error-class-test a b c ;
-
-{ "( a b c -- * )" } [ \ error-class-test stack-effect effect>string ] unit-test
-{ f } [ \ error-class-test "inline" word-prop ] unit-test
-
-[ "IN: classes.tuple.tests ERROR: error-x ; : error-x 3 ;" eval( -- ) ]
-[ error>> error>> redefine-error? ] must-fail-with
-
-DEFER: error-y
-
-{ } [ [ \ error-y dup class? [ forget-class ] [ drop ] if ] with-compilation-unit ] unit-test
-
-{ } [ "IN: classes.tuple.tests GENERIC: error-y ( a -- b )" eval( -- ) ] unit-test
-
-{ f } [ \ error-y tuple-class? ] unit-test
-
-{ f } [ \ error-y error-class? ] unit-test
-
-{ t } [ \ error-y generic? ] unit-test
-
-{ } [ "IN: classes.tuple.tests ERROR: error-y ;" eval( -- ) ] unit-test
-
-{ t } [ \ error-y tuple-class? ] unit-test
-
-{ t } [ \ error-y error-class? ] unit-test
-
-{ f } [ \ error-y generic? ] unit-test
 
 { } [
     "IN: classes.tuple.tests TUPLE: forget-subclass-test ; TUPLE: forget-subclass-test' < forget-subclass-test ;"
@@ -672,9 +617,11 @@ DEFER: error-y
     drop
 ] unit-test
 
+
 { } [
     "IN: sequences TUPLE: reversed { seq read-only } ;" eval( -- )
 ] unit-test
+
 
 TUPLE: bogus-hashcode-1 x ;
 
@@ -726,10 +673,33 @@ DEFER: redefine-tuple-twice
 
 { t } [ \ redefine-tuple-twice symbol? ] unit-test
 
-ERROR: base-error x y ;
-ERROR: derived-error < base-error z ;
 
-{ ( x y z -- * ) } [ \ derived-error stack-effect ] unit-test
+! Test reshaping with type declarations and slot attributes
+TUPLE: reshape-test x ;
+
+T{ reshape-test f "hi" } "tuple" set
+
+{ } [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval( -- ) ] unit-test
+
+{ f } [ \ reshape-test \ x<< ?lookup-method ] unit-test
+
+[ "tuple" get 5 >>x ] must-fail
+
+{ "hi" } [ "tuple" get x>> ] unit-test
+
+{ } [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x integer read-only } ;" eval( -- ) ] unit-test
+
+{ 0 } [ "tuple" get x>> ] unit-test
+
+{ } [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x fixnum initial: 4 read-only } ;" eval( -- ) ] unit-test
+
+{ 0 } [ "tuple" get x>> ] unit-test
+
+TUPLE: boa-coercer-test { x array-capacity } ;
+
+{ fixnum } [ 0 >bignum boa-coercer-test boa x>> class-of ] unit-test
+
+{ T{ boa-coercer-test f 0 } } [ T{ boa-coercer-test } ] unit-test
 
 ! Make sure that tuple reshaping updates code heap roots
 TUPLE: code-heap-ref ;

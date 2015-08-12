@@ -139,7 +139,7 @@ CONSTANT: bom-be B{ 0xfe 0xff }
 
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf16le ] [
-        bom-be sequence= [ utf16be ] [ missing-bom ] if
+        bom-be sequence= [ utf16be ] [ throw-missing-bom ] if
     ] if ;
 
 M: utf16 <decoder> ( stream utf16 -- decoder )

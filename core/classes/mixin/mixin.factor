@@ -22,7 +22,7 @@ ERROR: check-mixin-class-error class ;
 
 : check-mixin-class ( mixin -- mixin )
     dup mixin-class? [
-        check-mixin-class-error
+        throw-check-mixin-class-error
     ] unless ;
 
 <PRIVATE

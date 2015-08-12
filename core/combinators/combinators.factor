@@ -38,7 +38,7 @@ SLOT: terminated?
             check-datastack
         ] if
     ] 2dip rot
-    [ 2drop ] [ wrong-values ] if ;
+    [ 2drop ] [ throw-wrong-values ] if ;
 
 : execute-effect ( word effect -- )
     [ [ execute ] curry ] dip call-effect ;

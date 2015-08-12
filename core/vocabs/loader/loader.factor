@@ -36,7 +36,7 @@ ERROR: not-found-in-roots path ;
     vocab-roots get [ prepend-path exists? ] with find nip ;
 
 M: string vocab-path ( string -- path/f )
-    dup find-root-for [ prepend-path ] [ not-found-in-roots ] if* ;
+    dup find-root-for [ prepend-path ] [ throw-not-found-in-roots ] if* ;
 
 PRIVATE>
 
@@ -165,7 +165,7 @@ PRIVATE>
     [
         drop dup find-vocab-root
         [ (require) ]
-        [ dup lookup-vocab [ drop ] [ no-vocab ] if ]
+        [ dup lookup-vocab [ drop ] [ throw-no-vocab ] if ]
         if
     ] if
 ] require-hook set-global

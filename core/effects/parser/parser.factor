@@ -21,8 +21,8 @@ SYMBOL: effect-var
 
 : parse-effect-var ( first? var name -- var )
     nip
-    [ ":" ?tail [ row-variable-can't-have-type ] when ] curry
-    [ invalid-row-variable ] if ;
+    [ ":" ?tail [ throw-row-variable-can't-have-type ] when ] curry
+    [ throw-invalid-row-variable ] if ;
 
 : parse-effect-value ( token -- value )
     ":" ?tail [ scan-object 2array ] when ;
@@ -31,8 +31,8 @@ PRIVATE>
 : parse-effect-token ( first? var end -- var more? )
     scan-token {
         { [ end-token? ] [ drop nip f ] }
-        { [ effect-opener? ] [ bad-effect ] }
-        { [ effect-closer? ] [ stack-effect-omits-dashes ] }
+        { [ effect-opener? ] [ throw-bad-effect ] }
+        { [ effect-closer? ] [ throw-stack-effect-omits-dashes ] }
         { [ row-variable? ] [ parse-effect-var t ] }
         [ [ drop ] 2dip parse-effect-value , t ]
     } cond ;

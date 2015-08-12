@@ -23,7 +23,7 @@ TUPLE: single-combination ;
 PREDICATE: single-generic < generic
     "combination" word-prop single-combination? ;
 
-M: single-generic make-inline cannot-be-inline ;
+M: single-generic make-inline throw-cannot-be-inline ;
 
 GENERIC: dispatch# ( word -- n )
 
@@ -45,7 +45,7 @@ M: single-combination next-method-quot* ( class generic combination -- quot )
             [
                 pick predicate-def %
                 1quotation ,
-                [ inconsistent-next-method ] 2curry ,
+                [ throw-inconsistent-next-method ] 2curry ,
                 \ if ,
             ] [ ] make picker prepend
         ] [ 3drop f ] if
@@ -59,7 +59,7 @@ M: single-combination next-method-quot* ( class generic combination -- quot )
     bi or ;
 
 M: single-combination make-default-method
-    [ [ picker ] dip [ no-method ] curry append ] with-combination ;
+    [ [ picker ] dip [ throw-no-method ] curry append ] with-combination ;
 
 ! ! ! Build an engine ! ! !
 
@@ -216,7 +216,7 @@ ERROR: unreachable ;
 
 : prune-redundant-predicates ( assoc -- default assoc' )
     {
-        { [ dup empty? ] [ drop [ unreachable ] { } ] }
+        { [ dup empty? ] [ drop [ throw-unreachable ] { } ] }
         { [ dup length 1 = ] [ first second { } ] }
         { [ dup keep-going? ] [ rest-slice prune-redundant-predicates ] }
         [ [ first second ] [ rest-slice ] bi ]

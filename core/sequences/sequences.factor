@@ -57,13 +57,13 @@ M: integer bounds-check? ( n seq -- ? )
     dupd length < [ 0 >= ] [ drop f ] if ; inline
 
 : bounds-check ( n seq -- n seq )
-    2dup bounds-check? [ bounds-error ] unless ; inline
+    2dup bounds-check? [ throw-bounds-error ] unless ; inline
 
 MIXIN: immutable-sequence
 
 ERROR: immutable element index sequence ;
 
-M: immutable-sequence set-nth immutable ;
+M: immutable-sequence set-nth throw-immutable ;
 
 INSTANCE: immutable-sequence sequence
 
@@ -304,7 +304,7 @@ C: <copy> copy-state
     3dup nip new-sequence 0 swap <copy> ; inline
 
 : bounds-check-head ( n seq -- n seq )
-    over 0 < [ bounds-error ] when ; inline
+    over 0 < [ throw-bounds-error ] when ; inline
 
 : check-copy ( src n dst -- src n dst )
     3dup bounds-check-head
@@ -742,7 +742,7 @@ PRIVATE>
 
 : last ( seq -- elt )
     [ length 1 - ] keep
-    over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
+    over 0 < [ throw-bounds-error ] [ nth-unsafe ] if ; inline
 
 <PRIVATE
 
@@ -753,7 +753,7 @@ PRIVATE>
 
 : set-last ( elt seq -- )
     [ length 1 - ] keep
-    over 0 < [ bounds-error ] [ set-nth-unsafe ] if ; inline
+    over 0 < [ throw-bounds-error ] [ set-nth-unsafe ] if ; inline
 
 : pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
 
@@ -814,7 +814,7 @@ PRIVATE>
 : pop ( seq -- elt )
     [ length 1 - ] keep over 0 >=
     [ [ nth-unsafe ] [ shorten ] 2bi ]
-    [ bounds-error ] if ;
+    [ throw-bounds-error ] if ;
 
 : exchange ( m n seq -- )
     [ nip bounds-check 2drop ]
