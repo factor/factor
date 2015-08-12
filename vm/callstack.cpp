@@ -20,7 +20,7 @@ be calling it at all, so we leave it as it is for now. */
 cell factor_vm::second_from_top_stack_frame(context* ctx) {
   cell frame_top = ctx->callstack_top;
   for (cell i = 0; i < 2; ++i) {
-    cell pred = frame_predecessor(frame_top);
+    cell pred = code->frame_predecessor(frame_top);
     if (pred >= ctx->callstack_bottom)
       return frame_top;
     frame_top = pred;
@@ -47,14 +47,6 @@ void factor_vm::primitive_callstack() { ctx->push(capture_callstack(ctx)); }
 void factor_vm::primitive_callstack_for() {
   context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
   ctx->replace(capture_callstack(other_ctx));
-}
-
-cell factor_vm::frame_predecessor(cell frame_top) {
-  cell addr = *(cell*)frame_top;
-  FACTOR_ASSERT(addr != 0);
-  code_block* owner = code->code_block_for_address(addr);
-  cell frame_size = owner->stack_frame_size_for_address(addr);
-  return frame_top + frame_size;
 }
 
 struct stack_frame_in_array {

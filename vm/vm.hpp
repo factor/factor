@@ -628,7 +628,6 @@ struct factor_vm {
   cell capture_callstack(context* ctx);
   void primitive_callstack();
   void primitive_callstack_for();
-  cell frame_predecessor(cell frame_top);
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
   void primitive_innermost_stack_frame_scan();

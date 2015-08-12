@@ -83,6 +83,16 @@ code_block* code_heap::code_block_for_address(cell address) {
   return found_block;
 }
 
+cell code_heap::frame_predecessor(cell frame_top) {
+  cell addr = *(cell*)frame_top;
+  FACTOR_ASSERT(seg->in_segment_p(addr));
+  //FACTOR_ASSERT(addr != 0);
+  code_block* owner = code_block_for_address(addr);
+  cell frame_size = owner->stack_frame_size_for_address(addr);
+  return frame_top + frame_size;
+}
+
+/* Recomputes the all_blocks set of code blocks */
 void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
   auto all_blocks_set_inserter = [&](code_block* block, cell size) {
