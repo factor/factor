@@ -6,7 +6,7 @@ IN: sets.extras
 HELP: setwise-xor
 { $values
     { "seq1" sequence } { "seq2" sequence }
-    { "set" set }
+    { "set" unordered-set }
 }
 { $description "Converts the sequences to sets and takes the element-wise " { $link xor } ". Outputs elements that are in either set but not in both." }
 { $example
@@ -17,11 +17,11 @@ HELP: setwise-xor
 { $notes "Known as setxor1d in numpy." } ;
 
 HELP: symmetric-diff
-{ $values { "set1" set } { "set2" set } { "set" set } }
+{ $values { "set1" unordered-set } { "set2" unordered-set } { "set" unordered-set } }
 { $description "Find the symmetric difference of two sets.  Outputs a set containing elements that in either set but not in both." } ;
 
 HELP: proper-subset?
-{ $values { "set1" set } { "set2" set } { "?" boolean } }
+{ $values { "set1" unordered-set } { "set2" unordered-set } { "?" boolean } }
 { $description "Find whether " { $snippet "set1" } " is a proper subset of " { $snippet "set2" } ".  Returns true if " { $snippet "set1" } " is a subset of " { $snippet "set2" } " but " { $snippet "set2" } " is not a subset of " { $snippet "set1" } "." } ;
 
 ARTICLE: "sets.extras" "Extra sets words"
