@@ -279,11 +279,3 @@ M: slot-spec make-slot
 
 : slot-named ( name specs -- spec/f )
     slot-named* nip ;
-
-! Predefine some slots, because there are change-* words in other vocabs
-! that nondeterministically cause ambiguities when USEd alongside
-! accessors
-
-SLOT: at
-SLOT: nth
-SLOT: global

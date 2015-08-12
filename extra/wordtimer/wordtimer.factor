@@ -1,7 +1,6 @@
 USING: accessors arrays assocs fry io kernel make math
 math.statistics namespaces prettyprint sequences sorting
 tools.annotations tools.time vocabs ;
-FROM: namespaces => change-global ;
 IN: wordtimer
 
 SYMBOL: *wordtimes*

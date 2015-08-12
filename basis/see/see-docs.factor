@@ -1,6 +1,5 @@
 USING: classes definitions generic help.markup help.syntax
-sequences strings words ;
-FROM: prettyprint.sections => with-pprint ;
+prettyprint.sections sequences strings words ;
 IN: see
 
 HELP: synopsis

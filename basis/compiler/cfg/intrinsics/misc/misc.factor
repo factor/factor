@@ -4,9 +4,7 @@ USING: accessors classes.algebra compiler.cfg.builder.blocks
 compiler.cfg.comparisons compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.stacks
 compiler.tree.propagation.info cpu.architecture kernel layouts
-math namespaces sequences ;
-FROM: vm => context-field-offset vm-field-offset ;
-QUALIFIED-WITH: alien.c-types c
+math namespaces sequences vm ;
 IN: compiler.cfg.intrinsics.misc
 
 : emit-tag ( -- )

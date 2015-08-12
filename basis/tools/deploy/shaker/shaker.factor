@@ -23,9 +23,7 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 QUALIFIED: vocabs.loader
-FROM: assocs => change-at ;
 FROM: namespaces => set ;
-FROM: sequences => change-nth ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.

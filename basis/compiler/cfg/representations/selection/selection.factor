@@ -8,7 +8,6 @@ compiler.cfg.representations.preferred compiler.cfg.rpo
 compiler.cfg.utilities compiler.utilities cpu.architecture
 disjoint-sets fry kernel locals math math.functions namespaces
 sequences sets ;
-FROM: assocs => change-at ;
 FROM: namespaces => set ;
 IN: compiler.cfg.representations.selection
 

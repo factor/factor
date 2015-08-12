@@ -4,7 +4,6 @@ USING: accessors arrays assocs classes classes.algebra
 combinators combinators.private definitions effects generic
 hashtables kernel layouts make math namespaces quotations
 sequences words ;
-FROM: assocs => change-at ;
 IN: generic.single
 
 <PRIVATE

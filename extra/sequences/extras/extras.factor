@@ -2,7 +2,6 @@ USING: accessors arrays assocs combinators fry generalizations
 grouping growable kernel locals make math math.order math.ranges
 sequences sequences.deep sequences.private sorting splitting
 vectors ;
-FROM: sequences => change-nth ;
 IN: sequences.extras
 
 : reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline

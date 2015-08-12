@@ -81,7 +81,7 @@ MACRO: make-css ( pairs -- str )
     "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
 
 : img-tag ( xml style -- xml )
-    image of [ nip icon-path simple-image ] when* ;
+    image-style of [ nip icon-path simple-image ] when* ;
 
 : format-html-span ( string style stream -- )
     [

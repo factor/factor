@@ -3,7 +3,6 @@
 
 USING: accessors arrays assocs hashtables kernel sequences
 vocabs.loader ;
-FROM: sequences => change-nth ;
 IN: hashtables.wrapped
 
 TUPLE: wrapped-key

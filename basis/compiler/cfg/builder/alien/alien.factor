@@ -10,7 +10,6 @@ compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
 compiler.tree cpu.architecture fry kernel layouts make math
 math.parser namespaces sequences sequences.generalizations
 strings words ;
-FROM: compiler.errors => no-such-symbol no-such-library ;
 IN: compiler.cfg.builder.alien
 
 : with-param-regs* ( quot -- reg-values stack-values )

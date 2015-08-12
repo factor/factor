@@ -7,7 +7,6 @@ math.parser math.ranges memoize namespaces parser sequences
 sets simple-flat-file splitting unicode.categories
 unicode.categories.syntax unicode.data unicode.normalize
 unicode.normalize.private words words.constant ;
-FROM: sequences => change-nth ;
 IN: unicode.breaks
 
 <PRIVATE

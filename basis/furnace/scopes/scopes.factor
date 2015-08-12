@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors assocs destructors
 db.tuples db.types furnace.cache ;
-FROM: assocs => change-at ;
 IN: furnace.scopes
 
 TUPLE: scope < server-state namespace changed? ;

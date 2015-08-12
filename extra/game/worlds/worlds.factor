@@ -1,9 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors audio.engine combinators concurrency.promises
-destructors fry game.input game.loop generic kernel math parser
-sequences threads ui ui.gadgets ui.gadgets.worlds ui.gestures
-words words.constant ;
-FROM: namespaces => change-global ;
+destructors game.input game.loop kernel math parser sequences
+threads ui ui.gadgets ui.gadgets.worlds words.constant ;
 IN: game.worlds
 
 TUPLE: game-world < world

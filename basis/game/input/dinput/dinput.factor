@@ -7,7 +7,6 @@ specialized-arrays ui.backend.windows vectors windows.com
 windows.directx.dinput windows.directx.dinput.constants
 windows.kernel32 windows.messages windows.ole32 windows.errors
 windows.user32 classes.struct ;
-FROM: namespaces => change-global ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 

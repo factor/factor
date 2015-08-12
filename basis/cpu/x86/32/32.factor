@@ -5,10 +5,9 @@ combinators compiler.cfg.builder.alien.boxing
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
 cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86.features kernel locals make math namespaces sequences
-specialized-arrays system vocabs ;
+cpu.x86.features kernel layouts locals make math namespaces
+sequences specialized-arrays system vocabs ;
 SPECIALIZED-ARRAY: uint
-FROM: layouts => cell ;
 IN: cpu.x86.32
 
 : x86-float-regs ( -- seq )

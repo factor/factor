@@ -6,7 +6,6 @@ compiler.cfg.dominance.private compiler.cfg.rpo
 compiler.tree.builder compiler.tree.recursive graphviz.render io
 io.encodings.ascii io.files io.files.unique io.launcher kernel
 make math math.parser namespaces quotations sequences words ;
-FROM: assocs => change-at ;
 IN: compiler.graphviz
 
 : quotes ( str -- str' ) "\"" "\"" surround ;

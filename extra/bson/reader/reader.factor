@@ -1,14 +1,10 @@
 ! Copyright (C) 2010 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs bson.constants calendar combinators
-combinators.short-circuit io io.binary kernel math locals
-io.encodings.utf8 io.encodings io.files sequences.extras
-namespaces sequences serialize strings vectors byte-arrays ;
-
-FROM: io.encodings.binary => binary ;
-FROM: io.streams.byte-array => with-byte-reader ;
-FROM: typed => TYPED: ;
-
+USING: accessors assocs bson.constants byte-arrays calendar
+combinators combinators.short-circuit io io.binary io.encodings
+io.encodings.binary io.encodings.utf8 io.files
+io.streams.byte-array kernel locals math namespaces sequences
+sequences.extras serialize strings typed vectors ;
 IN: bson.reader
 
 SYMBOL: state

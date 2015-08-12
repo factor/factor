@@ -4,7 +4,6 @@ USING: accessors assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.registers
 compiler.cfg.rpo compiler.cfg.utilities fry kernel locals make
 namespaces sequences ;
-FROM: assocs => change-at ;
 IN: compiler.cfg.ssa.cssa
 
 SYMBOLS: edge-copies phi-copies ;

@@ -8,9 +8,8 @@ destructors io.encodings.utf8 io.pathnames io.streams.string
 kernel libc literals math mirrors namespaces prettyprint
 prettyprint.config see sequences specialized-arrays system
 tools.test parser lexer eval layouts generic.single classes
-vocabs generic classes.private definitions ;
+vocabs generic classes.private definitions specialized-arrays.private ;
 FROM: math => float ;
-FROM: specialized-arrays.private => specialized-array-vocab ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
