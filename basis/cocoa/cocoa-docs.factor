@@ -58,5 +58,4 @@ $nl
     "cocoa-window-utils"
 } ;
 
-IN: cocoa
 ABOUT: "cocoa"

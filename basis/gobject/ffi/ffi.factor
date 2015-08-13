@@ -21,8 +21,6 @@ IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
 GIR: vocab:gobject/GObject-2.0.gir
 
-IN: gobject.ffi
-
 FORGET: GIOCondition
 FORGET: G_IO_IN
 FORGET: G_IO_OUT
