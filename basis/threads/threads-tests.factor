@@ -97,7 +97,7 @@ yield
     <promise> [
         '[
             _ [
-                [ callstack swap fulfill stop ] start-context-and-delete
+                [ get-callstack swap fulfill stop ] start-context-and-delete
             ] start-context-and-delete
         ] in-thread
     ] [ ?promise callstack>array length ] bi
