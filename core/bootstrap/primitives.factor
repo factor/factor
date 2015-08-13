@@ -451,11 +451,11 @@ tuple
     { "fwrite" "io.streams.c" "primitive_fwrite" ( data length alien -- ) }
     { "(clone)" "kernel" "primitive_clone" ( obj -- newobj ) }
     { "<wrapper>" "kernel" "primitive_wrapper" ( obj -- wrapper ) }
-    { "callstack" "kernel" "primitive_callstack" ( -- callstack ) }
+    { "get-callstack" "kernel" "primitive_callstack" ( -- callstack ) }
     { "callstack>array" "kernel" "primitive_callstack_to_array" ( callstack -- array ) }
-    { "datastack" "kernel" "primitive_datastack" ( -- array ) }
+    { "get-datastack" "kernel" "primitive_datastack" ( -- array ) }
     { "die" "kernel" "primitive_die" ( -- ) }
-    { "retainstack" "kernel" "primitive_retainstack" ( -- array ) }
+    { "get-retainstack" "kernel" "primitive_retainstack" ( -- array ) }
     { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" ( obj -- code ) }
     { "become" "kernel.private" "primitive_become" ( old new -- ) }
     { "callstack-bounds" "kernel.private" "primitive_callstack_bounds" ( -- start end ) }

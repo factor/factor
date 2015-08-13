@@ -75,7 +75,7 @@ os windows? [
 ] unless
 
 : don't-compile-me ( -- ) ;
-: foo ( -- ) callstack "c" set don't-compile-me ;
+: foo ( -- ) get-callstack "c" set don't-compile-me ;
 : bar ( -- a b ) 1 foo 2 ;
 
 << { don't-compile-me foo bar } [ t "no-compile" set-word-prop ] each >>

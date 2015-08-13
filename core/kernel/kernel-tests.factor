@@ -129,9 +129,9 @@ os windows? [
 
 { 6 2 } [ 1 2 [ 5 + ] dip ] unit-test
 
-{ } [ callstack set-callstack ] unit-test
+{ } [ get-callstack set-callstack ] unit-test
 
-[ 3drop datastack ] must-fail
+[ 3drop get-datastack ] must-fail
 { } [ :c ] unit-test
 
 ! Doesn't compile; important

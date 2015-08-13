@@ -33,7 +33,7 @@ ARTICLE: "namespaces-global" "Global variables"
 ARTICLE: "namespaces.private" "Namespace implementation details"
 "The namestack holds namespaces."
 { $subsections
-    namestack
+    get-namestack
     set-namestack
     namespace
 }
@@ -169,7 +169,7 @@ HELP: namestack*
 { $values { "namestack" "a vector of assocs" } }
 { $description "Outputs the current name stack." } ;
 
-HELP: namestack
+HELP: get-namestack
 { $values { "namestack" "a vector of assocs" } }
 { $description "Outputs a copy of the current name stack." } ;
 

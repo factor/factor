@@ -228,7 +228,7 @@ M: real sleep
     >integer nano-count + sleep-until ;
 
 : (spawn) ( thread -- )
-    [ register-thread ] [ [ namestack ] dip resume-with ] bi ;
+    [ register-thread ] [ [ get-namestack ] dip resume-with ] bi ;
 
 : spawn ( quot name -- thread )
     <thread> [ (spawn) ] keep ;
@@ -237,7 +237,7 @@ M: real sleep
     [ '[ _ loop ] ] dip spawn ;
 
 : in-thread ( quot -- )
-    [ datastack ] dip
+    [ get-datastack ] dip
     '[ _ set-datastack @ ]
     "Thread" spawn drop ;
 

@@ -32,7 +32,7 @@ SLOT: terminated?
     ! Don't use fancy combinators here, since this word always
     ! runs unoptimized
     2dup [
-        [ [ datastack ] dip dip ] dip
+        [ [ get-datastack ] dip dip ] dip
         dup terminated?>> [ 2drop f ] [
             dup in>> length swap out>> length
             check-datastack

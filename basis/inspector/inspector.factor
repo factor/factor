@@ -55,7 +55,7 @@ M: tuple error. describe ;
     '[ dup _ assoc-stack ] H{ } map>assoc ;
 
 : .vars ( -- )
-    namestack vars-in-scope describe ;
+    get-namestack vars-in-scope describe ;
 
 : :vars ( -- )
     error-continuation get name>> vars-in-scope describe ;

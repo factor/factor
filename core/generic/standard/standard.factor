@@ -43,7 +43,7 @@ M: standard-combination picker
 M: standard-combination dispatch# #>> ;
 
 M: standard-generic effective-method
-    [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
+    [ get-datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
     method-for-object ;
 
 : inline-cache-quot ( word methods miss-word -- quot )

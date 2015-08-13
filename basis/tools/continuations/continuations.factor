@@ -21,7 +21,7 @@ PRIVATE>
 SYMBOL: break-hook
 
 : break ( -- )
-    current-continuation callstack >>call
+    current-continuation get-callstack >>call
     break-hook get call( continuation -- continuation' )
     after-break ;
 
@@ -63,7 +63,7 @@ M: object add-breakpoint ;
 \ (step-into-execute) t "step-into?" set-word-prop
 
 : (step-into-continuation) ( -- )
-    current-continuation callstack >>call break ;
+    current-continuation get-callstack >>call break ;
 
 : (step-into-call-next-method) ( method -- )
     next-method-quot (step-into-quotation) ;

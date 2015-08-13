@@ -346,7 +346,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ bits>double { integer } { float } define-primitive \ bits>double make-foldable
 \ bits>float { integer } { float } define-primitive \ bits>float make-foldable
 \ both-fixnums? { object object } { object } define-primitive
-\ callstack { } { callstack } define-primitive \ callstack make-flushable
+\ get-callstack { } { callstack } define-primitive \ get-callstack make-flushable
 \ callstack-bounds { } { alien alien } define-primitive \ callstack-bounds make-flushable
 \ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
 \ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
@@ -359,7 +359,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
 \ (callback-room) { } { byte-array } define-primitive \ (callback-room) make-flushable
 \ (data-room) { } { byte-array } define-primitive \ (data-room) make-flushable
-\ datastack { } { array } define-primitive \ datastack make-flushable
+\ get-datastack { } { array } define-primitive \ get-datastack make-flushable
 \ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
 \ die { } { } define-primitive
 \ disable-gc-events { } { object } define-primitive
@@ -438,7 +438,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ resize-array { integer array } { array } define-primitive
 \ resize-byte-array { integer byte-array } { byte-array } define-primitive
 \ resize-string { integer string } { string } define-primitive
-\ retainstack { } { array } define-primitive \ retainstack make-flushable
+\ get-retainstack { } { array } define-primitive \ get-retainstack make-flushable
 \ retainstack-for { c-ptr } { array } define-primitive \ retainstack-for make-flushable
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
 \ set-alien-double { float c-ptr integer } { } define-primitive
