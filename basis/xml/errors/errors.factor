@@ -47,7 +47,7 @@ XML-ERROR: no-entity thing ;
 
 XML-ERROR: mismatched open close ;
 
-ERROR: unclosed line column tags ;
+TUPLE: unclosed line column tags ;
 
 : throw-unclosed ( -- * )
     get-line get-column
