@@ -146,14 +146,14 @@ ERROR: uninferable ;
 : (infer-value) ( value-info -- effect )
     dup literal?>> [
         literal>>
-        [ callable? [ uninferable ] unless ]
-        [ already-inlined-quot? [ uninferable ] when ]
-        [ safe-infer dup +unknown+ = [ uninferable ] when ] tri
+        [ callable? [ throw-uninferable ] unless ]
+        [ already-inlined-quot? [ throw-uninferable ] when ]
+        [ safe-infer dup +unknown+ = [ throw-uninferable ] when ] tri
     ] [
         dup class>> {
             { \ curry [ slots>> third (infer-value) remove-effect-input ] }
             { \ compose [ slots>> last2 [ (infer-value) ] bi@ compose-effects ] }
-            [ uninferable ]
+            [ throw-uninferable ]
         } case
     ] if ;
 

@@ -43,7 +43,7 @@ IN: compiler.tree.propagation.call-effect.tests
             2dip
             rot
             [ 2drop ]
-            [ wrong-values ]
+            [ throw-wrong-values ]
             if
         ]
         ( obj -- a b c )

@@ -164,7 +164,7 @@ ERROR: bad-partial-eval quot word ;
 
 : check-effect ( quot word -- )
     2dup [ infer ] [ stack-effect ] bi* effect<=
-    [ 2drop ] [ bad-partial-eval ] if ;
+    [ 2drop ] [ throw-bad-partial-eval ] if ;
 
 :: define-partial-eval ( word quot n -- )
     word [
