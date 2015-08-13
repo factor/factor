@@ -16,7 +16,7 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 2 D 0 }
+    T{ ##peek f 2 D: 0 }
     T{ ##load-integer f 0 0 }
     T{ ##branch }
 } 1 test-bb

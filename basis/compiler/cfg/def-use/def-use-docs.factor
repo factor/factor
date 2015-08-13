@@ -16,7 +16,7 @@ HELP: defs-vregs
 { $examples
   { $example
     "USING: compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.registers prettyprint ;"
-    "T{ ##peek f 37 D 0 0 } defs-vregs ."
+    "T{ ##peek f 37 D: 0 0 } defs-vregs ."
     "{ 37 }"
   }
 } ;
@@ -40,7 +40,7 @@ HELP: uses-vregs
 { $examples
   { $example
     "USING: compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.registers prettyprint ;"
-    "T{ ##replace f 37 D 1 6 } uses-vregs ."
+    "T{ ##replace f 37 D: 1 6 } uses-vregs ."
     "{ 37 }"
   }
 } ;

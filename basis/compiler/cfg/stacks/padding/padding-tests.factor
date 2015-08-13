@@ -64,13 +64,13 @@ IN: compiler.cfg.stacks.padding.tests
 {
     { { 0 { } } { 0 { } } }
 } [
-    { { 3 { 0 } } { 0 { } } } T{ ##inc { loc D -3 } } visit-insn
+    { { 3 { 0 } } { 0 { } } } T{ ##inc { loc D: -3 } } visit-insn
 ] unit-test
 
 {
     { { 3 { 0 1 2 } } { 0 { } } }
 } [
-    { { 0 { } } { 0 { } } } T{ ##inc { loc D 3 } } visit-insn
+    { { 0 { } } { 0 { } } } T{ ##inc { loc D: 3 } } visit-insn
 ] unit-test
 
 ! visit-insn ##call
@@ -101,7 +101,7 @@ IN: compiler.cfg.stacks.padding.tests
 {
     { { 3 { 0 } } { 0 { } } }
 } [
-    { { 3 { 0 } } { 0 { } } } T{ ##peek { dst 1 } { loc D 1 } } visit-insn
+    { { 3 { 0 } } { 0 { } } } T{ ##peek { dst 1 } { loc D: 1 } } visit-insn
 ] unit-test
 
 ! After a ##peek that can cause a stack underflow, it is certain that
@@ -110,14 +110,14 @@ IN: compiler.cfg.stacks.padding.tests
     { { 0 { } } { 2 { } } }
     { { 2 { } } { 0 { } } }
 } [
-    { { 0 { } } { 2 { 0 1 } } } T{ ##peek { dst 1 } { loc R 2 } } visit-insn
-    { { 2 { 0 1 } } { 0 { } } } T{ ##peek { dst 1 } { loc D 2 } } visit-insn
+    { { 0 { } } { 2 { 0 1 } } } T{ ##peek { dst 1 } { loc R: 2 } } visit-insn
+    { { 2 { 0 1 } } { 0 { } } } T{ ##peek { dst 1 } { loc D: 2 } } visit-insn
 ] unit-test
 
 ! If the ##peek can't cause a stack underflow, then we don't have the
 ! same guarantees.
 [
-    { { 3 { 0 1 2 } } { 0 { } } } T{ ##peek { dst 1 } { loc D 0 } } visit-insn
+    { { 3 { 0 1 2 } } { 0 { } } } T{ ##peek { dst 1 } { loc D: 0 } } visit-insn
 ] [ vacant-peek? ] must-fail-with
 
 : following-stack-state ( insns -- state )
@@ -142,9 +142,9 @@ IN: compiler.cfg.stacks.padding.tests
     }
 } [
     {
-        T{ ##inc f D 2 }
-        T{ ##peek f f D 2 }
-        T{ ##inc f D 0 }
+        T{ ##inc f D: 2 }
+        T{ ##peek f f D: 2 }
+        T{ ##inc f D: 0 }
     } insns>cfg trace-stack-state2
 ] unit-test
 
@@ -168,8 +168,8 @@ IN: compiler.cfg.stacks.padding.tests
     }
 } [
     V{
-        T{ ##inc f D 3 }
-        T{ ##peek { loc D 3 } }
+        T{ ##inc f D: 3 }
+        T{ ##peek { loc D: 3 } }
         T{ ##branch }
     }
     insns>cfg trace-stack-state2
@@ -177,12 +177,12 @@ IN: compiler.cfg.stacks.padding.tests
 
 : cfg1 ( -- cfg )
     V{
-        T{ ##inc f D 1 }
-        T{ ##replace { src 10 } { loc D 0 } }
+        T{ ##inc f D: 1 }
+        T{ ##replace { src 10 } { loc D: 0 } }
     } 0 insns>block
     V{
-        T{ ##peek { dst 37 } { loc D 0 } }
-        T{ ##inc f D -1 }
+        T{ ##peek { dst 37 } { loc D: 0 } }
+        T{ ##inc f D: -1 }
     } 1 insns>block
     1vector >>successors block>cfg ;
 
@@ -202,9 +202,9 @@ IN: compiler.cfg.stacks.padding.tests
         { 0 V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } } }
         {
             1 V{
-                T{ ##inc f D 2 }
-                T{ ##replace { src 0 } { loc D 1 } }
-                T{ ##replace { src 0 } { loc D 0 } }
+                T{ ##inc f D: 2 }
+                T{ ##replace { src 0 } { loc D: 1 } }
+                T{ ##replace { src 0 } { loc D: 0 } }
             }
         }
         {
@@ -214,29 +214,29 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             3 V{
-                T{ ##peek { dst 0 } { loc D 0 } }
-                T{ ##peek { dst 0 } { loc D 1 } }
-                T{ ##inc f D 2 }
-                T{ ##replace { src 0 } { loc D 2 } }
-                T{ ##replace { src 0 } { loc D 3 } }
-                T{ ##replace { src 0 } { loc D 1 } }
+                T{ ##peek { dst 0 } { loc D: 0 } }
+                T{ ##peek { dst 0 } { loc D: 1 } }
+                T{ ##inc f D: 2 }
+                T{ ##replace { src 0 } { loc D: 2 } }
+                T{ ##replace { src 0 } { loc D: 3 } }
+                T{ ##replace { src 0 } { loc D: 1 } }
             }
         }
         {
             8 V{
-                T{ ##peek { dst 0 } { loc D 2 } }
-                T{ ##peek { dst 0 } { loc D 1 } }
-                T{ ##inc f D 3 }
-                T{ ##replace { src 0 } { loc D 0 } }
-                T{ ##replace { src 0 } { loc D 1 } }
-                T{ ##replace { src 0 } { loc D 2 } }
-                T{ ##replace { src 0 } { loc D 3 } }
+                T{ ##peek { dst 0 } { loc D: 2 } }
+                T{ ##peek { dst 0 } { loc D: 1 } }
+                T{ ##inc f D: 3 }
+                T{ ##replace { src 0 } { loc D: 0 } }
+                T{ ##replace { src 0 } { loc D: 1 } }
+                T{ ##replace { src 0 } { loc D: 2 } }
+                T{ ##replace { src 0 } { loc D: 3 } }
             }
         }
         {
             10 V{
-                T{ ##inc f D -3 }
-                T{ ##peek { dst 0 } { loc D 0 } }
+                T{ ##inc f D: -3 }
+                T{ ##peek { dst 0 } { loc D: 0 } }
                 T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
             }
         }
@@ -281,10 +281,10 @@ IN: compiler.cfg.stacks.padding.tests
         { 0 V{ } }
         {
             1 V{
-                T{ ##inc f D 3 }
-                T{ ##replace { src 0 } { loc D 2 } }
-                T{ ##replace { src 0 } { loc D 0 } }
-                T{ ##replace { src 0 } { loc D 1 } }
+                T{ ##inc f D: 3 }
+                T{ ##replace { src 0 } { loc D: 2 } }
+                T{ ##replace { src 0 } { loc D: 0 } }
+                T{ ##replace { src 0 } { loc D: 1 } }
             }
         }
         {
@@ -294,11 +294,11 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             3 V{
-                T{ ##peek { dst 0 } { loc D 1 } }
-                T{ ##peek { dst 0 } { loc D 0 } }
-                T{ ##inc f D 1 }
-                T{ ##inc f R 1 }
-                T{ ##replace { src 0 } { loc R 0 } }
+                T{ ##peek { dst 0 } { loc D: 1 } }
+                T{ ##peek { dst 0 } { loc D: 0 } }
+                T{ ##inc f D: 1 }
+                T{ ##inc f R: 1 }
+                T{ ##replace { src 0 } { loc R: 0 } }
             }
         }
         {
@@ -306,14 +306,14 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             5 V{
-                T{ ##inc f D -2 }
-                T{ ##inc f R 5 }
-                T{ ##replace { src 0 } { loc R 3 } }
-                T{ ##replace { src 0 } { loc D 0 } }
-                T{ ##replace { src 0 } { loc R 4 } }
-                T{ ##replace { src 0 } { loc R 2 } }
-                T{ ##replace { src 0 } { loc R 1 } }
-                T{ ##replace { src 0 } { loc R 0 } }
+                T{ ##inc f D: -2 }
+                T{ ##inc f R: 5 }
+                T{ ##replace { src 0 } { loc R: 3 } }
+                T{ ##replace { src 0 } { loc D: 0 } }
+                T{ ##replace { src 0 } { loc R: 4 } }
+                T{ ##replace { src 0 } { loc R: 2 } }
+                T{ ##replace { src 0 } { loc R: 1 } }
+                T{ ##replace { src 0 } { loc R: 0 } }
             }
         }
         {
@@ -323,14 +323,14 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             7 V{
-                T{ ##peek { dst 0 } { loc D 0 } }
-                T{ ##peek { dst 0 } { loc R 3 } }
-                T{ ##peek { dst 0 } { loc R 2 } }
-                T{ ##peek { dst 0 } { loc R 1 } }
-                T{ ##peek { dst 0 } { loc R 0 } }
-                T{ ##peek { dst 0 } { loc R 4 } }
-                T{ ##inc f D 2 }
-                T{ ##inc f R -5 }
+                T{ ##peek { dst 0 } { loc D: 0 } }
+                T{ ##peek { dst 0 } { loc R: 3 } }
+                T{ ##peek { dst 0 } { loc R: 2 } }
+                T{ ##peek { dst 0 } { loc R: 1 } }
+                T{ ##peek { dst 0 } { loc R: 0 } }
+                T{ ##peek { dst 0 } { loc R: 4 } }
+                T{ ##inc f D: 2 }
+                T{ ##inc f R: -5 }
             }
         }
         { 8 V{ } }
@@ -343,11 +343,11 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             12 V{
-                T{ ##peek { dst 0 } { loc R 0 } }
-                T{ ##inc f D -3 }
-                T{ ##inc f D 1 }
-                T{ ##inc f R -1 }
-                T{ ##replace { src 0 } { loc D 0 } }
+                T{ ##peek { dst 0 } { loc R: 0 } }
+                T{ ##inc f D: -3 }
+                T{ ##inc f D: 1 }
+                T{ ##inc f R: -1 }
+                T{ ##replace { src 0 } { loc D: 0 } }
             }
         }
         {
@@ -402,7 +402,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 25 { { 2 { } } { 6 { } } } }
         { 26 { { 4 { 0 1 } } { 6 { } } } }
         { 27 { { 4 { 0 1 } } { 1 { } } } }
-        ! gc-map here scrubbing D 0 and D 1
+        ! gc-map here scrubbing D: 0 and D: 1
         { 28 { { 4 { 0 1 } } { 1 { } } } }
         { 29 { { 4 { 0 1 } } { 1 { } } } }
         { 30 { { 1 { } } { 1 { } } } }
@@ -416,65 +416,65 @@ IN: compiler.cfg.stacks.padding.tests
         { 0 V{ } }
         {
             1 V{
-                T{ ##peek { loc D 0 } }
-                T{ ##peek { loc D 1 } }
-                T{ ##inc { loc D -1 } }
+                T{ ##peek { loc D: 0 } }
+                T{ ##peek { loc D: 1 } }
+                T{ ##inc { loc D: -1 } }
             }
         }
         {
             2 V{
-                T{ ##inc { loc D -1 } }
-                T{ ##replace { loc D 1 } }
-                T{ ##replace { loc D 0 } }
-                T{ ##inc { loc D 1 } }
-                T{ ##replace { loc D 0 } }
+                T{ ##inc { loc D: -1 } }
+                T{ ##replace { loc D: 1 } }
+                T{ ##replace { loc D: 0 } }
+                T{ ##inc { loc D: 1 } }
+                T{ ##replace { loc D: 0 } }
             }
         }
         { 3 V{ T{ ##call } } }
         { 4 V{ } }
         { 5 V{ T{ ##call } } }
-        { 6 V{ T{ ##peek { loc D 0 } } } }
+        { 6 V{ T{ ##peek { loc D: 0 } } } }
         { 7 V{ } }
         {
             8 V{
-                T{ ##replace { loc D 2 } }
-                T{ ##replace { loc D 1 } }
-                T{ ##replace { loc D 0 } }
+                T{ ##replace { loc D: 2 } }
+                T{ ##replace { loc D: 1 } }
+                T{ ##replace { loc D: 0 } }
             }
         }
         { 9 V{ T{ ##call } } }
         {
             10 V{
-                T{ ##inc { loc D 1 } }
-                T{ ##replace { loc D 0 } }
+                T{ ##inc { loc D: 1 } }
+                T{ ##replace { loc D: 0 } }
             }
         }
         { 11 V{ T{ ##call } } }
         { 12 V{ } }
         { 13 V{ T{ ##call } } }
-        { 14 V{ T{ ##peek { loc D 0 } } } }
+        { 14 V{ T{ ##peek { loc D: 0 } } } }
         { 15 V{ } }
         {
             16 V{
-                T{ ##inc { loc D 1 } }
-                T{ ##replace { loc D 0 } }
+                T{ ##inc { loc D: 1 } }
+                T{ ##replace { loc D: 0 } }
             }
         }
         { 17 V{ T{ ##call } } }
         {
             18 V{
-                T{ ##peek { loc D 2 } }
-                T{ ##peek { loc D 1 } }
-                T{ ##peek { loc D 0 } }
-                T{ ##inc { loc D 1 } }
+                T{ ##peek { loc D: 2 } }
+                T{ ##peek { loc D: 1 } }
+                T{ ##peek { loc D: 0 } }
+                T{ ##inc { loc D: 1 } }
             }
         }
         { 19 V{ } }
         { 20 V{ } }
         {
             21 V{
-                T{ ##inc { loc D -3 } }
-                T{ ##replace { loc D 0 } }
+                T{ ##inc { loc D: -3 } }
+                T{ ##replace { loc D: 0 } }
             }
         }
         { 22 V{ T{ ##call } } }
@@ -482,8 +482,8 @@ IN: compiler.cfg.stacks.padding.tests
         { 24 V{ T{ ##call } } }
         {
             25 V{
-                T{ ##peek { loc D 0 } }
-                T{ ##inc { loc D 3 } }
+                T{ ##peek { loc D: 0 } }
+                T{ ##inc { loc D: 3 } }
             }
         }
         { 26 V{ } }
@@ -494,9 +494,9 @@ IN: compiler.cfg.stacks.padding.tests
         { 31 V{ } }
         {
             32 V{
-                T{ ##inc { loc D -4 } }
-                T{ ##inc { loc D 1 } }
-                T{ ##replace { loc D 0 } }
+                T{ ##inc { loc D: -4 } }
+                T{ ##inc { loc D: 1 } }
+                T{ ##replace { loc D: 0 } }
             }
         }
         { 33 V{ } }
@@ -563,7 +563,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 22 { { -1 { } } { 0 { } } } }
         { 23 { { -1 { } } { 0 { } } } }
         { 24 { { -1 { } } { 0 { } } } }
-        ! gc-map here scrubbing D 0, D 1 and D 2
+        ! gc-map here scrubbing D: 0, D: 1 and D: 2
         { 25 { { 2 { 0 1 2 } } { 0 { } } } }
         { 26 { { 2 { 0 1 2 } } { 0 { } } } }
         { 27 { { -2 { } } { 0 { } } } }
@@ -589,18 +589,18 @@ IN: compiler.cfg.stacks.padding.tests
 
 {
     { { 1 { 0 } } { 0 { } } }
-} [ V{ T{ ##inc f D 1 } } following-stack-state ] unit-test
+} [ V{ T{ ##inc f D: 1 } } following-stack-state ] unit-test
 
 {
     { { 0 { } } { 1 { 0 } } }
-} [ V{ T{ ##inc f R 1 } } following-stack-state ] unit-test
+} [ V{ T{ ##inc f R: 1 } } following-stack-state ] unit-test
 
 ! Here the peek refers to a parameter of the word.
 {
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##peek { loc D 25 } }
+        T{ ##peek { loc D: 25 } }
     } following-stack-state
 ] unit-test
 
@@ -608,9 +608,9 @@ IN: compiler.cfg.stacks.padding.tests
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##replace { src 10 } { loc D 1 } }
-        T{ ##replace { src 10 } { loc D 2 } }
+        T{ ##replace { src 10 } { loc D: 0 } }
+        T{ ##replace { src 10 } { loc D: 1 } }
+        T{ ##replace { src 10 } { loc D: 2 } }
     } following-stack-state
 ] unit-test
 
@@ -618,9 +618,9 @@ IN: compiler.cfg.stacks.padding.tests
     { { 1 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc f D 1 }
-        T{ ##replace { src 10 } { loc D 0 } }
+        T{ ##replace { src 10 } { loc D: 0 } }
+        T{ ##inc f D: 1 }
+        T{ ##replace { src 10 } { loc D: 0 } }
     } following-stack-state
 ] unit-test
 
@@ -628,10 +628,10 @@ IN: compiler.cfg.stacks.padding.tests
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc f D 1 }
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc f D -1 }
+        T{ ##replace { src 10 } { loc D: 0 } }
+        T{ ##inc f D: 1 }
+        T{ ##replace { src 10 } { loc D: 0 } }
+        T{ ##inc f D: -1 }
     } following-stack-state
 ] unit-test
 
@@ -639,9 +639,9 @@ IN: compiler.cfg.stacks.padding.tests
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##inc f D 1 }
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc f D -1 }
+        T{ ##inc f D: 1 }
+        T{ ##replace { src 10 } { loc D: 0 } }
+        T{ ##inc f D: -1 }
     } following-stack-state
 ] unit-test
 
@@ -650,8 +650,8 @@ IN: compiler.cfg.stacks.padding.tests
     { { -1 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc D 0 } }
-        T{ ##inc f D -1 }
+        T{ ##replace { src 10 } { loc D: 0 } }
+        T{ ##inc f D: -1 }
         T{ ##call }
     } following-stack-state
 ] unit-test
@@ -659,22 +659,22 @@ IN: compiler.cfg.stacks.padding.tests
 ! Should not be ok because the value wasn't initialized when gc ran.
 [
     V{
-        T{ ##inc f D 1 }
+        T{ ##inc f D: 1 }
         T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
-        T{ ##peek { loc D 0 } }
+        T{ ##peek { loc D: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with
 
 [
     V{
-        T{ ##inc f D 1 }
-        T{ ##peek { loc D 0 } }
+        T{ ##inc f D: 1 }
+        T{ ##peek { loc D: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with
 
 [
     V{
-        T{ ##inc f R 1 }
-        T{ ##peek { loc R 0 } }
+        T{ ##inc f R: 1 }
+        T{ ##peek { loc R: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with

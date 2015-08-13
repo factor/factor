@@ -5,11 +5,11 @@ IN: compiler.cfg.stacks.vacant
 ARTICLE: "compiler.cfg.stacks.vacant" "Uninitialized/overinitialized stack location analysis"
 "Consider the following sequence of instructions:"
 { $code
-  "##inc D 2"
+  "##inc D: 2"
   "..."
   "##allot"
-  "##replace ... D 0"
-  "##replace ... D 1"
+  "##replace ... D: 0"
+  "##replace ... D: 1"
 }
 "The GC check runs before stack locations 0 and 1 have been initialized, and so the GC needs to scrub them so that they don't get traced. This is achieved by computing uninitialized locations with a dataflow analysis, and recording the information in GC maps. The call_frame_slot_visitor object in vm/slot_visitor.hpp reads this information from GC maps and performs the scrubbing." ;
 

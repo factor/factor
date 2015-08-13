@@ -88,9 +88,9 @@ M: insn insn. tuple>array but-last [
 ! Prettyprinting
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
 
-M: ds-loc pprint* \ D pprint-loc ;
+M: ds-loc pprint* \ D: pprint-loc ;
 
-M: rs-loc pprint* \ R pprint-loc ;
+M: rs-loc pprint* \ R: pprint-loc ;
 
 : resolve-phis ( bb -- )
     [

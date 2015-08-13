@@ -131,10 +131,10 @@ CONSTANT: [binary/param] [ [ -2 <ds-loc> inc-stack 2inputs ] dip ]
 CONSTANT: [quaternary]
     [
         ds-drop
-        D 3 peek-loc
-        D 2 peek-loc
-        D 1 peek-loc
-        D 0 peek-loc
+        D: 3 peek-loc
+        D: 2 peek-loc
+        D: 1 peek-loc
+        D: 0 peek-loc
         -4 <ds-loc> inc-stack
     ]
 

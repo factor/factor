@@ -4,7 +4,7 @@ namespaces tools.test ;
 IN: compiler.cfg.stacks.tests
 
 {
-    H{ { D 1 4 } { D 2 3 } { D 0 5 } }
+    H{ { D: 1 4 } { D: 2 3 } { D: 0 5 } }
     { { 0 0 } { 0 0 } }
 } [
     { 3 4 5 } ds-loc store-vregs
@@ -13,7 +13,7 @@ IN: compiler.cfg.stacks.tests
 ] cfg-unit-test
 
 ! stack-locs
-{ { D 4 D 3 D 2 D 1 D 0 } } [
+{ { D: 4 D: 3 D: 2 D: 1 D: 0 } } [
     ds-loc 5 stack-locs >array
 ] unit-test
 

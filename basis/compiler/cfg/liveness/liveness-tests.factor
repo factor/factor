@@ -76,12 +76,12 @@ QUALIFIED: sets
 
 ! kill-defs
 { H{ } } [
-    H{ } dup T{ ##peek f 37 D 0 0 } kill-defs
+    H{ } dup T{ ##peek f 37 D: 0 0 } kill-defs
 ] unit-test
 
 { H{ { 3 3 } } } [
     H{ { 37 99 } { 99 99 } { 2 99 } } leader-map set
-    H{ { 37 37 } { 3 3 } } dup T{ ##peek f 2 D 0 0 } kill-defs
+    H{ { 37 37 } { 3 3 } } dup T{ ##peek f 2 D: 0 0 } kill-defs
 ] unit-test
 
 ! liveness-step
@@ -104,21 +104,21 @@ QUALIFIED: sets
 cpu x86.64? [
     { f } [
         H{ } base-pointers set
-        H{ { 123 T{ ##peek { dst RCX } { loc D 1 } { insn# 6 } } } } insns set
+        H{ { 123 T{ ##peek { dst RCX } { loc D: 1 } { insn# 6 } } } } insns set
         123 lookup-base-pointer
     ] unit-test
 ] when
 
 ! lookup-base-pointer*
 { f } [
-    456 T{ ##peek f 123 D 0 } lookup-base-pointer*
+    456 T{ ##peek f 123 D: 0 } lookup-base-pointer*
 ] unit-test
 
 ! transfer-liveness
 {
     H{ { 37 37 } }
 } [
-    H{ } clone dup { T{ ##replace f 37 D 1 6 } T{ ##peek f 37 D 0 0 } }
+    H{ } clone dup { T{ ##replace f 37 D: 1 6 } T{ ##peek f 37 D: 0 0 } }
     transfer-liveness
 ] unit-test
 
@@ -137,12 +137,12 @@ cpu x86.64? [
 
 ! visit-insn
 { H{ } } [
-    H{ } clone [ T{ ##peek f 0 D 0 } visit-insn ] keep
+    H{ } clone [ T{ ##peek f 0 D: 0 } visit-insn ] keep
 ] unit-test
 
 { H{ { 48 48 } { 37 37 } } } [
     H{ { 48 tagged-rep } } representations set
-    H{ { 48 48  } } clone [ T{ ##replace f 37 D 1 6 } visit-insn ] keep
+    H{ { 48 48  } } clone [ T{ ##replace f 37 D: 1 6 } visit-insn ] keep
 ] unit-test
 
 {
@@ -163,20 +163,20 @@ cpu x86.64? [
 ! Sanity check...
 
 V{
-    T{ ##peek f 0 D 0 }
-    T{ ##replace f 0 D 0 }
-    T{ ##replace f 1 D 1 }
-    T{ ##peek f 1 D 1 }
+    T{ ##peek f 0 D: 0 }
+    T{ ##replace f 0 D: 0 }
+    T{ ##replace f 1 D: 1 }
+    T{ ##peek f 1 D: 1 }
     T{ ##branch }
 } 1 test-bb
 
 V{
-    T{ ##replace f 2 D 0 }
+    T{ ##replace f 2 D: 0 }
     T{ ##branch }
 } 2 test-bb
 
 V{
-    T{ ##replace f 3 D 0 }
+    T{ ##replace f 3 D: 0 }
     T{ ##return }
 } 3 test-bb
 
@@ -197,7 +197,7 @@ unit-test
 ! Tricky case; defs must be killed before uses
 
 V{
-    T{ ##peek f 0 D 0 }
+    T{ ##peek f 0 D: 0 }
     T{ ##branch }
 } 1 test-bb
 
@@ -219,12 +219,12 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##inc { loc R 2 } }
-    T{ ##inc { loc D -2 } }
-    T{ ##peek f 21 D -1 }
-    T{ ##peek f 22 D -2 }
-    T{ ##replace f 21 R 0 }
-    T{ ##replace f 22 R 1 }
+    T{ ##inc { loc R: 2 } }
+    T{ ##inc { loc D: -2 } }
+    T{ ##peek f 21 D: -1 }
+    T{ ##peek f 22 D: -2 }
+    T{ ##replace f 21 R: 0 }
+    T{ ##replace f 22 R: 1 }
     T{ ##branch }
 } 1 test-bb
 
@@ -234,10 +234,10 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc { loc R -1 } }
-    T{ ##inc { loc D 1 } }
-    T{ ##peek f 25 R -1 }
-    T{ ##replace f 25 D 0 }
+    T{ ##inc { loc R: -1 } }
+    T{ ##inc { loc D: 1 } }
+    T{ ##peek f 25 R: -1 }
+    T{ ##replace f 25 D: 0 }
     T{ ##branch }
 } 3 test-bb
 
@@ -247,35 +247,35 @@ V{
 } 4 test-bb
 
 V{
-    T{ ##inc f R -1 }
-    T{ ##inc f D 2 }
-    T{ ##peek f 27 R -1 }
-    T{ ##peek f 28 D 2 }
-    T{ ##peek f 29 D 3 }
+    T{ ##inc f R: -1 }
+    T{ ##inc f D: 2 }
+    T{ ##peek f 27 R: -1 }
+    T{ ##peek f 28 D: 2 }
+    T{ ##peek f 29 D: 3 }
     T{ ##load-integer f 30 1 }
     T{ ##load-integer f 31 0 }
     T{ ##compare-imm-branch f 27 f cc/= }
 } 5 test-bb
 
 V{
-    T{ ##inc f D -1 }
+    T{ ##inc f D: -1 }
     T{ ##branch }
 } 6 test-bb
 
 V{
-    T{ ##inc f D -1 }
+    T{ ##inc f D: -1 }
     T{ ##branch }
 } 7 test-bb
 
 V{
     T{ ##phi f 36 H{ { 6 30 } { 7 31 } } }
-    T{ ##inc f D -2 }
+    T{ ##inc f D: -2 }
     T{ ##unbox f 37 29 "alien_offset" int-rep }
     T{ ##unbox f 38 28 "to_double" double-rep }
     T{ ##unbox f 39 36 "to_cell" int-rep }
     T{ ##alien-invoke f V{ } V{ { 37 int-rep 0 } { 38 double-rep 4 } { 39 int-rep 12 } } { { 40 int-rep EAX } } { } 0 16 "CFRunLoopRunInMode" f T{ gc-map } }
     T{ ##box f 41 40 "from_signed_cell" int-rep T{ gc-map } }
-    T{ ##replace f 41 D 0 }
+    T{ ##replace f 41 D: 0 }
     T{ ##branch }
 } 8 test-bb
 
@@ -330,7 +330,7 @@ V{
 } 5 test-bb
 
 V{
-    T{ ##replace f 2 D 0 }
+    T{ ##replace f 2 D: 0 }
     T{ ##branch }
 } 6 test-bb
 
@@ -364,12 +364,12 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 0 D 0 }
+    T{ ##peek f 0 D: 0 }
     T{ ##tagged>integer f 1 0 }
     T{ ##call-gc f T{ gc-map } }
-    T{ ##replace f 0 D 0 }
+    T{ ##replace f 0 D: 0 }
     T{ ##call-gc f T{ gc-map } }
-    T{ ##replace f 1 D 0 }
+    T{ ##replace f 1 D: 0 }
     T{ ##branch }
 } 1 test-bb
 

@@ -12,13 +12,13 @@ IN: compiler.cfg.alias-analysis.tests
 ! Redundant load elimination
 {
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##copy f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##slot-imm f 2 0 1 0 }
     } test-alias-analysis
@@ -27,15 +27,15 @@ IN: compiler.cfg.alias-analysis.tests
 ! Store-load forwarding
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##copy f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##slot-imm f 2 0 1 0 }
     } test-alias-analysis
@@ -44,16 +44,16 @@ IN: compiler.cfg.alias-analysis.tests
 ! Dead store elimination
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
         T{ ##set-slot-imm f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##set-slot-imm f 2 0 1 0 }
     } test-alias-analysis
@@ -61,18 +61,18 @@ IN: compiler.cfg.alias-analysis.tests
 
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##set-slot-imm f 3 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##set-slot-imm f 2 0 1 0 }
         T{ ##set-slot-imm f 3 0 1 0 }
@@ -82,12 +82,12 @@ IN: compiler.cfg.alias-analysis.tests
 ! Redundant store elimination
 {
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##set-slot-imm f 1 0 1 0 }
     } test-alias-analysis
@@ -95,13 +95,13 @@ IN: compiler.cfg.alias-analysis.tests
 
 {
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##copy f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##copy f 2 1 any-rep }
         T{ ##set-slot-imm f 2 0 1 0 }
@@ -111,16 +111,16 @@ IN: compiler.cfg.alias-analysis.tests
 ! Not a redundant load
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##set-slot-imm f 0 1 1 0 }
         T{ ##slot-imm f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##set-slot-imm f 0 1 1 0 }
         T{ ##slot-imm f 2 0 1 0 }
@@ -130,20 +130,20 @@ IN: compiler.cfg.alias-analysis.tests
 ! Not a redundant store
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##set-slot-imm f 2 1 1 0 }
         T{ ##slot-imm f 4 0 1 0 }
         T{ ##set-slot-imm f 3 1 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##set-slot-imm f 2 1 1 0 }
         T{ ##slot-imm f 4 0 1 0 }
         T{ ##set-slot-imm f 3 1 1 0 }
@@ -153,10 +153,10 @@ IN: compiler.cfg.alias-analysis.tests
 ! There's a redundant load, but not a redundant store
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##slot-imm f 4 0 1 0 }
         T{ ##set-slot-imm f 2 0 1 0 }
         T{ ##slot f 5 0 3 0 0 }
@@ -165,10 +165,10 @@ IN: compiler.cfg.alias-analysis.tests
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##slot-imm f 4 0 1 0 }
         T{ ##set-slot-imm f 2 0 1 0 }
         T{ ##slot f 5 0 3 0 0 }
@@ -182,9 +182,9 @@ IN: compiler.cfg.alias-analysis.tests
 ! Redundant load elimination
 {
     V{
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##allot f 4 16 array }
         T{ ##set-slot-imm f 3 4 1 0 }
         T{ ##set-slot-imm f 2 1 1 0 }
@@ -192,9 +192,9 @@ IN: compiler.cfg.alias-analysis.tests
     }
 } [
     V{
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##allot f 4 16 array }
         T{ ##set-slot-imm f 3 4 1 0 }
         T{ ##set-slot-imm f 2 1 1 0 }
@@ -205,18 +205,18 @@ IN: compiler.cfg.alias-analysis.tests
 ! Redundant store elimination
 {
     V{
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##allot f 4 16 array }
         T{ ##slot-imm f 5 1 1 0 }
         T{ ##set-slot-imm f 3 4 1 0 }
     }
 } [
     V{
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##allot f 4 16 array }
         T{ ##set-slot-imm f 1 4 1 0 }
         T{ ##slot-imm f 5 1 1 0 }
@@ -228,10 +228,10 @@ IN: compiler.cfg.alias-analysis.tests
 ! can now alias the new ac
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##allot f 4 16 array }
         T{ ##set-slot-imm f 0 4 1 0 }
         T{ ##set-slot-imm f 4 2 1 0 }
@@ -241,10 +241,10 @@ IN: compiler.cfg.alias-analysis.tests
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
-        T{ ##peek f 3 D 3 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
+        T{ ##peek f 3 D: 3 }
         T{ ##allot f 4 16 array }
         T{ ##set-slot-imm f 0 4 1 0 }
         T{ ##set-slot-imm f 4 2 1 0 }
@@ -257,13 +257,13 @@ IN: compiler.cfg.alias-analysis.tests
 ! Compares between objects which cannot alias are eliminated
 {
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##allot f 1 16 array }
         T{ ##load-reference f 2 f }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##allot f 1 16 array }
         T{ ##compare f 2 0 1 cc= }
     } test-alias-analysis
@@ -292,14 +292,14 @@ IN: compiler.cfg.alias-analysis.tests
 ! instructions which can call back into Factor code
 {
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
@@ -308,16 +308,16 @@ IN: compiler.cfg.alias-analysis.tests
 
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
@@ -326,18 +326,18 @@ IN: compiler.cfg.alias-analysis.tests
 
 {
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }
@@ -346,14 +346,14 @@ IN: compiler.cfg.alias-analysis.tests
 
 {
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 1 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D 0 }
+        T{ ##peek f 0 D: 0 }
         T{ ##slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 1 0 1 0 }
@@ -381,7 +381,7 @@ IN: compiler.cfg.alias-analysis.tests
 {
     V{
         T{ ##allot f 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 1 D: 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##copy f 2 1 any-rep }
@@ -389,7 +389,7 @@ IN: compiler.cfg.alias-analysis.tests
 } [
     V{
         T{ ##allot f 0 }
-        T{ ##peek f 1 D 1 }
+        T{ ##peek f 1 D: 1 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##slot-imm f 2 0 1 0 }
@@ -399,8 +399,8 @@ IN: compiler.cfg.alias-analysis.tests
 {
     V{
         T{ ##allot f 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }
@@ -408,8 +408,8 @@ IN: compiler.cfg.alias-analysis.tests
 } [
     V{
         T{ ##allot f 0 }
-        T{ ##peek f 1 D 1 }
-        T{ ##peek f 2 D 2 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 2 D: 2 }
         T{ ##set-slot-imm f 1 0 1 0 }
         T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }

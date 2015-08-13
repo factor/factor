@@ -9,6 +9,6 @@ IN: compiler.cfg.stacks.height.tests
     begin-stack-analysis
     3 4 T{ basic-block }
     [ record-stack-heights ]
-    [ D 1 swap untranslate-loc ]
-    [ R 1 swap untranslate-loc ] tri
+    [ D: 1 swap untranslate-loc ]
+    [ R: 1 swap untranslate-loc ] tri
 ] unit-test

@@ -24,8 +24,8 @@ IN: compiler.tests.low-level-ir
 : compile-test-bb ( insns -- result )
     V{ T{ ##prologue } T{ ##branch } } [ clone ] map 0 test-bb
     V{
-        T{ ##inc f D 1 }
-        T{ ##replace f 0 D 0 }
+        T{ ##inc f D: 1 }
+        T{ ##replace f 0 D: 0 }
         T{ ##branch }
     } [ clone ] map append 1 test-bb
     V{
