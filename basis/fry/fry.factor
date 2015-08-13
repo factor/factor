@@ -15,7 +15,7 @@ GENERIC: fry ( quot -- quot' )
 
 : check-fry ( quot -- quot )
     dup { load-local load-locals get-local drop-locals } intersect
-    [ >r/r>-in-fry-error ] unless-empty ;
+    [ throw->r/r>-in-fry-error ] unless-empty ;
 
 PREDICATE: fry-specifier < word { _ @ } member-eq? ;
 

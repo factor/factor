@@ -9,7 +9,7 @@ ERROR: snappy-error error ;
 <PRIVATE
 
 : check-snappy ( ret -- )
-    dup SNAPPY_OK = [ drop ] [ snappy-error ] if ;
+    dup SNAPPY_OK = [ drop ] [ throw-snappy-error ] if ;
 
 : n>outs ( n -- byte-array size_t* )
     [ <byte-array> ] [ size_t <ref> ] bi ;

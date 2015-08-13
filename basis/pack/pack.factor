@@ -142,7 +142,7 @@ ERROR: packed-read-fail str bytes ;
 
 : read-packed-bytes ( str -- bytes )
     dup packed-length [ read dup length ] keep =
-    [ nip ] [ packed-read-fail ] if ; inline
+    [ nip ] [ throw-packed-read-fail ] if ; inline
 
 PRIVATE>
 

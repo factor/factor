@@ -281,4 +281,4 @@ M: windows (run-process) ( process -- handle )
             dup call-CreateProcess
             lpProcessInformation>>
         ] with-destructors
-    ] [ launch-error ] recover ;
+    ] [ throw-launch-error ] recover ;

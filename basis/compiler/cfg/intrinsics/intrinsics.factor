@@ -28,7 +28,7 @@ ERROR: inline-intrinsics-not-supported word quot ;
 
 : enable-intrinsics ( alist -- )
     [
-        over inline? [ inline-intrinsics-not-supported ] when
+        over inline? [ throw-inline-intrinsics-not-supported ] when
         "intrinsic" set-word-prop
     ] assoc-each ;
 

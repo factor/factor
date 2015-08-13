@@ -18,7 +18,7 @@ ERROR: bad-numbering bb ;
 
 : check-block-numbering ( bb -- )
     dup instructions>> [ insn#>> ] map sift [ <= ] monotonic?
-    [ drop ] [ bad-numbering ] if ;
+    [ drop ] [ throw-bad-numbering ] if ;
 
 : check-numbering ( cfg -- )
     check-numbering? get

@@ -15,7 +15,7 @@ ERROR: promise-already-fulfilled promise ;
 
 : fulfill ( value promise -- )
     dup promise-fulfilled? [
-        promise-already-fulfilled
+        throw-promise-already-fulfilled
     ] [
         mailbox>> mailbox-put
     ] if ;

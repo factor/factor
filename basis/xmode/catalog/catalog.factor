@@ -87,8 +87,6 @@ DEFER: finalize-rule-set
         ] with-variable
     ] with each ;
 
-ERROR: mutually-recursive-rulesets ruleset ;
-
 : finalize-rule-set ( ruleset -- )
     dup finalized?>> [ drop ] [
         t >>finalized?

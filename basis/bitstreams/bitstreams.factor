@@ -20,7 +20,7 @@ ERROR: invalid-widthed bits #bits ;
                 dup 0 < [ neg ] when log2 <=
             ] if-zero
         ]
-    } 2|| [ invalid-widthed ] when ;
+    } 2|| [ throw-invalid-widthed ] when ;
 
 : <widthed> ( bits #bits -- widthed )
     check-widthed
@@ -85,11 +85,11 @@ GENERIC: poke ( value n bitstream -- )
 
 <PRIVATE
 
-ERROR: not-enough-bits widthed n ;
+ERROR: not-enough-widthed-bits widthed n ;
 
 : check-widthed-bits ( widthed n -- widthed n )
     2dup { [ nip 0 < ] [ [ #bits>> ] dip < ] } 2||
-    [ not-enough-bits ] when ;
+    [ throw-not-enough-widthed-bits ] when ;
 
 : widthed-bits ( widthed n -- bits )
     check-widthed-bits
@@ -161,7 +161,7 @@ ERROR: not-enough-bits n bit-reader ;
     ] if ;
 
 :: (peek) ( n bs endian> subseq-endian -- bits )
-    n bs enough-bits? [ n bs not-enough-bits ] unless
+    n bs enough-bits? [ n bs throw-not-enough-bits ] unless
     bs [ byte-pos>> ] [ bit-pos>> n + ] bi #bits>#bytes dupd +
     bs bytes>> subseq endian> execute( seq -- x )
     n bs subseq-endian execute( bignum n bs -- bits ) ;

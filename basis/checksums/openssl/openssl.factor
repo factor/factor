@@ -33,7 +33,7 @@ M: evp-md-context dispose*
 
 : digest-named ( name -- md )
     dup EVP_get_digestbyname
-    [ ] [ unknown-digest ] ?if ;
+    [ ] [ throw-unknown-digest ] ?if ;
 
 : set-digest ( name ctx -- )
     handle>> swap digest-named f EVP_DigestInit_ex ssl-error ;

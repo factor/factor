@@ -68,6 +68,6 @@ ERROR: bad-kill-index vreg bb ;
     2dup live-out? [ 2drop 1/0. ] [
         2dup kill-indices get at at* [ 2nip ] [
             drop 2dup live-in?
-            [ bad-kill-index ] [ 2drop -1/0. ] if
+            [ throw-bad-kill-index ] [ 2drop -1/0. ] if
         ] if
     ] if ;

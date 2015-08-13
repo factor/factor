@@ -21,8 +21,8 @@ ERROR: read-only-slot slot ;
 
 : check-set-slot ( val slot -- val offset )
     {
-        { [ dup not ] [ no-such-slot ] }
-        { [ dup read-only>> ] [ read-only-slot ] }
+        { [ dup not ] [ throw-no-such-slot ] }
+        { [ dup read-only>> ] [ throw-read-only-slot ] }
         { [ 2dup class>> instance? not ] [ class>> bad-slot-value ] }
         [ offset>> ]
     } cond ; inline

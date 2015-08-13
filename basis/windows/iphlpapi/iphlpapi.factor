@@ -141,7 +141,7 @@ ERROR: unknown-sockaddr-length sockaddr length ;
     dup iSockaddrLength>> {
         { 16 [ lpSockaddr>> sockaddr-in memory>struct ] }
         { 28 [ lpSockaddr>> sockaddr-in6 memory>struct ] }
-        [ unknown-sockaddr-length ]
+        [ throw-unknown-sockaddr-length ]
     } case ;
 
 TYPEDEF: SOCKET_ADDRESS* PSOCKET_ADDRESS

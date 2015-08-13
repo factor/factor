@@ -14,7 +14,7 @@ ERROR: invalid-lucas-lehmer-candidate obj ;
 
 : lucas-lehmer-guard ( obj -- obj )
     dup { [ integer? ] [ 0 > ] } 1&&
-    [ invalid-lucas-lehmer-candidate ] unless ;
+    [ throw-invalid-lucas-lehmer-candidate ] unless ;
 
 PRIVATE>
 

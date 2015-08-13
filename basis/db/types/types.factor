@@ -38,7 +38,7 @@ SYMBOL: IGNORE
 ERROR: not-persistent class ;
 
 : db-table-name ( class -- object )
-    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
+    dup "db-table" word-prop [ ] [ throw-not-persistent ] ?if ;
 
 : db-columns ( class -- object )
     superclasses-of [ "db-columns" word-prop ] map concat ;
@@ -117,13 +117,13 @@ ERROR: unknown-modifier modifier ;
 : lookup-modifier ( obj -- string )
     {
         { [ dup array? ] [ unclip lookup-modifier swap compound ] }
-        [ persistent-table ?at [ unknown-modifier ] unless third ]
+        [ persistent-table ?at [ throw-unknown-modifier ] unless third ]
     } cond ;
 
 ERROR: no-sql-type type ;
 
 : (lookup-type) ( obj -- string )
-    persistent-table ?at [ no-sql-type ] unless ;
+    persistent-table ?at [ throw-no-sql-type ] unless ;
 
 : lookup-type ( obj -- string )
     dup array? [
@@ -152,5 +152,5 @@ ERROR: no-column column ;
     first2
     [ [ db-table-name " " glue ] [ db-columns ] bi ] dip
     swap [ column-name>> = ] with find nip
-    [ no-column ] unless*
+    [ throw-no-column ] unless*
     column-name>> "(" ")" surround append ;

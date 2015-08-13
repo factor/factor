@@ -66,7 +66,7 @@ M: object file-spec>string ( file-listing spec -- string )
         { +file-date+ [ file-info>> modified>> listing-date ] }
         { +file-time+ [ file-info>> modified>> listing-time ] }
         { +file-datetime+ [ file-info>> modified>> timestamp>ymdhms ] }
-        [ unknown-file-spec ]
+        [ throw-unknown-file-spec ]
     } case ;
 
 : list-files-fast ( listing-tool -- array )

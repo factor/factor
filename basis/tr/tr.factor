@@ -15,7 +15,7 @@ M: bad-tr summary
 : tr-nth ( n mapping -- ch ) nth-unsafe 127 bitand ; inline
 
 : check-tr ( from to -- )
-    [ [ ascii? ] all? ] both? [ bad-tr ] unless ;
+    [ [ ascii? ] all? ] both? [ throw-bad-tr ] unless ;
 
 : compute-tr ( quot from to -- mapping )
     [ 128 iota ] 3dip zip

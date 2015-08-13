@@ -9,7 +9,6 @@ QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
 ERROR: bad-simd-length got expected ;
-
 ERROR: bad-simd-vector obj ;
 
 <<
@@ -139,7 +138,7 @@ M: simd-128 byte-length drop 16 ; inline
 M: simd-128 new-sequence
     2dup length =
     [ nip [ 16 (byte-array) ] make-underlying ]
-    [ length bad-simd-length ] if ; inline
+    [ length throw-bad-simd-length ] if ; inline
 
 M: simd-128 equal?
     dup simd-rep [ drop v= vall? ] [ 3drop f ] if-both-vectors-match ; inline
@@ -322,7 +321,7 @@ c:<c-type>
     A >>boxed-class
     { A-rep alien-vector A boa } >quotation >>getter
     {
-        [ dup simd-128? [ bad-simd-vector ] unless underlying>> ] 2dip
+        [ dup simd-128? [ throw-bad-simd-vector ] unless underlying>> ] 2dip
         A-rep set-alien-vector
     } >quotation >>setter
     16 >>size

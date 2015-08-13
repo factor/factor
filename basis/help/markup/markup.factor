@@ -210,11 +210,11 @@ M: word link-long-text
 ERROR: number-of-arguments found required ;
 
 : check-first ( seq -- first )
-    dup length 1 = [ length 1 number-of-arguments ] unless
+    dup length 1 = [ length 1 throw-number-of-arguments ] unless
     first-unsafe ;
 
 : check-first2 ( seq -- first second )
-    dup length 2 = [ length 2 number-of-arguments ] unless
+    dup length 2 = [ length 2 throw-number-of-arguments ] unless
     first2-unsafe ;
 
 PRIVATE>

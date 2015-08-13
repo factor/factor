@@ -12,7 +12,7 @@ ERROR: bad-live-ranges interval ;
 : check-ranges ( live-interval -- )
     check-allocation? get [
         dup ranges>> [ [ from>> ] [ to>> ] bi <= ] all?
-        [ drop ] [ bad-live-ranges ] if
+        [ drop ] [ throw-bad-live-ranges ] if
     ] [ drop ] if ;
 
 : trim-before-ranges ( live-interval -- )

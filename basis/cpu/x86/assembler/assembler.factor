@@ -234,14 +234,14 @@ M: operand MOV 0x88 2-operand ;
 ERROR: bad-movabs-operands dst src ;
 
 GENERIC: MOVABS ( dst src -- )
-M: object MOVABS bad-movabs-operands ;
+M: object MOVABS throw-bad-movabs-operands ;
 M: register MOVABS
     {
         { AL [ 0xa2 , cell, ] }
         { AX [ 0x66 , 0xa3 , cell, ] }
         { EAX [ 0xa3 , cell, ] }
         { RAX [ 0x48 , 0xa3 , cell, ] }
-        [ swap bad-movabs-operands ]
+        [ swap throw-bad-movabs-operands ]
     } case ;
 M: integer MOVABS
     swap {
@@ -249,7 +249,7 @@ M: integer MOVABS
         { AX [ 0x66 , 0xa1 , cell, ] }
         { EAX [ 0xa1 , cell, ] }
         { RAX [ 0x48 , 0xa1 , cell, ] }
-        [ swap bad-movabs-operands ]
+        [ swap throw-bad-movabs-operands ]
     } case ;
 
 : LEA ( dst src -- ) swap 0x8d 2-operand ;
@@ -481,7 +481,7 @@ ERROR: bad-x87-operands ;
 :: x87-st0-op ( src opcode reg -- )
     src register?
     [ src opcode reg (x87-op) ]
-    [ bad-x87-operands ] if ;
+    [ throw-bad-x87-operands ] if ;
 
 :: x87-m-st0/n-op ( dst src opcode reg -- )
     {
@@ -494,7 +494,7 @@ ERROR: bad-x87-operands ;
         { [ src ST0 = dst register? and ] [
             dst opcode 4 + reg (x87-op)
         ] }
-        [ bad-x87-operands ]
+        [ throw-bad-x87-operands ]
     } cond ;
 
 PRIVATE>

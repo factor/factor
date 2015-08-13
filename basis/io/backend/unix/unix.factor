@@ -75,7 +75,7 @@ M: unix wait-for-fd ( handle event -- )
             { +input+ [ add-input-callback ] }
             { +output+ [ add-output-callback ] }
         } case
-        "I/O" suspend [ io-timeout ] when
+        "I/O" suspend [ throw-io-timeout ] when
     ] if ;
 
 : wait-for-port ( port event -- )
@@ -86,7 +86,7 @@ M: unix wait-for-fd ( handle event -- )
 ERROR: not-a-buffered-port port ;
 
 : check-buffered-port ( port -- port )
-    dup buffered-port? [ not-a-buffered-port ] unless ; inline
+    dup buffered-port? [ throw-not-a-buffered-port ] unless ; inline
 
 M: fd refill
     [ check-buffered-port buffer>> ] [ fd>> ] bi*

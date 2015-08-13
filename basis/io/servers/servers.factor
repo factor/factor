@@ -27,17 +27,17 @@ secure-context ;
 SYMBOL: running-servers
 running-servers [ HS{ } clone ] initialize
 
-ERROR: server-already-running threaded-server ;
-
 ERROR: server-not-running threaded-server ;
+
+ERROR: server-already-running threaded-server ;
 
 <PRIVATE
 
 : must-be-running ( threaded-server -- threaded-server )
-    dup running-servers get in? [ server-not-running ] unless ;
+    dup running-servers get in? [ throw-server-not-running ] unless ;
 
 : must-not-be-running ( threaded-server -- threaded-server )
-    dup running-servers get in? [ server-already-running ] when ;
+    dup running-servers get in? [ throw-server-already-running ] when ;
 
 : add-running-server ( threaded-server -- )
     must-not-be-running

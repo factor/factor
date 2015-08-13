@@ -29,7 +29,7 @@ IN: math.bitwise
 
 ERROR: bit-range-error x high low ;
 : bit-range ( x high low -- y )
-    2dup { [ nip 0 < ] [ < ] } 2|| [ bit-range-error ] when
+    2dup { [ nip 0 < ] [ < ] } 2|| [ throw-bit-range-error ] when
     [ nip neg shift ] [ - 1 + ] 2bi bits ; inline
 
 : bitroll ( x s w -- y )

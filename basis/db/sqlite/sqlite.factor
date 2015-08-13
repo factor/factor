@@ -100,7 +100,7 @@ ERROR: sqlite-last-id-fail ;
 
 : last-insert-id ( -- id )
     db-connection get handle>> sqlite3_last_insert_rowid
-    dup zero? [ sqlite-last-id-fail ] when ;
+    dup zero? [ throw-sqlite-last-id-fail ] when ;
 
 M: sqlite-db-connection insert-tuple-set-key ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;

@@ -24,7 +24,7 @@ TUPLE: heap { data vector } ;
 ERROR: not-a-heap object ;
 
 : check-heap ( heap -- heap )
-    dup heap? [ not-a-heap ] unless ; inline
+    dup heap? [ throw-not-a-heap ] unless ; inline
 
 TUPLE: entry value key heap index ;
 
@@ -164,7 +164,7 @@ M: bad-heap-delete summary
 <PRIVATE
 
 : entry>index ( entry heap -- n )
-    over heap>> eq? [ bad-heap-delete ] unless
+    over heap>> eq? [ throw-bad-heap-delete ] unless
     index>> { fixnum } declare ; inline
 
 PRIVATE>

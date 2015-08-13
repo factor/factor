@@ -73,14 +73,14 @@ M: quotation rewrite-element rewrite-sugar* ;
 
 M: lambda rewrite-element rewrite-sugar* ;
 
-M: let rewrite-element let-form-in-literal-error ;
+M: let rewrite-element throw-let-form-in-literal-error ;
 
 M: local rewrite-element , ;
 
 M: local-reader rewrite-element , ;
 
 M: local-writer rewrite-element
-    local-writer-in-literal-error ;
+    throw-local-writer-in-literal-error ;
 
 M: word rewrite-element <wrapper> , ;
 

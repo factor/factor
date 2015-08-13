@@ -35,7 +35,7 @@ M: bad-probabilities summary
     dup good-probabilities? [
         [ dup pair? [ prepare-pair ] [ with-drop ] if ] map
         cond>quot
-    ] [ bad-probabilities ] if ;
+    ] [ throw-bad-probabilities ] if ;
 
 MACRO: (casep) ( assoc -- quot ) (casep>quot) ;
 

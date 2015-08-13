@@ -38,7 +38,7 @@ M: tuple-class group-words
 
 : check-broadcast-group ( group -- group )
     dup group-words [ first stack-effect out>> empty? ] all?
-    [ broadcast-words-must-have-no-outputs ] unless ;
+    [ throw-broadcast-words-must-have-no-outputs ] unless ;
 
 ! Consultation
 
@@ -160,7 +160,7 @@ ERROR: not-a-generic word ;
 
 : check-generic ( generic -- )
     dup array? [ first ] when
-    dup generic? [ drop ] [ not-a-generic ] if ;
+    dup generic? [ drop ] [ throw-not-a-generic ] if ;
 
 PRIVATE>
 

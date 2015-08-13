@@ -72,7 +72,7 @@ fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
 fmt-f     = digits "f"           => [[ first '[ _ format-decimal ] ]]
 fmt-x     = "x"                  => [[ [ >hex ] ]]
 fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
-unknown   = (.)*                 => [[ unknown-printf-directive ]]
+unknown   = (.)*                 => [[ throw-unknown-printf-directive ]]
 
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S|fmt-u
 strings   = pad width strings_   => [[ <reversed> compose-all ]]

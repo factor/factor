@@ -9,7 +9,6 @@ IN: compression.inflate
 
 <PRIVATE
 
-ERROR: zlib-unimplemented ;
 ERROR: bad-zlib-data ;
 ERROR: bad-zlib-header ;
 
@@ -18,7 +17,7 @@ ERROR: bad-zlib-header ;
     0 assert=
     4 data bs:read 8 assert=            ! compression method: deflate
     4 data bs:read                      ! log2(max length)-8, 32K max
-    7 <= [ bad-zlib-header ] unless
+    7 <= [ throw-bad-zlib-header ] unless
     5 data bs:seek                      ! drop check bits
     1 data bs:read 0 assert=            ! dictionary - not allowed in png
     2 data bs:seek                      ! compression level; ignore
@@ -105,7 +104,7 @@ CONSTANT: dist-table
             dup 285 = [
                 dup 264 > [
                     dup 261 - 4 /i
-                    dup 5 > [ bad-zlib-data ] when
+                    dup 5 > [ throw-bad-zlib-data ] when
                     bitstream bs:read 2array
                 ] when
             ] unless
@@ -114,7 +113,7 @@ CONSTANT: dist-table
 
             dup 3 > [
                 dup 2 - 2 /i dup 13 >
-                [ bad-zlib-data ] when
+                [ throw-bad-zlib-data ] when
                 bitstream bs:read 2array
             ] when 2array
         ] when dup 256 = not
@@ -158,7 +157,7 @@ CONSTANT: dist-table
             { 0 [ inflate-raw ] }
             { 1 [ inflate-static ] }
             { 2 [ inflate-dynamic ] }
-            { 3 [ bad-zlib-data f ] }
+            { 3 [ throw-bad-zlib-data f ] }
         } case
     ] [ produce ] keep call suffix concat ;
 

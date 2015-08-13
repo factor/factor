@@ -15,7 +15,7 @@ ERROR: bad-array-type ;
 
 : parse-array-type ( name -- c-type )
     "[" split unclip
-    [ [ "]" ?tail [ bad-array-type ] unless parse-datum ] map ]
+    [ [ "]" ?tail [ throw-bad-array-type ] unless parse-datum ] map ]
     [ (parse-c-type) ]
     bi* prefix ;
 

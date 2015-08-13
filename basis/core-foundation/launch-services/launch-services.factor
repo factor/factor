@@ -113,7 +113,7 @@ CONSTANT: kLSUnknownCreator f
 ERROR: core-foundation-error n ;
 
 : cf-error ( n -- )
-    dup 0 = [ drop ] [ core-foundation-error ] if ;
+    dup 0 = [ drop ] [ throw-core-foundation-error ] if ;
 
 : fsref>string ( fsref -- string )
     MAXPATHLEN [ <char-array> ] [ ] bi

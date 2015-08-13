@@ -18,7 +18,7 @@ CONSTANT: roman-values
 ERROR: roman-range-error n ;
 
 : roman-range-check ( n -- n )
-    dup 1 10000 between? [ roman-range-error ] unless ;
+    dup 1 10000 between? [ throw-roman-range-error ] unless ;
 
 : roman-digit-index ( ch -- n )
     1string roman-digits index ; inline

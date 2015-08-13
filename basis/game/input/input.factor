@@ -50,7 +50,7 @@ ERROR: game-input-not-open ;
     reset-mouse ;
 : close-game-input ( -- )
     game-input-opened [
-        dup zero? [ game-input-not-open ] when
+        dup zero? [ throw-game-input-not-open ] when
         1 -
     ] change-global
     game-input-opened? [

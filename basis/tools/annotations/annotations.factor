@@ -33,7 +33,7 @@ PREDICATE: annotated < word "unannotated-def" word-prop >boolean ;
 <PRIVATE
 
 : check-annotate-twice ( word -- word )
-    dup annotated? [ cannot-annotate-twice ] when ;
+    dup annotated? [ throw-cannot-annotate-twice ] when ;
 
 : annotate-generic ( word quot -- )
     [ "methods" word-prop values ] dip each ; inline

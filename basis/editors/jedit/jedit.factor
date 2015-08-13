@@ -8,8 +8,6 @@ IN: editors.jedit
 SINGLETON: jedit
 jedit editor-class set-global
 
-ERROR: jedit-not-found ;
-
 HOOK: find-jedit-path os ( -- path )
 
 M: object find-jedit-path f ;

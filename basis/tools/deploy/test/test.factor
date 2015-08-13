@@ -23,7 +23,7 @@ ERROR: image-too-big actual-size max-size ;
         cpu ppc? [ 100000 + ] when
         os windows? [ 160000 + ] when
     ] bi*
-    2dup <= [ 2drop ] [ image-too-big ] if ;
+    2dup <= [ 2drop ] [ throw-image-too-big ] if ;
 
 : deploy-test-command ( -- args )
     os macosx?

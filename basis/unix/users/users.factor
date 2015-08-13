@@ -71,7 +71,7 @@ M: string user-passwd ( string -- passwd/f )
 ERROR: no-user string ;
 
 : ?user-id ( string -- id/f )
-    dup user-passwd [ nip uid>> ] [ no-user ] if* ;
+    dup user-passwd [ nip uid>> ] [ throw-no-user ] if* ;
 
 : real-user-id ( -- id )
     unix.ffi:getuid ; inline
@@ -132,6 +132,6 @@ M: string set-effective-user ( string -- )
 ERROR: no-such-user obj ;
 
 : user-home ( name/uid -- path )
-    dup user-passwd [ nip dir>> ] [ no-such-user ] if* ;
+    dup user-passwd [ nip dir>> ] [ throw-no-such-user ] if* ;
 
 os macosx? [ "unix.users.macosx" require ] when

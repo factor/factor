@@ -34,11 +34,11 @@ ERROR: unrolled-2bounds-error
 
 <PRIVATE
 : unrolled-bounds-check ( seq len quot -- seq len quot )
-    2over swap length > [ 2over unrolled-bounds-error ] when ; inline
+    2over swap length > [ 2over throw-unrolled-bounds-error ] when ; inline
 
 :: unrolled-2bounds-check ( xseq yseq len quot -- xseq yseq len quot )
     { [ len xseq length > ] [ len yseq length > ] } 0||
-    [ xseq yseq len unrolled-2bounds-error ]
+    [ xseq yseq len throw-unrolled-2bounds-error ]
     [ xseq yseq len quot ] if ; inline
 
 : (unrolled-each) ( seq len quot -- len quot )

@@ -16,7 +16,7 @@ ERROR: no-such-word name vocab ;
 
 : string>word ( string -- word )
     ":" split1 swap 2dup lookup-word dup
-    [ 2nip ] [ drop no-such-word ] if ;
+    [ 2nip ] [ drop throw-no-such-word ] if ;
 
 : strings>words ( seq -- seq' )
     [ string>word ] map ;
@@ -32,7 +32,7 @@ ERROR: no-such-responder responder ;
 : base-path ( string -- seq )
     dup responder-nesting get
     [ second class-of superclasses-of [ name>> = ] with any? ] with find nip
-    [ first ] [ no-such-responder ] ?if ;
+    [ first ] [ throw-no-such-responder ] ?if ;
 
 : resolve-base-path ( string -- string' )
     "$" ?head [

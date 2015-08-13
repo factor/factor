@@ -21,7 +21,7 @@ MACRO:: test-vconvert ( from-type to-type -- quot )
         inputs narray
         [ quot with-datastack ]
         [ [ [ declaration declare quot call ] compile-call ] with-datastack ] bi
-        2dup = [ optimized-vconvert-inconsistent ] unless
+        2dup = [ throw-optimized-vconvert-inconsistent ] unless
         drop outputs firstn
     ] ;
 

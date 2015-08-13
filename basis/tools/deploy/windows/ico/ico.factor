@@ -58,10 +58,10 @@ ERROR: unsupported-ico-format bytes format ;
 
 : check-ico-type ( bytes -- bytes )
     dup "PNG" head? [
-        "PNG" unsupported-ico-format
+        "PNG" throw-unsupported-ico-format
     ] when
     dup B{ 0 0 } head? [
-        "UNKNOWN" unsupported-ico-format
+        "UNKNOWN" throw-unsupported-ico-format
     ] unless ;
 
 PRIVATE>
