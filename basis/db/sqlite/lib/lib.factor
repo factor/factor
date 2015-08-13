@@ -11,18 +11,18 @@ IN: db.sqlite.lib
 ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
 
-: throw-sqlite-error ( n -- * )
-    dup sqlite-error-messages nth sqlite-error ;
+: sqlite-other-error ( n -- * )
+    dup sqlite-error-messages nth throw-sqlite-error ;
 
 : sqlite-statement-error ( -- * )
     SQLITE_ERROR
-    db-connection get handle>> sqlite3_errmsg sqlite-sql-error ;
+    db-connection get handle>> sqlite3_errmsg throw-sqlite-sql-error ;
 
 : sqlite-check-result ( n -- )
     {
         { SQLITE_OK [ ] }
         { SQLITE_ERROR [ sqlite-statement-error ] }
-        [ throw-sqlite-error ]
+        [ sqlite-other-error ]
     } case ;
 
 : sqlite-open ( path -- db )
