@@ -52,7 +52,7 @@ TUPLE: unclosed line column tags ;
 : throw-unclosed ( -- * )
     get-line get-column
     xml-stack get rest-slice [ first name>> ] map
-    unclosed ;
+    unclosed boa throw ;
 
 XML-ERROR: bad-uri string ;
 
