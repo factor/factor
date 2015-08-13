@@ -17,10 +17,10 @@ ERROR: content-length-missing < request-error ;
 ERROR: bad-request-line < request-error parse-error ;
 
 : check-absolute ( url -- )
-    path>> dup "/" head? [ drop ] [ throw-invalid-path ] if ; inline
+    path>> dup "/" head? [ drop ] [ invalid-path ] if ; inline
 
 : parse-request-line-safe ( string -- triple )
-    [ parse-request-line ] [ nip throw-bad-request-line ] recover ;
+    [ parse-request-line ] [ nip bad-request-line ] recover ;
 
 : read-request-line ( request -- request )
     read-?crlf [ dup "" = ] [ drop read-?crlf ] while
@@ -36,7 +36,7 @@ upload-limit [ 200,000,000 ] initialize
 
 : parse-multipart-form-data ( string -- separator )
     ";" split1 nip
-    "=" split1 nip [ throw-no-boundary ] unless* ;
+    "=" split1 nip [ no-boundary ] unless* ;
 
 : maybe-limit-input ( content-length -- )
     unlimited-input upload-limit get [ min ] when* limited-input ;
@@ -49,10 +49,10 @@ upload-limit [ 200,000,000 ] initialize
     "content-length" header [
         dup string>number [
             nip dup 0 upload-limit get between? [
-                throw-invalid-content-length
+                invalid-content-length
             ] unless
-        ] [ throw-invalid-content-length ] if*
-    ] [ throw-content-length-missing ] if* ;
+        ] [ invalid-content-length ] if*
+    ] [ content-length-missing ] if* ;
 
 : parse-content ( request content-type -- post-data )
     dup <post-data> -rot over parse-content-length-safe swap

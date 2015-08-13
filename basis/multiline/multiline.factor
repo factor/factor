@@ -28,7 +28,7 @@ ERROR: text-found-before-eol string ;
 : parse-here ( -- str )
     [
         lexer get
-        dup rest-of-line [ throw-text-found-before-eol ] unless-empty
+        dup rest-of-line [ text-found-before-eol ] unless-empty
         (parse-here)
     ] "" make but-last ;
 
@@ -71,7 +71,7 @@ SYNTAX: STRING:
             begin-text lexer (parse-til-line-begins)
         ] if
     ] [
-        begin-text throw-bad-heredoc
+        begin-text bad-heredoc
     ] if ;
 
 : parse-til-line-begins ( begin-text lexer -- seq )

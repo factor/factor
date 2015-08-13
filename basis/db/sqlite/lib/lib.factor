@@ -12,11 +12,11 @@ ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
 
 : sqlite-other-error ( n -- * )
-    dup sqlite-error-messages nth throw-sqlite-error ;
+    dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
     SQLITE_ERROR
-    db-connection get handle>> sqlite3_errmsg throw-sqlite-sql-error ;
+    db-connection get handle>> sqlite3_errmsg sqlite-sql-error ;
 
 : sqlite-check-result ( n -- )
     {

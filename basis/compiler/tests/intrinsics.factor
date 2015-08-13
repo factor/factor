@@ -319,7 +319,7 @@ ERROR: bug-in-fixnum* x y a b ;
         32 random-bits >fixnum
         32 random-bits >fixnum
         2dup [ fixnum* ] [ compiled-fixnum* ] 2bi 2dup =
-        [ 4drop ] [ throw-bug-in-fixnum* ] if
+        [ 4drop ] [ bug-in-fixnum* ] if
     ] times
 ] unit-test
 

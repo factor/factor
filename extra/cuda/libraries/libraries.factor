@@ -86,10 +86,10 @@ PRIVATE>
 ERROR: no-cuda-library name ;
 
 : lookup-cuda-library ( name -- cuda-library )
-    cuda-libraries get ?at [ throw-no-cuda-library ] unless ;
+    cuda-libraries get ?at [ no-cuda-library ] unless ;
 
 : remove-cuda-library ( name -- library )
-    cuda-libraries get ?delete-at [ throw-no-cuda-library ] unless ;
+    cuda-libraries get ?delete-at [ no-cuda-library ] unless ;
 
 : unload-cuda-library ( name -- )
     remove-cuda-library handle>> unload-module ;
@@ -189,7 +189,7 @@ TUPLE: cuda-library name abi path handle ;
 ERROR: bad-cuda-abi abi ;
 
 : check-cuda-abi ( abi -- abi )
-    dup cuda-abi? [ throw-bad-cuda-abi ] unless ; inline
+    dup cuda-abi? [ bad-cuda-abi ] unless ; inline
 
 : <cuda-library> ( name abi path -- obj )
     \ cuda-library new

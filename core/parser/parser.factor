@@ -53,7 +53,7 @@ SYMBOL: auto-use?
 ERROR: number-expected ;
 
 : parse-number ( string -- number )
-    string>number [ throw-number-expected ] unless* ;
+    string>number [ number-expected ] unless* ;
 
 : parse-datum ( string -- word/number )
     dup search [ ] [
@@ -77,7 +77,7 @@ ERROR: invalid-word-name string ;
 : scan-word-name ( -- string )
     scan-token
     dup "\"" = [ t ] [ dup string>number ] if
-    [ throw-invalid-word-name ] when ;
+    [ invalid-word-name ] when ;
 
 : scan-new ( -- word )
     scan-word-name create-word-in ;
@@ -93,7 +93,7 @@ ERROR: staging-violation word ;
     pop-parsing-word ; inline
 
 : execute-parsing ( accum word -- accum )
-    dup changed-definitions get in? [ throw-staging-violation ] when
+    dup changed-definitions get in? [ staging-violation ] when
     (execute-parsing) ;
 
 : scan-object ( -- object )

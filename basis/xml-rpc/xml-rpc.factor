@@ -125,7 +125,7 @@ TAG: boolean xml>item
     children>string {
         { "1" [ t ] }
         { "0" [ f ] }
-        [ "Bad boolean" throw-server-error ]
+        [ "Bad boolean" server-error ]
     } case ;
 
 : unstruct-member ( tag -- )
@@ -167,7 +167,7 @@ TAG: array xml>item
             dup first-child-tag main>> "fault" =
             [ parse-fault <rpc-fault> ]
             [ parse-rpc-response <rpc-response> ] if
-        ] [ "Bad main tag name" throw-server-error ] if
+        ] [ "Bad main tag name" server-error ] if
     ] if ;
 
 <PRIVATE

@@ -112,7 +112,7 @@ PRIVATE>
         { "png"  [ ".png" ] }
         { "tif"  [ ".tif" ] }
         { "tiff" [ ".tif" ] }
-        [ throw-unsupported-preview-format ]
+        [ unsupported-preview-format ]
     } case ;
 
 :: with-preview ( graph quot: ( path -- ) -- )

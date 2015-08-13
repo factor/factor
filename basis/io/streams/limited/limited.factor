@@ -62,11 +62,11 @@ ERROR: limit-exceeded n stream ;
 
 : check-count-bounds ( n stream -- n stream )
     dup [ count>> ] [ limit>> ] bi >
-    [ throw-limit-exceeded ] when ;
+    [ limit-exceeded ] when ;
 
 : check-current-bounds ( n stream -- n stream )
     dup [ current>> ] [ start>> ] bi <
-    [ throw-limit-exceeded ] when ;
+    [ limit-exceeded ] when ;
 
 : adjust-limited-read ( n stream -- n stream )
     dup start>> [

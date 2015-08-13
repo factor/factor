@@ -36,7 +36,7 @@ IN: html.parser.analyzer
 ERROR: undefined-find-nth m n seq quot ;
 
 : check-trivial-find ( m n seq quot -- m n seq quot )
-    pick 0 = [ throw-undefined-find-nth ] when ; inline
+    pick 0 = [ undefined-find-nth ] when ; inline
 
 : find-nth-from ( m n seq quot -- i/f elt/f )
     check-trivial-find [ f ] 3dip '[

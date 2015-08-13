@@ -44,7 +44,7 @@ ERROR: no-cairo-t ;
 <PRIVATE
 
 : draw-hello-world ( gadget -- )
-    cairo-t>> [ throw-no-cairo-t ] unless*
+    cairo-t>> [ no-cairo-t ] unless*
     {
         [
             "Sans" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_BOLD

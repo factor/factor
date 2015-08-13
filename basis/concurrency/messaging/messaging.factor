@@ -56,7 +56,7 @@ M: cannot-send-synchronous-to-self summary
 
 : send-synchronous ( message thread -- reply )
     dup self eq? [
-        throw-cannot-send-synchronous-to-self
+        cannot-send-synchronous-to-self
     ] [
         [ <synchronous> dup ] dip send
         '[ _ synchronous-reply? ] receive-if

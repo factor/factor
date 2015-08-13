@@ -154,7 +154,7 @@ ERROR: zone-not-found name ;
 
 : find-zone ( string -- rules )
     raw-zone-map
-    [ last ] assoc-map ?at [ throw-zone-not-found ] unless ;
+    [ last ] assoc-map ?at [ zone-not-found ] unless ;
 
 : find-zone-rules ( string -- zone rules )
     find-zone dup rules/save>> find-rules ;

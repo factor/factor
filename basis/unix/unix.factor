@@ -32,7 +32,7 @@ MACRO:: unix-system-call ( quot -- quot )
         failed [
             n narray
             errno dup strerror
-            word throw-unix-system-call-error
+            word unix-system-call-error
         ] [
             n ndrop
             ret
@@ -51,7 +51,7 @@ MACRO:: unix-system-call-allow-eintr ( quot -- quot )
             errno EINTR = [
                 n narray
                 errno dup strerror
-                word throw-unix-system-call-error
+                word unix-system-call-error
             ] unless
         ] [
             n ndrop

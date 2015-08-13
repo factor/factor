@@ -139,7 +139,7 @@ TR: hyphens>underscores "-" "_" ;
         [ vertex-attribute name>> name = ]
         [ size 1 = ]
         [ gl-type vertex-attribute [ component-type>> ] [ dim>> ] bi feedback-type= ]
-    } 0&& [ vertex-attribute throw-inaccurate-feedback-attribute-error ] unless ;
+    } 0&& [ vertex-attribute inaccurate-feedback-attribute-error ] unless ;
 
 :: (bind-float-vertex-attribute) ( program-instance ptr name dim gl-type normalize? stride offset -- )
     program-instance name attribute-index :> idx
@@ -182,7 +182,7 @@ TR: hyphens>underscores "-" "_" ;
 
 :: [link-feedback-format] ( vertex-attributes -- quot )
     vertex-attributes [ name>> not ] any?
-    [ [ nip throw-invalid-link-feedback-format-error ] ] [
+    [ [ nip invalid-link-feedback-format-error ] ] [
         vertex-attributes
         [ name>> ascii malloc-string ]
         void*-array{ } map-as :> varying-names
@@ -473,7 +473,7 @@ DEFER: <shader-instance>
     [ ] [ source>> ] [ kind>> gl-shader-kind ] tri <gl-shader>
     dup gl-shader-ok?
     [ swap world get \ shader-instance boa window-resource ]
-    [ throw-compile-shader-error ] if ;
+    [ compile-shader-error ] if ;
 
 : (link-program) ( program shader-instances -- program-instance )
     '[ _ [ handle>> ] map ]
@@ -488,7 +488,7 @@ DEFER: <shader-instance>
     dup gl-program-ok?  [
         [ swap world get \ program-instance boa |dispose dup verify-feedback-format ]
         with-destructors window-resource
-    ] [ throw-link-program-error ] if ;
+    ] [ link-program-error ] if ;
 
 : link-program ( program -- program-instance )
     dup shaders>> [ <shader-instance> ] map (link-program) ;
@@ -529,7 +529,7 @@ TUPLE: feedback-format
 : validate-feedback-format ( sequence -- vertex-format/f )
     dup length 1 <=
     [ [ f ] [ first vertex-format>> ] if-empty ]
-    [ throw-too-many-feedback-formats-error ] if ;
+    [ too-many-feedback-formats-error ] if ;
 
 : ?shader ( object -- shader/f )
     dup word? [ def>> first dup shader? [ drop f ] unless ] [ drop f ] if ;

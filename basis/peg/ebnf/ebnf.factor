@@ -18,7 +18,7 @@ ERROR: no-rule rule parser ;
 <PRIVATE
 
 : lookup-rule ( rule parser -- rule' )
-        2dup rule [ 2nip ] [ throw-no-rule ] if* ;
+        2dup rule [ 2nip ] [ no-rule ] if* ;
 
 TUPLE: tokenizer-tuple any one many ;
 
@@ -48,7 +48,7 @@ M: no-tokenizer summary
     drop "Tokenizer not found" ;
 
 SYNTAX: TOKENIZER:
-    scan-word-name dup search [ nip ] [ throw-no-tokenizer ] if*
+    scan-word-name dup search [ nip ] [ no-tokenizer ] if*
     execute( -- tokenizer ) \ tokenizer set-global ;
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -395,7 +395,7 @@ M: redefined-rule summary
 M: ebnf-rule (transform) ( ast -- parser )
     dup elements>>
     (transform) [
-        swap symbol>> dup get parser? [ throw-redefined-rule ] [ set ] if
+        swap symbol>> dup get parser? [ redefined-rule ] [ set ] if
     ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )

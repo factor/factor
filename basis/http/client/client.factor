@@ -93,7 +93,7 @@ SYMBOL: redirects
         response "location" header redirect-url
         response code>> 307 = [ "GET" >>method ] unless
         quot (with-http-request)
-    ] [ throw-too-many-redirects ] if ; inline recursive
+    ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
     read-crlf ";" split1 drop [ blank? ] trim-tail

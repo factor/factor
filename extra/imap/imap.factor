@@ -41,7 +41,7 @@ CONSTANT: IMAP4_SSL_PORT 993
     [ number>string ] map "," join ;
 
 : check-status ( ind data -- )
-    over "OK" = not [ throw-imap4-error ] [ 2drop ] if ;
+    over "OK" = not [ imap4-error ] [ 2drop ] if ;
 
 : read-response-chunk ( stop-expr -- item ? )
     read-?crlf ascii decode swap dupd pcre:findall

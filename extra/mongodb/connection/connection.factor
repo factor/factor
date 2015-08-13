@@ -150,7 +150,7 @@ ERROR: mongod-connection-error address message ;
         open-connection [ authenticate-connection ] keep
     ] [
         drop nip address>> "Could not open connection to mongod"
-        throw-mongod-connection-error
+        mongod-connection-error
     ] recover ;
 
 : mdb-close ( mdb-connection -- )

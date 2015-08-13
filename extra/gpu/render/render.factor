@@ -399,7 +399,7 @@ DEFER: [bind-uniform-tuple]
         { mat4-uniform   { [ dim 0 ] dip 4 4 >uniform-matrix-array glUniformMatrix4fv   } }
 
         { texture-uniform { drop dim dup iota [ texture-unit + ] int-array{ } map-as glUniform1iv } }
-    } at [ uniform throw-invalid-uniform-type ] unless* >quotation :> value-quot
+    } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
 
     type uniform-type-texture-units dim * texture-unit +
     pre-quot value-quot append ;
@@ -442,7 +442,7 @@ DEFER: [bind-uniform-tuple]
         { mat4-uniform   [ [ 1 0 ] dip 4 4 >uniform-matrix glUniformMatrix4fv   ] }
 
         { texture-uniform { drop texture-unit glUniform1i } }
-    } at [ uniform throw-invalid-uniform-type ] unless* >quotation :> value-quot
+    } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
 
     type uniform-type-texture-units texture-unit +
     pre-quot value-quot append ;

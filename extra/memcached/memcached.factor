@@ -112,14 +112,14 @@ TUPLE: request cmd key val extra opaque cas ;
 
 : check-status ( header -- )
     [ 5 ] dip nth {
-        { NOT_FOUND    [ throw-key-not-found     ] }
-        { EXISTS       [ throw-key-exists        ] }
-        { TOO_LARGE    [ throw-value-too-large   ] }
-        { INVALID_ARGS [ throw-invalid-arguments ] }
-        { NOT_STORED   [ throw-item-not-stored   ] }
-        { NOT_NUMERIC  [ throw-value-not-numeric ] }
-        { UNKNOWN_CMD  [ throw-unknown-command   ] }
-        { MEMORY       [ throw-out-of-memory     ] }
+        { NOT_FOUND    [ key-not-found     ] }
+        { EXISTS       [ key-exists        ] }
+        { TOO_LARGE    [ value-too-large   ] }
+        { INVALID_ARGS [ invalid-arguments ] }
+        { NOT_STORED   [ item-not-stored   ] }
+        { NOT_NUMERIC  [ value-not-numeric ] }
+        { UNKNOWN_CMD  [ unknown-command   ] }
+        { MEMORY       [ out-of-memory     ] }
         [ drop ]
     } case ;
 

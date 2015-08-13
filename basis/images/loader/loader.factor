@@ -13,7 +13,7 @@ SYMBOL: types
 types [ H{ } clone ] initialize
 
 : (image-class) ( type -- class )
-    >lower types get ?at [ throw-unknown-image-extension ] unless ;
+    >lower types get ?at [ unknown-image-extension ] unless ;
 
 : image-class ( path -- class )
     file-extension (image-class) ;

@@ -19,7 +19,7 @@ ERROR: bad-response json status ;
 : check-status ( json -- json )
     dup "status_code" of 200 = [
         dup "status_txt" of
-        throw-bad-response
+        bad-response
     ] unless ;
 
 : json-data ( url -- json )

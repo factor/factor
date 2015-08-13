@@ -174,7 +174,7 @@ ERROR: negative-power-matrix m n ;
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
 
 : m^n ( m n -- n )
-    dup 0 >= [ (m^n) ] [ throw-negative-power-matrix ] if ;
+    dup 0 >= [ (m^n) ] [ negative-power-matrix ] if ;
 
 : stitch ( m -- m' )
     [ ] [ [ append ] 2map ] map-reduce ;

@@ -56,7 +56,7 @@ ERROR: atlas-image-formats-dont-match images ;
         [ [ upside-down?>>    ] same? ] 2tri and and
     ] all?
     [ first [ component-order>> ] [ component-type>> ] [ upside-down?>> ] tri ]
-    [ throw-atlas-image-formats-dont-match ] if ; inline
+    [ atlas-image-formats-dont-match ] if ; inline
 
 : atlas-dim ( image-placements -- dim )
     [ [ loc>> ] [ image>> dim>> ] bi v+ atlas-padding v+n ] [ vmax ] map-reduce

@@ -18,7 +18,7 @@ TUPLE: definition value node uses ;
 ERROR: no-def-error value ;
 
 : (def-of) ( value def-use -- definition )
-    ?at [ throw-no-def-error ] unless ; inline
+    ?at [ no-def-error ] unless ; inline
 
 : def-of ( value -- definition )
     def-use get (def-of) ;
@@ -27,7 +27,7 @@ ERROR: multiple-defs-error ;
 
 : (def-value) ( node value def-use -- )
     2dup key? [
-        throw-multiple-defs-error
+        multiple-defs-error
     ] [
         [ [ <definition> ] keep ] dip set-at
     ] if ; inline

@@ -39,10 +39,10 @@ PRIVATE>
 ERROR: not-enough-data ;
 
 : fft ( seq -- seq' )
-    [ throw-not-enough-data ] [ f (fft) ] if-empty ;
+    [ not-enough-data ] [ f (fft) ] if-empty ;
 
 : ifft ( seq -- seq' )
-    [ throw-not-enough-data ] [ t (fft) ] if-empty ;
+    [ not-enough-data ] [ t (fft) ] if-empty ;
 
 : correlate ( x y -- z )
     [ fft ] [ reverse fft ] bi* v* ifft ;

@@ -94,7 +94,7 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium )
 
 ERROR: null-com-release ;
 : com-release ( interface -- )
-    [ IUnknown::Release drop ] [ throw-null-com-release ] if* ; inline
+    [ IUnknown::Release drop ] [ null-com-release ] if* ; inline
 
 : with-com-interface ( interface quot -- )
     over [ com-release ] curry [ ] cleanup ; inline

@@ -11,7 +11,7 @@ IN: uu
 ERROR: bad-length seq ;
 
 : check-length ( seq -- seq )
-    dup length 45 > [ throw-bad-length ] when ; inline
+    dup length 45 > [ bad-length ] when ; inline
 
 :: binary>ascii ( seq -- seq' )
     0 :> char!
@@ -41,7 +41,7 @@ ERROR: illegal-character ch ;
 
 : check-illegal-character ( ch -- ch )
     dup { [ CHAR: \s < ] [ CHAR: \s 64 + > ] } 1||
-    [ throw-illegal-character ] when ;
+    [ illegal-character ] when ;
 
 :: ascii>binary ( seq -- seq' )
     0 :> char!

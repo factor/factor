@@ -23,7 +23,7 @@ DERIVATIVE: abs
     [ 0 <=>
         {
             { +lt+ [ neg ] }
-            { +eq+ [ 0 \ abs throw-undefined-derivative ] }
+            { +eq+ [ 0 \ abs undefined-derivative ] }
             { +gt+ [ ] }
         } case
     ] ;

@@ -16,7 +16,7 @@ M: no-tag summary
     drop "The tag-dispatching word has no method for the given tag name" ;
 
 : compile-tags ( word xtable -- quot )
-    >alist swap '[ _ throw-no-tag ] suffix '[ dup main>> _ case ] ;
+    >alist swap '[ _ no-tag ] suffix '[ dup main>> _ case ] ;
 
 : define-tags ( word effect -- )
     [ dup dup "xtable" word-prop compile-tags ] dip define-declared ;

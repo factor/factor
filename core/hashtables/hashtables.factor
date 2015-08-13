@@ -194,7 +194,7 @@ M: hashtable assoc-like
 ERROR: malformed-hashtable-pair seq pair ;
 
 : check-hashtable ( seq -- seq )
-    dup [ dup length 2 = [ drop ] [ throw-malformed-hashtable-pair ] if ] each ;
+    dup [ dup length 2 = [ drop ] [ malformed-hashtable-pair ] if ] each ;
 
 : parse-hashtable ( seq -- hashtable )
     check-hashtable H{ } assoc-clone-like ;

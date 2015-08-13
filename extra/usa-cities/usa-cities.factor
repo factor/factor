@@ -22,7 +22,7 @@ M: no-such-state summary drop "No such state" ;
 
 MEMO: string>state ( string -- state )
     dup states [ name>> = ] with find nip
-    [ ] [ throw-no-such-state ] ?if ;
+    [ ] [ no-such-state ] ?if ;
 
 TUPLE: city
 first-zip name state latitude longitude gmt-offset dst-offset ;

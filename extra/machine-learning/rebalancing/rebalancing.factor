@@ -7,7 +7,7 @@ IN: machine-learning.rebalancing
 ERROR: probability-sum-not-one seq ;
 
 : check-probabilities ( seq -- seq )
-    dup sum 1.0 .00000000001 ~ [ throw-probability-sum-not-one ] unless ;
+    dup sum 1.0 .00000000001 ~ [ probability-sum-not-one ] unless ;
 
 : equal-probabilities ( n -- array )
     dup recip <array> ; inline

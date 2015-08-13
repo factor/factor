@@ -19,7 +19,7 @@ PRIVATE>
 
 :: (typed-get) ( name type getter: ( name -- value ) -- value )
     name getter call :> value
-    value type instance? [ name value type throw-variable-type-error ] unless
+    value type instance? [ name value type variable-type-error ] unless
     value type declare1 ; inline
 
 : typed-get ( name type -- value )
@@ -29,7 +29,7 @@ PRIVATE>
     [ get-global ] (typed-get) ; inline
 
 :: (typed-set) ( value name type setter: ( value name -- ) -- )
-    value type instance? [ name value type throw-variable-type-error ] unless
+    value type instance? [ name value type variable-type-error ] unless
     value name setter call ; inline
 
 : typed-set ( value name type -- )

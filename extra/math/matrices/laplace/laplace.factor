@@ -32,7 +32,7 @@ INSTANCE: missing immutable-sequence
 ERROR: not-a-square-matrix matrix ;
 
 : check-square-matrix ( matrix -- matrix )
-    dup square-matrix? [ throw-not-a-square-matrix ] unless ; inline
+    dup square-matrix? [ not-a-square-matrix ] unless ; inline
 
 PRIVATE>
 

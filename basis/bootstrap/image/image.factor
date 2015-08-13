@@ -365,7 +365,7 @@ ERROR: not-in-image vocabulary word ;
 
 : fixup-word ( word -- offset )
     transfer-word dup lookup-object
-    [ ] [ [ vocabulary>> ] [ name>> ] bi throw-not-in-image ] ?if ;
+    [ ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?if ;
 
 : fixup-words ( -- )
     bootstrapping-image get [ dup word? [ fixup-word ] when ] map! drop ;
@@ -437,7 +437,7 @@ M: byte-array '
 ERROR: tuple-removed class ;
 
 : require-tuple-layout ( word -- layout )
-    dup tuple-layout [ ] [ throw-tuple-removed ] ?if ;
+    dup tuple-layout [ ] [ tuple-removed ] ?if ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]

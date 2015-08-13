@@ -33,8 +33,8 @@ MACRO: write-tuple ( class -- quot )
 
 : check-final ( class -- )
     {
-        { [ dup tuple-class? not ] [ throw-not-a-tuple ] }
-        { [ dup final-class? not ] [ throw-not-final ] }
+        { [ dup tuple-class? not ] [ not-a-tuple ] }
+        { [ dup final-class? not ] [ not-final ] }
         [ drop ]
     } cond ;
 

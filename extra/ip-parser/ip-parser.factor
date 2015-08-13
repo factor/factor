@@ -28,7 +28,7 @@ ERROR: invalid-ipv4 str ;
         { 2 [ 1 cut { 0 0 } glue ] }
         { 3 [ 2 cut { 0 } glue ] }
         { 4 [ ] }
-        [ drop throw-invalid-ipv4 ]
+        [ drop invalid-ipv4 ]
     } case bubble nip ; inline
 
 PRIVATE>

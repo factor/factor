@@ -85,7 +85,7 @@ M: unrolled-list peek-front*
     drop ; inline
 
 M: unrolled-list pop-front*
-    dup front>> [ throw-empty-unrolled-list ] unless*
+    dup front>> [ empty-unrolled-list ] unless*
     over front-pos>> unroll-factor 1 - eq?
     [ pop-front/new ] [ pop-front/existing ] if ;
 
@@ -131,7 +131,7 @@ M: unrolled-list peek-back*
     drop ; inline
 
 M: unrolled-list pop-back*
-    dup back>> [ throw-empty-unrolled-list ] unless*
+    dup back>> [ empty-unrolled-list ] unless*
     over back-pos>> 1 eq?
     [ pop-back/new ] [ pop-back/existing ] if ;
 

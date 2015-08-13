@@ -81,7 +81,7 @@ ERROR: header-file-missing path ;
     skip-whitespace/comments advance dup previous {
         { CHAR: < [ CHAR: > take-until-object read-standard-include ] }
         { CHAR: " [ CHAR: " take-until-object read-local-include ] }
-        [ throw-bad-include-line ]
+        [ bad-include-line ]
     } case ;
 
 : (readlns) ( -- )
@@ -155,7 +155,7 @@ ERROR: header-file-missing path ;
         { "else" [ handle-else ] }
         { "pragma" [ handle-pragma ] }
         { "include_next" [ handle-include-next ] }
-        [ throw-unknown-c-preprocessor ]
+        [ unknown-c-preprocessor ]
     } case ;
 
 : parse-directive-line ( preprocessor-state sequence-parser -- )

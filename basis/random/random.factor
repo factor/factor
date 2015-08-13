@@ -35,9 +35,9 @@ ERROR: no-random-number-generator ;
 M: no-random-number-generator summary
     drop "Random number generator is not defined." ;
 
-M: f random-bytes* ( n obj -- * ) throw-no-random-number-generator ;
+M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
-M: f random-32* ( obj -- * ) throw-no-random-number-generator ;
+M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 : random-32 ( -- n )
     random-generator get random-32* ;
@@ -127,7 +127,7 @@ M: hash-set random
 ERROR: too-many-samples seq n ;
 
 : sample ( seq n -- seq' )
-    2dup [ length ] dip < [ throw-too-many-samples ] when
+    2dup [ length ] dip < [ too-many-samples ] when
     [ [ length iota >array ] dip [ randomize-n-last ] keep tail-slice* ]
     [ drop ] 2bi nths-unsafe ;
 

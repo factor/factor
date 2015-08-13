@@ -24,13 +24,13 @@ ERROR: invalid-stream-read-unsafe-return out-len in-len buf port word ;
 :: check-stream-read-unsafe-before ( n buf stream word -- n buf stream )
     buf alien? [ n buf port ] [
         n buf byte-length >
-        [ n buf stream word throw-invalid-stream-read-unsafe ]
+        [ n buf stream word invalid-stream-read-unsafe ]
         [ n buf stream ] if
     ] if ; inline
 
 :: check-stream-read-unsafe-after ( count n buf stream word -- count )
     count n >
-    [ count n buf stream word throw-invalid-stream-read-unsafe-return ]
+    [ count n buf stream word invalid-stream-read-unsafe-return ]
     [ count ] if ;
 
 : (assert-stream-read-unsafe) ( word -- )

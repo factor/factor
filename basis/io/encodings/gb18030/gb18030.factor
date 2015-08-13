@@ -90,7 +90,7 @@ ascii <file-reader> xml>gb-data
 : lookup-range ( char -- byte-array )
     dup u>gb get-global interval-at [
         [ ufirst>> - ] [ bfirst>> ] bi + unlinear
-    ] [ throw-encode-error ] if* ;
+    ] [ encode-error ] if* ;
 
 M: gb18030 encode-char ( char stream encoding -- )
     drop [

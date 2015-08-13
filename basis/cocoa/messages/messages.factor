@@ -67,7 +67,7 @@ ERROR: no-objc-method name ;
     objc-methods get at ;
 
 : lookup-method ( selector -- method )
-    dup ?lookup-method [ ] [ throw-no-objc-method ] ?if ;
+    dup ?lookup-method [ ] [ no-objc-method ] ?if ;
 
 : lookup-sender ( name -- method )
     lookup-method message-senders get at ;
@@ -196,7 +196,7 @@ ERROR: no-objc-type name ;
 
 : decode-type ( ch -- ctype )
     1string dup objc>alien-types get at
-    [ ] [ throw-no-objc-type ] ?if ;
+    [ ] [ no-objc-type ] ?if ;
 
 : (parse-objc-type) ( i string -- ctype )
     [ [ 1 + ] dip ] [ nth ] 2bi {

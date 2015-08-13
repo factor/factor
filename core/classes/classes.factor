@@ -225,7 +225,7 @@ GENERIC: update-methods ( class seq -- )
     [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
 : check-inheritance ( subclass superclass -- )
-    2dup superclass-of? [ throw-bad-inheritance ] [ 2drop ] if ;
+    2dup superclass-of? [ bad-inheritance ] [ 2drop ] if ;
 
 : define-class ( word superclass members participants metaclass -- )
     [ 2dup check-inheritance ] 3dip

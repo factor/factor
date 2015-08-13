@@ -14,7 +14,7 @@ TUPLE: interval-set { array uint-array read-only } ;
 ERROR: not-an-interval-set obj ;
 
 : check-interval-set ( map -- map )
-    dup interval-set? [ throw-not-an-interval-set ] unless ; inline
+    dup interval-set? [ not-an-interval-set ] unless ; inline
 
 PRIVATE>
 

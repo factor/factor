@@ -69,14 +69,14 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 :: typed-inputs ( quot word types -- quot' )
     types unboxed-types :> unboxed-types
 
-    [ throw-input-mismatch-error ] word types make-unboxer
+    [ input-mismatch-error ] word types make-unboxer
     unboxed-types quot '[ _ declare @ ]
     compose ;
 
 ! typed outputs
 
 :: typed-outputs ( quot word types -- quot' )
-    [ throw-output-mismatch-error ] word types make-unboxer
+    [ output-mismatch-error ] word types make-unboxer
     quot prepose ;
 
 DEFER: make-boxer
@@ -143,7 +143,7 @@ MACRO: typed ( quot word effect -- quot' )
     dup {
         [ effect-in-types typed-stack-effect? ]
         [ effect-out-types typed-stack-effect? ]
-    } 1|| [ (typed-def) ] [ nip throw-no-types-specified ] if ;
+    } 1|| [ (typed-def) ] [ nip no-types-specified ] if ;
 
 M: typed-word subwords
     [ call-next-method ]

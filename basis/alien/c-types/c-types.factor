@@ -55,12 +55,12 @@ UNION: c-type-name
     c-type-word pointer ;
 
 : resolve-typedef ( name -- c-type )
-    dup void? [ throw-no-c-type ] when
+    dup void? [ no-c-type ] when
     dup c-type-name? [ lookup-c-type ] when ;
 
 M: word lookup-c-type
     dup "c-type" word-prop resolve-typedef
-    [ ] [ throw-no-c-type ] ?if ;
+    [ ] [ no-c-type ] ?if ;
 
 GENERIC: c-type-class ( name -- class )
 

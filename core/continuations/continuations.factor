@@ -52,7 +52,7 @@ C: <continuation> continuation
 ERROR: not-a-continuation object ;
 
 : >continuation< ( continuation -- data call retain name catch )
-    dup continuation? [ throw-not-a-continuation ] unless
+    dup continuation? [ not-a-continuation ] unless
     { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ; inline
 
 PRIVATE>

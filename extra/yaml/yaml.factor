@@ -22,7 +22,7 @@ ERROR: yaml-no-document ;
 <PRIVATE
 
 : yaml-initialize-assert-ok ( ? -- )
-    [ throw-libyaml-initialize-error ] unless ;
+    [ libyaml-initialize-error ] unless ;
 
 : (libyaml-parser-error) ( parser -- )
     {
@@ -33,10 +33,10 @@ ERROR: yaml-no-document ;
         [ problem_mark>> ]
         [ context>> ]
         [ context_mark>> ]
-    } cleave [ clone ] 7 napply throw-libyaml-parser-error ;
+    } cleave [ clone ] 7 napply libyaml-parser-error ;
 
 : (libyaml-emitter-error) ( emitter -- )
-    [ error>> ] [ problem>> ] bi [ clone ] bi@ throw-libyaml-emitter-error ;
+    [ error>> ] [ problem>> ] bi [ clone ] bi@ libyaml-emitter-error ;
 
 : yaml-parser-assert-ok ( ? parser -- )
     swap [ drop ] [ (libyaml-parser-error) ] if ;
@@ -60,7 +60,7 @@ SYMBOL: anchors
 
 : assert-anchor-exists ( anchor -- )
     anchors get 2dup at* nip
-    [ 2drop ] [ throw-yaml-undefined-anchor ] if ;
+    [ 2drop ] [ yaml-undefined-anchor ] if ;
 
 : deref-anchor ( event -- obj )
     data>> alias>> anchor>>
@@ -182,7 +182,7 @@ DEFER: parse-mapping
 : expect-event ( parser event type -- )
     [
         [ next-event type>> ] dip 2dup =
-        [ 2drop ] [ 1array throw-yaml-unexpected-event ] if
+        [ 2drop ] [ 1array yaml-unexpected-event ] if
     ] with-destructors ;
 
 ! Same as 'with', but for combinators that
@@ -257,7 +257,7 @@ M: assoc apply-merge-keys
         parser event next-event type>> {
             { YAML_DOCUMENT_START_EVENT [ t ] }
             { YAML_STREAM_END_EVENT [ f ] }
-            [ { YAML_DOCUMENT_START_EVENT YAML_STREAM_END_EVENT } throw-yaml-unexpected-event ]
+            [ { YAML_DOCUMENT_START_EVENT YAML_STREAM_END_EVENT } yaml-unexpected-event ]
         } case
     ] with-destructors [
         parser event parse-yaml-doc t
@@ -283,7 +283,7 @@ PRIVATE>
     [
         init-parser
         [ YAML_STREAM_START_EVENT expect-event ]
-        [ ?parse-yaml-doc [ throw-yaml-no-document ] unless ] 2bi
+        [ ?parse-yaml-doc [ yaml-no-document ] unless ] 2bi
     ] with-destructors ;
 
 : yaml-docs> ( str -- arr )

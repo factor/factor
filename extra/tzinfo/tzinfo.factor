@@ -27,7 +27,7 @@ PACKED-STRUCT: ttinfo
 ERROR: bad-magic ;
 
 : check-magic ( -- )
-    4 read "TZif" sequence= [ throw-bad-magic ] unless ;
+    4 read "TZif" sequence= [ bad-magic ] unless ;
 
 TUPLE: tzfile header transition-times local-times types abbrevs
 leaps is-std is-gmt ;

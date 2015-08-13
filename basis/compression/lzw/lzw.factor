@@ -30,7 +30,7 @@ ERROR: code-size-zero ;
 
 : <lzw-uncompress> ( input code-size class -- obj )
     new
-        swap [ throw-code-size-zero ] when-zero >>code-size
+        swap [ code-size-zero ] when-zero >>code-size
         dup code-size>> >>initial-code-size
         dup code-size>> 1 - 2^ >>clear-code
         dup clear-code>> 1 + >>end-of-information-code

@@ -134,7 +134,7 @@ PRIVATE>
 ERROR: log2-expects-positive x ;
 
 : log2 ( x -- n )
-    dup 0 <= [ throw-log2-expects-positive ] [ (log2) ] if ; inline
+    dup 0 <= [ log2-expects-positive ] [ (log2) ] if ; inline
 
 : zero? ( x -- ? ) 0 number= ; inline
 : 2/ ( x -- y ) -1 shift ; inline

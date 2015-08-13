@@ -34,7 +34,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : check-dimensions ( d d -- )
     [ dimensions 2array ] same?
-    [ throw-dimensions-not-equal ] unless ;
+    [ dimensions-not-equal ] unless ;
 
 : 2values ( dim dim -- val val ) [ value>> ] bi@ ;
 

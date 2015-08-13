@@ -37,7 +37,7 @@ M: object editor-detached? t ;
 ERROR: invalid-location file line ;
 
 : edit-location ( file line -- )
-    over [ throw-invalid-location ] unless
+    over [ invalid-location ] unless
     [ absolute-path ] dip
     editor-command [ run-and-wait-for-editor ] when* ;
 
@@ -66,7 +66,7 @@ PRIVATE>
 GENERIC: edit ( object -- )
 
 M: object edit
-    dup where [ first2 edit-location ] [ throw-cannot-find-source ] ?if ;
+    dup where [ first2 edit-location ] [ cannot-find-source ] ?if ;
 
 M: string edit edit-vocab ;
 

@@ -28,7 +28,7 @@ ERROR: timed-out-error timer ;
 : wait ( queue timeout status -- )
     over [
         [ queue-timeout ] dip suspend
-        [ throw-timed-out-error ] [ stop-timer ] if
+        [ timed-out-error ] [ stop-timer ] if
     ] [
         [ drop queue ] dip suspend drop
     ] if ; inline

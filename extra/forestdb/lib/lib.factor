@@ -16,7 +16,7 @@ IN: forestdb.lib
 ERROR: fdb-error error ;
 
 : fdb-check-error ( ret -- )
-    dup FDB_RESULT_SUCCESS = [ drop ] [ throw-fdb-error ] if ;
+    dup FDB_RESULT_SUCCESS = [ drop ] [ fdb-error ] if ;
 
 
 TUPLE: fdb-kvs-handle < disposable handle ;
@@ -93,7 +93,7 @@ SYMBOL: current-fdb-kvs-handle
     rot {
         { FDB_RESULT_SUCCESS [ ret>string ] }
         { FDB_RESULT_KEY_NOT_FOUND [ 2drop f ] }
-        [ throw-fdb-error ]
+        [ fdb-error ]
     } case ;
 
 : fdb-del-kv ( key -- )

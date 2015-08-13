@@ -45,7 +45,7 @@ M: object strerror strerror_unsafe ;
 
 ERROR: libc-error errno message ;
 
-: (throw-errno) ( errno -- * ) dup strerror throw-libc-error ;
+: (throw-errno) ( errno -- * ) dup strerror libc-error ;
 
 : throw-errno ( -- * ) errno (throw-errno) ;
 
@@ -72,7 +72,7 @@ M: bad-ptr summary
     drop "Memory allocation failed" ;
 
 : check-ptr ( c-ptr -- c-ptr )
-    [ throw-bad-ptr ] unless* ;
+    [ bad-ptr ] unless* ;
 
 ERROR: realloc-error ptr size ;
 
@@ -100,7 +100,7 @@ PRIVATE>
 
 : realloc ( alien size -- newalien )
     [ >c-ptr ] dip
-    over malloc-exists? [ throw-realloc-error ] unless
+    over malloc-exists? [ realloc-error ] unless
     [ drop ] [ (realloc) check-ptr ] 2bi
     [ delete-malloc ] [ add-malloc ] bi* ;
 

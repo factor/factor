@@ -24,7 +24,7 @@ ERROR: redis-error message ;
     <redis-response> ;
 
 : handle-error ( string -- * )
-    throw-redis-error ;
+    redis-error ;
 
 PRIVATE>
 

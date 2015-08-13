@@ -26,7 +26,7 @@ log-level [ DEBUG ] initialize
 ERROR: undefined-log-level ;
 
 : log-level<=> ( log-level log-level -- <=> )
-    [ log-levels at* [ throw-undefined-log-level ] unless ] compare ;
+    [ log-levels at* [ undefined-log-level ] unless ] compare ;
 
 : log? ( log-level -- ? )
     log-level get log-level<=> +lt+ = not ;
@@ -40,7 +40,7 @@ ERROR: bad-log-message-parameters msg word level ;
 
 : check-log-message ( msg word level -- msg word level )
     3dup [ string? ] [ word? ] [ word? ] tri* and and
-    [ throw-bad-log-message-parameters ] unless ; inline
+    [ bad-log-message-parameters ] unless ; inline
 
 : log-message ( msg word level -- )
     check-log-message

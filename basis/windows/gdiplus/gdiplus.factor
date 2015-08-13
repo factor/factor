@@ -1628,7 +1628,7 @@ FUNCTION: GpStatus GdipTestControl ( GpTestControlEnum x, void* x )
 ERROR: gdi+-error status ;
 
 : check-gdi+-status ( GpStatus -- )
-    dup Ok = [ drop ] [ throw-gdi+-error ] if ;
+    dup Ok = [ drop ] [ gdi+-error ] if ;
 
 CONSTANT: standard-gdi+-startup-input
     S{ GdiplusStartupInput

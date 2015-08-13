@@ -26,7 +26,7 @@ ERROR: too-many-symlinks path n ;
 <PRIVATE
 
 : (follow-links) ( n path -- path' )
-    over 0 = [ symlink-depth get throw-too-many-symlinks ] when
+    over 0 = [ symlink-depth get too-many-symlinks ] when
     dup link-info symbolic-link?
     [ [ 1 - ] [ follow-link ] bi* (follow-links) ]
     [ nip ] if ; inline recursive

@@ -149,7 +149,7 @@ M: aes-128-key key-expand-round ( temp i -- temp' )
 
 ERROR: aes-192-256-not-implemented ;
 M: aes-256-key key-expand-round ( temp i -- temp' )
-    throw-aes-192-256-not-implemented ;
+    aes-192-256-not-implemented ;
 
 : (key-sched-round) ( output temp i -- output' )
     key-expand-round

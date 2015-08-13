@@ -22,7 +22,7 @@ ERROR: bad-escape char ;
         { CHAR: 0  CHAR: \0 }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } ?at [ throw-bad-escape ] unless ;
+    } ?at [ bad-escape ] unless ;
 
 SYMBOL: name>char-hook
 
@@ -116,7 +116,7 @@ ERROR: escaped-char-expected ;
     dup still-parsing-line? [
         [ current-char ] [ advance-char ] bi
     ] [
-        throw-escaped-char-expected
+        escaped-char-expected
     ] if ;
 
 : lexer-head? ( lexer string -- ? )

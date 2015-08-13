@@ -34,7 +34,7 @@ ALIAS: value third-unsafe
 ERROR: not-an-interval-map obj ;
 
 : check-interval-map ( map -- map )
-    dup interval-map? [ throw-not-an-interval-map ] unless ; inline
+    dup interval-map? [ not-an-interval-map ] unless ; inline
 
 PRIVATE>
 

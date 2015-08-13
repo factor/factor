@@ -80,7 +80,7 @@ M: library dispose dll>> [ dispose ] when* ;
 
 : address-of ( name library -- value )
     2dup load-library dlsym-raw
-    [ 2nip ] [ throw-no-such-symbol ] if* ;
+    [ 2nip ] [ no-such-symbol ] if* ;
 
 SYMBOL: deploy-libraries
 
@@ -89,7 +89,7 @@ deploy-libraries [ V{ } clone ] initialize
 : deploy-library ( name -- )
     dup libraries get key?
     [ deploy-libraries get 2dup member? [ 2drop ] [ push ] if ]
-    [ "deploy-library failure" throw-no-such-library ] if ;
+    [ "deploy-library failure" no-such-library ] if ;
 
 HOOK: >deployed-library-path os ( path -- path' )
 

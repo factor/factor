@@ -75,7 +75,7 @@ SYMBOL: string-context?
 ERROR: tag-not-allowed-here ;
 
 : check-tag ( -- )
-    string-context? get [ throw-tag-not-allowed-here ] when ;
+    string-context? get [ tag-not-allowed-here ] when ;
 
 : compile-tag ( tag -- )
     check-tag

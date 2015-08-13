@@ -30,7 +30,7 @@ M: label string<< ( string label -- )
         {
             { [ dup string-array? ] [ ] }
             { [ dup string? ] [ ?string-lines ] }
-            [ throw-not-a-string ]
+            [ not-a-string ]
         } cond
     ] dip [ text<< ] [ relayout ] bi ; inline
 

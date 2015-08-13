@@ -22,7 +22,7 @@ ERROR: not-a-json-number string ;
     ] dip ;
 
 : json-expect ( token stream -- )
-    [ dup length ] [ stream-read ] bi* = [ throw-json-error ] unless ; inline
+    [ dup length ] [ stream-read ] bi* = [ json-error ] unless ; inline
 
 DEFER: (read-json-string)
 
@@ -54,7 +54,7 @@ DEFER: (read-json-string)
         { CHAR: t [ CHAR: \t ] }
         { CHAR: u [ over read-json-escape-unicode ] }
         [ ]
-    } case [ suffix! (read-json-string) ] [ throw-json-error ] if* ;
+    } case [ suffix! (read-json-string) ] [ json-error ] if* ;
 
 : (read-json-string) ( stream accum -- accum )
     { sbuf } declare
@@ -72,7 +72,7 @@ DEFER: (read-json-string)
     [ length 1 - ] keep [ nth-unsafe ] [ shorten ] 2bi ; inline
 
 : check-length ( seq n -- seq )
-    [ dup length ] [ >= ] bi* [ throw-json-error ] unless ; inline
+    [ dup length ] [ >= ] bi* [ json-error ] unless ; inline
 
 : v-over-push ( accum -- accum )
     { vector } declare 2 check-length

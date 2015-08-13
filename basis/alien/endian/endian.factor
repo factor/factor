@@ -15,7 +15,7 @@ ERROR: invalid-signed-conversion n ;
         { 2 [ [ c:short <ref> c:short deref ] ] }
         { 4 [ [ int <ref> int deref ] ] }
         { 8 [ [ longlong <ref> longlong deref ] ] }
-        [ throw-invalid-signed-conversion ]
+        [ invalid-signed-conversion ]
     } case ; inline
 
 MACRO: byte-reverse ( n signed? -- quot )

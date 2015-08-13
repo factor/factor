@@ -25,7 +25,7 @@ ERROR: no-pair-method a b generic ;
 
 : pair-generic-definition ( word -- def )
     [ sorted-pair-methods [ first2 pair-method-cond ] map ]
-    [ [ throw-no-pair-method ] curry suffix ] bi 1quotation
+    [ [ no-pair-method ] curry suffix ] bi 1quotation
     [ 2dup [ class-of ] compare +gt+ eq? ?swap ] [ cond ] surround ;
 
 : make-pair-generic ( word -- )

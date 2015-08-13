@@ -18,7 +18,7 @@ CONSTANT: MAGIC 0o432
 ERROR: bad-magic ;
 
 : check-magic ( n -- )
-    MAGIC = [ throw-bad-magic ] unless ;
+    MAGIC = [ bad-magic ] unless ;
 
 TUPLE: terminfo-header names-bytes boolean-bytes #numbers
 #strings string-bytes ;

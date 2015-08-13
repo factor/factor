@@ -8,7 +8,7 @@ ERROR: unknown-gl-platform ;
     { [ os windows? ] [ "opengl.gl.windows" ] }
     { [ os macosx? ]  [ "opengl.gl.macosx" ] }
     { [ os unix? ] [ "opengl.gl.gtk" ] }
-    [ throw-unknown-gl-platform ]
+    [ unknown-gl-platform ]
 } cond use-vocab >>
 
 SYMBOL: +gl-function-counter+

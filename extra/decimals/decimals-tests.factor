@@ -21,7 +21,7 @@ ERROR: decimal-test-failure D1 D2 quot ;
     D1 D2
     quot1 [ decimal>ratio >float ] compose
     [ [ decimal>ratio ] bi@ quot2 call( obj obj -- obj ) >float ] 2bi -.1 ~
-    [ t ] [ D1 D2 quot1 throw-decimal-test-failure ] if ; inline
+    [ t ] [ D1 D2 quot1 decimal-test-failure ] if ; inline
 
 : test-decimal-op ( quot1 quot2 -- ? )
     [ random-test-decimal random-test-decimal ] 2dip (test-decimal-op) ; inline

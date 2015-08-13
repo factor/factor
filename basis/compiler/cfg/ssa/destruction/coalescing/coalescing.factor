@@ -27,7 +27,7 @@ ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
 : try-eliminate-copy ( follower leader must? -- )
     -rot leaders 2dup = [ 3drop ] [
         2dup vregs-interfere? [
-            drop rot [ throw-vregs-shouldn't-interfere ] [ 2drop ] if
+            drop rot [ vregs-shouldn't-interfere ] [ 2drop ] if
         ] [ -rot coalesce-vregs drop ] if
     ] if ;
 
