@@ -242,7 +242,7 @@ ERROR: unsupported-domain-name string ;
 
 : >n/label ( string -- byte-array )
     dup [ ascii? ] all?
-    [ unsupported-domain-name ] unless
+    [ throw-unsupported-domain-name ] unless
     [ length 1array ] [ ] bi B{ } append-as ;
 
 : >name ( domain -- byte-array )

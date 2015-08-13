@@ -18,7 +18,7 @@ CONSTANT: alphabet
 
 : base85>ch ( ch -- ch )
     $[ alphabet alphabet-inverse ] nth
-    [ malformed-base85 ] unless* ; inline
+    [ throw-malformed-base85 ] unless* ; inline
 
 : encode4 ( seq -- seq' )
     be> 5 [ 85 /mod ch>base85 ] B{ } replicate-as reverse! nip ; inline
@@ -48,7 +48,7 @@ PRIVATE>
     5 "\n\r" pick read-ignoring dup length {
         { 0 [ 2drop ] }
         { 5 [ decode5 (decode-base85) ] }
-        [ malformed-base85 ]
+        [ throw-malformed-base85 ]
     } case ;
 
 PRIVATE>

@@ -77,7 +77,7 @@ CONSTANT: ACL_EXTENDED_DENY  2
 ERROR: bad-acl-tag-t n ;
 
 : acl_tag_t>string ( n -- string )
-    dup 0 2 between? [ bad-acl-tag-t ] unless
+    dup 0 2 between? [ throw-bad-acl-tag-t ] unless
     { "undefined" "allow" "deny" } nth ;
 
 ! acl_flag_t

@@ -13,7 +13,7 @@ IN: cuda
 ERROR: cuda-error-state code ;
 
 : cuda-error ( code -- )
-    dup CUDA_SUCCESS = [ drop ] [ cuda-error-state ] if ;
+    dup CUDA_SUCCESS = [ drop ] [ throw-cuda-error-state ] if ;
 
 : cuda-version ( -- n )
     { c:int } [ cuDriverGetVersion cuda-error ] with-out-parameters ;

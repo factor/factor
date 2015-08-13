@@ -55,12 +55,12 @@ ERROR: display-change-error n ;
 : fullscreen-mode ( monitor-info devmode -- )
     [ szDevice>> ] dip f CDS_FULLSCREEN f
     ChangeDisplaySettingsEx dup DISP_CHANGE_SUCCESSFUL =
-    [ drop ] [ display-change-error ] if ;
+    [ drop ] [ throw-display-change-error ] if ;
 
 : non-fullscreen-mode ( monitor-info devmode -- )
     [ szDevice>> ] dip f 0 f
     ChangeDisplaySettingsEx dup DISP_CHANGE_SUCCESSFUL =
-    [ drop ] [ display-change-error ] if ;
+    [ drop ] [ throw-display-change-error ] if ;
 
 : get-style ( hwnd n -- style )
     GetWindowLongPtr [ win32-error=0/f ] keep ;
@@ -86,7 +86,7 @@ ERROR: unsupported-resolution triple ;
     [
         slots{ dmPelsWidth dmPelsHeight dmBitsPerPel }
         triple =
-    ] find nip [ triple unsupported-resolution ] unless* ;
+    ] find nip [ triple throw-unsupported-resolution ] unless* ;
 
 :: set-fullscreen-window-position ( hwnd triple -- )
     hwnd f

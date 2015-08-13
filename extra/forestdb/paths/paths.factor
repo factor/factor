@@ -18,12 +18,12 @@ CONSTANT: fdb-filename-base "fq"
 ERROR: not-an-fdb-filename string ;
 
 : ensure-fdb-filename ( string -- string )
-    dup fdb-filename? [ not-an-fdb-filename ] unless ;
+    dup fdb-filename? [ throw-not-an-fdb-filename ] unless ;
 
 ERROR: not-a-string-number string ;
 
 : ?string>number ( string -- n )
-    dup string>number dup [ nip ] [ not-a-string-number ] if ;
+    dup string>number dup [ nip ] [ throw-not-a-string-number ] if ;
 
 : change-string-number ( string quot -- string' )
     [ [ string>number ] dip call number>string ] 2keep drop

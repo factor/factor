@@ -31,7 +31,7 @@ ERROR: pcre-error value ;
     ] [ 2drop f ] if* ;
 
 : check-bad-option ( err value what -- value )
-    rot 0 = [ drop ] [ bad-option ] if ;
+    rot 0 = [ drop ] [ throw-bad-option ] if ;
 
 : pcre-config ( what -- value )
     [
@@ -81,7 +81,7 @@ CONSTANT: default-opts flags{ PCRE_UTF8 PCRE_UCP }
     default-opts { c-string int } [ f pcre_compile ] with-out-parameters ;
 
 : <pcre> ( expr -- pcre )
-    dup (pcre) 2array swap [ 2nip ] [ malformed-regexp ] if* ;
+    dup (pcre) 2array swap [ 2nip ] [ throw-malformed-regexp ] if* ;
 
 : <pcre-extra> ( pcre -- pcre-extra )
     0 { c-string } [ pcre_study ] with-out-parameters drop ;
@@ -104,7 +104,7 @@ CONSTANT: empty-match-opts flags{ PCRE_NOTEMPTY_ATSTART PCRE_ANCHORED }
         [ ofs>> ]
         [ exec-opts>> ]
     } cleave exec over dup -1 < [
-        PCRE_ERRORS number>enum pcre-error
+        PCRE_ERRORS number>enum throw-pcre-error
     ] [
         -1 = [
             2drop dup exec-opts>> 0 =

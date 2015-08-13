@@ -148,7 +148,10 @@ ERROR: mongod-connection-error address message ;
     clone [ verify-nodes ] [ <mdb-connection> ] [ ] tri
     master-node [
         open-connection [ authenticate-connection ] keep
-    ] [ drop nip address>> "Could not open connection to mongod" mongod-connection-error ] recover ;
+    ] [
+        drop nip address>> "Could not open connection to mongod"
+        throw-mongod-connection-error
+    ] recover ;
 
 : mdb-close ( mdb-connection -- )
      [ [ dispose ] when* f ] change-handle drop ;

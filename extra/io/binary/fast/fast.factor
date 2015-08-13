@@ -14,7 +14,7 @@ IN: io.binary.fast
 ERROR: bad-length bytes n ;
 
 : check-length ( bytes n -- bytes n )
-    2dup [ length ] dip > [ bad-length ] when ; inline
+    2dup [ length ] dip > [ throw-bad-length ] when ; inline
 
 <<
 : be-range ( n -- range )

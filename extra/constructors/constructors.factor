@@ -26,9 +26,9 @@ ERROR: repeated-constructor-parameters class effect ;
 ERROR: unknown-constructor-parameters class effect unknown ;
 
 : ensure-constructor-parameters ( class effect -- class effect )
-    dup in>> all-unique? [ repeated-constructor-parameters ] unless
+    dup in>> all-unique? [ throw-repeated-constructor-parameters ] unless
     2dup [ all-slots [ name>> ] map ] [ in>> ] bi* swap diff
-    [ unknown-constructor-parameters ] unless-empty ;
+    [ throw-unknown-constructor-parameters ] unless-empty ;
 
 : constructor-boa-quot ( constructor-word class effect -- word quot )
     in>> swap '[ _ _ slots>boa ] ; inline

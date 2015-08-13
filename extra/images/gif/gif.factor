@@ -126,7 +126,7 @@ CONSTANT: BLOCK-TERMINATOR 0x00
 
 ERROR: unimplemented message ;
 : read-GIF87a ( loading-gif -- loading-gif )
-    "GIF87a" unimplemented ;
+    "GIF87a" throw-unimplemented ;
 
 : read-logical-screen-descriptor ( loading-gif -- loading-gif )
     2 read le> >>width
@@ -182,8 +182,8 @@ ERROR: unimplemented message ;
         { APPLICATION-EXTENSION [
             read-application-extension over application-extensions>> push
         ] }
-        { f [ gif-unexpected-eof ] }
-        [ unknown-extension ]
+        { f [ throw-gif-unexpected-eof ] }
+        [ throw-unknown-extension ]
     } case ;
 
 ERROR: unhandled-data byte ;
@@ -197,7 +197,7 @@ ERROR: unhandled-data byte ;
         ] }
         { IMAGE-DESCRIPTOR [ read-table-based-image ] }
         { TRAILER [ f >>loading? ] }
-        [ unhandled-data ]
+        [ throw-unhandled-data ]
     } case ;
 
 : read-GIF89a ( loading-gif -- loading-gif )
@@ -211,7 +211,7 @@ ERROR: unhandled-data byte ;
         read-gif-header dup magic>> {
             { "GIF87a" [ read-GIF87a ] }
             { "GIF89a" [ read-GIF89a ] }
-            [ unsupported-gif-format ]
+            [ throw-unsupported-gif-format ]
         } case
     ] with-input-stream ;
 
@@ -246,7 +246,7 @@ ERROR: unhandled-data byte ;
 ERROR: loading-gif-error gif-image ;
 
 : ensure-loaded ( gif-image -- gif-image )
-    dup loading?>> [ loading-gif-error ] when ;
+    dup loading?>> [ throw-loading-gif-error ] when ;
 
 M: gif-image stream>image* ( path gif-image -- image )
     drop load-gif ensure-loaded gif>image ;

@@ -53,7 +53,7 @@ ERROR: invalid-perlin-noise-table table ;
 
 : validate-table ( table -- table )
     dup { [ byte-array? ] [ length 512 >= ] } 1&&
-    [ invalid-perlin-noise-table ] unless ;
+    [ throw-invalid-perlin-noise-table ] unless ;
 
 ! XXX doesn't work when v is nan or |v| >= 2^31
 : floor-vector ( v -- v' )

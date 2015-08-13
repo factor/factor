@@ -31,7 +31,7 @@ M: pair set-at
 ERROR: cannot-delete-key pair ;
 
 M: pair delete-at
-    [ cannot-delete-key ] [
+    [ throw-cannot-delete-key ] [
         [ delete-at ] [ 2drop ] if-hash
     ] if-key ; inline
 

@@ -23,6 +23,6 @@ ERROR: git-revision-not-found path ;
 : use-vocab-rev ( vocab-name rev -- )
     [ create-vocab vocab-source-path dup ] dip git-object-id
     [ [ input-stream get swap parse-stream call( -- ) ] with-git-object-stream ]
-    [ git-revision-not-found ] if* ;
+    [ throw-git-revision-not-found ] if* ;
 
 SYNTAX: USE-REV: scan-token scan-token use-vocab-rev ;

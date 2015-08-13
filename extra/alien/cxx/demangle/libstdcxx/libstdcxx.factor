@@ -13,9 +13,9 @@ ERROR: invalid-demangle-args name ;
 : demangle-error ( name status -- )
     {
         {  0 [ drop ] }
-        { -1 [ drop demangle-memory-allocation-failure ] }
-        { -2 [ invalid-mangled-name ] }
-        { -3 [ invalid-demangle-args ] }
+        { -1 [ drop throw-demangle-memory-allocation-failure ] }
+        { -2 [ throw-invalid-mangled-name ] }
+        { -3 [ throw-invalid-demangle-args ] }
     } case ;
 
 : mangled-name? ( name -- ? )

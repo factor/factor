@@ -13,7 +13,7 @@ classes [ H{ } clone ] initialize
 ERROR: no-class name ;
 
 : lookup-class ( class -- class )
-    classes get ?at [ no-class ] unless ;
+    classes get ?at [ throw-no-class ] unless ;
 
 : define-class ( class superclass ivars -- class-word )
     [ create-class ] [ lookup-class ] [ ] tri*

@@ -11,7 +11,7 @@ IN: smalltalk.parser
 ERROR: bad-number str ;
 
 : check-number ( str -- n )
-    >string dup string>number [ ] [ bad-number ] ?if ;
+    >string dup string>number [ ] [ throw-bad-number ] ?if ;
 
 EBNF: parse-smalltalk
 

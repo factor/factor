@@ -76,7 +76,7 @@ ERROR: unsupported-tag-encoding id ;
     elements get id>> 31 bitand
     dup elements get tag<<
     31 < [
-        get-id unsupported-tag-encoding
+        get-id throw-unsupported-tag-encoding
     ] unless ;
 
 : set-tagclass ( -- )

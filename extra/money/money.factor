@@ -26,7 +26,7 @@ ERROR: not-an-integer x ;
     [ "-" ?head swap ] dip
     [ [ "0" ] when-empty ] bi@
     [
-        [ dup string>number [ nip ] [ not-an-integer ] if* ] bi@
+        [ dup string>number [ nip ] [ throw-not-an-integer ] if* ] bi@
     ] keep length
     10^ / + swap [ neg ] when ;
 

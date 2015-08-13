@@ -19,7 +19,7 @@ M: descriptive-error error.
 
 : rethrower ( word inputs -- quot )
     [ length ] keep [ [ narray ] dip swap 2array flip ] 2curry
-    [ 2 ndip descriptive-error ] 2curry ;
+    [ 2 ndip throw-descriptive-error ] 2curry ;
 
 : [descriptive] ( word def effect -- newdef )
     swapd in>> rethrower [ recover ] 2curry ;

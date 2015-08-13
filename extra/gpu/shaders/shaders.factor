@@ -139,7 +139,7 @@ TR: hyphens>underscores "-" "_" ;
         [ vertex-attribute name>> name = ]
         [ size 1 = ]
         [ gl-type vertex-attribute [ component-type>> ] [ dim>> ] bi feedback-type= ]
-    } 0&& [ vertex-attribute inaccurate-feedback-attribute-error ] unless ;
+    } 0&& [ vertex-attribute throw-inaccurate-feedback-attribute-error ] unless ;
 
 :: (bind-float-vertex-attribute) ( program-instance ptr name dim gl-type normalize? stride offset -- )
     program-instance name attribute-index :> idx
@@ -182,7 +182,7 @@ TR: hyphens>underscores "-" "_" ;
 
 :: [link-feedback-format] ( vertex-attributes -- quot )
     vertex-attributes [ name>> not ] any?
-    [ [ nip invalid-link-feedback-format-error ] ] [
+    [ [ nip throw-invalid-link-feedback-format-error ] ] [
         vertex-attributes
         [ name>> ascii malloc-string ]
         void*-array{ } map-as :> varying-names
@@ -529,7 +529,7 @@ TUPLE: feedback-format
 : validate-feedback-format ( sequence -- vertex-format/f )
     dup length 1 <=
     [ [ f ] [ first vertex-format>> ] if-empty ]
-    [ too-many-feedback-formats-error ] if ;
+    [ throw-too-many-feedback-formats-error ] if ;
 
 : ?shader ( object -- shader/f )
     dup word? [ def>> first dup shader? [ drop f ] unless ] [ drop f ] if ;
