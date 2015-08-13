@@ -56,7 +56,7 @@ ERROR: bad-png-header header ;
 
 : read-png-header ( -- )
     8 read dup png-header sequence= [
-        bad-png-header
+        throw-bad-png-header
     ] unless drop ;
 
 ERROR: bad-checksum ;

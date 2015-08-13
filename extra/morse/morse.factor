@@ -160,7 +160,7 @@ CONSTANT: beep-freq 880
             { dash-char [ dash ] }
             { word-gap-char [ intra-char-gap ] }
             { unknown-char [ intra-char-gap ] }
-            [ no-morse-ch ]
+            [ throw-no-morse-ch ]
         } case
     ] interleave ;
 

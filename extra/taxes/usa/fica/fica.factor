@@ -12,7 +12,7 @@ ERROR: fica-base-unknown ;
         { 2009 106800 }
         { 2008 102000 }
         { 2007  97500 }
-    } at [ fica-base-unknown ] unless* ;
+    } at [ throw-fica-base-unknown ] unless* ;
 
 : fica-tax ( salary w4 -- x )
     year>> fica-base-rate min fica-tax-rate * ;

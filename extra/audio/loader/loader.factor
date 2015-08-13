@@ -14,7 +14,7 @@ audio-types [ H{ } clone ] initialize
 : read-audio ( path -- audio )
     dup file-extension >lower audio-types get ?at
     [ call( path -- audio ) ]
-    [ unknown-audio-extension ] if ;
+    [ throw-unknown-audio-extension ] if ;
 
 "audio.wav" require
 "audio.aiff" require

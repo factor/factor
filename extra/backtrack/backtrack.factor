@@ -13,7 +13,7 @@ ERROR: amb-failure ;
 M: amb-failure summary drop "Backtracking failure" ;
 
 : fail ( -- )
-    failure get [ continue ] [ amb-failure ] if* ;
+    failure get [ continue ] [ throw-amb-failure ] if* ;
 
 : must-be-true ( ? -- )
     [ fail ] unless ;

@@ -16,7 +16,7 @@ M: local-not-defined summary
 
 : >local-word ( string -- word )
     qualified-vocabs last words>> ?at
-    [ local-not-defined ] unless ;
+    [ throw-local-not-defined ] unless ;
 
 ERROR: invalid-op string ;
 
@@ -28,7 +28,7 @@ ERROR: invalid-op string ;
         { "/" [ [ / ] ] }
         { "%" [ [ mod ] ] }
         { "**" [ [ ^ ] ] }
-        [ invalid-op ]
+        [ throw-invalid-op ]
     } case ;
 
 GENERIC: infix-codegen ( ast -- quot/number )

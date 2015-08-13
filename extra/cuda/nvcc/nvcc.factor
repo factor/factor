@@ -26,6 +26,6 @@ ERROR: nvcc-failed n path ;
     path normalize-path :> path2
     path2 parent-directory [
         path2 nvcc-command
-        run-process wait-for-process [ path2 nvcc-failed ] unless-zero
+        run-process wait-for-process [ path2 throw-nvcc-failed ] unless-zero
         path2 cu>ptx
     ] with-directory ;

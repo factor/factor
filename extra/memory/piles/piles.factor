@@ -21,7 +21,7 @@ M: pile dispose
 : pile-alloc ( pile size -- alien )
     [
         [ [ ] [ size>> ] [ offset>> ] tri ] dip +
-        < [ not-enough-pile-space ] [ drop ] if
+        < [ throw-not-enough-pile-space ] [ drop ] if
     ] [
         drop [ offset>> ] [ underlying>> ] bi <displaced-alien>
     ] [

@@ -53,7 +53,7 @@ ERROR: not-a-gopher-url url ;
 
 : gopher ( url -- item-type byte-array )
     dup url? [ >url ] unless
-    dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
+    dup protocol>> "gopher" = [ throw-not-a-gopher-url ] unless {
         [ host>> ]
         [ port>> 70 or <inet> binary ]
         [ path>> rest [ "1/" ] when-empty ]

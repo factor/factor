@@ -198,7 +198,7 @@ ERROR: no-card card deck ;
 
 : draw-specific-card ( card deck -- card )
     [ >ckf ] dip
-    2dup index [ swap remove-nth! drop ] [ no-card ] if* ;
+    2dup index [ swap remove-nth! drop ] [ throw-no-card ] if* ;
 
 : start-hands ( seq -- seq' deck )
     <deck> [ '[ [ _ draw-specific-card ] map ] map ] keep ;
@@ -248,7 +248,7 @@ ERROR: bad-suit-symbol ch ;
         { CHAR: D CHAR: D }
         { CHAR: H CHAR: H }
         { CHAR: C CHAR: C }
-    } ?at [ bad-suit-symbol ] unless ;
+    } ?at [ throw-bad-suit-symbol ] unless ;
 
 : card> ( string -- card )
     1 over [ symbol>suit ] change-nth >ckf ;

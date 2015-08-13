@@ -21,7 +21,7 @@ HOOK: handle-client-disconnect managed-server ( -- )
 
 ERROR: already-logged-in username ;
 
-M: managed-server handle-already-logged-in already-logged-in ;
+M: managed-server handle-already-logged-in throw-already-logged-in ;
 M: managed-server handle-client-join ;
 M: managed-server handle-client-disconnect ;
 
@@ -44,7 +44,7 @@ ERROR: no-such-client username ;
 PRIVATE>
 
 : send-client ( seq username -- )
-    clients ?at [ no-such-client ] [ (send-client) ] if ;
+    clients ?at [ throw-no-such-client ] [ (send-client) ] if ;
 
 : send-everyone ( seq -- )
     [ client-streams ] dip '[ _ (send-client) ] each ;

@@ -43,7 +43,7 @@ ERROR: decimal-types-expected d1 d2 ;
 
 : guard-decimals ( obj1 obj2 -- D1 D2 )
     2dup [ decimal? ] both?
-    [ decimal-types-expected ] unless ;
+    [ throw-decimal-types-expected ] unless ;
 
 M: decimal equal?
     {

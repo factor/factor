@@ -147,9 +147,9 @@ SINGLETON: aes-256-key
 M: aes-128-key key-expand-round ( temp i -- temp' )
     4 /mod 0 = swap and [ (add-rcon) ] when* ;
 
-ERROR: aes-192-256-not-implemented* ;
+ERROR: aes-192-256-not-implemented ;
 M: aes-256-key key-expand-round ( temp i -- temp' )
-    aes-192-256-not-implemented* ;
+    throw-aes-192-256-not-implemented ;
 
 : (key-sched-round) ( output temp i -- output' )
     key-expand-round

@@ -67,7 +67,9 @@ GENERIC: cursor-key-value-unsafe ( cursor -- key value )
 PRIVATE>
 M: input-cursor cursor-key-value-unsafe cursor-key-value ; inline
 M: input-cursor cursor-key-value
-    dup cursor-valid? [ cursor-key-value-unsafe ] [ invalid-cursor ] if ; inline
+    dup cursor-valid?
+    [ cursor-key-value-unsafe ]
+    [ throw-invalid-cursor ] if ; inline
 
 : cursor-key ( cursor -- key ) cursor-key-value drop ;
 : cursor-value ( cursor -- key ) cursor-key-value nip ;
@@ -87,7 +89,9 @@ GENERIC: set-cursor-value-unsafe ( value cursor -- )
 PRIVATE>
 M: output-cursor set-cursor-value-unsafe set-cursor-value ; inline
 M: output-cursor set-cursor-value
-    dup cursor-valid? [ set-cursor-value-unsafe ] [ invalid-cursor ] if ; inline
+    dup cursor-valid?
+    [ set-cursor-value-unsafe ]
+    [ throw-invalid-cursor ] if ; inline
 
 !
 ! stream cursors

@@ -68,7 +68,7 @@ ERROR: unsupported-resolv.conf-option string ;
         { [ "rotate" ?head ] [ drop t >>rotate? ] }
         { [ "no-check-names" ?head ] [ drop t >>no-check-names? ] }
         { [ "inet6" ?head ] [ drop t >>inet6? ] }
-        [ unsupported-resolv.conf-option ]
+        [ throw-unsupported-resolv.conf-option ]
     } cond drop ;
 
 ERROR: unsupported-resolv.conf-line string ;
@@ -81,7 +81,7 @@ ERROR: unsupported-resolv.conf-line string ;
         { [ "search" ?head ] [ parse-search ] }
         { [ "sortlist" ?head ] [ parse-sortlist ] }
         { [ "options" ?head ] [ parse-option ] }
-        [ unsupported-resolv.conf-line ]
+        [ throw-unsupported-resolv.conf-line ]
     } cond ;
 
 PRIVATE>

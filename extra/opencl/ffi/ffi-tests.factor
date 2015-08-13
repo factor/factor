@@ -21,7 +21,7 @@ __kernel void square(
 
 ERROR: cl-error err ;
 : cl-success ( err -- )
-    dup CL_SUCCESS = [ drop ] [ cl-error ] if ;
+    dup CL_SUCCESS = [ drop ] [ throw-cl-error ] if ;
 
 :: cl-string-array ( str -- alien )
     str ascii encode 0 suffix :> str-buffer

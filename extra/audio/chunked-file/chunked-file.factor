@@ -8,7 +8,7 @@ ERROR: invalid-audio-file ;
 : ensured-read ( count -- output/f )
     [ read ] keep over length = [ drop f ] unless ;
 : ensured-read* ( count -- output )
-    ensured-read [ invalid-audio-file ] unless* ;
+    ensured-read [ throw-invalid-audio-file ] unless* ;
 
 : read-chunk ( -- byte-array/f )
     4 ensured-read [ 4 ensured-read* dup endian> ensured-read* 3append ] [ f ] if* ;

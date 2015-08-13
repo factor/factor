@@ -19,5 +19,5 @@ ERROR: format-unsupported-by-openal audio ;
         { { 1 16 } [ drop AL_FORMAT_MONO16   ] }
         { { 2  8 } [ drop AL_FORMAT_STEREO8  ] }
         { { 2 16 } [ drop AL_FORMAT_STEREO16 ] }
-        [ drop format-unsupported-by-openal ]
+        [ drop throw-format-unsupported-by-openal ]
     } case ;

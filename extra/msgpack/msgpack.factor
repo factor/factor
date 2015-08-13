@@ -66,7 +66,7 @@ ERROR: unknown-format n ;
         { [ dup 0xc7 = ] [ drop read1 read-ext ] }
         { [ dup 0xc8 = ] [ drop 2 read be> read-ext ] }
         { [ dup 0xc9 = ] [ drop 4 read be> read-ext ] }
-        [ unknown-format ]
+        [ throw-unknown-format ]
     } cond ;
 
 ERROR: cannot-convert obj ;
@@ -89,7 +89,7 @@ M: integer write-msgpack
             { [ dup 0xffff <= ] [ 0xcd write1 2 >be write ] }
             { [ dup 0xffffffff <= ] [ 0xce write1 4 >be write ] }
             { [ dup 0xffffffffffffffff <= ] [ 0xcf write1 8 >be write ] }
-            [ cannot-convert ]
+            [ throw-cannot-convert ]
         } cond
     ] [
         {
@@ -98,7 +98,7 @@ M: integer write-msgpack
             { [ dup -0x8000 >= ] [ 0xd1 write1 2 >be write ] }
             { [ dup -0x80000000 >= ] [ 0xd2 write1 4 >be write ] }
             { [ dup -0x8000000000000000 >= ] [ 0xd3 write1 8 >be write ] }
-            [ cannot-convert ]
+            [ throw-cannot-convert ]
         } cond
     ] if ;
 
@@ -111,7 +111,7 @@ M: string write-msgpack
         { [ dup 0xff <= ] [ 0xd9 write1 write1 ] }
         { [ dup 0xffff <= ] [ 0xda write1 2 >be write ] }
         { [ dup 0xffffffff <= ] [ 0xdb write1 4 >be write ] }
-        [ cannot-convert ]
+        [ throw-cannot-convert ]
     } cond output-stream get utf8 encode-string ;
 
 M: byte-array write-msgpack
@@ -119,7 +119,7 @@ M: byte-array write-msgpack
         { [ dup 0xff <= ] [ 0xc4 write1 write1 ] }
         { [ dup 0xffff <= ] [ 0xc5 write1 2 >be write ] }
         { [ dup 0xffffffff <= ] [ 0xc6 write1 4 >be write ] }
-        [ cannot-convert ]
+        [ throw-cannot-convert ]
     } cond write ;
 
 : write-array-header ( n -- )
@@ -127,7 +127,7 @@ M: byte-array write-msgpack
         { [ dup 0xf <= ] [ 0x90 bitor write1 ] }
         { [ dup 0xffff <= ] [ 0xdc write1 2 >be write ] }
         { [ dup 0xffffffff <= ] [ 0xdd write1 4 >be write ] }
-        [ cannot-convert ]
+        [ throw-cannot-convert ]
     } cond ;
 
 M: sequence write-msgpack
@@ -138,7 +138,7 @@ M: sequence write-msgpack
         { [ dup 0xf <= ] [ 0x80 bitor write1 ] }
         { [ dup 0xffff <= ] [ 0xde write1 2 >be write ] }
         { [ dup 0xffffffff <= ] [ 0xdf write1 4 >be write ] }
-        [ cannot-convert ]
+        [ throw-cannot-convert ]
     } cond ;
 
 M: assoc write-msgpack

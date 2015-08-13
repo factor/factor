@@ -65,7 +65,7 @@ ERROR: bad-photometric-interpretation n ;
         { 10 [ photometric-interpretation-itulab ] }
         { 32844 [ photometric-interpretation-logl ] }
         { 32845 [ photometric-interpretation-logluv ] }
-        [ bad-photometric-interpretation ]
+        [ throw-bad-photometric-interpretation ]
     } case ;
 
 SINGLETONS: compression
@@ -124,7 +124,7 @@ ERROR: bad-compression n ;
         { 34676 [ compression-sgilog ] }
         { 34677 [ compression-sgilog24 ] }
         { 34712 [ compression-jp2000 ] }
-        [ bad-compression ]
+        [ throw-bad-compression ]
     } case ;
 
 SINGLETONS: resolution-unit
@@ -137,7 +137,7 @@ ERROR: bad-resolution-unit n ;
         { 1 [ resolution-unit-none ] }
         { 2 [ resolution-unit-inch ] }
         { 3 [ resolution-unit-centimeter ] }
-        [ bad-resolution-unit ]
+        [ throw-bad-resolution-unit ]
     } case ;
 
 SINGLETONS: predictor
@@ -148,7 +148,7 @@ ERROR: bad-predictor n ;
     {
         { 1 [ predictor-none ] }
         { 2 [ predictor-horizontal-differencing ] }
-        [ bad-predictor ]
+        [ throw-bad-predictor ]
     } case ;
 
 SINGLETONS: planar-configuration
@@ -159,7 +159,7 @@ ERROR: bad-planar-configuration n ;
     {
         { 1 [ planar-configuration-chunky ] }
         { 2 [ planar-configuration-planar ] }
-        [ bad-planar-configuration ]
+        [ throw-bad-planar-configuration ]
     } case ;
 
 SINGLETONS: sample-format
@@ -177,7 +177,7 @@ ERROR: bad-sample-format n ;
             { 2 [ sample-format-signed-integer ] }
             { 3 [ sample-format-ieee-float ] }
             { 4 [ sample-format-undefined-data ] }
-            [ bad-sample-format ]
+            [ throw-bad-sample-format ]
         } case
     ] map ;
 
@@ -191,7 +191,7 @@ ERROR: bad-extra-samples n ;
         { 0 [ extra-samples-unspecified-alpha-data ] }
         { 1 [ extra-samples-associated-alpha-data ] }
         { 2 [ extra-samples-unassociated-alpha-data ] }
-        [ bad-extra-samples ]
+        [ throw-bad-extra-samples ]
     } case ;
 
 SINGLETONS: image-length image-width x-resolution y-resolution
@@ -224,7 +224,7 @@ ERROR: bad-jpeg-proc n ;
     {
         { 1 [ jpeg-proc-baseline ] }
         { 14 [ jpeg-proc-lossless ] }
-        [ bad-jpeg-proc ]
+        [ throw-bad-jpeg-proc ]
     } case ;
 
 ERROR: bad-tiff-magic bytes ;
@@ -232,7 +232,7 @@ ERROR: bad-tiff-magic bytes ;
     {
         { B{ CHAR: M CHAR: M } [ big-endian ] }
         { B{ CHAR: I CHAR: I } [ little-endian ] }
-        [ bad-tiff-magic ]
+        [ throw-bad-tiff-magic ]
     } case ;
 
 : read-header ( tiff -- tiff )
@@ -277,7 +277,7 @@ ERROR: no-tag class ;
     swap processed-tags>> ?at ;
 
 : find-tag ( ifd class -- tag )
-    find-tag* [ no-tag ] unless ;
+    find-tag* [ throw-no-tag ] unless ;
 
 : tag? ( ifd class -- tag )
     swap processed-tags>> key? ;
@@ -314,7 +314,7 @@ ERROR: unknown-ifd-type n where ;
         { 11 [ 4 * ] }
         { 12 [ 8 * ] }
         { 13 [ 4 * ] }
-        [ "value-length" unknown-ifd-type ]
+        [ "value-length" throw-unknown-ifd-type ]
     } case ;
 
 ERROR: bad-small-ifd-type n ;
@@ -330,7 +330,7 @@ ERROR: bad-small-ifd-type n ;
         { 9 [ endian> 32 >signed ] }
         { 11 [ endian> bits>float ] }
         { 13 [ endian> 32 >signed ] }
-        [ bad-small-ifd-type ]
+        [ throw-bad-small-ifd-type ]
     } case ;
 
 : offset-bytes>obj ( bytes type -- obj )
@@ -347,7 +347,7 @@ ERROR: bad-small-ifd-type n ;
         { 10 [ 8 group [ "ii" unpack first2 / ] map ] }
         { 11 [ 4 group [ "f" unpack ] map ] }
         { 12 [ 8 group [ "d" unpack ] map ] }
-        [ "offset-bytes>obj" unknown-ifd-type ]
+        [ "offset-bytes>obj" throw-unknown-ifd-type ]
     } case ;
 
 : ifd-entry-value ( ifd-entry -- n )
@@ -455,7 +455,7 @@ ERROR: unhandled-compression compression ;
     {
         { compression-none [ ] }
         { compression-lzw [ [ tiff-lzw-uncompress ] map ] }
-        [ unhandled-compression ]
+        [ throw-unhandled-compression ]
     } case ;
 
 : uncompress-strips ( ifd -- ifd )
@@ -483,7 +483,7 @@ ERROR: unhandled-compression compression ;
         {
             { predictor-none [ ] }
             { predictor-horizontal-differencing [ (strips-predictor) ] }
-            [ bad-predictor ]
+            [ throw-bad-predictor ]
         } case
     ] when ;
 
@@ -499,7 +499,7 @@ ERROR: unknown-component-order ifd ;
         { { 8 8 8 8 } [ ] }
         { { 8 8 8 } [ ] }
         { 8 [ ] }
-        [ unknown-component-order ]
+        [ throw-unknown-component-order ]
     } case >>bitmap ;
 
 : ifd-component-order ( ifd -- component-order component-type )
@@ -511,7 +511,7 @@ ERROR: unknown-component-order ifd ;
         { { 8 8 8 8 } [ RGBA ubyte-components ] }
         { { 8 8 8 } [ RGB ubyte-components ] }
         { 8 [ LA ubyte-components ] }
-        [ unknown-component-order ]
+        [ throw-unknown-component-order ]
     } case ;
 
 : handle-alpha-data ( ifd -- ifd )
@@ -519,7 +519,7 @@ ERROR: unknown-component-order ifd ;
         { extra-samples-associated-alpha-data [ ] }
         { extra-samples-unspecified-alpha-data [ ] }
         { extra-samples-unassociated-alpha-data [ ] }
-        [ bad-extra-samples ]
+        [ throw-bad-extra-samples ]
     } case ;
 
 : ifd>image ( ifd -- image )

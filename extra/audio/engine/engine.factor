@@ -94,11 +94,11 @@ ERROR: audio-context-not-available device-name ;
 :: <audio-engine> ( device-name voice-count -- engine )
     [
         device-name alcOpenDevice :> al-device
-        al-device [ device-name audio-device-not-found ] unless
+        al-device [ device-name throw-audio-device-not-found ] unless
         al-device |alcCloseDevice* drop
 
         al-device f alcCreateContext :> al-context
-        al-context [ device-name audio-context-not-available ] unless
+        al-context [ device-name throw-audio-context-not-available ] unless
         al-context |alcDestroyContext drop
 
         al-context alcSuspendContext
