@@ -641,6 +641,12 @@ struct factor_vm {
 
   // cpu-*
   void dispatch_signal_handler(cell* sp, cell* pc, cell newpc);
+#if defined(FACTOR_X86) || defined(FACTOR_64)
+  void dispatch_non_resumable_signal(cell* sp, cell* pc,
+                                     cell handler,
+                                     cell limit);
+  void dispatch_resumable_signal(cell* sp, cell* pc, cell handler);
+#endif
 
   // alien
   char* pinned_alien_offset(cell obj);
