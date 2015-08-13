@@ -58,7 +58,7 @@ PRIVATE>
 
 TUPLE: undefined-word word ;
 
-: undefined ( -- * ) callstack caller undefined-word boa throw ;
+: undefined ( -- * ) get-callstack caller undefined-word boa throw ;
 
 : undefined-def ( -- quot )
     #! 'f' inhibits tail call optimization in non-optimizing
