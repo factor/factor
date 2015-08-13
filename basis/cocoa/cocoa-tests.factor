@@ -5,11 +5,10 @@ core-graphics.types ;
 IN: cocoa.tests
 
 CLASS: Foo < NSObject
-[
     METHOD: void foo: NSRect rect [
         gc rect "x" set
-    ]
-]
+    ] ;
+;
 
 : test-foo ( -- )
     Foo -> alloc -> init
@@ -24,9 +23,8 @@ CLASS: Foo < NSObject
 { 102.0 } [ "x" get CGRect-h ] unit-test
 
 CLASS: Bar < NSObject
-[
-    METHOD: NSRect bar [ test-foo "x" get ]
-]
+    METHOD: NSRect bar [ test-foo "x" get ] ;
+;
 
 { } [
     Bar [
@@ -43,11 +41,10 @@ CLASS: Bar < NSObject
 
 ! Make sure that we can add methods
 CLASS: Bar < NSObject
-[
-    METHOD: NSRect bar [ test-foo "x" get ]
+    METHOD: NSRect bar [ test-foo "x" get ] ;
 
-    METHOD: int babb: int x [ x sq ]
-]
+    METHOD: int babb: int x [ x sq ] ;
+;
 
 { 144 } [
     Bar [
