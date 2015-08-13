@@ -161,7 +161,7 @@ PRIVATE>
 
 M: persistent-vector ppop ( pvec -- pvec' )
     dup count>> {
-        { 0 [ empty-error ] }
+        { 0 [ throw-empty-error ] }
         { 1 [ drop T{ persistent-vector } ] }
         [
             [

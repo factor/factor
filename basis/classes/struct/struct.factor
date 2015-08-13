@@ -285,7 +285,7 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
 
 :: (define-struct-class) ( class slot-specs offsets-quot alignment-quot -- )
     slot-specs check-struct-slots
-    slot-specs empty? [ struct-must-have-slots ] when
+    slot-specs empty? [ throw-struct-must-have-slots ] when
     class redefine-struct-tuple-class
     slot-specs offsets-quot call :> unaligned-size
     slot-specs alignment-quot call :> alignment
@@ -376,7 +376,7 @@ PRIVATE>
     scan-token {
         { ";" [ f ] }
         { "{" [ parse-struct-slot suffix! t ] }
-        [ invalid-struct-slot ]
+        [ throw-invalid-struct-slot ]
     } case ;
 
 : parse-struct-definition ( -- class slots )
@@ -413,7 +413,7 @@ SYNTAX: S@
     scan-token {
         { ";" [ f ] }
         { "{" [ parse-struct-slot` t ] }
-        [ invalid-struct-slot ]
+        [ throw-invalid-struct-slot ]
     } case ;
 
 PRIVATE>

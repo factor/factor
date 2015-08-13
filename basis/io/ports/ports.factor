@@ -45,7 +45,7 @@ M: input-port stream-read1
 ERROR: not-a-c-ptr object ;
 
 : check-c-ptr ( c-ptr -- c-ptr )
-    dup c-ptr? [ not-a-c-ptr ] unless ; inline
+    dup c-ptr? [ throw-not-a-c-ptr ] unless ; inline
 
 <PRIVATE
 

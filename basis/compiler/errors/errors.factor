@@ -61,13 +61,15 @@ ERROR: no-such-library name message ;
 
 M: no-such-library summary drop "Library not found" ;
 
-: no-such-library-error ( name message word -- ) \ no-such-library set-linkage-error ;
+: no-such-library-error ( name message word -- )
+    \ no-such-library set-linkage-error ;
 
 ERROR: no-such-symbol name message ;
 
 M: no-such-symbol summary drop "Symbol not found" ;
 
-: no-such-symbol-error ( name message word -- ) \ no-such-symbol set-linkage-error ;
+: no-such-symbol-error ( name message word -- )
+    \ no-such-symbol set-linkage-error ;
 
 ERROR: not-compiled word error ;
 

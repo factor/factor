@@ -29,7 +29,7 @@ M: no-biassoc-deletion summary
     drop "biassocs do not support deletion" ;
 
 M: biassoc delete-at
-    no-biassoc-deletion ;
+    throw-no-biassoc-deletion ;
 
 M: biassoc >alist from>> >alist ;
 

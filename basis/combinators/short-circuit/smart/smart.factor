@@ -8,7 +8,7 @@ ERROR: cannot-determine-arity ;
 
 : arity ( quots -- n )
     first infer
-    dup terminated?>> [ cannot-determine-arity ] when
+    dup terminated?>> [ throw-cannot-determine-arity ] when
     effect-height neg 1 + ;
 
 PRIVATE>

@@ -92,7 +92,7 @@ ERROR: unknown-cpuinfo-line string ;
         { "vendor_id" [ >>vendor-id ] }
         { "wp" [ "yes" = >>wp? ] }
         { "TLB size" [ >>tlb-size ] }
-        [ unknown-cpuinfo-line ]
+        [ throw-unknown-cpuinfo-line ]
     } case ;
 
 

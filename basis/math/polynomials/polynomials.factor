@@ -46,7 +46,7 @@ ERROR: negative-power-polynomial p n ;
     make-bits { 1 } [ [ over p* ] when [ p-sq ] dip ] reduce nip ;
 
 : p^ ( p n -- p^n )
-    dup 0 >= [ (p^) ] [ negative-power-polynomial ] if ;
+    dup 0 >= [ (p^) ] [ throw-negative-power-polynomial ] if ;
 
 <PRIVATE
 

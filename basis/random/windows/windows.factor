@@ -31,7 +31,10 @@ ERROR: acquire-crypto-context-failed provider type error ;
 
 : attempt-crypto-context ( provider type -- handle )
     [ acquire-crypto-context ]
-    [ drop [ create-crypto-context ] [ acquire-crypto-context-failed ] recover ] recover ;
+    [
+        drop [ create-crypto-context ]
+        [ throw-acquire-crypto-context-failed ] recover
+    ] recover ;
 
 : initialize-crypto-context ( crypto-context -- crypto-context )
     dup [ provider>> ] [ type>> ] bi attempt-crypto-context >>handle ;

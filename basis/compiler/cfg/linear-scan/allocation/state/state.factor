@@ -71,7 +71,7 @@ ERROR: register-already-used live-interval ;
 : check-activate ( live-interval -- )
     check-allocation? get [
         dup [ reg>> ] [ active-intervals-for [ reg>> ] map ] bi member?
-        [ register-already-used ] [ drop ] if
+        [ throw-register-already-used ] [ drop ] if
     ] [ drop ] if ;
 
 : activate ( n live-interval -- keep? )

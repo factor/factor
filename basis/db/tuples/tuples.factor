@@ -78,7 +78,7 @@ ERROR: no-slots-named class seq ;
         [ keys ]
         [ all-slots [ name>> ] map ] bi* diff
     ] 2bi
-    [ drop ] [ no-slots-named ] if-empty ;
+    [ drop ] [ throw-no-slots-named ] if-empty ;
 
 : define-persistent ( class table columns -- )
     pick dupd
@@ -103,7 +103,7 @@ ERROR: no-defined-persistent object ;
 
 : ensure-defined-persistent ( object -- object )
     dup { [ class? ] [ "db-table" word-prop ] } 1&& [
-        no-defined-persistent
+        throw-no-defined-persistent
     ] unless ;
 
 : create-table ( class -- )

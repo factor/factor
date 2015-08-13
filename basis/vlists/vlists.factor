@@ -33,7 +33,7 @@ M: vlist ppush
 ERROR: empty-vlist-error ;
 
 M: vlist ppop
-    [ empty-vlist-error ]
+    [ throw-empty-vlist-error ]
     [ [ length>> 1 - ] [ vector>> ] bi vlist boa ] if-empty ;
 
 M: vlist clone

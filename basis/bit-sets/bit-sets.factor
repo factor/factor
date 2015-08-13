@@ -32,7 +32,7 @@ M: bit-set delete
 ERROR: check-bit-set-failed ;
 
 : check-bit-set ( bit-set -- bit-set )
-    dup bit-set? [ check-bit-set-failed ] unless ; inline
+    dup bit-set? [ throw-check-bit-set-failed ] unless ; inline
 
 : bit-set-map ( seq1 seq2 quot -- seq )
     [ drop [ length ] bi@ [ assert= ] keep ]

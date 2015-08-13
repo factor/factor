@@ -108,8 +108,6 @@ M: windows init-io ( -- )
     <master-completion-port> master-completion-port set-global
     H{ } clone pending-overlapped set-global ;
 
-ERROR: invalid-file-size n ;
-
 : (handle>file-size) ( handle -- n/f )
     0 ulonglong <ref> [ GetFileSizeEx ] keep swap
     [ drop f ] [ drop ulonglong deref ] if-zero ;
@@ -124,7 +122,7 @@ ERROR: invalid-file-size n ;
 ERROR: seek-before-start n ;
 
 : set-seek-ptr ( n handle -- )
-    [ dup 0 < [ seek-before-start ] when ] dip ptr<< ;
+    [ dup 0 < [ throw-seek-before-start ] when ] dip ptr<< ;
 
 M: windows tell-handle ( handle -- n ) ptr>> ;
 

@@ -45,7 +45,7 @@ MEMO: make-attributes ( open-font color -- hashtable )
     [
         [
             dup selection? [ string>> ] when
-            dup string? [ not-a-string ] unless
+            dup string? [ throw-not-a-string ] unless
         ] 2dip
         make-attributes <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString

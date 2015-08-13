@@ -116,7 +116,7 @@ M: process-already-started error.
     process>> . ;
 
 M: process >process
-    dup process-started? [ process-already-started ] when
+    dup process-started? [ throw-process-already-started ] when
     clone ;
 
 M: object >process <process> swap >>command ;
@@ -135,7 +135,7 @@ M: process-was-killed error.
 : (wait-for-process) ( process -- status )
     dup handle>>
     [ self over processes get at push "process" suspend drop ] when
-    dup killed>> [ process-was-killed ] [ status>> ] if ;
+    dup killed>> [ throw process-was-killed ] [ status>> ] if ;
 
 : wait-for-process ( process -- status )
     [ (wait-for-process) ] with-timeout ;
@@ -158,7 +158,7 @@ M: process-failed error.
     ] [ process>> . ] bi ;
 
 : check-success ( process status -- )
-    0 = [ drop ] [ process-failed ] if ;
+    0 = [ drop ] [ throw-process-failed ] if ;
 
 : wait-for-success ( process -- )
     dup wait-for-process check-success ;
@@ -290,7 +290,7 @@ M: output-process-error error.
     [ +closed+ or ] change-stdin
     utf8 (process-reader)
     [ [ stream-contents ] [ dup (wait-for-process) ] bi* ] with-timeout
-    0 = [ 2drop ] [ output-process-error ] if ;
+    0 = [ 2drop ] [ throw-output-process-error ] if ;
 
 <PRIVATE
 

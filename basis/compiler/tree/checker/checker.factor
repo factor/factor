@@ -11,8 +11,12 @@ IN: compiler.tree.checker
 ERROR: check-use-error value message ;
 
 : check-use ( value uses -- )
-    [ empty? [ "No use" check-use-error ] [ drop ] if ]
-    [ all-unique? [ drop ] [ "Uses not all unique" check-use-error ] if ] 2bi ;
+    [ empty? [ "No use" throw-check-use-error ] [ drop ] if ]
+    [
+        all-unique?
+        [ drop ]
+        [ "Uses not all unique" throw-check-use-error ] if
+    ] 2bi ;
 
 : check-def-use ( -- )
     def-use get [ uses>> check-use ] assoc-each ;
@@ -58,7 +62,7 @@ ERROR: check-node-error node error ;
         [ node-defs-values check-values ]
         [ check-node* ]
         tri
-    ] [ check-node-error ] recover ;
+    ] [ throw-check-node-error ] recover ;
 
 SYMBOL: datastack
 SYMBOL: retainstack

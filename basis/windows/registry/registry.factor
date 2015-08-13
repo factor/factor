@@ -19,7 +19,7 @@ CONSTANT: registry-value-max-length 16384
             drop
         ] [
             [ key subkey mode ] dip n>win32-error-string
-            open-key-failed
+            throw-open-key-failed
         ] if
     ] keep HKEY deref ;
 
@@ -36,7 +36,7 @@ CONSTANT: registry-value-max-length 16384
             hKey lpSubKey 0 lpClass dwOptions samDesired
             lpSecurityAttributes
         ] dip n>win32-error-string
-        create-key-failed
+        throw-create-key-failed
     ] unless ;
 
 : create-key ( hkey lsubkey -- hkey )

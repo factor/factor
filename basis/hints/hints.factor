@@ -70,7 +70,7 @@ M: object specializer-declaration class-of ;
 ERROR: cannot-specialize word specializer ;
 
 : set-specializer ( word specializer -- )
-    over inline-recursive? [ cannot-specialize ] when
+    over inline-recursive? [ throw-cannot-specialize ] when
     "specializer" set-word-prop ;
 
 SYNTAX: HINTS:

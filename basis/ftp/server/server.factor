@@ -111,7 +111,7 @@ ERROR: type-error type ;
     >upper {
         { "IMAGE" [ "Binary" ] }
         { "I" [ "Binary" ] }
-        [ type-error ]
+        [ throw-type-error ]
     } case ;
 
 : handle-TYPE ( obj -- )
@@ -286,9 +286,6 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
     ] [
         "" not-a-plain-file
     ] if* ;
-
-ERROR: not-a-directory ;
-ERROR: no-directory-permissions ;
 
 : directory-change-success ( -- )
     "Directory successully changed." 250 server-response ;

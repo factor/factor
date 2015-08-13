@@ -103,13 +103,13 @@ PRIVATE>
 ERROR: file-not-found path bfs? quot ;
 
 : find-file-throws ( path bfs? quot -- path )
-    3dup find-file [ 2nip nip ] [ file-not-found ] if* ; inline
+    3dup find-file [ 2nip nip ] [ throw-file-not-found ] if* ; inline
 
 ERROR: sequence-expected obj ;
 
 : ensure-sequence-of-directories ( obj -- seq )
     dup string? [ 1array ] when
-    dup sequence? [ sequence-expected ] unless ;
+    dup sequence? [ throw-sequence-expected ] unless ;
 
 ! Can't make this generic# on string/sequence because of combinators
 : find-in-directories ( directories bfs? quot -- path'/f )

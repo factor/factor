@@ -158,7 +158,7 @@ M: db-connection <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
         [ dupd filter-ignores ] dip
-        over empty? [ all-slots-ignored ] when
+        over empty? [ throw-all-slots-ignored ] when
         over
         [ ", " 0% ]
         [ dup column-name>> 0% 2, ] interleave

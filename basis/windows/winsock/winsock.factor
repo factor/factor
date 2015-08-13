@@ -447,7 +447,7 @@ ERROR: winsock-exception n string ;
     maybe-winsock-exception [ throw ] when* ;
 
 : (throw-winsock-error) ( n -- * )
-    [ ] [ n>win32-error-string ] bi winsock-exception ;
+    [ ] [ n>win32-error-string ] bi throw-winsock-exception ;
 
 : throw-winsock-error ( -- * )
     WSAGetLastError (throw-winsock-error) ;

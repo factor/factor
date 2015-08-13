@@ -202,7 +202,7 @@ M: timestamp year. ( timestamp -- )
 ERROR: invalid-timestamp-format ;
 
 : check-timestamp ( obj/f -- obj )
-    [ invalid-timestamp-format ] unless* ;
+    [ throw-invalid-timestamp-format ] unless* ;
 
 : read-token ( seps -- token )
     [ read-until ] keep member? check-timestamp drop ;

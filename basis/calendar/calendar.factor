@@ -57,7 +57,7 @@ M: not-a-month summary
 <PRIVATE
 
 : check-month ( n -- n )
-    [ not-a-month ] when-zero ;
+    [ throw-not-a-month ] when-zero ;
 
 PRIVATE>
 
@@ -93,7 +93,7 @@ CONSTANT: month-abbreviations-hash
 
 : month-abbreviation-index ( string -- n )
     month-abbreviations-hash ?at
-    [ not-a-month-abbreviation ] unless ;
+    [ throw-not-a-month-abbreviation ] unless ;
 
 CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 

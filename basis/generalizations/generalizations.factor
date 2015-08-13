@@ -28,7 +28,7 @@ ERROR: nonpositive-npick n ;
 
 MACRO: npick ( n -- quot )
     {
-        { [ dup 0 <= ] [ nonpositive-npick ] }
+        { [ dup 0 <= ] [ throw-nonpositive-npick ] }
         { [ dup 1 = ] [ drop [ dup ] ] }
         [ 1 - [ dup ] [ '[ _ dip swap ] ] repeat ]
     } cond ;

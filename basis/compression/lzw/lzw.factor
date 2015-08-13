@@ -30,15 +30,13 @@ ERROR: code-size-zero ;
 
 : <lzw-uncompress> ( input code-size class -- obj )
     new
-        swap [ code-size-zero ] when-zero >>code-size
+        swap [ throw-code-size-zero ] when-zero >>code-size
         dup code-size>> >>initial-code-size
         dup code-size>> 1 - 2^ >>clear-code
         dup clear-code>> 1 + >>end-of-information-code
         swap >>input
         BV{ } clone >>output
         reset-lzw-uncompress ;
-
-ERROR: not-in-table value ;
 
 : lookup-old-code ( lzw -- vector )
     [ old-code>> ] [ table>> ] bi nth ;

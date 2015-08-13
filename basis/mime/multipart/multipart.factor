@@ -29,15 +29,11 @@ C: <mime-variable> mime-variable
         swap >>mime-separator
         H{ } clone >>mime-parts ;
 
-ERROR: bad-header bytes ;
-
 : mime-write ( sequence -- )
     >byte-array write ;
 
 : parse-headers ( string -- hashtable )
     string-lines harvest [ parse-header-line ] map >hashtable ;
-
-ERROR: end-of-stream multipart ;
 
 : fill-bytes ( multipart -- multipart )
     buffer-size read
@@ -120,7 +116,7 @@ ERROR: unknown-content-disposition multipart ;
             [ dup mime-separator>> dump-string >>name-content ] dip
             >>name dup save-mime-part
         ] [
-             unknown-content-disposition
+             throw-unknown-content-disposition
         ] if*
     ] if* ;
 
@@ -132,7 +128,7 @@ ERROR: no-content-disposition multipart ;
             parse-content-disposition-form-data >>content-disposition
             parse-form-data
         ] }
-        [ no-content-disposition ]
+        [ throw-no-content-disposition ]
     } case ;
 
 : read-assert-sequence= ( sequence -- )

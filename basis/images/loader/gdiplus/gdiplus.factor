@@ -58,7 +58,7 @@ os windows? [
 ERROR: unsupported-pixel-format component-order ;
 
 : check-pixel-format ( image -- )
-    component-order>> dup BGRA = [ drop ] [ unsupported-pixel-format ] if ;
+    component-order>> dup BGRA = [ drop ] [ throw-unsupported-pixel-format ] if ;
 
 : image>gdi+-bitmap ( image -- bitmap )
     dup check-pixel-format

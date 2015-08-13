@@ -77,7 +77,7 @@ M: asides call-responder*
 ERROR: end-aside-in-get-error ;
 
 : move-on ( id -- response )
-    post-request? [ end-aside-in-get-error ] unless
+    post-request? [ throw-end-aside-in-get-error ] unless
     dup method>> {
         { "GET" [ url>> <redirect> ] }
         { "HEAD" [ url>> <redirect> ] }

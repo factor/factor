@@ -39,7 +39,7 @@ M: gir-not-found summary
         current-vocab-dirs custom-gir-dirs system-gir-dirs
         3append sift :> paths
         paths [ path append-path exists? ] find nip
-        [ path append-path ] [ path paths gir-not-found ] if*
+        [ path append-path ] [ path paths throw-gir-not-found ] if*
     ] if ;
 
 : define-gir-vocab ( path -- )

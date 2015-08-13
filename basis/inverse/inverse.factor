@@ -12,7 +12,7 @@ IN: inverse
 ERROR: fail ;
 M: fail summary drop "Matching failed" ;
 
-: assure ( ? -- ) [ fail ] unless ; inline
+: assure ( ? -- ) [ throw-fail ] unless ; inline
 
 : =/fail ( obj1 obj2 -- ) = assure ; inline
 
@@ -32,14 +32,10 @@ M: fail summary drop "Matching failed" ;
     [ dupd "pop-length" set-word-prop ] dip
     "pop-inverse" set-word-prop ;
 
-ERROR: no-inverse word ;
-M: no-inverse summary
-    drop "The word cannot be used in pattern matching" ;
-
 ERROR: bad-math-inverse ;
 
 : next ( revquot -- revquot* first )
-    [ bad-math-inverse ]
+    [ throw-bad-math-inverse ]
     [ unclip-slice ] if-empty ;
 
 : constant-word? ( word -- ? )
@@ -48,7 +44,7 @@ ERROR: bad-math-inverse ;
     [ in>> empty? ] bi and ;
 
 : assure-constant ( constant -- quot )
-    dup word? [ bad-math-inverse ] when 1quotation ;
+    dup word? [ throw-bad-math-inverse ] when 1quotation ;
 
 : swap-inverse ( math-inverse revquot -- revquot* quot )
     next assure-constant rot second '[ @ swap @ ] ;
@@ -173,7 +169,7 @@ ERROR: missing-literal ;
 
 \ ? 2 [
     [ assert-literal ] bi@
-    [ swap [ over = ] dip swap [ 2drop f ] [ = [ t ] [ fail ] if ] if ]
+    [ swap [ over = ] dip swap [ 2drop f ] [ = [ t ] [ throw-fail ] if ] if ]
     2curry
 ] define-pop-inverse
 
@@ -259,7 +255,7 @@ DEFER: __
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
-    [ tuple-slots [ ] any? [ fail ] when ]
+    [ tuple-slots [ ] any? [ throw-fail ] when ]
     compose ;
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse

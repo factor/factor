@@ -18,13 +18,13 @@ GENERIC: deque-empty? ( deque -- ? )
 ERROR: empty-deque ;
 
 : peek-front ( deque -- obj )
-    peek-front* [ drop empty-deque ] unless ;
+    peek-front* [ drop throw-empty-deque ] unless ;
 
 : ?peek-front ( deque -- obj/f )
     peek-front* [ drop f ] unless ;
 
 : peek-back ( deque -- obj )
-    peek-back* [ drop empty-deque ] unless ;
+    peek-back* [ drop throw-empty-deque ] unless ;
 
 : ?peek-back ( deque -- obj/f )
     peek-back* [ drop f ] unless ;

@@ -103,7 +103,7 @@ ERROR: no-world-found ;
 
 : find-gl-context ( gadget -- )
     find-world dup
-    [ set-gl-context ] [ no-world-found ] if ;
+    [ set-gl-context ] [ throw-no-world-found ] if ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [

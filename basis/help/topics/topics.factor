@@ -63,7 +63,7 @@ M: no-article summary
     drop "Help article does not exist" ;
 
 : lookup-article ( name -- article )
-    articles get ?at [ no-article ] unless ;
+    articles get ?at [ throw-no-article ] unless ;
 
 M: object valid-article? articles get key? ;
 M: object article-title lookup-article article-title ;

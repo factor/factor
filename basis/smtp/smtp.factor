@@ -69,7 +69,7 @@ ERROR: bad-email-address email ;
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
     dup "\r\n>" intersects?
-    [ bad-email-address ] when ;
+    [ throw-bad-email-address ] when ;
 
 : mail-from ( fromaddr -- )
     validate-address
@@ -130,17 +130,17 @@ ERROR: smtp-transaction-failed < smtp-error ;
 : check-response ( response -- )
     dup code>> {
         { [ dup { 220 235 250 221 354 } member? ] [ 2drop ] }
-        { [ dup 400 499 between? ] [ drop smtp-server-busy ] }
-        { [ dup 500 = ] [ drop smtp-syntax-error ] }
-        { [ dup 501 = ] [ drop smtp-command-not-implemented ] }
-        { [ dup 500 509 between? ] [ drop smtp-syntax-error ] }
-        { [ dup 530 539 between? ] [ drop smtp-bad-authentication ] }
-        { [ dup 550 = ] [ drop smtp-mailbox-unavailable ] }
-        { [ dup 551 = ] [ drop smtp-user-not-local ] }
-        { [ dup 552 = ] [ drop smtp-exceeded-storage-allocation ] }
-        { [ dup 553 = ] [ drop smtp-bad-mailbox-name ] }
-        { [ dup 554 = ] [ drop smtp-transaction-failed ] }
-        [ drop smtp-error ]
+        { [ dup 400 499 between? ] [ drop throw-smtp-server-busy ] }
+        { [ dup 500 = ] [ drop throw-smtp-syntax-error ] }
+        { [ dup 501 = ] [ drop throw-smtp-command-not-implemented ] }
+        { [ dup 500 509 between? ] [ drop throw-smtp-syntax-error ] }
+        { [ dup 530 539 between? ] [ drop throw-smtp-bad-authentication ] }
+        { [ dup 550 = ] [ drop throw-smtp-mailbox-unavailable ] }
+        { [ dup 551 = ] [ drop throw-smtp-user-not-local ] }
+        { [ dup 552 = ] [ drop throw-smtp-exceeded-storage-allocation ] }
+        { [ dup 553 = ] [ drop throw-smtp-bad-mailbox-name ] }
+        { [ dup 554 = ] [ drop throw-smtp-transaction-failed ] }
+        [ drop throw-smtp-error ]
     } cond ;
 
 : get-ok ( -- ) receive-response check-response ;
@@ -168,7 +168,7 @@ ERROR: invalid-header-string string ;
 
 : validate-header ( string -- string' )
     dup "\r\n" intersects?
-    [ invalid-header-string ] when ;
+    [ throw-invalid-header-string ] when ;
 
 : write-header ( key value -- )
     [ validate-header write ]

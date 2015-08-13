@@ -25,7 +25,7 @@ ERROR: can't-deploy-library-file library ;
 : copy-library ( dir library -- )
     dup find-library-file
     [ swap over file-name append-path copy-file ]
-    [ can't-deploy-library-file ] ?if ;
+    [ throw-can't-deploy-library-file ] ?if ;
 
 : copy-libraries ( manifest name dir -- )
     append-path swap libraries>> [ copy-library ] with each ;

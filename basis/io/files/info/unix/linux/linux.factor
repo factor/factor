@@ -80,8 +80,6 @@ M: linux file-systems
     resolve-symlinks
     parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc (find-mount-point) ;
 
-ERROR: file-system-not-found ;
-
 M: linux file-system-info ( path -- file-system-info )
     normalize-path
     [

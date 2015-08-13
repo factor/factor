@@ -147,7 +147,7 @@ ERROR: not-absolute-path ;
         [ length 2 >= ]
         [ second CHAR: : = ]
         [ first Letter? ]
-    } 1&& [ 2 head "\\" append ] [ not-absolute-path ] if ;
+    } 1&& [ 2 head "\\" append ] [ throw-not-absolute-path ] if ;
 
 <PRIVATE
 

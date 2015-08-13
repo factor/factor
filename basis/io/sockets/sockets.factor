@@ -78,12 +78,12 @@ ERROR: bad-ipv4-component string ;
 
 : parse-ipv4 ( string -- seq )
     [ f ] [
-        "." split dup length 4 = [ malformed-ipv4 ] unless
-        [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as
+        "." split dup length 4 = [ throw-malformed-ipv4 ] unless
+        [ dup string>number [ ] [ throw-bad-ipv4-component ] ?if ] B{ } map-as
     ] if-empty ;
 
 : check-ipv4 ( string -- )
-    [ parse-ipv4 drop ] [ invalid-ipv4 ] recover ;
+    [ parse-ipv4 drop ] [ throw-invalid-ipv4 ] recover ;
 
 PRIVATE>
 
@@ -93,7 +93,7 @@ M: ipv4 inet-ntop ( data addrspec -- str )
     drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
 
 M: ipv4 inet-pton ( str addrspec -- data )
-    drop [ parse-ipv4 ] [ invalid-ipv4 ] recover ;
+    drop [ parse-ipv4 ] [ throw-invalid-ipv4 ] recover ;
 
 M: ipv4 address-size drop 4 ;
 
@@ -146,7 +146,7 @@ ERROR: bad-ipv4-embedded-prefix obj ;
 ERROR: more-than-8-components ;
 
 : parse-ipv6-component ( seq -- seq' )
-    [ dup hex> [ nip ] [ bad-ipv6-component ] if* ] { } map-as ;
+    [ dup hex> [ nip ] [ throw-bad-ipv6-component ] if* ] { } map-as ;
 
 : parse-ipv6 ( string -- seq )
     [ f ] [
@@ -159,7 +159,7 @@ ERROR: more-than-8-components ;
     ] if-empty ;
 
 : check-ipv6 ( string -- )
-    [ "::" split1 [ parse-ipv6 ] bi@ 2drop ] [ invalid-ipv6 ] recover ;
+    [ "::" split1 [ parse-ipv6 ] bi@ 2drop ] [ throw-invalid-ipv6 ] recover ;
 
 PRIVATE>
 
@@ -172,7 +172,7 @@ M: ipv6 inet-ntop ( data addrspec -- str )
 
 : pad-ipv6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -
-    dup 0 < [ more-than-8-components ] when
+    dup 0 < [ throw-more-than-8-components ] when
     <byte-array> glue ;
 
 : ipv6-bytes ( seq -- bytes )
@@ -183,7 +183,7 @@ PRIVATE>
 M: ipv6 inet-pton ( str addrspec -- data )
     drop
     [ "::" split1 [ parse-ipv6 ] bi@ pad-ipv6 ipv6-bytes ]
-    [ invalid-ipv6 ]
+    [ throw-invalid-ipv6 ]
     recover ;
 
 M: ipv6 address-size drop 16 ;
@@ -293,7 +293,7 @@ ERROR: invalid-port object ;
     pick class-of byte-array assert= ;
 
 : check-connectionless-port ( port -- port )
-    dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
+    dup { [ datagram-port? ] [ raw-port? ] } 1|| [ throw-invalid-port ] unless ;
 
 : check-send ( packet addrspec port -- packet addrspec port )
     check-connectionless-port check-disposed check-port ;
@@ -411,7 +411,7 @@ C: <inet> inet
 M: string resolve-host
     f prepare-addrinfo f void* <ref> [
         getaddrinfo [
-            dup addrinfo-error-string addrinfo-error
+            dup addrinfo-error-string throw-addrinfo-error
         ] unless-zero
     ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
@@ -452,7 +452,7 @@ M: invalid-inet-server summary
     drop "Cannot use <server> with <inet>; use <inet4> or <inet6> instead" ;
 
 M: inet (server)
-    invalid-inet-server ;
+    throw-invalid-inet-server ;
 
 ERROR: invalid-local-address addrspec ;
 
@@ -463,7 +463,7 @@ M: invalid-local-address summary
     [
         [ ] [ inet4? ] [ inet6? ] tri or
         [ bind-local-address ]
-        [ invalid-local-address ] if
+        [ throw-invalid-local-address ] if
     ] dip with-variable ; inline
 
 : protocol-port ( protocol -- port )

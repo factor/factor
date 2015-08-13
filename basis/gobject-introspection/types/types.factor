@@ -79,7 +79,7 @@ ERROR: unknown-type-error type ;
 
 : get-type-info ( data-type -- info )
     qualified-type-name dup type-infos get-global at
-    [ ] [ unknown-type-error ] ?if ;
+    [ ] [ throw-unknown-type-error ] ?if ;
 
 : find-type-info ( data-type -- info/f )
     qualified-type-name type-infos get-global at ;
@@ -105,8 +105,8 @@ ERROR: deferred-type-error ;
 
 <<
 void* lookup-c-type clone
-    [ drop deferred-type-error ] >>unboxer-quot
-    [ drop deferred-type-error ] >>boxer-quot
+    [ drop throw-deferred-type-error ] >>unboxer-quot
+    [ drop throw-deferred-type-error ] >>boxer-quot
     object >>boxed-class
 "deferred-type" create-word-in typedef
 >>

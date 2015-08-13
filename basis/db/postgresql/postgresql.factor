@@ -278,7 +278,7 @@ M: postgresql-db-connection compound ( string object -- string' )
         { "default" [ first number>string " " glue ] }
         { "varchar" [ first number>string "(" ")" surround append ] }
         { "references" [ >reference-string ] }
-        [ drop no-compound-found ]
+        [ drop throw-no-compound-found ]
     } case ;
 
 M: postgresql-db-connection parse-db-error
