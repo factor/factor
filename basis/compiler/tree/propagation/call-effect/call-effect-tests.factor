@@ -34,7 +34,7 @@ IN: compiler.tree.propagation.call-effect.tests
             ( -- a b c )
             2dup
             [
-                [ [ datastack ] dip dip ] dip dup terminated?>>
+                [ [ get-datastack ] dip dip ] dip dup terminated?>>
                 [ 2drop f ] [
                     dup in>> length swap out>> length
                     check-datastack
