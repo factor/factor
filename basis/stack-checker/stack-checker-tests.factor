@@ -297,7 +297,7 @@ DEFER: an-inline-word
 ERROR: custom-error ;
 
 { T{ effect f { } { } t } } [
-    [ throw-custom-error ] infer
+    [ custom-error ] infer
 ] unit-test
 
 : funny-throw ( a -- * ) throw ; inline
@@ -307,7 +307,7 @@ ERROR: custom-error ;
 ] unit-test
 
 { T{ effect f { } { } t } } [
-    [ throw-custom-error inference-error ] infer
+    [ custom-error inference-error ] infer
 ] unit-test
 
 { T{ effect f { "x" } { "x" "x" } t } } [

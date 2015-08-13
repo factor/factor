@@ -45,7 +45,7 @@ PRIVATE>
 ERROR: no-math-method left right generic ;
 
 : default-math-method ( generic -- quot )
-    [ throw-no-math-method ] curry [ ] like ;
+    [ no-math-method ] curry [ ] like ;
 
 <PRIVATE
 

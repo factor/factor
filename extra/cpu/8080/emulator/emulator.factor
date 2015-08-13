@@ -488,7 +488,7 @@ ERROR: undefined-8080-opcode n ;
     dup instruction-cycles nth [
         nip
     ] [
-        throw-undefined-8080-opcode
+        undefined-8080-opcode
     ] if* ;
 
 : process-interrupts ( cpu -- )

@@ -13,7 +13,7 @@ IN: mason.common
 ERROR: no-host-name ;
 
 : short-host-name ( -- string )
-    host-name "." split1 drop [ throw-no-host-name ] unless* ;
+    host-name "." split1 drop [ no-host-name ] unless* ;
 
 SYMBOL: current-git-id
 

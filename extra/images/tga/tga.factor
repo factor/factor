@@ -20,11 +20,11 @@ ERROR: bad-tga-unsupported ;
 
 : read-color-map-type ( -- byte )
     1 read le> dup
-    { 0 1 } member? [ throw-bad-tga-header ] unless ;
+    { 0 1 } member? [ bad-tga-header ] unless ;
 
 : read-image-type ( -- byte )
     1 read le> dup
-    { 0 1 2 3 9 10 11 } member? [ throw-bad-tga-header ] unless ; inline
+    { 0 1 2 3 9 10 11 } member? [ bad-tga-header ] unless ; inline
 
 : read-color-map-first ( -- short )
     2 read le> ; inline
@@ -70,10 +70,10 @@ ERROR: bad-tga-unsupported ;
     4 read le> ; inline
 
 : read-signature ( -- )
-    18 read ascii decode "TRUEVISION-XFILE.\0" = [ throw-bad-tga-footer ] unless ; inline
+    18 read ascii decode "TRUEVISION-XFILE.\0" = [ bad-tga-footer ] unless ; inline
 
 : read-extension-size ( -- )
-    2 read le> 495 = [ throw-bad-tga-extension-size ] unless ; inline
+    2 read le> 495 = [ bad-tga-extension-size ] unless ; inline
 
 : read-author-name ( -- string )
     41 read ascii decode [ 0 = ] trim ; inline
@@ -83,12 +83,12 @@ ERROR: bad-tga-unsupported ;
 
 : read-date-timestamp ( -- timestamp )
     timestamp new
-    2 read le> dup 12 [1,b] member? [ throw-bad-tga-timestamp ] unless >>month
-    2 read le> dup 31 [1,b] member? [ throw-bad-tga-timestamp ] unless >>day
+    2 read le> dup 12 [1,b] member? [ bad-tga-timestamp ] unless >>month
+    2 read le> dup 31 [1,b] member? [ bad-tga-timestamp ] unless >>day
     2 read le>                                                   >>year
-    2 read le> dup 23 [0,b] member? [ throw-bad-tga-timestamp ] unless >>hour
-    2 read le> dup 59 [0,b] member? [ throw-bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0,b] member? [ throw-bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 23 [0,b] member? [ bad-tga-timestamp ] unless >>hour
+    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>minute
+    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>second ; inline
 
 : read-job-name ( -- string )
     41 read ascii decode [ 0 = ] trim ; inline
@@ -96,8 +96,8 @@ ERROR: bad-tga-unsupported ;
 : read-job-time ( -- duration )
     duration new
     2 read le>                                                   >>hour
-    2 read le> dup 59 [0,b] member? [ throw-bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0,b] member? [ throw-bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>minute
+    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>second ; inline
 
 : read-software-id ( -- string )
     41 read ascii decode [ 0 = ] trim ; inline
@@ -240,10 +240,10 @@ ERROR: bad-tga-unsupported ;
 
     #! Only 24-bit uncompressed BGR and 32-bit uncompressed BGRA are supported.
     #! Other formats would need to be converted to work within the image class.
-    map-type 0 = [ throw-bad-tga-unsupported ] unless
-    image-type 2 = [ throw-bad-tga-unsupported ] unless
-    pixel-depth { 24 32 } member? [ throw-bad-tga-unsupported ] unless
-    pixel-order { 0 2 } member? [ throw-bad-tga-unsupported ] unless
+    map-type 0 = [ bad-tga-unsupported ] unless
+    image-type 2 = [ bad-tga-unsupported ] unless
+    pixel-depth { 24 32 } member? [ bad-tga-unsupported ] unless
+    pixel-order { 0 2 } member? [ bad-tga-unsupported ] unless
 
     #! Create image instance
     image new
@@ -259,7 +259,7 @@ M: tga-image stream>image*
 M: tga-image image>stream
     2drop
     [
-        component-order>> { BGRA BGRA } member? [ throw-bad-tga-unsupported ] unless
+        component-order>> { BGRA BGRA } member? [ bad-tga-unsupported ] unless
     ] keep
 
     B{ 0 }         write #! id-length

@@ -62,7 +62,7 @@ PRIVATE>
 ERROR: no-group string ;
 
 : ?group-id ( string -- id )
-    dup group-struct [ nip gr_gid>> ] [ throw-no-group ] if* ;
+    dup group-struct [ nip gr_gid>> ] [ no-group ] if* ;
 
 <PRIVATE
 

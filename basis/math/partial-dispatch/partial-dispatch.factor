@@ -19,7 +19,7 @@ ERROR: bad-integer-op word ;
 
 M: word integer-op-input-classes
     dup "input-classes" word-prop
-    [ ] [ throw-bad-integer-op ] ?if ;
+    [ ] [ bad-integer-op ] ?if ;
 
 : generic-variant ( op -- generic-op/f )
     dup "derived-from" word-prop [ first ] [ ] ?if ;

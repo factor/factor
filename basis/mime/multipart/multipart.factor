@@ -116,7 +116,7 @@ ERROR: unknown-content-disposition multipart ;
             [ dup mime-separator>> dump-string >>name-content ] dip
             >>name dup save-mime-part
         ] [
-             throw-unknown-content-disposition
+             unknown-content-disposition
         ] if*
     ] if* ;
 
@@ -128,7 +128,7 @@ ERROR: no-content-disposition multipart ;
             parse-content-disposition-form-data >>content-disposition
             parse-form-data
         ] }
-        [ throw-no-content-disposition ]
+        [ no-content-disposition ]
     } case ;
 
 : read-assert-sequence= ( sequence -- )

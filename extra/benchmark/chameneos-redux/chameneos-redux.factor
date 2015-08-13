@@ -38,7 +38,7 @@ TUPLE: meeting-place count mailbox ;
             { { yellow blue } [ red ] }
             { { blue red } [ yellow ] }
             { { blue yellow } [ red ] }
-            [ throw-bad-color-pair ]
+            [ bad-color-pair ]
         } case
     ] if ;
 

@@ -47,7 +47,7 @@ M: sequence shape array-replace wrap-shape ;
 ERROR: no-negative-shape-components shape ;
 
 : check-shape-domain ( seq -- seq )
-    dup [ 0 < ] any? [ throw-no-negative-shape-components ] when ;
+    dup [ 0 < ] any? [ no-negative-shape-components ] when ;
 
 GENERIC: shape-capacity ( shape -- n )
 
@@ -68,20 +68,20 @@ ERROR: no-abnormally-shaped-arrays underlying shape ;
 GENERIC: check-underlying-shape ( underlying shape -- underlying shape )
 
 M: abnormal-shape check-underlying-shape
-    throw-no-abnormally-shaped-arrays ;
+    no-abnormally-shaped-arrays ;
 
 M: uniform-shape check-underlying-shape
     shape>> check-underlying-shape ;
 
 M: sequence check-underlying-shape
     2dup [ length ] [ shape-capacity ] bi*
-    = [ throw-underlying-shape-mismatch ] unless ; inline
+    = [ underlying-shape-mismatch ] unless ; inline
 
 ERROR: shape-mismatch shaped0 shaped1 ;
 
 : check-shape ( shaped-array shaped-array -- shaped-array shaped-array )
     2dup [ shape>> ] bi@
-    sequence= [ throw-shape-mismatch ] unless ;
+    sequence= [ shape-mismatch ] unless ;
 
 TUPLE: shaped-array underlying shape ;
 TUPLE: row-array < shaped-array ;

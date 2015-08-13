@@ -37,7 +37,7 @@ M: postgresql-result-null summary ( obj -- str )
     drop "PQexec returned f." ;
 
 : postgresql-result-ok? ( res -- ? )
-    [ throw-postgresql-result-null ] unless*
+    [ postgresql-result-null ] unless*
     PQresultStatus
     PGRES_COMMAND_OK PGRES_TUPLES_OK 2array member? ;
 

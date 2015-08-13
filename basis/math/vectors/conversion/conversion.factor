@@ -18,7 +18,7 @@ ERROR: bad-vconvert-input value expected-type ;
     { uchar ushort uint ulonglong } member-eq? ;
 
 : check-vconvert-type ( value expected-type -- value )
-    2dup instance? [ drop ] [ throw-bad-vconvert-input ] if ; inline
+    2dup instance? [ drop ] [ bad-vconvert-input ] if ; inline
 
 :: [vconvert] ( from-element to-element from-size to-size from-type to-type -- quot )
     {
@@ -46,7 +46,7 @@ ERROR: bad-vconvert-input value expected-type ;
         [ steps 1 = not ]
         [ from-element to-element [ float-type? ] bi@ xor ]
         [ from-element unsigned-type? to-element unsigned-type? not and ]
-    } 0|| [ from-type to-type throw-bad-vconvert ] when ;
+    } 0|| [ from-type to-type bad-vconvert ] when ;
 
 :: ([vpack-unsigned]) ( from-type to-type -- quot )
     from-type new simd-rep
@@ -75,7 +75,7 @@ ERROR: bad-vconvert-input value expected-type ;
         [ steps 1 = not ]
         [ from-element to-element [ float-type? ] bi@ xor ]
         [ from-element unsigned-type? not to-element unsigned-type? and ]
-    } 0|| [ from-type to-type throw-bad-vconvert ] when ;
+    } 0|| [ from-type to-type bad-vconvert ] when ;
 
 :: ([vunpack]) ( from-type to-type -- quot )
     from-type new simd-rep
@@ -98,7 +98,7 @@ MACRO:: vconvert ( from-type to-type -- quot )
     from-element heap-size :> from-size
     to-element   heap-size :> to-size
 
-    from-length to-length = [ from-type to-type throw-bad-vconvert ] unless
+    from-length to-length = [ from-type to-type bad-vconvert ] unless
 
     from-element to-element from-size to-size from-type to-type {
         { [ from-size to-size < ] [ [vunpack] ] }

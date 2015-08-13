@@ -24,12 +24,12 @@ SYMBOLS: up-axis unit-ratio ;
 
 : x/ ( tag child-name -- child-tag )
     [ tag-named ]
-    [ rot dup [ drop throw-missing-child ] unless 2nip ]
+    [ rot dup [ drop missing-child ] unless 2nip ]
     2bi ; inline
 
 : x@ ( tag attr-name -- attr-value )
     [ attr ]
-    [ rot dup [ drop throw-missing-attr ] unless 2nip ]
+    [ rot dup [ drop missing-attr ] unless 2nip ]
     2bi ; inline
 
 : xt ( tag -- content ) children>string ;

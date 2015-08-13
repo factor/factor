@@ -46,4 +46,4 @@ ERROR: invalid-duplex-stream ;
 M: duplex-stream underlying-handle
     >duplex-stream<
     [ underlying-handle ] bi@
-    [ = [ throw-invalid-duplex-stream ] when ] keep ;
+    [ = [ invalid-duplex-stream ] when ] keep ;

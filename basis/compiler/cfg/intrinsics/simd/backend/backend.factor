@@ -121,7 +121,7 @@ MACRO: if-literals-match ( quots -- quot )
             ! node literals quot
             [ _ firstn ] dip call
             drop
-        ] [ 2drop throw-bad-simd-intrinsic ] if
+        ] [ 2drop bad-simd-intrinsic ] if
     ] ;
 
 CONSTANT: [unary]        [ ds-drop  ds-pop ]

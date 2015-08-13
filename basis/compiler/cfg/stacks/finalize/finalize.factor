@@ -24,7 +24,7 @@ ERROR: bad-peek dst loc ;
 
 : insert-peeks ( from to -- )
     [ inserting-peeks ] keep
-    [ dup n>> 0 < [ throw-bad-peek ] [ ##peek, ] if ] each-insertion ;
+    [ dup n>> 0 < [ bad-peek ] [ ##peek, ] if ] each-insertion ;
 
 : insert-replaces ( from to -- )
     [ inserting-replaces ] keep

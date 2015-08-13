@@ -8,8 +8,8 @@ IN: classes.error.tests
 ! Test error classes
 ERROR: error-class-test a b c ;
 
-{ "( a b c -- * )" } [ \ throw-error-class-test stack-effect effect>string ] unit-test
-{ f } [ \ throw-error-class-test "inline" word-prop ] unit-test
+{ "( a b c -- * )" } [ \ error-class-test stack-effect effect>string ] unit-test
+{ f } [ \ error-class-test "inline" word-prop ] unit-test
 
 [ "IN: classes.error.tests ERROR: error-x ; : error-x 3 ;" eval( -- ) ]
 [ error>> error>> redefine-error? ] must-fail-with
@@ -37,4 +37,4 @@ DEFER: error-y
 ERROR: base-error x y ;
 ERROR: derived-error < base-error z ;
 
-{ ( x y z -- * ) } [ \ throw-derived-error stack-effect ] unit-test
+{ ( x y z -- * ) } [ \ derived-error stack-effect ] unit-test

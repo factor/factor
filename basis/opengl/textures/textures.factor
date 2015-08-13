@@ -148,7 +148,7 @@ M: XBGR fix-internal-component-order drop RGBA ;
 : image-internal-format ( component-order component-type -- internal-format )
     2dup
     [ fix-internal-component-order ] dip 2array image-internal-formats at
-    [ 2nip ] [ throw-unsupported-component-order ] if* ;
+    [ 2nip ] [ unsupported-component-order ] if* ;
 
 : reversed-type? ( component-type -- ? )
     { u-9-9-9-e5-components float-11-11-10-components } member? ;
@@ -167,7 +167,7 @@ M: XBGR fix-internal-component-order drop RGBA ;
             { RGBA [ drop GL_RGBA_INTEGER ] }
             { BGRX [ drop GL_BGRA_INTEGER ] }
             { RGBX [ drop GL_RGBA_INTEGER ] }
-            [ swap throw-unsupported-component-order ]
+            [ swap unsupported-component-order ]
         } case
     ] [
         swap {
@@ -189,22 +189,22 @@ M: XBGR fix-internal-component-order drop RGBA ;
             { INTENSITY [ drop GL_INTENSITY ] }
             { DEPTH [ drop GL_DEPTH_COMPONENT ] }
             { DEPTH-STENCIL [ drop GL_DEPTH_STENCIL ] }
-            [ swap throw-unsupported-component-order ]
+            [ swap unsupported-component-order ]
         } case
     ] if ;
 
 GENERIC: (component-type>type) ( component-order component-type -- gl-type )
 
-M: object (component-type>type) throw-unsupported-component-order ;
+M: object (component-type>type) unsupported-component-order ;
 
 : four-channel-alpha-first? ( component-order component-type -- ? )
     over component-count 4 =
     [ drop alpha-channel-precedes-colors? ]
-    [ throw-unsupported-component-order ] if ;
+    [ unsupported-component-order ] if ;
 
 : not-alpha-first ( component-order component-type -- )
     over alpha-channel-precedes-colors?
-    [ throw-unsupported-component-order ]
+    [ unsupported-component-order ]
     [ 2drop ] if ;
 
 M: ubyte-components          (component-type>type)
@@ -238,22 +238,22 @@ M: u-10-10-10-2-components   (component-type>type)
 M: u-24-components           (component-type>type)
     over DEPTH =
     [ 2drop GL_UNSIGNED_INT ]
-    [ throw-unsupported-component-order ] if ;
+    [ unsupported-component-order ] if ;
 
 M: u-24-8-components         (component-type>type)
     over DEPTH-STENCIL =
     [ 2drop GL_UNSIGNED_INT_24_8 ]
-    [ throw-unsupported-component-order ] if ;
+    [ unsupported-component-order ] if ;
 
 M: u-9-9-9-e5-components     (component-type>type)
     over BGR =
     [ 2drop GL_UNSIGNED_INT_5_9_9_9_REV ]
-    [ throw-unsupported-component-order ] if ;
+    [ unsupported-component-order ] if ;
 
 M: float-11-11-10-components (component-type>type)
     over BGR =
     [ 2drop GL_UNSIGNED_INT_10F_11F_11F_REV ]
-    [ throw-unsupported-component-order ] if ;
+    [ unsupported-component-order ] if ;
 
 : image-data-format ( component-order component-type -- gl-format gl-type )
     [ (component-order>format) ] [ (component-type>type) ] 2bi ;

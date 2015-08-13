@@ -48,7 +48,7 @@ ERROR: no-vorbis-in-ogg ;
     stream>> read-bytes-into ; inline
 
 : ?ogg-error ( n -- )
-    dup 0 < [ throw-ogg-error ] [ drop ] if ; inline
+    dup 0 < [ ogg-error ] [ drop ] if ; inline
 
 : confirm-buffer ( len vorbis-stream -- ? )
     '[ _ sync-state>> swap ogg_sync_wrote ?ogg-error ] keep zero? not ; inline
@@ -119,11 +119,11 @@ ERROR: no-vorbis-in-ogg ;
     #vorbis-headers>> 1 2 between? not ; inline
 
 : ?vorbis-error ( code -- )
-    [ throw-vorbis-error ] unless-zero ; inline
+    [ vorbis-error ] unless-zero ; inline
 
 : get-remaining-vorbis-header-packet ( player -- ? )
     [ stream-state>> ] [ packet>> ] bi ogg_stream_packetout {
-        { [ dup 0 <   ] [ throw-vorbis-error ] }
+        { [ dup 0 <   ] [ vorbis-error ] }
         { [ dup zero? ] [ drop f ] }
         [ drop t ]
     } cond ;
@@ -153,7 +153,7 @@ ERROR: no-vorbis-in-ogg ;
 
 : initialize-decoder ( vorbis-stream -- )
     dup #vorbis-headers>> zero?
-    [ throw-no-vorbis-in-ogg ]
+    [ no-vorbis-in-ogg ]
     [ init-vorbis-codec ] if ;
 
 : get-pending-decoded-audio ( vorbis-stream -- pcm len )

@@ -67,7 +67,7 @@ ERROR: vreg-not-new vreg ;
 
 :: set-ac ( vreg ac -- )
     #! Set alias class of newly-seen vreg.
-    vreg vregs>acs get key? [ vreg throw-vreg-not-new ] when
+    vreg vregs>acs get key? [ vreg vreg-not-new ] when
     ac vreg vregs>acs get set-at
     vreg ac ac>vregs push ;
 

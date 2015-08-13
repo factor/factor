@@ -30,7 +30,7 @@ ERROR: not-spilled-error vreg ;
 : vreg>spill-slot ( vreg -- spill-slot )
     dup vreg>reg dup spill-slot?
     [ nip ]
-    [ drop leader throw-not-spilled-error ] if ;
+    [ drop leader not-spilled-error ] if ;
 
 : vregs>regs ( vregs -- assoc )
     [ dup vreg>reg ] H{ } map>assoc ;

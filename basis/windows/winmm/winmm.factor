@@ -20,7 +20,7 @@ ALIAS: mciSendString mciSendStringW
 ERROR: mci-error n ;
 
 : check-mci-error ( n -- )
-    [ throw-mci-error ] unless-zero ;
+    [ mci-error ] unless-zero ;
 
 : open-command ( path -- )
     "open \"%s\" type mpegvideo alias MediaFile" sprintf f 0 f

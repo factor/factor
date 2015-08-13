@@ -16,7 +16,7 @@ SYMBOL: representations
 ERROR: bad-vreg vreg ;
 
 : rep-of ( vreg -- rep )
-    representations get ?at [ throw-bad-vreg ] unless ;
+    representations get ?at [ bad-vreg ] unless ;
 
 : set-rep-of ( rep vreg -- )
     representations get set-at ;

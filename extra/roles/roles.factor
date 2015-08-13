@@ -36,7 +36,7 @@ PREDICATE: role < mixin-class
 
 : check-for-slot-overlap ( class roles-and-superclass slots -- )
     [ [ role-or-tuple-slot-names ] map concat ] [ slot-names ] bi* append
-    duplicates dup empty? [ 2drop ] [ throw-role-slot-overlap ] if ;
+    duplicates dup empty? [ 2drop ] [ role-slot-overlap ] if ;
 
 : roles>slots ( roles-and-superclass slots -- superclass slots' )
     [
@@ -44,7 +44,7 @@ PREDICATE: role < mixin-class
         dup length {
             { 0 [ drop tuple ] }
             { 1 [ first ] }
-            [ drop throw-multiple-inheritance-attempted ]
+            [ drop multiple-inheritance-attempted ]
         } case
         swap [ role-slots ] map concat
     ] dip append ;

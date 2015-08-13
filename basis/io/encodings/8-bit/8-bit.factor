@@ -18,7 +18,7 @@ SYMBOL: 8-bit-encodings
 TUPLE: 8-bit { biassoc biassoc read-only } ;
 
 : 8-bit-encode ( char 8-bit -- byte )
-    biassoc>> value-at [ throw-encode-error ] unless* ; inline
+    biassoc>> value-at [ encode-error ] unless* ; inline
 
 M: 8-bit encode-char
     swap [ 8-bit-encode ] dip stream-write1 ;

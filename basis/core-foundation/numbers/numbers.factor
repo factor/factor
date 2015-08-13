@@ -67,5 +67,5 @@ ERROR: unsupported-number-type type ;
         { kCFNumberLongType [ long (CFNumber>number) ] }
         { kCFNumberLongLongType [ longlong (CFNumber>number) ] }
         { kCFNumberDoubleType [ double (CFNumber>number) ] }
-        [ throw-unsupported-number-type ]
+        [ unsupported-number-type ]
     } case ;

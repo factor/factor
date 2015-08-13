@@ -58,7 +58,7 @@ ERROR: invalid-plist-object object ;
         { NSArray [ (plist-NSArray>) ] }
         { NSDictionary [ (plist-NSDictionary>) ] }
         { NSObject [ ] }
-        [ throw-invalid-plist-object ]
+        [ invalid-plist-object ]
     } objc-class-case ;
 
 : read-plist ( path -- assoc )

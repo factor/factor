@@ -11,7 +11,7 @@ ERROR: box-full box ;
 
 : >box ( value box -- )
     dup occupied>>
-    [ throw-box-full ] [ t >>occupied value<< ] if ; inline
+    [ box-full ] [ t >>occupied value<< ] if ; inline
 
 ERROR: box-empty box ;
 

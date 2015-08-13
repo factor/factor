@@ -28,7 +28,7 @@ IN: ftp.client
 ERROR: ftp-error got expected ;
 
 : ftp-assert ( ftp-response n -- )
-    2dup [ n>> ] dip = [ 2drop ] [ throw-ftp-error ] if ;
+    2dup [ n>> ] dip = [ 2drop ] [ ftp-error ] if ;
 
 : ftp-command ( string -- ftp-response )
     ftp-send read-response ;

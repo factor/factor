@@ -182,7 +182,7 @@ UNION: os2-header os2v1-header os2v2-header ;
         { 40 [ read-v3-header ] }
         { 108 [ read-v4-header ] }
         { 124 [ read-v5-header ] }
-        [ throw-unknown-bitmap-header ]
+        [ unknown-bitmap-header ]
     } case ;
 
 : color-index-length ( header -- n )
@@ -228,7 +228,7 @@ GENERIC: bitmap>component-order* ( loading-bitmap header -- object )
         { 8 [ BGR ] }
         { 4 [ BGR ] }
         { 1 [ BGR ] }
-        [ throw-unknown-component-order ]
+        [ unknown-component-order ]
     } case ;
 
 : advanced-bitmap>component-order ( loading-bitmap -- object )

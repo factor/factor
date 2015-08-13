@@ -80,7 +80,7 @@ ERROR: invalid-primitive vocabulary word effect ;
     [ drop vocabulary>> = ]
     [ drop nip primitive? ]
     [ [ nip "declared-effect" word-prop ] dip = ] 3tri and and
-    [ 3drop ] [ throw-invalid-primitive ] if ;
+    [ 3drop ] [ invalid-primitive ] if ;
 
 : lookup-word ( name vocab -- word ) vocab-words-assoc at ;
 
@@ -216,13 +216,13 @@ M: word reset-word
 
 : reveal ( word -- )
     dup [ name>> ] [ vocabulary>> ] bi dup vocab-words-assoc
-    [ ] [ throw-no-vocab ] ?if set-at ;
+    [ ] [ no-vocab ] ?if set-at ;
 
 ERROR: bad-create name vocab ;
 
 : check-create ( name vocab -- name vocab )
     2dup [ string? ] [ [ string? ] [ vocab? ] bi or ] bi* and
-    [ throw-bad-create ] unless ;
+    [ bad-create ] unless ;
 
 : create-word ( name vocab -- word )
     check-create 2dup lookup-word

@@ -12,7 +12,7 @@ IN: inverse
 ERROR: fail ;
 M: fail summary drop "Matching failed" ;
 
-: assure ( ? -- ) [ throw-fail ] unless ; inline
+: assure ( ? -- ) [ fail ] unless ; inline
 
 : =/fail ( obj1 obj2 -- ) = assure ; inline
 
@@ -35,7 +35,7 @@ M: fail summary drop "Matching failed" ;
 ERROR: bad-math-inverse ;
 
 : next ( revquot -- revquot* first )
-    [ throw-bad-math-inverse ]
+    [ bad-math-inverse ]
     [ unclip-slice ] if-empty ;
 
 : constant-word? ( word -- ? )
@@ -44,7 +44,7 @@ ERROR: bad-math-inverse ;
     [ in>> empty? ] bi and ;
 
 : assure-constant ( constant -- quot )
-    dup word? [ throw-bad-math-inverse ] when 1quotation ;
+    dup word? [ bad-math-inverse ] when 1quotation ;
 
 : swap-inverse ( math-inverse revquot -- revquot* quot )
     next assure-constant rot second '[ @ swap @ ] ;
@@ -169,7 +169,7 @@ ERROR: missing-literal ;
 
 \ ? 2 [
     [ assert-literal ] bi@
-    [ swap [ over = ] dip swap [ 2drop f ] [ = [ t ] [ throw-fail ] if ] if ]
+    [ swap [ over = ] dip swap [ 2drop f ] [ = [ t ] [ fail ] if ] if ]
     2curry
 ] define-pop-inverse
 
@@ -255,7 +255,7 @@ DEFER: __
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
-    [ tuple-slots [ ] any? [ throw-fail ] when ]
+    [ tuple-slots [ ] any? [ fail ] when ]
     compose ;
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse

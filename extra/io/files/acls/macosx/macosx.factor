@@ -77,7 +77,7 @@ PRIVATE>
 ERROR: acl-init-failed n ;
 
 :: n>new-acl ( n -- acl )
-    n acl_init dup [ n throw-acl-init-failed ] unless ;
+    n acl_init dup [ n acl-init-failed ] unless ;
 
 : new-acl ( -- acl ) 1 n>new-acl ; inline
 

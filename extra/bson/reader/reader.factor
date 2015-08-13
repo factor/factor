@@ -60,7 +60,7 @@ DEFER: read-elements
         { T_Binary_Function [ read-sized-string ] }
         { T_Binary_MD5 [ read >string ] }
         { T_Binary_UUID [ read >string ] }
-        [ "unknown binary sub-type" throw-unknown-bson-type ]
+        [ "unknown binary sub-type" unknown-bson-type ]
    } case ; inline
 
 TYPED: bson-regexp-read ( -- mdbregexp: mdbregexp )
@@ -90,7 +90,7 @@ TYPED: element-data-read ( type: integer -- object )
         { T_Code        [ read-int32 read-sized-string ] }
         { T_ScopedCode  [ read-int32 drop read-cstring H{ } clone stream>assoc <mongo-scoped-code> ] }
         { T_NULL        [ f ] }
-        [ "type unknown" throw-unknown-bson-type ]
+        [ "type unknown" unknown-bson-type ]
     } case ; inline recursive
 
 TYPED: (read-object) ( type: integer name: string -- )

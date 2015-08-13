@@ -267,7 +267,7 @@ M: mdb-collection validate.
 <PRIVATE
 
 : send-message-check-error ( message -- )
-    send-message lasterror [ throw-mdb-error ] when* ;
+    send-message lasterror [ mdb-error ] when* ;
 
 PRIVATE>
 

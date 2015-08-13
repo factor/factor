@@ -15,7 +15,7 @@ ERROR: article-expects-name-and-title got ;
 SYNTAX: ARTICLE:
     location [
         \ ; parse-until >array
-        dup length 2 < [ throw-article-expects-name-and-title ] when
+        dup length 2 < [ article-expects-name-and-title ] when
         [ first2 ] [ 2 tail ] bi <article>
         over add-article >link
     ] dip remember-definition ;

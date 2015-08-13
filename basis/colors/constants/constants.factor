@@ -28,6 +28,6 @@ PRIVATE>
 ERROR: no-such-color name ;
 
 : named-color ( name -- color )
-    dup colors at [ ] [ throw-no-such-color ] ?if ;
+    dup colors at [ ] [ no-such-color ] ?if ;
 
 SYNTAX: COLOR: scan-token named-color suffix! ;

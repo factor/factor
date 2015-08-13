@@ -7,7 +7,7 @@ ERROR: bad-successors ;
 
 : check-successors ( bb -- )
     dup successors>> [ predecessors>> member-eq? ] with all?
-    [ throw-bad-successors ] unless ;
+    [ bad-successors ] unless ;
 
 : check-cfg ( cfg -- )
     [ check-successors ] each-basic-block ;

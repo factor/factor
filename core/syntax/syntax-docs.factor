@@ -823,7 +823,7 @@ HELP: SLOT:
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class and a word " { $snippet "throw-classname" } " that throws a new instance of the error." }
+{ $description "Defines a new tuple class and a word " { $snippet "classname" } " that throws a new instance of the error." }
 { $notes
     "The following two snippets are equivalent:"
     { $code

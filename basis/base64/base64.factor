@@ -24,7 +24,7 @@ CONSTANT: alphabet
 
 : base64>ch ( ch -- ch )
     $[ alphabet alphabet-inverse 0 CHAR: = pick set-nth ] nth
-    [ throw-malformed-base64 ] unless* ; inline
+    [ malformed-base64 ] unless* ; inline
 
 : (write-lines) ( column byte-array -- column' )
     output-stream get dup '[
@@ -84,7 +84,7 @@ PRIVATE>
     4 "\n\r" pick read-ignoring dup length {
         { 0 [ 2drop ] }
         { 4 [ decode4 (decode-base64) ] }
-        [ throw-malformed-base64 ]
+        [ malformed-base64 ]
     } case ;
 
 PRIVATE>

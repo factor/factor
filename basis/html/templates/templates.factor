@@ -39,10 +39,10 @@ M: no-boilerplate error.
 SYMBOL: title
 
 : set-title ( string -- )
-    title get [ >box ] [ throw-no-boilerplate ] if* ;
+    title get [ >box ] [ no-boilerplate ] if* ;
 
 : get-title ( -- string )
-    title get [ value>> ] [ throw-no-boilerplate ] if* ;
+    title get [ value>> ] [ no-boilerplate ] if* ;
 
 : write-title ( -- )
     get-title write ;

@@ -88,7 +88,7 @@ PRIVATE>
 ERROR: no-relative-prime n ;
 
 : find-relative-prime* ( n guess -- p )
-    [ dup 1 <= [ throw-no-relative-prime ] when ]
+    [ dup 1 <= [ no-relative-prime ] when ]
     [ >odd dup 1 <= [ drop 3 ] when ] bi*
     [ 2dup coprime? ] [ 2 + ] until nip ;
 
@@ -98,6 +98,6 @@ ERROR: no-relative-prime n ;
 ERROR: too-few-primes n numbits ;
 
 : unique-primes ( n numbits -- seq )
-    2dup 2^ estimated-primes > [ throw-too-few-primes ] when
+    2dup 2^ estimated-primes > [ too-few-primes ] when
     2dup [ random-prime ] curry replicate
     dup all-unique? [ 2nip ] [ drop unique-primes ] if ;

@@ -172,7 +172,7 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
 ERROR: bad-live-interval live-interval ;
 
 : check-start ( live-interval -- )
-    dup start>> -1 = [ throw-bad-live-interval ] [ drop ] if ;
+    dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
 
 : finish-live-intervals ( live-intervals -- )
     [

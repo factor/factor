@@ -22,7 +22,7 @@ ERROR: bad-location str ;
         { 3 [ first3 [ string>number ] tri@ 60.0 / + 60.0 / + ] }
         { 2 [ first2 [ string>number ] bi@ 60.0 / + ] }
         { 1 [ first string>number ] }
-        [ drop throw-bad-location ]
+        [ drop bad-location ]
     } case ;
 
 : string>longitude ( str -- lon/f )

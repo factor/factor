@@ -132,4 +132,4 @@ ERROR: bad-stack-effect word expected got ;
 
 : check-stack-effect ( word effect -- )
     over stack-effect 2dup effect=
-    [ 3drop ] [ throw-bad-stack-effect ] if ;
+    [ 3drop ] [ bad-stack-effect ] if ;

@@ -8,7 +8,7 @@ MIXIN: definition-mixin
 ERROR: no-compilation-unit definition ;
 
 : add-to-unit ( key set -- )
-    [ adjoin ] [ throw-no-compilation-unit ] if* ;
+    [ adjoin ] [ no-compilation-unit ] if* ;
 
 SYMBOL: changed-definitions
 

@@ -14,7 +14,7 @@ SYMBOL: in-lambda?
 ERROR: invalid-local-name name ;
 
 : check-local-name ( name -- name )
-    dup { "]" "]!" } member? [ throw-invalid-local-name ] when ;
+    dup { "]" "]!" } member? [ invalid-local-name ] when ;
 
 : make-local ( name -- word )
     check-local-name "!" ?tail [
@@ -79,7 +79,7 @@ M: lambda-parser parse-quotation ( -- quotation )
 : (parse-locals-definition) ( effect vars assoc reader-quot -- word quot effect )
     with-lambda-scope <lambda>
     [ nip "lambda" set-word-prop ]
-    [ nip rewrite-closures dup length 1 = [ first ] [ throw-bad-rewrite ] if ]
+    [ nip rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ]
     [ drop nip ] 3tri ; inline
 
 : parse-locals-definition ( word reader-quot -- word quot effect )

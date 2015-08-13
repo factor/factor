@@ -24,7 +24,7 @@ ERROR: no-slot name tuple ;
 
 : offset-of-slot ( name tuple -- n )
     2dup class-of all-slots slot-named
-    [ 2nip offset>> ] [ throw-no-slot ] if* ;
+    [ 2nip offset>> ] [ no-slot ] if* ;
 
 : get-slot-named ( name tuple -- value )
     [ nip ] [ offset-of-slot ] 2bi slot ;
@@ -59,7 +59,7 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     [ [ layout-of ] [ class-of tuple-layout ] bi eq? ] [ drop t ] if ;
 
 : check-tuple ( object -- tuple )
-    dup tuple? [ throw-not-a-tuple ] unless ; inline
+    dup tuple? [ not-a-tuple ] unless ; inline
 
 : prepare-tuple-slots ( tuple -- n tuple )
     check-tuple [ tuple-size iota ] keep ;
@@ -324,7 +324,7 @@ M: tuple-class (define-tuple-class)
 ERROR: not-a-tuple-class object ;
 
 : check-tuple-class ( class -- class )
-    dup tuple-class? [ throw-not-a-tuple-class ] unless ; inline
+    dup tuple-class? [ not-a-tuple-class ] unless ; inline
 
 : define-boa-word ( word class -- )
     check-tuple-class [ [ boa ] curry ] [ boa-effect ] bi

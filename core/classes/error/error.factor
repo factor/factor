@@ -22,11 +22,4 @@ M: error-class reset-class
             [ all-slots thrower-effect ]
             tri define-declared
         ]
-        [
-            2drop
-            [ name>> "throw-" prepend create-word-in [ reset-generic ] keep ]
-            [ [ boa throw ] curry ]
-            [ all-slots thrower-effect ]
-            tri define-declared
-        ]
     } 3cleave ;

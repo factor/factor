@@ -446,17 +446,17 @@ ERROR: winsock-exception n string ;
 : winsock-error ( -- )
     maybe-winsock-exception [ throw ] when* ;
 
-: (throw-winsock-error) ( n -- * )
-    [ ] [ n>win32-error-string ] bi throw-winsock-exception ;
+: (winsock-error) ( n -- * )
+    [ ] [ n>win32-error-string ] bi winsock-exception ;
 
 : throw-winsock-error ( -- * )
-    WSAGetLastError (throw-winsock-error) ;
+    WSAGetLastError (winsock-error) ;
 
 : winsock-error=0/f ( n/f -- )
-    { 0 f } member? [ throw-winsock-error ] when ;
+    { 0 f } member? [ winsock-error ] when ;
 
 : winsock-error!=0/f ( n/f -- )
-    { 0 f } member? [ throw-winsock-error ] unless ;
+    { 0 f } member? [ winsock-error ] unless ;
 
 ! WSAStartup and WSACleanup return the error code directly
 : winsock-return-check ( n/f -- )

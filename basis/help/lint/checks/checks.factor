@@ -30,7 +30,7 @@ SYMBOL: vocab-articles
             last assert=
         ] vocabs-quot get call( quot -- )
     ] leaks members length [
-        "%d disposable(s) leaked in example" sprintf throw-simple-lint-error
+        "%d disposable(s) leaked in example" sprintf simple-lint-error
     ] unless-zero ;
 
 : check-examples ( element -- )
@@ -88,7 +88,7 @@ SYMBOL: vocab-articles
         [ effect-values ] [ extract-values ] bi* 2dup
         sequence= [ 2drop ] [
             "$values don't match stack effect; expected %u, got %u" sprintf
-            throw-simple-lint-error
+            simple-lint-error
         ] if
     ] if ;
 
@@ -96,17 +96,17 @@ SYMBOL: vocab-articles
     [ effect-effects ] [ extract-value-effects ] bi*
     [ 2dup and [ = ] [ 2drop t ] if ] 2all? [
         "$quotation stack effects in $values don't match"
-        throw-simple-lint-error
+        simple-lint-error
     ] unless ;
 
 : check-nulls ( element -- )
     \ $values swap elements
     null swap deep-member?
-    [ "$values should not contain null" throw-simple-lint-error ] when ;
+    [ "$values should not contain null" simple-lint-error ] when ;
 
 : check-see-also ( element -- )
     \ $see-also swap elements [ rest all-unique? ] all?
-    [ "$see-also are not unique" throw-simple-lint-error ] unless ;
+    [ "$see-also are not unique" simple-lint-error ] unless ;
 
 : vocab-exists? ( name -- ? )
     [ lookup-vocab ] [ all-vocabs-list get member? ] bi or ;
@@ -116,7 +116,7 @@ SYMBOL: vocab-articles
         second
         vocab-exists? [
             "$vocab-link to non-existent vocabulary"
-            throw-simple-lint-error
+            simple-lint-error
         ] unless
     ] each ;
 
@@ -127,23 +127,23 @@ SYMBOL: vocab-articles
     [
         "\n\t" intersects? [
             "Paragraph text should not contain \\n or \\t"
-            throw-simple-lint-error
+            simple-lint-error
         ] when
     ] [
         "  " swap subseq? [
             "Paragraph text should not contain double spaces"
-            throw-simple-lint-error
+            simple-lint-error
         ] when
     ] bi ;
 
 : check-whitespace ( str1 str2 -- )
     [ " " tail? ] [ " " head? ] bi* or
-    [ "Missing whitespace between strings" throw-simple-lint-error ] unless ;
+    [ "Missing whitespace between strings" simple-lint-error ] unless ;
 
 : check-bogus-nl ( element -- )
     { { $nl } { { $nl } } } [ head? ] with any? [
         "Simple element should not begin with a paragraph break"
-        throw-simple-lint-error
+        simple-lint-error
     ] when ;
 
 : extract-slots ( elements -- seq )
@@ -158,18 +158,18 @@ SYMBOL: vocab-articles
         ] [ extract-slots ] bi*
         [ swap member? ] with reject [
             ", " join "Described $slot does not exist: " prepend
-            throw-simple-lint-error
+            simple-lint-error
         ] unless-empty
     ] [
         nip empty? not [
             "A word that is not a class has a $class-description"
-            throw-simple-lint-error
+            simple-lint-error
         ] when
     ] if ;
 
 : check-article-title ( article -- )
     article-title first LETTER?
-    [ "Article title must begin with a capital letter" throw-simple-lint-error ] unless ;
+    [ "Article title must begin with a capital letter" simple-lint-error ] unless ;
 
 : check-elements ( element -- )
     {
@@ -184,7 +184,7 @@ SYMBOL: vocab-articles
     swap '[
         _ elements [
             rest { { } { "" } } member?
-            [ "Empty $description" throw-simple-lint-error ] when
+            [ "Empty $description" simple-lint-error ] when
         ] each
     ] each ;
 

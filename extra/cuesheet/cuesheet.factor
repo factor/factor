@@ -31,7 +31,7 @@ ERROR: unknown-filetype filetype ;
 
 : check-filetype ( filetype -- filetype )
     dup { "BINARY" "MOTOROLA" "AIFF" "WAVE" "MP3" } member?
-    [ throw-unknown-filetype ] unless ;
+    [ unknown-filetype ] unless ;
 
 ERROR: unknown-flag flag ;
 

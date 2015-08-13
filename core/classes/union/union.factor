@@ -68,7 +68,7 @@ M: object classes-contained-by
         dup dup [ classes-contained-by ] map concat sift append
         2dup set= [ 2drop f ] [ nip ] if
     ] follow concat
-    member-eq? [ throw-cannot-reference-self ] when ;
+    member-eq? [ cannot-reference-self ] when ;
 
 PRIVATE>
 

@@ -74,7 +74,7 @@ TYPED: checksum-header ( seq: byte-array -- n )
         [
             binary [ read-tar-header ] with-byte-reader
             dup checksum>>
-        ] dip = [ throw-checksum-error ] unless
+        ] dip = [ checksum-error ] unless
     ] if ;
 
 ERROR: unknown-typeflag ch ;

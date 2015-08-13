@@ -13,7 +13,7 @@ IN: regexp.parser
 ERROR: bad-number ;
 
 : ensure-number ( n -- n )
-    [ throw-bad-number ] unless* ;
+    [ bad-number ] unless* ;
 
 :: at-error ( key assoc quot: ( key -- replacement ) -- value )
     key assoc at* [ drop key quot call ] unless ; inline
@@ -45,13 +45,13 @@ MEMO: simple-category-table ( -- table )
         { [ "script=" ?head ] [
             dup simple-script-table at
             [ <script-class> ]
-            [ "script=" prepend throw-bad-class ] ?if
+            [ "script=" prepend bad-class ] ?if
         ] }
-        [ throw-bad-class ]
+        [ bad-class ]
     } cond ;
 
 : unicode-class ( name -- class )
-    dup parse-unicode-class [ ] [ throw-bad-class ] ?if ;
+    dup parse-unicode-class [ ] [ bad-class ] ?if ;
 
 : name>class ( name -- class )
     >string simple {
@@ -106,7 +106,7 @@ MEMO: simple-category-table ( -- table )
 ERROR: nonexistent-option name ;
 
 : ch>option ( ch -- singleton )
-    dup options-assoc at [ ] [ throw-nonexistent-option ] ?if ;
+    dup options-assoc at [ ] [ nonexistent-option ] ?if ;
 
 : option>ch ( option -- string )
     options-assoc value-at ;
@@ -198,7 +198,7 @@ Number = (!(","|"}").)* => [[ string>number ensure-number ]]
 Times = "," Number:n "}" => [[ 0 n <from-to> ]]
       | Number:n ",}" => [[ n <at-least> ]]
       | Number:n "}" => [[ n n <from-to> ]]
-      | "}" => [[ throw-bad-number ]]
+      | "}" => [[ bad-number ]]
       | Number:n "," Number:m "}" => [[ n m <from-to> ]]
 
 Repeated = Element:e "{" Times:t => [[ e t <times> ]]

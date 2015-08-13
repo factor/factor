@@ -26,7 +26,7 @@ ERROR: division-by-zero x ;
 
 M: integer /
     [
-        throw-division-by-zero
+        division-by-zero
     ] [
         dup 0 < [ [ neg ] bi@ ] when
         2dup fast-gcd [ /i ] curry bi@ fraction>
@@ -34,7 +34,7 @@ M: integer /
 
 M: integer recip
     1 swap [
-        throw-division-by-zero
+        division-by-zero
     ] [
         dup 0 < [ [ neg ] bi@ ] when fraction>
     ] if-zero ;

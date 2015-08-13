@@ -66,7 +66,7 @@ M: indirect extended? base>> extended? ;
 ERROR: bad-index indirect ;
 
 : check-ESP ( indirect -- indirect )
-    dup index>> { ESP RSP } member-eq? [ throw-bad-index ] when ;
+    dup index>> { ESP RSP } member-eq? [ bad-index ] when ;
 
 : canonicalize ( indirect -- indirect )
     #! Modify the indirect to work around certain addressing mode

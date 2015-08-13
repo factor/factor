@@ -20,13 +20,13 @@ ERROR: zlib-failed n string ;
             "stream error" "data error"
             "memory error" "buffer error" "zlib version error"
         } ?nth
-    ] if throw-zlib-failed ;
+    ] if zlib-failed ;
 
 : zlib-error ( n -- )
     dup {
         { compression.zlib.ffi:Z_OK [ drop ] }
         { compression.zlib.ffi:Z_STREAM_END [ drop ] }
-        [ dup zlib-error-message throw-zlib-failed ]
+        [ dup zlib-error-message zlib-failed ]
     } case ;
 
 : compressed-size ( byte-array -- n )

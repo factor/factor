@@ -33,7 +33,7 @@ ERROR: invalid-file-size n path ;
 
 : zero-file ( n path -- )
     {
-        { [ over 0 < ] [ throw-invalid-file-size ] }
+        { [ over 0 < ] [ invalid-file-size ] }
         { [ over 0 = ] [ nip touch-file ] }
         [ (zero-file) ]
     } cond ;

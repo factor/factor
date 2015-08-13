@@ -136,35 +136,35 @@ ERROR: specialized-array-vocab-not-loaded c-type ;
 M: c-type-word c-array-constructor
     underlying-type
     dup [ name>> "<" "-array>" surround ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ throw-specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: pointer c-array-constructor drop void* c-array-constructor ;
 
 M: c-type-word c-(array)-constructor
     underlying-type
     dup [ name>> "(" "-array)" surround ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ throw-specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: pointer c-(array)-constructor drop void* c-(array)-constructor ;
 
 M: c-type-word c-direct-array-constructor
     underlying-type
     dup [ name>> "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ throw-specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: pointer c-direct-array-constructor drop void* c-direct-array-constructor ;
 
 M: c-type-word c-array-type
     underlying-type
     dup [ name>> "-array" append ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ throw-specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: pointer c-array-type drop void* c-array-type ;
 
 M: c-type-word c-array-type?
     underlying-type
     dup [ name>> "-array?" append ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ throw-specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
 
 M: pointer c-array-type? drop void* c-array-type? ;
 

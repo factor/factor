@@ -102,12 +102,12 @@ CONSTANT: fortran>c-types H{
     dims>> [ product 2array ] when* ;
 
 MACRO: size-case-type ( cases -- quot )
-    [ throw-invalid-fortran-type ] suffix
+    [ invalid-fortran-type ] suffix
     '[ [ size>> _ case ] [ append-dimensions ] bi ] ;
 
 : simple-type ( type base-c-type -- c-type )
     swap
-    [ dup size>> [ throw-invalid-fortran-type ] [ drop ] if ]
+    [ dup size>> [ invalid-fortran-type ] [ drop ] if ]
     [ append-dimensions ] bi ;
 
 : new-fortran-type ( out? dims size class -- type )
@@ -150,7 +150,7 @@ M: misc-type (fortran-type>c-type)
 
 : fix-character-type ( character-type -- character-type' )
     clone dup size>>
-    [ dup dims>> [ throw-invalid-fortran-type ] [ dup size>> 1array >>dims f >>size ] if ]
+    [ dup dims>> [ invalid-fortran-type ] [ dup size>> 1array >>dims f >>size ] if ]
     [ dup dims>> [ ] [ f >>dims ] if ] if
     dup single-char? [ f >>dims ] when ;
 
@@ -212,7 +212,7 @@ M: integer-type (fortran-arg>c-args)
             { 2 [ [ c:short <ref>   ] [ drop ] ] }
             { 4 [ [ c:int <ref>     ] [ drop ] ] }
             { 8 [ [ c:longlong <ref> ] [ drop ] ] }
-            [ throw-invalid-fortran-type ]
+            [ invalid-fortran-type ]
         } case
     ] args?dims ;
 
@@ -225,7 +225,7 @@ M: real-type (fortran-arg>c-args)
             { f [ [ c:float <ref> ] [ drop ] ] }
             { 4 [ [ c:float <ref> ] [ drop ] ] }
             { 8 [ [ c:double <ref> ] [ drop ] ] }
-            [ throw-invalid-fortran-type ]
+            [ invalid-fortran-type ]
         } case
     ] args?dims ;
 
@@ -235,7 +235,7 @@ M: real-complex-type (fortran-arg>c-args)
             {  f [ [ <complex-float>  ] [ drop ] ] }
             {  8 [ [ <complex-float>  ] [ drop ] ] }
             { 16 [ [ <complex-double> ] [ drop ] ] }
-            [ throw-invalid-fortran-type ]
+            [ invalid-fortran-type ]
         } case
     ] args?dims ;
 
@@ -266,7 +266,7 @@ M: integer-type (fortran-result>)
             { 2 [ { [ c:short deref    ] } ] }
             { 4 [ { [ c:int deref      ] } ] }
             { 8 [ { [ c:longlong deref ] } ] }
-            [ throw-invalid-fortran-type ]
+            [ invalid-fortran-type ]
         } case
     ] result?dims ;
 
@@ -278,7 +278,7 @@ M: real-type (fortran-result>)
         { f [ { [ c:float deref ] } ] }
         { 4 [ { [ c:float deref ] } ] }
         { 8 [ { [ c:double deref ] } ] }
-        [ throw-invalid-fortran-type ]
+        [ invalid-fortran-type ]
     } case ] result?dims ;
 
 M: real-complex-type (fortran-result>)
@@ -286,7 +286,7 @@ M: real-complex-type (fortran-result>)
         {  f [ { [ *complex-float  ] } ] }
         {  8 [ { [ *complex-float  ] } ] }
         { 16 [ { [ *complex-double ] } ] }
-        [ throw-invalid-fortran-type ]
+        [ invalid-fortran-type ]
     } case ] result?dims ;
 
 M: double-precision-type (fortran-result>)

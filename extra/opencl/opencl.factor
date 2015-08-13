@@ -13,10 +13,10 @@ SPECIALIZED-ARRAYS: void* char size_t ;
 ERROR: cl-error err ;
 
 : cl-success ( err -- )
-    dup CL_SUCCESS = [ drop ] [ throw-cl-error ] if ; inline
+    dup CL_SUCCESS = [ drop ] [ cl-error ] if ; inline
 
 : cl-not-null ( err -- )
-    dup f = [ throw-cl-error ] [ drop ] if ; inline
+    dup f = [ cl-error ] [ drop ] if ; inline
 
 : info-data-size ( handle name info-quot -- size_t )
     [ 0 f 0 size_t <ref> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
@@ -354,7 +354,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     {
         { CL_BUILD_PROGRAM_FAILURE [
             program-handle device id>> program-build-log program-handle
-            clReleaseProgram cl-success throw-cl-error f ] }
+            clReleaseProgram cl-success cl-error f ] }
         { CL_SUCCESS [ cl-program new-disposable program-handle >>handle ] }
         [ program-handle clReleaseProgram cl-success cl-success f ]
     } case ;

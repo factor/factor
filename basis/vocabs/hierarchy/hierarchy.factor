@@ -34,7 +34,7 @@ M: vocab-prefix vocab-name name>> ;
 ERROR: vocab-root-required root ;
 
 : ensure-vocab-root ( root -- root )
-    dup vocab-roots get member? [ throw-vocab-root-required ] unless ;
+    dup vocab-roots get member? [ vocab-root-required ] unless ;
 
 : ensure-vocab-root/prefix ( root prefix -- root prefix )
     [ ensure-vocab-root ] [ check-vocab-name ] bi* ;

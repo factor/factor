@@ -31,7 +31,7 @@ ERROR: no-com-interface interface ;
 : find-com-interface-definition ( name -- definition )
     [
         dup +com-interface-definitions+ get-global at*
-        [ nip ] [ drop throw-no-com-interface ] if
+        [ nip ] [ drop no-com-interface ] if
     ] [ f ] if* ;
 
 : save-com-interface-definition ( definition -- )

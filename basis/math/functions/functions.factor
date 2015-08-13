@@ -116,7 +116,7 @@ ERROR: non-trivial-divisor n ;
 : mod-inv ( x n -- y )
     [ nip ] [ gcd 1 = ] 2bi
     [ dup 0 < [ + ] [ nip ] if ]
-    [ throw-non-trivial-divisor ] if ; foldable
+    [ non-trivial-divisor ] if ; foldable
 
 : ^mod ( x y n -- z )
     over 0 <

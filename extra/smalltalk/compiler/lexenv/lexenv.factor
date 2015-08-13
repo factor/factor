@@ -47,7 +47,7 @@ M: bad-identifier summary drop "Unknown identifier" ;
         [ local-reader ]
         [ ivar-reader ]
         [ drop class-name ]
-        [ drop throw-bad-identifier ]
+        [ drop bad-identifier ]
     } 2|| ;
 
 : local-writer ( name lexenv -- local )
@@ -63,5 +63,5 @@ M: bad-identifier summary drop "Unknown identifier" ;
     {
         [ local-writer ]
         [ ivar-writer ]
-        [ drop throw-bad-identifier ]
+        [ drop bad-identifier ]
     } 2|| ;

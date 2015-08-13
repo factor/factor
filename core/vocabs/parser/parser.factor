@@ -58,7 +58,7 @@ ERROR: no-word-in-vocab word vocab ;
 
 : extract-words ( seq vocab -- assoc )
     [ words>> extract-keys dup ] [ name>> ] bi
-    [ swap [ 2drop ] [ throw-no-word-in-vocab ] if ] curry assoc-each ;
+    [ swap [ 2drop ] [ no-word-in-vocab ] if ] curry assoc-each ;
 
 : excluding-words ( seq vocab -- assoc )
     [ nip words>> ] [ extract-words ] 2bi assoc-diff ;
@@ -98,13 +98,13 @@ ERROR: unbalanced-private-declaration vocab ;
 
 : begin-private ( -- )
     current-vocab name>> ".private" ?tail
-    [ throw-unbalanced-private-declaration ]
+    [ unbalanced-private-declaration ]
     [ ".private" append set-current-vocab ] if ;
 
 : end-private ( -- )
     current-vocab name>> ".private" ?tail
     [ set-current-vocab ]
-    [ throw-unbalanced-private-declaration ] if ;
+    [ unbalanced-private-declaration ] if ;
 
 : using-vocab? ( vocab -- ? )
     vocab-name manifest get search-vocab-names>> in? ;
@@ -161,7 +161,7 @@ TUPLE: rename word vocab words ;
 : <rename> ( word vocab new-name -- rename )
     [
         2dup load-vocab words>> dupd at
-        [ ] [ swap throw-no-word-in-vocab ] ?if
+        [ ] [ swap no-word-in-vocab ] ?if
     ] dip associate rename boa ;
 
 : add-renamed-word ( word vocab new-name -- )

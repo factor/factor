@@ -8,7 +8,7 @@ vocabs.loader words ;
 IN: vocabs.metadata
 
 : check-vocab ( vocab -- vocab )
-    dup find-vocab-root [ throw-no-vocab ] unless ;
+    dup find-vocab-root [ no-vocab ] unless ;
 
 MEMO: vocab-file-contents ( vocab name -- seq )
     vocab-append-path dup
@@ -18,7 +18,7 @@ MEMO: vocab-file-contents ( vocab name -- seq )
     dupd vocab-append-path [
         swap [ ?delete-file ] [ swap utf8 set-file-lines ] if-empty
         \ vocab-file-contents reset-memoized
-    ] [ vocab-name throw-no-vocab ] ?if ;
+    ] [ vocab-name no-vocab ] ?if ;
 
 : vocab-windows-icon-path ( vocab -- string )
     vocab-dir "icon.ico" append-path ;
@@ -92,7 +92,7 @@ ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
     dup vocab-platforms-path vocab-file-contents
-    [ dup "system" lookup-word [ ] [ throw-bad-platform ] ?if ] map ;
+    [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
 
 : set-vocab-platforms ( platforms vocab -- )
     [ [ name>> ] map ] dip
@@ -119,12 +119,12 @@ ERROR: bad-platform name ;
 TUPLE: unsupported-platform vocab requires ;
 
 : throw-unsupported-platform ( vocab requires -- )
-    \ unsupported-platform boa throw-continue ;
+    unsupported-platform boa throw-continue ;
 
 M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;
 
 [
     dup vocab-platforms dup supported-platform?
-    [ 2drop ] [ [ vocab-name ] dip throw-unsupported-platform ] if
+    [ 2drop ] [ [ vocab-name ] dip unsupported-platform ] if
 ] check-vocab-hook set-global

@@ -29,7 +29,7 @@ IN: imap.tests
 ERROR: no-imap-test-host ;
 
 : get-test-host ( -- host )
-    \ imap-settings get-global host>> [ throw-no-imap-test-host ] unless* ;
+    \ imap-settings get-global host>> [ no-imap-test-host ] unless* ;
 
 : imap-test ( result quot -- )
     '[ \ imap-settings get-global _ with-imap-settings ] unit-test ; inline

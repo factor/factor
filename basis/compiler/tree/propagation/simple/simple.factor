@@ -73,7 +73,7 @@ ERROR: invalid-outputs #call infos ;
 
 : check-outputs ( #call infos -- infos )
     over out-d>> over [ length ] bi@ =
-    [ nip ] [ throw-invalid-outputs ] if ;
+    [ nip ] [ invalid-outputs ] if ;
 
 : call-outputs-quot ( #call word -- infos )
     dupd

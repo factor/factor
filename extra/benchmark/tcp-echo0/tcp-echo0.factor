@@ -21,7 +21,7 @@ TUPLE: tcp-echo < threaded-server #times #bytes ;
 ERROR: incorrect-#bytes ;
 
 : check-bytes ( bytes n -- bytes )
-    over length = [ throw-incorrect-#bytes ] unless ;
+    over length = [ incorrect-#bytes ] unless ;
 
 : read-n ( n -- bytes )
     [ read ] [ check-bytes ] bi ;
@@ -46,7 +46,7 @@ M: tcp-echo handle-client*
     <tcp-echo> [
         \ threaded-server get server>address binary [
             #times [ #bytes read-write ] times
-            contents empty? [ throw-incorrect-#bytes ] unless
+            contents empty? [ incorrect-#bytes ] unless
         ] with-client
     ] with-threaded-server ;
 

@@ -47,7 +47,7 @@ PRIVATE>
 ERROR: bad-array-length n ;
 
 : <bit-array> ( n -- bit-array )
-    dup 0 < [ throw-bad-array-length ] when
+    dup 0 < [ bad-array-length ] when
     dup bits>bytes <byte-array>
     bit-array boa ; inline
 

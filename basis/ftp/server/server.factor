@@ -111,7 +111,7 @@ ERROR: type-error type ;
     >upper {
         { "IMAGE" [ "Binary" ] }
         { "I" [ "Binary" ] }
-        [ throw-type-error ]
+        [ type-error ]
     } case ;
 
 : handle-TYPE ( obj -- )

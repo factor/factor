@@ -51,7 +51,7 @@ M: no-match-cond summary drop "Fall-through in match-cond" ;
 
 MACRO: match-cond ( assoc -- quot )
     <reversed>
-    dup ?first callable? [ unclip ] [ [ throw-no-match-cond ] ] if
+    dup ?first callable? [ unclip ] [ [ no-match-cond ] ] if
     [
         first2
         [ [ dupd match ] curry ] dip

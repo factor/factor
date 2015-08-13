@@ -40,11 +40,11 @@ ERROR: splitting-atomic-interval ;
 
 : check-split ( live-interval n -- )
     check-allocation? get [
-        [ [ start>> ] dip > [ throw-splitting-too-early ] when ]
-        [ [ end>> ] dip < [ throw-splitting-too-late ] when ]
+        [ [ start>> ] dip > [ splitting-too-early ] when ]
+        [ [ end>> ] dip < [ splitting-too-late ] when ]
         [
             drop [ end>> ] [ start>> ] bi =
-            [ throw-splitting-atomic-interval ] when
+            [ splitting-atomic-interval ] when
         ] 2tri
     ] [ 2drop ] if ; inline
 

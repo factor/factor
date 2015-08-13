@@ -77,7 +77,7 @@ M: scalar-rep int>rep ( dst src rep -- )
                 ! it is allowed... otherwise bail out.
                 [
                     drop 2dup [ reg-class-of ] bi@ eq?
-                    [ drop ##copy, ] [ throw-bad-conversion ] if
+                    [ drop ##copy, ] [ bad-conversion ] if
                 ]
             } case
         ]

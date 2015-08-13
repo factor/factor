@@ -29,7 +29,7 @@ TUPLE: openssl-context < secure-context aliens sessions ;
 ERROR: file-expected path ;
 
 : ensure-exists ( path -- path )
-    dup exists? [ throw-file-expected ] unless ; inline
+    dup exists? [ file-expected ] unless ; inline
 
 : ssl-file-path ( path -- path' )
     absolute-path ensure-exists ;
@@ -188,7 +188,7 @@ SYMBOL: default-secure-context
     ERR_get_error [
         {
             { -1 [
-                errno ECONNRESET = [ throw-premature-close ]
+                errno ECONNRESET = [ premature-close ]
                 [ throw-errno ] if
             ] }
             ! OpenSSL docs say this it is an error condition for
@@ -286,7 +286,7 @@ M: ssl-handle dispose*
 
 : check-verify-result ( ssl-handle -- )
     SSL_get_verify_result dup X509_V_OK =
-    [ drop ] [ verify-message throw-certificate-verify-error ] if ;
+    [ drop ] [ verify-message certificate-verify-error ] if ;
 
 : x509name>string ( x509name -- string )
     NID_commonName 256 <byte-array>
@@ -315,8 +315,8 @@ M: ssl-handle dispose*
     SSL_get_peer_certificate [
         [ alternative-dns-names ] [ subject-name ] bi suffix
         2dup [ subject-names-match? ] with any?
-        [ 2drop ] [ throw-subject-name-verify-error ] if
-    ] [ throw-certificate-missing-error ] if* ;
+        [ 2drop ] [ subject-name-verify-error ] if
+    ] [ certificate-missing-error ] if* ;
 
 M: openssl check-certificate ( host ssl -- )
     current-secure-context config>> verify>> [
@@ -327,20 +327,20 @@ M: openssl check-certificate ( host ssl -- )
     ] [ 2drop ] if ;
 
 : check-buffer ( port -- port )
-    dup buffer>> buffer-empty? [ throw-upgrade-buffers-full ] unless ;
+    dup buffer>> buffer-empty? [ upgrade-buffers-full ] unless ;
 
 : input/output-ports ( -- input output )
     input-stream output-stream
     [ get underlying-port check-buffer ] bi@
-    2dup [ handle>> ] bi@ eq? [ throw-upgrade-on-non-socket ] unless ;
+    2dup [ handle>> ] bi@ eq? [ upgrade-on-non-socket ] unless ;
 
 : make-input/output-secure ( input output -- )
-    dup handle>> non-ssl-socket? [ throw-upgrade-on-non-socket ] unless
+    dup handle>> non-ssl-socket? [ upgrade-on-non-socket ] unless
     [ <ssl-socket> ] change-handle
     handle>> >>handle drop ;
 
 : (send-secure-handshake) ( output -- )
-    remote-address get [ throw-upgrade-on-non-socket ] unless*
+    remote-address get [ upgrade-on-non-socket ] unless*
     secure-connection ;
 
 M: openssl send-secure-handshake

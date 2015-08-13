@@ -19,7 +19,7 @@ M: euc encode-char ( char stream encoding -- )
             h>b/b swap 2byte-array
             swap stream-write
         ] if
-    ] [ throw-encode-error ] if* ;
+    ] [ encode-error ] if* ;
 
 : euc-multibyte? ( ch -- ? )
     0x81 0xfe between? ;

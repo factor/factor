@@ -26,7 +26,7 @@ ERROR: duplicate-slot-names names ;
 
 : check-duplicate-slots ( slots -- )
     slot-names duplicates
-    [ throw-duplicate-slot-names ] unless-empty ;
+    [ duplicate-slot-names ] unless-empty ;
 
 ERROR: invalid-slot-name name ;
 
@@ -40,7 +40,7 @@ ERROR: invalid-slot-name name ;
     !
     ! : ...
     {
-        { [ dup { ":" "(" "<" "\"" "!" } member? ] [ throw-invalid-slot-name ] }
+        { [ dup { ":" "(" "<" "\"" "!" } member? ] [ invalid-slot-name ] }
         { [ 2dup = ] [ drop f ] }
         [ dup "{" = [ drop parse-long-slot-name ] when , t ]
     } cond nip ;
@@ -72,12 +72,12 @@ ERROR: bad-literal-tuple ;
 ERROR: bad-slot-name class slot ;
 
 : check-slot-name ( class slots name -- name )
-    2dup swap slot-named [ 2nip ] [ nip throw-bad-slot-name ] if ;
+    2dup swap slot-named [ 2nip ] [ nip bad-slot-name ] if ;
 
 : parse-slot-value ( class slots -- )
     scan-token check-slot-name scan-object 2array , scan-token {
         { "}" [ ] }
-        [ throw-bad-literal-tuple ]
+        [ bad-literal-tuple ]
     } case ;
 
 : (parse-slot-values) ( class slots -- )
@@ -85,7 +85,7 @@ ERROR: bad-slot-name class slot ;
     scan-token {
         { "{" [ (parse-slot-values) ] }
         { "}" [ 2drop ] }
-        [ 2nip throw-bad-literal-tuple ]
+        [ 2nip bad-literal-tuple ]
     } case ;
 
 : parse-slot-values ( class slots -- values )
@@ -97,7 +97,7 @@ M: tuple-class boa>object
     swap slots>tuple ;
 
 : check-slot-exists ( class initials slot-spec/f index/f name -- class initials slot-spec index )
-    over [ drop ] [ nip nip nip throw-bad-slot-name ] if ;
+    over [ drop ] [ nip nip nip bad-slot-name ] if ;
 
 : slot-named-checked ( class initials name slots -- class initials slot-spec )
     over [ slot-named* ] dip check-slot-exists drop ;
@@ -112,7 +112,7 @@ M: tuple-class boa>object
         { "f" [ drop \ } parse-until boa>object ] }
         { "{" [ 2dup parse-slot-values assoc>object ] }
         { "}" [ drop new ] }
-        [ throw-bad-literal-tuple ]
+        [ bad-literal-tuple ]
     } case ;
 
 : parse-tuple-literal ( -- tuple )

@@ -833,7 +833,7 @@ ERROR: not-fat-binary ;
     fat_header memory>struct dup magic>> {
         { FAT_MAGIC [ ] }
         { FAT_CIGAM [ ] }
-        [ 2drop throw-not-fat-binary ]
+        [ 2drop not-fat-binary ]
     } case dup
     [ >c-ptr fat_header heap-size swap <displaced-alien> ]
     [ nfat_arch>> 4 >be le> ] bi

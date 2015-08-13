@@ -15,11 +15,11 @@ types [ H{ } clone ] initialize
 
 : models-class ( path -- class )
     file-extension >lower types get ?at
-    [ throw-unknown-models-extension ] unless second ;
+    [ unknown-models-extension ] unless second ;
 
 : models-encoding ( path -- encoding )
     file-extension >lower types get ?at
-    [ throw-unknown-models-extension ] unless first ;
+    [ unknown-models-extension ] unless first ;
 
 : open-models-file ( path encoding -- stream )
     <file-reader> ;

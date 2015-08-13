@@ -31,7 +31,7 @@ IN: bootstrap.syntax
 
 : define-core-syntax ( name quot -- )
     [
-        dup "syntax" lookup-word [ ] [ throw-no-word-error ] ?if
+        dup "syntax" lookup-word [ ] [ no-word-error ] ?if
         mark-top-level-syntax
     ] dip
     define-syntax ;
@@ -261,7 +261,7 @@ IN: bootstrap.syntax
             literalize suffix!
             \ (call-next-method) suffix!
         ] [
-            throw-not-in-a-method-error
+            not-in-a-method-error
         ] if*
     ] define-core-syntax
 

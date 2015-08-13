@@ -10,7 +10,7 @@ IN: locals.rewrite.point-free
 
 : local-index ( args obj -- n )
     2dup '[ unquote _ eq? ] find drop
-    [ 2nip ] [ throw-bad-local ] if* ;
+    [ 2nip ] [ bad-local ] if* ;
 
 : read-local-quot ( args obj -- quot )
     local-index neg [ get-local ] curry ;

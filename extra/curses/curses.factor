@@ -179,8 +179,8 @@ ERROR: unsupported-curses-terminal ;
 : >BOOLEAN ( ? -- TRUE/FALSE ) ffi:TRUE ffi:FALSE ? ; inline
 
 : curses-pointer-error ( ptr/f -- ptr )
-    [ throw-curses-failed ] unless* ; inline
-: curses-error ( n -- ) ffi:ERR = [ throw-curses-failed ] when ;
+    [ curses-failed ] unless* ; inline
+: curses-error ( n -- ) ffi:ERR = [ curses-failed ] when ;
 
 PRIVATE>
 
@@ -262,7 +262,7 @@ PRIVATE>
     [ current-window ] dip with-variable ; inline
 
 : with-curses ( window quot -- )
-    curses-ok? [ throw-unsupported-curses-terminal ] unless
+    curses-ok? [ unsupported-curses-terminal ] unless
     [
         '[
             ffi:initscr curses-pointer-error
