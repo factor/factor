@@ -13,12 +13,12 @@ IN: compiler.cfg.linear-scan.assignment.tests
     H{ { 37 RAX } } pending-interval-assoc set
     H{ { 37 int-rep } } representations set
     H{ { 37 37 } } leader-map set
-    T{ ##peek f 37 D 0 0 } [ assign-insn-defs ] keep
+    T{ ##peek f 37 D: 0 0 } [ assign-insn-defs ] keep
 ] unit-test
 
 ! assign-registers
 { } [
-    V{ T{ ##inc { loc D 3 } { insn# 7 } } } 0 insns>block block>cfg { }
+    V{ T{ ##inc { loc D: 3 } { insn# 7 } } } 0 insns>block block>cfg { }
     assign-registers
 ] unit-test
 
@@ -27,7 +27,7 @@ IN: compiler.cfg.linear-scan.assignment.tests
     V{ T{ ##inc { loc T{ ds-loc { n 3 } } } { insn# 7 } } }
 } [
     { } init-assignment
-    V{ T{ ##inc { loc D 3 } { insn# 7 } } } 0 insns>block
+    V{ T{ ##inc { loc D: 3 } { insn# 7 } } } 0 insns>block
     [ assign-registers-in-block ] keep instructions>>
 ] unit-test
 

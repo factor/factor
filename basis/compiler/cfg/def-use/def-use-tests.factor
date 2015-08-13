@@ -8,23 +8,23 @@ IN: compiler.cfg.def-use.tests
 
 ! compute-insns
 {
-    T{ ##peek f 123 D 0 f }
+    T{ ##peek f 123 D: 0 f }
 } [
-    { T{ ##peek f 123 D 0 } } 0 insns>block block>cfg compute-insns
+    { T{ ##peek f 123 D: 0 } } 0 insns>block block>cfg compute-insns
     123 insn-of
 ] unit-test
 
 V{
-    T{ ##peek f 0 D 0 }
-    T{ ##peek f 1 D 0 }
-    T{ ##peek f 2 D 0 }
+    T{ ##peek f 0 D: 0 }
+    T{ ##peek f 1 D: 0 }
+    T{ ##peek f 2 D: 0 }
 } 1 test-bb
 V{
-    T{ ##replace f 2 D 0 }
+    T{ ##replace f 2 D: 0 }
 } 2 test-bb
 1 2 edge
 V{
-    T{ ##replace f 0 D 0 }
+    T{ ##replace f 0 D: 0 }
 } 3 test-bb
 2 3 edge
 V{ } 4 test-bb

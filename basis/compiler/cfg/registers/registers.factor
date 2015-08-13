@@ -32,5 +32,5 @@ C: <ds-loc> ds-loc
 TUPLE: rs-loc < loc ;
 C: <rs-loc> rs-loc
 
-SYNTAX: D scan-number <ds-loc> suffix! ;
-SYNTAX: R scan-number <rs-loc> suffix! ;
+SYNTAX: D: scan-number <ds-loc> suffix! ;
+SYNTAX: R: scan-number <rs-loc> suffix! ;

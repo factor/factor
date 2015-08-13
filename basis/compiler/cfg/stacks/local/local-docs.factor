@@ -28,8 +28,8 @@ HELP: translate-local-loc
 { $examples
   { $example
     "USING: compiler.cfg.stacks.local compiler.cfg.registers compiler.cfg.debugger namespaces prettyprint ;"
-    "D 7 { { 3 0 } { 0 0 } } translate-local-loc ."
-    "D 4"
+    "D: 7 { { 3 0 } { 0 0 } } translate-local-loc ."
+    "D: 4"
   }
 }
 { $see-also height-state } ;
@@ -41,7 +41,7 @@ HELP: height-state>insns
   { $example
     "USING: compiler.cfg.stacks.local prettyprint ;"
     "{ { 0 4 } { 0 -2 } } height-state>insns ."
-    "{ T{ ##inc { loc D 4 } } T{ ##inc { loc R -2 } } }"
+    "{ T{ ##inc { loc D: 4 } } T{ ##inc { loc R: -2 } } }"
   }
 } ;
 

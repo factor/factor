@@ -42,14 +42,14 @@ IN: compiler.cfg.stacks
     over length stack-locs [ replace-loc ] 2each ;
 
 ! Utility
-: ds-drop ( -- ) D -1 inc-stack ;
+: ds-drop ( -- ) D: -1 inc-stack ;
 
-: ds-peek ( -- vreg ) D 0 peek-loc ;
+: ds-peek ( -- vreg ) D: 0 peek-loc ;
 
 : ds-pop ( -- vreg ) ds-peek ds-drop ;
 
 : ds-push ( vreg -- )
-    D 1 inc-stack D 0 replace-loc ;
+    D: 1 inc-stack D: 0 replace-loc ;
 
 : (2inputs) ( -- vreg1 vreg2 )
     2 ds-loc (load-vregs) first2 ;

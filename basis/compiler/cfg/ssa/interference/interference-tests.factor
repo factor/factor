@@ -33,19 +33,19 @@ IN: compiler.cfg.ssa.interference.tests
     [ [ <test-vreg-info> ] map ] bi@ sets-interfere? ;
 
 V{
-    T{ ##peek f 0 D 0 }
-    T{ ##peek f 2 D 0 }
+    T{ ##peek f 0 D: 0 }
+    T{ ##peek f 2 D: 0 }
     T{ ##copy f 1 0 }
     T{ ##copy f 3 2 }
     T{ ##branch }
 } 0 test-bb
 
 V{
-    T{ ##peek f 4 D 0 }
-    T{ ##peek f 5 D 0 }
-    T{ ##replace f 3 D 0 }
-    T{ ##peek f 6 D 0 }
-    T{ ##replace f 5 D 0 }
+    T{ ##peek f 4 D: 0 }
+    T{ ##peek f 5 D: 0 }
+    T{ ##replace f 3 D: 0 }
+    T{ ##peek f 6 D: 0 }
+    T{ ##replace f 5 D: 0 }
     T{ ##return }
 } 1 test-bb
 
@@ -75,11 +75,11 @@ V{
 
 
 V{
-    T{ ##inc f D -3 }
-    T{ ##peek f 12 D -2 }
-    T{ ##peek f 23 D -1 }
+    T{ ##inc f D: -3 }
+    T{ ##peek f 12 D: -2 }
+    T{ ##peek f 23 D: -1 }
     T{ ##sar-imm f 13 23 4 }
-    T{ ##peek f 24 D -3 }
+    T{ ##peek f 24 D: -3 }
     T{ ##sar-imm f 14 24 4 }
     T{ ##mul f 15 13 13 }
     T{ ##mul f 16 15 15 }
@@ -106,8 +106,8 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##inc f D 2 }
-    T{ ##peek f 32 D 2 }
+    T{ ##inc f D: 2 }
+    T{ ##peek f 32 D: 2 }
     T{ ##load-reference f 33 ##check-nursery-branch }
     T{ ##load-integer f 34 11 }
     T{ ##tagged>integer f 35 32 }
@@ -123,10 +123,10 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc f D -2 }
+    T{ ##inc f D: -2 }
     T{ ##slot-imm f 57 48 11 2 }
     T{ ##compare f 58 33 57 cc= 20 }
-    T{ ##replace f 58 D 0 }
+    T{ ##replace f 58 D: 0 }
     T{ ##branch f }
 } 3 test-bb
 
@@ -136,8 +136,8 @@ V{
 } 4 test-bb
 
 V{
-    T{ ##inc f D -2 }
-    T{ ##replace-imm f f D 0 }
+    T{ ##inc f D: -2 }
+    T{ ##replace-imm f f D: 0 }
     T{ ##branch f }
 } 5 test-bb
 
@@ -147,8 +147,8 @@ V{
 } 6 test-bb
 
 V{
-    T{ ##inc f D -2 }
-    T{ ##replace-imm f f D 0 }
+    T{ ##inc f D: -2 }
+    T{ ##replace-imm f f D: 0 }
     T{ ##branch f }
 } 7 test-bb
 
@@ -188,13 +188,13 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##inc f D 1 }
+    T{ ##inc f D: 1 }
     T{ ##load-reference f 37 T{ bab } }
     T{ ##load-reference f 38 { gfg 1 1 tuple 57438726 gfg 7785907 } }
     T{ ##allot f 40 12 tuple 4 }
     T{ ##set-slot-imm f 38 40 1 7 }
     T{ ##set-slot-imm f 37 40 2 7 }
-    T{ ##replace f 40 D 0 }
+    T{ ##replace f 40 D: 0 }
     T{ ##branch }
 } 3 test-bb
 
@@ -204,17 +204,17 @@ V{
 } 4 test-bb
 
 V{
-    T{ ##inc f R 1 }
-    T{ ##inc f D 1 }
-    T{ ##peek f 43 D 1 }
-    T{ ##peek f 44 D 2 }
+    T{ ##inc f R: 1 }
+    T{ ##inc f D: 1 }
+    T{ ##peek f 43 D: 1 }
+    T{ ##peek f 44 D: 2 }
     T{ ##tagged>integer f 45 43 }
     T{ ##and-imm f 46 45 15 }
     T{ ##compare-integer-imm-branch f 46 7 cc= }
 } 5 test-bb
 
 V{
-    T{ ##inc f D 1 }
+    T{ ##inc f D: 1 }
     T{ ##slot-imm f 58 43 1 7 }
     T{ ##slot-imm f 60 58 7 2 }
     T{ ##compare-imm-branch f 60 bab cc= }
@@ -225,8 +225,8 @@ V{
 } 7 test-bb
 
 V{
-    T{ ##inc f R -1 }
-    T{ ##inc f D -1 }
+    T{ ##inc f R: -1 }
+    T{ ##inc f D: -1 }
     T{ ##set-slot-imm f 43 44 2 7 }
     T{ ##write-barrier-imm f 44 2 7 34 35 }
     T{ ##branch }
@@ -238,9 +238,9 @@ V{
 } 9 test-bb
 
 V{
-    T{ ##inc f D 1 }
-    T{ ##replace f 44 R 0 }
-    T{ ##replace-imm f bab D 0 }
+    T{ ##inc f D: 1 }
+    T{ ##replace f 44 R: 0 }
+    T{ ##replace-imm f bab D: 0 }
     T{ ##branch }
 } 10 test-bb
 
@@ -254,14 +254,14 @@ V{
 } 12 test-bb
 
 V{
-    T{ ##inc f D -1 }
+    T{ ##inc f D: -1 }
     T{ ##branch }
 } 13 test-bb
 
 V{
-    T{ ##inc f D 1 }
-    T{ ##replace f 44 R 0 }
-    T{ ##replace-imm f bab D 0 }
+    T{ ##inc f D: 1 }
+    T{ ##replace f 44 R: 0 }
+    T{ ##replace-imm f bab D: 0 }
     T{ ##branch }
 } 14 test-bb
 
@@ -315,8 +315,8 @@ V{
 
 V{
 
-    T{ ##inc f D 1 }
-    T{ ##peek f 31 D 1 }
+    T{ ##inc f D: 1 }
+    T{ ##peek f 31 D: 1 }
     T{ ##sar-imm f 16 31 4 }
     T{ ##load-integer f 17 0 }
     T{ ##copy f 33 17 int-rep }
@@ -335,7 +335,7 @@ V{
 } 3 test-bb
 
 V{
-    T{ ##inc f D -2 }
+    T{ ##inc f D: -2 }
     T{ ##branch f }
 } 4 test-bb
 

@@ -32,7 +32,7 @@ check-numbering? on
 ! live range
 V{
     T{ ##load-integer f 1 0 }
-    T{ ##replace-imm f D 0 "hi" }
+    T{ ##replace-imm f D: 0 "hi" }
     T{ ##branch }
 } 0 test-bb
 
