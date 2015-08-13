@@ -66,7 +66,7 @@ IN: compiler.tests.simple
 
 ! Regression
 
-[ ] [ [ callstack ] compile-call drop ] unit-test
+[ ] [ [ get-callstack ] compile-call drop ] unit-test
 
 ! Regression
 

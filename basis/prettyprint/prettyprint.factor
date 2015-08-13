@@ -49,8 +49,8 @@ IN: prettyprint
         ] recover
     ] each ;
 
-: .s ( -- ) datastack stack. ;
-: .r ( -- ) retainstack stack. ;
+: .s ( -- ) get-datastack stack. ;
+: .r ( -- ) get-retainstack stack. ;
 
 <PRIVATE
 
@@ -125,7 +125,7 @@ PRIVATE>
     callstack>array 3 <groups>
     { { table-gap { 5 5 } } } [ [ callframe. ] each ] tabular-output nl ;
 
-: .c ( -- ) callstack callstack. ;
+: .c ( -- ) get-callstack callstack. ;
 
 : pprint-cell ( obj -- ) [ pprint-short ] with-cell ;
 

@@ -71,15 +71,15 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 }
 "The five stacks can be read and written:"
 { $subsections
-    datastack
+    get-datastack
     set-datastack
-    retainstack
+    get-retainstack
     set-retainstack
-    callstack
+    get-callstack
     set-callstack
-    namestack
+    get-namestack
     set-namestack
-    catchstack
+    get-catchstack
     set-catchstack
 } ;
 
@@ -112,7 +112,7 @@ HELP: catchstack*
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs the current catchstack." } ;
 
-HELP: catchstack
+HELP: get-catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs a copy of the current catchstack." } ;
 

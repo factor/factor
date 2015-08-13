@@ -6,8 +6,8 @@ IN: continuations
 
 : with-datastack ( stack quot -- new-stack )
     [
-        [ [ datastack ] dip swap [ { } like set-datastack ] dip ] dip
-        swap [ call datastack ] dip
+        [ [ get-datastack ] dip swap [ { } like set-datastack ] dip ] dip
+        swap [ call get-datastack ] dip
         swap [ set-datastack ] dip
     ] ( stack quot -- new-stack ) call-effect-unsafe ;
 
@@ -26,7 +26,7 @@ SYMBOL: restarts
 : dummy-1 ( -- obj ) f ;
 : dummy-2 ( obj -- obj ) ;
 
-: catchstack ( -- catchstack ) catchstack* clone ; inline
+: get-catchstack ( -- catchstack ) catchstack* clone ; inline
 
 : (set-catchstack) ( catchstack -- )
     CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
@@ -44,7 +44,7 @@ TUPLE: continuation data call retain name catch ;
 C: <continuation> continuation
 
 : current-continuation ( -- continuation )
-    datastack callstack retainstack namestack catchstack
+    get-datastack get-callstack get-retainstack get-namestack get-catchstack
     <continuation> ;
 
 <PRIVATE
