@@ -1,10 +1,14 @@
-USING: see tools.test io.streams.string math summary words ;
+USING: see tools.test io.streams.string math sequences summary
+words ;
 IN: see.tests
 
 CONSTANT: test-const 10
 
 { "IN: see.tests\nCONSTANT: test-const 10 inline\n" }
 [ [ \ test-const see ] with-string-writer ] unit-test
+
+{ "IN: sequences\nERROR: non-negative-integer-expected n ;\n" }
+[ [ \ non-negative-integer-expected see ] with-string-writer ] unit-test
 
 ALIAS: test-alias +
 
@@ -15,3 +19,4 @@ ALIAS: test-alias +
 [ \ test-alias summary ] unit-test
 
 { } [ gensym see ] unit-test
+
