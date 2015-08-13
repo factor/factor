@@ -1381,13 +1381,13 @@ SYMBOL: last-opcode
        dup last-instruction set-global
     ] dip ( cpu -- ) define-declared ;
 
-SYNTAX: INSTRUCTION:  ";" parse-tokens parse-instructions ;
+SYNTAX: INSTRUCTION: ";" parse-tokens parse-instructions ;
 
-SYNTAX: cycles
+SYNTAX: cycles:
     #! Set the number of cycles for the last instruction that was defined.
     scan-token string>number last-opcode get-global instruction-cycles set-nth ;
 
-SYNTAX: opcode
+SYNTAX: opcode:
     #! Set the opcode number for the last instruction that was defined.
     last-instruction get-global 1quotation scan-token hex>
     dup last-opcode set-global set-instruction ;
