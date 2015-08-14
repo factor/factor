@@ -5,34 +5,43 @@ IN: vm
 
 TYPEDEF: uintptr_t cell_t
 
+STRUCT: segment
+    { start cell_t }
+    { size cell_t }
+    { end cell_t } ;
+
 STRUCT: context
-{ callstack-top void* }
-{ callstack-bottom void* }
-{ datastack cell_t }
-{ retainstack cell_t }
-{ callstack-save cell_t }
-{ datastack-region void* }
-{ retainstack-region void* }
-{ callstack-region void* }
-{ context-objects cell_t[context-object-count] } ;
+    { callstack-top cell_t }
+    { callstack-bottom cell_t }
+    { datastack cell_t }
+    { retainstack cell_t }
+    { callstack-save cell_t }
+    { datastack-seg segment* }
+    { retainstack-seg segment* }
+    { callstack-seg segment* }
+    { context-objects cell_t[context-object-count] } ;
 
 : context-field-offset ( field -- offset ) context offset-of ; inline
 
 STRUCT: zone
-{ here cell_t }
-{ start cell_t }
-{ end cell_t }
-{ size cell_t } ;
+    { here cell_t }
+    { start cell_t }
+    { end cell_t }
+    { size cell_t } ;
 
 STRUCT: vm
-{ ctx context* }
-{ spare-ctx context* }
-{ nursery zone }
-{ cards-offset cell_t }
-{ decks-offset cell_t }
-{ signal-handler-addr cell_t }
-{ faulting? cell_t }
-{ special-objects cell_t[special-object-count] } ;
+    { ctx context* }
+    { spare-ctx context* }
+    { nursery zone }
+    { cards-offset cell_t }
+    { decks-offset cell_t }
+    { signal-handler-addr cell_t }
+    { faulting? cell_t }
+    { special-objects cell_t[special-object-count] }
+    { thread void* }
+    { datastack-size cell_t }
+    { retainstack-size cell_t }
+    { callstack-size cell_t } ;
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
 
