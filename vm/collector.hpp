@@ -94,16 +94,6 @@ template <typename TargetGeneration, typename Policy> struct collector {
     }
   }
 
-  void trace_partial_objects(cell start, cell card_start, cell card_end) {
-    cell *scan_start = (cell*)start + 1;
-    cell *scan_end = scan_start + ((object*)start)->slot_count();
-
-    scan_start = std::max(scan_start, (cell*)card_start);
-    scan_end = std::min(scan_end, (cell*)card_end);
-
-    visitor.visit_object_array(scan_start, scan_end);
-  }
-
   template <typename SourceGeneration>
   cell trace_card(SourceGeneration* gen, cell index, cell start) {
 
@@ -119,7 +109,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
     }
 
     while (start && start < end_addr) {
-      trace_partial_objects(start, start_addr, end_addr);
+      visitor.visit_partial_objects(start, start_addr, end_addr);
       if ((start + ((object*)start)->size()) >= end_addr) {
         /* The object can overlap the card boundary, then the
            remainder of it will be handled in the next card
