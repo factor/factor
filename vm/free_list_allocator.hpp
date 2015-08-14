@@ -134,7 +134,7 @@ void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
   cell dest_addr = start;
   auto compact_block_func = [&](Block* block, cell size) {
     cell block_addr = (cell)block;
-    if (!state.marked_p(block_addr))
+    if (!this->state.marked_p(block_addr))
       return;
     *finger = (Block*)(block_addr + size);
     memmove((Block*)dest_addr, block, size);
