@@ -1,8 +1,8 @@
 namespace factor {
 
 // gc_info should be kept in sync with:
+//   basis/compiler/codegen/gc-maps/gc-maps.factor
 //   basis/vm/vm.factor
-
 struct gc_info {
   uint32_t scrub_d_count;
   uint32_t scrub_r_count;

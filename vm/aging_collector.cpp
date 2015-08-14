@@ -27,7 +27,7 @@ void factor_vm::collect_aging() {
     current_gc->op = collect_to_tenured_op;
 
     collector<tenured_space, to_tenured_policy> collector(this,
-                                                          this->data->tenured,
+                                                          data->tenured,
                                                           to_tenured_policy(this));
     gc_event* event = current_gc->event;
 
@@ -53,7 +53,7 @@ void factor_vm::collect_aging() {
     data->reset_aging();
 
     collector<aging_space, aging_policy> collector(this,
-                                                   this->data->aging,
+                                                   data->aging,
                                                    aging_policy(this));
 
     collector.visitor.visit_all_roots();

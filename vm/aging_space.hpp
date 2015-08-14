@@ -19,15 +19,13 @@ struct aging_space : bump_allocator {
     cell size = ((object*)scan)->size();
     if (scan + size < here)
       return scan + size;
-    else
-      return 0;
+    return 0;
   }
 
   cell first_object() {
     if (start != here)
       return start;
-    else
-      return 0;
+    return 0;
   }
 };
 

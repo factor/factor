@@ -41,13 +41,10 @@ cell factor_vm::compute_entry_point_address(cell obj) {
 cell factor_vm::compute_entry_point_pic_address(word* w, cell tagged_quot) {
   if (!to_boolean(tagged_quot) || max_pic_size == 0)
     return w->entry_point;
-  else {
-    quotation* quot = untag<quotation>(tagged_quot);
-    if (quotation_compiled_p(quot))
-      return quot->entry_point;
-    else
-      return w->entry_point;
-  }
+  quotation* q = untag<quotation>(tagged_quot);
+  if (quotation_compiled_p(q))
+    return q->entry_point;
+  return w->entry_point;
 }
 
 cell factor_vm::compute_entry_point_pic_address(cell w_) {
