@@ -19,14 +19,14 @@ SYMBOL: restarts
 
 <PRIVATE
 
-: catchstack* ( -- catchstack )
+: (get-catchstack) ( -- catchstack )
     CONTEXT-OBJ-CATCHSTACK context-object { vector } declare ; inline
 
 ! We have to defeat some optimizations to make continuations work
 : dummy-1 ( -- obj ) f ;
 : dummy-2 ( obj -- obj ) ;
 
-: get-catchstack ( -- catchstack ) catchstack* clone ; inline
+: get-catchstack ( -- catchstack ) (get-catchstack) clone ; inline
 
 : (set-catchstack) ( catchstack -- )
     CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
@@ -132,7 +132,7 @@ callback-error-hook [ [ die ] ] initialize
 
 : rethrow ( error -- * )
     dup save-error
-    catchstack* [
+    (get-catchstack) [
         in-callback?
         [ callback-error-hook get-global call( error -- * ) ]
         [ OBJ-CURRENT-THREAD special-object error-in-thread ]
@@ -142,9 +142,9 @@ callback-error-hook [ [ die ] ] initialize
 : recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
     [
         [
-            [ catchstack* push ] dip
+            [ (get-catchstack) push ] dip
             call
-            catchstack* pop*
+            (get-catchstack) pop*
         ] curry
     ] dip ifcc ; inline
 
