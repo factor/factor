@@ -49,31 +49,6 @@ IN: continuations.tests
     gc
 ] unit-test
 
-! ! See how well callstack overflow is handled
-! [ clear drop ] must-fail
-!
-! : callstack-overflow callstack-overflow f ;
-! [ callstack-overflow ] must-fail
-
-! This tries to verify that enough bytes are cut off from the
-! callstack to run the error handler.
-: pre ( -- ) nano-count 0 = [ ] [ ] if ;
-
-: post ( -- ) ;
-
-: do-overflow ( -- )
-    pre do-overflow post ;
-
-: recurse ( -- ? )
-    [ do-overflow f ] [ ] recover
-    second ERROR-CALLSTACK-OVERFLOW = ;
-
-os windows? [
-    { t } [
-        10 [ recurse ] replicate [ ] all?
-    ] unit-test
-] unless
-
 : don't-compile-me ( -- ) ;
 : foo ( -- ) get-callstack "c" set don't-compile-me ;
 : bar ( -- a b ) 1 foo 2 ;
