@@ -723,7 +723,7 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
 ERROR: windows-error n string ;
 
 : (win32-error) ( n -- )
-    [ dup win32-error-string throw-windows-error ] unless-zero ;
+    [ dup win32-error-string windows-error ] unless-zero ;
 
 : win32-error ( -- )
     GetLastError (win32-error) ;
@@ -737,7 +737,7 @@ ERROR: windows-error n string ;
     dup ERROR_SUCCESS = [
         drop
     ] [
-        dup n>win32-error-string throw-windows-error
+        dup n>win32-error-string windows-error
     ] if ;
 
 : throw-win32-error ( -- * )
