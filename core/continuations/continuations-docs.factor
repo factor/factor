@@ -108,7 +108,7 @@ $nl
 
 ABOUT: "continuations"
 
-HELP: catchstack*
+HELP: (get-catchstack)
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs the current catchstack." } ;
 
