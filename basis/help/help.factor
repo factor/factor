@@ -71,7 +71,7 @@ M: word article-title
             [ \ $vocabulary swap 2array , ]
             [ word-help % ]
             [ \ $related swap 2array , ]
-            [ dup is-global [ get-global \ $value swap 2array , ] [ drop ] if ]
+            [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
             [ \ $definition swap 2array , ]
         } cleave
     ] { } make ;

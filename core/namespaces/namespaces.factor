@@ -22,7 +22,7 @@ TUPLE: global-box value ;
 
 M: global-hashtable at*
     boxes>> at* [
-        { global-box } declare value>> dup
+        { global-box } declare value>> t
     ] [ drop f f ] if ; inline
 
 M: global-hashtable set-at
@@ -33,12 +33,15 @@ M: global-hashtable delete-at
 
 : namestack* ( -- namestack )
     CONTEXT-OBJ-NAMESTACK context-object { vector } declare ; inline
+
 : >n ( namespace -- ) namestack* push ;
+
 : ndrop ( -- ) namestack* pop* ;
 
 PRIVATE>
 
-: global ( -- g ) OBJ-GLOBAL special-object { global-hashtable } declare ; foldable
+: global ( -- g )
+    OBJ-GLOBAL special-object { global-hashtable } declare ; foldable
 
 : namespace ( -- namespace ) namestack* last ; inline
 : get-namestack ( -- namestack ) namestack* clone ;
@@ -47,12 +50,11 @@ PRIVATE>
 : init-namespaces ( -- ) global 1array set-namestack ;
 : get ( variable -- value ) namestack* assoc-stack ; inline
 : set ( value variable -- ) namespace set-at ;
+: change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
-: is-global ( variable -- ? ) global boxes>> key? ; inline
 : get-global ( variable -- value ) global box-at value>> ; inline
 : set-global ( value variable -- ) global set-at ; inline
-: change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
 : change-global ( variable quot -- )
     [ [ get-global ] keep ] dip dip set-global ; inline
 : toggle ( variable -- ) [ not ] change ; inline
