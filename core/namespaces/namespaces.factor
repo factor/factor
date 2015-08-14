@@ -31,39 +31,44 @@ M: global-hashtable set-at
 M: global-hashtable delete-at
     box-at f swap value<< ; inline
 
-: namestack* ( -- namestack )
+: (get-namestack) ( -- namestack )
     CONTEXT-OBJ-NAMESTACK context-object { vector } declare ; inline
 
-: >n ( namespace -- ) namestack* push ;
+: (set-namestack) ( namestack -- )
+    CONTEXT-OBJ-NAMESTACK set-context-object ; inline
 
-: ndrop ( -- ) namestack* pop* ;
+: >n ( namespace -- ) (get-namestack) push ;
+
+: ndrop ( -- ) (get-namestack) pop* ;
 
 PRIVATE>
 
 : global ( -- g )
     OBJ-GLOBAL special-object { global-hashtable } declare ; foldable
 
-: namespace ( -- namespace ) namestack* last ; inline
-: get-namestack ( -- namestack ) namestack* clone ;
-: set-namestack ( namestack -- )
-    >vector CONTEXT-OBJ-NAMESTACK set-context-object ;
+: namespace ( -- namespace ) (get-namestack) last ; inline
+: get-namestack ( -- namestack ) (get-namestack) clone ;
+: set-namestack ( namestack -- ) >vector (set-namestack) ;
 : init-namespaces ( -- ) global 1array set-namestack ;
-: get ( variable -- value ) namestack* assoc-stack ; inline
-: set ( value variable -- ) namespace set-at ;
-: change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
-: on ( variable -- ) t swap set ; inline
-: off ( variable -- ) f swap set ; inline
+
 : get-global ( variable -- value ) global box-at value>> ; inline
 : set-global ( value variable -- ) global set-at ; inline
 : change-global ( variable quot -- )
     [ [ get-global ] keep ] dip dip set-global ; inline
+: counter ( variable -- n ) [ 0 or 1 + dup ] change-global ; inline
+: initialize ( variable quot -- ) [ unless* ] curry change-global ; inline
+
+: get ( variable -- value ) (get-namestack) assoc-stack ; inline
+: set ( value variable -- ) namespace set-at ;
+: change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
+: on ( variable -- ) t swap set ; inline
+: off ( variable -- ) f swap set ; inline
 : toggle ( variable -- ) [ not ] change ; inline
 : +@ ( n variable -- ) [ 0 or + ] change ; inline
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
+
 : with-variables ( ns quot -- ) swap >n call ndrop ; inline
-: counter ( variable -- n ) [ 0 or 1 + dup ] change-global ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
 : with-variable ( value key quot -- ) [ associate ] dip with-variables ; inline
 : with-global ( quot -- ) [ global ] dip with-variables ; inline
-: initialize ( variable quot -- ) [ unless* ] curry change-global ; inline
