@@ -73,17 +73,6 @@ IN: kernel.tests
 
 { } [ :c ] unit-test
 
-: overflow-c ( -- ) overflow-c overflow-c ;
-
-! The VM cannot recover from callstack overflow on Windows,
-! because no facility exists to run memory protection
-! fault handlers on an alternate callstack.
-os windows? [
-    [ overflow-c ] [
-        2 head ${ "kernel-error" ERROR-CALLSTACK-OVERFLOW } =
-    ] must-fail-with
-] unless
-
 [ -7 <byte-array> ] must-fail
 
 { 3 } [ t 3 and ] unit-test
