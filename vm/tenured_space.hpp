@@ -11,8 +11,8 @@ struct tenured_space : free_list_allocator<object> {
     if (obj) {
       starts.record_object_start_offset(obj);
       return obj;
-    } else
-      return NULL;
+    }
+    return NULL;
   }
 
   cell next_allocated_object_after(cell scan) {

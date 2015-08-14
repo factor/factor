@@ -12,7 +12,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
                                                 Iterator& iterator,
                                                 Fixup& fixup) {
   data_root<callstack> stack(stack_, this);
-  fixnum frame_length = factor::untag_fixnum(stack->length);
+  fixnum frame_length = untag_fixnum(stack->length);
   fixnum frame_offset = 0;
 
   while (frame_offset < frame_length) {
@@ -39,7 +39,8 @@ inline void factor_vm::iterate_callstack_object(callstack* stack,
   iterate_callstack_object(stack, iterator, none);
 }
 
-/* Allocates memory */
+/* Iterates the callstack from innermost to outermost
+   callframe. Allocates memory */
 template <typename Iterator, typename Fixup>
 void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
                                   Fixup& fixup) {
