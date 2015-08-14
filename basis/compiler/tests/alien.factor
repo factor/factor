@@ -358,9 +358,9 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y )
 
 { t 3 5 } [
     [
-        namestack*
+        (get-namestack)
         3 "x" set callback-3 [ callback_test_1 ] with-callback
-        namestack* eq?
+        (get-namestack) eq?
         "x" get "x" get-global
     ] with-scope
 ] unit-test

@@ -60,7 +60,7 @@ gc
 
         wrap probe
 
-        namestack*
+        (get-namestack)
 
         layout-of
     } compile-unoptimized
