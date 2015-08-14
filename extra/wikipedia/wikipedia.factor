@@ -48,7 +48,7 @@ SYMBOL: language
     [ month-name ] [ day>> ] bi "%s_%s" sprintf wikipedia-url ;
 
 : (historical-events) ( timestamp -- seq )
-    historical-url http-get nip string>xml "ul" deep-tags-named ;
+    historical-url scrape-html nip "ul" deep-tags-named ;
 
 : items>sequence ( tag -- seq )
     children-tags [ deep-children>string ] map ;

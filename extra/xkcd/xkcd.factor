@@ -20,8 +20,7 @@ IN: xkcd
     comic-image image. ;
 
 : comic-text ( url -- string )
-    http-get nip parse-html
-    "transcript" find-by-id-between
+    scrape-html nip "transcript" find-by-id-between
     html-text html-unescape ;
 
 : comic-text. ( url -- )
