@@ -13,8 +13,9 @@ void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc,
   signal_resumable = false;
 
   cell frame_top = ctx->callstack_top;
+  cell seg_start = ctx->callstack_seg->start;
 
-  if (frame_top < ctx->callstack_seg->start) {
+  if (frame_top < seg_start) {
     /* The saved callstack pointer is outside the callstack
        segment. That means that we need to carefully cut off one frame
        first which hopefully should put the pointer within the
@@ -28,7 +29,7 @@ void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc,
      frame that leaves room for the signal handler to do its thing,
      and launch the handler without going through the resumable
      subprimitive. */
-  FACTOR_ASSERT(ctx->callstack_seg->start <= frame_top);
+  FACTOR_ASSERT(seg_start <= frame_top);
   while (frame_top < ctx->callstack_bottom && frame_top < limit) {
     frame_top = code->frame_predecessor(frame_top);
   }
@@ -56,27 +57,23 @@ void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
      leafness by matching the PC to a word. We should also use
      FRAME_RETURN_ADDRESS instead of assuming the stack pointer is the
      right place to put the resume address. */
-  cell word_idx = 0;
+  cell index = 0;
+  cell delta = 0;
   if (offset == 0) {
-    word_idx = SIGNAL_HANDLER_WORD;
-
-    cell newsp = *sp - sizeof(cell);
-    *sp = newsp;
-    *(cell*)newsp = *pc;
-
+    delta = sizeof(cell);
+    index = SIGNAL_HANDLER_WORD;
   } else if (offset == 16 - sizeof(cell)) {
-    word_idx = LEAF_SIGNAL_HANDLER_WORD;
     /* Make a fake frame for the leaf procedure */
     FACTOR_ASSERT(code->code_block_for_address(*pc) != NULL);
-
-    cell newsp = *sp - LEAF_FRAME_SIZE;
-    *sp = newsp;
-    *(cell*)newsp = *pc;
-
+    delta = LEAF_FRAME_SIZE;
+    index = LEAF_SIGNAL_HANDLER_WORD;
   } else {
     FACTOR_ASSERT(false);
   }
-  tagged<word> handler_word = tagged<word>(special_objects[word_idx]);
+  cell new_sp = *sp - delta;
+  *sp = new_sp;
+  *(cell*)new_sp = *pc;
+  tagged<word> handler_word = tagged<word>(special_objects[index]);
   *pc = (cell)handler_word->entry_point;
 }
 
