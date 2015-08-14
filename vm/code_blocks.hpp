@@ -42,8 +42,7 @@ struct code_block {
   cell stack_frame_size() const {
     if (free_p())
       return 0;
-    else
-      return (header >> 20) & 0xFF0;
+    return (header >> 20) & 0xFF0;
   }
 
   cell stack_frame_size_for_address(cell addr) const {
@@ -54,8 +53,7 @@ struct code_block {
        fake "leaf frame" set up by the signal handler. */
     if (natural_frame_size == 0 || addr == entry_point())
       return LEAF_FRAME_SIZE;
-    else
-      return natural_frame_size;
+    return natural_frame_size;
   }
 
   void set_stack_frame_size(cell frame_size) {

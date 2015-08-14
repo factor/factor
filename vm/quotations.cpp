@@ -150,11 +150,10 @@ void quotation_jit::iterate_quotation() {
     emit(parent->special_objects[JIT_PROLOG]);
   }
 
-  cell i;
   cell length = array_capacity(elements.untagged());
   bool tail_call = false;
 
-  for (i = 0; i < length; i++) {
+  for (cell i = 0; i < length; i++) {
     set_position(i);
 
     data_root<object> obj(array_nth(elements.untagged(), i), parent);
