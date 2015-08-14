@@ -6,7 +6,7 @@ sequences tools.test kernel.private ;
 IN: decimals.tests
 
 { t } [
-    D: 12.34 D: 00012.34000 =
+    DECIMAL: 12.34 DECIMAL: 00012.34000 =
 ] unit-test
 
 : random-test-int ( -- n )
@@ -38,15 +38,15 @@ ERROR: decimal-test-failure D1 D2 quot ;
 ] unit-test
 
 { t } [
-    { D: 0. D: .0 D: 0.0 D: 00.00 D: . } all-equal?
+    { DECIMAL: 0. DECIMAL: .0 DECIMAL: 0.0 DECIMAL: 00.00 DECIMAL: . } all-equal?
 ] unit-test
 
 { t } [ T{ decimal f 90 0 } T{ decimal f 9 1 } = ] unit-test
 
-{ t } [ D: 1 D: 2 before? ] unit-test
-{ f } [ D: 2 D: 2 before? ] unit-test
-{ f } [ D: 3 D: 2 before? ] unit-test
-{ f } [ D: -1 D: -2 before? ] unit-test
-{ f } [ D: -2 D: -2 before? ] unit-test
-{ t } [ D: -3 D: -2 before? ] unit-test
-{ t } [ D: .5 D: 0 D: 1.0 between? ] unit-test
+{ t } [ DECIMAL: 1 DECIMAL: 2 before? ] unit-test
+{ f } [ DECIMAL: 2 DECIMAL: 2 before? ] unit-test
+{ f } [ DECIMAL: 3 DECIMAL: 2 before? ] unit-test
+{ f } [ DECIMAL: -1 DECIMAL: -2 before? ] unit-test
+{ f } [ DECIMAL: -2 DECIMAL: -2 before? ] unit-test
+{ t } [ DECIMAL: -3 DECIMAL: -2 before? ] unit-test
+{ t } [ DECIMAL: .5 DECIMAL: 0 DECIMAL: 1.0 between? ] unit-test
