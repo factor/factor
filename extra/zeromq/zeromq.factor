@@ -13,7 +13,7 @@ TUPLE: zmq-error n string ;
     zmq_errno dup zmq_strerror zmq-error boa throw ; inline
 
 : check-zmq-error ( retval -- )
-    [ zmq-error ] unless-zero ; inline
+    [ throw-zmq-error ] unless-zero ; inline
 
 : zmq-version ( -- version )
     { int int int } [ zmq_version ] with-out-parameters 3array ;
@@ -62,7 +62,7 @@ TUPLE: zmq-socket underlying ;
 
 : <zmq-socket> ( context type -- socket )
     [ underlying>> ] dip zmq_socket
-    dup [ zmq-error ] unless
+    dup [ throw-zmq-error ] unless
     zmq-socket boa ;
 
 M: zmq-socket dispose
@@ -90,11 +90,11 @@ M: zmq-socket zmq-setopt
 
 : zmq-sendmsg ( socket msg flags -- )
     [ [ underlying>> ] bi@ ] dip zmq_sendmsg
-    0 < [ zmq-error ] when ;
+    0 < [ throw-zmq-error ] when ;
 
 : zmq-recvmsg ( socket msg flags -- )
     [ [ underlying>> ] bi@ ] dip zmq_recvmsg
-    0 < [ zmq-error ] when ;
+    0 < [ throw-zmq-error ] when ;
 
 : zmq-send ( socket byte-array flags -- )
     [ byte-array>zmq-message ] dip

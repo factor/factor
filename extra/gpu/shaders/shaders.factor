@@ -473,7 +473,7 @@ DEFER: <shader-instance>
     [ ] [ source>> ] [ kind>> gl-shader-kind ] tri <gl-shader>
     dup gl-shader-ok?
     [ swap world get \ shader-instance boa window-resource ]
-    [ compile-shader-error ] if ;
+    [ throw-compile-shader-error ] if ;
 
 : (link-program) ( program shader-instances -- program-instance )
     '[ _ [ handle>> ] map ]
@@ -488,7 +488,7 @@ DEFER: <shader-instance>
     dup gl-program-ok?  [
         [ swap world get \ program-instance boa |dispose dup verify-feedback-format ]
         with-destructors window-resource
-    ] [ link-program-error ] if ;
+    ] [ throw-link-program-error ] if ;
 
 : link-program ( program -- program-instance )
     dup shaders>> [ <shader-instance> ] map (link-program) ;

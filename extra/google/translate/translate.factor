@@ -26,8 +26,8 @@ TUPLE: response-error response error ;
 : check-response ( response -- response )
     "responseStatus" over at {
         { 200 [ ] }
-        { 400 [ response-error ] }
-        [ drop response-error ]
+        { 400 [ throw-response-error ] }
+        [ drop throw-response-error ]
     } case ;
 
 : query-response>text ( response -- text )

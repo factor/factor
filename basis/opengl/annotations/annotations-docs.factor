@@ -27,14 +27,14 @@ HELP: log-gl-errors
 { $description "Annotate every OpenGL function to log using " { $link log-gl-error } " if the function results in an error. Use " { $link reset-gl-functions } " to reverse this operation." } ;
 
 HELP: reset-gl-functions
-{ $description "Removes any annotations from all OpenGL functions, such as those applied by " { $link gl-errors } " or " { $link log-gl-errors } "." } ;
+{ $description "Removes any annotations from all OpenGL functions, such as those applied by " { $link throw-gl-errors } " or " { $link log-gl-errors } "." } ;
 
-{ gl-errors gl-error log-gl-errors log-gl-error clear-gl-error-log reset-gl-functions } related-words
+{ throw-gl-errors gl-error log-gl-errors log-gl-error clear-gl-error-log reset-gl-functions } related-words
 
 ARTICLE: "opengl.annotations" "OpenGL error reporting"
 "The " { $vocab-link "opengl.annotations" } " vocabulary provides some tools for tracking down GL errors:"
 { $subsections
-    gl-errors
+    throw-gl-errors
     log-gl-errors
     clear-gl-error-log
     reset-gl-functions
