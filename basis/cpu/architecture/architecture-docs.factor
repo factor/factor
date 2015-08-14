@@ -213,7 +213,7 @@ HELP: %replace-imm
 { $examples
   { $unchecked-example
     "USING: cpu.architecture make ;"
-    "[ 777 D 0 %replace-imm ] B{ } make disassemble"
+    "[ 777 D: 0 %replace-imm ] B{ } make disassemble"
     "0000000000aad8c0: 49c70690300000  mov qword [r14], 0x3090"
   }
 } ;

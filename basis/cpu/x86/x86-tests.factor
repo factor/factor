@@ -35,7 +35,7 @@ IN: cpu.x86.tests
 
 ! %clear
 { t } [
-    [ D 0 %clear ] B{ } make
+    [ D: 0 %clear ] B{ } make
     cpu x86.32? B{ 199 6 144 18 0 0 } B{ 73 199 6 144 18 0 0 } ? =
 ] unit-test
 
