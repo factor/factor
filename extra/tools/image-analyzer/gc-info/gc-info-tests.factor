@@ -1,5 +1,5 @@
 USING: accessors alien.c-types alien.syntax arrays assocs bit-arrays
-classes.struct combinators combinators.short-circuit compiler
+classes.struct combinators combinators.short-circuit compiler compiler.cfg
 compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.stack-frame compiler.codegen.gc-maps compiler.units fry generic
 grouping io io.encodings.binary io.streams.byte-array kernel math namespaces
@@ -10,6 +10,7 @@ IN: tools.image-analyzer.gc-info.tests
 QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
+QUALIFIED: gtk-samples.opengl
 QUALIFIED: opencl
 
 : normal? ( word -- ? )
@@ -35,7 +36,7 @@ QUALIFIED: opencl
 
 ! Like word>gc-info but uses the compiler
 : word>gc-info-expected ( word -- seq/f )
-    test-regs first cfg>gc-maps tally-gc-maps ;
+    test-regs first [ cfg set ] [ cfg>gc-maps tally-gc-maps ] bi ;
 
 ! Handle f f as input. Deferred words don't have any gc-info. See #1394.
 : same-gc-info? ( compiler-gc-info/f gc-info/f -- ? )
@@ -124,6 +125,12 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 
 { t } [
     \ cpu.x86.features.private:(sse-version)
+    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+] unit-test
+
+! #1436
+{ t } [
+    \ gtk-samples.opengl:opengl-main
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
