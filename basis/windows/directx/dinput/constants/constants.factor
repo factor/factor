@@ -835,7 +835,7 @@ MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
 [ define-constants ] "windows.directx.dinput.constants" add-startup-hook
 
 : uninitialize ( variable quot -- )
-    [ [ get-global ] dip when* ] [ drop global delete-at ] 2bi ; inline
+    '[ _ when* f ] change-global ; inline
 
 : free-dinput-constants ( -- )
     {
