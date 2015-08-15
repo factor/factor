@@ -17,37 +17,48 @@ ARTICLE: "grouping" "Groups and clumps"
 "The difference can be summarized as the following:"
 { $list
     { "With groups, the subsequences form the original sequence when concatenated:"
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } 2 group ." "{ { 1 2 } { 3 4 } }"
+            "{ 1 2 3 4 } 2 group ."
+            "{ { 1 2 } { 3 4 } }"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } dup" "2 <groups> concat sequence= ." "t"
+            "{ 1 2 3 4 } dup"
+            "2 <groups> concat sequence= ."
+            "t"
         }
     }
     { "With clumps, collecting the first element of each subsequence but the last one, together with the last subsequence, yields the original sequence:"
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } 2 clump ." "{ { 1 2 } { 2 3 } { 3 4 } }"
+            "{ 1 2 3 4 } 2 clump ."
+            "{ { 1 2 } { 2 3 } { 3 4 } }"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping assocs sequences ;"
-            "{ 1 2 3 4 } dup" "2 <clumps> unclip-last [ keys ] dip append sequence= ." "t"
+            "{ 1 2 3 4 } dup"
+            "2 <clumps> unclip-last [ keys ] dip append sequence= ."
+            "t"
         }
     }
     { "With circular clumps, collecting the first element of each subsequence yields the original sequence. Collecting the " { $snippet "n" } "th element of each subsequence would rotate the original sequence " { $snippet "n" } " elements rightward:"
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } 2 circular-clump ." "{ { 1 2 } { 2 3 } { 3 4 } { 4 1 } }"
+            "{ 1 2 3 4 } 2 circular-clump ."
+            "{ { 1 2 } { 2 3 } { 3 4 } { 4 1 } }"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping assocs sequences ;"
-            "{ 1 2 3 4 } dup" "2 <circular-clumps> keys sequence= ." "t"
+            "{ 1 2 3 4 } dup"
+            "2 <circular-clumps> keys sequence= ."
+            "t"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } dup" "2 <circular-clumps> [ second ] { } map-as ." "{ 2 3 4 1 }"
+            "{ 1 2 3 4 }"
+            "2 <circular-clumps> [ second ] { } map-as ."
+            "{ 2 3 4 1 }"
         }
     }
 }
