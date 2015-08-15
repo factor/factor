@@ -80,10 +80,10 @@ TUPLE: annotation < entity parent ;
 : lookup-annotation ( id -- annotation )
     [ f ] dip <annotation> select-tuple ;
 
-: paste ( id -- paste )
-    [ <paste-state> select-tuple ]
-    [ f <annotation> select-tuples ]
-    bi >>annotations ;
+: paste ( id -- paste/f )
+    [ <paste-state> select-tuple ] keep over [
+        f <annotation> select-tuples >>annotations
+    ] [ drop ] if ;
 
 ! ! !
 ! LINKS, ETC
