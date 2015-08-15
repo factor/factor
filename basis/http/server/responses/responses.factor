@@ -36,11 +36,14 @@ IN: http.server.responses
 : <304> ( -- response )
     304 "Not modified" <trivial-response> ;
 
-: <403> ( -- response )
-    403 "Forbidden" <trivial-response> ;
-
 : <400> ( -- response )
     400 "Bad request" <trivial-response> ;
 
+: <403> ( -- response )
+    403 "Forbidden" <trivial-response> ;
+
 : <404> ( -- response )
     404 "Not found" <trivial-response> ;
+
+: <405> ( -- response )
+    405 "Method Not Allowed" <trivial-response> ;
