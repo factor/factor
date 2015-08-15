@@ -96,6 +96,7 @@ M: action call-responder* ( path action -- response )
         { "GET" [ handle-get ] }
         { "HEAD" [ handle-get ] }
         { "POST" [ handle-post ] }
+        [ 2drop <405> ]
     } case ;
 
 M: action modify-form
