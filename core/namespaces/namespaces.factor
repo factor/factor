@@ -1,10 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs hashtables kernel kernel.private math
-sequences vectors ;
-SLOT: boxes
-SLOT: value
-FROM: accessors => boxes>> value>> value<< ;
+USING: accessors arrays assocs hashtables kernel kernel.private
+math sequences vectors ;
 IN: namespaces
 
 <PRIVATE
