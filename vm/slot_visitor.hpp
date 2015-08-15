@@ -127,6 +127,7 @@ template <typename Fixup> struct slot_visitor {
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
   void visit_object_array(cell* start, cell* end);
+  void visit_partial_objects(cell start, cell card_start, cell card_end);
   void visit_slots(object* ptr);
   void visit_stack_elements(segment* region, cell* top);
   void visit_all_roots();
@@ -161,6 +162,19 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_object_array(cell* start, cell* end) {
   while (start < end)
     visit_handle(start++);
+}
+
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_partial_objects(cell start,
+                                                cell card_start,
+                                                cell card_end) {
+  cell *scan_start = (cell*)start + 1;
+  cell *scan_end = scan_start + ((object*)start)->slot_count();
+
+  scan_start = std::max(scan_start, (cell*)card_start);
+  scan_end = std::min(scan_end, (cell*)card_end);
+
+  visit_object_array(scan_start, scan_end);
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {

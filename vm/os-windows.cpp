@@ -95,23 +95,34 @@ segment::segment(cell size_, bool executable_p) {
   size = size_;
 
   char* mem;
-  DWORD ignore;
 
   if ((mem = (char*)VirtualAlloc(
            NULL, getpagesize() * 2 + size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
-      0)
+      0) {
     out_of_memory("VirtualAlloc");
-
-  if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
-    fatal_error("Cannot allocate low guard page", (cell)mem);
-
-  if (!VirtualProtect(mem + size + getpagesize(), getpagesize(), PAGE_NOACCESS,
-                      &ignore))
-    fatal_error("Cannot allocate high guard page", (cell)mem);
+  }
 
   start = (cell)mem + getpagesize();
   end = start + size;
+
+  set_border_locked(true);
+}
+
+void segment::set_border_locked(bool locked) {
+  int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
+  int pagesize = getpagesize();
+  DWORD ignore;
+
+  cell lo = start - pagesize;
+  if (!VirtualProtect((char*)lo, pagesize, prot, &ignore)) {
+    fatal_error("Cannot (un)protect low guard page", lo);
+  }
+
+  cell hi = end;
+  if (!VirtualProtect((char*)hi, pagesize, prot, &ignore)) {
+    fatal_error("Cannot (un)protect high guard page", lo);
+  }
 }
 
 segment::~segment() {

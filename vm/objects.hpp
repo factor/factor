@@ -44,7 +44,7 @@ enum special_object {
   JIT_SAFEPOINT,
   JIT_EPILOG,
   JIT_RETURN,
-  JIT_PROFILING,
+  JIT_UNUSED,
   JIT_PUSH_IMMEDIATE,
   JIT_DIP_WORD,
   JIT_DIP,
@@ -55,7 +55,8 @@ enum special_object {
   JIT_EXECUTE,
   JIT_DECLARE_WORD,
 
-  /* External entry points */
+  /* External entry points. These are defined in the files in
+     bootstrap/assembler/ */
   C_TO_FACTOR_WORD = 43,
   LAZY_JIT_COMPILE_WORD,
   UNWIND_NATIVE_FRAMES_WORD,
@@ -70,7 +71,7 @@ enum special_object {
      caching */
   REDEFINITION_COUNTER = 52,
 
-  /* Callback stub generation in callbacks.c */
+  /* Callback stub generation in callbacks.cpp */
   CALLBACK_STUB = 53,
 
   /* Polymorphic inline cache generation in inline_cache.c */

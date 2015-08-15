@@ -91,24 +91,33 @@ segment::segment(cell size_, bool executable_p) {
   else
     prot = PROT_READ | PROT_WRITE;
 
-  char* array = (char*)mmap(NULL, pagesize + size + pagesize, prot,
+  char* array = (char*)mmap(NULL, 2 * pagesize + size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
 
-  if (array == (char*)- 1)
+  if (array == (char*)-1)
     out_of_memory("mmap");
-
-  if (mprotect(array, pagesize, PROT_NONE) == -1) {
-    check_ENOMEM("mprotect low");
-    fatal_error("Cannot protect low guard page", (cell)array);
-  }
-
-  if (mprotect(array + pagesize + size, pagesize, PROT_NONE) == -1) {
-    check_ENOMEM("mprotect high");
-    fatal_error("Cannot protect high guard page", (cell)array);
-  }
 
   start = (cell)(array + pagesize);
   end = start + size;
+
+  set_border_locked(true);
+}
+
+void segment::set_border_locked(bool locked) {
+  int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
+  int pagesize = getpagesize();
+
+  cell lo = start - pagesize;
+  if (mprotect((char*)lo, pagesize, prot) == -1) {
+    check_ENOMEM("mprotect low");
+    fatal_error("Cannot (un)protect low guard page", lo);
+  }
+
+  cell hi = end;
+  if (mprotect((char*)hi, pagesize, prot) == -1) {
+    check_ENOMEM("mprotect high");
+    fatal_error("Cannot protect high guard page", lo);
+  }
 }
 
 segment::~segment() {
@@ -150,10 +159,13 @@ void factor_vm::end_sampling_profiler_timer() {
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+
+  cell fault_addr = (cell)siginfo->si_addr;
+  cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm();
-  vm->verify_memory_protection_error((cell)siginfo->si_addr);
-  vm->signal_fault_addr = (cell)siginfo->si_addr;
-  vm->signal_fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
+  vm->verify_memory_protection_error(fault_addr);
+  vm->signal_fault_addr = fault_addr;
+  vm->signal_fault_pc = fault_pc;
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
 

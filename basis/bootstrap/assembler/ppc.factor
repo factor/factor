@@ -118,7 +118,7 @@ IN: bootstrap.ppc
     0 1 lr-save jit-load-cell    ! Fetch return address
     0 MTLR                       ! Set up return
     BLR                          ! Branch back
-] callback-stub jit-define
+] CALLBACK-STUB jit-define
 
 : jit-conditional* ( test-quot false-quot -- )
     [ '[ 4 + @ ] ] dip jit-conditional ; inline
@@ -137,19 +137,6 @@ IN: bootstrap.ppc
     rs-reg ctx-reg context-retainstack-offset jit-load-cell ;
 
 [
-    12 jit-load-literal-arg
-    0 profile-count-offset LI
-    11 12 0 jit-load-cell-x
-    11 11 1 tag-fixnum ADDI
-    11 12 0 jit-save-cell-x
-    0 word-code-offset LI
-    11 12 0 jit-load-cell-x
-    11 11 compiled-header-size ADDI
-    11 MTCTR
-    BCTR
-] jit-profiling jit-define
-
-[
     0 MFLR
     0 1 lr-save jit-save-cell
     0 jit-load-this-arg
@@ -157,12 +144,12 @@ IN: bootstrap.ppc
     0 stack-frame LI
     0 1 cell-size 1 * neg jit-save-cell
     1 1 stack-frame neg jit-save-cell-update
-] jit-prolog jit-define
+] JIT-PROLOG jit-define
 
 [
     3 jit-load-literal-arg
     3 ds-reg cell-size jit-save-cell-update
-] jit-push jit-define
+] JIT-PUSH-IMMEDIATE jit-define
 
 [
     jit-save-context
@@ -172,14 +159,16 @@ IN: bootstrap.ppc
     jit-load-dlsym-toc-arg ! Restore the TOC/GOT
     BLRL
     jit-restore-context
-] jit-primitive jit-define
+] JIT-PRIMITIVE jit-define
 
-[ 0 BL rc-relative-ppc-3-pc rt-entry-point-pic jit-rel ] jit-word-call jit-define
+[
+    0 BL rc-relative-ppc-3-pc rt-entry-point-pic jit-rel
+] JIT-WORD-CALL jit-define
 
 [
     6 jit-load-here-arg
     0 B rc-relative-ppc-3-pc rt-entry-point-pic-tail jit-rel
-] jit-word-jump jit-define
+] JIT-WORD-JUMP jit-define
 
 [
     3 ds-reg 0 jit-load-cell
@@ -187,7 +176,7 @@ IN: bootstrap.ppc
     0 3 \ f type-number jit-compare-cell-imm
     [ 0 swap BEQ ] [ 0 B rc-relative-ppc-3-pc rt-entry-point jit-rel ] jit-conditional*
     0 B rc-relative-ppc-3-pc rt-entry-point jit-rel
-] jit-if jit-define
+] JIT-IF jit-define
 
 : jit->r ( -- )
     4 ds-reg 0 jit-load-cell
@@ -239,27 +228,27 @@ IN: bootstrap.ppc
     jit->r
     0 BL rc-relative-ppc-3-pc rt-entry-point jit-rel
     jit-r>
-] jit-dip jit-define
+] JIT-DIP jit-define
 
 [
     jit-2>r
     0 BL rc-relative-ppc-3-pc rt-entry-point jit-rel
     jit-2r>
-] jit-2dip jit-define
+] JIT-2DIP jit-define
 
 [
     jit-3>r
     0 BL rc-relative-ppc-3-pc rt-entry-point jit-rel
     jit-3r>
-] jit-3dip jit-define
+] JIT-3DIP jit-define
 
 [
     1 1 stack-frame ADDI
     0 1 lr-save jit-load-cell
     0 MTLR
-] jit-epilog jit-define
+] JIT-EPILOG jit-define
 
-[ BLR ] jit-return jit-define
+[ BLR ] JIT-RETURN jit-define
 
 ! ! ! Polymorphic inline caches
 
@@ -269,9 +258,9 @@ IN: bootstrap.ppc
 ! Load a value from a stack position
 [
     4 ds-reg 0 jit-load-cell rc-absolute-ppc-2 rt-untagged jit-rel
-] pic-load jit-define
+] PIC-LOAD jit-define
 
-[ 4 4 tag-mask get ANDI. ] pic-tag jit-define
+[ 4 4 tag-mask get ANDI. ] PIC-TAG jit-define
 
 [
     3 4 MR
@@ -280,20 +269,20 @@ IN: bootstrap.ppc
     [ 0 swap BNE ]
     [ 4 tuple-class-offset LI 4 3 4 jit-load-cell-x ]
     jit-conditional*
-] pic-tuple jit-define
+] PIC-TUPLE jit-define
 
 [
     0 4 0 jit-compare-cell-imm rc-absolute-ppc-2 rt-untagged jit-rel
-] pic-check-tag jit-define
+] PIC-CHECK-TAG jit-define
 
 [
     5 jit-load-literal-arg
     0 4 5 jit-compare-cell
-] pic-check-tuple jit-define
+] PIC-CHECK-TUPLE jit-define
 
 [
     [ 0 swap BNE ] [ 0 B rc-relative-ppc-3-pc rt-entry-point jit-rel ] jit-conditional*
-] pic-hit jit-define
+] PIC-HIT jit-define
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- ) 6 MFLR ;
@@ -360,7 +349,7 @@ IN: bootstrap.ppc
     ]
     jit-conditional*
     ! fall-through on miss
-] mega-lookup jit-define
+] MEGA-LOOKUP jit-define
 
 ! ! ! Sub-primitives
 
@@ -387,7 +376,7 @@ IN: bootstrap.ppc
     4 word-entry-point-offset LI
     4 3 4 jit-load-cell-x
     4 MTCTR BCTR
-] jit-execute jit-define
+] JIT-EXECUTE jit-define
 
 ! Special primitives
 [

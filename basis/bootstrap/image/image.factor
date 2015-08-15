@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bootstrap.image.syntax
-byte-arrays classes classes.builtin classes.private
-classes.tuple classes.tuple.private combinators
+USING: accessors arrays assocs byte-arrays classes classes.builtin
+classes.private classes.tuple classes.tuple.private combinators
 combinators.short-circuit combinators.smart
 compiler.codegen.relocation compiler.units fry generic
 generic.single.private grouping hashtables hashtables.private io
@@ -94,8 +93,6 @@ CONSTANT: image-version 4
 
 CONSTANT: data-base 1024
 
-CONSTANT: special-objects-size 80
-
 CONSTANT: header-size 10
 
 CONSTANT: data-heap-size-offset 3
@@ -105,6 +102,8 @@ CONSTANT: 1-offset              8
 CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
+
+SYMBOL: special-objects
 
 :: jit-conditional ( test-quot false-quot -- )
     [ 0 test-quot call ] B{ } make length :> len
@@ -126,8 +125,8 @@ SYMBOL: sub-primitives
 : make-jit-no-params ( quot -- code )
     make-jit 2nip ;
 
-: jit-define ( quot name -- )
-    [ make-jit-no-params ] dip set ;
+: jit-define ( quot n -- )
+    [ make-jit-no-params ] dip special-objects get set-at ;
 
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
@@ -143,7 +142,6 @@ SYMBOL: sub-primitives
     ] dip
     sub-primitives get set-at ;
 
-! The image being constructed; a vector of word-size integers
 SYMBOL: bootstrapping-image
 
 ! Image output format
@@ -151,68 +149,7 @@ SYMBOL: big-endian
 
 SYMBOL: architecture
 
-RESET
-
-! Boot quotation, set in stage1.factor
-SPECIAL-OBJECT: bootstrap-startup-quot 20
-
-! Bootstrap global namesapce
-SPECIAL-OBJECT: bootstrap-global 21
-
-! JIT parameters
-SPECIAL-OBJECT: jit-prolog 23
-SPECIAL-OBJECT: jit-primitive-word 24
-SPECIAL-OBJECT: jit-primitive 25
-SPECIAL-OBJECT: jit-word-jump 26
-SPECIAL-OBJECT: jit-word-call 27
-SPECIAL-OBJECT: jit-if-word 28
-SPECIAL-OBJECT: jit-if 29
-SPECIAL-OBJECT: jit-safepoint 30
-SPECIAL-OBJECT: jit-epilog 31
-SPECIAL-OBJECT: jit-return 32
-SPECIAL-OBJECT: jit-profiling 33
-SPECIAL-OBJECT: jit-push 34
-SPECIAL-OBJECT: jit-dip-word 35
-SPECIAL-OBJECT: jit-dip 36
-SPECIAL-OBJECT: jit-2dip-word 37
-SPECIAL-OBJECT: jit-2dip 38
-SPECIAL-OBJECT: jit-3dip-word 39
-SPECIAL-OBJECT: jit-3dip 40
-SPECIAL-OBJECT: jit-execute 41
-SPECIAL-OBJECT: jit-declare-word 42
-
-SPECIAL-OBJECT: c-to-factor-word 43
-SPECIAL-OBJECT: lazy-jit-compile-word 44
-SPECIAL-OBJECT: unwind-native-frames-word 45
-SPECIAL-OBJECT: fpu-state-word 46
-SPECIAL-OBJECT: set-fpu-state-word 47
-SPECIAL-OBJECT: signal-handler-word 48
-SPECIAL-OBJECT: leaf-signal-handler-word 49
-SPECIAL-OBJECT: ffi-signal-handler-word 50
-SPECIAL-OBJECT: ffi-leaf-signal-handler-word 51
-
-SPECIAL-OBJECT: callback-stub 53
-
-! PIC stubs
-SPECIAL-OBJECT: pic-load 54
-SPECIAL-OBJECT: pic-tag 55
-SPECIAL-OBJECT: pic-tuple 56
-SPECIAL-OBJECT: pic-check-tag 57
-SPECIAL-OBJECT: pic-check-tuple 58
-SPECIAL-OBJECT: pic-hit 59
-SPECIAL-OBJECT: pic-miss-word 60
-SPECIAL-OBJECT: pic-miss-tail-word 61
-
-! Megamorphic dispatch
-SPECIAL-OBJECT: mega-lookup 62
-SPECIAL-OBJECT: mega-lookup-word 63
-SPECIAL-OBJECT: mega-miss-word 64
-
-! Default definition for undefined words
-SPECIAL-OBJECT: undefined-quot 65
-
-: special-object-offset ( symbol -- n )
-    special-objects get at header-size + ;
+H{ } clone special-objects set-global
 
 : emit ( cell -- ) bootstrapping-image get push ;
 
@@ -228,7 +165,7 @@ SPECIAL-OBJECT: undefined-quot 65
 : fixup ( value offset -- ) bootstrapping-image get set-nth ;
 
 : heap-size ( -- size )
-    bootstrapping-image get length header-size - special-objects-size -
+    bootstrapping-image get length header-size - special-object-count -
     bootstrap-cells ;
 
 : here ( -- size ) heap-size data-base + ;
@@ -266,10 +203,7 @@ GENERIC: ' ( obj -- ptr )
     0 emit ! pointer to bignum 0
     0 emit ! pointer to bignum 1
     0 emit ! pointer to bignum -1
-    special-objects-size [ f ' emit ] times ;
-
-: emit-special-object ( symbol -- )
-    [ get ' ] [ special-object-offset ] bi fixup ;
+    special-object-count [ f ' emit ] times ;
 
 ! Bignums
 
@@ -509,32 +443,39 @@ M: quotation '
         class-and-cache class-or-cache next-method-quot-cache
     } [ H{ } clone global-box boa ] H{ } map>assoc assoc-union
     global-hashtable boa
-    bootstrap-global set ;
+    OBJ-GLOBAL special-objects get set-at ;
 
 : emit-jit-data ( -- )
-    \ if jit-if-word set
-    \ do-primitive jit-primitive-word set
-    \ dip jit-dip-word set
-    \ 2dip jit-2dip-word set
-    \ 3dip jit-3dip-word set
-    \ inline-cache-miss pic-miss-word set
-    \ inline-cache-miss-tail pic-miss-tail-word set
-    \ mega-cache-lookup mega-lookup-word set
-    \ mega-cache-miss mega-miss-word set
-    \ declare jit-declare-word set
-    \ c-to-factor c-to-factor-word set
-    \ lazy-jit-compile lazy-jit-compile-word set
-    \ unwind-native-frames unwind-native-frames-word set
-    \ fpu-state fpu-state-word set
-    \ set-fpu-state set-fpu-state-word set
-    \ signal-handler signal-handler-word set
-    \ leaf-signal-handler leaf-signal-handler-word set
-    \ ffi-signal-handler ffi-signal-handler-word set
-    \ ffi-leaf-signal-handler ffi-leaf-signal-handler-word set
-    undefined-def undefined-quot set ;
+    {
+        { JIT-IF-WORD if }
+        { JIT-PRIMITIVE-WORD do-primitive }
+        { JIT-DIP-WORD dip }
+        { JIT-2DIP-WORD 2dip }
+        { JIT-3DIP-WORD 3dip }
+        { PIC-MISS-WORD inline-cache-miss }
+        { PIC-MISS-TAIL-WORD inline-cache-miss-tail }
+        { MEGA-LOOKUP-WORD mega-cache-lookup }
+        { MEGA-MISS-WORD mega-cache-miss }
+        { JIT-DECLARE-WORD declare }
+        { C-TO-FACTOR-WORD c-to-factor }
+        { LAZY-JIT-COMPILE-WORD lazy-jit-compile }
+        { UNWIND-NATIVE-FRAMES-WORD unwind-native-frames }
+        { GET-FPU-STATE-WORD fpu-state }
+        { SET-FPU-STATE-WORD set-fpu-state }
+        { SIGNAL-HANDLER-WORD signal-handler }
+        { LEAF-SIGNAL-HANDLER-WORD leaf-signal-handler }
+        { FFI-SIGNAL-HANDLER-WORD ffi-signal-handler }
+        { FFI-LEAF-SIGNAL-HANDLER-WORD ffi-leaf-signal-handler }
+    }
+    \ OBJ-UNDEFINED undefined-def 2array suffix [
+        swap execute( -- x ) special-objects get set-at
+    ] assoc-each ;
+
+: emit-special-object ( obj idx -- )
+    [ ' ] [ header-size + ] bi* fixup ;
 
 : emit-special-objects ( -- )
-    special-objects get keys [ emit-special-object ] each ;
+    special-objects get [ swap emit-special-object ] assoc-each ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;

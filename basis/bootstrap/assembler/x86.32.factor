@@ -54,7 +54,7 @@ IN: bootstrap.x86
 [
     pic-tail-reg 0 MOV 0 rc-absolute-cell rel-here
     0 JMP f rc-relative rel-word-pic-tail
-] jit-word-jump jit-define
+] JIT-WORD-JUMP jit-define
 
 : jit-load-vm ( -- )
     vm-reg 0 MOV 0 rc-absolute-cell rel-vm ;
@@ -83,7 +83,7 @@ IN: bootstrap.x86
     ESP [] vm-reg MOV
     0 CALL f f rc-relative rel-dlsym
     jit-restore-context
-] jit-primitive jit-define
+] JIT-PRIMITIVE jit-define
 
 : jit-jump-quot ( -- )
     EAX quot-entry-point-offset [+] JMP ;
@@ -189,7 +189,7 @@ IN: bootstrap.x86
 
 [
     temp1 0xffffffff CMP f rc-absolute-cell rel-literal
-] pic-check-tuple jit-define
+] PIC-CHECK-TUPLE jit-define
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
@@ -371,7 +371,7 @@ IN: bootstrap.x86
 
 [
     0 EAX MOVABS rc-absolute rel-safepoint
-] \ jit-safepoint jit-define
+] JIT-SAFEPOINT jit-define
 
 [
     jit-start-context-and-delete

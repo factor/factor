@@ -122,6 +122,8 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   FACTOR_ASSERT(!data->high_fragmentation_p());
 
   current_gc = new gc_state(op, this);
+  if (ctx)
+    ctx->callstack_seg->set_border_locked(false);
   atomic::store(&current_gc_p, true);
 
   /* Keep trying to GC higher and higher generations until we don't run
@@ -179,6 +181,8 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   end_gc();
 
   atomic::store(&current_gc_p, false);
+  if (ctx)
+    ctx->callstack_seg->set_border_locked(true);
   delete current_gc;
   current_gc = NULL;
 

@@ -74,7 +74,7 @@ big-endian off
 
     ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
     0xffff RET f rc-absolute-2 rel-untagged
-] callback-stub jit-define
+] CALLBACK-STUB jit-define
 
 [
     ! load literal
@@ -83,11 +83,11 @@ big-endian off
     ds-reg bootstrap-cell ADD
     ! store literal on datastack
     ds-reg [] temp0 MOV
-] jit-push jit-define
+] JIT-PUSH-IMMEDIATE jit-define
 
 [
     0 CALL f rc-relative rel-word-pic
-] jit-word-call jit-define
+] JIT-WORD-CALL jit-define
 
 ! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
 ! not to trigger generation of a stack frame, so they can
@@ -161,7 +161,7 @@ big-endian off
     0 JNE f rc-relative rel-word
     ! jump to false branch if equal
     0 JMP f rc-relative rel-word
-] jit-if jit-define
+] JIT-IF jit-define
 
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD
@@ -215,19 +215,19 @@ big-endian off
     jit->r
     0 CALL f rc-relative rel-word
     jit-r>
-] jit-dip jit-define
+] JIT-DIP jit-define
 
 [
     jit-2>r
     0 CALL f rc-relative rel-word
     jit-2r>
-] jit-2dip jit-define
+] JIT-2DIP jit-define
 
 [
     jit-3>r
     0 CALL f rc-relative rel-word
     jit-3r>
-] jit-3dip jit-define
+] JIT-3DIP jit-define
 
 [
     ! load from stack
@@ -243,17 +243,17 @@ big-endian off
     temp0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
     temp0 word-entry-point-offset [+] JMP
-] jit-execute jit-define
+] JIT-EXECUTE jit-define
 
 [
     stack-reg stack-frame-size bootstrap-cell - SUB
-] jit-prolog jit-define
+] JIT-PROLOG jit-define
 
 [
     stack-reg stack-frame-size bootstrap-cell - ADD
-] jit-epilog jit-define
+] JIT-EPILOG jit-define
 
-[ 0 RET ] jit-return jit-define
+[ 0 RET ] JIT-RETURN jit-define
 
 ! ! ! Polymorphic inline caches
 
@@ -262,9 +262,9 @@ big-endian off
 ! Load a value from a stack position
 [
     temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
-] pic-load jit-define
+] PIC-LOAD jit-define
 
-[ temp1 tag-mask get AND ] pic-tag jit-define
+[ temp1 tag-mask get AND ] PIC-TAG jit-define
 
 [
     temp0 temp1 MOV
@@ -273,13 +273,13 @@ big-endian off
     [ JNE ]
     [ temp1 temp0 tuple-class-offset [+] MOV ]
     jit-conditional
-] pic-tuple jit-define
+] PIC-TUPLE jit-define
 
 [
     temp1 0x7f CMP f rc-absolute-1 rel-untagged
-] pic-check-tag jit-define
+] PIC-CHECK-TAG jit-define
 
-[ 0 JE f rc-relative rel-word ] pic-hit jit-define
+[ 0 JE f rc-relative rel-word ] PIC-HIT jit-define
 
 ! ! ! Megamorphic caches
 
@@ -315,7 +315,7 @@ big-endian off
         temp0 word-entry-point-offset [+] JMP
         ! fall-through on miss
     ] jit-conditional
-] mega-lookup jit-define
+] MEGA-LOOKUP jit-define
 
 ! ! ! Sub-primitives
 

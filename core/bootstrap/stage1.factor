@@ -55,4 +55,5 @@ load-help? off
         ] if
     ] %
 ] [ ] make
-bootstrap.image.private:bootstrap-startup-quot set
+OBJ-STARTUP-QUOT
+bootstrap.image.private:special-objects get set-at
