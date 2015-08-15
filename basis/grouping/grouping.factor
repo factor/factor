@@ -4,7 +4,7 @@ USING: accessors combinators fry kernel math math.order
 sequences sequences.private ;
 IN: grouping
 
-ERROR: groups-error seq group-size ;
+ERROR: groups-error seq n ;
 
 <PRIVATE
 
