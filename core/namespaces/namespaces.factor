@@ -14,8 +14,7 @@ TUPLE: global-hashtable
 TUPLE: global-box value ;
 
 : (box-at) ( key globals -- box )
-    boxes>> 2dup at
-    [ 2nip ] [ [ f global-box boa ] 2dip [ set-at ] 2curry keep ] if* ; foldable
+    boxes>> [ drop f global-box boa ] cache ; foldable
 
 : box-at ( key globals -- box )
     (box-at) { global-box } declare ; inline
