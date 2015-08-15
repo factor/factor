@@ -9,8 +9,11 @@ IN: webapps.mason.report
         [ validate-os/cpu ] >>init
         [
             [
-                current-builder last-report>>
-                <html-content>
+                current-builder [
+                    last-report>> <html-content>
+                ] [
+                    <404>
+                ] if
             ] with-mason-db
         ] >>display ;
 

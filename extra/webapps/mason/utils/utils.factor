@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs db.tuples furnace.actions
-furnace.utilities html.forms kernel namespaces sequences
-validators xml.syntax urls mason.config
-webapps.mason.version.data webapps.mason.backend ;
+furnace.utilities html.forms kernel mason.config namespaces
+sequences urls validators webapps.mason.backend
+webapps.mason.version.data xml.syntax ;
 IN: webapps.mason.utils
 
 : link ( url label -- xml )
@@ -15,10 +15,10 @@ IN: webapps.mason.utils
         { "cpu" [ v-one-line ] }
     } validate-params ;
 
-: current-builder ( -- builder )
+: current-builder ( -- builder/f )
     builder new "os" value >>os "cpu" value >>cpu select-tuple ;
 
-: current-release ( -- builder )
+: current-release ( -- builder/f )
     release new "os" value >>os "cpu" value >>cpu select-tuple ;
 
 : requirements ( builder -- xml )
