@@ -222,17 +222,12 @@ print-use-hook [ [ ] ] initialize
 : parse-file-restarts ( path -- restarts )
     "Load " " again" surround t 2array 1array ;
 
-: (parse-file) ( path -- quot )
-    [
-        dup [
-            utf8 file-lines dup parse-fresh
-            [ nip ] [ finish-parsing ] 2bi
-            forget-smudged
-        ] with-source-file
-    ] with-compilation-unit ;
-
 : parse-file ( path -- quot )
-    [ (parse-file) ] [
+    [
+        [ parsing-file ] keep
+        [ utf8 <file-reader> ] keep
+        parse-stream
+    ] [
         over parse-file-restarts rethrow-restarts
         drop parse-file
     ] recover ;
