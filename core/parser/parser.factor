@@ -74,10 +74,12 @@ ERROR: number-expected ;
 
 ERROR: invalid-word-name string ;
 
-: scan-word-name ( -- string )
-    scan-token
+: check-word-name ( string -- string )
     dup "\"" = [ t ] [ dup string>number ] if
     [ invalid-word-name ] when ;
+
+: scan-word-name ( -- string )
+    scan-token check-word-name ;
 
 : scan-new ( -- word )
     scan-word-name create-word-in ;
