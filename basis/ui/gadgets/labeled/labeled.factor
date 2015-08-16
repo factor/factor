@@ -17,7 +17,10 @@ M: labeled-gadget focusable-child* content>> ;
     swap >label
     [ t >>bold? ] change-font
     { 0 4 } <border>
-    title-bar-gradient <gradient> >>interior
+    os windows =
+    [ toolbar-background <solid> ]
+    [ title-bar-gradient <gradient> ]
+    if >>interior
     f track-add ;
 
 : add-content ( content track -- track )
