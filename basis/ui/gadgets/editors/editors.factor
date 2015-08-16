@@ -8,7 +8,8 @@ math.vectors models models.arrow namespaces opengl sequences
 sorting splitting timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-ui.gestures ui.pens.solid ui.render ui.text unicode.categories ;
+ui.gadgets.theme ui.gestures ui.pens.solid ui.render ui.text
+unicode.categories ;
 EXCLUDE: fonts => selection ;
 IN: ui.gadgets.editors
 
@@ -646,10 +647,35 @@ M: model-field ungraft*
 M: model-field model-changed
     nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;
 
+TUPLE: action-editor < editor default-text ;
+
+: <action-editor> ( -- editor )
+    action-editor new-editor ;
+
+<PRIVATE
+
+: draw-default-text? ( editor -- ? )
+    { [ default-text>> ] [ model>> doc-string empty? ] } 1&& ;
+
+: draw-default-text ( editor -- )
+    [ font>> clone line-color >>foreground ]
+    [ default-text>> ] bi draw-text ;
+
+PRIVATE>
+
+M: action-editor draw-gadget*
+    dup draw-default-text? [
+        [ draw-default-text ] [ draw-caret ] bi
+    ] [
+        call-next-method
+    ] if ;
+
 TUPLE: action-field < field quot ;
 
 : <action-field> ( quot: ( string -- ) -- gadget )
-    action-field new-field
+    action-field [ <action-editor> ] dip new-border
+        dup gadget-child >>editor
+        field-theme
         swap >>quot ;
 
 : invoke-action-field ( field -- )
