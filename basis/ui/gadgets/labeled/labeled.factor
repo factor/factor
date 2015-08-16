@@ -14,10 +14,7 @@ M: labeled-gadget focusable-child* content>> ;
 : <title-bar> ( title -- title-bar )
     >label [ t >>bold? ] change-font
     { 0 4 } <border>
-    os windows?
-    [ toolbar-background <solid> ]
-    [ title-bar-gradient <gradient> ]
-    if >>interior ;
+    title-bar-gradient <gradient> >>interior ;
 
 PRIVATE>
 
