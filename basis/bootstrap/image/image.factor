@@ -187,8 +187,8 @@ H{ } clone special-objects set-global
     [ type-number ] dip over here-as
     [ swap emit-header call align-here ] dip ; inline
 
-! Write an object to the image.
-GENERIC: ' ( obj -- ptr )
+! Read any object for emitting.
+GENERIC: prepare-object ( obj -- ptr )
 
 ! Image header
 
@@ -203,7 +203,7 @@ GENERIC: ' ( obj -- ptr )
     0 emit ! pointer to bignum 0
     0 emit ! pointer to bignum 1
     0 emit ! pointer to bignum -1
-    special-object-count [ f ' emit ] times ;
+    special-object-count [ f prepare-object emit ] times ;
 
 ! Bignums
 
@@ -224,30 +224,30 @@ GENERIC: ' ( obj -- ptr )
     [ nip emit-seq ]
     2tri ;
 
-M: bignum '
+M: bignum prepare-object
     [
         bignum [ emit-bignum ] emit-object
     ] cache-eql-object ;
 
 ! Fixnums
 
-M: fixnum '
+M: fixnum prepare-object
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
     dup
     bootstrap-most-negative-fixnum
     bootstrap-most-positive-fixnum between?
-    [ tag-fixnum ] [ >bignum ' ] if ;
+    [ tag-fixnum ] [ >bignum prepare-object ] if ;
 
 TUPLE: fake-bignum n ;
 
 C: <fake-bignum> fake-bignum
 
-M: fake-bignum ' n>> tag-fixnum ;
+M: fake-bignum prepare-object n>> tag-fixnum ;
 
 ! Floats
 
-M: float '
+M: float prepare-object
     [
         float [
             8 (align-here) double>bits emit-64
@@ -260,11 +260,11 @@ M: float '
 
 : t, ( -- ) t t-offset fixup ;
 
-M: f ' drop \ f type-number ;
+M: f prepare-object drop \ f type-number ;
 
-:  0, ( -- )  0 >bignum '  0-offset fixup ;
-:  1, ( -- )  1 >bignum '  1-offset fixup ;
-: -1, ( -- ) -1 >bignum ' -1-offset fixup ;
+:  0, ( -- )  0 >bignum prepare-object  0-offset fixup ;
+:  1, ( -- )  1 >bignum prepare-object  1-offset fixup ;
+: -1, ( -- ) -1 >bignum prepare-object -1-offset fixup ;
 
 ! Words
 
@@ -287,7 +287,7 @@ M: f ' drop \ f type-number ;
                     [ word-sub-primitive ]
                     [ drop 0 ] ! entry point
                 } cleave
-            ] output>array [ ' ] map!
+            ] output>array [ prepare-object ] map!
         ] bi
         \ word [ emit-seq ] emit-object
     ] keep put-object ;
@@ -304,12 +304,12 @@ ERROR: not-in-image vocabulary word ;
 : fixup-words ( -- )
     bootstrapping-image get [ dup word? [ fixup-word ] when ] map! drop ;
 
-M: word ' ;
+M: word prepare-object ;
 
 ! Wrappers
 
-M: wrapper '
-    [ wrapped>> ' wrapper [ emit ] emit-object ] cache-eql-object ;
+M: wrapper prepare-object
+    [ wrapped>> prepare-object wrapper [ emit ] emit-object ] cache-eql-object ;
 
 ! Strings
 : native> ( object -- object )
@@ -337,15 +337,15 @@ M: wrapper '
     ] B{ } map-as ;
 
 : emit-string ( string -- ptr )
-    [ length ] [ extended-part ' ] [ ] tri
+    [ length ] [ extended-part prepare-object ] [ ] tri
     string [
         [ emit-fixnum ]
         [ emit ]
-        [ f ' emit ascii-part pad-bytes emit-bytes ]
+        [ f prepare-object emit ascii-part pad-bytes emit-bytes ]
         tri*
     ] emit-object ;
 
-M: string '
+M: string prepare-object
     #! We pool strings so that each string is only written once
     #! to the image
     [ emit-string ] cache-eql-object ;
@@ -358,7 +358,7 @@ M: string '
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
-M: byte-array '
+M: byte-array prepare-object
     [
         byte-array [
             dup length emit-fixnum
@@ -375,7 +375,7 @@ ERROR: tuple-removed class ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
-    [ class-of transfer-word require-tuple-layout ] bi prefix [ ' ] map
+    [ class-of transfer-word require-tuple-layout ] bi prefix [ prepare-object ] map
     tuple [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
@@ -384,18 +384,18 @@ ERROR: tuple-removed class ;
     [ [ (emit-tuple) ] cache-eq-object ]
     if ;
 
-M: tuple ' emit-tuple ;
+M: tuple prepare-object emit-tuple ;
 
-M: tombstone '
+M: tombstone prepare-object
     state>> "((tombstone))" "((empty))" ?
     "hashtables.private" lookup-word def>> first
     [ emit-tuple ] cache-eql-object ;
 
 ! Arrays
 : emit-array ( array -- offset )
-    [ ' ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+    [ prepare-object ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
-M: array ' [ emit-array ] cache-eq-object ;
+M: array prepare-object [ emit-array ] cache-eq-object ;
 
 ! This is a hack. We need to detect arrays which are tuple
 ! layout arrays so that they can be internalized, but making
@@ -409,7 +409,7 @@ PREDICATE: tuple-layout-array < array
         } 1&&
     ] [ drop f ] if ;
 
-M: tuple-layout-array '
+M: tuple-layout-array prepare-object
     [
         [ dup integer? [ <fake-bignum> ] when ] map
         emit-array
@@ -417,13 +417,13 @@ M: tuple-layout-array '
 
 ! Quotations
 
-M: quotation '
+M: quotation prepare-object
     [
-        array>> '
+        array>> prepare-object
         quotation [
             emit ! array
-            f ' emit ! cached-effect
-            f ' emit ! cache-counter
+            f prepare-object emit ! cached-effect
+            f prepare-object emit ! cache-counter
             0 emit ! entry point
         ] emit-object
     ] cache-eql-object ;
@@ -472,7 +472,7 @@ M: quotation '
     ] assoc-each ;
 
 : emit-special-object ( obj idx -- )
-    [ ' ] [ header-size + ] bi* fixup ;
+    [ prepare-object ] [ header-size + ] bi* fixup ;
 
 : emit-special-objects ( -- )
     special-objects get [ swap emit-special-object ] assoc-each ;
