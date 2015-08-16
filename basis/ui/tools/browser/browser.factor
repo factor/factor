@@ -69,11 +69,8 @@ M: browser-gadget set-history-value
         10 >>max-cols
         white-interior ;
 
-: add-spacer ( track -- track )
-    <pile> 1/4 track-add ;
-
 : <browser-toolbar> ( browser -- toolbar )
-    [ <toolbar> add-spacer ] [ search-field>> "Search" label-on-left 1 track-add ] bi ;
+    [ <toolbar> ] [ search-field>> "Search" label-on-left 1 track-add ] bi ;
 
 : add-browser-toolbar ( track -- track )
     dup <browser-toolbar> format-toolbar f track-add ;
