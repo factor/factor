@@ -4,7 +4,7 @@ USING: accessors colors.constants fonts kernel ui.gadgets
 ui.gadgets.borders ui.gadgets.corners ui.gadgets.frames
 ui.gadgets.grids ui.gadgets.labels
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.theme ui.tools.common 
-ui.pens.gradient ui.pens.image ui.pens.solid ui.render ;
+ui.pens.gradient ui.pens.image ui.pens.solid ui.render system ;
 IN: ui.gadgets.labeled
 
 TUPLE: labeled-gadget < track content color ;
