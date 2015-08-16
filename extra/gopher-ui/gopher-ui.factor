@@ -5,8 +5,9 @@ USING: accessors arrays debugger fry gopher gopher.private
 kernel models present sequences ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.tracks ui.gadgets.viewports ui.gestures ui.operations
-ui.tools.browser ui.tools.browser.history ui.tools.common urls ;
+ui.gadgets.toolbar ui.gadgets.tracks ui.gadgets.viewports
+ui.gestures ui.operations ui.tools.browser
+ui.tools.browser.history ui.tools.common urls ;
 
 IN: gopher-ui
 
