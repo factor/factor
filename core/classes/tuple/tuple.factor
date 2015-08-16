@@ -15,6 +15,8 @@ PRIVATE>
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
+ERROR: too-many-slots class slots got max ;
+
 ERROR: not-a-tuple object ;
 
 : all-slots ( class -- slots )
@@ -75,11 +77,16 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
         ] 2each
     ] if-bootstrapping ; inline
 
-: initial-values ( class -- slots )
-    all-slots [ initial>> ] map ;
+: initial-values ( class -- seq )
+    all-slots [ initial>> ] map ; inline
 
-: pad-slots ( slots class -- slots' class )
-    [ initial-values over length tail append ] keep ; inline
+: pad-slots ( seq class -- seq' class )
+    [ initial-values ] keep
+    2over [ length ] bi@ 2dup > [
+        [ nip swap ] 2dip too-many-slots
+    ] [
+        drop [ tail append ] curry dip
+    ] if ; inline
 
 PRIVATE>
 
