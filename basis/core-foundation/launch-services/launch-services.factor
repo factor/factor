@@ -1,9 +1,10 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax classes.struct continuations core-foundation
-core-foundation.strings core-foundation.urls destructors kernel
-sequences specialized-arrays.instances.alien.c-types.char
-strings unix.ffi ;
+USING: alien.c-types alien.data alien.syntax classes.struct
+continuations core-foundation core-foundation.strings
+core-foundation.urls destructors kernel sequences
+specialized-arrays strings unix.ffi ;
+SPECIALIZED-ARRAY: char
 IN: core-foundation.launch-services
 
 FUNCTION: OSStatus LSFindApplicationForInfo (
@@ -116,7 +117,7 @@ ERROR: core-foundation-error n ;
     dup 0 = [ drop ] [ core-foundation-error ] if ;
 
 : fsref>string ( fsref -- string )
-    MAXPATHLEN [ <char-array> ] [ ] bi
+    MAXPATHLEN [ char <c-array> ] [ ] bi
     [ FSRefMakePath cf-error ] [ drop ] 2bi
     [ 0 = ] trim-tail >string ;
 
