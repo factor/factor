@@ -110,11 +110,13 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     [ prefix 1array ] dip prefix , ;
 
 : ($navigation-links) ( topic -- )
-    [
-        [ prev-article [ 1array \ $long-link "Prev:" ($navigation-link) ] when* ]
-        [ next-article [ 1array \ $long-link "Next:" ($navigation-link) ] when* ]
-        bi
-    ] { } make [ ($navigation-table) ] unless-empty ;
+    help-path-style get [
+        [
+            [ prev-article [ 1array \ $long-link "Prev:" ($navigation-link) ] when* ]
+            [ next-article [ 1array \ $long-link "Next:" ($navigation-link) ] when* ]
+            bi
+        ] { } make [ ($navigation-table) ] unless-empty
+    ] with-style ;
 
 : $title ( topic -- )
     title-style get [

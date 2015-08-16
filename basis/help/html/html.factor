@@ -90,7 +90,12 @@ M: pathname url-of
     [ drop help-stylesheet ]
     [
         [ help-navbar ]
-        [ [ print-topic ] with-html-writer ]
+        [
+            [
+                title-style get
+                { { page-color COLOR: FactorLightTan } } assoc-union
+                title-style [ print-topic ] with-variable
+            ] with-html-writer ]
         bi* append
     ] tri
     simple-page ;
