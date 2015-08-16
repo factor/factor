@@ -1,15 +1,16 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes colors colors.constants combinators
+USING: accessors arrays classes combinators
 combinators.short-circuit compiler.units debugger fry help
-help.apropos help.crossref help.home help.stylesheet help.topics
-kernel locals models sequences sets ui ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.toolbar
-ui.gadgets.packs ui.gadgets.theme ui.gadgets.viewports ui.gadgets.worlds ui.gestures
+help.apropos help.crossref help.home help.markup help.stylesheet
+help.topics io.styles kernel locals make models namespaces
+sequences sets ui ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labels
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
+ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.tracks
+ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
 ui.tools.browser.history ui.tools.browser.popups ui.tools.common
-ui.pens.solid vocabs ;
+vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -34,6 +35,36 @@ M: browser-gadget set-history-value
     [ set-control-value ]
     2bi ;
 
+CONSTANT: prev -1
+CONSTANT: next 1
+
+: add-navigation-arrow ( str direction -- str )
+    prev = [ "<" prefix ] [ ">" suffix ] if ;
+
+: $navigation-arrow ( content element direction -- )
+    [ prefix 1array ] dip add-navigation-arrow , ;
+
+:: ($navigation) ( topic direction -- )
+    topic [
+        direction prev/next-article
+        [ 1array \ $long-link direction $navigation-arrow ] when*
+    ] { } make [ ($navigation-table) ] unless-empty ;
+
+: $navigation ( topic direction -- )
+    title-style get [
+        help-path-style get [
+            ($navigation)
+        ] with-style
+    ] with-style ;
+
+: $title ( topic -- )
+    title-style get [
+        title-style get [
+            [ ($title) ]
+            [ ($navigation-path) ] bi
+        ] with-nesting
+    ] with-style ;
+
 : <help-header> ( browser-gadget -- gadget )
     model>> [ '[ _ $title ] try ] <pane-control> ;
 
@@ -52,6 +83,11 @@ M: browser-gadget set-history-value
     dupd swap prev <help-footer> 1 track-add
     dupd swap next <help-footer> 1 track-add
     f track-add ;
+
+: print-topic ( topic -- )
+    >link
+    last-element off
+    article-content print-content ;
 
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;

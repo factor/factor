@@ -97,45 +97,39 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : ($title) ( topic -- )
     [ [ article-title ] [ >link ] bi write-object ] ($block) ;
-    
-CONSTANT: prev -1
-CONSTANT: next 1
-
-: add-navigation-arrow ( str direction -- str )
-    prev = [ "<" prefix ] [ ">" suffix ] if ;
-
-: $navigation-row ( content element direction -- )
-    [ prefix 1array ] dip add-navigation-arrow , ;
 
 : ($navigation-table) ( element -- )
     help-path-style get table-style [ $table ] with-variable ;
 
-:: ($navigation) ( topic direction -- )
-    topic [ direction prev/next-article
-      [ 1array \ $long-link direction $navigation-row ] when* ] 
-    { } make [ ($navigation-table) ] unless-empty ;
-
 : ($navigation-path) ( topic -- )
-    help-path-style get
-       [ help-path [ reverse $breadcrumbs ] unless-empty ]
-    with-style ;
+    help-path-style get [
+       help-path [ reverse $breadcrumbs ] unless-empty
+    ] with-style ;
+
+: ($navigation-link) ( content element label -- )
+    [ prefix 1array ] dip prefix , ;
+
+: ($navigation-links) ( topic -- )
+    [
+        [ prev-article [ 1array \ $long-link "Prev:" ($navigation-link) ] when* ]
+        [ next-article [ 1array \ $long-link "Next:" ($navigation-link) ] when* ]
+        bi
+    ] { } make [ ($navigation-table) ] unless-empty ;
 
 : $title ( topic -- )
     title-style get [
         title-style get [
-            [ ($title) ] [ ($navigation-path) ] bi
+            [ ($title) ]
+            [ ($navigation-path) ]
+            [ ($navigation-links) ] tri
         ] with-nesting
     ] with-style ;
-
-:: $navigation ( topic direction -- )
-    topic title-style get 
-    [ help-path-style get [ direction ($navigation) ] with-style ]
-    with-style ;
 
 : print-topic ( topic -- )
     >link
     last-element off
-    article-content print-content ;
+    [ $title ($blank-line) ]
+    [ article-content print-content nl ] bi ;
 
 SYMBOL: help-hook
 

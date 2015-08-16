@@ -85,35 +85,12 @@ M: pathname url-of
         </div>
      XML] ;
 
-: $navigation-row ( content element label -- )
-    [ prefix 1array ] dip prefix , ;
-
-: ($navigation-links) ( topic -- )
-    help-path-style get [
-        [
-            [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
-            [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
-            bi
-        ] { } make [ ($navigation-table) ] unless-empty
-    ] with-style ;
-
-: $title ( topic -- )
-    title-style get
-    { { page-color COLOR: FactorLightTan } } assoc-union dup
-    [
-        [
-            [ ($title) ]
-            [ ($navigation-path) ]
-            [ ($navigation-links) ] tri
-        ] with-nesting
-    ] with-style ;
-
 : help>html ( topic -- xml )
     [ article-title " - Factor Documentation" append ]
     [ drop help-stylesheet ]
     [
         [ help-navbar ]
-        [ [ [ $title ($blank-line) ] [ print-topic ] bi ] with-html-writer ]
+        [ [ print-topic ] with-html-writer ]
         bi* append
     ] tri
     simple-page ;
