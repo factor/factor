@@ -13,14 +13,18 @@ TUPLE: labeled-gadget < track content color ;
 
 M: labeled-gadget focusable-child* content>> ;
 
+! gradients don't work as backgrounds on windows, see #152 and #1397
+: title-bar-interior ( -- interior )
+    os windows?
+    [ toolbar-background <solid> ]
+    [ title-bar-gradient <gradient> ]
+    if ;
+
 : add-title-bar ( title track -- track )
     swap >label
     [ t >>bold? ] change-font
     { 0 4 } <border>
-    os windows =
-    [ toolbar-background <solid> ]
-    [ title-bar-gradient <gradient> ]
-    if >>interior
+    title-bar-interior >>interior
     f track-add ;
 
 : add-content ( content track -- track )
@@ -28,7 +32,7 @@ M: labeled-gadget focusable-child* content>> ;
 
 : add-color-line ( color track -- track )
     <shelf> { 0 1.5 } <border>
-    rot <solid> >>interior 
+    rot <solid> >>interior
     f track-add ;
 
 : add-content-area ( labeled -- labeled )
@@ -53,8 +57,8 @@ PRIVATE>
 : <labeled-gadget> ( gadget title -- labeled )
     vertical labeled-gadget new-track with-lines
     add-title-bar
-    swap >>content dup content>>
-    vertical <track> 
+    swap [ >>content ] keep
+    vertical <track>
     add-content
     { 5 5 } <border>
     content-background <solid> >>interior
