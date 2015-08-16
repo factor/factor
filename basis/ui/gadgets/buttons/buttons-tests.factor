@@ -1,23 +1,6 @@
-USING: ui.commands ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets tools.test namespaces sequences kernel models
-accessors ;
+USING: accessors models namespaces tools.test ui.gadgets
+ui.gadgets.buttons ;
 IN: ui.gadgets.buttons.tests
-
-TUPLE: foo-gadget ;
-
-: com-foo-a ( -- ) ;
-
-: com-foo-b ( -- ) ;
-
-\ foo-gadget "toolbar" f {
-    { f com-foo-a }
-    { f com-foo-b }
-} define-command-map
-
-T{ foo-gadget } <toolbar> "t" set
-
-{ 2 } [ "t" get children>> length ] unit-test
-{ "Foo A" } [ "t" get gadget-child gadget-child string>> ] unit-test
 
 { } [
     2 <model> {
