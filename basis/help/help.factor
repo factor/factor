@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple
+USING: accessors arrays assocs classes classes.error classes.tuple
 combinators combinators.short-circuit continuations debugger
 effects generic help.crossref help.markup help.stylesheet
 help.topics io io.styles kernel locals make namespaces prettyprint
