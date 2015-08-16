@@ -678,6 +678,10 @@ TUPLE: action-field < field quot ;
         field-theme
         swap >>quot ;
 
+M: action-field default-text>> editor>> default-text>> ;
+
+M: action-field default-text<< editor>> default-text<< ;
+
 : invoke-action-field ( field -- )
     [ editor>> editor-string ]
     [ editor>> clear-editor ]
