@@ -860,3 +860,6 @@ C: <no-slot-tuple0> no-slot-tuple0
         [ name>> "d" = ]
     } 1&&
 ] must-fail-with
+
+[ "IN: classes.tuple.tests TUPLE: too-many-slots-test a b c d ; T{ too-many-slots-test f 1 2 3 4 5 }" eval( -- x ) ]
+[ error>> too-many-slots? ] must-fail-with
