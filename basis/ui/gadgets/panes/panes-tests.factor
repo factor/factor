@@ -89,16 +89,6 @@ IN: ui.gadgets.panes.tests
 ] unit-test
 
 { t } [
-    [
-        last-element off
-        \ = >link title-style get [
-            $navigation-table
-        ] with-nesting
-        "Hello world" print-content
-    ] test-gadget-text
-] unit-test
-
-{ t } [
     [ { { "a\n" } } simple-table. ] test-gadget-text
 ] unit-test
 
