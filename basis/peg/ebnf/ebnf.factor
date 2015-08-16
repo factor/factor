@@ -103,7 +103,7 @@ C: <ebnf> ebnf
     token sp hide ;
 
 : syntax-pack ( begin parser end -- parser )
-    #! Parse 'parser' surrounded by syntax elements
+    #! Parse parser-parser surrounded by syntax elements
     #! begin and end.
     [ syntax ] 2dip syntax pack ;
 
@@ -114,7 +114,7 @@ C: <ebnf> ebnf
         "\r" token [ drop "\\r" ] action ,
     ] choice* replace ;
 
-: 'identifier' ( -- parser )
+: identifier-parser ( -- parser )
     #! Return a parser that parses an identifer delimited by
     #! a quotation character. The quotation can be single
     #! or double quotes. The AST produced is the identifier
@@ -124,7 +124,7 @@ C: <ebnf> ebnf
         [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
     ] choice* [ >string unescape-string ] action ;
 
-: 'non-terminal' ( -- parser )
+: non-terminal-parser ( -- parser )
     #! A non-terminal is the name of another rule. It can
     #! be any non-blank character except for characters used
     #! in the EBNF syntax itself.
@@ -154,12 +154,12 @@ C: <ebnf> ebnf
         } 1|| not
     ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
-: 'terminal' ( -- parser )
+: terminal-parser ( -- parser )
     #! A terminal is an identifier enclosed in quotations
     #! and it represents the literal value of the identifier.
-    'identifier' [ <ebnf-terminal> ] action ;
+    identifier-parser [ <ebnf-terminal> ] action ;
 
-: 'foreign-name' ( -- parser )
+: foreign-name-parser ( -- parser )
     #! Parse a valid foreign parser name
     [
         {
@@ -168,20 +168,20 @@ C: <ebnf> ebnf
         } 1|| not
     ] satisfy repeat1 [ >string ] action ;
 
-: 'foreign' ( -- parser )
+: foreign-parser ( -- parser )
     #! A foreign call is a call to a rule in another ebnf grammar
     [
         "<foreign" syntax ,
-        'foreign-name' sp ,
-        'foreign-name' sp optional ,
+        foreign-name-parser sp ,
+        foreign-name-parser sp optional ,
         ">" syntax ,
     ] seq* [ first2 <ebnf-foreign> ] action ;
 
-: 'any-character' ( -- parser )
+: any-character-parser ( -- parser )
     #! A parser to match the symbol for any character match.
     [ CHAR: . = ] satisfy [ drop <ebnf-any-character> ] action ;
 
-: 'range-parser' ( -- parser )
+: range-parser-parser ( -- parser )
     #! Match the syntax for declaring character ranges
     [
         [ "[" syntax , "[" token ensure-not , ] seq* hide ,
@@ -189,7 +189,7 @@ C: <ebnf> ebnf
         "]" syntax ,
     ] seq* [ first >string unescape-string <ebnf-range> ] action ;
 
-: ('element') ( -- parser )
+: (element-parser) ( -- parser )
     #! An element of a rule. It can be a terminal or a
     #! non-terminal but must not be followed by a "=".
     #! The latter indicates that it is the beginning of a
@@ -197,11 +197,11 @@ C: <ebnf> ebnf
     [
         [
             [
-                'non-terminal' ,
-                'terminal' ,
-                'foreign' ,
-                'range-parser' ,
-                'any-character' ,
+                non-terminal-parser ,
+                terminal-parser ,
+                foreign-parser ,
+                range-parser-parser ,
+                any-character-parser ,
             ] choice*
             [ dup , "~" token hide , ] seq* [ first <ebnf-ignore> ] action ,
             [ dup , "*" token hide , ] seq* [ first <ebnf-repeat0> ] action ,
@@ -215,19 +215,19 @@ C: <ebnf> ebnf
         ] choice* ,
     ] seq* [ first ] action ;
 
-DEFER: 'action'
+DEFER: action-parser
 
-: 'element' ( -- parser )
+: element-parser ( -- parser )
     [
         [
-            ('element') , ":" syntax ,
+            (element-parser) , ":" syntax ,
             "a-zA-Z_" range-pattern
             "a-zA-Z0-9_-" range-pattern repeat1 2seq [ first2 swap prefix >string ] action ,
         ] seq* [ first2 <ebnf-var> ] action ,
-        ('element') ,
+        (element-parser) ,
     ] choice* ;
 
-DEFER: 'choice'
+DEFER: choice-parser
 
 : grouped ( quot suffix -- parser )
     #! Parse a group of choices, with a suffix indicating
@@ -235,15 +235,15 @@ DEFER: 'choice'
     #! an quot that is the action that produces the AST.
     2dup
     [
-        "(" [ 'choice' sp ] delay ")" syntax-pack
+        "(" [ choice-parser sp ] delay ")" syntax-pack
         swap 2seq
         [ first ] rot compose action ,
-        "{" [ 'choice' sp ] delay "}" syntax-pack
+        "{" [ choice-parser sp ] delay "}" syntax-pack
         swap 2seq
         [ first <ebnf-whitespace> ] rot compose action ,
     ] choice* ;
 
-: 'group' ( -- parser )
+: group-parser ( -- parser )
     #! A grouping with no suffix. Used for precedence.
     [ ] [
         "~" token sp ensure-not ,
@@ -252,115 +252,115 @@ DEFER: 'choice'
         "?" token sp ensure-not ,
     ] seq* hide grouped ;
 
-: 'ignore' ( -- parser )
+: ignore-parser ( -- parser )
     [ <ebnf-ignore> ] "~" syntax grouped ;
 
-: 'repeat0' ( -- parser )
+: repeat0-parser ( -- parser )
     [ <ebnf-repeat0> ] "*" syntax grouped ;
 
-: 'repeat1' ( -- parser )
+: repeat1-parser ( -- parser )
     [ <ebnf-repeat1> ] "+" syntax grouped ;
 
-: 'optional' ( -- parser )
+: optional-parser ( -- parser )
     [ <ebnf-optional> ] "?" syntax grouped ;
 
-: 'factor-code' ( -- parser )
+: factor-code-parser ( -- parser )
     [
         "]]" token ensure-not ,
         "]?" token ensure-not ,
         [ drop t ] satisfy ,
     ] seq* repeat0 [ "" concat-as ] action ;
 
-: 'ensure-not' ( -- parser )
+: ensure-not-parser ( -- parser )
     #! Parses the '!' syntax to ensure that
     #! something that matches the following elements do
     #! not exist in the parse stream.
     [
         "!" syntax ,
-        'group' sp ,
+        group-parser sp ,
     ] seq* [ first <ebnf-ensure-not> ] action ;
 
-: 'ensure' ( -- parser )
+: ensure-parser ( -- parser )
     #! Parses the '&' syntax to ensure that
     #! something that matches the following elements does
     #! exist in the parse stream.
     [
         "&" syntax ,
-        'group' sp ,
+        group-parser sp ,
     ] seq* [ first <ebnf-ensure> ] action ;
 
-: ('sequence') ( -- parser )
+: (sequence-parser) ( -- parser )
     #! A sequence of terminals and non-terminals, including
     #! groupings of those.
     [
         [
-            'ensure-not' sp ,
-            'ensure' sp ,
-            'element' sp ,
-            'group' sp ,
-            'ignore' sp ,
-            'repeat0' sp ,
-            'repeat1' sp ,
-            'optional' sp ,
+            ensure-not-parser sp ,
+            ensure-parser sp ,
+            element-parser sp ,
+            group-parser sp ,
+            ignore-parser sp ,
+            repeat0-parser sp ,
+            repeat1-parser sp ,
+            optional-parser sp ,
         ] choice*
         [ dup    , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
         ,
     ] choice* ;
 
-: 'action' ( -- parser )
-     "[[" 'factor-code' "]]" syntax-pack ;
+: action-parser ( -- parser )
+     "[[" factor-code-parser "]]" syntax-pack ;
 
-: 'semantic' ( -- parser )
-     "?[" 'factor-code' "]?" syntax-pack ;
+: semantic-parser ( -- parser )
+     "?[" factor-code-parser "]?" syntax-pack ;
 
-: 'sequence' ( -- parser )
+: sequence-parser ( -- parser )
     #! A sequence of terminals and non-terminals, including
     #! groupings of those.
     [
-        [ ('sequence') , 'action' , ] seq*
+        [ (sequence-parser) , action-parser , ] seq*
         [ first2 <ebnf-action> ] action ,
 
-        [ ('sequence') , 'semantic' , ] seq*
+        [ (sequence-parser) , semantic-parser , ] seq*
         [ first2 <ebnf-semantic> ] action ,
 
-        ('sequence') ,
+        (sequence-parser) ,
     ] choice* repeat1 [
          dup length 1 = [ first ] [ <ebnf-sequence> ] if
     ] action ;
 
-: 'actioned-sequence' ( -- parser )
+: actioned-sequence-parser ( -- parser )
     [
-        [ 'sequence' , "=>" syntax , 'action' , ] seq*
+        [ sequence-parser , "=>" syntax , action-parser , ] seq*
         [ first2 <ebnf-action> ] action ,
-        'sequence' ,
+        sequence-parser ,
     ] choice* ;
 
-: 'choice' ( -- parser )
-    'actioned-sequence' sp repeat1 [
+: choice-parser ( -- parser )
+    actioned-sequence-parser sp repeat1 [
         dup length 1 = [ first ] [ <ebnf-sequence> ] if
     ] action "|" token sp list-of [
         dup length 1 = [ first ] [ <ebnf-choice> ] if
     ] action ;
 
-: 'tokenizer' ( -- parser )
+: tokenizer-parser ( -- parser )
     [
         "tokenizer" syntax ,
         "=" syntax ,
         ">" token ensure-not ,
-        [ "default" token sp , 'choice' , ] choice* ,
+        [ "default" token sp , choice-parser , ] choice* ,
     ] seq* [ first <ebnf-tokenizer> ] action ;
 
-: 'rule' ( -- parser )
+: rule-parser ( -- parser )
     [
         "tokenizer" token ensure-not ,
-        'non-terminal' [ symbol>> ] action ,
+        non-terminal-parser [ symbol>> ] action ,
         "=" syntax ,
         ">" token ensure-not ,
-        'choice' ,
+        choice-parser ,
     ] seq* [ first2 <ebnf-rule> ] action ;
 
-: 'ebnf' ( -- parser )
-    [ 'tokenizer' sp , 'rule' sp , ] choice* repeat1 [ <ebnf> ] action ;
+: ebnf-parser ( -- parser )
+    [ tokenizer-parser sp , rule-parser sp , ] choice* repeat1 [ <ebnf> ] action ;
 
 GENERIC: (transform) ( ast -- parser )
 
@@ -530,7 +530,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
     ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
-    'ebnf' parse transform ;
+    ebnf-parser parse transform ;
 
 ERROR: unable-to-fully-parse-ebnf remaining ;
 
@@ -546,7 +546,7 @@ ERROR: could-not-parse-ebnf ;
     ] if* ;
 
 : parse-ebnf ( string -- hashtable )
-    'ebnf' (parse) check-parse-result ast>> transform ;
+    ebnf-parser (parse) check-parse-result ast>> transform ;
 
 : ebnf>quot ( string -- hashtable quot )
     parse-ebnf dup dup parser [ main of compile ] with-variable
