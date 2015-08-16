@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors kernel concurrency.messaging colors.constants inspector formatting
-ui.tools.listener ui.tools.traceback ui.gadgets.buttons
-ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.theme ui.gadgets.tracks
-ui.commands ui.gadgets
-models models.arrow ui.tools.browser ui.tools.common ui.gestures
-ui.gadgets.labels ui.pens.solid ui threads namespaces make tools.walker assocs
-combinators fry ;
+USING: accessors assocs colors colors.constants combinators
+concurrency.messaging formatting fry inspector kernel make
+models models.arrow namespaces sequences threads tools.walker ui
+ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.labels
+ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.toolbar
+ui.gadgets.tracks ui.gestures ui.pens.solid ui.tools.browser
+ui.tools.common ui.tools.listener ui.tools.traceback ;
 IN: ui.tools.walker
 
 TUPLE: walker-gadget < tool
@@ -39,14 +39,22 @@ M: walker-gadget ungraft*
 M: walker-gadget focusable-child*
     traceback>> ;
 
-: thread-status-text ( status thread -- string )
-    name>> swap {
+: thread-status-text ( status -- string )
+    {
         { +stopped+ "Stopped" }
         { +suspended+ "Suspended" }
         { +running+ "Running" }
-    } at "Thread: %s (%s)" sprintf ;
+    } at "(" ")" surround ;
 
-: thread-status-color ( status -- color )
+: thread-status-foreground ( status -- color )
+    {
+      { +stopped+   [ thread-status-stopped-foreground ] }
+      { +suspended+ [ thread-status-suspended-foreground ] }
+      { +running+   [ thread-status-running-foreground ] }
+      { f           [ text-color ] }
+    } case ;
+
+: thread-status-background ( status -- color )
     {
       { +stopped+   [ thread-status-stopped-background ] }
       { +suspended+ [ thread-status-suspended-background ] }
@@ -54,22 +62,29 @@ M: walker-gadget focusable-child*
       { f           [ content-background ] }
     } case ;
 
-TUPLE: thread-status < label thread ;
+TUPLE: thread-status < label ;
 
 M: thread-status model-changed
     [ value>> ] dip {
-        [ [ thread>> thread-status-text ] [ string<< ] bi ]
-        [ [ thread-status-color <solid> ] [ parent>> interior<< ] bi* ]
+        [ [ thread-status-text ] [ string<< ] bi* ]
+        [ [ thread-status-foreground ] [ font>> foreground<< ] bi* ]
+        [ [ thread-status-background <solid> ] [ parent>> parent>> interior<< ] bi* ]
     } 2cleave ;
 
-: <thread-status> ( model thread -- gadget )
+: <thread-status> ( model -- gadget )
     "" thread-status new-label
-        swap >>thread
         swap >>model ;
 
 : add-thread-status ( track -- track )
-    dup status>> self <thread-status> margins
-    f track-add ;
+    horizontal <track> { 5 5 } >>gap
+        "Thread:" <label>
+            dup font>> t >>bold? drop
+            f track-add
+        self name>> <label> f track-add
+        over status>> <thread-status>
+            dup font>> t >>bold? drop
+            f track-add
+    margins f track-add ;
 
 : add-traceback ( track -- track )
     dup traceback>> 1 track-add ;
