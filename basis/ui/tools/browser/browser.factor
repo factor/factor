@@ -1,16 +1,17 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.units debugger fry help
-help.apropos help.crossref help.home help.markup help.stylesheet
-help.topics io.styles kernel locals make models namespaces
-sequences sets ui ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.labels
+USING: accessors arrays assocs classes colors.constants
+combinators combinators.short-circuit compiler.units debugger
+documents fry help help.apropos help.crossref help.home
+help.markup help.stylesheet help.topics io.styles kernel locals
+make models namespaces sequences sets ui ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.editors ui.gadgets.editors.private
+ui.gadgets.glass ui.gadgets.labels ui.gadgets.labels.private
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.tracks
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
-ui.tools.browser.history ui.tools.browser.popups ui.tools.common
-vocabs ;
+ui.render ui.text ui.tools.browser.history
+ui.tools.browser.popups ui.tools.common vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -45,17 +46,15 @@ CONSTANT: next 1
     [ prefix 1array ] dip add-navigation-arrow , ;
 
 :: ($navigation) ( topic direction -- )
-    topic [
-        direction prev/next-article
-        [ 1array \ $long-link direction $navigation-arrow ] when*
-    ] { } make [ ($navigation-table) ] unless-empty ;
+    help-path-style get [
+        topic [
+            direction prev/next-article
+            [ 1array \ $long-link direction $navigation-arrow ] when*
+        ] { } make [ ($navigation-table) ] unless-empty
+    ] with-style ;
 
 : $navigation ( topic direction -- )
-    title-style get [
-        help-path-style get [
-            ($navigation)
-        ] with-style
-    ] with-style ;
+    title-style get [ ($navigation) ] with-style ;
 
 : $title ( topic -- )
     title-style get clone page-color over delete-at dup
@@ -102,12 +101,17 @@ CONSTANT: next 1
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
+        dup editor>> "Search" >>default-text drop
         10 >>min-cols
         10 >>max-cols
         white-interior ;
 
 : <browser-toolbar> ( browser -- toolbar )
-    [ <toolbar> ] [ search-field>> "Search" label-on-left 1 track-add ] bi ;
+    [ <toolbar> ] [
+        search-field>> horizontal <track>
+            0 >>fill swap 1 track-add
+        1 track-add
+    ] bi ;
 
 : add-browser-toolbar ( track -- track )
     dup <browser-toolbar> format-toolbar f track-add ;
