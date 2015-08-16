@@ -28,7 +28,7 @@ TUPLE: ast-hashtable elements ;
         [ digit? not ]
     } 1&& ;
 
-: 'identifier-ends' ( -- parser )
+: identifier-ends-parser ( -- parser )
     [
         {
             [ blank? not ]
@@ -40,22 +40,22 @@ TUPLE: ast-hashtable elements ;
         } 1&&
     ] satisfy repeat0 ;
 
-: 'identifier-middle' ( -- parser )
+: identifier-middle-parser ( -- parser )
     [ identifier-middle? ] satisfy repeat1 ;
 
-: 'identifier' ( -- parser )
+: identifier-parser ( -- parser )
     [
-        'identifier-ends' ,
-        'identifier-middle' ,
-        'identifier-ends' ,
+        identifier-ends-parser ,
+        identifier-middle-parser ,
+        identifier-ends-parser ,
     ] seq* [
         "" concat-as f ast-identifier boa
     ] action ;
 
 
-DEFER: 'expression'
+DEFER: expression-parser
 
-: 'effect-name' ( -- parser )
+: effect-name-parser ( -- parser )
     [
         {
             [ blank? not ]
@@ -64,54 +64,54 @@ DEFER: 'expression'
         } 1&&
     ] satisfy repeat1 [ >string ] action ;
 
-: 'stack-effect' ( -- parser )
+: stack-effect-parser ( -- parser )
     [
         "(" token hide ,
-        'effect-name' sp repeat0 ,
+        effect-name-parser sp repeat0 ,
         "--" token sp hide ,
-        'effect-name' sp repeat0 ,
+        effect-name-parser sp repeat0 ,
         ")" token sp hide ,
     ] seq* [
         first2 ast-stack-effect boa
     ] action ;
 
-: 'define' ( -- parser )
+: define-parser ( -- parser )
     [
         ":" token sp hide ,
-        'identifier' sp [ value>> ] action ,
-        'stack-effect' sp optional ,
-        'expression' ,
+        identifier-parser sp [ value>> ] action ,
+        stack-effect-parser sp optional ,
+        expression-parser ,
         ";" token sp hide ,
     ] seq* [ first3 ast-define boa ] action ;
 
-: 'quotation' ( -- parser )
+: quotation-parser ( -- parser )
     [
         "[" token sp hide ,
-        'expression' [ values>> ] action ,
+        expression-parser [ values>> ] action ,
         "]" token sp hide ,
     ] seq* [ first ast-quotation boa ] action ;
 
-: 'array' ( -- parser )
+: array-parser ( -- parser )
     [
         "{" token sp hide ,
-        'expression' [ values>> ] action ,
+        expression-parser [ values>> ] action ,
         "}" token sp hide ,
     ] seq* [ first ast-array boa ] action ;
 
-: 'word' ( -- parser )
+: word-parser ( -- parser )
     [
         "\\" token sp hide ,
-        'identifier' sp ,
+        identifier-parser sp ,
     ] seq* [ first value>> f ast-word boa ] action ;
 
-: 'atom' ( -- parser )
+: atom-parser ( -- parser )
     [
-        'identifier' ,
-        'integer' [ ast-number boa ] action ,
-        'string' [ ast-string boa ] action ,
+        identifier-parser ,
+        integer-parser [ ast-number boa ] action ,
+        string-parser [ ast-string boa ] action ,
     ] choice* ;
 
-: 'comment' ( -- parser )
+: comment-parser ( -- parser )
     [
         [
             "#!" token sp ,
@@ -122,55 +122,55 @@ DEFER: 'expression'
         ] satisfy repeat0 ,
     ] seq* [ drop ast-comment boa ] action ;
 
-: 'USE:' ( -- parser )
+: USE-parser ( -- parser )
     [
         "USE:" token sp hide ,
-        'identifier' sp ,
+        identifier-parser sp ,
     ] seq* [ first value>> ast-use boa ] action ;
 
-: 'IN:' ( -- parser )
+: IN-parser ( -- parser )
     [
         "IN:" token sp hide ,
-        'identifier' sp ,
+        identifier-parser sp ,
     ] seq* [ first value>> ast-in boa ] action ;
 
-: 'USING:' ( -- parser )
+: USING-parser ( -- parser )
     [
         "USING:" token sp hide ,
-        'identifier' sp [ value>> ] action repeat1 ,
+        identifier-parser sp [ value>> ] action repeat1 ,
         ";" token sp hide ,
     ] seq* [ first ast-using boa ] action ;
 
-: 'hashtable' ( -- parser )
+: hashtable-parser ( -- parser )
     [
         "H{" token sp hide ,
-        'expression' [ values>> ] action ,
+        expression-parser [ values>> ] action ,
         "}" token sp hide ,
     ] seq* [ first ast-hashtable boa ] action ;
 
-: 'parsing-word' ( -- parser )
+: parsing-word-parser ( -- parser )
     [
-        'USE:' ,
-        'USING:' ,
-        'IN:' ,
+        USE-parser ,
+        USING-parser ,
+        IN-parser ,
     ] choice* ;
 
-: 'expression' ( -- parser )
+: expression-parser ( -- parser )
     [
         [
-            'comment' ,
-            'parsing-word' sp ,
-            'quotation' sp ,
-            'define' sp ,
-            'array' sp ,
-            'hashtable' sp ,
-            'word' sp ,
-            'atom' sp ,
+            comment-parser ,
+            parsing-word-parser sp ,
+            quotation-parser sp ,
+            define-parser sp ,
+            array-parser sp ,
+            hashtable-parser sp ,
+            word-parser sp ,
+            atom-parser sp ,
         ] choice* repeat0 [ ast-expression boa ] action
     ] delay ;
 
-: 'statement' ( -- parser )
-    'expression' ;
+: statement-parser ( -- parser )
+    expression-parser ;
 
 GENERIC: (compile) ( ast -- )
 GENERIC: (literal) ( ast -- )
@@ -334,7 +334,7 @@ M: wrapper (parse-factor-quotation) ( object -- ast )
 GENERIC: fjsc-parse ( object -- ast )
 
 M: string fjsc-parse ( object -- ast )
-    'expression' parse ;
+    expression-parser parse ;
 
 M: quotation fjsc-parse ( object -- ast )
     [ (parse-factor-quotation) ] { } map-as ast-expression boa ;
@@ -349,11 +349,11 @@ M: quotation fjsc-parse ( object -- ast )
     ] with-string-writer ;
 
 : fjsc-compile* ( string -- string )
-    'statement' parse fjsc-compile ;
+    statement-parser parse fjsc-compile ;
 
 : fc* ( string -- )
     [
-        'statement' parse values>> do-expressions
+        statement-parser parse values>> do-expressions
     ] { } make [ write ] each ;
 
 : fjsc-literal ( ast -- string )
