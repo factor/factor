@@ -22,7 +22,7 @@ CONSTANT: column-title-background COLOR: grey95
 CONSTANT: roll-button-rollover-border COLOR: gray50
 CONSTANT: roll-button-selected-background COLOR: dark-gray
 
-CONSTANT: source-files-color COLOR: yellow2
+CONSTANT: source-files-color COLOR: MediumSeaGreen
 CONSTANT: errors-color COLOR: chocolate1
 CONSTANT: details-color COLOR: SteelBlue3
 
@@ -45,6 +45,10 @@ CONSTANT: help-header-background HEXCOLOR: F4EFD9
 CONSTANT: thread-status-stopped-background HEXCOLOR: F4D9D9
 CONSTANT: thread-status-suspended-background HEXCOLOR: F4EAD9
 CONSTANT: thread-status-running-background HEXCOLOR: EDF4D9
+
+CONSTANT: thread-status-stopped-foreground HEXCOLOR: F42300
+CONSTANT: thread-status-suspended-foreground HEXCOLOR: F37B00
+CONSTANT: thread-status-running-foreground HEXCOLOR: 3FCA00
 
 CONSTANT: error-summary-background HEXCOLOR: F4D9D9
 
