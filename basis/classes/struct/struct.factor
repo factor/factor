@@ -74,21 +74,23 @@ M: struct hashcode*
     [ heap-size read ] [ memory>struct ] bi ;
 
 <PRIVATE
-: (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
+
+: init-struct ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
     '[ dup struct-prototype _ _ ?if ] keep memory>struct ; inline
+
 PRIVATE>
 
 : (malloc-struct) ( class -- struct )
     [ heap-size malloc ] keep memory>struct ; inline
 
 : malloc-struct ( class -- struct )
-    [ >c-ptr malloc-byte-array ] [ 1 swap heap-size calloc ] (init-struct) ; inline
+    [ >c-ptr malloc-byte-array ] [ 1 swap heap-size calloc ] init-struct ; inline
 
 : (struct) ( class -- struct )
     [ heap-size (byte-array) ] keep memory>struct ; inline
 
 : <struct> ( class -- struct )
-    [ >c-ptr clone ] [ heap-size <byte-array> ] (init-struct) ; inline
+    [ >c-ptr clone ] [ heap-size <byte-array> ] init-struct ; inline
 
 MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
     [
