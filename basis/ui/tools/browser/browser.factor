@@ -101,7 +101,7 @@ CONSTANT: next 1
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
-        dup editor>> "Search" >>default-text drop
+        "Search" >>default-text
         10 >>min-cols
         10 >>max-cols
         white-interior ;
