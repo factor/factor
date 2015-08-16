@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs debugger fry help help.home
-help.topics help.vocabs html html.streams io.directories
+USING: accessors arrays assocs colors.constants debugger fry
+help help.crossref help.home help.markup help.stylesheet
+help.topics help.vocabs html html.streams io io.directories
 io.encodings.binary io.encodings.utf8 io.files io.files.temp
-io.pathnames kernel make math.parser memoize namespaces
-sequences serialize splitting tools.completion vocabs
+io.pathnames io.styles kernel make math.parser memoize
+namespaces sequences serialize splitting tools.completion vocabs
 vocabs.hierarchy words xml.syntax xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
@@ -84,12 +85,35 @@ M: pathname url-of
         </div>
      XML] ;
 
+: $navigation-row ( content element label -- )
+    [ prefix 1array ] dip prefix , ;
+
+: ($navigation-links) ( topic -- )
+    help-path-style get [
+        [
+            [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
+            [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
+            bi
+        ] { } make [ ($navigation-table) ] unless-empty
+    ] with-style ;
+
+: $title ( topic -- )
+    title-style get
+    { { page-color COLOR: FactorLightTan } } assoc-union dup
+    [
+        [
+            [ ($title) ]
+            [ ($navigation-path) ]
+            [ ($navigation-links) ] tri
+        ] with-nesting
+    ] with-style ;
+
 : help>html ( topic -- xml )
     [ article-title " - Factor Documentation" append ]
     [ drop help-stylesheet ]
     [
         [ help-navbar ]
-        [ [ print-topic ] with-html-writer ]
+        [ [ [ $title ($blank-line) ] [ print-topic ] bi ] with-html-writer ]
         bi* append
     ] tri
     simple-page ;
