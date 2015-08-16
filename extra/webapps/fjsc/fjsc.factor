@@ -38,7 +38,7 @@ TUPLE: fjsc < dispatcher ;
 
 : do-compile-url ( url -- response )
     [
-        absolute-url http-get nip 'expression' parse
+        absolute-url http-get nip expression-parser parse
         fjsc-compile write "();" write
     ] with-string-writer
     <javascript-content> ;
@@ -59,7 +59,7 @@ TUPLE: fjsc < dispatcher ;
 
 : do-compile ( code -- response )
     [
-        'expression' parse fjsc-compile write
+        expression-parser parse fjsc-compile write
     ] with-string-writer
     <javascript-content> ;
 
