@@ -62,18 +62,18 @@ PRIVATE>
     [ flatten-vectors ] action ;
 
 : pack ( begin body end -- parser )
-    [ hide ] 2dip hide 3seq [ first ] action ;
+    [ hide ] [ ] [ hide ] tri* 3seq [ first ] action ;
 
 : surrounded-by ( parser begin end -- parser' )
     [ token ] bi@ swapd pack ;
 
-: 'digit' ( -- parser )
+: digit-parser ( -- parser )
     [ digit? ] satisfy [ digit> ] action ;
 
-: 'integer' ( -- parser )
+: integer-parser ( -- parser )
     [ digit? ] satisfy repeat1 [ string>number ] action ;
 
-: 'string' ( -- parser )
+: string-parser ( -- parser )
     [
         [ CHAR: " = ] satisfy hide ,
         [ CHAR: " = not ] satisfy repeat0 ,

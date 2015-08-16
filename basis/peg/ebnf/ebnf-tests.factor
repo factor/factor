@@ -7,11 +7,11 @@ namespaces arrays strings eval unicode.data multiline ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
-  "abc" 'non-terminal' parse
+  "abc" non-terminal-parser parse
 ] unit-test
 
 { T{ ebnf-terminal f "55" } } [
-  "'55'" 'terminal' parse
+  "'55'" terminal-parser parse
 ] unit-test
 
 {
@@ -22,7 +22,7 @@ IN: peg.ebnf.tests
      }
   }
 } [
-  "digit = '1' | '2'" 'rule' parse
+  "digit = '1' | '2'" rule-parser parse
 ] unit-test
 
 {
@@ -33,7 +33,7 @@ IN: peg.ebnf.tests
      }
   }
 } [
-  "digit = '1' '2'" 'rule' parse
+  "digit = '1' '2'" rule-parser parse
 ] unit-test
 
 {
@@ -46,7 +46,7 @@ IN: peg.ebnf.tests
      }
   }
 } [
-  "one two | three" 'choice' parse
+  "one two | three" choice-parser parse
 ] unit-test
 
 {
@@ -61,7 +61,7 @@ IN: peg.ebnf.tests
      }
   }
 } [
-  "one {two | three}" 'choice' parse
+  "one {two | three}" choice-parser parse
 ] unit-test
 
 {
@@ -81,7 +81,7 @@ IN: peg.ebnf.tests
      }
   }
 } [
-  "one ((two | three) four)*" 'choice' parse
+  "one ((two | three) four)*" choice-parser parse
 ] unit-test
 
 {
@@ -101,7 +101,7 @@ IN: peg.ebnf.tests
      }
   }
 } [
-  "one ((two | three) four)~" 'choice' parse
+  "one ((two | three) four)~" choice-parser parse
 ] unit-test
 
 {
@@ -113,23 +113,23 @@ IN: peg.ebnf.tests
      }
   }
 } [
-  "one ( two )? three" 'choice' parse
+  "one ( two )? three" choice-parser parse
 ] unit-test
 
 { "foo" } [
-  "\"foo\"" 'identifier' parse
+  "\"foo\"" identifier-parser parse
 ] unit-test
 
 { "foo" } [
-  "'foo'" 'identifier' parse
+  "'foo'" identifier-parser parse
 ] unit-test
 
 { "foo" } [
-  "foo" 'non-terminal' parse symbol>>
+  "foo" non-terminal-parser parse symbol>>
 ] unit-test
 
 { "foo" } [
-  "foo]" 'non-terminal' parse symbol>>
+  "foo]" non-terminal-parser parse symbol>>
 ] unit-test
 
 { V{ "a" "b" } } [
@@ -272,7 +272,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { t } [
-  "abcd='9' | ('8'):x => [[ x ]]" 'ebnf' (parse) remaining>> empty?
+  "abcd='9' | ('8'):x => [[ x ]]" ebnf-parser (parse) remaining>> empty?
 ] unit-test
 
 EBNF: primary 
@@ -431,29 +431,29 @@ main = Primary
 ] unit-test
 
 { t } [
-  "number=(digit)+:n 'a'" 'ebnf' (parse) remaining>> length zero?
+  "number=(digit)+:n 'a'" ebnf-parser (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "number=(digit)+ 'a'" 'ebnf' (parse) remaining>> length zero?
+  "number=(digit)+ 'a'" ebnf-parser (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "number=digit+ 'a'" 'ebnf' (parse) remaining>> length zero?
+  "number=digit+ 'a'" ebnf-parser (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "number=digit+:n 'a'" 'ebnf' (parse) remaining>> length zero?
+  "number=digit+:n 'a'" ebnf-parser (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "foo=(name):n !(keyword) => [[ n ]]" 'rule' parse
-  "foo=name:n !(keyword) => [[ n ]]" 'rule' parse =
+  "foo=(name):n !(keyword) => [[ n ]]" rule-parser parse
+  "foo=name:n !(keyword) => [[ n ]]" rule-parser parse =
 ] unit-test
 
 { t } [
-  "foo=!(keyword) (name):n => [[ n ]]" 'rule' parse
-  "foo=!(keyword) name:n => [[ n ]]" 'rule' parse =
+  "foo=!(keyword) (name):n => [[ n ]]" rule-parser parse
+  "foo=!(keyword) name:n => [[ n ]]" rule-parser parse =
 ] unit-test
 
 <<
@@ -501,7 +501,7 @@ foo=<foreign any-char> 'd'
 { t } [
   #! Rule lookup occurs in a namespace. This causes an incorrect duplicate rule
   #! if a var in a namespace is set. This unit test is to remind me to fix this.
-  [ "fail" "foo" set "foo='a'" 'ebnf' parse transform drop t ] with-scope
+  [ "fail" "foo" set "foo='a'" ebnf-parser parse transform drop t ] with-scope
 ] unit-test
 
 #! Tokenizer tests
