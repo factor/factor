@@ -3,7 +3,7 @@
 USING: help.syntax help.markup parser-combinators ;
 IN: parser-combinators.simple
 
-HELP: 'digit'
+HELP: digit-parser
 { $values
   { "parser" "a parser object" } }
 { $description
@@ -11,9 +11,9 @@ HELP: 'digit'
     "the input string. The numeric value of the digit "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'digit' parse-1 ." "1" } } ;
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" digit-parser parse-1 ." "1" } } ;
 
-HELP: 'integer'
+HELP: integer-parser
 { $values
   { "parser" "a parser object" } }
 { $description
@@ -21,8 +21,8 @@ HELP: 'integer'
     "the input string. The numeric value of the integer "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'integer' parse-1 ." "123" } } ;
-HELP: 'string'
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" integer-parser parse-1 ." "123" } } ;
+HELP: string-parser
 { $values
   { "parser" "a parser object" } }
 { $description
@@ -30,9 +30,9 @@ HELP: 'string'
     "quotations from the input string. The string value "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"\\\"foo\\\"\" 'string' parse-1 ." "\"foo\"" } } ;
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"\\\"foo\\\"\" string-parser parse-1 ." "\"foo\"" } } ;
 
-HELP: 'bold'
+HELP: bold-parser
 { $values
   { "parser" "a parser object" } }
 { $description
@@ -40,10 +40,10 @@ HELP: 'bold'
     "the '*' character from the input string. This is "
     "commonly used in markup languages to indicate bold "
     "faced text." }
-{ $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"*foo*\" 'bold' parse-1 ." "\"foo\"" }
-{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"*foo*\" 'bold' [ \"<strong>\" \"</strong>\" surround ] <@ parse-1 ." "\"<strong>foo</strong>\"" } ;
+{ $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"*foo*\" bold-parser parse-1 ." "\"foo\"" }
+{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"*foo*\" bold-parser [ \"<strong>\" \"</strong>\" surround ] <@ parse-1 ." "\"<strong>foo</strong>\"" } ;
 
-HELP: 'italic'
+HELP: italic-parser
 { $values
   { "parser" "a parser object" } }
 { $description
@@ -52,16 +52,16 @@ HELP: 'italic'
     "commonly used in markup languages to indicate italic "
     "faced text." }
 { $examples
-{ $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"_foo_\" 'italic' parse-1 ." "\"foo\"" }
-{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"_foo_\" 'italic' [ \"<emphasis>\" \"</emphasis>\" surround ] <@ parse-1 ." "\"<emphasis>foo</emphasis>\"" } } ;
+{ $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"_foo_\" italic-parser parse-1 ." "\"foo\"" }
+{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"_foo_\" italic-parser [ \"<emphasis>\" \"</emphasis>\" surround ] <@ parse-1 ." "\"<emphasis>foo</emphasis>\"" } } ;
 HELP: comma-list
 { $values
   { "element" "a parser object" } { "parser" "a parser object" } }
 { $description
     "Return a parser that parses comma separated lists of elements. "
-    "'element' should be a parser that can parse the elements. The "
+    { $snippet "element-parser" } " should be a parser that can parse the elements. The "
     "result of the parser is a sequence of the parsed elements." }
 { $examples
-{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"1,2,3,4\" 'integer' comma-list parse-1 ." "{ 1 2 3 4 }" } } ;
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"1,2,3,4\" integer-parser comma-list parse-1 ." "{ 1 2 3 4 }" } } ;
 
-{ $see-also 'digit' 'integer' 'string' 'bold' 'italic' comma-list } related-words
+{ $see-also digit-parser integer-parser string-parser bold-parser italic-parser comma-list } related-words
