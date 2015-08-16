@@ -1,16 +1,16 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes combinators
-combinators.short-circuit compiler.units debugger fry help
-help.apropos help.crossref help.home help.markup help.stylesheet
-help.topics io.styles kernel locals make models namespaces
-sequences sets ui ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.labels
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.tracks
-ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
-ui.tools.browser.history ui.tools.browser.popups ui.tools.common
-vocabs ;
+USING: accessors arrays assocs classes combinators
+combinators.short-circuit compiler.units debugger fry hashtables
+help help.apropos help.crossref help.home help.markup
+help.stylesheet help.topics io.styles kernel locals make models
+namespaces sequences sets ui ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.editors ui.gadgets.glass
+ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.toolbar
+ui.gadgets.tracks ui.gadgets.viewports ui.gadgets.worlds
+ui.gestures ui.pens.solid ui.tools.browser.history
+ui.tools.browser.popups ui.tools.common vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -58,8 +58,11 @@ CONSTANT: next 1
     ] with-style ;
 
 : $title ( topic -- )
-    title-style get [
-        title-style get [
+    title-style get
+    help-header-background page-color associate
+    assoc-union dup
+    [
+        [
             [ ($title) ]
             [ ($navigation-path) ] bi
         ] with-nesting

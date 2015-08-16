@@ -35,6 +35,7 @@ H{
     { font-style bold }
     { wrap-margin 500 }
     { foreground COLOR: gray20 }
+    { page-color COLOR: FactorLightTan }
     { inset { 5 5 } }
 } title-style set-global
 
