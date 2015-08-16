@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs colors.constants debugger fry
-help help.crossref help.home help.markup help.stylesheet
-help.topics help.vocabs html html.streams io io.directories
+USING: accessors arrays assocs debugger fry help help.home
+help.topics help.vocabs html html.streams io.directories
 io.encodings.binary io.encodings.utf8 io.files io.files.temp
-io.pathnames io.styles kernel make math.parser memoize
-namespaces sequences serialize splitting tools.completion vocabs
+io.pathnames kernel make math.parser memoize namespaces
+sequences serialize splitting tools.completion vocabs
 vocabs.hierarchy words xml.syntax xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
@@ -90,12 +89,7 @@ M: pathname url-of
     [ drop help-stylesheet ]
     [
         [ help-navbar ]
-        [
-            [
-                title-style get
-                { { page-color COLOR: FactorLightTan } } assoc-union
-                title-style [ print-topic ] with-variable
-            ] with-html-writer ]
+        [ [ print-topic ] with-html-writer ]
         bi* append
     ] tri
     simple-page ;
