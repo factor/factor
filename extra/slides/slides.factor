@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors fry help.markup help.stylesheet
 io.styles kernel math math.ranges models namespaces parser
-sequences ui ui.gadgets ui.gadgets.books ui.gadgets.panes
-ui.gestures ui.pens.gradient ;
+sequences system ui ui.gadgets ui.gadgets.books ui.gadgets.panes
+ui.gestures ui.pens.gradient ui.pens.solid ;
 IN: slides
 
 CONSTANT: stylesheet
@@ -53,23 +53,35 @@ CONSTANT: stylesheet
         } format
     ] ($block) ;
 
+: divider-interior ( -- interior )
+    os windows? [
+        T{ rgba f 0.25 0.25 0.25 1.0 } <solid>
+    ] [ {
+            T{ rgba f 0.25 0.25 0.25 1.0 }
+            T{ rgba f 1.0 1.0 1.0 0.0 }
+        } <gradient>
+    ] if ;
+
 : $divider ( -- )
     [
         <gadget>
-            {
-                T{ rgba f 0.25 0.25 0.25 1.0 }
-                T{ rgba f 1.0 1.0 1.0 0.0 }
-            } <gradient> >>interior
+            divider-interior >>interior
             { 800 10 } >>dim
             { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 
+: page-interior ( -- interior )
+    os windows? [
+        T{ rgba f 0.8 0.8 1.0 1.0 } <solid>
+    ] [ {
+            T{ rgba f 0.8 0.8 1.0 1.0 }
+            T{ rgba f 0.8 1.0 1.0 1.0 }
+        } <gradient>
+    ] if ;
+
 : page-theme ( gadget -- gadget )
-    {
-        T{ rgba f 0.8 0.8 1.0 1.0 }
-        T{ rgba f 0.8 1.0 1.0 1.0 }
-    } <gradient> >>interior ;
+    page-interior >>interior ;
 
 : <page> ( list -- gadget )
     [
