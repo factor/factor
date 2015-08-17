@@ -171,10 +171,8 @@ struct factor_vm {
   void primitive_set_context_object();
   cell stack_to_array(cell bottom, cell top, vm_error_type error);
   cell datastack_to_array(context* ctx);
-  void primitive_datastack();
   void primitive_datastack_for();
   cell retainstack_to_array(context* ctx);
-  void primitive_retainstack();
   void primitive_retainstack_for();
   cell array_to_stack(array* array, cell bottom);
   void set_datastack(context* ctx, array* array);
@@ -626,7 +624,6 @@ struct factor_vm {
   callstack* allot_callstack(cell size);
   cell second_from_top_stack_frame(context* ctx);
   cell capture_callstack(context* ctx);
-  void primitive_callstack();
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
