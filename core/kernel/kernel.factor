@@ -28,9 +28,6 @@ PRIMITIVE: 4dup ( w x y z -- w x y z w x y z )
 PRIMITIVE: (clone) ( obj -- newobj )
 PRIMITIVE: eq? ( obj1 obj2 -- ? )
 PRIMITIVE: <wrapper> ( obj -- wrapper )
-PRIMITIVE: get-datastack ( -- array )
-PRIMITIVE: get-callstack ( -- callstack )
-PRIMITIVE: get-retainstack ( -- array )
 PRIMITIVE: die ( -- )
 PRIMITIVE: callstack>array ( callstack -- array )
 
@@ -453,4 +450,20 @@ CONSTANT: ERROR-FP-TRAP 18
 CONSTANT: ERROR-INTERRUPT 19
 CONSTANT: ERROR-CALLBACK-SPACE-OVERFLOW 20
 
+PRIMITIVE: callstack-for ( context -- array )
+PRIMITIVE: retainstack-for ( context -- array )
+PRIMITIVE: datastack-for ( context -- array )
+
+: context ( -- context )
+    CONTEXT-OBJ-CONTEXT context-object ; inline
+
 PRIVATE>
+
+: get-callstack ( -- callstack )
+    context callstack-for ; inline
+
+: get-datastack ( -- array )
+    context datastack-for ; inline
+
+: get-retainstack ( -- array )
+    context retainstack-for ; inline

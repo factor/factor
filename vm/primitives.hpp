@@ -10,11 +10,11 @@ namespace factor {
       _(bignum_gcd) _(bignum_multiply) _(bignum_not) _(bignum_or)              \
       _(bignum_shift) _(bignum_subtract) _(bignum_to_fixnum)                   \
       _(bignum_to_fixnum_strict) _(bignum_xor) _(bits_double) _(bits_float)    \
-      _(byte_array) _(callback) _(callback_room) _(callstack)                  \
+      _(byte_array) _(callback) _(callback_room)                               \
       _(callstack_bounds) _(callstack_for) _(callstack_to_array)               \
       _(check_datastack) _(clear_samples) _(clone) _(code_blocks) _(code_room) \
       _(compact_gc) _(compute_identity_hashcode) _(context_object)             \
-      _(context_object_for) _(current_callback) _(data_room) _(datastack)      \
+      _(context_object_for) _(current_callback) _(data_room)                   \
       _(datastack_for) _(die) _(disable_gc_events) _(dispatch_stats)           \
       _(displaced_alien) _(dlclose) _(dll_validp) _(dlopen) _(dlsym)           \
       _(dlsym_raw) _(double_bits) _(enable_gc_events) _(existsp) _(exit)       \
@@ -29,7 +29,7 @@ namespace factor {
       _(jit_compile) _(load_locals) _(lookup_method) _(mega_cache_miss)        \
       _(minor_gc) _(modify_code_heap) _(nano_count) _(quotation_code)          \
       _(quotation_compiled_p) _(reset_dispatch_stats) _(resize_array)          \
-      _(resize_byte_array) _(resize_string) _(retainstack) _(retainstack_for)  \
+      _(resize_byte_array) _(resize_string) _(retainstack_for)                 \
       _(sampling_profiler) _(save_image) _(set_context_object)                 \
       _(set_datastack) _(set_innermost_stack_frame_quotation)                  \
       _(set_retainstack) _(set_slot) _(set_special_object)                     \

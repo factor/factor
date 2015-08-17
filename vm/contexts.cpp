@@ -228,12 +228,11 @@ cell factor_vm::datastack_to_array(context* ctx) {
 }
 
 /* Allocates memory */
-void factor_vm::primitive_datastack() { ctx->push(datastack_to_array(ctx)); }
-
-/* Allocates memory */
 void factor_vm::primitive_datastack_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
-  ctx->replace(datastack_to_array(other_ctx));
+  data_root<alien> alien_ctx(ctx->pop(), this);
+  context* other_ctx = (context*)pinned_alien_offset(alien_ctx.value());
+  cell array = datastack_to_array(other_ctx);
+  ctx->push(array);
 }
 
 /* Allocates memory */
@@ -241,11 +240,6 @@ cell factor_vm::retainstack_to_array(context* ctx) {
   return stack_to_array(ctx->retainstack_seg->start,
                         ctx->retainstack,
                         ERROR_RETAINSTACK_UNDERFLOW);
-}
-
-/* Allocates memory */
-void factor_vm::primitive_retainstack() {
-  ctx->push(retainstack_to_array(ctx));
 }
 
 /* Allocates memory */
