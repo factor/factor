@@ -330,6 +330,17 @@ struct factor_vm {
     gc_off = false;
   }
 
+  template <typename Iterator>
+  inline void each_object_each_slot(Iterator& iterator) {
+    auto each_object_func = [&](object* obj) {
+      auto each_slot_func = [&](cell* slot) {
+        iterator(obj, slot);
+      };
+      obj->each_slot(each_slot_func);
+    };
+    each_object(each_object_func);
+  }
+
   /* the write barrier must be called any time we are potentially storing a
      pointer from an older generation to a younger one */
   inline void write_barrier(cell* slot_ptr) {

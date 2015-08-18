@@ -298,64 +298,26 @@ void factor_vm::dump_objects(ostream& out, cell type) {
   each_object(object_dumper);
 }
 
-struct find_data_reference_slot_visitor {
-  cell look_for;
-  object* obj;
-  factor_vm* parent;
-  ostream& out;
-
-  find_data_reference_slot_visitor(cell look_for,
-                                   object* obj,
-                                   factor_vm* parent,
-                                   ostream& out)
-    : look_for(look_for), obj(obj), parent(parent), out(out) {}
-
-  void operator()(cell* scan) {
-    if (look_for == *scan) {
+void factor_vm::find_data_references(ostream& out, cell look_for) {
+  auto find_data_ref_func = [&](object* obj, cell* slot) {
+    if (look_for == *slot) {
       out << padded_address((cell)obj) << " ";
-      parent->print_nested_obj(out, tag_dynamic(obj), 2);
+      print_nested_obj(out, tag_dynamic(obj), 2);
       out << endl;
     }
-  }
-};
-
-struct dump_edges_slot_visitor {
-  object* obj;
-  factor_vm* parent;
-  ostream& out;
-
-  dump_edges_slot_visitor(cell, object* obj, factor_vm* parent, ostream& out)
-      : obj(obj), parent(parent), out(out) {}
-
-  void operator()(cell* scan) {
-    if (TAG(*scan) > F_TYPE)
-      out << (void*)tag_dynamic(obj) << " ==> " << (void*)*scan << endl;
-  }
-};
-
-template <typename SlotVisitor> struct data_reference_object_visitor {
-  cell look_for;
-  factor_vm* parent;
-  ostream& out;
-
-  data_reference_object_visitor(cell look_for, factor_vm* parent, ostream& out)
-      : look_for(look_for), parent(parent), out(out) {}
-
-  void operator()(object* obj) {
-    SlotVisitor visitor(look_for, obj, parent, out);
-    obj->each_slot(visitor);
-  }
-};
-
-void factor_vm::find_data_references(ostream& out, cell look_for) {
-  data_reference_object_visitor<find_data_reference_slot_visitor>
-      visitor(look_for, this, out);
-  each_object(visitor);
+  };
+  each_object_each_slot(find_data_ref_func);
 }
 
 void factor_vm::dump_edges(ostream& out) {
-  data_reference_object_visitor<dump_edges_slot_visitor> visitor(0, this, out);
-  each_object(visitor);
+  auto dump_edges_func = [&](object* obj, cell* scan) {
+    if (TAG(*scan) > F_TYPE) {
+      out << (void*)tag_dynamic(obj);
+      out << " ==> ";
+      out << (void*)*scan << endl;
+    }
+  };
+  each_object_each_slot(dump_edges_func);
 }
 
 struct code_block_printer {
