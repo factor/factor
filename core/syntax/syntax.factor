@@ -92,14 +92,14 @@ IN: bootstrap.syntax
         } cond suffix!
     ] define-core-syntax
 
-    "\"" [ "\"" parse-multiline-string-until suffix! ] define-core-syntax
+    "\"" [ parse-full-string suffix! ] define-core-syntax
 
     "SBUF\"" [
-        lexer get skip-blank parse-string >sbuf suffix!
+        lexer get skip-blank parse-full-string >sbuf suffix!
     ] define-core-syntax
 
     "P\"" [
-        lexer get skip-blank parse-string <pathname> suffix!
+        lexer get skip-blank parse-short-string <pathname> suffix!
     ] define-core-syntax
 
     "[" [ parse-quotation suffix! ] define-core-syntax

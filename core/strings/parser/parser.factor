@@ -70,14 +70,14 @@ PRIVATE>
 
 <PRIVATE
 
-: (parse-string) ( accum str -- accum m )
+: (parse-short-string) ( accum str -- accum m )
     { sbuf slice } declare
     dup [ "\"\\" member? ] find [
         [ cut-slice [ append! ] dip rest-slice ] dip
         CHAR: " = [
             from>>
         ] [
-            next-escape [ suffix! ] dip (parse-string)
+            next-escape [ suffix! ] dip (parse-short-string)
         ] if
     ] [
         "Unterminated string" throw
@@ -85,9 +85,9 @@ PRIVATE>
 
 PRIVATE>
 
-: parse-string ( -- str )
+: parse-short-string ( -- str )
     SBUF" " clone lexer get [
-        swap tail-slice (parse-string) [ "" like ] dip
+        swap tail-slice (parse-short-string) [ "" like ] dip
     ] change-lexer-column ;
 
 <PRIVATE
@@ -109,80 +109,46 @@ PRIVATE>
     { lexer } declare
     [ 1 + ] change-column drop ;
 
-ERROR: escaped-char-expected ;
-
-: next-char ( lexer -- ch )
+: next-char ( lexer -- ch/f )
     { lexer } declare
     dup still-parsing-line? [
         [ current-char ] [ advance-char ] bi
     ] [
-        escaped-char-expected
+        drop f
     ] if ;
-
-: lexer-head? ( lexer string -- ? )
-    { lexer string } declare
-    [ rest-of-line ] dip head? ;
-
-: advance-lexer ( lexer n -- )
-    { lexer fixnum } declare
-    [ + ] curry change-column drop ;
-
-: find-next-token ( lexer ch -- i elt )
-    { lexer fixnum } declare
-    [ [ column>> ] [ line-text>> ] bi ] dip
-    CHAR: \ 2array [ member? ] curry find-from ;
 
 : next-line% ( accum lexer -- )
     { sbuf lexer } declare
-    [ rest-of-line swap push-all ]
-    [ next-line CHAR: \n swap push ] 2bi ;
+    [ rest-of-line swap push-all ] [ next-line ] bi ;
 
-: take-double-quotes ( lexer -- string )
+: find-next-token ( lexer -- i elt )
     { lexer } declare
-    dup current-char CHAR: " = [
-        dup [ column>> ] [ line-text>> ] bi
-        [ CHAR: " = not ] find-from drop [
-            over column>> - CHAR: " <repetition>
-        ] [
-            dup rest-of-line
-        ] if*
-        [ length advance-lexer ] keep
-    ] [ drop f ] if ;
+    [ column>> ] [ line-text>> ] bi
+    [ "\"\\" member? ] find-from ;
 
-: end-string-parse ( accum lexer delimiter -- )
-    { sbuf lexer string } declare
-    length 3 = [
-        take-double-quotes 3 tail-slice swap push-all
+DEFER: (parse-full-string)
+
+: parse-found-token ( accum lexer i elt -- )
+    { sbuf lexer fixnum fixnum } declare
+    [ over lexer-subseq pick push-all ] dip
+    CHAR: \ = [
+        dup dup [ next-char ] bi@
+        [ [ pick push ] bi@ ]
+        [ drop 2dup next-line% ] if*
+        (parse-full-string)
     ] [
         advance-char drop
     ] if ;
 
-DEFER: (parse-multiline-string-until)
-
-: parse-found-token ( accum lexer string i token -- )
-    { sbuf lexer string fixnum fixnum } declare
-    [ [ 2over ] dip swap lexer-subseq swap push-all ] dip
-    CHAR: \ = [
-        2over next-char swap push
-        2over next-char swap push
-        (parse-multiline-string-until)
-    ] [
-        2dup lexer-head? [
-            end-string-parse
-        ] [
-            2over next-char swap push
-            (parse-multiline-string-until)
-        ] if
-    ] if ;
-
-: (parse-multiline-string-until) ( accum lexer string -- )
-    { sbuf lexer fixnum } declare
-    over still-parsing? [
-        2dup first find-next-token [
+: (parse-full-string) ( accum lexer -- )
+    { sbuf lexer } declare
+    dup still-parsing? [
+        dup find-next-token [
             parse-found-token
         ] [
-            drop 2over next-line%
-            (parse-multiline-string-until)
+            drop 2dup next-line%
+            CHAR: \n pick push
+            (parse-full-string)
         ] if*
     ] [
         throw-unexpected-eof
@@ -190,7 +156,7 @@ DEFER: (parse-multiline-string-until)
 
 PRIVATE>
 
-: parse-multiline-string-until ( arg -- string )
-    [ SBUF" " clone ] dip [
-        [ lexer get ] dip (parse-multiline-string-until)
-    ] curry keep unescape-string ;
+: parse-full-string ( -- str )
+    SBUF" " clone [
+        lexer get (parse-full-string)
+    ] keep unescape-string ;

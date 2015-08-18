@@ -9,8 +9,14 @@ HELP: escape
 { $description "Converts from a single-character escape code and the corresponding character." }
 { $examples { $example "USING: kernel prettyprint strings.parser ;" "CHAR: n escape CHAR: \\n = ." "t" } } ;
 
-HELP: parse-string
+HELP: parse-short-string
 { $values { "str" "a new " { $link string } } }
 { $description "Parses the line until a quote (\"), interpreting escape codes along the way." }
+{ $errors "Throws an error if the string contains an invalid escape sequence." }
+$parsing-note ;
+
+HELP: parse-full-string
+{ $values { "str" "a new " { $link string } } }
+{ $description "Parses one or more lines until a quote (\"), interpreting escape codes along the way." }
 { $errors "Throws an error if the string contains an invalid escape sequence." }
 $parsing-note ;
