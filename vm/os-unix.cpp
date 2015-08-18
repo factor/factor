@@ -39,16 +39,16 @@ void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY | RTLD_GLOBAL);
 }
 
-void* factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
-  return dlsym(dll ? dll->handle : null_dll, symbol);
+cell factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
+  return (cell)dlsym(dll ? dll->handle : null_dll, symbol);
 }
 
-void* factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
+cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
   return FUNCTION_CODE_POINTER(ffi_dlsym_raw(dll, symbol));
 }
 
 #ifdef FACTOR_PPC
-void* factor_vm::ffi_dlsym_toc(dll* dll, symbol_char* symbol) {
+cell factor_vm::ffi_dlsym_toc(dll* dll, symbol_char* symbol) {
   return FUNCTION_TOC_POINTER(ffi_dlsym_raw(dll, symbol));
 }
 #endif
@@ -384,12 +384,9 @@ void safe_close(int fd) {
 bool check_write(int fd, void* data, ssize_t size) {
   if (write(fd, data, size) == size)
     return true;
-  else {
-    if (errno == EINTR)
-      return check_write(fd, data, size);
-    else
-      return false;
-  }
+  if (errno == EINTR)
+    return check_write(fd, data, size);
+  return false;
 }
 
 void safe_write(int fd, void* data, ssize_t size) {

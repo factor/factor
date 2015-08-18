@@ -14,12 +14,12 @@ void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = LoadLibraryEx((WCHAR*)alien_offset(dll->path), NULL, 0);
 }
 
-void* factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return (void*)GetProcAddress(dll ? (HMODULE) dll->handle : hFactorDll,
-                               symbol);
+cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
+  return (cell)GetProcAddress(dll ? (HMODULE) dll->handle : hFactorDll,
+                              symbol);
 }
 
-void* factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
+cell factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
   return ffi_dlsym(dll, symbol);
 }
 
