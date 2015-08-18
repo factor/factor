@@ -47,12 +47,6 @@ cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
   return FUNCTION_CODE_POINTER(ffi_dlsym_raw(dll, symbol));
 }
 
-#ifdef FACTOR_PPC
-cell factor_vm::ffi_dlsym_toc(dll* dll, symbol_char* symbol) {
-  return FUNCTION_TOC_POINTER(ffi_dlsym_raw(dll, symbol));
-}
-#endif
-
 void factor_vm::ffi_dlclose(dll* dll) {
   if (dlclose(dll->handle))
     general_error(ERROR_FFI, false_object, false_object);
