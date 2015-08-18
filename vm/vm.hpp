@@ -576,10 +576,7 @@ struct factor_vm {
   cell code_block_owner(code_block* compiled);
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
-  cell compute_dlsym_address(array* literals, cell index);
-#ifdef FACTOR_PPC
-  cell compute_dlsym_toc_address(array* literals, cell index);
-#endif
+  cell compute_dlsym_address(array* literals, cell index, bool toc);
   cell compute_vm_address(cell arg);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
@@ -740,9 +737,6 @@ struct factor_vm {
   void ffi_dlopen(dll* dll);
   cell ffi_dlsym(dll* dll, symbol_char* symbol);
   cell ffi_dlsym_raw(dll* dll, symbol_char* symbol);
-#ifdef FACTOR_PPC
-  cell ffi_dlsym_toc(dll* dll, symbol_char* symbol);
-#endif
   void ffi_dlclose(dll* dll);
   void c_to_factor_toplevel(cell quot);
   void init_signals();
