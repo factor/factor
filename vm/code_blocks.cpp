@@ -142,73 +142,43 @@ void factor_vm::update_word_references(code_block* compiled,
   }
 }
 
-/* Look up an external library symbol referenced by a compiled code block */
-cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
+/* Look up an external library symbol referenced by a compiled code
+   block */
+cell factor_vm::compute_dlsym_address(array* parameters,
+                                      cell index,
+                                      bool toc) {
   cell symbol = array_nth(parameters, index);
   cell library = array_nth(parameters, index + 1);
+  dll* d = to_boolean(library) ? untag<dll>(library) : NULL;
 
-  dll* d = (to_boolean(library) ? untag<dll>(library) : NULL);
-
-  cell undefined_symbol = (cell)factor::undefined_symbol;
-  undefined_symbol = FUNCTION_CODE_POINTER(undefined_symbol);
+  cell undef = (cell)factor::undefined_symbol;
+  undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
   if (d != NULL && !d->handle)
-    return undefined_symbol;
+    return undef;
 
-  switch (tagged<object>(symbol).type()) {
-    case BYTE_ARRAY_TYPE: {
-      symbol_char* name = alien_offset(symbol);
-      cell sym = ffi_dlsym(d, name);
-      return sym ? sym : undefined_symbol;
-    }
-    case ARRAY_TYPE: {
-      array* names = untag<array>(symbol);
-      for (cell i = 0; i < array_capacity(names); i++) {
-        symbol_char* name = alien_offset(array_nth(names, i));
-        cell sym = ffi_dlsym(d, name);
+  cell type = TAG(symbol);
+  if (type == BYTE_ARRAY_TYPE) {
 
-        if (sym)
-          return sym;
-      }
-      return undefined_symbol;
+    symbol_char* name = alien_offset(symbol);
+    cell sym = ffi_dlsym_raw(d, name);
+    sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
+    return sym ? sym : undef;
+
+  } else if (type == ARRAY_TYPE) {
+
+    array* names = untag<array>(symbol);
+    for (cell i = 0; i < array_capacity(names); i++) {
+      symbol_char* name = alien_offset(array_nth(names, i));
+      cell sym = ffi_dlsym_raw(d, name);
+      sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
+      if (sym)
+        return sym;
     }
-    default:
-      return -1;
+    return undef;
+
   }
+  return -1;
 }
-
-#ifdef FACTOR_PPC
-cell factor_vm::compute_dlsym_toc_address(array* parameters, cell index) {
-  cell symbol = array_nth(parameters, index);
-  cell library = array_nth(parameters, index + 1);
-
-  dll* d = (to_boolean(library) ? untag<dll>(library) : NULL);
-
-  cell undefined_toc = (cell)factor::undefined_symbol;
-  undefined_toc = FUNCTION_TOC_POINTER(undefined_toc);
-  if (d != NULL && !d->handle)
-    return undefined_toc;
-
-  switch (tagged<object>(symbol).type()) {
-    case BYTE_ARRAY_TYPE: {
-      symbol_char* name = alien_offset(symbol);
-      cell toc = ffi_dlsym_toc(d, name);
-      return toc ? toc : undefined_toc;
-    }
-    case ARRAY_TYPE: {
-      array* names = untag<array>(symbol);
-      for (cell i = 0; i < array_capacity(names); i++) {
-        symbol_char* name = alien_offset(array_nth(names, i));
-        cell toc = ffi_dlsym_toc(d, name);
-        if (toc)
-          return toc;
-      }
-      return undefined_toc;
-    }
-    default:
-      return -1;
-  }
-}
-#endif
 
 cell factor_vm::compute_vm_address(cell arg) {
   return (cell)this + untag_fixnum(arg);
@@ -220,7 +190,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
                                         cell index) {
   switch (rel_type) {
     case RT_DLSYM:
-      return compute_dlsym_address(parameters, index);
+      return compute_dlsym_address(parameters, index, false);
     case RT_THIS:
       return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
@@ -237,7 +207,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
 #endif
 #ifdef FACTOR_PPC
     case RT_DLSYM_TOC:
-      return compute_dlsym_toc_address(parameters, index);
+      return compute_dlsym_address(parameters, index, true);
 #endif
     case RT_INLINE_CACHE_MISS:
       return (cell)&factor::inline_cache_miss;
