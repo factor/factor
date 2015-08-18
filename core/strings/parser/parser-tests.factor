@@ -13,18 +13,9 @@ IN: strings.parser.tests
 " "hi" ] unit-test
 { "Hello\n\rworld\"" "hi" } [ "Hello\n\rworld\"" "hi" ] unit-test
 
-[
-    "\"\"\"Hello\n\rworld\\\n\"\"\"" eval( -- obj )
-] [
-    error>> escaped-char-expected?
-] must-fail-with
+{ "foobarbaz" } [ "\"foo\\\nbar\\\r\nbaz\"" eval( -- obj ) ] unit-test
 
-{
-    "\"abc\""
-} [
-    "\"\\\"abc\\\"\"" eval( -- string )
-] unit-test
-
+{ "\"abc\"" } [ "\"\\\"abc\\\"\"" eval( -- string ) ] unit-test
 
 { "\"\\" } [ "\"\\" ] unit-test
 

@@ -196,7 +196,7 @@ PRIVATE>
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
-SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
+SYNTAX: URL" lexer get skip-blank parse-short-string >url suffix! ;
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
 { "urls" "io.sockets.secure" } "urls.secure" require-when
