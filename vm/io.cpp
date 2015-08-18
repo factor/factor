@@ -171,8 +171,9 @@ void factor_vm::primitive_fopen() {
   path.untag_check(this);
 
   FILE* file;
-  file = safe_fopen((char*)(path.untagged() + 1), (char*)(mode.untagged() + 1));
-  ctx->push(allot_alien(file));
+  file = safe_fopen((char*)(path.untagged() + 1),
+                    (char*)(mode.untagged() + 1));
+  ctx->push(allot_alien((cell)file));
 }
 
 FILE* factor_vm::pop_file_handle() { return (FILE*)alien_offset(ctx->pop()); }

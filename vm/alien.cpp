@@ -47,8 +47,8 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement) {
 }
 
 /* Allocates memory */
-cell factor_vm::allot_alien(void* address) {
-  return allot_alien(false_object, (cell)address);
+cell factor_vm::allot_alien(cell address) {
+  return allot_alien(false_object, address);
 }
 
 /* make an alien pointing at an offset of another alien */
