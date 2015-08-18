@@ -149,31 +149,27 @@ cell factor_vm::compute_dlsym_address(array* parameters, cell index) {
 
   dll* d = (to_boolean(library) ? untag<dll>(library) : NULL);
 
-  void* undefined_symbol = (void*)factor::undefined_symbol;
+  cell undefined_symbol = (cell)factor::undefined_symbol;
   undefined_symbol = FUNCTION_CODE_POINTER(undefined_symbol);
   if (d != NULL && !d->handle)
-    return (cell)undefined_symbol;
+    return undefined_symbol;
 
   switch (tagged<object>(symbol).type()) {
     case BYTE_ARRAY_TYPE: {
       symbol_char* name = alien_offset(symbol);
-      void* sym = ffi_dlsym(d, name);
-
-      if (sym)
-        return (cell)sym;
-      else
-        return (cell)undefined_symbol;
+      cell sym = ffi_dlsym(d, name);
+      return sym ? sym : undefined_symbol;
     }
     case ARRAY_TYPE: {
       array* names = untag<array>(symbol);
       for (cell i = 0; i < array_capacity(names); i++) {
         symbol_char* name = alien_offset(array_nth(names, i));
-        void* sym = ffi_dlsym(d, name);
+        cell sym = ffi_dlsym(d, name);
 
         if (sym)
-          return (cell)sym;
+          return sym;
       }
-      return (cell)undefined_symbol;
+      return undefined_symbol;
     }
     default:
       return -1;
@@ -187,30 +183,26 @@ cell factor_vm::compute_dlsym_toc_address(array* parameters, cell index) {
 
   dll* d = (to_boolean(library) ? untag<dll>(library) : NULL);
 
-  void* undefined_toc = (void*)factor::undefined_symbol;
+  cell undefined_toc = (cell)factor::undefined_symbol;
   undefined_toc = FUNCTION_TOC_POINTER(undefined_toc);
   if (d != NULL && !d->handle)
-    return (cell)undefined_toc;
+    return undefined_toc;
 
   switch (tagged<object>(symbol).type()) {
     case BYTE_ARRAY_TYPE: {
       symbol_char* name = alien_offset(symbol);
-      void* toc = ffi_dlsym_toc(d, name);
-      if (toc)
-        return (cell)toc;
-      else
-        return (cell)undefined_toc;
+      cell toc = ffi_dlsym_toc(d, name);
+      return toc ? toc : undefined_toc;
     }
     case ARRAY_TYPE: {
       array* names = untag<array>(symbol);
       for (cell i = 0; i < array_capacity(names); i++) {
         symbol_char* name = alien_offset(array_nth(names, i));
-        void* toc = ffi_dlsym_toc(d, name);
-
+        cell toc = ffi_dlsym_toc(d, name);
         if (toc)
-          return (cell)toc;
+          return toc;
       }
-      return (cell)undefined_toc;
+      return undefined_toc;
     }
     default:
       return -1;

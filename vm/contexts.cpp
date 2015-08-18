@@ -121,7 +121,7 @@ context* factor_vm::new_context() {
 
 /* Allocates memory */
 void factor_vm::init_context(context* ctx) {
-  ctx->context_objects[OBJ_CONTEXT] = allot_alien(ctx);
+  ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
 }
 
 /* Allocates memory (init_context(), but not parent->new_context() */

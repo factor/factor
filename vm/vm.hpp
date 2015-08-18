@@ -659,7 +659,7 @@ struct factor_vm {
   // alien
   char* pinned_alien_offset(cell obj);
   cell allot_alien(cell delegate_, cell displacement);
-  cell allot_alien(void* address);
+  cell allot_alien(cell address);
   void primitive_displaced_alien();
   void primitive_alien_address();
   void* alien_pointer();
@@ -738,10 +738,10 @@ struct factor_vm {
   void move_file(const vm_char* path1, const vm_char* path2);
   void init_ffi();
   void ffi_dlopen(dll* dll);
-  void* ffi_dlsym(dll* dll, symbol_char* symbol);
-  void* ffi_dlsym_raw(dll* dll, symbol_char* symbol);
+  cell ffi_dlsym(dll* dll, symbol_char* symbol);
+  cell ffi_dlsym_raw(dll* dll, symbol_char* symbol);
 #ifdef FACTOR_PPC
-  void* ffi_dlsym_toc(dll* dll, symbol_char* symbol);
+  cell ffi_dlsym_toc(dll* dll, symbol_char* symbol);
 #endif
   void ffi_dlclose(dll* dll);
   void c_to_factor_toplevel(cell quot);

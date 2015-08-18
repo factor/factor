@@ -125,7 +125,7 @@ void factor_vm::primitive_callback() {
 
   cell func = callbacks->add(w.value(), return_rewind)->entry_point();
   CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);
-  ctx->push(allot_alien((void*)func));
+  ctx->push(allot_alien(func));
 }
 
 void factor_vm::primitive_free_callback() {
