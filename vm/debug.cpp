@@ -299,6 +299,7 @@ void factor_vm::dump_objects(ostream& out, cell type) {
 }
 
 void factor_vm::find_data_references(ostream& out, cell look_for) {
+  primitive_full_gc();
   auto find_data_ref_func = [&](object* obj, cell* slot) {
     if (look_for == *slot) {
       out << padded_address((cell)obj) << " ";
@@ -310,6 +311,7 @@ void factor_vm::find_data_references(ostream& out, cell look_for) {
 }
 
 void factor_vm::dump_edges(ostream& out) {
+  primitive_full_gc();
   auto dump_edges_func = [&](object* obj, cell* scan) {
     if (TAG(*scan) > F_TYPE) {
       out << (void*)tag_dynamic(obj);
