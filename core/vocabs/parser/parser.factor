@@ -10,12 +10,13 @@ IN: vocabs.parser
 ERROR: no-word-error name ;
 
 : word-restarts ( possibilities -- restarts )
-    natural-sort
-    [ [ vocabulary>> "Use the " " vocabulary" surround ] keep ] { } map>assoc ;
+    natural-sort [
+        [ vocabulary>> "Use the " " vocabulary" surround ] keep
+    ] { } map>assoc ;
 
 : word-restarts-with-defer ( name possibilities -- restarts )
     word-restarts
-    swap "Defer word in current vocabulary" swap 2array
+    "Defer word in current vocabulary" rot 2array
     suffix ;
 
 : <no-word-error> ( name possibilities -- error restarts )
@@ -110,8 +111,9 @@ ERROR: unbalanced-private-declaration vocab ;
     vocab-name manifest get search-vocab-names>> in? ;
 
 : use-vocab ( vocab -- )
-    dup using-vocab?
-    [ vocab-name "Already using ``" "'' vocabulary" surround note. ] [
+    dup using-vocab? [
+        vocab-name "Already using ``" "'' vocabulary" surround note.
+    ] [
         manifest get
         [ [ load-vocab ] dip search-vocabs>> push ]
         [ [ vocab-name ] dip search-vocab-names>> adjoin ]
@@ -184,8 +186,7 @@ TUPLE: ambiguous-use-error words ;
     [ words>> (lookup) ] with map sift dup length ;
 
 : vocab-search ( name manifest -- word/f )
-    search-vocabs>>
-    (vocab-search) {
+    search-vocabs>> (vocab-search) {
         { 0 [ drop f ] }
         { 1 [ first ] }
         [
