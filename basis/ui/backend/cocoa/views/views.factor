@@ -14,12 +14,14 @@ IN: ui.backend.cocoa.views
     [ mouse-location ] [ drop window ] 2bi
     [ move-hand fire-motion yield ] [ drop ] if* ;
 
+! Issue #1453
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
     -> buttonNumber {
         { 0 [ 1 ] }
         { 1 [ 3 ] }
         { 2 [ 2 ] }
+        [ ]
     } case ;
 
 CONSTANT: modifiers
