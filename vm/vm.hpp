@@ -750,8 +750,6 @@ struct factor_vm {
 
   const vm_char* vm_executable_path();
   const vm_char* default_image_path();
-  void windows_image_path(vm_char* full_path, vm_char* temp_path,
-                          unsigned int length);
   BOOL windows_stat(vm_char* path);
 
   LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
