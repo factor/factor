@@ -48,15 +48,6 @@ BOOL factor_vm::windows_stat(vm_char* path) {
   return ret;
 }
 
-void factor_vm::windows_image_path(vm_char* full_path, vm_char* temp_path,
-                                   unsigned int length) {
-  wcsncpy(temp_path, full_path, length - 1);
-  size_t full_path_len = wcslen(full_path);
-  if (full_path_len < length - 1)
-    wcsncat(temp_path, L".image", length - full_path_len - 1);
-  temp_path[length - 1] = 0;
-}
-
 /* You must free() this yourself. */
 const vm_char* factor_vm::default_image_path() {
   vm_char full_path[MAX_UNICODE_PATH];
