@@ -171,10 +171,8 @@ struct factor_vm {
   void primitive_set_context_object();
   cell stack_to_array(cell bottom, cell top, vm_error_type error);
   cell datastack_to_array(context* ctx);
-  void primitive_datastack();
   void primitive_datastack_for();
   cell retainstack_to_array(context* ctx);
-  void primitive_retainstack();
   void primitive_retainstack_for();
   cell array_to_stack(array* array, cell bottom);
   void set_datastack(context* ctx, array* array);
@@ -330,6 +328,17 @@ struct factor_vm {
     each_object(data->tenured, iterator);
     each_object(data->aging, iterator);
     gc_off = false;
+  }
+
+  template <typename Iterator>
+  inline void each_object_each_slot(Iterator& iterator) {
+    auto each_object_func = [&](object* obj) {
+      auto each_slot_func = [&](cell* slot) {
+        iterator(obj, slot);
+      };
+      obj->each_slot(each_slot_func);
+    };
+    each_object(each_object_func);
   }
 
   /* the write barrier must be called any time we are potentially storing a
@@ -567,10 +576,7 @@ struct factor_vm {
   cell code_block_owner(code_block* compiled);
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
-  cell compute_dlsym_address(array* literals, cell index);
-#ifdef FACTOR_PPC
-  cell compute_dlsym_toc_address(array* literals, cell index);
-#endif
+  cell compute_dlsym_address(array* literals, cell index, bool toc);
   cell compute_vm_address(cell arg);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
@@ -626,7 +632,6 @@ struct factor_vm {
   callstack* allot_callstack(cell size);
   cell second_from_top_stack_frame(context* ctx);
   cell capture_callstack(context* ctx);
-  void primitive_callstack();
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
@@ -651,7 +656,7 @@ struct factor_vm {
   // alien
   char* pinned_alien_offset(cell obj);
   cell allot_alien(cell delegate_, cell displacement);
-  cell allot_alien(void* address);
+  cell allot_alien(cell address);
   void primitive_displaced_alien();
   void primitive_alien_address();
   void* alien_pointer();
@@ -730,11 +735,8 @@ struct factor_vm {
   void move_file(const vm_char* path1, const vm_char* path2);
   void init_ffi();
   void ffi_dlopen(dll* dll);
-  void* ffi_dlsym(dll* dll, symbol_char* symbol);
-  void* ffi_dlsym_raw(dll* dll, symbol_char* symbol);
-#ifdef FACTOR_PPC
-  void* ffi_dlsym_toc(dll* dll, symbol_char* symbol);
-#endif
+  cell ffi_dlsym(dll* dll, symbol_char* symbol);
+  cell ffi_dlsym_raw(dll* dll, symbol_char* symbol);
   void ffi_dlclose(dll* dll);
   void c_to_factor_toplevel(cell quot);
   void init_signals();

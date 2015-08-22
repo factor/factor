@@ -451,11 +451,12 @@ tuple
     { "fwrite" "io.streams.c" "primitive_fwrite" ( data length alien -- ) }
     { "(clone)" "kernel" "primitive_clone" ( obj -- newobj ) }
     { "<wrapper>" "kernel" "primitive_wrapper" ( obj -- wrapper ) }
-    { "get-callstack" "kernel" "primitive_callstack" ( -- callstack ) }
+
     { "callstack>array" "kernel" "primitive_callstack_to_array" ( callstack -- array ) }
-    { "get-datastack" "kernel" "primitive_datastack" ( -- array ) }
     { "die" "kernel" "primitive_die" ( -- ) }
-    { "get-retainstack" "kernel" "primitive_retainstack" ( -- array ) }
+    { "callstack-for" "kernel.private" "primitive_callstack_for" ( context -- array ) }
+    { "datastack-for" "kernel.private" "primitive_datastack_for" ( context -- array ) }
+    { "retainstack-for" "kernel.private" "primitive_retainstack_for" ( context -- array ) }
     { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" ( obj -- code ) }
     { "become" "kernel.private" "primitive_become" ( old new -- ) }
     { "callstack-bounds" "kernel.private" "primitive_callstack_bounds" ( -- start end ) }
@@ -542,10 +543,7 @@ tuple
     { "(exit)" "system" "primitive_exit" ( n -- * ) }
     { "nano-count" "system" "primitive_nano_count" ( -- ns ) }
     { "(sleep)" "threads.private" "primitive_sleep" ( nanos -- ) }
-    { "callstack-for" "threads.private" "primitive_callstack_for" ( context -- array ) }
     { "context-object-for" "threads.private" "primitive_context_object_for" ( n context -- obj ) }
-    { "datastack-for" "threads.private" "primitive_datastack_for" ( context -- array ) }
-    { "retainstack-for" "threads.private" "primitive_retainstack_for" ( context -- array ) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" ( -- stats ) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" ( -- ) }
     { "word-code" "words" "primitive_word_code" ( word -- start end ) }
