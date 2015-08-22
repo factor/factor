@@ -85,8 +85,9 @@ M: object cwd ( -- path ) "." ;
 PRIVATE>
 
 : init-resource-path ( -- )
-    OBJ-ARGS special-object
-    [ utf8 alien>string "-resource-path=" ?head [ drop f ] unless ] map-find drop
+    OBJ-ARGS special-object [
+        alien>native-string "-resource-path=" ?head [ drop f ] unless
+    ] map-find drop
     [ image-path parent-directory ] unless* "resource-path" set-global ;
 
 [
