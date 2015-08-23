@@ -129,17 +129,18 @@ M: word parent-word drop f ;
 : make-deprecated ( word -- )
     t "deprecated" set-word-prop ;
 
-: inline? ( obj -- ? )
-    dup word? [ "inline" word-prop ] [ drop f ] if ; inline
+: word-prop? ( obj string -- ? )
+    over word? [ word-prop ] [ 2drop f ] if ; inline
 
-: recursive? ( obj -- ? )
-    dup word? [ "recursive" word-prop ] [ drop f ] if ; inline
+: word-props? ( obj seq -- ? )
+    over word? [ [ word-prop ] with all? ] [ 2drop f ] if ; inline
+
+: inline? ( obj -- ? ) "inline" word-prop? ; inline
+
+: recursive? ( obj -- ? ) "recursive" word-prop? ; inline
 
 : inline-recursive? ( obj -- ? )
-    dup word? [
-        dup "inline" word-prop
-        [ "recursive" word-prop ] [ drop f ] if
-    ] [ drop f ] if ; inline
+    { "inline" "recursive" } word-props? ; inline
 
 ERROR: cannot-be-inline word ;
 
@@ -174,7 +175,8 @@ M: word foldable?
     [ parent-word dup [ foldable? ] when ] bi or ;
 
 : make-foldable ( word -- )
-    dup make-flushable t "foldable" set-word-prop ;
+    [ make-flushable ]
+    [ t "foldable" set-word-prop ] bi ;
 
 GENERIC: reset-word ( word -- )
 
@@ -242,11 +244,9 @@ M: parsing-word definer drop \ SYNTAX: \ ; ;
 : define-syntax ( word quot -- )
     [ drop ] [ define ] 2bi t "parsing" set-word-prop ;
 
-: delimiter? ( obj -- ? )
-    dup word? [ "delimiter" word-prop ] [ drop f ] if ;
+: delimiter? ( obj -- ? ) "delimiter" word-prop? ;
 
-: deprecated? ( obj -- ? )
-    dup word? [ "deprecated" word-prop ] [ drop f ] if ;
+: deprecated? ( obj -- ? ) "deprecated" word-prop? ;
 
 ! Definition protocol
 M: word where "loc" word-prop ;
