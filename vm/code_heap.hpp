@@ -11,7 +11,7 @@ struct code_heap {
   segment* seg;
 
   /* Memory area reserved for safepoint guard page */
-  void* safepoint_page;
+  cell safepoint_page;
 
   /* Memory area reserved for SEH. Only used on Windows */
   char* seh_area;
@@ -51,7 +51,7 @@ struct code_heap {
 
   bool safepoint_p(cell addr) {
     cell page_mask = ~(getpagesize() - 1);
-    return (addr & page_mask) == (cell)safepoint_page;
+    return (addr & page_mask) == safepoint_page;
   }
 };
 
