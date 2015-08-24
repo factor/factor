@@ -126,5 +126,5 @@ M: unsupported-platform summary
 
 [
     dup vocab-platforms dup supported-platform?
-    [ 2drop ] [ [ vocab-name ] dip unsupported-platform ] if
+    [ 2drop ] [ [ vocab-name ] dip throw-unsupported-platform ] if
 ] check-vocab-hook set-global
