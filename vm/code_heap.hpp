@@ -39,8 +39,7 @@ struct code_heap {
   bool uninitialized_p(code_block* compiled);
   void free(code_block* compiled);
   void flush_icache();
-  void guard_safepoint();
-  void unguard_safepoint();
+  void set_safepoint_guard(bool locked);
   void verify_all_blocks_set();
   void initialize_all_blocks_set();
 

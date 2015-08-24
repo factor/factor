@@ -3,7 +3,7 @@
 namespace factor {
 
 void safepoint_state::enqueue_safepoint(factor_vm* parent) volatile {
-  parent->code->guard_safepoint();
+  parent->code->set_safepoint_guard(true);
 }
 
 void safepoint_state::enqueue_fep(factor_vm* parent) volatile {
@@ -13,26 +13,30 @@ void safepoint_state::enqueue_fep(factor_vm* parent) volatile {
   enqueue_safepoint(parent);
 }
 
-void safepoint_state::enqueue_samples(factor_vm* parent, cell samples, cell pc,
+void safepoint_state::enqueue_samples(factor_vm* parent,
+                                      cell samples,
+                                      cell pc,
                                       bool foreign_thread_p) volatile {
-  if (atomic::load(&parent->sampling_profiler_p)) {
-    atomic::fetch_add(&sample_counts.sample_count, samples);
-    if (foreign_thread_p)
-      atomic::fetch_add(&sample_counts.foreign_thread_sample_count, samples);
-    else {
-      if (atomic::load(&parent->current_gc_p))
-        atomic::fetch_add(&sample_counts.gc_sample_count, samples);
-      if (atomic::load(&parent->current_jit_count) > 0)
-        atomic::fetch_add(&sample_counts.jit_sample_count, samples);
-      if (!parent->code->seg->in_segment_p(pc))
-        atomic::fetch_add(&sample_counts.foreign_sample_count, samples);
-    }
-    enqueue_safepoint(parent);
+
+  if (!atomic::load(&parent->sampling_profiler_p))
+    return;
+  atomic::fetch_add(&sample_counts.sample_count, samples);
+
+  if (foreign_thread_p)
+    atomic::fetch_add(&sample_counts.foreign_thread_sample_count, samples);
+  else {
+    if (atomic::load(&parent->current_gc_p))
+      atomic::fetch_add(&sample_counts.gc_sample_count, samples);
+    if (atomic::load(&parent->current_jit_count) > 0)
+      atomic::fetch_add(&sample_counts.jit_sample_count, samples);
+    if (!parent->code->seg->in_segment_p(pc))
+      atomic::fetch_add(&sample_counts.foreign_sample_count, samples);
   }
+  enqueue_safepoint(parent);
 }
 
 void safepoint_state::handle_safepoint(factor_vm* parent, cell pc) volatile {
-  parent->code->unguard_safepoint();
+  parent->code->set_safepoint_guard(false);
   parent->faulting_p = false;
 
   if (atomic::load(&fep_p)) {
