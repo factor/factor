@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit effects io.streams.string kernel make
 math.parser multiline namespaces parser peg peg.parsers
-peg.search quotations sequences splitting stack-checker strings
+peg.search quotations sequences sequences.deep splitting stack-checker strings
 strings.parser summary unicode.categories words ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
@@ -120,9 +120,13 @@ C: <ebnf> ebnf
     #! or double quotes. The AST produced is the identifier
     #! between the quotes.
     [
-        [ CHAR: " = not ] satisfy repeat1 "\"" "\"" surrounded-by ,
+        [
+            [ CHAR: \ = ] satisfy
+            [ [ CHAR: " = ] [ CHAR: \ = ] bi or ] satisfy 2seq ,
+            [ CHAR: " = not ] satisfy ,
+        ] choice* repeat1 "\"" "\"" surrounded-by ,
         [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
-    ] choice* [ >string unescape-string ] action ;
+    ] choice* [ flatten >string unescape-string ] action ;
 
 : non-terminal-parser ( -- parser )
     #! A non-terminal is the name of another rule. It can
