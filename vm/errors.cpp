@@ -102,7 +102,7 @@ void factor_vm::not_implemented_error() {
 
 void factor_vm::verify_memory_protection_error(cell addr) {
   /* Called from the OS-specific top halves of the signal handlers to
-     make sure it's safe to dispatch to memory_protection_error */
+     make sure it's safe to dispatch to memory_signal_handler_impl. */
   if (fatal_erroring_p)
     fa_diddly_atal_error();
   if (faulting_p && !code->safepoint_p(addr))
@@ -111,16 +111,6 @@ void factor_vm::verify_memory_protection_error(cell addr) {
     fatal_error("Memory protection fault during low-level debugger", addr);
   else if (atomic::load(&current_gc_p))
     fatal_error("Memory protection fault during gc", addr);
-}
-
-/* Allocates memory */
-void factor_vm::memory_protection_error(cell pc, cell addr) {
-  if (code->safepoint_p(addr))
-    safepoint.handle_safepoint(this, pc);
-  else {
-    vm_error_type type = ctx->address_to_error(addr);
-    general_error(type, from_unsigned_cell(addr), false_object);
-  }
 }
 
 /* Allocates memory */
@@ -134,7 +124,14 @@ void factor_vm::primitive_unimplemented() { not_implemented_error(); }
 
 /* Allocates memory */
 void factor_vm::memory_signal_handler_impl() {
-  memory_protection_error(signal_fault_pc, signal_fault_addr);
+  if (code->safepoint_p(signal_fault_addr)) {
+    safepoint.handle_safepoint(this, signal_fault_pc);
+  }
+  else {
+    vm_error_type type = ctx->address_to_error(signal_fault_addr);
+    cell number = from_unsigned_cell(signal_fault_addr);
+    general_error(type, number, false_object);
+  }
   if (!signal_resumable) {
     /* In theory we should only get here if the callstack overflowed during a
        safepoint */
