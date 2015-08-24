@@ -42,7 +42,7 @@ HELP: printf
     { $list
         { { $snippet "%5s" } " formats a string padding with spaces up to 5 characters wide." }
         { { $snippet "%03d" } " formats an integer padding with zeros up to 3 characters wide." }
-        { { $snippet "%'#5f" } " formats a float padding with " { $snippet "#" } " up to 3 characters wide." }
+        { { $snippet "%'#10f" } " formats a float padding with " { $snippet "#" } " up to 10 characters wide." }
         { { $snippet "%-10d" } " formats an integer to 10 characters wide and left-aligns." }
     }
     $nl
