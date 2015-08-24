@@ -9,6 +9,9 @@ inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
 static const cell data_alignment = 16;
 
+/* Must match leaf-stack-frame-size in core/layouts/layouts.factor */
+#define LEAF_FRAME_SIZE 16
+
 #define WORD_SIZE (signed)(sizeof(cell) * 8)
 
 #define TAG_MASK 15

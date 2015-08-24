@@ -6,7 +6,6 @@ IN: bootstrap.x86
 
 DEFER: stack-reg
 
-: leaf-stack-frame-size ( -- n ) 2 bootstrap-cells ;
 : signal-handler-stack-frame-size ( -- n ) 24 bootstrap-cells ;
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : nv-regs ( -- seq ) { RBX RSI RDI R12 R13 R14 R15 } ;
