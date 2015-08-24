@@ -427,7 +427,7 @@ ARTICLE: "action-gestures" "Action gestures"
     revert-action
     close-action
 }
-"The following keyboard gestures, if not handled directly, send action gestures:"
+"The following keyboard gestures, if not handled directly by any gadget in the hierarchy until reaching the world, are re-sent as action gestures to the first gadget:"
 { $table
     { { $strong "Keyboard gesture" } { $strong "Action gesture" } }
     { { $snippet "T{ key-down f { C+ } \"z\" }" } { $snippet "undo-action" } }
