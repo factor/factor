@@ -14,7 +14,7 @@ code_heap::code_heap(cell size) {
   allocator = new free_list_allocator<code_block>(seg->end - start, start);
 
   /* See os-windows-x86.64.cpp for seh_area usage */
-  safepoint_page = (void*)seg->start;
+  safepoint_page = seg->start;
   seh_area = (char*)seg->start + getpagesize();
 }
 
@@ -48,6 +48,12 @@ void code_heap::free(code_block* compiled) {
 }
 
 void code_heap::flush_icache() { factor::flush_icache(seg->start, seg->size); }
+
+void code_heap::set_safepoint_guard(bool locked) {
+  if (!set_memory_locked(safepoint_page, getpagesize(), locked)) {
+    fatal_error("Cannot (un)protect safepoint guard page", safepoint_page);
+  }
+}
 
 void code_heap::sweep() {
   auto clear_free_blocks_from_all_blocks = [&](code_block* block, cell size) {

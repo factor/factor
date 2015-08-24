@@ -4,6 +4,13 @@ namespace factor {
 
 HMODULE hFactorDll;
 
+bool set_memory_locked(cell base, cell size, bool locked) {
+  int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
+  DWORD ignore;
+  int status = VirtualProtect((char*)base, size, prot, &ignore);
+  return status != 0;
+}
+
 void factor_vm::init_ffi() {
   hFactorDll = GetModuleHandle(NULL);
   if (!hFactorDll)
@@ -46,15 +53,6 @@ BOOL factor_vm::windows_stat(vm_char* path) {
   BOOL ret = GetFileInformationByHandle(h, &bhfi);
   CloseHandle(h);
   return ret;
-}
-
-void factor_vm::windows_image_path(vm_char* full_path, vm_char* temp_path,
-                                   unsigned int length) {
-  wcsncpy(temp_path, full_path, length - 1);
-  size_t full_path_len = wcslen(full_path);
-  if (full_path_len < length - 1)
-    wcsncat(temp_path, L".image", length - full_path_len - 1);
-  temp_path[length - 1] = 0;
 }
 
 /* You must free() this yourself. */
@@ -110,18 +108,15 @@ segment::segment(cell size_, bool executable_p) {
 }
 
 void segment::set_border_locked(bool locked) {
-  int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
   int pagesize = getpagesize();
-  DWORD ignore;
-
   cell lo = start - pagesize;
-  if (!VirtualProtect((char*)lo, pagesize, prot, &ignore)) {
+  if (!set_memory_locked(lo, pagesize, locked)) {
     fatal_error("Cannot (un)protect low guard page", lo);
   }
 
   cell hi = end;
-  if (!VirtualProtect((char*)hi, pagesize, prot, &ignore)) {
-    fatal_error("Cannot (un)protect high guard page", lo);
+  if (!set_memory_locked(hi, pagesize, locked)) {
+    fatal_error("Cannot (un)protect high guard page", hi);
   }
 }
 
@@ -140,18 +135,6 @@ long getpagesize() {
     g_pagesize = system_info.dwPageSize;
   }
   return g_pagesize;
-}
-
-void code_heap::guard_safepoint() {
-  DWORD ignore;
-  if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_NOACCESS, &ignore))
-    fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
-}
-
-void code_heap::unguard_safepoint() {
-  DWORD ignore;
-  if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_READWRITE, &ignore))
-    fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
 }
 
 void factor_vm::move_file(const vm_char* path1, const vm_char* path2) {

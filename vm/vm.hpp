@@ -215,7 +215,6 @@ struct factor_vm {
   void type_error(cell type, cell tagged);
   void not_implemented_error();
   void verify_memory_protection_error(cell addr);
-  void memory_protection_error(cell pc, cell addr);
   void divide_by_zero_error();
   void primitive_unimplemented();
   void memory_signal_handler_impl();
@@ -750,8 +749,6 @@ struct factor_vm {
 
   const vm_char* vm_executable_path();
   const vm_char* default_image_path();
-  void windows_image_path(vm_char* full_path, vm_char* temp_path,
-                          unsigned int length);
   BOOL windows_stat(vm_char* path);
 
   LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
