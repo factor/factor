@@ -14,7 +14,7 @@ code_heap::code_heap(cell size) {
   allocator = new free_list_allocator<code_block>(seg->end - start, start);
 
   /* See os-windows-x86.64.cpp for seh_area usage */
-  safepoint_page = (void*)seg->start;
+  safepoint_page = seg->start;
   seh_area = (char*)seg->start + getpagesize();
 }
 

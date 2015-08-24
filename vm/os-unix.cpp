@@ -2,6 +2,12 @@
 
 namespace factor {
 
+bool set_memory_locked(cell base, cell size, bool locked) {
+  int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
+  int status = mprotect((char*)base, size, prot);
+  return status != -1;
+}
+
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
   pthread_attr_t attr;
   pthread_t thread;
@@ -98,19 +104,17 @@ segment::segment(cell size_, bool executable_p) {
 }
 
 void segment::set_border_locked(bool locked) {
-  int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
   int pagesize = getpagesize();
-
   cell lo = start - pagesize;
-  if (mprotect((char*)lo, pagesize, prot) == -1) {
+  if (!set_memory_locked(lo, pagesize, locked)) {
     check_ENOMEM("mprotect low");
     fatal_error("Cannot (un)protect low guard page", lo);
   }
 
   cell hi = end;
-  if (mprotect((char*)hi, pagesize, prot) == -1) {
+  if (!set_memory_locked(hi, pagesize, locked)) {
     check_ENOMEM("mprotect high");
-    fatal_error("Cannot protect high guard page", lo);
+    fatal_error("Cannot (un)protect high guard page", hi);
   }
 }
 
@@ -122,13 +126,13 @@ segment::~segment() {
 }
 
 void code_heap::guard_safepoint() {
-  if (mprotect(safepoint_page, getpagesize(), PROT_NONE) == -1)
-    fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
+  if (!set_memory_locked(safepoint_page, getpagesize(), true))
+    fatal_error("Cannot protect safepoint guard page", safepoint_page);
 }
 
 void code_heap::unguard_safepoint() {
-  if (mprotect(safepoint_page, getpagesize(), PROT_WRITE) == -1)
-    fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
+  if (!set_memory_locked(safepoint_page, getpagesize(), false))
+    fatal_error("Cannot unprotect safepoint guard page", safepoint_page);
 }
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {

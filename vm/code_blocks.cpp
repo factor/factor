@@ -212,7 +212,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_INLINE_CACHE_MISS:
       return (cell)&factor::inline_cache_miss;
     case RT_SAFEPOINT:
-      return (cell)code->safepoint_page;
+      return code->safepoint_page;
     default:
       return -1;
   }
