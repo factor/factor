@@ -13,4 +13,6 @@ void unlock_console();
 void ignore_ctrl_c();
 void handle_ctrl_c();
 
+bool set_memory_locked(cell base, cell size, bool locked);
+
 }
