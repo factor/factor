@@ -124,6 +124,18 @@ IN: peg.ebnf.tests
   "'foo'" identifier-parser parse
 ] unit-test
 
+{ "\"" } [
+  "\"\\\"\"" identifier-parser parse
+] unit-test
+
+{ "\\" } [
+  "\"\\\\\"" identifier-parser parse
+] unit-test
+
+{ "AΣ𝄞" } [
+  "'\\x41\\u{greek-capital-letter-sigma}\\u01D11E'" identifier-parser parse
+] unit-test
+
 { "foo" } [
   "foo" non-terminal-parser parse symbol>>
 ] unit-test

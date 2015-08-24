@@ -60,12 +60,30 @@ HELP: EBNF:
 
 ARTICLE: "peg.ebnf.strings" "Strings"
 "A string in a rule will match that sequence of characters from the input string. "
+"The string is delimited by matching single or double quotes. "
+"Factor's escape sequences are interpreted: " { $link "escape" } ". "
+"For double quotes delimiters, an escaped double quote doesn't terminate the string. "
 "The AST result from the match is the string itself."
 { $examples
     { $example
        "USING: prettyprint peg.ebnf ;"
        "\"helloworld\" [EBNF rule=\"hello\" \"world\" EBNF] ."
        "V{ \"hello\" \"world\" }"
+    }
+    { $example
+       "USING: prettyprint peg.ebnf ;"
+       "\"AΣ𝄞\" [EBNF rule='\\x41' '\\u{greek-capital-letter-sigma}' '\\u01D11E' EBNF] ."
+       "V{ \"A\" \"Σ\" \"𝄞\" }"
+    }
+    { $example
+       "USING: io peg.ebnf ;"
+       "\"A double quote: \\\"\" [EBNF rule='A double quote: \"' EBNF] print"
+       "A double quote: \""
+    }
+    { $example
+       "USING: io peg.ebnf ;"
+       "\"' and \\\"\" [EBNF rule=\"' and \\\"\" EBNF] print"
+       "' and \""
     }
 } ;
 
