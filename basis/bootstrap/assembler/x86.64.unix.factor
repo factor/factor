@@ -4,7 +4,6 @@ USING: cpu.x86.assembler.operands kernel layouts parser
 sequences ;
 IN: bootstrap.x86
 
-: leaf-stack-frame-size ( -- n ) 2 bootstrap-cells ;
 : signal-handler-stack-frame-size ( -- n ) 20 bootstrap-cells ;
 : stack-frame-size ( -- n ) 4 bootstrap-cells ;
 : nv-regs ( -- seq ) { RBX R12 R13 R14 R15 } ;
