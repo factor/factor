@@ -215,7 +215,6 @@ struct factor_vm {
   void type_error(cell type, cell tagged);
   void not_implemented_error();
   void verify_memory_protection_error(cell addr);
-  void memory_protection_error(cell pc, cell addr);
   void divide_by_zero_error();
   void primitive_unimplemented();
   void memory_signal_handler_impl();
