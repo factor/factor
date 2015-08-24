@@ -14,7 +14,7 @@ HELP: parse-def
 
 HELP: with-lambda-scope
 { $values { "assoc" "local variables" } { "reader-quot" quotation } { "quot" quotation } }
-{ $description "Runs the quotation in a lambda scope. That means changes the quotation does to the " { $link manifest } " will not escape after the quotation ends." } ;
+{ $description "Runs the quotation in a lambda scope. That means that any local variables are available for lookup in the " { $link manifest } ", but are cleaned up after the quotation finishes." } ;
 
 ARTICLE: "locals.parser" "Utility words used by locals parsing words"
 "Words for parsing local words."
