@@ -87,23 +87,15 @@ set_md5sum() {
     fi
 }
 
-set_gcc() {
-    case $OS in
-        macosx)
-            xcode_major=`xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).*$/\1/p'`
-            if [[ $xcode_major -ge 4 ]]; then
-                [ -z "$CC" ] && CC=clang
-                [ -z "$CXX" ] && CXX=clang++
-            else
-                [ -z "$CC" ] && CC=gcc
-                [ -z "$CXX" ] && CXX=g++
-            fi
-        ;;
-        *)
-            [ -z "$CC" ] && CC=gcc
-            [ -z "$CXX" ] && CXX=g++
-        ;;
-    esac
+set_cc() {
+    test_program_installed clang gcc
+    if [[ $? -ne 0 ]] ; then
+        [ -z "$CC" ] && CC=clang
+        [ -z "$CXX" ] && CXX=clang++
+    else
+        [ -z "$CC" ] && CC=gcc
+        [ -z "$CXX" ] && CXX=g++
+    fi
 }
 
 set_make() {
@@ -355,7 +347,7 @@ parse_build_info() {
 find_build_info() {
     find_os
     find_architecture
-    set_gcc
+    set_cc
     find_word_size
     set_factor_binary
     set_factor_library
@@ -573,6 +565,12 @@ install_deps_pacman() {
     check_ret sudo
 }
 
+install_deps_dnf() {
+    sudo dnf --assumeyes install gcc gcc-c++ glibc-devel binutils libX11-devel pango-devel gtk3-devel gdk-pixbuf2-devel gtkglext-devel tmux rlwrap wget
+    check_ret sudo
+}
+
+
 install_deps_macosx() {
     test_program_installed git
     if [[ $? -ne 1 ]] ; then
@@ -622,6 +620,7 @@ case "$1" in
     deps-apt-get) install_deps_apt_get ;;
     deps-pacman) install_deps_pacman ;;
     deps-macosx) install_deps_macosx ;;
+    deps-dnf) install_deps_dnf ;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; download_and_bootstrap ;;
@@ -629,5 +628,6 @@ case "$1" in
     net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report) find_build_info ;;
+    full-report) find_build_info; check_installed_programs; check_libraries ;;
     *) usage ;;
 esac
