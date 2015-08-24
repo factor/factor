@@ -49,6 +49,12 @@ void code_heap::free(code_block* compiled) {
 
 void code_heap::flush_icache() { factor::flush_icache(seg->start, seg->size); }
 
+void code_heap::set_safepoint_guard(bool locked) {
+  if (!set_memory_locked(safepoint_page, getpagesize(), locked)) {
+    fatal_error("Cannot (un)protect safepoint guard page", safepoint_page);
+  }
+}
+
 void code_heap::sweep() {
   auto clear_free_blocks_from_all_blocks = [&](code_block* block, cell size) {
     std::set<cell>::iterator erase_from =
