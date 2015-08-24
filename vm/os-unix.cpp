@@ -125,16 +125,6 @@ segment::~segment() {
     fatal_error("Segment deallocation failed", 0);
 }
 
-void code_heap::guard_safepoint() {
-  if (!set_memory_locked(safepoint_page, getpagesize(), true))
-    fatal_error("Cannot protect safepoint guard page", safepoint_page);
-}
-
-void code_heap::unguard_safepoint() {
-  if (!set_memory_locked(safepoint_page, getpagesize(), false))
-    fatal_error("Cannot unprotect safepoint guard page", safepoint_page);
-}
-
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
   dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
                           (cell*)&UAP_PROGRAM_COUNTER(uap),
