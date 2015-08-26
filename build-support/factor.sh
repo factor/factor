@@ -487,7 +487,7 @@ make_clean() {
 }
 
 make_factor() {
-    invoke_make NO_UI=$NO_UI $MAKE_TARGET -j5
+    invoke_make CC=$CC CXX=$CXX NO_UI=$NO_UI $MAKE_TARGET -j5
 }
 
 make_clean_factor() {
