@@ -16,11 +16,32 @@ GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 SCRIPT_ARGS="$*"
 
+# return 1 on found
 test_program_installed() {
     if ! [[ -n `type -p $1` ]] ; then
         return 0;
     fi
     return 1;
+}
+
+# return 1 on found
+test_programs_installed() {
+    installed=0;
+    $ECHO -n "Checking for all($*)..."
+    for i in $* ;
+    do
+        test_program_installed $i
+        if [[ $? -eq 1 ]]; then
+            installed=$(( $installed + 1 ))
+        fi
+    done
+    if [[ $installed -eq $# ]] ; then
+        $ECHO "found!"
+        return 1
+    else
+        $ECHO "all not found."
+        return 0
+    fi
 }
 
 exit_script() {
@@ -33,32 +54,30 @@ exit_script() {
 
 ensure_program_installed() {
     installed=0;
+    $ECHO -n "Checking for any($*)..."
     for i in $* ;
     do
-        $ECHO -n "Checking for $i..."
         test_program_installed $i
-        if [[ $? -eq 0 ]]; then
-            $ECHO -n "not "
-        else
+        if [[ $? -eq 1 ]]; then
+            $ECHO "found $i!"
             installed=$(( $installed + 1 ))
+            return
         fi
-        $ECHO "found!"
     done
-    if [[ $installed -eq 0 ]] ; then
-        $ECHO -n "Install "
-        if [[ $# -eq 1 ]] ; then
-            $ECHO -n $1
-        else
-            $ECHO -n "any of [ $* ]"
-        fi
-        $ECHO " and try again."
-        if [[ $OS == macosx ]] ; then
-            $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
-            $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
-            $ECHO "to build Factor."
-        fi
-        exit_script 1;
+    $ECHO "none found."
+    $ECHO -n "Install "
+    if [[ $# -eq 1 ]] ; then
+        $ECHO -n $1
+    else
+        $ECHO -n "any of [ $* ]"
     fi
+    $ECHO " and try again."
+    if [[ $OS == macosx ]] ; then
+        $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
+        $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
+        $ECHO "to build Factor."
+    fi
+    exit_script 1;
 }
 
 check_ret() {
@@ -70,12 +89,18 @@ check_ret() {
 }
 
 set_downloader() {
-    test_program_installed wget curl
+    test_program_installed wget
     if [[ $? -ne 0 ]] ; then
         DOWNLOADER=wget
-    else
-        DOWNLOADER="curl -f -O"
+        return
     fi
+    test_program_installed curl
+    if [[ $? -ne 0 ]] ; then
+        DOWNLOADER="curl -f -O"
+        return
+    fi
+    $ECHO "error: wget or curl required"
+    exit_script 11
 }
 
 set_md5sum() {
@@ -88,14 +113,22 @@ set_md5sum() {
 }
 
 set_cc() {
-    test_program_installed clang gcc
+    test_programs_installed clang clang++
     if [[ $? -ne 0 ]] ; then
         [ -z "$CC" ] && CC=clang
         [ -z "$CXX" ] && CXX=clang++
-    else
+        return
+    fi
+
+    test_programs_installed gcc g++
+    if [[ $? -ne 0 ]] ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
+        return
     fi
+
+    $ECHO "error: both (clang/clang++) or (gcc/g++) required!"
+    exit_script 10
 }
 
 set_make() {
@@ -129,7 +162,7 @@ check_library_exists() {
     $ECHO "int main(){return 0;}" > $GCC_TEST
     $CC $GCC_TEST -o $GCC_OUT -l $1 2>&-
     if [[ $? -ne 0 ]] ; then
-        $ECHO "not found!"
+        $ECHO "not found."
         $ECHO "***Factor will compile NO_UI=1"
         NO_UI=1
     else
@@ -556,7 +589,7 @@ make_boot_image() {
 }
 
 install_deps_apt_get() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev g++
     check_ret sudo
 }
 
