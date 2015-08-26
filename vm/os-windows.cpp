@@ -228,20 +228,15 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                               (cell)factor::synchronous_signal_handler_impl);
       break;
   }
-
   return ExceptionContinueExecution;
 }
 
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                 void* dispatch) {
-  if (factor_vm::fatal_erroring_p)
-    return ExceptionContinueSearch;
-
   factor_vm* vm = current_vm_p();
-  if (vm)
-    return vm->exception_handler(e, frame, c, dispatch);
-  else
+  if (factor_vm::fatal_erroring_p || !vm)
     return ExceptionContinueSearch;
+  return vm->exception_handler(e, frame, c, dispatch);
 }
 
 /* On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
@@ -306,6 +301,21 @@ void unlock_console() {}
 
 void close_console() {}
 
+cell get_thread_pc(THREADHANDLE th) {
+  DWORD suscount = SuspendThread(th);
+  FACTOR_ASSERT(suscount == 0);
+
+  CONTEXT context;
+  memset((void*)&context, 0, sizeof(CONTEXT));
+  context.ContextFlags = CONTEXT_CONTROL;
+  BOOL context_ok = GetThreadContext(th, &context);
+  FACTOR_ASSERT(context_ok);
+
+  suscount = ResumeThread(th);
+  FACTOR_ASSERT(suscount == 1);
+  return context.EIP;
+}
+
 void factor_vm::sampler_thread_loop() {
   LARGE_INTEGER counter, new_counter, units_per_second;
   DWORD ok;
@@ -328,22 +338,11 @@ void factor_vm::sampler_thread_loop() {
       ++samples;
       counter.QuadPart += units_per_second.QuadPart;
     }
+    if (samples == 0)
+      continue;
 
-    if (samples > 0) {
-      DWORD suscount = SuspendThread(thread);
-      FACTOR_ASSERT(suscount == 0);
-
-      CONTEXT context;
-      memset((void*)&context, 0, sizeof(CONTEXT));
-      context.ContextFlags = CONTEXT_CONTROL;
-      BOOL context_ok = GetThreadContext(thread, &context);
-      FACTOR_ASSERT(context_ok);
-
-      suscount = ResumeThread(thread);
-      FACTOR_ASSERT(suscount == 1);
-
-      safepoint.enqueue_samples(this, samples, context.EIP, false);
-    }
+    cell pc = get_thread_pc(thread);
+    safepoint.enqueue_samples(this, samples, pc, false);
   }
 }
 
