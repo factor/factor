@@ -1,3 +1,19 @@
+# Build instructions
+# ------------------
+#
+# Standard build and install command:
+#
+#   $ python waf.py --prefix=/desired/path configure build install
+#
+# To use clang instead of the automatically detected installed
+# compiler:
+#
+#   $ CXX=clang++ CC=clang python waf.py configure ...
+#
+# To cross-compile a 32bit binary on a 64bit system:
+#
+#   $ python waf.py --dest-cpu=i386 configure
+#
 from checksums import dlls
 from hashlib import md5
 from os import path
@@ -121,7 +137,7 @@ def options(ctx):
         '--dest-cpu',
         type = 'string',
         default = '',
-        help = 'cpu target (gcc only), one of: %s' % text
+        help = 'cpu target (gcc & clang only), one of: %s' % text
     )
 
 def configure(ctx):
