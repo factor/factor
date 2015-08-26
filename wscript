@@ -155,9 +155,7 @@ def configure(ctx):
     ctx.env.MAKE_BOOTSTRAP_IMAGE = opts.make_bootstrap_image
 
     cxx = ctx.env.COMPILER_CXX
-    pf = opts.prefix
-    if dest_os == 'win32':
-        pf = pf.replace('\\', '\\\\')
+    pf = '.' if dest_os == 'win32' else opts.prefix
 
     # Values to be inked into the binary.
     ctx.define('FACTOR_VERSION', VERSION)
@@ -191,7 +189,7 @@ def configure(ctx):
         elif cxx == 'g++':
             env.LINKFLAGS += ['-static-libgcc', '-static-libstdc++', '-s']
             env.CXXFLAGS += ['-O2', '-fomit-frame-pointer', '-std=c++11']
-            ctx.define('_CRT_SECURE_NO_WARNINGS', None)
+        ctx.define('_CRT_SECURE_NO_WARNINGS', None)
         # WIX checks
         ctx.find_program('candle')
         ctx.find_program('heat')
