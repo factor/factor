@@ -10,8 +10,6 @@ void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc,
      call stack from *sp and instead use the last saved "good value"
      which we get from ctx->callstack_top. Then launch the handler
      without going through the resumable subprimitive. */
-  signal_resumable = false;
-
   cell frame_top = ctx->callstack_top;
   cell seg_start = ctx->callstack_seg->start;
 
@@ -39,8 +37,6 @@ void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc,
 }
 
 void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
-
-  signal_resumable = true;
 
   /* Fault came from Factor, and we've got a good callstack. Route the
      signal handler through the resumable signal handler
@@ -81,8 +77,9 @@ void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
 
   bool in_code_seg = code->seg->in_segment_p(*pc);
   cell cs_limit = ctx->callstack_seg->start + stack_reserved;
-  bool resumable_p = in_code_seg && *sp >= cs_limit;
-  if (resumable_p) {
+  signal_resumable = in_code_seg && *sp >= cs_limit;
+
+  if (signal_resumable) {
     dispatch_resumable_signal(sp, pc, handler);
   } else {
     dispatch_non_resumable_signal(sp, pc, handler, cs_limit);
