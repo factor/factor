@@ -8,7 +8,6 @@ IN: bootstrap.x86
 
 4 \ cell set
 
-: signal-handler-stack-frame-size ( -- n ) 12 bootstrap-cells ;
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;

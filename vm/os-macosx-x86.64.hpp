@@ -67,9 +67,8 @@ inline static void uap_clear_fpu_status(void* uap) {
   mach_clear_fpu_status(UAP_FS(uap));
 }
 
-/* Must match the signal-handler-stack-frame-size and stack-frame-size
-   constants in basis/bootstrap/assembler/x86.64.unix.factor */
-static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 160;
+/* Must match the stack-frame-size constant in
+   basis/bootstrap/assembler/x86.64.unix.factor */
 static const unsigned JIT_FRAME_SIZE = 32;
 
 }
