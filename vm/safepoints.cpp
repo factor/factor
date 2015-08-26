@@ -2,15 +2,11 @@
 
 namespace factor {
 
-void safepoint_state::enqueue_safepoint(factor_vm* parent) volatile {
-  parent->code->set_safepoint_guard(true);
-}
-
 void safepoint_state::enqueue_fep(factor_vm* parent) volatile {
   if (parent->fep_p)
     fatal_error("Low-level debugger interrupted", 0);
   atomic::store(&fep_p, true);
-  enqueue_safepoint(parent);
+  parent->code->set_safepoint_guard(true);
 }
 
 void safepoint_state::enqueue_samples(factor_vm* parent,
@@ -32,7 +28,7 @@ void safepoint_state::enqueue_samples(factor_vm* parent,
     if (!parent->code->seg->in_segment_p(pc))
       atomic::fetch_add(&sample_counts.foreign_sample_count, samples);
   }
-  enqueue_safepoint(parent);
+  parent->code->set_safepoint_guard(true);
 }
 
 void safepoint_state::handle_safepoint(factor_vm* parent, cell pc) volatile {

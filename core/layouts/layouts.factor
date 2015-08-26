@@ -32,6 +32,8 @@ SYMBOL: header-bits
 : hashcode-shift ( -- n )
     tag-bits get header-bits get + ;
 
+: leaf-stack-frame-size ( -- n ) 16 ;
+
 ! We do this in its own compilation unit so that they can be
 ! folded below
 <<

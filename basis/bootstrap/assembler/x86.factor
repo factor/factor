@@ -92,28 +92,30 @@ big-endian off
 ! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
 ! not to trigger generation of a stack frame, so they can
 ! peform their own prolog/epilog preserving registers.
-
+!
+! It is important that the total is 192/64 and that it matches the
+! constants in vm/cpu-x86.*.hpp
 : jit-signal-handler-prolog ( -- )
-    ! minus a cell each for flags, return address
-    ! use LEA so we don't dirty flags
-    stack-reg stack-reg signal-handler-stack-frame-size
-    2 bootstrap-cells - neg [+] LEA
+    ! Return address already on stack -> 8/4 bytes.
 
-    signal-handler-save-regs
-    [| r i | stack-reg i bootstrap-cells [+] r MOV ] each-index
+    ! Push all registers. 15 regs/120 bytes on 64bit, 7 regs/28 bytes
+    ! on 32bit -> 128/32 bytes.
+    signal-handler-save-regs [ PUSH ] each
 
+    ! Push flags -> 136/36 bytes
     PUSHF
+
+    ! Register parameter area 32 bytes, unused on platforms other than
+    ! windows 64 bit, but including it doesn't hurt. Plus
+    ! alignment. LEA used so we don't dirty flags -> 192/64 bytes.
+    stack-reg stack-reg 7 bootstrap-cells neg [+] LEA
 
     jit-load-vm ;
 
 : jit-signal-handler-epilog ( -- )
+    stack-reg stack-reg 7 bootstrap-cells [+] LEA
     POPF
-
-    signal-handler-save-regs
-    [| r i | r stack-reg i bootstrap-cells [+] MOV ] each-index
-
-    stack-reg stack-reg signal-handler-stack-frame-size
-    2 bootstrap-cells - [+] LEA ;
+    signal-handler-save-regs reverse [ POP ] each ;
 
 [| |
     jit-signal-handler-prolog
