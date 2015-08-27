@@ -10,9 +10,13 @@
 #
 #   $ CXX=clang++ CC=clang python waf.py configure ...
 #
-# To cross-compile a 32bit binary on a 64bit system:
+# To cross-compile a 32bit binary on a 64bit system on unixes:
 #
-#   $ python waf.py --dest-cpu=i386 configure
+#   $ python waf.py --dest-cpu=i386 configure ...
+#
+# On Windows:
+#
+#   $ python .\waf.py --msvc_targets=x86 configure
 #
 from checksums import dlls
 from hashlib import md5
@@ -21,6 +25,11 @@ from urllib import urlopen
 from waflib import Errors, Task
 
 cpu_to_bits = {'amd64' : 64, 'i386' : 32, 'x86' : 32, 'x86_64' : 64}
+
+guids = {
+    32 : 'a19134b3-f679-4901-bd35-04d6e9d0cee0',
+    64 : '98a680c5-da23-42fe-b953-c33616a6b3c3'
+}
 
 APPNAME = 'factor-lang'
 VERSION = '0.98'
@@ -169,7 +178,7 @@ def configure(ctx):
     if opts.debug:
         ctx.define('FACTOR_DEBUG', 1)
         if cxx == 'msvc':
-            env.CXXFLAGS += ['/Zi']
+            env.CXXFLAGS += ['/Zi', '/FS']
             env.LINKFLAGS += ['/DEBUG']
         elif cxx == 'g++':
             env.CXXFLAGS += ['-g']
@@ -266,9 +275,18 @@ def build_msi(ctx, bits, image_target):
     # numeric. So if you have a version like 0.97-git, you need to
     # strip out the -git part.
     product_version = VERSION.split('-')[0]
+    bits_and_version = '%dbit %s' % (bits, VERSION)
+    candle_rule = ' '.join([
+        'candle',
+        '-nologo',
+        '-dProductVersion=%s' % product_version,
+        '-dVersion="%s"' % bits_and_version,
+        '-dBits=%s' % bits,
+        '-dUpgradeCode=%s' % guids[bits],
+        '-out ${TGT} ${SRC}'
+    ])
     ctx(
-        rule = 'candle -nologo -dProductVersion=%s -dVersion=%s -dBits=%s' \
-            ' -out ${TGT} ${SRC}' % (product_version, VERSION, bits),
+        rule = candle_rule,
         source = ['factor.wxs'],
         target = ['factor.wxsobj']
         )

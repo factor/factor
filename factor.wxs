@@ -3,7 +3,7 @@
   <Product
       Name='Factor $(var.Version)'
       Id='*'
-      UpgradeCode='840a2300-0be5-11e3-b156-09eb3a9c2bdd'
+      UpgradeCode='$(var.UpgradeCode)'
       Language='1033'
       Codepage='1252'
       Version='$(var.ProductVersion)'
@@ -166,7 +166,7 @@
                Order="2">1</Publish>
     </UI>
     <Property Id='PREVIOUSVERSIONSINSTALLED' Secure="yes" />
-    <Upgrade Id='840a2300-0be5-11e3-b156-09eb3a9c2bdd'>
+    <Upgrade Id='$(var.UpgradeCode)'>
       <UpgradeVersion
           Minimum="0.0.1.0" Maximum="99.0.0.0"
           Property="PREVIOUSVERSIONSINSTALLED"
