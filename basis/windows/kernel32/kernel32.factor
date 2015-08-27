@@ -927,6 +927,8 @@ FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped )
 FUNCTION: BOOL CopyFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName, BOOL bFailIfExists )
 ALIAS: CopyFile CopyFileW
 ! FUNCTION: CopyLZFile
+
+FUNCTION: void CopyMemory ( PVOID Destination, VOID* Source, SIZE_T Length )
 ! FUNCTION: CreateActCtxA
 ! FUNCTION: CreateActCtxW
 ! FUNCTION: CreateConsoleScreenBuffer
@@ -1186,7 +1188,9 @@ ALIAS: FindNextVolume FindNextVolumeW
 ! FUNCTION: FindResourceA
 ! FUNCTION: FindResourceExA
 ! FUNCTION: FindResourceExW
-! FUNCTION: FindResourceW
+FUNCTION: HRSRC FindResourceW ( HMODULE hModule, LPCTSTR lpName, LPCTSTR lpType )
+ALIAS: FindResource FindResourceW
+
 FUNCTION: BOOL FindVolumeClose ( HANDLE hFindVolume )
 FUNCTION: BOOL FindVolumeMountPointClose ( HANDLE hFindVolumeMountPoint )
 ! FUNCTION: FlushConsoleInputBuffer
@@ -1502,7 +1506,7 @@ FUNCTION: HGLOBAL GlobalAlloc ( UINT uFlags, SIZE_T dwBytes )
 ! FUNCTION: GlobalFindAtomW
 ! FUNCTION: GlobalFix
 ! FUNCTION: GlobalFlags
-! FUNCTION: GlobalFree
+FUNCTION: HGLOBAL GlobalFree ( HGLOBAL hMem )
 ! FUNCTION: GlobalGetAtomNameA
 ! FUNCTION: GlobalGetAtomNameW
 ! FUNCTION: GlobalHandle
@@ -1591,7 +1595,7 @@ FUNCTION: HLOCAL LocalFree ( HLOCAL hMem )
 ! FUNCTION: LocalUnlock
 ! FUNCTION: LockFile
 ! FUNCTION: LockFileEx
-! FUNCTION: LockResource
+FUNCTION: LPVOID LockResource ( HGLOBAL hResData )
 ! FUNCTION: lstrcat
 ! FUNCTION: lstrcatA
 ! FUNCTION: lstrcatW
@@ -1876,7 +1880,7 @@ FUNCTION: BOOL SetThreadPriorityBoost ( HANDLE hThread, BOOL disablePriorityBoos
 ! FUNCTION: SetWaitableTimer
 ! FUNCTION: ShowConsoleCursor
 ! FUNCTION: SignalObjectAndWait
-! FUNCTION: SizeofResource
+FUNCTION: DWORD SizeofResource ( HMODULE hModule, HRSRC hResInfo )
 ! FUNCTION: Sleep
 FUNCTION: DWORD SleepEx ( DWORD dwMilliSeconds, BOOL bAlertable )
 ! FUNCTION: SuspendThread
