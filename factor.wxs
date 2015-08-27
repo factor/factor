@@ -7,7 +7,7 @@
       Language='1033'
       Codepage='1252'
       Version='$(var.ProductVersion)'
-      Manufacturer='Slava Pestov'>
+      Manufacturer='Factor Development Team'>
     <Package
         Id='*'
         Keywords='Installer'
