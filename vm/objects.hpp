@@ -64,8 +64,8 @@ enum special_object {
   SET_FPU_STATE_WORD,
   SIGNAL_HANDLER_WORD,
   LEAF_SIGNAL_HANDLER_WORD,
-  FFI_SIGNAL_HANDLER_WORD,
-  FFI_LEAF_SIGNAL_HANDLER_WORD,
+  UNUSED1,
+  UNUSED2,
 
   /* Incremented on every modify-code-heap call; invalidates call( inline
      caching */
