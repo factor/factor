@@ -24,7 +24,6 @@ $nl
 { $subsections card-bits card-mark deck-bits }
 "Constants that must match vm/layouts.hpp:"
 { $subsections
-  profile-count-offset
   slot-offset
 }
 "Offsets to fields in the context struct:"
@@ -39,7 +38,6 @@ $nl
 "Offsets to field in the segment struct:"
 { $subsections
   segment-end-offset
-  segment-size-offset
   segment-start-offset
 }
 "Offsets to fields in the vm struct:"
@@ -58,10 +56,8 @@ $nl
   callstack-top-offset
   float-offset
   quot-entry-point-offset
-  string-aux-offset
   string-offset
   tuple-class-offset
-  underlying-alien-offset
   word-entry-point-offset
 } ;
 
