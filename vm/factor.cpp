@@ -142,22 +142,24 @@ void factor_vm::init_factor(vm_parameters* p) {
   load_image(p);
   init_c_io();
   init_inline_caching((int)p->max_pic_size);
-  special_objects[OBJ_CPU] =
-      allot_alien(false_object, (cell)FACTOR_CPU_STRING);
-  special_objects[OBJ_OS] = allot_alien(false_object, (cell)FACTOR_OS_STRING);
   special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
-  special_objects[OBJ_EXECUTABLE] =
-      allot_alien(false_object, (cell)p->executable_path);
   special_objects[OBJ_ARGS] = false_object;
   special_objects[OBJ_EMBEDDED] = false_object;
-  special_objects[OBJ_VM_COMPILER] =
-      allot_alien(false_object, (cell)FACTOR_COMPILER_VERSION);
-  special_objects[OBJ_VM_COMPILE_TIME] =
-      allot_alien(false_object, (cell)FACTOR_COMPILE_TIME);
-  special_objects[OBJ_VM_VERSION] =
-      allot_alien(false_object, (cell)FACTOR_STRINGIZE(FACTOR_VERSION));
-  special_objects[OBJ_VM_GIT_LABEL] =
-      allot_alien(false_object, (cell)FACTOR_STRINGIZE(FACTOR_GIT_LABEL));
+
+  cell aliens[][2] = {
+    {OBJ_CPU,             (cell)FACTOR_CPU_STRING},
+    {OBJ_EXECUTABLE,      (cell)p->executable_path},
+    {OBJ_OS,              (cell)FACTOR_OS_STRING},
+    {OBJ_VM_COMPILE_TIME, (cell)FACTOR_COMPILE_TIME},
+    {OBJ_VM_COMPILER,     (cell)FACTOR_COMPILER_VERSION},
+    {OBJ_VM_GIT_LABEL,    (cell)FACTOR_STRINGIZE(FACTOR_GIT_LABEL)},
+    {OBJ_VM_VERSION,      (cell)FACTOR_STRINGIZE(FACTOR_VERSION)}
+  };
+  int n_items = sizeof(aliens) / sizeof(cell[2]);
+  for (int n = 0; n < n_items; n++) {
+    cell idx = aliens[n][0];
+    special_objects[idx] = allot_alien(false_object, aliens[n][1]);
+  }
 
   /* We can GC now */
   gc_off = false;
