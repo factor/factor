@@ -16,7 +16,7 @@
 #
 # On Windows:
 #
-#   $ python .\waf.py --msvc_targets=x86 configure
+#   $ python .\waf.py --msvc_targets=x86 configure ...
 #
 from checksums import dlls
 from hashlib import md5

@@ -63,6 +63,7 @@ dlls = [
     ('libpng12.dll', None, '19ce7c5d61434ab553024ef46b2643a5'),
     ('libpng14-14.dll', None, '33948c627ab6be9a5ce94a68878994f9'),
     ('libpq.dll', '8c3037545f39c5a2f4099faca26cc0a1', '2cd1cb3e4ffaf05d046224b84cea8c97'),
+    ('libpython27.dll', '45e9efbe2b2c9b98f4e08ca35e73b5ae', '9c23faac6e19bb86934c198333101b4e'),
 
     ('libssp-0.dll', None, '51515b2264de2f8660cc46b7f3ebbc6b'),
     ('libstdc++-6.dll', None, '54a45223d73d6ea6dd5a1828d2b59195'),
@@ -73,11 +74,18 @@ dlls = [
     ('libudis86.dll', '6d70e891faa03a17068d0ab58f14e946', 'e7fb66c3f50469160ca992bd4d8b6544'),
 
     ('libxml2.dll', 'cce96a8421c6b764e58eb8f13dbe5dd8', '059ca11eea704709f024fbccb2c49466'),
+    ('libxslt.dll', '7931188c564aa428fefdf6017bedf39e', '5cd2b89f0de9abe7a96ef0d05a5e5502'),
 
     ('libyaml-0-2.dll', '5aa3f060b1858f28b124ade5dce079ed', 'd7b47ae80b9a3a7f2d62a33262a51334'),
 
+    ('libzmq.dll', 'b4f44f1fbe1a36440758a47b6e2c46e6', '58797adaee268f600be05ef357cd9711'),
+
+    ('msvcp120.dll', 'fd5cabbe52272bd76007b68186ebaf00', '46060c35f697281bc5e7337aee3722b1'),
+    ('msvcr120.dll', '034ccadc1c073e4216e9466b720f9849', '9c861c079dd81762b6c54e37597b7712'),
+
     ('pcre.dll', '5d6cade5112191346afa3fa66252440a', 'ce9a046b8ac744d20015ef93e2d23a47'),
 
+    ('snappy.dll', 'd5fb0ce7c811af02dcabd22b8a7ff42e', '4ee4bf3eec99ee1867980ceaad0a490e'),
     ('sqlite3.dll', 'ee68b052a08fec0f574f2dae2003df27', 'e5a07bbb9dcff7e72142f589d7d0234c'),
     ('ssleay32.dll', 'fda1d86f4d506921458b02bc302c1344', '0131a8cbeb9772bb70c34bfc8406943a'),
 
