@@ -136,22 +136,6 @@ big-endian off
     leaf-stack-frame-size bootstrap-cell - RET
 ] \ leaf-signal-handler define-sub-primitive
 
-[| |
-    jit-signal-handler-prolog
-    temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
-    temp0 CALL
-    jit-signal-handler-epilog
-    red-zone-size RET
-] \ ffi-signal-handler define-sub-primitive
-
-[| |
-    jit-signal-handler-prolog
-    temp0 vm-reg vm-signal-handler-addr-offset [+] MOV
-    temp0 CALL
-    jit-signal-handler-epilog
-    red-zone-size 16 bootstrap-cell - + RET
-] \ ffi-leaf-signal-handler define-sub-primitive
-
 [
     ! load boolean
     temp0 ds-reg [] MOV

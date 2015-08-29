@@ -41,8 +41,6 @@ PRIMITIVE: callstack-bounds ( -- start end )
 PRIMITIVE: check-datastack ( array in# out# -- ? )
 PRIMITIVE: compute-identity-hashcode ( obj -- )
 PRIMITIVE: context-object ( n -- obj )
-PRIMITIVE: ffi-leaf-signal-handler ( -- )
-PRIMITIVE: ffi-signal-handler ( -- )
 PRIMITIVE: fpu-state ( -- )
 PRIMITIVE: innermost-frame-executing ( callstack -- obj )
 PRIMITIVE: innermost-frame-scan ( callstack -- n )
@@ -369,8 +367,6 @@ CONSTANT: GET-FPU-STATE-WORD 46
 CONSTANT: SET-FPU-STATE-WORD 47
 CONSTANT: SIGNAL-HANDLER-WORD 48
 CONSTANT: LEAF-SIGNAL-HANDLER-WORD 49
-CONSTANT: FFI-SIGNAL-HANDLER-WORD 50
-CONSTANT: FFI-LEAF-SIGNAL-HANDLER-WORD 51
 
 CONSTANT: REDEFINITION-COUNTER 52
 

@@ -464,8 +464,6 @@ M: quotation prepare-object
         { SET-FPU-STATE-WORD set-fpu-state }
         { SIGNAL-HANDLER-WORD signal-handler }
         { LEAF-SIGNAL-HANDLER-WORD leaf-signal-handler }
-        { FFI-SIGNAL-HANDLER-WORD ffi-signal-handler }
-        { FFI-LEAF-SIGNAL-HANDLER-WORD ffi-leaf-signal-handler }
     }
     \ OBJ-UNDEFINED undefined-def 2array suffix [
         swap execute( -- x ) special-objects get set-at
