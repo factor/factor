@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.codegen.relocation compiler.constants
-cpu.x86.assembler cpu.x86.assembler.operands kernel layouts
-locals parser sequences ;
+USING: compiler.codegen.relocation compiler.constants cpu.x86.assembler
+cpu.x86.assembler.operands kernel kernel.private layouts locals parser
+sequences ;
 IN: bootstrap.x86
 
 : tib-segment ( -- ) FS ;
@@ -16,7 +16,7 @@ IN: bootstrap.x86
     ! Clobbers tib-temp.
     ! Align stack
     ESP 3 bootstrap-cells ADD
-    tib-temp EBX 50 vm-special-object-offset [+] MOV
+    tib-temp EBX WIN-EXCEPTION-HANDLER vm-special-object-offset [+] MOV
     tib-temp tib-temp alien-offset [+] MOV
     tib-temp PUSH
 
