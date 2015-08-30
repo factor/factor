@@ -201,10 +201,6 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return cards_offset;
     case RT_DECKS_OFFSET:
       return decks_offset;
-#ifdef WINDOWS
-    case RT_EXCEPTION_HANDLER:
-      return (cell)&factor::exception_handler;
-#endif
 #ifdef FACTOR_PPC
     case RT_DLSYM_TOC:
       return compute_dlsym_address(parameters, index, true);

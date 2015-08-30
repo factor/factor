@@ -23,14 +23,6 @@ void factor_vm::init_callbacks(cell size) {
   callbacks = new callback_heap(size, this);
 }
 
-bool callback_heap::setup_seh_p() {
-#if defined(WINDOWS) && defined(FACTOR_X86)
-  return true;
-#else
-  return false;
-#endif
-}
-
 bool callback_heap::return_takes_param_p() {
 #if defined(FACTOR_X86) || defined(FACTOR_AMD64)
   return true;
@@ -49,23 +41,23 @@ instruction_operand callback_heap::callback_operand(code_block* stub,
   return instruction_operand(entry, stub, 0);
 }
 
-void callback_heap::store_callback_operand(code_block* stub, cell index) {
-  instruction_operand op = callback_operand(stub, index);
-  op.store_value(parent->compute_external_address(op));
-}
-
 void callback_heap::store_callback_operand(code_block* stub, cell index,
                                            cell value) {
-  callback_operand(stub, index).store_value(value);
+  instruction_operand op = callback_operand(stub, index);
+  op.store_value(value);
 }
 
 void callback_heap::update(code_block* stub) {
-  store_callback_operand(stub, setup_seh_p() ? 2 : 1,
-                         callback_entry_point(stub));
+  store_callback_operand(stub, 1, callback_entry_point(stub));
   stub->flush_icache();
 }
 
 code_block* callback_heap::add(cell owner, cell return_rewind) {
+
+  /* code_template is a 2-tuple where the first element contains the
+     relocations and the second a byte array of compiled assembly
+     code. The code assumes that there are four relocations on x86 and
+     three on ppc. */
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   tagged<byte_array> insns(array_nth(code_template.untagged(), 1));
   cell size = array_capacity(insns.untagged());
@@ -88,21 +80,13 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   /* Store VM pointer */
   store_callback_operand(stub, 0, (cell)parent);
 
-  cell index;
-
-  if (setup_seh_p()) {
-    store_callback_operand(stub, 1);
-    index = 1;
-  } else
-    index = 0;
-
   /* Store VM pointer */
-  store_callback_operand(stub, index + 2, (cell) parent);
+  store_callback_operand(stub, 2, (cell) parent);
 
   /* On x86, the RET instruction takes an argument which depends on
      the callback's calling convention */
   if (return_takes_param_p())
-    store_callback_operand(stub, index + 3, return_rewind);
+    store_callback_operand(stub, 3, return_rewind);
 
   update(stub);
 

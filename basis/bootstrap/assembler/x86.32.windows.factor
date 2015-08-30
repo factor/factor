@@ -11,13 +11,15 @@ IN: bootstrap.x86
 << "vocab:bootstrap/assembler/x86.windows.factor" parse-file suffix! >> call
 
 : jit-install-seh ( -- )
+    ! VM pointer must be in vm-reg already
     ! Create a new exception record and store it in the TIB.
     ! Clobbers tib-temp.
     ! Align stack
     ESP 3 bootstrap-cells ADD
-    ! Exception handler address filled in by callback.cpp
-    tib-temp 0 MOV rc-absolute-cell rel-exception-handler
+    tib-temp EBX 50 vm-special-object-offset [+] MOV
+    tib-temp tib-temp alien-offset [+] MOV
     tib-temp PUSH
+
     ! No next handler
     0 PUSH
     ! This is the new exception handler
