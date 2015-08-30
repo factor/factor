@@ -89,9 +89,6 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-megamorphic-cache-hits ( class -- )
     rt-megamorphic-cache-hits add-relocation ;
 
-: rel-exception-handler ( class -- )
-    rt-exception-handler add-relocation ;
-
 : rel-inline-cache-miss ( class -- )
     rt-inline-cache-miss add-relocation ;
 

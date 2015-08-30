@@ -20,10 +20,6 @@ CONSTANT: deck-bits 18
 : array-start-offset ( -- n ) 2 array type-number slot-offset ; inline
 : callstack-length-offset ( -- n ) 1 \ callstack type-number slot-offset ; inline
 : callstack-top-offset ( -- n ) 2 \ callstack type-number slot-offset ; inline
-: vm-context-offset ( -- n ) 0 bootstrap-cells ; inline
-: vm-spare-context-offset ( -- n ) 1 bootstrap-cells ; inline
-: vm-signal-handler-addr-offset ( -- n ) 8 bootstrap-cells ; inline
-: vm-fault-flag-offset ( -- n ) 9 bootstrap-cells ; inline
 : context-callstack-top-offset ( -- n ) 0 bootstrap-cells ; inline
 : context-callstack-bottom-offset ( -- n ) 1 bootstrap-cells ; inline
 : context-datastack-offset ( -- n ) 2 bootstrap-cells ; inline
@@ -32,6 +28,15 @@ CONSTANT: deck-bits 18
 : context-callstack-seg-offset ( -- n ) 7 bootstrap-cells ; inline
 : segment-start-offset ( -- n ) 0 bootstrap-cells ; inline
 : segment-end-offset ( -- n ) 2 bootstrap-cells ; inline
+
+! Offsets in vm struct
+: vm-context-offset ( -- n ) 0 bootstrap-cells ; inline
+: vm-spare-context-offset ( -- n ) 1 bootstrap-cells ; inline
+: vm-signal-handler-addr-offset ( -- n ) 8 bootstrap-cells ; inline
+: vm-fault-flag-offset ( -- n ) 9 bootstrap-cells ; inline
+: vm-special-object-offset ( n -- offset )
+    ! Can't reuse the one in compiler.cfg.intrinsics.misc :(
+    bootstrap-cells 10 bootstrap-cells + ;
 
 ! Relocation classes
 CONSTANT: rc-absolute-cell 0
@@ -58,7 +63,6 @@ CONSTANT: rt-megamorphic-cache-hits 8
 CONSTANT: rt-vm 9
 CONSTANT: rt-cards-offset 10
 CONSTANT: rt-decks-offset 11
-CONSTANT: rt-exception-handler 12
 CONSTANT: rt-dlsym-toc 13
 CONSTANT: rt-inline-cache-miss 14
 CONSTANT: rt-safepoint 15

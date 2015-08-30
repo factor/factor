@@ -111,7 +111,6 @@ struct relocation_entry {
       case RT_MEGAMORPHIC_CACHE_HITS:
       case RT_CARDS_OFFSET:
       case RT_DECKS_OFFSET:
-      case RT_EXCEPTION_HANDLER:
       case RT_INLINE_CACHE_MISS:
       case RT_SAFEPOINT:
         return 0;
