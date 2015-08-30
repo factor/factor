@@ -155,7 +155,7 @@ void factor_vm::init_factor(vm_parameters* p) {
     {OBJ_VM_GIT_LABEL,    (cell)FACTOR_STRINGIZE(FACTOR_GIT_LABEL)},
     {OBJ_VM_VERSION,      (cell)FACTOR_STRINGIZE(FACTOR_VERSION)},
 #if defined(WINDOWS)
-    {UNUSED1,              (cell)&factor::exception_handler}
+    {WIN_EXCEPTION_HANDLER, (cell)&factor::exception_handler}
 #endif
   };
   int n_items = sizeof(aliens) / sizeof(cell[2]);
