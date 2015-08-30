@@ -89,8 +89,6 @@ bool quotation_jit::special_subprimitive_p(cell obj) {
   // See #295.
   return obj == parent->special_objects[SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[LEAF_SIGNAL_HANDLER_WORD] ||
-         obj == parent->special_objects[FFI_SIGNAL_HANDLER_WORD] ||
-         obj == parent->special_objects[FFI_LEAF_SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
 }
 
@@ -262,8 +260,7 @@ void quotation_jit::iterate_quotation() {
 cell quotation_jit::word_stack_frame_size(cell obj) {
   if (special_subprimitive_p(obj))
     return SIGNAL_HANDLER_STACK_FRAME_SIZE;
-  else
-    return JIT_FRAME_SIZE;
+  return JIT_FRAME_SIZE;
 }
 
 /* Allocates memory */
