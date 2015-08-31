@@ -35,7 +35,6 @@ CONSTANT: deck-bits 18
 : vm-signal-handler-addr-offset ( -- n ) 8 bootstrap-cells ; inline
 : vm-fault-flag-offset ( -- n ) 9 bootstrap-cells ; inline
 : vm-special-object-offset ( n -- offset )
-    ! Can't reuse the one in compiler.cfg.intrinsics.misc :(
     bootstrap-cells 10 bootstrap-cells + ;
 
 ! Relocation classes
