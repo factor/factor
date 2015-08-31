@@ -31,17 +31,11 @@ struct callback_heap {
   callback_heap(cell size, factor_vm* parent);
   ~callback_heap();
 
-  cell callback_entry_point(code_block* stub) {
-    word* w = (word*)UNTAG(stub->owner);
-    return w->entry_point;
-  }
-
   bool return_takes_param_p();
   instruction_operand callback_operand(code_block* stub, cell index);
   void store_callback_operand(code_block* stub, cell index, cell value);
   void update(code_block* stub);
   code_block* add(cell owner, cell return_rewind);
-  void update();
 };
 
 }

@@ -16,7 +16,6 @@ callback_heap::~callback_heap() {
   allocator = NULL;
   delete seg;
   seg = NULL;
-
 }
 
 void factor_vm::init_callbacks(cell size) {
@@ -48,12 +47,12 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 }
 
 void callback_heap::update(code_block* stub) {
-  store_callback_operand(stub, 1, callback_entry_point(stub));
+  word* w = (word*)UNTAG(stub->owner);
+  store_callback_operand(stub, 1, w->entry_point);
   stub->flush_icache();
 }
 
 code_block* callback_heap::add(cell owner, cell return_rewind) {
-
   /* code_template is a 2-tuple where the first element contains the
      relocations and the second a byte array of compiled assembly
      code. The code assumes that there are four relocations on x86 and
@@ -69,7 +68,6 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
                           false_object,
                           false_object);
   }
-
   stub->header = bump & ~7;
   stub->owner = owner;
   stub->parameters = false_object;
@@ -77,11 +75,9 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   memcpy((void*)stub->entry_point(), insns->data<void>(), size);
 
-  /* Store VM pointer */
+  /* Store VM pointer in two relocations. */
   store_callback_operand(stub, 0, (cell)parent);
-
-  /* Store VM pointer */
-  store_callback_operand(stub, 2, (cell) parent);
+  store_callback_operand(stub, 2, (cell)parent);
 
   /* On x86, the RET instruction takes an argument which depends on
      the callback's calling convention */
@@ -89,15 +85,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
     store_callback_operand(stub, 3, return_rewind);
 
   update(stub);
-
   return stub;
-}
-
-void callback_heap::update() {
-  auto callback_updater = [&](code_block* stub, cell size) {
-    update(stub);
-  };
-  allocator->iterate(callback_updater);
 }
 
 /* Allocates memory (add(), allot_alien())*/

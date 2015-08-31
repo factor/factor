@@ -131,7 +131,14 @@ void factor_vm::collect_compact_impl() {
   }
 
   update_code_roots_for_compaction();
-  callbacks->update();
+
+  /* Each callback has a relocation with a pointer to a code block in
+     the code heap. Since the code heap has now been compacted, those
+     pointers are invalid and we need to update them. */
+  auto callback_updater = [&](code_block* stub, cell size) {
+    callbacks->update(stub);
+  };
+  callbacks->allocator->iterate(callback_updater);
 
   code->initialize_all_blocks_set();
 
