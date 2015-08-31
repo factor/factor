@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.algebra compiler.cfg.builder.blocks
 compiler.cfg.comparisons compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.stacks
+compiler.cfg.instructions compiler.cfg.stacks compiler.constants
 compiler.tree.propagation.info cpu.architecture kernel layouts
 math namespaces sequences vm ;
 IN: compiler.cfg.intrinsics.misc
@@ -14,20 +14,17 @@ IN: compiler.cfg.intrinsics.misc
     node-input-infos first2 [ class>> fixnum class<= ] both?
     [ [ cc= ^^compare-integer ] binary-op ] [ [ cc= ^^compare ] binary-op ] if ;
 
-: special-object-offset ( n -- offset )
-    cells "special-objects" vm-field-offset + ;
-
 : emit-special-object ( node -- )
     dup node-input-infos first literal>> [
         ds-drop
-        special-object-offset ^^vm-field
+        vm-special-object-offset ^^vm-field
         ds-push
     ] [ emit-primitive ] ?if ;
 
 : emit-set-special-object ( node -- )
     dup node-input-infos second literal>> [
         ds-drop
-        [ ds-pop ] dip special-object-offset ##set-vm-field,
+        [ ds-pop ] dip vm-special-object-offset ##set-vm-field,
     ] [ emit-primitive ] ?if ;
 
 : context-object-offset ( n -- n )
