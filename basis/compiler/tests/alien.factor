@@ -718,46 +718,32 @@ mingw? [
 : fastcall-struct-return-iii-indirect ( x y z ptr -- result )
     test-struct-11 { int int int } fastcall alien-indirect ;
 
-: win32? ( -- ? ) os windows? cpu x86.32? and ;
-
 [ 8 ] [
-    3 4
-    win32? [ &: @ffi_test_50@8 ] [ &: ffi_test_50 ] if
-    fastcall-ii-indirect
+    3 4 &: ffi_test_50 fastcall-ii-indirect
 ] unit-test
 
 [ 13 ] [
-    3 4 5
-    win32? [ &: @ffi_test_51@12 ] [ &: ffi_test_51 ] if
-    fastcall-iii-indirect
+    3 4 5 &: ffi_test_51 fastcall-iii-indirect
 ] unit-test
 
 mingw? [
     [ 13 ] [
-        3 4.0 5
-        win32? [ &: @ffi_test_52@12 ] [ &: ffi_test_52 ] if
-        fastcall-ifi-indirect
+        3 4.0 5 &: ffi_test_52 fastcall-ifi-indirect
     ] unit-test
 
     [ 19 ] [
-        3 4.0 5 6
-        win32? [ &: @ffi_test_53@16 ] [ &: ffi_test_53 ] if
-        fastcall-ifii-indirect
+        3 4.0 5 6 &: ffi_test_53 fastcall-ifii-indirect
     ] unit-test
 ] unless
 
 [ S{ test-struct-11 f 7 -1 } ]
 [
-    3 4
-    win32? [ &: @ffi_test_57@8 ] [ &: ffi_test_57 ] if
-    fastcall-struct-return-ii-indirect
+    3 4 &: ffi_test_57 fastcall-struct-return-ii-indirect
 ] unit-test
 
 [ S{ test-struct-11 f 7 -3 } ]
 [
-    3 4 7
-    win32? [ &: @ffi_test_58@12 ] [ &: ffi_test_58 ] if
-    fastcall-struct-return-iii-indirect
+    3 4 7 &: ffi_test_58 fastcall-struct-return-iii-indirect
 ] unit-test
 
 : fastcall-ii-callback ( -- ptr )

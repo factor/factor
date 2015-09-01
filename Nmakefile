@@ -116,7 +116,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	rc $<
 
 libfactor-ffi-test.dll: vm/ffi_test.obj
-	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll vm/ffi_test.obj
+	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll /def:vm\ffi_test.def vm/ffi_test.obj
 
 factor.dll.lib: $(DLL_OBJS)
 	link $(LINK_FLAGS) /implib:factor.dll.lib /out:factor.dll /dll $(DLL_OBJS)
@@ -160,6 +160,9 @@ clean:
 	if exist factor.exe del factor.exe
 	if exist factor.dll del factor.dll
 	if exist factor.dll.lib del factor.dll.lib
+	if exist libfactor-ffi-test.dll del libfactor-ffi-test.dll
+	if exist libfactor-ffi-test.exp del libfactor-ffi-test.exp
+	if exist libfactor-ffi-test.lib del libfactor-ffi-test.lib
 
 .PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista clean
 

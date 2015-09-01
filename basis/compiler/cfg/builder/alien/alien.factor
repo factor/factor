@@ -59,38 +59,21 @@ IN: compiler.cfg.builder.alien
     [ stack-params get ] dip [ return>> ] [ abi>> ] bi stack-cleanup
     stack-params get ;
 
-GENERIC# dlsym-valid? 1 ( symbols dll -- ? )
-
-M: string dlsym-valid? dlsym ;
-
-M: array dlsym-valid? '[ _ dlsym ] any? ;
-
-: check-dlsym ( symbols library -- )
+: check-dlsym ( symbol library -- )
     {
         { [ dup library-dll dll-valid? not ] [
             [ library-dll dll-path ] [ dlerror>> ] bi
             cfg get word>> no-such-library-error drop
         ] }
-        { [ 2dup library-dll dlsym-valid? not ] [
+        { [ 2dup library-dll dlsym not ] [
             drop dlerror cfg get word>> no-such-symbol-error
         ] }
         [ 2drop ]
     } cond ;
 
-: decorated-symbol ( params -- symbols )
-    [ function>> ] [ parameters>> [ stack-size ] map-sum number>string ] bi
-    {
-        [ drop ]
-        [ "@" glue ]
-        [ "@" glue "_" prepend ]
-        [ "@" glue "@" prepend ]
-    } 2cleave
-    4array ;
-
-: caller-linkage ( params -- symbols dll )
-    [ dup abi>> callee-cleanup? [ decorated-symbol ] [ function>> ] if ]
-    [ library>> lookup-library ]
-    bi 2dup check-dlsym library-dll ;
+: caller-linkage ( params -- symbol dll )
+    [ function>> ] [ library>> lookup-library ] bi
+    2dup check-dlsym library-dll ;
 
 : caller-return ( params -- )
     return>> [ ] [
@@ -186,10 +169,7 @@ M: #alien-assembly emit-node ( node -- )
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
-        needs-frame-pointer
-
-        begin-word
-
+        needs-frame-pointer begin-word
         {
             [ params>> callee-parameters ##callback-inputs, ]
             [ params>> box-parameters ]
@@ -197,6 +177,5 @@ M: #alien-callback emit-node
             [ params>> emit-callback-return ]
             [ params>> callback-stack-cleanup ]
         } cleave
-
         basic-block get [ end-word ] when
     ] with-cfg-builder ;
