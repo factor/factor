@@ -156,28 +156,11 @@ cell factor_vm::compute_dlsym_address(array* parameters,
   if (d != NULL && !d->handle)
     return undef;
 
-  cell type = TAG(symbol);
-  if (type == BYTE_ARRAY_TYPE) {
-
-    symbol_char* name = alien_offset(symbol);
-    cell sym = ffi_dlsym_raw(d, name);
-    sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
-    return sym ? sym : undef;
-
-  } else if (type == ARRAY_TYPE) {
-
-    array* names = untag<array>(symbol);
-    for (cell i = 0; i < array_capacity(names); i++) {
-      symbol_char* name = alien_offset(array_nth(names, i));
-      cell sym = ffi_dlsym_raw(d, name);
-      sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
-      if (sym)
-        return sym;
-    }
-    return undef;
-
-  }
-  return -1;
+  FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
+  symbol_char* name = alien_offset(symbol);
+  cell sym = ffi_dlsym_raw(d, name);
+  sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
+  return sym ? sym : undef;
 }
 
 cell factor_vm::compute_vm_address(cell arg) {
