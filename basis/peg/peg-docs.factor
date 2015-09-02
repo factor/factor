@@ -75,8 +75,8 @@ HELP: repeat0
   { "parser" parser }
 }
 { $description
-    "Returns a parser that parses 0 or more instances of the 'p1' parser. The AST produced is "
-    "an array of the AST produced by the 'p1' parser. An empty array indicates 0 instances were "
+    "Returns a parser that parses 0 or more instances of the " { $snippet "parser" } ". The AST produced is "
+    "an array of the AST produced by the " { $snippet "parser" } ". An empty array indicates 0 instances were "
     "parsed." } ;
 
 HELP: repeat1
@@ -84,16 +84,16 @@ HELP: repeat1
   { "parser" parser }
 }
 { $description
-    "Returns a parser that parses 1 or more instances of the 'p1' parser. The AST produced is "
-    "an array of the AST produced by the 'p1' parser." } ;
+    "Returns a parser that parses 1 or more instances of the " { $snippet "parser" } ". The AST produced is "
+    "an array of the AST produced by the " { $snippet "parser" } "." } ;
 
 HELP: optional
 { $values
   { "parser" parser }
 }
 { $description
-    "Returns a parser that parses 0 or 1 instances of the 'p1' parser. The AST produced is "
-    "'f' if 0 instances are parsed the AST produced is 'f', otherwise it is the AST produced by 'p1'." } ;
+    "Returns a parser that parses 0 or 1 instances of the " { $snippet "parser" } ". The AST produced is "
+    { $link f } " if 0 instances are parsed the AST produced is " { $link f } ", otherwise it is the AST produced by " { $snippet "parser" } "." } ;
 
 HELP: semantic
 { $values
@@ -101,8 +101,8 @@ HELP: semantic
   { "quot" { $quotation ( object -- ? ) } }
 }
 { $description
-    "Returns a parser that succeeds if the 'p1' parser succeeds and the quotation called with "
-    "the AST produced by 'p1' on the stack returns true." }
+    "Returns a parser that succeeds if the " { $snippet "parser" } " succeeds and the quotation called with "
+    "the AST produced by " { $snippet "parser" } " on the stack returns true." }
 { $examples
   { $example "USING: kernel math peg prettyprint ;" "\"C\" [ drop t ] satisfy [ 66 > ] semantic parse ." "67" }
 } ;
@@ -112,7 +112,7 @@ HELP: ensure
   { "parser" parser }
 }
 { $description
-    "Returns a parser that succeeds if the 'p1' parser succeeds but does not add anything to the "
+    "Returns a parser that succeeds if the " { $snippet "parser" } " succeeds but does not add anything to the "
     "AST and does not move the location in the input string. This can be used for lookahead and "
     "disambiguation, along with the " { $link ensure-not } " word." }
 { $examples { $code "\"0\" token ensure octal-parser" } } ;
@@ -122,7 +122,7 @@ HELP: ensure-not
   { "parser" parser }
 }
 { $description
-    "Returns a parser that succeeds if the 'p1' parser fails but does not add anything to the "
+    "Returns a parser that succeeds if the " { $snippet "parser" } " fails but does not add anything to the "
     "AST and does not move the location in the input string. This can be used for lookahead and "
     "disambiguation, along with the " { $link ensure } " word." }
 { $code "\"+\" token \"=\" token ensure-not \"+=\" token 3array seq" } ;
@@ -133,7 +133,7 @@ HELP: action
   { "quot" { $quotation ( ast -- ast ) } }
 }
 { $description
-    "Returns a parser that calls the 'p1' parser and applies the quotation to the AST resulting "
+    "Returns a parser that calls the " { $snippet "parser" } " and applies the quotation to the AST resulting "
     "from that parse. The result of the quotation is then used as the final AST. This can be used "
     "for manipulating the parse tree to produce a AST better suited for the task at hand rather than "
     "the default AST. If the quotation returns " { $link fail } " then the parser fails." }
@@ -144,7 +144,7 @@ HELP: sp
   { "parser" parser }
 }
 { $description
-    "Returns a parser that calls the original parser 'p1' after stripping any whitespace "
+    "Returns a parser that calls the original " { $snippet "parser" } " after stripping any whitespace "
     " from the left of the input string." } ;
 
 HELP: hide
