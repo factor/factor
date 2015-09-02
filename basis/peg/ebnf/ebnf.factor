@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
-combinators.short-circuit effects io.streams.string kernel make
-math.parser multiline namespaces parser peg peg.parsers
-peg.search quotations sequences sequences.deep splitting stack-checker strings
-strings.parser summary unicode.categories words ;
+USING: accessors assocs combinators combinators.short-circuit
+effects kernel make math.parser multiline namespaces parser peg
+peg.parsers quotations sequences sequences.deep splitting
+stack-checker strings strings.parser summary unicode.categories
+words ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
 IN: peg.ebnf
@@ -41,15 +41,6 @@ TUPLE: tokenizer-tuple any one many ;
 
 : reset-tokenizer ( -- )
     default-tokenizer \ tokenizer set-global ;
-
-ERROR: no-tokenizer name ;
-
-M: no-tokenizer summary
-    drop "Tokenizer not found" ;
-
-SYNTAX: TOKENIZER:
-    scan-word-name dup search [ nip ] [ no-tokenizer ] if*
-    execute( -- tokenizer ) \ tokenizer set-global ;
 
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
@@ -122,11 +113,11 @@ C: <ebnf> ebnf
     [
         [
             [ CHAR: \ = ] satisfy
-            [ [ CHAR: " = ] [ CHAR: \ = ] bi or ] satisfy 2seq ,
+            [ "\"\\" member? ] satisfy 2seq ,
             [ CHAR: " = not ] satisfy ,
         ] choice* repeat1 "\"" "\"" surrounded-by ,
         [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
-    ] choice* [ flatten >string unescape-string ] action ;
+    ] choice* [ "" flatten-as unescape-string ] action ;
 
 : non-terminal-parser ( -- parser )
     #! A non-terminal is the name of another rule. It can
@@ -134,27 +125,8 @@ C: <ebnf> ebnf
     #! in the EBNF syntax itself.
     [
         {
-            [ blank?    ]
-            [ CHAR: " = ]
-            [ CHAR: ' = ]
-            [ CHAR: | = ]
-            [ CHAR: { = ]
-            [ CHAR: } = ]
-            [ CHAR: = = ]
-            [ CHAR: ) = ]
-            [ CHAR: ( = ]
-            [ CHAR: ] = ]
-            [ CHAR: [ = ]
-            [ CHAR: . = ]
-            [ CHAR: ! = ]
-            [ CHAR: & = ]
-            [ CHAR: * = ]
-            [ CHAR: + = ]
-            [ CHAR: ? = ]
-            [ CHAR: : = ]
-            [ CHAR: ~ = ]
-            [ CHAR: < = ]
-            [ CHAR: > = ]
+            [ blank? ]
+            [ "\"'|{}=)(][.!&*+?:~<>" member? ]
         } 1|| not
     ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
@@ -167,7 +139,7 @@ C: <ebnf> ebnf
     #! Parse a valid foreign parser name
     [
         {
-            [ blank?        ]
+            [ blank? ]
             [ CHAR: > = ]
         } 1|| not
     ] satisfy repeat1 [ >string ] action ;
