@@ -25,10 +25,7 @@ enum relocation_type {
   RT_CARDS_OFFSET,
   /* value of vm->decks_offset */
   RT_DECKS_OFFSET,
-  /* address of exception_handler -- this exists as a separate relocation
-     type since its used in a situation where relocation arguments cannot
-     be passed in, and so RT_DLSYM is inappropriate (Windows only) */
-  RT_EXCEPTION_HANDLER,
+  RT_UNUSED,
   /* arg is a literal table index, holding a pair (symbol/dll) */
   RT_DLSYM_TOC,
   /* address of inline_cache_miss function. This is a separate
