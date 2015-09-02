@@ -11,8 +11,6 @@
 
 #if defined(__APPLE__)
 #define FACTOR_EXPORT __attribute__((visibility("default")))
-#elif defined(WIN32) || defined(_MSC_VER)
-#define FACTOR_EXPORT __declspec(dllexport)
 #else
 #define FACTOR_EXPORT
 #endif
