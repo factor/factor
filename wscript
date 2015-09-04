@@ -371,8 +371,9 @@ def build(ctx):
         # Force lib prefix on windows too, it's nonidiomatic.
         target = '%sfactor-ffi-test' % ('lib' if dest_os == 'win32' else ''),
         source = ['vm/ffi_test.c'],
+        defs = ['vm/ffi_test.def'],
         install_path = libdir
-        )
+    )
 
     # Build shared lib on Windows, static on Linux.  This is needed to
     # trick waf into always building the dll after the exe.
