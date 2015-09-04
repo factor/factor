@@ -18,10 +18,16 @@
 #
 #   $ python .\waf.py --msvc_targets=x86 configure ...
 #
+# To use boot images from a directory instead of
+# http://downloads.factorcode.org/images/latest/:
+#
+#   $ python .\waf.py --image-url="file:///image/dir/" configure ...
+#
 from checksums import dlls
 from hashlib import md5
 from os import path
 from urllib import urlopen
+from urlparse import urljoin, urlparse
 from waflib import Errors, Task
 
 cpu_to_bits = {'amd64' : 64, 'i386' : 32, 'x86' : 32, 'x86_64' : 64}
@@ -140,6 +146,12 @@ def options(ctx):
         default = False,
         help = 'build with gc map debugging'
     )
+    ctx.add_option(
+        '--image-url',
+        type = 'string',
+        help = 'URI to the boot image directory',
+        default = 'http://downloads.factorcode.org/images/latest/'
+    )
     dest_cpus = cpu_to_bits.keys()
     text = ', '.join(dest_cpus[:-1]) + ' or ' + dest_cpus[-1]
     ctx.add_option(
@@ -186,7 +198,6 @@ def configure(ctx):
         ctx.define('DEBUG_GC_MAPS', 1)
 
     bits = get_bits(ctx)
-
     if dest_os == 'win32':
         ctx.check_lib_msvc('shell32')
         ctx.load('winres')
@@ -220,24 +231,47 @@ def configure(ctx):
             env[lst] += ['-m%d' % bits]
         env.LINKFLAGS += ['-Wl,--no-as-needed', '-Wl,--export-dynamic']
 
+def file_checksum(fname, must_exist):
+    if not path.exists(fname):
+        if must_exist:
+            fmt = 'File missing: %s'
+            raise Errors.WafError(fmt % fname)
+        return None
+    with open(fname, 'rb') as f:
+        return md5(f.read()).hexdigest()
+
+def check_and_download(src, dst, checksum_expected):
+    checksum_dst = file_checksum(dst, False)
+    if checksum_dst == checksum_expected:
+        return
+    data = urlopen(src).read()
+    checksum_actual = md5(data).hexdigest()
+    if checksum_actual != checksum_expected:
+        fmt = 'Checksum mismatch: File %s has checksum %s, expected %s.'
+        args = (src, checksum_actual, checksum_expected)
+        raise Errors.WafError(fmt % args)
+    with open(dst, 'wb') as f:
+        f.write(data)
+
 def download_file(self):
     gen = self.generator
-    url = gen.url
-    expected_digest = gen.digest
     local_path = self.outputs[0].abspath()
-    if path.exists(local_path):
-        with open(local_path, 'rb') as f:
-            digest = md5(f.read()).hexdigest()
-            if digest == expected_digest:
-                return
-    data = urlopen(url).read()
-    digest = md5(data).hexdigest()
-    if digest != expected_digest:
-        fmt = 'Digest mismatch: File %s has digest %s, expected %s.'
-        raise Errors.WafError(fmt % (url, digest, expected_digest))
-    with open(local_path, 'wb') as f:
-        f.write(data)
-    return
+    check_and_download(gen.url, local_path, gen.checksum)
+
+def get_image_checksum(base_url, name):
+    o = urlparse(base_url)
+    if o.scheme == 'file':
+        p = path.abspath(path.join(o.netloc, o.path))
+        return file_checksum(path.join(p, name), True)
+
+    checksum_file = urljoin(base_url, 'checksums.txt')
+    with urlopen(checksum_file) as f:
+        for line in f:
+            other_name, checksum = line.split()
+            if name == other_name:
+                return checksum
+    fmt = 'No checksum for %s in %s found'
+    raise Errors.WafError(fmt % (name, base_url))
 
 def get_bits(ctx):
     return cpu_to_bits[ctx.env.DEST_CPU]
@@ -246,15 +280,15 @@ def build_msi(ctx, bits, image_target):
     # Download all dlls needed for the build
     dll_targets = []
     url_fmt = 'http://downloads.factorcode.org/dlls/%s%s'
-    for name, digest32, digest64 in dlls:
-        digest = digest32 if bits == 32 else digest64
-        if digest is None:
+    for name, chk32, chk64 in dlls:
+        checksum = chk32 if bits == 32 else chk64
+        if checksum is None:
             continue
         url = url_fmt % ('' if bits == 32 else '64/', name)
         r = ctx(
             rule = download_file,
             url = url,
-            digest = digest,
+            checksum = checksum,
             target = 'dlls/%s' % name,
             always = True
             )
@@ -296,8 +330,7 @@ def build_msi(ctx, bits, image_target):
         wxsobjs,
         'factor.%dbit.%s.msi' % (bits, VERSION),
         [image_target, '%s.com' % APPNAME]
-        )
-
+    )
 
 def build(ctx):
     dest_os = ctx.env.DEST_OS
@@ -353,7 +386,7 @@ def build(ctx):
             use = link_libs,
             linkflags = subsys_fmt % 'windows',
             name = 'factor-exe'
-            )
+        )
     elif dest_os == 'linux':
         ctx.program(
             features = features,
@@ -417,12 +450,15 @@ def build(ctx):
             target = boot_image_path
         )
     else:
-        source_image = 'boot-images/%s' % boot_image_name
+        image_url = ctx.options.image_url
+        checksum = get_image_checksum(image_url, boot_image_name)
+        url = urljoin(image_url, boot_image_name)
         ctx(
-            features = 'subst',
-            source = source_image,
+            rule = download_file,
+            url = url,
+            checksum = checksum,
             target = boot_image_path,
-            is_copy = True
+            always = True
         )
 
     # Build factor.image using the newly built executable.
