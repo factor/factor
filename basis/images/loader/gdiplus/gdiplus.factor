@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data alien.enums alien.strings
 assocs byte-arrays classes.struct destructors grouping images images.loader
-io kernel locals math mime.types namespaces sequences specialized-arrays
+io kernel libc locals math mime.types namespaces sequences specialized-arrays
 system windows.com windows.gdiplus windows.streams windows.types ;
 IN: images.loader.gdiplus
 
@@ -32,9 +32,15 @@ os windows? [
     { UINT } [ GdipGetImageHeight check-gdi+-status ]
     with-out-parameters ;
 
-: gdi+-lock-bitmap ( bitmap rect mode format -- data )
-    { BitmapData } [ GdipBitmapLockBits check-gdi+-status ]
-    with-out-parameters ;
+:: gdi+-lock-bitmap ( bitmap rect mode format -- data )
+    ! Copy the rect to stack space because the gc might move it
+    ! because calling GdipBitmapLockBits triggers callbacks to Factor.
+    { BitmapData GpRect } [
+        :> ( stack-data stack-rect )
+        stack-rect rect binary-object memcpy
+        bitmap stack-rect mode format stack-data GdipBitmapLockBits
+        check-gdi+-status
+    ] with-out-parameters drop ;
 
 :: gdi+-bitmap>data ( bitmap -- w h pixels )
     bitmap [ gdi+-bitmap-width ] [ gdi+-bitmap-height ] bi :> ( w h )
