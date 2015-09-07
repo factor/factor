@@ -24,6 +24,7 @@
 #   $ python .\waf.py --image-url="file:///image/dir/" configure ...
 #
 from checksums import dlls
+from contextlib import closing
 from hashlib import md5
 from os import path
 from urllib import urlopen
@@ -244,7 +245,8 @@ def check_and_download(src, dst, checksum_expected):
     checksum_dst = file_checksum(dst, False)
     if checksum_dst == checksum_expected:
         return
-    data = urlopen(src).read()
+    with closing(urlopen(src)) as f:
+        data = f.read()
     checksum_actual = md5(data).hexdigest()
     if checksum_actual != checksum_expected:
         fmt = 'Checksum mismatch: File %s has checksum %s, expected %s.'
@@ -265,7 +267,7 @@ def get_image_checksum(base_url, name):
         return file_checksum(path.join(p, name), True)
 
     checksum_file = urljoin(base_url, 'checksums.txt')
-    with urlopen(checksum_file) as f:
+    with closing(urlopen(checksum_file)) as f:
         for line in f:
             other_name, checksum = line.split()
             if name == other_name:
