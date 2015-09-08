@@ -57,8 +57,8 @@ GENERIC: write-full-response ( request response -- )
     ] change-domain ;
 
 : write-response-header ( response -- response )
-    #! We send one set-cookie header per cookie, because that's
-    #! what Firefox expects.
+    ! We send one set-cookie header per cookie, because that's
+    ! what Firefox expects.
     dup header>> >alist >vector
     over unparse-content-type "content-type" pick set-at
     over cookies>> [

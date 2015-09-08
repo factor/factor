@@ -189,16 +189,16 @@ M: x86.32 %end-callback ( -- )
     "end_callback" f f %c-invoke ;
 
 : funny-large-struct-return? ( return abi -- ? )
-    #! MINGW ABI incompatibility disaster
+    ! MINGW ABI incompatibility disaster
     [ large-struct? ] [ mingw eq? os windows? not or ] bi* and ;
 
 M: x86.32 %prepare-var-args ( -- ) ;
 
 M:: x86.32 stack-cleanup ( stack-size return abi -- n )
-    #! a) Functions which are stdcall/fastcall/thiscall have to
-    #! clean up the caller's stack frame.
-    #! b) Functions returning large structs on MINGW have to
-    #! fix ESP.
+    ! a) Functions which are stdcall/fastcall/thiscall have to
+    ! clean up the caller's stack frame.
+    ! b) Functions returning large structs on MINGW have to
+    ! fix ESP.
     {
         { [ abi callee-cleanup? ] [ stack-size ] }
         { [ return abi funny-large-struct-return? ] [ 4 ] }

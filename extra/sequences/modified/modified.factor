@@ -55,7 +55,7 @@ M: summed length seqs>> longest length ;
 
 <PRIVATE
 : ?+ ( x/f y/f -- sum )
-    #! addition that treats f as 0
+    ! addition that treats f as 0
     [
         swap [ + ] when*
     ] [

@@ -9,9 +9,9 @@ SYMBOL: introductions
 GENERIC: count-introductions* ( node -- )
 
 : count-introductions ( nodes -- n )
-    #! Note: we use each, not each-node, since the #branch
-    #! method recurses into children directly and we don't
-    #! recurse into #recursive at all.
+    ! Note: we use each, not each-node, since the #branch
+    ! method recurses into children directly and we don't
+    ! recurse into #recursive at all.
     [
         0 introductions set
         [ count-introductions* ] each

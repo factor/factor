@@ -57,8 +57,8 @@ CONSTANT: default-segment-radius 1
     n-segments simple-segments ;
 
 : sub-tunnel ( from to segments -- segments )
-    #! return segments between from and to, after clamping from and to to
-    #! valid values
+    ! return segments between from and to, after clamping from and to to
+    ! valid values
     [ '[ _ clamp-length ] bi@ ] keep <slice> ;
 
 : get-segment ( segments n -- segment )
@@ -71,7 +71,7 @@ CONSTANT: default-segment-radius 1
     number>> 1 - get-segment ;
 
 : heading-segment ( segments current-segment heading -- segment )
-    #! the next segment on the given heading
+    ! the next segment on the given heading
     over forward>> v. 0 <=> {
         { +gt+ [ next-segment ] }
         { +lt+ [ previous-segment ] }
@@ -99,7 +99,7 @@ CONSTANT: default-segment-radius 1
 CONSTANT: distant 1000
 
 : max-real ( a b -- c )
-    #! sometimes collision-coefficient yields complex roots, so we ignore these (hack)
+    ! sometimes collision-coefficient yields complex roots, so we ignore these (hack)
     dup real? [
         over real? [ max ] [ nip ] if
     ] [
@@ -133,12 +133,12 @@ CONSTANT: distant 1000
     [ wall-normal ] [ forward>> swap reflect ] [ forward<< ] tri ;
 
 : bounce-left ( segment oint -- )
-    #! must be done after forward
+    ! must be done after forward
     [ forward>> vneg ] dip [ left>> swap reflect ]
     [ forward>> proj-perp normalize ] [ left<< ] tri ;
 
 : bounce-up ( segment oint -- )
-    #! must be done after forward and left!
+    ! must be done after forward and left!
     nip [ forward>> ] [ left>> cross ] [ up<< ] tri ;
 
 : bounce-off-wall ( oint segment -- )

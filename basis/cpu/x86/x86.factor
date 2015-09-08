@@ -104,7 +104,7 @@ M: x86 %inc ( loc -- )
 M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
 
 : xt-tail-pic-offset ( -- n )
-    #! See the comment in vm/cpu-x86.hpp
+    ! See the comment in vm/cpu-x86.hpp
     4 1 + ; inline
 
 HOOK: %prepare-jump cpu ( -- )
@@ -617,10 +617,10 @@ M:: x86 %local-allot ( dst size align offset -- )
     dst offset local-allot-offset special-offset stack@ LEA ;
 
 : next-stack@ ( n -- operand )
-    #! nth parameter from the next stack frame. Used to box
-    #! input values to callbacks; the callback has its own
-    #! stack frame set up, and we want to read the frame
-    #! set up by the caller.
+    ! nth parameter from the next stack frame. Used to box
+    ! input values to callbacks; the callback has its own
+    ! stack frame set up, and we want to read the frame
+    ! set up by the caller.
     [ frame-reg ] dip 2 cells + reserved-stack-space + [+] ;
 
 : return-reg ( rep -- reg )
@@ -686,9 +686,9 @@ M: x86 %callback-outputs ( reg-inputs -- )
 M: x86 %loop-entry 16 alignment [ NOP ] times ;
 
 M:: x86 %save-context ( temp1 temp2 -- )
-    #! Save Factor stack pointers in case the C code calls a
-    #! callback which does a GC, which must reliably trace
-    #! all roots.
+    ! Save Factor stack pointers in case the C code calls a
+    ! callback which does a GC, which must reliably trace
+    ! all roots.
     temp1 %context
     temp2 stack-reg cell neg [+] LEA
     temp1 "callstack-top" context-field-offset [+] temp2 MOV

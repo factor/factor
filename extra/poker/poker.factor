@@ -131,8 +131,8 @@ M: integer >ckf ;
     [ 0xFF bitand ] map-product ;
 
 : perfect-hash-find ( q -- value )
-    #! magic to convert a hand's unique identifying bits to the
-    #! proper index for fast lookup in a table of hand values
+    ! magic to convert a hand's unique identifying bits to the
+    ! proper index for fast lookup in a table of hand values
     0xE91AAA35 +
     dup -16 shift bitxor
     dup   8 shift w+

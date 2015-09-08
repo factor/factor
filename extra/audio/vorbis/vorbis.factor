@@ -40,8 +40,8 @@ ERROR: no-vorbis-in-ogg ;
     stream-buffer-size ; inline
 
 : read-bytes-into ( dest size stream -- len )
-    #! Read the given number of bytes from a stream
-    #! and store them in the destination byte array.
+    ! Read the given number of bytes from a stream
+    ! and store them in the destination byte array.
     stream-read >byte-array dup length [ memcpy ] keep  ;
 
 : stream-into-buffer ( buffer size vorbis-stream -- len )

@@ -12,8 +12,8 @@ IN: opengl.textures
 SYMBOL: non-power-of-2-textures?
 
 : check-extensions ( -- )
-    #! ATI frglx driver doesn't implement GL_ARB_texture_non_power_of_two properly.
-    #! See thread 'Linux font display problem' April 2009 on Factor-talk
+    ! ATI frglx driver doesn't implement GL_ARB_texture_non_power_of_two properly.
+    ! See thread 'Linux font display problem' April 2009 on Factor-talk
     gl-vendor "ATI Technologies Inc." = not os macosx? or [
         "2.0" { "GL_ARB_texture_non_power_of_two" }
         has-gl-version-or-extensions?
@@ -409,8 +409,8 @@ CONSTANT: max-texture-size { 512 512 }
 PRIVATE>
 
 : make-texture ( image -- id )
-    #! We use glTexSubImage2D to work around the power of 2 texture size
-    #! limitation
+    ! We use glTexSubImage2D to work around the power of 2 texture size
+    ! limitation
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture

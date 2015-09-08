@@ -43,7 +43,7 @@ CONSTANT: wall-drawing-offset 0.15
     swap [ segment-vertex ] keep dupd segment-vertex-normal ;
 
 : equally-spaced-radians ( n -- seq )
-    #! return a sequence of n numbers between 0 and 2pi
+    ! return a sequence of n numbers between 0 and 2pi
     [ iota ] keep [ / pi 2 * * ] curry map ;
 
 : draw-segment-vertex ( segment theta -- )

@@ -25,7 +25,7 @@ MEMO: error-icon ( type -- image-name )
     [ swap <checkbox> add-gadget ] assoc-each ;
 
 : <error-toggle> ( -- model gadget )
-    #! Linkage errors are not shown by default.
+    ! Linkage errors are not shown by default.
     error-types get [ fatal?>> <model> ] assoc-map
     [ [ [ error-icon ] dip ] assoc-map <checkboxes> ]
     [ <mapping> ] bi ;

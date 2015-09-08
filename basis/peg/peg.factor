@@ -49,12 +49,12 @@ SYMBOL: error-stack
 SYMBOL: ignore
 
 : packrat ( id -- cache )
-    #! The packrat cache is a mapping of parser-id->cache.
-    #! For each parser it maps to a cache holding a mapping
-    #! of position->result. The packrat cache therefore keeps
-    #! track of all parses that have occurred at each position
-    #! of the input string and the results obtained from that
-    #! parser.
+    ! The packrat cache is a mapping of parser-id->cache.
+    ! For each parser it maps to a cache holding a mapping
+    ! of position->result. The packrat cache therefore keeps
+    ! track of all parses that have occurred at each position
+    ! of the input string and the results obtained from that
+    ! parser.
     \ packrat get [ drop H{ } clone ] cache ;
 
 SYMBOL: pos
@@ -63,20 +63,20 @@ SYMBOL: fail
 SYMBOL: lrstack
 
 : heads ( -- cache )
-    #! A mapping from position->peg-head. It maps a
-    #! position in the input string being parsed to
-    #! the head of the left recursion which is currently
-    #! being grown. It is 'f' at any position where
-    #! left recursion growth is not underway.
+    ! A mapping from position->peg-head. It maps a
+    ! position in the input string being parsed to
+    ! the head of the left recursion which is currently
+    ! being grown. It is 'f' at any position where
+    ! left recursion growth is not underway.
     \ heads get ;
 
 : failed? ( obj -- ? )
     fail = ;
 
 : peg-cache ( -- cache )
-    #! Holds a hashtable mapping a peg tuple to
-    #! the parser tuple for that peg. The parser tuple
-    #! holds a unique id and the compiled form of that peg.
+    ! Holds a hashtable mapping a peg tuple to
+    ! the parser tuple for that peg. The parser tuple
+    ! holds a unique id and the compiled form of that peg.
     \ peg-cache get-global [
         H{ } clone dup \ peg-cache set-global
     ] unless* ;
@@ -97,17 +97,17 @@ TUPLE: left-recursion seed rule-id head next ;
 TUPLE: peg-head rule-id involved-set eval-set ;
 
 : rule-id ( word -- id )
-    #! A rule is the parser compiled down to a word. It has
-    #! a "peg-id" property containing the id of the original parser.
+    ! A rule is the parser compiled down to a word. It has
+    ! a "peg-id" property containing the id of the original parser.
     "peg-id" word-prop ;
 
 : input-slice ( -- slice )
-    #! Return a slice of the input from the current parse position
+    ! Return a slice of the input from the current parse position
     input get pos get tail-slice ;
 
 : input-from ( input -- n )
-    #! Return the index from the original string that the
-    #! input slice is based on.
+    ! Return the index from the original string that the
+    ! input slice is based on.
     dup slice? [ from>> ] [ drop 0 ] if ;
 
 : process-rule-result ( p result -- result )
@@ -118,17 +118,17 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     ] if* ;
 
 : eval-rule ( rule -- ast )
-    #! Evaluate a rule, return an ast resulting from it.
-    #! Return fail if the rule failed. The rule has
-    #! stack effect ( -- parse-result )
+    ! Evaluate a rule, return an ast resulting from it.
+    ! Return fail if the rule failed. The rule has
+    ! stack effect ( -- parse-result )
     pos get swap execute( -- parse-result ) process-rule-result ; inline
 
 : memo ( pos id -- memo-entry )
-    #! Return the result from the memo cache.
+    ! Return the result from the memo cache.
     packrat at ;
 
 : set-memo ( memo-entry pos id -- )
-    #! Store an entry in the cache
+    ! Store an entry in the cache
     packrat set-at ;
 
 : update-m ( ast m -- )
@@ -239,7 +239,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     ] if* ; inline
 
 : with-packrat ( input quot -- result )
-    #! Run the quotation with a packrat cache active.
+    ! Run the quotation with a packrat cache active.
     [
         swap input ,,
         0 pos ,,
@@ -265,18 +265,18 @@ GENERIC: (compile) ( peg -- quot )
     gensym [ >>compiled ] keep ;
 
 : define-parser-word ( parser word -- )
-    #! Return the body of the word that is the compiled version
-    #! of the parser.
+    ! Return the body of the word that is the compiled version
+    ! of the parser.
     2dup swap peg>> (compile) ( -- result ) define-declared
     swap id>> "peg-id" set-word-prop ;
 
 : compile-parser ( parser -- word )
-    #! Look to see if the given parser has been compiled.
-    #! If not, compile it to a temporary word, cache it,
-    #! and return it. Otherwise return the existing one.
-    #! Circular parsers are supported by getting the word
-    #! name and storing it in the cache, before compiling,
-    #! so it is picked up when re-entered.
+    ! Look to see if the given parser has been compiled.
+    ! If not, compile it to a temporary word, cache it,
+    ! and return it. Otherwise return the existing one.
+    ! Circular parsers are supported by getting the word
+    ! name and storing it in the cache, before compiling,
+    ! so it is picked up when re-entered.
     dup compiled>> [
         nip
     ] [
@@ -289,8 +289,8 @@ GENERIC: (compile) ( peg -- quot )
 SYMBOL: delayed
 
 : fixup-delayed ( -- )
-    #! Work through all delayed parsers and recompile their
-    #! words to have the correct bodies.
+    ! Work through all delayed parsers and recompile their
+    ! words to have the correct bodies.
     delayed get [
         call( -- parser ) compile-parser-quot ( -- result ) define-declared
     ] assoc-each ;
@@ -314,13 +314,13 @@ SYMBOL: delayed
 <PRIVATE
 
 : next-id ( -- n )
-    #! Return the next unique id for a parser
+    ! Return the next unique id for a parser
     \ next-id counter ;
 
 : wrap-peg ( peg -- parser )
-    #! Wrap a parser tuple around the peg object.
-    #! Look for an existing parser tuple for that
-    #! peg object.
+    ! Wrap a parser tuple around the peg object.
+    ! Look for an existing parser tuple for that
+    ! peg object.
     peg-cache [
         f next-id parser boa
     ] cache ;
@@ -328,7 +328,7 @@ SYMBOL: delayed
 TUPLE: token-parser symbol ;
 
 : parse-token ( input string -- result )
-    #! Parse the string, returning a parse result
+    ! Parse the string, returning a parse result
     [ ?head-slice ] keep swap [
         <parse-result> f f f add-error
     ] [
@@ -503,18 +503,18 @@ M: sp-parser (compile)
 TUPLE: delay-parser quot ;
 
 M: delay-parser (compile)
-    #! For efficiency we memoize the quotation.
-    #! This way it is run only once and the
-    #! parser constructed once at run time.
+    ! For efficiency we memoize the quotation.
+    ! This way it is run only once and the
+    ! parser constructed once at run time.
     quot>> gensym [ delayed get set-at ] keep 1quotation ;
 
 TUPLE: box-parser quot ;
 
 M: box-parser (compile)
-    #! Calls the quotation at compile time
-    #! to produce the parser to be compiled.
-    #! This differs from 'delay' which calls
-    #! it at run time.
+    ! Calls the quotation at compile time
+    ! to produce the parser to be compiled.
+    ! This differs from 'delay' which calls
+    ! it at run time.
     quot>> call( -- parser ) compile-parser-quot ;
 
 PRIVATE>
@@ -589,17 +589,17 @@ PRIVATE>
     delay-parser boa wrap-peg ;
 
 : box ( quot -- parser )
-    #! because a box has its quotation run at compile time
-    #! it must always have a new parser wrapper created,
-    #! not a cached one. This is because the same box,
-    #! compiled twice can have a different compiled word
-    #! due to running at compile time.
-    #! Why the [ ] action at the end? Box parsers don't get
-    #! memoized during parsing due to all box parsers being
-    #! unique. This breaks left recursion detection during the
-    #! parse. The action adds an indirection with a parser type
-    #! that gets memoized and fixes this. Need to rethink how
-    #! to fix boxes so this isn't needed...
+    ! because a box has its quotation run at compile time
+    ! it must always have a new parser wrapper created,
+    ! not a cached one. This is because the same box,
+    ! compiled twice can have a different compiled word
+    ! due to running at compile time.
+    ! Why the [ ] action at the end? Box parsers don't get
+    ! memoized during parsing due to all box parsers being
+    ! unique. This breaks left recursion detection during the
+    ! parse. The action adds an indirection with a parser type
+    ! that gets memoized and fixes this. Need to rethink how
+    ! to fix boxes so this isn't needed...
     box-parser boa f next-id parser boa [ ] action ;
 
 ERROR: parse-failed input word ;

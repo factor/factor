@@ -43,17 +43,17 @@ TUPLE: callback cont quot expires alarm responder ;
     <callback> callback-responder get callbacks>> set-at-unique ;
 
 : forward-to-url ( url -- * )
-    #! When executed inside a 'show' call, this will force a
-    #! HTTP 302 to occur to instruct the browser to forward to
-    #! the request URL.
+    ! When executed inside a 'show' call, this will force a
+    ! HTTP 302 to occur to instruct the browser to forward to
+    ! the request URL.
     <temporary-redirect> exit-with ;
 
 : cont-id "factorcontid" ;
 
 : forward-to-id ( id -- * )
-    #! When executed inside a 'show' call, this will force a
-    #! HTTP 302 to occur to instruct the browser to forward to
-    #! the request URL.
+    ! When executed inside a 'show' call, this will force a
+    ! HTTP 302 to occur to instruct the browser to forward to
+    ! the request URL.
     <url>
         swap cont-id set-query-param forward-to-url ;
 
@@ -63,13 +63,13 @@ TUPLE: callback cont quot expires alarm responder ;
 SYMBOL: post-refresh-get?
 
 : redirect-to-here ( -- )
-    #! Force a redirect to the client browser so that the browser
-    #! goes to the current point in the code. This forces an URL
-    #! change on the browser so that refreshing that URL will
-    #! immediately run from this code point. This prevents the
-    #! "this request will issue a POST" warning from the browser
-    #! and prevents re-running the previous POST logic. This is
-    #! known as the 'post-refresh-get' pattern.
+    ! Force a redirect to the client browser so that the browser
+    ! goes to the current point in the code. This forces an URL
+    ! change on the browser so that refreshing that URL will
+    ! immediately run from this code point. This prevents the
+    ! "this request will issue a POST" warning from the browser
+    ! and prevents re-running the previous POST logic. This is
+    ! known as the 'post-refresh-get' pattern.
     post-refresh-get? get [
         [
             [ ] t register-callback forward-to-id
@@ -81,10 +81,10 @@ SYMBOL: post-refresh-get?
 SYMBOL: current-show
 
 : store-current-show ( -- )
-    #! Store the current continuation in the variable 'current-show'
-    #! so it can be returned to later by 'quot-id'. Note that it
-    #! recalls itself when the continuation is called to ensure that
-    #! it resets its value back to the most recent show call.
+    ! Store the current continuation in the variable 'current-show'
+    ! so it can be returned to later by 'quot-id'. Note that it
+    ! recalls itself when the continuation is called to ensure that
+    ! it resets its value back to the most recent show call.
     [ current-show set f ] callcc1
     [ restore-request store-current-show ] when* ;
 

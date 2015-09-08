@@ -47,7 +47,7 @@ IN: project-euler.070
     7 10^ sqrt >integer 1000 [ - ] [ + ] 2bi primes-between ; inline
 
 : n-and-phi ( seq -- seq' )
-    #! ( seq  = { p1, p2 } -- seq' = { n, φ(n) } )
+    ! ( seq  = { p1, p2 } -- seq' = { n, φ(n) } )
     [ product ] [ [ 1 - ] map product ] bi 2array ;
 
 : fit-requirements? ( seq -- ? )

@@ -253,7 +253,7 @@ M: windows init-stdio
     f CreateFileW dup win32-error=0/f <win32-file> ;
 
 : maybe-create-file ( path -- win32-file ? )
-    #! return true if file was just created
+    ! return true if file was just created
     flags{ GENERIC_READ GENERIC_WRITE }
     share-mode
     f

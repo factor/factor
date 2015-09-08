@@ -52,7 +52,7 @@ SYMBOL: log-files
     ] unless-empty ;
 
 : (log-message) ( msg -- )
-    #! msg: { msg word-name level service }
+    ! msg: { msg word-name level service }
     first4 log-stream [ write-message flush ] with-output-stream* ;
 
 : try-dispose ( obj -- )

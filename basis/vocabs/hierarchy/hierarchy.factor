@@ -75,7 +75,7 @@ PRIVATE>
     [ dup vocab-prefix? [ name>> <vocab-link> ] when ] map ;
 
 : remove-redundant-prefixes ( seq -- seq' )
-    #! Hack.
+    ! Hack.
     [ vocab-prefix? ] partition
     [
         [ vocab-name ] map fast-set

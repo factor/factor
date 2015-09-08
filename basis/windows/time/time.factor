@@ -21,7 +21,7 @@ IN: windows.time
     FILETIME>windows-time ;
 
 : timestamp>windows-time ( timestamp -- n )
-    #! 64bit number representing # of nanoseconds since Jan 1, 1601 (UTC)
+    ! 64bit number representing # of nanoseconds since Jan 1, 1601 (UTC)
     >gmt windows-1601 (time-) 10,000,000 * >integer ;
 
 : windows-time>FILETIME ( n -- FILETIME )

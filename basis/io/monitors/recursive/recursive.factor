@@ -19,7 +19,7 @@ DEFER: add-child-monitor
     monitor tget path>> prepend-path ;
 
 : add-child-monitors ( path -- )
-    #! We yield since this directory scan might take a while.
+    ! We yield since this directory scan might take a while.
     dup [
         [ append-path ] with map
         [ add-child-monitor ] each yield

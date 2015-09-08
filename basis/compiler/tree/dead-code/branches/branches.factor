@@ -14,8 +14,8 @@ M: #dispatch mark-live-values* look-at-inputs ;
     [ index ] dip swap [ <column> look-at-values ] [ drop ] if* ;
 
 M: #phi compute-live-values*
-    #! If any of the outputs of a #phi are live, then the
-    #! corresponding inputs are live too.
+    ! If any of the outputs of a #phi are live, then the
+    ! corresponding inputs are live too.
     [ out-d>> ] [ phi-in-d>> ] bi look-at-phi ;
 
 SYMBOL: if-node

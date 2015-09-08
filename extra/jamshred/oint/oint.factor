@@ -62,7 +62,7 @@ PRIVATE>
     over forward>> rotate-oint ;
 
 : random-float+- ( n -- m )
-    #! find a random float between -n/2 and n/2
+    ! find a random float between -n/2 and n/2
     dup 10000 * >integer random 10000 / swap 2 / - ;
 
 : random-turn ( oint theta -- )
@@ -81,7 +81,7 @@ PRIVATE>
     distance-vector norm ;
 
 : scalar-projection ( v1 v2 -- n )
-    #! the scalar projection of v1 onto v2
+    ! the scalar projection of v1 onto v2
     [ v. ] [ norm ] bi / ;
 
 : proj-perp ( u v -- w )
@@ -92,7 +92,7 @@ PRIVATE>
     -rot up>> scalar-projection abs + ;
 
 :: reflect ( v n -- v' )
-    #! bounce v on a surface with normal n
+    ! bounce v on a surface with normal n
     v v n v. n n v. / 2 * n n*v v- ;
 
 : half-way ( p1 p2 -- p3 )

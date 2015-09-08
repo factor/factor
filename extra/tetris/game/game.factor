@@ -86,7 +86,7 @@ CONSTANT: default-height 20
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
 : tetris-move ( tetris move -- ? )
-    #! moves the piece if possible, returns whether the piece was moved
+    ! moves the piece if possible, returns whether the piece was moved
     2dup can-move? [
         [ current-piece ] dip move-piece drop t
     ] [

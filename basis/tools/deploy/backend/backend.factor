@@ -45,7 +45,7 @@ ERROR: can't-deploy-library-file library ;
     utf8 [ copy-lines ] with-process-reader ;
 
 : make-boot-image ( -- )
-    #! If stage1 image doesn't exist, create one.
+    ! If stage1 image doesn't exist, create one.
     my-boot-image-name resource-path exists?
     [ make-my-image ] unless ;
 

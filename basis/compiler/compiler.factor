@@ -14,7 +14,7 @@ IN: compiler
 SYMBOL: compiled
 
 : compile? ( word -- ? )
-    #! Don't attempt to compile certain words.
+    ! Don't attempt to compile certain words.
     {
         [ "forgotten" word-prop ]
         [ inlined-block? ]
@@ -46,17 +46,17 @@ M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
 M: word combinator? inline? ;
 
 : ignore-error? ( word error -- ? )
-    #! Ignore some errors on inline combinators, macros, and special
-    #! words such as 'call'.
+    ! Ignore some errors on inline combinators, macros, and special
+    ! words such as 'call'.
     {
         [ drop no-compile? ]
         [ [ combinator? ] [ unknown-macro-input? ] bi* and ]
     } 2|| ;
 
 : finish ( word -- )
-    #! Recompile callers if the word's stack effect changed, then
-    #! save the word's dependencies so that if they change, the
-    #! word can get recompiled too.
+    ! Recompile callers if the word's stack effect changed, then
+    ! save the word's dependencies so that if they change, the
+    ! word can get recompiled too.
     [ compiled-unxref ]
     [
         dup crossref? [
@@ -67,8 +67,8 @@ M: word combinator? inline? ;
     ] bi ;
 
 : deoptimize-with ( word def -- * )
-    #! If the word failed to infer, compile it with the
-    #! non-optimizing compiler.
+    ! If the word failed to infer, compile it with the
+    ! non-optimizing compiler.
     swap [ finish ] [ compiled get set-at ] bi return ;
 
 : not-compiled-def ( word error -- def )
@@ -86,10 +86,10 @@ M: word combinator? inline? ;
     2bi ;
 
 : deoptimize ( word error -- * )
-    #! If the error is ignorable, compile the word with the
-    #! non-optimizing compiler, using its definition. Otherwise,
-    #! if the compiler error is not ignorable, use a dummy
-    #! definition from 'not-compiled-def' which throws an error.
+    ! If the error is ignorable, compile the word with the
+    ! non-optimizing compiler, using its definition. Otherwise,
+    ! if the compiler error is not ignorable, use a dummy
+    ! definition from 'not-compiled-def' which throws an error.
     {
         { [ dup inference-error? not ] [ rethrow ] }
         { [ 2dup ignore-error? ] [ ignore-error ] }
@@ -106,8 +106,8 @@ M: word combinator? inline? ;
     dependencies get keys [ "break?" word-prop ] any? ;
 
 : frontend ( word -- tree )
-    #! If the word contains breakpoints, don't optimize it, since
-    #! the walker does not support this.
+    ! If the word contains breakpoints, don't optimize it, since
+    ! the walker does not support this.
     dup optimize? [
         [ [ build-tree ] [ deoptimize ] recover optimize-tree ] keep
         contains-breakpoints? [ nip deoptimize* ] [ drop ] if
@@ -124,8 +124,8 @@ M: word combinator? inline? ;
     ] each ;
 
 : compile-word ( word -- )
-    #! We return early if the word has breakpoints or if it
-    #! failed to infer.
+    ! We return early if the word has breakpoints or if it
+    ! failed to infer.
     '[
         _ {
             [ start ]
@@ -138,8 +138,8 @@ M: word combinator? inline? ;
 SINGLETON: optimizing-compiler
 
 M: optimizing-compiler update-call-sites ( class generic -- words )
-    #! Words containing call sites with inferred type 'class'
-    #! which inlined a method on 'generic'
+    ! Words containing call sites with inferred type 'class'
+    ! which inlined a method on 'generic'
     generic-call-sites-of keys swap '[
         _ 2dup [ valid-classoid? ] both?
         [ classes-intersect? ] [ 2drop f ] if

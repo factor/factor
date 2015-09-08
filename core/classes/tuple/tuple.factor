@@ -133,7 +133,7 @@ M: object final-class? drop f ;
 <PRIVATE
 
 : tuple-predicate-quot/1 ( class -- quot )
-    #! Fast path for tuples with no superclass
+    ! Fast path for tuples with no superclass
     [ ] curry [ layout-of 7 slot ] [ eq? ] surround 1quotation
     [ dup tuple? ] [ [ drop f ] if ] surround ;
 

@@ -16,7 +16,7 @@ IN: benchmark.backtrack
     { + - * } amb-execute ;
 
 : some-rots ( a b c -- a b c )
-    #! Try to rot 0, 1 or 2 times.
+    ! Try to rot 0, 1 or 2 times.
     { nop rot -rot } amb-execute ;
 
 MEMO: 24-from-1 ( a -- ? )

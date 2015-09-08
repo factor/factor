@@ -193,8 +193,8 @@ print-use-hook [ [ ] ] initialize
     filter-moved [ class? ] filter [ forget-class ] each ;
 
 : fix-class-words ( -- )
-    #! If a class word had a compound definition which was
-    #! removed, it must go back to being a symbol.
+    ! If a class word had a compound definition which was
+    ! removed, it must go back to being a symbol.
     new-definitions get first2
     filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each ;
 

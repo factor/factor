@@ -170,7 +170,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     [ buffers>> second uint <ref> alSourceQueueBuffers check-error ] keep ;
 
 : fill-processed-audio-buffer ( player n -- player )
-    #! n is the number of audio buffers processed
+    ! n is the number of audio buffers processed
     over >r >r dup source>> r> pick buffer-indexes>>
     [ alSourceUnqueueBuffers check-error ] keep
     uint deref dup r> swap >r al-channel-format rot
@@ -199,8 +199,8 @@ HINTS: yuv>rgb byte-array byte-array ;
     dup playing?>> [ append-audio ] [ start-audio ] if ;
 
 : read-bytes-into ( dest size stream -- len )
-    #! Read the given number of bytes from a stream
-    #! and store them in the destination byte array.
+    ! Read the given number of bytes from a stream
+    ! and store them in the destination byte array.
     stream-read >byte-array dup length [ memcpy ] keep  ;
 
 : check-not-negative ( int -- )
@@ -219,31 +219,31 @@ HINTS: yuv>rgb byte-array byte-array ;
   [ oy>> swap ogg_sync_wrote check-not-negative ] 2keep swap zero? ;
 
 : buffer-data ( player -- player eof? )
-    #! Take some compressed bitstream data and sync it for
-    #! page extraction.
+    ! Take some compressed bitstream data and sync it for
+    ! page extraction.
     sync-buffer stream-into-buffer confirm-buffer ;
 
 : queue-page ( player -- player )
-    #! Push a page into the stream for packetization
+    ! Push a page into the stream for packetization
     [ [ vo>> ] [ og>> ] bi ogg_stream_pagein drop ]
     [ [ to>> ] [ og>> ] bi ogg_stream_pagein drop ]
     [ ] tri ;
 
 : retrieve-page ( player -- player bool )
-    #! Sync the streams and get a page. Return true if a page was
-    #! successfully retrieved.
+    ! Sync the streams and get a page. Return true if a page was
+    ! successfully retrieved.
     dup [ oy>> ] [ og>> ] bi ogg_sync_pageout 0 > ;
 
 : standard-initial-header? ( player -- player bool )
     dup og>> ogg_page_bos zero? not ;
 
 : ogg-stream-init ( player -- state player )
-    #! Init the encode/decode logical stream state
+    ! Init the encode/decode logical stream state
     [ temp-state>> ] keep
     [ og>> ogg_page_serialno ogg_stream_init check-not-negative ] 2keep ;
 
 : ogg-stream-pagein ( state player -- state player )
-    #! Add the incoming page to the stream state
+    ! Add the incoming page to the stream state
     [ og>> ogg_stream_pagein drop ] 2keep ;
 
 : ogg-stream-packetout ( state player -- state player )
@@ -253,28 +253,28 @@ HINTS: yuv>rgb byte-array byte-array ;
     ogg-stream-init ogg-stream-pagein ogg-stream-packetout ;
 
 : theora-header? ( player -- player bool )
-    #! Is the current page a theora header?
+    ! Is the current page a theora header?
     dup [ ti>> ] [ tc>> ] [ op>> ] tri theora_decode_header 0 >= ;
 
 : is-theora-packet? ( player -- player bool )
     dup theora>> zero? [ theora-header? ] [ f ] if ;
 
 : copy-to-theora-state ( state player -- player )
-    #! Copy the state to the theora state structure in the player
+    ! Copy the state to the theora state structure in the player
     [ to>> swap dup length memcpy ] keep ;
 
 : handle-initial-theora-header ( state player -- player )
     copy-to-theora-state 1 >>theora ;
 
 : vorbis-header? ( player -- player bool )
-    #! Is the current page a vorbis header?
+    ! Is the current page a vorbis header?
     dup [ vi>> ] [ vc>> ] [ op>> ] tri vorbis_synthesis_headerin 0 >= ;
 
 : is-vorbis-packet? ( player -- player bool )
     dup vorbis>> zero? [ vorbis-header? ] [ f ] if ;
 
 : copy-to-vorbis-state ( state player -- player )
-    #! Copy the state to the vorbis state structure in the player
+    ! Copy the state to the vorbis state structure in the player
     [ vo>> swap dup length memcpy ] keep ;
 
 : handle-initial-vorbis-header ( state player -- player )
@@ -284,7 +284,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     swap ogg_stream_clear drop ;
 
 : process-initial-header ( player -- player bool )
-    #! Is this a standard initial header? If not, stop parsing
+    ! Is this a standard initial header? If not, stop parsing
     standard-initial-header? [
         decode-packet {
             { [ is-vorbis-packet? ] [ handle-initial-vorbis-header ] }
@@ -296,13 +296,13 @@ HINTS: yuv>rgb byte-array byte-array ;
     ] if ;
 
 : parse-initial-headers ( player -- player )
-    #! Parse Vorbis headers, ignoring any other type stored
-    #! in the Ogg container.
+    ! Parse Vorbis headers, ignoring any other type stored
+    ! in the Ogg container.
     retrieve-page [
         process-initial-header [
             parse-initial-headers
         ] [
-            #! Don't leak the page, get it into the appropriate stream
+            ! Don't leak the page, get it into the appropriate stream
             queue-page
         ] if
     ] [
@@ -310,15 +310,15 @@ HINTS: yuv>rgb byte-array byte-array ;
     ] if ;
 
 : have-required-vorbis-headers? ( player -- player bool )
-    #! Return true if we need to decode vorbis due to there being
-    #! vorbis headers read from the stream but we don't have them all
-    #! yet.
+    ! Return true if we need to decode vorbis due to there being
+    ! vorbis headers read from the stream but we don't have them all
+    ! yet.
     dup vorbis>> 1 2 between? not ;
 
 : have-required-theora-headers? ( player -- player bool )
-    #! Return true if we need to decode theora due to there being
-    #! theora headers read from the stream but we don't have them all
-    #! yet.
+    ! Return true if we need to decode theora due to there being
+    ! theora headers read from the stream but we don't have them all
+    ! yet.
     dup theora>> 1 2 between? not ;
 
 : get-remaining-vorbis-header-packet ( player -- player bool )
@@ -472,7 +472,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     ] when
     dup vd>> granulepos>> dup 0 >= [
         ! numtoread player granulepos
-        #! This is wrong: fix
+        ! This is wrong: fix
         pick - >>audio-granulepos
     ] [
         ! numtoread player granulepos
@@ -481,20 +481,20 @@ HINTS: yuv>rgb byte-array byte-array ;
     [ vd>> swap vorbis_synthesis_read drop ] keep ;
 
 : no-pending-audio ( player -- player bool )
-    #! No pending audio. Is there a pending packet to decode.
+    ! No pending audio. Is there a pending packet to decode.
     dup [ vo>> ] [ op>> ] bi ogg_stream_packetout 0 > [
         dup [ vb>> ] [ op>> ] bi vorbis_synthesis 0 = [
             dup [ vd>> ] [ vb>> ] bi vorbis_synthesis_blockin drop
         ] when
         t
     ] [
-        #! Need more data. Break out to suck in another page.
+        ! Need more data. Break out to suck in another page.
         f
     ] if ;
 
 : decode-audio ( player -- player )
     audio-buffer-not-ready? [
-        #! If there's pending decoded audio, grab it
+        ! If there's pending decoded audio, grab it
         pending-decoded-audio? [
             decode-pending-audio decode-audio
         ] [
@@ -579,7 +579,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     delete-openal-source ;
 
 : wait-for-sound ( player -- player )
-    #! Waits for the openal to finish playing remaining sounds
+    ! Waits for the openal to finish playing remaining sounds
     dup source>> AL_SOURCE_STATE 0 <int> [ alGetSourcei check-error ] keep
     *int AL_PLAYING = [
         100 sleep

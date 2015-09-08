@@ -16,11 +16,11 @@ TUPLE: piece
     piece new swap >>tetromino ;
 
 : (piece-blocks) ( piece -- blocks )
-    #! rotates the piece
+    ! rotates the piece
     [ rotation>> ] [ tetromino>> states>> ] bi nth ;
 
 : piece-blocks ( piece -- blocks )
-    #! rotates and positions the piece
+    ! rotates and positions the piece
     [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
 
 : piece-width ( piece -- width )
@@ -36,7 +36,7 @@ TUPLE: piece
     [ [ <random-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
 : modulo ( n m -- n )
-  #! -2 7 mod => -2, -2 7 modulo =>  5
+  ! -2 7 mod => -2, -2 7 modulo =>  5
   [ mod ] [ + ] [ mod ] tri ;
 
 : (rotate-piece) ( rotation inc n-states -- rotation' )

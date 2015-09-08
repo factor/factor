@@ -436,7 +436,7 @@ ERROR: winsock-exception n string ;
     ${ ERROR_IO_PENDING ERROR_SUCCESS WSA_IO_PENDING } member? ;
 
 : (maybe-winsock-exception) ( n -- winsock-exception/f )
-    ! #! WSAStartup returns the error code 'n' directly
+    ! ! WSAStartup returns the error code 'n' directly
     dup winsock-expected-error?
     [ drop f ] [ [ ] [ n>win32-error-string ] bi \ winsock-exception boa ] if ;
 

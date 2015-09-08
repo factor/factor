@@ -87,8 +87,8 @@ M: array noise [ noise ] map vsum ;
 : noise-factor ( x y -- z ) / 100 * >integer ;
 
 : quot-noise-factor ( quot -- n )
-    #! For very short words, noise doesn't count so much
-    #! (so dup foo swap bar isn't penalized as badly).
+    ! For very short words, noise doesn't count so much
+    ! (so dup foo swap bar isn't penalized as badly).
     noise first2 {
         { [ over 4 <= ] [ [ drop 0 ] dip ] }
         { [ over 15 >= ] [ [ 2 * ] dip ] }

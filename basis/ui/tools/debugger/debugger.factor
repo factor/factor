@@ -57,7 +57,7 @@ M: debugger focusable-child*
     dup restart-hook>> [ restart-list>> ] [ drop t ] if ;
 
 : debugger-window ( error continuation -- )
-    #! No restarts for the debugger window
+    ! No restarts for the debugger window
     f f <debugger> "Error" open-status-window ;
 
 GENERIC: error-in-debugger? ( error -- ? )

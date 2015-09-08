@@ -16,7 +16,7 @@ IN: ui.backend.cocoa.views
 
 ! Issue #1453
 : button ( event -- n )
-    #! Cocoa -> Factor UI button mapping
+    ! Cocoa -> Factor UI button mapping
     -> buttonNumber {
         { 0 [ 1 ] }
         { 1 [ 3 ] }

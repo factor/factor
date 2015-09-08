@@ -47,7 +47,7 @@ M: retryable execute-statement* ( statement type -- )
     [ db-columns ] [ db-table-name ] bi ;
 
 : query-make ( class quot -- statements )
-    #! query, input, outputs, secondary queries
+    ! query, input, outputs, secondary queries
     over db-table-name "table-name" set
     [ sql-props ] dip
     [ 0 sql-counter rot with-variable ] curry

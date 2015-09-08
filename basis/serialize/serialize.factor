@@ -21,12 +21,12 @@ GENERIC: (serialize) ( obj -- )
 SYMBOL: serialized
 
 : add-object ( obj -- )
-    #! Add an object to the sequence of already serialized
-    #! objects.
+    ! Add an object to the sequence of already serialized
+    ! objects.
     serialized get [ assoc-size swap ] keep set-at ;
 
 : object-id ( obj -- id )
-    #! Return the id of an already serialized object
+    ! Return the id of an already serialized object
     serialized get at ;
 
 ! Positive numbers are serialized as follows:
@@ -231,8 +231,8 @@ SYMBOL: deserialized
     [ set-array-nth ] curry each-index ;
 
 : deserialize-tuple ( -- array )
-    #! Ugly because we have to intern the tuple before reading
-    #! slots
+    ! Ugly because we have to intern the tuple before reading
+    ! slots
     (deserialize) new
     [ intern-object ]
     [

@@ -246,7 +246,7 @@ ERROR: bad-partial-eval quot word ;
 CONSTANT: lookup-table-at-max 256
 
 : lookup-table-at? ( assoc -- ? )
-    #! Can we use a fast byte array test here?
+    ! Can we use a fast byte array test here?
     {
         [ assoc-size 4 > ]
         [ values [ ] all? ]

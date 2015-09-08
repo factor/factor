@@ -196,7 +196,7 @@ M: pane-control model-changed ( model pane-control -- )
 ! Character styles
 
 MEMO:: specified-font ( name style size foreground background -- font )
-    #! We memoize here to avoid creating lots of duplicate font objects.
+    ! We memoize here to avoid creating lots of duplicate font objects.
     monospace-font
         name [ >>name ] when*
         style {

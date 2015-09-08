@@ -117,7 +117,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     } case ;
 
 : sqlite-bind-type ( handle key value type -- )
-    #! null and empty values need to be set by sqlite-bind-null-by-name
+    ! null and empty values need to be set by sqlite-bind-null-by-name
     over [
         NULL = [ 2drop NULL NULL ] when
     ] [

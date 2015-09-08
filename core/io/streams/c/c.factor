@@ -93,10 +93,10 @@ M: c-io-backend (file-appender)
     "ab" fopen <c-writer> ;
 
 : show ( msg -- )
-    #! A word which directly calls primitives. It is used to
-    #! print stuff from contexts where the I/O system would
-    #! otherwise not work (tools.deploy.shaker, the I/O
-    #! multiplexer thread).
+    ! A word which directly calls primitives. It is used to
+    ! print stuff from contexts where the I/O system would
+    ! otherwise not work (tools.deploy.shaker, the I/O
+    ! multiplexer thread).
     "\n" append >byte-array dup length
     stdout-handle fwrite
     stdout-handle fflush ;

@@ -252,7 +252,7 @@ GENERIC: prev-float ( m -- n )
 : if-iterate? ( i n true false -- ) [ 2over < ] 2dip if ; inline
 
 : iterate-step ( i n quot -- i n quot )
-    #! Apply quot to i, keep i and quot, hide n.
+    ! Apply quot to i, keep i and quot, hide n.
     [ nip call ] 3keep ; inline
 
 : iterate-rot ( ? i n quot -- i n quot ? )

@@ -100,7 +100,7 @@ PRIVATE>
 : &rename ( key n -- ) key@ mirror get rename-at &push reinspect ;
 
 : &help ( -- )
-    #! A tribute to Slate:
+    ! A tribute to Slate:
     "You are in a twisty little maze of objects, all alike." print
     nl
     "'n' is a slot number in the following:" print

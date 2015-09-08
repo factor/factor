@@ -61,9 +61,9 @@ TUPLE: undefined-word word ;
 : undefined ( -- * ) get-callstack caller undefined-word boa throw ;
 
 : undefined-def ( -- quot )
-    #! 'f' inhibits tail call optimization in non-optimizing
-    #! compiler, ensuring that we can pull out the caller word
-    #! above.
+    ! 'f' inhibits tail call optimization in non-optimizing
+    ! compiler, ensuring that we can pull out the caller word
+    ! above.
     [ undefined f ] ;
 
 PREDICATE: deferred < word def>> undefined-def = ;

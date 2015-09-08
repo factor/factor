@@ -86,9 +86,9 @@ SYMBOL: error-stream
     swapd [ with-output-stream* ] curry with-input-stream* ; inline
 
 : with-streams ( input output quot -- )
-    #! We have to dispose of the output stream first, so that
-    #! if both streams point to the same FD, we get to flush the
-    #! buffer before closing the FD.
+    ! We have to dispose of the output stream first, so that
+    ! if both streams point to the same FD, we get to flush the
+    ! buffer before closing the FD.
     swapd [ with-output-stream ] curry with-input-stream ; inline
 
 : with-input-output+error-streams* ( input output+error quot -- )

@@ -59,7 +59,7 @@ M: indirect extended? base>> extended? ;
     [ f >>displacement ] when ;
 
 : canonicalize-EBP ( indirect -- indirect )
-    #! { EBP } ==> { EBP 0 }
+    ! { EBP } ==> { EBP 0 }
     dup [ base>> { EBP RBP R13 } member? ] [ displacement>> not ] bi and
     [ 0 >>displacement ] when ;
 
@@ -69,8 +69,8 @@ ERROR: bad-index indirect ;
     dup index>> { ESP RSP } member-eq? [ bad-index ] when ;
 
 : canonicalize ( indirect -- indirect )
-    #! Modify the indirect to work around certain addressing mode
-    #! quirks.
+    ! Modify the indirect to work around certain addressing mode
+    ! quirks.
     canonicalize-displacement canonicalize-EBP check-ESP ;
 
 ! Utilities

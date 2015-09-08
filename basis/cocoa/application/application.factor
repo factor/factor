@@ -39,7 +39,7 @@ FUNCTION: void NSBeep ( )
     -> alloc -> init -> setDelegate: ;
 
 : running.app? ( -- ? )
-    #! Test if we're running a .app.
+    ! Test if we're running a .app.
     ".app"
     NSBundle -> mainBundle -> bundlePath CF>string
     subseq? ;

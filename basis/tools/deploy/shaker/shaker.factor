@@ -599,11 +599,11 @@ SYMBOL: deploy-vocab
     clear-megamorphic-caches ;
 
 : die-with ( error original-error -- * )
-    #! We don't want DCE to drop the error before the die call!
+    ! We don't want DCE to drop the error before the die call!
     [ die 1 exit ] ( a -- * ) call-effect-unsafe ;
 
 : die-with2 ( error original-error -- * )
-    #! We don't want DCE to drop the error before the die call!
+    ! We don't want DCE to drop the error before the die call!
     [ die 1 exit ] ( a b -- * ) call-effect-unsafe ;
 
 : deploy-error-handler ( quot -- )
@@ -617,8 +617,8 @@ SYMBOL: deploy-vocab
     ] recover ; inline
 
 : (deploy) ( final-image vocab-manifest-out vocab config -- )
-    #! Does the actual work of a deployment in the slave
-    #! stage2 image
+    ! Does the actual work of a deployment in the slave
+    ! stage2 image
     [
         [
             strip-debugger? [

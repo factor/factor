@@ -24,7 +24,7 @@ M: circular virtual@ circular-wrap seq>> ; inline
 M: circular virtual-exemplar seq>> ; inline
 
 : change-circular-start ( n circular -- )
-    #! change start to (start + n) mod length
+    ! change start to (start + n) mod length
     circular-wrap start<< ; inline
 
 : rotate-circular ( circular -- )

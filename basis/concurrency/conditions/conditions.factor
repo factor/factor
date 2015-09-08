@@ -10,8 +10,8 @@ IN: concurrency.conditions
     [ resume-now ] slurp-deque ; inline
 
 : queue-timeout ( queue timeout -- timer )
-    #! Add an timer which removes the current thread from the
-    #! queue, and resumes it, passing it a value of t.
+    ! Add an timer which removes the current thread from the
+    ! queue, and resumes it, passing it a value of t.
     [
         [ self swap push-front* ] keep '[
             _ _

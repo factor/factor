@@ -10,7 +10,7 @@ FROM: peg.search => replace ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )
-    #! Given an EBNF word produced from EBNF: return the EBNF rule
+    ! Given an EBNF word produced from EBNF: return the EBNF rule
     "ebnf-parser" word-prop at ;
 
 ERROR: no-rule rule parser ;
@@ -85,17 +85,17 @@ C: <ebnf-semantic> ebnf-semantic
 C: <ebnf> ebnf
 
 : filter-hidden ( seq -- seq )
-    #! Remove elements that produce no AST from sequence
+    ! Remove elements that produce no AST from sequence
     [ ebnf-ensure-not? ] reject [ ebnf-ensure? not ] filter ;
 
 : syntax ( string -- parser )
-    #! Parses the string, ignoring white space, and
-    #! does not put the result in the AST.
+    ! Parses the string, ignoring white space, and
+    ! does not put the result in the AST.
     token sp hide ;
 
 : syntax-pack ( begin parser end -- parser )
-    #! Parse parser-parser surrounded by syntax elements
-    #! begin and end.
+    ! Parse parser-parser surrounded by syntax elements
+    ! begin and end.
     [ syntax ] 2dip syntax pack ;
 
 : insert-escapes ( string -- string )
@@ -106,10 +106,10 @@ C: <ebnf> ebnf
     ] choice* replace ;
 
 : identifier-parser ( -- parser )
-    #! Return a parser that parses an identifer delimited by
-    #! a quotation character. The quotation can be single
-    #! or double quotes. The AST produced is the identifier
-    #! between the quotes.
+    ! Return a parser that parses an identifer delimited by
+    ! a quotation character. The quotation can be single
+    ! or double quotes. The AST produced is the identifier
+    ! between the quotes.
     [
         [
             [ CHAR: \ = ] satisfy
@@ -120,9 +120,9 @@ C: <ebnf> ebnf
     ] choice* [ "" flatten-as unescape-string ] action ;
 
 : non-terminal-parser ( -- parser )
-    #! A non-terminal is the name of another rule. It can
-    #! be any non-blank character except for characters used
-    #! in the EBNF syntax itself.
+    ! A non-terminal is the name of another rule. It can
+    ! be any non-blank character except for characters used
+    ! in the EBNF syntax itself.
     [
         {
             [ blank? ]
@@ -131,12 +131,12 @@ C: <ebnf> ebnf
     ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : terminal-parser ( -- parser )
-    #! A terminal is an identifier enclosed in quotations
-    #! and it represents the literal value of the identifier.
+    ! A terminal is an identifier enclosed in quotations
+    ! and it represents the literal value of the identifier.
     identifier-parser [ <ebnf-terminal> ] action ;
 
 : foreign-name-parser ( -- parser )
-    #! Parse a valid foreign parser name
+    ! Parse a valid foreign parser name
     [
         {
             [ blank? ]
@@ -145,7 +145,7 @@ C: <ebnf> ebnf
     ] satisfy repeat1 [ >string ] action ;
 
 : foreign-parser ( -- parser )
-    #! A foreign call is a call to a rule in another ebnf grammar
+    ! A foreign call is a call to a rule in another ebnf grammar
     [
         "<foreign" syntax ,
         foreign-name-parser sp ,
@@ -154,11 +154,11 @@ C: <ebnf> ebnf
     ] seq* [ first2 <ebnf-foreign> ] action ;
 
 : any-character-parser ( -- parser )
-    #! A parser to match the symbol for any character match.
+    ! A parser to match the symbol for any character match.
     [ CHAR: . = ] satisfy [ drop <ebnf-any-character> ] action ;
 
 : range-parser-parser ( -- parser )
-    #! Match the syntax for declaring character ranges
+    ! Match the syntax for declaring character ranges
     [
         [ "[" syntax , "[" token ensure-not , ] seq* hide ,
         [ CHAR: ] = not ] satisfy repeat1 ,
@@ -166,10 +166,10 @@ C: <ebnf> ebnf
     ] seq* [ first >string unescape-string <ebnf-range> ] action ;
 
 : (element-parser) ( -- parser )
-    #! An element of a rule. It can be a terminal or a
-    #! non-terminal but must not be followed by a "=".
-    #! The latter indicates that it is the beginning of a
-    #! new rule.
+    ! An element of a rule. It can be a terminal or a
+    ! non-terminal but must not be followed by a "=".
+    ! The latter indicates that it is the beginning of a
+    ! new rule.
     [
         [
             [
@@ -206,9 +206,9 @@ DEFER: action-parser
 DEFER: choice-parser
 
 : grouped ( quot suffix -- parser )
-    #! Parse a group of choices, with a suffix indicating
-    #! the type of group (repeat0, repeat1, etc) and
-    #! an quot that is the action that produces the AST.
+    ! Parse a group of choices, with a suffix indicating
+    ! the type of group (repeat0, repeat1, etc) and
+    ! an quot that is the action that produces the AST.
     2dup
     [
         "(" [ choice-parser sp ] delay ")" syntax-pack
@@ -220,7 +220,7 @@ DEFER: choice-parser
     ] choice* ;
 
 : group-parser ( -- parser )
-    #! A grouping with no suffix. Used for precedence.
+    ! A grouping with no suffix. Used for precedence.
     [ ] [
         "~" token sp ensure-not ,
         "*" token sp ensure-not ,
@@ -248,26 +248,26 @@ DEFER: choice-parser
     ] seq* repeat0 [ "" concat-as ] action ;
 
 : ensure-not-parser ( -- parser )
-    #! Parses the '!' syntax to ensure that
-    #! something that matches the following elements do
-    #! not exist in the parse stream.
+    ! Parses the '!' syntax to ensure that
+    ! something that matches the following elements do
+    ! not exist in the parse stream.
     [
         "!" syntax ,
         group-parser sp ,
     ] seq* [ first <ebnf-ensure-not> ] action ;
 
 : ensure-parser ( -- parser )
-    #! Parses the '&' syntax to ensure that
-    #! something that matches the following elements does
-    #! exist in the parse stream.
+    ! Parses the '&' syntax to ensure that
+    ! something that matches the following elements does
+    ! exist in the parse stream.
     [
         "&" syntax ,
         group-parser sp ,
     ] seq* [ first <ebnf-ensure> ] action ;
 
 : (sequence-parser) ( -- parser )
-    #! A sequence of terminals and non-terminals, including
-    #! groupings of those.
+    ! A sequence of terminals and non-terminals, including
+    ! groupings of those.
     [
         [
             ensure-not-parser sp ,
@@ -290,8 +290,8 @@ DEFER: choice-parser
      "?[" factor-code-parser "]?" syntax-pack ;
 
 : sequence-parser ( -- parser )
-    #! A sequence of terminals and non-terminals, including
-    #! groupings of those.
+    ! A sequence of terminals and non-terminals, including
+    ! groupings of those.
     [
         [ (sequence-parser) , action-parser , ] seq*
         [ first2 <ebnf-action> ] action ,
@@ -375,9 +375,9 @@ M: ebnf-rule (transform) ( ast -- parser )
     ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )
-    #! If ignore-ws is set then each element of the sequence
-    #! ignores leading whitespace. This is not inherited by
-    #! subelements of the sequence.
+    ! If ignore-ws is set then each element of the sequence
+    ! ignores leading whitespace. This is not inherited by
+    ! subelements of the sequence.
     elements>> [
         f ignore-ws [ (transform) ] with-variable
         ignore-ws get [ sp ] when
@@ -393,7 +393,7 @@ M: ebnf-range (transform) ( ast -- parser )
     pattern>> range-pattern ;
 
 : transform-group ( ast -- parser )
-    #! convert a ast node with groups to a parser for that group
+    ! convert a ast node with groups to a parser for that group
     group>> (transform) ;
 
 M: ebnf-ensure (transform) ( ast -- parser )
@@ -420,8 +420,8 @@ M: ebnf-whitespace (transform) ( ast -- parser )
 GENERIC: build-locals ( code ast -- code )
 
 M: ebnf-sequence build-locals ( code ast -- code )
-    #! Note the need to filter out this ebnf items that
-    #! leave nothing in the AST
+    ! Note the need to filter out this ebnf items that
+    ! leave nothing in the AST
     elements>> filter-hidden dup length 1 = [
         first build-locals
     ] [

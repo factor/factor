@@ -140,9 +140,9 @@ SYMBOL: ui-notify-flag
 : layout-queue ( -- queue ) \ layout-queue get ;
 
 : layout-later ( gadget -- )
-    #! When unit testing gadgets without the UI running, the
-    #! invalid queue is not initialized and we simply ignore
-    #! invalidation requests.
+    ! When unit testing gadgets without the UI running, the
+    ! invalid queue is not initialized and we simply ignore
+    ! invalidation requests.
     layout-queue [ push-front notify-ui-thread ] [ drop ] if* ;
 
 : invalidate* ( gadget -- )

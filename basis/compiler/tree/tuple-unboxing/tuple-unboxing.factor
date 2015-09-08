@@ -67,7 +67,7 @@ M: #call unbox-tuples*
     } case ;
 
 M: #declare unbox-tuples*
-    #! We don't look at declarations after escape analysis anyway.
+    ! We don't look at declarations after escape analysis anyway.
     drop f ;
 
 M: #copy unbox-tuples*

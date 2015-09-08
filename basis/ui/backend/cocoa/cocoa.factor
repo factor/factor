@@ -80,9 +80,9 @@ M: pasteboard set-clipboard-contents
     [ 0 0 ] dip dim>> first2 <CGRect> ;
 
 : auto-position ( window loc -- )
-    #! Note: if this is the initial window, the length of the windows
-    #! vector should be 1, since (open-window) calls auto-position
-    #! after register-window.
+    ! Note: if this is the initial window, the length of the windows
+    ! vector should be 1, since (open-window) calls auto-position
+    ! after register-window.
     dup { 0 0 } = [
         drop
         ui-windows get-global length 1 <= [ -> center ] [

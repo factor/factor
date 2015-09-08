@@ -26,8 +26,8 @@ M: #return mark-live-values* look-at-inputs ;
     [ index ] dip over [ nth look-at-value ] [ 2drop ] if ;
 
 M: #copy compute-live-values*
-    #! If the output of a copy is live, then the corresponding
-    #! input is live also.
+    ! If the output of a copy is live, then the corresponding
+    ! input is live also.
     [ out-d>> ] [ in-d>> ] bi look-at-mapping ;
 
 M: #call compute-live-values* nip look-at-inputs ;
@@ -41,8 +41,8 @@ M: #alien-node compute-live-values* nip look-at-inputs ;
     live-values get '[ drop _ key? ] assoc-filter ;
 
 : filter-corresponding ( new old -- old' )
-    #! Remove elements from 'old' if the element with the same
-    #! index in 'new' is dead.
+    ! Remove elements from 'old' if the element with the same
+    ! index in 'new' is dead.
     zip filter-mapping values ;
 
 : filter-live ( values -- values' )

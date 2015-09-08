@@ -66,7 +66,7 @@ C: <sphere> sphere
     dup 0.0 < [ 3drop 1/0. ] [ sqrt sphere-t nip ] if ; inline
 
 : if-ray-sphere ( hit ray sphere quot -- hit )
-    #! quot: hit ray sphere l -- hit
+    ! quot: hit ray sphere l -- hit
     [
         [ ] [ swap ray-sphere nip ] [ 2drop lambda>> ] 3tri
         [ drop ] [ < ] 2bi

@@ -40,7 +40,7 @@ SYMBOL: matrix
     over [ find-from drop ] dip length or ; inline
 
 : first-col ( row# -- n )
-    #! First non-zero column
+    ! First non-zero column
     0 swap nth-row [ zero? not ] skip ;
 
 : clear-scale ( col# pivot-row i-row -- n )

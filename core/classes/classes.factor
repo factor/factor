@@ -114,11 +114,11 @@ M: predicate reset-word
     swap superclass-of? ;
 
 : class-members ( class -- seq )
-    #! Output f for non-classes to work with algebra code
+    ! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;
 
 : class-participants ( class -- seq )
-    #! Output f for non-classes to work with algebra code
+    ! Output f for non-classes to work with algebra code
     dup class? [ "participants" word-prop ] [ drop f ] if ;
 
 GENERIC: implementors ( class/classes -- seq )

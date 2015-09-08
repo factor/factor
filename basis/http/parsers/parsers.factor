@@ -67,7 +67,7 @@ IN: http.parsers
     ] seq* [ "1.0" suffix! ] action ;
 
 PEG: parse-request-line ( string -- triple )
-    #! Triple is { method url version }
+    ! Triple is { method url version }
     full-request-parser simple-request-parser 2array choice ;
 
 : text-parser ( -- parser )
@@ -80,7 +80,7 @@ PEG: parse-request-line ( string -- triple )
     text-parser repeat0 case-sensitive ;
 
 PEG: parse-response-line ( string -- triple )
-    #! Triple is { version code message }
+    ! Triple is { version code message }
     [
         space-parser ,
         http-version-parser ,
@@ -120,8 +120,8 @@ PEG: parse-response-line ( string -- triple )
     2choice ;
 
 PEG: parse-header-line ( string -- pair )
-    #! Pair is either { name value } or { f value }. If f, its a
-    #! continuation of the previous header line.
+    ! Pair is either { name value } or { f value }. If f, its a
+    ! continuation of the previous header line.
     [
         field-name-parser ,
         space-parser ,

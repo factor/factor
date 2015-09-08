@@ -285,7 +285,7 @@ TUPLE: ceo < executive ;
 GENERIC: salary ( person -- n )
 
 M: intern salary
-    #! Intentional mistake.
+    ! Intentional mistake.
     call-next-method ;
 
 M: employee salary drop 24000 ;
@@ -299,7 +299,7 @@ M: senior-manager salary call-next-method 15000 + ;
 M: executive salary call-next-method 2 * ;
 
 M: ceo salary
-    #! Intentional error.
+    ! Intentional error.
     drop 5 call-next-method 3 * ;
 
 [ salary ] must-infer

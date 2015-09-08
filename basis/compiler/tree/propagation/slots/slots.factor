@@ -51,13 +51,13 @@ IN: compiler.tree.propagation.slots
     dup [ read-only>> ] when ;
 
 : literal-info-slot ( slot object -- info/f )
-    #! literal-info-slot makes an unsafe call to 'slot'.
-    #! Check that the layout is up to date to avoid accessing the
-    #! wrong slot during a compilation unit where reshaping took
-    #! place. This could happen otherwise because the "slots" word
-    #! property would reflect the new layout, but instances in the
-    #! heap would use the old layout since instances are updated
-    #! immediately after compilation.
+    ! literal-info-slot makes an unsafe call to 'slot'.
+    ! Check that the layout is up to date to avoid accessing the
+    ! wrong slot during a compilation unit where reshaping took
+    ! place. This could happen otherwise because the "slots" word
+    ! property would reflect the new layout, but instances in the
+    ! heap would use the old layout since instances are updated
+    ! immediately after compilation.
     {
         [ class-of read-only-slot? ]
         [ nip layout-up-to-date? ]

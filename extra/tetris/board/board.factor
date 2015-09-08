@@ -49,6 +49,6 @@ TUPLE: board { width integer } { height integer } rows ;
     [ [ row-not-full? ] filter ] change-rows ;
 
 : check-rows ( board -- n )
-    #! remove full rows, then add blank ones at the top, returning the number
-    #! of rows removed (and added)
+    ! remove full rows, then add blank ones at the top, returning the number
+    ! of rows removed (and added)
     remove-full-rows dup height>> over rows>> length - swap top-up-rows ;

@@ -114,7 +114,7 @@ M: avl set-at ( value key node -- )
     ] if* ;
 
 : replace-with-a-child ( node -- node shorter? )
-    #! assumes that node is not a leaf, otherwise will recurse forever
+    ! assumes that node is not a leaf, otherwise will recurse forever
     dup node-link [
         dupd [ avl-replace-with-extremity ] with-other-side
         [ over set-node-link ] dip [ balance-delete ] [ f ] if
@@ -123,8 +123,8 @@ M: avl set-at ( value key node -- )
     ] if* ;
 
 : avl-delete-node ( node -- node shorter? )
-    #! delete this node, returning its replacement, and whether this subtree is
-    #! shorter as a result
+    ! delete this node, returning its replacement, and whether this subtree is
+    ! shorter as a result
     dup leaf? [
         drop f t
     ] [

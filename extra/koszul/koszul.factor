@@ -133,7 +133,7 @@ DEFER: (d)
     ] if ;
 
 : interior ( x y -- i_y[x] )
-    #! y is a generator
+    ! y is a generator
     swap >alt [ dupd (interior) ] linear-op nip ;
 
 ! Computing a basis
@@ -172,7 +172,7 @@ DEFER: (d)
 
 ! Graded by degree
 : (graded-ker/im-d) ( n seq -- null/rank )
-    #! d: C(n) ---> C(n+1)
+    ! d: C(n) ---> C(n+1)
     [ ?nth ] [ [ 1 + ] dip ?nth ] 2bi
     dim-im/ker-d ;
 
@@ -184,7 +184,7 @@ DEFER: (d)
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
-    #! d: C(u,z) ---> C(u+2,z-1)
+    ! d: C(u,z) ---> C(u+2,z-1)
     [ ?nth ?nth ] 3keep [ [ 2 + ] dip 1 - ] dip ?nth ?nth
     dim-im/ker-d ;
 
@@ -257,7 +257,7 @@ DEFER: (d)
     ] each-index ;
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
-    #! d: C(u,z) ---> C(u+2,z-1)
+    ! d: C(u,z) ---> C(u+2,z-1)
     [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ]
     [ ?nth ?nth ]
     [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]

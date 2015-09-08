@@ -17,9 +17,9 @@ IN: channels.examples
     [ from ] keep [ from ] keep from ;
 
 : filter ( send prime recv -- )
-    #! Receives numbers from the 'send' channel,
-    #! filters out all those divisible by 'prime',
-    #! and sends to the 'recv' channel.
+    ! Receives numbers from the 'send' channel,
+    ! filters out all those divisible by 'prime',
+    ! and sends to the 'recv' channel.
     [
         from swap dupd mod zero? not [ swap to ] [ 2drop ] if
     ] 3keep filter ;
@@ -32,7 +32,7 @@ IN: channels.examples
     prime newc (sieve) ;
 
 : sieve ( prime -- )
-    #! Send prime numbers to 'prime' channel
+    ! Send prime numbers to 'prime' channel
     <channel> dup [ counter ] curry "Counter" spawn drop
     (sieve) ;
 

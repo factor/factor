@@ -92,7 +92,7 @@ M: object modify-form drop f ;
 CONSTANT: nested-forms-key "__n"
 
 : referrer ( -- referrer/f )
-    #! Typo is intentional, it's in the HTTP spec!
+    ! Typo is intentional, it's in the HTTP spec!
     request get "referer" header
     dup [ >url ensure-port [ remap-port ] change-port ] when ;
 

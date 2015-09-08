@@ -148,8 +148,8 @@ M: windows (kill-process) ( process -- )
     handle>> hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
-    #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
-    #! with CloseHandle when they are no longer needed."
+    ! From MSDN: "Handles in PROCESS_INFORMATION must be closed
+    ! with CloseHandle when they are no longer needed."
     [ hProcess>> [ CloseHandle drop ] when* ]
     [ hThread>> [ CloseHandle drop ] when* ] bi ;
 

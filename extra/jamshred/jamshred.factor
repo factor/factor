@@ -43,11 +43,11 @@ M: jamshred-gadget ungraft* ( gadget -- )
     / pi 4 * * ; ! 2 / / pi 2 * * ;
 
 : x>radians ( x gadget -- theta )
-    #! translate motion of x pixels to an angle
+    ! translate motion of x pixels to an angle
     dim>> first pix>radians neg ;
 
 : y>radians ( y gadget -- theta )
-    #! translate motion of y pixels to an angle
+    ! translate motion of y pixels to an angle
     dim>> second pix>radians ;
 
 : (handle-mouse-motion) ( jamshred-gadget mouse-motion -- )

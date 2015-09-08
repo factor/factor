@@ -15,7 +15,7 @@ USING:
 IN: cpu.8080.test
 
 : step ( cpu -- )
-  #! Run a single 8080 instruction
+  ! Run a single 8080 instruction
   [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions nth call( cpu -- ) ] keep
@@ -47,7 +47,7 @@ IN: cpu.8080.test
   [ 8 <bits> ] dip each ; inline
 
 : >ppm ( cpu filename -- cpu )
-  #! Dump the current screen image to a ppm image file with the given name.
+  ! Dump the current screen image to a ppm image file with the given name.
   ascii [
     "P3" print
     "256 224" print

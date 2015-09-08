@@ -8,7 +8,7 @@ IN: io.sniffer.filter.bsd
 ! http://www.iana.org/assignments/ethernet-numbers
 
 : bpf-align ( n -- n' )
-    #! Align to next higher word size
+    ! Align to next higher word size
     "long" heap-size align ;
 
 M: unix-io packet. ( string -- )

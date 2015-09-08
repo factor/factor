@@ -224,7 +224,7 @@ M: windows file-systems ( -- array )
     ] with-destructors ;
 
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )
-    #! timestamp order: creation access write
+    ! timestamp order: creation access write
     [
         [
             normalize-path open-existing &dispose handle>>

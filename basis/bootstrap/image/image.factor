@@ -112,7 +112,7 @@ SYMBOL: special-objects
     [ length test-quot call ] [ % ] bi ; inline
 
 : make-jit ( quot -- parameters literals code )
-    #! code is a { relocation insns } pair
+    ! code is a { relocation insns } pair
     [
         0 extra-offset set
         init-relocation
@@ -212,7 +212,7 @@ GENERIC: prepare-object ( obj -- ptr )
 : bignum-radix ( -- n ) bignum-bits 2^ 1 - ;
 
 : bignum>sequence ( n -- seq )
-    #! n is positive or zero.
+    ! n is positive or zero.
     [ dup 0 > ]
     [ [ bignum-bits neg shift ] [ bignum-radix bitand ] bi ]
     produce nip ;
@@ -232,8 +232,8 @@ M: bignum prepare-object
 ! Fixnums
 
 M: fixnum prepare-object
-    #! When generating a 32-bit image on a 64-bit system,
-    #! some fixnums should be bignums.
+    ! When generating a 32-bit image on a 64-bit system,
+    ! some fixnums should be bignums.
     dup
     bootstrap-most-negative-fixnum
     bootstrap-most-positive-fixnum between?
@@ -346,8 +346,8 @@ M: wrapper prepare-object
     ] emit-object ;
 
 M: string prepare-object
-    #! We pool strings so that each string is only written once
-    #! to the image
+    ! We pool strings so that each string is only written once
+    ! to the image
     [ emit-string ] cache-eql-object ;
 
 : assert-empty ( seq -- )
