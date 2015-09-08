@@ -81,8 +81,8 @@ PRIVATE>
     ] seq* [ first >string ] action ;
 
 : (range-pattern) ( pattern -- string )
-    #! Given a range pattern, produce a string containing
-    #! all characters within that range.
+    ! Given a range pattern, produce a string containing
+    ! all characters within that range.
     [
         any-char ,
         [ CHAR: - = ] satisfy hide ,
@@ -93,14 +93,14 @@ PRIVATE>
     replace ;
 
 : range-pattern ( pattern -- parser )
-    #! 'pattern' is a set of characters describing the
-    #! parser to be produced. Any single character in
-    #! the pattern matches that character. If the pattern
-    #! begins with a ^ then the set is negated (the element
-    #! matches any character not in the set). Any pair of
-    #! characters separated with a dash (-) represents the
-    #! range of characters from the first to the second,
-    #! inclusive.
+    ! 'pattern' is a set of characters describing the
+    ! parser to be produced. Any single character in
+    ! the pattern matches that character. If the pattern
+    ! begins with a ^ then the set is negated (the element
+    ! matches any character not in the set). Any pair of
+    ! characters separated with a dash (-) represents the
+    ! range of characters from the first to the second,
+    ! inclusive.
     dup first CHAR: ^ = [
         rest (range-pattern) [ member? not ] curry satisfy
     ] [

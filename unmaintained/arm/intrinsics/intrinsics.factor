@@ -277,7 +277,7 @@ IN: cpu.arm.intrinsics
 } define-intrinsic
 
 : userenv ( reg -- )
-    #! Load the userenv pointer in a register.
+    ! Load the userenv pointer in a register.
     "userenv" f rot compile-dlsym ;
 
 \ getenv [

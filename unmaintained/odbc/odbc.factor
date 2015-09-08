@@ -115,7 +115,7 @@ SYMBOL: SQL-TYPE-UNKNOWN
   } case ;
 
 : succeeded? ( n -- bool )
-  #! Did the call succeed (SQL-SUCCESS or SQL-SUCCESS-WITH-INFO)
+  ! Did the call succeed (SQL-SUCCESS or SQL-SUCCESS-WITH-INFO)
   {
     { SQL-SUCCESS [ t ] }
     { SQL-SUCCESS-WITH-INFO [ t ] }

@@ -18,7 +18,7 @@ IN: xml.elements
     [ quoteless-attr ] take-interpolated ;
 
 : start-tag ( -- name ? )
-    #! Outputs the name and whether this is a closing tag
+    ! Outputs the name and whether this is a closing tag
     get-char CHAR: / eq? dup [ next ] when
     parse-name swap ;
 

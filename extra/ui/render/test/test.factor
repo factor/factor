@@ -23,7 +23,7 @@ M: line-test draw-interior
 SYMBOL: render-output
 
 : twiddle ( bytes -- bytes )
-    #! On Windows, white is { 253 253 253 } ?
+    ! On Windows, white is { 253 253 253 } ?
     [ 10 /i ] map ;
 
 : bitmap= ( bitmap1 bitmap2 -- ? )

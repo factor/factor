@@ -4,11 +4,11 @@ USING: assocs checksums grouping kernel locals math sequences ;
 IN: checksums.interleave
 
 : seq>2seq ( seq -- seq1 seq2 )
-    #! { abcdefgh } -> { aceg } { bdfh }
+    ! { abcdefgh } -> { aceg } { bdfh }
     2 group flip [ { } { } ] [ first2 ] if-empty ;
 
 : 2seq>seq ( seq1 seq2 -- seq )
-    #! { aceg } { bdfh } -> { abcdefgh }
+    ! { aceg } { bdfh } -> { abcdefgh }
     [ zip concat ] keep like ;
 
 :: interleaved-checksum ( bytes checksum -- seq )

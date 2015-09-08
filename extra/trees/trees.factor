@@ -151,8 +151,8 @@ DEFER: delete-node
     ] if* ;
 
 : prune-extremity ( node -- new-extremity )
-    #! remove and return the leftmost or rightmost child of this node.
-    #! assumes at least one child
+    ! remove and return the leftmost or rightmost child of this node.
+    ! assumes at least one child
     dup node-link (prune-extremity) ;
 
 : replace-with-child ( node -- node )
@@ -168,11 +168,11 @@ DEFER: delete-node
     ] if ;
 
 : delete-node-with-two-children ( node -- node )
-    #! randomised to minimise tree unbalancing
+    ! randomised to minimise tree unbalancing
     random-side [ replace-with-extremity ] with-side ;
 
 : delete-node ( node -- node )
-    #! delete this node, returning its replacement
+    ! delete this node, returning its replacement
     dup [ right>> ] [ left>> ] bi [
         swap [
             drop delete-node-with-two-children

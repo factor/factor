@@ -50,9 +50,9 @@ M: standard-generic effective-method
     [ [ literalize , ] [ , ] [ combination get #>> , { } , , ] tri* ] [ ] make ;
 
 M: standard-combination inline-cache-quots
-    #! Direct calls to the generic word (not tail calls or indirect calls)
-    #! will jump to the inline cache entry point instead of the megamorphic
-    #! dispatch entry point.
+    ! Direct calls to the generic word (not tail calls or indirect calls)
+    ! will jump to the inline cache entry point instead of the megamorphic
+    ! dispatch entry point.
     [ \ inline-cache-miss inline-cache-quot ]
     [ \ inline-cache-miss-tail inline-cache-quot ]
     2bi ;

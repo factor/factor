@@ -18,8 +18,8 @@ ERROR: no-host-name ;
 SYMBOL: current-git-id
 
 : short-running-process ( command -- )
-    #! Give network operations and shell commands at most
-    #! 30 minutes to complete, to catch hangs.
+    ! Give network operations and shell commands at most
+    ! 30 minutes to complete, to catch hangs.
     >process
         30 minutes >>timeout
         +new-group+ >>group
@@ -30,8 +30,8 @@ SYMBOL: current-git-id
     '[ drop @ f ] attempt-all drop ; inline
 
 : upload-process ( process -- )
-    #! Give network operations and shell commands at most
-    #! 30 minutes to complete, to catch hangs.
+    ! Give network operations and shell commands at most
+    ! 30 minutes to complete, to catch hangs.
     >process
         upload-timeout get >>timeout
         +new-group+ >>group

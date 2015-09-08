@@ -57,7 +57,7 @@ SYMBOL: cond-code
     cond-code set ;
 
 : CC> ( -- n )
-    #! Default value is 0b1110 AL (= always)
+    ! Default value is 0b1110 AL (= always)
     cond-code [ f ] change 0b1110 or ;
 
 : EQ ( -- ) 0b0000 >CC ;

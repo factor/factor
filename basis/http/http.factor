@@ -32,7 +32,7 @@ CONSTANT: max-redirects 10
     } cond ;
 
 : check-header-string ( str -- str )
-    #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
+    ! http://en.wikipedia.org/wiki/HTTP_Header_Injection
     dup "\r\n" intersects?
     [ "Header injection attack" throw ] when ;
 

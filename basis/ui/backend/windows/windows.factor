@@ -271,8 +271,8 @@ CONSTANT: window-control>ex-style
     [ get-RECT-top-left ] [ get-RECT-width/height ] bi ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
-    #! wParam and lParam are unused
-    #! only paint if width/height both > 0
+    ! wParam and lParam are unused
+    ! only paint if width/height both > 0
     3drop window relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
@@ -531,11 +531,11 @@ SYMBOL: nc-buttons
     wParam mouse-scroll hand-loc get-global hWnd window send-scroll ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
-    #! message sent if windows needs application to stop dragging
+    ! message sent if windows needs application to stop dragging
     4drop release-capture ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
-    #! message sent if mouse leaves main application
+    ! message sent if mouse leaves main application
     4drop forget-rollover ;
 
 : system-background-color ( -- color )

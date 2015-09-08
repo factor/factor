@@ -28,7 +28,7 @@ GENERIC# stream-json-print 1 ( obj stream -- )
     output-stream get stream-json-print ;
 
 : >json ( obj -- string )
-    #! Returns a string representing the factor object in JSON format
+    ! Returns a string representing the factor object in JSON format
     [ json-print ] with-string-writer ;
 
 M: f stream-json-print

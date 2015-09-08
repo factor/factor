@@ -67,7 +67,7 @@ TUPLE: email
 ERROR: bad-email-address email ;
 
 : validate-address ( string -- string' )
-    #! Make sure we send funky stuff to the server by accident.
+    ! Make sure we send funky stuff to the server by accident.
     dup "\r\n>" intersects?
     [ bad-email-address ] when ;
 

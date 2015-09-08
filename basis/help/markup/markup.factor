@@ -136,7 +136,7 @@ ALIAS: $slot $snippet
     ] ($code) ;
 
 : $unchecked-example ( element -- )
-    #! help-lint ignores these.
+    ! help-lint ignores these.
     $example ;
 
 : $markup-example ( element -- )

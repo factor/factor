@@ -41,11 +41,11 @@ ERROR: check-mixin-class-error class ;
     swap redefine-mixin-class ; inline
 
 : (add-mixin-instance) ( class mixin -- )
-    #! Call update-methods before adding the member:
-    #! - Call sites of generics specializing on 'mixin'
-    #! where the inferred type is 'class' are updated,
-    #! - Call sites where the inferred type is a subtype
-    #! of 'mixin' disjoint from 'class' are not updated
+    ! Call update-methods before adding the member:
+    ! - Call sites of generics specializing on 'mixin'
+    ! where the inferred type is 'class' are updated,
+    ! - Call sites where the inferred type is a subtype
+    ! of 'mixin' disjoint from 'class' are not updated
     dup class-usages {
         [ nip update-methods ]
         [ drop [ suffix ] change-mixin-class ]
@@ -54,11 +54,11 @@ ERROR: check-mixin-class-error class ;
     } 3cleave ;
 
 : (remove-mixin-instance) ( class mixin -- )
-    #! Call update-methods after removing the member:
-    #! - Call sites of generics specializing on 'mixin'
-    #! where the inferred type is 'class' are updated,
-    #! - Call sites where the inferred type is a subtype
-    #! of 'mixin' disjoint from 'class' are not updated
+    ! Call update-methods after removing the member:
+    ! - Call sites of generics specializing on 'mixin'
+    ! where the inferred type is 'class' are updated,
+    ! - Call sites where the inferred type is a subtype
+    ! of 'mixin' disjoint from 'class' are not updated
     dup class-usages {
         [ drop [ swap remove ] change-mixin-class ]
         [ drop "instances" word-prop delete-at ]

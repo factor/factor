@@ -18,11 +18,11 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     with-out-parameters ;
 
 : open-process-token ( -- handle )
-    #! remember to CloseHandle
+    ! remember to CloseHandle
     GetCurrentProcess (open-process-token) ;
 
 : with-process-token ( quot -- )
-    #! quot: ( token-handle -- token-handle )
+    ! quot: ( token-handle -- token-handle )
     [ open-process-token ] dip
     [ keep ] curry
     [ CloseHandle drop ] [ ] cleanup ; inline

@@ -9,8 +9,8 @@ TR: soundex-tr
     "00000000111122222222334556" ;
 
 : remove-duplicates ( seq -- seq' )
-    #! Remove _consecutive_ duplicates (unlike prune which removes
-    #! all duplicates).
+    ! Remove _consecutive_ duplicates (unlike prune which removes
+    ! all duplicates).
     [ 2 <clumps> [ = ] assoc-reject values ] [ first ] bi prefix ;
 
 : first>upper ( seq -- seq' ) 1 head >upper ;

@@ -926,8 +926,8 @@ PRIVATE>
     [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
 
 : (binary-reduce) ( seq start quot: ( elt1 elt2 -- newelt ) from length -- value )
-    #! We can't use case here since combinators depends on
-    #! sequences
+    ! We can't use case here since combinators depends on
+    ! sequences
     dup 4 < [
         integer>fixnum {
             [ 2drop nip ]

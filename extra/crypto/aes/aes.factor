@@ -11,9 +11,9 @@ CONSTANT: AES_BLOCK_SIZE 16
 #! FIPS-197 AES
 #! input block, state, output block -- 4 32-bit words
 CONSTANT: FIPS-197 {
-    { 128 10 } #! aes-128 -- Key(4) Block(4) Rounds(10)
-    { 192 12 } #! aes-192 -- Key(6) Block(4) Rounds(12)
-    { 256 14 } #! aes-256 -- Key(8) Block(4) Rounds(14)
+    { 128 10 } ! aes-128 -- Key(4) Block(4) Rounds(10)
+    { 192 12 } ! aes-192 -- Key(6) Block(4) Rounds(12)
+    { 256 14 } ! aes-256 -- Key(8) Block(4) Rounds(14)
 }
 
 <PRIVATE
@@ -156,7 +156,7 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
     [ dup 4th-from-end ] dip bitxor suffix! ; inline
 
 : (sched-interval) ( K Nr -- seq )
-    [ length ] dip 1 + 4 * [a,b) ;    #! over the interval Nk...Nb(Nr + 1)
+    [ length ] dip 1 + 4 * [a,b) ;    ! over the interval Nk...Nb(Nr + 1)
 
 : (init-round) ( out -- out temp quot )
     [ ]
@@ -211,16 +211,16 @@ SINGLETON: aes-encrypt
 #! rotate each row n times, transpose again, and then
 #! smash them back into 4-byte words.
 :: (shift-rows) ( c0 c1 c2 c3 -- c0' c1' c2' c3' )
-    c3 gb0   c2 gb1   c1 gb2   c0 gb3   >ui32   #! c0'
-    c0 gb0   c3 gb1   c2 gb2   c1 gb3   >ui32   #! c1'
-    c1 gb0   c0 gb1   c3 gb2   c2 gb3   >ui32   #! c2'
-    c2 gb0   c1 gb1   c0 gb2   c3 gb3   >ui32 ; #! c3'
+    c3 gb0   c2 gb1   c1 gb2   c0 gb3   >ui32   ! c0'
+    c0 gb0   c3 gb1   c2 gb2   c1 gb3   >ui32   ! c1'
+    c1 gb0   c0 gb1   c3 gb2   c2 gb3   >ui32   ! c2'
+    c2 gb0   c1 gb1   c0 gb2   c3 gb3   >ui32 ; ! c3'
 
 :: (unshift-rows) ( c0 c1 c2 c3 -- c0' c1' c2' c3' )
-    c1 gb0   c2 gb1   c3 gb2   c0 gb3   >ui32   #! c0'
-    c2 gb0   c3 gb1   c0 gb2   c1 gb3   >ui32   #! c1'
-    c3 gb0   c0 gb1   c1 gb2   c2 gb3   >ui32   #! c2'
-    c0 gb0   c1 gb1   c2 gb2   c3 gb3   >ui32 ; #! c3'
+    c1 gb0   c2 gb1   c3 gb2   c0 gb3   >ui32   ! c0'
+    c2 gb0   c3 gb1   c0 gb2   c1 gb3   >ui32   ! c1'
+    c3 gb0   c0 gb1   c1 gb2   c2 gb3   >ui32   ! c2'
+    c0 gb0   c1 gb1   c2 gb2   c3 gb3   >ui32 ; ! c3'
 
 : (add-round-key) ( key state -- state' )
    4 [ bitxor ] unrolled-2map ;

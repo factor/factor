@@ -18,13 +18,13 @@ M: cpu update-video
     3drop ;
 
 M: cpu read-port
-    #! Read a byte from the hardware port. 'port' should
-    #! be an 8-bit value.
+    ! Read a byte from the hardware port. 'port' should
+    ! be an 8-bit value.
     2drop 0 ;
 
 M: cpu write-port
-    #! Write a byte to the hardware port, where 'port' is
-    #! an 8-bit value.
+    ! Write a byte to the hardware port, where 'port' is
+    ! an 8-bit value.
     3drop ;
 
 CONSTANT: carry-flag        0x01
@@ -35,39 +35,39 @@ CONSTANT: zero-flag         0x40
 CONSTANT: sign-flag         0x80
 
 : >word< ( word -- byte byte )
-    #! Explode a word into its two 8 bit values.
+    ! Explode a word into its two 8 bit values.
     dup 0xFF bitand swap -8 shift 0xFF bitand swap ;
 
 : af>> ( cpu -- word )
-    #! Return the 16-bit pseudo register AF.
+    ! Return the 16-bit pseudo register AF.
     [ a>> 8 shift ] keep f>> bitor ;
 
 : af<< ( value cpu -- )
-    #! Set the value of the 16-bit pseudo register AF
+    ! Set the value of the 16-bit pseudo register AF
     [ >word< ] dip swap >>f swap >>a drop ;
 
 : bc>> ( cpu -- word )
-    #! Return the 16-bit pseudo register BC.
+    ! Return the 16-bit pseudo register BC.
     [ b>> 8 shift ] keep c>> bitor ;
 
 : bc<< ( value cpu -- )
-    #! Set the value of the 16-bit pseudo register BC
+    ! Set the value of the 16-bit pseudo register BC
     [ >word< ] dip swap >>c swap >>b drop ;
 
 : de>> ( cpu -- word )
-    #! Return the 16-bit pseudo register DE.
+    ! Return the 16-bit pseudo register DE.
     [ d>> 8 shift ] keep e>> bitor ;
 
 : de<< ( value cpu -- )
-    #! Set the value of the 16-bit pseudo register DE
+    ! Set the value of the 16-bit pseudo register DE
     [ >word< ] dip swap >>e swap >>d drop ;
 
 : hl>> ( cpu -- word )
-    #! Return the 16-bit pseudo register HL.
+    ! Return the 16-bit pseudo register HL.
     [ h>> 8 shift ] keep l>> bitor ;
 
 : hl<< ( value cpu -- )
-    #! Set the value of the 16-bit pseudo register HL
+    ! Set the value of the 16-bit pseudo register HL
     [ >word< ] dip swap >>l swap >>h drop ;
 
 : flag-set? ( flag cpu -- bool )
@@ -77,41 +77,41 @@ CONSTANT: sign-flag         0x80
     f>> bitand 0 = ;
 
 : flag-nz? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> zero-flag bitand 0 = ;
 
 : flag-z? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> zero-flag bitand 0 = not ;
 
 : flag-nc? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> carry-flag bitand 0 = ;
 
 : flag-c? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> carry-flag bitand 0 = not ;
 
 : flag-po? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> parity-flag bitand 0 =  ;
 
 : flag-pe? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> parity-flag bitand 0 = not ;
 
 : flag-p? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> sign-flag bitand 0 = ;
 
 : flag-m? ( cpu -- bool )
-    #! Test flag status
+    ! Test flag status
     f>> sign-flag bitand 0 = not ;
 
 : read-byte ( addr cpu -- byte )
-    #! Read one byte from memory at the specified address.
-    #! The address is 16-bit, but if a value greater than
-    #! 0xFFFF is provided then return a default value.
+    ! Read one byte from memory at the specified address.
+    ! The address is 16-bit, but if a value greater than
+    ! 0xFFFF is provided then return a default value.
     over 0xFFFF <= [
       ram>> nth
     ] [
@@ -119,13 +119,13 @@ CONSTANT: sign-flag         0x80
     ] if ;
 
 : read-word ( addr cpu -- word )
-    #! Read a 16-bit word from memory at the specified address.
-    #! The address is 16-bit, but if a value greater than
-    #! 0xFFFF is provided then return a default value.
+    ! Read a 16-bit word from memory at the specified address.
+    ! The address is 16-bit, but if a value greater than
+    ! 0xFFFF is provided then return a default value.
     [ read-byte ] 2keep [ 1 + ] dip read-byte 8 shift bitor ;
 
 : next-byte ( cpu -- byte )
-    #! Return the value of the byte at PC, and increment PC.
+    ! Return the value of the byte at PC, and increment PC.
     {
       [ pc>> ]
       [ read-byte ]
@@ -134,7 +134,7 @@ CONSTANT: sign-flag         0x80
     } cleave ;
 
 : next-word ( cpu -- word )
-    #! Return the value of the word at PC, and increment PC.
+    ! Return the value of the word at PC, and increment PC.
     [ pc>> ] keep
     [ read-word ] keep
     [ pc>> 2 + ] keep
@@ -142,7 +142,7 @@ CONSTANT: sign-flag         0x80
 
 
 : write-byte ( value addr cpu -- )
-    #! Write a byte to the specified memory address.
+    ! Write a byte to the specified memory address.
     over dup 0x2000 < swap 0xFFFF > or [
       3drop
     ] [
@@ -152,47 +152,47 @@ CONSTANT: sign-flag         0x80
 
 
 : write-word ( value addr cpu -- )
-    #! Write a 16-bit word to the specified memory address.
+    ! Write a 16-bit word to the specified memory address.
     [ >word< ] 2dip [ write-byte ] 2keep [ 1 + ] dip write-byte ;
 
 : cpu-a-bitand ( quot cpu -- )
-    #! A &= quot call
+    ! A &= quot call
     [ a>> swap call bitand ] keep a<< ; inline
 
 : cpu-a-bitor ( quot cpu -- )
-    #! A |= quot call
+    ! A |= quot call
     [ a>> swap call bitor ] keep a<< ; inline
 
 : cpu-a-bitxor ( quot cpu -- )
-    #! A ^= quot call
+    ! A ^= quot call
     [ a>> swap call bitxor ] keep a<< ; inline
 
 : cpu-a-bitxor= ( value cpu -- )
-    #! cpu-a ^= value
+    ! cpu-a ^= value
     [ a>> bitxor ] keep a<< ;
 
 : cpu-f-bitand ( quot cpu -- )
-    #! F &= quot call
+    ! F &= quot call
     [ f>> swap call bitand ] keep f<< ; inline
 
 : cpu-f-bitor ( quot cpu -- )
-    #! F |= quot call
+    ! F |= quot call
     [ f>> swap call bitor ] keep f<< ; inline
 
 : cpu-f-bitxor ( quot cpu -- )
-    #! F |= quot call
+    ! F |= quot call
     [ f>> swap call bitxor ] keep f<< ; inline
 
 : cpu-f-bitor= ( value cpu -- )
-    #! cpu-f |= value
+    ! cpu-f |= value
     [ f>> bitor ] keep f<< ;
 
 : cpu-f-bitand= ( value cpu -- )
-    #! cpu-f &= value
+    ! cpu-f &= value
     [ f>> bitand ] keep f<< ;
 
 : cpu-f-bitxor= ( value cpu -- )
-    #! cpu-f ^= value
+    ! cpu-f ^= value
     [ f>> bitxor ] keep f<< ;
 
 : set-flag ( cpu flag -- )
@@ -202,42 +202,42 @@ CONSTANT: sign-flag         0x80
      bitnot 0xFF bitand swap cpu-f-bitand= ;
 
 : update-zero-flag ( result cpu -- )
-    #! If the result of an instruction has the value 0, this
-    #! flag is set, otherwise it is reset.
+    ! If the result of an instruction has the value 0, this
+    ! flag is set, otherwise it is reset.
     swap 0xFF bitand 0 =
     [ zero-flag set-flag ]
     [ zero-flag clear-flag ] if ;
 
 : update-sign-flag ( result cpu -- )
-    #! If the most significant bit of the result
-    #! has the value 1 then the flag is set, otherwise
-    #! it is reset.
+    ! If the most significant bit of the result
+    ! has the value 1 then the flag is set, otherwise
+    ! it is reset.
     swap 0x80 bitand 0 =
     [ sign-flag clear-flag ]
     [ sign-flag set-flag ] if ;
 
 : update-parity-flag ( result cpu -- )
-    #! If the modulo 2 sum of the bits of the result
-    #! is 0, (ie. if the result has even parity) this flag
-    #! is set, otherwise it is reset.
+    ! If the modulo 2 sum of the bits of the result
+    ! is 0, (ie. if the result has even parity) this flag
+    ! is set, otherwise it is reset.
     swap 0xFF bitand 2 mod 0 =
     [ parity-flag set-flag ]
     [ parity-flag clear-flag ] if ;
 
 : update-carry-flag ( result cpu -- )
-    #! If the instruction resulted in a carry (from addition)
-    #! or a borrow (from subtraction or a comparison) out of the
-    #! higher order bit, this flag is set, otherwise it is reset.
+    ! If the instruction resulted in a carry (from addition)
+    ! or a borrow (from subtraction or a comparison) out of the
+    ! higher order bit, this flag is set, otherwise it is reset.
     swap dup 0x100 >= swap 0 < or
     [ carry-flag set-flag ]
     [ carry-flag clear-flag ] if ;
 
 : update-half-carry-flag ( original change-by result cpu -- )
-    #! If the instruction caused a carry out of bit 3 and into bit 4 of the
-    #! resulting value, the half carry flag is set, otherwise it is reset.
-    #! The 'original' is the original value of the register being changed.
-    #! 'change-by' is the amount it is being added or decremented by.
-    #! 'result' is the result of that change.
+    ! If the instruction caused a carry out of bit 3 and into bit 4 of the
+    ! resulting value, the half carry flag is set, otherwise it is reset.
+    ! The 'original' is the original value of the register being changed.
+    ! 'change-by' is the amount it is being added or decremented by.
+    ! 'result' is the result of that change.
     [ bitxor bitxor 0x10 bitand 0 = not ] dip swap
     [ half-carry-flag set-flag ]
     [ half-carry-flag clear-flag ] if ;
@@ -256,18 +256,18 @@ CONSTANT: sign-flag         0x80
     [ update-zero-flag ] 2tri ;
 
 : add-byte ( lhs rhs cpu -- result )
-    #! Add rhs to lhs
+    ! Add rhs to lhs
     [ 2dup + ] dip
     [ update-flags ] 2keep
     [ update-half-carry-flag ] 2keep
     drop 0xFF bitand ;
 
 : add-carry ( change-by result cpu -- change-by result )
-    #! Add the effect of the carry flag to the result
+    ! Add the effect of the carry flag to the result
     flag-c? [ 1 + [ 1 + ] dip ] when ;
 
 : add-byte-with-carry ( lhs rhs cpu -- result )
-    #! Add rhs to lhs plus carry.
+    ! Add rhs to lhs plus carry.
     [ 2dup + ] dip
     [ add-carry ] keep
     [ update-flags ] 2keep
@@ -275,18 +275,18 @@ CONSTANT: sign-flag         0x80
     drop 0xFF bitand ;
 
 : sub-carry ( change-by result cpu -- change-by result )
-    #! Subtract the effect of the carry flag from the result
+    ! Subtract the effect of the carry flag from the result
     flag-c? [ 1 - [ 1 - ] dip  ] when ;
 
 : sub-byte ( lhs rhs cpu -- result )
-    #! Subtract rhs from lhs
+    ! Subtract rhs from lhs
     [ 2dup - ] dip
     [ update-flags ] 2keep
     [ update-half-carry-flag ] 2keep
     drop 0xFF bitand ;
 
 : sub-byte-with-carry ( lhs rhs cpu -- result )
-    #! Subtract rhs from lhs and take carry into account
+    ! Subtract rhs from lhs and take carry into account
     [ 2dup - ] dip
     [ sub-carry ] keep
     [ update-flags ] 2keep
@@ -294,41 +294,41 @@ CONSTANT: sign-flag         0x80
     drop 0xFF bitand ;
 
 : inc-byte ( byte cpu -- result )
-    #! Increment byte by one. Note that carry flag is not affected
-    #! by this operation.
+    ! Increment byte by one. Note that carry flag is not affected
+    ! by this operation.
     [ 1 2dup + ] dip
     [ update-flags-no-carry ] 2keep
     [ update-half-carry-flag ] 2keep
     drop 0xFF bitand ;
 
 : dec-byte ( byte cpu -- result )
-    #! Decrement byte by one. Note that carry flag is not affected
-    #! by this operation.
+    ! Decrement byte by one. Note that carry flag is not affected
+    ! by this operation.
     [ 1 2dup - ] dip
     [ update-flags-no-carry ] 2keep
     [ update-half-carry-flag ] 2keep
     drop 0xFF bitand ;
 
 : inc-word ( w cpu -- w )
-    #! Increment word by one. Note that no flags are modified.
+    ! Increment word by one. Note that no flags are modified.
     drop 1 + 0xFFFF bitand ;
 
 : dec-word ( w cpu -- w )
-    #! Decrement word by one. Note that no flags are modified.
+    ! Decrement word by one. Note that no flags are modified.
     drop 1 - 0xFFFF bitand ;
 
 : add-word ( lhs rhs cpu -- result )
-    #! Add rhs to lhs. Note that only the carry flag is modified
-    #! and only if there is a carry out of the double precision add.
+    ! Add rhs to lhs. Note that only the carry flag is modified
+    ! and only if there is a carry out of the double precision add.
     [ + ] dip over 0xFFFF > [ carry-flag set-flag ] [ drop ] if 0xFFFF bitand ;
 
 : bit3or ( lhs rhs -- 0|1 )
-    #! bitor bit 3 of the two numbers on the stack
+    ! bitor bit 3 of the two numbers on the stack
     [ 0b00001000 bitand -3 shift ] bi@ bitor ;
 
 : and-byte ( lhs rhs cpu -- result )
-    #! Logically and rhs to lhs. The carry flag is cleared and
-    #! the half carry is set to the ORing of bits 3 of the operands.
+    ! Logically and rhs to lhs. The carry flag is cleared and
+    ! the half carry is set to the ORing of bits 3 of the operands.
     [ drop bit3or ] 3keep ! bit3or lhs rhs cpu
     [ bitand ] dip [ update-flags ] 2keep
     [ carry-flag clear-flag ] keep
@@ -336,31 +336,31 @@ CONSTANT: sign-flag         0x80
     0xFF bitand ;
 
 : xor-byte ( lhs rhs cpu -- result )
-    #! Logically xor rhs to lhs. The carry and half-carry flags are cleared.
+    ! Logically xor rhs to lhs. The carry and half-carry flags are cleared.
     [ bitxor ] dip [ update-flags ] 2keep
     half-carry-flag carry-flag bitor clear-flag
     0xFF bitand ;
 
 : or-byte ( lhs rhs cpu -- result )
-    #! Logically or rhs to lhs. The carry and half-carry flags are cleared.
+    ! Logically or rhs to lhs. The carry and half-carry flags are cleared.
     [ bitor ] dip [ update-flags ] 2keep
     half-carry-flag carry-flag bitor clear-flag
     0xFF bitand ;
 
 : decrement-sp ( n cpu -- )
-    #! Decrement the stackpointer by n.
+    ! Decrement the stackpointer by n.
     [ sp>> swap - ] keep sp<< ;
 
 : save-pc ( cpu -- )
-    #! Save the value of the PC on the stack.
+    ! Save the value of the PC on the stack.
     [ pc>> ] [ sp>> ] [ write-word ] tri ;
 
 : push-pc ( cpu -- )
-    #! Push the value of the PC on the stack.
+    ! Push the value of the PC on the stack.
     [ 2 swap decrement-sp ] [ save-pc ] bi ;
 
 : pop-pc ( cpu -- pc )
-    #! Pop the value of the PC off the stack.
+    ! Pop the value of the PC off the stack.
     [ sp>> ] [ read-word ] [ -2 swap decrement-sp ] tri ;
 
 : push-sp ( value cpu -- )
@@ -370,7 +370,7 @@ CONSTANT: sign-flag         0x80
     [ sp>> ] [ read-word ] [ -2 swap decrement-sp ] tri ;
 
 : call-sub ( addr cpu -- )
-    #! Call the address as a subroutine.
+    ! Call the address as a subroutine.
     dup push-pc
     [ 0xFFFF bitand ] dip pc<< ;
 
@@ -378,7 +378,7 @@ CONSTANT: sign-flag         0x80
     [ pop-pc ] keep pc<< ;
 
 : interrupt ( number cpu -- )
-    #! Perform a hardware interrupt
+    ! Perform a hardware interrupt
 !  "***Interrupt: " write over >hex print
     dup f>> interrupt-flag bitand 0 = not [
       dup push-pc
@@ -388,12 +388,12 @@ CONSTANT: sign-flag         0x80
     ] if ;
 
 : inc-cycles ( n cpu -- )
-    #! Increment the number of cpu cycles
+    ! Increment the number of cpu cycles
     [ cycles>> + ] keep cycles<< ;
 
 : instruction-cycles ( -- vector )
-    #! Return a 256 element vector containing the cycles for
-    #! each opcode in the 8080 instruction set.
+    ! Return a 256 element vector containing the cycles for
+    ! each opcode in the 8080 instruction set.
     \ instruction-cycles get-global [
       256 f <array> \ instruction-cycles set-global
     ] unless
@@ -403,8 +403,8 @@ CONSTANT: sign-flag         0x80
     drop ;
 
 : instructions ( -- vector )
-    #! Return a 256 element vector containing the emulation words for
-    #! each opcode in the 8080 instruction set.
+    ! Return a 256 element vector containing the emulation words for
+    ! each opcode in the 8080 instruction set.
     \ instructions get-global [
       256 [ not-implemented ] <array> \ instructions set-global
     ] unless
@@ -414,7 +414,7 @@ CONSTANT: sign-flag         0x80
     instructions set-nth ;
 
 M: cpu reset
-    #! Reset the CPU to its poweron state
+    ! Reset the CPU to its poweron state
     0 >>b
     0 >>c
     0 >>d
@@ -440,11 +440,11 @@ M: cpu reset
         2drop
     ] if* ;
 
-    #! Reads the ROM from stdin and stores it in ROM from
-    #! offset n.
+    ! Reads the ROM from stdin and stores it in ROM from
+    ! offset n.
 : load-rom ( filename cpu -- )
-    #! Load the contents of the file into ROM.
-    #! (address 0x0000-0x1FFF).
+    ! Load the contents of the file into ROM.
+    ! (address 0x0000-0x1FFF).
     ram>> swap binary [
         0 swap (load-rom)
     ] with-file-reader ;
@@ -457,10 +457,10 @@ SYMBOL: rom-root
     ] unless* ;
 
 : load-rom* ( seq cpu -- )
-    #! 'seq' is an array of arrays. Each array contains
-    #! an address and filename of a ROM file. The ROM
-    #! file will be loaded at the specified address. This
-    #! file path shoul dbe relative to the '/roms' resource path.
+    ! 'seq' is an array of arrays. Each array contains
+    ! an address and filename of a ROM file. The ROM
+    ! file will be loaded at the specified address. This
+    ! file path shoul dbe relative to the '/roms' resource path.
     rom-dir [
         ram>> [
             swap first2 rom-dir prepend-path binary [
@@ -474,8 +474,8 @@ SYMBOL: rom-root
     ] if ;
 
 : read-instruction ( cpu -- word )
-    #! Read the next instruction from the cpu's program
-    #! counter, and increment the program counter.
+    ! Read the next instruction from the cpu's program
+    ! counter, and increment the program counter.
     [ pc>> ] keep ! pc cpu
     [ over 1 + swap pc<< ] keep
     read-byte ;
@@ -483,8 +483,8 @@ SYMBOL: rom-root
 ERROR: undefined-8080-opcode n ;
 
 : get-cycles ( n -- opcode )
-    #! Returns the cycles for the given instruction value.
-    #! If the opcode is not defined throw an error.
+    ! Returns the cycles for the given instruction value.
+    ! If the opcode is not defined throw an error.
     dup instruction-cycles nth [
         nip
     ] [
@@ -492,7 +492,7 @@ ERROR: undefined-8080-opcode n ;
     ] if* ;
 
 : process-interrupts ( cpu -- )
-    #! Process any hardware interrupts
+    ! Process any hardware interrupts
     [ cycles>> ] keep
     over 16667 < [
         2drop
@@ -506,8 +506,8 @@ ERROR: undefined-8080-opcode n ;
     ] if ;
 
 : peek-instruction ( cpu -- word )
-    #! Return the next instruction from the cpu's program
-    #! counter, but don't increment the counter.
+    ! Return the next instruction from the cpu's program
+    ! counter, but don't increment the counter.
     [ pc>> ] keep read-byte instructions nth first ;
 
 : cpu. ( cpu -- )
@@ -544,9 +544,9 @@ ERROR: undefined-8080-opcode n ;
     } cleave ;
 
 : register-lookup ( string -- vector )
-    #! Given a string containing a register name, return a vector
-    #! where the 1st item is the getter and the 2nd is the setter
-    #! for that register.
+    ! Given a string containing a register name, return a vector
+    ! where the 1st item is the getter and the 2nd is the setter
+    ! for that register.
     H{
         { "A"  { a>>  a<<  } }
         { "B"  { b>>  b<<  } }
@@ -564,8 +564,8 @@ ERROR: undefined-8080-opcode n ;
 
 
 : flag-lookup ( string -- vector )
-    #! Given a string containing a flag name, return a vector
-    #! where the 1st item is a word that tests that flag.
+    ! Given a string containing a flag name, return a vector
+    ! where the 1st item is a word that tests that flag.
     H{
         { "NZ" { flag-nz?  } }
         { "NC" { flag-nc?  } }
@@ -591,7 +591,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     ] with deep-map ;
 
 : (emulate-RST) ( n cpu -- )
-    #! RST nn
+    ! RST nn
     [ sp>> 2 - dup ] keep ! sp sp cpu
     [ sp<< ] keep ! sp cpu
     [ pc>> ] keep ! sp pc cpu
@@ -599,7 +599,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     [ 8 * ] dip pc<< ;
 
 : (emulate-CALL) ( cpu -- )
-    #! 205 - CALL nn
+    ! 205 - CALL nn
     [ next-word 0xFFFF bitand ] keep ! addr cpu
     [ sp>> 2 - dup ] keep ! addr sp sp cpu
     [ sp<< ] keep ! addr sp cpu
@@ -608,58 +608,58 @@ SYMBOLS: $1 $2 $3 $4 ;
     pc<< ;
 
 : (emulate-RLCA) ( cpu -- )
-    #! The content of the accumulator is rotated left
-    #! one position. The low order bit and the carry flag
-    #! are both set to the value shifd out of the high
-    #! order bit position. Only the carry flag is affected.
+    ! The content of the accumulator is rotated left
+    ! one position. The low order bit and the carry flag
+    ! are both set to the value shifd out of the high
+    ! order bit position. Only the carry flag is affected.
     [ a>> -7 shift ] keep
     over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
     [ a>> 1 shift 0xFF bitand ] keep
     [ bitor ] dip a<< ;
 
 : (emulate-RRCA) ( cpu -- )
-    #! The content of the accumulator is rotated right
-    #! one position. The high order bit and the carry flag
-    #! are both set to the value shifd out of the low
-    #! order bit position. Only the carry flag is affected.
+    ! The content of the accumulator is rotated right
+    ! one position. The high order bit and the carry flag
+    ! are both set to the value shifd out of the low
+    ! order bit position. Only the carry flag is affected.
     [ a>> 1 bitand 7 shift ] keep
     over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
     [ a>> 254 bitand -1 shift ] keep
     [ bitor ] dip a<< ;
 
 : (emulate-RLA) ( cpu -- )
-    #! The content of the accumulator is rotated left
-    #! one position through the carry flag. The low
-    #! order bit is set equal to the carry flag and
-    #! the carry flag is set to the value shifd out
-    #! of the high order bit. Only the carry flag is
-    #! affected.
+    ! The content of the accumulator is rotated left
+    ! one position through the carry flag. The low
+    ! order bit is set equal to the carry flag and
+    ! the carry flag is set to the value shifd out
+    ! of the high order bit. Only the carry flag is
+    ! affected.
     [ carry-flag swap flag-set? [ 1 ] [ 0 ] if ] keep
     [ a>> 127 bitand 7 shift ] keep
     dup a>> 128 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
     [ bitor ] dip a<< ;
 
 : (emulate-RRA) ( cpu -- )
-    #! The content of the accumulator is rotated right
-    #! one position through the carry flag. The high order
-    #! bit is set to the carry flag and the carry flag is
-    #! set to the value shifd out of the low order bit.
-    #! Only the carry flag is affected.
+    ! The content of the accumulator is rotated right
+    ! one position through the carry flag. The high order
+    ! bit is set to the carry flag and the carry flag is
+    ! set to the value shifd out of the low order bit.
+    ! Only the carry flag is affected.
     [ carry-flag swap flag-set? [ 0b10000000 ] [ 0 ] if ] keep
     [ a>> 254 bitand -1 shift ] keep
     dup a>> 1 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
     [ bitor ] dip a<< ;
 
 : (emulate-CPL) ( cpu -- )
-    #! The contents of the accumulator are complemented
-    #! (zero bits become one, one bits becomes zero).
-    #! No flags are affected.
+    ! The contents of the accumulator are complemented
+    ! (zero bits become one, one bits becomes zero).
+    ! No flags are affected.
     0xFF swap cpu-a-bitxor= ;
 
 : (emulate-DAA) ( cpu -- )
-    #! The eight bit number in the accumulator is
-    #! adjusted to form two four-bit binary-coded-decimal
-    #! digits.
+    ! The eight bit number in the accumulator is
+    ! adjusted to form two four-bit binary-coded-decimal
+    ! digits.
     [
         dup half-carry-flag swap flag-set? swap
         a>> 0b1111 bitand 9 > or [ 6 ] [ 0 ] if
@@ -676,7 +676,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     swap 0xFF bitand swap a<< ;
 
 : patterns ( -- hashtable )
-    #! table of code quotation patterns for each type of instruction.
+    ! table of code quotation patterns for each type of instruction.
     H{
         { "NOP" [ drop ] }
         { "RET-NN" [ ret-from-sub ] }
@@ -756,59 +756,59 @@ SYMBOLS: $1 $2 $3 $4 ;
     } ;
 
 : 8-bit-registers ( -- parser )
-    #! A parser for 8-bit registers. On a successfull parse the
-    #! parse tree contains a vector. The first item in the vector
-    #! is the getter word for that register with stack effect
-    #! ( cpu -- value ). The second item is the setter word with
-    #! stack effect ( value cpu -- ).
+    ! A parser for 8-bit registers. On a successfull parse the
+    ! parse tree contains a vector. The first item in the vector
+    ! is the getter word for that register with stack effect
+    ! ( cpu -- value ). The second item is the setter word with
+    ! stack effect ( value cpu -- ).
     <EBNF
         main=("A" | "B" | "C" | "D" | "E" | "H" | "L") => [[ register-lookup ]]
     EBNF> ;
 
 : all-flags ( -- parser )
-    #! A parser for 16-bit flags.
+    ! A parser for 16-bit flags.
     <EBNF
         main=("NZ" | "NC" | "PO" | "PE" | "Z" | "C" | "P" | "M") => [[ flag-lookup ]]
     EBNF> ;
 
 : 16-bit-registers ( -- parser )
-    #! A parser for 16-bit registers. On a successfull parse the
-    #! parse tree contains a vector. The first item in the vector
-    #! is the getter word for that register with stack effect
-    #! ( cpu -- value ). The second item is the setter word with
-    #! stack effect ( value cpu -- ).
+    ! A parser for 16-bit registers. On a successfull parse the
+    ! parse tree contains a vector. The first item in the vector
+    ! is the getter word for that register with stack effect
+    ! ( cpu -- value ). The second item is the setter word with
+    ! stack effect ( value cpu -- ).
     <EBNF
         main=("AF" | "BC" | "DE" | "HL" | "SP") => [[ register-lookup ]]
     EBNF> ;
 
 : all-registers ( -- parser )
-    #! Return a parser that can parse the format
-    #! for 8 bit or 16 bit registers.
+    ! Return a parser that can parse the format
+    ! for 8 bit or 16 bit registers.
     [ 16-bit-registers , 8-bit-registers , ] choice* ;
 
 : indirect ( parser -- parser )
-    #! Given a parser, return a parser which parses the original
-    #! wrapped in brackets, representing an indirect reference.
-    #! eg. BC -> (BC). The value of the original parser is left in
-    #! the parse tree.
+    ! Given a parser, return a parser which parses the original
+    ! wrapped in brackets, representing an indirect reference.
+    ! eg. BC -> (BC). The value of the original parser is left in
+    ! the parse tree.
     "(" ")" surrounded-by ;
 
 : generate-instruction ( vector string -- quot )
-    #! Generate the quotation for an instruction, given the instruction in
-    #! the 'string' and a vector containing the arguments for that instruction.
+    ! Generate the quotation for an instruction, given the instruction in
+    ! the 'string' and a vector containing the arguments for that instruction.
     patterns at replace-patterns ;
 
 : simple-instruction ( token -- parser )
-    #! Return a parser for then instruction identified by the token.
-    #! The parser return parses the token only and expects no additional
-    #! arguments to the instruction.
+    ! Return a parser for then instruction identified by the token.
+    ! The parser return parses the token only and expects no additional
+    ! arguments to the instruction.
     token [ '[ { } _ generate-instruction ] ] action ;
 
 : complex-instruction ( type token -- parser )
-    #! Return a parser for an instruction identified by the token.
-    #! The instruction is expected to take additional arguments by
-    #! being combined with other parsers. Then 'type' is used for a lookup
-    #! in a pattern hashtable to return the instruction quotation pattern.
+    ! Return a parser for an instruction identified by the token.
+    ! The instruction is expected to take additional arguments by
+    ! being combined with other parsers. Then 'type' is used for a lookup
+    ! in a pattern hashtable to return the instruction quotation pattern.
     token swap [ nip '[ _ generate-instruction ] ] curry action ;
 
 : no-params ( ast -- ast )
@@ -1164,7 +1164,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     ] seq* [ two-params ] action ;
 
 : LD-RR,NN-instruction ( -- parser )
-    #! LD BC,nn
+    ! LD BC,nn
     [
       "LD-RR,NN" "LD" complex-instruction ,
       16-bit-registers sp ,
@@ -1172,7 +1172,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     ] seq* [ one-param ] action ;
 
 : LD-R,N-instruction ( -- parser )
-    #! LD B,n
+    ! LD B,n
     [
       "LD-R,N" "LD" complex-instruction ,
       8-bit-registers sp ,
@@ -1187,7 +1187,7 @@ SYMBOLS: $1 $2 $3 $4 ;
     ] seq* [ one-param ] action ;
 
 : LD-(RR),R-instruction ( -- parser )
-    #! LD (BC),A
+    ! LD (BC),A
     [
       "LD-(RR),R" "LD" complex-instruction ,
       16-bit-registers indirect sp ,
@@ -1363,18 +1363,18 @@ SYMBOLS: $1 $2 $3 $4 ;
     ] choice* [ call( -- quot ) ] action ;
 
 : instruction-quotations ( string -- emulate-quot )
-    #! Given an instruction string, return the emulation quotation for
-    #! it. This will later be expanded to produce the disassembly and
-    #! assembly quotations.
+    ! Given an instruction string, return the emulation quotation for
+    ! it. This will later be expanded to produce the disassembly and
+    ! assembly quotations.
     8080-generator-parser parse ;
 
 SYMBOL: last-instruction
 SYMBOL: last-opcode
 
 : parse-instructions ( list -- )
-    #! Process the list of strings, which should make
-    #! up an 8080 instruction, and output a quotation
-    #! that would implement that instruction.
+    ! Process the list of strings, which should make
+    ! up an 8080 instruction, and output a quotation
+    ! that would implement that instruction.
     dup " " join instruction-quotations
     [
        "_" join [ "emulate-" % % ] "" make create-word-in
@@ -1384,10 +1384,10 @@ SYMBOL: last-opcode
 SYNTAX: INSTRUCTION: ";" parse-tokens parse-instructions ;
 
 SYNTAX: cycles:
-    #! Set the number of cycles for the last instruction that was defined.
+    ! Set the number of cycles for the last instruction that was defined.
     scan-token string>number last-opcode get-global instruction-cycles set-nth ;
 
 SYNTAX: opcode:
-    #! Set the opcode number for the last instruction that was defined.
+    ! Set the opcode number for the last instruction that was defined.
     last-instruction get-global 1quotation scan-token hex>
     dup last-opcode set-global set-instruction ;

@@ -5,8 +5,8 @@ io prettyprint ;
 IN: benchmark.fannkuch
 
 : count ( quot: ( -- ? ) -- n )
-    #! Call quot until it returns false, return number of times
-    #! it was true
+    ! Call quot until it returns false, return number of times
+    ! it was true
     [ 0 ] dip '[ _ dip swap [ [ 1 + ] when ] keep ] loop ; inline
 
 : count-flips ( perm -- flip# )

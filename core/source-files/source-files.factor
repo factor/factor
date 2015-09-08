@@ -67,7 +67,7 @@ SYMBOL: current-source-file
         swap >>error rethrow ;
 
 : with-source-file ( name quot -- )
-    #! Should be called from inside with-compilation-unit.
+    ! Should be called from inside with-compilation-unit.
     [
         [
             path>source-file

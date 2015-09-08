@@ -42,9 +42,9 @@ M: anonymous-intersection add-depends-on-class
     participants>> [ add-depends-on-class ] each ;
 
 M: #declare propagate-before
-    #! We need to force the caller word to recompile when the
-    #! classes mentioned in the declaration are redefined, since
-    #! now we're making assumptions about their definitions.
+    ! We need to force the caller word to recompile when the
+    ! classes mentioned in the declaration are redefined, since
+    ! now we're making assumptions about their definitions.
     declaration>> [
         [ add-depends-on-class ]
         [ <class-info> swap refine-value-info ]
@@ -121,9 +121,9 @@ ERROR: invalid-outputs #call infos ;
     if ;
 
 : propagate-predicate ( #call word -- infos )
-    #! We need to force the caller word to recompile when the class
-    #! is redefined, since now we're making assumptions but the
-    #! class definition itself.
+    ! We need to force the caller word to recompile when the class
+    ! is redefined, since now we're making assumptions but the
+    ! class definition itself.
     [ in-d>> first value-info ]
     [ "predicating" word-prop ] bi*
     [ nip add-depends-on-conditionally ]

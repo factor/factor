@@ -61,7 +61,7 @@ PRIVATE>
 <PRIVATE
 
 :: ((kth-object)) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
-    #! Wirth's method, Algorithm's + Data structues = Programs p. 84
+    ! Wirth's method, Algorithm's + Data structues = Programs p. 84
     k seq bounds-check 2drop
     0 :> i!
     0 :> j!
@@ -90,7 +90,7 @@ PRIVATE>
     k seq nth-unsafe ; inline
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
-    #! The algorithm modifiers seq, so we clone it
+    ! The algorithm modifiers seq, so we clone it
     [ >array ] 4dip ((kth-object)) ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )

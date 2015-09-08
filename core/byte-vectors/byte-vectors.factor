@@ -29,10 +29,10 @@ M: byte-vector equal?
 M: byte-vector contract 2drop ; inline
 
 M: byte-array like
-    #! If we have an byte-array, we're done.
-    #! If we have a byte-vector, and it's at full capacity,
-    #! we're done. Otherwise, call resize-byte-array, which is a
-    #! relatively fast primitive.
+    ! If we have an byte-array, we're done.
+    ! If we have a byte-vector, and it's at full capacity,
+    ! we're done. Otherwise, call resize-byte-array, which is a
+    ! relatively fast primitive.
     drop dup byte-array? [
         dup byte-vector? [
             [ length ] [ underlying>> ] bi

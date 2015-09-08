@@ -37,7 +37,7 @@ math.parser random webapps.continuation ;
 IN: webapps.numbers
 
 : web-print ( str -- )
-  #! Display the string in a web page.
+  ! Display the string in a web page.
   [
     swap dup
     <html>

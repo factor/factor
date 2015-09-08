@@ -245,7 +245,7 @@ This is the body of the second test.
     } cond nip [ process ] when ;
 
 :: mock-pop3-server ( promise -- )
-    #! Store the port we are running on in the promise.
+    ! Store the port we are running on in the promise.
     [
         [
             "127.0.0.1" 0 <inet4> utf8 <server> [

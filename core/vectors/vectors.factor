@@ -24,10 +24,10 @@ M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;
 
 M: array like
-    #! If we have an array, we're done.
-    #! If we have a vector, and it's at full capacity, we're done.
-    #! Otherwise, call resize-array, which is a relatively
-    #! fast primitive.
+    ! If we have an array, we're done.
+    ! If we have a vector, and it's at full capacity, we're done.
+    ! Otherwise, call resize-array, which is a relatively
+    ! fast primitive.
     drop dup array? [
         dup vector? [
             [ length ] [ underlying>> ] bi

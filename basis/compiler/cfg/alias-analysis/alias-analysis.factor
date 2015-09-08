@@ -30,14 +30,14 @@ SYMBOL: heap-ac
     acs>vregs get [ drop V{ } clone ] cache ;
 
 : vreg>ac ( vreg -- ac )
-    #! Only vregs produced by ##allot, ##peek and ##slot can
-    #! ever be used as valid inputs to ##slot and ##set-slot,
-    #! so we assert this fact by not giving alias classes to
-    #! other vregs.
+    ! Only vregs produced by ##allot, ##peek and ##slot can
+    ! ever be used as valid inputs to ##slot and ##set-slot,
+    ! so we assert this fact by not giving alias classes to
+    ! other vregs.
     vregs>acs get [ heap-ac get [ ac>vregs push ] keep ] cache ;
 
 : aliases ( vreg -- vregs )
-    #! All vregs which may contain the same value as vreg.
+    ! All vregs which may contain the same value as vreg.
     vreg>ac ac>vregs ;
 
 : each-alias ( vreg quot -- )
@@ -66,14 +66,14 @@ SYMBOL: dead-stores
 ERROR: vreg-not-new vreg ;
 
 :: set-ac ( vreg ac -- )
-    #! Set alias class of newly-seen vreg.
+    ! Set alias class of newly-seen vreg.
     vreg vregs>acs get key? [ vreg vreg-not-new ] when
     ac vreg vregs>acs get set-at
     vreg ac ac>vregs push ;
 
 : live-slot ( slot#/f vreg -- vreg' )
-    #! If the slot number is unknown, we never reuse a previous
-    #! value.
+    ! If the slot number is unknown, we never reuse a previous
+    ! value.
     over [ live-slots get at at ] [ 2drop f ] if ;
 
 : load-constant-slot ( value slot# vreg -- )
@@ -83,12 +83,12 @@ ERROR: vreg-not-new vreg ;
     over [ load-constant-slot ] [ 3drop ] if ;
 
 : record-constant-slot ( slot# vreg -- )
-    #! A load can potentially read every store of this slot#
-    #! in that alias class.
+    ! A load can potentially read every store of this slot#
+    ! in that alias class.
     [ recent-stores get at delete-at ] with each-alias ;
 
 : record-computed-slot ( vreg -- )
-    #! Computed load is like a load of every slot touched so far
+    ! Computed load is like a load of every slot touched so far
     [ recent-stores get at clear-assoc ] each-alias ;
 
 :: remember-slot ( value slot# vreg -- )
@@ -171,8 +171,8 @@ M: vreg-insn analyze-aliases
     def-acs ;
 
 M: allocation-insn analyze-aliases
-    #! A freshly allocated object is distinct from any other
-    #! object.
+    ! A freshly allocated object is distinct from any other
+    ! object.
     dup dst>> set-new-ac ;
 
 M: ##box-displaced-alien analyze-aliases
@@ -188,8 +188,8 @@ M: read-insn analyze-aliases
     if ;
 
 : idempotent? ( value slot#/f vreg -- ? )
-    #! Are we storing a value back to the same slot it was read
-    #! from?
+    ! Are we storing a value back to the same slot it was read
+    ! from?
     live-slot = ;
 
 M:: write-insn analyze-aliases ( insn -- insn )
@@ -207,8 +207,8 @@ M:: write-insn analyze-aliases ( insn -- insn )
     insn ;
 
 M: ##copy analyze-aliases
-    #! The output vreg gets the same alias class as the input
-    #! vreg, since they both contain the same value.
+    ! The output vreg gets the same alias class as the input
+    ! vreg, since they both contain the same value.
     dup record-copy ;
 
 : useless-compare? ( insn -- ? )

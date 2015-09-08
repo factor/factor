@@ -92,8 +92,8 @@ M: object add-breakpoint ;
     ] when ; inline
 
 : change-frame ( continuation quot -- continuation' )
-    #! Applies quot to innermost call frame of the
-    #! continuation.
+    ! Applies quot to innermost call frame of the
+    ! continuation.
     [ clone ] dip '[ _ (change-frame) ] change-call ; inline
 
 PRIVATE>

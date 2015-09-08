@@ -64,7 +64,7 @@ M: single-combination make-default-method
 ! ! ! Build an engine ! ! !
 
 : find-default ( methods -- default )
-    #! Side-effects methods.
+    ! Side-effects methods.
     [ object bootstrap-word ] dip delete-at* [
         drop generic-word get "default-method" word-prop
     ] unless ;
@@ -108,9 +108,9 @@ TUPLE: tuple-dispatch-engine echelons ;
     [ ?set-at ] change-at ;
 
 : echelon-sort ( assoc -- assoc' )
-    #! Convert an assoc mapping classes to methods into an
-    #! assoc mapping echelons to assocs. The first echelon
-    #! is always there
+    ! Convert an assoc mapping classes to methods into an
+    ! assoc mapping echelons to assocs. The first echelon
+    ! is always there
     H{ { 0 f } } clone [ [ push-echelon ] curry assoc-each ] keep ;
 
 : copy-superclass-methods ( engine superclass assoc -- )
@@ -121,11 +121,11 @@ TUPLE: tuple-dispatch-engine echelons ;
     [ swapd copy-superclass-methods ] 2curry each ;
 
 : convert-tuple-inheritance ( assoc -- assoc' )
-    #! A method on a superclass A might have a higher precedence
-    #! than a method on a subclass B, if the methods are
-    #! defined on incomparable classes that happen to contain
-    #! A and B, respectively. Copy A's methods into B's set so
-    #! that they can be sorted and selected properly.
+    ! A method on a superclass A might have a higher precedence
+    ! than a method on a subclass B, if the methods are
+    ! defined on incomparable classes that happen to contain
+    ! A and B, respectively. Copy A's methods into B's set so
+    ! that they can be sorted and selected properly.
     dup dup [ copy-superclasses-methods ] curry assoc-each ;
 
 : <tuple-dispatch-engine> ( methods -- engine )

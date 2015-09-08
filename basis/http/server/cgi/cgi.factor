@@ -7,7 +7,7 @@ math.parser fry urls urls.encoding calendar make ;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
-    #! This needs some work.
+    ! This needs some work.
     [
         "CGI/1.0" "GATEWAY_INTERFACE" ,,
         "HTTP/" request get version>> append "SERVER_PROTOCOL" ,,

@@ -29,7 +29,7 @@ C: <multi-def> multi-def
 PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
-    #! Create a local variable identifier
+    ! Create a local variable identifier
     f <word>
     dup t "local?" set-word-prop ;
 

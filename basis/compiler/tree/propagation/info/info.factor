@@ -34,8 +34,8 @@ CONSTANT: null-info T{ value-info-state f null empty-interval }
 CONSTANT: object-info T{ value-info-state f object full-interval }
 
 : interval>literal ( class interval -- literal literal? )
-    #! If interval has zero length and the class is sufficiently
-    #! precise, we can turn it into a literal
+    ! If interval has zero length and the class is sufficiently
+    ! precise, we can turn it into a literal
     dup special-interval? [
         2drop f f
     ] [
@@ -60,7 +60,7 @@ DEFER: <literal-info>
 UNION: fixed-length array byte-array string ;
 
 : literal-class ( obj -- class )
-    #! Handle forgotten tuples and singleton classes properly
+    ! Handle forgotten tuples and singleton classes properly
     dup singleton-class? [
         class-of dup class? [
             drop tuple

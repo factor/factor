@@ -111,8 +111,8 @@ M: timestamp year. ( timestamp -- )
     } case ;
 
 : timestamp>rfc822 ( timestamp -- str )
-    #! RFC822 timestamp format
-    #! Example: Tue, 15 Nov 1994 08:12:31 +0200
+    ! RFC822 timestamp format
+    ! Example: Tue, 15 Nov 1994 08:12:31 +0200
     [
         [ (timestamp>string) bl ]
         [ gmt-offset>> write-gmt-offset ]
@@ -126,8 +126,8 @@ M: timestamp year. ( timestamp -- )
     ] with-string-writer ;
 
 : timestamp>http-string ( timestamp -- str )
-    #! http timestamp format
-    #! Example: Tue, 15 Nov 1994 08:12:31 GMT
+    ! http timestamp format
+    ! Example: Tue, 15 Nov 1994 08:12:31 GMT
     >gmt timestamp>rfc822 ;
 
 : (timestamp>cookie-string) ( timestamp -- )

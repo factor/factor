@@ -24,8 +24,8 @@ M: node delete-node drop ;
 GENERIC: cleanup-tree* ( node -- node/nodes )
 
 : cleanup-tree ( nodes -- nodes' )
-    #! We don't recurse into children here, instead the methods
-    #! do it since the logic is a bit more involved
+    ! We don't recurse into children here, instead the methods
+    ! do it since the logic is a bit more involved
     [ cleanup-tree* ] map-flat ;
 
 ! Constant folding
@@ -34,8 +34,8 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
     [ f ] [ [ literal?>> ] all? ] if-empty ;
 
 : (cleanup-folding) ( #call -- nodes )
-    #! Replace a #call having a known result with a #drop of its
-    #! inputs followed by #push nodes for the outputs.
+    ! Replace a #call having a known result with a #drop of its
+    ! inputs followed by #push nodes for the outputs.
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip <#push> ] 2map
@@ -114,8 +114,8 @@ M: #call cleanup-tree*
     ] change-children drop ;
 
 : fold-only-branch ( #branch -- node/nodes )
-    #! If only one branch is live we don't need to branch at
-    #! all; just drop the condition value.
+    ! If only one branch is live we don't need to branch at
+    ! all; just drop the condition value.
     dup live-children sift dup length {
         { 0 [ drop in-d>> <#drop> ] }
         { 1 [ first swap in-d>> <#drop> prefix ] }
@@ -152,7 +152,7 @@ M: #branch cleanup-tree*
     } case ;
 
 M: #phi cleanup-tree*
-    #! Remove #phi function inputs which no longer exist.
+    ! Remove #phi function inputs which no longer exist.
     live-branches get
     [ '[ _ sift-children ] change-phi-in-d ]
     [ '[ _ sift-children ] change-phi-info-d ]
@@ -163,14 +163,14 @@ M: #phi cleanup-tree*
 : >copy ( node -- #copy ) [ in-d>> ] [ out-d>> ] bi <#copy> ;
 
 : flatten-recursive ( #recursive -- nodes )
-    #! convert #enter-recursive and #return-recursive into
-    #! #copy nodes.
+    ! convert #enter-recursive and #return-recursive into
+    ! #copy nodes.
     child>>
     unclip >copy prefix
     unclip-last >copy suffix ;
 
 M: #recursive cleanup-tree*
-    #! Inline bodies of #recursive blocks with no calls left.
+    ! Inline bodies of #recursive blocks with no calls left.
     [ cleanup-tree ] change-child
     dup label>> calls>> empty? [ flatten-recursive ] when ;
 

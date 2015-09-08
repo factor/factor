@@ -35,10 +35,10 @@ ERROR: cairo-error n message ;
     ubyte-components >>component-type ; inline
 
 : dummy-cairo ( -- cr )
-    #! Sometimes we want a dummy context; eg with Pango, we want
-    #! to measure text dimensions to create a new image context with,
-    #! but we need an existing context to measure text dimensions
-    #! with so we use the dummy.
+    ! Sometimes we want a dummy context; eg with Pango, we want
+    ! to measure text dimensions to create a new image context with,
+    ! but we need an existing context to measure text dimensions
+    ! with so we use the dummy.
     \ dummy-cairo [
         CAIRO_FORMAT_ARGB32 0 0 cairo_image_surface_create
         cairo_create

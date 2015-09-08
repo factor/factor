@@ -262,9 +262,9 @@ TUPLE: flow < block ;
     flow new-block ;
 
 M: flow short-section? ( section -- ? )
-    #! If we can make room for this entire block by inserting
-    #! a newline, do it; otherwise, don't bother, print it as
-    #! a short section
+    ! If we can make room for this entire block by inserting
+    ! a newline, do it; otherwise, don't bother, print it as
+    ! a short section
     {
         [ section-fits? ]
         [ [ end>> 1 - ] [ start>> ] bi - text-fits? not ]

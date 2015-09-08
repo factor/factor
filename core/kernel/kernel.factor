@@ -78,9 +78,9 @@ GENERIC: execute ( word -- )
 DEFER: if
 
 : ? ( ? true false -- true/false )
-    #! 'if' and '?' can be defined in terms of each other
-    #! because the JIT special-cases an 'if' preceeded by
-    #! two literal quotations.
+    ! 'if' and '?' can be defined in terms of each other
+    ! because the JIT special-cases an 'if' preceeded by
+    ! two literal quotations.
     rot [ drop ] [ nip ] if ; inline
 
 : if ( ..a ? true: ( ..a -- ..b ) false: ( ..a -- ..b ) -- ..b ) ? call ;

@@ -139,13 +139,13 @@ TUPLE: simd-test-failure
     --
     failures
 )
-    #! Use test-quot to generate a bunch of test cases from the
-    #! given inputs. Run each test case optimized and
-    #! unoptimized. Compare results with eq-quot.
-    #!
-    #! seq: sequence of inputs
-    #! test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
-    #! eq-quot: ( result1 result2 -- ? )
+    ! Use test-quot to generate a bunch of test cases from the
+    ! given inputs. Run each test case optimized and
+    ! unoptimized. Compare results with eq-quot.
+    !
+    ! seq: sequence of inputs
+    ! test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
+    ! eq-quot: ( result1 result2 -- ? )
     seq [| input |
         input test-quot call :> ( input-quot code-quot )
         input-quot [ class-of ] { } map-as :> input-classes

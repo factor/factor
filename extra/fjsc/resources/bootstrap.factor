@@ -6,11 +6,11 @@ USE: kernel-internals
 "browser-dom" set-in
 
 : elements ( string -- result )
-  #! Call JQuery's $ function
+  ! Call JQuery's $ function
   window { "result" } "" "$" { "string" } alien-invoke ;
   
 : html ( string -- element ) 
-  #! Set the innerHTML of element using jQuery
+  ! Set the innerHTML of element using jQuery
   { } "" "html" { "string" } alien-invoke ;
 
 : bind-event ( name element quot -- )
@@ -35,5 +35,5 @@ USE: kernel-internals
   ] callcc0 ;
   
 : alert ( string -- )
-  #! Display the string in an alert box
+  ! Display the string in an alert box
   window { } "" "alert" { "string" } alien-invoke ;

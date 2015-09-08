@@ -34,7 +34,7 @@ INSTANCE: interactor input-stream
     thread>> thread-continuation ;
 
 : interactor-busy? ( interactor -- ? )
-    #! We're busy if there's no thread to resume.
+    ! We're busy if there's no thread to resume.
     {
         [ waiting>> ]
         [ thread>> dup [ thread-registered? ] when ]
@@ -233,7 +233,7 @@ M: listener-gadget focusable-child*
     input>> dup popup>> or ;
 
 : wait-for-listener ( listener -- )
-    #! Wait for the listener to start.
+    ! Wait for the listener to start.
     input>> flag>> wait-for-flag ;
 
 : listener-busy? ( listener -- ? )
@@ -420,7 +420,7 @@ interactor "completion" f {
     ] "Listener" spawn drop ;
 
 : restart-listener ( listener -- )
-    #! Returns when listener is ready to receive input.
+    ! Returns when listener is ready to receive input.
     {
         [ com-end ]
         [ clear-output ]

@@ -152,8 +152,8 @@ repeat-button H{
 } set-gestures
 
 : <repeat-button> ( label quot: ( button -- ) -- button )
-    #! Button that calls the quotation every 100ms as long as
-    #! the mouse is held down.
+    ! Button that calls the quotation every 100ms as long as
+    ! the mouse is held down.
     repeat-button new-button border-button-theme ;
 
 <PRIVATE

@@ -170,7 +170,7 @@ V{ 729683222 682545830 2885096840 164581180 2700803607 2287217841
    2893506291 435870753 684796225 1465647214 3491035560 3387827593
    3779005640 3059944614 }
 } [
-  HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c } #! AES-128 key expansion test vector from FIPS-197 (appendix)
+  HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c } ! AES-128 key expansion test vector from FIPS-197 (appendix)
         10 (expand-enc-key)
     ] unit-test
 

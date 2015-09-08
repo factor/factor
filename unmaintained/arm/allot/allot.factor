@@ -9,8 +9,8 @@ IN: cpu.arm.allot
 : load-zone-ptr ( reg -- ) "nursery" f rot %alien-global ;
 
 : %allot ( header size -- )
-    #! Store a pointer to 'size' bytes allocated from the
-    #! nursery in R11
+    ! Store a pointer to 'size' bytes allocated from the
+    ! nursery in R11
     8 align ! align the size
     R12 load-zone-ptr ! nusery -> r12
     R11 R12 cell <+> LDR ! nursery.here -> r11
@@ -25,17 +25,17 @@ IN: cpu.arm.allot
     >r dup fresh-object v>operand R11 r> tag-number ORR ;
 
 : %allot-bignum ( #digits -- )
-    #! 1 cell header, 1 cell length, 1 cell sign, + digits
-    #! length is the # of digits + sign
+    ! 1 cell header, 1 cell length, 1 cell sign, + digits
+    ! length is the # of digits + sign
     bignum over 3 + cells %allot
     R12 swap 1+ v>operand MOV ! compute the length
     R12 R11 cell <+> STR ! store the length
     ;
 
 : %allot-bignum-signed-1 ( dst src -- )
-    #! on entry, reg is a 30-bit quantity sign-extended to
-    #! 32-bits.
-    #! exits with tagged ptr to bignum in reg.
+    ! on entry, reg is a 30-bit quantity sign-extended to
+    ! 32-bits.
+    ! exits with tagged ptr to bignum in reg.
     [
         "end" define-label
         ! is it zero?

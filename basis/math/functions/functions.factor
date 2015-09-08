@@ -11,7 +11,7 @@ M: real sqrt
     [ neg fsqrt [ 0.0 ] dip rect> ] [ fsqrt ] if ; inline
 
 : factor-2s ( n -- r s )
-    #! factor an integer into 2^r * s
+    ! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
         [ 0 ] dip [ dup even? ] [ [ 1 + ] [ 2/ ] bi* ] while
     ] if ; inline

@@ -29,7 +29,7 @@ $nl
 ARTICLE: "syntax-comments" "Comments"
 { $subsections
     POSTPONE: !
-    POSTPONE: #!
+    POSTPONE: !
 } ;
 
 ARTICLE: "syntax-immediate" "Parse time evaluation"
@@ -664,9 +664,9 @@ HELP: !
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." } ;
 
-{ POSTPONE: ! POSTPONE: #! } related-words
+{ POSTPONE: ! POSTPONE: ! } related-words
 
-HELP: #!
+HELP: !
 { $syntax "#!comment..." }
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." }

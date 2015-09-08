@@ -5,8 +5,8 @@ prettyprint.custom prettyprint.sections sequences words ;
 IN: locals.prettyprint
 
 : pprint-var ( var -- )
-    #! Prettyprint a read/write local as its writer, just like
-    #! in the input syntax: [| x! | ... x 3 + x! ]
+    ! Prettyprint a read/write local as its writer, just like
+    ! in the input syntax: [| x! | ... x 3 + x! ]
     dup local-reader? [
         "local-writer" word-prop
     ] when pprint-word ;

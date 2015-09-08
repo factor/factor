@@ -53,7 +53,7 @@ M: #recursive escape-analysis* ( #recursive -- )
     ] bi ;
 
 M: #enter-recursive escape-analysis* ( #enter-recursive -- )
-    #! Handled by #recursive
+    ! Handled by #recursive
     drop ;
 
 M: #call-recursive escape-analysis* ( #call-label -- )

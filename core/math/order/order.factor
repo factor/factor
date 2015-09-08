@@ -8,7 +8,7 @@ SYMBOL: +eq+
 SYMBOL: +gt+
 
 : invert-comparison ( <=> -- >=< )
-    #! Can't use case, index or nth here
+    ! Can't use case, index or nth here
     dup +lt+ eq? [ drop +gt+ ] [ +eq+ eq? +eq+ +lt+ ? ] if ;
 
 GENERIC: <=> ( obj1 obj2 -- <=> )

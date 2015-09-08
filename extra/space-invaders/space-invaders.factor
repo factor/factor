@@ -20,7 +20,7 @@ CONSTANT: game-height 256
     game-height game-width 3 * * uchar <c-array> ;
 
 : bitmap-index ( point -- index )
-    #! Point is a {x y}.
+    ! Point is a {x y}.
     first2 game-width 3 * * swap 3 * + ;
 
 :: set-bitmap-pixel ( bitmap point color -- )
@@ -30,7 +30,7 @@ CONSTANT: game-height 256
     color third  index 2 + bitmap set-nth ;
 
 : get-bitmap-pixel ( point array -- color )
-    #! Point is a {x y}. color is a {r g b}
+    ! Point is a {x y}. color is a {r g b}
     [ bitmap-index ] dip
     [ nth ]
     [ [ 1 + ] dip nth ]
@@ -81,35 +81,35 @@ CONSTANT: SOUND-UFO-HIT      8
     swap sounds>> nth source-stop ;
 
 : read-port1 ( cpu -- byte )
-    #! Port 1 maps the keys for space invaders
-    #! Bit 0 = coin slot
-    #! Bit 1 = two players button
-    #! Bit 2 = one player button
-    #! Bit 4 = player one fire
-    #! Bit 5 = player one left
-    #! Bit 6 = player one right
+    ! Port 1 maps the keys for space invaders
+    ! Bit 0 = coin slot
+    ! Bit 1 = two players button
+    ! Bit 2 = one player button
+    ! Bit 4 = player one fire
+    ! Bit 5 = player one left
+    ! Bit 6 = player one right
     [ dup 0xFE bitand ] change-port1 drop ;
 
 : read-port2 ( cpu -- byte )
-    #! Port 2 maps player 2 controls and dip switches
-    #! Bit 0,1 = number of ships
-    #! Bit 2   = mode (1=easy, 0=hard)
-    #! Bit 4   = player two fire
-    #! Bit 5   = player two left
-    #! Bit 6   = player two right
-    #! Bit 7   = show or hide coin info
+    ! Port 2 maps player 2 controls and dip switches
+    ! Bit 0,1 = number of ships
+    ! Bit 2   = mode (1=easy, 0=hard)
+    ! Bit 4   = player two fire
+    ! Bit 5   = player two left
+    ! Bit 6   = player two right
+    ! Bit 7   = show or hide coin info
     [ port2i>> 0x8F bitand ]
     [ port1>> 0x70 bitand bitor ] bi ;
 
 : read-port3 ( cpu -- byte )
-    #! Used to compute a special formula
+    ! Used to compute a special formula
     [ port4hi>> 8 shift ] keep
     [ port4lo>> bitor ] keep
     port2o>> shift -8 shift 0xFF bitand ;
 
 M: space-invaders read-port
-    #! Read a byte from the hardware port. 'port' should
-    #! be an 8-bit value.
+    ! Read a byte from the hardware port. 'port' should
+    ! be an 8-bit value.
     swap {
         { 1 [ read-port1 ] }
         { 2 [ read-port2 ] }
@@ -118,7 +118,7 @@ M: space-invaders read-port
     } case ;
 
 : write-port2 ( value cpu -- )
-    #! Setting this value affects the value read from port 3
+    ! Setting this value affects the value read from port 3
     port2o<< ;
 
 :: bit-newly-set? ( old-value new-value bit -- bool )
@@ -131,12 +131,12 @@ M: space-invaders read-port
     [ port5o>> swap ] dip bit-newly-set? ;
 
 : write-port3 ( value cpu -- )
-    #! Connected to the sound hardware
-    #! Bit 0 = spaceship sound (looped)
-    #! Bit 1 = Shot
-    #! Bit 2 = Your ship hit
-    #! Bit 3 = Invader hit
-    #! Bit 4 = Extended play sound
+    ! Connected to the sound hardware
+    ! Bit 0 = spaceship sound (looped)
+    ! Bit 1 = Shot
+    ! Bit 2 = Your ship hit
+    ! Bit 3 = Invader hit
+    ! Bit 4 = Extended play sound
     over 0 bit? [
         dup looping?>> [
             dup SOUND-UFO play-invaders-sound
@@ -155,17 +155,17 @@ M: space-invaders read-port
     port3o<< ;
 
 : write-port4 ( value cpu -- )
-    #! Affects the value returned by reading port 3
+    ! Affects the value returned by reading port 3
     [ port4hi>> ] [ port4lo<< ] [ port4hi<< ] tri ;
 
 : write-port5 ( value cpu -- )
-    #! Plays sounds
-    #! Bit 0 = invaders sound 1
-    #! Bit 1 = invaders sound 2
-    #! Bit 2 = invaders sound 3
-    #! Bit 3 = invaders sound 4
-    #! Bit 4 = spaceship hit
-    #! Bit 5 = amplifier enabled/disabled
+    ! Plays sounds
+    ! Bit 0 = invaders sound 1
+    ! Bit 1 = invaders sound 2
+    ! Bit 2 = invaders sound 3
+    ! Bit 3 = invaders sound 4
+    ! Bit 4 = spaceship hit
+    ! Bit 5 = amplifier enabled/disabled
     2dup 0 port5-newly-set? [ dup SOUND-WALK1 play-invaders-sound ] when
     2dup 1 port5-newly-set? [ dup SOUND-WALK2 play-invaders-sound ] when
     2dup 2 port5-newly-set? [ dup SOUND-WALK3 play-invaders-sound ] when
@@ -174,8 +174,8 @@ M: space-invaders read-port
     port5o<< ;
 
 M: space-invaders write-port
-    #! Write a byte to the hardware port, where 'port' is
-    #! an 8-bit value.
+    ! Write a byte to the hardware port, where 'port' is
+    ! an 8-bit value.
     swap {
         { 2 [ write-port2 ] }
         { 3 [ write-port3 ] }
@@ -292,17 +292,17 @@ CONSTANT: green {   0 255   0 }
 CONSTANT: red   { 255   0   0 }
 
 : addr>xy ( addr -- point )
-    #! Convert video RAM address to base X Y value. point is a {x y}.
+    ! Convert video RAM address to base X Y value. point is a {x y}.
     0x2400 - ! n
     dup 0x1f bitand 8 * 255 swap - ! n y
     swap -5 shift swap 2array ;
 
 : plot-bitmap-pixel ( bitmap point color -- )
-    #! point is a {x y}. color is a {r g b}.
+    ! point is a {x y}. color is a {r g b}.
     set-bitmap-pixel ;
 
 : get-point-color ( point -- color )
-    #! Return the color to use for the given x/y position.
+    ! Return the color to use for the given x/y position.
     first2
     {
         { [ dup 184 238 between? pick 0 223 between? and ] [ 2drop green ] }
@@ -312,7 +312,7 @@ CONSTANT: red   { 255   0   0 }
     } cond ;
 
 : plot-bitmap-bits ( bitmap point byte bit -- )
-    #! point is a {x y}.
+    ! point is a {x y}.
     [ first2 ] 2dip
     dup swapd -1 * shift 1 bitand 0 =
     [ - 2array ] dip
@@ -330,15 +330,15 @@ M: space-invaders update-video
     ] if ;
 
 : sync-frame ( micros -- micros )
-    #! Sleep until the time for the next frame arrives.
+    ! Sleep until the time for the next frame arrives.
     16,667 + system:nano-count - dup 0 >
     [ 1,000 * threads:sleep ] [ drop threads:yield ] if
     system:nano-count ;
 
 : invaders-process ( micros gadget -- )
-    #! Run a space invaders gadget inside a
-    #! concurrent process. Messages can be sent to
-    #! signal key presses, etc.
+    ! Run a space invaders gadget inside a
+    ! concurrent process. Messages can be sent to
+    ! signal key presses, etc.
     dup quit?>> [
         2drop
     ] [

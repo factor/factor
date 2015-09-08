@@ -8,16 +8,16 @@ stack-checker.backend ;
 IN: compiler.tree.dead-code.recursive
 
 M: #enter-recursive compute-live-values*
-    #! If the output of an #enter-recursive is live, then the
-    #! corresponding inputs to the #call-recursive are live also.
+    ! If the output of an #enter-recursive is live, then the
+    ! corresponding inputs to the #call-recursive are live also.
     [ out-d>> ] [ recursive-phi-in ] bi look-at-phi ;
 
 M: #return-recursive compute-live-values*
     [ out-d>> ] [ in-d>> ] bi look-at-mapping ;
 
 M: #call-recursive compute-live-values*
-    #! If the output of a #call-recursive is live, then the
-    #! corresponding inputs to #return nodes are live also.
+    ! If the output of a #call-recursive is live, then the
+    ! corresponding inputs to #return nodes are live also.
     [ out-d>> ] [ label>> return>> in-d>> ] bi look-at-mapping ;
 
 :: drop-dead-inputs ( inputs outputs -- #shuffle )

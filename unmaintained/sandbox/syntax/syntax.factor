@@ -18,7 +18,7 @@ SYNTAX: APPLY: scan sandbox-use+ ;
 SYNTAX: APPLYING: ";" parse-tokens [ sandbox-use+ ] each ;
 
 REVEALING:
-    ! #!
+    ! !
     HEX: OCT: BIN: f t CHAR: "
     [ { T{
     ] } ;

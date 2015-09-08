@@ -197,8 +197,8 @@ M: world draw-world*
     } cleave ;
 
 : draw-world? ( world -- ? )
-    #! We don't draw deactivated worlds, or those with 0 size.
-    #! On Windows, the latter case results in GL errors.
+    ! We don't draw deactivated worlds, or those with 0 size.
+    ! On Windows, the latter case results in GL errors.
     { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
 
 TUPLE: world-error error world ;
