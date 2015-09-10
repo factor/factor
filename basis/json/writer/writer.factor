@@ -21,7 +21,7 @@ f json-escape-slashes? set-global
 SYMBOL: json-escape-unicode?
 f json-escape-unicode? set-global
 
-#! Writes the object out to a stream in JSON format
+! Writes the object out to a stream in JSON format
 GENERIC# stream-json-print 1 ( obj stream -- )
 
 : json-print ( obj -- )

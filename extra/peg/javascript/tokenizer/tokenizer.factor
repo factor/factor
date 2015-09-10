@@ -3,8 +3,8 @@
 USING: kernel sequences strings arrays math.parser peg peg.ebnf peg.javascript.ast ;
 IN: peg.javascript.tokenizer
 
-#! Grammar for JavaScript. Based on OMeta-JS example from:
-#! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
+! Grammar for JavaScript. Based on OMeta-JS example from:
+! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
 
 USE: prettyprint
 

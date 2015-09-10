@@ -109,7 +109,7 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
 :: (>ckf) ( rank suit -- n )
     rank rank suit rank card-bitfield ;
 
-#! Cactus Kev Format
+! Cactus Kev Format
 GENERIC: >ckf ( string -- n )
 
 M: string >ckf >upper 1 cut (>ckf) ;

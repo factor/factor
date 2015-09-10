@@ -186,8 +186,8 @@ M: or-parser parse ( input parser1 -- list )
 
 TUPLE: sp-parser p1 ;
 
-#! Return a parser that first skips all whitespace before
-#! calling the original parser.
+! Return a parser that first skips all whitespace before
+! calling the original parser.
 C: sp sp-parser
 
 M: sp-parser parse ( input parser -- list )

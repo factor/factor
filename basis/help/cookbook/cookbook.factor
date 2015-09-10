@@ -29,7 +29,6 @@ $nl
     "\"character strings\""
     "{ 1 2 3 }"
     "! by the way, this is a comment"
-    "#! and so is this"
 }
 { $references
     { "Factor's syntax can be extended, the parser can be called reflectively, and the " { $link . } " word is in fact a general facility for turning almost any object into a form which can be parsed back in again. If this interests you, consult the following sections:" }
@@ -238,7 +237,7 @@ command-line get [
 { $code "USE: regexp" "save" }
 "Now, the " { $snippet "grep.factor" } " script will start up much faster. See " { $link "images" } " for details."
 { $heading "Executable scripts" }
-"It is also possible to make executable scripts. A Factor file can begin with a comment like the following:"
+"It is also possible to make executable scripts. A Factor file can begin with a 'shebang' like the following:"
 { $code "#!/usr/bin/env factor" }
 "If the text file is made executable, then it can be run, assuming the " { $snippet "factor" } " binary is in your " { $snippet "$PATH" } "."
 { $references

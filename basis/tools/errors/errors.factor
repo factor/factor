@@ -5,8 +5,8 @@ summary accessors continuations make math.parser io.styles namespaces
 compiler.errors prettyprint source-files.errors.debugger command-line ;
 IN: tools.errors
 
-#! Tools for source-files.errors. Used by tools.tests and others
-#! for error reporting
+! Tools for source-files.errors. Used by tools.tests and others
+! for error reporting
 
 : errors. ( errors -- )
     group-by-source-file sort-errors

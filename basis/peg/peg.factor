@@ -86,11 +86,11 @@ SYMBOL: lrstack
 
 reset-pegs
 
-#! An entry in the table of memoized parse results
-#! ast = an AST produced from the parse
-#!       or the symbol 'fail'
-#!       or a left-recursion object
-#! pos = the position in the input string of this entry
+! An entry in the table of memoized parse results
+! ast = an AST produced from the parse
+!       or the symbol 'fail'
+!       or a left-recursion object
+! pos = the position in the input string of this entry
 TUPLE: memo-entry ans pos ;
 
 TUPLE: left-recursion seed rule-id head next ;

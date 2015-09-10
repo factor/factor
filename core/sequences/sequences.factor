@@ -278,7 +278,7 @@ INSTANCE: repetition immutable-sequence
 
 ERROR: integer-length-expected obj ;
 
-#! The check-length call forces partial dispatch
+! The check-length call forces partial dispatch
 : check-length ( n -- n )
     dup integer? [ integer-length-expected ] unless ; inline
 

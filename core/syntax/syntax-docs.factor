@@ -29,7 +29,6 @@ $nl
 ARTICLE: "syntax-comments" "Comments"
 { $subsections
     POSTPONE: !
-    POSTPONE: #!
 } ;
 
 ARTICLE: "syntax-immediate" "Parse time evaluation"
@@ -663,20 +662,6 @@ HELP: !
 { $syntax "! comment..." }
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." } ;
-
-{ POSTPONE: ! POSTPONE: #! } related-words
-
-HELP: #!
-{ $syntax "#!comment..." }
-{ $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." }
-{ $notes "To allow Unix-style \"shebang\" scripts to work as expected, " { $snippet "#!" } " is parsed as a separate token regardless of following whitespace if it appears at the beginning of a line."
-{ $example
-    "#!/usr/bin/env/factor"
-    "USING: io ;"
-    "\"Hello world\" print"
-    "Hello world"
-} } ;
 
 HELP: NAN:
 { $syntax "NAN: payload" }
