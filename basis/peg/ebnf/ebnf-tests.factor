@@ -516,7 +516,7 @@ foo=<foreign any-char> 'd'
   [ "fail" "foo" set "foo='a'" ebnf-parser parse transform drop t ] with-scope
 ] unit-test
 
-#! Tokenizer tests
+! Tokenizer tests
 { V{ "a" CHAR: b } } [
   "ab" [EBNF tokenizer=default foo="a" . EBNF]
 ] unit-test

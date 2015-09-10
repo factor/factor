@@ -50,8 +50,6 @@ IN: bootstrap.syntax
 
     "!" [ lexer get next-line ] define-core-syntax
 
-    "#!" [ POSTPONE: ! ] define-core-syntax
-
     "IN:" [ scan-token set-current-vocab ] define-core-syntax
 
     "<PRIVATE" [ begin-private ] define-core-syntax

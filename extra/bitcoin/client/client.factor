@@ -134,6 +134,6 @@ PRIVATE>
 : stop ( -- )
     "stop" { } bitcoin-request drop ;
 
-#! requires patched bitcoind
+! requires patched bitcoind
 :: list-transactions ( count include-generated -- seq )
     "listtransactions" { count include-generated } bitcoin-request ;

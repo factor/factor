@@ -4,7 +4,7 @@ USING: accessors byte-arrays.hex crypto.aes crypto.aes.private
 crypto.aes.utils grouping kernel sequences tools.test ;
 IN: crypto.aes.tests
 
-#! fips-197 test vectors
+! fips-197 test vectors
 CONSTANT: plaintext HEX{ 32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34 }
 CONSTANT: key HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c }
 
@@ -145,10 +145,10 @@ CONSTANT: key HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c }
     0x4141c382 0x9999b029 0x2d2d775a 0x0f0f111e 0xb0b0cb7b 0x5454fca8 0xbbbbd66d 0x16163a2c
 } } [ t-table ] unit-test
 
-#! NOT TESTED:
-#! ui32
-#! set-t
-#! set-d
+! NOT TESTED:
+! ui32
+! set-t
+! set-d
 
 { { 0x01020304 0x02030401 0x03040102 0x04010203 } } [
   { 0x01010101 0x02020202 0x03030303 0x04040404 } shift-rows

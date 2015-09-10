@@ -4,7 +4,7 @@ USING: kernel arrays strings math.parser sequences
 peg peg.ebnf peg.parsers memoize namespaces math ;
 IN: peg.pl0
 
-#! Grammar for PL/0 based on http://en.wikipedia.org/wiki/PL/0
+! Grammar for PL/0 based on http://en.wikipedia.org/wiki/PL/0
 
 EBNF: pl0
 

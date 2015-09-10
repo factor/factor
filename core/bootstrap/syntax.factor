@@ -10,7 +10,6 @@ IN: bootstrap.syntax
     {
         "!"
         "\""
-        "#!"
         "("
         ":"
         ";"

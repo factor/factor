@@ -113,10 +113,7 @@ DEFER: expression-parser
 
 : comment-parser ( -- parser )
     [
-        [
-            "#!" token sp ,
-            "!" token sp ,
-        ] choice* hide ,
+        "!" token hide ,
         [
             dup CHAR: \n = swap CHAR: \r = or not
         ] satisfy repeat0 ,

@@ -5,7 +5,7 @@ namespaces opengl opengl.gl sequences tetris.board tetris.game
 tetris.piece ui.render tetris.tetromino ui.gadgets colors ;
 IN: tetris.gl
 
-#! OpenGL rendering for tetris
+! OpenGL rendering for tetris
 
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;

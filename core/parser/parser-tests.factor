@@ -57,7 +57,7 @@ unit-test
 unit-test
 
 ! Test EOL comments in multiline strings.
-{ "Hello" } [ "#! This calls until-eol.\n\"Hello\"" eval( -- string ) ] unit-test
+{ "Hello" } [ "! This calls until-eol.\n\"Hello\"" eval( -- string ) ] unit-test
 
 { word } [ \ f class-of ] unit-test
 

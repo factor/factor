@@ -8,8 +8,8 @@ sequences.unrolled ;
 IN: crypto.aes
 
 CONSTANT: AES_BLOCK_SIZE 16
-#! FIPS-197 AES
-#! input block, state, output block -- 4 32-bit words
+! FIPS-197 AES
+! input block, state, output block -- 4 32-bit words
 CONSTANT: FIPS-197 {
     { 128 10 } ! aes-128 -- Key(4) Block(4) Rounds(10)
     { 192 12 } ! aes-192 -- Key(6) Block(4) Rounds(12)
@@ -61,19 +61,19 @@ CONSTANT: FIPS-197 {
     256 0 <array>
     dup 256 [ dup sbox nth rot set-nth ] with each-integer ;
 
-#! applies sbox to each byte of word
+! applies sbox to each byte of word
 : subword ( word -- word' )
     [ gb0 sbox nth ] keep [ gb1 sbox nth ] keep
     [ gb2 sbox nth ] keep gb3 sbox nth >ui32 ;
 
-#! applies inverse sbox to each byte of word
+! applies inverse sbox to each byte of word
 : inv-subword ( word -- word' )
     [ gb0 inv-sbox nth ] keep [ gb1 inv-sbox nth ] keep
     [ gb2 inv-sbox nth ] keep gb3 inv-sbox nth >ui32 ;
 
 : rotword ( n -- n ) 8 bitroll-32 ;
 
-#! round constants, 2^n over GF(2^8)
+! round constants, 2^n over GF(2^8)
 : rcon ( -- array )
     {
         0x00 0x01 0x02 0x04 0x08 0x10
@@ -82,12 +82,12 @@ CONSTANT: FIPS-197 {
 
 : (rcon-nth) ( n -- rcon[n] ) rcon nth 24 shift ;
 
-#! Galois field product related
+! Galois field product related
 : xtime ( x -- x' )
     [ 1 shift ]
     [ 0x80 bitand 0 = 0 0x1b ? ] bi bitxor 8 bits ;
 
-#! generate t-box
+! generate t-box
 :: set-t ( T i -- )
     i sbox nth :> a1
     a1 xtime :> a2
@@ -102,7 +102,7 @@ MEMO:: t-table ( -- array )
     1024 0 <array>
     dup 256 [ set-t ] with each-integer ;
 
-#! generate inverse t-box
+! generate inverse t-box
 :: set-d ( D i -- )
     i inv-sbox nth :> a1
     a1 xtime :> a2
@@ -132,8 +132,8 @@ MEMO:: d-table ( -- array )
 : t-transform ( a0 a1 a2 a3 -- word' ) t-table (transform) ;
 : d-transform ( a0 a1 a2 a3 -- word' ) d-table (transform) ;
 
-#! key schedule
-#! expands an 128/192/256 bit key into an 176/208/240 byte schedule
+! key schedule
+! expands an 128/192/256 bit key into an 176/208/240 byte schedule
 
 SYMBOL: aes-expand-inner
 HOOK: key-expand-round aes-expand-inner  ( temp i -- temp' )
@@ -166,8 +166,8 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
         6 > [ aes-256-key ] [ aes-128-key ] if
     ] tri ;
 
-#! K -- input key (byte-array), Nr -- number of rounds
-#! output: sched, Nb(Nr+1) byte key schedule
+! K -- input key (byte-array), Nr -- number of rounds
+! output: sched, Nb(Nr+1) byte key schedule
 : (expand-enc-key) ( K Nr -- sched )
     [ bytes>words ] dip
     [ drop (init-round) ]
@@ -182,7 +182,7 @@ TUPLE: aes-state nrounds key state ;
 
 : <aes> ( nrounds key state -- aes-state ) \ aes-state boa ;
 
-#! grabs the 4n...4(n+1) words of the key
+! grabs the 4n...4(n+1) words of the key
 : (key-at-nth-round) ( nth aes -- seq )
     [ 4 * dup 4 + ] [ key>> ] bi* <slice> ;
 
@@ -198,18 +198,18 @@ SINGLETON: aes-decrypt
 SINGLETON: aes-encrypt
 
 
-#! rotates the 2nd row left by one element
-#! rotates the 3rd row left by two elements
-#! rotates the 4th row left by three elements
-#!
-#! Kind of ugly because the algorithm is specified and
-#! implemented in terms of columns. This approach is very
-#! efficient in terms of execution and only requires one new
-#! word to implement.
-#!
-#! The alternative is to split into arrays of bytes, transpose,
-#! rotate each row n times, transpose again, and then
-#! smash them back into 4-byte words.
+! rotates the 2nd row left by one element
+! rotates the 3rd row left by two elements
+! rotates the 4th row left by three elements
+!
+! Kind of ugly because the algorithm is specified and
+! implemented in terms of columns. This approach is very
+! efficient in terms of execution and only requires one new
+! word to implement.
+!
+! The alternative is to split into arrays of bytes, transpose,
+! rotate each row n times, transpose again, and then
+! smash them back into 4-byte words.
 :: (shift-rows) ( c0 c1 c2 c3 -- c0' c1' c2' c3' )
     c3 gb0   c2 gb1   c1 gb2   c0 gb3   >ui32   ! c0'
     c0 gb0   c3 gb1   c2 gb2   c1 gb3   >ui32   ! c1'

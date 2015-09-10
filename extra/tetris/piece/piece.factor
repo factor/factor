@@ -3,9 +3,9 @@
 USING: accessors arrays kernel math math.vectors sequences tetris.tetromino lists.lazy ;
 IN: tetris.piece
 
-#! The rotation is an index into the tetromino's states array, and the
-#! position is added to the tetromino's blocks to give them their location on the
-#! tetris board. If the location is f then the piece is not yet on the board.
+! The rotation is an index into the tetromino's states array, and the
+! position is added to the tetromino's blocks to give them their location on the
+! tetris board. If the location is f then the piece is not yet on the board.
 
 TUPLE: piece
     { tetromino tetromino }
