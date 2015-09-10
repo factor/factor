@@ -224,6 +224,7 @@ unit-test
 { "0.0" } [ 0.0 >hex ] unit-test
 { "1.0p-1074" } [ 1 bits>double >hex ] unit-test
 { "-0.0" } [ -0.0 >hex ] unit-test
+[ "deadbeef" ] [ B{ 222 173 190 239 } >hex ] unit-test
 
 { "1.0p0" } [ 1.0 >bin ] unit-test
 { "1.1p2" } [ 6.0 >bin ] unit-test
