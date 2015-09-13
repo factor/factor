@@ -1,6 +1,6 @@
 USING: compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation cpu.architecture help.markup help.syntax
-math sequences ;
+kernel math sequences ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 HELP: <live-interval>
@@ -15,10 +15,19 @@ HELP: block-from
 { $values { "bb" basic-block } { "n" integer } }
 { $description "The instruction number immediately preceeding this block." } ;
 
+HELP: cfg>live-intervals
+{ $values { "cfg" cfg } { "live-intervals" sequence } }
+{ $description "The cfg is traversed in reverse linearization order." } ;
+
 HELP: cfg>sync-points
 { $values { "cfg" cfg } { "sync-points" sequence } }
 { $description "Creates a sequence of all sync points in the cfg." }
 { $see-also sync-point } ;
+
+HELP: compute-live-intervals
+{ $values { "cfg" cfg } { "intervals/sync-points" sequence } }
+{ $description "Computes the live intervals and sync points of a cfg." }
+{ $notes "The instructions must be numbered." } ;
 
 HELP: finish-live-intervals
 { $values { "live-intervals" sequence } }
@@ -26,6 +35,10 @@ HELP: finish-live-intervals
 
 HELP: from
 { $var-description "An integer representing a sequence number one lower than all numbers in the currently processed block." } ;
+
+HELP: intervals-intersect?
+{ $values { "interval1" live-interval } { "interval2" live-interval } { "?" boolean } }
+{ $description "Checks if two live intervals intersect each other." } ;
 
 HELP: live-interval-state
 { $class-description "A class encoding the \"liveness\" of a virtual register. It has the following slots:"
@@ -50,7 +63,7 @@ HELP: live-interval-state
         { "Inclusive ranges where the live interval is live. This is because the [start,end] interval can have gaps." }
     }
     {
-        { $slot "uses" } { "sequence of references to instructions that use the register in the live interval." }
+        { $slot "uses" } { "sequence of insn# numbers which reference insructions that use the register in the live interval." }
     }
     {
         { $slot "reg-class" }
@@ -62,12 +75,8 @@ HELP: live-interval-state
 }
 { $notes "The " { $slot "uses" } " and " { $slot "ranges" } " will never be empty because then the interval would be unused." } ;
 
-
 HELP: live-intervals
 { $var-description "Mapping from vreg to " { $link live-interval-state } "." } ;
-
-HELP: live-range
-{ $class-description "Represents a range in the " { $link cfg } " in which a vreg is live." } ;
 
 HELP: sync-point
 { $class-description "A location where all registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
@@ -84,12 +93,7 @@ ARTICLE: "compiler.cfg.linear-scan.live-intervals" "Live interval utilities"
 "This vocab contains words for managing live intervals."
 $nl
 "Liveness classes and constructors:"
-{ $subsections
-  <live-interval>
-  <live-range>
-  live-interval
-  live-range
-} ;
+{ $subsections <live-interval> live-interval } ;
 
 
 ABOUT: "compiler.cfg.linear-scan.live-intervals"

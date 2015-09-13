@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors binary-search combinators
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals fry hints kernel locals
-math math.order namespaces sequences ;
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.ranges fry hints kernel locals math math.order
+namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.splitting
 
 : split-range ( live-range n -- before after )

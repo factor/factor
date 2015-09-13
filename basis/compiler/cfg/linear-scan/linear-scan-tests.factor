@@ -13,12 +13,13 @@ compiler.cfg.def-use
 compiler.cfg.comparisons
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.linear-scan
-compiler.cfg.linear-scan.numbering
-compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.spilling
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.numbering
+compiler.cfg.linear-scan.ranges
 compiler.cfg.linear-scan.debugger
 compiler.cfg.utilities ;
 IN: compiler.cfg.linear-scan.tests

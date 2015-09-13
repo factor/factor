@@ -2,24 +2,21 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs binary-search combinators
 compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.linearization compiler.cfg.liveness
-compiler.cfg.registers compiler.cfg.ssa.destruction.leaders cpu.architecture
-fry kernel locals math math.intervals math.order namespaces sequences ;
+compiler.cfg.linear-scan.ranges compiler.cfg.linearization
+compiler.cfg.liveness compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders cpu.architecture fry kernel locals math
+math.intervals math.order namespaces sequences ;
 IN: compiler.cfg.linear-scan.live-intervals
-
-TUPLE: live-range from to ;
-
-C: <live-range> live-range
 
 TUPLE: vreg-use n def-rep use-rep spill-slot? ;
 
 : <vreg-use> ( n -- vreg-use ) vreg-use new swap >>n ;
 
 TUPLE: live-interval-state
-vreg
-reg spill-to spill-rep reload-from reload-rep
-start end ranges uses
-reg-class ;
+    vreg
+    reg spill-to spill-rep reload-from reload-rep
+    start end ranges uses
+    reg-class ;
 
 : first-use ( live-interval -- use ) uses>> first ; inline
 
@@ -36,20 +33,8 @@ reg-class ;
     insn# uses last-use? [ insn# uses new-use ] unless*
     spill-slot? [ t >>spill-slot? ] when ;
 
-GENERIC: covers? ( insn# obj -- ? )
-
-M: f covers? 2drop f ;
-
-M: live-range covers? [ from>> ] [ to>> ] bi between? ;
-
-M: live-interval-state covers? ( insn# live-interval -- ? )
-    ranges>>
-    dup length 4 <= [
-        [ covers? ] with any?
-    ] [
-        [ drop ] [ [ from>> <=> ] with search nip ] 2bi
-        covers?
-    ] if ;
+: covers? ( n live-interval -- ? )
+    ranges>> ranges-cover? ;
 
 : (find-use) ( insn# live-interval -- vreg-use )
     uses>> [ n>> <=> ] with search nip ;
@@ -57,26 +42,6 @@ M: live-interval-state covers? ( insn# live-interval -- ? )
 :: find-use ( insn# live-interval -- vreg-use )
     insn# live-interval (find-use)
     dup [ dup n>> insn# = [ drop f ] unless ] when ;
-
-: add-new-range ( from to live-interval -- )
-    [ <live-range> ] dip ranges>> push ;
-
-: shorten-range ( n live-interval -- )
-    dup ranges>> empty?
-    [ dupd add-new-range ] [ ranges>> last from<< ] if ;
-
-: extend-range ( from to live-range -- )
-    ranges>> last
-    [ max ] change-to
-    [ min ] change-from
-    drop ;
-
-: extend-range? ( to live-interval -- ? )
-    ranges>> [ drop f ] [ last from>> >= ] if-empty ;
-
-: add-range ( from to live-interval -- )
-    2dup extend-range?
-    [ extend-range ] [ add-new-range ] if ;
 
 : <live-interval> ( vreg reg-class -- live-interval )
     \ live-interval-state new
@@ -104,19 +69,19 @@ M: insn compute-live-intervals* drop ;
 :: record-def ( vreg n spill-slot? -- )
     vreg live-interval :> live-interval
 
-    n live-interval shorten-range
+    n live-interval ranges>> shorten-ranges
     n live-interval spill-slot? (add-use) vreg rep-of >>def-rep drop ;
 
 :: record-use ( vreg n spill-slot? -- )
     vreg live-interval :> live-interval
 
-    from get n live-interval add-range
+    from get n live-interval ranges>> add-range
     n live-interval spill-slot? (add-use) vreg rep-of >>use-rep drop ;
 
 :: record-temp ( vreg n -- )
     vreg live-interval :> live-interval
 
-    n n live-interval add-range
+    n n live-interval ranges>> add-range
     n live-interval f (add-use) vreg rep-of >>def-rep drop ;
 
 M: vreg-insn compute-live-intervals* ( insn -- )
@@ -155,7 +120,7 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
 
 : handle-live-out ( bb -- )
     [ from get to get ] dip live-out keys
-    [ live-interval add-range ] 2with each ;
+    [ live-interval ranges>> add-range ] 2with each ;
 
 : compute-live-intervals-step ( bb -- )
     {
