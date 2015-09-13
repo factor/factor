@@ -1,8 +1,9 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.cfg.registers cpu.architecture
-kernel namespaces sequences tools.test ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
+compiler.cfg.registers cpu.architecture kernel namespaces sequences
+tools.test ;
 IN: compiler.cfg.linear-scan.allocation.spilling.tests
 
 : test-live-interval ( -- live-interval )

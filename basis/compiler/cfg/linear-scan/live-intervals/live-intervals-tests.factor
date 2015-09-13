@@ -1,35 +1,14 @@
-USING: arrays compiler.cfg compiler.cfg.instructions
+USING: accessors arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.numbering compiler.cfg.liveness
-compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
-compiler.cfg.utilities cpu.architecture kernel namespaces sequences
-tools.test ;
+compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.ranges
+compiler.cfg.liveness compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
+fry kernel namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.live-intervals.tests
 
-! add-range
-{
-    T{ live-interval-state
-       { vreg 5 }
-       { ranges V{ T{ live-range { from 5 } { to 12 } } } }
-       { uses V{ } }
-       { reg-class int-rep }
-    }
-} [
-    5 int-rep <live-interval> dup
-    { { 5 10 } { 8 12 } } [ first2 rot add-range ] with each
-] unit-test
-
-{
-    T{ live-interval-state
-       { vreg 5 }
-       { ranges V{ T{ live-range { from 5 } { to 12 } } } }
-       { uses V{ } }
-       { reg-class int-rep }
-    }
-} [
-    5 int-rep <live-interval> dup
-    { { 10 12 } { 5 10 } } [ first2 rot add-range ] with each
-] unit-test
+: <live-interval-for-ranges> ( ranges -- live-interval )
+    10 int-rep <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep
+    dup compute-start/end ;
 
 ! cfg>sync-points
 {
@@ -37,6 +16,16 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 } [
     V{ T{ ##call-gc } } insns>cfg
     [ number-instructions ] [ cfg>sync-points ] bi
+] unit-test
+
+! intervals-intersect?
+{ t f f } [
+    { { 4 20 } } <live-interval-for-ranges>
+    { { 8 12 } } <live-interval-for-ranges> intervals-intersect?
+    { { 9 20 } { 3 5 } } <live-interval-for-ranges>
+    { { 0 1 } { 7 8 } } <live-interval-for-ranges> intervals-intersect?
+    { { 3 5 } } <live-interval-for-ranges>
+    { { 7 8 } } <live-interval-for-ranges> intervals-intersect?
 ] unit-test
 
 ! handle-live-out

@@ -1,5 +1,6 @@
 USING: compiler.cfg.instructions compiler.cfg.linear-scan.allocation.splitting
-compiler.cfg.linear-scan.live-intervals cpu.architecture sequences tools.test ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
+cpu.architecture sequences tools.test ;
 IN: compiler.cfg.linear-scan.allocation.splitting.tests
 
 : test-interval-easy ( -- interval )

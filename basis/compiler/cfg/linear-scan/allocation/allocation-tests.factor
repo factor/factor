@@ -1,7 +1,8 @@
 USING: accessors compiler.cfg compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals cpu.architecture
-cpu.x86.assembler.operands heaps kernel namespaces system tools.test ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
+cpu.architecture cpu.x86.assembler.operands heaps kernel namespaces system
+tools.test ;
 IN: compiler.cfg.linear-scan.allocation.tests
 
 : interval-[30,46] ( -- live-interval )
