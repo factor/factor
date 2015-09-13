@@ -66,12 +66,8 @@ PRIVATE>
         ]
     } cleave ;
 
-SYMBOL: numbers
-
-: block-number ( bb -- n ) numbers get at ;
-
 : number-blocks ( bbs -- )
-    H{ } zip-index-as numbers set ;
+    [ >>number drop ] each-index ;
 
 : blocks>insns ( bbs -- insns )
     [ instructions>> ] map concat ;

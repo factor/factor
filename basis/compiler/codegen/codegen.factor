@@ -23,9 +23,7 @@ SYMBOL: labels
     labels get [ drop <label> ] cache ;
 
 : useless-branch? ( bb successor -- ? )
-    ! If our successor immediately follows us in linearization
-    ! order then we don't need to branch.
-    [ block-number ] bi@ 1 - = ; inline
+    [ number>> ] bi@ 1 - = ; inline
 
 : emit-branch ( bb successor -- )
     2dup useless-branch?

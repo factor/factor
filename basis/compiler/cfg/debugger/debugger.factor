@@ -59,11 +59,11 @@ M: insn insn. tuple>array but-last [
     ] interleave nl ;
 
 : block. ( bb -- )
-    "=== Basic block #" write dup block-number . nl
+    "=== Basic block #" write dup number>> . nl
     dup instructions>> [ insn. ] each nl
     successors>> [
         "Successors: " write
-        [ block-number unparse ] map ", " join print nl
+        [ number>> unparse ] map ", " join print nl
     ] unless-empty ;
 
 : cfg. ( cfg -- )
