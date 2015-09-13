@@ -64,7 +64,6 @@ template <typename TargetGeneration, typename Policy> struct collector {
   data_heap* data;
   code_heap* code;
   TargetGeneration* target;
-  gc_workhorse<TargetGeneration, Policy> workhorse;
   slot_visitor<gc_workhorse<TargetGeneration, Policy> > visitor;
   cell cards_scanned;
   cell decks_scanned;
@@ -76,8 +75,7 @@ template <typename TargetGeneration, typename Policy> struct collector {
         data(parent->data),
         code(parent->code),
         target(target),
-        workhorse(parent, target, policy),
-        visitor(parent, workhorse),
+        visitor(parent, gc_workhorse<TargetGeneration, Policy>(parent, target, policy)),
         cards_scanned(0),
         decks_scanned(0),
         code_blocks_scanned(0) {
