@@ -17,12 +17,15 @@ V{ } 2 test-bb
     0 get block>cfg linearization-order [ number>> ] map
 ] unit-test
 
-! (linearization-order)
-{ { 10 20 30 } } [
+: two-successors-cfg ( -- cfg )
     V{ } 10 insns>block
     [ V{ } 20 insns>block connect-bbs ] keep
     [ V{ } 30 insns>block connect-bbs ] keep
-    block>cfg (linearization-order) [ number>> ] map
+    block>cfg ;
+
+! (linearization-order)
+{ { 10 20 30 } } [
+    two-successors-cfg (linearization-order) [ number>> ] map
 ] unit-test
 
 { { 0 1 2 3 4 5 } } [
@@ -42,4 +45,9 @@ V{ } 2 test-bb
     HS{ } clone visited set
     V{ } 10 insns>block [ process-block ] V{ } make
     [ number>> ] map
+] unit-test
+
+! number-blocks
+{ { 0 1 2 } } [
+    two-successors-cfg linearization-order dup number-blocks [ number>> ] map
 ] unit-test
