@@ -56,57 +56,7 @@ V{
     1 live-intervals get at [ start>> ] [ end>> ] bi
 ] unit-test
 
-! Live range and interval splitting
-{
-    { T{ live-range f 1 10 } T{ live-range f 15 15 } }
-    { T{ live-range f 16 20 } }
-} [
-    {
-        T{ live-range f 1 10 }
-        T{ live-range f 15 20 }
-    } 15 split-ranges
-] unit-test
-
-{
-    { T{ live-range f 1 10 } T{ live-range f 15 16 } }
-    { T{ live-range f 17 20 } }
-} [
-    {
-        T{ live-range f 1 10 }
-        T{ live-range f 15 20 }
-    } 16 split-ranges
-] unit-test
-
-{
-    { T{ live-range f 1 10 } }
-    { T{ live-range f 15 20 } }
-} [
-    {
-        T{ live-range f 1 10 }
-        T{ live-range f 15 20 }
-    } 12 split-ranges
-] unit-test
-
-{
-    { T{ live-range f 1 10 } T{ live-range f 15 17 } }
-    { T{ live-range f 18 20 } }
-} [
-    {
-        T{ live-range f 1 10 }
-        T{ live-range f 15 20 }
-    } 17 split-ranges
-] unit-test
-
-[
-    { T{ live-range f 1 10 } } 0 split-ranges
-] must-fail
-
-{
-    { T{ live-range f 0 0 } }
-    { T{ live-range f 1 5 } }
-} [
-    { T{ live-range f 0 5 } } 0 split-ranges
-] unit-test
+! Live interval splitting
 
 cfg new 0 >>spill-area-size 4 >>spill-area-align cfg set
 H{ } spill-slots set
@@ -640,82 +590,6 @@ H{
     }
     H{ { int-regs { "A" } } }
     check-linear-scan
-] unit-test
-
-{ f } [
-    T{ live-range f 0 10 }
-    T{ live-range f 20 30 }
-    intersect-live-range
-] unit-test
-
-{ 10 } [
-    T{ live-range f 0 10 }
-    T{ live-range f 10 30 }
-    intersect-live-range
-] unit-test
-
-{ 5 } [
-    T{ live-range f 0 10 }
-    T{ live-range f 5 30 }
-    intersect-live-range
-] unit-test
-
-{ 5 } [
-    T{ live-range f 5 30 }
-    T{ live-range f 0 10 }
-    intersect-live-range
-] unit-test
-
-{ 5 } [
-    T{ live-range f 5 10 }
-    T{ live-range f 0 15 }
-    intersect-live-range
-] unit-test
-
-{ 50 } [
-    {
-        T{ live-range f 0 10 }
-        T{ live-range f 20 30 }
-        T{ live-range f 40 50 }
-    }
-    {
-        T{ live-range f 11 15 }
-        T{ live-range f 31 35 }
-        T{ live-range f 50 55 }
-    }
-    intersect-live-ranges
-] unit-test
-
-{ f } [
-    {
-        T{ live-range f 0 10 }
-        T{ live-range f 20 30 }
-        T{ live-range f 40 50 }
-    }
-    {
-        T{ live-range f 11 15 }
-        T{ live-range f 31 36 }
-        T{ live-range f 51 55 }
-    }
-    intersect-live-ranges
-] unit-test
-
-{ 5 } [
-    T{ live-interval-state
-       { start 0 }
-       { reg-class int-regs }
-       { end 10 }
-       { uses { 0 10 } }
-       { ranges V{ T{ live-range f 0 10 } } }
-    }
-    T{ live-interval-state
-       { start 5 }
-       { reg-class int-regs }
-       { end 10 }
-       { uses { 5 10 } }
-       { ranges V{ T{ live-range f 5 10 } } }
-    }
-    relevant-ranges intersect-live-ranges
 ] unit-test
 
 ! register-status had problems because it used map>assoc where the sequence

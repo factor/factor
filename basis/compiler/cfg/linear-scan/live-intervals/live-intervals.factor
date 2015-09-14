@@ -177,23 +177,8 @@ M: insn insn>sync-point drop f ;
 : relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )
     [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
 
-: intersect-live-range ( range1 range2 -- n/f )
-    2dup [ from>> ] bi@ > [ swap ] when
-    2dup [ to>> ] [ from>> ] bi* >= [ nip from>> ] [ 2drop f ] if ;
-
-: intersect-live-ranges ( ranges1 ranges2 -- n )
-    {
-        { [ over empty? ] [ 2drop f ] }
-        { [ dup empty? ] [ 2drop f ] }
-        [
-            2dup [ first ] bi@ intersect-live-range dup [ 2nip ] [
-                drop
-                2dup [ first from>> ] bi@ <
-                [ [ rest-slice ] dip ] [ rest-slice ] if
-                intersect-live-ranges
-            ] if
-        ]
-    } cond ;
+: intersect-intervals ( interval1 interval2 -- n/f )
+    relevant-ranges intersect-ranges ;
 
 : intervals-intersect? ( interval1 interval2 -- ? )
-    relevant-ranges intersect-live-ranges >boolean ; inline
+    intersect-intervals >boolean ; inline

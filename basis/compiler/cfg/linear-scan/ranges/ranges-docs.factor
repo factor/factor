@@ -1,5 +1,13 @@
-USING: compiler.cfg help.syntax help.markup ;
+USING: compiler.cfg help.syntax help.markup math ;
 IN: compiler.cfg.linear-scan.ranges
+
+HELP: intersect-range
+{ $values
+  { "range1" live-range }
+  { "range2" live-range }
+  { "n/f" { $link number } " or " { $link f } }
+}
+{ $description "First index for the ranges intersection, or f if they don't intersect." } ;
 
 HELP: live-range
 { $class-description "Represents a range in the " { $link cfg } " in which a vreg is live." } ;
