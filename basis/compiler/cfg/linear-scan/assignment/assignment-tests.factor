@@ -53,7 +53,7 @@ IN: compiler.cfg.linear-scan.assignment.tests
 
 { V{ T{ ##spill { src RAX } { rep int-rep } } } } [
     [
-        1234 int-regs <live-interval>
+        1234 <live-interval>
         RAX >>reg int-rep >>spill-rep
         insert-spill
     ] V{ } make
@@ -85,7 +85,7 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ] unit-test
 
 { 3 } [
-    { 50 90 95 120 } [ 25 int-regs <live-interval> 2array ] map >min-heap
+    { 50 90 95 120 } [ 25 <live-interval> 2array ] map >min-heap
     pending-interval-heap set 90 expire-old-intervals
     pending-interval-heap get heap-size
 ] unit-test

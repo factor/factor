@@ -6,7 +6,6 @@ IN: compiler.cfg.linear-scan.live-intervals
 HELP: <live-interval>
 { $values
   { "vreg" "virtual register" }
-  { "reg-class" "register class" }
   { "live-interval" live-interval-state }
 }
 { $description "Creates a new live interval for a virtual register. Initially the range is empty." } ;
@@ -77,6 +76,10 @@ HELP: live-interval-state
 
 HELP: live-intervals
 { $var-description "Mapping from vreg to " { $link live-interval-state } "." } ;
+
+HELP: record-temp
+{ $values { "vreg" number } { "n" number } }
+{ $description "Assigns the interval [n,n] to vreg:s live interval." } ;
 
 HELP: sync-point
 { $class-description "A location where all registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"

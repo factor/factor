@@ -7,7 +7,7 @@ fry kernel namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.live-intervals.tests
 
 : <live-interval-for-ranges> ( ranges -- live-interval )
-    10 int-rep <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep
+    10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep
     dup compute-start/end ;
 
 ! cfg>sync-points
@@ -42,7 +42,6 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
                { vreg 8 }
                { ranges V{ T{ live-range { from -10 } { to 23 } } } }
                { uses V{ } }
-               { reg-class int-regs }
             }
         }
         {
@@ -51,7 +50,6 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
                { vreg 9 }
                { ranges V{ T{ live-range { from -10 } { to 23 } } } }
                { uses V{ } }
-               { reg-class int-regs }
             }
         }
         {
@@ -60,7 +58,6 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
                { vreg 4 }
                { ranges V{ T{ live-range { from -10 } { to 23 } } } }
                { uses V{ } }
-               { reg-class int-regs }
             }
         }
     }
@@ -81,14 +78,12 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 } [
     T{ live-interval-state
        { start 0 }
-       { reg-class int-regs }
        { end 10 }
        { uses { 0 10 } }
        { ranges V{ T{ live-range f 0 10 } } }
     }
     T{ live-interval-state
        { start 5 }
-       { reg-class int-regs }
        { end 10 }
        { uses { 5 10 } }
        { ranges V{ T{ live-range f 5 10 } } }

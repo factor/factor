@@ -21,7 +21,7 @@ IN: compiler.cfg.linear-scan.allocation
     of [ 1/0. 2array ] map ;
 
 : register-status ( new registers -- free-pos )
-    over reg-class>> free-positions [
+    over interval-reg-class free-positions [
         [ inactive-positions ] [ active-positions ] 2bi
     ] keep alist-max ;
 

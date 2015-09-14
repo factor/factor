@@ -1,8 +1,8 @@
 USING: accessors compiler.cfg compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
-cpu.architecture cpu.x86.assembler.operands heaps kernel namespaces system
-tools.test ;
+compiler.cfg.registers cpu.architecture cpu.x86.assembler.operands heaps kernel
+namespaces system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.tests
 
 : interval-[30,46] ( -- live-interval )
@@ -16,20 +16,19 @@ IN: compiler.cfg.linear-scan.allocation.tests
              T{ vreg-use { n 46 } { use-rep double-rep } }
          }
        }
-       { reg-class int-regs }
     } clone ;
 
 : interval-[30,60] ( -- live-interval )
     T{ live-interval-state
        { vreg 25 }
        { start 30 } { end 60 }
-       { reg-class int-regs }
        { reg RAX }
     } ;
 
 cpu x86.64? [
     ! assign-registers
     { RAX } [
+        H{ { 49 int-rep } } representations set
         f machine-registers init-allocator
         interval-[30,46] dup machine-registers assign-register reg>>
     ] unit-test
@@ -42,6 +41,7 @@ cpu x86.64? [
 
     { { RBX 1/0. } } [
         f machine-registers init-allocator
+        H{ { 25 int-rep } { 49 int-rep } } representations set
         interval-[30,60] add-active
         interval-[30,46] machine-registers register-status
     ] unit-test

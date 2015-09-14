@@ -15,8 +15,7 @@ TUPLE: vreg-use n def-rep use-rep spill-slot? ;
 TUPLE: live-interval-state
     vreg
     reg spill-to spill-rep reload-from reload-rep
-    start end ranges uses
-    reg-class ;
+    start end ranges uses ;
 
 : first-use ( live-interval -- use ) uses>> first ; inline
 
@@ -43,11 +42,10 @@ TUPLE: live-interval-state
     insn# live-interval (find-use)
     dup [ dup n>> insn# = [ drop f ] unless ] when ;
 
-: <live-interval> ( vreg reg-class -- live-interval )
+: <live-interval> ( vreg -- live-interval )
     \ live-interval-state new
         V{ } clone >>uses
         V{ } clone >>ranges
-        swap >>reg-class
         swap >>vreg ;
 
 : block-from ( bb -- n ) instructions>> first insn#>> 1 - ;
@@ -59,8 +57,10 @@ SYMBOLS: from to ;
 SYMBOL: live-intervals
 
 : live-interval ( vreg -- live-interval )
-    leader live-intervals get
-    [ dup rep-of reg-class-of <live-interval> ] cache ;
+    leader live-intervals get [ <live-interval> ] cache ;
+
+: interval-reg-class ( live-interval -- reg-class )
+    vreg>> rep-of reg-class-of ;
 
 GENERIC: compute-live-intervals* ( insn -- )
 
