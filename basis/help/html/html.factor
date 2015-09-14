@@ -94,7 +94,7 @@ M: pathname url-of
 
 : css-classes ( classes -- stylesheet )
     [
-        [ " { " " }" surround ] [ "." prepend ] bi* prepend
+        [ " { " "}" surround ] [ "." prepend ] bi* prepend
     ] { } assoc>map "\n" join ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
