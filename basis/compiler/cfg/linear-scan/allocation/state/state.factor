@@ -32,7 +32,7 @@ SYMBOL: registers
 SYMBOL: active-intervals
 
 : active-intervals-for ( live-interval -- seq )
-    reg-class>> active-intervals get at ;
+    interval-reg-class active-intervals get at ;
 
 : add-active ( live-interval -- )
     dup active-intervals-for push ;
@@ -46,7 +46,7 @@ SYMBOL: active-intervals
 SYMBOL: inactive-intervals
 
 : inactive-intervals-for ( live-interval -- seq )
-    reg-class>> inactive-intervals get at ;
+    interval-reg-class inactive-intervals get at ;
 
 : add-inactive ( live-interval -- )
     dup inactive-intervals-for push ;

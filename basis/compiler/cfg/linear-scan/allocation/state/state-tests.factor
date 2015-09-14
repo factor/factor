@@ -1,17 +1,18 @@
 USING: accessors assocs combinators.extras compiler.cfg
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.cfg.utilities
-cpu.architecture cpu.x86.assembler.operands heaps kernel layouts
-literals namespaces sequences system tools.test ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
+compiler.cfg.utilities cpu.architecture cpu.x86.assembler.operands heaps
+kernel layouts literals namespaces sequences system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.state.tests
 
 ! active-intervals-for
 {
-    V{ T{ live-interval-state { reg-class int-regs } { vreg 123 } } }
+    V{ T{ live-interval-state { vreg 123 } } }
 } [
     f machine-registers init-allocator
-    T{ live-interval-state { reg-class int-regs } { vreg 123 } }
+    H{ { 123 int-rep } } representations set
+    T{ live-interval-state { vreg 123 } }
     [ add-active ] keep active-intervals-for
 ] unit-test
 
@@ -23,7 +24,6 @@ IN: compiler.cfg.linear-scan.allocation.state.tests
             V{
                 T{ live-interval-state
                    { vreg 123 }
-                   { reg-class int-regs }
                 }
             }
         }
@@ -31,7 +31,8 @@ IN: compiler.cfg.linear-scan.allocation.state.tests
     }
 } [
     f machine-registers init-allocator
-    T{ live-interval-state { reg-class int-regs } { vreg 123 } } add-active
+    H{ { 123 int-rep } } representations set
+    T{ live-interval-state { vreg 123 } } add-active
     active-intervals get
 ] unit-test
 
@@ -99,7 +100,6 @@ ${
     40 progress set
     T{ live-interval-state
        { end 34 }
-       { reg-class int-regs }
        { vreg 123 }
     }
     check-handled
@@ -113,10 +113,11 @@ ${ cell } [
 
 ! inactive-intervals-for
 {
-    V{ T{ live-interval-state { reg-class int-regs } { vreg 123 } } }
+    V{ T{ live-interval-state { vreg 123 } } }
 } [
     f machine-registers init-allocator
-    T{ live-interval-state { reg-class int-regs } { vreg 123 } }
+    H{ { 123 int-rep } } representations set
+    T{ live-interval-state { vreg 123 } }
     [ add-inactive ] keep inactive-intervals-for
 ] unit-test
 
