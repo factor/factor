@@ -3,8 +3,8 @@
 USING: accessors arrays assocs combinators combinators.short-circuit
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.utilities fry
-heaps kernel locals math namespaces sequences ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
+compiler.utilities fry heaps kernel locals math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation
 
 : active-positions ( new assoc -- )
@@ -13,7 +13,7 @@ IN: compiler.cfg.linear-scan.allocation
 : inactive-positions ( new assoc -- )
     [ [ inactive-intervals-for ] keep ] dip
     '[
-        [ _ relevant-ranges intersect-live-ranges 1/0. or ] [ reg>> ] bi
+        [ _ intersect-intervals 1/0. or ] [ reg>> ] bi
         _ add-use-position
     ] each ;
 

@@ -23,7 +23,7 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     { { 4 20 } } <live-interval-for-ranges>
     { { 8 12 } } <live-interval-for-ranges> intervals-intersect?
     { { 9 20 } { 3 5 } } <live-interval-for-ranges>
-    { { 0 1 } { 7 8 } } <live-interval-for-ranges> intervals-intersect?
+    { { 7 8 } { 0 1 } } <live-interval-for-ranges> intervals-intersect?
     { { 3 5 } } <live-interval-for-ranges>
     { { 7 8 } } <live-interval-for-ranges> intervals-intersect?
 ] unit-test
@@ -72,4 +72,26 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     H{ { 4 int-rep } { 8 int-rep } { 9 int-rep } } representations set
     <basic-block> [ H{ { 4 4 } { 8 8 } { 9 9 } } 2array 1array live-outs set ]
     [ handle-live-out ] bi live-intervals get
+] unit-test
+
+! relevant-ranges
+{
+    V{ T{ live-range { from 0 } { to 10 } } }
+    V{ T{ live-range { from 5 } { to 10 } } }
+} [
+    T{ live-interval-state
+       { start 0 }
+       { reg-class int-regs }
+       { end 10 }
+       { uses { 0 10 } }
+       { ranges V{ T{ live-range f 0 10 } } }
+    }
+    T{ live-interval-state
+       { start 5 }
+       { reg-class int-regs }
+       { end 10 }
+       { uses { 5 10 } }
+       { ranges V{ T{ live-range f 5 10 } } }
+    }
+    relevant-ranges
 ] unit-test

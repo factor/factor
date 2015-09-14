@@ -7,24 +7,6 @@ compiler.cfg.linear-scan.ranges fry hints kernel locals math math.order
 namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.splitting
 
-: split-range ( live-range n -- before after )
-    [ [ from>> ] dip <live-range> ]
-    [ 1 + swap to>> <live-range> ]
-    2bi ;
-
-: split-last-range? ( last n -- ? )
-    swap to>> <= ;
-
-: split-last-range ( before after last n -- before' after' )
-    split-range [ [ but-last ] dip suffix ] [ prefix ] bi-curry* bi* ;
-
-: split-ranges ( live-ranges n -- before after )
-    [ '[ from>> _ <= ] partition ]
-    [
-        [ over last ] dip 2dup split-last-range?
-        [ split-last-range ] [ 2drop ] if
-    ] bi ;
-
 :: split-uses ( uses n -- before after )
     uses n uses [ n>> <=> ] with search
     n>> n <=> {

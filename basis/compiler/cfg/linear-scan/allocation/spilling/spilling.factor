@@ -3,17 +3,10 @@
 USING: accessors assocs combinators
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-compiler.utilities fry kernel linked-assocs locals math namespaces sequences ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
+compiler.cfg.registers compiler.utilities fry kernel linked-assocs locals
+math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.spilling
-
-ERROR: bad-live-ranges interval ;
-
-: check-ranges ( live-interval -- )
-    check-allocation? get [
-        dup ranges>> [ [ from>> ] [ to>> ] bi <= ] all?
-        [ drop ] [ bad-live-ranges ] if
-    ] [ drop ] if ;
 
 : trim-before-ranges ( live-interval -- )
     dup last-use n>> 1 +
@@ -36,6 +29,14 @@ ERROR: bad-live-ranges interval ;
         dup [ vreg>> ] [ spill-rep>> ] bi
         assign-spill-slot >>spill-to drop
     ] [ 2drop ] if ;
+
+ERROR: bad-live-ranges interval ;
+
+: check-ranges ( ranges -- )
+    check-allocation? get [
+        ranges>> dup [ [ from>> ] [ to>> ] bi <= ] all?
+        [ drop ] [ bad-live-ranges ] if
+    ] [ drop ] if ;
 
 : spill-before ( before -- before/f )
     dup uses>> empty? [ drop f ] [
