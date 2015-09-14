@@ -1,11 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs debugger fry help help.home
-help.topics help.vocabs html html.streams io.directories
-io.encodings.binary io.encodings.utf8 io.files io.files.temp
-io.pathnames kernel make math.parser memoize namespaces
-sequences serialize splitting tools.completion vocabs
-vocabs.hierarchy words xml.syntax xml.writer ;
+USING: accessors arrays assocs combinators.short-circuit
+debugger fry help help.home help.topics help.vocabs html
+html.streams io.directories io.encodings.binary
+io.encodings.utf8 io.files io.files.temp io.pathnames kernel
+locals make math math.parser memoize namespaces sequences
+sequences.deep serialize sorting splitting tools.completion
+vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
+xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -65,9 +67,9 @@ M: pathname url-of
         prepend
     ] [ drop f ] if ;
 
-: help-stylesheet ( -- xml )
+: help-stylesheet ( stylesheet -- xml )
     "vocab:help/html/stylesheet.css" ascii file-contents
-    [XML <style><-></style> XML] ;
+    swap "\n" glue [XML <style><-></style> XML] ;
 
 : help-navbar ( -- xml )
     "conventions" >link topic>filename
@@ -84,15 +86,42 @@ M: pathname url-of
         </div>
      XML] ;
 
+: bijective-base26 ( n -- name )
+    [ dup 0 > ] [ 1 - 26 /mod CHAR: a + ] "" produce-as nip reverse! ;
+
+: css-class ( style classes -- name )
+    dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;
+
+: css-classes ( classes -- stylesheet )
+    [
+        [ " { " " }" surround ] [ "." prepend ] bi* prepend
+    ] { } assoc>map "\n" join ;
+
+:: css-styles-to-classes ( body -- stylesheet body )
+    H{ } clone :> classes
+    body [
+        dup xml-chunk? [
+            seq>> [ tag? ] filter
+            "span" "div" [ deep-tags-named ] bi-curry@ bi append
+            [
+                dup {
+                    [ "style" attr ]
+                    [ "class" attr not ]
+                } 1&& [
+                    attrs>> [ V{ } like ] change-alist
+                    "style" over delete-at* drop classes css-class
+                    "class" rot set-at
+                ] [ drop ] if
+            ] each
+        ] [ drop ] if
+    ] each classes sort-values css-classes body ;
+
 : help>html ( topic -- xml )
     [ article-title " - Factor Documentation" append ]
-    [ drop help-stylesheet ]
     [
-        [ help-navbar ]
-        [ [ print-topic ] with-html-writer ]
-        bi* append
-    ] tri
-    simple-page ;
+        [ print-topic ] with-html-writer css-styles-to-classes
+        [ help-stylesheet ] [ help-navbar prepend ] bi*
+    ] bi simple-page ;
 
 : generate-help-file ( topic -- )
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
