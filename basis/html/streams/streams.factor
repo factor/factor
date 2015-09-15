@@ -111,7 +111,7 @@ M: html-span-stream dispose
 : padding-css, ( padding -- )
     first2 (padding-css,) ;
 
-CONSTANT: pre-css "white-space: pre; font-family: monospace;"
+CONSTANT: pre-css "white-space: pre; font-family: monospace; "
 
 : div-css-style ( style -- str )
     [
