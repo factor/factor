@@ -154,3 +154,47 @@ IN: compiler.cfg.linear-scan.ranges.tests
 [
     { T{ live-range f 1 10 } } 0 split-ranges
 ] must-fail
+
+! valid-ranges?
+{ t f f f } [
+    { T{ live-range f 1 10 } T{ live-range f 15 20 } } valid-ranges?
+    { T{ live-range f 10 1 } T{ live-range f 15 20 } } valid-ranges?
+    { T{ live-range f 1 5 } T{ live-range f 3 10 } } valid-ranges?
+    { T{ live-range f 5 1 } } valid-ranges?
+] unit-test
+
+! fix-lower-bound
+{
+    {
+        T{ live-range { from 25 } { to 30 } }
+        T{ live-range { from 40 } { to 50 } }
+    }
+    { T{ live-range { from 10 } { to 23 } } }
+} [
+    25 {
+        T{ live-range { from 0 } { to 10 } }
+        T{ live-range { from 20 } { to 30 } }
+        T{ live-range { from 40 } { to 50 } }
+    } fix-lower-bound
+    10 { T{ live-range { from 20 } { to 23 } } } fix-lower-bound
+] unit-test
+
+! fix-upper-bound
+{
+    {
+        T{ live-range { from 0 } { to 10 } }
+        T{ live-range { from 20 } { to 20 } }
+    }
+} [
+    20 {
+        T{ live-range { from 0 } { to 10 } }
+        T{ live-range { from 20 } { to 30 } }
+        T{ live-range { from 40 } { to 50 } }
+    } fix-upper-bound
+] unit-test
+
+{
+    { T{ live-range { from 0 } { to 20 } } }
+} [
+    20 { T{ live-range { from 0 } { to 40 } } } fix-upper-bound
+] unit-test

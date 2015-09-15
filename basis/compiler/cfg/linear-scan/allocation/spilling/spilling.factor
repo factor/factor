@@ -9,16 +9,10 @@ math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 : trim-before-ranges ( live-interval -- )
-    dup last-use n>> 1 +
-    [ '[ [ from>> _ >= ] trim-tail-slice ] change-ranges drop ]
-    [ swap ranges>> last to<< ]
-    2bi ;
+    dup last-use n>> 1 + swap [ fix-upper-bound ] change-ranges drop ;
 
 : trim-after-ranges ( live-interval -- )
-    dup first-use n>>
-    [ '[ [ to>> _ < ] trim-head-slice ] change-ranges drop ]
-    [ swap ranges>> first from<< ]
-    2bi ;
+    dup first-use n>> swap [ fix-lower-bound ] change-ranges drop ;
 
 : last-use-rep ( live-interval -- rep/f )
     last-use [ def-rep>> ] [ use-rep>> ] bi or ; inline
@@ -34,8 +28,7 @@ ERROR: bad-live-ranges interval ;
 
 : check-ranges ( ranges -- )
     check-allocation? get [
-        ranges>> dup [ [ from>> ] [ to>> ] bi <= ] all?
-        [ drop ] [ bad-live-ranges ] if
+        dup ranges>> valid-ranges? [ drop ] [ bad-live-ranges ] if
     ] [ drop ] if ;
 
 : spill-before ( before -- before/f )

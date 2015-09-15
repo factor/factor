@@ -1,5 +1,4 @@
-USING: accessors compiler.cfg.linear-scan.allocation.state fry kernel
-math math.order namespaces sequences ;
+USING: accessors arrays fry grouping kernel math math.order sequences ;
 IN: compiler.cfg.linear-scan.ranges
 
 ! Data definitions
@@ -17,8 +16,7 @@ C: <live-range> live-range
     [ from>> ] [ to>> ] bi between? ;
 
 : split-range ( live-range n -- before after )
-    [ [ from>> ] dip <live-range> ]
-    [ 1 + swap to>> <live-range> ] 2bi ;
+    [ [ from>> ] dip <live-range> ] [ 1 + swap to>> <live-range> ] 2bi ;
 
 ! Range sequence utilities
 : extend-ranges? ( n ranges -- ? )
@@ -54,3 +52,13 @@ C: <live-range> live-range
         [ over last ] dip 2dup split-last-range?
         [ split-last-range ] [ 2drop ] if
     ] bi ;
+
+: valid-ranges? ( ranges -- ? )
+    [ [ [ from>> ] [ to>> ] bi <= ] all? ]
+    [ [ [ to>> ] [ from>> ] bi* <= ] monotonic? ] bi and ;
+
+: fix-lower-bound ( n ranges -- ranges' )
+    over '[ to>> _ >= ] filter [ first from<< ] keep ;
+
+: fix-upper-bound ( n ranges -- ranges' )
+    over '[ from>> _ <= ] filter [ last to<< ] keep ;

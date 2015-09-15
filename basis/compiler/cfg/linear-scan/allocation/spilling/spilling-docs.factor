@@ -48,6 +48,10 @@ HELP: spill-partially-available
 }
 { $description "A register would be available for part of the new interval's lifetime if all active and inactive intervals using that register were split and spilled." } ;
 
+HELP: trim-before-ranges
+{ $values { "live-interval" live-interval } }
+{ $description "Extends the last intervals range to one after the last use point and removes all intervals beyond that." } ;
+
 ARTICLE: "compiler.cfg.linear-scan.allocation.spilling" "Spill slot assignment"
 "Words and dynamic variables for assigning spill slots to spilled registers during the " { $link linear-scan } " compiler pass." ;
 
