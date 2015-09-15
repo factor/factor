@@ -62,3 +62,6 @@ C: <live-range> live-range
 
 : fix-upper-bound ( n ranges -- ranges' )
     over '[ from>> _ <= ] filter [ last to<< ] keep ;
+
+: ranges-endpoints ( ranges -- start end )
+    [ first from>> ] [ last to>> ] bi ;
