@@ -49,3 +49,64 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
 { double-rep } [
     test-live-interval last-use-rep
 ] unit-test
+
+! trim-after-ranges
+{
+    T{ live-interval-state
+       { ranges
+         {
+             T{ live-range { from 25 } { to 30 } }
+             T{ live-range { from 40 } { to 50 } }
+         }
+       }
+       { uses { T{ vreg-use { n 25 } } } }
+    }
+} [
+    T{ live-interval-state
+       { ranges
+         {
+             T{ live-range { from 0 } { to 10 } }
+             T{ live-range { from 20 } { to 30 } }
+             T{ live-range { from 40 } { to 50 } }
+         }
+       }
+       { uses { T{ vreg-use { n 25 } } } }
+    } dup trim-after-ranges
+] unit-test
+
+{
+    T{ live-interval-state
+       { ranges { T{ live-range { from 10 } { to 23 } } } }
+       { uses { T{ vreg-use { n 10 } } } }
+    }
+} [
+    T{ live-interval-state
+       { ranges { T{ live-range { from 20 } { to 23 } } } }
+       { uses { T{ vreg-use { n 10 } } } }
+    }
+    dup trim-after-ranges
+] unit-test
+
+! trim-before-ranges
+{
+    T{ live-interval-state
+       { ranges
+         {
+             T{ live-range { from 0 } { to 10 } }
+             T{ live-range { from 20 } { to 21 } }
+         }
+       }
+       { uses { T{ vreg-use { n 20 } } } }
+    }
+} [
+    T{ live-interval-state
+       { ranges
+         {
+             T{ live-range { from 0 } { to 10 } }
+             T{ live-range { from 20 } { to 30 } }
+             T{ live-range { from 40 } { to 50 } }
+         }
+       }
+       { uses { T{ vreg-use { n 20 } } } }
+    } dup trim-before-ranges
+] unit-test
