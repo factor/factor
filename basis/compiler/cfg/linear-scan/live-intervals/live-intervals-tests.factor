@@ -70,23 +70,3 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     <basic-block> [ H{ { 4 4 } { 8 8 } { 9 9 } } 2array 1array live-outs set ]
     [ handle-live-out ] bi live-intervals get
 ] unit-test
-
-! relevant-ranges
-{
-    V{ T{ live-range { from 0 } { to 10 } } }
-    V{ T{ live-range { from 5 } { to 10 } } }
-} [
-    T{ live-interval-state
-       { start 0 }
-       { end 10 }
-       { uses { 0 10 } }
-       { ranges V{ T{ live-range f 0 10 } } }
-    }
-    T{ live-interval-state
-       { start 5 }
-       { end 10 }
-       { uses { 5 10 } }
-       { ranges V{ T{ live-range f 5 10 } } }
-    }
-    relevant-ranges
-] unit-test

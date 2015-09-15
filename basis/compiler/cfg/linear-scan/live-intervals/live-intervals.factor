@@ -131,8 +131,7 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
     } cleave ;
 
 : compute-start/end ( live-interval -- )
-    dup ranges>> [ first from>> ] [ last to>> ] bi
-    [ >>start ] [ >>end ] bi* drop ;
+    dup ranges>> ranges-endpoints [ >>start ] [ >>end ] bi* drop ;
 
 ERROR: bad-live-interval live-interval ;
 
@@ -174,11 +173,8 @@ M: insn insn>sync-point drop f ;
 : compute-live-intervals ( cfg -- intervals/sync-points )
     [ cfg>live-intervals ] [ cfg>sync-points ] bi append ;
 
-: relevant-ranges ( interval1 interval2 -- ranges1 ranges2 )
-    [ [ ranges>> ] bi@ ] [ nip start>> ] 2bi '[ to>> _ >= ] filter ;
-
 : intersect-intervals ( interval1 interval2 -- n/f )
-    relevant-ranges intersect-ranges ;
+    [ ranges>> ] bi@ intersect-ranges ;
 
 : intervals-intersect? ( interval1 interval2 -- ? )
     intersect-intervals >boolean ; inline

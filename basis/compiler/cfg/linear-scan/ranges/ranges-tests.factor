@@ -198,3 +198,11 @@ IN: compiler.cfg.linear-scan.ranges.tests
 } [
     20 { T{ live-range { from 0 } { to 40 } } } fix-upper-bound
 ] unit-test
+
+! ranges-endpoints
+{ 0 40 } [
+    V{
+        T{ live-range { from 0 } { to 10 } }
+        T{ live-range { from 30 } { to 40 } }
+    } ranges-endpoints
+] unit-test
