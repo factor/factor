@@ -9,27 +9,19 @@ IN: compiler.cfg.linear-scan.ranges.tests
     10 20 V{ } [ add-new-range ] keep
 ] unit-test
 
-! extend-ranges
-{
-    V{ { 7 25 } }
-} [
-    7 25 V{ { 10 20 } } [ extend-ranges ] keep
-] unit-test
-
-! extend-ranges?
+! extend-last?
 { f } [
-    10 { } extend-ranges?
+    10 { } extend-last?
 ] unit-test
 
 ! add-range
 {
+    V{ { 3 10 } }
     V{ { 5 12 } }
     V{ { 5 12 } }
-    V{ { 10 12 } { 5 9 } }
 } [
-    8 12 V{ { 5 10 } } [ add-range ] keep
+    3 9 V{ { 5 10 } } [ add-range ] keep
     5 10 V{ { 10 12 } } [ add-range ] keep
-
     5 9 V{ { 10 12 } } [ add-range ] keep
 ] unit-test
 
