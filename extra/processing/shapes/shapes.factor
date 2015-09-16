@@ -1,7 +1,6 @@
-
-USING: alien.c-types alien.data arrays colors grouping kernel
-locals math math.vectors namespaces opengl opengl.gl opengl.glu
-sequences sequences.generalizations shuffle ;
+USING: alien.c-types alien.data arrays colors.constants grouping
+kernel locals math math.vectors namespaces opengl opengl.gl
+opengl.glu sequences sequences.generalizations shuffle ;
 IN: processing.shapes
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -13,8 +12,8 @@ IN: processing.shapes
 SYMBOL: fill-color
 SYMBOL: stroke-color
 
-T{ rgba f 0 0 0 1 } stroke-color set-global
-T{ rgba f 1 1 1 1 } fill-color   set-global
+COLOR: black stroke-color set-global
+COLOR: white fill-color set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -81,8 +80,8 @@ T{ rgba f 1 1 1 1 } fill-color   set-global
 
     x y 2array
     x dx + y 2array
-    x y dy + 2array
     x dx + y dy + 2array
+    x y dy + 2array
     4array
     polygon ;
 
