@@ -9,7 +9,7 @@ IN: compiler.cfg.linear-scan.allocation.tests
     T{ live-interval-state
        { vreg 49 }
        { start 30 } { end 46 }
-       { ranges { T{ live-range { from 30 } { to 46 } } } }
+       { ranges { { 30 46 } } }
        { uses
          {
              T{ vreg-use { n 30 } { def-rep double-rep } }
@@ -79,9 +79,7 @@ cpu x86.64? [
                { vreg 1 }
                { start 30 }
                { end 40 }
-               { ranges
-                 { T{ live-range { from 30 } { to 40 } } }
-               }
+               { ranges { { 30 40 } } }
                { uses
                  { T{ vreg-use { n 32 } { def-rep double-rep } } }
                }
@@ -90,9 +88,7 @@ cpu x86.64? [
                { vreg 50 }
                { start 5 }
                { end 10 }
-               { ranges
-                 { T{ live-range { from 5 } { to 10 } } }
-               }
+               { ranges { { 5 10 } } }
                { uses
                  { T{ vreg-use { n 8 } { def-rep double-rep } } }
                }

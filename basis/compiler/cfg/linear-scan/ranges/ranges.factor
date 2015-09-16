@@ -1,67 +1,61 @@
 USING: accessors arrays fry grouping kernel math math.order sequences ;
 IN: compiler.cfg.linear-scan.ranges
 
-! Data definitions
-TUPLE: live-range from to ;
-
-C: <live-range> live-range
-
 ! Range utilities
-: intersect-range ( range1 range2 -- n/f )
-    2dup [ from>> ] bi@ > [ swap ] when
-    2dup [ to>> ] [ from>> ] bi* >=
-    [ nip from>> ] [ 2drop f ] if ;
+: intersect-range ( r1 r2 -- n/f )
+    2dup [ first ] bi@ > [ swap ] when
+    2dup [ second ] [ first ] bi* >=
+    [ nip first ] [ 2drop f ] if ;
 
-: range-covers? ( n range -- ? )
-    [ from>> ] [ to>> ] bi between? ;
-
-: split-range ( live-range n -- before after )
-    [ [ from>> ] dip <live-range> ] [ 1 + swap to>> <live-range> ] 2bi ;
+: split-range ( range n -- before after )
+    swap first2 pick 1 + [ swap 2array ] 2bi@  ;
 
 ! Range sequence utilities
 : extend-ranges? ( n ranges -- ? )
-    [ drop f ] [ last from>> >= ] if-empty ;
+    [ drop f ] [ last first >= ] if-empty ;
 
 : extend-ranges ( from to ranges -- )
-    last [ max ] change-to [ min ] change-from drop ;
+    [ last first2 rot [ min ] [ max ] 2bi* 2array ] keep set-last ;
 
 : add-new-range ( from to ranges -- )
-    [ <live-range> ] dip push ;
+    [ 2array ] dip push ;
 
 : add-range ( from to ranges -- )
     2dup extend-ranges? [ extend-ranges ] [ add-new-range ] if ;
 
 : ranges-cover? ( n ranges -- ? )
-    [ range-covers? ] with any? ;
+    [ first2 between? ] with any? ;
 
 : intersect-ranges ( ranges1 ranges2 -- n/f )
     '[ _ [ intersect-range ] with map-find drop ] map-find drop ;
 
 : shorten-ranges ( n ranges -- )
-    dup empty? [ dupd add-new-range ] [ last from<< ] if ;
-
-: split-last-range? ( last n -- ? )
-    swap to>> <= ;
+    dup empty? [ dupd add-new-range ] [
+        [ last second 2array ] keep set-last
+    ] if ;
 
 : split-last-range ( before after last n -- before' after' )
     split-range [ [ but-last ] dip suffix ] [ prefix ] bi-curry* bi* ;
 
-: split-ranges ( live-ranges n -- before after )
-    [ '[ from>> _ <= ] partition ]
+: split-last-range? ( last n -- ? )
+    swap second <= ;
+
+: split-ranges ( ranges n -- before after )
+    [ '[ first _ <= ] partition ]
     [
         [ over last ] dip 2dup split-last-range?
         [ split-last-range ] [ 2drop ] if
     ] bi ;
 
 : valid-ranges? ( ranges -- ? )
-    [ [ [ from>> ] [ to>> ] bi <= ] all? ]
-    [ [ [ to>> ] [ from>> ] bi* <= ] monotonic? ] bi and ;
+    [ [ first2 <= ] all? ]
+    [ [ [ second ] [ first ] bi* <= ] monotonic? ] bi and ;
 
 : fix-lower-bound ( n ranges -- ranges' )
-    over '[ to>> _ >= ] filter [ first from<< ] keep ;
+    over '[ second _ >= ] filter unclip second swapd 2array prefix ;
 
 : fix-upper-bound ( n ranges -- ranges' )
-    over '[ from>> _ <= ] filter [ last to<< ] keep ;
+    over '[ first _ <= ] filter unclip-last first rot 2array suffix ;
 
 : ranges-endpoints ( ranges -- start end )
-    [ first from>> ] [ last to>> ] bi ;
+    [ first first ] [ last last ] bi ;

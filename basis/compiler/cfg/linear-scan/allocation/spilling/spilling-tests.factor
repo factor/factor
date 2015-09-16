@@ -13,19 +13,7 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
        { spill-rep double-rep }
        { start 22 }
        { end 47 }
-       { ranges
-         T{ slice
-            { from 0 }
-            { to 1 }
-            { seq
-              {
-                  T{ live-range { from 22 } { to 47 } }
-                  T{ live-range { from 67 } { to 68 } }
-                  T{ live-range { from 69 } { to 72 } }
-              }
-            }
-         }
-       }
+       { ranges { { 22 47 } { 67 68 } { 69 72 } } }
        { uses
          {
              T{ vreg-use
@@ -53,35 +41,24 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
 ! trim-after-ranges
 {
     T{ live-interval-state
-       { ranges
-         {
-             T{ live-range { from 25 } { to 30 } }
-             T{ live-range { from 40 } { to 50 } }
-         }
-       }
+       { ranges { { 25 30 } { 40 50 } } }
        { uses { T{ vreg-use { n 25 } } } }
     }
 } [
     T{ live-interval-state
-       { ranges
-         {
-             T{ live-range { from 0 } { to 10 } }
-             T{ live-range { from 20 } { to 30 } }
-             T{ live-range { from 40 } { to 50 } }
-         }
-       }
+       { ranges { { 0 10 } { 20 30 } { 40 50 } } }
        { uses { T{ vreg-use { n 25 } } } }
     } dup trim-after-ranges
 ] unit-test
 
 {
     T{ live-interval-state
-       { ranges { T{ live-range { from 10 } { to 23 } } } }
+       { ranges { { 10 23 } } }
        { uses { T{ vreg-use { n 10 } } } }
     }
 } [
     T{ live-interval-state
-       { ranges { T{ live-range { from 20 } { to 23 } } } }
+       { ranges { { 20 23 } } }
        { uses { T{ vreg-use { n 10 } } } }
     }
     dup trim-after-ranges
@@ -90,23 +67,12 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
 ! trim-before-ranges
 {
     T{ live-interval-state
-       { ranges
-         {
-             T{ live-range { from 0 } { to 10 } }
-             T{ live-range { from 20 } { to 21 } }
-         }
-       }
+       { ranges { { 0 10 } { 20 21 } } }
        { uses { T{ vreg-use { n 20 } } } }
     }
 } [
     T{ live-interval-state
-       { ranges
-         {
-             T{ live-range { from 0 } { to 10 } }
-             T{ live-range { from 20 } { to 30 } }
-             T{ live-range { from 40 } { to 50 } }
-         }
-       }
+       { ranges { { 0 10 } { 20 30 } { 40 50 } } }
        { uses { T{ vreg-use { n 20 } } } }
     } dup trim-before-ranges
 ] unit-test
