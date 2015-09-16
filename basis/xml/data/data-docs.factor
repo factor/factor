@@ -101,7 +101,7 @@ HELP: xml
 HELP: <xml>
 { $values { "prolog" "an XML prolog" } { "before" "a sequence of XML elements" }
 { "body" tag } { "after" "a sequence of XML elements" } { "xml" "an XML document" } }
-{ $description "Creates an XML document. The " { $snippet "before" } " and " { $snippet "after" } " slots store what comes before and after the main tag, and " { $snippet "body" } "contains the main tag itself." }
+{ $description "Creates an XML document. The " { $snippet "before" } " and " { $snippet "after" } " slots store what comes before and after the main tag, and " { $snippet "body" } " contains the main tag itself." }
 { $see-also xml <tag> } ;
 
 HELP: prolog
