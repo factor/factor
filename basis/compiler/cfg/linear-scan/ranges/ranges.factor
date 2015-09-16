@@ -11,17 +11,16 @@ IN: compiler.cfg.linear-scan.ranges
     swap first2 pick 1 + [ swap 2array ] 2bi@  ;
 
 ! Range sequence utilities
-: extend-ranges? ( n ranges -- ? )
-    [ drop f ] [ last first >= ] if-empty ;
-
-: extend-ranges ( from to ranges -- )
-    [ last first2 rot [ min ] [ max ] 2bi* 2array ] keep set-last ;
-
 : add-new-range ( from to ranges -- )
     [ 2array ] dip push ;
 
+: extend-last? ( to ranges -- ? )
+    [ drop f ] [ last first 1 - >= ] if-empty ;
+
 : add-range ( from to ranges -- )
-    2dup extend-ranges? [ extend-ranges ] [ add-new-range ] if ;
+    2dup extend-last? [
+        [ nip last second 2array ] keep set-last
+    ] [ add-new-range ] if ;
 
 : ranges-cover? ( n ranges -- ? )
     [ first2 between? ] with any? ;
