@@ -1,9 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture fry heaps kernel math math.order namespaces sequences ;
+compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.ranges compiler.cfg.registers cpu.architecture fry
+heaps kernel math math.order namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 SYMBOL: progress
@@ -87,6 +87,9 @@ ERROR: register-already-used live-interval ;
 : process-intervals ( n symbol quots -- )
     ! symbol stores an alist mapping register classes to vectors
     [ get values ] dip '[ [ _ cond ] with filter! drop ] with each ; inline
+
+: covers? ( n live-interval -- ? )
+    ranges>> ranges-cover? ;
 
 : deactivate-intervals ( n -- )
     dup progress set

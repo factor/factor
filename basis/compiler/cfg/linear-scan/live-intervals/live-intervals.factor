@@ -32,9 +32,6 @@ TUPLE: live-interval-state
     insn# uses last-use? [ insn# uses new-use ] unless*
     spill-slot? [ t >>spill-slot? ] when ;
 
-: covers? ( n live-interval -- ? )
-    ranges>> ranges-cover? ;
-
 : (find-use) ( insn# live-interval -- vreg-use )
     uses>> [ n>> <=> ] with search nip ;
 

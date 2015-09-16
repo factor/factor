@@ -40,7 +40,7 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
             8
             T{ live-interval-state
                { vreg 8 }
-               { ranges V{ T{ live-range { from -10 } { to 23 } } } }
+               { ranges V{ { -10 23 } } }
                { uses V{ } }
             }
         }
@@ -48,7 +48,7 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
             9
             T{ live-interval-state
                { vreg 9 }
-               { ranges V{ T{ live-range { from -10 } { to 23 } } } }
+               { ranges V{ { -10 23 } } }
                { uses V{ } }
             }
         }
@@ -56,7 +56,7 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
             4
             T{ live-interval-state
                { vreg 4 }
-               { ranges V{ T{ live-range { from -10 } { to 23 } } } }
+               { ranges V{ { -10 23 } } }
                { uses V{ } }
             }
         }
