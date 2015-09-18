@@ -16,7 +16,6 @@ M: object satisfied? drop f ;
 
 : assume ( constraint -- ) dup satisfied? [ drop ] [ assume* ] if ;
 
-! Boolean constraints
 TUPLE: true-constraint value ;
 
 : =t ( value -- constraint ) resolve-copy true-constraint boa ;
@@ -95,8 +94,6 @@ M: equivalence assume*
 
 ! Conjunction constraints -- sequences act as conjunctions
 M: sequence assume* [ assume ] each ;
-
-: /\ ( p q -- constraint ) 2array ;
 
 : t--> ( constraint boolean-value -- constraint' ) =t swap --> ;
 
