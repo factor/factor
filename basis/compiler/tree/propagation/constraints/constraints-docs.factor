@@ -26,6 +26,8 @@ HELP: satisfied?
 ARTICLE: "compiler.tree.propagation.constraints" "Support for predicated value info"
 "A constraint is a statement about a value."
 $nl
+"Boolean constraints:"
+{ $subsections true-constraint true-constraint }
 "Utilities:"
 { $subsections t--> f--> } ;
 

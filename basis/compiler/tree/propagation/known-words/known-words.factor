@@ -184,11 +184,11 @@ IN: compiler.tree.propagation.known-words
     in2 value-info interval>> :> i2
     in1 i1 i2 op assumption is-in-interval
     in2 i2 i1 op swap-comparison assumption is-in-interval
-    /\ ;
+    2array ;
 
 :: comparison-constraints ( in1 in2 out op -- constraint )
     in1 in2 op (comparison-constraints) out t-->
-    in1 in2 op negate-comparison (comparison-constraints) out f--> /\ ;
+    in1 in2 op negate-comparison (comparison-constraints) out f--> 2array ;
 
 : define-comparison-constraints ( word op -- )
     '[ _ comparison-constraints ] "constraints" set-word-prop ;

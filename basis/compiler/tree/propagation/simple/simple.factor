@@ -54,7 +54,7 @@ M: #declare propagate-before
 : predicate-constraints ( value class boolean-value -- constraint )
     [ [ is-instance-of ] dip t--> ]
     [ [ class-not is-instance-of ] dip f--> ]
-    3bi /\ ;
+    3bi 2array ;
 
 : custom-constraints ( #call quot -- )
     [ [ in-d>> ] [ out-d>> ] bi append ] dip
