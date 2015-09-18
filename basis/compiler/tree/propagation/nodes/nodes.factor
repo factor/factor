@@ -5,8 +5,6 @@ compiler.tree.propagation.copy compiler.tree.propagation.info
 kernel sequences ;
 IN: compiler.tree.propagation.nodes
 
-SYMBOL: loop-nesting
-
 GENERIC: propagate-before ( node -- )
 
 GENERIC: propagate-after ( node -- )
