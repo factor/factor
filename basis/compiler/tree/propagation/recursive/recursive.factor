@@ -67,8 +67,6 @@ IN: compiler.tree.propagation.recursive
 M: #recursive propagate-around ( #recursive -- )
     constraints [ H{ } clone suffix ] change
     [
-        loop-nesting inc
-
         constraints [ but-last H{ } clone suffix ] change
 
         child>>
@@ -76,8 +74,6 @@ M: #recursive propagate-around ( #recursive -- )
         [ first propagate-recursive-phi ]
         [ (propagate) ]
         tri
-
-        loop-nesting dec
     ] until-fixed-point ;
 
 : recursive-phi-infos ( node -- infos )
