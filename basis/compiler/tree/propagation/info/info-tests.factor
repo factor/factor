@@ -96,7 +96,7 @@ STRUCT: self { s self* } ;
     value-info<=
 ] unit-test
 
-{ f f f f } [
+{ f f f f f } [
     ! Checking intervals
     fixnum <class-info> 20 <literal-info> value-info<=
 
@@ -108,4 +108,15 @@ STRUCT: self { s self* } ;
     f c-ptr <class-info> 2array self <tuple-info>
     f byte-array <class-info> 2array self <tuple-info>
     value-info<=
+
+    ! If one value-info has a slot specified and the other doesn't,
+    ! then it can't be smaller because that other slot could be
+    ! anything!
+    self <class-info>
+    f byte-array <class-info> 2array self <tuple-info> value-info<=
+] unit-test
+
+{ t f } [
+    10 <literal-info> f value-info<=
+    f 10 <literal-info> value-info<=
 ] unit-test
