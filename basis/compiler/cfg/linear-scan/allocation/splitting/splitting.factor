@@ -7,13 +7,8 @@ compiler.cfg.linear-scan.ranges fry hints kernel locals math math.order
 namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.splitting
 
-:: split-uses ( uses n -- before after )
-    uses n uses [ n>> <=> ] with search
-    n>> n <=> {
-        { +eq+ [ [ head-slice ] [ 1 + tail-slice ] 2bi ] }
-        { +lt+ [ 1 + cut-slice ] }
-        { +gt+ [ cut-slice ] }
-    } case ;
+: split-uses ( uses n -- before after )
+    [ '[ n>> _ < ] filter ] [ '[ n>> _ > ] filter ] 2bi ;
 
 ERROR: splitting-too-early ;
 

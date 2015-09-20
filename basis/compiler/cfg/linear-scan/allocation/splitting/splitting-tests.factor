@@ -18,30 +18,35 @@ IN: compiler.cfg.linear-scan.allocation.splitting.tests
 {
     T{ live-interval-state
        { ranges { { 5 8 } } }
-       { uses
-         T{ slice
-            { from 0 }
-            { to 1 }
-            { seq {
-                T{ vreg-use { n 3 } { def-rep int-rep } }
-                T{ vreg-use { n 15 } { def-rep int-rep } }
-            } }
-         }
-       }
+       { uses { T{ vreg-use { n 3 } { def-rep int-rep } } } }
     }
     T{ live-interval-state
        { ranges { { 12 20 } } }
-       { uses
-         T{ slice
-            { from 1 }
-            { to 2 }
-            { seq {
-                T{ vreg-use { n 3 } { def-rep int-rep } }
-                T{ vreg-use { n 15 } { def-rep int-rep } }
-            } }
-         }
-       }
+       { uses { T{ vreg-use { n 15 } { def-rep int-rep } } } }
     }
 } [
     test-interval-easy 10 split-interval
+] unit-test
+
+! split-uses
+{
+    { T{ vreg-use { n 3 } } }
+    { T{ vreg-use { n 9 } } }
+} [
+    { T{ vreg-use { n 3 } } T{ vreg-use { n 9 } } } 6 split-uses
+] unit-test
+
+{
+    { T{ vreg-use { n 10 } } T{ vreg-use { n 10 } } } { }
+} [
+    { T{ vreg-use { n 10 } } T{ vreg-use { n 10 } } } 12 split-uses
+] unit-test
+
+! This one is strange. Why is the middle one removed?
+{
+    { T{ vreg-use { n 3 } } }
+    { T{ vreg-use { n 5 } } }
+} [
+    { T{ vreg-use { n 3 } } T{ vreg-use { n 4 } } T{ vreg-use { n 5 } } }
+    4 split-uses
 ] unit-test
