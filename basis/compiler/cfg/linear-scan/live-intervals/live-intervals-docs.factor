@@ -28,6 +28,14 @@ HELP: compute-live-intervals
 { $description "Computes the live intervals and sync points of a cfg." }
 { $notes "The instructions must be numbered." } ;
 
+HELP: find-use
+{ $values
+  { "insn#" integer }
+  { "live-interval" live-interval }
+  { "vreg-use/f" vreg-use }
+}
+{ $description "Finds the live intervals " { $link vreg-use } " at the given instruction number, if it has one." } ;
+
 HELP: finish-live-intervals
 { $values { "live-intervals" sequence } }
 { $description "Since live intervals are computed in a backward order, we have to reverse some sequences, and compute the start and end." } ;
@@ -85,6 +93,7 @@ HELP: sync-point
 { $class-description "A location where all registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
   { $table
     { { $slot "n" } { "Set from an instructions sequence number." } }
+    { { $slot "keep-dst?" } { "Boolean that determines whether registers are spilled around this sync point." } }
   }
 }
 { $see-also insn } ;

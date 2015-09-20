@@ -10,6 +10,9 @@ HELP: compute-insns
 { $values { "cfg" cfg } }
 { $description "Computes a mapping from vregs to the instructions that define them and store the result in the " { $link insns } " variable. The " { $link insn-of } " word can then be used to access the assoc." } ;
 
+HELP: defs
+{ $var-description "Mapping from vreg to " { $link basic-block } " which introduces it." } ;
+
 HELP: defs-vregs
 { $values { "insn" insn } { "seq" sequence } }
 { $description "Returns the sequence of vregs defined, or introduced, by this instruction." }
@@ -19,7 +22,8 @@ HELP: defs-vregs
     "T{ ##peek f 37 D: 0 0 } defs-vregs ."
     "{ 37 }"
   }
-} ;
+}
+{ $see-also defs } ;
 
 HELP: insns
 { $var-description { $link assoc } " mapping vreg integers to defining instructions." }
@@ -57,6 +61,10 @@ $nl
   defs-vregs
   temp-vregs
   uses-vregs
+}
+"Dynamic variables:"
+{ $subsections
+  defs
 } ;
 
 ABOUT: "compiler.cfg.def-use"

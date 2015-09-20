@@ -9,7 +9,14 @@ HELP: ##alien-invoke
 { $class-description
   "An instruction for calling a function in a dynamically linked library. It has the following slots:"
   { $table
-    { { $slot "reg-inputs" } { "Registers to use for the arguments to the function call." } }
+    {
+        { $slot "gc-map" }
+        { "If the invoked c-function calls Factor code which triggers a gc, then a " { $link gc-map } " might be necessary." }
+    }
+    {
+        { $slot "reg-inputs" }
+        { "Registers to use for the arguments to the function call. Each sequence item is a 3-tuple consisting of a " { $link spill-slot } ", register representation and a register." }
+    }
     {
         { $slot "stack-inputs" }
         { "Stack slots used for the arguments to the function call." }
@@ -21,8 +28,9 @@ HELP: ##alien-invoke
     { { $slot "symbols" } { "Name of the function to call." } }
     { { $slot "dll" } { "A dll handle." } }
   }
-  "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } " but on " { $link x86.64 } " the first six arguments are passed in registers and only then are the stack used."
-} ;
+  "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } " but on " { $link x86.64 } " the first six arguments are passed in registers and only then is the stack used."
+}
+{ $see-also %alien-invoke } ;
 
 HELP: ##allot
 { $class-description
@@ -107,7 +115,7 @@ HELP: ##load-double
 { $see-also %load-double } ;
 
 HELP: ##load-memory-imm
-{ $class-description "Instruction for loading data from memory into an MMS register." }
+{ $class-description "Instruction for loading data from memory into a register. Either a General Purpose or an SSE register." }
 { $see-also %load-memory-imm } ;
 
 HELP: ##load-reference
@@ -160,7 +168,7 @@ HELP: ##phi
 { $class-description
   "A special kind of instruction used to mark control flow. It is inserted by the " { $vocab-link "compiler.cfg.ssa.construction" } " vocab. It has the following slots:"
   { $table
-    { { $slot "inputs" } { "An assoc containing as keys the blocks where the vreg was defined and as values the vreg." } }
+    { { $slot "inputs" } { "An assoc containing as keys the blocks/block numbers where the vreg was defined and as values the vreg. Why care about the blocks?" } }
     { { $slot "dst" } { "A merged vreg for the value." } }
   }
 } ;
@@ -257,6 +265,18 @@ HELP: ##store-memory-imm
   }
 }
 { $see-also %store-memory-imm } ;
+
+HELP: ##unbox-any-c-ptr
+{ $class-description "Instruction that unboxes a pointer in a register so that it can be fed to a C FFI function. For example, if 'src' points to a " { $link byte-array } ", then in 'dst' will be put a pointer to the first byte of that byte array."
+  { $table
+    { { $slot "dst" } { "Destination register." } }
+    { { $slot "src" } { "Source register." } }
+  }
+}
+{ $see-also %unbox-any-c-ptr } ;
+
+HELP: ##unbox-long-long
+{ $class-description "Instruction that unboxes a 64-bit integer to two 32-bit registers. Only used on 32 bit architectures." } ;
 
 HELP: ##vector>scalar
 { $class-description
