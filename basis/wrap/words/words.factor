@@ -33,7 +33,7 @@ C: <wrapping-word> wrapping-word
     [ prefix ] when* ;
 
 : words>elements ( seq -- newseq )
-    split-words ?first-break make-elements ;
+    [ { } ] [ split-words ?first-break make-elements ] if-empty ;
 
 PRIVATE>
 

@@ -3,6 +3,9 @@
 USING: tools.test wrap.words sequences ;
 IN: wrap.words.tests
 
+{ { } } [ f 35 35 wrap-words ] unit-test
+{ { } } [ { } 35 35 wrap-words ] unit-test
+
 {
     {
         {
