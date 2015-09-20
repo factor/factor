@@ -1,5 +1,5 @@
-USING: accessors math math.intervals sequences classes.algebra
-kernel tools.test compiler.tree.propagation.info arrays ;
+USING: accessors alien byte-arrays classes.struct math math.intervals sequences
+classes.algebra kernel tools.test compiler.tree.propagation.info arrays ;
 IN: compiler.tree.propagation.info.tests
 
 { f } [ 0.0 -0.0 eql? ] unit-test
@@ -64,10 +64,6 @@ TUPLE: test-tuple { x read-only } ;
     object-info value-info-intersect =
 ] unit-test
 
-{ t } [
-    null-info 3 <literal-info> value-info<=
-] unit-test
-
 { t t } [
     f <literal-info>
     fixnum 0 40 [a,b] <class/interval-info>
@@ -76,4 +72,40 @@ TUPLE: test-tuple { x read-only } ;
     value-info-intersect
     [ class>> fixnum class= ]
     [ interval>> 0 40 [a,b] = ] bi
+] unit-test
+
+! interval>literal
+{ 10 t } [
+    fixnum 10 10 [a,b]  interval>literal
+] unit-test
+
+STRUCT: self { s self* } ;
+
+! value-info<=
+{ t t t t t t } [
+    byte-array <class-info> c-ptr <class-info> value-info<=
+    null-info 3 <literal-info> value-info<=
+    null-info null-info value-info<=
+    alien <class-info> c-ptr <class-info> value-info<=
+
+    20 <literal-info> fixnum <class-info> value-info<=
+
+    ! A byte-array is a kind of c-ptr
+    f byte-array <class-info> 2array self <tuple-info>
+    f c-ptr <class-info> 2array self <tuple-info>
+    value-info<=
+] unit-test
+
+{ f f f f } [
+    ! Checking intervals
+    fixnum <class-info> 20 <literal-info> value-info<=
+
+    ! Mutable literals
+    [ "foo" ] <literal-info> [ "foo" ] <literal-info> value-info<=
+    ! Strings should be immutable but they aren't. :/
+    "hey" <literal-info> "hey" <literal-info> value-info<=
+
+    f c-ptr <class-info> 2array self <tuple-info>
+    f byte-array <class-info> 2array self <tuple-info>
+    value-info<=
 ] unit-test

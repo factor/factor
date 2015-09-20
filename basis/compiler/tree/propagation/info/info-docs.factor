@@ -1,5 +1,19 @@
-USING: compiler.tree help.markup help.syntax math sequences ;
+USING: classes compiler.tree help.markup help.syntax kernel math math.intervals
+sequences ;
 IN: compiler.tree.propagation.info
+
+HELP: interval>literal
+{ $values
+  { "class" class }
+  { "interval" interval }
+  { "literal" "a literal value" }
+  { "literal?" boolean }
+}
+{ $description "If interval has zero length and the class is sufficiently precise, we can turn it into a literal." } ;
+
+HELP: literal-class
+{ $values { "obj" object } { "class" class } }
+{ $description "Handle forgotten tuples and singleton classes properly." } ;
 
 HELP: node-input-infos
 { $values { "node" node } { "seq" sequence } }
@@ -12,6 +26,10 @@ HELP: node-output-infos
 HELP: value-info
 { $values { "value" integer } { "info" value-info-state } }
 { $description "Gets the value info for the given SSA value. If none is found then a null empty interval is returned." } ;
+
+HELP: value-info<=
+{ $values { "info1" value-info } { "info2" value-info } { "?" boolean } }
+{ $description "Checks if the first value info is equal to, or smaller than the second one." } ;
 
 HELP: value-info-state
 { $class-description "Represents constraints the compiler knows about the input and output variables to an SSA tree node. It has the following slots:"
@@ -34,6 +52,12 @@ ARTICLE: "compiler.tree.propagation.info" "Value info data type and operations"
   node-input-infos
   node-output-infos
   value-info
+}
+"Value info operations:"
+{ $subsections
+  value-info<=
+  value-info-union
+  value-infos-union
 } ;
 
 ABOUT: "compiler.tree.propagation.info"
