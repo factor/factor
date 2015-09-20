@@ -54,7 +54,11 @@ TUPLE: line words width height baseline ;
     [ height>> ] map-sum ;
 
 M: paragraph pref-dim*
-    cached-wrapped [ max-line-width ] [ sum-line-heights ] bi 2array ;
+    cached-wrapped [
+        { 0 0 }
+    ] [
+        [ max-line-width ] [ sum-line-heights ] bi 2array
+    ] if-empty ;
 
 : line-y-coordinates ( wrapped-paragraph -- ys )
     0 [ height>> + ] accumulate nip ;
