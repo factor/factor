@@ -1,11 +1,11 @@
-USING: help.markup help.syntax kernel ;
+USING: help.markup help.syntax kernel sequences ;
 IN: compiler.tree.propagation.constraints
 
 HELP: class-constraint
 { $class-description "A class constraint." } ;
 
 HELP: constraints
-{ $var-description "Maps constraints to constraints ('A implies B')" } ;
+{ $var-description "A " { $link sequence } " of assocs. They maps constraints to constraints ('A implies B')." } ;
 
 HELP: equivalence
 { $var-description "An equivalence constraint." } ;

@@ -24,8 +24,6 @@ M: node delete-node drop ;
 GENERIC: cleanup-tree* ( node -- node/nodes )
 
 : cleanup-tree ( nodes -- nodes' )
-    ! We don't recurse into children here, instead the methods
-    ! do it since the logic is a bit more involved
     [ cleanup-tree* ] map-flat ;
 
 ! Constant folding
@@ -114,8 +112,6 @@ M: #call cleanup-tree*
     ] change-children drop ;
 
 : fold-only-branch ( #branch -- node/nodes )
-    ! If only one branch is live we don't need to branch at
-    ! all; just drop the condition value.
     dup live-children sift dup length {
         { 0 [ drop in-d>> <#drop> ] }
         { 1 [ first swap in-d>> <#drop> prefix ] }

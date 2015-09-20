@@ -45,7 +45,12 @@ IN: compiler.tree.propagation.recursive
     2dup [ not ] either? [ drop ] [
         2dup [ class>> null-class? ] either? [ drop ] [
             [ clone ] dip
-            [ [ drop ] [ [ [ interval>> ] bi@ ] [ drop class>> ] 2bi generalize-counter-interval ] 2bi >>interval ]
+            [
+                [ drop ] [
+                    [ [ interval>> ] bi@ ] [ drop class>> ] 2bi
+                    generalize-counter-interval
+                ] 2bi >>interval
+            ]
             [ [ drop ] [ [ slots>> ] bi@ [ generalize-counter ] 2map ] 2bi >>slots ]
             bi
         ] if
