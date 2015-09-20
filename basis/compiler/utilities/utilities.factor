@@ -22,6 +22,9 @@ IN: compiler.utilities
 
 : 2map-flat ( seq quot -- seq' ) [ 2each ] flattening ; inline
 
+: pad-tail-shorter ( seq1 seq2 elt -- seq1' seq2' )
+    2over longer length swap [ pad-tail ] 2curry bi@ ;
+
 SYMBOL: yield-hook
 
 yield-hook [ [ ] ] initialize

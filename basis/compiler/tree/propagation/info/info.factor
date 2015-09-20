@@ -3,7 +3,7 @@
 USING: accessors arrays assocs byte-arrays classes
 classes.algebra classes.singleton classes.tuple
 classes.tuple.private combinators combinators.short-circuit
-compiler.tree.propagation.copy kernel layouts math
+compiler.tree.propagation.copy compiler.utilities kernel layouts math
 math.intervals namespaces sequences sequences.private strings
 words ;
 IN: compiler.tree.propagation.info
@@ -265,19 +265,13 @@ DEFER: (value-info-union)
     } cond ;
 
 : value-info<= ( info1 info2 -- ? )
+    [ [ object-info ] unless* ] bi@
     {
-        { [ dup not ] [ 2drop t ] }
-        { [ over not ] [ 2drop f ] }
-        [
-            {
-                { [ 2dup [ class>> ] bi@ class<= not ] [ f ] }
-                { [ 2dup [ interval>> ] bi@ interval-subset? not ] [ f ] }
-                { [ 2dup literals<= not ] [ f ] }
-                { [ 2dup [ slots>> ] bi@ [ value-info<= ] 2all? not ] [ f ] }
-                [ t ]
-            } cond 2nip
-        ]
-    } cond ;
+        [ [ class>> ] bi@ class<= ]
+        [ [ interval>> ] bi@ interval-subset? ]
+        [ literals<= ]
+        [ [ slots>> ] bi@ f pad-tail-shorter [ value-info<= ] 2all? ]
+    } 2&& ;
 
 SYMBOL: value-infos
 
