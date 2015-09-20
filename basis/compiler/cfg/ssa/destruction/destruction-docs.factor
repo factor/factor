@@ -5,7 +5,11 @@ IN: compiler.cfg.ssa.destruction
 
 HELP: cleanup-cfg
 { $values { "cfg" cfg } }
-{ $description "In this step, " { $link ##parallel-copy } " instructions are substituted with more concreete " { $link ##copy } " instructions. " { $link ##phi } " instructions are removed here." } ;
+{ $description "In this pass, useless copies are eliminated. " { $link ##phi } " instructions are removed and " { $link ##parallel-copy } " are transformed into regular " { $link ##copy } " instructions. Then for the copy instructions, which are ##copy and " { $link ##tagged>integer } " it is checked to see if the copy is useful. If it is not, the instruction is removed from the cfg." } ;
+
+HELP: destruct-ssa
+{ $values { "cfg" cfg } }
+{ $description "Main entry point for the SSA destruction compiler pass." } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
 "Because of the design of the register allocator, this pass has three peculiar properties."

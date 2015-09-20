@@ -1,6 +1,6 @@
 USING: compiler.cfg.linear-scan
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals help.markup help.syntax ;
+compiler.cfg.linear-scan.live-intervals help.markup help.syntax math ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 HELP: assign-spill
@@ -28,6 +28,14 @@ HELP: spill-before
 { $description "If the interval does not have any usages before the spill location, then it is the second child of an interval that was split. We reload the value and let the resolve pass insert a spill later." }
 { $see-also spill-after } ;
 
+HELP: split-for-spill
+{ $values
+  { "live-interval" live-interval }
+  { "n" integer }
+  { "before" live-interval }
+  { "after" live-interval }
+} { $description "During register allocation an interval needs to be split so that the 'after' part of it can be placed in a spill slot." } ;
+
 HELP: spill-intersecting
 { $values { "new" live-interval-state } { "reg" "register" } }
 { $description "Split and spill all active and inactive intervals which intersect 'new' and use 'reg'." } ;
@@ -53,6 +61,9 @@ HELP: trim-before-ranges
 { $description "Extends the last intervals range to one after the last use point and removes all intervals beyond that." } ;
 
 ARTICLE: "compiler.cfg.linear-scan.allocation.spilling" "Spill slot assignment"
-"Words and dynamic variables for assigning spill slots to spilled registers during the " { $link linear-scan } " compiler pass." ;
+"Words and dynamic variables for assigning spill slots to spilled registers during the " { $link linear-scan } " compiler pass."
+$nl
+"Splitting live intervals:"
+{ $subsections split-for-spill } ;
 
 ABOUT: "compiler.cfg.linear-scan.allocation.spilling"
