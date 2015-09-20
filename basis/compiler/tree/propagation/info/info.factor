@@ -23,19 +23,17 @@ M: float eql? over float? [ [ double>bits ] same? ] [ 2drop f ] if ;
 M: complex eql? over complex? [ = ] [ 2drop f ] if ;
 
 TUPLE: value-info-state
-class
-interval
-literal
-literal?
-slots ;
+    class
+    interval
+    literal
+    literal?
+    slots ;
 
 CONSTANT: null-info T{ value-info-state f null empty-interval }
 
 CONSTANT: object-info T{ value-info-state f object full-interval }
 
 : interval>literal ( class interval -- literal literal? )
-    ! If interval has zero length and the class is sufficiently
-    ! precise, we can turn it into a literal
     dup special-interval? [
         2drop f f
     ] [
@@ -60,7 +58,6 @@ DEFER: <literal-info>
 UNION: fixed-length array byte-array string ;
 
 : literal-class ( obj -- class )
-    ! Handle forgotten tuples and singleton classes properly
     dup singleton-class? [
         class-of dup class? [
             drop tuple
