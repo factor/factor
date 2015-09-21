@@ -18,6 +18,14 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     [ number-instructions ] [ cfg>sync-points ] bi
 ] unit-test
 
+! find-use
+{
+    f T{ vreg-use { n 25 } }
+} [
+    25 T{ live-interval-state { uses V{ } } } find-use
+    25 T{ live-interval-state { uses V{ T{ vreg-use { n 25 } } } } } find-use
+] unit-test
+
 ! intervals-intersect?
 { t f f } [
     { { 4 20 } } <live-interval-for-ranges>

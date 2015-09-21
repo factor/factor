@@ -133,22 +133,18 @@ M: #if emit-node
         [ emit-actual-if ]
     } cond ;
 
-! #dispatch
 M: #dispatch emit-node
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
     ! though.
     ds-pop ^^offset>slot next-vreg ##dispatch, emit-if ;
 
-! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
     [ emit-intrinsic ] [ swap call-height emit-call ] if ;
 
-! #call-recursive
 M: #call-recursive emit-node [ label>> id>> ] [ call-height ] bi emit-call ;
 
-! #push
 M: #push emit-node
     literal>> ^^load-literal ds-push ;
 

@@ -1,5 +1,8 @@
-USING: compiler.codegen.relocation help.markup help.syntax math ;
+USING: compiler.codegen.relocation help.markup help.syntax math vm ;
 IN: compiler.constants
+
+HELP: context-callstack-save-offset
+{ $description "Offset in bytes in the " { $link context } " struct to where the c callstack is saved." } ;
 
 HELP: rt-cards-offset
 { $description "Relocation offset type for the cards table." }

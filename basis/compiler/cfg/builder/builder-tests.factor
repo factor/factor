@@ -4,10 +4,10 @@ compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
 compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.representations
 compiler.cfg.rpo compiler.cfg.stacks compiler.cfg.stacks.local
 compiler.cfg.utilities compiler.test compiler.tree compiler.tree.builder
-compiler.tree.optimizer fry hashtables io kernel kernel.private locals make math
-math.partial-dispatch math.private namespaces prettyprint sbufs sequences
-sequences.private slots.private strings strings.private tools.test vectors
-words ;
+compiler.tree.optimizer cpu.architecture fry hashtables io kernel kernel.private
+locals make math math.partial-dispatch math.private namespaces prettyprint sbufs
+sequences sequences.private slots.private strings strings.private tools.test
+vectors words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
@@ -273,6 +273,26 @@ IN: compiler.cfg.builder.tests
     } emit-node
     height-state get
     replaces get
+] cfg-unit-test
+
+{
+    V{
+        T{ ##load-integer { dst 3 } { val 0 } }
+        T{ ##add { dst 4 } { src1 3 } { src2 2 } }
+        T{ ##load-memory-imm
+           { dst 5 }
+           { base 4 }
+           { offset 0 }
+           { rep int-rep }
+        }
+        T{ ##box-alien { dst 7 } { src 5 } { temp 6 } }
+    }
+} [
+    T{ #call
+       { word alien-cell }
+       { in-d V{ 10 20 } }
+       { out-d { 30 } }
+    } [ emit-node ] V{ } make
 ] cfg-unit-test
 
 { 1 } [

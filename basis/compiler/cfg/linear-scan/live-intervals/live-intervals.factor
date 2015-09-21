@@ -35,7 +35,7 @@ TUPLE: live-interval-state
 : (find-use) ( insn# live-interval -- vreg-use )
     uses>> [ n>> <=> ] with search nip ;
 
-:: find-use ( insn# live-interval -- vreg-use )
+:: find-use ( insn# live-interval -- vreg-use/f )
     insn# live-interval (find-use)
     dup [ dup n>> insn# = [ drop f ] unless ] when ;
 

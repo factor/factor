@@ -112,3 +112,43 @@ cpu x86.64? [
     full-interval-and-bignum-literal setup-value-infos
     V{ 0 1 } V{ 2 } \ mod call-outputs-quot-of-word
 ] unit-test
+
+! (fold-call)
+{
+    {
+        T{ value-info-state
+           { class fixnum }
+           { interval
+             T{ interval { from { 5 t } } { to { 5 t } } }
+           }
+           { literal 5 }
+           { literal? t }
+        }
+    }
+} [
+    { 2 3 "hello" } [ <literal-info> ] map setup-value-infos
+    { 0 1 } { 2 } \ + <#call> dup word>> (fold-call)
+] unit-test
+
+{
+    {
+        T{ value-info-state
+           { class object }
+           { interval full-interval }
+        }
+    }
+} [
+    { 2 "hello" } [ <literal-info> ] map setup-value-infos { 0 1 } { 2 } \ +
+    <#call> (fold-call2)
+] unit-test
+
+! foldable-call?
+{ t f f t } [
+    { 2 3 "hello" } [ <literal-info> ] map setup-value-infos
+    { 0 1 } { 2 } \ + <#call> foldable-call?
+    { 0 2 } { 2 } \ + <#call> foldable-call?
+    number <class-info> 1array setup-value-infos
+    { 0 } { 1 } \ >fixnum <#call> foldable-call?
+    "mamma mia" <literal-info> 1array setup-value-infos
+    { 0 } { 1 } \ >fixnum <#call> foldable-call?
+] unit-test
