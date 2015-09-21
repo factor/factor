@@ -11,6 +11,10 @@ HELP: output-value-infos
 { $description "Computes what the output value infos for a #call node should be." }
 { $see-also value-info-state } ;
 
+HELP: propagate-predicate
+{ $values { "#call" #call } { "word" word } { "infos" sequence } }
+{ $description "We need to force the caller word to recompile when the class is redefined, since now we're making assumptions but the class definition itself." } ;
+
 ARTICLE: "compiler.tree.propagation.simple"
 "Propagation for straight-line code"
 "Propagation for straight-line code" ;

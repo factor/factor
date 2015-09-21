@@ -43,7 +43,7 @@ HELP: live-ins
 { $see-also compute-live-sets } ;
 
 HELP: live-outs
-{ $var-description "Hash that maps from basic blocks to sets of vregs that are live after execution leaves the block." } ;
+{ $var-description "Hash that maps from basic blocks to sets of vregs that are live after execution leaves the block. The data is computed by " { $link compute-live-sets } } ;
 
 HELP: lookup-base-pointer
 { $values { "vreg" "vreg" } { "vreg/f" { $maybe "vreg" } } }

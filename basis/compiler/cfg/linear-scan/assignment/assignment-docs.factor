@@ -1,7 +1,7 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state compiler.cfg.liveness
-compiler.cfg.registers heaps help.markup help.syntax math ;
+compiler.cfg.registers heaps help.markup help.syntax math sequences ;
 IN: compiler.cfg.linear-scan.assignment
 
 HELP: add-pending
@@ -20,6 +20,10 @@ HELP: assign-gc-roots
 HELP: assign-registers-in-block
 { $values { "bb" basic-block } }
 { $description "Assigns registers and also inserts " { $link ##reload } " and " { $link ##spill } " instructions." } ;
+
+HELP: assign-registers
+{ $values { "cfg" cfg } { "live-intervals" sequence } }
+{ $description "Uses the live intervals in the sequence to assign physical registers to all instructions in the cfg. The live intervals must first have had their physical registers assigned by " { $link allocate-registers } "." } ;
 
 HELP: assign-registers-in-insn
 { $values { "insn" insn } }
