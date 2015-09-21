@@ -132,7 +132,11 @@ HELP: %box
 { $description "Call a function to convert a value into a tagged pointer, possibly allocating a bignum, float, or alien instance, which is then pushed on the data stack." } ;
 
 HELP: %box-alien
-{ $values { "dst" "destination register" } { "src" "source register" } { "temp" "temporary register" } }
+{ $values
+  { "dst" "destination register" }
+  { "src" "register containing pointer to the alien" }
+  { "temp" "temporary register" }
+}
 { $description "Emits machine code for boxing an alien value. If the alien is not a NULL pointer, then five " { $link cells } " will be allocated in the nursery space to wrap the object. See vm/layouts.hpp for details." }
 { $examples { $unchecked-example $[ ex-%box-alien ] } }
 { $see-also ##box-alien %allot } ;

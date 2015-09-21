@@ -48,7 +48,7 @@ HELP: gc-map-needed?
 
 HELP: gc-root-offsets
 { $values { "gc-map" gc-map } { "offsets" sequence } }
-{ $description "Gets the offets of all roots in a gc-map. The " { $link stack-frame } " variable must have been setup first." } ;
+{ $description "Gets the offets of all roots in a gc-map. The " { $link cfg } " variable must have been set and the stack-frame slot been initialized." } ;
 
 HELP: serialize-gc-maps
 { $values { "byte-array" byte-array } }

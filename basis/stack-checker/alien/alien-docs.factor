@@ -7,8 +7,10 @@ HELP: alien-node-params
   { $table
     { { $slot "return" } { "a " { $link c-type-name } " which indicates the type of the functions return value." } }
     { { $slot "parameters" } { "a " { $link sequence } " of " { $link c-type-name } " giving the types of the functions parameters." } }
+    { { $slot "abi" } { "calling convention of the function the node parameters operates on." } }
   }
-} ;
+}
+{ $see-also abi } ;
 
 HELP: alien-callback-params
 { $class-description "Class that holds the parameter types and return value type of an alien callback call." }
