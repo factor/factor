@@ -443,7 +443,13 @@ HELP: 3map-as
 
 HELP: 2all?
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "?" boolean } }
-{ $description "Tests the predicate pairwise against elements of " { $snippet "seq1" } " and " { $snippet "seq2" } "." } ;
+{ $description "Tests the predicate pairwise against elements of " { $snippet "seq1" } " and " { $snippet "seq2" } ". If the sequences have different lengths, then only the smallest sequences items are compared with the other." }
+{ $examples
+  { $example "USING: prettyprint sequences ;"
+    "{ 1 2 3 4 } { 2 4 6 8 } [ <= ] 2all? ."
+    "t"
+  }
+} ;
 
 HELP: find
 { $values { "seq" sequence }
