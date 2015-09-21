@@ -406,3 +406,5 @@ USE: make
 {
     BV{ 11 23 35 }
 } [ { 11 22 33 } [ + ] BV{ } map-index-as ] unit-test
+
+{ t } [ { } { 99 88 } [ <= ] 2all? ] unit-test
