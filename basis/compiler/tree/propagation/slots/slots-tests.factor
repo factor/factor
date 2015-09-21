@@ -15,10 +15,6 @@ IN: compiler.tree.propagation.slots.tests
     \ <array> sequence-constructor?
 ] unit-test
 
-{ array byte-array string } [
-    \ <array> \ <byte-array> \ <string> [ constructor-output-class ] tri@
-] unit-test
-
 {
     T{ value-info-state
        { class array }
