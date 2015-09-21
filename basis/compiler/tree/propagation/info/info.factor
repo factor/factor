@@ -264,13 +264,20 @@ DEFER: (value-info-union)
         [ [ literal>> ] bi@ eql? ]
     } cond ;
 
+DEFER: value-info<=
+
+: slots<= ( info1 info2 -- ? )
+    2dup [ class>> ] bi@ class< [ 2drop t ] [
+        [ slots>> ] bi@ f pad-tail-shorter [ value-info<= ] 2all?
+    ] if ;
+
 : value-info<= ( info1 info2 -- ? )
     [ [ object-info ] unless* ] bi@
     {
         [ [ class>> ] bi@ class<= ]
         [ [ interval>> ] bi@ interval-subset? ]
         [ literals<= ]
-        [ [ slots>> ] bi@ f pad-tail-shorter [ value-info<= ] 2all? ]
+        [ slots<= ]
     } 2&& ;
 
 SYMBOL: value-infos
