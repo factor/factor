@@ -1,5 +1,5 @@
 USING: compiler.tree effects help.markup help.syntax math quotations sequences
-stack-checker.state stack-checker.values stack-checker.visitor ;
+stack-checker.state stack-checker.values stack-checker.visitor words ;
 IN: stack-checker.backend
 
 HELP: consume-d
@@ -50,6 +50,10 @@ HELP: push-literal
 { $values { "obj" "object" } }
 { $description "Pushes a literal onto the " { $link literals } " sequence." }
 { $see-also commit-literals } ;
+
+HELP: required-stack-effect
+{ $values { "word" word } { "effect" effect } }
+{ $description "Gets the stack effect of the word, or throws an error if it doesn't have one." } ;
 
 HELP: with-infer
 { $values { "quot" quotation } { "effect" effect } { "visitor" "a visitor, if any" } }

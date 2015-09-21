@@ -19,7 +19,6 @@ SYMBOL: extra-offset  ! Only used by non-optimizing compiler
 : align-code ( n -- )
     alignment (align-code) ;
 
-! Parameter table
 SYMBOL: parameter-table
 
 : add-parameter ( obj -- ) parameter-table get push ;

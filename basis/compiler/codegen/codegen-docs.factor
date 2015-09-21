@@ -1,6 +1,6 @@
-USING: alien byte-arrays compiler.cfg compiler.codegen.labels
-compiler.codegen.relocation hashtables help.markup help.syntax literals make
-multiline sequences ;
+USING: alien byte-arrays compiler.cfg compiler.cfg.instructions
+compiler.codegen.labels compiler.codegen.relocation cpu.architecture hashtables
+help.markup help.syntax literals make multiline sequences ;
 IN: compiler.codegen
 
 <<
@@ -53,16 +53,10 @@ STRING: generate-ex-answer
 ;
 >>
 
-HELP: labels
-{ $description { $link hashtable } " of mappings from " { $link basic-block } " to " { $link label } "." } ;
-
-HELP: lookup-label
-{ $values { "bb" basic-block } { "label" label } }
-{ $description "Sets and gets a " { $link label } " for the " { $link basic-block } ". The labels are used to generate branch instructions from one block to another." } ;
-
-HELP: generate-block
-{ $values { "bb" basic-block } }
-{ $description "Emits machine code to the current " { $link make } " sequence for one basic block." } ;
+HELP: emit-branch
+{ $values { "bb" basic-block } { "successor" basic-block } }
+{ $description "Emits a branching instruction for jumping from one block to the next. If the blocks are next to each other, then no jump is needed." }
+{ $see-also %jump-label } ;
 
 HELP: generate
 { $values { "cfg" cfg } { "code" sequence } }
@@ -80,6 +74,23 @@ HELP: generate
   "A small quotation is compiled and then disassembled:"
   { $unchecked-example $[ generate-ex generate-ex-answer ] }
 } ;
+
+HELP: generate-insn
+{ $values { "insn" insn } }
+{ $description "Generates assembler code for one cfg instruction." }
+{ $see-also generate } ;
+
+HELP: generate-block
+{ $values { "bb" basic-block } }
+{ $description "Emits machine code to the current " { $link make } " sequence for one basic block." } ;
+
+
+HELP: labels
+{ $description { $link hashtable } " of mappings from " { $link basic-block } " to " { $link label } "." } ;
+
+HELP: lookup-label
+{ $values { "bb" basic-block } { "label" label } }
+{ $description "Sets and gets a " { $link label } " for the " { $link basic-block } ". The labels are used to generate branch instructions from one block to another." } ;
 
 HELP: useless-branch?
 { $values

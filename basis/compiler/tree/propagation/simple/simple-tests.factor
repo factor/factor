@@ -139,16 +139,16 @@ cpu x86.64? [
     }
 } [
     { 2 "hello" } [ <literal-info> ] map setup-value-infos { 0 1 } { 2 } \ +
-    <#call> (fold-call2)
+    <#call> dup word>> (fold-call)
 ] unit-test
 
 ! foldable-call?
 { t f f t } [
     { 2 3 "hello" } [ <literal-info> ] map setup-value-infos
-    { 0 1 } { 2 } \ + <#call> foldable-call?
-    { 0 2 } { 2 } \ + <#call> foldable-call?
+    { 0 1 } { 2 } \ + <#call> dup word>> foldable-call?
+    { 0 2 } { 2 } \ + <#call> dup word>> foldable-call?
     number <class-info> 1array setup-value-infos
-    { 0 } { 1 } \ >fixnum <#call> foldable-call?
+    { 0 } { 1 } \ >fixnum <#call> dup word>> foldable-call?
     "mamma mia" <literal-info> 1array setup-value-infos
-    { 0 } { 1 } \ >fixnum <#call> foldable-call?
+    { 0 } { 1 } \ >fixnum <#call> dup word>> foldable-call?
 ] unit-test
