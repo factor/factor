@@ -3,23 +3,15 @@
 USING: accessors arrays assocs byte-arrays classes
 classes.algebra classes.tuple classes.tuple.private combinators
 combinators.short-circuit compiler.tree.propagation.info kernel
-math sequences slots.private strings ;
+math sequences slots.private strings words ;
 IN: compiler.tree.propagation.slots
 
 : sequence-constructor? ( word -- ? )
     { <array> <byte-array> (byte-array) <string> } member-eq? ;
 
-: constructor-output-class ( word -- class )
-    {
-        { <array> array }
-        { <byte-array> byte-array }
-        { (byte-array) byte-array }
-        { <string> string }
-    } at ;
-
 : propagate-sequence-constructor ( #call word -- infos )
     [ in-d>> first value-info ]
-    [ constructor-output-class ] bi*
+    [ "default-output-classes" word-prop first ] bi*
     <sequence-info> 1array ;
 
 : fold-<tuple-boa> ( values class -- info )
