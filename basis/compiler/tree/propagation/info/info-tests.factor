@@ -81,42 +81,113 @@ TUPLE: test-tuple { x read-only } ;
 
 STRUCT: self { s self* } ;
 
+TUPLE: tup1 foo ;
+
+TUPLE: tup2 < tup1 bar ;
+
+: make-slotted-info ( slot-classes class -- info )
+    [ [ dup [ <class-info> ] when ] map ] dip <tuple-info> ;
+
+! slots<=
+{ t t f } [
+    null-info null-info slots<=
+    { byte-array } self make-slotted-info self <class-info> slots<=
+    self <class-info> { byte-array } self make-slotted-info slots<=
+] unit-test
+
 ! value-info<=
-{ t t t t t t } [
-    byte-array <class-info> c-ptr <class-info> value-info<=
-    null-info 3 <literal-info> value-info<=
-    null-info null-info value-info<=
-    alien <class-info> c-ptr <class-info> value-info<=
+! ------------
 
-    20 <literal-info> fixnum <class-info> value-info<=
-
-    ! A byte-array is a kind of c-ptr
-    f byte-array <class-info> 2array self <tuple-info>
-    f c-ptr <class-info> 2array self <tuple-info>
-    value-info<=
+! Comparing classes
+{ t t } [
+    byte-array c-ptr [ <class-info> ] bi@ value-info<=
+    alien c-ptr [ <class-info> ] bi@ value-info<=
 ] unit-test
 
-{ f f f f f } [
-    ! Checking intervals
-    fixnum <class-info> 20 <literal-info> value-info<=
-
-    ! Mutable literals
-    [ "foo" ] <literal-info> [ "foo" ] <literal-info> value-info<=
-    ! Strings should be immutable but they aren't. :/
-    "hey" <literal-info> "hey" <literal-info> value-info<=
-
-    f c-ptr <class-info> 2array self <tuple-info>
-    f byte-array <class-info> 2array self <tuple-info>
-    value-info<=
-
-    ! If one value-info has a slot specified and the other doesn't,
-    ! then it can't be smaller because that other slot could be
-    ! anything!
-    self <class-info>
-    f byte-array <class-info> 2array self <tuple-info> value-info<=
-] unit-test
-
+! Literals vs. classes
 { t f } [
+    20 <literal-info> fixnum <class-info> value-info<=
+    fixnum <class-info> 20 <literal-info> value-info<=
+] unit-test
+
+! Nulls vs. literals
+{ t f } [
+    null-info 3 <literal-info> value-info<=
+    3 <literal-info> null-info value-info<=
+] unit-test
+
+! Fulls vs. literal
+{ t } [
     10 <literal-info> f value-info<=
-    f 10 <literal-info> value-info<=
+] unit-test
+
+! Same class, different slots
+{ t t f } [
+    { byte-array } self make-slotted-info
+    { c-ptr } self make-slotted-info
+    value-info<=
+
+    { byte-array byte-array } self make-slotted-info
+    { } self make-slotted-info
+    value-info<=
+
+    { } self make-slotted-info
+    { byte-array byte-array } self make-slotted-info
+    value-info<=
+] unit-test
+
+! Slots with literals
+{ f } [
+    10 <literal-info> 1array array <tuple-info>
+    20 <literal-info> 1array array <tuple-info>
+    value-info<=
+] unit-test
+
+! Slots, but different classes
+{ t } [
+    null-info { f c-ptr } self make-slotted-info value-info<=
+] unit-test
+
+! Null vs. null vs. full
+{ t t f } [
+    null-info null-info value-info<=
+    null-info f value-info<=
+    f null-info value-info<=
+] unit-test
+
+! Same class, intervals
+{ t f } [
+    fixnum 20 30 [a,b] <class/interval-info>
+    fixnum 0 100 [a,b] <class/interval-info>
+    value-info<=
+    fixnum 0 100 [a,b] <class/interval-info>
+    fixnum 20 30 [a,b] <class/interval-info>
+    value-info<=
+] unit-test
+
+! Different classes, intervals
+{ t f f } [
+    fixnum 20 30 [a,b] <class/interval-info>
+    real 0 100 [a,b] <class/interval-info>
+    value-info<=
+
+    real 5 10 [a,b] <class/interval-info>
+    integer 0 20 [a,b] <class/interval-info>
+    value-info<=
+
+    integer 0 20 [a,b] <class/interval-info>
+    real 5 10 [a,b] <class/interval-info>
+    value-info<=
+] unit-test
+
+! Mutable literals
+{ f f } [
+    [ "foo" ] <literal-info> [ "foo" ] <literal-info> value-info<=
+    "hey" <literal-info> "hey" <literal-info> value-info<=
+] unit-test
+
+! Tuples
+{ t f } [
+    tup2 <class-info> tup1 <class-info> value-info<=
+    tup1 <class-info> tup2 <class-info> value-info<=
 ] unit-test
