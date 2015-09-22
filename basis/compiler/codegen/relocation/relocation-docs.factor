@@ -1,5 +1,5 @@
-USING: byte-vectors compiler.constants cpu.architecture help.markup
-help.syntax make vectors ;
+USING: alien byte-arrays byte-vectors compiler.constants cpu.architecture
+help.markup help.syntax make vectors ;
 IN: compiler.codegen.relocation
 
 HELP: relocation-table
@@ -7,6 +7,7 @@ HELP: relocation-table
 { $see-also init-relocation } ;
 
 HELP: add-dlsym-parameters
+{ $values { "symbol" byte-array } { "dll" dll } }
 { $description "Adds a pair of parameters for a reference to an external C function to the " { $link parameter-table } "." } ;
 
 HELP: add-relocation

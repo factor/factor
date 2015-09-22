@@ -7,8 +7,8 @@ HELP: add-range
 
 HELP: intersect-range
 { $values
-  { "range1" pair }
-  { "range2" pair }
+  { "r1" pair }
+  { "r2" pair }
   { "n/f" { $link number } " or " { $link f } }
 }
 { $description "First index for the ranges intersection, or f if they don't intersect." } ;
