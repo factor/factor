@@ -36,7 +36,7 @@ HELP: #declare
 { $class-description "SSA tree node emitted when " { $link declare } " declarations are encountered." } ;
 
 HELP: #enter-recursive
-{ $class-description "This node works is placed first in the " { $slot "child" } " sequence for " { $link #recursive } " nodes and works like a header for it." }
+{ $class-description "This node works is placed first in the 'child' " { $link sequence } " for " { $link #recursive } " nodes and works like a header for it." }
 { $see-also #recursive #return-recursive } ;
 
 HELP: #if

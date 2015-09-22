@@ -72,12 +72,6 @@ HELP: live-interval-state
     {
         { $slot "uses" } { "sequence of insn# numbers which reference insructions that use the register in the live interval." }
     }
-    {
-        { $slot "reg-class" }
-        { "Register class of the interval, either "
-          { $link int-regs } " or " { $link float-regs } "." }
-
-    }
   }
 }
 { $notes "The " { $slot "uses" } " and " { $slot "ranges" } " will never be empty because then the interval would be unused." } ;
