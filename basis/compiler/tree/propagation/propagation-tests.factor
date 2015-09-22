@@ -1,14 +1,14 @@
 USING: accessors alien alien.accessors alien.c-types alien.data arrays assocs
-byte-arrays classes classes.algebra classes.tuple.private compiler.tree
-compiler.tree.builder compiler.tree.checker compiler.tree.debugger
-compiler.tree.def-use compiler.tree.normalization compiler.tree.optimizer
-compiler.tree.propagation compiler.tree.propagation.info
-compiler.tree.recursive effects fry generic.single hashtables kernel
-kernel.private layouts locals math math.floats.private math.functions
-math.integers.private math.intervals math.libm math.order math.private
-quotations sets sequences sequences.private slots.private sorting
-specialized-arrays strings strings.private system tools.test vectors vocabs
-words ;
+byte-arrays classes classes.algebra classes.struct classes.tuple.private
+combinators.short-circuit compiler.tree compiler.tree.builder
+compiler.tree.checker compiler.tree.debugger compiler.tree.def-use
+compiler.tree.normalization compiler.tree.optimizer compiler.tree.propagation
+compiler.tree.propagation.info compiler.tree.recursive effects fry
+generic.single hashtables kernel kernel.private layouts locals math
+math.floats.private math.functions math.integers.private math.intervals
+math.libm math.order math.private quotations sets sequences sequences.private
+slots.private sorting specialized-arrays strings strings.private system
+tools.test vectors vocabs words ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -1083,3 +1083,13 @@ M: f derp drop t ;
     4.3 shift ;
 
 [ 1 shift-test0 ] [ no-method? ] must-fail-with
+
+! Test for the #1370 bug
+STRUCT: bar { s bar* } ;
+
+{ t } [
+    [ bar <struct> [ s>> ] follow ] build-tree optimize-tree
+    [ #recursive? ] find nip
+    child>> [ { [ #call? ] [ word>> \ alien-cell = ] } 1&& ] find nip
+    >boolean
+] unit-test
