@@ -31,6 +31,17 @@ from urllib import urlopen
 from urlparse import urljoin, urlparse
 from waflib import Errors, Task
 
+# Hack over a bug in waf 1.8.12
+from waflib.Tools import c_config
+c_config.SNIP_FUNCTION = '''
+int main(int argc, char **argv) {
+	void *p;
+	(void)argc; (void)argv;
+	p=(void*)(%s);
+	return p != 0;
+}
+'''
+
 cpu_to_bits = {'amd64' : 64, 'i386' : 32, 'x86' : 32, 'x86_64' : 64}
 
 guids = {
