@@ -112,12 +112,13 @@ PRIVATE>
 : add-output-logging ( word level -- )
     [ output-logging-quot ] (define-logging) ;
 
+: error>string ( error -- string )
+    [ print-error :c ] with-string-writer ;
+
 : (log-error) ( object word level -- )
     log-service get [
-        [ [ print-error ] with-string-writer ] 2dip log-message
-    ] [
-        2drop rethrow
-    ] if ;
+        [ error>string ] 2dip log-message
+    ] [ 2drop rethrow ] if ;
 
 : log-error ( error word -- ) ERROR (log-error) ;
 
