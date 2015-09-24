@@ -208,9 +208,8 @@ M: output-port stream-seek
 M: buffered-port stream-seekable?
     handle>> can-seek-handle? ;
 
-! Cannot be ``handle>> handle-length`` because of a race condition.
 M: buffered-port stream-length
-    drop f ;
+    handle>> handle-length [ f ] when-zero ;
 
 GENERIC: shutdown ( handle -- )
 
