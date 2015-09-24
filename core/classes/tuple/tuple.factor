@@ -103,8 +103,8 @@ M: tuple-class slots>tuple ( seq class -- tuple )
         bi 2each
     ] keep ;
 
-: tuple>array ( tuple -- array )
-    [ tuple-slots ] [ layout-of first prefix ] bi ;
+: tuple>array ( tuple -- seq )
+    [ tuple-slots ] [ class-of prefix ] bi ;
 
 : >tuple ( seq -- tuple )
     unclip slots>tuple ;

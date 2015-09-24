@@ -200,6 +200,7 @@ ARTICLE: "tuple-introspection" "Tuple introspection"
     >tuple
     tuple>array
     tuple-slots
+    slots>tuple
 }
 "Tuples can be compared for slot equality even if the tuple class overrides " { $link equal? } ":"
 { $subsections tuple= }
