@@ -27,8 +27,14 @@ from checksums import dlls
 from contextlib import closing
 from hashlib import md5
 from os import path
-from urllib import urlopen
-from urlparse import urljoin, urlparse
+try:
+    from urllib import urlopen
+except ImportError:
+    from urllib.request import urlopen
+try:
+    from urlparse import urljoin, urlparse
+except ImportError:
+    from urllib.parse import urljoin, urlparse
 from waflib import Errors, Task
 
 # Hack over a bug in waf 1.8.12
@@ -164,7 +170,7 @@ def options(ctx):
         help = 'URI to the boot image directory',
         default = 'http://downloads.factorcode.org/images/latest/'
     )
-    dest_cpus = cpu_to_bits.keys()
+    dest_cpus = list(cpu_to_bits.keys())
     text = ', '.join(dest_cpus[:-1]) + ' or ' + dest_cpus[-1]
     ctx.add_option(
         '--dest-cpu',
@@ -271,6 +277,13 @@ def download_file(self):
     local_path = self.outputs[0].abspath()
     check_and_download(gen.url, local_path, gen.checksum)
 
+def url_to_lines(url):
+    with closing(urlopen(url)) as f:
+        for line in f:
+            if type(line) != str:
+                line = line.decode('utf-8')
+            yield line
+
 def get_image_checksum(base_url, name):
     o = urlparse(base_url)
     if o.scheme == 'file':
@@ -278,11 +291,10 @@ def get_image_checksum(base_url, name):
         return file_checksum(path.join(p, name), True)
 
     checksum_file = urljoin(base_url, 'checksums.txt')
-    with closing(urlopen(checksum_file)) as f:
-        for line in f:
-            other_name, checksum = line.split()
-            if name == other_name:
-                return checksum
+    for line in url_to_lines(checksum_file):
+        other_name, checksum = line.split()
+        if name == other_name:
+            return checksum
     fmt = 'No checksum for %s in %s found'
     raise Errors.WafError(fmt % (name, base_url))
 
