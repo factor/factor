@@ -1,6 +1,11 @@
 # Checksums used on Windows to verify integrity of downloaded dlls.
 from hashlib import md5
-from urllib import urlopen
+from sys import stdout
+try:
+    from urllib import urlopen
+except ImportError:
+    from urllib.request import urlopen
+    from urllib.error import HTTPError
 
 # List of prebuilt libraries to download to create the windows msi
 # (name, digest32, digest64). If digest is None, then the dll is not
@@ -97,14 +102,20 @@ def data_digest(data):
     # Filter file not found pages.
     return None if len(data) < 512 else md5(data).hexdigest()
 
+def read_url(url):
+    try:
+        return urlopen(url).read()
+    except HTTPError:
+        return ''
+
 if __name__ == '__main__':
     # Run file to update the checksums to check against.
     url_fmt = 'http://downloads.factorcode.org/dlls/%s%s'
     for name, _, _ in dlls:
         url1 = url_fmt % ('', name)
-        data = urlopen(url1).read()
+        data = read_url(url1)
         chk32 = data_digest(data)
         url2 = url_fmt % ('64/', name)
-        data = urlopen(url2).read()
+        data = read_url(url2)
         chk64 = data_digest(data)
-        print "('%s', %r, %r)," % (name, chk32, chk64)
+        stdout.write("('%s', %r, %r),\n" % (name, chk32, chk64))

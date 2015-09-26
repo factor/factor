@@ -194,7 +194,7 @@ def configure(ctx):
     ctx.define('FACTOR_VERSION', VERSION)
     try:
         git_label = ctx.cmd_and_log("git describe --all --long").strip()
-    except Errors.WafError, e:
+    except Errors.WafError:
         git_label = 'tarball-build'
     ctx.define('FACTOR_GIT_LABEL', git_label)
     ctx.define('INSTALL_PREFIX', pf)
