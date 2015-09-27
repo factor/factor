@@ -112,22 +112,70 @@ set_md5sum() {
     fi
 }
 
+semver_into() {
+	CLANG_RE_OLD="^([0-9]*)\.([0-9]*)-(.*)?$" # 3.3-5
+	RE_SEMVER="^([0-9]*)\.([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3.3-5
+	if [[ $1 =~ $CLANG_RE_OLD ]] ; then
+		eval $2=${BASH_REMATCH[1]}
+		eval $3=${BASH_REMATCH[2]}
+		eval $4=0
+		eval $5=${BASH_REMATCH[3]}
+	elif [[ $1 =~ $RE_SEMVER ]] ; then
+		eval $2=${BASH_REMATCH[1]}
+		eval $3=${BASH_REMATCH[2]}
+		eval $4=${BASH_REMATCH[3]}
+		eval $5=${BASH_REMATCH[4]}
+	else
+		echo "unsupported version number, please report a bug: $1"
+		exit 123
+	fi
+}
+
+# issue 1440
+gcc_version_ok() {
+	GCC_VERSION=`gcc --version | head -n1 | rev | cut -d ' ' -f 1 | rev`
+	local GCC_MAJOR local GCC_MINOR local GCC_PATCH local GCC_SPECIAL
+	semver_into $GCC_VERSION GCC_MAJOR GCC_MINOR GCC_PATCH GCC_SPECIAL
+	if [[ $GCC_MAJOR -lt 4
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -lt 7 )
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_THIRD -lt 3 )
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 8 && $GCC_THIRD -eq 0 )
+		]] ; then
+		echo "gcc version required >= 4.7.3, != 4.8.0, >= 4.8.1, got $GCC_VERSION"
+		return 1
+	fi
+	return 0
+}
+
+clang_version_ok() {
+	CLANG_VERSION=`clang --version | head -n1 | cut -d ' ' -f4`
+	local CLANG_MAJOR local CLANG_MINOR local CLANG_PATCH local CLANG_SPECIAL
+	semver_into $CLANG_VERSION CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
+	if [[ $CLANG_MAJOR -lt 3
+		|| ( $CLANG_MAJOR -eq 3 && $CLANG_MINOR -le 1 )
+		]] ; then
+		echo "clang version required >= 3.1, got $CLANG_VERSION"
+		return 1
+	fi
+	return 0
+}
+
 set_cc() {
     test_programs_installed clang clang++
-    if [[ $? -ne 0 ]] ; then
+    if [[ $? -ne 0 ]] && clang_version_ok ; then
         [ -z "$CC" ] && CC=clang
         [ -z "$CXX" ] && CXX=clang++
         return
     fi
 
     test_programs_installed gcc g++
-    if [[ $? -ne 0 ]] ; then
+    if [[ $? -ne 0 ]] && gcc_version_ok ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
         return
     fi
 
-    $ECHO "error: both (clang/clang++) or (gcc/g++) required!"
+    $ECHO "error: high enough version of either (clang/clang++) or (gcc/g++) required!"
     exit_script 10
 }
 
