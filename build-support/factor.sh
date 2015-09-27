@@ -635,12 +635,8 @@ usage() {
     $ECHO "  deps-macosx - install git on MacOSX using port"
     $ECHO "  self-update - git pull, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
-<<<<<<< Updated upstream
     $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
     $ECHO "  thiscommit - recompile, bootstrap"
-=======
-    $ECHO "  update - download a boot image, recompile, bootstrap"
->>>>>>> Stashed changes
     $ECHO "  bootstrap - bootstrap with an existing boot image"
     $ECHO "  net-bootstrap - download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
