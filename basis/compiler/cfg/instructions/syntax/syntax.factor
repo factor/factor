@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes.tuple classes.tuple.parser kernel words
-make fry sequences parser accessors effects namespaces
-combinators splitting classes.parser lexer quotations ;
+USING: accessors classes.parser classes.tuple combinators
+effects fry kernel lexer make namespaces parser sequences
+splitting words ;
 IN: compiler.cfg.instructions.syntax
 
 SYMBOLS: def use temp literal ;
@@ -75,7 +75,7 @@ TUPLE: insn-slot-spec type name rep ;
     name>> "," append ;
 
 : define-insn-ctor ( class specs -- )
-    [ [ insn-ctor-name create-in ] [ '[ _ ] [ f ] [ boa , ] surround ] bi ] dip
+    [ [ insn-ctor-name create-word-in ] [ '[ _ ] [ f ] [ boa , ] surround ] bi ] dip
     [ name>> ] map { } <effect> define-declared ;
 
 : define-insn ( class superclass specs -- )

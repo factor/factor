@@ -113,17 +113,17 @@ HELP: range-max-value*
 
 HELP: set-range-value
 { $values { "value" object } { "model" model } }
-{ $description "Sets the current value of a range model." } 
+{ $description "Sets the current value of a range model." }
 { $side-effects "model" } ;
 
 HELP: set-range-page-value
 { $values { "value" object } { "model" model } }
-{ $description "Sets the page size of a range model." } 
+{ $description "Sets the page size of a range model." }
 { $side-effects "model" } ;
 
 HELP: set-range-min-value
 { $values { "value" object } { "model" model } }
-{ $description "Sets the minimum value of a range model." } 
+{ $description "Sets the minimum value of a range model." }
 { $side-effects "model" } ;
 
 HELP: set-range-max-value

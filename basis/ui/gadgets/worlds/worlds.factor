@@ -74,7 +74,7 @@ TUPLE: world-attributes
         f >>grab-input?
         dup focused?>> [ handle>> (ungrab-input) ] [ drop ] if
     ] [ drop ] if ;
-    
+
 : show-status ( string/f gadget -- )
     dup find-world dup [
         dup status>> [
@@ -97,7 +97,7 @@ TUPLE: world-attributes
 
 : with-gl-context ( world quot -- )
     '[ set-gl-context @ ]
-    [ handle>> flush-gl-context gl-error ] bi ; inline
+    [ handle>> flush-gl-context gl-error-nonfatal ] bi ; inline
 
 ERROR: no-world-found ;
 
@@ -197,8 +197,8 @@ M: world draw-world*
     } cleave ;
 
 : draw-world? ( world -- ? )
-    #! We don't draw deactivated worlds, or those with 0 size.
-    #! On Windows, the latter case results in GL errors.
+    ! We don't draw deactivated worlds, or those with 0 size.
+    ! On Windows, the latter case results in GL errors.
     { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
 
 TUPLE: world-error error world ;

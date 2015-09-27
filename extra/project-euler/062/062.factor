@@ -32,7 +32,7 @@ IN: project-euler.062
         2dup [ >key ] dip
         [ dup 0 swap [ 1 + ] change-nth ] change-at
         2dup [ >key ] dip at first 5 =
-        [ 
+        [
             [ >key ] dip at second
         ] [
             [ 1 + ] dip (euler062)

@@ -7,7 +7,7 @@ unix.linux.proc math ;
 IN: system-info.linux
 
 FUNCTION-ALIAS: (uname)
-    int uname ( c-string buf ) ;
+    int uname ( c-string buf )
 
 : uname ( -- seq )
     65536 <byte-array> [ (uname) io-error ] keep >string

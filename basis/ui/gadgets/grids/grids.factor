@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.order namespaces make sequences
-words io math.vectors ui.gadgets ui.baseline-alignment columns
-accessors strings.tables math.rectangles fry ;
+USING: accessors arrays fry kernel make math math.order
+math.rectangles math.vectors sequences strings.tables
+ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget
@@ -35,16 +35,16 @@ PRIVATE>
 
 <PRIVATE
 
-TUPLE: cell pref-dim baseline cap-height ;
+TUPLE: grid-cell pref-dim baseline cap-height ;
 
-: <cell> ( gadget -- cell )
-    [ pref-dim ] [ baseline ] [ cap-height ] tri cell boa ;
+: <grid-cell> ( gadget -- cell )
+    [ pref-dim ] [ baseline ] [ cap-height ] tri grid-cell boa ;
 
-M: cell baseline baseline>> ;
+M: grid-cell baseline baseline>> ;
 
-M: cell cap-height cap-height>> ;
+M: grid-cell cap-height cap-height>> ;
 
-TUPLE: grid-layout-tuple grid gap fill? row-heights column-widths ;
+TUPLE: grid-layout grid gap fill? row-heights column-widths ;
 
 : iterate-cell-dims ( cells quot -- seq )
     '[ [ pref-dim>> @ ] [ max ] map-reduce ] map ; inline
@@ -59,9 +59,9 @@ TUPLE: grid-layout-tuple grid gap fill? row-heights column-widths ;
     grid>> flip [ first ] iterate-cell-dims ;
 
 : <grid-layout> ( grid -- grid-layout )
-    \ grid-layout-tuple new
+    grid-layout new
         swap
-        [ grid>> [ [ <cell> ] map ] map >>grid ]
+        [ grid>> [ [ <grid-cell> ] map ] map >>grid ]
         [ fill?>> >>fill? ]
         [ gap>> >>gap ]
         tri
@@ -107,11 +107,11 @@ M: grid pref-dim* <grid-layout> grid-pref-dim ;
     [ grid>> [ [ pref-dim>> ] map ] map ]
     if ;
 
-: grid-layout ( children grid-layout -- )
+: layout-grid ( children grid-layout -- )
     [ cell-locs ] [ cell-dims ] bi
     [ [ <rect> swap set-rect-bounds ] 3each ] 3each ;
 
-M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
+M: grid layout* [ grid>> ] [ <grid-layout> ] bi layout-grid ;
 
 M: grid children-on ( rect gadget -- seq )
     dup children>> empty? [ 2drop f ] [

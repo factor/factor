@@ -43,7 +43,7 @@ HELP: 1vector
 { $description "Create a new vector with one element." } ;
 
 HELP: ?push
-{ $values { "elt" object } { "seq/f" "a resizable mutable sequence, or " { $link f } } { "seq" "a resizable mutable sequence" } }
+{ $values { "elt" object } { "seq/f" { $maybe "a resizable mutable sequence" } } { "seq" "a resizable mutable sequence" } }
 { $description "If the given sequence is " { $link f } ", creates and outputs a new one-element vector holding " { $snippet "elt" } ". Otherwise, pushes " { $snippet "elt" } " onto the given sequence." }
 { $errors "Throws an error if " { $snippet "seq" } " is not resizable, or if the type of " { $snippet "elt" } " is not permitted in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;

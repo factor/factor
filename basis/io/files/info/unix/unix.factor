@@ -197,7 +197,7 @@ CONSTANT: ALL-EXECUTE   0o0000111
 PRIVATE>
 
 : set-file-times ( path timestamps -- )
-    #! set access, write
+    ! set access, write
     [ normalize-path ] dip
     timestamps>byte-array [ utimes ] unix-system-call drop ;
 

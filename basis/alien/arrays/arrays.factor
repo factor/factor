@@ -63,4 +63,3 @@ M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
 [ { c-string utf8 } c-string typedef ] with-compilation-unit
-

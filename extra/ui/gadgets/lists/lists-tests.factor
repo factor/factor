@@ -2,4 +2,4 @@ IN: ui.gadgets.lists.tests
 USING: ui.gadgets.lists models prettyprint math tools.test
 kernel ;
 
-[ ] [ [ drop ] [ 3 + . ] f <model> <list> invoke-value-action ] unit-test
+{ } [ [ drop ] [ 3 + . ] f <model> <list> invoke-value-action ] unit-test

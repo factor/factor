@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax classes.struct kernel layouts
-math math.rectangles arrays literals ;
+USING: accessors alien.c-types alien.syntax arrays
+classes.struct kernel layouts math math.rectangles ;
 FROM: alien.c-types => float ;
 IN: core-graphics.types
 

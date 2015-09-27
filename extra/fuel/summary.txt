@@ -1,0 +1,3 @@
+FUEL turns Emacs into a rich, interactive development environment for Factor,
+including source code edition and interaction with a Factor listener instance
+running within Emacs.

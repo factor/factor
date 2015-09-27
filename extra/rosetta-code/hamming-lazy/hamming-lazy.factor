@@ -35,4 +35,3 @@ IN: rosetta-code.hamming-lazy
         h 2 3 5 [ '[ _ * ] lazy-map ] tri-curry@ tri
         sort-merge sort-merge
     ] lazy-cons h! h ;
-

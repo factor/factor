@@ -4,7 +4,6 @@ USING: kernel namespaces xml.tokenize xml.state xml.name
 xml.data accessors arrays make xml.char-classes fry assocs sequences
 math xml.errors sets combinators io.encodings io.encodings.iana
 unicode.case xml.dtd strings xml.entities unicode.categories ;
-FROM: namespaces => set ;
 IN: xml.elements
 
 : take-interpolated ( quot -- interpolated )
@@ -19,7 +18,7 @@ IN: xml.elements
     [ quoteless-attr ] take-interpolated ;
 
 : start-tag ( -- name ? )
-    #! Outputs the name and whether this is a closing tag
+    ! Outputs the name and whether this is a closing tag
     get-char CHAR: / eq? dup [ next ] when
     parse-name swap ;
 
@@ -57,7 +56,7 @@ IN: xml.elements
         T{ name f "" "encoding" f }
         T{ name f "" "standalone" f }
     } diff
-    [ extra-attrs ] unless-empty ; 
+    [ extra-attrs ] unless-empty ;
 
 : good-version ( version -- version )
     dup { "1.0" "1.1" } member? [ bad-version ] unless ;

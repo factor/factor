@@ -7,8 +7,6 @@ void factor_vm::init_inline_caching(int max_size) { max_pic_size = max_size; }
 void factor_vm::deallocate_inline_cache(cell return_address) {
   /* Find the call target. */
   void* old_entry_point = get_call_target(return_address);
-  check_code_pointer((cell)old_entry_point);
-
   code_block* old_block = (code_block*)old_entry_point - 1;
 
   /* Free the old PIC since we know its unreachable */
@@ -131,11 +129,6 @@ code_block* factor_vm::compile_inline_cache(fixnum index, cell generic_word_,
   return code;
 }
 
-/* A generic word's definition performs general method lookup. */
-void* factor_vm::megamorphic_call_stub(cell generic_word) {
-  return untag<word>(generic_word)->entry_point;
-}
-
 cell factor_vm::inline_cache_size(cell cache_entries) {
   return array_capacity(untag_check<array>(cache_entries)) / 2;
 }
@@ -171,15 +164,15 @@ void factor_vm::update_pic_transitions(cell pic_size) {
    also, the block containing the return address may now be dead. Use a
    code_root to take care of the details. */
 /* Allocates memory */
-void* factor_vm::inline_cache_miss(cell return_address_) {
+cell factor_vm::inline_cache_miss(cell return_address_) {
   code_root return_address(return_address_, this);
-  check_code_pointer(return_address.value);
   bool tail_call_site = tail_call_site_p(return_address.value);
 
 #ifdef PIC_DEBUG
-  std::cout << "Inline cache miss at " << (tail_call_site ? "tail" : "non-tail")
-            << " call site 0x" << std::hex << return_address.value << std::dec
-            << std::endl;
+  FACTOR_PRINT("Inline cache miss at "
+               << (tail_call_site ? "tail" : "non-tail")
+               << " call site 0x" << std::hex << return_address.value
+               << std::dec);
   print_callstack();
 #endif
 
@@ -193,10 +186,10 @@ void* factor_vm::inline_cache_miss(cell return_address_) {
 
   update_pic_transitions(pic_size);
 
-  void* xt;
+  cell xt;
 
   if (pic_size >= max_pic_size)
-    xt = megamorphic_call_stub(generic_word.value());
+    xt = generic_word->entry_point;
   else {
     cell klass = object_class(object.value());
     cell method = lookup_method(object.value(), methods.value());
@@ -218,9 +211,9 @@ void* factor_vm::inline_cache_miss(cell return_address_) {
     set_call_target(return_address.value, xt);
 
 #ifdef PIC_DEBUG
-    std::cout << "Updated " << (tail_call_site ? "tail" : "non-tail")
-              << " call site 0x" << std::hex << return_address.value << std::dec
-              << " with 0x" << std::hex << (cell)xt << std::dec << std::endl;
+    FACTOR_PRINT("Updated " << (tail_call_site ? "tail" : "non-tail")
+                 << " call site 0x" << std::hex << return_address.value << std::dec
+                 << " with 0x" << std::hex << (cell)xt << std::dec);
     print_callstack();
 #endif
   }
@@ -229,7 +222,7 @@ void* factor_vm::inline_cache_miss(cell return_address_) {
 }
 
 /* Allocates memory */
-VM_C_API void* inline_cache_miss(cell return_address, factor_vm* parent) {
+VM_C_API cell inline_cache_miss(cell return_address, factor_vm* parent) {
   return parent->inline_cache_miss(return_address);
 }
 

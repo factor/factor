@@ -8,24 +8,24 @@ IN: heaps.tests
 [ <min-heap> heap-pop ] must-fail
 [ <max-heap> heap-pop ] must-fail
 
-[ t ] [ <min-heap> heap-empty? ] unit-test
-[ f ] [ <min-heap> 1 t pick heap-push heap-empty? ] unit-test
-[ t ] [ <max-heap> heap-empty? ] unit-test
-[ f ] [ <max-heap> 1 t pick heap-push heap-empty? ] unit-test
+{ t } [ <min-heap> heap-empty? ] unit-test
+{ f } [ <min-heap> 1 t pick heap-push heap-empty? ] unit-test
+{ t } [ <max-heap> heap-empty? ] unit-test
+{ f } [ <max-heap> 1 t pick heap-push heap-empty? ] unit-test
 
 ! Binary Min Heap
 { 1 2 3 4 5 6 } [ 0 left 0 right 1 left 1 right 2 left 2 right ] unit-test
 { t } [ t 5 f <entry> t 3 f <entry> T{ min-heap } heap-compare ] unit-test
 { f } [ t 5 f <entry> t 3 f <entry> T{ max-heap } heap-compare ] unit-test
 
-[ t 2 ] [ <min-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push heap-pop ] unit-test
+{ t 2 } [ <min-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push heap-pop ] unit-test
 
-[ t 1 ] [ <min-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push t 1 pick heap-push heap-pop ] unit-test
+{ t 1 } [ <min-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push t 1 pick heap-push heap-pop ] unit-test
 
-[ t 400 ] [ <max-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push t 1 pick heap-push heap-pop ] unit-test
+{ t 400 } [ <max-heap> t 300 pick heap-push t 200 pick heap-push t 400 pick heap-push t 3 pick heap-push t 2 pick heap-push t 1 pick heap-push heap-pop ] unit-test
 
-[ 0 ] [ <max-heap> heap-size ] unit-test
-[ 1 ] [ <max-heap> t 1 pick heap-push heap-size ] unit-test
+{ 0 } [ <max-heap> heap-size ] unit-test
+{ 1 } [ <max-heap> t 1 pick heap-push heap-size ] unit-test
 
 : heap-sort ( alist heap -- keys )
     [ heap-push-all ] keep heap-pop-all ;

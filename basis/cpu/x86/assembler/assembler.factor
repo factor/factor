@@ -116,7 +116,7 @@ M: register displacement, drop ;
     and and ;
 
 :: rex-prefix ( reg r/m rex.w -- )
-    #! Compile an AMD64 REX prefix.
+    ! Compile an AMD64 REX prefix.
     rex.w reg r/m rex.w? 0b01001000 0b01000000 ?
     reg rex.r
     r/m rex.b
@@ -129,8 +129,8 @@ M: register displacement, drop ;
     [ drop 16-prefix ] [ [ f ] 2dip rex-prefix ] 2bi ;
 
 : short-operand ( reg rex.w n -- )
-    #! Some instructions encode their single operand as part of
-    #! the opcode.
+    ! Some instructions encode their single operand as part of
+    ! the opcode.
     [ dupd prefix-1 reg-code ] dip + , ;
 
 : opcode, ( opcode -- ) dup array? [ % ] [ , ] if ;
@@ -145,8 +145,8 @@ M: register displacement, drop ;
     [ [ unclip-last ] dip bitor suffix ] [ bitor ] if ;
 
 : 1-operand ( operand reg,rex.w,opcode -- )
-    #! The 'reg' is not really a register, but a value for the
-    #! 'reg' field of the mod-r/m byte.
+    ! The 'reg' is not really a register, but a value for the
+    ! 'reg' field of the mod-r/m byte.
     first3 [ [ over ] dip prefix-1 ] dip opcode, swap addressing ;
 
 : immediate-operand-size-bit ( dst imm reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
@@ -165,10 +165,10 @@ M: register displacement, drop ;
     over integer? [ first3 0b10 opcode-or 3array ] when ;
 
 : immediate-1/4 ( dst imm reg,rex.w,opcode -- )
-    #! If imm is a byte, compile the opcode and the byte.
-    #! Otherwise, set the 8-bit operand flag in the opcode, and
-    #! compile the cell. The 'reg' is not really a register, but
-    #! a value for the 'reg' field of the mod-r/m byte.
+    ! If imm is a byte, compile the opcode and the byte.
+    ! Otherwise, set the 8-bit operand flag in the opcode, and
+    ! compile the cell. The 'reg' is not really a register, but
+    ! a value for the 'reg' field of the mod-r/m byte.
     over fits-in-byte? [
         immediate-fits-in-size-bit immediate-1
     ] [

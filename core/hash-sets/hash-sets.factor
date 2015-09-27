@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays growable.private hash-sets
+USING: accessors arrays combinators growable.private hash-sets
 hashtables.private kernel kernel.private math math.private
 sequences sequences.private sets sets.private slots.private
 vectors ;
@@ -36,7 +36,7 @@ TUPLE: hash-set
     [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
-    1 + next-power-of-2 2 * ((empty)) <array> ; inline
+    3 * 1 + 2/ next-power-of-2 ((empty)) <array> ; inline
 
 : reset-hash ( n hash -- )
     swap <hash-array> >>array init-hash ; inline
@@ -59,7 +59,7 @@ TUPLE: hash-set
     [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
     [ over [ hash-deleted- ] [ hash-count+ ] if swap or t ] [ 2drop f ] if ; inline
 
-: set-nth-item ( key seq n -- )
+: set-nth-item ( key array n -- )
     2 fixnum+fast set-slot ; inline
 
 : (adjoin) ( key hash -- ? )
@@ -69,7 +69,7 @@ TUPLE: hash-set
     [ (adjoin) drop ] curry each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast ]
+    [ count>> 1 fixnum+fast 3 fixnum*fast ]
     [ array>> length>> 1 fixnum-shift-fast ] bi fixnum>= ; inline
 
 : each-member ( ... array quot: ( ... elt -- ... ) -- ... )
@@ -88,6 +88,7 @@ TUPLE: hash-set
 PRIVATE>
 
 : <hash-set> ( capacity -- hash-set )
+    integer>fixnum-strict
     [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?
@@ -133,7 +134,7 @@ M: hash-set equal?
 M: hash-set set-like
     drop dup hash-set? [ ?members >hash-set ] unless ; inline
 
-INSTANCE: hash-set set
+INSTANCE: hash-set unordered-set
 
 ! Overrides for performance
 
@@ -193,6 +194,12 @@ M: hash-set set=
         ] [ 2drop f ] if
     ] [ call-next-method ] if ;
 
+M: hash-set hashcode*
+    [
+        dup cardinality 1 eq?
+        [ members hashcode* ] [ nip cardinality ] if
+    ] recursive-hashcode ;
+
 ! Default methods
 
 M: f fast-set drop 0 <hash-set> ;
@@ -200,7 +207,7 @@ M: f fast-set drop 0 <hash-set> ;
 M: sequence fast-set >hash-set ;
 
 M: sequence duplicates
-    dup length <hash-set> [ ?adjoin not ] curry filter ;
+    dup length <hash-set> [ ?adjoin ] curry reject ;
 
 M: sequence all-unique?
     dup length <hash-set> [ ?adjoin ] curry all? ;

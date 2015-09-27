@@ -21,7 +21,7 @@ IN: mason.git
     } ;
 
 : git-clone ( -- )
-    #! Must be run from builds-dir
+    ! Must be run from builds-dir
     "Cloning initial repository" print-timestamp
     git-clone-cmd try-output-process ;
 
@@ -54,22 +54,18 @@ IN: mason.git
         if
     ] [ rethrow ] if ;
 
-: with-process-reader* ( desc encoding quot -- )
-    [ <process-reader*> ] dip swap [ with-input-stream ] dip
-    dup wait-for-process dup { 0 1 } member?
-    [ 2drop ] [ process-failed ] if ; inline
-
 : git-status-cmd ( -- cmd )
     { "git" "status" } ;
 
 : git-status-failed ( error -- )
-    #! Exit code 1 means there's nothing to commit.
+    ! Exit code 1 means there's nothing to commit.
     dup { [ process-failed? ] [ code>> 1 = ] } 1&&
     [ drop ] [ rethrow ] if ;
 
 : git-status ( -- seq )
     [
         git-status-cmd utf8 [ lines ] with-process-reader*
+        { 0 1 } member? [ drop ] [ process-failed ] if
         [ "#\t" head? ] filter
     ] [ git-status-failed { } ] recover ;
 
@@ -90,8 +86,8 @@ IN: mason.git
 
 PRIVATE>
 
-: git-pull ( -- id )
-    #! Must be run from builds-dir.
+: git-clone-or-pull ( -- id )
+    ! Must be run from builds-dir.
     "factor" exists? [
         check-repository [
             "factor" [

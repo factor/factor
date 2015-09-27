@@ -166,13 +166,13 @@ TUPLE: vbo
     ] 3map ;
 
 : clear-screen ( -- )
-    0 0 0 0 glClearColor 
+    0 0 0 0 glClearColor
     1 glClearDepth
     0xffffffff glClearStencil
     flags{ GL_COLOR_BUFFER_BIT
       GL_DEPTH_BUFFER_BIT
       GL_STENCIL_BUFFER_BIT } glClear ;
-    
+
 : draw-model ( world -- )
     clear-screen
     face-ccw cull-back <triangle-cull-state> set-gpu-state

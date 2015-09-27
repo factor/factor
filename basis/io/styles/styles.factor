@@ -129,7 +129,7 @@ SYMBOL: presented
 SYMBOL: href
 
 ! Image
-SYMBOL: image
+SYMBOL: image-style
 
 ! Paragraph styles
 SYMBOL: page-color
@@ -163,4 +163,4 @@ M: input summary
 
 : write-object ( str obj -- ) presented associate format ;
 
-: write-image ( image -- ) [ "" ] dip image associate format ;
+: write-image ( image -- ) [ "" ] dip image-style associate format ;

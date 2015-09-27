@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces ui.gadgets ui.gadgets.worlds
-ui.gadgets.wrappers ui.gestures math.rectangles
-math.rectangles.positioning combinators vectors ;
+USING: accessors kernel math.rectangles
+math.rectangles.positioning namespaces ui.gadgets
+ui.gadgets.worlds ui.gadgets.wrappers ui.gestures vectors ;
 FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.gadgets.glass
 
@@ -19,7 +19,7 @@ TUPLE: glass < gadget visible-rect owner ;
         swap >>visible-rect
         swap add-gadget
         swap >>owner ;
-    
+
 : visible-rect ( glass -- rect )
     [ visible-rect>> ] [ owner>> ] bi screen-loc offset-rect ;
 

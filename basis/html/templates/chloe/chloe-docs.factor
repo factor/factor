@@ -77,7 +77,7 @@ ARTICLE: "html.templates.chloe.tags.component" "Component Chloe tags"
     { { $snippet "t:link" }       { $link link } }
     { { $snippet "t:password" }   { $link password } }
     { { $snippet "t:textarea" }   { $link textarea } }
-} ;                                       
+} ;
 
 ARTICLE: "html.templates.chloe.tags.boilerplate" "Boilerplate Chloe tags"
 "The following Chloe tags interface with the HTML templating " { $link "html.templates.boilerplate" } "."

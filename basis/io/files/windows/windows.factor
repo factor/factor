@@ -13,6 +13,8 @@ windows.types windows.winsock ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
+SLOT: file
+
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: open-append os ( path -- win32-file )
 
@@ -105,8 +107,6 @@ M: windows io-multiplex ( nanos -- )
 M: windows init-io ( -- )
     <master-completion-port> master-completion-port set-global
     H{ } clone pending-overlapped set-global ;
-
-ERROR: invalid-file-size n ;
 
 : (handle>file-size) ( handle -- n/f )
     0 ulonglong <ref> [ GetFileSizeEx ] keep swap
@@ -253,7 +253,7 @@ M: windows init-stdio
     f CreateFileW dup win32-error=0/f <win32-file> ;
 
 : maybe-create-file ( path -- win32-file ? )
-    #! return true if file was just created
+    ! return true if file was just created
     flags{ GENERIC_READ GENERIC_WRITE }
     share-mode
     f

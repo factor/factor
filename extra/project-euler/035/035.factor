@@ -38,7 +38,7 @@ IN: project-euler.035
 
 : (circular?) ( seq n -- ? )
     dup 0 > [
-        2dup rotate 10 digits>integer
+        2dup rotate digits>number
         prime? [ 1 - (circular?) ] [ 2drop f ] if
     ] [
         2drop t

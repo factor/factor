@@ -161,13 +161,13 @@ CONSTANT: create-offsets
 
 : pgm-pixel ( n -- ) 255 * 0.5 + >fixnum , ;
 
-: run ( -- string )
+: run-raytracer-simd ( -- string )
     levels double-4{ 0.0 -1.0 0.0 0.0 } 1.0 create ray-trace [
         size size pgm-header
         [ [ oversampling sq / pgm-pixel ] each ] each
     ] B{ } make ;
 
 : raytracer-simd-benchmark ( -- )
-    run "raytracer.pnm" temp-file binary set-file-contents ;
+    run-raytracer-simd "raytracer.pnm" temp-file binary set-file-contents ;
 
 MAIN: raytracer-simd-benchmark

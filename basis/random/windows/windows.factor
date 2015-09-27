@@ -31,7 +31,10 @@ ERROR: acquire-crypto-context-failed provider type error ;
 
 : attempt-crypto-context ( provider type -- handle )
     [ acquire-crypto-context ]
-    [ drop [ create-crypto-context ] [ acquire-crypto-context-failed ] recover ] recover ;
+    [
+        drop [ create-crypto-context ]
+        [ acquire-crypto-context-failed ] recover
+    ] recover ;
 
 : initialize-crypto-context ( crypto-context -- crypto-context )
     dup [ provider>> ] [ type>> ] bi attempt-crypto-context >>handle ;
@@ -42,7 +45,7 @@ ERROR: acquire-crypto-context-failed provider type error ;
         swap >>provider
         initialize-crypto-context ; inline
 
-M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )    
+M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
     handle>> swap [ ] [ <byte-array> ] bi
     [ CryptGenRandom win32-error=0/f ] keep ;
 

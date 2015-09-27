@@ -15,7 +15,7 @@ SINGLETON: gdb-disassembler
 :: make-disassemble-cmd ( from to -- )
     in-file ascii [
         "attach " write
-        current-process-handle number>string print
+        (current-process) number>string print
         "x/" write to from - 4 / number>string write
         "i" write bl from number>string write
     ] with-file-writer ;

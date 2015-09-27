@@ -23,15 +23,15 @@ SYMBOLS: latest-sources last-built-sources ;
     counter-url get-global http-get nip string>number ;
 
 : update-sources ( -- )
-    #! Must be run from builds-dir
-    git-pull latest-boot-image latest-counter <sources>
+    ! Must be run from builds-dir
+    git-clone-or-pull latest-boot-image latest-counter <sources>
     latest-sources set-global ;
 
-: build? ( -- ? )
+: should-build? ( -- ? )
     latest-sources get-global last-built-sources get-global = not ;
 
 : finish-build ( -- )
-    #! If the build completed (successfully or not) without
-    #! mason crashing or being killed, don't build this git ID
-    #! and boot image hash again.
+    ! If the build completed (successfully or not) without
+    ! mason crashing or being killed, don't build this git ID
+    ! and boot image hash again.
     latest-sources get-global last-built-sources set-global ;

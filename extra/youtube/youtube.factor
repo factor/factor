@@ -60,8 +60,8 @@ CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
     [ "url" of ] [ "sig" of ] bi "&signature=" glue ;
 
 : sanitize ( title -- title' )
-    [ 0 31 between? not ] filter
-    [ "\"#$%'*,./:;<>?^|~\\" member? not ] filter
+    [ 0 31 between? ] reject
+    [ "\"#$%'*,./:;<>?^|~\\" member? ] reject
     200 short head ;
 
 : download-video ( video-id -- )

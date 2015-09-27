@@ -12,7 +12,7 @@ HELP: 1token
     "Calls 1string on a character and returns a parser that matches that character."
 } { $examples
     { $example "USING: peg peg.parsers prettyprint ;" "\"a\" CHAR: a 1token parse ." "\"a\"" }
-} { $see-also 'string' } ;
+} { $see-also string-parser } ;
 
 HELP: (list-of)
 { $values
@@ -84,7 +84,7 @@ HELP: at-least-n
 } { $description
     "Returns a parser that matches n or more repetitions of the input parser."
 } { $examples
-    { $code "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 at-least-n parse => exception"}
+    { $code "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 at-least-n parse => exception" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 at-least-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 4 at-least-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also exactly-n at-most-n from-m-to-n } ;
@@ -124,7 +124,7 @@ HELP: pack
 } { $description
     "Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" \"hi\" token 'integer' \"bye\" token pack parse ." "123" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" \"hi\" token integer-parser \"bye\" token pack parse ." "123" }
 } { $see-also surrounded-by } ;
 
 HELP: surrounded-by
@@ -136,29 +136,29 @@ HELP: surrounded-by
 } { $description
     "Calls token on begin and end to make them into string parsers.  Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" 'integer' \"hi\" \"bye\" surrounded-by parse ." "123" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" integer-parser \"hi\" \"bye\" surrounded-by parse ." "123" }
 } { $see-also pack } ;
 
-HELP: 'digit'
+HELP: digit-parser
 { $values
     { "parser" "a parser" }
 } { $description
     "Returns a parser that matches a single digit as defined by the " { $link digit? } " word."
-} { $see-also 'integer' } ;
+} { $see-also integer-parser } ;
 
-HELP: 'integer'
+HELP: integer-parser
 { $values
     { "parser" "a parser" }
 } { $description
-    "Returns a parser that matches an integer composed of digits, as defined by the " { $link 'digit' } " word."
-} { $see-also 'digit' 'string' } ;
+    "Returns a parser that matches an integer composed of digits, as defined by the " { $link digit-parser } " word."
+} { $see-also digit-parser string-parser } ;
 
-HELP: 'string'
+HELP: string-parser
 { $values
     { "parser" "a parser" }
 } { $description
     "Returns a parser that matches an string composed of a \", anything that is not \", and another \"."
-} { $see-also 'integer' } ;
+} { $see-also integer-parser } ;
 
 HELP: range-pattern
 { $values
@@ -173,7 +173,7 @@ HELP: range-pattern
 "of characters separated with a dash (-) represents the "
 "range of characters from the first to the second, inclusive."
 { $examples
-    { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse 1string ." "\"a\"" } 
-    { $code "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse => exception"} 
+    { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse 1string ." "\"a\"" }
+    { $code "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse => exception" }
 }
 }  ;

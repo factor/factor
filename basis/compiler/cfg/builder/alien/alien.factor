@@ -1,17 +1,15 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays layouts math math.order
-math.parser combinators combinators.short-circuit fry make
-sequences sequences.generalizations alien alien.private
-alien.strings alien.c-types alien.libraries classes.struct
-namespaces kernel strings libc locals quotations words
-cpu.architecture compiler.utilities compiler.tree compiler.cfg
-compiler.cfg.builder compiler.cfg.builder.alien.params
-compiler.cfg.builder.alien.boxing compiler.cfg.builder.blocks
-compiler.cfg.instructions compiler.cfg.stack-frame
-compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.cfg.registers compiler.cfg.hats compiler.errors ;
-FROM: compiler.errors => no-such-symbol no-such-library ;
+USING: accessors alien alien.c-types alien.libraries
+alien.strings arrays assocs classes.struct combinators
+compiler.cfg compiler.cfg.builder
+compiler.cfg.builder.alien.boxing
+compiler.cfg.builder.alien.params compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
+compiler.tree cpu.architecture fry kernel layouts make math
+math.parser namespaces sequences sequences.generalizations
+strings words ;
 IN: compiler.cfg.builder.alien
 
 : with-param-regs* ( quot -- reg-values stack-values )
@@ -33,7 +31,7 @@ IN: compiler.cfg.builder.alien
         [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
         2 2 mnmap [ concat ] bi@
     ]
-    [ length neg inc-d ] bi ;
+    [ length neg <ds-loc> inc-stack ] bi ;
 
 : prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
     dup large-struct? [
@@ -48,7 +46,7 @@ IN: compiler.cfg.builder.alien
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
-    '[ 
+    '[
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
@@ -61,38 +59,21 @@ IN: compiler.cfg.builder.alien
     [ stack-params get ] dip [ return>> ] [ abi>> ] bi stack-cleanup
     stack-params get ;
 
-GENERIC# dlsym-valid? 1 ( symbols dll -- ? )
-
-M: string dlsym-valid? dlsym ;
-
-M: array dlsym-valid? '[ _ dlsym ] any? ;
-
-: check-dlsym ( symbols library -- )
+: check-dlsym ( symbol library -- )
     {
         { [ dup library-dll dll-valid? not ] [
             [ library-dll dll-path ] [ dlerror>> ] bi
-            cfg get word>> no-such-library-error drop 
+            cfg get word>> no-such-library-error drop
         ] }
-        { [ 2dup library-dll dlsym-valid? not ] [
+        { [ 2dup library-dll dlsym not ] [
             drop dlerror cfg get word>> no-such-symbol-error
         ] }
         [ 2drop ]
     } cond ;
 
-: decorated-symbol ( params -- symbols )
-    [ function>> ] [ parameters>> [ stack-size ] map-sum number>string ] bi
-    {
-        [ drop ]
-        [ "@" glue ]
-        [ "@" glue "_" prepend ]
-        [ "@" glue "@" prepend ]
-    } 2cleave
-    4array ;
-
-: caller-linkage ( params -- symbols dll )
-    [ dup abi>> callee-cleanup? [ decorated-symbol ] [ function>> ] if ]
-    [ library>> lookup-library ]
-    bi 2dup check-dlsym library-dll ;
+: caller-linkage ( params -- symbol dll )
+    [ function>> ] [ library>> lookup-library ] bi
+    2dup check-dlsym library-dll ;
 
 : caller-return ( params -- )
     return>> [ ] [
@@ -129,7 +110,7 @@ M: #alien-indirect emit-node ( node -- )
     [ caller-return ]
     bi ;
 
-M: #alien-assembly emit-node
+M: #alien-assembly emit-node ( node -- )
     params>>
     [
         {
@@ -137,7 +118,7 @@ M: #alien-assembly emit-node
             [ prepare-caller-return ]
             [ caller-stack-frame ]
             [ quot>> ]
-        } cleave <gc-map> ##alien-assembly,
+        } cleave ##alien-assembly,
     ]
     [ caller-return ]
     bi ;
@@ -160,7 +141,7 @@ M: #alien-assembly emit-node
 
 : callee-parameters ( params -- vregs reps reg-outputs stack-outputs )
     [ abi>> ] [ return>> ] [ parameters>> ] tri
-    '[ 
+    '[
         _ prepare-struct-callee struct-return-area set
         _ [ base-type ] map (callee-parameters)
     ] with-param-regs* ;
@@ -188,10 +169,7 @@ M: #alien-assembly emit-node
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
-        needs-frame-pointer
-
-        begin-word
-
+        needs-frame-pointer begin-word
         {
             [ params>> callee-parameters ##callback-inputs, ]
             [ params>> box-parameters ]
@@ -199,6 +177,5 @@ M: #alien-callback emit-node
             [ params>> emit-callback-return ]
             [ params>> callback-stack-cleanup ]
         } cleave
-
         basic-block get [ end-word ] when
     ] with-cfg-builder ;

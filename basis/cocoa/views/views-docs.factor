@@ -20,5 +20,4 @@ ARTICLE: "cocoa-view-utils" "Cocoa view utilities"
     mouse-location
 } ;
 
-IN: cocoa.views
 ABOUT: "cocoa-view-utils"

@@ -7,7 +7,7 @@ io.sockets.secure.debug ;
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
-[ ] [ <promise> "port" set ] unit-test
+{ } [ <promise> "port" set ] unit-test
 
 :: server-test ( quot -- )
     [
@@ -26,14 +26,14 @@ io.sockets.secure.debug ;
         "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop stream-contents
     ] with-secure-context ;
 
-[ ] [ [ class-of name>> write ] server-test ] unit-test
+{ } [ [ class-of name>> write ] server-test ] unit-test
 
-[ "secure" ] [ client-test ] unit-test
+{ "secure" } [ client-test ] unit-test
 
 ! Now, see what happens if the server closes the connection prematurely
-[ ] [ <promise> "port" set ] unit-test
+{ } [ <promise> "port" set ] unit-test
 
-[ ] [
+{ } [
     [
         drop
         "hello" write flush
@@ -45,13 +45,13 @@ io.sockets.secure.debug ;
 ! (eg, google.com) do this.
 
 ! [ client-test ] [ premature-close? ] must-fail-with
-[ "hello" ] [ client-test ] unit-test
+{ "hello" } [ client-test ] unit-test
 
 ! Now, try validating the certificate. This should fail because its
 ! actually an invalid certificate
-[ ] [ <promise> "port" set ] unit-test
+{ } [ <promise> "port" set ] unit-test
 
-[ ] [ [ drop "hi" write ] server-test ] unit-test
+{ } [ [ drop "hi" write ] server-test ] unit-test
 
 [
     <secure-config> [
@@ -61,12 +61,12 @@ io.sockets.secure.debug ;
 ] [ certificate-verify-error? ] must-fail-with
 
 ! Client-side handshake timeout
-[ ] [ <promise> "port" set ] unit-test
+{ } [ <promise> "port" set ] unit-test
 
-[ ] [
+{ } [
     [
         [
-            "127.0.0.1" 0 <inet4> ascii <server> &dispose 
+            "127.0.0.1" 0 <inet4> ascii <server> &dispose
                 dup addr>> port>> "port" get fulfill
                 accept drop &dispose 1 minutes sleep
         ] with-destructors
@@ -80,9 +80,9 @@ io.sockets.secure.debug ;
 ] [ io-timeout? ] must-fail-with
 
 ! Server-side handshake timeout
-[ ] [ <promise> "port" set ] unit-test
+{ } [ <promise> "port" set ] unit-test
 
-[ ] [
+{ } [
     [
         [
             "127.0.0.1" "port" get ?promise
@@ -109,7 +109,7 @@ io.sockets.secure.debug ;
 ! Until I sort out two-stage handshaking, I can't do much here
 [
     [ ] [ <promise> "port" set ] unit-test
-    
+
     [ ] [
         [
             [
@@ -122,7 +122,7 @@ io.sockets.secure.debug ;
             ] with-destructors
         ] "Silly server" spawn drop
     ] unit-test
-    
+
     [
         1 seconds secure-socket-timeout [
             <secure-config> [
@@ -131,10 +131,10 @@ io.sockets.secure.debug ;
             ] with-secure-context
         ] with-variable
     ] [ io-timeout? ] must-fail-with
-    
+
     ! Server socket shutdown timeout
     [ ] [ <promise> "port" set ] unit-test
-    
+
     [ ] [
         [
             [
@@ -145,7 +145,7 @@ io.sockets.secure.debug ;
             ] with-destructors
         ] "Silly client" spawn drop
     ] unit-test
-    
+
     [
         [
             1 seconds secure-socket-timeout [

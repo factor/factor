@@ -7,7 +7,6 @@ concurrency.semaphores continuations debugger destructors fry
 io io.sockets io.sockets.secure io.streams.duplex io.styles
 io.timeouts kernel logging make math math.parser namespaces
 present prettyprint random sequences sets strings threads ;
-FROM: namespaces => set ;
 IN: io.servers
 
 TUPLE: threaded-server < identity-tuple
@@ -28,9 +27,9 @@ secure-context ;
 SYMBOL: running-servers
 running-servers [ HS{ } clone ] initialize
 
-ERROR: server-already-running threaded-server ;
-
 ERROR: server-not-running threaded-server ;
+
+ERROR: server-already-running threaded-server ;
 
 <PRIVATE
 
@@ -243,8 +242,8 @@ PRIVATE>
     server-addrs [ secure? ] filter random ;
 
 : insecure-addr ( -- addrspec )
-    server-addrs [ secure? not ] filter random ;
-    
+    server-addrs [ secure? ] reject random ;
+
 : server. ( threaded-server -- )
     [ [ "=== " write name>> ] [ ] bi write-object nl ]
     [ servers>> [ addr>> present print ] each ] bi ;
@@ -254,7 +253,7 @@ PRIVATE>
 
 : get-servers-named ( string -- sequence )
     [ all-servers ] dip '[ name>> _ = ] filter ;
-    
+
 : servers. ( -- )
     all-servers [ server. ] each ;
 

@@ -36,7 +36,7 @@ MACRO: set-slot ( name -- quot: ( value tuple -- ) )
 : set-slot* ( tuple value name -- tuple )
     swapd '[ _ set-slot ] keep ; inline
 
-: change-slot* ( tuple name quot: ( ..a old -- ..b new ) -- ..b tuple ) 
+: change-slot* ( tuple name quot: ( ..a old -- ..b new ) -- ..b tuple )
     '[ _ _ change-slot ] keep ; inline
 
 ! Multiple-slot accessors

@@ -79,7 +79,7 @@ M: object file-spec>string ( file-listing spec -- string )
         [ _ [ file-spec>string ] with map ] map
     ] with-directory-entries ; inline
 
-: list-files ( listing-tool -- array ) 
+: list-files ( listing-tool -- array )
     dup list-slow? [ list-files-slow ] [ list-files-fast ] if ; inline
 
 HOOK: (directory.) os ( path -- lines )

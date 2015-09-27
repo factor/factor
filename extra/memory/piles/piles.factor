@@ -36,4 +36,3 @@ M: pile dispose
 
 : pile-align ( pile align -- pile )
     [ align ] curry change-offset ;
-    

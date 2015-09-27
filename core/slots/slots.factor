@@ -7,6 +7,11 @@ kernel.private make math quotations sequences sequences.private
 slots.private strings words ;
 IN: slots
 
+<PRIVATE
+PRIMITIVE: set-slot ( value obj n -- )
+PRIMITIVE: slot ( obj m -- value )
+PRIVATE>
+
 TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
@@ -39,7 +44,7 @@ M: object reader-quot
     ] [ ] make ;
 
 : reader-word ( name -- word )
-    ">>" append "accessors" create
+    ">>" append "accessors" create-word
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
@@ -60,7 +65,7 @@ M: object reader-quot
     ] 2bi ;
 
 : writer-word ( name -- word )
-    "<<" append "accessors" create
+    "<<" append "accessors" create-word
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -107,7 +112,7 @@ M: object writer-quot
     ] 2bi ;
 
 : setter-word ( name -- word )
-    ">>" prepend "accessors" create ;
+    ">>" prepend "accessors" create-word ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
@@ -116,7 +121,7 @@ M: object writer-quot
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
-    "change-" prepend "accessors" create ;
+    "change-" prepend "accessors" create-word ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [
@@ -274,11 +279,3 @@ M: slot-spec make-slot
 
 : slot-named ( name specs -- spec/f )
     slot-named* nip ;
-
-! Predefine some slots, because there are change-* words in other vocabs
-! that nondeterministically cause ambiguities when USEd alongside
-! accessors
-
-SLOT: at
-SLOT: nth
-SLOT: global

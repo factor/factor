@@ -14,7 +14,7 @@ SYMBOL: tetrominoes
   [
     { {
         { 0 0 } { 1 0 } { 2 0 } { 3 0 }
-      } 
+      }
       { { 0 0 }
         { 0 1 }
         { 0 2 }
@@ -60,7 +60,7 @@ SYMBOL: tetrominoes
       }
     } COLOR: orange
   ] [
-    { 
+    {
       { { 0 0 } { 1 0 } { 2 0 }
                         { 2 1 }
       } {
@@ -111,4 +111,3 @@ SYMBOL: tetrominoes
 
 : blocks-height ( blocks -- height )
     [ second ] blocks-max ;
-

@@ -49,8 +49,8 @@ CONSTANT: key-locations H{
     { key-i             { {  85  25 } {  10  10 } } }
     { key-o             { {  95  25 } {  10  10 } } }
     { key-p             { { 105  25 } {  10  10 } } }
-    { key-[             { { 115  25 } {  10  10 } } }
-    { key-]             { { 125  25 } {  10  10 } } }
+    { key-lbracket      { { 115  25 } {  10  10 } } }
+    { key-rbracket      { { 125  25 } {  10  10 } } }
     { key-\             { { 135  25 } {  15  10 } } }
 
     { key-caps-lock     { {   0  35 } {  20  10 } } }
@@ -93,7 +93,7 @@ CONSTANT: key-locations H{
     { key-print-screen  { { 155   0 } {  10  10 } } }
     { key-scroll-lock   { { 165   0 } {  10  10 } } }
     { key-pause         { { 175   0 } {  10  10 } } }
-    
+
     { key-insert        { { 155  15 } {  10  10 } } }
     { key-home          { { 165  15 } {  10  10 } } }
     { key-page-up       { { 175  15 } {  10  10 } } }
@@ -137,8 +137,8 @@ CONSTANT: FREQUENCY $[ 1/30 seconds ]
 TUPLE: key-caps-gadget < gadget keys timer ;
 
 : make-key-gadget ( scancode dim array -- )
-    [ 
-        swap [ 
+    [
+        swap [
             " " [ drop ] <border-button>
             swap [ first >>loc ] [ second >>dim ] bi
         ] [ execute( -- value ) ] bi*
@@ -147,7 +147,7 @@ TUPLE: key-caps-gadget < gadget keys timer ;
 : add-keys-gadgets ( gadget -- gadget )
     key-locations 256 f <array>
     [ [ make-key-gadget ] curry assoc-each ]
-    [ [ [ add-gadget ] when* ] each ] 
+    [ [ [ add-gadget ] when* ] each ]
     [ >>keys ] tri ;
 
 : <key-caps-gadget> ( -- gadget )
@@ -157,8 +157,8 @@ TUPLE: key-caps-gadget < gadget keys timer ;
 M: key-caps-gadget pref-dim* drop KEYBOARD-SIZE ;
 
 : update-key-caps-state ( gadget -- )
-    read-keyboard keys>> over keys>> 
-    [ [ selected?<< ] [ drop ] if* ] 2each 
+    read-keyboard keys>> over keys>>
+    [ [ selected?<< ] [ drop ] if* ] 2each
     relayout-1 ;
 
 M: key-caps-gadget graft*

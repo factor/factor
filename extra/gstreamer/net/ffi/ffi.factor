@@ -19,4 +19,3 @@ LIBRARY: gstreamer.net
 >>
 
 GIR: GstNet-0.10.gir
-

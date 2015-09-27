@@ -5,13 +5,13 @@ sequences specialized-arrays tools.test ;
 SPECIALIZED-ARRAY: uint
 IN: random.cmwc.tests
 
-[ ] [
+{ } [
     cmwc-4096 [
         random-32 drop
     ] with-random
 ] unit-test
 
-[
+{
 {
     4294604858
     4294948512
@@ -24,14 +24,14 @@ IN: random.cmwc.tests
     4294817038
     4294798256
 }
-] [
+} [
     cmwc-4096
     4096 iota uint >c-array 362436 <cmwc-seed> seed-random [
         10 [ random-32 ] replicate
     ] with-random
 ] unit-test
 
-[ t ] [
+{ t } [
     cmwc-4096 [
         4096 iota uint >c-array 362436 <cmwc-seed> seed-random [
             10 [ random-32 ] replicate

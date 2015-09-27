@@ -21,7 +21,7 @@ M: word enum>number "enum-value" word-prop ;
     { } map-as [ ] suffix '[ _ case ] ;
 PRIVATE>
 
-MACRO: number>enum ( enum-c-type -- )
+MACRO: number>enum ( enum-c-type -- quot )
     lookup-c-type members>> enum-boxer ;
 
 M: enum-c-type c-type-boxed-class drop object ;
@@ -39,7 +39,7 @@ M: enum-c-type c-type-setter
     [ first define-singleton-class ] each ;
 
 : define-enum-constructor ( word -- )
-    [ name>> "<" ">" surround create-in ] keep
+    [ name>> "<" ">" surround create-word-in ] keep
     [ number>enum ] curry ( number -- enum ) define-inline ;
 
 PRIVATE>

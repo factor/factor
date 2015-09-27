@@ -15,9 +15,8 @@ struct quotation_jit : public jit {
   void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
   bool primitive_call_p(cell i, cell length);
   bool trivial_quotation_p(array* elements);
-  void emit_quot(cell quot);
-  void emit_prolog(bool safepoint, bool stack_frame);
-  void emit_epilog(bool safepoint, bool stack_frame);
+  void emit_quotation(cell quot);
+  void emit_epilog(bool needed);
   bool fast_if_p(cell i, cell length);
   bool fast_dip_p(cell i, cell length);
   bool fast_2dip_p(cell i, cell length);
@@ -25,11 +24,9 @@ struct quotation_jit : public jit {
   bool mega_lookup_p(cell i, cell length);
   bool declare_p(cell i, cell length);
   bool special_subprimitive_p(cell obj);
-  bool word_stack_frame_p(cell obj);
   cell word_stack_frame_size(cell obj);
   bool word_safepoint_p(cell obj);
-  bool stack_frame_p();
-  bool safepoint_p();
+  bool no_non_safepoint_words_p();
   void iterate_quotation();
 };
 

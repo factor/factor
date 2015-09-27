@@ -22,7 +22,7 @@ PREDICATE: mdb-killcursors-op < integer OP_KillCursors = ;
 
 CONSTANT: MSG-HEADER-SIZE 16
 
-SYMBOL: msg-bytes-read 
+SYMBOL: msg-bytes-read
 
 : bytes-read> ( -- integer )
     msg-bytes-read get ; inline
@@ -52,10 +52,10 @@ SYMBOL: msg-bytes-read
     read-longlong >>cursor
     read-int32 >>start#
     read-int32 [ >>returned# ] keep
-    [ H{ } clone stream>assoc ] collector [ times ] dip >>objects ;    
+    [ H{ } clone stream>assoc ] collector [ times ] dip >>objects ;
 
 : (read-message) ( message opcode -- message )
-    OP_Reply = 
+    OP_Reply =
     [ reply-read-message ]
     [ "unknown message type" throw ] if ; inline
 
@@ -109,7 +109,7 @@ PRIVATE>
     ] (write-message) ; inline
 
 : write-insert-message ( message -- )
-    [ 
+    [
        [ flags>> write-int32 ]
        [ collection>> write-cstring ]
        [ objects>> [ assoc>stream ] each ] tri
@@ -117,7 +117,7 @@ PRIVATE>
 
 : write-update-message ( message -- )
     [
-        { 
+        {
             [ flags>> write-int32 ]
             [ collection>> write-cstring ]
             [ update-flags>> write-int32 ]
@@ -156,7 +156,7 @@ PRIVATE>
 PRIVATE>
 
 : write-message ( message -- )
-    {  
+    {
         { [ dup mdb-query-msg? ] [ write-query-message ] }
         { [ dup mdb-insert-msg? ] [ write-insert-message ] }
         { [ dup mdb-update-msg? ] [ write-update-message ] }

@@ -1,4 +1,4 @@
-USING: accessors assocs compiler compiler.cfg
+USING: accessors assocs combinators compiler compiler.cfg
 compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.linear-scan
 compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
@@ -8,22 +8,24 @@ literals math arrays alien.c-types alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
-    gensym
-    [ linear-scan build-stack-frame generate ] dip
+    gensym [
+        [ linear-scan ] [ build-stack-frame ] [ generate ] tri
+    ] dip
     [ associate >alist t t modify-code-heap ] keep ;
 
 : compile-test-cfg ( -- word )
-    0 get block>cfg
-    dup cfg set
-    dup fake-representations
-    destruct-ssa
-    compile-cfg ;
+    0 get block>cfg {
+        [ cfg set ]
+        [ fake-representations ]
+        [ destruct-ssa ]
+        [ compile-cfg ]
+    } cleave ;
 
 : compile-test-bb ( insns -- result )
     V{ T{ ##prologue } T{ ##branch } } [ clone ] map 0 test-bb
     V{
-        T{ ##inc-d f 1 }
-        T{ ##replace f 0 D 0 }
+        T{ ##inc f D: 1 }
+        T{ ##replace f 0 D: 0 }
         T{ ##branch }
     } [ clone ] map append 1 test-bb
     V{

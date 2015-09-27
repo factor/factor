@@ -98,4 +98,3 @@ PRIVATE>
 
 : odd-word ( string -- )
     [ read-odd-word ] with-string-reader ;
-

@@ -3,7 +3,6 @@ json.writer kernel mirrors sequences urls urls.encoding
 arrays furnace.auth byte-arrays combinators.short-circuit
 strings continuations combinators base64 make
 locals namespaces ;
-FROM: assocs => change-at ;
 IN: furnace.auth.providers.couchdb
 
 ! !!! Implement the authentication protocol for CouchDB.
@@ -119,7 +118,7 @@ TUPLE: couchdb-auth-provider
     ((get-user)) ;
 
 : strip-hash ( hash1 -- hash2 )
-    [ drop first CHAR: _ = not ] assoc-filter ;
+    [ drop first CHAR: _ = ] assoc-reject ;
 
 : at-or-k ( key hash -- newkey )
     dupd at [ nip ] when* ;

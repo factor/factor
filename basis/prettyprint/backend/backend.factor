@@ -1,15 +1,13 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-classes.algebra.private classes.intersection classes.maybe
-classes.tuple classes.tuple.private classes.union colors
-colors.constants combinators continuations effects generic
-hash-sets hashtables io io.pathnames io.styles kernel
-make math math.order math.parser namespaces prettyprint.config
+classes.algebra.private classes.maybe classes.private
+classes.tuple combinators continuations effects generic
+hash-sets hashtables io.pathnames io.styles kernel make math
+math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
-quotations sbufs sequences strings vectors words words.symbol
-classes.private ;
-FROM: sets => members ;
+quotations sbufs sequences strings vectors words ;
+QUALIFIED: sets
 IN: prettyprint.backend
 
 M: effect pprint* effect>string text ;
@@ -145,10 +143,10 @@ M: pathname pprint*
 : present-text ( str obj -- )
     presented associate styled-text ;
 
-: check-recursion ( obj quot -- )
+: check-recursion ( obj quot: ( obj -- ) -- )
     nesting-limit? [
         drop
-        [ class-of name>> "~" dup surround ] keep present-text 
+        [ class-of name>> "~" dup surround ] keep present-text
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
@@ -160,7 +158,7 @@ M: pathname pprint*
     ] if ; inline
 
 : filter-tuple-assoc ( slot,value -- name,value )
-    [ [ initial>> ] dip = not ] assoc-filter
+    [ [ initial>> ] dip = ] assoc-reject
     [ [ name>> ] dip ] assoc-map ;
 
 : tuple>assoc ( tuple -- assoc )
@@ -232,7 +230,7 @@ M: callable >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
-M: hash-set >pprint-sequence members ;
+M: hash-set >pprint-sequence sets:members ;
 M: anonymous-union >pprint-sequence members>> ;
 M: anonymous-intersection >pprint-sequence participants>> ;
 M: anonymous-complement >pprint-sequence class>> 1array ;

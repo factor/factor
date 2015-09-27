@@ -4,32 +4,32 @@ IN: typed
 
 HELP: TYPED:
 { $syntax
-"""TYPED: word ( a b: class ... -- x: class y ... )
-    body ;""" }
+"TYPED: word ( a b: class ... -- x: class y ... )
+    body ;" }
 { $description "Like " { $link POSTPONE: : } ", defines a new word with a given stack effect in the current vocabulary. The inputs and outputs of the stack effect can additionally be given type annotations in the form " { $snippet "a: class" } ". When invoked, the word will attempt to coerce its input values to the declared input types before executing the body, throwing an " { $link input-mismatch-error } " if the types cannot be made to match. The word will likewise attempt to coerce its outputs to their declared types and throw an " { $link output-mismatch-error } " if the types cannot be made to match." }
 { $notes "The aforementioned type conversions and checks are structured in such a way that they will be eliminated by the compiler if it can statically determine that the types of the inputs at a call site or of the outputs in the word definition are always correct." }
 { $examples
 "A version of " { $link + } " specialized for floats, converting other real number types:"
 { $example
-"""USING: math prettyprint typed ;
+"USING: math prettyprint typed ;
 IN: scratchpad
 
 TYPED: add-floats ( a: float b: float -- c: float )
     + ;
 
-1 2+1/2 add-floats ."""
+1 2+1/2 add-floats ."
 "3.5" } } ;
 
 HELP: TYPED::
 { $syntax
-"""TYPED:: word ( a b: class ... -- x: class y ... )
-    body ;""" }
+"TYPED:: word ( a b: class ... -- x: class y ... )
+    body ;" }
 { $description "Like " { $link POSTPONE: :: } ", defines a new word with named inputs in the current vocabulary. The inputs and outputs of the stack effect can additionally be given type annotations in the form " { $snippet "a: class" } ". When invoked, the word will attempt to coerce its input values to the declared input types before executing the body, throwing an " { $link input-mismatch-error } " if the types cannot be made to match. The word will likewise attempt to coerce its outputs to their declared types and throw an " { $link output-mismatch-error } " if the types cannot be made to match." }
 { $notes "The aforementioned type conversions and checks are structured in such a way that they will be eliminated by the compiler if it can statically determine that the types of the inputs at a call site or of the outputs in the word definition are always correct." }
 { $examples
 "A version of the quadratic formula specialized for floats, converting other real number types:"
 { $example
-"""USING: kernel math math.libm prettyprint typed ;
+"USING: kernel math math.libm prettyprint typed ;
 IN: scratchpad
 
 TYPED:: quadratic-roots ( a: float b: float c: float -- q1: float q2: float )
@@ -38,9 +38,9 @@ TYPED:: quadratic-roots ( a: float b: float c: float -- q1: float q2: float )
     [ + ] [ - ] 2bi
     [ 2.0 a * / ] bi@ ;
 
-1 0 -9/4 quadratic-roots [ . ] bi@"""
-"""1.5
--1.5""" } } ;
+1 0 -9/4 quadratic-roots [ . ] bi@"
+"1.5
+-1.5" } } ;
 
 HELP: define-typed
 { $values { "word" word } { "def" quotation } { "effect" effect } }

@@ -5,7 +5,7 @@ io.files io.streams.byte-array io.streams.string
 io.streams.throwing kernel namespaces tools.test ;
 IN: io.streams.throwing.tests
 
-[ "asdf" ]
+{ "asdf" }
 [
     "asdf" [ [ 6 read-partial ] throw-on-eof ] with-string-reader
 ] unit-test
@@ -30,17 +30,17 @@ IN: io.streams.throwing.tests
     "asdf" [ [ 4 read 4 read ] throw-on-eof ] with-string-reader
 ] [ stream-exhausted? ] must-fail-with
 
-[ "as" "df" ] [
+{ "as" "df" } [
     "asdf" [ [ 2 read ] throw-on-eof 3 read ] with-string-reader
 ] unit-test
 
-[ "as" "df\n" ] [
+{ "as" "df\n" } [
     "vocab:io/streams/throwing/asdf.txt" utf8 [
         [ 2 read ] throw-on-eof 20 read
     ] with-file-reader
 ] unit-test
 
-[ B{ 0 1 2 3 } B{ 0 1 2 3 } ] [
+{ B{ 0 1 2 3 } B{ 0 1 2 3 } } [
     B{ 0 1 2 3 } binary [
         [ 4 read 0 seek-absolute seek-input 4 read ] throw-on-eof
     ] with-byte-reader
@@ -52,7 +52,7 @@ IN: io.streams.throwing.tests
     ] with-byte-reader
 ] [ stream-exhausted? ] must-fail-with
 
-[ "asd" CHAR: f ] [
+{ "asd" CHAR: f } [
     "asdf" [ [ "f" read-until ] throw-on-eof ] with-string-reader
 ] unit-test
 

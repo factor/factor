@@ -97,7 +97,7 @@ void factor_vm::start_gc_again() {
     default:
       /* Nothing else should fail mid-collection due to insufficient
          space in the target generation. */
-      critical_error("Bad GC op", current_gc->op);
+      critical_error("in start_gc_again, bad GC op", current_gc->op);
       break;
   }
 
@@ -111,7 +111,7 @@ void factor_vm::set_current_gc_op(gc_op op) {
     current_gc->event->op = op;
 }
 
-void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
+void factor_vm::gc(gc_op op, cell requested_size) {
   FACTOR_ASSERT(!gc_off);
   FACTOR_ASSERT(!current_gc);
 
@@ -122,6 +122,8 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
   FACTOR_ASSERT(!data->high_fragmentation_p());
 
   current_gc = new gc_state(op, this);
+  if (ctx)
+    ctx->callstack_seg->set_border_locked(false);
   atomic::store(&current_gc_p, true);
 
   /* Keep trying to GC higher and higher generations until we don't run
@@ -141,7 +143,7 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
           if (data->high_fragmentation_p()) {
             /* Change GC op so that if we fail again, we crash. */
             set_current_gc_op(collect_full_op);
-            collect_full(trace_contexts_p);
+            collect_full();
           }
           break;
         case collect_to_tenured_op:
@@ -150,20 +152,20 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
           if (data->high_fragmentation_p()) {
             /* Change GC op so that if we fail again, we crash. */
             set_current_gc_op(collect_full_op);
-            collect_full(trace_contexts_p);
+            collect_full();
           }
           break;
         case collect_full_op:
-          collect_full(trace_contexts_p);
+          collect_full();
           break;
         case collect_compact_op:
-          collect_compact(trace_contexts_p);
+          collect_compact();
           break;
         case collect_growing_heap_op:
-          collect_growing_heap(requested_size, trace_contexts_p);
+          collect_growing_heap(requested_size);
           break;
         default:
-          critical_error("Bad GC op", current_gc->op);
+          critical_error("in gc, bad GC op", current_gc->op);
           break;
       }
 
@@ -179,6 +181,8 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
   end_gc();
 
   atomic::store(&current_gc_p, false);
+  if (ctx)
+    ctx->callstack_seg->set_border_locked(true);
   delete current_gc;
   current_gc = NULL;
 
@@ -187,18 +191,15 @@ void factor_vm::gc(gc_op op, cell requested_size, bool trace_contexts_p) {
 }
 
 void factor_vm::primitive_minor_gc() {
-  gc(collect_nursery_op, 0, /* requested size */
-     true /* trace contexts? */);
+  gc(collect_nursery_op, 0);
 }
 
 void factor_vm::primitive_full_gc() {
-  gc(collect_full_op, 0, /* requested size */
-     true /* trace contexts? */);
+  gc(collect_full_op, 0);
 }
 
 void factor_vm::primitive_compact_gc() {
-  gc(collect_compact_op, 0, /* requested size */
-     true /* trace contexts? */);
+  gc(collect_compact_op, 0);
 }
 
 /*
@@ -214,8 +215,7 @@ object* factor_vm::allot_large_object(cell type, cell size) {
 
     /* If it still won't fit, grow the heap */
     if (!data->tenured->can_allot_p(requested_size)) {
-      gc(collect_growing_heap_op, size, /* requested size */
-         true /* trace contexts? */);
+      gc(collect_growing_heap_op, size);
     }
   }
 
@@ -235,6 +235,7 @@ void factor_vm::primitive_enable_gc_events() {
 }
 
 /* Allocates memory (byte_array_from_value, result.add) */
+/* XXX: Remember that growable_array has a data_root already */
 void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
     growable_array result(this);
@@ -242,10 +243,7 @@ void factor_vm::primitive_disable_gc_events() {
     std::vector<gc_event>* gc_events = this->gc_events;
     this->gc_events = NULL;
 
-    std::vector<gc_event>::const_iterator iter = gc_events->begin();
-    std::vector<gc_event>::const_iterator end = gc_events->end();
-
-    for (; iter != end; iter++) {
+    FACTOR_FOR_EACH(*gc_events) {
       gc_event event = *iter;
       byte_array* obj = byte_array_from_value(&event);
       result.add(tag<byte_array>(obj));

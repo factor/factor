@@ -43,7 +43,7 @@ HELP: LIBRARY:
 { $description "Sets the logical library for subsequent " { $link POSTPONE: FUNCTION: } " and " { $link POSTPONE: SUBROUTINE: } " definitions. The given library name must have been opened with a previous call to " { $link add-fortran-library } "." } ;
 
 HELP: add-fortran-library
-{ $values { "name" string } { "soname" string } { "fortran-abi" symbol } } 
+{ $values { "name" string } { "soname" string } { "fortran-abi" symbol } }
 { $description "Opens the shared library in the file specified by " { $snippet "soname" } " under the logical name " { $snippet "name" } " so that it may be used in subsequent " { $link POSTPONE: LIBRARY: } " and " { $link fortran-invoke } " calls. Functions and subroutines from the library will be defined using the specified " { $snippet "fortran-abi" } ", which must be one of the supported " { $link "alien.fortran-abis" } "." }
 ;
 

@@ -32,10 +32,10 @@ M: secure (accept)
     ] with-destructors ;
 
 : check-shutdown-response ( handle r -- event )
-    #! We don't do two-step shutdown here because I couldn't
-    #! figure out how to do it with non-blocking BIOs. Also, it
-    #! seems that SSL_shutdown always returns 0 -- this sounds
-    #! like a bug
+    ! We don't do two-step shutdown here because I couldn't
+    ! figure out how to do it with non-blocking BIOs. Also, it
+    ! seems that SSL_shutdown always returns 0 -- this sounds
+    ! like a bug
     over handle>> over SSL_get_error
     {
         { SSL_ERROR_NONE [ 2drop f ] }
@@ -47,7 +47,7 @@ M: secure (accept)
 
 : (shutdown) ( handle -- )
     dup dup handle>> SSL_shutdown check-shutdown-response
-    dup [ dupd wait-for-fd (shutdown) ] [ 2drop ] if ;
+    [ dupd wait-for-fd (shutdown) ] [ drop ] if* ;
 
 M: ssl-handle shutdown
     dup connected>> [

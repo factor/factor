@@ -40,7 +40,6 @@ IN: stack-checker.known-words
 : infer-shuffle-word ( word -- )
     "shuffle" word-prop infer-shuffle ;
 
-! This is a hack for combinators combinators.short-circuit.smart.
 : infer-local-reader ( word -- )
     ( -- value ) apply-word/effect ;
 
@@ -292,8 +291,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ (format-float) { float byte-array } { byte-array } define-primitive \ (format-float) make-foldable
 \ (fopen) { byte-array byte-array } { alien } define-primitive
 \ (identity-hashcode) { object } { fixnum } define-primitive
-\ (save-image) { byte-array byte-array } { } define-primitive
-\ (save-image-and-exit) { byte-array byte-array } { } define-primitive
+\ (save-image) { byte-array byte-array object } { } define-primitive
 \ (set-context) { object alien } { object } define-primitive
 \ (set-context-and-delete) { object alien } { } define-primitive
 \ (sleep) { integer } { } define-primitive
@@ -333,11 +331,11 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum-bitor { bignum bignum } { bignum } define-primitive \ bignum-bitor make-foldable
 \ bignum-bitxor { bignum bignum } { bignum } define-primitive \ bignum-bitxor make-foldable
 \ bignum-log2 { bignum } { bignum } define-primitive \ bignum-log2 make-foldable
-\ bignum-mod { bignum bignum } { bignum } define-primitive \ bignum-mod make-foldable
+\ bignum-mod { bignum bignum } { integer } define-primitive \ bignum-mod make-foldable
 \ bignum-gcd { bignum bignum } { bignum } define-primitive \ bignum-gcd make-foldable
 \ bignum-shift { bignum fixnum } { bignum } define-primitive \ bignum-shift make-foldable
 \ bignum/i { bignum bignum } { bignum } define-primitive \ bignum/i make-foldable
-\ bignum/mod { bignum bignum } { bignum bignum } define-primitive \ bignum/mod make-foldable
+\ bignum/mod { bignum bignum } { bignum integer } define-primitive \ bignum/mod make-foldable
 \ bignum< { bignum bignum } { object } define-primitive \ bignum< make-foldable
 \ bignum<= { bignum bignum } { object } define-primitive \ bignum<= make-foldable
 \ bignum= { bignum bignum } { object } define-primitive \ bignum= make-foldable
@@ -348,7 +346,6 @@ M: object infer-call* \ call bad-macro-input ;
 \ bits>double { integer } { float } define-primitive \ bits>double make-foldable
 \ bits>float { integer } { float } define-primitive \ bits>float make-foldable
 \ both-fixnums? { object object } { object } define-primitive
-\ callstack { } { callstack } define-primitive \ callstack make-flushable
 \ callstack-bounds { } { alien alien } define-primitive \ callstack-bounds make-flushable
 \ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
 \ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
@@ -361,7 +358,6 @@ M: object infer-call* \ call bad-macro-input ;
 \ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
 \ (callback-room) { } { byte-array } define-primitive \ (callback-room) make-flushable
 \ (data-room) { } { byte-array } define-primitive \ (data-room) make-flushable
-\ datastack { } { array } define-primitive \ datastack make-flushable
 \ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
 \ die { } { } define-primitive
 \ disable-gc-events { } { object } define-primitive
@@ -372,8 +368,6 @@ M: object infer-call* \ call bad-macro-input ;
 \ enable-gc-events { } { } define-primitive
 \ eq? { object object } { object } define-primitive \ eq? make-foldable
 \ fclose { alien } { } define-primitive
-\ ffi-signal-handler { } { } define-primitive
-\ ffi-leaf-signal-handler { } { } define-primitive
 \ fflush { alien } { } define-primitive
 \ fgetc { alien } { object } define-primitive
 \ fixnum* { fixnum fixnum } { integer } define-primitive \ fixnum* make-foldable
@@ -414,7 +408,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ float>= { float float } { object } define-primitive \ float>= make-foldable
 \ float>bignum { float } { bignum } define-primitive \ float>bignum make-foldable
 \ float>bits { real } { integer } define-primitive \ float>bits make-foldable
-\ float>fixnum { float } { fixnum } define-primitive \ bignum>fixnum make-foldable
+\ float>fixnum { float } { fixnum } define-primitive \ float>fixnum make-foldable
 \ fpu-state { } { } define-primitive
 \ fputc { object alien } { } define-primitive
 \ fread-unsafe { integer c-ptr alien } { integer } define-primitive
@@ -431,17 +425,15 @@ M: object infer-call* \ call bad-macro-input ;
 \ minor-gc { } { } define-primitive
 \ modify-code-heap { array object object } { } define-primitive
 \ nano-count { } { integer } define-primitive \ nano-count make-flushable
-\ optimized? { word } { object } define-primitive
 \ profiling { object } { } define-primitive
 \ (get-samples) { } { object } define-primitive
 \ (clear-samples) { } { } define-primitive
-\ quot-compiled? { quotation } { object } define-primitive
 \ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
+\ quotation-compiled? { quotation } { object } define-primitive
 \ reset-dispatch-stats { } { } define-primitive
 \ resize-array { integer array } { array } define-primitive
 \ resize-byte-array { integer byte-array } { byte-array } define-primitive
 \ resize-string { integer string } { string } define-primitive
-\ retainstack { } { array } define-primitive \ retainstack make-flushable
 \ retainstack-for { c-ptr } { array } define-primitive \ retainstack-for make-flushable
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
 \ set-alien-double { float c-ptr integer } { } define-primitive
@@ -458,7 +450,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
 \ set-context-object { object fixnum } { } define-primitive
 \ set-fpu-state { } { } define-primitive
-\ set-innermost-frame-quot { quotation callstack } { } define-primitive
+\ set-innermost-frame-quotation { quotation callstack } { } define-primitive
 \ set-slot { object object fixnum } { } define-primitive
 \ set-special-object { object fixnum } { } define-primitive
 \ set-string-nth-fast { fixnum fixnum string } { } define-primitive
@@ -471,3 +463,4 @@ M: object infer-call* \ call bad-macro-input ;
 \ tag { object } { fixnum } define-primitive \ tag make-foldable
 \ unimplemented { } { } define-primitive
 \ word-code { word } { integer integer } define-primitive \ word-code make-flushable
+\ word-optimized? { word } { object } define-primitive

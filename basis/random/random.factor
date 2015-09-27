@@ -105,7 +105,7 @@ M: hashtable random
         [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
     ] if-zero ;
 
-M: sets:set random members random ;
+M: unordered-set random members random ;
 
 M: hash-set random
     dup cardinality [ drop f ] [

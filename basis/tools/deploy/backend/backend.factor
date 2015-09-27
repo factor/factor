@@ -12,8 +12,8 @@ tools.deploy.libraries vocabs.metadata.resources
 tools.deploy.embed locals ;
 IN: tools.deploy.backend
 
-: copy-vm ( executable bundle-name -- vm )
-    prepend-path vm over copy-file ;
+: copy-vm ( executable bundle-name -- vm-path )
+    prepend-path vm-path over copy-file ;
 
 TUPLE: vocab-manifest vocabs libraries ;
 
@@ -45,7 +45,7 @@ ERROR: can't-deploy-library-file library ;
     utf8 [ copy-lines ] with-process-reader ;
 
 : make-boot-image ( -- )
-    #! If stage1 image doesn't exist, create one.
+    ! If stage1 image doesn't exist, create one.
     my-boot-image-name resource-path exists?
     [ make-my-image ] unless ;
 
@@ -62,8 +62,15 @@ ERROR: can't-deploy-library-file library ;
     ] { } make ;
 
 : staging-image-name ( profile -- name )
-    "-" join "." my-arch 3append
+    "-" join "." my-arch-name 3append
     "staging." ".image" surround cache-file ;
+
+: delete-staging-images ( -- )
+    cache-directory [
+        [ "staging." head? ] filter
+        "." my-arch-name ".image" 3append [ tail? ] curry filter
+        [ delete-file ] each
+    ] with-directory-files ;
 
 : staging-command-line ( profile -- flags )
     [
@@ -80,14 +87,14 @@ ERROR: can't-deploy-library-file library ;
         ] bi
     ] { } make ;
 
-: run-factor ( vm flags -- )
+: run-factor ( vm-path flags -- )
     swap prefix dup . run-with-output ; inline
 
 DEFER: ?make-staging-image
 
 : make-staging-image ( profile -- )
     dup [ but-last ?make-staging-image ] unless-empty
-    vm swap staging-command-line run-factor ;
+    vm-path swap staging-command-line run-factor ;
 
 : ?make-staging-image ( profile -- )
     dup staging-image-name exists?
@@ -132,4 +139,9 @@ DEFER: ?make-staging-image
     vm image vocab config make-deploy-image
     image vm embed-image ;
 
+SYMBOL: open-directory-after-deploy?
+t open-directory-after-deploy? set-global
+
 HOOK: deploy* os ( vocab -- )
+
+HOOK: deploy-path os ( vocab -- path )

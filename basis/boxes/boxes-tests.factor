@@ -1,24 +1,24 @@
 USING: boxes namespaces tools.test accessors ;
 IN: boxes.tests
 
-[ ] [ <box> "b" set ] unit-test
+{ } [ <box> "b" set ] unit-test
 
-[ ] [ 3 "b" get >box ] unit-test
+{ } [ 3 "b" get >box ] unit-test
 
-[ t ] [ "b" get occupied>> ] unit-test
+{ t } [ "b" get occupied>> ] unit-test
 
 [ 4 "b" >box ] must-fail
 
-[ 3 ] [ "b" get box> ] unit-test
+{ 3 } [ "b" get box> ] unit-test
 
-[ f ] [ "b" get occupied>> ] unit-test
+{ f } [ "b" get occupied>> ] unit-test
 
 [ "b" get box> ] must-fail
 
-[ f f ] [ "b" get ?box ] unit-test
+{ f f } [ "b" get ?box ] unit-test
 
-[ ] [ 12 "b" get >box ] unit-test
+{ } [ 12 "b" get >box ] unit-test
 
-[ 12 t ] [ "b" get ?box ] unit-test
+{ 12 t } [ "b" get ?box ] unit-test
 
-[ f ] [ "b" get occupied>> ] unit-test
+{ f } [ "b" get occupied>> ] unit-test

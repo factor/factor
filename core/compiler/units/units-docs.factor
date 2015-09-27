@@ -1,5 +1,5 @@
 USING: definitions help.markup help.syntax kernel parser
-quotations source-files stack-checker.errors words ;
+quotations sequences source-files stack-checker.errors words ;
 IN: compiler.units
 
 ARTICLE: "compilation-units-internals" "Compilation units internals"
@@ -50,10 +50,10 @@ HELP: remember-definition
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: old-definitions
-{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link file } " the most recent time it was loaded." } ;
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link current-source-file } " the most recent time it was loaded." } ;
 
 HELP: new-definitions
-{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link file } "." } ;
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link current-source-file } "." } ;
 
 HELP: with-compilation-unit
 { $values { "quot" quotation } }
@@ -72,6 +72,10 @@ HELP: with-nested-compilation-unit
 HELP: recompile
 { $values { "words" "a sequence of words" } { "alist" "an association list mapping words to compiled definitions" } }
 { $contract "Internal word which compiles words. Called at the end of " { $link with-compilation-unit } "." } ;
+
+HELP: to-recompile
+{ $values { "words" sequence } }
+{ $description "Sequence of words that will be recompiled by the compilation unit." } ;
 
 HELP: no-compilation-unit
 { $values { "word" word } }

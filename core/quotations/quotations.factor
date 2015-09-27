@@ -9,7 +9,12 @@ BUILTIN: quotation
     cached-effect
     cache-counter ;
 
+PRIMITIVE: jit-compile ( quot -- )
+PRIMITIVE: quotation-code ( quot -- start end )
+PRIMITIVE: quotation-compiled? ( quot -- ? )
+
 <PRIVATE
+PRIMITIVE: array>quotation ( array -- quot )
 
 : uncurry ( curry -- obj quot )
     { curry } declare dup 2 slot swap 3 slot ; inline

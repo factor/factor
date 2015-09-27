@@ -41,4 +41,3 @@ M: indexed-seq new-resizable
     [ [ iseq>> new-resizable ] keep iseq<< ]
     [ [ rassoc>> clone nip ] keep rassoc<< ]
     2tri ;
-

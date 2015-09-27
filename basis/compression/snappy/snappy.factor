@@ -27,7 +27,6 @@ PRIVATE>
     over
     dup length 0 size_t <ref>
     [ snappy_uncompressed_length check-snappy ] keep
-    size_t deref 
+    size_t deref
     n>outs
     [ snappy_uncompress check-snappy ] 2keep drop >byte-array ;
-

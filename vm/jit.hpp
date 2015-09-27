@@ -22,17 +22,20 @@ struct jit {
 
   /* Allocates memory */
   void parameter(cell parameter) { parameters.add(parameter); }
+  /* Allocates memory */
   void emit_with_parameter(cell code_template_, cell parameter_);
 
   /* Allocates memory */
   void literal(cell literal) { literals.add(literal); }
+  /* Allocates memory */
   void emit_with_literal(cell code_template_, cell literal_);
 
+  /* Allocates memory */
   void push(cell literal) {
     emit_with_literal(parent->special_objects[JIT_PUSH_IMMEDIATE], literal);
   }
 
-  /* Allocates memory */
+  /* Allocates memory (literal(), emit())*/
   void word_jump(cell word_) {
     data_root<word> word(word_, parent);
 #ifndef FACTOR_AMD64

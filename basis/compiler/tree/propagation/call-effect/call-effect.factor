@@ -1,30 +1,12 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.private effects
-fry kernel kernel.private make namespaces sequences continuations
-quotations words math stack-checker stack-checker.dependencies
-combinators.short-circuit stack-checker.transforms
-compiler.tree.propagation.info
-compiler.tree.propagation.inlining compiler.units ;
+USING: accessors combinators combinators.private
+combinators.short-circuit compiler.tree.propagation.info
+compiler.tree.propagation.inlining compiler.units continuations
+effects fry kernel kernel.private namespaces quotations
+sequences stack-checker stack-checker.dependencies
+stack-checker.transforms words ;
 IN: compiler.tree.propagation.call-effect
-
-! call( and execute( have complex expansions.
-
-! If the input quotation is a literal, or built up from curry and
-! compose with terminal quotations literal, it is inlined at the
-! call site.
-
-! For dynamic call sites, call( uses the following strategy:
-! - Inline caching. If the quotation is the same as last time, just call it unsafely
-! - Effect inference. Infer quotation's effect, caching it in the cached-effect slot,
-!   and compare it with declaration. If matches, call it unsafely.
-! - Fallback. If the above doesn't work, call it and compare the datastack before
-!   and after to make sure it didn't mess anything up.
-! - Inline caches and cached effects are invalidated whenever a macro is redefined, or
-!   a word's effect changes, by comparing a global counter against the counter value
-!   last observed. The counter is incremented by compiler.units.
-
-! execute( uses a similar strategy.
 
 TUPLE: inline-cache value counter ;
 
@@ -32,8 +14,7 @@ TUPLE: inline-cache value counter ;
     { [ value>> eq? ] [ nip counter>> effect-counter eq? ] } 2&& ; inline
 
 : update-inline-cache ( word/quot ic -- )
-    [ effect-counter ] dip
-    [ value<< ] [ counter<< ] bi-curry bi* ; inline
+    swap >>value effect-counter >>counter drop ; inline
 
 SINGLETON: +unknown+
 
@@ -70,17 +51,11 @@ M: compose cached-effect
     cache-counter>> effect-counter eq? ; inline
 
 : save-effect ( effect quot -- )
-    [ effect-counter ] dip
-    [ cached-effect<< ] [ cache-counter<< ] bi-curry bi* ;
+    swap >>cached-effect effect-counter >>cache-counter drop ;
 
 M: quotation cached-effect
     dup cached-effect-valid?
     [ cached-effect>> ] [ [ safe-infer dup ] keep save-effect ] if ;
-
-: call-effect-unsafe? ( quot effect -- ? )
-    [ cached-effect ] dip
-    over +unknown+ eq?
-    [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
 
 : call-effect-slow>quot ( effect -- quot )
     [ \ call-effect def>> curry ] [ add-effect-input ] bi
@@ -91,6 +66,11 @@ M: quotation cached-effect
 \ call-effect-slow [ call-effect-slow>quot ] 1 define-transform
 
 \ call-effect-slow t "no-compile" set-word-prop
+
+: call-effect-unsafe? ( quot effect -- ? )
+    [ cached-effect ] dip
+    over +unknown+ eq?
+    [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
 
 : call-effect-fast ( quot effect inline-cache -- )
     2over call-effect-unsafe?
@@ -111,7 +91,7 @@ M: quotation cached-effect
     [ '[ _ execute ] ] dip call-effect-slow ; inline
 
 : execute-effect-unsafe? ( word effect -- ? )
-    over optimized?
+    over word-optimized?
     [ [ stack-effect { effect } declare ] dip effect<= ]
     [ 2drop f ]
     if ; inline
@@ -131,9 +111,6 @@ M: quotation cached-effect
 : execute-effect>quot ( effect -- quot )
     inline-cache new '[ drop _ _ execute-effect-ic ] ;
 
-! Some bookkeeping to make sure that crap like
-! [ dup curry call( quot -- ) ] dup curry call( quot -- ) ]
-! doesn't hang the compiler.
 GENERIC: already-inlined-quot? ( quot -- ? )
 
 M: curry already-inlined-quot? quot>> already-inlined-quot? ;

@@ -28,14 +28,14 @@ FUNCTION: HRESULT ScriptItemize (
     SCRIPT_STATE* psState,
     SCRIPT_ITEM* pItems,
     int* pcItems
-) ;
+)
 
 FUNCTION: HRESULT ScriptLayout (
     int cRuns,
     BYTE* pbLevel,
     int* piVisualToLogical,
     int* piLogicalToVisual
-) ;
+)
 
 CONSTANT: SCRIPT_JUSTIFY_NONE 0
 CONSTANT: SCRIPT_JUSTIFY_ARABIC_BLANK 1
@@ -71,7 +71,7 @@ FUNCTION: HRESULT ScriptShape (
     WORD* pwLogClust,
     SCRIPT_VISATTR* psva,
     int* pcGlyphs
-) ;
+)
 
 STRUCT: GOFFSET
     { du LONG }
@@ -87,7 +87,7 @@ FUNCTION: HRESULT ScriptPlace (
     int* piAdvance,
     GOFFSET* pGoffset,
     ABC* pABC
-) ;
+)
 
 FUNCTION: HRESULT ScriptTextOut (
     HDC hdc,
@@ -104,7 +104,7 @@ FUNCTION: HRESULT ScriptTextOut (
     int* piAdvance,
     int* piJustify,
     GOFFSET* pGoffset
-) ;
+)
 
 FUNCTION: HRESULT ScriptJustify (
     SCRIPT_VISATTR* psva,
@@ -113,7 +113,7 @@ FUNCTION: HRESULT ScriptJustify (
     int iDx,
     int iMinKashida,
     int* piJustify
-) ;
+)
 
 STRUCT: SCRIPT_LOGATTR
     { flags BYTE } ;
@@ -123,7 +123,7 @@ FUNCTION: HRESULT ScriptBreak (
     int cChars,
     SCRIPT_ANALYSIS* psa,
     SCRIPT_LOGATTR* psla
-) ;
+)
 
 FUNCTION: HRESULT ScriptCPtoX (
     int iCP,
@@ -135,7 +135,7 @@ FUNCTION: HRESULT ScriptCPtoX (
     int* piAdvance,
     SCRIPT_ANALYSIS* psa,
     int* piX
-) ;
+)
 
 FUNCTION: HRESULT ScriptXtoCP (
     int iCP,
@@ -148,7 +148,7 @@ FUNCTION: HRESULT ScriptXtoCP (
     SCRIPT_ANALYSIS* psa,
     int* piCP,
     int* piTrailing
-) ;
+)
 
 FUNCTION: HRESULT ScriptGetLogicalWidths (
     SCRIPT_ANALYSIS* psa,
@@ -158,7 +158,7 @@ FUNCTION: HRESULT ScriptGetLogicalWidths (
     WORD* pwLogClust,
     SCRIPT_VISATTR* psva,
     int* piDx
-) ;
+)
 
 FUNCTION: HRESULT ScriptApplyLogicalWidth (
     int* piDx,
@@ -170,7 +170,7 @@ FUNCTION: HRESULT ScriptApplyLogicalWidth (
     SCRIPT_ANALYSIS* psa,
     ABC* pABC,
     int* piJustify
-) ;
+)
 
 FUNCTION: HRESULT ScriptGetCMap (
     HDC hdc,
@@ -179,14 +179,14 @@ FUNCTION: HRESULT ScriptGetCMap (
     int cChars,
     DWORD dwFlags,
     WORD* pwOutGlyphs
-) ;
+)
 
 FUNCTION: HRESULT ScriptGetGlyphABCWidth (
     HDC hdc,
     SCRIPT_CACHE* psc,
     WORD wGlyph,
     ABC* pABC
-) ;
+)
 
 STRUCT: SCRIPT_PROPERTIES
     { flags DWORD } ;
@@ -194,7 +194,7 @@ STRUCT: SCRIPT_PROPERTIES
 FUNCTION: HRESULT ScriptGetProperties (
     SCRIPT_PROPERTIES*** ppSp,
     int* piNumScripts
-) ;
+)
 
 STRUCT: SCRIPT_FONTPROPERTIES
     { cBytes int }
@@ -208,13 +208,13 @@ FUNCTION: HRESULT ScriptGetFontProperties (
     HDC hdc,
     SCRIPT_CACHE* psc,
     SCRIPT_FONTPROPERTIES* sfp
-) ;
+)
 
 FUNCTION: HRESULT ScriptCacheGetHeight (
     HDC hdc,
     SCRIPT_CACHE* psc,
     long* tmHeight
-) ;
+)
 
 CONSTANT: SSA_PASSWORD 0x00000001
 CONSTANT: SSA_TAB 0x00000002
@@ -260,47 +260,47 @@ FUNCTION: HRESULT ScriptStringAnalyse (
     SCRIPT_TABDEF* pTabDef,
     BYTE* pbInClass,
     SCRIPT_STRING_ANALYSIS* pssa
-) ;
+)
 
 FUNCTION: HRESULT ScriptStringFree (
     SCRIPT_STRING_ANALYSIS* pssa
-) ;
+)
 
 DESTRUCTOR: ScriptStringFree
 
-FUNCTION: SIZE* ScriptString_pSize ( SCRIPT_STRING_ANALYSIS ssa ) ;
+FUNCTION: SIZE* ScriptString_pSize ( SCRIPT_STRING_ANALYSIS ssa )
 
-FUNCTION: int* ScriptString_pcOutChars ( SCRIPT_STRING_ANALYSIS ssa ) ;
+FUNCTION: int* ScriptString_pcOutChars ( SCRIPT_STRING_ANALYSIS ssa )
 
-FUNCTION: SCRIPT_LOGATTR* ScriptString_pLogAttr ( SCRIPT_STRING_ANALYSIS ssa ) ;
+FUNCTION: SCRIPT_LOGATTR* ScriptString_pLogAttr ( SCRIPT_STRING_ANALYSIS ssa )
 
 FUNCTION: HRESULT ScriptStringGetOrder (
     SCRIPT_STRING_ANALYSIS ssa,
     UINT* puOrder
-) ;
+)
 
 FUNCTION: HRESULT ScriptStringCPtoX (
     SCRIPT_STRING_ANALYSIS ssa,
     int icp,
     BOOL fTrailing,
     int* pX
-) ;
+)
 
 FUNCTION: HRESULT ScriptStringXtoCP (
     SCRIPT_STRING_ANALYSIS ssa,
     int iX,
     int* piCh,
     int* piTrailing
-) ;
+)
 
 FUNCTION: HRESULT ScriptStringGetLogicalWidths (
     SCRIPT_STRING_ANALYSIS ssa,
     int* piDx
-) ;
+)
 
 FUNCTION: HRESULT ScriptStringValidate (
     SCRIPT_STRING_ANALYSIS ssa
-) ;
+)
 
 FUNCTION: HRESULT ScriptStringOut (
     SCRIPT_STRING_ANALYSIS ssa,
@@ -311,7 +311,7 @@ FUNCTION: HRESULT ScriptStringOut (
     int iMinSel,
     int iMaxSel,
     BOOL fDisabled
-) ;
+)
 
 CONSTANT: SIC_COMPLEX 1
 CONSTANT: SIC_ASCIIDIGIT 2
@@ -321,7 +321,7 @@ FUNCTION: HRESULT ScriptIsComplex (
     WCHAR* pwcInChars,
     int cInChars,
     DWORD dwFlags
-) ;
+)
 
 STRUCT: SCRIPT_DIGITSUBSTITUTE
     { flags DWORD } ;
@@ -329,7 +329,7 @@ STRUCT: SCRIPT_DIGITSUBSTITUTE
 FUNCTION: HRESULT ScriptRecordDigitSubstitution (
     LCID Locale,
     SCRIPT_DIGITSUBSTITUTE* psds
-) ;
+)
 
 CONSTANT: SCRIPT_DIGITSUBSTITUTE_CONTEXT 0
 CONSTANT: SCRIPT_DIGITSUBSTITUTE_NONE 1
@@ -340,4 +340,4 @@ FUNCTION: HRESULT ScriptApplyDigitSubstitution (
     SCRIPT_DIGITSUBSTITUTE* psds,
     SCRIPT_CONTROL* psc,
     SCRIPT_STATE* pss
-) ;
+)

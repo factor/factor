@@ -6,8 +6,8 @@ IN: gtk-samples.hello-world
 
 : on-button-clicked ( button label-user-data -- )
     nip "Hello! :)" utf8 string>alien gtk_label_set_text ;
-    
-:: hello-world-win ( -- window )  
+
+:: hello-world-win ( -- window )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> window
 
     window
@@ -17,7 +17,7 @@ IN: gtk-samples.hello-world
 
     gtk_fixed_new :> frame
     window frame gtk_container_add
-    
+
     "Say 'Hello!'" utf8 string>alien gtk_button_new_with_label :> button
     button 140 30 gtk_widget_set_size_request
     frame button 80 60 gtk_fixed_put
@@ -28,7 +28,7 @@ IN: gtk-samples.hello-world
     button "clicked" utf8 string>alien
     [ on-button-clicked ] GtkButton:clicked label
     g_signal_connect drop
-    
+
     window ;
 
 :: hello-world-main ( -- )
@@ -40,8 +40,7 @@ IN: gtk-samples.hello-world
     g_signal_connect drop
 
     window gtk_widget_show_all
-    
+
     gtk_main ;
 
 MAIN: hello-world-main
-

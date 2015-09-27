@@ -21,7 +21,7 @@ SYMBOLS: unary binary keyword ;
     } case "receiver" suffix { "result" } <effect> ;
 
 : selector>generic ( selector -- generic )
-    [ "selector-" prepend "smalltalk.selectors" create dup ]
+    [ "selector-" prepend "smalltalk.selectors" create-word dup ]
     [ selector>effect ]
     bi define-simple-generic ;
 

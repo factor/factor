@@ -29,7 +29,8 @@ const char* vm_executable_path(void) {
 const char* default_image_path(void) {
   NSBundle* bundle = [NSBundle mainBundle];
   NSString* path = [bundle bundlePath];
-  NSString* executable = [[bundle executablePath] lastPathComponent];
+  NSString* executablePath = [[bundle executablePath] stringByResolvingSymlinksInPath];
+  NSString* executable = [executablePath lastPathComponent];
   NSString* image = [executable stringByAppendingString:@".image"];
 
   NSString* returnVal;
@@ -45,8 +46,16 @@ const char* default_image_path(void) {
 
     returnVal = ([mgr fileExistsAtPath:imageInBundle] ? imageInBundle
                                                       : imageAlongBundle);
-  } else
+  } else if ([executablePath hasSuffix:@".app/Contents/MacOS/factor"]) {
+    returnVal = executablePath;
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByAppendingPathComponent:image];
+  } else {
     returnVal = [path stringByAppendingPathComponent:image];
+  }
 
   return [returnVal UTF8String];
 }

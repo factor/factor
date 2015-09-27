@@ -40,7 +40,7 @@ SYMBOL: person4
     [ ] [ person create-table ] unit-test
     [ person create-table ] must-fail
     [ ] [ person ensure-table ] unit-test
-    
+
     [ ] [ person1 get insert-tuple ] unit-test
 
     [ 1 ] [ person1 get the-id>> ] unit-test
@@ -307,7 +307,7 @@ TUPLE: serialize-me id data ;
         { T{ serialize-me f 1 H{ { 1 2 } } } }
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
-TUPLE: exam id name score ; 
+TUPLE: exam id name score ;
 
 : random-exam ( -- exam )
         f
@@ -433,7 +433,7 @@ TUPLE: exam id name score ;
     ] [
         T{ exam f T{ interval f { -1/0. t } { 1/0. f } } } select-tuples
     ] unit-test
-    
+
     [
         {
             T{ exam f 1 "Kyle" 100 }
@@ -552,18 +552,18 @@ fubbclass "FUBCLASS" { } define-persistent
 : test-db-inheritance ( -- )
     [ ] [ subbclass ensure-table ] unit-test
     [ ] [ fubbclass ensure-table ] unit-test
-    
+
     [ ] [
         subbclass new 5 >>a "hi" >>b dup insert-tuple id>> "id" set
     ] unit-test
-    
+
     [ t "hi" 5 ] [
         subbclass new "id" get >>id select-tuple
         [ subbclass? ] [ b>> ] [ a>> ] tri
     ] unit-test
-    
+
     [ ] [ fubbclass new 0 >>a "hi" >>b insert-tuple ] unit-test
-    
+
     [ t ] [ fubbclass new select-tuples [ fubbclass? ] all? ] unit-test ;
 
 [ test-db-inheritance ] test-sqlite
@@ -585,7 +585,7 @@ string-encoding-test "STRING_ENCODING_TEST" {
             "\u{copyright-sign}\u{bengali-letter-cha}" >>string
         [ insert-tuple ] [ id>> "id" set ] bi
     ] unit-test
-    
+
     [ "\u{copyright-sign}\u{bengali-letter-cha}" ] [
         string-encoding-test new "id" get >>id select-tuple string>>
     ] unit-test ;
@@ -605,7 +605,7 @@ string-encoding-test "STRING_ENCODING_TEST" {
 
 TUPLE: compound-foo a b c ;
 
-compound-foo "COMPOUND_FOO" 
+compound-foo "COMPOUND_FOO"
 {
     { "a" "A" INTEGER +user-assigned-id+ }
     { "b" "B" INTEGER +user-assigned-id+ }

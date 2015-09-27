@@ -7,7 +7,6 @@ specialized-arrays ui.backend.windows vectors windows.com
 windows.directx.dinput windows.directx.dinput.constants
 windows.kernel32 windows.messages windows.ole32 windows.errors
 windows.user32 classes.struct ;
-FROM: namespaces => change-global ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 
@@ -159,7 +158,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-and-remove-detached-devices ( -- )
     +controller-devices+ get-global keys
-    [ device-attached? not ] filter
+    [ device-attached? ] reject
     [ remove-controller ] each ;
 
 : ?device-interface ( dbt-broadcast-hdr -- ? )

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax words math source-files
+USING: generic hash-sets help.markup help.syntax words math source-files
 parser quotations compiler.units ;
 IN: definitions
 
@@ -91,3 +91,7 @@ HELP: forget-all
 { $values { "definitions" "a sequence of definition specifiers" } }
 { $description "Forgets every definition in a sequence." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
+
+HELP: outdated-generics
+{ $var-description "A " { $link hash-set } " where newly defined generic words are kept until they are being remade." }
+{ $see-also remake-generic remake-generics } ;

@@ -49,8 +49,8 @@ HELP: append-path
 { $values { "path1" "a pathname string" } { "path2" "a pathname string" } { "path" "a pathname string" } }
 { $description "Appends " { $snippet "path1" } " and " { $snippet "path2" } " to form a pathname." }
 { $examples
-    { $unchecked-example """USING: io.pathnames prettyprint ;
-"first" "second.txt" append-path ."""
+    { $unchecked-example "USING: io.pathnames prettyprint ;
+\"first\" \"second.txt\" append-path ."
 "\"first/second.txt\""
     }
 } ;
@@ -59,8 +59,8 @@ HELP: prepend-path
 { $values { "path1" "a pathname string" } { "path2" "a pathname string" } { "path" "a pathname string" } }
 { $description "Appends " { $snippet "path2" } " and " { $snippet "path1" } " to form a pathname." }
 { $examples
-    { $unchecked-example """USING: io.pathnames prettyprint ;
-"second.txt" "first" prepend-path ."""
+    { $unchecked-example "USING: io.pathnames prettyprint ;
+\"second.txt\" \"first\" prepend-path ."
 "\"first/second.txt\""
     }
 } ;
@@ -129,7 +129,7 @@ HELP: home
 } ;
 
 ARTICLE: "io.pathnames.special" "Special pathnames"
-"If a pathname begins with " { $snippet "resource:" } ", it is resolved relative to the directory containing the current image (see " { $link image } ")."
+"If a pathname begins with " { $snippet "resource:" } ", it is resolved relative to the directory containing the current image (see " { $link image-path } ")."
 $nl
 "If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")."
 $nl

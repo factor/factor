@@ -12,16 +12,16 @@ CONSTANT: D3D9b_SDK_VERSION 31
 
 C-TYPE: IDirect3D9
 
-FUNCTION: IDirect3D9* Direct3DCreate9 ( UINT SDKVersion ) ;
+FUNCTION: IDirect3D9* Direct3DCreate9 ( UINT SDKVersion )
 
-FUNCTION: int D3DPERF_BeginEvent ( D3DCOLOR col, LPCWSTR wszName ) ;
-FUNCTION: int D3DPERF_EndEvent ( ) ;
-FUNCTION: void D3DPERF_SetMarker ( D3DCOLOR col, LPCWSTR wszName ) ;
-FUNCTION: void D3DPERF_SetRegion ( D3DCOLOR col, LPCWSTR wszName ) ;
-FUNCTION: BOOL D3DPERF_QueryRepeatFrame ( ) ;
+FUNCTION: int D3DPERF_BeginEvent ( D3DCOLOR col, LPCWSTR wszName )
+FUNCTION: int D3DPERF_EndEvent ( )
+FUNCTION: void D3DPERF_SetMarker ( D3DCOLOR col, LPCWSTR wszName )
+FUNCTION: void D3DPERF_SetRegion ( D3DCOLOR col, LPCWSTR wszName )
+FUNCTION: BOOL D3DPERF_QueryRepeatFrame ( )
 
-FUNCTION: void D3DPERF_SetOptions ( DWORD dwOptions ) ;
-FUNCTION: DWORD D3DPERF_GetStatus ( ) ;
+FUNCTION: void D3DPERF_SetOptions ( DWORD dwOptions )
+FUNCTION: DWORD D3DPERF_GetStatus ( )
 
 C-TYPE: IDirect3DDevice9
 
@@ -253,7 +253,7 @@ COM-INTERFACE: IDirect3DTexture9 IDirect3DBaseTexture9 {85C31227-3DE5-4f00-9B3A-
     HRESULT GetSurfaceLevel ( UINT Level, IDirect3DSurface9** ppSurfaceLevel )
     HRESULT LockRect ( UINT Level, D3DLOCKED_RECT* pLockedRect, RECT* pRect, DWORD Flags )
     HRESULT UnlockRect ( UINT Level ) ;
-    
+
 TYPEDEF: IDirect3DTexture9* LPDIRECT3DTEXTURE9
 TYPEDEF: IDirect3DTexture9* PDIRECT3DTEXTURE9
 
@@ -407,7 +407,7 @@ CONSTANT: D3DERR_CANNOTPROTECTCONTENT             0x8876087E
 CONSTANT: D3DERR_UNSUPPORTEDCRYPTO                0x8876087F
 CONSTANT: D3DERR_PRESENT_STATISTICS_DISJOINT      0x88760884
 
-FUNCTION: HRESULT Direct3DCreate9Ex ( UINT SDKVersion, IDirect3D9Ex** out ) ;
+FUNCTION: HRESULT Direct3DCreate9Ex ( UINT SDKVersion, IDirect3D9Ex** out )
 
 COM-INTERFACE: IDirect3D9Ex IDirect3D9 {02177241-69FC-400C-8FF1-93A44DF6861D}
     UINT GetAdapterModeCountEx ( UINT Adapter, D3DDISPLAYMODEFILTER* pFilter  )

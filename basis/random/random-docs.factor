@@ -39,7 +39,7 @@ HELP: random-32
 HELP: random-bytes
 { $values { "n" integer } { "byte-array" "a random integer" } }
 { $description "Outputs an integer with n bytes worth of bits." }
-{ $examples 
+{ $examples
     { $unchecked-example "USING: prettyprint random ;"
                "5 random-bytes ."
                "B{ 135 50 185 119 240 }"
@@ -49,7 +49,7 @@ HELP: random-bytes
 HELP: random-integers
 { $values { "length" integer } { "n" integer } { "sequence" array } }
 { $description "Outputs an array with " { $snippet "length" } " random integers from [0,n)." }
-{ $examples 
+{ $examples
     { $unchecked-example "USING: prettyprint random ;"
                "10 100 random-integers ."
                "{ 32 62 71 89 54 12 57 57 10 19 }"
@@ -63,7 +63,7 @@ HELP: random-unit
 HELP: random-units
 { $values { "length" integer } { "sequence" array } }
 { $description "Outputs an array with " { $snippet "length" } " random uniform floats from [0,1]." }
-{ $examples 
+{ $examples
     { $unchecked-example "USING: prettyprint random ;"
                "7 random-units ."
                "{

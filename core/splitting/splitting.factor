@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences strings sbufs ;
+USING: arrays kernel math sequences sequences.private strings
+sbufs ;
 IN: splitting
 
 <PRIVATE
@@ -89,10 +90,10 @@ PRIVATE>
 PRIVATE>
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ subseq ] (split) ; inline
+    [ subseq-unsafe ] (split) ; inline
 
 : split-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ <slice> ] (split) ; inline
+    [ <slice-unsafe> ] (split) ; inline
 
 : split ( seq separators -- pieces )
     [ member? ] curry split-when ; inline
@@ -101,8 +102,9 @@ PRIVATE>
     [ member? ] curry split-when-slice ; inline
 
 : split-indices ( seq indices -- pieces )
-    over length suffix 0 swap [ dup swapd 2array ] map nip
-    [ first2 rot subseq ] with map ;
+    over length suffix 0 swap [
+        [ pick subseq ] keep swap
+    ] map 2nip ;
 
 GENERIC: string-lines ( str -- seq )
 

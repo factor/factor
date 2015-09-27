@@ -1,19 +1,25 @@
-USING: tools.test kernel sequences words sequences.private fry
-prettyprint alien alien.accessors math.private
-compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.debugger
-compiler.cfg.optimizer compiler.cfg.rpo
-compiler.cfg.predecessors compiler.cfg.checker compiler.cfg
-arrays locals byte-arrays kernel.private math slots.private
-vectors sbufs strings math.partial-dispatch hashtables assocs
-combinators.short-circuit strings.private accessors
-compiler.cfg.instructions compiler.cfg.representations ;
+USING: accessors alien alien.accessors arrays assocs byte-arrays
+combinators.short-circuit compiler.cfg compiler.cfg.builder compiler.cfg.checker
+compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
+compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.representations
+compiler.cfg.rpo compiler.cfg.stacks compiler.cfg.stacks.local
+compiler.cfg.utilities compiler.test compiler.tree compiler.tree.builder
+compiler.tree.optimizer cpu.architecture fry hashtables io kernel kernel.private
+locals make math math.partial-dispatch math.private namespaces prettyprint sbufs
+sequences sequences.private slots.private strings strings.private tools.test
+vectors words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
 ! Just ensure that various CFGs build correctly.
 : unit-test-builder ( quot -- )
-    '[ _ test-builder [ [ optimize-cfg check-cfg ] with-cfg ] each ] [ ] swap unit-test ;
+    '[
+        _ test-builder [
+            [
+                [ optimize-cfg ] [ check-cfg ] bi
+            ] with-cfg
+        ] each
+    ] [ ] swap unit-test ;
 
 : blahblah ( nodes -- ? )
     { fixnum } declare [
@@ -138,7 +144,7 @@ IN: compiler.cfg.builder.tests
         { class } word '[ _ declare 10 _ execute ] unit-test-builder
         { class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each
-    
+
     {
         set-alien-signed-1
         set-alien-signed-2
@@ -150,54 +156,53 @@ IN: compiler.cfg.builder.tests
         { fixnum class } word '[ _ declare 10 _ execute ] unit-test-builder
         { fixnum class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each
-    
+
     { float class } \ set-alien-float '[ _ declare 10 _ execute ] unit-test-builder
     { float class fixnum } \ set-alien-float '[ _ declare _ execute ] unit-test-builder
-    
+
     { float class } \ set-alien-double '[ _ declare 10 _ execute ] unit-test-builder
     { float class fixnum } \ set-alien-double '[ _ declare _ execute ] unit-test-builder
-    
+
     { pinned-c-ptr class } \ set-alien-cell '[ _ declare 10 _ execute ] unit-test-builder
     { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-builder
 ] each
 
-[ t ] [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
+{ t } [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
 
-[ f ] [ [ swap swap ] [ ##replace? ] contains-insn? ] unit-test
+{ f } [ [ swap swap ] [ ##replace? ] contains-insn? ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum byte-array fixnum } declare set-alien-unsigned-1 ]
     [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum byte-array fixnum } declare [ dup * dup * ] 2dip set-alien-unsigned-1 ]
     [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { byte-array fixnum } declare set-alien-unsigned-1 ]
     [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ t t ] [
+{ t t } [
     [ { byte-array fixnum } declare alien-cell ]
     [ [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn? ]
     [ [ ##box-alien? ] contains-insn? ]
     bi
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { byte-array integer } declare alien-cell ]
     [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn?
 ] unit-test
 
-[ f ] [
-    [ 1000 [ ] times ]
-    [ [ ##peek? ] [ ##replace? ] bi or ] contains-insn?
+{ f } [
+    [ 1000 [ ] times ] [ ##peek? ] contains-insn?
 ] unit-test
 
-[ f t ] [
+{ f t } [
     [ { fixnum alien } declare <displaced-alien> 0 alien-cell ]
     [ [ ##unbox-any-c-ptr? ] contains-insn? ]
     [ [ ##unbox-alien? ] contains-insn? ] bi
@@ -215,18 +220,115 @@ IN: compiler.cfg.builder.tests
         [ [ ##box-alien? ] contains-insn? ]
         [ [ ##allot? ] contains-insn? ] bi
     ] unit-test
-    
+
     [ 1 ] [ [ dup float+ ] [ ##load-memory-imm? ] count-insns ] unit-test
 ] when
 
 ! Regression. Make sure everything is inlined correctly
-[ f ] [ M\ hashtable set-at [ { [ ##call? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test
+{ f } [ M\ hashtable set-at [ { [ ##call? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test
 
 ! Regression. Make sure branch splitting works.
-[ 2 ] [ [ 1 2 ? ] [ ##return? ] count-insns ] unit-test
+{ 2 } [ [ 1 2 ? ] [ ##return? ] count-insns ] unit-test
 
 ! Make sure fast union predicates don't have conditionals.
-[ f ] [
+{ f } [
     [ tag 1 swap fixnum-shift-fast ]
     [ ##compare-integer-imm-branch? ] contains-insn?
 ] unit-test
+
+! make-input-map
+{
+    { { 37 D: 2 } { 81 D: 1 } { 92 D: 0 } }
+} [
+    T{ #shuffle { in-d { 37 81 92 } } } make-input-map
+] unit-test
+
+! emit-call
+{
+    V{ T{ ##call { word print } } T{ ##branch } }
+} [
+    [ \ print 4 emit-call ] V{ } make drop
+    basic-block get successors>> first instructions>>
+] cfg-unit-test
+
+! emit-node
+{
+    { T{ ##load-integer { dst 78 } { val 0 } } }
+} [
+    77 vreg-counter set-global
+    [
+        T{ #push { literal 0 } { out-d { 8537399 } } } emit-node
+    ] { } make
+] cfg-unit-test
+
+{
+    { { 1 1 } { 0 0 } }
+    H{ { D: -1 4 } { D: 0 4 } }
+} [
+    4 D: 0 replace-loc
+    T{ #shuffle
+       { mapping { { 2 4 } { 3 4 } } }
+       { in-d V{ 4 } }
+       { out-d V{ 2 3 } }
+    } emit-node
+    height-state get
+    replaces get
+] cfg-unit-test
+
+{
+    V{
+        T{ ##load-integer { dst 3 } { val 0 } }
+        T{ ##add { dst 4 } { src1 3 } { src2 2 } }
+        T{ ##load-memory-imm
+           { dst 5 }
+           { base 4 }
+           { offset 0 }
+           { rep int-rep }
+        }
+        T{ ##box-alien { dst 7 } { src 5 } { temp 6 } }
+    }
+} [
+    T{ #call
+       { word alien-cell }
+       { in-d V{ 10 20 } }
+       { out-d { 30 } }
+    } [ emit-node ] V{ } make
+] cfg-unit-test
+
+{ 1 } [
+    V{ } 0 insns>block basic-block set init-cfg-test
+    V{ } 1 insns>block [ emit-loop-call ] V{ } make drop
+    basic-block get successors>> length
+] unit-test
+
+! emit-loop-call
+{ "bar" } [
+    V{ } "foo" insns>block basic-block set init-cfg-test
+    [ V{ } "bar" insns>block emit-loop-call ] V{ } make drop
+    basic-block get successors>> first number>>
+] unit-test
+
+! begin-cfg
+SYMBOL: foo
+
+{ foo } [
+    \ foo f begin-cfg word>>
+] cfg-unit-test
+
+! store-shuffle
+{
+    H{ { D: 2 1 } }
+} [
+    T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
+    emit-node replaces get
+] cfg-unit-test
+
+{
+    H{ { D: -1 1 } { D: 0 1 } }
+} [
+    T{ #shuffle
+       { in-d { 7 } }
+       { out-d { 55 77 } }
+       { mapping { { 55 7 } { 77 7 } } }
+    } emit-node replaces get
+] cfg-unit-test

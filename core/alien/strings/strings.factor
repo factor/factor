@@ -31,7 +31,7 @@ M: c-ptr string>alien drop ;
 <PRIVATE
 
 : fast-string? ( string encoding -- ? )
-    [ aux>> not ] [ { ascii utf8 } member-eq? ] bi* and ; inline
+    swap aux>> not [ { ascii utf8 } member-eq? ] [ drop f ] if ; inline
 
 : string>alien-fast ( string encoding -- byte-array )
     { string object } declare ! aux>> must be f
@@ -63,6 +63,7 @@ M: tuple string>alien drop underlying>> ;
 HOOK: native-string-encoding os ( -- encoding ) foldable
 
 M: unix native-string-encoding utf8 ;
+
 M: windows native-string-encoding utf16n ;
 
 : alien>native-string ( alien -- string )
@@ -80,16 +81,14 @@ M: string string>symbol utf8 string>alien ;
 
 M: sequence string>symbol [ utf8 string>alien ] map ;
 
-: (symbol>string) ( alien -- str )
-    utf8 alien>string ;
-
 GENERIC: symbol>string ( symbol(s) -- string )
 
-: special-object>string ( n -- str )
-    special-object (symbol>string) ;
+M: byte-array symbol>string utf8 alien>string ;
 
-M: byte-array symbol>string (symbol>string) ;
-M: array symbol>string [ (symbol>string) ] map ", " join ;
+M: array symbol>string [ utf8 alien>string ] map ", " join ;
+
+: special-object>string ( n -- str )
+    special-object utf8 alien>string ;
 
 [
     OBJ-CPU special-object>string string>cpu \ cpu set-global

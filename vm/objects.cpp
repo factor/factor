@@ -82,45 +82,13 @@ struct slot_become_fixup : no_fixup {
     std::map<object*, object*>::const_iterator iter = become_map->find(old);
     if (iter != become_map->end())
       return iter->second;
-    else
-      return old;
-  }
-};
-
-struct object_become_visitor {
-  slot_visitor<slot_become_fixup>* workhorse;
-
-  explicit object_become_visitor(slot_visitor<slot_become_fixup>* workhorse)
-      : workhorse(workhorse) {}
-
-  void operator()(object* obj) { workhorse->visit_slots(obj); }
-};
-
-struct code_block_become_visitor {
-  slot_visitor<slot_become_fixup>* workhorse;
-
-  explicit code_block_become_visitor(
-      slot_visitor<slot_become_fixup>* workhorse)
-      : workhorse(workhorse) {}
-
-  void operator()(code_block* compiled, cell size) {
-    workhorse->visit_code_block_objects(compiled);
-    workhorse->visit_embedded_literals(compiled);
-  }
-};
-
-struct code_block_write_barrier_visitor {
-  code_heap* code;
-
-  explicit code_block_write_barrier_visitor(code_heap* code) : code(code) {}
-
-  void operator()(code_block* compiled, cell size) {
-    code->write_barrier(compiled);
+    return old;
   }
 };
 
 /* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
    to coalesce equal but distinct quotations and wrappers. */
+/* Calls gc */
 void factor_vm::primitive_become() {
   primitive_minor_gc();
   array* new_objects = untag_check<array>(ctx->pop());
@@ -143,26 +111,26 @@ void factor_vm::primitive_become() {
 
   /* Update all references to old objects to point to new objects */
   {
-    slot_visitor<slot_become_fixup> workhorse(this,
-                                              slot_become_fixup(&become_map));
-    workhorse.visit_roots();
-    workhorse.visit_contexts();
+    slot_visitor<slot_become_fixup> visitor(this,
+                                            slot_become_fixup(&become_map));
+    visitor.visit_all_roots();
 
-    object_become_visitor object_visitor(&workhorse);
-    each_object(object_visitor);
+    auto object_become_func = [&](object* obj) {
+      visitor.visit_slots(obj);
+    };
+    each_object(object_become_func);
 
-    code_block_become_visitor code_block_visitor(&workhorse);
-    each_code_block(code_block_visitor);
+    auto code_block_become_func = [&](code_block* compiled, cell size) {
+      visitor.visit_code_block_objects(compiled);
+      visitor.visit_embedded_literals(compiled);
+      code->write_barrier(compiled);
+    };
+    each_code_block(code_block_become_func);
   }
 
   /* Since we may have introduced old->new references, need to revisit
      all objects and code blocks on a minor GC. */
   data->mark_all_cards();
-
-  {
-    code_block_write_barrier_visitor code_block_visitor(code);
-    each_code_block(code_block_visitor);
-  }
 }
 
 }

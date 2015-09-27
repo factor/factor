@@ -26,14 +26,10 @@ TUPLE: ftp-command raw tokenized ;
         swap tokenize >>tokenized ;
 
 TUPLE: ftp-get path ;
-: <ftp-get> ( path -- obj )
-    ftp-get new
-        swap >>path ;
+C: <ftp-get> ftp-get
 
 TUPLE: ftp-put path ;
-: <ftp-put> ( path -- obj )
-    ftp-put new
-        swap >>path ;
+C: <ftp-put> ftp-put
 
 TUPLE: ftp-list ;
 C: <ftp-list> ftp-list
@@ -76,11 +72,12 @@ C: <ftp-disconnect> ftp-disconnect
 : can-serve-file? ( path -- ? )
     {
         [ exists? ]
-        [ file-info type>> +regular-file+ = ]
+        [ file-info regular-file? ]
         [ serving? ]
     } 1&& ;
 
 : ftp-error ( string -- ) 500 server-response ;
+
 : ftp-unimplemented ( string -- ) 502 server-response ;
 
 : send-banner ( -- )
@@ -224,7 +221,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
     dup can-serve-file? [
         <ftp-put> fulfill-client
     ] [
-        drop 
+        drop
         <ftp-disconnect> fulfill-client
     ] if ;
 
@@ -289,9 +286,6 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
     ] [
         "" not-a-plain-file
     ] if* ;
-
-ERROR: not-a-directory ;
-ERROR: no-directory-permissions ;
 
 : directory-change-success ( -- )
     "Directory successully changed." 250 server-response ;
@@ -370,4 +364,3 @@ M: ftp-server handle-client* ( server -- )
 
 ! sudo tcpdump -i en1 -A -s 10000  tcp port 21
 ! [2010-09-04T22:07:58-05:00] DEBUG server-response: 500:Unrecognized command: EPRT |2|0:0:0:0:0:0:0:1|59359|
-

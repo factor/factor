@@ -158,7 +158,7 @@ STRUCT: segment_command_64
     { initprot       vm_prot_t  }
     { nsects         uint       }
     { flags          uint       } ;
-    
+
 CONSTANT: SG_HIGHVM               0x1
 CONSTANT: SG_FVMLIB               0x2
 CONSTANT: SG_NORELOC              0x4
@@ -904,7 +904,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     [ symtab_command? ] filter ; inline
 
 : read-array-string ( uchar-array -- string )
-    ascii decode [ 0 = not ] filter ;
+    ascii decode [ 0 = ] reject ;
 
 : segment-sections ( segment-command -- sections )
     {
@@ -929,7 +929,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
       [ nlist_64 <c-direct-array> ]
       [ nlist <c-direct-array> ] if ]
     [ stroff>> swap >c-ptr <displaced-alien> ] 2tri ;
-    
+
 : symbol-name ( symbol string-table -- name )
     [ n_strx>> ] dip <displaced-alien> ascii alien>string ;
 

@@ -9,8 +9,8 @@ IN: io.backend.unix.multiplexers.epoll
 
 TUPLE: epoll-mx < mx events ;
 
-#! We read up to 256 events at a time. This is an arbitrary
-#! constant...
+! We read up to 256 events at a time. This is an arbitrary
+! constant...
 CONSTANT: max-events 256
 
 : <epoll-mx> ( -- mx )

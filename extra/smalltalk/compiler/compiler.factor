@@ -1,12 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit
-continuations fry kernel namespaces quotations sequences sets
-generalizations sequences.generalizations slots locals.types
-splitting math locals.rewrite.closures generic words combinators
-locals smalltalk.ast smalltalk.compiler.lexenv
-smalltalk.compiler.assignment smalltalk.compiler.return
-smalltalk.selectors smalltalk.classes ;
+USING: accessors arrays assocs combinators continuations fry
+generic kernel locals locals.types math quotations sequences
+sequences.generalizations sets smalltalk.ast smalltalk.classes
+smalltalk.compiler.assignment smalltalk.compiler.lexenv
+smalltalk.compiler.return smalltalk.selectors splitting vocabs
+words ;
 IN: smalltalk.compiler
 
 GENERIC: compile-ast ( lexenv ast -- quot )
@@ -139,7 +138,7 @@ M: ast-class compile-ast
     nip
     [
         [ name>> ] [ superclass>> ] [ ivars>> ] tri
-        define-class <class-lexenv> 
+        define-class <class-lexenv>
     ]
     [ methods>> ] bi
     [ compile-method ] with each

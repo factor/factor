@@ -3,9 +3,9 @@
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs colors
-combinators.smart continuations fry init kernel locals macros
-math namespaces opengl.gl sequences sequences.generalizations
-specialized-arrays words ;
+combinators.smart continuations fry init io kernel locals macros
+math math.parser namespaces opengl.gl sequences
+sequences.generalizations specialized-arrays words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
@@ -22,7 +22,7 @@ SYMBOL: gl-scale-factor
 
 : error>string ( n -- string )
     H{
-        { 0x0 "No error" }
+        { 0x0000 "No error" }
         { 0x0501 "Invalid value" }
         { 0x0500 "Invalid enumerant" }
         { 0x0502 "Invalid operation" }
@@ -46,6 +46,14 @@ TUPLE: gl-error-tuple function code string ;
 : gl-error ( -- )
     f (gl-error) ; inline
 
+: gl-error-nonfatal ( -- )
+    gl-error-code [
+        [
+            [ number>string ] [ error>string ] bi ": " glue
+            "OpenGL error: " prepend print flush
+        ] with-global
+    ] when* ;
+
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
 
@@ -65,10 +73,10 @@ TUPLE: gl-error-tuple function code string ;
     dip
     [ glDisableClientState ] each ; inline
 
-MACRO: all-enabled ( seq quot -- )
+MACRO: all-enabled ( seq quot -- quot )
     [ words>values ] dip '[ _ _ (all-enabled) ] ;
 
-MACRO: all-enabled-client-state ( seq quot -- )
+MACRO: all-enabled-client-state ( seq quot -- quot )
     [ words>values ] dip '[ _ _ (all-enabled-client-state) ] ;
 
 : do-matrix ( quot -- )
@@ -86,25 +94,27 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-texture-coord-pointer ( seq -- )
     [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
 
+: (line-vertices) ( a b -- vertices )
+    [ first2 [ 0.3 + ] bi@ ] bi@ 4 float-array{ } nsequence ;
+
 : line-vertices ( a b -- )
-    [ first2 [ 0.5 + ] bi@ ] bi@ 4 float-array{ } nsequence
-    gl-vertex-pointer ;
+    (line-vertices) gl-vertex-pointer ;
 
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
 
 :: (rect-vertices) ( loc dim -- vertices )
-    #! We use GL_LINE_STRIP with a duplicated first vertex
-    #! instead of GL_LINE_LOOP to work around a bug in Apple's
-    #! X3100 driver.
-    loc first2 :> ( x y )
-    dim first2 :> ( w h )
+    ! We use GL_LINE_STRIP with a duplicated first vertex
+    ! instead of GL_LINE_LOOP to work around a bug in Apple's
+    ! X3100 driver.
+    loc first2 [ 0.3 + ] bi@ :> ( x y )
+    dim first2 [ 0.6 - ] bi@ :> ( w h )
     [
-        x 0.5 +     y 0.5 +
-        x w + 0.3 - y 0.5 +
-        x w + 0.3 - y h + 0.3 -
-        x           y h + 0.3 -
-        x 0.5 +     y 0.5 +
+        x           y
+        x w +       y
+        x w +       y h +
+        x           y h +
+        x           y
     ] float-array{ } output>sequence ;
 
 : rect-vertices ( loc dim -- )
@@ -185,7 +195,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : (set-draw-buffers) ( buffers -- )
     [ length ] [ uint >c-array ] bi glDrawBuffers ;
 
-MACRO: set-draw-buffers ( buffers -- )
+MACRO: set-draw-buffers ( buffers -- quot )
     words>values '[ _ (set-draw-buffers) ] ;
 
 : gen-dlist ( -- id ) 1 glGenLists ;
@@ -216,7 +226,7 @@ MACRO: set-draw-buffers ( buffers -- )
     fix-coordinates glViewport ;
 
 : init-matrices ( -- )
-    #! Leaves with matrix mode GL_MODELVIEW
+    ! Leaves with matrix mode GL_MODELVIEW
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode

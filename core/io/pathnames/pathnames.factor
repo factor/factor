@@ -170,4 +170,3 @@ C: <pathname> pathname
 M: pathname absolute-path string>> absolute-path ;
 
 M: pathname <=> [ string>> ] compare ;
-

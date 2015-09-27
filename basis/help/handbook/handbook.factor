@@ -35,7 +35,7 @@ ARTICLE: "conventions" "Conventions"
     { { "vocabulary " { $strong "or" } " vocab" } { "a named set of words. See " { $link "vocabularies" } } }
     { "vocabulary specifier"  { "a " { $link vocab } ", " { $link vocab-link } " or a string naming a vocabulary" } }
     { "word"                  { "the basic unit of code, analogous to a function or procedure in other programming languages. See " { $link "words" } } }
-} 
+}
 { $heading "Documentation conventions" }
 "Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
 $nl
@@ -122,7 +122,7 @@ ARTICLE: "numbers" "Numbers"
 
 USE: io.buffers
 
-ARTICLE: "collections" "Collections" 
+ARTICLE: "collections" "Collections"
 { $heading "Sequences" }
 { $subsections
     "sequences"

@@ -27,7 +27,7 @@ IN: benchmark.nsieve-bits
     print ; inline
 
 : nsieve-bits-main ( n -- )
-    [ 2^ 10000 * nsieve-bits. ] 
+    [ 2^ 10000 * nsieve-bits. ]
     [ 1 - 2^ 10000 * nsieve-bits. ]
     [ 2 - 2^ 10000 * nsieve-bits. ]
     tri ;

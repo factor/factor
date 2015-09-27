@@ -9,7 +9,7 @@ IN: windows.directx
     { "d3d10"       "d3d10.dll"          stdcall }
     { "d3d10_1"     "d3d10_1.dll"        stdcall }
     { "d3d11"       "d3d11.dll"          stdcall }
-    { "d3dcompiler" "d3dcompiler_42.dll" stdcall } 
+    { "d3dcompiler" "d3dcompiler_42.dll" stdcall }
     { "d3dcsx"      "d3dcsx_42.dll"      stdcall }
     { "d3dx9"       "d3dx9_42.dll"       stdcall }
     { "d3dx10"      "d3dx10_42.dll"      stdcall }

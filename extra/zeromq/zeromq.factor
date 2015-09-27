@@ -7,10 +7,10 @@ kernel libc math namespaces sequences zeromq.ffi ;
 
 IN: zeromq
 
-ERROR: zmq-error n string ;
+TUPLE: zmq-error n string ;
 
 : throw-zmq-error ( -- )
-    zmq_errno dup zmq_strerror zmq-error ; inline
+    zmq_errno dup zmq_strerror zmq-error boa throw ; inline
 
 : check-zmq-error ( retval -- )
     [ throw-zmq-error ] unless-zero ; inline

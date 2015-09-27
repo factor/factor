@@ -8,6 +8,15 @@ IN: alien
 BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;
 BUILTIN: dll { path byte-array read-only initial: B{ } } ;
 
+PRIMITIVE: <callback> ( word return-rewind -- alien )
+PRIMITIVE: <displaced-alien> ( displacement c-ptr -- alien )
+PRIMITIVE: alien-address ( c-ptr -- addr )
+PRIMITIVE: free-callback ( alien -- )
+
+<PRIVATE
+PRIMITIVE: current-callback ( -- n )
+PRIVATE>
+
 PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
@@ -117,10 +126,10 @@ SYMBOL: callbacks
 TUPLE: expiry-check object alien ;
 
 : recompute-value? ( check -- ? )
-    dup [ alien>> expired? ] [ drop t ] if ;
+    [ alien>> expired? ] [ t ] if* ;
 
 : delete-values ( value assoc -- )
-    [ rot drop = not ] with assoc-filter! drop ;
+    [ rot drop = ] with assoc-reject! drop ;
 
 PRIVATE>
 

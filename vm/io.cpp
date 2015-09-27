@@ -13,13 +13,43 @@ The Factor library provides platform-specific code for Unix and Windows
 with many more capabilities so these words are not usually used in
 normal operation. */
 
+size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
+  FACTOR_ASSERT(nitems > 0);
+  size_t items_read = 0;
+
+  do {
+    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+                       nitems - items_read, stream);
+    if (ret == 0) {
+      if (feof(stream)) {
+        break;
+      }
+      else if (errno != EINTR) {
+        return 0;
+      }
+    }
+    items_read += ret;
+  } while (items_read != nitems);
+
+  return items_read;
+}
+
+// Call fclose() once only. Issues #1335, #908.
+int raw_fclose(FILE* stream) {
+  if (fclose(stream) == EOF && errno != EINTR)
+    return -1;
+  return 0;
+}
+
+
 void factor_vm::init_c_io() {
   special_objects[OBJ_STDIN] = allot_alien(false_object, (cell)stdin);
   special_objects[OBJ_STDOUT] = allot_alien(false_object, (cell)stdout);
   special_objects[OBJ_STDERR] = allot_alien(false_object, (cell)stderr);
 }
 
-void factor_vm::io_error() {
+/* Allocates memory */
+void factor_vm::io_error_if_not_EINTR() {
   if (errno == EINTR)
     return;
 
@@ -31,7 +61,7 @@ FILE* factor_vm::safe_fopen(char* filename, char* mode) {
   for (;;) {
     file = fopen(filename, mode);
     if (file == NULL)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -46,7 +76,7 @@ int factor_vm::safe_fgetc(FILE* stream) {
       if (feof(stream))
         return EOF;
       else
-        io_error();
+        io_error_if_not_EINTR();
     } else
       break;
   }
@@ -55,28 +85,16 @@ int factor_vm::safe_fgetc(FILE* stream) {
 
 size_t factor_vm::safe_fread(void* ptr, size_t size, size_t nitems,
                              FILE* stream) {
-  size_t items_read = 0;
-  size_t ret = 0;
-
-  do {
-    ret = fread((void*)((int*)ptr + items_read * size), size,
-                nitems - items_read, stream);
-    if (ret == 0) {
-      if (feof(stream))
-        break;
-      else
-        io_error();
-    }
-    items_read += ret;
-  } while (items_read != nitems);
-
-  return items_read;
+  size_t ret = raw_fread(ptr, size, nitems, stream);
+  if (ret == 0 && !feof(stream))
+    io_error_if_not_EINTR();
+  return ret;
 }
 
 void factor_vm::safe_fputc(int c, FILE* stream) {
   for (;;) {
     if (putc(c, stream) == EOF)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -91,7 +109,7 @@ size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
     ret = fwrite((void*)((int*)ptr + items_written * size), size,
                  nitems - items_written, stream);
     if (ret == 0)
-      io_error();
+      io_error_if_not_EINTR();
     items_written += ret;
   } while (items_written != nitems);
 
@@ -102,7 +120,7 @@ int factor_vm::safe_ftell(FILE* stream) {
   off_t offset;
   for (;;) {
     if ((offset = FTELL(stream)) == -1)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -126,7 +144,7 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
 
   for (;;) {
     if (FSEEK(stream, offset, whence) == -1)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -135,19 +153,15 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
 void factor_vm::safe_fflush(FILE* stream) {
   for (;;) {
     if (fflush(stream) == EOF)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
 }
 
 void factor_vm::safe_fclose(FILE* stream) {
-  for (;;) {
-    if (fclose(stream) == EOF)
-      io_error();
-    else
-      break;
-  }
+  if (raw_fclose(stream) == -1)
+    io_error_if_not_EINTR();
 }
 
 void factor_vm::primitive_fopen() {
@@ -157,8 +171,9 @@ void factor_vm::primitive_fopen() {
   path.untag_check(this);
 
   FILE* file;
-  file = safe_fopen((char*)(path.untagged() + 1), (char*)(mode.untagged() + 1));
-  ctx->push(allot_alien(file));
+  file = safe_fopen((char*)(path.untagged() + 1),
+                    (char*)(mode.untagged() + 1));
+  ctx->push(allot_alien((cell)file));
 }
 
 FILE* factor_vm::pop_file_handle() { return (FILE*)alien_offset(ctx->pop()); }
@@ -176,7 +191,7 @@ void factor_vm::primitive_fgetc() {
     ctx->replace(tag_fixnum(c));
 }
 
-/* Allocates memory */
+/* Allocates memory (from_unsigned_cell())*/
 void factor_vm::primitive_fread() {
   FILE* file = pop_file_handle();
   void* buf = (void*)alien_offset(ctx->pop());
@@ -186,7 +201,6 @@ void factor_vm::primitive_fread() {
     ctx->push(from_unsigned_cell(0));
     return;
   }
-
   size_t c = safe_fread(buf, 1, size, file);
   if (c == 0 || feof(file))
     clearerr(file);
@@ -209,7 +223,7 @@ void factor_vm::primitive_fwrite() {
 
   size_t written = safe_fwrite(text, 1, length, file);
   if (written != length)
-    io_error();
+    io_error_if_not_EINTR();
 }
 
 void factor_vm::primitive_ftell() {

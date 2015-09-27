@@ -1,11 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generic hashtables io kernel assocs math
-namespaces prettyprint prettyprint.custom prettyprint.sections
-sequences strings io.styles vectors words quotations mirrors
-splitting math.parser classes vocabs sets sorting summary
-debugger continuations fry combinators ;
-FROM: namespaces => set ;
+USING: accessors assocs continuations debugger fry hashtables io
+io.styles kernel math mirrors namespaces prettyprint
+prettyprint.custom prettyprint.sections sequences sets sorting
+summary ;
 IN: inspector
 
 SYMBOL: +number-rows+
@@ -53,11 +51,11 @@ PRIVATE>
 M: tuple error. describe ;
 
 : vars-in-scope ( seq -- alist )
-    [ [ global eq? not ] filter [ keys ] gather ] keep
+    [ [ global eq? ] reject [ keys ] gather ] keep
     '[ dup _ assoc-stack ] H{ } map>assoc ;
 
 : .vars ( -- )
-    namestack vars-in-scope describe ;
+    get-namestack vars-in-scope describe ;
 
 : :vars ( -- )
     error-continuation get name>> vars-in-scope describe ;
@@ -102,7 +100,7 @@ PRIVATE>
 : &rename ( key n -- ) key@ mirror get rename-at &push reinspect ;
 
 : &help ( -- )
-    #! A tribute to Slate:
+    ! A tribute to Slate:
     "You are in a twisty little maze of objects, all alike." print
     nl
     "'n' is a slot number in the following:" print

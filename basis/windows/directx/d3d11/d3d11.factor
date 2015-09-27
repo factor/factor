@@ -1475,7 +1475,7 @@ FUNCTION: HRESULT D3D11CreateDevice (
     UINT                  SDKVersion,
     ID3D11Device**        ppDevice,
     D3D_FEATURE_LEVEL*    pFeatureLevel,
-    ID3D11DeviceContext** ppImmediateContext ) ;
+    ID3D11DeviceContext** ppImmediateContext )
 
 FUNCTION: HRESULT D3D11CreateDeviceAndSwapChain (
     IDXGIAdapter*         pAdapter,
@@ -1489,4 +1489,4 @@ FUNCTION: HRESULT D3D11CreateDeviceAndSwapChain (
     IDXGISwapChain**      ppSwapChain,
     ID3D11Device**        ppDevice,
     D3D_FEATURE_LEVEL*    pFeatureLevel,
-    ID3D11DeviceContext** ppImmediateContext ) ;
+    ID3D11DeviceContext** ppImmediateContext )

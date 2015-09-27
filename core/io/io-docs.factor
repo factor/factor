@@ -27,13 +27,13 @@ HELP: stream-element-type
 { $contract "Outputs one of " { $link +byte+ } " or " { $link +character+ } "." } ;
 
 HELP: stream-readln
-{ $values { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
+{ $values { "stream" "an input stream" } { "str/f" { $maybe string } } }
 { $contract "Reads a line of input from the stream. Outputs " { $link f } " on stream exhaustion." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link readln } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read1
-{ $values { "stream" "an input stream" } { "elt" "an element or " { $link f } } }
+{ $values { "stream" "an input stream" } { "elt" { $maybe "an element" } } }
 { $contract "Reads an element from the stream. Outputs " { $link f } " on stream exhaustion." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read1 } "; see " { $link "stdio" } "." }
 $io-error ;
@@ -62,7 +62,7 @@ HELP: stream-read-into
 $io-error ;
 
 HELP: stream-read-until
-{ $values { "seps" string } { "stream" "an input stream" } { "seq" { $or byte-array string f } } { "sep/f" "a character or " { $link f } } }
+{ $values { "seps" string } { "stream" "an input stream" } { "seq" { $or byte-array string f } } { "sep/f" { $maybe "a character" } } }
 { $contract "Reads elements from the stream, until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read-until } "; see " { $link "stdio" } "." }
 $io-error ;
@@ -157,7 +157,7 @@ HELP: stream-seekable?
 
 HELP: stream-length
 { $values
-     { "stream" "a stream" } { "n/f" "an integer or " { $link f } }
+     { "stream" "a stream" } { "n/f" { $maybe integer } }
 }
 { $description "Returns the length of the data supplied by " { $snippet "stream" } ", or " { $link f } " if the stream is not seekable or has unknown length." }
 { $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
@@ -208,12 +208,12 @@ HELP: error-stream
 { $var-description "Holds an error stream." } ;
 
 HELP: readln
-{ $values { "str/f" "a string or " { $link f } } }
+{ $values { "str/f" { $maybe string } } }
 { $description "Reads a line of input from " { $link input-stream } ". Outputs " { $link f } " on stream exhaustion." }
 $io-error ;
 
 HELP: read1
-{ $values { "elt" "an element or " { $link f } } }
+{ $values { "elt" { $maybe "an element" } } }
 { $description "Reads an element from " { $link input-stream } ". Outputs " { $link f } " on stream exhaustion." }
 $io-error ;
 
@@ -223,7 +223,7 @@ HELP: read
 $io-error ;
 
 HELP: read-until
-{ $values { "seps" string } { "seq" { $or byte-array string f } } { "sep/f" "a character or " { $link f } } }
+{ $values { "seps" string } { "seq" { $or byte-array string f } } { "sep/f" { $maybe "a character" } } }
 { $contract "Reads elements from " { $link input-stream } " until the first occurrence of a separator, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output. In the latter case, the entire stream contents are output, along with " { $link f } "." }
 $io-error ;
 

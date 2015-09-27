@@ -28,7 +28,7 @@ HELP: read-xml-chunk
 { $see-also read-xml } ;
 
 HELP: each-element
-{ $values { "stream" "an input stream" } { "quot" "a quotation ( xml-elem -- )" } }
+{ $values { "stream" "an input stream" } { "quot" { $quotation ( xml-elem -- ) } } }
 { $description "Parses the XML document, and whenever an event is encountered (a tag piece, comment, parsing instruction, directive or string element), the quotation is called with that event on the stack. The quotation has all responsibility to deal with the event properly. The encoding of the stream is automatically detected, so a binary input stream should be used." }
 { $see-also read-xml } ;
 

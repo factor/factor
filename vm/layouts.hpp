@@ -9,6 +9,9 @@ inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
 static const cell data_alignment = 16;
 
+/* Must match leaf-stack-frame-size in core/layouts/layouts.factor */
+#define LEAF_FRAME_SIZE 16
+
 #define WORD_SIZE (signed)(sizeof(cell) * 8)
 
 #define TAG_MASK 15
@@ -107,13 +110,22 @@ inline static cell tag_fixnum(fixnum untagged) {
 
 struct object {
   NO_TYPE_CHECK;
+  // header format (bits indexed with least significant as zero):
+  // bit 0      : free?
+  // if not forwarding:
+  //   bit 1      : forwarding pointer?
+  //   bit 2-5    : tag
+  //   bit 7-end  : hashcode
+  // if forwarding:
+  //   bit 2-end  : forwarding pointer
   cell header;
 
-  cell size() const;
+  template <typename Fixup> cell base_size(Fixup fixup) const;
   template <typename Fixup> cell size(Fixup fixup) const;
+  cell size() const;
 
-  cell binary_payload_start() const;
-  template <typename Fixup> cell binary_payload_start(Fixup fixup) const;
+  cell slot_count() const;
+  template <typename Fixup> cell slot_count(Fixup fixup) const;
 
   cell* slots() const { return (cell*)this; }
 
@@ -228,7 +240,7 @@ struct word : public object {
   /* TAGGED machine code for sub-primitive */
   cell subprimitive;
   /* UNTAGGED entry point: jump here to execute word */
-  void* entry_point;
+  cell entry_point;
   /* UNTAGGED compiled code block */
 
   /* defined in code_blocks.hpp */
@@ -266,7 +278,7 @@ struct quotation : public object {
   /* tagged */
   cell cache_counter;
   /* UNTAGGED entry point; jump here to call quotation */
-  void* entry_point;
+  cell entry_point;
 
   /* defined in code_blocks.hpp */
   code_block* code() const;
@@ -305,8 +317,8 @@ struct callstack : public object {
   /* tagged */
   cell length;
 
-  void* frame_top_at(cell offset) const {
-    return (void*)((char*)(this + 1) + offset);
+  cell frame_top_at(cell offset) const {
+    return (cell)(this + 1) + offset;
   }
 
   void* top() const { return (void*)(this + 1); }
@@ -322,5 +334,19 @@ struct tuple : public object {
 
   cell* data() const { return (cell*)(this + 1); }
 };
+
+inline static cell tuple_capacity(const tuple_layout *layout) {
+  return untag_fixnum(layout->size);
+}
+
+inline static cell tuple_size(const tuple_layout* layout) {
+  return sizeof(tuple) + tuple_capacity(layout) * sizeof(cell);
+}
+
+inline static cell string_capacity(const string* str) {
+  return untag_fixnum(str->length);
+}
+
+inline static cell string_size(cell size) { return sizeof(string) + size; }
 
 }

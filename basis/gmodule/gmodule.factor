@@ -2,4 +2,3 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: gmodule.ffi ;
 IN: gmodule
-

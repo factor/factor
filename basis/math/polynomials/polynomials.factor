@@ -32,7 +32,7 @@ ALIAS: n*p n*v
     2dup [ length ] bi@ + 1 - 2pad-tail ;
 
 : p* ( p q -- r )
-    2unempty pextend-conv 
+    2unempty pextend-conv
     [ drop length [ iota ] keep ]
     [ nip <reversed> ]
     [ drop ] 2tri
@@ -94,9 +94,8 @@ PRIVATE>
     [ drop ] 2bi
     '[ [ _ * ] dip + ] each ;
 
-MACRO: polyval* ( p -- )
+MACRO: polyval* ( p -- quot )
     reverse
     [ rest [ \ * swap \ + [ ] 3sequence ] map ]
     [ first \ drop swap [ ] 2sequence ] bi
     prefix \ cleave [ ] 2sequence ;
-

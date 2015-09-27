@@ -36,7 +36,7 @@ t verbose-tests? set-global
 : <test-failure> ( error experiment file line# -- triple )
     test-failure new
         swap >>line#
-        swap >>file
+        swap >>path
         swap >>asset
         swap >>error
         error-continuation get >>continuation ;
@@ -46,10 +46,10 @@ t verbose-tests? set-global
     <test-failure> test-failures get push
     notify-error-observers ;
 
-SYMBOL: file
+SYMBOL: current-test-file
 
 : file-failure ( error -- )
-    [ f file get ] keep error-line failure ;
+    [ f current-test-file get ] keep error-line failure ;
 
 :: (unit-test) ( output input -- error ? )
     [ { } input with-datastack output assert-sequence= f f ] [ t ] recover ;
@@ -79,7 +79,7 @@ M: did-not-fail summary drop "Did not fail" ;
     "(" ?head drop ")" ?tail drop
     H{ { CHAR: - CHAR: \s } } substitute >title ;
 
-MACRO: <experiment> ( word -- )
+MACRO: <experiment> ( word -- quot )
     [ stack-effect in>> length dup ]
     [ name>> experiment-title ] bi
     '[ _ ndup _ narray _ prefix ] ;
@@ -92,8 +92,8 @@ MACRO: <experiment> ( word -- )
     word <experiment> :> e
     e experiment.
     word execute [
-        file get [
-            e file get line# failure
+        current-test-file get [
+            e current-test-file get line# failure
         ] [ rethrow ] if
     ] [ drop ] if ; inline
 
@@ -106,7 +106,7 @@ MACRO: <experiment> ( word -- )
 
 SYNTAX: TEST:
     scan-token
-    [ create-in ]
+    [ create-word-in ]
     [ "(" ")" surround search '[ _ parse-test ] ] bi
     define-syntax ;
 
@@ -114,7 +114,7 @@ SYNTAX: TEST:
 
 : fake-unit-test ( quot -- test-failures )
     [
-        "fake" file set
+        "fake" current-test-file set
         V{ } clone test-failures set
         call
         test-failures get
@@ -123,8 +123,8 @@ SYNTAX: TEST:
 PRIVATE>
 
 : run-test-file ( path -- )
-    dup file [
-        test-failures get file get +test-failure+ delete-file-errors
+    dup current-test-file [
+        test-failures get current-test-file get +test-failure+ delete-file-errors
         '[ _ run-file ] [ file-failure ] recover
     ] with-variable ;
 
@@ -166,9 +166,9 @@ M: test-failure error. ( error -- )
 
 : :test-failures ( -- ) test-failures get errors. ;
 
-: test ( prefix -- ) child-vocabs test-vocabs ;
+: test ( prefix -- ) loaded-child-vocab-names test-vocabs ;
 
-: test-all ( -- ) vocabs filter-don't-test test-vocabs ;
+: test-all ( -- ) loaded-vocab-names filter-don't-test test-vocabs ;
 
 : test-main ( -- )
     command-line get [ [ load ] [ test ] bi ] each ;

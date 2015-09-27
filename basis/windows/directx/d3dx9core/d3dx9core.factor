@@ -8,9 +8,9 @@ LIBRARY: d3dx9
 CONSTANT: D3DX_VERSION 0x0902
 CONSTANT: D3DX_SDK_VERSION 42
 
-FUNCTION: BOOL D3DXCheckVersion ( UINT D3DSdkVersion, UINT D3DXSdkVersion ) ;
-FUNCTION: BOOL D3DXDebugMute ( BOOL Mute ) ;  
-FUNCTION: UINT D3DXGetDriverLevel ( LPDIRECT3DDEVICE9 pDevice ) ;
+FUNCTION: BOOL D3DXCheckVersion ( UINT D3DSdkVersion, UINT D3DXSdkVersion )
+FUNCTION: BOOL D3DXDebugMute ( BOOL Mute )
+FUNCTION: UINT D3DXGetDriverLevel ( LPDIRECT3DDEVICE9 pDevice )
 
 C-TYPE: ID3DXBuffer
 TYPEDEF: ID3DXBuffer* LPD3DXBUFFER
@@ -46,9 +46,9 @@ COM-INTERFACE: ID3DXSprite IUnknown {BA0B762D-7D28-43ec-B9DC-2F84443B0614}
     HRESULT OnResetDevice ( ) ;
 
 FUNCTION: HRESULT
-    D3DXCreateSprite ( 
-        LPDIRECT3DDEVICE9   pDevice, 
-        LPD3DXSPRITE*       ppSprite ) ;
+    D3DXCreateSprite (
+        LPDIRECT3DDEVICE9   pDevice,
+        LPD3DXSPRITE*       ppSprite )
 
 STRUCT: D3DXFONT_DESCA
     { Height          INT               }
@@ -103,7 +103,7 @@ COM-INTERFACE: ID3DXFont IUnknown {D79DBB70-5F21-4d36-BBC2-FF525C213CDC}
 
 FUNCTION: HRESULT
     D3DXCreateFontA (
-        LPDIRECT3DDEVICE9       pDevice,  
+        LPDIRECT3DDEVICE9       pDevice,
         INT                     Height,
         UINT                    Width,
         UINT                    Weight,
@@ -114,11 +114,11 @@ FUNCTION: HRESULT
         DWORD                   Quality,
         DWORD                   PitchAndFamily,
         LPCSTR                  pFaceName,
-        LPD3DXFONT*             ppFont ) ;
+        LPD3DXFONT*             ppFont )
 
 FUNCTION: HRESULT
     D3DXCreateFontW (
-        LPDIRECT3DDEVICE9       pDevice,  
+        LPDIRECT3DDEVICE9       pDevice,
         INT                     Height,
         UINT                    Width,
         UINT                    Weight,
@@ -129,21 +129,21 @@ FUNCTION: HRESULT
         DWORD                   Quality,
         DWORD                   PitchAndFamily,
         LPCWSTR                 pFaceName,
-        LPD3DXFONT*             ppFont ) ;
+        LPD3DXFONT*             ppFont )
 
 ALIAS: D3DXCreateFont D3DXCreateFontW
 
 FUNCTION: HRESULT
-    D3DXCreateFontIndirectA ( 
-        LPDIRECT3DDEVICE9       pDevice, 
-        D3DXFONT_DESCA*         pDesc,   
-        LPD3DXFONT*             ppFont ) ;
+    D3DXCreateFontIndirectA (
+        LPDIRECT3DDEVICE9       pDevice,
+        D3DXFONT_DESCA*         pDesc,
+        LPD3DXFONT*             ppFont )
 
 FUNCTION: HRESULT
-    D3DXCreateFontIndirectW ( 
-        LPDIRECT3DDEVICE9       pDevice, 
-        D3DXFONT_DESCW*         pDesc,   
-        LPD3DXFONT*             ppFont ) ;
+    D3DXCreateFontIndirectW (
+        LPDIRECT3DDEVICE9       pDevice,
+        D3DXFONT_DESCW*         pDesc,
+        LPD3DXFONT*             ppFont )
 
 ALIAS: D3DXCreateFontIndirect D3DXCreateFontIndirectW
 
@@ -174,7 +174,7 @@ FUNCTION: HRESULT
         D3DFORMAT               Format,
         BOOL                    DepthStencil,
         D3DFORMAT               DepthStencilFormat,
-        LPD3DXRENDERTOSURFACE*  ppRenderToSurface ) ;
+        LPD3DXRENDERTOSURFACE*  ppRenderToSurface )
 
 STRUCT: D3DXRTE_DESC
     { Size                 UINT      }
@@ -207,7 +207,7 @@ FUNCTION: HRESULT
         D3DFORMAT               Format,
         BOOL                    DepthStencil,
         D3DFORMAT               DepthStencilFormat,
-        LPD3DXRenderToEnvMap*   ppRenderToEnvMap ) ;
+        LPD3DXRenderToEnvMap*   ppRenderToEnvMap )
 
 C-TYPE: ID3DXLine
 TYPEDEF: ID3DXLine* LPD3DXLINE
@@ -216,7 +216,7 @@ COM-INTERFACE: ID3DXLine IUnknown {D379BA7F-9042-4ac4-9F5E-58192A4C6BD8}
     HRESULT Begin ( )
     HRESULT Draw ( D3DXVECTOR2* pVertexList, DWORD dwVertexListCount, D3DCOLOR Color )
     HRESULT DrawTransform ( D3DXVECTOR3* pVertexList,
-        DWORD dwVertexListCount, D3DXMATRIX* pTransform, 
+        DWORD dwVertexListCount, D3DXMATRIX* pTransform,
         D3DCOLOR Color )
     HRESULT SetPattern ( DWORD dwPattern )
     DWORD GetPattern ( )
@@ -235,4 +235,4 @@ COM-INTERFACE: ID3DXLine IUnknown {D379BA7F-9042-4ac4-9F5E-58192A4C6BD8}
 FUNCTION: HRESULT
     D3DXCreateLine (
         LPDIRECT3DDEVICE9   pDevice,
-        LPD3DXLINE*         ppLine ) ;
+        LPD3DXLINE*         ppLine )

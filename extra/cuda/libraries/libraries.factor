@@ -162,7 +162,7 @@ MACRO: cuda-arguments ( c-types abi -- quot: ( args... function -- ) )
     [ cached-module ] dip
     2array cuda-functions get [ first2 get-function-ptr ] cache ;
 
-MACRO: cuda-invoke ( module-name function-name arguments -- )
+MACRO: cuda-invoke ( module-name function-name arguments -- quot )
     pick lookup-cuda-library abi>> '[
         _ _ cached-function
         [ nip _ _ cuda-arguments ]
@@ -171,7 +171,7 @@ MACRO: cuda-invoke ( module-name function-name arguments -- )
 
 : cuda-global* ( module-name symbol-name -- device-ptr size )
     [ { CUdeviceptr { c:uint initial: 0 } } ] 2dip
-    [ cached-module ] dip 
+    [ cached-module ] dip
     '[ _ _ cuModuleGetGlobal cuda-error ] with-out-parameters ; inline
 
 : cuda-global ( module-name symbol-name -- device-ptr )
@@ -200,4 +200,3 @@ ERROR: bad-cuda-abi abi ;
 : add-cuda-library ( name abi path -- )
     normalize-path <cuda-library>
     dup name>> cuda-libraries get-global set-at ;
-

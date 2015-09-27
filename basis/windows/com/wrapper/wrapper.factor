@@ -47,7 +47,7 @@ unless
     [ drop f ] suffix ;
 
 : (make-query-interface) ( interfaces -- quot )
-    (query-interface-cases) 
+    (query-interface-cases)
     '[
         swap _ case
         [
@@ -79,7 +79,7 @@ unless
     [ (make-add-ref) ]
     [ (make-release) ] tri
     3array ;
-    
+
 : (thunk) ( n -- quot )
     dup 0 =
     [ drop [ ] ]
@@ -98,7 +98,7 @@ unless
 
 : (callback-word) ( function-name interface counter -- word )
     [ name>> "::" rot 3append "-callback-" ] dip number>string 3append
-    "windows.com.wrapper.callbacks" create ;
+    "windows.com.wrapper.callbacks" create-word ;
 
 : (finish-thunk) ( param-count thunk quot -- thunked-quot )
     [ [ drop [ ] ] [ swap 1 - '[ _ _ ndip ] ] if-empty ]

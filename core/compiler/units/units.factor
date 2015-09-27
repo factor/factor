@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 classes.tuple classes.tuple.private continuations definitions
-generic init kernel kernel.private math namespaces sequences
-sets source-files.errors vocabs words ;
-FROM: namespaces => set ;
-FROM: sets => members ;
+generic hash-sets init kernel kernel.private math namespaces
+sequences sets source-files.errors vocabs words ;
 IN: compiler.units
+
+PRIMITIVE: modify-code-heap ( alist update-existing? reset-pics? -- )
 
 SYMBOL: old-definitions
 SYMBOL: new-definitions
@@ -33,8 +33,9 @@ PRIVATE>
     old-definitions get [ delete ] with each ;
 
 : remember-class ( class loc -- )
-    [ dup new-definitions get first in? [ dup throw-redefine-error ] when ] dip
-    new-definitions get second (remember-definition) ;
+    new-definitions get first2
+    [ dupd in? [ dup throw-redefine-error ] when ]
+    [ (remember-definition) ] bi-curry* bi* ;
 
 : forward-reference? ( word -- ? )
     dup old-definitions get [ in? ] with any? [
@@ -168,7 +169,7 @@ M: object always-bump-effect-counter? drop f ;
         notify-observers
     ] if-bootstrapping ;
 
-TUPLE: nesting-observer new-words ;
+TUPLE: nesting-observer { new-words hash-set } ;
 
 M: nesting-observer definitions-changed
     [ members ] dip new-words>> [ delete ] curry each ;

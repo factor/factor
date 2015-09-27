@@ -45,7 +45,7 @@ CONSTANT: environment-cube-map-mv-matrices
             {  0.0  0.0  0.0  1.0 }
         } }
     }
-    
+
 GLSL-SHADER: window-vertex-shader vertex-shader
 attribute vec2 vertex;
 varying vec2 texcoord;
@@ -107,7 +107,7 @@ CONSTANT: window-vertexes
     }
 
 : <window-vertex-buffer> ( -- buffer )
-    window-vertexes 
+    window-vertexes
     static-upload draw-usage vertex-buffer
     byte-array>buffer ; inline
 
@@ -150,7 +150,7 @@ CONSTANT: window-vertexes
         { "indexes"        [ 2drop length 2 / 0 swap <index-range> ] }
         { "framebuffer"    [ drop nip ] }
     } 3<render-set> render ;
-    
+
 :: blended-point-sprite-batch ( verts texture point-size dim -- texture )
     dim RGB float-components <2d-render-texture> :> ( target-framebuffer target-texture )
     verts target-framebuffer texture point-size dim (blended-point-sprite-batch)

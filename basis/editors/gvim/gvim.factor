@@ -1,5 +1,5 @@
-USING: editors.vim io.backend kernel namespaces system
-vocabs editors ;
+USING: editors.vim io.backend io.standard-paths kernel
+namespaces system vocabs editors ;
 IN: editors.gvim
 
 ! This code builds on the code in editors.vim; see there for
@@ -9,10 +9,15 @@ TUPLE: gvim < vim ;
 T{ gvim } editor-class set-global
 
 HOOK: find-gvim-path io-backend ( -- path )
+
 M: object find-gvim-path f ;
 
-M: gvim find-vim-path find-gvim-path "gvim" or ;
-M: gvim vim-ui? t ;
-M: gvim editor-detached? t ;
+M: windows find-gvim-path
+    { "vim" } "gvim.exe" find-in-applications ;
 
-os windows? [ "editors.gvim.windows" require ] when
+M: gvim find-vim-path
+    find-gvim-path [ "gvim" ?find-in-path ] unless* ;
+
+M: gvim vim-ui? t ;
+
+M: gvim editor-detached? t ;

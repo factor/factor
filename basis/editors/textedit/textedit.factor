@@ -7,4 +7,4 @@ textedit editor-class set-global
 
 M: textedit editor-command ( file line -- command )
     drop
-    [ "open" , "-a" , "TextEdit", , ] { } make ;
+    [ "open" , "-a" , "TextEdit" , , ] { } make ;

@@ -8,4 +8,4 @@ IN: digraphs.tests
     { { "one" "three" } { "one" "four" } { "two" "three" } { "two" "one" } { "three" "four" } }
     [ first2 pick add-edge ] each ;
 
-[ 5 ] [ test-digraph topological-sort length ] unit-test
+{ 5 } [ test-digraph topological-sort length ] unit-test

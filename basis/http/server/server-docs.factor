@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax http io.servers kernel
-math strings urls vocabs.refresh ;
+USING: assocs continuations help.markup help.syntax http http.server.requests
+io.servers kernel math strings urls vocabs.refresh ;
 USE: html.forms ! needed for $link in param
 IN: http.server
 
@@ -38,6 +38,10 @@ HELP: post-request?
 
 HELP: responder-nesting
 { $description "A sequence of " { $snippet "{ path responder }" } " pairs." } ;
+
+HELP: handle-client-error
+{ $values { "error" error } }
+{ $description "Handles an error that may have occurred during the processing of a request. The rules are: 1) if the error is caused by an empty request line, it is silenced because it is a redundant dummy request issued by certain browsers. 2) if the error is a " { $link request-error } " then it is logged and the client is served a 400 Bad Request. 3) all other errors are thrown upwards." } ;
 
 HELP: http-server
 { $class-description "The class of HTTP servers. New instances are created by calling " { $link <http-server> } "." } ;

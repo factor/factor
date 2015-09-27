@@ -1,12 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: layouts namespaces kernel accessors sequences math
-classes.algebra classes.builtin locals combinators
-combinators.short-circuit cpu.architecture
-compiler.tree.propagation.info compiler.cfg.stacks
-compiler.cfg.hats compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.utilities
-compiler.cfg.builder.blocks compiler.constants ;
+USING: accessors classes.algebra classes.builtin
+combinators.short-circuit compiler.cfg.builder.blocks
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks
+compiler.tree.propagation.info cpu.architecture kernel layouts
+locals math namespaces sequences ;
 IN: compiler.cfg.intrinsics.slots
 
 : class-tag ( class -- tag/f )

@@ -13,15 +13,11 @@ template <typename Block> struct free_list_allocator {
   cell start;
   cell end;
   free_list free_blocks;
-  mark_bits<Block> state;
+  mark_bits state;
 
   free_list_allocator(cell size, cell start);
   void initial_free_list(cell occupied);
   bool contains_p(Block* block);
-  Block* first_block();
-  Block* last_block();
-  Block* next_block_after(Block* block);
-  Block* next_allocated_block_after(Block* block);
   bool can_allot_p(cell size);
   Block* allot(cell size);
   void free(Block* block);
@@ -44,7 +40,7 @@ free_list_allocator<Block>::free_list_allocator(cell size, cell start)
     : size(size),
       start(start),
       end(start + size),
-      state(mark_bits<Block>(size, start)) {
+      state(mark_bits(size, start)) {
   initial_free_list(0);
 }
 
@@ -56,32 +52,6 @@ void free_list_allocator<Block>::initial_free_list(cell occupied) {
 template <typename Block>
 bool free_list_allocator<Block>::contains_p(Block* block) {
   return ((cell)block - start) < size;
-}
-
-template <typename Block> Block* free_list_allocator<Block>::first_block() {
-  return (Block*)start;
-}
-
-template <typename Block> Block* free_list_allocator<Block>::last_block() {
-  return (Block*)end;
-}
-
-template <typename Block>
-Block* free_list_allocator<Block>::next_block_after(Block* block) {
-  return (Block*)((cell)block + block->size());
-}
-
-template <typename Block>
-Block* free_list_allocator<Block>::next_allocated_block_after(Block* block) {
-  while (block != this->last_block() && block->free_p()) {
-    free_heap_block* free_block = (free_heap_block*)block;
-    block = (object*)((cell)free_block + free_block->size());
-  }
-
-  if (block == this->last_block())
-    return NULL;
-  else
-    return block;
 }
 
 template <typename Block>
@@ -128,8 +98,8 @@ template <typename Iterator>
 void free_list_allocator<Block>::sweep(Iterator& iter) {
   free_blocks.clear_free_list();
 
-  Block* start = this->first_block();
-  Block* end = this->last_block();
+  cell start = this->start;
+  cell end = this->end;
 
   while (start != end) {
     /* find next unmarked block */
@@ -143,41 +113,17 @@ void free_list_allocator<Block>::sweep(Iterator& iter) {
       free_heap_block* free_block = (free_heap_block*)start;
       free_block->make_free(size);
       free_blocks.add_to_free_list(free_block);
-      iter(start, size);
+      iter((Block*)start, size);
 
-      start = (Block*)((char*)start + size);
+      start = start + size;
     }
   }
 }
-
-template <typename Block> struct null_sweep_iterator {
-  void operator()(Block* free_block, cell size) {}
-};
 
 template <typename Block> void free_list_allocator<Block>::sweep() {
-  null_sweep_iterator<Block> none;
-  sweep(none);
+  auto null_sweep = [](Block* free_block, cell size) { };
+  sweep(null_sweep);
 }
-
-template <typename Block, typename Iterator> struct heap_compactor {
-  mark_bits<Block>* state;
-  char* address;
-  Iterator& iter;
-  const Block** finger;
-
-  heap_compactor(mark_bits<Block>* state, Block* address,
-                 Iterator& iter, const Block** finger)
-      : state(state), address((char*)address), iter(iter), finger(finger) {}
-
-  void operator()(Block* block, cell size) {
-    if (this->state->marked_p(block)) {
-      *finger = (Block*)((char*)block + size);
-      memmove((Block*)address, block, size);
-      iter(block, (Block*)address, size);
-      address += size;
-    }
-  }
-};
 
 /* The forwarding map must be computed first by calling
    state.compute_forwarding(). */
@@ -185,13 +131,21 @@ template <typename Block>
 template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
                                          const Block** finger) {
-  heap_compactor<Block, Iterator> compactor(&state, first_block(), iter,
-                                            finger);
-  iterate(compactor, fixup);
+  cell dest_addr = start;
+  auto compact_block_func = [&](Block* block, cell size) {
+    cell block_addr = (cell)block;
+    if (!state.marked_p(block_addr))
+      return;
+    *finger = (Block*)(block_addr + size);
+    memmove((Block*)dest_addr, block, size);
+    iter(block, (Block*)dest_addr, size);
+    dest_addr += size;
+  };
+  iterate(compact_block_func, fixup);
 
   /* Now update the free list; there will be a single free block at
      the end */
-  free_blocks.initial_free_list(start, end, (cell)compactor.address - start);
+  free_blocks.initial_free_list(start, end, dest_addr - start);
 }
 
 /* During compaction we have to be careful and measure object sizes
@@ -199,15 +153,13 @@ void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
 template <typename Block>
 template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {
-  Block* scan = first_block();
-  Block* end = last_block();
-
-  while (scan != end) {
-    cell size = fixup.size(scan);
-    Block* next = (Block*)((cell)scan + size);
-    if (!scan->free_p())
-      iter(scan, size);
-    scan = next;
+  cell scan = this->start;
+  while (scan != this->end) {
+    Block* block = (Block*)scan;
+    cell size = fixup.size(block);
+    if (!block->free_p())
+      iter(block, size);
+    scan += size;
   }
 }
 

@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes classes.algebra classes.tuple
-classes.tuple.private classes.singleton kernel accessors math
-math.intervals namespaces sequences sequences.private words
-combinators memoize combinators.short-circuit byte-arrays
-strings arrays layouts cpu.architecture
-compiler.tree.propagation.copy ;
+USING: accessors arrays assocs byte-arrays classes
+classes.algebra classes.singleton classes.tuple
+classes.tuple.private combinators combinators.short-circuit
+compiler.tree.propagation.copy compiler.utilities kernel layouts math
+math.intervals namespaces sequences sequences.private strings
+words ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -22,24 +22,18 @@ M: ratio eql? over ratio? [ = ] [ 2drop f ] if ;
 M: float eql? over float? [ [ double>bits ] same? ] [ 2drop f ] if ;
 M: complex eql? over complex? [ = ] [ 2drop f ] if ;
 
-! Value info represents a set of objects. Don't mutate value infos
-! you receive, always construct new ones. We don't declare the
-! slots read-only to allow cloning followed by writing, and to
-! simplify constructors.
 TUPLE: value-info-state
-class
-interval
-literal
-literal?
-slots ;
+    class
+    interval
+    literal
+    literal?
+    slots ;
 
 CONSTANT: null-info T{ value-info-state f null empty-interval }
 
 CONSTANT: object-info T{ value-info-state f object full-interval }
 
 : interval>literal ( class interval -- literal literal? )
-    #! If interval has zero length and the class is sufficiently
-    #! precise, we can turn it into a literal
     dup special-interval? [
         2drop f f
     ] [
@@ -64,7 +58,6 @@ DEFER: <literal-info>
 UNION: fixed-length array byte-array string ;
 
 : literal-class ( obj -- class )
-    #! Handle forgotten tuples and singleton classes properly
     dup singleton-class? [
         class-of dup class? [
             drop tuple
@@ -271,22 +264,22 @@ DEFER: (value-info-union)
         [ [ literal>> ] bi@ eql? ]
     } cond ;
 
-: value-info<= ( info1 info2 -- ? )
-    {
-        { [ dup not ] [ 2drop t ] }
-        { [ over not ] [ 2drop f ] }
-        [
-            {
-                { [ 2dup [ class>> ] bi@ class<= not ] [ f ] }
-                { [ 2dup [ interval>> ] bi@ interval-subset? not ] [ f ] }
-                { [ 2dup literals<= not ] [ f ] }
-                { [ 2dup [ slots>> ] bi@ [ value-info<= ] 2all? not ] [ f ] }
-                [ t ]
-            } cond 2nip
-        ]
-    } cond ;
+DEFER: value-info<=
 
-! Assoc stack of current value --> info mapping
+: slots<= ( info1 info2 -- ? )
+    2dup [ class>> ] bi@ class< [ 2drop t ] [
+        [ slots>> ] bi@ f pad-tail-shorter [ value-info<= ] 2all?
+    ] if ;
+
+: value-info<= ( info1 info2 -- ? )
+    [ [ object-info ] unless* ] bi@
+    {
+        [ [ class>> ] bi@ class<= ]
+        [ [ interval>> ] bi@ interval-subset? ]
+        [ literals<= ]
+        [ slots<= ]
+    } 2&& ;
+
 SYMBOL: value-infos
 
 : value-info* ( value -- info ? )

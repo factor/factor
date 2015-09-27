@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io kernel namespaces fry math math.vectors
-math.rectangles math.order sequences words ui.gadgets ui.gadgets.packs
-ui.gadgets.packs.private combinators ;
+USING: accessors combinators fry kernel math math.vectors
+sequences ui.gadgets ui.gadgets.packs ui.gadgets.packs.private ;
 IN: ui.gadgets.tracks
 
 TUPLE: track < pack sizes ;

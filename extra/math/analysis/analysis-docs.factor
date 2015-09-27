@@ -17,4 +17,3 @@ HELP: exp-int
 HELP: stirling-fact
 { $values { "n" integer } { "fact" integer } }
 { $description "James Stirling's factorial approximation." } ;
-

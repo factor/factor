@@ -1,50 +1,81 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry hashtables io kernel macros make
-math.parser multiline namespaces present sequences
-sequences.generalizations splitting strings vocabs.parser ;
+USING: accessors fry generalizations io io.streams.string kernel
+locals macros make math math.order math.parser multiline
+namespaces present sequences splitting strings vocabs.parser ;
 IN: interpolate
 
 <PRIVATE
 
-TUPLE: interpolate-var name ;
+TUPLE: named-var name ;
 
-: (parse-interpolate) ( string -- )
+TUPLE: stack-var n ;
+
+TUPLE: anon-var ;
+
+: (parse-interpolate) ( str -- )
     [
-        "${" split1-slice [ >string , ] [
+        "${" split1-slice [
+            [ >string , ] unless-empty
+        ] [
             [
                 "}" split1-slice
-                [ >string interpolate-var boa , ]
+                [
+                    >string dup string>number
+                    [ 1 + stack-var boa ]
+                    [ [ anon-var new ] [ named-var boa ] if-empty ] ?if ,
+                ]
                 [ (parse-interpolate) ] bi*
             ] when*
         ] bi*
     ] unless-empty ;
 
-: parse-interpolate ( string -- seq )
-    [ (parse-interpolate) ] { } make ;
+: deanonymize ( seq -- seq' )
+    0 over <reversed> [
+        dup anon-var? [
+            drop 1 + dup stack-var boa
+        ] when
+    ] map! 2drop ;
 
-: (interpolate) ( string quot -- quot' )
-    [ parse-interpolate ] dip '[
-        dup interpolate-var?
-        [ name>> @ '[ _ @ present write ] ]
-        [ '[ _ write ] ]
-        if
-    ] map [ ] join ; inline
+: parse-interpolate ( str -- seq )
+    [ (parse-interpolate) ] { } make deanonymize ;
+
+: max-stack-var ( seq -- n/f )
+    f [
+        dup stack-var? [ n>> [ or ] keep max ] [ drop ] if
+    ] reduce ;
+
+:: interpolate-quot ( str quot -- quot' )
+    str parse-interpolate :> args
+    args max-stack-var    :> vars
+
+    args [
+        dup named-var? [
+            name>> quot call '[ _ @ present write ]
+        ] [
+            dup stack-var? [
+                n>> '[ _ npick present write ]
+            ] [
+                '[ _ write ]
+            ] if
+        ] if
+    ] map concat
+
+    vars [
+        '[ _ ndrop ] append
+    ] when* ; inline
 
 PRIVATE>
 
-MACRO: interpolate ( string -- )
-    [ [ get ] ] (interpolate) ;
+MACRO: interpolate ( str -- quot )
+    [ [ get ] ] interpolate-quot ;
 
-: interpolate-locals ( string -- quot )
-    [ search [ ] ] (interpolate) ;
+: interpolate>string ( str -- newstr )
+    [ interpolate ] with-string-writer ; inline
 
-SYNTAX: I[
-    "]I" parse-multiline-string
+: interpolate-locals ( str -- quot )
+    [ dup search [ [ ] ] [ [ get ] ] ?if ] interpolate-quot ;
+
+SYNTAX: [I
+    "I]" parse-multiline-string
     interpolate-locals append! ;
-
-MACRO: ninterpolate ( str n -- quot )
-    swap '[
-        _ narray [ number>string swap 2array ] map-index
-        >hashtable [ _ interpolate ] with-variables
-    ] ;

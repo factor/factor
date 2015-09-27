@@ -3,17 +3,24 @@
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions effects generic kernel kernel.private
-make math math.private memory namespaces quotations sequences
-sequences.private slots slots.private strings words ;
+make math math.private memory namespaces quotations
+sequences sequences.private slots slots.private strings words ;
 IN: classes.tuple
+
+<PRIVATE
+PRIMITIVE: <tuple> ( layout -- tuple )
+PRIMITIVE: <tuple-boa> ( slots... layout -- tuple )
+PRIVATE>
 
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
+ERROR: too-many-slots class slots got max ;
+
 ERROR: not-a-tuple object ;
 
 : all-slots ( class -- slots )
-    superclasses [ "slots" word-prop ] map concat ;
+    superclasses-of [ "slots" word-prop ] map concat ;
 
 ERROR: no-slot name tuple ;
 
@@ -56,8 +63,8 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
 : check-tuple ( object -- tuple )
     dup tuple? [ not-a-tuple ] unless ; inline
 
-: prepare-tuple>array ( tuple -- n tuple layout )
-    check-tuple [ tuple-size iota ] [ ] [ layout-of ] tri ;
+: prepare-tuple-slots ( tuple -- n tuple )
+    check-tuple [ tuple-size iota ] keep ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -70,21 +77,21 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
         ] 2each
     ] if-bootstrapping ; inline
 
-: initial-values ( class -- slots )
-    all-slots [ initial>> ] map ;
+: initial-values ( class -- seq )
+    all-slots [ initial>> ] map ; inline
 
-: pad-slots ( slots class -- slots' class )
-    [ initial-values over length tail append ] keep ; inline
+: pad-slots ( seq class -- seq' class )
+    [ initial-values ] keep
+    2over [ length ] bi@ 2dup > [
+        [ nip swap ] 2dip too-many-slots
+    ] [
+        drop [ tail append ] curry dip
+    ] if ; inline
 
 PRIVATE>
 
-: tuple>array ( tuple -- array )
-    prepare-tuple>array
-    [ copy-tuple-slots ] dip
-    first prefix ;
-
 : tuple-slots ( tuple -- seq )
-    prepare-tuple>array drop copy-tuple-slots ;
+    prepare-tuple-slots copy-tuple-slots ;
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
@@ -95,6 +102,9 @@ M: tuple-class slots>tuple ( seq class -- tuple )
         [ [ set-array-nth ] curry ]
         bi 2each
     ] keep ;
+
+: tuple>array ( tuple -- array )
+    [ tuple-slots ] [ class-of prefix ] bi ;
 
 : >tuple ( seq -- tuple )
     unclip slots>tuple ;
@@ -123,7 +133,7 @@ M: object final-class? drop f ;
 <PRIVATE
 
 : tuple-predicate-quot/1 ( class -- quot )
-    #! Fast path for tuples with no superclass
+    ! Fast path for tuples with no superclass
     [ ] curry [ layout-of 7 slot ] [ eq? ] surround 1quotation
     [ dup tuple? ] [ [ drop f ] if ] surround ;
 
@@ -150,7 +160,7 @@ M: object final-class? drop f ;
     } case define-predicate ;
 
 : class-size ( class -- n )
-    superclasses [ "slots" word-prop length ] map-sum ;
+    superclasses-of [ "slots" word-prop length ] map-sum ;
 
 : boa-check-quot ( class -- quot )
     all-slots [ class>> instance-check-quot ] map shallow-spread>quot
@@ -170,16 +180,16 @@ M: object final-class? drop f ;
     [ make-slots ] [ class-size 2 + ] bi* finalize-slots ;
 
 : define-tuple-slots ( class -- )
-    dup "slots" word-prop over superclass prepare-slots
+    dup "slots" word-prop over superclass-of prepare-slots
     define-accessors ;
 
 : make-tuple-layout ( class -- layout )
     [
         {
             [ , ]
-            [ [ superclass class-size ] [ "slots" word-prop length ] bi + , ]
-            [ superclasses length 1 - , ]
-            [ superclasses [ [ , ] [ hashcode , ] bi ] each ]
+            [ [ superclass-of class-size ] [ "slots" word-prop length ] bi + , ]
+            [ superclasses-of length 1 - , ]
+            [ superclasses-of [ [ , ] [ hashcode , ] bi ] each ]
         } cleave
     ] { } make ;
 
@@ -237,6 +247,9 @@ M: tuple-class update-class
         [ define-tuple-prototype ]
     } cleave ;
 
+! The "defining-class" word-prop is to ensure that the tuple being
+! defined becomes a classoid as it's being parsed so that it can
+! be used as the type of its own slots.
 : define-new-tuple-class ( class superclass slots -- )
     {
         [ drop f f tuple-class define-class ]
@@ -263,7 +276,7 @@ M: tuple-class update-class
     [ define-new-tuple-class ] 3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
-    [ [ superclass ] [ bootstrap-word ] bi* = ]
+    [ [ superclass-of ] [ bootstrap-word ] bi* = ]
     [ [ "slots" word-prop ] dip = ]
     bi-curry* bi and ;
 
@@ -312,29 +325,10 @@ M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
-PREDICATE: error-class < tuple-class
-    "error-class" word-prop ;
-
-M: error-class reset-class
-    [ call-next-method ] [ "error-class" remove-word-prop ] bi ;
-
-: define-error-class ( class superclass slots -- )
-    error-slots {
-        [ define-tuple-class ]
-        [ 2drop reset-generic ]
-        [ 2drop t "error-class" set-word-prop ]
-        [
-            2drop
-            [ dup [ boa throw ] curry ]
-            [ all-slots thrower-effect ]
-            bi define-declared
-        ]
-    } 3cleave ;
-
 : boa-effect ( class -- effect )
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
-ERROR: not-a-tuple-class obj ;
+ERROR: not-a-tuple-class object ;
 
 : check-tuple-class ( class -- class )
     dup tuple-class? [ not-a-tuple-class ] unless ; inline
@@ -355,7 +349,7 @@ M: tuple-class reset-class
         dup "slots" word-prop forget-slot-accessors
     ] [
         [ call-next-method ]
-        [ { "layout" "slots" "boa-check" "prototype" "final" } reset-props ]
+        [ { "layout" "slots" "boa-check" "prototype" "final" } remove-word-props ]
         bi
     ] bi ;
 

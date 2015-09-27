@@ -3,4 +3,4 @@
 USING: tools.test colors.constants colors ;
 IN: colors.constants.tests
 
-[ t ] [ COLOR: light-green rgba? ] unit-test
+{ t } [ COLOR: light-green rgba? ] unit-test

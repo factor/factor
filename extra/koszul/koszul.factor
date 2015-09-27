@@ -4,7 +4,6 @@ USING: accessors arrays assocs combinators fry hashtables io
 kernel locals make math math.matrices math.matrices.elimination
 math.order math.parser math.vectors namespaces prettyprint
 sequences sets shuffle sorting splitting ;
-FROM: namespaces => set ;
 IN: koszul
 
 ! Utilities
@@ -20,7 +19,7 @@ IN: koszul
     } cond ;
 
 : canonicalize ( assoc -- assoc' )
-    [ nip zero? not ] assoc-filter ;
+    [ nip zero? ] assoc-reject ;
 
 SYMBOL: terms
 
@@ -134,7 +133,7 @@ DEFER: (d)
     ] if ;
 
 : interior ( x y -- i_y[x] )
-    #! y is a generator
+    ! y is a generator
     swap >alt [ dupd (interior) ] linear-op nip ;
 
 ! Computing a basis
@@ -173,7 +172,7 @@ DEFER: (d)
 
 ! Graded by degree
 : (graded-ker/im-d) ( n seq -- null/rank )
-    #! d: C(n) ---> C(n+1)
+    ! d: C(n) ---> C(n+1)
     [ ?nth ] [ [ 1 + ] dip ?nth ] 2bi
     dim-im/ker-d ;
 
@@ -185,7 +184,7 @@ DEFER: (d)
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
-    #! d: C(u,z) ---> C(u+2,z-1)
+    ! d: C(u,z) ---> C(u+2,z-1)
     [ ?nth ?nth ] 3keep [ [ 2 + ] dip 1 - ] dip ?nth ?nth
     dim-im/ker-d ;
 
@@ -242,8 +241,7 @@ DEFER: (d)
     dup length [ graded-triple ] with map ;
 
 : graded-laplacian ( generators quot -- seq )
-    [ basis graded graded-triples [ first3 ] ] dip compose map ;
-    inline
+    [ basis graded graded-triples [ first3 ] ] dip compose map ; inline
 
 : graded-laplacian-betti ( generators -- seq )
     [ laplacian-betti ] graded-laplacian ;
@@ -259,7 +257,7 @@ DEFER: (d)
     ] each-index ;
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
-    #! d: C(u,z) ---> C(u+2,z-1)
+    ! d: C(u,z) ---> C(u+2,z-1)
     [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ]
     [ ?nth ?nth ]
     [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]

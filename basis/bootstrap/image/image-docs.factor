@@ -1,4 +1,5 @@
-USING: help.markup help.syntax io io.files io.pathnames strings ;
+USING: bootstrap.image.private help.markup help.syntax io io.files
+io.pathnames quotations strings words ;
 IN: bootstrap.image
 
 ARTICLE: "bootstrap.image" "Bootstrapping new images"
@@ -13,8 +14,15 @@ $nl
 
 ABOUT: "bootstrap.image"
 
+HELP: architecture
+{ $var-description "Bootstrap architecture name" } ;
+
+HELP: define-sub-primitive
+{ $values { "quot" quotation } { "word" word } }
+{ $description "Defines a sub primitive by running the quotation which is supposed to output assembler code. The word is then used to call the assembly." } ;
+
 HELP: make-image
 { $values { "arch" string } }
 { $description "Creates a bootstrap image from sources, where " { $snippet "architecture" } " is one of the following:"
-{ $code "x86.32" "unix-x86.64" "windows-x86.64" "linux-ppc" }
+{ $code "\"x86.32\"" "\"unix-x86.64\"" "\"windows-x86.64\"" "\"linux-ppc\"" }
 "The new image file is written to the " { $link resource-path } " and is named " { $snippet "boot." { $emphasis "architecture" } ".image" } "." } ;

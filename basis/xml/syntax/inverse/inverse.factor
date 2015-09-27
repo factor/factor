@@ -44,7 +44,7 @@ M: xml-chunk [undo-xml]
 M: tag [undo-xml] ( tag -- quot: ( tag -- ) )
     {
         [ name>> main>> '[ name>> main>> _ =/fail ] ]
-        [ attrs>> undo-attrs ] 
+        [ attrs>> undo-attrs ]
         [ children>> [undo-xml] '[ children>> @ ] ]
     } cleave '[ _ _ _ tri ] ;
 

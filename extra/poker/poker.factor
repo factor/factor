@@ -5,7 +5,6 @@ USING: arrays ascii assocs combinators fry kernel lexer locals
 math math.bitwise math.combinatorics math.order math.statistics
 poker.arrays random sequences sequences.extras
 sequences.product splitting strings ;
-FROM: sequences => change-nth ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
@@ -110,7 +109,7 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
 :: (>ckf) ( rank suit -- n )
     rank rank suit rank card-bitfield ;
 
-#! Cactus Kev Format
+! Cactus Kev Format
 GENERIC: >ckf ( string -- n )
 
 M: string >ckf >upper 1 cut (>ckf) ;
@@ -132,8 +131,8 @@ M: integer >ckf ;
     [ 0xFF bitand ] map-product ;
 
 : perfect-hash-find ( q -- value )
-    #! magic to convert a hand's unique identifying bits to the
-    #! proper index for fast lookup in a table of hand values
+    ! magic to convert a hand's unique identifying bits to the
+    ! proper index for fast lookup in a table of hand values
     0xE91AAA35 +
     dup -16 shift bitxor
     dup   8 shift w+

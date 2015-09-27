@@ -124,7 +124,7 @@ M: string set-real-user ( string -- )
     ?user-id (set-real-user) ;
 
 M: integer set-effective-user ( id -- )
-    (set-effective-user) ; 
+    (set-effective-user) ;
 
 M: string set-effective-user ( string -- )
     ?user-id (set-effective-user) ;

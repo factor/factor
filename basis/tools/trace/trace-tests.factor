@@ -2,7 +2,7 @@ IN: tools.trace.tests
 USING: tools.trace tools.test tools.continuations kernel math combinators
 sequences ;
 
-[ { 3 2 1 } ] [ { 1 2 3 } [ reverse ] trace ] unit-test
+{ { 3 2 1 } } [ { 1 2 3 } [ reverse ] trace ] unit-test
 
 GENERIC: method-breakpoint-test ( x -- y )
 
@@ -12,7 +12,7 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 
 \ method-breakpoint-test don't-step-into
 
-[ 3 ]
+{ 3 }
 [ [ T{ method-breakpoint-tuple } method-breakpoint-test ] trace ] unit-test
 
 : case-breakpoint-test ( -- x )
@@ -20,11 +20,11 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 
 \ case-breakpoint-test don't-step-into
 
-[ 6 ] [ [ case-breakpoint-test ] trace ] unit-test
+{ 6 } [ [ case-breakpoint-test ] trace ] unit-test
 
 : call(-breakpoint-test ( -- x )
     [ break 1 ] call( -- x ) 2 + ;
 
 \ call(-breakpoint-test don't-step-into
 
-[ 3 ] [ [ call(-breakpoint-test ] trace ] unit-test
+{ 3 } [ [ call(-breakpoint-test ] trace ] unit-test

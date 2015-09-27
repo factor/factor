@@ -16,15 +16,13 @@ M: search-deque peek-back* deque>> peek-back* ;
 M: search-deque push-front*
     2dup assoc>> at* [ 2nip ] [
         drop
-        [ deque>> push-front* ] [ assoc>> ] 2bi
-        [ 2drop ] [ set-at ] 3bi
+        [ deque>> push-front* dup ] [ assoc>> set-at ] 2bi
     ] if ;
 
 M: search-deque push-back*
     2dup assoc>> at* [ 2nip ] [
         drop
-        [ deque>> push-back* ] [ assoc>> ] 2bi
-        [ 2drop ] [ set-at ] 3bi
+        [ deque>> push-back* dup ] [ assoc>> set-at ] 2bi
     ] if ;
 
 M: search-deque pop-front*

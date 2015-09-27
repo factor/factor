@@ -108,5 +108,5 @@ void* lookup-c-type clone
     [ drop deferred-type-error ] >>unboxer-quot
     [ drop deferred-type-error ] >>boxer-quot
     object >>boxed-class
-"deferred-type" create-in typedef
+"deferred-type" create-word-in typedef
 >>

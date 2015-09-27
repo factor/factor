@@ -18,7 +18,7 @@ TUPLE: triangle-gadget < gadget ;
     -30.0 30.0 -30.0 30.0 -30.0 30.0 glOrtho
     GL_MODELVIEW glMatrixMode ;
 
-: paint ( -- ) 
+: paint ( -- )
     0.3 0.3 0.3 0.0 glClearColor
     GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
     GL_SMOOTH glShadeModel
@@ -27,7 +27,7 @@ TUPLE: triangle-gadget < gadget ;
     GL_TRIANGLES glBegin
     1.0 0.0 0.0 glColor3f 0.0 0.0 glVertex2f
     0.0 1.0 0.0 glColor3f 30.0 0.0 glVertex2f
-    0.0 0.0 1.0 glColor3f 0.0 30.0 glVertex2f 
+    0.0 0.0 1.0 glColor3f 0.0 30.0 glVertex2f
     glEnd
     glFlush ;
 
@@ -39,4 +39,3 @@ M: triangle-gadget draw-gadget*
    [ triangle-gadget new "Triangle" open-window ] with-ui ;
 
 MAIN: triangle-window
-

@@ -26,7 +26,7 @@ IN: rosetta-code.bitmap-bezier
 : points-to-lines ( seq -- seq )
     dup rest [ 2array ] 2map ;
 
-: draw-lines ( {R,G,B} points image -- ) 
+: draw-lines ( {R,G,B} points image -- )
     [ [ first2 ] dip draw-line ] curry with each ;
 
 :: bezier-lines ( {R,G,B} P0 P1 P2 P3 image -- )

@@ -32,7 +32,7 @@ CONSTANT: max-redirects 10
     } cond ;
 
 : check-header-string ( str -- str )
-    #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
+    ! http://en.wikipedia.org/wiki/HTTP_Header_Injection
     dup "\r\n" intersects?
     [ "Header injection attack" throw ] when ;
 
@@ -222,5 +222,5 @@ TUPLE: post-data data params content-type content-encoding ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1
-    parse-content-type-attributes "charset" of 
+    parse-content-type-attributes "charset" of
     [ dup mime-type-encoding encoding>name ] unless* ;

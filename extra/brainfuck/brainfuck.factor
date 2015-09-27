@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs fry io io.streams.string kernel
-macros math peg.ebnf prettyprint sequences strings ;
+USING: accessors assocs command-line fry io io.encodings.binary
+io.files io.streams.string kernel macros math namespaces
+peg.ebnf prettyprint sequences ;
 
 IN: brainfuck
 
@@ -57,7 +58,7 @@ dec-mem  = ("-")+  => [[ length '[ _ (-) ] ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
 debug    = "#"  => [[ [ (#) ] ]]
-space    = (" "|"\t"|"\r\n"|"\n")+ => [[ [ ] ]]
+space    = [ \t\n\r]+ => [[ [ ] ]]
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
@@ -69,9 +70,24 @@ code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
 PRIVATE>
 
-MACRO: run-brainfuck ( code -- )
-    [ blank? not ] filter parse-brainfuck
-    '[ <brainfuck> @ drop flush ] ;
+MACRO: run-brainfuck ( code -- quot )
+    parse-brainfuck '[ <brainfuck> @ drop flush ] ;
 
 : get-brainfuck ( code -- result )
     [ run-brainfuck ] with-string-writer ; inline
+
+<PRIVATE
+
+: (run-brainfuck) ( code -- )
+    [ <brainfuck> ] dip parse-brainfuck call( x -- x ) drop flush ;
+
+PRIVATE>
+
+: brainfuck-main ( -- )
+    command-line get [
+        contents (run-brainfuck)
+    ] [
+        [ binary file-contents (run-brainfuck) ] each
+    ] if-empty ;
+
+MAIN: brainfuck-main

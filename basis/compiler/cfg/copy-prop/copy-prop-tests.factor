@@ -4,7 +4,7 @@ cpu.architecture kernel namespaces tools.test ;
 IN: compiler.cfg.copy-prop.tests
 
 : test-copy-propagation ( -- )
-    0 get block>cfg copy-propagation drop ;
+    0 get block>cfg copy-propagation ;
 
 ! Simple example
 V{
@@ -13,12 +13,12 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 0 D 0 }
+    T{ ##peek f 0 D: 0 }
     T{ ##branch }
 } 1 test-bb
 
 V{
-    T{ ##peek f 1 D 1 }
+    T{ ##peek f 1 D: 1 }
     T{ ##branch }
 } 2 test-bb
 
@@ -36,9 +36,9 @@ V{
 
 V{
     T{ ##copy f 6 4 any-rep }
-    T{ ##replace f 3 D 0 }
-    T{ ##replace f 5 D 1 }
-    T{ ##replace f 6 D 2 }
+    T{ ##replace f 3 D: 0 }
+    T{ ##replace f 5 D: 1 }
+    T{ ##replace f 6 D: 2 }
     T{ ##branch }
 } 5 test-bb
 
@@ -53,16 +53,16 @@ V{
 3 4 edge
 4 5 edge
 
-[ ] [ test-copy-propagation ] unit-test
+{ } [ test-copy-propagation ] unit-test
 
-[
+{
     V{
-        T{ ##replace f 0 D 0 }
-        T{ ##replace f 4 D 1 }
-        T{ ##replace f 4 D 2 }
+        T{ ##replace f 0 D: 0 }
+        T{ ##replace f 4 D: 1 }
+        T{ ##replace f 4 D: 2 }
         T{ ##branch }
     }
-] [ 5 get instructions>> ] unit-test
+} [ 5 get instructions>> ] unit-test
 
 ! Test optimistic assumption
 V{
@@ -71,7 +71,7 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 0 D 0 }
+    T{ ##peek f 0 D: 0 }
     T{ ##branch }
 } 1 test-bb
 
@@ -82,7 +82,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##replace f 2 D 1 }
+    T{ ##replace f 2 D: 1 }
     T{ ##branch }
 } 3 test-bb
 
@@ -96,11 +96,11 @@ V{
 2 { 2 3 } edges
 3 4 edge
 
-[ ] [ test-copy-propagation ] unit-test
+{ } [ test-copy-propagation ] unit-test
 
-[
+{
     V{
-        T{ ##replace f 0 D 1 }
+        T{ ##replace f 0 D: 1 }
         T{ ##branch }
     }
-] [ 3 get instructions>> ] unit-test
+} [ 3 get instructions>> ] unit-test

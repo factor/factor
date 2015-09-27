@@ -18,7 +18,7 @@ HELP: amb
 ;
 
 HELP: cut-amb
-{ $description "Reset the amb system. Calling this word resets the whole stack of " { $link amb } " calls and should not be done lightly."}
+{ $description "Reset the amb system. Calling this word resets the whole stack of " { $link amb } " calls and should not be done lightly." }
 { $see-also amb fail }
 ;
 

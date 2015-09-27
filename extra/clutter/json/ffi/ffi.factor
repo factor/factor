@@ -20,4 +20,3 @@ LIBRARY: clutter.json
 >>
 
 GIR: Json-1.0.gir
-

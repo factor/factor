@@ -3,7 +3,6 @@
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros make namespaces sequences
 io.sockets.secure fry oauth urls ;
-FROM: assocs => change-at ;
 IN: twitter
 
 ! Configuration
@@ -49,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 ! Utilities
-MACRO: keys-boa ( keys class -- )
+MACRO: keys-boa ( keys class -- quot )
     [ [ '[ _ of ] ] map ] dip '[ _ cleave _ boa ] ;
 
 ! Twitter requests
@@ -83,7 +82,7 @@ TUPLE: twitter-user
     screen-name
     description
     location
-    profile-image-url 
+    profile-image-url
     url
     protected?
     followers-count ;
@@ -104,7 +103,7 @@ TUPLE: twitter-user
     } twitter-user keys-boa ;
 
 : <twitter-status> ( assoc -- tweet )
-    clone "user" over [ <twitter-user> ] change-at 
+    clone "user" over [ <twitter-user> ] change-at
     {
         "created_at"
         "id"

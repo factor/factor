@@ -1,12 +1,13 @@
-USING: alien.syntax debugger kernel continuations tools.test ;
+USING: accessors alien.syntax continuations debugger kernel
+namespaces tools.test ;
 IN: debugger.tests
 
-[ ] [ [ drop ] [ error. ] recover ] unit-test
+{ } [ [ drop ] [ error. ] recover ] unit-test
 
-[ f ] [ { } vm-error? ] unit-test
-[ f ] [ { "A" "B" } vm-error? ] unit-test
+{ f } [ { } vm-error? ] unit-test
+{ f } [ { "A" "B" } vm-error? ] unit-test
 
-[ ] [
+{ } [
 T{ test-failure
     { error
         {
@@ -33,8 +34,12 @@ T{ test-failure
         }
     }
     { asset { "Unit Test" [ ] [ dup ] } }
-    { file "resource:basis/game/input/input-tests.factor" }
+    { path "resource:basis/game/input/input-tests.factor" }
     { line# 6 }
     { continuation f }
 } error.
+] unit-test
+
+{ "foo" { 1 2 3 "foo" } } [
+    [ 1 2 3 "foo" throw ] [ ] recover error-continuation get data>>
 ] unit-test

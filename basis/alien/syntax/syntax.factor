@@ -6,7 +6,7 @@ strings.parser vocabs words ;
 << "alien.arrays" require >> ! needed for bootstrap
 IN: alien.syntax
 
-SYNTAX: DLL" lexer get skip-blank parse-string dlopen suffix! ;
+SYNTAX: DLL" lexer get skip-blank parse-short-string dlopen suffix! ;
 
 SYNTAX: ALIEN: 16 scan-base <alien> suffix! ;
 

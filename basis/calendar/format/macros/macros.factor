@@ -2,7 +2,7 @@ USING: macros kernel words quotations io sequences combinators
 continuations ;
 IN: calendar.format.macros
 
-MACRO: formatted ( spec -- )
+MACRO: formatted ( spec -- quot )
     [
         {
             { [ dup word? ] [ 1quotation ] }
@@ -11,7 +11,7 @@ MACRO: formatted ( spec -- )
         } cond
     ] map [ cleave ] curry ;
 
-MACRO: attempt-all-quots ( quots -- )
+MACRO: attempt-all-quots ( quots -- quot )
     dup length 1 = [ first ] [
         unclip swap
         [ nip attempt-all-quots ] curry

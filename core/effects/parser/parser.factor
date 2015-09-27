@@ -49,7 +49,7 @@ PRIVATE>
 : scan-effect ( -- effect )
     "(" expect ")" parse-effect ;
 
-: parse-call( ( accum word -- accum )
+: parse-call-paren ( accum word -- accum )
     [ ")" parse-effect ] dip 2array append! ;
 
 SYMBOL: in-definition

@@ -37,30 +37,30 @@ HELP: vconvert
 }
 { $examples
 "Conversion between integer and float vectors:"
-{ $example """USING: alien.c-types math.vectors.conversion math.vectors.simd
+{ $example "USING: alien.c-types math.vectors.conversion math.vectors.simd
 prettyprint ;
 
 int-4{ 0 1 2 3 } int-4 float-4 vconvert .
-double-2{ 1.25 3.75 } double-2 longlong-2 vconvert ."""
-"""float-4{ 0.0 1.0 2.0 3.0 }
-longlong-2{ 1 3 }""" }
+double-2{ 1.25 3.75 } double-2 longlong-2 vconvert ."
+"float-4{ 0.0 1.0 2.0 3.0 }
+longlong-2{ 1 3 }" }
 "Packing conversions:"
-{ $example """USING: alien.c-types math.vectors.conversion math.vectors.simd
+{ $example "USING: alien.c-types math.vectors.conversion math.vectors.simd
 prettyprint ;
 
 int-4{ -8 70000 6000 50 } int-4{ 4 3 2 -1 } int-4 ushort-8 vconvert .
 double-2{ 0.0 1.0e100 }
-double-2{ -1.0e100 0.0 } double-2 float-4 vconvert ."""
-"""ushort-8{ 0 65535 6000 50 4 3 2 0 }
-float-4{ 0.0 1/0. -1/0. 0.0 }""" }
+double-2{ -1.0e100 0.0 } double-2 float-4 vconvert ."
+"ushort-8{ 0 65535 6000 50 4 3 2 0 }
+float-4{ 0.0 1/0. -1/0. 0.0 }" }
 "Unpacking conversions:"
-{ $example """USING: alien.c-types kernel math.vectors.conversion
+{ $example "USING: alien.c-types kernel math.vectors.conversion
 math.vectors.simd prettyprint ;
 
 uchar-16{ 8 70 60 50 4 30 200 1 9 10 110 102 133 143 115 0 }
-uchar-16 short-8 vconvert [ . ] bi@"""
-"""short-8{ 8 70 60 50 4 30 200 1 }
-short-8{ 9 10 110 102 133 143 115 0 }""" }
+uchar-16 short-8 vconvert [ . ] bi@"
+"short-8{ 8 70 60 50 4 30 200 1 }
+short-8{ 9 10 110 102 133 143 115 0 }" }
 } ;
 
 ARTICLE: "math.vectors.conversion" "SIMD vector conversion"

@@ -2,7 +2,7 @@ IN: mason.release.branch.tests
 USING: mason.release.branch mason.config tools.test namespaces
 system ;
 
-[ { "git" "push" "-f" "joe@blah.com:/my/git" "master:clean-linux-x86-32" } ] [
+{ { "git" "push" "-f" "joe@blah.com:/my/git" "master:clean-linux-x86-32" } } [
     [
         "joe" branch-username set
         "blah.com" branch-host set
@@ -13,7 +13,7 @@ system ;
     ] with-scope
 ] unit-test
 
-[ { "scp" "boot.windows-x86.64.image" "joe@blah.com:/stuff/clean/windows-x86-64" } ] [
+{ { "scp" "boot.windows-x86.64.image" "joe@blah.com:/stuff/clean/windows-x86-64" } } [
     [
         "scp" scp-command set
         "joe" image-username set

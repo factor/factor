@@ -3,7 +3,7 @@
 USING: accessors arrays.shaped kernel tools.test math ;
 IN: arrays.shaped.tests
 
-[ t ] [
+{ t } [
     { 5 5 } increasing
     {
         { 0 1 2 3 4 }
@@ -14,7 +14,7 @@ IN: arrays.shaped.tests
     } >shaped-array =
 ] unit-test
 
-[ { 5 5 } ] [
+{ { 5 5 } } [
     {
         { 0 1 2 3 4 }
         { 5 6 7 8 9 }
@@ -24,7 +24,7 @@ IN: arrays.shaped.tests
     } >shaped-array shape>>
 ] unit-test
 
-[ { 5 5 } ] [
+{ { 5 5 } } [
     {
         { 0 1 2 3 4 }
         { 5 6 7 8 9 }
@@ -42,9 +42,9 @@ IN: arrays.shaped.tests
 
 ! Error on 0, negative shapes
 
-[
+{
     sa{ { 1 3 3 } { 4 1 3 } { 4 4 1 } }
-] [
+} [
     { 3 3 } 2 strict-lower
     [ drop 3 ] map-strict-upper
     [ drop 1 ] map-diagonal

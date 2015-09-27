@@ -1,8 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes.algebra compiler.units definitions
-graphs grouping kernel namespaces sequences words fry
-stack-checker.dependencies combinators sets ;
+USING: assocs combinators fry graphs grouping kernel namespaces
+sequences sets stack-checker.dependencies words ;
 IN: compiler.crossref
 
 SYMBOL: compiled-crossref
@@ -35,7 +34,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
 : outdated-conditional-usages ( set -- assocs )
     members H{ } clone '[
         conditional-dependencies-of
-        [ drop _ dependencies-satisfied? not ] assoc-filter
+        [ drop _ dependencies-satisfied? ] assoc-reject
     ] map ;
 
 : generic-call-sites-of ( word -- assoc )

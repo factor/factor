@@ -4,7 +4,7 @@ USING: accessors io kernel math math.parser sequences system
 vocabs ;
 IN: system-info
 
-HOOK: os-version os ( -- version )    
+HOOK: os-version os ( -- version )
 HOOK: cpus os ( -- n )
 HOOK: cpu-mhz os ( -- n )
 HOOK: memory-load os ( -- n )

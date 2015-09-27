@@ -1,12 +1,11 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: strings arrays hashtables assocs sequences fry macros
-cocoa cocoa.messages cocoa.classes cocoa.application
-kernel namespaces io.backend math cocoa.enumeration byte-arrays
-combinators alien.c-types alien.data words quotations
-core-foundation core-foundation.data core-foundation.strings
-core-foundation.utilities ;
+USING: alien.c-types alien.data arrays byte-arrays cocoa
+cocoa.application cocoa.classes cocoa.enumeration combinators
+core-foundation.data core-foundation.strings
+core-foundation.utilities fry io.backend kernel macros math
+quotations sequences ;
 IN: cocoa.plists
 
 : >plist ( value -- plist ) >cf -> autorelease ;

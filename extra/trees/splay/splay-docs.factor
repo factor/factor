@@ -1,5 +1,5 @@
 USING: help.syntax help.markup assocs ;
-IN: trees.splay 
+IN: trees.splay
 
 HELP: SPLAY{
 { $syntax "SPLAY{ { key value }... }" }

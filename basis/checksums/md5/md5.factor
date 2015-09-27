@@ -4,7 +4,6 @@ USING: accessors alien.c-types alien.data byte-arrays checksums
 checksums.common checksums.stream combinators fry grouping hints
 kernel kernel.private literals locals macros math math.bitwise
 math.functions sequences sequences.private specialized-arrays ;
-FROM: sequences.private => change-nth-unsafe ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5
 
@@ -35,19 +34,19 @@ CONSTANT: T $[
 ]
 
 :: F ( X Y Z -- FXYZ )
-    #! F(X,Y,Z) = XY v not(X) Z
+    ! F(X,Y,Z) = XY v not(X) Z
     X Y bitand X bitnot Z bitand bitor ; inline
 
 :: G ( X Y Z -- GXYZ )
-    #! G(X,Y,Z) = XZ v Y not(Z)
+    ! G(X,Y,Z) = XZ v Y not(Z)
     X Z bitand Y Z bitnot bitand bitor ; inline
 
 : H ( X Y Z -- HXYZ )
-    #! H(X,Y,Z) = X xor Y xor Z
+    ! H(X,Y,Z) = X xor Y xor Z
     bitxor bitxor ; inline
 
 :: I ( X Y Z -- IXYZ )
-    #! I(X,Y,Z) = Y xor (X v not(Z))
+    ! I(X,Y,Z) = Y xor (X v not(Z))
     Z bitnot X bitor Y bitxor ; inline
 
 CONSTANT: S11 7
@@ -73,7 +72,7 @@ CONSTANT: c 2
 CONSTANT: d 3
 
 :: (ABCD) ( x state a b c d k s i quot -- )
-    #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
+    ! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
     a state [
         b state nth-unsafe
         c state nth-unsafe
@@ -84,7 +83,7 @@ CONSTANT: d 3
         b state nth-unsafe w+
     ] change-nth-unsafe ; inline
 
-MACRO: with-md5-round ( ops quot -- )
+MACRO: with-md5-round ( ops quot -- quot )
     '[ [ _ (ABCD) ] compose ] map '[ _ 2cleave ] ;
 
 : (process-md5-block-F) ( block state -- )

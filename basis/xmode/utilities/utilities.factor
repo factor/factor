@@ -25,7 +25,7 @@ IN: xmode.utilities
 : with-tag-initializer ( tag obj quot -- )
     [ object set tag set ] prepose with-scope ; inline
 
-MACRO: (init-from-tag) ( specs -- )
+MACRO: (init-from-tag) ( specs -- quot )
     [ tag-init-form ] map concat [ ] like
     [ with-tag-initializer ] curry ;
 

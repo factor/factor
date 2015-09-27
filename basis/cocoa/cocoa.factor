@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa.messages compiler.units core-foundation.bundles
 hashtables init io kernel lexer namespaces sequences vocabs ;
-FROM: cocoa.messages => selector ;
+QUALIFIED: cocoa.messages
 IN: cocoa
 
 SYMBOL: sent-messages
@@ -18,7 +18,7 @@ SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
 SYNTAX: SEL:
     scan-token
     [ remember-send ]
-    [ <selector> suffix! \ selector suffix! ] bi ;
+    [ <selector> suffix! \ cocoa.messages:selector suffix! ] bi ;
 
 SYMBOL: super-sent-messages
 

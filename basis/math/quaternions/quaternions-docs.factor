@@ -42,4 +42,3 @@ HELP: c>q
 HELP: euler
 { $values { "phi" number } { "theta" number } { "psi" number } { "q" "a quaternion" } }
 { $description "Convert a rotation given by Euler angles (phi, theta, and psi) to a quaternion." } ;
-

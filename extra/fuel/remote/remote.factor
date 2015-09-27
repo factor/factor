@@ -18,4 +18,3 @@ PRIVATE>
     print-banner integer? [ 9000 ] unless* <tty-server> start-server drop ;
 
 : fuel-start-remote-listener* ( -- ) f fuel-start-remote-listener ;
-

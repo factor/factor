@@ -11,7 +11,7 @@ TUPLE: dual ordinary-part epsilon-part ;
 
 C: <dual> dual
 
-! Ordinary numbers implement the dual protocol by returning 
+! Ordinary numbers implement the dual protocol by returning
 ! themselves as the ordinary part, and 0 as the epsilon part.
 M: number ordinary-part>> ;
 
@@ -28,12 +28,12 @@ MACRO: ordinary-op ( word -- o )
     [ input-length ] keep
     '[ [ ordinary-part>> ] _ napply _ execute ] ;
 
-! Takes N dual numbers <o1,e1> <o2,e2> ... <oN,eN> and weaves 
+! Takes N dual numbers <o1,e1> <o2,e2> ... <oN,eN> and weaves
 ! their ordinary and epsilon parts to produce
 ! e1 o1 o2 ... oN e2 o1 o2 ... oN ... eN o1 o2 ... oN
-! This allows a set of partial derivatives each to be evaluated 
+! This allows a set of partial derivatives each to be evaluated
 ! at the same point.
-MACRO: duals>nweave ( n -- )
+MACRO: duals>nweave ( n -- quot )
    dup dup dup
    '[
        [ [ epsilon-part>> ] _ napply ]
@@ -49,14 +49,14 @@ MACRO: chain-rule ( word -- e )
     tri
     '[ [ @ _ @ ] sum-outputs ] ;
 
-: set-dual-help ( word dword -- ) 
+: set-dual-help ( word dword -- )
     [ swap
-        [ stack-effect [ in>> ] [ out>> ] bi append 
+        [ stack-effect [ in>> ] [ out>> ] bi append
             [ dual ] { } map>assoc { $values } prepend
         ]
-        [ [ { $description } % "Version of " , 
-                   { $link } swap suffix , 
-                   " extended to work on dual numbers." , ] 
+        [ [ { $description } % "Version of " ,
+                   { $link } swap suffix ,
+                   " extended to work on dual numbers." , ]
             { } make
         ]
         bi* 2array
@@ -64,7 +64,7 @@ MACRO: chain-rule ( word -- e )
 
 PRIVATE>
 
-MACRO: dual-op ( word -- )
+MACRO: dual-op ( word -- quot )
     [ '[ _ ordinary-op ] ]
     [ input-length '[ _ nkeep ] ]
     [ '[ _ chain-rule ] ]
@@ -72,7 +72,7 @@ MACRO: dual-op ( word -- )
     '[ _ @ @ <dual> ] ;
 
 : define-dual ( word -- )
-    dup name>> "d" prepend "math.dual" create
+    dup name>> "d" prepend "math.dual" create-word
     [ [ stack-effect ] dip set-stack-effect ]
     [ set-dual-help ]
     [ swap '[ _ dual-op ] define ]

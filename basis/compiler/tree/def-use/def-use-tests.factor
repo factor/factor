@@ -7,7 +7,7 @@ compiler.tree.def-use arrays kernel.private sorting math.order
 binary-search compiler.tree.checker ;
 IN: compiler.tree.def-use.tests
 
-[ t ] [
+{ t } [
     [ 1 2 3 ] build-tree compute-def-use drop
     def-use get {
         [ assoc-size 3 = ]
@@ -20,14 +20,14 @@ IN: compiler.tree.def-use.tests
     analyze-recursive
     normalize
     propagate
-    cleanup
+    cleanup-tree
     compute-def-use
     check-nodes ;
 
 : too-deep ( a b -- c )
     dup [ drop ] [ 2dup too-deep too-deep drop ] if ; inline recursive
 
-[ ] [
+{ } [
     [ too-deep ]
     build-tree
     analyze-recursive

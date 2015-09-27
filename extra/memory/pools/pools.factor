@@ -51,4 +51,3 @@ PRIVATE>
 
 SYNTAX: POOL:
     scan-word scan-word '[ _ swap <pool> ] [ swap set-class-pool ] bi ;
-

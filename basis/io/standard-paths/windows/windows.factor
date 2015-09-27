@@ -6,10 +6,8 @@ system unicode.case ;
 IN: io.standard-paths.windows
 
 M: windows find-in-applications
-    '[ [ >lower _ tail? ] find-in-program-files ] map
-    sift ?first ;
+    '[ [ >lower _ tail? ] find-in-program-files ] map-find drop ;
 
 M: windows find-in-path*
     [ "PATH" os-env ";" split ] dip
     '[ _ append-path exists? ] find nip ;
-

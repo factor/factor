@@ -7,7 +7,6 @@ math.parser math.ranges memoize namespaces parser sequences
 sets simple-flat-file splitting unicode.categories
 unicode.categories.syntax unicode.data unicode.normalize
 unicode.normalize.private words words.constant ;
-FROM: sequences => change-nth ;
 IN: unicode.breaks
 
 <PRIVATE
@@ -97,7 +96,7 @@ SYMBOL: table
     graphemes iota { SpacingMark } connect
     { Prepend } graphemes iota connect ;
 
-"grapheme-table" create-in
+"grapheme-table" create-word-in
 graphemes init-table table
 [ make-grapheme-table finish-table ] with-variable
 define-constant
@@ -153,7 +152,7 @@ CONSTANT: wMidNum 9
 CONSTANT: wMidNumLet 10
 CONSTANT: wNumeric 11
 CONSTANT: wExtendNumLet 12
-CONSTANT: words 13
+CONSTANT: unicode-words 13
 
 ! Is there a way to avoid this?
 CONSTANT: word-break-classes H{
@@ -164,7 +163,7 @@ CONSTANT: word-break-classes H{
     { "ExtendNumLet" 12 }
 }
 
-"word-break-table" create-in
+"word-break-table" create-word-in
 "vocab:unicode/data/WordBreakProperty.txt"
 load-interval-file dup array>>
 [ 2 swap [ word-break-classes at ] change-nth ] each
@@ -182,8 +181,8 @@ SYMBOL: check-number-after
 
 : make-word-table ( -- )
     { wCR } { wLF } connect
-    { wNewline wCR wLF } words iota disconnect
-    words iota { wNewline wCR wLF } disconnect
+    { wNewline wCR wLF } unicode-words iota disconnect
+    unicode-words iota { wNewline wCR wLF } disconnect
     { wALetter } { wMidLetter wMidNumLet } check-letter-after set-table
     { wMidLetter wMidNumLet } { wALetter } check-letter-before set-table
     { wNumeric wALetter } { wNumeric wALetter } connect
@@ -198,8 +197,8 @@ SYMBOL: check-number-after
         [ { { 0 [ f ] } { 1 [ t ] } [ ] } case ] map
     ] map ;
 
-"word-table" create-in
-words init-table table
+"word-table" create-word-in
+unicode-words init-table table
 [ make-word-table finish-word-table ] with-variable
 define-constant
 >>

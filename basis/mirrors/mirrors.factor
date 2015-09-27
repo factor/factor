@@ -14,7 +14,7 @@ C: <mirror> mirror
 
 M: mirror at*
     [ nip object>> ] [ object-slots slot-named ] 2bi
-    dup [ offset>> slot t ] [ 2drop f f ] if ;
+    [ offset>> slot t ] [ drop f f ] if* ;
 
 ERROR: no-such-slot slot ;
 ERROR: read-only-slot slot ;

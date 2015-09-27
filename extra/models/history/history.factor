@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel models sequences ;
+USING: accessors kernel locals models sequences ;
 IN: models.history
 
 TUPLE: history < model back forward ;
@@ -14,11 +14,13 @@ TUPLE: history < model back forward ;
         reset-history ;
 
 : (add-history) ( history to -- )
-    swap value>> dup [ swap push ] [ 2drop ] if ;
+    swap value>> [ swap push ] [ drop ] if* ;
 
-: go-back/forward ( history to from -- )
-    [ 2drop ]
-    [ [ dupd (add-history) ] dip pop swap set-model ] if-empty ;
+:: go-back/forward ( history to from -- )
+    from empty? [
+        history to (add-history)
+        from pop history set-model
+    ] unless ;
 
 : go-back ( history -- )
     dup [ forward>> ] [ back>> ] bi go-back/forward ;

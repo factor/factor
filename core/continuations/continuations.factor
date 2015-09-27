@@ -6,8 +6,8 @@ IN: continuations
 
 : with-datastack ( stack quot -- new-stack )
     [
-        [ [ datastack ] dip swap [ { } like set-datastack ] dip ] dip
-        swap [ call datastack ] dip
+        [ [ get-datastack ] dip swap [ { } like set-datastack ] dip ] dip
+        swap [ call get-datastack ] dip
         swap [ set-datastack ] dip
     ] ( stack quot -- new-stack ) call-effect-unsafe ;
 
@@ -19,14 +19,14 @@ SYMBOL: restarts
 
 <PRIVATE
 
-: catchstack* ( -- catchstack )
+: (get-catchstack) ( -- catchstack )
     CONTEXT-OBJ-CATCHSTACK context-object { vector } declare ; inline
 
 ! We have to defeat some optimizations to make continuations work
 : dummy-1 ( -- obj ) f ;
 : dummy-2 ( obj -- obj ) ;
 
-: catchstack ( -- catchstack ) catchstack* clone ; inline
+: get-catchstack ( -- catchstack ) (get-catchstack) clone ; inline
 
 : (set-catchstack) ( catchstack -- )
     CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
@@ -44,12 +44,12 @@ TUPLE: continuation data call retain name catch ;
 C: <continuation> continuation
 
 : current-continuation ( -- continuation )
-    datastack callstack retainstack namestack catchstack
+    get-datastack get-callstack get-retainstack get-namestack get-catchstack
     <continuation> ;
 
 <PRIVATE
 
-ERROR: not-a-continuation obj ;
+ERROR: not-a-continuation object ;
 
 : >continuation< ( continuation -- data call retain name catch )
     dup continuation? [ not-a-continuation ] unless
@@ -100,7 +100,7 @@ PRIVATE>
 SYMBOL: return-continuation
 
 : with-return ( quot -- )
-    [ [ return-continuation set ] prepose callcc0 ] with-scope ; inline
+    [ return-continuation ] dip [ with-variable ] 2curry callcc0 ; inline
 
 : return ( -- * )
     return-continuation get continue ;
@@ -132,7 +132,7 @@ callback-error-hook [ [ die ] ] initialize
 
 : rethrow ( error -- * )
     dup save-error
-    catchstack* [
+    (get-catchstack) [
         in-callback?
         [ callback-error-hook get-global call( error -- * ) ]
         [ OBJ-CURRENT-THREAD special-object error-in-thread ]
@@ -142,9 +142,9 @@ callback-error-hook [ [ die ] ] initialize
 : recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
     [
         [
-            [ catchstack* push ] dip
+            [ (get-catchstack) push ] dip
             call
-            catchstack* pop*
+            (get-catchstack) pop*
         ] curry
     ] dip ifcc ; inline
 

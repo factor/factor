@@ -77,9 +77,9 @@ IN: rosetta-code.raycasting
 ! if Py = Ay or Py = By then
 !   Py ← Py + ε
 ! end if
-! if Py < Ay or Py > By then 
+! if Py < Ay or Py > By then
 !   return false
-! else if Px > max(Ax, Bx) then 
+! else if Px > max(Ax, Bx) then
 !   return false
 ! else
 !   if Px < min(Ax, Bx) then

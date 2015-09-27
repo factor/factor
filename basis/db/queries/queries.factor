@@ -23,7 +23,7 @@ SINGLETON: retryable
     [ make-retryable ] when ;
 
 : regenerate-params ( statement -- statement )
-    dup 
+    dup
     [ bind-params>> ] [ in-params>> ] bi
     [
         dup generator-bind? [
@@ -32,13 +32,13 @@ SINGLETON: retryable
             drop
         ] if
     ] 2map >>bind-params ;
-    
+
 M: retryable execute-statement* ( statement type -- )
     drop [ retries>> iota ] [
         [
             nip
             [ query-results dispose t ]
-            [ ] 
+            [ ]
             [ regenerate-params bind-statement* f ] cleanup
         ] curry
     ] bi attempt-all drop ;
@@ -47,7 +47,7 @@ M: retryable execute-statement* ( statement type -- )
     [ db-columns ] [ db-table-name ] bi ;
 
 : query-make ( class quot -- statements )
-    #! query, input, outputs, secondary queries
+    ! query, input, outputs, secondary queries
     over db-table-name "table-name" set
     [ sql-props ] dip
     [ 0 sql-counter rot with-variable ] curry

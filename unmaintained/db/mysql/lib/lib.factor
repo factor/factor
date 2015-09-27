@@ -53,8 +53,8 @@ TUPLE: mysql-result-set ;
     ! mysql-connection-resulthandle mysql_num_fields ;
    
 ! : mysql-char*-nth ( index object -- str )
-    ! #! Utility based on 'char*-nth' to perform an additional sanity check on the value
-    ! #! extracted from the array of strings.
+    ! ! Utility based on 'char*-nth' to perform an additional sanity check on the value
+    ! ! extracted from the array of strings.
     ! void*-nth [ alien>char-string ] [ "" ] if* ;
 
 ! : mysql-row>seq ( object n -- seq )

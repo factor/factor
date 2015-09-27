@@ -7,6 +7,74 @@ BUILTIN: fixnum ;
 BUILTIN: bignum ;
 BUILTIN: float ;
 
+PRIMITIVE: bits>double ( n -- x )
+PRIMITIVE: bits>float ( n -- x )
+PRIMITIVE: double>bits ( x -- n )
+PRIMITIVE: float>bits ( x -- n )
+
+<PRIVATE
+PRIMITIVE: bignum* ( x y -- z )
+PRIMITIVE: bignum+ ( x y -- z )
+PRIMITIVE: bignum- ( x y -- z )
+PRIMITIVE: bignum-bit? ( x n -- ? )
+PRIMITIVE: bignum-bitand ( x y -- z )
+PRIMITIVE: bignum-bitnot ( x -- y )
+PRIMITIVE: bignum-bitor ( x y -- z )
+PRIMITIVE: bignum-bitxor ( x y -- z )
+PRIMITIVE: bignum-gcd ( x y -- z )
+PRIMITIVE: bignum-log2 ( x -- n )
+PRIMITIVE: bignum-mod ( x y -- z )
+PRIMITIVE: bignum-shift ( x y -- z )
+PRIMITIVE: bignum/i ( x y -- z )
+PRIMITIVE: bignum/mod ( x y -- z w )
+PRIMITIVE: bignum< ( x y -- ? )
+PRIMITIVE: bignum<= ( x y -- ? )
+PRIMITIVE: bignum= ( x y -- ? )
+PRIMITIVE: bignum> ( x y -- ? )
+PRIMITIVE: bignum>= ( x y -- ? )
+PRIMITIVE: bignum>fixnum ( x -- y )
+PRIMITIVE: bignum>fixnum-strict ( x -- y )
+PRIMITIVE: both-fixnums? ( x y -- ? )
+PRIMITIVE: fixnum* ( x y -- z )
+PRIMITIVE: fixnum*fast ( x y -- z )
+PRIMITIVE: fixnum+ ( x y -- z )
+PRIMITIVE: fixnum+fast ( x y -- z )
+PRIMITIVE: fixnum- ( x y -- z )
+PRIMITIVE: fixnum-bitand ( x y -- z )
+PRIMITIVE: fixnum-bitnot ( x -- y )
+PRIMITIVE: fixnum-bitor ( x y -- z )
+PRIMITIVE: fixnum-bitxor ( x y -- z )
+PRIMITIVE: fixnum-fast ( x y -- z )
+PRIMITIVE: fixnum-mod ( x y -- z )
+PRIMITIVE: fixnum-shift ( x y -- z )
+PRIMITIVE: fixnum-shift-fast ( x y -- z )
+PRIMITIVE: fixnum/i ( x y -- z )
+PRIMITIVE: fixnum/i-fast ( x y -- z )
+PRIMITIVE: fixnum/mod ( x y -- z w )
+PRIMITIVE: fixnum/mod-fast ( x y -- z w )
+PRIMITIVE: fixnum< ( x y -- ? )
+PRIMITIVE: fixnum<= ( x y -- z )
+PRIMITIVE: fixnum> ( x y -- ? )
+PRIMITIVE: fixnum>= ( x y -- ? )
+PRIMITIVE: fixnum>bignum ( x -- y )
+PRIMITIVE: fixnum>float ( x -- y )
+PRIMITIVE: float* ( x y -- z )
+PRIMITIVE: float+ ( x y -- z )
+PRIMITIVE: float- ( x y -- z )
+PRIMITIVE: float-u< ( x y -- ? )
+PRIMITIVE: float-u<= ( x y -- ? )
+PRIMITIVE: float-u> ( x y -- ? )
+PRIMITIVE: float-u>= ( x y -- ? )
+PRIMITIVE: float/f ( x y -- z )
+PRIMITIVE: float< ( x y -- ? )
+PRIMITIVE: float<= ( x y -- ? )
+PRIMITIVE: float= ( x y -- ? )
+PRIMITIVE: float> ( x y -- ? )
+PRIMITIVE: float>= ( x y -- ? )
+PRIMITIVE: float>bignum ( x -- y )
+PRIMITIVE: float>fixnum ( x -- y )
+PRIVATE>
+
 GENERIC: >fixnum ( x -- n ) foldable
 GENERIC: >bignum ( x -- n ) foldable
 GENERIC: >integer ( x -- n ) foldable
@@ -16,6 +84,7 @@ GENERIC: integer>fixnum-strict ( x -- y ) foldable
 
 GENERIC: numerator ( a/b -- a )
 GENERIC: denominator ( a/b -- b )
+GENERIC: >fraction ( a/b -- a b )
 
 GENERIC: real-part ( z -- x )
 GENERIC: imaginary-part ( z -- y )
@@ -89,7 +158,9 @@ GENERIC: neg? ( x -- -x )
 
 UNION: integer fixnum bignum ;
 
-TUPLE: ratio { numerator integer read-only } { denominator integer read-only } ;
+TUPLE: ratio
+    { numerator integer read-only }
+    { denominator integer read-only } ;
 
 UNION: rational integer ratio ;
 
@@ -97,13 +168,51 @@ M: rational neg? 0 < ; inline
 
 UNION: real rational float ;
 
-TUPLE: complex { real real read-only } { imaginary real read-only } ;
+TUPLE: complex
+    { real real read-only }
+    { imaginary real read-only } ;
 
 UNION: number real complex ;
 
 GENERIC: recip ( x -- y )
 
 M: number recip 1 swap / ; inline
+
+: rect> ( x y -- z )
+    ! Note: an imaginary 0.0 should still create a complex
+    dup 0 = [ drop ] [ complex boa ] if ; inline
+
+GENERIC: >rect ( z -- x y )
+
+M: real >rect 0 ; inline
+
+M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
+
+<PRIVATE
+
+: (gcd) ( b a x y -- a d )
+    swap [
+        nip
+    ] [
+        [ /mod [ over * swapd - ] dip ] keep (gcd)
+    ] if-zero ; inline recursive
+
+PRIVATE>
+
+: gcd ( x y -- a d )
+    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
+
+MATH: fast-gcd ( x y -- d ) foldable
+
+<PRIVATE
+
+: simple-gcd ( x y -- d ) gcd nip ; inline
+
+PRIVATE>
+
+M: real fast-gcd simple-gcd ; inline
+
+M: bignum fast-gcd bignum-gcd ; inline
 
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 
@@ -143,7 +252,7 @@ GENERIC: prev-float ( m -- n )
 : if-iterate? ( i n true false -- ) [ 2over < ] 2dip if ; inline
 
 : iterate-step ( i n quot -- i n quot )
-    #! Apply quot to i, keep i and quot, hide n.
+    ! Apply quot to i, keep i and quot, hide n.
     [ nip call ] 3keep ; inline
 
 : iterate-rot ( ? i n quot -- i n quot ? )

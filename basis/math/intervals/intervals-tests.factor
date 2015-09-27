@@ -3,155 +3,155 @@ arrays prettyprint tools.test random vocabs combinators
 accessors math.constants fry ;
 IN: math.intervals.tests
 
-[ empty-interval ] [ 2 2 (a,b) ] unit-test
+{ empty-interval } [ 2 2 (a,b) ] unit-test
 
-[ empty-interval ] [ 2 2.0 (a,b) ] unit-test
+{ empty-interval } [ 2 2.0 (a,b) ] unit-test
 
-[ empty-interval ] [ 2 2 [a,b) ] unit-test
+{ empty-interval } [ 2 2 [a,b) ] unit-test
 
-[ empty-interval ] [ 2 2 (a,b] ] unit-test
+{ empty-interval } [ 2 2 (a,b] ] unit-test
 
-[ empty-interval ] [ 3 2 [a,b] ] unit-test
+{ empty-interval } [ 3 2 [a,b] ] unit-test
 
-[ T{ interval f { 1 t } { 2 t } } ] [ 1 2 [a,b] ] unit-test
+{ T{ interval f { 1 t } { 2 t } } } [ 1 2 [a,b] ] unit-test
 
-[ T{ interval f { 1 t } { 2 f } } ] [ 1 2 [a,b) ] unit-test
+{ T{ interval f { 1 t } { 2 f } } } [ 1 2 [a,b) ] unit-test
 
-[ T{ interval f { 1 f } { 2 f } } ] [ 1 2 (a,b) ] unit-test
+{ T{ interval f { 1 f } { 2 f } } } [ 1 2 (a,b) ] unit-test
 
-[ T{ interval f { 1 f } { 2 t } } ] [ 1 2 (a,b] ] unit-test
+{ T{ interval f { 1 f } { 2 t } } } [ 1 2 (a,b] ] unit-test
 
-[ T{ interval f { 1 t } { 1 t } } ] [ 1 [a,a] ] unit-test
+{ T{ interval f { 1 t } { 1 t } } } [ 1 [a,a] ] unit-test
 
 ! Not sure how to handle NaNs yet...
 ! [ 1 0/0. [a,b] ] must-fail
 ! [ 0/0. 1 [a,b] ] must-fail
 
-[ t ] [ { 3 t } { 3 f } endpoint< ] unit-test
-[ t ] [ { 2 f } { 3 f } endpoint< ] unit-test
-[ f ] [ { 3 f } { 3 t } endpoint< ] unit-test
-[ t ] [ { 4 f } { 3 t } endpoint> ] unit-test
-[ f ] [ { 3 f } { 3 t } endpoint> ] unit-test
+{ t } [ { 3 t } { 3 f } endpoint< ] unit-test
+{ t } [ { 2 f } { 3 f } endpoint< ] unit-test
+{ f } [ { 3 f } { 3 t } endpoint< ] unit-test
+{ t } [ { 4 f } { 3 t } endpoint> ] unit-test
+{ f } [ { 3 f } { 3 t } endpoint> ] unit-test
 
-[ empty-interval ] [ 1 2 [a,b] empty-interval interval+ ] unit-test
+{ empty-interval } [ 1 2 [a,b] empty-interval interval+ ] unit-test
 
-[ empty-interval ] [ empty-interval 1 2 [a,b] interval+ ] unit-test
+{ empty-interval } [ empty-interval 1 2 [a,b] interval+ ] unit-test
 
-[ t ] [
+{ t } [
     1 2 [a,b] -3 3 [a,b] interval+ -2 5 [a,b] =
 ] unit-test
 
-[ t ] [
+{ t } [
     1 2 [a,b] -3 3 (a,b) interval+ -2 5 (a,b) =
 ] unit-test
 
-[ empty-interval ] [ 1 2 [a,b] empty-interval interval- ] unit-test
+{ empty-interval } [ 1 2 [a,b] empty-interval interval- ] unit-test
 
-[ empty-interval ] [ empty-interval 1 2 [a,b] interval- ] unit-test
+{ empty-interval } [ empty-interval 1 2 [a,b] interval- ] unit-test
 
-[ t ] [
+{ t } [
     1 2 [a,b] 0 1 [a,b] interval- 0 2 [a,b] =
 ] unit-test
 
-[ empty-interval ] [ 1 2 [a,b] empty-interval interval* ] unit-test
+{ empty-interval } [ 1 2 [a,b] empty-interval interval* ] unit-test
 
-[ empty-interval ] [ empty-interval 1 2 [a,b] interval* ] unit-test
+{ empty-interval } [ empty-interval 1 2 [a,b] interval* ] unit-test
 
-[ t ] [
+{ t } [
     1 2 [a,b] 0 4 [a,b] interval* 0 8 [a,b] =
 ] unit-test
 
-[ t ] [
+{ t } [
     1 2 [a,b] -4 4 [a,b] interval* -8 8 [a,b] =
 ] unit-test
 
-[ t ] [
+{ t } [
     1 2 [a,b] -0.5 0.5 [a,b] interval* -1.0 1.0 [a,b] =
 ] unit-test
 
-[ t ] [
+{ t } [
     1 2 [a,b] -0.5 0.5 (a,b] interval* -1.0 1.0 (a,b] =
 ] unit-test
 
-[ t ] [
+{ t } [
     -1 1 [a,b] -1 1 (a,b] interval* -1 1 [a,b] =
 ] unit-test
 
-[ t ] [ 1 2 [a,b] dup empty-interval interval-union = ] unit-test
+{ t } [ 1 2 [a,b] dup empty-interval interval-union = ] unit-test
 
-[ t ] [ 1 2 [a,b] empty-interval over interval-union = ] unit-test
+{ t } [ 1 2 [a,b] empty-interval over interval-union = ] unit-test
 
-[ t ] [
+{ t } [
     0 1 (a,b) 0 1 [a,b] interval-union 0 1 [a,b] =
 ] unit-test
 
-[ t ] [
+{ t } [
     0 1 (a,b) 1 2 [a,b] interval-union 0 2 (a,b] =
 ] unit-test
 
-[ t ] [
+{ t } [
     0 1 (a,b) 0 1 [a,b] interval-intersect 0 1 (a,b) =
 ] unit-test
 
-[ empty-interval ] [ 0 5 [a,b] -1 [a,a] interval-intersect ] unit-test
+{ empty-interval } [ 0 5 [a,b] -1 [a,a] interval-intersect ] unit-test
 
-[ empty-interval ] [ 0 5 (a,b] 0 [a,a] interval-intersect ] unit-test
+{ empty-interval } [ 0 5 (a,b] 0 [a,a] interval-intersect ] unit-test
 
-[ empty-interval ] [ empty-interval -1 [a,a] interval-intersect ] unit-test
+{ empty-interval } [ empty-interval -1 [a,a] interval-intersect ] unit-test
 
-[ empty-interval ] [ 0 5 (a,b] empty-interval interval-intersect ] unit-test
+{ empty-interval } [ 0 5 (a,b] empty-interval interval-intersect ] unit-test
 
-[ t ] [
+{ t } [
     0 1 (a,b) full-interval interval-intersect 0 1 (a,b) =
 ] unit-test
 
-[ t ] [
+{ t } [
     empty-interval empty-interval interval-subset?
 ] unit-test
 
-[ t ] [
+{ t } [
     empty-interval 0 1 [a,b] interval-subset?
 ] unit-test
 
-[ t ] [
+{ t } [
     0 1 (a,b) 0 1 [a,b] interval-subset?
 ] unit-test
 
-[ t ] [
+{ t } [
     full-interval -1/0. 1/0. [a,b] interval-subset?
 ] unit-test
 
-[ t ] [
+{ t } [
     -1/0. 1/0. [a,b] full-interval interval-subset?
 ] unit-test
 
-[ f ] [
+{ f } [
     full-interval 0 1/0. [a,b] interval-subset?
 ] unit-test
 
-[ t ] [
+{ t } [
     0 1/0. [a,b] full-interval interval-subset?
 ] unit-test
 
-[ f ] [
+{ f } [
     0 0 1 (a,b) interval-contains?
 ] unit-test
 
-[ t ] [
+{ t } [
     0.5 0 1 (a,b) interval-contains?
 ] unit-test
 
-[ f ] [
+{ f } [
     1 0 1 (a,b) interval-contains?
 ] unit-test
 
-[ empty-interval ] [ -1 1 (a,b) empty-interval interval/ ] unit-test
+{ empty-interval } [ -1 1 (a,b) empty-interval interval/ ] unit-test
 
-[ t ] [ 0 0 331 [a,b) -1775 -953 (a,b) interval/ interval-contains? ] unit-test
+{ t } [ 0 0 331 [a,b) -1775 -953 (a,b) interval/ interval-contains? ] unit-test
 
-[ t ] [ -1 1 (a,b) -1 1 (a,b) interval/ [-inf,inf] = ] unit-test
+{ t } [ -1 1 (a,b) -1 1 (a,b) interval/ [-inf,inf] = ] unit-test
 
-[ t ] [ -1 1 (a,b) 0 1 (a,b) interval/ [-inf,inf] = ] unit-test
+{ t } [ -1 1 (a,b) 0 1 (a,b) interval/ [-inf,inf] = ] unit-test
 
 "math.ratios.private" lookup-vocab [
     [ t ] [
@@ -159,75 +159,75 @@ IN: math.intervals.tests
     ] unit-test
 ] when
 
-[ f ] [ empty-interval interval-singleton? ] unit-test
+{ f } [ empty-interval interval-singleton? ] unit-test
 
-[ t ] [ 1 [a,a] interval-singleton? ] unit-test
+{ t } [ 1 [a,a] interval-singleton? ] unit-test
 
-[ f ] [ 1 1 [a,b) interval-singleton? ] unit-test
+{ f } [ 1 1 [a,b) interval-singleton? ] unit-test
 
-[ f ] [ 1 3 [a,b) interval-singleton? ] unit-test
+{ f } [ 1 3 [a,b) interval-singleton? ] unit-test
 
-[ f ] [ 1 1 (a,b) interval-singleton? ] unit-test
+{ f } [ 1 1 (a,b) interval-singleton? ] unit-test
 
-[ 2 ] [ 1 3 [a,b) interval-length ] unit-test
+{ 2 } [ 1 3 [a,b) interval-length ] unit-test
 
-[ 0 ] [ empty-interval interval-length ] unit-test
+{ 0 } [ empty-interval interval-length ] unit-test
 
-[ t ] [ 0 5 [a,b] 5 [a,a] interval<= ] unit-test
+{ t } [ 0 5 [a,b] 5 [a,a] interval<= ] unit-test
 
-[ incomparable ] [ empty-interval 5 [a,a] interval< ] unit-test
+{ incomparable } [ empty-interval 5 [a,a] interval< ] unit-test
 
-[ incomparable ] [ 5 [a,a] empty-interval interval< ] unit-test
+{ incomparable } [ 5 [a,a] empty-interval interval< ] unit-test
 
-[ incomparable ] [ 0 5 [a,b] 5 [a,a] interval< ] unit-test
+{ incomparable } [ 0 5 [a,b] 5 [a,a] interval< ] unit-test
 
-[ t ] [ 0 5 [a,b) 5 [a,a] interval< ] unit-test
+{ t } [ 0 5 [a,b) 5 [a,a] interval< ] unit-test
 
-[ f ] [ 0 5 [a,b] -1 [a,a] interval< ] unit-test
+{ f } [ 0 5 [a,b] -1 [a,a] interval< ] unit-test
 
-[ incomparable ] [ 0 5 [a,b] 1 [a,a] interval< ] unit-test
+{ incomparable } [ 0 5 [a,b] 1 [a,a] interval< ] unit-test
 
-[ t ] [ -1 1 (a,b) -1 [a,a] interval> ] unit-test
+{ t } [ -1 1 (a,b) -1 [a,a] interval> ] unit-test
 
-[ t ] [ -1 1 (a,b) -1 [a,a] interval>= ] unit-test
+{ t } [ -1 1 (a,b) -1 [a,a] interval>= ] unit-test
 
-[ f ] [ -1 1 (a,b) -1 [a,a] interval< ] unit-test
+{ f } [ -1 1 (a,b) -1 [a,a] interval< ] unit-test
 
-[ f ] [ -1 1 (a,b) -1 [a,a] interval<= ] unit-test
+{ f } [ -1 1 (a,b) -1 [a,a] interval<= ] unit-test
 
-[ t ] [ -1 1 (a,b] 1 [a,a] interval<= ] unit-test
+{ t } [ -1 1 (a,b] 1 [a,a] interval<= ] unit-test
 
-[ t ] [ -1 1 (a,b] 1 2 [a,b] interval<= ] unit-test
+{ t } [ -1 1 (a,b] 1 2 [a,b] interval<= ] unit-test
 
-[ incomparable ] [ -1 1 (a,b] empty-interval interval>= ] unit-test
+{ incomparable } [ -1 1 (a,b] empty-interval interval>= ] unit-test
 
-[ incomparable ] [ empty-interval -1 1 (a,b] interval>= ] unit-test
+{ incomparable } [ empty-interval -1 1 (a,b] interval>= ] unit-test
 
-[ incomparable ] [ -1 1 (a,b] 1 2 [a,b] interval>= ] unit-test
+{ incomparable } [ -1 1 (a,b] 1 2 [a,b] interval>= ] unit-test
 
-[ incomparable ] [ -1 1 (a,b] 1 2 [a,b] interval> ] unit-test
+{ incomparable } [ -1 1 (a,b] 1 2 [a,b] interval> ] unit-test
 
-[ t ] [ -1 1 (a,b] 1 2 (a,b] interval<= ] unit-test
+{ t } [ -1 1 (a,b] 1 2 (a,b] interval<= ] unit-test
 
-[ f ] [ 0 10 [a,b] 0 [a,a] interval< ] unit-test
+{ f } [ 0 10 [a,b] 0 [a,a] interval< ] unit-test
 
-[ f ] [ 0 10 [a,b] 0.0 [a,a] interval< ] unit-test
+{ f } [ 0 10 [a,b] 0.0 [a,a] interval< ] unit-test
 
-[ f ] [ 0.0 10 [a,b] 0 [a,a] interval< ] unit-test
+{ f } [ 0.0 10 [a,b] 0 [a,a] interval< ] unit-test
 
-[ f ] [ 0 10 [a,b] 10 [a,a] interval> ] unit-test
+{ f } [ 0 10 [a,b] 10 [a,a] interval> ] unit-test
 
-[ incomparable ] [ 0 [a,a] 0 10 [a,b] interval< ] unit-test
+{ incomparable } [ 0 [a,a] 0 10 [a,b] interval< ] unit-test
 
-[ incomparable ] [ 10 [a,a] 0 10 [a,b] interval> ] unit-test
+{ incomparable } [ 10 [a,a] 0 10 [a,b] interval> ] unit-test
 
-[ t ] [ 0 [a,a] 0 10 [a,b] interval<= ] unit-test
+{ t } [ 0 [a,a] 0 10 [a,b] interval<= ] unit-test
 
-[ incomparable ] [ 0 [a,a] 0 10 [a,b] interval>= ] unit-test
+{ incomparable } [ 0 [a,a] 0 10 [a,b] interval>= ] unit-test
 
-[ t ] [ 0 10 [a,b] 0 [a,a] interval>= ] unit-test
+{ t } [ 0 10 [a,b] 0 [a,a] interval>= ] unit-test
 
-[ t ] [
+{ t } [
     418
     418 423 [a,b)
     79 893 (a,b]
@@ -235,14 +235,14 @@ IN: math.intervals.tests
     interval-contains?
 ] unit-test
 
-[ t ] [ full-interval 10 10 [a,b] interval-max 10 1/0. [a,b] = ] unit-test
+{ t } [ full-interval 10 10 [a,b] interval-max 10 1/0. [a,b] = ] unit-test
 
-[ t ] [ full-interval 10 10 [a,b] interval-min -1/0. 10 [a,b] = ] unit-test
+{ t } [ full-interval 10 10 [a,b] interval-min -1/0. 10 [a,b] = ] unit-test
 
-[ t ] [ 1 100 [a,b] -1 1 [a,b] interval/i [-inf,inf] = ] unit-test
+{ t } [ 1 100 [a,b] -1 1 [a,b] interval/i [-inf,inf] = ] unit-test
 
 ! Accuracy of interval-mod
-[ t ] [ full-interval 40 40 [a,b] interval-mod -40 40 (a,b) interval-subset?
+{ t } [ full-interval 40 40 [a,b] interval-mod -40 40 (a,b) interval-subset?
 ] unit-test
 
 ! Interval random tester
@@ -342,27 +342,27 @@ comparison-ops [
     [ [ t ] ] dip '[ 8000 iota [ drop _ comparison-test ] all? ] unit-test
 ] each
 
-[ t ] [ -10 10 [a,b] 0 100 [a,b] assume> 0 10 (a,b] = ] unit-test
+{ t } [ -10 10 [a,b] 0 100 [a,b] assume> 0 10 (a,b] = ] unit-test
 
-[ t ] [ -10 10 [a,b] 0 100 [a,b] assume>= 0 10 [a,b] = ] unit-test
+{ t } [ -10 10 [a,b] 0 100 [a,b] assume>= 0 10 [a,b] = ] unit-test
 
-[ t ] [ -10 10 [a,b] 0 100 [a,b] assume< -10 10 [a,b] = ] unit-test
+{ t } [ -10 10 [a,b] 0 100 [a,b] assume< -10 10 [a,b] = ] unit-test
 
-[ t ] [ -10 10 [a,b] -100 0 [a,b] assume< -10 0 [a,b) = ] unit-test
+{ t } [ -10 10 [a,b] -100 0 [a,b] assume< -10 0 [a,b) = ] unit-test
 
-[ t ] [ -10 10 [a,b] -100 0 [a,b] assume<= -10 0 [a,b] = ] unit-test
+{ t } [ -10 10 [a,b] -100 0 [a,b] assume<= -10 0 [a,b] = ] unit-test
 
-[ t ] [ -10 10 [a,b] 0 100 [a,b] assume<= -10 10 [a,b] = ] unit-test
+{ t } [ -10 10 [a,b] 0 100 [a,b] assume<= -10 10 [a,b] = ] unit-test
 
-[ t ] [ -10 10 [a,b] interval-abs 0 10 [a,b] = ] unit-test
+{ t } [ -10 10 [a,b] interval-abs 0 10 [a,b] = ] unit-test
 
-[ t ] [ full-interval interval-abs [0,inf] = ] unit-test
+{ t } [ full-interval interval-abs [0,inf] = ] unit-test
 
-[ t ] [ [0,inf] interval-abs [0,inf] = ] unit-test
+{ t } [ [0,inf] interval-abs [0,inf] = ] unit-test
 
-[ t ] [ empty-interval interval-abs empty-interval = ] unit-test
+{ t } [ empty-interval interval-abs empty-interval = ] unit-test
 
-[ t ] [ [0,inf] interval-sq [0,inf] = ] unit-test
+{ t } [ [0,inf] interval-sq [0,inf] = ] unit-test
 
 ! Test that commutative interval ops really are
 : random-interval-or-empty ( -- obj )

@@ -27,13 +27,13 @@ COM-INTERFACE: ID3DX11Scan IUnknown {5089b68f-e71d-4d38-be8e-f363b95a9405}
     HRESULT Scan ( D3DX11_SCAN_DATA_TYPE ElementType, D3DX11_SCAN_OPCODE OpCode, UINT ElementScanSize, ID3D11UnorderedAccessView* pSrc, ID3D11UnorderedAccessView* pDst )
     HRESULT Multiscan ( D3DX11_SCAN_DATA_TYPE ElementType, D3DX11_SCAN_OPCODE OpCode, UINT ElementScanSize, UINT ElementScanPitch, UINT ScanCount, ID3D11UnorderedAccessView* pSrc, ID3D11UnorderedAccessView* pDst ) ;
 
-FUNCTION: HRESULT D3DX11CreateScan ( ID3D11DeviceContext* pDeviceContext, UINT MaxElementScanSize, UINT MaxScanCount, ID3DX11Scan** ppScan ) ;
+FUNCTION: HRESULT D3DX11CreateScan ( ID3D11DeviceContext* pDeviceContext, UINT MaxElementScanSize, UINT MaxScanCount, ID3DX11Scan** ppScan )
 
 COM-INTERFACE: ID3DX11SegmentedScan IUnknown {a915128c-d954-4c79-bfe1-64db923194d6}
     HRESULT SetScanDirection ( D3DX11_SCAN_DIRECTION Direction )
     HRESULT SegScan ( D3DX11_SCAN_DATA_TYPE ElementType, D3DX11_SCAN_OPCODE OpCode, UINT ElementScanSize, ID3D11UnorderedAccessView* pSrc, ID3D11UnorderedAccessView* pSrcElementFlags, ID3D11UnorderedAccessView* pDst ) ;
 
-FUNCTION: HRESULT D3DX11CreateSegmentedScan ( ID3D11DeviceContext* pDeviceContext, UINT MaxElementScanSize, ID3DX11SegmentedScan** ppScan ) ;
+FUNCTION: HRESULT D3DX11CreateSegmentedScan ( ID3D11DeviceContext* pDeviceContext, UINT MaxElementScanSize, ID3DX11SegmentedScan** ppScan )
 
 CONSTANT: D3DX11_FFT_MAX_PRECOMPUTE_BUFFERS 4
 CONSTANT: D3DX11_FFT_MAX_TEMP_BUFFERS       4
@@ -72,10 +72,10 @@ STRUCT: D3DX11_FFT_BUFFER_INFO
 CONSTANT: D3DX11_FFT_CREATE_FLAG_NO_PRECOMPUTE_BUFFERS 1
 TYPEDEF: int D3DX11_FFT_CREATE_FLAG
 
-FUNCTION: HRESULT D3DX11CreateFFT ( ID3D11DeviceContext* pDeviceContext, D3DX11_FFT_DESC* pDesc, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT ) ;
-FUNCTION: HRESULT D3DX11CreateFFT1DReal ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT ) ;
-FUNCTION: HRESULT D3DX11CreateFFT1DComplex ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT ) ;
-FUNCTION: HRESULT D3DX11CreateFFT2DReal ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT ) ;
-FUNCTION: HRESULT D3DX11CreateFFT2DComplex ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT ) ;
-FUNCTION: HRESULT D3DX11CreateFFT3DReal ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Z, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT ) ;
-FUNCTION: HRESULT D3DX11CreateFFT3DComplex ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Z, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT ) ;
+FUNCTION: HRESULT D3DX11CreateFFT ( ID3D11DeviceContext* pDeviceContext, D3DX11_FFT_DESC* pDesc, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT )
+FUNCTION: HRESULT D3DX11CreateFFT1DReal ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT )
+FUNCTION: HRESULT D3DX11CreateFFT1DComplex ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT )
+FUNCTION: HRESULT D3DX11CreateFFT2DReal ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT )
+FUNCTION: HRESULT D3DX11CreateFFT2DComplex ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT )
+FUNCTION: HRESULT D3DX11CreateFFT3DReal ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Z, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT )
+FUNCTION: HRESULT D3DX11CreateFFT3DComplex ( ID3D11DeviceContext* pDeviceContext, UINT X, UINT Y, UINT Z, UINT Flags, D3DX11_FFT_BUFFER_INFO* pBufferInfo, ID3DX11FFT** ppFFT )

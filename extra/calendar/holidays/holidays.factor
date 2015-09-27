@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar fry kernel locals parser 
+USING: accessors assocs calendar fry kernel locals parser
 sequences vocabs words memoize ;
 IN: calendar.holidays
 

@@ -1,11 +1,11 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel math sequences vectors ;
-FROM: assocs => change-at ;
 IN: sets
 
-! Set protocol
-MIXIN: set
+! unordered-set protocol
+! The word name ``set`` is for dynamic variables.
+MIXIN: unordered-set
 GENERIC: adjoin ( elt set -- )
 GENERIC: ?adjoin ( elt set -- ? )
 GENERIC: in? ( elt set -- ? )
@@ -36,15 +36,15 @@ M: f clear-set drop ; inline
 ! Defaults for some methods.
 ! Override them for efficiency
 
-M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
+M: unordered-set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
 
-M: set null? members null? ; inline
+M: unordered-set null? members null? ; inline
 
-M: set cardinality members length ;
+M: unordered-set cardinality members length ;
 
-M: set clear-set [ members ] keep [ delete ] curry each ;
+M: unordered-set clear-set [ members ] keep [ delete ] curry each ;
 
-M: set set-like drop ; inline
+M: unordered-set set-like drop ; inline
 
 <PRIVATE
 
@@ -56,7 +56,7 @@ M: set set-like drop ; inline
 
 PRIVATE>
 
-M: set union [ (union) ] keep set-like ;
+M: unordered-set union [ (union) ] keep set-like ;
 
 <PRIVATE
 
@@ -77,11 +77,11 @@ M: set union [ (union) ] keep set-like ;
 
 PRIVATE>
 
-M: set intersect [ (intersect) ] keep set-like ;
+M: unordered-set intersect [ (intersect) ] keep set-like ;
 
-M: set diff [ (diff) ] keep set-like ;
+M: unordered-set diff [ (diff) ] keep set-like ;
 
-M: set intersects?
+M: unordered-set intersects?
     small/large sequence/tester any? ;
 
 <PRIVATE
@@ -91,17 +91,17 @@ M: set intersects?
 
 PRIVATE>
 
-M: set subset?
+M: unordered-set subset?
     2dup [ cardinality ] bi@ > [ 2drop f ] [ (subset?) ] if ;
 
-M: set set=
+M: unordered-set set=
     2dup [ cardinality ] bi@ eq? [ (subset?) ] [ 2drop f ] if ;
 
-M: set fast-set ;
+M: unordered-set fast-set ;
 
-M: set duplicates drop f ;
+M: unordered-set duplicates drop f ;
 
-M: set all-unique? drop t ;
+M: unordered-set all-unique? drop t ;
 
 <PRIVATE
 
@@ -115,7 +115,7 @@ M: set all-unique? drop t ;
 PRIVATE>
 
 ! Sequences are sets
-INSTANCE: sequence set
+INSTANCE: sequence unordered-set
 
 M: sequence in?
     member? ; inline

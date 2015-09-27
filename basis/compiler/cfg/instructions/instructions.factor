@@ -1,9 +1,7 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors arrays kernel sequences namespaces words
-math math.order layouts classes.union compiler.units alien
-byte-arrays combinators compiler.cfg.registers
-compiler.cfg.instructions.syntax ;
+USING: accessors compiler.cfg.instructions.syntax kernel math
+namespaces ;
 IN: compiler.cfg.instructions
 
 <<
@@ -59,11 +57,11 @@ literal: loc ;
 INSN: ##replace-imm
 literal: src loc ;
 
-INSN: ##inc-d
-literal: n ;
+INSN: ##clear
+literal: loc ;
 
-INSN: ##inc-r
-literal: n ;
+INSN: ##inc
+literal: loc ;
 
 ! Subroutine calls
 INSN: ##call
@@ -225,6 +223,11 @@ use: src/int-rep ;
 FOLDABLE-INSN: ##bit-count
 def: dst/int-rep
 use: src/int-rep ;
+
+FOLDABLE-INSN: ##bit-test
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+temp: temp/int-rep ;
 
 ! Float arithmetic
 FOLDABLE-INSN: ##add-float
@@ -673,7 +676,7 @@ use: src/int-rep
 literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
 
 VREG-INSN: ##alien-assembly
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map ;
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot ;
 
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
@@ -810,10 +813,10 @@ VREG-INSN: ##reload
 def: dst
 literal: rep src ;
 
-UNION: ##allocation
-##allot
-##box-alien
-##box-displaced-alien ;
+UNION: allocation-insn
+    ##allot
+    ##box-alien
+    ##box-displaced-alien ;
 
 UNION: conditional-branch-insn
 ##compare-branch
@@ -831,28 +834,24 @@ UNION: conditional-branch-insn
 ##fixnum-mul ;
 
 ! For alias analysis
-UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
-UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
+UNION: read-insn ##slot ##slot-imm ##vm-field ##alien-global ;
+UNION: write-insn ##set-slot ##set-slot-imm ##set-vm-field ;
 
 UNION: alien-call-insn
-##alien-invoke
-##alien-indirect
-##alien-assembly ;
-
-! Instructions that contain subroutine calls to functions which
-! can callback arbitrary Factor code
-UNION: factor-call-insn
-alien-call-insn ;
+    ##alien-assembly
+    ##alien-indirect
+    ##alien-invoke ;
 
 UNION: gc-map-insn
-##call-gc
-##box
-##box-long-long
-factor-call-insn ;
+    ##call-gc
+    ##box
+    ##box-long-long
+    ##alien-indirect
+    ##alien-invoke ;
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
-TUPLE: gc-map scrub-d check-d scrub-r check-r gc-roots derived-roots ;
+TUPLE: gc-map scrub-d scrub-r gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
 

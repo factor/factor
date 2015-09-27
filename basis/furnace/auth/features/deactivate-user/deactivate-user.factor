@@ -17,7 +17,7 @@ IN: furnace.auth.features.deactivate-user
             drop
             URL" $realm" end-aside
         ] >>submit ;
-    
+
 : allow-deactivation ( realm -- realm )
     <deactivate-user-action> <protected>
         "delete your profile" >>description

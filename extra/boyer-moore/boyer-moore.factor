@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel locals math math.order
 math.ranges sequences sequences.private z-algorithm ;
-FROM: sequences.private => change-nth-unsafe ;
 IN: boyer-moore
 
 <PRIVATE

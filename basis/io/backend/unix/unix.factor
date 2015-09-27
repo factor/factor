@@ -124,7 +124,7 @@ M: fd drain
 M: unix (wait-to-write) ( port -- )
     dup
     dup handle>> check-disposed drain
-    dup [ wait-for-port ] [ 2drop ] if ;
+    [ wait-for-port ] [ drop ] if* ;
 
 M: unix io-multiplex ( nanos -- )
     mx get-global wait-for-events ;

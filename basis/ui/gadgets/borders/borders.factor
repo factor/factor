@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets ui.baseline-alignment kernel math fry
-namespaces vectors sequences math.vectors math.rectangles ;
+USING: accessors fry kernel math math.rectangles math.vectors
+sequences ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.borders
 
 TUPLE: border < aligned-gadget

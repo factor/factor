@@ -10,8 +10,13 @@ ERROR: bad-dispatch-position # ;
 TUPLE: standard-combination < single-combination # ;
 
 : <standard-combination> ( # -- standard-combination )
-    dup 0 < [ bad-dispatch-position ] when
+    dup integer? [ dup 0 < ] [ t ] if
+    [ bad-dispatch-position ] when
     standard-combination boa ;
+
+M: standard-combination check-combination-effect
+    [ dispatch# ] [ in>> length ] bi* over >
+    [ drop ] [ bad-dispatch-position ] if ;
 
 PREDICATE: standard-generic < generic
     "combination" word-prop standard-combination? ;
@@ -38,16 +43,16 @@ M: standard-combination picker
 M: standard-combination dispatch# #>> ;
 
 M: standard-generic effective-method
-    [ datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
+    [ get-datastack ] dip [ "combination" word-prop #>> swap <reversed> nth ] keep
     method-for-object ;
 
 : inline-cache-quot ( word methods miss-word -- quot )
     [ [ literalize , ] [ , ] [ combination get #>> , { } , , ] tri* ] [ ] make ;
 
 M: standard-combination inline-cache-quots
-    #! Direct calls to the generic word (not tail calls or indirect calls)
-    #! will jump to the inline cache entry point instead of the megamorphic
-    #! dispatch entry point.
+    ! Direct calls to the generic word (not tail calls or indirect calls)
+    ! will jump to the inline cache entry point instead of the megamorphic
+    ! dispatch entry point.
     [ \ inline-cache-miss inline-cache-quot ]
     [ \ inline-cache-miss-tail inline-cache-quot ]
     2bi ;

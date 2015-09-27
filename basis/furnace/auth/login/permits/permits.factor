@@ -24,6 +24,6 @@ permit "PERMITS" {
         swap >>uid
         session get id>> >>session
     [ touch-permit ] [ insert-tuple ] [ id>> ] tri ;
-                                                                    
+
 : delete-permit ( id -- )
     permit new-server-state delete-tuples ;

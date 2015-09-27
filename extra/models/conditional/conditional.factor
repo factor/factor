@@ -11,7 +11,7 @@ M: conditional model-changed
             [ condition>> call( -- ? ) ]
             [ thread>> self = not ] bi or
             [ [ value>> ] dip set-model f ]
-            [ 2drop t ] if 100 milliseconds sleep 
+            [ 2drop t ] if 100 milliseconds sleep
         ] 2curry "models.conditional" spawn-server
     ] keep thread<< ;
 

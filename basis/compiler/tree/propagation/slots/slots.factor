@@ -1,32 +1,21 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry assocs arrays byte-arrays strings accessors sequences
-kernel slots classes.algebra classes.tuple classes.tuple.private
-combinators.short-circuit words math math.private combinators
-sequences.private namespaces slots.private classes
-compiler.tree.propagation.info ;
+USING: accessors arrays assocs byte-arrays classes
+classes.algebra classes.tuple classes.tuple.private combinators
+combinators.short-circuit compiler.tree.propagation.info kernel
+math sequences slots.private strings words ;
 IN: compiler.tree.propagation.slots
-
-! Propagation of immutable slots and array lengths
 
 : sequence-constructor? ( word -- ? )
     { <array> <byte-array> (byte-array) <string> } member-eq? ;
 
-: constructor-output-class ( word -- class )
-    {
-        { <array> array }
-        { <byte-array> byte-array }
-        { (byte-array) byte-array }
-        { <string> string }
-    } at ;
-
 : propagate-sequence-constructor ( #call word -- infos )
     [ in-d>> first value-info ]
-    [ constructor-output-class ] bi*
+    [ "default-output-classes" word-prop first ] bi*
     <sequence-info> 1array ;
 
 : fold-<tuple-boa> ( values class -- info )
-    [ [ literal>> ] map ] dip prefix >tuple
+    [ [ literal>> ] map ] dip slots>tuple
     <literal-info> ;
 
 : read-only-slots ( values class -- slots )
@@ -52,13 +41,6 @@ IN: compiler.tree.propagation.slots
     dup [ read-only>> ] when ;
 
 : literal-info-slot ( slot object -- info/f )
-    #! literal-info-slot makes an unsafe call to 'slot'.
-    #! Check that the layout is up to date to avoid accessing the
-    #! wrong slot during a compilation unit where reshaping took
-    #! place. This could happen otherwise because the "slots" word
-    #! property would reflect the new layout, but instances in the
-    #! heap would use the old layout since instances are updated
-    #! immediately after compilation.
     {
         [ class-of read-only-slot? ]
         [ nip layout-up-to-date? ]

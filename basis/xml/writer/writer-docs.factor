@@ -47,19 +47,19 @@ HELP: pprint-xml
 
 HELP: indenter
 { $var-description "Contains the string which is used for indenting in the XML prettyprinter. For example, to print an XML document using " { $snippet "%%%%" } " for indentation, you can use the following:" }
-{ $example """USING: xml.syntax xml.writer namespaces ;
-[XML <foo>bar</foo> XML] "%%%%" indenter [ pprint-xml ] with-variable """ """
+{ $example "USING: xml.syntax xml.writer namespaces ;
+[XML <foo>bar</foo> XML] \"%%%%\" indenter [ pprint-xml ] with-variable " "
 <foo>
 %%%%bar
-</foo>""" } ;
+</foo>" } ;
 
 HELP: sensitive-tags
 { $var-description "Contains a sequence of " { $link name } "s where whitespace should be considered significant for prettyprinting purposes. The sequence can contain " { $link string } "s in place of names. For example, to preserve whitespace inside a " { $snippet "pre" } " tag:" }
-{ $example """USING: xml.syntax xml.writer namespaces ;
+{ $example "USING: xml.syntax xml.writer namespaces ;
 [XML <html> <head>   <title> something</title></head><body><pre>bing
 bang
-   bong</pre></body></html> XML] { "pre" } sensitive-tags [ pprint-xml ] with-variable"""
-"""
+   bong</pre></body></html> XML] { \"pre\" } sensitive-tags [ pprint-xml ] with-variable"
+"
 <html>
   <head>
     <title>
@@ -71,4 +71,4 @@ bang
 bang
    bong</pre>
   </body>
-</html>""" } ;
+</html>" } ;

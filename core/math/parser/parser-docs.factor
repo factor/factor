@@ -28,11 +28,6 @@ $nl
 
 ABOUT: "number-strings"
 
-HELP: digits>integer
-{ $values { "seq" "a sequence of integers" } { "radix" "an integer between 2 and 16" } { "n/f" { $maybe integer } } }
-{ $description "Converts a sequence of digits (with most significant digit first) into an integer." }
-{ $notes "This is one of the factors of " { $link string>number } "." } ;
-
 HELP: >digit
 { $values { "n" "an integer between 0 and 15" } { "ch" "a character" } }
 { $description "Outputs a character representation of a digit." }
@@ -44,7 +39,7 @@ HELP: digit>
 { $notes "This is one of the factors of " { $link string>number } "." } ;
 
 HELP: base>
-{ $values { "str" string } { "radix" "an integer between 2 and 16" } { "n/f" "a real number or " { $link f } } }
+{ $values { "str" string } { "radix" "an integer between 2 and 16" } { "n/f" { $maybe real } } }
 { $description "Creates a real number from a string representation with the given radix. The radix for floating point literals can be either base 10 or base 16."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
@@ -52,7 +47,7 @@ $nl
 { >base base> } related-words
 
 HELP: string>number
-{ $values { "str" string } { "n/f" "a real number or " { $link f } } }
+{ $values { "str" string } { "n/f" { $maybe real } } }
 { $description "Creates a real number from a string representation of a number in base 10."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
@@ -60,7 +55,7 @@ $nl
 { string>number number>string } related-words
 
 HELP: bin>
-{ $values { "str" string } { "n/f" "a real number or " { $link f } } }
+{ $values { "str" string } { "n/f" { $maybe real } } }
 { $description "Creates a real number from a string representation of a number in base 2."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
@@ -68,7 +63,7 @@ $nl
 { >bin bin> .b } related-words
 
 HELP: oct>
-{ $values { "str" string } { "n/f" "a real number or " { $link f } } }
+{ $values { "str" string } { "n/f" { $maybe real } } }
 { $description "Creates a real number from a string representation of a number in base 8."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
@@ -76,7 +71,7 @@ $nl
 { >oct oct> .o } related-words
 
 HELP: hex>
-{ $values { "str" string } { "n/f" "a real number or " { $link f } } }
+{ $values { "str" string } { "n/f" { $maybe real } } }
 { $description "Creates a real number from a string representation of a number in base 16."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
@@ -110,11 +105,6 @@ HELP: >hex
         "\"-1.fp3\""
     }
 } ;
-
-! HELP: float>string
-! { $values { "n" real } { "str" string } }
-! { $description "Primitive for getting a string representation of a float." }
-! { $notes "The " { $link number>string } " word is more general." } ;
 
 HELP: number>string
 { $values { "n" real } { "str" string } }

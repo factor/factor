@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math namespaces make
-cocoa cocoa.messages cocoa.classes core-graphics
-core-graphics.types sequences continuations accessors ;
+USING: accessors arrays cocoa core-graphics.types kernel math
+sequences ;
 IN: cocoa.views
 
 CONSTANT: NSOpenGLPFAAllRenderers 1

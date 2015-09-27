@@ -5,42 +5,42 @@ grouping compression.lzw multiline byte-arrays io.encodings.binary
 io.streams.byte-array ;
 IN: bitstreams.tests
 
-[ 0b1111111111 ]
+{ 0b1111111111 }
 [
     B{ 0x0f 0xff 0xff 0xff } <msb0-bit-reader>
     2 >>byte-pos 6 >>bit-pos
     10 swap peek
 ] unit-test
 
-[ 0b111111111 ]
+{ 0b111111111 }
 [
     B{ 0x0f 0xff 0xff 0xff } <msb0-bit-reader>
     2 >>byte-pos 6 >>bit-pos
     9 swap peek
 ] unit-test
 
-[ 0b11111111 ]
+{ 0b11111111 }
 [
     B{ 0x0f 0xff 0xff 0xff } <msb0-bit-reader>
     2 >>byte-pos 6 >>bit-pos
     8 swap peek
 ] unit-test
 
-[ 0b1111111 ]
+{ 0b1111111 }
 [
     B{ 0x0f 0xff 0xff 0xff } <msb0-bit-reader>
     2 >>byte-pos 6 >>bit-pos
     7 swap peek
 ] unit-test
 
-[ 0b111111 ]
+{ 0b111111 }
 [
     B{ 0x0f 0xff 0xff 0xff } <msb0-bit-reader>
     2 >>byte-pos 6 >>bit-pos
     6 swap peek
 ] unit-test
 
-[ 0b11111 ]
+{ 0b11111 }
 [
     B{ 0x0f 0xff 0xff 0xff } <msb0-bit-reader>
     2 >>byte-pos 6 >>bit-pos
@@ -51,4 +51,4 @@ IN: bitstreams.tests
 [ B{ } <msb0-bit-reader> 1 swap peek ] must-fail
 [ B{ } <msb0-bit-reader> 8 swap peek ] must-fail
 
-[ 0 ] [ B{ } <msb0-bit-reader> 0 swap peek ] unit-test
+{ 0 } [ B{ } <msb0-bit-reader> 0 swap peek ] unit-test

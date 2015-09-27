@@ -56,7 +56,7 @@ PRIVATE>
     ] cache ;
 
 : vocab-append-path ( vocab path -- newpath )
-    swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
+    swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
 
 : vocab-source-path ( vocab -- path/f )
     dup ".factor" append-vocab-dir vocab-append-path ;
@@ -133,10 +133,13 @@ PRIVATE>
 
 SYMBOL: blacklist
 
+: require-all ( vocabs -- )
+    V{ } clone blacklist [ [ require ] each ] with-variable ;
+
 <PRIVATE
 
 : add-to-blacklist ( error vocab -- )
-    vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
+    vocab-name blacklist get [ set-at ] [ 2drop ] if* ;
 
 GENERIC: (require) ( name -- )
 

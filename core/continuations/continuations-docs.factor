@@ -71,15 +71,15 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 }
 "The five stacks can be read and written:"
 { $subsections
-    datastack
+    get-datastack
     set-datastack
-    retainstack
+    get-retainstack
     set-retainstack
-    callstack
+    get-callstack
     set-callstack
-    namestack
+    get-namestack
     set-namestack
-    catchstack
+    get-catchstack
     set-catchstack
 } ;
 
@@ -108,21 +108,24 @@ $nl
 
 ABOUT: "continuations"
 
-HELP: catchstack*
+HELP: (get-catchstack)
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs the current catchstack." } ;
 
-HELP: catchstack
+HELP: get-catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs a copy of the current catchstack." } ;
+
+HELP: current-continuation
+{ $values { "continuation" continuation } }
+{ $description "Creates a continuation object from the current execution context." } ;
 
 HELP: set-catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Replaces the catchstack with a copy of the given vector." } ;
 
 HELP: continuation
-{ $values { "continuation" continuation } }
-{ $description "Reifies the current continuation from the point immediately after which the caller returns." } ;
+{ $class-description "Reifies the current continuation from the point immediately after which the caller returns." } ;
 
 HELP: >continuation<
 { $values { "continuation" continuation } { "data" vector } { "call" vector } { "retain" vector } { "name" vector } { "catch" vector } }
@@ -181,7 +184,7 @@ HELP: ignore-errors
 { $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
 
 HELP: in-callback?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "t if Factor is currently executing a callback." } ;
 
 HELP: rethrow

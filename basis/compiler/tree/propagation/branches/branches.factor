@@ -1,17 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel sequences assocs accessors
-math.intervals arrays classes.algebra combinators columns
-stack-checker.branches locals math namespaces
-compiler.utilities
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.tree.propagation.nodes
-compiler.tree.propagation.simple
-compiler.tree.propagation.constraints ;
+USING: accessors arrays assocs combinators compiler.tree
+compiler.tree.combinators compiler.tree.propagation.constraints
+compiler.tree.propagation.info compiler.tree.propagation.nodes
+compiler.tree.propagation.simple fry kernel locals math
+namespaces sequences stack-checker.branches ;
 FROM: sets => union ;
-FROM: assocs => change-at ;
 IN: compiler.tree.propagation.branches
 
 ! For conditionals, an assoc of child node # --> constraint
@@ -116,7 +110,7 @@ M: #phi propagate-before ( #phi -- )
             [
                 drop condition-value get
                 [ [ =t ] [ =t ] bi* <--> ]
-                [ [ =f ] [ =f ] bi* <--> ] 2bi /\
+                [ [ =f ] [ =f ] bi* <--> ] 2bi 2array
             ]
         }
         {
@@ -124,14 +118,14 @@ M: #phi propagate-before ( #phi -- )
             [
                 drop condition-value get
                 [ [ =t ] [ =f ] bi* <--> ]
-                [ [ =f ] [ =t ] bi* <--> ] 2bi /\
+                [ [ =f ] [ =t ] bi* <--> ] 2bi 2array
             ]
         }
         {
             { { t f } { f } }
             [
                 first =t
-                condition-value get =t /\
+                condition-value get =t 2array
                 swap t-->
             ]
         }
@@ -139,7 +133,7 @@ M: #phi propagate-before ( #phi -- )
             { { f } { t f } }
             [
                 second =t
-                condition-value get =f /\
+                condition-value get =f 2array
                 swap t-->
             ]
         }
@@ -147,7 +141,7 @@ M: #phi propagate-before ( #phi -- )
             { { t f } { t } }
             [
                 first =f
-                condition-value get =t /\
+                condition-value get =t 2array
                 swap f-->
             ]
         }
@@ -155,7 +149,7 @@ M: #phi propagate-before ( #phi -- )
             { { t } { t f } }
             [
                 second =f
-                condition-value get =f /\
+                condition-value get =f 2array
                 swap f-->
             ]
         }
@@ -164,7 +158,7 @@ M: #phi propagate-before ( #phi -- )
             [
                 first
                 [ [ =t ] bi@ <--> ]
-                [ [ =f ] bi@ <--> ] 2bi /\
+                [ [ =f ] bi@ <--> ] 2bi 2array
                 0 include-child-constraints
             ]
         }
@@ -173,7 +167,7 @@ M: #phi propagate-before ( #phi -- )
             [
                 second
                 [ [ =t ] bi@ <--> ]
-                [ [ =f ] bi@ <--> ] 2bi /\
+                [ [ =f ] bi@ <--> ] 2bi 2array
                 1 include-child-constraints
             ]
         }

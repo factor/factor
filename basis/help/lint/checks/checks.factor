@@ -3,11 +3,10 @@
 USING: accessors arrays assocs classes classes.struct
 classes.tuple combinators combinators.short-circuit debugger
 definitions effects eval formatting fry grouping help
-help.markup help.topics io io.streams.string kernel macros
+help.markup help.topics io io.streams.string kernel macros math
 namespaces sequences sequences.deep sets splitting strings
-summary unicode.categories vocabs vocabs.loader words
-words.constant words.symbol ;
-FROM: sets => members ;
+summary tools.destructors unicode.categories vocabs
+vocabs.loader words words.constant words.symbol ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
@@ -17,11 +16,11 @@ M: simple-lint-error summary message>> ;
 M: simple-lint-error error. summary print ;
 
 SYMBOL: vocabs-quot
-SYMBOL: all-vocabs
+SYMBOL: all-vocabs-list
 SYMBOL: vocab-articles
 
 : check-example ( element -- )
-    ! [
+    [
         '[
             _ rest [
                 but-last "\n" join
@@ -29,10 +28,10 @@ SYMBOL: vocab-articles
                 "\n" ?tail drop
             ] keep
             last assert=
-        ] vocabs-quot get call( quot -- ) ;
-    ! ] leaks members length [
-    !     "%d disposable(s) leaked in example" sprintf simple-lint-error
-    ! ] unless-zero ;
+        ] vocabs-quot get call( quot -- )
+    ] leaks members length [
+        "%d disposable(s) leaked in example" sprintf simple-lint-error
+    ] unless-zero ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;
@@ -110,7 +109,7 @@ SYMBOL: vocab-articles
     [ "$see-also are not unique" simple-lint-error ] unless ;
 
 : vocab-exists? ( name -- ? )
-    [ lookup-vocab ] [ all-vocabs get member? ] bi or ;
+    [ lookup-vocab ] [ all-vocabs-list get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [
@@ -157,7 +156,7 @@ SYMBOL: vocab-articles
             dup struct-class? [ struct-slots ] [ all-slots ] if
             [ name>> ] map
         ] [ extract-slots ] bi*
-        [ swap member? not ] with filter [
+        [ swap member? ] with reject [
             ", " join "Described $slot does not exist: " prepend
             simple-lint-error
         ] unless-empty
@@ -199,7 +198,7 @@ SYMBOL: vocab-articles
     } cleave ;
 
 : files>vocabs ( -- assoc )
-    vocabs
+    loaded-vocab-names
     [ [ [ vocab-docs-path ] keep ] H{ } map>assoc ]
     [ [ [ vocab-source-path ] keep ] H{ } map>assoc ]
     bi assoc-union ;

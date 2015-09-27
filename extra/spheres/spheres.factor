@@ -32,7 +32,7 @@ main()
 {
     float distance_factor = (gl_FragCoord.z * 0.5 + 0.5);
     distance_factor = pow(distance_factor, 500.0)*0.5;
-    
+
     gl_FragColor = checker_color(object_position)
         ? mix(checker_color_1, checker_color_2, distance_factor)
         : mix(checker_color_2, checker_color_1, distance_factor);
@@ -52,9 +52,9 @@ main()
 {
     world_position = gl_ModelViewMatrix * vec4(center, 1);
     sphere_position = gl_Vertex.xyz;
-    
+
     gl_Position = gl_ProjectionMatrix * (world_position + vec4(sphere_position * radius, 0));
-    
+
     vcolor = surface_color;
     vradius = radius;
 }
@@ -73,7 +73,7 @@ sphere_color(vec3 point, vec3 normal)
     vec3 transformed_light_position = (gl_ModelViewMatrix * vec4(light_position, 1)).xyz;
     vec3 direction = normalize(transformed_light_position - point);
     float d = max(0.0, dot(normal, direction));
-    
+
     return ambient * vcolor + diffuse * vec4(d * vcolor.rgb, vcolor.a);
 }
 ;
@@ -176,7 +176,7 @@ M: spheres-world begin-world
     { "GL_EXT_framebuffer_object" } require-gl-extensions
     GL_DEPTH_TEST glEnable
     GL_VERTEX_ARRAY glEnableClientState
-    0.15 0.15 1.0 1.0 glClearColor 
+    0.15 0.15 1.0 1.0 glClearColor
     20.0 10.0 20.0 set-demo-orientation
     (plane-program) >>plane-program
     (solid-sphere-program) >>solid-sphere-program
@@ -200,7 +200,7 @@ M: spheres-world end-world
     program "center" glGetAttribLocation center first3 glVertexAttrib3f
     program "radius" glGetAttribLocation radius glVertexAttrib1f
     { -1.0 -1.0 } { 2.0 2.0 } gl-fill-rect ;
-    
+
 :: (draw-colored-sphere) ( program center radius surfacecolor -- )
     program "surface_color" glGetAttribLocation surfacecolor first4 glVertexAttrib4f
     program center radius (draw-sphere) ;

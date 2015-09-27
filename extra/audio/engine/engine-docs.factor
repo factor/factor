@@ -19,7 +19,7 @@ HELP: <audio-orientation-state>
 
 HELP: <standard-audio-engine>
 { $values
-    
+
     { "engine" audio-engine }
 }
 { $description "Constructs an " { $link audio-engine } " instance by calling " { $link <audio-engine> } " with the default values of " { $link f } " for the " { $snippet "device-name" } " and 16 for the " { $snippet "voice-count" } ". The engine is returned in the stopped state; to start audio processing, use " { $link start-audio } " or " { $link start-audio* } "." } ;
@@ -80,7 +80,7 @@ HELP: audio-gain
 HELP: audio-listener
 { $class-description "A tuple class that trivially implements the " { $link "audio.engine-listener" } " with accessors on its tuple slots."
 { $list
-    { { $snippet "position" } " provides the " { $link audio-position } "." } 
+    { { $snippet "position" } " provides the " { $link audio-position } "." }
     { { $snippet "gain" } " provides the " { $link audio-gain } "." }
     { { $snippet "velocity" } " provides the " { $link audio-velocity } "." }
     { { $snippet "orientation" } " provides the " { $link audio-orientation } "." }
@@ -91,7 +91,7 @@ HELP: audio-orientation
     { "listener" "an object implementing the " { $link "audio.engine-listener" } }
     { "orientation" audio-orientation }
 }
-{ $description "Returns the orientation of the listener. The orientation must be returned in an " { $snippet "audio-orientation" } " tuple with the following slots:" 
+{ $description "Returns the orientation of the listener. The orientation must be returned in an " { $snippet "audio-orientation" } " tuple with the following slots:"
 { $list
     { { $snippet "forward" } " is a 3-component vector indicating the direction the listener is facing." }
     { { $snippet "up" } " is a 3-component vector indicating the \"up\" direction for the listener. This vector does not need to be normal to the " { $snippet "forward" } " vector." }
@@ -121,7 +121,7 @@ HELP: audio-rolloff
 HELP: audio-source
 { $class-description "A tuple class that trivially implements the " { $link "audio.engine-sources" } " with accessors on its tuple slots."
 { $list
-    { { $snippet "position" } " provides the " { $link audio-position } "." } 
+    { { $snippet "position" } " provides the " { $link audio-position } "." }
     { { $snippet "gain" } " provides the " { $link audio-gain } "." }
     { { $snippet "velocity" } " provides the " { $link audio-velocity } "." }
     { { $snippet "relative?" } " provides the " { $link audio-relative? } " value." }

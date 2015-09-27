@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors assocs destructors
 db.tuples db.types furnace.cache ;
-FROM: assocs => change-at ;
 IN: furnace.scopes
 
 TUPLE: scope < server-state namespace changed? ;
@@ -20,7 +19,7 @@ scope f
     t >>changed? drop ;
 
 : scope-get ( key scope -- value )
-    dup [ namespace>> at ] [ 2drop f ] if ;
+    [ namespace>> at ] [ drop f ] if* ;
 
 : scope-set ( value key scope -- )
     [ namespace>> set-at ] [ scope-changed ] bi ;

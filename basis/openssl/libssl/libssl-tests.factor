@@ -29,15 +29,15 @@ IN: openssl.libssl.tests
     new-ctx SSL_new ;
 
 ! Test default options
-[ { f f f f f } ] [ new-ctx all-opts [ has-opt ] with map ] unit-test
+{ { f f f f f } } [ new-ctx all-opts [ has-opt ] with map ] unit-test
 
 ! Test setting options
-[ 5 ] [
+{ 5 } [
     new-ctx all-opts [ [ set-opt ] [ has-opt ] 2bi ] with map [ t = ] count
 ] unit-test
 
 ! Initial state
-[ { "before/connect initialization" "read header" 1 f } ] [
+{ { "before/connect initialization" "read header" 1 f } } [
     new-ssl {
         SSL_state_string_long
         SSL_rstate_string_long

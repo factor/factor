@@ -32,10 +32,6 @@ M: fail summary drop "Matching failed" ;
     [ dupd "pop-length" set-word-prop ] dip
     "pop-inverse" set-word-prop ;
 
-ERROR: no-inverse word ;
-M: no-inverse summary
-    drop "The word cannot be used in pattern matching" ;
-
 ERROR: bad-math-inverse ;
 
 : next ( revquot -- revquot* first )
@@ -79,7 +75,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     if ;
 
 : fold ( quot -- folded-quot )
-    [ { } [ fold-word ] reduce % ] [ ] make ; 
+    [ { } [ fold-word ] reduce % ] [ ] make ;
 
 ERROR: no-recursive-inverse ;
 
@@ -89,7 +85,7 @@ SYMBOL: visited
     { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
         [ word-prop ] with any? not
-    ] } 1&& ; 
+    ] } 1&& ;
 
 : flatten ( quot -- expanded )
     [
@@ -132,7 +128,7 @@ M: pop-inverse inverse
 : [undo] ( quot -- undo )
     flatten fold reverse [ (undo) ] [ ] make ;
 
-MACRO: undo ( quot -- ) [undo] ;
+MACRO: undo ( quot -- quot ) [undo] ;
 
 ! Inverse of selected words
 
@@ -219,7 +215,7 @@ DEFER: __
 \ first4 [ 4array ] define-inverse
 
 \ prefix \ unclip define-dual
-\ suffix [ dup but-last swap last ] define-inverse
+\ suffix \ unclip-last define-dual
 
 \ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
 \ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse
@@ -281,7 +277,7 @@ DEFER: __
 : [matches?] ( quot -- undoes?-quot )
     [undo] dup infer [ true-out ] [ false-recover ] bi curry ;
 
-MACRO: matches? ( quot -- ? ) [matches?] ;
+MACRO: matches? ( quot -- quot' ) [matches?] ;
 
 ERROR: no-match ;
 M: no-match summary drop "Fall through in switch" ;
@@ -294,4 +290,4 @@ M: no-match summary drop "Fall through in switch" ;
     reverse [ [ [undo] ] dip compose ] { } assoc>map
     recover-chain ;
 
-MACRO: switch ( quot-alist -- ) [switch] ;
+MACRO: switch ( quot-alist -- quot ) [switch] ;

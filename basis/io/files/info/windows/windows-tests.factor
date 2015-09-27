@@ -3,4 +3,4 @@
 USING: tools.test io.files.info.windows system kernel ;
 IN: io.files.info.windows.tests
 
-[ ] [ vm file-times 3drop ] unit-test
+[ ] [ vm-path file-times 3drop ] unit-test

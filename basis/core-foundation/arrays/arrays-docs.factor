@@ -8,4 +8,3 @@ HELP: CF>array
 HELP: <CFArray>
 { $values { "seq" "a sequence of " { $link alien } " instances" } { "alien" "a " { $snippet "CFArray" } } }
 { $description "Creates a Core Foundation array from a Factor array." } ;
-

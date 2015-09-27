@@ -36,7 +36,7 @@ IN: mason.build
     copy-image
     save-git-id ;
 
-: build ( -- )
+: do-build ( -- )
     create-build-dir
     enter-build-dir
     [
@@ -51,4 +51,4 @@ IN: mason.build
     ] [ cleanup-build ] [ ] cleanup
     notify-idle ;
 
-MAIN: build
+MAIN: do-build

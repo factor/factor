@@ -31,6 +31,7 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <sstream>
 #include <string>
 
 #define FACTOR_STRINGIZE_I(x) #x
@@ -86,17 +87,18 @@ namespace factor { struct factor_vm; }
 
 /* Factor headers */
 #include "assert.hpp"
+#include "debug.hpp"
 #include "layouts.hpp"
 #include "platform.hpp"
 #include "utilities.hpp"
 #include "primitives.hpp"
 #include "segments.hpp"
 #include "gc_info.hpp"
+#include "errors.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
 #include "objects.hpp"
 #include "sampling_profiler.hpp"
-#include "errors.hpp"
 #include "bignumint.hpp"
 #include "bignum.hpp"
 #include "booleans.hpp"
@@ -107,23 +109,19 @@ namespace factor { struct factor_vm; }
 #include "mark_bits.hpp"
 #include "free_list.hpp"
 #include "fixup.hpp"
-#include "tuples.hpp"
 #include "free_list_allocator.hpp"
 #include "write_barrier.hpp"
 #include "object_start_map.hpp"
-#include "nursery_space.hpp"
 #include "aging_space.hpp"
 #include "tenured_space.hpp"
 #include "data_heap.hpp"
 #include "code_heap.hpp"
 #include "gc.hpp"
-#include "strings.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
 #include "image.hpp"
 #include "callbacks.hpp"
 #include "dispatch.hpp"
-#include "entry_points.hpp"
 #include "safepoints.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
@@ -134,12 +132,7 @@ namespace factor { struct factor_vm; }
 #include "callstack.hpp"
 #include "slot_visitor.hpp"
 #include "collector.hpp"
-#include "copying_collector.hpp"
-#include "nursery_collector.hpp"
-#include "aging_collector.hpp"
 #include "to_tenured_collector.hpp"
-#include "code_block_visitor.hpp"
-#include "full_collector.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
 #include "byte_arrays.hpp"

@@ -1,16 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs math math.intervals kernel accessors
-sequences namespaces classes classes.algebra
-combinators words combinators.short-circuit
-compiler.tree
-compiler.tree.propagation.info
-compiler.tree.propagation.copy ;
+USING: accessors arrays assocs classes.algebra
+compiler.tree.propagation.copy compiler.tree.propagation.info
+kernel namespaces sequences ;
 IN: compiler.tree.propagation.constraints
 
-! A constraint is a statement about a value.
-
-! Maps constraints to constraints ("A implies B")
 SYMBOL: constraints
 
 GENERIC: assume* ( constraint -- )
@@ -18,14 +12,10 @@ GENERIC: satisfied? ( constraint -- ? )
 
 M: f assume* drop ;
 
-! satisfied? is inaccurate. It's just used to prevent infinite
-! loops so its only implemented for true-constraints and
-! false-constraints.
 M: object satisfied? drop f ;
 
 : assume ( constraint -- ) dup satisfied? [ drop ] [ assume* ] if ;
 
-! Boolean constraints
 TUPLE: true-constraint value ;
 
 : =t ( value -- constraint ) resolve-copy true-constraint boa ;
@@ -55,7 +45,6 @@ M: false-constraint satisfied?
     value>> value-info*
     [ class>> false-class? ] [ drop f ] if ;
 
-! Class constraints
 TUPLE: class-constraint value class ;
 
 : is-instance-of ( value class -- constraint )
@@ -64,7 +53,6 @@ TUPLE: class-constraint value class ;
 M: class-constraint assume*
     [ class>> <class-info> ] [ value>> ] bi refine-value-info ;
 
-! Interval constraints
 TUPLE: interval-constraint value interval ;
 
 : is-in-interval ( value interval -- constraint )
@@ -73,7 +61,6 @@ TUPLE: interval-constraint value interval ;
 M: interval-constraint assume*
     [ interval>> <interval-info> ] [ value>> ] bi refine-value-info ;
 
-! Literal constraints
 TUPLE: literal-constraint value literal ;
 
 : is-equal-to ( value literal -- constraint )
@@ -82,7 +69,6 @@ TUPLE: literal-constraint value literal ;
 M: literal-constraint assume*
     [ literal>> <literal-info> ] [ value>> ] bi refine-value-info ;
 
-! Implication constraints
 TUPLE: implication p q ;
 
 C: --> implication
@@ -97,7 +83,6 @@ C: --> implication
 M: implication assume*
     [ q>> ] [ p>> ] bi assume-implication ;
 
-! Equivalence constraints
 TUPLE: equivalence p q ;
 
 C: <--> equivalence
@@ -110,9 +95,6 @@ M: equivalence assume*
 ! Conjunction constraints -- sequences act as conjunctions
 M: sequence assume* [ assume ] each ;
 
-: /\ ( p q -- constraint ) 2array ;
-
-! Utilities
 : t--> ( constraint boolean-value -- constraint' ) =t swap --> ;
 
 : f--> ( constraint boolean-value -- constraint' ) =f swap --> ;

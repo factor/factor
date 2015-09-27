@@ -4,9 +4,8 @@ USING: alien alien.c-types assocs combinators
 compiler.cfg.intrinsics compiler.codegen.gc-maps
 compiler.codegen.labels compiler.codegen.relocation
 compiler.constants cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.features kernel locals math
-sequences specialized-arrays system vocabs ;
-FROM: layouts => cell cells ;
+cpu.x86.assembler.operands cpu.x86.features kernel layouts locals
+math sequences specialized-arrays system vocabs ;
 SPECIALIZED-ARRAY: uint
 IN: cpu.x86.64
 
@@ -32,7 +31,7 @@ M: x86.64 frame-reg RBP ;
 
 M: x86.64 machine-registers
     {
-        { int-regs { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 } }
+        { int-regs { RAX RBX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 } }
         { float-regs {
             XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
             XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15
@@ -41,9 +40,6 @@ M: x86.64 machine-registers
 
 : vm-reg ( -- reg ) R13 ; inline
 : nv-reg ( -- reg ) RBX ; inline
-
-M: x86.64 %mov-vm-ptr ( reg -- )
-    vm-reg MOV ;
 
 M: x86.64 %vm-field ( dst offset -- )
     [ vm-reg ] dip [+] MOV ;
@@ -93,13 +89,13 @@ M: x86.64 %discard-reg-param ( rep reg -- )
 
 M:: x86.64 %unbox ( dst src func rep -- )
     param-reg-0 src tagged-rep %copy
-    param-reg-1 %mov-vm-ptr
+    param-reg-1 vm-reg MOV
     func f f %c-invoke
     dst rep %load-return ;
 
 M:: x86.64 %box ( dst src func rep gc-map -- )
     0 rep reg-class-of cdecl param-regs at nth src rep %copy
-    rep int-rep? os windows? or param-reg-1 param-reg-0 ? %mov-vm-ptr
+    rep int-rep? os windows? or param-reg-1 param-reg-0 ? vm-reg MOV
     func f gc-map %c-invoke
     dst int-rep %load-return ;
 
@@ -108,12 +104,12 @@ M: x86.64 %c-invoke
     gc-map-here ;
 
 M: x86.64 %begin-callback ( -- )
-    param-reg-0 %mov-vm-ptr
+    param-reg-0 vm-reg MOV
     param-reg-1 0 MOV
     "begin_callback" f f %c-invoke ;
 
 M: x86.64 %end-callback ( -- )
-    param-reg-0 %mov-vm-ptr
+    param-reg-0 vm-reg MOV
     "end_callback" f f %c-invoke ;
 
 M: x86.64 %prepare-var-args ( -- ) RAX RAX XOR ;

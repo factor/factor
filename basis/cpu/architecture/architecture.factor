@@ -231,8 +231,8 @@ HOOK: %load-vector cpu ( reg val rep -- )
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
 HOOK: %replace-imm cpu ( src loc -- )
-HOOK: %inc-d cpu ( n -- )
-HOOK: %inc-r cpu ( n -- )
+HOOK: %clear cpu ( loc -- )
+HOOK: %inc cpu ( loc -- )
 
 HOOK: stack-frame-size cpu ( stack-frame -- n )
 HOOK: %call cpu ( word -- )
@@ -271,6 +271,7 @@ HOOK: %not     cpu ( dst src -- )
 HOOK: %neg     cpu ( dst src -- )
 HOOK: %log2    cpu ( dst src -- )
 HOOK: %bit-count cpu ( dst src -- )
+HOOK: %bit-test cpu ( dst src1 src2 temp -- )
 
 HOOK: %copy cpu ( dst src rep -- )
 
@@ -590,9 +591,6 @@ HOOK: %unbox-long-long cpu ( dst1 dst2 src func -- )
 
 HOOK: %local-allot cpu ( dst size align offset -- )
 
-! Call a function to convert a value into a tagged pointer,
-! possibly allocating a bignum, float, or alien instance,
-! which is then pushed on the data stack
 HOOK: %box cpu ( dst src func rep gc-map -- )
 
 HOOK: %box-long-long cpu ( dst src1 src2 func gc-map -- )
@@ -605,7 +603,7 @@ HOOK: %alien-invoke cpu ( reg-inputs stack-inputs reg-outputs dead-outputs clean
 
 HOOK: %alien-indirect cpu ( src reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map -- )
 
-HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map -- )
+HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
 
 HOOK: %callback-inputs cpu ( reg-outputs stack-outputs -- )
 

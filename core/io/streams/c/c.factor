@@ -5,6 +5,16 @@ destructors io io.backend io.encodings.utf8 io.files kernel
 kernel.private math sequences threads.private ;
 IN: io.streams.c
 
+PRIMITIVE: (fopen) ( path mode -- alien )
+PRIMITIVE: fclose ( alien -- )
+PRIMITIVE: fflush ( alien -- )
+PRIMITIVE: fgetc ( alien -- byte/f )
+PRIMITIVE: fputc ( byte alien -- )
+PRIMITIVE: fread-unsafe ( n buf alien -- count )
+PRIMITIVE: fseek ( alien offset whence -- )
+PRIMITIVE: ftell ( alien -- n )
+PRIMITIVE: fwrite ( data length alien -- )
+
 TUPLE: c-stream < disposable handle ;
 
 : new-c-stream ( handle class -- c-stream )
@@ -43,7 +53,7 @@ M: c-reader stream-read1
 : read-until-loop ( handle seps accum -- accum ch )
     pick fgetc dup [
         pick dupd member-eq?
-        [ [ 2drop ] 2dip ] [ over push read-until-loop ] if
+        [ [ 2drop ] 2dip ] [ suffix! read-until-loop ] if
     ] [
         [ 2drop ] 2dip
     ] if ; inline recursive
@@ -83,10 +93,10 @@ M: c-io-backend (file-appender)
     "ab" fopen <c-writer> ;
 
 : show ( msg -- )
-    #! A word which directly calls primitives. It is used to
-    #! print stuff from contexts where the I/O system would
-    #! otherwise not work (tools.deploy.shaker, the I/O
-    #! multiplexer thread).
+    ! A word which directly calls primitives. It is used to
+    ! print stuff from contexts where the I/O system would
+    ! otherwise not work (tools.deploy.shaker, the I/O
+    ! multiplexer thread).
     "\n" append >byte-array dup length
     stdout-handle fwrite
     stdout-handle fflush ;

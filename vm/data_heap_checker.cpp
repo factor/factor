@@ -58,39 +58,28 @@ struct slot_checker {
   }
 
   void operator()(cell* slot_ptr) {
-    if (!immediate_p(*slot_ptr)) {
-      generation target = generation_of(parent, untag<object>(*slot_ptr));
-      switch (gen) {
-        case nursery_generation:
-          break;
-        case aging_generation:
-          if (target == nursery_generation)
-            check_write_barrier(slot_ptr, target, card_points_to_nursery);
-          break;
-        case tenured_generation:
-          if (target == nursery_generation)
-            check_write_barrier(slot_ptr, target, card_points_to_nursery);
-          else if (target == aging_generation)
-            check_write_barrier(slot_ptr, target, card_points_to_aging);
-          break;
+    if (immediate_p(*slot_ptr))
+      return;
+
+    generation target = generation_of(parent, untag<object>(*slot_ptr));
+    if (gen == aging_generation && target == nursery_generation) {
+      check_write_barrier(slot_ptr, target, card_points_to_nursery);
+    } else if (gen == tenured_generation) {
+      if (target == nursery_generation) {
+        check_write_barrier(slot_ptr, target, card_points_to_nursery);
+      } else if (target == aging_generation) {
+        check_write_barrier(slot_ptr, target, card_points_to_aging);
       }
     }
   }
 };
 
-struct object_checker {
-  factor_vm* parent;
-
-  explicit object_checker(factor_vm* parent) : parent(parent) {}
-
-  void operator()(object* obj) {
-    slot_checker checker(parent, obj, generation_of(parent, obj));
-    obj->each_slot(checker);
-  }
-};
-
 void factor_vm::check_data_heap() {
-  object_checker checker(this);
+  auto checker = [&](object* obj){
+    generation obj_gen = generation_of(this, obj);
+    slot_checker s_checker(this, obj, obj_gen);
+    obj->each_slot(s_checker);
+  };
   each_object(checker);
 }
 

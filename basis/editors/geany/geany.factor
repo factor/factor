@@ -1,22 +1,27 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: editors fry kernel make math.parser namespaces system
-vocabs ;
+USING: combinators.short-circuit editors fry io.standard-paths
+kernel make math.parser namespaces system vocabs ;
 IN: editors.geany
 
 SINGLETON: geany
 geany editor-class set-global
 
-HOOK: geany-path os ( -- path )
+SYMBOL: geany-path
 
-M: unix geany-path
-    \ geany-path get-global [ "geany" ] unless* ;
+HOOK: find-geany-path os ( -- path )
+
+M: unix find-geany-path "geany" ;
+
+M: windows find-geany-path
+    {
+        [ { "Geany" } "geany.exe" find-in-applications ]
+        [ "Geany.exe" ]
+    } 0|| ;
 
 M: geany editor-command
     '[
-        geany-path ,
+        geany-path get [ find-geany-path ] unless* ,
         _ ,
         "--line" , _ number>string ,
     ] { } make ;
-
-os windows? [ "editors.geany.windows" require ] when

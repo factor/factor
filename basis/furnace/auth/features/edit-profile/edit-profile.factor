@@ -26,7 +26,7 @@ IN: furnace.auth.features.edit-profile
                 { "realname" [ [ v-one-line ] v-optional ] }
                 { "password" [ ] }
                 { "new-password" [ [ v-password ] v-optional ] }
-                { "verify-password" [ [ v-password ] v-optional ] } 
+                { "verify-password" [ [ v-password ] v-optional ] }
                 { "email" [ [ v-email ] v-optional ] }
             } validate-params
 

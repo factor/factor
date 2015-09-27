@@ -11,4 +11,3 @@ IN: sorting.heap
     { "fred" "wilma" "pebbles" "dino" "barney" "betty" "bamm-bamm" }
     [ length ] heapsort-with
 ] unit-test
-

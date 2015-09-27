@@ -37,7 +37,7 @@ M: bad-probabilities summary
         cond>quot
     ] [ bad-probabilities ] if ;
 
-MACRO: (casep) ( assoc -- ) (casep>quot) ;
+MACRO: (casep) ( assoc -- quot ) (casep>quot) ;
 
 : casep>quot ( assoc -- quot )
     (casep>quot) [ random-unit ] prepend ;
@@ -62,11 +62,11 @@ MACRO: (casep) ( assoc -- ) (casep>quot) ;
 
 PRIVATE>
 
-MACRO: casep ( assoc -- ) casep>quot ;
+MACRO: casep ( assoc -- quot ) casep>quot ;
 
-MACRO: casep* ( assoc -- ) direct>conditional casep>quot ;
+MACRO: casep* ( assoc -- quot ) direct>conditional casep>quot ;
 
-MACRO: call-random ( seq -- ) call-random>casep casep>quot ;
+MACRO: call-random ( seq -- quot ) call-random>casep casep>quot ;
 
-MACRO: execute-random ( seq -- )
+MACRO: execute-random ( seq -- quot )
     [ 1quotation ] map call-random>casep casep>quot ;

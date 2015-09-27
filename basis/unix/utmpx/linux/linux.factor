@@ -14,4 +14,3 @@ M: linux utmpx>utmpx-record ( utmpx -- utmpx-record )
         [ ut_tv>>   timeval>unix-time >>timestamp ]
         [ ut_host>> __UT_HOSTSIZE memory>string >>host ]
     } cleave ;
-

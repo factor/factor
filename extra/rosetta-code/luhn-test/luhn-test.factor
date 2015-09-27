@@ -69,4 +69,3 @@ IN: rosetta-code.luhn-test
 
 : luhn? ( n -- ? )
     luhn-digit 0 = ;
-

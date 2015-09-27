@@ -20,4 +20,3 @@ LIBRARY: clutter.gtk
 >>
 
 GIR: GtkClutter-1.0.gir
-

@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser effects.parser kernel sequences words effects
-combinators assocs definitions quotations namespaces memoize
-accessors fry compiler.units ;
+USING: accessors combinators compiler.units definitions effects
+effects.parser fry kernel memoize words ;
 IN: macros
 
 <PRIVATE
@@ -10,10 +9,15 @@ IN: macros
 : real-macro-effect ( effect -- effect' )
     in>> { "quot" } <effect> ;
 
+: check-macro-effect ( word effect -- )
+    [ real-macro-effect ] keep 2dup effect=
+    [ 3drop ] [ bad-stack-effect ] if ;
+
 PRIVATE>
 
 : define-macro ( word definition effect -- )
-    real-macro-effect {
+    {
+        [ nip check-macro-effect ]
         [
             [ '[ _ _ call-effect ] ] keep
             [ memoize-quot '[ @ call ] ] keep

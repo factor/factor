@@ -13,7 +13,7 @@ IN: compiler.tree.tuple-unboxing.tests
     analyze-recursive
     normalize
     propagate
-    cleanup
+    cleanup-tree
     escape-analysis
     unbox-tuples
     check-nodes ;
@@ -45,11 +45,11 @@ TUPLE: empty-tuple ;
 : bleach-node ( quot: ( ..a -- ..b ) -- )
     [ bleach-node ] curry [ ] compose impeach-node ; inline recursive
 
-[ ] [ [ [ ] bleach-node ] test-unboxing ] unit-test
+{ } [ [ [ ] bleach-node ] test-unboxing ] unit-test
 
 TUPLE: box { i read-only } ;
 
 : box-test ( m -- n )
     dup box-test i>> swap box-test drop box boa ; inline recursive
 
-[ ] [ [ T{ box f 34 } box-test i>> ] test-unboxing ] unit-test
+{ } [ [ T{ box f 34 } box-test i>> ] test-unboxing ] unit-test

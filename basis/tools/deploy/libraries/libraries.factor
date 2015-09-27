@@ -8,4 +8,3 @@ HOOK: find-library-file os ( file -- path )
 os windows?
 "tools.deploy.libraries.windows"
 "tools.deploy.libraries.unix" ? require
-

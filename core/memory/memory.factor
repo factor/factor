@@ -4,6 +4,16 @@ USING: alien.strings io.backend kernel memory.private sequences
 system ;
 IN: memory
 
+PRIMITIVE: all-instances ( -- array )
+PRIMITIVE: compact-gc ( -- )
+PRIMITIVE: gc ( -- )
+PRIMITIVE: minor-gc ( -- )
+PRIMITIVE: size ( obj -- n )
+
+<PRIVATE
+PRIMITIVE: (save-image) ( path1 path2 then-die? -- )
+PRIVATE>
+
 : instances ( quot -- seq )
     [ all-instances ] dip filter ; inline
 
@@ -12,9 +22,9 @@ IN: memory
     [ native-string>alien ] bi@ ;
 
 : save-image ( path -- )
-    normalize-path saving-path (save-image) ;
+    normalize-path saving-path f (save-image) ;
 
 : save-image-and-exit ( path -- )
-    normalize-path saving-path (save-image-and-exit) ;
+    normalize-path saving-path t (save-image) ;
 
-: save ( -- ) image save-image ;
+: save ( -- ) image-path save-image ;

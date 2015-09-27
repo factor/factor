@@ -1,13 +1,11 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
-cpu.architecture fry kernel layouts locals make math sequences
-compiler.cfg.instructions
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.value-numbering.folding
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.utilities compiler.cfg.value-numbering.folding
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite cpu.architecture fry kernel
+layouts locals make math ;
 IN: compiler.cfg.value-numbering.math
 
 : f-insn? ( insn -- ? )

@@ -7,7 +7,7 @@ io.files.info io.directories io.pathnames io.encodings.binary
 fry xml.entities destructors urls html xml.syntax
 html.templates.fhtml http http.server http.server.responses
 http.server.redirection xml.writer ;
-FROM: sets => adjoin ;
+QUALIFIED: sets
 IN: http.server.static
 
 TUPLE: file-responder root hook special index-names allow-listings ;
@@ -102,7 +102,7 @@ M: file-responder call-responder* ( path responder -- response )
     [ drop <400> ] [ "/" join serve-object ] if ;
 
 : add-index ( name responder -- )
-    index-names>> adjoin ;
+    index-names>> sets:adjoin ;
 
 : serve-fhtml ( path -- response )
     <fhtml> <html-content> ;

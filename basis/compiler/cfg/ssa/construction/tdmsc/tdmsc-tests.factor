@@ -1,8 +1,6 @@
 USING: accessors arrays compiler.cfg compiler.cfg.debugger
-compiler.cfg.dominance compiler.cfg.predecessors
-compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities kernel namespaces
-sequences sets tools.test vectors ;
-FROM: namespaces => set ;
+compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities
+kernel namespaces sequences sets tools.test ;
 IN: compiler.cfg.ssa.construction.tdmsc.tests
 
 : test-tdmsc ( -- )
@@ -22,12 +20,12 @@ V{ } 5 test-bb
 3 4 edge
 4 5 edge
 
-[ ] [ test-tdmsc ] unit-test
+{ } [ test-tdmsc ] unit-test
 
-[ { 4 } ] [ 1 get 1array merge-set [ number>> ] map ] unit-test
-[ { 4 } ] [ 2 get 1array merge-set [ number>> ] map ] unit-test
-[ { } ] [ 0 get 1array merge-set ] unit-test
-[ { } ] [ 4 get 1array merge-set ] unit-test
+{ { 4 } } [ 1 get 1array merge-set [ number>> ] map ] unit-test
+{ { 4 } } [ 2 get 1array merge-set [ number>> ] map ] unit-test
+{ { } } [ 0 get 1array merge-set ] unit-test
+{ { } } [ 4 get 1array merge-set ] unit-test
 
 V{ } 0 test-bb
 V{ } 1 test-bb
@@ -44,9 +42,9 @@ V{ } 6 test-bb
 4 6 edge
 5 6 edge
 
-[ ] [ test-tdmsc ] unit-test
+{ } [ test-tdmsc ] unit-test
 
-[ t ] [
+{ t } [
     2 get 3 get 2array merge-set
     4 get 6 get 2array set=
 ] unit-test
@@ -68,7 +66,7 @@ V{ } 7 test-bb
 4 5 edge
 5 2 edge
 
-[ ] [ test-tdmsc ] unit-test
+{ } [ test-tdmsc ] unit-test
 
-[ { 2 } ] [ { 2 3 4 5 } [ get ] map merge-set [ number>> ] map ] unit-test
-[ { } ] [ { 0 1 6 7 } [ get ] map merge-set ] unit-test
+{ { 2 } } [ { 2 3 4 5 } [ get ] map merge-set [ number>> ] map ] unit-test
+{ { } } [ { 0 1 6 7 } [ get ] map merge-set ] unit-test

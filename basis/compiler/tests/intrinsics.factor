@@ -288,7 +288,7 @@ cell 8 = [
 cell 8 = [
     [ t ] [ 1 58 fixnum-shift dup [ fixnum+ ] compile-call 1 59 fixnum-shift = ] unit-test
     [ -576460752303423489 ] [ 1 59 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
-    
+
     [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-call 1 80 shift = ] unit-test
     [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-call 1 80 shift neg = ] unit-test
     [ t ] [ 1 40 shift neg 1 40 shift neg [ fixnum* ] compile-call 1 80 shift = ] unit-test

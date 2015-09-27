@@ -65,7 +65,7 @@ ERROR: unknown-endian-c-type symbol ;
                     [ alien-unsigned-4 4 f byte-reverse 32 shift ]
                     [ 4 + alien-unsigned-4 4 f byte-reverse ] 2bi bitor
                 ]
-            ] dip [ [ 64 >signed ] compose ] when 
+            ] dip [ [ 64 >signed ] compose ] when
             >>getter drop
         ]
         [ '[ [ [ _ _ byte-reverse ] 2dip ] prepose ] change-setter ] 3bi
@@ -160,4 +160,3 @@ SYNTAX: LE-PACKED-STRUCT:
 SYNTAX: BE-PACKED-STRUCT:
     parse-struct-definition
     big-endian define-endian-packed-struct-class ;
-

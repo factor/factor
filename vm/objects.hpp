@@ -44,7 +44,7 @@ enum special_object {
   JIT_SAFEPOINT,
   JIT_EPILOG,
   JIT_RETURN,
-  JIT_PROFILING,
+  JIT_UNUSED,
   JIT_PUSH_IMMEDIATE,
   JIT_DIP_WORD,
   JIT_DIP,
@@ -55,7 +55,8 @@ enum special_object {
   JIT_EXECUTE,
   JIT_DECLARE_WORD,
 
-  /* External entry points */
+  /* External entry points. These are defined in the files in
+     bootstrap/assembler/ */
   C_TO_FACTOR_WORD = 43,
   LAZY_JIT_COMPILE_WORD,
   UNWIND_NATIVE_FRAMES_WORD,
@@ -63,14 +64,14 @@ enum special_object {
   SET_FPU_STATE_WORD,
   SIGNAL_HANDLER_WORD,
   LEAF_SIGNAL_HANDLER_WORD,
-  FFI_SIGNAL_HANDLER_WORD,
-  FFI_LEAF_SIGNAL_HANDLER_WORD,
+  WIN_EXCEPTION_HANDLER,
+  UNUSED2,
 
   /* Incremented on every modify-code-heap call; invalidates call( inline
      caching */
   REDEFINITION_COUNTER = 52,
 
-  /* Callback stub generation in callbacks.c */
+  /* Callback stub generation in callbacks.cpp */
   CALLBACK_STUB = 53,
 
   /* Polymorphic inline cache generation in inline_cache.c */
@@ -121,15 +122,12 @@ inline static bool save_special_p(cell i) {
 }
 
 template <typename Iterator> void object::each_slot(Iterator& iter) {
-  cell scan = (cell)this;
-  cell payload_start = binary_payload_start();
-  cell end = scan + payload_start;
+  cell* start = (cell*)this + 1;
+  cell* end = start + slot_count();
 
-  scan += sizeof(cell);
-
-  while (scan < end) {
-    iter((cell*)scan);
-    scan += sizeof(cell);
+  while (start < end) {
+    iter(start);
+    start++;
   }
 }
 

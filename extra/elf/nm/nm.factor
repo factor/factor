@@ -15,10 +15,10 @@ IN: elf.nm
         } case "%-16s " printf
     ]
     [ name>> "%s\n" printf ] tri ;
-    
+
 : elf-nm ( path -- )
     [
         sections dup ".symtab" find-section
-        symbols [ name>> empty? not ] filter
+        symbols [ name>> empty? ] reject
         [ print-symbol ] with each
     ] with-mapped-elf ;

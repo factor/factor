@@ -27,4 +27,3 @@ HELP: type>class
 { $values { "n" "a non-negative integer" } { "class" class } }
 { $description "Outputs a builtin class whose instances are precisely those having a given pointer tag." }
 { $notes "The parameter " { $snippet "n" } " must be between 0 and the return value of " { $link num-types } "." } ;
-

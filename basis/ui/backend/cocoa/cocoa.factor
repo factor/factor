@@ -80,16 +80,16 @@ M: pasteboard set-clipboard-contents
     [ 0 0 ] dip dim>> first2 <CGRect> ;
 
 : auto-position ( window loc -- )
-    #! Note: if this is the initial window, the length of the windows
-    #! vector should be 1, since (open-window) calls auto-position
-    #! after register-window.
+    ! Note: if this is the initial window, the length of the windows
+    ! vector should be 1, since (open-window) calls auto-position
+    ! after register-window.
     dup { 0 0 } = [
-        first2 <CGPoint> -> setFrameTopLeftPoint:
-!        windows get-global length 1 <= [ -> center ] [
-!            windows get-global last second window-loc>>
-!            dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
-!            -> setFrameTopLeftPoint:
-!        ] if
+        drop
+        ui-windows get-global length 1 <= [ -> center ] [
+            ui-windows get-global last second window-loc>>
+            dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
+            -> setFrameTopLeftPoint:
+        ] if
     ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 M: cocoa-ui-backend set-title ( string world -- )
@@ -103,7 +103,7 @@ M: cocoa-ui-backend set-title ( string world -- )
 
 : exit-fullscreen ( world -- )
     handle>>
-    [ view>> f -> exitFullScreenModeWithOptions: ] 
+    [ view>> f -> exitFullScreenModeWithOptions: ]
     [ [ window>> ] [ view>> ] bi -> makeFirstResponder: drop ] bi ;
 
 M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
@@ -232,10 +232,8 @@ M: cocoa-ui-backend system-alert
     ] [ 2drop ] if* ;
 
 CLASS: FactorApplicationDelegate < NSObject
-[
-    METHOD: void applicationDidUpdate: id obj
-    [ reset-run-loop ]
-]
+    METHOD: void applicationDidUpdate: id obj [ reset-thread-timer ] ;
+;
 
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
@@ -254,7 +252,7 @@ M: cocoa-ui-backend (with-ui)
             start-ui
             stop-io-thread
             init-thread-timer
-            reset-run-loop
+            reset-thread-timer
             NSApp -> run
         ] ui-running
     ] with-cocoa ;
@@ -263,4 +261,3 @@ cocoa-ui-backend ui-backend set-global
 
 M: cocoa-ui-backend ui-backend-available?
     running.app? ;
-

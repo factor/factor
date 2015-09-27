@@ -1,17 +1,32 @@
-USING: compiler.cfg.stacks.local help.markup help.syntax math sequences ;
+USING: compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks.local compiler.tree help.markup help.syntax math
+sequences ;
 IN: compiler.cfg.stacks
+
+HELP: ds-push
+{ $values { "vreg" "a virtual register" } }
+{ $description "Used when translating the " { $link #push } " SSA node to CFG form for pushing a literal value onto the data stack." } ;
 
 HELP: begin-stack-analysis
 { $description "Initializes a set of variables related to stack analysis of Factor words." }
-{ $see-also current-height } ;
+{ $see-also height-state } ;
+
+HELP: end-stack-analysis
+{ $description "Ends the stack analysis of the current cfg. This is the last step of the cfg construction (but comes before all optimization passes)." } ;
 
 HELP: adjust-d
 { $values { "n" number } }
-{ $description "Changes the height of the current data stack." } ;
+{ $description "Changes the height of the current data stack. This word is called when other instructions which internally adjust the stack height are emitted, such as " { $link ##call } " and " { $link ##alien-invoke } "." } ;
 
-HELP: rs-store
-{ $values { "vregs" "a " { $link sequence } " of vregs." } }
-{ $description "Stores one or more virtual register values on the retain stack. This modifies the " { $link current-height } " dynamic variable." } ;
+HELP: ds-drop
+{ $description "Used to signal to the stack analysis that the datastacks height is decreased by one." } ;
+
+HELP: store-vregs
+{ $values
+  { "vregs" "a " { $link sequence } " of vregs" }
+  { "loc-class" "either " { $link ds-loc } " or " { $link rs-loc } }
+}
+{ $description "Stores one or more virtual register values on the data or retain stack. The " { $link replaces } " dynamic variable is modified but the " { $link height-state } " is not touched" } ;
 
 HELP: 2inputs
 { $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } }

@@ -51,5 +51,4 @@ ARTICLE: "cocoa-application-utils" "Cocoa application utilities"
     with-cocoa
 } ;
 
-IN: cocoa.application
 ABOUT: "cocoa-application-utils"

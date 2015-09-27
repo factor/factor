@@ -25,7 +25,7 @@ M: bad-tr summary
     { { byte-array } { string } } set-specializer ;
 
 : create-tr ( token -- word )
-    create-in dup tr-hints ;
+    create-word-in dup tr-hints ;
 
 : tr-quot ( mapping -- quot )
     '[ [ dup ascii? [ _ tr-nth ] when ] map ] ;

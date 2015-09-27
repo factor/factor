@@ -1,6 +1,9 @@
-USING: arrays classes combinators help.markup help.syntax
-kernel.private layouts math quotations words ;
+USING: alien arrays classes combinators help.markup help.syntax
+kernel.private layouts math quotations system words ;
 IN: kernel
+
+HELP: WIN-EXCEPTION-HANDLER
+{ $description "This special object is an " { $link alien } " containing a pointer to the processes global exception handler. Only applicable on " { $link windows } "." } ;
 
 HELP: eq?
 { $values { "obj1" object } { "obj2" object } { "?" boolean } }
@@ -26,7 +29,7 @@ HELP: -rot  $complex-shuffle ;
 HELP: dupd  $complex-shuffle ;
 HELP: swapd $complex-shuffle ;
 
-HELP: datastack
+HELP: get-datastack
 { $values { "array" array } }
 { $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
@@ -34,7 +37,7 @@ HELP: set-datastack
 { $values { "array" array } }
 { $description "Replaces the data stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: retainstack
+HELP: get-retainstack
 { $values { "array" array } }
 { $description "Outputs an array containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
@@ -42,9 +45,15 @@ HELP: set-retainstack
 { $values { "array" array } }
 { $description "Replaces the retain stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: callstack
+HELP: get-callstack
 { $values { "callstack" callstack } }
-{ $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
+{ $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included. Each group of three elements in the callstack is frame:"
+  { $list
+    "The first element is the executing word or quotation."
+    "The second element is the executing quotation."
+    "The third element is the offset in the executing quotation, or -1 if the offset can't be determined."
+  }
+} ;
 
 HELP: set-callstack
 { $values { "callstack" callstack } }
@@ -56,6 +65,9 @@ HELP: clear
 HELP: build
 { $values { "n" integer } }
 { $description "The current build number. Factor increments this number whenever a new boot image is created." } ;
+
+HELP: leaf-signal-handler
+{ $description "A word called by the VM when a VM error occurs." } ;
 
 HELP: hashcode*
 { $values { "depth" integer } { "obj" object } { "code" fixnum } }
@@ -713,7 +725,7 @@ HELP: declare
 
 HELP: tag
 { $values { "object" object } { "n" "a tag number" } }
-{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class-of } " instead." } ;
 
 HELP: special-object
 { $values { "n" "a non-negative integer" } { "obj" object } }

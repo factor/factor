@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences namespaces ui.gadgets.frames
-ui.pens.image ui.gadgets.icons ui.gadgets.grids ui.gadgets.theme ;
+USING: accessors kernel namespaces sequences ui.gadgets.frames
+ui.gadgets.grids ui.gadgets.icons ui.gadgets.theme ;
 IN: ui.gadgets.corners
 
 CONSTANT: @center { 1 1 }

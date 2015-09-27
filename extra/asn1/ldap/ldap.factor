@@ -17,7 +17,7 @@ CONSTANT: SearchScope_WholeSubtree    2
                      }
                 }
                 { "constructed"
-                    H{ 
+                    H{
                         { 0 "array" }   ! BindRequest
                         { 1 "array" }   ! BindResponse
                         { 2 "array" }   ! UnbindRequest

@@ -7,7 +7,7 @@ HELP: best-holdem-hand
 { $examples
     { $example "USING: kernel poker prettyprint ;"
         "HAND{ AS KD JC KH 2D 2S KC } best-holdem-hand drop value>hand-name ."
-        """"Full House""""
+        "\"Full House\""
     }
 } ;
 

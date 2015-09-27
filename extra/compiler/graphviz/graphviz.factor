@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors compiler.tree.builder compiler.cfg compiler.cfg.rpo
-compiler.cfg.dominance compiler.cfg.dominance.private
-compiler.cfg.predecessors compiler.cfg.debugger compiler.cfg.optimizer
-compiler.cfg.utilities compiler.tree.recursive images.viewer
-images.png io io.encodings.ascii io.files io.files.unique io.launcher
-kernel math.parser sequences assocs arrays make math namespaces
-quotations combinators locals words ;
-FROM: assocs => change-at ;
+USING: accessors arrays assocs combinators compiler.cfg
+compiler.cfg.debugger compiler.cfg.dominance
+compiler.cfg.dominance.private compiler.cfg.rpo
+compiler.tree.builder compiler.tree.recursive graphviz.render io
+io.encodings.ascii io.files io.files.unique io.launcher kernel
+make math math.parser namespaces quotations sequences words ;
+QUALIFIED: assocs
 IN: compiler.graphviz
 
 : quotes ( str -- str' ) "\"" "\"" surround ;
@@ -24,7 +23,7 @@ IN: compiler.graphviz
     "cfg" ".dot" make-unique-file
     dup "Wrote " prepend print
     [ [ concat ] dip ascii set-file-lines ]
-    [ { "dot" "-Tpng" "-O" } swap suffix try-process ]
+    [ [ ?default-graphviz-program "-Tpng" "-O" ] dip 4array try-process ]
     [ ".png" append ]
     tri ; inline
 
@@ -90,7 +89,7 @@ IN: compiler.graphviz
 : dom-trees ( cfgs -- )
     [
         [
-            needs-dominance drop
+            needs-dominance
             dom-childrens get [
                 [
                     bb-edge,
@@ -108,7 +107,8 @@ SYMBOL: vertex-names
 : vertex-name ( call-graph-node -- string )
     label>> vertex-names get [
         word>> name>>
-        dup word-counts get [ 0 or 1 + dup ] change-at number>string " #" glue
+        dup word-counts get [ 0 or 1 + dup ] assocs:change-at
+        number>string " #" glue
     ] cache ;
 
 : vertex-attrs ( obj -- string )
@@ -125,7 +125,7 @@ SYMBOL: vertex-names
         {
             [ { } call-graph-edge, ]
             [ [ vertex-name ] [ label>> loop?>> { "shape=box" } { } ? ] bi node-style, ]
-            [ [ vertex-name ] [ calls>> ] bi (call-graph-back-edges) ] 
+            [ [ vertex-name ] [ calls>> ] bi (call-graph-back-edges) ]
             [ [ vertex-name ] [ children>> ] bi (call-graph-edges) ]
         } cleave
     ] with each ;

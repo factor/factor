@@ -47,7 +47,7 @@ M: unrolled-list clear-deque
         unroll-factor 0 <array>
         [ unroll-factor 1 - swap set-nth ] keep f
     ] dip [ node boa dup ] keep
-    dup [ prev<< ] [ 2drop ] if ; inline
+    [ prev<< ] [ drop ] if* ; inline
 
 : normalize-back ( list -- )
     dup back>> [
@@ -93,7 +93,7 @@ M: unrolled-list pop-front*
     [
         unroll-factor 0 <array> [ set-first ] keep
     ] dip [ f node boa dup ] keep
-    dup [ next<< ] [ 2drop ] if ; inline
+    [ next<< ] [ drop ] if* ; inline
 
 : normalize-front ( list -- )
     dup front>> [

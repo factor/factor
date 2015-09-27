@@ -71,7 +71,7 @@ exponent =
 sign =
     "+" => [[ f ]] | "-"
 digit-sequence = [0-9]+ => [[ >string ]]
-wsp = (" " | "\t" | "\r" | "\n")
+wsp = [ \t\r\n]
 
 transform-list = wsp* transforms?:t wsp*
     => [[ t [ identity-transform ] unless* ]]
@@ -214,7 +214,7 @@ fractional-constant = digit-sequence? "." digit-sequence | digit-sequence "."
 exponent = ( "e" | "E" ) sign? digit-sequence
 sign = "+" => [[ drop f ]] | "-"
 digit-sequence = [0-9]+ => [[ >string ]]
-wsp = (" " | "\t" | "\r" | "\n")
+wsp = [ \t\r\n]
 
 svg-path = wsp* moveto-drawto-command-groups?:x wsp* => [[ x ]]
 

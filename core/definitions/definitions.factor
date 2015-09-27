@@ -29,9 +29,6 @@ SYMBOL: new-words
 : new-word ( word -- )
     new-words get add-to-unit ;
 
-: new-word? ( word -- ? )
-    new-words get in? ;
-
 GENERIC: where ( defspec -- loc )
 
 M: object where drop f ;
@@ -45,7 +42,8 @@ SYMBOL: forgotten-definitions
 : forgotten-definition ( defspec -- )
     forgotten-definitions get add-to-unit ;
 
-: forget ( defspec -- ) [ forgotten-definition ] [ forget* ] bi ;
+: forget ( defspec -- )
+    [ forgotten-definition ] [ forget* ] bi ;
 
 M: f forget* drop ;
 

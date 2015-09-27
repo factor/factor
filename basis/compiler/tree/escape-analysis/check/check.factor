@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.tuple math math.private accessors sequences
-combinators.short-circuit kernel compiler.tree
-compiler.tree.combinators compiler.tree.propagation.info ;
+USING: accessors classes classes.tuple combinators.short-circuit
+compiler.tree compiler.tree.propagation.info kernel math
+sequences ;
 IN: compiler.tree.escape-analysis.check
 
 GENERIC: run-escape-analysis* ( node -- ? )

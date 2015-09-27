@@ -1,16 +1,14 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
-classes.intersection classes.mixin classes.predicate classes.singleton
-classes.tuple classes.union combinators definitions effects generic
-generic.single generic.standard generic.hook io io.pathnames
+classes.error classes.intersection classes.mixin
+classes.predicate classes.singleton classes.tuple classes.union
+combinators definitions effects generic generic.hook
+generic.single generic.standard io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections sequences sets slots sorting strings summary
-words words.symbol words.constant words.alias vocabs ;
-FROM: namespaces => set ;
-FROM: classes => members ;
-RENAME: members sets => set-members
+prettyprint.sections sequences sets slots sorting strings
+summary vocabs words words.alias words.constant words.symbol ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -55,7 +53,7 @@ M: word print-stack-effect? drop t ;
         [ seeing-word ]
         [ definer. ]
         [ pprint-word ]
-        [ stack-effect. ] 
+        [ stack-effect. ]
     } cleave ;
 
 M: word synopsis* word-synopsis ;
@@ -142,17 +140,17 @@ GENERIC: see-class* ( word -- )
 M: union-class see-class*
     <colon \ UNION: pprint-word
     dup pprint-word
-    members pprint-elements pprint-; block> ;
+    class-members pprint-elements pprint-; block> ;
 
 M: intersection-class see-class*
     <colon \ INTERSECTION: pprint-word
     dup pprint-word
-    participants pprint-elements pprint-; block> ;
+    class-participants pprint-elements pprint-; block> ;
 
 M: mixin-class see-class*
     <block \ MIXIN: pprint-word
     dup pprint-word <block
-    dup members [
+    dup class-members [
         hard add-line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
     ] with each block> block> ;
@@ -161,7 +159,7 @@ M: predicate-class see-class*
     <colon \ PREDICATE: pprint-word
     dup pprint-word
     "<" text
-    dup superclass pprint-word
+    dup superclass-of pprint-word
     <block
     "predicate-definition" word-prop pprint-elements
     pprint-; block> block> ;
@@ -203,7 +201,7 @@ M: array pprint-slot-name
     \ final declaration. ;
 
 : superclass. ( class -- )
-    superclass dup tuple eq? [ drop ] [ "<" text pprint-word ] if ;
+    superclass-of dup tuple eq? [ drop ] [ "<" text pprint-word ] if ;
 
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word
@@ -239,9 +237,21 @@ M: word see*
         [ drop ] [ call-next-method ] if
     ] tri ;
 
+M: error-class see-class*
+    <colon \ ERROR: pprint-word
+    {
+        [ pprint-word ]
+        [ superclass. ]
+        [ <block "slots" word-prop [ name>> pprint-slot-name ] each block> pprint-; ]
+        [ tuple-declarations. ]
+    } cleave
+    block> ;
+
+M: error-class see* see-class ;
+
 : seeing-implementors ( class -- seq )
     dup implementors
-    [ [ reader? ] [ writer? ] bi or not ] filter
+    [ [ reader? ] [ writer? ] bi or ] reject
     [ lookup-method ] with map
     natural-sort ;
 
@@ -258,7 +268,7 @@ PRIVATE>
         dup class? [ dup seeing-implementors % ] when
         dup generic? [ dup seeing-methods % ] when
         drop
-    ] { } make set-members ;
+    ] { } make members ;
 
 : see-methods ( word -- )
     methods see-all nl ;

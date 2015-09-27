@@ -1,13 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel sets namespaces accessors assocs
-arrays combinators continuations columns math vectors
-grouping stack-checker.branches
-compiler.tree
-compiler.tree.def-use
-compiler.tree.recursive
-compiler.tree.combinators ;
-FROM: namespaces => set ;
+USING: accessors arrays assocs columns combinators compiler.tree
+compiler.tree.combinators compiler.tree.def-use
+compiler.tree.recursive continuations grouping kernel math
+namespaces sequences sets vectors ;
 IN: compiler.tree.checker
 
 ! Check some invariants; this can help catch compiler bugs.
@@ -16,7 +12,11 @@ ERROR: check-use-error value message ;
 
 : check-use ( value uses -- )
     [ empty? [ "No use" check-use-error ] [ drop ] if ]
-    [ all-unique? [ drop ] [ "Uses not all unique" check-use-error ] if ] 2bi ;
+    [
+        all-unique?
+        [ drop ]
+        [ "Uses not all unique" check-use-error ] if
+    ] 2bi ;
 
 : check-def-use ( -- )
     def-use get [ uses>> check-use ] assoc-each ;

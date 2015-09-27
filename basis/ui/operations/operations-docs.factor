@@ -30,7 +30,7 @@ $nl
 } } ;
 
 HELP: operation-gesture
-{ $values { "operation" operation } { "gesture" "a gesture or " { $link f } } }
+{ $values { "operation" operation } { "gesture" { $maybe "a gesture" } } }
 { $description "Outputs the keyboard gesture associated with the operation." } ;
 
 HELP: operations

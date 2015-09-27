@@ -46,14 +46,14 @@ M: growable set-length ( n seq -- )
     ] if
     length<< ;
 
-: new-size ( old -- new ) 1 + 3 * ; inline
+: new-size ( old -- new ) 1 + 2 * ; inline
 
 : ensure ( n seq -- n seq )
     bounds-check-head
     2dup length >= [
         2dup capacity >= [ over new-size over expand ] when
         [ integer>fixnum ] dip
-        over 1 fixnum+fast over length<<
+        over 1 fixnum+fast >>length
     ] [
         [ integer>fixnum ] dip
     ] if ; inline

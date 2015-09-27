@@ -4,9 +4,13 @@ continuations formatting fry generalizations hashtables.identity
 io kernel kernel.private layouts locals math math.parser
 math.statistics math.vectors memory namespaces prettyprint
 sequences sequences.generalizations sets sorting ;
-FROM: sequences => change-nth ;
-FROM: assocs => change-at ;
 IN: tools.profiler.sampling
+
+<PRIVATE
+PRIMITIVE: (get-samples) ( -- samples/f )
+PRIMITIVE: profiling ( ? -- )
+PRIMITIVE: (clear-samples) ( -- )
+PRIVATE>
 
 SYMBOL: samples-per-second
 
@@ -95,7 +99,7 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
 
 :: (collect-subtrees) ( samples max-depth depth child-quot: ( samples -- child ) -- children )
     max-depth depth > [
-        samples [ sample-callstack leaf-callstack? not ] filter
+        samples [ sample-callstack leaf-callstack? ] reject
         [ f ] [ child-quot call ] if-empty
     ] [ f ] if ; inline
 
@@ -144,7 +148,7 @@ PRIVATE>
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
     samples [| sample |
-        sample sample-callstack members [ ignore-word? not ] filter [
+        sample sample-callstack members [ ignore-word? ] reject [
             per-word-samples sample counts+at
         ] each
     ] each
@@ -154,7 +158,7 @@ PRIVATE>
     [ total-time>> ] same? ;
 
 : trim-flat ( root-node -- root-node' )
-    dup '[ [ nip _ redundant-flat-node? not ] assoc-filter ] change-children ;
+    dup '[ [ nip _ redundant-flat-node? ] assoc-reject ] change-children ;
 
 PRIVATE>
 

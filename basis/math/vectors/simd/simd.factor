@@ -9,7 +9,6 @@ QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
 ERROR: bad-simd-length got expected ;
-
 ERROR: bad-simd-vector obj ;
 
 <<

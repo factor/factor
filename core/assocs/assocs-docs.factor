@@ -151,6 +151,8 @@ $nl
     assoc-map
     assoc-filter
     assoc-filter-as
+    assoc-reject
+    assoc-reject-as
     assoc-partition
     assoc-any?
     assoc-all?
@@ -159,16 +161,20 @@ $nl
 { $subsections
     sift-keys
     sift-values
+    harvest-keys
+    harvest-values
 }
 "Mapping between assocs and sequences:"
 { $subsections
     map>assoc
+    map>alist
     assoc>map
     assoc-map-as
 }
 "Destructive combinators:"
 { $subsections
     assoc-filter!
+    assoc-reject!
     cache
     2cache
 } ;
@@ -300,6 +306,21 @@ HELP: assoc-filter!
 
 { assoc-filter assoc-filter-as assoc-filter! } related-words
 
+HELP: assoc-reject
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "subassoc" "a new assoc" } }
+{ $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields false." } ;
+
+HELP: assoc-reject-as
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
+{ $description "Outputs an assoc of the same type as " { $snippet "exemplar" } " consisting of all entries for which the predicate quotation yields false." } ;
+
+HELP: assoc-reject!
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } }
+{ $description "Removes all entries for which the predicate quotation yields false." }
+{ $side-effects "assoc" } ;
+
+{ assoc-reject assoc-reject-as assoc-reject! } related-words
+
 HELP: assoc-partition
 { $values
     { "assoc" assoc } { "quot" quotation }
@@ -325,11 +346,42 @@ HELP: assoc-subset?
 
 HELP: sift-keys
 { $values { "assoc" assoc } { "assoc'" "a new assoc" } }
-{ $description "Outputs an assoc removing keys that are " { $link f } "." } ;
+{ $description "Outputs an assoc removing keys that are " { $link f } "." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 2 } { f 3 } } sift-keys ."
+        "H{ { 1 2 } }" }
+} ;
 
 HELP: sift-values
 { $values { "assoc" assoc } { "assoc'" "a new assoc" } }
-{ $description "Outputs an assoc removing values that are " { $link f } "." } ;
+{ $description "Outputs an assoc removing values that are " { $link f } "." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 f } { 3 4 } } sift-values ."
+        "H{ { 3 4 } }" }
+} ;
+
+{ sift-keys sift-values harvest-keys harvest-values } related-words
+
+HELP: harvest-keys
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing keys that are empty sequences." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { { 2 } 1 } { { } 3 } } harvest-keys ."
+        "H{ { { 2 } 1 } }" }
+} ;
+
+HELP: harvest-values
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing values that are empty sequences." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 { } } { 3 { 4 } } } harvest-values ."
+        "H{ { 3 { 4 } } }" }
+} ;
+
 
 HELP: assoc=
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
@@ -342,16 +394,16 @@ HELP: assoc-hashcode
 { $notes "Custom assoc implementations should use this word to implement a method for the " { $link hashcode* } " generic word." } ;
 
 HELP: assoc-stack
-{ $values { "key" "a key" } { "seq" "a sequence of assocs" } { "value" "a value or " { $link f } } }
+{ $values { "key" "a key" } { "seq" "a sequence of assocs" } { "value" { $maybe "a value" } } }
 { $description "Searches for the key in successive elements of the sequence, starting from the end. If an assoc containing the key is found, the associated value is output. If no assoc contains the key, outputs " { $link f } "." }
 { $notes "This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed assoc -- the innermost scope -- will be searched first." } ;
 
 HELP: value-at*
-{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } { "?" boolean } }
+{ $values { "value" object } { "assoc" assoc } { "key/f" { $maybe "the key associated to the value" } } { "?" boolean } }
 { $description "Looks up the key associated with a value. The boolean flag can decide between the case of a missing key, and a key of " { $link f } "." } ;
 
 HELP: value-at
-{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } }
+{ $values { "value" object } { "assoc" assoc } { "key/f" { $maybe "the key associated to the value" } } }
 { $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." } ;
 
 HELP: value?
@@ -359,7 +411,7 @@ HELP: value?
 { $description "Tests if an assoc contains at least one key with the given value." } ;
 
 HELP: delete-at*
-{ $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" boolean } }
+{ $values { "key" "a key" } { "assoc" assoc } { "old" { $maybe "the previous value" } } { "?" boolean } }
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
 
@@ -419,6 +471,12 @@ HELP: 2cache
 HELP: map>assoc
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "exemplar" assoc } { "assoc" "a new assoc" } }
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new assoc having the same type as " { $snippet "exemplar" } "." } ;
+
+HELP: map>alist
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "alist" "a new alist" } }
+{ $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new alist." } ;
+
+{ map>assoc map>alist } related-words
 
 HELP: assoc>map
 { $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... elt ) } } { "exemplar" sequence } { "seq" "a new sequence" } }

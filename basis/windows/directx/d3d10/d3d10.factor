@@ -681,7 +681,7 @@ STRUCT: D3D10_TEX2D_ARRAY_RTV
     { MipSlice        UINT }
     { FirstArraySlice UINT }
     { ArraySize       UINT } ;
-    
+
 STRUCT: D3D10_TEX2DMS_ARRAY_RTV
     { FirstArraySlice UINT }
     { ArraySize       UINT } ;

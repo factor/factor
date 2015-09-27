@@ -1,37 +1,20 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators hashtables kernel
-math fry namespaces make sequences words byte-arrays
-layouts alien.c-types
-stack-checker.inlining cpu.architecture
-compiler.tree
-compiler.tree.builder
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.cfg
-compiler.cfg.hats
-compiler.cfg.utilities
-compiler.cfg.registers
-compiler.cfg.intrinsics
-compiler.cfg.comparisons
-compiler.cfg.stack-frame
-compiler.cfg.instructions
-compiler.cfg.predecessors
-compiler.cfg.builder.blocks
-compiler.cfg.stacks
-compiler.cfg.stacks.local ;
+USING: accessors arrays assocs combinators compiler.cfg
+compiler.cfg.builder.blocks compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.intrinsics compiler.cfg.registers
+compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
+compiler.cfg.utilities cpu.architecture fry kernel make math namespaces
+sequences words ;
 IN: compiler.cfg.builder
-
-! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is
-! constructed later by calling compiler.cfg.ssa.construction:construct-ssa.
 
 SYMBOL: procedures
 SYMBOL: loops
 
 : begin-cfg ( word label -- cfg )
-    initial-basic-block
     H{ } clone loops set
-    [ basic-block get ] 2dip <cfg> dup cfg set ;
+    <basic-block> dup set-basic-block <cfg> dup cfg set ;
 
 : begin-procedure ( word label -- )
     begin-cfg procedures get push ;
@@ -64,6 +47,7 @@ GENERIC: emit-node ( node -- )
 
 : (build-cfg) ( nodes word label -- )
     [
+
         begin-word
         emit-nodes
     ] with-cfg-builder ;
@@ -78,17 +62,14 @@ GENERIC: emit-node ( node -- )
 : emit-loop-call ( basic-block -- )
     ##safepoint,
     ##branch,
-    basic-block get successors>> push
+    basic-block get swap connect-bbs
     end-basic-block ;
 
 : emit-call ( word height -- )
     over loops get key?
     [ drop loops get at emit-loop-call ]
     [
-        [
-            [ ##call, ] [ adjust-d ] bi*
-            make-kill-block
-        ] emit-trivial-block
+        [ emit-call-block ] emit-trivial-block
     ] if ;
 
 ! #recursive
@@ -111,7 +92,7 @@ M: #recursive emit-node
     dup label>> loop?>> [ emit-loop ] [ emit-recursive ] if ;
 
 ! #if
-: emit-branch ( obj -- final-bb )
+: emit-branch ( obj -- pair/f )
     [ emit-nodes ] with-branch ;
 
 : emit-if ( node -- )
@@ -152,22 +133,18 @@ M: #if emit-node
         [ emit-actual-if ]
     } cond ;
 
-! #dispatch
 M: #dispatch emit-node
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
     ! though.
     ds-pop ^^offset>slot next-vreg ##dispatch, emit-if ;
 
-! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
     [ emit-intrinsic ] [ swap call-height emit-call ] if ;
 
-! #call-recursive
 M: #call-recursive emit-node [ label>> id>> ] [ call-height ] bi emit-call ;
 
-! #push
 M: #push emit-node
     literal>> ^^load-literal ds-push ;
 
@@ -178,26 +155,25 @@ M: #push emit-node
 ! the accuracy of global stack analysis.
 
 : make-input-map ( #shuffle -- assoc )
-    ! Assoc maps high-level IR values to stack locations.
-    [
-        [ in-d>> <reversed> [ <ds-loc> swap ,, ] each-index ]
-        [ in-r>> <reversed> [ <rs-loc> swap ,, ] each-index ] bi
-    ] H{ } make ;
+    [ in-d>> ds-loc ] [ in-r>> rs-loc ] bi
+    [ over length stack-locs zip ] 2bi@ append ;
 
-: make-output-seq ( values mapping input-map -- vregs )
-    '[ _ at _ at peek-loc ] map ;
+: height-changes ( #shuffle -- height-changes )
+    { [ out-d>> ] [ in-d>> ] [ out-r>> ] [ in-r>> ] } cleave
+    4array [ length ] map first4 [ - ] 2bi@ 2array ;
 
-: load-shuffle ( #shuffle mapping input-map -- ds-vregs rs-vregs )
-    [ [ out-d>> ] 2dip make-output-seq ]
-    [ [ out-r>> ] 2dip make-output-seq ] 3bi ;
+: store-height-changes ( #shuffle -- )
+    height-changes { ds-loc rs-loc } [ new swap >>n inc-stack ] 2each ;
 
-: store-shuffle ( #shuffle ds-vregs rs-vregs -- )
-    [ [ in-d>> length neg inc-d ] dip ds-store ]
-    [ [ in-r>> length neg inc-r ] dip rs-store ]
-    bi-curry* bi ;
+: extract-outputs ( #shuffle -- seq )
+    [ out-d>> ds-loc 2array ] [ out-r>> rs-loc 2array ] bi 2array ;
+
+: out-vregs/stack ( #shuffle -- seq )
+    [ make-input-map ] [ mapping>> ] [ extract-outputs ] tri
+    [ first2 [ [ of of peek-loc ] 2with map ] dip 2array ] 2with map ;
 
 M: #shuffle emit-node
-    dup dup [ mapping>> ] [ make-input-map ] bi load-shuffle store-shuffle ;
+    [ out-vregs/stack ] keep store-height-changes [ first2 store-vregs ] each ;
 
 ! #return
 : end-word ( -- )

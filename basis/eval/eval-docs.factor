@@ -48,11 +48,11 @@ $nl
 { $heading "Example" }
 "In this example, a string is evaluated with a fictional " { $snippet "cad.objects" } " vocabulary in the search path by default, together with the listener's " { $link interactive-vocabs } "; the quotation is expected to produce a sequence on the stack:"
 { $code
-    """USING: eval listener vocabs.parser ;
+    "USING: eval listener vocabs.parser ;
 [
-    "cad.objects" use-vocab
+    \"cad.objects\" use-vocab
     ( -- seq ) (eval)
-] with-interactive-vocabs"""
+] with-interactive-vocabs"
 }
 "Note that the search path in the outer code (set by the " { $link POSTPONE: USING: } " form) has no relation to the search path used when parsing the string parameter (this is determined by " { $link with-interactive-vocabs } " and " { $link use-vocab } ")." ;
 

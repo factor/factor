@@ -35,7 +35,7 @@ HELP: inspector-stack
 { $var-description "If the inspector is running, this variable holds previously-inspected objects." } ;
 
 HELP: &push
-{ $values { "obj" object } } 
+{ $values { "obj" object } }
 { $description "If the inspector is running, outputs the object currently being inspected." } ;
 
 HELP: inspector

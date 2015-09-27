@@ -11,7 +11,7 @@ TUPLE: rpc-request args vocabspec wordname ;
     serialize flush deserialize dup no-vocab? [ throw ] when ;
 
 :: define-remote ( str effect addrspec vocabspec -- )
-    str create-in effect [ in>> length ] [ out>> length ] bi
+    str create-word-in effect [ in>> length ] [ out>> length ] bi
     '[ _ narray vocabspec str rpc-request boa addrspec 9012 <inet> binary
     [ "doer" serialize send-with-check ] with-client _ firstn ]
     effect define-declared ;

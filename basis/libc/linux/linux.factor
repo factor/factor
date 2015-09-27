@@ -170,7 +170,7 @@ ALIAS:    SIGPOLL         SIGIO
 CONSTANT: SIGPWR          30
 CONSTANT: SIGSYS          31
 
-FUNCTION: c-string strerror_r ( int errno, char* buf, size_t buflen ) ;
+FUNCTION: c-string strerror_r ( int errno, char* buf, size_t buflen )
 
 M: linux strerror ( errno -- str )
     [

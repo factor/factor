@@ -106,6 +106,7 @@
     ($code . fuel-markup--code)
     ($command . fuel-markup--command)
     ($command-map . fuel-markup--null)
+    ($complex-shuffle . fuel-markup--complex-shuffle)
     ($contract . fuel-markup--contract)
     ($curious . fuel-markup--curious)
     ($definition . fuel-markup--definition)
@@ -128,6 +129,7 @@
     ($markup-example . fuel-markup--markup-example)
     ($maybe . fuel-markup--maybe)
     ($methods . fuel-markup--methods)
+    ($next-link . (lambda (e) (fuel-markup--prefixed-link "Next:" e)))
     ($nl . fuel-markup--newline)
     ($notes . fuel-markup--notes)
     ($operation . fuel-markup--link)
@@ -135,6 +137,7 @@
     ($parsing-note . fuel-markup--parsing-note)
     ($predicate . fuel-markup--predicate)
     ($prettyprinting-note . fuel-markup--prettyprinting-note)
+    ($prev-link . (lambda (e) (fuel-markup--prefixed-link "Prev:" e)))
     ($quotation . fuel-markup--quotation)
     ($references . fuel-markup--references)
     ($related . fuel-markup--related)
@@ -465,6 +468,15 @@
     (fuel-markup--list
      (cons '$list (mapcar (lambda (a) (list '$link a a 'author)) authors)))))
 
+(defun fuel-markup--complex-shuffle (e)
+  (fuel-markup--description
+   `($description "Shuffle word. Rearranges the top of the datastack as "
+                  "indicated in the stack effect pattern."))
+  (fuel-markup--elem-with-heading
+   `(nil "The data flow represented by this shuffle word can be more clearly "
+         "expressed using " ($vocab-link "Lexical variables" "locals") ".")
+   "This word is deprecated"))
+
 (defun fuel-markup--list (e)
   (fuel-markup--insert-nl-if-nb)
   (dolist (elt (cdr e))
@@ -611,6 +623,11 @@
 (defun fuel-markup--prettyprinting-note (e)
   (fuel-markup--print '($notes ("This word should only be called within the "
                                 ($link with-pprint) " combinator."))))
+
+(defun fuel-markup--prefixed-link (prefix e)
+  (insert (format "  %s " prefix))
+  (fuel-markup--link e)
+  (newline))
 
 (defun fuel-markup--elem-with-heading (elem heading)
   (fuel-markup--insert-heading heading)

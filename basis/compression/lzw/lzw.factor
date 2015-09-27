@@ -38,8 +38,6 @@ ERROR: code-size-zero ;
         BV{ } clone >>output
         reset-lzw-uncompress ;
 
-ERROR: not-in-table value ;
-
 : lookup-old-code ( lzw -- vector )
     [ old-code>> ] [ table>> ] bi nth ;
 

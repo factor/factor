@@ -100,8 +100,8 @@ M: arm-backend %epilogue ( n -- )
     [ compile-dlsym ] keep dup 0 <+> LDR ;
 
 M: arm-backend %profiler-prologue ( -- )
-    #! We can clobber R0 here since it is undefined at the start
-    #! of a word.
+    ! We can clobber R0 here since it is undefined at the start
+    ! of a word.
     R12 load-indirect
     R0 R12 profile-count-offset <+> LDR
     R0 R0 1 v>operand ADD
@@ -112,7 +112,7 @@ M: arm-backend %call-label ( label -- ) BL ;
 M: arm-backend %jump-label ( label -- ) B ;
 
 : %prepare-primitive ( -- )
-    #! Save stack pointer to stack_chain->callstack_top, load XT
+    ! Save stack pointer to stack_chain->callstack_top, load XT
     R1 SP 4 SUB ;
 
 M: arm-backend %call-primitive ( word -- )
@@ -132,7 +132,7 @@ M: arm-backend %jump-t ( label -- )
     "flag" operand f v>operand CMP NE B ;
 
 : (%dispatch) ( word-table# -- )
-    #! Load jump table target address into reg.
+    ! Load jump table target address into reg.
     "scratch" operand PC "n" operand 1 <LSR> ADD
     "scratch" operand dup 0 <+> LDR
     rc-indirect-arm rel-dispatch
@@ -210,14 +210,14 @@ M: arm-backend %unbox-long-long ( n func -- )
     ] when* ;
 
 M: arm-backend %unbox-small-struct ( size -- )
-    #! Alien must be in R0.
+    ! Alien must be in R0.
     drop
     "alien_offset" f %alien-invoke
     ! Load first cell
     R0 R0 0 <+> LDR ;
 
 M: arm-backend %unbox-large-struct ( n size -- )
-    #! Alien must be in R0.
+    ! Alien must be in R0.
     ! Compute destination address
     R1 SP roll ADD
     R2 swap MOV
@@ -239,7 +239,7 @@ M: arm-backend %box-long-long ( n func -- )
     ] when* r> f %alien-invoke ;
 
 M: arm-backend %box-small-struct ( size -- )
-    #! Box a 4-byte struct returned in R0.
+    ! Box a 4-byte struct returned in R0.
     R2 swap MOV
     "box_small_struct" f %alien-invoke ;
 
@@ -270,9 +270,9 @@ M: arm-backend struct-small-enough? ( size -- ? )
     4 <= ;
 
 M: arm-backend %prepare-alien-invoke
-    #! Save Factor stack pointers in case the C code calls a
-    #! callback which does a GC, which must reliably trace
-    #! all roots.
+    ! Save Factor stack pointers in case the C code calls a
+    ! callback which does a GC, which must reliably trace
+    ! all roots.
     "stack_chain" f R12 %alien-global
     SP R12 0 <+> STR
     ds-reg R12 8 <+> STR
@@ -331,9 +331,9 @@ M: arm-backend %unbox-f ( dst src -- )
     drop v>operand 0 MOV ;
 
 M: arm-backend %unbox-any-c-ptr ( dst src -- )
-    #! We need three registers here. R11 and R12 are reserved
-    #! temporary registers. The third one is R14, which we have
-    #! to save/restore.
+    ! We need three registers here. R11 and R12 are reserved
+    ! temporary registers. The third one is R14, which we have
+    ! to save/restore.
     "end" define-label
     "start" define-label
     ! Save R14.

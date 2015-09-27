@@ -1,5 +1,5 @@
-USING: alien.c-types arrays accessors combinators classes.struct
-alien.syntax unix.time unix.types unix.ffi ;
+USING: alien.c-types alien.syntax classes.struct unix.time
+unix.types ;
 IN: unix.stat
 
 ! Mac OS X
@@ -26,9 +26,9 @@ STRUCT: stat
     { st_qspare0 __int64_t }
     { st_qspare1 __int64_t } ;
 
-FUNCTION: int stat64  ( c-string pathname, stat* buf ) ;
-FUNCTION: int lstat64 ( c-string pathname, stat* buf ) ;
-FUNCTION: int fstat64 ( int fd, stat* buf ) ;
+FUNCTION: int stat64  ( c-string pathname, stat* buf )
+FUNCTION: int lstat64 ( c-string pathname, stat* buf )
+FUNCTION: int fstat64 ( int fd, stat* buf )
 
 : stat-func ( path buf -- n ) stat64 ;
 : lstat ( path buf -- n ) lstat64 ;

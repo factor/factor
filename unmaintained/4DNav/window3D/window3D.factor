@@ -71,7 +71,7 @@ M: window3D draw-gadget* ( gadget -- )
             GL_FRONT GL_AMBIENT_AND_DIFFUSE glColorMaterial
             ! *************************
             
-            model>> value>> 
+            control-value
             [ space->GL ] when*
 
             ! *************************

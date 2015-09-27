@@ -15,7 +15,7 @@ IN: peg.javascript.tokenizer.tests
     T{ ast-name f "x" }
     ")"
     ";"
-  }    
+  }
 } [
   "123; 'hello'; foo(x);" tokenize-javascript
 ] unit-test

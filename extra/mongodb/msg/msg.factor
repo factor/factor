@@ -3,24 +3,24 @@ sequences strings ;
 
 IN: mongodb.msg
 
-CONSTANT: OP_Reply   1 
-CONSTANT: OP_Message 1000 
-CONSTANT: OP_Update  2001 
-CONSTANT: OP_Insert  2002 
-CONSTANT: OP_Query   2004 
-CONSTANT: OP_GetMore 2005 
-CONSTANT: OP_Delete  2006 
+CONSTANT: OP_Reply   1
+CONSTANT: OP_Message 1000
+CONSTANT: OP_Update  2001
+CONSTANT: OP_Insert  2002
+CONSTANT: OP_Query   2004
+CONSTANT: OP_GetMore 2005
+CONSTANT: OP_Delete  2006
 CONSTANT: OP_KillCursors 2007
 
 CONSTANT: ResultFlag_CursorNotFound  1 ! /* returned, with zero results, when getMore is called but the cursor id is not valid at the server. */
 CONSTANT: ResultFlag_ErrSet  2 ! /* { $err : ... } is being returned */
 CONSTANT: ResultFlag_ShardConfigStale 4 !  /* have to update config from the server,  usually $err is also set */
-            
+
 TUPLE: mdb-msg
-    { opcode integer } 
+    { opcode integer }
     { req-id integer initial: 0 }
     { resp-id integer initial: 0 }
-    { length integer initial: 0 }     
+    { length integer initial: 0 }
     { flags integer initial: 0 } ;
 
 TUPLE: mdb-query-msg < mdb-msg
@@ -101,6 +101,5 @@ M: assoc <mdb-insert-msg> ( collection assoc -- mdb-insert-msg )
 
 CONSTRUCTOR: <mdb-update-msg> mdb-update-msg ( collection selector object -- mdb-update-msg )
     OP_Update >>opcode ; inline
-    
-CONSTRUCTOR: <mdb-reply-msg> mdb-reply-msg ( -- mdb-reply-msg ) ; inline
 
+CONSTRUCTOR: <mdb-reply-msg> mdb-reply-msg ( -- mdb-reply-msg ) ; inline

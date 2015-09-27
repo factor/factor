@@ -18,7 +18,7 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   init_data_heap(p->young_size, p->aging_size, p->tenured_size);
 
   fixnum bytes_read =
-      safe_fread((void*)data->tenured->start, 1, h->data_size, file);
+      raw_fread((void*)data->tenured->start, 1, h->data_size, file);
 
   if ((cell)bytes_read != h->data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
@@ -33,11 +33,11 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
   if (h->code_size > p->code_size)
     fatal_error("Code heap too small to fit image", h->code_size);
 
-  init_code_heap(p->code_size);
+  code = new code_heap(p->code_size);
 
   if (h->code_size != 0) {
     size_t bytes_read =
-        safe_fread(code->allocator->first_block(), 1, h->code_size, file);
+        raw_fread((void*)code->allocator->start, 1, h->code_size, file);
     if (bytes_read != h->code_size) {
       std::cout << "truncated image: " << bytes_read << " bytes read, ";
       std::cout << h->code_size << " bytes expected\n";
@@ -77,23 +77,14 @@ struct startup_fixup {
   cell size(code_block* compiled) { return compiled->size(*this); }
 };
 
-struct start_object_updater {
-  factor_vm* parent;
-  startup_fixup fixup;
-  slot_visitor<startup_fixup> data_visitor;
-  code_block_visitor<startup_fixup> code_visitor;
+void factor_vm::fixup_data(cell data_offset, cell code_offset) {
+  startup_fixup fixup(data_offset, code_offset);
+  slot_visitor<startup_fixup> visitor(this, fixup);
+  visitor.visit_all_roots();
 
-  start_object_updater(factor_vm* parent, startup_fixup fixup)
-      : parent(parent),
-        fixup(fixup),
-        data_visitor(slot_visitor<startup_fixup>(parent, fixup)),
-        code_visitor(code_block_visitor<startup_fixup>(parent, fixup)) {}
-
-  void operator()(object* obj, cell size) {
-    parent->data->tenured->starts.record_object_start_offset(obj);
-
-    data_visitor.visit_slots(obj);
-
+  auto start_object_updater = [&](object *obj, cell size) {
+    data->tenured->starts.record_object_start_offset(obj);
+    visitor.visit_slots(obj);
     switch (obj->type()) {
       case ALIEN_TYPE: {
 
@@ -102,94 +93,30 @@ struct start_object_updater {
         if (to_boolean(ptr->base))
           ptr->update_address();
         else
-          ptr->expired = parent->true_object;
+          ptr->expired = true_object;
         break;
       }
       case DLL_TYPE: {
-        parent->ffi_dlopen((dll*)obj);
+        ffi_dlopen((dll*)obj);
         break;
       }
       default: {
-        code_visitor.visit_object_code_block(obj);
+        visitor.visit_object_code_block(obj);
         break;
       }
     }
-  }
-};
-
-void factor_vm::fixup_data(cell data_offset, cell code_offset) {
-  startup_fixup fixup(data_offset, code_offset);
-  slot_visitor<startup_fixup> data_workhorse(this, fixup);
-  data_workhorse.visit_roots();
-
-  start_object_updater updater(this, fixup);
-  data->tenured->iterate(updater, fixup);
+  };
+  data->tenured->iterate(start_object_updater, fixup);
 }
-
-struct startup_code_block_relocation_visitor {
-  factor_vm* parent;
-  startup_fixup fixup;
-  slot_visitor<startup_fixup> data_visitor;
-
-  startup_code_block_relocation_visitor(factor_vm* parent,
-                                        startup_fixup fixup)
-      : parent(parent),
-        fixup(fixup),
-        data_visitor(slot_visitor<startup_fixup>(parent, fixup)) {}
-
-  void operator()(instruction_operand op) {
-    code_block* compiled = op.compiled;
-    cell old_offset =
-        op.rel_offset() + (cell)compiled->entry_point() - fixup.code_offset;
-
-    switch (op.rel_type()) {
-      case RT_LITERAL: {
-        cell value = op.load_value(old_offset);
-        if (immediate_p(value))
-          op.store_value(value);
-        else
-          op.store_value(
-              RETAG(fixup.fixup_data(untag<object>(value)), TAG(value)));
-        break;
-      }
-      case RT_ENTRY_POINT:
-      case RT_ENTRY_POINT_PIC:
-      case RT_ENTRY_POINT_PIC_TAIL:
-      case RT_HERE: {
-        cell value = op.load_value(old_offset);
-        cell offset = TAG(value);
-        code_block* compiled = (code_block*)UNTAG(value);
-        op.store_value((cell)fixup.fixup_code(compiled) + offset);
-        break;
-      }
-      case RT_UNTAGGED:
-        break;
-      default:
-        parent->store_external_address(op);
-        break;
-    }
-  }
-};
-
-struct startup_code_block_updater {
-  factor_vm* parent;
-  startup_fixup fixup;
-
-  startup_code_block_updater(factor_vm* parent, startup_fixup fixup)
-      : parent(parent), fixup(fixup) {}
-
-  void operator()(code_block* compiled, cell size) {
-    slot_visitor<startup_fixup> data_visitor(parent, fixup);
-    data_visitor.visit_code_block_objects(compiled);
-
-    startup_code_block_relocation_visitor code_visitor(parent, fixup);
-    compiled->each_instruction_operand(code_visitor);
-  }
-};
 
 void factor_vm::fixup_code(cell data_offset, cell code_offset) {
   startup_fixup fixup(data_offset, code_offset);
-  startup_code_block_updater updater(this, fixup);
+  auto updater = [&](code_block* compiled, cell size) {
+    slot_visitor<startup_fixup> visitor(this, fixup);
+    visitor.visit_code_block_objects(compiled);
+    cell rel_base = compiled->entry_point() - fixup.code_offset;
+    visitor.visit_instruction_operands(compiled, rel_base);
+  };
   code->allocator->iterate(updater, fixup);
 }
 
@@ -215,7 +142,7 @@ FILE* factor_vm::open_image(vm_parameters* p) {
     if (file == NULL) {
       std::cout << "Cannot open embedded image" << std::endl;
       char *msg = threadsafe_strerror(errno);
-      std::cout << "strerror: " << msg << std::endl;
+      std::cout << "strerror:1: " << msg << std::endl;
       free(msg);
       exit(1);
     }
@@ -237,13 +164,12 @@ void factor_vm::load_image(vm_parameters* p) {
   if (file == NULL) {
     std::cout << "Cannot open image file: " << p->image_path << std::endl;
     char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror: " << msg << std::endl;
+    std::cout << "strerror:2: " << msg << std::endl;
     free(msg);
     exit(1);
   }
-
   image_header h;
-  if (safe_fread(&h, sizeof(image_header), 1, file) != 1)
+  if (raw_fread(&h, sizeof(image_header), 1, file) != 1)
     fatal_error("Cannot read image header", 0);
 
   if (h.magic != image_magic)
@@ -255,7 +181,7 @@ void factor_vm::load_image(vm_parameters* p) {
   load_data_heap(file, &h, p);
   load_code_heap(file, &h, p);
 
-  safe_fclose(file);
+  raw_fclose(file);
 
   init_objects(&h);
 
@@ -279,7 +205,7 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   if (file == NULL) {
     std::cout << "Cannot open image file for writing: " << saving_filename << std::endl;
     char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror: " << msg << std::endl;
+    std::cout << "strerror:3: " << msg << std::endl;
     free(msg);
     return false;
   }
@@ -306,14 +232,14 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     ok = false;
   if (safe_fwrite((void*)data->tenured->start, h.data_size, 1, file) != 1)
     ok = false;
-  if (safe_fwrite(code->allocator->first_block(), h.code_size, 1, file) != 1)
+  if (safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
     ok = false;
   safe_fclose(file);
 
   if (!ok) {
     std::cout << "save-image failed." << std::endl;
     char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror: " << msg << std::endl;
+    std::cout << "strerror:4: " << msg << std::endl;
     free(msg);
   }
   else
@@ -322,41 +248,42 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   return ok;
 }
 
+/* Allocates memory */
 void factor_vm::primitive_save_image() {
-  /* do a full GC to push everything into tenured space */
-  primitive_compact_gc();
-
-  data_root<byte_array> path2(ctx->pop(), this);
-  path2.untag_check(this);
-  data_root<byte_array> path1(ctx->pop(), this);
-  path1.untag_check(this);
-  save_image((vm_char*)(path1.untagged() + 1),
-             (vm_char*)(path2.untagged() + 1));
-}
-
-void factor_vm::primitive_save_image_and_exit() {
   /* We unbox this before doing anything else. This is the only point
      where we might throw an error, so we have to throw an error here since
      later steps destroy the current image. */
-  data_root<byte_array> path2(ctx->pop(), this);
-  path2.untag_check(this);
-  data_root<byte_array> path1(ctx->pop(), this);
-  path1.untag_check(this);
+  bool then_die = to_boolean(ctx->pop());
+  byte_array* path2 = untag_check<byte_array>(ctx->pop());
+  byte_array* path1 = untag_check<byte_array>(ctx->pop());
 
-  /* strip out special_objects data which is set on startup anyway */
-  for (cell i = 0; i < special_object_count; i++)
-    if (!save_special_p(i))
-      special_objects[i] = false_object;
+  /* Copy the paths to non-gc memory to avoid them hanging around in
+     the saved image. */
+  vm_char* path1_saved = safe_strdup(path1->data<vm_char>());
+  vm_char* path2_saved = safe_strdup(path2->data<vm_char>());
 
-  gc(collect_compact_op, 0, /* requested size */
-     false /* discard objects only reachable from stacks */);
+  if (then_die) {
+    /* strip out special_objects data which is set on startup anyway */
+    for (cell i = 0; i < special_object_count; i++)
+      if (!save_special_p(i))
+        special_objects[i] = false_object;
+
+    /* dont trace objects only reachable from context stacks so we don't
+       get volatile data saved in the image. */
+    active_contexts.clear();
+    code->uninitialized_blocks.clear();
+  }
+
+  /* do a full GC to push everything remaining into tenured space */
+  primitive_compact_gc();
 
   /* Save the image */
-  if (save_image((vm_char*)(path1.untagged() + 1),
-                 (vm_char*)(path2.untagged() + 1)))
-    exit(0);
-  else
-    exit(1);
+  bool ret = save_image(path1_saved, path2_saved);
+  if (then_die) {
+    exit(ret ? 0 : 1);
+  }
+  free(path1_saved);
+  free(path2_saved);
 }
 
 bool factor_vm::embedded_image_p() {

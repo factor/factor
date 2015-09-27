@@ -18,12 +18,12 @@ CONSTANT: ACCOUNTING 9
 CONSTANT: SIGNATURE 10
 CONSTANT: SHUTDOWN_TIME 11
 
-FUNCTION: void setutxent ( ) ;
-FUNCTION: void endutxent ( ) ;
-FUNCTION: utmpx* getutxent ( ) ;
-FUNCTION: utmpx* getutxid ( utmpx* id ) ;
-FUNCTION: utmpx* getutxline ( utmpx* line ) ;
-FUNCTION: utmpx* pututxline ( utmpx* utx ) ;
+FUNCTION: void setutxent ( )
+FUNCTION: void endutxent ( )
+FUNCTION: utmpx* getutxent ( )
+FUNCTION: utmpx* getutxid ( utmpx* id )
+FUNCTION: utmpx* getutxline ( utmpx* line )
+FUNCTION: utmpx* pututxline ( utmpx* utx )
 
 TUPLE: utmpx-record user id line pid type timestamp host ;
 

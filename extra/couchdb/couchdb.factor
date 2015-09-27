@@ -94,7 +94,7 @@ CONSTANT: default-uuids-to-cache 100
 : next-uuid ( server -- uuid )
     ensure-uuids uuids>> pop ;
 
-! db 
+! db
 TUPLE: db { server server } { name string } ;
 C: <db> db
 
@@ -129,7 +129,7 @@ C: <db> db
     >json utf8 encode "application/json" <post-data> swap >>data ;
 
 ! documents
-: id> ( assoc -- id ) "_id" of ; 
+: id> ( assoc -- id ) "_id" of ;
 : >id ( assoc id -- assoc ) "_id" pick set-at ;
 : rev> ( assoc -- rev ) "_rev" of ;
 : >rev ( assoc rev -- assoc ) "_rev" pick set-at ;
@@ -166,7 +166,7 @@ C: <db> db
     couch get server>> next-uuid save-doc-as ;
 
 : save-doc ( assoc -- )
-    dup id> [ save-doc-as ] [ save-new-doc ] if* ; 
+    dup id> [ save-doc-as ] [ save-new-doc ] if* ;
 
 : load-doc ( id -- assoc )
     id-url couch-get ;
@@ -185,10 +185,10 @@ C: <db> db
 
 ! : construct-attachment ( content-type data -- assoc )
 !     H{ } clone "name" pick set-at "content-type" pick set-at ;
-! 
+!
 ! : add-attachment ( assoc name attachment -- )
-!     pick attachments> [ H{ } clone ] unless* 
-! 
+!     pick attachments> [ H{ } clone ] unless*
+!
 ! : attach ( assoc name content-type data -- )
 !     construct-attachment H{ } clone
 

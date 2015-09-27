@@ -157,6 +157,10 @@ TUPLE: tag
 CONSULT: sequence-protocol tag children>> ;
 INSTANCE: tag sequence
 
+! They also follow the assoc protocol (for attributes)
+CONSULT: assoc-protocol tag attrs>> ;
+INSTANCE: tag assoc
+
 CONSULT: name tag name>> ;
 
 M: tag like
@@ -165,7 +169,7 @@ M: tag like
         rot dup [ V{ } like ] when <tag>
     ] if ;
 
-MACRO: clone-slots ( class -- tuple )
+MACRO: clone-slots ( class -- quot )
     [
         "slots" word-prop
         [ name>> reader-word '[ _ execute clone ] ] map
@@ -210,8 +214,8 @@ M: xml like
 : <contained-tag> ( name attrs -- tag )
     f <tag> ;
 
-PREDICATE: contained-tag < tag children>> not ;
-PREDICATE: open-tag < tag children>> ;
+PREDICATE: contained-tag < tag children>> empty? ;
+PREDICATE: open-tag < tag children>> empty? not ;
 
 TUPLE: unescaped string ;
 C: <unescaped> unescaped

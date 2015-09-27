@@ -1,17 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
-combinators.short-circuit fry kernel math math.order sorting
-sorting.slots namespaces sequences locals compiler.cfg.def-use
-compiler.cfg.dominance compiler.cfg.ssa.interference.live-ranges ;
+USING: accessors arrays combinators combinators.short-circuit
+compiler.cfg.dominance compiler.cfg.ssa.interference.live-ranges
+kernel locals math math.order sequences sorting.slots ;
 IN: compiler.cfg.ssa.interference
-
-! Interference testing using SSA properties.
-!
-! Based on:
-!
-! Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency
-! http://hal.archives-ouvertes.fr/docs/00/34/99/25/PDF/OutSSA-RR.pdf
 
 TUPLE: vreg-info vreg value def-index bb pre-of color equal-anc-in equal-anc-out ;
 

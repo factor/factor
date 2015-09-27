@@ -1,15 +1,11 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math math.order namespaces
-sequences vectors combinators.short-circuit
-cpu.architecture
-compiler.cfg
-compiler.cfg.comparisons
-compiler.cfg.instructions
-compiler.cfg.registers
+USING: accessors combinators combinators.short-circuit
+compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite cpu.architecture kernel
+math math.order namespaces sequences vectors ;
 IN: compiler.cfg.value-numbering.comparisons
 
 ! Optimizations performed here:

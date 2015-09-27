@@ -19,7 +19,7 @@ IN: game.debug.tests
 :: draw-debug-tests ( world -- )
     world [ wasd-p-matrix ] [ wasd-mv-matrix ] bi m. :> mvp-matrix
     { 0 0 0 } clear-screen
-    
+
     [
         { 0 0 0 } { 1 0 0 } COLOR: red   debug-line
         { 0 0 0 } { 0 1 0 } COLOR: green debug-line

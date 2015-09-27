@@ -7,4 +7,3 @@ ARTICLE: "tools.coverage.testvocab" "Coverage tool dummy test vocabulary"
 "The " { $vocab-link "tools.coverage.testvocab" } " vocabulary is just a dummy vocabulary to test " { $vocab-link "tools.coverage" } "." ;
 
 ABOUT: "tools.coverage.testvocab"
-

@@ -3,8 +3,7 @@
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions kernel kernel.private math math.private
-quotations sequences words ;
-FROM: sets => set= ;
+quotations sequences sets words ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -17,7 +16,7 @@ GENERIC: union-of-builtins? ( class -- ? )
 M: builtin-class union-of-builtins? drop t ;
 
 M: union-class union-of-builtins?
-    members [ union-of-builtins? ] all? ;
+    class-members [ union-of-builtins? ] all? ;
 
 M: class union-of-builtins?
     drop f ;
@@ -36,12 +35,12 @@ M: class union-of-builtins?
     surround ;
 
 : slow-union-predicate-quot ( class -- quot )
-    members [ predicate-def ] map unclip swap
+    class-members [ predicate-def ] map unclip swap
     [ [ dup ] prepend [ drop t ] ] { } map>assoc alist>quot ;
 
 : union-predicate-quot ( class -- quot )
     {
-        { [ dup members empty? ] [ empty-union-predicate-quot ] }
+        { [ dup class-members empty? ] [ empty-union-predicate-quot ] }
         { [ dup union-of-builtins? ] [ fast-union-predicate-quot ] }
         [ slow-union-predicate-quot ]
     } cond ;
@@ -91,7 +90,7 @@ M: anonymous-union class-name
     members>> [ class-name ] map " " join ;
 
 M: union-class normalize-class
-    members <anonymous-union> normalize-class ;
+    class-members <anonymous-union> normalize-class ;
 
 M: union-class (flatten-class)
-    members <anonymous-union> (flatten-class) ;
+    class-members <anonymous-union> (flatten-class) ;

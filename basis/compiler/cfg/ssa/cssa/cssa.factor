@@ -1,19 +1,10 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel locals fry make namespaces
-sequences cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.utilities
-compiler.cfg.predecessors
-compiler.cfg.registers
-compiler.cfg.instructions ;
-FROM: assocs => change-at ;
+USING: accessors assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.rpo compiler.cfg.utilities fry kernel locals make
+namespaces sequences ;
 IN: compiler.cfg.ssa.cssa
-
-! Convert SSA to conventional SSA. This pass runs after representation
-! selection, so it must keep track of representations when introducing
-! new values.
 
 SYMBOLS: edge-copies phi-copies ;
 
@@ -47,8 +38,8 @@ SYMBOLS: edge-copies phi-copies ;
         [ drop ] [ [ _ ] dip insert-edge-copies ] if-empty
     ] assoc-each ;
 
-: phi-copy-insn ( -- insn )
-    phi-copies get f \ ##parallel-copy boa ;
+: phi-copy-insn ( copies -- insn )
+    f \ ##parallel-copy boa ;
 
 : end-of-phis ( insns -- i )
     [ [ ##phi? not ] find drop ] [ length ] bi or ;
@@ -56,7 +47,9 @@ SYMBOLS: edge-copies phi-copies ;
 : insert-phi-copies ( bb -- )
     [
         [
-            [ drop phi-copy-insn ] [ end-of-phis ] [ ] tri insert-nth
+            [ drop phi-copies get phi-copy-insn ]
+            [ end-of-phis ]
+            [ ] tri insert-nth
         ] change-instructions drop
     ] if-has-phis ;
 
@@ -70,8 +63,6 @@ SYMBOLS: edge-copies phi-copies ;
     tri ;
 
 : construct-cssa ( cfg -- )
-    needs-predecessors
-
-    dup [ convert-phis ] each-basic-block
-
-    cfg-changed drop ;
+    [ needs-predecessors ]
+    [ [ convert-phis ] each-basic-block ]
+    [ cfg-changed ] tri ;

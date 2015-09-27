@@ -10,7 +10,7 @@ IN: html.templates.chloe.compiler
     [ drop chloe-name? ] assoc-filter ;
 
 : non-chloe-attrs-only ( assoc -- assoc' )
-    [ drop chloe-name? not ] assoc-filter ;
+    [ drop chloe-name? ] assoc-reject ;
 
 : chloe-tag? ( tag -- ? )
     dup xml? [ body>> ] when

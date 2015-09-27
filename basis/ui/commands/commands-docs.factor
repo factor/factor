@@ -48,7 +48,7 @@ HELP: invoke-command
 { invoke-command +nullary+ } related-words
 
 HELP: command-name
-{ $values { "command" "a command" } { "str" "a string" } }
+{ $values { "command" "a command" } { "str" string } }
 { $description "Outputs a human-readable name for the command." }
 { $examples
     { $example
@@ -61,7 +61,7 @@ HELP: command-name
 } ;
 
 HELP: command-description
-{ $values { "command" "a command" } { "str/f" "a string or " { $link f } } }
+{ $values { "command" "a command" } { "str/f" { $maybe string } } }
 { $description "Outputs the command's description." } ;
 
 { command-description +description+ } related-words
@@ -97,7 +97,7 @@ HELP: $command
 { $description "Prints the keyboard shortcut associated with " { $snippet "command" } " in the command map named " { $snippet "map" } " on the class " { $snippet "class" } "." } ;
 
 HELP: define-command
-{ $values { "word" word } { "hash" hashtable } } 
+{ $values { "word" word } { "hash" hashtable } }
 { $description "Defines a command. The hashtable can contain the following keys:"
     { $list
         { { $link +nullary+ } " - if set to a true value, the word must have stack effect " { $snippet "( -- )" } "; otherwise it must have stack effect " { $snippet "( target -- )" } }

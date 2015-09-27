@@ -82,4 +82,3 @@ M: pdf-writer stream-write-table ! FIXME: needs style?
     ] map <table> swap data>> push ;
 
 M: pdf-writer dispose drop ;
-

@@ -57,7 +57,7 @@ PRIVATE>
 <<
 
 SYNTAX: ROMAN-OP:
-    scan-word [ name>> "roman" prepend create-in ] keep
+    scan-word [ name>> "roman" prepend create-word-in ] keep
     1quotation '[ _ binary-roman-op ]
     scan-effect define-declared ;
 

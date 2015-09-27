@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sets kernel namespaces assocs accessors sequences grouping
-combinators fry compiler.cfg.def-use compiler.cfg.rpo
-compiler.cfg.renaming compiler.cfg.instructions
-compiler.cfg.predecessors ;
-FROM: namespaces => set ;
+USING: accessors assocs compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.renaming compiler.cfg.rpo compiler.cfg.utilities
+fry grouping kernel namespaces sequences ;
 IN: compiler.cfg.copy-prop
 
 <PRIVATE
@@ -33,7 +32,7 @@ GENERIC: visit-insn ( insn -- )
 
 M: ##copy visit-insn
     [ dst>> ] [ src>> resolve ] bi
-    dup [ record-copy ] [ 2drop ] if ;
+    [ record-copy ] [ drop ] if* ;
 
 : useless-phi ( dst inputs -- ) first record-copy ;
 
@@ -119,10 +118,10 @@ PRIVATE>
 
 USE: compiler.cfg
 
-: copy-propagation ( cfg -- cfg' )
-    needs-predecessors
-
-    dup collect-copies
-    dup rename-copies
-
-    predecessors-changed ;
+: copy-propagation ( cfg -- )
+    {
+        needs-predecessors
+        collect-copies
+        rename-copies
+        predecessors-changed
+    } apply-passes ;

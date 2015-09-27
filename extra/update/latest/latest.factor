@@ -5,7 +5,7 @@ IN: update.latest
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-pull-master ( -- )
-  image parent-directory
+  image-path parent-directory
     [
       { "git" "pull" "git://factorcode.org/git/factor.git" "master" }
       run-command
@@ -22,7 +22,7 @@ IN: update.latest
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : rebuild-latest ( -- )
-  image parent-directory
+  image-path parent-directory
     [
       backup
       download-latest-image
@@ -35,7 +35,7 @@ IN: update.latest
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : update-latest ( -- )
-  image parent-directory
+  image-path parent-directory
     [
       git-id
       git-pull-master

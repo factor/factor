@@ -44,14 +44,14 @@ TUPLE: parts in out ;
 
 :: class-partitions ( classes -- assoc )
     classes [ integer? ] partition :> ( integers classes )
-    
+
     classes powerset-partition classes integers add-integers
     [ [ partition>class ] keep 2array ] map [ first ] filter
     integers [ classes singleton-partition ] map append ;
 
 : new-transitions ( transitions -- assoc ) ! assoc is class, partition
     values [ keys ] gather
-    [ tagged-epsilon? not ] filter
+    [ tagged-epsilon? ] reject
     class-partitions ;
 
 : get-transitions ( partition state-transitions -- next-states )
@@ -61,12 +61,12 @@ TUPLE: parts in out ;
     [ [ drop tagged-epsilon? ] assoc-filter ] bi
     assoc-union H{ } assoc-like ; inline
 
-: disambiguate ( nfa -- nfa )  
+: disambiguate ( nfa -- nfa )
     expand-ors [
         dup new-transitions '[
             [
                 _ swap '[ _ get-transitions ] assoc-map
-                [ nip empty? not ] assoc-filter 
+                harvest-values
             ] preserving-epsilon
         ] assoc-map
     ] change-transitions ;

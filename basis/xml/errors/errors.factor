@@ -47,12 +47,12 @@ XML-ERROR: no-entity thing ;
 
 XML-ERROR: mismatched open close ;
 
-ERROR: unclosed line column tags ;
+TUPLE: unclosed line column tags ;
 
 : throw-unclosed ( -- * )
     get-line get-column
     xml-stack get rest-slice [ first name>> ] map
-    unclosed ;
+    unclosed boa throw ;
 
 XML-ERROR: bad-uri string ;
 

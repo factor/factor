@@ -19,7 +19,7 @@ IN: opengl.framebuffers
     dup GL_FRAMEBUFFER_COMPLETE = f rot ? ;
 
 : framebuffer-error ( status -- * )
-    { 
+    {
         { GL_FRAMEBUFFER_COMPLETE [ "framebuffer complete" ] }
         { GL_FRAMEBUFFER_UNSUPPORTED [ "framebuffer configuration unsupported" ] }
         { GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT [ "framebuffer incomplete (incomplete attachment)" ] }
@@ -44,7 +44,7 @@ IN: opengl.framebuffers
         [ GL_DRAW_FRAMEBUFFER swap glBindFramebuffer ]
         [ GL_READ_FRAMEBUFFER swap glBindFramebuffer ] bi*
     ] dip
-    [ 
+    [
         GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer
         GL_READ_FRAMEBUFFER 0 glBindFramebuffer
     ] [ ] cleanup ; inline

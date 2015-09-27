@@ -3,7 +3,6 @@
 USING: math accessors kernel sequences.private sequences arrays
 combinators combinators.short-circuit parser prettyprint.custom
 persistent.sequences ;
-FROM: sequences => change-nth ;
 IN: persistent.vectors
 
 <PRIVATE
@@ -20,6 +19,8 @@ TUPLE: persistent-vector
 { tail node initial: T{ node f { } 0 } } ;
 
 M: persistent-vector length count>> ;
+
+<PRIVATE
 
 CONSTANT: node-size 32
 

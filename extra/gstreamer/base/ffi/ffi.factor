@@ -19,4 +19,3 @@ LIBRARY: gstreamer.base
 >>
 
 GIR: GstBase-0.10.gir
-

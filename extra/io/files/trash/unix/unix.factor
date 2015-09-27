@@ -27,7 +27,7 @@ IN: io.files.trash.unix
     {
         [ file-info directory? ]
         [ sticky? ]
-        [ link-info type>> +symbolic-link+ = not ]
+        [ link-info symbolic-link? not ]
     } 1&& [ "invalid trash path" throw ] unless ;
 
 : trash-home ( -- path )
@@ -79,5 +79,3 @@ M: unix send-to-trash ( path -- )
             now "%Y-%m-%dT%H:%M:%S" strftime write nl
         ] with-file-writer
     ] bi move-file ;
-
-

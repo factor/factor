@@ -94,7 +94,7 @@ HELP: var-ref
 HELP: <var-ref>
 { $values { "var" object } { "var-ref" var-ref } }
 { $description "Creates a reference to the given variable. Note that this reference behaves just like any variable when it comes to dynamic scope. For example, if you use " { $link set-ref } " in an inner scope and then leave that scope, then calling " { $link get-ref } " may not return the expected value. If this is not what you want, try using an " { $link obj-ref } " instead." } ;
- 
+
 HELP: global-var-ref
 { $class-description "Instances of this class reference a global variable. New global references are created by calling " { $link <global-var-ref> } "." } ;
 
@@ -108,7 +108,7 @@ HELP: slot-ref
 HELP: <slot-ref>
 { $values { "tuple" tuple } { "slot" integer } { "slot-ref" slot-ref } }
 { $description "Creates a reference to the value in a particular slot of the given tuple. The slot must be given as an integer, where the first user-defined slot is number 2. This is mostly just a proof of concept until we have a way of generating this slot number from a slot name." } ;
-  
+
 HELP: key-ref
 { $class-description "Instances of this class identify a key in an associative structure. New key references are created by calling " { $link <key-ref> } "." } ;
 
@@ -124,7 +124,7 @@ HELP: <value-ref>
 { $description "Creates a reference to the value associated with " { $snippet "key" } " in " { $snippet "assoc" } "." } ;
 
 { get-ref set-ref delete-ref set-ref* } related-words
-  
+
 { <obj-ref> <var-ref> <global-var-ref> <slot-ref> <key-ref> <value-ref> } related-words
 
 HELP: set-ref*
@@ -150,7 +150,7 @@ HELP: ref-dec
 HELP: take
 { $values { "ref" ref } { "obj" object } }
 { $description "Retrieve the value of the ref and then delete it, returning the value." } ;
-  
+
 { ref-on ref-off ref-inc ref-dec take } related-words
 { take delete-ref } related-words
 { on ref-on } related-words

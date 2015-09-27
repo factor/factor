@@ -14,10 +14,11 @@ IN: webapps.mason.release
         [
             validate-os/cpu
             "os" value "cpu" value (platform) "platform" set-value
-            current-release
-            [ release-link "release" set-value ]
-            [ release-git-id>> git-link "git-id" set-value ]
-            [ requirements "requirements" set-value ]
-            tri
+            current-release [
+                [ release-link "release" set-value ]
+                [ release-git-id>> git-link "git-id" set-value ]
+                [ requirements "requirements" set-value ]
+                tri
+            ] when*
         ] with-mason-db
     ] >>init ;

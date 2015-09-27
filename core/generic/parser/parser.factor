@@ -51,8 +51,6 @@ ERROR: bad-method-effect ;
         [ ?execute-parsing \ ; parse-until append >quotation ]
     } case ;
 
-PRIVATE>
-
 : (M:) ( -- method def )
     [
         scan-new-method [ parse-method-definition ] with-method-definition

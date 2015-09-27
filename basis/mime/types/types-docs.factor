@@ -5,7 +5,7 @@ IN: mime.types
 
 HELP: mime-db
 { $values
-    
+
      { "seq" sequence } }
 { $description "Outputs an array where the first element is a MIME type and the rest of the array is file extensions that have that MIME type." } ;
 
@@ -17,13 +17,13 @@ HELP: mime-type
 
 HELP: mime-types
 { $values
-    
+
      { "assoc" assoc } }
 { $description "Outputs an " { $snippet "assoc" } " made from the data in the " { $link mime-db } " word where the keys are file extensions and the values are the corresponding MIME types." } ;
 
 HELP: nonstandard-mime-types
 { $values
-    
+
      { "assoc" assoc } }
 { $description "A list of Factor-specific MIME types that are added to the MIME database loaded from disk." } ;
 

@@ -3,24 +3,24 @@ tools.test kernel io.files.unique namespaces continuations
 io.files.info io.pathnames io.directories ;
 IN: io.files.unique.tests
 
-[ 123 ] [
+{ 123 } [
     "core" ".test" [
         [ [ 123 CHAR: a <string> ] dip ascii set-file-contents ]
         [ file-info size>> ] bi
     ] cleanup-unique-file
 ] unit-test
 
-[ t ] [
+{ t } [
     [ current-directory get file-info directory? ] cleanup-unique-directory
 ] unit-test
 
-[ t ] [
+{ t } [
     current-directory get
     [ [ "FAILDOG" throw ] cleanup-unique-directory ] [ drop ] recover
     current-directory get =
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         "asdf" unique-file drop
         "asdf2" unique-file drop
@@ -28,11 +28,11 @@ IN: io.files.unique.tests
     ] cleanup-unique-directory
 ] unit-test
 
-[ t ] [
+{ t } [
     [ ] with-unique-directory >boolean
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         "asdf" unique-file drop
         "asdf" unique-file drop

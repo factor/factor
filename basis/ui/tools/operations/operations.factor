@@ -87,7 +87,7 @@ IN: ui.tools.operations
 } define-operation
 
 : com-reload ( error -- )
-    file>> run-file ;
+    path>> run-file ;
 
 [ compiler-error? ] \ com-reload H{
     { +listener+ t }

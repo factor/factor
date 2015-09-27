@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cpu.architecture fry kernel layouts math math.order
-namespaces sequences vectors assocs arrays locals ;
+USING: arrays assocs cpu.architecture fry kernel layouts locals
+math math.order namespaces sequences vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params

@@ -2,6 +2,12 @@
 
 namespace factor {
 
+bool set_memory_locked(cell base, cell size, bool locked) {
+  int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
+  int status = mprotect((char*)base, size, prot);
+  return status != -1;
+}
+
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
   pthread_attr_t attr;
   pthread_t thread;
@@ -39,19 +45,13 @@ void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY | RTLD_GLOBAL);
 }
 
-void* factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
-  return dlsym(dll ? dll->handle : null_dll, symbol);
+cell factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
+  return (cell)dlsym(dll ? dll->handle : null_dll, symbol);
 }
 
-void* factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
+cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
   return FUNCTION_CODE_POINTER(ffi_dlsym_raw(dll, symbol));
 }
-
-#ifdef FACTOR_PPC
-void* factor_vm::ffi_dlsym_toc(dll* dll, symbol_char* symbol) {
-  return FUNCTION_TOC_POINTER(ffi_dlsym_raw(dll, symbol));
-}
-#endif
 
 void factor_vm::ffi_dlclose(dll* dll) {
   if (dlclose(dll->handle))
@@ -87,28 +87,35 @@ segment::segment(cell size_, bool executable_p) {
 
   int prot;
   if (executable_p)
-    prot = (PROT_READ | PROT_WRITE | PROT_EXEC);
+    prot = PROT_READ | PROT_WRITE | PROT_EXEC;
   else
-    prot = (PROT_READ | PROT_WRITE);
+    prot = PROT_READ | PROT_WRITE;
 
-  char* array = (char*)mmap(NULL, pagesize + size + pagesize, prot,
+  char* array = (char*)mmap(NULL, 2 * pagesize + size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
 
-  if (array == (char*)- 1)
+  if (array == (char*)-1)
     out_of_memory("mmap");
-
-  if (mprotect(array, pagesize, PROT_NONE) == -1) {
-    check_ENOMEM("mprotect low");
-    fatal_error("Cannot protect low guard page", (cell)array);
-  }
-
-  if (mprotect(array + pagesize + size, pagesize, PROT_NONE) == -1) {
-    check_ENOMEM("mprotect high");
-    fatal_error("Cannot protect high guard page", (cell)array);
-  }
 
   start = (cell)(array + pagesize);
   end = start + size;
+
+  set_border_locked(true);
+}
+
+void segment::set_border_locked(bool locked) {
+  int pagesize = getpagesize();
+  cell lo = start - pagesize;
+  if (!set_memory_locked(lo, pagesize, locked)) {
+    check_ENOMEM("mprotect low");
+    fatal_error("Cannot (un)protect low guard page", lo);
+  }
+
+  cell hi = end;
+  if (!set_memory_locked(hi, pagesize, locked)) {
+    check_ENOMEM("mprotect high");
+    fatal_error("Cannot (un)protect high guard page", hi);
+  }
 }
 
 segment::~segment() {
@@ -116,16 +123,6 @@ segment::~segment() {
   int retval = munmap((void*)(start - pagesize), pagesize + size + pagesize);
   if (retval)
     fatal_error("Segment deallocation failed", 0);
-}
-
-void code_heap::guard_safepoint() {
-  if (mprotect(safepoint_page, getpagesize(), PROT_NONE) == -1)
-    fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
-}
-
-void code_heap::unguard_safepoint() {
-  if (mprotect(safepoint_page, getpagesize(), PROT_WRITE) == -1)
-    fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
 }
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
@@ -150,10 +147,13 @@ void factor_vm::end_sampling_profiler_timer() {
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+
+  cell fault_addr = (cell)siginfo->si_addr;
+  cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm();
-  vm->verify_memory_protection_error((cell)siginfo->si_addr);
-  vm->signal_fault_addr = (cell)siginfo->si_addr;
-  vm->signal_fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
+  vm->verify_memory_protection_error(fault_addr);
+  vm->signal_fault_addr = fault_addr;
+  vm->signal_fault_pc = fault_pc;
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
 
@@ -372,12 +372,9 @@ void safe_close(int fd) {
 bool check_write(int fd, void* data, ssize_t size) {
   if (write(fd, data, size) == size)
     return true;
-  else {
-    if (errno == EINTR)
-      return check_write(fd, data, size);
-    else
-      return false;
-  }
+  if (errno == EINTR)
+    return check_write(fd, data, size);
+  return false;
 }
 
 void safe_write(int fd, void* data, ssize_t size) {
@@ -455,7 +452,7 @@ void* stdin_loop(void* arg) {
   return NULL;
 }
 
-void factor_vm::open_console() {
+void open_console() {
   FACTOR_ASSERT(!stdin_thread_initialized_p);
   safe_pipe(&control_read, &control_write);
   safe_pipe(&size_read, &size_write);
@@ -468,14 +465,14 @@ void factor_vm::open_console() {
 /* This method is used to kill the stdin_loop before exiting from factor.
    A Nvidia driver bug on Linux is the reason this has to be done, see:
      http://www.nvnews.net/vbulletin/showthread.php?t=164619 */
-void factor_vm::close_console() {
+void close_console() {
   if (stdin_thread_initialized_p) {
     pthread_cancel(stdin_thread);
     pthread_join(stdin_thread, 0);
   }
 }
 
-void factor_vm::lock_console() {
+void lock_console() {
   FACTOR_ASSERT(stdin_thread_initialized_p);
   /* Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
      any read() it has in progress. When the stdin loop iterates again, it will
@@ -484,19 +481,19 @@ void factor_vm::lock_console() {
   pthread_kill(stdin_thread, SIGUSR2);
 }
 
-void factor_vm::unlock_console() {
+void unlock_console() {
   FACTOR_ASSERT(stdin_thread_initialized_p);
   pthread_mutex_unlock(&stdin_mutex);
 }
 
-void factor_vm::ignore_ctrl_c() {
+void ignore_ctrl_c() {
   sig_t ret;
   do {
     ret = signal(SIGINT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);
 }
 
-void factor_vm::handle_ctrl_c() {
+void handle_ctrl_c() {
   struct sigaction fep_sigaction;
   init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
   sigaction_safe(SIGINT, &fep_sigaction, NULL);
@@ -508,7 +505,7 @@ void abort() {
     ret = signal(SIGABRT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);
 
-  factor_vm::close_console();
+  close_console();
   ::abort();
 }
 

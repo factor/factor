@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser kernel arrays math accessors sequences
-math.vectors math.order sorting binary-search sets assocs fry ;
+USING: accessors binary-search fry kernel math math.order
+parser sequences sets sorting ;
 IN: suffix-arrays
 
 <PRIVATE
@@ -11,7 +11,7 @@ IN: suffix-arrays
 
 : prefix<=> ( begin seq -- <=> )
     [ <=> ] [ swap head? ] 2bi [ drop +eq+ ] when ;
- 
+
 : find-index ( begin suffix-array -- index/f )
     [ prefix<=> ] with search drop ;
 

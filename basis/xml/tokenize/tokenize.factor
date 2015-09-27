@@ -72,9 +72,9 @@ HINTS: next* { spot } ;
     spot get (skip-until) ; inline
 
 : take-until ( ... quot: ( ... char -- ... ? ) -- ... string )
-    #! Take the substring of a string starting at spot
-    #! from code until the quotation given is true and
-    #! advance spot to after the substring.
+    ! Take the substring of a string starting at spot
+    ! from code until the quotation given is true and
+    ! advance spot to after the substring.
    10 <sbuf> [
        '[ _ keep over [ drop ] [ _ push ] if ] skip-until
    ] keep "" like ; inline
@@ -83,7 +83,7 @@ HINTS: next* { spot } ;
     '[ _ member? ] take-until ; inline
 
 : pass-blank ( -- )
-    #! Advance code past any whitespace, including newlines
+    ! Advance code past any whitespace, including newlines
     [ blank? not ] skip-until ;
 
 : next-matching ( pos ch str -- pos' )

@@ -214,24 +214,19 @@ INSTANCE: reversed virtual-sequence
 
 ! A slice of another sequence.
 TUPLE: slice
-{ from read-only }
-{ to read-only }
-{ seq read-only } ;
+    { from integer read-only }
+    { to integer read-only }
+    { seq read-only } ;
 
 : collapse-slice ( m n slice -- m' n' seq )
     [ from>> ] [ seq>> ] bi [ [ + ] curry bi@ ] dip ; inline
 
-ERROR: slice-error from to seq reason ;
-
-: check-slice-error ( from to seq ? string -- from to seq )
-    [ slice-error ] curry when ; inline
+ERROR: slice-error from to seq ;
 
 : check-slice ( from to seq -- from to seq )
-    3dup
-    [ 2drop 0 < "start < 0" check-slice-error ]
-    [ [ drop ] 2dip length > "end > sequence" check-slice-error ]
-    [ drop > "start > end" check-slice-error ]
-    3tri ; inline
+    pick 0 < [ slice-error ] when
+    2dup length > [ slice-error ] when
+    2over > [ slice-error ] when ; inline
 
 <PRIVATE
 
@@ -266,13 +261,15 @@ M: slice length [ to>> ] [ from>> ] bi - ; inline
 INSTANCE: slice virtual-sequence
 
 ! One element repeated many times
-TUPLE: repetition { len read-only } { elt read-only } ;
+TUPLE: repetition
+    { length integer read-only }
+    { elt read-only } ;
 
 : <repetition> ( len elt -- repetition )
     over 0 < [ non-negative-integer-expected ] when
     repetition boa ; inline
 
-M: repetition length len>> ; inline
+M: repetition length length>> ; inline
 M: repetition nth-unsafe nip elt>> ; inline
 
 INSTANCE: repetition immutable-sequence
@@ -281,6 +278,7 @@ INSTANCE: repetition immutable-sequence
 
 ERROR: integer-length-expected obj ;
 
+! The check-length call forces partial dispatch
 : check-length ( n -- n )
     dup integer? [ integer-length-expected ] unless ; inline
 
@@ -313,8 +311,10 @@ C: <copy> copy-state
     [ swap length + ] dip lengthen ; inline
 
 : copy-unsafe ( src i dst -- )
-    #! The check-length call forces partial dispatch
     [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
+
+: subseq-unsafe ( from to seq -- subseq )
+    [ subseq>copy (copy) ] keep like ;
 
 PRIVATE>
 
@@ -383,7 +383,7 @@ PRIVATE>
 <PRIVATE
 
 : ((each)) ( seq -- n quot )
-    [ length ] keep [ nth-unsafe ] curry ; inline
+    [ length check-length ] keep [ nth-unsafe ] curry ; inline
 
 : (each) ( seq quot -- n quot' )
     [ ((each)) ] dip compose ; inline
@@ -404,7 +404,7 @@ PRIVATE>
     [ nth-unsafe ] bi-curry@ bi ; inline
 
 : ((2each)) ( seq1 seq2 -- n quot )
-    [ min-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
+    [ min-length check-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
     [ ((2each)) ] dip compose ; inline
@@ -414,7 +414,7 @@ PRIVATE>
 
 : (3each) ( seq1 seq2 seq3 quot -- n quot' )
     [
-        [ [ length ] tri@ min min ]
+        [ [ length ] tri@ min min check-length ]
         [ [ 3nth-unsafe ] 3curry ] 3bi
     ] dip compose ; inline
 
@@ -446,6 +446,9 @@ PRIVATE>
 
 : each ( ... seq quot: ( ... x -- ... ) -- ... )
     (each) each-integer ; inline
+
+: each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
+    -rot (each) (each-integer) ; inline
 
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
@@ -479,6 +482,9 @@ PRIVATE>
 
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     (2each) each-integer ; inline
+
+: 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) i -- ... )
+    [ (2each) ] dip -rot (each-integer) ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     [ -rot ] dip 2each ; inline
@@ -544,6 +550,12 @@ PRIVATE>
 : filter ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-as ; inline
 
+: reject-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
+    [ [ not ] compose ] [ filter-as ] bi* ; inline
+
+: reject ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    over reject-as ; inline
+
 : push-either ( ..a elt quot: ( ..a elt -- ..b ? ) accum1 accum2 -- ..b )
     [ keep swap ] 2dip ? push ; inline
 
@@ -580,7 +592,7 @@ PRIVATE>
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
-        [ [ bi* ] 2curry [ 1 ] 2dip (each) (each-integer) ]
+        [ [ bi* ] 2curry 1 each-from ]
         3bi
     ] if ; inline
 
@@ -630,16 +642,16 @@ PRIVATE>
     [ eq? ] with any? ;
 
 : remove ( elt seq -- newseq )
-    [ = not ] with filter ;
+    [ = ] with reject ;
 
 : remove-eq ( elt seq -- newseq )
-    [ eq? not ] with filter ;
+    [ eq? ] with reject ;
 
 : sift ( seq -- newseq )
     [ ] filter ;
 
 : harvest ( seq -- newseq )
-    [ empty? not ] filter ;
+    [ empty? ] reject ;
 
 <PRIVATE
 
@@ -704,11 +716,14 @@ PRIVATE>
 : filter! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     swap [ [ 0 0 ] dip (filter!) ] keep ; inline
 
+: reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
+    [ not ] compose filter! ; inline
+
 : remove! ( elt seq -- seq )
-    [ = not ] with filter! ;
+    [ = ] with reject! ;
 
 : remove-eq! ( elt seq -- seq )
-    [ eq? not ] with filter! ;
+    [ eq? ] with reject! ;
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
@@ -828,13 +843,13 @@ M: object sum-lengths
     0 [ length + ] reduce ;
 
 M: repetition sum-lengths
-    [ len>> ] [ elt>> length ] bi * ;
+    [ length>> ] [ elt>> length ] bi * ;
 
 : concat-as ( seq exemplar -- newseq )
-    swap [ { } ] [
-        [ sum-lengths over new-resizable ] keep
-        [ append! ] each
-    ] if-empty swap like ;
+    [
+        [ dup sum-lengths ] dip new-resizable
+        [ [ push-all ] curry each ] keep
+    ] keep like ; inline
 
 : concat ( seq -- newseq )
     [ { } ] [ dup first concat-as ] if-empty ;
@@ -911,8 +926,8 @@ PRIVATE>
     [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
 
 : (binary-reduce) ( seq start quot: ( elt1 elt2 -- newelt ) from length -- value )
-    #! We can't use case here since combinators depends on
-    #! sequences
+    ! We can't use case here since combinators depends on
+    ! sequences
     dup 4 < [
         integer>fixnum {
             [ 2drop nip ]
@@ -969,11 +984,11 @@ PRIVATE>
 
 : map-reduce ( ..a seq map-quot: ( ..a elt -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ dup first ] dip [ call ] keep ] dip compose
-    swapd [ 1 ] 2dip (each) (each-integer) ; inline
+    swapd 1 each-from ; inline
 
 : 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
     [ [ 2dup [ first ] bi@ ] dip [ call ] keep ] dip compose
-    [ -rot ] dip [ 1 ] 3dip (2each) (each-integer) ; inline
+    [ -rot ] dip 1 2each-from ; inline
 
 <PRIVATE
 
@@ -1025,13 +1040,13 @@ PRIVATE>
 GENERIC: sum ( seq -- n )
 M: object sum 0 [ + ] binary-reduce ; inline
 M: iota-tuple sum length dup 1 - * 2/ ; inline
-M: repetition sum [ elt>> ] [ len>> ] bi * ; inline
+M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
-: infimum ( seq -- n ) [ ] [ min ] map-reduce ;
+: infimum ( seq -- elt ) [ ] [ min ] map-reduce ;
 
-: supremum ( seq -- n ) [ ] [ max ] map-reduce ;
+: supremum ( seq -- elt ) [ ] [ max ] map-reduce ;
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
@@ -1047,9 +1062,6 @@ M: repetition sum [ elt>> ] [ len>> ] bi * ; inline
 
 : cartesian-product ( seq1 seq2 -- newseq )
     [ { } 2sequence ] cartesian-map ;
-
-: each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    -rot (each) (each-integer) ; inline
 
 <PRIVATE
 

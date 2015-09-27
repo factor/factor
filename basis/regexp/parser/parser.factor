@@ -22,7 +22,7 @@ ERROR: bad-class name ;
 
 : simple ( str -- simple )
     ! Alternatively, first collation key level?
-    >case-fold [ " \t_" member? not ] filter ;
+    >case-fold [ " \t_" member? ] reject ;
 
 : simple-table ( seq -- table )
     [ [ simple ] keep ] H{ } map>assoc ;
@@ -116,7 +116,7 @@ ERROR: nonexistent-option name ;
 
 : string>options ( string -- options )
     "-" split1 parse-options ;
- 
+
 : options>string ( options -- string )
     [ on>> ] [ off>> ] bi
     [ [ option>ch ] map ] bi@

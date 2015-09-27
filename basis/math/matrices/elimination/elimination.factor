@@ -21,10 +21,10 @@ SYMBOL: matrix
 : cols ( -- n ) 0 nth-row length ;
 
 : skip ( i seq quot -- n )
-    over [ find-from drop ] dip length or ; inline
+    over [ find-from drop ] dip swap [ nip ] [ length ] if* ; inline
 
 : first-col ( row# -- n )
-    #! First non-zero column
+    ! First non-zero column
     0 swap nth-row [ zero? not ] skip ;
 
 : clear-scale ( col# pivot-row i-row -- n )
@@ -70,7 +70,7 @@ SYMBOL: matrix
     [ 0 0 (echelon) ] with-matrix ;
 
 : nonzero-rows ( matrix -- matrix' )
-    [ [ zero? ] all? not ] filter ;
+    [ [ zero? ] all? ] reject ;
 
 : null/rank ( matrix -- null rank )
     echelon dup length swap nonzero-rows length [ - ] keep ;
@@ -81,7 +81,7 @@ SYMBOL: matrix
     [
         rows iota <reversed> [
             dup nth-row leading drop
-            dup [ swap dup iota clear-col ] [ 2drop ] if
+            [ swap dup iota clear-col ] [ drop ] if*
         ] each
     ] with-matrix ;
 
@@ -96,7 +96,7 @@ SYMBOL: matrix
         dup first length identity-matrix [
             [
                 dup leading drop
-                dup [ basis-vector ] [ 2drop ] if
+                [ basis-vector ] [ drop ] if*
             ] each
         ] with-matrix flip nonzero-rows
     ] unless ;

@@ -23,7 +23,7 @@ IN: quoted-printable
 : char>quoted ( ch -- str )
     dup printable? [ 1string ] [
         assure-small >hex >upper
-        2 CHAR: 0 pad-head 
+        2 CHAR: 0 pad-head
         CHAR: = prefix
     ] if ;
 

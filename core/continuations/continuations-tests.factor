@@ -1,6 +1,5 @@
-USING: kernel math namespaces io tools.test sequences vectors
-continuations debugger parser memory arrays words
-kernel.private accessors eval ;
+USING: accessors arrays continuations debugger eval io kernel kernel.private
+math memory namespaces parser sequences system tools.test vectors words ;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )
@@ -22,12 +21,12 @@ IN: continuations.tests
         ] with-scope
     ] callcc0 "x" get 5 = ;
 
-[ t ] [ 10 callcc1-test 10 iota reverse >vector = ] unit-test
-[ t ] [ callcc-namespace-test ] unit-test
+{ t } [ 10 callcc1-test 10 iota reverse >vector = ] unit-test
+{ t } [ callcc-namespace-test ] unit-test
 
 [ 5 throw ] [ 5 = ] must-fail-with
 
-[ t ] [
+{ t } [
     [ "Hello" throw ] ignore-errors
     error get-global
     "Hello" =
@@ -35,38 +34,32 @@ IN: continuations.tests
 
 "!!! The following error is part of the test" print
 
-[ ] [ [ 6 [ 12 [ "2 car" ] ] ] print-error ] unit-test
+{ } [ [ 6 [ 12 [ "2 car" ] ] ] print-error ] unit-test
 
 "!!! The following error is part of the test" print
 
-[ ] [ [ [ "2 car" ] eval ] try ] unit-test
+{ } [ [ [ "2 car" ] eval ] try ] unit-test
 
 [ f throw ] must-fail
 
 ! Weird PowerPC bug.
-[ ] [
+{ } [
     [ "4" throw ] ignore-errors
     gc
     gc
 ] unit-test
 
-! ! See how well callstack overflow is handled
-! [ clear drop ] must-fail
-! 
-! : callstack-overflow callstack-overflow f ;
-! [ callstack-overflow ] must-fail
-
 : don't-compile-me ( -- ) ;
-: foo ( -- ) callstack "c" set don't-compile-me ;
+: foo ( -- ) get-callstack "c" set don't-compile-me ;
 : bar ( -- a b ) 1 foo 2 ;
 
 << { don't-compile-me foo bar } [ t "no-compile" set-word-prop ] each >>
 
-[ 1 2 ] [ bar ] unit-test
+{ 1 2 } [ bar ] unit-test
 
-[ t ] [ \ bar def>> "c" get innermost-frame-executing = ] unit-test
+{ t } [ \ bar def>> "c" get innermost-frame-executing = ] unit-test
 
-[ 1 ] [ "c" get innermost-frame-scan ] unit-test
+{ 1 } [ "c" get innermost-frame-scan ] unit-test
 
 SYMBOL: always-counter
 SYMBOL: error-counter
@@ -99,10 +92,10 @@ SYMBOL: error-counter
     [ 1 ] [ error-counter get ] unit-test
 ] with-scope
 
-[ ] [ [ return ] with-return ] unit-test
+{ } [ [ return ] with-return ] unit-test
 
 [ { } [ ] attempt-all ] [ attempt-all-error? ] must-fail-with
 
-[ { 4 } ] [ { 2 2 } [ + ] with-datastack ] unit-test
+{ { 4 } } [ { 2 2 } [ + ] with-datastack ] unit-test
 
 [ with-datastack ] must-infer

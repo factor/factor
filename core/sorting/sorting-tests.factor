@@ -2,13 +2,13 @@ USING: sorting sequences kernel math math.order random
 tools.test vectors sets vocabs grouping ;
 IN: sorting.tests
 
-[ { } ] [ { } natural-sort ] unit-test
+{ { } } [ { } natural-sort ] unit-test
 
-[ { 270000000 270000001 } ]
+{ { 270000000 270000001 } }
 [ T{ slice f 270000000 270000002 T{ iota-tuple f 270000002 } } natural-sort ]
 unit-test
 
-[ t ] [
+{ t } [
     100 [
         drop
         100 [ 20 random [ 1000 random ] replicate ] replicate
@@ -17,12 +17,12 @@ unit-test
     ] all-integers?
 ] unit-test
 
-[ ] [ { 1 2 } [ 2drop 1 ] sort drop ] unit-test
+{ } [ { 1 2 } [ 2drop 1 ] sort drop ] unit-test
 
 ! Is it a stable sort?
-[ t ] [ { { 1 "a" } { 1 "b" } { 1 "c" } } dup sort-keys = ] unit-test
+{ t } [ { { 1 "a" } { 1 "b" } { 1 "c" } } dup sort-keys = ] unit-test
 
-[ { { 1 "a" } { 1 "b" } { 1 "c" } { 1 "e" } { 2 "d" } } ]
+{ { { 1 "a" } { 1 "b" } { 1 "c" } { 1 "e" } { 2 "d" } } }
 [ { { 1 "a" } { 1 "b" } { 1 "c" } { 2 "d" } { 1 "e" } } sort-keys ] unit-test
 
-[ ] [ all-words natural-sort drop ] unit-test
+{ } [ all-words natural-sort drop ] unit-test

@@ -7,5 +7,5 @@ ABOUT: "wrap"
 
 ARTICLE: "wrap" "Word wrapping"
 "The " { $vocab-link "wrap" } " vocabulary implements word wrapping. Wrapping can take place based on simple strings, assumed to be monospace, or abstract word objects."
-{ $vocab-subsection "String word wrapping" "wrap.strings" } 
+{ $vocab-subsection "String word wrapping" "wrap.strings" }
 { $vocab-subsection "Word object wrapping" "wrap.words" } ;

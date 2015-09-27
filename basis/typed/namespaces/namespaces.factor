@@ -37,4 +37,3 @@ PRIVATE>
 
 : typed-set-global ( value name type -- )
     [ set-global ] (typed-set) ; inline
-

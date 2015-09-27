@@ -54,7 +54,7 @@ M: float-4-rep copy-register* drop MOVAPS ;
 M: double-2-rep copy-register* drop MOVAPS ;
 M: vector-rep copy-register* drop MOVDQA ;
 
-MACRO: available-reps ( alist -- )
+MACRO: available-reps ( alist -- quot )
     ! Each SSE version adds new representations and supports
     ! all old ones
     unzip { } [ append ] accumulate rest swap suffix

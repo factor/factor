@@ -5,9 +5,8 @@ combinators combinators.smart constructors destructors grouping
 io io.binary io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
-math.parser namespaces nested-comments random sequences
-slots.syntax splitting system vectors vocabs strings
-ascii ;
+math.parser namespaces random sequences slots.syntax splitting
+system vectors vocabs strings ascii ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -159,7 +158,7 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
 
 : trim-ipv6-arpa ( string -- string' )
     dotted> ipv6-arpa-suffix ?tail drop ;
- 
+
 : arpa>ipv4 ( string -- ip ) trim-ipv4-arpa reverse-ipv4 ;
 
 : arpa>ipv6 ( string -- ip )
@@ -270,7 +269,7 @@ M: HINFO rdata>byte-array
     [ os>> >name ] bi append ;
 
 M: MX rdata>byte-array
-    drop 
+    drop
     [ preference>> 2 >be ]
     [ exchange>> >name ] bi append ;
 
@@ -384,7 +383,7 @@ M: TXT rdata>byte-array
 : message>mxs ( message -- assoc )
     answer-section>> [ rdata>> [ preference>> ] [ exchange>> ] bi 2array ] map ;
 
-: messages>names ( messages -- names ) 
+: messages>names ( messages -- names )
     [ message>names ] map concat ;
 
 : forward-confirmed-reverse-dns-ipv4? ( ipv4-string -- ? )
@@ -399,15 +398,14 @@ M: TXT rdata>byte-array
 : message>query-name ( message -- string )
     query>> first name>> dotted> ;
 
-(*
-M: string resolve-host
-    dup >lower "localhost" = [
-        drop resolve-localhost
-    ] [
-        dns-A-query message>a-names [ <ipv4> ] map
-    ] if ;
-*)
-    
+! XXX: Turn on someday for nonblocking DNS lookups
+! M: string resolve-host
+    ! dup >lower "localhost" = [
+        ! drop resolve-localhost
+    ! ] [
+        ! dns-A-query message>a-names [ <ipv4> ] map
+    ! ] if ;
+
 HOOK: initial-dns-servers os ( -- sequence )
 
 {
@@ -417,5 +415,5 @@ HOOK: initial-dns-servers os ( -- sequence )
 
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline
-    
+
 dns-servers [ initial-dns-servers >vector ] initialize

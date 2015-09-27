@@ -3,14 +3,14 @@ prettyprint parser io.streams.string kernel source-files
 assocs namespaces words io sequences eval accessors see ;
 IN: help.definitions.tests
 
-[ ] [ \ + >link see ] unit-test
+{ } [ \ + >link see ] unit-test
 
 [
     [ 4 ] [
         "IN: help.definitions.tests USING: help.syntax ; : hello ( -- ) ; HELP: hello \"test\" ; ARTICLE: \"hello\" \"world\" ; ARTICLE: \"hello2\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file definitions>> first cardinality
+        "foo" path>source-file definitions>> first cardinality
     ] unit-test
 
     [ t ] [ "hello" articles get key? ] unit-test
@@ -23,7 +23,7 @@ IN: help.definitions.tests
         "IN: help.definitions.tests USING: help.syntax ; : hello ( -- ) ; ARTICLE: \"hello\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file definitions>> first cardinality
+        "foo" path>source-file definitions>> first cardinality
     ] unit-test
 
     [ t ] [ "hello" articles get key? ] unit-test

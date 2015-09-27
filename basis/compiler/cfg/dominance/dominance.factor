@@ -1,23 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators sets math fry kernel math.order
-dlists deques vectors namespaces sequences sorting locals
-compiler.cfg.rpo compiler.cfg.predecessors ;
-FROM: namespaces => set ;
+USING: accessors assocs combinators compiler.cfg.predecessors
+compiler.cfg.rpo deques dlists fry kernel locals math math.order
+namespaces sequences sorting vectors ;
 IN: compiler.cfg.dominance
-
-! Reference:
-
-! A Simple, Fast Dominance Algorithm
-! Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy
-! http://www.cs.rice.edu/~keith/EMBED/dom.pdf
-
-! Also, a nice overview is given in these lecture notes:
-! http://llvm.cs.uiuc.edu/~vadve/CS526/public_html/Notes/4ssa.4up.pdf
 
 <PRIVATE
 
-! Maps bb -> idom(bb)
 SYMBOL: dom-parents
 
 PRIVATE>
@@ -41,14 +30,13 @@ PRIVATE>
     [ ] [ intersect ] map-reduce ;
 
 : iterate ( rpo -- changed? )
-    [ [ compute-idom ] keep set-idom ] map [ ] any? ;
+    f [ [ compute-idom ] keep set-idom or ] reduce ;
 
 : compute-dom-parents ( cfg -- )
     H{ } clone dom-parents set
     reverse-post-order
     unclip dup set-idom drop '[ _ iterate ] loop ;
 
-! Maps bb -> {bb' | idom(bb') = bb}
 SYMBOL: dom-childrens
 
 PRIVATE>
@@ -57,10 +45,9 @@ PRIVATE>
 
 <PRIVATE
 
-: compute-dom-children ( -- )
-    dom-parents get H{ } clone
-    [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
-    dom-childrens set ;
+: compute-dom-children ( dom-parents -- dom-childrens )
+    H{ } clone [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
+    [ [ number>> ] sort-with ] assoc-map ;
 
 SYMBOLS: preorder maxpreorder ;
 
@@ -84,14 +71,20 @@ PRIVATE>
     H{ } clone maxpreorder set
     [ 0 ] dip entry>> (compute-dfs) drop ;
 
-: compute-dominance ( cfg -- cfg' )
-    [ compute-dom-parents compute-dom-children ] [ compute-dfs ] [ ] tri ;
+: compute-dominance ( cfg -- )
+    [
+        compute-dom-parents
+        dom-parents get compute-dom-children dom-childrens set
+    ] [ compute-dfs ] bi ;
 
 PRIVATE>
 
-: needs-dominance ( cfg -- cfg' )
-    needs-predecessors
-    dup dominance-valid?>> [ compute-dominance t >>dominance-valid? ] unless ;
+: needs-dominance ( cfg -- )
+    [ needs-predecessors ]
+    [
+        dup dominance-valid?>> [ drop ]
+        [ t >>dominance-valid? compute-dominance ] if
+    ] bi ;
 
 : dominates? ( bb1 bb2 -- ? )
     swap [ pre-of ] [ [ pre-of ] [ maxpre-of ] bi ] bi* between? ;

@@ -55,7 +55,7 @@ HOOK: (fp-env-registers) cpu ( -- registers )
 : fp-env-register ( -- register ) (fp-env-registers) first ;
 
 :: mask> ( bits assoc -- symbols )
-    assoc [| k v | bits v mask zero? not ] assoc-filter keys ;
+    assoc [| k v | bits v mask zero? ] assoc-reject keys ;
 : >mask ( symbols assoc -- bits )
     over empty?
     [ 2drop 0 ]
@@ -154,9 +154,8 @@ PRIVATE>
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline
 
-<< {
+{
     { [ cpu x86? ] [ "math.floats.env.x86" require ] }
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
-} cond >>
-
+} cond

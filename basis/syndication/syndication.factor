@@ -107,7 +107,7 @@ M: string parse-feed [ string>xml xml>feed ] with-html-entities ;
 M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
 
 : download-feed ( url -- feed )
-    #! Retrieve an news syndication file, return as a feed tuple.
+    ! Retrieve an news syndication file, return as a feed tuple.
     http-get nip parse-feed ;
 
 ! Atom generation

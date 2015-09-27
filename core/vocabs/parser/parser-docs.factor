@@ -1,4 +1,5 @@
-USING: help.markup help.syntax parser strings words assocs vocabs ;
+USING: assocs continuations help.markup help.syntax parser sequences strings
+words vocabs ;
 IN: vocabs.parser
 
 ARTICLE: "word-search-errors" "Word lookup errors"
@@ -99,6 +100,16 @@ HELP: <manifest>
 { $values { "manifest" manifest } }
 { $description "Creates a new manifest." } ;
 
+HELP: <no-word-error>
+{ $values
+  { "name" "name of the missing words" }
+  { "possibilities" sequence }
+  { "error" error }
+  { "restarts" sequence }
+}
+{ $description "Creates a no word error." } ;
+
+
 HELP: set-current-vocab
 { $values { "name" string } }
 { $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist." }
@@ -136,12 +147,12 @@ HELP: add-qualified
 { $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. See the example in " { $link POSTPONE: QUALIFIED: } " for further explanation." } ;
 
 HELP: add-words-from
-{ $values { "vocab" "a vocabulary specifier" } { "words" "a sequence of word names" } }
+{ $values { "vocab" "a vocabulary specifier" } { "words" { $sequence "word names" } } }
 { $description "Adds " { $snippet "words" } " from " { $snippet "vocab" } " to the current manifest." }
 { $notes "This word is used to implement " { $link POSTPONE: FROM: } "." } ;
 
 HELP: add-words-excluding
-{ $values { "vocab" "a vocabulary specifier" } { "words" "a sequence of word names" } }
+{ $values { "vocab" "a vocabulary specifier" } { "words" { $sequence "word names" } } }
 { $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } " to the manifest." }
 { $notes "This word is used to implement " { $link POSTPONE: EXCLUDE: } "." } ;
 
@@ -152,13 +163,11 @@ HELP: add-renamed-word
 
 HELP: use-words
 { $values { "assoc" assoc } }
-{ $description "Adds an assoc mapping word names to words to the current manifest." }
-{ $notes "This word is used by " { $link "locals" } " to implement lexically-scoped names." } ;
+{ $description "Adds an assoc mapping word names to words to the current manifest." } ;
 
 HELP: unuse-words
 { $values { "assoc" assoc } }
-{ $description "Removes an assoc mapping word names to words from the current manifest." }
-{ $notes "This word is used by " { $link "locals" } " to implement lexically-scoped names." } ;
+{ $description "Removes an assoc mapping word names to words from the current manifest." } ;
 
 HELP: ambiguous-use-error
 { $error-description "Thrown when a word name referenced in source file is available in more than one vocabulary in the manifest. Such cases must be explicitly disambiguated using " { $link POSTPONE: FROM: } ", " { $link POSTPONE: EXCLUDE: } ", " { $link POSTPONE: QUALIFIED: } ", or " { $link POSTPONE: QUALIFIED-WITH: } "." } ;

@@ -6,7 +6,7 @@ IN: openal.alut.other
 
 LIBRARY: alut
 
-FUNCTION: void alutLoadWAVFile ( c-string fileName, ALenum* format, void** data, ALsizei* size, ALsizei* frequency, ALboolean* looping ) ;
+FUNCTION: void alutLoadWAVFile ( c-string fileName, ALenum* format, void** data, ALsizei* size, ALsizei* frequency, ALboolean* looping )
 
 M: object load-wav-file ( filename -- format data size frequency )
     0 int <ref>

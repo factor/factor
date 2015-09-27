@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit kernel
-layouts math cpu.architecture
-compiler.cfg.instructions
-compiler.cfg.value-numbering.graph ;
+USING: accessors combinators combinators.short-circuit
+compiler.cfg.instructions compiler.cfg.value-numbering.graph
+cpu.architecture kernel layouts math ;
 IN: compiler.cfg.value-numbering.rewrite
 
 ! Outputs f to mean no change

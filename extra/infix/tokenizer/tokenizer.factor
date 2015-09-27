@@ -10,7 +10,7 @@ Digit             = [0-9]
 Digits            = Digit+
 Number            =   Digits '.' Digits => [[ "" concat-as string>number ast-number boa ]]
                     | Digits => [[ >string string>number ast-number boa ]]
-Space             = " " | "\n" | "\r" | "\t"
+Space             = [ \t\n\r]
 Spaces            = Space* => [[ ignore ]]
 NameFirst         = Letter | "_" => [[ CHAR: _ ]]
 NameRest          = NameFirst | Digit

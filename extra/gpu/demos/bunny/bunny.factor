@@ -75,7 +75,7 @@ UNIFORM-TUPLE: sobel-uniforms
     { "color-texture"  texture-uniform f }
     { "normal-texture" texture-uniform f }
     { "depth-texture"  texture-uniform f }
-    { "line-color"     vec4-uniform    f } ; 
+    { "line-color"     vec4-uniform    f } ;
 
 UNIFORM-TUPLE: loading-uniforms
     { "texcoord-scale"  vec2-uniform    f }
@@ -212,7 +212,7 @@ CONSTANT: bunny-model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
 
 M: bunny-world begin-game-world
     init-gpu
-    
+
     { -0.2 0.13 0.1 } 1.1 0.2 set-wasd-view
 
     <bunny-state> >>bunny
@@ -232,7 +232,7 @@ M: bunny-world begin-game-world
 
 : draw-bunny ( world -- )
     T{ depth-state { comparison cmp-less } } set-gpu-state
-    
+
     [
         sobel>> framebuffer>> {
             { T{ color-attachment f 0 } { 0.15 0.15 0.15 1.0 } }

@@ -7,4 +7,3 @@ IN: checksums.fletcher
     "abcde" { fletcher-16 fletcher-32 fletcher-64 }
     [ checksum-bytes ] with map
 ] unit-test
-

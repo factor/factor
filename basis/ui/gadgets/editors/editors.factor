@@ -1,14 +1,15 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers arrays assocs calendar colors.constants
+USING: accessors arrays assocs calendar colors.constants
 combinators combinators.short-circuit documents
 documents.elements fry grouping kernel locals make math
 math.functions math.order math.ranges math.rectangles
 math.vectors models models.arrow namespaces opengl sequences
-sorting splitting ui.baseline-alignment ui.clipboards
+sorting splitting timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-ui.gestures ui.pens.solid ui.render ui.text unicode.categories ;
+ui.gadgets.theme ui.gestures ui.pens.solid ui.render ui.text
+unicode.categories ;
 EXCLUDE: fonts => selection ;
 IN: ui.gadgets.editors
 
@@ -341,22 +342,22 @@ M: editor gadget-text* editor-string % ;
     [ drop dup extend-selection dup mark>> click-loc ]
     [ select-elt ] if ;
 
-: delete-previous-character ( editor -- ) 
+: delete-previous-character ( editor -- )
     char-elt editor-backspace ;
 
-: delete-next-character ( editor -- ) 
+: delete-next-character ( editor -- )
     char-elt editor-delete ;
 
-: delete-previous-word ( editor -- ) 
+: delete-previous-word ( editor -- )
     word-elt editor-backspace ;
 
-: delete-next-word ( editor -- ) 
+: delete-next-word ( editor -- )
     word-elt editor-delete ;
 
-: delete-to-start-of-line ( editor -- ) 
+: delete-to-start-of-line ( editor -- )
     one-line-elt editor-backspace ;
 
-: delete-to-end-of-line ( editor -- ) 
+: delete-to-end-of-line ( editor -- )
     one-line-elt editor-delete ;
 
 : delete-to-start-of-document ( editor -- )
@@ -445,28 +446,28 @@ editor "caret-motion" f {
     [ dup select-word ] unless
     gadget-selection ;
 
-: select-previous-character ( editor -- ) 
+: select-previous-character ( editor -- )
     char-elt editor-select-prev ;
 
-: select-next-character ( editor -- ) 
+: select-next-character ( editor -- )
     char-elt editor-select-next ;
 
-: select-previous-word ( editor -- ) 
+: select-previous-word ( editor -- )
     word-elt editor-select-prev ;
 
-: select-next-word ( editor -- ) 
+: select-next-word ( editor -- )
     word-elt editor-select-next ;
 
-: select-start-of-line ( editor -- ) 
+: select-start-of-line ( editor -- )
     one-line-elt editor-select-prev ;
 
-: select-end-of-line ( editor -- ) 
+: select-end-of-line ( editor -- )
     one-line-elt editor-select-next ;
 
-: select-start-of-document ( editor -- ) 
+: select-start-of-document ( editor -- )
     doc-elt editor-select-prev ;
 
-: select-end-of-document ( editor -- ) 
+: select-end-of-document ( editor -- )
     doc-elt editor-select-next ;
 
 editor "selection" f {
@@ -646,11 +647,40 @@ M: model-field ungraft*
 M: model-field model-changed
     nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;
 
+TUPLE: action-editor < editor default-text ;
+
+: <action-editor> ( -- editor )
+    action-editor new-editor ;
+
+<PRIVATE
+
+: draw-default-text? ( editor -- ? )
+    { [ default-text>> ] [ model>> doc-string empty? ] } 1&& ;
+
+: draw-default-text ( editor -- )
+    [ font>> clone line-color >>foreground ]
+    [ default-text>> ] bi draw-text ;
+
+PRIVATE>
+
+M: action-editor draw-gadget*
+    dup draw-default-text? [
+        [ draw-default-text ] [ draw-caret ] bi
+    ] [
+        call-next-method
+    ] if ;
+
 TUPLE: action-field < field quot ;
 
-: <action-field> ( quot -- gadget )
-    action-field new-field
+: <action-field> ( quot: ( string -- ) -- gadget )
+    action-field [ <action-editor> ] dip new-border
+        dup gadget-child >>editor
+        field-theme
         swap >>quot ;
+
+M: action-field default-text>> editor>> default-text>> ;
+
+M: action-field default-text<< editor>> default-text<< ;
 
 : invoke-action-field ( field -- )
     [ editor>> editor-string ]

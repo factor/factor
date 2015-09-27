@@ -10,7 +10,7 @@ IN: images.atlas
 !   place first rect at x 0
 !   place rects that fit in remaining stripe
 !   pack stripes(y + height)
-! if height > max height 
+! if height > max height
 
 TUPLE: image-placement
     { image read-only }
@@ -108,7 +108,7 @@ PRIVATE>
     image-placement image>> :> image
     image-placement loc>> first2 :> ( x y )
     image dim>> first2 :> ( w h )
-    
+
     x     aw /f :> left-u
     y     ah /f :> top-v
     x w + aw /f :> right-u

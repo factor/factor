@@ -65,7 +65,7 @@ TUPLE: password size ;
     password new ;
 
 M: password render*
-    #! Don't send passwords back to the user
+    ! Don't send passwords back to the user
     [ drop "" ] 2dip size>> "password" render-field ;
 
 ! Text areas

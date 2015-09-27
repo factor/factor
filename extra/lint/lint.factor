@@ -1,13 +1,10 @@
 ! Copyright (C) 2007, 2008, 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: accessors alien arrays assocs classes
-classes.tuple.private combinators.short-circuit continuations
-fry hashtables io kernel kernel.private locals.backend make math
-math.private namespaces prettyprint quotations sequences
-sequences.deep shuffle slots.private splitting stack-checker
-vectors vocabs words words.alias ;
-
+USING: accessors arrays assocs classes classes.tuple.private
+combinators.short-circuit continuations fry io kernel
+kernel.private locals.backend make math math.private namespaces
+prettyprint quotations sequences sequences.deep slots.private
+splitting stack-checker vocabs words words.alias ;
 IN: lint
 
 <PRIVATE
@@ -232,7 +229,7 @@ SYMBOL: lint-definitions-keys
     lintable-words load-definitions
 
     ! Remove words that are their own definition
-    [ [ [ def>> ] [ 1quotation ] bi = not ] filter ] assoc-map
+    [ [ [ def>> ] [ 1quotation ] bi = ] reject ] assoc-map
 
     ! Add manual definitions
     manual-substitutions over '[ _ push-at ] assoc-each
@@ -284,7 +281,7 @@ GENERIC: run-lint ( obj -- obj )
 
 M: sequence run-lint ( seq -- seq )
     [ dup lint ] { } map>assoc trim-self
-    [ second empty? not ] filter filter-symbols ;
+    [ second empty? ] reject filter-symbols ;
 
 M: word run-lint ( word -- seq ) 1array run-lint ;
 
@@ -314,10 +311,10 @@ PRIVATE>
     all-words run-lint dup lint. ;
 
 : lint-vocab ( vocab -- seq )
-    words run-lint dup lint. ;
+    vocab-words run-lint dup lint. ;
 
 : lint-vocabs ( prefix -- seq )
-    [ vocabs ] dip [ head? ] curry filter [ lint-vocab ] map ;
+    [ loaded-vocab-names ] dip [ head? ] curry filter [ lint-vocab ] map ;
 
 : lint-word ( word -- seq )
     1array run-lint dup lint. ;

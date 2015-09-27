@@ -29,7 +29,6 @@ $nl
 ARTICLE: "syntax-comments" "Comments"
 { $subsections
     POSTPONE: !
-    POSTPONE: #!
 } ;
 
 ARTICLE: "syntax-immediate" "Parse time evaluation"
@@ -107,7 +106,7 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 "A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
-"Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and an optional base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
+"Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
     "8.0 0x1.0p3 = ."
     "t"
@@ -118,6 +117,14 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 { $example
     "10.125 0x1.44p3 = ."
+    "t"
+}
+{ $example
+    "10.125 0b1.010001p3 = ."
+    "t"
+}
+{ $example
+    "10.125 0o1.21p3 = ."
     "t"
 }
 "The normalized hex form " { $snippet "±0x1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of the binary IEEE 754 representation."
@@ -459,7 +466,7 @@ HELP: SINGLETON:
     "Defines a new singleton class. The class word itself is the sole instance of the singleton class."
 }
 { $examples
-    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint\nSINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } ;
 
 HELP: SINGLETONS:
@@ -603,9 +610,9 @@ HELP: CHAR:
 } ;
 
 HELP: "
-{ $syntax "\"string...\"" "\"\"\"string...\"\"\"" }
+{ $syntax "\"string...\"" }
 { $values { "string" "literal and escaped characters" } }
-{ $description "Reads from the input string until the next occurrence of " { $snippet "\"" } " or " { $snippet "\"\"\"" } ", and appends the resulting string to the parse tree. String literals can span multiple lines. Various special characters can be read by inserting " { $link "escape" } ". For triple quoted strings, the double-quote character does not require escaping." }
+{ $description "Reads from the input string until the next occurrence of " { $snippet "\"" } ", and appends the resulting string to the parse tree. String literals can span multiple lines. Various special characters can be read by inserting " { $link "escape" } "." }
 { $examples
     "A string with an escaped newline in it:"
     { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" }
@@ -613,9 +620,6 @@ HELP: "
     { $example "USE: io" "\"Hello\nworld\" print" "Hello\nworld" }
     "A string with a named Unicode code point:"
     { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
-    "A triple-quoted string:"
-    { $example "USE: io \"\"\"Teach a man to \"fish\"...\nand fish will go extinct\"\"\" print" """Teach a man to \"fish\"...
-and fish will go extinct""" }
 } ;
 
 HELP: SBUF"
@@ -658,20 +662,6 @@ HELP: !
 { $syntax "! comment..." }
 { $values { "comment" "characters" } }
 { $description "Discards all input until the end of the line." } ;
-
-{ POSTPONE: ! POSTPONE: #! } related-words
-
-HELP: #!
-{ $syntax "#!comment..." }
-{ $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." }
-{ $notes "To allow Unix-style \"shebang\" scripts to work as expected, " { $snippet "#!" } " is parsed as a separate token regardless of following whitespace if it appears at the beginning of a line."
-{ $example
-    "#!/usr/bin/env/factor"
-    "USING: io ;"
-    "\"Hello world\" print"
-    "Hello world"
-} } ;
 
 HELP: NAN:
 { $syntax "NAN: payload" }
@@ -818,15 +808,15 @@ HELP: SLOT:
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class whose class word throws a new instance of the error." }
+{ $description "Defines a new tuple class and a word " { $snippet "classname" } " that throws a new instance of the error." }
 { $notes
     "The following two snippets are equivalent:"
     { $code
         "ERROR: invalid-values x y ;"
         ""
         "TUPLE: invalid-values x y ;"
-        ": invalid-values ( x y -- * )"
-        "    \\ invalid-values boa throw ;"
+        ": throw-invalid-values ( x y -- * )"
+        "    invalid-values boa throw ;"
     }
 } ;
 

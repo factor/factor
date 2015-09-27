@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations debugger io
-io.directories io.sockets io.streams.string kernel mason.config
-mason.disk mason.email mason.notify mason.updates namespaces
-prettyprint threads ;
-FROM: mason.build => build ;
+io.directories io.sockets io.streams.string kernel mason.build
+mason.config mason.disk mason.email mason.notify mason.updates
+namespaces prettyprint threads ;
 IN: mason
 
 : heartbeat-loop ( -- )
@@ -29,7 +28,7 @@ IN: mason
         builds-dir get [
             check-disk-space
             update-sources
-            build? [ build ] [ 5 minutes sleep ] if
+            should-build? [ do-build ] [ 5 minutes sleep ] if
         ] with-directory
     ] [
         error-continuation get call>> build-loop-error
@@ -38,9 +37,9 @@ IN: mason
 
     build-loop ;
 
-: mason ( -- )
+: run-mason ( -- )
     [ heartbeat-loop ] "Heartbeat loop" spawn
     [ build-loop ] "Build loop" spawn
     stop ;
 
-MAIN: mason
+MAIN: run-mason

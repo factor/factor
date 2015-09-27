@@ -5,8 +5,7 @@ peg peg.ebnf peg.parsers memoize math accessors ;
 IN: peg.expr
 
 EBNF: expr 
-digit    = [0-9]            => [[ digit> ]]
-number   = (digit)+         => [[ 10 digits>integer ]]
+number   = ([0-9])+         => [[ string>number ]]
 value    =   number 
            | ("(" exp ")")  => [[ second ]]
 

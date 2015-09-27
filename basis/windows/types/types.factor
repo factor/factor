@@ -271,7 +271,7 @@ TYPEDEF: void* PAINTSTRUCT
 
 STRUCT: POINT
     { x LONG }
-    { y LONG } ; 
+    { y LONG } ;
 
 STRUCT: SIZE
     { cx LONG }

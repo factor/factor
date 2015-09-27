@@ -3,4 +3,4 @@
 USING: accessors kernel tools.test usa-cities ;
 IN: usa-cities.tests
 
-[ t ] [ 55406 find-zip-code name>> "Minneapolis" = ] unit-test
+{ t } [ 55406 find-zip-code name>> "Minneapolis" = ] unit-test

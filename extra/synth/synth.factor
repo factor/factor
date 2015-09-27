@@ -33,4 +33,3 @@ C: <note> note
 
 : >note ( harmonics note buffer -- buffer )
     [ [ note-harmonic-data ] 2curry map <summed> ] [ data<< ] [ ] tri ;
-

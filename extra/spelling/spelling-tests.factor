@@ -12,8 +12,8 @@ MEMO: test-dictionary ( -- assoc )
 : test-correct ( word -- word/f )
     test-dictionary (correct) ;
 
-[ "government" ] [ "goverment" test-correct ] unit-test
-[ "government" ] [ "govxernment" test-correct ] unit-test
-[ "government" ] [ "govermnent" test-correct ] unit-test
-[ "government" ] [ "govxermnent" test-correct ] unit-test
-[ "government" ] [ "govyrmnent" test-correct ] unit-test
+{ "government" } [ "goverment" test-correct ] unit-test
+{ "government" } [ "govxernment" test-correct ] unit-test
+{ "government" } [ "govermnent" test-correct ] unit-test
+{ "government" } [ "govxermnent" test-correct ] unit-test
+{ "government" } [ "govyrmnent" test-correct ] unit-test

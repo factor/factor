@@ -72,4 +72,3 @@ TUPLE: foo a b c ;
     T{ foo { a 1 } { b 2 } { c 3 } } clone
     [ { "b" "a" "c" } {set-slots} ] keep
 ] unit-test
-

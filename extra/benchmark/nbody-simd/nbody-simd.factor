@@ -45,7 +45,7 @@ SPECIALIZED-ARRAY: body
 
 : <sun> ( -- body )
     double-4{ 0 0 0 0 } double-4{ 0 0 0 0 } 1 <body> ;
-    
+
 : offset-momentum ( body offset -- body )
     vneg solar-mass v/n >>velocity ; inline
 

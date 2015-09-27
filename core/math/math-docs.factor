@@ -235,6 +235,19 @@ HELP: sgn
     }
 } ;
 
+HELP: rect>
+{ $values { "x" real } { "y" real } { "z" number } }
+{ $description "Creates a complex number from real and imaginary components. If " { $snippet "z" } " is an integer zero, this will simply output " { $snippet "x" } "." } ;
+
+HELP: >rect
+{ $values { "z" number } { "x" real } { "y" real } }
+{ $description "Extracts the real and imaginary components of a complex number." } ;
+
+HELP: gcd
+{ $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
+{ $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
+{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
+
 HELP: 2/
 { $values { "x" integer } { "y" integer } }
 { $description "Shifts " { $snippet "x" } " to the right by one bit." }
@@ -423,12 +436,12 @@ HELP: all-integers?
 { $notes "This word is used to implement " { $link all? } "." } ;
 
 HELP: find-integer
-{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i" { $maybe integer } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find } "." } ;
 
 HELP: find-last-integer
-{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i" { $maybe integer } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
@@ -509,4 +522,3 @@ $nl
 { $see-also "integers" "rationals" "floats" "complex-numbers" } ;
 
 ABOUT: "arithmetic"
-

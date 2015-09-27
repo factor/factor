@@ -2,8 +2,6 @@
 
 namespace factor {
 
-#define FRAME_RETURN_ADDRESS(frame, vm) \
-  *((void**)(vm->frame_successor(frame) + 1) + 2)
 #define UAP_STACK_POINTER(ucontext) \
   ((ucontext_t*)ucontext)->uc_mcontext.gp_regs[1]
 #define UAP_PROGRAM_COUNTER(ucontext) \
@@ -23,8 +21,6 @@ namespace factor {
 #define FUNCTION_CODE_POINTER(ptr) (function_descriptor_field((void*)ptr, 0))
 
 #define FUNCTION_TOC_POINTER(ptr) (function_descriptor_field((void*)ptr, 1))
-
-#define UAP_STACK_POINTER_TYPE unsigned long
 
 inline static unsigned int uap_fpu_status(void* uap) {
   union {

@@ -78,7 +78,7 @@ TUPLE: bull ;
       write flush drop validate-readln ]
     when ;
 
-: win ( -- ) "\nYou've won! Good job. You're so smart." print flush ; 
+: win ( -- ) "\nYou've won! Good job. You're so smart." print flush ;
 
 : main-loop ( x -- )
     "Enter a 4 digit number: " write flush validate-readln num>hash swap

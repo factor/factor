@@ -6,5 +6,5 @@ TUPLE: resource < change-tracking-tuple
 
 : <resource> ( pathname -- resource ) f swap resource boa ;
 
-[ t ] [ "foo" <resource> "bar" >>pathname changed?>> ] unit-test
-[ f ] [ "foo" <resource> [ 123 >>pathname ] [ drop ] recover changed?>> ] unit-test
+{ t } [ "foo" <resource> "bar" >>pathname changed?>> ] unit-test
+{ f } [ "foo" <resource> [ 123 >>pathname ] [ drop ] recover changed?>> ] unit-test

@@ -45,6 +45,6 @@ M: wrapped-hash-set members
 M: wrapped-hash-set equal?
     over wrapped-hash-set? [ [ underlying>> ] same? ] [ 2drop f ] if ;
 
-INSTANCE: wrapped-hash-set set
+INSTANCE: wrapped-hash-set unordered-set
 
 { "hash-sets.wrapped" "prettyprint" } "hash-sets.wrapped.prettyprint" require-when

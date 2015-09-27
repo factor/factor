@@ -21,7 +21,7 @@ PRIVATE>
 
 : unpublish ( id -- )
     remote-channels delete-at ;
-    
+
 <PRIVATE
 
 MATCH-VARS: ?from ?tag ?id ?value ;
@@ -34,7 +34,7 @@ TUPLE: from-message id ;
     [
         {
             { T{ to-message f ?id ?value  }
-            [ ?value ?id get-channel dup [ to f ] [ 2drop no-channel ] if ] }
+            [ ?value ?id get-channel [ to f ] [ drop no-channel ] if* ] }
             { T{ from-message f ?id }
             [ ?id get-channel [ from ] [ no-channel ] if* ] }
         } match-cond
@@ -43,21 +43,21 @@ TUPLE: from-message id ;
 : start-channel-node ( -- )
     "remote-channels" get-remote-thread [
         [ channel-thread t ] "Remote channels" spawn-server
-        "remote-channels" register-remote-thread 
+        "remote-channels" register-remote-thread
     ] unless ;
 
 PRIVATE>
 
 TUPLE: remote-channel node id ;
 
-C: <remote-channel> remote-channel 
+C: <remote-channel> remote-channel
 
 <PRIVATE
 
 : send-message ( message remote-channel -- value )
-    node>> "remote-channels" <remote-thread> 
+    node>> "remote-channels" <remote-thread>
     send-synchronous dup no-channel = [ no-channel throw ] when* ;
-    
+
 PRIVATE>
 
 M: remote-channel to ( value remote-channel -- )

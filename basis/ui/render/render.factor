@@ -3,7 +3,6 @@
 USING: math.rectangles math.vectors namespaces kernel accessors
 assocs combinators sequences sets opengl opengl.gl colors
 colors.constants ui.gadgets ui.pens ;
-FROM: namespaces => set ;
 IN: ui.render
 
 SYMBOL: clip

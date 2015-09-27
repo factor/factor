@@ -3,8 +3,9 @@
 USING: accessors arrays assocs calendar combinators
 combinators.smart fry generalizations io io.streams.string
 kernel macros math math.functions math.parser namespaces
-peg.ebnf present prettyprint quotations sequences strings
-unicode.case unicode.categories vectors ;
+peg.ebnf present prettyprint quotations sequences
+sequences.generalizations strings unicode.case
+unicode.categories vectors ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -14,16 +15,16 @@ IN: formatting
     [ ] [ compose ] reduce ; inline
 
 : fix-sign ( string -- string )
-    dup CHAR: 0 swap index 0 =
-      [ dup 0 swap [ [ CHAR: 0 = not ] keep digit? and ] find-from
-         [ dup 1 - rot dup [ nth ] dip swap
-            {
-               { CHAR: - [ [ 1 - ] dip remove-nth "-" prepend ] }
-               { CHAR: + [ [ 1 - ] dip remove-nth "+" prepend ] }
-               [ drop nip ]
+    dup first CHAR: 0 = [
+        dup [ [ CHAR: 0 = not ] [ digit? ] bi and ] find
+        [
+            1 - swap 2dup nth {
+                { CHAR: - [ remove-nth "-" prepend ] }
+                { CHAR: + [ remove-nth "+" prepend ] }
+                [ drop nip ]
             } case
-         ] [ drop ] if
-      ] when ;
+        ] [ drop ] if
+    ] when ;
 
 : >digits ( string -- digits )
     [ 0 ] [ string>number ] if-empty ;
@@ -48,7 +49,8 @@ pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0 = [ drop [ ] ] when ]]
 
-sign      = ("+")?               => [[ [ dup CHAR: - swap index [ "+" prepend ] unless ] [ ] ? ]]
+sign_     = [+ ]                 => [[ '[ dup CHAR: - swap index [ _ prefix ] unless ] ]]
+sign      = (sign_)?             => [[ [ ] or ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
 width     = (width_)?            => [[ [ ] or ]]
@@ -92,18 +94,23 @@ text      = (formats|plain-text)* => [[ ]]
 
 ;EBNF
 
-PRIVATE>
-
-MACRO: printf ( format-string -- )
+: printf-quot ( format-string -- format-quot n )
     parse-printf [ [ callable? ] count ] keep [
         dup string? [ 1quotation ] [ [ 1 - ] dip ] if
         over [ ndip ] 2curry
-    ] map nip [ compose-all ] [ length ] bi '[
+    ] map nip [ compose-all ] [ length ] bi ; inline
+
+PRIVATE>
+
+MACRO: printf ( format-string -- quot )
+    printf-quot '[
         @ output-stream get [ stream-write ] curry _ napply
     ] ;
 
-: sprintf ( format-string -- result )
-    [ printf ] with-string-writer ; inline
+MACRO: sprintf ( format-string -- quot )
+    printf-quot '[
+        @ _ "" nappend-as
+    ] ;
 
 : vprintf ( seq format-string -- )
     parse-printf output-stream get '[
@@ -117,17 +124,19 @@ MACRO: printf ( format-string -- )
 
 <PRIVATE
 
-: pad-00 ( n -- string ) number>string 2 CHAR: 0 pad-head ; inline
+: pad-00 ( n -- string )
+    number>string 2 CHAR: 0 pad-head ; inline
 
-: pad-000 ( n -- string ) number>string 3 CHAR: 0 pad-head ; inline
+: pad-000 ( n -- string )
+    number>string 3 CHAR: 0 pad-head ; inline
 
 : >time ( timestamp -- string )
-    [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array
-    [ pad-00 ] map ":" join ; inline
+    [ hour>> ] [ minute>> ] [ second>> floor ] tri
+    [ pad-00 ] tri@ 3array ":" join ; inline
 
 : >date ( timestamp -- string )
-    [ month>> ] [ day>> ] [ year>> ] tri 3array
-    [ pad-00 ] map "/" join ; inline
+    [ month>> ] [ day>> ] [ year>> ] tri
+    [ pad-00 ] tri@ 3array "/" join ; inline
 
 : >datetime ( timestamp -- string )
     [
@@ -140,13 +149,13 @@ MACRO: printf ( format-string -- )
        } cleave
     ] output>array " " join ; inline
 
-: (week-of-year) ( timestamp day -- n )
+: week-of-year ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
     [ day-of-year ] dip 2dup < [ 0 2nip ] [ - 7 / 1 + >fixnum ] if ;
 
-: week-of-year-sunday ( timestamp -- n ) 0 (week-of-year) ; inline
+: week-of-year-sunday ( timestamp -- n ) 0 week-of-year ; inline
 
-: week-of-year-monday ( timestamp -- n ) 1 (week-of-year) ; inline
+: week-of-year-monday ( timestamp -- n ) 1 week-of-year ; inline
 
 EBNF: parse-strftime
 
@@ -188,7 +197,7 @@ text      = (formats|plain-text)* => [[ ]]
 
 PRIVATE>
 
-MACRO: strftime ( format-string -- )
+MACRO: strftime ( format-string -- quot )
     parse-strftime [
         dup string? [
             '[ _ swap push-all ]

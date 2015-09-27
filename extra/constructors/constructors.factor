@@ -7,7 +7,7 @@ words alien.parser ;
 IN: constructors
 
 : all-slots-assoc ( class -- slots )
-    superclasses [
+    superclasses-of [
         [ "slots" word-prop ] keep '[ _ ] { } map>assoc
     ] map concat ;
 
@@ -17,7 +17,7 @@ MACRO:: slots>boa ( slots class -- quot )
     slots length
     default-params length
     '[
-        _ narray slot-assoc swap zip 
+        _ narray slot-assoc swap zip
         default-params swap assoc-union values _ firstn class boa
     ] ;
 
@@ -38,7 +38,7 @@ ERROR: unknown-constructor-parameters class effect unknown ;
     [ constructor-boa-quot ] keep define-declared ;
 
 : create-reset ( string -- word )
-    create-in dup reset-generic ;
+    create-word-in dup reset-generic ;
 
 : scan-constructor ( -- word class )
     scan-new-word scan-class ;
@@ -62,4 +62,3 @@ SYNTAX: CONSTRUCTOR:
 SYNTAX: SLOT-CONSTRUCTOR:
     scan-new-word [ name>> "(" append create-reset ] keep
     '[ scan-rest-input-effect in>> _ '[ _ _ slots>boa ] append! ] define-syntax ;
-

@@ -35,7 +35,7 @@ IN: project-euler.099
     ascii file-lines [ "," split [ string>number ] map ] map ;
 
 : simplify ( seq -- seq )
-    #! exponent * log(base)
+    ! exponent * log(base)
     flip first2 swap [ log ] map v* ;
 
 : solve ( seq -- index )

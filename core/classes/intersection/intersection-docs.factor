@@ -8,7 +8,7 @@ ARTICLE: "intersections" "Intersection classes"
 { $subsections POSTPONE: INTERSECTION: }
 { $subsections define-intersection-class }
 "Intersection classes can be introspected:"
-{ $subsections participants }
+{ $subsections class-participants }
 "The set of intersection classes is a class:"
 { $subsections
     intersection-class

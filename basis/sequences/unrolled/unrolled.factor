@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
-USING: combinators combinators.short-circuit fry generalizations kernel
-locals macros math quotations sequences compiler.tree.propagation.transforms ;
-FROM: sequences.private => (each) (each-index) (2each) nth-unsafe set-nth-unsafe ;
+USING: combinators combinators.short-circuit
+compiler.tree.propagation.transforms fry generalizations kernel
+locals math sequences sequences.private ;
 IN: sequences.unrolled
 
 <PRIVATE
@@ -96,4 +96,3 @@ PRIVATE>
 
 : unrolled-map-index ( seq len quot: ( x i -- newx ) -- newseq )
     [ dup length iota ] 2dip unrolled-2map ; inline
-

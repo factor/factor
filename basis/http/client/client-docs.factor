@@ -11,112 +11,112 @@ HELP: too-many-redirects
 { $error-description "Thrown by " { $link http-request } " if the server returns a chain of than " { $link max-redirects } " redirections." } ;
 
 HELP: <get-request>
-{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $values { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP GET request for retrieving the URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
 HELP: <post-request>
-{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $values { "post-data" object } { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP POST request for submitting post data to the URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
 HELP: <head-request>
-{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $values { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP HEAD request for retrieving the URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
 HELP: <delete-request>
-{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $values { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP DELETE request for the requested URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
 HELP: <options-request>
-{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $values { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP OPTIONS request for the requested URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
 HELP: <trace-request>
-{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $values { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP TRACE request for the requested URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
 HELP: download
-{ $values { "url" "a " { $link url } " or " { $link string } } }
+{ $values { "url" { $or url string } } }
 { $description "Downloads the contents of the URL to a file in the " { $link current-directory } " having the same file name." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: download-to
-{ $values { "url" "a " { $link url } " or " { $link string } } { "file" "a pathname string" } }
+{ $values { "url" { $or url string } } { "file" "a pathname string" } }
 { $description "Downloads the contents of the URL to a file with the given pathname." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: ?download-to
-{ $values { "url" "a " { $link url } " or " { $link string } } { "file" "a pathname string" } }
+{ $values { "url" { $or url string } } { "file" "a pathname string" } }
 { $description "Version of " { $link download-to } " that only downloads if " { $snippet "file" } " does not exist." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-get
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Downloads the contents of a URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-get*
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Downloads the contents of a URL, but does not check the HTTP response code for success." } ;
 
 { http-get http-get* } related-words
 
 HELP: http-post
-{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP POST request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-post*
-{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP POST request, but does not check the HTTP response code for success." } ;
 
 { http-post http-post* } related-words
 
 HELP: http-put
-{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-put*
-{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request, but does not check the HTTP response code for success." } ;
 
 { http-put http-put* } related-words
 
 HELP: http-head
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Same as " { $link http-get } " except that the server is not supposed to return a message-body in the response, as per RFC2616. However in practise, most web servers respond to GET and HEAD method calls with identical responses." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-head*
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Same as " { $link http-get* } " except that the server is not supposed to return a message-body in the response, as per RFC2616. However in practise, most web servers respond to GET and HEAD method calls with identical responses." } ;
 
 { http-head http-head* } related-words
 
 HELP: http-delete
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Requests that the origin server delete the resource identified by the URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-delete*
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Requests that the origin server delete the resource identified by the URL, but does not check the HTTP response code for success." } ;
 
 { http-delete http-delete* } related-words
 
 HELP: http-options
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP OPTIONS request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-options*
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP OPTIONS request, but does not check the HTTP response code for success." } ;
 
 { http-options http-options* } related-words
@@ -127,7 +127,7 @@ HELP: http-trace
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-trace*
-{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP TRACE request, but does not check the HTTP response code for success." } ;
 
 { http-trace http-trace* } related-words

@@ -45,7 +45,7 @@ Keyword = Identifier:i ":" => [[ i ":" append ]]
 
 KeywordMessageSelector = Keyword+ => [[ concat ]]
 BinarySelectorChar =   "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+"
-                     | "=" | "|" | "\" | "<" | ">" | "," | "?" | "/"
+                     | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
 BinaryMessageSelector = BinarySelectorChar+ => [[ concat ]]
 
 OptionalMinus = ("-" => [[ CHAR: - ]])?

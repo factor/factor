@@ -7,7 +7,7 @@ regexp.combinators sequences sets splitting splitting.monotonic
 unicode.case unicode.categories urls ;
 IN: robots
 
-! visit-time is GMT, request-rate is pages/second 
+! visit-time is GMT, request-rate is pages/second
 ! crawl-rate is seconds
 
 SYMBOL: robot-identities
@@ -35,14 +35,14 @@ visit-time request-rate crawl-delay unknowns ;
 : normalize-robots.txt ( string -- sitemaps seq )
     string-lines
     [ [ blank? ] trim ] map
-    [ "#" head? not ] filter harvest
+    [ "#" head? ] reject harvest
     [ ":" split1 [ [ blank? ] trim ] bi@ [ >lower ] dip  ] { } map>assoc
     [ first "sitemap" = ] partition [ values ] dip
     [
         {
             [ [ first "user-agent" = ] both? ]
             [ nip first "user-agent" = not ]
-        } 2|| 
+        } 2||
     ] monotonic-split ;
 
 : <rules> ( -- rules )

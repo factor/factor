@@ -91,11 +91,3 @@ SYNTAX: HEREDOC:
         [ next-line ]
         [ parse-til-line-begins ]
     } cleave suffix! ;
-
-SYNTAX: DELIMITED:
-    lexer get {
-        [ skip-blank ]
-        [ rest-of-line ]
-        [ next-line ]
-        [ 0 (parse-multiline-string) ]
-    } cleave suffix! ;

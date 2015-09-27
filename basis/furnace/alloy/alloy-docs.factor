@@ -10,13 +10,13 @@ HELP: <alloy>
 { $examples
     "The " { $vocab-link "webapps.counter" } " vocabulary uses an alloy to configure the counter:"
     { $code
-        """: counter-db ( -- db ) "counter.db" <sqlite-db> ;
+        ": counter-db ( -- db ) \"counter.db\" <sqlite-db> ;
 
 : run-counter ( -- )
     <counter-app>
         counter-db <alloy>
         main-responder set-global
-    8080 httpd ;"""
+    8080 httpd ;"
     }
 } ;
 

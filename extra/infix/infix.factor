@@ -3,7 +3,7 @@
 USING: accessors assocs combinators effects effects.parser fry
 infix.ast infix.parser kernel locals locals.parser math
 math.functions math.order math.ranges multiline namespaces
-parser quotations sequences summary words ;
+parser quotations sequences summary vocabs.parser words ;
 IN: infix
 
 <PRIVATE
@@ -15,7 +15,8 @@ M: local-not-defined summary
     drop "local is not defined" ;
 
 : >local-word ( string -- word )
-    locals get ?at [ local-not-defined ] unless ;
+    qualified-vocabs last words>> ?at
+    [ local-not-defined ] unless ;
 
 ERROR: invalid-op string ;
 

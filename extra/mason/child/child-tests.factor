@@ -1,42 +1,44 @@
+USING: io io.pathnames kernel mason.child mason.config
+namespaces sequences system tools.test ;
 IN: mason.child.tests
-USING: mason.child mason.config tools.test namespaces io kernel
-sequences system ;
 
-[ { "nmake" "/f" "nmakefile" "x86-32" } ] [
-    H{
-        { target-os windows }
-        { target-cpu x86.32 }
-    } [ make-cmd ] with-variables
-] unit-test
-
-[ { "make" "macosx-x86-32" } ] [
+{ { "make" "macosx-x86-32" } } [
     H{
         { target-os macosx }
         { target-cpu x86.32 }
-    } [ make-cmd ] with-variables
+    } [ mason-child-make-cmd ] with-variables
 ] unit-test
 
-[ { "./factor.com" "-i=boot.windows-x86.32.image" "-no-user-init" } ] [
+! Must be an absolute path on Windows because launch directory
+! is relative to parent directory (instead of current directory).
+{ t } [
     H{
         { target-os windows }
         { target-cpu x86.32 }
-    } [ boot-cmd ] with-variables
+    } [ mason-child-make-cmd ] with-variables first absolute-path?
+] unit-test
+
+{ t } [
+    H{
+        { target-os windows }
+        { target-cpu x86.32 }
+    } [ mason-child-boot-cmd ] with-variables first absolute-path?
 ] unit-test
 
 [ [ "Hi" print ] [ drop 3 ] [ 4 ] recover-else ] must-infer
 
-[ 4 ] [ [ "Hi" print ] [ drop 3 ] [ 4 ] recover-else ] unit-test
+{ 4 } [ [ "Hi" print ] [ drop 3 ] [ 4 ] recover-else ] unit-test
 
-[ 3 ] [ [ "Hi" throw ] [ drop 3 ] [ 4 ] recover-else ] unit-test
+{ 3 } [ [ "Hi" throw ] [ drop 3 ] [ 4 ] recover-else ] unit-test
 
-[ "A" ] [
+{ "A" } [
     {
         { [ 3 throw ] [ { "X" "Y" "Z" "A" } nth ] }
         [ "B" ]
     } recover-cond
 ] unit-test
 
-[ "B" ] [
+{ "B" } [
     {
         { [ ] [ ] }
         [ "B" ]

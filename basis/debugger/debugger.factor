@@ -6,11 +6,11 @@ combinators combinators.short-circuit compiler.errors
 compiler.units continuations definitions destructors
 effects.parser fry generic generic.math generic.parser
 generic.single grouping io io.encodings io.styles kernel
-kernel.private lexer make math math.order math.parser namespaces
-parser prettyprint sequences sequences.private slots
-source-files.errors strings strings.parser summary system vocabs
-vocabs.loader vocabs.parser words ;
-FROM: namespaces => change-global ;
+kernel.private lexer make math math.order math.parser
+math.ratios namespaces parser prettyprint sequences
+sequences.private slots source-files.errors strings
+strings.parser summary system vocabs vocabs.loader vocabs.parser
+words ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -190,6 +190,9 @@ M: vm-error error. dup vm-errors dispatch ;
 
 M: vm-error error-help vm-errors nth first ;
 
+M: division-by-zero summary
+    drop "Division by zero" ;
+
 M: no-method summary
     drop "No suitable method" ;
 
@@ -204,6 +207,8 @@ M: no-method error.
 M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
 M: bad-slot-name summary drop "Bad slot name in object literal" ;
+
+M: bad-vocab-name summary drop "Vocab name cannot contain \":/\\ \"" ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
@@ -233,7 +238,12 @@ M: no-case summary
     drop "Fall-through in case" ;
 
 M: slice-error summary
-    drop "Cannot create slice" ;
+    "Cannot create slice" swap {
+        { [ dup from>> 0 < ] [ ": from < 0" ] }
+        { [ dup [ to>> ] [ seq>> length ] bi > ] [ ": to > length" ] }
+        { [ dup [ from>> ] [ to>> ] bi > ] [ ": from > to" ] }
+        [ f ]
+    } cond nip append ;
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 

@@ -20,4 +20,3 @@ SYMBOL: G-world
 
 SYNTAX: GB
     \ gl-break suffix! ;
-

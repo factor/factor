@@ -1,6 +1,6 @@
 namespace factor {
 
-template <typename Block> struct bump_allocator {
+struct bump_allocator {
   /* offset of 'here' and 'end' is hardcoded in compiler backends */
   cell here;
   cell start;
@@ -10,12 +10,12 @@ template <typename Block> struct bump_allocator {
   bump_allocator(cell size, cell start)
       : here(start), start(start), end(start + size), size(size) {}
 
-  bool contains_p(Block* block) { return ((cell)block - start) < size; }
+  bool contains_p(object* obj) { return ((cell)obj - start) < size; }
 
-  Block* allot(cell size) {
+  object* allot(cell size) {
     cell h = here;
     here = h + align(size, data_alignment);
-    return (Block*)h;
+    return (object*)h;
   }
 
   cell occupied_space() { return here - start; }

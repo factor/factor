@@ -13,14 +13,18 @@ struct segment {
   ~segment();
 
   bool underflow_p(cell addr) {
-    return (addr >= start - getpagesize() && addr < start);
+    return addr >= (start - getpagesize()) && addr < start;
   }
 
   bool overflow_p(cell addr) {
-    return (addr >= end && addr < end + getpagesize());
+    return addr >= end && addr < (end + getpagesize());
   }
 
-  bool in_segment_p(cell addr) { return (addr >= start && addr < end); }
+  bool in_segment_p(cell addr) {
+    return addr >= start && addr < end;
+  }
+
+  void set_border_locked(bool locked);
 };
 
 }

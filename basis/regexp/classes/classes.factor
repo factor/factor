@@ -5,7 +5,6 @@ combinators.smart combinators.short-circuit locals
 unicode.categories sequences fry macros arrays assocs sets
 classes unicode.script unicode.data ;
 FROM: ascii => ascii? ;
-FROM: sets => members ;
 IN: regexp.classes
 
 SINGLETONS: dot letter-class LETTER-class Letter-class digit-class
@@ -217,7 +216,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     dup
     [ simples>> ] [ not-simples>> ] [ and>> ] tri
     3append or-class boa
-    '[ [ _ class-member? not ] filter ] change-integers ;
+    '[ [ _ class-member? ] reject ] change-integers ;
 
 : answer-ands ( partition -- partition' )
     dup [ integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
@@ -328,7 +327,7 @@ M: object class>questions 1array ;
     ! input table is state => class
     >alist dup table>questions make-condition ;
 
-: condition-map ( condition quot: ( obj -- obj' ) -- new-condition ) 
+: condition-map ( condition quot: ( obj -- obj' ) -- new-condition )
     over condition? [
         [ [ question>> ] [ yes>> ] [ no>> ] tri ] dip
         '[ _ condition-map ] bi@ <condition>

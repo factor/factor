@@ -56,15 +56,13 @@ STRUCT: yuv-buffer
     drop 516 * 128 + swap 298 * + -8 shift clamp ; inline
 
 : compute-green ( y u v -- g )
-    [ [ 298 * ] dip 100 * - ] dip 208 * - 128 + -8 shift clamp ;
-    inline
+    [ [ 298 * ] dip 100 * - ] dip 208 * - 128 + -8 shift clamp ; inline
 
 : compute-red ( y u v -- g )
     nip 409 * swap 298 * + 128 + -8 shift clamp ; inline
 
 : compute-rgb ( y u v -- b g r )
-    [ compute-blue ] [ compute-green ] [ compute-red ] 3tri ;
-    inline
+    [ compute-blue ] [ compute-green ] [ compute-red ] 3tri ; inline
 
 : store-rgb ( index rgb b g r -- index )
     [ pick 0 + pick set-nth-unsafe ]

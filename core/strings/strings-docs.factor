@@ -44,7 +44,7 @@ HELP: <string>
 { $description "Creates a new string with the given length and all characters initially set to " { $snippet "ch" } "." } ;
 
 HELP: 1string
-{ $values { "ch" "a character"} { "str" string } }
+{ $values { "ch" "a character" } { "str" string } }
 { $description "Outputs a string of one character." } ;
 
 HELP: >string

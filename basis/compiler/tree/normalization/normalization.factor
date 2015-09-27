@@ -1,32 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry namespaces sequences math math.order accessors kernel arrays
-combinators assocs
-stack-checker.backend
-stack-checker.branches
-stack-checker.inlining
-compiler.utilities
-compiler.tree
-compiler.tree.combinators
+USING: accessors arrays assocs combinators compiler.tree
 compiler.tree.normalization.introductions
-compiler.tree.normalization.renaming ;
+compiler.tree.normalization.renaming compiler.utilities fry
+kernel math math.order namespaces sequences
+stack-checker.backend stack-checker.branches ;
 IN: compiler.tree.normalization
-
-! A transform pass done before optimization can begin to
-! fix up some oddities in the tree output by the stack checker:
-!
-! - We rewrite the code so that all #introduce nodes are
-! replaced with a single one, at the beginning of a program.
-! This simplifies subsequent analysis.
-!
-! - We normalize #call-recursive as follows. The stack checker
-! says that the inputs of a #call-recursive are the entire stack
-! at the time of the call. This is a conservative estimate; we
-! don't know the exact number of stack values it touches until
-! the #return-recursive node has been visited, because of row
-! polymorphism. So in the normalize pass, we split a
-! #call-recursive into a #copy of the unchanged values and a
-! #call-recursive with trimmed inputs and outputs.
 
 GENERIC: normalize* ( node -- node' )
 

@@ -12,7 +12,7 @@ IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
     running.app?
-    [ vm parent-directory parent-directory parent-directory ]
+    [ vm-path parent-directory parent-directory parent-directory ]
     [ "resource:Factor.app" ]
     if ;
 
@@ -72,6 +72,9 @@ IN: tools.deploy.macosx
     [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
+: ?show-in-finder ( path -- )
+    open-directory-after-deploy? get [ show-in-finder ] [ drop ] if ;
+
 : deploy.app-image-name ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
@@ -85,15 +88,29 @@ IN: tools.deploy.macosx
             bundle-name
             [ "Contents/Resources" copy-resources ]
             [ "Contents/Frameworks" copy-libraries ] 2bi
-            bundle-name show-in-finder
+            bundle-name ?show-in-finder
         ] with-variables
     ] with-directory ;
 
 : deploy-app-bundle? ( vocab -- ? )
     deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;
 
-M: macosx deploy* ( vocab -- )
+M: macosx deploy*
     ! pass off to M: unix deploy* if we're building a console app
-    dup deploy-app-bundle?
-    [ deploy-app-bundle ]
-    [ call-next-method ] if ;
+    dup deploy-app-bundle? [
+        deploy-app-bundle
+    ] [
+        call-next-method
+    ] if ;
+
+M: macosx deploy-path
+    dup deploy-app-bundle? [
+        deploy-directory get [
+            dup deploy-config [
+                bundle-name "Contents/MacOS/" append-path
+                swap append-path normalize-path
+            ] with-variables
+        ] with-directory
+    ] [
+        call-next-method
+    ] if ;

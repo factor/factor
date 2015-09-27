@@ -33,4 +33,4 @@ IN: cap
     normalize-image ;
 
 : screenshot. ( window -- )
-    [ screenshot <image-gadget> ] [ title>> ] bi open-window ; 
+    [ screenshot <image-gadget> ] [ title>> ] bi open-window ;

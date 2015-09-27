@@ -4,35 +4,39 @@ tools.test vectors ;
 
 IN: sequences.extras.tests
 
-[ { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } ] [ "abcd" all-subseqs ] unit-test
+{ { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } } [ "abcd" all-subseqs ] unit-test
 
-[ { "a" "ab" "abc" "abcd" "b" "bc" "bcd" "c" "cd" "d" } ]
+{ { "a" "ab" "abc" "abcd" "b" "bc" "bcd" "c" "cd" "d" } }
 [ [ "abcd" [ , ] each-subseq ] { } make ] unit-test
 
 { B{ 115 } } [ 1 2 "asdf" B{ } subseq-as ] unit-test
 
-[ "" ] [ "abc" "def" longest-subseq ] unit-test
-[ "abcd" ] [ "abcd" "abcde" longest-subseq ] unit-test
-[ "foo" ] [ "foo" "foobar" longest-subseq ] unit-test
-[ "foo" ] [ "foobar" "foo" longest-subseq ] unit-test
+{ "" } [ "abc" "def" longest-subseq ] unit-test
+{ "abcd" } [ "abcd" "abcde" longest-subseq ] unit-test
+{ "foo" } [ "foo" "foobar" longest-subseq ] unit-test
+{ "foo" } [ "foobar" "foo" longest-subseq ] unit-test
 
-[ "" "" ] [ "" "" CHAR: ? pad-longest ] unit-test
-[ "abc" "def" ] [ "abc" "def" CHAR: ? pad-longest ] unit-test
-[ "   " "abc" ] [ "" "abc" CHAR: \s pad-longest ] unit-test
-[ "abc" "   " ] [ "abc" "" CHAR: \s pad-longest ] unit-test
-[ "abc..." "foobar" ] [ "abc" "foobar" CHAR: . pad-longest ] unit-test
+{ "" "" } [ "" "" CHAR: ? pad-longest ] unit-test
+{ "abc" "def" } [ "abc" "def" CHAR: ? pad-longest ] unit-test
+{ "   " "abc" } [ "" "abc" CHAR: \s pad-longest ] unit-test
+{ "abc" "   " } [ "abc" "" CHAR: \s pad-longest ] unit-test
+{ "abc..." "foobar" } [ "abc" "foobar" CHAR: . pad-longest ] unit-test
 
-[ { 0 1 0 1 } ] [
+{ { 0 1 0 1 } } [
     { 0 0 0 0 } { 1 3 } over [ 1 + ] change-nths
 ] unit-test
 
-[ { 1 3 5 } ] [ { 1 2 3 4 5 6 } [ nip even? ] filter-index ] unit-test
+{ V{ f t f } } [
+    { 1 2 3 } [ even? ] selector* [ each ] dip
+] unit-test
 
-[ V{ 1 3 5 } ] [ { 1 2 3 4 5 6 } [ nip even? ] V{ } filter-index-as ] unit-test
+{ { 1 3 5 } } [ { 1 2 3 4 5 6 } [ nip even? ] filter-index ] unit-test
 
-[ { 1 3 5 } ] [ { 1 2 3 4 5 6 } even-indices ] unit-test
+{ V{ 1 3 5 } } [ { 1 2 3 4 5 6 } [ nip even? ] V{ } filter-index-as ] unit-test
 
-[ { 2 4 6 } ] [ { 1 2 3 4 5 6 } odd-indices ] unit-test
+{ { 1 3 5 } } [ { 1 2 3 4 5 6 } even-indices ] unit-test
+
+{ { 2 4 6 } } [ { 1 2 3 4 5 6 } odd-indices ] unit-test
 
 { "a b c d e" }
 [ "a      b  \t \n \r  c   d \n    e   " [ blank? ] " " compact ] unit-test
@@ -170,7 +174,10 @@ IN: sequences.extras.tests
 { 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] supremum-by* ] unit-test
 { 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
 
-{ "0123456789" } [ 58 iota [ 48 < ] "" reject-as ] unit-test
-{ V{ 1 3 5 7 9 } } [ 10 iota >vector [ even? ] reject! ] unit-test
-
 { 3/10 } [ 10 iota [ 3 < ] count* ] unit-test
+
+{ { 0 } } [ "ABA" "ABABA" start-all ] unit-test
+{ { 0 2 } } [ "ABA" "ABABA" start-all* ] unit-test
+{ { 0 3 } } [ "ABA" "ABAABA" start-all ] unit-test
+{ 1 } [ "ABA" "ABABA" count-subseq ] unit-test
+{ 2 } [ "ABA" "ABABA" count-subseq* ] unit-test

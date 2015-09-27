@@ -1,6 +1,6 @@
 ifdef CONFIG
 	VERSION = 0.98
-	GIT_LABEL = $(shell git describe --all --long)
+	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
 
 	BUNDLE = Factor.app
 
@@ -10,6 +10,8 @@ ifdef CONFIG
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
+
+	CXXFLAGS += -std=c++11
 
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG
@@ -68,6 +70,7 @@ ifdef CONFIG
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
+		vm/debug.hpp \
 		vm/layouts.hpp \
 		vm/platform.hpp \
 		vm/primitives.hpp \
@@ -88,23 +91,19 @@ ifdef CONFIG
 		vm/mark_bits.hpp \
 		vm/free_list.hpp \
 		vm/fixup.hpp \
-		vm/tuples.hpp \
 		vm/free_list_allocator.hpp \
 		vm/write_barrier.hpp \
 		vm/object_start_map.hpp \
-		vm/nursery_space.hpp \
 		vm/aging_space.hpp \
 		vm/tenured_space.hpp \
 		vm/data_heap.hpp \
 		vm/code_heap.hpp \
 		vm/gc.hpp \
-		vm/strings.hpp \
 		vm/float_bits.hpp \
 		vm/io.hpp \
 		vm/image.hpp \
 		vm/callbacks.hpp \
 		vm/dispatch.hpp \
-		vm/entry_points.hpp \
 		vm/safepoints.hpp \
 		vm/vm.hpp \
 		vm/allot.hpp \
@@ -115,12 +114,7 @@ ifdef CONFIG
 		vm/callstack.hpp \
 		vm/slot_visitor.hpp \
 		vm/collector.hpp \
-		vm/copying_collector.hpp \
-		vm/nursery_collector.hpp \
-		vm/aging_collector.hpp \
 		vm/to_tenured_collector.hpp \
-		vm/code_block_visitor.hpp \
-		vm/full_collector.hpp \
 		vm/arrays.hpp \
 		vm/math.hpp \
 		vm/byte_arrays.hpp \
@@ -211,11 +205,11 @@ factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
@@ -229,16 +223,16 @@ vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.o: %.cpp vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.o: %.S
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.o: %.mm vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
 

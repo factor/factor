@@ -3,15 +3,15 @@
 USING: tools.test project-euler.common ;
 IN: project-euler.common.tests
 
-[ 4 ] [ -1000 number-length ] unit-test
-[ 3 ] [ -999 number-length ] unit-test
-[ 3 ] [ -100 number-length ] unit-test
-[ 2 ] [ -99 number-length ] unit-test
-[ 1 ] [ -9 number-length ] unit-test
-[ 1 ] [ -1 number-length ] unit-test
-[ 1 ] [ 0 number-length ] unit-test
-[ 1 ] [ 9 number-length ] unit-test
-[ 2 ] [ 99 number-length ] unit-test
-[ 3 ] [ 100 number-length ] unit-test
-[ 3 ] [ 999 number-length ] unit-test
-[ 4 ] [ 1000 number-length ] unit-test
+{ 4 } [ -1000 number-length ] unit-test
+{ 3 } [ -999 number-length ] unit-test
+{ 3 } [ -100 number-length ] unit-test
+{ 2 } [ -99 number-length ] unit-test
+{ 1 } [ -9 number-length ] unit-test
+{ 1 } [ -1 number-length ] unit-test
+{ 1 } [ 0 number-length ] unit-test
+{ 1 } [ 9 number-length ] unit-test
+{ 2 } [ 99 number-length ] unit-test
+{ 3 } [ 100 number-length ] unit-test
+{ 3 } [ 999 number-length ] unit-test
+{ 4 } [ 1000 number-length ] unit-test

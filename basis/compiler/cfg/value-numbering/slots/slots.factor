@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit cpu.architecture fry
-kernel math
-compiler.cfg.instructions
+USING: accessors compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite cpu.architecture fry kernel
+math ;
 IN: compiler.cfg.value-numbering.slots
 
 : simplify-slot-addressing? ( insn -- ? )

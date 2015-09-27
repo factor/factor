@@ -28,7 +28,7 @@ SYNTAX: hello "Hi" print ;
     ] unit-test
 ] with-file-vocabs
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.c" forget-vocab
     ] with-compilation-unit
@@ -40,7 +40,7 @@ SYNTAX: hello "Hi" print ;
     ] must-fail
 ] with-file-vocabs
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.c" forget-vocab
     ] with-compilation-unit
@@ -53,7 +53,7 @@ SYNTAX: hello "Hi" print ;
     ] unit-test
 ] with-file-vocabs
 
-[ "call" "scratchpad" create drop ] with-compilation-unit
+[ "call" "scratchpad" create-word drop ] with-compilation-unit
 
 [
     [ t ]
@@ -61,7 +61,7 @@ SYNTAX: hello "Hi" print ;
         "call" "scratchpad" lookup-word
         [ "call" search ] with-interactive-vocabs
         eq?
-    ] unit-test 
+    ] unit-test
 ] with-file-vocabs
 
 [ "call" "scratchpad" lookup-word forget ] with-compilation-unit

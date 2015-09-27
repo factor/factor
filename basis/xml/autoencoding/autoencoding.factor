@@ -82,4 +82,3 @@ IN: xml.autoencoding
         { 0xFE [ skip-utf16be-bom ] }
         [ drop utf8 decode-stream check f ]
     } case ;
-

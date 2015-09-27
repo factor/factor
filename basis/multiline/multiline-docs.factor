@@ -32,19 +32,6 @@ HELP: HEREDOC:
     }
 } ;
 
-HELP: DELIMITED:
-{ $syntax "DELIMITED: marker\n...text...\nmarker" }
-{ $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
-{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link POSTPONE: DELIMITED: } " until the end of the line containing " { $link POSTPONE: DELIMITED: } ". Text is captured until the exact delimiter string is found, regardless of where." }
-{ $warning "Whitespace is significant on the " { $link POSTPONE: DELIMITED: } " line." }
-{ $examples
-    { $example "USING: multiline prettyprint ;"
-               "DELIMITED: factor blows my mind"
-"whoafactor blows my mind ."
-                "\"whoa\""
-    }
-} ;
-
 HELP: parse-multiline-string
 { $values { "end-text" "a string delineating the end" } { "str" "the parsed string" } }
 { $description "Parses the input stream until the " { $snippet "end-text" } " is reached and returns the parsed text as a string." }
@@ -55,7 +42,6 @@ ARTICLE: "multiline" "Multiline"
 { $subsections
     POSTPONE: STRING:
     POSTPONE: HEREDOC:
-    POSTPONE: DELIMITED:
 }
 "Multiline comments:"
 { $subsections POSTPONE: /* }

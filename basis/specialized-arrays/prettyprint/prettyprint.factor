@@ -13,4 +13,3 @@ IN: specialized-arrays.prettyprint
 
 M: specialized-array pprint*
     [ pprint-object ] [ pprint-direct-array ] pprint-c-object ;
-

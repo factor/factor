@@ -31,7 +31,7 @@ IN: help.search
 
 MEMO: article-words ( name -- words )
     article-content [ element-value ] map " " join search-words
-    [ [ digit? ] all? not ] filter
+    [ [ digit? ] all? ] reject
     [ [ { [ letter? ] [ digit? ] } 1|| not ] trim ] map! harvest  ;
 
 : (search-articles) ( string -- seq' )

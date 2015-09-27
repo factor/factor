@@ -57,7 +57,7 @@ CONSTANT: IMAP4_SSL_PORT 993
             read-?crlf drop
         ] if-empty t
     ]
-    [ nip first 1 tail values f ] if-empty ;
+    [ nip first rest values f ] if-empty ;
 
 : read-response ( tag -- lines )
     "^%s (BAD|NO|OK) (.*)$" sprintf
@@ -81,7 +81,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 : parse-list-folders ( str -- folder )
     "\\* LIST \\(([^\\)]+)\\) \"([^\"]+)\" \"([^\"]+)\"" pcre:findall
-    first 1 tail values [ utf7imap4 decode ] map ;
+    first rest values [ utf7imap4 decode ] map ;
 
 : parse-select-folder ( seq -- count )
     [ "\\* (\\d+) EXISTS" pcre:findall ] map harvest
@@ -98,7 +98,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 : parse-store-mail-line ( str -- pair/f )
     "\\(FLAGS \\(([^\\)]+)\\) UID (\\d+)\\)" pcre:findall [ f ] [
-        first 1 tail values first2 [ " " split ] dip string>number swap 2array
+        first rest values first2 [ " " split ] dip string>number swap 2array
     ] if-empty ;
 
 : parse-store-mail ( seq -- assoc )

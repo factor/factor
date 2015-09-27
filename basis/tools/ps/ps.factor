@@ -9,3 +9,5 @@ HOOK: ps os ( -- assoc )
 
 : ps. ( -- )
     ps sort-keys { "PID" "CMD" } prefix simple-table. ;
+
+MAIN: ps.

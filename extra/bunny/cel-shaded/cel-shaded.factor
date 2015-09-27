@@ -93,4 +93,3 @@ M: bunny-cel-shaded draw-bunny
 
 M: bunny-cel-shaded dispose
     program>> delete-gl-program ;
-

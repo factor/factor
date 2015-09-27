@@ -45,7 +45,7 @@ M: matrix4 new-sequence 2drop matrix4 (struct) ; inline
 
 : map-columns ( ... a quot: ( ... col -- ... newcol ) -- ... c )
     '[ columns _ 4 napply ] make-matrix4 ; inline
-    
+
 PRIVATE>
 
 TYPED: m4+ ( a: matrix4 b: matrix4 -- c: matrix4 ) [ v+ ] 2map-columns ;
@@ -68,12 +68,12 @@ TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
         b3 first  a1 n*v :> c3a
         b4 first  a1 n*v :> c4a
 
-        b1 second a2 n*v c1a v+ :> c1b 
+        b1 second a2 n*v c1a v+ :> c1b
         b2 second a2 n*v c2a v+ :> c2b
         b3 second a2 n*v c3a v+ :> c3b
         b4 second a2 n*v c4a v+ :> c4b
 
-        b1 third  a3 n*v c1b v+ :> c1c 
+        b1 third  a3 n*v c1b v+ :> c1c
         b2 third  a3 n*v c2b v+ :> c2c
         b3 third  a3 n*v c3b v+ :> c3c
         b4 third  a3 n*v c4b v+ :> c4c
@@ -86,7 +86,7 @@ TYPED:: m4. ( a: matrix4 b: matrix4 -- c: matrix4 )
 
 TYPED:: m4.v ( m: matrix4 v: float-4 -- v': float-4 )
     m columns :> ( m1 m2 m3 m4 )
-    
+
     v first  m1 n*v
     v second m2 n*v v+
     v third  m3 n*v v+
@@ -144,7 +144,7 @@ TYPED: transpose-matrix4 ( matrix: matrix4 -- matrix: matrix4 )
 TYPED: translation-matrix4 ( offset: float-4 -- matrix: matrix4 )
     [
         linear>homogeneous
-        [ 
+        [
             float-4{ 1.0 0.0 0.0 0.0 }
             float-4{ 0.0 1.0 0.0 0.0 }
             float-4{ 0.0 0.0 1.0 0.0 }
@@ -189,13 +189,13 @@ TYPED:: rotation-matrix4 ( axis: float-4 theta: float -- matrix: matrix4 )
     triangle-a triangle-b v- :> triangle-hi
 
     diagonal triangle-hi triangle-lo (rotation-matrix4) ;
-    
+
 TYPED:: frustum-matrix4 ( xy: float-4 near: float far: float -- matrix: matrix4 )
     [
         near near near far + 2 near far * * float-4-boa ! num
         float-4{ t t f f } xy near far - float-4-with v? ! denom
         v/ :> fov
-        
+
         float-4{ 0.0 -1.0 0.0 0.0 } :> negone
 
         fov vmerge-diagonal

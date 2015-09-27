@@ -27,3 +27,7 @@ HELP: optimize-basic-block
 HELP: simple-analysis
 { $values { "cfg" cfg } { "quot" quotation } }
 { $description "Applies a quotation to each sequence of instructions in each " { $link basic-block } " in the cfg." } ;
+
+HELP: simple-optimization
+{ $values { "cfg" cfg } { "quot" quotation } }
+{ $description "Runs a quotation that optimizes each " { $link basic-block } " in the cfg, excluding the kill blocks. The quotation takes the blocks instruction sequence and returns them back in optimized form. The blocks are iterated in " { $link reverse-post-order } "." } ;

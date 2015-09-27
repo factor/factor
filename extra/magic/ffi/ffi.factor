@@ -37,19 +37,19 @@ CONSTANT: MAGIC_NO_CHECK_FORTRAN 0x080000
 CONSTANT: MAGIC_NO_CHECK_TOKENS 0x100000
 
 TYPEDEF: void* magic_t
-FUNCTION: magic_t magic_open ( int flags ) ;
-FUNCTION: void magic_close ( magic_t magic ) ;
+FUNCTION: magic_t magic_open ( int flags )
+FUNCTION: void magic_close ( magic_t magic )
 
-FUNCTION: c-string magic_file ( magic_t magic, c-string path ) ;
-FUNCTION: c-string magic_descriptor ( magic_t magic, int fd ) ;
-FUNCTION: c-string magic_buffer ( magic_t magic, void* buffer, size_t size ) ;
+FUNCTION: c-string magic_file ( magic_t magic, c-string path )
+FUNCTION: c-string magic_descriptor ( magic_t magic, int fd )
+FUNCTION: c-string magic_buffer ( magic_t magic, void* buffer, size_t size )
 
-FUNCTION: c-string magic_error ( magic_t magic ) ;
-FUNCTION: int magic_setflags ( magic_t magic, int flags ) ;
+FUNCTION: c-string magic_error ( magic_t magic )
+FUNCTION: int magic_setflags ( magic_t magic, int flags )
 
-FUNCTION: int magic_load ( magic_t magic, c-string path ) ;
-FUNCTION: int magic_compile ( magic_t magic, c-string path ) ;
-FUNCTION: int magic_check ( magic_t magic, c-string path ) ;
-FUNCTION: int magic_errno ( magic_t magic ) ;
+FUNCTION: int magic_load ( magic_t magic, c-string path )
+FUNCTION: int magic_compile ( magic_t magic, c-string path )
+FUNCTION: int magic_check ( magic_t magic, c-string path )
+FUNCTION: int magic_errno ( magic_t magic )
 
 DESTRUCTOR: magic_close

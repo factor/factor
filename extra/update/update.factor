@@ -9,7 +9,7 @@ IN: update
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-pull-clean ( -- )
-    image parent-directory [
+    image-path parent-directory [
         { "git" "pull" "git://factorcode.org/git/factor.git" branch-name }
         run-command
     ] with-directory ;
@@ -31,7 +31,7 @@ IN: update
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : rebuild ( -- )
-    image parent-directory [
+    image-path parent-directory [
         download-clean-image
         make-clean
         make
@@ -41,7 +41,7 @@ IN: update
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : update ( -- )
-    image parent-directory [
+    image-path parent-directory [
         git-id
         git-pull-clean
         git-id

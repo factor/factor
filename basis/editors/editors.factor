@@ -1,18 +1,16 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations debugger definitions
-help.topics io io.backend io.files io.launcher io.pathnames
-kernel lexer math namespaces parser prettyprint sequences
-source-files source-files.errors splitting strings summary
-tools.crossref vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata calendar threads words ;
-FROM: vocabs => vocab-name >vocab-link ;
+USING: accessors assocs calendar continuations debugger
+definitions io io.launcher io.pathnames kernel namespaces
+prettyprint sequences source-files.errors splitting strings
+threads tools.crossref vocabs vocabs.files vocabs.hierarchy
+vocabs.loader vocabs.metadata words ;
 IN: editors
 
 SYMBOL: editor-class
 
 : available-editors ( -- seq )
-    "editors" child-vocab-names ;
+    "editors" disk-child-vocab-names ;
 
 : editor-restarts ( -- alist )
     available-editors
@@ -29,7 +27,7 @@ M: object editor-detached? t ;
 
 : run-and-wait-for-editor ( command -- )
     <process>
-        swap >>command 
+        swap >>command
         editor-detached? >>detached
     run-process
     300 milliseconds sleep
@@ -55,8 +53,15 @@ M: cannot-find-source error.
 
 DEFER: edit
 
+<PRIVATE
+
+: public-vocab-name ( vocab-spec -- name )
+    vocab-name ".private" ?tail drop ;
+
+PRIVATE>
+
 : edit-vocab ( vocab -- )
-    vocab-name* >vocab-link edit ;
+    public-vocab-name >vocab-link edit ;
 
 GENERIC: edit ( object -- )
 
@@ -91,7 +96,7 @@ M: string edit edit-vocab ;
 GENERIC: edit-docs ( object -- )
 
 M: object edit-docs
-    vocab-name* vocab-docs-path 1 edit-location ;
+    public-vocab-name vocab-docs-path 1 edit-location ;
 
 M: word edit-docs
     dup "help-loc" word-prop
@@ -102,7 +107,7 @@ M: word edit-docs
 GENERIC: edit-tests ( object -- )
 
 M: object edit-tests
-    vocab-name* vocab-tests-path 1 edit-location ;
+    public-vocab-name vocab-tests-path 1 edit-location ;
 
 M: word edit-tests vocabulary>> edit-tests ;
 

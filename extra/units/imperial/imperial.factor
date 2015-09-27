@@ -138,7 +138,7 @@ DEFER: imperial-fluid-ounces
 : imperial-gill ( n -- dimensioned ) 5 * imperial-fluid-ounces ;
 
 
-: dry-gallons ( n -- dimensioned ) 440488377086/100000000000 * L ; 
+: dry-gallons ( n -- dimensioned ) 440488377086/100000000000 * L ;
 
 : dry-quarts ( n -- dimensioned ) 1/4 * dry-gallons ;
 

@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces make math sequences sets
-assocs fry compiler.cfg compiler.cfg.instructions ;
-FROM: namespaces => set ;
+USING: accessors compiler.cfg fry kernel make namespaces
+sequences sets ;
 IN: compiler.cfg.rpo
 
 : post-order-traversal ( visited bb -- visited )
@@ -49,5 +48,5 @@ IN: compiler.cfg.rpo
 : simple-analysis ( ... cfg quot: ( ... insns -- ... ) -- ... )
     '[ _ analyze-basic-block ] each-basic-block ; inline
 
-: needs-post-order ( cfg -- cfg' )
-    dup post-order drop ;
+: needs-post-order ( cfg -- )
+    post-order drop ;

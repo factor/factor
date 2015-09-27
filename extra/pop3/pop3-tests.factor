@@ -8,26 +8,26 @@ FROM: pop3 => count delete ;
 
 <promise> "p1" set
 
-[ ] [ "p1" get mock-pop3-server ] unit-test
-[ ] [
+{ } [ "p1" get mock-pop3-server ] unit-test
+{ } [
         <pop3-account>
             "127.0.0.1" >>host
             "p1" get 5 seconds ?promise-timeout >>port
         connect
 ] unit-test
-[ ] [ "username@host.com" >user ] unit-test
-[ ] [ "password" >pwd ] unit-test
-[ { "CAPA" "TOP" "UIDL" } ] [ capa ] unit-test
-[ 2 ] [ count ] unit-test
-[ H{ { 1 "1006" } { 2 "747" } } ] [ list ] unit-test
-[
+{ } [ "username@host.com" >user ] unit-test
+{ } [ "password" >pwd ] unit-test
+{ { "CAPA" "TOP" "UIDL" } } [ capa ] unit-test
+{ 2 } [ count ] unit-test
+{ H{ { 1 "1006" } { 2 "747" } } } [ list ] unit-test
+{
     H{
         { "From:" "from.first@mail.com" }
         { "Subject:" "First test with mock POP3 server" }
         { "To:" "username@host.com" }
     }
-] [ 1 0 top drop headers ] unit-test
-[
+} [ 1 0 top drop headers ] unit-test
+{
     {
         T{ message
             { # 1 }
@@ -46,17 +46,17 @@ FROM: pop3 => count delete ;
             { size "747" }
         }
     }
-] [ consolidate ] unit-test
-[ "000000d547ac2fc2" ] [ 1 uidl ] unit-test
-[ ] [ 1 delete ] unit-test
-[ ] [ reset ] unit-test
-[ ] [ close ] unit-test
+} [ consolidate ] unit-test
+{ "000000d547ac2fc2" } [ 1 uidl ] unit-test
+{ } [ 1 delete ] unit-test
+{ } [ reset ] unit-test
+{ } [ close ] unit-test
 
 
 <promise> "p2" set
 
-[ ] [ "p2" get mock-pop3-server ] unit-test
-[ ] [
+{ } [ "p2" get mock-pop3-server ] unit-test
+{ } [
         <pop3-account>
             "127.0.0.1" >>host
             "p2" get 5 seconds ?promise-timeout >>port
@@ -64,5 +64,5 @@ FROM: pop3 => count delete ;
             "password" >>pwd
         connect
 ] unit-test
-[ f ] [ 1 retrieve empty? ] unit-test
-[ ] [ close ] unit-test
+{ f } [ 1 retrieve empty? ] unit-test
+{ } [ close ] unit-test

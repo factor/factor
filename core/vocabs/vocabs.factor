@@ -41,25 +41,19 @@ M: vocab-link vocab-name name>> ;
 
 M: object vocab-name check-vocab-name ;
 
-: vocab-name* ( vocab-spec -- name )
-    vocab-name ".private" ?tail drop ;
-
-: private-vocab? ( vocab -- ? )
-    vocab-name ".private" tail? ;
-
 GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
 M: vocab lookup-vocab ;
 
 M: object lookup-vocab ( name -- vocab ) vocab-name dictionary get at ;
 
-GENERIC: vocab-words ( vocab-spec -- words )
+GENERIC: vocab-words-assoc ( vocab-spec -- assoc/f )
 
-M: vocab vocab-words words>> ;
+M: vocab vocab-words-assoc words>> ;
 
-M: object vocab-words lookup-vocab vocab-words ;
+M: object vocab-words-assoc lookup-vocab vocab-words-assoc ;
 
-M: f vocab-words ;
+M: f vocab-words-assoc ;
 
 GENERIC: vocab-help ( vocab-spec -- help )
 
@@ -96,18 +90,18 @@ GENERIC: vocab-changed ( vocab obj -- )
 
 ERROR: no-vocab name ;
 
-: vocabs ( -- seq )
+: loaded-vocab-names ( -- seq )
     dictionary get keys natural-sort ;
 
-: words ( vocab -- seq )
-    vocab-words values ;
+: vocab-words ( vocab-spec -- seq )
+    vocab-words-assoc values ;
 
 : all-words ( -- seq )
-    dictionary get values [ words ] map concat ;
+    dictionary get values [ vocab-words ] map concat ;
 
 : words-named ( str -- seq )
     dictionary get values
-    [ vocab-words at ] with map
+    [ vocab-words-assoc at ] with map
     sift ;
 
 : child-vocab? ( prefix name -- ? )
@@ -119,8 +113,8 @@ ERROR: no-vocab name ;
         ] if
     ] if-empty ;
 
-: child-vocabs ( vocab -- seq )
-    vocab-name vocabs [ child-vocab? ] with filter ;
+: loaded-child-vocab-names ( vocab-spec -- seq )
+    vocab-name loaded-vocab-names [ child-vocab? ] with filter ;
 
 GENERIC: >vocab-link ( name -- vocab )
 
@@ -129,7 +123,7 @@ M: vocab-spec >vocab-link ;
 M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
-    [ words forget-all ]
+    [ vocab-words forget-all ]
     [ vocab-name dictionary get delete-at ]
     [ notify-vocab-observers ] tri ;
 
@@ -148,6 +142,7 @@ INSTANCE: vocab-spec definition-mixin
 GENERIC: require ( object -- )
 
 M: vocab require name>> require ;
+
 M: vocab-link require name>> require ;
 
 ! When calling "foo.private" require, load "foo" instead, but only when

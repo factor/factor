@@ -33,7 +33,7 @@ PRIVATE>
         { "universal"
             H{
                 { "primitive"
-                    H{ 
+                    H{
                         { 1 "boolean" }
                         { 2 "integer" }
                         { 4 "string" }
@@ -90,7 +90,7 @@ ERROR: unsupported-tag-encoding id ;
 
 : set-content-length ( -- )
     read1
-    dup 127 <= [ 
+    dup 127 <= [
         127 bitand read be>
     ] unless elements get contentlength<< ;
 
@@ -103,7 +103,7 @@ ERROR: unsupported-tag-encoding id ;
         elements get tagclass>> of
         elements get encoding>> of
         elements get tag>>
-        of [ 
+        of [
             elements get objtype<<
         ] when*
     ] each ;

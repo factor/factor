@@ -51,7 +51,7 @@ PRIVATE>
 
 : function-types-effect ( -- function types effect )
     scan scan swap ")" parse-tokens
-    [ "(" subseq? not ] filter swap parse-arglist ;
+    [ "(" subseq? ] reject swap parse-arglist ;
 
 : prototype-string ( function types effect -- str )
     [ [ cify-type ] map ] dip

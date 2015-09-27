@@ -33,15 +33,15 @@ IN: gtk-samples.opengl
         0.0 0.0 1.0 glColor3f
         1 -1 glVertex2i
         glEnd
- 
+
         gl-drawable gdk_gl_drawable_is_double_buffered 1 =
         [ gl-drawable gdk_gl_drawable_swap_buffers ]
         [ glFlush ] if
 
         gl-drawable gdk_gl_drawable_gl_end
     ] when ;
-    
-:: opengl-win ( -- window )  
+
+:: opengl-win ( -- window )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> window
 
     window
@@ -50,7 +50,7 @@ IN: gtk-samples.opengl
     [ GTK_WIN_POS_CENTER gtk_window_set_position ] tri
 
     GDK_GL_MODE_RGBA gdk_gl_config_new_by_mode :> gl-config
-    
+
     window gl-config f t GDK_GL_RGBA_TYPE
     gtk_widget_set_gl_capability drop
 
@@ -74,8 +74,7 @@ IN: gtk-samples.opengl
     f f 0 g_signal_connect_data drop
 
     window gtk_widget_show_all
-    
+
     gtk_main ;
 
 MAIN: opengl-main
-

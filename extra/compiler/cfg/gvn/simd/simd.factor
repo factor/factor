@@ -132,7 +132,7 @@ M: ##not-vector vector-not-src
 M: ##xor-vector vector-not-src
     dup src1>> vreg>insn ##fill-vector? [ src2>> ] [ src1>> ] if ;
 
-M: ##and-vector rewrite 
+M: ##and-vector rewrite
     {
         { [ dup src1>> vreg>insn vector-not? ] [
             {

@@ -13,19 +13,19 @@ CONSTANT: will
 : please-stand-up ( assoc key -- value )
     of ;
 
-[ t ] [ will the-real-slim-shady please-stand-up ] unit-test
-[ t ] [ will clone the-real-slim-shady please-stand-up ] unit-test
+{ t } [ will the-real-slim-shady please-stand-up ] unit-test
+{ t } [ will clone the-real-slim-shady please-stand-up ] unit-test
 
-[ 2 ] [ will assoc-size ] unit-test
-[ { { "marshall mathers" f } } ] [
+{ 2 } [ will assoc-size ] unit-test
+{ { { "marshall mathers" f } } } [
     the-real-slim-shady will clone
     [ delete-at ] [ >alist ] bi
 ] unit-test
-[ t ] [
+{ t } [
     t the-real-slim-shady identity-associate
     t the-real-slim-shady identity-associate =
 ] unit-test
-[ f ] [
+{ f } [
     t the-real-slim-shady identity-associate
     t "marshall mathers"  identity-associate =
 ] unit-test

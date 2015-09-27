@@ -23,17 +23,16 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 QUALIFIED: vocabs.loader
-FROM: assocs => change-at ;
-FROM: namespaces => set ;
-FROM: sequences => change-nth ;
-FROM: sets => members ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
 
 : add-command-line-hook ( -- )
-    [ (command-line) command-line set-global ] "command-line"
-    startup-hooks get set-at ;
+    [
+        (command-line) unclip
+        executable set-global
+        command-line set-global
+    ] "command-line" startup-hooks get set-at ;
 
 : strip-startup-hooks ( -- )
     "Stripping startup hooks" show
@@ -122,14 +121,14 @@ IN: tools.deploy.shaker
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
-    [ "no-def-strip" word-prop not ] filter
+    [ "no-def-strip" word-prop ] reject
     [ [ ] >>def drop ] each ;
 
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     swap '[
         [
-            [ drop _ member? not ] assoc-filter sift-values
+            [ drop _ member? ] assoc-reject sift-values
             >alist f like
         ] change-props drop
     ] each ;
@@ -209,7 +208,7 @@ IN: tools.deploy.shaker
                 "writing"
             } %
         ] when
-        
+
         strip-prettyprint? [
             {
                 "delimiter"
@@ -223,7 +222,7 @@ IN: tools.deploy.shaker
                 "word-style"
             } %
         ] when
-        
+
         deploy-c-types? get [
             { "c-type" "struct-slots" "struct-align" } %
         ] unless
@@ -242,7 +241,7 @@ IN: tools.deploy.shaker
 
 : compiler-classes ( -- seq )
     { "compiler" "stack-checker" }
-    [ child-vocabs [ words ] map concat [ class? ] filter ]
+    [ loaded-child-vocab-names [ vocab-words ] map concat [ class? ] filter ]
     map concat unique ;
 
 : prune-decision-tree ( tree classes -- )
@@ -252,7 +251,7 @@ IN: tools.deploy.shaker
                 dup array? [
                     [
                         2 group
-                        [ drop _ key? not ] assoc-filter
+                        [ drop _ key? ] assoc-reject
                         concat
                     ] map
                 ] when
@@ -301,7 +300,7 @@ IN: tools.deploy.shaker
     ] when ;
 
 : vocab-tree-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat
+    [ loaded-child-vocab-names [ vocab-words ] map concat ] map concat
     swap [ first2 lookup-word ] map sift diff ;
 
 : stripped-globals ( -- seq )
@@ -395,8 +394,8 @@ IN: tools.deploy.shaker
             input-stream
             output-stream
             error-stream
-            vm
-            image
+            vm-path
+            image-path
             current-directory
         } %
 
@@ -429,7 +428,7 @@ IN: tools.deploy.shaker
         stripped-globals :> to-strip
         cleared-globals :> to-clear
         global boxes>>
-        [ drop to-strip strip-global? not ] assoc-filter!
+        [ drop to-strip strip-global? ] assoc-reject!
         [
             [
                 swap to-clear clear-global?
@@ -471,7 +470,7 @@ IN: tools.deploy.shaker
     ! Quotations which were formerly compiled must remain
     ! compiled.
     2dup [
-        2dup [ quot-compiled? ] [ quot-compiled? not ] bi* and
+        2dup [ quotation-compiled? ] [ quotation-compiled? not ] bi* and
         [ nip jit-compile ] [ 2drop ] if
     ] 2each ;
 
@@ -549,7 +548,7 @@ SYMBOL: deploy-vocab
 
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
-    vocabs "VOCABS:" prefix
+    loaded-vocab-names "VOCABS:" prefix
     deploy-libraries get [ lookup-library path>> ] map members
     "LIBRARIES:" prefix append
     swap utf8 set-file-lines ;
@@ -561,7 +560,7 @@ SYMBOL: deploy-vocab
             [ path>> >deployed-library-path ] [ abi>> ] bi make-library
         ] change-at
     ] each
-    
+
     [
         "deploy-libraries" "alien.libraries" lookup-word forget
         "deploy-library" "alien.libraries" lookup-word forget
@@ -600,11 +599,11 @@ SYMBOL: deploy-vocab
     clear-megamorphic-caches ;
 
 : die-with ( error original-error -- * )
-    #! We don't want DCE to drop the error before the die call!
+    ! We don't want DCE to drop the error before the die call!
     [ die 1 exit ] ( a -- * ) call-effect-unsafe ;
 
 : die-with2 ( error original-error -- * )
-    #! We don't want DCE to drop the error before the die call!
+    ! We don't want DCE to drop the error before the die call!
     [ die 1 exit ] ( a b -- * ) call-effect-unsafe ;
 
 : deploy-error-handler ( quot -- )
@@ -618,8 +617,8 @@ SYMBOL: deploy-vocab
     ] recover ; inline
 
 : (deploy) ( final-image vocab-manifest-out vocab config -- )
-    #! Does the actual work of a deployment in the slave
-    #! stage2 image
+    ! Does the actual work of a deployment in the slave
+    ! stage2 image
     [
         [
             strip-debugger? [

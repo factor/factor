@@ -13,4 +13,3 @@ M: unix find-library-file
         { "/lib" "/usr/lib" "/usr/local/lib" "/opt/local/lib" "resource:" }
         [ prepend-path ?exists ] with map-find drop
     ] if ;
-

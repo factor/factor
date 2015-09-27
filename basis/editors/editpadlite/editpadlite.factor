@@ -6,7 +6,7 @@ SINGLETON: editpadlite
 editpadlite editor-class set-global
 
 : editpadlite-path ( -- path )
-    \ editpadlite-path get-global [
+    \ editpadlite-path get [
         {
             [ { "Just Great Software" "JGsoft" } "editpadlite.exe" find-in-applications ]
             [ { "Just Great Software" "JGsoft" } "editpadlite7.exe" find-in-applications ]

@@ -5,11 +5,11 @@ sequences ;
 IN: benchmark.e-decimals
 
 : D-factorial ( n -- D! )
-    iota D: 1 [ 0 <decimal> D: 1 D+ D* ] reduce ; inline
+    iota DECIMAL: 1 [ 0 <decimal> DECIMAL: 1 D+ D* ] reduce ; inline
 
 :: calculate-e-decimals ( n -- e )
-    n [1,b] D: 1
-    [ D-factorial D: 1 swap n D/ D+ ] reduce ;
+    n [1,b] DECIMAL: 1
+    [ D-factorial DECIMAL: 1 swap n D/ D+ ] reduce ;
 
 : e-decimals-benchmark ( -- )
     5 [ 800 calculate-e-decimals drop ] times ;

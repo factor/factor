@@ -154,7 +154,7 @@ HELP: empty-block?
 { $values { "block" block } { "?" boolean } }
 { $description "Tests if the block has no child sections." } ;
 
-HELP: if-nonempty
+HELP: unless-empty-block
 { $values { "block" block } { "quot" { $quotation ( block -- ) } } }
 { $description "If the block has child sections, calls the quotation, otherwise does nothing." } ;
 

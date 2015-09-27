@@ -5,7 +5,7 @@ namespaces opengl opengl.gl sequences tetris.board tetris.game
 tetris.piece ui.render tetris.tetromino ui.gadgets colors ;
 IN: tetris.gl
 
-#! OpenGL rendering for tetris
+! OpenGL rendering for tetris
 
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;
@@ -36,7 +36,7 @@ IN: tetris.gl
     [ width>> ] [ height>> ] bi swapd [ / ] dup 2bi* 1 glScalef ;
 
 : draw-tetris ( width height tetris -- )
-    #! width and height are in pixels
+    ! width and height are in pixels
     [
         {
             [ board>> scale-board ]

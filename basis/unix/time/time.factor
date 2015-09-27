@@ -39,8 +39,8 @@ STRUCT: tm
     { gmtoff long }
     { zone c-string } ;
 
-FUNCTION: time_t time ( time_t* t ) ;
-FUNCTION: tm* localtime ( time_t* clock ) ;
-FUNCTION: int gettimeofday ( timespec* TP, void* TZP ) ;
-FUNCTION: int settimeofday ( timeval* TP, timezone* TZP ) ;
-FUNCTION: int adjtime ( timeval* delta, timeval* olddelta ) ;
+FUNCTION: time_t time ( time_t* t )
+FUNCTION: tm* localtime ( time_t* clock )
+FUNCTION: int gettimeofday ( timespec* TP, void* TZP )
+FUNCTION: int settimeofday ( timeval* TP, timezone* TZP )
+FUNCTION: int adjtime ( timeval* delta, timeval* olddelta )

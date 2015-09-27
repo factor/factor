@@ -3,15 +3,10 @@
 !
 ! Balloon Bomber: http://www.mameworld.net/maws/romset/ballbomb
 !
-USING: 
-    cpu.8080
-    kernel 
-    space-invaders
-    ui 
-;
+USING: kernel space-invaders ui ;
 IN: balloon-bomber
 
-TUPLE: balloon-bomber < space-invaders ; 
+TUPLE: balloon-bomber < space-invaders ;
 
 : <balloon-bomber> ( -- cpu )
     balloon-bomber new cpu-init ;
@@ -25,6 +20,8 @@ CONSTANT: rom-info {
 }
 
 : run-balloon ( -- )
-    [ "Balloon Bomber" <balloon-bomber>  rom-info (run) ] with-ui ;
+    [
+        "Ballon Bomber" <balloon-bomber> rom-info run-rom
+    ] with-ui ;
 
 MAIN: run-balloon

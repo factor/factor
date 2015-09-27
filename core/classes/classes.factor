@@ -2,8 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators definitions kernel
 make namespaces quotations sequences sets words words.symbol ;
-FROM: namespaces => set ;
-QUALIFIED: sets
 IN: classes
 
 ERROR: bad-inheritance class superclass ;
@@ -62,7 +60,7 @@ M: class reset-class
         "members"
         "participants"
         "predicate"
-    } reset-props ;
+    } remove-word-props ;
 
 M: word reset-class drop ;
 
@@ -73,7 +71,7 @@ PRIVATE>
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 : create-predicate-word ( word -- predicate )
-    [ name>> "?" append ] [ vocabulary>> ] bi create
+    [ name>> "?" append ] [ vocabulary>> ] bi create-word
     dup predicate? [ dup reset-generic ] unless ;
 
 GENERIC: class-of ( object -- class )
@@ -102,25 +100,25 @@ M: predicate reset-word
 : define-predicate ( class quot -- )
     [ predicate-word ] dip ( object -- ? ) define-declared ;
 
-: superclass ( class -- super )
-    #! Output f for non-classes to work with algebra code
+: superclass-of ( class -- super )
+    ! Output f for non-classes to work with algebra code
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
-: superclasses ( class -- supers )
-    [ superclass ] follow reverse! ;
+: superclasses-of ( class -- supers )
+    [ superclass-of ] follow reverse! ;
 
 : superclass-of? ( class superclass -- ? )
-    superclasses member-eq? ;
+    superclasses-of member-eq? ;
 
 : subclass-of? ( class superclass -- ? )
     swap superclass-of? ;
 
-: members ( class -- seq )
-    #! Output f for non-classes to work with algebra code
+: class-members ( class -- seq )
+    ! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;
 
-: participants ( class -- seq )
-    #! Output f for non-classes to work with algebra code
+: class-participants ( class -- seq )
+    ! Output f for non-classes to work with algebra code
     dup class? [ "participants" word-prop ] [ drop f ] if ;
 
 GENERIC: implementors ( class/classes -- seq )
@@ -128,14 +126,14 @@ GENERIC: implementors ( class/classes -- seq )
 ! update-map
 : class-uses ( class -- seq )
     [
-        [ members % ]
-        [ participants % ]
-        [ superclass [ , ] when* ]
+        [ class-members % ]
+        [ class-participants % ]
+        [ superclass-of [ , ] when* ]
         tri
     ] { } make ;
 
 : class-usage ( class -- seq )
-    update-map get at sets:members ;
+    update-map get at members ;
 
 <PRIVATE
 
@@ -150,9 +148,9 @@ GENERIC: implementors ( class/classes -- seq )
 PRIVATE>
 
 : class-usages ( class -- seq )
-    [ class-usage ] closure sets:members ;
+    [ class-usage ] closure members ;
 
-M: class implementors implementors-map get at sets:members ;
+M: class implementors implementors-map get at members ;
 
 M: sequence implementors [ implementors ] gather ;
 
@@ -185,7 +183,7 @@ M: sequence implementors [ implementors ] gather ;
 GENERIC: metaclass-changed ( use class -- )
 
 : ?metaclass-changed ( class usages/f -- )
-    dup [ [ metaclass-changed ] with each ] [ 2drop ] if ;
+    [ [ metaclass-changed ] with each ] [ drop ] if* ;
 
 : check-metaclass ( class metaclass -- usages/f )
     over class? [

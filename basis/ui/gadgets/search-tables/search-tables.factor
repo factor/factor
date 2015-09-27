@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel delegate fry sequences models
-combinators.short-circuit models.search models.delay calendar locals
-ui.gestures ui.pens ui.pens.image ui.gadgets.editors ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme ui.gadgets.tracks
-ui.gadgets.borders ui.gadgets.buttons ui.baseline-alignment ui.gadgets ;
+USING: accessors calendar combinators.short-circuit delegate fry
+kernel locals models models.delay models.search
+ui.baseline-alignment ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.editors ui.gadgets.labels
+ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme
+ui.gadgets.tracks ui.gestures ui.pens ui.pens.image ;
 IN: ui.gadgets.search-tables
 
 TUPLE: search-table < track table field ;

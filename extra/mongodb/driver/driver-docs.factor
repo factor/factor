@@ -54,7 +54,7 @@ HELP: >upsert
   "(inserts object identified by the update selector if it doesn't exist in the collection)" } ;
 
 HELP: PARTIAL?
-{ $values  
+{ $values
   { "value" "partial?" }
 }
 { $description "key which refers to a partially loaded object" } ;
@@ -169,7 +169,7 @@ HELP: hint
 
 HELP: lasterror
 { $values
-  
+
   { "error" "error message or f" }
 }
 { $description "Checks if the last operation resulted in an error on the MongoDB side"
@@ -188,14 +188,14 @@ HELP: limit
 
 HELP: load-collection-list
 { $values
-  
+
   { "collection-list" "list of collections in the current database" }
 }
 { $description "Returns a list of all collections that exist in the current database" } ;
 
 HELP: load-index-list
 { $values
-  
+
   { "index-list" "list of indexes" }
 }
 { $description "Returns a list of all indexes that exist in the current database" } ;
@@ -272,5 +272,3 @@ HELP: with-db
   { "quot" "quotation to execute with the given mdb instance as context" }
 }
 { $description "executes a quotation with the given mdb instance in its context" } ;
-
-

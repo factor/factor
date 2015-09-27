@@ -1,8 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets ui.gadgets.borders
-kernel math namespaces sequences models math.vectors
-math.rectangles ;
+USING: accessors kernel math.vectors models ui.gadgets ;
 IN: ui.gadgets.viewports
 
 TUPLE: viewport < gadget { constraint initial: { 1 1 } } ;

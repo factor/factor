@@ -4,4 +4,3 @@ USING: io.encodings.8-bit ;
 IN: io.encodings.8-bit.latin4
 
 8-BIT: latin4 ISO_8859-4:1988 8859-4
-

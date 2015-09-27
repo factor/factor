@@ -61,7 +61,7 @@ M: not-a-month summary
 
 PRIVATE>
 
-CONSTANT: month-names 
+CONSTANT: month-names
     {
         "January" "February" "March" "April" "May" "June"
         "July" "August" "September" "October" "November" "December"
@@ -123,8 +123,8 @@ CONSTANT: minutes-per-year 5259492/10
 CONSTANT: seconds-per-year 31556952
 
 :: julian-day-number ( year month day -- n )
-    #! Returns a composite date number
-    #! Not valid before year -4800
+    ! Returns a composite date number
+    ! Not valid before year -4800
     14 month - 12 /i :> a
     year 4800 + a - :> y
     month 12 a * + 3 - :> m
@@ -133,7 +133,7 @@ CONSTANT: seconds-per-year 31556952
     y 4 /i + y 100 /i - y 400 /i + 32045 - ;
 
 :: julian-day-number>date ( n -- year month day )
-    #! Inverse of julian-day-number
+    ! Inverse of julian-day-number
     n 32044 + :> a
     4 a * 3 + 146097 /i :> b
     a 146097 b * 4 /i - :> c
@@ -204,7 +204,7 @@ GENERIC: +minute ( timestamp x -- timestamp )
 GENERIC: +second ( timestamp x -- timestamp )
 
 : /rem ( f n -- q r )
-    #! q is positive or negative, r is positive from 0 <= r < n
+    ! q is positive or negative, r is positive from 0 <= r < n
     [ / floor >integer ] 2keep rem ;
 
 : float>whole-part ( float -- int float )
@@ -295,8 +295,8 @@ M: duration time+
     ] if ;
 
 : duration>years ( duration -- x )
-    #! Uses average month/year length since duration loses calendar
-    #! data
+    ! Uses average month/year length since duration loses calendar
+    ! data
     0 swap
     {
         [ year>> + ]
@@ -351,7 +351,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >time< [ [ 3600 * ] [ 60 * ] bi* ] dip + + ] bi@ - + ;
 
 M: timestamp time-
-    #! Exact calendar-time difference
+    ! Exact calendar-time difference
     (time-) seconds ;
 
 : time* ( obj1 obj2 -- obj3 )
@@ -420,9 +420,9 @@ M: duration time-
 : ago ( duration -- timestamp ) now swap time- ;
 
 : zeller-congruence ( year month day -- n )
-    #! Zeller Congruence
-    #! http://web.textfiles.com/computers/formulas.txt
-    #! good for any date since October 15, 1582
+    ! Zeller Congruence
+    ! http://web.textfiles.com/computers/formulas.txt
+    ! good for any date since October 15, 1582
     [
         dup 2 <= [ [ 1 - ] [ 12 + ] bi* ] when
         [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip

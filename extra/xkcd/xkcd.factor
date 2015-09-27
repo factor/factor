@@ -3,9 +3,9 @@
 
 USING: accessors formatting html.entities html.parser
 html.parser.analyzer html.parser.printer http.client images.http
-images.viewer images.viewer.prettyprint io io.streams.string
-kernel parser prettyprint.custom prettyprint.sections regexp
-sequences strings ui wrap.strings ;
+images.viewer images.viewer.prettyprint io kernel parser
+prettyprint.custom prettyprint.sections regexp sequences strings
+ui wrap.strings ;
 
 IN: xkcd
 
@@ -13,17 +13,15 @@ IN: xkcd
 
 : comic-image ( url -- image )
     http-get nip
-    R" http://imgs\.xkcd\.com/comics/[^\.]+\.(png|jpg)"
+    R@ http://imgs\.xkcd\.com/comics/[^\.]+\.(png|jpg)@
     first-match >string load-http-image ;
 
 : comic-image. ( url -- )
     comic-image image. ;
 
 : comic-text ( url -- string )
-    http-get nip parse-html
-    "transcript" find-by-id-between
-    [ html-text. ] with-string-writer
-    html-unescape ;
+    scrape-html nip "transcript" find-by-id-between
+    html-text html-unescape ;
 
 : comic-text. ( url -- )
     comic-text 80 wrap-string print ;
@@ -48,10 +46,10 @@ PRIVATE>
 : latest-xkcd. ( -- )
     "http://xkcd.com" comic. ;
 
-TUPLE: xkcd image ;
+TUPLE: xkcd number image ;
 
 C: <xkcd> xkcd
 
-SYNTAX: XKCD: scan-number xkcd-image <xkcd> suffix! ;
+SYNTAX: XKCD: scan-number dup xkcd-image <xkcd> suffix! ;
 
 M: xkcd pprint* image>> <image-section> add-section ;

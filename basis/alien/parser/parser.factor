@@ -41,16 +41,17 @@ ERROR: bad-array-type ;
         { [ dup "{" = ] [ drop \ } parse-until >array ] }
         { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
         [ parse-c-type ]
-    } cond ; 
+    } cond ;
 
 : reset-c-type ( word -- )
-    dup "struct-size" word-prop
-    [ dup [ forget-class ] [ { "struct-size" } reset-props ] bi ] when
+    dup "struct-size" word-prop [
+        dup [ forget-class ] [ "struct-size" remove-word-prop ] bi
+    ] when
     {
         "c-type"
         "callback-effect"
         "callback-library"
-    } reset-props ;
+    } remove-word-props ;
 
 ERROR: *-in-c-type-name name ;
 
@@ -59,7 +60,7 @@ ERROR: *-in-c-type-name name ;
     [ *-in-c-type-name ] when ;
 
 : (CREATE-C-TYPE) ( word -- word )
-    validate-c-type-name current-vocab create {
+    validate-c-type-name current-vocab create-word {
         [ fake-definition ]
         [ set-last-word ]
         [ reset-c-type ]
@@ -111,20 +112,15 @@ PRIVATE>
 : scan-function-name ( -- return function )
     scan-c-type scan-token parse-pointers ;
 
-:: (scan-c-args) ( end-marker types names -- )
-    scan-token :> type-str
-    type-str end-marker = [
-        type-str { "(" ")" } member? [
-            type-str parse-c-type :> type
-            scan-token "," ?tail drop :> name
-            type name parse-pointers :> ( type' name' )
-            type' types push name' names push
-        ] unless
-        end-marker types names (scan-c-args)
-    ] unless ;
-
-: scan-c-args ( end-marker -- types names )
-    V{ } clone V{ } clone [ (scan-c-args) ] 2keep [ >array ] bi@ ;
+:: scan-c-args ( -- types names )
+    V{ } clone :> types
+    V{ } clone :> names
+    "(" expect scan-token [ dup ")" = ] [
+        parse-c-type
+        scan-token "," ?tail drop
+        parse-pointers [ types push ] [ names push ] bi*
+        scan-token
+    ] until drop types names [ >array ] bi@ ;
 
 : function-quot ( return library function types -- quot )
     '[ _ _ _ _ alien-invoke ] ;
@@ -133,7 +129,7 @@ PRIVATE>
     [ { } ] [ return-type-name 1array ] if-void <effect> ;
 
 : create-function ( name -- word )
-    create-in dup reset-generic ;
+    create-word-in dup reset-generic ;
 
 :: (make-function) ( return function library types names -- quot effect )
     return library function types function-quot
@@ -144,13 +140,13 @@ PRIVATE>
     return function library types names (make-function) ;
 
 : (FUNCTION:) ( -- return function library types names )
-    scan-function-name current-library get ";" scan-c-args ;
+    scan-function-name current-library get scan-c-args ;
 
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
 
 :: make-callback-type ( lib return type-name types names -- word quot effect )
-    type-name current-vocab create :> type-word 
+    type-name current-vocab create-word :> type-word
     type-word [ reset-generic ] [ reset-c-type ] bi
     void* type-word typedef
     type-word names return function-effect "callback-effect" set-word-prop
@@ -159,7 +155,7 @@ PRIVATE>
 
 : (CALLBACK:) ( -- word quot effect )
     current-library get
-    scan-function-name ";" scan-c-args make-callback-type ;
+    scan-function-name scan-c-args make-callback-type ;
 
 PREDICATE: alien-function-alias-word < word
     def>> {
@@ -185,7 +181,7 @@ PREDICATE: alien-callback-type-word < typedef-word
     [ nip ] [ global-quot ] 2bi ( -- value ) define-declared ;
 
 : define-global-setter ( type word -- )
-    [ nip name>> "set-" prepend create-in ]
+    [ nip name>> "set-" prepend create-word-in ]
     [ set-global-quot ] 2bi ( obj -- ) define-declared ;
 
 : define-global ( type word -- )

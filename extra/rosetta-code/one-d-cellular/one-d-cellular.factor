@@ -49,4 +49,3 @@ IN: rosetta-code.one-d-cellular
     10 [ dup print-cellular step ] times print-cellular ;
 
 MAIN: main-cellular
-

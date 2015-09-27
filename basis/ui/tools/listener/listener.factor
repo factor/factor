@@ -10,7 +10,8 @@ quotations sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
 ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.tracks ui.gestures ui.operations ui.pens.solid
+ui.gadgets.tracks ui.gadgets.toolbar ui.gadgets.theme
+ui.gestures ui.operations ui.pens.solid
 ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
@@ -33,7 +34,7 @@ INSTANCE: interactor input-stream
     thread>> thread-continuation ;
 
 : interactor-busy? ( interactor -- ? )
-    #! We're busy if there's no thread to resume.
+    ! We're busy if there's no thread to resume.
     {
         [ waiting>> ]
         [ thread>> dup [ thread-registered? ] when ]
@@ -56,9 +57,9 @@ M: vocab-completion (word-at-caret)
     drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
 
 M: word-completion (word-at-caret)
-    manifest>> dup [
+    manifest>> [
         '[ _ _ search-manifest ] [ drop f ] recover
-    ] [ 2drop f ] if ;
+    ] [ drop f ] if* ;
 
 M: char-completion (word-at-caret) 2drop f ;
 
@@ -211,25 +212,28 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 : <error-summary> ( -- gadget )
     error-list-model get [ drop error-summary. ] <pane-control>
-        COLOR: light-yellow <solid> >>interior ;
+    error-summary-background <solid> >>interior ;
 
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
     dup error-summary>> f track-add ;
+    
+: add-listener-area ( listener -- listener )
+    dup output>> margins <scroller> >>scroller
+    dup scroller>> white-interior 1 track-add ;
 
 : <listener-gadget> ( -- listener )
-    vertical listener-gadget new-track
-        add-toolbar
-        init-input/output
-        dup output>> <scroller> >>scroller
-        dup scroller>> 1 track-add
-        init-error-summary ;
+    vertical listener-gadget new-track with-lines
+    add-toolbar
+    init-input/output
+    add-listener-area
+    init-error-summary ;
 
 M: listener-gadget focusable-child*
     input>> dup popup>> or ;
 
 : wait-for-listener ( listener -- )
-    #! Wait for the listener to start.
+    ! Wait for the listener to start.
     input>> flag>> wait-for-flag ;
 
 : listener-busy? ( listener -- ? )
@@ -330,7 +334,8 @@ M: object accept-completion-hook 2drop ;
     parse-lines-interactive ;
 
 : <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger> "Error" <labeled-gadget> ;
+    over compute-restarts [ hide-glass ] <debugger> 
+    "Error" debugger-color <framed-labeled> ;
 
 : debugger-popup ( interactor error continuation -- )
     [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
@@ -368,7 +373,7 @@ M: interactor stream-read-quot
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
     [ nip ] [ gesture>operation ] 2bi
-    dup [ invoke-command f ] [ 2drop t ] if ;
+    [ invoke-command f ] [ drop t ] if* ;
 
 M: interactor handle-gesture
     {
@@ -418,7 +423,7 @@ interactor "completion" f {
     ] "Listener" spawn drop ;
 
 : restart-listener ( listener -- )
-    #! Returns when listener is ready to receive input.
+    ! Returns when listener is ready to receive input.
     {
         [ com-end ]
         [ clear-output ]

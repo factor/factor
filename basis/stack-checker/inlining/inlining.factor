@@ -1,18 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry namespaces assocs kernel sequences words accessors
-definitions math math.order effects classes arrays combinators
-vectors hints
-stack-checker.state
-stack-checker.errors
-stack-checker.values
-stack-checker.visitor
-stack-checker.backend
-stack-checker.branches
-stack-checker.known-words
-stack-checker.dependencies
-stack-checker.row-polymorphism
-stack-checker.recursive-state ;
+USING: accessors arrays effects fry hints kernel math math.order
+namespaces sequences stack-checker.backend
+stack-checker.dependencies stack-checker.errors
+stack-checker.known-words stack-checker.recursive-state
+stack-checker.state stack-checker.values stack-checker.visitor
+vectors words ;
 IN: stack-checker.inlining
 
 ! Code to handle inline words. Much of the complexity stems from
@@ -107,8 +100,9 @@ SYMBOL: enter-out
     [ terminate ] when ;
 
 : check-call-height ( label -- )
-    dup entry-stack-height current-stack-height >
-    [ word>> diverging-recursion-error inference-error ] [ drop ] if ;
+    dup entry-stack-height current-stack-height > [
+        word>> diverging-recursion-error inference-error
+    ] [ drop ] if ;
 
 : trim-stack ( label seq -- stack )
     swap word>> required-stack-effect in>> length tail* ;

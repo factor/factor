@@ -32,7 +32,7 @@ ARTICLE: "logging.files" "Log files"
 { $subsections with-logging }
 "Log messages are written to " { $snippet "log-root/service/1.log" } ", where"
 { $list
-    { { $snippet "log-root" } " is the Factor source directory by default, but can be overriden with the " { $link log-root } " variable" }
+    { { $snippet "log-root" } " is " { $snippet "resource:logs" } " by default, but can be overriden with the " { $link log-root } " variable" }
     { { $snippet "service" } " is the service name" }
 }
 "You can get the log path for a service:"

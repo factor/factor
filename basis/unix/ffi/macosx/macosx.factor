@@ -134,4 +134,4 @@ STRUCT: sf_hdtr
     { trailers void* }
     { trl_cnt int } ;
 
-FUNCTION: int sendfile ( int fd, int s, off_t offset, off_t* len, sf_hdtr* hdtr, int flags ) ;
+FUNCTION: int sendfile ( int fd, int s, off_t offset, off_t* len, sf_hdtr* hdtr, int flags )

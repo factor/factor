@@ -1,28 +1,33 @@
 USING: assocs debugger hashtables help.markup help.syntax
-quotations sequences math ;
+kernel quotations sequences math ;
 IN: math.statistics
 
 HELP: geometric-mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the geometric mean of all elements in " { $snippet "seq" } ". The geometric mean measures the central tendency of a data set and minimizes the effects of extreme values." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } geometric-mean ." "1.81712059283214" } }
 { $errors "Throws a " { $link signal-error. } " (square-root of 0) if the sequence is empty." } ;
 
 HELP: harmonic-mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the harmonic mean of the elements in " { $snippet "seq" } ". The harmonic mean is appropriate when the average of rates is desired." }
 { $notes "Positive reals only." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "6/11" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
+HELP: kth-smallest
+{ $values { "seq" sequence } { "k" integer } { "elt" object } }
+{ $description "Returns the kth smallest element.  This is semantically equivalent to " { $snippet "swap natural-sort nth" } ", and is therefore zero-indexed.  " { $snippet "k" } " may not be larger than the highest index of " { $snippet "sequence" } "." }
+{ $examples { $example "USING: math.statistics prettyprint ;" "{ 3 1 2 } 1 kth-smallest ." "2" } } ;
+
 HELP: mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the arithmetic mean of the elements in " { $snippet "seq" } "." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } mean ." "2" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: median
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the median of " { $snippet "seq" } " by finding the middle element of the sequence using " { $link kth-smallest } ". If there is an even number of elements in the sequence, the median is not unique, so the mean of the two middle values is output." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } median ." "2" }
@@ -30,7 +35,7 @@ HELP: median
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: range
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the difference of the maximum and minimum values in " { $snippet "seq" } "." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } range ." "2" }
@@ -47,20 +52,20 @@ HELP: minmax
 } ;
 
 HELP: sample-std
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the sample standard deviation of " { $snippet "seq" } ", which is the square root of the sample variance. It measures how widely spread the values in a sequence are about the mean for a random subset of a dataset." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } sample-std ." "1.0" } } ;
 
 HELP: sample-ste
-  { $values { "seq" sequence } { "x" "a non-negative real number"} }
+  { $values { "seq" sequence } { "x" "a non-negative real number" } }
   { $description "Computes the standard error of the mean for " { $snippet "seq" } ". It's defined as the standard deviation divided by the square root of the length of the sequence, and measures uncertainty associated with the estimate of the mean." }
   { $examples
     { $example "USING: math.statistics prettyprint ;" "{ -2 2 } sample-ste ." "2.0" }
   } ;
 
 HELP: sample-var
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence." }
 { $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0." }
 { $examples
@@ -68,13 +73,13 @@ HELP: sample-var
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } sample-var ." "1" }
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } sample-var ." "1+2/3" } } ;
 
-HELP: population-cov 
-{ $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
-{ $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+HELP: population-cov
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "cov" "a real number" } }
+{ $description "Computes the covariance of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
 
 HELP: population-corr
-{ $values { "{x}" sequence } { "{y}" sequence } { "corr" "a real number" } }
-{ $description "Computes the correlation of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "corr" "a real number" } }
+{ $description "Computes the correlation of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
 
 HELP: histogram
 { $values
@@ -127,7 +132,7 @@ HELP: sorted-histogram
 { $description "Outputs a " { $link histogram } " of a sequence sorted by number of occurrences from lowest to highest." }
 { $examples
     { $example "USING: prettyprint math.statistics ;"
-        """"abababbbbbbc" sorted-histogram ."""
+        "\"abababbbbbbc\" sorted-histogram ."
         "{ { 99 1 } { 97 3 } { 98 8 } }"
     }
 } ;
@@ -257,7 +262,7 @@ HELP: collect-by
     { $example
                "USING: math math.statistics prettyprint ;"
                "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-by ."
-               "H{ { f V{ 12 14 14 12 } } { t V{ 11 13 13 11 } } }"
+               "H{ { t V{ 11 13 13 11 } } { f V{ 12 14 14 12 } } }"
     }
 }
 { $notes "May be named " { $snippet "group-by" } " in other languages." } ;
@@ -273,7 +278,7 @@ HELP: collect-index-by
     { $example
                "USING: math math.statistics prettyprint ;"
                "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-index-by ."
-               "H{ { f V{ 1 3 4 6 } } { t V{ 0 2 5 7 } } }"
+               "H{ { t V{ 0 2 5 7 } } { f V{ 1 3 4 6 } } }"
     }
 } ;
 

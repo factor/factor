@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations deques dlists fry
 io.backend io.directories io.files.info io.pathnames kernel
-kernel.private locals math sequences sorting strings system
-unicode.case vocabs vocabs.loader ;
+kernel.private locals math sequences sequences.extras sorting
+strings system unicode.case vocabs ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
@@ -63,8 +63,26 @@ TUPLE: directory-iterator
 
 PRIVATE>
 
-: each-file ( path bfs? quot: ( ... name -- ... ) -- )
+: each-file ( path bfs? quot -- )
     setup-traversal iterate-directory drop ; inline
+
+: each-file-breadth ( path quot -- )
+    t swap each-file ; inline
+
+: each-file-depth ( path quot -- )
+    f swap each-file ; inline
+
+: filter-files-by-depth ( quot -- seq )
+    selector* [ each-file-depth ] dip ; inline
+
+: filter-files-by-breadth ( quot -- seq )
+    selector* [ each-file-breadth ] dip ; inline
+
+: all-files-by-depth ( quot -- seq )
+    collector [ each-file-depth ] dip ; inline
+
+: all-files-by-breadth ( quot -- seq )
+    collector [ each-file-breadth ] dip ; inline
 
 : each-directory-entry ( path bfs? quot: ( ... entry -- ... ) -- )
     setup-traversal iterate-directory-entries drop ; inline
@@ -85,14 +103,46 @@ PRIVATE>
 ERROR: file-not-found path bfs? quot ;
 
 : find-file-throws ( path bfs? quot -- path )
-    3dup find-file dup [ 2nip nip ] [ drop file-not-found ] if ; inline
+    3dup find-file [ 2nip nip ] [ file-not-found ] if* ; inline
 
+ERROR: sequence-expected obj ;
+
+: ensure-sequence-of-directories ( obj -- seq )
+    dup string? [ 1array ] when
+    dup sequence? [ sequence-expected ] unless ;
+
+! Can't make this generic# on string/sequence because of combinators
 : find-in-directories ( directories bfs? quot -- path'/f )
+    [ ensure-sequence-of-directories ] 2dip
     '[ _ [ _ _ find-file-throws ] attempt-all ]
     [ drop f ] recover ; inline
 
 : find-all-in-directories ( directories quot -- paths/f )
     '[ _ find-all-files ] map concat ; inline
+
+: ?parent-directory ( path -- path'/f )
+    dup parent-directory 2dup = [ 2drop f ] [ nip ] if ;
+
+: ?file-info ( path -- file-info/f )
+    [ file-info ] [ 2drop f ] recover ;
+
+: containing-directory ( path -- path' )
+    dup ?file-info directory? [ parent-directory ] unless ;
+
+: ?qualified-directory-files ( path -- seq )
+    [ qualified-directory-files ]
+    [ drop ?parent-directory [ ?qualified-directory-files ] [ f ] if* ] recover ;
+
+: (find-up-to-root) ( path  quot: ( path -- ? ) -- obj )
+    [ [ ?qualified-directory-files ] dip find swap ] 2keep rot [
+        2drop
+    ] [
+        [ nip ?parent-directory ] dip over
+        [ (find-up-to-root) ] [ 2drop f ] if
+    ] if ; inline recursive
+
+: find-up-to-root ( path quot -- obj )
+    [ normalize-path containing-directory ] dip (find-up-to-root) ; inline
 
 : link-size/0 ( path -- n )
     [ link-info size-on-disk>> ] [ 2drop 0 ] recover ;
@@ -114,5 +164,11 @@ ERROR: file-not-found path bfs? quot ;
 
 : find-by-extension ( path extension -- seq )
     1array find-by-extensions ;
+
+: find-files-larger-than ( path size -- seq )
+    '[ file-info size>> _ > ] filter-files-by-depth ;
+
+: file-info-recursive ( path -- seq )
+    [ dup ?file-info [ 2array ] [ drop f ] if* ] filter-files-by-depth ;
 
 os windows? [ "io.directories.search.windows" require ] when

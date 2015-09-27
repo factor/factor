@@ -113,7 +113,7 @@ CONSTANT: BLOCK-TERMINATOR 0x00
 : read-comment-extension ( -- comment-extension )
     \ comment-extension new
         read-sub-blocks >>comment-data ;
-    
+
 : read-application-extension ( -- read-application-extension )
    \ application-extension new
        1 read le> >>block-size

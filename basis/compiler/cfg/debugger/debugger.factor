@@ -1,56 +1,48 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words sequences quotations namespaces io vectors
-arrays hashtables classes.tuple math accessors prettyprint
-prettyprint.config assocs prettyprint.backend prettyprint.custom
-prettyprint.sections parser random compiler.tree.builder
-compiler.tree.optimizer cpu.architecture compiler.cfg.builder
-compiler.cfg.linearization compiler.cfg.registers
-compiler.cfg.stack-frame compiler.cfg.linear-scan
-compiler.cfg.optimizer compiler.cfg.finalization
-compiler.cfg.instructions compiler.cfg.utilities
-compiler.cfg.def-use compiler.cfg.rpo
-compiler.cfg.representations compiler.cfg.gc-checks
-compiler.cfg.save-contexts compiler.cfg
-compiler.cfg.representations.preferred
-compiler.cfg.scheduling compiler.units ;
+USING: accessors assocs classes.tuple compiler.cfg
+compiler.cfg.builder compiler.cfg.def-use
+compiler.cfg.finalization compiler.cfg.gc-checks
+compiler.cfg.instructions compiler.cfg.linearization
+compiler.cfg.optimizer compiler.cfg.registers
+compiler.cfg.representations
+compiler.cfg.representations.preferred compiler.cfg.rpo
+compiler.cfg.save-contexts
+compiler.cfg.utilities compiler.tree.builder
+compiler.tree.optimizer compiler.units fry hashtables io kernel math
+namespaces prettyprint prettyprint.backend prettyprint.custom
+prettyprint.sections quotations random sequences vectors words strings ;
 FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-builder ( quot -- cfgs )
 
+: build-optimized-tree ( callable/word -- tree )
+    reset-vreg-counter
+    build-tree optimize-tree ;
+
 M: callable test-builder
-    0 vreg-counter set-global
-    build-tree optimize-tree gensym build-cfg ;
+    build-optimized-tree gensym build-cfg ;
 
 M: word test-builder
-    0 vreg-counter set-global
-    [ build-tree optimize-tree ] keep build-cfg ;
+    [ build-optimized-tree ] keep build-cfg ;
+
+: run-passes ( cfgs passes -- cfgs' )
+    '[ dup cfg set dup _ apply-passes ] map ;
 
 : test-ssa ( quot -- cfgs )
-    test-builder [
-        [
-            optimize-cfg
-        ] with-cfg
-    ] map ;
+    test-builder { optimize-cfg } run-passes ;
 
 : test-flat ( quot -- cfgs )
-    test-builder [
-        [
-            optimize-cfg
-            select-representations
-            insert-gc-checks
-            insert-save-contexts
-        ] with-cfg
-    ] map ;
+    test-builder {
+        optimize-cfg
+        select-representations
+        insert-gc-checks
+        insert-save-contexts
+    } run-passes ;
 
 : test-regs ( quot -- cfgs )
-    test-builder [
-        [
-            optimize-cfg
-            finalize-cfg
-        ] with-cfg
-    ] map ;
+    test-builder { optimize-cfg finalize-cfg } run-passes ;
 
 GENERIC: insn. ( insn -- )
 
@@ -58,14 +50,20 @@ M: ##phi insn.
     clone [ [ [ number>> ] dip ] assoc-map ] change-inputs
     call-next-method ;
 
-M: insn insn. tuple>array but-last [ bl ] [ pprint ] interleave nl ;
+! XXX: pprint on a string prints the double quotes.
+! This will cause graphviz to choke, so print without quotes.
+M: insn insn. tuple>array but-last [
+        bl
+    ] [
+        dup string? [ print ] [ pprint ] if
+    ] interleave nl ;
 
 : block. ( bb -- )
-    "=== Basic block #" write dup block-number . nl
+    "=== Basic block #" write dup number>> . nl
     dup instructions>> [ insn. ] each nl
     successors>> [
         "Successors: " write
-        [ block-number unparse ] map ", " join print nl
+        [ number>> unparse ] map ", " join print nl
     ] unless-empty ;
 
 : cfg. ( cfg -- )
@@ -90,9 +88,9 @@ M: insn insn. tuple>array but-last [ bl ] [ pprint ] interleave nl ;
 ! Prettyprinting
 : pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
 
-M: ds-loc pprint* \ D pprint-loc ;
+M: ds-loc pprint* \ D: pprint-loc ;
 
-M: rs-loc pprint* \ R pprint-loc ;
+M: rs-loc pprint* \ R: pprint-loc ;
 
 : resolve-phis ( bb -- )
     [
@@ -124,13 +122,7 @@ M: rs-loc pprint* \ R pprint-loc ;
     ] map concat >hashtable representations set ;
 
 : count-insns ( quot insn-check -- ? )
-    [ test-regs [ post-order [ instructions>> ] map concat ] map concat ] dip
-    count ; inline
+    [ test-regs [ cfg>insns ] map concat ] dip count ; inline
 
 : contains-insn? ( quot insn-check -- ? )
     count-insns 0 > ; inline
-
-! Random instruction scheduling exposes bugs in
-! compiler.cfg.dependencies
-: random-scheduling ( -- )
-    [ \ score [ drop 100 random ] define ] with-compilation-unit ;

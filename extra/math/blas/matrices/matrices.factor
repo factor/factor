@@ -117,7 +117,7 @@ PRIVATE>
 
 ! XXX should do a dense clone
 M: blas-matrix-base clone
-    [ 
+    [
         [ {
             [ underlying>> ]
             [ ld>> ]
@@ -168,7 +168,7 @@ M: blas-matrix-base clone
     [ 1.0 ] 2dip n*V(*)Vconj ; inline
 
 : n*M.M ( alpha A B -- alpha*A.B )
-    2dup [ Mheight ] [ Mwidth ] bi* pick <empty-matrix> 
+    2dup [ Mheight ] [ Mwidth ] bi* pick <empty-matrix>
     [ 1.0 ] dip n*M.M+n*M! ;
 
 : M. ( A B -- A.B )

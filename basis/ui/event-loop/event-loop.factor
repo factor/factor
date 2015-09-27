@@ -7,7 +7,7 @@ IN: ui.event-loop
 : event-loop? ( -- ? )
     {
         { [ graft-queue deque-empty? not ] [ t ] }
-        { [ windows get-global empty? not ] [ t ] }
+        { [ ui-windows get-global empty? not ] [ t ] }
         [ f ]
     } cond ;
 

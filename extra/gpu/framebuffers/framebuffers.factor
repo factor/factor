@@ -356,10 +356,10 @@ TYPED:: read-framebuffer-to ( framebuffer-rect: framebuffer-rect
                               gpu-data-ptr -- )
     GL_READ_FRAMEBUFFER framebuffer-rect framebuffer>> framebuffer-handle glBindFramebuffer
     framebuffer-rect [ framebuffer>> ] [ attachment>> ] bi gl-attachment glReadBuffer
-    framebuffer-rect rect>> [ loc>> first2 ] [ dim>> first2 ] bi 
+    framebuffer-rect rect>> [ loc>> first2 ] [ dim>> first2 ] bi
     framebuffer-rect framebuffer-rect-image-type image-data-format
     gpu-data-ptr pixel-pack-buffer [ glReadPixels ] with-gpu-data-ptr ;
-    
+
 : read-framebuffer ( framebuffer-rect -- byte-array )
     dup framebuffer-rect-size <byte-array> [ read-framebuffer-to ] keep ; inline
 
@@ -370,7 +370,7 @@ TYPED: read-framebuffer-image ( framebuffer-rect: framebuffer-rect -- image )
             framebuffer-rect-image-type
             [ >>component-order ] [ >>component-type ] bi*
         ]
-        [ read-framebuffer >>bitmap ] 
+        [ read-framebuffer >>bitmap ]
     } cleave ;
 
 TYPED:: copy-framebuffer ( to-fb-rect: framebuffer-rect
@@ -383,8 +383,7 @@ TYPED:: copy-framebuffer ( to-fb-rect: framebuffer-rect
     to-fb-rect attachment>> [ GL_COLOR_BUFFER_BIT ] [ 0 ] if
     depth?   [ GL_DEPTH_BUFFER_BIT   ] [ 0 ] if bitor
     stencil? [ GL_STENCIL_BUFFER_BIT ] [ 0 ] if bitor :> mask
-    
+
     from-fb-rect rect>> rect-extent [ first2 ] bi@
     to-fb-rect   rect>> rect-extent [ first2 ] bi@
     mask filter gl-mag-filter glBlitFramebuffer ;
-

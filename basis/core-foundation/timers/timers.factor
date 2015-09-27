@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax calendar core-foundation
-core-foundation.time calendar.unix kernel locals math system ;
+USING: alien.c-types alien.syntax calendar.unix core-foundation
+core-foundation.time locals ;
 IN: core-foundation.timers
 
 TYPEDEF: void* CFRunLoopTimerRef
@@ -9,7 +9,7 @@ TYPEDEF: void* CFRunLoopTimerRef
 CALLBACK: void CFRunLoopTimerCallBack (
    CFRunLoopTimerRef timer,
    void *info
-) ;
+)
 
 TYPEDEF: void* CFRunLoopTimerContext
 
@@ -21,7 +21,7 @@ FUNCTION: CFRunLoopTimerRef CFRunLoopTimerCreate (
    CFIndex order,
    CFRunLoopTimerCallBack callout,
    CFRunLoopTimerContext* context
-) ;
+)
 
 :: <CFTimer> ( interval callback -- timer )
     f system-micros >CFAbsoluteTime interval 0 0 callback f
@@ -29,27 +29,25 @@ FUNCTION: CFRunLoopTimerRef CFRunLoopTimerCreate (
 
 FUNCTION: void CFRunLoopTimerInvalidate (
    CFRunLoopTimerRef timer
-) ;
+)
 
 FUNCTION: Boolean CFRunLoopTimerIsValid (
    CFRunLoopTimerRef timer
-) ;
+)
 
 FUNCTION: void CFRunLoopTimerSetNextFireDate (
    CFRunLoopTimerRef timer,
    CFAbsoluteTime fireDate
-) ;
+)
 
 FUNCTION: Boolean CFRunLoopTimerDoesRepeat (
    CFRunLoopTimerRef timer
-) ;
+)
 
 FUNCTION: CFTimeInterval CFRunLoopTimerGetInterval (
    CFRunLoopTimerRef timer
-) ;
+)
 
 FUNCTION: CFAbsoluteTime CFRunLoopTimerGetNextFireDate (
    CFRunLoopTimerRef timer
-) ;
-
-
+)

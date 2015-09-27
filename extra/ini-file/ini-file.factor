@@ -146,4 +146,3 @@ PRIVATE>
 
 : ini>string ( assoc -- str )
     [ write-ini ] with-string-writer ;
-

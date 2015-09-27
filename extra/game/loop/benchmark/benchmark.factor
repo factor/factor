@@ -34,4 +34,3 @@ M: game-loop record-benchmarking ( loop quot: ( loop -- benchmark-data-pair ) --
     ]
     [ drop ensure-benchmark-data ]
     2bi push ;
-                                

@@ -12,7 +12,7 @@ USE: glib.ffi
 LIBRARY: gobject
 
 << "gobject" {
-    { [ os windows? ] [ "libobject-2.0-0.dll" ] }
+    { [ os windows? ] [ "libgobject-2.0-0.dll" ] }
     { [ os macosx? ] [ "libgobject-2.0.dylib" ] }
     { [ os unix? ] [ "libgobject-2.0.so" ] }
 } cond cdecl add-library >>
@@ -20,8 +20,6 @@ LIBRARY: gobject
 IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
 GIR: vocab:gobject/GObject-2.0.gir
-
-IN: gobject.ffi
 
 FORGET: GIOCondition
 FORGET: G_IO_IN

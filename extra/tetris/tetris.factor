@@ -60,7 +60,7 @@ M: tetris-gadget graft* ( gadget -- )
 M: tetris-gadget ungraft* ( gadget -- )
     [ stop-timer f ] change-timer drop ;
 
-: tetris-window ( -- ) 
+: tetris-window ( -- )
     [
         <default-tetris> <tetris-gadget>
         "Tetris" open-status-window

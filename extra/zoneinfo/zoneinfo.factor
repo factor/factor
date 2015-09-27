@@ -26,12 +26,12 @@ CONSTANT: zoneinfo-paths
 SYMBOL: last-zone
 
 TUPLE: raw-zone name gmt-offset rules/save format until ;
-TUPLE: raw-rule name from to type in on at save letters ;
+TUPLE: raw-rule name from to type in on at-time save letters ;
 TUPLE: raw-link from to ;
 TUPLE: raw-leap year month day hms corr r/s ;
 
 TUPLE: zone name ;
-TUPLE: rule name from to at ;
+TUPLE: rule name from to at-time ;
 TUPLE: link ;
 TUPLE: leap ;
 
@@ -138,7 +138,7 @@ MEMO: zoneinfo-array ( -- seq )
 
 : raw-zone-map ( -- assoc )
     zoneinfo-array [ raw-zone? ] filter [ name>> ] collect-by ;
-    
+
 GENERIC: zone-matches? ( string rule -- ? )
 
 M: raw-rule zone-matches? name>> = ;

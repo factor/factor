@@ -1,15 +1,16 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io io.sockets io.streams.duplex kernel
-redis.command-writer redis.response-parser io.encodings.utf8 ;
+USING: accessors calendar io io.sockets io.streams.duplex
+io.timeouts kernel redis.command-writer redis.response-parser
+io.encodings.utf8 ;
 IN: redis
 
-#! Connection
+! Connection
 : redis-quit ( -- ) quit flush ;
 : redis-ping ( -- response ) ping flush read-response ;
 : redis-auth ( password -- response ) auth flush read-response ;
 
-#! String values
+! String values
 : redis-set ( value key -- ) set flush check-response ;
 : redis-get ( key -- response ) get flush read-response ;
 : redis-getset ( value key -- response ) getset flush read-response ;
@@ -23,7 +24,7 @@ IN: redis
 : redis-del ( key -- response ) del flush read-response ;
 : redis-type ( key -- response ) type flush read-response ;
 
-#! Key space
+! Key space
 : redis-keys ( pattern -- response ) keys flush read-response ;
 : redis-randomkey ( -- response ) randomkey flush read-response ;
 : redis-rename ( newkey key -- response ) rename flush read-response ;
@@ -31,7 +32,7 @@ IN: redis
 : redis-dbsize ( -- response ) dbsize flush read-response ;
 : redis-expire ( integer key -- response ) expire flush read-response ;
 
-#! Lists
+! Lists
 : redis-rpush ( value key -- response ) rpush flush read-response ;
 : redis-lpush ( value key -- response ) lpush flush read-response ;
 : redis-llen ( key -- response ) llen flush read-response ;
@@ -43,7 +44,7 @@ IN: redis
 : redis-lpop ( key -- response ) lpop flush read-response ;
 : redis-rpop ( key -- response ) rpop flush read-response ;
 
-#! Sets
+! Sets
 : redis-sadd ( member key -- response ) sadd flush read-response ;
 : redis-srem  ( member key -- response ) srem flush read-response ;
 : redis-smove ( member newkey key -- response ) smove flush read-response ;
@@ -55,7 +56,7 @@ IN: redis
 : redis-sunionstore ( keys destkey -- response ) sunionstore flush read-response ;
 : redis-smembers ( key -- response ) smembers flush read-response ;
 
-#! Hashes
+! Hashes
 : redis-hdel ( field key -- response ) hdel flush read-response ;
 : redis-hexists ( field key -- response ) hexists flush read-response ;
 : redis-hget ( field key -- response ) hget flush read-response ;
@@ -70,26 +71,26 @@ IN: redis
 : redis-hsetnx ( value field key -- response ) hsetnx flush read-response ;
 : redis-hvals ( key -- response ) hvals flush read-response ;
 
-#! Multiple db
+! Multiple db
 : redis-select ( integer -- ) select flush check-response ;
 : redis-move ( integer key -- response ) move flush read-response ;
 : redis-flushdb ( -- ) flushdb flush check-response ;
 : redis-flushall ( -- ) flushall flush check-response ;
 
-#! Sorting
+! Sorting
 ! sort
 
-#! Persistence control
+! Persistence control
 : redis-save ( -- ) save flush check-response ;
 : redis-bgsave ( -- ) bgsave flush check-response ;
 : redis-lastsave ( -- response ) lastsave flush read-response ;
 : redis-shutdown ( -- ) shutdown flush check-response ;
 
-#! Remote server control
+! Remote server control
 : redis-info ( -- response ) info flush read-response ;
 : redis-monitor ( -- response ) monitor flush read-response ;
 
-#! Redis object
+! Redis object
 TUPLE: redis host port encoding password ;
 
 CONSTANT: default-redis-port 6379
@@ -102,7 +103,8 @@ CONSTANT: default-redis-port 6379
 
 : redis-do-connect ( redis -- stream )
     [ host>> ] [ port>> ] [ encoding>> ] tri
-    [ <inet> ] dip <client> drop ;
+    [ <inet> ] dip <client> drop
+    1 minutes over set-timeout ;
 
 : with-redis ( redis quot -- )
     [

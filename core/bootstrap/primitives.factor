@@ -1,14 +1,13 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.strings arrays byte-arrays generic hashtables
-hashtables.private io io.encodings.ascii kernel math
-math.private math.order namespaces make parser sequences strings
-vectors words quotations assocs layouts classes classes.private
-classes.builtin classes.singleton classes.tuple
+USING: accessors alien alien.strings arrays assocs byte-arrays classes
+classes.intersection classes.union combinators generic hashtables
+hashtables.private io io.encodings.ascii kernel math math.private math.order
+namespaces make parser quotations sequences strings vectors words layouts
+classes.private classes.builtin classes.singleton classes.tuple
 classes.tuple.private kernel.private vocabs vocabs.loader
-source-files definitions slots classes.union
-classes.intersection classes.predicate compiler.units
-bootstrap.image.private io.files accessors combinators ;
+source-files definitions slots  classes.predicate compiler.units
+bootstrap.image.private io.files splitting ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -17,22 +16,18 @@ H{ } clone sub-primitives set
 
 "vocab:bootstrap/syntax.factor" parse-file
 
-architecture get {
-    { "windows-x86.32" "x86/32/windows" }
-    { "windows-x86.64" "x86/64/windows" }
-    { "unix-x86.32"  "x86/32/unix"  }
-    { "unix-x86.64"  "x86/64/unix"  }
-    { "linux-ppc.32" "ppc/32/linux" }
-    { "linux-ppc.64" "ppc/64/linux" }
-} ?at [ "Bad architecture: " prepend throw ] unless
-"vocab:cpu/" "/bootstrap.factor" surround parse-file
+: asm-file ( arch -- file )
+    "-" split reverse "." join
+    "vocab:bootstrap/assembler/" ".factor" surround ;
+
+architecture get asm-file parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" lookup-vocab vocab-words bootstrap-syntax set
+"syntax" lookup-vocab vocab-words-assoc bootstrap-syntax set
 
 H{ } clone dictionary set
 H{ } clone root-cache set
@@ -57,7 +52,7 @@ num-types get f <array> builtins set
 
 call( -- ) ! syntax-quot
 
-! Create some empty vocabs where the below primitives and
+! create-word some empty vocabs where the below primitives and
 ! classes will go
 {
     "alien"
@@ -123,7 +118,7 @@ call( -- ) ! syntax-quot
     tri ;
 
 : prepare-slots ( slots -- slots' )
-    [ [ dup pair? [ first2 create ] when ] map ] map ;
+    [ [ dup pair? [ first2 create-word ] when ] map ] map ;
 
 : define-builtin-slots ( class slots -- )
     prepare-slots make-slots 1 finalize-slots
@@ -135,38 +130,38 @@ call( -- ) ! syntax-quot
 : define-builtin ( symbol slotspec -- )
     [ [ define-builtin-predicate ] keep ] dip define-builtin-slots ;
 
-"fixnum" "math" create register-builtin
-"bignum" "math" create register-builtin
-"tuple" "kernel" create register-builtin
-"float" "math" create register-builtin
+"fixnum" "math" create-word register-builtin
+"bignum" "math" create-word register-builtin
+"tuple" "kernel" create-word register-builtin
+"float" "math" create-word register-builtin
 "f" "syntax" lookup-word register-builtin
-"array" "arrays" create register-builtin
-"wrapper" "kernel" create register-builtin
-"callstack" "kernel" create register-builtin
-"string" "strings" create register-builtin
-"quotation" "quotations" create register-builtin
-"dll" "alien" create register-builtin
-"alien" "alien" create register-builtin
-"word" "words" create register-builtin
-"byte-array" "byte-arrays" create register-builtin
+"array" "arrays" create-word register-builtin
+"wrapper" "kernel" create-word register-builtin
+"callstack" "kernel" create-word register-builtin
+"string" "strings" create-word register-builtin
+"quotation" "quotations" create-word register-builtin
+"dll" "alien" create-word register-builtin
+"alien" "alien" create-word register-builtin
+"word" "words" create-word register-builtin
+"byte-array" "byte-arrays" create-word register-builtin
 
 ! We need this before defining c-ptr below
 "f" "syntax" lookup-word { } define-builtin
 
-"f" "syntax" create [ not ] "predicate" set-word-prop
-"f?" "syntax" vocab-words delete-at
+"f" "syntax" create-word [ not ] "predicate" set-word-prop
+"f?" "syntax" vocab-words-assoc delete-at
 
 "t" "syntax" lookup-word define-singleton-class
 
 ! Some unions
-"c-ptr" "alien" create [
+"c-ptr" "alien" create-word [
     "alien" "alien" lookup-word ,
     "f" "syntax" lookup-word ,
     "byte-array" "byte-arrays" lookup-word ,
 ] { } make define-union-class
 
 ! A predicate class used for declarations
-"array-capacity" "sequences.private" create
+"array-capacity" "sequences.private" create-word
 "fixnum" "math" lookup-word
 [
     [ dup 0 fixnum>= ] %
@@ -180,59 +175,59 @@ define-predicate-class
 "coercer" set-word-prop
 
 ! Catch-all class for providing a default method.
-"object" "kernel" create
+"object" "kernel" create-word
 [ f f { } intersection-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
 
-"object?" "kernel" vocab-words delete-at
+"object?" "kernel" vocab-words-assoc delete-at
 
 ! Empty class with no instances
-"null" "kernel" create
+"null" "kernel" create-word
 [ f { } f union-class define-class ]
 [ [ drop f ] "predicate" set-word-prop ]
 bi
 
-"null?" "kernel" vocab-words delete-at
+"null?" "kernel" vocab-words-assoc delete-at
 
-"fixnum" "math" create { } define-builtin
-"fixnum" "math" create "integer>fixnum-strict" "math" create 1quotation "coercer" set-word-prop
+"fixnum" "math" create-word { } define-builtin
+"fixnum" "math" create-word "integer>fixnum-strict" "math" create-word 1quotation "coercer" set-word-prop
 
-"bignum" "math" create { } define-builtin
-"bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
+"bignum" "math" create-word { } define-builtin
+"bignum" "math" create-word ">bignum" "math" create-word 1quotation "coercer" set-word-prop
 
-"float" "math" create { } define-builtin
-"float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
+"float" "math" create-word { } define-builtin
+"float" "math" create-word ">float" "math" create-word 1quotation "coercer" set-word-prop
 
-"array" "arrays" create {
+"array" "arrays" create-word {
     { "length" { "array-capacity" "sequences.private" } read-only }
 } define-builtin
 
-"wrapper" "kernel" create {
+"wrapper" "kernel" create-word {
     { "wrapped" read-only }
 } define-builtin
 
-"string" "strings" create {
+"string" "strings" create-word {
     { "length" { "array-capacity" "sequences.private" } read-only }
     "aux"
 } define-builtin
 
-"quotation" "quotations" create {
+"quotation" "quotations" create-word {
     { "array" { "array" "arrays" } read-only }
     "cached-effect"
     "cache-counter"
 } define-builtin
 
-"dll" "alien" create {
+"dll" "alien" create-word {
     { "path" { "byte-array" "byte-arrays" } read-only }
 } define-builtin
 
-"alien" "alien" create {
+"alien" "alien" create-word {
     { "underlying" { "c-ptr" "alien" } read-only }
     "expired"
 } define-builtin
 
-"word" "words" create {
+"word" "words" create-word {
     { "hashcode" { "fixnum" "math" } }
     "name"
     "vocabulary"
@@ -243,32 +238,32 @@ bi
     { "sub-primitive" read-only }
 } define-builtin
 
-"byte-array" "byte-arrays" create {
+"byte-array" "byte-arrays" create-word {
     { "length" { "array-capacity" "sequences.private" } read-only }
 } define-builtin
 
-"callstack" "kernel" create { } define-builtin
+"callstack" "kernel" create-word { } define-builtin
 
-"tuple" "kernel" create
+"tuple" "kernel" create-word
 [ { } define-builtin ]
 [ define-tuple-layout ]
 bi
 
-! Create special tombstone values
-"tombstone" "hashtables.private" create
+! create-word special tombstone values
+"tombstone" "hashtables.private" create-word
 tuple
 { "state" } define-tuple-class
 
-"((empty))" "hashtables.private" create
-"tombstone" "hashtables.private" lookup-word f
-2array >tuple 1quotation ( -- value ) define-inline
+"((empty))" "hashtables.private" create-word
+{ f } "tombstone" "hashtables.private" lookup-word
+slots>tuple 1quotation ( -- value ) define-inline
 
-"((tombstone))" "hashtables.private" create
-"tombstone" "hashtables.private" lookup-word t
-2array >tuple 1quotation ( -- value ) define-inline
+"((tombstone))" "hashtables.private" create-word
+{ t } "tombstone" "hashtables.private" lookup-word
+slots>tuple 1quotation ( -- value ) define-inline
 
 ! Some tuple classes
-"curry" "kernel" create
+"curry" "kernel" create-word
 tuple
 {
     { "obj" read-only }
@@ -290,7 +285,7 @@ tuple
 } cleave
 ( obj quot -- curry ) define-declared
 
-"compose" "kernel" create
+"compose" "kernel" create-word
 tuple
 {
     { "first" read-only }
@@ -316,7 +311,7 @@ tuple
 ! Sub-primitive words
 : make-sub-primitive ( word vocab effect -- )
     [
-        create
+        create-word
         dup t "primitive" set-word-prop
         dup 1quotation
     ] dip define-declared ;
@@ -350,8 +345,6 @@ tuple
     { "set-fpu-state" "kernel.private" ( -- ) }
     { "signal-handler" "kernel.private" ( -- ) }
     { "leaf-signal-handler" "kernel.private" ( -- ) }
-    { "ffi-signal-handler" "kernel.private" ( -- ) }
-    { "ffi-leaf-signal-handler" "kernel.private" ( -- ) }
     { "unwind-native-frames" "kernel.private" ( -- ) }
     { "set-callstack" "kernel.private" ( callstack -- * ) }
     { "lazy-jit-compile" "kernel.private" ( -- ) }
@@ -390,7 +383,7 @@ tuple
 : make-primitive ( word vocab function effect -- )
     [
         [
-            create
+            create-word
             dup reset-word
             dup t "primitive" set-word-prop
         ] dip
@@ -456,11 +449,12 @@ tuple
     { "fwrite" "io.streams.c" "primitive_fwrite" ( data length alien -- ) }
     { "(clone)" "kernel" "primitive_clone" ( obj -- newobj ) }
     { "<wrapper>" "kernel" "primitive_wrapper" ( obj -- wrapper ) }
-    { "callstack" "kernel" "primitive_callstack" ( -- callstack ) }
+
     { "callstack>array" "kernel" "primitive_callstack_to_array" ( callstack -- array ) }
-    { "datastack" "kernel" "primitive_datastack" ( -- array ) }
     { "die" "kernel" "primitive_die" ( -- ) }
-    { "retainstack" "kernel" "primitive_retainstack" ( -- array ) }
+    { "callstack-for" "kernel.private" "primitive_callstack_for" ( context -- array ) }
+    { "datastack-for" "kernel.private" "primitive_datastack_for" ( context -- array ) }
+    { "retainstack-for" "kernel.private" "primitive_retainstack_for" ( context -- array ) }
     { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" ( obj -- code ) }
     { "become" "kernel.private" "primitive_become" ( old new -- ) }
     { "callstack-bounds" "kernel.private" "primitive_callstack_bounds" ( -- start end ) }
@@ -471,7 +465,7 @@ tuple
     { "innermost-frame-scan" "kernel.private" "primitive_innermost_stack_frame_scan" ( callstack -- n ) }
     { "set-context-object" "kernel.private" "primitive_set_context_object" ( obj n -- ) }
     { "set-datastack" "kernel.private" "primitive_set_datastack" ( array -- ) }
-    { "set-innermost-frame-quot" "kernel.private" "primitive_set_innermost_stack_frame_quot" ( n callstack -- ) }
+    { "set-innermost-frame-quotation" "kernel.private" "primitive_set_innermost_stack_frame_quotation" ( n callstack -- ) }
     { "set-retainstack" "kernel.private" "primitive_set_retainstack" ( array -- ) }
     { "set-special-object" "kernel.private" "primitive_set_special_object" ( obj n -- ) }
     { "special-object" "kernel.private" "primitive_special_object" ( n -- obj ) }
@@ -486,7 +480,7 @@ tuple
     { "bignum*" "math.private" "primitive_bignum_multiply" ( x y -- z ) }
     { "bignum+" "math.private" "primitive_bignum_add" ( x y -- z ) }
     { "bignum-" "math.private" "primitive_bignum_subtract" ( x y -- z ) }
-    { "bignum-bit?" "math.private" "primitive_bignum_bitp" ( n x -- ? ) }
+    { "bignum-bit?" "math.private" "primitive_bignum_bitp" ( x n -- ? ) }
     { "bignum-bitand" "math.private" "primitive_bignum_and" ( x y -- z ) }
     { "bignum-bitnot" "math.private" "primitive_bignum_not" ( x -- y ) }
     { "bignum-bitor" "math.private" "primitive_bignum_or" ( x y -- z ) }
@@ -535,11 +529,10 @@ tuple
     { "gc" "memory" "primitive_full_gc" ( -- ) }
     { "minor-gc" "memory" "primitive_minor_gc" ( -- ) }
     { "size" "memory" "primitive_size" ( obj -- n ) }
-    { "(save-image)" "memory.private" "primitive_save_image" ( path1 path2 -- ) }
-    { "(save-image-and-exit)" "memory.private" "primitive_save_image_and_exit" ( path1 path2 -- ) }
+    { "(save-image)" "memory.private" "primitive_save_image" ( path1 path2 then-die? -- ) }
     { "jit-compile" "quotations" "primitive_jit_compile" ( quot -- ) }
-    { "quot-compiled?" "quotations" "primitive_quot_compiled_p" ( quot -- ? ) }
     { "quotation-code" "quotations" "primitive_quotation_code" ( quot -- start end ) }
+    { "quotation-compiled?" "quotations" "primitive_quotation_compiled_p" ( quot -- ? ) }
     { "array>quotation" "quotations.private" "primitive_array_to_quotation" ( array -- quot ) }
     { "set-slot" "slots.private" "primitive_set_slot" ( value obj n -- ) }
     { "<string>" "strings" "primitive_string" ( n ch -- string ) }
@@ -548,14 +541,11 @@ tuple
     { "(exit)" "system" "primitive_exit" ( n -- * ) }
     { "nano-count" "system" "primitive_nano_count" ( -- ns ) }
     { "(sleep)" "threads.private" "primitive_sleep" ( nanos -- ) }
-    { "callstack-for" "threads.private" "primitive_callstack_for" ( context -- array ) }
     { "context-object-for" "threads.private" "primitive_context_object_for" ( n context -- obj ) }
-    { "datastack-for" "threads.private" "primitive_datastack_for" ( context -- array ) }
-    { "retainstack-for" "threads.private" "primitive_retainstack_for" ( context -- array ) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" ( -- stats ) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" ( -- ) }
-    { "optimized?" "words" "primitive_optimized_p" ( word -- ? ) }
     { "word-code" "words" "primitive_word_code" ( word -- start end ) }
+    { "word-optimized?" "words" "primitive_word_optimized_p" ( word -- ? ) }
     { "(word)" "words.private" "primitive_word" ( name vocab hashcode -- word ) }
     { "profiling" "tools.profiler.sampling.private" "primitive_sampling_profiler" ( ? -- ) }
     { "(get-samples)" "tools.profiler.sampling.private" "primitive_get_samples" ( -- samples/f ) }
@@ -563,6 +553,6 @@ tuple
 } [ first4 make-primitive ] each
 
 ! Bump build number
-"build" "kernel" create build 1 + [ ] curry ( -- n ) define-declared
+"build" "kernel" create-word build 1 + [ ] curry ( -- n ) define-declared
 
 ] with-compilation-unit

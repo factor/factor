@@ -119,7 +119,7 @@ CONSTANT: jvm-summit-slides
                 "    a2 = area(s2)"
                 "a = φ(a1,a2)"
             }
-            
+
         }
     }
     { $slide "Factor compiler overview"

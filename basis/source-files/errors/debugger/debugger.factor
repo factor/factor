@@ -7,7 +7,7 @@ CONSTANT: +listener-input+ "<Listener input>"
 
 : error-location ( error -- string )
     [
-        [ file>> [ % ] [ +listener-input+ % ] if* ]
+        [ path>> [ % ] [ +listener-input+ % ] if* ]
         [ line#>> [ ": " % # ] when* ] bi
     ] "" make ;
 

@@ -1,25 +1,23 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs sequences kernel locals fry
-combinators stack-checker.backend
-compiler.tree
-compiler.tree.recursive
+USING: accessors arrays compiler.tree
 compiler.tree.dead-code.branches
-compiler.tree.dead-code.liveness
-compiler.tree.dead-code.simple ;
+compiler.tree.dead-code.liveness compiler.tree.dead-code.simple
+compiler.tree.recursive kernel locals sequences
+stack-checker.backend ;
 IN: compiler.tree.dead-code.recursive
 
 M: #enter-recursive compute-live-values*
-    #! If the output of an #enter-recursive is live, then the
-    #! corresponding inputs to the #call-recursive are live also.
+    ! If the output of an #enter-recursive is live, then the
+    ! corresponding inputs to the #call-recursive are live also.
     [ out-d>> ] [ recursive-phi-in ] bi look-at-phi ;
 
 M: #return-recursive compute-live-values*
     [ out-d>> ] [ in-d>> ] bi look-at-mapping ;
 
 M: #call-recursive compute-live-values*
-    #! If the output of a #call-recursive is live, then the
-    #! corresponding inputs to #return nodes are live also.
+    ! If the output of a #call-recursive is live, then the
+    ! corresponding inputs to #return nodes are live also.
     [ out-d>> ] [ label>> return>> in-d>> ] bi look-at-mapping ;
 
 :: drop-dead-inputs ( inputs outputs -- #shuffle )

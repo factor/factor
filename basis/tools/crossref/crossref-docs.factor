@@ -55,7 +55,7 @@ HELP: usage.
 { $examples { $code "\\ reverse usage." } } ;
 
 HELP: quot-uses
-{ $values { "obj" object } { "set" "a " { $link set } " of words" } }
+{ $values { "obj" object } { "set" "a " { $link unordered-set } " of words" } }
 { $description "Outputs a set of words referenced by the quotation and any quotations it contains." } ;
 
 { usage usage. } related-words

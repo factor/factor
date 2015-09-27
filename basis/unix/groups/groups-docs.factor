@@ -87,7 +87,7 @@ HELP: ?group-id
 
 HELP: all-group-names
 { $values
-    
+
     { "seq" sequence }
 }
 { $description "Returns a sequence of group names as strings." } ;

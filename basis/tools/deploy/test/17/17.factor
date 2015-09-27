@@ -14,7 +14,7 @@ person "PEOPLE" {
 : db-deploy-test ( -- )
     "test.db" temp-file <sqlite-db> [
         person recreate-table
-        
+
         person new
             "Stephen Hawking" >>name
             timestamp new 8 >>day 0 >>month 1942 >>year >>birthday

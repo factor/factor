@@ -13,7 +13,7 @@ IN: system-info.macosx
 
 TYPEDEF: SInt16 OSErr
 TYPEDEF: UInt32 OSType
-FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
+FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response )
 
 : gestalt ( selector -- response )
     { SInt32 } [ Gestalt 0 assert= ] with-out-parameters ;
@@ -24,6 +24,7 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { { 10 11 } "El Capitan" }
     { { 10 10 } "Yosemite" }
     { { 10 9 } "Mavericks" }
     { { 10 8 } "Mountain Lion" }
@@ -51,7 +52,7 @@ M: macosx os-version
 ! See /usr/include/sys/sysctl.h for constants
 
 LIBRARY: libc
-FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen ) ;
+FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen )
 
 : (sysctl-query) ( name namelen oldp oldlenp -- oldp )
     over [ f 0 sysctl io-error ] dip ;

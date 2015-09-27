@@ -118,7 +118,7 @@ M:: chipmunk-world begin-game-world ( world -- )
             ] when
         ] each
     ] each
-    
+
     space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody :> body
     body -1000 -10 cpv >>p drop
     body 400 0 cpv >>v drop

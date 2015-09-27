@@ -121,7 +121,7 @@ $nl
 HELP: href
 { $description "Character style. A URL string that the text links to." } ;
 
-HELP: image
+HELP: image-style
 { $description "Character style. A pathname string for an image file to display in place of the printed text. If this style is specified, the printed text serves the same role as the " { $snippet "alt" } " attribute of an HTML " { $snippet "img" } " tag -- the text is only displayed if the output medium does not support images." } ;
 
 ARTICLE: "character-styles" "Character styles"
@@ -136,7 +136,7 @@ ARTICLE: "character-styles" "Character styles"
 "Special styles:"
 { $subsections
     href
-    image
+    image-style
 }
 { $see-also "presentations" } ;
 

@@ -12,4 +12,3 @@ M: unix >deployed-library-path
 
 M: macosx >deployed-library-path
     file-name "@executable_path/../Frameworks" prepend-path ;
-

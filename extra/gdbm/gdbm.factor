@@ -160,4 +160,3 @@ PRIVATE>
 
 : with-gdbm-writer ( name quot -- )
     writer swap with-gdbm-role ; inline
-

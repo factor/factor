@@ -59,7 +59,7 @@ IN: validators
     [ 2drop ] [ drop "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )
-    #! From http://www.regular-expressions.info/email.html
+    ! From http://www.regular-expressions.info/email.html
     320 v-max-length
     "e-mail"
     R' [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}'i
@@ -89,7 +89,7 @@ IN: validators
 
 : v-mode ( str -- str )
     dup mode-names member? [
-        "not a valid syntax mode" throw 
+        "not a valid syntax mode" throw
     ] unless ;
 
 : luhn? ( str -- ? )

@@ -20,7 +20,7 @@ ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
     V/n
     Vneg
 }
-"Vector addition:" 
+"Vector addition:"
 { $subsections
     n*V+V!
     n*V+V
@@ -165,4 +165,3 @@ HELP: zvector{
     POSTPONE: svector{ POSTPONE: dvector{
     POSTPONE: cvector{ POSTPONE: zvector{
 } related-words
-

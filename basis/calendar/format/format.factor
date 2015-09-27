@@ -93,28 +93,41 @@ M: timestamp year. ( timestamp -- )
 : timestamp>string ( timestamp -- str )
     [ (timestamp>string) ] with-string-writer ;
 
-: (write-gmt-offset) ( duration -- )
+: write-hhmm ( duration -- )
     [ hh ] [ mm ] bi ;
 
 : write-gmt-offset ( gmt-offset -- )
     dup instant <=> {
         { +eq+ [ drop "GMT" write ] }
-        { +lt+ [ "-" write before (write-gmt-offset) ] }
-        { +gt+ [ "+" write (write-gmt-offset) ] }
+        { +lt+ [ "-" write before write-hhmm ] }
+        { +gt+ [ "+" write write-hhmm ] }
+    } case ;
+
+: write-gmt-offset-number ( gmt-offset -- )
+    dup instant <=> {
+        { +eq+ [ drop "+0000" write ] }
+        { +lt+ [ "-" write before write-hhmm ] }
+        { +gt+ [ "+" write write-hhmm ] }
     } case ;
 
 : timestamp>rfc822 ( timestamp -- str )
-    #! RFC822 timestamp format
-    #! Example: Tue, 15 Nov 1994 08:12:31 +0200
+    ! RFC822 timestamp format
+    ! Example: Tue, 15 Nov 1994 08:12:31 +0200
     [
         [ (timestamp>string) bl ]
         [ gmt-offset>> write-gmt-offset ]
         bi
     ] with-string-writer ;
 
+: timestamp>git-time ( timestamp -- str )
+    [
+        [ { DAY " " MONTH " " D " " hh ":" mm ":" ss " " YYYY " " } formatted ]
+        [ gmt-offset>> write-gmt-offset-number ] bi
+    ] with-string-writer ;
+
 : timestamp>http-string ( timestamp -- str )
-    #! http timestamp format
-    #! Example: Tue, 15 Nov 1994 08:12:31 GMT
+    ! http timestamp format
+    ! Example: Tue, 15 Nov 1994 08:12:31 GMT
     >gmt timestamp>rfc822 ;
 
 : (timestamp>cookie-string) ( timestamp -- )
@@ -137,7 +150,7 @@ M: timestamp year. ( timestamp -- )
 ! Should be enough for anyone, allows to not do a fancy
 ! algorithm to detect infinite decimals (e.g 1/3)
 : ss.SSSSSS ( timestamp -- )
-    second>> >float "%.6f" format-float 9 CHAR: 0 pad-head write ;
+    second>> >float "%09.6f" format-float write ;
 
 : (timestamp>rfc3339) ( timestamp -- )
     {

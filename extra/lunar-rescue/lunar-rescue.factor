@@ -3,15 +3,10 @@
 !
 ! Lunar Rescue: http://www.mameworld.net/maws/romset/lrescue
 !
-USING: 
-    cpu.8080
-    kernel 
-    space-invaders
-    ui 
-;
+USING: kernel space-invaders ui ;
 IN: lunar-rescue
 
-TUPLE: lunar-rescue < space-invaders ; 
+TUPLE: lunar-rescue < space-invaders ;
 
 : <lunar-rescue> ( -- cpu )
     lunar-rescue new cpu-init ;
@@ -25,7 +20,9 @@ CONSTANT: rom-info {
     { 0x4800 "lrescue/lrescue.6" }
 }
 
-: run-lunar ( -- )  
-    [ "Lunar Rescue" <lunar-rescue>  rom-info (run) ] with-ui ;
+: run-lunar ( -- )
+    [
+        "Lunar Rescue" <lunar-rescue> rom-info run-rom
+    ] with-ui ;
 
 MAIN: run-lunar

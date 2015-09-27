@@ -4,6 +4,7 @@ USING: namespaces arrays assocs hashtables kernel accessors fry
 grouping sorting sets sequences locals
 cpu.architecture
 sequences.deep
+combinators
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.def-use
@@ -117,9 +118,11 @@ M: insn gcse
     dup compute-avail-sets
     [ gcse-step ] simple-optimization ;
 
-: value-numbering ( cfg -- cfg )
-    needs-predecessors
-    dup determine-value-numbers
-    dup eliminate-common-subexpressions
-
-    cfg-changed predecessors-changed ;
+: value-numbering ( cfg -- )
+    {
+        needs-predecessors
+        determine-value-numbers
+        eliminate-common-subexpressions
+        cfg-changed
+        predecessors-changed
+    } apply-passes ;

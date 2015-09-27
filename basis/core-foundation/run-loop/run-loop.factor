@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.syntax calendar
-classes.struct combinators core-foundation
-core-foundation.file-descriptors core-foundation.strings
-core-foundation.time core-foundation.timers deques destructors
-heaps kernel math namespaces sequences system threads unix
-unix.time ;
+USING: accessors alien alien.c-types alien.syntax
+core-foundation core-foundation.file-descriptors
+core-foundation.strings core-foundation.time
+core-foundation.timers destructors init kernel math namespaces
+sequences threads ;
 FROM: calendar.unix => system-micros ;
 IN: core-foundation.run-loop
 
@@ -17,44 +16,44 @@ CONSTANT: kCFRunLoopRunHandledSource 4
 TYPEDEF: void* CFRunLoopRef
 TYPEDEF: void* CFRunLoopSourceRef
 
-FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;
-FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( ) ;
+FUNCTION: CFRunLoopRef CFRunLoopGetMain ( )
+FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( )
 
 FUNCTION: SInt32 CFRunLoopRunInMode (
     CFStringRef mode,
     CFTimeInterval seconds,
     Boolean returnAfterSourceHandled
-) ;
+)
 
 FUNCTION: CFRunLoopSourceRef CFFileDescriptorCreateRunLoopSource (
     CFAllocatorRef allocator,
     CFFileDescriptorRef f,
     CFIndex order
-) ;
+)
 
 FUNCTION: void CFRunLoopAddSource (
     CFRunLoopRef rl,
     CFRunLoopSourceRef source,
     CFStringRef mode
-) ;
+)
 
 FUNCTION: void CFRunLoopRemoveSource (
     CFRunLoopRef rl,
     CFRunLoopSourceRef source,
     CFStringRef mode
-) ;
+)
 
 FUNCTION: void CFRunLoopAddTimer (
     CFRunLoopRef rl,
     CFRunLoopTimerRef timer,
     CFStringRef mode
-) ;
+)
 
 FUNCTION: void CFRunLoopRemoveTimer (
     CFRunLoopRef rl,
     CFRunLoopTimerRef timer,
     CFStringRef mode
-) ;
+)
 
 CFSTRING: CFRunLoopDefaultMode "kCFRunLoopDefaultMode"
 
@@ -88,26 +87,13 @@ SYMBOL: run-loop
         tri
     ] with-destructors ;
 
-<PRIVATE
-
-: (reset-timer) ( timer timestamp -- )
-    >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
-
-: reset-timer ( timer -- )
-    sleep-time
-    [ 1000 /f ] [ 1,000,000 ] if* system-micros +
-    (reset-timer) ;
-
-PRIVATE>
-
 : add-timer-to-run-loop ( timer -- )
-    [ reset-timer ]
     [ get-run-loop timers>> push ]
     [
         CFRunLoopGetMain
         swap CFRunLoopDefaultMode
         CFRunLoopAddTimer
-    ] tri ;
+    ] bi ;
 
 : invalidate-run-loop-timers ( -- )
     get-run-loop [
@@ -115,16 +101,25 @@ PRIVATE>
         V{ } clone
     ] change-timers drop ;
 
-: reset-run-loop ( -- )
-    get-run-loop
-    [ timers>> [ reset-timer ] each ]
-    [ fds>> [ enable-all-callbacks ] each ] bi ;
+SYMBOL: thread-timer
+[ f thread-timer set-global ]
+"core-foundation.run-loop" add-startup-hook
 
-: timer-callback ( -- callback )
-    [ drop reset-timer yield ] CFRunLoopTimerCallBack ;
+: (reset-thread-timer) ( timer -- )
+    sleep-time
+    [ 1000 /f ] [ 1,000,000 ] if* system-micros +
+    >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
+
+: reset-thread-timer ( -- )
+    thread-timer get-global [ (reset-thread-timer) ] when* ;
+
+: thread-timer-callback ( -- callback )
+    [ drop (reset-thread-timer) yield ] CFRunLoopTimerCallBack ;
 
 : init-thread-timer ( -- )
-    60 timer-callback <CFTimer> add-timer-to-run-loop ;
+    60 thread-timer-callback <CFTimer>
+    [ add-timer-to-run-loop ]
+    [ thread-timer set-global ] bi ;
 
 : run-one-iteration ( nanos -- handled? )
     CFRunLoopDefaultMode

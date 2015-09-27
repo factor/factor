@@ -15,28 +15,28 @@ IN: db.sqlite.ffi
 ! Return values from sqlite functions
 CONSTANT: SQLITE_OK           0 ! Successful result
 CONSTANT: SQLITE_ERROR        1 ! SQL error or missing database
-CONSTANT: SQLITE_INTERNAL     2 ! An internal logic error in SQLite 
-CONSTANT: SQLITE_PERM         3 ! Access permission denied 
-CONSTANT: SQLITE_ABORT        4 ! Callback routine requested an abort 
-CONSTANT: SQLITE_BUSY         5 ! The database file is locked 
-CONSTANT: SQLITE_LOCKED       6 ! A table in the database is locked 
-CONSTANT: SQLITE_NOMEM        7 ! A malloc() failed 
-CONSTANT: SQLITE_READONLY     8 ! Attempt to write a readonly database 
-CONSTANT: SQLITE_INTERRUPT    9 ! Operation terminated by sqlite_interrupt() 
-CONSTANT: SQLITE_IOERR       10 ! Some kind of disk I/O error occurred 
-CONSTANT: SQLITE_CORRUPT     11 ! The database disk image is malformed 
-CONSTANT: SQLITE_NOTFOUND    12 ! (Internal Only) Table or record not found 
-CONSTANT: SQLITE_FULL        13 ! Insertion failed because database is full 
-CONSTANT: SQLITE_CANTOPEN    14 ! Unable to open the database file 
-CONSTANT: SQLITE_PROTOCOL    15 ! Database lock protocol error 
-CONSTANT: SQLITE_EMPTY       16 ! (Internal Only) Database table is empty 
-CONSTANT: SQLITE_SCHEMA      17 ! The database schema changed 
-CONSTANT: SQLITE_TOOBIG      18 ! Too much data for one row of a table 
-CONSTANT: SQLITE_CONSTRAINT  19 ! Abort due to contraint violation 
-CONSTANT: SQLITE_MISMATCH    20 ! Data type mismatch 
-CONSTANT: SQLITE_MISUSE      21 ! Library used incorrectly 
-CONSTANT: SQLITE_NOLFS       22 ! Uses OS features not supported on host 
-CONSTANT: SQLITE_AUTH        23 ! Authorization denied 
+CONSTANT: SQLITE_INTERNAL     2 ! An internal logic error in SQLite
+CONSTANT: SQLITE_PERM         3 ! Access permission denied
+CONSTANT: SQLITE_ABORT        4 ! Callback routine requested an abort
+CONSTANT: SQLITE_BUSY         5 ! The database file is locked
+CONSTANT: SQLITE_LOCKED       6 ! A table in the database is locked
+CONSTANT: SQLITE_NOMEM        7 ! A malloc() failed
+CONSTANT: SQLITE_READONLY     8 ! Attempt to write a readonly database
+CONSTANT: SQLITE_INTERRUPT    9 ! Operation terminated by sqlite_interrupt()
+CONSTANT: SQLITE_IOERR       10 ! Some kind of disk I/O error occurred
+CONSTANT: SQLITE_CORRUPT     11 ! The database disk image is malformed
+CONSTANT: SQLITE_NOTFOUND    12 ! (Internal Only) Table or record not found
+CONSTANT: SQLITE_FULL        13 ! Insertion failed because database is full
+CONSTANT: SQLITE_CANTOPEN    14 ! Unable to open the database file
+CONSTANT: SQLITE_PROTOCOL    15 ! Database lock protocol error
+CONSTANT: SQLITE_EMPTY       16 ! (Internal Only) Database table is empty
+CONSTANT: SQLITE_SCHEMA      17 ! The database schema changed
+CONSTANT: SQLITE_TOOBIG      18 ! Too much data for one row of a table
+CONSTANT: SQLITE_CONSTRAINT  19 ! Abort due to contraint violation
+CONSTANT: SQLITE_MISMATCH    20 ! Data type mismatch
+CONSTANT: SQLITE_MISUSE      21 ! Library used incorrectly
+CONSTANT: SQLITE_NOLFS       22 ! Uses OS features not supported on host
+CONSTANT: SQLITE_AUTH        23 ! Authorization denied
 CONSTANT: SQLITE_FORMAT      24 ! Auxiliary database format error
 CONSTANT: SQLITE_RANGE       25 ! 2nd parameter to sqlite3_bind out of range
 CONSTANT: SQLITE_NOTADB      26 ! File opened that is not a database file
@@ -82,7 +82,7 @@ CONSTANT: SQLITE_TEXT        3
 CONSTANT: SQLITE_BLOB        4
 CONSTANT: SQLITE_NULL        5
 
-! Values for the 'destructor' parameter of the 'bind' routines. 
+! Values for the 'destructor' parameter of the 'bind' routines.
 CONSTANT: SQLITE_STATIC      0
 CONSTANT: SQLITE_TRANSIENT   -1
 
@@ -105,36 +105,36 @@ TYPEDEF: longlong sqlite3_int64
 TYPEDEF: ulonglong sqlite3_uint64
 
 LIBRARY: sqlite
-FUNCTION: int sqlite3_open ( c-string filename, void* ppDb ) ;
-FUNCTION: int sqlite3_close ( sqlite3* pDb ) ;
-FUNCTION: c-string sqlite3_errmsg ( sqlite3* pDb ) ;
-FUNCTION: int sqlite3_prepare ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail ) ;
-FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail ) ;
-FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt ) ;
-FUNCTION: sqlite3_uint64 sqlite3_last_insert_rowid ( sqlite3* pStmt ) ;
-FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor ) ;
-FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
-FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
-FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n ) ;
+FUNCTION: int sqlite3_open ( c-string filename, void* ppDb )
+FUNCTION: int sqlite3_close ( sqlite3* pDb )
+FUNCTION: c-string sqlite3_errmsg ( sqlite3* pDb )
+FUNCTION: int sqlite3_prepare ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail )
+FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail )
+FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt )
+FUNCTION: sqlite3_uint64 sqlite3_last_insert_rowid ( sqlite3* pStmt )
+FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor )
+FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x )
+FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n )
+FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n )
 ! Bind the same function as above, but for unsigned 64bit integers
 FUNCTION-ALIAS: sqlite3-bind-uint64
-    int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_uint64 in64 ) ;
-FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n ) ;
-FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, c-string text, int len, int destructor ) ;
-FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, c-string name ) ;
-FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt ) ;
-FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
+    int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_uint64 in64 )
+FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n )
+FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, c-string text, int len, int destructor )
+FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, c-string name )
+FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt )
+FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col )
+FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col )
 ! Bind the same function as above, but for unsigned 64bit integers
 FUNCTION-ALIAS: sqlite3-column-uint64
-    sqlite3_uint64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_text ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col ) ;
+    sqlite3_uint64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col )
+FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_text ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col )

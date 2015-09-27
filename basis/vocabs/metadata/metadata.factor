@@ -108,18 +108,18 @@ ERROR: bad-platform name ;
     } 1|| ;
 
 : filter-don't-load ( vocabs -- vocabs' )
-    [ vocab-name don't-load? not ] filter ;
+    [ vocab-name don't-load? ] reject ;
 
 : don't-test? ( vocab -- ? )
     vocab-tags "not tested" swap member? ;
 
 : filter-don't-test ( vocabs -- vocabs' )
-    [ don't-test? not ] filter ;
+    [ don't-test? ] reject ;
 
 TUPLE: unsupported-platform vocab requires ;
 
 : throw-unsupported-platform ( vocab requires -- )
-    \ unsupported-platform boa throw-continue ;
+    unsupported-platform boa throw-continue ;
 
 M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;

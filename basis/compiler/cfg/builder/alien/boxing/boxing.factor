@@ -1,11 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs combinators
-classes.struct fry kernel layouts locals math namespaces
-sequences sequences.generalizations system
-compiler.cfg.builder.alien.params compiler.cfg.hats
-compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.intrinsics.allot cpu.architecture ;
+USING: accessors alien.c-types arrays assocs classes.struct
+combinators compiler.cfg.builder.alien.params compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.intrinsics.allot
+compiler.cfg.registers cpu.architecture fry kernel layouts
+locals math namespaces sequences system ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.boxing
 

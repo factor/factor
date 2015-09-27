@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences math combinators
-combinators.short-circuit vectors compiler.cfg
+USING: accessors combinators.short-circuit compiler.cfg
 compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.utilities ;
+compiler.cfg.utilities kernel sequences vectors ;
 IN: compiler.cfg.useless-conditionals
 
 : delete-conditional? ( bb -- ? )
@@ -25,9 +24,10 @@ IN: compiler.cfg.useless-conditionals
     [ first skip-empty-blocks 1vector ] change-successors
     instructions>> [ pop* ] [ [ ##branch new-insn ] dip push ] bi ;
 
-: delete-useless-conditionals ( cfg -- cfg' )
-    dup [
-        dup delete-conditional? [ delete-conditional ] [ drop ] if
-    ] each-basic-block
-    
-    cfg-changed predecessors-changed ;
+: delete-useless-conditionals ( cfg -- )
+    [
+        [
+            dup delete-conditional? [ delete-conditional ] [ drop ] if
+        ] each-basic-block
+    ]
+    [ cfg-changed ] [ predecessors-changed ] tri ;

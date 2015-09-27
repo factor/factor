@@ -12,7 +12,7 @@ IN: noise
 
 : float-map>byte-map ( floats: float-array scale: float bias: float -- bytes: byte-array )
     '[
-        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply 
+        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply
         [ int-4 short-8 vconvert ] 2bi@
         short-8 uchar-16 vconvert
     ] data-map( float-4[4] -- uchar-16 ) ; inline
@@ -72,7 +72,7 @@ ERROR: invalid-perlin-noise-table table ;
         [ v* ]
         [ v* ]
     } cleave ; inline
-    
+
 :: hashes ( table x y z -- aaa baa aba bba aab bab abb bbb )
     x      table nth-unsafe y + :> a
     x  1 + table nth-unsafe y + :> b
@@ -128,4 +128,3 @@ TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-
 
 : perlin-noise-image ( table transform dim -- image )
     [ perlin-noise-map-coords perlin-noise-map ] [ 5/7. 0.5 float-map>image ] bi ;
-

@@ -35,7 +35,7 @@ IN: system-info.windows
 
 M: windows os-version ( -- obj )
     os-version-struct [ dwMajorVersion>> ] [ dwMinorVersion>> ] bi 2array ;
-    
+
 : windows-build# ( -- n )
     os-version-struct dwBuildNumber>> ;
 
@@ -100,7 +100,7 @@ M: windows available-virtual-mem ( -- n )
     MAX_COMPUTERNAME_LENGTH 1 +
     [ <byte-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;
- 
+
 : username ( -- string )
     UNLEN 1 +
     [ <byte-array> dup ] keep uint <ref>

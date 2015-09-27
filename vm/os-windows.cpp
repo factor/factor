@@ -4,6 +4,13 @@ namespace factor {
 
 HMODULE hFactorDll;
 
+bool set_memory_locked(cell base, cell size, bool locked) {
+  int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
+  DWORD ignore;
+  int status = VirtualProtect((char*)base, size, prot, &ignore);
+  return status != 0;
+}
+
 void factor_vm::init_ffi() {
   hFactorDll = GetModuleHandle(NULL);
   if (!hFactorDll)
@@ -14,12 +21,12 @@ void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = LoadLibraryEx((WCHAR*)alien_offset(dll->path), NULL, 0);
 }
 
-void* factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return (void*)GetProcAddress(dll ? (HMODULE) dll->handle : hFactorDll,
-                               symbol);
+cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
+  return (cell)GetProcAddress(dll ? (HMODULE) dll->handle : hFactorDll,
+                              symbol);
 }
 
-void* factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
+cell factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
   return ffi_dlsym(dll, symbol);
 }
 
@@ -46,15 +53,6 @@ BOOL factor_vm::windows_stat(vm_char* path) {
   BOOL ret = GetFileInformationByHandle(h, &bhfi);
   CloseHandle(h);
   return ret;
-}
-
-void factor_vm::windows_image_path(vm_char* full_path, vm_char* temp_path,
-                                   unsigned int length) {
-  wcsncpy(temp_path, full_path, length - 1);
-  size_t full_path_len = wcslen(full_path);
-  if (full_path_len < length - 1)
-    wcsncat(temp_path, L".image", length - full_path_len - 1);
-  temp_path[length - 1] = 0;
 }
 
 /* You must free() this yourself. */
@@ -95,23 +93,31 @@ segment::segment(cell size_, bool executable_p) {
   size = size_;
 
   char* mem;
-  DWORD ignore;
 
   if ((mem = (char*)VirtualAlloc(
            NULL, getpagesize() * 2 + size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
-      0)
+      0) {
     out_of_memory("VirtualAlloc");
-
-  if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
-    fatal_error("Cannot allocate low guard page", (cell)mem);
-
-  if (!VirtualProtect(mem + size + getpagesize(), getpagesize(), PAGE_NOACCESS,
-                      &ignore))
-    fatal_error("Cannot allocate high guard page", (cell)mem);
+  }
 
   start = (cell)mem + getpagesize();
   end = start + size;
+
+  set_border_locked(true);
+}
+
+void segment::set_border_locked(bool locked) {
+  int pagesize = getpagesize();
+  cell lo = start - pagesize;
+  if (!set_memory_locked(lo, pagesize, locked)) {
+    fatal_error("Cannot (un)protect low guard page", lo);
+  }
+
+  cell hi = end;
+  if (!set_memory_locked(hi, pagesize, locked)) {
+    fatal_error("Cannot (un)protect high guard page", hi);
+  }
 }
 
 segment::~segment() {
@@ -129,18 +135,6 @@ long getpagesize() {
     g_pagesize = system_info.dwPageSize;
   }
   return g_pagesize;
-}
-
-void code_heap::guard_safepoint() {
-  DWORD ignore;
-  if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_NOACCESS, &ignore))
-    fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
-}
-
-void code_heap::unguard_safepoint() {
-  DWORD ignore;
-  if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_READWRITE, &ignore))
-    fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
 }
 
 void factor_vm::move_file(const vm_char* path1, const vm_char* path2) {
@@ -201,6 +195,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
   switch (e->ExceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:
       signal_fault_addr = e->ExceptionInformation[1];
+      signal_fault_pc = c->EIP;
       verify_memory_protection_error(signal_fault_addr);
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
                               (cell)factor::memory_signal_handler_impl);
@@ -233,20 +228,15 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                               (cell)factor::synchronous_signal_handler_impl);
       break;
   }
-
   return ExceptionContinueExecution;
 }
 
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                 void* dispatch) {
-  if (factor_vm::fatal_erroring_p)
-    return ExceptionContinueSearch;
-
   factor_vm* vm = current_vm_p();
-  if (vm)
-    return vm->exception_handler(e, frame, c, dispatch);
-  else
+  if (factor_vm::fatal_erroring_p || !vm)
     return ExceptionContinueSearch;
+  return vm->exception_handler(e, frame, c, dispatch);
 }
 
 /* On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
@@ -295,21 +285,36 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
   }
 }
 
-void factor_vm::open_console() { handle_ctrl_c(); }
+void open_console() { handle_ctrl_c(); }
 
-void factor_vm::ignore_ctrl_c() {
+void ignore_ctrl_c() {
   SetConsoleCtrlHandler(factor::ctrl_handler, FALSE);
 }
 
-void factor_vm::handle_ctrl_c() {
+void handle_ctrl_c() {
   SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
-void factor_vm::lock_console() {}
+void lock_console() {}
 
-void factor_vm::unlock_console() {}
+void unlock_console() {}
 
-void factor_vm::close_console() {}
+void close_console() {}
+
+cell get_thread_pc(THREADHANDLE th) {
+  DWORD suscount = SuspendThread(th);
+  FACTOR_ASSERT(suscount == 0);
+
+  CONTEXT context;
+  memset((void*)&context, 0, sizeof(CONTEXT));
+  context.ContextFlags = CONTEXT_CONTROL;
+  BOOL context_ok = GetThreadContext(th, &context);
+  FACTOR_ASSERT(context_ok);
+
+  suscount = ResumeThread(th);
+  FACTOR_ASSERT(suscount == 1);
+  return context.EIP;
+}
 
 void factor_vm::sampler_thread_loop() {
   LARGE_INTEGER counter, new_counter, units_per_second;
@@ -333,22 +338,11 @@ void factor_vm::sampler_thread_loop() {
       ++samples;
       counter.QuadPart += units_per_second.QuadPart;
     }
+    if (samples == 0)
+      continue;
 
-    if (samples > 0) {
-      DWORD suscount = SuspendThread(thread);
-      FACTOR_ASSERT(suscount == 0);
-
-      CONTEXT context;
-      memset((void*)&context, 0, sizeof(CONTEXT));
-      context.ContextFlags = CONTEXT_CONTROL;
-      BOOL context_ok = GetThreadContext(thread, &context);
-      FACTOR_ASSERT(context_ok);
-
-      suscount = ResumeThread(thread);
-      FACTOR_ASSERT(suscount == 1);
-
-      safepoint.enqueue_samples(this, samples, context.EIP, false);
-    }
+    cell pc = get_thread_pc(thread);
+    safepoint.enqueue_samples(this, samples, pc, false);
   }
 }
 

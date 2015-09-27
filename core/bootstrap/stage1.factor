@@ -28,6 +28,7 @@ load-help? off
     ] %
 
     "math.integers" require
+    "math.ratios" require
     "math.floats" require
     "memory" require
 
@@ -48,10 +49,11 @@ load-help? off
             run-file
         ] [
             "Cannot find " write write "." print
-            "Please move " write image write " into the same directory as the Factor sources," print
+            "Please move " write image-path write " into the same directory as the Factor sources," print
             "and try again." print
             1 (exit)
         ] if
     ] %
 ] [ ] make
-bootstrap.image.private:bootstrap-startup-quot set
+OBJ-STARTUP-QUOT
+bootstrap.image.private:special-objects get set-at

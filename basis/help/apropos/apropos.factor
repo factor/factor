@@ -24,7 +24,7 @@ SYMBOLS: word-result vocabulary-result article-result ;
         { vocabulary-result [ "Vocabularies" ] }
         { article-result [ "Help articles" ] }
     } case ;
-    
+
 : category>name ( category -- name )
     {
         { word-result [ "word" ] }
@@ -43,9 +43,9 @@ M: more-completions article-title
         "All " %
         [ seq>> length # " " % ]
         [ category>> category>name % ]
-        [ " results for “" % search>> % "”" % ] tri    
+        [ " results for “" % search>> % "”" % ] tri
     ] "" make ;
-    
+
 M: more-completions article-content
     seq>> [ second >lower ] sort-with keys \ $completions prefix ;
 

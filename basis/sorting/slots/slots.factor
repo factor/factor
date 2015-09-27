@@ -10,7 +10,7 @@ IN: sorting.slots
     '[ _ execute( tuple -- value ) ] bi@ ;
 
 : compare-slots ( obj1 obj2 sort-specs -- <=> )
-    #! sort-spec: { accessors comparator }
+    ! sort-spec: { accessors comparator }
     [
         dup array? [
             unclip-last-slice

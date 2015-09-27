@@ -88,22 +88,21 @@ HELP: all-combinations
 { $examples
     { $example "USING: math.combinatorics prettyprint ;"
         "{ \"a\" \"b\" \"c\" \"d\" } 2 all-combinations ."
-"""{
-    { "a" "b" }
-    { "a" "c" }
-    { "a" "d" }
-    { "b" "c" }
-    { "b" "d" }
-    { "c" "d" }
-}""" } } ;
+"{
+    { \"a\" \"b\" }
+    { \"a\" \"c\" }
+    { \"a\" \"d\" }
+    { \"b\" \"c\" }
+    { \"b\" \"d\" }
+    { \"c\" \"d\" }
+}" } } ;
 
 HELP: each-combination
 { $values { "seq" sequence } { "k" "a non-negative integer" } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies the quotation to each combination of " { $snippet "seq" } " choosing " { $snippet "k" } " elements, in order." } ;
 
 
-IN: math.combinatorics.private
-
+<PRIVATE
 HELP: factoradic
 { $values { "n" integer } { "factoradic" sequence } }
 { $description "Converts a positive integer " { $snippet "n" } " to factoradic form.  The factoradic of an integer is its representation based on a mixed radix numerical system that corresponds to the values of " { $snippet "n" } " factorial." }
@@ -147,3 +146,4 @@ HELP: selections
         "{ { 1 1 } { 1 2 } { 2 1 } { 2 2 } }"
     }
 } ;
+PRIVATE>

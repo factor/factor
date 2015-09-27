@@ -4,7 +4,7 @@ USING: accessors destructors io kernel math.parser sequences
 summary system vocabs ;
 IN: io.serial
 
-TUPLE: serial-port < disposable stream path baud 
+TUPLE: serial-port < disposable stream path baud
     termios iflag oflag cflag lflag ;
 
 ERROR: invalid-baud baud ;

@@ -2,8 +2,9 @@ USING: math kernel hints prettyprint io combinators ;
 IN: benchmark.recursive
 
 : fib ( m -- n )
-    dup 2 < [ drop 1 ] [ [ 1 - fib ] [ 2 - fib ] bi + ] if ;
-    inline recursive
+    dup 2 <
+    [ drop 1 ]
+    [ [ 1 - fib ] [ 2 - fib ] bi + ] if ; inline recursive
 
 : ack ( m n -- x )
     {

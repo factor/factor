@@ -1,5 +1,5 @@
-USING: continuations glib.ffi images.loader io.files.temp kernel sequences
-system tools.test ;
+USING: accessors continuations glib.ffi images.loader
+io.files.temp kernel sequences system tools.test ;
 IN: images.loader.tests
 
 : open-png-image ( -- image )
@@ -57,3 +57,10 @@ os { linux windows } member? [
         "foo.png" temp-file [ save-graphic-image ] [ load-image ] bi =
     ] unit-test
 ] when
+
+! On Windows, this image didn't load due to a funny problem with a
+! callback triggering a gc causing an important pointer to be
+! moved. Only happened with tiff images too.
+{ { 1024 768 } } [
+    "vocab:gpu/demos/bunny/loading.tiff" load-image dim>>
+] unit-test

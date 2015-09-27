@@ -4,7 +4,7 @@ USING: help.markup help.syntax ;
 IN: io.encodings.8-bit.latin6
 
 HELP: latin6
-{ $var-description "This is the ISO-8859-10 encoding, also called Latin-6: Nordic. It is an 8-bit superset of ASCII containing the same characters as Latin-4, but rearranged to be of better use to nordic languages." } 
+{ $var-description "This is the ISO-8859-10 encoding, also called Latin-6: Nordic. It is an 8-bit superset of ASCII containing the same characters as Latin-4, but rearranged to be of better use to nordic languages." }
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.8-bit.latin6" "Latin6 encoding"

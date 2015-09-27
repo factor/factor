@@ -9,16 +9,16 @@ HELP: sma
 
 HELP: ema
 { $values { "seq" sequence } { "n" "number of periods" } { "newseq" sequence } }
-{ $description 
-    "Returns the Exponential Moving Average with the specified periodicity, calculated by:\n" 
-    { $list 
+{ $description
+    "Returns the Exponential Moving Average with the specified periodicity, calculated by:\n"
+    { $list
         "A = 2.0 / (N + 1)"
         "EMA[t] = (A * SEQ[t]) + ((1-A) * EMA[t-1])" }
 } ;
 
 HELP: macd
 { $values { "seq" sequence } { "n1" "short number of periods" } { "n2" "long number of periods" } { "newseq" sequence } }
-{ $description 
+{ $description
     "Returns the Moving Average Converge of the sequence, calculated by:\n"
     { $list "MACD[t] = EMA2[t] - EMA1[t]" }
 } ;

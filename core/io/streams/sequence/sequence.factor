@@ -61,7 +61,7 @@ PRIVATE>
     [ find-separator ] keep
     [ [ (sequence-read-unsafe) ] (read-into-new) ]
     [ [ 1 + ] change-i drop ]
-    [ stream-element-type +byte+ eq? B{ } "" ? or ] tri swap ; inline
+    [ stream-exemplar or ] tri swap ; inline
 
 PRIVATE>
 

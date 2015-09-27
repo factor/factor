@@ -3,7 +3,7 @@
 USING: accessors assocs combinators kernel locals math
 math.ranges memoize sequences strings hashtables
 math.parser grouping ;
-FROM: assocs => change-at ;
+QUALIFIED: assocs
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )
@@ -33,7 +33,7 @@ MEMO: strings ( -- str )
     ] map drop
 
     keys [
-        hash [ 1 + ] change-at
+        hash [ 1 + ] assocs:change-at
     ] each ;
 
 : string-mix ( hash -- )

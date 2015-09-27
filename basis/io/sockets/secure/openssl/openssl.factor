@@ -187,7 +187,10 @@ SYMBOL: default-secure-context
 : syscall-error ( r -- event )
     ERR_get_error [
         {
-            { -1 [ errno ECONNRESET = [ premature-close ] [ throw-errno ] if ] }
+            { -1 [
+                errno ECONNRESET = [ premature-close ]
+                [ throw-errno ] if
+            ] }
             ! OpenSSL docs say this it is an error condition for
             ! a server to not send a close notify, but web
             ! servers in the wild don't seem to do this, for

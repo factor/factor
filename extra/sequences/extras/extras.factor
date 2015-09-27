@@ -2,7 +2,6 @@ USING: accessors arrays assocs combinators fry generalizations
 grouping growable kernel locals make math math.order math.ranges
 sequences sequences.deep sequences.private sorting splitting
 vectors ;
-FROM: sequences => change-nth ;
 IN: sequences.extras
 
 : reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
@@ -25,7 +24,7 @@ IN: sequences.extras
 : find-all ( seq quot: ( elt -- ? ) -- elts )
     [ [ length iota ] keep ] dip
     [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry
-    2map [ ] filter ; inline
+    2map sift ; inline
 
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
@@ -92,10 +91,16 @@ IN: sequences.extras
 : push-if-index ( ..a elt i quot: ( ..a elt i -- ..b ? ) accum -- ..b )
     [ 2keep drop ] dip rot [ push ] [ 2drop ] if ; inline
 
+: push-if* ( ..a elt quot: ( ..a elt -- ..b obj/f ) accum -- ..b )
+    [ call ] dip [ push ] [ drop ] if* ; inline
+
 <PRIVATE
 
 : (index-selector-for) ( quot length exampler -- selector accum )
     new-resizable [ [ push-if-index ] 2curry ] keep ; inline
+
+: (selector-for*) ( quot length exemplar -- selector accum )
+    new-resizable [ [ push-if* ] 2curry ] keep ; inline
 
 PRIVATE>
 
@@ -104,6 +109,11 @@ PRIVATE>
 
 : index-selector ( quot -- selector accum )
     V{ } index-selector-for ; inline
+
+: selector-for* ( quot exemplar -- selector accum )
+    [ length ] keep (selector-for*) ; inline
+
+: selector* ( quot -- selector accum ) V{ } selector-for* ; inline
 
 : filter-index-as ( ... seq quot: ( ... elt i -- ... ? ) exemplar -- ... seq' )
     pick length over [ (index-selector-for) [ each-index ] dip ] 2curry dip like ; inline
@@ -173,7 +183,7 @@ PRIVATE>
     [ appender-for [ each ] dip ] keep like ; inline
 
 : >resizable ( seq -- accum ) ! fixes map-concat "cannot apply call to run-time..."
-    [ length ] keep [ new-resizable ] [ over push-all ] bi ;
+    [ length ] keep [ new-resizable ] [ append! ] bi ;
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over empty? [ 2drop { } ] [
@@ -201,8 +211,8 @@ PRIVATE>
 : ((each-from)) ( i seq -- n quot )
     [ length over [-] swap ] keep '[ _ + _ nth-unsafe ] ; inline
 
-: (each-from) ( i seq quot -- n quot' ) [ ((each-from)) ] dip compose ;
-    inline
+: (each-from) ( i seq quot -- n quot' )
+    [ ((each-from)) ] dip compose ; inline
 
 PRIVATE>
 
@@ -257,10 +267,7 @@ PRIVATE>
     [ empty? not ] swap filter-as ;
 
 : harvest! ( seq -- newseq )
-    [ empty? not ] filter! ;
-
-: contains? ( seq elts -- ? )
-    [ member? ] curry any? ; inline
+    [ empty? ] reject! ;
 
 : head-as ( seq n exemplar -- seq' )
     [ head-slice ] [ like ] bi* ; inline
@@ -430,13 +437,13 @@ PRIVATE>
 
 <PRIVATE
 
-: (map-find-index) ( seq quot find-quot -- result elt index )
+: (map-find-index) ( seq quot find-quot -- result i elt )
     [ [ f ] 2dip [ [ nip ] 2dip call dup ] curry ] dip call
     [ [ [ drop f ] unless ] keep ] dip ; inline
 
 PRIVATE>
 
-: map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result elt index )
+: map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-index ] (map-find-index) ; inline
 
 : filter-length ( seq n -- seq' ) '[ length _ = ] filter ;
@@ -510,15 +517,6 @@ PRIVATE>
 : infimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ before? ] select-by* ; inline
 
-: reject-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
-    [ [ not ] compose ] [ filter-as ] bi* ; inline
-
-: reject ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    over reject-as ; inline
-
-: reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    [ not ] compose filter! ; inline
-
 : change-last ( seq quot -- )
     [ drop length 1 - ] [ change-nth ] 2bi ; inline
 
@@ -530,3 +528,26 @@ PRIVATE>
 
 : count* ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
     over [ count ] [ length ] bi* / ; inline
+
+: find-last-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
+    [ [ 1 - ] dip find-last-integer ] (find-index) ; inline
+
+: map-find-last-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
+    [ find-last-index ] (map-find-index) ; inline
+
+:: (start-all) ( subseq seq increment -- indices )
+    0
+    [ [ subseq seq ] dip start* dup ]
+    [ [ increment + ] keep ] produce nip ;
+
+: start-all ( subseq seq -- indices )
+    over length (start-all) ; inline
+
+: start-all* ( subseq seq -- indices )
+    1 (start-all) ; inline
+
+: count-subseq ( subseq seq -- n )
+    start-all length ; inline
+
+: count-subseq* ( subseq seq -- n )
+    start-all* length ; inline

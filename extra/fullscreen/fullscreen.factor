@@ -64,7 +64,7 @@ ERROR: display-change-error n ;
 
 : get-style ( hwnd n -- style )
     GetWindowLongPtr [ win32-error=0/f ] keep ;
-    
+
 : set-style ( hwnd n style -- )
     SetWindowLongPtr win32-error=0/f ;
 
@@ -100,7 +100,7 @@ ERROR: unsupported-resolution triple ;
 
 :: enable-fullscreen ( triple hwnd -- rect )
     hwnd hwnd>RECT :> rect
-    
+
     desktop-monitor-info
     triple GetDesktopWindow find-devmode
     hwnd set-fullscreen-styles

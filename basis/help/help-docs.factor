@@ -45,6 +45,7 @@ ARTICLE: "block-elements" "Block elements"
     $maybe
     $or
     $quotation
+    $sequence
 }
 "Boilerplate paragraphs:"
 { $subsections
@@ -407,6 +408,19 @@ HELP: $quotation
 }
 { $examples
     { $markup-example { $quotation ( obj -- ) } }
+} ;
+
+HELP: $sequence
+{ $values { "element" "an array of element types" } }
+{ $description
+    "Produces the text “a sequence of " { $emphasis "element types" } "”."
+}
+{ $examples
+    { $markup-example { $sequence number } }
+    { $markup-example { $sequence real complex } }
+    { $markup-example { $sequence rational float complex } }
+    { $markup-example { $sequence integer ratio float complex } }
+    { $markup-example { $sequence fixnum bignum ratio float complex } }
 } ;
 
 HELP: $list

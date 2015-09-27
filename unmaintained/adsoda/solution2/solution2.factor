@@ -40,7 +40,7 @@ SYMBOL: matrix
     over [ find-from drop ] dip length or ; inline
 
 : first-col ( row# -- n )
-    #! First non-zero column
+    ! First non-zero column
     0 swap nth-row [ zero? not ] skip ;
 
 : clear-scale ( col# pivot-row i-row -- n )
@@ -86,7 +86,7 @@ SYMBOL: matrix
     [ 0 0 (echelon) ] with-matrix ;
 
 : nonzero-rows ( matrix -- matrix' )
-    [ [ zero? ] all? not ] filter ;
+    [ [ zero? ] all? ] reject ;
 
 : null/rank ( matrix -- null rank )
     echelon dup length swap nonzero-rows length [ - ] keep ;

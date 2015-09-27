@@ -34,7 +34,7 @@ M: sqrt2 cfrac-b
 ! Napier's constant
 SINGLETON: napier
 M: napier cfrac-a
-    ! If n is 1, then a_n is 2, else a_n is n - 1. 
+    ! If n is 1, then a_n is 2, else a_n is n - 1.
     drop { { 1 [ 2 ] } [ 1 - ] } case ;
 M: napier cfrac-b
     ! If n is 1, then b_n is 1, else b_n is n - 1.

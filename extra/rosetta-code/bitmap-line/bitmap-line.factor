@@ -31,8 +31,8 @@ IN: rosetta-code.bitmap-line
     y0 :> y!
     y0 y1 < [ 1 ystep! ] [ -1 ystep! ] if
     x0 x1 1 <range> [
-        y steep [ swap ] when 2array  
-        current-error deltaerr + current-error! 
+        y steep [ swap ] when 2array
+        current-error deltaerr + current-error!
         current-error 0.5 >= [
             ystep y + y!
             current-error 1 - current-error!

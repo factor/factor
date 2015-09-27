@@ -1,13 +1,13 @@
-USING: editors io.files io.launcher kernel math.parser
-namespaces sequences io.directories.search.windows make ;
+USING: editors io.files io.launcher io.standard-paths kernel
+math.parser namespaces sequences make ;
 IN: editors.ted-notepad
 
 SINGLETON: ted-notepad
 ted-notepad editor-class set-global
 
 : ted-notepad-path ( -- path )
-    \ ted-notepad-path get-global [
-        "TED Notepad" [ "TedNPad.exe" tail? ] find-in-program-files
+    \ ted-notepad-path get [
+        { "TED Notepad" } "tednpad.exe" find-in-applications
         [ "TedNPad.exe" ] unless*
     ] unless* ;
 

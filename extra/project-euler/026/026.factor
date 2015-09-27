@@ -34,15 +34,12 @@ IN: project-euler.026
 <PRIVATE
 
 : source-026 ( -- seq )
-    1 1000 (a,b) [ prime? ] filter [ 1 swap / ] map ;
+    999 primes-upto [ recip ] map ;
 
 : (mult-order) ( n a m -- k )
     3dup ^ swap mod 1 = [ 2nip ] [ 1 + (mult-order) ] if ;
 
 PRIVATE>
-
-: coprime? ( m n -- ? )
-    gcd 1 = nip ;
 
 : recurring-period? ( a/b -- ? )
     denominator 10 coprime? ;

@@ -119,7 +119,7 @@ COM-INTERFACE: IDXGISurface1 IDXGISurface {4AE63092-6327-4c1b-80AE-BFE12EA32B86}
 HRESULT GetDC ( BOOL Discard, HDC* phdc )
 HRESULT ReleaseDC ( RECT* pDirtyRect ) ;
 
-C-TYPE: IDXGIOutput 
+C-TYPE: IDXGIOutput
 COM-INTERFACE: IDXGIAdapter IDXGIObject {2411e7e1-12ac-4ccf-bd14-9798e8534dc0}
 HRESULT EnumOutputs ( UINT Output, IDXGIOutput** ppOutput )
 HRESULT GetDesc ( DXGI_ADAPTER_DESC* pDesc )
@@ -171,8 +171,8 @@ HRESULT GetWindowAssociation ( HWND* pWindowHandle )
 HRESULT CreateSwapChain ( IUnknown* pDevice, DXGI_SWAP_CHAIN_DESC* pDesc, IDXGISwapChain** ppSwapChain )
 HRESULT CreateSoftwareAdapter ( HMODULE Module, IDXGIAdapter** ppAdapter ) ;
 
-FUNCTION: HRESULT CreateDXGIFactory ( REFIID riid, void** ppFactory ) ;
-FUNCTION: HRESULT CreateDXGIFactory1 ( REFIID riid, void** ppFactory ) ;
+FUNCTION: HRESULT CreateDXGIFactory ( REFIID riid, void** ppFactory )
+FUNCTION: HRESULT CreateDXGIFactory1 ( REFIID riid, void** ppFactory )
 
 COM-INTERFACE: IDXGIDevice IDXGIObject {54ec77fa-1377-44e6-8c32-88fd5f44c84c}
 HRESULT GetAdapter ( IDXGIAdapter** pAdapter )

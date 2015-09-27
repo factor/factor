@@ -17,12 +17,12 @@ GENERIC: cancel-operation ( obj -- )
     [ '[ _ cancel-operation ] ] dip later ;
 
 : with-timeout* ( obj timeout quot -- )
-    2over queue-timeout [ nip call ] dip stop-timer ;
-    inline
+    2over queue-timeout
+    [ nip call ] dip stop-timer ; inline
 
 : with-timeout ( obj quot -- )
-    over timeout [ [ dup timeout ] dip with-timeout* ] [ call ] if ;
-    inline
+    over timeout
+    [ [ dup timeout ] dip with-timeout* ] [ call ] if ; inline
 
 : timeouts ( dt -- )
     [ input-stream get set-timeout ]

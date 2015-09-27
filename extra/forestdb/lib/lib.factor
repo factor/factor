@@ -10,17 +10,14 @@ IN: forestdb.lib
 
 /*
 ! Issues
-! 2) build on macosx doesn't search /usr/local for libsnappy
-! 3) build on macosx doesn't include -L/usr/local/lib when it finds snappy
-!  - link_directories(/usr/local/lib) or some other fix
-! 4) byseq iteration doesn't have bodies, weird.
-! 5) Get byseq ignores seqnum and uses key instead if key is set
+! Get byseq ignores seqnum and uses key instead if key is set
 */
 
 ERROR: fdb-error error ;
 
 : fdb-check-error ( ret -- )
     dup FDB_RESULT_SUCCESS = [ drop ] [ fdb-error ] if ;
+
 
 TUPLE: fdb-kvs-handle < disposable handle ;
 : <fdb-kvs-handle> ( handle -- obj )
@@ -39,38 +36,9 @@ TUPLE: fdb-file-handle < disposable handle ;
 M: fdb-file-handle dispose*
     handle>> fdb_close fdb-check-error ;
 
+
 SYMBOL: current-fdb-file-handle
 SYMBOL: current-fdb-kvs-handle
-
-: get-kvs-default-config ( -- kvs-config )
-    S{ fdb_kvs_config
-        { create_if_missing t }
-        { custom_cmp f }
-    } clone ;
-
-: fdb-open-kvs' ( file-handle fdb-kvs-handle kvs-config -- file-handle handle )
-    [ dup handle>> ] 2dip
-    [ handle>> ] dip
-    [ fdb_kvs_open_default fdb-check-error ] 2keep drop
-    void* deref <fdb-kvs-handle> ;
-
-: fdb-open-kvs ( fdb-file-handle kvs-config -- file-handle handle )
-    [ f void* <ref> <fdb-kvs-handle> ] dip fdb-open-kvs' ;
-
-: fdb-open ( path config kvs-config -- file-handle handle )
-    [
-        [ f void* <ref> ] 2dip
-        [ absolute-path ensure-fdb-filename-directory ] dip
-        [ fdb_open fdb-check-error ] 3keep
-        2drop void* deref <fdb-file-handle>
-    ] dip fdb-open-kvs ;
-
-: fdb-open-default-config ( path -- file-handle handle )
-    fdb_get_default_config get-kvs-default-config fdb-open ;
-
-: ret>string ( void** len -- string )
-    [ void* deref ] [ size_t deref ] bi*
-    [ memory>byte-array utf8 decode ] [ drop (free) ] 2bi ;
 
 : get-file-handle ( -- handle )
     current-fdb-file-handle get handle>> ;
@@ -80,7 +48,7 @@ SYMBOL: current-fdb-kvs-handle
 
 : fdb-set-kv ( key value -- )
     [ get-kvs-handle ] 2dip
-    [ dup length ] bi@ fdb_set_kv fdb-check-error ;
+    [ utf8 encode dup length ] bi@ fdb_set_kv fdb-check-error ;
 
 : <key-doc> ( key -- doc )
     fdb_doc malloc-struct
@@ -114,9 +82,13 @@ SYMBOL: current-fdb-kvs-handle
 : fdb-del ( doc -- )
     [ get-kvs-handle ] dip fdb_del fdb-check-error ;
 
+: ret>string ( void** len -- string )
+    [ void* deref ] [ size_t deref ] bi*
+    memory>byte-array utf8 decode ;
+
 : fdb-get-kv ( key -- value/f )
     [ get-kvs-handle ] dip
-    dup length f void* <ref> 0 size_t <ref>
+    utf8 encode dup length f void* <ref> 0 size_t <ref>
     [ fdb_get_kv ] 2keep
     rot {
         { FDB_RESULT_SUCCESS [ ret>string ] }
@@ -125,17 +97,18 @@ SYMBOL: current-fdb-kvs-handle
     } case ;
 
 : fdb-del-kv ( key -- )
-    [ get-kvs-handle ] dip dup length fdb_del_kv fdb-check-error ;
+    [ get-kvs-handle ] dip
+    utf8 encode dup length fdb_del_kv fdb-check-error ;
 
 : fdb-doc-create ( key meta body -- doc )
     [ f void* <ref> ] 3dip
-    [ dup length ] tri@
+    [ utf8 encode dup length ] tri@
     [ fdb_doc_create fdb-check-error ] 7 nkeep 6 ndrop
     void* deref fdb_doc memory>struct ;
 
 : fdb-doc-update ( doc meta body -- )
     [ void* <ref> ] 2dip
-    [ dup length ] bi@
+    [ utf8 encode dup length ] bi@
     fdb_doc_update fdb-check-error ;
 
 : fdb-doc-free ( doc -- )
@@ -176,16 +149,6 @@ SYMBOL: current-fdb-kvs-handle
 : fdb-compact-commit ( new-path -- )
     fdb-compact fdb-commit-wal-flush ;
 
-: fdb-swap-current-db ( new-path -- )
-    current-fdb-kvs-handle [ dispose f ] change
-    fdb-open-default-config
-    [ current-fdb-file-handle set ]
-    [ current-fdb-kvs-handle set ] bi* ;
-
-: fdb-compact-and-swap-db ( path -- )
-    next-vnode-version-name
-    [ fdb-compact fdb-commit-wal-flush ]
-    [ fdb-swap-current-db ] bi ;
 
 ! Call from within with-foresdb
 : fdb-open-snapshot ( seqnum -- handle )
@@ -216,7 +179,7 @@ M: fdb-iterator dispose*
 
 : fdb-iterator-init ( start-key end-key fdb_iterator_opt_t -- iterator )
     [ get-kvs-handle f void* <ref> ] 3dip
-    [ [ dup length ] bi@ ] dip
+    [ [ utf8 encode dup length ] bi@ ] dip
     [ fdb_iterator_init fdb-check-error ] 7 nkeep 5 ndrop nip
     void* deref <fdb-iterator> ;
 
@@ -228,24 +191,15 @@ M: fdb-iterator dispose*
 : fdb-iterator-init-none ( start-key end-key -- iterator )
     FDB_ITR_NONE fdb-iterator-init ;
 
-: fdb-iterator-meta-only ( start-key end-key -- iterator )
-    FDB_ITR_METAONLY fdb-iterator-init ;
-
 : fdb-iterator-no-deletes ( start-key end-key -- iterator )
     FDB_ITR_NO_DELETES fdb-iterator-init ;
 
-: check-iterate-result ( doc fdb_status -- doc/f )
+: check-iterate-result ( fdb_status -- ? )
     {
-        { FDB_RESULT_SUCCESS [ void* deref fdb_doc memory>struct ] }
-        { FDB_RESULT_ITERATOR_FAIL [ drop f ] }
+        { FDB_RESULT_SUCCESS [ t ] }
+        { FDB_RESULT_ITERATOR_FAIL [ f ] }
         [ throw ]
     } case ;
-
-: fdb-iterate ( iterator word -- doc )
-    '[
-        fdb_doc malloc-struct fdb_doc <ref>
-        [ _ execute ] keep swap check-iterate-result
-    ] call ; inline
 
 ! fdb_doc key, meta, body only valid inside with-forestdb
 ! so make a helper word to preserve them outside
@@ -269,8 +223,6 @@ T{ doc
     { metalen 0 } { bodylen 4 }
     { offset 4256 } { size-ondisk 0 }
 }
-
-
 */
 
 : alien/length>string ( alien n -- string/f )
@@ -305,17 +257,29 @@ T{ doc
         [ file_size>> ]
     } cleave <info> ;
 
-: fdb-iterator-prev ( iterator -- doc/f ) \ fdb_iterator_prev fdb-iterate ;
-: fdb-iterator-next ( iterator -- doc/f ) \ fdb_iterator_next fdb-iterate ;
-: fdb-iterator-next-meta-only ( iterator -- doc/f ) \ fdb_iterator_next_metaonly fdb-iterate ;
-: fdb-iterator-seek ( iterator key -- )
-    dup length fdb_iterator_seek fdb-check-error ;
+: fdb-iterator-get ( iterator -- doc/f )
+    f void* <ref>
+    [ fdb_iterator_get check-iterate-result ] keep swap
+    [ void* deref fdb_doc memory>struct ]
+    [ drop f ] if ;
 
-: with-fdb-iterator ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
+: fdb-iterator-seek ( iterator key seek-opt -- )
+    [ dup length ] dip fdb_iterator_seek fdb-check-error ;
+
+: fdb-iterator-seek-lower ( iterator key -- )
+    FDB_ITR_SEEK_LOWER fdb-iterator-seek ;
+
+: fdb-iterator-seek-higher ( iterator key -- )
+    FDB_ITR_SEEK_HIGHER fdb-iterator-seek ;
+
+: with-fdb-iterator ( start-key end-key fdb_iterator_opt_t iterator-init iterator-advance quot: ( obj -- ) -- )
     [ execute ] 2dip
+    swap
     '[
         _ &dispose handle>> [
-            _ execute [ _ with-doc t ] [ f ] if*
+            [ fdb-iterator-get ] keep swap
+            [ _ with-doc _ execute check-iterate-result ]
+            [ drop f ] if*
         ] curry loop
     ] with-destructors ; inline
 
@@ -329,30 +293,77 @@ T{ doc
 
 PRIVATE>
 
+
+: get-kvs-default-config ( -- kvs-config )
+    S{ fdb_kvs_config
+        { create_if_missing t }
+        { custom_cmp f }
+    } clone ;
+
+: fdb-open ( path config -- file-handle )
+    [ f void* <ref> ] 2dip
+    [ absolute-path ensure-fdb-filename-directory ] dip
+    [ fdb_open fdb-check-error ] 3keep
+    2drop void* deref <fdb-file-handle> ;
+
+: fdb-open-default-config ( path -- file-handle )
+    fdb_get_default_config fdb-open ;
+
+: fdb-kvs-open-config ( name config -- kvs-handle )
+    [
+        current-fdb-file-handle get handle>>
+        f void* <ref>
+    ] 2dip
+    [ fdb_kvs_open fdb-check-error ] 3keep 2drop
+    void* deref <fdb-kvs-handle> ;
+
+: fdb-kvs-open ( name -- kvs-handle )
+    get-kvs-default-config fdb-kvs-open-config ;
+
 : with-fdb-map ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
     [ execute ] 2dip
+    swap
     '[
         _ &dispose handle>> [
-            _ execute [ _ with-doc t ] [ f f ] if* swap
+            [ fdb-iterator-get ] keep swap
+            [ _ with-doc swap _ execute check-iterate-result ]
+            [ drop f ] if* swap
         ] curry collector-when [ loop ] dip
     ] with-destructors ; inline
 
 : with-fdb-normal-iterator ( start-key end-key quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next ] dip
-    with-fdb-iterator ; inline
-
-: with-fdb-normal-meta-iterator ( start-key end-key quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb-iterator-next-meta-only ] dip
+    [ FDB_ITR_NONE \ fdb-iterator-init \ fdb_iterator_next ] dip
     with-fdb-iterator ; inline
 
 : with-fdb-byseq-each ( start-seq end-seq quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
+    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb_iterator_next ] dip
     with-fdb-iterator ; inline
 
 : with-fdb-byseq-map ( start-seq end-seq quot -- )
-    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb-iterator-next-meta-only ] dip
+    [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb_iterator_next ] dip
     with-fdb-map ; inline
 
+
+: with-kvs ( name quot -- )
+    [
+        [ fdb-kvs-open &dispose current-fdb-kvs-handle ] dip with-variable
+    ] with-destructors ; inline
+
+
+: with-default-kvs ( quot -- )
+    [ "default" ] dip with-kvs ; inline
+
+: with-forestdb ( path quot -- )
+    [
+        [ fdb-open-default-config &dispose current-fdb-file-handle ] dip with-variable
+    ] with-destructors ; inline
+
+: with-forestdb-kvs ( path name quot -- )
+    '[
+        _ _ with-kvs
+    ] with-forestdb ; inline
+
+/*
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
 ! fdb-current is weird, it gets replaced if you call fdb-rollback
 ! Therefore, only clean up fdb-current once, and clean it up at the end
@@ -400,3 +411,4 @@ PRIVATE>
 : with-forestdb-path ( path quot -- )
     [ absolute-path fdb-open-default-config ] dip with-forestdb-handles-commit-wal ; inline
     ! [ absolute-path fdb-open-default-config ] dip with-forestdb-handle-commit-normal ; inline
+*/

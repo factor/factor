@@ -15,7 +15,7 @@ IN: mason.platform
     "make" ;
 
 : target-arch ( -- arch )
-    target-os get target-cpu get arch ;
+    target-os get target-cpu get arch-name ;
 
 : target-boot-image-name ( -- string )
     target-arch boot-image-name ;

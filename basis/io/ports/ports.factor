@@ -209,7 +209,7 @@ M: buffered-port stream-seekable?
     handle>> can-seek-handle? ;
 
 M: buffered-port stream-length
-    handle>> handle-length ;
+    handle>> handle-length [ f ] when-zero ;
 
 GENERIC: shutdown ( handle -- )
 

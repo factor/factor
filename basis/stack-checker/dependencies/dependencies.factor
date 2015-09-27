@@ -1,11 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs accessors classes classes.algebra fry
-generic kernel math namespaces sequences words sets
-combinators.short-circuit classes.tuple alien.c-types ;
+USING: accessors alien.c-types arrays assocs classes
+classes.algebra classes.tuple combinators.short-circuit fry
+generic kernel math namespaces sequences sets words ;
 FROM: classes.tuple.private => tuple-layout ;
-FROM: assocs => change-at ;
-FROM: namespaces => set ;
 IN: stack-checker.dependencies
 
 ! Words that the current quotation depends on
@@ -17,8 +15,11 @@ SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
     [ index ] curry bi@ >= ;
 
 : dependency>= ( how1 how2 -- ? )
-    { effect-dependency conditional-dependency definition-dependency }
-    index>= ;
+    {
+        effect-dependency
+        conditional-dependency
+        definition-dependency
+    } index>= ;
 
 : strongest-dependency ( how1 how2 -- how )
     [ effect-dependency or ] bi@ [ dependency>= ] most ;

@@ -10,7 +10,7 @@ IN: cuda.gl
     '[ _ _ cuGLCtxCreate cuda-error ] with-out-parameters ; inline
 
 : with-gl-cuda-context ( device flags quot -- )
-    [ set-up-cuda-context create-gl-cuda-context ] dip (with-cuda-context) ; inline 
+    [ set-up-cuda-context create-gl-cuda-context ] dip (with-cuda-context) ; inline
 
 : gl-buffer>resource ( gl-buffer flags -- resource )
     enum>number

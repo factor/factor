@@ -1,9 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors audio.engine combinators concurrency.promises
-destructors fry game.input game.loop generic kernel math parser
-sequences threads ui ui.gadgets ui.gadgets.worlds ui.gestures
-words words.constant ;
-FROM: namespaces => change-global ;
+destructors game.input game.loop kernel math parser sequences
+threads ui ui.gadgets ui.gadgets.worlds words.constant ;
 IN: game.worlds
 
 TUPLE: game-world < world
@@ -79,7 +77,7 @@ M: game-world apply-world-attributes
     f swap open-window* dup promise>> ?promise drop ;
 
 : define-attributes-word ( word tuple -- )
-    [ name>> "-attributes" append create-in ] dip define-constant ;
+    [ name>> "-attributes" append create-word-in ] dip define-constant ;
 
 SYNTAX: GAME:
     scan-new-word

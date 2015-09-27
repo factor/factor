@@ -18,11 +18,32 @@ SCRIPT_ARGS="$*"
 SKIP_UPDATE=false
 DO_CLEAN=true
 
+# return 1 on found
 test_program_installed() {
     if ! [[ -n `type -p $1` ]] ; then
         return 0;
     fi
     return 1;
+}
+
+# return 1 on found
+test_programs_installed() {
+    installed=0;
+    $ECHO -n "Checking for all($*)..."
+    for i in $* ;
+    do
+        test_program_installed $i
+        if [[ $? -eq 1 ]]; then
+            installed=$(( $installed + 1 ))
+        fi
+    done
+    if [[ $installed -eq $# ]] ; then
+        $ECHO "found!"
+        return 1
+    else
+        $ECHO "all not found."
+        return 0
+    fi
 }
 
 exit_script() {
@@ -35,32 +56,30 @@ exit_script() {
 
 ensure_program_installed() {
     installed=0;
+    $ECHO -n "Checking for any($*)..."
     for i in $* ;
     do
-        $ECHO -n "Checking for $i..."
         test_program_installed $i
-        if [[ $? -eq 0 ]]; then
-            $ECHO -n "not "
-        else
+        if [[ $? -eq 1 ]]; then
+            $ECHO "found $i!"
             installed=$(( $installed + 1 ))
+            return
         fi
-        $ECHO "found!"
     done
-    if [[ $installed -eq 0 ]] ; then
-        $ECHO -n "Install "
-        if [[ $# -eq 1 ]] ; then
-            $ECHO -n $1
-        else
-            $ECHO -n "any of [ $* ]"
-        fi
-        $ECHO " and try again."
-        if [[ $OS == macosx ]] ; then
-            $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
-            $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
-            $ECHO "to build Factor."
-        fi
-        exit_script 1;
+    $ECHO "none found."
+    $ECHO -n "Install "
+    if [[ $# -eq 1 ]] ; then
+        $ECHO -n $1
+    else
+        $ECHO -n "any of [ $* ]"
     fi
+    $ECHO " and try again."
+    if [[ $OS == macosx ]] ; then
+        $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
+        $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
+        $ECHO "to build Factor."
+    fi
+    exit_script 1;
 }
 
 check_ret() {
@@ -72,12 +91,18 @@ check_ret() {
 }
 
 set_downloader() {
-    test_program_installed wget curl
+    test_program_installed wget
     if [[ $? -ne 0 ]] ; then
         DOWNLOADER=wget
-    else
-        DOWNLOADER="curl -f -O"
+        return
     fi
+    test_program_installed curl
+    if [[ $? -ne 0 ]] ; then
+        DOWNLOADER="curl -f -O"
+        return
+    fi
+    $ECHO "error: wget or curl required"
+    exit_script 11
 }
 
 set_md5sum() {
@@ -89,23 +114,71 @@ set_md5sum() {
     fi
 }
 
-set_gcc() {
-    case $OS in
-        macosx)
-            xcode_major=`xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).*$/\1/p'`
-            if [[ $xcode_major -ge 4 ]]; then
-                [ -z "$CC" ] && CC=clang
-                [ -z "$CXX" ] && CXX=clang++
-            else
-                [ -z "$CC" ] && CC=gcc
-                [ -z "$CXX" ] && CXX=g++
-            fi
-        ;;
-        *)
-            [ -z "$CC" ] && CC=gcc
-            [ -z "$CXX" ] && CXX=g++
-        ;;
-    esac
+semver_into() {
+	CLANG_RE_OLD="^([0-9]*)\.([0-9]*)-(.*)?$" # 3.3-5
+	RE_SEMVER="^([0-9]*)\.([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3.3-5
+	if [[ $1 =~ $CLANG_RE_OLD ]] ; then
+		eval $2=${BASH_REMATCH[1]}
+		eval $3=${BASH_REMATCH[2]}
+		eval $4=0
+		eval $5=${BASH_REMATCH[3]}
+	elif [[ $1 =~ $RE_SEMVER ]] ; then
+		eval $2=${BASH_REMATCH[1]}
+		eval $3=${BASH_REMATCH[2]}
+		eval $4=${BASH_REMATCH[3]}
+		eval $5=${BASH_REMATCH[4]}
+	else
+		echo "unsupported version number, please report a bug: $1"
+		exit 123
+	fi
+}
+
+# issue 1440
+gcc_version_ok() {
+	GCC_VERSION=`gcc --version | head -n1 | rev | cut -d ' ' -f 1 | rev`
+	local GCC_MAJOR local GCC_MINOR local GCC_PATCH local GCC_SPECIAL
+	semver_into $GCC_VERSION GCC_MAJOR GCC_MINOR GCC_PATCH GCC_SPECIAL
+	if [[ $GCC_MAJOR -lt 4
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -lt 7 )
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_THIRD -lt 3 )
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 8 && $GCC_THIRD -eq 0 )
+		]] ; then
+		echo "gcc version required >= 4.7.3, != 4.8.0, >= 4.8.1, got $GCC_VERSION"
+		return 1
+	fi
+	return 0
+}
+
+clang_version_ok() {
+	CLANG_VERSION=`clang --version | head -n1 | cut -d ' ' -f4`
+	local CLANG_MAJOR local CLANG_MINOR local CLANG_PATCH local CLANG_SPECIAL
+	semver_into $CLANG_VERSION CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
+	if [[ $CLANG_MAJOR -lt 3
+		|| ( $CLANG_MAJOR -eq 3 && $CLANG_MINOR -le 1 )
+		]] ; then
+		echo "clang version required >= 3.1, got $CLANG_VERSION"
+		return 1
+	fi
+	return 0
+}
+
+set_cc() {
+    test_programs_installed clang clang++
+    if [[ $? -ne 0 ]] && clang_version_ok ; then
+        [ -z "$CC" ] && CC=clang
+        [ -z "$CXX" ] && CXX=clang++
+        return
+    fi
+
+    test_programs_installed gcc g++
+    if [[ $? -ne 0 ]] && gcc_version_ok ; then
+        [ -z "$CC" ] && CC=gcc
+        [ -z "$CXX" ] && CXX=g++
+        return
+    fi
+
+    $ECHO "error: high enough version of either (clang/clang++) or (gcc/g++) required!"
+    exit_script 10
 }
 
 set_make() {
@@ -141,7 +214,7 @@ check_library_exists() {
     $ECHO "int main(){return 0;}" > $GCC_TEST
     $CC $GCC_TEST -o $GCC_OUT -l $1 2>&-
     if [[ $? -ne 0 ]] ; then
-        $ECHO "not found!"
+        $ECHO "not found."
         $ECHO "***Factor will compile NO_UI=1"
         NO_UI=1
     else
@@ -359,7 +432,7 @@ parse_build_info() {
 find_build_info() {
     find_os
     find_architecture
-    set_gcc
+    set_cc
     find_word_size
     set_factor_binary
     set_factor_library
@@ -480,7 +553,7 @@ make_clean() {
 }
 
 make_factor() {
-    invoke_make NO_UI=$NO_UI $MAKE_TARGET -j5
+    invoke_make CC=$CC CXX=$CXX NO_UI=$NO_UI $MAKE_TARGET -j5
 }
 
 make_clean_factor() {
@@ -605,7 +678,7 @@ make_boot_image() {
 }
 
 install_deps_apt_get() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev g++
     check_ret sudo
 }
 
@@ -613,6 +686,12 @@ install_deps_pacman() {
     sudo pacman --noconfirm -S gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11 screen tmux
     check_ret sudo
 }
+
+install_deps_dnf() {
+    sudo dnf --assumeyes install gcc gcc-c++ glibc-devel binutils libX11-devel pango-devel gtk3-devel gdk-pixbuf2-devel gtkglext-devel tmux rlwrap wget
+    check_ret sudo
+}
+
 
 install_deps_macosx() {
     test_program_installed git
@@ -633,12 +712,11 @@ usage() {
     $ECHO "  deps-apt-get - install required packages for Factor on Linux using apt-get"
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
     $ECHO "  deps-macosx - install git on MacOSX using port"
-    $ECHO "  self-update - git pull, make local boot image, bootstrap"
+    $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
-    $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
-    $ECHO "  thiscommit - recompile, bootstrap"
-    $ECHO "  bootstrap - bootstrap with an existing boot image"
-    $ECHO "  net-bootstrap - download a boot image, bootstrap"
+    $ECHO "  update - git pull, recompile, download a boot image, bootstrap"
+    $ECHO "  bootstrap - bootstrap with existing boot image"
+    $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  make-clean - same as update, but use current git commit"
     $ECHO "  make - same as make-boot, but does not clean first"
@@ -667,6 +745,7 @@ case "$1" in
     deps-apt-get) install_deps_apt_get ;;
     deps-pacman) install_deps_pacman ;;
     deps-macosx) install_deps_macosx ;;
+    deps-dnf) install_deps_dnf ;;
     self-update) update; make_boot_image; bootstrap;;
     make-clean) SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
     make) DO_CLEAN=false; SKIP_UPDATE=true; update; make_boot_image; bootstrap;;
@@ -678,5 +757,6 @@ case "$1" in
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
 	restore) restore_factor ;;
     report) find_build_info ;;
+    full-report) find_build_info; check_installed_programs; check_libraries ;;
     *) usage ;;
 esac

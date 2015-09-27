@@ -13,4 +13,3 @@ M: internet checksum-bytes
     drop 2 <groups> [ le> ] map-sum
     [ -16 shift ] [ 0xffff bitand ] bi +
     [ -16 shift ] keep + bitnot 2 >le ;
-

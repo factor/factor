@@ -1,14 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables arrays colors colors.constants fry
-kernel math math.functions math.ranges math.rectangles math.order
-math.vectors namespaces opengl sequences ui.gadgets
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
-ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
-ui.gadgets.menus ui.gadgets.line-support models combinators
-combinators.short-circuit fonts locals splitting strings sets
-sorting ;
-FROM: sequences => change-nth ;
+USING: accessors arrays colors colors.constants combinators
+combinators.short-circuit fonts fry kernel locals math
+math.functions math.order math.rectangles math.vectors models
+namespaces opengl sequences splitting strings ui.commands
+ui.gadgets ui.gadgets.line-support ui.gadgets.menus
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.worlds
+ui.gestures ui.images ui.pens.solid ui.render ui.text ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -82,8 +80,6 @@ M: image-name draw-cell nip draw-image ;
 
 : column-offsets ( widths gap -- x xs )
     [ 0 ] dip '[ _ + + ] accumulate ;
-
-CONSTANT: column-title-background COLOR: light-gray
 
 : column-title-font ( font -- font' )
     column-title-background font-with-background t >>bold? ;
@@ -257,19 +253,19 @@ PRIVATE>
     bi ;
 
 : update-mouse-index ( table -- )
-    dup [ model>> value>> ] [ mouse-index>> ] bi
+    dup [ control-value ] [ mouse-index>> ] bi
     dup [ swap length [ drop f ] [ 1 - min ] if-zero ] [ 2drop f ] if
     >>mouse-index drop ;
 
 : initial-selection-index ( table -- n/f )
     {
-        [ model>> value>> empty? not ]
+        [ control-value empty? not ]
         [ selection-required?>> ]
         [ drop 0 ]
     } 1&& ;
 
 : find-row-index ( value table -- n/f )
-    [ model>> value>> ] [ renderer>> ] bi
+    [ control-value ] [ renderer>> ] bi
     '[ _ row-value? ] with find drop ;
 
 : update-table-rows ( table -- )

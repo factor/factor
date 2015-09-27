@@ -10,11 +10,10 @@ windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
 windows.messages windows.types windows.offscreen windows threads
 libc combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render math.bitwise locals
-accessors math.rectangles math.order calendar ascii sets
+accessors math.rectangles math.order calendar ascii sets io.crlf
 io.encodings.utf16n windows.errors literals ui.pixel-formats
 ui.pixel-formats.private memoize classes colors
 specialized-arrays classes.struct ;
-FROM: namespaces => change-global set ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -172,12 +171,6 @@ PRIVATE>
 : GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
     hi-word FAPPCOMMAND_MASK lo-word bitnot bitand ; inline
 
-: crlf>lf ( str -- str' )
-    CHAR: \r swap remove ;
-
-: lf>crlf ( str -- str' )
-    [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
-
 : enum-clipboard ( -- seq )
     0
     [ EnumClipboardFormats win32-error dup dup 0 > ]
@@ -209,7 +202,7 @@ PRIVATE>
         EmptyClipboard win32-error=0/f
         GMEM_MOVEABLE over length 1 + GlobalAlloc
             dup win32-error=0/f
-    
+
         dup GlobalLock dup win32-error=0/f
         rot binary-object memcpy
         dup GlobalUnlock win32-error=0/f
@@ -278,8 +271,8 @@ CONSTANT: window-control>ex-style
     [ get-RECT-top-left ] [ get-RECT-width/height ] bi ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
-    #! wParam and lParam are unused
-    #! only paint if width/height both > 0
+    ! wParam and lParam are unused
+    ! only paint if width/height both > 0
     3drop window relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
@@ -506,7 +499,7 @@ SYMBOL: nc-buttons
         { APPCOMMAND_BROWSER_FORWARD [ pick window right-action send-action ] }
         [ drop ]
     } case 3drop ;
-    
+
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     [
         over set-capture
@@ -538,11 +531,11 @@ SYMBOL: nc-buttons
     wParam mouse-scroll hand-loc get-global hWnd window send-scroll ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
-    #! message sent if windows needs application to stop dragging
+    ! message sent if windows needs application to stop dragging
     4drop release-capture ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
-    #! message sent if mouse leaves main application 
+    ! message sent if mouse leaves main application
     4drop forget-rollover ;
 
 : system-background-color ( -- color )
@@ -868,4 +861,3 @@ M: windows-ui-backend ui-backend-available?
     t ;
 
 windows-ui-backend ui-backend set-global
-

@@ -29,8 +29,8 @@ TR: convert-separators "/\\" ".." ;
     chop-vocab-root path>vocab-name vocab-dir>vocab-name ;
 
 : monitor-loop ( monitor -- )
-    #! On OS X, monitors give us the full path, so we chop it
-    #! off if its there.
+    ! On OS X, monitors give us the full path, so we chop it
+    ! off if its there.
     [
         next-change path>> path>vocab
         [ changed-vocab ] [ reset-cache ] bi
@@ -49,7 +49,7 @@ TR: convert-separators "/\\" ".." ;
 
 : init-vocab-monitor ( -- )
     H{ } clone changed-vocabs set-global
-    vocabs [ changed-vocab ] each ;
+    loaded-vocab-names [ changed-vocab ] each ;
 
 [
     "-no-monitors" (command-line) member? [

@@ -57,5 +57,4 @@ inline static void uap_clear_fpu_status(void* uap) {
 #define FUNCTION_CODE_POINTER(ptr) ptr
 #define FUNCTION_TOC_POINTER(ptr) ptr
 
-#define UAP_STACK_POINTER_TYPE greg_t
 }

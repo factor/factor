@@ -10,9 +10,9 @@ IN: vocabs.cache
     [ root-cache get delete-at ]
     [
         \ vocab-file-contents "memoize" word-prop swap
-        '[ drop first vocab-name _ = not ] assoc-filter! drop
+        '[ drop first vocab-name _ = ] assoc-reject! drop
     ] bi
-    \ all-vocabs-recursive reset-memoized
+    \ all-disk-vocabs-recursive reset-memoized
     \ all-authors reset-memoized
     \ all-tags reset-memoized ;
 

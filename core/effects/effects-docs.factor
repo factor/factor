@@ -50,14 +50,14 @@ HELP: <effect>
 { $description "Constructs an " { $link effect } " object. Each element of " { $snippet "in" } " and " { $snippet "out" } " must be either a string, which is equivalent to a " { $snippet "name" } " in literal stack effect syntax, or a " { $link pair } " where the first element is a string and the second is either a " { $link class } " or effect, which is equivalent to " { $snippet "name: class" } " or " { $snippet "name: ( nested -- effect )" } " in the literal syntax. If the " { $snippet "out" } " array consists of a single string element " { $snippet "\"*\"" } ", a terminating stack effect will be constructed." }
 { $notes "This word cannot construct effects with " { $link "effects-variables" } ". Use " { $link <variable-effect> } " to construct variable stack effects." }
 { $examples
-{ $example """USING: effects prettyprint ;
-{ "a" "b" } { "c" } <effect> .""" """( a b -- c )""" }
-{ $example """USING: arrays effects prettyprint ;
-{ "a" { "b" array } } { "c" } <effect> .""" """( a b: array -- c )""" }
-{ $example """USING: effects prettyprint ;
-{ "a" { "b" ( x y -- z ) } } { "c" } <effect> .""" """( a b: ( x y -- z ) -- c )""" }
-{ $example """USING: effects prettyprint ;
-{ "a" { "b" ( x y -- z ) } } { "*" } <effect> .""" """( a b: ( x y -- z ) -- * )""" }
+{ $example "USING: effects prettyprint ;
+{ \"a\" \"b\" } { \"c\" } <effect> ." "( a b -- c )" }
+{ $example "USING: arrays effects prettyprint ;
+{ \"a\" { \"b\" array } } { \"c\" } <effect> ." "( a b: array -- c )" }
+{ $example "USING: effects prettyprint ;
+{ \"a\" { \"b\" ( x y -- z ) } } { \"c\" } <effect> ." "( a b: ( x y -- z ) -- c )" }
+{ $example "USING: effects prettyprint ;
+{ \"a\" { \"b\" ( x y -- z ) } } { \"*\" } <effect> ." "( a b: ( x y -- z ) -- * )" }
 } ;
 
 HELP: <terminated-effect>
@@ -70,10 +70,10 @@ HELP: <terminated-effect>
 { $description "Constructs an " { $link effect } " object like " { $link <effect> } ". If " { $snippet "terminated?" } " is true, the value of " { $snippet "out" } " is ignored, and a terminating stack effect is constructed." }
 { $notes "This word cannot construct effects with " { $link "effects-variables" } ". Use " { $link <variable-effect> } " to construct variable stack effects." }
 { $examples
-{ $example """USING: effects prettyprint ;
-{ "a" { "b" ( x y -- z ) } } { "c" } f <terminated-effect> .""" """( a b: ( x y -- z ) -- c )""" }
-{ $example """USING: effects prettyprint ;
-{ "a" { "b" ( x y -- z ) } } { } t <terminated-effect> .""" """( a b: ( x y -- z ) -- * )""" }
+{ $example "USING: effects prettyprint ;
+{ \"a\" { \"b\" ( x y -- z ) } } { \"c\" } f <terminated-effect> ." "( a b: ( x y -- z ) -- c )" }
+{ $example "USING: effects prettyprint ;
+{ \"a\" { \"b\" ( x y -- z ) } } { } t <terminated-effect> ." "( a b: ( x y -- z ) -- * )" }
 } ;
 
 HELP: <variable-effect>
@@ -86,14 +86,14 @@ HELP: <variable-effect>
 }
 { $description "Constructs an " { $link effect } " object like " { $link <effect> } ". If " { $snippet "in-var" } " or " { $snippet "out-var" } " are not " { $link f } ", they are used as the names of the " { $link "effects-variables" } " for the inputs and outputs of the effect object." }
 { $examples
-{ $example """USING: effects prettyprint ;
-f { "a" "b" } f { "c" } <variable-effect> .""" """( a b -- c )""" }
-{ $example """USING: effects prettyprint ;
-"x" { "a" "b" } "y" { "c" } <variable-effect> .""" """( ..x a b -- ..y c )""" }
-{ $example """USING: arrays effects prettyprint ;
-"y" { "a" { "b" ( ..x -- ..y ) } } "x" { "c" } <variable-effect> .""" """( ..y a b: ( ..x -- ..y ) -- ..x c )""" }
-{ $example """USING: effects prettyprint ;
-"." { "a" "b" } f { "*" } <variable-effect> .""" """( ... a b -- * )""" }
+{ $example "USING: effects prettyprint ;
+f { \"a\" \"b\" } f { \"c\" } <variable-effect> ." "( a b -- c )" }
+{ $example "USING: effects prettyprint ;
+\"x\" { \"a\" \"b\" } \"y\" { \"c\" } <variable-effect> ." "( ..x a b -- ..y c )" }
+{ $example "USING: arrays effects prettyprint ;
+\"y\" { \"a\" { \"b\" ( ..x -- ..y ) } } \"x\" { \"c\" } <variable-effect> ." "( ..y a b: ( ..x -- ..y ) -- ..x c )" }
+{ $example "USING: effects prettyprint ;
+\".\" { \"a\" \"b\" } f { \"*\" } <variable-effect> ." "( ... a b -- * )" }
 } ;
 
 
@@ -102,13 +102,13 @@ f { "a" "b" } f { "c" } <variable-effect> .""" """( a b -- c )""" }
 ARTICLE: "effects-variables" "Stack effect row variables"
 "The stack effect of many " { $link POSTPONE: inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, the quotation parameter to " { $link each } " receives an element from the input sequence each time it is called, but it can also manipulate values on the stack below the element as long as it leaves the same number of elements on the stack. (This is how " { $link reduce } " is implemented in terms of " { $snippet "each" } ".) The stack effect of an " { $snippet "each" } " expression thus depends on the stack effect of its input quotation:"
 { $example
- """USING: io sequences stack-checker ;
-[ [ write ] each ] infer."""
-"""( x -- )""" }
+ "USING: io sequences stack-checker ;
+[ [ write ] each ] infer."
+"( x -- )" }
 { $example
-"""USING: sequences stack-checker ;
-[ [ append ] each ] infer."""
-"""( x x -- x )""" }
+"USING: sequences stack-checker ;
+[ [ append ] each ] infer."
+"( x x -- x )" }
 "This feature is referred to as row polymorphism. Row-polymorphic combinators are declared by including row variables in their stack effect, which are indicated by names starting with " { $snippet ".." } ":"
 { $synopsis each }
 "Using the same variable name in both the inputs and outputs (in the above case of " { $snippet "each" } ", " { $snippet "..." } ") indicates that the number of additional inputs and outputs must be the same. Using different variable names indicates that they can be independent. In combinators with multiple quotation inputs, the number of inputs or outputs represented by a particular " { $snippet ".." } " name must match among all of the quotations. For example, the branches of " { $link if* } " can take a different number of inputs from outputs, as long as they both have the same stack height. The true branch receives the test value as an added input. This is declared as follows:"

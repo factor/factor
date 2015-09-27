@@ -1,44 +1,37 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private namespaces make
-quotations accessors words continuations vectors effects math
-generalizations fry arrays ;
+USING: accessors arrays combinators combinators.short-circuit
+continuations effects fry generalizations kernel make math
+namespaces quotations sequences sequences.private vectors words
+;
 IN: macros.expander
 
 GENERIC: expand-macros ( quot -- quot' )
 
 SYMBOL: stack
 
-: begin ( -- ) V{ } clone stack set ;
+: begin ( -- )
+    V{ } clone stack set ;
 
 : end ( -- )
-    stack get
-    [ [ literalize , ] each ]
-    [ delete-all ]
-    bi ;
+    stack get [ [ literalize , ] each ] [ delete-all ] bi ;
 
 GENERIC: condomize? ( obj -- ? )
 
 M: array condomize? [ condomize? ] any? ;
-
 M: callable condomize? [ condomize? ] any? ;
-
 M: object condomize? drop f ;
 
 GENERIC: condomize ( obj -- obj' )
 
 M: array condomize [ condomize ] map ;
-
 M: callable condomize [ condomize ] map ;
-
 M: object condomize ;
 
-: literal ( obj -- ) dup condomize? [ condomize ] when stack get push ;
+: literal ( obj -- )
+    dup condomize? [ condomize ] when stack get push ;
 
 GENERIC: expand-macros* ( obj -- )
-
-: (expand-macros) ( quot -- )
-    [ expand-macros* ] each ;
 
 M: wrapper expand-macros* wrapped>> literal ;
 
@@ -59,24 +52,38 @@ M: wrapper expand-macros* wrapped>> literal ;
     '[
         drop
         stack [ _ with-datastack >vector ] change
-        stack get pop >quotation end (expand-macros)
+        stack get pop >quotation end
+        [ expand-macros* ] each
     ] [
         drop
         word,
     ] recover ;
 
+: macro-quot ( word -- quot/f )
+    {
+        [ "transform-quot" word-prop ]
+        [ "macro" word-prop ]
+    } 1|| ;
+
+: macro-effect ( word -- n )
+    {
+        [ "transform-n" word-prop ]
+        [ stack-effect in>> length ]
+    } 1|| ;
+
 : expand-macro? ( word -- quot ? )
-    dup [ "transform-quot" word-prop ] [ "macro" word-prop ] bi or dup [
-        swap [ "transform-n" word-prop ] [ stack-effect in>> length ] bi or
-        stack get length <=
-    ] [ 2drop f f ] if ;
+    dup macro-quot [
+        swap macro-effect stack get length <=
+    ] [
+        drop f f
+    ] if* ;
 
 M: word expand-macros*
-    dup expand-dispatch? [ drop expand-dispatch ] [
-        dup expand-macro? [ expand-macro ] [
-            drop word,
-        ] if
-    ] if ;
+    {
+        { [ dup expand-dispatch? ] [ drop expand-dispatch ] }
+        { [ dup expand-macro? ] [ expand-macro ] }
+        [ drop word, ]
+    } cond ;
 
 M: object expand-macros* literal ;
 
@@ -84,4 +91,4 @@ M: callable expand-macros*
     expand-macros literal ;
 
 M: callable expand-macros ( quot -- quot' )
-    [ begin (expand-macros) end ] [ ] make ;
+    [ begin [ expand-macros* ] each end ] [ ] make ;

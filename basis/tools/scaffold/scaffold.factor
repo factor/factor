@@ -7,15 +7,12 @@ io.files io.pathnames io.streams.string kernel math math.parser
 namespaces prettyprint quotations sequences sets sorting
 splitting strings system timers unicode.categories urls vocabs
 vocabs.loader vocabs.metadata words words.symbol ;
-FROM: sets => members ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
 SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
-ERROR: vocab-name-contains-separator path ;
-ERROR: vocab-name-contains-dot path ;
 
 <PRIVATE
 
@@ -28,12 +25,7 @@ ERROR: vocab-name-contains-dot path ;
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
 : ensure-vocab-exists ( string -- string )
-    dup vocabs member? [ no-vocab ] unless ;
-
-: check-vocab-name ( string -- string )
-    [ ]
-    [ contains-dot? [ vocab-name-contains-dot ] when ]
-    [ contains-separator? [ vocab-name-contains-separator ] when ] tri ;
+    dup loaded-vocab-names member? [ no-vocab ] unless ;
 
 : check-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
@@ -163,7 +155,13 @@ ERROR: vocab-name-contains-dot path ;
         { "url" url }
     } at* [ swap [ \ $maybe swap 2array ] when ] dip ;
 
-: add-using ( object -- )
+GENERIC: add-using ( object -- )
+
+M: array add-using [ add-using ] each ;
+
+M: string add-using drop ;
+
+M: object add-using ( object -- )
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
 
 : 4bl ( -- )
@@ -177,7 +175,7 @@ ERROR: vocab-name-contains-dot path ;
             dup array? [ first ] when
             dup lookup-type [
                 [ unparse write bl ]
-                [ [ pprint ] [ dup string? [ drop ] [ add-using ] if ] bi ] bi*
+                [ [ pprint ] [ add-using ] bi ] bi*
             ] [
                 drop unparse write bl null pprint
                 null add-using
@@ -226,8 +224,8 @@ ERROR: vocab-name-contains-dot path ;
     [ docs-header. ] [ docs-body. ] bi ;
 
 : interesting-words ( vocab -- array )
-    words
-    [ { [ "help" word-prop ] [ predicate? ] } 1|| not ] filter
+    vocab-words
+    [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
     natural-sort ;
 
 : interesting-words. ( vocab -- )
@@ -343,12 +341,12 @@ SYMBOL: nested-examples
 : example-using ( using -- )
     " " join "example-using" [
         nested-examples get 4 0 ? CHAR: \s <string> "example-indent" [
-            """${example-indent}"Example:"
-${example-indent}{ $example "USING: ${example-using} ;"
-${example-indent}    ""
-${example-indent}    ""
+            "${example-indent}\"Example:\"
+${example-indent}{ $example \"USING: ${example-using} ;\"
+${example-indent}    \"\"
+${example-indent}    \"\"
 ${example-indent}}
-"""
+"
             interpolate
         ] with-variable
     ] with-variable ;

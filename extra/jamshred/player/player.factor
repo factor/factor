@@ -37,7 +37,7 @@ CONSTANT: max-speed 30.0
 
 : play-in-tunnel ( player segments -- )
     >>tunnel to-tunnel-start ;
-    
+
 : update-time ( player -- seconds-passed )
     nano-count swap [ last-move>> - 1,000,000,000 / ] [ last-move<< ] 2bi ;
 
@@ -50,7 +50,7 @@ CONSTANT: max-speed 30.0
     [ + 0 max-speed clamp ] change-speed drop ;
 
 : multiply-player-speed ( n player -- )
-    [ * 0 max-speed clamp ] change-speed drop ; 
+    [ * 0 max-speed clamp ] change-speed drop ;
 
 : distance-to-move ( seconds-passed player -- distance )
     speed>> * ;

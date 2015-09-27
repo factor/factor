@@ -2,12 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
-constructors continuations destructors forestdb.ffi
-forestdb.utils fry generalizations io.directories
+combinators.short-circuit constructors continuations destructors
+forestdb.ffi forestdb.utils fry generalizations io.directories
 io.encodings.string io.encodings.utf8 io.files.temp io.pathnames
-kernel libc make math math.parser math.ranges multiline
-namespaces sequences tools.test ;
+kernel layouts libc make math math.parser math.ranges multiline
+namespaces sequences system tools.test ;
 IN: forestdb.lib
+
+{ [ cell-bits 32 = ] [ os windows? ] } 0&& [
 
 { } [ [ delete-test-db-0 ] ignore-errors ] unit-test
 { } [ [ delete-test-db-1 ] ignore-errors ] unit-test
@@ -16,17 +18,21 @@ IN: forestdb.lib
 { "val123" } [
     delete-test-db-0
     test-db-0 [
-       "key123" "val123" fdb-set-kv
-       "key123" fdb-get-kv
-    ] with-forestdb-path
+        "test123" [
+            "key123" "val123" fdb-set-kv
+            "key123" fdb-get-kv
+        ] with-kvs
+    ] with-forestdb
 ] unit-test
 
 { "val12345" } [
     delete-test-db-0
     test-db-0 [
-       "key123" "val12345" fdb-set-kv
-       "key123" fdb-get-kv
-    ] with-forestdb-path
+        "test123" [
+            "key123" "val12345" fdb-set-kv
+            "key123" fdb-get-kv
+        ] with-kvs
+    ] with-forestdb
 ] unit-test
 
 ! Get
@@ -40,8 +46,9 @@ IN: forestdb.lib
         "key1" "meta" "val" [
             fdb_doc>doc [ key>> ] [ body>> ] bi 2array
         ] with-create-doc
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
+
 
 {
     { "key1" f "val1" }
@@ -53,7 +60,7 @@ IN: forestdb.lib
             fdb-get
             fdb_doc>doc [ key>> ] [ meta>> ] [ body>> ] tri 3array
         ] with-create-doc
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 
@@ -67,7 +74,7 @@ IN: forestdb.lib
             fdb-get-byseq fdb_doc>doc
             [ key>> ] [ meta>> ] [ body>> ] tri 3array
         ] with-doc
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 {
@@ -80,16 +87,15 @@ IN: forestdb.lib
             fdb-get-byseq fdb_doc>doc
             [ key>> ] [ meta>> ] [ body>> ] tri 3array
         ] with-doc
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
-
 
 ! Filename is only valid inside with-forestdb
 { f } [
     delete-test-db-0
     test-db-0 [
         fdb-get-info filename>> alien>native-string empty?
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 ! Test fdb_doc_create
@@ -99,7 +105,7 @@ IN: forestdb.lib
        "key123" "meta blah" "some body" [
             [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri
         ] with-create-doc
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 { 7 8 15 } [
@@ -109,7 +115,7 @@ IN: forestdb.lib
             [ "new meta" "some other body" fdb-doc-update ]
             [ [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri ] bi
         ] with-create-doc
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 { 1 1 } [
@@ -118,7 +124,7 @@ IN: forestdb.lib
         1 set-kv-n
         fdb-commit-normal
         fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 { 6 5 } [
@@ -128,7 +134,7 @@ IN: forestdb.lib
         5 set-kv-nth
         fdb-commit-normal
         fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 { 5 5 } [
@@ -137,10 +143,12 @@ IN: forestdb.lib
         5 set-kv-n
         fdb-commit-normal
         fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 ! Snapshots
+
+/*
 { 5 5 } [
     delete-test-db-1
     test-db-1 [
@@ -149,8 +157,10 @@ IN: forestdb.lib
         FDB_SNAPSHOT_INMEM [
             fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
         ] with-forestdb-snapshot
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
+*/
+
 
 /*
 ! Snapshots can only occur on commits. If you commit five keys at once,
@@ -165,11 +175,10 @@ IN: forestdb.lib
         FDB_SNAPSHOT_INMEM [
             fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
         ] with-forestdb-snapshot
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] [
     T{ fdb-error { error FDB_RESULT_NO_DB_INSTANCE } } =
 ] must-fail-with
-*/
 
 ! Test that we take two snapshots and their seqnums/doc counts are right.
 ! XXX: Buggy, want to see the first snapshot's document count at 5 too
@@ -192,8 +201,9 @@ IN: forestdb.lib
         FDB_SNAPSHOT_INMEM [
             fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
         ] with-forestdb-snapshot
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
+
 
 ! Same test as above, but with buggy behavior for now so it passes
 {
@@ -215,8 +225,10 @@ IN: forestdb.lib
         FDB_SNAPSHOT_INMEM [
             fdb-get-kvs-info last_seqnum>>
         ] with-forestdb-snapshot
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
+
+
 
 
 ! Rollback test
@@ -242,8 +254,10 @@ IN: forestdb.lib
         FDB_SNAPSHOT_INMEM [
             fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi 2array
         ] with-forestdb-snapshot
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
+
+*/
 
 
 ! Iterators test
@@ -260,7 +274,7 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 ! All the keys
@@ -282,7 +296,7 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 ! Test that keys at extremes get returned
@@ -300,7 +314,7 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 {
@@ -317,31 +331,9 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
-
-{
-    {
-        { 1 "key1" }
-        { 2 "key2" }
-        { 3 "key3" }
-        { 4 "key4" }
-        { 5 "key5" }
-    }
-} [
-    delete-test-db-1
-    test-db-1 [
-        5 set-kv-n
-        fdb-commit-normal
-        [
-            0 10 [
-                [ seqnum>> ]
-                [ [ key>> ] [ keylen>> ] bi alien/length>string ] bi 2array ,
-            ] with-fdb-byseq-each
-        ] { } make
-    ] with-forestdb-path
-] unit-test
 
 ! Test byseq mapping
 {
@@ -355,7 +347,7 @@ IN: forestdb.lib
             fdb_doc>doc
         ] with-fdb-byseq-map
         [ seqnum>> ] map
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
 
 ! Deleting 5 keys gives you 5 new seqnums that are those docs, but deleted
@@ -371,5 +363,29 @@ IN: forestdb.lib
             fdb_doc>doc
         ] with-fdb-byseq-map
         [ [ seqnum>> ] [ deleted?>> ] bi 2array ] map
-    ] with-forestdb-path
+    ] with-forestdb-tester
 ] unit-test
+
+{
+    {
+        { 1 "key1" }
+        { 2 "key2" }
+        { 3 "key3" }
+        { 4 "key4" }
+        { 5 "key5" }
+    }
+}
+[
+    delete-test-db-1 test-db-1 [
+        5 set-kv-n
+        fdb-commit-normal
+        [
+           0 10 [
+                [ seqnum>> ]
+                [ [ key>> ] [ keylen>> ] bi alien/length>string ] bi 2array ,
+            ] with-fdb-byseq-each
+        ] { } make
+    ] with-forestdb-tester
+] unit-test
+
+] unless

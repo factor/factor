@@ -8,15 +8,15 @@ USING:
     tools.test ;
 IN: openssl.libcrypto.tests
 
-[ t ] [ "factorcode.org:80" BIO_new_connect bio_st? ] unit-test
+{ t } [ "factorcode.org:80" BIO_new_connect bio_st? ] unit-test
 
-[ 1 1 ] [
+{ 1 1 } [
     "factorcode.org:80" BIO_new_connect [
         BIO_C_DO_STATE_MACHINE 0 f BIO_ctrl
     ] keep BIO_free
 ] unit-test
 
-[ "HTTP/1.1 200 Document follows" 1 ] [
+{ "HTTP/1.1 200 Document follows" 1 } [
     "factorcode.org:80" BIO_new_connect [
         [ BIO_C_DO_STATE_MACHINE 0 f BIO_ctrl drop ]
         [

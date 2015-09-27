@@ -87,8 +87,8 @@ M: array noise [ noise ] map vsum ;
 : noise-factor ( x y -- z ) / 100 * >integer ;
 
 : quot-noise-factor ( quot -- n )
-    #! For very short words, noise doesn't count so much
-    #! (so dup foo swap bar isn't penalized as badly).
+    ! For very short words, noise doesn't count so much
+    ! (so dup foo swap bar isn't penalized as badly).
     noise first2 {
         { [ over 4 <= ] [ [ drop 0 ] dip ] }
         { [ over 15 >= ] [ [ 2 * ] dip ] }
@@ -131,7 +131,7 @@ M: lambda-word word-noise-factor
     ] tabular-output ;
 
 : vocab-noise-factor ( vocab -- factor )
-    words flatten-generics
+    vocab-words flatten-generics
     [ word-noise-factor dup 20 < [ drop 0 ] when ] map
     [ 0 ] [
         [ [ sum ] [ length 5 max ] bi /i ]
@@ -140,7 +140,7 @@ M: lambda-word word-noise-factor
     ] if-empty ;
 
 : noisy-vocabs ( -- alist )
-    vocabs [ dup vocab-noise-factor ] { } map>assoc
+    loaded-vocab-names [ dup vocab-noise-factor ] { } map>assoc
     sort-values reverse ;
 
 : noise-report ( -- )

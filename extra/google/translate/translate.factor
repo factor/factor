@@ -18,10 +18,10 @@ CONSTANT: maximum-translation-size 5120
 : assoc>query-response ( assoc -- response )
     google-translate-url http-post nip ;
 
-ERROR: response-error response error ;
+TUPLE: response-error response error ;
 
 : throw-response-error ( response -- * )
-    "responseDetails" over at response-error ;
+    [ ] [ "responseDetails" of ] bi response-error boa throw ;
 
 : check-response ( response -- response )
     "responseStatus" over at {

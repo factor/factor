@@ -15,10 +15,10 @@ IN: alien.remote-control.tests
     ascii [ readln ] with-process-reader ;
 
 :: test-embedding ( code -- line )
-    image :> image
+    image-path :> image
 
     [
-        I[
+        [I
 #include <vm/master.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     printf("Done.\n");
     return 0;
 }
-        ]I
+        I]
     ] with-string-writer
     [ compile-file ] with-temp-directory
     [ run-test ] with-temp-directory ;

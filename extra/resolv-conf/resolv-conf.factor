@@ -90,7 +90,7 @@ PRIVATE>
     [ <resolv.conf> ] dip
     utf8 file-lines
     [ [ blank? ] trim ] map harvest
-    [ "#" head? not ] filter
+    [ "#" head? ] reject
     [ parse-resolv.conf-line ] each ;
 
 : default-resolv.conf ( -- resolv.conf )

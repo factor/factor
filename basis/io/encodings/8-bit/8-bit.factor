@@ -41,7 +41,7 @@ M: 8-bit-encoding <decoder>
     8-bit-encodings get-global at <decoder> ;
 
 : create-encoding ( name -- word )
-    create-in
+    create-word-in
     [ define-singleton-class ]
     [ 8-bit-encoding add-mixin-instance ]
     [ ] tri ;

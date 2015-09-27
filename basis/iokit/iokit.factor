@@ -11,7 +11,7 @@ IN: iokit
 
 CONSTANT: kIOKitBuildVersionKey   "IOKitBuildVersion"
 CONSTANT: kIOKitDiagnosticsKey   "IOKitDiagnostics"
- 
+
 CONSTANT: kIORegistryPlanesKey   "IORegistryPlanes"
 CONSTANT: kIOCatalogueKey    "IOCatalogue"
 
@@ -84,16 +84,16 @@ CONSTANT: kIOBundleResourceFileKey "IOBundleResourceFile"
 CONSTANT: kIOBusBadgeKey "IOBusBadge"
 CONSTANT: kIODeviceIconKey "IODeviceIcon"
 
-CONSTANT: kIOPlatformSerialNumberKey  "IOPlatformSerialNumber" 
+CONSTANT: kIOPlatformSerialNumberKey  "IOPlatformSerialNumber"
 
-CONSTANT: kIOPlatformUUIDKey  "IOPlatformUUID" 
+CONSTANT: kIOPlatformUUIDKey  "IOPlatformUUID"
 
 CONSTANT: kIONVRAMDeletePropertyKey  "IONVRAM-DELETE-PROPERTY"
 CONSTANT: kIODTNVRAMPanicInfoKey   "aapl,panic-info"
 
-CONSTANT: kIOBootDeviceKey "IOBootDevice"  
-CONSTANT: kIOBootDevicePathKey "IOBootDevicePath" 
-CONSTANT: kIOBootDeviceSizeKey "IOBootDeviceSize" 
+CONSTANT: kIOBootDeviceKey "IOBootDevice"
+CONSTANT: kIOBootDevicePathKey "IOBootDevicePath"
+CONSTANT: kIOBootDeviceSizeKey "IOBootDeviceSize"
 
 CONSTANT: kOSBuildVersionKey   "OS Build Version"
 
@@ -102,26 +102,26 @@ CONSTANT: kNilOptions 0
 CONSTANT: MACH_PORT_NULL 0
 CONSTANT: KERN_SUCCESS 0
 
-FUNCTION: IOReturn IOMasterPort ( mach_port_t bootstrap, mach_port_t* master ) ;
+FUNCTION: IOReturn IOMasterPort ( mach_port_t bootstrap, mach_port_t* master )
 
-FUNCTION: CFDictionaryRef IOServiceMatching ( c-string name ) ;
-FUNCTION: CFDictionaryRef IOServiceNameMatching ( c-string name ) ;
-FUNCTION: CFDictionaryRef IOBSDNameMatching ( c-string name ) ;
+FUNCTION: CFDictionaryRef IOServiceMatching ( c-string name )
+FUNCTION: CFDictionaryRef IOServiceNameMatching ( c-string name )
+FUNCTION: CFDictionaryRef IOBSDNameMatching ( c-string name )
 
-FUNCTION: IOReturn IOObjectRetain ( io_object_t o ) ;
-FUNCTION: IOReturn IOObjectRelease ( io_object_t o ) ;
+FUNCTION: IOReturn IOObjectRetain ( io_object_t o )
+FUNCTION: IOReturn IOObjectRelease ( io_object_t o )
 
-FUNCTION: IOReturn IOServiceGetMatchingServices ( mach_port_t master, CFDictionaryRef matchingDict, io_iterator_t* iterator ) ;
+FUNCTION: IOReturn IOServiceGetMatchingServices ( mach_port_t master, CFDictionaryRef matchingDict, io_iterator_t* iterator )
 
-FUNCTION: io_object_t IOIteratorNext ( io_iterator_t i ) ;
-FUNCTION: void IOIteratorReset ( io_iterator_t i ) ;
-FUNCTION: boolean_t IOIteratorIsValid ( io_iterator_t i ) ;
+FUNCTION: io_object_t IOIteratorNext ( io_iterator_t i )
+FUNCTION: void IOIteratorReset ( io_iterator_t i )
+FUNCTION: boolean_t IOIteratorIsValid ( io_iterator_t i )
 
-FUNCTION: IOReturn IORegistryEntryGetPath ( io_registry_entry_t entry, io_name_t plane, io_string_t path ) ;
+FUNCTION: IOReturn IORegistryEntryGetPath ( io_registry_entry_t entry, io_name_t plane, io_string_t path )
 
-FUNCTION: IOReturn IORegistryEntryCreateCFProperties ( io_registry_entry_t entry, CFMutableDictionaryRef properties, CFAllocatorRef allocator, IOOptionBits options ) ;
+FUNCTION: IOReturn IORegistryEntryCreateCFProperties ( io_registry_entry_t entry, CFMutableDictionaryRef properties, CFAllocatorRef allocator, IOOptionBits options )
 
-FUNCTION: c-string mach_error_string ( IOReturn error ) ;
+FUNCTION: c-string mach_error_string ( IOReturn error )
 
 TUPLE: mach-error-state error-code error-string ;
 : <mach-error> ( code -- error )
@@ -154,11 +154,10 @@ TUPLE: mach-error-state error-code error-string ;
 
 : io-objects-from-iterator ( i -- array )
     io-objects-from-iterator* [ release-io-object ] dip ;
-    
+
 : properties-from-io-object ( o -- o nsdictionary )
     dup f void* <ref> [
         kCFAllocatorDefault kNilOptions
         IORegistryEntryCreateCFProperties mach-error
     ]
     keep void* deref ;
-

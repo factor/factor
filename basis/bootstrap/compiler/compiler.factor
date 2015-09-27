@@ -1,12 +1,11 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cpu.architecture vocabs system
-sequences namespaces parser kernel kernel.private classes
-classes.private arrays hashtables vectors classes.tuple sbufs
-hashtables.private sequences.private math classes.tuple.private
-growable namespaces.private assocs words command-line io
-io.encodings.string libc splitting math.parser memory compiler.units
-math.order quotations quotations.private assocs.private vocabs.loader ;
+USING: accessors arrays assocs assocs.private classes
+classes.tuple.private compiler.units hashtables
+hashtables.private io kernel libc math math.parser memory
+namespaces namespaces.private quotations quotations.private
+sbufs sequences sequences.private splitting system vectors
+vocabs vocabs.loader words ;
 FROM: compiler => enable-optimizer ;
 IN: bootstrap.compiler
 
@@ -32,7 +31,7 @@ gc
 
 : compile-unoptimized ( words -- )
     [ [ subwords ] map ] keep suffix concat
-    [ optimized? not ] filter compile ;
+    [ word-optimized? ] reject compile ;
 
 "debug-compiler" get [
 
@@ -61,7 +60,7 @@ gc
 
         wrap probe
 
-        namestack*
+        (get-namestack)
 
         layout-of
     } compile-unoptimized
@@ -124,7 +123,7 @@ gc
 
     "." write flush
 
-    vocabs [ words compile-unoptimized "." write flush ] each
+    loaded-vocab-names [ vocab-words compile-unoptimized "." write flush ] each
 
     " done" print flush
 

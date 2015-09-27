@@ -11,7 +11,7 @@ IN: db.sqlite.lib
 ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
 
-: throw-sqlite-error ( n -- * )
+: sqlite-other-error ( n -- * )
     dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
@@ -22,7 +22,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     {
         { SQLITE_OK [ ] }
         { SQLITE_ERROR [ sqlite-statement-error ] }
-        [ throw-sqlite-error ]
+        [ sqlite-other-error ]
     } case ;
 
 : sqlite-open ( path -- db )
@@ -117,11 +117,11 @@ ERROR: sqlite-sql-error < sql-error n string ;
     } case ;
 
 : sqlite-bind-type ( handle key value type -- )
-    #! null and empty values need to be set by sqlite-bind-null-by-name
+    ! null and empty values need to be set by sqlite-bind-null-by-name
     over [
         NULL = [ 2drop NULL NULL ] when
     ] [
-        drop NULL 
+        drop NULL
     ] if* (sqlite-bind-type) ;
 
 : sqlite-finalize ( handle -- ) sqlite3_finalize sqlite-check-result ;

@@ -35,4 +35,3 @@ PRIVATE>
 
 : approximate ( x epsilon -- y )
     [ check-float ] bi@ [ - ] [ + ] 2bi simplest ;
-

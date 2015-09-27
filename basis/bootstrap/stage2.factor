@@ -16,12 +16,12 @@ SYMBOL: bootstrap-time
             P" resource:core/io/encodings/utf16/utf16.factor" 
             P" resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
             "io.encodings.utf16" 
-            "io.encodings.utf16n" [ child-vocabs [ forget-vocab ] each ] bi@
+            "io.encodings.utf16n" [ loaded-child-vocab-names [ forget-vocab ] each ] bi@
         ] with-compilation-unit
     ] when ;
 
 : default-image-name ( -- string )
-    vm file-name os windows? [ "." split1-last drop ] when
+    vm-path file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
 
 : load-components ( -- )
@@ -45,7 +45,7 @@ SYMBOL: bootstrap-time
 
     "Bootstrapping is complete." print
     "Now, you can run Factor:" print
-    vm write " -i=" write "output-image" get print flush ;
+    vm-path write " -i=" write "output-image" get print flush ;
 
 : save/restore-error ( quot -- )
     error get-global

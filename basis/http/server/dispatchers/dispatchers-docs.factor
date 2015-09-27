@@ -31,46 +31,46 @@ HELP: add-responder
 ARTICLE: "http.server.dispatchers.example" "HTTP dispatcher examples"
 { $heading "Simple pathname dispatcher" }
 { $code
-    """<dispatcher>
-    <new-action> "new" add-responder
-    <edit-action> "edit" add-responder
-    <delete-action> "delete" add-responder
-    <list-action> "" add-responder
-main-responder set-global"""
+    "<dispatcher>
+    <new-action> \"new\" add-responder
+    <edit-action> \"edit\" add-responder
+    <delete-action> \"delete\" add-responder
+    <list-action> \"\" add-responder
+main-responder set-global"
 }
 "In the above example, visiting any URL other than " { $snippet "/new" } ", " { $snippet "/edit" } ", " { $snippet "/delete" } ", or " { $snippet "/" } " will result in a 404 error."
 { $heading "Another pathname dispatcher" }
 "On the other hand, suppose we wanted to route all unrecognized paths to a “view” action:"
 { $code
-    """<dispatcher>
-    <new-action> "new" add-responder
-    <edit-action> "edit" add-responder
-    <delete-action> "delete" add-responder
+    "<dispatcher>
+    <new-action> \"new\" add-responder
+    <edit-action> \"edit\" add-responder
+    <delete-action> \"delete\" add-responder
     <view-action> >>default
-main-responder set-global"""
+main-responder set-global"
 }
 "The " { $slot "default" } " slot holds a responder to which all unrecognized paths are sent to."
 { $heading "Dispatcher subclassing example" }
 { $code
-    """TUPLE: golf-courses < dispatcher ;
+    "TUPLE: golf-courses < dispatcher ;
 
 : <golf-courses> ( -- golf-courses )
     golf-courses new-dispatcher ;
 
 <golf-courses>
-    <new-action> "new" add-responder
-    <edit-action> "edit" add-responder
-    <delete-action> "delete" add-responder
-    <list-action> "" add-responder
-main-responder set-global"""
+    <new-action> \"new\" add-responder
+    <edit-action> \"edit\" add-responder
+    <delete-action> \"delete\" add-responder
+    <list-action> \"\" add-responder
+main-responder set-global"
 }
 "The action templates can now emit links to responder-relative URLs prefixed by " { $snippet "$golf-courses/" } "."
 { $heading "Virtual hosting example" }
 { $code
-    """<vhost-dispatcher>
-    <casino> "concatenative-casino.com" add-responder
-    <dating> "raptor-dating.com" add-responder
-main-responder set-global"""
+    "<vhost-dispatcher>
+    <casino> \"concatenative-casino.com\" add-responder
+    <dating> \"raptor-dating.com\" add-responder
+main-responder set-global"
 }
 "Note that the virtual host dispatcher strips off a " { $snippet "www." } " prefix, so " { $snippet "www.concatenative-casino.com" } " would be routed to the " { $snippet "<casino>" } " responder instead of receiving a 404." ;
 

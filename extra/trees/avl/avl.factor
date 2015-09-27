@@ -27,11 +27,11 @@ TUPLE: avl-node < node balance ;
     [ node+link ]
     [ node-link ]
     [ set-node+link ] tri
-    [ set-node-link ] keep ;    
+    [ set-node-link ] keep ;
 
 : single-rotate ( node -- node )
     0 >>balance
-    0 over node+link 
+    0 over node+link
     balance<< rotate ;
 
 : pick-balances ( a node -- balance balance )
@@ -74,7 +74,7 @@ DEFER: avl-set
 
 : (avl-set) ( value key node -- node taller? )
     2dup key>> = [
-        -rot pick key<< over value<< f
+        -rot pick key<< >>value f
     ] [ avl-insert ] if ;
 
 : avl-set ( value key node -- node taller? )
@@ -85,7 +85,7 @@ M: avl set-at ( value key node -- )
 
 : delete-select-rotate ( node -- node shorter? )
     dup node+link balance>> zero? [
-        current-side get neg over balance<<
+        current-side get neg >>balance
         current-side get over node+link balance<< rotate f
     ] [
         select-rotate t
@@ -100,7 +100,7 @@ M: avl set-at ( value key node -- )
 
 : balance-delete ( node -- node shorter? )
     current-side get over balance>> {
-        { [ dup zero? ] [ drop neg over balance<< f ] }
+        { [ dup zero? ] [ drop neg >>balance f ] }
         { [ 2dup = ] [ 2drop 0 >>balance t ] }
         [ drop neg increase-balance rebalance-delete ]
     } cond ;
@@ -114,7 +114,7 @@ M: avl set-at ( value key node -- )
     ] if* ;
 
 : replace-with-a-child ( node -- node shorter? )
-    #! assumes that node is not a leaf, otherwise will recurse forever
+    ! assumes that node is not a leaf, otherwise will recurse forever
     dup node-link [
         dupd [ avl-replace-with-extremity ] with-other-side
         [ over set-node-link ] dip [ balance-delete ] [ f ] if
@@ -123,8 +123,8 @@ M: avl set-at ( value key node -- )
     ] if* ;
 
 : avl-delete-node ( node -- node shorter? )
-    #! delete this node, returning its replacement, and whether this subtree is
-    #! shorter as a result
+    ! delete this node, returning its replacement, and whether this subtree is
+    ! shorter as a result
     dup leaf? [
         drop f t
     ] [

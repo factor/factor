@@ -6,14 +6,14 @@ IN: images.loader.gtk.tests
 : open-png-image ( -- image )
     "vocab:images/testing/png/basi0g01.png" load-image ;
 
-[ t ] [
+{ t } [
     open-png-image [ dim>> ] [
         image>GdkPixbuf &g_object_unref
         [ gdk_pixbuf_get_width ] [ gdk_pixbuf_get_height ] bi 2array
     ] bi =
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         open-png-image image>GdkPixbuf &g_object_unref
         "frob" GdkPixbuf>byte-array

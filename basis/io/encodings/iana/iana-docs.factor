@@ -5,7 +5,7 @@ ABOUT: "io.encodings.iana"
 
 ARTICLE: "io.encodings.iana" "IANA-registered encoding names"
 "The " { $vocab-link "io.encodings.iana" } " vocabulary provides words for accessing the names of encodings and the encoding descriptors corresponding to names." $nl
-"Most text encodings in common use have been registered with IANA. There is a standard set of names for each encoding. Simple conversion functions:" 
+"Most text encodings in common use have been registered with IANA. There is a standard set of names for each encoding. Simple conversion functions:"
 { $subsections
     name>encoding
     encoding>name

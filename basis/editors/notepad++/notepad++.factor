@@ -1,18 +1,18 @@
-USING: editors io.files io.launcher kernel math.parser
-namespaces sequences io.directories.search.windows make ;
-IN: editors.notepadpp
+USING: editors io.standard-paths kernel make math.parser
+namespaces sequences ;
+IN: editors.notepad++
 
-SINGLETON: notepadpp
-notepadpp editor-class set-global
+SINGLETON: notepad++
+notepad++ editor-class set-global
 
-: notepadpp-path ( -- path )
-    \ notepadpp-path get-global [
-        "notepad++" [ "notepad++.exe" tail? ] find-in-program-files
+: notepad++-path ( -- path )
+    \ notepad++-path get [
+        { "notepad++" } "notepad++.exe" find-in-applications
         [ "notepad++.exe" ] unless*
     ] unless* ;
 
-M: notepadpp editor-command ( file line -- command )
+M: notepad++ editor-command ( file line -- command )
     [
-        notepadpp-path ,
+        notepad++-path ,
         number>string "-n" prepend , ,
     ] { } make ;

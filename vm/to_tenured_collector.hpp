@@ -18,9 +18,4 @@ struct to_tenured_policy {
   void visited_object(object* obj) {}
 };
 
-struct to_tenured_collector : collector<tenured_space, to_tenured_policy> {
-  explicit to_tenured_collector(factor_vm* parent);
-  void tenure_reachable_objects();
-};
-
 }

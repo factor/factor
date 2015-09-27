@@ -4,16 +4,6 @@ USING: math kernel math.constants math.private math.bits
 math.libm combinators fry math.order sequences ;
 IN: math.functions
 
-GENERIC: >fraction ( a/b -- a b )
-
-M: integer >fraction 1 ; inline
-
-M: ratio >fraction [ numerator ] [ denominator ] bi ; inline
-
-: rect> ( x y -- z )
-    ! Note: an imaginary 0.0 should still create a complex
-    dup 0 = [ drop ] [ complex boa ] if ; inline
-
 GENERIC: sqrt ( x -- y ) foldable
 
 M: real sqrt
@@ -21,7 +11,7 @@ M: real sqrt
     [ neg fsqrt [ 0.0 ] dip rect> ] [ fsqrt ] if ; inline
 
 : factor-2s ( n -- r s )
-    #! factor an integer into 2^r * s
+    ! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
         [ 0 ] dip [ dup even? ] [ [ 1 + ] [ 2/ ] bi* ] while
     ] if ; inline
@@ -60,12 +50,6 @@ M: complex ^n (^n) ;
     dup 0 >= [ ^n ] [ [ recip ] dip neg ^n ] if ; inline
 
 PRIVATE>
-
-GENERIC: >rect ( z -- x y )
-
-M: real >rect 0 ; inline
-
-M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
 
 : >float-rect ( z -- x y )
     >rect [ >float ] bi@ ; inline
@@ -109,13 +93,6 @@ M: complex e^ >rect [ e^ ] dip polar> ; inline
     [ make-bits 1 ] dip dup
     '[ [ over * _ mod ] when [ sq _ mod ] dip ] reduce nip ; inline
 
-: (gcd) ( b a x y -- a d )
-    over zero? [
-        2nip
-    ] [
-        swap [ /mod [ over * swapd - ] dip ] keep (gcd)
-    ] if ; inline recursive
-
 PRIVATE>
 
 : ^ ( x y -- z )
@@ -127,21 +104,6 @@ PRIVATE>
     } cond ; inline
 
 : nth-root ( n x -- y ) swap recip ^ ; inline
-
-: gcd ( x y -- a d )
-    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
-
-MATH: fast-gcd ( x y -- d ) foldable
-
-<PRIVATE
-
-: simple-gcd ( x y -- d ) gcd nip ; inline
-
-PRIVATE>
-
-M: real fast-gcd simple-gcd ; inline
-
-M: bignum fast-gcd bignum-gcd ; inline
 
 : lcm ( a b -- c )
     [ * ] 2keep fast-gcd /i ; foldable
@@ -238,18 +200,20 @@ M: complex log >polar [ flog ] dip rect> ; inline
 
 : most-negative-finite-float ( -- x )
     -0x1.ffff,ffff,ffff,fp1023 >integer ; inline
+
 : most-positive-finite-float ( -- x )
     0x1.ffff,ffff,ffff,fp1023 >integer ; inline
+
 CONSTANT: log-2   0x1.62e42fefa39efp-1
 CONSTANT: log10-2 0x1.34413509f79ffp-2
 
-: (representable-as-float?) ( x -- ? )
+: representable-as-float? ( x -- ? )
     most-negative-finite-float
     most-positive-finite-float between? ; inline
 
 : (bignum-log) ( n log-quot: ( x -- y ) log-2 -- log )
     [ dup ] dip '[
-        dup (representable-as-float?)
+        dup representable-as-float?
         [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
     ] call ; inline
 
@@ -368,8 +332,7 @@ M: real tanh >float tanh ; inline
     dup [-1,1]? [ >float fasin ] [ i* asinh -i* ] if ; inline
 
 : acos ( x -- y )
-    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ;
-    inline
+    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ; inline
 
 GENERIC: atan ( x -- y ) foldable
 

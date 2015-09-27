@@ -54,7 +54,7 @@ SYMBOL: data-mode
         {
             [ dup "DATA" = ]
             [
-                data-mode on 
+                data-mode on
                 "354 Enter message, ending with \".\" on a line by itself\r\n"
                 write flush t
             ]
@@ -71,7 +71,7 @@ SYMBOL: data-mode
     } cond nip [ process ] when ;
 
 :: mock-smtp-server ( promise -- )
-    #! Store the port we are running on in the promise.
+    ! Store the port we are running on in the promise.
     [
         [
             "127.0.0.1" 0 <inet4> ascii <server> [

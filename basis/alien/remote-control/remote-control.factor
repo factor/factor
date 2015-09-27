@@ -15,7 +15,7 @@ IN: alien.remote-control
     void { long } cdecl [ sleep ] alien-callback ;
 
 : ?callback ( word -- alien )
-    dup optimized? [ execute ] [ drop f ] if ; inline
+    dup word-optimized? [ execute ] [ drop f ] if ; inline
 
 : init-remote-control ( -- )
     \ eval-callback ?callback OBJ-EVAL-CALLBACK set-special-object

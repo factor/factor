@@ -5,7 +5,6 @@ io.encodings.binary io.servers io.sockets
 io.streams.duplex fry kernel locals math math.ranges multiline
 namespaces prettyprint random sequences sets splitting threads
 tools.continuations ;
-FROM: namespaces => set ;
 IN: managed-server
 
 TUPLE: managed-server < threaded-server clients ;
@@ -32,7 +31,7 @@ M: managed-server handle-client-disconnect ;
 : client-streams ( -- assoc ) clients values ;
 : username ( -- string ) client username>> ;
 : everyone-else ( -- assoc )
-    clients [ drop username = not ] assoc-filter ;
+    clients [ drop username = ] assoc-reject ;
 : everyone-else-streams ( -- assoc ) everyone-else values ;
 
 ERROR: no-such-client username ;

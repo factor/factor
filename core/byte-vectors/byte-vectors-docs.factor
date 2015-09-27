@@ -36,5 +36,5 @@ HELP: >byte-vector
 HELP: BV{
 { $syntax "BV{ elements... }" }
 { $values { "elements" "a list of bytes" } }
-{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "BV{ 1 2 3 12 }" } } ;

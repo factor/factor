@@ -1,10 +1,13 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data classes.struct
-combinators destructors io.backend io.files.windows io.ports
-io.sockets io.sockets.icmp io.sockets.private kernel libc locals
-math sequences system windows.errors windows.handles
-windows.kernel32 windows.types windows.winsock ;
+
+USING: accessors alien alien.c-types alien.data alien.strings
+byte-arrays classes.struct combinators destructors io.backend
+io.encodings.ascii io.files.windows io.ports io.sockets
+io.sockets.icmp io.sockets.private kernel libc locals math
+sequences system windows.errors windows.handles windows.kernel32
+windows.types windows.winsock ;
+
 FROM: namespaces => get ;
 IN: io.sockets.windows
 
@@ -318,3 +321,7 @@ M: windows (send) ( packet addrspec datagram -- )
         [ wait-for-socket drop ]
         bi
     ] with-destructors ;
+
+M: windows host-name
+    256 [ <byte-array> dup ] keep gethostname socket-error
+    ascii alien>string ;
