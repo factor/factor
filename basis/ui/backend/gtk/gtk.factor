@@ -467,11 +467,11 @@ M:: gtk-ui-backend (open-window) ( world -- )
     gtk_window_set_wmclass
 
     world configure-gl
+    win gtk_widget_realize
+
     win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
-
-    win gtk_widget_realize
     win world window-controls>> configure-window-controls
 
     win gtk_widget_show_all ;
