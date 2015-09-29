@@ -190,53 +190,53 @@ ARTICLE: "math-vectors" "Vector operations"
 ABOUT: "math-vectors"
 
 HELP: vneg
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
-{ $description "Negates each element of " { $snippet "u" } "." } ;
+{ $values { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Negates each element of " { $snippet "v" } "." } ;
 
 HELP: vabs
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of non-negative real numbers" } }
-{ $description "Takes the absolute value of each element of " { $snippet "u" } "." } ;
+{ $values { "v" "a sequence of numbers" } { "w" "a sequence of non-negative real numbers" } }
+{ $description "Takes the absolute value of each element of " { $snippet "v" } "." } ;
 
 HELP: vsqrt
-{ $values { "u" "a sequence of non-negative real numbers" } { "v" "a sequence of non-negative real numbers" } }
-{ $description "Takes the square root of each element of " { $snippet "u" } "." }
+{ $values { "v" "a sequence of non-negative real numbers" } { "w" "a sequence of non-negative real numbers" } }
+{ $description "Takes the square root of each element of " { $snippet "v" } "." }
 { $warning "For performance reasons, this does not work with negative inputs, unlike " { $link sqrt } "." } ;
 
 HELP: vfloor
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } }
-{ $description "Takes the " { $link floor } " of each element of " { $snippet "u" } "." } ;
+{ $values { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $description "Takes the " { $link floor } " of each element of " { $snippet "v" } "." } ;
 
 HELP: vceiling
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } }
-{ $description "Takes the " { $link ceiling } " of each element of " { $snippet "u" } "." } ;
+{ $values { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $description "Takes the " { $link ceiling } " of each element of " { $snippet "v" } "." } ;
 
 HELP: vtruncate
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } }
-{ $description "Truncates each element of " { $snippet "u" } "." } ;
+{ $values { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $description "Truncates each element of " { $snippet "v" } "." } ;
 
 HELP: n+v
 { $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "v" } "." } ;
 
 HELP: v+n
-{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
-{ $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
+{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $description "Adds " { $snippet "n" } " to each element of " { $snippet "v" } "." } ;
 
 HELP: n-v
 { $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Subtracts each element of " { $snippet "v" } " from " { $snippet "n" } "." } ;
 
 HELP: v-n
-{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
-{ $description "Subtracts " { $snippet "n" } " from each element of " { $snippet "u" } "." } ;
+{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $description "Subtracts " { $snippet "n" } " from each element of " { $snippet "v" } "." } ;
 
 HELP: n*v
 { $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "v" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
-{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
-{ $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
+{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $description "Multiplies each element of " { $snippet "v" } " by " { $snippet "n" } "." } ;
 
 HELP: n/v
 { $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
@@ -244,8 +244,8 @@ HELP: n/v
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v/n
-{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
-{ $description "Divides each element of " { $snippet "u" } " by " { $snippet "n" } "." }
+{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $description "Divides each element of " { $snippet "v" } " by " { $snippet "n" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: n^v
@@ -253,8 +253,8 @@ HELP: n^v
 { $description "Raises " { $snippet "n" } " to the power of each element of " { $snippet "v" } "." } ;
 
 HELP: v^n
-{ $values { "u" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
-{ $description "Raises each element of " { $snippet "u" } " to the power of " { $snippet "n" } "." } ;
+{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $description "Raises each element of " { $snippet "u" } " to the power of " { $snippet "v" } "." } ;
 
 HELP: v+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
@@ -359,21 +359,21 @@ HELP: vbitxor
 { $notes "Unlike " { $link bitxor } ", this word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
 
 HELP: vlshift
-{ $values { "u" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
-{ $description "Shifts each element of " { $snippet "u" } " to the left by " { $snippet "n" } " bits." }
+{ $values { "v" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
+{ $description "Shifts each element of " { $snippet "v" } " to the left by " { $snippet "n" } " bits." }
 { $notes "Undefined behavior will result if " { $snippet "n" } " is negative." } ;
 
 HELP: vrshift
-{ $values { "u" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
-{ $description "Shifts each element of " { $snippet "u" } " to the right by " { $snippet "n" } " bits." }
+{ $values { "v" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
+{ $description "Shifts each element of " { $snippet "v" } " to the right by " { $snippet "n" } " bits." }
 { $notes "Undefined behavior will result if " { $snippet "n" } " is negative." } ;
 
 HELP: hlshift
-{ $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
+{ $values { "v" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
 { $description "Shifts the entire SIMD array to the left by " { $snippet "n" } " bytes, filling the vacated right-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: hrshift
-{ $values { "u" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
+{ $values { "v" "a SIMD array" } { "n" "a non-negative integer" } { "w" "a SIMD array" } }
 { $description "Shifts the entire SIMD array to the right by " { $snippet "n" } " bytes, filling the vacated left-hand bits with zeroes. This word may only be used in a context where the compiler can statically infer that the input is a SIMD array." } ;
 
 HELP: vmerge
@@ -434,7 +434,7 @@ HELP: vbroadcast
 } ;
 
 HELP: vshuffle
-{ $values { "u" "a SIMD array" } { "perm" "an array of integers, or a byte-array" } { "v" "a SIMD array" } }
+{ $values { "v" "a SIMD array" } { "perm" "an array of integers, or a byte-array" } { "w" "a SIMD array" } }
 { $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation. The " { $snippet "perm" } " argument can have one of two forms:"
 { $list
 { "A literal array of integers of the same length as the vector. This will perform a static, elementwise shuffle." }
@@ -478,8 +478,8 @@ HELP: p-norm
 { $description "Computes the length of a mathematical vector in " { $snippet "L^p" } " space." } ;
 
 HELP: normalize
-{ $values { "u" "a sequence of numbers, not all zero" } { "v" "a sequence of numbers" } }
-{ $description "Outputs a vector with the same direction as " { $snippet "u" } " but length 1." } ;
+{ $values { "v" "a sequence of numbers, not all zero" } { "w" "a sequence of numbers" } }
+{ $description "Outputs a vector with the same direction as " { $snippet "v" } " but length 1." } ;
 
 HELP: distance
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
@@ -541,8 +541,8 @@ HELP: vxor
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vnot
-{ $values { "u" "a sequence of booleans" } { "w" "a sequence of booleans" } }
-{ $description "Takes the logical NOT of each element of " { $snippet "u" } "." }
+{ $values { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $description "Takes the logical NOT of each element of " { $snippet "v" } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: v?
