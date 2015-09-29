@@ -51,7 +51,6 @@ inline static THREADHANDLE thread_id() { return pthread_self(); }
 uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 
-void move_file(const vm_char* path1, const vm_char* path2);
 void check_ENOMEM(const char* msg);
 
 static inline void breakpoint() { __builtin_trap(); }

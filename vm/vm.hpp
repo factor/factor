@@ -552,7 +552,6 @@ struct factor_vm {
   int safe_ftell(FILE* stream);
   void safe_fseek(FILE* stream, off_t offset, int whence);
   void safe_fflush(FILE* stream);
-  void safe_fclose(FILE* stream);
   void primitive_fopen();
   FILE* pop_file_handle();
   FILE* peek_file_handle();
@@ -731,7 +730,6 @@ struct factor_vm {
 
   // os-*
   void primitive_existsp();
-  void move_file(const vm_char* path1, const vm_char* path2);
   void init_ffi();
   void ffi_dlopen(dll* dll);
   cell ffi_dlsym(dll* dll, symbol_char* symbol);
