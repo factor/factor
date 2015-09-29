@@ -104,9 +104,6 @@ HOOK: signal-error. os ( obj -- )
 : fixnum-range-error. ( obj -- )
     "Cannot convert to fixnum: " write third . ;
 
-: c-string-error. ( obj -- )
-    "Cannot convert to C string: " write third . ;
-
 : ffi-error. ( obj -- )
     "FFI error" print drop ;
 
@@ -169,7 +166,6 @@ PREDICATE: vm-error < array
         [ signal-error.            ]
         [ array-size-error.        ]
         [ fixnum-range-error.      ]
-        [ c-string-error.          ]
         [ ffi-error.               ]
         [ undefined-symbol-error.  ]
         [ datastack-underflow.     ]
