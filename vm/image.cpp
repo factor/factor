@@ -198,17 +198,7 @@ void factor_vm::load_image(vm_parameters* p) {
 /* Save the current image to disk */
 bool factor_vm::save_image(const vm_char* saving_filename,
                            const vm_char* filename) {
-  FILE* file;
   image_header h;
-
-  file = OPEN_WRITE(saving_filename);
-  if (file == NULL) {
-    std::cout << "Cannot open image file for writing: " << saving_filename << std::endl;
-    char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror:3: " << msg << std::endl;
-    free(msg);
-    return false;
-  }
 
   h.magic = image_magic;
   h.version = image_version;
@@ -226,26 +216,26 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     h.special_objects[i] =
         (save_special_p(i) ? special_objects[i] : false_object);
 
-  bool ok = true;
-
+  FILE* file = OPEN_WRITE(saving_filename);
+  if (file == NULL)
+    goto error;
   if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
-    ok = false;
+    goto error;
   if (safe_fwrite((void*)data->tenured->start, h.data_size, 1, file) != 1)
-    ok = false;
+    goto error;
   if (safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
-    ok = false;
+    goto error;
   safe_fclose(file);
+  move_file(saving_filename, filename);
+  return true;
 
-  if (!ok) {
-    std::cout << "save-image failed." << std::endl;
-    char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror:4: " << msg << std::endl;
-    free(msg);
-  }
-  else
-    move_file(saving_filename, filename);
+ error:
+  std::cout << "save_image failed." << std::endl;
+  char *msg = threadsafe_strerror(errno);
+  std::cout << "strerror:4: " << msg << std::endl;
+  free(msg);
+  return false;
 
-  return ok;
 }
 
 /* Allocates memory */
