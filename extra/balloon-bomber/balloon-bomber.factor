@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-! Balloon Bomber: http://www.mameworld.net/maws/romset/ballbomb
+! Balloon Bomber: http://www.mamedb.com/game/ballbomb
 !
 USING: kernel space-invaders ui ;
 IN: balloon-bomber

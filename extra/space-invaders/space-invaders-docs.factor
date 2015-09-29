@@ -13,7 +13,7 @@ HELP: run-invaders
 
 ARTICLE: { "space-invaders" "space-invaders" } "Space Invaders Emulator"
 "Provides an emulation of the original 8080 Arcade Game 'Space Invaders'." $nl
-"More information on the arcade game can be obtained from " { $url "http://www.mameworld.net/maws/romset/invaders" } "." $nl
+"More information on the arcade game can be obtained from " { $url "http://www.mamedb.com/game/invaders" } "." $nl
 "To play the game you need the ROM files for the arcade game. They should "
 "be placed in a directory called 'invaders' in the location specified by "
 "the variable " { $link rom-root } ". The specific files needed are:"

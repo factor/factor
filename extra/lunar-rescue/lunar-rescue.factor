@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-! Lunar Rescue: http://www.mameworld.net/maws/romset/lrescue
+! Lunar Rescue: http://www.mamedb.com/game/lrescue
 !
 USING: kernel space-invaders ui ;
 IN: lunar-rescue
