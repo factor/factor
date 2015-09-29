@@ -225,8 +225,10 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     goto error;
   if (safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
     goto error;
-  safe_fclose(file);
-  move_file(saving_filename, filename);
+  if (raw_fclose(file) == -1)
+    goto error;
+  if (!move_file(saving_filename, filename))
+    goto error;
   return true;
 
  error:
