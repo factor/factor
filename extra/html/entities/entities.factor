@@ -1,20 +1,35 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs combinators.short-circuit kernel locals make math
+USING: assocs combinators.short-circuit kernel make math
 math.order math.parser math.ranges regexp sequences splitting
 strings ;
 
 IN: html.entities
 
+<PRIVATE
+
+CONSTANT: html-escapes {
+    { CHAR: & "&amp;" }
+    { CHAR: < "&lt;" }
+    { CHAR: > "&gt;" }
+    { CHAR: \" "&quot;" }
+    { CHAR: ' "&#39;" }
+}
+
+: next-escape ( seq -- i elt )
+    [ html-escapes key? ] find ;
+
+: escape, ( seq i elt -- seq' )
+    [ [ head-slice , ] [ 1 + tail-slice ] 2bi ]
+    [ html-escapes at , ] bi* ;
+
+PRIVATE>
+
 : html-escape ( str -- newstr )
-    {
-        { "&" "&amp;" }
-        { "<" "&lt;" }
-        { ">" "&gt;" }
-        { "\"" "&quot;" }
-        { "'" "&#39;" }
-    } [ replace ] assoc-each ;
+    [
+        [ dup next-escape dup ] [ escape, ] while 2drop ,
+    ] { } make dup length 1 > [ concat ] [ first ] if ;
 
 <PRIVATE
 

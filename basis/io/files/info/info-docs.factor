@@ -2,7 +2,7 @@ USING: arrays help.markup help.syntax kernel io.files ;
 IN: io.files.info
 
 HELP: file-info
-{ $values { "path" "a pathname string" } { "info" file-info } }
+{ $values { "path" "a pathname string" } { "info" file-info-tuple } }
 { $description "Queries the file system for metadata. If " { $snippet "path" } " refers to a symbolic link, it is followed. See the article " { $link "file-types" } " for a list of metadata symbols." }
 { $errors "Throws an error if the file does not exist." } ;
 
@@ -31,7 +31,7 @@ HELP: file-systems
 HELP: file-system-info
 { $values
 { "path" "a pathname string" }
-{ "file-system-info" file-system-info } }
+{ "file-system-info" file-system-info-tuple } }
 { $description "Returns a platform-specific object describing the file-system that contains the path. The cross-platform slot is " { $slot "free-space" } "." }
 { $examples
     { $unchecked-example

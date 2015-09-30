@@ -13,7 +13,7 @@ HELP: run-balloon
 
 ARTICLE: { "balloon-bomber" "balloon-bomber" } "Balloon Bomber Emulator"
 "Provides an emulation of the original 8080 Arcade Game 'Balloon Bomber'." $nl
-"More information on the arcade game can be obtained from " { $url "http://www.mameworld.net/maws/romset/ballbomb" } "." $nl
+"More information on the arcade game can be obtained from " { $url "http://www.mamedb.com/game/ballbomb" } "." $nl
 "To play the game you need the ROM files for the arcade game. They should "
 "be placed in a directory called 'ballbomb' in the location specified by "
 "the variable " { $link rom-root } ". The specific files needed are:"

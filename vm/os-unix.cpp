@@ -65,14 +65,13 @@ void factor_vm::primitive_existsp() {
   ctx->push(tag_boolean(stat(path, &sb) >= 0));
 }
 
-void factor_vm::move_file(const vm_char* path1, const vm_char* path2) {
+bool move_file(const vm_char* path1, const vm_char* path2) {
   int ret = 0;
   do {
     ret = rename((path1), (path2));
   } while (ret < 0 && errno == EINTR);
 
-  if (ret < 0)
-    general_error(ERROR_IO, tag_fixnum(errno), false_object);
+  return ret == 0;
 }
 
 void check_ENOMEM(const char* msg) {

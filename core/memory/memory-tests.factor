@@ -6,6 +6,13 @@ IN: memory.tests
 
 [ save-image-and-exit ] must-fail
 
+[ "does/not/exist" save-image ] must-fail
+
+[
+    os windows? "C:\\windows\\hello-windows" "/usr/bin/hello-unix" ?
+    save-image
+] must-fail
+
 ! Tests for 'instances'
 [ [ ] instances ] must-infer
 2 [ [ [ 3 throw ] instances ] must-fail ] times

@@ -711,6 +711,7 @@ usage() {
     $ECHO "  install - git clone, compile, bootstrap"
     $ECHO "  deps-apt-get - install required packages for Factor on Linux using apt-get"
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
+    $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-macosx - install git on MacOSX using port"
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"

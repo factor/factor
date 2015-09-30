@@ -9,6 +9,7 @@ void open_console();
 void close_console();
 void lock_console();
 void unlock_console();
+bool move_file(const vm_char* path1, const vm_char* path2);
 
 void ignore_ctrl_c();
 void handle_ctrl_c();

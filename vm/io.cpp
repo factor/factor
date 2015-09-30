@@ -56,7 +56,7 @@ void factor_vm::io_error_if_not_EINTR() {
   general_error(ERROR_IO, tag_fixnum(errno), false_object);
 }
 
-FILE* factor_vm::safe_fopen(char* filename, char* mode) {
+FILE* factor_vm::safe_fopen(char* filename, const char* mode) {
   FILE* file;
   for (;;) {
     file = fopen(filename, mode);
@@ -159,11 +159,6 @@ void factor_vm::safe_fflush(FILE* stream) {
   }
 }
 
-void factor_vm::safe_fclose(FILE* stream) {
-  if (raw_fclose(stream) == -1)
-    io_error_if_not_EINTR();
-}
-
 void factor_vm::primitive_fopen() {
   data_root<byte_array> mode(ctx->pop(), this);
   data_root<byte_array> path(ctx->pop(), this);
@@ -245,7 +240,8 @@ void factor_vm::primitive_fflush() {
 
 void factor_vm::primitive_fclose() {
   FILE* file = pop_file_handle();
-  safe_fclose(file);
+  if (raw_fclose(file) == -1)
+    io_error_if_not_EINTR();
 }
 
 /* This function is used by FFI I/O. Accessing the errno global directly is
