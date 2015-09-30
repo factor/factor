@@ -284,13 +284,13 @@ PRIVATE>
 : times ( ... n quot: ( ... -- ... ) -- ... )
     [ drop ] prepose each-integer ; inline
 
-: find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i )
+: find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
     iterate-prep (find-integer) ; inline
 
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
     iterate-prep (all-integers?) ; inline
 
-: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i )
+: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
     over 0 < [
         2drop f
     ] [
