@@ -195,7 +195,9 @@ void factor_vm::load_image(vm_parameters* p) {
   special_objects[OBJ_IMAGE] = allot_alien(false_object, (cell)p->image_path);
 }
 
-/* Save the current image to disk */
+/* Save the current image to disk. We don't throw any exceptions here
+   because if the 'then-die' argument is t it is not safe to do
+   so. Instead we signal failure by returning false. */
 bool factor_vm::save_image(const vm_char* saving_filename,
                            const vm_char* filename) {
   image_header h;
@@ -218,26 +220,18 @@ bool factor_vm::save_image(const vm_char* saving_filename,
 
   FILE* file = OPEN_WRITE(saving_filename);
   if (file == NULL)
-    goto error;
+    return false;
   if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
-    goto error;
+    return false;
   if (safe_fwrite((void*)data->tenured->start, h.data_size, 1, file) != 1)
-    goto error;
+    return false;
   if (safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
-    goto error;
+    return false;
   if (raw_fclose(file) == -1)
-    goto error;
+    return false;
   if (!move_file(saving_filename, filename))
-    goto error;
+    return false;
   return true;
-
- error:
-  std::cout << "save_image failed." << std::endl;
-  char *msg = threadsafe_strerror(errno);
-  std::cout << "strerror:4: " << msg << std::endl;
-  free(msg);
-  return false;
-
 }
 
 /* Allocates memory */
@@ -276,6 +270,10 @@ void factor_vm::primitive_save_image() {
   }
   free(path1_saved);
   free(path2_saved);
+
+  if (!ret) {
+    general_error(ERROR_IO, tag_fixnum(errno), false_object);
+  }
 }
 
 bool factor_vm::embedded_image_p() {
