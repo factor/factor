@@ -137,8 +137,9 @@ long getpagesize() {
   return g_pagesize;
 }
 
+// MoveFileEx returns FALSE on fail
 bool move_file(const vm_char* path1, const vm_char* path2) {
-  return MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
+  return !(MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING) == FALSE);
 }
 
 void factor_vm::init_signals() {}
