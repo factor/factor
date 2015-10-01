@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings assocs
 classes.struct continuations fry io.backend io.backend.unix
-io.directories io.encodings.utf8 io.files io.files.info
-io.files.info.unix io.files.types kernel libc literals math
-sequences system unix unix.ffi vocabs ;
+io.directories io.files io.files.info io.files.info.unix
+io.files.types kernel libc literals math sequences system unix
+unix.ffi vocabs ;
 IN: io.directories.unix
 
 CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
@@ -60,7 +60,7 @@ M: unix copy-file ( from to -- )
     ] 2keep void* deref ; inline
 
 : >directory-entry ( dirent* -- directory-entry )
-    [ d_name>> utf8 alien>string ]
+    [ d_name>> alien>native-string ]
     [ d_type>> dirent-type>file-type ] bi
     dup +unknown+ = [ drop dup file-info type>> ] when
     <directory-entry> ; inline
