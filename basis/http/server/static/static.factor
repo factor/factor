@@ -1,5 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: http.server.static
+DEFER: file-responder ! necessary for cgi-docs
+DEFER: <static> ! necessary for cgi-docs
 USING: calendar kernel math math.order math.parser namespaces
 parser sequences strings assocs hashtables debugger mime.types
 sorting logging calendar.format accessors splitting io io.files
@@ -8,7 +11,6 @@ fry xml.entities destructors urls html xml.syntax
 html.templates.fhtml http http.server http.server.responses
 http.server.redirection xml.writer ;
 QUALIFIED: sets
-IN: http.server.static
 
 TUPLE: file-responder root hook special index-names allow-listings ;
 
