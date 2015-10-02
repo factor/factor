@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar fry http http.server io
-io.encodings io.encodings.binary io.launcher io.streams.duplex kernel
-make math.parser namespaces sequences urls urls.encoding ;
+USING: namespaces kernel assocs io.files io.streams.duplex
+combinators arrays io.launcher io.encodings io.encodings.binary io
+http.server.static http.server http accessors sequences strings
+math.parser fry urls urls.encoding calendar make ;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
