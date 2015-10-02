@@ -54,7 +54,6 @@ TUPLE: concatenative-website < dispatcher ;
 
 : <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
-        "Factor website" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile

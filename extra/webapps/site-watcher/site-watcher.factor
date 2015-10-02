@@ -57,7 +57,6 @@ IN: webapps.site-watcher
 
 : <login-config> ( responder -- responder' )
     "SiteWatcher" <login-realm>
-        "SiteWatcher" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile
