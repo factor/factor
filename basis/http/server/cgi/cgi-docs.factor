@@ -1,5 +1,8 @@
-USING: help.markup help.syntax http.server.static ;
+USING: help.markup help.syntax ;
 IN: http.server.cgi
+
+DEFER: file-responder
+DEFER: <static>
 
 HELP: enable-cgi
 { $values { "responder" file-responder } }
@@ -15,3 +18,5 @@ HELP: enable-cgi
 ARTICLE: "http.server.cgi" "Serving CGI scripts"
 "The " { $vocab-link "http.server.cgi" } " implements CGI support. It is used in conjunction with a " { $link <static> } " responder."
 { $subsections enable-cgi } ;
+
+ABOUT: "http.server.cgi"
