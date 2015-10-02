@@ -3,7 +3,8 @@
 USING: namespaces kernel assocs io.files io.streams.duplex
 combinators arrays io.launcher io.encodings io.encodings.binary io
 http.server.static http.server http accessors sequences strings
-math.parser fry urls urls.encoding calendar make ;
+math.parser fry urls urls.encoding calendar make vocabs ;
+<< "http.server" require >> ! necessary for cgi-docs
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
