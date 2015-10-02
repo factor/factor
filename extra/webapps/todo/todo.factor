@@ -127,7 +127,6 @@ io.sockets.secure ;
 
 : <login-config> ( responder -- responder' )
     "Todo list" <login-realm>
-        "Todo list" >>name
         allow-registration
         allow-edit-profile
         allow-deactivation ;
