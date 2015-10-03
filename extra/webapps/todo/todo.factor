@@ -1,19 +1,10 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences namespaces
-db db.types db.tuples validators hashtables urls
-html.forms
-html.components
-html.templates.chloe
-http.server
-http.server.dispatchers
-furnace
-furnace.boilerplate
-furnace.auth
-furnace.actions
-furnace.redirection
-furnace.db
-furnace.auth.login ;
+USING: accessors kernel sequences namespaces db db.types db.tuples validators
+hashtables urls html.forms html.components html.templates.chloe http.server
+http.server.dispatchers furnace furnace.boilerplate furnace.auth
+furnace.actions furnace.redirection furnace.db furnace.auth.login
+io.sockets.secure.debug ;
 IN: webapps.todo
 
 TUPLE: todo-list < dispatcher ;
@@ -139,13 +130,6 @@ io.sockets.secure ;
         todo ensure-table
     ] with-db ;
 
-: <todo-secure-config> ( -- config )
-    ! This is only suitable for testing!
-    <secure-config>
-        "vocab:openssl/test/dh1024.pem" >>dh-file
-        "vocab:openssl/test/server.pem" >>key-file
-        "password" >>password ;
-
 : <todo-app> ( -- responder )
     init-todo-db
     <todo-list>
@@ -154,7 +138,7 @@ io.sockets.secure ;
 
 : <todo-website-server> ( -- threaded-server )
     <http-server>
-        <todo-secure-config> >>secure-config
+        <test-secure-config> >>secure-config
         8080 >>insecure
         8431 >>secure ;
 
