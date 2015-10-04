@@ -39,8 +39,7 @@ M: recaptcha call-responder*
     XML] ;
 
 : recaptcha-url ( secure? -- ? )
-    "http://www.google.com/recaptcha/api/challenge"
-    "https://www.google.com/recaptcha/api/challenge" ?
+    "https" "http" ? "://www.google.com/recaptcha/api/challenge" append
     recaptcha-error cget [ "?error=" glue ] when* >url ;
 
 : render-recaptcha ( -- xml )
