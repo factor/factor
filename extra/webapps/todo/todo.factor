@@ -4,7 +4,7 @@ USING: accessors kernel sequences namespaces db db.types db.tuples validators
 hashtables urls html.forms html.components html.templates.chloe http.server
 http.server.dispatchers furnace furnace.boilerplate furnace.auth
 furnace.actions furnace.redirection furnace.db furnace.auth.login
-io.sockets.secure.debug ;
+webapps.utils ;
 IN: webapps.todo
 
 TUPLE: todo-list < dispatcher ;
@@ -111,10 +111,7 @@ todo "TODO"
 USING: furnace.auth.features.registration
 furnace.auth.features.edit-profile
 furnace.auth.features.deactivate-user
-db.sqlite
-furnace.alloy
-io.servers
-io.sockets.secure ;
+furnace.alloy ;
 
 : <login-config> ( responder -- responder' )
     "Todo list" <login-realm>
@@ -122,7 +119,8 @@ io.sockets.secure ;
         allow-edit-profile
         allow-deactivation ;
 
-: todo-db ( -- db ) "resource:todo.db" <sqlite-db> ;
+: todo-db ( -- db )
+    "todo.db" <temp-sqlite-db> ;
 
 : init-todo-db ( -- )
     todo-db [
@@ -136,15 +134,9 @@ io.sockets.secure ;
         <login-config>
         todo-db <alloy> ;
 
-: <todo-website-server> ( -- threaded-server )
-    <http-server>
-        <test-secure-config> >>secure-config
-        8080 >>insecure
-        8431 >>secure ;
-
 : run-todo ( -- )
     <todo-app> main-responder set-global
     todo-db start-expiring
-    <todo-website-server> start-server drop ;
+    run-test-httpd ;
 
 MAIN: run-todo
