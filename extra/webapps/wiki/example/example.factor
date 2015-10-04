@@ -1,12 +1,11 @@
-USING: accessors calendar db db.sqlite db.tuples furnace.alloy
+USING: accessors calendar db db.tuples furnace.alloy
 furnace.recaptcha.example http.server io.directories
-io.encodings.ascii io.files io.files.temp io.servers
-io.sockets.secure.debug kernel namespaces sequences splitting
-webapps.wiki websites.concatenative ;
+io.encodings.ascii io.files io.servers kernel namespaces sequences
+splitting webapps.utils webapps.wiki websites.concatenative ;
 IN: webapps.wiki.example
 
 : wiki-db ( -- db )
-    "wiki.db" temp-file <sqlite-db> ;
+    "wiki.db" <temp-sqlite-db> ;
 
 : insert-page ( file-name -- )
     dup ".txt" ?tail [
@@ -39,16 +38,10 @@ IN: webapps.wiki.example
     <factor-boilerplate>
     wiki-db <alloy> ;
 
-: <wiki-website-server> ( -- threaded-server )
-    <http-server>
-        <test-secure-config> >>secure-config
-        8080 >>insecure
-        8431 >>secure ;
-
 : run-wiki ( -- )
     init-wiki-db
     <wiki-app> main-responder set-global
     wiki-db start-expiring
-    <wiki-website-server> start-server drop ;
+    run-test-httpd ;
 
 MAIN: run-wiki

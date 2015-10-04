@@ -1,5 +1,5 @@
-USING: continuations db db.sqlite io.directories io.files.temp
-webapps.mason.backend tools.test ;
+USING: continuations db io.directories io.files.temp tools.test
+webapps.mason.backend webapps.utils ;
 IN: webapps.mason.backend.tests
 
 [ "mason-test.db" temp-file delete-file ] ignore-errors
@@ -7,7 +7,7 @@ IN: webapps.mason.backend.tests
 { 0 1 2 } [
     ! Do it in a with-transaction to simulate semantics of
     ! with-mason-db
-    "mason-test.db" temp-file <sqlite-db> [
+    "mason-test.db" <temp-sqlite-db> [
         [
             init-mason-db
 
