@@ -370,18 +370,3 @@ M: revision feed-entry-url id>> revision-url ;
     <boilerplate>
         [ init-sidebars init-relative-link-prefix ] >>init
         { wiki "wiki-common" } >>template ;
-
-: init-wiki ( -- )
-    "resource:extra/webapps/wiki/initial-content" [
-        [
-            dup ".txt" ?tail [
-                swap ascii file-contents
-                f <revision>
-                    swap >>content
-                    swap >>title
-                    "slava" >>author
-                    now >>date
-                add-revision
-            ] [ 2drop ] if
-        ] each
-    ] with-directory-files ;
