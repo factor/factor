@@ -108,8 +108,7 @@ t error-summary? set-global
         [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
     ] [ drop ] if ;
 
-:: (listener) ( datastack -- )
-    parser-quiet? off
+:: listener-step ( datastack -- datastack' )
     error-summary? get [ error-summary ] when
     visible-vars.
     datastack datastack.
@@ -126,9 +125,10 @@ t error-summary? set-global
         [ call-error-hook datastack ]
         [ rethrow ]
         if
-    ] recover
+    ] recover ;
 
-    (listener) ;
+: (listener) ( datastack -- )
+    listener-step (listener) ;
 
 PRIVATE>
 
@@ -209,7 +209,10 @@ SYMBOL: interactive-vocabs
     ] with-manifest ; inline
 
 : listener ( -- )
-    [ [ { } (listener) ] with-return ] with-interactive-vocabs ;
+    [
+        parser-quiet? off
+        [ { } (listener) ] with-return
+    ] with-interactive-vocabs ;
 
 : listener-main ( -- )
     version-info print flush listener ;
