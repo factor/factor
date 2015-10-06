@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: accessors assocs compiler.units continuations fuel.eval fuel.help
-fuel.remote fuel.xref help.topics io.pathnames kernel namespaces parser
-sequences tools.scaffold vocabs.loader vocabs.parser words vocabs.files
-vocabs.metadata vocabs vocabs.hierarchy ;
+USING: accessors assocs compiler.units continuations fuel.eval
+fuel.help fuel.xref help.topics io.pathnames kernel namespaces parser
+sequences tools.scaffold vocabs vocabs.files vocabs.hierarchy
+vocabs.loader vocabs.metadata vocabs.parser words ;
 
 IN: fuel
 
@@ -165,7 +164,3 @@ PRIVATE>
     [ drop [ vocab-platforms-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
-
-! Remote connection
-
-MAIN: fuel-start-remote-listener*
