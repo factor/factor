@@ -116,15 +116,15 @@ semver_into() {
 	CLANG_RE_OLD="^([0-9]*)\.([0-9]*)-(.*)?$" # 3.3-5
 	RE_SEMVER="^([0-9]*)\.([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3.3-5
 	if [[ $1 =~ $CLANG_RE_OLD ]] ; then
-		eval $2=${BASH_REMATCH[1]}
-		eval $3=${BASH_REMATCH[2]}
-		eval $4=0
-		eval $5=${BASH_REMATCH[3]}
+		export "$2=${BASH_REMATCH[1]}"
+		export "$3=${BASH_REMATCH[2]}"
+		export "$4=0"
+		export "$5=${BASH_REMATCH[3]}"
 	elif [[ $1 =~ $RE_SEMVER ]] ; then
-		eval $2=${BASH_REMATCH[1]}
-		eval $3=${BASH_REMATCH[2]}
-		eval $4=${BASH_REMATCH[3]}
-		eval $5=${BASH_REMATCH[4]}
+		export "$2=${BASH_REMATCH[1]}"
+		export "$3=${BASH_REMATCH[2]}"
+		export "$4=${BASH_REMATCH[3]}"
+		export "$5=${BASH_REMATCH[4]}"
 	else
 		echo "unsupported version number, please report a bug: $1"
 		exit 123
@@ -136,6 +136,7 @@ gcc_version_ok() {
 	GCC_VERSION=`gcc --version | head -n1 | rev | cut -d ' ' -f 1 | rev`
 	local GCC_MAJOR local GCC_MINOR local GCC_PATCH local GCC_SPECIAL
 	semver_into $GCC_VERSION GCC_MAJOR GCC_MINOR GCC_PATCH GCC_SPECIAL
+
 	if [[ $GCC_MAJOR -lt 4
 		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -lt 7 )
 		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_THIRD -lt 3 )
@@ -148,13 +149,19 @@ gcc_version_ok() {
 }
 
 clang_version_ok() {
-	CLANG_VERSION=`clang --version | head -n1 | cut -d ' ' -f4`
-	local CLANG_MAJOR local CLANG_MINOR local CLANG_PATCH local CLANG_SPECIAL
-	semver_into $CLANG_VERSION CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
-	if [[ $CLANG_MAJOR -lt 3
-		|| ( $CLANG_MAJOR -eq 3 && $CLANG_MINOR -le 1 )
-		]] ; then
-		echo "clang version required >= 3.1, got $CLANG_VERSION"
+	CLANG_VERSION=`clang --version | head -n1`
+	CLANG_VERSION_RE='^[a-zA-Z0-9 ]* version (.*)$' # 3.3-5
+	if [[ $CLANG_VERSION =~ $CLANG_VERSION_RE ]] ; then
+		export "CLANG_VERSION=${BASH_REMATCH[1]}"
+		local CLANG_MAJOR local CLANG_MINOR local CLANG_PATCH local CLANG_SPECIAL
+		semver_into "$CLANG_VERSION" CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
+		if [[ $CLANG_MAJOR -lt 3
+			|| ( $CLANG_MAJOR -eq 3 && $CLANG_MINOR -le 1 )
+			]] ; then
+			echo "clang version required >= 3.1, got $CLANG_VERSION"
+			return 1
+		fi
+	else
 		return 1
 	fi
 	return 0
