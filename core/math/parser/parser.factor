@@ -488,12 +488,13 @@ M: ratio >base
 
 <PRIVATE
 
-: fix-float ( str exponent -- newstr )
-    2dup first swap member? [
-         [ [ split1 ] keep swap [ fix-float ] dip ] [ glue ] bi
-    ] [
-        drop CHAR: . over member? [ ".0" append ] unless
-    ] if ;
+: (fix-float) ( str-no-exponent -- newstr )
+    CHAR: . over member? [ ".0" append ] unless ; inline
+
+: fix-float ( str exponent-char -- newstr )
+    over index [
+        cut [ (fix-float) ] dip append
+    ] [ (fix-float) ] if* ; inline
 
 : mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
     [ dup log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + neg ] bi ]
@@ -553,7 +554,8 @@ M: ratio >base
         [ format-string ] 4dip [ format-string ] bi@ (format-float)
         dup [ 0 = ] find drop format-head
     ] [
-        "C" = [ [ "G" = ] [ "E" = ] bi or "E" "e" ? fix-float ] [ drop ] if
+        "C" = [ [ "G" = ] [ "E" = ] bi or CHAR: E CHAR: e ? fix-float ]
+        [ drop ] if
     ] 2bi ; inline
 
 : float>base ( n radix -- str )
