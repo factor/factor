@@ -18,7 +18,8 @@ void fatal_error(const char* msg, cell tagged) {
 
   std::cout << "fatal_error: " << msg;
   std::cout << ": " << (void*)tagged;
-  std::cout << std::endl;
+  std::cout << std::endl << std::endl;
+  current_vm()->dump_memory_layout(std::cout);
   abort();
 }
 
@@ -28,12 +29,6 @@ void critical_error(const char* msg, cell tagged) {
   std::cout << ": " << std::hex << tagged << std::dec;
   std::cout << std::endl;
   current_vm()->factorbug();
-}
-
-void out_of_memory(const char *msg) {
-  std::cout << "Out of memory: " << msg << "\n\n";
-  current_vm()->dump_memory_layout(std::cout);
-  abort();
 }
 
 /* Allocates memory */

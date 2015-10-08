@@ -93,12 +93,12 @@ segment::segment(cell size_, bool executable_p) {
   size = size_;
 
   char* mem;
-
+  cell alloc_size = getpagesize() * 2 + size;
   if ((mem = (char*)VirtualAlloc(
-           NULL, getpagesize() * 2 + size, MEM_COMMIT,
+           NULL, alloc_size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
       0) {
-    out_of_memory("VirtualAlloc");
+    fatal_error("Out of memory in VirtualAlloc", alloc_size);
   }
 
   start = (cell)mem + getpagesize();

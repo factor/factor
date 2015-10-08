@@ -74,11 +74,6 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
   return ret == 0;
 }
 
-void check_ENOMEM(const char* msg) {
-  if(errno == ENOMEM)
-    out_of_memory(msg);
-}
-
 segment::segment(cell size_, bool executable_p) {
   size = size_;
 
@@ -90,11 +85,12 @@ segment::segment(cell size_, bool executable_p) {
   else
     prot = PROT_READ | PROT_WRITE;
 
-  char* array = (char*)mmap(NULL, 2 * pagesize + size, prot,
+  cell alloc_size = 2 * pagesize + size;
+  char* array = (char*)mmap(NULL, alloc_size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
 
   if (array == (char*)-1)
-    out_of_memory("mmap");
+    fatal_error("Out of memory in mmap", alloc_size);
 
   start = (cell)(array + pagesize);
   end = start + size;
@@ -106,13 +102,11 @@ void segment::set_border_locked(bool locked) {
   int pagesize = getpagesize();
   cell lo = start - pagesize;
   if (!set_memory_locked(lo, pagesize, locked)) {
-    check_ENOMEM("mprotect low");
     fatal_error("Cannot (un)protect low guard page", lo);
   }
 
   cell hi = end;
   if (!set_memory_locked(hi, pagesize, locked)) {
-    check_ENOMEM("mprotect high");
     fatal_error("Cannot (un)protect high guard page", hi);
   }
 }
