@@ -81,14 +81,15 @@ M: array >insecure [ >insecure ] map ;
 M: f >insecure ;
 
 : >secure ( addrspec -- addrspec' )
-    >insecure
-    [ dup secure? [ <secure> ] unless ] map ;
+    >insecure [ dup secure? [ <secure> ] unless ] map ;
+
+: configurable-addrspecs ( addrspecs -- addrspecs' )
+    [ inet6? not ipv6-supported? or ] filter ;
 
 : listen-on ( threaded-server -- addrspecs )
     [ secure>> ssl-supported? [ >secure ] [ drop { } ] if ]
-    [ insecure>> >insecure ]
-    bi append
-    [ resolve-host ] map concat ;
+    [ insecure>> >insecure ] bi append
+    [ resolve-host ] map concat configurable-addrspecs ;
 
 : accepted-connection ( remote local -- )
     [
