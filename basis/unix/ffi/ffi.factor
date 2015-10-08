@@ -36,6 +36,14 @@ CONSTANT: DT_WHT      14
 : SIG_DFL ( -- obj ) ALIEN: 0 void* <ref> ; inline
 : SIG_IGN ( -- obj ) ALIEN: 1 void* <ref> ; inline
 
+! Possible values for 'ai_flags' in 'addrinfo'.
+CONSTANT: AI_PASSIVE        0x0001
+CONSTANT: AI_CANONNAME      0x0002
+CONSTANT: AI_NUMERICHOST    0x0004
+CONSTANT: AI_V4MAPPED       0x0008
+CONSTANT: AI_ALL            0x0010
+CONSTANT: AI_ADDRCONFIG     0x0020
+
 LIBRARY: libc
 
 STRUCT: group
