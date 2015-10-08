@@ -44,3 +44,12 @@ IN: io.servers
         0 >>insecure
     start-server [ '[ _ wait-for-server ] in-thread ] [ stop-server ] bi
 ] unit-test
+
+ipv6-supported? [
+    { f } [
+        ascii <threaded-server>
+            "localhost" 1234 inet boa >>insecure
+        listen-on
+        [ inet6? ] any?
+    ] unit-test
+] unless
