@@ -32,7 +32,7 @@ void critical_error(const char* msg, cell tagged) {
 
 void out_of_memory(const char *msg) {
   std::cout << "Out of memory: " << msg << "\n\n";
-  current_vm()->dump_generations(std::cout);
+  current_vm()->dump_memory_layout(std::cout);
   abort();
 }
 
