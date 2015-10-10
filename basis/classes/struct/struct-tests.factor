@@ -246,7 +246,6 @@ STRUCT: struct-test-equality-1
 STRUCT: struct-test-equality-2
     { y int } ;
 
-{ 0 } [ struct-test-equality-1 new hashcode ] unit-test
 
 { t } [
     [
@@ -259,14 +258,6 @@ STRUCT: struct-test-equality-2
     [
         struct-test-equality-1 <struct> 5 >>x
         struct-test-equality-2 malloc-struct &free 5 >>y =
-    ] with-destructors
-] unit-test
-
-{ t } [
-    [
-        struct-test-equality-1 <struct> 5 >>x
-        struct-test-equality-1 malloc-struct &free 5 >>x
-        [ hashcode ] same?
     ] with-destructors
 ] unit-test
 
@@ -542,3 +533,28 @@ STRUCT: some-accessors { aaa uint } { bbb int } ;
 { f } [ \ some-accessors \ struct-slot-values ?lookup-method ] unit-test
 
 << \ some-accessors forget >>
+
+! hashcode tests
+{ 0 } [ struct-test-equality-1 new hashcode ] unit-test
+
+{ t } [
+    [
+        struct-test-equality-1 <struct> 5 >>x
+        struct-test-equality-1 malloc-struct &free 5 >>x
+        [ hashcode ] same?
+    ] with-destructors
+] unit-test
+
+! Same slots, so the hashcode should be the same.
+{ t } [
+    B{ 98 0 33 0 1 1 1 1 1 1 1 1 } struct-test-foo memory>struct
+    B{ 98 0 22 0 1 1 1 1 1 1 1 1 } struct-test-foo memory>struct
+    [ hashcode ] same?
+] unit-test
+
+! Equality tests
+{ t } [
+    B{ 98 0 33 0 1 1 1 1 1 1 1 1 } struct-test-foo memory>struct
+    B{ 98 0 22 0 1 1 1 1 1 1 1 1 } struct-test-foo memory>struct
+    =
+] unit-test
