@@ -32,7 +32,7 @@ TUPLE: win32-monitor < monitor port ;
         [ recursive>> 1 0 ? ]
     } cleave
     FILE_NOTIFY_CHANGE_ALL
-    0 uint <ref>
+    0 DWORD <ref>
     (make-overlapped)
     [ f ReadDirectoryChangesW win32-error=0/f ] keep ;
 
