@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.smart fry functors kernel
-kernel.private macros sequences combinators sequences.private
-stack-checker parser math classes.tuple classes.tuple.private ;
+USING: accessors arrays classes.tuple classes.tuple.private
+combinators combinators.smart fry functors kernel macros math parser
+sequences sequences.private ;
 FROM: inverse => undo ;
 IN: tuple-arrays
 
@@ -13,12 +13,6 @@ ERROR: not-final class ;
 MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
 : tuple-arity ( class -- quot ) '[ _ boa ] inputs ; inline
-
-: smart-tuple>array ( tuple class -- array )
-    '[ [ _ boa ] undo ] output>array ; inline
-
-: tuple-prototype ( class -- array )
-    [ new ] [ smart-tuple>array ] bi ; inline
 
 : tuple-slice ( n seq -- slice )
     [ n>> [ * dup ] keep + ] [ seq>> ] bi <slice-unsafe> ; inline
@@ -60,7 +54,7 @@ TUPLE: CLASS-array
 { length array-capacity read-only } ;
 
 : <CLASS-array> ( length -- tuple-array )
-    [ \ CLASS [ tuple-prototype <repetition> concat ] [ tuple-arity ] bi ] keep
+    [ \ CLASS [ initial-values <repetition> concat ] [ tuple-arity ] bi ] keep
     \ CLASS-array boa ; inline
 
 M: CLASS-array length length>> ; inline
