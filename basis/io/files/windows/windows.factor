@@ -263,7 +263,7 @@ M: windows init-stdio
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    [ [ handle>> ] dip d>w/w uint <ref> ] dip SetFilePointer
+    [ [ handle>> ] dip d>w/w LONG <ref> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
 
 M: windows (file-reader) ( path -- stream )
