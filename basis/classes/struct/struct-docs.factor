@@ -1,6 +1,6 @@
 ! (c)Joe Groff bsd license
-USING: alien classes help.markup help.syntax kernel libc
-quotations slots ;
+USING: alien classes classes.struct.private help.markup help.syntax
+kernel libc math sequences ;
 IN: classes.struct
 
 HELP: <struct-boa>
@@ -92,6 +92,10 @@ HELP: (malloc-struct)
 }
 { $description "Allocates unmanaged C heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are left uninitialized; to initialize the allocated memory with the slots' initial values, use " { $link malloc-struct } ". The struct should be " { $link free } "d when it is no longer needed." } ;
 
+HELP: compute-struct-offsets
+{ $values { "slots" sequence } { "size" integer } }
+{ $description "Computes how many bytes of memory the struct takes, minus final padding." } ;
+
 HELP: memory>struct
 { $values
     { "ptr" c-ptr } { "class" class }
@@ -110,6 +114,11 @@ HELP: struct
 
 HELP: struct-class
 { $class-description "The metaclass of all " { $link struct } " classes." } ;
+
+HELP: struct-slot-values
+{ $values { "struct" struct } { "sequence" sequence } }
+{ $description "Extracts the values of the structs slots" }
+{ $errors "Throws a memory protection error if the memory the struct references is not accessible." } ;
 
 ARTICLE: "classes.struct.examples" "Struct class examples"
 "A struct with a variety of fields:"
