@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.pathnames kernel tools.test io.backend
-io.files.windows splitting sequences io.pathnames.private ;
+USING: io.backend io.files io.files.windows io.pathnames kernel
+sequences splitting tools.test ;
 IN: io.files.windows.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
@@ -58,3 +58,10 @@ IN: io.files.windows.tests
 
 [ "c:\\blah" ] [ "c:\\foo\\bar" "\\blah" append-path ] unit-test
 [ t ] [ "" resource-path 2 tail exists? ] unit-test
+
+! win32-file-attributes
+{
+    { +read-only+ +hidden+ }
+} [
+    3 win32-file-attributes
+] unit-test
