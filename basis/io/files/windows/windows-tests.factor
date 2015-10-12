@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators continuations io.backend io.directories io.files
-io.files.temp io.files.windows io.pathnames kernel memory sequences
-splitting tools.test windows.kernel32 ;
+io.files.temp io.files.windows io.pathnames kernel kernel.private libc
+literals memory sequences splitting tools.test windows.kernel32 ;
 IN: io.files.windows.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
@@ -68,7 +68,7 @@ IN: io.files.windows.tests
 ] unit-test
 
 ! set-file-attributes & save-image
-{ { "kernel-error" 1 13 f } } [
+{ ${ "kernel-error" ERROR-IO EIO f } } [
     [
         "read-only.image" temp-file {
             [ ?delete-file ]

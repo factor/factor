@@ -137,9 +137,18 @@ long getpagesize() {
   return g_pagesize;
 }
 
-// MoveFileEx returns FALSE on fail
+
 bool move_file(const vm_char* path1, const vm_char* path2) {
-  return !(MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING) == FALSE);
+  /* MoveFileEx returns FALSE on fail. */
+  BOOL val = MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
+  if (val == FALSE) {
+    /* MoveFileEx doesn't set errno, which primitive_save_image()
+       reads the error code from. Instead of converting from
+       GetLastError() to errno values, we ust set it to the generic
+       EIO value. */
+    errno = EIO;
+  }
+  return val == TRUE;
 }
 
 void factor_vm::init_signals() {}
