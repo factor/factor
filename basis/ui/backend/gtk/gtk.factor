@@ -1,17 +1,15 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line
-continuations destructors environment gdk.ffi gdk.gl.ffi
-gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io io.encodings.binary
-io.encodings.utf8 io.files kernel libc literals locals math
-math.bitwise math.order math.vectors namespaces sequences
-strings system threads ui ui.backend
-ui.backend.gtk.input-methods ui.backend.gtk.io ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
-vocabs.loader combinators ;
+alien.strings arrays assocs classes.struct combinators continuations
+destructors environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
+gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
+io.encodings.binary io.encodings.utf8 io.files kernel libc literals
+locals math math.bitwise math.vectors namespaces sequences strings
+system threads ui ui.backend ui.backend.gtk.input-methods
+ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -467,13 +465,18 @@ M:: gtk-ui-backend (open-window) ( world -- )
     gtk_window_set_wmclass
 
     world configure-gl
+
+    ! This must be done before realize due to #776.
+    win events-mask gtk_widget_add_events
+
     win gtk_widget_realize
 
+    ! And this must be done after and in this order due to #1307
     win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
-    win world window-controls>> configure-window-controls
 
+    win world window-controls>> configure-window-controls
     win gtk_widget_show_all ;
 
 M: gtk-ui-backend (close-window) ( handle -- )
