@@ -1,9 +1,7 @@
-USING: continuations documents
-ui.tools.listener hashtables kernel namespaces parser sequences
-tools.test ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.panes vocabs words ui.gadgets.debug slots.private
-arrays generic threads accessors listener math
-calendar concurrency.promises io ui.tools.common ;
+USING: accessors arrays calendar concurrency.promises continuations
+documents io kernel listener math namespaces parser threads tools.test
+ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes ui.gestures
+ui.tools.common ui.tools.listener ;
 IN: ui.tools.listener.tests
 
 [
@@ -198,3 +196,10 @@ CONSTANT: text "Hello world.\nThis is a test."
 { } [ <listener-gadget> "l" set ] unit-test
 { } [ "l" get com-scroll-up ] unit-test
 { } [ "l" get com-scroll-down ] unit-test
+
+{ t t } [
+    T{ key-down f f "UP" } T{ key-down f { C+ } "p" }
+    [ <interactor> get-gesture-handler ] same?
+    T{ key-down f f "DOWN" } T{ key-down f { C+ } "n" }
+    [ <interactor> get-gesture-handler ] same?
+] unit-test
