@@ -1,27 +1,23 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.short-circuit concurrency.flags
-concurrency.mailboxes continuations destructors documents
-documents.elements fry hashtables help help.markup help.tips io
-io.styles kernel lexer listener locals make math models
-models.arrow models.delay namespaces parser prettyprint
-quotations sequences source-files.errors strings system threads
-tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
+USING: accessors arrays assocs calendar combinators
+combinators.short-circuit concurrency.flags concurrency.mailboxes
+continuations destructors documents documents.elements fry hashtables
+help help.markup help.tips io io.styles kernel lexer listener locals
+make math models models.arrow models.delay namespaces parser
+prettyprint quotations sequences source-files.errors strings system
+threads tools.errors.model ui ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.tracks ui.gadgets.toolbar ui.gadgets.theme
-ui.gestures ui.operations ui.pens.solid
-ui.tools.browser ui.tools.common ui.tools.debugger
-ui.tools.error-list ui.tools.listener.completion
+ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.tracks ui.gestures
+ui.operations ui.pens.solid ui.tools.browser ui.tools.common
+ui.tools.debugger ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener
 
-! If waiting is t, we're waiting for user input, and invoking
-! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
-output history flag mailbox thread waiting token-model word-model popup ;
+    output history flag mailbox thread waiting token-model word-model popup ;
 
 INSTANCE: interactor input-stream
 
@@ -189,9 +185,6 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 { 600 700 } listener-gadget set-tool-dim
 
-: find-listener ( gadget -- listener )
-    [ listener-gadget? ] find-parent ;
-
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
 
@@ -217,7 +210,7 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
     dup error-summary>> f track-add ;
-    
+
 : add-listener-area ( listener -- listener )
     dup output>> margins <scroller> >>scroller
     dup scroller>> white-interior 1 track-add ;
@@ -334,7 +327,7 @@ M: object accept-completion-hook 2drop ;
     parse-lines-interactive ;
 
 : <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger> 
+    over compute-restarts [ hide-glass ] <debugger>
     "Error" debugger-color <framed-labeled> ;
 
 : debugger-popup ( interactor error continuation -- )
@@ -392,6 +385,8 @@ interactor "completion" f {
     { T{ key-down f f "TAB" } code-completion-popup }
     { T{ key-down f { C+ } "p" } recall-previous }
     { T{ key-down f { C+ } "n" } recall-next }
+    { T{ key-down f f "UP" } recall-previous }
+    { T{ key-down f f "DOWN" } recall-next }
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
