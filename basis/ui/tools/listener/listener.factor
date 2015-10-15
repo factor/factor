@@ -30,7 +30,6 @@ INSTANCE: interactor input-stream
     thread>> thread-continuation ;
 
 : interactor-busy? ( interactor -- ? )
-    ! We're busy if there's no thread to resume.
     {
         [ waiting>> ]
         [ thread>> dup [ thread-registered? ] when ]
@@ -226,7 +225,6 @@ M: listener-gadget focusable-child*
     input>> dup popup>> or ;
 
 : wait-for-listener ( listener -- )
-    ! Wait for the listener to start.
     input>> flag>> wait-for-flag ;
 
 : listener-busy? ( listener -- ? )
@@ -372,7 +370,10 @@ M: interactor handle-gesture
     {
         { [ over key-gesture? not ] [ call-next-method ] }
         { [ dup popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
-        { [ dup token-model>> value>> ] [ { [ interactor-operation ] [ call-next-method ] } 2&& ] }
+        {
+            [ dup token-model>> value>> ]
+            [ { [ interactor-operation ] [ call-next-method ] } 2&& ]
+        }
         [ call-next-method ]
     } cond ;
 
