@@ -227,7 +227,7 @@ these lines in your .emacs:
     "HINTS:"
     "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
     "MACRO:" "MACRO::" "MATH:"
-    "MEMO:" "MEMO:" "METHOD:"
+    "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only" "REQUIRE:"  "REQUIRES:"
     "SINGLETONS:" "SLOT:"
@@ -253,6 +253,7 @@ these lines in your .emacs:
 
 (defconst factor-declaration-words
   '("deprecated"
+    "final"
     "flushable"
     "foldable"
     "inline"
@@ -264,7 +265,7 @@ these lines in your .emacs:
   (regexp-opt factor-declaration-words 'symbols))
 
 (defconst factor-integer-regex
-  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9]+\\)\\_>")
+  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9][0-9,]*\\)\\_>")
 
 (defconst factor-raw-float-regex
   "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
@@ -285,8 +286,8 @@ these lines in your .emacs:
   (concat
    (format "\\_<\\(\\(?:%s\\)?[:#]\\)"
            (regexp-opt
-            '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "POSTPONE"
-              "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:")))
+            '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "MEMO" "MEMO:"
+              "POSTPONE" "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:")))
    ws+ symbol))
 
 ;; [parsing-word] [vocab-word]
@@ -300,7 +301,7 @@ these lines in your .emacs:
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
    '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "HELP" "LIBRARY"
-     "MAIN" "STRING" "SYMBOL" "VAR")))
+     "MAIN" "MAIN-WINDOW" "STRING" "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
 (defconst factor-symbols-lines-regex
@@ -311,7 +312,8 @@ these lines in your .emacs:
 
 (defconst factor-type-definition-regex
   (syntax-and-1-symbol
-   '("COM-INTERFACE" "C-TYPE" "MIXIN" "SINGLETON" "SPECIALIZED-ARRAY")))
+   '("COM-INTERFACE" "C-TYPE" "MIXIN" "SINGLETON" "SPECIALIZED-ARRAY"
+     "TUPLE-ARRAY")))
 
 (defconst factor-constructor-regex
   (one-symbol "<[^ >]+>"))
