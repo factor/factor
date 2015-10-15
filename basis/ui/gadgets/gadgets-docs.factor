@@ -1,7 +1,10 @@
-USING: help.markup help.syntax opengl kernel strings
-classes.tuple classes quotations models math.rectangles
-ui.gadgets.private accessors ;
+USING: accessors concurrency.flags help.markup help.syntax kernel
+math.rectangles models strings ui.gadgets.private ;
 IN: ui.gadgets
+
+HELP: control-value
+{ $values { "control" gadget } { "value" object } }
+{ $description "Outputs the value of the control's model." } ;
 
 HELP: gadget-child
 { $values { "gadget" gadget } { "child" gadget } }
@@ -173,13 +176,13 @@ HELP: focusable-child
 
 { control-value set-control-value } related-words
 
-HELP: control-value
-{ $values { "control" gadget } { "value" object } }
-{ $description "Outputs the value of the control's model." } ;
-
 HELP: set-control-value
 { $values { "value" object } { "control" gadget } }
 { $description "Sets the value of the control's model." } ;
+
+HELP: ui-notify-flag
+{ $var-description "A " { $link flag } " raised to notify the UI thread that there is work to do." }
+{ $see-also notify-ui-thread } ;
 
 ARTICLE: "ui-control-impl" "Implementing controls"
 "A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $snippet "model" } " slot set to a " { $link model } " instance."
