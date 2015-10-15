@@ -149,6 +149,10 @@ HELP: parents
 { $values { "gadget" gadget } { "seq" "a sequence of gadgets" } }
 { $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
 
+HELP: child?
+{ $values { "parent" gadget } { "child" gadget } { "?" boolean } }
+{ $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
+
 HELP: each-parent
 { $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "?" boolean } }
 { $description "Applies the quotation to every parent of the gadget, starting from the gadget itself, stopping if the quotation yields " { $link f } ". Outputs " { $link t } " if the iteration completed, and outputs " { $link f } " if it was stopped prematurely." } ;
@@ -156,14 +160,6 @@ HELP: each-parent
 HELP: find-parent
 { $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "parent" gadget } }
 { $description "Outputs the first parent of the gadget, starting from the gadget itself, for which the quotation outputs a true value, or " { $link f } " if the quotation outputs " { $link f } " for every parent." } ;
-
-HELP: screen-loc
-{ $values { "gadget" gadget } { "loc" "a pair of integers" } }
-{ $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
-
-HELP: child?
-{ $values { "parent" gadget } { "child" gadget } { "?" boolean } }
-{ $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
 
 HELP: focusable-child*
 { $values { "gadget" gadget } { "child/t" "a " { $link gadget } " or " { $link t } } }
@@ -175,6 +171,14 @@ HELP: focusable-child
 { $description "Outputs the child of the gadget which would prefer to receive keyboard focus." } ;
 
 { control-value set-control-value } related-words
+
+HELP: layout-later
+{ $values { "gadget" gadget } }
+{ $description "Adds the gadget to the " { $link layout-queue } " and notifies the UI thread that there is a gadget to layout. If the length of the queue is larger than " { $link layout-queue-limit } ", then the current thread is yielded so that the UI thread has a chance to run." } ;
+
+HELP: screen-loc
+{ $values { "gadget" gadget } { "loc" "a pair of integers" } }
+{ $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
 
 HELP: set-control-value
 { $values { "value" object } { "control" gadget } }

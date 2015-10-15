@@ -1,7 +1,7 @@
-USING: accessors ui.gadgets ui.gadgets.packs ui.gadgets.worlds
-tools.test namespaces models kernel dlists deques math
-math.parser ui sequences hashtables assocs io arrays prettyprint
-io.streams.string math.rectangles ui.gadgets.private sets generic ;
+USING: accessors arrays assocs concurrency.flags deques dlists io
+io.streams.string kernel math math.parser math.rectangles models
+namespaces prettyprint sequences sets threads tools.test ui ui.gadgets
+ui.gadgets.private ;
 IN: ui.gadgets.tests
 
 { { 300 300 } }
@@ -151,3 +151,18 @@ M: mock-gadget ungraft*
 
     { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
 ] with-string-writer print
+
+: fake-ui-loop ( -- )
+    ui-notify-flag get-global lower-flag ;
+
+ui-running? [
+    { f } [
+        ! Initially lowered
+        <dlist> \ layout-queue set-global
+        <flag> ui-notify-flag set-global
+
+        [ fake-ui-loop ] "Fake UI" spawn drop
+        8001 iota [ layout-later ] each
+        ui-notify-flag get-global value>>
+    ] unit-test
+] unless
