@@ -3,9 +3,9 @@
 USING: accessors arrays assocs boxes classes.tuple
 classes.tuple.parser combinators combinators.short-circuit
 concurrency.flags concurrency.promises continuations deques
-destructors dlists fry init kernel lexer make math namespaces
-parser sequences sets strings threads ui.backend ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures vocabs.parser
+destructors dlists fry init kernel lexer make math namespaces parser
+sequences sets strings threads ui.backend ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures vectors vocabs.parser
 words ;
 IN: ui
 
@@ -105,7 +105,7 @@ M: world ungraft*
     f hand-world set-global
     f world set-global
     <dlist> \ graft-queue set-global
-    <dlist> \ layout-queue set-global
+    100 <vector> \ layout-queue set-global
     <dlist> \ gesture-queue set-global
     V{ } clone ui-windows set-global ;
 
@@ -113,17 +113,14 @@ M: world ungraft*
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: (layout-queued) ( deque -- seq )
-    [
-        in-layout? on
-        [
-            dup layout find-world [ , ] when*
-        ] slurp-deque
-    ] { } make members ; inline
+: slurp-vector ( .. seq quot: ( ... elt -- .. ) -- )
+    over '[ _ empty? not ] -rot '[ _ pop @ ] while ; inline
 
 : layout-queued ( -- seq )
-    layout-queue dup deque-empty?
-    [ drop { } ] [ (layout-queued) ] if ;
+    layout-queue [
+        in-layout? on
+        [ dup layout find-world [ , ] when* ] slurp-vector
+    ] { } make members ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;

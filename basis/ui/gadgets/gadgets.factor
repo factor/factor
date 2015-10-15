@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays binary-search combinators concurrency.flags
-deques dlists fry kernel locals make math math.order math.rectangles
+deques fry kernel locals make math math.order math.rectangles
 math.vectors models namespaces sequences threads vectors ;
 IN: ui.gadgets
 
@@ -143,10 +143,9 @@ CONSTANT: layout-queue-limit 8000
 
 : layout-later ( gadget -- )
     layout-queue [
-        [ push-back notify-ui-thread ] [ drop ] if*
-    ] [
-        dlist-length layout-queue-limit > [ yield ] when
-    ] bi ;
+        [ push notify-ui-thread ]
+        [ length layout-queue-limit > [ yield ] when ] bi
+    ] [ drop ] if* ;
 
 : invalidate* ( gadget -- )
     \ invalidate* >>layout-state
