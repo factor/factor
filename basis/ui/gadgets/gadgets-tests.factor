@@ -1,7 +1,7 @@
 USING: accessors arrays assocs concurrency.flags deques dlists io
 io.streams.string kernel math math.parser math.rectangles models
 namespaces prettyprint sequences sets threads tools.test ui ui.gadgets
-ui.gadgets.private ;
+ui.gadgets.private ui.private ;
 IN: ui.gadgets.tests
 
 { { 300 300 } }
@@ -157,8 +157,8 @@ M: mock-gadget ungraft*
 
 ui-running? [
     { f } [
+        init-ui
         ! Initially lowered
-        <dlist> \ layout-queue set-global
         <flag> ui-notify-flag set-global
 
         [ fake-ui-loop ] "Fake UI" spawn drop
