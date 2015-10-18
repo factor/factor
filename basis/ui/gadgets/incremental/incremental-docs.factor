@@ -8,7 +8,7 @@ $nl
 $nl
 "Children are managed with the " { $link add-incremental } " and " { $link clear-incremental } " words."
 $nl
-"An example of an incremental is the " { $slot "output" } " of a 'pane' gadget."
+"An example of an incremental is the 'output' of a 'pane' gadget."
 $nl
 "Not every " { $link pack } " can use incremental layout, since incremental layout does not support non-default values for the " { $slot "align" } ", " { $slot "fill" } ", and " { $slot "gap" } " slots." } ;
 
