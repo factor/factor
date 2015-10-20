@@ -202,16 +202,13 @@ CONSTANT: action-key-codes
     keyval>> dup action-key-codes at [ t ]
     [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
 
-: key-event>gesture ( event -- mods sym/f action? )
-    [ event-modifiers ] [ key-sym ] bi ;
+: key-event>gesture ( event -- key-gesture )
+    [ event-modifiers ] [ key-sym ] [
+        type>> GDK_KEY_PRESS = [ <key-down> ] [ <key-up> ] if
+    ] tri ;
 
-: on-key-press ( win event user-data -- ? )
-    drop swap [ key-event>gesture <key-down> ] [ window ] bi*
-    propagate-key-gesture t ;
-
-: on-key-release ( win event user-data -- ? )
-    drop swap [ key-event>gesture <key-up> ] [ window ] bi*
-    propagate-key-gesture t ;
+: on-key-press/release ( win event user-data -- ? )
+    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture t ;
 
 : on-focus-in ( win event user-data -- ? )
     2drop window focus-world t ;
@@ -235,7 +232,6 @@ CONSTANT: action-key-codes
     ] when* ;
 
 :: connect-user-input-signals ( win -- )
-    win events-mask gtk_widget_add_events
     win "motion-notify-event" [ on-motion yield ]
     GtkWidget:motion-notify-event connect-signal
     win "leave-notify-event" [ on-leave yield ]
@@ -246,9 +242,9 @@ CONSTANT: action-key-codes
     GtkWidget:button-release-event connect-signal
     win "scroll-event" [ on-scroll yield ]
     GtkWidget:scroll-event connect-signal
-    win "key-press-event" [ on-key-press yield ]
+    win "key-press-event" [ on-key-press/release yield ]
     GtkWidget:key-press-event connect-signal
-    win "key-release-event" [ on-key-release yield ]
+    win "key-release-event" [ on-key-press/release yield ]
     GtkWidget:key-release-event connect-signal
     win "focus-in-event" [ on-focus-in yield ]
     GtkWidget:focus-in-event connect-signal
