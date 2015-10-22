@@ -113,7 +113,7 @@ set_md5sum() {
 }
 
 semver_into() {
-	CLANG_RE_OLD="^([0-9]*)\.([0-9]*)-(.*)?$" # 3.3-5
+	CLANG_RE_OLD="^([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3-5
 	RE_SEMVER="^([0-9]*)\.([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3.3-5
 	if [[ $1 =~ $CLANG_RE_OLD ]] ; then
 		export "$2=${BASH_REMATCH[1]}"
