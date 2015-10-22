@@ -336,30 +336,23 @@ M: object accept-completion-hook 2drop ;
     error-continuation get
     debugger-popup ;
 
-: try-parse ( lines interactor -- quot/error/f )
-    [ drop parse-lines-interactive ] [
-        2nip
-        dup lexer-error? [
-            dup error>> unexpected-eof? [ drop f ] when
-        ] when
-    ] recover ;
+: try-parse ( lines -- quot/f/error )
+    [ read-quot-step ] [ nip ] recover ;
 
-: handle-interactive ( lines interactor -- quot/f ? )
-    [ nip ] [ try-parse ] 2bi {
-        { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop insert-newline f f ] }
-        [ handle-parse-error f f ]
-    } cond ;
+: handle-interactive ( interactor lines -- quot/f )
+    try-parse dup quotation? [ nip ] [
+        dup not [ drop insert-newline ] [
+            handle-parse-error
+        ] if f
+    ] if ;
 
-M: interactor stream-read-quot
-    [ interactor-yield ] keep {
-        { [ over not ] [ drop ] }
-        { [ over callable? ] [ drop ] }
-        [
-            [ handle-interactive ] keep swap
-            [ interactor-finish ] [ nip stream-read-quot ] if
-        ]
-    } cond ;
+M: interactor stream-read-quot ( stream -- quot/f )
+    dup interactor-yield dup [ not ] [ callable? ] bi or
+    [ nip ] [
+        dupd handle-interactive dup quotation? [
+            swap interactor-finish
+        ] [ drop stream-read-quot ] if
+    ] if ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
