@@ -1,7 +1,8 @@
 USING: accessors arrays calendar concurrency.promises continuations
 documents io kernel lexer listener math namespaces parser quotations
 sequences threads tools.test ui.gadgets.debug ui.gadgets.editors
-ui.gadgets.panes ui.gestures ui.tools.common ui.tools.listener ;
+ui.gadgets.panes ui.gestures ui.tools.common ui.tools.listener
+vocabs.parser ;
 IN: ui.tools.listener.tests
 
 [
@@ -210,16 +211,16 @@ CONSTANT: text "Hello world.\nThis is a test."
 { [ 3 4 + ] } [
     <listener-gadget> input>> [ register-self ] keep
     [ { "3 4 +" } swap interactor-continue ] keep
-    stream-read-quot
+    [ "math" use-vocab stream-read-quot ] with-manifest
 ] unit-test
 
 ! try-parse
-{ t } [
-    { "goga" } try-parse
-    [ callable? ] [ length 2 = ] [ first lexer-error? ] tri and and
-] unit-test
-
-{ [ sq ] t } [
-    { "sq" } try-parse
-    { "[" } try-parse first lexer-error?
+{ [ sq ] t t } [
+    [
+        "math" use-vocab
+        { "sq" } try-parse
+        { "[" } try-parse first lexer-error?
+        { "goga" } try-parse
+        [ callable? ] [ length 2 = ] [ first lexer-error? ] tri and and
+    ] with-manifest
 ] unit-test
