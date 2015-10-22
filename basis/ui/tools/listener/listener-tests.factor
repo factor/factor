@@ -1,7 +1,7 @@
 USING: accessors arrays calendar concurrency.promises continuations
-documents io kernel listener math namespaces parser threads tools.test
-ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes ui.gestures
-ui.tools.common ui.tools.listener ;
+documents io kernel lexer listener math namespaces parser quotations
+sequences threads tools.test ui.gadgets.debug ui.gadgets.editors
+ui.gadgets.panes ui.gestures ui.tools.common ui.tools.listener ;
 IN: ui.tools.listener.tests
 
 [
@@ -35,7 +35,7 @@ IN: ui.tools.listener.tests
 
     [ ] [ "interactor" get register-self ] unit-test
 
-    [ ] [ <promise> "promise" set ] unit-test
+    { } [ <promise> "promise" set ] unit-test
 
     [
         self "interactor" get thread<<
@@ -95,7 +95,9 @@ IN: ui.tools.listener.tests
 
     [ ] [ "interactor" get interactor-eof ] unit-test
 
-    [ { "Hello\nWorld\n" f } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
+    { { "Hello\nWorld\n" f } } [
+        "promise" get 5 seconds ?promise-timeout
+    ] unit-test
 ] with-interactive-vocabs
 
 ! Hang
@@ -202,4 +204,22 @@ CONSTANT: text "Hello world.\nThis is a test."
     [ <interactor> get-gesture-handler ] same?
     T{ key-down f f "DOWN" } T{ key-down f { C+ } "n" }
     [ <interactor> get-gesture-handler ] same?
+] unit-test
+
+! stream-read-quot
+{ [ 3 4 + ] } [
+    <listener-gadget> input>> [ register-self ] keep
+    [ { "3 4 +" } swap interactor-continue ] keep
+    stream-read-quot
+] unit-test
+
+! try-parse
+{ t } [
+    { "goga" } try-parse
+    [ callable? ] [ length 2 = ] [ first lexer-error? ] tri and and
+] unit-test
+
+{ [ sq ] t } [
+    { "sq" } try-parse
+    { "[" } try-parse first lexer-error?
 ] unit-test

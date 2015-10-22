@@ -4,14 +4,14 @@ USING: accessors arrays assocs calendar combinators
 combinators.short-circuit concurrency.flags concurrency.mailboxes
 continuations destructors documents documents.elements fry hashtables
 help help.markup help.tips io io.styles kernel lexer listener locals
-make math models models.arrow models.delay namespaces parser
-prettyprint quotations sequences source-files.errors strings system
-threads tools.errors.model ui ui.commands ui.gadgets
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.tracks ui.gestures
-ui.operations ui.pens.solid ui.tools.browser ui.tools.common
-ui.tools.debugger ui.tools.error-list ui.tools.listener.completion
+math models models.arrow models.delay namespaces parser prettyprint
+quotations sequences source-files.errors strings system threads
+tools.errors.model ui ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
+ui.pens.solid ui.tools.browser ui.tools.common ui.tools.debugger
+ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener
@@ -98,11 +98,8 @@ M: input (print-input)
     [ string>> H{ { font-style bold } } format ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: "
-    [
-        "sans-serif" font-name ,,
-        bold font-style ,,
-    ] H{ } make format . ;
+    "Command: " H{ { font-name "sans-serif" } { font-style bold } }
+    format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
@@ -331,28 +328,14 @@ M: object accept-completion-hook 2drop ;
 : debugger-popup ( interactor error continuation -- )
     [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
 
-: handle-parse-error ( interactor error -- )
-    dup lexer-error? [ 2dup go-to-error error>> ] when
-    error-continuation get
-    debugger-popup ;
-
-: try-parse ( lines -- quot/f/error )
-    [ read-quot-step ] [ nip ] recover ;
-
-: handle-interactive ( interactor lines -- quot/f )
-    try-parse dup quotation? [ nip ] [
-        dup not [ drop insert-newline ] [
-            handle-parse-error
-        ] if f
-    ] if ;
+: try-parse ( lines -- quot/f )
+    [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
 
 M: interactor stream-read-quot ( stream -- quot/f )
-    dup interactor-yield dup [ not ] [ callable? ] bi or
-    [ nip ] [
-        dupd handle-interactive dup quotation? [
-            swap interactor-finish
-        ] [ drop stream-read-quot ] if
-    ] if ;
+    dup interactor-yield dup array? [
+        over interactor-finish try-parse
+        [ nip ] [ stream-read-quot ] if*
+    ] [ nip ] if ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
