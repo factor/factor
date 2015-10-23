@@ -5,7 +5,7 @@ combinators.short-circuit concurrency.flags concurrency.mailboxes
 continuations destructors documents documents.elements fry hashtables
 help help.markup help.tips io io.styles kernel lexer listener locals
 math models models.arrow models.delay namespaces parser prettyprint
-quotations sequences source-files.errors strings system threads
+sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme
@@ -325,7 +325,11 @@ M: object accept-completion-hook 2drop ;
     over compute-restarts [ hide-glass ] <debugger>
     "Error" debugger-color <framed-labeled> ;
 
+: recall-on-lexer-error ( interactor error -- )
+    dup lexer-error? [ over recall-previous go-to-error ] [ 2drop ] if ;
+
 : debugger-popup ( interactor error continuation -- )
+    2over recall-on-lexer-error
     [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
 
 : try-parse ( lines -- quot/f )
