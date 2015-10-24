@@ -1,19 +1,34 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors colors.constants fry io.styles kernel
+USING: assocs colors.constants fonts fry io.styles kernel literals
 math namespaces sequences ;
 IN: help.stylesheet
 
+: wrap-margin-full ( -- n )
+    42 default-font-size * ;
+
+: wrap-margin-table-content ( -- n )
+    29 default-font-size * ;
+
+: font-size-subsection ( -- n )
+    7/6 default-font-size * >integer ;
+
+: font-size-title ( -- n )
+    5/3 default-font-size * >integer ;
+
+: font-size-heading ( -- n )
+    4/3 default-font-size * >integer ;
+
 SYMBOL: default-span-style
 H{
-    { font-name "sans-serif" }
-    { font-size 12 }
+    { font-name $ default-sans-serif-font-name }
+    { font-size $ default-font-size }
     { font-style plain }
 } default-span-style set-global
 
 SYMBOL: default-block-style
 H{
-    { wrap-margin 500 }
+    { wrap-margin $ wrap-margin-full }
 } default-block-style set-global
 
 SYMBOL: link-style
@@ -30,10 +45,10 @@ H{ { font-style bold } } strong-style set-global
 
 SYMBOL: title-style
 H{
-    { font-name "sans-serif" }
-    { font-size 20 }
+    { font-name $ default-sans-serif-font-name }
+    { font-size $ font-size-title }
     { font-style bold }
-    { wrap-margin 500 }
+    { wrap-margin $ wrap-margin-full }
     { foreground COLOR: gray20 }
     { page-color COLOR: FactorLightTan }
     { inset { 5 5 } }
@@ -41,37 +56,37 @@ H{
 
 SYMBOL: help-path-style
 H{
-    { font-size 12 }
+    { font-size $ default-font-size }
     { table-gap { 5 5 } }
     { table-border COLOR: FactorLightTan }
 } help-path-style set-global
 
 SYMBOL: heading-style
 H{
-    { font-name "sans-serif" }
-    { font-size 16 }
+    { font-name $ default-sans-serif-font-name }
+    { font-size $ font-size-heading }
     { font-style bold }
     { foreground COLOR: FactorDarkSlateBlue }
 } heading-style set-global
 
 SYMBOL: subsection-style
 H{
-    { font-name "sans-serif" }
-    { font-size 14 }
+    { font-name $ default-sans-serif-font-name }
+    { font-size $ font-size-subsection }
     { font-style bold }
 } subsection-style set-global
 
 SYMBOL: snippet-style
 H{
-    { font-name "monospace" }
-    { font-size 12 }
+    { font-name $ default-monospace-font-name }
+    { font-size $ default-font-size }
     { foreground COLOR: DarkOrange4 }
 } snippet-style set-global
 
 SYMBOL: code-char-style
 H{
-    { font-name "monospace" }
-    { font-size 12 }
+    { font-name $ default-monospace-font-name }
+    { font-size $ default-font-size }
 } code-char-style set-global
 
 SYMBOL: code-style
@@ -89,7 +104,7 @@ H{
 
 SYMBOL: url-style
 H{
-    { font-name "monospace" }
+    { font-name $ default-monospace-font-name }
     { foreground COLOR: DodgerBlue4 }
 } url-style set-global
 
@@ -98,7 +113,7 @@ H{
     { page-color COLOR: gray90 }
     { border-color COLOR: red }
     { inset { 5 5 } }
-    { wrap-margin 500 }
+    { wrap-margin $ wrap-margin-full }
 } warning-style set-global
 
 SYMBOL: deprecated-style
@@ -106,12 +121,12 @@ H{
     { page-color COLOR: gray90 }
     { border-color COLOR: red }
     { inset { 5 5 } }
-    { wrap-margin 500 }
+    { wrap-margin $ wrap-margin-full }
 } deprecated-style set-global
 
 SYMBOL: table-content-style
 H{
-    { wrap-margin 350 }
+    { wrap-margin $ wrap-margin-table-content }
 } table-content-style set-global
 
 SYMBOL: table-style
