@@ -353,6 +353,6 @@ CONSTANT: jvm-summit-slides
 }
 
 : jvm-summit-talk ( -- )
-    jvm-summit-slides slides-window ;
+    jvm-summit-slides "JVM Summit talk" slides-window ;
 
 MAIN: jvm-summit-talk

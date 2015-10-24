@@ -307,6 +307,6 @@ CONSTANT: galois-slides
     }
 }
 
-: galois-talk ( -- ) galois-slides slides-window ;
+: galois-talk ( -- ) galois-slides "Galois talk" slides-window ;
 
 MAIN: galois-talk

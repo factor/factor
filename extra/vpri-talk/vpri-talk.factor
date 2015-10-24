@@ -487,6 +487,6 @@ CONSTANT: vpri-slides
     }
 }
 
-: vpri-talk ( -- ) vpri-slides slides-window ;
+: vpri-talk ( -- ) vpri-slides "VPRI talk" slides-window ;
 
 MAIN: vpri-talk

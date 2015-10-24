@@ -336,6 +336,7 @@ var price = (order == null ? null : order.price);" }
     }
 }
 
-: otug-talk ( -- ) otug-slides slides-window ;
+: otug-talk ( -- )
+      otug-slides "OTUG talk" slides-window ;
 
 MAIN: otug-talk
