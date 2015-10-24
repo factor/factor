@@ -177,6 +177,7 @@ CONSTANT: minneapolis-slides
     { $slide "Questions?" }
 }
 
-: minneapolis-talk ( -- ) minneapolis-slides slides-window ;
+: minneapolis-talk ( -- )
+    minneapolis-slides "Minneapolis talk" slides-window ;
 
 MAIN: minneapolis-talk

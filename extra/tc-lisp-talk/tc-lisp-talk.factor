@@ -26,7 +26,7 @@ CONSTANT: tc-lisp-slides
     { $slide "XML Literals"
         { $code
         "USING: splitting xml.writer xml.syntax ;
-{ \"one\" \"two\" \"three\" } 
+{ \"one\" \"two\" \"three\" }
 [ [XML <item><-></item> XML] ] map
 <XML <doc><-></doc> XML> pprint-xml"
         }
@@ -529,6 +529,7 @@ xyz
     }
 }
 
-: tc-lisp-talk ( -- ) tc-lisp-slides slides-window ;
+: tc-lisp-talk ( -- )
+    tc-lisp-slides "TC Lisp talk" slides-window ;
 
 MAIN: tc-lisp-talk

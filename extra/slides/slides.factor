@@ -123,5 +123,5 @@ SYNTAX: STRIP-TEASE:
     { T{ key-down f f "f" } [ toggle-fullscreen ] }
 } set-gestures
 
-: slides-window ( slides -- )
-    '[ _ <slides> "Slides" open-window ] with-ui ;
+: slides-window ( slides title -- )
+    '[ _ <slides> _ open-window ] with-ui ;

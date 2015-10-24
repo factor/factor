@@ -564,6 +564,7 @@ CONSTANT: google-slides
     { $slide "Questions?" }
 }
 
-: google-talk ( -- ) google-slides slides-window ;
+: google-talk ( -- )
+    google-slides "Google Tech talk" slides-window ;
 
 MAIN: google-talk
