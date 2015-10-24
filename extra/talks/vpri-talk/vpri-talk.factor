@@ -2,97 +2,47 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slides help.markup math arrays hashtables namespaces
 kernel sequences parser memoize io.encodings.binary
-locals kernel.private help.vocabs assocs quotations
-urls peg.ebnf tools.annotations tools.crossref
-help.topics math.functions compiler.tree.optimizer
-compiler.cfg.optimizer fry ;
-IN: google-tech-talk
+locals kernel.private help.vocabs assocs quotations urls
+peg.ebnf tools.annotations tools.crossref help.topics
+math.functions compiler.tree.optimizer compiler.cfg.optimizer
+fry ;
+IN: talks.vpri-talk
 
-CONSTANT: google-slides
+CONSTANT: vpri-slides
 {
     { $slide "Factor!"
         { $url "http://factorcode.org" }
         "Development started in 2003"
         "Open source (BSD license)"
-        "First result for \"Factor\" on Google :-)"
-        "Influenced by Forth, Lisp, and Smalltalk (but don't worry if you don't know them)"
+        "Influenced by Forth, Lisp, and Smalltalk"
+        "Blurs the line between language and library"
+        "Interactive development"
     }
-    { $slide "Language overview"
-        "Words operate on a stack"
-        "Functional"
-        "Object-oriented"
-        "Rich collections library"
-        "Rich input/output library"
-        "Optional named local variables"
-        "Extensible syntax"
+    { $slide "Programming is hard"
+        "Let's play tetris instead"
+        { $vocab-link "tetris" }
+        "Tetris is hard too... let's cheat"
+        "Factor workflow: change code, F2, test, repeat"
     }
-    { $slide "Example: factorial"
-        "Lame example, but..."
-        { $code "USE: math.ranges" ": factorial ( n -- n! )" "    1 [a,b] product ;" }
-        { $code "100 factorial ." }
+    { $slide "Basics"
+        "Stack based, dynamically typed"
+        { $code "{ 1 1 3 4 4 8 9 9 } dup duplicates diff ." }
+        "Words: named code snippets"
+        { $code ": remove-duplicates ( seq -- seq' )" "    dup duplicates diff ;" }
+        { $code "{ 1 1 3 4 4 8 9 9 } remove-duplicates ." }
+        "Vocabularies: named sets of words"
+        { $link "vocab-index" }
     }
-    { $slide "Example: sending an e-mail"
-        { $vocab-link "smtp-example" }
-        "Demonstrates basic stack syntax and tuple slot setters"
-    }
-    { $slide "Functional programming"
-        "Code is data in Factor"
-        { { $snippet "[ ... ]" } " is a block of code pushed on the stack" }
-        { "We call them " { $emphasis "quotations" } }
-        { "Words which take quotations as input are called " { $emphasis "combinators" } }
-    }
-    { $slide "Functional programming"
-        { $code "10 dup 0 < [ 1 - ] [ 1 + ] if ." }
-        { $code "10 [ \"Hello Googlers!\" print ] times" }
-        { $code
-            "USING: io.encodings.ascii unicode.case ;"
-            "{ \"tomato\" \"orange\" \"banana\" }"
-            "\"out.txt\" ascii ["
-            "    [ >upper print ] each"
-            "] with-file-writer"
-        }
-    }
-    { $slide "Object system: motivation"
-        "Encapsulation, polymorphism, inheritance"
-        "Smalltalk, Python, Java approach: methods inside classes"
-        "Often the \"message sending\" metaphor is used to describe such systems"
-    }
-    { $slide "Object system: motivation"
-        { $code
-            "class Rect {"
-            "  int x, y;"
-            "  int area() { ... }"
-            "  int perimeter() { ... }"
-            "}"
-            ""
-            "class Circle {"
-            "  int radius;"
-            "  int area() { ... }"
-            "  int perimeter() { ... }"
-            "}"
-        }
-    }
-    { $slide "Object system: motivation"
-        "Classical functional language approach: functions switch on a type"
-        { $code
-            "data Shape = Rect w h | Circle r"
-            ""
-            "area s = s of"
-            "  (Rect w h) = ..."
-            "| (Circle r) = ..."
-            ""
-            "perimeter s = s of"
-            "  (Rect w h) = ..."
-            "| (Circle r) = ..."
-        }
-    }
-    { $slide "Object system: motivation"
-        "First approach: hard to extend existing types with new operations (open classes, etc are a hack)"
-        "Second approach: hard to extend existing operations with new types"
-        "Common Lisp Object System (CLOS): decouples classes from methods."
-        "Factor's object system is a simplified CLOS"
+    { $slide "Quotations"
+        "Quotation: unnamed block of code"
+        "Combinators: words taking quotations"
+        { $code "{ 1 1 3 4 4 8 9 9 }" "[ { 1 3 8 } member? ] filter ." }
+        { $code "{ -1 1 -2 0 3 } [ 0 max ] map" }
+        "Partial application:"
+        { $code ": clamp ( seq n -- seq' ) '[ _ max ] map" "{ -1 1 -2 0 3 } 0 clamp ;" }
     }
     { $slide "Object system"
+        "CLOS with single dispatch"
         "A tuple is a user-defined class which holds named values."
         { $code
             "TUPLE: rectangle width height ;"
@@ -166,127 +116,32 @@ CONSTANT: google-slides
         }
     }
     { $slide "Object system"
-        "We can ask an object if its a rectangle:"
-        { $code "70 65 <rectangle> rectangle? ." }
-        { $code "13 <circle> rectangle? ." }
-        { "How do we tell if something is a " { $emphasis "shape" } "?" }
+        "Object system handles dynamic redefinition very well"
+        { $code "TUPLE: person name age occupation ;" }
+        "Make an instance..."
     }
     { $slide "Object system"
-        "We define a mixin class for shapes, and add our existing data types as instances:"
-        { $code
-            "MIXIN: shape"
-            "INSTANCE: rectangle shape"
-            "INSTANCE: circle shape"
-            "INSTANCE: triangle shape"
-        }
+        "Let's add a new slot:"
+        { $code "TUPLE: person name age address occupation ;" }
+        "Fill it in with inspector..."
+        "Change the order:"
+        { $code "TUPLE: person name occupation address ;" }
     }
     { $slide "Object system"
-        "Now, we can ask objects if they are shapes or not:"
-        { $code "13 <circle> shape? ." }
-        { $code "3.14 shape? ." }
+        "How does it work?"
+        "Objects are not hashtables; slot access is very fast"
+        "Redefinition walks the heap; expensive but rare"
     }
     { $slide "Object system"
-        "Or put methods on shapes:"
-        { $code
-            "GENERIC: tell-me ( obj -- )"
-            ""
-            "M: shape tell-me"
-            "    \"My area is \" write area . ;"
-            ""
-            "M: integer tell-me"
-            "    \"I am \" write"
-            "    even? \"even\" \"odd\" ? print ;"
-        }
-    }
-    { $slide "Object system"
-        "Let's test our new generic word:"
-        { $code "13 <circle> tell-me" }
-        { $code "103 76 <rectangle> tell-me" }
-        { $code "101 tell-me" }
-        { { $link integer } ", " { $link array } ", and others are built-in classes" }
-    }
-    { $slide "Object system"
-        "Anyone can define new shapes..."
-        { $code
-            "TUPLE: parallelogram ... ;"
-            ""
-            "INSTANCE: parallelogram shape"
-            ""
-            "M: parallelogram area ... ;"
-            ""
-            "M: parallelogram perimeter ... ;"
-        }
+        "Supports \"duck typing\""
+        "Two tuples can have a slot with the same name"
+        "Code that uses accessors will work on both"
+        "Accessors are auto-generated generic words"
     }
     { $slide "Object system"
         "More: inheritance, type declarations, read-only slots, predicate, intersection, singleton classes, reflection"
-        "Object system is entirely implemented in Factor: 2184 lines"
+        "Object system is entirely implemented in Factor"
         { { $vocab-link "generic" } ", " { $vocab-link "classes" } ", " { $vocab-link "slots" } }
-    }
-    { $slide "Collections"
-        "Sequences (arrays, vector, strings, ...)"
-        "Associative mappings (hashtables, ...)"
-        { "More: deques, heaps, purely functional structures, disjoint sets, and more: "
-        { $link T{ vocab-tag f "collections" } } }
-    }
-    { $slide "Sequences"
-        { "Protocol: " { $link length } ", " { $link set-length } ", " { $link nth } ", " { $link set-nth } }
-        { "Combinators: " { $link each } ", " { $link map } ", " { $link filter } ", " { $link produce } ", and more: " { $link "sequences-combinators" } }
-        { "Utilities: " { $link append } ", " { $link reverse } ", " { $link first } ",  " { $link second } ", ..." }
-    }
-    { $slide "Example: bin packing"
-        { "We have " { $emphasis "m" } " objects and " { $emphasis "n" } " bins, and we want to distribute these objects as evenly as possible." }
-        { $vocab-link "distribute-example" }
-        "Demonstrates various sequence utilities and vector words"
-        { $code "20 13 distribute ." }
-    }
-    { $slide "Unicode strings"
-        "Strings are sequences of 21-bit Unicode code points"
-        "Efficient implementation: ASCII byte string unless it has chars > 127"
-        "If a byte char has high bit set, the remaining 14 bits come from auxiliary vector"
-    }
-    { $slide "Unicode strings"
-        "Unicode-aware case conversion, char classes, collation, word breaks, and so on..."
-        { $code "USE: unicode.case" "\"ß\" >upper ." }
-    }
-    { $slide "Unicode strings"
-        "All external byte I/O is encoded/decoded"
-        "ASCII, UTF8, UTF16, EBCDIC..."
-        { $code "USE: io.encodings.utf8" "\"document.txt\" utf8" "[ readln ] with-file-reader" }
-        { "Binary I/O is supported as well with the " { $link binary } " encoding" }
-    }
-    { $slide "Associative mappings"
-        { "Protocol: " { $link assoc-size } ", " { $link at* } ", " { $link set-at } ", " { $link delete-at } }
-        { "Combinators: " { $link assoc-each } ", " { $link assoc-map } ", " { $link assoc-filter } ", and more: " { $link "assocs-combinators" } }
-        { "Utilities: " { $link at } ", " { $link key? } ", ..." }
-    }
-    ! { $slide "Example: soundex"
-    !     { $vocab-link "soundex" }
-    !     "From Wikipedia: \"Soundex is a phonetic algorithm for indexing names by sound, as pronounced in English.\""
-    !     "Factored into many small words, uses sequence and assoc operations, no explicit loops"
-    ! }
-    { $slide "Locals and lexical scope"
-        "Sometimes, there's no good stack solution to a problem"
-        "Or, you're porting existing code in a quick-and-dirty way"
-        "Our solution: implement named locals as a DSL in Factor"
-        "Influenced by Scheme and Lisp"
-    }
-    { $slide "Locals and lexical scope"
-        { "Define lambda words with " { $link POSTPONE: :: } }
-        { "Establish bindings with " { $link POSTPONE: [let } " and " { $snippet "[let*" } }
-        "Mutable bindings with correct semantics"
-        { "Named inputs for quotations with " { $link POSTPONE: [| } }
-        "Full closures"
-    }
-    { $slide "Locals and lexical scope"
-        "Two examples:"
-        { $vocab-link "lambda-quadratic" }
-        { $vocab-link "closures-example" }
-    }
-    { $slide "Locals and lexical scope"
-        "Locals are entirely implemented in Factor: 477 lines"
-        "Example of compile-time meta-programming"
-        "No performance penalty -vs- using the stack"
-        "In the base image, only 59 words out of 13,000 use locals"
     }
     { $slide "The parser"
         "All data types have a literal syntax"
@@ -295,9 +150,11 @@ CONSTANT: google-slides
         { $code "H{ { \"cookies\" 12 } { \"milk\" 10 } }" }
         "Libraries can define new parsing words"
     }
-    { $slide "The parser"
-        { "Example: URLs define a " { $link POSTPONE: URL" } " word" }
-        { $code "URL\" http://paste.factorcode.org/paste?id=81\"" }
+    { $slide "Example: float arrays"
+        { $vocab-link "specialized-arrays.float" }
+        "Avoids boxing and unboxing overhead"
+        "Implemented with library code"
+        { $code "float-array{ 3.14 7.6 10.3 }" }
     }
     { $slide "Example: memoization"
         { "Memoization with " { $link POSTPONE: MEMO: } }
@@ -331,44 +188,12 @@ CONSTANT: google-slides
         "Second category: defining new types of words"
         "Some parsing words are more complicated"
     }
-    { $slide "Parser expression grammars"
+    { $slide "Example: printf"
         { { $link POSTPONE: EBNF: } ": a complex parsing word" }
-        "Implements a custom syntax for expressing parsers"
+        "Implements a custom syntax for expressing parsers: like OMeta!"
         { "Example: " { $vocab-link "printf-example" } }
         { $code "\"vegan\" \"cheese\" \"%s is not %s\\n\" printf" }
         { $code "5 \"Factor\" \"%s is %d years old\\n\" printf" }
-    }
-    { $slide "Input/output library"
-        "One of Factor's strongest points: portable, full-featured, efficient"
-        { $vocab-link "io.files" }
-        { $vocab-link "io.launcher" }
-        { $vocab-link "io.monitors" }
-        { $vocab-link "io.mmap" }
-        { $vocab-link "http.client" }
-        "... and so on"
-    }
-    { $slide "Example: file system monitors"
-        { $code
-            "USE: io.monitors"
-            ""
-            ": forever ( quot -- ) '[ @ t ] loop ; inline"
-            ""
-            "\"/tmp\" t <monitor>"
-            "'[ _ next-change . ] forever"
-        }
-    }
-    { $slide "Example: time server"
-        { $vocab-link "time-server" }
-        { "Demonstrates " { $vocab-link "io.servers" } " vocabulary, threads" }
-    }
-    { $slide "Example: what is my IP?"
-        { $vocab-link "webapps.ip" }
-        "Simple web app, defines a single action, use an XHTML template"
-        "Web framework supports more useful features: sessions, SSL, form validation, ..."
-    }
-    { $slide "Example: Yahoo! web search"
-        { $vocab-link "yahoo" }
-        { "Demonstrates " { $vocab-link "http.client" } ", " { $vocab-link "xml" } }
     }
     { $slide "Example: simple web browser"
         { $vocab-link "webkit-demo" }
@@ -376,22 +201,100 @@ CONSTANT: google-slides
         "Let's deploy a stand-alone binary with the deploy tool"
         "Deploy tool generates binaries with no external dependencies"
     }
-    { $slide "Example: environment variables"
-        { $vocab-link "environment" }
-        "Hooks are generic words which dispatch on dynamically-scoped variables"
-        { "Implemented in an OS-specific way: " { $vocab-link "environment.unix" } ", " { $vocab-link "environment.windows" } }
+    { $slide "Locals and lexical scope"
+        "Sometimes, there's no good stack solution to a problem"
+        "Or, you're porting existing code in a quick-and-dirty way"
+        "Our solution: implement named locals as a DSL in Factor"
+        "Influenced by Scheme and Lisp"
     }
-    { $slide "Example: environment variables"
-        "Implementations use C FFI"
-        "Call C functions, call function pointers, call Factor from C, structs, floats, ..."
-        "No need to write C wrapper code"
+    { $slide "Locals and lexical scope"
+        { "Define lambda words with " { $link POSTPONE: :: } }
+        { "Establish bindings with " { $link POSTPONE: [let } " and " { $snippet "[let*" } }
+        "Mutable bindings with correct semantics"
+        { "Named inputs for quotations with " { $link POSTPONE: [| } }
+        "Full closures"
+    }
+    { $slide "Locals and lexical scope"
+        "Combinator with 5 parameters!"
+        { $code
+            ":: branch ( a b neg zero pos -- )"
+            "    a b = zero [ a b < neg pos if ] if ; inline"
+        }
+        "Unwieldy with the stack"
+    }
+    { $slide "Locals and lexical scope"
+        { $code
+            "ERROR: underage-exception ;"
+            ""
+            ": check-drinking-age ( age -- )"
+            "    21"
+            "    [ underage-exception ]"
+            "    [ \"Grats, you're now legal\" print ]"
+            "    [ \"Go get hammered\" print ]"
+            "    branch ;"
+        }
+    }
+    { $slide "Locals and lexical scope"
+        "Locals are entirely implemented in Factor"
+        "Example of compile-time meta-programming"
+        "No performance penalty -vs- using the stack"
+        "In the base image, only 59 words out of 13,000 use locals"
+    }
+    { $slide "More about partial application"
+        { { $link POSTPONE: '[ } " is \"fry syntax\"" }
+        { $code "'[ _ + ] == [ + ] curry" }
+        { $code "'[ @ t ] == [ t ] compose" }
+        { $code "'[ _ nth @ ] == [ [ nth ] curry ] dip compose" }
+        { $code "'[ [ _ ] dip nth ] == [ [ ] curry dip nth ] curry" }
+        { "Fry and locals desugar to " { $link curry } ", " { $link compose } }
+    }
+    { $slide "More about partial application"
+        { { $link call } " is fundamental" }
+        { { $link quotation } ", " { $link curry } " and " { $link compose } " are classes" }
+        { $code
+            "GENERIC: call ( quot -- )"
+            "M: curry call uncurry call ;"
+            "M: compose call uncompose slip call ;"
+            "M: quotation call (call) ;"
+        }
+        { "So " { $link curry } ", " { $link compose } " are library features" }
+    }
+    { $slide "Why stack-based?"
+        "Because nobody else is doing it"
+        "Interesting properties: concatenation is composition, chaining functions together, \"fluent\" interfaces, new combinators"
+        { $vocab-link "smtp-example" }
+        { $code
+            "{ \"chicken\" \"beef\" \"pork\" \"turkey\" }"
+            "[ 5 short head ] map ."
+        }
+        "To rattle people's cages"
+    }
+    { $slide "Help system"
+        "Help markup is just literal data"
+        { "Look at the help for " { $link T{ link f + } } }
+        "These slides are built with the help system and a custom style sheet"
+        { $vocab-link "talks.vpri-talk" }
+    }
+    { $slide "Some line counts"
+        "VM: 12,000 lines of C"
+        "core: 9,000 lines of Factor"
+        "basis: 80,000 lines of Factor"
+    }
+    { $slide "More line counts"
+        "Object system (core): 2184 lines"
+        "Dynamic variables (core): 40 lines"
+        "Deterministic scoped destructors (core): 56 lines"
+        "Optimizing compiler (basis): 12938 lines"
+        "Lexical variables and closures (basis): 477 lines"
+        "Fry (basis): 51 lines"
+        "Help system (basis): 1831 lines"
     }
     { $slide "Implementation"
-        "VM: 12,000 lines of C"
-        "Generational garbage collection"
-        "core: 9,000 lines of Factor"
-        "Optimizing native code compiler for x86, PowerPC"
-        "basis: 80,000 lines of Factor"
+        "VM: garbage collection, bignums, ..."
+        "Bootstrap image: parser, hashtables, object system, ..."
+        "Non-optimizing compiler"
+        "Stage 2 bootstrap: optimizing compiler, UI, ..."
+        "Full image contains machine code"
     }
     { $slide "Compiler"
         { "Let's look at " { $vocab-link "benchmark.mandel" } }
@@ -437,7 +340,7 @@ CONSTANT: google-slides
     }
     { $slide "Compiler: escape analysis"
         "We identify allocations for tuples which are never returned or passed to other words (except slot access)"
-        { "Partial application with " { $link POSTPONE: '[ } }
+        { "Partial application with " { $link curry } " and " { $link compose } }
         "Complex numbers"
     }
     { $slide "Compiler: escape analysis"
@@ -451,6 +354,7 @@ CONSTANT: google-slides
         { "No-ops like " { $snippet "0 +" } ", " { $snippet "1 *" } }
         "Literals which are never used"
         "Side-effect-free words whose outputs are dropped"
+        { $code "[ c pixel ] optimized." }
     }
     { $slide "Compiler: low level IR"
         "Register-based SSA"
@@ -522,6 +426,21 @@ CONSTANT: google-slides
         "Generational copying for data"
         "Mark sweep for native code"
     }
+    { $slide "History"
+        "Started in 2003, implemented in Java"
+        "Scripting language for a 2D shooter game"
+        "Interactive development is addictive"
+        "I wanted to write entire applications in Factor"
+        "Added JVM bytecode compiler pretty early on"
+    }
+    { $slide "History"
+        "Wrote native C implementation, mid-2004"
+        "Added native compiler at some point"
+        "Added an FFI, SDL bindings, then UI"
+        "Switched UI to OpenGL and native APIs"
+        "Generational GC"
+        "Got rid of interpreter"
+    }
     { $slide "Project infrastructure"
         { $url "http://factorcode.org" }
         { $url "http://concatenative.org" }
@@ -556,15 +475,18 @@ CONSTANT: google-slides
         "Embedding Factor in C apps"
         "Cross-compilation for smaller devices"
     }
+    { $slide "Research areas"
+        "Identify areas where stack languages are lacking, and try to find idioms, abstractions or DSLs to solve these problems"
+        "Factor is a good platform for DSLs (fry, locals, EBNF, help, ...); what about implementing a complete language on top?"
+        "Static typing, soft typing, for stack-based languages"
+    }
     { $slide "That's all, folks"
         "It is hard to cover everything in a single talk"
         "Factor has many cool things that I didn't talk about"
-        "Put your prejudices aside and give it a shot!"
+        "Questions?"
     }
-    { $slide "Questions?" }
 }
 
-: google-talk ( -- )
-    google-slides "Google Tech talk" slides-window ;
+: vpri-talk ( -- ) vpri-slides "VPRI talk" slides-window ;
 
-MAIN: google-talk
+MAIN: vpri-talk

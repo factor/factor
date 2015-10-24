@@ -7,7 +7,7 @@ tools.annotations tools.crossref help.topics math.functions
 compiler.tree.optimizer compiler.cfg.optimizer fry
 ui.gadgets.panes tetris tetris.game combinators generalizations
 multiline sequences.private ;
-IN: otug-talk
+IN: talks.otug-talk
 
 : $tetris ( element -- )
     drop [ <default-tetris> <tetris-gadget> gadget. ] ($block) ;
@@ -78,11 +78,11 @@ CONSTANT: otug-slides
     }
     { $slide "Data flow combinators - cleave family"
         { { $link bi } ", " { $link tri } ", " { $link cleave } }
-        { $image "resource:extra/otug-talk/bi.tiff" }
+        { $image "resource:extra/talks/otug-talk/bi.tiff" }
     }
     { $slide "Data flow combinators - cleave family"
         { { $link 2bi } ", " { $link 2tri } ", " { $link 2cleave } }
-        { $image "resource:extra/otug-talk/2bi.tiff" }
+        { $image "resource:extra/talks/otug-talk/2bi.tiff" }
     }
     { $slide "Data flow combinators"
         "First, let's define a data type:"
@@ -101,19 +101,19 @@ CONSTANT: otug-slides
     }
     { $slide "Data flow combinators - spread family"
         { { $link bi* } ", " { $link tri* } ", " { $link spread } }
-        { $image "resource:extra/otug-talk/bi_star.tiff" }
+        { $image "resource:extra/talks/otug-talk/bi_star.tiff" }
     }
     { $slide "Data flow combinators - spread family"
         { { $link 2bi* } }
-        { $image "resource:extra/otug-talk/2bi_star.tiff" }
+        { $image "resource:extra/talks/otug-talk/2bi_star.tiff" }
     }
     { $slide "Data flow combinators - apply family"
         { { $link bi@ } ", " { $link tri@ } ", " { $link napply } }
-        { $image "resource:extra/otug-talk/bi_at.tiff" }
+        { $image "resource:extra/talks/otug-talk/bi_at.tiff" }
     }
     { $slide "Data flow combinators - apply family"
         { { $link 2bi@ } }
-        { $image "resource:extra/otug-talk/2bi_at.tiff" }
+        { $image "resource:extra/talks/otug-talk/2bi_at.tiff" }
     }
     { $slide "Shuffle words"
         "When data flow combinators are not enough"
@@ -258,7 +258,7 @@ var price = (order == null ? null : order.price);" }
         "Help markup is just literal data"
         { "Look at the help for " { $link T{ link f + } } }
         "These slides are built with the help system and a custom style sheet"
-        { $vocab-link "otug-talk" }
+        { $vocab-link "talks.otug-talk" }
     }
     { $slide "The VM"
         "Lowest level is the VM: ~12,000 lines of C"
