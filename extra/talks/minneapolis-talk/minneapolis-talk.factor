@@ -1,6 +1,6 @@
 USING: slides help.markup math arrays hashtables namespaces
 sequences kernel parser memoize ;
-IN: minneapolis-talk
+IN: talks.minneapolis-talk
 
 CONSTANT: minneapolis-slides
 {

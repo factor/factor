@@ -6,7 +6,7 @@ locals kernel.private help.vocabs assocs quotations
 urls peg.ebnf tools.annotations tools.crossref
 help.topics math.functions compiler.tree.optimizer
 compiler.cfg.optimizer fry ;
-IN: galois-talk
+IN: talks.galois-talk
 
 CONSTANT: galois-slides
 {
@@ -230,7 +230,7 @@ CONSTANT: galois-slides
         "Help markup is just literal data"
         { "Look at the help for " { $link T{ link f + } } }
         "These slides are built with the help system and a custom style sheet"
-        { $vocab-link "galois-talk" }
+        { $vocab-link "talks.galois-talk" }
     }
     { $slide "Why stack-based?"
         "Because nobody else is doing it"
