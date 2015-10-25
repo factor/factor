@@ -59,15 +59,14 @@ os windows? [
         ubyte-components >>component-type
         f >>upside-down? ;
 
-! Only one pixel format supported, but I can't find images in the
-! wild, loaded using gdi+, in which the format is different.
+! Loaded images usually have the format BGRA, text rendered BGRX.
 ERROR: unsupported-pixel-format component-order ;
 
-: check-pixel-format ( image -- )
-    component-order>> dup BGRA = [ drop ] [ unsupported-pixel-format ] if ;
+: check-pixel-format ( component-order -- )
+    dup { BGRX BGRA } member? [ drop ] [ unsupported-pixel-format ] if ;
 
 : image>gdi+-bitmap ( image -- bitmap )
-    dup check-pixel-format
+    dup component-order>> check-pixel-format
     [ dim>> first2 ] [ rowstride PixelFormat32bppARGB ] [ bitmap>> ] tri
     { void* } [
         GdipCreateBitmapFromScan0 check-gdi+-status
