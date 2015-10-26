@@ -15,10 +15,8 @@ IN: ui.backend.cocoa
 
 TUPLE: handle ;
 TUPLE: window-handle < handle view window ;
-TUPLE: offscreen-handle < handle context buffer ;
 
 C: <window-handle> window-handle
-C: <offscreen-handle> offscreen-handle
 
 SINGLETON: cocoa-ui-backend
 
@@ -181,40 +179,14 @@ M: cocoa-ui-backend raise-window* ( world -- )
         NSApp 1 -> activateIgnoringOtherApps:
     ] when* ;
 
-: pixel-size ( pixel-format -- size )
-    color-bits (pixel-format-attribute) -3 shift ;
-
-: offscreen-buffer ( world pixel-format -- alien w h pitch )
-    [ dim>> first2 ] [ pixel-size ] bi*
-    { [ * * malloc ] [ 2drop ] [ drop nip ] [ nip * ] } 3cleave ;
-
-:: gadget-offscreen-context ( world -- context buffer )
-    world [
-        nip :> pf
-        NSOpenGLContext -> alloc pf handle>> f -> initWithFormat:shareContext:
-        dup world pf offscreen-buffer
-        4 npick [ -> setOffScreen:width:height:rowbytes: ] dip
-    ] with-world-pixel-format ;
-
-M: cocoa-ui-backend (open-offscreen-buffer) ( world -- )
-    dup gadget-offscreen-context <offscreen-handle> >>handle drop ;
-
-M: cocoa-ui-backend (close-offscreen-buffer) ( handle -- )
-    [ context>> -> release ]
-    [ buffer>> free ] bi ;
-
 GENERIC: (gl-context) ( handle -- context )
 M: window-handle (gl-context) view>> -> openGLContext ;
-M: offscreen-handle (gl-context) context>> ;
 
 M: handle select-gl-context ( handle -- )
     (gl-context) -> makeCurrentContext ;
 
 M: handle flush-gl-context ( handle -- )
     (gl-context) -> flushBuffer ;
-
-M: cocoa-ui-backend offscreen-pixels ( world -- alien w h )
-    [ handle>> buffer>> ] [ dim>> first2 neg ] bi ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
