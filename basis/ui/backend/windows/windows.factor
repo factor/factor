@@ -22,9 +22,7 @@ SINGLETON: windows-ui-backend
 
 TUPLE: win-base hDC hRC ;
 TUPLE: win < win-base hWnd world title ;
-TUPLE: win-offscreen < win-base hBitmap bits ;
 C: <win> win
-C: <win-offscreen> win-offscreen
 
 <PRIVATE
 
@@ -734,20 +732,6 @@ M: win-base select-gl-context ( handle -- )
 M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
 
-: setup-offscreen-gl ( world -- )
-    dup [ handle>> ] [ dim>> ] bi make-offscreen-dc-and-bitmap
-    [ >>hDC ] [ >>hBitmap ] [ >>bits ] tri* drop [
-        swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi
-    ] with-world-pixel-format ;
-
-M: windows-ui-backend (open-offscreen-buffer) ( world -- )
-    win-offscreen new >>handle
-    setup-offscreen-gl ;
-
-M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
-    [ hDC>> DeleteDC drop ]
-    [ hBitmap>> DeleteObject drop ] bi ;
-
 ! Windows 32-bit bitmaps don't actually use the alpha byte of
 ! each pixel; it's left as zero
 
@@ -758,9 +742,6 @@ M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
 
 : (opaque-pixels) ( world -- pixels )
     [ handle>> bits>> ] [ dim>> ] bi bitmap>byte-array (make-opaque) ;
-
-M: windows-ui-backend offscreen-pixels ( world -- alien w h )
-    [ (opaque-pixels) ] [ dim>> first2 ] bi ;
 
 M: windows-ui-backend raise-window* ( world -- )
     handle>> [ hWnd>> SetFocus drop ] when* ;

@@ -15,17 +15,11 @@ HOOK: (open-window) ui-backend ( world -- )
 
 HOOK: (close-window) ui-backend ( handle -- )
 
-HOOK: (open-offscreen-buffer) ui-backend ( world -- )
-
-HOOK: (close-offscreen-buffer) ui-backend ( handle -- )
-
 HOOK: raise-window* ui-backend ( world -- )
 
 GENERIC: select-gl-context ( handle -- )
 
 GENERIC: flush-gl-context ( handle -- )
-
-HOOK: offscreen-pixels ui-backend ( world -- alien w h )
 
 HOOK: (with-ui) ui-backend ( quot -- )
 
