@@ -64,7 +64,6 @@ SYMBOL: ui-windows
         [ [ title>> ] keep set-title ]
         [ begin-world ]
         [ resize-world ]
-        [ t >>active? drop ]
         [ request-focus ]
     } cleave ;
 
