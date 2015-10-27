@@ -257,12 +257,17 @@ CONSTANT: action-key-codes
     2drop window relayout t ;
 
 : on-configure ( win event user-data -- ? )
-    drop [ window ] [ GdkEventConfigure memory>struct ] bi*
-    [ event-loc >>window-loc ] [ event-dim >>dim ] bi
-    relayout-1 f ;
+    drop swap window dup active?>> 50 >= [
+        100 >>active? swap GdkEventConfigure memory>struct
+        [ event-loc >>window-loc ] [ event-dim >>dim ] bi
+        relayout-1
+    ] [ 2drop ] if f ;
 
 : on-delete ( win event user-data -- ? )
     2drop window ungraft t ;
+
+: on-map ( win event user-data -- ? )
+    2drop window 50 >>active? drop t ;
 
 :: connect-win-state-signals ( win -- )
     win "expose-event" [ on-expose yield ]
@@ -270,7 +275,9 @@ CONSTANT: action-key-codes
     win "configure-event" [ on-configure yield ]
     GtkWidget:configure-event connect-signal
     win "delete-event" [ on-delete yield ]
-    GtkWidget:delete-event connect-signal ;
+    GtkWidget:delete-event connect-signal
+    win "map-event" [ on-map yield ]
+    GtkWidget:map-event connect-signal ;
 
 ! Input methods
 

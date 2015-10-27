@@ -57,6 +57,7 @@ M: world expose-event nip relayout ;
 
 M: world configure-event
     swap [ event-loc >>window-loc ] [ event-dim >>dim ] bi
+    100 >>active?
     ! In case dimensions didn't change
     relayout-1 ;
 

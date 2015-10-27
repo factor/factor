@@ -143,7 +143,8 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     world window save-position
     window install-window-delegate
     view window <window-handle> world handle<<
-    window f -> makeKeyAndOrderFront: ;
+    window f -> makeKeyAndOrderFront:
+    100 window active?<< ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
     [
