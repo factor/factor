@@ -222,7 +222,7 @@ these lines in your .emacs:
     "CONSULT:" "call-next-method"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
-    "GAME:" "GIR:"
+    "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HINTS:"
     "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
@@ -230,7 +230,7 @@ these lines in your .emacs:
     "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only" "REQUIRE:"  "REQUIRES:"
-    "SINGLETONS:" "SLOT:"
+    "SLOT:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
     "TYPED:" "TYPED::"
     "UNIFORM-TUPLE:"
@@ -282,12 +282,14 @@ these lines in your .emacs:
 (defconst factor-bad-string-regex
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
+(defconst factor-word-starters
+  '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
+    "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
+    "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::"))
+
 (defconst factor-word-definition-regex
   (concat
-   (format "\\_<\\(\\(?:%s\\)?[:#]\\)"
-           (regexp-opt
-            '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "MEMO" "MEMO:"
-              "POSTPONE" "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:")))
+   (format "\\_<\\(%s\\)" (regexp-opt factor-word-starters))
    ws+ symbol))
 
 ;; [parsing-word] [vocab-word]
@@ -300,15 +302,15 @@ these lines in your .emacs:
 ;; [parsing-word] [symbol-word]
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
-   '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "HELP" "LIBRARY"
+   '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "GAME" "HELP" "LIBRARY"
      "MAIN" "MAIN-WINDOW" "STRING" "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
 (defconst factor-symbols-lines-regex
   (concat (syntax-begin '("SYMBOLS")) ws+ symbols-to-semicolon))
 
-;; (defconst factor-int-constant-def-regex
-;;   (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")))
+(defconst factor-types-lines-regex
+  (concat (syntax-begin '("SINGLETONS")) ws+ symbols-to-semicolon))
 
 (defconst factor-type-definition-regex
   (syntax-and-1-symbol
@@ -416,6 +418,9 @@ these lines in your .emacs:
           symbol ws+
           "\\(=>\\)" ws+ symbols-to-semicolon))
 
+(defconst factor-predicate-regex
+  (concat (syntax-begin '("PREDICATE")) ws+ symbol ws+ "\\(<\\)" ws+ symbol))
+
 (defconst factor-group-name-to-face
   #s(hash-table test equal data
                 ("C" 'factor-font-lock-comment
@@ -460,6 +465,7 @@ these lines in your .emacs:
     ,(factor-syntax factor-word-definition-regex '("P" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
     ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
+    ,(factor-syntax factor-types-lines-regex '("P" "T"))
     (,factor-integer-regex . 'factor-font-lock-number)
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
@@ -496,11 +502,7 @@ these lines in your .emacs:
       nil
       (1 'factor-font-lock-symbol nil t)
       (2 'factor-font-lock-symbol nil t)))
-    ;; Highlights predicates
-    (,(format "\\(PREDICATE\\):[ \n]%s[ \n]<[ \n]%s" symbol symbol)
-     (1 'factor-font-lock-parsing-word)
-     (2 'factor-font-lock-type-name)
-     (3 'factor-font-lock-type-name))
+    ,(factor-syntax factor-predicate-regex '("P" "T" "P" "T"))
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.
     (,(format "\\(\\(?:GL-\\)?FUNCTION\\|CALLBACK\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
