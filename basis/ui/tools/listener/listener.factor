@@ -321,16 +321,30 @@ M: object accept-completion-hook 2drop ;
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
     parse-lines-interactive ;
 
-: <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger>
+: do-recall? ( table error -- ? )
+    [ selection>> value>> not ] [ lexer-error? ] bi* and ;
+
+: recall-lexer-error ( interactor error -- )
+    over recall-previous go-to-error ;
+
+: make-restart-hook-quot ( error interactor -- quot )
+    over '[
+        dup hide-glass
+        _ do-recall? [ _ _ recall-lexer-error ] when
+    ] ;
+
+: frame-debugger ( debugger -- labeled )
     "Error" debugger-color <framed-labeled> ;
 
-: recall-on-lexer-error ( interactor error -- )
-    dup lexer-error? [ over recall-previous go-to-error ] [ 2drop ] if ;
+:: <debugger-popup> ( error continuation interactor -- popup )
+    error
+    continuation
+    error compute-restarts
+    error interactor make-restart-hook-quot
+    <debugger> frame-debugger ;
 
 : debugger-popup ( interactor error continuation -- )
-    2over recall-on-lexer-error
-    [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
+    pick <debugger-popup> one-line-elt swap show-listener-popup ;
 
 : try-parse ( lines -- quot/f )
     [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
