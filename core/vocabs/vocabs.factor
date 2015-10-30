@@ -161,3 +161,6 @@ M: string require ( vocab -- )
 
 : load-vocab ( name -- vocab )
     [ require ] [ lookup-vocab ] bi ;
+
+: ensure-vocab-loaded ( name -- )
+    dup lookup-vocab [ drop ] [ require ] if ;
