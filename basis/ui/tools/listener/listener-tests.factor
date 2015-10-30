@@ -200,13 +200,6 @@ CONSTANT: text "Hello world.\nThis is a test."
 { } [ "l" get com-scroll-up ] unit-test
 { } [ "l" get com-scroll-down ] unit-test
 
-{ t t } [
-    T{ key-down f f "UP" } T{ key-down f { C+ } "p" }
-    [ <interactor> get-gesture-handler ] same?
-    T{ key-down f f "DOWN" } T{ key-down f { C+ } "n" }
-    [ <interactor> get-gesture-handler ] same?
-] unit-test
-
 ! stream-read-quot
 { [ 3 4 + ] } [
     <listener-gadget> input>> [ register-self ] keep
