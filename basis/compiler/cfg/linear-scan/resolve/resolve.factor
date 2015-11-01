@@ -29,7 +29,7 @@ SYMBOL: temp-spills
 
 : temp-spill ( rep -- spill-slot )
     rep-size temp-spills get
-    [ next-spill-slot ] cache ;
+    [ cfg get next-spill-slot ] cache ;
 
 SYMBOL: temp-locations
 

@@ -2,8 +2,8 @@ USING: accessors assocs combinators.extras compiler.cfg
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-compiler.cfg.utilities cpu.architecture cpu.x86.assembler.operands heaps
-kernel layouts literals namespaces sequences system tools.test ;
+compiler.cfg.utilities cpu.architecture cpu.x86.assembler.operands fry
+heaps kernel layouts literals namespaces sequences system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.state.tests
 
 ! active-intervals-for
@@ -128,14 +128,11 @@ ${ cell } [
 
 ! next-spill-slot
 {
+    T{ cfg { spill-area-size 16 } }
     T{ spill-slot f 0 }
     T{ spill-slot f 8 }
-    T{ cfg { spill-area-size 16 } }
 } [
-    H{ } clone spill-slots set
-    T{ cfg { spill-area-size 0 } } cfg set
-    [ 8 next-spill-slot ] twice
-    cfg get
+    T{ cfg { spill-area-size 0 } } dup '[ 8 _ next-spill-slot ] twice
 ] unit-test
 
 ! >unhandled-min-heap
