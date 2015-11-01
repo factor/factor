@@ -113,10 +113,8 @@ ERROR: register-already-used live-interval ;
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
 
-: next-spill-slot ( size -- spill-slot )
-    cfg get
-    [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
-    <spill-slot> ;
+: next-spill-slot ( size cfg -- spill-slot )
+    [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop <spill-slot> ;
 
 : align-spill-area ( align cfg -- )
     [ max ] change-spill-area-align drop ;
@@ -126,7 +124,7 @@ SYMBOL: spill-slots
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
     rep-size
     [ cfg get align-spill-area ]
-    [ spill-slots get [ nip next-spill-slot ] 2cache ]
+    [ spill-slots get [ nip cfg get next-spill-slot ] 2cache ]
     bi ;
 
 : lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
