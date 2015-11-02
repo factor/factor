@@ -6,9 +6,9 @@ combinators.short-circuit continuations destructors environment io
 io.backend io.binary io.buffers io.files io.files.private
 io.files.types io.pathnames io.ports io.streams.c io.streams.null
 io.timeouts kernel libc literals locals math math.bitwise namespaces
-sequences specialized-arrays system threads tr windows windows.errors
-windows.handles windows.kernel32 windows.shell32 windows.time
-windows.types windows.winsock ;
+sequences specialized-arrays system threads tr vectors windows
+windows.errors windows.handles windows.kernel32 windows.shell32
+windows.time windows.types windows.winsock ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -381,3 +381,34 @@ M: windows home
         [ "USERPROFILE" os-env ]
         [ my-documents ]
     } 0|| ;
+
+: STREAM_DATA>out ( WIN32_FIND_STREAM_DATA -- pair/f )
+    [ cStreamName>> alien>native-string ]
+    [ StreamSize>> ] bi 2array ;
+
+: file-streams-rest ( streams handle -- streams )
+    WIN32_FIND_STREAM_DATA <struct>
+    [ FindNextStream ] 2keep
+    rot zero? [
+        GetLastError ERROR_HANDLE_EOF = [ win32-error ] unless
+        2drop
+    ] [
+        pick push file-streams-rest
+    ] if ;
+
+: file-streams ( path -- streams )
+    FindStreamInfoStandard
+    WIN32_FIND_STREAM_DATA <struct>
+    0
+    [ FindFirstStream ] 2keep drop
+    over ALIEN: -1 = [
+        2drop throw-win32-error
+    ] [
+        1vector swap file-streams-rest
+    ] if ;
+
+: alternate-file-streams ( path -- streams )
+    file-streams [ cStreamName>> alien>native-string "::$DATA" = not ] filter ;
+
+: alternate-file-streams? ( path -- streams )
+    alternate-file-streams empty? not ;
