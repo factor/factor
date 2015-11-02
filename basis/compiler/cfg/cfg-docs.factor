@@ -1,6 +1,6 @@
-USING: compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.stack-frame compiler.tree help.markup help.syntax namespaces
-sequences vectors words ;
+USING: compiler.cfg.instructions compiler.cfg.rpo
+compiler.cfg.stack-frame compiler.tree help.markup help.syntax math
+namespaces sequences vectors words ;
 IN: compiler.cfg
 
 HELP: basic-block
@@ -41,3 +41,7 @@ HELP: cfg-changed
 { $values { "cfg" cfg } }
 { $description "Resets all \"calculated\" slots in the cfg which forces them to be recalculated." }
 { $see-also predecessors-changed } ;
+
+HELP: spill-offset
+{ $values { "n" integer } { "offset" integer } }
+{ $description "Offset in the current " { $link stack-frame } " to byte at index 'n' in the spill area." } ;

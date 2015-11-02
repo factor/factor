@@ -27,7 +27,8 @@ HELP: assign-spill-slot
   { "rep" representation }
   { "spill-slot" spill-slot }
 }
-{ $description "Assigns a spill slot for the vreg." } ;
+{ $description "Assigns a spill slot for the vreg. The stack frames spill area align is updated so that it is at least as large as the vregs size. Then a " { $link spill-slot } " is assigned for the vreg/rep-size combination if one hasn't already been assigned and is put on the stack." }
+{ $see-also next-spill-slot } ;
 
 HELP: deactivate-intervals
 { $values { "n" integer } }

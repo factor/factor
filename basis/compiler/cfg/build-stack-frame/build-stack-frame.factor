@@ -53,18 +53,14 @@ M: insn compute-stack-frame* drop f ;
     dup calculate-spill-area-base >>spill-area-base
     dup stack-frame-size >>total-size ;
 
-: <stack-frame> ( cfg -- stack-frame )
-    stack-frame new
-        over spill-area-size>> >>spill-area-size
-        swap spill-area-align>> >>spill-area-align
+: compute-stack-frame ( cfg -- stack-frame/f )
+    dup cfg>insns f [ compute-stack-frame* or ] reduce [
+        stack-frame>>
         allot-area-size get >>allot-area-size
         allot-area-align get >>allot-area-align
         param-area-size get >>params
-        finalize-stack-frame ;
-
-: compute-stack-frame ( cfg -- stack-frame/f )
-    dup cfg>insns f [ compute-stack-frame* or ] reduce
-    [ <stack-frame> ] [ drop f ] if ;
+        finalize-stack-frame
+    ] [ drop f ] if ;
 
 : build-stack-frame ( cfg -- )
     0 param-area-size set

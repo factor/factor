@@ -1,8 +1,6 @@
-USING: compiler.cfg.linear-scan.resolve tools.test kernel namespaces
-accessors
-compiler.cfg
-compiler.cfg.instructions cpu.architecture make sequences
-compiler.cfg.linear-scan.allocation.state ;
+USING: accessors compiler.cfg compiler.cfg.instructions
+compiler.cfg.linear-scan.resolve compiler.cfg.utilities
+cpu.architecture kernel make namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.resolve.tests
 
 {
@@ -106,7 +104,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
     mapping-instructions
 ] unit-test
 
-cfg new 8 >>spill-area-size cfg set
+{ } insns>cfg [ stack-frame>> 8 >>spill-area-size drop ] [ cfg set ] bi
 init-resolve
 
 { t } [

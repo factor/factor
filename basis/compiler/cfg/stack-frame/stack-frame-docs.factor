@@ -27,10 +27,6 @@ HELP: (stack-frame-size)
 { $values { "stack-frame" stack-frame } { "n" integer } }
 { $description "Base stack frame size, without padding and alignment. If the size is zero, then no " { $link ##epilogue } " and " { $link ##prologue } " needs to be emitted for the word." } ;
 
-HELP: spill-offset
-{ $values { "n" integer } { "offset" integer } }
-{ $description "Offset in the current " { $link stack-frame } " to byte at index 'n' in the spill area." } ;
-
 ARTICLE: "compiler.cfg.stack-frame" "Stack frames"
 "This vocab contains definitions for constructing stack frames." ;
 

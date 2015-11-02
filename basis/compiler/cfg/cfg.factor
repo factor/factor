@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel layouts math namespaces vectors ;
+USING: accessors compiler.cfg.stack-frame kernel layouts math
+namespaces vectors ;
 IN: compiler.cfg
 
 TUPLE: basic-block < identity-tuple
@@ -20,8 +21,6 @@ TUPLE: cfg
     { entry basic-block }
     word
     label
-    { spill-area-size integer }
-    { spill-area-align integer }
     stack-frame
     frame-pointer?
     post-order linear-order
@@ -32,8 +31,7 @@ TUPLE: cfg
         swap >>entry
         swap >>label
         swap >>word
-        0 >>spill-area-size
-        cell >>spill-area-align ;
+        stack-frame new cell >>spill-area-align >>stack-frame ;
 
 : cfg-changed ( cfg -- )
     f >>post-order
@@ -46,3 +44,9 @@ TUPLE: cfg
 
 : with-cfg ( ..a cfg quot: ( ..a cfg -- ..b ) -- ..b )
     [ dup cfg ] dip with-variable ; inline
+
+: local-allot-offset ( n -- offset )
+    cfg get stack-frame>> allot-area-base>> + ;
+
+: spill-offset ( n -- offset )
+    cfg get stack-frame>> spill-area-base>> + ;

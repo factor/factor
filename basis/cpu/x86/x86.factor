@@ -1,20 +1,15 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs alien alien.c-types arrays strings
-cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
-cpu.x86.features cpu.x86.features.private cpu.architecture kernel
-kernel.private math memory namespaces make sequences words system
-layouts combinators math.order math.vectors fry locals compiler.constants
-byte-arrays io macros quotations classes.algebra compiler
-compiler.units init vm vocabs
-compiler.cfg.registers
-compiler.cfg.instructions
-compiler.cfg.intrinsics
-compiler.cfg.comparisons
-compiler.cfg.stack-frame
-compiler.codegen.gc-maps
-compiler.codegen.labels
-compiler.codegen.relocation ;
+USING: accessors alien arrays assocs byte-arrays classes.algebra
+combinators compiler compiler.cfg compiler.cfg.comparisons
+compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.cfg.registers compiler.cfg.stack-frame
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.constants compiler.units
+cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
+cpu.x86.assembler.private cpu.x86.features cpu.x86.features.private
+fry io kernel layouts locals make math math.order memory namespaces
+sequences system vm vocabs ;
 QUALIFIED-WITH: alien.c-types c
 FROM: math => float ;
 IN: cpu.x86
