@@ -28,17 +28,14 @@ check-allocation? on
 check-numbering? on
 
 ! Live interval calculation
-
-! A value is defined and never used; make sure it has the right
-! live range
-V{
-    T{ ##load-integer f 1 0 }
-    T{ ##replace-imm f D: 0 "hi" }
-    T{ ##branch }
-} 0 test-bb
-
 : test-live-intervals ( -- )
-    0 get block>cfg
+    ! A value is defined and never used; make sure it has the right
+    ! live range
+    {
+        T{ ##load-integer f 1 0 }
+        T{ ##replace-imm f D: 0 "hi" }
+        T{ ##branch }
+    } insns>cfg
     [ cfg set ] [ number-instructions ] [ compute-live-intervals ] tri
     drop ;
 
@@ -57,8 +54,7 @@ V{
 ] unit-test
 
 ! Live interval splitting
-
-cfg new 0 >>spill-area-size 4 >>spill-area-align cfg set
+{ } insns>cfg [ stack-frame>> 4 >>spill-area-align drop ] keep cfg set
 H{ } spill-slots set
 
 H{

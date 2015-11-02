@@ -5,7 +5,7 @@ classes.algebra byte-arrays make math math.order math.ranges
 system namespaces locals layouts words alien alien.accessors
 alien.c-types alien.complex alien.data alien.libraries
 literals cpu.architecture cpu.ppc.assembler
-compiler.cfg.registers compiler.cfg.instructions
+compiler.cfg compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.comparisons compiler.codegen.fixup
 compiler.cfg.intrinsics compiler.cfg.stack-frame
 compiler.cfg.build-stack-frame compiler.units compiler.constants

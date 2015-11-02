@@ -2,8 +2,9 @@ USING: accessors assocs combinators.extras compiler.cfg
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-compiler.cfg.utilities cpu.architecture cpu.x86.assembler.operands fry
-heaps kernel layouts literals namespaces sequences system tools.test ;
+compiler.cfg.stack-frame compiler.cfg.utilities cpu.architecture
+cpu.x86.assembler.operands fry heaps kernel layouts literals
+namespaces sequences system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.state.tests
 
 ! active-intervals-for
@@ -91,8 +92,22 @@ ${
 
 { t } [
     H{ } clone spill-slots set
-    f f <basic-block> <cfg> cfg set
+    { } insns>cfg cfg set
     55 int-rep assign-spill-slot spill-slots get values first eq?
+] unit-test
+
+{
+    H{
+        { { 55 8 } T{ spill-slot } }
+        { { 44 8 } T{ spill-slot { n 8 } } }
+    }
+} [
+    H{ } clone spill-slots set
+    { } insns>cfg cfg set
+    { { 55 int-rep } { 44 int-rep } { 55 int-rep } } [
+        assign-spill-slot drop
+    ] assoc-each
+    spill-slots get
 ] unit-test
 
 ! check-handled
@@ -107,7 +122,7 @@ ${
 
 ! align-spill-area
 ${ cell } [
-    3 { } insns>cfg [ align-spill-area ] keep
+    3 { } insns>cfg stack-frame>> [ align-spill-area ] keep
     spill-area-align>>
 ] unit-test
 
@@ -128,11 +143,14 @@ ${ cell } [
 
 ! next-spill-slot
 {
-    T{ cfg { spill-area-size 16 } }
     T{ spill-slot f 0 }
     T{ spill-slot f 8 }
+    T{ stack-frame
+       { spill-area-size 16 }
+       { spill-area-align 8 }
+    }
 } [
-    T{ cfg { spill-area-size 0 } } dup '[ 8 _ next-spill-slot ] twice
+    { } insns>cfg stack-frame>> [ '[ 8 _ next-spill-slot ] twice ] keep
 ] unit-test
 
 ! >unhandled-min-heap

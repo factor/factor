@@ -11,7 +11,10 @@ IN: compiler.cfg.tests
     {
         [ word>> ]
         [ label>> ]
-        [ spill-area-size>> ]
-        [ spill-area-align>> cell = ]
+        [
+            stack-frame>>
+            [ spill-area-size>> ]
+            [ spill-area-align>> cell = ] bi
+        ]
     } cleave
 ] unit-test
