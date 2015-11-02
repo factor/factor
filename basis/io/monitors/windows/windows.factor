@@ -54,9 +54,15 @@ TUPLE: win32-monitor < monitor port ;
 : memory>u16-string ( alien len -- string )
     memory>byte-array utf16n decode ;
 
+! Files on an NTFS downloaded from the internet may contain an
+! ADS (alternate data stream) such as foo.txt:Zone.Identifier
+! which the win32 API reports as the filename. We wish to strip this off
+! and instead work on the actual file contents instead of ADS data.
 : parse-notify-record ( buffer -- path changed )
-    [ [ FileName>> ] [ FileNameLength>> ] bi memory>u16-string ]
-    [ Action>> parse-action ] bi ;
+    [
+        [ FileName>> ] [ FileNameLength>> ] bi
+        memory>u16-string ":Zone.Identifier" ?tail drop
+    ] [ Action>> parse-action ] bi ;
 
 : (file-notify-records) ( buffer -- buffer )
     FILE_NOTIFY_INFORMATION memory>struct
