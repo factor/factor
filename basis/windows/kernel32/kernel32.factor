@@ -1161,6 +1161,28 @@ ALIAS: FindFirstChangeNotification FindFirstChangeNotificationW
 ! FUNCTION: FindFirstFileExW
 FUNCTION: HANDLE FindFirstFileW ( LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileData )
 ALIAS: FindFirstFile FindFirstFileW
+
+ENUM: STREAM_INFO_LEVELS
+    FindStreamInfoStandard
+    FindStreamInfoMaxInfoLevel ;
+
+STRUCT: WIN32_FIND_STREAM_DATA
+    { StreamSize LARGE_INTEGER }
+    { cStreamName WCHAR[292] } ;
+
+TYPEDEF: WIN32_FIND_STREAM_DATA* PWIN32_FIND_STREAM_DATA
+
+FUNCTION: HANDLE FindFirstStreamW (
+    LPCWSTR            lpFileName,
+    STREAM_INFO_LEVELS InfoLevel,
+    LPVOID             lpFindStreamData,
+    DWORD              dwFlags
+)
+ALIAS: FindFirstStream FindFirstStreamW
+
+FUNCTION: BOOL FindNextStreamW ( HANDLE hFindStream, LPVOID lpFindStreamData )
+ALIAS: FindNextStream FindNextStreamW
+
 ! FUNCTION: FindFirstVolumeA
 ! FUNCTION: FindFirstVolumeMountPointA
 
