@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs command-line concurrency.messaging
-continuations init io.backend io.files io.monitors io.pathnames
-kernel libc namespaces sequences sets splitting threads fry
-tr vocabs vocabs.loader vocabs.refresh vocabs.cache
-io.files.links ;
+USING: accessors command-line continuations fry init io
+io.backend io.files io.monitors io.pathnames kernel namespaces
+prettyprint sequences splitting threads tr vocabs vocabs.cache
+vocabs.loader vocabs.refresh ;
 IN: vocabs.refresh.monitor
 
 TR: convert-separators "/\\" ".." ;
@@ -43,8 +42,12 @@ TR: convert-separators "/\\" ".." ;
     [ [ t <monitor> monitor-loop ] with-monitors ] [ drop ] if ;
 
 : start-vocab-monitor ( vocab-root -- )
-    [ '[ [ _ (start-vocab-monitor) ] ignore-errors ] ]
-    [ "Root monitor: " prepend ]
+    [
+        dup '[
+            [ _ (start-vocab-monitor) ]
+            [ [ _ "fatal error for monitor root ``" "``: " surround write . flush ] with-global ] recover
+        ]
+    ] [ "Root monitor: " prepend ]
     bi spawn drop ;
 
 : init-vocab-monitor ( -- )
