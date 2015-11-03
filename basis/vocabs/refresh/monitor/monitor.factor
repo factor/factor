@@ -31,11 +31,17 @@ TR: convert-separators "/\\" ".." ;
     ! On OS X, monitors give us the full path, so we chop it
     ! off if its there.
     [
-        next-change path>> path>vocab
-        [ changed-vocab ] [ reset-cache ] bi
-    ]
-    [ monitor-loop ]
-    bi ;
+        next-change path>>
+        [
+            path>vocab
+            [ changed-vocab ] [ reset-cache ] bi
+        ] [
+            [
+                [ "monitor-loop warning for path ``" "``:" surround write ]
+                [ . ] bi* flush
+            ] with-global
+        ] recover
+    ] [ monitor-loop ] bi ;
 
 : (start-vocab-monitor) ( vocab-root -- )
     dup exists?
@@ -45,7 +51,12 @@ TR: convert-separators "/\\" ".." ;
     [
         dup '[
             [ _ (start-vocab-monitor) ]
-            [ [ _ "fatal error for monitor root ``" "``: " surround write . flush ] with-global ] recover
+            [
+                [
+                    _ "fatal error for monitor root ``" "``: " surround write
+                    . flush
+                ] with-global
+            ] recover
         ]
     ] [ "Root monitor: " prepend ]
     bi spawn drop ;
