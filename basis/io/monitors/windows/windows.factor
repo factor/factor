@@ -1,13 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.strings libc destructors
-locals kernel math assocs namespaces make continuations sequences
-hashtables sorting arrays combinators math.bitwise strings
-system accessors threads splitting io.backend
-io.files.windows io.monitors io.ports
-io.buffers io.files io.timeouts io.encodings.string literals
-io.encodings.utf16n io windows.errors windows.kernel32 windows.types
-io.pathnames classes.struct ;
+USING: accessors alien alien.data arrays classes.struct
+combinators continuations destructors io.backend
+io.encodings.string io.encodings.utf16n io.files.windows
+io.monitors io.pathnames io.ports kernel literals locals make
+math sequences system threads windows.errors windows.kernel32
+windows.types ;
 IN: io.monitors.windows
 
 : open-directory ( path -- handle )
@@ -54,14 +52,9 @@ TUPLE: win32-monitor < monitor port ;
 : memory>u16-string ( alien len -- string )
     memory>byte-array utf16n decode ;
 
-! Files on an NTFS downloaded from the internet may contain an
-! ADS (alternate data stream) such as foo.txt:Zone.Identifier
-! which the win32 API reports as the filename. We wish to strip this off
-! and instead work on the actual file contents instead of ADS data.
 : parse-notify-record ( buffer -- path changed )
     [
-        [ FileName>> ] [ FileNameLength>> ] bi
-        memory>u16-string ":Zone.Identifier" ?tail drop
+        [ FileName>> ] [ FileNameLength>> ] bi memory>u16-string
     ] [ Action>> parse-action ] bi ;
 
 : (file-notify-records) ( buffer -- buffer )
