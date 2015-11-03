@@ -397,11 +397,12 @@ M: windows home
     ] if ;
 
 : file-streams ( path -- streams )
+    normalize-path
     FindStreamInfoStandard
     WIN32_FIND_STREAM_DATA <struct>
     0
     [ FindFirstStream ] 2keep drop
-    over ALIEN: -1 = [
+    over -1 <alien> = [
         2drop throw-win32-error
     ] [
         1vector swap file-streams-rest
