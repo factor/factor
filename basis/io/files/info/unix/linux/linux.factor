@@ -1,11 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax combinators csv
-io.backend io.encodings.utf8 io.files io.files.info
-io.files.unix libc libc.linux kernel math.order namespaces sequences
-sorting system unix unix.statfs.linux unix.statvfs.linux io.files.links
-arrays io.files.info.unix assocs io.pathnames unix.types
-classes.struct ;
+USING: accessors assocs classes.struct combinators csv
+io.backend io.encodings.utf8 io.files.info io.files.info.unix
+io.pathnames kernel libc math math.parser sequences splitting
+strings system unix.statfs.linux unix.statvfs.linux ;
 FROM: csv => delimiter ;
 IN: io.files.info.unix.linux
 
@@ -44,11 +42,21 @@ M: linux statvfs>file-system-info ( file-system-info statfs -- file-system-info'
 TUPLE: mtab-entry file-system-name mount-point type options
 frequency pass-number ;
 
+! octal escape sequences, e.g. "/media/erg/4TB\\040E"
+: decode-mount-point ( string -- string' )
+    dup "\\" split
+    dup length 1 > [
+        nip 1 cut
+        [ 3 cut [ oct> 1string ] dip append ] map append concat
+    ] [
+        drop
+    ] if ;
+
 : mtab-csv>mtab-entry ( csv -- mtab-entry )
     [ mtab-entry new ] dip
     {
         [ first >>file-system-name ]
-        [ second >>mount-point ]
+        [ second decode-mount-point >>mount-point ]
         [ third >>type ]
         [ fourth string>csv first >>options ]
         [ 4 swap ?nth [ 0 ] unless* >>frequency ]
