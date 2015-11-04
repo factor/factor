@@ -4,7 +4,7 @@
 USING: accessors arrays assocs combinators fry hashtables
 io.pathnames io.sockets kernel lexer make math.parser
 namespaces peg.ebnf present sequences splitting strings
-strings.parser urls.encoding vocabs vocabs.loader ;
+strings.parser urls.encoding vocabs.loader ;
 
 IN: urls
 
@@ -187,7 +187,7 @@ PRIVATE>
         [ protocol>> protocol-port ]
         tri or <inet>
     ] [ protocol>> ] bi
-    secure-protocol? [ "urls.secure" ensure-vocab-loaded >secure-addr ] when ;
+    secure-protocol? [ >secure-addr ] when ;
 
 : set-url-addr ( url addr -- url )
     [ host>> >>host ] [ port>> >>port ] bi ;
