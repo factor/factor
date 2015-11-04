@@ -30,21 +30,17 @@ M: color-preview model-changed
     [ [ range-model ] map <product> ]
     bi ;
 
+: color>str ( seq -- str )
+    vtruncate v>integer first3 3dup "%d %d %d #%02x%02x%02x" sprintf ;
+
 : <color-picker> ( -- gadget )
-    vertical <track>
-        { 5 5 } >>gap
-        <color-sliders>
-        [ f track-add ]
-        [
-            [ <color-model> <color-preview> 1 track-add ]
-            [
-                [
-                    vtruncate v>integer
-                    first3 3dup "%d %d %d #%02x%02x%02x" sprintf
-                ] <arrow> <label-control>
-                f track-add
-            ] bi
-        ] bi* ;
+    vertical <track> { 5 5 } >>gap
+    <color-sliders>
+    [ f track-add ]
+    [
+        [ <color-model> <color-preview> 1 track-add ]
+        [ [ color>str ] <arrow> <label-control> f track-add ] bi
+    ] bi* ;
 
 MAIN-WINDOW: color-picker-window { { title "Color Picker" } }
     <color-picker> >>gadgets ;
