@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes deques dlists fry kernel
-sequences sequences.private ;
+USING: accessors arrays assocs classes deques dlists fry
+hashtables kernel parser prettyprint.backend prettyprint.custom
+sequences.private ;
 IN: linked-assocs
 
 TUPLE: linked-assoc { assoc read-only } { dlist dlist read-only } ;
@@ -60,3 +61,16 @@ M: linked-assoc assoc-like
 
 M: linked-assoc equal?
     over linked-assoc? [ [ dlist>> ] bi@ = ] [ 2drop f ] if ;
+
+SYNTAX: LH{ \ } [ check-hashtable >linked-hash ] parse-literal ;
+
+PREDICATE: linked-hash < linked-assoc assoc>> hashtable? ;
+
+M: linked-hash pprint-delims drop \ LH{ \ } ;
+
+M: linked-hash >pprint-sequence >alist ;
+
+M: linked-hash pprint-narrow? drop t ;
+
+M: linked-hash pprint*
+    [ pprint-object ] with-extra-nesting-level ;
