@@ -66,7 +66,7 @@ IN: python.syntax.tests
 [ t ] [
     "python-file" temp-file >py "wb" >py open
     [ tell ] [ fileno ] [ close ] tri
-    [ py> integer? ] bi@ and
+    [ py> integer? ] both?
 ] py-test
 
 ! Method chaining
