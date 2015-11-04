@@ -1,8 +1,8 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation
-compiler.cfg.linear-scan.allocation.spilling
-compiler.cfg.linear-scan.live-intervals cpu.architecture heaps help.markup
-help.syntax kernel math sequences vectors ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.stack-frame
+cpu.architecture heaps help.markup help.syntax kernel math sequences
+vectors ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 HELP: activate-intervals
@@ -18,7 +18,7 @@ HELP: add-active
 { $see-also active-intervals } ;
 
 HELP: align-spill-area
-{ $values { "align" integer } { "cfg" cfg } }
+{ $values { "align" integer } { "stack-frame" stack-frame } }
 { $description "This word is used to ensure that the alignment of the spill area in the " { $link cfg } " is equal to the largest " { $link spill-slot } "." } ;
 
 HELP: assign-spill-slot
@@ -50,7 +50,11 @@ HELP: init-allocator
 { $see-also reg-class } ;
 
 HELP: next-spill-slot
-{ $values { "size" "number of bytes required" } { "cfg" cfg } { "spill-slot" spill-slot } }
+{ $values
+  { "size" "number of bytes required" }
+  { "stack-frame" stack-frame }
+  { "spill-slot" spill-slot }
+}
 { $description "Creates a new " { $link spill-slot } " of the given size and also allocates space in the " { $link cfg } " in the cfg for it." } ;
 
 HELP: progress
