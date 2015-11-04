@@ -1,6 +1,7 @@
-USING: accessors assocs continuations http http.client http.client.private
-http.server http.server.requests io.crlf io.streams.limited io.streams.string
-kernel math math.parser multiline namespaces peg sequences splitting
+USING: accessors assocs continuations http http.client
+http.client.private http.server http.server.requests io.crlf
+io.streams.limited io.streams.string linked-assocs kernel math
+math.parser multiline namespaces peg sequences splitting
 tools.test urls ;
 IN: http.server.requests.tests
 
@@ -22,12 +23,12 @@ IN: http.server.requests.tests
 ] unit-test
 
 ! Incorrect content-length works fine
-{ H{ { "foo" "bar" } } } [
+{ LH{ { "foo" "bar" } } } [
     { { "foo" "bar" } } "localhost" <post-request> request>string
     "7" "190" replace string>request post-data>> params>>
 ] unit-test
 
-{ H{ { "name" "John Smith" } } } [
+{ LH{ { "name" "John Smith" } } } [
     { { "name" "John Smith" } } "localhost" <post-request> request>string
     string>request post-data>> params>>
 ] unit-test
