@@ -98,8 +98,8 @@ ${
 
 {
     H{
-        { { 55 8 } T{ spill-slot } }
-        { { 44 8 } T{ spill-slot { n 8 } } }
+        { { 55 $[ cell ] } T{ spill-slot } }
+        { { 44 $[ cell ] } T{ spill-slot { n $[ cell ] } } }
     }
 } [
     H{ } clone spill-slots set
@@ -147,7 +147,7 @@ ${ cell } [
     T{ spill-slot f 8 }
     T{ stack-frame
        { spill-area-size 16 }
-       { spill-area-align 8 }
+       { spill-area-align $[ cell ] }
     }
 } [
     { } insns>cfg stack-frame>> [ '[ 8 _ next-spill-slot ] twice ] keep
