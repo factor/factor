@@ -1,6 +1,6 @@
+USING: accessors arrays assocs io.sockets io.sockets.secure
+kernel linked-assocs present prettyprint tools.test urls ;
 IN: urls.tests
-USING: io.sockets io.sockets.secure urls urls.private tools.test prettyprint
-arrays kernel assocs present accessors ;
 
 CONSTANT: urls
     {
@@ -10,7 +10,7 @@ CONSTANT: urls
                 { host "www.apple.com" }
                 { port 1234 }
                 { path "/a/path" }
-                { query H{ { "a" "b" } } }
+                { query LH{ { "a" "b" } } }
                 { anchor "foo" }
             }
             "http://www.apple.com:1234/a/path?a=b#foo"
@@ -20,7 +20,7 @@ CONSTANT: urls
                 { protocol "http" }
                 { host "www.apple.com" }
                 { path "/a/path" }
-                { query H{ { "a" "b" } } }
+                { query LH{ { "a" "b" } } }
                 { anchor "foo" }
             }
             "http://www.apple.com/a/path?a=b#foo"
@@ -57,7 +57,7 @@ CONSTANT: urls
         {
             T{ url
                 { path "bar" }
-                { query H{ { "a" "b" } } }
+                { query LH{ { "a" "b" } } }
             }
             "bar?a=b"
         }
@@ -85,7 +85,7 @@ CONSTANT: urls
                { protocol "http" }
                { host "foo.com" }
                { path "/" }
-               { query H{ { "a" f } } }
+               { query LH{ { "a" f } } }
             }
             "http://foo.com/?a"
         }
@@ -246,7 +246,7 @@ urls [
     T{ url
         { protocol "http" }
         { host "localhost" }
-        { query H{ { "foo" "bar" } } }
+        { query LH{ { "foo" "bar" } } }
         { path "/" }
     }
 }
@@ -256,7 +256,7 @@ urls [
     T{ url
         { protocol "http" }
         { host "localhost" }
-        { query H{ { "foo" "bar" } } }
+        { query LH{ { "foo" "bar" } } }
         { path "/" }
     }
 }
