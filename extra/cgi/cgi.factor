@@ -27,7 +27,7 @@ IN: cgi
     "multipart unsupported" throw ;
 
 : (urlencoded) ( -- assoc )
-    "CONTENT_LENGTH" os-env "0" or string>number
+    "CONTENT_LENGTH" os-env [ string>number ] [ 0 ] if*
     read [ "" ] [ "&" append ] if-empty
     "QUERY_STRING" os-env [ append ] when* (query-string) ;
 
