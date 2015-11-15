@@ -279,188 +279,249 @@ M: object infer-call* \ call bad-macro-input ;
     [ "default-output-classes" set-word-prop ]
     bi-curry* bi ;
 
-! Stack effects for all primitives
-\ (byte-array) { integer } { byte-array } define-primitive \ (byte-array) make-flushable
-\ (clone) { object } { object } define-primitive \ (clone) make-flushable
-\ (code-blocks) { } { array } define-primitive \ (code-blocks)  make-flushable
-\ (dlopen) { byte-array } { dll } define-primitive
-\ (dlsym) { byte-array object } { c-ptr } define-primitive
-\ (dlsym-raw) { byte-array object } { c-ptr } define-primitive
-\ (exists?) { string } { object } define-primitive
-\ (exit) { integer } { } define-primitive
-\ (format-float) { float byte-array } { byte-array } define-primitive \ (format-float) make-foldable
-\ (fopen) { byte-array byte-array } { alien } define-primitive
-\ (identity-hashcode) { object } { fixnum } define-primitive
-\ (save-image) { byte-array byte-array object } { } define-primitive
-\ (set-context) { object alien } { object } define-primitive
-\ (set-context-and-delete) { object alien } { } define-primitive
-\ (sleep) { integer } { } define-primitive
-\ (start-context) { object quotation } { object } define-primitive
-\ (start-context-and-delete) { object quotation } { } define-primitive
-\ (word) { object object object } { word } define-primitive \ (word) make-flushable
-\ <array> { integer object } { array } define-primitive \ <array> make-flushable
-\ <byte-array> { integer } { byte-array } define-primitive \ <byte-array> make-flushable
-\ <callback> { word integer } { alien } define-primitive
-\ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive \ <displaced-alien> make-flushable
-\ <string> { integer integer } { string } define-primitive \ <string> make-flushable
-\ <tuple> { array } { tuple } define-primitive \ <tuple> make-flushable
-\ <wrapper> { object } { wrapper } define-primitive \ <wrapper> make-foldable
-\ alien-address { alien } { integer } define-primitive \ alien-address make-flushable
-\ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive \ alien-cell make-flushable
-\ alien-double { c-ptr integer } { float } define-primitive \ alien-double make-flushable
-\ alien-float { c-ptr integer } { float } define-primitive \ alien-float make-flushable
-\ alien-signed-1 { c-ptr integer } { fixnum } define-primitive \ alien-signed-1 make-flushable
-\ alien-signed-2 { c-ptr integer } { fixnum } define-primitive \ alien-signed-2 make-flushable
-\ alien-signed-4 { c-ptr integer } { integer } define-primitive \ alien-signed-4 make-flushable
-\ alien-signed-8 { c-ptr integer } { integer } define-primitive \ alien-signed-8 make-flushable
-\ alien-signed-cell { c-ptr integer } { integer } define-primitive \ alien-signed-cell make-flushable
-\ alien-unsigned-1 { c-ptr integer } { fixnum } define-primitive \ alien-unsigned-1 make-flushable
-\ alien-unsigned-2 { c-ptr integer } { fixnum } define-primitive \ alien-unsigned-2 make-flushable
-\ alien-unsigned-4 { c-ptr integer } { integer } define-primitive \ alien-unsigned-4 make-flushable
-\ alien-unsigned-8 { c-ptr integer } { integer } define-primitive \ alien-unsigned-8 make-flushable
-\ alien-unsigned-cell { c-ptr integer } { integer } define-primitive \ alien-unsigned-cell make-flushable
-\ all-instances { } { array } define-primitive
-\ array>quotation { array } { quotation } define-primitive \ array>quotation make-foldable
-\ become { array array } { } define-primitive
-\ bignum* { bignum bignum } { bignum } define-primitive \ bignum* make-foldable
-\ bignum+ { bignum bignum } { bignum } define-primitive \ bignum+ make-foldable
-\ bignum- { bignum bignum } { bignum } define-primitive \ bignum- make-foldable
-\ bignum-bit? { bignum integer } { object } define-primitive \ bignum-bit? make-foldable
-\ bignum-bitand { bignum bignum } { bignum } define-primitive \ bignum-bitand make-foldable
-\ bignum-bitnot { bignum } { bignum } define-primitive \ bignum-bitnot make-foldable
-\ bignum-bitor { bignum bignum } { bignum } define-primitive \ bignum-bitor make-foldable
-\ bignum-bitxor { bignum bignum } { bignum } define-primitive \ bignum-bitxor make-foldable
-\ bignum-log2 { bignum } { bignum } define-primitive \ bignum-log2 make-foldable
-\ bignum-mod { bignum bignum } { integer } define-primitive \ bignum-mod make-foldable
-\ bignum-gcd { bignum bignum } { bignum } define-primitive \ bignum-gcd make-foldable
-\ bignum-shift { bignum fixnum } { bignum } define-primitive \ bignum-shift make-foldable
-\ bignum/i { bignum bignum } { bignum } define-primitive \ bignum/i make-foldable
-\ bignum/mod { bignum bignum } { bignum integer } define-primitive \ bignum/mod make-foldable
-\ bignum< { bignum bignum } { object } define-primitive \ bignum< make-foldable
-\ bignum<= { bignum bignum } { object } define-primitive \ bignum<= make-foldable
-\ bignum= { bignum bignum } { object } define-primitive \ bignum= make-foldable
-\ bignum> { bignum bignum } { object } define-primitive \ bignum> make-foldable
-\ bignum>= { bignum bignum } { object } define-primitive \ bignum>= make-foldable
-\ bignum>fixnum { bignum } { fixnum } define-primitive \ bignum>fixnum make-foldable
-\ bignum>fixnum-strict { bignum } { fixnum } define-primitive \ bignum>fixnum-strict make-foldable
-\ bits>double { integer } { float } define-primitive \ bits>double make-foldable
-\ bits>float { integer } { float } define-primitive \ bits>float make-foldable
-\ both-fixnums? { object object } { object } define-primitive
-\ callstack-bounds { } { alien alien } define-primitive \ callstack-bounds make-flushable
-\ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
-\ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
-\ check-datastack { array integer integer } { object } define-primitive \ check-datastack make-flushable
-\ (code-room) { } { byte-array } define-primitive \ (code-room)  make-flushable
-\ compact-gc { } { } define-primitive
-\ compute-identity-hashcode { object } { } define-primitive
-\ context-object { fixnum } { object } define-primitive \ context-object make-flushable
-\ context-object-for { fixnum c-ptr } { object } define-primitive \ context-object-for make-flushable
-\ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
-\ (callback-room) { } { byte-array } define-primitive \ (callback-room) make-flushable
-\ (data-room) { } { byte-array } define-primitive \ (data-room) make-flushable
-\ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
-\ die { } { } define-primitive
-\ disable-gc-events { } { object } define-primitive
-\ dispatch-stats { } { byte-array } define-primitive
-\ dlclose { dll } { } define-primitive
-\ dll-valid? { object } { object } define-primitive
-\ double>bits { real } { integer } define-primitive \ double>bits make-foldable
-\ enable-gc-events { } { } define-primitive
-\ eq? { object object } { object } define-primitive \ eq? make-foldable
-\ fclose { alien } { } define-primitive
-\ fflush { alien } { } define-primitive
-\ fgetc { alien } { object } define-primitive
-\ fixnum* { fixnum fixnum } { integer } define-primitive \ fixnum* make-foldable
-\ fixnum*fast { fixnum fixnum } { fixnum } define-primitive \ fixnum*fast make-foldable
-\ fixnum+ { fixnum fixnum } { integer } define-primitive \ fixnum+ make-foldable
-\ fixnum+fast { fixnum fixnum } { fixnum } define-primitive \ fixnum+fast make-foldable
-\ fixnum- { fixnum fixnum } { integer } define-primitive \ fixnum- make-foldable
-\ fixnum-bitand { fixnum fixnum } { fixnum } define-primitive \ fixnum-bitand make-foldable
-\ fixnum-bitnot { fixnum } { fixnum } define-primitive \ fixnum-bitnot make-foldable
-\ fixnum-bitor { fixnum fixnum } { fixnum } define-primitive \ fixnum-bitor make-foldable
-\ fixnum-bitxor { fixnum fixnum } { fixnum } define-primitive \ fixnum-bitxor make-foldable
-\ fixnum-fast { fixnum fixnum } { fixnum } define-primitive \ fixnum-fast make-foldable
-\ fixnum-mod { fixnum fixnum } { fixnum } define-primitive \ fixnum-mod make-foldable
-\ fixnum-shift { fixnum fixnum } { integer } define-primitive \ fixnum-shift make-foldable
-\ fixnum-shift-fast { fixnum fixnum } { fixnum } define-primitive \ fixnum-shift-fast make-foldable
-\ fixnum/i { fixnum fixnum } { integer } define-primitive \ fixnum/i make-foldable
-\ fixnum/i-fast { fixnum fixnum } { fixnum } define-primitive \ fixnum/i-fast make-foldable
-\ fixnum/mod { fixnum fixnum } { integer fixnum } define-primitive \ fixnum/mod make-foldable
-\ fixnum/mod-fast { fixnum fixnum } { fixnum fixnum } define-primitive \ fixnum/mod-fast make-foldable
-\ fixnum< { fixnum fixnum } { object } define-primitive \ fixnum< make-foldable
-\ fixnum<= { fixnum fixnum } { object } define-primitive \ fixnum<= make-foldable
-\ fixnum> { fixnum fixnum } { object } define-primitive \ fixnum> make-foldable
-\ fixnum>= { fixnum fixnum } { object } define-primitive \ fixnum>= make-foldable
-\ fixnum>bignum { fixnum } { bignum } define-primitive \ fixnum>bignum make-foldable
-\ fixnum>float { fixnum } { float } define-primitive \ fixnum>float make-foldable
-\ float* { float float } { float } define-primitive \ float* make-foldable
-\ float+ { float float } { float } define-primitive \ float+ make-foldable
-\ float- { float float } { float } define-primitive \ float- make-foldable
-\ float-u< { float float } { object } define-primitive \ float-u< make-foldable
-\ float-u<= { float float } { object } define-primitive \ float-u<= make-foldable
-\ float-u> { float float } { object } define-primitive \ float-u> make-foldable
-\ float-u>= { float float } { object } define-primitive \ float-u>= make-foldable
-\ float/f { float float } { float } define-primitive \ float/f make-foldable
-\ float< { float float } { object } define-primitive \ float< make-foldable
-\ float<= { float float } { object } define-primitive \ float<= make-foldable
-\ float= { float float } { object } define-primitive \ float= make-foldable
-\ float> { float float } { object } define-primitive \ float> make-foldable
-\ float>= { float float } { object } define-primitive \ float>= make-foldable
-\ float>bignum { float } { bignum } define-primitive \ float>bignum make-foldable
-\ float>bits { real } { integer } define-primitive \ float>bits make-foldable
-\ float>fixnum { float } { fixnum } define-primitive \ float>fixnum make-foldable
-\ fpu-state { } { } define-primitive
-\ fputc { object alien } { } define-primitive
-\ fread-unsafe { integer c-ptr alien } { integer } define-primitive
-\ free-callback { alien } { } define-primitive
-\ fseek { integer integer alien } { } define-primitive
-\ ftell { alien } { integer } define-primitive
-\ fwrite { c-ptr integer alien } { } define-primitive
-\ gc { } { } define-primitive
-\ innermost-frame-executing { callstack } { object } define-primitive
-\ innermost-frame-scan { callstack } { fixnum } define-primitive
-\ jit-compile { quotation } { } define-primitive
-\ leaf-signal-handler { } { } define-primitive
-\ gsp:lookup-method { object array } { word } define-primitive
-\ minor-gc { } { } define-primitive
-\ modify-code-heap { array object object } { } define-primitive
-\ nano-count { } { integer } define-primitive \ nano-count make-flushable
-\ profiling { object } { } define-primitive
-\ (get-samples) { } { object } define-primitive
-\ (clear-samples) { } { } define-primitive
-\ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
-\ quotation-compiled? { quotation } { object } define-primitive
-\ reset-dispatch-stats { } { } define-primitive
-\ resize-array { integer array } { array } define-primitive
-\ resize-byte-array { integer byte-array } { byte-array } define-primitive
-\ resize-string { integer string } { string } define-primitive
-\ retainstack-for { c-ptr } { array } define-primitive \ retainstack-for make-flushable
-\ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
-\ set-alien-double { float c-ptr integer } { } define-primitive
-\ set-alien-float { float c-ptr integer } { } define-primitive
-\ set-alien-signed-1 { integer c-ptr integer } { } define-primitive
-\ set-alien-signed-2 { integer c-ptr integer } { } define-primitive
-\ set-alien-signed-4 { integer c-ptr integer } { } define-primitive
-\ set-alien-signed-8 { integer c-ptr integer } { } define-primitive
-\ set-alien-signed-cell { integer c-ptr integer } { } define-primitive
-\ set-alien-unsigned-1 { integer c-ptr integer } { } define-primitive
-\ set-alien-unsigned-2 { integer c-ptr integer } { } define-primitive
-\ set-alien-unsigned-4 { integer c-ptr integer } { } define-primitive
-\ set-alien-unsigned-8 { integer c-ptr integer } { } define-primitive
-\ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
-\ set-context-object { object fixnum } { } define-primitive
-\ set-fpu-state { } { } define-primitive
-\ set-innermost-frame-quotation { quotation callstack } { } define-primitive
-\ set-slot { object object fixnum } { } define-primitive
-\ set-special-object { object fixnum } { } define-primitive
-\ set-string-nth-fast { fixnum fixnum string } { } define-primitive
-\ signal-handler { } { } define-primitive
-\ size { object } { fixnum } define-primitive \ size make-flushable
-\ slot { object fixnum } { object } define-primitive \ slot make-flushable
-\ special-object { fixnum } { object } define-primitive \ special-object make-flushable
-\ string-nth-fast { fixnum string } { fixnum } define-primitive \ string-nth-fast make-flushable
-\ strip-stack-traces { } { } define-primitive
-\ tag { object } { fixnum } define-primitive \ tag make-foldable
-\ unimplemented { } { } define-primitive
-\ word-code { word } { integer integer } define-primitive \ word-code make-flushable
-\ word-optimized? { word } { object } define-primitive
+: define-primitives ( seq -- )
+    [ first3 define-primitive ] each ;
+
+: make-flushable-primitives ( flushables -- )
+    dup define-primitives [ first make-flushable ] each ;
+
+: make-foldable-primitives ( flushables -- )
+    dup define-primitives [ first make-foldable ] each ;
+
+! ! Stack effects for all primitives
+
+! Alien getters
+{
+    { alien-cell { c-ptr integer } { pinned-c-ptr } }
+    { alien-double { c-ptr integer } { float } }
+    { alien-float { c-ptr integer } { float } }
+    { alien-signed-1 { c-ptr integer } { fixnum } }
+    { alien-signed-2 { c-ptr integer } { fixnum } }
+    { alien-signed-4 { c-ptr integer } { integer } }
+    { alien-signed-8 { c-ptr integer } { integer } }
+    { alien-signed-cell { c-ptr integer } { integer } }
+    { alien-unsigned-1 { c-ptr integer } { fixnum } }
+    { alien-unsigned-2 { c-ptr integer } { fixnum } }
+    { alien-unsigned-4 { c-ptr integer } { integer } }
+    { alien-unsigned-8 { c-ptr integer } { integer } }
+    { alien-unsigned-cell { c-ptr integer } { integer } }
+} make-flushable-primitives
+
+! Alien setters
+{
+    { set-alien-cell { c-ptr c-ptr integer } { } }
+    { set-alien-double { float c-ptr integer } { } }
+    { set-alien-float { float c-ptr integer } { } }
+    { set-alien-signed-1 { integer c-ptr integer } { } }
+    { set-alien-signed-2 { integer c-ptr integer } { } }
+    { set-alien-signed-4 { integer c-ptr integer } { } }
+    { set-alien-signed-8 { integer c-ptr integer } { } }
+    { set-alien-signed-cell { integer c-ptr integer } { } }
+    { set-alien-unsigned-1 { integer c-ptr integer } { } }
+    { set-alien-unsigned-2 { integer c-ptr integer } { } }
+    { set-alien-unsigned-4 { integer c-ptr integer } { } }
+    { set-alien-unsigned-8 { integer c-ptr integer } { } }
+    { set-alien-unsigned-cell { integer c-ptr integer } { } }
+} define-primitives
+
+! Container constructors
+{
+    { (byte-array) { integer } { byte-array } }
+    { <array> { integer object } { array } }
+    { <byte-array> { integer } { byte-array } }
+    { <string> { integer integer } { string } }
+    { <tuple> { array } { tuple } }
+} make-flushable-primitives
+
+! Misc flushables
+{
+    { (callback-room) { } { byte-array } }
+    { (clone) { object } { object } }
+    { (code-blocks) { } { array } }
+    { (code-room) { } { byte-array } }
+    { (data-room) { } { byte-array } }
+    { (word) { object object object } { word } }
+    { <displaced-alien> { integer c-ptr } { c-ptr } }
+    { alien-address { alien } { integer } }
+    { callstack-bounds { } { alien alien } }
+    { callstack-for { c-ptr } { callstack } }
+    { callstack>array { callstack } { array } }
+    { check-datastack { array integer integer } { object } }
+    { context-object { fixnum } { object } }
+    { context-object-for { fixnum c-ptr } { object } }
+    { current-callback { } { fixnum } }
+    { datastack-for { c-ptr } { array } }
+    { nano-count { } { integer } }
+    { quotation-code { quotation } { integer integer } }
+    { retainstack-for { c-ptr } { array } }
+    { size { object } { fixnum } }
+    { slot { object fixnum } { object } }
+    { special-object { fixnum } { object } }
+    { string-nth-fast { fixnum string } { fixnum } }
+    { word-code { word } { integer integer } }
+} make-flushable-primitives
+
+! Misc foldables
+{
+    { <wrapper> { object } { wrapper } }
+    { array>quotation { array } { quotation } }
+    { eq? { object object } { object } }
+    { tag { object } { fixnum } }
+} make-foldable-primitives
+
+! Numeric primitives
+{
+    ! bignum
+    { bignum* { bignum bignum } { bignum } }
+    { bignum+ { bignum bignum } { bignum } }
+    { bignum- { bignum bignum } { bignum } }
+    { bignum-bit? { bignum integer } { object } }
+    { bignum-bitand { bignum bignum } { bignum } }
+    { bignum-bitnot { bignum } { bignum } }
+    { bignum-bitor { bignum bignum } { bignum } }
+    { bignum-bitxor { bignum bignum } { bignum } }
+    { bignum-log2 { bignum } { bignum } }
+    { bignum-mod { bignum bignum } { integer } }
+    { bignum-gcd { bignum bignum } { bignum } }
+    { bignum-shift { bignum fixnum } { bignum } }
+    { bignum/i { bignum bignum } { bignum } }
+    { bignum/mod { bignum bignum } { bignum integer } }
+    { bignum< { bignum bignum } { object } }
+    { bignum<= { bignum bignum } { object } }
+    { bignum= { bignum bignum } { object } }
+    { bignum> { bignum bignum } { object } }
+    { bignum>= { bignum bignum } { object } }
+    { bignum>fixnum { bignum } { fixnum } }
+    { bignum>fixnum-strict { bignum } { fixnum } }
+
+    ! fixnum
+    { fixnum* { fixnum fixnum } { integer } }
+    { fixnum*fast { fixnum fixnum } { fixnum } }
+    { fixnum+ { fixnum fixnum } { integer } }
+    { fixnum+fast { fixnum fixnum } { fixnum } }
+    { fixnum- { fixnum fixnum } { integer } }
+    { fixnum-bitand { fixnum fixnum } { fixnum } }
+    { fixnum-bitnot { fixnum } { fixnum } }
+    { fixnum-bitor { fixnum fixnum } { fixnum } }
+    { fixnum-bitxor { fixnum fixnum } { fixnum } }
+    { fixnum-fast { fixnum fixnum } { fixnum } }
+    { fixnum-mod { fixnum fixnum } { fixnum } }
+    { fixnum-shift { fixnum fixnum } { integer } }
+    { fixnum-shift-fast { fixnum fixnum } { fixnum } }
+    { fixnum/i { fixnum fixnum } { integer } }
+    { fixnum/i-fast { fixnum fixnum } { fixnum } }
+    { fixnum/mod { fixnum fixnum } { integer fixnum } }
+    { fixnum/mod-fast { fixnum fixnum } { fixnum fixnum } }
+    { fixnum< { fixnum fixnum } { object } }
+    { fixnum<= { fixnum fixnum } { object } }
+    { fixnum> { fixnum fixnum } { object } }
+    { fixnum>= { fixnum fixnum } { object } }
+    { fixnum>bignum { fixnum } { bignum } }
+    { fixnum>float { fixnum } { float } }
+
+    ! float
+    { (format-float) { float byte-array } { byte-array } }
+    { bits>float { integer } { float } }
+    { float* { float float } { float } }
+    { float+ { float float } { float } }
+    { float- { float float } { float } }
+    { float-u< { float float } { object } }
+    { float-u<= { float float } { object } }
+    { float-u> { float float } { object } }
+    { float-u>= { float float } { object } }
+    { float/f { float float } { float } }
+    { float< { float float } { object } }
+    { float<= { float float } { object } }
+    { float= { float float } { object } }
+    { float> { float float } { object } }
+    { float>= { float float } { object } }
+    { float>bignum { float } { bignum } }
+    { float>bits { real } { integer } }
+    { float>fixnum { float } { fixnum } }
+
+    ! double
+    { bits>double { integer } { float } }
+    { double>bits { real } { integer } }
+} make-foldable-primitives
+
+! ! Misc primitives
+{
+    ! Contexts
+    { (set-context) { object alien } { object } }
+    { (set-context-and-delete) { object alien } { } }
+    { (sleep) { integer } { } }
+    { (start-context) { object quotation } { object } }
+    { (start-context-and-delete) { object quotation } { } }
+    { set-context-object { object fixnum } { } }
+
+    ! Dispatch stats
+    { dispatch-stats { } { byte-array } }
+    { reset-dispatch-stats { } { } }
+
+    ! FFI
+    { (dlopen) { byte-array } { dll } }
+    { (dlsym) { byte-array object } { c-ptr } }
+    { (dlsym-raw) { byte-array object } { c-ptr } }
+    { dlclose { dll } { } }
+    { dll-valid? { object } { object } }
+
+    ! GC
+    { compact-gc { } { } }
+    { disable-gc-events { } { object } }
+    { enable-gc-events { } { } }
+    { gc { } { } }
+    { minor-gc { } { } }
+
+    ! Hashing
+    { (identity-hashcode) { object } { fixnum } }
+    { compute-identity-hashcode { object } { } }
+
+    ! IO
+    { (exists?) { string } { object } }
+    { (fopen) { byte-array byte-array } { alien } }
+    { fclose { alien } { } }
+    { fflush { alien } { } }
+    { fgetc { alien } { object } }
+    { fputc { object alien } { } }
+    { fread-unsafe { integer c-ptr alien } { integer } }
+    { fseek { integer integer alien } { } }
+    { ftell { alien } { integer } }
+    { fwrite { c-ptr integer alien } { } }
+
+    ! Profiling
+    { (clear-samples) { } { } }
+    { (get-samples) { } { object } }
+    { profiling { object } { } }
+
+    ! Resizing
+    { resize-array { integer array } { array } }
+    { resize-byte-array { integer byte-array } { byte-array } }
+    { resize-string { integer string } { string } }
+
+    ! Other primitives
+    { (exit) { integer } { } }
+    { (save-image) { byte-array byte-array object } { } }
+    { <callback> { word integer } { alien } }
+    { all-instances { } { array } }
+    { become { array array } { } }
+    { both-fixnums? { object object } { object } }
+    { die { } { } }
+    { fpu-state { } { } }
+    { free-callback { alien } { } }
+    { innermost-frame-executing { callstack } { object } }
+    { innermost-frame-scan { callstack } { fixnum } }
+    { jit-compile { quotation } { } }
+    { leaf-signal-handler { } { } }
+    { gsp:lookup-method { object array } { word } }
+    { modify-code-heap { array object object } { } }
+    { quotation-compiled? { quotation } { object } }
+    { set-fpu-state { } { } }
+    { set-innermost-frame-quotation { quotation callstack } { } }
+    { set-slot { object object fixnum } { } }
+    { set-special-object { object fixnum } { } }
+    { set-string-nth-fast { fixnum fixnum string } { } }
+    { signal-handler { } { } }
+    { strip-stack-traces { } { } }
+    { unimplemented { } { } }
+    { word-optimized? { word } { object } }
+} define-primitives
