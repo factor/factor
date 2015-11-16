@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs combinators fry hashtables
-io.pathnames io.sockets kernel lexer make math.parser
-namespaces peg.ebnf present sequences splitting strings
-strings.parser urls.encoding vocabs.loader ;
+USING: accessors arrays assocs combinators fry hashtables io.pathnames
+io.sockets kernel lexer linked-assocs make math.parser namespaces
+peg.ebnf present sequences splitting strings strings.parser
+urls.encoding vocabs.loader ;
 
 IN: urls
 
@@ -15,15 +15,11 @@ TUPLE: url protocol username password host port path query anchor ;
 : query-param ( url key -- value )
     swap query>> at ;
 
-: delete-query-param ( url key -- url )
-    over query>> delete-at ;
+: set-or-delete ( val key query -- )
+    pick [ set-at ] [ delete-at drop ] if ;
 
 : set-query-param ( url value key -- url )
-    over [
-        '[ [ _ _ ] dip ?set-at ] change-query
-    ] [
-        nip delete-query-param
-    ] if ;
+    pick query>> <linked-hash> or [ set-or-delete ] keep >>query ;
 
 ERROR: malformed-port ;
 
