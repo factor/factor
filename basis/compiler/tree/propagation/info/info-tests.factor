@@ -1,5 +1,6 @@
-USING: accessors alien byte-arrays classes.struct math math.intervals sequences
-classes.algebra kernel tools.test compiler.tree.propagation.info arrays ;
+USING: accessors alien arrays byte-arrays classes.algebra
+classes.struct compiler.tree.propagation.info kernel literals math
+math.intervals sequences sequences.private tools.test ;
 IN: compiler.tree.propagation.info.tests
 
 { f } [ 0.0 -0.0 eql? ] unit-test
@@ -190,4 +191,32 @@ TUPLE: tup2 < tup1 bar ;
 { t f } [
     tup2 <class-info> tup1 <class-info> value-info<=
     tup1 <class-info> tup2 <class-info> value-info<=
+] unit-test
+
+! init-interval
+{
+    T{ value-info-state
+       { class array-capacity }
+       { interval $[ array-capacity-interval ] }
+    }
+} [
+    <value-info> -100 100 [a,b] >>interval array-capacity >>class
+    init-interval
+] unit-test
+
+! wrap-interval
+${
+    full-interval
+    empty-interval
+    fixnum-interval
+    array-capacity-interval
+    array-capacity-interval
+    -100 100 [a,b]
+} [
+    full-interval integer wrap-interval
+    empty-interval integer wrap-interval
+    full-interval fixnum wrap-interval
+    fixnum-interval array-capacity wrap-interval
+    -100 100 [a,b] array-capacity wrap-interval
+    -100 100 [a,b] integer wrap-interval
 ] unit-test

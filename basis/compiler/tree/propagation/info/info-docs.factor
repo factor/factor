@@ -46,6 +46,10 @@ HELP: value-info-state
 HELP: value-infos
 { $var-description "Assoc stack of current value --> info mapping" } ;
 
+HELP: wrap-interval
+{ $values { "interval" interval } { "class" class } { "interval'" interval } }
+{ $description "Wraps an interval to the given numeric types interval." } ;
+
 ARTICLE: "compiler.tree.propagation.info" "Value info data type and operations"
 "Querying words:"
 { $subsections
