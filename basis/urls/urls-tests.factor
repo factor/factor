@@ -139,7 +139,7 @@ urls [
         { host "www.apple.com" }
         { port 1234 }
         { path "/a/path/relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 } [
@@ -152,7 +152,7 @@ urls [
 
     T{ url
         { path "relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 
@@ -165,7 +165,7 @@ urls [
         { host "www.apple.com" }
         { port 1234 }
         { path "/a/path/relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 } [
@@ -178,7 +178,7 @@ urls [
 
     T{ url
         { path "relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 
@@ -236,6 +236,11 @@ urls [
     <url> "a" "b" set-query-param "b" query-param
 ] unit-test
 
+{ t } [
+    URL" http://www.google.com" "foo" "bar" set-query-param
+    query>> linked-assoc?
+] unit-test
+
 { "foo#3" } [ URL" foo" clone 3 >>anchor present ] unit-test
 
 { "http://www.foo.com/" } [ "http://www.foo.com:80" >url present ] unit-test
@@ -278,3 +283,12 @@ urls [
 
 { "git+https" }
 [ URL" git+https://google.com/git/factor.git" >url protocol>> ] unit-test
+
+! Params should be rendered in the order in which they are added.
+{ "/?foo=foo&bar=bar&baz=baz" } [
+    URL" /"
+    "foo" "foo" set-query-param
+    "bar" "bar" set-query-param
+    "baz" "baz" set-query-param
+    present
+] unit-test
