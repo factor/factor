@@ -20,10 +20,8 @@ IN: compiler.tree.propagation.recursive
     [ latest-input-infos ] bi ;
 
 : counter-class ( interval class -- class' )
-    dup fixnum class<= [
-        swap array-capacity-interval interval-subset?
-        [ drop array-capacity ] when
-    ] [ nip ] if ;
+    dup fixnum class<= rot array-capacity-interval interval-subset? and
+    [ drop array-capacity ] when ;
 
 :: generalize-counter-interval ( interval initial-interval class -- interval' )
     interval class counter-class :> class
