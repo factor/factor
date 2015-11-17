@@ -1,6 +1,11 @@
-USING: compiler.tree compiler.tree.propagation.info
-compiler.tree.propagation.nodes help.markup help.syntax sequences ;
+USING: classes compiler.tree compiler.tree.propagation.info
+compiler.tree.propagation.nodes help.markup help.syntax math.intervals
+sequences ;
 IN: compiler.tree.propagation.recursive
+
+HELP: counter-class
+{ $values { "interval" interval } { "class" class } { "class'" class } }
+{ $description "The smallest class to use for a counter that iterates the given interval." } ;
 
 HELP: recursive-phi-infos
 { $values { "node" #recursive } { "infos" sequence } }

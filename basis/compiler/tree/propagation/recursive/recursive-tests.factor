@@ -1,8 +1,21 @@
-USING: accessors tools.test compiler.tree compiler.tree.builder
+USING: accessors compiler.tree compiler.tree.builder
 compiler.tree.optimizer compiler.tree.propagation.info
-compiler.tree.propagation.recursive math.intervals kernel kernel.private
-math literals layouts sequences ;
+compiler.tree.propagation.recursive kernel kernel.private layouts
+literals math math.intervals sequences sequences.private tools.test ;
 IN: compiler.tree.propagation.recursive.tests
+
+! counter-class
+{
+    array-capacity
+    fixnum
+    integer
+    array-capacity
+} [
+    0 100 [a,b] fixnum counter-class
+    -100 100 [a,b] fixnum counter-class
+    0 100 [a,b] integer counter-class
+    0 10 [a,b] array-capacity counter-class
+] unit-test
 
 ! generalize-counter-interval
 { T{ interval f { 0 t } { 1/0. t } } } [
