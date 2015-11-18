@@ -2,17 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.algebra combinators
 compiler.tree compiler.tree.dead-code.liveness
-compiler.tree.propagation.info fry kernel locals math
-math.private namespaces sequences stack-checker.backend
-stack-checker.dependencies words ;
+compiler.tree.propagation.info fry kernel locals math math.private
+namespaces sequences stack-checker.backend stack-checker.dependencies
+words ;
 IN: compiler.tree.dead-code.simple
 
 : flushable-call? ( #call -- ? )
     dup word>> dup flushable? [
-        "input-classes" word-prop dup [
+        "input-classes" word-prop [ drop t ] [
             [ node-input-infos ] dip
             [ [ class>> ] dip class<= ] 2all?
-        ] [ 2drop t ] if
+        ] if-empty
     ] [ 2drop f ] if ;
 
 M: #call mark-live-values*
@@ -41,8 +41,6 @@ M: #alien-node compute-live-values* nip look-at-inputs ;
     live-values get '[ drop _ key? ] assoc-filter ;
 
 : filter-corresponding ( new old -- old' )
-    ! Remove elements from 'old' if the element with the same
-    ! index in 'new' is dead.
     zip filter-mapping values ;
 
 : filter-live ( values -- values' )
