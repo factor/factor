@@ -297,14 +297,15 @@ IN: compiler.cfg.builder.tests
 
 { 1 } [
     V{ } 0 insns>block basic-block set init-cfg-test
-    V{ } 1 insns>block [ emit-loop-call ] V{ } make drop
+    V{ } 1 insns>block [ basic-block get emit-loop-call ] V{ } make drop
     basic-block get successors>> length
 ] unit-test
 
 ! emit-loop-call
 { "bar" } [
-    V{ } "foo" insns>block basic-block set init-cfg-test
-    [ V{ } "bar" insns>block emit-loop-call ] V{ } make drop
+    V{ } "foo" insns>block basic-block set
+    init-cfg-test
+    [ V{ } "bar" insns>block basic-block get emit-loop-call ] V{ } make drop
     basic-block get successors>> first number>>
 ] unit-test
 
@@ -313,6 +314,13 @@ SYMBOL: foo
 
 { foo } [
     \ foo f begin-cfg word>>
+] cfg-unit-test
+
+! remember-loop
+{ 20 } [
+    H{ } clone loops set
+    "hello" { } 20 insns>block remember-loop
+    loops get "hello" of number>>
 ] cfg-unit-test
 
 ! store-shuffle

@@ -29,7 +29,8 @@ T{ basic-block
 >>
 
 HELP: begin-basic-block
-{ $description "Terminates the current block and initializes a new " { $link basic-block } " to begin outputting instructions to. The new block is included in the old blocks " { $slot "successors" } "." } ;
+{ $values { "block" basic-block } }
+{ $description "Terminates the given block and initializes a new " { $link basic-block } " to begin outputting instructions to. The new block is included in the old blocks " { $slot "successors" } "." } ;
 
 HELP: call-height
 { $values { "#call" #call } { "n" number } }
@@ -52,7 +53,8 @@ HELP: end-branch
 { $description "pair is { final-bb final-height }" } ;
 
 HELP: make-kill-block
-{ $description "Marks the current " { $link basic-block } " being processed as a kill block." } ;
+{ $values { "block" basic-block } }
+{ $description "Marks the block as a kill block." } ;
 
 HELP: set-basic-block
 { $values { "basic-block" basic-block } }
