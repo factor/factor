@@ -169,7 +169,7 @@ M: #alien-assembly emit-node ( node -- )
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
-        needs-frame-pointer begin-word
+        needs-frame-pointer basic-block get begin-word
         {
             [ params>> callee-parameters ##callback-inputs, ]
             [ params>> box-parameters ]
