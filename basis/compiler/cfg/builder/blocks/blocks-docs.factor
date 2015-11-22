@@ -45,7 +45,7 @@ HELP: call-height
 
 HELP: emit-trivial-block
 { $values { "quot" quotation } }
-{ $description "Combinator that emits a trivial block, constructed by calling the supplied quotation." }
+{ $description "Combinator that emits a new trivial block, constructed by calling the supplied quotation. The quotation should not end the current block -- only add instructions to it." }
 { $examples { $unchecked-example $[ ex-emit-trivial-block ] } } ;
 
 HELP: end-branch
