@@ -169,7 +169,7 @@ M: #alien-assembly emit-node ( node -- )
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
-        needs-frame-pointer basic-block get begin-word
+        needs-frame-pointer begin-word
         {
             [ params>> callee-parameters ##callback-inputs, ]
             [ params>> box-parameters ]
@@ -177,5 +177,5 @@ M: #alien-callback emit-node
             [ params>> emit-callback-return ]
             [ params>> callback-stack-cleanup ]
         } cleave
-        basic-block get [ end-word ] when
+        basic-block get [ end-word ] when*
     ] with-cfg-builder ;

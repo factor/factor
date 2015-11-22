@@ -1,6 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.builder.blocks
-compiler.cfg.stacks.local compiler.tree help.markup help.syntax
-kernel literals math multiline sequences vectors words ;
+compiler.cfg.stacks.local compiler.tree help.markup help.syntax kernel
+literals math multiline quotations sequences vectors words ;
 IN: compiler.cfg.builder
 
 <<
@@ -44,6 +44,10 @@ H{
 ;
 >>
 
+HELP: build-cfg
+{ $values { "nodes" sequence } { "word" word } { "procedures" sequence } }
+{ $description "Builds one or more cfgs from the given word." } ;
+
 HELP: procedures
 { $var-description "A " { $link vector } " used as temporary storage during cfg construction for all procedures being built." } ;
 
@@ -84,9 +88,9 @@ HELP: trivial-branch?
   }
 } ;
 
-HELP: build-cfg
-{ $values { "nodes" sequence } { "word" word } { "procedures" sequence } }
-{ $description "Builds one or more cfgs from the given word." } ;
+HELP: with-cfg-builder
+{ $values { "nodes" sequence } { "word" word } { "label" word } { "quot" quotation } }
+{ $description "Combinator used to begin and end stack analysis so that the given quotation can build the cfg. The quotation is passed the initial basic block on the stack." } ;
 
 ARTICLE: "compiler.cfg.builder"
 "Final stage of compilation generates machine code from dataflow IR"

@@ -51,4 +51,4 @@ IN: compiler.cfg.intrinsics.misc
     if ;
 
 : emit-cleanup-allot ( -- )
-    [ ##no-tco, ] emit-trivial-block ;
+    [ drop ##no-tco, ] emit-trivial-block ;
