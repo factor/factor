@@ -49,7 +49,7 @@ HELP: emit-trivial-block
 { $examples { $unchecked-example $[ ex-emit-trivial-block ] } } ;
 
 HELP: end-branch
-{ $values { "pair/f" "two-tuple" } }
+{ $values { "block" basic-block } { "pair/f" "two-tuple" } }
 { $description "pair is { final-bb final-height }" } ;
 
 HELP: make-kill-block
