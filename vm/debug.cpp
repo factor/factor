@@ -13,10 +13,10 @@ ostream& operator<<(ostream& out, const string* str) {
 }
 
 void factor_vm::print_word(ostream& out, word* word, cell nesting) {
-  if (tagged<object>(word->vocabulary).type_p(STRING_TYPE))
+  if (TAG(word->vocabulary) == STRING_TYPE)
     out << untag<string>(word->vocabulary) << ":";
 
-  if (tagged<object>(word->name).type_p(STRING_TYPE))
+  if (TAG(word->name) == STRING_TYPE)
     out << untag<string>(word->name);
   else {
     out << "#<not a string: ";
@@ -112,7 +112,7 @@ void factor_vm::print_nested_obj(ostream& out, cell obj, fixnum nesting) {
 
   quotation* quot;
 
-  switch (tagged<object>(obj).type()) {
+  switch (TAG(obj)) {
     case FIXNUM_TYPE:
       out << untag_fixnum(obj);
       break;
@@ -158,7 +158,7 @@ void factor_vm::print_nested_obj(ostream& out, cell obj, fixnum nesting) {
       print_alien(out, untag<alien>(obj), nesting - 1);
       break;
     default:
-      out << "#<" << type_name(tagged<object>(obj).type()) << " @ ";
+      out << "#<" << type_name(TAG(obj)) << " @ ";
       out << (void*)obj << ">";
       break;
   }

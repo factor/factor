@@ -3,10 +3,9 @@
 namespace factor {
 
 cell code_block::owner_quot() const {
-  tagged<object> executing(owner);
-  if (!optimized_p() && executing->type() == WORD_TYPE)
-    executing = executing.as<word>()->def;
-  return executing.value();
+  if (!optimized_p() && TAG(owner) == WORD_TYPE)
+    return untag<word>(owner)->def;
+  return owner;
 }
 
 /* If the code block is an unoptimized quotation, we can calculate the
@@ -16,18 +15,17 @@ cell code_block::scan(factor_vm* vm, cell addr) const {
     return tag_fixnum(-1);
   }
 
-  tagged<object> obj(owner);
-  if (obj.type_p(WORD_TYPE))
-    obj = obj.as<word>()->def;
-  if (!obj.type_p(QUOTATION_TYPE))
+  cell ptr = owner;
+  if (TAG(ptr) == WORD_TYPE)
+    ptr = untag<word>(ptr)->def;
+  if (TAG(ptr) != QUOTATION_TYPE)
     return tag_fixnum(-1);
-
   cell ofs = offset(addr);
-  return tag_fixnum(vm->quot_code_offset_to_scan(obj.value(), ofs));
+  return tag_fixnum(vm->quot_code_offset_to_scan(ptr, ofs));
 }
 
 cell factor_vm::compute_entry_point_address(cell obj) {
-  switch (tagged<object>(obj).type()) {
+  switch (TAG(obj)) {
     case WORD_TYPE:
       return untag<word>(obj)->entry_point;
     case QUOTATION_TYPE:
@@ -58,24 +56,21 @@ cell factor_vm::compute_entry_point_pic_tail_address(cell w_) {
 }
 
 cell factor_vm::code_block_owner(code_block* compiled) {
-  tagged<object> owner(compiled->owner);
+  cell owner = compiled->owner;
 
   /* Cold generic word call sites point to quotations that call the
      inline-cache-miss and inline-cache-miss-tail primitives. */
-  if (owner.type_p(QUOTATION_TYPE)) {
-    tagged<quotation> quot(owner.as<quotation>());
-    tagged<array> elements(quot->array);
+  if (TAG(owner) != QUOTATION_TYPE)
+    return owner;
 
-    FACTOR_ASSERT(array_capacity(elements.untagged()) == 5);
-    FACTOR_ASSERT(array_nth(elements.untagged(), 4) ==
-                      special_objects[PIC_MISS_WORD] ||
-                  array_nth(elements.untagged(), 4) ==
-                      special_objects[PIC_MISS_TAIL_WORD]);
+  quotation* quot = untag<quotation>(owner);
+  array* elements = untag<array>(quot->array);
 
-    tagged<wrapper> word_wrapper(array_nth(elements.untagged(), 0));
-    return word_wrapper->object;
-  } else
-    return compiled->owner;
+  FACTOR_ASSERT(array_capacity(elements) == 5);
+  FACTOR_ASSERT(array_nth(elements, 4) == special_objects[PIC_MISS_WORD] ||
+                array_nth(elements, 4) == special_objects[PIC_MISS_TAIL_WORD]);
+  wrapper* wrap = untag<wrapper>(array_nth(elements, 0));
+  return wrap->object;
 }
 
 struct update_word_references_relocation_visitor {
