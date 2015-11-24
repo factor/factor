@@ -100,8 +100,8 @@ void factor_vm::primitive_set_innermost_stack_frame_quotation() {
   data_root<callstack> stack(ctx->pop(), this);
   data_root<quotation> quot(ctx->pop(), this);
 
-  stack.untag_check(this);
-  quot.untag_check(this);
+  check_tagged(stack);
+  check_tagged(quot);
 
   jit_compile_quotation(quot.value(), true);
 

@@ -79,7 +79,7 @@ struct code_block {
     if (!to_boolean(relocation))
       return;
 
-    byte_array* rels = (byte_array*)UNTAG(relocation);
+    byte_array* rels = untag<byte_array>(relocation);
 
     cell index = 0;
     cell length = (rels->capacity >> TAG_BITS) / sizeof(relocation_entry);
