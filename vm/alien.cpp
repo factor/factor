@@ -32,7 +32,7 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement) {
   data_root<object> delegate(delegate_, this);
   data_root<alien> new_alien(allot<alien>(sizeof(alien)), this);
 
-  if (delegate.type_p(ALIEN_TYPE)) {
+  if (TAG(delegate_) == ALIEN_TYPE) {
     tagged<alien> delegate_alien = delegate.as<alien>();
     displacement += delegate_alien->displacement;
     new_alien->base = delegate_alien->base;
@@ -99,7 +99,7 @@ EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)
 /* Allocates memory */
 void factor_vm::primitive_dlopen() {
   data_root<byte_array> path(ctx->pop(), this);
-  path.untag_check(this);
+  check_tagged(path);
   data_root<dll> library(allot<dll>(sizeof(dll)), this);
   library->path = path.value();
   ffi_dlopen(library.untagged());
@@ -111,7 +111,7 @@ void factor_vm::primitive_dlopen() {
 void factor_vm::primitive_dlsym() {
   data_root<object> library(ctx->pop(), this);
   data_root<byte_array> name(ctx->peek(), this);
-  name.untag_check(this);
+  check_tagged(name);
 
   symbol_char* sym = name->data<symbol_char>();
 
@@ -131,7 +131,7 @@ void factor_vm::primitive_dlsym() {
 void factor_vm::primitive_dlsym_raw() {
   data_root<object> library(ctx->pop(), this);
   data_root<byte_array> name(ctx->peek(), this);
-  name.untag_check(this);
+  check_tagged(name);
 
   symbol_char* sym = name->data<symbol_char>();
 
