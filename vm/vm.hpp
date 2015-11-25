@@ -539,7 +539,7 @@ struct factor_vm {
   // tagged
   template <typename Type> void check_tagged(tagged<Type> t) {
     if (!t.type_p())
-      type_error(Type::type_number, t.value());
+      type_error(Type::type_number, t.value_);
   }
 
   template <typename Type> Type* untag_check(cell value) {
