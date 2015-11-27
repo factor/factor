@@ -222,7 +222,7 @@ M: listener-gadget focusable-child*
     input>> dup popup>> or ;
 
 : wait-for-listener ( listener -- )
-    input>> flag>> wait-for-flag ;
+    input>> flag>> 5 seconds wait-for-flag-timeout ;
 
 : listener-busy? ( listener -- ? )
     input>> interactor-busy? ;
