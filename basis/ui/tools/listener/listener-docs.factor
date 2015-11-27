@@ -1,7 +1,7 @@
-USING: help.markup help.syntax help.tips io kernel listener
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.panes
-ui.operations ui.tools.common ui.tools.listener.completion vocabs
-vocabs.refresh words ;
+USING: help.markup help.syntax help.tips io kernel listener sequences
+ui.commands ui.gadgets.editors ui.gadgets.panes ui.operations
+ui.tools.common ui.tools.listener.completion vocabs vocabs.refresh
+words ;
 IN: ui.tools.listener
 
 HELP: <listener-gadget>
@@ -24,9 +24,13 @@ HELP: interactor-busy?
 { $values { "interactor" interactor } { "?" boolean } }
 { $description "We're busy if there's no thread to resume." } ;
 
+HELP: interactor-read
+{ $values { "interactor" interactor } { "lines" sequence } }
+{ $description "Implements the " { $link stream-readln } " generic for the interactor." } ;
+
 HELP: wait-for-listener
 { $values { "listener" listener-gadget } }
-{ $description "Wait for the listener to start." } ;
+{ $description "Wait up to five seconds for the listener to start." } ;
 
 ARTICLE: "ui-listener" "UI listener"
 "The graphical listener adds input history and word and vocabulary completion. A summary with any outstanding error conditions is displayed before every prompt (see " { $link "ui.tools.error-list" } " for details)."
