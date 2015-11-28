@@ -2,16 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.algebra classes.builtin
 combinators.short-circuit compiler.cfg.builder.blocks
-compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stacks
-compiler.tree.propagation.info cpu.architecture kernel layouts
-locals math namespaces sequences ;
+compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks compiler.tree.propagation.info cpu.architecture
+kernel layouts locals math namespaces sequences slots.private ;
 IN: compiler.cfg.intrinsics.slots
 
 : class-tag ( class -- tag/f )
     builtins get [ class<= ] with find drop ;
 
-: value-tag ( info -- n ) class>> class-tag ;
+: value-tag ( info -- n/f )
+    class>> class-tag ;
 
 : slot-indexing ( slot tag -- slot scale tag )
     complex-addressing?
@@ -27,52 +27,48 @@ IN: compiler.cfg.intrinsics.slots
     [ [ second literal>> ] [ first value-tag ] bi ] bi*
     ^^slot-imm ;
 
-: immediate-slot-offset? ( value-info -- ? )
-    literal>> {
-        [ fixnum? ]
-        [ cell * immediate-arithmetic? ]
-    } 1&& ;
+: immediate-slot-offset? ( object -- ? )
+    { [ fixnum? ] [ cell * immediate-arithmetic? ] } 1&& ;
 
 : emit-slot ( node -- )
     dup node-input-infos
     dup first value-tag [
         nip
-        dup second immediate-slot-offset?
+        dup second literal>> immediate-slot-offset?
         [ (emit-slot-imm) ] [ (emit-slot) ] if
         ds-push
     ] [ drop emit-primitive ] if ;
 
-: emit-write-barrier? ( infos -- ? )
-    first class>> immediate class<= not ;
-
-:: (emit-set-slot) ( infos -- )
-    3inputs :> ( src obj slot )
-
-    infos second value-tag :> tag
-
-    slot tag slot-indexing :> ( slot scale tag )
-    src obj slot scale tag ##set-slot,
-
-    infos emit-write-barrier?
-    [ obj slot scale tag next-vreg next-vreg ##write-barrier, ] when ;
-
-:: (emit-set-slot-imm) ( infos -- )
+:: (emit-set-slot-imm) ( write-barrier? tag slot -- )
     ds-drop
 
     2inputs :> ( src obj )
 
-    infos third literal>> :> slot
-    infos second value-tag :> tag
-
     src obj slot tag ##set-slot-imm,
 
-    infos emit-write-barrier?
+    write-barrier?
     [ obj slot tag next-vreg next-vreg ##write-barrier-imm, ] when ;
 
+:: (emit-set-slot) ( write-barrier? tag -- )
+    3inputs :> ( src obj slot )
+
+    slot tag slot-indexing :> ( slot scale tag )
+
+    src obj slot scale tag ##set-slot,
+
+    write-barrier?
+    [ obj slot scale tag next-vreg next-vreg ##write-barrier, ] when ;
+
+: node>set-slot-data ( #call -- write-barrier? tag literal )
+    node-input-infos first3
+    [ class>> immediate class<= not ] [ value-tag ] [ literal>> ] tri* ;
+
+: emit-intrinsic-set-slot ( write-barrier? tag index-info -- )
+    dup immediate-slot-offset? [
+        (emit-set-slot-imm)
+    ] [ drop (emit-set-slot) ] if ;
+
 : emit-set-slot ( node -- )
-    dup node-input-infos
-    dup second value-tag [
-        nip
-        dup third immediate-slot-offset?
-        [ (emit-set-slot-imm) ] [ (emit-set-slot) ] if
-    ] [ drop emit-primitive ] if ;
+    dup node>set-slot-data over [
+        emit-intrinsic-set-slot drop
+    ] [ 3drop emit-primitive ] if ;
