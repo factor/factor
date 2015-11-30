@@ -133,7 +133,7 @@ semver_into() {
 
 # issue 1440
 gcc_version_ok() {
-	GCC_VERSION=`gcc --version | head -n1 | rev | cut -d ' ' -f 1 | rev`
+	GCC_VERSION=`gcc -dumpversion`
 	local GCC_MAJOR local GCC_MINOR local GCC_PATCH local GCC_SPECIAL
 	semver_into $GCC_VERSION GCC_MAJOR GCC_MINOR GCC_PATCH GCC_SPECIAL
 
