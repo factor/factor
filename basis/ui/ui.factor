@@ -3,10 +3,10 @@
 USING: accessors arrays assocs boxes classes.tuple
 classes.tuple.parser combinators combinators.short-circuit
 concurrency.flags concurrency.promises continuations deques
-destructors dlists fry init kernel lexer make math namespaces parser
-sequences sets strings threads ui.backend ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures vectors vocabs.parser
-words ;
+destructors dlists fry init io.streams.c kernel lexer make math
+namespaces parser sequences sets strings threads ui.backend ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.render vectors
+vocabs.parser words ;
 IN: ui
 
 <PRIVATE
@@ -65,7 +65,7 @@ SYMBOL: ui-windows
         [ begin-world ]
         [ resize-world ]
         [ request-focus ]
-    } cleave ;
+    } cleave gl-init ;
 
 : clean-up-broken-window ( world -- )
     [
