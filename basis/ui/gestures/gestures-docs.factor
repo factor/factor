@@ -1,5 +1,5 @@
-USING: ui.gadgets help.markup help.syntax
-hashtables strings kernel system ;
+USING: hashtables help.markup help.syntax kernel strings system
+ui.gadgets ui.gadgets.worlds ;
 IN: ui.gestures
 
 HELP: set-gestures
@@ -234,6 +234,10 @@ HELP: up-action
 HELP: down-action
 { $class-description "Gesture sent when the user performs a multi-touch three-finger swipe down." } ;
 
+HELP: world-focus
+{ $values { "world" world } { "gadget" gadget } }
+{ $description "Gets the gadget that is in focus for the world." } ;
+
 HELP: zoom-in-action
 { $class-description "Gesture sent when the user performs a multi-touch two-finger pinch in." } ;
 
@@ -347,7 +351,7 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
 }
 "The " { $link S+ } " modifier is only ever used with the above action keys; alphanumeric input input with the shift key is delivered without the " { $link S+ } " modifier set, instead the input itself is upper case. For example, the gesture corresponding to " { $snippet "s" } " with the Control and Shift keys pressed is presented as "
 { $code "T{ key-down f { C+ } \"S\" }" }
-"The " { $snippet "RET" } ", " { $snippet "TAB" } " and " { $snippet "SPACE" } " keys are never delivered in their literal form (" { $snippet "\"\\n\"" } ", " { $snippet "\"\\t\"" } " or "  { $snippet "\" \"" } ")." ;
+"The " { $snippet "RET" } " and " { $snippet "TAB" } " keys are never delivered in their literal form (" { $snippet "\"\\n\"" } " and " { $snippet "\"\\t\"" } ;
 
 ARTICLE: "ui-user-input" "Free-form keyboard input"
 "Whereas keyboard gestures are intended to be used for keyboard shortcuts, certain gadgets such as text fields need to accept free-form keyboard input. This can be done by implementing a generic word:"
