@@ -1,7 +1,7 @@
 USING: accessors arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.intrinsics.slots compiler.test compiler.tree
-compiler.tree.propagation.info kernel make math math.intervals
-namespaces sequences slots.private tools.test ;
+compiler.tree.propagation.info kernel layouts literals make math
+math.intervals namespaces sequences slots.private tools.test ;
 IN: compiler.cfg.intrinsics.slots.tests
 
 : call-node-1 ( -- node )
@@ -121,13 +121,13 @@ IN: compiler.cfg.intrinsics.slots.tests
            { src 1 }
            { obj 2 }
            { slot 3 }
-           { scale 3 }
+           { scale $[ cell log2 ] }
            { tag 2 }
         }
         T{ ##write-barrier
            { src 2 }
            { slot 3 }
-           { scale 3 }
+           { scale $[ cell log2 ] }
            { tag 2 }
            { temp1 4 }
            { temp2 5 }

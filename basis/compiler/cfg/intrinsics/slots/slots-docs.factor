@@ -1,6 +1,6 @@
-USING: classes classes.builtin compiler.tree
-compiler.tree.propagation.info help.markup help.syntax layouts math
-slots.private ;
+USING: classes classes.builtin compiler.cfg.instructions compiler.tree
+compiler.tree.propagation.info help.markup help.syntax kernel layouts
+math slots.private ;
 IN: compiler.cfg.intrinsics.slots
 
 HELP: class-tag
@@ -15,13 +15,13 @@ HELP: class-tag
 } ;
 
 HELP: immediate-slot-offset?
-{ $values { "value-info" value-info-state } { "?" "true or false" } }
+{ $values { "object" object } { "?" "true or false" } }
 { $description
-  { $link t } " if the value info is a literal " { $link fixnum } " that is small enough to fit into a machine register." }
+  { $link t } " if the object is a " { $link fixnum } " that is small enough to fit into a machine register. It is used to determine whether immediate versions of the instructions " { $link ##set-slot } " and " { $link ##set-slot-imm } " can be emitted." }
 { $examples
   { $example
     "USING: compiler.cfg.intrinsics.slots compiler.tree.propagation.info prettyprint ;"
-    "33 <literal-info> immediate-slot-offset? ."
+    "33 immediate-slot-offset? ."
     "t"
   }
 } ;
