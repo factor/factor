@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.rectangles math.vectors namespaces kernel accessors
-assocs combinators sequences sets opengl opengl.gl colors
-colors.constants ui.gadgets ui.pens ;
+USING: accessors colors colors.constants combinators kernel
+math.rectangles math.vectors namespaces opengl opengl.capabilities
+opengl.gl opengl.textures sequences sets ui.gadgets ui.pens ;
 IN: ui.render
 
 SYMBOL: clip
@@ -17,7 +17,7 @@ SYMBOL: viewport-translation
 
 : do-clip ( -- ) clip get flip-rect gl-set-clip ;
 
-: init-clip ( clip-rect -- )
+: init-clip ( gadget -- )
     [
         dim>>
         [ { 0 1 } v* viewport-translation set ]
@@ -29,14 +29,17 @@ SYMBOL: viewport-translation
 
 SLOT: background-color
 
-: init-gl ( world -- )
+: gl-init ( -- )
+    check-extensions "1.0" require-gl-version
     GL_SMOOTH glShadeModel
-    GL_SCISSOR_TEST glEnable
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_VERTEX_ARRAY glEnableClientState
     GL_PACK_ALIGNMENT 1 glPixelStorei
-    GL_UNPACK_ALIGNMENT 1 glPixelStorei
+    GL_UNPACK_ALIGNMENT 1 glPixelStorei ;
+
+: gl-draw-init ( world -- )
+    GL_SCISSOR_TEST glEnable
     init-matrices
     [ init-clip ]
     [

@@ -35,6 +35,10 @@ HELP: set-fullscreen
 { $values { "gadget" gadget } { "?" boolean } }
 { $description "Sets and unsets fullscreen mode for the gadget's world." } ;
 
+HELP: set-up-window
+{ $values { "world" world } }
+{ $description "Initializes the window that shows the world." } ;
+
 HELP: fullscreen?
 { $values { "gadget" gadget } { "?" boolean } }
 { $description "Queries the gadget's world to see if it is running in fullscreen mode." } ;
