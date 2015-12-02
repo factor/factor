@@ -113,22 +113,22 @@ set_md5sum() {
 }
 
 semver_into() {
-	CLANG_RE_OLD="^([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3-5
-	RE_SEMVER="^([0-9]*)\.([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3.3-5
-	if [[ $1 =~ $CLANG_RE_OLD ]] ; then
-		export "$2=${BASH_REMATCH[1]}"
-		export "$3=${BASH_REMATCH[2]}"
-		export "$4=0"
-		export "$5=${BASH_REMATCH[3]}"
-	elif [[ $1 =~ $RE_SEMVER ]] ; then
-		export "$2=${BASH_REMATCH[1]}"
-		export "$3=${BASH_REMATCH[2]}"
-		export "$4=${BASH_REMATCH[3]}"
-		export "$5=${BASH_REMATCH[4]}"
-	else
-		echo "unsupported version number, please report a bug: $1"
-		exit 123
-	fi
+    RE_SEMVER="^([0-9]*)\.([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3.3-5
+    CLANG_RE_OLD="^([0-9]*)\.([0-9]*)-?(.*)?$" # 3.3-5
+    if [[ $1 =~ $RE_SEMVER ]] ; then
+        export "$2=${BASH_REMATCH[1]}"
+        export "$3=${BASH_REMATCH[2]}"
+        export "$4=${BASH_REMATCH[3]}"
+        export "$5=${BASH_REMATCH[4]}"
+    elif [[ $1 =~ $CLANG_RE_OLD ]] ; then
+	export "$2=${BASH_REMATCH[1]}"
+	export "$3=${BASH_REMATCH[2]}"
+	export "$4=0"
+	export "$5=${BASH_REMATCH[3]}"
+    else
+	echo "unsupported version number, please report a bug: $1"
+	exit 123
+    fi
 }
 
 # issue 1440
