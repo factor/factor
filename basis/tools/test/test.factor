@@ -161,7 +161,7 @@ M: test-failure error. ( error -- )
         [ error-location print nl ]
         [ asset>> [ experiment. nl ] when* ]
         [ error>> error. ]
-        [ continuation>> traceback-link. ]
+        [ continuation>> call>> callstack. ]
     } cleave ;
 
 : :test-failures ( -- ) test-failures get errors. ;
