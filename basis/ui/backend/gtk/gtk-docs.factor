@@ -13,4 +13,4 @@ HELP: on-configure
   { "user-data" alien }
   { "?" boolean }
 }
-{ $description "Handles a configure event (" { $link GdkEventConfigure } " sent from the windowing system. The world is activated if it isn't already and a map event has been received. Then it is relayouted." } ;
+{ $description "Handles a configure event (" { $link GdkEventConfigure } " sent from the windowing system. If the world has been sent the on-map event from gtk then it is relayouted, otherwise nothing happens." } ;

@@ -257,17 +257,17 @@ CONSTANT: action-key-codes
     2drop window relayout t ;
 
 : on-configure ( win event user-data -- ? )
-    drop swap window dup active?>> 50 >= [
-        100 >>active? swap GdkEventConfigure memory>struct
+    drop swap window dup active?>> 100 = [
+        swap GdkEventConfigure memory>struct
         [ event-loc >>window-loc ] [ event-dim >>dim ] bi
         relayout-1
     ] [ 2drop ] if f ;
 
+: on-map ( win event user-data -- ? )
+    2drop window 100 >>active? drop t ;
+
 : on-delete ( win event user-data -- ? )
     2drop window ungraft t ;
-
-: on-map ( win event user-data -- ? )
-    2drop window 50 >>active? drop t ;
 
 :: connect-win-state-signals ( win -- )
     win "expose-event" [ on-expose yield ]
