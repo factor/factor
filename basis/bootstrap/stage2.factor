@@ -13,9 +13,9 @@ SYMBOL: bootstrap-time
 : strip-encodings ( -- )
     os unix? [
         [
-            P" resource:core/io/encodings/utf16/utf16.factor" 
+            P" resource:core/io/encodings/utf16/utf16.factor"
             P" resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
-            "io.encodings.utf16" 
+            "io.encodings.utf16"
             "io.encodings.utf16n" [ loaded-child-vocab-names [ forget-vocab ] each ] bi@
         ] with-compilation-unit
     ] when ;
@@ -24,14 +24,13 @@ SYMBOL: bootstrap-time
     vm-path file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
 
-: load-components ( -- )
-    "include" "exclude"
-    [ get-global " " split harvest ] bi@
-    diff
-    [ "bootstrap." prepend require ] each ;
+: load-component ( name -- )
+    dup "* Loading the " write write " component" print
+    "bootstrap." prepend require ;
 
-: count-words ( pred -- )
-    all-words swap count number>string write ; inline
+: load-components ( -- )
+    "include" "exclude" [ get-global " " split harvest ] bi@ diff
+    [ load-component ] each ;
 
 : print-time ( us -- )
     1,000,000,000 /i
@@ -56,6 +55,9 @@ SYMBOL: bootstrap-time
     original-error set-global
     error set-global ; inline
 
+CONSTANT: default-components
+    "math compiler threads help io tools ui ui.tools unicode handbook"
+
 [
     ! We time bootstrap
     nano-count
@@ -66,7 +68,7 @@ SYMBOL: bootstrap-time
 
     default-image-name "output-image" set-global
 
-    "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
+    default-components "include" set-global
     "" "exclude" set-global
 
     strip-encodings
@@ -90,10 +92,6 @@ SYMBOL: bootstrap-time
 
     run-bootstrap-init
 
-    f error set-global
-    f original-error set-global
-    f error-continuation set-global
-
     nano-count swap - bootstrap-time set-global
     print-report
 
@@ -106,6 +104,9 @@ SYMBOL: bootstrap-time
             "vocab:bootstrap/finish-bootstrap.factor" run-file
         ] if
 
+        f error set-global
+        f original-error set-global
+        f error-continuation set-global
         "output-image" get save-image-and-exit
     ] if
 ] [
