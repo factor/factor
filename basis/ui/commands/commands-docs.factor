@@ -3,35 +3,6 @@ hashtables quotations words classes sequences namespaces make
 arrays assocs ;
 IN: ui.commands
 
-: command-map-row ( gesture command -- seq )
-    [
-        [ gesture>string , ]
-        [
-            [ command-name , ]
-            [ command-word <$link> , ]
-            [ command-description , ]
-            tri
-        ] bi*
-    ] { } make ;
-
-: command-map. ( alist -- )
-    [ command-map-row ] { } assoc>map
-    { "Shortcut" "Command" "Word" "Notes" }
-    [ \ $strong swap ] { } map>assoc prefix
-    $table ;
-
-: $command-map ( element -- )
-    [ second (command-name) " commands" append $heading ]
-    [
-        first2 swap get-command-at
-        [ blurb>> print-element ] [ commands>> command-map. ] bi
-    ] bi ;
-
-: $command ( element -- )
-    reverse first3 get-command-at
-    commands>> value-at gesture>string
-    $snippet ;
-
 HELP: +nullary+
 { $description "A key which may be set in the hashtable passed to " { $link define-command } ". If set to a true value, the command does not take any inputs, and the value passed to " { $link invoke-command } " will be ignored. Otherwise, it takes one input." } ;
 
