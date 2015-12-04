@@ -364,17 +364,4 @@ void factor_vm::primitive_quotation_compiled_p() {
   ctx->push(tag_boolean(quotation_compiled_p(quot)));
 }
 
-/* Allocates memory */
-void factor_vm::initialize_all_quotations() {
-  cell all_quots = instances(QUOTATION_TYPE);
-  data_root<array> quotations(all_quots, this);
-
-  cell length = array_capacity(quotations.untagged());
-  for (cell i = 0; i < length; i++) {
-    data_root<quotation> quot(array_nth(quotations.untagged(), i), this);
-    if (!quot->entry_point)
-      quot.untagged()->entry_point = lazy_jit_compile_entry_point();
-  }
-}
-
 }
