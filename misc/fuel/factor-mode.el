@@ -220,19 +220,18 @@ these lines in your .emacs:
     "B"
     "COLOR:"
     "CONSULT:" "call-next-method"
-    "EBNF:" ";EBNF" "ENUM:" "ERROR:"
+    "EBNF:" ";EBNF"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
     "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HINTS:"
     "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
-    "MACRO:" "MACRO::" "MATH:"
+    "MATH:"
     "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only" "REQUIRE:"  "REQUIRES:"
     "SLOT:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
-    "TYPED:" "TYPED::"
     "UNIFORM-TUPLE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
@@ -246,7 +245,7 @@ these lines in your .emacs:
   (regexp-opt factor-constant-words 'symbols))
 
 (defconst factor-bracer-words
-  '("B" "BV" "C" "CS" "H" "HS" "T" "V" "W"))
+  '("B" "BV" "C" "CS" "H" "HS" "S" "T" "V" "W"))
 
 (defconst factor-brace-words-regex
   (format "%s{" (regexp-opt factor-bracer-words t)))
@@ -343,7 +342,7 @@ these lines in your .emacs:
     "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
     "INTERSECTION:"
     "M" "M:" "MACRO" "MACRO:"
-    "MEMO" "MEMO:" "METHOD"
+    "MAIN-WINDOW:" "MEMO" "MEMO:" "METHOD"
     "SYNTAX"
     "PREDICATE" "PRIMITIVE" "PROTOCOL"
     "SINGLETONS"
@@ -420,6 +419,17 @@ these lines in your .emacs:
 
 (defconst factor-predicate-regex
   (concat (syntax-begin '("PREDICATE")) ws+ symbol ws+ "\\(<\\)" ws+ symbol))
+
+(defconst factor-alien-function-regex
+  (concat (syntax-begin '("GL-FUNCTION" "FUNCTION" "GL-CALLBACK" "CALLBACK"))
+          ws+ symbol
+          ws+ symbol ws+))
+
+(defconst factor-function-alias-regex
+  (concat (syntax-begin '("FUNCTION-ALIAS"))
+          ws+ symbol
+          ws+ symbol
+          ws+ symbol ws+))
 
 (defconst factor-group-name-to-face
   #s(hash-table test equal data
@@ -505,7 +515,7 @@ these lines in your .emacs:
     ,(factor-syntax factor-predicate-regex '("P" "T" "P" "T"))
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.
-    (,(format "\\(\\(?:GL-\\)?FUNCTION\\|CALLBACK\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
+    (,factor-alien-function-regex
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-word)
@@ -519,8 +529,7 @@ these lines in your .emacs:
       (3 'factor-font-lock-stack-effect nil t)))
 
     ;; Almost identical to the previous one, but for function aliases.
-    (,(format "\\(FUNCTION-ALIAS\\):[ \n]+%s[ \n]+%s[ \n]+%s[ \n]+"
-              symbol symbol symbol)
+    (,factor-function-alias-regex
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-word)
      (3 'factor-font-lock-type-name)
