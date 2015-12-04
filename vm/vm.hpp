@@ -461,8 +461,6 @@ struct factor_vm {
   void primitive_word_optimized_p();
   void primitive_wrapper();
   void jit_compile_word(cell word_, cell def_, bool relocating);
-  cell find_all_words();
-  void compile_all_words();
 
   // math
   void primitive_bignum_to_fixnum();
@@ -683,7 +681,6 @@ struct factor_vm {
   cell lazy_jit_compile(cell quot);
   bool quotation_compiled_p(quotation* quot);
   void primitive_quotation_compiled_p();
-  void initialize_all_quotations();
 
   // dispatch
   cell search_lookup_alist(cell table, cell klass);
