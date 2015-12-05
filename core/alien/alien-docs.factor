@@ -3,6 +3,10 @@ alien.syntax byte-arrays cpu.x86 eval help.markup help.syntax io
 io.backend kernel math quotations sequences system ;
 IN: alien
 
+HELP: callee-cleanup?
+{ $values { "abi" abi } { "?" boolean } }
+{ $description { $link t } " if the calling convention is callee cleanup." } ;
+
 HELP: cdecl
 { $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the standard C calling convention should be used, where the caller cleans up the stack frame after calling the function. This symbol only has meaning on 32-bit x86 platforms." } ;
 

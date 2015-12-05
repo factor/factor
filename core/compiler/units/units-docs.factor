@@ -1,5 +1,6 @@
-USING: definitions help.markup help.syntax kernel parser
-quotations sequences source-files stack-checker.errors words ;
+USING: compiler.units.private definitions help.markup help.syntax kernel
+kernel.private parser quotations sequences source-files stack-checker.errors
+words ;
 IN: compiler.units
 
 ARTICLE: "compilation-units-internals" "Compilation units internals"
@@ -40,6 +41,13 @@ $nl
 
 ABOUT: "compilation-units"
 
+HELP: bump-effect-counter?
+{ $values { "?" boolean } }
+{ $description "Whether the " { $link REDEFINITION-COUNTER } " should be increased." } ;
+
+HELP: old-definitions
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link current-source-file } " the most recent time it was loaded." } ;
+
 HELP: redefine-error
 { $values { "definition" "a definition specifier" } }
 { $description "Throws a " { $link redefine-error } "." }
@@ -48,9 +56,6 @@ HELP: redefine-error
 HELP: remember-definition
 { $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
-
-HELP: old-definitions
-{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link current-source-file } " the most recent time it was loaded." } ;
 
 HELP: new-definitions
 { $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link current-source-file } "." } ;

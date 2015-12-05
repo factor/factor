@@ -5,6 +5,9 @@ IN: kernel
 HELP: WIN-EXCEPTION-HANDLER
 { $description "This special object is an " { $link alien } " containing a pointer to the processes global exception handler. Only applicable on " { $link windows } "." } ;
 
+HELP: OBJ-UNDEFINED
+{ $description "Default definition for undefined words" } ;
+
 HELP: eq?
 { $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $description "Tests if two references point at the same object." } ;
