@@ -6,10 +6,9 @@ HELP: load-image
 { $values
   { "image" string }
   { "header" image-header }
-  { "data-heap" sequence }
-  { "code-heap" sequence }
+  { "heap-nodes" sequence }
 }
-{ $description "Loads and decodes Factor image." } ;
+{ $description "Loads and decodes Factor image. The images header and a sequence of all Factor objects found in its data and code heaps are put on the stack." } ;
 
 ARTICLE: "tools.image-analyzer" "Loader for Factor images"
 "The " { $vocab-link "tools.image-analyzer" } " loads and decodes Factor images."

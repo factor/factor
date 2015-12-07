@@ -11,11 +11,11 @@ IN: tools.image-analyzer
 : data-heap>objects ( data-relocation-base data-heap -- seq )
     binary [ '[ _ read-object ] consume-stream>sequence ] with-byte-reader ;
 
-: load-image ( image -- header data-heap code-heap )
+: load-image ( image -- header heap-nodes )
     binary [
         image-header read-struct dup [
             [ data-relocation-base>> ] [ data-size>> read ] bi
             data-heap>objects
         ]
         [ code-size>> read code-heap>code-blocks ] bi
-    ] with-file-reader ;
+    ] with-file-reader append ;
