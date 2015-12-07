@@ -90,3 +90,7 @@ STRUCT: code-block
     { owner cell_t }
     { parameters cell_t }
     { relocation cell_t } ;
+
+TUPLE: heap-node address object payload ;
+
+TUPLE: code-heap-node < heap-node free? gc-maps ;
