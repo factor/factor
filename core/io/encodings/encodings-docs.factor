@@ -26,6 +26,8 @@ HELP: decode-until
   { "seps" sequence }
   { "stream" "an input stream" }
   { "encoding" "an encoding descriptor" }
+  { "string/f" "a string or f" }
+  { "sep/f" "encountered separator or f" }
 }
 { $description "Decodes characters from the stream until one of the separators are encountered." } ;
 
