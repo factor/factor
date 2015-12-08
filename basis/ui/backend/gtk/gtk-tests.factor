@@ -1,5 +1,5 @@
-USING: alien.syntax classes.struct gdk.ffi tools.test ui.backend.gtk
-ui.gestures ;
+USING: alien.syntax classes.struct gdk.ffi kernel system tools.test
+ui.backend.gtk ui.gestures ;
 IN: ui.backend.gtk.tests
 
 : gdk-key-release-event ( -- event )
@@ -47,12 +47,15 @@ IN: ui.backend.gtk.tests
        { is_modifier 1 }
     } ;
 
-{
-    T{ key-down f f "F2" }
-    T{ key-up f f "H" }
-    T{ key-down f f " " }
-} [
-    gdk-key-press-event key-event>gesture
-    gdk-key-release-event key-event>gesture
-    gdk-space-key-press-event key-event>gesture
-] unit-test
+! The Mac build servers doesn't have the gtk libs
+os linux? [
+    {
+        T{ key-down f f "F2" }
+        T{ key-up f f "H" }
+        T{ key-down f f " " }
+    } [
+        gdk-key-press-event key-event>gesture
+        gdk-key-release-event key-event>gesture
+        gdk-space-key-press-event key-event>gesture
+    ] unit-test
+] when
