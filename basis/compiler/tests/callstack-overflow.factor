@@ -66,11 +66,15 @@ os windows? [
         2 head ${ "kernel-error" ERROR-CALLSTACK-OVERFLOW } =
     ] must-fail-with
 
-    ! Load up the stack until there is < 500 bytes of it left. Then
-    ! run a big gc cycle. 500 bytes isn't enough, so a callstack
-    ! overflow would occur during the gc which we can't handle. The
-    ! solution is to for the duration of the gc unlock the segment's
-    ! lower guard page which gives it pagesize (4096) more bytes to
-    ! play with.
-    { } [ overflow/w-compact-gc ] unit-test
+    ! This test crashes with a Memory protection fault on OS X 64-bit
+    ! for some reason. See #1478
+    cpu x86.64? os macosx? and [
+        ! Load up the stack until there is < 500 bytes of it left. Then
+        ! run a big gc cycle. 500 bytes isn't enough, so a callstack
+        ! overflow would occur during the gc which we can't handle. The
+        ! solution is to for the duration of the gc unlock the segment's
+        ! lower guard page which gives it pagesize (4096) more bytes to
+        ! play with.
+        { } [ overflow/w-compact-gc ] unit-test
+    ] unless
 ] unless
