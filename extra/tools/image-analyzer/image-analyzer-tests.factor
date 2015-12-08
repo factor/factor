@@ -14,7 +14,7 @@ IN: tools.image-analyzer.tests
 { t } [
     loadable-images [ [ ?make-image ] each ] [
         [
-            image-path load-image 2drop code-size>>
+            image-path load-image drop code-size>>
         ] map [ 0 = ] all?
     ] bi
 ] unit-test
