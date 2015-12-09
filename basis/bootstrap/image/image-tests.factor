@@ -31,6 +31,26 @@ IN: bootstrap.image.tests
     H{ } [ special-objects set emit-jit-data ] keep assoc-size
 ] unit-test
 
-{ 90 } [
+{ 95 } [
     50 <vector> [ bootstrapping-image set emit-image-header ] keep length
+] unit-test
+
+! emit-bignum
+{ V{
+    ! 33 bignum
+    32 0 33
+    ! -108 bignum
+    32 1 108
+} } [
+    V{ } bootstrapping-image set
+    33 emit-bignum
+    -108 emit-bignum
+    bootstrapping-image get
+] unit-test
+
+! prepare-object - what does this mean?
+{ 269 } [
+    V{ } clone bootstrapping-image set
+    H{ } clone objects set
+    55 >bignum prepare-object
 ] unit-test

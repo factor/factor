@@ -433,6 +433,12 @@ M: quotation prepare-object
 : emit-words ( -- )
     all-words [ emit-word ] each ;
 
+: emit-singletons ( -- )
+    t OBJ-CANONICAL-TRUE special-objects get set-at
+    0 >bignum OBJ-BIGNUM-ZERO special-objects get set-at
+    1 >bignum OBJ-BIGNUM-POS-ONE special-objects get set-at
+    -1 >bignum OBJ-BIGNUM-NEG-ONE special-objects get set-at ;
+
 : emit-global ( -- )
     {
         dictionary source-files builtins
@@ -497,6 +503,8 @@ M: quotation prepare-object
     emit-jit-data
     "Serializing global namespace..." print flush
     emit-global
+    "Serializing singletons..." print flush
+    emit-singletons
     "Serializing special object table..." print flush
     emit-special-objects
     "Performing word fixups..." print flush

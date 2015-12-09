@@ -309,8 +309,7 @@ ERROR: assert got expect ;
 
 ! Special object count and identifiers must be kept in sync with:
 !   vm/objects.hpp
-!   basis/bootstrap/image/image.factor
-CONSTANT: special-object-count 80
+CONSTANT: special-object-count 85
 
 CONSTANT: OBJ-WALKER-HOOK 3
 
@@ -408,6 +407,12 @@ CONSTANT: OBJ-VM-COMPILE-TIME 75
 
 CONSTANT: OBJ-VM-VERSION 76
 CONSTANT: OBJ-VM-GIT-LABEL 77
+
+CONSTANT: OBJ-CANONICAL-TRUE 78
+
+CONSTANT: OBJ-BIGNUM-ZERO 79
+CONSTANT: OBJ-BIGNUM-POS-ONE 80
+CONSTANT: OBJ-BIGNUM-NEG-ONE 81
 
 ! Context object count and identifiers must be kept in sync with:
 !   vm/contexts.hpp
