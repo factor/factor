@@ -4,7 +4,7 @@ namespace factor {
 //   core/kernel/kernel.factor
 //   basis/bootstrap/image/image.factor
 
-static const cell special_object_count = 80;
+static const cell special_object_count = 85;
 
 enum special_object {
   OBJ_WALKER_HOOK = 3, /* non-local exit hook, used by library only */
@@ -110,6 +110,15 @@ enum special_object {
   OBJ_VM_COMPILE_TIME = 75, /* when the binary was built */
   OBJ_VM_VERSION = 76, /* factor version */
   OBJ_VM_GIT_LABEL = 77, /* git label (git describe --all --long) */
+
+  /* Canonical truth value. In Factor, 't' */
+  OBJ_CANONICAL_TRUE = 78,
+
+  /* Canonical bignums. These needs to be kept in the image in case
+     some heap objects refer to them. */
+  OBJ_BIGNUM_ZERO,
+  OBJ_BIGNUM_POS_ONE,
+  OBJ_BIGNUM_NEG_ONE = 81,
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup
@@ -118,7 +127,9 @@ enum special_object {
 #define OBJ_LAST_SAVE OBJ_STAGE2
 
 inline static bool save_special_p(cell i) {
-  return (i >= OBJ_FIRST_SAVE && i <= OBJ_LAST_SAVE);
+  /* Need to fix the order here. */
+  return (i >= OBJ_FIRST_SAVE && i <= OBJ_LAST_SAVE) ||
+      (i >= OBJ_CANONICAL_TRUE);
 }
 
 template <typename Iterator> void object::each_slot(Iterator& iter) {
