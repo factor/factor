@@ -193,11 +193,6 @@ void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
-  visit_handle(&parent->true_object);
-  visit_handle(&parent->bignum_zero);
-  visit_handle(&parent->bignum_pos_one);
-  visit_handle(&parent->bignum_neg_one);
-
   FACTOR_FOR_EACH(parent->data_roots) {
     visit_handle(*iter);
   }

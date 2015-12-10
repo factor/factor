@@ -86,8 +86,8 @@ SYMBOL: objects
 : put-object ( n obj -- )
     <eq-wrapper> objects get set-at ;
 
-! Constants
-
+! Constants need to be synced with
+!   vm/image.hpp
 CONSTANT: image-magic 0x0f0e0d0c
 CONSTANT: image-version 4
 
@@ -96,10 +96,6 @@ CONSTANT: data-base 1024
 CONSTANT: header-size 10
 
 CONSTANT: data-heap-size-offset 3
-CONSTANT: t-offset              6
-CONSTANT: 0-offset              7
-CONSTANT: 1-offset              8
-CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
@@ -199,10 +195,10 @@ GENERIC: prepare-object ( obj -- ptr )
     0 emit ! size of data heap set later
     0 emit ! reloc base of code heap is 0
     0 emit ! size of code heap is 0
-    0 emit ! pointer to t object
-    0 emit ! pointer to bignum 0
-    0 emit ! pointer to bignum 1
-    0 emit ! pointer to bignum -1
+    0 emit ! reserved
+    0 emit ! reserved
+    0 emit ! reserved
+    0 emit ! reserved
     special-object-count [ f prepare-object emit ] times ;
 
 ! Bignums
@@ -257,14 +253,7 @@ M: float prepare-object
 ! Special objects
 
 ! Padded with fixnums for 8-byte alignment
-
-: t, ( -- ) t t-offset fixup ;
-
 M: f prepare-object drop \ f type-number ;
-
-:  0, ( -- )  0 >bignum prepare-object  0-offset fixup ;
-:  1, ( -- )  1 >bignum prepare-object  1-offset fixup ;
-: -1, ( -- ) -1 >bignum prepare-object -1-offset fixup ;
 
 ! Words
 
@@ -494,7 +483,7 @@ M: quotation prepare-object
 : build-image ( -- image )
     600,000 <vector> bootstrapping-image set
     60,000 <hashtable> objects set
-    emit-image-header t, 0, 1, -1,
+    emit-image-header
     "Building generic words..." print flush
     build-generics
     "Serializing words..." print flush
