@@ -158,7 +158,7 @@ void factor_vm::primitive_dll_validp() {
   if (to_boolean(library))
     ctx->replace(tag_boolean(untag_check<dll>(library)->handle != NULL));
   else
-    ctx->replace(true_object);
+    ctx->replace(special_objects[OBJ_CANONICAL_TRUE]);
 }
 
 /* gets the address of an object representing a C pointer */

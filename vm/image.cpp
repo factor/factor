@@ -2,16 +2,6 @@
 
 namespace factor {
 
-/* Certain special objects in the image are known to the runtime */
-void factor_vm::init_objects(image_header* h) {
-  memcpy(special_objects, h->special_objects, sizeof(special_objects));
-
-  true_object = h->true_object;
-  bignum_zero = h->bignum_zero;
-  bignum_pos_one = h->bignum_pos_one;
-  bignum_neg_one = h->bignum_neg_one;
-}
-
 void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   p->tenured_size = std::max((h->data_size * 3) / 2, p->tenured_size);
 
@@ -93,7 +83,7 @@ void factor_vm::fixup_data(cell data_offset, cell code_offset) {
         if (to_boolean(ptr->base))
           ptr->update_address();
         else
-          ptr->expired = true_object;
+          ptr->expired = special_objects[OBJ_CANONICAL_TRUE];
         break;
       }
       case DLL_TYPE: {
@@ -183,7 +173,8 @@ void factor_vm::load_image(vm_parameters* p) {
 
   raw_fclose(file);
 
-  init_objects(&h);
+  /* Certain special objects in the image are known to the runtime */
+  memcpy(special_objects, h.special_objects, sizeof(special_objects));
 
   cell data_offset = data->tenured->start - h.data_relocation_base;
   cell code_offset = code->allocator->start - h.code_relocation_base;
@@ -208,11 +199,6 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   h.data_size = data->tenured->occupied_space();
   h.code_relocation_base = code->allocator->start;
   h.code_size = code->allocator->occupied_space();
-
-  h.true_object = true_object;
-  h.bignum_zero = bignum_zero;
-  h.bignum_pos_one = bignum_pos_one;
-  h.bignum_neg_one = bignum_neg_one;
 
   for (cell i = 0; i < special_object_count; i++)
     h.special_objects[i] =

@@ -118,7 +118,7 @@ void factor_vm::prepare_boot_image() {
       quot->entry_point = lazy_jit_compile_entry_point();
   }
 
-  special_objects[OBJ_STAGE2] = true_object;
+  special_objects[OBJ_STAGE2] = special_objects[OBJ_CANONICAL_TRUE];
 
   std::cout << "done" << std::endl;
 }

@@ -66,9 +66,6 @@ struct factor_vm {
   /* Active contexts, for tracing by the GC */
   std::set<context*> active_contexts;
 
-  /* Canonical truth value. In Factor, 't' */
-  cell true_object;
-
   /* External entry points */
   c_to_factor_func_type c_to_factor_func;
 
@@ -129,11 +126,6 @@ struct factor_vm {
   bool fep_help_was_shown;
   bool fep_disabled;
   bool full_output;
-
-  /* Canonical bignums */
-  cell bignum_zero;
-  cell bignum_pos_one;
-  cell bignum_neg_one;
 
   /* Method dispatch statistics */
   dispatch_statistics dispatch_stats;
@@ -439,7 +431,7 @@ struct factor_vm {
 
   // booleans
   cell tag_boolean(cell untagged) {
-    return (untagged ? true_object : false_object);
+    return untagged ? special_objects[OBJ_CANONICAL_TRUE] : false_object;
   }
 
   // byte arrays
@@ -614,7 +606,6 @@ struct factor_vm {
   void primitive_callback_room();
 
   // image
-  void init_objects(image_header* h);
   void load_data_heap(FILE* file, image_header* h, vm_parameters* p);
   void load_code_heap(FILE* file, image_header* h, vm_parameters* p);
   bool save_image(const vm_char* saving_filename, const vm_char* filename);
