@@ -83,7 +83,7 @@ struct update_word_references_relocation_visitor {
 
   void operator()(instruction_operand op) {
     code_block* compiled = op.load_code_block();
-    switch (op.rel_type()) {
+    switch (op.rel.type()) {
       case RT_ENTRY_POINT: {
         cell owner = compiled->owner;
         if (to_boolean(owner))
@@ -198,7 +198,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
       ? untag<array>(compiled->parameters)
       : NULL;
   cell idx = op.index;
-  relocation_type rel_type = op.rel_type();
+  relocation_type rel_type = op.rel.type();
 
   cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
   if (ext_addr == (cell)-1) {
@@ -239,7 +239,7 @@ struct initial_code_block_visitor {
   }
 
   fixnum compute_operand_value(instruction_operand op) {
-    switch (op.rel_type()) {
+    switch (op.rel.type()) {
       case RT_LITERAL:
         return next_literal();
       case RT_ENTRY_POINT:
@@ -250,7 +250,7 @@ struct initial_code_block_visitor {
         return parent->compute_entry_point_pic_tail_address(next_literal());
       case RT_HERE:
         return parent->compute_here_address(
-            next_literal(), op.rel_offset(), op.compiled);
+            next_literal(), op.rel.offset(), op.compiled);
       case RT_UNTAGGED:
         return untag_fixnum(next_literal());
       default:
@@ -395,7 +395,7 @@ void factor_vm::undefined_symbol() {
   cell library = false_object;
 
   auto find_symbol_at_address_visitor = [&](instruction_operand op) {
-    if (op.rel_type() == RT_DLSYM && op.pointer <= return_address) {
+    if (op.rel.type() == RT_DLSYM && op.pointer <= return_address) {
       array* parameters = untag<array>(compiled->parameters);
       cell index = op.index;
       symbol = array_nth(parameters, index);
