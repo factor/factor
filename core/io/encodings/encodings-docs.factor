@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io quotations math sequences ;
+USING: help.markup help.syntax io quotations math sequences strings ;
 IN: io.encodings
 
 HELP: <encoder>
@@ -26,8 +26,8 @@ HELP: decode-until
   { "seps" sequence }
   { "stream" "an input stream" }
   { "encoding" "an encoding descriptor" }
-  { "string/f" "a string or f" }
-  { "sep/f" "encountered separator or f" }
+  { "string/f" { $maybe string } }
+  { "sep/f" { $maybe "encountered separator" } }
 }
 { $description "Decodes characters from the stream until one of the separators are encountered." } ;
 

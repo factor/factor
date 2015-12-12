@@ -61,5 +61,5 @@ HELP: set-basic-block
 { $description "Sets the given blocks as the current one by storing it in the basic-block dynamic variable. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;
 
 HELP: with-branch
-{ $values { "quot" quotation } { "pair/f" "a pair or f" } }
+{ $values { "quot" quotation } { "pair/f" { $maybe "pair" } } }
 { $description "The pair is either " { $link f } " or a two-tuple containing a " { $link basic-block } " and a " { $link height-state } " two-tuple." } ;
