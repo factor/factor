@@ -47,7 +47,7 @@ HELP: :c
 { $description "Prints the call stack at the time of the most recent error. Used for interactive debugging." } ;
 
 HELP: :get
-{ $values { "variable" object } { "value" "the value, or f" } }
+{ $values { "variable" object } { "value" { $maybe "value" } } }
 { $description "Looks up the value of a variable at the time of the most recent error." } ;
 
 HELP: :res
