@@ -1,12 +1,11 @@
-USING: accessors alien.strings assocs classes graphviz
-graphviz.attributes graphviz.notation kernel math.parser sequences
-slots.syntax system tools.image-analyzer
-tools.image-analyzer.ref-fixer tools.image-analyzer.vm vocabs.parser ;
+USING: accessors alien.strings assocs classes fry graphviz
+graphviz.attributes graphviz.notation kernel sequences system
+tools.image-analyzer.references tools.image-analyzer.vm vocabs.parser ;
 IN: tools.image-analyzer.graphviz
 FROM: arrays => 1array 2array ;
 FROM: byte-arrays => >byte-array ;
 FROM: kernel => object ;
-FROM: math => - ;
+FROM: math => <= - shift ;
 
 <<
 ! For the two annoying structs that differ on 32 and 64 bit.
@@ -16,22 +15,8 @@ cpu x86.32?
 ? use-vocab
 >>
 
-GENERIC: object-references ( struct -- seq )
-
-M: word object-references ( struct -- seq )
-    slots{ def entry_point name props vocabulary } ;
-
-M: code-block object-references ( struct -- seq )
-    slots{ owner parameters relocation } ;
-
-M: object object-references ( struct -- seq )
-    drop { } ;
-
-: heap-node>edges ( heap-node -- edges )
-    [ address>> ]
-    [
-        object>> object-references [ 1 = ] reject
-    ] bi [ 2array ] with map ;
+: array>string ( array -- str )
+    0 suffix >byte-array alien>native-string ;
 
 CONSTANT: node-colors {
     { array "#999999" }
@@ -40,38 +25,47 @@ CONSTANT: node-colors {
     { code-block "#ffaaff" }
     { string "#aaddff" }
     { quotation "#449900" }
-    { word "#00ff99" }
+    { word "#00ffcc" }
 }
 
-: array>string ( array -- str )
-    0 suffix >byte-array alien>native-string ;
-
-: heap-node>label ( heap-node -- id )
-    dup object>> dup string? [ drop payload>> array>string ] [
-        [ address>> ] dip
-        code-block? [ code-heap-shift - ] when number>string
-    ] if ;
-
-: heap-node>fill-color ( heap-node -- color )
+: heap-node>color ( heap-node -- color )
     object>> class-of node-colors at ;
 
-: heap-node>node ( heap-node -- node )
-    dup address>> <node>
-    over heap-node>fill-color =fillcolor
-    swap heap-node>label =label
-    "filled" =style ;
+: relativise-address ( image heap-node -- address )
+    swap [
+        [ address>> ] [ code-heap-node? ] bi
+    ] [
+        header>> [ code-relocation-base>> ] [ data-relocation-base>> ] bi
+    ] bi* ? - ;
 
-: add-edges ( graph edges -- graph )
+: heap-node>label ( image heap-node -- label )
+    dup object>> string? [
+        nip payload>> array>string
+    ] [ relativise-address ] if ;
+
+: heap-node>node ( image heap-node -- node )
+    [ heap-node>label ] [ heap-node>color ] [ address>> ] tri
+    <node> swap =fillcolor swap =label "filled" =style ;
+
+: add-nodes ( graph image -- graph )
+    dup heap>> [ heap-node>node add ] with each ;
+
+: heap-node-edges ( heap heap-node -- seq )
+    [ collect-pointers ] keep address>> '[ _ swap 2array ] map ;
+
+: image>edges ( image -- edges )
+    heap>> dup [ heap-node-edges ] with map concat ;
+
+: add-graphviz-edges ( graph edges -- graph )
     [ first2 add-edge ] each ;
 
-: setup-graph ( graph -- graph )
+: add-edges ( graph image -- graph )
+    image>edges add-graphviz-edges ;
+
+: <heap-graph> ( -- graph )
+    <digraph>
     [graph "neato" =layout ];
     <graph-attributes> "false" >>overlap add ;
 
-: make-graph ( heap-nodes -- graph )
-    dup <digraph> setup-graph
-    swap [ heap-node>node add ] each
-    swap [ heap-node>edges add-edges ] each ;
-
-: graph-image ( image -- graph )
-    load-image swap dupd fix-references make-graph ;
+: image>graph ( image -- graph )
+    <heap-graph> over add-nodes swap add-edges ;
