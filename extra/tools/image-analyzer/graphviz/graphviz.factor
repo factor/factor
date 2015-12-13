@@ -1,10 +1,13 @@
+! Copyright (C) 2013 Björn Lindqvist
+! See http://factorcode.org/license.txt for BSD license
 USING: accessors alien.strings assocs classes fry graphviz
-graphviz.attributes graphviz.notation kernel sequences system
-tools.image-analyzer.references tools.image-analyzer.vm vocabs.parser ;
+graphviz.attributes graphviz.notation math.bitwise sequences
+sets system tools.image-analyzer.references tools.image-analyzer.vm
+vocabs.parser ;
 IN: tools.image-analyzer.graphviz
 FROM: arrays => 1array 2array ;
 FROM: byte-arrays => >byte-array ;
-FROM: kernel => object ;
+FROM: kernel => ? = 2drop bi bi* dup if keep nip object over swap tri with ;
 FROM: math => <= - shift ;
 
 <<
@@ -18,14 +21,18 @@ cpu x86.32?
 : array>string ( array -- str )
     0 suffix >byte-array alien>native-string ;
 
+! Regular nodes
 CONSTANT: node-colors {
+    { alien "#aa5566" }
     { array "#999999" }
     { bignum "#cc3311" }
     { byte-array "#ffff00" }
     { code-block "#ffaaff" }
     { string "#aaddff" }
+    { tuple "#abcdef" }
     { quotation "#449900" }
     { word "#00ffcc" }
+    { wrapper "#ffaa77" }
 }
 
 : heap-node>color ( heap-node -- color )
@@ -47,14 +54,30 @@ CONSTANT: node-colors {
     [ heap-node>label ] [ heap-node>color ] [ address>> ] tri
     <node> swap =fillcolor swap =label "filled" =style ;
 
-: add-nodes ( graph image -- graph )
+: add-heap-nodes ( graph image -- graph )
     dup heap>> [ heap-node>node add ] with each ;
 
+! Root nodes
+: <root-node> ( id -- node )
+    <node> "box" =shape ;
+
+: add-root-node ( graph ptr index -- graph )
+    over 15 mask 1 <= [ 2drop ] [
+        [ swap 15 unmask add-edge ] keep <root-node> add
+    ] if ;
+
+: add-root-nodes ( graph image -- graph )
+    0 <cluster> swap
+    header>> special-objects>> [ add-root-node ] each-index
+    add ;
+
+! Edges
 : heap-node-edges ( heap heap-node -- seq )
     [ collect-pointers ] keep address>> '[ _ swap 2array ] map ;
 
 : image>edges ( image -- edges )
-    heap>> dup [ heap-node-edges ] with map concat ;
+    heap>> dup [ heap-node-edges ] with map concat
+    members [ first2 = ] reject ;
 
 : add-graphviz-edges ( graph edges -- graph )
     [ first2 add-edge ] each ;
@@ -64,8 +87,8 @@ CONSTANT: node-colors {
 
 : <heap-graph> ( -- graph )
     <digraph>
-    [graph "neato" =layout ];
+    [graph "dot" =layout ];
     <graph-attributes> "false" >>overlap add ;
 
 : image>graph ( image -- graph )
-    <heap-graph> over add-nodes swap add-edges ;
+    <heap-graph> over add-heap-nodes over add-root-nodes swap add-edges ;
