@@ -1,35 +1,46 @@
+! Copyright (C) 2013 Björn Lindqvist
+! See http://factorcode.org/license.txt for BSD license
+!
 ! Tools to follow references in the loaded image.
-USING: accessors byte-arrays fry kernel layouts math math.bitwise
-sequences slots.syntax tools.image-analyzer.relocations ;
+USING: accessors arrays byte-arrays fry kernel layouts math
+math.bitwise math.order sequences sets slots.syntax
+tools.image-analyzer.relocations ;
 IN: tools.image-analyzer.references
 QUALIFIED-WITH: tools.image-analyzer.vm vm
 
 ! Edges in the heap
 GENERIC: pointers ( heap heap-node struct -- seq )
 
-M: vm:array pointers ( heap heap-node struct -- seq )
-    drop nip payload>> ;
-
 : find-heap-node ( heap ptr -- node )
     15 unmask '[ address>> _ = ] find nip ;
 
 : load-relocations ( heap code-block -- seq )
     relocation>> find-heap-node payload>> >byte-array byte-array>relocations
-    [ first 2 = ] filter ;
+    [ interesting-relocation? ] filter ;
 
 : relocation>pointer ( heap-node relocation -- ptr )
-    over payload>> swap load-relative-value swap address>> + ;
+    [ [ address>> ] [ payload>> ] bi ] dip decode-relocation ;
 
 : relocation-pointers ( heap heap-node code-block -- seq )
     swapd load-relocations [ relocation>pointer ] with map ;
+
+: filter-data-pointers ( seq -- seq' )
+    [ 15 mask 1 <= ] reject ;
+
+M: vm:array pointers ( heap heap-node struct -- seq )
+    drop nip payload>> filter-data-pointers ;
 
 M: vm:code-block pointers ( heap heap-node struct -- seq )
     [ relocation-pointers ] [ slots{ owner parameters relocation } ] bi
     append ;
 
+M: vm:quotation pointers ( heap heap-node struct -- seq )
+    2nip [ array>> ] [ entry_point>> 4 cell * - ] bi 2array ;
+
 M: vm:word pointers ( heap heap-node struct -- seq )
     2nip [
-        slots{ def name props vocabulary }
+        slots{ def name pic_def pic_tail_def props subprimitive vocabulary }
+        filter-data-pointers
     ] [ entry_point>> 4 cell * - ] bi suffix ;
 
 M: object pointers ( heap heap-node struct -- seq )
