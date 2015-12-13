@@ -48,7 +48,7 @@ delete-staging-images
 { } [ "spheres" shake-and-bake 2183500 small-enough? ] unit-test
 
 ! [ ] [ "terrain" shake-and-bake 2053000 small-enough? ] unit-test
-{ } [ "terrain" shake-and-bake 2683000 small-enough? ] unit-test
+{ } [ "terrain" shake-and-bake 2683100 small-enough? ] unit-test
 
 ! [ ] [ "gpu.demos.raytrace" shake-and-bake 2764000 small-enough? ] unit-test
 { } [ "gpu.demos.raytrace" shake-and-bake 3557800 small-enough? ] unit-test
