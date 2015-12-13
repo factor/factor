@@ -370,8 +370,10 @@ void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
     return;
 
   auto update_literal_refs = [&](instruction_operand op) {
-    if (op.rel.type() == RT_LITERAL)
-      op.store_value(visit_pointer(op.load_value()));
+    if (op.rel.type() == RT_LITERAL) {
+      fixnum value = op.load_value(op.pointer);
+      op.store_value(visit_pointer(value));
+    }
   };
   compiled->each_instruction_operand(update_literal_refs);
 }
@@ -441,8 +443,10 @@ void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
     relocation_type type = op.rel.type();
     if (type == RT_ENTRY_POINT ||
         type == RT_ENTRY_POINT_PIC ||
-        type == RT_ENTRY_POINT_PIC_TAIL)
-      op.store_code_block(fixup.fixup_code(op.load_code_block()));
+        type == RT_ENTRY_POINT_PIC_TAIL) {
+      code_block* block = fixup.fixup_code(op.load_code_block());
+      op.store_value(block->entry_point());
+    }
   };
   compiled->each_instruction_operand(update_code_block_refs);
 }
