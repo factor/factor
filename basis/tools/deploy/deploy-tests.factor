@@ -45,7 +45,7 @@ delete-staging-images
 { } [ "tetris" shake-and-bake 2462008 small-enough? ] unit-test
 
 ! [ ] [ "spheres" shake-and-bake 1557000 small-enough? ] unit-test
-{ } [ "spheres" shake-and-bake 2183000 small-enough? ] unit-test
+{ } [ "spheres" shake-and-bake 2183500 small-enough? ] unit-test
 
 ! [ ] [ "terrain" shake-and-bake 2053000 small-enough? ] unit-test
 { } [ "terrain" shake-and-bake 2683000 small-enough? ] unit-test
