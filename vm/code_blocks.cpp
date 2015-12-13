@@ -158,10 +158,6 @@ cell factor_vm::compute_dlsym_address(array* parameters,
   return sym ? sym : undef;
 }
 
-cell factor_vm::compute_vm_address(cell arg) {
-  return (cell)this + untag_fixnum(arg);
-}
-
 cell factor_vm::lookup_external_address(relocation_type rel_type,
                                         code_block *compiled,
                                         array* parameters,
@@ -174,7 +170,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_MEGAMORPHIC_CACHE_HITS:
       return (cell)&dispatch_stats.megamorphic_cache_hits;
     case RT_VM:
-      return compute_vm_address(array_nth(parameters, index));
+      return (cell)this + untag_fixnum(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:
