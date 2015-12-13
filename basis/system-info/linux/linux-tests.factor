@@ -11,6 +11,6 @@ IN: system-info.linux.tests
 [ t ] [ machine    string? ] unit-test
 [ t ] [ domainname string? ] unit-test
 
-[ t ] [
-    release "." split1 drop { "2" "3" } member?
+{ t } [
+    release "." split1 drop { "2" "3" "4" } member?
 ] unit-test
