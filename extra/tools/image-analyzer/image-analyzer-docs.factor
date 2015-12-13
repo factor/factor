@@ -1,14 +1,12 @@
 USING: assocs help.markup help.syntax sequences strings ;
 IN: tools.image-analyzer
-FROM: tools.image-analyzer.vm => image-header ;
 
 HELP: load-image
 { $values
-  { "image" string }
-  { "header" image-header }
-  { "heap-nodes" sequence }
+  { "image-file" string }
+  { "image" image }
 }
-{ $description "Loads and decodes Factor image. The images header and a sequence of all Factor objects found in its data and code heaps are put on the stack." } ;
+{ $description "Loads and decodes Factor image." } ;
 
 ARTICLE: "tools.image-analyzer" "Loader for Factor images"
 "The " { $vocab-link "tools.image-analyzer" } " loads and decodes Factor images."
