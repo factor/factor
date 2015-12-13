@@ -73,14 +73,8 @@ fixnum instruction_operand::load_value(cell relative_to) {
   }
 }
 
-fixnum instruction_operand::load_value() { return load_value(pointer); }
-
-code_block* instruction_operand::load_code_block(cell relative_to) {
-  return ((code_block*)load_value(relative_to) - 1);
-}
-
 code_block* instruction_operand::load_code_block() {
-  return load_code_block(pointer);
+  return ((code_block*)load_value(pointer) - 1);
 }
 
 /* Store a 32-bit value into a PowerPC LIS/ORI sequence */
@@ -156,10 +150,6 @@ void instruction_operand::store_value(fixnum absolute_value) {
       critical_error("Bad rel class", rel.klass());
       break;
   }
-}
-
-void instruction_operand::store_code_block(code_block* compiled) {
-  store_value(compiled->entry_point());
 }
 
 }
