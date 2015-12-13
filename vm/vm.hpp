@@ -572,7 +572,6 @@ struct factor_vm {
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
   cell compute_dlsym_address(array* literals, cell index, bool toc);
-  cell compute_vm_address(cell arg);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
                                array* parameters,
