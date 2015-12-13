@@ -123,13 +123,12 @@ enum special_object {
 
 /* save-image-and-exit discards special objects that are filled in on startup
    anyway, to reduce image size */
-#define OBJ_FIRST_SAVE OBJ_STARTUP_QUOT
-#define OBJ_LAST_SAVE OBJ_STAGE2
-
 inline static bool save_special_p(cell i) {
   /* Need to fix the order here. */
-  return (i >= OBJ_FIRST_SAVE && i <= OBJ_LAST_SAVE) ||
-      (i >= OBJ_CANONICAL_TRUE);
+  return (i >= OBJ_STARTUP_QUOT && i <= LEAF_SIGNAL_HANDLER_WORD) ||
+      (i >= REDEFINITION_COUNTER && i <= OBJ_UNDEFINED) ||
+      i == OBJ_STAGE2 ||
+      (i >= OBJ_CANONICAL_TRUE && i <= OBJ_BIGNUM_NEG_ONE);
 }
 
 template <typename Iterator> void object::each_slot(Iterator& iter) {
