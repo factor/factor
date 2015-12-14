@@ -1,5 +1,5 @@
-USING: arrays assocs bootstrap.image.private kernel math namespaces
-sequences tools.test vectors ;
+USING: arrays assocs bootstrap.image.private kernel layouts math
+math.bitwise namespaces sequences tools.test vectors ;
 IN: bootstrap.image.tests
 
 { f } [ { 1 2 3 } [ 1 2 3 ] eql? ] unit-test
@@ -48,9 +48,28 @@ IN: bootstrap.image.tests
     bootstrapping-image get
 ] unit-test
 
+! emit-object
+{ 32 } [
+    V{ } clone bootstrapping-image set array [ ] emit-object
+    15 unmask bootstrap-cell /
+] unit-test
+
+! heap-size
+{ -95 } [
+    V{ } clone bootstrapping-image set heap-size
+    bootstrap-cell /
+] unit-test
+
+! here-as
+{ 32 } [
+    V{ } clone bootstrapping-image set array type-number here-as
+    15 unmask bootstrap-cell /
+] unit-test
+
 ! prepare-object - what does this mean?
-{ 269 } [
+{ 32 } [
     V{ } clone bootstrapping-image set
     H{ } clone objects set
     55 >bignum prepare-object
+    15 unmask bootstrap-cell /
 ] unit-test
