@@ -21,8 +21,6 @@ STRUCT: context
     { callstack-seg segment* }
     { context-objects cell_t[context-object-count] } ;
 
-: context-field-offset ( field -- offset ) context offset-of ; inline
-
 STRUCT: zone
     { here cell_t }
     { start cell_t }
@@ -42,8 +40,6 @@ STRUCT: vm
     { datastack-size cell_t }
     { retainstack-size cell_t }
     { callstack-size cell_t } ;
-
-: vm-field-offset ( field -- offset ) vm offset-of ; inline
 
 CONSTANT: collect-nursery-op 0
 CONSTANT: collect-aging-op 1
@@ -90,6 +86,8 @@ STRUCT: gc-event
 { compaction-time cell_t }
 { temp-time ulonglong } ;
 
+! dispatch-statistics should be kept in sync with:
+!   vm/dispatch.hpp
 STRUCT: dispatch-statistics
 { megamorphic-cache-hits cell_t }
 { megamorphic-cache-misses cell_t }
