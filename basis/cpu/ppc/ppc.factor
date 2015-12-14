@@ -1,15 +1,13 @@
 ! Copyright (C) 2011 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences kernel combinators
-classes.algebra byte-arrays make math math.order math.ranges
-system namespaces locals layouts words alien alien.accessors
-alien.c-types alien.complex alien.data alien.libraries
-literals cpu.architecture cpu.ppc.assembler
-compiler.cfg compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.comparisons compiler.codegen.fixup
-compiler.cfg.intrinsics compiler.cfg.stack-frame
-compiler.cfg.build-stack-frame compiler.units compiler.constants
-compiler.codegen vm memory fry io prettyprint ;
+USING: accessors alien alien.accessors alien.c-types alien.complex alien.data
+alien.libraries assocs byte-arrays classes.algebra classes.struct combinators
+compiler.cfg compiler.cfg.build-stack-frame compiler.cfg.comparisons
+compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
+compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup
+compiler.constants compiler.units cpu.architecture cpu.ppc.assembler fry io
+kernel layouts literals locals make math math.order math.ranges memory
+namespaces prettyprint sequences system vm words ;
 QUALIFIED-WITH: alien.c-types c
 FROM: cpu.ppc.assembler => B ;
 FROM: math => float ;
@@ -408,9 +406,9 @@ M:: ppc %box-long-long ( dst src1 src2 func gc-map -- )
 
 M:: ppc %save-context ( temp1 temp2 -- )
     temp1 %context
-    1 temp1 "callstack-top" context-field-offset %store-cell
-    ds-reg temp1 "datastack" context-field-offset %store-cell
-    rs-reg temp1 "retainstack" context-field-offset %store-cell ;
+    1 temp1 "callstack-top" context offset-of %store-cell
+    ds-reg temp1 "datastack" context offset-of %store-cell
+    rs-reg temp1 "retainstack" context offset-of %store-cell ;
 
 M:: ppc %c-invoke ( name dll gc-map -- )
     11 0 %load-cell-imm name dll %load-cell-imm-rc rel-dlsym
@@ -873,7 +871,7 @@ M: ppc.64 %store-memory ( src base displacement scale offset rep c-type -- )
 
 M:: ppc %allot ( dst size class nursery-ptr -- )
     ! dst = vm->nursery.here;
-    nursery-ptr vm-reg "nursery" vm-field-offset ADDI
+    nursery-ptr vm-reg "nursery" vm offset-of ADDI
     dst nursery-ptr 0 %load-cell
     ! vm->nursery.here += align(size, data_alignment);
     scratch-reg dst size data-alignment get align ADDI
@@ -908,8 +906,8 @@ M:: ppc %write-barrier-imm ( src slot tag temp1 temp2 -- )
 
 M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
     ! if (vm->nursery.here + size >= vm->nursery.end) ...
-    temp1 vm-reg "nursery" vm-field-offset %load-cell
-    temp2 vm-reg "nursery" vm-field-offset 2 cells + %load-cell
+    temp1 vm-reg "nursery" vm offset-of %load-cell
+    temp2 vm-reg "nursery" vm offset-of 2 cells + %load-cell
     temp1 temp1 size ADDI
     0 temp1 temp2 %compare-cell
     cc {

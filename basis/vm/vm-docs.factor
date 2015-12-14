@@ -17,10 +17,6 @@ HELP: vm
   }
 } ;
 
-HELP: vm-field-offset
-{ $values { "field" string } { "offset" number } }
-{ $description "Gets the offset in bytes to the named virtual machine field." } ;
-
 HELP: gc-info
 { $class-description "A struct that defines the sizes of the garbage collection maps for a word. It has the following slots:"
   { $table
