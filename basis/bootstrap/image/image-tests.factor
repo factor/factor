@@ -49,27 +49,33 @@ IN: bootstrap.image.tests
 ] unit-test
 
 ! emit-object
-{ 32 } [
+{ -96 } [
     V{ } clone bootstrapping-image set array [ ] emit-object
-    15 unmask bootstrap-cell /
+    data-base - 15 unmask bootstrap-cell /
 ] unit-test
 
-! heap-size
+! heap-size 10 header + 85 special objects
 { -95 } [
     V{ } clone bootstrapping-image set heap-size
     bootstrap-cell /
 ] unit-test
 
-! here-as
-{ 32 } [
-    V{ } clone bootstrapping-image set array type-number here-as
-    15 unmask bootstrap-cell /
+! here
+{ -95 } [
+    V{ } clone bootstrapping-image set here
+    data-base - bootstrap-cell /
 ] unit-test
 
-! prepare-object - what does this mean?
-{ 32 } [
+! here-as
+{ -96 } [
+    V{ } clone bootstrapping-image set array type-number here-as
+    data-base - 15 unmask bootstrap-cell /
+] unit-test
+
+! prepare-object
+{ -96 } [
     V{ } clone bootstrapping-image set
     H{ } clone objects set
     55 >bignum prepare-object
-    15 unmask bootstrap-cell /
+    data-base - 15 unmask bootstrap-cell /
 ] unit-test
