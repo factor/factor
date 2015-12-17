@@ -73,7 +73,7 @@ Factor contains fuel and the vocabularies it depends on.
 If you prefer to start Factor externally, you can also connect
 remotely from Emacs. Here's how to proceed:
 
-- In the factor listener, run FUEL: `"fuel" run`. This will start a server
+- In the factor listener, run `"fuel.remote" run`. This will start a server
 listener in port 9000.
 - Switch to Emacs and issue the command `M-x connect-to-factor`.
 
