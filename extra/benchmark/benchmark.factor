@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs continuations debugger formatting fry help.markup
 io io.styles kernel math memory prettyprint sequences
-tools.profiler.sampling tools.time vocabs.hierarchy vocabs.loader ;
+tools.profiler.sampling tools.test tools.time vocabs.hierarchy vocabs.loader ;
 IN: benchmark
 
 : run-timing-benchmark ( vocab -- time )
@@ -20,7 +20,9 @@ IN: benchmark
     "=== %s\n" printf ;
 
 : run-benchmark ( vocab quot: ( vocab -- res ) -- result ok? )
-    over write-header '[ _ @ t ] [ f ] recover ; inline
+    over write-header '[ _ @ t ] [
+        f f f <test-failure> f
+    ] recover ; inline
 
 PRIVATE>
 
