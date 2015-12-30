@@ -21,16 +21,16 @@ M: checksum-state clone
 
 GENERIC: initialize-checksum-state ( checksum -- checksum-state )
 
-GENERIC: checksum-block ( bytes checksum -- )
+GENERIC: checksum-block ( bytes checksum-state -- )
 
-GENERIC: get-checksum ( checksum -- value )
+GENERIC: get-checksum ( checksum-state -- value )
 
 : add-checksum-bytes ( checksum-state data -- checksum-state )
     over bytes>> [ push-all ] keep
     [ dup length pick block-size>> >= ]
     [
         over block-size>> cut-slice [
-            >byte-array over checksum-block
+            over checksum-block
             [ block-size>> ] keep [ + ] change-bytes-read
         ] dip
     ] while
@@ -38,9 +38,7 @@ GENERIC: get-checksum ( checksum -- value )
     [ >>bytes ] [ length [ + ] curry change-bytes-read ] bi ;
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
-    [
-        [ [ swap add-checksum-bytes drop ] curry each-block ] keep
-    ] with-input-stream ;
+    [ [ add-checksum-bytes ] each-block ] with-input-stream ;
 
 : add-checksum-file ( checksum-state path -- checksum-state )
     normalize-path (file-reader) add-checksum-stream ;
