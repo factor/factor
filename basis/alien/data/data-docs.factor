@@ -159,7 +159,7 @@ $nl
 { $subsections "alien.enums" }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
 { $subsections "alien.destructors" }
-"C struct and union types can be defined with " { $link POSTPONE: STRUCT: } " and " { $link POSTPONE: UNION: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
+"C struct and union types can be defined with " { $link POSTPONE: STRUCT: } " and " { $link POSTPONE: UNION-STRUCT: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
 
 HELP: malloc-string
 { $values { "string" string } { "encoding" "an encoding descriptor" } { "alien" c-ptr } }
