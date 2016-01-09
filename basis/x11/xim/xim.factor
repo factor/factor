@@ -3,8 +3,7 @@
 USING: alien alien.c-types alien.data alien.strings arrays
 byte-arrays hashtables io io.encodings.string kernel math
 namespaces sequences strings continuations x11 x11.xlib
-specialized-arrays accessors io.encodings.utf16n ;
-SPECIALIZED-ARRAY: uint
+accessors io.encodings.utf8 ;
 IN: x11.xim
 
 SYMBOL: xim
@@ -41,17 +40,17 @@ SYMBOL: keybuf
 SYMBOL: keysym
 
 : prepare-lookup ( -- )
-    buf-size uint <c-array> keybuf set
+    buf-size <byte-array> keybuf set
     0 KeySym <ref> keysym set ;
 
 : finish-lookup ( len -- string keysym )
-    keybuf get swap 2 * head utf16n decode
+    keybuf get swap head utf8 decode
     keysym get *KeySym ;
 
 : lookup-string ( event xic -- string keysym )
     [
         prepare-lookup
         swap keybuf get buf-size keysym get 0 int <ref>
-        XwcLookupString
+        Xutf8LookupString
         finish-lookup
     ] with-scope ;
