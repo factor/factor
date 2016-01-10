@@ -34,7 +34,10 @@ SYMBOL: xim
     XNResourceClass over 0 XCreateIC
     [ "XCreateIC() failed" throw ] unless* ;
 
+<<
 CONSTANT: buf-size 100
+>>
+
 CONSTANT: buf $[ buf-size <byte-array> ]
 
 : lookup-string ( event xic -- string keysym )
