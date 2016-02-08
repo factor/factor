@@ -177,5 +177,5 @@ M: #alien-callback emit-node
             [ params>> emit-callback-return ]
             [ params>> callback-stack-cleanup ]
         } cleave
-        basic-block get [ end-word ] when
+        basic-block get [ end-word ] when*
     ] with-cfg-builder ;

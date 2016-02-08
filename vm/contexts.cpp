@@ -291,7 +291,7 @@ void factor_vm::primitive_check_datastack() {
         return;
       }
     }
-    ctx->push(true_object);
+    ctx->push(special_objects[OBJ_CANONICAL_TRUE]);
   }
 }
 

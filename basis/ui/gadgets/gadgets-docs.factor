@@ -1,7 +1,10 @@
-USING: help.markup help.syntax opengl kernel strings
-classes.tuple classes quotations models math.rectangles
-ui.gadgets.private accessors ;
+USING: accessors concurrency.flags help.markup help.syntax kernel
+math.rectangles models strings ui.gadgets.private ;
 IN: ui.gadgets
+
+HELP: control-value
+{ $values { "control" gadget } { "value" object } }
+{ $description "Outputs the value of the control's model." } ;
 
 HELP: gadget-child
 { $values { "gadget" gadget } { "child" gadget } }
@@ -146,6 +149,10 @@ HELP: parents
 { $values { "gadget" gadget } { "seq" "a sequence of gadgets" } }
 { $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
 
+HELP: child?
+{ $values { "parent" gadget } { "child" gadget } { "?" boolean } }
+{ $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
+
 HELP: each-parent
 { $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "?" boolean } }
 { $description "Applies the quotation to every parent of the gadget, starting from the gadget itself, stopping if the quotation yields " { $link f } ". Outputs " { $link t } " if the iteration completed, and outputs " { $link f } " if it was stopped prematurely." } ;
@@ -153,14 +160,6 @@ HELP: each-parent
 HELP: find-parent
 { $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "parent" gadget } }
 { $description "Outputs the first parent of the gadget, starting from the gadget itself, for which the quotation outputs a true value, or " { $link f } " if the quotation outputs " { $link f } " for every parent." } ;
-
-HELP: screen-loc
-{ $values { "gadget" gadget } { "loc" "a pair of integers" } }
-{ $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
-
-HELP: child?
-{ $values { "parent" gadget } { "child" gadget } { "?" boolean } }
-{ $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
 
 HELP: focusable-child*
 { $values { "gadget" gadget } { "child/t" "a " { $link gadget } " or " { $link t } } }
@@ -173,13 +172,21 @@ HELP: focusable-child
 
 { control-value set-control-value } related-words
 
-HELP: control-value
-{ $values { "control" gadget } { "value" object } }
-{ $description "Outputs the value of the control's model." } ;
+HELP: layout-later
+{ $values { "gadget" gadget } }
+{ $description "Adds the gadget to the " { $link layout-queue } " and notifies the UI thread that there is a gadget to layout. If the length of the queue is larger than " { $link layout-queue-limit } ", then the current thread is yielded so that the UI thread has a chance to run." } ;
+
+HELP: screen-loc
+{ $values { "gadget" gadget } { "loc" "a pair of integers" } }
+{ $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
 
 HELP: set-control-value
 { $values { "value" object } { "control" gadget } }
 { $description "Sets the value of the control's model." } ;
+
+HELP: ui-notify-flag
+{ $var-description "A " { $link flag } " raised to notify the UI thread that there is work to do." }
+{ $see-also notify-ui-thread } ;
 
 ARTICLE: "ui-control-impl" "Implementing controls"
 "A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $snippet "model" } " slot set to a " { $link model } " instance."

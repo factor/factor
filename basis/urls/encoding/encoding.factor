@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs combinators combinators.short-circuit
-fry io.encodings.string io.encodings.utf8 kernel make math
-math.parser present sequences splitting strings ;
+fry io.encodings.string io.encodings.utf8 kernel linked-assocs
+make math math.parser present sequences splitting strings ;
 IN: urls.encoding
 
 : url-quotable? ( ch -- ? )
@@ -92,7 +92,7 @@ PRIVATE>
 
 : query>assoc ( query -- assoc )
     dup [
-        "&;" split H{ } clone [
+        "&;" split <linked-hash> [
             [
                 [ "=" split1 [ dup [ query-decode ] when ] bi@ swap ] dip
                 add-query-param

@@ -132,7 +132,7 @@ HELP: delete-tuples
 HELP: select-tuple
 { $values
      { "query/tuple" tuple }
-     { "tuple/f" "a tuple or f" } }
+     { "tuple/f" { $maybe tuple } } }
 { $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuples

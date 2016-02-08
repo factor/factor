@@ -1,4 +1,4 @@
-USING: ui.gadgets help.markup help.syntax ui.gadgets.packs ;
+USING: help.markup help.syntax ui.gadgets ui.gadgets.packs ;
 IN: ui.gadgets.incremental
 
 HELP: incremental
@@ -7,6 +7,8 @@ $nl
 "Incremental layout gadgets are created by calling " { $link <incremental> } "."
 $nl
 "Children are managed with the " { $link add-incremental } " and " { $link clear-incremental } " words."
+$nl
+"An example of an incremental is the 'output' of a 'pane' gadget."
 $nl
 "Not every " { $link pack } " can use incremental layout, since incremental layout does not support non-default values for the " { $slot "align" } ", " { $slot "fill" } ", and " { $slot "gap" } " slots." } ;
 

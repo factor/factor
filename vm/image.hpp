@@ -21,14 +21,12 @@ struct image_header {
   cell code_relocation_base;
   /* size of code heap */
   cell code_size;
-  /* tagged pointer to t singleton */
-  cell true_object;
-  /* tagged pointer to bignum 0 */
-  cell bignum_zero;
-  /* tagged pointer to bignum 1 */
-  cell bignum_pos_one;
-  /* tagged pointer to bignum -1 */
-  cell bignum_neg_one;
+
+  cell reserved_1;
+  cell reserved_2;
+  cell reserved_3;
+  cell reserved_4;
+
   /* Initial user environment */
   cell special_objects[special_object_count];
 };

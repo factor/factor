@@ -1,6 +1,6 @@
+USING: accessors arrays assocs io.sockets io.sockets.secure
+kernel linked-assocs present prettyprint tools.test urls ;
 IN: urls.tests
-USING: io.sockets io.sockets.secure urls urls.private tools.test prettyprint
-arrays kernel assocs present accessors ;
 
 CONSTANT: urls
     {
@@ -10,7 +10,7 @@ CONSTANT: urls
                 { host "www.apple.com" }
                 { port 1234 }
                 { path "/a/path" }
-                { query H{ { "a" "b" } } }
+                { query LH{ { "a" "b" } } }
                 { anchor "foo" }
             }
             "http://www.apple.com:1234/a/path?a=b#foo"
@@ -20,7 +20,7 @@ CONSTANT: urls
                 { protocol "http" }
                 { host "www.apple.com" }
                 { path "/a/path" }
-                { query H{ { "a" "b" } } }
+                { query LH{ { "a" "b" } } }
                 { anchor "foo" }
             }
             "http://www.apple.com/a/path?a=b#foo"
@@ -57,7 +57,7 @@ CONSTANT: urls
         {
             T{ url
                 { path "bar" }
-                { query H{ { "a" "b" } } }
+                { query LH{ { "a" "b" } } }
             }
             "bar?a=b"
         }
@@ -85,7 +85,7 @@ CONSTANT: urls
                { protocol "http" }
                { host "foo.com" }
                { path "/" }
-               { query H{ { "a" f } } }
+               { query LH{ { "a" f } } }
             }
             "http://foo.com/?a"
         }
@@ -139,7 +139,7 @@ urls [
         { host "www.apple.com" }
         { port 1234 }
         { path "/a/path/relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 } [
@@ -152,7 +152,7 @@ urls [
 
     T{ url
         { path "relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 
@@ -165,7 +165,7 @@ urls [
         { host "www.apple.com" }
         { port 1234 }
         { path "/a/path/relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 } [
@@ -178,7 +178,7 @@ urls [
 
     T{ url
         { path "relative/path" }
-        { query H{ { "a" "b" } } }
+        { query LH{ { "a" "b" } } }
         { anchor "foo" }
     }
 
@@ -236,6 +236,11 @@ urls [
     <url> "a" "b" set-query-param "b" query-param
 ] unit-test
 
+{ t } [
+    URL" http://www.google.com" "foo" "bar" set-query-param
+    query>> linked-assoc?
+] unit-test
+
 { "foo#3" } [ URL" foo" clone 3 >>anchor present ] unit-test
 
 { "http://www.foo.com/" } [ "http://www.foo.com:80" >url present ] unit-test
@@ -246,7 +251,7 @@ urls [
     T{ url
         { protocol "http" }
         { host "localhost" }
-        { query H{ { "foo" "bar" } } }
+        { query LH{ { "foo" "bar" } } }
         { path "/" }
     }
 }
@@ -256,7 +261,7 @@ urls [
     T{ url
         { protocol "http" }
         { host "localhost" }
-        { query H{ { "foo" "bar" } } }
+        { query LH{ { "foo" "bar" } } }
         { path "/" }
     }
 }
@@ -278,3 +283,12 @@ urls [
 
 { "git+https" }
 [ URL" git+https://google.com/git/factor.git" >url protocol>> ] unit-test
+
+! Params should be rendered in the order in which they are added.
+{ "/?foo=foo&bar=bar&baz=baz" } [
+    URL" /"
+    "foo" "foo" set-query-param
+    "bar" "bar" set-query-param
+    "baz" "baz" set-query-param
+    present
+] unit-test

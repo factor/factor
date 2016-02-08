@@ -95,10 +95,30 @@ void factor_vm::init_parameters_from_args(vm_parameters* p, int argc,
 void factor_vm::prepare_boot_image() {
   std::cout << "*** Stage 2 early init... " << std::flush;
 
-  compile_all_words();
+  // Compile all words.
+  data_root<array> words(instances(WORD_TYPE), this);
+
+  cell n_words = array_capacity(words.untagged());
+  for (cell i = 0; i < n_words; i++) {
+    data_root<word> word(array_nth(words.untagged(), i), this);
+
+    FACTOR_ASSERT(!word->entry_point);
+    jit_compile_word(word.value(), word->def, false);
+  }
   update_code_heap_words(true);
-  initialize_all_quotations();
-  special_objects[OBJ_STAGE2] = true_object;
+
+  // Initialize all quotations
+  data_root<array> quotations(instances(QUOTATION_TYPE), this);
+
+  cell n_quots = array_capacity(quotations.untagged());
+  for (cell i = 0; i < n_quots; i++) {
+    data_root<quotation> quot(array_nth(quotations.untagged(), i), this);
+
+    if (!quot->entry_point)
+      quot->entry_point = lazy_jit_compile_entry_point();
+  }
+
+  special_objects[OBJ_STAGE2] = special_objects[OBJ_CANONICAL_TRUE];
 
   std::cout << "done" << std::endl;
 }

@@ -1,7 +1,14 @@
-USING: ui.gadgets ui.pens ui.gestures help.markup help.syntax
-kernel classes strings opengl opengl.gl models
-math.rectangles math colors ;
+USING: help.markup help.syntax math.rectangles models opengl.gl
+ui.gadgets ui.gadgets.worlds ui.gestures ui.pens ;
 IN: ui.render
+
+HELP: clip
+{ $var-description "The current clipping rectangle." } ;
+
+HELP: draw-gadget*
+{ $values { "gadget" gadget } }
+{ $contract "Draws the gadget by making OpenGL calls. The top-left corner of the gadget should be drawn at the location stored in the " { $link origin } " variable." }
+{ $notes "This word should not be called directly. To force a gadget to redraw, call " { $link relayout-1 } "." } ;
 
 HELP: gadget
 { $class-description "An object which displays itself on the screen and acts on user input gestures. Gadgets have the following slots:"
@@ -9,6 +16,7 @@ HELP: gadget
         { { $snippet "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
         { { $snippet "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
         { { $snippet "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
+      { { $snippet "graft-state" } { "This two tuple represents the current graft state of the gadget and what its next state will become." } }
         { { $snippet "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
         { { $snippet "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
         { { $snippet "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
@@ -22,13 +30,9 @@ HELP: gadget
 { $notes
 "Other classes may inherit from " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } "." } ;
 
-HELP: clip
-{ $var-description "The current clipping rectangle." } ;
-
-HELP: draw-gadget*
-{ $values { "gadget" gadget } }
-{ $contract "Draws the gadget by making OpenGL calls. The top-left corner of the gadget should be drawn at the location stored in the " { $link origin } " variable." }
-{ $notes "This word should not be called directly. To force a gadget to redraw, call " { $link relayout-1 } "." } ;
+HELP: gl-draw-init
+{ $values { "world" world } }
+{ $description "Does some OpenGL setup that is required each time the world is to be redrawn." } ;
 
 ARTICLE: "ui-paint" "Customizing gadget appearance"
 "The UI carries out the following steps when drawing a gadget:"

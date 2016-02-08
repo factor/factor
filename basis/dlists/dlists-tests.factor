@@ -153,3 +153,8 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
         { 3 2 4 1 0 } [ swap push-sorted drop ] with each
     ] keep
 ] unit-test
+
+{ 0 5 } [
+    <dlist> dlist-length
+    { 3 4 9 1 7 } >dlist dlist-length
+] unit-test

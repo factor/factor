@@ -2,14 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
-combinators.short-circuit continuations destructors environment
-fry io io.backend io.binary io.buffers io.encodings.utf16n io.files
-io.files.private io.files.types io.pathnames io.ports
-io.streams.c io.streams.null io.timeouts kernel libc literals
-locals make math math.bitwise namespaces sequences
-specialized-arrays system threads tr windows windows.errors
-windows.handles windows.kernel32 windows.shell32 windows.time
-windows.types windows.winsock ;
+combinators.short-circuit continuations destructors environment io
+io.backend io.binary io.buffers io.files io.files.private
+io.files.types io.pathnames io.ports io.streams.c io.streams.null
+io.timeouts kernel libc literals locals math math.bitwise namespaces
+sequences specialized-arrays system threads tr vectors windows
+windows.errors windows.handles windows.kernel32 windows.shell32
+windows.time windows.types windows.winsock ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -263,7 +262,7 @@ M: windows init-stdio
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    [ [ handle>> ] dip d>w/w uint <ref> ] dip SetFilePointer
+    [ [ handle>> ] dip d>w/w LONG <ref> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
 
 M: windows (file-reader) ( path -- stream )
@@ -291,28 +290,24 @@ SLOT: attributes
 : set-file-normal-attribute ( path -- )
     FILE_ATTRIBUTE_NORMAL set-file-attributes ;
 
-: win32-file-attribute ( n symbol attr -- )
-    rot mask? [ , ] [ drop ] if ;
-
 : win32-file-attributes ( n -- seq )
-    [
-        {
-            [ +read-only+ FILE_ATTRIBUTE_READONLY win32-file-attribute ]
-            [ +hidden+ FILE_ATTRIBUTE_HIDDEN win32-file-attribute ]
-            [ +system+ FILE_ATTRIBUTE_SYSTEM win32-file-attribute ]
-            [ +directory+ FILE_ATTRIBUTE_DIRECTORY win32-file-attribute ]
-            [ +archive+ FILE_ATTRIBUTE_ARCHIVE win32-file-attribute ]
-            [ +device+ FILE_ATTRIBUTE_DEVICE win32-file-attribute ]
-            [ +normal+ FILE_ATTRIBUTE_NORMAL win32-file-attribute ]
-            [ +temporary+ FILE_ATTRIBUTE_TEMPORARY win32-file-attribute ]
-            [ +sparse-file+ FILE_ATTRIBUTE_SPARSE_FILE win32-file-attribute ]
-            [ +reparse-point+ FILE_ATTRIBUTE_REPARSE_POINT win32-file-attribute ]
-            [ +compressed+ FILE_ATTRIBUTE_COMPRESSED win32-file-attribute ]
-            [ +offline+ FILE_ATTRIBUTE_OFFLINE win32-file-attribute ]
-            [ +not-content-indexed+ FILE_ATTRIBUTE_NOT_CONTENT_INDEXED win32-file-attribute ]
-            [ +encrypted+ FILE_ATTRIBUTE_ENCRYPTED win32-file-attribute ]
-        } cleave
-    ] { } make ;
+    {
+        { +read-only+ FILE_ATTRIBUTE_READONLY }
+        { +hidden+ FILE_ATTRIBUTE_HIDDEN }
+        { +system+ FILE_ATTRIBUTE_SYSTEM }
+        { +directory+ FILE_ATTRIBUTE_DIRECTORY }
+        { +archive+ FILE_ATTRIBUTE_ARCHIVE }
+        { +device+ FILE_ATTRIBUTE_DEVICE }
+        { +normal+ FILE_ATTRIBUTE_NORMAL }
+        { +temporary+ FILE_ATTRIBUTE_TEMPORARY }
+        { +sparse-file+ FILE_ATTRIBUTE_SPARSE_FILE }
+        { +reparse-point+ FILE_ATTRIBUTE_REPARSE_POINT }
+        { +compressed+ FILE_ATTRIBUTE_COMPRESSED }
+        { +offline+ FILE_ATTRIBUTE_OFFLINE }
+        { +not-content-indexed+ FILE_ATTRIBUTE_NOT_CONTENT_INDEXED }
+        { +encrypted+ FILE_ATTRIBUTE_ENCRYPTED }
+    }
+    [ execute( -- y ) mask? [ drop f ] unless ] with { } assoc>map sift ;
 
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
@@ -386,3 +381,35 @@ M: windows home
         [ "USERPROFILE" os-env ]
         [ my-documents ]
     } 0|| ;
+
+: STREAM_DATA>out ( WIN32_FIND_STREAM_DATA -- pair/f )
+    [ cStreamName>> alien>native-string ]
+    [ StreamSize>> ] bi 2array ;
+
+: file-streams-rest ( streams handle -- streams )
+    WIN32_FIND_STREAM_DATA <struct>
+    [ FindNextStream ] 2keep
+    rot zero? [
+        GetLastError ERROR_HANDLE_EOF = [ win32-error ] unless
+        2drop
+    ] [
+        pick push file-streams-rest
+    ] if ;
+
+: file-streams ( path -- streams )
+    normalize-path
+    FindStreamInfoStandard
+    WIN32_FIND_STREAM_DATA <struct>
+    0
+    [ FindFirstStream ] 2keep drop
+    over -1 <alien> = [
+        2drop throw-win32-error
+    ] [
+        1vector swap file-streams-rest
+    ] if ;
+
+: alternate-file-streams ( path -- streams )
+    file-streams [ cStreamName>> alien>native-string "::$DATA" = not ] filter ;
+
+: alternate-file-streams? ( path -- streams )
+    alternate-file-streams empty? not ;

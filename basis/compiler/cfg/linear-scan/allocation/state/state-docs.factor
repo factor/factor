@@ -1,8 +1,8 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation
-compiler.cfg.linear-scan.allocation.spilling
-compiler.cfg.linear-scan.live-intervals cpu.architecture heaps help.markup
-help.syntax kernel math sequences vectors ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.stack-frame
+cpu.architecture heaps help.markup help.syntax kernel math sequences
+vectors ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 HELP: activate-intervals
@@ -18,7 +18,7 @@ HELP: add-active
 { $see-also active-intervals } ;
 
 HELP: align-spill-area
-{ $values { "align" integer } { "cfg" cfg } }
+{ $values { "align" integer } { "stack-frame" stack-frame } }
 { $description "This word is used to ensure that the alignment of the spill area in the " { $link cfg } " is equal to the largest " { $link spill-slot } "." } ;
 
 HELP: assign-spill-slot
@@ -27,7 +27,8 @@ HELP: assign-spill-slot
   { "rep" representation }
   { "spill-slot" spill-slot }
 }
-{ $description "Assigns a spill slot for the vreg." } ;
+{ $description "Assigns a spill slot for the vreg. The stack frames spill area align is updated so that it is at least as large as the vregs size. Then a " { $link spill-slot } " is assigned for the vreg/rep-size combination if one hasn't already been assigned and is put on the stack." }
+{ $see-also next-spill-slot } ;
 
 HELP: deactivate-intervals
 { $values { "n" integer } }
@@ -49,8 +50,12 @@ HELP: init-allocator
 { $see-also reg-class } ;
 
 HELP: next-spill-slot
-{ $values { "size" "number of bytes required" } { "spill-slot" spill-slot } }
-{ $description "Creates a new " { $link spill-slot } " of the given size and also allocates space in the " { $link cfg } " in the 'cfg' dynamic variable for it." } ;
+{ $values
+  { "size" "number of bytes required" }
+  { "stack-frame" stack-frame }
+  { "spill-slot" spill-slot }
+}
+{ $description "Creates a new " { $link spill-slot } " of the given size and also allocates space in the " { $link cfg } " in the cfg for it." } ;
 
 HELP: progress
 { $var-description "Start index of current live interval. We ensure that all live intervals added to the unhandled set have a start index strictly greater than this one. This ensures that we can catch infinite loop situations. We also ensure that all live intervals added to the handled set have an end index strictly smaller than this one. This helps catch bugs." }

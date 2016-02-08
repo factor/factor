@@ -1,10 +1,10 @@
-USING: accessors assocs classes classes.struct io locals
-math.bitwise namespaces sequences system tools.image-analyzer.utils
-tools.image-analyzer.vm vm vocabs.parser ;
+USING: accessors assocs classes.struct io locals math.bitwise
+namespaces system tools.image-analyzer.utils tools.image-analyzer.vm
+vm vocabs.parser ;
 IN: tools.image-analyzer.data-heap-reader
 FROM: alien.c-types => uchar heap-size ;
 FROM: arrays => 2array ;
-FROM: kernel => ? bi dup keep nip swap ;
+FROM: kernel => ? boa bi dup keep nip swap ;
 FROM: layouts => data-alignment ;
 FROM: math => + - * align neg shift ;
 
@@ -103,4 +103,4 @@ M: tuple read-payload ( rel-base tuple -- payload )
     peek-read-object object-tag tag>class read-struct ;
 
 : read-object ( rel-base -- object )
-    (read-object) [ read-payload ] keep swap 2array ;
+    tell-input swap (read-object) [ read-payload ] keep swap heap-node boa ;

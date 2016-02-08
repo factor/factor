@@ -73,9 +73,8 @@ $nl
 
 ABOUT: "definitions"
 
-HELP: where
-{ $values { "defspec" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
-{ $description "Outputs the location of a definition. If the location is not known, will output " { $link f } "." } ;
+HELP: changed-effects
+{ $var-description "A set that contains all words whose stack effects have changed in the compilation unit." } ;
 
 HELP: set-where
 { $values { "loc" "a " { $snippet "{ path line# }" } " pair" } { "defspec" "a definition specifier" } }
@@ -95,3 +94,7 @@ HELP: forget-all
 HELP: outdated-generics
 { $var-description "A " { $link hash-set } " where newly defined generic words are kept until they are being remade." }
 { $see-also remake-generic remake-generics } ;
+
+HELP: where
+{ $values { "defspec" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
+{ $description "Outputs the location of a definition. If the location is not known, will output " { $link f } "." } ;

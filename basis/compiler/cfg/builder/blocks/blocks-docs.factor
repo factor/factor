@@ -29,7 +29,8 @@ T{ basic-block
 >>
 
 HELP: begin-basic-block
-{ $description "Terminates the current block and initializes a new " { $link basic-block } " to begin outputting instructions to. The new block is included in the old blocks " { $slot "successors" } "." } ;
+{ $values { "block" basic-block } }
+{ $description "Terminates the given block and initializes a new " { $link basic-block } " to begin outputting instructions to. The new block is included in the old blocks " { $slot "successors" } "." } ;
 
 HELP: call-height
 { $values { "#call" #call } { "n" number } }
@@ -44,20 +45,21 @@ HELP: call-height
 
 HELP: emit-trivial-block
 { $values { "quot" quotation } }
-{ $description "Combinator that emits a trivial block, constructed by calling the supplied quotation." }
+{ $description "Combinator that emits a new trivial block, constructed by calling the supplied quotation. The quotation should not end the current block -- only add instructions to it." }
 { $examples { $unchecked-example $[ ex-emit-trivial-block ] } } ;
 
 HELP: end-branch
-{ $values { "pair/f" "two-tuple" } }
+{ $values { "block" basic-block } { "pair/f" "two-tuple" } }
 { $description "pair is { final-bb final-height }" } ;
 
 HELP: make-kill-block
-{ $description "Marks the current " { $link basic-block } " being processed as a kill block." } ;
+{ $values { "block" basic-block } }
+{ $description "Marks the block as a kill block." } ;
 
 HELP: set-basic-block
 { $values { "basic-block" basic-block } }
 { $description "Sets the given blocks as the current one by storing it in the basic-block dynamic variable. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;
 
 HELP: with-branch
-{ $values { "quot" quotation } { "pair/f" "a pair or f" } }
+{ $values { "quot" quotation } { "pair/f" { $maybe "pair" } } }
 { $description "The pair is either " { $link f } " or a two-tuple containing a " { $link basic-block } " and a " { $link height-state } " two-tuple." } ;

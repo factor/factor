@@ -25,4 +25,4 @@ INSTANCE: array sequence
 : 3array ( x y z -- array ) { } 3sequence ; inline
 : 4array ( w x y z -- array ) { } 4sequence ; inline
 
-PREDICATE: pair < array length 2 number= ;
+PREDICATE: pair < array length>> 2 number= ;

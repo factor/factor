@@ -1,15 +1,36 @@
-USING: help.markup help.syntax ui.commands ui.operations
-ui.gadgets.editors ui.gadgets.panes listener io words
-ui.tools.listener.completion ui.tools.common help.tips
-vocabs vocabs.refresh ;
+USING: help.markup help.syntax help.tips io kernel listener sequences
+ui.commands ui.gadgets.editors ui.gadgets.panes ui.operations
+ui.tools.common ui.tools.listener.completion vocabs vocabs.refresh
+words ;
 IN: ui.tools.listener
 
+HELP: <listener-gadget>
+{ $values { "listener" listener-gadget } }
+{ $description "Creates a new listener gadget." } ;
+
 HELP: interactor
-{ $class-description "An interactor is an " { $link editor } " intended to be used as the input component of a " { $link "ui-listener" } "."
-$nl
+{ $class-description "An interactor is an " { $link editor } " intended to be used as the input component of a " { $link "ui-listener" } ". It has the following slots:"
+{ $table
+  {
+      { $slot "waiting" }
+      { "If waiting is " { $link t } ", the interactor is waiting for user input, and invoking " { $link evaluate-input } " resumes the thread." }
+  }
+}
 "Interactors are created by calling " { $link <interactor> } "."
 $nl
 "Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link stream-read-quot } " generic words." } ;
+
+HELP: interactor-busy?
+{ $values { "interactor" interactor } { "?" boolean } }
+{ $description "We're busy if there's no thread to resume." } ;
+
+HELP: interactor-read
+{ $values { "interactor" interactor } { "lines" sequence } }
+{ $description "Implements the " { $link stream-readln } " generic for the interactor." } ;
+
+HELP: wait-for-listener
+{ $values { "listener" listener-gadget } }
+{ $description "Wait up to five seconds for the listener to start." } ;
 
 ARTICLE: "ui-listener" "UI listener"
 "The graphical listener adds input history and word and vocabulary completion. A summary with any outstanding error conditions is displayed before every prompt (see " { $link "ui.tools.error-list" } " for details)."

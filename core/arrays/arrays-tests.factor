@@ -25,3 +25,7 @@ IN: arrays.tests
     ${ "kernel-error" ERROR-OUT-OF-FIXNUM-RANGE 147573952589676412928 f }
     =
 ] must-fail-with
+
+{ t } [
+    1 2 2array pair?
+] unit-test

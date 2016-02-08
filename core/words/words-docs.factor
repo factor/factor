@@ -91,24 +91,62 @@ ARTICLE: "word-props" "Word properties"
 $nl
 "The following are some of the properties used by the library:"
 { $table
-    { "Property" "Documentation" }
-    { { $snippet "\"parsing\"" } { $link "parsing-words" } }
-
-    { { { $snippet "\"inline\"" } ", " { $snippet "\"foldable\"" } ", " { $snippet "flushable" } } { $link "declarations" } }
-
-    { { $snippet "\"loc\"" } { "Location information - " { $link where } } }
-
-    { { { $snippet "\"methods\"" } ", " { $snippet "\"combination\"" } } { "Set on generic words - " { $link "generic" } } }
-
-    { { { $snippet "\"reading\"" } ", " { $snippet "\"writing\"" } } { "Set on slot accessor words - " { $link "slots" } } }
-
-    { { $snippet "\"declared-effect\"" } { $link "effects" } }
-
-    { { { $snippet "\"help\"" } ", " { $snippet "\"help-loc\"" } ", " { $snippet "\"help-parent\"" } } { "Where word help is stored - " { $link "writing-help" } } }
-
-    { { $snippet "\"specializer\"" } { $link "hints" } }
-
-    { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
+  { "Property" "Documentation" }
+  {
+      { $snippet "\"declared-effect\"" } { $link "effects" }
+  }
+  {
+      {
+          { $snippet "\"inline\"" } ", "
+          { $snippet "\"foldable\"" } ", "
+          { $snippet "flushable" }
+      }
+      { $link "declarations" }
+  }
+  {
+      {
+          { $snippet "\"help\"" } ", "
+          { $snippet "\"help-loc\"" } ", "
+          { $snippet "\"help-parent\"" }
+      }
+      { "Where word help is stored - " { $link "writing-help" } }
+  }
+  {
+      { $snippet "\"intrinsic\"" }
+      { "Quotation run by the compiler during cfg building to emit the word inline." }
+  }
+  {
+      { $snippet "\"loc\"" }
+      { "Location information - " { $link where } }
+  }
+  {
+      { { $snippet "\"methods\"" } ", " { $snippet "\"combination\"" } }
+      { "Set on generic words - " { $link "generic" } }
+  }
+  {
+      {
+          { $snippet "\"outputs\"" } ", "
+          { $snippet "\"input-classes\"" } ", "
+          { $snippet "\"default-output-classes\"" }
+      }
+      { "A bunch of metadata used during the value propagation step of the compilation to produce type-optimized code." }
+  }
+  {
+      { $snippet "\"parsing\"" }
+      { $link "parsing-words" }
+  }
+  {
+      { $snippet "\"predicating\"" }
+      " Set on class predicates, stores the corresponding class word"
+  }
+  {
+      { { $snippet "\"reading\"" } ", " { $snippet "\"writing\"" } }
+      { "Set on slot accessor words - " { $link "slots" } }
+  }
+  {
+      { $snippet "\"specializer\"" }
+      { $link "hints" }
+  }
 }
 "Properties which are defined for classes only:"
 { $table
@@ -182,10 +220,15 @@ $nl
     "deferred"
     "declarations"
     "words.introspection"
+    "word-props"
 }
 { $see-also "vocabularies" "vocabs.loader" "definitions" "see" } ;
 
 ABOUT: "words"
+
+HELP: changed-effect
+{ $values { "word" word } }
+{ $description "Signals to the compilation unit that the word has changed. It causes all words that depend on it to be recompiled in response." } ;
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;

@@ -1,27 +1,23 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.short-circuit concurrency.flags
-concurrency.mailboxes continuations destructors documents
-documents.elements fry hashtables help help.markup help.tips io
-io.styles kernel lexer listener locals make math models
-models.arrow models.delay namespaces parser prettyprint
-quotations sequences source-files.errors strings system threads
-tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.tracks ui.gadgets.toolbar ui.gadgets.theme
-ui.gestures ui.operations ui.pens.solid
-ui.tools.browser ui.tools.common ui.tools.debugger
+USING: accessors arrays assocs calendar combinators
+combinators.short-circuit concurrency.flags concurrency.mailboxes
+continuations destructors documents documents.elements fry hashtables
+help help.markup help.tips io io.styles kernel lexer listener locals
+math models models.arrow models.delay namespaces parser prettyprint
+sequences source-files.errors strings system threads
+tools.errors.model ui ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
+ui.pens.solid ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener
 
-! If waiting is t, we're waiting for user input, and invoking
-! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
-output history flag mailbox thread waiting token-model word-model popup ;
+    output history flag mailbox thread waiting token-model word-model popup ;
 
 INSTANCE: interactor input-stream
 
@@ -34,7 +30,6 @@ INSTANCE: interactor input-stream
     thread>> thread-continuation ;
 
 : interactor-busy? ( interactor -- ? )
-    ! We're busy if there's no thread to resume.
     {
         [ waiting>> ]
         [ thread>> dup [ thread-registered? ] when ]
@@ -103,11 +98,8 @@ M: input (print-input)
     [ string>> H{ { font-style bold } } format ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: "
-    [
-        "sans-serif" font-name ,,
-        bold font-style ,,
-    ] H{ } make format . ;
+    "Command: " H{ { font-name "sans-serif" } { font-style bold } }
+    format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
@@ -189,9 +181,6 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 { 600 700 } listener-gadget set-tool-dim
 
-: find-listener ( gadget -- listener )
-    [ listener-gadget? ] find-parent ;
-
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
 
@@ -217,7 +206,7 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
     dup error-summary>> f track-add ;
-    
+
 : add-listener-area ( listener -- listener )
     dup output>> margins <scroller> >>scroller
     dup scroller>> white-interior 1 track-add ;
@@ -233,8 +222,7 @@ M: listener-gadget focusable-child*
     input>> dup popup>> or ;
 
 : wait-for-listener ( listener -- )
-    ! Wait for the listener to start.
-    input>> flag>> wait-for-flag ;
+    input>> flag>> 5 seconds wait-for-flag-timeout ;
 
 : listener-busy? ( listener -- ? )
     input>> interactor-busy? ;
@@ -333,42 +321,39 @@ M: object accept-completion-hook 2drop ;
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
     parse-lines-interactive ;
 
-: <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger> 
+: do-recall? ( table error -- ? )
+    [ selection>> value>> not ] [ lexer-error? ] bi* and ;
+
+: recall-lexer-error ( interactor error -- )
+    over recall-previous go-to-error ;
+
+: make-restart-hook-quot ( error interactor -- quot )
+    over '[
+        dup hide-glass
+        _ do-recall? [ _ _ recall-lexer-error ] when
+    ] ;
+
+: frame-debugger ( debugger -- labeled )
     "Error" debugger-color <framed-labeled> ;
 
+:: <debugger-popup> ( error continuation interactor -- popup )
+    error
+    continuation
+    error compute-restarts
+    error interactor make-restart-hook-quot
+    <debugger> frame-debugger ;
+
 : debugger-popup ( interactor error continuation -- )
-    [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
+    pick <debugger-popup> one-line-elt swap show-listener-popup ;
 
-: handle-parse-error ( interactor error -- )
-    dup lexer-error? [ 2dup go-to-error error>> ] when
-    error-continuation get
-    debugger-popup ;
+: try-parse ( lines -- quot/f )
+    [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
 
-: try-parse ( lines interactor -- quot/error/f )
-    [ drop parse-lines-interactive ] [
-        2nip
-        dup lexer-error? [
-            dup error>> unexpected-eof? [ drop f ] when
-        ] when
-    ] recover ;
-
-: handle-interactive ( lines interactor -- quot/f ? )
-    [ nip ] [ try-parse ] 2bi {
-        { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop insert-newline f f ] }
-        [ handle-parse-error f f ]
-    } cond ;
-
-M: interactor stream-read-quot
-    [ interactor-yield ] keep {
-        { [ over not ] [ drop ] }
-        { [ over callable? ] [ drop ] }
-        [
-            [ handle-interactive ] keep swap
-            [ interactor-finish ] [ nip stream-read-quot ] if
-        ]
-    } cond ;
+M: interactor stream-read-quot ( stream -- quot/f )
+    dup interactor-yield dup array? [
+        over interactor-finish try-parse
+        [ nip ] [ stream-read-quot ] if*
+    ] [ nip ] if ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
@@ -379,7 +364,10 @@ M: interactor handle-gesture
     {
         { [ over key-gesture? not ] [ call-next-method ] }
         { [ dup popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
-        { [ dup token-model>> value>> ] [ { [ interactor-operation ] [ call-next-method ] } 2&& ] }
+        {
+            [ dup token-model>> value>> ]
+            [ { [ interactor-operation ] [ call-next-method ] } 2&& ]
+        }
         [ call-next-method ]
     } cond ;
 

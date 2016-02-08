@@ -93,12 +93,12 @@ segment::segment(cell size_, bool executable_p) {
   size = size_;
 
   char* mem;
-
+  cell alloc_size = getpagesize() * 2 + size;
   if ((mem = (char*)VirtualAlloc(
-           NULL, getpagesize() * 2 + size, MEM_COMMIT,
+           NULL, alloc_size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
       0) {
-    out_of_memory("VirtualAlloc");
+    fatal_error("Out of memory in VirtualAlloc", alloc_size);
   }
 
   start = (cell)mem + getpagesize();
@@ -137,8 +137,18 @@ long getpagesize() {
   return g_pagesize;
 }
 
+
 bool move_file(const vm_char* path1, const vm_char* path2) {
-  return MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
+  /* MoveFileEx returns FALSE on fail. */
+  BOOL val = MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
+  if (val == FALSE) {
+    /* MoveFileEx doesn't set errno, which primitive_save_image()
+       reads the error code from. Instead of converting from
+       GetLastError() to errno values, we ust set it to the generic
+       EIO value. */
+    errno = EIO;
+  }
+  return val == TRUE;
 }
 
 void factor_vm::init_signals() {}

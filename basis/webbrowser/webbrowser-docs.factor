@@ -8,8 +8,8 @@ IN: webbrowser
 HELP: open-file
 { $values { "path" string } }
 { $description
-    "Open a specified file or directory using the default "
-    "application, similar to double-clicking the file's icon."
+    "Open a specified file or directory in a detached process using "
+    "the default application, similar to double-clicking the file's icon."
 } ;
 
 HELP: open-url

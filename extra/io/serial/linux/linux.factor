@@ -22,11 +22,11 @@ IN: io.serial.linux
 : serial-fd ( serial -- fd )
     stream>> in>> handle>> fd>> ;
 
+: get-fd-termios ( fd -- serial )
+    termios <struct> [ tcgetattr io-error ] keep ;
+
 : set-termios ( serial -- )
-    [
-        serial-fd
-        termios <struct> [ tcgetattr io-error ] keep
-    ] keep termios<< ;
+    [ serial-fd get-fd-termios ] keep termios<< ;
 
 : configure-termios ( serial -- )
     dup termios>>

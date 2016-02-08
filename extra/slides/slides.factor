@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors fry help.markup help.stylesheet
-io.styles kernel math math.ranges models namespaces parser
+USING: accessors arrays colors fonts fry help.markup help.stylesheet
+io.styles kernel literals math math.ranges models namespaces parser
 sequences system ui ui.gadgets ui.gadgets.books ui.gadgets.panes
 ui.gestures ui.pens.gradient ui.pens.solid ;
 IN: slides
@@ -10,19 +10,19 @@ CONSTANT: stylesheet
     H{
         { default-span-style
             H{
-                { font-name "sans-serif" }
-                { font-size 36 }
+                { font-name $ default-sans-serif-font-name }
+                { font-size $[ default-font-size 3 * ] }
             }
         }
         { default-block-style
             H{
-                { wrap-margin 1100 }
+                { wrap-margin $[ default-font-size 92 * ] }
             }
         }
         { code-char-style
             H{
-                { font-name "monospace" }
-                { font-size 36 }
+                { font-name $ default-monospace-font-name }
+                { font-size $[ default-font-size 3 * ] }
             }
         }
         { code-style
@@ -32,24 +32,28 @@ CONSTANT: stylesheet
         }
         { snippet-style
             H{
-                { font-name "monospace" }
-                { font-size 36 }
+                { font-name $ default-monospace-font-name }
+                { font-size $[ default-font-size 3 * ] }
                 { foreground T{ rgba f 0.1 0.1 0.4 1 } }
             }
         }
         { table-content-style
-            H{ { wrap-margin 1000 } }
+            H{ { wrap-margin $[ default-font-size 83 * ] } }
         }
         { list-style
-            H{ { table-gap { 10 20 } } }
+            H{
+                { table-gap ${ default-font-size 5/6 *
+                               default-font-size 10/6 * }
+                }
+            }
         }
     }
 
 : $title ( string -- )
     [
         H{
-            { font-name "sans-serif" }
-            { font-size 48 }
+            { font-name $ default-sans-serif-font-name }
+            { font-size $[ default-font-size 4 * ] }
         } format
     ] ($block) ;
 
@@ -66,7 +70,7 @@ CONSTANT: stylesheet
     [
         <gadget>
             divider-interior >>interior
-            { 800 10 } >>dim
+            ${ default-font-size 67 * default-font-size 5/6 * } >>dim
             { 1 0 } >>orientation
         gadget.
     ] ($block) ;
@@ -114,10 +118,13 @@ SYNTAX: STRIP-TEASE:
 
 \ slides H{
     { T{ button-down } [ request-focus ] }
+    { T{ key-down f f " " } [ next-page ] }
     { T{ key-down f f "DOWN" } [ next-page ] }
     { T{ key-down f f "UP" } [ prev-page ] }
+    { T{ key-down f f "q" } [ close-window ] }
+    { T{ key-down f f "ESC" } [ close-window ] }
     { T{ key-down f f "f" } [ toggle-fullscreen ] }
 } set-gestures
 
-: slides-window ( slides -- )
-    '[ _ <slides> "Slides" open-window ] with-ui ;
+: slides-window ( slides title -- )
+    '[ _ <slides> _ open-window ] with-ui ;

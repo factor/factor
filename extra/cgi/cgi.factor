@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: arrays assocs combinators environment io kernel
-math.parser regexp sequences splitting strings unicode.case
-urls.encoding ;
+linked-assocs math.parser regexp sequences splitting strings
+unicode.case urls.encoding ;
 
 IN: cgi
 
@@ -20,14 +20,14 @@ IN: cgi
 
 : (content-type) ( string -- params media/type )
     ";" split unclip [
-        [ H{ } clone ] [ first (query-string) ] if-empty
+        [ LH{ } clone ] [ first (query-string) ] if-empty
     ] dip ;
 
 : (multipart) ( -- assoc )
     "multipart unsupported" throw ;
 
 : (urlencoded) ( -- assoc )
-    "CONTENT_LENGTH" os-env "0" or string>number
+    "CONTENT_LENGTH" os-env [ string>number ] [ 0 ] if*
     read [ "" ] [ "&" append ] if-empty
     "QUERY_STRING" os-env [ append ] when* (query-string) ;
 

@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.pathnames kernel tools.test io.backend
-io.files.windows splitting sequences io.pathnames.private ;
+USING: combinators continuations io.backend io.directories io.files
+io.files.temp io.files.windows io.pathnames kernel kernel.private libc
+literals memory sequences splitting tools.test windows.kernel32 ;
 IN: io.files.windows.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
@@ -58,3 +59,22 @@ IN: io.files.windows.tests
 
 [ "c:\\blah" ] [ "c:\\foo\\bar" "\\blah" append-path ] unit-test
 [ t ] [ "" resource-path 2 tail exists? ] unit-test
+
+! win32-file-attributes
+{
+    { +read-only+ +hidden+ }
+} [
+    3 win32-file-attributes
+] unit-test
+
+! set-file-attributes & save-image
+{ ${ "kernel-error" ERROR-IO EIO f } } [
+    [
+        "read-only.image" temp-file {
+            [ ?delete-file ]
+            [ touch-file ]
+            [ FILE_ATTRIBUTE_READONLY set-file-attributes ]
+            [ save-image ]
+        } cleave
+    ] [ ] recover
+] unit-test

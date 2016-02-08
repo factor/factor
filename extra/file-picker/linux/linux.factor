@@ -23,10 +23,10 @@ FUNCTION: GtkWidget* gtk_file_chooser_dialog_new (
         f
         GTK_FILE_CHOOSER_ACTION_OPEN
         "Cancel" utf8 encode
-        GTK_RESPONSE_CANCEL int <ref>
+        GTK_RESPONSE_CANCEL gint <ref>
     ] [
         utf8 encode
-        GTK_RESPONSE_ACCEPT int <ref>
+        GTK_RESPONSE_ACCEPT gint <ref>
         f
         gtk_file_chooser_dialog_new
         &gtk_widget_destroy

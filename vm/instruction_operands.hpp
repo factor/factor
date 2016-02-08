@@ -81,18 +81,18 @@ struct relocation_entry {
     value = (uint32_t)((rel_type << 28) | (rel_class << 24) | offset);
   }
 
-  relocation_type rel_type() {
+  relocation_type type() {
     return (relocation_type)((value & 0xf0000000) >> 28);
   }
 
-  relocation_class rel_class() {
+  relocation_class klass() {
     return (relocation_class)((value & 0x0f000000) >> 24);
   }
 
-  cell rel_offset() { return (value & 0x00ffffff); }
+  cell offset() { return (value & 0x00ffffff); }
 
   int number_of_parameters() {
-    switch (rel_type()) {
+    switch (type()) {
       case RT_VM:
         return 1;
       case RT_DLSYM:
@@ -112,7 +112,7 @@ struct relocation_entry {
       case RT_SAFEPOINT:
         return 0;
       default:
-        critical_error("Bad rel type in number_of_parameters()", rel_type());
+        critical_error("Bad rel type in number_of_parameters()", type());
         return -1; /* Can't happen */
     }
   }
@@ -127,23 +127,16 @@ struct instruction_operand {
   instruction_operand(relocation_entry rel, code_block* compiled,
                       cell index);
 
-  relocation_type rel_type() { return rel.rel_type(); }
-
-  cell rel_offset() { return rel.rel_offset(); }
-
   fixnum load_value_2_2();
   fixnum load_value_2_2_2_2();
   fixnum load_value_masked(cell mask, cell bits, cell shift);
   fixnum load_value(cell relative_to);
-  fixnum load_value();
-  code_block* load_code_block(cell relative_to);
   code_block* load_code_block();
 
   void store_value_2_2(fixnum value);
   void store_value_2_2_2_2(fixnum value);
   void store_value_masked(fixnum value, cell mask, cell shift);
   void store_value(fixnum value);
-  void store_code_block(code_block* compiled);
 };
 
 }

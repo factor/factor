@@ -173,7 +173,6 @@ ARTICLE: "furnace.auth.example" "Furnace authentication example"
 { $code
 ": <login-config> ( responder -- responder' )
     \"Factor website\" <login-realm>
-        \"Factor website\" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile

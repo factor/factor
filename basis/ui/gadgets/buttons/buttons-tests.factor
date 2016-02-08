@@ -1,4 +1,4 @@
-USING: accessors models namespaces tools.test ui.gadgets
+USING: accessors kernel models namespaces tools.test ui.gadgets
 ui.gadgets.buttons ;
 IN: ui.gadgets.buttons.tests
 
@@ -17,4 +17,9 @@ IN: ui.gadgets.buttons.tests
 
 { 2 } [
     "religion" get gadget-child control-value
+] unit-test
+
+{ t t } [
+    "but1" [ ] <roll-button> "but2" [ ] <roll-button>
+    [ [ boundary>> ] bi@ eq? ] [ [ interior>> ] bi@ eq? ] 2bi
 ] unit-test

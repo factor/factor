@@ -1,5 +1,5 @@
-USING: ui.gadgets models help.markup help.syntax io kernel
-quotations ;
+USING: help.markup help.syntax io kernel models quotations ui.gadgets
+ui.gadgets.panes.private ;
 IN: ui.gadgets.panes
 
 HELP: pane
@@ -15,6 +15,11 @@ HELP: write-gadget
 { $notes "Not all streams support this operation." } ;
 
 { write-gadget print-gadget gadget. } related-words
+
+HELP: pane-nl
+{ $values { "pane" pane } }
+{ $description "Outputs a virtual newline character to the pane stream." }
+{ $see-also nl } ;
 
 HELP: print-gadget
 { $values { "gadget" gadget } { "stream" "an output stream" } }

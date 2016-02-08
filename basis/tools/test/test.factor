@@ -31,15 +31,15 @@ T{ error-type-holder
 SYMBOL: verbose-tests?
 t verbose-tests? set-global
 
-<PRIVATE
-
-: <test-failure> ( error experiment file line# -- triple )
+: <test-failure> ( error experiment file line# -- test-failure )
     test-failure new
         swap >>line#
         swap >>path
         swap >>asset
         swap >>error
         error-continuation get >>continuation ;
+
+<PRIVATE
 
 : failure ( error experiment file line# -- )
     "--> test failed!" print
@@ -161,7 +161,7 @@ M: test-failure error. ( error -- )
         [ error-location print nl ]
         [ asset>> [ experiment. nl ] when* ]
         [ error>> error. ]
-        [ continuation>> traceback-link. ]
+        [ continuation>> call>> callstack. ]
     } cleave ;
 
 : :test-failures ( -- ) test-failures get errors. ;

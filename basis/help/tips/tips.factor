@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors.constants definitions help.markup
-help.stylesheet io io.styles kernel namespaces parser random
+help.stylesheet io io.styles kernel literals namespaces parser random
 sequences ;
 IN: help.tips
 
@@ -32,7 +32,7 @@ SYMBOL: tip-of-the-day-style
 H{
     { page-color COLOR: lavender }
     { inset { 5 5 } }
-    { wrap-margin 500 }
+    { wrap-margin $ wrap-margin-full }
 } tip-of-the-day-style set-global
 
 : $tip-title ( tip -- )

@@ -13,10 +13,10 @@ ostream& operator<<(ostream& out, const string* str) {
 }
 
 void factor_vm::print_word(ostream& out, word* word, cell nesting) {
-  if (tagged<object>(word->vocabulary).type_p(STRING_TYPE))
+  if (TAG(word->vocabulary) == STRING_TYPE)
     out << untag<string>(word->vocabulary) << ":";
 
-  if (tagged<object>(word->name).type_p(STRING_TYPE))
+  if (TAG(word->name) == STRING_TYPE)
     out << untag<string>(word->name);
   else {
     out << "#<not a string: ";
@@ -112,7 +112,7 @@ void factor_vm::print_nested_obj(ostream& out, cell obj, fixnum nesting) {
 
   quotation* quot;
 
-  switch (tagged<object>(obj).type()) {
+  switch (TAG(obj)) {
     case FIXNUM_TYPE:
       out << untag_fixnum(obj);
       break;
@@ -158,7 +158,7 @@ void factor_vm::print_nested_obj(ostream& out, cell obj, fixnum nesting) {
       print_alien(out, untag<alien>(obj), nesting - 1);
       break;
     default:
-      out << "#<" << type_name(tagged<object>(obj).type()) << " @ ";
+      out << "#<" << type_name(TAG(obj)) << " @ ";
       out << (void*)obj << ">";
       break;
   }
@@ -264,26 +264,39 @@ void factor_vm::dump_memory(ostream& out, cell from, cell to) {
     dump_cell(out, from);
 }
 
-template <typename Generation>
-void factor_vm::dump_generation(ostream& out, const char* name, Generation* gen) {
-  out << name << ": ";
-  out << "Start=" << gen->start;
-  out << ", size=" << gen->size;
-  out << ", end=" << gen->end;
-  out << endl;
+void dump_memory_range(ostream& out, const char* name, cell name_w,
+                       cell start, cell end) {
+  out << setw(name_w) << left << name << ": ";
+
+  out << "[" << (void*)start << " -> " << (void*)end << "] ";
+  out << setw(10) << right << (end - start) << " bytes" << endl;
 }
 
-void factor_vm::dump_generations(ostream& out) {
-  out << hex;
+template <typename Generation>
+void dump_generation(ostream& out, const char* name, Generation* gen) {
+  dump_memory_range(out, name, 10, gen->start, gen->end);
+}
 
-  dump_generation(out, "Nursery", &nursery);
+void factor_vm::dump_memory_layout(ostream& out) {
+  dump_generation(out, "Nursery", data->nursery);
   dump_generation(out, "Aging", data->aging);
   dump_generation(out, "Tenured", data->tenured);
+  dump_memory_range(out, "Cards", 10, (cell)data->cards, (cell)data->cards_end);
 
-  out << "Cards:";
-  out << "base=" << (cell)data->cards << ", ";
-  out << "size=" << (cell)(data->cards_end - data->cards) << endl;
-  out << dec;
+  out << endl << "Contexts:" << endl << endl;
+  FACTOR_FOR_EACH(active_contexts) {
+    context* the_ctx = *iter;
+    segment* ds = the_ctx->datastack_seg;
+    segment* rs = the_ctx->retainstack_seg;
+    segment* cs = the_ctx->callstack_seg;
+    if (the_ctx == ctx) {
+      out << "  Active:" << endl;
+    }
+    dump_memory_range(out, "  Datastack", 14, ds->start, ds->end);
+    dump_memory_range(out, "  Retainstack", 14, rs->start, rs->end);
+    dump_memory_range(out, "  Callstack", 14, cs->start, cs->end);
+    out << endl;
+  }
 }
 
 void factor_vm::dump_objects(ostream& out, cell type) {
@@ -382,7 +395,7 @@ void factor_vm::factorbug_usage(bool advanced_p) {
          << endl;
     cout << "  . <addr>         -- print object at tagged <addr>"
          << endl;
-    cout << "  g                -- dump generations" << endl;
+    cout << "  g                -- dump memory layout" << endl;
     cout << "  ds dr            -- dump data, retain stacks" << endl;
     cout << "  trim             -- toggle output trimming" << endl;
     cout << "  data             -- data heap dump" << endl;
@@ -498,7 +511,7 @@ void factor_vm::factorbug() {
       for (cell i = 0; i < special_object_count; i++)
         dump_cell(cout, (cell)&special_objects[i]);
     } else if (cmd == "g")
-      dump_generations(cout);
+      dump_memory_layout(cout);
     else if (cmd == "c") {
       exit_fep(this);
       return;
@@ -542,11 +555,7 @@ void factor_vm::factorbug() {
 }
 
 void factor_vm::primitive_die() {
-  cout << "The die word was called by the library. Unless you called it "
-      "yourself," << endl;
-  cout << "you have triggered a bug in Factor. Please report."
-       << endl;
-  factorbug();
+  critical_error("The die word was called by the library.", 0);
 }
 
 }

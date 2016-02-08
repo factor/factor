@@ -1,7 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel colors colors.constants accessors combinators math ;
+USING: accessors colors.constants combinators kernel math ;
 IN: fonts
+
+CONSTANT: default-serif-font-name "serif"
+CONSTANT: default-sans-serif-font-name "sans-serif"
+CONSTANT: default-monospace-font-name "monospace"
+
+CONSTANT: default-font-size 12
 
 TUPLE: font
 name
@@ -42,18 +48,18 @@ italic?
 
 : serif-font ( -- font )
     <font>
-        "serif" >>name
-        12 >>size ;
+        default-serif-font-name >>name
+        default-font-size >>size ;
 
 : sans-serif-font ( -- font )
     <font>
-        "sans-serif" >>name
-        12 >>size ;
+        default-sans-serif-font-name >>name
+        default-font-size >>size ;
 
 : monospace-font ( -- font )
     <font>
-        "monospace" >>name
-        12 >>size ;
+        default-monospace-font-name >>name
+        default-font-size >>size ;
 
 : strip-font-colors ( font -- font' )
     clone f >>background f >>foreground ;

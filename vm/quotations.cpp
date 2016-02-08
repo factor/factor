@@ -41,47 +41,47 @@ void quotation_jit::init_quotation(cell quot) {
   elements = untag<quotation>(quot)->array;
 }
 
-bool quotation_jit::primitive_call_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-      parent->special_objects[JIT_PRIMITIVE_WORD];
-}
-
 bool quotation_jit::fast_if_p(cell i, cell length) {
   return (i + 3) == length &&
-         tagged<object>(array_nth(elements.untagged(), i + 1))
-             .type_p(QUOTATION_TYPE) &&
-         array_nth(elements.untagged(), i + 2) ==
-             parent->special_objects[JIT_IF_WORD];
+      TAG(array_nth(elements.untagged(), i + 1)) == QUOTATION_TYPE &&
+      array_nth(elements.untagged(), i + 2) == parent->special_objects[JIT_IF_WORD];
+}
+
+bool quotation_jit::primitive_call_p(cell i, cell length) {
+  cell jit_primitive_word = parent->special_objects[JIT_PRIMITIVE_WORD];
+  return (i + 2) <= length &&
+      array_nth(elements.untagged(), i + 1) == jit_primitive_word;
 }
 
 bool quotation_jit::fast_dip_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-                                  parent->special_objects[JIT_DIP_WORD];
+  cell jit_dip_word = parent->special_objects[JIT_DIP_WORD];
+  return (i + 2) <= length &&
+      array_nth(elements.untagged(), i + 1) == jit_dip_word;
 }
 
 bool quotation_jit::fast_2dip_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-                                  parent->special_objects[JIT_2DIP_WORD];
+  cell jit_2dip_word = parent->special_objects[JIT_2DIP_WORD];
+  return (i + 2) <= length &&
+      array_nth(elements.untagged(), i + 1) == jit_2dip_word;
 }
 
 bool quotation_jit::fast_3dip_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-                                  parent->special_objects[JIT_3DIP_WORD];
+  cell jit_3dip_word = parent->special_objects[JIT_3DIP_WORD];
+  return (i + 2) <= length &&
+      array_nth(elements.untagged(), i + 1) == jit_3dip_word;
+}
+
+bool quotation_jit::declare_p(cell i, cell length) {
+  cell jit_declare_word = parent->special_objects[JIT_DECLARE_WORD];
+  return (i + 2) <= length &&
+      array_nth(elements.untagged(), i + 1) == jit_declare_word;
 }
 
 bool quotation_jit::mega_lookup_p(cell i, cell length) {
   return (i + 4) <= length &&
-         tagged<object>(array_nth(elements.untagged(), i + 1))
-             .type_p(FIXNUM_TYPE) &&
-         tagged<object>(array_nth(elements.untagged(), i + 2))
-             .type_p(ARRAY_TYPE) &&
-         array_nth(elements.untagged(), i + 3) ==
-             parent->special_objects[MEGA_LOOKUP_WORD];
-}
-
-bool quotation_jit::declare_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-                                  parent->special_objects[JIT_DECLARE_WORD];
+      TAG(array_nth(elements.untagged(), i + 1)) == FIXNUM_TYPE &&
+      TAG(array_nth(elements.untagged(), i + 2)) == ARRAY_TYPE &&
+      array_nth(elements.untagged(), i + 3) == parent->special_objects[MEGA_LOOKUP_WORD];
 }
 
 bool quotation_jit::special_subprimitive_p(cell obj) {
@@ -101,7 +101,7 @@ bool quotation_jit::no_non_safepoint_words_p() {
   cell length = array_capacity(elements.untagged());
   for (cell i = 0; i < length; i++) {
     cell obj = array_nth(elements.untagged(), i);
-    if (tagged<object>(obj).type() == WORD_TYPE && !word_safepoint_p(obj))
+    if (TAG(obj) == WORD_TYPE && !word_safepoint_p(obj))
       return false;
   }
   return true;
@@ -109,7 +109,7 @@ bool quotation_jit::no_non_safepoint_words_p() {
 
 bool quotation_jit::trivial_quotation_p(array* elements) {
   return array_capacity(elements) == 1 &&
-         tagged<object>(array_nth(elements, 0)).type_p(WORD_TYPE);
+      TAG(array_nth(elements, 0)) == WORD_TYPE;
 }
 
 /* Allocates memory (emit) */
@@ -362,19 +362,6 @@ bool factor_vm::quotation_compiled_p(quotation* quot) {
 void factor_vm::primitive_quotation_compiled_p() {
   quotation* quot = untag_check<quotation>(ctx->pop());
   ctx->push(tag_boolean(quotation_compiled_p(quot)));
-}
-
-/* Allocates memory */
-void factor_vm::initialize_all_quotations() {
-  cell all_quots = instances(QUOTATION_TYPE);
-  data_root<array> quotations(all_quots, this);
-
-  cell length = array_capacity(quotations.untagged());
-  for (cell i = 0; i < length; i++) {
-    data_root<quotation> quot(array_nth(quotations.untagged(), i), this);
-    if (!quot->entry_point)
-      quot.untagged()->entry_point = lazy_jit_compile_entry_point();
-  }
 }
 
 }

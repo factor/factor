@@ -220,19 +220,18 @@ these lines in your .emacs:
     "B"
     "COLOR:"
     "CONSULT:" "call-next-method"
-    "EBNF:" ";EBNF" "ENUM:" "ERROR:"
+    "EBNF:" ";EBNF"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
-    "GAME:" "GIR:"
+    "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HINTS:"
     "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
-    "MACRO:" "MACRO::" "MATH:"
-    "MEMO:" "MEMO:" "METHOD:"
+    "MATH:"
+    "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only" "REQUIRE:"  "REQUIRES:"
-    "SINGLETONS:" "SLOT:"
+    "SLOT:"
     "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
-    "TYPED:" "TYPED::"
     "UNIFORM-TUPLE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
@@ -246,13 +245,14 @@ these lines in your .emacs:
   (regexp-opt factor-constant-words 'symbols))
 
 (defconst factor-bracer-words
-  '("B" "BV" "C" "CS" "H" "HS" "T" "V" "W"))
+  '("B" "BV" "C" "CS" "H" "HS" "S" "T" "V" "W"))
 
 (defconst factor-brace-words-regex
   (format "%s{" (regexp-opt factor-bracer-words t)))
 
 (defconst factor-declaration-words
   '("deprecated"
+    "final"
     "flushable"
     "foldable"
     "inline"
@@ -264,7 +264,7 @@ these lines in your .emacs:
   (regexp-opt factor-declaration-words 'symbols))
 
 (defconst factor-integer-regex
-  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9]+\\)\\_>")
+  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9][0-9,]*\\)\\_>")
 
 (defconst factor-raw-float-regex
   "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
@@ -281,12 +281,14 @@ these lines in your .emacs:
 (defconst factor-bad-string-regex
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
+(defconst factor-word-starters
+  '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
+    "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
+    "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::"))
+
 (defconst factor-word-definition-regex
   (concat
-   (format "\\_<\\(\\(?:%s\\)?[:#]\\)"
-           (regexp-opt
-            '(":" "GENERIC" "DEFER" "HOOK" "MACRO" "MATH" "POSTPONE"
-              "PRIMITIVE" "SYNTAX" "TYPED" "TYPED:")))
+   (format "\\_<\\(%s\\)" (regexp-opt factor-word-starters))
    ws+ symbol))
 
 ;; [parsing-word] [vocab-word]
@@ -299,19 +301,20 @@ these lines in your .emacs:
 ;; [parsing-word] [symbol-word]
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
-   '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "HELP" "LIBRARY"
-     "MAIN" "STRING" "SYMBOL" "VAR")))
+   '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "GAME" "HELP" "LIBRARY"
+     "MAIN" "MAIN-WINDOW" "STRING" "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
 (defconst factor-symbols-lines-regex
   (concat (syntax-begin '("SYMBOLS")) ws+ symbols-to-semicolon))
 
-;; (defconst factor-int-constant-def-regex
-;;   (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")))
+(defconst factor-types-lines-regex
+  (concat (syntax-begin '("SINGLETONS")) ws+ symbols-to-semicolon))
 
 (defconst factor-type-definition-regex
   (syntax-and-1-symbol
-   '("COM-INTERFACE" "C-TYPE" "MIXIN" "SINGLETON" "SPECIALIZED-ARRAY")))
+   '("COM-INTERFACE" "C-TYPE" "MIXIN" "SINGLETON" "SPECIALIZED-ARRAY"
+     "TUPLE-ARRAY")))
 
 (defconst factor-constructor-regex
   (one-symbol "<[^ >]+>"))
@@ -339,7 +342,7 @@ these lines in your .emacs:
     "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
     "INTERSECTION:"
     "M" "M:" "MACRO" "MACRO:"
-    "MEMO" "MEMO:" "METHOD"
+    "MAIN-WINDOW:" "MEMO" "MEMO:" "METHOD"
     "SYNTAX"
     "PREDICATE" "PRIMITIVE" "PROTOCOL"
     "SINGLETONS"
@@ -414,6 +417,20 @@ these lines in your .emacs:
           symbol ws+
           "\\(=>\\)" ws+ symbols-to-semicolon))
 
+(defconst factor-predicate-regex
+  (concat (syntax-begin '("PREDICATE")) ws+ symbol ws+ "\\(<\\)" ws+ symbol))
+
+(defconst factor-alien-function-regex
+  (concat (syntax-begin '("GL-FUNCTION" "FUNCTION" "GL-CALLBACK" "CALLBACK"))
+          ws+ symbol
+          ws+ symbol ws+))
+
+(defconst factor-function-alias-regex
+  (concat (syntax-begin '("FUNCTION-ALIAS"))
+          ws+ symbol
+          ws+ symbol
+          ws+ symbol ws+))
+
 (defconst factor-group-name-to-face
   #s(hash-table test equal data
                 ("C" 'factor-font-lock-comment
@@ -458,6 +475,7 @@ these lines in your .emacs:
     ,(factor-syntax factor-word-definition-regex '("P" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
     ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
+    ,(factor-syntax factor-types-lines-regex '("P" "T"))
     (,factor-integer-regex . 'factor-font-lock-number)
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
@@ -494,14 +512,10 @@ these lines in your .emacs:
       nil
       (1 'factor-font-lock-symbol nil t)
       (2 'factor-font-lock-symbol nil t)))
-    ;; Highlights predicates
-    (,(format "\\(PREDICATE\\):[ \n]%s[ \n]<[ \n]%s" symbol symbol)
-     (1 'factor-font-lock-parsing-word)
-     (2 'factor-font-lock-type-name)
-     (3 'factor-font-lock-type-name))
+    ,(factor-syntax factor-predicate-regex '("P" "T" "P" "T"))
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.
-    (,(format "\\(\\(?:GL-\\)?FUNCTION\\|CALLBACK\\):[ \n]+%s[ \n]+%s[ \n]+" symbol symbol)
+    (,factor-alien-function-regex
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-word)
@@ -515,8 +529,7 @@ these lines in your .emacs:
       (3 'factor-font-lock-stack-effect nil t)))
 
     ;; Almost identical to the previous one, but for function aliases.
-    (,(format "\\(FUNCTION-ALIAS\\):[ \n]+%s[ \n]+%s[ \n]+%s[ \n]+"
-              symbol symbol symbol)
+    (,factor-function-alias-regex
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-word)
      (3 'factor-font-lock-type-name)

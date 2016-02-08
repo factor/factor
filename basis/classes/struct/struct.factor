@@ -45,23 +45,8 @@ M: struct-class group-words
     struct-slots slot-group-words ;
 
 ! struct allocation
-
 M: struct >c-ptr
     2 slot { c-ptr } declare ; inline
-
-M: struct equal?
-    over struct? [
-        2dup [ class-of ] same? [
-            2dup [ >c-ptr ] both?
-            [ [ >c-ptr ] [ binary-object ] bi* memory= ]
-            [ [ >c-ptr not ] both? ]
-            if
-        ] [ 2drop f ] if
-    ] [ 2drop f ] if ; inline
-
-M: struct hashcode*
-    binary-object over
-    [ uchar <c-direct-array> hashcode* ] [ 3drop 0 ] if ; inline
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
@@ -168,6 +153,14 @@ M: struct-class writer-quot
 
 : offset-of ( field struct -- offset )
     struct-slots slot-named offset>> ; inline
+
+M: struct equal?
+    2dup [ class-of ] same? [
+        [ struct-slot-values ] same?
+    ] [ 2drop f ] if ; inline
+
+M: struct hashcode*
+    nip dup >c-ptr [ struct-slot-values hashcode ] [ drop 0 ] if ; inline
 
 ! c-types
 

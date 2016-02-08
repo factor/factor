@@ -71,7 +71,7 @@ HELP: TYPEDEF:
 
 HELP: ENUM:
 { $syntax "ENUM: type words... ;" "ENUM: type < base-type words..." }
-{ $values { "type" "a name to typedef to int or f" } { "words" "a sequence of word names" } }
+{ $values { "type" { $maybe "a name to typedef to int" } } { "words" "a sequence of word names" } }
 { $description "Creates a c-type that boxes and unboxes integer values to symbols. A symbol is defined for each member word. The base c-type can optionally be specified and defaults to " { $link int } ". A constructor word " { $snippet "<type>" } " is defined for converting from integers to singletons. The generic word " { $link enum>number } " converts from singletons to integers. Enum-typed values are automatically prettyprinted as their singleton words. Unrecognizing enum numbers are kept as numbers." }
 { $examples
     "Here is an example enumeration definition:"

@@ -1,17 +1,15 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line
-continuations destructors environment gdk.ffi gdk.gl.ffi
-gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io io.encodings.binary
-io.encodings.utf8 io.files kernel libc literals locals math
-math.bitwise math.order math.vectors namespaces sequences
-strings system threads ui ui.backend
-ui.backend.gtk.input-methods ui.backend.gtk.io ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
-vocabs.loader combinators ;
+alien.strings arrays assocs classes.struct combinators continuations
+destructors environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
+gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
+io.encodings.binary io.encodings.utf8 io.files kernel libc literals
+locals math math.bitwise math.vectors namespaces sequences strings
+system threads ui ui.backend ui.backend.gtk.input-methods
+ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -204,16 +202,13 @@ CONSTANT: action-key-codes
     keyval>> dup action-key-codes at [ t ]
     [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
 
-: key-event>gesture ( event -- mods sym/f action? )
-    [ event-modifiers ] [ key-sym ] bi ;
+: key-event>gesture ( event -- key-gesture )
+    [ event-modifiers ] [ key-sym ] [
+        type>> GDK_KEY_PRESS = [ <key-down> ] [ <key-up> ] if
+    ] tri ;
 
-: on-key-press ( win event user-data -- ? )
-    drop swap [ key-event>gesture <key-down> ] [ window ] bi*
-    propagate-key-gesture t ;
-
-: on-key-release ( win event user-data -- ? )
-    drop swap [ key-event>gesture <key-up> ] [ window ] bi*
-    propagate-key-gesture t ;
+: on-key-press/release ( win event user-data -- ? )
+    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture t ;
 
 : on-focus-in ( win event user-data -- ? )
     2drop window focus-world t ;
@@ -237,7 +232,6 @@ CONSTANT: action-key-codes
     ] when* ;
 
 :: connect-user-input-signals ( win -- )
-    win events-mask gtk_widget_add_events
     win "motion-notify-event" [ on-motion yield ]
     GtkWidget:motion-notify-event connect-signal
     win "leave-notify-event" [ on-leave yield ]
@@ -248,9 +242,9 @@ CONSTANT: action-key-codes
     GtkWidget:button-release-event connect-signal
     win "scroll-event" [ on-scroll yield ]
     GtkWidget:scroll-event connect-signal
-    win "key-press-event" [ on-key-press yield ]
+    win "key-press-event" [ on-key-press/release yield ]
     GtkWidget:key-press-event connect-signal
-    win "key-release-event" [ on-key-release yield ]
+    win "key-release-event" [ on-key-press/release yield ]
     GtkWidget:key-release-event connect-signal
     win "focus-in-event" [ on-focus-in yield ]
     GtkWidget:focus-in-event connect-signal
@@ -263,9 +257,14 @@ CONSTANT: action-key-codes
     2drop window relayout t ;
 
 : on-configure ( win event user-data -- ? )
-    drop [ window ] [ GdkEventConfigure memory>struct ] bi*
-    [ event-loc >>window-loc ] [ event-dim >>dim ] bi
-    relayout-1 f ;
+    drop swap window dup active?>> 100 = [
+        swap GdkEventConfigure memory>struct
+        [ event-loc >>window-loc ] [ event-dim >>dim ] bi
+        relayout-1
+    ] [ 2drop ] if f ;
+
+: on-map ( win event user-data -- ? )
+    2drop window 100 >>active? drop t ;
 
 : on-delete ( win event user-data -- ? )
     2drop window ungraft t ;
@@ -276,7 +275,9 @@ CONSTANT: action-key-codes
     win "configure-event" [ on-configure yield ]
     GtkWidget:configure-event connect-signal
     win "delete-event" [ on-delete yield ]
-    GtkWidget:delete-event connect-signal ;
+    GtkWidget:delete-event connect-signal
+    win "map-event" [ on-map yield ]
+    GtkWidget:map-event connect-signal ;
 
 ! Input methods
 
@@ -467,13 +468,18 @@ M:: gtk-ui-backend (open-window) ( world -- )
     gtk_window_set_wmclass
 
     world configure-gl
+
+    ! This must be done before realize due to #776.
+    win events-mask gtk_widget_add_events
+
     win gtk_widget_realize
 
+    ! And this must be done after and in this order due to #1307
     win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
-    win world window-controls>> configure-window-controls
 
+    win world window-controls>> configure-window-controls
     win gtk_widget_show_all ;
 
 M: gtk-ui-backend (close-window) ( handle -- )

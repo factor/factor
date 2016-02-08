@@ -69,8 +69,8 @@ void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
   cell new_sp = *sp - delta;
   *sp = new_sp;
   *(cell*)new_sp = *pc;
-  tagged<word> handler_word = tagged<word>(special_objects[index]);
-  *pc = (cell)handler_word->entry_point;
+
+  *pc = untag<word>(special_objects[index])->entry_point;
 }
 
 void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {

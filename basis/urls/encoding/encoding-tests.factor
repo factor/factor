@@ -1,5 +1,6 @@
 IN: urls.encoding.tests
-USING: urls.encoding tools.test arrays kernel assocs present accessors ;
+USING: urls.encoding tools.test arrays kernel assocs present
+accessors linked-assocs ;
 
 { "~hello world" } [ "%7ehello world" url-decode ] unit-test
 { "" } [ "%XX%XX%XX" url-decode ] unit-test
@@ -23,13 +24,15 @@ USING: urls.encoding tools.test arrays kernel assocs present accessors ;
 
 { "a=b&a=c" } [ { { "a" { "b" "c" } } } assoc>query ] unit-test
 
-{ H{ { "a" "b" } } } [ "a=b" query>assoc ] unit-test
+{ LH{ { "a" "b" } } } [ "a=b" query>assoc ] unit-test
 
-{ H{ { "a" { "b" "c" } } } } [ "a=b&a=c" query>assoc ] unit-test
+{ LH{ { "a" { "b" "c" } } } } [ "a=b&a=c" query>assoc ] unit-test
 
-{ H{ { "a" { "b" "c" } } } } [ "a=b;a=c" query>assoc ] unit-test
+{ LH{ { "a" { "b" "c" } } } } [ "a=b;a=c" query>assoc ] unit-test
 
-{ H{ { "text" "hello world" } } } [ "text=hello+world" query>assoc ] unit-test
+{ LH{ { "c" "d" } { "a" "b" } { "e" "f" } } } [ "c=d&a=b&e=f" query>assoc ] unit-test
+
+{ LH{ { "text" "hello world" } } } [ "text=hello+world" query>assoc ] unit-test
 
 { "foo=%3A" } [ { { "foo" ":" } } assoc>query ] unit-test
 
@@ -37,4 +40,4 @@ USING: urls.encoding tools.test arrays kernel assocs present accessors ;
 
 { "a" } [ { { "a" f } } assoc>query ] unit-test
 
-{ H{ { "a" f } } } [ "a" query>assoc ] unit-test
+{ LH{ { "a" f } } } [ "a" query>assoc ] unit-test

@@ -66,9 +66,6 @@ struct factor_vm {
   /* Active contexts, for tracing by the GC */
   std::set<context*> active_contexts;
 
-  /* Canonical truth value. In Factor, 't' */
-  cell true_object;
-
   /* External entry points */
   c_to_factor_func_type c_to_factor_func;
 
@@ -129,11 +126,6 @@ struct factor_vm {
   bool fep_help_was_shown;
   bool fep_disabled;
   bool full_output;
-
-  /* Canonical bignums */
-  cell bignum_zero;
-  cell bignum_pos_one;
-  cell bignum_neg_one;
 
   /* Method dispatch statistics */
   dispatch_statistics dispatch_stats;
@@ -410,9 +402,7 @@ struct factor_vm {
   void print_callstack_object(ostream& out, callstack* obj);
   void dump_cell(ostream& out, cell x);
   void dump_memory(ostream& out, cell from, cell to);
-  template <typename Generation>
-  void dump_generation(ostream& out, const char* name, Generation* gen);
-  void dump_generations(ostream& out);
+  void dump_memory_layout(ostream& out);
   void dump_objects(ostream& out, cell type);
   void dump_edges(ostream& out);
   void find_data_references(ostream& out, cell look_for_);
@@ -441,7 +431,7 @@ struct factor_vm {
 
   // booleans
   cell tag_boolean(cell untagged) {
-    return (untagged ? true_object : false_object);
+    return untagged ? special_objects[OBJ_CANONICAL_TRUE] : false_object;
   }
 
   // byte arrays
@@ -463,8 +453,6 @@ struct factor_vm {
   void primitive_word_optimized_p();
   void primitive_wrapper();
   void jit_compile_word(cell word_, cell def_, bool relocating);
-  cell find_all_words();
-  void compile_all_words();
 
   // math
   void primitive_bignum_to_fixnum();
@@ -539,12 +527,21 @@ struct factor_vm {
   inline double fixnum_to_float(cell tagged);
 
   // tagged
-  template <typename Type> Type* untag_check(cell value);
+  template <typename Type> void check_tagged(tagged<Type> t) {
+    if (!t.type_p())
+      type_error(Type::type_number, t.value_);
+  }
+
+  template <typename Type> Type* untag_check(cell value) {
+    tagged<Type> t(value);
+    check_tagged(t);
+    return t.untagged();
+  }
 
   // io
   void init_c_io();
   void io_error_if_not_EINTR();
-  FILE* safe_fopen(char* filename, char* mode);
+  FILE* safe_fopen(char* filename, const char* mode);
   int safe_fgetc(FILE* stream);
   size_t safe_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
   void safe_fputc(int c, FILE* stream);
@@ -575,7 +572,6 @@ struct factor_vm {
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
   cell compute_dlsym_address(array* literals, cell index, bool toc);
-  cell compute_vm_address(cell arg);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
                                array* parameters,
@@ -609,7 +605,6 @@ struct factor_vm {
   void primitive_callback_room();
 
   // image
-  void init_objects(image_header* h);
   void load_data_heap(FILE* file, image_header* h, vm_parameters* p);
   void load_code_heap(FILE* file, image_header* h, vm_parameters* p);
   bool save_image(const vm_char* saving_filename, const vm_char* filename);
@@ -676,7 +671,6 @@ struct factor_vm {
   cell lazy_jit_compile(cell quot);
   bool quotation_compiled_p(quotation* quot);
   void primitive_quotation_compiled_p();
-  void initialize_all_quotations();
 
   // dispatch
   cell search_lookup_alist(cell table, cell klass);

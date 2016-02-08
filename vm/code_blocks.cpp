@@ -3,10 +3,9 @@
 namespace factor {
 
 cell code_block::owner_quot() const {
-  tagged<object> executing(owner);
-  if (!optimized_p() && executing->type() == WORD_TYPE)
-    executing = executing.as<word>()->def;
-  return executing.value();
+  if (!optimized_p() && TAG(owner) == WORD_TYPE)
+    return untag<word>(owner)->def;
+  return owner;
 }
 
 /* If the code block is an unoptimized quotation, we can calculate the
@@ -16,18 +15,17 @@ cell code_block::scan(factor_vm* vm, cell addr) const {
     return tag_fixnum(-1);
   }
 
-  tagged<object> obj(owner);
-  if (obj.type_p(WORD_TYPE))
-    obj = obj.as<word>()->def;
-  if (!obj.type_p(QUOTATION_TYPE))
+  cell ptr = owner;
+  if (TAG(ptr) == WORD_TYPE)
+    ptr = untag<word>(ptr)->def;
+  if (TAG(ptr) != QUOTATION_TYPE)
     return tag_fixnum(-1);
-
   cell ofs = offset(addr);
-  return tag_fixnum(vm->quot_code_offset_to_scan(obj.value(), ofs));
+  return tag_fixnum(vm->quot_code_offset_to_scan(ptr, ofs));
 }
 
 cell factor_vm::compute_entry_point_address(cell obj) {
-  switch (tagged<object>(obj).type()) {
+  switch (TAG(obj)) {
     case WORD_TYPE:
       return untag<word>(obj)->entry_point;
     case QUOTATION_TYPE:
@@ -58,24 +56,21 @@ cell factor_vm::compute_entry_point_pic_tail_address(cell w_) {
 }
 
 cell factor_vm::code_block_owner(code_block* compiled) {
-  tagged<object> owner(compiled->owner);
+  cell owner = compiled->owner;
 
   /* Cold generic word call sites point to quotations that call the
      inline-cache-miss and inline-cache-miss-tail primitives. */
-  if (owner.type_p(QUOTATION_TYPE)) {
-    tagged<quotation> quot(owner.as<quotation>());
-    tagged<array> elements(quot->array);
+  if (TAG(owner) != QUOTATION_TYPE)
+    return owner;
 
-    FACTOR_ASSERT(array_capacity(elements.untagged()) == 5);
-    FACTOR_ASSERT(array_nth(elements.untagged(), 4) ==
-                      special_objects[PIC_MISS_WORD] ||
-                  array_nth(elements.untagged(), 4) ==
-                      special_objects[PIC_MISS_TAIL_WORD]);
+  quotation* quot = untag<quotation>(owner);
+  array* elements = untag<array>(quot->array);
 
-    tagged<wrapper> word_wrapper(array_nth(elements.untagged(), 0));
-    return word_wrapper->object;
-  } else
-    return compiled->owner;
+  FACTOR_ASSERT(array_capacity(elements) == 5);
+  FACTOR_ASSERT(array_nth(elements, 4) == special_objects[PIC_MISS_WORD] ||
+                array_nth(elements, 4) == special_objects[PIC_MISS_TAIL_WORD]);
+  wrapper* wrap = untag<wrapper>(array_nth(elements, 0));
+  return wrap->object;
 }
 
 struct update_word_references_relocation_visitor {
@@ -88,7 +83,7 @@ struct update_word_references_relocation_visitor {
 
   void operator()(instruction_operand op) {
     code_block* compiled = op.load_code_block();
-    switch (op.rel_type()) {
+    switch (op.rel.type()) {
       case RT_ENTRY_POINT: {
         cell owner = compiled->owner;
         if (to_boolean(owner))
@@ -163,10 +158,6 @@ cell factor_vm::compute_dlsym_address(array* parameters,
   return sym ? sym : undef;
 }
 
-cell factor_vm::compute_vm_address(cell arg) {
-  return (cell)this + untag_fixnum(arg);
-}
-
 cell factor_vm::lookup_external_address(relocation_type rel_type,
                                         code_block *compiled,
                                         array* parameters,
@@ -179,7 +170,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_MEGAMORPHIC_CACHE_HITS:
       return (cell)&dispatch_stats.megamorphic_cache_hits;
     case RT_VM:
-      return compute_vm_address(array_nth(parameters, index));
+      return (cell)this + untag_fixnum(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:
@@ -203,7 +194,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
       ? untag<array>(compiled->parameters)
       : NULL;
   cell idx = op.index;
-  relocation_type rel_type = op.rel_type();
+  relocation_type rel_type = op.rel.type();
 
   cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
   if (ext_addr == (cell)-1) {
@@ -244,7 +235,7 @@ struct initial_code_block_visitor {
   }
 
   fixnum compute_operand_value(instruction_operand op) {
-    switch (op.rel_type()) {
+    switch (op.rel.type()) {
       case RT_LITERAL:
         return next_literal();
       case RT_ENTRY_POINT:
@@ -255,7 +246,7 @@ struct initial_code_block_visitor {
         return parent->compute_entry_point_pic_tail_address(next_literal());
       case RT_HERE:
         return parent->compute_here_address(
-            next_literal(), op.rel_offset(), op.compiled);
+            next_literal(), op.rel.offset(), op.compiled);
       case RT_UNTAGGED:
         return untag_fixnum(next_literal());
       default:
@@ -400,7 +391,7 @@ void factor_vm::undefined_symbol() {
   cell library = false_object;
 
   auto find_symbol_at_address_visitor = [&](instruction_operand op) {
-    if (op.rel_type() == RT_DLSYM && op.pointer <= return_address) {
+    if (op.rel.type() == RT_DLSYM && op.pointer <= return_address) {
       array* parameters = untag<array>(compiled->parameters);
       cell index = op.index;
       symbol = array_nth(parameters, index);

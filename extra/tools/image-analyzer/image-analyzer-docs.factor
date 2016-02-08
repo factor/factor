@@ -1,13 +1,10 @@
 USING: assocs help.markup help.syntax sequences strings ;
 IN: tools.image-analyzer
-FROM: tools.image-analyzer.vm => image-header ;
 
 HELP: load-image
 { $values
-  { "image" string }
-  { "header" image-header }
-  { "data-heap" sequence }
-  { "code-heap" sequence }
+  { "image-file" string }
+  { "image" image }
 }
 { $description "Loads and decodes Factor image." } ;
 

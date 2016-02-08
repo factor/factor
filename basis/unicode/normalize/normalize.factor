@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii sequences namespaces make unicode.data kernel math arrays
-locals sorting.insertion accessors assocs math.order combinators
-strings sbufs hints combinators.short-circuit vectors ;
+USING: accessors arrays ascii combinators
+combinators.short-circuit hints kernel locals make math
+math.order sbufs sequences sorting.insertion strings
+unicode.data vectors ;
 IN: unicode.normalize
 
 <PRIVATE

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.algebra compiler.cfg.builder.blocks
-compiler.cfg.comparisons compiler.cfg.hats
+USING: accessors classes.algebra classes.struct
+compiler.cfg.builder.blocks compiler.cfg.comparisons compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.stacks compiler.constants
-compiler.tree.propagation.info cpu.architecture kernel layouts
-math namespaces sequences vm ;
+compiler.tree.propagation.info cpu.architecture kernel layouts math
+namespaces sequences vm ;
 IN: compiler.cfg.intrinsics.misc
 
 : emit-tag ( -- )
@@ -28,11 +28,11 @@ IN: compiler.cfg.intrinsics.misc
     ] [ emit-primitive ] ?if ;
 
 : context-object-offset ( n -- n )
-    cells "context-objects" context-field-offset + ;
+    cells "context-objects" context offset-of + ;
 
 : emit-context-object ( node -- )
     dup node-input-infos first literal>> [
-        "ctx" vm-field-offset ^^vm-field
+        "ctx" vm offset-of ^^vm-field
         ds-drop swap context-object-offset cell /i 0 ^^slot-imm ds-push
     ] [ emit-primitive ] ?if ;
 
@@ -51,4 +51,4 @@ IN: compiler.cfg.intrinsics.misc
     if ;
 
 : emit-cleanup-allot ( -- )
-    [ ##no-tco, ] emit-trivial-block ;
+    [ drop ##no-tco, ] emit-trivial-block ;

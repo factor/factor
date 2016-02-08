@@ -18,7 +18,7 @@ GENERIC: number-hashcode ( x -- h )
 
 : hash-fraction ( m n -- h )
 
-    [ 2dup [ P mod zero? ] bi@ and ] [
+    [ 2dup [ P mod zero? ] both? ] [
         [ P /i ] bi@
     ] while
 

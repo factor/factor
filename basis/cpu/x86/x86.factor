@@ -1,20 +1,15 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs alien alien.c-types arrays strings
-cpu.x86.assembler cpu.x86.assembler.private cpu.x86.assembler.operands
-cpu.x86.features cpu.x86.features.private cpu.architecture kernel
-kernel.private math memory namespaces make sequences words system
-layouts combinators math.order math.vectors fry locals compiler.constants
-byte-arrays io macros quotations classes.algebra compiler
-compiler.units init vm vocabs
-compiler.cfg.registers
-compiler.cfg.instructions
-compiler.cfg.intrinsics
-compiler.cfg.comparisons
-compiler.cfg.stack-frame
-compiler.codegen.gc-maps
-compiler.codegen.labels
-compiler.codegen.relocation ;
+USING: accessors alien arrays assocs byte-arrays classes.algebra
+classes.struct combinators compiler compiler.cfg
+compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.intrinsics compiler.cfg.registers
+compiler.cfg.stack-frame compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation compiler.constants
+compiler.units cpu.architecture cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.assembler.private cpu.x86.features
+cpu.x86.features.private fry io kernel layouts locals make math
+math.order memory namespaces sequences system vm vocabs ;
 QUALIFIED-WITH: alien.c-types c
 FROM: math => float ;
 IN: cpu.x86
@@ -457,7 +452,7 @@ M: x86 %sar int-rep two-operand [ SAR ] emit-shift ;
 HOOK: %vm-field-ptr cpu ( reg offset -- )
 
 : load-zone-offset ( nursery-ptr -- )
-    "nursery" vm-field-offset %vm-field-ptr ;
+    "nursery" vm offset-of %vm-field-ptr ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-offset ] [ swap [] MOV ] 2bi ;
@@ -691,9 +686,9 @@ M:: x86 %save-context ( temp1 temp2 -- )
     ! all roots.
     temp1 %context
     temp2 stack-reg cell neg [+] LEA
-    temp1 "callstack-top" context-field-offset [+] temp2 MOV
-    temp1 "datastack" context-field-offset [+] ds-reg MOV
-    temp1 "retainstack" context-field-offset [+] rs-reg MOV ;
+    temp1 "callstack-top" context offset-of [+] temp2 MOV
+    temp1 "datastack" context offset-of [+] ds-reg MOV
+    temp1 "retainstack" context offset-of [+] rs-reg MOV ;
 
 M: x86 value-struct? drop t ;
 

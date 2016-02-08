@@ -50,15 +50,14 @@ SINGLETON: x11-ui-backend
 
 TUPLE: x11-handle-base glx ;
 TUPLE: x11-handle < x11-handle-base window xic ;
-TUPLE: x11-pixmap-handle < x11-handle-base pixmap glx-pixmap ;
 
 C: <x11-handle> x11-handle
-C: <x11-pixmap-handle> x11-pixmap-handle
 
 M: world expose-event nip relayout ;
 
 M: world configure-event
     swap [ event-loc >>window-loc ] [ event-dim >>dim ] bi
+    100 >>active?
     ! In case dimensions didn't change
     relayout-1 ;
 
@@ -366,27 +365,6 @@ M: x11-handle select-gl-context ( handle -- )
 
 M: x11-handle flush-gl-context ( handle -- )
     dpy get swap window>> glXSwapBuffers ;
-
-M: x11-pixmap-handle select-gl-context ( handle -- )
-    dpy get swap
-    [ glx-pixmap>> ] [ glx>> ] bi glXMakeCurrent
-    [ "Failed to set current GLX context" throw ] unless ;
-
-M: x11-pixmap-handle flush-gl-context ( handle -- )
-    drop ;
-
-M: x11-ui-backend (open-offscreen-buffer) ( world -- )
-    dup [ [ dim>> ] [ handle>> ] bi* glx-pixmap ] with-world-pixel-format
-    <x11-pixmap-handle> >>handle drop ;
-
-M: x11-ui-backend (close-offscreen-buffer) ( handle -- )
-    dpy get swap
-    [ glx-pixmap>> glXDestroyGLXPixmap ]
-    [ pixmap>> XFreePixmap drop ]
-    [ glx>> glXDestroyContext ] 2tri ;
-
-M: x11-ui-backend offscreen-pixels ( world -- alien w h )
-    [ [ dim>> ] [ handle>> pixmap>> ] bi pixmap-bits ] [ dim>> first2 ] bi ;
 
 M: x11-ui-backend (with-ui) ( quot -- )
     [

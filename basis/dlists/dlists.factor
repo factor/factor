@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.short-circuit
-deques fry hashtables kernel math.order parser search-deques
-sequences summary vocabs.loader ;
+USING: accessors combinators combinators.short-circuit deques fry
+hashtables kernel kernel.private math math.order parser search-deques
+sequences vocabs.loader ;
 IN: dlists
 
 TUPLE: dlist-link
@@ -164,6 +164,11 @@ M: dlist delete-node
 
 M: dlist clear-deque
     f >>front f >>back drop ;
+
+: dlist-length ( dlist -- n )
+    0 swap [
+        drop { fixnum } declare 1 + f
+    ] dlist-find-node drop ; flushable
 
 : dlist-each ( ... dlist quot: ( ... value -- ... ) -- ... )
     '[ obj>> @ ] dlist-each-node ; inline

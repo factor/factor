@@ -3,8 +3,8 @@
 USING: accessors assocs cache colors combinators
 combinators.short-circuit concurrency.promises continuations
 destructors fry kernel literals math models namespaces opengl
-opengl.capabilities opengl.textures sequences strings ui.backend
-ui.gadgets ui.gadgets.tracks ui.gestures ui.pixel-formats
+opengl.capabilities opengl.gl opengl.textures sequences strings
+ui.backend ui.gadgets ui.gadgets.tracks ui.gestures ui.pixel-formats
 ui.render ;
 IN: ui.gadgets.worlds
 
@@ -118,7 +118,7 @@ M: world request-focus-on ( child gadget -- )
 : new-world ( class -- world )
     vertical swap new-track
         t >>root?
-        f >>active?
+        0 >>active?
         { 0 0 } >>window-loc
         f >>grab-input?
         V{ } clone >>window-resources
@@ -177,7 +177,7 @@ M: world resize-world drop ;
 M: world dim<<
     [ call-next-method ]
     [
-        dup active?>> [
+        dup active?>> 100 = [
             dup handle>>
             [ [ set-gl-context ] [ resize-world ] bi ]
             [ drop ] if
@@ -187,10 +187,8 @@ M: world dim<<
 GENERIC: draw-world* ( world -- )
 
 M: world draw-world*
-    check-extensions
-    "1.0" require-gl-version
     {
-        [ init-gl ]
+        [ gl-draw-init ]
         [ draw-gadget ]
         [ text-handle>> [ purge-cache ] when* ]
         [ images>> [ purge-cache ] when* ]
@@ -199,7 +197,7 @@ M: world draw-world*
 : draw-world? ( world -- ? )
     ! We don't draw deactivated worlds, or those with 0 size.
     ! On Windows, the latter case results in GL errors.
-    { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
+    { [ active?>> 100 = ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
 
 TUPLE: world-error error world ;
 
@@ -219,7 +217,7 @@ ui-error-hook [ [ rethrow ] ] initialize
                 dup [ draw-world* ] with-gl-context
                 flush-layout-cache-hook get call( -- )
             ] [
-                swap f >>active? <world-error> ui-error
+                swap 0 >>active? <world-error> ui-error
             ] recover
         ] with-variable
     ] [ drop ] if ;

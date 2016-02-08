@@ -3,8 +3,7 @@
 USING: alien alien.c-types alien.data alien.strings arrays
 byte-arrays hashtables io io.encodings.string kernel math
 namespaces sequences strings continuations x11 x11.xlib
-specialized-arrays accessors io.encodings.utf16n ;
-SPECIALIZED-ARRAY: uint
+accessors io.encodings.utf8 literals ;
 IN: x11.xim
 
 SYMBOL: xim
@@ -35,23 +34,13 @@ SYMBOL: xim
     XNResourceClass over 0 XCreateIC
     [ "XCreateIC() failed" throw ] unless* ;
 
+<<
 CONSTANT: buf-size 100
+>>
 
-SYMBOL: keybuf
-SYMBOL: keysym
-
-: prepare-lookup ( -- )
-    buf-size uint <c-array> keybuf set
-    0 KeySym <ref> keysym set ;
-
-: finish-lookup ( len -- string keysym )
-    keybuf get swap 2 * head utf16n decode
-    keysym get *KeySym ;
+CONSTANT: buf $[ buf-size <byte-array> ]
 
 : lookup-string ( event xic -- string keysym )
-    [
-        prepare-lookup
-        swap keybuf get buf-size keysym get 0 int <ref>
-        XwcLookupString
-        finish-lookup
-    ] with-scope ;
+    swap buf buf-size { KeySym } [ 0 int <ref>
+        Xutf8LookupString buf swap head utf8 decode
+    ] with-out-parameters ;

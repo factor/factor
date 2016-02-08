@@ -193,11 +193,6 @@ void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
-  visit_handle(&parent->true_object);
-  visit_handle(&parent->bignum_zero);
-  visit_handle(&parent->bignum_pos_one);
-  visit_handle(&parent->bignum_neg_one);
-
   FACTOR_FOR_EACH(parent->data_roots) {
     visit_handle(*iter);
   }
@@ -375,8 +370,10 @@ void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
     return;
 
   auto update_literal_refs = [&](instruction_operand op) {
-    if (op.rel_type() == RT_LITERAL)
-      op.store_value(visit_pointer(op.load_value()));
+    if (op.rel.type() == RT_LITERAL) {
+      fixnum value = op.load_value(op.pointer);
+      op.store_value(visit_pointer(value));
+    }
   };
   compiled->each_instruction_operand(update_literal_refs);
 }
@@ -443,11 +440,13 @@ void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
   if (parent->code->uninitialized_p(compiled))
     return;
   auto update_code_block_refs = [&](instruction_operand op){
-    relocation_type type = op.rel_type();
+    relocation_type type = op.rel.type();
     if (type == RT_ENTRY_POINT ||
         type == RT_ENTRY_POINT_PIC ||
-        type == RT_ENTRY_POINT_PIC_TAIL)
-      op.store_code_block(fixup.fixup_code(op.load_code_block()));
+        type == RT_ENTRY_POINT_PIC_TAIL) {
+      code_block* block = fixup.fixup_code(op.load_code_block());
+      op.store_value(block->entry_point());
+    }
   };
   compiled->each_instruction_operand(update_code_block_refs);
 }
@@ -490,9 +489,9 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
                                                      cell rel_base) {
   auto visit_func = [&](instruction_operand op){
-    cell old_offset = rel_base + op.rel_offset();
+    cell old_offset = rel_base + op.rel.offset();
     cell value = op.load_value(old_offset);
-    switch (op.rel_type()) {
+    switch (op.rel.type()) {
       case RT_LITERAL: {
         value = visit_pointer(value);
         break;

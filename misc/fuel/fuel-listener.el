@@ -137,7 +137,7 @@ sessions."
     (message "Starting FUEL listener (this may take a while) ...")
     (pop-to-buffer (fuel-listener--buffer))
     (make-comint-in-buffer "fuel listener" (current-buffer) factor nil
-                           "-run=listener" (format "-i=%s" image))
+                           "-run=fuel.listener" (format "-i=%s" image))
     (fuel-listener--wait-for-prompt 60000)
     (fuel-listener--history-setup)
     (fuel-con--setup-connection (current-buffer))))

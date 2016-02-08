@@ -9,10 +9,10 @@ STRUCT: image-header
     { data-size cell_t }
     { code-relocation-base cell_t }
     { code-size cell_t }
-    { true-object cell_t }
-    { bignum-zero cell_t }
-    { bignum-pos-one cell_t }
-    { bignum-neg-one cell_t }
+    { reserved-1 cell_t }
+    { reserved-2 cell_t }
+    { reserved-3 cell_t }
+    { reserved-4 cell_t }
     { special-objects cell_t[special-object-count] } ;
 
 ! These structs and words correspond to vm/layouts.hpp
@@ -90,3 +90,7 @@ STRUCT: code-block
     { owner cell_t }
     { parameters cell_t }
     { relocation cell_t } ;
+
+TUPLE: heap-node address object payload ;
+
+TUPLE: code-heap-node < heap-node free? gc-maps ;

@@ -2,11 +2,11 @@ USING: accessors bootstrap.image fry grouping io.files io.pathnames kernel
 sequences system tools.deploy.backend tools.image-analyzer tools.test ;
 IN: tools.image-analyzer.tests
 
-: image-path ( arch -- path )
+: boot-image-path ( arch -- path )
     boot-image-name resource-path ;
 
 : ?make-image ( arch -- )
-    dup image-path exists? [ drop ] [ make-image ] if ;
+    dup boot-image-path exists? [ drop ] [ make-image ] if ;
 
 : loadable-images ( -- images )
     image-names cpu name>> '[ _ tail? ] filter ;
@@ -14,7 +14,7 @@ IN: tools.image-analyzer.tests
 { t } [
     loadable-images [ [ ?make-image ] each ] [
         [
-            image-path load-image 2drop code-size>>
+            boot-image-path load-image header>> code-size>>
         ] map [ 0 = ] all?
     ] bi
 ] unit-test
