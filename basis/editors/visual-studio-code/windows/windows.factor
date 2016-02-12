@@ -5,6 +5,7 @@ io.directories.search io.files.temp.windows io.pathnames kernel
 system ;
 IN: editors.visual-studio-code.windows
 
-M: windows find-visual-studio-code-path
+M: windows find-visual-studio-code-invocation
     get-appdata-directory f
-    [ file-name >lower "code.exe" = ] find-in-directories ;
+    [ file-name >lower "code.exe" = ] find-in-directories
+    [ 1array ] [ f ] if* ;
