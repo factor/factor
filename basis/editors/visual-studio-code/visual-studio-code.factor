@@ -6,17 +6,20 @@ IN: editors.visual-studio-code
 SINGLETON: visual-studio-code
 visual-studio-code editor-class set-global
 
-HOOK: find-visual-studio-code-path os ( -- path )
+HOOK: find-visual-studio-code-invocation os ( -- array )
 
-MEMO: visual-studio-code-path ( -- path )
-    \ visual-studio-code-path get [
-        find-visual-studio-code-path
-        [ "code" ] unless*
+MEMO: visual-studio-code-invocation ( -- array )
+    \ visual-studio-code-invocation get [
+        find-visual-studio-code-invocation
+        [ { "code" } ] unless*
     ] unless* ;
+
+M: macosx find-visual-studio-code-invocation
+    { "open" "-n" "-b" "com.microsoft.VSCode" "--args" } ;
 
 M: visual-studio-code editor-command ( file line -- command )
     [
-        visual-studio-code-path , drop ,
+        visual-studio-code-invocation % drop ,
     ] { } make ;
 
 os windows? [ "editors.visual-studio-code.windows" require ] when
