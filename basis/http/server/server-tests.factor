@@ -52,6 +52,7 @@ IN: http.server.tests
     T{ request
         { method "GET" }
         { url URL" /" }
+        { proxy-url URL" " }
         { version "1.0" }
         { header H{ } }
         { cookies V{ } }
@@ -69,6 +70,7 @@ IN: http.server.tests
     T{ request
         { method "GET" }
         { url URL" /" }
+        { proxy-url URL" " }
         { version "1.0" }
         { header H{ } }
         { cookies V{ } }
