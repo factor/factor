@@ -91,7 +91,7 @@ SYMBOL: redirects
     redirects get request get redirects>> < [
         request get clone
         response "location" header redirect-url
-        response code>> 307 = [ "GET" >>method ] unless
+        response code>> 307 = [ "GET" >>method f >>post-data ] unless
         quot (with-http-request)
     ] [ too-many-redirects ] if ; inline recursive
 
