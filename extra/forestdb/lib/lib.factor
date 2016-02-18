@@ -327,7 +327,7 @@ PRIVATE>
         _ &dispose handle>> [
             [ fdb-iterator-get ] keep swap
             [ _ with-doc swap _ execute check-iterate-result ]
-            [ drop f ] if* swap
+            [ drop f f ] if* swap
         ] curry collector-when [ loop ] dip
     ] with-destructors ; inline
 
