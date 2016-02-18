@@ -22,6 +22,7 @@ TYPEDEF: int64_t cs_off_t
 
 TYPEDEF: void* fdb_custom_cmp_fixed
 TYPEDEF: void* fdb_custom_cmp_variable
+TYPEDEF: void* fdb_fatal_error_callback
 TYPEDEF: void* fdb_log_callback
 TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_kvs_handle
@@ -30,7 +31,8 @@ TYPEDEF: void* fdb_compaction_callback
 
 ENUM: fdb_open_flags
     { FDB_OPEN_FLAG_CREATE 1 }
-    { FDB_OPEN_FLAG_RDONLY 2 } ;
+    { FDB_OPEN_FLAG_RDONLY 2 }
+    { FDB_OPEN_WITH_LEGACY_CRC 4 } ;
 
 ENUM: fdb_commit_opt_t
     { FDB_COMMIT_NORMAL 0 }
@@ -51,8 +53,6 @@ ENUM: fdb_compaction_mode_t
     { FDB_COMPACTION_AUTO 1 } ;
 
 ENUM: fdb_isolation_level_t
-    { FDB_ISOLATION_SERIALIZABLE 0 }
-    { FDB_ISOLATION_REPEATABLE_READ 1 }
     { FDB_ISOLATION_READ_COMMITTED 2 }
     { FDB_ISOLATION_READ_UNCOMMITTED 3 } ;
 
@@ -71,7 +71,20 @@ ENUM: fdb_compaction_status
     { FDB_CS_MOVE_DOC 0x2 }
     { FDB_CS_BATCH_MOVE 0x4 }
     { FDB_CS_FLUSH_WAL 0x8 }
-    { FDB_CS_END 0x10 } ;
+    { FDB_CS_END 0x10 }
+    { FDB_CS_COMPLETE 0x20 } ;
+
+ENUM: fdb_compact_decision
+    { FDB_CS_KEEP_DOC 0 }
+    { FDB_CS_DROP_DOC 1 } ;
+
+ENUM: fdb_encryption_algorithm_t
+    { FDB_ENCRYPTION_NONE 0 }
+    { FDB_ENCRYPTION_AES256 1 } ;
+
+STRUCT: fdb_encryption_key
+    { algorithm fdb_encryption_algorithm_t }
+    { bytes uint8_t[32] } ;
 
 ! cmp_fixed and cmp_variable have their own open() functions
 STRUCT: fdb_config
@@ -80,6 +93,7 @@ STRUCT: fdb_config
     { buffercache_size uint64_t }
     { wal_threshold uint64_t }
     { wal_flush_before_commit bool }
+    { auto_commit bool }
     { purging_interval uint32_t }
     { seqtree_opt fdb_seqtree_opt_t }
     { durability_opt fdb_durability_opt_t }
@@ -97,7 +111,13 @@ STRUCT: fdb_config
     { num_bcache_partitions uint16_t }
     { compaction_cb fdb_compaction_callback }
     { compaction_cb_mask uint32_t }
-    { compaction_cb_ctx void* } ;
+    { compaction_cb_ctx void* }
+    { max_writer_lock_prob size_t }
+    { num_compactor_threads size_t }
+    { num_bgflusher_threads size_t }
+    { encryption_key fdb_encryption_key }
+    { block_reusing_threshold size_t }
+    { num_keeping_headers size_t } ;
 
 STRUCT: fdb_kvs_config
     { create_if_missing bool }
@@ -113,7 +133,8 @@ STRUCT: fdb_doc
     { offset uint64_t }
     { meta void* }
     { body void* }
-    { deleted bool } ;
+    { deleted bool }
+    { flags uint32_t } ;
 
 ! filename is a pointer to the handle's filename
 ! new_filename is a pointer to the handle's new_file
@@ -122,19 +143,44 @@ STRUCT: fdb_file_info
     { filename char* }
     { new_filename char* }
     { doc_count uint64_t }
+    { deleted_count uint64_t }
     { space_used uint64_t }
-    { file_size uint64_t } ;
+    { file_size uint64_t }
+    { num_kv_stores size_t } ;
 
 STRUCT: fdb_kvs_info
     { name char* }
     { last_seqnum fdb_seqnum_t }
     { doc_count uint64_t }
+    { deleted_count uint64_t }
     { space_used uint64_t }
     { file fdb_file_handle* } ;
 
 STRUCT: fdb_kvs_name_list
     { num_kvs_names size_t }
     { kvs_names char** } ;
+
+STRUCT: fdb_kvs_ops_info
+    { num_sets uint64_t }
+    { num_dels uint64_t }
+    { num_commits uint64_t }
+    { num_compacts uint64_t }
+    { num_gets uint64_t }
+    { num_iterator_gets uint64_t }
+    { num_iterator_moves uint64_t } ;
+
+ENUM: fdb_latency_stat_type
+    { FDB_LATENCY_SETS 0 }
+    { FDB_LATENCY_GETS 1 }
+    { FDB_LATENCY_COMMITS 2 }
+    { FDB_LATENCY_SNAPSHOTS 3 }
+    { FDB_LATENCY_COMPACTS 4 } ;
+
+STRUCT: fdb_latency_stat
+    { lat_count uint64_t }
+    { lat_min uint32_t }
+    { lat_max uint32_t }
+    { lat_avg uint32_t } ;
 
 STRUCT: fdb_kvs_commit_marker_t
     { kv_store_name char* }
@@ -186,7 +232,20 @@ ENUM: fdb_status
     { FDB_RESULT_KV_STORE_BUSY -32 }
     { FDB_RESULT_INVALID_KV_INSTANCE_NAME -33 }
     { FDB_RESULT_INVALID_CMP_FUNCTION -34 }
-    { FDB_RESULT_IN_USE_BY_COMPACTOR -35 } ;
+    { FDB_RESULT_IN_USE_BY_COMPACTOR -35 }
+    { FDB_RESULT_FILE_NOT_OPEN -36 }
+    { FDB_RESULT_TOO_BIG_BUFFER_CACHE -37 }
+    { FDB_RESULT_NO_DB_HEADERS -38 }
+    { FDB_RESULT_HANDLE_BUSY -39 }
+    { FDB_RESULT_AIO_NOT_SUPPORTED -40 }
+    { FDB_RESULT_AIO_INIT_FAIL -41 }
+    { FDB_RESULT_AIO_SUBMIT_FAIL -42 }
+    { FDB_RESULT_AIO_GETEVENTS_FAIL -43 }
+    { FDB_RESULT_CRYPTO_ERROR -44 }
+    { FDB_RESULT_COMPACTION_CANCELLATION -45 }
+    { FDB_RESULT_SB_INIT_FAIL -46 }
+    { FDB_RESULT_SB_RACE_CONDITION -47 }
+    { FDB_RESULT_SB_READ_FAIL -48 } ;
 
 ! End fdb_errors.h
 
@@ -200,9 +259,12 @@ FUNCTION: fdb_status fdb_open_custom_cmp ( fdb_file_handle** ptr_fhandle, c-stri
 
 FUNCTION: fdb_status fdb_set_log_callback ( fdb_kvs_handle* handle, fdb_log_callback log_callback, void* ctx_data )
 
+FUNCTION: void fdb_set_fatal_error_callback ( fdb_fatal_error_callback err_callback )
+
 ! doc is calloc'd
 FUNCTION: fdb_status fdb_doc_create ( fdb_doc** doc, void* key, size_t keylen, void* meta, size_t metalen, void* body, size_t bodylen )
 FUNCTION: fdb_status fdb_doc_update ( fdb_doc** doc, void* meta, size_t metalen, void* body, size_t bodylen )
+FUNCTION: fdb_status fdb_doc_set_seqnum ( fdb_doc* doc, fdb_seqnum_t seqnum )
 FUNCTION: fdb_status fdb_doc_free ( fdb_doc* doc )
 
 FUNCTION: fdb_status fdb_get ( fdb_kvs_handle* handle, fdb_doc* doc )
@@ -223,6 +285,7 @@ FUNCTION: fdb_status fdb_commit ( fdb_file_handle* fhandle, fdb_commit_opt_t opt
 FUNCTION: fdb_status fdb_snapshot_open ( fdb_kvs_handle* handle_in, fdb_kvs_handle** handle_out, fdb_seqnum_t snapshot_seqnum )
 ! Swaps out the handle for a new one
 FUNCTION: fdb_status fdb_rollback ( fdb_kvs_handle** handle_ptr, fdb_seqnum_t rollback_seqnum )
+FUNCTION: fdb_status fdb_rollback_all ( fdb_file_handle* fhandle, fdb_snapshot_marker_t marker )
 
 FUNCTION: fdb_status fdb_iterator_init ( fdb_kvs_handle* handle, fdb_iterator** iterator, void* min_key, size_t min_keylen, void* max_key, size_t max_keylen, fdb_iterator_opt_t opt )
 FUNCTION: fdb_status fdb_iterator_sequence_init ( fdb_kvs_handle* handle, fdb_iterator** iterator, fdb_seqnum_t min_seq, fdb_seqnum_t max_seq, fdb_iterator_opt_t opt )
@@ -237,11 +300,22 @@ FUNCTION: fdb_status fdb_iterator_seek_to_min ( fdb_iterator* iterator )
 FUNCTION: fdb_status fdb_iterator_seek_to_max ( fdb_iterator* iterator )
 FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator )
 
-FUNCTION: fdb_status fdb_compact ( fdb_file_handle* handle, c-string new_filename )
-FUNCTION: fdb_status fdb_compact_upto ( fdb_file_handle* handle, c-string new_filename, fdb_snapshot_marker_t marker )
+FUNCTION: fdb_status fdb_compact ( fdb_file_handle* fhandle, c-string new_filename )
+FUNCTION: fdb_status fdb_compact_with_cow ( fdb_file_handle* fhandle, c-string new_filename )
+FUNCTION: fdb_status fdb_compact_upto ( fdb_file_handle* fhandle, c-string new_filename, fdb_snapshot_marker_t marker )
+FUNCTION: fdb_status fdb_compact_upto_with_cow ( fdb_file_handle* fhandle, c-string new_filename, fdb_snapshot_marker_t marker )
+FUNCTION: fdb_status fdb_cancel_compaction ( fdb_file_handle* fhandle )
+FUNCTION: fdb_status fdb_set_daemon_compaction_interval ( fdb_file_handle* fhandle, size_t interval )
+FUNCTION: fdb_status fdb_rekey ( fdb_file_handle* fhandle, fdb_encryption_key new_key )
+FUNCTION: size_t fdb_get_buffer_cache_used ( )
+FUNCTION: size_t fdb_estimate_space_used ( fdb_file_handle* fhandle )
+FUNCTION: size_t fdb_estimate_space_used_from ( fdb_file_handle* fhandle, fdb_snapshot_marker_t marker )
 
-FUNCTION: fdb_status fdb_get_file_info ( fdb_file_handle* handle, fdb_file_info* info )
+FUNCTION: fdb_status fdb_get_file_info ( fdb_file_handle* fhandle, fdb_file_info* info )
 FUNCTION: fdb_status fdb_get_kvs_info ( fdb_kvs_handle* handle, fdb_kvs_info* info )
+FUNCTION: fdb_status fdb_get_kvs_ops_info ( fdb_kvs_handle* handle, fdb_kvs_ops_info* info )
+FUNCTION: fdb_status fdb_get_latency_stats ( fdb_file_handle* fhandle, fdb_latency_stat* stats, fdb_latency_stat_type type )
+FUNCTION: c-string fdb_get_latency_stat_name ( fdb_latency_stat_type type )
 FUNCTION: fdb_status fdb_get_kvs_seqnum ( fdb_kvs_handle* handle, fdb_seqnum_t* seqnum )
 FUNCTION: fdb_status fdb_get_kvs_name_list ( fdb_kvs_handle* handle, fdb_kvs_name_list* kvs_name_list )
 
@@ -252,7 +326,6 @@ FUNCTION: fdb_status fdb_get_all_snap_markers (
 
 FUNCTION: fdb_status fdb_free_snap_markers ( fdb_snapshot_info_t* markers, uint64_t size )
 FUNCTION: fdb_status fdb_free_kvs_name_list ( fdb_kvs_name_list* kvs_name_list )
-
 
 FUNCTION: fdb_status fdb_switch_compaction_mode ( fdb_file_handle* fhandle, fdb_compaction_mode_t mode, size_t new_threshold )
 FUNCTION: fdb_status fdb_close ( fdb_file_handle* fhandle )
@@ -268,7 +341,6 @@ FUNCTION: fdb_status fdb_kvs_open ( fdb_file_handle* fhandle,
                         c-string kvs_name,
                         fdb_kvs_config* config )
 
-
 FUNCTION: fdb_status fdb_kvs_open_default ( fdb_file_handle* fhandle,
                                 fdb_kvs_handle** ptr_handle,
                                 fdb_kvs_config* config )
@@ -276,4 +348,8 @@ FUNCTION: fdb_status fdb_kvs_open_default ( fdb_file_handle* fhandle,
 FUNCTION: fdb_status fdb_kvs_close ( fdb_kvs_handle* handle )
 
 FUNCTION: fdb_status fdb_kvs_remove ( fdb_file_handle* fhandle, c-string kvs_name )
+
+FUNCTION: fdb_status fdb_set_block_reusing_params ( fdb_file_handle* fhandle, size_t block_reusing_threshold, size_t num_keeping_headers )
 FUNCTION: char* fdb_error_msg ( fdb_status err_code )
+FUNCTION: char* fdb_get_lib_version ( )
+FUNCTION: char* fdb_get_file_version ( fdb_file_handle* fhandle )

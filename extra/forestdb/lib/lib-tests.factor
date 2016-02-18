@@ -350,12 +350,29 @@ IN: forestdb.lib
     ] with-forestdb-tester
 ] unit-test
 
+! XXX: Behavior changed here
+! No longer makes new docs that are deleted
 ! Deleting 5 keys gives you 5 new seqnums that are those docs, but deleted
+! {
+    ! V{ { 6 t } { 7 t } { 8 t } { 9 t } { 10 t } }
+! } [
+    ! delete-test-db-1
+    ! test-db-1 [
+        ! 5 set-kv-n
+        ! 5 del-kv-n
+        ! fdb-commit-normal
+        ! 0 10 [
+            ! fdb_doc>doc
+        ! ] with-fdb-byseq-map
+        ! [ [ seqnum>> ] [ deleted?>> ] bi 2array ] map
+    ! ] with-forestdb-tester
+! ] unit-test
+
+! Test new behavior
 {
-    V{ { 6 t } { 7 t } { 8 t } { 9 t } { 10 t } }
+    V{ }
 } [
-    delete-test-db-1
-    test-db-1 [
+    delete-test-db-1 test-db-1 [
         5 set-kv-n
         5 del-kv-n
         fdb-commit-normal
