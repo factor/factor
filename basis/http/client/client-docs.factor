@@ -281,6 +281,7 @@ $nl
     "http.client.encoding"
     "http.client.errors"
 }
+"For authentication, only Basic Access Authentication is implemented, using the username/password from the target url. Alternatively, the " { $link set-basic-auth } " word can be called on the " { $link request } " object."
 { $see-also "urls" } ;
 
 ABOUT: "http.client"
