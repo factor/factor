@@ -37,9 +37,16 @@ ERROR: too-many-redirects ;
 : set-cookie-header ( header cookies -- header )
     unparse-cookie "cookie" pick set-at ;
 
+: ?set-basic-auth ( header url name -- header )
+    swap [
+        [ username>> ] [ password>> ] bi 2dup and
+        [ basic-auth swap pick set-at ] [ 3drop ] if
+    ] [ drop ] if* ;
+
 : write-request-header ( request -- request )
     dup header>> >hashtable
     over url>> host>> [ set-host-header ] when
+    over url>> "Authorization" ?set-basic-auth
     over post-data>> [ set-post-data-headers ] when*
     over cookies>> [ set-cookie-header ] unless-empty
     write-header ;
