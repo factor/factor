@@ -63,7 +63,7 @@ M: topic url-of topic>filename ;
 
 M: pathname url-of
     string>> "resource:" ?head [
-        "https://github.com/slavapestov/factor/blob/master/"
+        "https://github.com/factor/factor/blob/master/"
         prepend
     ] [ drop f ] if ;
 
