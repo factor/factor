@@ -143,8 +143,11 @@ redirects ;
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
 
+: basic-auth ( username password -- str )
+    ":" glue >base64 "Basic " "" prepend-as ;
+
 : set-basic-auth ( request username password -- request )
-    ":" glue >base64 "Basic " "" prepend-as "Authorization" set-header ;
+    basic-auth "Authorization" set-header ;
 
 : <request> ( -- request )
     request new
