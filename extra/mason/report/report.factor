@@ -7,7 +7,7 @@ xml.syntax xml.writer ;
 IN: mason.report
 
 : git-link ( id -- link )
-    [ "http://github.com/slavapestov/factor/commit/" "" prepend-as ] keep
+    [ "http://github.com/factor/factor/commit/" "" prepend-as ] keep
     [XML <a href=<->><-></a> XML] ;
 
 : common-report ( -- xml )
