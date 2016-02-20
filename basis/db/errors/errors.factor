@@ -43,6 +43,11 @@ TUPLE: sql-database-exists < sql-error message ;
 : <sql-database-exists> ( message -- error )
     f swap sql-database-exists boa ;
 
+TUPLE: sql-index-exists < sql-error name ;
+
+: <sql-index-exists> ( name -- error )
+    f swap sql-index-exists boa ;
+
 : ignore-error ( quot word -- )
     '[ dup @ [ drop ] [ rethrow ] if ] recover ; inline
 
@@ -60,3 +65,6 @@ TUPLE: sql-database-exists < sql-error message ;
 
 : ignore-database-exists ( quot -- )
     [ sql-database-exists? ] ignore-error ; inline
+
+: ignore-index-exists ( quot -- )
+    [ sql-index-exists? ] ignore-error ; inline

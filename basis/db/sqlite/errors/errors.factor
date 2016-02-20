@@ -14,6 +14,8 @@ AlreadyExists = " already exists"
 SqliteError =
     "table " (!(AlreadyExists).)+:table AlreadyExists
       => [[ table >string <sql-table-exists> ]]
+    | "index " (!(AlreadyExists).)+:name AlreadyExists
+      => [[ name >string <sql-index-exists> ]]
     | "no such table: " .+:table
       => [[ table >string <sql-table-missing> ]]
     | .*:error
