@@ -119,6 +119,8 @@ TUPLE: inet4 < ipv4 { port integer read-only } ;
 : <inet4> ( host port -- inet4 )
     over check-ipv4 inet4 boa ;
 
+: <random-local-inet4> ( -- inet4 ) f 0 <inet4> ;
+
 M: ipv4 with-port [ host>> ] dip <inet4> ;
 
 M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
@@ -288,20 +290,20 @@ HOOK: (receive-unsafe) io-backend ( n buf datagram -- count addrspec )
 
 ERROR: invalid-port object ;
 
-: check-port ( packet addrspec port -- packet addrspec port )
+: check-port ( bytes addrspec port -- bytes addrspec port )
     2dup addr>> [ class-of ] bi@ assert=
     pick class-of byte-array assert= ;
 
 : check-connectionless-port ( port -- port )
     dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
 
-: check-send ( packet addrspec port -- packet addrspec port )
+: check-send ( bytes addrspec port -- bytes addrspec port )
     check-connectionless-port check-disposed check-port ;
 
 : check-receive ( port -- port )
     check-connectionless-port check-disposed ;
 
-HOOK: (send) io-backend ( packet addrspec datagram -- )
+HOOK: (send) io-backend ( bytes addrspec datagram -- )
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
     [ [ addr>> ] [ family>> ] bi sockaddr-of-family ]
@@ -375,7 +377,7 @@ SYMBOL: remote-address
 
 CONSTANT: datagram-size 65536
 
-:: receive ( datagram -- packet addrspec )
+:: receive ( datagram -- bytes addrspec )
     datagram-size (byte-array) :> buf
     datagram-size buf datagram
     receive-unsafe :> ( count addrspec )
@@ -386,8 +388,36 @@ CONSTANT: datagram-size 65536
     n buf datagram receive-unsafe :> ( count addrspec )
     buf count head-slice addrspec ; inline
 
-: send ( packet addrspec datagram -- )
+: send ( bytes addrspec datagram -- )
     check-send (send) ; inline
+
+: <random-local-datagram> ( -- datagram )
+    <random-local-inet4> <datagram> ;
+
+: <random-local-broadcast> ( -- datagram )
+    <random-local-inet4> <broadcast> ;
+
+: with-random-local-datagram ( quot -- )
+    [ <random-local-datagram> ] dip with-disposal ; inline
+
+: with-random-local-broadcast ( quot -- )
+    [ <random-local-broadcast> ] dip with-disposal ; inline
+
+: send-once ( bytes addrspec -- )
+    [ send ] with-random-local-datagram ;
+
+:: send-n-times ( bytes addrspec n -- )
+    [
+        n swap '[ bytes addrspec _ send ] times
+    ] with-random-local-datagram ;
+
+: broadcast-once ( bytes addrspec -- )
+    [ send ] with-random-local-broadcast ;
+
+:: broadcast-n-times ( bytes addrspec n -- )
+    [
+        n swap '[ bytes addrspec _ send ] times
+    ] with-random-local-broadcast ;
 
 MEMO: ipv6-supported? ( -- ? )
     [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
