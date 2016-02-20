@@ -1,10 +1,11 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
-classes.struct combinators constructors continuations
-destructors forestdb.ffi forestdb.paths fry generalizations
-io.encodings.string io.encodings.utf8 io.pathnames kernel libc
-math multiline namespaces sequences ;
+byte-arrays classes.struct combinators constructors
+continuations destructors forestdb.ffi forestdb.paths fry
+generalizations io.encodings.string io.encodings.utf8
+io.pathnames kernel libc math multiline namespaces sequences
+strings ;
 QUALIFIED: sets
 IN: forestdb.lib
 
