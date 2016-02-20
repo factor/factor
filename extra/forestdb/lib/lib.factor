@@ -46,9 +46,14 @@ SYMBOL: current-fdb-kvs-handle
 : get-kvs-handle ( -- handle )
     current-fdb-kvs-handle get handle>> ;
 
+GENERIC: encode-kv ( object -- bytes )
+
+M: string encode-kv utf8 encode ;
+M: byte-array encode-kv ;
+
 : fdb-set-kv ( key value -- )
     [ get-kvs-handle ] 2dip
-    [ utf8 encode dup length ] bi@ fdb_set_kv fdb-check-error ;
+    [ encode-kv dup length ] bi@ fdb_set_kv fdb-check-error ;
 
 : <key-doc> ( key -- doc )
     fdb_doc malloc-struct
