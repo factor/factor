@@ -206,6 +206,9 @@ M: db-connection <count-statement> ( query -- statement )
         "," join % ")" %
     ] "" make sql-command ;
 
+: ensure-index ( index-name table-name columns -- )
+    '[ _ _ _ create-index ] ignore-index-exists ;
+
 : drop-index ( index-name -- )
     [ "drop index " % % ] "" make sql-command ;
 
