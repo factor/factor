@@ -21,5 +21,13 @@ db.sqlite kernel locals tools.test ;
             { [ sql-table-exists? ] [ table>> "foo" = ] } 1&&
         ] must-fail-with
 
+        "create index main_index on foo(id);" sql-command
+
+        [
+            "create index main_index on foo(id);" sql-command
+        ] [
+            { [ sql-index-exists? ] [ name>> "main_index" = ] } 1&&
+        ] must-fail-with
+
     ] with-db
 ] with-test-file
