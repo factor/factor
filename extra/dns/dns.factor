@@ -325,10 +325,10 @@ M: TXT rdata>byte-array
     ] B{ } append-outputs-as ;
 
 : udp-query ( bytes server -- bytes' )
-    f 0 <inet4> <datagram>
-    10 seconds over set-timeout [
+    [
+        10 seconds over set-timeout
         [ send ] [ receive drop ] bi
-    ] with-disposal ;
+    ] with-random-local-datagram ;
 
 : <dns-inet4> ( -- inet4 )
     dns-servers get random 53 <inet4> ;

@@ -16,7 +16,7 @@ TUPLE: tcp-echo < threaded-server #times #bytes ;
     binary \ tcp-echo new-threaded-server
         swap >>#bytes
         swap >>#times
-        f 0 <inet4> >>insecure ;
+        <random-local-inet4> >>insecure ;
 
 ERROR: incorrect-#bytes ;
 

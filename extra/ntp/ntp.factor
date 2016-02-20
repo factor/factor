@@ -103,10 +103,10 @@ PRIVATE>
 ! - why does <inet4> resolve-host not work?
 
 : <ntp> ( host -- ntp )
-    123 <inet> resolve-host [ inet4? ] filter random
-    f 0 <inet4> <datagram> [
+    123 <inet> resolve-host
+    [ inet4? ] filter random [
         [ REQUEST ] 2dip [ send ] [ receive drop ] bi (ntp)
-    ] with-disposal ;
+    ] with-random-local-datagram ;
 
 : default-ntp ( -- ntp )
     "pool.ntp.org" <ntp> ;
