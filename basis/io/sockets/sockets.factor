@@ -406,18 +406,8 @@ CONSTANT: datagram-size 65536
 : send-once ( bytes addrspec -- )
     [ send ] with-random-local-datagram ;
 
-:: send-n-times ( bytes addrspec n -- )
-    [
-        n swap '[ bytes addrspec _ send ] times
-    ] with-random-local-datagram ;
-
 : broadcast-once ( bytes addrspec -- )
     [ send ] with-random-local-broadcast ;
-
-:: broadcast-n-times ( bytes addrspec n -- )
-    [
-        n swap '[ bytes addrspec _ send ] times
-    ] with-random-local-broadcast ;
 
 MEMO: ipv6-supported? ( -- ? )
     [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;

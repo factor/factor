@@ -238,19 +238,6 @@ HELP: send-once
 }
 { $description "Sends a packet one time to the address and closes the sending datagram port." } ;
 
-HELP: send-n-times
-{ $values
-    { "bytes" byte-array } { "addrspec" "an address specifier" } { "n" integer }
-}
-{ $examples
-    "Send a datagram 10 times to localhost, port 7777:"
-    { $example "USING: io.sockets prettyprint ;"
-        "B{ 1 2 3 } f 7777 <inet4> 10 send-n-times"
-        ""
-    }
-}
-{ $description "Sends a packet n times to the address and closes the sending datagram port." } ;
-
 HELP: broadcast-once
 { $values
     { "bytes" byte-array } { "addrspec" "an address specifier" }
@@ -263,21 +250,6 @@ HELP: broadcast-once
     }
 }
 { $description "Broadcasts a packet one time to the address and closes the sending broadcast port." } ;
-
-HELP: broadcast-n-times
-{ $values
-    { "bytes" byte-array } { "addrspec" "an address specifier" } { "n" integer }
-}
-{ $examples
-    "Broadcast a datagram 10 times to localhost, port 7777:"
-    { $example "USING: io.sockets prettyprint ;"
-        "B{ 1 2 3 } f 7777 <inet4> 10 broadcast-n-times"
-        ""
-    }
-}
-{ $description "Broadcasts a packet n times to the address and closes the sending broadcast port." } ;
-
-
 
 HELP: with-random-local-broadcast
 { $values
