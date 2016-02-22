@@ -5,8 +5,8 @@
 !
 ! export LD_LIBRARY_PATH=/opt/local/lib
 
-USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators system ;
+USING: alien alien.c-types alien.destructors alien.libraries
+alien.syntax classes.struct combinators system ;
 
 IN: openssl.libcrypto
 
@@ -180,8 +180,9 @@ FUNCTION: void* PEM_read_bio_DHparams ( void* bp, void* x, void* cb,
 ! rsa.h
 ! ===============================================
 
-FUNCTION: void* RSA_generate_key ( int num, ulong e, void* callback,
-                                   void* cb_arg )
+FUNCTION: void* RSA_new ( )
+
+FUNCTION: int RSA_generate_key_ex ( void* rsa int bits, void* e, void* cb )
 
 FUNCTION: int RSA_check_key ( void* rsa )
 
@@ -206,6 +207,7 @@ FUNCTION: void* BN_bin2bn ( void* s, int len, void* ret )
 FUNCTION: int BN_bn2bin ( void* a, void* to )
 
 FUNCTION: void BN_clear_free ( void* a )
+DESTRUCTOR: BN_clear_free
 
 ! ===============================================
 ! ec.h
