@@ -1,14 +1,14 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-assocs byte-arrays classes.struct combinators destructors fry io
-io.backend io.buffers io.encodings.8-bit.latin1
+assocs byte-arrays classes.struct combinators destructors fry
+io io.binary io.backend io.buffers io.encodings.8-bit.latin1
 io.encodings.utf8 io.files io.pathnames io.ports io.sockets
 io.sockets.secure io.timeouts kernel libc
 
-locals math math.order math.parser namespaces openssl
-openssl.libcrypto openssl.libssl random sequences splitting
-unicode.case ;
+locals math math.functions math.order math.parser namespaces
+openssl openssl.libcrypto openssl.libssl random sequences
+splitting unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -19,6 +19,18 @@ M: SSLv3  ssl-method drop SSLv3_method ;
 M: TLSv1  ssl-method drop TLSv1_method ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
+
+<PRIVATE
+
+: bn-bytes-needed ( num -- bytes-required )
+    log2 1 + 8 / ceiling ;
+
+PRIVATE>
+
+: number>bn ( num -- bn )
+    dup bn-bytes-needed >be
+    dup length
+    f BN_bin2bn ; inline
 
 : set-session-cache ( ctx -- )
     handle>>
@@ -113,9 +125,13 @@ M: rsa dispose* handle>> RSA_free ;
 
 : generate-eph-rsa-key ( ctx -- )
     [ handle>> ]
-    [
-        config>> ephemeral-key-bits>> RSA_F4 f f RSA_generate_key
-        dup ssl-error <rsa> &dispose handle>>
+    [| ctx |
+        RSA_new :> rsa-struct
+            rsa-struct
+            ctx config>> ephemeral-key-bits>>
+            RSA_F4 number>bn &BN_clear_free
+            f RSA_generate_key_ex
+        ssl-error rsa-struct <rsa> &dispose handle>>
     ] bi
     SSL_CTX_set_tmp_rsa ssl-error ;
 
