@@ -410,6 +410,9 @@ FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa )
 
 FUNCTION: void* BIO_f_ssl (  )
 
+: SSL_CTX_need_tmp_rsa ( ctx -- n )
+    SSL_CTRL_NEED_TMP_RSA 0 f SSL_CTX_ctrl ;
+
 : SSL_CTX_set_tmp_rsa ( ctx rsa -- n )
     [ SSL_CTRL_SET_TMP_RSA 0 ] dip SSL_CTX_ctrl ;
 

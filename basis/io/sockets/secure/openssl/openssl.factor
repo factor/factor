@@ -123,17 +123,21 @@ TUPLE: rsa < disposable handle ;
 
 M: rsa dispose* handle>> RSA_free ;
 
+: needs-rsa-key ( ctx -- ? )
+    handle>> SSL_CTX_need_tmp_rsa 0 = not ; inline
+
 : generate-eph-rsa-key ( ctx -- )
-    [ handle>> ]
-    [| ctx |
-        RSA_new :> rsa-struct
-            rsa-struct
-            ctx config>> ephemeral-key-bits>>
-            RSA_F4 number>bn &BN_clear_free
-            f RSA_generate_key_ex
-        ssl-error rsa-struct <rsa> &dispose handle>>
-    ] bi
-    SSL_CTX_set_tmp_rsa ssl-error ;
+    dup needs-rsa-key [
+        [ handle>> ]
+        [| ctx |
+            RSA_new :> rsa-struct
+                rsa-struct
+                ctx config>> ephemeral-key-bits>>
+                RSA_F4 number>bn &BN_clear_free
+                f RSA_generate_key_ex
+            ssl-error rsa-struct <rsa> &dispose handle>>
+        ] bi
+    SSL_CTX_set_tmp_rsa ssl-error ] [ drop ] if ;
 
 : <openssl-context> ( config ctx -- context )
     openssl-context new-disposable
