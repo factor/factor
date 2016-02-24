@@ -1,7 +1,8 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: editors kernel make math.parser memoize namespaces
-sequences system vocabs ;
+USING: arrays editors io.files io.pathnames kernel make
+math.parser memoize namespaces sequences system tools.which
+vocabs ;
 IN: editors.visual-studio-code
 
 SINGLETON: visual-studio-code
@@ -17,6 +18,15 @@ MEMO: visual-studio-code-invocation ( -- array )
 
 M: macosx find-visual-studio-code-invocation
     { "open" "-n" "-b" "com.microsoft.VSCode" "--args" } ;
+
+ERROR: can't-find-visual-studio-code ;
+
+M: linux find-visual-studio-code-invocation
+    "Code" which [
+        home "VSCode-linux-x64/Code" append-path dup exists? [
+            can't-find-visual-studio-code
+        ] unless
+    ] unless* 1array ;
 
 M: visual-studio-code editor-command ( file line -- command )
     [
