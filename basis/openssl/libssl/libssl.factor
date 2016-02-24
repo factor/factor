@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.parser
+USING: alien alien.c-types alien.destructors alien.libraries alien.parser
 alien.syntax assocs classes.struct combinators kernel lexer
 literals namespaces openssl.libcrypto parser quotations
 sequences system words ;
@@ -62,6 +62,65 @@ CONSTANT: SSL_CTRL_GET_SESS_CACHE_MODE      45
 
 CONSTANT: SSL_CTRL_GET_MAX_CERT_LIST        50
 CONSTANT: SSL_CTRL_SET_MAX_CERT_LIST        51
+CONSTANT: SSL_CTRL_SET_MAX_SEND_FRAGMENT    52
+CONSTANT: SSL_CTRL_SET_TLSEXT_SERVERNAME_CB       53
+CONSTANT: SSL_CTRL_SET_TLSEXT_SERVERNAME_ARG      54
+CONSTANT: SSL_CTRL_SET_TLSEXT_HOSTNAME            55
+CONSTANT: SSL_CTRL_SET_TLSEXT_DEBUG_CB            56
+CONSTANT: SSL_CTRL_SET_TLSEXT_DEBUG_ARG           57
+CONSTANT: SSL_CTRL_GET_TLSEXT_TICKET_KEYS         58
+CONSTANT: SSL_CTRL_SET_TLSEXT_TICKET_KEYS         59
+CONSTANT: SSL_CTRL_SET_TLSEXT_OPAQUE_PRF_INPUT_CB 61
+CONSTANT: SSL_CTRL_SET_TLSEXT_OPAQUE_PRF_INPUT_CB_ARG 62
+CONSTANT: SSL_CTRL_SET_TLSEXT_STATUS_REQ_CB       63
+CONSTANT: SSL_CTRL_SET_TLSEXT_STATUS_REQ_CB_ARG   64
+CONSTANT: SSL_CTRL_SET_TLSEXT_STATUS_REQ_TYPE     65
+CONSTANT: SSL_CTRL_GET_TLSEXT_STATUS_REQ_EXTS     66
+CONSTANT: SSL_CTRL_SET_TLSEXT_STATUS_REQ_EXTS     67
+CONSTANT: SSL_CTRL_GET_TLSEXT_STATUS_REQ_IDS      68
+CONSTANT: SSL_CTRL_SET_TLSEXT_STATUS_REQ_IDS      69
+CONSTANT: SSL_CTRL_GET_TLSEXT_STATUS_REQ_OCSP_RESP        70
+CONSTANT: SSL_CTRL_SET_TLSEXT_STATUS_REQ_OCSP_RESP        71
+CONSTANT: SSL_CTRL_SET_TLSEXT_TICKET_KEY_CB               72
+CONSTANT: SSL_CTRL_SET_TLS_EXT_SRP_USERNAME_CB            75
+CONSTANT: SSL_CTRL_SET_SRP_VERIFY_PARAM_CB                76
+CONSTANT: SSL_CTRL_SET_SRP_GIVE_CLIENT_PWD_CB             77
+CONSTANT: SSL_CTRL_SET_SRP_ARG                            78
+CONSTANT: SSL_CTRL_SET_TLS_EXT_SRP_USERNAME               79
+CONSTANT: SSL_CTRL_SET_TLS_EXT_SRP_STRENGTH               80
+CONSTANT: SSL_CTRL_SET_TLS_EXT_SRP_PASSWORD               81
+CONSTANT: SSL_CTRL_TLS_EXT_SEND_HEARTBEAT                 85
+CONSTANT: SSL_CTRL_GET_TLS_EXT_HEARTBEAT_PENDING          86
+CONSTANT: SSL_CTRL_SET_TLS_EXT_HEARTBEAT_NO_REQUESTS      87
+
+
+CONSTANT: TLSEXT_NAMETYPE_host_name 0
+CONSTANT: TLSEXT_STATUSTYPE_ocsp 1
+
+CONSTANT: TLSEXT_ECPOINTFORMAT_first                      0
+CONSTANT: TLSEXT_ECPOINTFORMAT_uncompressed               0
+CONSTANT: TLSEXT_ECPOINTFORMAT_ansiX962_compressed_prime  1
+CONSTANT: TLSEXT_ECPOINTFORMAT_ansiX962_compressed_char2  2
+CONSTANT: TLSEXT_ECPOINTFORMAT_last                       2
+
+CONSTANT: TLSEXT_signature_anonymous                      0
+CONSTANT: TLSEXT_signature_rsa                            1
+CONSTANT: TLSEXT_signature_dsa                            2
+CONSTANT: TLSEXT_signature_ecdsa                          3
+CONSTANT: TLSEXT_signature_num                            4
+
+CONSTANT: TLSEXT_hash_none                                0
+CONSTANT: TLSEXT_hash_md5                                 1
+CONSTANT: TLSEXT_hash_sha1                                2
+CONSTANT: TLSEXT_hash_sha224                              3
+CONSTANT: TLSEXT_hash_sha256                              4
+CONSTANT: TLSEXT_hash_sha384                              5
+CONSTANT: TLSEXT_hash_sha512                              6
+CONSTANT: TLSEXT_hash_num                                 7
+
+CONSTANT: TLSEXT_nid_unknown                              0x1000000
+
+
 
 CONSTANT: SSL_OP_NO_SSLv2 0x01000000
 CONSTANT: SSL_OP_NO_SSLv3 0x02000000
@@ -326,13 +385,14 @@ FUNCTION: void SSL_set_connect_state ( SSL* ssl )
 
 FUNCTION: void SSL_set_accept_state ( SSL* ssl )
 
-FUNCTION: int SSL_connect ( SSL* ssl )
 
+FUNCTION: void SSL_free ( SSL* ssl )
 FUNCTION: int SSL_accept ( SSL* ssl )
-
-FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
-
+FUNCTION: int SSL_connect ( SSL* ssl )
 FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num )
+FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
+FUNCTION: long SSL_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
+! FUNCTION: long SSL_callback_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
 
 FUNCTION: int SSL_shutdown ( SSL* ssl )
 
@@ -342,8 +402,6 @@ CONSTANT: SSL_RECEIVED_SHUTDOWN 2
 FUNCTION: int SSL_get_shutdown ( SSL* ssl )
 
 FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, c-string sid_ctx, uint len )
-
-FUNCTION: void SSL_free ( SSL* ssl )
 
 FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses )
 
@@ -524,6 +582,8 @@ FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a )
 FUNCTION: X509_NAME* X509_get_subject_name ( X509* a )
 FUNCTION: int X509_check_trust ( X509* a, int id, int flags )
 FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc )
+FUNCTION: void X509_free ( X509 *a )
+DESTRUCTOR: X509_free
 
 ! stack.h
 FUNCTION: int sk_num ( _STACK *s )
