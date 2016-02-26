@@ -8,7 +8,7 @@ HELP: html-class?
 
 HELP: stack-find
 { $values { "seq" sequence } { "quot" { $quotation ( elt -- 1/0/-1 ) } } { "i/f" "an index or " { $link f } } }
-{ $description "Takes a sequence and a quotation expected to return -1 if the element decrements the stack, 0 if it doesnt affect it and 1 if it increments it. Then finds the first element where the stack is empty." } ;
+{ $description "Takes a sequence and a quotation expected to return -1 if the element decrements the stack, 0 if it doesn't affect it and 1 if it increments it. Then finds the first element where the stack is empty." } ;
 
 HELP: tag-classifier
 { $values { "string" string } { "quot" { $quotation ( elt -- 1/0/-1 ) } } }
