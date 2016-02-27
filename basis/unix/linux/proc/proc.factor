@@ -47,7 +47,8 @@ TUPLE: processor-info
     { cache-alignment integer }
     { address-sizes array }
     { power-management string }
-    { tlb-size string } ;
+    { tlb-size string }
+    { bugs string } ;
 
 
 ERROR: unknown-cpuinfo-line string ;
@@ -92,6 +93,7 @@ ERROR: unknown-cpuinfo-line string ;
         { "vendor_id" [ >>vendor-id ] }
         { "wp" [ "yes" = >>wp? ] }
         { "TLB size" [ >>tlb-size ] }
+        { "bugs" [ >>bugs ] }
         [ unknown-cpuinfo-line ]
     } case ;
 
