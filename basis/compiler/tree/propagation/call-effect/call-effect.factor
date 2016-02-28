@@ -41,8 +41,6 @@ M: compose cached-effect
     [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
 
 : safe-infer ( quot -- effect )
-    ! Save and restore error variables here, so that we don't
-    ! pollute words such as :error and :c for the user.
     error get-global error-continuation get-global
     [ [ [ infer ] [ 2drop +unknown+ ] recover ] without-dependencies ] 2dip
     [ error set-global ] [ error-continuation set-global ] bi* ;

@@ -43,7 +43,7 @@ HELP: machine-edge-live-ins
 { $var-description "Mapping from basic blocks to predecessors to values which are live on a particular incoming edge." } ;
 
 HELP: machine-live-ins
-{ $var-description "Mapping from basic blocks to values which are live at the start on all incoming CFG edges. It's like " { $link live-ins } " except the registers are physical instead of virtual." } ;
+{ $var-description "Mapping from basic blocks to values which are live at the start on all incoming CFG edges. Each value is a sequence of 2-tuples where the first element is the vreg and the second the register or " { $link spill-slot } " which contains its value. It's like " { $link live-ins } " except the registers are physical instead of virtual." } ;
 
 HELP: machine-live-outs
 { $var-description "Mapping from " { $link basic-block } " to an " { $link assoc } " of pairs which are the values that are live at the end. The keys of the pairs are virtual registers and the values are either real registers or spill slots." } ;

@@ -1,5 +1,5 @@
-USING: combinators.private compiler.units effects help.markup help.syntax
-kernel quotations words ;
+USING: combinators.private compiler.units debugger effects help.markup
+help.syntax kernel quotations words ;
 IN: compiler.tree.propagation.call-effect
 
 HELP: already-inlined-quot?
@@ -25,6 +25,10 @@ HELP: call-effect-slow>quot
 HELP: call-effect-unsafe?
 { $values { "quot" quotation } { "effect" effect } { "?" boolean } }
 { $description "Checks if the given effect is safe with regards to the quotation." } ;
+
+HELP: safe-infer
+{ $values { "quot" quotation } { "effect" effect } }
+{ $description "Save and restore error variables here, so that we don't pollute words such as " { $link :error } " and " { $link :c } " for the user." } ;
 
 HELP: update-inline-cache
 { $values { "word/quot" { $or word quotation } } { "ic" inline-cache } }
