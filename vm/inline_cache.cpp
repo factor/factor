@@ -17,18 +17,13 @@ void factor_vm::deallocate_inline_cache(cell return_address) {
 /* Figure out what kind of type check the PIC needs based on the methods
    it contains */
 cell factor_vm::determine_inline_cache_type(array* cache_entries) {
-  bool seen_tuple = false;
-
-  cell i;
-  for (i = 0; i < array_capacity(cache_entries); i += 2) {
+  for (cell i = 0; i < array_capacity(cache_entries); i += 2) {
     /* Is it a tuple layout? */
     if (TAG(array_nth(cache_entries, i)) == ARRAY_TYPE) {
-      seen_tuple = true;
-      break;
+      return PIC_TUPLE;
     }
   }
-
-  return seen_tuple ? PIC_TUPLE : PIC_TAG;
+  return PIC_TAG;
 }
 
 void factor_vm::update_pic_count(cell type) {
