@@ -22,6 +22,10 @@ HELP: finalize-stack-shuffling
 { $values { "cfg" cfg } }
 { $description "Called to end the stack analysis." } ;
 
+HELP: visit-edge
+{ $values { "from" basic-block } { "to" basic-block } }
+{ $description "If both blocks are subroutine calls, don't bother computing anything." } ;
+
 ARTICLE: "compiler.cfg.stacks.finalize" "Stack finalization"
 "This pass inserts peeks and replaces." ;
 
