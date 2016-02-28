@@ -108,7 +108,6 @@ SYMBOL: special-objects
     [ length test-quot call ] [ % ] bi ; inline
 
 : make-jit ( quot -- parameters literals code )
-    ! code is a { relocation insns } pair
     [
         0 extra-offset set
         init-relocation
@@ -428,7 +427,7 @@ M: quotation prepare-object
     1 >bignum OBJ-BIGNUM-POS-ONE special-objects get set-at
     -1 >bignum OBJ-BIGNUM-NEG-ONE special-objects get set-at ;
 
-: emit-global ( -- )
+: create-global-hashtable ( -- global-hashtable )
     {
         dictionary source-files builtins
         update-map implementors-map
@@ -437,7 +436,10 @@ M: quotation prepare-object
         class<=-cache class-not-cache classes-intersect-cache
         class-and-cache class-or-cache next-method-quot-cache
     } [ H{ } clone global-box boa ] H{ } map>assoc assoc-union
-    global-hashtable boa
+    global-hashtable boa ;
+
+: emit-global ( -- )
+    create-global-hashtable
     OBJ-GLOBAL special-objects get set-at ;
 
 : emit-jit-data ( -- )
