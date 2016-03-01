@@ -98,7 +98,6 @@ void factor_vm::delete_contexts() {
   FACTOR_ASSERT(!ctx);
   FACTOR_FOR_EACH(unused_contexts) {
     delete *iter;
-    iter++;
   }
 }
 
