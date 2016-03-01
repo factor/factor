@@ -22,12 +22,9 @@ TYPEDEF: int64_t cs_off_t
 
 TYPEDEF: void* fdb_custom_cmp_fixed
 TYPEDEF: void* fdb_custom_cmp_variable
-TYPEDEF: void* fdb_fatal_error_callback
-TYPEDEF: void* fdb_log_callback
 TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_kvs_handle
 TYPEDEF: void* fdb_iterator
-TYPEDEF: void* fdb_compaction_callback
 
 ENUM: fdb_open_flags
     { FDB_OPEN_FLAG_CREATE 1 }
@@ -82,6 +79,30 @@ ENUM: fdb_encryption_algorithm_t
     { FDB_ENCRYPTION_NONE 0 }
     { FDB_ENCRYPTION_AES256 1 } ;
 
+STRUCT: fdb_doc
+    { keylen size_t }
+    { metalen size_t }
+    { bodylen size_t }
+    { size_ondisk size_t }
+    { key void* }
+    { seqnum fdb_seqnum_t }
+    { offset uint64_t }
+    { meta void* }
+    { body void* }
+    { deleted bool }
+    { flags uint32_t } ;
+
+CALLBACK: void fdb_log_callback ( int err_code, char* err_msg, void* ctx_data )
+CALLBACK: void fdb_fatal_error_callback ( )
+CALLBACK: fdb_compact_decision fdb_compaction_callback (
+                               fdb_file_handle* fhandle,
+                               fdb_compaction_status status,
+                               char* kv_store_name,
+                               fdb_doc* doc,
+                               uint64_t last_oldfile_offset,
+                               uint64_t last_newfile_offset,
+                               void* ctx )
+
 STRUCT: fdb_encryption_key
     { algorithm fdb_encryption_algorithm_t }
     { bytes uint8_t[32] } ;
@@ -123,19 +144,6 @@ STRUCT: fdb_kvs_config
     { create_if_missing bool }
     { custom_cmp fdb_custom_cmp_variable } ;
 
-STRUCT: fdb_doc
-    { keylen size_t }
-    { metalen size_t }
-    { bodylen size_t }
-    { size_ondisk size_t }
-    { key void* }
-    { seqnum fdb_seqnum_t }
-    { offset uint64_t }
-    { meta void* }
-    { body void* }
-    { deleted bool }
-    { flags uint32_t } ;
-
 ! filename is a pointer to the handle's filename
 ! new_filename is a pointer to the handle's new_file
 
@@ -174,7 +182,8 @@ ENUM: fdb_latency_stat_type
     { FDB_LATENCY_GETS 1 }
     { FDB_LATENCY_COMMITS 2 }
     { FDB_LATENCY_SNAPSHOTS 3 }
-    { FDB_LATENCY_COMPACTS 4 } ;
+    { FDB_LATENCY_SNAPSHOT_DUR 4 }
+    { FDB_LATENCY_COMPACTS 5 } ;
 
 STRUCT: fdb_latency_stat
     { lat_count uint64_t }
