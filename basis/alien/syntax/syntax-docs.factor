@@ -86,7 +86,7 @@ STRUCT: forward { x backward* } ;" } }
 { $notes "Primitive C types are displayed using " { $snippet "C-TYPE:" } " syntax when they are " { $link see } "n." } ;
 
 HELP: CALLBACK:
-{ $syntax "CALLBACK: return type ( parameters ) ;" }
+{ $syntax "CALLBACK: return type ( parameters )" }
 { $values { "return" "a C return type" } { "type" "a type name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
 { $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters. The ABI of the callback is decided from the ABI of the active " { $link POSTPONE: LIBRARY: } " declaration." }
 { $examples
