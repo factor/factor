@@ -228,8 +228,7 @@ SYMBOL: outdated-tuples
     [ drop class-of "forgotten" word-prop not ]
     2bi and ;
 
-: update-tuples ( -- )
-    outdated-tuples get
+: update-tuples ( outdated-tuples -- )
     dup assoc-empty? [ drop ] [
         [ [ tuple? ] instances ] dip [ outdated-tuple? ] curry filter
         dup [ update-tuple ] map become
