@@ -117,28 +117,6 @@ M: bio dispose* handle>> BIO_free ssl-error ;
         SSL_CTX_set_tmp_dh ssl-error
     ] [ drop ] if ;
 
-TUPLE: rsa < disposable handle ;
-
-: <rsa> ( handle -- rsa ) rsa new-disposable swap >>handle ;
-
-M: rsa dispose* handle>> RSA_free ;
-
-: needs-rsa-key ( ctx -- ? )
-    handle>> SSL_CTX_need_tmp_rsa 0 = not ; inline
-
-: generate-eph-rsa-key ( ctx -- )
-    dup needs-rsa-key [
-        [ handle>> ]
-        [| ctx |
-            RSA_new :> rsa-struct
-                rsa-struct
-                ctx config>> ephemeral-key-bits>>
-                RSA_F4 number>bn &BN_clear_free
-                f RSA_generate_key_ex
-            ssl-error rsa-struct <rsa> &dispose handle>>
-        ] bi
-    SSL_CTX_set_tmp_rsa ssl-error ] [ drop ] if ;
-
 : <openssl-context> ( config ctx -- context )
     openssl-context new-disposable
         swap >>handle
@@ -159,7 +137,6 @@ M: openssl <secure-context> ( config -- context )
             [ load-verify-locations ]
             [ set-verify-depth ]
             [ load-dh-params ]
-            [ generate-eph-rsa-key ]
             [ ]
         } cleave
     ] with-destructors ;
