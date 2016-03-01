@@ -91,7 +91,7 @@ HELP: CALLBACK:
 { $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters. The ABI of the callback is decided from the ABI of the active " { $link POSTPONE: LIBRARY: } " declaration." }
 { $examples
     { $code
-        "CALLBACK: bool FakeCallback ( int message, void* payload ) ;"
+        "CALLBACK: bool FakeCallback ( int message, void* payload )"
         ": MyFakeCallback ( -- alien )"
         "    [| message payload |"
         "        \"message #\" write"
