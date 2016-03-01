@@ -129,8 +129,8 @@ M: object always-bump-effect-counter? drop f ;
     maybe-changed get union!
     dup changed-vocabs over adjoin-all ;
 
-: process-forgotten-definitions ( -- )
-    forgotten-definitions get members
+: process-forgotten-definitions ( forgotten-definitions -- )
+    members
     [ [ word? ] filter process-forgotten-words ]
     [ [ delete-definition-errors ] each ]
     bi ;
@@ -138,7 +138,8 @@ M: object always-bump-effect-counter? drop f ;
 : bump-effect-counter? ( -- ? )
     changed-effects get members
     maybe-changed get members
-    changed-definitions get members [ always-bump-effect-counter? ] filter
+    changed-definitions get members
+    [ always-bump-effect-counter? ] filter
     3array combine new-words get [ in? not ] curry any? ;
 
 : bump-effect-counter ( -- )
@@ -162,8 +163,8 @@ M: object always-bump-effect-counter? drop f ;
         remake-generics
         to-recompile [
             recompile
-            update-tuples
-            process-forgotten-definitions
+            outdated-tuples get update-tuples
+            forgotten-definitions get process-forgotten-definitions
         ] keep update-existing? reset-pics? modify-code-heap
         bump-effect-counter
         notify-observers
