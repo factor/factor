@@ -108,7 +108,7 @@ PRIVATE>
 
 ! Constructor
 : <imap4ssl> ( host -- imap4 )
-    IMAP4_SSL_PORT <inet> <secure> binary <client> drop
+    IMAP4_SSL_PORT <inet> f <secure> binary <client> drop
     ! Read the useless welcome message.
     dup [ "\\*" read-response drop ] with-stream* ;
 

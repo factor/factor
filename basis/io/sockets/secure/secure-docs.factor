@@ -1,4 +1,4 @@
-USING: io help.markup help.syntax calendar quotations io.sockets ;
+USING: io help.markup help.syntax calendar quotations strings io.sockets ;
 IN: io.sockets.secure
 
 HELP: secure-socket-timeout
@@ -74,7 +74,7 @@ HELP: secure
 { $class-description "The class of secure socket addresses." } ;
 
 HELP: <secure>
-{ $values { "addrspec" "an address specifier" } { "secure" secure } }
+{ $values { "addrspec" "an address specifier" } { "hostname" { $maybe string } } { "secure" secure } }
 { $description "Creates a new secure socket address, which can then be passed to " { $link <client> } " or " { $link <server> } "." } ;
 
 ARTICLE: "ssl-addresses" "Secure socket addresses"

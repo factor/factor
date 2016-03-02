@@ -14,10 +14,10 @@ M: ssl-handle handle-fd file>> handle-fd ;
 
 M: unix socket-handle fd>> ;
 
-M: secure ((client)) ( addrspec -- handle )
-    addrspec>> ((client)) <ssl-socket> ;
+M: secure ((client)) ( secure -- handle )
+    [ addrspec>> ((client)) ] [ hostname>> ] bi <ssl-socket> ;
 
-M: secure parse-sockaddr addrspec>> parse-sockaddr <secure> ;
+M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
 M: secure (get-local-address) addrspec>> (get-local-address) ;
 
@@ -28,7 +28,8 @@ M: secure (server) addrspec>> (server) ;
 
 M: secure (accept)
     [
-        addrspec>> (accept) [ |dispose <ssl-socket> ] dip
+        [ hostname>> ] [ addrspec>> ] bi (accept)
+        [ |dispose <ssl-socket> ] dip
     ] with-destructors ;
 
 : check-shutdown-response ( handle r -- event )

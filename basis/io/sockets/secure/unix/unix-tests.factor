@@ -12,7 +12,7 @@ io.sockets.secure.debug ;
 :: server-test ( quot -- )
     [
         [
-            "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+            "127.0.0.1" 0 <inet4> f <secure> ascii <server> [
                 dup addr>> addrspec>> port>> "port" get fulfill
                 accept [
                     quot call
@@ -23,7 +23,7 @@ io.sockets.secure.debug ;
 
 : client-test ( -- string )
     <secure-config> [
-        "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop stream-contents
+        "127.0.0.1" "port" get ?promise <inet4> f <secure> ascii <client> drop stream-contents
     ] with-secure-context ;
 
 { } [ [ class-of name>> write ] server-test ] unit-test
@@ -55,7 +55,7 @@ io.sockets.secure.debug ;
 
 [
     <secure-config> [
-        "localhost" "port" get ?promise <inet> <secure> ascii
+        "localhost" "port" get ?promise <inet> f <secure> ascii
         <client> drop dispose
     ] with-secure-context
 ] [ certificate-verify-error? ] must-fail-with
@@ -95,7 +95,7 @@ io.sockets.secure.debug ;
     1 seconds secure-socket-timeout [
         [
             [
-                "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                "127.0.0.1" 0 <inet4> f <secure> ascii <server> [
                     dup addr>> addrspec>> port>> "port" get fulfill
                     accept drop &dispose dup stream-read1 drop
                 ] with-disposal
@@ -114,7 +114,7 @@ io.sockets.secure.debug ;
         [
             [
                 [
-                    "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                    "127.0.0.1" 0 <inet4> f <secure> ascii <server> [
                         dup addr>> addrspec>> port>> "port" get fulfill
                         accept drop &dispose 1 minutes sleep
                     ] with-disposal
@@ -126,7 +126,7 @@ io.sockets.secure.debug ;
     [
         1 seconds secure-socket-timeout [
             <secure-config> [
-                "127.0.0.1" "port" get ?promise <inet4> <secure>
+                "127.0.0.1" "port" get ?promise <inet4> f <secure>
                 ascii <client> drop dispose
             ] with-secure-context
         ] with-variable
@@ -140,7 +140,7 @@ io.sockets.secure.debug ;
             [
                 [
                     "127.0.0.1" "port" get ?promise
-                    <inet4> <secure> ascii <client> drop &dispose 1 minutes sleep
+                    <inet4> f <secure> ascii <client> drop &dispose 1 minutes sleep
                 ] with-test-context
             ] with-destructors
         ] "Silly client" spawn drop
@@ -150,7 +150,7 @@ io.sockets.secure.debug ;
         [
             1 seconds secure-socket-timeout [
                 [
-                    "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                    "127.0.0.1" 0 <inet4> f <secure> ascii <server> [
                         dup addr>> addrspec>> port>> "port" get fulfill
                         accept drop &dispose
                     ] with-disposal
