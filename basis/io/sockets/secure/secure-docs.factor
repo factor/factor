@@ -4,20 +4,6 @@ IN: io.sockets.secure
 HELP: secure-socket-timeout
 { $var-description "Timeout for operations not associated with a constructed port instance, such as SSL handshake and shutdown. Represented as a " { $link duration } "." } ;
 
-HELP: SSLv2
-{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
-$nl
-"Note that the SSLv2 protocol is vulnerable to truncation attacks and its use is discouraged (" { $url "http://www.gnu.org/software/gnutls/manual/html_node/On-SSL-2-and-older-protocols.html" } ")." } ;
-
-HELP: SSLv3
-{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
-$nl
-"SSLv3 is widely used, however it is being supersceded by TLSv1." } ;
-
-HELP: SSLv23
-{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
-$nl
-"This value indicates that either SSLv2 or SSLv3 is acceptable." } ;
 
 HELP: TLSv1
 { $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
@@ -27,12 +13,9 @@ $nl
 ARTICLE: "ssl-methods" "SSL/TLS methods"
 "The " { $snippet "method" } " slot of a " { $link secure-config } " can be set to one of the following values:"
 { $subsections
-    SSLv2
-    SSLv23
-    SSLv3
     TLSv1
 }
-"The default value is " { $link SSLv23 } "." ;
+"The default value is " { $link TLSv1 } "." ;
 
 HELP: secure-config
 { $class-description "Instances represent secure socket configurations." } ;
@@ -121,7 +104,7 @@ $nl
 { $subsections accept-secure-handshake } ;
 
 HELP: premature-close
-{ $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence. This error is never reported for " { $link SSLv2 } " connections because there is no distinction between expected and unexpected connection closure in that case." } ;
+{ $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence." } ;
 
 HELP: certificate-verify-error
 { $error-description "Thrown if certificate verification failed. The " { $snippet "result" } " slot contains an object identifying the low-level error that occurred." } ;

@@ -17,7 +17,7 @@ HOOK: ssl-certificate-verification-supported? secure-socket-backend ( -- ? )
 M: object ssl-supported? f ;
 M: object ssl-certificate-verification-supported? f ;
 
-SINGLETONS: SSLv2 SSLv23 SSLv3 TLSv1 ;
+SINGLETONS: TLSv1 ;
 
 TUPLE: secure-config
 method
@@ -30,7 +30,7 @@ ephemeral-key-bits ;
 
 : <secure-config> ( -- config )
     secure-config new
-        SSLv23 >>method
+        TLSv1 >>method
         1024 >>ephemeral-key-bits
         ssl-certificate-verification-supported? >>verify ;
 
