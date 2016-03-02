@@ -172,7 +172,7 @@ PRIVATE>
 
 <PRIVATE
 
-GENERIC: >secure-addr ( addrspec -- addrspec' )
+GENERIC# >secure-addr 1 ( addrspec host -- addrspec' )
 
 PRIVATE>
 
@@ -182,8 +182,10 @@ PRIVATE>
         [ port>> ]
         [ protocol>> protocol-port ]
         tri or <inet>
-    ] [ protocol>> ] bi
-    secure-protocol? [ >secure-addr ] when ;
+    ]
+    [ host>> ]
+    [ protocol>> ] tri
+    secure-protocol? [ >secure-addr ] [ drop ] if ;
 
 : set-url-addr ( url addr -- url )
     [ host>> >>host ] [ port>> >>port ] bi ;
