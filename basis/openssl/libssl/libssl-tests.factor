@@ -23,7 +23,7 @@ IN: openssl.libssl.tests
     swap SSL_CTRL_OPTIONS 0 f SSL_CTX_ctrl bitand 0 > ;
 
 : new-ctx ( -- ctx )
-    SSLv23_client_method SSL_CTX_new ;
+    TLSv1_client_method SSL_CTX_new ;
 
 : new-ssl ( -- ssl )
     new-ctx SSL_new ;

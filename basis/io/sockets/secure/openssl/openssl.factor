@@ -13,9 +13,6 @@ IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
 
-M: SSLv2  ssl-method drop SSLv2_client_method ;
-M: SSLv23 ssl-method drop SSLv23_method ;
-M: SSLv3  ssl-method drop SSLv3_method ;
 M: TLSv1  ssl-method drop TLSv1_method ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
