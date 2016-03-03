@@ -1,4 +1,4 @@
-USING: accessors http.client http.client.private http
+USING: accessors io.sockets.secure http.client http.client.private http
 io.streams.string kernel namespaces sequences tools.test urls ;
 IN: http.client.tests
 
@@ -42,6 +42,11 @@ IN: http.client.tests
 { "DELETE" } [ "http://arc.com" <delete-request> method>> ] unit-test
 { "TRACE" } [ "http://concatenative.org" <trace-request> method>> ] unit-test
 { "OPTIONS" } [ "http://factorcode.org" <options-request> method>> ] unit-test
+{ t } [
+    "https://alice.sni.velox.ch" http-get nip
+    [ "Great!" swap subseq? ]
+    [ "TLS SNI Test Site: alice.sni.velox.ch" swap subseq? ] bi and
+] unit-test
 
 { t } [
     {
