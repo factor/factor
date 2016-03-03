@@ -44,7 +44,9 @@ HOOK: <secure-context> secure-socket-backend ( config -- context )
         with-disposal
     ] with-scope ; inline
 
-TUPLE: secure { addrspec read-only } ;
+TUPLE: secure
+    { addrspec read-only }
+    { hostname read-only } ;
 
 C: <secure> secure
 
@@ -53,7 +55,8 @@ M: secure present addrspec>> present " (secure)" append ;
 CONSULT: inet secure addrspec>> ;
 
 M: secure resolve-host ( secure -- seq )
-    addrspec>> resolve-host [ <secure> ] map ;
+    [ addrspec>> resolve-host ] [ hostname>> ] bi
+    [ <secure> ] curry map ;
 
 HOOK: check-certificate secure-socket-backend ( host handle -- )
 

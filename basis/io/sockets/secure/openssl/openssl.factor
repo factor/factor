@@ -171,11 +171,16 @@ SYMBOL: default-secure-context
         swap >>file
     ] with-destructors ;
 
-: <ssl-socket> ( winsock -- ssl )
-    [
-        socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error
-    ] keep <ssl-handle>
-    [ handle>> swap dup SSL_set_bio ] keep ;
+:: <ssl-socket> ( winsock hostname -- ssl )
+    winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
+    winsock <ssl-handle> :> handle
+    handle handle>> :> native-handle
+    hostname [
+        utf8 string>alien
+        native-handle swap SSL_set_tlsext_host_name ssl-error
+    ] when*
+    native-handle bio bio SSL_set_bio
+    handle ;
 
 ! Error handling
 : syscall-error ( r -- event )
@@ -330,7 +335,7 @@ M: openssl check-certificate ( host ssl -- )
 
 : make-input/output-secure ( input output -- )
     dup handle>> non-ssl-socket? [ upgrade-on-non-socket ] unless
-    [ <ssl-socket> ] change-handle
+    [ f <ssl-socket> ] change-handle
     handle>> >>handle drop ;
 
 : (send-secure-handshake) ( output -- )

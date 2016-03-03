@@ -392,7 +392,6 @@ FUNCTION: int SSL_connect ( SSL* ssl )
 FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num )
 FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
 FUNCTION: long SSL_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
-! FUNCTION: long SSL_callback_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
 
 FUNCTION: int SSL_shutdown ( SSL* ssl )
 
@@ -467,6 +466,10 @@ FUNCTION: void SSL_CTX_set_tmp_dh_callback ( SSL_CTX* ctx, void* dh )
 FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa )
 
 FUNCTION: void* BIO_f_ssl (  )
+
+: SSL_set_tlsext_host_name ( ctx hostname -- n )
+    [ SSL_CTRL_SET_TLSEXT_HOSTNAME TLSEXT_NAMETYPE_host_name ] dip
+    SSL_ctrl ;
 
 : SSL_CTX_need_tmp_rsa ( ctx -- n )
     SSL_CTRL_NEED_TMP_RSA 0 f SSL_CTX_ctrl ;

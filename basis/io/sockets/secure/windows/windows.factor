@@ -14,7 +14,7 @@ M: secure ((client)) ( addrspec -- handle )
 M: secure (get-local-address) ( handle remote -- sockaddr )
     [ file>> ] [ addrspec>> ] bi* (get-local-address) ;
 
-M: secure parse-sockaddr addrspec>> parse-sockaddr <secure> ;
+M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
 M:: secure establish-connection ( client-out addrspec -- )
     client-out handle>> file>> :> socket
