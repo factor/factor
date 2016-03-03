@@ -276,7 +276,8 @@ urls [
 
 {
     T{ secure
-       { addrspec T{ inet { host "google.com" } { port 443 } } }
+        { addrspec T{ inet { host "google.com" } { port 443 } } }
+        { hostname "google.com" }
     }
 }
 [ URL" https://google.com/" url-addr ] unit-test
