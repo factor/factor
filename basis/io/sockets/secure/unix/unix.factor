@@ -28,8 +28,7 @@ M: secure (server) addrspec>> (server) ;
 
 M: secure (accept)
     [
-        [ hostname>> ] [ addrspec>> ] bi (accept)
-        [ |dispose <ssl-socket> ] dip
+        addrspec>> (accept) [ |dispose f <ssl-socket> ] dip
     ] with-destructors ;
 
 : check-shutdown-response ( handle r -- event )
