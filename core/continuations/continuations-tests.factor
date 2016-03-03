@@ -16,9 +16,10 @@ IN: continuations.tests
 : callcc-namespace-test ( -- ? )
     [
         "test-cc" set
-        5 "x" [
+        5 "x" set
+        H{ } clone [
             6 "x" set "test-cc" get continue
-        ] with-variable
+        ] with-variables
     ] callcc0 "x" get 5 = ;
 
 { t } [ 10 callcc1-test 10 iota reverse >vector = ] unit-test
