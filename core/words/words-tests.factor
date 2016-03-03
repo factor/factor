@@ -31,11 +31,11 @@ DEFER: plist-test
     "create-test" "scratchpad" lookup-word "testing" word-prop
 ] unit-test
 
-[
+H{ } clone [
     [ t ] [ \ array? "array?" "arrays" lookup-word = ] unit-test
 
     [ ] [ [ "test-scope" "scratchpad" create-word drop ] with-compilation-unit ] unit-test
-] with-scope
+] with-variables
 
 { "test-scope" } [
     "test-scope" "scratchpad" lookup-word name>>

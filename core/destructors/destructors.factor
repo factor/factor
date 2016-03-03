@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations init kernel make
-namespaces sequences sets ;
+USING: accessors continuations hashtables init kernel namespaces
+sequences sets ;
 IN: destructors
 
 SYMBOL: disposables
@@ -82,13 +82,13 @@ PRIVATE>
     dup error-destructors get push ; inline
 
 : with-destructors ( quot -- )
-    [
-        V{ } clone always-destructors set
-        V{ } clone error-destructors set
+    V{ } clone always-destructors
+    V{ } clone error-destructors
+    2hashtable [
         [ do-always-destructors ]
         [ do-error-destructors ]
         cleanup
-    ] with-scope ; inline
+    ] with-variables ; inline
 
 [
     HS{ } clone disposables set-global

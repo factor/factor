@@ -81,10 +81,9 @@ IN: vectors.tests
 ] unit-test
 
 { 0 } [
-    [
-        10 <vector> "x" set
+    10 <vector> "x" [
         "x" get clone length
-    ] with-scope
+    ] with-variable
 ] unit-test
 
 { f } [ 5 V{ } index ] unit-test
