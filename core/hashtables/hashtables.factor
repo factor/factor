@@ -150,9 +150,6 @@ M: hashtable set-at
     [ 2dup hash@ set-nth-pair ] keep
     hashtable boa ; inline
 
-: 2hashtable ( value0 key0 value1 key1 -- hash )
-    H{ } clone [ set-at ] keep [ set-at ] keep ; inline
-
 <PRIVATE
 
 : collect-pairs ( hash quot: ( key value -- elt ) -- seq )

@@ -57,8 +57,10 @@ IN: io.pathnames.tests
 { } [ 2 [ "touch-twice-test" temp-file touch-file ] times ] unit-test
 
 ! aum's bug
-"." current-directory
-".." "resource-path" 2hashtable [
+H{
+    { current-directory "." }
+    { "resource-path" ".." }
+} [
     [ "../core/bootstrap/stage2.factor" ]
     [ "resource:core/bootstrap/stage2.factor" absolute-path ]
     unit-test

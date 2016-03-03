@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations hashtables init kernel namespaces
+USING: accessors assocs continuations init kernel namespaces
 sequences sets ;
 IN: destructors
 
@@ -82,9 +82,9 @@ PRIVATE>
     dup error-destructors get push ; inline
 
 : with-destructors ( quot -- )
-    V{ } clone always-destructors
-    V{ } clone error-destructors
-    2hashtable [
+    H{ } clone
+    V{ } clone always-destructors pick set-at
+    V{ } clone error-destructors pick set-at [
         [ do-always-destructors ]
         [ do-error-destructors ]
         cleanup
