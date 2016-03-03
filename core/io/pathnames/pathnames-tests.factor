@@ -1,7 +1,6 @@
-USING: io.pathnames io.files.temp io.directories
-continuations math io.files.private kernel
-namespaces sequences system tools.test
-io.backend io.pathnames.private ;
+USING: continuations hashtables io.backend io.directories
+io.files.private io.files.temp io.pathnames kernel math
+namespaces system tools.test ;
 IN: io.pathnames.tests
 
 { "passwd" } [ "/etc/passwd" file-name ] unit-test
@@ -58,13 +57,12 @@ IN: io.pathnames.tests
 { } [ 2 [ "touch-twice-test" temp-file touch-file ] times ] unit-test
 
 ! aum's bug
-[
-    "." current-directory set
-    ".." "resource-path" set
+"." current-directory
+".." "resource-path" 2hashtable [
     [ "../core/bootstrap/stage2.factor" ]
     [ "resource:core/bootstrap/stage2.factor" absolute-path ]
     unit-test
-] with-scope
+] with-variables
 
 { t } [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
 
