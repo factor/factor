@@ -48,6 +48,10 @@ SYMBOL: command-line
         ".factor-roots" rc-path dup exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
+        "roots" get [
+            os windows? ";" ":" ?
+            split [ add-vocab-root ] each
+        ] when*
     ] when ;
 
 : var-param ( name value -- ) swap set-global ;

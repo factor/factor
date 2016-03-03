@@ -98,6 +98,7 @@ Common arguments:
         -run=ui.tools    run Factor development UI
     -e=<code>        evaluate <code>
     -no-user-init    suppress loading of .factor-rc
+    -roots=<paths>   a list of path-delimited extra vocab roots
 
 Enter
     "command-line" help
