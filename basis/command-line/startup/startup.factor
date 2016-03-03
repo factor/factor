@@ -27,6 +27,7 @@ Common arguments:
     -fep                enter fep mode immediately
     -nosignals          turn off OS signal handling
     -console            open console if possible
+    -roots=<paths>      a list of \"" write os windows? ";" ":" ? write "\"-delimited extra vocab roots
 
 Enter
     \"command-line\" help

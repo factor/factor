@@ -30,3 +30,7 @@ IN: command-line
     { "factor" "-foo" "a" "b" "c" } parse-command-line
     executable get script get command-line get
 ] unit-test
+
+{ "a:b:c" } [ { "factor" "-roots=a:b:c" } parse-command-line
+    "roots" get-global
+] unit-test
