@@ -65,9 +65,10 @@ IN: continuations.tests
 SYMBOL: always-counter
 SYMBOL: error-counter
 
-0 always-counter
-0 error-counter 2hashtable
-[
+H{
+    { always-counter 0 }
+    { error-counter 0 }
+} [
 
     [ ] [ always-counter inc ] [ error-counter inc ] cleanup
 
