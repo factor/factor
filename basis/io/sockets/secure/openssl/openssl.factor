@@ -1,20 +1,49 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-assocs byte-arrays classes.struct combinators destructors fry
-io io.binary io.backend io.buffers io.encodings.8-bit.latin1
+assocs byte-arrays classes.struct combinators destructors fry io
+io.backend io.binary io.buffers io.encodings.8-bit.latin1
 io.encodings.utf8 io.files io.pathnames io.ports io.sockets
-io.sockets.secure io.timeouts kernel libc
-
-locals math math.functions math.order math.parser namespaces
-openssl openssl.libcrypto openssl.libssl random sequences
-splitting unicode.case ;
+io.sockets.secure io.timeouts kernel libc locals math
+math.functions math.order math.parser memoize namespaces openssl
+openssl.libcrypto openssl.libssl random sequences splitting
+unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
 M: TLSv1 ssl-method drop TLSv1_method ;
 M: TLSv1.1 ssl-method drop TLSv1_1_method ;
 M: TLSv1.2 ssl-method drop TLSv1_2_method ;
+
+MEMO: make-cipher-list ( -- string )
+    {
+        "ECDHE-ECDSA-AES256-GCM-SHA384"
+        "ECDHE-ECDSA-AES256-SHA384"
+        "ECDHE-ECDSA-AES128-GCM-SHA256"
+        "ECDHE-ECDSA-AES128-SHA256"
+        "ECDHE-RSA-AES256-GCM-SHA384"
+        "ECDHE-RSA-AES256-SHA384"
+        "ECDHE-RSA-AES128-GCM-SHA256"
+        "ECDHE-RSA-AES128-SHA256"
+        "ECDHE-ECDSA-AES256-CCM8"
+        "ECDHE-ECDSA-AES256-CCM"
+        "ECDHE-ECDSA-AES128-CCM8"
+        "ECDHE-ECDSA-AES128-CCM"
+        "ECDHE-ECDSA-CAMELLIA256-SHA384"
+        "ECDHE-RSA-CAMELLIA256-SHA384"
+        "ECDHE-ECDSA-CAMELLIA128-SHA256"
+        "ECDHE-RSA-CAMELLIA128-SHA256"
+        "ECDHE-RSA-CHACHA20-POLY1305"
+        "ECDHE-ECDSA-CHACHA20-POLY1305"
+        "ECDHE-PSK-CHACHA20-POLY1305"
+        "AES256-SHA"
+        "AES128-SHA256"
+        "AES128-SHA"
+        "CAMELLIA256-SHA"
+        "CAMELLIA128-SHA"
+        "IDEA-CBC-SHA"
+        "DES-CBC3-SHA"
+    } ":" join ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
 
@@ -170,9 +199,7 @@ SYMBOL: default-secure-context
     current-secure-context sessions>> set-at ;
 
 : set-secure-cipher-list-only ( ssl -- ssl )
-    dup handle>>
-    "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA:DES-CBC3-SHA:IDEA-CBC-SHA:AES128-SHA256:AES128-SHA:CAMELLIA128-SHA:AES256-SHA:CAMELLIA256-SHA"
-    SSL_set_cipher_list ssl-error ;
+    dup handle>> make-cipher-list SSL_set_cipher_list ssl-error ;
 
 : <ssl-handle> ( fd -- ssl )
     [
