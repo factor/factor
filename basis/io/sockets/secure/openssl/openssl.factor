@@ -166,7 +166,7 @@ SYMBOL: default-secure-context
 
 : set-secure-cipher-list-only ( ssl -- ssl )
     dup handle>>
-    "DES-CBC3-SHA:IDEA-CBC-SHA:AES128-SHA:CAMELLIA128-SHA:AES256-SHA:CAMELLIA256-SHA"
+    "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA:DES-CBC3-SHA:IDEA-CBC-SHA:AES128-SHA:CAMELLIA128-SHA:AES256-SHA:CAMELLIA256-SHA"
     SSL_set_cipher_list ssl-error ;
 
 : <ssl-handle> ( fd -- ssl )
