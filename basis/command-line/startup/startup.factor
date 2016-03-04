@@ -18,15 +18,15 @@ Common arguments:
     -datastack=<int>    datastack size in kb
     -retainstack=<int>  retainstack size in kb
     -callstack=<int>    callstack size in kb
-    -young=<int>        young gc size in MB
-    -aging=<int>        aging gc size in MB
-    -tenured=<int>      tenured gc size in MB
+    -callbacks=<int>    callback heap size in kb
+    -young=<int>        young gc generation 0 size in MB
+    -aging=<int>        aging gc generation 1 size in MB
+    -tenured=<int>      tenured gc generation 2 size in MB
     -codeheap=<int>     codeheap size in MB
-    -callbacks=<int>    callback size size in kb
     -pic=<int>          max pic size
     -fep                enter fep mode immediately
     -nosignals          turn off OS signal handling
-    -console            open console if present
+    -console            open console if possible
 
 Enter
     \"command-line\" help
