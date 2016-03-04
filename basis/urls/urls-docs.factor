@@ -159,7 +159,7 @@ HELP: url-addr
     { $example
         "USING: io.sockets.secure prettyprint urls ;"
         "URL\" https://google.com/\" url-addr ."
-        "T{ secure\n    { addrspec T{ inet { host \"google.com\" } { port 443 } } }\n}"
+        "T{ secure\n    { addrspec T{ inet { host \"google.com\" } { port 443 } } }\n    { hostname \"google.com\" }\n}"
     }
 } ;
 
