@@ -79,12 +79,12 @@ void factor_vm::init_parameters_from_args(vm_parameters* p, int argc,
     else if (factor_arg(arg, STRING_LITERAL("-callbacks=%d"),
                         &p->callback_size))
       ;
+    else if (STRNCMP(arg, STRING_LITERAL("-i="), 3) == 0)
+      p->image_path = arg + 3;
     else if (STRCMP(arg, STRING_LITERAL("-fep")) == 0)
       p->fep = true;
     else if (STRCMP(arg, STRING_LITERAL("-nosignals")) == 0)
       p->signals = false;
-    else if (STRNCMP(arg, STRING_LITERAL("-i="), 3) == 0)
-      p->image_path = arg + 3;
     else if (STRCMP(arg, STRING_LITERAL("-console")) == 0)
       p->console = true;
   }
