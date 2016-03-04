@@ -16,7 +16,7 @@ ERROR: too-many-redirects ;
 : write-request-line ( request -- request )
     dup
     [ method>> write bl ]
-    [ url>> relative-url present write bl ]
+    [ url>> relative-url f >>anchor present write bl ]
     [ "HTTP/" write version>> write crlf ]
     tri ;
 
