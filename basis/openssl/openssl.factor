@@ -23,8 +23,7 @@ SINGLETON: openssl
 : init-ssl ( -- )
     SSL_library_init ssl-error
     SSL_load_error_strings
-    OpenSSL_add_all_digests
-    OpenSSL_add_all_ciphers ;
+    OpenSSL_add_all_digests ;
 
 SYMBOL: ssl-initialized?
 

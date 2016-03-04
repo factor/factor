@@ -362,6 +362,10 @@ FUNCTION: ssl-method TLSv1_server_method (  )
 
 FUNCTION: ssl-method TLSv1_method (  )
 
+FUNCTION: ssl-method TLSv1_1_method (  )
+
+FUNCTION: ssl-method TLSv1_2_method (  )
+
 ! Creates the context
 FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method )
 
