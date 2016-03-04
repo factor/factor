@@ -29,6 +29,11 @@ C: <library> library
 
 : lookup-library ( name -- library ) libraries get at ;
 
+ERROR: no-library-named name ;
+GENERIC: dlsym? ( name string/dll -- ? )
+M: string dlsym? dup lookup-library [ nip dll>> dlsym? ] [ no-library-named ] if* ;
+M: dll dlsym? dlsym >boolean ;
+
 : open-dll ( path -- dll dll-error/f )
     [ dlopen dup dll-valid? [ f ] [ dlerror ] if ]
     [ f f ] if* ;
