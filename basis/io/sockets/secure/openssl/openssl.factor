@@ -115,6 +115,10 @@ M: bio dispose* handle>> BIO_free ssl-error ;
         SSL_CTX_set_tmp_dh ssl-error
     ] [ drop ] if ;
 
+! Attempt to set ecdh. If it fails, ignore...?
+: set-ecdh-params ( ctx -- )
+    handle>> SSL_CTRL_SET_ECDH_AUTO 1 f SSL_CTX_ctrl drop ;
+
 : <openssl-context> ( config ctx -- context )
     openssl-context new-disposable
         swap >>handle
@@ -135,6 +139,7 @@ M: openssl <secure-context> ( config -- context )
             [ load-verify-locations ]
             [ set-verify-depth ]
             [ load-dh-params ]
+            [ set-ecdh-params ]
             [ ]
         } cleave
     ] with-destructors ;
@@ -166,7 +171,7 @@ SYMBOL: default-secure-context
 
 : set-secure-cipher-list-only ( ssl -- ssl )
     dup handle>>
-    "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA:DES-CBC3-SHA:IDEA-CBC-SHA:AES128-SHA:CAMELLIA128-SHA:AES256-SHA:CAMELLIA256-SHA"
+    "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA:DES-CBC3-SHA:IDEA-CBC-SHA:AES128-SHA256:AES128-SHA:CAMELLIA128-SHA:AES256-SHA:CAMELLIA256-SHA"
     SSL_set_cipher_list ssl-error ;
 
 : <ssl-handle> ( fd -- ssl )
