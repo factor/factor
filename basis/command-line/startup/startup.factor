@@ -15,10 +15,10 @@ Common arguments:
         -run=ui.tools   run Factor development UI
     -e=<code>           evaluate <code>
     -no-user-init       suppress loading of .factor-rc
-    -datastack=<int>    datastack size in kb
-    -retainstack=<int>  retainstack size in kb
-    -callstack=<int>    callstack size in kb
-    -callbacks=<int>    callback heap size in kb
+    -datastack=<int>    datastack size in KB
+    -retainstack=<int>  retainstack size in KB
+    -callstack=<int>    callstack size in KB
+    -callbacks=<int>    callback heap size in KB
     -young=<int>        young gc generation 0 size in MB
     -aging=<int>        aging gc generation 1 size in MB
     -tenured=<int>      tenured gc generation 2 size in MB
