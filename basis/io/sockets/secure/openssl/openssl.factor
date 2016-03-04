@@ -12,8 +12,9 @@ splitting unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
-
-M: TLSv1  ssl-method drop TLSv1_method ;
+M: TLSv1 ssl-method drop TLSv1_method ;
+M: TLSv1.1 ssl-method drop TLSv1_1_method ;
+M: TLSv1.2 ssl-method drop TLSv1_2_method ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
 
@@ -163,12 +164,18 @@ SYMBOL: default-secure-context
 : save-session ( session addrspec -- )
     current-secure-context sessions>> set-at ;
 
+: set-secure-cipher-list-only ( ssl -- ssl )
+    dup handle>>
+    "DES-CBC3-SHA:IDEA-CBC-SHA:AES128-SHA:CAMELLIA128-SHA:AES256-SHA:CAMELLIA256-SHA"
+    SSL_set_cipher_list ssl-error ;
+
 : <ssl-handle> ( fd -- ssl )
     [
         ssl-handle new-disposable |dispose
-        current-secure-context handle>> SSL_new
+        current-secure-context handle>> SSL_new |dispose
         dup ssl-error >>handle
         swap >>file
+        set-secure-cipher-list-only
     ] with-destructors ;
 
 :: <ssl-socket> ( winsock hostname -- ssl )
