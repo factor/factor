@@ -1,20 +1,20 @@
 # Factor
 
-Factor is a [concatenative](http://www.concatenative.org), stack-based
+Factor is a [concatenative](https://www.concatenative.org), stack-based
 programming language with [high-level
-features](http://concatenative.org/wiki/view/Factor/Features/The%20language)
+features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
 including dynamic types, extensible syntax, macros, and garbage collection.
 On a practical side, Factor has a [full-featured
-library](http://docs.factorcode.org/content/article-vocab-index.html),
+library](https://docs.factorcode.org/content/article-vocab-index.html),
 supports many different platforms, and has been extensively documented. 
 
 The implementation is [fully
-compiled](http://concatenative.org/wiki/view/Factor/Optimizing%20compiler)
+compiled](https://concatenative.org/wiki/view/Factor/Optimizing%20compiler)
 for performance, while still supporting [interactive
-development](http://concatenative.org/wiki/view/Factor/Interactive%20development).
+development](https://concatenative.org/wiki/view/Factor/Interactive%20development).
 Factor applications are portable between all common platforms.  Factor can
 [deploy stand-alone
-applications](http://concatenative.org/wiki/view/Factor/Deployment) on all
+applications](https://concatenative.org/wiki/view/Factor/Deployment) on all
 platforms.  Full source code for the Factor project is available under a BSD
 license.
 
@@ -38,12 +38,12 @@ To build the latest complete Factor system from git:
 
 Now you should have a complete Factor system ready to run.
 
-More information on [building factor](http://concatenative.org/wiki/view/Factor/Building%20Factor)
-and [system requirements](http://concatenative.org/wiki/view/Factor/Requirements).
+More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
+and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).
 
 ### To run a Factor binary:
 
-You can download a Factor binary from the grid on [http://factorcode.org](http://factorcode.org).
+You can download a Factor binary from the grid on [https://factorcode.org](https://factorcode.org).
 The nightly builds are usually a better experience than the point releases.
 
 * Windows: Double-click `factor.exe`, or run `.\factor.com` in a command prompt
@@ -73,7 +73,7 @@ Some other simple things you can try in the listener:
 ] each
 ```
 
-For more tips, see [Learning Factor](http://concatenative.org/wiki/view/Factor/Learning).
+For more tips, see [Learning Factor](https://concatenative.org/wiki/view/Factor/Learning).
 
 ## Documentation
 
@@ -81,7 +81,7 @@ The Factor environment includes extensive reference documentation and a
 short "cookbook" to help you get started. The best way to read the
 documentation is in the UI; press F1 in the UI listener to open the help
 browser tool. You can also [browse the documentation
-online](http://docs.factorcode.org).
+online](https://docs.factorcode.org).
 
 ## Command Line Usage
 
@@ -126,7 +126,7 @@ Factor developers meet in the `#concatenative` channel on
 [irc.freenode.net](http://freenode.net). Drop by if you want to discuss
 anything related to Factor or language design in general.
 
-* [Factor homepage](http://factorcode.org)
-* [Concatenative languages wiki](http://concatenative.org)
+* [Factor homepage](https://factorcode.org)
+* [Concatenative languages wiki](https://concatenative.org)
 
 Have fun!
