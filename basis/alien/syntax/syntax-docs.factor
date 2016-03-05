@@ -73,6 +73,12 @@ HELP: ENUM:
     { $code "ENUM: color_t red { green 3 } blue ;" }
     "The following expression returns true:"
     { $code "3 <color_t> [ green = ] [ enum>number 3 = ] bi and" }
+
+    "Here is a version where the C-type takes a single byte:"
+    { $code "ENUM: tv_peripherals_1 < uchar\n{ appletv 1 } { chromecast 2 } { roku 4 } ;" }
+
+    "The same as above but four bytes instead of one:"
+    { $code "ENUM: tv_peripherals_4 < uint\n{ appletv 1 } { chromecast 2 } { roku 4 } ;" }
 } ;
 
 HELP: C-TYPE:
