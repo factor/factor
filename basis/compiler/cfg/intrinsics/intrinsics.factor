@@ -142,6 +142,3 @@ ERROR: inline-intrinsics-not-supported word quot ;
     {
         { math.integers.private:fixnum-bit? [ drop [ ^^bit-test ] binary-op ] }
     } enable-intrinsics ;
-
-: emit-intrinsic ( node word -- )
-    "intrinsic" word-prop call( node -- ) ;

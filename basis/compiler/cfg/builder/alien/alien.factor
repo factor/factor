@@ -84,8 +84,8 @@ IN: compiler.cfg.builder.alien
         base-type box-return ds-push
     ] if-void ;
 
-M: #alien-invoke emit-node
-    params>>
+M: #alien-invoke emit-node ( block node -- )
+    nip params>>
     [
         {
             [ caller-parameters ]
@@ -98,8 +98,8 @@ M: #alien-invoke emit-node
     [ caller-return ]
     bi ;
 
-M: #alien-indirect emit-node ( node -- )
-    params>>
+M: #alien-indirect emit-node ( block node -- )
+    nip params>>
     [
         [ ds-pop ^^unbox-any-c-ptr ] dip
         [ caller-parameters ]
@@ -110,8 +110,8 @@ M: #alien-indirect emit-node ( node -- )
     [ caller-return ]
     bi ;
 
-M: #alien-assembly emit-node ( node -- )
-    params>>
+M: #alien-assembly emit-node ( block node -- )
+    nip params>>
     [
         {
             [ caller-parameters ]
@@ -166,8 +166,8 @@ M: #alien-assembly emit-node ( node -- )
 : emit-callback-return ( params -- )
     basic-block get [ callee-return ##callback-outputs, ] [ drop ] if ;
 
-M: #alien-callback emit-node
-    dup params>> xt>> dup
+M: #alien-callback emit-node ( block node -- )
+    nip dup params>> xt>> dup
     [
         needs-frame-pointer begin-word
         {

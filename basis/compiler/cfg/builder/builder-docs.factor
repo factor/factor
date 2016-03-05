@@ -57,7 +57,7 @@ HELP: make-input-map
 { $examples { $unchecked-example $[ ex-make-input-map ] } } ;
 
 HELP: emit-call
-{ $values { "word" word } { "height" number } }
+{ $values { "block" basic-block } { "word" word } { "height" number } }
 { $description "Emits a call to the given word to the " { $link cfg } " being constructed. \"height\" is the number of items being added to or removed from the data stack. Side effects of the word is that it modifies the \"basic-block\" and " { $link height-state } " variables." }
 { $examples
   "In this example, a call to a dummy word is emitted which pushes three items onto the stack."
@@ -70,7 +70,7 @@ HELP: emit-loop-call
 { $description "Sets the given block as the successor of the current block. Then ends the block." } ;
 
 HELP: emit-node
-{ $values { "node" node } }
+{ $values { "block" basic-block } { "node" node } }
 { $description "Emits CFG instructions for the given SSA node." } ;
 
 HELP: trivial-branch?

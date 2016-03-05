@@ -21,7 +21,7 @@ IN: compiler.cfg.builder.blocks
 : begin-basic-block ( block -- )
     dup [ end-local-analysis ] when* (begin-basic-block) ;
 
-: emit-trivial-block ( quot -- )
+: emit-trivial-block ( quot: ( ..a block -- ..b ) -- )
     ##branch, basic-block get begin-basic-block
     basic-block get [ swap call ] keep
     ##branch, begin-basic-block ; inline
