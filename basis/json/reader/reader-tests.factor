@@ -6,6 +6,7 @@ IN: json.reader.tests
 { t } [ "true" json> ] unit-test
 { json-null } [ "null" json> ] unit-test
 { 0 } [ "0" json> ] unit-test
+{ 0 } [ "-0" json> ] unit-test
 { 102 } [ "102" json> ] unit-test
 { -102 } [ "-102" json> ] unit-test
 { 102 } [ "+102" json> ] unit-test
@@ -16,11 +17,13 @@ IN: json.reader.tests
 { 102.5 } [ "102.50" json> ] unit-test
 { -10250.0 } [ "-102.5e2" json> ] unit-test
 { -10250.0 } [ "-102.5E+2" json> ] unit-test
+{ -1.025 } [ "-102.5E-2" json> ] unit-test
 { 10.25 } [ "1025e-2" json> ] unit-test
 { 0.125 } [ "0.125" json> ] unit-test
 { -0.125 } [ "-0.125" json> ] unit-test
 { -0.00125 } [ "-0.125e-2" json> ] unit-test
 { -012.5 } [ "-0.125e+2" json> ] unit-test
+{ 0.0 } [ "123e-10000000" json> ] unit-test
 
 ! not widely supported by javascript, but allowed in the grammar, and a nice
 ! feature to get
@@ -65,6 +68,8 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 
 ! empty objects are allowed as values in objects
 { H{ { "foo" H{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test
+! And arrays
+{ { H{ } } } [ "[{}]" json> ] unit-test
 
 {
     "\0\x01\x02\x03\x04\x05\x06\a\b\t\n\v\f\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\e\x1c\x1d\x1e\x1f"
