@@ -8,7 +8,7 @@ grouping init io.backend io.binary io.encodings.ascii
 io.encodings.binary io.pathnames io.ports io.streams.duplex
 kernel locals math math.parser memoize namespaces present
 sequences sequences.private splitting strings summary system
-vocabs vocabs.parser ip-parser ;
+vocabs vocabs.parser ip-parser ip-parser.private ;
 IN: io.sockets
 
 << {
@@ -68,32 +68,25 @@ TUPLE: ipv4 { host maybe{ string } read-only } ;
 
 <PRIVATE
 
-ERROR: invalid-ipv4 string reason ;
+ERROR: invalid-ipv4 host reason ;
 
 M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
 
-ERROR: malformed-ipv4 sequence ;
+: ?parse-ipv4 ( string -- seq/f )
+    [ f ] [ parse-ipv4 ] if-empty ;
 
-ERROR: bad-ipv4-component string ;
-
-: ipv4>bytes ( string -- seq )
-    [ f ] [
-        "." split dup length 4 = [ malformed-ipv4 ] unless
-        [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as
-    ] if-empty ;
-
-: check-ipv4 ( string -- )
-    [ parse-ipv4 drop ] [ invalid-ipv4 ] recover ;
+: check-ipv4 ( host -- )
+    [ ?parse-ipv4 drop ] [ invalid-ipv4 ] recover ;
 
 PRIVATE>
 
 : <ipv4> ( host -- ipv4 ) dup check-ipv4 ipv4 boa ;
 
 M: ipv4 inet-ntop ( data addrspec -- str )
-    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
+    drop 4 memory>byte-array join-ipv4 ;
 
 M: ipv4 inet-pton ( str addrspec -- data )
-    drop [ parse-ipv4 ipv4>bytes ] [ invalid-ipv4 ] recover ;
+    drop [ ?parse-ipv4 ] [ invalid-ipv4 ] recover ;
 
 M: ipv4 address-size drop 4 ;
 
@@ -141,27 +134,8 @@ ERROR: invalid-ipv6 host reason ;
 
 M: invalid-ipv6 summary drop "Invalid IPv6 address" ;
 
-ERROR: bad-ipv6-component obj ;
-
-ERROR: bad-ipv4-embedded-prefix obj ;
-
-ERROR: more-than-8-components ;
-
-: parse-ipv6-component ( seq -- seq' )
-    [ dup hex> [ nip ] [ bad-ipv6-component ] if* ] { } map-as ;
-
-: parse-ipv6 ( string -- seq )
-    [ f ] [
-        ":" split CHAR: . over last member? [
-            unclip-last
-            [ parse-ipv6-component ] [ ipv4>bytes ] bi* append
-        ] [
-            parse-ipv6-component
-        ] if
-    ] if-empty ;
-
-: check-ipv6 ( string -- )
-    [ "::" split1 [ parse-ipv6 ] bi@ 2drop ] [ invalid-ipv6 ] recover ;
+: check-ipv6 ( host -- )
+    [ parse-ipv6 drop ] [ invalid-ipv6 ] recover ;
 
 PRIVATE>
 
@@ -172,21 +146,13 @@ M: ipv6 inet-ntop ( data addrspec -- str )
 
 <PRIVATE
 
-: pad-ipv6 ( string1 string2 -- seq )
-    2dup [ length ] bi@ + 8 swap -
-    dup 0 < [ more-than-8-components ] when
-    <byte-array> glue ;
-
 : ipv6-bytes ( seq -- bytes )
     [ 2 >be ] { } map-as B{ } concat-as ;
 
 PRIVATE>
 
 M: ipv6 inet-pton ( str addrspec -- data )
-    drop
-    [ "::" split1 [ parse-ipv6 ] bi@ pad-ipv6 ipv6-bytes ]
-    [ invalid-ipv6 ]
-    recover ;
+    drop [ parse-ipv6 ipv6-bytes ] [ invalid-ipv6 ] recover ;
 
 M: ipv6 address-size drop 16 ;
 
