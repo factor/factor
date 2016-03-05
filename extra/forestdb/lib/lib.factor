@@ -299,12 +299,8 @@ T{ doc
 
 PRIVATE>
 
-
 : get-kvs-default-config ( -- kvs-config )
-    S{ fdb_kvs_config
-        { create_if_missing t }
-        { custom_cmp f }
-    } clone ;
+    fdb_get_default_kvs_config ;
 
 : fdb-open ( path config -- file-handle )
     [ f void* <ref> ] 2dip
@@ -312,8 +308,11 @@ PRIVATE>
     [ fdb_open fdb-check-error ] 3keep
     2drop void* deref <fdb-file-handle> ;
 
+! Make SEQTREES by default
 : fdb-open-default-config ( path -- file-handle )
-    fdb_get_default_config fdb-open ;
+    fdb_get_default_config
+        FDB_SEQTREE_USE >>seqtree_opt
+    fdb-open ;
 
 : fdb-kvs-open-config ( name config -- kvs-handle )
     [
