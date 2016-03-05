@@ -8,7 +8,7 @@ grouping init io.backend io.binary io.encodings.ascii
 io.encodings.binary io.pathnames io.ports io.streams.duplex
 kernel locals math math.parser memoize namespaces present
 sequences sequences.private splitting strings summary system
-vocabs vocabs.parser ;
+vocabs vocabs.parser ip-parser ;
 IN: io.sockets
 
 << {
@@ -76,7 +76,7 @@ ERROR: malformed-ipv4 sequence ;
 
 ERROR: bad-ipv4-component string ;
 
-: parse-ipv4 ( string -- seq )
+: ipv4>bytes ( string -- seq )
     [ f ] [
         "." split dup length 4 = [ malformed-ipv4 ] unless
         [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as
@@ -93,7 +93,7 @@ M: ipv4 inet-ntop ( data addrspec -- str )
     drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
 
 M: ipv4 inet-pton ( str addrspec -- data )
-    drop [ parse-ipv4 ] [ invalid-ipv4 ] recover ;
+    drop [ parse-ipv4 ipv4>bytes ] [ invalid-ipv4 ] recover ;
 
 M: ipv4 address-size drop 4 ;
 
@@ -154,7 +154,7 @@ ERROR: more-than-8-components ;
     [ f ] [
         ":" split CHAR: . over last member? [
             unclip-last
-            [ parse-ipv6-component ] [ parse-ipv4 ] bi* append
+            [ parse-ipv6-component ] [ ipv4>bytes ] bi* append
         ] [
             parse-ipv6-component
         ] if
