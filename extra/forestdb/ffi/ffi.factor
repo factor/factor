@@ -26,44 +26,44 @@ TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_kvs_handle
 TYPEDEF: void* fdb_iterator
 
-ENUM: fdb_open_flags
+ENUM: fdb_open_flags < uint32_t
     { FDB_OPEN_FLAG_CREATE 1 }
     { FDB_OPEN_FLAG_RDONLY 2 }
     { FDB_OPEN_WITH_LEGACY_CRC 4 } ;
 
-ENUM: fdb_commit_opt_t
+ENUM: fdb_commit_opt_t < uint8_t
     { FDB_COMMIT_NORMAL 0 }
     { FDB_COMMIT_MANUAL_WAL_FLUSH 1 } ;
 
-ENUM: fdb_seqtree_opt_t
+ENUM: fdb_seqtree_opt_t < uint8_t
     { FDB_SEQTREE_NOT_USE 0 }
     { FDB_SEQTREE_USE 1 } ;
 
-ENUM: fdb_durability_opt_t
+ENUM: fdb_durability_opt_t < uint8_t
     { FDB_DRB_NONE 0 }
     { FDB_DRB_ODIRECT 1 }
     { FDB_DRB_ASYNC 2 }
     { FDB_DRB_ODIRECT_ASYNC 3 } ;
 
-ENUM: fdb_compaction_mode_t
+ENUM: fdb_compaction_mode_t < uint8_t
     { FDB_COMPACTION_MANUAL 0 }
     { FDB_COMPACTION_AUTO 1 } ;
 
-ENUM: fdb_isolation_level_t
+ENUM: fdb_isolation_level_t < uint8_t
     { FDB_ISOLATION_READ_COMMITTED 2 }
     { FDB_ISOLATION_READ_UNCOMMITTED 3 } ;
 
-ENUM: fdb_iterator_opt_t
+ENUM: fdb_iterator_opt_t < uint16_t
     { FDB_ITR_NONE 0 }
     { FDB_ITR_NO_DELETES 2 }
     { FDB_ITR_SKIP_MIN_KEY 4 }
     { FDB_ITR_SKIP_MAX_KEY 8 } ;
 
-ENUM: fdb_iterator_seek_opt_t
+ENUM: fdb_iterator_seek_opt_t < uint8_t
     { FDB_ITR_SEEK_HIGHER 0 }
     { FDB_ITR_SEEK_LOWER 1 } ;
 
-ENUM: fdb_compaction_status
+ENUM: fdb_compaction_status < uint32_t
     { FDB_CS_BEGIN 0x1 }
     { FDB_CS_MOVE_DOC 0x2 }
     { FDB_CS_BATCH_MOVE 0x4 }
@@ -71,11 +71,11 @@ ENUM: fdb_compaction_status
     { FDB_CS_END 0x10 }
     { FDB_CS_COMPLETE 0x20 } ;
 
-ENUM: fdb_compact_decision
+ENUM: fdb_compact_decision < int
     { FDB_CS_KEEP_DOC 0 }
     { FDB_CS_DROP_DOC 1 } ;
 
-ENUM: fdb_encryption_algorithm_t
+ENUM: fdb_encryption_algorithm_t < int
     { FDB_ENCRYPTION_NONE 0 }
     { FDB_ENCRYPTION_AES256 1 } ;
 
@@ -177,7 +177,7 @@ STRUCT: fdb_kvs_ops_info
     { num_iterator_gets uint64_t }
     { num_iterator_moves uint64_t } ;
 
-ENUM: fdb_latency_stat_type
+ENUM: fdb_latency_stat_type < uint8_t
     { FDB_LATENCY_SETS 0 }
     { FDB_LATENCY_GETS 1 }
     { FDB_LATENCY_COMMITS 2 }
