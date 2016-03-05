@@ -1,13 +1,13 @@
 USING: accessors alien alien.accessors arrays assocs byte-arrays
-combinators.short-circuit compiler.cfg compiler.cfg.builder compiler.cfg.checker
-compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.optimizer
-compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.representations
-compiler.cfg.rpo compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.cfg.utilities compiler.test compiler.tree compiler.tree.builder
-compiler.tree.optimizer cpu.architecture fry hashtables io kernel kernel.private
-locals make math math.partial-dispatch math.private namespaces prettyprint sbufs
-sequences sequences.private slots.private strings strings.private tools.test
-vectors words ;
+combinators.short-circuit compiler.cfg compiler.cfg.builder
+compiler.cfg.checker compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.optimizer compiler.cfg.registers
+compiler.cfg.stacks.local compiler.cfg.utilities compiler.test
+compiler.tree compiler.tree.propagation.info cpu.architecture fry
+hashtables io kernel kernel.private locals make math math.intervals
+math.partial-dispatch math.private namespaces prettyprint sbufs
+sequences sequences.private slots.private strings strings.private
+tools.test vectors words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
@@ -247,7 +247,7 @@ IN: compiler.cfg.builder.tests
 {
     V{ T{ ##call { word print } } T{ ##branch } }
 } [
-    [ \ print 4 emit-call ] V{ } make drop
+    [ f \ print 4 emit-call ] V{ } make drop
     basic-block get successors>> first instructions>>
 ] cfg-unit-test
 
@@ -256,9 +256,7 @@ IN: compiler.cfg.builder.tests
     { T{ ##load-integer { dst 78 } { val 0 } } }
 } [
     77 vreg-counter set-global
-    [
-        T{ #push { literal 0 } { out-d { 8537399 } } } emit-node
-    ] { } make
+    [ f T{ #push { literal 0 } { out-d { 8537399 } } } emit-node ] { } make
 ] cfg-unit-test
 
 {
@@ -266,7 +264,7 @@ IN: compiler.cfg.builder.tests
     H{ { D: -1 4 } { D: 0 4 } }
 } [
     4 D: 0 replace-loc
-    T{ #shuffle
+    f T{ #shuffle
        { mapping { { 2 4 } { 3 4 } } }
        { in-d V{ 4 } }
        { out-d V{ 2 3 } }
@@ -288,7 +286,7 @@ IN: compiler.cfg.builder.tests
         T{ ##box-alien { dst 7 } { src 5 } { temp 6 } }
     }
 } [
-    T{ #call
+    f T{ #call
        { word alien-cell }
        { in-d V{ 10 20 } }
        { out-d { 30 } }
@@ -300,6 +298,45 @@ IN: compiler.cfg.builder.tests
     V{ } 1 insns>block [ basic-block get emit-loop-call ] V{ } make drop
     basic-block get successors>> length
 ] unit-test
+
+: call-node-1 ( -- node )
+    T{ #call
+       { word set-slot }
+       { in-d V{ 1 2 3 } }
+       { out-d { } }
+       { info
+         H{
+             {
+                 1
+                 T{ value-info-state
+                    { class object }
+                    { interval full-interval }
+                 }
+             }
+             {
+                 2
+                 T{ value-info-state
+                    { class object }
+                    { interval full-interval }
+                 }
+             }
+             {
+                 3
+                 T{ value-info-state
+                    { class object }
+                    { interval full-interval }
+                 }
+             }
+         }
+       }
+    } ;
+
+{
+    V{ T{ ##call { word set-slot } } T{ ##branch } }
+} [
+    [ f call-node-1 emit-node ] V{ } make drop
+    basic-block get successors>> first instructions>>
+] cfg-unit-test
 
 ! emit-loop-call
 { "bar" } [
@@ -327,14 +364,14 @@ SYMBOL: foo
 {
     H{ { D: 2 1 } }
 } [
-    T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
+    f T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
     emit-node replaces get
 ] cfg-unit-test
 
 {
     H{ { D: -1 1 } { D: 0 1 } }
 } [
-    T{ #shuffle
+    f T{ #shuffle
        { in-d { 7 } }
        { out-d { 55 77 } }
        { mapping { { 55 7 } { 77 7 } } }
