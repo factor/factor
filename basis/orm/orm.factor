@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.tuple
 combinators db2.query-objects db2.types fry kernel make
 namespaces orm.persistent sequences shuffle db2.utils
-nested-comments locals vocabs ;
+locals vocabs multiline ;
 IN: orm
 
 USE: vocabs.loader
@@ -11,7 +11,7 @@ USE: vocabs.loader
 
 
 
-(*
+/*
 
 TUPLE: relations internal external ;
 
@@ -61,9 +61,7 @@ SYMBOL: table-counter
     [ internal-class-relations ]
     [ external-class-relations ] bi ;
 
-(*
-Don't introspect the quotation at runtime.
-*)
+! Don't introspect the quotation at runtime.
 
 : column-contains-many? ( column -- ? )
     type>> dup array? [
@@ -89,12 +87,10 @@ Don't introspect the quotation at runtime.
 : relations>joins ( seq -- seq' )
     [ relation>join ] map concat ;
 
-(*
 : tuple>select-statement ( tuple -- select )
     [ select new ] dip
     {
         ! [ tuple>relations relations>joins 1array >>join ]
         ! [ ]
     } cleave ;
-*)
-*)
+*/

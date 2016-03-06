@@ -27,4 +27,4 @@ M: sqlite-db-connection database-table-columns-statement
 M: sqlite-db-connection database-tables-statement
     drop
     <statement>
-        """SELECT * FROM sqlite_master""" >>sql ;
+        "SELECT * FROM sqlite_master" >>sql ;

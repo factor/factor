@@ -3,8 +3,8 @@
 USING: accessors arrays assocs combinators combinators.smart db2
 db2.binders db2.errors db2.query-objects db2.types db2.utils fry
 kernel macros make math math.parser mirrors namespaces
-nested-comments orm orm.persistent orm.queries sequences sets
-splitting.monotonic destructors ;
+orm orm.persistent orm.queries sequences sets
+splitting.monotonic destructors multiline ;
 IN: orm.tuples
 
 : create-table ( tuple-class -- )
@@ -56,7 +56,7 @@ IN: orm.tuples
 
 
 
-(*
+/*
 
 
 : tuple>pairs ( tuple -- seq )
@@ -166,10 +166,10 @@ B
 
 : count-tuples ( tuple -- n )
     ;
+*/
 
 
-(*
-(*
+/*
 TUPLE: foo a b ;
 
 PERSISTENT: foo
@@ -181,11 +181,11 @@ PERSISTENT: foo
 [ "select * from foo" sql-query . ] test-sqlite
 [ "update foo set a=1, b='omg' where a=1" sql-command ] test-sqlite
 [ "select * from foo" sql-query . ] test-sqlite
-*)
 [ 1 f foo boa (select-tuples) query-object>statement ] test-sqlite
-*)
+*/
 
 
+/*
 ERROR: unimplemented ;
 
 : select-relations ( tuple relations -- seq )
@@ -206,4 +206,4 @@ ERROR: unimplemented ;
         select-relations
     ] if-empty ;
 
-*)
+*/

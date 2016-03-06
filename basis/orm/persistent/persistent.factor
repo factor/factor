@@ -4,7 +4,7 @@ USING: accessors annotations arrays assocs classes
 classes.tuple combinators combinators.short-circuit
 constructors db2.types db2.utils kernel math namespaces
 parser quotations sequences sets strings words make
-fry lexer db2.binders nested-comments random ;
+fry lexer db2.binders random multiline ;
 QUALIFIED-WITH: namespaces n
 IN: orm.persistent
 
@@ -44,7 +44,7 @@ SYMBOL: deferred-persistent
 
 TUPLE: persistent class table-name columns primary-key incomplete? ;
 
-CONSTRUCTOR: persistent ( class table-name columns -- obj ) ;
+CONSTRUCTOR: <persistent> persistent ( class table-name columns -- obj ) ;
 
 TUPLE: db-column persistent
 slot-name column-name type modifiers getter setter generator ;
@@ -74,7 +74,7 @@ M: +random-key+ compute-generator
     [ parse-column-modifiers ] tri* <db-column> ;
 
 : superclass-persistent-columns ( class -- columns )
-    superclasses [ ?>persistent ] map
+    superclasses-of [ ?>persistent ] map
     sift \ deferred-persistent swap remove
     [ columns>> ] map concat ;
 
@@ -434,7 +434,7 @@ M: db-column select-reconstructor*
     over find-primary-key 1 ensure-length
     first setter>> call( tuple obj -- tuple ) ;
 
-(*
+/*
 : select-joins ( obj -- seq )
     query-shape
     [ nip ] assoc-filter
@@ -447,4 +447,4 @@ M: db-column select-reconstructor*
             [ first relation-class primary-key-slots ]
         } cleave <left-join>
     ] map ;
-*)
+*/

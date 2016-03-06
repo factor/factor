@@ -37,16 +37,16 @@ PRIVATE>
 
 : database-table-schema-select-sql ( string -- string )
     information-schema-select-sql
-    """WHERE
+    "WHERE
             table_catalog=$1 AND
             table_name=$2 AND
-            table_schema='public'""" append ;
+            table_schema='public'" append ;
 
 : database-schema-select-sql ( string -- string )
     information-schema-select-sql
-    """WHERE
+    "WHERE
             table_catalog=$1 AND
-            table_schema='public'""" append ;
+            table_schema='public'" append ;
 
 M: object database-tables-statement
     [ <statement> ] dip
@@ -55,10 +55,10 @@ M: object database-tables-statement
 
 M: object databases-statement
     <statement>
-        """SELECT DISTINCT table_catalog
+        "SELECT DISTINCT table_catalog
         FROM information_schema.tables
         WHERE
-            table_schema='public'""" >>sql ;
+            table_schema='public'" >>sql ;
 
 M: object database-table-columns-statement ( database table -- sequence )
     [ <statement> ] 2dip

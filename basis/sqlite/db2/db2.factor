@@ -5,7 +5,7 @@ IN: sqlite.db2
 
 TUPLE: sqlite-db path ;
 
-CONSTRUCTOR: sqlite-db ( path -- db ) ;
+CONSTRUCTOR: <sqlite-db> sqlite-db ( path -- db ) ;
 
 {
     "sqlite.db2.connections"

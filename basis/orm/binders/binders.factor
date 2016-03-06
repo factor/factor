@@ -4,7 +4,7 @@ USING: constructors ;
 IN: orm.binders
 
 TUPLE: column-binder-in column value ;
-CONSTRUCTOR: column-binder-in ( column value -- obj ) ;
+CONSTRUCTOR: <column-binder-in> column-binder-in ( column value -- obj ) ;
 
 TUPLE: column-binder-out column ;
-CONSTRUCTOR: column-binder-out ( column -- obj ) ;
+CONSTRUCTOR: <column-binder-out> column-binder-out ( column -- obj ) ;

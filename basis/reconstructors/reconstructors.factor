@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry grouping hashtables kernel make
-math nested-comments sequences splitting.monotonic ;
+math multiline sequences splitting.monotonic ;
 IN: reconstructors
 
 
@@ -9,7 +9,7 @@ TUPLE: reconstructor row-spec combiner-spec ;
 
 
 
-(*
+/*
 ERROR: no-setter ;
 
 : out-binder>setter ( toc -- word )
@@ -27,10 +27,10 @@ MACRO: query-object>reconstructor ( tuple -- quot )
             [ reverse [ \ swap , , (( obj obj -- obj )) , \ call-effect , ] each ] bi*
         ] each
     ] [ ] make '[ [ _ input<sequence ] ] ;
-*)
+*/
 
 
-(*
+/*
 
 
 
@@ -169,7 +169,7 @@ TUPLE: nested-reconstructor
 
 
 
-*)
+*/
 
 ERROR: not-found key ;
 

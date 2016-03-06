@@ -8,13 +8,13 @@ IN: db2.query-objects
 TUPLE: query reconstructor ;
 
 TUPLE: insert < query { in sequence } ;
-CONSTRUCTOR: insert ( -- insert ) ;
+CONSTRUCTOR: <insert> insert ( -- insert ) ;
 
 TUPLE: update < query { in sequence } { where sequence } ;
-CONSTRUCTOR: update ( -- update ) ;
+CONSTRUCTOR: <update> update ( -- update ) ;
 
 TUPLE: delete < query { where sequence } ;
-CONSTRUCTOR: delete ( -- delete ) ;
+CONSTRUCTOR: <delete> delete ( -- delete ) ;
 
 TUPLE: select < query
     { in sequence }
@@ -23,7 +23,7 @@ TUPLE: select < query
     { join sequence }
     { offset integer }
     { limit integer } ;
-CONSTRUCTOR: select ( -- select ) ;
+CONSTRUCTOR: <select> select ( -- select ) ;
 
 GENERIC: >table-as ( obj -- string )
 GENERIC: >table-name ( in -- string )

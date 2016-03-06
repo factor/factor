@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: db2 db2.debug db2.types debugger
-kernel nested-comments orm.persistent orm.tuples sequences
+kernel orm.persistent orm.tuples sequences
 tools.test ;
 IN: orm.tuples.tests
 
@@ -138,11 +138,11 @@ PERSISTENT: baz-3
             { "0" "1" "2" "third" }
             { "0" "1" "3" "fourth" }
         }
-    ] [ """select baz_3.id, bar_3.id, foo_3.id, foo_3.a
+    ] [ "select baz_3.id, bar_3.id, foo_3.id, foo_3.a
             from baz_3
                 left join bar_3 on baz_3.id = bar_3.baz_3_id
                 left join foo_3 on bar_3.id = foo_3.bar_3_id
-                where baz_3.id = 0 order by baz_3.id, bar_3.id, foo_3.id"""
+                where baz_3.id = 0 order by baz_3.id, bar_3.id, foo_3.id"
         sql-query
     ] unit-test ;
 

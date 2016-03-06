@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar constructors db2.types nested-comments
-orm orm.persistent sequences ;
+USING: accessors calendar constructors db2.types orm
+orm.persistent sequences multiline ;
 IN: orm.examples
 
 TUPLE: user id name age ;
-CONSTRUCTOR: user ( name age -- obj ) ;
+CONSTRUCTOR: <user> user ( name age -- obj ) ;
 TUPLE: score id user score ;
 
 PERSISTENT: user
@@ -20,7 +20,7 @@ PERSISTENT: score
 
 
 TUPLE: user2 id name age ;
-CONSTRUCTOR: user2 ( name age -- obj ) ;
+CONSTRUCTOR: <user2> user2 ( name age -- obj ) ;
 TUPLE: score2 id user score ;
 
 PERSISTENT: user2
@@ -35,7 +35,7 @@ PERSISTENT: score2
 
 
 TUPLE: user3 id name age ;
-CONSTRUCTOR: user3 ( name age -- obj ) ;
+CONSTRUCTOR: <user3> user3 ( name age -- obj ) ;
 TUPLE: score3 id user score ;
 
 PERSISTENT: user3
@@ -49,7 +49,7 @@ PERSISTENT: score3
     { "score" INTEGER NOT-NULL } ;
 
 
-(*
+/*
 
 T{ score2
     {
@@ -70,7 +70,7 @@ T{ score2
         { score 106 }
     }
 }
-*)
+*/
 
 TUPLE: jar id name beans ;
 TUPLE: bean id ;
@@ -83,7 +83,7 @@ PERSISTENT: jar
     { "name" VARCHAR }
     { "beans" { bean sequence } } ;
 
-(*
+/*
 
 T{ bean } select-tuples
 {
@@ -109,11 +109,11 @@ T{ jar { beans IGNORE } } select-tuples
     T{ jar { id 2 } { "beans2" } }
 }
 
-*)
+*/
 
 ! Blogs
 TUPLE: entity id author date content ;
-CONSTRUCTOR: entity ( author content -- entity ) now >>date ;
+CONSTRUCTOR: <entity> entity ( author content -- entity ) now >>date ;
 PERSISTENT: entity
     { "id" +db-assigned-key+ }
     { "author" VARCHAR NOT-NULL } ! uid
@@ -121,7 +121,7 @@ PERSISTENT: entity
     { "content" TEXT NOT-NULL } ;
 
 TUPLE: post < entity title comments ;
-CONSTRUCTOR: post ( title -- entity ) now >>date ;
+CONSTRUCTOR: <post> post ( title -- entity ) now >>date ;
 PERSISTENT: post
     { "title" VARCHAR NOT-NULL }
     { "comments" { entity sequence } } ;

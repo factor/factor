@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart db2
 db2.binders db2.statements db2.types db2.utils kernel locals make
-math.parser math.ranges namespaces nested-comments
-orm.persistent orm.queries postgresql.db2.connections.private
-sequences math ;
+math.parser math.ranges namespaces orm.persistent orm.queries
+postgresql.db2.connections.private sequences math multiline ;
 IN: postgresql.orm.queries
 
 ! TODOOOOOO
@@ -61,7 +60,7 @@ M: postgresql-db-connection insert-user-assigned-key-sql
         ]
     } 2cleave ;
 
-(*
+/*
 M: postgresql-db-connection insert-user-assigned-key-sql
     [ <statement> ] dip >persistent {
         [ table-name>> quote-sql-name "INSERT INTO " prepend add-sql "(" add-sql ]
@@ -91,7 +90,7 @@ M: postgresql-db-connection insert-user-assigned-key-sql
                 ] bi
             ]
     } cleave ;
-*)
+*/
 
 
 : postgresql-create-table ( tuple-class -- string )

@@ -9,22 +9,22 @@ TUPLE: sql-error location ;
 HOOK: parse-sql-error db-connection ( error -- error' )
 
 TUPLE: sql-unknown-error < sql-error message ;
-CONSTRUCTOR: sql-unknown-error ( message -- error ) ;
+CONSTRUCTOR: <sql-unknown-error> sql-unknown-error ( message -- error ) ;
 
 TUPLE: sql-table-exists < sql-error table ;
-CONSTRUCTOR: sql-table-exists ( table -- error ) ;
+CONSTRUCTOR: <sql-table-exists> sql-table-exists ( table -- error ) ;
 
 TUPLE: sql-table-missing < sql-error table ;
-CONSTRUCTOR: sql-table-missing ( table -- error ) ;
+CONSTRUCTOR: <sql-table-missing> sql-table-missing ( table -- error ) ;
 
 TUPLE: sql-syntax-error < sql-error message ;
-CONSTRUCTOR: sql-syntax-error ( message -- error ) ;
+CONSTRUCTOR: <sql-syntax-error> sql-syntax-error ( message -- error ) ;
 
 TUPLE: sql-function-exists < sql-error message ;
-CONSTRUCTOR: sql-function-exists ( message -- error ) ;
+CONSTRUCTOR: <sql-function-exists> sql-function-exists ( message -- error ) ;
 
 TUPLE: sql-function-missing < sql-error message ;
-CONSTRUCTOR: sql-function-missing ( message -- error ) ;
+CONSTRUCTOR: <sql-function-missing> sql-function-missing ( message -- error ) ;
 
 : ignore-error ( quot word -- )
     '[ dup _ execute [ drop ] [ rethrow ] if ] recover ; inline

@@ -2,20 +2,20 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators db2 db2.binders
 db2.query-objects db2.statements db2.types db2.utils fry kernel
-make namespaces nested-comments orm.persistent orm.queries
+make namespaces orm.persistent orm.queries multiline
 sequences sqlite.db2.connections sqlite.db2.lib orm.binders ;
 IN: sqlite.orm.queries
 
-(*
+/*
 M: sqlite-db-connection reset-bind-index
     0 \ bind-index set ;
 
 M: sqlite-db-connection next-bind-index
     \ bind-index [ get ] [ inc ] bi number>string ;
-*)
+*/
 
 
-(*
+/*
 : insert-trigger-not-null ( -- string )
     [
     """
@@ -76,7 +76,7 @@ M: sqlite-db-connection next-bind-index
         END;
     """ interpolate
     ] with-string-writer ;
-*)
+*/
 
 ! : can-be-null? ( -- ? ) "sql-spec" get modifiers>> [ +not-null+ = ] any? not ;
 
@@ -111,7 +111,7 @@ M: sqlite-db-connection next-bind-index
     ] "" make ;
 
 
-(*
+/*
 : create-sqlite-triggers ( -- )
     can-be-null? [
         insert-trigger sqlite-trigger,
@@ -142,7 +142,7 @@ M: sqlite-db-connection next-bind-index
             ] each
         ] bi
     ] each ;
-*)
+*/
 
 M: sqlite-db-connection create-table-sql ( tuple-class -- seq )
     ! [ sqlite-create-table ] [ drop create-db-triggers ] 2bi 2array ;

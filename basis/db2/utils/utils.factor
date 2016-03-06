@@ -101,7 +101,7 @@ ERROR: length-expected seq length ;
 ERROR: no-slot name specs ;
 
 : offset-of-slot ( string tuple -- n )
-    class-of superclasses [ "slots" word-prop ] map concat
+    class-of superclasses-of [ "slots" word-prop ] map concat
     2dup slot-named [ 2nip offset>> ] [ no-slot ] if* ;
 
 : get-slot-named ( name tuple -- value )
