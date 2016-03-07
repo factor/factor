@@ -21,10 +21,10 @@ IN: compiler.cfg.builder.blocks
 : begin-basic-block ( block -- block' )
     dup [ end-local-analysis ] when* (begin-basic-block) ;
 
-: emit-trivial-block ( quot: ( ..a block -- ..b ) -- )
-    ##branch, basic-block get begin-basic-block
+: emit-trivial-block ( block quot: ( ..a block' -- ..b ) -- block' )
+    ##branch, swap begin-basic-block
     [ swap call ] keep
-    ##branch, begin-basic-block drop ; inline
+    ##branch, begin-basic-block ; inline
 
 : make-kill-block ( block -- )
     t swap kill-block?<< ;
@@ -35,8 +35,8 @@ IN: compiler.cfg.builder.blocks
 : emit-call-block ( word height block -- )
     make-kill-block adjust-d ##call, ;
 
-: emit-primitive ( node -- )
-    [ word>> ] [ call-height ] bi
+: emit-primitive ( block node -- block' )
+    [ word>> ] [ call-height ] bi rot
     [ emit-call-block ] emit-trivial-block ;
 
 : begin-branch ( block -- block' )
@@ -49,12 +49,8 @@ IN: compiler.cfg.builder.blocks
         height-state get clone-height-state 2array
     ] when* ;
 
-: with-branch ( quot -- pair/f )
-    [
-        basic-block get begin-branch drop
-        call
-        basic-block get end-branch
-    ] with-scope ; inline
+: with-branch ( block quot: ( ..a block -- ..b block' ) -- pair/f )
+    [ [ begin-branch ] dip call end-branch ] with-scope ; inline
 
 : emit-conditional ( block branches -- block' )
     swap end-basic-block

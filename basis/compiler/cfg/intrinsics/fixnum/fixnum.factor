@@ -27,8 +27,8 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-fixnum-shift-general ( -- )
     ds-peek 0 cc> ##compare-integer-imm-branch,
-    [ emit-fixnum-left-shift ] with-branch
-    [ emit-fixnum-right-shift ] with-branch
+    basic-block get [ emit-fixnum-left-shift ] with-branch
+    basic-block get [ emit-fixnum-right-shift ] with-branch
     2array basic-block get swap emit-conditional drop ;
 
 : emit-fixnum-shift-fast ( node -- )
@@ -42,11 +42,13 @@ IN: compiler.cfg.intrinsics.fixnum
     '[ _ ^^compare-integer ] binary-op ;
 
 : emit-no-overflow-case ( dst -- final-bb )
-    [ D: -2 inc-stack ds-push ] with-branch ;
+    basic-block get [
+        swap D: -2 inc-stack ds-push
+    ] with-branch ;
 
 : emit-overflow-case ( word -- final-bb )
-    [
-        -1 basic-block get emit-call-block
+    basic-block get [
+        swap -1 basic-block get emit-call-block
     ] with-branch ;
 
 : emit-fixnum-overflow-op ( quot word -- )

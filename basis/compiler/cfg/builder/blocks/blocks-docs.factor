@@ -59,7 +59,11 @@ HELP: emit-conditional
 { $description "Emits a sequence of conditional branches to the current " { $link cfg } ". Each branch is a pair where the first item is the entry basic block and the second the branches " { $link height-state } ". 'block' is the block in which the control flow is branched and \"block'\" the block in which it converges again." } ;
 
 HELP: emit-trivial-block
-{ $values { "quot" quotation } }
+{ $values
+  { "block" basic-block }
+  { "quot" quotation }
+  { "block'" basic-block }
+}
 { $description "Combinator that emits a new trivial block, constructed by calling the supplied quotation. The quotation should not end the current block -- only add instructions to it." }
 { $examples { $unchecked-example $[ ex-emit-trivial-block ] } } ;
 
@@ -76,7 +80,11 @@ HELP: set-basic-block
 { $description "Sets the given blocks as the current one by storing it in the basic-block dynamic variable. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;
 
 HELP: with-branch
-{ $values { "quot" quotation } { "pair/f" { $maybe "pair" } } }
+{ $values
+  { "block" basic-block }
+  { "quot" quotation }
+  { "pair/f" { $maybe "pair" } }
+}
 { $description "The pair is either " { $link f } " or a two-tuple containing a " { $link basic-block } " and a " { $link height-state } " two-tuple." } ;
 
 ARTICLE: "compiler.cfg.builder.blocks"

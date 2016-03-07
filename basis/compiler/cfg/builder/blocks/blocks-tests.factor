@@ -23,8 +23,9 @@ IN: compiler.cfg.builder.blocks.tests
 {
     V{ T{ ##no-tco } T{ ##branch } }
 } [
-    [ [ drop ##no-tco, ] emit-trivial-block ] V{ } make drop
-    basic-block get successors>> first instructions>>
+    <basic-block> dup set-basic-block
+    [ drop ##no-tco, ] emit-trivial-block
+    predecessors>> first instructions>>
 ] cfg-unit-test
 
 ! end-basic-block

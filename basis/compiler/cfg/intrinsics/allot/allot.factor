@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays compiler.cfg.builder.blocks
-compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stacks compiler.constants compiler.tree.propagation.info
-cpu.architecture fry kernel layouts locals math math.order
-sequences ;
+USING: accessors arrays byte-arrays compiler.cfg
+compiler.cfg.builder.blocks compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
+compiler.constants compiler.tree.propagation.info cpu.architecture fry
+kernel layouts locals math math.order namespaces sequences ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots, ( regs obj class -- )
@@ -28,7 +28,7 @@ IN: compiler.cfg.intrinsics.allot
         ds-drop
         [ tuple-slot-regs ] [ second ^^allot-tuple ] bi
         [ tuple ##set-slots, ] [ ds-push drop ] 2bi
-    ] [ drop emit-primitive ] if ;
+    ] [ drop basic-block get swap emit-primitive drop ] if ;
 
 : store-length ( len reg class -- )
     [ [ ^^load-literal ] dip 1 ] dip type-number ##set-slot-imm, ;
@@ -51,7 +51,7 @@ IN: compiler.cfg.intrinsics.allot
         len reg array store-length
         len reg elt array store-initial-element
         reg ds-push
-    ] [ node emit-primitive ] if ;
+    ] [ node basic-block get swap emit-primitive drop ] if ;
 
 : expand-(byte-array)? ( obj -- ? )
     dup integer? [ 0 1024 between? ] [ drop f ] if ;
@@ -69,7 +69,7 @@ IN: compiler.cfg.intrinsics.allot
 
 : emit-(byte-array) ( node -- )
     dup node-input-infos first literal>> dup expand-(byte-array)?
-    [ nip emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
+    [ nip emit-allot-byte-array drop ] [ drop basic-block get swap emit-primitive drop ] if ;
 
 :: zero-byte-array ( len reg -- )
     0 ^^load-literal :> elt
@@ -83,4 +83,4 @@ IN: compiler.cfg.intrinsics.allot
         :> len
         len emit-allot-byte-array :> reg
         len reg zero-byte-array
-    ] [ drop node emit-primitive ] if ;
+    ] [ drop node basic-block get swap emit-primitive drop ] if ;
