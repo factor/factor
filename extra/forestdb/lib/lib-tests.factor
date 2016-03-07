@@ -9,8 +9,6 @@ kernel layouts libc make math math.parser math.ranges multiline
 namespaces sequences system tools.test ;
 IN: forestdb.lib
 
-{ [ cell-bits 32 = ] [ os windows? ] } 0&& [
-
 { } [ [ delete-test-db-0 ] ignore-errors ] unit-test
 { } [ [ delete-test-db-1 ] ignore-errors ] unit-test
 
@@ -404,5 +402,3 @@ IN: forestdb.lib
         ] { } make
     ] with-forestdb-tester
 ] unit-test
-
-] unless
