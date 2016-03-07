@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.algebra classes.builtin
-combinators.short-circuit compiler.cfg.builder.blocks
+combinators.short-circuit compiler.cfg compiler.cfg.builder.blocks
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.tree.propagation.info cpu.architecture
-kernel layouts locals math namespaces sequences slots.private ;
+kernel layouts locals math namespaces sequences ;
 IN: compiler.cfg.intrinsics.slots
 
 : class-tag ( class -- tag/f )
@@ -37,7 +37,7 @@ IN: compiler.cfg.intrinsics.slots
         dup second literal>> immediate-slot-offset?
         [ (emit-slot-imm) ] [ (emit-slot) ] if
         ds-push
-    ] [ drop emit-primitive ] if ;
+    ] [ drop basic-block get swap emit-primitive drop ] if ;
 
 :: (emit-set-slot-imm) ( write-barrier? tag slot -- )
     ds-drop
@@ -71,4 +71,4 @@ IN: compiler.cfg.intrinsics.slots
 : emit-set-slot ( node -- )
     dup node>set-slot-data over [
         emit-intrinsic-set-slot drop
-    ] [ 3drop emit-primitive ] if ;
+    ] [ 3drop basic-block get swap emit-primitive drop ] if ;

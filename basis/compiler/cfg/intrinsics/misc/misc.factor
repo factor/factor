@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.algebra classes.struct
+USING: accessors classes.algebra classes.struct compiler.cfg
 compiler.cfg.builder.blocks compiler.cfg.comparisons compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.stacks compiler.constants
 compiler.tree.propagation.info cpu.architecture kernel layouts math
@@ -19,13 +19,13 @@ IN: compiler.cfg.intrinsics.misc
         ds-drop
         vm-special-object-offset ^^vm-field
         ds-push
-    ] [ emit-primitive ] ?if ;
+    ] [ basic-block get swap emit-primitive drop ] ?if ;
 
 : emit-set-special-object ( node -- )
     dup node-input-infos second literal>> [
         ds-drop
         [ ds-pop ] dip vm-special-object-offset ##set-vm-field,
-    ] [ emit-primitive ] ?if ;
+    ] [ basic-block get swap emit-primitive drop ] ?if ;
 
 : context-object-offset ( n -- n )
     cells "context-objects" context offset-of + ;
@@ -34,7 +34,7 @@ IN: compiler.cfg.intrinsics.misc
     dup node-input-infos first literal>> [
         "ctx" vm offset-of ^^vm-field
         ds-drop swap context-object-offset cell /i 0 ^^slot-imm ds-push
-    ] [ emit-primitive ] ?if ;
+    ] [ basic-block get swap emit-primitive drop ] ?if ;
 
 : emit-identity-hashcode ( -- )
     [
@@ -47,8 +47,8 @@ IN: compiler.cfg.intrinsics.misc
 : emit-local-allot ( node -- )
     dup node-input-infos first2 [ literal>> ] bi@ 2dup [ integer? ] both?
     [ ds-drop ds-drop f ^^local-allot ^^box-alien ds-push drop ]
-    [ 2drop emit-primitive ]
+    [ 2drop basic-block get swap emit-primitive drop ]
     if ;
 
 : emit-cleanup-allot ( -- )
-    [ drop ##no-tco, ] emit-trivial-block ;
+    basic-block get [ drop ##no-tco, ] emit-trivial-block drop ;

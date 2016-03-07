@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences alien math classes.algebra fry
-locals combinators combinators.short-circuit cpu.architecture
-compiler.tree.propagation.info compiler.cfg.hats
-compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.instructions compiler.cfg.utilities
-compiler.cfg.builder.blocks ;
+USING: accessors alien classes.algebra combinators
+combinators.short-circuit compiler.cfg compiler.cfg.builder.blocks
+compiler.cfg.hats compiler.cfg.instructions compiler.cfg.stacks
+compiler.tree.propagation.info cpu.architecture fry kernel locals math
+namespaces sequences ;
 IN: compiler.cfg.intrinsics.alien
 
 : emit-<displaced-alien>? ( node -- ? )
@@ -20,13 +19,13 @@ IN: compiler.cfg.intrinsics.alien
             _ node-input-infos second class>>
             ^^box-displaced-alien
         ] binary-op
-    ] [ emit-primitive ] if ;
+    ] [ basic-block get swap emit-primitive drop ] if ;
 
 :: inline-accessor ( node quot test -- )
     node node-input-infos :> infos
     infos test call
     [ infos quot call ]
-    [ node emit-primitive ] if ; inline
+    [ node basic-block get swap emit-primitive drop ] if ; inline
 
 : inline-load-memory? ( infos -- ? )
     [ first class>> c-ptr class<= ]

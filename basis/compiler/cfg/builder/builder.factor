@@ -55,9 +55,7 @@ GENERIC: emit-node ( block node -- block' )
     [ swap connect-bbs ] [ end-basic-block ] bi ;
 
 : emit-trivial-call ( block word height -- block' )
-    ##branch, rot begin-basic-block
-    [ emit-call-block ] keep
-    ##branch, begin-basic-block ;
+    rot [ emit-call-block ] emit-trivial-block ;
 
 : emit-call ( block word height -- block' )
     over loops get at [
@@ -81,7 +79,7 @@ M: #recursive emit-node ( block node -- block' )
 
 ! #if
 : emit-branch ( nodes block -- pair/f )
-    [ begin-branch swap emit-nodes end-branch ] with-scope ;
+    [ swap emit-nodes ] with-branch ;
 
 : emit-if ( block node -- block' )
     children>> over '[ _ emit-branch ] map emit-conditional ;
