@@ -6,6 +6,7 @@ system unicode.case ;
 IN: io.standard-paths.windows
 
 M: windows find-in-applications
+    >lower
     '[ [ >lower _ tail? ] find-in-program-files ] map-find drop ;
 
 M: windows find-in-path*
