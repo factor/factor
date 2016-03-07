@@ -4,6 +4,7 @@ USING: alien alien.c-types alien.syntax classes.struct
 combinators system alien.libraries ;
 IN: mysql.db2.ffi
 
+! Mysql 5.7.11, 3/6/2016
 << "mysql" {
     { [ os windows? ]  [ "libmysql.dll" ] }
     { [ os macosx? ] [ "libmysqlclient.dylib" ] }
@@ -11,6 +12,9 @@ IN: mysql.db2.ffi
 } cond cdecl add-library >>
 
 LIBRARY: mysql
+
+TYPEDEF: int my_socket
+TYPEDEF: char my_bool
 
 CONSTANT: MYSQL_ERRMSG_SIZE 512
 CONSTANT: SCRAMBLE_LENGTH 20
@@ -111,6 +115,8 @@ STRUCT: USED_MEM
     { left uint }
     { size uint } ;
 
+TYPEDEF: uint PSI_memory_key
+
 STRUCT: MEM_ROOT
     { free USED_MEM* }
     { used USED_MEM* }
@@ -119,7 +125,11 @@ STRUCT: MEM_ROOT
     { block_size size_t }
     { block_num uint }
     { first_block_usage uint }
-    { error_handler void* } ;
+    { max_capacity size_t }
+    { allocated_size size_t }
+    { error_for_capacity_exceeded my_bool }
+    { error_handler void* }
+    { m_psi_key PSI_memory_key } ;
 
 ! st_mysql_field
 STRUCT: MYSQL_FIELD
@@ -158,7 +168,7 @@ STRUCT: st_mysql_options
     { write_timeout uint }
     { port uint }
     { protocol uint }
-    { client_flag uint }
+    { client_flag ulong }
     { host c-string }
     { user c-string }
     { password c-string }
@@ -176,16 +186,16 @@ STRUCT: st_mysql_options
     { ssl_cipher c-string }
     { shared_memory_base_name c-string }
     { max_allowed_packet ulong }
-    { use_ssl bool }
-    { compress bool }
-    { named_pipe bool }
-    { rpl_probe bool }
-    { rpl_parse bool }
-    { no_master_reads bool }
+    { use_ssl my_bool }
+    { compress my_bool }
+    { named_pipe my_bool }
+    { rpl_probe my_bool }
+    { rpl_parse my_bool }
+    { no_master_reads my_bool }
     { methods_to_use mysql_option }
     { client_ip c-string }
-    { secure_auth bool }
-    { report_data_truncation bool }
+    { secure_auth my_bool }
+    { report_data_truncation my_bool }
     { local_infile_init void* }
     { local_infile_read void* }
     { local_infile_end void* }
@@ -237,14 +247,15 @@ STRUCT: charset_info_st
     { cset void* }
     { coll void* } ;
 
+C-TYPE: Vio
 ! st_net
 STRUCT: NET
-    { vio void* }
+    { vio Vio* }
     { buff uchar* }
     { buff_end uchar* }
     { write_pos uchar* }
     { read_pos uchar* }
-    { fd int }
+    { fd my_socket }
     { remain_in_buf ulong }
     { length ulong }
     { buf_length ulong }
@@ -260,15 +271,15 @@ STRUCT: NET
     { return_status uint* }
     { reading_or_writing uchar }
     { save_char char }
-    { unused0 char }
-    { unused char }
-    { compress char }
-    { unused1 char }
+    { unused1 my_bool }
+    { unused2 my_bool }
+    { compress my_bool }
+    { unused3 my_bool }
     { query_cache_query uchar* }
     { last_errno uint }
     { error uchar }
-    { unused2 char }
-    { return_errno char }
+    { unused4 my_bool }
+    { unused5 my_bool }
     { last_error char[512] }
     { sqlstate char[6] }
     { extension void* } ;
@@ -305,7 +316,7 @@ STRUCT: MYSQL
     { free_me bool }
     { reconnect bool }
     { scramble char[21] }
-    { rpl_pivot bool }
+    { rpl_pivot my_bool }
     { master MYSQL* }
     { next_slave MYSQL* }
     { last_used_slave MYSQL* }

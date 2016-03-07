@@ -4,8 +4,7 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 calendar.format classes.struct combinators db2.errors db2.types
 fry generalizations io.encodings.utf8 kernel layouts locals
-make math math.parser mysql.db2.ffi present sequences serialize
-db2.types ;
+make math math.parser mysql.db2.ffi present sequences serialize ;
 FROM: alien.c-types => short ;
 IN: mysql.db2.lib
 
@@ -153,17 +152,6 @@ PRIVATE>
         { MYSQL_TYPE_INT24    [ string>number ] }
         [ drop ]
     } case ;
-
-
-
-
-
-
-
-
-
-
-
 
 
 
