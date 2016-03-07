@@ -7,12 +7,16 @@ IN: compiler.cfg.builder.blocks.tests
 ! (begin-basic-block)
 { 20 } [
     { } 20 insns>block (begin-basic-block)
-    basic-block get predecessors>> first number>>
+    predecessors>> first number>>
 ] cfg-unit-test
 
 ! begin-branch
 { f } [
-    height-state get <basic-block> begin-branch height-state get eq?
+    height-state get <basic-block> begin-branch drop height-state get eq?
+] cfg-unit-test
+
+{ f } [
+    <basic-block> dup begin-branch eq?
 ] cfg-unit-test
 
 ! emit-trivial-block
@@ -22,6 +26,11 @@ IN: compiler.cfg.builder.blocks.tests
     [ [ drop ##no-tco, ] emit-trivial-block ] V{ } make drop
     basic-block get successors>> first instructions>>
 ] cfg-unit-test
+
+! end-basic-block
+{ f } [
+    f end-basic-block basic-block get
+] unit-test
 
 ! make-kill-block
 { t } [

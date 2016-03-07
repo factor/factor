@@ -29,7 +29,7 @@ IN: compiler.cfg.intrinsics.fixnum
     ds-peek 0 cc> ##compare-integer-imm-branch,
     [ emit-fixnum-left-shift ] with-branch
     [ emit-fixnum-right-shift ] with-branch
-    2array basic-block get emit-conditional ;
+    2array basic-block get swap emit-conditional drop ;
 
 : emit-fixnum-shift-fast ( node -- )
     node-input-infos second interval>> {
@@ -54,7 +54,7 @@ IN: compiler.cfg.intrinsics.fixnum
     ! of loc>vreg sync
     [ [ (2inputs) [ any-rep ^^copy ] bi@ cc/o ] dip call ] dip
     [ emit-no-overflow-case ] [ emit-overflow-case ] bi* 2array
-    basic-block get emit-conditional ; inline
+    basic-block get swap emit-conditional drop ; inline
 
 : fixnum+overflow ( x y -- z ) [ >bignum ] bi@ + ;
 
