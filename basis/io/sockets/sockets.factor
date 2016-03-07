@@ -101,7 +101,7 @@ M: ipv4 make-sockaddr ( inet -- sockaddr )
         AF_INET >>family
         swap
         [ port>> htons >>port ]
-        [ host>> "127.0.0.1" or ]
+        [ host>> "0.0.0.0" or ]
         [ inet-pton uint deref >>addr ] tri ;
 
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
