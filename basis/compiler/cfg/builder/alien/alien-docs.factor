@@ -1,6 +1,6 @@
-USING: alien alien.libraries compiler.cfg.builder help.markup
-help.syntax literals make multiline sequences stack-checker.alien
-strings ;
+USING: alien alien.libraries compiler.cfg compiler.cfg.builder
+compiler.cfg.instructions compiler.tree help.markup help.syntax
+literals make multiline sequences stack-checker.alien strings ;
 IN: compiler.cfg.builder.alien
 
 <<
@@ -34,12 +34,26 @@ HELP: check-dlsym
 { $values { "symbol" string } { "library" library } }
 { $description "Checks that a symbol with the given name exists in the given library. Throws an error if not." } ;
 
+HELP: emit-callback-body
+{ $values { "params" alien-node-params } }
+{ $description "Emits the nodes that forms the body of the alien callback." } ;
+
+HELP: emit-callback-return
+{ $values { "params" alien-node-params } { "block" basic-block } }
+{ $description "Emits a " { $link ##callback-outputs } " instruction for the " { $link #alien-callback } " if needed." } ;
+
 HELP: unbox-parameters
 { $values { "parameters" sequence } { "vregs" sequence } { "reps" sequence } }
 { $description "Unboxes a sequence of parameters to send to an ffi function." } ;
 
 ARTICLE: "compiler.cfg.builder.alien"
 "CFG node emitter for alien nodes"
-"The " { $vocab-link "compiler.cfg.builder.alien" } " vocab implements " { $link emit-node } " methods for alien nodes." ;
+"The " { $vocab-link "compiler.cfg.builder.alien" } " vocab implements " { $link emit-node } " methods for alien nodes."
+$nl
+"Words for alien callbacks:"
+{ $subsections
+  emit-callback-body
+  emit-callback-return
+} ;
 
 ABOUT: "compiler.cfg.builder.alien"

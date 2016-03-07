@@ -1,15 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
-alien.strings arrays assocs classes.struct combinators
-compiler.cfg compiler.cfg.builder
-compiler.cfg.builder.alien.boxing
-compiler.cfg.builder.alien.params compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.registers
+USING: accessors alien.c-types alien.libraries alien.strings arrays
+assocs classes.struct combinators compiler.cfg compiler.cfg.builder
+compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
+compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
-compiler.tree cpu.architecture fry kernel layouts make math
-math.parser namespaces sequences sequences.generalizations
-strings words ;
+compiler.tree cpu.architecture fry kernel layouts make math namespaces
+sequences sequences.generalizations words ;
 IN: compiler.cfg.builder.alien
 
 : with-param-regs* ( quot -- reg-values stack-values )
@@ -84,8 +81,8 @@ IN: compiler.cfg.builder.alien
         base-type box-return ds-push
     ] if-void ;
 
-M: #alien-invoke emit-node ( block node -- )
-    nip params>>
+M: #alien-invoke emit-node ( block node -- block' )
+    params>>
     [
         {
             [ caller-parameters ]
@@ -95,11 +92,10 @@ M: #alien-invoke emit-node ( block node -- )
         } cleave
         <gc-map> ##alien-invoke,
     ]
-    [ caller-return ]
-    bi ;
+    [ caller-return ] bi ;
 
-M: #alien-indirect emit-node ( block node -- )
-    nip params>>
+M: #alien-indirect emit-node ( block node -- block' )
+    params>>
     [
         [ ds-pop ^^unbox-any-c-ptr ] dip
         [ caller-parameters ]
@@ -107,11 +103,10 @@ M: #alien-indirect emit-node ( block node -- )
         [ caller-stack-frame ] tri
         <gc-map> ##alien-indirect,
     ]
-    [ caller-return ]
-    bi ;
+    [ caller-return ] bi ;
 
-M: #alien-assembly emit-node ( block node -- )
-    nip params>>
+M: #alien-assembly emit-node ( block node -- block' )
+    params>>
     [
         {
             [ caller-parameters ]
@@ -120,8 +115,7 @@ M: #alien-assembly emit-node ( block node -- )
             [ quot>> ]
         } cleave ##alien-assembly,
     ]
-    [ caller-return ]
-    bi ;
+    [ caller-return ] bi ;
 
 : callee-parameter ( rep on-stack? odd-register? -- dst )
     [ next-vreg dup ] 3dip next-parameter ;
@@ -133,8 +127,7 @@ M: #alien-assembly emit-node ( block node -- )
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
     [ [ [ first3 callee-parameter ] map ] map ]
-    [ [ keys ] map ]
-    bi ;
+    [ [ keys ] map ] bi ;
 
 : box-parameters ( vregs reps params -- )
     parameters>> [ base-type box-parameter ds-push ] 3each ;
@@ -152,30 +145,30 @@ M: #alien-assembly emit-node ( block node -- )
         base-type unbox-return store-return
     ] if-void ;
 
+: emit-callback-body ( block nodes -- block' )
+    dup last #return? t assert= but-last emit-nodes ;
+
+: emit-callback-inputs ( params -- )
+    [ callee-parameters ##callback-inputs, ] keep box-parameters ;
+
 : callback-stack-cleanup ( params -- )
     [ xt>> ]
     [ [ stack-params get ] dip [ return>> ] [ abi>> ] bi stack-cleanup ] bi
     "stack-cleanup" set-word-prop ;
 
-: needs-frame-pointer ( -- )
-    cfg get t >>frame-pointer? drop ;
+: emit-callback-return ( block params -- )
+    swap [ callee-return ##callback-outputs, ] [ drop ] if ;
 
-: emit-callback-body ( nodes -- )
-    [ last #return? t assert= ] [ but-last emit-nodes ] bi ;
+: emit-callback-outputs ( block params -- )
+    [ emit-callback-return ] keep callback-stack-cleanup ;
 
-: emit-callback-return ( params -- )
-    basic-block get [ callee-return ##callback-outputs, ] [ drop ] if ;
-
-M: #alien-callback emit-node ( block node -- )
-    nip dup params>> xt>> dup
+M: #alien-callback emit-node ( block node -- block' )
+    dup params>> xt>> dup
     [
-        needs-frame-pointer begin-word
-        {
-            [ params>> callee-parameters ##callback-inputs, ]
-            [ params>> box-parameters ]
-            [ child>> emit-callback-body ]
-            [ params>> emit-callback-return ]
-            [ params>> callback-stack-cleanup ]
-        } cleave
-        basic-block get [ end-word ] when*
+        t cfg get frame-pointer?<<
+        begin-word
+        over params>> emit-callback-inputs
+        over child>> emit-callback-body
+        [ swap params>> emit-callback-outputs ] keep
+        [ end-word drop ] when*
     ] with-cfg-builder ;

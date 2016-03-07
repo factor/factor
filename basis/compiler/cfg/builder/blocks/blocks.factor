@@ -15,16 +15,16 @@ IN: compiler.cfg.builder.blocks
 : end-basic-block ( block -- )
     [ end-local-analysis ] when* building off basic-block off ;
 
-: (begin-basic-block) ( block -- )
-    <basic-block> swap [ over connect-bbs ] when* set-basic-block ;
+: (begin-basic-block) ( block -- block' )
+    <basic-block> swap [ over connect-bbs ] when* dup set-basic-block ;
 
-: begin-basic-block ( block -- )
+: begin-basic-block ( block -- block' )
     dup [ end-local-analysis ] when* (begin-basic-block) ;
 
 : emit-trivial-block ( quot: ( ..a block -- ..b ) -- )
     ##branch, basic-block get begin-basic-block
-    basic-block get [ swap call ] keep
-    ##branch, begin-basic-block ; inline
+    [ swap call ] keep
+    ##branch, begin-basic-block drop ; inline
 
 : make-kill-block ( block -- )
     t swap kill-block?<< ;
@@ -39,7 +39,7 @@ IN: compiler.cfg.builder.blocks
     [ word>> ] [ call-height ] bi
     [ emit-call-block ] emit-trivial-block ;
 
-: begin-branch ( block -- )
+: begin-branch ( block -- block' )
     height-state [ clone-height-state ] change (begin-basic-block) ;
 
 : end-branch ( block -- pair/f )
@@ -51,16 +51,16 @@ IN: compiler.cfg.builder.blocks
 
 : with-branch ( quot -- pair/f )
     [
-        basic-block get begin-branch
+        basic-block get begin-branch drop
         call
         basic-block get end-branch
     ] with-scope ; inline
 
-: emit-conditional ( branches block -- )
-    ! branches is a sequence of pairs as above
-    end-basic-block
-    sift [
+: emit-conditional ( block branches -- block' )
+    swap end-basic-block
+    sift [ f ] [
         dup first second height-state set
-        basic-block get begin-basic-block
-        [ first ] map basic-block get connect-Nto1-bbs
-    ] unless-empty ;
+        [ first ] map
+        f begin-basic-block
+        [ connect-Nto1-bbs ] keep
+    ] if-empty ;

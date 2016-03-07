@@ -5,8 +5,8 @@ compiler.cfg.builder.blocks compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
-compiler.cfg.utilities cpu.architecture fry kernel make math namespaces
-sequences words ;
+compiler.cfg.utilities cpu.architecture fry kernel locals make math
+namespaces sequences words ;
 IN: compiler.cfg.builder
 
 SYMBOL: procedures
@@ -16,14 +16,11 @@ SYMBOL: loops
     H{ } clone loops set
     <basic-block> dup set-basic-block <cfg> dup cfg set ;
 
-: begin-procedure ( word label -- )
-    begin-cfg procedures get push ;
-
 : with-cfg-builder ( nodes word label quot: ( ..a block -- ..b ) -- )
     '[
         begin-stack-analysis
-        begin-procedure
-        basic-block get @
+        begin-cfg dup procedures get push
+        entry>> @
         end-stack-analysis
     ] with-scope ; inline
 
@@ -33,18 +30,18 @@ SYMBOL: loops
         '[ _ t t [ drop _ call( node -- ) ] with-cfg-builder ] with-variable
     ] { } make drop ;
 
-GENERIC: emit-node ( block node -- )
+GENERIC: emit-node ( block node -- block' )
 
-: emit-nodes ( nodes -- )
-    [ basic-block get [ swap emit-node ] [ drop ] if* ] each ;
+: emit-nodes ( block nodes -- block' )
+    [ over [ emit-node ] [ drop ] if ] each ;
 
-: begin-word ( block -- )
+: begin-word ( block -- block' )
     dup make-kill-block
     ##safepoint, ##prologue, ##branch,
     begin-basic-block ;
 
 : (build-cfg) ( nodes word label -- )
-    [ begin-word emit-nodes ] with-cfg-builder ;
+    [ begin-word swap emit-nodes drop ] with-cfg-builder ;
 
 : build-cfg ( nodes word -- procedures )
     V{ } clone [
@@ -54,41 +51,40 @@ GENERIC: emit-node ( block node -- )
     ] keep ;
 
 : emit-loop-call ( successor-block current-block -- )
-    ##safepoint,
-    ##branch,
+    ##safepoint, ##branch,
     [ swap connect-bbs ] [ end-basic-block ] bi ;
 
-: emit-call ( block word height -- )
-    over loops get at [ 2nip swap emit-loop-call ]
-    [
-        [ emit-call-block ] emit-trivial-block drop
-    ] if* ;
+: emit-trivial-call ( block word height -- block' )
+    ##branch, rot begin-basic-block
+    [ emit-call-block ] keep
+    ##branch, begin-basic-block ;
+
+: emit-call ( block word height -- block' )
+    over loops get at [
+        2nip swap emit-loop-call f
+    ] [ emit-trivial-call ] if* ;
 
 ! #recursive
 : recursive-height ( #recursive -- n )
     [ label>> return>> in-d>> length ] [ in-d>> length ] bi - ;
 
-: emit-recursive ( block #recursive -- )
+: emit-recursive ( block #recursive -- block' )
     [ [ label>> id>> ] [ recursive-height ] bi emit-call ] keep
     [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ;
 
-: remember-loop ( label block -- )
-    swap loops get set-at ;
+: emit-loop ( block #recursive -- block' )
+    ##branch, [ begin-basic-block ] dip
+    [ label>> id>> loops get set-at ] [ child>> emit-nodes ] 2bi ;
 
-: emit-loop ( node block -- )
-    ##branch, begin-basic-block
-    [ label>> id>> basic-block get remember-loop ]
-    [ child>> emit-nodes ] bi ;
-
-M: #recursive emit-node ( block node -- )
-    dup label>> loop?>> [ swap emit-loop ] [ emit-recursive ] if ;
+M: #recursive emit-node ( block node -- block' )
+    dup label>> loop?>> [ emit-loop ] [ emit-recursive ] if ;
 
 ! #if
-: emit-branch ( obj -- pair/f )
-    [ emit-nodes ] with-branch ;
+: emit-branch ( nodes block -- pair/f )
+    [ begin-branch swap emit-nodes end-branch ] with-scope ;
 
-: emit-if ( block node -- )
-    children>> [ emit-branch ] map swap emit-conditional ;
+: emit-if ( block node -- block' )
+    children>> over '[ _ emit-branch ] map emit-conditional ;
 
 : trivial-branch? ( nodes -- value ? )
     dup length 1 = [
@@ -113,33 +109,34 @@ M: #recursive emit-node ( block node -- )
 : emit-trivial-not-if ( -- )
     [ f cc= ^^compare-imm ] unary-op ;
 
-: emit-actual-if ( block #if -- )
+: emit-actual-if ( block #if -- block' )
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync
     ds-pop any-rep ^^copy f cc/= ##compare-imm-branch, emit-if ;
 
-M: #if emit-node ( block node -- )
+M: #if emit-node ( block node -- block' )
     {
-        { [ dup trivial-if? ] [ 2drop emit-trivial-if ] }
-        { [ dup trivial-not-if? ] [ 2drop emit-trivial-not-if ] }
+        { [ dup trivial-if? ] [ drop emit-trivial-if ] }
+        { [ dup trivial-not-if? ] [ drop emit-trivial-not-if ] }
         [ emit-actual-if ]
     } cond ;
 
-M: #dispatch emit-node ( block node -- )
+M: #dispatch emit-node ( block node -- block' )
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
     ! though.
     ds-pop ^^offset>slot next-vreg ##dispatch, emit-if ;
 
-M: #call emit-node ( block node -- )
-    dup word>> dup "intrinsic" word-prop
-    [ nip call( node -- ) drop ] [ swap call-height emit-call ] if* ;
+M: #call emit-node ( block node -- block' )
+    dup word>> dup "intrinsic" word-prop [
+        nip call( node -- ) drop basic-block get
+    ] [ swap call-height emit-call ] if* ;
 
-M: #call-recursive emit-node ( block node -- )
+M: #call-recursive emit-node ( block node -- block' )
     [ label>> id>> ] [ call-height ] bi emit-call ;
 
-M: #push emit-node ( block node -- )
-    nip literal>> ^^load-literal ds-push ;
+M: #push emit-node ( block node -- block' )
+    literal>> ^^load-literal ds-push ;
 
 ! #shuffle
 
@@ -165,35 +162,35 @@ M: #push emit-node ( block node -- )
     [ make-input-map ] [ mapping>> ] [ extract-outputs ] tri
     [ first2 [ [ of of peek-loc ] 2with map ] dip 2array ] 2with map ;
 
-M: #shuffle emit-node ( block node -- )
-    nip [ out-vregs/stack ] keep store-height-changes
+M: #shuffle emit-node ( block node -- block' )
+    [ out-vregs/stack ] keep store-height-changes
     [ first2 store-vregs ] each ;
 
 ! #return
-: end-word ( block -- )
+: end-word ( block -- block' )
     ##branch, begin-basic-block
-    basic-block get make-kill-block
+    dup make-kill-block
     ##safepoint,
     ##epilogue,
     ##return, ;
 
-M: #return emit-node ( block node -- )
+M: #return emit-node ( block node -- block' )
     drop end-word ;
 
-M: #return-recursive emit-node ( block node -- )
-    label>> id>> loops get key? [ drop ] [ end-word ] if ;
+M: #return-recursive emit-node ( block node -- block' )
+    label>> id>> loops get key? [ ] [ end-word ] if ;
 
 ! #terminate
-M: #terminate emit-node ( block node -- )
-    drop ##no-tco, end-basic-block ;
+M: #terminate emit-node ( block node -- block' )
+    drop ##no-tco, end-basic-block f ;
 
 ! No-op nodes
-M: #introduce emit-node 2drop ;
+M: #introduce emit-node drop ;
 
-M: #copy emit-node 2drop ;
+M: #copy emit-node drop ;
 
-M: #enter-recursive emit-node 2drop ;
+M: #enter-recursive emit-node drop ;
 
-M: #phi emit-node 2drop ;
+M: #phi emit-node drop ;
 
-M: #declare emit-node 2drop ;
+M: #declare emit-node drop ;
