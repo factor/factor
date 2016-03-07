@@ -325,9 +325,3 @@ M: windows (send) ( packet addrspec datagram -- )
 M: windows host-name
     256 [ <byte-array> dup ] keep gethostname socket-error
     ascii alien>string ;
-
-M: windows resolve-localhost
-    ipv6-supported?
-    { T{ ipv4 f "127.0.0.1" } T{ ipv6 f "::" } }
-    { T{ ipv4 f "127.0.0.1" } }
-    ? ;
