@@ -188,6 +188,16 @@ HELP: cum-sum
     }
 } ;
 
+HELP: cum-sum0
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative sum of " { $snippet "seq" } " starting with 0 and not including the whole sum." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 -1 2 -1 4 } cum-sum0 ."
+               "{ 0 1 0 2 1 }"
+    }
+} ;
+
 HELP: cum-count
 { $values { "seq" sequence } { "quot" quotation } { "seq'" sequence } }
 { $description "Returns the cumulative count of how many times " { $snippet "quot" } " returns true." }
@@ -206,6 +216,16 @@ HELP: cum-product
     { $example "USING: math.statistics prettyprint ;"
                "{ 1 2 3 4 } cum-product ."
                "{ 1 2 6 24 }"
+    }
+} ;
+
+HELP: cum-product1
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative product of " { $snippet "seq" } " starting with 1 and not including the whole product." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 2 3 4 } cum-product1 ."
+               "{ 1 2 6 }"
     }
 } ;
 
@@ -309,6 +329,7 @@ $nl
     cum-sum
     cum-sum0
     cum-product
+    cum-product1
 }
 "Cumulative comparisons:"
 { $subsections

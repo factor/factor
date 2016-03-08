@@ -212,6 +212,9 @@ IN: math.statistics.tests
 { { 0 1 3 6 } }
 [ { 1 2 3 4 } cum-sum0 ] unit-test
 
+{ { 1 2 6 } }
+[ { 2 3 4 } cum-product1 ] unit-test
+
 {
     H{
         { 0 V{ 600 603 606 609 } }
