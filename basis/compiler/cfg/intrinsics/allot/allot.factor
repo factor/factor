@@ -21,14 +21,14 @@ IN: compiler.cfg.intrinsics.allot
 : ^^allot-tuple ( n -- dst )
     2 + cells tuple ^^allot ;
 
-: emit-<tuple-boa> ( node -- )
+: emit-<tuple-boa> ( block #call -- block' )
     dup node-input-infos last literal>>
     dup array? [
         nip
         ds-drop
         [ tuple-slot-regs ] [ second ^^allot-tuple ] bi
         [ tuple ##set-slots, ] [ ds-push drop ] 2bi
-    ] [ drop basic-block get swap emit-primitive drop ] if ;
+    ] [ drop emit-primitive ] if ;
 
 : store-length ( len reg class -- )
     [ [ ^^load-literal ] dip 1 ] dip type-number ##set-slot-imm, ;
@@ -42,7 +42,7 @@ IN: compiler.cfg.intrinsics.allot
 : ^^allot-array ( n -- dst )
     2 + cells array ^^allot ;
 
-:: emit-<array> ( node -- )
+:: emit-<array> ( block node -- block' )
     node node-input-infos first literal>> :> len
     len expand-<array>? [
         ds-pop :> elt
@@ -50,8 +50,8 @@ IN: compiler.cfg.intrinsics.allot
         ds-drop
         len reg array store-length
         len reg elt array store-initial-element
-        reg ds-push
-    ] [ node basic-block get swap emit-primitive drop ] if ;
+        reg ds-push block
+    ] [ block node emit-primitive ] if ;
 
 : expand-(byte-array)? ( obj -- ? )
     dup integer? [ 0 1024 between? ] [ drop f ] if ;
@@ -67,9 +67,10 @@ IN: compiler.cfg.intrinsics.allot
 : emit-allot-byte-array ( len -- dst )
     ds-drop ^^allot-byte-array dup ds-push ;
 
-: emit-(byte-array) ( node -- )
-    dup node-input-infos first literal>> dup expand-(byte-array)?
-    [ nip emit-allot-byte-array drop ] [ drop basic-block get swap emit-primitive drop ] if ;
+: emit-(byte-array) ( block node -- block' )
+    dup node-input-infos first literal>> dup expand-(byte-array)? [
+        nip emit-allot-byte-array drop
+    ] [ drop emit-primitive ] if ;
 
 :: zero-byte-array ( len reg -- )
     0 ^^load-literal :> elt
@@ -78,9 +79,9 @@ IN: compiler.cfg.intrinsics.allot
         [ elt reg ] dip cells byte-array-offset + int-rep f ##store-memory-imm,
     ] each ;
 
-:: emit-<byte-array> ( node -- )
-    node node-input-infos first literal>> dup expand-<byte-array>? [
+:: emit-<byte-array> ( block #call -- block' )
+    #call node-input-infos first literal>> dup expand-<byte-array>? [
         :> len
         len emit-allot-byte-array :> reg
-        len reg zero-byte-array
-    ] [ drop node basic-block get swap emit-primitive drop ] if ;
+        len reg zero-byte-array block
+    ] [ drop block #call emit-primitive ] if ;

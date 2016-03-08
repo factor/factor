@@ -35,7 +35,7 @@ HELP: begin-basic-block
 HELP: begin-branch
 { $values
   { "block" "current " { $link basic-block } }
-  { "block" basic-block }
+  { "block'" basic-block }
 }
 { $description "Used to begin emitting a branch." } ;
 
@@ -87,9 +87,7 @@ HELP: with-branch
 }
 { $description "The pair is either " { $link f } " or a two-tuple containing a " { $link basic-block } " and a " { $link height-state } " two-tuple." } ;
 
-ARTICLE: "compiler.cfg.builder.blocks"
-"CFG construction utilities"
-$nl
+ARTICLE: "compiler.cfg.builder.blocks" "CFG construction utilities"
 "This vocab contains utilities for that helps " { $vocab-link "compiler.cfg.builder" } " to construct CFG:s."
 $nl
 "Combinators:"
@@ -102,6 +100,7 @@ $nl
   begin-branch
   emit-call-block
   emit-conditional
+  emit-trivial-call
 } ;
 
 ABOUT: "compiler.cfg.builder.blocks"

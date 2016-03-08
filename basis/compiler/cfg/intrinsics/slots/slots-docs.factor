@@ -1,6 +1,6 @@
-USING: classes classes.builtin compiler.cfg.instructions compiler.tree
-compiler.tree.propagation.info help.markup help.syntax kernel layouts
-math slots.private ;
+USING: classes classes.builtin compiler.cfg compiler.cfg.instructions
+compiler.tree compiler.tree.propagation.info help.markup help.syntax
+kernel layouts math slots.private ;
 IN: compiler.cfg.intrinsics.slots
 
 HELP: class-tag
@@ -39,5 +39,21 @@ HELP: value-tag
 { $description "Finds the class number for this value-info-states class (an index in the " { $link builtins } " list), or " { $link f } " if it hasn't one." } ;
 
 HELP: emit-set-slot
-{ $values { "node" node } }
+{ $values
+  { "block" basic-block }
+  { "#call" #call }
+  { "block'" basic-block }
+}
 { $description "Emits intrinsic code for a " { $link set-slot } " call." } ;
+
+ARTICLE: "compiler.cfg.intrinsics.slots"
+"Generating instructions for slot access"
+"This vocab has words for generating intrinsic CFG instructions for slot accessors."
+$nl
+"Main words, called directly by the compiler through the \"intrinsic\" word property:"
+{ $subsections
+  emit-set-slot
+  emit-slot
+} ;
+
+ABOUT: "compiler.cfg.intrinsics.slots"

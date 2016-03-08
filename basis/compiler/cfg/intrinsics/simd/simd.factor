@@ -633,7 +633,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { float-vector-rep  [ ^select-vector ] }
     } [ integer? ] emit-vl-vector-op ;
 
-: emit-alien-vector ( node -- )
+: emit-alien-vector ( block node -- block' )
     dup [
         '[
             ds-drop prepare-load-memory
@@ -642,14 +642,13 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ inline-load-memory? ] inline-accessor
     ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
-: emit-set-alien-vector ( node -- )
+: emit-set-alien-vector ( block node -- block' )
     dup [
         '[
             ds-drop prepare-store-memory
             _ f ##store-memory-imm,
         ]
-        [ byte-array inline-store-memory? ]
-        inline-accessor
+        [ byte-array inline-store-memory? ] inline-accessor
     ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
 : enable-simd ( -- )

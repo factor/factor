@@ -13,19 +13,19 @@ IN: compiler.cfg.intrinsics.alien
         [ second class>> c-ptr class<= ]
     } 1&& ;
 
-: emit-<displaced-alien> ( node -- )
+: emit-<displaced-alien> ( block node -- block' )
     dup emit-<displaced-alien>? [
         '[
             _ node-input-infos second class>>
             ^^box-displaced-alien
         ] binary-op
-    ] [ basic-block get swap emit-primitive drop ] if ;
+    ] [ emit-primitive ] if ;
 
-:: inline-accessor ( node quot test -- )
-    node node-input-infos :> infos
+:: inline-accessor ( block #call quot test -- block' )
+    #call node-input-infos :> infos
     infos test call
-    [ infos quot call ]
-    [ node basic-block get swap emit-primitive drop ] if ; inline
+    [ infos quot call block ]
+    [ block #call emit-primitive ] if ; inline
 
 : inline-load-memory? ( infos -- ? )
     [ first class>> c-ptr class<= ]
@@ -38,15 +38,15 @@ IN: compiler.cfg.intrinsics.alien
 : prepare-load-memory ( infos -- base offset )
     [ 2inputs ] dip first prepare-accessor ;
 
-: (emit-load-memory) ( node rep c-type quot -- )
+: (emit-load-memory) ( block node rep c-type quot -- block' )
     '[ prepare-load-memory _ _ ^^load-memory-imm @ ds-push ]
     [ inline-load-memory? ]
     inline-accessor ; inline
 
-: emit-load-memory ( node rep c-type -- )
+: emit-load-memory ( block node rep c-type -- block' )
     [ ] (emit-load-memory) ;
 
-: emit-alien-cell ( node -- )
+: emit-alien-cell ( block node -- block' )
     int-rep f [ ^^box-alien ] (emit-load-memory) ;
 
 : inline-store-memory? ( infos class -- ? )
@@ -58,14 +58,14 @@ IN: compiler.cfg.intrinsics.alien
 : prepare-store-memory ( infos -- value base offset )
     [ 3inputs ] dip second prepare-accessor ;
 
-:: (emit-store-memory) ( node rep c-type prepare-quot test-quot -- )
-    node
+:: (emit-store-memory) ( block node rep c-type prepare-quot test-quot -- block' )
+    block node
     [ prepare-quot call rep c-type ##store-memory-imm, ]
     [ test-quot call inline-store-memory? ]
     inline-accessor ; inline
 
-:: emit-store-memory ( node rep c-type -- )
-    node rep c-type
+:: emit-store-memory ( block node rep c-type -- block' )
+    block node rep c-type
     [ prepare-store-memory ]
     [
         rep {
@@ -76,7 +76,7 @@ IN: compiler.cfg.intrinsics.alien
     ]
     (emit-store-memory) ;
 
-: emit-set-alien-cell ( node -- )
+: emit-set-alien-cell ( block node -- block' )
     int-rep f
     [
         [ first class>> ] [ prepare-store-memory ] bi
