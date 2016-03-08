@@ -7,7 +7,7 @@ QUALIFIED: assocs
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )
-    1 100 [a,b] 1 [ + ] accumulate nip [ number>string ] map ;
+    0 100 [a,b) 1 [ + ] accumulate* [ number>string ] map ;
 
 :: add-delete-mix ( hash keys -- )
     keys [| k |

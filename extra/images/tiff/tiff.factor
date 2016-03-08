@@ -473,7 +473,7 @@ ERROR: unhandled-compression compression ;
     [ * ] keep
     '[
         _ group
-        [ _ group unclip [ v+ ] accumulate swap suffix concat ] map
+        [ _ [ group ] [ 0 <array> ] bi [ v+ ] accumulate* concat ] map
         B{ } concat-as
     ] change-bitmap ;
 

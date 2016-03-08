@@ -340,29 +340,26 @@ ALIAS: std sample-std
 
 : sample-corr ( x-seq y-seq -- corr ) 1 corr-ddof ; inline
 
-: cum-map ( seq identity quot: ( prev elt -- next ) -- seq' )
-    swapd [ dup ] compose map nip ; inline
-
 : cum-sum ( seq -- seq' )
-    0 [ + ] cum-map ;
+    0 [ + ] accumulate* ;
 
 : cum-sum0 ( seq -- seq' )
     0 [ + ] accumulate nip ;
 
 : cum-product ( seq -- seq' )
-    1 [ * ] cum-map ;
+    1 [ * ] accumulate* ;
 
 : cum-mean ( seq -- seq' )
     0 swap [ [ + dup ] dip 1 + / ] map-index nip ;
 
 : cum-count ( seq quot -- seq' )
-    [ 0 ] dip '[ _ call [ 1 + ] when ] cum-map ; inline
+    [ 0 ] dip '[ _ call [ 1 + ] when ] accumulate* ; inline
 
 : cum-min ( seq -- seq' )
-    dup ?first [ min ] cum-map ;
+    dup ?first [ min ] accumulate* ;
 
 : cum-max ( seq -- seq' )
-    dup ?first [ max ] cum-map ;
+    dup ?first [ max ] accumulate* ;
 
 : entropy ( probabilities -- n )
     dup sum '[ _ / dup log * ] map-sum neg ;
