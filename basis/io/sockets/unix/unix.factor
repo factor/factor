@@ -162,7 +162,7 @@ M: unix (receive-unsafe)
     ] when ; inline recursive
 
 M: unix (send)
-    [ make-sockaddr/size ] [ [ handle>> ] keep ] bi* do-send ;
+    [ make-sockaddr/size-outgoing ] [ [ handle>> ] keep ] bi* do-send ;
 
 ! Unix domain sockets
 M: local protocol-family drop PF_UNIX ;
