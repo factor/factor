@@ -254,7 +254,7 @@ SYMBOL: foo
 ! emit-branch
 { 77 } [
     { T{ #call { word + } } }
-    V{ } 77 insns>block dup basic-block set
+    V{ } 77 insns>block
     emit-branch
     first predecessors>>
     first predecessors>>
@@ -377,9 +377,7 @@ SYMBOL: foo
         T{ ##return }
     }
 } [
-    [
-        <basic-block> dup set-basic-block end-word
-    ] V{ } make drop instructions>>
+    <basic-block> dup set-basic-block end-word instructions>>
 ] unit-test
 
 

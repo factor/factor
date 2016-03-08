@@ -5,22 +5,21 @@ IN: compiler.cfg.builder.blocks
 <<
 STRING: ex-emit-trivial-block
 USING: compiler.cfg.builder.blocks make prettyprint ;
-<basic-block> set-basic-block [ [ gensym ##call, ] emit-trivial-block ] { } make drop basic-block get .
+begin-stack-analysis <basic-block> dup set-basic-block [ gensym ##call, drop ] emit-trivial-block predecessors>> first .
 T{ basic-block
-    { id 2040412 }
+    { instructions
+        V{ T{ ##call { word ( gensym ) } } T{ ##branch } }
+    }
     { successors
         V{
+            T{ basic-block { predecessors V{ ~circularity~ } } }
+        }
+    }
+    { predecessors
+        V{
             T{ basic-block
-                { id 2040413 }
-                { instructions
-                    V{
-                        T{ ##call { word ( gensym ) } }
-                        T{ ##branch }
-                    }
-                }
-                { successors
-                    V{ T{ basic-block { id 2040414 } } }
-                }
+                { instructions V{ T{ ##branch } } }
+                { successors V{ ~circularity~ } }
             }
         }
     }
