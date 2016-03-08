@@ -55,8 +55,13 @@ ERROR: mysql-connect-fail string mysql ;
         [ cell swap <displaced-alien> ] bi swap
     ] replicate nip ;
 
-: mysql-query ( mysql query -- result )
+! returns a result or f
+: mysql-query ( mysql query -- result/f )
     dupd mysql_query dupd mysql-check-result mysql_store_result ;
+
+! Throws if fails
+: mysql-command ( mysql query -- )
+    dupd mysql_query mysql-check-result ;
 
 : mysql-reset-statement ( statement -- )
     handle>> dup mysql_stmt_reset mysql-stmt-check-result ;
