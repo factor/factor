@@ -328,7 +328,7 @@ M: TXT rdata>byte-array
     [
         10 seconds over set-timeout
         [ send ] [ receive drop ] bi
-    ] with-random-local-datagram ;
+    ] with-any-port-local-datagram ;
 
 : <dns-inet4> ( -- inet4 )
     dns-servers get random 53 <inet4> ;

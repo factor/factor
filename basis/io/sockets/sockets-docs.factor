@@ -251,13 +251,13 @@ HELP: broadcast-once
 }
 { $description "Broadcasts a packet one time to the address and closes the sending broadcast port." } ;
 
-HELP: with-random-local-broadcast
+HELP: with-any-port-local-broadcast
 { $values
     { "quot" quotation }
 }
 { $description "Creates a broadcast datagram socket and calls the quotation with this datagram on top of the stack, cleaning up afterwards." } ;
 
-HELP: with-random-local-datagram
+HELP: with-any-port-local-datagram
 { $values
     { "quot" quotation }
 }
