@@ -4,7 +4,7 @@ alien.syntax combinators io.sockets.secure system unix.types ;
 IN: libtls.ffi
 
 << "libtls" {
-    { [ os windows? ] [ "libtls.dll" ] }
+    { [ os windows? ] [ "libtls-10.dll" ] }
     { [ os macosx? ] [ "libtls.dylib" ] }
     { [ os unix? ] [ "libtls.so" ] }
 } cond cdecl add-library >>

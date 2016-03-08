@@ -9,7 +9,7 @@ sequences system words ;
 IN: openssl.libssl
 
 << "libssl" {
-    { [ os windows? ] [ "ssleay32.dll" ] }
+    { [ os windows? ] [ "libssl-38.dll" ] }
     { [ os macosx? ] [ "libssl.dylib" ] }
     { [ os unix? ] [ "libssl.so" ] }
 } cond cdecl add-library >>
