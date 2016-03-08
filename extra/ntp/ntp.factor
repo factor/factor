@@ -106,7 +106,7 @@ PRIVATE>
     123 <inet> resolve-host
     [ inet4? ] filter random [
         [ REQUEST ] 2dip [ send ] [ receive drop ] bi (ntp)
-    ] with-random-local-datagram ;
+    ] with-any-port-local-datagram ;
 
 : default-ntp ( -- ntp )
     "pool.ntp.org" <ntp> ;

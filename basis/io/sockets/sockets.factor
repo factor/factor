@@ -29,6 +29,8 @@ GENERIC: sockaddr-size ( addrspec -- n )
 
 GENERIC: make-sockaddr ( addrspec -- sockaddr )
 
+GENERIC: make-sockaddr-outgoing ( addrspec -- sockaddr )
+
 GENERIC: empty-sockaddr ( addrspec -- sockaddr )
 
 GENERIC: address-size ( addrspec -- n )
@@ -36,6 +38,9 @@ GENERIC: address-size ( addrspec -- n )
 GENERIC: inet-ntop ( data addrspec -- str )
 
 GENERIC: inet-pton ( str addrspec -- data )
+
+: make-sockaddr/size-outgoing ( addrspec -- sockaddr size )
+    [ make-sockaddr-outgoing ] [ sockaddr-size ] bi ;
 
 : make-sockaddr/size ( addrspec -- sockaddr size )
     [ make-sockaddr ] [ sockaddr-size ] bi ;
@@ -96,13 +101,21 @@ M: ipv4 sockaddr-size drop sockaddr-in heap-size ;
 
 M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
 
-M: ipv4 make-sockaddr ( inet -- sockaddr )
+: make-sockaddr-part ( inet -- sockaddr )
     sockaddr-in <struct>
         AF_INET >>family
         swap
-        [ port>> htons >>port ]
-        [ host>> "0.0.0.0" or ]
-        [ inet-pton uint deref >>addr ] tri ;
+        port>> htons >>port ; inline
+
+M: ipv4 make-sockaddr ( inet -- sockaddr )
+    [ make-sockaddr-part ]
+    [ host>> "0.0.0.0" or ]
+    [ inet-pton uint deref >>addr ] tri ;
+
+M: ipv4 make-sockaddr-outgoing ( inet -- sockaddr )
+    [ make-sockaddr-part ]
+    [ host>> dup { f "0.0.0.0" } member? [ drop "127.0.0.1" ] when ]
+    [ inet-pton uint deref >>addr ] tri ;
 
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
     [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
@@ -160,14 +173,23 @@ M: ipv6 sockaddr-size drop sockaddr-in6 heap-size ;
 
 M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
 
-M: ipv6 make-sockaddr ( inet -- sockaddr )
+: make-sockaddr-in6-part ( inet -- sockaddr )
     sockaddr-in6 <struct>
         AF_INET6 >>family
         swap
-        [ port>> htons >>port ]
-        [ [ host>> "::" or ] keep inet-pton >>addr ]
-        [ scope-id>> >>scopeid ]
-        tri ;
+        port>> htons >>port ; inline
+
+M: ipv6 make-sockaddr ( inet -- sockaddr )
+    [ make-sockaddr-in6-part ]
+    [ [ host>> "::" or ] keep inet-pton >>addr ]
+    [ scope-id>> >>scopeid ]
+    tri ;
+
+M: ipv6 make-sockaddr-outgoing ( inet -- sockaddr )
+    [ make-sockaddr-in6-part ]
+    [ [ host>> dup { f "::" } member? [ drop "::1" ] when ] keep inet-pton >>addr ]
+    [ scope-id>> >>scopeid ]
+    tri ;
 
 M: ipv6 parse-sockaddr
     [ [ addr>> ] dip inet-ntop ] [ drop scopeid>> ] 2bi
@@ -435,29 +457,30 @@ M: invalid-local-address summary
 : protocol-port ( protocol -- port )
     [ f getservbyname [ port>> htons ] [ f ] if* ] [ f ] if* ;
 
+: <any-port-local-inet4> ( -- inet4 ) f 0 <inet4> ;
+: <any-port-local-inet6> ( -- inet6 ) f 0 <inet6> ;
 
-GENERIC: <random-local-inet> ( inet -- inet4 )
-M: inet4 <random-local-inet> drop f 0 <inet4> ;
-M: inet <random-local-inet> drop resolve-localhost random ;
-M: inet6 <random-local-inet> drop f 0 <inet6> ;
+GENERIC: <any-port-local-inet> ( inet -- inet4 )
+M: inet4 <any-port-local-inet> drop <any-port-local-inet4> ;
+M: inet6 <any-port-local-inet> drop f 0 <inet6> ;
 
-: <random-local-datagram> ( inet -- datagram )
-    <random-local-inet> <datagram> ;
+: <any-port-local-datagram> ( inet -- datagram )
+    <any-port-local-inet> <datagram> ;
 
-: <random-local-broadcast> ( inet -- datagram )
-    <random-local-inet> <broadcast> ;
+: <any-port-local-broadcast> ( inet -- datagram )
+    <any-port-local-inet> <broadcast> ;
 
-: with-random-local-datagram ( quot -- )
-    [ dup <random-local-datagram> ] dip with-disposal ; inline
+: with-any-port-local-datagram ( quot -- )
+    [ dup <any-port-local-datagram> ] dip with-disposal ; inline
 
-: with-random-local-broadcast ( quot -- )
-    [ dup <random-local-broadcast> ] dip with-disposal ; inline
+: with-any-port-local-broadcast ( quot -- )
+    [ dup <any-port-local-broadcast> ] dip with-disposal ; inline
 
 : send-once ( bytes addrspec -- )
-    [ send ] with-random-local-datagram ;
+    [ send ] with-any-port-local-datagram ;
 
 : broadcast-once ( bytes addrspec -- )
-    [ send ] with-random-local-broadcast ;
+    [ send ] with-any-port-local-broadcast ;
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }

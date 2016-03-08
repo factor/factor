@@ -152,7 +152,7 @@ TUPLE: ConnectEx-args port
     winsock-error ; inline
 
 M: object establish-connection ( client-out remote -- )
-    make-sockaddr/size <ConnectEx-args>
+    make-sockaddr/size-outgoing <ConnectEx-args>
         swap >>port
         dup port>> handle>> handle>> >>s
         dup s>> get-ConnectEx-ptr >>ptr
@@ -292,7 +292,7 @@ TUPLE: WSASendTo-args port
     WSASendTo-args new
         swap >>port
         dup port>> handle>> handle>> >>s
-        swap make-sockaddr/size
+        swap make-sockaddr/size-outgoing
             [ malloc-byte-array &free ] dip
             [ >>lpTo ] [ >>iToLen ] bi*
         swap make-send-buffer >>lpBuffers
