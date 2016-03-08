@@ -317,31 +317,67 @@ HELP: accumulate-as
 { $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "exemplar" sequence } { "final" "the final result" } { "newseq" "a new sequence" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of the same type as " { $snippet "exemplar" } " containing intermediate results, together with the final result."
 $nl
-"The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
+"The first element of the output sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } " and the first element of the input sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the next element of the input sequence."
 $nl
-"When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." } ;
+"When given the empty sequence, outputs a new empty sequence together with the " { $snippet "identity" } "." } ;
 
 HELP: accumulate
-{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "final" "the final result" } { "newseq" "a new array" } }
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "final" "the final result" } { "newseq" "a new sequence" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of intermediate results, together with the final result."
 $nl
-"The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
+"The first element of the output sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } " and the first element of the input sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the next element of the input sequence."
 $nl
-"When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
+"When given the empty sequence, outputs a new empty sequence together with the " { $snippet "identity" } "." }
 { $examples
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 }\n10" }
 } ;
 
 HELP: accumulate!
-{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "final" "the final result" } }
+{ $values { "seq" "a mutable sequence" } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "final" "the final result" } }
 { $description "Combines successive elements of the sequence using a binary operation, and outputs the original sequence of intermediate results, together with the final result."
 $nl
 "The first element of the new sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", and the first element of the old sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the corresponding element of the old sequence."
 $nl
-"When given the empty sequence, outputs an empty sequence together with the " { $snippet "identity" } "." }
+"When given the empty sequence, outputs the same empty sequence together with the " { $snippet "identity" } "." }
+{ $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
+{ $side-effects "seq" }
 { $examples
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate! . ." "{ 0 2 4 6 8 }\n10" }
 } ;
+
+HELP: accumulate*-as
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "exemplar" sequence } { "newseq" "a new sequence" } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of the same type as " { $snippet "exemplar" } " containing all results."
+$nl
+"On the first iteration, the two inputs to the quotation are " { $snippet "identity" } " and the first element of the input sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the next element of the input sequence."
+$nl
+"When given the empty sequence, outputs a new empty sequence" } ;
+
+HELP: accumulate*
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "newseq" sequence } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs a sequence of all results."
+$nl
+"On the first iteration, the two inputs to the quotation are " { $snippet "identity" } " and the first element of the input sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the next element of the input sequence."
+$nl
+"When given the empty sequence, outputs a new empty sequence." }
+{ $examples
+    { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate* ." "{ 2 4 6 8 10 }" }
+} ;
+
+HELP: accumulate*!
+{ $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } }
+{ $description "Combines successive elements of the sequence using a binary operation, and outputs the original sequence of all results."
+$nl
+"On the first iteration, the two inputs to the quotation are " { $snippet "identity" } " and the first element of the input sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the next element of the input sequence."
+$nl
+"When given the empty sequence, outputs the same empty sequence." }
+{ $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
+{ $side-effects "seq" }
+{ $examples
+    { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate*! ." "{ 2 4 6 8 10 }" }
+} ;
+
+{ accumulate accumulate! accumulate-as accumulate* accumulate*! accumulate*-as } related-words
 
 HELP: map
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... newelt ) } } { "newseq" "a new sequence" } }
@@ -1745,6 +1781,8 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     accumulate
     accumulate-as
     accumulate!
+    accumulate*
+    accumulate*-as
     produce
     produce-as
 }
@@ -1834,10 +1872,11 @@ ARTICLE: "sequences-destructive" "Destructive sequence operations"
     { { $link reverse } { $link reverse! } }
     { { $link append } { $link append! } }
     { { $link map } { $link map! } }
+    { { $link accumulate* } { $link accumulate*! } }
     { { $link filter } { $link filter! } }
 }
 "Changing elements:"
-{ $subsections map! change-nth }
+{ $subsections map! accumulate*! change-nth }
 "Deleting elements:"
 { $subsections
     remove!

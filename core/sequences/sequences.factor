@@ -442,6 +442,9 @@ PRIVATE>
 : (accumulate) ( seq identity quot -- identity seq quot )
     swapd [ curry keep ] curry ; inline
 
+: (accumulate*) ( seq identity quot -- identity seq quot )
+    swapd [ dup ] compose ; inline
+
 PRIVATE>
 
 : each ( ... seq quot: ( ... x -- ... ) -- ... )
@@ -479,6 +482,15 @@ PRIVATE>
 
 : accumulate! ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... final seq )
     (accumulate) map! ; inline
+
+: accumulate*-as ( ... seq identity quot: ( ... prev elt -- ... next ) exemplar -- ... newseq )
+    [ (accumulate*) ] dip map-as nip ; inline
+
+: accumulate* ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... newseq )
+    pick accumulate*-as ; inline
+
+: accumulate*! ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... seq )
+    (accumulate*) map! nip ; inline
 
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     (2each) each-integer ; inline

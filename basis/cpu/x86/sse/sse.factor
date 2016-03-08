@@ -57,7 +57,7 @@ M: vector-rep copy-register* drop MOVDQA ;
 MACRO: available-reps ( alist -- quot )
     ! Each SSE version adds new representations and supports
     ! all old ones
-    unzip { } [ append ] accumulate rest swap suffix
+    unzip { } [ append ] accumulate*
     [ [ 1quotation ] map ] bi@ zip
     reverse [ { } ] suffix
     '[ _ cond ] ;
