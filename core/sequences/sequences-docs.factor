@@ -319,7 +319,8 @@ HELP: accumulate-as
 $nl
 "The first element of the output sequence is " { $snippet "identity" } ". Then, on the first iteration, the two inputs to the quotation are " { $snippet "identity" } " and the first element of the input sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the next element of the input sequence."
 $nl
-"When given the empty sequence, outputs a new empty sequence together with the " { $snippet "identity" } "." } ;
+"When given the empty sequence, outputs a new empty sequence together with the " { $snippet "identity" } "." }
+{ $notes "May be named " { $snippet "scan" } " or " { $snippet "prefix sum" } " in other languages." } ;
 
 HELP: accumulate
 { $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "final" "the final result" } { "newseq" "a new sequence" } }
@@ -330,7 +331,8 @@ $nl
 "When given the empty sequence, outputs a new empty sequence together with the " { $snippet "identity" } "." }
 { $examples
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate . ." "{ 0 2 4 6 8 }\n10" }
-} ;
+}
+{ $notes "May be named " { $snippet "scan" } " or " { $snippet "prefix sum" } " in other languages." } ;
 
 HELP: accumulate!
 { $values { "seq" "a mutable sequence" } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "final" "the final result" } }
@@ -343,7 +345,8 @@ $nl
 { $side-effects "seq" }
 { $examples
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate! . ." "{ 0 2 4 6 8 }\n10" }
-} ;
+}
+{ $notes "May be named " { $snippet "scan" } " or " { $snippet "prefix sum" } " in other languages." } ;
 
 HELP: accumulate*-as
 { $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "exemplar" sequence } { "newseq" "a new sequence" } }
@@ -351,7 +354,8 @@ HELP: accumulate*-as
 $nl
 "On the first iteration, the two inputs to the quotation are " { $snippet "identity" } " and the first element of the input sequence. On successive iterations, the first input is the result of the previous iteration, and the second input is the next element of the input sequence."
 $nl
-"When given the empty sequence, outputs a new empty sequence" } ;
+"When given the empty sequence, outputs a new empty sequence" }
+{ $notes "May be named " { $snippet "scan" } " or " { $snippet "prefix sum" } " in other languages." } ;
 
 HELP: accumulate*
 { $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "newseq" sequence } }
@@ -362,7 +366,8 @@ $nl
 "When given the empty sequence, outputs a new empty sequence." }
 { $examples
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate* ." "{ 2 4 6 8 10 }" }
-} ;
+}
+{ $notes "May be named " { $snippet "scan" } " or " { $snippet "prefix sum" } " in other languages." } ;
 
 HELP: accumulate*!
 { $values { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } }
@@ -375,7 +380,8 @@ $nl
 { $side-effects "seq" }
 { $examples
     { $example "USING: math prettyprint sequences ;" "{ 2 2 2 2 2 } 0 [ + ] accumulate*! ." "{ 2 4 6 8 10 }" }
-} ;
+}
+{ $notes "May be named " { $snippet "scan" } " or " { $snippet "prefix sum" } " in other languages." } ;
 
 { accumulate accumulate! accumulate-as accumulate* accumulate*! accumulate*-as } related-words
 
@@ -423,7 +429,7 @@ HELP: map-index-as
     }
 } ;
 
-{ map-index map-index-as } related-words
+{ map map! map-as map-index map-index-as } related-words
 
 HELP: change-nth
 { $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" { $quotation ( ..a elt -- ..b newelt ) } } }
@@ -556,8 +562,6 @@ HELP: filter!
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
-{ filter filter-as filter! } related-words
-
 HELP: reject
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence removing with the elements of the original sequence for which the quotation output a true value." } ;
@@ -570,8 +574,6 @@ HELP: reject!
 { $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a true value." }
 { $side-effects "seq" } ;
-
-{ reject reject-as reject! } related-words
 
 HELP: interleave
 { $values { "seq" sequence } { "between" quotation } { "quot" { $quotation ( ... elt -- ... ) } } }
@@ -1334,7 +1336,7 @@ HELP: harvest
     }
 } ;
 
-{ filter filter! sift harvest } related-words
+{ filter filter-as filter! reject reject-as reject! sift harvest } related-words
 
 HELP: set-first
 { $values
@@ -1768,8 +1770,6 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     each-index
     reduce
     interleave
-    replicate
-    replicate-as
 }
 "Mapping:"
 { $subsections
@@ -1780,17 +1780,21 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     map-reduce
     accumulate
     accumulate-as
-    accumulate!
     accumulate*
     accumulate*-as
-    produce
-    produce-as
 }
 "Filtering:"
 { $subsections
     filter
     filter-as
     partition
+}
+"Generating:"
+{ $subsections
+    replicate
+    replicate-as
+    produce
+    produce-as
 }
 "Testing if a sequence contains elements satisfying a predicate:"
 { $subsections
@@ -1872,11 +1876,12 @@ ARTICLE: "sequences-destructive" "Destructive sequence operations"
     { { $link reverse } { $link reverse! } }
     { { $link append } { $link append! } }
     { { $link map } { $link map! } }
+    { { $link accumulate } { $link accumulate! } }
     { { $link accumulate* } { $link accumulate*! } }
     { { $link filter } { $link filter! } }
 }
 "Changing elements:"
-{ $subsections map! accumulate*! change-nth }
+{ $subsections map! accumulate! accumulate*! change-nth }
 "Deleting elements:"
 { $subsections
     remove!
