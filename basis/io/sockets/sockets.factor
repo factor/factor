@@ -48,6 +48,8 @@ GENERIC: inet-pton ( str addrspec -- data )
 : empty-sockaddr/size ( addrspec -- sockaddr size )
     [ empty-sockaddr ] [ sockaddr-size ] bi ;
 
+M: object make-sockaddr-outgoing make-sockaddr ;
+
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
 M: f parse-sockaddr nip ;
