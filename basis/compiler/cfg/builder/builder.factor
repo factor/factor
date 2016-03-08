@@ -54,9 +54,6 @@ GENERIC: emit-node ( block node -- block' )
     ##safepoint, ##branch,
     [ swap connect-bbs ] [ end-basic-block ] bi ;
 
-: emit-trivial-call ( block word height -- block' )
-    rot [ emit-call-block ] emit-trivial-block ;
-
 : emit-call ( block word height -- block' )
     over loops get at [
         2nip swap emit-loop-call f
@@ -127,7 +124,7 @@ M: #dispatch emit-node ( block node -- block' )
 
 M: #call emit-node ( block node -- block' )
     dup word>> dup "intrinsic" word-prop [
-        nip call( node -- ) drop basic-block get
+        nip call( block #call -- block' )
     ] [ swap call-height emit-call ] if* ;
 
 M: #call-recursive emit-node ( block node -- block' )

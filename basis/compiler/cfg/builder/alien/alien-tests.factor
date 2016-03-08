@@ -1,9 +1,9 @@
 USING: accessors alien alien.c-types compiler.cfg compiler.cfg.builder
-compiler.cfg.builder.alien compiler.cfg.instructions
-compiler.cfg.registers compiler.test compiler.tree.builder
-compiler.tree.optimizer cpu.architecture cpu.x86.assembler
-cpu.x86.assembler.operands kernel make namespaces sequences system
-tools.test words ;
+compiler.cfg.builder.alien compiler.cfg.builder.blocks
+compiler.cfg.instructions compiler.cfg.registers compiler.test
+compiler.tree.builder compiler.tree.optimizer cpu.architecture
+cpu.x86.assembler cpu.x86.assembler.operands kernel make namespaces
+sequences system tools.test words ;
 IN: compiler.cfg.builder.alien.tests
 
 ! unboxing ints is only needed on 32bit archs
@@ -35,7 +35,7 @@ cpu x86.32?
     ] alien-assembly ;
 
 { t } [
-    <basic-block> dup basic-block set dup
+    <basic-block> dup set-basic-block dup
     \ dummy-assembly build-tree optimize-tree first
     [ emit-node ] V{ } make drop eq?
 ] unit-test
@@ -58,7 +58,7 @@ cpu x86.32?
         T{ ##branch }
     }
 } [
-    basic-block get
+    <basic-block> dup set-basic-block
     \ dummy-callback build-tree optimize-tree 3 swap nth child>>
     [ emit-callback-body drop ] V{ } make
 ] cfg-unit-test

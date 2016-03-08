@@ -35,9 +35,11 @@ IN: compiler.cfg.builder.blocks
 : emit-call-block ( word height block -- )
     make-kill-block adjust-d ##call, ;
 
-: emit-primitive ( block node -- block' )
-    [ word>> ] [ call-height ] bi rot
-    [ emit-call-block ] emit-trivial-block ;
+: emit-trivial-call ( block word height -- block' )
+    rot [ emit-call-block ] emit-trivial-block ;
+
+: emit-primitive ( block #call -- block' )
+    [ word>> ] [ call-height ] bi emit-trivial-call ;
 
 : begin-branch ( block -- block' )
     height-state [ clone-height-state ] change (begin-basic-block) ;

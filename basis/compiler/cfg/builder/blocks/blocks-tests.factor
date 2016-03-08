@@ -29,8 +29,8 @@ IN: compiler.cfg.builder.blocks.tests
 ] cfg-unit-test
 
 ! end-basic-block
-{ f } [
-    f end-basic-block basic-block get
+{ } [
+    <basic-block> dup set-basic-block ##branch, end-basic-block
 ] unit-test
 
 ! make-kill-block

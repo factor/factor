@@ -30,14 +30,14 @@ IN: compiler.cfg.intrinsics.slots
 : immediate-slot-offset? ( object -- ? )
     { [ fixnum? ] [ cell * immediate-arithmetic? ] } 1&& ;
 
-: emit-slot ( node -- )
+: emit-slot ( block node -- block' )
     dup node-input-infos
     dup first value-tag [
         nip
         dup second literal>> immediate-slot-offset?
         [ (emit-slot-imm) ] [ (emit-slot) ] if
         ds-push
-    ] [ drop basic-block get swap emit-primitive drop ] if ;
+    ] [ drop emit-primitive ] if ;
 
 :: (emit-set-slot-imm) ( write-barrier? tag slot -- )
     ds-drop
@@ -68,7 +68,7 @@ IN: compiler.cfg.intrinsics.slots
         (emit-set-slot-imm)
     ] [ drop (emit-set-slot) ] if ;
 
-: emit-set-slot ( node -- )
+: emit-set-slot ( block #call -- block' )
     dup node>set-slot-data over [
         emit-intrinsic-set-slot drop
-    ] [ 3drop basic-block get swap emit-primitive drop ] if ;
+    ] [ 3drop emit-primitive ] if ;

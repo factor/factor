@@ -271,17 +271,10 @@ SYMBOL: foo
 ] cfg-unit-test
 
 ! emit-loop-call
-{ 1 } [
-    V{ } 0 insns>block basic-block set init-cfg-test
-    V{ } 1 insns>block [ basic-block get emit-loop-call ] V{ } make drop
-    basic-block get successors>> length
-] unit-test
-
-{ "bar" } [
-    V{ } "foo" insns>block basic-block set
-    init-cfg-test
-    [ V{ } "bar" insns>block basic-block get emit-loop-call ] V{ } make drop
-    basic-block get successors>> first number>>
+{ 1 "good" } [
+    V{ } 0 insns>block dup set-basic-block
+    V{ } "good" insns>block swap [ emit-loop-call ] keep
+    [ successors>> length ] [ successors>> first number>> ] bi
 ] unit-test
 
 ! emit-node
@@ -342,8 +335,8 @@ SYMBOL: foo
 {
     V{ T{ ##call { word set-slot } } T{ ##branch } }
 } [
-    [ f call-node-1 emit-node drop ] V{ } make drop
-    basic-block get successors>> first instructions>>
+    [ f call-node-1 emit-node ] V{ } make drop
+    predecessors>> first instructions>>
 ] cfg-unit-test
 
 ! ! #push
@@ -372,7 +365,7 @@ SYMBOL: foo
 ! ! #terminate
 
 { f } [
-    basic-block get dup set-basic-block
+    <basic-block> dup set-basic-block
     T{ #terminate { in-d { } } { in-r { } } } emit-node
 ] cfg-unit-test
 

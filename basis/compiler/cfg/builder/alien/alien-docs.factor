@@ -35,11 +35,15 @@ HELP: check-dlsym
 { $description "Checks that a symbol with the given name exists in the given library. Throws an error if not." } ;
 
 HELP: emit-callback-body
-{ $values { "params" alien-node-params } }
+{ $values
+  { "block" basic-block }
+  { "nodes" alien-node-params }
+  { "block'" basic-block }
+}
 { $description "Emits the nodes that forms the body of the alien callback." } ;
 
 HELP: emit-callback-return
-{ $values { "params" alien-node-params } { "block" basic-block } }
+{ $values { "block" basic-block } { "params" alien-node-params } }
 { $description "Emits a " { $link ##callback-outputs } " instruction for the " { $link #alien-callback } " if needed." } ;
 
 HELP: unbox-parameters

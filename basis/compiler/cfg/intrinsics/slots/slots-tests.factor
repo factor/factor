@@ -1,7 +1,7 @@
-USING: accessors arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.intrinsics.slots compiler.test compiler.tree
-compiler.tree.propagation.info kernel layouts literals make math
-math.intervals namespaces sequences slots.private tools.test ;
+USING: accessors arrays compiler.cfg compiler.cfg.builder.blocks
+compiler.cfg.instructions compiler.cfg.intrinsics.slots compiler.test
+compiler.tree compiler.tree.propagation.info kernel layouts literals
+make math math.intervals sequences slots.private tools.test ;
 IN: compiler.cfg.intrinsics.slots.tests
 
 : call-node-1 ( -- node )
@@ -111,8 +111,9 @@ IN: compiler.cfg.intrinsics.slots.tests
 {
     V{ T{ ##call { word set-slot } } T{ ##branch } }
 } [
+    <basic-block> dup set-basic-block
     call-node-1 [ emit-set-slot ] V{ } make drop
-    basic-block get successors>> first instructions>>
+    predecessors>> first instructions>>
 ] cfg-unit-test
 
 {

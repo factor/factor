@@ -128,7 +128,6 @@ HELP: with-cfg-builder
 
 ARTICLE: "compiler.cfg.builder"
 "Final stage of compilation generates machine code from dataflow IR"
-$nl
 "The compiler first builds an SSA IR tree of the word to be compiled (see " { $vocab-link "compiler.tree.builder" } ") then this vocab converts it to a CFG IR tree. The result is not in SSA form; this is constructed later by calling compiler.cfg.ssa.construction:construct-ssa."
 $nl
 "Main word:"
@@ -148,7 +147,6 @@ $nl
 { $subsections
   emit-call
   emit-loop-call
-  emit-trivial-call
 }
 "Emitters for " { $link #dispatch } " and " { $link #if } ":"
 { $subsections
