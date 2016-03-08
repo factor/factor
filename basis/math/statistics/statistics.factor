@@ -349,6 +349,9 @@ ALIAS: std sample-std
 : cum-product ( seq -- seq' )
     1 [ * ] accumulate* ;
 
+: cum-product1 ( seq -- seq' )
+    1 [ * ] accumulate nip ;
+
 : cum-mean ( seq -- seq' )
     0 swap [ [ + dup ] dip 1 + / ] map-index nip ;
 
