@@ -94,6 +94,12 @@ in another window."
   (interactive)
   (fuel-autohelp-mode 1))
 
+(defun turn-off-fuel-autohelp-mode ()
+  "Unequivocally turn on FUEL's Autohelp mode (see command
+`fuel-autohelp-mode')."
+  (interactive)
+  (fuel-autohelp-mode 0))
+
 
 (provide 'fuel-autohelp)
 
