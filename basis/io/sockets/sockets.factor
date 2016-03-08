@@ -8,7 +8,7 @@ grouping init io.backend io.binary io.encodings.ascii
 io.encodings.binary io.pathnames io.ports io.streams.duplex
 kernel locals math math.parser memoize namespaces present
 sequences sequences.private splitting strings summary system
-vocabs vocabs.parser ip-parser ip-parser.private ;
+vocabs vocabs.parser ip-parser ip-parser.private random ;
 IN: io.sockets
 
 << {
@@ -111,8 +111,6 @@ TUPLE: inet4 < ipv4 { port integer read-only } ;
 
 : <inet4> ( host port -- inet4 )
     over check-ipv4 inet4 boa ;
-
-: <random-local-inet4> ( -- inet4 ) f 0 <inet4> ;
 
 M: ipv4 with-port [ host>> ] dip <inet4> ;
 
@@ -357,24 +355,6 @@ CONSTANT: datagram-size 65536
 : send ( bytes addrspec datagram -- )
     check-send (send) ; inline
 
-: <random-local-datagram> ( -- datagram )
-    <random-local-inet4> <datagram> ;
-
-: <random-local-broadcast> ( -- datagram )
-    <random-local-inet4> <broadcast> ;
-
-: with-random-local-datagram ( quot -- )
-    [ <random-local-datagram> ] dip with-disposal ; inline
-
-: with-random-local-broadcast ( quot -- )
-    [ <random-local-broadcast> ] dip with-disposal ; inline
-
-: send-once ( bytes addrspec -- )
-    [ send ] with-random-local-datagram ;
-
-: broadcast-once ( bytes addrspec -- )
-    [ send ] with-random-local-broadcast ;
-
 MEMO: ipv6-supported? ( -- ? )
     [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
 
@@ -454,6 +434,30 @@ M: invalid-local-address summary
 
 : protocol-port ( protocol -- port )
     [ f getservbyname [ port>> htons ] [ f ] if* ] [ f ] if* ;
+
+
+GENERIC: <random-local-inet> ( inet -- inet4 )
+M: inet4 <random-local-inet> drop f 0 <inet4> ;
+M: inet <random-local-inet> drop resolve-localhost random ;
+M: inet6 <random-local-inet> drop f 0 <inet6> ;
+
+: <random-local-datagram> ( inet -- datagram )
+    <random-local-inet> <datagram> ;
+
+: <random-local-broadcast> ( inet -- datagram )
+    <random-local-inet> <broadcast> ;
+
+: with-random-local-datagram ( quot -- )
+    [ dup <random-local-datagram> ] dip with-disposal ; inline
+
+: with-random-local-broadcast ( quot -- )
+    [ dup <random-local-broadcast> ] dip with-disposal ; inline
+
+: send-once ( bytes addrspec -- )
+    [ send ] with-random-local-datagram ;
+
+: broadcast-once ( bytes addrspec -- )
+    [ send ] with-random-local-broadcast ;
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
