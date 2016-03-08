@@ -1,7 +1,7 @@
 USING: accessors arrays assocs calendar calendar.format
 combinators continuations destructors formatting fry grouping.extras imap
 imap.private io.streams.duplex kernel math math.parser math.ranges
-math.statistics namespaces random sequences sets sorting uuid
+namespaces random sequences sets sorting uuid
 splitting strings system tools.test memoize combinators.smart ;
 FROM: pcre => findall ;
 IN: imap.tests
@@ -157,7 +157,7 @@ MEMO: my-uuid ( -- str )
 ! A gmail compliant way of creating a folder hierarchy.
 [ ] [
     "foo/bar/baz/boo" test-folder "/" split
-    { } [ suffix ] cum-map [ "/" join ] map
+    { } [ suffix ] accumulate* [ "/" join ] map
     [ [ create-folder ] each ] [ [ delete-folder ] each ] bi
 ] imap-test
 

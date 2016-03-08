@@ -47,7 +47,7 @@ CONSTANT: homo-sapiens
 
 TYPED: make-cumulative ( freq -- chars: byte-array floats: double-array )
     [ keys >byte-array ]
-    [ values c:double >c-array unclip [ + ] accumulate swap suffix ] bi ;
+    [ values c:double >c-array 0.0 [ + ] accumulate* ] bi ;
 
 :: select-random ( seed chars floats -- seed elt )
     seed next-fasta-random floats [ <= ] with find drop chars nth-unsafe ; inline

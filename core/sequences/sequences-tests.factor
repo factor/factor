@@ -34,6 +34,18 @@ IN: sequences.tests
 { t }
 [ { 1 2 3 4 5 6 7 } dup 1 [ * ] accumulate! nip eq? ] unit-test
 
+{ { 1 2 6 24 120 720 5040 } }
+[ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate* ] unit-test
+
+{ B{ 2 4 16 64 } }
+[ B{ 2 2 4 4 } 1 [ * ] accumulate* ] unit-test
+
+{ { 1 2 6 24 120 720 5040 } }
+[ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate*! ] unit-test
+
+{ t }
+[ { 1 2 3 4 5 6 7 } dup 1 [ * ] accumulate*! eq? ] unit-test
+
 { f f } [ [ ] [ ] find ] unit-test
 { 0 1 } [ [ 1 ] [ ] find ] unit-test
 { 1 "world" } [ [ "hello" "world" ] [ "world" = ] find ] unit-test

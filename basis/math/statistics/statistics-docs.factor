@@ -302,10 +302,8 @@ ARTICLE: "histogram" "Computing histograms"
 } ;
 
 ARTICLE: "cumulative" "Computing cumulative sequences"
-"Cumulative mapping combinators:"
-{ $subsections
-    cum-map
-}
+"Cumulative words build on " { $link accumulate } " and " { $link accumulate* } "."
+$nl
 "Cumulative math:"
 { $subsections
     cum-sum
