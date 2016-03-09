@@ -20,7 +20,7 @@ MEMO: visual-studio-code-invocation ( -- array )
     ] unless* ;
 
 M: macosx find-visual-studio-code-invocation
-    { "open" "-n" "-b" "-r" "com.microsoft.VSCode" "--args" } ;
+    { "open" "-b" "com.microsoft.VSCode" "--args" } ;
 
 ERROR: can't-find-visual-studio-code ;
 
