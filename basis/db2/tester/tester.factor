@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.combinators db2 db2.pools db2.types
-fry io io.files.temp kernel math math.parser namespaces
-nested-comments postgresql.db2 prettyprint random sequences
+fry io io.files.temp kernel math math.parser multiline
+namespaces postgresql.db2 prettyprint random sequences
 sqlite.db2 system threads tools.test ;
 IN: db2.tester
 
-(*
+/*
 TUPLE: test-1 id a b c ;
 
 test-1 "TEST1" {
@@ -61,4 +61,4 @@ test-2 "TEST2" {
             ] parallel-each
         ] with-pooled-db
     ] bi ;
-*)
+*/
