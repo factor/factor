@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: constructors db2.connections sequences vocabs vocabs.loader ;
+USING: constructors db2.connections kernel sequences vocabs
+vocabs.loader ;
 IN: sqlite.db2
 
 TUPLE: sqlite-db path ;
