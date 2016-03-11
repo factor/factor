@@ -11,7 +11,7 @@ SHARED_DLL_EXTENSION = .dylib
 SHARED_FLAG = -dynamiclib
 
 ifdef X11
-	LIBS = -lm -framework Cocoa -L/opt/local/lib $(X11_UI_LIBS) -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+	LIBS = -lm -framework Cocoa -L/opt/local/lib -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 else
 	LIBS = -lm -framework Cocoa -framework AppKit
 endif
@@ -36,4 +36,3 @@ ifeq ($(XCODE_4_P),0)
 	CC ?= clang
 	CXX ?= clang++
 endif
-
