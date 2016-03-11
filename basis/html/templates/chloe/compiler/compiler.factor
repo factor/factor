@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces make kernel sequences accessors
 combinators strings splitting io io.streams.string present
-xml.writer xml.data xml.entities html.forms
+sets ascii xml.writer xml.data xml.entities html.forms
 html.templates html.templates.chloe.syntax ;
 IN: html.templates.chloe.compiler
 
@@ -60,6 +60,11 @@ DEFER: compile-element
         "\"" [write]
     ] assoc-each ;
 
+: compile-self-closing-tag ( tag -- )
+    "<" [write]
+    [ name>string [write] ] [ attrs>> compile-attrs ] bi
+    " />" [write] ;
+
 : compile-start-tag ( tag -- )
     "<" [write]
     [ name>string [write] ] [ attrs>> compile-attrs ] bi
@@ -74,17 +79,38 @@ SYMBOL: string-context?
 
 ERROR: tag-not-allowed-here ;
 
+CONSTANT: self-closing-tags {
+        "area"
+        "base"
+        "br"
+        "embed"
+        "hr"
+        "iframe"
+        "img"
+        "input"
+        "link"
+        "meta"
+        "param"
+        "source"
+        "track"
+    }
+
 : check-tag ( -- )
     string-context? get [ tag-not-allowed-here ] when ;
 
-: compile-tag ( tag -- )
-    check-tag
-    {
-        [ main>> tag-stack get push ]
+: (compile-tag) ( tag -- )
+    dup name>string >lower self-closing-tags in?
+    [ compile-self-closing-tag ]
+    [
         [ compile-start-tag ]
         [ compile-children ]
-        [ compile-end-tag ]
-    } cleave
+        [ compile-end-tag ] tri
+    ] if ;
+
+: compile-tag ( tag -- )
+    check-tag
+    [ main>> tag-stack get push ]
+    [ (compile-tag) ] bi
     tag-stack get pop* ;
 
 ERROR: unknown-chloe-tag tag ;
