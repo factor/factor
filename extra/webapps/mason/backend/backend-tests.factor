@@ -1,8 +1,8 @@
-USING: continuations db io.directories io.files.temp tools.test
-webapps.mason.backend webapps.utils ;
+USING: continuations io.directories io.files.temp tools.test
+webapps.mason.backend webapps.utils db2.transactions db2.connections ;
 IN: webapps.mason.backend.tests
 
-[ "mason-test.db" temp-file delete-file ] ignore-errors
+[ "resource:mason-test.db" temp-file delete-file ] ignore-errors
 
 { 0 1 2 } [
     ! Do it in a with-transaction to simulate semantics of

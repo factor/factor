@@ -36,7 +36,7 @@ $nl
 { $list
     "Continuations cannot be stored at all."
     { "Object identity is not preserved between serialization and deserialization. That is, if an object is stored with " { $link sset } " and later retrieved with " { $link sget } ", the retrieved value will be " { $link = } " to the original, but not necessarily " { $link eq? } "." }
-    { "All objects reachable from the value passed to " { $link sset } " are serialized, so large structures should not be stored in the session state, and neither should anything that can reference the global namespace. Large structures should be persisted in the database directly instead, using " { $vocab-link "db.tuples" } "." }
+    { "All objects reachable from the value passed to " { $link sset } " are serialized, so large structures should not be stored in the session state, and neither should anything that can reference the global namespace. Large structures should be persisted in the database directly instead, using " { $vocab-link "orm.tuples" } "." }
 } ;
 
 ARTICLE: "furnace.sessions" "Furnace sessions"

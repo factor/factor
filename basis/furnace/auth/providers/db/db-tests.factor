@@ -1,11 +1,8 @@
-USING: furnace.actions
-furnace.auth
-furnace.auth.login
-furnace.auth.providers
-furnace.auth.providers.db tools.test
-namespaces db db.sqlite db.tuples continuations
-io.files io.files.temp io.directories accessors kernel
-sequences system ;
+USING: accessors continuations db2.connections furnace.actions
+furnace.auth furnace.auth.login furnace.auth.providers
+furnace.auth.providers.db io.directories io.files io.files.temp
+kernel namespaces orm.tuples sequences sqlite.db2 system
+tools.test ;
 IN: furnace.auth.providers.db.tests
 
 <action> "test" <login-realm> realm set

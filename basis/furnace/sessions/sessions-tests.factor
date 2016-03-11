@@ -2,7 +2,7 @@ USING: tools.test http furnace.sessions furnace.actions
 http.server http.server.responses math namespaces make kernel
 accessors io.sockets io.servers prettyprint
 io.streams.string io.files io.files.temp io.directories
-splitting destructors sequences db db.tuples db.sqlite
+splitting destructors sequences orm.tuples sqlite.db2 db2.connections
 continuations urls math.parser furnace furnace.utilities ;
 IN: furnace.sessions.tests
 
