@@ -1,7 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces combinators words
-assocs db.tuples arrays splitting strings validators urls fry
+assocs arrays splitting strings validators urls fry
+db2.connections
+orm.tuples
 html.forms
 html.components
 furnace

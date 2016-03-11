@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar db db.sqlite db.tuples db.types kernel
-math math.order sequences combinators.short-circuit
-io.pathnames ;
+USING: accessors calendar combinators.short-circuit
+db2.connections db2.transactions db2.types io.pathnames kernel
+math math.order orm.persistent orm.tuples sequences sqlite.db2 ;
 IN: webapps.mason.backend
 
 CONSTANT: +idle+ "idle"
@@ -25,34 +25,33 @@ last-git-id last-timestamp last-report
 current-git-id current-timestamp
 status ;
 
-builder "BUILDERS" {
-    { "host-name" "HOST_NAME" TEXT +user-assigned-id+ }
-    { "os" "OS" TEXT +user-assigned-id+ }
-    { "cpu" "CPU" TEXT +user-assigned-id+ }
-    { "heartbeat-timestamp" "HEARTBEAT_TIMESTAMP" TIMESTAMP }
+PERSISTENT: { builder "BUILDERS" }
+    { "host-name" TEXT +user-assigned-key+ }
+    { "os" TEXT +user-assigned-key+ }
+    { "cpu" TEXT +user-assigned-key+ }
+    { "heartbeat-timestamp" TIMESTAMP }
 
-    { "clean-git-id" "CLEAN_GIT_ID" TEXT }
-    { "clean-timestamp" "CLEAN_TIMESTAMP" TIMESTAMP }
+    { "clean-git-id" TEXT } 
+    { "clean-timestamp" TIMESTAMP }
 
-    { "last-release" "LAST_RELEASE" TEXT }
-    { "release-git-id" "RELEASE_GIT_ID" TEXT }
+    { "last-release" TEXT }
+    { "release-git-id" TEXT }
+    
+    { "last-git-id" TEXT }
+    { "last-timestamp" TIMESTAMP }
+    { "last-report" TEXT }
 
-    { "last-git-id" "LAST_GIT_ID" TEXT }
-    { "last-timestamp" "LAST_TIMESTAMP" TIMESTAMP }
-    { "last-report" "LAST_REPORT" TEXT }
-
-    { "current-git-id" "CURRENT_GIT_ID" TEXT }
+    { "current-git-id" TEXT }
+    ! TODO FIX THIS OMG
     ! Can't name it CURRENT_TIMESTAMP because of bug in db library
-    { "current-timestamp" "CURR_TIMESTAMP" TIMESTAMP }
-    { "status" "STATUS" TEXT }
-} define-persistent
+    { { "current-timestamp" "CURR_TIMESTAMP" } TIMESTAMP }
+    { "status" TEXT } ;
 
 TUPLE: counter id value ;
 
-counter "COUNTER" {
-    { "id" "ID" INTEGER +db-assigned-id+ }
-    { "value" "VALUE" INTEGER }
-} define-persistent
+PERSISTENT: counter
+    { "id" INTEGER +db-assigned-key+ }
+    { "value" INTEGER } ;
 
 : counter-tuple ( -- counter )
     counter new select-tuple

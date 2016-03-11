@@ -1,7 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math.order math.parser
-urls validators db db.types db.tuples calendar present namespaces
+db2.transactions
+db2.types
+orm.tuples
+orm.persistent
+urls validators calendar present namespaces
 html.forms
 html.components
 http.server.dispatchers
@@ -38,12 +42,11 @@ GENERIC: entity-url ( entity -- url )
 
 M: entity feed-entry-url entity-url ;
 
-entity f {
-    { "id" "ID" INTEGER +db-assigned-id+ }
-    { "author" "AUTHOR" { VARCHAR 256 } +not-null+ } ! uid
-    { "date" "DATE" TIMESTAMP +not-null+ }
-    { "content" "CONTENT" TEXT +not-null+ }
-} define-persistent
+PERSISTENT: entity
+    { "id" INTEGER +db-assigned-key+ }
+    { "author" { VARCHAR 256 } +not-null+ } ! uid
+    { "date" TIMESTAMP +not-null+ }
+    { "content" TEXT +not-null+ } ;
 
 M: entity feed-entry-date date>> ;
 
@@ -55,17 +58,15 @@ M: post-state feed-entry-title
 M: post-state entity-url
     id>> view-post-url ;
 
-\ post-state "BLOG_POSTS" {
-    { "title" "TITLE" { VARCHAR 256 } +not-null+ }
-} define-persistent
+PERSISTENT: { post-state "BLOG_POSTS" }
+    { "title" { VARCHAR 256 } +not-null+ } ;
 
 : <post-state> ( id -- post ) \ post-state new swap >>id ;
 
 TUPLE: comment < entity parent ;
 
-comment "COMMENTS" {
-    { "parent" "PARENT" INTEGER +not-null+ } ! post id
-} define-persistent
+PERSISTENT: { comment "COMMENTS" }
+    { "parent" INTEGER +not-null+ } ;
 
 M: comment feed-entry-title
     author>> "Comment by " prepend ;

@@ -20,7 +20,7 @@ IN: db2.debug
 : postgresql-test-db ( -- postgresql-db )
     <postgresql-db>
         "localhost" >>host
-        "postgres" >>username
+        "erg" >>username
         "thepasswordistrust" >>password
         "factor-test" >>database ;
 
@@ -43,3 +43,8 @@ IN: db2.debug
         [ test-postgresql0 ]
     } cleave ;
 
+: with-dummy-postgresql ( quot -- )
+    [ postgresql-test-db ] dip with-db ; inline
+
+: with-dummy-sqlite ( quot -- )
+    [ postgresql-test-db ] dip with-db ; inline

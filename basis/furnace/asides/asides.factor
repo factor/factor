@@ -1,13 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel sequences accessors hashtables
-urls db.types db.tuples math.parser fry logging combinators
-html.templates.chloe.syntax
-http http.server http.server.filters http.server.redirection
-furnace.cache
-furnace.sessions
-furnace.utilities
-furnace.redirection ;
+USING: accessors assocs combinators db2.types fry furnace.cache
+furnace.redirection furnace.sessions furnace.utilities
+hashtables html.templates.chloe.syntax http http.server
+http.server.filters http.server.redirection kernel logging
+math.parser namespaces orm.persistent orm.tuples sequences urls ;
 IN: furnace.asides
 
 TUPLE: aside < server-state
@@ -16,12 +13,11 @@ session method url post-data ;
 : <aside> ( id -- aside )
     aside new-server-state ;
 
-aside "ASIDES" {
-    { "session" "SESSION" BIG-INTEGER +not-null+ }
-    { "method" "METHOD" { VARCHAR 10 } }
-    { "url" "URL" URL }
-    { "post-data" "POST_DATA" FACTOR-BLOB }
-} define-persistent
+PERSISTENT: { aside "ASIDES" }
+    { "session" BIG-INTEGER +not-null+ }
+    { "method" VARCHAR }
+    { "url" URL }
+    { "post-data" FACTOR-BLOB } ;
 
 CONSTANT: aside-id-key "__a"
 

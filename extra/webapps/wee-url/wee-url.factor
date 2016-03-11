@@ -2,9 +2,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.ranges sequences random accessors
-kernel namespaces fry db.types db.tuples urls validators
+kernel namespaces fry db2.types orm.tuples urls validators
 html.components html.forms http http.server.dispatchers furnace
 furnace.actions furnace.boilerplate furnace.redirection
+orm.persistent
 furnace.utilities continuations ;
 IN: webapps.wee-url
 
@@ -12,10 +13,9 @@ TUPLE: wee-url < dispatcher ;
 
 TUPLE: short-url short url ;
 
-short-url "SHORT_URLS" {
-    { "short" "SHORT" TEXT +user-assigned-id+ }
-    { "url" "URL" TEXT +not-null+ }
-} define-persistent
+PERSISTENT: { short-url "SHORT_URLS" }
+    { "short" TEXT +user-assigned-key+ }
+    { "url" TEXT +not-null+ } ;
 
 : letter-bank ( -- seq )
     CHAR: a CHAR: z [a,b]

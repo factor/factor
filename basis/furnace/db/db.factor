@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors continuations namespaces destructors
-db db.private db.pools io.pools http.server http.server.filters ;
+USING: accessors continuations db2.connections db2.pools
+destructors http.server http.server.filters io.pools kernel
+namespaces ;
 IN: furnace.db
 
 TUPLE: db-persistence < filter-responder pool disposed ;

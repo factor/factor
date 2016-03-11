@@ -1,5 +1,5 @@
-USING: accessors db.sqlite http.server io.files.temp io.servers
-io.sockets.secure.debug kernel ;
+USING: accessors http.server io.files.temp io.servers
+io.sockets.secure.debug kernel sqlite.db2 ;
 IN: webapps.utils
 
 : <temp-sqlite-db> ( name -- db )

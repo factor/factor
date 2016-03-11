@@ -175,11 +175,11 @@ M: persistent >persistent ;
 M: tuple >persistent class-of >persistent ;
 
 M: tuple-class >persistent
-    inherited-persistent-table get [
+    ! inherited-persistent-table get [
         join-persistent-hierarchy
         process-persistent
-        check-columns
-    ] cache ;
+        check-columns ;
+    ! ] cache ;
 
 : ensure-persistent ( obj -- obj )
     dup lookup-raw-persistent [ not-persistent ] unless ;
@@ -231,7 +231,7 @@ M: integer parse-table-name throw ;
 M: sequence parse-table-name
     unclip swap
     unclip swap
-    [ quote-sql-name ] [ "." join ] bi* "." glue ;
+    [ quote-sql-name ] [ "." join ] bi* [ "." glue ] unless-empty ;
 
 M: tuple-class parse-table-name
     dup name>> sql-name-replace ;

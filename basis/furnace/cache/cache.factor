@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math.intervals
-system calendar fry
-random db db.tuples db.types
-http.server.filters ;
+USING: accessors calendar db2.types fry http.server.filters
+kernel math.intervals orm.persistent orm.tuples random system ;
 IN: furnace.cache
 
 TUPLE: server-state id expires ;
@@ -11,11 +9,9 @@ TUPLE: server-state id expires ;
 : new-server-state ( id class -- server-state )
     new swap >>id ; inline
 
-server-state f
-{
-    { "id" "ID" +random-id+ system-random-generator }
-    { "expires" "EXPIRES" BIG-INTEGER +not-null+ }
-} define-persistent
+PERSISTENT: server-state
+    { "id" +random-key+ +system-random-generator+ }
+    { "expires" BIG-INTEGER +not-null+ } ;
 
 : get-state ( id class -- state )
     new-server-state select-tuple ;

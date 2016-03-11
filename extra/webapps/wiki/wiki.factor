@@ -1,22 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel hashtables calendar random assocs
-namespaces make splitting sequences sorting math.order present
-io.files io.directories io.encodings.ascii
-syndication farkup
-html.components html.forms
-http.server
-http.server.dispatchers
-furnace.actions
-furnace.utilities
-furnace.recaptcha
-furnace.redirection
-furnace.auth
-furnace.auth.login
-furnace.boilerplate
-furnace.syndication
-validators
-db.types db.tuples lcs urls ;
+USING: accessors assocs calendar db2.types farkup
+furnace.actions furnace.auth furnace.auth.login
+furnace.boilerplate furnace.recaptcha furnace.redirection
+furnace.syndication furnace.utilities hashtables html.components
+html.forms http.server http.server.dispatchers io.directories
+io.encodings.ascii io.files kernel lcs make math.order
+namespaces orm.persistent orm.tuples present random sequences
+sorting splitting syndication urls validators ;
 IN: webapps.wiki
 
 : wiki-url ( rest path -- url )
@@ -41,23 +32,21 @@ can-delete-wiki-articles? define-capability
 
 TUPLE: article title revision ;
 
-article "ARTICLES" {
-    { "title" "TITLE" { VARCHAR 256 } +not-null+ +user-assigned-id+ }
-    { "revision" "REVISION" INTEGER +not-null+ } ! revision id
-} define-persistent
+PERSISTENT: { article "ARTICLES" }
+    { "title" { VARCHAR 256 } +not-null+ +user-assigned-key+ }
+    { "revision" INTEGER +not-null+ } ; ! revision id
 
 : <article> ( title -- article ) article new swap >>title ;
 
 TUPLE: revision id title author date content description ;
 
-revision "REVISIONS" {
-    { "id" "ID" INTEGER +db-assigned-id+ }
-    { "title" "TITLE" { VARCHAR 256 } +not-null+ } ! article id
-    { "author" "AUTHOR" { VARCHAR 256 } +not-null+ } ! uid
-    { "date" "DATE" TIMESTAMP +not-null+ }
-    { "content" "CONTENT" TEXT +not-null+ }
-    { "description" "DESCRIPTION" TEXT }
-} define-persistent
+PERSISTENT: { revision "REVISIONS" }
+    { "id" INTEGER +db-assigned-key+ }
+    { "title" { VARCHAR 256 } +not-null+ } ! article id
+    { "author" { VARCHAR 256 } +not-null+ } ! uid
+    { "date" TIMESTAMP +not-null+ }
+    { "content" TEXT +not-null+ }
+    { "description" TEXT } ;
 
 M: revision feed-entry-title
     [ title>> ] [ drop " by " ] [ author>> ] tri 3append ;

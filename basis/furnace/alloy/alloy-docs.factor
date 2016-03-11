@@ -1,4 +1,4 @@
-USING: help.markup help.syntax db ;
+USING: help.markup help.syntax db2.connections ;
 IN: furnace.alloy
 
 HELP: init-furnace-tables

@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors bit.ly combinators db.tuples debugger fry
+USING: accessors bit.ly combinators orm.tuples debugger fry
 grouping io io.streams.string kernel locals make sequences
 threads mason.email mason.twitter webapps.mason.backend
 webapps.mason.version.common webapps.mason.version.data

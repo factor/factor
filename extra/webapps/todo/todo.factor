@@ -1,24 +1,24 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences namespaces db db.types db.tuples validators
-hashtables urls html.forms html.components html.templates.chloe http.server
-http.server.dispatchers furnace furnace.boilerplate furnace.auth
-furnace.actions furnace.redirection furnace.db furnace.auth.login
-webapps.utils ;
+USING: accessors db2.connections db2.types furnace.actions
+furnace.alloy furnace.auth furnace.auth.features.deactivate-user
+furnace.auth.features.edit-profile
+furnace.auth.features.registration furnace.auth.login
+furnace.boilerplate furnace.redirection html.forms http.server
+http.server.dispatchers kernel namespaces orm.persistent
+orm.tuples urls validators webapps.utils ;
 IN: webapps.todo
 
 TUPLE: todo-list < dispatcher ;
 
 TUPLE: todo uid id priority summary description ;
 
-todo "TODO"
-{
-    { "uid" "UID" { VARCHAR 256 } +not-null+ }
-    { "id" "ID" +db-assigned-id+ }
-    { "priority" "PRIORITY" INTEGER +not-null+ }
-    { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
-    { "description" "DESCRIPTION" { VARCHAR 256 } }
-} define-persistent
+PERSISTENT: todo
+    { "uid" { VARCHAR 256 } +not-null+ }
+    { "id" +db-assigned-key+ }
+    { "priority" INTEGER +not-null+ }
+    { "summary" { VARCHAR 256 } +not-null+ }
+    { "description" { VARCHAR 256 } } ;
 
 : <todo> ( id -- todo )
     todo new
@@ -108,10 +108,6 @@ todo "TODO"
     <protected>
         "view your todo list" >>description ;
 
-USING: furnace.auth.features.registration
-furnace.auth.features.edit-profile
-furnace.auth.features.deactivate-user
-furnace.alloy ;
 
 : <login-config> ( responder -- responder' )
     "Todo list" <login-realm>

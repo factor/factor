@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel accessors http.server http.server.dispatchers
-furnace furnace.actions furnace.sessions furnace.redirection
-html.components html.forms fry urls ;
+USING: accessors fry furnace.actions furnace.alloy
+furnace.redirection furnace.sessions html.forms http.server
+http.server.dispatchers kernel math namespaces sqlite.db2 urls ;
 IN: webapps.counter
 
 SYMBOL: count
@@ -30,7 +30,6 @@ M: counter-app init-session* drop 0 count sset ;
         <display-action> "" add-responder ;
 
 ! Deployment example
-USING: db.sqlite furnace.alloy namespaces ;
 
 : counter-db ( -- db ) "counter.db" <sqlite-db> ;
 

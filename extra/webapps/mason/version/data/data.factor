@@ -1,20 +1,19 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar db db.tuples db.types kernel locals
-webapps.mason.version.files sequences ;
+USING: accessors calendar db2.types kernel locals orm.persistent
+orm.tuples sequences webapps.mason.version.files ;
 IN: webapps.mason.version.data
 
 TUPLE: release
 host-name os cpu
 last-release release-git-id ;
 
-release "RELEASES" {
-    { "host-name" "HOST_NAME" TEXT +user-assigned-id+ }
-    { "os" "OS" TEXT +user-assigned-id+ }
-    { "cpu" "CPU" TEXT +user-assigned-id+ }
-    { "last-release" "LAST_RELEASE" TEXT }
-    { "release-git-id" "RELEASE_GIT_ID" TEXT }
-} define-persistent
+PERSISTENT: { release "RELEASES" }
+    { "host-name" TEXT +user-assigned-key+ }
+    { "os" TEXT +user-assigned-key+ }
+    { "cpu" TEXT +user-assigned-key+ }
+    { "last-release" TEXT }
+    { "release-git-id" TEXT } ;
 
 :: <release> ( version builder -- release )
     release new
@@ -31,14 +30,13 @@ release "RELEASES" {
 TUPLE: version
 id version git-id timestamp source-path announcement-url ;
 
-version "VERSIONS" {
-    { "id" "ID" INTEGER +db-assigned-id+ }
-    { "version" "VERSION" TEXT }
-    { "git-id" "GIT_ID" TEXT }
-    { "timestamp" "TIMESTAMP" TIMESTAMP }
-    { "source-path" "SOURCE_PATH" TEXT }
-    { "announcement-url" "ANNOUNCEMENT_URL" TEXT }
-} define-persistent
+PERSISTENT: { version "VERSIONS" }
+    { "id" INTEGER +db-assigned-key+ }
+    { "version" TEXT }
+    { "git-id" TEXT }
+    { "timestamp" TIMESTAMP }
+    { "source-path" TEXT }
+    { "announcement-url" TEXT } ;
 
 : update-version ( version git-id announcement-url -- )
     version new

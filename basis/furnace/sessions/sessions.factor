@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math.intervals math.parser namespaces
-strings random accessors quotations hashtables sequences
-continuations fry calendar combinators combinators.short-circuit
-destructors io.sockets db db.tuples db.types
+USING: accessors assocs calendar combinators
+combinators.short-circuit continuations db2.types destructors
+fry furnace.cache furnace.scopes furnace.utilities hashtables
 http http.server http.server.dispatchers http.server.filters
-furnace.cache furnace.scopes furnace.utilities ;
+io.sockets kernel math.intervals math.parser namespaces
+orm.persistent orm.tuples quotations random sequences strings ;
 IN: furnace.sessions
 
 TUPLE: session < scope user-agent client ;
@@ -13,11 +13,9 @@ TUPLE: session < scope user-agent client ;
 : <session> ( id -- session )
     session new-server-state ;
 
-session "SESSIONS"
-{
-    { "user-agent" "USER_AGENT" TEXT +not-null+ }
-    { "client" "CLIENT" TEXT +not-null+ }
-} define-persistent
+PERSISTENT: { session "SESSIONS" }
+    { "user-agent" TEXT +not-null+ }
+    { "client" TEXT +not-null+ } ;
 
 : get-session ( id -- session )
     dup [ session get-state ] when ;

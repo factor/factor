@@ -1,25 +1,15 @@
 ! Copyright (C) 2007, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs sorting sequences kernel accessors
-hashtables db.types db.tuples db combinators
-calendar calendar.format math.parser math.order syndication urls
-xml.writer xmode.catalog validators
-html.forms
-html.components
-html.templates.chloe
-http.server
-http.server.dispatchers
-http.server.redirection
-http.server.responses
-furnace
-furnace.actions
-furnace.redirection
-furnace.auth
-furnace.auth.login
-furnace.boilerplate
-furnace.recaptcha
-furnace.syndication
-furnace.conversations ;
+USING: accessors assocs calendar calendar.format
+db2.transactions db2.types furnace furnace.actions furnace.alloy
+furnace.auth furnace.auth.login furnace.boilerplate
+furnace.conversations furnace.recaptcha furnace.redirection
+furnace.syndication hashtables html.components html.forms
+html.templates.chloe http.server http.server.dispatchers
+http.server.redirection http.server.responses kernel math.order
+math.parser namespaces orm.persistent orm.tuples sequences
+sorting sqlite.db2 syndication urls validators xml.writer
+xmode.catalog ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
@@ -34,15 +24,13 @@ can-delete-pastes? define-capability
 
 TUPLE: entity id summary author mode date contents ;
 
-entity f
-{
-    { "id" "ID" INTEGER +db-assigned-id+ }
-    { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
-    { "author" "AUTHOR" { VARCHAR 256 } +not-null+ }
-    { "mode" "MODE" { VARCHAR 256 } +not-null+ }
-    { "date" "DATE" DATETIME +not-null+ }
-    { "contents" "CONTENTS" TEXT +not-null+ }
-} define-persistent
+PERSISTENT: entity
+    { "id" INTEGER +db-assigned-key+ }
+    { "summary" { VARCHAR 256 } +not-null+ }
+    { "author" { VARCHAR 256 } +not-null+ }
+    { "mode" { VARCHAR 256 } +not-null+ }
+    { "date" DATETIME +not-null+ }
+    { "contents" TEXT +not-null+ } ;
 
 GENERIC: entity-url ( entity -- url )
 
@@ -54,7 +42,7 @@ M: entity feed-entry-url entity-url ;
 
 TUPLE: paste-state < entity annotations ;
 
-\ paste-state "PASTES" { } define-persistent
+PERSISTENT: { paste-state "pastes" } ;
 
 : <paste-state> ( id -- paste )
     \ paste-state new
@@ -67,10 +55,8 @@ TUPLE: paste-state < entity annotations ;
 
 TUPLE: annotation < entity parent ;
 
-\ annotation "ANNOTATIONS"
-{
-    { "parent" "PARENT" INTEGER +not-null+ }
-} define-persistent
+PERSISTENT: { annotation "annotations" }
+    { "parent" INTEGER +not-null+ } ;
 
 : <annotation> ( parent id -- annotation )
     \ annotation new

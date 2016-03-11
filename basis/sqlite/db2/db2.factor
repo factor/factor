@@ -8,9 +8,6 @@ TUPLE: sqlite-db path ;
 
 CONSTRUCTOR: <sqlite-db> sqlite-db ( path -- db ) ;
 
-: with-dummy-sqlite ( quot -- )
-    "resource:dummy.sqlite.db" <sqlite-db> swap with-db ; inline
-
 {
     "sqlite.db2.connections"
     "sqlite.db2.errors"

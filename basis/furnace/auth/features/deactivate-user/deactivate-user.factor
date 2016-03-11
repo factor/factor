@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs namespaces accessors db db.tuples urls
+USING: kernel assocs namespaces accessors urls
 http.server.dispatchers
 furnace.asides
 furnace.actions

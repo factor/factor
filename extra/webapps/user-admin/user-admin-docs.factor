@@ -1,4 +1,4 @@
-USING: help.markup help.syntax db strings ;
+USING: db2.connections help.markup help.syntax strings ;
 IN: webapps.user-admin
 
 HELP: <user-admin>
