@@ -99,9 +99,10 @@ CONSTANT: self-closing-tags {
     string-context? get [ tag-not-allowed-here ] when ;
 
 : (compile-tag) ( tag -- )
-    dup name>string >lower self-closing-tags in?
-    [ compile-self-closing-tag ]
-    [
+    dup name>string >lower self-closing-tags
+    member? [
+        compile-self-closing-tag
+    ] [
         [ compile-start-tag ]
         [ compile-children ]
         [ compile-end-tag ] tri
