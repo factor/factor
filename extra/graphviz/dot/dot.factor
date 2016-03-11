@@ -1,8 +1,8 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.tuple combinators formatting graphviz
-graphviz.attributes io io.files kernel namespaces prettyprint.backend
-sequences splitting strings words ;
+graphviz.attributes io io.files kernel namespaces sequences splitting
+strings words ;
 IN: graphviz.dot
 
 <PRIVATE
@@ -14,8 +14,12 @@ GENERIC: dot. ( obj -- )
 ! option in case there's a keyword clash, spaces in the ID,
 ! etc.  This does mean that HTML labels aren't supported, but
 ! they don't seem to work using the Graphviz API anyway.
+!
+! Special escaping logic is required here because of the \l escape
+! sequence.
 : quote-string ( str -- str' )
-    "\"" "\"" unparse-string "\0" split "" join ;
+    { { "\"" "\\\"" } { "\0" "" } } [ first2 replace ] each
+    "\"" "\"" surround ;
 
 M: string dot. quote-string "%s " printf ;
 
