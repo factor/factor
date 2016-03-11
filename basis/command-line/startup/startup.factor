@@ -15,14 +15,14 @@ Common arguments:
         -run=ui.tools   run Factor development UI
     -e=<code>           evaluate <code>
     -no-user-init       suppress loading of .factor-rc
-    -datastack=<int>    datastack size in KB
-    -retainstack=<int>  retainstack size in KB
-    -callstack=<int>    callstack size in KB
-    -callbacks=<int>    callback heap size in KB
-    -young=<int>        young gc generation 0 size in MB
-    -aging=<int>        aging gc generation 1 size in MB
-    -tenured=<int>      tenured gc generation 2 size in MB
-    -codeheap=<int>     codeheap size in MB
+    -datastack=<int>    datastack size in KiB
+    -retainstack=<int>  retainstack size in KiB
+    -callstack=<int>    callstack size in KiB
+    -callbacks=<int>    callback heap size in KiB
+    -young=<int>        young gc generation 0 size in MiB
+    -aging=<int>        aging gc generation 1 size in MiB
+    -tenured=<int>      tenured gc generation 2 size in MiB
+    -codeheap=<int>     codeheap size in MiB
     -pic=<int>          max pic size
     -fep                enter fep mode immediately
     -nosignals          turn off OS signal handling
