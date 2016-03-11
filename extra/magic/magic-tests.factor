@@ -2,7 +2,7 @@ USING: kernel magic sequences system tools.test ;
 IN: magic.tests
 
 { t } [
-    image-path guess-file [ "data" = ] [ "symbolic link" head? ] either?
+    image-path guess-file [ "data" = ] [ "symbolic link" head? ] bi or
 ] unit-test
 { t } [
     image-path guess-mime-type
