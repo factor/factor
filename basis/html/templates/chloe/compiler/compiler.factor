@@ -176,9 +176,7 @@ ERROR: unknown-chloe-tag tag ;
 
 : compile-prologue ( xml -- )
     [
-        [ prolog>> [ write-xml ] [code-with] ]
-        [ before>> compile-chunk ]
-        bi
+        before>> compile-chunk
     ] compile-quot
     [ if-not-nested ] [code] ;
 
