@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors db.sqlite furnace.actions furnace.alloy
+USING: accessors sqlite.db2 furnace.actions furnace.alloy
 furnace.conversations furnace.recaptcha furnace.redirection
 html.templates.chloe.compiler http.server
 http.server.dispatchers http.server.responses io.streams.string

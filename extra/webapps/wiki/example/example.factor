@@ -1,4 +1,4 @@
-USING: accessors calendar db db.tuples furnace.alloy
+USING: accessors calendar furnace.alloy db2.connections orm.tuples
 furnace.recaptcha.example http.server io.directories
 io.encodings.ascii io.files io.servers kernel namespaces sequences
 splitting webapps.utils webapps.wiki websites.concatenative ;

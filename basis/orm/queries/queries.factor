@@ -104,10 +104,14 @@ M:: object delete-tuple-sql ( tuple -- statement )
         ] if
     ] each ;
 
+! XXX: include the assoc-filter?
 : filter-tuple-values ( persistent tuple -- assoc )
     [ columns>> ] dip
     2dup call-generators
-    '[ _ over getter>> call( obj -- slot-value ) ] { } map>assoc
+    '[ _ over getter>> call( obj -- slot-value ) ] { } map>assoc ;
+
+: filter-empty-tuple-values ( persistent tuple -- assoc )
+    filter-tuple-values
     [ nip ] assoc-filter ;
 
 ! : where-primary-key ( statement persistent tuple -- statement )
@@ -140,7 +144,7 @@ M:: object update-tuple-sql ( tuple -- statement )
 M: object select-tuple-sql ( tuple -- object )
     [ <select> ] dip
     [ >persistent ] [ ] bi {
-        [ filter-tuple-values [ first2 <column-binder-in> ] map >>in ]
+        [ filter-empty-tuple-values [ first2 <column-binder-in> ] map >>in ]
         [ drop columns>> [ <column-binder-out> ] map >>out ]
         [ drop 1array >>from ]
     } 2cleave ;

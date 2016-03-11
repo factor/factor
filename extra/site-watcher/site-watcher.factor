@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers arrays calendar combinators
 combinators.smart continuations debugger http.client fry
-init io.streams.string kernel locals math math.parser db
+init io.streams.string kernel locals math math.parser db2.connections
 namespaces sequences site-watcher.db site-watcher.email ;
 IN: site-watcher
 
