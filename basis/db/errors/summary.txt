@@ -1,1 +1,0 @@
-Errors thrown by database library
