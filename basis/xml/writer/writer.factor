@@ -142,9 +142,10 @@ M: public-id write-xml
 
 M: doctype-decl write-xml
     ?indent "<!DOCTYPE " write
-    [ name>> write bl ]
-    [ external-id>> [ write-xml bl ] when* ]
-    [ internal-subset>> write-internal-subset ">" write ] tri ;
+    [ name>> write ]
+    [ external-id>> [ bl write-xml ] when* ]
+    [ internal-subset>> [ bl write-internal-subset ] when* ] tri
+    ">" write ;
 
 M: directive write-xml
     "<!" write text>> write CHAR: > write1 nl ;
