@@ -67,7 +67,11 @@ M: +random-key+ compute-generator
         swap >>slot-name
         set-generator ; inline
 
+: ?cut ( seq n -- before after ) [ short head ] [ short tail ] 2bi ;
+
+ERROR: db-column-must-be-triple extra ;
 : parse-column ( seq -- db-column )
+    3 ?cut [ db-column-must-be-triple ] unless-empty
     ?first3
     [ parse-name ]
     [ parse-column-type ]
@@ -231,7 +235,7 @@ M: integer parse-table-name throw ;
 M: sequence parse-table-name
     unclip swap
     unclip swap
-    [ quote-sql-name ] [ "." join ] bi* [ "." glue ] unless-empty ;
+    [ ] [ "." join ] bi* [ "." glue ] unless-empty ;
 
 M: tuple-class parse-table-name
     dup name>> sql-name-replace ;

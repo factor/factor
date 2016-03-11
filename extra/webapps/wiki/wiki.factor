@@ -33,7 +33,7 @@ can-delete-wiki-articles? define-capability
 TUPLE: article title revision ;
 
 PERSISTENT: { article "ARTICLES" }
-    { "title" { VARCHAR 256 } +not-null+ +user-assigned-key+ }
+    { "title" { VARCHAR 256 } { +not-null+ +user-assigned-key+ } }
     { "revision" INTEGER +not-null+ } ; ! revision id
 
 : <article> ( title -- article ) article new swap >>title ;

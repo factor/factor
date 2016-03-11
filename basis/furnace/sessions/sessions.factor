@@ -17,6 +17,7 @@ PERSISTENT: { session "SESSIONS" }
     { "user-agent" TEXT +not-null+ }
     { "client" TEXT +not-null+ } ;
 
+
 : get-session ( id -- session )
     dup [ session get-state ] when ;
 

@@ -23,10 +23,10 @@ M: postgresql-db-connection sql-type>string
         { CHARACTER [ "TEXT" ] }
         { DATE [ "DATE" ] }
         { TIME [ "TIME" ] }
-        { DATETIME [ "DATETIME" ] }
+        { DATETIME [ "TIMESTAMP" ] }
         { TIMESTAMP [ "TIMESTAMP" ] }
-        { BLOB [ "BLOB" ] }
-        { FACTOR-BLOB [ "BLOB" ] }
+        { BLOB [ "BYTEA" ] }
+        { FACTOR-BLOB [ "BYTEA" ] }
         { URL [ "TEXT" ] }
         { +db-assigned-key+ [ "INTEGER" ] }
         { +random-key+ [ "BIGINT" ] }
@@ -48,10 +48,10 @@ M: postgresql-db-connection sql-create-type>string
         { CHARACTER [ "TEXT" ] }
         { DATE [ "DATE" ] }
         { TIME [ "TIME" ] }
-        { DATETIME [ "DATETIME" ] }
+        { DATETIME [ "TIMESTAMP" ] }
         { TIMESTAMP [ "TIMESTAMP" ] }
-        { BLOB [ "BLOB" ] }
-        { FACTOR-BLOB [ "BLOB" ] }
+        { BLOB [ "BYTEA" ] }
+        { FACTOR-BLOB [ "BYTEA" ] }
         { URL [ "TEXT" ] }
         { +db-assigned-key+ [ "SERIAL" ] }
         { +random-key+ [ "BIGINT" ] }

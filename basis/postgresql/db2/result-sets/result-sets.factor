@@ -101,7 +101,9 @@ M: postgresql-db-connection statement>result-set ( statement -- result-set )
             [ param-formats ]
         } cleave
         0 PQexecParams dup postgresql-result-ok? [
-            [ postgresql-result-error-message parse-sql-error ] [ PQclear ] bi throw
+            [
+                postgresql-result-error-message parse-sql-error
+            ] [ PQclear ] bi throw
         ] unless
     ] with-destructors
     \ postgresql-result-set new-result-set
