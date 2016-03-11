@@ -225,13 +225,13 @@ these lines in your .emacs:
     "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HINTS:"
-    "initial:" "INTERSECTION:" "IMPLEMENT-STRUCTS:"
+    "initial:" "IMPLEMENT-STRUCTS:"
     "MATH:"
     "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
-    "read-only" "REQUIRE:"  "REQUIRES:"
+    "read-only"
     "SLOT:"
-    "SPECIALIZED-ARRAYS:" "STRING:" "SYNTAX:"
+    "STRING:" "SYNTAX:"
     "UNIFORM-TUPLE:"
     "VARIANT:" "VERTEX-FORMAT:"))
 
@@ -309,7 +309,9 @@ these lines in your .emacs:
   (concat (syntax-begin '("SYMBOLS")) ws+ symbols-to-semicolon))
 
 (defconst factor-types-lines-regex
-  (concat (syntax-begin '("SINGLETONS")) ws+ symbols-to-semicolon))
+  (concat
+   (syntax-begin '("INTERSECTION" "SINGLETONS" "SPECIALIZED-ARRAYS"))
+   ws+ symbols-to-semicolon))
 
 (defconst factor-type-definition-regex
   (syntax-and-1-symbol
