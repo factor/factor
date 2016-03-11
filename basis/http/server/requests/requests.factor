@@ -14,13 +14,13 @@ ERROR: invalid-content-length < request-error content-length ;
 
 ERROR: content-length-missing < request-error ;
 
-ERROR: bad-request-line < request-error parse-error ;
+ERROR: bad-request-line < request-error line parse-error ;
 
 : check-absolute ( url -- )
     path>> dup "/" head? [ drop ] [ invalid-path ] if ; inline
 
 : parse-request-line-safe ( string -- triple )
-    [ parse-request-line ] [ nip bad-request-line ] recover ;
+    [ parse-request-line ] [ bad-request-line ] recover ;
 
 : read-request-line ( request -- request )
     read-?crlf [ dup "" = ] [ drop read-?crlf ] while
