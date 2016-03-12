@@ -9,7 +9,7 @@ M: openssl ssl-certificate-verification-supported? f ;
 M: windows socket-handle handle>> alien-address ;
 
 M: secure ((client)) ( addrspec -- handle )
-    addrspec>> ((client)) f <ssl-socket> ;
+    [ addrspec>> ((client)) ] [ hostname>> ] bi <ssl-socket> ;
 
 M: secure (get-local-address) ( handle remote -- sockaddr )
     [ file>> ] [ addrspec>> ] bi* (get-local-address) ;
