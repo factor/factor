@@ -50,7 +50,7 @@ IN: xml.writer.tests
 ]>
 <x>&foo;</x>" pprint-reprints-as
 
-{ t } [ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\" >" dup string>xml-chunk xml>string = ] unit-test
+{ t } [ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" dup string>xml-chunk xml>string = ] unit-test
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" }
     [ "<a b='c'/>" string>xml xml>string ] unit-test
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" }
