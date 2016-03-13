@@ -401,6 +401,8 @@ FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method )
 FUNCTION: int SSL_CTX_use_certificate_chain_file ( SSL_CTX* ctx,
                                                    c-string file ) ! PEM type
 
+FUNCTION: int SSL_CTX_use_certificate ( SSL_CTX* ctx, X509* x )
+
 FUNCTION: SSL* SSL_new ( SSL_CTX* ctx )
 
 FUNCTION: int SSL_set_fd ( SSL* ssl, int fd )
@@ -600,13 +602,13 @@ CONSTANT: NID_subject_alt_name  85
 CONSTANT: NID_issuer_alt_name   86
 
 ! ===============================================
-! On Windows, some of the functions making up libssl are placed in the
-! libeay32.dll and not in the similarily named ssleay32.dll file.
+! On Windows, some of the functions making up libressl
+! are placed in libcrypto-37.dll
 ! ===============================================
 
 << os windows? [
     "libssl-windows"
-    [ "libeay32.dll" cdecl add-library ] [ current-library set ] bi
+    [ "libcrypto-37.dll" cdecl add-library ] [ current-library set ] bi
 ] when >>
 
 ! x509.h
@@ -622,6 +624,12 @@ DESTRUCTOR: X509_free
 
 C-TYPE: X509_STORE
 FUNCTION: X509_STORE* X509_STORE_new ( )
+
+CONSTANT: X509_R_CERT_ALREADY_IN_HASH_TABLE 101
+FUNCTION: int X509_STORE_add_cert ( X509_STORE* ctx, X509* x )
+
+! X509_NAME_oneline could return c-string but needs to be freed with OPENSSL_free
+FUNCTION: char* X509_NAME_oneline ( X509_NAME* a, char* buf, int size )
 
 FUNCTION: X509* d2i_X509 ( X509** px, uchar** in, int len )
 FUNCTION: int i2d_X509 ( X509* x, uchar** out )
