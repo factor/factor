@@ -52,13 +52,14 @@ DEFER: wait-to-connect
     dup +output+ wait-for-port wait-to-connect ; inline
 
 : wait-to-connect ( port -- )
-    dup handle>> handle-fd f 0 write 0 = [ drop ] [
-        errno {
-            { EAGAIN [ wait-for-output ] }
-            { EINTR [ wait-to-connect ] }
-            [ (throw-errno) ]
-        } case
-    ] if ;
+    dup handle>> handle-fd SOL_SOCKET SO_ERROR
+    -1 int <ref> [ dup byte-length int <ref> getsockopt io-error ] keep int deref
+    {
+        { 0 [ drop ] }
+        { EAGAIN [ wait-for-output ] }
+        { EINTR [ wait-to-connect ] }
+        [ (throw-errno) ]
+    } case ;
 
 M: object establish-connection
     2dup
