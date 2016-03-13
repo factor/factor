@@ -620,6 +620,18 @@ FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc )
 FUNCTION: void X509_free ( X509 *a )
 DESTRUCTOR: X509_free
 
+C-TYPE: X509_STORE
+FUNCTION: X509_STORE* X509_STORE_new ( )
+
+FUNCTION: X509* d2i_X509 ( X509** px, uchar** in, int len )
+FUNCTION: int i2d_X509 ( X509* x, uchar** out )
+! FUNCTION: X509* d2i_X509_bio ( BIO* bp, X509** x )
+! FUNCTION: X509* d2i_X509_fp ( FILE* fp, X509** x )
+! FUNCTION: int i2d_X509_bio ( BIO* bp, X509* x )
+! FUNCTION: int i2d_X509_fp ( FILE* fp, X509* x )
+FUNCTION: int i2d_re_X509_tbs ( X509* x, uchar** out )
+
+
 ! stack.h
 FUNCTION: int sk_num ( _STACK *s )
 FUNCTION: void* sk_value ( _STACK *s, int v )
