@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel math sequences
-sequences.private strings sbufs ;
+USING: arrays kernel math sbufs sequences sequences.private
+strings ;
 IN: splitting
 
 <PRIVATE
