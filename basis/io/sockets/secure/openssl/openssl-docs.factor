@@ -7,7 +7,7 @@ HELP: subject-name
 { $description "The subject name of a certificate." } ;
 
 HELP: subject-names-match?
-{ $values { "host" "a host name" } { "subject" "a subject name" } { "?" boolean } }
+{ $values { "name" "a host name" } { "pattern" "a subject name" } { "?" boolean } }
 { $description "True if the host name matches the subject name." }
 { $examples
     { $code
