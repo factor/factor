@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax namespaces kernel words
-sequences math math.bitwise math.vectors colors
-io.encodings.utf16n classes.struct accessors ;
+USING: alien.c-types alien.syntax classes.struct colors
+io.encodings.utf16n io.encodings.utf8 kernel math math.bitwise
+math.vectors sequences ;
 FROM: alien.c-types => float short ;
 IN: windows.types
 
