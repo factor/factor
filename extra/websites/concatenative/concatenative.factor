@@ -6,6 +6,7 @@ namespaces smtp urls
 db2.connections
 orm.tuples
 sqlite.db2
+postgresql.db2
 logging.insomniac calendar timers
 html.templates.chloe
 http.server
@@ -35,6 +36,12 @@ websites.factorcode ;
 IN: websites.concatenative
 
 : website-db ( -- db ) home "website.db" append-path <sqlite-db> ;
+: website-db2 ( -- db )
+    <postgresql-db>
+        "localhost" >>host
+        "erg" >>username
+        "thepasswordistrust" >>password
+        "factor-test" >>database ;
 
 : init-factor-db ( -- )
     mason-db [ init-mason-db ] with-db
