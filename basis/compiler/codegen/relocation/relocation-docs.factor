@@ -2,13 +2,9 @@ USING: alien byte-arrays byte-vectors compiler.constants cpu.architecture
 help.markup help.syntax make vectors ;
 IN: compiler.codegen.relocation
 
-HELP: relocation-table
-{ $description "A " { $link byte-vector } " holding the relocations for the current compilation. Each sequence of four bytes in the vector represents one relocation." }
-{ $see-also init-relocation } ;
-
 HELP: add-dlsym-parameters
 { $values { "symbol" byte-array } { "dll" dll } }
-{ $description "Adds a pair of parameters for a reference to an external C function to the " { $link parameter-table } "." } ;
+{ $description "Adds a pair of parameters for a reference to an external C function to the " { $link parameter-table } ". 'symbol' is the name of the function and 'dll' is the shared library which contains it." } ;
 
 HELP: add-relocation
 { $values
@@ -42,7 +38,12 @@ HELP: compiled-offset
 } ;
 
 HELP: parameter-table
-{ $var-description "The parameter table is a " { $link vector } " which contains all the paramters for the word being generated." } ;
+{ $var-description "The parameter table is a " { $link vector } " which contains all the parameters for the word being generated." }
+{ $see-also add-dlsym-parameters init-relocation } ;
+
+HELP: relocation-table
+{ $description "A " { $link byte-vector } " holding the relocations for the current compilation. Each sequence of four bytes in the vector represents one relocation." }
+{ $see-also init-relocation } ;
 
 HELP: rel-decks-offset
 { $values { "class" "a relocation class" } }
