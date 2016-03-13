@@ -76,16 +76,19 @@ M: object database-table-columns-statement ( database table -- sequence )
 : database-tables ( database -- sequence )
     database-tables-statement >sql-objects ;
 
-: tables ( -- sequence )
+: current-tables ( -- sequence )
     current-db-name database-tables ;
 
-: database-table-names ( database -- sequence )
-    database-tables [ table-name>> ] map ;
+: table-names ( sequence -- strings )
+    [ table-name>> ] map ;
 
-: table-names ( -- sequence )
+: database-table-names ( database -- sequence )
+    database-tables table-names ;
+
+: current-table-names ( -- sequence )
     current-db-name database-table-names ;
 
-: table-exists? ( table -- ? ) table-names member? ;
+: table-exists? ( table -- ? ) current-table-names member? ;
 
 : database-table-columns ( database table -- sequence )
     database-table-columns-statement >sql-columns ;
@@ -95,3 +98,6 @@ M: object database-table-columns-statement ( database table -- sequence )
 
 : databases ( -- sequence )
     databases-statement sql-query concat ;
+
+! [ "select nspname from pg_catalog.pg_namespace" sql-query ] with-dummy-postgresql
+! [ "select schema_name from information_schema.schemata" sql-query ] with-dummy-postgresql

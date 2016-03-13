@@ -47,4 +47,4 @@ IN: db2.debug
     [ postgresql-test-db ] dip with-db ; inline
 
 : with-dummy-sqlite ( quot -- )
-    [ postgresql-test-db ] dip with-db ; inline
+    [ sqlite-test-db ] dip with-db ; inline
