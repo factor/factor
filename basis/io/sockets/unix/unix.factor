@@ -5,7 +5,6 @@ arrays byte-arrays classes.struct combinators destructors
 io.backend.unix io.encodings.ascii io.encodings.utf8 io.files
 io.pathnames io.sockets.private kernel libc locals math
 namespaces sequences system unix unix.ffi vocabs ;
-EXCLUDE: io => read write ;
 EXCLUDE: io.sockets => accept ;
 IN: io.sockets.unix
 
