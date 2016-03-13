@@ -1,6 +1,7 @@
-USING: alien.accessors alien.c-types alien.libraries
+USING: alien.accessors alien.c-types alien.libraries alien.strings
 alien.syntax byte-arrays cpu.x86 eval help.markup help.syntax io
-io.backend kernel math quotations sequences system ;
+io.backend io.encodings.utf16n io.encodings.utf8 kernel math
+quotations sequences system ;
 IN: alien
 
 HELP: callee-cleanup?
@@ -41,7 +42,9 @@ HELP: alien
 { $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-data" } " for general information." } ;
 
 HELP: dll
-{ $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
+{ $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information."
+$nl
+"The dll tuple has one slot 'path' which holds the filesystem path to the library being loaded in the systems " { $link native-string-encoding } ", usually " { $link utf8 } " on unices and " { $link utf16n } " on windows." } ;
 
 HELP: dll-valid?
 { $values { "dll" dll } { "?" boolean } }
