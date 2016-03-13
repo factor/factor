@@ -12,6 +12,11 @@ IN: io.sockets.unix
 : socket-fd ( domain type protocol -- fd )
     socket dup io-error <fd> init-fd |dispose ;
 
+: get-socket-option ( fd level opt -- val )
+    [ handle-fd ] 2dip -1 int <ref> [
+        dup byte-length int <ref> getsockopt io-error
+    ] keep int deref ;
+
 : set-socket-option ( fd level opt -- )
     [ handle-fd ] 2dip 1 int <ref> dup byte-length setsockopt io-error ;
 
@@ -52,9 +57,7 @@ DEFER: wait-to-connect
     dup +output+ wait-for-port wait-to-connect ; inline
 
 : wait-to-connect ( port -- )
-    dup handle>> handle-fd SOL_SOCKET SO_ERROR
-    -1 int <ref> [ dup byte-length int <ref> getsockopt io-error ] keep int deref
-    {
+    dup handle>> SOL_SOCKET SO_ERROR get-socket-option {
         { 0 [ drop ] }
         { EAGAIN [ wait-for-output ] }
         { EINTR [ wait-to-connect ] }
