@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io kernel math models namespaces make
-sequences strings splitting combinators unicode.categories
-math.order math.ranges fry locals ;
+USING: accessors arrays fry kernel locals math math.order
+math.ranges models sequences splitting ;
 QUALIFIED: models
 IN: documents
 
@@ -112,12 +111,30 @@ CONSTANT: doc-start { 0 0 }
 : with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
+! XXX: This is the old string-lines behavior, it would be nice
+! if we could update documents to work with the new string-lines
+! behavior.
+: doc-lines ( str -- seq )
+    dup [ "\r\n" member? ] any? [
+        "\n" split
+        [
+            but-last-slice [
+                "\r" ?tail drop "\r" split
+            ] map! drop
+        ] [
+            [ length 1 - ] keep [ "\r" split ] change-nth
+        ]
+        [ concat ]
+        tri
+    ] [
+        1array
+    ] if ;
+
 PRIVATE>
 
-: doc-range ( from to document -- string )
-    [ 2dup ] dip
-    '[ [ 2dup ] dip _ (doc-range) ] map-lines
-    2nip "\n" join ;
+:: doc-range ( from to document -- string )
+    from to [ [ from to ] dip document (doc-range) ] map-lines
+    "\n" join ;
 
 : add-undo ( edit document -- )
     dup inside-undo?>> [ 2drop ] [
@@ -127,7 +144,7 @@ PRIVATE>
 
 :: set-doc-range ( string from to document -- )
     from to = string empty? and [
-        string string-lines :> new-lines
+        string doc-lines :> new-lines
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
