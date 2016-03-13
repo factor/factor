@@ -166,19 +166,18 @@ these lines in your .emacs:
 
 (defun factor-beginning-of-symbol ()
   "Move point to the beginning of the current symbol."
-  (skip-syntax-backward "w_()"))
+  (skip-syntax-backward "w_()\""))
 
 (defun factor-end-of-symbol ()
   "Move point to the end of the current symbol."
-  (skip-syntax-forward "w_()"))
+  (skip-syntax-forward "w_()\""))
 
-(put 'factor-symbol 'end-op 'factor-end-of-symbol)
-(put 'factor-symbol 'beginning-op 'factor-beginning-of-symbol)
+(put 'symbol 'end-op 'factor-end-of-symbol)
+(put 'symbol 'beginning-op 'factor-beginning-of-symbol)
 
-(defsubst factor-symbol-at-point ()
-  (let* ((thing (thing-at-point 'factor-symbol))
-         (s (when thing (substring-no-properties thing))))
-    (and (> (length s) 0) s)))
+(defun factor-symbol-at-point ()
+  (let ((thing (thing-at-point 'symbol t)))
+    (and (> (length thing) 0) thing)))
 
 
 ;;; Regexps galore:
