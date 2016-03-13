@@ -14,3 +14,8 @@ IN: io.sockets.secure.openssl.tests
 
 [ "test" 33 <ssl-handle> handle>> check-subject-name ]
 [ certificate-missing-error? ] must-fail-with
+
+{ t } [ "badssl.com" "*.badssl.com" subject-names-match? ] unit-test
+{ t } [ "www.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
+{ f } [ "foo.bar.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
+{ f } [ ".com" "*.badssl.com" subject-names-match? ] unit-test

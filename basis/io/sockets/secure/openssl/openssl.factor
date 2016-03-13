@@ -1,13 +1,13 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-assocs byte-arrays classes.struct combinators destructors fry io
-io.backend io.binary io.buffers io.encodings.8-bit.latin1
-io.encodings.utf8 io.files io.pathnames io.ports io.sockets
-io.sockets.secure io.timeouts kernel libc locals math
-math.functions math.order math.parser memoize namespaces openssl
-openssl.libcrypto openssl.libssl random sequences splitting
-unicode.case ;
+assocs byte-arrays classes.struct combinators
+combinators.short-circuit destructors fry io io.backend
+io.binary io.buffers io.encodings.8-bit.latin1 io.encodings.utf8
+io.files io.pathnames io.ports io.sockets io.sockets.secure
+io.timeouts kernel libc locals math math.functions math.order
+math.parser memoize namespaces openssl openssl.libcrypto
+openssl.libssl random sequences sets splitting unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -346,12 +346,23 @@ M: ssl-handle dispose*
     [ type>> GEN_DNS = ] filter
     [ d>> dNSName>> data>> utf8 alien>string ] map ;
 
-: subject-names-match? ( host subject -- ? )
-    [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
+! *.foo.com matches: foo.com, www.foo.com, a.foo.com
+! *.bar.foo.com matches: bar.foo.com, www.bar.foo.com, b.bar.foo.com
+: subject-names-match? ( name pattern -- ? )
+    [ >lower ] bi@
+    "*." ?head [
+        {
+            [ tail? ]
+            [ [ [ CHAR: . = ] count ] bi@ - 1 <= ]
+        } 2&&
+    ] [
+        =
+    ] if ;
 
 : check-subject-name ( host ssl-handle -- )
     SSL_get_peer_certificate [
-        [ alternative-dns-names ] [ subject-name ] bi suffix
+        [ alternative-dns-names ]
+        [ subject-name ] bi suffix members
         2dup [ subject-names-match? ] with any?
         [ 2drop ] [ subject-name-verify-error ] if
     ] [ certificate-missing-error ] if* ;
