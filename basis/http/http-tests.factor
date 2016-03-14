@@ -154,7 +154,6 @@ STRING: read-response-test-1'
 HTTP/1.1 404 not found
 content-type: text/html; charset=UTF-8
 
-
 ;
 
 ${ read-response-test-1' } [
@@ -443,7 +442,7 @@ test-db <db-persistence> [
     "resource:basis/http/test/" <static> enable-fhtml >>default
     add-quit-action [
 
-    [ "OK\n\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
+    [ "OK\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
 
     [ ] [ stop-test-httpd ] unit-test
 
