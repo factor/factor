@@ -114,7 +114,7 @@ CONSTANT: doc-start { 0 0 }
 ! XXX: This is the old string-lines behavior, it would be nice
 ! if we could update documents to work with the new string-lines
 ! behavior.
-: doc-lines ( str -- seq )
+: string-lines ( str -- seq )
     dup [ "\r\n" member? ] any? [
         "\n" split
         [
@@ -144,7 +144,7 @@ PRIVATE>
 
 :: set-doc-range ( string from to document -- )
     from to = string empty? and [
-        string doc-lines :> new-lines
+        string string-lines :> new-lines
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
