@@ -50,18 +50,10 @@ M: object (get-remote-address)
 : init-client-socket ( fd -- )
     SOL_SOCKET SO_OOBINLINE set-socket-option ;
 
-DEFER: wait-to-connect
-
-: wait-for-output ( port -- )
-    dup +output+ wait-for-port wait-to-connect ; inline
-
 : wait-to-connect ( port -- )
-    dup handle>> SOL_SOCKET SO_ERROR get-socket-option {
-        { 0 [ drop ] }
-        { EAGAIN [ wait-for-output ] }
-        { EINTR [ wait-to-connect ] }
-        [ (throw-errno) ]
-    } case ;
+    dup +output+ wait-for-port
+    dup handle>> SOL_SOCKET SO_ERROR get-socket-option
+    [ drop ] [ (throw-errno) ] if-zero ; inline
 
 M: object establish-connection
     2dup
@@ -69,7 +61,7 @@ M: object establish-connection
     connect 0 = [ 2drop ] [
         errno {
             { EINTR [ establish-connection ] }
-            { EINPROGRESS [ drop wait-for-output ] }
+            { EINPROGRESS [ drop wait-to-connect ] }
             [ (throw-errno) ]
         } case
     ] if ;
