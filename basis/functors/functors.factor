@@ -6,6 +6,7 @@ effects.parser fry functors.backend generic generic.parser
 interpolate io.streams.string kernel lexer locals.parser
 locals.types macros make namespaces parser quotations sequences
 vocabs.parser words words.symbol ;
+
 IN: functors
 
 ! This is a hack
@@ -147,15 +148,12 @@ DEFER: ;FUNCTOR delimiter
         [ nip scan-object 2array ]
     } cond ;
 
-: (parse-bindings) ( end -- words )
-    [ dup parse-binding dup ]
-    [ first2 [ make-local ] dip 2array ]
-    produce 2nip ;
-
 : parse-bindings ( end -- words assoc )
-    [
+    '[
         building get use-words
-        (parse-bindings)
+        [ _ parse-binding dup ]
+        [ first2 [ make-local ] dip 2array ]
+        produce nip
     ] H{ } make ;
 
 : parse-functor-body ( -- form )
@@ -163,6 +161,7 @@ DEFER: ;FUNCTOR delimiter
         "WHERE" parse-bindings drop
         [ swap <def> suffix ] { } assoc>map concat
         \ ;FUNCTOR parse-until [ ] append-as
+        qualified-vocabs pop* ! unuse the bindings
     ] with-lambda-scope ;
 
 : (FUNCTOR:) ( -- word def effect )
