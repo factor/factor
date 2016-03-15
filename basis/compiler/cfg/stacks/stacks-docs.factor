@@ -1,4 +1,4 @@
-USING: compiler.cfg.instructions compiler.cfg.registers
+USING: compiler.cfg compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks.local compiler.tree help.markup help.syntax math
 sequences ;
 IN: compiler.cfg.stacks
@@ -12,6 +12,7 @@ HELP: begin-stack-analysis
 { $see-also height-state } ;
 
 HELP: end-stack-analysis
+{ $values { "cfg" cfg } }
 { $description "Ends the stack analysis of the current cfg. This is the last step of the cfg construction (but comes before all optimization passes)." } ;
 
 HELP: adjust-d
