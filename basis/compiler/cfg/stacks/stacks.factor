@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors biassocs compiler.cfg compiler.cfg.registers
+USING: accessors biassocs compiler.cfg.registers
 compiler.cfg.stacks.finalize compiler.cfg.stacks.global
-compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.utilities
-fry kernel math namespaces sequences ;
+compiler.cfg.stacks.height compiler.cfg.stacks.local
+compiler.cfg.utilities kernel math namespaces sequences ;
 IN: compiler.cfg.stacks
 
 : begin-stack-analysis ( -- )
@@ -15,8 +15,7 @@ IN: compiler.cfg.stacks
     H{ } clone kill-sets set
     initial-height-state height-state set ;
 
-: end-stack-analysis ( -- )
-    cfg get
+: end-stack-analysis ( cfg -- )
     {
         compute-anticip-sets
         compute-live-sets

@@ -19,9 +19,10 @@ SYMBOL: loops
 : with-cfg-builder ( nodes word label quot: ( ..a block -- ..b ) -- )
     '[
         begin-stack-analysis
-        begin-cfg dup procedures get push
-        entry>> @
-        end-stack-analysis
+        begin-cfg
+        [ procedures get push ]
+        [ entry>> @ ]
+        [ end-stack-analysis ] tri
     ] with-scope ; inline
 
 : with-dummy-cfg-builder ( node quot -- )
