@@ -14,6 +14,8 @@ CONSTANT: cleanup-list {
     "GNUmakefile"
     "Nmakefile"
     "unmaintained"
+    "build.cmd"
+    "build.sh"
     "build-support"
     "images"
     "factor.dll.exp"
