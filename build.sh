@@ -474,7 +474,7 @@ update_script() {
 }
 
 update_script_changed() {
-    invoke_git diff --stat `invoke_git merge-base HEAD FETCH_HEAD` FETCH_HEAD | grep 'build-support.factor\.sh' >/dev/null
+    invoke_git diff --stat `invoke_git merge-base HEAD FETCH_HEAD` FETCH_HEAD | grep 'build\.sh' >/dev/null
 }
 
 git_fetch_factorcode() {
@@ -526,7 +526,7 @@ check_makefile_exists() {
         $ECHO "***GNUmakefile not found***"
         $ECHO "You are likely in the wrong directory."
         $ECHO "Run this script from your factor directory:"
-        $ECHO "     ./build-support/factor.sh"
+        $ECHO "     ./build.sh"
         exit_script 6
     fi
 }

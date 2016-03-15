@@ -33,8 +33,8 @@ To check out Factor:
 
 To build the latest complete Factor system from git:
 
-* Windows: `build-support\factor.cmd`
-* Unix: `./build-support/factor.sh update`
+* Windows: `build.cmd`
+* Unix: `./build.sh update`
 
 Now you should have a complete Factor system ready to run.
 
@@ -112,7 +112,6 @@ You can also write scripts that can be run from the terminal, by putting
 
 The Factor source tree is organized as follows:
 
-* `build-support/` - scripts used for compiling Factor (not present in binary packages)
 * `vm/` - Factor VM source code (not present in binary packages)
 * `core/` - Factor core library
 * `basis/` - Factor basis library, compiler, tools
