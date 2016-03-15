@@ -9,7 +9,7 @@ IN: mason.child
 
 ! Make sure we call the build directory's factor.cmd
 : nmake-cmd ( -- args )
-    "./build-support/factor.cmd" absolute-path
+    "./build.cmd" absolute-path
     "latest"
     target-cpu get name>> "." split "-" join 3array ;
 

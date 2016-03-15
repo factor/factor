@@ -56,7 +56,7 @@ nmake /nologo /f Nmakefile %_target%
 if errorlevel 1 goto fail
 
 echo Fetching %_bootimage_version% boot image...
-cscript /nologo build-support\http-get.vbs http://downloads.factorcode.org/images/%_bootimage_path%/%_bootimage% %_bootimage%
+cscript /nologo misc\http-get.vbs http://downloads.factorcode.org/images/%_bootimage_path%/%_bootimage% %_bootimage%
 if errorlevel 1 goto fail
 
 echo Bootstrapping...
@@ -75,7 +75,7 @@ echo Build failed.
 goto :EOF
 
 :wrongdir
-echo build-support\factor.cmd must be run from the root of the Factor source tree.
+echo build.cmd must be run from the root of the Factor source tree.
 goto :EOF
 
 :nocl
@@ -84,7 +84,7 @@ echo Make sure you're running within the Visual Studio or Windows SDK environmen
 goto :EOF
 
 :usage
-echo Usage: build-support\factor.cmd [latest/clean]
+echo Usage: build.cmd [latest/clean]
 echo     Updates the working copy, cleans and builds the vm using nmake,
 echo     fetches a boot image, and bootstraps factor.
 echo     If latest is specified, then the working copy is updated to the
