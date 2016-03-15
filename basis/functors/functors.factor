@@ -141,6 +141,12 @@ DEFER: ;FUNCTOR delimiter
 
 <PRIVATE
 
+: parse-binding ( end -- pair/f )
+    scan-token {
+        { [ 2dup = ] [ 2drop f ] }
+        [ nip scan-object 2array ]
+    } cond ;
+
 : (parse-bindings) ( end -- words )
     [ dup parse-binding dup ]
     [ first2 [ make-local ] dip 2array ]

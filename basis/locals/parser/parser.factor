@@ -62,12 +62,6 @@ SINGLETON: lambda-parser
 M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
 
-: parse-binding ( end -- pair/f )
-    scan-token {
-        { [ 2dup = ] [ 2drop f ] }
-        [ nip scan-object 2array ]
-    } cond ;
-
 : parse-let ( -- form )
     H{ } clone (parse-lambda) <let> ?rewrite-closures ;
 
