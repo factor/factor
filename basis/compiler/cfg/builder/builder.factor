@@ -37,7 +37,7 @@ GENERIC: emit-node ( block node -- block' )
     [ over [ emit-node ] [ drop ] if ] each ;
 
 : begin-word ( block -- block' )
-    dup make-kill-block
+    t >>kill-block?
     ##safepoint, ##prologue, ##branch,
     begin-basic-block ;
 
@@ -165,10 +165,8 @@ M: #shuffle emit-node ( block node -- block' )
 ! #return
 : end-word ( block -- block' )
     ##branch, begin-basic-block
-    dup make-kill-block
-    ##safepoint,
-    ##epilogue,
-    ##return, ;
+    t >>kill-block?
+    ##safepoint, ##epilogue, ##return, ;
 
 M: #return emit-node ( block node -- block' )
     drop end-word ;

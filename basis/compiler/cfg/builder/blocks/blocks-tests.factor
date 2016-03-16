@@ -33,11 +33,6 @@ IN: compiler.cfg.builder.blocks.tests
     <basic-block> dup set-basic-block ##branch, end-basic-block
 ] unit-test
 
-! make-kill-block
-{ t } [
-    <basic-block> [ make-kill-block ] keep kill-block?>>
-] unit-test
-
 {
     { "succ" "succ" "succ" }
 } [
