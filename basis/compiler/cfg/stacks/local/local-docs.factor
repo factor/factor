@@ -50,7 +50,7 @@ HELP: replace-loc
 { $see-also replaces } ;
 
 HELP: replace-sets
-{ $var-description "An " { $link assoc } " that maps from basic blocks to stack locations." } ;
+{ $var-description "An " { $link assoc } " in which each key is a " { $link basic-block } " and each value a " { $link hash-set } " with locations that were replaced in that block." } ;
 
 HELP: replaces
 { $var-description "An " { $link assoc } " that maps from stack locations to virtual registers that were put on the stack." }
