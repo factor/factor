@@ -9,7 +9,7 @@ IN: io.files.temp.windows
 
 <PRIVATE
 
-: (get-temp-directory) ( -- path )
+: get-temp-directory ( -- path )
     MAX_PATH 1 + dup WCHAR <c-array> [ GetTempPath ] keep
     swap win32-error=0/f
     alien>native-string ;
@@ -25,13 +25,9 @@ PRIVATE>
     [ SHGetFolderPath ] keep
     swap check-ole32-error alien>native-string ;
 
+M: windows default-temp-directory
+    get-temp-directory "factorcode.org\\Factor" append-path ;
 
-MEMO: (temp-directory) ( -- path )
-    (get-temp-directory) "factorcode.org\\Factor" append-path dup make-directories ;
+M: windows default-cache-directory
+    get-appdata-directory "factorcode.org\\Factor" append-path ;
 
-M: windows temp-directory (temp-directory) ;
-
-MEMO: (cache-directory) ( -- path )
-    get-appdata-directory "factorcode.org\\Factor" append-path dup make-directories ;
-
-M: windows cache-directory (cache-directory) ;

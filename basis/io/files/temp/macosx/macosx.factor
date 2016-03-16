@@ -22,22 +22,18 @@ FUNCTION: id NSSearchPathForDirectoriesInDomains (
 
 CONSTANT: factor-bundle-name "org.factorcode.Factor"
 
-: (make-factor-bundle-subdir) ( path -- path )
-    factor-bundle-name append-path dup make-directories ;
+: factor-bundle-subdir ( path -- path )
+    factor-bundle-name append-path ;
 
-: (first-existing) ( paths -- path )
+: first-existing ( paths -- path )
     [ exists? ] map-find nip
     [ "no user cache directory found" throw ] unless* ; inline
 
 PRIVATE>
 
-: (temp-directory) ( -- path )
-    NSTemporaryDirectory CF>string (make-factor-bundle-subdir) ;
+M: macosx default-temp-directory
+    NSTemporaryDirectory CF>string factor-bundle-subdir ;
 
-M: macosx temp-directory (temp-directory) ;
-
-: (cache-directory) ( -- path )
+M: macosx default-cache-directory
     NSCachesDirectory NSUserDomainMask 1 NSSearchPathForDirectoriesInDomains
-    plist> (first-existing) (make-factor-bundle-subdir) ;
-
-M: macosx cache-directory (cache-directory) ;
+    plist> first-existing factor-bundle-subdir ;
