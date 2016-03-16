@@ -245,7 +245,7 @@ CONSTANT: pt-array-1
 ] must-fail
 
 { } [
-    "resource:license.txt" binary [
+    "resource:LICENSE.txt" binary [
         44 read drop
         tell-input 44 assert=
         -44 seek-relative seek-input

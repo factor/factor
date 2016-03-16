@@ -99,9 +99,9 @@ IN: io.streams.limited.tests
 { t }
 [
     [
-        "resource:license.txt" utf8 <file-reader> &dispose
+        "resource:LICENSE.txt" utf8 <file-reader> &dispose
         3 limit-stream unlimit-stream
-        "resource:license.txt" utf8 <file-reader> &dispose
+        "resource:LICENSE.txt" utf8 <file-reader> &dispose
         [ decoder? ] both?
     ] with-destructors
 ] unit-test

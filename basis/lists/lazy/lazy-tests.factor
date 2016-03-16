@@ -42,12 +42,12 @@ IN: lists.lazy.tests
 { { 1 2 3 } } [ { 1 2 3 4 5 } >list [ 2 > ] luntil list>array ] unit-test
 
 { } [
-    "resource:license.txt" utf8 <file-reader> [
+    "resource:LICENSE.txt" utf8 <file-reader> [
         llines list>array drop
     ] with-disposal
 ] unit-test
 { } [
-    "resource:license.txt" utf8 <file-reader> [
+    "resource:LICENSE.txt" utf8 <file-reader> [
         lcontents list>array drop
     ] with-disposal
 ] unit-test
