@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
-layouts make math math.private namespaces sbufs sequences
-sequences.private splitting strings strings.private ;
+layouts make math math.private sbufs sequences sequences.private
+strings strings.private ;
 IN: math.parser
 
 <PRIVATE
@@ -577,3 +577,23 @@ M: float >base
     } cond ;
 
 : # ( n -- ) number>string % ; inline
+
+: hex-string>bytes ( hex-string -- bytes )
+    dup length 2/ <byte-array> [
+        [
+            [ digit> ] 2dip over even? [
+                [ 16 * ] [ 2/ ] [ set-nth ] tri*
+            ] [
+                [ 2/ ] [ [ + ] change-nth ] bi*
+            ] if
+        ] curry each-index
+    ] keep ;
+
+: bytes>hex-string ( bytes -- hex-string )
+    dup length 2 * CHAR: 0 <string> [
+        [
+            [ 16 /mod [ >digit ] bi@ ]
+            [ 2 * dup 1 + ]
+            [ [ set-nth ] curry bi-curry@ bi* ] tri*
+        ] curry each-index
+    ] keep ;
