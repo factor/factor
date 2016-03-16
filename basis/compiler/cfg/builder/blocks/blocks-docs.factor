@@ -70,10 +70,6 @@ HELP: end-branch
 { $values { "block" basic-block } { "pair/f" "two-tuple" } }
 { $description "pair is { final-bb final-height }" } ;
 
-HELP: make-kill-block
-{ $values { "block" basic-block } }
-{ $description "Marks the block as a kill block." } ;
-
 HELP: set-basic-block
 { $values { "basic-block" basic-block } }
 { $description "Sets the given blocks as the current one by storing it in the basic-block dynamic variable. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;

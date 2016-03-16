@@ -22,14 +22,11 @@ IN: compiler.cfg.builder.blocks
     [ swap call ] keep
     ##branch, begin-basic-block ; inline
 
-: make-kill-block ( block -- )
-    t swap kill-block?<< ;
-
 : call-height ( #call -- n )
     [ out-d>> length ] [ in-d>> length ] bi - ;
 
 : emit-call-block ( word height block -- )
-    make-kill-block adjust-d ##call, ;
+    t swap kill-block?<< adjust-d ##call, ;
 
 : emit-trivial-call ( block word height -- block' )
     rot [ emit-call-block ] emit-trivial-block ;
