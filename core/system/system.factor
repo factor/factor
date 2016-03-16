@@ -20,20 +20,20 @@ UNION: unix macosx linux ;
 
 : os ( -- class ) \ os get-global ; foldable
 
-: vm-version ( -- string ) \ vm-version get-global ; foldable
+: vm-version ( -- string ) \ vm-version get-global ;
 
-: vm-git-label ( -- string ) \ vm-git-label get-global ; foldable
+: vm-git-label ( -- string ) \ vm-git-label get-global ;
 
 : split-vm-git-label ( -- ref git-id )
-    vm-git-label "-" split1-last ; foldable
+    vm-git-label "-" split1-last ;
 
-: vm-git-ref ( -- string ) split-vm-git-label drop ; foldable
+: vm-git-ref ( -- string ) split-vm-git-label drop ;
 
-: vm-git-id ( -- string ) split-vm-git-label nip ; foldable
+: vm-git-id ( -- string ) split-vm-git-label nip ;
 
-: vm-compiler ( -- string ) \ vm-compiler get-global ; foldable
+: vm-compiler ( -- string ) \ vm-compiler get-global ;
 
-: vm-compile-time ( -- string ) \ vm-compile-time get-global ; foldable
+: vm-compile-time ( -- string ) \ vm-compile-time get-global ;
 
 <PRIVATE
 
