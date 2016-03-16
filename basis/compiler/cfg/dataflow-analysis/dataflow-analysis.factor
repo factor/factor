@@ -59,7 +59,7 @@ M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
 FUNCTOR: define-analysis ( name -- )
 
-name-analysis DEFINES-CLASS ${name}-analysis
+name DEFINES-CLASS ${name}
 name-ins DEFINES ${name}-ins
 name-outs DEFINES ${name}-outs
 name-in DEFINES ${name}-in
@@ -67,7 +67,7 @@ name-out DEFINES ${name}-out
 
 WHERE
 
-SINGLETON: name-analysis
+SINGLETON: name
 
 SYMBOL: name-ins
 
@@ -90,17 +90,17 @@ M: forward-analysis predecessors drop predecessors>> ;
 
 FUNCTOR: define-forward-analysis ( name -- )
 
-name-analysis IS ${name}-analysis
+name IS ${name}
 name-ins IS ${name}-ins
 name-outs IS ${name}-outs
 compute-name-sets DEFINES compute-${name}-sets
 
 WHERE
 
-INSTANCE: name-analysis forward-analysis
+INSTANCE: name forward-analysis
 
 : compute-name-sets ( cfg -- )
-    name-analysis run-dataflow-analysis
+    name run-dataflow-analysis
     [ name-ins set ] [ name-outs set ] bi* ;
 
 ;FUNCTOR
@@ -116,17 +116,17 @@ M: backward-analysis predecessors drop successors>> ;
 
 FUNCTOR: define-backward-analysis ( name -- )
 
-name-analysis IS ${name}-analysis
+name IS ${name}
 name-ins IS ${name}-ins
 name-outs IS ${name}-outs
 compute-name-sets DEFINES compute-${name}-sets
 
 WHERE
 
-INSTANCE: name-analysis backward-analysis
+INSTANCE: name backward-analysis
 
 : compute-name-sets ( cfg -- )
-    \ name-analysis run-dataflow-analysis
+    \ name run-dataflow-analysis
     [ name-outs set ] [ name-ins set ] bi* ;
 
 ;FUNCTOR

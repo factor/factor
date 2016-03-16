@@ -87,13 +87,13 @@ SYMBOL: stack-record
 : visit-insns ( insns state -- state' )
     [ [ register-stack-state ] [ visit-insn ] 2bi ] reduce ;
 
-M: padding-analysis transfer-set ( in-set bb dfa -- out-set )
+M: padding transfer-set ( in-set bb dfa -- out-set )
     drop instructions>> swap visit-insns ;
 
-M: padding-analysis ignore-block? ( bb dfa -- ? )
+M: padding ignore-block? ( bb dfa -- ? )
     2drop f ;
 
-M: padding-analysis join-sets ( sets bb dfa -- set )
+M: padding join-sets ( sets bb dfa -- set )
     2drop combine-states ;
 
 : uniquely-number-instructions ( cfg -- )
