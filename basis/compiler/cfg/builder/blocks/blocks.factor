@@ -4,6 +4,8 @@ USING: accessors arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities
 kernel make math namespaces sequences ;
 IN: compiler.cfg.builder.blocks
+SLOT: in-d
+SLOT: out-d
 
 : set-basic-block ( basic-block -- )
     dup begin-local-analysis instructions>> building set ;
