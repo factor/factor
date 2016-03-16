@@ -1,5 +1,7 @@
-USING: help.markup help.syntax math math.parser.private prettyprint
-namespaces make strings ;
+USING: byte-arrays help.markup help.syntax math
+math.parser.private prettyprint namespaces make sequences
+strings ;
+
 IN: math.parser
 
 ARTICLE: "number-strings" "Converting between numbers and strings"
@@ -114,3 +116,20 @@ HELP: number>string
 HELP: #
 { $values { "n" real } }
 { $description "Appends the string representation of a real number to the end of the sequence being constructed by " { $link make } "." } ;
+
+HELP: bytes>hex-string
+{ $values { "bytes" sequence } { "hex-string" string } }
+{ $description "Converts a sequence of bytes (integers in the range [0,255]) to a string of hex numbers in the range [00,ff]." }
+{ $examples
+    { $example "USING: math.parser prettyprint ;" "B{ 1 2 3 4 } bytes>hex-string ." "\"01020304\"" }
+}
+{ $notes "Numbers are zero-padded on the left." } ;
+
+HELP: hex-string>bytes
+{ $values { "hex-string" sequence } { "bytes" byte-array } }
+{ $description "Converts a sequence of hex numbers in the range [00,ff] to a sequence of bytes (integers in the range [0,255])." }
+{ $examples
+    { $example "USING: math.parser prettyprint ;" "\"cafebabe\" hex-string>bytes ." "B{ 202 254 186 190 }" }
+} ;
+
+{ bytes>hex-string hex-string>bytes } related-words

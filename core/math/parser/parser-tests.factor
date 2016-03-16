@@ -458,3 +458,6 @@ unit-test
 { 0.0  } [ "1e-100000" string>number ] unit-test
 { 1/0. } [ "0x1p300000" string>number ] unit-test
 { 0.0  } [ "0x1p-300000" string>number ] unit-test
+
+{ "deadbeef" } [ B{ 222 173 190 239 } bytes>hex-string ] unit-test
+{ B{ 222 173 190 239 } } [ "deADbeEF" hex-string>bytes ] unit-test
