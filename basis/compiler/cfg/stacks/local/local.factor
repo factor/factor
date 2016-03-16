@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.instructions compiler.cfg.parallel-copy
-compiler.cfg.registers compiler.cfg.stacks.height
-fry hash-sets kernel make math math.order namespaces sequences sets ;
+USING: accessors assocs compiler.cfg.instructions
+compiler.cfg.parallel-copy compiler.cfg.registers
+compiler.cfg.stacks.height hash-sets kernel make math math.order
+namespaces sequences sets ;
 IN: compiler.cfg.stacks.local
 
 : current-height ( state -- ds rs )
@@ -84,8 +84,8 @@ SYMBOLS: local-peek-set replaces ;
 : end-local-analysis ( basic-block -- )
     [
         replaces get remove-redundant-replaces
-        dup height-state get emit-changes keys
-        swap replace-sets get set-at
+        [ height-state get emit-changes ]
+        [ keys swap replace-sets get set-at ] bi
     ]
     [ [ local-peek-set get ] dip peek-sets get set-at ]
     [ [ compute-local-kill-set ] keep kill-sets get set-at ] tri ;
