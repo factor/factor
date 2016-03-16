@@ -484,7 +484,7 @@ git_fetch_factorcode() {
     invoke_git fetch "$GIT_URL" master
 
     if update_script_changed; then
-        $ECHO "Updating and restarting the factor.sh script..."
+        $ECHO "Updating and restarting the build.sh script..."
         update_script
     else
         $ECHO "Updating the working tree..."

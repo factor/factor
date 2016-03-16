@@ -133,7 +133,7 @@ ifdef CONFIG
 endif
 
 default:
-	$(MAKE) `./build-support/factor.sh make-target`
+	$(MAKE) `./build.sh make-target`
 
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
