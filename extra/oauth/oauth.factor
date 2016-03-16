@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs base64 calendar checksums.hmac
 checksums.sha combinators fry http http.client kernel locals
-make math namespaces present random sequences sorting strings
-urls urls.encoding urls.private checksums ;
+make math math.parser namespaces present random sequences
+sorting strings urls urls.encoding urls.private ;
 IN: oauth
 
 SYMBOL: consumer-token
@@ -26,7 +26,7 @@ nonce ;
     new
         consumer-token get >>consumer-token
         now timestamp>unix-time >integer >>timestamp
-        16 random-bytes hex-string >>nonce ; inline
+        16 random-bytes bytes>hex-string >>nonce ; inline
 
 : present-base-url ( url -- string )
     [
