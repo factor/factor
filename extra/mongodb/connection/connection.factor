@@ -7,7 +7,7 @@ namespaces sequences splitting ;
 IN: mongodb.connection
 
 : md5-checksum ( string -- digest )
-    utf8 encode md5 checksum-bytes hex-string ; inline
+    utf8 encode md5 checksum-bytes bytes>hex-string ; inline
 
 TUPLE: mdb-db name username pwd-digest nodes collections ;
 
