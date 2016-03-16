@@ -3,12 +3,10 @@
 USING: accessors arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities
 kernel make math namespaces sequences ;
-SLOT: in-d
-SLOT: out-d
 IN: compiler.cfg.builder.blocks
 
 : set-basic-block ( basic-block -- )
-    [ instructions>> building set ] [ begin-local-analysis ] bi ;
+    dup begin-local-analysis instructions>> building set ;
 
 : end-basic-block ( block -- )
     [ end-local-analysis ] when* building off ;
@@ -17,7 +15,7 @@ IN: compiler.cfg.builder.blocks
     <basic-block> swap [ over connect-bbs ] when* dup set-basic-block ;
 
 : begin-basic-block ( block -- block' )
-    dup [ end-local-analysis ] when* (begin-basic-block) ;
+    dup end-basic-block (begin-basic-block) ;
 
 : emit-trivial-block ( block quot: ( ..a block' -- ..b ) -- block' )
     ##branch, swap begin-basic-block
@@ -52,7 +50,7 @@ IN: compiler.cfg.builder.blocks
 : with-branch ( block quot: ( ..a block -- ..b block' ) -- pair/f )
     [ [ begin-branch ] dip call end-branch ] with-scope ; inline
 
-: emit-conditional ( block branches -- block' )
+: emit-conditional ( block branches -- block'/f )
     swap end-basic-block
     sift [ f ] [
         dup first second height-state set
