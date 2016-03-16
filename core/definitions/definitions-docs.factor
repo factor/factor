@@ -87,7 +87,7 @@ HELP: forget
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: forget-all
-{ $values { "definitions" "a sequence of definition specifiers" } }
+{ $values { "definitions" { $sequence "definition specifiers" } } }
 { $description "Forgets every definition in a sequence." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 

@@ -52,7 +52,7 @@ ARTICLE: "defining-words" "Defining words"
 "There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } "." ;
 
 ARTICLE: "parsing-tokens" "Parsing raw tokens"
-"So far we have seen how to read individual tokens, or read a sequence of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."
+"So far we have seen how to read individual tokens, or read a  of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."
 $nl
 "One example is the " { $link POSTPONE: USING: } " parsing word."
 { $see POSTPONE: USING: }
@@ -215,7 +215,7 @@ HELP: (parse-lines)
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-lines
-{ $values { "lines" "a sequence of strings" } { "quot" "a new " { $link quotation } } }
+{ $values { "lines" { $sequence string } } { "quot" "a new " { $link quotation } } }
 { $description "Parses Factor source code which has been tokenized into lines. The vocabulary search path is taken from the current scope." }
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
@@ -239,12 +239,12 @@ HELP: with-file-vocabs
 { $description "Calls the quotation in a scope with an initial vocabulary search path consisting of just the " { $snippet "syntax" } " vocabulary." } ;
 
 HELP: parse-fresh
-{ $values { "lines" "a sequence of strings" } { "quot" quotation } }
+{ $values { "lines" { $sequence string } } { "quot" quotation } }
 { $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link with-file-vocabs } ")." }
 { $errors "Throws a parse error if the input is malformed." } ;
 
 HELP: filter-moved
-{ $values { "set1" set } { "set2" set } { "seq" "an sequence of definitions" } }
+{ $values { "set1" set } { "set2" set } { "seq" { $sequence "definitions" } } }
 { $description "Removes all definitions from " { $snippet "set2" } " which are in " { $snippet "set1" } " or are no longer present in the " { $link current-source-file } "." } ;
 
 HELP: forget-smudged

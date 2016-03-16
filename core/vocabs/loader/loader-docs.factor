@@ -113,7 +113,7 @@ HELP: reload
 { $errors "Throws a " { $link no-vocab } " error if the vocabulary does not exist on disk." } ;
 
 HELP: require-when
-{ $values { "if" "a sequence of vocabulary specifiers" } { "then" "a vocabulary specifier" } }
+{ $values { "if" { $sequence "vocabulary specifiers" } } { "then" "a vocabulary specifier" } }
 { $description "Loads the " { $snippet "then" } " vocabulary if it is not loaded and all of the " { $snippet "if" } " vocabulary is. If some of the " { $snippet "if" } " vocabularies are not loaded now, but they are later, then the " { $snippet "then" } " vocabulary will be loaded along with the final one." }
 { $notes "This is used to express a joint dependency of vocabularies. If vocabularies " { $snippet "a" } " and " { $snippet "b" } " use code in vocabulary " { $snippet "c" } " to interact, then the following line, which can be placed in " { $snippet "a" } " or " { $snippet "b" } ", expresses the dependency."
 { $code "{ \"a\" \"b\" } \"c\" require-when" } } ;

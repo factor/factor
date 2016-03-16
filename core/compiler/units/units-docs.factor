@@ -75,7 +75,7 @@ HELP: with-nested-compilation-unit
 { $notes "This word is used by " { $link "syntax-immediate" } " to ensure that definitions in nested blocks are correctly recorded. User code should not depend on parser internals in such a way that calling this combinator is required." } ;
 
 HELP: recompile
-{ $values { "words" "a sequence of words" } { "alist" "an association list mapping words to compiled definitions" } }
+{ $values { "words" { $sequence word } } { "alist" "an association list mapping words to compiled definitions" } }
 { $contract "Internal word which compiles words. Called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: to-recompile
@@ -112,5 +112,5 @@ $nl
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: compile
-{ $values { "words" "a sequence of words" } }
+{ $values { "words" { $sequence word } } }
 { $description "Compiles a set of words." } ;

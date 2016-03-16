@@ -48,7 +48,7 @@ HELP: 1string
 { $description "Outputs a string of one character." } ;
 
 HELP: >string
-{ $values { "seq" "a sequence of characters" } { "str" string } }
+{ $values { "seq" { $sequence "characters" } } { "str" string } }
 { $description "Outputs a freshly-allocated string with the same elements as a given sequence, by interpreting the sequence elements as Unicode code points." }
 { $notes "This operation is only appropriate if the underlying sequence holds Unicode code points, which is rare unless it is a " { $link slice } " of another string. To convert a sequence of bytes to a string, use the words documented in " { $link "io.encodings.string" } "." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;

@@ -261,7 +261,7 @@ HELP: remove-word-prop
 { $side-effects "word" } ;
 
 HELP: remove-word-props
-{ $values { "word" word } { "seq" "a sequence of word property names" } }
+{ $values { "word" word } { "seq" { $sequence "word property names" } } }
 { $description "Removes all listed word properties from the word." }
 { $side-effects "word" } ;
 

@@ -298,11 +298,11 @@ HELP: bl
 $io-error ;
 
 HELP: stream-lines
-{ $values { "stream" "an input stream" } { "seq" "a sequence of strings" } }
+{ $values { "stream" "an input stream" } { "seq" { $sequence string } } }
 { $description "Reads lines of text until the stream is exhausted, collecting them in a sequence of strings." } ;
 
 HELP: lines
-{ $values { "seq" "a sequence of strings" } }
+{ $values { "seq" { $sequence string } } }
 { $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
 HELP: each-line
