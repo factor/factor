@@ -53,7 +53,7 @@ HELP: emit-conditional
 { $values
   { "block" basic-block }
   { "branches" "sequence of pairs" }
-  { "block'" basic-block }
+  { "block'/f" { $maybe basic-block } }
 }
 { $description "Emits a sequence of conditional branches to the current " { $link cfg } ". Each branch is a pair where the first item is the entry basic block and the second the branches " { $link height-state } ". 'block' is the block in which the control flow is branched and \"block'\" the block in which it converges again." } ;
 
