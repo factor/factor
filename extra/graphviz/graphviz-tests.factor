@@ -36,13 +36,6 @@ SYMBOLS: supported-layouts supported-formats ;
     "-T" force-error-message standard-formats intersect
     supported-formats set-global ;
 
-! Can't use cleanup-unique-working-directory without fixing
-! issue #890, so skip the cleanup on Windows.
-:: cleanup-unique-working-directory* ( quot -- )
-    unique-directory :> path
-    path [ path quot with-temporary-directory ] with-directory
-    os windows? [ path delete-tree ] unless ; inline
-
 ! Can't predict file extension since we use Graphviz's actual
 ! -O flag, so just look to see that there seems to be some sort
 ! of output.
@@ -58,7 +51,7 @@ SYMBOLS: supported-layouts supported-formats ;
     [
         graph "smoke-test" -T -K graphviz
         "smoke-test" graphviz-output-appears-to-exist?
-    ] cleanup-unique-working-directory* ;
+    ] cleanup-unique-working-directory ;
 
 : preview-smoke-test ( graph -- pass? )
     f "pass?" [
