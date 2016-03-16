@@ -85,7 +85,7 @@ SYMBOLS: local-peek-set replaces ;
     [
         replaces get remove-redundant-replaces
         [ height-state get emit-changes ]
-        [ keys swap replace-sets get set-at ] bi
+        [ keys >hash-set swap replace-sets get set-at ] bi
     ]
     [ [ local-peek-set get ] dip peek-sets get set-at ]
     [ [ compute-local-kill-set ] keep kill-sets get set-at ] tri ;

@@ -1,7 +1,8 @@
-USING: accessors assocs biassocs combinators compiler.cfg
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.stacks.height compiler.cfg.stacks.local compiler.cfg.utilities
-compiler.test cpu.architecture make namespaces kernel tools.test ;
+USING: assocs compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks.height compiler.cfg.stacks.local
+compiler.cfg.utilities compiler.test cpu.architecture kernel
+kernel.private make math namespaces sequences.private slots.private
+tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.local.tests
 
@@ -29,7 +30,7 @@ IN: compiler.cfg.stacks.local.tests
 ! end-local-analysis
 {
     HS{ }
-    { }
+    HS{ }
     HS{ }
 } [
     V{ } 137 insns>block
@@ -39,7 +40,7 @@ IN: compiler.cfg.stacks.local.tests
 ] cfg-unit-test
 
 {
-    { D: 3 }
+    HS{ D: 3 }
 } [
     V{ } 137 insns>block
     [ 0 0 rot record-stack-heights ]
@@ -115,3 +116,43 @@ IN: compiler.cfg.stacks.local.tests
 { H{ { D: -1 40 } } } [
     D: 1 inc-stack 40 D: 0 replace-loc replaces get
 ] cfg-unit-test
+
+! Compiling these words used to make the compiler hang due to a bug in
+! end-local-analysis. So the test is just to compile them and if it
+! doesn't hang, the bug is fixed! See #1507
+: my-new-key4 ( a i j -- i/j )
+    2over
+    slot
+    swap over
+    ! a i el j el
+    [
+        ! a i el j
+        swap
+        ! a i j el
+        77 eq?
+        [
+            rot drop and
+        ]
+        [
+            ! a i j
+            over or my-new-key4
+        ] if
+    ]
+    [
+        ! a i el j
+        2drop t
+        ! a i t
+        my-new-key4
+    ] if ; inline recursive
+
+: badword ( y -- )
+    0 swap dup
+    { integer object } declare
+    [
+        { array-capacity object } declare nip
+        1234 1234 pick
+        f
+        my-new-key4
+        set-slot
+    ]
+    curry (each-integer) ;
