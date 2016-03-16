@@ -131,7 +131,7 @@ IN: io.streams.peek.tests
 
 ! Issue #1317
 { "Red" } [
-    "resource:license.txt" binary [
+    "resource:LICENSE.txt" binary [
         input-stream [ <peek-stream> ] change
         peek1 drop
         3 read >string
@@ -139,7 +139,7 @@ IN: io.streams.peek.tests
 ] unit-test
 
 { "ist" } [
-    "resource:license.txt" binary [
+    "resource:LICENSE.txt" binary [
         input-stream [ <peek-stream> ] change
         peek1 drop
         3 read drop

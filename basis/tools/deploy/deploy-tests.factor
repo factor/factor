@@ -155,7 +155,7 @@ os macosx? [
     test-image temp-file =
 ] unit-test
 
-{ } [ "resource:license.txt" "license.txt" temp-file copy-file ] unit-test
+{ } [ "resource:LICENSE.txt" "license.txt" temp-file copy-file ] unit-test
 
 { } [ "tools.deploy.test.19" shake-and-bake run-temp-image ] unit-test
 
