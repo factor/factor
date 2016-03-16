@@ -36,11 +36,11 @@ $nl
 ABOUT: "stream-binary"
 
 HELP: be>
-{ $values { "seq" "a sequence of bytes" } { "x" "a non-negative integer" } }
+{ $values { "seq" { $sequence "bytes" } } { "x" "a non-negative integer" } }
 { $description "Converts a sequence of bytes in big endian order into an unsigned integer." } ;
 
 HELP: le>
-{ $values { "seq" "a sequence of bytes" } { "x" "a non-negative integer" } }
+{ $values { "seq" { $sequence "bytes" } } { "x" "a non-negative integer" } }
 { $description "Converts a sequence of bytes in little endian order into an unsigned integer." } ;
 
 HELP: nth-byte

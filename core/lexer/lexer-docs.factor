@@ -13,7 +13,7 @@ HELP: lexer
 "Custom lexing can be implemented by delegating a tuple to an instance of this class and implementing the " { $link skip-word } " and " { $link skip-blank } " generic words." } ;
 
 HELP: <lexer>
-{ $values { "text" "a sequence of strings" } { "lexer" lexer } }
+{ $values { "text" { $sequence string } } { "lexer" lexer } }
 { $description "Creates a new lexer for tokenizing the given sequence of lines." } ;
 
 HELP: next-line
@@ -78,12 +78,12 @@ HELP: each-token
 $parsing-note ;
 
 HELP: map-tokens
-{ $values { "end" string } { "quot" { $quotation ( ... token -- ... elt ) } } { "seq" "a new sequence of " { $snippet "object" } "s" } }
+{ $values { "end" string } { "quot" { $quotation ( ... token -- ... elt ) } } { "seq" { $sequence object } } }
 { $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read, and the results are collected into a new output sequence." }
 $parsing-note ;
 
 HELP: parse-tokens
-{ $values { "end" string } { "seq" "a new sequence of strings" } }
+{ $values { "end" string } { "seq" { $sequence string } } }
 { $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". The tokens remain as strings and are not processed in any way. This word is equivalent to " { $link map-tokens } " with an empty quotation." }
 $parsing-note ;
 

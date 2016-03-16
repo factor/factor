@@ -150,7 +150,7 @@ HELP: <method>
 { $description "Creates a new method." } ;
 
 HELP: order
-{ $values { "generic" generic } { "seq" "a sequence of classes" } }
+{ $values { "generic" generic } { "seq" { $sequence class } } }
 { $description "Outputs a sequence of classes for which methods have been defined on this generic word. The sequence is sorted in method dispatch order." } ;
 
 HELP: check-method

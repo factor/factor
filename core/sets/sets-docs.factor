@@ -222,5 +222,5 @@ HELP: cardinality
 { $description "Returns the number of elements in the set. All sets support this operation." } ;
 
 HELP: combine
-{ $values { "sets" "a sequence of sets" } { "set/f" { $maybe unordered-set } } }
+{ $values { "sets" { $sequence unordered-set } } { "set/f" { $maybe unordered-set } } }
 { $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;

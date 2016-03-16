@@ -394,7 +394,7 @@ HELP: assoc-hashcode
 { $notes "Custom assoc implementations should use this word to implement a method for the " { $link hashcode* } " generic word." } ;
 
 HELP: assoc-stack
-{ $values { "key" "a key" } { "seq" "a sequence of assocs" } { "value" { $maybe "a value" } } }
+{ $values { "key" "a key" } { "seq" { $sequence assoc } } { "value" { $maybe "a value" } } }
 { $description "Searches for the key in successive elements of the sequence, starting from the end. If an assoc containing the key is found, the associated value is output. If no assoc contains the key, outputs " { $link f } "." }
 { $notes "This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed assoc -- the innermost scope -- will be searched first." } ;
 

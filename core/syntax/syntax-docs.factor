@@ -453,7 +453,7 @@ HELP: SYMBOL:
 
 HELP: SYMBOLS:
 { $syntax "SYMBOLS: words... ;" }
-{ $values { "words" "a sequence of new words to define" } }
+{ $values { "words" { $sequence "new words to define" } } }
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
@@ -471,7 +471,7 @@ HELP: SINGLETON:
 
 HELP: SINGLETONS:
 { $syntax "SINGLETONS: words... ;" }
-{ $values { "words" "a sequence of new words to define" } }
+{ $values { "words" { $sequence "new words to define" } } }
 { $description "Creates a new singleton for every token until the " { $snippet ";" } "." } ;
 
 HELP: ALIAS:

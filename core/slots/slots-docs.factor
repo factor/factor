@@ -158,7 +158,7 @@ HELP: define-slot-methods
 $low-level-note ;
 
 HELP: define-accessors
-{ $values { "class" class } { "specs" "a sequence of " { $link slot-spec } " instances" } }
+{ $values { "class" class } { "specs" { $sequence slot-spec } } }
 { $description "Defines slot methods." }
 $low-level-note ;
 
@@ -173,5 +173,5 @@ HELP: set-slot
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: slot-named
-{ $values { "name" string } { "specs" "a sequence of " { $link slot-spec } " instances" } { "spec/f" { $maybe slot-spec } } }
+{ $values { "name" string } { "specs" { $sequence slot-spec } } { "spec/f" { $maybe slot-spec } } }
 { $description "Outputs the " { $link slot-spec } " with the given name." } ;

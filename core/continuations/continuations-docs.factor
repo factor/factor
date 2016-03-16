@@ -199,7 +199,7 @@ HELP: rethrow
 } ;
 
 HELP: throw-restarts
-{ $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
+{ $values { "error" object } { "restarts" { $sequence { { $snippet "{ string object }" } " pairs" } } } { "restart" object } }
 { $description "Throws a restartable error using " { $link throw } ". The " { $snippet "restarts" } " parameter is a sequence of pairs where the first element in each pair is a human-readable description and the second is an arbitrary object. If the error reaches the top-level error handler, the user will be presented with the list of possible restarts, and upon invoking one, execution will continue after the call to " { $link throw-restarts } " with the object associated to the chosen restart on the stack." }
 { $examples
     "Try invoking one of the two restarts which are offered after the below code throws an error:"
@@ -212,7 +212,7 @@ HELP: throw-restarts
 } ;
 
 HELP: rethrow-restarts
-{ $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
+{ $values { "error" object } { "restarts" { $sequence { { $snippet "{ string object }" } " pairs" } } } { "restart" object } }
 { $description "Throws a restartable error using " { $link rethrow } ". Otherwise, this word is identical to " { $link throw-restarts } "." } ;
 
 { throw rethrow throw-restarts rethrow-restarts throw-continue } related-words

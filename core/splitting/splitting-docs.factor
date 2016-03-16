@@ -93,7 +93,7 @@ HELP: ?tail-slice
 { $description "Like " { $link ?tail } ", except the resulting sequence is a " { $link slice } "." } ;
 
 HELP: string-lines
-{ $values { "str" string } { "seq" "a sequence of strings" } }
+{ $values { "str" string } { "seq" { $sequence string } } }
 { $description "Splits a string along line breaks." }
 { $examples
     { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" }" }
