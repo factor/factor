@@ -103,11 +103,11 @@ HELP: set-file-permissions
 { $description "Sets the file permissions for a given file with the supplied Unix permissions integer." }
 { $examples "Using the traditional octal value:"
     { $code "USING: io.files.info.unix kernel ;"
-        "\"resource:license.txt\" 0o755 set-file-permissions"
+        "\"resource:LICENSE.txt\" 0o755 set-file-permissions"
     }
     "Higher-level, setting named bits:"
     { $code "USING: io.files.info.unix kernel literals ;"
-    "\"resource:license.txt\""
+    "\"resource:LICENSE.txt\""
     "flags{ USER-ALL GROUP-READ GROUP-EXECUTE OTHER-READ OTHER-EXECUTE }"
     "set-file-permissions"
     }
