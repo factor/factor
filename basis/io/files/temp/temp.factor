@@ -7,10 +7,6 @@ HOOK: default-temp-directory os ( -- path )
 
 SYMBOL: current-temp-directory
 
-current-temp-directory [
-    default-temp-directory dup make-directories
-] initialize
-
 : temp-directory ( -- path )
     current-temp-directory get ;
 
@@ -23,10 +19,6 @@ current-temp-directory [
 HOOK: default-cache-directory os ( -- path )
 
 SYMBOL: current-cache-directory
-
-current-cache-directory [
-    default-cache-directory dup make-directories
-] initialize
 
 : cache-directory ( -- path )
     current-cache-directory get ;
@@ -42,3 +34,11 @@ current-cache-directory [
     { [ os macosx? ] [ "io.files.temp.macosx" ] }
     { [ os unix? ] [ "io.files.temp.unix" ] }
 } cond require
+
+\ current-temp-directory [
+    default-temp-directory dup make-directories
+] initialize
+
+\ current-cache-directory [
+    default-cache-directory dup make-directories
+] initialize
