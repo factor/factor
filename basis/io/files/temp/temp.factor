@@ -1,5 +1,5 @@
 ! (c)2012 Joe Groff bsd license
-USING: combinators io.directories io.pathnames kernel
+USING: combinators init io.directories io.pathnames kernel
 namespaces system vocabs ;
 IN: io.files.temp
 
@@ -35,10 +35,10 @@ SYMBOL: current-cache-directory
     { [ os unix? ] [ "io.files.temp.unix" ] }
 } cond require
 
-\ current-temp-directory [
+[
     default-temp-directory dup make-directories
-] initialize
+    current-temp-directory set-global
 
-\ current-cache-directory [
     default-cache-directory dup make-directories
-] initialize
+    current-cache-directory set-global
+] "io.files.temp" add-startup-hook
