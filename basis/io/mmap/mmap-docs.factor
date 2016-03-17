@@ -49,7 +49,7 @@ HELP: with-mapped-array
     { $unchecked-example
         "USING: alien.c-types io.mmap prettyprint specialized-arrays ;"
         "SPECIALIZED-ARRAY: uint"
-"resource:license.txt\" uint [
+"resource:LICENSE.txt\" uint [
     [ . ] each
 ] with-mapped-array"
         ""
