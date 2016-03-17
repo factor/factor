@@ -1,5 +1,4 @@
 *~
-_darcs
 *.gch*
 *.obj
 *.o
@@ -25,10 +24,8 @@ factor.com
 .*.swn
 .*.swo
 .*.swp
-temp
 logs
 work
-build-support/wordsize
 *.bak
 .#*
 checksums.txt
