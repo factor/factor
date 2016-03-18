@@ -95,15 +95,14 @@ IN: io.launcher.unix.tests
 ] unit-test
 
 { "hi\n" } [
-    temp-directory [
+    [
         [ "aloha" delete-file ] ignore-errors
         <process>
             { "echo" "hi" } >>command
             "aloha" >>stdout
         try-process
-    ] with-directory
-    temp-directory "aloha" append-path
-    utf8 file-contents
+        "aloha" utf8 file-contents
+    ] with-temp-directory
 ] unit-test
 
 [ "append-test" arch-temp-file delete-file ] ignore-errors
