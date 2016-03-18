@@ -79,14 +79,19 @@ IN: csv.tests
 
 { { { "writing" "some" "csv" "tests" } } }
 [
-    "writing,some,csv,tests"
-    "csv-test1-" unique-file utf8
-    [ set-file-contents ] [ file>csv ] [ drop delete-file ] 2tri
+    [
+        "writing,some,csv,tests"
+        "csv-test1-" ".csv" unique-file utf8
+        [ set-file-contents ] [ file>csv ] [ drop delete-file ] 2tri
+    ] with-temp-directory
 ] unit-test
 
 { t } [
-    { { "writing,some,csv,tests" } } dup "csv-test2-"
-    unique-file utf8 [ csv>file ] [ file>csv ] 2bi =
+    [
+        { { "writing,some,csv,tests" } } dup
+        "csv-test2-" ".csv" unique-file utf8
+        [ csv>file ] [ file>csv ] 2bi =
+    ] with-temp-directory
 ] unit-test
 
 { { { "hello" "" "" "" "goodbye" "" } } }

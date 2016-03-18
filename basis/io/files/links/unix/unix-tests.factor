@@ -9,30 +9,30 @@ IN: io.files.links.unix.tests
 
 { t } [
     [
-        current-temporary-directory get [
+        [
             5 "lol" make-test-links
             "lol1" follow-links
-            current-temporary-directory get "lol5" append-path =
-        ] with-directory
-    ] cleanup-unique-directory
+            "lol5" absolute-path =
+        ] cleanup-unique-directory
+    ] with-temp-directory
 ] unit-test
 
 [
     [
-        current-temporary-directory get [
+        [
             100 "laf" make-test-links "laf1" follow-links
-        ] with-directory
-    ] with-unique-directory
+        ] with-unique-directory
+    ] with-temp-directory
 ] [ too-many-symlinks? ] must-fail-with
 
 { t } [
     110 symlink-depth [
         [
-            current-temporary-directory get [
+            [
                 100 "laf" make-test-links
                 "laf1" follow-links
-                current-temporary-directory get "laf100" append-path =
-            ] with-directory
-        ] cleanup-unique-directory
+                "laf100" absolute-path =
+            ] cleanup-unique-directory
+        ] with-temp-directory
     ] with-variable
 ] unit-test

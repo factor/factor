@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image bootstrap.image.download io
-io.directories io.directories.hierarchy io.files.unique
-io.launcher io.pathnames kernel namespaces sequences
-mason.common mason.config webapps.mason.version.files ;
+io.directories io.directories.hierarchy io.files.temp
+io.files.unique io.launcher io.pathnames kernel namespaces
+sequences mason.common mason.config webapps.mason.version.files ;
 IN: webapps.mason.version.source
 
 : clone-factor ( -- )
@@ -34,13 +34,12 @@ IN: webapps.mason.version.source
     [ suffix "factor" suffix try-process ] keep ;
 
 : make-source-release ( version git-id -- path )
-    "Creating source release..." print flush
-    [
-        current-temporary-directory get [
+    "Creating source release..." print flush [
+        [
             clone-factor prepare-source (make-source-release)
             "Package created: " write absolute-path dup print
-        ] with-directory
-    ] with-unique-directory drop ;
+        ] with-unique-directory drop
+    ] with-temp-directory ;
 
 : upload-source-release ( package version -- )
     "Uploading source release..." print flush

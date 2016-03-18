@@ -3,10 +3,10 @@ USING: accessors arrays assocs calendar calendar.format
 combinators combinators.short-circuit fry io io.backend
 io.directories io.directories.hierarchy io.encodings.binary
 io.encodings.detect io.encodings.utf8 io.files io.files.info
-io.files.types io.files.unique io.launcher io.pathnames kernel
-locals math math.parser namespaces sequences sorting strings
-system unicode.categories xml.syntax xml.writer xmode.catalog
-xmode.marker xmode.tokens ;
+io.files.temp io.files.types io.files.unique io.launcher
+io.pathnames kernel locals math math.parser namespaces sequences
+sorting strings system unicode.categories xml.syntax xml.writer
+xmode.catalog xmode.marker xmode.tokens ;
 IN: codebook
 
 ! Usage: "my/source/tree" codebook
@@ -194,8 +194,8 @@ TUPLE: code-file
         </guide>
     </package> XML> ;
 
-: write-dest-file ( xml dest-dir name ext -- )
-    append append-path utf8 [ write-xml ] with-file-writer ;
+: write-dest-file ( xml name ext -- )
+    append utf8 [ write-xml ] with-file-writer ;
 
 SYMBOL: kindlegen-path
 kindlegen-path [ "kindlegen" ] initialize
@@ -216,30 +216,31 @@ codebook-output-path [ "resource:codebooks" ] initialize
 
     dest-dir make-directories
     [
-        current-temporary-directory get :> temp-dir
-        src-dir file-name :> name
-        src-dir code-files :> files
+        [
+            src-dir file-name :> name
+            src-dir code-files :> files
 
-        src-dir name files code>opf
-        temp-dir name ".opf" write-dest-file
+            src-dir name files code>opf
+            name ".opf" write-dest-file
 
-        "vocab:codebook/cover.jpg" temp-dir copy-file-into
+            "vocab:codebook/cover.jpg" "." copy-file-into
 
-        src-dir name files code>ncx
-        temp-dir name ".ncx" write-dest-file
+            src-dir name files code>ncx
+            name ".ncx" write-dest-file
 
-        src-dir name files code>toc-html
-        temp-dir "_toc.html" "" write-dest-file
+            src-dir name files code>toc-html
+            "_toc.html" "" write-dest-file
 
-        files [| file |
-            src-dir file code>html
-            temp-dir file name>> file-html-name "" write-dest-file
-        ] each
+            files [| file |
+                src-dir file code>html
+                file name>> file-html-name "" write-dest-file
+            ] each
 
-        temp-dir name ".opf" kindle-path kindlegen
-        temp-dir name ".mobi" kindle-path dest-dir copy-file-into
+            "." name ".opf" kindle-path kindlegen
+            "." name ".mobi" kindle-path dest-dir copy-file-into
 
-        dest-dir name ".mobi" kindle-path :> mobi-path
+            dest-dir name ".mobi" kindle-path :> mobi-path
 
-        "Job's finished: " write mobi-path print flush
-    ] cleanup-unique-working-directory ;
+            "Job's finished: " write mobi-path print flush
+        ] cleanup-unique-directory
+    ] with-temp-directory ;

@@ -10,26 +10,30 @@ CONSTANT: test-file-contents "Files are so boring anymore."
 
 : create-test-file ( -- path )
     test-file-contents
-    "ftp.server" "test" make-unique-file
+    "ftp.server" "test" unique-file
     [ ascii set-file-contents ] [ normalize-path ] bi ;
 
 : test-ftp-server ( quot -- )
-    '[
-        current-temporary-directory get
-        0 <ftp-server> [
-            "ftp://localhost" >url insecure-addr set-url-addr
-                "ftp" >>protocol
-                create-test-file >>path
-                @
-        ] with-threaded-server
-    ] cleanup-unique-directory ; inline
+    [
+        '[
+            "." 0 <ftp-server> [
+                "ftp://localhost" >url insecure-addr set-url-addr
+                    "ftp" >>protocol
+                    create-test-file >>path
+                    @
+            ] with-threaded-server
+        ] cleanup-unique-directory
+    ] with-temp-directory ; inline
 
 { t }
 [
     [
         [
-            [ ftp-get ] [ path>> file-name ascii file-contents ] bi
-        ] cleanup-unique-working-directory
+            [
+                [ ftp-get ]
+                [ path>> file-name ascii file-contents ] bi
+            ] cleanup-unique-directory
+        ] with-temp-directory
     ] test-ftp-server test-file-contents =
 ] unit-test
 
@@ -38,7 +42,10 @@ CONSTANT: test-file-contents "Files are so boring anymore."
     [
         "/" >>path
         [
-            [ ftp-get ] [ path>> file-name ascii file-contents ] bi
-        ] cleanup-unique-working-directory
+            [
+                [ ftp-get ]
+                [ path>> file-name ascii file-contents ] bi
+            ] cleanup-unique-directory
+        ] with-temp-directory
     ] test-ftp-server test-file-contents =
 ] must-fail

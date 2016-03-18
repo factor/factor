@@ -6,9 +6,11 @@ IN: io.directories.search.tests
 
 { t } [
     [
-        10 [ "io.paths.test" "gogogo" make-unique-file ] replicate
-        current-temporary-directory get [ ] find-all-files
-    ] cleanup-unique-directory [ natural-sort ] same?
+        [
+            10 [ "io.paths.test" "gogogo" unique-file ] replicate
+            "." [ ] find-all-files
+        ] cleanup-unique-directory [ natural-sort ] same?
+    ] with-temp-directory
 ] unit-test
 
 { f } [
@@ -23,17 +25,22 @@ IN: io.directories.search.tests
 
 { t } [
     [
-        current-temporary-directory get
-        "the-head" unique-file drop t
-        [ file-name "the-head" head? ] find-file string?
-    ] cleanup-unique-directory
+        [
+            "the-head" "" unique-file drop
+            "." t [ file-name "the-head" head? ] find-file string?
+        ] cleanup-unique-directory
+    ] with-temp-directory
 ] unit-test
 
 { t } [
-    [ unique-directory unique-directory ] output>array
-    [ [ "abcd" append-path touch-file ] each ]
-    [ [ file-name "abcd" = ] find-all-in-directories length 2 = ]
-    [ [ delete-tree ] each ] tri
+    [
+        [
+            [ unique-directory unique-directory ] output>array
+            [ [ "abcd" append-path touch-file ] each ]
+            [ [ file-name "abcd" = ] find-all-in-directories length 2 = ]
+            [ [ delete-tree ] each ] tri
+        ] cleanup-unique-directory
+    ] with-temp-directory
 ] unit-test
 
 { t } [
