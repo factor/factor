@@ -1,6 +1,7 @@
-USING: accessors continuations io.directories io.encodings.ascii
-io.files io.files.info io.files.unique io.pathnames kernel
-namespaces sequences strings tools.test ;
+USING: accessors io.directories io.directories.hierarchy
+io.encodings.ascii io.files io.files.info io.files.temp
+io.files.unique io.pathnames kernel namespaces sequences strings
+tools.test ;
 IN: io.files.unique.tests
 
 { 123 } [
@@ -9,13 +10,6 @@ IN: io.files.unique.tests
             [ [ 123 CHAR: a <string> ] dip ascii set-file-contents ]
             [ file-info size>> ] bi
         ] cleanup-unique-file
-    ] with-temp-directory
-] unit-test
-
-{ t } [
-    [
-        [ current-directory get file-info directory? ]
-        cleanup-unique-directory
     ] with-temp-directory
 ] unit-test
 
@@ -39,7 +33,8 @@ IN: io.files.unique.tests
 
 { t } [
     [
-        [ ] with-unique-directory >boolean
+        [ ] with-unique-directory
+        [ exists? ] [ delete-tree ] bi
     ] with-temp-directory
 ] unit-test
 
