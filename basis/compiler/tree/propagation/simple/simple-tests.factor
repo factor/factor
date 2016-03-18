@@ -37,8 +37,7 @@ IN: compiler.tree.propagation.simple.tests
 
 { } [
     fixnum-value-infos setup-value-infos
-    #call-fixnum* dup word>> "input-classes" word-prop
-    propagate-input-classes
+    #call-fixnum* dup word>> word>input-infos propagate-input-infos
 ] unit-test
 
 {

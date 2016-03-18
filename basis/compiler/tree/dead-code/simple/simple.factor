@@ -9,10 +9,10 @@ IN: compiler.tree.dead-code.simple
 
 : flushable-call? ( #call -- ? )
     dup word>> dup flushable? [
-        "input-classes" word-prop [ drop t ] [
+        word>input-infos [
             [ node-input-infos ] dip
-            [ [ class>> ] dip class<= ] 2all?
-        ] if-empty
+            [ value-info<= ] 2all?
+        ] [ drop t ] if*
     ] [ 2drop f ] if ;
 
 M: #call mark-live-values*

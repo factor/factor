@@ -1,14 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs classes
-classes.algebra classes.algebra.private classes.maybe
-classes.tuple.private combinators combinators.short-circuit
-compiler.tree compiler.tree.propagation.constraints
-compiler.tree.propagation.info
-compiler.tree.propagation.inlining
-compiler.tree.propagation.nodes compiler.tree.propagation.slots
-continuations fry kernel sequences stack-checker.dependencies
-words ;
+USING: accessors alien.c-types arrays assocs classes classes.algebra
+classes.algebra.private classes.maybe classes.tuple.private
+combinators combinators.short-circuit compiler.tree
+compiler.tree.propagation.constraints compiler.tree.propagation.info
+compiler.tree.propagation.inlining compiler.tree.propagation.nodes
+compiler.tree.propagation.slots continuations fry kernel
+math.intervals sequences stack-checker.dependencies words ;
 IN: compiler.tree.propagation.simple
 
 M: #introduce propagate-before
@@ -18,11 +16,8 @@ M: #push propagate-before
     [ literal>> <literal-info> ] [ out-d>> first ] bi
     set-value-info ;
 
-: refine-value-infos ( classes values -- )
+: refine-value-infos ( classes/f values -- )
     [ refine-value-info ] 2each ;
-
-: class-infos ( classes -- infos )
-    [ <class-info> ] map ;
 
 : set-value-infos ( infos values -- )
     [ set-value-info ] 2each ;
@@ -121,9 +116,6 @@ ERROR: invalid-outputs #call infos ;
     if ;
 
 : propagate-predicate ( #call word -- infos )
-    ! We need to force the caller word to recompile when the class
-    ! is redefined, since now we're making assumptions but the
-    ! class definition itself.
     [ in-d>> first value-info ]
     [ "predicating" word-prop ] bi*
     [ nip add-depends-on-conditionally ]
@@ -158,12 +150,11 @@ M: #call propagate-before
 M: #call annotate-node
     dup [ in-d>> ] [ out-d>> ] bi append (annotate-node) ;
 
-: propagate-input-classes ( node input-classes -- )
-    class-infos swap in-d>> refine-value-infos ;
+: propagate-input-infos ( node infos/f -- )
+    swap in-d>> refine-value-infos ;
 
 M: #call propagate-after
-    dup word>> "input-classes" word-prop dup
-    [ propagate-input-classes ] [ 2drop ] if ;
+    dup word>> word>input-infos propagate-input-infos ;
 
 : propagate-alien-invoke ( node -- )
     [ out-d>> ] [ params>> return>> ] bi

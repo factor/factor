@@ -1,10 +1,12 @@
 USING: accessors alien arrays byte-arrays classes.algebra
-classes.struct compiler.tree.propagation.info kernel literals math
-math.intervals sequences sequences.private tools.test ;
+classes.struct compiler.tree.propagation.copy
+compiler.tree.propagation.info io.encodings.utf8 kernel literals math
+math.intervals namespaces sequences sequences.private tools.test ;
 IN: compiler.tree.propagation.info.tests
 
 { f } [ 0.0 -0.0 eql? ] unit-test
 
+! value-info-intersect
 { t t } [
     0 10 [a,b] <interval-info>
     5 20 [a,b] <interval-info>
@@ -51,13 +53,6 @@ IN: compiler.tree.propagation.info.tests
     value-info-intersect
 ] unit-test
 
-{ 3 t } [
-    3 <literal-info>
-    null-info value-info-union >literal<
-] unit-test
-
-{ } [ { } value-infos-union drop ] unit-test
-
 TUPLE: test-tuple { x read-only } ;
 
 { t } [
@@ -74,6 +69,30 @@ TUPLE: test-tuple { x read-only } ;
     [ class>> fixnum class= ]
     [ interval>> 0 40 [a,b] = ] bi
 ] unit-test
+
+! refine-value-info
+{
+    $[ fixnum array-capacity-interval <class/interval-info> ]
+} [
+    H{ { 1234 1234 } } copies set
+    {
+        H{
+            { 1234 $[ fixnum <class-info> ] }
+        }
+    } value-infos set
+    integer array-capacity-interval <class/interval-info> 1234
+    refine-value-info
+    1234 value-info
+] unit-test
+
+! value-info-union
+
+{ 3 t } [
+    3 <literal-info>
+    null-info value-info-union >literal<
+] unit-test
+
+{ } [ { } value-infos-union drop ] unit-test
 
 ! interval>literal
 { 10 t } [
@@ -192,6 +211,9 @@ TUPLE: tup2 < tup1 bar ;
     tup2 <class-info> tup1 <class-info> value-info<=
     tup1 <class-info> tup2 <class-info> value-info<=
 ] unit-test
+
+! <class-info>
+{ utf8 } [ utf8 <class-info> class>> ] unit-test
 
 ! init-interval
 {
