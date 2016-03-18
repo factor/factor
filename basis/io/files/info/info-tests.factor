@@ -3,13 +3,15 @@ io.directories kernel io.pathnames accessors tools.test
 sequences io.files.temp ;
 IN: io.files.info.tests
 
-{ t } [
-    temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
-    temp-directory "test41" append-path utf8 file-contents "hi41" =
+{ "hi41" } [
+    [
+        "hi41" "test41" utf8 set-file-contents
+        "test41" utf8 file-contents
+    ] with-temp-directory
 ] unit-test
 
-{ t } [
-    temp-directory [ "test41" file-info size>> ] with-directory 4 =
+{ 4 } [
+    [ "test41" file-info size>> ] with-temp-directory
 ] unit-test
 
 { t } [ "/" file-system-info file-system-info-tuple? ] unit-test
