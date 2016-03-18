@@ -4,6 +4,7 @@ USING: io io.files io.encodings.ascii ;
 IN: tools.deploy.test.19
 
 : main ( -- )
-    "resource:LICENSE.txt" ascii file-contents write ;
+    ! make sure to test vocab: urls
+    "vocab:LICENSE.txt" ascii file-contents write ;
 
 MAIN: main
