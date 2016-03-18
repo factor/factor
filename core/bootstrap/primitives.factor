@@ -1,13 +1,11 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.strings arrays assocs byte-arrays classes
-classes.intersection classes.union combinators generic hashtables
-hashtables.private io io.encodings.ascii kernel math math.private math.order
-namespaces make parser quotations sequences strings vectors words layouts
-classes.private classes.builtin classes.singleton classes.tuple
-classes.tuple.private kernel.private vocabs vocabs.loader
-source-files definitions slots  classes.predicate compiler.units
-bootstrap.image.private io.files splitting ;
+USING: alien.strings arrays assocs bootstrap.image.private classes
+classes.builtin classes.intersection classes.predicate classes.private
+classes.singleton classes.tuple classes.tuple.private classes.union
+combinators compiler.units io io.encodings.ascii kernel kernel.private
+layouts make math math.private namespaces parser quotations sequences
+slots source-files splitting vocabs vocabs.loader words ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -160,7 +158,11 @@ call( -- ) ! syntax-quot
     "byte-array" "byte-arrays" lookup-word ,
 ] { } make define-union-class
 
-! A predicate class used for declarations
+"integer" "math" create-word
+"fixnum" "math" lookup-word "bignum" "math" lookup-word 2array
+define-union-class
+
+! Two predicate classes used for declarations.
 "array-capacity" "sequences.private" create-word
 "fixnum" "math" lookup-word
 [
@@ -173,6 +175,15 @@ define-predicate-class
 "array-capacity" "sequences.private" lookup-word
 [ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
 "coercer" set-word-prop
+
+"integer-array-capacity" "sequences.private" create-word
+"integer" "math" lookup-word
+[
+    [ dup 0 >= ] %
+    bootstrap-max-array-capacity <fake-bignum> [ <= ] curry ,
+    [ [ drop f ] if ] %
+] [ ] make
+define-predicate-class
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create-word
