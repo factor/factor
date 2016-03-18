@@ -350,7 +350,7 @@ cell-bits 32 = [
     \ +-integer-fixnum inlined?
 ] unit-test
 
-{ f } [
+{ t } [
     [
         { integer } declare iota [ ] map
     ] \ integer>fixnum inlined?
