@@ -326,10 +326,10 @@ M: object infer-call* \ call bad-macro-input ;
 
 ! Container constructors
 {
-    { (byte-array) { integer } { byte-array } }
-    { <array> { integer object } { array } }
-    { <byte-array> { integer } { byte-array } }
-    { <string> { integer integer } { string } }
+    { (byte-array) { integer-array-capacity } { byte-array } }
+    { <array> { integer-array-capacity object } { array } }
+    { <byte-array> { integer-array-capacity } { byte-array } }
+    { <string> { integer-array-capacity } { string } }
     { <tuple> { array } { tuple } }
 } make-flushable-primitives
 
