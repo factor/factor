@@ -541,3 +541,44 @@ cell-bits 32 = [
     [ void { } cdecl [ ] alien-callback void { } cdecl alien-indirect ]
     \ >c-ptr inlined?
 ] unit-test
+
+! cleanup-folding
+: call-node-foldable ( -- node )
+    T{ #call
+       { word set-slot }
+       { in-d V{ 1 2 } }
+       { out-d V{ 3 } }
+       { info
+         H{
+             {
+                 1
+                 T{ value-info-state
+                    { class fixnum }
+                    { literal 2 }
+                    { literal? t }
+                 }
+             }
+             {
+                 2
+                 T{ value-info-state
+                    { class fixnum }
+                    { literal 3 }
+                    { literal? t }
+                 }
+             }
+             {
+                 3
+                 T{ value-info-state
+                    { class fixnum }
+                    { literal 5 }
+                    { literal? t }
+                 }
+             }
+         }
+       }
+    } ;
+
+{ t t } [
+    call-node-foldable cleanup-folding
+    [ length 2 = ] [ last literal>> 5 = ] bi
+] unit-test

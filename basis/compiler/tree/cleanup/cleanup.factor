@@ -1,12 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra combinators
-compiler.tree compiler.tree.combinators
-compiler.tree.propagation.branches
-compiler.tree.propagation.info compiler.utilities fry kernel
-layouts math math.intervals math.partial-dispatch math.private
-namespaces sequences stack-checker.branches
-stack-checker.dependencies words ;
+USING: accessors classes classes.algebra combinators compiler.tree
+compiler.tree.combinators compiler.tree.propagation.branches
+compiler.tree.propagation.info compiler.utilities fry kernel layouts
+math math.intervals math.partial-dispatch math.private namespaces
+sequences stack-checker.branches stack-checker.dependencies words ;
 IN: compiler.tree.cleanup
 
 GENERIC: delete-node ( node -- )
@@ -32,8 +30,6 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
     [ f ] [ [ literal?>> ] all? ] if-empty ;
 
 : (cleanup-folding) ( #call -- nodes )
-    ! Replace a #call having a known result with a #drop of its
-    ! inputs followed by #push nodes for the outputs.
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip <#push> ] 2map
@@ -87,7 +83,10 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
 
 : remove-overflow-check? ( #call -- ? )
     {
-        { [ dup word>> \ fixnum-shift eq? ] [ [ (remove-overflow-check?) ] [ small-shift? ] bi and ] }
+        {
+            [ dup word>> \ fixnum-shift eq? ]
+            [ [ (remove-overflow-check?) ] [ small-shift? ] bi and ]
+        }
         { [ dup word>> no-overflow-variant ] [ (remove-overflow-check?) ] }
         [ drop f ]
     } cond ;
@@ -159,8 +158,6 @@ M: #phi cleanup-tree*
 : >copy ( node -- #copy ) [ in-d>> ] [ out-d>> ] bi <#copy> ;
 
 : flatten-recursive ( #recursive -- nodes )
-    ! convert #enter-recursive and #return-recursive into
-    ! #copy nodes.
     child>>
     unclip >copy prefix
     unclip-last >copy suffix ;
