@@ -86,10 +86,12 @@ UNION: fixed-length array byte-array string ;
         [ [ interval>> empty-interval eq? ] [ class>> real class<= ] bi and ]
     } 1|| ;
 
+! Hardcoding classes is kind of a hack.
 : min-value ( class -- n )
     {
         { fixnum [ most-negative-fixnum ] }
         { array-capacity [ 0 ] }
+        { integer-array-capacity [ 0 ] }
         [ drop -1/0. ]
     } case ;
 
@@ -97,6 +99,7 @@ UNION: fixed-length array byte-array string ;
     {
         { fixnum [ most-positive-fixnum ] }
         { array-capacity [ max-array-capacity ] }
+        { integer-array-capacity [ max-array-capacity ] }
         [ drop 1/0. ]
     } case ;
 
@@ -104,8 +107,15 @@ UNION: fixed-length array byte-array string ;
     {
         { fixnum [ fixnum-interval ] }
         { array-capacity [ array-capacity-interval ] }
+        { integer-array-capacity [ array-capacity-interval ] }
         [ drop full-interval ]
     } case ;
+
+: fix-capacity-class ( class -- class' )
+    {
+        { array-capacity fixnum }
+        { integer-array-capacity integer }
+    } ?at drop ;
 
 : wrap-interval ( interval class -- interval' )
     class-interval 2dup interval-subset? [ drop ] [ nip ] if ;
@@ -125,6 +135,7 @@ UNION: fixed-length array byte-array string ;
             init-interval
             dup [ class>> ] [ interval>> ] bi interval>literal
             [ >>literal ] [ >>literal? ] bi*
+            [ fix-capacity-class ] change-class
         ] if
     ] if ; inline
 
@@ -323,3 +334,9 @@ SYMBOL: value-infos
         dup in-d>> last node-value-info
         literal>> first immutable-tuple-class?
     ] [ drop f ] if ;
+
+: class-infos ( classes/f -- infos )
+    [ <class-info> ] map ;
+
+: word>input-infos ( word -- input-infos/f )
+    "input-classes" word-prop class-infos ;
