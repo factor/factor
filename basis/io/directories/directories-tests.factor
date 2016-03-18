@@ -27,57 +27,54 @@ IN: io.directories.tests
 { t } [ "blahblah" temp-file file-info directory? ] unit-test
 
 { t } [
-    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
-    temp-directory [
+    [
+        [ "loldir" delete-directory ] ignore-errors
         "loldir" make-directory
-    ] with-directory
-    temp-directory "loldir" append-path exists?
+        "loldir" exists?
+    ] with-temp-directory
 ] unit-test
 
 { } [
-    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
-    temp-directory [
+    [
+        [ "loldir" delete-directory ] ignore-errors
         "loldir" make-directory
         "loldir" delete-directory
-    ] with-directory
+    ] with-temp-directory
 ] unit-test
 
 { "file1 contents" } [
-    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
-    temp-directory [
+    [
         "file1 contents" "file1" utf8 set-file-contents
         "file1" "file2" copy-file
         "file2" utf8 file-contents
-    ] with-directory
-    "file1" temp-file delete-file
-    "file2" temp-file delete-file
+        "file1" delete-file
+        "file2" delete-file
+    ] with-temp-directory
 ] unit-test
 
 { "file3 contents" } [
-    temp-directory [
+    [
         "file3 contents" "file3" utf8 set-file-contents
         "file3" "file4" move-file
         "file4" utf8 file-contents
-    ] with-directory
-    "file4" temp-file delete-file
+        "file4" delete-file
+    ] with-temp-directory
 ] unit-test
 
-[ "file5" temp-file delete-file ] ignore-errors
-
 { } [
-    temp-directory [
+    [
+        [ "file5" delete-file ] ignore-errors
         "file5" touch-file
         "file5" delete-file
-    ] with-directory
+    ] with-temp-directory
 ] unit-test
 
-[ "file6" temp-file delete-file ] ignore-errors
-
 { } [
-    temp-directory [
+    [
+        [ "file6" delete-file ] ignore-errors
         "file6" touch-file
         "file6" link-info drop
-    ] with-directory
+    ] with-temp-directory
 ] unit-test
 
 { } [
