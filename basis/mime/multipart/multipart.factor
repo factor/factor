@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs byte-arrays combinators fry
 hashtables http http.parsers io io.encodings.binary io.files
-io.files.unique io.streams.string kernel math quoting sequences
-splitting ;
+io.files.temp io.files.unique io.streams.string kernel math
+quoting sequences splitting ;
 IN: mime.multipart
 
 CONSTANT: buffer-size 65536
@@ -94,7 +94,7 @@ C: <mime-variable> mime-variable
     ] with-output-stream ;
 
 : dump-file ( multipart -- multipart )
-    "factor-" "-upload" make-unique-file
+    [ "factor-" "-upload" unique-file ] with-temp-directory
     [ >>temp-file ] [ dump-mime-file ] bi ;
 
 : parse-content-disposition-form-data ( string -- hashtable )

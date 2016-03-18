@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations fry http.server io
-io.encodings.ascii io.files io.files.unique
+io.encodings.ascii io.files io.files.temp io.files.unique
 io.servers io.streams.duplex io.streams.string
 kernel math.ranges mime.multipart multiline namespaces random
 sequences sorting strings threads tools.test ;
@@ -13,8 +13,8 @@ CONSTANT: upload1 "------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Dispositi
 
 : mime-test-stream ( -- stream )
    upload1
-   "mime" "test" make-unique-file ascii
-   [ set-file-contents ] [ <file-reader> ] 2bi ;
+   [ "mime" "test" unique-file ] with-temp-directory
+   ascii [ set-file-contents ] [ <file-reader> ] 2bi ;
 
 { } [ mime-test-stream [ ] with-input-stream ] unit-test
 

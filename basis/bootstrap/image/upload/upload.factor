@@ -59,26 +59,27 @@ M: windows scp-name "pscp" ;
     ] change-file-lines ;
 
 : with-build-images ( quot -- )
+    [ boot-image-names [ absolute-path ] map ] dip
     '[
-        ! Copy boot images
-        boot-image-names current-temporary-directory get copy-files-into
-        ! Copy checksums
-        checksums-path current-temporary-directory get copy-file-into
-        current-temporary-directory get [
+        [
+            ! Copy boot images
+            _ "." copy-files-into
+            ! Copy checksums
+            checksums-path "." copy-file-into
             ! Rewrite checksum lines with build number
             checksum-lines-append-build
             ! Rename file to file.build-number
-            current-directory get directory-files [ dup append-build move-file ] each
-            ! Run the quot in the current-directory, which is the unique directory
+            "." directory-files [ dup append-build move-file ] each
+            ! Run the quot in the unique directory
             @
-        ] with-directory
-    ] cleanup-unique-directory ; inline
+        ] cleanup-unique-directory
+    ] with-temp-directory ; inline
 
 : upload-build-images ( -- )
     [
         [
             \ scp-name get-global scp-name or ,
-            current-directory get directory-files %
+            "." directory-files %
             build-destination ,
         ] { } make try-process
     ] with-build-images ;

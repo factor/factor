@@ -157,91 +157,116 @@ CONSTANT: pt-array-1
 ! File seeking tests
 { B{ 3 2 3 4 5 } }
 [
-    "seek-test1" unique-file binary
     [
-        [
-            B{ 1 2 3 4 5 } write
-            tell-output 5 assert=
-            0 seek-absolute seek-output
-            tell-output 0 assert=
-            B{ 3 } write
-            tell-output 1 assert=
-        ] with-file-writer
-    ] [
-        file-contents
-    ] 2bi
+        "seek-test1" "" [
+            binary
+            [
+                [
+                    B{ 1 2 3 4 5 } write
+                    tell-output 5 assert=
+                    0 seek-absolute seek-output
+                    tell-output 0 assert=
+                    B{ 3 } write
+                    tell-output 1 assert=
+                ] with-file-writer
+            ] [
+                file-contents
+            ] 2bi
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] unit-test
 
 { B{ 1 2 3 4 3 } }
 [
-    "seek-test2" unique-file binary
     [
-        [
-            B{ 1 2 3 4 5 } write
-            tell-output 5 assert=
-            -1 seek-relative seek-output
-            tell-output 4 assert=
-            B{ 3 } write
-            tell-output 5 assert=
-        ] with-file-writer
-    ] [
-        file-contents
-    ] 2bi
+        "seek-test2" "" [
+        binary
+            [
+                [
+                    B{ 1 2 3 4 5 } write
+                    tell-output 5 assert=
+                    -1 seek-relative seek-output
+                    tell-output 4 assert=
+                    B{ 3 } write
+                    tell-output 5 assert=
+                ] with-file-writer
+            ] [
+                file-contents
+            ] 2bi
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] unit-test
 
 { B{ 1 2 3 4 5 0 3 } }
 [
-    "seek-test3" unique-file binary
     [
-        [
-            B{ 1 2 3 4 5 } write
-            tell-output 5 assert=
-            1 seek-relative seek-output
-            tell-output 6 assert=
-            B{ 3 } write
-            tell-output 7 assert=
-        ] with-file-writer
-    ] [
-        file-contents
-    ] 2bi
+        "seek-test3" "" [
+            binary
+            [
+                [
+                    B{ 1 2 3 4 5 } write
+                    tell-output 5 assert=
+                    1 seek-relative seek-output
+                    tell-output 6 assert=
+                    B{ 3 } write
+                    tell-output 7 assert=
+                ] with-file-writer
+            ] [
+                file-contents
+            ] 2bi
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] unit-test
 
 { B{ 3 } }
 [
-    B{ 1 2 3 4 5 } "seek-test4" unique-file binary [
-        set-file-contents
-    ] [
-        [
-            tell-input 0 assert=
-            -3 seek-end seek-input
-            tell-input 2 assert=
-            1 read
-            tell-input 3 assert=
-        ] with-file-reader
-    ] 2bi
+    [
+        "seek-test4" "" [
+            B{ 1 2 3 4 5 } swap binary
+            [
+                set-file-contents
+            ] [
+                [
+                    tell-input 0 assert=
+                    -3 seek-end seek-input
+                    tell-input 2 assert=
+                    1 read
+                    tell-input 3 assert=
+                ] with-file-reader
+            ] 2bi
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] unit-test
 
 { B{ 2 } }
 [
-    B{ 1 2 3 4 5 } "seek-test5" unique-file binary [
-        set-file-contents
-    ] [
-        [
-            tell-input 0 assert=
-            3 seek-absolute seek-input
-            tell-input 3 assert=
-            -2 seek-relative seek-input
-            tell-input 1 assert=
-            1 read
-            tell-input 2 assert=
-        ] with-file-reader
-    ] 2bi
+    [
+        "seek-test5" "" [
+            B{ 1 2 3 4 5 } swap binary [
+                set-file-contents
+            ] [
+                [
+                    tell-input 0 assert=
+                    3 seek-absolute seek-input
+                    tell-input 3 assert=
+                    -2 seek-relative seek-input
+                    tell-input 1 assert=
+                    1 read
+                    tell-input 2 assert=
+                ] with-file-reader
+            ] 2bi
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] unit-test
 
 [
-    "seek-test6" unique-file binary [
-        -10 seek-absolute seek-input
-    ] with-file-reader
+    [
+        "seek-test6" "" [
+            binary [
+                -10 seek-absolute seek-input
+            ] with-file-reader
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] must-fail
 
 { } [
@@ -254,21 +279,29 @@ CONSTANT: pt-array-1
 ] unit-test
 
 [
-    "non-string-error" unique-file ascii [
-        { } write
-    ] with-file-writer
+    [
+        "non-string-error" "" [
+            ascii [ { } write ] with-file-writer
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] [ no-method? ] must-fail-with
 
 [
-    "non-byte-array-error" unique-file binary [
-        "" write
-    ] with-file-writer
+    [
+        "non-byte-array-error" "" [
+            binary [ "" write ] with-file-writer
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] [ no-method? ] must-fail-with
 
 ! What happens if we close a file twice?
 { } [
-    "closing-twice" unique-file ascii <file-writer>
-    [ dispose ] [ dispose ] bi
+    [
+        "closing-twice" "" [
+            ascii <file-writer>
+            [ dispose ] [ dispose ] bi
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] unit-test
 
 ! Test cwd, cd. You do not want to use with-cd, you want with-directory.

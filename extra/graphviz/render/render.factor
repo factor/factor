@@ -116,13 +116,15 @@ PRIVATE>
     } case ;
 
 :: with-preview ( graph quot: ( path -- ) -- )
-    "preview" ".dot" [| code-file |
-        "preview" preview-extension [| image-file |
-            graph code-file ?encoding write-dot
-            code-file image-file try-preview-command
-            image-file quot call( path -- )
+    [
+        "preview" ".dot" [| code-file |
+            "preview" preview-extension [| image-file |
+                graph code-file ?encoding write-dot
+                code-file image-file try-preview-command
+                image-file quot call( path -- )
+            ] cleanup-unique-file
         ] cleanup-unique-file
-    ] cleanup-unique-file ;
+    ] with-temp-directory ;
 
 PRIVATE>
 
