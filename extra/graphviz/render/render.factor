@@ -115,7 +115,7 @@ PRIVATE>
         [ unsupported-preview-format ]
     } case ;
 
-:: with-preview ( graph quot -- )
+:: with-preview ( ..a graph quot: ( ..a path -- ..b ) -- ..b )
     [
         "preview" ".dot" [| code-file |
             "preview" preview-extension [| image-file |
