@@ -473,6 +473,9 @@ M: f ($instance) ($link) ;
         { $link with-pprint } " combinator."
     } $notes ;
 
+: $content ( element -- )
+    first article-content print-content nl ;
+
 GENERIC: elements* ( elt-type element -- )
 
 M: simple-element elements*
