@@ -29,7 +29,7 @@ M: integer /
         division-by-zero
     ] [
         dup 0 < [ [ neg ] bi@ ] when
-        2dup fast-gcd [ /i ] curry bi@ fraction>
+        2dup simple-gcd [ /i ] curry bi@ fraction>
     ] if-zero ;
 
 M: integer recip
