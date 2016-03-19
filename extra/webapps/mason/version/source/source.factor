@@ -38,7 +38,7 @@ IN: webapps.mason.version.source
         [
             clone-factor prepare-source (make-source-release)
             "Package created: " write absolute-path dup print
-        ] cleanup-unique-directory
+        ] with-unique-directory drop
     ] with-temp-directory ;
 
 : upload-source-release ( package version -- )
