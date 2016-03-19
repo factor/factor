@@ -1,5 +1,4 @@
-USING: help.markup help.syntax help.topics literals
-sequences.generalizations ;
+USING: help.markup help.syntax ;
 IN: help.home
 
 ARTICLE: "help.home" "Factor documentation"
