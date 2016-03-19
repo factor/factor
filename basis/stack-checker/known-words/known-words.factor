@@ -329,7 +329,7 @@ M: object infer-call* \ call bad-macro-input ;
     { (byte-array) { integer-array-capacity } { byte-array } }
     { <array> { integer-array-capacity object } { array } }
     { <byte-array> { integer-array-capacity } { byte-array } }
-    { <string> { integer-array-capacity } { string } }
+    { <string> { integer-array-capacity integer } { string } }
     { <tuple> { array } { tuple } }
 } make-flushable-primitives
 

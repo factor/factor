@@ -58,9 +58,13 @@ IN: compiler.tree.propagation.tests
     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ] unit-test
 
-{ t } [
-    [ dupd <string> drop ] final-info first
-    integer-array-capacity <class-info> =
+{
+    V{ $[
+        integer-array-capacity <class-info>
+        integer <class-info>
+    ] }
+} [
+    [ 2dup <string> drop ] final-info
 ] unit-test
 
 { { } } [
