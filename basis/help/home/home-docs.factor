@@ -3,8 +3,8 @@ sequences.generalizations ;
 IN: help.home
 
 ARTICLE: "help.home" "Factor documentation"
-$[ "handbook" lookup-article article-content 6 firstn ]
-{ $heading "Searches" }
+{ $content "handbook" }
+{ $heading "Recent searches" }
 "Use the search field in the top-right of the " { $link "ui-browser" } " window to search for words, vocabularies, and help articles."
 { $recent-searches }
 { $heading "Recently visited pages" }
