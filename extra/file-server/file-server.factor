@@ -28,8 +28,7 @@ IN: file-server
 
 : file-server-main ( -- )
     [
-        command-line get file-server-args
-        current-directory get or
+        command-line get file-server-args "." or
         <static>
             t >>allow-listings
         swap [ enable-cgi ] when

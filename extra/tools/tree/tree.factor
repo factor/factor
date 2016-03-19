@@ -52,7 +52,7 @@ DEFER: write-tree
 
 : run-tree ( -- )
     command-line get [
-        current-directory get tree
+        "." tree
     ] [
         [ tree ] each
     ] if-empty ;

@@ -50,8 +50,7 @@ IN: spotlight
 PRIVATE>
 
 : mdfind ( query -- results )
-    current-directory get "/" or swap
-    "mdfind -onlyin %s %s" sprintf run-process-output ;
+    "mdfind -onlyin . %s" sprintf run-process-output ;
 
 : mdfind. ( query -- )
     mdfind [ dup <pathname> write-object nl ] each ;

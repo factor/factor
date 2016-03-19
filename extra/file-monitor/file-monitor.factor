@@ -11,7 +11,7 @@ IN: file-monitor
     "%u %s\n" printf flush file-monitor-loop ;
 
 : file-monitor-main ( -- )
-    command-line get ?first current-directory get or
+    command-line get ?first "." or
     dup "Monitoring %s\n" printf flush
     [ t [ file-monitor-loop ] with-monitor ] with-monitors ;
 
