@@ -115,16 +115,16 @@ PRIVATE>
         [ unsupported-preview-format ]
     } case ;
 
-:: with-preview ( graph quot: ( path -- ) -- )
+:: with-preview ( graph quot -- )
     [
         "preview" ".dot" [| code-file |
             "preview" preview-extension [| image-file |
                 graph code-file ?encoding write-dot
                 code-file image-file try-preview-command
-                image-file quot call( path -- )
+                image-file quot call
             ] cleanup-unique-file
         ] cleanup-unique-file
-    ] with-temp-directory ;
+    ] with-temp-directory ; inline
 
 PRIVATE>
 

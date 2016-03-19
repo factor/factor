@@ -55,10 +55,7 @@ SYMBOLS: supported-layouts supported-formats ;
     ] with-temp-directory ;
 
 : preview-smoke-test ( graph -- pass? )
-    f "pass?" [
-        [ exists? "pass?" set ] with-preview
-        "pass?" get
-    ] with-variable ;
+    [ exists? ] with-preview ;
 
 : K_n ( n -- graph )
     <graph>
