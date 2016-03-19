@@ -22,7 +22,7 @@ HELP: unique-file
 { unique-file cleanup-unique-file } related-words
 
 HELP: cleanup-unique-file
-{ $values { "prefix" string } { "suffix" string } { "quot" { $quotation ( path -- ) } } }
+{ $values { "prefix" string } { "suffix" string } { "quot" { $quotation ( ..a path -- ..b ) } } }
 { $description "Creates a file with " { $link unique-file } " and calls the quotation with the path name on the stack." }
 { $notes "The unique file will be deleted after calling this word, even if an error is thrown in the quotation." } ;
 
