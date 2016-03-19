@@ -60,14 +60,8 @@ ERROR: header-file-missing path ;
         drop
     ] if* ;
 
-:: read-local-include ( preprocessor-state path -- )
-    current-directory get path append-path dup :> full-path
-    dup exists? [
-        [ preprocessor-state ] dip preprocess-file
-    ] [
-        ! full-path header-file-missing
-        drop
-    ] if ;
+: read-local-include ( preprocessor-state path -- )
+    dup exists? [ preprocess-file ] [ 2drop ] if ;
 
 : skip-whitespace/comments ( sequence-parser -- sequence-parser )
     skip-whitespace

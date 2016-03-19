@@ -180,7 +180,7 @@ M: ftp-list handle-passive-command ( stream obj -- )
     drop
     start-directory [
         utf8 encode-output [
-            current-directory get directory.
+            "." directory.
         ] with-string-writer string-lines
         harvest [ ftp-send ] each
     ] with-output-stream finish-directory ;

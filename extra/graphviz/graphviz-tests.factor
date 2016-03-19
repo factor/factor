@@ -40,8 +40,7 @@ SYMBOLS: supported-layouts supported-formats ;
 ! -O flag, so just look to see that there seems to be some sort
 ! of output.
 : graphviz-output-appears-to-exist? ( base -- ? )
-    current-directory get directory-files
-    [ swap head? ] with count 1 = ;
+    "." directory-files [ swap head? ] with count 1 = ;
 
 : next! ( seq -- elt ) [ first ] [ 1 rotate! ] bi ;
 
