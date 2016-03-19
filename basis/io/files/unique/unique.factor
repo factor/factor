@@ -36,7 +36,7 @@ PRIVATE>
         dup touch-unique-file
     ] unique-retries get retry absolute-path ;
 
-:: cleanup-unique-file ( prefix suffix quot: ( path -- ) -- )
+:: cleanup-unique-file ( ..a prefix suffix quot: ( ..a path -- ..b ) -- ..b )
     prefix suffix unique-file :> path
     [ path quot call ] [ path delete-file ] [ ] cleanup ; inline
 
