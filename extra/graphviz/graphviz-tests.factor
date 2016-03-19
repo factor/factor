@@ -2,10 +2,10 @@ USING: accessors arrays assocs combinators.short-circuit
 continuations formatting graphviz graphviz.attributes
 graphviz.dot graphviz.notation graphviz.render
 graphviz.render.private images.loader.private io.directories
-io.directories.hierarchy io.files io.files.unique io.launcher
-io.pathnames kernel locals make math math.combinatorics
-math.parser memoize namespaces sequences sequences.extras sets
-splitting system tools.test ;
+io.directories.hierarchy io.files io.files.temp io.files.unique
+io.launcher io.pathnames kernel locals make math
+math.combinatorics math.parser memoize namespaces sequences
+sequences.extras sets splitting system tools.test ;
 IN: graphviz.tests
 
 ! XXX hack
@@ -48,9 +48,11 @@ SYMBOLS: supported-layouts supported-formats ;
     supported-formats get-global next! :> -T
     supported-layouts get-global next! :> -K
     [
-        graph "smoke-test" -T -K graphviz
-        "smoke-test" graphviz-output-appears-to-exist?
-    ] cleanup-unique-working-directory ;
+        [
+            graph "smoke-test" -T -K graphviz
+            "smoke-test" graphviz-output-appears-to-exist?
+        ] cleanup-unique-directory
+    ] with-temp-directory ;
 
 : preview-smoke-test ( graph -- pass? )
     f "pass?" [

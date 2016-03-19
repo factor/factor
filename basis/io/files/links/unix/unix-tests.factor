@@ -1,6 +1,6 @@
 USING: io.directories io.files.links tools.test sequences
-io.files.unique tools.files fry math kernel math.parser
-io.pathnames namespaces ;
+io.files.temp io.files.unique tools.files fry math kernel
+math.parser io.pathnames namespaces ;
 IN: io.files.links.unix.tests
 
 : make-test-links ( n path -- )
