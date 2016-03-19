@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ;
+USING: kernel kernel.private ;
 IN: math
 
 BUILTIN: fixnum ;
@@ -202,17 +202,17 @@ PRIVATE>
 : gcd ( x y -- a d )
     [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
 
-MATH: fast-gcd ( x y -- d ) foldable
+MATH: simple-gcd ( x y -- d ) foldable
 
 <PRIVATE
 
-: simple-gcd ( x y -- d ) gcd nip ; inline
+: fixnum-gcd ( x y -- d ) { fixnum fixnum } declare gcd nip ;
 
 PRIVATE>
 
-M: real fast-gcd simple-gcd ; inline
+M: fixnum simple-gcd fixnum-gcd ; inline
 
-M: bignum fast-gcd bignum-gcd ; inline
+M: bignum simple-gcd bignum-gcd ; inline
 
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 

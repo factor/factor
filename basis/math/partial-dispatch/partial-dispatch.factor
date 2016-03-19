@@ -216,7 +216,7 @@ SYMBOL: fast-math-ops
         \ mod \ fixnum-mod \ bignum-mod define-integer-ops
         \ /i \ fixnum/i \ bignum/i define-integer-ops
 
-        \ fast-gcd \ simple-gcd \ bignum-gcd define-integer-ops
+        \ simple-gcd \ fixnum-gcd \ bignum-gcd define-integer-ops
 
         \ bitand \ fixnum-bitand \ bignum-bitand define-integer-ops
         \ bitor \ fixnum-bitor \ bignum-bitor define-integer-ops
