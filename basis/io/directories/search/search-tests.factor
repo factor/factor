@@ -1,7 +1,7 @@
 USING: combinators.smart io.directories
 io.directories.hierarchy io.directories.search io.files
-io.files.unique io.pathnames kernel namespaces sequences
-sorting strings tools.test ;
+io.files.temp io.files.unique io.pathnames kernel namespaces
+sequences sorting strings tools.test ;
 IN: io.directories.search.tests
 
 { t } [
