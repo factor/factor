@@ -511,7 +511,7 @@ M: zip-cursor cursor= ( cursor cursor -- ? )
 
 M: zip-cursor cursor-distance-hint ( cursor cursor -- n )
     [ [ keys>> ] bi@ cursor-distance-hint ]
-    [ [ values>> ] bi@ cursor-distance-hint ] 2bi max ; inline
+    [ [ values>> ] bi@ cursor-distance-hint ] 2bi min ; inline
 
 M: zip-cursor inc-cursor ( cursor -- cursor' )
     [ keys>> inc-cursor ] [ values>> inc-cursor ] bi <zip-cursor> ; inline
