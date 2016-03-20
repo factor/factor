@@ -142,7 +142,7 @@ HELP: clone
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
 HELP: ?
-{ $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
+{ $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" { { $snippet "true" } " or " { $snippet "false" } } } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
 
 HELP: boolean
