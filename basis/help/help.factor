@@ -172,14 +172,10 @@ help-hook [ [ print-topic ] ] initialize
     articles get delete-at ;
 
 : add-article ( article name -- )
-    [ remove-article ] keep
-    [ articles get set-at ] keep
-    xref-article ;
+    [ articles get set-at ] keep xref-article ;
 
 : remove-word-help ( word -- )
     f "help" set-word-prop ;
 
 : set-word-help ( content word -- )
-    [ remove-word-help ] keep
-    [ swap "help" set-word-prop ] keep
-    xref-article ;
+    [ swap "help" set-word-prop ] keep xref-article ;
