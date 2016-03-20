@@ -12,7 +12,7 @@ IN: math.primes.solovay-strassen
     numtrials iota [
         drop
         n 1 - [1,b) random :> a
-        a n fast-gcd 1 > [ t ] [
+        a n simple-gcd 1 > [ t ] [
             a n jacobi n mod'
             a n 1 - 2 /i n ^mod = not
         ] if

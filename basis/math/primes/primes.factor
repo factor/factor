@@ -76,7 +76,7 @@ PRIVATE>
 : nprimes ( n -- seq )
     2 swap [ [ next-prime ] keep ] replicate nip ;
 
-: coprime? ( a b -- ? ) fast-gcd 1 = ; foldable
+: coprime? ( a b -- ? ) simple-gcd 1 = ; foldable
 
 : random-prime ( numbits -- p )
     [ ] [ 2^ ] [ random-bits* next-prime ] tri
