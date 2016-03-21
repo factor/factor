@@ -397,17 +397,17 @@ SYNTAX: S@
 ! functor support
 
 <PRIVATE
-: scan-c-type` ( -- c-type/param )
+: scan-c-type* ( -- c-type/param )
     scan-token dup "{" = [ drop \ } parse-until >array ] [ search ] if ;
 
-: parse-struct-slot` ( accum -- accum )
-    scan-string-param scan-c-type` \ } parse-until
+: parse-struct-slot* ( accum -- accum )
+    scan-string-param scan-c-type* \ } parse-until
     [ <struct-slot-spec> suffix! ] 3curry append! ;
 
-: parse-struct-slots` ( accum -- accum more? )
+: parse-struct-slots* ( accum -- accum more? )
     scan-token {
         { ";" [ f ] }
-        { "{" [ parse-struct-slot` t ] }
+        { "{" [ parse-struct-slot* t ] }
         [ invalid-struct-slot ]
     } case ;
 
@@ -416,7 +416,7 @@ PRIVATE>
 FUNCTOR-SYNTAX: STRUCT:
     scan-param suffix!
     [ 8 <vector> ] append!
-    [ parse-struct-slots` ] [ ] while
+    [ parse-struct-slots* ] [ ] while
     [ >array define-struct-class ] append! ;
 
 { "classes.struct" "prettyprint" } "classes.struct.prettyprint" require-when
