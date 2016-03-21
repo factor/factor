@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays classes
-classes.tuple classes.tuple.private combinators fry hashtables
-kernel math quotations sequences slots slots.private strings
+USING: accessors arrays assocs byte-arrays classes classes.tuple
+classes.tuple.private combinators fry hash-sets hashtables
+kernel math quotations sequences sets slots slots.private
 vectors ;
 IN: mirrors
 
@@ -64,6 +64,7 @@ INSTANCE: byte-array        inspected-sequence
 
 GENERIC: make-mirror ( obj -- assoc )
 M: hashtable make-mirror ;
+M: hash-set make-mirror members make-mirror ;
 M: integer make-mirror drop f ;
 M: inspected-sequence make-mirror <enum> ;
 M: object make-mirror <mirror> ;
