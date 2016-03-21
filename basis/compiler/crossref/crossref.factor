@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators fry graphs grouping kernel namespaces
+USING: assocs combinators fry grouping kernel namespaces
 sequences sets stack-checker.dependencies words ;
 IN: compiler.crossref
 
@@ -58,9 +58,17 @@ generic-call-site-crossref [ H{ } clone ] initialize
     "effect-dependencies" "conditional-dependencies" "definition-dependencies"
     [ (store-dependencies) ] tri-curry@ tri-curry* tri ;
 
+: add-xref ( word dependencies crossref -- )
+    rot '[
+        swap _ [ drop H{ } clone ] cache _ swap set-at
+    ] assoc-each ;
+
+: remove-xref ( word dependencies crossref -- )
+    [ keys ] dip '[ _ at delete-at ] with each ;
+
 : (compiled-xref) ( word dependencies generic-dependencies -- )
     compiled-crossref generic-call-site-crossref
-    [ get add-vertex* ] bi-curry@ bi-curry* bi ;
+    [ get add-xref ] bi-curry@ bi-curry* bi ;
 
 : compiled-xref ( word dependencies generic-dependencies -- )
     [ only-xref ] bi@
@@ -86,7 +94,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     join-dependencies ;
 
 : (compiled-unxref) ( word dependencies variable -- )
-    get remove-vertex* ;
+    get remove-xref ;
 
 : generic-call-sites ( word -- alist )
     "generic-call-sites" word-prop 2 group ;
