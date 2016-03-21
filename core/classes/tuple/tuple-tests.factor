@@ -701,6 +701,16 @@ TUPLE: boa-coercer-test { x array-capacity } ;
 
 { T{ boa-coercer-test f 0 } } [ T{ boa-coercer-test } ] unit-test
 
+TUPLE: boa-iac { x integer-array-capacity initial: 77 } ;
+
+{ fixnum bignum 77 } [
+    30 boa-iac boa x>> class-of
+    10 >bignum boa-iac boa x>> class-of
+    boa-iac new x>>
+] unit-test
+
+[ -99 boa-iac boa ] [ bad-slot-value? ] must-fail-with
+
 ! Make sure that tuple reshaping updates code heap roots
 TUPLE: code-heap-ref ;
 
