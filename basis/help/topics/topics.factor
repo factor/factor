@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.x
-USING: accessors arrays definitions generic assocs
-io kernel namespaces make prettyprint prettyprint.sections
-sequences words summary classes strings vocabs ;
+USING: accessors assocs definitions kernel make namespaces
+prettyprint summary vocabs words ;
 IN: help.topics
 
 TUPLE: link name ;

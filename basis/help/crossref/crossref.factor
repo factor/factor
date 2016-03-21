@@ -1,13 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs math fry
-io kernel namespaces prettyprint prettyprint.sections
-sequences words summary classes help.topics help.markup ;
+USING: fry help.markup help.topics kernel math sequences ;
 IN: help.crossref
 
 : article-links ( topic elements -- seq )
-    [ article-content ] dip
-    collect-elements ;
+    [ article-content ] dip collect-elements ;
 
 : article-children ( topic -- seq )
     { $subsection $subsections } article-links [ >link ] map ;
