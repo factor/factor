@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.smart compiler.units
-generic generic.single graphs hash-sets.identity hashtables help
+generic generic.single hash-sets.identity hashtables help
 help.crossref help.markup help.topics init io io.pathnames
 io.styles kernel namespaces quotations see sequences sets
 sorting source-files threads vocabs words ;
@@ -57,7 +57,7 @@ M: pathname uses string>> path>source-file top-level-form>> [ uses ] [ { } ] if*
 M: object uses drop f ;
 
 : crossref-def ( defspec -- )
-    dup uses crossref get-global add-vertex ;
+    dup uses [ crossref get-global adjoin-at ] with each ;
 
 : defs-to-crossref ( -- seq )
     [
@@ -91,7 +91,7 @@ M: predicate-engine-word irrelevant? drop t ;
 
 PRIVATE>
 
-: usage ( defspec -- seq ) get-crossref at keys ;
+: usage ( defspec -- seq ) get-crossref at members ;
 
 GENERIC: smart-usage ( defspec -- seq )
 
@@ -139,7 +139,8 @@ M: f smart-usage drop \ f smart-usage ;
 
 SINGLETON: invalidate-crossref
 
-M: invalidate-crossref definitions-changed 2drop crossref global delete-at ;
+M: invalidate-crossref definitions-changed
+    2drop crossref global delete-at ;
 
 [ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 

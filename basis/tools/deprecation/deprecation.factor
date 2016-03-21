@@ -64,7 +64,7 @@ SINGLETON: deprecation-observer
 : initialize-deprecation-notes ( -- )
     [
         get-crossref [ drop deprecated? ] assoc-filter
-        values [ keys [ check-deprecations ] each ] each
+        values [ members [ check-deprecations ] each ] each
     ] with-null-writer ;
 
 M: deprecation-observer definitions-changed
