@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit db db.errors
-db.errors.sqlite db.sqlite io.files.temp io.files.unique kernel
+db.sqlite db.sqlite.errors io.files.temp io.files.unique kernel
 namespaces tools.test ;
-IN: db.errors.sqlite.tests
 
 [
     "sqlite" "error-test" [
