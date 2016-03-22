@@ -60,6 +60,3 @@ M: checksum checksum-lines
     ! binary <file-reader>. We use the lower-level form
     ! so that we can move io.encodings.binary to basis/.
     [ normalize-path (file-reader) ] dip checksum-stream ;
-
-: hex-string ( seq -- str )
-    [ >hex 2 CHAR: 0 pad-head ] { } map-as concat ;
