@@ -128,6 +128,7 @@
     ($low-level-note . fuel-markup--low-level-note)
     ($markup-example . fuel-markup--markup-example)
     ($maybe . fuel-markup--maybe)
+    ($sequence . fuel-markup--sequence)
     ($methods . fuel-markup--methods)
     ($next-link . (lambda (e) (fuel-markup--prefixed-link "Next:" e)))
     ($nl . fuel-markup--newline)
@@ -499,6 +500,13 @@
 (defun fuel-markup--maybe (e)
   (fuel-markup--instance (cons '$instance (cdr e)))
   (insert " or f "))
+
+(defun fuel-markup--sequence (e)
+  (insert "a ")
+  (fuel-markup--link (list '$link 'sequence 'sequence 'word))
+  (insert " of ")
+  (fuel-markup--print (cadr e))
+  (insert "s"))
 
 (defun fuel-markup--or (e)
   (let ((fst (car (cdr e)))
