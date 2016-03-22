@@ -3,6 +3,8 @@ namespace factor {
 // Runtime errors must be kept in sync with:
 //   basis/debugger/debugger.factor
 //   core/kernel/kernel.factor
+#define KERNEL_ERROR 0xfac7
+
 enum vm_error_type {
   ERROR_EXPIRED = 0,
   ERROR_IO,
