@@ -1,11 +1,11 @@
-USING: arrays assocs kernel sequences tools.test ;
+USING: assocs kernel sequences tools.test ;
 
 IN: tools.completion
 
 { f } [ "abc" "def" fuzzy ] unit-test
 { V{ 4 5 6 } } [ "set-nth" "nth" fuzzy ] unit-test
 
-{ { { 0 } { 4 5 6 } } } [ V{ 0 4 5 6 } runs [ >array ] map ] unit-test
+{ { { 0 } { 4 5 6 } } } [ V{ 0 4 5 6 } runs [ { } like ] map ] unit-test
 
 { { "nth" "?nth" "set-nth" } } [
     "nth" { "set-nth" "nth" "?nth" } dup zip completions keys

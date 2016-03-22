@@ -26,7 +26,7 @@ HELP: runs
 { $values { "seq" "a sequence of integers" } { "newseq" "a sequence of sequences of integers" } }
 { $description "Groups subsequences of consecutive integers." }
 { $examples
-    { $example "USING: prettyprint tools.completion ;" "{ 1 2 3 5 6 9 10 } runs ." "V{ V{ 1 2 3 } V{ 5 6 } V{ 9 10 } }" }
+    { $example "USING: prettyprint sequences tools.completion ;" "{ 1 2 3 5 6 9 10 } runs [ { } like ] map ." "{ { 1 2 3 } { 5 6 } { 9 10 } }" }
 } ;
 
 HELP: score
