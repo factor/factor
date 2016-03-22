@@ -51,7 +51,7 @@ os windows? [
     ! : callstack-overflow callstack-overflow f ;
     ! [ callstack-overflow ] must-fail
     [ overflow-c ] [
-        2 head ${ "kernel-error" ERROR-CALLSTACK-OVERFLOW } =
+        2 head ${ KERNEL-ERROR ERROR-CALLSTACK-OVERFLOW } =
     ] must-fail-with
 
     ! The way this is problematic is because a primitive is
@@ -63,7 +63,7 @@ os windows? [
     ! so we need to handle the case specially in
     ! dispatch_non_resumable_signal().
     [ overflow/w-primitive ] [
-        2 head ${ "kernel-error" ERROR-CALLSTACK-OVERFLOW } =
+        2 head ${ KERNEL-ERROR ERROR-CALLSTACK-OVERFLOW } =
     ] must-fail-with
 
     ! This test crashes with a Memory protection fault on OS X 64-bit

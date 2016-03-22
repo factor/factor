@@ -9,7 +9,7 @@ FUNCTION: void this_does_not_exist ( )
 [ this_does_not_exist ] try
 
 [ this_does_not_exist ] [
-    ${ "kernel-error" ERROR-UNDEFINED-SYMBOL "this_does_not_exist" string>symbol f }
+    ${ KERNEL-ERROR ERROR-UNDEFINED-SYMBOL "this_does_not_exist" string>symbol f }
     =
 ] must-fail-with
 
@@ -31,7 +31,7 @@ FUNCTION: void no_such_function ( )
 
 [ no_such_function ] [
     ${
-        "kernel-error" ERROR-UNDEFINED-SYMBOL
+        KERNEL-ERROR ERROR-UNDEFINED-SYMBOL
         "no_such_function" string>symbol
         "no_such_library" load-library
     }
