@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs colors.constants combinators
 combinators.short-circuit fry io.directories io.files
-io.files.info io.files.types io.pathnames kernel locals make
-math math.order sequences sequences.private sorting splitting
-unicode.categories unicode.data vectors vocabs vocabs.hierarchy
-;
+io.files.info io.pathnames kernel locals make math math.order
+sequences sequences.private sorting splitting
+splitting.monotonic unicode.categories unicode.data vectors
+vocabs vocabs.hierarchy ;
 IN: tools.completion
 
 <PRIVATE
@@ -28,21 +28,8 @@ PRIVATE>
     dup [ length <vector> 0 ] curry 2dip
     [ (fuzzy) ] with all? 2drop ;
 
-<PRIVATE
-
-: (runs) ( runs n seq -- runs n )
-    [
-        [
-            2dup number=
-            [ drop ] [ nip V{ } clone pick push ] if
-            1 +
-        ] keep pick last push
-    ] each ; inline
-
-PRIVATE>
-
 : runs ( seq -- newseq )
-    [ V{ } clone 1vector ] dip [ first ] keep (runs) drop ;
+    [ 1 - = ] monotonic-split-slice ;
 
 <PRIVATE
 
@@ -69,15 +56,12 @@ PRIVATE>
     ] if ;
 
 : rank-completions ( results -- newresults )
-    sort-keys <reversed>
     [ 0 [ first max ] reduce 3 /f ] keep
     [ first-unsafe < ] with filter
-    values ;
+    sort-keys <reversed> values ;
 
 : complete ( full short -- score )
-    [ dupd fuzzy score ] 2keep
-    [ <reversed> ] bi@
-    dupd fuzzy score max ;
+    2dup [ <reversed> ] bi@ [ dupd fuzzy score ] 2bi@ max ;
 
 : completion ( short candidate -- result )
     [ second swap complete ] keep 2array ; inline
