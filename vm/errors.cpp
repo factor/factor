@@ -19,7 +19,10 @@ void fatal_error(const char* msg, cell tagged) {
   std::cout << "fatal_error: " << msg;
   std::cout << ": " << (void*)tagged;
   std::cout << std::endl << std::endl;
-  current_vm()->dump_memory_layout(std::cout);
+  factor_vm* vm = current_vm();
+  if (vm->data) {
+    vm->dump_memory_layout(std::cout);
+  }
   abort();
 }
 
