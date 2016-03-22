@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit db db.errors
-db.errors.postgresql db.postgresql io.files.unique kernel namespaces
-tools.test db.tester continuations ;
-IN: db.errors.postgresql.tests
+db.postgresql db.postgresql.errors io.files.unique kernel
+namespaces tools.test db.tester continuations ;
 
 [
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators db kernel sequences peg.ebnf
 strings db.errors ;
-IN: db.errors.sqlite
+IN: db.sqlite.errors
 
 TUPLE: unparsed-sqlite-error error ;
 C: <unparsed-sqlite-error> unparsed-sqlite-error
