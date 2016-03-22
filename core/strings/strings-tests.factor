@@ -59,7 +59,7 @@ unit-test
 
 ! Random tester found this
 [ 2 -7 resize-string ]
-[ ${ "kernel-error" ERROR-TYPE 11 -7 } = ] must-fail-with
+[ ${ KERNEL-ERROR ERROR-TYPE 11 -7 } = ] must-fail-with
 
 ! Make sure 24-bit strings work
 "hello world" "s" set

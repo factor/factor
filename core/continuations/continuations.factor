@@ -204,9 +204,6 @@ M: condition compute-restarts
         OBJ-CURRENT-THREAD special-object error-thread set-global
         current-continuation error-continuation set-global
         [ original-error set-global ] [ rethrow ] bi
-    ] ERROR-HANDLER-QUOT set-special-object
-    ! VM adds this to kernel errors, so that user-space
-    ! can identify them
-    "kernel-error" OBJ-ERROR set-special-object ;
+    ] ERROR-HANDLER-QUOT set-special-object ;
 
 PRIVATE>

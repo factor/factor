@@ -1,7 +1,7 @@
-USING: accessors effects eval kernel layouts math namespaces
-quotations tools.test typed words words.symbol combinators.short-circuit
-compiler.tree.debugger prettyprint definitions compiler.units sequences
-classes.intersection strings classes.union ;
+USING: accessors compiler.units effects eval kernel kernel.private layouts
+literals math namespaces quotations tools.test typed words words.symbol
+combinators.short-circuit compiler.tree.debugger prettyprint definitions
+sequences classes.intersection strings classes.union ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -18,7 +18,7 @@ TYPED: fix+ ( a: fixnum b: fixnum -- c: fixnum )
 ! [ most-positive-fixnum 1 fix+ ] unit-test
 
 ! XXX: Check that we throw an error. This used to underflow to the least-positive-fixnum.
-[ most-positive-fixnum 1 fix+ ] [ { "kernel-error" 7 } head? ] must-fail-with
+[ most-positive-fixnum 1 fix+ ] [ ${ KERNEL-ERROR 7 } head? ] must-fail-with
 
 TUPLE: tweedle-dee ; final
 TUPLE: tweedle-dum ; final

@@ -57,7 +57,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
 
     /* Now its safe to allocate and GC */
     cell error_object =
-        allot_array_4(special_objects[OBJ_ERROR], tag_fixnum(error),
+        allot_array_4(tag_fixnum(KERNEL_ERROR), tag_fixnum(error),
                       arg1.value(), arg2.value());
     ctx->push(error_object);
 

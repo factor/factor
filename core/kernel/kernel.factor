@@ -316,7 +316,6 @@ CONSTANT: OBJ-WALKER-HOOK 3
 CONSTANT: OBJ-CALLCC-1 4
 
 CONSTANT: ERROR-HANDLER-QUOT 5
-CONSTANT: OBJ-ERROR 6
 
 CONSTANT: OBJ-CELL-SIZE 7
 CONSTANT: OBJ-CPU 8
@@ -427,6 +426,9 @@ CONSTANT: CONTEXT-OBJ-IN-CALLBACK-P 3
 ! Runtime errors must be kept in sync with:
 !   basis/debugger/debugger.factor
 !   vm/errors.hpp
+
+! VM adds this to kernel errors, so that user-space can identify them.
+CONSTANT: KERNEL-ERROR 0xfac7
 
 CONSTANT: kernel-error-count 20
 
