@@ -1,7 +1,7 @@
 USING: accessors arrays calendar continuations grouping io.directories
 io.files.info io.files.info.unix io.files.temp io.files.unix
 io.pathnames kernel literals math math.bitwise math.functions
-sequences strings tools.test unix.groups unix.users ;
+sequences strings system tools.test unix unix.groups unix.users ;
 IN: io.files.unix.tests
 
 { "/usr/libexec/" } [ "/usr/libexec/awk/" parent-directory ] unit-test
@@ -164,6 +164,8 @@ prepare-test-file
 { f } [ 0 other-execute? ] unit-test
 
 ! (cwd)
-{ t } [
-    1 (cwd) string?
-] unit-test
+{ t } [ 1 (cwd) string? ] unit-test
+
+os linux? [
+    { t } [ "/proc/self/exe" read-symbolic-link string? ] unit-test
+] when
