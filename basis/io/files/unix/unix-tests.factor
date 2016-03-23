@@ -1,8 +1,7 @@
-USING: tools.test io.files io.files.temp io.pathnames
-io.directories io.files.info io.files.info.unix continuations
-kernel io.files.unix math.bitwise calendar accessors
-math.functions math unix.users unix.groups arrays sequences
-grouping io.pathnames.private literals ;
+USING: accessors arrays calendar continuations grouping io.directories
+io.files.info io.files.info.unix io.files.temp io.files.unix
+io.pathnames kernel literals math math.bitwise math.functions
+sequences strings tools.test unix.groups unix.users ;
 IN: io.files.unix.tests
 
 { "/usr/libexec/" } [ "/usr/libexec/awk/" parent-directory ] unit-test
@@ -163,3 +162,8 @@ prepare-test-file
 { f } [ 0 other-read? ] unit-test
 { f } [ 0 other-write? ] unit-test
 { f } [ 0 other-execute? ] unit-test
+
+! (cwd)
+{ t } [
+    1 (cwd) string?
+] unit-test
