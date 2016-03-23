@@ -20,12 +20,6 @@ MEMO: vocab-file-contents ( vocab name -- seq )
         \ vocab-file-contents reset-memoized
     ] [ vocab-name no-vocab ] ?if ;
 
-: vocab-windows-icon-path ( vocab -- string )
-    vocab-dir "icon.ico" append-path ;
-
-: vocab-mac-icon-path ( vocab -- string )
-    vocab-dir "icon.icns" append-path ;
-
 : vocab-resources-path ( vocab -- string )
     vocab-dir "resources.txt" append-path ;
 
