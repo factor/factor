@@ -25,6 +25,9 @@ CONSTANT: app-icon-resource-id "APPICON"
 : ?open-in-explorer ( dir -- )
     open-directory-after-deploy? get [ open-in-explorer ] [ drop ] if ;
 
+: vocab-windows-icon-path ( vocab -- string )
+    vocab-dir "icon.ico" append-path ;
+
 : embed-ico ( vm-path vocab -- )
     dup vocab-windows-icon-path vocab-append-path dup exists?
     [ binary file-contents app-icon-resource-id embed-icon-resource ]

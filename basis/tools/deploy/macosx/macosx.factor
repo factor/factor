@@ -45,6 +45,9 @@ IN: tools.deploy.macosx
         "Contents/Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
     ] [ drop ] if ;
 
+: vocab-mac-icon-path ( vocab -- string )
+    vocab-dir "icon.icns" append-path ;
+
 : copy-icns ( vocab bundle-name -- icon? )
     swap dup vocab-mac-icon-path vocab-append-path dup exists?
     [ swap "Contents/Resources/Icon.icns" append-path copy-file t ]
