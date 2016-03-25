@@ -1,9 +1,7 @@
 ! Copyright (C) 2015 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: assocs assocs.extras combinators kernel literals locals
-math math.parser sequences splitting unicode.case
-unicode.categories ;
+USING: assocs assocs.extras combinators formatting kernel literals
+locals math math.parser sequences splitting unicode.case ;
 
 IN: english
 
@@ -142,6 +140,9 @@ PRIVATE>
         }
         [ "s" append ]
     } cond match-case ;
+
+: count-of-things ( count word -- str )
+    over 1 = [ pluralize ] unless "%d %s" sprintf ;
 
 : a10n ( str -- str' )
     dup length 3 > [
