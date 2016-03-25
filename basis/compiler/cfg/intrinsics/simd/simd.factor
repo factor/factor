@@ -93,7 +93,7 @@ CONSTANT: rep>half {
         [ [ ^^fill-vector ] [ ^^xor-vector ] bi ]
     } v-vector-op ;
 
-:: ^((compare-vector)) ( src1 src2 rep {cc,swap} -- dst )
+:: ^swap-compare-vector ( src1 src2 rep {cc,swap} -- dst )
     {cc,swap} first2 :> ( cc swap? )
     swap?
     [ src2 src1 rep cc ^^compare-vector ]
@@ -106,10 +106,10 @@ CONSTANT: rep>half {
     [ rep not? [ ^^fill-vector ] [ ^^zero-vector ] if ]
     [
         ccs unclip :> ( rest-ccs first-cc )
-        src1 src2 rep first-cc ^((compare-vector)) :> first-dst
+        src1 src2 rep first-cc ^swap-compare-vector :> first-dst
 
         rest-ccs first-dst
-        [ [ src1 src2 rep ] dip ^((compare-vector)) rep ^^or-vector ]
+        [ [ src1 src2 rep ] dip ^swap-compare-vector rep ^^or-vector ]
         reduce
 
         not? [ rep ^not-vector ] when

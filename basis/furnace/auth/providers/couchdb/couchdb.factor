@@ -107,7 +107,7 @@ TUPLE: couchdb-auth-provider
     over [ change-at ] dip ; inline
 
 ! Should be given a view URL.
-: ((get-user)) ( couchdb-url -- user/f )
+: url>user ( couchdb-url -- user/f )
     couch-get
     "rows" of dup empty? [ drop f ] [ first "value" of ] if ;
 
@@ -115,7 +115,7 @@ TUPLE: couchdb-auth-provider
     couchdb-auth-provider get
     username-view>> get-url
     swap >json "key" set-query-param
-    ((get-user)) ;
+    url>user ;
 
 : strip-hash ( hash1 -- hash2 )
     [ drop first CHAR: _ = ] assoc-reject ;

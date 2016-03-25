@@ -189,7 +189,7 @@ PRIVATE>
     over empty? [ 2drop { } ] [
         [ [ first ] dip call ] 2keep rot dup [
             >resizable [ [ push-all ] curry compose ] keep
-            [ 1 ] 3dip [ (each) (each-integer) ] dip
+            [ 1 ] 3dip [ setup-each (each-integer) ] dip
         ] curry dip like
     ] if ; inline
 
@@ -208,16 +208,16 @@ PRIVATE>
 
 <PRIVATE
 
-: ((each-from)) ( i seq -- n quot )
+: (each-from) ( i seq -- n quot )
     [ length over [-] swap ] keep '[ _ + _ nth-unsafe ] ; inline
 
-: (each-from) ( i seq quot -- n quot' )
-    [ ((each-from)) ] dip compose ; inline
+: each-from ( i seq quot -- n quot' )
+    [ (each-from) ] dip compose ; inline
 
 PRIVATE>
 
 : map-from-as ( ... seq quot: ( ... elt -- ... newelt ) i exemplar -- ... newseq )
-    [ -rot (each-from) ] dip map-integers ; inline
+    [ -rot each-from ] dip map-integers ; inline
 
 : map-from ( ... seq quot: ( ... elt -- ... newelt ) i -- ... newseq )
     pick map-from-as ; inline
@@ -319,7 +319,7 @@ PRIVATE>
 <PRIVATE
 
 : (2each-index) ( seq1 seq2 quot -- n quot' )
-    [ ((2each)) [ keep ] curry ] dip compose ; inline
+    [ setup-2each [ keep ] curry ] dip compose ; inline
 
 PRIVATE>
 

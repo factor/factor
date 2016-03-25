@@ -90,14 +90,14 @@ M: model update-model drop ;
 : ?set-model ( value model -- )
     2dup value>> = [ 2drop ] [ set-model ] if ;
 
-: ((change-model)) ( model quot -- newvalue model )
+: call-change-model ( model quot -- newvalue model )
     over [ [ value>> ] dip call ] dip ; inline
 
 : change-model ( ..a model quot: ( ..a obj -- ..b newobj ) -- ..b )
-    ((change-model)) set-model ; inline
+    call-change-model set-model ; inline
 
 : (change-model) ( ..a model quot: ( ..a obj -- ..b newobj ) -- ..b )
-    ((change-model)) value<< ; inline
+    call-change-model value<< ; inline
 
 GENERIC: range-value ( model -- value )
 GENERIC: range-page-value ( model -- value )

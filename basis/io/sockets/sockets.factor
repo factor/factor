@@ -241,7 +241,7 @@ SYMBOL: bind-local-address
 
 GENERIC: establish-connection ( client-out remote -- )
 
-GENERIC: ((client)) ( remote -- handle )
+GENERIC: remote>handle ( remote -- handle )
 
 GENERIC: (client) ( remote -- client-in client-out local )
 
@@ -249,7 +249,7 @@ M: array (client) [ (client) 3array ] attempt-all first3 ;
 
 M: object (client) ( remote -- client-in client-out local )
     [
-        [ ((client)) ] keep
+        [ remote>handle ] keep
         [
             [ <ports> [ |dispose ] bi@ dup ] dip
             establish-connection
