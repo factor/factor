@@ -375,7 +375,7 @@ ERROR: tuple-removed class ;
 M: tuple prepare-object emit-tuple ;
 
 M: tombstone prepare-object
-    state>> "((tombstone))" "((empty))" ?
+    state>> "+tombstone+" "+empty+" ?
     "hashtables.private" lookup-word def>> first
     [ emit-tuple ] cache-eql-object ;
 

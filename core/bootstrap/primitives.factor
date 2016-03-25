@@ -265,11 +265,11 @@ bi
 tuple
 { "state" } define-tuple-class
 
-"((empty))" "hashtables.private" create-word
+"+empty+" "hashtables.private" create-word
 { f } "tombstone" "hashtables.private" lookup-word
 slots>tuple 1quotation ( -- value ) define-inline
 
-"((tombstone))" "hashtables.private" create-word
+"+tombstone+" "hashtables.private" create-word
 { t } "tombstone" "hashtables.private" lookup-word
 slots>tuple 1quotation ( -- value ) define-inline
 
