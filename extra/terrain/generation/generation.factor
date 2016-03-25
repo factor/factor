@@ -61,7 +61,7 @@ TYPED: terrain-segment ( terrain: terrain at: float-4 -- image )
 : 4max ( a b c d -- max )
     max max max ; inline
 
-: mipmap ( {{pixels}} quot: ( aa ab ba bb -- c ) -- pixels' )
+: mipmap ( pixels quot: ( aa ab ba bb -- c ) -- pixels' )
     [ [ 2 <groups> ] map 2 <groups> ] dip
     '[ first2 [ [ first2 ] bi@ @ ] 2map ] map ; inline
 
