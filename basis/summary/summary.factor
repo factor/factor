@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes continuations formatting kernel math
-sequences sets ;
+sequences sets strings ;
 IN: summary
 
 GENERIC: summary ( object -- string )
@@ -29,6 +29,9 @@ M: object summary object-summary ;
 
 M: sequence summary
     dup length "elements" container-summary ;
+
+M: string summary
+    dup length "characters" container-summary ;
 
 ! Override sequence => integer instance
 M: f summary object-summary ;
