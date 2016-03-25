@@ -174,8 +174,8 @@ C: <code-point> code-point
     4 head [ multihex ] map first4
     <code-point> swap first ,, ;
 
-! Extra properties
-: parse-properties ( -- {{[a,b],prop}} )
+! Extra properties {{[a,b],prop}}
+: parse-properties ( -- assoc )
     "vocab:unicode/data/PropList.txt" data [
         [
             ".." split1 [ dup ] unless*
