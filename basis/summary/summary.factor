@@ -19,7 +19,7 @@ M: assoc tuple-summary
     dup assoc-size "entries" container-summary ;
 
 M: object tuple-summary
-    class-of name>> "a " " tuple" surround ;
+    object-summary "a " " tuple" surround ;
 
 M: unordered-set tuple-summary
     dup cardinality "members" container-summary ;
