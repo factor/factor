@@ -15,8 +15,8 @@ SYMBOL: effect-var
 
 <PRIVATE
 : end-token? ( end token -- token ? ) [ nip ] [ = ] 2bi ; inline
-: effect-opener? ( token -- token ? ) dup { f "(" "((" "--" } member? ; inline
-: effect-closer? ( token -- token ? ) dup { ")" "))" } member? ; inline
+: effect-opener? ( token -- token ? ) dup { f "(" "--" } member? ; inline
+: effect-closer? ( token -- token ? ) dup ")" sequence= ; inline
 : row-variable? ( token -- token' ? ) ".." ?head ; inline
 
 : parse-effect-var ( first? var name -- var )
