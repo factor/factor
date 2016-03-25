@@ -442,8 +442,3 @@ pane H{
 
 GENERIC: content-gadget ( object -- gadget/f )
 M: object content-gadget drop f ;
-
-M: string content-gadget
-    '[ _ write ] make-pane <scroller>
-        { 450 100 } >>pref-dim
-    <wrapper> ;
