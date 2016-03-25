@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes continuations formatting kernel math
-sequences sets strings ;
+sequences sets ;
 IN: summary
 
 GENERIC: summary ( object -- string )
@@ -11,16 +11,24 @@ GENERIC: summary ( object -- string )
 : container-summary ( obj size word -- str )
     [ object-summary ] 2dip "%s with %d %s" sprintf ;
 
+GENERIC: tuple-summary ( object -- string )
+
+M: assoc tuple-summary
+    dup assoc-size "entries" container-summary ;
+
+M: object tuple-summary
+    class-of "a %s tuple" sprintf ;
+
+M: unordered-set tuple-summary
+    dup cardinality "members" container-summary ;
+
+M: tuple summary
+    tuple-summary ;
+
 M: object summary object-summary ;
 
 M: sequence summary
     dup length "elements" container-summary ;
-
-M: assoc summary
-    dup assoc-size "entries" container-summary ;
-
-M: unordered-set summary
-    dup cardinality "members" container-summary ;
 
 ! Override sequence => integer instance
 M: f summary object-summary ;
