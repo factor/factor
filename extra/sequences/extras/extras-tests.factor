@@ -181,3 +181,5 @@ IN: sequences.extras.tests
 { { 0 3 } } [ "ABA" "ABAABA" start-all ] unit-test
 { 1 } [ "ABA" "ABABA" count-subseq ] unit-test
 { 2 } [ "ABA" "ABABA" count-subseq* ] unit-test
+
+{ 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test

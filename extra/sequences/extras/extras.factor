@@ -208,16 +208,16 @@ PRIVATE>
 
 <PRIVATE
 
-: (each-from) ( i seq -- n quot )
+: (setup-each-from) ( i seq -- n quot )
     [ length over [-] swap ] keep '[ _ + _ nth-unsafe ] ; inline
 
-: each-from ( i seq quot -- n quot' )
-    [ (each-from) ] dip compose ; inline
+: setup-each-from ( i seq quot -- n quot' )
+    [ (setup-each-from) ] dip compose ; inline
 
 PRIVATE>
 
 : map-from-as ( ... seq quot: ( ... elt -- ... newelt ) i exemplar -- ... newseq )
-    [ -rot each-from ] dip map-integers ; inline
+    [ -rot setup-each-from ] dip map-integers ; inline
 
 : map-from ( ... seq quot: ( ... elt -- ... newelt ) i -- ... newseq )
     pick map-from-as ; inline
