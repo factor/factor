@@ -103,9 +103,9 @@ SYMBOL: boundaries
 : d= ( value basis -- )
     boundaries [ ?set-at ] change ;
 
-: ((d)) ( basis -- value ) boundaries get at ;
+: get-boundary ( basis -- value ) boundaries get at ;
 
-: dx.y ( x y -- vec ) [ ((d)) ] dip wedge ;
+: dx.y ( x y -- vec ) [ get-boundary ] dip wedge ;
 
 DEFER: (d)
 

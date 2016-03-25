@@ -6,7 +6,7 @@ IN: splitting.monotonic
 
 <PRIVATE
 
-:: ((monotonic-split)) ( seq quot slice-quot n -- pieces )
+:: monotonic-split-impl ( seq quot slice-quot n -- pieces )
     V{ 0 } clone :> accum
 
     0 seq [ ] [
@@ -22,7 +22,7 @@ IN: splitting.monotonic
     ] { } 2map-as ; inline
 
 : (monotonic-split) ( seq quot slice-quot -- pieces )
-    pick length [ 3drop { } ] [ ((monotonic-split)) ] if-zero ; inline
+    pick length [ 3drop { } ] [ monotonic-split-impl ] if-zero ; inline
 
 PRIVATE>
 

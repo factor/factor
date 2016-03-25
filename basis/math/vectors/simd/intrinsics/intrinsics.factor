@@ -136,7 +136,7 @@ GENERIC: native/ ( x y -- x/y )
 M: integer native/ /i ; inline
 M: float native/ /f ; inline
 
-: ((vgetmask)) ( a rep -- b )
+: (vgetmask) ( a rep -- b )
     0 [ [ 1 shift ] [ zero? 0 1 ? ] bi* bitor ] bitwise-components-reduce* ; inline
 
 PRIVATE>
@@ -245,7 +245,7 @@ PRIVATE>
 : (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
 : (simd-vgetmask)          ( a   rep -- n )
     { float-4-rep double-2-rep } member?
-    [ uint-4-rep ((vgetmask)) ] [ uchar-16-rep ((vgetmask)) ] if ;
+    [ uint-4-rep (vgetmask) ] [ uchar-16-rep (vgetmask) ] if ;
 : (simd-v>float)           ( a   rep -- c )
     [ [ byte>rep-array ] [ rep-length ] bi [ >float ] ]
     [ >float-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;

@@ -247,7 +247,7 @@ PRIVATE>
 : hide-mouse-help ( table -- )
     f >>mouse-index [ update-status ] [ relayout-1 ] bi ;
 
-: ((select-row)) ( n table -- )
+: select-table-row ( n table -- )
     [ selection-index>> set-model ]
     [ [ selected-row drop ] keep selection>> set-model ]
     bi ;
@@ -282,7 +282,7 @@ PRIVATE>
             [ initial-selection-index ]
         } 1||
     ] keep
-    over [ ((select-row)) ] [
+    over [ select-table-row ] [
         [ selection-index>> set-model ]
         [ selection>> set-model ]
         2bi
@@ -303,7 +303,7 @@ M: table model-changed
 
 : (select-row) ( table n -- )
     [ scroll-to-row ]
-    [ swap ((select-row)) ]
+    [ swap select-table-row ]
     [ drop relayout-1 ]
     2tri ;
 

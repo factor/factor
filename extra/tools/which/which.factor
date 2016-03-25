@@ -25,7 +25,7 @@ IN: tools.which
         [ drop 1array ] [ [ append ] with map ] if
     ] [ 1array ] if* ;
 
-: ((which)) ( commands paths -- file/f )
+: find-which ( commands paths -- file/f )
     [ normalize-path ] map members
     cartesian-product flip concat
     [ prepend-path ] { } assoc>map
@@ -34,7 +34,7 @@ IN: tools.which
 : (which) ( command path -- file/f )
     split-path os windows? [
         [ path-extensions ] [ "." prefix ] bi*
-    ] [ [ 1array ] dip ] if ((which)) ;
+    ] [ [ 1array ] dip ] if find-which ;
 
 PRIVATE>
 

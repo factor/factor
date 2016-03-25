@@ -146,7 +146,7 @@ MACRO: smart-map-reduce ( map-reduce-quots -- quot )
     [ keys ] [ [ [ ] concat-as ] [ ] map-as ] bi dup length dup '[
         [ first _ cleave ] keep
         [ @ _ cleave-curry _ spread* ]
-        [ 1 ] 2dip (each) (each-integer)
+        [ 1 ] 2dip setup-each (each-integer)
     ] ;
 
 MACRO: smart-2reduce ( 2reduce-quots -- quot )

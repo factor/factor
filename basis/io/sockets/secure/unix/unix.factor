@@ -14,8 +14,8 @@ M: ssl-handle handle-fd file>> handle-fd ;
 
 M: unix socket-handle fd>> ;
 
-M: secure ((client)) ( secure -- handle )
-    [ addrspec>> ((client)) ] [ hostname>> ] bi <ssl-socket> ;
+M: secure remote>handle ( secure -- handle )
+    [ addrspec>> remote>handle ] [ hostname>> ] bi <ssl-socket> ;
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
