@@ -23,7 +23,7 @@ TUPLE: hashtable
 : no-key ( key array -- array n ? ) nip f f ; inline
 
 : (key@) ( key array i probe# -- array n ? )
-    [ 3dup swap array-nth ] dip over ((empty)) eq?
+    [ 3dup swap array-nth ] dip over +empty+ eq?
     [ 4drop no-key ] [
         [ = ] dip swap
         [ drop rot drop t ]
@@ -36,7 +36,7 @@ TUPLE: hashtable
     [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
-    3 * 1 + 2/ next-power-of-2 2 * ((empty)) <array> ; inline
+    3 * 1 + 2/ next-power-of-2 2 * +empty+ <array> ; inline
 
 : init-hash ( hash -- )
     0 >>count 0 >>deleted drop ; inline
@@ -68,7 +68,7 @@ TUPLE: hashtable
 : (new-key@) ( key array i probe# j -- array i j empty? )
     [ 2dup swap array-nth ] 2dip pick tombstone?
     [
-        rot ((empty)) eq?
+        rot +empty+ eq?
         [ nip [ drop ] 3dip t ]
         [ pick or [ probe ] dip (new-key@) ]
         if
@@ -126,11 +126,11 @@ M: hashtable at*
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
 
 M: hashtable clear-assoc
-    [ init-hash ] [ array>> [ drop ((empty)) ] map! drop ] bi ;
+    [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;
 
 M: hashtable delete-at
     [ nip ] [ key@ ] 2bi [
-        [ ((tombstone)) dup ] 2dip set-nth-pair
+        [ +tombstone+ dup ] 2dip set-nth-pair
         hash-deleted+
     ] [
         3drop
