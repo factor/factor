@@ -242,7 +242,7 @@ M: anonymous-complement (classes-intersect?)
 : anonymous-union-or ( first second -- class )
     members>> swap suffix <anonymous-union> ;
 
-: ((class-or)) ( first second -- class )
+: classes>anonymous-union ( first second -- class )
     [ normalize-class ] bi@ {
         { [ dup anonymous-union? ] [ anonymous-union-or ] }
         { [ over anonymous-union? ] [ swap anonymous-union-or ] }
@@ -250,7 +250,7 @@ M: anonymous-complement (classes-intersect?)
     } cond ;
 
 : anonymous-complement-or ( first second -- class )
-    2dup class>> swap class<= [ 2drop object ] [ ((class-or)) ] if ;
+    2dup class>> swap class<= [ 2drop object ] [ classes>anonymous-union ] if ;
 
 : (class-or) ( first second -- class )
     2dup compare-classes {
@@ -261,7 +261,7 @@ M: anonymous-complement (classes-intersect?)
             {
                 { [ dup anonymous-complement? ] [ anonymous-complement-or ] }
                 { [ over anonymous-complement? ] [ swap anonymous-complement-or ] }
-                [ ((class-or)) ]
+                [ classes>anonymous-union ]
             } cond
         ] }
     } case ;
