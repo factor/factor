@@ -21,6 +21,6 @@ ARTICLE: "compiler.cfg.save-contexts" "Insert context saves"
 $nl
 "Main word:"
 { $subsections insert-save-contexts }
-{ $notes "The " { ##call-gc } " instruction does not need a context save because the primitive implementing the instruction (" { $link minor-gc } ") already saves the context for us." } ;
+{ $notes "The " { $link ##call-gc } " instruction does not need a context save because the primitive implementing the instruction (" { $link minor-gc } ") already saves the context for us." } ;
 
 ABOUT: "compiler.cfg.save-contexts"
