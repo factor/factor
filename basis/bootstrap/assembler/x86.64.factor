@@ -85,17 +85,6 @@ IN: bootstrap.x86
 
 : jit-call-quot ( -- ) arg1 quot-entry-point-offset [+] CALL ;
 
-[
-    arg2 arg1 MOV
-    vm-reg "begin_callback" jit-call-1arg
-
-    ! call the quotation
-    arg1 return-reg MOV
-    jit-call-quot
-
-    vm-reg "end_callback" jit-call-1arg
-] \ c-to-factor define-sub-primitive
-
 : signal-handler-save-regs ( -- regs )
     { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 } ;
 
@@ -106,66 +95,6 @@ IN: bootstrap.x86
 [ jit-call-quot ]
 [ jit-jump-quot ]
 \ (call) define-combinator-primitive
-
-[
-    ! Unwind stack frames
-    RSP arg2 MOV
-
-    ! Load VM pointer into vm-reg, since we're entering from
-    ! C code
-    vm-reg 0 MOV 0 rc-absolute-cell rel-vm
-
-    ! Load ds and rs registers
-    jit-load-context
-    jit-restore-context
-
-    ! Clear the fault flag
-    vm-reg vm-fault-flag-offset [+] 0 MOV
-
-    ! Call quotation
-    jit-jump-quot
-] \ unwind-native-frames define-sub-primitive
-
-[
-    RSP 2 SUB
-    RSP [] FNSTCW
-    FNINIT
-    AX RSP [] MOV
-    RSP 2 ADD
-] \ fpu-state define-sub-primitive
-
-[
-    RSP 2 SUB
-    RSP [] arg1 16-bit-version-of MOV
-    RSP [] FLDCW
-    RSP 2 ADD
-] \ set-fpu-state define-sub-primitive
-
-[
-    ! Load callstack object
-    arg4 ds-reg [] MOV
-    ds-reg bootstrap-cell SUB
-    ! Get ctx->callstack_bottom
-    jit-load-context
-    arg1 ctx-reg context-callstack-bottom-offset [+] MOV
-    ! Get top of callstack object -- 'src' for memcpy
-    arg2 arg4 callstack-top-offset [+] LEA
-    ! Get callstack length, in bytes --- 'len' for memcpy
-    arg3 arg4 callstack-length-offset [+] MOV
-    arg3 tag-bits get SHR
-    ! Compute new stack pointer -- 'dst' for memcpy
-    arg1 arg3 SUB
-    ! Install new stack pointer
-    RSP arg1 MOV
-    ! Call memcpy; arguments are now in the correct registers
-    ! Create register shadow area for Win64
-    RSP 32 SUB
-    "factor_memcpy" jit-call
-    ! Tear down register shadow area
-    RSP 32 ADD
-    ! Return with new callstack
-    0 RET
-] \ set-callstack define-sub-primitive
 
 [
     jit-save-context
@@ -220,30 +149,6 @@ IN: bootstrap.x86
     [ arg3 vm-reg MOV jit-call ]
     jit-conditional ; inline
 
-[ [ ADD ] "overflow_fixnum_add" jit-overflow ] \ fixnum+ define-sub-primitive
-
-[ [ SUB ] "overflow_fixnum_subtract" jit-overflow ] \ fixnum- define-sub-primitive
-
-[
-    ds-reg 8 SUB
-    jit-save-context
-    RCX ds-reg [] MOV
-    RBX ds-reg 8 [+] MOV
-    RBX tag-bits get SAR
-    RAX RCX MOV
-    RBX IMUL
-    ds-reg [] RAX MOV
-    [ JNO ]
-    [
-        arg1 RCX MOV
-        arg1 tag-bits get SAR
-        arg2 RBX MOV
-        arg3 vm-reg MOV
-        "overflow_fixnum_multiply" jit-call
-    ]
-    jit-conditional
-] \ fixnum* define-sub-primitive
-
 ! Contexts
 : jit-switch-context ( reg -- )
     ! Push a bogus return address so the GC can track this frame back
@@ -279,8 +184,6 @@ IN: bootstrap.x86
     RSP 8 ADD
     jit-push-param ;
 
-[ jit-set-context ] \ (set-context) define-sub-primitive
-
 : jit-pop-quot-and-param ( -- )
     arg1 ds-reg [] MOV
     arg2 ds-reg -8 [+] MOV
@@ -299,15 +202,8 @@ IN: bootstrap.x86
     jit-push-param
     jit-jump-quot ;
 
-[ jit-start-context ] \ (start-context) define-sub-primitive
-
 : jit-delete-current-context ( -- )
     vm-reg "delete_context" jit-call-1arg ;
-
-[
-    jit-delete-current-context
-    jit-set-context
-] \ (set-context-and-delete) define-sub-primitive
 
 ! Resets the active context and instead the passed in quotation
 ! becomes the new code that it executes.
@@ -333,6 +229,109 @@ IN: bootstrap.x86
     0 [RIP+] EAX MOV rc-relative rel-safepoint
 ] JIT-SAFEPOINT jit-define
 
-[
-    jit-start-context-and-delete
-] \ (start-context-and-delete) define-sub-primitive
+! # All x86.64 subprimitives
+{
+    ! ## Contexts
+    { (set-context) [ jit-set-context ] }
+    { (set-context-and-delete) [
+        jit-delete-current-context
+        jit-set-context
+    ] }
+    { (start-context) [ jit-start-context ] }
+    { (start-context-and-delete) [ jit-start-context-and-delete ] }
+
+    ! ## Entry points
+    { c-to-factor [
+        arg2 arg1 MOV
+        vm-reg "begin_callback" jit-call-1arg
+
+        ! call the quotation
+        arg1 return-reg MOV
+        jit-call-quot
+
+        vm-reg "end_callback" jit-call-1arg
+    ] }
+    { unwind-native-frames [
+        ! unwind-native-frames is marked as "special" in
+        ! vm/quotations.cpp so it does not have a standard prolog
+        ! Unwind stack frames
+        RSP arg2 MOV
+
+        ! Load VM pointer into vm-reg, since we're entering from
+        ! C code
+        vm-reg 0 MOV 0 rc-absolute-cell rel-vm
+
+        ! Load ds and rs registers
+        jit-load-context
+        jit-restore-context
+
+        ! Clear the fault flag
+        vm-reg vm-fault-flag-offset [+] 0 MOV
+
+        ! Call quotation
+        jit-jump-quot
+    ] }
+
+    ! ## Math
+    { fixnum+ [ [ ADD ] "overflow_fixnum_add" jit-overflow ] }
+    { fixnum- [ [ SUB ] "overflow_fixnum_subtract" jit-overflow ] }
+    { fixnum* [
+        ds-reg 8 SUB
+        jit-save-context
+        RCX ds-reg [] MOV
+        RBX ds-reg 8 [+] MOV
+        RBX tag-bits get SAR
+        RAX RCX MOV
+        RBX IMUL
+        ds-reg [] RAX MOV
+        [ JNO ]
+        [
+            arg1 RCX MOV
+            arg1 tag-bits get SAR
+            arg2 RBX MOV
+            arg3 vm-reg MOV
+            "overflow_fixnum_multiply" jit-call
+        ]
+        jit-conditional
+    ] }
+
+    ! ## Misc
+    { fpu-state [
+        RSP 2 SUB
+        RSP [] FNSTCW
+        FNINIT
+        AX RSP [] MOV
+        RSP 2 ADD
+    ] }
+    { set-fpu-state [
+        RSP 2 SUB
+        RSP [] arg1 16-bit-version-of MOV
+        RSP [] FLDCW
+        RSP 2 ADD
+    ] }
+    { set-callstack [
+        ! Load callstack object
+        arg4 ds-reg [] MOV
+        ds-reg bootstrap-cell SUB
+        ! Get ctx->callstack_bottom
+        jit-load-context
+        arg1 ctx-reg context-callstack-bottom-offset [+] MOV
+        ! Get top of callstack object -- 'src' for memcpy
+        arg2 arg4 callstack-top-offset [+] LEA
+        ! Get callstack length, in bytes --- 'len' for memcpy
+        arg3 arg4 callstack-length-offset [+] MOV
+        arg3 tag-bits get SHR
+        ! Compute new stack pointer -- 'dst' for memcpy
+        arg1 arg3 SUB
+        ! Install new stack pointer
+        RSP arg1 MOV
+        ! Call memcpy; arguments are now in the correct registers
+        ! Create register shadow area for Win64
+        RSP 32 SUB
+        "factor_memcpy" jit-call
+        ! Tear down register shadow area
+        RSP 32 ADD
+        ! Return with new callstack
+        0 RET
+    ] }
+} define-sub-primitives

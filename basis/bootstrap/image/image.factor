@@ -126,6 +126,9 @@ SYMBOL: special-objects
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
 
+: define-sub-primitives ( assoc -- )
+    [ swap define-sub-primitive ] assoc-each ;
+
 : define-combinator-primitive ( quot non-tail-quot tail-quot word -- )
     [
         [
