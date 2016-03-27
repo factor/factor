@@ -172,11 +172,11 @@ these lines in your .emacs:
   "Move point to the end of the current symbol."
   (skip-syntax-forward "w_()\""))
 
-(put 'symbol 'end-op 'factor-end-of-symbol)
-(put 'symbol 'beginning-op 'factor-beginning-of-symbol)
+(put 'factor-symbol 'end-op 'factor-end-of-symbol)
+(put 'factor-symbol 'beginning-op 'factor-beginning-of-symbol)
 
 (defun factor-symbol-at-point ()
-  (let ((thing (thing-at-point 'symbol t)))
+  (let ((thing (thing-at-point 'factor-symbol t)))
     (and (> (length thing) 0) thing)))
 
 
