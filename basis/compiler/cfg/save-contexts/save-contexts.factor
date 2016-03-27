@@ -9,8 +9,14 @@ UNION: context-modifier ##phi ##inc ##callback-inputs ;
 : save-context-offset ( insns -- n )
     [ context-modifier? not ] find drop ;
 
+UNION: needs-save-context-insn
+    ##alien-invoke
+    ##alien-indirect
+    ##box-long-long
+    ##box ;
+
 : insns-needs-save-context? ( insns -- ? )
-    [ gc-map-insn? ] any? ;
+    [ needs-save-context-insn? ] any? ;
 
 : insert-save-context ( insns -- insns' )
     dup insns-needs-save-context? [
