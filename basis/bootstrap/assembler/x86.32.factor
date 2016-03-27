@@ -89,17 +89,6 @@ IN: bootstrap.x86
 : jit-call-quot ( -- )
     EAX quot-entry-point-offset [+] CALL ;
 
-[
-    jit-load-vm
-    EAX EBP 8 [+] MOV
-    vm-reg EAX "begin_callback" jit-call-2arg
-
-    jit-call-quot
-
-    jit-load-vm
-    vm-reg "end_callback" jit-call-1arg
-] \ c-to-factor define-sub-primitive
-
 : signal-handler-save-regs ( -- regs )
     { EAX EBX ECX EDX EBP EDI ESI } ;
 
@@ -110,69 +99,6 @@ IN: bootstrap.x86
 [ jit-call-quot ]
 [ jit-jump-quot ]
 \ (call) define-combinator-primitive
-
-! unwind-native-frames is marked as "special" in vm/quotations.cpp
-! so it does not have a standard prolog
-[
-    ! Load ds and rs registers
-    jit-load-vm
-    jit-load-context
-    jit-restore-context
-
-    ! clear the fault flag
-    vm-reg vm-fault-flag-offset [+] 0 MOV
-
-    ! Windows-specific setup
-    ctx-reg jit-update-seh
-
-    ! Load arguments
-    EAX ESP bootstrap-cell [+] MOV
-    EDX ESP 2 bootstrap-cells [+] MOV
-
-    ! Unwind stack frames
-    ESP EDX MOV
-
-    jit-jump-quot
-] \ unwind-native-frames define-sub-primitive
-
-[
-    ESP 2 SUB
-    ESP [] FNSTCW
-    FNINIT
-    AX ESP [] MOV
-    ESP 2 ADD
-] \ fpu-state define-sub-primitive
-
-[
-    ESP stack-frame-size [+] FLDCW
-] \ set-fpu-state define-sub-primitive
-
-[
-    ! Load callstack object
-    temp3 ds-reg [] MOV
-    ds-reg bootstrap-cell SUB
-    ! Get ctx->callstack_bottom
-    jit-load-vm
-    jit-load-context
-    temp0 ctx-reg context-callstack-bottom-offset [+] MOV
-    ! Get top of callstack object -- 'src' for memcpy
-    temp1 temp3 callstack-top-offset [+] LEA
-    ! Get callstack length, in bytes --- 'len' for memcpy
-    temp2 temp3 callstack-length-offset [+] MOV
-    temp2 tag-bits get SHR
-    ! Compute new stack pointer -- 'dst' for memcpy
-    temp0 temp2 SUB
-    ! Install new stack pointer
-    ESP temp0 MOV
-    ! Call memcpy
-    temp2 PUSH
-    temp1 PUSH
-    temp0 PUSH
-    "factor_memcpy" jit-call
-    ESP 12 ADD
-    ! Return with new callstack
-    0 RET
-] \ set-callstack define-sub-primitive
 
 [
     jit-load-vm
@@ -233,29 +159,6 @@ IN: bootstrap.x86
     ]
     jit-conditional ;
 
-[ [ ADD ] "overflow_fixnum_add" jit-overflow ] \ fixnum+ define-sub-primitive
-
-[ [ SUB ] "overflow_fixnum_subtract" jit-overflow ] \ fixnum- define-sub-primitive
-
-[
-    ds-reg 4 SUB
-    jit-load-vm
-    jit-save-context
-    ECX ds-reg [] MOV
-    EAX ECX MOV
-    EBP ds-reg 4 [+] MOV
-    EBP tag-bits get SAR
-    ! clobbers EDX
-    EBP IMUL
-    ds-reg [] EAX MOV
-    [ JNO ]
-    [
-        ECX tag-bits get SAR
-        ECX EBP vm-reg "overflow_fixnum_multiply" jit-call-3arg
-    ]
-    jit-conditional
-] \ fixnum* define-sub-primitive
-
 ! Contexts
 : jit-switch-context ( reg -- )
     ! Push a bogus return address so the GC can track this frame back
@@ -299,8 +202,6 @@ IN: bootstrap.x86
     ds-reg 4 ADD
     ds-reg [] EDX MOV ;
 
-[ jit-set-context ] \ (set-context) define-sub-primitive
-
 : jit-save-quot-and-param ( -- )
     EDX ds-reg MOV
     ds-reg 8 SUB ;
@@ -335,17 +236,10 @@ IN: bootstrap.x86
     EAX EDX [] MOV
     jit-jump-quot ;
 
-[ jit-start-context ] \ (start-context) define-sub-primitive
-
 : jit-delete-current-context ( -- )
     jit-load-vm
     jit-load-context
     vm-reg "delete_context" jit-call-1arg ;
-
-[
-    jit-delete-current-context
-    jit-set-context
-] \ (set-context-and-delete) define-sub-primitive
 
 : jit-start-context-and-delete ( -- )
     jit-load-vm
@@ -371,6 +265,109 @@ IN: bootstrap.x86
     0 EAX MOVABS rc-absolute rel-safepoint
 ] JIT-SAFEPOINT jit-define
 
-[
-    jit-start-context-and-delete
-] \ (start-context-and-delete) define-sub-primitive
+! # All x86.32 subprimitives
+{
+    ! ## Contexts
+    { (set-context) [ jit-set-context ] }
+    { (set-context-and-delete) [
+        jit-delete-current-context
+        jit-set-context
+    ] }
+    { (start-context) [ jit-start-context ] }
+    { (start-context-and-delete) [ jit-start-context-and-delete ] }
+
+    ! ## Entry points
+    { c-to-factor [
+        jit-load-vm
+        EAX EBP 8 [+] MOV
+        vm-reg EAX "begin_callback" jit-call-2arg
+
+        jit-call-quot
+
+        jit-load-vm
+        vm-reg "end_callback" jit-call-1arg
+    ] }
+    { unwind-native-frames [
+        ! unwind-native-frames is marked as "special" in
+        ! vm/quotations.cpp so it does not have a standard prolog Load
+        ! ds and rs registers
+        jit-load-vm
+        jit-load-context
+        jit-restore-context
+
+        ! clear the fault flag
+        vm-reg vm-fault-flag-offset [+] 0 MOV
+
+        ! Windows-specific setup
+        ctx-reg jit-update-seh
+
+        ! Load arguments
+        EAX ESP bootstrap-cell [+] MOV
+        EDX ESP 2 bootstrap-cells [+] MOV
+
+        ! Unwind stack frames
+        ESP EDX MOV
+
+        jit-jump-quot
+    ] }
+
+    ! ## Math
+    { fixnum+ [ [ ADD ] "overflow_fixnum_add" jit-overflow ] }
+    { fixnum- [ [ SUB ] "overflow_fixnum_subtract" jit-overflow ] }
+    { fixnum* [
+        ds-reg 4 SUB
+        jit-load-vm
+        jit-save-context
+        ECX ds-reg [] MOV
+        EAX ECX MOV
+        EBP ds-reg 4 [+] MOV
+        EBP tag-bits get SAR
+        ! clobbers EDX
+        EBP IMUL
+        ds-reg [] EAX MOV
+        [ JNO ]
+        [
+            ECX tag-bits get SAR
+            ECX EBP vm-reg "overflow_fixnum_multiply" jit-call-3arg
+        ]
+        jit-conditional
+    ] }
+
+    ! ## Misc
+    { fpu-state [
+        ESP 2 SUB
+        ESP [] FNSTCW
+        FNINIT
+        AX ESP [] MOV
+        ESP 2 ADD
+    ] }
+    { set-fpu-state [
+        ESP stack-frame-size [+] FLDCW
+    ] }
+    { set-callstack [
+        ! Load callstack object
+        temp3 ds-reg [] MOV
+        ds-reg bootstrap-cell SUB
+        ! Get ctx->callstack_bottom
+        jit-load-vm
+        jit-load-context
+        temp0 ctx-reg context-callstack-bottom-offset [+] MOV
+        ! Get top of callstack object -- 'src' for memcpy
+        temp1 temp3 callstack-top-offset [+] LEA
+        ! Get callstack length, in bytes --- 'len' for memcpy
+        temp2 temp3 callstack-length-offset [+] MOV
+        temp2 tag-bits get SHR
+        ! Compute new stack pointer -- 'dst' for memcpy
+        temp0 temp2 SUB
+        ! Install new stack pointer
+        ESP temp0 MOV
+        ! Call memcpy
+        temp2 PUSH
+        temp1 PUSH
+        temp0 PUSH
+        "factor_memcpy" jit-call
+        ESP 12 ADD
+        ! Return with new callstack
+        0 RET
+    ] }
+} define-sub-primitives
