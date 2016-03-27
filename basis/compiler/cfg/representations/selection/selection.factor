@@ -73,17 +73,17 @@ SYMBOL: costs
     ] each ; inline
 
 UNION: inert-tag-untag-insn
-##add
-##sub
-##and
-##or
-##xor
-##min
-##max ;
+    ##add
+    ##sub
+    ##and
+    ##or
+    ##xor
+    ##min
+    ##max ;
 
 UNION: inert-arithmetic-tag-untag-insn
-##add-imm
-##sub-imm ;
+    ##add-imm
+    ##sub-imm ;
 
 UNION: inert-bitwise-tag-untag-insn
     ##and-imm
