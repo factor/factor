@@ -125,13 +125,15 @@ M: declared-effect infer-call*
     [ [ known>> infer-call* ] keep ] with-effect-here check-declared-effect ;
 
 M: input-parameter infer-call* \ call unknown-macro-input ;
+
 M: object infer-call* \ call bad-macro-input ;
 
-: infer-ndip ( word n -- )
-    [ literals get ] 2dip
-    [ '[ _ def>> infer-quot-here ] ]
-    [ '[ _ [ pop ] dip [ infer->r infer-quot-here ] [ infer-r> ] bi ] ] bi*
-    if-empty ;
+:: infer-ndip ( word n -- )
+    literals get [
+        word def>> infer-quot-here
+    ] [
+        pop n [ infer->r infer-quot-here ] [ infer-r> ] bi
+    ] if-empty ;
 
 : infer-dip ( -- ) \ dip 1 infer-ndip ;
 
@@ -145,12 +147,9 @@ M: object infer-call* \ call bad-macro-input ;
 
 \ 3dip [ infer-3dip ] "special" set-word-prop
 
-: infer-builder ( quot word -- )
-    [
-        [ 2 consume-d ] dip
-        [ dup first2 ] dip call make-known
-        [ push-d ] [ 1array ] bi
-    ] dip #call, ; inline
+:: infer-builder ( quot word -- )
+    2 consume-d dup first2 quot call make-known
+    [ push-d ] [ 1array ] bi word #call, ; inline
 
 : infer-curry ( -- ) [ <curried> ] \ curry infer-builder ;
 
