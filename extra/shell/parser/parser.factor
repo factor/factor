@@ -1,10 +1,7 @@
-
-USING: kernel arrays strings sequences sequences.deep accessors peg peg.ebnf
-       newfx ;
+USING: accessors kernel peg peg.ebnf sequences sequences.deep
+strings ;
 
 IN: shell.parser
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: basic-expr         command  stdin stdout background ;
 TUPLE: pipeline-expr      commands stdin stdout background ;
@@ -15,33 +12,34 @@ TUPLE: glob-expr          expr ;
 TUPLE: variable-expr      expr ;
 TUPLE: factor-expr        expr ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: ast>basic-expr ( ast -- obj ) first4 basic-expr boa ;
+: ast>basic-expr ( ast -- obj )
+    first4 basic-expr boa ;
 
 : ast>pipeline-expr ( ast -- obj )
-  pipeline-expr new
-    over [ 1st ] [ 4th [ 1st ] map ] [ 5th ] tri suffix prefix-on >>commands
-    over 2nd >>stdin
-    over 6th   >>stdout
-    swap 7th   >>background ;
+    pipeline-expr new
+        over [ first ] [ fourth [ first ] map ] [ 4 swap nth ] tri
+        suffix swap prefix >>commands
+        over second >>stdin
+        over 5 swap nth >>stdout
+        swap 6 swap nth >>background ;
 
 : ast>single-quoted-expr ( ast -- obj )
-  2nd >string single-quoted-expr boa ;
+    second >string single-quoted-expr boa ;
 
 : ast>double-quoted-expr ( ast -- obj )
-  2nd >string double-quoted-expr boa ;
+    second >string double-quoted-expr boa ;
 
 : ast>back-quoted-expr ( ast -- obj )
-  2nd >string back-quoted-expr boa ;
+    second >string back-quoted-expr boa ;
 
-: ast>glob-expr ( ast -- obj ) flatten concat glob-expr boa ;
+: ast>glob-expr ( ast -- obj )
+    flatten concat glob-expr boa ;
 
-: ast>variable-expr ( ast -- obj ) 2nd variable-expr boa ;
+: ast>variable-expr ( ast -- obj )
+    second variable-expr boa ;
 
-: ast>factor-expr ( ast -- obj ) 2nd >string factor-expr boa ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: ast>factor-expr ( ast -- obj )
+    second >string factor-expr boa ;
 
 EBNF: expr
 
