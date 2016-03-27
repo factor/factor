@@ -45,7 +45,7 @@ TUPLE: literal-tuple < identity-tuple value recursion ;
 M: literal-tuple hashcode* nip value>> identity-hashcode ;
 
 : <literal> ( obj -- value )
-    recursive-state get \ literal-tuple boa ;
+    recursive-state get literal-tuple boa ;
 
 M: literal-tuple (input-value?) drop f ;
 
@@ -56,7 +56,7 @@ M: literal-tuple (literal) ;
 : curried/composed-literal ( input1 input2 quot -- literal )
     [ [ literal ] bi@ ] dip
     [ [ [ value>> ] bi@ ] dip call ] [ drop nip recursion>> ] 3bi
-    \ literal-tuple boa ; inline
+    literal-tuple boa ; inline
 
 TUPLE: curried obj quot ;
 
@@ -82,7 +82,7 @@ C: <composed> composed
     [ quot1>> ] [ quot2>> ] bi ; inline
 
 M: composed (input-value?)
-    [ quot1>> input-value? ] [ quot2>> input-value? ] bi or ;
+    >composed< [ input-value? ] either? ;
 
 M: composed (literal-value?)
     >composed< [ literal-value? ] both? ;
@@ -132,12 +132,10 @@ M: object known>callable drop \ _ ;
 M: literal-tuple known>callable value>> ;
 
 M: composed known>callable
-    [ quot1>> ] [ quot2>> ] bi
-    [ known known>callable ?@ ] bi@ append ;
+    >composed< [ known known>callable ?@ ] bi@ append ;
 
 M: curried known>callable
-    [ quot>> ] [ obj>> ] bi
-    [ known known>callable ] bi@ prefix ;
+    >curried< [ known known>callable ] bi@ swap prefix ;
 
 M: declared-effect known>callable
     known>> known>callable ;

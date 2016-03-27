@@ -11,7 +11,7 @@ IN: stack-checker.backend
 : push-d ( obj -- ) meta-d push ;
 
 : introduce-values ( values -- )
-    [ [ [ input-parameter ] dip set-known ] each ]
+    [ [ input-parameter swap set-known ] each ]
     [ length input-count +@ ]
     [ #introduce, ]
     tri ;
@@ -55,12 +55,10 @@ IN: stack-checker.backend
 : push-r ( obj -- ) meta-r push ;
 
 : pop-r ( -- obj )
-    meta-r dup empty?
-    [ too-many-r> ] [ pop ] if ;
+    meta-r [ too-many-r> ] [ pop ] if-empty ;
 
 : consume-r ( n -- seq )
-    meta-r 2dup length >
-    [ too-many-r> ] when
+    meta-r 2dup length > [ too-many-r> ] when
     [ swap tail* ] [ shorten-by ] 2bi ;
 
 : output-r ( seq -- ) meta-r push-all ;
@@ -76,8 +74,11 @@ IN: stack-checker.backend
     ] [ pop recursive-state get swap ] if-empty ;
 
 : literals-available? ( n -- literals ? )
-    literals get 2dup length <=
-    [ [ swap tail* ] [ shorten-by ] 2bi t ] [ 2drop f f ] if ;
+    literals get 2dup length <= [
+        [ swap tail* ] [ shorten-by ] 2bi t
+    ] [
+        2drop f f
+    ] if ;
 
 GENERIC: apply-object ( obj -- )
 
