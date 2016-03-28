@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: regexp sequences kernel regexp.negation regexp.ast
-accessors fry regexp.classes ;
+accessors fry regexp.classes strings ;
 IN: regexp.combinators
 
 <PRIVATE
@@ -19,9 +19,8 @@ CONSTANT: <nothing> R/ (?~.*)/s
     [ "\\Q" "\\E" surround ] [ <concatenation> ] bi make-regexp ; foldable
 
 : <char-range> ( char1 char2 -- regexp )
-    [ [ "[" "-" surround ] [ "]" append ] bi* append ]
-    [ <range-class> ]
-    2bi make-regexp ;
+    [ [ 1string ] bi@ [ "[" "-" surround ] [ "]" append ] bi* append ]
+    [ <range-class> ] 2bi make-regexp ;
 
 : <or> ( regexps -- disjunction )
     [ [ raw>> "(" ")" surround ] map "|" join ]
