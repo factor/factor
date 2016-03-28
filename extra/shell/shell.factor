@@ -1,5 +1,5 @@
-USING: accessors continuations debugger environment eval io
-io.directories io.encodings.utf8 io.launcher io.pathnames
+USING: accessors continuations debugger environment eval globs
+io io.directories io.encodings.utf8 io.launcher io.pathnames
 io.pipes kernel namespaces sequences sequences.deep shell.parser
 splitting words ;
 IN: shell
@@ -22,10 +22,7 @@ M: double-quoted-expr expand expr>> ;
 
 M: variable-expr expand expr>> os-env ;
 
-M: glob-expr expand
-    expr>> dup "*" = [
-        drop current-directory get directory-files
-    ] when ;
+M: glob-expr expand expr>> glob-directory ;
 
 M: factor-expr expand expr>> eval>string ;
 
