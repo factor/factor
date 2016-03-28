@@ -81,12 +81,3 @@ IN: globs.tests
         ] cleanup-unique-directory
     ] with-temp-directory
 ] unit-test
-
-${ { "foo" "bar" } path-separator join }
-[ { "foo" "bar" "ba?" } path-separator join glob-parent-directory ] unit-test
-
-{ "foo" }
-[ { "foo" "b?r" "bas" } path-separator join glob-parent-directory ] unit-test
-
-{ "" }
-[ { "f*" "bar" "bas" } path-separator join glob-parent-directory ] unit-test

@@ -145,7 +145,3 @@ PRIVATE>
 
 : glob-directory ( glob -- files )
     glob-path [ glob-directory% ] { } make ;
-
-: glob-parent-directory ( glob -- parent-directory )
-    path-separator split harvest dup [ glob-pattern? ] find drop head
-    path-separator join ;
