@@ -58,6 +58,9 @@ Main = Concatenation End
 
 DEFER: glob-directory%
 
+: glob-entries ( path -- entries )
+    directory-entries [ name>> "." head? ] reject ;
+
 : ?glob-directory% ( root remaining entry -- )
     directory? [
         glob-directory%
@@ -69,7 +72,7 @@ DEFER: glob-directory%
     globs ?second :> next-glob
     next-glob dup pair? [ second ] [ drop f ] if :> next-glob-regexp
 
-    root directory-entries [| entry |
+    root glob-entries [| entry |
         root entry name>> append-path
         {
             { [ next-glob not ] [ dup , ] }
@@ -106,7 +109,7 @@ DEFER: glob-directory%
 :: glob-pattern% ( root globs -- )
     globs unclip second :> ( remaining glob )
 
-    root directory-entries [| entry |
+    root glob-entries [| entry |
         entry name>> >case-fold glob matches? [
             root entry name>> append-path
             remaining entry ?glob-directory%
