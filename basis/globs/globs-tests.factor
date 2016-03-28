@@ -18,6 +18,8 @@ IN: globs.tests
 { f } [ "foo." "*.{xml,txt}" glob-matches? ] unit-test
 { t } [ "foo." "*.{,xml,txt}" glob-matches? ] unit-test
 { t } [ "foo.{" "*.{" glob-matches? ] unit-test
+{ t } [ "foo" "[a-z]oo" glob-matches? ] unit-test
+{ f } [ "foo" "[g-z]oo" glob-matches? ] unit-test
 
 { f } [ "foo" "bar" append-path "*" glob-matches? ] unit-test
 { t } [ "foo" "bar" append-path "*" "*" append-path glob-matches? ] unit-test
