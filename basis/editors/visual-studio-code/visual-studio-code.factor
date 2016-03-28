@@ -20,23 +20,28 @@ MEMO: visual-studio-code-invocation ( -- array )
     ] unless* ;
 
 M: macosx find-visual-studio-code-invocation
-    { "open" "-b" "com.microsoft.VSCode" "--args" } ;
+    "com.microsoft.VSCode" find-native-bundle [
+        "Contents/MacOS/Electron" append-path
+    ] [
+        f
+    ] if* ;
 
 ERROR: can't-find-visual-studio-code ;
 
 M: linux find-visual-studio-code-invocation
     "Code" which [
-        home "VSCode-linux-x64/Code" append-path dup exists? [
-            can't-find-visual-studio-code
-        ] unless
-    ] unless* 1array ;
+        home "VSCode-linux-x64/Code" append-path
+        dup exists? [ drop f ] unless
+    ] unless* ;
 
 M: windows find-visual-studio-code-invocation
     { "Microsoft VS Code" } "code.exe" find-in-applications
-    [ 1array ] [ can't-find-visual-studio-code ] if* ;
+    [ f ] unless* ;
 
 M: visual-studio-code editor-command ( file line -- command )
     [
-        visual-studio-code-invocation % "-g" , "-r" ,
+        visual-studio-code-invocation
+        [ , ] [ can't-find-visual-studio-code ] if*
+        "-g" , "-r" ,
         number>string ":" glue ,
     ] { } make ;
