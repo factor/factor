@@ -470,7 +470,9 @@ ERROR: bad-effect quot effect ;
     [ parser>> (transform) ]
     [ code>> insert-escapes ]
     [ parser>> ] tri build-locals
-    string-lines parse-lines ;
+    qualified-vocabs length
+    [ string-lines parse-lines ] dip
+    qualified-vocabs set-length ;
 
 M: ebnf-action (transform) ( ast -- parser )
     ebnf-transform check-action-effect action ;
