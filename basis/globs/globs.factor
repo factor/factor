@@ -51,6 +51,11 @@ Main = Concatenation End
 
 <PRIVATE
 
+! TODO: simplify
+! TODO: handle two more test cases
+! TODO: make case-fold an option, off by default
+! TODO: maybe make case-fold an option on regexp
+
 DEFER: glob-directory%
 
 : ?glob-directory% ( root remaining entry -- )
@@ -129,7 +134,7 @@ DEFER: glob-directory%
         over glob-pattern?
     ] [
         [
-            path-separator first over last-index
+            dup [ path-separator? ] find-last drop
             [ cut rest ] [ "" swap ] if*
         ] dip swap prefix
     ] while ;
