@@ -1,4 +1,5 @@
-USING: globs io.pathnames literals sequences tools.test ;
+USING: globs io.directories io.files.temp io.files.unique
+io.pathnames literals sequences tools.test ;
 IN: globs.tests
 
 { f } [ "abd" "fdf" glob-matches? ] unit-test
@@ -29,6 +30,57 @@ IN: globs.tests
 { t } [ "fo[mno]" glob-pattern? ] unit-test
 { t } [ "fo\\*" glob-pattern? ] unit-test
 { t } [ "fo{o,bro}" glob-pattern? ] unit-test
+
+{
+    { "a" }
+    { "a" "a/b" "a/b/c" "a/b/c/d" "a/b/h" "a/e" "a/e/g" }
+    {
+        "a" "a/b" "a/b/c" "a/b/c/d" "a/b/c/d/e" "a/b/c/f"
+        "a/b/g" "a/b/h" "a/b/h/e" "a/e" "a/e/f" "a/e/g"
+        "a/e/g/e"
+    }
+    {
+        "a" "a/b" "a/b/c" "a/b/c/d" "a/b/c/d/e" "a/b/c/f"
+        "a/b/g" "a/b/h" "a/b/h/e" "a/e" "a/e/f" "a/e/g"
+        "a/e/g/e"
+    }
+    { "a/b" }
+    { "a/b/c/d/e" "a/b/h/e" "a/e" "a/e/g/e" }
+    ! { "a/b/c/d/e" "a/b/h/e" "a/e" "a/e/g/e" }
+    ! { "a/b/c/d/e" "a/b/h/e" "a/e" "a/e/g/e" }
+    { "a/e/f" "a/e/g" }
+    { "a/b" "a/e" }
+} [
+
+    [
+        [
+            "a" make-directory
+            "a/b" make-directory
+            "a/b/c" make-directory
+            "a/b/c/d" make-directory
+            "a/b/c/d/e" touch-file
+            "a/b/c/f" touch-file
+            "a/b/g" touch-file
+            "a/b/h" make-directory
+            "a/b/h/e" touch-file
+            "a/e" make-directory
+            "a/e/f" touch-file
+            "a/e/g" make-directory
+            "a/e/g/e" touch-file
+
+            "**" glob-directory
+            "**/" glob-directory
+            "**/*" glob-directory
+            "**/**" glob-directory
+            "**/b" glob-directory
+            "**/e" glob-directory
+            ! "**//e" glob-directory
+            ! "**/**/e" glob-directory
+            "**/e/**" glob-directory
+            "a/**" glob-directory
+        ] cleanup-unique-directory
+    ] with-temp-directory
+] unit-test
 
 ${ { "foo" "bar" } path-separator join }
 [ { "foo" "bar" "ba?" } path-separator join glob-parent-directory ] unit-test
