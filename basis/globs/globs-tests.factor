@@ -1,5 +1,6 @@
-USING: globs io.directories io.files.temp io.files.unique
-io.pathnames literals sequences tools.test ;
+USING: globs globs.private io.directories io.files.temp
+io.files.unique io.pathnames literals sequences sorting
+tools.test ;
 IN: globs.tests
 
 { f } [ "abd" "fdf" glob-matches? ] unit-test
@@ -32,6 +33,11 @@ IN: globs.tests
 { t } [ "fo[mno]" glob-pattern? ] unit-test
 { t } [ "fo\\*" glob-pattern? ] unit-test
 { t } [ "fo{o,bro}" glob-pattern? ] unit-test
+
+{ "a/b/c" { } } [ "a/b/c" split-glob ] unit-test
+{ "a/b" { "c*" } } [ "a/b/c*" split-glob ] unit-test
+{ "a/b" { "c*" "" } } [ "a/b/c*/" split-glob ] unit-test
+{ "/path/to" { "a?" } } [ "/path/to/a?" split-glob ] unit-test
 
 {
     { "a" }
@@ -70,16 +76,16 @@ IN: globs.tests
             "a/e/g" make-directory
             "a/e/g/e" touch-file
 
-            "**" glob-directory
-            "**/" glob-directory
-            "**/*" glob-directory
-            "**/**" glob-directory
-            "**/b" glob-directory
-            "**/e" glob-directory
-            ! "**//e" glob-directory
-            ! "**/**/e" glob-directory
-            "**/e/**" glob-directory
-            "a/**" glob-directory
+            "**" glob-directory natural-sort
+            "**/" glob-directory natural-sort
+            "**/*" glob-directory natural-sort
+            "**/**" glob-directory natural-sort
+            "**/b" glob-directory natural-sort
+            "**/e" glob-directory natural-sort
+            ! "**//e" glob-directory natural-sort
+            ! "**/**/e" glob-directory natural-sort
+            "**/e/**" glob-directory natural-sort
+            "a/**" glob-directory natural-sort
         ] cleanup-unique-directory
     ] with-temp-directory
 ] unit-test
