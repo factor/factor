@@ -537,8 +537,6 @@ void factor_vm::factorbug() {
       ctx->push(addr);
     } else if (cmd == "code")
       dump_code_heap(cout);
-    else if (cmd == "compact-gc")
-      primitive_compact_gc();
     else if (cmd == "gc")
       primitive_full_gc();
     else if (cmd == "compact-gc")
