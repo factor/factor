@@ -175,20 +175,26 @@ TUPLE: rename word vocab words ;
 : unuse-words ( assoc -- )
     <extra-words> qualified-vocabs remove! drop ;
 
-TUPLE: ambiguous-use-error words ;
+TUPLE: ambiguous-use-error name words ;
 
-: <ambiguous-use-error> ( words -- error restarts )
+: <ambiguous-use-error> ( name words -- error restarts )
     [ ambiguous-use-error boa ] [ word-restarts ] bi ;
 
 <PRIVATE
 
-: (vocab-search) ( name assocs -- words n )
-    [ words>> (lookup) ] with map sift dup length ;
+: (vocab-search) ( name assocs -- words )
+    [ words>> (lookup) ] with map sift ;
+
+: (vocab-search-qualified) ( name assocs -- words )
+    [ ":" split1 swap ] dip [ name>> = ] with filter (vocab-search) ;
+
+: (vocab-search-full) ( name assocs -- words )
+    [ (vocab-search-qualified) ] [ (vocab-search) ] 2bi append ;
 
 : vocab-search ( name manifest -- word/f )
-    search-vocabs>> (vocab-search) {
-        { 0 [ drop f ] }
-        { 1 [ first ] }
+    dupd search-vocabs>> (vocab-search-full) dup length {
+        { 0 [ 2drop f ] }
+        { 1 [ first nip ] }
         [
             drop <ambiguous-use-error> throw-restarts
             dup [ vocabulary>> ] [ name>> 1array ] bi add-words-from
@@ -196,8 +202,7 @@ TUPLE: ambiguous-use-error words ;
     } case ;
 
 : qualified-search ( name manifest -- word/f )
-    qualified-vocabs>>
-    (vocab-search) 0 = [ drop f ] [ last ] if ;
+    qualified-vocabs>> (vocab-search) ?last ;
 
 PRIVATE>
 

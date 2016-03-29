@@ -310,8 +310,8 @@ M: no-word-in-vocab summary
 M: no-word-in-vocab error. summary print ;
 
 M: ambiguous-use-error summary
-    words>> first name>>
-    "More than one vocabulary defines a word named “" "”" surround ;
+    name>>
+    "The name “" "” resolves to more than one word." surround ;
 
 M: ambiguous-use-error error. summary print ;
 
