@@ -104,7 +104,7 @@ ERROR: no-vocab name ;
     [ values [ vocab-words-assoc at ] with map sift ]
     [
         [ ":" split1 swap ] dip at
-        [ vocab-words-assoc at suffix ] [ drop ] if*
+        [ vocab-words-assoc at [ suffix ] when* ] [ drop ] if*
     ] 2bi ;
 
 : child-vocab? ( prefix name -- ? )
