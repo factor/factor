@@ -6,8 +6,6 @@ images images.loader io io.binary io.encodings.ascii
 io.encodings.binary io.encodings.string io.streams.byte-array
 io.streams.throwing kernel locals math math.bitwise
 math.functions math.order math.ranges sequences sorting ;
-QUALIFIED-WITH: bitstreams bs
-QUALIFIED: math
 IN: images.png
 
 SINGLETON: png-image
@@ -169,10 +167,10 @@ ERROR: bad-filter n ;
         count 2 * count!
     ] when
 
-    bs:<msb0-bit-reader> :> br
+    bitstreams:<msb0-bit-reader> :> br
     height [
-        count [ depth br bs:read ] B{ } replicate-as
-        8 br bs:align
+        count [ depth br bitstreams:read ] B{ } replicate-as
+        8 br bitstreams:align
     ] replicate concat ;
 
 :: reverse-interlace-none ( bytes loading-png -- array )

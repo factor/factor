@@ -5,7 +5,6 @@ assocs byte-arrays classes.struct combinators
 combinators.short-circuit continuations fry io.encodings.utf8
 kernel math math.parser namespaces sequences splitting strings
 unix unix.ffi unix.users unix.utilities ;
-QUALIFIED: unix.ffi
 QUALIFIED: grouping
 IN: unix.groups
 

@@ -1,9 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators kernel locals math
-math.ranges memoize sequences strings hashtables
-math.parser grouping ;
-QUALIFIED: assocs
+USING: accessors assocs combinators grouping kernel locals math
+math.parser math.ranges memoize sequences ;
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )
