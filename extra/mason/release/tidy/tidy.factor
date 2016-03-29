@@ -24,7 +24,6 @@ CONSTANT: cleanup-list {
     "factor.lib"
     "libfactor-ffi-test.exp"
     "libfactor-ffi-test.lib"
-    "libfactor-ffi-test.dylib"
 }
 
 : useless-files ( -- seq )
