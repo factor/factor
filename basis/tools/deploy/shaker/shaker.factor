@@ -11,18 +11,7 @@ tools.deploy.config combinators combinators.private classes
 vocabs.loader.private classes.builtin slots.private grouping
 command-line io.pathnames memoize namespaces.private
 hashtables locals ;
-QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
-QUALIFIED: compiler.crossref
-QUALIFIED: compiler.errors
-QUALIFIED: continuations
-QUALIFIED: definitions
-QUALIFIED: init
-QUALIFIED: layouts
-QUALIFIED: source-files
-QUALIFIED: source-files.errors
-QUALIFIED: vocabs
-QUALIFIED: vocabs.loader
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.

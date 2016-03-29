@@ -5,7 +5,6 @@ combinators.short-circuit grouping hashtables interval-sets
 io.encodings.utf8 io.files kernel locals make math math.bitwise
 math.order math.parser math.ranges memoize namespaces sequences
 sets simple-flat-file sorting splitting strings.parser ;
-QUALIFIED: interval-sets
 IN: unicode.data
 
 <PRIVATE
