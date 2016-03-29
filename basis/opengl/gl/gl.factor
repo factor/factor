@@ -631,7 +631,7 @@ LIBRARY: gl
 
 [
     os [ linux? ] [ macosx? not ] bi and
-    [ "gl" "GL" find-library cdecl update-library ] when
+    [ "gl" "GL" find-library cdecl add-library ] when
 ] "find-gl" add-startup-hook
 
 ! Miscellaneous
