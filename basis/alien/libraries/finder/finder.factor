@@ -7,11 +7,11 @@ HOOK: find-library* os ( name -- path/f )
 : find-library ( name -- path/library-not-found )
     dup find-library* [ nip ] when* ;
 
-: ?add-library ( name path abi -- )
+: ?update-library ( name path abi -- )
     pick lookup-library [ dll>> dll-valid? ] [ f ] if* [
         3drop
     ] [
-        [ find-library ] [ add-library ] bi*
+        [ find-library ] [ update-library ] bi*
     ] if ;
 
 ! Try to find the library from a list, but if it's not found,
