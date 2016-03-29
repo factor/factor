@@ -49,7 +49,7 @@ fetched-in parsed-html links processed-in fetched-at ;
 
 : apply-filters ( links spider -- links' )
     filters>> [
-        '[ _ 1&& ] filter
+        '[ [ _ 1&& ] filter ] call( seq -- seq' )
     ] when* ;
 
 : push-links ( links level unique-deque -- )
