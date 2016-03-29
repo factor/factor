@@ -553,4 +553,4 @@ PRIVATE>
     start-all* length ; inline
 
 : map-zip ( quot: ( x -- y ) -- alist )
-    '[ [ _ call ] [ ] bi swap ] map>alist ; inline
+    '[ _ keep swap ] map>alist ; inline
