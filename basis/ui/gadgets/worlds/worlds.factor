@@ -203,7 +203,7 @@ TUPLE: world-error error world ;
 
 C: <world-error> world-error
 
-SYMBOL: ui-error-hook
+SYMBOL: ui-error-hook ! ( error -- )
 
 : ui-error ( error -- )
     ui-error-hook get [ call( error -- ) ] [ die drop ] if* ;
