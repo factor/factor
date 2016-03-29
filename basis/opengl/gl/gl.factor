@@ -2,10 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
-
-USING: alien alien.c-types alien.libraries
-alien.libraries.finder alien.syntax init io.encodings.ascii
-kernel opengl.gl.extensions system ;
+USING: alien alien.c-types alien.libraries alien.syntax
+io.encodings.ascii kernel opengl.gl.extensions system ;
 FROM: alien.c-types => short ;
 IN: opengl.gl
 
@@ -629,10 +627,11 @@ CONSTANT: GL_CLIENT_ALL_ATTRIB_BITS         0xFFFFFFFF
 
 LIBRARY: gl
 
-[
-    os [ linux? ] [ macosx? not ] bi and
-    [ "gl" "GL" find-library cdecl add-library ] when
-] "find-gl" add-startup-hook
+<<
+os linux? [
+    "gl" "libGL.so" cdecl add-library
+] when
+>>
 
 ! Miscellaneous
 
