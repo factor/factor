@@ -1,6 +1,6 @@
 USING: bootstrap.image tools.test system io io.encodings.ascii
 io.pathnames io.files io.files.info io.files.temp kernel
-tools.deploy.config tools.deploy.config.editor
+tools.deploy.config tools.deploy.config.editor literals
 tools.deploy.backend math sequences io.launcher arrays
 namespaces continuations layouts accessors urls math.parser
 io.directories splitting tools.deploy tools.deploy.test vocabs ;
