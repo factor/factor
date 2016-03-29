@@ -21,7 +21,7 @@ M: assoc tuple-summary
 M: object tuple-summary
     object-summary "a " " tuple" surround ;
 
-M: unordered-set tuple-summary
+M: set tuple-summary
     dup cardinality "members" container-summary ;
 
 M: tuple summary

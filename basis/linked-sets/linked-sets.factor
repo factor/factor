@@ -43,7 +43,7 @@ M: linked-set equal?
 : >linked-set ( set -- linked-set )
     [ 0 <linked-set> ] dip union! ;
 
-INSTANCE: linked-set unordered-set
+INSTANCE: linked-set set
 
 M: linked-set set-like
     drop dup linked-set? [ >linked-set ] unless ;

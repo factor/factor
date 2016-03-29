@@ -302,17 +302,17 @@ CONSTANT: lookup-table-at-max 256
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
     [ tester ] keep '[ members [ @ ] reject _ set-like ] ;
 
-M\ unordered-set diff [ diff-quot ] 1 define-partial-eval
+M\ sets:set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
     [ tester ] keep '[ members _ filter _ set-like ] ;
 
-M\ unordered-set intersect [ intersect-quot ] 1 define-partial-eval
+M\ sets:set intersect [ intersect-quot ] 1 define-partial-eval
 
 : intersects?-quot ( seq -- quot: ( seq' -- seq'' ) )
     tester '[ members _ any? ] ;
 
-M\ unordered-set intersects? [ intersects?-quot ] 1 define-partial-eval
+M\ sets:set intersects? [ intersects?-quot ] 1 define-partial-eval
 
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
