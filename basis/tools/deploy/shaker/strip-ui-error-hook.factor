@@ -1,5 +1,5 @@
 USING: continuations namespaces sequences kernel ui
-ui.gadgets.worlds ;
+ui.gadgets.worlds system ;
 
 [
     "Error"
