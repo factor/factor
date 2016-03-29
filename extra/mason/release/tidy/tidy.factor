@@ -22,6 +22,7 @@ CONSTANT: cleanup-list {
     "factor.dll.lib"
     "factor.exp"
     "factor.lib"
+    "factor.image.fresh"
     "libfactor-ffi-test.exp"
     "libfactor-ffi-test.lib"
 }
