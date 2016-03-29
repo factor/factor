@@ -1,7 +1,6 @@
-USING: arrays ascii io io.streams.string kernel make math
-math.vectors random sequences sequences.extras strings
-tools.test vectors ;
-
+USING: accessors arrays ascii io io.streams.string kernel make
+math math.vectors random sequences sequences.extras strings
+tools.test vectors vocabs ;
 IN: sequences.extras.tests
 
 { { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } } [ "abcd" all-subseqs ] unit-test
@@ -183,3 +182,15 @@ IN: sequences.extras.tests
 { 2 } [ "ABA" "ABABA" count-subseq* ] unit-test
 
 { 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
+
+{
+    {
+        { 2 4 }
+        { 3 6 }
+        { 4 8 }
+    }
+} [ { 2 3 4 } [ 2 * ] map-zip ] unit-test
+
+{ }
+[ "test:" all-words [ name>> over prepend ] map-zip 2drop ] unit-test
+
