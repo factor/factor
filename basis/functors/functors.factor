@@ -123,7 +123,7 @@ FUNCTOR-SYNTAX: inline [ last-word make-inline ] append! ;
 FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
 : (INTERPOLATE) ( accum quot -- accum )
-    [ scan-token interpolate-locals ] dip
+    [ scan-token interpolate-locals-quot ] dip
     '[ _ with-string-writer @ ] suffix! ;
 
 PRIVATE>
