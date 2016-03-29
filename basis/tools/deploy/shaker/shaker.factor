@@ -7,10 +7,11 @@ vocabs sequences sequences.deep sequences.private words memory
 kernel.private continuations io vocabs.loader system strings
 sets vectors quotations byte-arrays sorting compiler.units
 definitions generic generic.standard generic.single
+compiler.crossref compiler.errors source-files.errors
 tools.deploy.config combinators combinators.private classes
 vocabs.loader.private classes.builtin slots.private grouping
 command-line io.pathnames memoize namespaces.private
-hashtables locals ;
+hashtables locals source-files ;
 QUALIFIED: classes.private
 IN: tools.deploy.shaker
 
