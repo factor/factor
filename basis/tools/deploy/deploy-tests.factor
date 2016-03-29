@@ -18,12 +18,17 @@ delete-staging-images
 
 { } [ "hello-world" shake-and-bake 550000 small-enough? ] unit-test
 
+! XXX: deploy-path is "resource:" by default, but deploying there in a
+! test would pollute the Factor directory, so deploy test to temp.
 { { "Hello world" } } [
-    f open-directory-after-deploy? [
+    H{
+        { open-directory-after-deploy? f }
+        { deploy-directory $[ temp-directory ] }
+    } [
         "hello-world" deploy
         "hello-world" deploy-path 1array
         ascii [ lines ] with-process-reader
-    ] with-variable
+    ] with-variables
 ] unit-test
 
 { } [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
