@@ -31,7 +31,7 @@ T{ error-type-holder
 SYMBOL: verbose-tests?
 t verbose-tests? set-global
 
-: <test-failure> ( error experiment file line# -- test-failure )
+: <test-failure> ( error experiment path line# -- test-failure )
     test-failure new
         swap >>line#
         swap >>path
