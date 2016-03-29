@@ -6,87 +6,87 @@ CONSTANT: all-primitives {
     {
         "alien"
         {
-            { "<callback>" ( word return-rewind -- alien ) "primitive_callback" }
-            { "<displaced-alien>" ( displacement c-ptr -- alien ) "primitive_displaced_alien" }
-            { "alien-address" ( c-ptr -- addr ) "primitive_alien_address" }
-            { "free-callback" ( alien -- ) "primitive_free_callback" }
+            { "<callback>" ( word return-rewind -- alien ) "callback" }
+            { "<displaced-alien>" ( displacement c-ptr -- alien ) "displaced_alien" }
+            { "alien-address" ( c-ptr -- addr ) "alien_address" }
+            { "free-callback" ( alien -- ) "free_callback" }
         }
     }
     {
         "alien.private"
         {
-            { "current-callback" ( -- n ) "primitive_current_callback" }
+            { "current-callback" ( -- n ) "current_callback" }
         }
     }
     {
         "alien.accessors"
         {
-            { "alien-cell" ( c-ptr n -- value ) "primitive_alien_cell" }
-            { "alien-double" ( c-ptr n -- value ) "primitive_alien_double" }
-            { "alien-float" ( c-ptr n -- value ) "primitive_alien_float" }
+            { "alien-cell" ( c-ptr n -- value ) "alien_cell" }
+            { "alien-double" ( c-ptr n -- value ) "alien_double" }
+            { "alien-float" ( c-ptr n -- value ) "alien_float" }
 
-            { "alien-signed-1" ( c-ptr n -- value ) "primitive_alien_signed_1" }
-            { "alien-signed-2" ( c-ptr n -- value ) "primitive_alien_signed_2" }
-            { "alien-signed-4" ( c-ptr n -- value ) "primitive_alien_signed_4" }
-            { "alien-signed-8" ( c-ptr n -- value ) "primitive_alien_signed_8" }
-            { "alien-signed-cell" ( c-ptr n -- value ) "primitive_alien_signed_cell" }
+            { "alien-signed-1" ( c-ptr n -- value ) "alien_signed_1" }
+            { "alien-signed-2" ( c-ptr n -- value ) "alien_signed_2" }
+            { "alien-signed-4" ( c-ptr n -- value ) "alien_signed_4" }
+            { "alien-signed-8" ( c-ptr n -- value ) "alien_signed_8" }
+            { "alien-signed-cell" ( c-ptr n -- value ) "alien_signed_cell" }
 
-            { "alien-unsigned-1" ( c-ptr n -- value ) "primitive_alien_unsigned_1" }
-            { "alien-unsigned-2" ( c-ptr n -- value ) "primitive_alien_unsigned_2" }
-            { "alien-unsigned-4" ( c-ptr n -- value ) "primitive_alien_unsigned_4" }
-            { "alien-unsigned-8" ( c-ptr n -- value ) "primitive_alien_unsigned_8" }
-            { "alien-unsigned-cell" ( c-ptr n -- value ) "primitive_alien_unsigned_cell" }
+            { "alien-unsigned-1" ( c-ptr n -- value ) "alien_unsigned_1" }
+            { "alien-unsigned-2" ( c-ptr n -- value ) "alien_unsigned_2" }
+            { "alien-unsigned-4" ( c-ptr n -- value ) "alien_unsigned_4" }
+            { "alien-unsigned-8" ( c-ptr n -- value ) "alien_unsigned_8" }
+            { "alien-unsigned-cell" ( c-ptr n -- value ) "alien_unsigned_cell" }
 
-            { "set-alien-cell" ( value c-ptr n -- ) "primitive_set_alien_cell" }
-            { "set-alien-double" ( value c-ptr n -- ) "primitive_set_alien_double" }
-            { "set-alien-float" ( value c-ptr n -- ) "primitive_set_alien_float" }
+            { "set-alien-cell" ( value c-ptr n -- ) "set_alien_cell" }
+            { "set-alien-double" ( value c-ptr n -- ) "set_alien_double" }
+            { "set-alien-float" ( value c-ptr n -- ) "set_alien_float" }
 
-            { "set-alien-signed-1" ( value c-ptr n -- ) "primitive_set_alien_signed_1" }
-            { "set-alien-signed-2" ( value c-ptr n -- ) "primitive_set_alien_signed_2" }
-            { "set-alien-signed-4" ( value c-ptr n -- ) "primitive_set_alien_signed_4" }
-            { "set-alien-signed-8" ( value c-ptr n -- ) "primitive_set_alien_signed_8" }
-            { "set-alien-signed-cell" ( value c-ptr n -- ) "primitive_set_alien_signed_cell" }
+            { "set-alien-signed-1" ( value c-ptr n -- ) "set_alien_signed_1" }
+            { "set-alien-signed-2" ( value c-ptr n -- ) "set_alien_signed_2" }
+            { "set-alien-signed-4" ( value c-ptr n -- ) "set_alien_signed_4" }
+            { "set-alien-signed-8" ( value c-ptr n -- ) "set_alien_signed_8" }
+            { "set-alien-signed-cell" ( value c-ptr n -- ) "set_alien_signed_cell" }
 
-            { "set-alien-unsigned-1" ( value c-ptr n -- ) "primitive_set_alien_unsigned_1" }
-            { "set-alien-unsigned-2" ( value c-ptr n -- ) "primitive_set_alien_unsigned_2" }
-            { "set-alien-unsigned-4" ( value c-ptr n -- ) "primitive_set_alien_unsigned_4" }
-            { "set-alien-unsigned-8" ( value c-ptr n -- ) "primitive_set_alien_unsigned_8" }
-            { "set-alien-unsigned-cell" ( value c-ptr n -- ) "primitive_set_alien_unsigned_cell" }
+            { "set-alien-unsigned-1" ( value c-ptr n -- ) "set_alien_unsigned_1" }
+            { "set-alien-unsigned-2" ( value c-ptr n -- ) "set_alien_unsigned_2" }
+            { "set-alien-unsigned-4" ( value c-ptr n -- ) "set_alien_unsigned_4" }
+            { "set-alien-unsigned-8" ( value c-ptr n -- ) "set_alien_unsigned_8" }
+            { "set-alien-unsigned-cell" ( value c-ptr n -- ) "set_alien_unsigned_cell" }
         }
     }
     {
         "alien.libraries"
         {
-            { "(dlopen)" ( path -- dll ) "primitive_dlopen" }
-            { "(dlsym)" ( name dll -- alien ) "primitive_dlsym" }
-            { "(dlsym-raw)" ( name dll -- alien ) "primitive_dlsym_raw" }
-            { "dlclose" ( dll -- ) "primitive_dlclose" }
-            { "dll-valid?" ( dll -- ? ) "primitive_dll_validp" }
+            { "(dlopen)" ( path -- dll ) "dlopen" }
+            { "(dlsym)" ( name dll -- alien ) "dlsym" }
+            { "(dlsym-raw)" ( name dll -- alien ) "dlsym_raw" }
+            { "dlclose" ( dll -- ) "dlclose" }
+            { "dll-valid?" ( dll -- ? ) "dll_validp" }
         }
     }
     {
         "arrays"
         {
-            { "<array>" ( n elt -- array ) "primitive_array" }
-            { "resize-array" ( n array -- new-array ) "primitive_resize_array" }
+            { "<array>" ( n elt -- array ) "array" }
+            { "resize-array" ( n array -- new-array ) "resize_array" }
         }
     }
     {
         "byte-arrays"
         {
-            { "(byte-array)" ( n -- byte-array ) "primitive_uninitialized_byte_array" }
-            { "<byte-array>" ( n -- byte-array ) "primitive_byte_array" }
+            { "(byte-array)" ( n -- byte-array ) "uninitialized_byte_array" }
+            { "<byte-array>" ( n -- byte-array ) "byte_array" }
             {
                 "resize-byte-array" ( n byte-array -- new-byte-array )
-                "primitive_resize_byte_array"
+                "resize_byte_array"
             }
         }
     }
     {
         "classes.tuple.private"
         {
-            { "<tuple-boa>" ( slots... layout -- tuple ) "primitive_tuple_boa" }
-            { "<tuple>" ( layout -- tuple ) "primitive_tuple" }
+            { "<tuple-boa>" ( slots... layout -- tuple ) "tuple_boa" }
+            { "<tuple>" ( layout -- tuple ) "tuple" }
         }
     }
     {
@@ -94,7 +94,7 @@ CONSTANT: all-primitives {
         {
             {
                 "modify-code-heap" ( alist update-existing? reset-pics? -- )
-                "primitive_modify_code_heap"
+                "modify_code_heap"
             }
         }
     }
@@ -103,38 +103,38 @@ CONSTANT: all-primitives {
         {
             { "inline-cache-miss" ( generic methods index cache -- ) f }
             { "inline-cache-miss-tail" ( generic methods index cache -- ) f }
-            { "lookup-method" ( object methods -- method ) "primitive_lookup_method" }
+            { "lookup-method" ( object methods -- method ) "lookup_method" }
             { "mega-cache-lookup" ( methods index cache -- ) f }
-            { "mega-cache-miss" ( methods index cache -- method ) "primitive_mega_cache_miss" }
+            { "mega-cache-miss" ( methods index cache -- method ) "mega_cache_miss" }
         }
     }
     {
         "io.files.private"
         {
-            { "(exists?)" ( path -- ? ) "primitive_existsp" }
+            { "(exists?)" ( path -- ? ) "existsp" }
         }
     }
     {
         "io.streams.c"
         {
-            { "(fopen)" ( path mode -- alien ) "primitive_fopen" }
-            { "fclose" ( alien -- ) "primitive_fclose" }
-            { "fflush" ( alien -- ) "primitive_fflush" }
-            { "fgetc" ( alien -- byte/f ) "primitive_fgetc" }
-            { "fputc" ( byte alien -- ) "primitive_fputc" }
-            { "fread-unsafe" ( n buf alien -- count ) "primitive_fread" }
-            { "fseek" ( alien offset whence -- ) "primitive_fseek" }
-            { "ftell" ( alien -- n ) "primitive_ftell" }
-            { "fwrite" ( data length alien -- ) "primitive_fwrite" }
+            { "(fopen)" ( path mode -- alien ) "fopen" }
+            { "fclose" ( alien -- ) "fclose" }
+            { "fflush" ( alien -- ) "fflush" }
+            { "fgetc" ( alien -- byte/f ) "fgetc" }
+            { "fputc" ( byte alien -- ) "fputc" }
+            { "fread-unsafe" ( n buf alien -- count ) "fread" }
+            { "fseek" ( alien offset whence -- ) "fseek" }
+            { "ftell" ( alien -- n ) "ftell" }
+            { "fwrite" ( data length alien -- ) "fwrite" }
         }
     }
     {
         "kernel"
         {
-            { "(clone)" ( obj -- newobj ) "primitive_clone" }
-            { "<wrapper>" ( obj -- wrapper ) "primitive_wrapper" }
-            { "callstack>array" ( callstack -- array ) "primitive_callstack_to_array" }
-            { "die" ( -- ) "primitive_die" }
+            { "(clone)" ( obj -- newobj ) "clone" }
+            { "<wrapper>" ( obj -- wrapper ) "wrapper" }
+            { "callstack>array" ( callstack -- array ) "callstack_to_array" }
+            { "die" ( -- ) "die" }
             { "drop" ( x -- ) f }
             { "2drop" ( x y -- ) f }
             { "3drop" ( x y z -- ) f }
@@ -170,34 +170,34 @@ CONSTANT: all-primitives {
             { "tag" ( object -- n ) f }
             { "unwind-native-frames" ( -- ) f }
 
-            { "callstack-for" ( context -- array ) "primitive_callstack_for" }
-            { "datastack-for" ( context -- array ) "primitive_datastack_for" }
-            { "retainstack-for" ( context -- array ) "primitive_retainstack_for" }
-            { "(identity-hashcode)" ( obj -- code ) "primitive_identity_hashcode" }
-            { "become" ( old new -- ) "primitive_become" }
-            { "callstack-bounds" ( -- start end ) "primitive_callstack_bounds" }
-            { "check-datastack" ( array in# out# -- ? ) "primitive_check_datastack" }
-            { "compute-identity-hashcode" ( obj -- ) "primitive_compute_identity_hashcode" }
-            { "context-object" ( n -- obj ) "primitive_context_object" }
+            { "callstack-for" ( context -- array ) "callstack_for" }
+            { "datastack-for" ( context -- array ) "datastack_for" }
+            { "retainstack-for" ( context -- array ) "retainstack_for" }
+            { "(identity-hashcode)" ( obj -- code ) "identity_hashcode" }
+            { "become" ( old new -- ) "become" }
+            { "callstack-bounds" ( -- start end ) "callstack_bounds" }
+            { "check-datastack" ( array in# out# -- ? ) "check_datastack" }
+            { "compute-identity-hashcode" ( obj -- ) "compute_identity_hashcode" }
+            { "context-object" ( n -- obj ) "context_object" }
             {
                 "innermost-frame-executing" ( callstack -- obj )
-                "primitive_innermost_stack_frame_executing"
+                "innermost_stack_frame_executing"
             }
             {
                 "innermost-frame-scan" ( callstack -- n )
-                "primitive_innermost_stack_frame_scan"
+                "innermost_stack_frame_scan"
             }
-            { "set-context-object" ( obj n -- ) "primitive_set_context_object" }
-            { "set-datastack" ( array -- ) "primitive_set_datastack" }
+            { "set-context-object" ( obj n -- ) "set_context_object" }
+            { "set-datastack" ( array -- ) "set_datastack" }
             {
                 "set-innermost-frame-quotation" ( n callstack -- )
-                "primitive_set_innermost_stack_frame_quotation"
+                "set_innermost_stack_frame_quotation"
             }
-            { "set-retainstack" ( array -- ) "primitive_set_retainstack" }
-            { "set-special-object" ( obj n -- ) "primitive_set_special_object" }
-            { "special-object" ( n -- obj ) "primitive_special_object" }
-            { "strip-stack-traces" ( -- ) "primitive_strip_stack_traces" }
-            { "unimplemented" ( -- * ) "primitive_unimplemented" }
+            { "set-retainstack" ( array -- ) "set_retainstack" }
+            { "set-special-object" ( obj n -- ) "set_special_object" }
+            { "special-object" ( n -- obj ) "special_object" }
+            { "strip-stack-traces" ( -- ) "strip_stack_traces" }
+            { "unimplemented" ( -- * ) "unimplemented" }
         }
     }
     {
@@ -206,16 +206,16 @@ CONSTANT: all-primitives {
             { "drop-locals" ( n -- ) f }
             { "get-local" ( n -- obj ) f }
             { "load-local" ( obj -- ) f }
-            { "load-locals" ( ... n -- ) "primitive_load_locals" }
+            { "load-locals" ( ... n -- ) "load_locals" }
         }
     }
     {
         "math"
         {
-            { "bits>double" ( n -- x ) "primitive_bits_double" }
-            { "bits>float" ( n -- x ) "primitive_bits_float" }
-            { "double>bits" ( x -- n ) "primitive_double_bits" }
-            { "float>bits" ( x -- n ) "primitive_float_bits" }
+            { "bits>double" ( n -- x ) "bits_double" }
+            { "bits>float" ( n -- x ) "bits_float" }
+            { "double>bits" ( x -- n ) "double_bits" }
+            { "float>bits" ( x -- n ) "float_bits" }
         }
     }
     {
@@ -223,7 +223,7 @@ CONSTANT: all-primitives {
         {
             {
                 "(format-float)" ( n fill width precision format locale -- byte-array )
-                "primitive_format_float"
+                "format_float"
             }
         }
     }
@@ -250,161 +250,163 @@ CONSTANT: all-primitives {
             { "fixnum>" ( x y -- ? ) f }
             { "fixnum>=" ( x y -- ? ) f }
 
-            { "bignum*" ( x y -- z ) "primitive_bignum_multiply" }
-            { "bignum+" ( x y -- z ) "primitive_bignum_add" }
-            { "bignum-" ( x y -- z ) "primitive_bignum_subtract" }
-            { "bignum-bit?" ( x n -- ? ) "primitive_bignum_bitp" }
-            { "bignum-bitand" ( x y -- z ) "primitive_bignum_and" }
-            { "bignum-bitnot" ( x -- y ) "primitive_bignum_not" }
-            { "bignum-bitor" ( x y -- z ) "primitive_bignum_or" }
-            { "bignum-bitxor" ( x y -- z ) "primitive_bignum_xor" }
-            { "bignum-log2" ( x -- n ) "primitive_bignum_log2" }
-            { "bignum-mod" ( x y -- z ) "primitive_bignum_mod" }
-            { "bignum-gcd" ( x y -- z ) "primitive_bignum_gcd" }
-            { "bignum-shift" ( x y -- z ) "primitive_bignum_shift" }
-            { "bignum/i" ( x y -- z ) "primitive_bignum_divint" }
-            { "bignum/mod" ( x y -- z w ) "primitive_bignum_divmod" }
-            { "bignum<" ( x y -- ? ) "primitive_bignum_less" }
-            { "bignum<=" ( x y -- ? ) "primitive_bignum_lesseq" }
-            { "bignum=" ( x y -- ? ) "primitive_bignum_eq" }
-            { "bignum>" ( x y -- ? ) "primitive_bignum_greater" }
-            { "bignum>=" ( x y -- ? ) "primitive_bignum_greatereq" }
-            { "bignum>fixnum" ( x -- y ) "primitive_bignum_to_fixnum" }
-            { "bignum>fixnum-strict" ( x -- y ) "primitive_bignum_to_fixnum_strict" }
-            { "fixnum-shift" ( x y -- z ) "primitive_fixnum_shift" }
-            { "fixnum/i" ( x y -- z ) "primitive_fixnum_divint" }
-            { "fixnum/mod" ( x y -- z w ) "primitive_fixnum_divmod" }
-            { "fixnum>bignum" ( x -- y ) "primitive_fixnum_to_bignum" }
-            { "fixnum>float" ( x -- y ) "primitive_fixnum_to_float" }
-            { "float*" ( x y -- z ) "primitive_float_multiply" }
-            { "float+" ( x y -- z ) "primitive_float_add" }
-            { "float-" ( x y -- z ) "primitive_float_subtract" }
-            { "float-u<" ( x y -- ? ) "primitive_float_less" }
-            { "float-u<=" ( x y -- ? ) "primitive_float_lesseq" }
-            { "float-u>" ( x y -- ? ) "primitive_float_greater" }
-            { "float-u>=" ( x y -- ? ) "primitive_float_greatereq" }
-            { "float/f" ( x y -- z ) "primitive_float_divfloat" }
-            { "float<" ( x y -- ? ) "primitive_float_less" }
-            { "float<=" ( x y -- ? ) "primitive_float_lesseq" }
-            { "float=" ( x y -- ? ) "primitive_float_eq" }
-            { "float>" ( x y -- ? ) "primitive_float_greater" }
-            { "float>=" ( x y -- ? ) "primitive_float_greatereq" }
-            { "float>bignum" ( x -- y ) "primitive_float_to_bignum" }
-            { "float>fixnum" ( x -- y ) "primitive_float_to_fixnum" }
+            { "bignum*" ( x y -- z ) "bignum_multiply" }
+            { "bignum+" ( x y -- z ) "bignum_add" }
+            { "bignum-" ( x y -- z ) "bignum_subtract" }
+            { "bignum-bit?" ( x n -- ? ) "bignum_bitp" }
+            { "bignum-bitand" ( x y -- z ) "bignum_and" }
+            { "bignum-bitnot" ( x -- y ) "bignum_not" }
+            { "bignum-bitor" ( x y -- z ) "bignum_or" }
+            { "bignum-bitxor" ( x y -- z ) "bignum_xor" }
+            { "bignum-log2" ( x -- n ) "bignum_log2" }
+            { "bignum-mod" ( x y -- z ) "bignum_mod" }
+            { "bignum-gcd" ( x y -- z ) "bignum_gcd" }
+            { "bignum-shift" ( x y -- z ) "bignum_shift" }
+            { "bignum/i" ( x y -- z ) "bignum_divint" }
+            { "bignum/mod" ( x y -- z w ) "bignum_divmod" }
+            { "bignum<" ( x y -- ? ) "bignum_less" }
+            { "bignum<=" ( x y -- ? ) "bignum_lesseq" }
+            { "bignum=" ( x y -- ? ) "bignum_eq" }
+            { "bignum>" ( x y -- ? ) "bignum_greater" }
+            { "bignum>=" ( x y -- ? ) "bignum_greatereq" }
+            { "bignum>fixnum" ( x -- y ) "bignum_to_fixnum" }
+            { "bignum>fixnum-strict" ( x -- y ) "bignum_to_fixnum_strict" }
+            { "fixnum-shift" ( x y -- z ) "fixnum_shift" }
+            { "fixnum/i" ( x y -- z ) "fixnum_divint" }
+            { "fixnum/mod" ( x y -- z w ) "fixnum_divmod" }
+            { "fixnum>bignum" ( x -- y ) "fixnum_to_bignum" }
+            { "fixnum>float" ( x -- y ) "fixnum_to_float" }
+            { "float*" ( x y -- z ) "float_multiply" }
+            { "float+" ( x y -- z ) "float_add" }
+            { "float-" ( x y -- z ) "float_subtract" }
+            { "float-u<" ( x y -- ? ) "float_less" }
+            { "float-u<=" ( x y -- ? ) "float_lesseq" }
+            { "float-u>" ( x y -- ? ) "float_greater" }
+            { "float-u>=" ( x y -- ? ) "float_greatereq" }
+            { "float/f" ( x y -- z ) "float_divfloat" }
+            { "float<" ( x y -- ? ) "float_less" }
+            { "float<=" ( x y -- ? ) "float_lesseq" }
+            { "float=" ( x y -- ? ) "float_eq" }
+            { "float>" ( x y -- ? ) "float_greater" }
+            { "float>=" ( x y -- ? ) "float_greatereq" }
+            { "float>bignum" ( x -- y ) "float_to_bignum" }
+            { "float>fixnum" ( x -- y ) "float_to_fixnum" }
         }
     }
     {
         "memory"
         {
-            { "all-instances" ( -- array ) "primitive_all_instances" }
-            { "compact-gc" ( -- ) "primitive_compact_gc" }
-            { "gc" ( -- ) "primitive_full_gc" }
-            { "minor-gc" ( -- ) "primitive_minor_gc" }
-            { "size" ( obj -- n ) "primitive_size" }
+            { "all-instances" ( -- array ) "all_instances" }
+            { "compact-gc" ( -- ) "compact_gc" }
+            { "gc" ( -- ) "full_gc" }
+            { "minor-gc" ( -- ) "minor_gc" }
+            { "size" ( obj -- n ) "size" }
         }
     }
     {
         "memory.private"
         {
-            { "(save-image)" ( path1 path2 then-die? -- ) "primitive_save_image" }
+            { "(save-image)" ( path1 path2 then-die? -- ) "save_image" }
         }
     }
     {
         "quotations"
         {
-            { "jit-compile" ( quot -- ) "primitive_jit_compile" }
-            { "quotation-code" ( quot -- start end ) "primitive_quotation_code" }
-            { "quotation-compiled?" ( quot -- ? ) "primitive_quotation_compiled_p" }
+            { "jit-compile" ( quot -- ) "jit_compile" }
+            { "quotation-code" ( quot -- start end ) "quotation_code" }
+            { "quotation-compiled?" ( quot -- ? ) "quotation_compiled_p" }
         }
     }
     {
         "quotations.private"
         {
-            { "array>quotation" ( array -- quot ) "primitive_array_to_quotation" }
+            { "array>quotation" ( array -- quot ) "array_to_quotation" }
         }
     }
     {
         "slots.private"
         {
-            { "set-slot" ( value obj n -- ) "primitive_set_slot" }
+            { "set-slot" ( value obj n -- ) "set_slot" }
             { "slot" ( obj m -- value ) f }
         }
     }
     {
         "strings"
         {
-            { "<string>" ( n ch -- string ) "primitive_string" }
-            { "resize-string" ( n str -- newstr ) "primitive_resize_string" }
+            { "<string>" ( n ch -- string ) "string" }
+            { "resize-string" ( n str -- newstr ) "resize_string" }
         }
     }
     {
         "strings.private"
         {
-            { "set-string-nth-fast" ( ch n string -- ) "primitive_set_string_nth_fast" }
+            { "set-string-nth-fast" ( ch n string -- ) "set_string_nth_fast" }
             { "string-nth-fast" ( n string -- ch ) f }
         }
     }
     {
         "system"
         {
-            { "(exit)" ( n -- * ) "primitive_exit" }
-            { "nano-count" ( -- ns ) "primitive_nano_count" }
+            { "(exit)" ( n -- * ) "exit" }
+            { "nano-count" ( -- ns ) "nano_count" }
         }
     }
     {
         "threads.private"
         {
-            { "(sleep)" ( nanos -- ) "primitive_sleep" }
+            { "(sleep)" ( nanos -- ) "sleep" }
             { "(set-context)" ( obj context -- obj' ) f }
             { "(set-context-and-delete)" ( obj context -- * ) f }
             { "(start-context)" ( obj quot -- obj' ) f }
             { "(start-context-and-delete)" ( obj quot -- * ) f }
-            { "context-object-for" ( n context -- obj ) "primitive_context_object_for" }
+            { "context-object-for" ( n context -- obj ) "context_object_for" }
         }
     }
     {
         "tools.dispatch.private"
         {
-            { "dispatch-stats" ( -- stats ) "primitive_dispatch_stats" }
-            { "reset-dispatch-stats" ( -- ) "primitive_reset_dispatch_stats" }
+            { "dispatch-stats" ( -- stats ) "dispatch_stats" }
+            { "reset-dispatch-stats" ( -- ) "reset_dispatch_stats" }
         }
     }
     {
         "tools.memory.private"
         {
-            { "(callback-room)" ( -- allocator-room ) "primitive_callback_room" }
-            { "(code-blocks)" ( -- array ) "primitive_code_blocks" }
-            { "(code-room)" ( -- allocator-room ) "primitive_code_room" }
-            { "(data-room)" ( -- data-room ) "primitive_data_room" }
-            { "disable-gc-events" ( -- events ) "primitive_disable_gc_events" }
-            { "enable-gc-events" ( -- ) "primitive_enable_gc_events" }
+            { "(callback-room)" ( -- allocator-room ) "callback_room" }
+            { "(code-blocks)" ( -- array ) "code_blocks" }
+            { "(code-room)" ( -- allocator-room ) "code_room" }
+            { "(data-room)" ( -- data-room ) "data_room" }
+            { "disable-gc-events" ( -- events ) "disable_gc_events" }
+            { "enable-gc-events" ( -- ) "enable_gc_events" }
         }
     }
     {
         "tools.profiler.sampling.private"
         {
-            { "profiling" ( ? -- ) "primitive_sampling_profiler" }
-            { "(get-samples)" ( -- samples/f ) "primitive_get_samples" }
-            { "(clear-samples)" ( -- ) "primitive_clear_samples" }
+            { "profiling" ( ? -- ) "sampling_profiler" }
+            { "(get-samples)" ( -- samples/f ) "get_samples" }
+            { "(clear-samples)" ( -- ) "clear_samples" }
         }
     }
     {
         "words"
         {
-            { "word-code" ( word -- start end ) "primitive_word_code" }
-            { "word-optimized?" ( word -- ? ) "primitive_word_optimized_p" }
+            { "word-code" ( word -- start end ) "word_code" }
+            { "word-optimized?" ( word -- ? ) "word_optimized_p" }
         }
     }
     {
         "words.private"
         {
-            { "(word)" ( name vocab hashcode -- word ) "primitive_word" }
+            { "(word)" ( name vocab hashcode -- word ) "word" }
         }
     }
 }
 
 : primitive-quot ( word vm-func -- quot )
-    [ nip ascii string>alien [ do-primitive ] curry ] [ 1quotation ] if* ;
+    [
+        nip "primitive_" prepend ascii string>alien [ do-primitive ] curry
+    ] [ 1quotation ] if* ;
 
 : primitive-word ( name vocab -- word )
     create-word dup t "primitive" set-word-prop ;
