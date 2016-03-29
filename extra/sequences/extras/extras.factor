@@ -551,3 +551,6 @@ PRIVATE>
 
 : count-subseq* ( subseq seq -- n )
     start-all* length ; inline
+
+: map-zip ( quot: ( x -- y ) -- alist )
+    '[ [ _ call ] [ ] bi swap ] map>alist ; inline
