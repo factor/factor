@@ -12,7 +12,7 @@ IN: gtk.ffi
 
 LIBRARY: gtk
 
-[ "gtk" "gtk-x11-2.0" find-library cdecl update-library ] "gtk" add-startup-hook
+[ "gtk" "gtk-x11-2.0" find-library cdecl add-library ] "find-gtk" add-startup-hook
 
 IMPLEMENT-STRUCTS: GtkTreeIter ;
 
