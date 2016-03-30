@@ -1,5 +1,4 @@
-USING: bootstrap.image.primitives kernel.private sequences tools.test
-vocabs words ;
+USING: bootstrap.image.primitives kernel.private tools.test words ;
 IN: bootstrap.image.primitives.tests
 
 {
@@ -11,8 +10,4 @@ IN: bootstrap.image.primitives.tests
     ]
 } [
     gensym "hello" primitive-quot
-] unit-test
-
-{ t } [
-    all-words [ primitive? ] filter [ foldable? ] filter [ flushable? ] all?
 ] unit-test
