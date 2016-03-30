@@ -7,6 +7,8 @@ if "%1"=="/?" (
     set _bootimage_version=latest
 ) else if "%1"=="latest" (
     set _bootimage_version=latest
+) else if "%1"=="update" (
+    set _bootimage_version=latest
 ) else if "%1"=="clean" (
     set _bootimage_version=clean
 ) else goto usage
