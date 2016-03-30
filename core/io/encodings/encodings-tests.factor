@@ -99,3 +99,11 @@ unit-test
         "t" read-until
     ] with-byte-reader
 ] unit-test
+
+! shouldn't be able to tell on (underlying) stream of a decoder
+! because it's confusing when you read1 character and tell is
+! greater than 1.
+[
+    "hello world" utf8 encode
+    utf8 [ tell-input ] with-byte-reader
+] must-fail
