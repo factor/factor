@@ -53,7 +53,7 @@ TUPLE: exec-name < identity-tuple name ;
 
 MEMO: exec-name ( string -- name ) name \ exec-name boa ;
 
-SYNTAX: exec" lexer get skip-blank parse-string exec-name suffix! ;
+SYNTAX: exec" lexer get skip-blank parse-short-string exec-name suffix! ;
 
 ERROR: unbound-name { name name } ;
 
