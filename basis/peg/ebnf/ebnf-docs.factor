@@ -308,7 +308,7 @@ ARTICLE: "peg.ebnf.semantic-action" "EBNF Semantic Action"
     { $example
        "USING: prettyprint peg.ebnf math math.parser ;"
        "\"2\" [EBNF rule=[0-9] ?[ digit> odd? ]? EBNF] ."
-       "Sequence index out of bounds\nindex 0\nseq   V{ }"
+       "Peg parsing error at character position 0.\nExpected \nGot '2'"
     }
 }
 ;
