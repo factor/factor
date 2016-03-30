@@ -204,7 +204,7 @@ ARTICLE: "http.proxy-variables" "HTTP(S) proxy variables"
 { "HTTPS" { $snippet "\"https.proxy\"" } "https_proxy" "HTTPS_PROXY" }
 { "no proxy" { $snippet "\"no_proxy\"" } "no_proxy" "NO_PROXY" }
 }
-"When making an http request, if the target host is not matched by the no_proxy list, the " { $vocab-link "http.client" } " will fill the missing components of the " { $slot "proxy-url" } " slot of the " { $link request } " from the value of these variables."
+"When making an http request, if the target host is not matched by the no_proxy list, the " { $vocab-link "http.client" } " will fill the missing components of the " { $slot "proxy-url" } " slot of the " { $link request } " from the value of these variables. If the filled result is not valid, an error is thrown."
 { $notes "The dynamic variables are keyed by strings. This allows to use Factor's command line support to define them (see in the examples below)." }
 
 { $heading "no_proxy" }
