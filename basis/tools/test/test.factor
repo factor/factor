@@ -125,7 +125,9 @@ PRIVATE>
 : run-test-file ( path -- )
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
-        '[ _ run-file ] [ file-failure ] recover
+        '[ _ run-file ] [
+            dup condition? [ rethrow ] [ file-failure ] if
+        ] recover
     ] with-variable ;
 
 SYMBOL: forget-tests?
