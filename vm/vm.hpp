@@ -335,8 +335,8 @@ struct factor_vm {
   /* the write barrier must be called any time we are potentially storing a
      pointer from an older generation to a younger one */
   inline void write_barrier(cell* slot_ptr) {
-    *(char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
-    *(char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
+    *(unsigned char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
+    *(unsigned char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
   }
 
   inline void write_barrier(object* obj, cell size) {
