@@ -16,7 +16,7 @@ ERROR: bad-number str ;
 EBNF: parse-smalltalk
 
 Character = .
-WhitespaceCharacter = (" " | "\t" | "\n" | "\r" )
+WhitespaceCharacter = [ \t\n\r]
 DecimalDigit = [0-9]
 Letter = [A-Za-z]
 
@@ -27,7 +27,7 @@ OptionalWhiteSpace = (WhitespaceCharacter | Comment)*
 Whitespace = (WhitespaceCharacter | Comment)+
 
 LetterOrDigit = DecimalDigit | Letter
-Identifier = (Letter | "_"):h (LetterOrDigit | "_")*:t => [[ { h t } flatten >string ]]
+Identifier = (Letter | [_]):h (LetterOrDigit | [_])*:t => [[ { h t } flatten >string ]]
 Reference = Identifier => [[ ast-name boa ]]
 
 ConstantReference =   "nil" => [[ nil ]]
