@@ -1,15 +1,16 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct combinators continuations
-destructors environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
-gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
-io.encodings.binary io.encodings.utf8 io.files kernel libc literals
-locals math math.bitwise math.vectors namespaces sequences strings
-system threads ui ui.backend ui.backend.gtk.input-methods
-ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private vocabs.loader ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+assocs classes.struct combinators continuations destructors
+environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
+gobject-introspection.standard-types gobject.ffi gtk.ffi
+gtk.gl.ffi io.encodings.binary io.encodings.utf8 io.files kernel
+literals locals math math.bitwise math.vectors namespaces
+sequences strings system threads ui ui.backend
+ui.backend.gtk.input-methods ui.backend.gtk.io ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
+vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -54,34 +55,6 @@ M: gtk-clipboard set-clipboard-contents
         utf8 string>alien gdk_atom_intern_static_string
         gtk_clipboard_get <gtk-clipboard> swap set-global
     ] 2bi@ ;
-
-! Timer
-
-: set-timeout*-value ( alien value -- )
-    swap 0 set-alien-signed-4 ; inline
-
-: timer-prepare ( source timeout* -- ? )
-    nip sleep-time 1,000,000,000 or
-    [ 1,000,000 /i set-timeout*-value ] keep 0 = ;
-
-: timer-check ( source -- ? )
-    drop sleep-time 0 = ;
-
-: timer-dispatch ( source callback user_data -- ? )
-    3drop yield t ;
-
-: <timer-funcs> ( -- timer-funcs )
-    GSourceFuncs malloc-struct
-        [ timer-prepare ] GSourceFuncsPrepareFunc >>prepare
-        [ timer-check ] GSourceFuncsCheckFunc >>check
-        [ timer-dispatch ] GSourceFuncsDispatchFunc >>dispatch ;
-
-:: with-timer ( quot -- )
-    <timer-funcs> &free
-    GSource heap-size g_source_new &g_source_unref :> source
-    source f g_source_attach drop
-    [ quot call( -- ) ]
-    [ source g_source_destroy ] [ ] cleanup ;
 
 ! User input
 
@@ -547,10 +520,8 @@ M: gtk-ui-backend (with-ui)
         start-ui
         [
             [
-                [
-                    <yield-callback> f g_idle_add drop
-                    gtk_main
-                ] with-timer
+                <yield-callback> f g_idle_add drop
+                gtk_main
             ] with-event-loop
         ] with-destructors
     ] ui-running ;
