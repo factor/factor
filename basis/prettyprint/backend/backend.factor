@@ -70,12 +70,15 @@ M: method pprint*
     [ [ neg ] [ call ] [ prepend ] tri* "-" prepend text ]
     [ [ call ] [ prepend ] bi* text ] if ; inline
 
+ERROR: unsupported-number-base n base ;
+
 M: real pprint*
     number-base get {
+        { 10 [ number>string text ] }
         { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
         {  8 [ [ >oct ] "0o" pprint-prefixed-number ] }
         {  2 [ [ >bin ] "0b" pprint-prefixed-number ] }
-        [ drop number>string text ]
+        [ unsupported-number-base ]
     } case ;
 
 M: float pprint*
@@ -83,8 +86,9 @@ M: float pprint*
         \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
     ] [
         number-base get {
+            { 10 [ number>string text ] }
             { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
-            [ drop number>string text ]
+            [ unsupported-number-base ]
         } case
     ] if ;
 
