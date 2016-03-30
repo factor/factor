@@ -1,5 +1,5 @@
-USING: continuations db io.directories io.files.temp tools.test
-webapps.mason.backend webapps.utils ;
+USING: accessors calendar continuations db io.directories
+io.files.temp kernel tools.test webapps.mason.backend webapps.utils ;
 IN: webapps.mason.backend.tests
 
 [ "mason-test.db" temp-file delete-file ] ignore-errors
@@ -16,4 +16,9 @@ IN: webapps.mason.backend.tests
             increment-counter-value
         ] with-transaction
     ] with-db
+] unit-test
+
+{ f f } [
+    builder new now >>heartbeat-timestamp
+    [ broken? ] [ crashed? ] bi
 ] unit-test
