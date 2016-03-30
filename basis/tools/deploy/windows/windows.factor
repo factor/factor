@@ -13,7 +13,7 @@ CONSTANT: app-icon-resource-id "APPICON"
 :: copy-vm ( executable bundle-name extension -- vm-path )
     vm-path "." split1-last drop extension append
     bundle-name executable ".exe" append append-path
-    [ copy-file ] keep ;
+    [ copy-file ] keep normalize-path ;
 
 : create-exe-dir ( vocab bundle-name -- vm-path )
     deploy-console? get ".com" ".exe" ? copy-vm ;
