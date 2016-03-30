@@ -251,7 +251,7 @@ DEFER: foo
 ] unit-test
 
 { } [
-    "USE: azz M: my-class a-generic ;"
+    "IN: azz2 USE: azz M: my-class a-generic ;"
     <string-reader> "azz-2" parse-stream drop
 ] unit-test
 
@@ -261,7 +261,7 @@ DEFER: foo
 ] unit-test
 
 { } [
-    "USE: azz USE: math M: integer a-generic ;"
+    "IN: azz-2 USE: azz USE: math M: integer a-generic ;"
     <string-reader> "azz-2" parse-stream drop
 ] unit-test
 
