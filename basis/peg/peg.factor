@@ -345,15 +345,15 @@ M: token-parser (compile) ( peg -- quot )
 TUPLE: satisfy-parser quot ;
 
 : parse-satisfy ( input quot -- result )
-    swap dup empty? [
-        2drop f
+    swap [
+        drop f
     ] [
         unclip-slice rot dupd call [
             <parse-result>
         ] [
             2drop f
         ] if
-    ] if ; inline
+    ] if-empty ; inline
 
 M: satisfy-parser (compile)
     quot>> '[ input-slice _ parse-satisfy ] ;
