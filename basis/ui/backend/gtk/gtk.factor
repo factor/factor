@@ -229,14 +229,14 @@ CONSTANT: action-key-codes
     2drop window relayout t ;
 
 : on-configure ( win event user-data -- ? )
-    drop swap window dup active?>> 100 = [
+    drop swap window dup active?>> [
         swap GdkEventConfigure memory>struct
         [ event-loc >>window-loc ] [ event-dim >>dim ] bi
         relayout-1
     ] [ 2drop ] if f ;
 
 : on-map ( win event user-data -- ? )
-    2drop window 100 >>active? drop t ;
+    2drop window t >>active? drop t ;
 
 : on-delete ( win event user-data -- ? )
     2drop window ungraft t ;
