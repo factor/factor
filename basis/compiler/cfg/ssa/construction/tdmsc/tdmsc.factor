@@ -15,14 +15,15 @@ IN: compiler.cfg.ssa.construction.tdmsc
 SYMBOLS: merge-sets levels again? ;
 
 : init-merge-sets ( cfg -- )
-    post-order dup length '[ _ <bit-set> ] H{ } map>assoc merge-sets set ;
+    post-order dup length '[ _ <bit-set> ] H{ } map>assoc
+    merge-sets namespaces:set ;
 
 : compute-levels ( cfg -- )
     0 over entry>> associate [
         '[
             _ [ [ dom-parent ] dip at 1 + ] 2keep set-at
         ] each-basic-block
-    ] keep levels set ;
+    ] keep levels namespaces:set ;
 
 : j-edge? ( from to -- ? )
     2dup eq? [ 2drop f ] [ dominates? not ] if ;

@@ -269,10 +269,10 @@ SYMBOL: drag-timer
         dup multi-click? [
             hand-click# inc
         ] [
-            1 hand-click# set
+            1 hand-click# namespaces:set
         ] if
-        hand-last-button set
-        nano-count hand-last-time set
+        hand-last-button namespaces:set
+        nano-count hand-last-time namespaces:set
     ] with-global ;
 
 : update-clicked ( -- )

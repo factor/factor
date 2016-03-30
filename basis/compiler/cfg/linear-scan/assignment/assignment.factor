@@ -117,7 +117,7 @@ M: insn assign-registers-in-insn drop ;
 
 : begin-block ( bb -- )
     {
-        [ basic-block set ]
+        [ basic-block namespaces:set ]
         [ block-from activate-new-intervals ]
         [ compute-edge-live-in ]
         [ compute-live-in ]
@@ -139,12 +139,12 @@ M: insn assign-registers-in-insn drop ;
     ] change-instructions compute-live-out ;
 
 : init-assignment ( live-intervals -- )
-    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals set
-    <min-heap> pending-interval-heap set
-    H{ } clone pending-interval-assoc set
-    H{ } clone machine-live-ins set
-    H{ } clone machine-edge-live-ins set
-    H{ } clone machine-live-outs set ;
+    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals namespaces:set
+    <min-heap> pending-interval-heap namespaces:set
+    H{ } clone pending-interval-assoc namespaces:set
+    H{ } clone machine-live-ins namespaces:set
+    H{ } clone machine-edge-live-ins namespaces:set
+    H{ } clone machine-live-outs namespaces:set ;
 
 : assign-registers ( cfg live-intervals -- )
     init-assignment
