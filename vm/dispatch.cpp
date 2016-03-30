@@ -20,8 +20,7 @@ cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode) {
   cell bucket = array_nth(buckets, hashcode & (array_capacity(buckets) - 1));
   if (TAG(bucket) == ARRAY_TYPE)
     return search_lookup_alist(bucket, klass);
-  else
-    return bucket;
+  return bucket;
 }
 
 cell factor_vm::nth_superclass(tuple_layout* layout, fixnum echelon) {
@@ -69,10 +68,9 @@ cell factor_vm::lookup_method(cell obj, cell methods) {
   if (tag == TUPLE_TYPE) {
     if (TAG(method) == ARRAY_TYPE)
       return lookup_tuple_method(obj, method);
-    else
-      return method;
-  } else
     return method;
+  }
+  return method;
 }
 
 void factor_vm::primitive_lookup_method() {
@@ -85,8 +83,7 @@ cell factor_vm::object_class(cell obj) {
   cell tag = TAG(obj);
   if (tag == TUPLE_TYPE)
     return untag<tuple>(obj)->layout;
-  else
-    return tag_fixnum(tag);
+  return tag_fixnum(tag);
 }
 
 cell factor_vm::method_cache_hashcode(cell klass, array* array) {

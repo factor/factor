@@ -155,11 +155,10 @@ void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     return;
 
   factor_vm* vm = current_vm_p();
-  if (vm) {
-    vm->signal_number = signal;
-    vm->dispatch_signal(uap, factor::synchronous_signal_handler_impl);
-  } else
+  if (!vm)
     fatal_error("Foreign thread received signal", signal);
+  vm->signal_number = signal;
+  vm->dispatch_signal(uap, factor::synchronous_signal_handler_impl);
 }
 
 void safe_write_nonblock(int fd, void* data, ssize_t size);

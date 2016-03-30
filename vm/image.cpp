@@ -127,24 +127,24 @@ char *threadsafe_strerror(int errnum) {
 }
 
 FILE* factor_vm::open_image(vm_parameters* p) {
-  if (p->embedded_image) {
-    FILE* file = OPEN_READ(p->executable_path);
-    if (file == NULL) {
-      std::cout << "Cannot open embedded image" << std::endl;
-      char *msg = threadsafe_strerror(errno);
-      std::cout << "strerror:1: " << msg << std::endl;
-      free(msg);
-      exit(1);
-    }
-    embedded_image_footer footer;
-    if (!read_embedded_image_footer(file, &footer)) {
-      std::cout << "No embedded image" << std::endl;
-      exit(1);
-    }
-    safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
-    return file;
-  } else
+  if (!p->embedded_image)
     return OPEN_READ(p->image_path);
+
+  FILE* file = OPEN_READ(p->executable_path);
+  if (file == NULL) {
+    std::cout << "Cannot open embedded image" << std::endl;
+    char *msg = threadsafe_strerror(errno);
+    std::cout << "strerror:1: " << msg << std::endl;
+    free(msg);
+    exit(1);
+  }
+  embedded_image_footer footer;
+  if (!read_embedded_image_footer(file, &footer)) {
+    std::cout << "No embedded image" << std::endl;
+    exit(1);
+  }
+  safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
+  return file;
 }
 
 /* Read an image file from disk, only done once during startup */
@@ -209,9 +209,11 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     return false;
   if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
     return false;
-  if (safe_fwrite((void*)data->tenured->start, h.data_size, 1, file) != 1)
+  if (h.data_size > 0 &&
+      safe_fwrite((void*)data->tenured->start, h.data_size, 1, file) != 1)
     return false;
-  if (safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
+  if (h.code_size > 0 &&
+      safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
     return false;
   if (raw_fclose(file) == -1)
     return false;
@@ -244,6 +246,9 @@ void factor_vm::primitive_save_image() {
        get volatile data saved in the image. */
     active_contexts.clear();
     code->uninitialized_blocks.clear();
+
+    /* I think clearing the callback heap should be fine too. */
+    callbacks->allocator->initial_free_list(0);
   }
 
   /* do a full GC to push everything remaining into tenured space */
