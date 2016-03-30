@@ -1,6 +1,7 @@
 USING: accessors arrays compiler.cfg compiler.cfg.debugger
 compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities
-kernel namespaces sequences sets tools.test ;
+kernel namespaces sequences tools.test ;
+QUALIFIED: sets
 IN: compiler.cfg.ssa.construction.tdmsc.tests
 
 : test-tdmsc ( -- )
@@ -46,7 +47,7 @@ V{ } 6 test-bb
 
 { t } [
     2 get 3 get 2array merge-set
-    4 get 6 get 2array set=
+    4 get 6 get 2array sets:set=
 ] unit-test
 
 V{ } 0 test-bb

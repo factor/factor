@@ -1,7 +1,8 @@
 USING: accessors alien alien.accessors alien.c-types alien.libraries
 alien.syntax arrays byte-arrays continuations fry kernel kernel.private
-layouts libc math namespaces prettyprint sequences sets system tools.memory
+layouts libc math namespaces prettyprint sequences system tools.memory
 tools.test ;
+QUALIFIED: sets
 IN: alien.tests
 
 { t } [ -1 <alien> alien-address 0 > ] unit-test
@@ -84,7 +85,7 @@ f initialize-test set-global
 
 { 7575 } [ initialize-test [ 7575 ] initialize-alien ] unit-test
 
-{ { BAD-ALIEN } } [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } members ] unit-test
+{ { BAD-ALIEN } } [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } sets:members ] unit-test
 
 ! Generate callbacks until the whole callback-heap is full, then free
 ! them. Do it ten times in a row for good measure.
