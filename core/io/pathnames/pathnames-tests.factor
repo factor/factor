@@ -1,7 +1,6 @@
-USING: continuations hashtables io.backend io.directories
-io.files.private io.files.temp io.pathnames kernel math
-namespaces system tools.test ;
-IN: io.pathnames.tests
+USING: io.backend io.directories io.files.private io.files.temp
+io.files.unique io.pathnames kernel locals math namespaces
+system tools.test ;
 
 { "passwd" } [ "/etc/passwd" file-name ] unit-test
 { "awk" } [ "/usr/libexec/awk/" file-name ] unit-test
@@ -53,8 +52,11 @@ IN: io.pathnames.tests
 { t } [ "resource:core" absolute-path? ] unit-test
 { f } [ "" absolute-path? ] unit-test
 
-[ "touch-twice-test" temp-file delete-file ] ignore-errors
-{ } [ 2 [ "touch-twice-test" temp-file touch-file ] times ] unit-test
+[
+    "touch-twice-test" ".txt" [| path |
+        { } [ 2 [ path touch-file ] times ] unit-test
+    ] cleanup-unique-file
+] with-temp-directory
 
 ! aum's bug
 H{
