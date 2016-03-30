@@ -303,7 +303,11 @@ SYMBOL: delayed
     ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
-    swap [ execute( -- result ) [ error-stack get first throw ] unless* ] with-packrat ;
+    swap [
+        execute( -- result )
+        [ error-stack get ?first [ throw ]
+        [ pos get input get f <parse-error> throw ] if* ] unless*
+    ] with-packrat ;
 
 : (parse) ( input parser -- result )
     dup word? [ compile ] unless compiled-parse ;
