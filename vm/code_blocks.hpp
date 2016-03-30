@@ -82,7 +82,7 @@ struct code_block {
     byte_array* rels = untag<byte_array>(relocation);
 
     cell index = 0;
-    cell length = (rels->capacity >> TAG_BITS) / sizeof(relocation_entry);
+    cell length = untag_fixnum(rels->capacity) / sizeof(relocation_entry);
 
     for (cell i = 0; i < length; i++) {
       relocation_entry rel = rels->data<relocation_entry>()[i];
