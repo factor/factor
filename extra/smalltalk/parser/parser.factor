@@ -27,7 +27,7 @@ OptionalWhiteSpace = (WhitespaceCharacter | Comment)*
 Whitespace = (WhitespaceCharacter | Comment)+
 
 LetterOrDigit = DecimalDigit | Letter
-Identifier = (Letter | [_]):h (LetterOrDigit | [_])*:t => [[ { h t } flatten >string ]]
+Identifier = (Letter | [_]):h (LetterOrDigit | [_])*:t => [[ h 1string t append ]]
 Reference = Identifier => [[ ast-name boa ]]
 
 ConstantReference =   "nil" => [[ nil ]]
