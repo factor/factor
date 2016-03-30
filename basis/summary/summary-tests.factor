@@ -9,5 +9,8 @@ IN: summary.tests
     [ [ ] f wrong-values ] [ ] recover summary
 ] unit-test
 
-TUPLE: ooga-boga ;
-{ "a ooga-boga tuple" } [ ooga-boga boa summary ] unit-test
+TUPLE: ooga-booga ;
+{ "an ooga-booga tuple" } [ ooga-booga boa summary ] unit-test
+
+TUPLE: booga-ooga ;
+{ "a booga-ooga tuple" } [ booga-ooga boa summary ] unit-test
