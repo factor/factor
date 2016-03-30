@@ -1,4 +1,4 @@
-USING: tools.test random sorting sequences sets hashtables assocs
+USING: tools.test random sorting sequences hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors locals
 math.order grouping strings strings.private classes layouts
 cpu.architecture
