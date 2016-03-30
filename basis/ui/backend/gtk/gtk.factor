@@ -14,8 +14,7 @@ IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
 
-TUPLE: handle ;
-TUPLE: window-handle < handle window fullscreen? im-context ;
+TUPLE: window-handle window fullscreen? im-context ;
 
 : <window-handle> ( window im-context -- window-handle )
     window-handle new
@@ -486,7 +485,8 @@ M: gtk-ui-backend (close-window) ( handle -- )
     window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 
-M: gtk-ui-backend resize-window [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
+M: gtk-ui-backend resize-window
+    [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
 
 M: gtk-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*
@@ -547,7 +547,7 @@ M: gtk-ui-backend (with-ui)
         ] with-destructors
     ] ui-running ;
 
-os unix? os macosx? not and [
+os linux? [
     gtk-ui-backend ui-backend set-global
 ] when
 
