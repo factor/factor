@@ -7,6 +7,7 @@ ifdef CONFIG
 	include $(CONFIG)
 
 	CFLAGS = -Wall \
+		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
