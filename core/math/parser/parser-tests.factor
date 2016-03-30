@@ -54,6 +54,8 @@ unit-test
 [ "e" string>number ]
 unit-test
 
+{ f } [ "1/0" string>number ] unit-test
+{ f } [ "-1/0" string>number ] unit-test
 { 1/2 } [ "1/2" string>number ] unit-test
 { -1/2 } [ "-1/2" string>number ] unit-test
 { 2 } [ "4/2" string>number ] unit-test
