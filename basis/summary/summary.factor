@@ -19,8 +19,7 @@ M: assoc tuple-summary
     dup assoc-size "entries" container-summary ;
 
 M: object tuple-summary
-    object-summary dup ?first "aeiou" member?
-    "an " "a " ? " tuple" surround ;
+    object-summary ;
 
 M: set tuple-summary
     dup cardinality "members" container-summary ;

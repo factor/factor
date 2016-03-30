@@ -10,7 +10,4 @@ IN: summary.tests
 ] unit-test
 
 TUPLE: ooga-booga ;
-{ "an ooga-booga tuple" } [ ooga-booga boa summary ] unit-test
-
-TUPLE: booga-ooga ;
-{ "a booga-ooga tuple" } [ booga-ooga boa summary ] unit-test
+{ "ooga-booga" } [ ooga-booga boa summary ] unit-test
