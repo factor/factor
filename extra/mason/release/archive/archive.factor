@@ -32,25 +32,8 @@ IN: mason.release.archive
         archive-name
     } short-running-process ;
 
-: cert-path ( -- path )
-    home "config/mac_app.cer" append-path ;
-
-: sign-factor.app? ( -- ? ) cert-path exists? ;
-
-: factor.app-path ( -- path )
-    build-dir get "factor/Factor.app/" append-path ;
-
-:: sign-factor.app ( -- )
-    ${
-        "codesign" "--force" "--sign"
-        "Developer ID Application"
-        cert-path
-        factor.app-path
-    } short-running-process ;
-
 ! Make the .dmg
 : make-macosx-archive ( archive-name -- )
-    sign-factor.app? [ sign-factor.app ] when
     "dmg-root" make-directory
     "factor" "dmg-root" copy-tree-into
     "factor" "dmg-root" make-disk-image
