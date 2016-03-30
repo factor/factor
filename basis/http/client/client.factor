@@ -11,6 +11,7 @@ environment ;
 IN: http.client
 
 ERROR: too-many-redirects ;
+ERROR: invalid-proxy proxy ;
 
 : success? ( code -- ? ) 200 299 between? ;
 
@@ -181,8 +182,15 @@ SYMBOL: redirects
        [ "." split no-proxy-match? ] with any?
     ] [ drop f ] if* ;
 
+: (check-proxy) ( proxy -- ? )
+    {
+        { [ dup URL" " = ] [ drop f ] }
+        { [ dup host>> ] [ drop t ] }
+        [ invalid-proxy ]
+    } cond ;
+
 : check-proxy ( request proxy -- request' )
-    dup [ host>> ] [ f ] if*
+    dup [ (check-proxy) ] [ f ] if*
     [ drop f ] unless [ clone ] dip >>proxy-url ;
 
 : get-default-proxy ( request -- default-proxy )

@@ -10,6 +10,9 @@ HELP: download-failed
 HELP: too-many-redirects
 { $error-description "Thrown by " { $link http-request } " if the server returns a chain of than " { $link max-redirects } " redirections." } ;
 
+HELP: invalid-proxy
+{ $error-description "Thrown by " { $link http-request } " if the proxy url is not valid." } ;
+
 HELP: <get-request>
 { $values { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP GET request for retrieving the URL." }

@@ -202,3 +202,9 @@ CONSTANT: classic-proxy-settings H{
        "allprivate.google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
+
+[
+    <url> 3128 >>port "http.proxy" [
+       "http://www.google.com" "GET" <client-request> ?default-proxy
+    ] with-variable
+] [ invalid-proxy? ] must-fail-with
