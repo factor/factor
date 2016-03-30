@@ -176,9 +176,9 @@ SYMBOL: redirects
     [ "NO_PROXY" os-env ] unless* ;
 
 : no-proxy? ( request -- ? )
-    url>> host>> "." split
     get-no-proxy-list [
-        "," split [ "." split no-proxy-match? ] with any?
+       [ url>> host>> "." split ] dip "," split
+       [ "." split no-proxy-match? ] with any?
     ] [ drop f ] if* ;
 
 : check-proxy ( request proxy -- request' )
