@@ -1,14 +1,30 @@
 ! Copyright (C) 2004, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs classes classes.tuple.private
-combinators combinators.private combinators.short-circuit effects fry
-generic.single.private kernel kernel.private locals locals.backend
-locals.types macros math namespaces quotations.private sequences
-sequences.private stack-checker.alien stack-checker.backend
-stack-checker.branches stack-checker.dependencies stack-checker.errors
-stack-checker.row-polymorphism stack-checker.state
-stack-checker.transforms stack-checker.values stack-checker.visitor
-words ;
+USING: fry accessors alien alien.accessors alien.private arrays
+byte-arrays classes continuations.private effects generic
+hashtables hashtables.private io io.backend io.files
+io.files.private io.streams.c kernel kernel.private math
+math.private math.parser.private memory memory.private
+namespaces namespaces.private parser quotations
+quotations.private sbufs sbufs.private sequences
+sequences.private slots.private strings strings.private system
+threads.private classes.tuple classes.tuple.private vectors
+vectors.private words words.private definitions assocs summary
+compiler.units system.private combinators tools.memory.private
+combinators.short-circuit locals locals.backend locals.types
+combinators.private stack-checker.values generic.single
+generic.single.private alien.libraries tools.dispatch.private
+macros tools.profiler.sampling.private classes.algebra
+stack-checker.alien
+stack-checker.state
+stack-checker.errors
+stack-checker.visitor
+stack-checker.backend
+stack-checker.branches
+stack-checker.transforms
+stack-checker.dependencies
+stack-checker.recursive-state
+stack-checker.row-polymorphism ;
 QUALIFIED-WITH: generic.single.private gsp
 IN: stack-checker.known-words
 
@@ -162,6 +178,8 @@ M: object infer-call* \ call bad-macro-input ;
 
 \ <tuple-boa> [ infer-<tuple-boa> ] "special" set-word-prop
 
+\ <tuple-boa> t "flushable" set-word-prop
+
 : infer-effect-unsafe ( word -- )
     pop-literal nip
     add-effect-input
@@ -254,3 +272,255 @@ M: object infer-call* \ call bad-macro-input ;
 
 ! More words not to compile
 \ clear t "no-compile" set-word-prop
+
+: define-primitive ( word inputs outputs -- )
+    [ "input-classes" set-word-prop ]
+    [ "default-output-classes" set-word-prop ]
+    bi-curry* bi ;
+
+: define-primitives ( seq -- )
+    [ first3 define-primitive ] each ;
+
+: make-flushable-primitives ( flushables -- )
+    dup define-primitives [ first make-flushable ] each ;
+
+: make-foldable-primitives ( flushables -- )
+    dup define-primitives [ first make-foldable ] each ;
+
+! ! Stack effects for all primitives
+
+! Alien getters
+{
+    { alien-cell { c-ptr integer } { pinned-c-ptr } }
+    { alien-double { c-ptr integer } { float } }
+    { alien-float { c-ptr integer } { float } }
+    { alien-signed-1 { c-ptr integer } { fixnum } }
+    { alien-signed-2 { c-ptr integer } { fixnum } }
+    { alien-signed-4 { c-ptr integer } { integer } }
+    { alien-signed-8 { c-ptr integer } { integer } }
+    { alien-signed-cell { c-ptr integer } { integer } }
+    { alien-unsigned-1 { c-ptr integer } { fixnum } }
+    { alien-unsigned-2 { c-ptr integer } { fixnum } }
+    { alien-unsigned-4 { c-ptr integer } { integer } }
+    { alien-unsigned-8 { c-ptr integer } { integer } }
+    { alien-unsigned-cell { c-ptr integer } { integer } }
+} make-flushable-primitives
+
+! Alien setters
+{
+    { set-alien-cell { c-ptr c-ptr integer } { } }
+    { set-alien-double { float c-ptr integer } { } }
+    { set-alien-float { float c-ptr integer } { } }
+    { set-alien-signed-1 { integer c-ptr integer } { } }
+    { set-alien-signed-2 { integer c-ptr integer } { } }
+    { set-alien-signed-4 { integer c-ptr integer } { } }
+    { set-alien-signed-8 { integer c-ptr integer } { } }
+    { set-alien-signed-cell { integer c-ptr integer } { } }
+    { set-alien-unsigned-1 { integer c-ptr integer } { } }
+    { set-alien-unsigned-2 { integer c-ptr integer } { } }
+    { set-alien-unsigned-4 { integer c-ptr integer } { } }
+    { set-alien-unsigned-8 { integer c-ptr integer } { } }
+    { set-alien-unsigned-cell { integer c-ptr integer } { } }
+} define-primitives
+
+! Container constructors
+{
+    { (byte-array) { integer-array-capacity } { byte-array } }
+    { <array> { integer-array-capacity object } { array } }
+    { <byte-array> { integer-array-capacity } { byte-array } }
+    { <string> { integer-array-capacity integer } { string } }
+    { <tuple> { array } { tuple } }
+} make-flushable-primitives
+
+! Misc flushables
+{
+    { (callback-room) { } { byte-array } }
+    { (clone) { object } { object } }
+    { (code-blocks) { } { array } }
+    { (code-room) { } { byte-array } }
+    { (data-room) { } { byte-array } }
+    { (word) { object object object } { word } }
+    { <displaced-alien> { integer c-ptr } { c-ptr } }
+    { alien-address { alien } { integer } }
+    { callstack-bounds { } { alien alien } }
+    { callstack-for { c-ptr } { callstack } }
+    { callstack>array { callstack } { array } }
+    { check-datastack { array integer integer } { object } }
+    { context-object { fixnum } { object } }
+    { context-object-for { fixnum c-ptr } { object } }
+    { current-callback { } { fixnum } }
+    { datastack-for { c-ptr } { array } }
+    { nano-count { } { integer } }
+    { quotation-code { quotation } { integer integer } }
+    { retainstack-for { c-ptr } { array } }
+    { size { object } { fixnum } }
+    { slot { object fixnum } { object } }
+    { special-object { fixnum } { object } }
+    { string-nth-fast { fixnum string } { fixnum } }
+    { word-code { word } { integer integer } }
+} make-flushable-primitives
+
+! Misc foldables
+{
+    { <wrapper> { object } { wrapper } }
+    { array>quotation { array } { quotation } }
+    { eq? { object object } { object } }
+    { tag { object } { fixnum } }
+} make-foldable-primitives
+
+! Numeric primitives
+{
+    ! bignum
+    { bignum* { bignum bignum } { bignum } }
+    { bignum+ { bignum bignum } { bignum } }
+    { bignum- { bignum bignum } { bignum } }
+    { bignum-bit? { bignum integer } { object } }
+    { bignum-bitand { bignum bignum } { bignum } }
+    { bignum-bitnot { bignum } { bignum } }
+    { bignum-bitor { bignum bignum } { bignum } }
+    { bignum-bitxor { bignum bignum } { bignum } }
+    { bignum-log2 { bignum } { bignum } }
+    { bignum-mod { bignum bignum } { integer } }
+    { bignum-gcd { bignum bignum } { bignum } }
+    { bignum-shift { bignum fixnum } { bignum } }
+    { bignum/i { bignum bignum } { bignum } }
+    { bignum/mod { bignum bignum } { bignum integer } }
+    { bignum< { bignum bignum } { object } }
+    { bignum<= { bignum bignum } { object } }
+    { bignum= { bignum bignum } { object } }
+    { bignum> { bignum bignum } { object } }
+    { bignum>= { bignum bignum } { object } }
+    { bignum>fixnum { bignum } { fixnum } }
+    { bignum>fixnum-strict { bignum } { fixnum } }
+
+    ! fixnum
+    { fixnum* { fixnum fixnum } { integer } }
+    { fixnum*fast { fixnum fixnum } { fixnum } }
+    { fixnum+ { fixnum fixnum } { integer } }
+    { fixnum+fast { fixnum fixnum } { fixnum } }
+    { fixnum- { fixnum fixnum } { integer } }
+    { fixnum-bitand { fixnum fixnum } { fixnum } }
+    { fixnum-bitnot { fixnum } { fixnum } }
+    { fixnum-bitor { fixnum fixnum } { fixnum } }
+    { fixnum-bitxor { fixnum fixnum } { fixnum } }
+    { fixnum-fast { fixnum fixnum } { fixnum } }
+    { fixnum-mod { fixnum fixnum } { fixnum } }
+    { fixnum-shift { fixnum fixnum } { integer } }
+    { fixnum-shift-fast { fixnum fixnum } { fixnum } }
+    { fixnum/i { fixnum fixnum } { integer } }
+    { fixnum/i-fast { fixnum fixnum } { fixnum } }
+    { fixnum/mod { fixnum fixnum } { integer fixnum } }
+    { fixnum/mod-fast { fixnum fixnum } { fixnum fixnum } }
+    { fixnum< { fixnum fixnum } { object } }
+    { fixnum<= { fixnum fixnum } { object } }
+    { fixnum> { fixnum fixnum } { object } }
+    { fixnum>= { fixnum fixnum } { object } }
+    { fixnum>bignum { fixnum } { bignum } }
+    { fixnum>float { fixnum } { float } }
+
+    ! float
+    { (format-float) { float byte-array fixnum fixnum byte-array byte-array } { byte-array } }
+    { bits>float { integer } { float } }
+    { float* { float float } { float } }
+    { float+ { float float } { float } }
+    { float- { float float } { float } }
+    { float-u< { float float } { object } }
+    { float-u<= { float float } { object } }
+    { float-u> { float float } { object } }
+    { float-u>= { float float } { object } }
+    { float/f { float float } { float } }
+    { float< { float float } { object } }
+    { float<= { float float } { object } }
+    { float= { float float } { object } }
+    { float> { float float } { object } }
+    { float>= { float float } { object } }
+    { float>bignum { float } { bignum } }
+    { float>bits { real } { integer } }
+    { float>fixnum { float } { fixnum } }
+
+    ! double
+    { bits>double { integer } { float } }
+    { double>bits { real } { integer } }
+} make-foldable-primitives
+
+! ! Misc primitives
+{
+    ! Contexts
+    { (set-context) { object alien } { object } }
+    { (set-context-and-delete) { object alien } { } }
+    { (sleep) { integer } { } }
+    { (start-context) { object quotation } { object } }
+    { (start-context-and-delete) { object quotation } { } }
+    { set-context-object { object fixnum } { } }
+
+    ! Dispatch stats
+    { dispatch-stats { } { byte-array } }
+    { reset-dispatch-stats { } { } }
+
+    ! FFI
+    { (dlopen) { byte-array } { dll } }
+    { (dlsym) { byte-array object } { c-ptr } }
+    { (dlsym-raw) { byte-array object } { c-ptr } }
+    { dlclose { dll } { } }
+    { dll-valid? { object } { object } }
+
+    ! GC
+    { compact-gc { } { } }
+    { disable-gc-events { } { object } }
+    { enable-gc-events { } { } }
+    { gc { } { } }
+    { minor-gc { } { } }
+
+    ! Hashing
+    { (identity-hashcode) { object } { fixnum } }
+    { compute-identity-hashcode { object } { } }
+
+    ! IO
+    { (exists?) { string } { object } }
+    { (fopen) { byte-array byte-array } { alien } }
+    { fclose { alien } { } }
+    { fflush { alien } { } }
+    { fgetc { alien } { object } }
+    { fputc { object alien } { } }
+    { fread-unsafe { integer c-ptr alien } { integer } }
+    { fseek { integer integer alien } { } }
+    { ftell { alien } { integer } }
+    { fwrite { c-ptr integer alien } { } }
+
+    ! Profiling
+    { (clear-samples) { } { } }
+    { (get-samples) { } { object } }
+    { profiling { object } { } }
+
+    ! Resizing
+    { resize-array { integer array } { array } }
+    { resize-byte-array { integer byte-array } { byte-array } }
+    { resize-string { integer string } { string } }
+
+    ! Other primitives
+    { (exit) { integer } { } }
+    { (save-image) { byte-array byte-array object } { } }
+    { <callback> { word integer } { alien } }
+    { all-instances { } { array } }
+    { become { array array } { } }
+    { both-fixnums? { object object } { object } }
+    { die { } { } }
+    { fpu-state { } { } }
+    { free-callback { alien } { } }
+    { innermost-frame-executing { callstack } { object } }
+    { innermost-frame-scan { callstack } { fixnum } }
+    { jit-compile { quotation } { } }
+    { leaf-signal-handler { } { } }
+    { gsp:lookup-method { object array } { word } }
+    { modify-code-heap { array object object } { } }
+    { quotation-compiled? { quotation } { object } }
+    { set-fpu-state { } { } }
+    { set-innermost-frame-quotation { quotation callstack } { } }
+    { set-slot { object object fixnum } { } }
+    { set-special-object { object fixnum } { } }
+    { set-string-nth-fast { fixnum fixnum string } { } }
+    { signal-handler { } { } }
+    { strip-stack-traces { } { } }
+    { unimplemented { } { } }
+    { word-optimized? { word } { object } }
+} define-primitives

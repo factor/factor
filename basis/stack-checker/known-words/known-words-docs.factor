@@ -6,6 +6,10 @@ HELP: check-declaration
 { $values { "declaration" sequence } }
 { $description "Checks that a declaration sequence as inputted to a " { $link declare } " word is well-formed." } ;
 
+HELP: define-primitive
+{ $values { "word" word } { "inputs" sequence } { "outputs" sequence } }
+{ $description "Marks the word as a primitive whose input and output types must be the given ones." } ;
+
 HELP: infer-call
 { $description "Performs inferencing for the " { $link call } " word." } ;
 
@@ -26,7 +30,7 @@ HELP: infer-special
 { $description "Performs inferencing of a word with the \"special\" property set." } ;
 
 
-ARTICLE: "stack-checker.known-words" "Extra properties for special words"
-"This vocab adds properties for words that are handled specially by the compiler. Such as " { $link curry } " and " { $link dip } "." ;
+ARTICLE: "stack-checker.known-words" "Hard-coded stack effects for primitive words"
+"This vocab declares primitive and shuffle words." ;
 
 ABOUT: "stack-checker.known-words"
