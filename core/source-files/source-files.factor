@@ -71,8 +71,8 @@ SYMBOL: current-source-file
     H{ } clone [
         [
             path>source-file
-            [ current-source-file set ]
-            [ definitions>> old-definitions set ] bi
+            [ current-source-file namespaces:set ]
+            [ definitions>> old-definitions namespaces:set ] bi
         ] dip
         [ wrap-source-file-error ] recover
     ] with-variables ; inline

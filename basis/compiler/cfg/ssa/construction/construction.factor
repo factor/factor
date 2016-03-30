@@ -25,8 +25,8 @@ M: vreg-insn compute-insn-defs
     ] with each ;
 
 : compute-defs ( cfg -- )
-    H{ } clone defs set
-    HS{ } clone defs-multi set
+    H{ } clone defs namespaces:set
+    HS{ } clone defs-multi namespaces:set
     [
         [ basic-block get ] dip
         [ compute-insn-defs ] with each
@@ -44,7 +44,7 @@ SYMBOL: inserting-phis
     members merge-set [ insert-phi-later ] with each ;
 
 : compute-phis ( -- )
-    H{ } clone inserting-phis set
+    H{ } clone inserting-phis namespaces:set
     defs-multi get members
     defs get '[ dup _ at compute-phis-for ] each ;
 
@@ -55,9 +55,9 @@ SYMBOL: used-vregs
 SYMBOLS: stacks pushed ;
 
 : init-renaming ( -- )
-    H{ } clone phis set
-    <hashed-dlist>  used-vregs set
-    H{ } clone stacks set ;
+    H{ } clone phis namespaces:set
+    <hashed-dlist>  used-vregs namespaces:set
+    H{ } clone stacks namespaces:set ;
 
 : gen-name ( vreg -- vreg' )
     [ next-vreg dup ] dip
@@ -109,7 +109,7 @@ M: vreg-insn rename-insn
     pushed get members stacks get '[ _ at pop* ] each ;
 
 : rename-in-block ( bb -- )
-    HS{ } clone pushed set
+    HS{ } clone pushed namespaces:set
     {
         [ rename-phis ]
         [ rename-insns ]
@@ -117,7 +117,7 @@ M: vreg-insn rename-insn
         [
             pushed get
             [ dom-children [ rename-in-block ] each ] dip
-            pushed set
+            pushed namespaces:set
         ]
     } cleave
     pop-stacks ;
@@ -132,7 +132,7 @@ SYMBOL: live-phis
     dst>> live-phis get in? ;
 
 : compute-live-phis ( -- )
-    HS{ } clone live-phis set
+    HS{ } clone live-phis namespaces:set
     used-vregs get [
         phis get at [
             [

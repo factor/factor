@@ -20,11 +20,11 @@ SYMBOL: viewport-translation
 : init-clip ( gadget -- )
     [
         dim>>
-        [ { 0 1 } v* viewport-translation set ]
+        [ { 0 1 } v* viewport-translation namespaces:set ]
         [ [ { 0 0 } ] dip gl-viewport ]
         [ [ 0 ] dip first2 0 1 -1 glOrtho ] tri
     ]
-    [ clip set ] bi
+    [ clip namespaces:set ] bi
     do-clip ;
 
 SLOT: background-color
@@ -87,7 +87,7 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
 <PRIVATE
 
 : draw-selection-background ( gadget -- )
-    selection-background get background set
+    selection-background get background namespaces:set
     selection-background get gl-color
     [ { 0 0 } ] dip dim>> gl-fill-rect ;
 
@@ -122,7 +122,8 @@ PRIVATE>
     >absolute clip [ rect-intersect ] change ;
 
 : with-clipping ( gadget quot -- )
-    clip get [ over change-clip do-clip call ] dip clip set do-clip ; inline
+    clip get [ over change-clip do-clip call ] dip
+    clip namespaces:set do-clip ; inline
 
 : draw-gadget ( gadget -- )
     {
@@ -141,10 +142,10 @@ M: gadget draw-children
         } cleave [
 
             {
-                [ [ selected-gadgets set ] when* ]
-                [ [ selection-background set ] when* ]
-                [ [ background set ] when* ]
-                [ [ foreground set ] when* ]
+                [ [ selected-gadgets namespaces:set ] when* ]
+                [ [ selection-background namespaces:set ] when* ]
+                [ [ background namespaces:set ] when* ]
+                [ [ foreground namespaces:set ] when* ]
             } spread
             [ draw-gadget ] each
         ] with-scope

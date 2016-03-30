@@ -147,9 +147,9 @@ M: depends-on-final satisfied?
     class>> { [ class? ] [ final-class? ] } 1&& ;
 
 : init-dependencies ( -- )
-    H{ } clone dependencies set
-    H{ } clone generic-dependencies set
-    HS{ } clone conditional-dependencies set ;
+    H{ } clone dependencies namespaces:set
+    H{ } clone generic-dependencies namespaces:set
+    HS{ } clone conditional-dependencies namespaces:set ;
 
 : without-dependencies ( quot -- )
     [

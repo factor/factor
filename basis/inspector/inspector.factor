@@ -69,11 +69,11 @@ SYMBOL: inspector-stack
 SYMBOL: sorted-keys
 
 : reinspect ( obj -- )
-    [ me set ]
+    [ me namespaces:set ]
     [
-        dup make-mirror dup mirror set
+        dup make-mirror dup mirror namespaces:set
         t +number-rows+ [ (describe) ] with-variable
-        sorted-keys set
+        sorted-keys namespaces:set
     ] bi ;
 
 : (inspect) ( obj -- )
@@ -118,7 +118,7 @@ PRIVATE>
 
 : inspector ( obj -- )
     &help
-    V{ } clone inspector-stack set
+    V{ } clone inspector-stack namespaces:set
     (inspect) ;
 
 : inspect ( obj -- )

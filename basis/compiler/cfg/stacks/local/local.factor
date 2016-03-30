@@ -75,8 +75,8 @@ SYMBOLS: local-peek-set replaces ;
 : begin-local-analysis ( basic-block -- )
     height-state get dup reset-emits
     current-height rot record-stack-heights
-    HS{ } clone local-peek-set set
-    H{ } clone replaces set ;
+    HS{ } clone local-peek-set namespaces:set
+    H{ } clone replaces namespaces:set ;
 
 : remove-redundant-replaces ( replaces -- replaces' )
     [ [ loc>vreg ] dip = ] assoc-reject ;

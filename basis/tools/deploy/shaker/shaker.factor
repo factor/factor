@@ -619,7 +619,7 @@ SYMBOL: deploy-vocab
                     "ui.debugger" require
                 ] when
             ] unless
-            [ deploy-vocab set ] [ require ] [
+            [ deploy-vocab namespaces:set ] [ require ] [
                 vocab-main [
                     "Vocabulary has no MAIN: word." print flush 1 exit
                 ] unless

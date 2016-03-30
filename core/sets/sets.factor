@@ -3,6 +3,7 @@
 USING: assocs hashtables kernel math sequences vectors ;
 IN: sets
 
+! Set protocol
 MIXIN: set
 
 GENERIC: adjoin ( elt set -- )
