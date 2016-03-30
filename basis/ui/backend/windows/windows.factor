@@ -483,7 +483,7 @@ SYMBOL: nc-buttons
         drop
     ] [
         [ SetCapture drop ] keep
-        mouse-captured set
+        mouse-captured namespaces:set
     ] if ;
 
 : release-capture ( -- )
