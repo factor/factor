@@ -5,7 +5,7 @@
 USING: alien alien.c-types alien.data assocs colors
 combinators.smart continuations fry init io kernel locals macros
 math math.parser namespaces opengl.gl sequences
-sequences.generalizations specialized-arrays words ;
+sequences.generalizations specialized-arrays system words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
@@ -40,19 +40,31 @@ TUPLE: gl-error-tuple function code string ;
 : gl-error-code ( -- code/f )
     glGetError dup 0 = [ drop f ] when ; inline
 
+: throw-gl-error? ( -- ? )
+    os macosx? [
+        ! This is kind of terrible, but we are having
+        ! problems on Mac OS X 10.11 where the
+        ! default framebuffer seems to be initialized
+        ! asynchronously or something, so we should
+        ! just log these for now in (gl-error).
+        GL_FRAMEBUFFER glCheckFramebufferStatus
+        GL_FRAMEBUFFER_UNDEFINED = not
+    ] [ t ] if ;
+
 : (gl-error) ( function -- )
-    gl-error-code [ <gl-error> throw ] [ drop ] if* ;
+    gl-error-code [
+        throw-gl-error? [
+            <gl-error> throw
+        ] [
+            [
+                [ number>string ] [ error>string ] bi ": " glue
+                "OpenGL error: " prepend print flush drop
+            ] with-global
+        ] if
+    ] [ drop ] if* ;
 
 : gl-error ( -- )
     f (gl-error) ; inline
-
-: gl-error-nonfatal ( -- )
-    gl-error-code [
-        [
-            [ number>string ] [ error>string ] bi ": " glue
-            "OpenGL error: " prepend print flush
-        ] with-global
-    ] when* ;
 
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
