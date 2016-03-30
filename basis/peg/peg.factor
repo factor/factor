@@ -330,7 +330,7 @@ TUPLE: token-parser symbol ;
 : parse-token ( input string -- result )
     ! Parse the string, returning a parse result
     [ ?head-slice ] keep swap [
-        <parse-result> f f f add-error
+        <parse-result>
     ] [
         [ seq>> pos get swap ] dip "'" "'" surround 1vector add-error f
     ] if ;
