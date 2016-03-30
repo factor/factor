@@ -17,6 +17,8 @@ IN: mason.release.sign
 
 HOOK: cert-path os ( -- path/f )
 
+M: object cert-path f ;
+
 M: macosx cert-path
     home "config/mac_app.cer" append-path ;
 
