@@ -118,7 +118,7 @@ M: world request-focus-on ( child gadget -- )
 : new-world ( class -- world )
     vertical swap new-track
         t >>root?
-        0 >>active?
+        f >>active?
         { 0 0 } >>window-loc
         f >>grab-input?
         V{ } clone >>window-resources
@@ -177,7 +177,7 @@ M: world resize-world drop ;
 M: world dim<<
     [ call-next-method ]
     [
-        dup active?>> 100 = [
+        dup active?>> [
             dup handle>>
             [ [ set-gl-context ] [ resize-world ] bi ]
             [ drop ] if
@@ -197,7 +197,7 @@ M: world draw-world*
 : draw-world? ( world -- ? )
     ! We don't draw deactivated worlds, or those with 0 size.
     ! On Windows, the latter case results in GL errors.
-    { [ active?>> 100 = ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
+    { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
 
 TUPLE: world-error error world ;
 
@@ -217,7 +217,7 @@ ui-error-hook [ [ rethrow ] ] initialize
                 dup [ draw-world* ] with-gl-context
                 flush-layout-cache-hook get call( -- )
             ] [
-                swap 0 >>active? <world-error> ui-error
+                swap f >>active? <world-error> ui-error
             ] recover
         ] with-variable
     ] [ drop ] if ;
