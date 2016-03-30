@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators effects kernel lexer make namespaces
-parser sequences splitting words ;
+USING: arrays combinators continuations effects kernel lexer
+make parser sequences sets splitting vocabs.parser words ;
 IN: effects.parser
 
 DEFER: parse-effect
@@ -52,15 +52,19 @@ PRIVATE>
 : parse-call-paren ( accum word -- accum )
     [ ")" parse-effect ] dip 2array append! ;
 
-SYMBOL: in-definition
+CONSTANT: in-definition HS{ }
 
 ERROR: can't-nest-definitions word ;
 
-: check-in-definition ( -- )
-    in-definition get [ last-word can't-nest-definitions ] when ;
+: set-in-definition ( -- )
+    current-vocab in-definition ?adjoin
+    [ last-word can't-nest-definitions ] unless ;
+
+: unset-in-definition ( -- )
+    current-vocab in-definition delete ;
 
 : with-definition ( quot -- )
-    [ check-in-definition t in-definition ] dip with-variable ; inline
+    [ set-in-definition ] prepose [ unset-in-definition ] [ ] cleanup ; inline
 
 : (:) ( -- word def effect )
     [
