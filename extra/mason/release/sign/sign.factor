@@ -39,7 +39,7 @@ M:: macosx sign-factor-app ( -- )
 M:: windows sign-factor-app ( -- )
     { "factor.com" "factor.exe" } [
         [
-            {
+            ${
                 "signtool" "sign"
                 "/v"
                 "/f" cert-path
