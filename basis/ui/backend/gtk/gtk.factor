@@ -231,23 +231,23 @@ CONSTANT: action-key-codes
     ] when* ;
 
 :: connect-user-input-signals ( win -- )
-    win "motion-notify-event" [ on-motion ]
+    win "motion-notify-event" [ on-motion yield ]
     GtkWidget:motion-notify-event connect-signal
-    win "leave-notify-event" [ on-leave ]
+    win "leave-notify-event" [ on-leave yield ]
     GtkWidget:leave-notify-event connect-signal
-    win "button-press-event" [ on-button-press ]
+    win "button-press-event" [ on-button-press yield ]
     GtkWidget:button-press-event connect-signal
-    win "button-release-event" [ on-button-release ]
+    win "button-release-event" [ on-button-release yield ]
     GtkWidget:button-release-event connect-signal
-    win "scroll-event" [ on-scroll ]
+    win "scroll-event" [ on-scroll yield ]
     GtkWidget:scroll-event connect-signal
-    win "key-press-event" [ on-key-press/release ]
+    win "key-press-event" [ on-key-press/release yield ]
     GtkWidget:key-press-event connect-signal
-    win "key-release-event" [ on-key-press/release ]
+    win "key-release-event" [ on-key-press/release yield ]
     GtkWidget:key-release-event connect-signal
-    win "focus-in-event" [ on-focus-in ]
+    win "focus-in-event" [ on-focus-in yield ]
     GtkWidget:focus-in-event connect-signal
-    win "focus-out-event" [ on-focus-out ]
+    win "focus-out-event" [ on-focus-out yield ]
     GtkWidget:focus-out-event connect-signal ;
 
 ! Window state events
@@ -269,13 +269,13 @@ CONSTANT: action-key-codes
     2drop window ungraft t ;
 
 :: connect-win-state-signals ( win -- )
-    win "expose-event" [ on-expose ]
+    win "expose-event" [ on-expose yield ]
     GtkWidget:expose-event connect-signal
-    win "configure-event" [ on-configure ]
+    win "configure-event" [ on-configure yield ]
     GtkWidget:configure-event connect-signal
-    win "delete-event" [ on-delete ]
+    win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal
-    win "map-event" [ on-map ]
+    win "map-event" [ on-map yield ]
     GtkWidget:map-event connect-signal ;
 
 ! Input methods
@@ -327,22 +327,22 @@ CONSTANT: action-key-codes
     im win gtk_widget_get_window gtk_im_context_set_client_window
     im f gtk_im_context_set_use_preedit
 
-    im "commit" [ on-commit ]
+    im "commit" [ on-commit yield ]
     GtkIMContext:commit win connect-signal-with-data
-    im "retrieve-surrounding" [ on-retrieve-surrounding ]
+    im "retrieve-surrounding" [ on-retrieve-surrounding yield ]
     GtkIMContext:retrieve-surrounding win connect-signal-with-data
-    im "delete-surrounding" [ on-delete-surrounding ]
+    im "delete-surrounding" [ on-delete-surrounding yield ]
     GtkIMContext:delete-surrounding win connect-signal-with-data
 
-    win "key-press-event" [ im-on-key-event ]
+    win "key-press-event" [ im-on-key-event yield ]
     GtkWidget:key-press-event im connect-signal-with-data
-    win "key-release-event" [ im-on-key-event ]
+    win "key-release-event" [ im-on-key-event yield ]
     GtkWidget:key-release-event im connect-signal-with-data
-    win "focus-in-event" [ im-on-focus-in ]
+    win "focus-in-event" [ im-on-focus-in yield ]
     GtkWidget:focus-out-event im connect-signal-with-data
-    win "focus-out-event" [ im-on-focus-out ]
+    win "focus-out-event" [ im-on-focus-out yield ]
     GtkWidget:focus-out-event im connect-signal-with-data
-    win "destroy" [ im-on-destroy ]
+    win "destroy" [ im-on-destroy yield ]
     GtkObject:destroy im connect-signal-with-data ;
 
 ! Window controls
@@ -535,9 +535,6 @@ M:: gtk-ui-backend system-alert ( caption text -- )
         ] [ gtk_dialog_run drop ] bi
     ] with-destructors ;
 
-: <yield-callback> ( -- callback )
-    [ drop yield t ] GSourceFunc ;
-
 M: gtk-ui-backend (with-ui)
     [
         0 gint <ref> f void* <ref> gtk_init
@@ -546,12 +543,7 @@ M: gtk-ui-backend (with-ui)
         init-clipboard
         start-ui
         [
-            [
-                [
-                    <yield-callback> f g_idle_add drop
-                    gtk_main
-                ] with-timer
-            ] with-event-loop
+            [ [ gtk_main ] with-timer ] with-event-loop
         ] with-destructors
     ] ui-running ;
 
