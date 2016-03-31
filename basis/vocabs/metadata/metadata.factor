@@ -11,8 +11,13 @@ IN: vocabs.metadata
     dup find-vocab-root [ no-vocab ] unless ;
 
 MEMO: vocab-file-contents ( vocab name -- seq )
-    vocab-append-path dup
-    [ dup exists? [ utf8 file-lines ] [ drop f ] if ] when ;
+    vocab-append-path dup [
+        dup exists? [
+            utf8 file-lines harvest
+        ] [
+            drop f
+        ] if
+    ] when ;
 
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
@@ -24,7 +29,7 @@ MEMO: vocab-file-contents ( vocab name -- seq )
     vocab-dir "resources.txt" append-path ;
 
 : vocab-resources ( vocab -- patterns )
-    dup vocab-resources-path vocab-file-contents harvest ;
+    dup vocab-resources-path vocab-file-contents ;
 
 : set-vocab-resources ( patterns vocab -- )
     dup vocab-resources-path set-vocab-file-contents ;
@@ -59,7 +64,7 @@ M: vocab-link summary vocab-summary ;
     vocab-dir "tags.txt" append-path ;
 
 : vocab-tags ( vocab -- tags )
-    dup vocab-tags-path vocab-file-contents harvest ;
+    dup vocab-tags-path vocab-file-contents ;
 
 : set-vocab-tags ( tags vocab -- )
     dup vocab-tags-path set-vocab-file-contents ;
@@ -74,7 +79,7 @@ M: vocab-link summary vocab-summary ;
     vocab-dir "authors.txt" append-path ;
 
 : vocab-authors ( vocab -- authors )
-    dup vocab-authors-path vocab-file-contents harvest ;
+    dup vocab-authors-path vocab-file-contents ;
 
 : set-vocab-authors ( authors vocab -- )
     dup vocab-authors-path set-vocab-file-contents ;
@@ -85,7 +90,7 @@ M: vocab-link summary vocab-summary ;
 ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
-    dup vocab-platforms-path vocab-file-contents harvest
+    dup vocab-platforms-path vocab-file-contents
     [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
 
 : set-vocab-platforms ( platforms vocab -- )
