@@ -1,6 +1,6 @@
 USING: accessors assocs globs io.pathnames kernel memoize
 namespaces regexp sequences sorting splitting strings
-unicode.case xml xml.data xml.syntax xml.traversal xmode.loader
+unicode xml xml.data xml.syntax xml.traversal xmode.loader
 xmode.rules xmode.utilities ;
 IN: xmode.catalog
 

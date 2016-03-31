@@ -1,8 +1,7 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel fry make math sequences ui.text unicode.categories
-wrap ;
+USING: kernel fry make math sequences ui.text unicode wrap ;
 
 IN: pdf.wrap
 

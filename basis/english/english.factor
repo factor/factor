@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: assocs assocs.extras combinators formatting kernel literals
-locals math math.parser sequences splitting unicode.case ;
+locals math math.parser sequences splitting unicode ;
 
 IN: english
 

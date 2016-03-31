@@ -5,7 +5,7 @@ graphviz.dot images.viewer io.backend io.directories
 io.encodings.8-bit.latin1 io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.standard-paths
 kernel locals make namespaces sequences summary system threads
-unicode.case vocabs webbrowser words ;
+unicode vocabs webbrowser words ;
 IN: graphviz.render
 
 <PRIVATE

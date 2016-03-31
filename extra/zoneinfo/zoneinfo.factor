@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 combinators.smart fry io.encodings.utf8 io.files kernel
 math.parser math.statistics memoize namespaces sequences
-splitting unicode.case calendar arrays ;
+splitting unicode calendar arrays ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths

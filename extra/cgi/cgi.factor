@@ -3,7 +3,7 @@
 
 USING: arrays assocs combinators environment io kernel
 linked-assocs math.parser regexp sequences splitting strings
-unicode.case urls.encoding ;
+unicode urls.encoding ;
 
 IN: cgi
 

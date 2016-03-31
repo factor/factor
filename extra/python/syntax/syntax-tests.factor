@@ -3,7 +3,7 @@ fry io.files.temp kernel math namespaces python python.ffi
 python.modules.__builtin__ python.modules.argparse python.modules.datetime
 python.modules.os python.modules.os.path python.modules.sys
 python.modules.time python.objects python.syntax sets splitting tools.test
-unicode.categories ;
+unicode ;
 QUALIFIED-WITH: sequences s
 IN: python.syntax.tests
 

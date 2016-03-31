@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 fry html.parser http.client io kernel locals math math.statistics
-sequences sets splitting unicode.case unicode.categories urls
-urls.encoding shuffle ;
+sequences sets splitting unicode urls urls.encoding shuffle ;
 IN: html.parser.analyzer
 
 : scrape-html ( url -- response vector )

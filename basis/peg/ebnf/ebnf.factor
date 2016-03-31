@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 effects kernel make math math.parser multiline namespaces parser
 peg peg.parsers quotations sequences sequences.deep splitting
-stack-checker strings strings.parser summary unicode.categories
+stack-checker strings strings.parser summary unicode
 vocabs.parser words ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;

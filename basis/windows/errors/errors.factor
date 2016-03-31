@@ -1,5 +1,5 @@
 USING: alien.data kernel locals math math.bitwise
-windows.kernel32 sequences byte-arrays unicode.categories
+windows.kernel32 sequences byte-arrays unicode
 io.encodings.string alien.strings arrays literals
 windows.types specialized-arrays math.parser ;
 SPECIALIZED-ARRAY: TCHAR

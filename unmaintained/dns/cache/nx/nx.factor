@@ -1,6 +1,6 @@
 
 USING: kernel assocs locals combinators
-       math math.functions system unicode.case ;
+       math math.functions system unicode ;
 
 IN: dns.cache.nx
 

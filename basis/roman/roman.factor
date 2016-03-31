@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators.smart effects
 effects.parser fry generalizations grouping kernel lexer macros
 math math.order math.vectors namespaces parser quotations
 sequences sequences.private splitting.monotonic stack-checker
-strings unicode.case words ;
+strings unicode words ;
 IN: roman
 
 <PRIVATE

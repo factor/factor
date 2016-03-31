@@ -3,7 +3,7 @@
 USING: accessors arrays assocs continuations deques dlists fry
 io.backend io.directories io.files.info io.pathnames kernel
 kernel.private locals math sequences sequences.extras sorting
-strings system unicode.case vocabs ;
+strings system unicode vocabs ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )

@@ -3,7 +3,7 @@
 
 USING: arrays assocs combinators.short-circuit command-line
 environment io io.backend io.files io.files.info io.pathnames
-kernel namespaces sequences sets splitting system unicode.case ;
+kernel namespaces sequences sets splitting system unicode ;
 
 IN: tools.which
 

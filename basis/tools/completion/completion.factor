@@ -4,8 +4,8 @@ USING: accessors arrays assocs colors.constants combinators
 combinators.short-circuit fry io.directories io.files
 io.files.info io.pathnames kernel locals make math math.order
 sequences sequences.private sorting splitting
-splitting.monotonic unicode.categories unicode.data vectors
-vocabs vocabs.hierarchy ;
+splitting.monotonic unicode unicode.data vectors vocabs
+vocabs.hierarchy ;
 IN: tools.completion
 
 <PRIVATE

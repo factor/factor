@@ -9,7 +9,7 @@ sorting splitting timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 ui.gadgets.theme ui.gestures ui.pens.solid ui.render ui.text
-unicode.categories ;
+unicode ;
 EXCLUDE: fonts => selection ;
 IN: ui.gadgets.editors
 

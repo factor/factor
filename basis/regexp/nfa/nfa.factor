@@ -1,13 +1,11 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping kernel locals math namespaces
-sequences fry quotations math.order math.ranges vectors
-unicode.categories regexp.transition-tables words sets hashtables
-combinators.short-circuit unicode.data regexp.ast
-regexp.classes memoize ;
+USING: accessors arrays assocs combinators.short-circuit fry
+kernel locals math memoize namespaces regexp.ast regexp.classes
+regexp.transition-tables sequences sets unicode vectors ;
 IN: regexp.nfa
 
-! This uses unicode.data for ch>upper and ch>lower
+! This uses unicode for ch>upper and ch>lower
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
 

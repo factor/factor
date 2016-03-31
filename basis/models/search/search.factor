@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel models.arrow.smart sequences unicode.case ;
+USING: fry kernel models.arrow.smart sequences unicode ;
 IN: models.search
 
 : <search> ( values search quot -- model )

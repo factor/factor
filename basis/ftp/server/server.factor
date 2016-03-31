@@ -8,7 +8,7 @@ io.files io.files.info io.files.types io.pathnames
 io.servers io.sockets io.streams.string io.timeouts
 kernel logging math math.bitwise math.parser namespaces
 sequences simple-tokenizer splitting strings threads
-tools.files unicode.case ;
+tools.files unicode ;
 IN: ftp.server
 
 SYMBOL: server
