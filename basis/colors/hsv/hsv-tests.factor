@@ -1,4 +1,4 @@
-USING: accessors kernel colors colors.hsv tools.test math ;
+USING: accessors colors colors.hsv kernel math tools.test ;
 IN: colors.hsv.tests
 
 : hsv>rgb ( h s v -- r g b )

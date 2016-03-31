@@ -1,5 +1,4 @@
-USING: alien alien.libraries alien.syntax tools.test kernel ;
-IN: alien.libraries.tests
+USING: alien alien.libraries alien.syntax kernel tools.test ;
 
 { f } [ DLL" fadfasdfsada" dll-valid? ] unit-test
 

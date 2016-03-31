@@ -1,9 +1,6 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-USING: kernel tools.test math channels channels.private
-sequences threads sorting ;
-IN: channels.tests
+USING: channels kernel sequences sorting threads tools.test ;
 
 { V{ 10 } } [
     V{ } clone <channel>

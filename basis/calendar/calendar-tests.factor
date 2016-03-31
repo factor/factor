@@ -1,7 +1,5 @@
-USING: arrays calendar kernel math sequences tools.test
-continuations system math.order threads accessors
-random ;
-IN: calendar.tests
+USING: accessors kernel math.order random threads tools.test ;
+IN: calendar
 
 { f } [ 2004 12 32 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
 { f } [ 2004  2 30 0   0  0 instant <timestamp> valid-timestamp? ] unit-test

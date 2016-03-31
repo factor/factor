@@ -1,7 +1,6 @@
-USING: alien alien.syntax alien.c-types alien.parser
-eval kernel tools.test sequences system libc alien.strings
-io.encodings.ascii io.encodings.utf8 math.constants classes.struct classes
-accessors compiler.units ;
+USING: accessors alien.c-types alien.syntax classes
+classes.struct compiler.units eval io.encodings.ascii kernel
+math.constants tools.test ;
 FROM: alien.c-types => short ;
 IN: alien.c-types.tests
 

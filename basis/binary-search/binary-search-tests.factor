@@ -1,5 +1,4 @@
-USING: binary-search math.order sequences kernel tools.test ;
-IN: binary-search.tests
+USING: binary-search kernel math.order sequences tools.test ;
 
 { f } [ 3 { } [ <=> ] with search drop ] unit-test
 { 0 } [ 3 { 3 } [ <=> ] with search drop ] unit-test

@@ -1,6 +1,5 @@
-USING: alien sequences sequences.private arrays bit-arrays kernel
-tools.test math random ;
-IN: bit-arrays.tests
+USING: alien arrays bit-arrays kernel math random sequences
+sequences.private tools.test ;
 
 [ -1 <bit-array> ] [ T{ bad-array-length f -1 } = ] must-fail-with
 

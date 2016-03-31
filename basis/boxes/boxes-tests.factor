@@ -1,5 +1,4 @@
-USING: boxes namespaces tools.test accessors ;
-IN: boxes.tests
+USING: accessors boxes namespaces tools.test ;
 
 { } [ <box> "b" set ] unit-test
 

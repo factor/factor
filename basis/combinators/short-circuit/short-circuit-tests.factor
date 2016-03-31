@@ -1,4 +1,5 @@
-USING: kernel math tools.test combinators.short-circuit accessors ;
+USING: accessors combinators.short-circuit kernel math
+tools.test ;
 IN: combinators.short-circuit.tests
 
 { 3 } [ { [ 1 ] [ 2 ] [ 3 ] } 0&& ] unit-test
