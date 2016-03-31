@@ -50,4 +50,8 @@ $nl
 "The bootstrap process can be customized with command-line switches."
 { $see-also "runtime-cli-args" "bootstrap-cli-args" } ;
 
-ABOUT: "bootstrap.image"
+HELP: make-image
+{ $values { "arch" string } }
+{ $description "Creates a bootstrap image from sources, where " { $snippet "architecture" } " is one of the following:"
+{ $code "x86.32" "unix-x86.64" "windows-x86.64" "linux-ppc" }
+"The new image file is written to the " { $link user-resource-path } " and is named " { $snippet "boot." { $emphasis "architecture" } ".image" } "." } ;

@@ -8,7 +8,7 @@ strings threads ;
 IN: logging.server
 
 : log-root ( -- string )
-    \ log-root get-global [ "logs" resource-path ] unless* ;
+    \ log-root get-global [ "logs" user-resource-path ] unless* ;
 
 : log-path ( service -- path )
     log-root prepend-path ;

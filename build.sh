@@ -641,6 +641,7 @@ refresh_image() {
 make_boot_image() {
     ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
     check_ret factor
+    mv ~/.factor/$BOOT_IMAGE .
 }
 
 install_deps_apt_get() {

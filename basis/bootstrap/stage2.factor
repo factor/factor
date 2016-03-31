@@ -21,8 +21,8 @@ SYMBOL: bootstrap-time
     ] when ;
 
 : default-image-name ( -- string )
-    vm-path file-name os windows? [ "." split1-last drop ] when
-    ".image" append resource-path ;
+    vm file-name os windows? [ "." split1-last drop ] when
+    ".image" append site-resource-path ;
 
 : load-component ( name -- )
     dup "* Loading the " write write " component" print

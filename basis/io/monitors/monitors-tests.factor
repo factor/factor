@@ -79,8 +79,8 @@ os { windows linux macosx } member? [
     ] with-monitors
 
     ! Out-of-scope disposal should not fail
-    [ ] [ [ "" resource-path f <monitor> ] with-monitors dispose ] unit-test
-    [ ] [ [ "" resource-path t <monitor> ] with-monitors dispose ] unit-test
+    [ ] [ [ "" site-resource-path f <monitor> ] with-monitors dispose ] unit-test
+    [ ] [ [ "" site-resource-path t <monitor> ] with-monitors dispose ] unit-test
 
     ! Timeouts
     [

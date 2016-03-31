@@ -4,9 +4,9 @@ USING: accessors arrays assocs byte-arrays classes classes.builtin
 classes.private classes.tuple classes.tuple.private combinators
 combinators.short-circuit combinators.smart
 compiler.codegen.relocation compiler.units fry generic
-generic.single.private grouping hashtables hashtables.private io
-io.binary io.encodings.binary io.files io.pathnames kernel
-kernel.private layouts locals make math math.order namespaces
+generic.single.private grouping hashtables hashtables.private
+io io.binary io.directories io.encodings.binary io.files io.pathnames
+kernel kernel.private layouts locals make math math.order namespaces
 namespaces.private parser parser.notes prettyprint quotations
 sequences sequences.private source-files strings system vectors
 vocabs words ;
@@ -520,9 +520,10 @@ M: quotation prepare-object
 
 : write-image ( image -- )
     "Writing image to " write
-    architecture get boot-image-name resource-path
+    architecture get boot-image-name user-resource-path
+    [ parent-directory make-directories ]
     [ write "..." print flush ]
-    [ binary [ (write-image) ] with-file-writer ] bi ;
+    [ binary [ (write-image) ] with-file-writer ] tri ;
 
 PRIVATE>
 

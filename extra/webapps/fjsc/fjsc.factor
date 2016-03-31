@@ -80,8 +80,8 @@ TUPLE: fjsc < dispatcher ;
 
 : <fjsc> ( -- fjsc )
     dispatcher new-dispatcher
-        "extra/webapps/fjsc/www" resource-path <static> "static" add-responder
-        "extra/fjsc/resources" resource-path <static> "fjsc" add-responder
+        "extra/webapps/fjsc/www" site-resource-path <static> "static" add-responder
+        "extra/fjsc/resources" site-resource-path <static> "fjsc" add-responder
         fjsc new-dispatcher
             <main-action> "" add-responder
             <compile-action> "compile" add-responder
