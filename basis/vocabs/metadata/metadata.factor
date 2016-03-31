@@ -85,7 +85,7 @@ M: vocab-link summary vocab-summary ;
 ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
-    dup vocab-platforms-path vocab-file-contents
+    dup vocab-platforms-path vocab-file-contents harvest
     [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
 
 : set-vocab-platforms ( platforms vocab -- )
