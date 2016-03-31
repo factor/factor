@@ -150,8 +150,8 @@ HELP: bitand
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in both inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "0b101 0b10 bitand .b" "0" }
-    { $example "USING: math prettyprint ;" "0b110 0b10 bitand .b" "10" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitand .b" "0b0" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitand .b" "0b10" }
 }
 { $notes "This word implements bitwise and, so applying it to booleans will throw an error. Boolean and is the " { $link and } " word." } ;
 
@@ -159,8 +159,8 @@ HELP: bitor
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in at least one of the inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "0b101 0b10 bitor .b" "111" }
-    { $example "USING: math prettyprint ;" "0b110 0b10 bitor .b" "110" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitor .b" "0b111" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitor .b" "0b110" }
 }
 { $notes "This word implements bitwise inclusive or, so applying it to booleans will throw an error. Boolean inclusive or is the " { $link and } " word." } ;
 
@@ -168,15 +168,15 @@ HELP: bitxor
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in exactly one of the inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "0b101 0b10 bitxor .b" "111" }
-    { $example "USING: math prettyprint ;" "0b110 0b10 bitxor .b" "100" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitxor .b" "0b111" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitxor .b" "0b100" }
 }
 { $notes "This word implements bitwise exclusive or, so applying it to booleans will throw an error. Boolean exclusive or is the " { $link xor } " word." } ;
 
 HELP: shift
 { $values { "x" integer } { "n" integer } { "y" integer } }
 { $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits “falling off” the right hand side and being discarded." }
-{ $examples { $example "USING: math prettyprint ;" "0b101 5 shift .b" "10100000" } { $example "USING: math prettyprint ;" "0b11111 -2 shift .b" "111" } } ;
+{ $examples { $example "USING: math prettyprint ;" "0b101 5 shift .b" "0b10100000" } { $example "USING: math prettyprint ;" "0b11111 -2 shift .b" "111" } } ;
 
 HELP: bitnot
 { $values { "x" integer } { "y" integer } }
