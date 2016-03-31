@@ -48,8 +48,6 @@ IN: bootstrap.syntax
         "Call stack literals are not supported" throw
     ] define-core-syntax
 
-    "!" [ lexer get next-line ] define-core-syntax
-
     "IN:" [ scan-token set-current-vocab ] define-core-syntax
 
     "<PRIVATE" [ begin-private ] define-core-syntax
