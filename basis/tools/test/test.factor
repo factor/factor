@@ -130,10 +130,8 @@ PRIVATE>
         test-failures get current-test-file get +test-failure+ delete-file-errors
         '[ _ run-file ] [
             restartable-tests? get
-            [ dup compute-restarts empty? not ] [ f ] if [
-                "Continue running tests" over 2array 1array
-                rethrow-restarts
-            ] when [ file-failure ] when*
+            [ dup compute-restarts empty? not ] [ f ] if
+            [ rethrow ] [ file-failure ] if
         ] recover
     ] with-variable ;
 
