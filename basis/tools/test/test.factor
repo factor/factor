@@ -31,6 +31,9 @@ T{ error-type-holder
 SYMBOL: verbose-tests?
 t verbose-tests? set-global
 
+SYMBOL: restartable-tests?
+t restartable-tests? set-global
+
 : <test-failure> ( error experiment path line# -- test-failure )
     test-failure new
         swap >>line#
@@ -41,7 +44,7 @@ t verbose-tests? set-global
 
 <PRIVATE
 
-: failure ( error experiment file line# -- )
+: failure ( error experiment path line# -- )
     "--> test failed!" print
     <test-failure> test-failures get push
     notify-error-observers ;
@@ -126,11 +129,11 @@ PRIVATE>
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
         '[ _ run-file ] [
-            dup compute-restarts empty? [
-                file-failure
-            ] [
-                rethrow
-            ] if
+            restartable-tests? get
+            [ dup compute-restarts empty? not ] [ f ] if [
+                "Continue running tests" over 2array 1array
+                rethrow-restarts
+            ] when [ file-failure ] when*
         ] recover
     ] with-variable ;
 
