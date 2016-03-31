@@ -81,7 +81,7 @@ IN: bootstrap.syntax
     "f" [ f suffix! ] define-core-syntax
 
     "CHAR:" [
-        scan-token {
+        lexer get parse-raw [ "token" throw-unexpected-eof ] unless* {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape >string "" assert= ] }
             [ name>char-hook get call( name -- char ) ]
