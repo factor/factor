@@ -5,7 +5,7 @@ classes combinators combinators.short-circuit fry hashtables
 help.markup interpolate io io.directories io.encodings.utf8
 io.files io.pathnames io.streams.string kernel math math.parser
 namespaces prettyprint quotations sequences sets sorting
-splitting strings system timers unicode.categories urls vocabs
+splitting strings system timers unicode urls vocabs
 vocabs.loader vocabs.metadata words words.symbol ;
 IN: tools.scaffold
 

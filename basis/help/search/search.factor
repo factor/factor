@@ -4,8 +4,8 @@
 USING: arrays assocs combinators combinators.short-circuit fry
 help help.apropos help.markup help.stylesheet help.topics io
 io.streams.string io.styles kernel math memoize namespaces
-sequences sequences.deep sorting splitting strings unicode.case
-unicode.categories words ;
+sequences sequences.deep sorting splitting strings unicode
+words ;
 
 IN: help.search
 

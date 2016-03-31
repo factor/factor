@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences assocs accessors splitting
-unicode.case urls http http.server http.server.responses ;
+unicode urls http http.server http.server.responses ;
 IN: http.server.dispatchers
 
 TUPLE: dispatcher default responders ;

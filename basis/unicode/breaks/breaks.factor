@@ -1,11 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.syntax arrays assocs combinators
-combinators.short-circuit compiler.units fry interval-maps io
-io.encodings.ascii io.files kernel literals locals make math
-math.parser math.ranges memoize namespaces parser sequences
-sets simple-flat-file splitting unicode.categories
-unicode.categories.syntax unicode.data unicode.normalize
+USING: accessors arrays assocs combinators fry interval-maps
+kernel literals locals math namespaces parser sequences
+simple-flat-file unicode.categories unicode.data
 unicode.normalize.private words words.constant ;
 IN: unicode.breaks
 
@@ -104,38 +101,6 @@ define-constant
 
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
-
-PRIVATE>
-
-: first-grapheme ( str -- i )
-    unclip-slice grapheme-class over
-    [ grapheme-class [ nip ] [ grapheme-break? ] 2bi ] find drop
-    nip swap length or 1 + ;
-
-: first-grapheme-from ( start str -- i )
-    over tail-slice first-grapheme + ;
-
-: last-grapheme ( str -- i )
-    unclip-last-slice grapheme-class swap
-    [ grapheme-class dup rot grapheme-break? ] find-last drop ?1+ nip ;
-
-: last-grapheme-from ( end str -- i )
-    swap head-slice last-grapheme ;
-
-<PRIVATE
-
-: >pieces ( str quot: ( str -- i ) -- graphemes )
-    [ dup empty? not ] swap '[ dup @ cut-slice swap ] produce nip ; inline
-
-PRIVATE>
-
-: >graphemes ( str -- graphemes )
-    [ first-grapheme ] >pieces ;
-
-: string-reverse ( str -- rts )
-    >graphemes reverse! concat ;
-
-<PRIVATE
 
 ! Word breaks
 <<
@@ -253,37 +218,3 @@ define-constant
     ] if ;
 
 PRIVATE>
-
- : first-word ( str -- i )
-    [ [ length ] [ first word-break-prop ] bi ] keep
-    1 swap dup '[ _ word-break-next ] find-index-from
-    drop nip swap or ;
-
-: >words ( str -- words )
-    [ first-word ] >pieces ;
-
-<PRIVATE
-
-: nth-next ( i str -- str[i-1] str[i] )
-    [ [ 1 - ] keep ] dip '[ _ nth ] bi@ ;
-
-PRIVATE>
-
-: word-break-at? ( i str -- ? )
-    {
-        [ drop zero? ]
-        [ length = ]
-        [
-            [ nth-next [ word-break-prop ] dip ] 2keep
-            word-break-next nip
-        ]
-    } 2|| ;
-
-: first-word-from ( start str -- i )
-    over tail-slice first-word + ;
-
-: last-word ( str -- i )
-    [ length iota ] keep '[ _ word-break-at? ] find-last drop 0 or ;
-
-: last-word-from ( end str -- i )
-    swap head-slice last-word ;

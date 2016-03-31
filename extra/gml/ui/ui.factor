@@ -5,7 +5,7 @@ io.pathnames io.streams.string kernel locals models namespaces
 sequences ui ui.gadgets ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.labels
 ui.gadgets.packs ui.gadgets.scrollers ui.gadgets.worlds
-ui.gadgets.tables ui.gadgets.labeled unicode.case ;
+ui.gadgets.tables ui.gadgets.labeled unicode ;
 FROM: gml => gml ;
 IN: gml.ui
 

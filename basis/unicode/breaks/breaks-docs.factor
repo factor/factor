@@ -1,4 +1,4 @@
-USING: help.syntax help.markup strings ;
+USING: help.syntax help.markup strings unicode ;
 IN: unicode.breaks
 
 ABOUT: "unicode.breaks"

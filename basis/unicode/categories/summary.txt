@@ -1,1 +1,1 @@
-Unicode character categories
+Parsing words used by Unicode implementation

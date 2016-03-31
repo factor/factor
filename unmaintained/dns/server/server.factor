@@ -1,6 +1,6 @@
 
 USING: kernel combinators sequences sets math threads namespaces continuations
-       debugger io io.sockets unicode.case accessors destructors
+       debugger io io.sockets unicode accessors destructors
        combinators.short-circuit combinators.smart
        fry arrays
        dns dns.util dns.misc ;

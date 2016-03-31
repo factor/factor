@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.smart csv io.encodings.8-bit
-math.parser memoize sequences kernel unicode.categories money
+math.parser memoize sequences kernel unicode money
 io.encodings.8-bit.latin1 ;
 IN: geobytes
 

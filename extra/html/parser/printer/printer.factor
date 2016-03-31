@@ -1,6 +1,6 @@
 USING: accessors assocs combinators html.parser
 html.parser.utils io io.streams.string kernel math math.order
-namespaces sequences strings unicode.categories ;
+namespaces sequences strings unicode ;
 IN: html.parser.printer
 
 TUPLE: html-printer ;

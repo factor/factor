@@ -4,8 +4,7 @@ USING: accessors arrays assocs calendar combinators
 combinators.smart fry generalizations io io.streams.string
 kernel macros math math.functions math.parser namespaces
 peg.ebnf present prettyprint quotations sequences
-sequences.generalizations strings unicode.case
-unicode.categories vectors ;
+sequences.generalizations strings unicode vectors ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 

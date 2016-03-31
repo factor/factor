@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order words combinators
-combinators.smart combinators.short-circuit locals
-unicode.categories sequences fry macros arrays assocs sets
-classes unicode.script unicode.data ;
+USING: accessors arrays assocs classes combinators
+combinators.short-circuit combinators.smart fry kernel locals
+math math.order sequences sets unicode unicode.data ;
 FROM: ascii => ascii? ;
 IN: regexp.classes
 

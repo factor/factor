@@ -3,8 +3,7 @@
 USING: accessors arrays assocs fry help.markup help.topics io
 kernel make math math.parser namespaces sequences sorting
 summary tools.completion vocabs.hierarchy help.vocabs
-vocabs words unicode.case help unicode.categories
-combinators locals ;
+vocabs words unicode help combinators locals ;
 IN: help.apropos
 
 : $completions ( seq -- )

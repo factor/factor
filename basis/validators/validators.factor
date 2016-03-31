@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations hashtables kernel
 make math math.functions math.parser math.ranges namespaces
-quotations regexp sequences sets unicode.case unicode.categories
-words xmode.catalog ;
+quotations regexp sequences sets unicode words xmode.catalog ;
 IN: validators
 
 : v-checkbox ( str -- ? )

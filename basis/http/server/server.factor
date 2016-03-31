@@ -19,7 +19,7 @@ io.servers
 io.timeouts
 io.crlf
 fry logging logging.insomniac calendar urls
-unicode.categories
+unicode
 http
 http.server.requests
 http.server.responses

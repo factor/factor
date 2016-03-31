@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel lists lists.lazy tools.test strings math
-sequences parser-combinators arrays math.parser unicode.categories ;
+sequences parser-combinators arrays math.parser unicode ;
 IN: parser-combinators.tests
 
 ! Testing <&>

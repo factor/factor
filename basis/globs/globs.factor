@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.short-circuit
 io.directories io.files io.files.info io.pathnames kernel locals
 make peg.ebnf regexp regexp.combinators sequences splitting
-strings system unicode.case ;
+strings system unicode ;
 IN: globs
 
 : not-path-separator ( -- sep )

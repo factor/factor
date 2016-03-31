@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel strings assocs sequences hashtables
-sorting unicode.case unicode.categories sets ;
+sorting unicode sets ;
 IN: xmode.keyword-map
 
 ! Based on org.gjt.sp.jedit.syntax.KeywordMap

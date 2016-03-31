@@ -3,8 +3,7 @@
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units effects.parser fry
 generalizations kernel locals make math math.order namespaces
-quotations sequences sets splitting unicode.categories vectors
-words ;
+quotations sequences sets splitting unicode vectors words ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;

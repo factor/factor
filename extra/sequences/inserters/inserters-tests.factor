@@ -1,6 +1,6 @@
 ! (c)2010 Joe Groff bsd license
 USING: assocs kernel sequences sequences.inserters tools.test
-unicode.case ;
+unicode ;
 IN: sequences.inserters.tests
 
 { V{ 1 2 "Three" "Four" "Five" } } [

@@ -89,23 +89,6 @@ HINTS: (nfd) string ;
 
 HINTS: (nfkd) string ;
 
-PRIVATE>
-
-: nfd ( string -- nfd )
-    [ (nfd) ] with-string ;
-
-: nfkd ( string -- nfkd )
-    [ (nfkd) ] with-string ;
-
-: string-append ( s1 s2 -- string )
-    [ append ] keep
-    0 over ?nth non-starter?
-    [ length dupd reorder-back ] [ drop ] if ;
-
-HINTS: string-append string string ;
-
-<PRIVATE
-
 ! Normalization -- Composition
 
 : initial-medial? ( str i -- ? )
@@ -189,9 +172,3 @@ DEFER: compose-iter
 HINTS: combine string ;
 
 PRIVATE>
-
-: nfc ( string -- nfc )
-    [ (nfd) combine ] with-string ;
-
-: nfkc ( string -- nfkc )
-    [ (nfkd) combine ] with-string ;

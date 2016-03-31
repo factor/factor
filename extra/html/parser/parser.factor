@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables sequences.parser
 html.parser.utils kernel namespaces sequences make math
-unicode.case unicode.categories combinators.short-circuit
-quoting fry ;
+unicode combinators.short-circuit quoting fry ;
 IN: html.parser
 
 TUPLE: tag name attributes text closing? ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors regexp.classes math.bits assocs sequences
-arrays sets regexp.dfa math fry regexp.minimize regexp.ast
-locals regexp.transition-tables ;
+USING: accessors arrays assocs fry kernel locals math math.bits
+regexp.ast regexp.classes regexp.transition-tables sequences
+sets ;
 IN: regexp.disambiguate
 
 TUPLE: parts in out ;

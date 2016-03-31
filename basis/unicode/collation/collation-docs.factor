@@ -1,5 +1,5 @@
 USING: byte-arrays help.syntax help.markup kernel math.order
-strings ;
+strings unicode ;
 IN: unicode.collation
 
 ARTICLE: "unicode.collation" "Collation and weak comparison"

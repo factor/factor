@@ -5,7 +5,7 @@ compiler.units continuations debugger effects fry
 generalizations io kernel lexer locals macros namespaces parser
 prettyprint quotations sequences sequences.generalizations
 source-files source-files.errors source-files.errors.debugger
-splitting stack-checker summary tools.errors unicode.case vocabs
+splitting stack-checker summary tools.errors unicode vocabs
 vocabs.files vocabs.metadata vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test

@@ -3,8 +3,8 @@
 USING: sequences.parser io io.encodings.utf8 io.files
 io.streams.string kernel combinators accessors io.pathnames
 fry sequences arrays locals namespaces io.directories
-assocs math splitting make unicode.categories
-combinators.short-circuit c.lexer ;
+assocs math splitting make unicode combinators.short-circuit
+c.lexer ;
 IN: c.preprocessor
 
 : initial-library-paths ( -- seq )

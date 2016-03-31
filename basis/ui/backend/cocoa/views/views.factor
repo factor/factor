@@ -7,7 +7,7 @@ cocoa.views combinators core-foundation.strings core-graphics
 core-graphics.types core-text io.encodings.utf8 kernel literals
 locals math math.rectangles namespaces opengl sequences threads
 ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.private unicode.case ;
+ui.private unicode ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )

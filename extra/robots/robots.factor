@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar.format combinators
 combinators.short-circuit fry globs http.client kernel make
 math.parser multiline namespaces present regexp
 regexp.combinators sequences sets splitting splitting.monotonic
-unicode.case unicode.categories urls ;
+unicode urls ;
 IN: robots
 
 ! visit-time is GMT, request-rate is pages/second

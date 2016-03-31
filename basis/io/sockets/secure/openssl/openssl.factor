@@ -7,7 +7,7 @@ io.binary io.buffers io.encodings.8-bit.latin1 io.encodings.utf8
 io.files io.pathnames io.ports io.sockets io.sockets.secure
 io.timeouts kernel libc locals math math.functions math.order
 math.parser memoize namespaces openssl openssl.libcrypto
-openssl.libssl random sequences sets splitting unicode.case ;
+openssl.libssl random sequences sets splitting unicode ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )

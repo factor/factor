@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel math sequences
-unicode.categories strings ;
+unicode strings ;
 IN: peg.parsers
 
 HELP: 1token
