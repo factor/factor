@@ -94,9 +94,22 @@ M: lexer skip-word
 : still-parsing-line? ( lexer -- ? )
     check-lexer [ column>> ] [ line-length>> ] bi < ;
 
-DEFER: parse-token
+: (parse-raw) ( lexer -- str )
+    check-lexer {
+        [ column>> ]
+        [ skip-word ]
+        [ column>> ]
+        [ line-text>> ]
+    } cleave subseq ;
 
-<PRIVATE
+: parse-raw ( lexer -- str/f )
+    dup still-parsing? [
+        dup skip-blank
+        dup still-parsing-line?
+        [ (parse-raw) ] [ dup next-line parse-raw ] if
+    ] [ drop f ] if ;
+
+DEFER: parse-token
 
 : skip-comments ( lexer str -- str' )
     dup "!" = [
@@ -105,22 +118,8 @@ DEFER: parse-token
         nip
     ] if ;
 
-PRIVATE>
-
-: (parse-token) ( lexer -- str )
-    dup check-lexer {
-        [ column>> ]
-        [ skip-word ]
-        [ column>> ]
-        [ line-text>> ]
-    } cleave subseq skip-comments ;
-
 : parse-token ( lexer -- str/f )
-    dup still-parsing? [
-        dup skip-blank
-        dup still-parsing-line?
-        [ (parse-token) ] [ dup next-line parse-token ] if
-    ] [ drop f ] if ;
+    dup parse-raw [ skip-comments ] [ drop f ] if* ;
 
 : ?scan-token ( -- str/f ) lexer get parse-token ;
 
