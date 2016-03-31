@@ -1,4 +1,4 @@
-USING: io io.files splitting grouping unicode.collation
+USING: io io.files splitting grouping unicode
 sequences kernel io.encodings.utf8 math.parser math.order
 tools.test assocs words ;
 IN: unicode.collation.tests
