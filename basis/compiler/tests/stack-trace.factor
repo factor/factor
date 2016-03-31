@@ -1,8 +1,6 @@
-USING: accessors combinators combinators.short-circuit compiler
-continuations continuations.private fry generic generic.hook
-grouping io.backend io.encodings.utf8 io.files io.files.temp
-kernel kernel.private math namespaces parser sequences sorting
-splitting tools.test vocabs words ;
+USING: accessors combinators continuations grouping io.backend
+io.encodings.utf8 io.files io.files.temp io.files.unique kernel
+math namespaces parser sequences tools.test ;
 IN: compiler.tests.stack-trace
 
 : symbolic-stack-trace ( -- newseq )
@@ -41,6 +39,10 @@ IN: compiler.tests.stack-trace
 
 ! #1265: Used to crash factor if compiled in debug mode.
 [
-    "USING: continuations io.backend ; [ normalize-path ] ignore-errors f"
-    "weird.factor" temp-file [ utf8 set-file-contents ] keep run-file
+    [
+        "compiler-run-file" "-test" [
+            "USING: continuations io.backend ; [ normalize-path ] ignore-errors f"
+            swap [ utf8 set-file-contents ] keep run-file
+        ] cleanup-unique-file
+    ] with-temp-directory
 ] [ wrong-values? ] must-fail-with
