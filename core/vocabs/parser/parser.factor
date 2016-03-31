@@ -192,7 +192,7 @@ TUPLE: ambiguous-use-error name words ;
     [ (vocab-search-qualified) ] [ (vocab-search) ] 2bi append ;
 
 : vocab-search ( name manifest -- word/f )
-    dupd search-vocabs>> (vocab-search-full) dup length {
+    dupd search-vocabs>> sift (vocab-search-full) dup length {
         { 0 [ 2drop f ] }
         { 1 [ first nip ] }
         [
