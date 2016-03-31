@@ -191,6 +191,22 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
+{ URL" http://localhost:3128" } [
+    { { "http.proxy" "localhost:3128" } } [
+       "google.com" "GET" <client-request> ?default-proxy proxy-url>>
+    ] with-variables
+] unit-test
+
+{ URL" http://localhost:3128" } [
+    "google.com" "GET" <client-request>
+    URL" localhost:3128" >>proxy-url ?default-proxy proxy-url>>
+] unit-test
+
+{ URL" http://localhost:3128" } [
+    "google.com" "GET" <client-request>
+    "localhost:3128" >>proxy-url ?default-proxy proxy-url>>
+] unit-test
+
 { URL" http://proxysec.private:3128" } [
     classic-proxy-settings [
        "https://google.com" "GET" <client-request> ?default-proxy proxy-url>>

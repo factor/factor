@@ -204,10 +204,20 @@ SYMBOL: redirects
         [ "HTTP_PROXY" os-env ] unless*
     ] if ;
 
+: misparsed-url? ( url -- url' )
+    [ protocol>> not ] [ host>> not ] [ path>> ]
+    tri and and ;
+
+: request-url ( url -- url' )
+    dup >url dup misparsed-url? [
+        drop dup url? [ present ] when
+        "http://" prepend >url
+    ] [ nip ] if ensure-port ;
+
 : ?default-proxy ( request -- request' )
     dup get-default-proxy
-    over proxy-url>> 2dup and [
-        pick no-proxy? [ nip ] [ [ >url ] dip derive-url ] if
+    over proxy-url>> dup [ request-url ] when 2dup and [
+        pick no-proxy? [ nip ] [ [ request-url ] dip derive-url ] if
     ] [ nip ] if check-proxy ;
 
 : (with-http-request) ( request quot: ( chunk -- ) -- response )
@@ -236,16 +246,6 @@ SYMBOL: redirects
         ] with-disposal
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
-
-: misparsed-url? ( url -- url' )
-    [ protocol>> not ] [ host>> not ] [ path>> ]
-    tri and and ;
-
-: request-url ( url -- url' )
-    dup >url dup misparsed-url? [
-        drop dup url? [ present ] when
-        "http://" prepend >url
-    ] [ nip ] if ensure-port ;
 
 : <client-request> ( url method -- request )
     <request>
