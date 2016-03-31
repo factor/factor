@@ -7,7 +7,7 @@ IN: mason.release.sign
 <<
 ! Two cases to allow signing in mason or in the UI
 : make-factor-path ( path -- path )
-    build-dir get [
+    build-dir [
         ! In a build, make dir: "build-dir/factor/factor.com"
         [ "factor/" prepend-path ] dip prepend-path
     ] [
@@ -35,8 +35,9 @@ M:: macosx sign-factor-app ( -- )
         "codesign" "--force" "--sign"
         "Developer ID Application"
         cert-path
-        "Factor.app/" make-factor-path
-    } short-running-process ;
+    }
+    "Factor.app/" make-factor-path suffix
+    short-running-process ;
 
 M:: windows sign-factor-app ( -- )
     { "factor.com" "factor.exe" } [
