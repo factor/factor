@@ -1,4 +1,4 @@
-USING: tools.test unicode.breaks sequences math kernel splitting
+USING: tools.test unicode sequences math kernel splitting
 unicode.categories io.pathnames io.encodings.utf8 io.files
 strings quotations math.parser locals ;
 IN: unicode.breaks.tests

@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: unicode.case tools.test namespaces strings unicode.normalize
+USING: unicode tools.test namespaces strings unicode.case
 unicode.case.private ;
-IN: unicode.case.tests
 
 { "Hello How Are You? I'm Good" } [ "hEllo how ARE yOU? I'm good" >title ] unit-test
 { "FUSS" } [ "Fu\u0000DF" >upper ] unit-test
