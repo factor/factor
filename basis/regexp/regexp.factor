@@ -211,7 +211,7 @@ PRIVATE>
     dup still-parsing-line? [ (parse-raw) ] [ drop f ] if ;
 
 : parse-regexp ( accum -- accum )
-    lexer get [ take-until ] [ parse-noblank-token ] bi
+    lexer get [ take-until "\\/" "/" replace ] [ parse-noblank-token ] bi
     <optioned-regexp> compile-next-match suffix! ;
 
 PRIVATE>
