@@ -1,5 +1,4 @@
-USING: ascii tools.test sequences kernel math strings ;
-IN: ascii.tests
+USING: ascii kernel math sequences strings tools.test ;
 
 { t } [ CHAR: a letter? ] unit-test
 { f } [ CHAR: A letter? ] unit-test

@@ -1,7 +1,6 @@
-USING: alien.c-types cocoa cocoa.messages cocoa.subclassing
-cocoa.types compiler.test kernel namespaces cocoa.classes
-cocoa.runtime tools.test memory compiler.units math
-core-graphics.types ;
+USING: alien.c-types cocoa cocoa.classes cocoa.subclassing
+cocoa.types compiler.test core-graphics.types kernel math memory
+namespaces tools.test ;
 IN: cocoa.tests
 
 CLASS: Foo < NSObject

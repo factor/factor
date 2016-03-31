@@ -1,9 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors bitstreams io io.streams.string kernel tools.test
-grouping compression.lzw multiline byte-arrays io.encodings.binary
-io.streams.byte-array ;
-IN: bitstreams.tests
+USING: accessors bitstreams kernel tools.test ;
 
 { 0b1111111111 }
 [

@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test checksums.interleave checksums.sha ;
-IN: checksums.interleave.tests
+USING: checksums.interleave checksums.sha tools.test ;
 
 {
     B{

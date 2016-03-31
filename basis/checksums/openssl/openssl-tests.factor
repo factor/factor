@@ -1,6 +1,5 @@
 USING: accessors byte-arrays checksums checksums.openssl
 combinators.short-circuit kernel system tools.test ;
-IN: checksums.openssl.tests
 
 {
     B{ 201 238 222 100 92 200 182 188 138 255 129 163 115 88 240 136 }

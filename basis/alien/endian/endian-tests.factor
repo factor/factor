@@ -1,8 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.endian classes.struct io
-io.encodings.binary io.streams.byte-array kernel tools.test
-alien.c-types ;
+USING: accessors alien.c-types alien.endian classes.struct io
+io.encodings.binary io.streams.byte-array kernel tools.test ;
 IN: alien.endian.tests
 
 STRUCT: endian-struct

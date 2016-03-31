@@ -1,9 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays checksums checksums.md5 io.encodings.binary
-io.streams.byte-array kernel math math.parser namespaces
-tools.test sequences ;
-IN: checksums.md5.tests
+io.streams.byte-array kernel math.parser sequences tools.test ;
 
 { "d41d8cd98f00b204e9800998ecf8427e" } [ "" >byte-array md5 checksum-bytes bytes>hex-string ] unit-test
 { "0cc175b9c0f1b6a831c399e269772661" } [ "a" >byte-array md5 checksum-bytes bytes>hex-string ] unit-test

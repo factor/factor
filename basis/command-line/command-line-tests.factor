@@ -1,5 +1,4 @@
-USING: namespaces splitting tools.test ;
-IN: command-line
+USING: command-line namespaces tools.test ;
 
 { "factor" f { "a" "b" "c" } } [
     { "factor" "-run=test-voc" "a" "b" "c" } parse-command-line

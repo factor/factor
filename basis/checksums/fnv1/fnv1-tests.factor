@@ -1,5 +1,4 @@
-USING: checksums.fnv1 checksums strings tools.test ;
-IN: checksums.fnv1.tests
+USING: checksums checksums.fnv1 tools.test ;
 
 ! A few test vectors taken from http://www.isthe.com/chongo/src/fnv/test_fnv.c
 

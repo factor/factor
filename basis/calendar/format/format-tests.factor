@@ -1,6 +1,5 @@
-USING: calendar.format calendar kernel math tools.test
-io.streams.string accessors io math.order sequences ;
-IN: calendar.format.tests
+USING: accessors calendar calendar.format io io.streams.string
+kernel math.order sequences tools.test ;
 
 { 0 } [
     "Z" [ read1 read-rfc3339-gmt-offset ] with-string-reader duration>hours
