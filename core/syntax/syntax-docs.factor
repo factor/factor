@@ -255,7 +255,6 @@ ARTICLE: "syntax" "Syntax"
     "parser-algorithm"
     "word-search"
     "top-level-forms"
-    "syntax-comments"
     "syntax-literals"
     "syntax-immediate"
 } ;
