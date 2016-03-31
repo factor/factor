@@ -126,7 +126,11 @@ PRIVATE>
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
         '[ _ run-file ] [
-            dup condition? [ rethrow ] [ file-failure ] if
+            dup compute-restarts empty? [
+                file-failure
+            ] [
+                rethrow
+            ] if
         ] recover
     ] with-variable ;
 
