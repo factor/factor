@@ -1,6 +1,4 @@
-USING: kernel math math.order math.parser math.ratios
-math.functions tools.test ;
-IN: math.ratios.tests
+USING: kernel math math.functions math.parser tools.test ;
 
 { 1 2 } [ 1/2 >fraction ] unit-test
 

@@ -1,8 +1,7 @@
-USING: arrays byte-arrays kernel kernel.private literals math
-memory namespaces sequences tools.test math.private quotations
-continuations prettyprint io.streams.string debugger assocs
-sequences.private accessors locals.backend grouping words
-system alien alien.accessors kernel.private ;
+USING: accessors alien alien.accessors arrays assocs byte-arrays
+continuations debugger grouping io.streams.string kernel
+kernel.private literals locals.backend math memory namespaces
+prettyprint sequences sequences.private tools.test words ;
 IN: kernel.tests
 
 { 0 } [ f size ] unit-test

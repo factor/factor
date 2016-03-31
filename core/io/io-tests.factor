@@ -1,5 +1,5 @@
-USING: accessors io io.streams.string kernel math parser sbufs
-sequences tools.test words namespaces strings ;
+USING: accessors io io.streams.string kernel math namespaces
+parser sbufs sequences strings tools.test words ;
 IN: io.tests
 
 { f } [

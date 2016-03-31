@@ -1,5 +1,5 @@
+USING: math tools.test words.constant ;
 IN: words.constant.tests
-USING: tools.test math words.constant ;
 
 CONSTANT: a +
 

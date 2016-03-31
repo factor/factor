@@ -1,6 +1,6 @@
-USING: accessors byte-arrays effects kernel kernel.private math memory
-prettyprint io sequences tools.test words namespaces layouts classes
-classes.builtin arrays quotations system ;
+USING: accessors arrays byte-arrays effects kernel
+kernel.private math memory namespaces quotations sequences
+tools.test words ;
 FROM: tools.memory => data-room code-room ;
 IN: memory.tests
 

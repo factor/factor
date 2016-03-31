@@ -1,10 +1,7 @@
-USING: alien arrays definitions generic assocs hashtables io
-kernel math namespaces parser prettyprint sequences strings
-tools.test words quotations classes classes.algebra
-classes.private classes.union classes.mixin classes.predicate
-vectors source-files compiler.units growable random
-stack-checker effects kernel.private sbufs math.order
-classes.tuple accessors generic.private ;
+USING: accessors arrays assocs classes classes.algebra
+classes.tuple classes.union generic generic.private growable
+kernel math prettyprint quotations random sbufs sequences
+stack-checker strings tools.test vectors words ;
 IN: classes.algebra.tests
 
 TUPLE: first-one ;

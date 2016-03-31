@@ -1,6 +1,5 @@
-USING: math tools.test classes.algebra words kernel sequences assocs
-accessors eval definitions compiler.units generic strings classes
-generic.single ;
+USING: accessors assocs classes classes.algebra compiler.units
+eval generic.single kernel math strings tools.test words ;
 IN: classes.predicate.tests
 
 PREDICATE: negative < integer 0 < ;

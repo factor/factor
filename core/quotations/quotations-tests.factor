@@ -1,5 +1,4 @@
-USING: math kernel quotations tools.test sequences ;
-IN: quotations.tests
+USING: kernel math quotations sequences tools.test ;
 
 { [ 3 ] } [ 3 [ ] curry ] unit-test
 { [ \ + ] } [ \ + [ ] curry ] unit-test

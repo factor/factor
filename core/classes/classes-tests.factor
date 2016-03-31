@@ -1,9 +1,6 @@
-USING: alien arrays generic assocs hashtables io
-io.streams.string kernel math namespaces parser prettyprint
-sequences strings tools.test vectors words quotations classes
-classes.private classes.union classes.mixin classes.predicate
-classes.algebra definitions source-files compiler.units
-kernel.private sorting vocabs memory eval accessors sets ;
+USING: assocs classes classes.private compiler.units definitions
+eval generic io.streams.string kernel math multiline namespaces
+parser sequences sets sorting tools.test vocabs words ;
 IN: classes.tests
 
 { t } [ 3 object instance? ] unit-test

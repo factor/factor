@@ -1,7 +1,5 @@
-USING: accessors arrays kernel kernel.private math namespaces
-sequences sequences.private strings tools.test vectors
-continuations random growable classes ;
-IN: vectors.tests
+USING: accessors arrays classes continuations kernel math
+namespaces random sequences tools.test vectors ;
 
 { } [ 10 [ [ -1000000 <vector> ] ignore-errors ] times ] unit-test
 

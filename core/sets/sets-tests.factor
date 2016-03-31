@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sets tools.test kernel prettyprint hash-sets sorting
-math sequences bit-sets bit-arrays ;
+USING: bit-arrays bit-sets kernel math sequences sets sorting
+tools.test ;
 IN: sets.tests
 
 { V{ 1 2 3 } } [ 3 V{ 1 2 } clone [ adjoin ] keep ] unit-test

@@ -1,13 +1,11 @@
 USING: accessors arrays assocs calendar classes classes.algebra
 classes.private classes.tuple classes.tuple.private columns
-compiler.errors compiler.units continuations definitions
-effects eval generic generic.single generic.standard grouping
-io.streams.string kernel kernel.private math math.constants
-math.order namespaces parser parser.notes prettyprint
-quotations random see sequences sequences.private slots
-slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol fry literals memory
-combinators.short-circuit ;
+combinators.short-circuit compiler.errors compiler.units
+definitions eval generic generic.single io.streams.string kernel
+kernel.private literals math math.constants memory namespaces
+parser parser.notes see sequences sequences.private slots
+splitting strings threads tools.test vectors vocabs words
+words.symbol ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;

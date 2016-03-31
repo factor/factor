@@ -1,5 +1,4 @@
-USING: kernel tools.test generic generic.standard classes math
-accessors classes.intersection slots math.order ;
+USING: accessors generic kernel math math.order slots tools.test ;
 IN: classes.intersection.tests
 
 TUPLE: a ;

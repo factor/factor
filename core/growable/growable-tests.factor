@@ -1,5 +1,4 @@
-USING: math sequences classes growable tools.test kernel
-layouts ;
+USING: classes kernel layouts math sequences tools.test ;
 IN: growable.tests
 
 ! erg found this one

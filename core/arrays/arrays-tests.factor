@@ -1,6 +1,5 @@
 USING: accessors arrays kernel kernel.private layouts literals math
 sequences tools.test vectors ;
-IN: arrays.tests
 
 [ -2 { "a" "b" "c" } nth ] must-fail
 [ 10 { "a" "b" "c" } nth ] must-fail

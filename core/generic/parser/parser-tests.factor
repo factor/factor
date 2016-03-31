@@ -1,7 +1,5 @@
 USING: generic.parser tools.test ;
 
-IN: generic.parser.tests
-
 { t } [ ( -- ) ( -- ) method-effect= ] unit-test
 { t } [ ( a -- b ) ( x -- y ) method-effect= ] unit-test
 { f } [ ( a b -- c ) ( x -- y ) method-effect= ] unit-test

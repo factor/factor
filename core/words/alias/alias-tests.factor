@@ -1,4 +1,4 @@
-USING: math eval lexer tools.test effects sequences ;
+USING: effects eval math tools.test ;
 IN: words.alias.tests
 
 ALIAS: foo +
