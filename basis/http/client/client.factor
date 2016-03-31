@@ -237,11 +237,15 @@ SYMBOL: redirects
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
 
+: misparsed-url? ( url -- url' )
+    [ protocol>> not ] [ host>> not ] [ path>> ]
+    tri and and ;
+
 : request-url ( url -- url' )
-    dup >url dup protocol>> [ nip ] [
+    dup >url dup misparsed-url? [
         drop dup url? [ present ] when
         "http://" prepend >url
-    ] if ensure-port ;
+    ] [ nip ] if ensure-port ;
 
 : <client-request> ( url method -- request )
     <request>

@@ -208,3 +208,14 @@ CONSTANT: classic-proxy-settings H{
        "http://www.google.com" "GET" <client-request> ?default-proxy
     ] with-variable
 ] [ invalid-proxy? ] must-fail-with
+
+! This url is misparsed bu request-url can fix it
+{ T{ url
+   { protocol "http" }
+   { host "www.google.com" }
+   { path "/" }
+   { port 80 }
+} } [ "www.google.com" request-url ] unit-test
+
+! This one is not fixable, leave it as it is
+{ T{ url } } [ "" request-url ] unit-test
