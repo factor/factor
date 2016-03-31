@@ -7,7 +7,7 @@ strings system unicode.case ;
 IN: globs
 
 : not-path-separator ( -- sep )
-    os windows? R! [^/\\]! R! [^/]! ? ; foldable
+    os windows? R/ [^\\/\\]/ R/ [^\\/]/ ? ; foldable
 
 EBNF: <glob>
 

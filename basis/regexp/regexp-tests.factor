@@ -60,7 +60,7 @@ IN: regexp-tests
 
 { t } [ "/" "\\/" <regexp> matches? ] unit-test
 
-{ t } [ "a" R' a'i matches? ] unit-test
+{ t } [ "a" R/ a/i matches? ] unit-test
 
 { t } [ "" "a|b*|c+|d?" <regexp> matches? ] unit-test
 { t } [ "a" "a|b*|c+|d?" <regexp> matches? ] unit-test
@@ -259,11 +259,11 @@ IN: regexp-tests
 ! Comment inside a regular expression
 { t } [ "ac" "a(?#boo)c" <regexp> matches? ] unit-test
 
-{ } [ "USING: regexp kernel ; R' -{3}[+]{1,6}(?:!!)?\\s' drop" eval( -- ) ] unit-test
+{ } [ "USING: regexp kernel ; R/ -{3}[+]{1,6}(?:!!)?\\s/ drop" eval( -- ) ] unit-test
 
-{ } [ "USING: regexp kernel ; R' (ftp|http|https)://(\\w+:?\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?' drop" eval( -- ) ] unit-test
+{ } [ "USING: regexp kernel ; R/ (ftp|http|https):\\/\\/(\\w+:?\\w*@)?(\\S+)(:[0-9]+)?(\\/\\|\\/([\\w#!:.?+=&%@!\\-\\/]))?/ drop" eval( -- ) ] unit-test
 
-{ } [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval( -- ) ] unit-test
+{ } [ "USING: regexp kernel ; R/ \\*[^\s*][^*]*\\*/ drop" eval( -- ) ] unit-test
 
 { "ab" } [ "ab" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
 { "abc" } [ "abc" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
@@ -349,7 +349,7 @@ unit-test
 { f } [ "foobxr" "foo(?=bar)" <regexp> first-match ] unit-test
 
 ! Bug in parsing word
-{ t } [ "a" R' a' matches? ] unit-test
+{ t } [ "a" R/ a/ matches? ] unit-test
 
 ! Testing negation
 { f } [ "a" R/ (?~a)/ matches? ] unit-test
