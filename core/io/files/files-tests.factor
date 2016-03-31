@@ -1,16 +1,22 @@
 USING: alien alien.c-types alien.data arrays classes.struct
 compiler.units continuations destructors generic.single io
 io.directories io.encodings.8-bit.latin1 io.encodings.ascii
-io.encodings.binary io.encodings.string io.files io.pathnames
-io.files.private io.files.temp io.files.unique kernel make math
-sequences specialized-arrays system threads tools.test vocabs ;
+io.encodings.binary io.encodings.string io.files
+io.files.private io.files.temp io.files.unique io.pathnames
+kernel locals make math sequences specialized-arrays
+system threads tools.test vocabs ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
-SPECIALIZED-ARRAY: int
 IN: io.files.tests
 
-{ } [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
+SPECIALIZED-ARRAY: int
 
-{ } [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
+{ } [
+    [
+        "append-test" ".txt" [| path |
+            path ascii <file-appender> dispose
+        ] cleanup-unique-file
+    ] with-temp-directory
+] unit-test
 
 {
     "This is a line.\rThis is another line.\r"
@@ -40,27 +46,30 @@ IN: io.files.tests
     [ " " read-until [ ascii decode ] dip ] with-file-reader
 ] unit-test
 
-{ } [
-    "It seems Jobs has lost his grasp on reality again.\n"
-    "separator-test.txt" temp-file latin1 set-file-contents
-] unit-test
+[
+    "separator-test" ".txt" [| path |
+        { } [
+            "It seems Jobs has lost his grasp on reality again.\n"
+            path latin1 set-file-contents
+        ] unit-test
 
-{
-    {
-        { "It seems " CHAR: J }
-        { "obs has lost h" CHAR: i }
-        { "s grasp on reality again.\n" f }
-    }
-} [
-    [
-        "separator-test.txt" temp-file
-        latin1 [
-            "J" read-until 2array ,
-            "i" read-until 2array ,
-            "X" read-until 2array ,
-        ] with-file-reader
-    ] { } make
-] unit-test
+        {
+            {
+                { "It seems " CHAR: J }
+                { "obs has lost h" CHAR: i }
+                { "s grasp on reality again.\n" f }
+            }
+        } [
+            [
+                path latin1 [
+                    "J" read-until 2array ,
+                    "i" read-until 2array ,
+                    "X" read-until 2array ,
+                ] with-file-reader
+            ] { } make
+        ] unit-test
+    ] cleanup-unique-file
+] with-temp-directory
 
 { } [
     image-path binary [
@@ -69,27 +78,35 @@ IN: io.files.tests
 ] unit-test
 
 ! Writing specialized arrays to binary streams should work
-{ } [
-    "test.txt" temp-file binary [
-        int-array{ 1 2 3 } write
-    ] with-file-writer
-] unit-test
+[
+    "binary-int-array" ".bin" [| path |
+        { } [
+            path binary [
+                int-array{ 1 2 3 } write
+            ] with-file-writer
+        ] unit-test
 
-{ int-array{ 1 2 3 } } [
-    "test.txt" temp-file binary [
-        3 4 * read
-    ] with-file-reader
-    int cast-array
-] unit-test
+        { int-array{ 1 2 3 } } [
+            path binary [
+                3 4 * read
+            ] with-file-reader
+            int cast-array
+        ] unit-test
+    ] cleanup-unique-file
+] with-temp-directory
 
-{ } [
-    BV{ 0 1 2 } "test.txt" temp-file binary set-file-contents
-] unit-test
+[
+    "test-012" ".bin" [| path |
+        { } [
+            BV{ 0 1 2 } path binary set-file-contents
+        ] unit-test
 
-{ t } [
-    "test.txt" temp-file binary file-contents
-    B{ 0 1 2 } =
-] unit-test
+        { t } [
+            path binary file-contents
+            B{ 0 1 2 } =
+        ] unit-test
+    ] cleanup-unique-file
+] with-temp-directory
 
 STRUCT: pt { x uint } { y uint } ;
 SPECIALIZED-ARRAY: pt
@@ -97,28 +114,34 @@ SPECIALIZED-ARRAY: pt
 CONSTANT: pt-array-1
     pt-array{ S{ pt f 1 1 } S{ pt f 2 2 } S{ pt f 3 3 } }
 
-{ } [
-    pt-array-1
-    "test.txt" temp-file binary set-file-contents
-] unit-test
+[
+    "test-pt-array-1" ".bin" [| path |
+        { } [
+            pt-array-1 path binary set-file-contents
+        ] unit-test
 
-{ t } [
-    "test.txt" temp-file binary file-contents
-    pt-array-1 >c-ptr sequence=
-] unit-test
+        { t } [
+            path binary file-contents
+            pt-array-1 >c-ptr sequence=
+        ] unit-test
+    ] cleanup-unique-file
+] with-temp-directory
 
 ! Slices should support >c-ptr and byte-length
-
-{ } [
-    pt-array-1 rest-slice
-    "test.txt" temp-file binary set-file-contents
-] unit-test
-
-{ t } [
-    "test.txt" temp-file binary file-contents
-    pt cast-array
-    pt-array-1 rest-slice sequence=
-] unit-test
+[
+    "test-pt-array-1-slice" ".bin" [| path |
+        { } [
+            pt-array-1 rest-slice
+            path binary set-file-contents
+        ] unit-test
+    
+        { t } [
+            path binary file-contents
+            pt cast-array
+            pt-array-1 rest-slice sequence=
+        ] unit-test
+    ] cleanup-unique-file
+] with-temp-directory
 
 { } [
     [
@@ -128,9 +151,9 @@ CONSTANT: pt-array-1
 
 ! Writing strings to binary streams should fail
 [
-    "test.txt" temp-file binary [
-        "OMGFAIL" write
-    ] with-file-writer
+    "omgfail-binary" ".bin" [| path |
+        path binary [ "OMGFAIL" write ] with-file-writer
+    ] cleanup-unique-file
 ] must-fail
 
 ! Test EOF behavior
@@ -142,17 +165,24 @@ CONSTANT: pt-array-1
 ] unit-test
 
 ! Make sure that writing to a closed stream from another thread doesn't crash
-{ } [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
+! Don't use cleanup-unique-file here because we do manual cleanup as part of test
+[
+    "test-quux" ".txt" unique-file [| path |
+        path ".2" append :> path2
 
-{ } [ "test-quux.txt" temp-file delete-file ] unit-test
+        { } [ path ascii [ [ yield "Hi" write ] "Test-write-file" spawn drop ] with-file-writer ] unit-test
 
-{ } [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
+        { } [ path delete-file ] unit-test
 
-{ } [ "test-quux.txt" "quux-test.txt" [ temp-file ] bi@ move-file ] unit-test
+        { } [ path ascii [ [ yield "Hi" write ] "Test-write-file" spawn drop ] with-file-writer ] unit-test
 
-{ t } [ "quux-test.txt" temp-file exists? ] unit-test
+        { } [ path path2 move-file ] unit-test
 
-{ } [ "quux-test.txt" temp-file delete-file ] unit-test
+        { t } [ path2 exists? ] unit-test
+
+        { } [ path2 delete-file ] unit-test
+    ] call
+] with-temp-directory
 
 ! File seeking tests
 { B{ 3 2 3 4 5 } }
@@ -304,8 +334,8 @@ CONSTANT: pt-array-1
     ] with-temp-directory
 ] unit-test
 
-! Test cwd, cd. You do not want to use with-cd, you want with-directory.
-
+! Test cwd, cd.
+! NOTE TO USER: You do not want to use with-cd, you want with-directory.
 : with-cd ( path quot -- )
     [ [ absolute-path cd ] curry ] dip compose
     cwd [ cd ] curry
