@@ -208,7 +208,7 @@ PRIVATE>
     ] change-lexer-column ;
 
 : parse-noblank-token ( lexer -- str/f )
-    dup still-parsing-line? [ (parse-token) ] [ drop f ] if ;
+    dup still-parsing-line? [ (parse-raw) ] [ drop f ] if ;
 
 : parse-regexp ( accum -- accum )
     lexer get [ take-until ] [ parse-noblank-token ] bi
