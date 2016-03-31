@@ -1,6 +1,5 @@
-USING: sorting sequences kernel math math.order random
-tools.test vectors sets vocabs grouping ;
-IN: sorting.tests
+USING: grouping kernel math math.order random sequences sets
+sorting tools.test vocabs ;
 
 { { } } [ { } natural-sort ] unit-test
 

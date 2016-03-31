@@ -1,6 +1,4 @@
-USING: kernel layouts literals math math.parser sequences
-tools.test ;
-IN: math.parser.tests
+USING: layouts literals math math.parser sequences tools.test ;
 
 { f }
 [ f string>number ]

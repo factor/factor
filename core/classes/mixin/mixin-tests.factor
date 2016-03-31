@@ -1,8 +1,7 @@
-USING: alien arrays definitions generic assocs hashtables io kernel
-math namespaces parser prettyprint sequences strings tools.test words
-quotations classes classes.private classes.union classes.mixin
-classes.predicate classes.algebra vectors source-files compiler.units
-kernel.private sorting vocabs eval ;
+USING: arrays assocs classes classes.algebra classes.mixin
+compiler.units definitions eval hashtables io.streams.string
+kernel math parser sequences source-files strings tools.test
+vectors words ;
 IN: classes.mixin.tests
 
 ! Test mixins

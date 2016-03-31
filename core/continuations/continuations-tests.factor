@@ -1,6 +1,6 @@
-USING: accessors continuations debugger eval hashtables io
-kernel kernel.private math memory namespaces sequences
-tools.test vectors words ;
+USING: accessors continuations debugger eval io kernel
+kernel.private math memory namespaces sequences tools.test
+vectors words ;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )

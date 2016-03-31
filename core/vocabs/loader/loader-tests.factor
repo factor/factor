@@ -1,8 +1,7 @@
-USING: vocabs.loader tools.test continuations vocabs math
-kernel arrays sequences namespaces io.streams.string sets
-parser source-files words assocs classes.tuple definitions
-debugger compiler.units accessors eval vocabs.hierarchy
-combinators vocabs.parser grouping vocabs.files vocabs.refresh ;
+USING: accessors compiler.units continuations debugger
+definitions eval io.streams.string kernel math namespaces parser
+prettyprint sequences sets source-files tools.test vocabs
+vocabs.files vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: vocabs.loader.tests
 
 ! This vocab should not exist, but just in case...
@@ -46,7 +45,7 @@ IN: vocabs.loader.tests
 
     [ t ] [
         "resource:core/vocabs/loader/test/a/a.factor"
-        path>source-file definitions>> dup USE: prettyprint .
+        path>source-file definitions>>
         "v-l-t-a-hello" "vocabs.loader.test.a" lookup-word dup .
         swap first in?
     ] unit-test

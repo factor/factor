@@ -1,6 +1,6 @@
-USING: kernel math math.functions math.order namespaces
-prettyprint math.private continuations tools.test sequences
-random prettyprint.config ;
+USING: continuations kernel math math.functions math.order
+math.private namespaces prettyprint prettyprint.config random
+sequences tools.test ;
 IN: math.integers.tests
 
 10 number-base [

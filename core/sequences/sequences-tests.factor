@@ -1,7 +1,6 @@
-USING: arrays byte-arrays kernel math math.order math.parser
-namespaces sequences kernel.private sequences.private strings
-sbufs tools.test vectors assocs generic vocabs.loader
-generic.single math.vectors math.functions ;
+USING: arrays assocs byte-arrays generic.single kernel make math
+math.functions math.order math.parser math.vectors sbufs
+sequences sequences.private strings tools.test vectors ;
 IN: sequences.tests
 
 { "empty" } [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -344,8 +343,6 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { f f } [
     { 1 2 3 4 5 6 7 8 } [ H{ { 11 "hi" } } at ] map-find
 ] unit-test
-
-USE: make
 
 { { "a" 1 "b" 1 "c" } }
 [ 1 { "a" "b" "c" } [ [ dup , ] [ , ] interleave drop ] { } make ] unit-test

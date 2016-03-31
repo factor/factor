@@ -1,7 +1,7 @@
-USING: continuations kernel literals math math.order namespaces make
-strings strings.private sbufs tools.test sequences vectors
-arrays memory prettyprint io.streams.null kernel.private ;
-IN: strings.tests
+USING: arrays continuations io.streams.null kernel
+kernel.private literals make math math.order memory namespaces
+prettyprint sbufs sequences strings strings.private tools.test
+vectors ;
 
 { CHAR: b } [ 1 >bignum "abc" nth ] unit-test
 

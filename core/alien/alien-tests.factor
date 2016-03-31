@@ -1,7 +1,6 @@
-USING: accessors alien alien.accessors alien.c-types alien.libraries
-alien.syntax arrays byte-arrays continuations fry kernel kernel.private
-layouts libc math namespaces prettyprint sequences system tools.memory
-tools.test ;
+USING: accessors alien alien.accessors alien.c-types
+alien.syntax byte-arrays continuations fry kernel layouts math
+namespaces prettyprint sequences tools.memory tools.test ;
 QUALIFIED: sets
 IN: alien.tests
 

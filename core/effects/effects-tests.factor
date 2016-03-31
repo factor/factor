@@ -1,5 +1,5 @@
-USING: effects effects.parser eval kernel tools.test prettyprint accessors
-quotations sequences ;
+USING: accessors effects effects.parser eval kernel prettyprint
+sequences tools.test ;
 IN: effects.tests
 
 { t } [ { "a" } { "a" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
