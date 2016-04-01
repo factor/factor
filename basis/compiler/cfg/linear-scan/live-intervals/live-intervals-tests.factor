@@ -7,8 +7,7 @@ fry kernel namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.live-intervals.tests
 
 : <live-interval-for-ranges> ( ranges -- live-interval )
-    10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep
-    dup compute-start/end ;
+    10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep ;
 
 ! cfg>sync-points
 {
@@ -77,4 +76,9 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     H{ { 4 int-rep } { 8 int-rep } { 9 int-rep } } representations set
     <basic-block> [ H{ { 4 4 } { 8 8 } { 9 9 } } 2array 1array live-outs set ]
     [ handle-live-out ] bi live-intervals get
+] unit-test
+
+! record-def
+{ } [
+    H{ { 37 37 } } leader-map set H{ { 37 int-rep } } representations set
 ] unit-test

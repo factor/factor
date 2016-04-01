@@ -11,8 +11,6 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
        { vreg 45 }
        { spill-to T{ spill-slot { n 8 } } }
        { spill-rep double-rep }
-       { start 22 }
-       { end 47 }
        { ranges { { 22 47 } { 67 68 } { 69 72 } } }
        { uses
          {

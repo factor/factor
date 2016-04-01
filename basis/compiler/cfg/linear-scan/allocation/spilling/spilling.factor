@@ -37,7 +37,6 @@ ERROR: bad-live-ranges interval ;
             [ ]
             [ assign-spill ]
             [ trim-before-ranges ]
-            [ compute-start/end ]
             [ check-ranges ]
         } cleave
     ] if ;
@@ -58,7 +57,6 @@ ERROR: bad-live-ranges interval ;
             [ ]
             [ assign-reload ]
             [ trim-after-ranges ]
-            [ compute-start/end ]
             [ check-ranges ]
         } cleave
     ] if ;
@@ -67,7 +65,7 @@ ERROR: bad-live-ranges interval ;
     split-interval [ spill-before ] [ spill-after ] bi* ;
 
 : find-next-use ( live-interval new -- n )
-    [ uses>> ] [ start>> ] bi*
+    [ uses>> ] [ live-interval-start ] bi*
     '[ [ spill-slot?>> not ] [ n>> ] bi _ >= and ] find nip
     [ n>> ] [ 1/0. ] if* ;
 
@@ -103,13 +101,13 @@ ERROR: bad-live-ranges interval ;
 
 :: spill-intersecting-active ( new reg -- )
     new active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
-    '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
+    '[ _ remove-nth! drop new live-interval-start spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
     new inactive-intervals-for [
         dup reg>> reg = [
             dup new intervals-intersect? [
-                new start>> spill f
+                new live-interval-start spill f
             ] [ drop t ] if
         ] [ drop t ] if
     ] filter! drop ;

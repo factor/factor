@@ -15,7 +15,7 @@ TUPLE: vreg-use n def-rep use-rep spill-slot? ;
 TUPLE: live-interval-state
     vreg
     reg spill-to spill-rep reload-from reload-rep
-    start end ranges uses ;
+    ranges uses ;
 
 : first-use ( live-interval -- use ) uses>> first ; inline
 
@@ -127,20 +127,22 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
         [ instructions>> <reversed> [ compute-live-intervals* ] each ]
     } cleave ;
 
-: compute-start/end ( live-interval -- )
-    dup ranges>> ranges-endpoints [ >>start ] [ >>end ] bi* drop ;
+: live-interval-start ( live-interval -- n )
+    ranges>> first first ; inline
+
+: live-interval-end ( live-interval -- n )
+    ranges>> last last ; inline
 
 ERROR: bad-live-interval live-interval ;
 
 : check-start ( live-interval -- )
-    dup start>> -1 = [ bad-live-interval ] [ drop ] if ;
+    dup live-interval-start -1 = [ bad-live-interval ] [ drop ] if ;
 
 : finish-live-intervals ( live-intervals -- )
     [
         {
             [ [ { } like reverse! ] change-ranges drop ]
             [ [ { } like reverse! ] change-uses drop ]
-            [ compute-start/end ]
             [ check-start ]
         } cleave
     ] each ;
