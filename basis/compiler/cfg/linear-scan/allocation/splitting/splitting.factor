@@ -41,4 +41,4 @@ ERROR: splitting-atomic-interval ;
     before split-before
     after split-after ;
 
-HINTS: split-interval live-interval object ;
+HINTS: split-interval live-interval-state object ;
