@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs binary-search combinators
-compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.linear-scan.ranges compiler.cfg.linearization
-compiler.cfg.liveness compiler.cfg.registers
-compiler.cfg.ssa.destruction.leaders cpu.architecture fry kernel locals math
-math.intervals math.order namespaces sequences ;
+USING: accessors assocs binary-search combinators compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.linear-scan.ranges
+compiler.cfg.linearization compiler.cfg.liveness
+compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
+cpu.architecture fry kernel locals math math.order namespaces
+sequences vectors ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: vreg-use n def-rep use-rep spill-slot? ;
@@ -53,7 +53,7 @@ SYMBOLS: from to ;
 
 SYMBOL: live-intervals
 
-: live-interval ( vreg -- live-interval )
+: vreg>live-interval ( vreg -- live-interval )
     leader live-intervals get [ <live-interval> ] cache ;
 
 : interval-reg-class ( live-interval -- reg-class )
@@ -64,42 +64,37 @@ GENERIC: compute-live-intervals* ( insn -- )
 M: insn compute-live-intervals* drop ;
 
 :: record-def ( vreg n spill-slot? -- )
-    vreg live-interval :> live-interval
+    vreg vreg>live-interval :> live-interval
 
     n live-interval ranges>> shorten-ranges
     n live-interval spill-slot? (add-use) vreg rep-of >>def-rep drop ;
 
 :: record-use ( vreg n spill-slot? -- )
-    vreg live-interval :> live-interval
+    vreg vreg>live-interval :> live-interval
 
     from get n live-interval ranges>> add-range
     n live-interval spill-slot? (add-use) vreg rep-of >>use-rep drop ;
 
 :: record-temp ( vreg n -- )
-    vreg live-interval :> live-interval
+    vreg vreg>live-interval :> live-interval
 
     n n live-interval ranges>> add-range
     n live-interval f (add-use) vreg rep-of >>def-rep drop ;
 
-M: vreg-insn compute-live-intervals* ( insn -- )
-    dup insn#>>
-    [ [ defs-vregs ] dip '[ _ f record-def ] each ]
-    [ [ uses-vregs ] dip '[ _ f record-use ] each ]
-    [ [ temp-vregs ] dip '[ _ record-temp ] each ]
-    2tri ;
-
 ! Extend lifetime intervals of base pointers, so that their
 ! values are available even if the base pointer is never used
 ! again.
+: uses-vregs* ( insn -- seq )
+    dup gc-map-insn? [
+        [ uses-vregs ] [ gc-map>> derived-roots>> values ] bi append
+    ] [ uses-vregs ] if ;
 
-GENERIC: uses-vregs* ( insn -- seq )
-
-M: gc-map-insn uses-vregs*
-    [ uses-vregs ] [ gc-map>> derived-roots>> values ] bi append ;
-
-M: vreg-insn uses-vregs* uses-vregs ;
-
-M: insn uses-vregs* drop f ;
+M: vreg-insn compute-live-intervals* ( insn -- )
+    dup insn#>>
+    [ [ defs-vregs ] dip '[ _ f record-def ] each ]
+    [ [ uses-vregs* ] dip '[ _ f record-use ] each ]
+    [ [ temp-vregs ] dip '[ _ record-temp ] each ]
+    2tri ;
 
 M: clobber-insn compute-live-intervals* ( insn -- )
     dup insn#>>
@@ -117,7 +112,7 @@ M: hairy-clobber-insn compute-live-intervals* ( insn -- )
 
 : handle-live-out ( bb -- )
     [ from get to get ] dip live-out keys
-    [ live-interval ranges>> add-range ] 2with each ;
+    [ vreg>live-interval ranges>> add-range ] 2with each ;
 
 : compute-live-intervals-step ( bb -- )
     {
