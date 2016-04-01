@@ -25,6 +25,14 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     25 T{ live-interval-state { uses V{ T{ vreg-use { n 25 } } } } } find-use
 ] unit-test
 
+! finish-live-interval
+{
+    V{ { 5 10 } { 21 30 } }
+} [
+    { { 21 30 } { 5 10 } } <live-interval-for-ranges>
+    dup finish-live-interval ranges>>
+] unit-test
+
 ! intervals-intersect?
 { t f f } [
     { { 4 20 } } <live-interval-for-ranges>
@@ -79,6 +87,15 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 ] unit-test
 
 ! record-def
-{ } [
-    H{ { 37 37 } } leader-map set H{ { 37 int-rep } } representations set
+{
+    T{ live-interval-state
+       { vreg 37 }
+       { ranges V{ { 20 20 } } }
+       { uses V{ T{ vreg-use { n 20 } { def-rep int-rep } } } }
+    }
+} [
+    H{ { 37 37 } } leader-map set
+    H{ { 37 int-rep } } representations set
+    37 20 f record-def
+    37 vreg>live-interval
 ] unit-test

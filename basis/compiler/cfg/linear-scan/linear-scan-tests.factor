@@ -298,7 +298,7 @@ H{
               T{ live-interval-state
                  { vreg 1 }
                  { reg 1 }
-                 { ranges { { 1 15 } } }
+                 { ranges V{ { 1 15 } } }
                  { uses
                    V{
                        T{ vreg-use f 1 int-rep f }
@@ -312,7 +312,7 @@ H{
               T{ live-interval-state
                  { vreg 2 }
                  { reg 2 }
-                 { ranges { { 3 8 } } }
+                 { ranges V{ { 3 8 } } }
                  { uses
                    V{
                        T{ vreg-use f 3 int-rep f }
@@ -324,7 +324,7 @@ H{
               T{ live-interval-state
                  { vreg 3 }
                  { reg 3 }
-                 { ranges { { 3 10 } } }
+                 { ranges V{ { 3 10 } } }
                  { uses V{ T{ vreg-use f 3 int-rep f } T{ vreg-use f 10 f int-rep } } }
               }
           }
@@ -333,7 +333,7 @@ H{
     H{ } inactive-intervals set
     T{ live-interval-state
        { vreg 1 }
-       { ranges { { 5 5 } } }
+       { ranges V{ { 5 5 } } }
        { uses V{ T{ vreg-use f 5 int-rep f } } }
     }
     spill-status
@@ -351,7 +351,7 @@ H{
               T{ live-interval-state
                  { vreg 1 }
                  { reg 1 }
-                 { ranges { { 1 15 } } }
+                 { ranges V{ { 1 15 } } }
                  { uses V{ T{ vreg-use f 1 int-rep f } } }
               }
               T{ live-interval-state
@@ -365,7 +365,7 @@ H{
     H{ } inactive-intervals set
     T{ live-interval-state
        { vreg 3 }
-       { ranges { { 5 5 } } }
+       { ranges V{ { 5 5 } } }
        { uses V{ T{ vreg-use f 5 int-rep f } } }
     }
     spill-status
