@@ -50,7 +50,7 @@ check-numbering? on
 ] unit-test
 
 { 0 0 } [
-    1 live-intervals get at [ start>> ] [ end>> ] bi
+    1 live-intervals get at ranges>> ranges-endpoints
 ] unit-test
 
 ! Live interval splitting
@@ -69,8 +69,6 @@ H{
 {
     T{ live-interval-state
        { vreg 1 }
-       { start 0 }
-       { end 2 }
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 1 f float-rep } } }
        { ranges V{ { 0 2 } } }
        { spill-to T{ spill-slot f 0 } }
@@ -78,8 +76,6 @@ H{
     }
     T{ live-interval-state
        { vreg 1 }
-       { start 5 }
-       { end 5 }
        { uses V{ T{ vreg-use f 5 f float-rep } } }
        { ranges V{ { 5 5 } } }
        { reload-from T{ spill-slot f 0 } }
@@ -88,8 +84,6 @@ H{
 } [
     T{ live-interval-state
        { vreg 1 }
-       { start 0 }
-       { end 5 }
        { uses
          V{
              T{ vreg-use f 0 float-rep f }
@@ -106,8 +100,6 @@ H{
     f
     T{ live-interval-state
        { vreg 2 }
-       { start 1 }
-       { end 5 }
        { uses V{ T{ vreg-use f 1 f float-rep } T{ vreg-use f 5 f float-rep } } }
        { ranges V{ { 1 5 } } }
        { reload-from T{ spill-slot f 4 } }
@@ -116,8 +108,6 @@ H{
 } [
     T{ live-interval-state
        { vreg 2 }
-       { start 0 }
-       { end 5 }
        { uses
          V{
              T{ vreg-use f 0 float-rep f }
@@ -133,8 +123,6 @@ H{
 {
     T{ live-interval-state
        { vreg 3 }
-       { start 0 }
-       { end 2 }
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 1 f float-rep } } }
        { ranges V{ { 0 2 } } }
        { spill-to T{ spill-slot f 8 } }
@@ -144,8 +132,6 @@ H{
 } [
     T{ live-interval-state
        { vreg 3 }
-       { start 0 }
-       { end 5 }
        { uses
          V{
              T{ vreg-use f 0 float-rep f }
@@ -161,8 +147,6 @@ H{
 {
     T{ live-interval-state
        { vreg 4 }
-       { start 0 }
-       { end 1 }
        { uses V{ T{ vreg-use f 0 float-rep f } } }
        { ranges V{ { 0 1 } } }
        { spill-to T{ spill-slot f 12 } }
@@ -170,8 +154,6 @@ H{
     }
     T{ live-interval-state
        { vreg 4 }
-       { start 20 }
-       { end 30 }
        { uses V{ T{ vreg-use f 20 f float-rep } T{ vreg-use f 30 f float-rep } } }
        { ranges V{ { 20 30 } } }
        { reload-from T{ spill-slot f 12 } }
@@ -180,8 +162,6 @@ H{
 } [
     T{ live-interval-state
        { vreg 4 }
-       { start 0 }
-       { end 30 }
        { uses
          V{
              T{ vreg-use f 0 float-rep f }
@@ -198,8 +178,6 @@ H{
 {
     T{ live-interval-state
        { vreg 5 }
-       { start 0 }
-       { end 1 }
        { uses V{ T{ vreg-use f 0 float-rep f } } }
        { ranges V{ { 0 1 } } }
        { spill-to T{ spill-slot f 16 } }
@@ -207,16 +185,12 @@ H{
     }
     T{ live-interval-state
        { vreg 5 }
-       { start 20 }
-       { end 30 }
        { uses V{ T{ vreg-use f 20 float-rep f } T{ vreg-use f 30 f float-rep } } }
        { ranges V{ { 20 30 } } }
     }
 } [
     T{ live-interval-state
        { vreg 5 }
-       { start 0 }
-       { end 30 }
        { uses
          V{
              T{ vreg-use f 0 float-rep f }
@@ -233,8 +207,6 @@ H{
 {
     T{ live-interval-state
        { vreg 6 }
-       { start 0 }
-       { end 11 }
        { uses V{ T{ vreg-use f 0 float-rep f } T{ vreg-use f 10 double-rep float-rep } } }
        { ranges V{ { 0 11 } } }
        { spill-to T{ spill-slot f 24 } }
@@ -242,8 +214,6 @@ H{
     }
     T{ live-interval-state
        { vreg 6 }
-       { start 20 }
-       { end 20 }
        { uses V{ T{ vreg-use f 20 f double-rep } } }
        { ranges V{ { 20 20 } } }
        { reload-from T{ spill-slot f 24 } }
@@ -252,8 +222,6 @@ H{
 } [
     T{ live-interval-state
        { vreg 6 }
-       { start 0 }
-       { end 20 }
        { uses
          V{
              T{ vreg-use f 0 float-rep f }
@@ -270,16 +238,12 @@ H{
     f
     T{ live-interval-state
         { vreg 7 }
-        { start 8 }
-        { end 8 }
         { ranges V{ { 8 8 } } }
         { uses V{ T{ vreg-use f 8 int-rep } } }
     }
 } [
     T{ live-interval-state
         { vreg 7 }
-        { start 4 }
-        { end 8 }
         { ranges V{ { 4 8 } } }
         { uses V{ T{ vreg-use f 8 int-rep } } }
     } 4 split-for-spill
@@ -290,8 +254,6 @@ H{
 {
     T{ live-interval-state
         { vreg 8 }
-        { start 0 }
-        { end 3 }
         { ranges V{ { 0 3 } } }
         { uses V{ T{ vreg-use f 0 f int-rep } T{ vreg-use f 2 f int-rep } } }
         { spill-to T{ spill-slot f 32 } }
@@ -299,8 +261,6 @@ H{
     }
     T{ live-interval-state
         { vreg 8 }
-        { start 14 }
-        { end 16 }
         { ranges V{ { 14 16 } } }
         { uses V{ T{ vreg-use f 14 f int-rep } } }
         { reload-from T{ spill-slot f 32 } }
@@ -309,8 +269,6 @@ H{
 } [
     T{ live-interval-state
         { vreg 8 }
-        { start 0 }
-        { end 16 }
         { ranges V{ { 0 4 } { 6 10 } { 12 16 } } }
         { uses
           V{
@@ -340,8 +298,7 @@ H{
               T{ live-interval-state
                  { vreg 1 }
                  { reg 1 }
-                 { start 1 }
-                 { end 15 }
+                 { ranges { { 1 15 } } }
                  { uses
                    V{
                        T{ vreg-use f 1 int-rep f }
@@ -355,8 +312,7 @@ H{
               T{ live-interval-state
                  { vreg 2 }
                  { reg 2 }
-                 { start 3 }
-                 { end 8 }
+                 { ranges { { 3 8 } } }
                  { uses
                    V{
                        T{ vreg-use f 3 int-rep f }
@@ -368,8 +324,7 @@ H{
               T{ live-interval-state
                  { vreg 3 }
                  { reg 3 }
-                 { start 3 }
-                 { end 10 }
+                 { ranges { { 3 10 } } }
                  { uses V{ T{ vreg-use f 3 int-rep f } T{ vreg-use f 10 f int-rep } } }
               }
           }
@@ -377,10 +332,9 @@ H{
     } active-intervals set
     H{ } inactive-intervals set
     T{ live-interval-state
-        { vreg 1 }
-        { start 5 }
-        { end 5 }
-        { uses V{ T{ vreg-use f 5 int-rep f } } }
+       { vreg 1 }
+       { ranges { { 5 5 } } }
+       { uses V{ T{ vreg-use f 5 int-rep f } } }
     }
     spill-status
 ] unit-test
@@ -397,15 +351,12 @@ H{
               T{ live-interval-state
                  { vreg 1 }
                  { reg 1 }
-                 { start 1 }
-                 { end 15 }
+                 { ranges { { 1 15 } } }
                  { uses V{ T{ vreg-use f 1 int-rep f } } }
               }
               T{ live-interval-state
                  { vreg 2 }
                  { reg 2 }
-                 { start 3 }
-                 { end 8 }
                  { uses V{ T{ vreg-use f 3 int-rep f } T{ vreg-use f 8 f int-rep } } }
               }
           }
@@ -413,10 +364,9 @@ H{
     } active-intervals set
     H{ } inactive-intervals set
     T{ live-interval-state
-        { vreg 3 }
-        { start 5 }
-        { end 5 }
-        { uses V{ T{ vreg-use f 5 int-rep f } } }
+       { vreg 3 }
+       { ranges { { 5 5 } } }
+       { uses V{ T{ vreg-use f 5 int-rep f } } }
     }
     spill-status
 ] unit-test
@@ -427,8 +377,6 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval-state
            { vreg 1 }
-           { start 0 }
-           { end 100 }
            { uses V{ T{ vreg-use f 0 int-rep f } T{ vreg-use f 100 f int-rep } } }
            { ranges V{ { 0 100 } } }
         }
@@ -441,15 +389,11 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval-state
            { vreg 1 }
-           { start 0 }
-           { end 10 }
            { uses V{ T{ vreg-use f 0 int-rep f } T{ vreg-use f 10 f int-rep } } }
            { ranges V{ { 0 10 } } }
         }
         T{ live-interval-state
            { vreg 2 }
-           { start 11 }
-           { end 20 }
            { uses V{ T{ vreg-use f 11 int-rep f } T{ vreg-use f 20 f int-rep } } }
            { ranges V{ { 11 20 } } }
         }
@@ -462,15 +406,11 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval-state
            { vreg 1 }
-           { start 0 }
-           { end 100 }
            { uses V{ T{ vreg-use f 0 int-rep f } T{ vreg-use f 100 f int-rep } } }
            { ranges V{ { 0 100 } } }
         }
         T{ live-interval-state
            { vreg 2 }
-           { start 30 }
-           { end 60 }
            { uses V{ T{ vreg-use f 30 int-rep f } T{ vreg-use f 60 f int-rep } } }
            { ranges V{ { 30 60 } } }
         }
@@ -483,15 +423,11 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval-state
            { vreg 1 }
-           { start 0 }
-           { end 100 }
            { uses V{ T{ vreg-use f 0 int-rep f } T{ vreg-use f 100 f int-rep } } }
            { ranges V{ { 0 100 } } }
         }
         T{ live-interval-state
            { vreg 2 }
-           { start 30 }
-           { end 200 }
            { uses V{ T{ vreg-use f 30 int-rep f } T{ vreg-use f 200 f int-rep } } }
            { ranges V{ { 30 200 } } }
         }
@@ -504,15 +440,11 @@ H{ { 1 int-rep } { 2 int-rep } } representations set
     {
         T{ live-interval-state
            { vreg 1 }
-           { start 0 }
-           { end 100 }
            { uses V{ T{ vreg-use f 0 int-rep f } T{ vreg-use f 100 f int-rep } } }
            { ranges V{ { 0 100 } } }
         }
         T{ live-interval-state
            { vreg 2 }
-           { start 30 }
-           { end 100 }
            { uses V{ T{ vreg-use f 30 int-rep f } T{ vreg-use f 100 f int-rep } } }
            { ranges V{ { 30 100 } } }
         }
@@ -534,8 +466,6 @@ H{
     {
         T{ live-interval-state
            { vreg 1 }
-           { start 0 }
-           { end 20 }
            { uses
              V{
                  T{ vreg-use f 0 int-rep f }
@@ -547,8 +477,6 @@ H{
         }
         T{ live-interval-state
            { vreg 2 }
-           { start 0 }
-           { end 20 }
            { uses
              V{
                  T{ vreg-use f 0 int-rep f }
@@ -560,15 +488,11 @@ H{
         }
         T{ live-interval-state
            { vreg 3 }
-           { start 4 }
-           { end 8 }
            { uses V{ T{ vreg-use f 6 int-rep f } } }
            { ranges V{ { 4 8 } } }
         }
         T{ live-interval-state
            { vreg 4 }
-           { start 4 }
-           { end 8 }
            { uses V{ T{ vreg-use f 8 int-rep f } } }
            { ranges V{ { 4 8 } } }
         }
@@ -576,8 +500,6 @@ H{
         ! This guy will invoke the 'spill partially available' code path
         T{ live-interval-state
            { vreg 5 }
-           { start 4 }
-           { end 8 }
            { uses V{ T{ vreg-use f 8 int-rep f } } }
            { ranges V{ { 4 8 } } }
         }
@@ -592,8 +514,6 @@ H{
     {
         T{ live-interval-state
            { vreg 1 }
-           { start 0 }
-           { end 10 }
            { uses V{ T{ vreg-use f 0 int-rep f } T{ vreg-use f 6 f int-rep } T{ vreg-use f 10 f int-rep } } }
            { ranges V{ { 0 10 } } }
         }
@@ -601,8 +521,6 @@ H{
         ! This guy will invoke the 'spill new' code path
         T{ live-interval-state
            { vreg 5 }
-           { start 2 }
-           { end 8 }
            { uses V{ T{ vreg-use f 8 int-rep f } } }
            { ranges V{ { 2 8 } } }
         }
@@ -626,8 +544,6 @@ H{
           {
               T{ live-interval-state
                  { vreg 1 }
-                 { start 0 }
-                 { end 20 }
                  { reg 0 }
                  { ranges V{ { 0 2 } { 10 20 } } }
                  { uses V{ 0 2 10 20 } }
@@ -635,8 +551,6 @@ H{
 
               T{ live-interval-state
                  { vreg 2 }
-                 { start 4 }
-                 { end 40 }
                  { reg 0 }
                  { ranges V{ { 4 6 } { 30 40 } } }
                  { uses V{ 4 6 30 40 } }
@@ -649,8 +563,6 @@ H{
           {
               T{ live-interval-state
                  { vreg 3 }
-                 { start 0 }
-                 { end 40 }
                  { reg 1 }
                  { ranges V{ { 0 40 } } }
                  { uses V{ 0 40 } }
@@ -661,8 +573,6 @@ H{
 
     T{ live-interval-state
         { vreg 4 }
-        { start 8 }
-        { end 10 }
         { ranges V{ { 8 10 } } }
         { uses V{ T{ vreg-use f 8 int-rep f } T{ vreg-use f 10 f int-rep } } }
     }

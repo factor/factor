@@ -14,7 +14,7 @@ SYMBOL: pending-interval-heap
 SYMBOL: pending-interval-assoc
 
 : add-pending ( live-interval -- )
-    [ dup end>> pending-interval-heap get heap-push ]
+    [ dup live-interval-end pending-interval-heap get heap-push ]
     [ [ reg>> ] [ vreg>> ] bi pending-interval-assoc get set-at ]
     bi ;
 
@@ -139,7 +139,8 @@ M: insn assign-registers-in-insn drop ;
     ] change-instructions compute-live-out ;
 
 : init-assignment ( live-intervals -- )
-    [ [ start>> ] map ] keep zip >min-heap unhandled-intervals namespaces:set
+    [ [ live-interval-start ] map ] keep zip
+    >min-heap unhandled-intervals namespaces:set
     <min-heap> pending-interval-heap namespaces:set
     H{ } clone pending-interval-assoc namespaces:set
     H{ } clone machine-live-ins namespaces:set

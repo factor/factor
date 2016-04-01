@@ -114,8 +114,8 @@ ${
 { } [
     40 progress set
     T{ live-interval-state
-       { end 34 }
        { vreg 123 }
+       { ranges { { 0 0 } { 30 34 } } }
     }
     check-handled
 ] unit-test
@@ -141,6 +141,13 @@ ${ cell } [
     T{ sync-point { n 33 } } interval/sync-point-key
 ] unit-test
 
+{ { 0 34 123 } } [
+    T{ live-interval-state
+       { vreg 123 }
+       { ranges { { 0 0 } { 30 34 } } }
+    } interval/sync-point-key
+] unit-test
+
 ! next-spill-slot
 {
     T{ spill-slot f 0 }
@@ -159,24 +166,24 @@ ${ cell } [
         { { 5 1/0. 1/0. } T{ sync-point { n 5 } } }
         {
             { 20 28 f }
-            T{ live-interval-state { start 20 } { end 28 } }
+            T{ live-interval-state { ranges { { 20 28 } } } }
         }
         {
             { 20 30 f }
-            T{ live-interval-state { start 20 } { end 30 } }
+            T{ live-interval-state { ranges { { 20 30 } } } }
         }
         {
             { 33 999 f }
-            T{ live-interval-state { start 33 } { end 999 } }
+            T{ live-interval-state { ranges { { 33 999 } } } }
         }
         { { 33 1/0. 1/0. } T{ sync-point { n 33 } } }
         { { 100 1/0. 1/0. } T{ sync-point { n 100 } } }
     }
 } [
     {
-        T{ live-interval-state { start 20 } { end 30 } }
-        T{ live-interval-state { start 20 } { end 28 } }
-        T{ live-interval-state { start 33 } { end 999 } }
+        T{ live-interval-state { ranges { { 20 30 } } } }
+        T{ live-interval-state { ranges { { 20 28 } } } }
+        T{ live-interval-state { ranges { { 33 999 } } } }
         T{ sync-point { n 5 } }
         T{ sync-point { n 33 } }
         T{ sync-point { n 100 } }
@@ -186,7 +193,7 @@ ${ cell } [
 
 { 2 } [
     {
-        T{ live-interval-state { start 20 } { end 30 } }
-        T{ live-interval-state { start 20 } { end 30 } }
+        T{ live-interval-state { ranges { { 20 30 } } } }
+        T{ live-interval-state { ranges { { 20 30 } } } }
     } >unhandled-min-heap heap-size
 ] unit-test

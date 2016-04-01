@@ -9,17 +9,17 @@ IN: compiler.cfg.linear-scan.allocation.state
 SYMBOL: progress
 
 : check-unhandled ( live-interval -- )
-    start>> progress get <= [ "check-unhandled" throw ] when ; inline
+    live-interval-start progress get <= [ "check-unhandled" throw ] when ; inline
 
 : check-handled ( live-interval -- )
-    end>> progress get > [ "check-handled" throw ] when ; inline
+    live-interval-end progress get > [ "check-handled" throw ] when ; inline
 
 SYMBOL: unhandled-min-heap
 
 GENERIC: interval/sync-point-key ( interval/sync-point -- key )
 
 M: live-interval-state interval/sync-point-key
-    [ start>> ] [ end>> ] [ vreg>> ] tri 3array ;
+    [ ranges>> ranges-endpoints ] [ vreg>> ] bi 3array ;
 
 M: sync-point interval/sync-point-key
     n>> 1/0. 1/0. 3array ;
@@ -59,7 +59,7 @@ SYMBOL: handled-intervals
 : add-handled ( live-interval -- )
     [ check-handled ] [ handled-intervals get push ] bi ;
 
-: finished? ( n live-interval -- ? ) end>> swap < ;
+: finished? ( n live-interval -- ? ) live-interval-end swap < ;
 
 : finish ( n live-interval -- keep? )
     nip add-handled f ;
@@ -143,7 +143,7 @@ SYMBOL: spill-slots
     [ [ min ] when* ] change-at ;
 
 : register-available? ( new result -- ? )
-    [ end>> ] [ second ] bi* < ; inline
+    [ live-interval-end ] [ second ] bi* < ; inline
 
 : register-available ( new result -- )
     first >>reg add-active ;
