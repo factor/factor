@@ -1,141 +1,130 @@
-USING: io.files io.files.temp io.directories io.sockets io kernel threads
-namespaces tools.test continuations strings byte-arrays
-sequences prettyprint system io.encodings.binary io.encodings.ascii
-io.streams.duplex destructors make io.launcher ;
-IN: io.backend.unix.tests
-
-! Unix domain stream sockets
-: socket-server ( -- path ) "unix-domain-socket-test" temp-file ;
+USING: byte-arrays destructors io io.directories
+io.encodings.ascii io.encodings.binary io.files io.files.temp
+io.files.unique io.launcher io.sockets io.streams.duplex kernel
+make namespaces prettyprint sequences strings system threads
+tools.test ;
 
 [
-    [ socket-server delete-file ] ignore-errors
-
-    socket-server <local>
-    ascii <server> [
-        accept drop [
-            "Hello world" print flush
-            readln "XYZ" = "FOO" "BAR" ? print flush
-        ] with-stream
-    ] with-disposal
-
-    socket-server delete-file
-] "Test" spawn drop
-
-yield
-
-{ { "Hello world" "FOO" } } [
     [
-        socket-server <local> ascii [
-            readln ,
-            "XYZ" print flush
-            readln ,
-        ] with-client
-    ] { } make
-] unit-test
+        [
+            "socket-server" <local>
+            ascii <server> [
+                accept drop [
+                    "Hello world" print flush
+                    readln "XYZ" = "FOO" "BAR" ? print flush
+                ] with-stream
+            ] with-disposal
 
-: datagram-server ( -- path ) "unix-domain-datagram-test" temp-file ;
-: datagram-client ( -- path ) "unix-domain-datagram-test-2" temp-file ;
+            "socket-server" delete-file
+        ] "Test" spawn drop
 
-! Unix domain datagram sockets
-[ datagram-server delete-file ] ignore-errors
-[ datagram-client delete-file ] ignore-errors
+        yield
 
-[
-    datagram-server <local> <datagram> "d" [
+        { { "Hello world" "FOO" } } [
+            [
+                "socket-server" <local> ascii [
+                    readln ,
+                    "XYZ" print flush
+                    readln ,
+                ] with-client
+            ] { } make
+        ] unit-test
 
-        "Receive 1" print
+        ! Unix domain datagram sockets
+        [
+            "datagram-server" <local> <datagram> "d" [
 
-        "d" get receive [ reverse ] dip
+                "Receive 1" print
 
-        "Send 1" print
-        dup .
+                "d" get receive [ reverse ] dip
 
-        "d" get send
+                "Send 1" print
+                dup .
 
-        "Receive 2" print
+                "d" get send
 
-        "d" get receive [ " world" append ] dip
+                "Receive 2" print
 
-        "Send 1" print
-        dup .
+                "d" get receive [ " world" append ] dip
 
-         "d" get send
+                "Send 1" print
+                dup .
 
-        "d" get dispose
+                 "d" get send
 
-        "Done" print
+                "d" get dispose
 
-        datagram-server delete-file
-    ] with-variable
-] "Test" spawn drop
+                "Done" print
 
-yield
+                "datagram-server" delete-file
+            ] with-variable
+        ] "Test" spawn drop
 
-[ datagram-client delete-file ] ignore-errors
+        yield
 
-{ } [ datagram-client <local> <datagram> "d" set ] unit-test
+        { } [ "datagram-client" <local> <datagram> "d" set ] unit-test
 
-{ } [
-    "hello" >byte-array
-    datagram-server <local>
-    "d" get send
-] unit-test
+        { } [
+            "hello" >byte-array
+            "datagram-server" <local>
+            "d" get send
+        ] unit-test
 
-{ "olleh" t } [
-    "d" get receive
-    datagram-server <local> =
-    [ >string ] dip
-] unit-test
+        { "olleh" t } [
+            "d" get receive
+            "datagram-server" <local> =
+            [ >string ] dip
+        ] unit-test
 
-{ } [
-    "hello" >byte-array
-    datagram-server <local>
-    "d" get send
-] unit-test
+        { } [
+            "hello" >byte-array
+            "datagram-server" <local>
+            "d" get send
+        ] unit-test
 
-{ "hello world" t } [
-    "d" get receive
-    datagram-server <local> =
-    [ >string ] dip
-] unit-test
+        { "hello world" t } [
+            "d" get receive
+            "datagram-server" <local> =
+            [ >string ] dip
+        ] unit-test
 
-{ } [ "d" get dispose ] unit-test
+        { } [ "d" get dispose ] unit-test
 
-! Test error behavior
-: another-datagram ( -- path ) "unix-domain-datagram-test-3" temp-file ;
+        ! Test error behavior
 
-[ another-datagram delete-file ] ignore-errors
+        "datagram-client" delete-file
 
-datagram-client delete-file
+        { } [ "datagram-client" <local> <datagram> "d" set ] unit-test
 
-{ } [ datagram-client <local> <datagram> "d" set ] unit-test
+        [ B{ 1 2 3 } "another-datagram" <local> "d" get send ] must-fail
 
-[ B{ 1 2 3 } another-datagram <local> "d" get send ] must-fail
+        { } [ "d" get dispose ] unit-test
 
-{ } [ "d" get dispose ] unit-test
+        ! See what happens on send/receive after close
 
-! See what happens on send/receive after close
+        [ "d" get receive ] must-fail
 
-[ "d" get receive ] must-fail
+        [ B{ 1 2 } "datagram-server" <local> "d" get send ] must-fail
 
-[ B{ 1 2 } datagram-server <local> "d" get send ] must-fail
+        ! Invalid parameter tests
 
-! Invalid parameter tests
+        [
+            image-path binary [ input-stream get accept ] with-file-reader
+        ] must-fail
 
-[
-    image-path binary [ input-stream get accept ] with-file-reader
-] must-fail
+        [
+            image-path binary [ input-stream get receive ] with-file-reader
+        ] must-fail
 
-[
-    image-path binary [ input-stream get receive ] with-file-reader
-] must-fail
+        [
+            image-path binary [
+                B{ 1 2 } "datagram-server" <local>
+                input-stream get send
+            ] with-file-reader
+        ] must-fail
 
-[
-    image-path binary [
-        B{ 1 2 } datagram-server <local>
-        input-stream get send
-    ] with-file-reader
-] must-fail
+    ] cleanup-unique-directory
+] with-temp-directory
 
 ! closing stdin caused some problems
 { } [
