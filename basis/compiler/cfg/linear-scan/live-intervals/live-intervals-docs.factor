@@ -31,7 +31,7 @@ HELP: compute-live-intervals
 HELP: find-use
 { $values
   { "insn#" integer }
-  { "live-interval" live-interval }
+  { "live-interval" live-interval-state }
   { "vreg-use/f" vreg-use }
 }
 { $description "Finds the live intervals " { $link vreg-use } " at the given instruction number, if it has one." } ;
@@ -44,7 +44,11 @@ HELP: from
 { $var-description "An integer representing a sequence number one lower than all numbers in the currently processed block." } ;
 
 HELP: intervals-intersect?
-{ $values { "interval1" live-interval } { "interval2" live-interval } { "?" boolean } }
+{ $values
+  { "interval1" live-interval-state }
+  { "interval2" live-interval-state }
+  { "?" boolean }
+}
 { $description "Checks if two live intervals intersect each other." } ;
 
 HELP: live-interval-state
@@ -79,6 +83,10 @@ HELP: live-interval-state
 HELP: live-intervals
 { $var-description "Mapping from vreg to " { $link live-interval-state } "." } ;
 
+HELP: record-def
+{ $values { "vreg" integer } { "n" integer } { spill-slot? boolean } }
+{ $description "Records that the 'vreg' is defined at the instruction numbered 'n'." } ;
+
 HELP: record-temp
 { $values { "vreg" number } { "n" number } }
 { $description "Assigns the interval [n,n] to vreg:s live interval." } ;
@@ -96,10 +104,12 @@ HELP: to
 { $var-description "An integer representing a sequence number equal to the highest number in the currently processed block." } ;
 
 ARTICLE: "compiler.cfg.linear-scan.live-intervals" "Live interval utilities"
-"This vocab contains words for managing live intervals."
+"This vocab contains words for managing live intervals. The main word is " { $link compute-live-intervals } " which goes through the " { $link cfg } " and returns a sequence of " { $link live-interval-state } " instances which encodes all liveness information for it."
 $nl
 "Liveness classes and constructors:"
-{ $subsections <live-interval> live-interval } ;
+{ $subsections <live-interval> live-interval-state }
+"Recording liveness info:"
+{ $subsections record-def record-use record-temp } ;
 
 
 ABOUT: "compiler.cfg.linear-scan.live-intervals"

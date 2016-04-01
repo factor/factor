@@ -4,7 +4,7 @@ compiler.cfg.linear-scan.live-intervals help.markup help.syntax math ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 HELP: assign-spill
-{ $values { "live-interval" live-interval } }
+{ $values { "live-interval" live-interval-state } }
 { $description "Assigns a spill slot for the live interval." }
 { $see-also assign-spill-slot } ;
 
@@ -30,10 +30,10 @@ HELP: spill-before
 
 HELP: split-for-spill
 { $values
-  { "live-interval" live-interval }
+  { "live-interval" live-interval-state }
   { "n" integer }
-  { "before" live-interval }
-  { "after" live-interval }
+  { "before" live-interval-state }
+  { "after" live-interval-state }
 } { $description "During register allocation an interval needs to be split so that the 'after' part of it can be placed in a spill slot." } ;
 
 HELP: spill-intersecting
@@ -57,7 +57,7 @@ HELP: spill-partially-available
 { $description "A register would be available for part of the new interval's lifetime if all active and inactive intervals using that register were split and spilled." } ;
 
 HELP: trim-before-ranges
-{ $values { "live-interval" live-interval } }
+{ $values { "live-interval" live-interval-state } }
 { $description "Extends the last intervals range to one after the last use point and removes all intervals beyond that." } ;
 
 ARTICLE: "compiler.cfg.linear-scan.allocation.spilling" "Spill slot assignment"
