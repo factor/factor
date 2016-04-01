@@ -67,8 +67,6 @@ HELP: live-interval-state
         { $slot "spill-to" }
         { { $link spill-slot } " to use for spilling, if it needs to be spilled." }
     }
-    { { $slot "start" } { "Earliest insn# where the interval is live." } }
-    { { $slot "end" } { "Latest insn# where the interval is live." } }
     {
         { $slot "ranges" }
         { "Inclusive ranges where the live interval is live. This is because the [start,end] interval can have gaps." }
@@ -84,7 +82,7 @@ HELP: live-intervals
 { $var-description "Mapping from vreg to " { $link live-interval-state } "." } ;
 
 HELP: record-def
-{ $values { "vreg" integer } { "n" integer } { spill-slot? boolean } }
+{ $values { "vreg" integer } { "n" integer } { "spill-slot?" boolean } }
 { $description "Records that the 'vreg' is defined at the instruction numbered 'n'." } ;
 
 HELP: record-temp
