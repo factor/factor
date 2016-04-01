@@ -15,7 +15,7 @@ TUPLE: vreg-use n def-rep use-rep spill-slot? ;
 TUPLE: live-interval-state
     vreg
     reg spill-to spill-rep reload-from reload-rep
-    ranges uses ;
+    { ranges vector } { uses vector } ;
 
 : first-use ( live-interval -- use ) uses>> first ; inline
 
@@ -133,14 +133,11 @@ ERROR: bad-live-interval live-interval ;
 : check-start ( live-interval -- )
     dup live-interval-start -1 = [ bad-live-interval ] [ drop ] if ;
 
+: finish-live-interval ( live-interval -- )
+    [ ranges>> reverse! drop ] [ uses>> reverse! drop ] [ check-start ] tri ;
+
 : finish-live-intervals ( live-intervals -- )
-    [
-        {
-            [ [ { } like reverse! ] change-ranges drop ]
-            [ [ { } like reverse! ] change-uses drop ]
-            [ check-start ]
-        } cleave
-    ] each ;
+    [ finish-live-interval ] each ;
 
 TUPLE: sync-point n keep-dst? ;
 

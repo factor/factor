@@ -8,9 +8,9 @@ IN: compiler.cfg.linear-scan.allocation.tests
 : interval-[30,46] ( -- live-interval )
     T{ live-interval-state
        { vreg 49 }
-       { ranges { { 30 46 } } }
+       { ranges V{ { 30 46 } } }
        { uses
-         {
+         V{
              T{ vreg-use { n 30 } { def-rep double-rep } }
              T{ vreg-use { n 46 } { use-rep double-rep } }
          }
@@ -20,7 +20,7 @@ IN: compiler.cfg.linear-scan.allocation.tests
 : interval-[30,60] ( -- live-interval )
     T{ live-interval-state
        { vreg 25 }
-       { ranges { { 30 60 } } }
+       { ranges V{ { 30 60 } } }
        { reg RAX }
     } ;
 
@@ -76,16 +76,16 @@ cpu x86.64? [
         { int-regs V{
             T{ live-interval-state
                { vreg 1 }
-               { ranges { { 30 40 } } }
+               { ranges V{ { 30 40 } } }
                { uses
-                 { T{ vreg-use { n 32 } { def-rep double-rep } } }
+                 V{ T{ vreg-use { n 32 } { def-rep double-rep } } }
                }
             }
             T{ live-interval-state
                { vreg 50 }
-               { ranges { { 5 10 } } }
+               { ranges V{ { 5 10 } } }
                { uses
-                 { T{ vreg-use { n 8 } { def-rep double-rep } } }
+                 V{ T{ vreg-use { n 8 } { def-rep double-rep } } }
                }
             }
         } }
