@@ -129,7 +129,6 @@ M: insn assign-registers-in-insn drop ;
         [
             [
                 {
-                    [ insn#>> 1 - prepare-insn ]
                     [ insn#>> prepare-insn ]
                     [ assign-registers-in-insn ]
                     [ , ]
