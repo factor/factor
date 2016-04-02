@@ -29,8 +29,7 @@ ERROR: not-spilled-error vreg ;
 
 : vreg>spill-slot ( vreg -- spill-slot )
     dup vreg>reg dup spill-slot?
-    [ nip ]
-    [ drop leader not-spilled-error ] if ;
+    [ nip ] [ drop leader not-spilled-error ] if ;
 
 : vregs>regs ( vregs -- assoc )
     [ dup vreg>reg ] H{ } map>assoc ;
@@ -75,9 +74,8 @@ SYMBOL: machine-live-outs
 : expire-interval ( live-interval -- )
     [ remove-pending ] [ handle-spill ] bi ;
 
-: expire-old-intervals ( n -- )
-    pending-interval-heap get swap '[ _ < ] heap-pop-while
-    [ expire-interval ] each ;
+: expire-old-intervals ( n pending-heap -- )
+    swap '[ _ < ] heap-pop-while [ expire-interval ] each ;
 
 : insert-reload ( live-interval -- )
     [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ;
@@ -88,18 +86,16 @@ SYMBOL: machine-live-outs
 : activate-interval ( live-interval -- )
     [ add-pending ] [ handle-reload ] bi ;
 
-: activate-new-intervals ( n -- )
-    unhandled-intervals get swap '[ _ = ] heap-pop-while
-    [ activate-interval ] each ;
+: activate-new-intervals ( n unhandled-heap -- )
+    swap '[ _ = ] heap-pop-while [ activate-interval ] each ;
 
 : prepare-insn ( n -- )
-    [ expire-old-intervals ] [ activate-new-intervals ] bi ;
-
-GENERIC: assign-registers-in-insn ( insn -- )
+    [ pending-interval-heap get expire-old-intervals ]
+    [ unhandled-intervals get activate-new-intervals ] bi ;
 
 RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 
-M: vreg-insn assign-registers-in-insn
+: assign-all-registers ( insn -- )
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
 : assign-gc-roots ( gc-map -- )
@@ -108,17 +104,15 @@ M: vreg-insn assign-registers-in-insn
 : assign-derived-roots ( gc-map -- )
     [ [ [ vreg>spill-slot ] bi@ ] assoc-map ] change-derived-roots drop ;
 
-M: gc-map-insn assign-registers-in-insn
-    [ [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ]
-    [ gc-map>> [ assign-gc-roots ] [ assign-derived-roots ] bi ]
-    bi ;
-
-M: insn assign-registers-in-insn drop ;
+: assign-registers-in-insn ( insn -- )
+    dup assign-all-registers dup gc-map-insn? [
+        gc-map>> [ assign-gc-roots ] [ assign-derived-roots ] bi
+    ] [ drop ] if ;
 
 : begin-block ( bb -- )
     {
         [ basic-block namespaces:set ]
-        [ block-from activate-new-intervals ]
+        [ block-from unhandled-intervals get activate-new-intervals ]
         [ compute-edge-live-in ]
         [ compute-live-in ]
     } cleave ;
