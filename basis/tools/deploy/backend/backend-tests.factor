@@ -1,4 +1,4 @@
-USING: kernel pcre sequences tools.deploy.backend tools.test ;
+USING: pcre sequences tools.deploy.backend tools.test ;
 IN: tools.deploy.backend.tests
 
 : complete-match? ( str regexp -- ? )

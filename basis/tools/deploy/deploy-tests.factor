@@ -37,10 +37,8 @@ delete-staging-images
 { } [ "hello-ui" shake-and-bake 2242000 small-enough? ] unit-test
 
 { "math-threads-compiler-io-ui" } [
-    "hello-ui" deploy-config [
-        bootstrap-profile staging-image-name file-name
-        "." split second
-    ] with-variables
+    "hello-ui" deploy-config config>profile
+    staging-image-name file-name "." split second
 ] unit-test
 
 ! [ ] [ "maze" shake-and-bake 1520000 small-enough? ] unit-test
@@ -157,7 +155,7 @@ os macosx? [
 { t } [
     "tools.deploy.test.18" shake-and-bake
     deploy-test-command ascii [ readln ] with-process-reader
-    test-image temp-file =
+    test-image-path =
 ] unit-test
 
 { } [ "resource:LICENSE.txt" "license.txt" temp-file copy-file ] unit-test

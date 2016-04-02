@@ -1,15 +1,10 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make continuations.private kernel.private init
-assocs kernel vocabs words sequences memory io system arrays
-continuations math definitions mirrors splitting parser classes
-summary layouts vocabs.loader prettyprint.config prettyprint debugger
-io.streams.c io.files io.files.temp io.pathnames io.directories
-io.directories.hierarchy io.backend quotations io.launcher
-tools.deploy.config tools.deploy.config.editor bootstrap.image
-io.encodings.utf8 destructors accessors hashtables
-tools.deploy.libraries vocabs.metadata.resources
-tools.deploy.embed locals ;
+USING: accessors assocs bootstrap.image hashtables io io.directories
+io.encodings.utf8 io.files io.files.temp io.launcher io.pathnames
+kernel locals make namespaces prettyprint sequences splitting system
+tools.deploy.config tools.deploy.config.editor tools.deploy.embed
+tools.deploy.libraries vocabs.loader vocabs.metadata.resources ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm-path )
@@ -48,18 +43,6 @@ ERROR: can't-deploy-library-file library ;
     ! If stage1 image doesn't exist, create one.
     my-boot-image-name resource-path exists?
     [ make-my-image ] unless ;
-
-: bootstrap-profile ( -- profile )
-    [
-        deploy-math? get [ "math" , ] when
-        deploy-threads? get [ "threads" , ] when
-        "compiler" ,
-        deploy-help? get [ "help" , ] when
-        native-io? [ "io" , ] when
-        deploy-ui? get [ "ui" , ] when
-        deploy-unicode? get [ "unicode" , ] when
-
-    ] { } make ;
 
 : staging-image-name ( profile -- name )
     "-" join "." my-arch-name 3append
@@ -126,14 +109,14 @@ DEFER: ?make-staging-image
 
 :: make-deploy-image ( vm image vocab config -- manifest )
     make-boot-image
-    config [
-        bootstrap-profile :> profile
-        vocab "vocab-manifest-" prepend temp-file :> manifest-file
-        image vocab manifest-file profile deploy-command-line :> flags
-        profile ?make-staging-image
-        vm flags run-factor
-        manifest-file parse-vocab-manifest-file
-    ] with-variables ;
+
+    config config>profile :> profile
+    vocab "vocab-manifest-" prepend temp-file :> manifest-file
+    image vocab manifest-file profile deploy-command-line :> flags
+
+    profile ?make-staging-image
+    vm flags run-factor
+    manifest-file parse-vocab-manifest-file ;
 
 :: make-deploy-image-executable ( vm image vocab config -- manifest )
     vm image vocab config make-deploy-image
