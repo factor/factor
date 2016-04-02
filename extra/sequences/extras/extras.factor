@@ -158,6 +158,42 @@ PRIVATE>
 : sequence>slice ( sequence -- slice )
     [ drop 0 ] [ length ] [ ] tri <slice> ; inline
 
+: slice-order-by-from ( slice1 slice2 -- slice-lt slice-gt )
+    2dup [ from>> ] bi@ > [ swap ] when ; inline
+
+: ordered-slices-range ( slice-lt slice-gt -- to from )
+    [ to>> ] [ from>> ] bi* ;
+
+: unordered-slices-range ( slice1 slice2 -- to from )
+    slice-order-by-from ordered-slices-range ;
+
+: ordered-slices-overlap? ( slice-lt slice-gt -- ? )
+    ordered-slices-range > ; inline
+
+: unordered-slices-overlap? ( slice1 slice2 -- ? )
+    unordered-slices-range > ; inline
+
+: slices-overlap? ( slice1 slice2 -- ? )
+    unordered-slices-overlap? ;
+
+: ordered-slices-touch? ( slice-lt slice-gt -- ? )
+    ordered-slices-range >= ; inline
+
+: unordered-slices-touch? ( slice1 slice2 -- ? )
+    unordered-slices-range >= ; inline
+
+: slices-touch? ( slice1 slice2 -- ? )
+    unordered-slices-touch? ;
+
+ERROR: slices-don't-touch slice1 slice2 ;
+: merge-slices ( slice1 slice2 -- slice/* )
+    slice-order-by-from
+    2dup ordered-slices-touch? [
+        [ from>> ] [ [ to>> ] [ seq>> ] bi ] bi* <slice>
+    ] [
+        slices-don't-touch
+    ] if ;
+
 : length- ( n sequence -- m ) length swap - ; inline
 
 : rotate-headwards ( seq n -- seq' )

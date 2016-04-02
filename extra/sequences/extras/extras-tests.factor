@@ -52,6 +52,26 @@ IN: sequences.extras.tests
 { "abc" }
 [ "abc" sequence>slice >string ] unit-test
 
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 2 4 rot <slice> ] bi slices-overlap? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 1 2 rot <slice> ] bi slices-overlap? ] unit-test
+{ f } [ "abcdef" [ 0 3 rot <slice> ] [ 3 6 rot <slice> ] bi slices-overlap? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 2 4 rot <slice> ] bi slices-touch? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 1 2 rot <slice> ] bi slices-touch? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 3 6 rot <slice> ] bi slices-touch? ] unit-test
+{ f } [ "abcdef" [ 0 3 rot <slice> ] [ 4 6 rot <slice> ] bi slices-touch? ] unit-test
+
+{ "abcdef" } [
+    "abcdef" [ 0 3 rot <slice> ] [ 3 6 rot <slice> ] bi merge-slices >string
+] unit-test
+
+{ "abcdef" } [
+    "abcdef" [ 3 6 rot <slice> ] [ 0 3 rot <slice> ] bi merge-slices >string
+] unit-test
+
+{ "abc" } [
+    "abcdef" [ 0 3 rot <slice> ] [ 0 3 rot <slice> ] bi merge-slices >string
+] unit-test
+
 
 { "hello" } [ "hello" 0 rotate-headwards ] unit-test
 { "llohe" } [ "hello" 2 rotate-headwards ] unit-test
