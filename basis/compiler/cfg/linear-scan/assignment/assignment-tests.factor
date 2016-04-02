@@ -16,6 +16,21 @@ IN: compiler.cfg.linear-scan.assignment.tests
     T{ ##peek f 37 D: 0 0 } [ assign-insn-defs ] keep
 ] unit-test
 
+! assign-all-registers
+{
+    T{ ##replace-imm f 20 D: 0 f }
+    T{ ##replace f RAX D: 0 f }
+} [
+    ! It doesn't do anything because ##replace-imm isn't a vreg-insn.
+    T{ ##replace-imm { src 20 } { loc D: 0 } } [ assign-all-registers ] keep
+
+    ! This one does something.
+    H{ { 37 RAX } } pending-interval-assoc set
+    H{ { 37 37 } } leader-map set
+    T{ ##replace { src 37 } { loc D: 0 } } clone
+    [ assign-all-registers ] keep
+] unit-test
+
 ! assign-registers
 { } [
     V{ T{ ##inc { loc D: 3 } { insn# 7 } } } 0 insns>block block>cfg { }
@@ -59,23 +74,39 @@ IN: compiler.cfg.linear-scan.assignment.tests
     ] V{ } make
 ] unit-test
 
+: cherry-pick ( seq indices -- seq' )
+    [ swap nth ] with map  ;
+
+: (setup-vreg-spills) ( vreg-defs -- reps leaders spill-slots )
+    [ [ 2 head ] map ]
+    [ [ { 0 2 } cherry-pick ] map ]
+    [
+        [
+            first4 [ nip [ rep-size 2array ] dip 2array ] [ 3drop f ] if*
+        ] map sift
+    ] tri ;
+
+: setup-vreg-spills ( vreg-defs -- )
+    (setup-vreg-spills)
+    [ representations set ] [ leader-map set ] [ spill-slots set ] tri* ;
+
+! vreg>spill-slot
+{ T{ spill-slot { n 990 } } } [
+    { { 10 int-rep 10 T{ spill-slot { n 990 } } } } setup-vreg-spills
+    10 vreg>spill-slot
+] unit-test
+
 ! vreg>reg
 { T{ spill-slot f 16 } } [
-    H{ { 45 double-2-rep } } representations set
-    H{ { 45 45 } } leader-map set
-    H{ { { 45 16 } T{ spill-slot { n 16 } } } } spill-slots set
+    { { 45 double-rep 45 T{ spill-slot { n 16 } } } } setup-vreg-spills
     45 vreg>reg
 ] unit-test
 
 [
     ! It gets very strange if the leader of a vreg has a different
     ! sized representation than the vreg being led.
-    H{
-        { 45 double-2-rep }
-        { 46 double-rep }
-    } representations set
-    H{ { 45 45 } { 46 45 } } leader-map set
-    H{ { { 45 16 } T{ spill-slot { n 16 } } } } spill-slots set
+    { { 45 double-2-rep 45 T{ spill-slot { n 16 } } }
+      { 46 double-rep 45 f } } setup-vreg-spills
     46 vreg>reg
 ] [ bad-vreg? ] must-fail-with
 
@@ -85,7 +116,6 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ] unit-test
 
 { 3 } [
-    { 50 90 95 120 } [ 25 <live-interval> 2array ] map >min-heap
-    pending-interval-heap set 90 expire-old-intervals
-    pending-interval-heap get heap-size
+    90 { 50 90 95 120 } [ 25 <live-interval> 2array ] map >min-heap
+    [ expire-old-intervals ] keep heap-size
 ] unit-test
