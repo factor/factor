@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2011 Slava Pestov.
+! Copyrioht (C) 2006, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations debugger io io.streams.string
 kernel namespaces prettyprint ui ui.gadgets.worlds ;
@@ -13,7 +13,7 @@ IN: ui.debugger
 
 ! ( error -- * )
 [
-    ui-running? [ dup error-alert ] [ dup print-error ] if die throw
+    ui-running? [ dup error-alert ] [ dup print-error ] if die
 ] callback-error-hook set-global
 
 M: world-error error.
