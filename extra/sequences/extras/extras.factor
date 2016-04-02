@@ -152,10 +152,21 @@ PRIVATE>
 : cut-slice* ( seq n -- before after )
     [ head-slice* ] [ tail-slice* ] 2bi ;
 
-: rotate ( seq n -- seq' )
+: ?<slice> ( from to/f sequence -- slice )
+    over [ nip [ length ] [ ] bi ] unless <slice> ; inline
+
+: sequence>slice ( sequence -- slice )
+    [ drop 0 ] [ length ] [ ] tri <slice> ; inline
+
+: length- ( n sequence -- m ) length swap - ; inline
+
+: rotate-headwards ( seq n -- seq' )
     cut prepend ;
 
-:: rotate! ( seq n -- )
+: rotate-tailwards ( seq n -- seq' )
+    over length- cut prepend ;
+
+:: rotate-headwards! ( seq n -- )
     n seq bounds-check length :> end
     0 n [ 2dup = ] [
         [ seq exchange-unsafe ] [ [ 1 + ] bi@ ] 2bi
@@ -164,7 +175,7 @@ PRIVATE>
     ] until 3drop ;
 
 : all-rotations ( seq -- seq' )
-    dup length iota [ rotate ] with map ;
+    dup length iota [ rotate-headwards ] with map ;
 
 <PRIVATE
 
