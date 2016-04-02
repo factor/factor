@@ -14,12 +14,10 @@ IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
 
-TUPLE: window-handle window fullscreen? im-context ;
+TUPLE: window-handle window im-context fullscreen? ;
 
 : <window-handle> ( window im-context -- window-handle )
-    window-handle new
-        swap >>im-context
-        swap >>window ;
+    f window-handle boa ;
 
 : connect-signal-with-data ( object signal-name callback data -- )
     [ utf8 string>alien ] 2dip g_signal_connect drop ;
