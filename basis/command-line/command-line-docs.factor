@@ -135,10 +135,10 @@ $nl
     "\".factor-rc\" rc-path print"
     "\".factor-boot-rc\" rc-path print"
 }
-"Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration:"
+"Here is an example " { $snippet ".factor-boot-rc" } " which sets up your developer name:"
 { $code
-    "USING: editors.gvim namespaces ;"
-    "\"/opt/local/bin\" \\ gvim-path set-global"
+    "USING: tools.scaffold namespaces ;"
+    "\"Sheeple Sheepleton\" developer-name set-global"
 } ;
 
 ARTICLE: "command-line" "Command line arguments"
