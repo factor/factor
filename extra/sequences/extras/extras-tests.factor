@@ -46,10 +46,17 @@ IN: sequences.extras.tests
 { { "hello," " " "world!" " " " " } }
 [ "hello, world!  " [ blank? ] slice-when [ >string ] map ] unit-test
 
-{ "hello" } [ "hello" 0 rotate ] unit-test
-{ "llohe" } [ "hello" 2 rotate ] unit-test
-{ "hello" } [ "hello" dup 0 rotate! ] unit-test
-{ "lohel" } [ "hello" dup 3 rotate! ] unit-test
+{ t }
+[ "abc" sequence>slice slice? ] unit-test
+
+{ "abc" }
+[ "abc" sequence>slice >string ] unit-test
+
+
+{ "hello" } [ "hello" 0 rotate-headwards ] unit-test
+{ "llohe" } [ "hello" 2 rotate-headwards ] unit-test
+{ "hello" } [ "hello" dup 0 rotate-headwards! ] unit-test
+{ "lohel" } [ "hello" dup 3 rotate-headwards! ] unit-test
 
 { { } } [ { } [ ] map-concat ] unit-test
 { V{ 0 0 1 0 1 2 } } [ 4 iota [ iota ] map-concat ] unit-test
