@@ -33,6 +33,13 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     dup finish-live-interval ranges>>
 ] unit-test
 
+! insn>sync-point
+{ f f t } [
+    T{ ##call-gc } insn>sync-point keep-dst?>>
+    T{ ##callback-outputs } insn>sync-point keep-dst?>>
+    T{ ##unbox } insn>sync-point keep-dst?>>
+] unit-test
+
 ! intervals-intersect?
 { t f f } [
     { { 4 20 } } <live-interval-for-ranges>

@@ -134,22 +134,14 @@ ERROR: bad-live-interval live-interval ;
     dup live-interval-start -1 = [ bad-live-interval ] [ drop ] if ;
 
 : finish-live-interval ( live-interval -- )
-    [ ranges>> reverse! drop ] [ uses>> reverse! drop ] [ check-start ] tri ;
-
-: finish-live-intervals ( live-intervals -- )
-    [ finish-live-interval ] each ;
+    [ ranges>> reverse! ] [ uses>> reverse! ] [ check-start ] tri 2drop ;
 
 TUPLE: sync-point n keep-dst? ;
 
-C: <sync-point> sync-point
-
 GENERIC: insn>sync-point ( insn -- sync-point/f )
 
-M: hairy-clobber-insn insn>sync-point
-    insn#>> f <sync-point> ;
-
 M: clobber-insn insn>sync-point
-    insn#>> t <sync-point> ;
+    [ insn#>> ] [ hairy-clobber-insn? not ] bi sync-point boa ;
 
 M: insn insn>sync-point drop f ;
 
@@ -159,7 +151,7 @@ M: insn insn>sync-point drop f ;
 : cfg>live-intervals ( cfg -- live-intervals )
     H{ } clone live-intervals set
     linearization-order <reversed> [ compute-live-intervals-step ] each
-    live-intervals get values dup finish-live-intervals ;
+    live-intervals get values dup [ finish-live-interval ] each ;
 
 : compute-live-intervals ( cfg -- intervals/sync-points )
     [ cfg>live-intervals ] [ cfg>sync-points ] bi append ;

@@ -8,7 +8,8 @@ HELP: <live-interval>
   { "vreg" "virtual register" }
   { "live-interval" live-interval-state }
 }
-{ $description "Creates a new live interval for a virtual register. Initially the range is empty." } ;
+{ $description "Creates a new live interval for a virtual register. Initially the ranges are empty and it has no uses." }
+{ $see-also vreg>live-interval } ;
 
 HELP: block-from
 { $values { "bb" basic-block } { "n" integer } }
@@ -36,9 +37,9 @@ HELP: find-use
 }
 { $description "Finds the live intervals " { $link vreg-use } " at the given instruction number, if it has one." } ;
 
-HELP: finish-live-intervals
-{ $values { "live-intervals" sequence } }
-{ $description "Since live intervals are computed in a backward order, we have to reverse some sequences, and compute the start and end." } ;
+HELP: finish-live-interval
+{ $values { "live-interval" live-interval-state } }
+{ $description "Reverses the 'ranges' and 'uses' of the live-interval since those are computed in the reverse order." } ;
 
 HELP: from
 { $var-description "An integer representing a sequence number one lower than all numbers in the currently processed block." } ;
@@ -50,6 +51,10 @@ HELP: intervals-intersect?
   { "?" boolean }
 }
 { $description "Checks if two live intervals intersect each other." } ;
+
+HELP: last-use?
+{ $values { "insn#" integer } { "uses" sequence } { "use/f" $maybe vreg-use } }
+{ $description "Maybe gets the last " { $link vreg-use } " of a " { $link live-interval-state } "." } ;
 
 HELP: live-interval-state
 { $class-description "A class encoding the \"liveness\" of a virtual register. It has the following slots:"
@@ -90,13 +95,13 @@ HELP: record-temp
 { $description "Assigns the interval [n,n] to vreg:s live interval." } ;
 
 HELP: sync-point
-{ $class-description "A location where all registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
+{ $class-description "A location where all live registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
   { $table
     { { $slot "n" } { "Set from an instructions sequence number." } }
     { { $slot "keep-dst?" } { "Boolean that determines whether registers are spilled around this sync point." } }
   }
 }
-{ $see-also insn } ;
+{ $see-also cfg>sync-points insn } ;
 
 HELP: to
 { $var-description "An integer representing a sequence number equal to the highest number in the currently processed block." } ;
