@@ -61,7 +61,7 @@ ERROR: bad-live-ranges interval ;
         } cleave
     ] if ;
 
-: split-for-spill ( live-interval n -- before after )
+: split-for-spill ( live-interval n -- before/f after/f )
     split-interval [ spill-before ] [ spill-after ] bi* ;
 
 : find-next-use ( live-interval new -- n )
@@ -96,8 +96,7 @@ ERROR: bad-live-ranges interval ;
 
 : spill ( live-interval n -- )
     split-for-spill
-    [ [ add-handled ] when* ]
-    [ [ add-unhandled ] when* ] bi* ;
+    [ [ add-handled ] when* ] [ [ add-unhandled ] when* ] bi* ;
 
 :: spill-intersecting-active ( new reg -- )
     new active-intervals-for [ [ reg>> reg = ] find swap dup ] keep

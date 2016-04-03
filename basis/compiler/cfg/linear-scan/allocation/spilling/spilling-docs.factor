@@ -32,8 +32,8 @@ HELP: split-for-spill
 { $values
   { "live-interval" live-interval-state }
   { "n" integer }
-  { "before" live-interval-state }
-  { "after" live-interval-state }
+  { "before/f" $maybe live-interval-state }
+  { "after/f" $maybe live-interval-state }
 } { $description "During register allocation an interval needs to be split so that the 'after' part of it can be placed in a spill slot." } ;
 
 HELP: spill-intersecting

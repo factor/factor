@@ -36,6 +36,11 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
     test-live-interval last-use-rep
 ] unit-test
 
+! spill-before
+{ f } [
+    30 <live-interval> spill-before
+] unit-test
+
 ! trim-after-ranges
 {
     T{ live-interval-state
