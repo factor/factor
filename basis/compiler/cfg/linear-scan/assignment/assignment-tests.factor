@@ -6,13 +6,36 @@ cpu.x86.assembler.operands grouping heaps kernel make namespaces random
 sequences sorting tools.test ;
 IN: compiler.cfg.linear-scan.assignment.tests
 
+: cherry-pick ( seq indices -- seq' )
+    [ swap nth ] with map  ;
+
+: (setup-vreg-spills) ( vreg-defs -- reps leaders spill-slots )
+    [ [ 2 head ] map ]
+    [ [ { 0 2 } cherry-pick ] map ]
+    [
+        [
+            first4 [ nip [ rep-size 2array ] dip 2array ] [ 3drop f ] if*
+        ] map sift
+    ] tri ;
+
+: setup-vreg-spills ( vreg-defs -- )
+    (setup-vreg-spills)
+    [ representations set ] [ leader-map set ] [ spill-slots set ] tri* ;
+
+! assign-gc-roots
+{
+    T{ gc-map { gc-roots { T{ spill-slot { n 7 } } } } }
+} [
+    { { 23 int-rep 23 T{ spill-slot { n 7 } } } } setup-vreg-spills
+    <gc-map> 23 1array >>gc-roots [ assign-gc-roots ] keep
+] unit-test
+
 ! assign-insn-defs
 {
     T{ ##peek { dst RAX } { loc T{ ds-loc } } { insn# 0 } }
 } [
     H{ { 37 RAX } } pending-interval-assoc set
-    H{ { 37 int-rep } } representations set
-    H{ { 37 37 } } leader-map set
+    { { 37 int-rep 37 f } } setup-vreg-spills
     T{ ##peek f 37 D: 0 0 } [ assign-insn-defs ] keep
 ] unit-test
 
@@ -46,6 +69,12 @@ IN: compiler.cfg.linear-scan.assignment.tests
     [ assign-registers-in-block ] keep instructions>>
 ] unit-test
 
+! expire-old-intervals
+{ 3 } [
+    90 { 50 90 95 120 } [ 25 <live-interval> 2array ] map >min-heap
+    [ expire-old-intervals ] keep heap-size
+] unit-test
+
 ! insert-reload
 {
     { T{ ##reload { dst RAX } { rep int-rep } { src T{ spill-slot } } } }
@@ -74,22 +103,6 @@ IN: compiler.cfg.linear-scan.assignment.tests
     ] V{ } make
 ] unit-test
 
-: cherry-pick ( seq indices -- seq' )
-    [ swap nth ] with map  ;
-
-: (setup-vreg-spills) ( vreg-defs -- reps leaders spill-slots )
-    [ [ 2 head ] map ]
-    [ [ { 0 2 } cherry-pick ] map ]
-    [
-        [
-            first4 [ nip [ rep-size 2array ] dip 2array ] [ 3drop f ] if*
-        ] map sift
-    ] tri ;
-
-: setup-vreg-spills ( vreg-defs -- )
-    (setup-vreg-spills)
-    [ representations set ] [ leader-map set ] [ spill-slots set ] tri* ;
-
 ! vreg>spill-slot
 { T{ spill-slot { n 990 } } } [
     { { 10 int-rep 10 T{ spill-slot { n 990 } } } } setup-vreg-spills
@@ -113,9 +126,4 @@ IN: compiler.cfg.linear-scan.assignment.tests
 { { 3 56 } } [
     { { 3 7 } { -1 56 } { -1 3 } } >min-heap [ -1 = ] heap-pop-while
     natural-sort
-] unit-test
-
-{ 3 } [
-    90 { 50 90 95 120 } [ 25 <live-interval> 2array ] map >min-heap
-    [ expire-old-intervals ] keep heap-size
 ] unit-test
