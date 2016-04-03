@@ -75,7 +75,7 @@ SYMBOL: machine-live-outs
     [ remove-pending ] [ handle-spill ] bi ;
 
 : expire-old-intervals ( n pending-heap -- )
-    swap '[ _ < ] heap-pop-while [ expire-interval ] each ;
+    [ > ] with heap-pop-while [ expire-interval ] each ;
 
 : insert-reload ( live-interval -- )
     [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ;
@@ -87,7 +87,7 @@ SYMBOL: machine-live-outs
     [ add-pending ] [ handle-reload ] bi ;
 
 : activate-new-intervals ( n unhandled-heap -- )
-    swap '[ _ = ] heap-pop-while [ activate-interval ] each ;
+    [ = ] with heap-pop-while [ activate-interval ] each ;
 
 : prepare-insn ( n -- )
     [ pending-interval-heap get expire-old-intervals ]
@@ -99,7 +99,7 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
 : assign-gc-roots ( gc-map -- )
-    [ [ vreg>spill-slot ] map ] change-gc-roots drop ;
+    gc-roots>> [ vreg>spill-slot ] map! drop ;
 
 : assign-derived-roots ( gc-map -- )
     [ [ [ vreg>spill-slot ] bi@ ] assoc-map ] change-derived-roots drop ;
