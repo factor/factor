@@ -1,6 +1,6 @@
-USING: compiler.cfg compiler.cfg.instructions
-compiler.cfg.linear-scan.allocation cpu.architecture help.markup help.syntax
-kernel math sequences ;
+USING: compiler.cfg compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation help.markup help.syntax kernel
+math sequences ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 HELP: <live-interval>
@@ -24,10 +24,16 @@ HELP: cfg>sync-points
 { $description "Creates a sequence of all sync points in the cfg." }
 { $see-also sync-point } ;
 
+HELP: clobber-insn
+{ $class-description "Instructions that clobber registers but are allowed to produce outputs in registers. Inputs are in spill slots, except for inputs coalesced with the output, in which case that input will be in a register." } ;
+
 HELP: compute-live-intervals
 { $values { "cfg" cfg } { "intervals/sync-points" sequence } }
 { $description "Computes the live intervals and sync points of a cfg." }
 { $notes "The instructions must be numbered." } ;
+
+HELP: hairy-clobber-insn
+{ $class-description "Instructions that clobber registers. They receive inputs and  produce outputs in spill slots." } ;
 
 HELP: find-use
 { $values
@@ -101,10 +107,14 @@ HELP: sync-point
     { { $slot "keep-dst?" } { "Boolean that determines whether registers are spilled around this sync point." } }
   }
 }
-{ $see-also cfg>sync-points insn } ;
+{ $see-also cfg>sync-points clobber-insn hairy-clobber-insn insn } ;
 
 HELP: to
 { $var-description "An integer representing a sequence number equal to the highest number in the currently processed block." } ;
+
+HELP: uses-vregs*
+{ $values { "insn" insn } { "seq" sequence } }
+{ $description "Like " { $link uses-vregs } " except it also includes gc-maps base pointers. The point is to make their values available even if the base pointers themselves are never used again." } ;
 
 ARTICLE: "compiler.cfg.linear-scan.live-intervals" "Live interval utilities"
 "This vocab contains words for managing live intervals. The main word is " { $link compute-live-intervals } " which goes through the " { $link cfg } " and returns a sequence of " { $link live-interval-state } " instances which encodes all liveness information for it."
@@ -112,7 +122,12 @@ $nl
 "Liveness classes and constructors:"
 { $subsections <live-interval> live-interval-state }
 "Recording liveness info:"
-{ $subsections record-def record-use record-temp } ;
+{ $subsections
+  compute-live-intervals*
+  record-def
+  record-use
+  record-temp
+} ;
 
 
 ABOUT: "compiler.cfg.linear-scan.live-intervals"

@@ -81,13 +81,23 @@ M: insn compute-live-intervals* drop ;
     n n live-interval ranges>> add-range
     n live-interval f (add-use) vreg rep-of >>def-rep drop ;
 
-! Extend lifetime intervals of base pointers, so that their
-! values are available even if the base pointer is never used
-! again.
 : uses-vregs* ( insn -- seq )
     dup gc-map-insn? [
         [ uses-vregs ] [ gc-map>> derived-roots>> values ] bi append
     ] [ uses-vregs ] if ;
+
+UNION: hairy-clobber-insn
+    ##call-gc
+    alien-call-insn
+    ##callback-inputs
+    ##callback-outputs
+    ##unbox-long-long ;
+
+UNION: clobber-insn
+    hairy-clobber-insn
+    ##unbox
+    ##box
+    ##box-long-long ;
 
 M: vreg-insn compute-live-intervals* ( insn -- )
     dup insn#>>

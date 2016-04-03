@@ -855,25 +855,6 @@ TUPLE: gc-map scrub-d scrub-r gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
 
-! Instructions that clobber registers. They receive inputs and
-! produce outputs in spill slots.
-UNION: hairy-clobber-insn
-    ##call-gc
-    alien-call-insn
-    ##callback-inputs
-    ##callback-outputs
-    ##unbox-long-long ;
-
-! Instructions that clobber registers but are allowed to produce
-! outputs in registers. Inputs are in spill slots, except for
-! inputs coalesced with the output, in which case that input
-! will be in a register.
-UNION: clobber-insn
-    hairy-clobber-insn
-    ##unbox
-    ##box
-    ##box-long-long ;
-
 UNION: def-is-use-insn
     ##box-alien
     ##box-displaced-alien
