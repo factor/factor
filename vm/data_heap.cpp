@@ -2,11 +2,6 @@
 
 namespace factor {
 
-void factor_vm::init_card_decks() {
-  cards_offset = (cell)data->cards - addr_to_card(data->start);
-  decks_offset = (cell)data->decks - addr_to_deck(data->start);
-}
-
 data_heap::data_heap(bump_allocator* vm_nursery,
                      cell young_size_,
                      cell aging_size_,
@@ -108,7 +103,8 @@ void data_heap::mark_all_cards() {
 
 void factor_vm::set_data_heap(data_heap* data_) {
   data = data_;
-  init_card_decks();
+  cards_offset = (cell)data->cards - addr_to_card(data->start);
+  decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
 void factor_vm::init_data_heap(cell young_size, cell aging_size,

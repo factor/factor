@@ -42,8 +42,8 @@ bool factor_vm::factor_arg(const vm_char* str, const vm_char* arg,
   if (SSCANF(str, arg, &val) > 0) {
     *value = val;
     return true;
-  } else
-    return false;
+  }
+  return false;
 }
 
 void factor_vm::init_parameters_from_args(vm_parameters* p, int argc,
@@ -158,7 +158,7 @@ void factor_vm::init_factor(vm_parameters* p) {
   srand((unsigned int)nano_count());
   init_ffi();
   init_contexts(p->datastack_size, p->retainstack_size, p->callstack_size);
-  init_callbacks(p->callback_size);
+  callbacks = new callback_heap(p->callback_size, this);
   load_image(p);
   init_c_io();
   init_inline_caching((int)p->max_pic_size);
