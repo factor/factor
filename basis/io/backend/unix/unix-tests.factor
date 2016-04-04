@@ -1,130 +1,127 @@
 USING: byte-arrays destructors io io.directories
-io.encodings.ascii io.encodings.binary io.files io.files.temp
-io.files.unique io.launcher io.sockets io.streams.duplex kernel
-make namespaces prettyprint sequences strings system threads
-tools.test ;
+io.encodings.ascii io.encodings.binary io.files io.launcher
+io.sockets io.streams.duplex kernel make namespaces prettyprint
+sequences strings system threads tools.test ;
 
 [
     [
+        "socket-server" <local>
+        ascii <server> [
+            accept drop [
+                "Hello world" print flush
+                readln "XYZ" = "FOO" "BAR" ? print flush
+            ] with-stream
+        ] with-disposal
+
+        "socket-server" delete-file
+    ] "Test" spawn drop
+
+    yield
+
+    { { "Hello world" "FOO" } } [
         [
-            "socket-server" <local>
-            ascii <server> [
-                accept drop [
-                    "Hello world" print flush
-                    readln "XYZ" = "FOO" "BAR" ? print flush
-                ] with-stream
-            ] with-disposal
+            "socket-server" <local> ascii [
+                readln ,
+                "XYZ" print flush
+                readln ,
+            ] with-client
+        ] { } make
+    ] unit-test
 
-            "socket-server" delete-file
-        ] "Test" spawn drop
+    ! Unix domain datagram sockets
+    [
+        "datagram-server" <local> <datagram> "d" [
 
-        yield
+            "Receive 1" print
 
-        { { "Hello world" "FOO" } } [
-            [
-                "socket-server" <local> ascii [
-                    readln ,
-                    "XYZ" print flush
-                    readln ,
-                ] with-client
-            ] { } make
-        ] unit-test
+            "d" get receive [ reverse ] dip
 
-        ! Unix domain datagram sockets
-        [
-            "datagram-server" <local> <datagram> "d" [
+            "Send 1" print
+            dup .
 
-                "Receive 1" print
-
-                "d" get receive [ reverse ] dip
-
-                "Send 1" print
-                dup .
-
-                "d" get send
-
-                "Receive 2" print
-
-                "d" get receive [ " world" append ] dip
-
-                "Send 1" print
-                dup .
-
-                 "d" get send
-
-                "d" get dispose
-
-                "Done" print
-
-                "datagram-server" delete-file
-            ] with-variable
-        ] "Test" spawn drop
-
-        yield
-
-        { } [ "datagram-client" <local> <datagram> "d" set ] unit-test
-
-        { } [
-            "hello" >byte-array
-            "datagram-server" <local>
             "d" get send
-        ] unit-test
 
-        { "olleh" t } [
-            "d" get receive
-            "datagram-server" <local> =
-            [ >string ] dip
-        ] unit-test
+            "Receive 2" print
 
-        { } [
-            "hello" >byte-array
-            "datagram-server" <local>
-            "d" get send
-        ] unit-test
+            "d" get receive [ " world" append ] dip
 
-        { "hello world" t } [
-            "d" get receive
-            "datagram-server" <local> =
-            [ >string ] dip
-        ] unit-test
+            "Send 1" print
+            dup .
 
-        { } [ "d" get dispose ] unit-test
+             "d" get send
 
-        ! Test error behavior
+            "d" get dispose
 
-        "datagram-client" delete-file
+            "Done" print
 
-        { } [ "datagram-client" <local> <datagram> "d" set ] unit-test
+            "datagram-server" delete-file
+        ] with-variable
+    ] "Test" spawn drop
 
-        [ B{ 1 2 3 } "another-datagram" <local> "d" get send ] must-fail
+    yield
 
-        { } [ "d" get dispose ] unit-test
+    { } [ "datagram-client" <local> <datagram> "d" set ] unit-test
 
-        ! See what happens on send/receive after close
+    { } [
+        "hello" >byte-array
+        "datagram-server" <local>
+        "d" get send
+    ] unit-test
 
-        [ "d" get receive ] must-fail
+    { "olleh" t } [
+        "d" get receive
+        "datagram-server" <local> =
+        [ >string ] dip
+    ] unit-test
 
-        [ B{ 1 2 } "datagram-server" <local> "d" get send ] must-fail
+    { } [
+        "hello" >byte-array
+        "datagram-server" <local>
+        "d" get send
+    ] unit-test
 
-        ! Invalid parameter tests
+    { "hello world" t } [
+        "d" get receive
+        "datagram-server" <local> =
+        [ >string ] dip
+    ] unit-test
 
-        [
-            image-path binary [ input-stream get accept ] with-file-reader
-        ] must-fail
+    { } [ "d" get dispose ] unit-test
 
-        [
-            image-path binary [ input-stream get receive ] with-file-reader
-        ] must-fail
+    ! Test error behavior
 
-        [
-            image-path binary [
-                B{ 1 2 } "datagram-server" <local>
-                input-stream get send
-            ] with-file-reader
-        ] must-fail
+    "datagram-client" delete-file
 
-    ] cleanup-unique-directory
-] with-temp-directory
+    { } [ "datagram-client" <local> <datagram> "d" set ] unit-test
+
+    [ B{ 1 2 3 } "another-datagram" <local> "d" get send ] must-fail
+
+    { } [ "d" get dispose ] unit-test
+
+    ! See what happens on send/receive after close
+
+    [ "d" get receive ] must-fail
+
+    [ B{ 1 2 } "datagram-server" <local> "d" get send ] must-fail
+
+    ! Invalid parameter tests
+
+    [
+        image-path binary [ input-stream get accept ] with-file-reader
+    ] must-fail
+
+    [
+        image-path binary [ input-stream get receive ] with-file-reader
+    ] must-fail
+
+    [
+        image-path binary [
+            B{ 1 2 } "datagram-server" <local>
+            input-stream get send
+        ] with-file-reader
+    ] must-fail
+
+] with-test-directory
 
 ! closing stdin caused some problems
 { } [

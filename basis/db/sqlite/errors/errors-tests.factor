@@ -1,28 +1,25 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit db db.errors
-db.sqlite db.sqlite.errors io.files.temp io.files.unique kernel
-namespaces tools.test ;
+db.sqlite kernel locals tools.test ;
 
-[
-    "sqlite" "error-test" [
+[| path |
 
-        <sqlite-db> [
+    path <sqlite-db> [
 
-            [
-                "insert into foo (id) values('1');" sql-command
-            ] [
-                { [ sql-table-missing? ] [ table>> "foo" = ] } 1&&
-            ] must-fail-with
+        [
+            "insert into foo (id) values('1');" sql-command
+        ] [
+            { [ sql-table-missing? ] [ table>> "foo" = ] } 1&&
+        ] must-fail-with
 
+        "create table foo(id);" sql-command
+
+        [
             "create table foo(id);" sql-command
+        ] [
+            { [ sql-table-exists? ] [ table>> "foo" = ] } 1&&
+        ] must-fail-with
 
-            [
-                "create table foo(id);" sql-command
-            ] [
-                { [ sql-table-exists? ] [ table>> "foo" = ] } 1&&
-            ] must-fail-with
-
-        ] with-db
-    ] cleanup-unique-file
-] with-temp-directory
+    ] with-db
+] with-test-file

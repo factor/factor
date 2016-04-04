@@ -52,11 +52,9 @@ system tools.test ;
 { t } [ "resource:core" absolute-path? ] unit-test
 { f } [ "" absolute-path? ] unit-test
 
-[
-    "touch-twice-test" ".txt" [| path |
-        { } [ 2 [ path touch-file ] times ] unit-test
-    ] cleanup-unique-file
-] with-temp-directory
+[| path |
+    { } [ 2 [ path touch-file ] times ] unit-test
+] with-test-file
 
 ! aum's bug
 H{

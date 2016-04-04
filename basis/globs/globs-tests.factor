@@ -1,7 +1,5 @@
-USING: globs globs.private io.directories io.files.temp
-io.files.unique io.pathnames literals sequences sorting
+USING: globs globs.private io.directories io.pathnames sorting
 tools.test ;
-IN: globs.tests
 
 { f } [ "abd" "fdf" glob-matches? ] unit-test
 { f } [ "fdsafas" "?" glob-matches? ] unit-test
@@ -61,31 +59,29 @@ IN: globs.tests
 } [
 
     [
-        [
-            "a" make-directory
-            "a/b" make-directory
-            "a/b/c" make-directory
-            "a/b/c/d" make-directory
-            "a/b/c/d/e" touch-file
-            "a/b/c/f" touch-file
-            "a/b/g" touch-file
-            "a/b/h" make-directory
-            "a/b/h/e" touch-file
-            "a/e" make-directory
-            "a/e/f" touch-file
-            "a/e/g" make-directory
-            "a/e/g/e" touch-file
+        "a" make-directory
+        "a/b" make-directory
+        "a/b/c" make-directory
+        "a/b/c/d" make-directory
+        "a/b/c/d/e" touch-file
+        "a/b/c/f" touch-file
+        "a/b/g" touch-file
+        "a/b/h" make-directory
+        "a/b/h/e" touch-file
+        "a/e" make-directory
+        "a/e/f" touch-file
+        "a/e/g" make-directory
+        "a/e/g/e" touch-file
 
-            "**" glob-directory natural-sort
-            "**/" glob-directory natural-sort
-            "**/*" glob-directory natural-sort
-            "**/**" glob-directory natural-sort
-            "**/b" glob-directory natural-sort
-            "**/e" glob-directory natural-sort
-            ! "**//e" glob-directory natural-sort
-            ! "**/**/e" glob-directory natural-sort
-            "**/e/**" glob-directory natural-sort
-            "a/**" glob-directory natural-sort
-        ] cleanup-unique-directory
-    ] with-temp-directory
+        "**" glob-directory natural-sort
+        "**/" glob-directory natural-sort
+        "**/*" glob-directory natural-sort
+        "**/**" glob-directory natural-sort
+        "**/b" glob-directory natural-sort
+        "**/e" glob-directory natural-sort
+        ! "**//e" glob-directory natural-sort
+        ! "**/**/e" glob-directory natural-sort
+        "**/e/**" glob-directory natural-sort
+        "a/**" glob-directory natural-sort
+    ] with-test-directory
 ] unit-test
