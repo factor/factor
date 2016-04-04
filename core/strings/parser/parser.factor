@@ -70,28 +70,6 @@ PRIVATE>
 
 <PRIVATE
 
-: (parse-short-string) ( accum str -- accum m )
-    { sbuf slice } declare
-    dup [ "\"\\" member? ] find [
-        [ cut-slice [ append! ] dip rest-slice ] dip
-        CHAR: " = [
-            from>>
-        ] [
-            next-escape [ suffix! ] dip (parse-short-string)
-        ] if
-    ] [
-        "Unterminated string" throw
-    ] if* ;
-
-PRIVATE>
-
-: parse-short-string ( -- str )
-    SBUF" " clone lexer get [
-        swap tail-slice (parse-short-string) [ "" like ] dip
-    ] change-lexer-column ;
-
-<PRIVATE
-
 : lexer-subseq ( i lexer -- before )
     { fixnum lexer } declare
     [ [ column>> ] [ line-text>> ] bi swapd subseq ]
@@ -126,7 +104,7 @@ PRIVATE>
     [ column>> ] [ line-text>> ] bi
     [ "\"\\" member? ] find-from ;
 
-DEFER: (parse-full-string)
+DEFER: (parse-string)
 
 : parse-found-token ( accum lexer i elt -- )
     { sbuf lexer fixnum fixnum } declare
@@ -135,12 +113,12 @@ DEFER: (parse-full-string)
         dup dup [ next-char ] bi@
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
-        (parse-full-string)
+        (parse-string)
     ] [
         advance-char drop
     ] if ;
 
-: (parse-full-string) ( accum lexer -- )
+: (parse-string) ( accum lexer -- )
     { sbuf lexer } declare
     dup still-parsing? [
         dup find-next-token [
@@ -148,13 +126,13 @@ DEFER: (parse-full-string)
         ] [
             drop 2dup next-line%
             CHAR: \n pick push
-            (parse-full-string)
+            (parse-string)
         ] if*
     ] [
         "Unterminated string" throw
     ] if ;
 
-: rewind-on-error ( quot -- )
+: rewind-lexer-on-error ( quot -- )
     lexer get [ line>> ] [ line-text>> ] [ column>> ] tri
     [
         lexer get [ column<< ] [ line-text<< ] [ line<< ] tri
@@ -163,9 +141,9 @@ DEFER: (parse-full-string)
 
 PRIVATE>
 
-: parse-full-string ( -- str )
+: parse-string ( -- str )
     [
         SBUF" " clone [
-            lexer get (parse-full-string)
+            lexer get (parse-string)
         ] keep unescape-string
-    ] rewind-on-error ;
+    ] rewind-lexer-on-error ;
