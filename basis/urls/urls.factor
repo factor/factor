@@ -197,6 +197,6 @@ UNION: abstract-inet inet inet4 inet6 ;
 M: abstract-inet >secure-addr <secure> ;
 
 ! Literal syntax
-SYNTAX: URL" lexer get skip-blank parse-short-string >url suffix! ;
+SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
