@@ -75,7 +75,7 @@ IN: sequences.extras.tests
 
 { "hello" "hello" } [ "hello" dup 0 rotate ] unit-test
 { "hello" "llohe" } [ "hello" dup 2 rotate ] unit-test
-[ "hello" dup -1 rotate ] must-fail
+{ "hello" "ohell" } [ "hello" dup -1 rotate ] unit-test
 
 { "hello" } [ "hello" dup 0 rotate! ] unit-test
 { "lohel" } [ "hello" dup 3 rotate! ] unit-test
