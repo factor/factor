@@ -186,6 +186,7 @@ PRIVATE>
     unordered-slices-touch? ;
 
 ERROR: slices-don't-touch slice1 slice2 ;
+
 : merge-slices ( slice1 slice2 -- slice/* )
     slice-order-by-from
     2dup ordered-slices-touch? [
@@ -194,15 +195,10 @@ ERROR: slices-don't-touch slice1 slice2 ;
         slices-don't-touch
     ] if ;
 
-: length- ( n sequence -- m ) length swap - ; inline
-
-: rotate-headwards ( seq n -- seq' )
+: rotate ( seq n -- seq' )
     cut prepend ;
 
-: rotate-tailwards ( seq n -- seq' )
-    over length- cut prepend ;
-
-:: rotate-headwards! ( seq n -- )
+:: rotate! ( seq n -- )
     n seq bounds-check length :> end
     0 n [ 2dup = ] [
         [ seq exchange-unsafe ] [ [ 1 + ] bi@ ] 2bi
@@ -211,7 +207,7 @@ ERROR: slices-don't-touch slice1 slice2 ;
     ] until 3drop ;
 
 : all-rotations ( seq -- seq' )
-    dup length iota [ rotate-headwards ] with map ;
+    dup length iota [ rotate ] with map ;
 
 <PRIVATE
 

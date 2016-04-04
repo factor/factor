@@ -40,7 +40,7 @@ SYMBOLS: supported-layouts supported-formats ;
 : graphviz-output-appears-to-exist? ( base -- ? )
     "." directory-files [ swap head? ] with count 1 = ;
 
-: next! ( seq -- elt ) [ first ] [ 1 rotate-headwards! ] bi ;
+: next! ( seq -- elt ) [ first ] [ 1 rotate! ] bi ;
 
 :: smoke-test ( graph -- pass? )
     supported-formats get-global next! :> -T
