@@ -11,7 +11,7 @@ HELP: assign-spill
 HELP: spill-after
 { $values
   { "after" live-interval-state }
-  { "after/f" { $link live-interval-state } " or " { $link f } }
+  { "after/f" { $maybe live-interval-state } }
 }
 { $description "If the interval has no more usages after the spill location, then it is the first child of an interval that was split.  We spill the value and let the resolve pass insert a reload later. An interval may be split if it overlaps a " { $link sync-point } "." }
 { $see-also spill-before } ;
@@ -32,8 +32,8 @@ HELP: split-for-spill
 { $values
   { "live-interval" live-interval-state }
   { "n" integer }
-  { "before/f" $maybe live-interval-state }
-  { "after/f" $maybe live-interval-state }
+  { "before/f" { $maybe live-interval-state } }
+  { "after/f" { $maybe live-interval-state } }
 } { $description "During register allocation an interval needs to be split so that the 'after' part of it can be placed in a spill slot." } ;
 
 HELP: spill-intersecting
