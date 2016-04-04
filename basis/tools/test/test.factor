@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
 compiler.units continuations debugger effects fry
-generalizations io kernel lexer locals macros namespaces parser
-prettyprint quotations sequences sequences.generalizations
-source-files source-files.errors source-files.errors.debugger
-splitting stack-checker summary tools.errors unicode vocabs
-vocabs.files vocabs.metadata vocabs.parser words ;
+generalizations io io.files.temp io.files.unique kernel lexer
+locals macros namespaces parser prettyprint quotations sequences
+sequences.generalizations source-files source-files.errors
+source-files.errors.debugger splitting stack-checker summary
+tools.errors unicode vocabs vocabs.files vocabs.metadata
+vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
@@ -156,6 +157,12 @@ SYMBOL: forget-tests?
 : test-vocabs ( vocabs -- ) [ test-vocab ] each ;
 
 PRIVATE>
+
+: with-test-file ( ..a quot: ( ..a path -- ..b ) -- ..b )
+    '[ "" "" _ cleanup-unique-file ] with-temp-directory ; inline
+
+: with-test-directory ( ..a quot: ( ..a -- ..b ) -- ..b )
+    [ cleanup-unique-directory ] with-temp-directory ; inline
 
 TEST: unit-test
 TEST: must-infer-as
