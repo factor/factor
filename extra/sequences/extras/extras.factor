@@ -196,7 +196,7 @@ ERROR: slices-don't-touch slice1 slice2 ;
     ] if ;
 
 : rotate ( seq n -- seq' )
-    cut prepend ;
+    dup 0 > [ cut ] [ abs cut* ] if prepend ;
 
 :: rotate! ( seq n -- )
     n seq bounds-check length :> end
