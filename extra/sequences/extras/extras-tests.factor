@@ -73,10 +73,13 @@ IN: sequences.extras.tests
 ] unit-test
 
 
-{ "hello" } [ "hello" 0 rotate-headwards ] unit-test
-{ "llohe" } [ "hello" 2 rotate-headwards ] unit-test
-{ "hello" } [ "hello" dup 0 rotate-headwards! ] unit-test
-{ "lohel" } [ "hello" dup 3 rotate-headwards! ] unit-test
+{ "hello" "hello" } [ "hello" dup 0 rotate ] unit-test
+{ "hello" "llohe" } [ "hello" dup 2 rotate ] unit-test
+[ "hello" dup -1 rotate ] must-fail
+
+{ "hello" } [ "hello" dup 0 rotate! ] unit-test
+{ "lohel" } [ "hello" dup 3 rotate! ] unit-test
+[ "hello" dup -1 rotate! ] must-fail
 
 { { } } [ { } [ ] map-concat ] unit-test
 { V{ 0 0 1 0 1 2 } } [ 4 iota [ iota ] map-concat ] unit-test
