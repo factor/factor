@@ -198,6 +198,16 @@ ERROR: slices-don't-touch slice1 slice2 ;
 : rotate ( seq n -- seq' )
     over length mod dup 0 >= [ cut ] [ abs cut* ] if prepend ;
 
+ERROR: underlying-mismatch slice1 slice2 ;
+: ensure-same-underlying ( slice1 slice2 -- slice1 slice2 )
+    2dup [ seq>> ] bi@ eq? [ underlying-mismatch ] unless ;
+
+: span-slices ( slice1 slice2 -- slice )
+    ensure-same-underlying
+    [ [ from>> ] bi@ min ]
+    [ [ to>> ] bi@ max ]
+    [ drop seq>> ] 2tri <slice> ;
+
 :: rotate! ( seq n -- )
     seq length :> len
     n len mod dup 0 < [ len + ] when seq bounds-check drop 0 over
