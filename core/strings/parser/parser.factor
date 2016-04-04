@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators kernel kernel.private
-lexer math math.parser namespaces sbufs sequences splitting
-strings ;
+USING: accessors assocs combinators continuations kernel
+kernel.private lexer math math.parser namespaces sbufs sequences
+splitting strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -151,12 +151,21 @@ DEFER: (parse-full-string)
             (parse-full-string)
         ] if*
     ] [
-        throw-unexpected-eof
+        "Unterminated string" throw
     ] if ;
+
+: rewind-on-error ( quot -- )
+    lexer get [ line>> ] [ line-text>> ] [ column>> ] tri
+    [
+        lexer get [ column<< ] [ line-text<< ] [ line<< ] tri
+        rethrow
+    ] 3curry recover ; inline
 
 PRIVATE>
 
 : parse-full-string ( -- str )
-    SBUF" " clone [
-        lexer get (parse-full-string)
-    ] keep unescape-string ;
+    [
+        SBUF" " clone [
+            lexer get (parse-full-string)
+        ] keep unescape-string
+    ] rewind-on-error ;
