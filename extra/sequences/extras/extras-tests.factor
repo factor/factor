@@ -79,7 +79,7 @@ IN: sequences.extras.tests
 
 { "hello" } [ "hello" dup 0 rotate! ] unit-test
 { "lohel" } [ "hello" dup 3 rotate! ] unit-test
-[ "hello" dup -1 rotate! ] must-fail
+{ "ohell" } [ "hello" dup -1 rotate! ] unit-test
 
 { { } } [ { } [ ] map-concat ] unit-test
 { V{ 0 0 1 0 1 2 } } [ 4 iota [ iota ] map-concat ] unit-test
