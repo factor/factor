@@ -1,33 +1,30 @@
 USING: accessors alien.c-types alien.data destructors io
 io.encodings.ascii io.encodings.binary io.encodings.string
-io.encodings.utf8 io.files io.files.temp io.files.unique
-io.pipes io.sockets kernel libc locals math namespaces sequences
-tools.test ;
-IN: io.ports.tests
+io.encodings.utf8 io.files io.pipes io.sockets kernel libc
+locals math namespaces sequences tools.test ;
 
 ! Make sure that writing malloced storage to a file works, and
 ! also make sure that writes larger than the buffer size work
 
-[
-    "test" ".txt" [| path |
+[| path |
 
-        { } [
-            path binary [
-                [
-                    100,000 iota
-                    0
-                    100,000 int malloc-array &free [ copy ] keep write
-                ] with-destructors
-            ] with-file-writer
-        ] unit-test
+    { } [
+        path binary [
+            [
+                100,000 iota
+                0
+                100,000 int malloc-array &free [ copy ] keep write
+            ] with-destructors
+        ] with-file-writer
+    ] unit-test
 
-        { t } [
-            path binary [
-                100,000 4 * read int cast-array 100,000 iota sequence=
-            ] with-file-reader
-        ] unit-test
-    ] cleanup-unique-file
-] with-temp-directory
+    { t } [
+        path binary [
+            100,000 4 * read int cast-array 100,000 iota sequence=
+        ] with-file-reader
+    ] unit-test
+
+] with-test-file
 
 ! Getting the stream-element-type of an output-port was broken
 { +byte+ } [ binary <pipe> [ stream-element-type ] with-disposal ] unit-test

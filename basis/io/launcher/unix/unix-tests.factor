@@ -1,88 +1,85 @@
 USING: accessors calendar concurrency.promises continuations
 debugger.unix destructors io io.backend.unix io.directories
 io.encodings.ascii io.encodings.binary io.encodings.utf8
-io.files io.files.temp io.files.unique io.launcher
-io.launcher.unix io.streams.duplex io.timeouts kernel libc
-locals math namespaces sequences threads tools.test unix.process
-;
+io.files io.launcher io.launcher.unix io.streams.duplex
+io.timeouts kernel libc locals math namespaces sequences threads
+tools.test unix.process ;
 IN: io.launcher.unix.tests
 
 
 [
-    [
-        { } [ { "touch" "launcher-test-1" } try-process ] unit-test
+    { } [ { "touch" "launcher-test-1" } try-process ] unit-test
 
-        { t } [ "launcher-test-1" exists? ] unit-test
+    { t } [ "launcher-test-1" exists? ] unit-test
 
-        { } [
-            [ "launcher-test-1" delete-file ] ignore-errors
-        ] unit-test
+    { } [
+        [ "launcher-test-1" delete-file ] ignore-errors
+    ] unit-test
 
-        { } [
-            <process>
-                "echo Hello" >>command
-                "launcher-test-1" >>stdout
-            try-process
-        ] unit-test
+    { } [
+        <process>
+            "echo Hello" >>command
+            "launcher-test-1" >>stdout
+        try-process
+    ] unit-test
 
-        { "Hello\n" } [
-            { "cat" "launcher-test-1" }
-            ascii <process-reader> stream-contents
-        ] unit-test
+    { "Hello\n" } [
+        { "cat" "launcher-test-1" }
+        ascii <process-reader> stream-contents
+    ] unit-test
 
-        { } [
-            [ "launcher-test-1" delete-file ] ignore-errors
-        ] unit-test
+    { } [
+        [ "launcher-test-1" delete-file ] ignore-errors
+    ] unit-test
 
-        { } [
-            <process>
-                "cat" >>command
-                +closed+ >>stdin
-                "launcher-test-1" >>stdout
-            try-process
-        ] unit-test
+    { } [
+        <process>
+            "cat" >>command
+            +closed+ >>stdin
+            "launcher-test-1" >>stdout
+        try-process
+    ] unit-test
 
-        { "" } [
-            { "cat" "launcher-test-1" }
-            ascii <process-reader> stream-contents
-        ] unit-test
+    { "" } [
+        { "cat" "launcher-test-1" }
+        ascii <process-reader> stream-contents
+    ] unit-test
 
-        { } [
-            2 [
-                "launcher-test-1" binary <file-appender> [
-                    <process>
-                        swap >>stdout
-                        "echo Hello" >>command
-                    try-process
-                ] with-disposal
-            ] times
-        ] unit-test
-
-        { "Hello\nHello\n" } [
-            { "cat" "launcher-test-1" }
-            ascii <process-reader> stream-contents
-        ] unit-test
-
-        { "hi\n" } [
-            <process>
-                { "echo" "hi" } >>command
-                "launcher-test-2" >>stdout
-            try-process
-            "launcher-test-2" utf8 file-contents
-        ] unit-test
-
-        { "hi\nhi\n" } [
-            2 [
+    { } [
+        2 [
+            "launcher-test-1" binary <file-appender> [
                 <process>
-                    "echo hi" >>command
-                    "launcher-test-3" <appender> >>stdout
+                    swap >>stdout
+                    "echo Hello" >>command
                 try-process
-            ] times
-            "launcher-test-3" utf8 file-contents
-        ] unit-test
+            ] with-disposal
+        ] times
+    ] unit-test
 
-    ] cleanup-unique-directory
-] with-temp-directory
+    { "Hello\nHello\n" } [
+        { "cat" "launcher-test-1" }
+        ascii <process-reader> stream-contents
+    ] unit-test
+
+    { "hi\n" } [
+        <process>
+            { "echo" "hi" } >>command
+            "launcher-test-2" >>stdout
+        try-process
+        "launcher-test-2" utf8 file-contents
+    ] unit-test
+
+    { "hi\nhi\n" } [
+        2 [
+            <process>
+                "echo hi" >>command
+                "launcher-test-3" <appender> >>stdout
+            try-process
+        ] times
+        "launcher-test-3" utf8 file-contents
+    ] unit-test
+
+] with-test-directory
 
 { t } [
     <process>

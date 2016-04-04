@@ -1,11 +1,9 @@
-USING: accessors arrays assocs combinators.short-circuit
-continuations formatting graphviz graphviz.attributes
-graphviz.dot graphviz.notation graphviz.render
-graphviz.render.private images.loader.private io.directories
-io.directories.hierarchy io.files io.files.temp io.files.unique
-io.launcher io.pathnames kernel locals make math
-math.combinatorics math.parser memoize namespaces sequences
-sequences.extras sets splitting system tools.test ;
+USING: accessors arrays assocs continuations formatting graphviz
+graphviz.notation graphviz.render graphviz.render.private
+images.loader.private io.directories io.encodings.8-bit.latin1
+io.encodings.ascii io.encodings.utf8 io.files io.launcher kernel
+locals make math math.combinatorics math.parser namespaces
+sequences sequences.extras sets splitting system tools.test ;
 IN: graphviz.tests
 
 ! XXX hack
@@ -48,11 +46,9 @@ SYMBOLS: supported-layouts supported-formats ;
     supported-formats get-global next! :> -T
     supported-layouts get-global next! :> -K
     [
-        [
-            graph "smoke-test" -T -K graphviz
-            "smoke-test" graphviz-output-appears-to-exist?
-        ] cleanup-unique-directory
-    ] with-temp-directory ;
+        graph "smoke-test" -T -K graphviz
+        "smoke-test" graphviz-output-appears-to-exist?
+    ] with-test-directory ;
 
 : preview-smoke-test ( graph -- pass? )
     [ exists? ] with-preview ;
@@ -296,21 +292,10 @@ default-graphviz-program [
         [ preview-format-test ] attempt-all
     ] [ unsupported-preview-format? ] must-fail-with
 
-    { t }
-    [
-        USE: io.encodings.8-bit.latin1
-        latin1 encoding-test
-    ] unit-test
+    { t } [ latin1 encoding-test ] unit-test
 
-    { t }
-    [
-        USE: io.encodings.utf8
-        utf8 encoding-test
-    ] unit-test
+    { t } [ utf8 encoding-test ] unit-test
 
-    [
-        USE: io.encodings.ascii
-        ascii encoding-test
-    ] [ unsupported-encoding? ] must-fail-with
+    [ ascii encoding-test ] [ unsupported-encoding? ] must-fail-with
 
 ] when
