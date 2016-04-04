@@ -1,15 +1,17 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct combinators continuations
-destructors environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
-gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
-io.encodings.binary io.encodings.utf8 io.files kernel libc literals
-locals math math.bitwise math.vectors namespaces sequences strings
-system threads ui ui.backend ui.backend.gtk.input-methods
+alien.strings arrays assocs classes.struct combinators
+continuations destructors environment gdk.ffi gdk.gl.ffi
+gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
+gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.binary
+io.encodings.utf8 io.files kernel libc literals locals math
+math.bitwise math.vectors namespaces sequences strings system
+threads ui ui.backend ui.backend.gtk.input-methods
 ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private vocabs.loader ;
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.pixel-formats.private ui.private
+vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -535,8 +537,8 @@ M:: gtk-ui-backend system-alert ( caption text -- )
 
 M: gtk-ui-backend (with-ui)
     [
-        0 gint <ref> f void* <ref> gtk_init
-        0 gint <ref> f void* <ref> gtk_gl_init
+        f f gtk_init
+        f f gtk_gl_init
         load-icon
         init-clipboard
         start-ui
