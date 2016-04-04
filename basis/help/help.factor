@@ -1,19 +1,17 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.error classes.tuple
-combinators combinators.short-circuit continuations debugger
-effects generic help.crossref help.markup help.stylesheet
-help.topics io io.styles kernel locals make namespaces prettyprint
-sequences sorting vocabs words words.symbol ;
+USING: accessors arrays assocs classes classes.error
+classes.tuple combinators combinators.short-circuit
+continuations debugger effects generic help.crossref help.markup
+help.stylesheet help.topics io io.styles kernel locals make
+namespaces prettyprint sequences sets sorting vocabs words
+words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
 
 : word-help ( word -- content )
-    dup "help" word-prop [ ] [
-        dup word-help* dup
-        [ swap 2array 1array ] [ 2drop f ] if
-    ] ?if ;
+    dup "help" word-prop [ ] [ word-help* ] ?if ;
 
 : $predicate ( element -- )
     { { "object" object } { "?" boolean } } $values
@@ -23,9 +21,20 @@ GENERIC: word-help* ( word -- content )
         " class." ,
     ] { } make $description ;
 
-M: word word-help* drop f ;
+M: word word-help*
+    stack-effect [ in>> ] [ out>> ] bi [
+        [
+            dup pair? [
+                first2 dup effect? [ \ $quotation swap 2array ] when
+            ] [
+                object
+            ] if
+        ] { } map>assoc
+    ] bi@ append members \ $values prefix 1array ;
 
-M: predicate word-help* drop \ $predicate ;
+M: class word-help* drop f ;
+
+M: predicate word-help* \ $predicate prefix 1array ;
 
 : all-articles ( -- seq )
     articles get keys
