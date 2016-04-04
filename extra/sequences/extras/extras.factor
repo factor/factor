@@ -196,11 +196,11 @@ ERROR: slices-don't-touch slice1 slice2 ;
     ] if ;
 
 : rotate ( seq n -- seq' )
-    dup 0 >= [ cut ] [ abs cut* ] if prepend ;
+    over length mod dup 0 >= [ cut ] [ abs cut* ] if prepend ;
 
 :: rotate! ( seq n -- )
     seq length :> len
-    n dup 0 < [ len + ] when seq bounds-check drop 0 over
+    n len mod dup 0 < [ len + ] when seq bounds-check drop 0 over
     [ 2dup = ] [
         [ seq exchange-unsafe ] [ [ 1 + ] bi@ ] 2bi
         dup len = [ drop over ] when
