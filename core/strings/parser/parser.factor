@@ -35,9 +35,13 @@ name>char-hook [
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
-        CHAR: } over index cut-slice
-        [ >string name>char-hook get call( name -- char ) ] dip
-        rest-slice
+        CHAR: } over index cut-slice [
+            dup hex> [
+                nip
+            ] [
+                >string name>char-hook get call( name -- char )
+            ] if*
+        ] dip rest-slice
     ] [
         6 cut-slice [ hex> ] dip
     ] if ;
