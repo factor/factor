@@ -1,4 +1,4 @@
-USING: io.directories io.directories.hierarchy
+USING: combinators io.directories io.directories.hierarchy
 io.directories.search io.files.unique io.pathnames kernel
 sequences sorting strings tools.test ;
 
