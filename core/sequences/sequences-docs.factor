@@ -990,6 +990,11 @@ HELP: subseq
 { $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } "." }
 { $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
 
+HELP: subseq-as
+{ $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "exemplar" sequence } { "subseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } " of type " { $snippet "exemplar" } "." }
+{ $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
+
 HELP: clone-like
 { $values { "seq" sequence } { "exemplar" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a newly-allocated sequence with the same elements as " { $snippet "seq" } " but of the same type as " { $snippet "exemplar" } "." }
@@ -1737,6 +1742,7 @@ $nl
 "Extracting a subsequence:"
 { $subsections
     subseq
+    subseq-as
     head
     tail
     head*
