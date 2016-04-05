@@ -51,9 +51,6 @@ IN: sequences.extras
         ] each
     ] each ; inline
 
-: subseq-as ( from to seq exemplar -- subseq )
-    [ check-slice subseq>copy (copy) ] dip like ;
-
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
 

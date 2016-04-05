@@ -313,13 +313,19 @@ C: <copy> copy-state
 : copy-unsafe ( src i dst -- )
     [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
 
+: subseq-unsafe-as ( from to seq exemplar -- subseq )
+    [ subseq>copy (copy) ] dip like ;
+
 : subseq-unsafe ( from to seq -- subseq )
-    [ subseq>copy (copy) ] keep like ;
+    dup subseq-unsafe-as ; inline
 
 PRIVATE>
 
+: subseq-as ( from to seq exemplar -- subseq )
+    [ check-slice ] dip subseq-unsafe-as ;
+
 : subseq ( from to seq -- subseq )
-    [ check-slice subseq>copy (copy) ] keep like ;
+    dup subseq-as ; inline
 
 : head ( seq n -- headseq ) (head) subseq ;
 
