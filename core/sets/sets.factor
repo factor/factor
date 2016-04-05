@@ -38,7 +38,7 @@ M: f clear-set drop ; inline
 
 M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
 
-M: set null? members null? ; inline
+M: set null? cardinality zero? ; inline
 
 M: set cardinality members length ;
 
