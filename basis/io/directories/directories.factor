@@ -43,6 +43,9 @@ HOOK: (directory-entries) os ( path -- seq )
 : directory-files ( path -- seq )
     directory-entries [ name>> ] map! ;
 
+: directory-file-paths ( path -- seq )
+    dup directory-files [ dupd append-path ] map nip ;
+
 : with-directory-entries ( path quot -- )
     '[ "" directory-entries @ ] with-directory ; inline
 

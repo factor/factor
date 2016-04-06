@@ -44,6 +44,10 @@ HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
 
+HELP: directory-file-paths
+{ $values { "path" "a pathname string" } { "seq" "a sequence of file paths" } }
+{ $description "Outputs the paths of all the contents of a directory named by " { $snippet "path" } "." } ;
+
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." }
@@ -141,6 +145,7 @@ ARTICLE: "io.directories.listing" "Directory listing"
 { $subsections
     directory-entries
     directory-files
+    directory-file-paths
     with-directory-entries
     with-directory-files
 } ;

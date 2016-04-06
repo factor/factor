@@ -19,6 +19,9 @@ PRIVATE>
 : directory-tree-files ( path -- seq )
     [ "" directory-tree-files% ] { } make ;
 
+: directory-tree-file-paths ( path -- seq )
+    dup directory-tree-files [ dupd append-path ] map nip ;
+
 : with-directory-tree-files ( path quot -- )
     '[ "" directory-tree-files @ ] with-directory ; inline
 
