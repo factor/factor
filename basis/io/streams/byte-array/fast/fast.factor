@@ -8,8 +8,6 @@ IN: io.streams.byte-array.fast
 ! optimizing compiler has been loaded.
 
 M: byte-vector stream-write
-    [ dup byte-length tail-slice ]
-    [ [ [ byte-length ] bi@ + ] keep lengthen ]
-    [ drop byte-length ]
-    2tri
-    [ >c-ptr swap >c-ptr ] dip memcpy ;
+    [ dup byte-length tail-slice swap ]
+    [ [ [ byte-length ] bi@ + ] keep lengthen ] 2bi
+    dup byte-length memcpy ;
