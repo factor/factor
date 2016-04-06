@@ -9,6 +9,9 @@ IN: globs
 : not-path-separator ( -- sep )
     os windows? R/ [^\\/\\]/ R/ [^\\/]/ ? ; foldable
 
+: wild-path-separator ( -- sep )
+    os windows? R/ [^\\/\\][\\/\\]|[^\\/\\]/ R/ [^\\/][\\/]|[^\\/]/ ? ; foldable
+
 EBNF: <glob>
 
 Character = "\\" .:c => [[ c 1string <literal> ]]
@@ -29,7 +32,8 @@ CharClass = "^"?:n Ranges:e => [[ e <or> n [ <not> ] when ]]
 AlternationBody = Concatenation:c "," AlternationBody:a => [[ a c prefix ]]
                 | Concatenation => [[ 1array ]]
 
-Element = "*" => [[ not-path-separator <zero-or-more> ]]
+Element = "**" => [[ wild-path-separator <zero-or-more> ]]
+        | "*" => [[ not-path-separator <zero-or-more> ]]
         | "?" => [[ not-path-separator ]]
         | "[" CharClass:c "]" => [[ c ]]
         | "{" AlternationBody:b "}" => [[ b <or> ]]

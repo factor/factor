@@ -22,6 +22,8 @@ tools.test ;
 
 { f } [ "foo" "bar" append-path "*" glob-matches? ] unit-test
 { t } [ "foo" "bar" append-path "*" "*" append-path glob-matches? ] unit-test
+{ t } [ "foo" "bar" append-path "**/bar" glob-matches? ] unit-test
+{ t } [ "foo" "bar" append-path "**/b*" glob-matches? ] unit-test
 { f } [ "foo" "bar" append-path "foo?bar" glob-matches? ] unit-test
 { t } [ "foo" "bar" append-path "fo?" "bar" append-path glob-matches? ] unit-test
 
