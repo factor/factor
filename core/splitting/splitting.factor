@@ -106,7 +106,12 @@ PRIVATE>
         [ pick subseq ] keep swap
     ] map 2nip ;
 
-: string-lines ( seq -- seq' )
+! string-lines uses string-nth-fast which is 50% faster over
+! nth-unsafe. be careful when changing the definition so that
+! you don't unoptimize it.
+GENERIC: string-lines ( seq -- seq' )
+
+M: string string-lines
     [ V{ } clone 0 ] dip [ 2dup bounds-check? ] [
         2dup [ "\r\n" member? ] find-from swapd [
             over [ [ nip length ] keep ] unless
@@ -115,3 +120,5 @@ PRIVATE>
             2dup ?nth CHAR: \n eq? [ [ 1 + ] dip ] when
         ] when
     ] while 2drop { } like ;
+
+M: sbuf string-lines "" like string-lines ;
