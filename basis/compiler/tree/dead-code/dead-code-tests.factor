@@ -180,7 +180,23 @@ IN: compiler.tree.dead-code.tests
 
 { [ drop ] } [ [ array instance? drop ] optimize-quot ] unit-test
 
-{ [ drop ] } [ [ { integer } declare f <array> drop ] optimize-quot ] unit-test
+{
+    [ f <array> drop ]
+    [ f <array> drop ]
+    [ drop ]
+} [
+    ! Not flushed because the first argument to <array> can be
+    ! something random which would cause an exception.
+    [ f <array> drop ] optimize-quot
+
+    ! This call is not flushed because the integer can be outside
+    ! array-capacity-interval
+    [ { integer } declare f <array> drop ] optimize-quot
+
+    ! Flushed because the declaration guarantees that the integer is
+    ! within the array-capacity-interval.
+    [ { integer-array-capacity } declare f <array> drop ] optimize-quot
+] unit-test
 
 { [ f <array> drop ] } [ [ f <array> drop ] optimize-quot ] unit-test
 

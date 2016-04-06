@@ -1,33 +1,35 @@
-USING: tools.test io.files io.files.temp io io.streams.c
-io.encodings.ascii strings destructors kernel specialized-arrays
-alien.c-types math alien.data ;
+USING: alien.c-types alien.data io io.encodings.ascii io.files
+io.pathnames io.streams.c kernel math specialized-arrays
+strings tools.test ;
 SPECIALIZED-ARRAY: int
-IN: io.streams.c.tests
 
-{ "hello world" } [
-    "hello world" "test.txt" temp-file ascii set-file-contents
-
-    "test.txt" temp-file "rb" fopen <c-reader> stream-contents
-    >string
-] unit-test
-
-! Writing specialized arrays to binary streams
-{ } [
-    "test.txt" temp-file "wb" fopen <c-writer> [
-        int-array{ 1 2 3 } write
-    ] with-output-stream
-] unit-test
-
-{ int-array{ 1 2 3 } } [
-    "test.txt" temp-file "rb" fopen <c-reader> [
-        3 4 * read
-    ] with-input-stream
-    int cast-array
-] unit-test
-
-! Writing strings to binary streams should fail
 [
-    "test.txt" temp-file "wb" fopen <c-writer> [
-        "OMGFAIL" write
-    ] with-output-stream
-] must-fail
+    ! Writing strings to ascii streams
+    { "hello world" } [
+        "hello-world.txt" absolute-path
+        [ "hello world" swap ascii set-file-contents ]
+        [ "rb" fopen <c-reader> stream-contents >string ] bi
+    ] unit-test
+
+    ! Writing specialized arrays to binary streams
+    { int-array{ 1 2 3 } } [
+        "c-tests-int.dat" absolute-path [
+            "wb" fopen <c-writer> [
+                int-array{ 1 2 3 } write
+            ] with-output-stream
+        ] [
+            "rb" fopen <c-reader> [
+                3 4 * read int cast-array
+            ] with-input-stream
+        ] bi
+    ] unit-test
+
+    ! Writing strings to binary streams should fail
+    [
+        "omgfail.txt" absolute-path "wb" fopen <c-writer> [
+            "OMGFAIL" write
+        ] with-output-stream
+    ] must-fail
+
+] with-test-directory
+

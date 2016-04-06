@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.error classes.tuple
-combinators combinators.short-circuit continuations debugger
-effects generic help.crossref help.markup help.stylesheet
-help.topics io io.styles kernel locals make namespaces prettyprint
-sequences sorting vocabs words words.symbol ;
+USING: accessors arrays assocs classes classes.error
+classes.tuple combinators combinators.short-circuit
+continuations debugger effects generic help.crossref help.markup
+help.stylesheet help.topics io io.styles kernel locals make
+namespaces prettyprint sequences sets sorting vocabs words
+words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -12,7 +13,7 @@ GENERIC: word-help* ( word -- content )
 : word-help ( word -- content )
     dup "help" word-prop [ ] [
         dup word-help* dup
-        [ swap 2array 1array ] [ 2drop f ] if
+       [ swap 2array 1array ] [ 2drop f ] if
     ] ?if ;
 
 : $predicate ( element -- )
@@ -23,7 +24,20 @@ GENERIC: word-help* ( word -- content )
         " class." ,
     ] { } make $description ;
 
-M: word word-help* drop f ;
+: $default ( element -- )
+    first stack-effect [ in>> ] [ out>> ] bi [
+        [
+            dup pair? [
+                first2 dup effect? [ \ $quotation swap 2array ] when
+            ] [
+                object
+            ] if
+        ] { } map>assoc
+    ] bi@ append members $values ;
+
+M: word word-help* drop \ $default ;
+
+M: class word-help* drop f ;
 
 M: predicate word-help* drop \ $predicate ;
 
@@ -172,14 +186,10 @@ help-hook [ [ print-topic ] ] initialize
     articles get delete-at ;
 
 : add-article ( article name -- )
-    [ remove-article ] keep
-    [ articles get set-at ] keep
-    xref-article ;
+    [ articles get set-at ] keep xref-article ;
 
 : remove-word-help ( word -- )
     f "help" set-word-prop ;
 
 : set-word-help ( content word -- )
-    [ remove-word-help ] keep
-    [ swap "help" set-word-prop ] keep
-    xref-article ;
+    [ swap "help" set-word-prop ] keep xref-article ;

@@ -48,7 +48,10 @@ IN: compiler.cfg.linear-scan.allocation
 GENERIC: handle ( obj -- )
 
 M: live-interval-state handle
-    [ start>> [ deactivate-intervals ] [ activate-intervals ] bi ]
+    [
+        live-interval-start
+        [ deactivate-intervals ] [ activate-intervals ] bi
+    ]
     [ registers get assign-register ] bi ;
 
 : handle-sync-point ( sync-point active-intervals -- )

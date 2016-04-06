@@ -8,7 +8,7 @@ io.files io.files.info io.files.types io.pathnames
 io.servers io.sockets io.streams.string io.timeouts
 kernel logging math math.bitwise math.parser namespaces
 sequences simple-tokenizer splitting strings threads
-tools.files unicode.case ;
+tools.files unicode ;
 IN: ftp.server
 
 SYMBOL: server
@@ -180,7 +180,7 @@ M: ftp-list handle-passive-command ( stream obj -- )
     drop
     start-directory [
         utf8 encode-output [
-            current-directory get directory.
+            "." directory.
         ] with-string-writer string-lines
         harvest [ ftp-send ] each
     ] with-output-stream finish-directory ;

@@ -32,21 +32,19 @@ PRIVATE>
 
 : unique-file ( prefix suffix -- path )
     '[
-        current-directory get
-        _ _ random-file-name glue append-path
+        _ _ random-file-name glue
         dup touch-unique-file
-    ] unique-retries get retry ;
+    ] unique-retries get retry absolute-path ;
 
-:: cleanup-unique-file ( prefix suffix quot: ( path -- ) -- )
+:: cleanup-unique-file ( ..a prefix suffix quot: ( ..a path -- ..b ) -- ..b )
     prefix suffix unique-file :> path
     [ path quot call ] [ path delete-file ] [ ] cleanup ; inline
 
 : unique-directory ( -- path )
     [
-        current-directory get
-        random-file-name append-path
+        random-file-name
         dup make-directory
-    ] unique-retries get retry ;
+    ] unique-retries get retry absolute-path ;
 
 :: with-unique-directory ( quot -- path )
     unique-directory :> path

@@ -11,8 +11,13 @@ IN: vocabs.metadata
     dup find-vocab-root [ no-vocab ] unless ;
 
 MEMO: vocab-file-contents ( vocab name -- seq )
-    vocab-append-path dup
-    [ dup exists? [ utf8 file-lines ] [ drop f ] if ] when ;
+    vocab-append-path dup [
+        dup exists? [
+            utf8 file-lines harvest
+        ] [
+            drop f
+        ] if
+    ] when ;
 
 : set-vocab-file-contents ( seq vocab name -- )
     dupd vocab-append-path [
@@ -20,17 +25,11 @@ MEMO: vocab-file-contents ( vocab name -- seq )
         \ vocab-file-contents reset-memoized
     ] [ vocab-name no-vocab ] ?if ;
 
-: vocab-windows-icon-path ( vocab -- string )
-    vocab-dir "icon.ico" append-path ;
-
-: vocab-mac-icon-path ( vocab -- string )
-    vocab-dir "icon.icns" append-path ;
-
 : vocab-resources-path ( vocab -- string )
     vocab-dir "resources.txt" append-path ;
 
 : vocab-resources ( vocab -- patterns )
-    dup vocab-resources-path vocab-file-contents harvest ;
+    dup vocab-resources-path vocab-file-contents ;
 
 : set-vocab-resources ( patterns vocab -- )
     dup vocab-resources-path set-vocab-file-contents ;
@@ -65,7 +64,7 @@ M: vocab-link summary vocab-summary ;
     vocab-dir "tags.txt" append-path ;
 
 : vocab-tags ( vocab -- tags )
-    dup vocab-tags-path vocab-file-contents harvest ;
+    dup vocab-tags-path vocab-file-contents ;
 
 : set-vocab-tags ( tags vocab -- )
     dup vocab-tags-path set-vocab-file-contents ;
@@ -80,7 +79,7 @@ M: vocab-link summary vocab-summary ;
     vocab-dir "authors.txt" append-path ;
 
 : vocab-authors ( vocab -- authors )
-    dup vocab-authors-path vocab-file-contents harvest ;
+    dup vocab-authors-path vocab-file-contents ;
 
 : set-vocab-authors ( authors vocab -- )
     dup vocab-authors-path set-vocab-file-contents ;

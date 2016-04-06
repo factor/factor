@@ -5,7 +5,7 @@ effects.parser sequences summary lexer splitting combinators
 locals memoize sequences.deep xml.data xml.state xml namespaces
 present arrays generalizations sequences.generalizations strings
 make math macros multiline combinators.short-circuit sorting fry
-unicode.categories effects ;
+unicode effects ;
 IN: xml.syntax
 
 <PRIVATE

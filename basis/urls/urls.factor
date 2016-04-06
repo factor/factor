@@ -1,11 +1,9 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: accessors arrays assocs combinators fry hashtables io.pathnames
-io.sockets kernel lexer linked-assocs make math.parser namespaces
-peg.ebnf present sequences splitting strings strings.parser
-urls.encoding vocabs.loader ;
-
+USING: accessors arrays assocs combinators fry io.pathnames
+io.sockets io.sockets.secure kernel lexer linked-assocs make
+math.parser namespaces peg.ebnf present sequences splitting
+strings strings.parser urls.encoding vocabs.loader ;
 IN: urls
 
 TUPLE: url protocol username password host port path query anchor ;
@@ -193,8 +191,12 @@ PRIVATE>
 : ensure-port ( url -- url' )
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
+! Secure sockets
+UNION: abstract-inet inet inet4 inet6 ;
+
+M: abstract-inet >secure-addr <secure> ;
+
 ! Literal syntax
-SYNTAX: URL" lexer get skip-blank parse-short-string >url suffix! ;
+SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
-{ "urls" "io.sockets.secure" } "urls.secure" require-when

@@ -1,7 +1,6 @@
-USING: alien alien.data alien.syntax
-classes.struct kernel sequences specialized-arrays
-specialized-arrays.private tools.test compiler.units vocabs
-system ;
+USING: alien alien.data alien.syntax classes.struct
+compiler.units kernel sequences specialized-arrays
+specialized-arrays.private system tools.test vocabs ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.data.tests
 

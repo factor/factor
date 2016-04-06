@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations hashtables kernel
 make math math.functions math.parser math.ranges namespaces
-quotations regexp sequences sets unicode.case unicode.categories
-words xmode.catalog ;
+quotations regexp sequences sets unicode words xmode.catalog ;
 IN: validators
 
 : v-checkbox ( str -- ? )
@@ -62,11 +61,11 @@ IN: validators
     ! From http://www.regular-expressions.info/email.html
     320 v-max-length
     "e-mail"
-    R' [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}'i
+    R/ [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
     v-regexp ;
 
 : v-url ( str -- str )
-    "URL" R' (?:ftp|http|https)://\S+' v-regexp ;
+    "URL" R/ (?:ftp|http|https):\\/\\/\S+/ v-regexp ;
 
 : v-captcha ( str -- str )
     dup empty? [ "must remain blank" throw ] unless ;

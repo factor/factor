@@ -1,5 +1,5 @@
-USING: cache tools.test accessors destructors kernel assocs
-namespaces ;
+USING: accessors assocs cache destructors kernel namespaces
+tools.test ;
 IN: cache.tests
 
 TUPLE: mock-disposable < disposable n ;

@@ -5,8 +5,6 @@ hash-sets hashtables init io io.files kernel kernel.private
 make math memory namespaces parser parser.notes prettyprint
 sequences splitting system vectors vocabs vocabs.loader words ;
 QUALIFIED: bootstrap.image.private
-QUALIFIED: hashtables
-QUALIFIED: hash-sets
 IN: bootstrap.stage1
 
 "Bootstrap stage 1..." print flush

@@ -3,8 +3,8 @@
 USING: sequences.parser io io.encodings.utf8 io.files
 io.streams.string kernel combinators accessors io.pathnames
 fry sequences arrays locals namespaces io.directories
-assocs math splitting make unicode.categories
-combinators.short-circuit c.lexer ;
+assocs math splitting make unicode combinators.short-circuit
+c.lexer ;
 IN: c.preprocessor
 
 : initial-library-paths ( -- seq )
@@ -60,14 +60,8 @@ ERROR: header-file-missing path ;
         drop
     ] if* ;
 
-:: read-local-include ( preprocessor-state path -- )
-    current-directory get path append-path dup :> full-path
-    dup exists? [
-        [ preprocessor-state ] dip preprocess-file
-    ] [
-        ! full-path header-file-missing
-        drop
-    ] if ;
+: read-local-include ( preprocessor-state path -- )
+    dup exists? [ preprocess-file ] [ 2drop ] if ;
 
 : skip-whitespace/comments ( sequence-parser -- sequence-parser )
     skip-whitespace

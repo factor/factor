@@ -126,6 +126,9 @@ SYMBOL: special-objects
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
 
+: define-sub-primitives ( assoc -- )
+    [ swap define-sub-primitive ] assoc-each ;
+
 : define-combinator-primitive ( quot non-tail-quot tail-quot word -- )
     [
         [
@@ -375,7 +378,7 @@ ERROR: tuple-removed class ;
 M: tuple prepare-object emit-tuple ;
 
 M: tombstone prepare-object
-    state>> "((tombstone))" "((empty))" ?
+    state>> "+tombstone+" "+empty+" ?
     "hashtables.private" lookup-word def>> first
     [ emit-tuple ] cache-eql-object ;
 

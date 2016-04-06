@@ -18,10 +18,10 @@ ERROR: splitting-atomic-interval ;
 
 : check-split ( live-interval n -- )
     check-allocation? get [
-        [ [ start>> ] dip > [ splitting-too-early ] when ]
-        [ [ end>> ] dip < [ splitting-too-late ] when ]
+        [ [ live-interval-start ] dip > [ splitting-too-early ] when ]
+        [ [ live-interval-end ] dip < [ splitting-too-late ] when ]
         [
-            drop [ end>> ] [ start>> ] bi =
+            drop ranges>> ranges-endpoints =
             [ splitting-atomic-interval ] when
         ] 2tri
     ] [ 2drop ] if ; inline
@@ -41,4 +41,4 @@ ERROR: splitting-atomic-interval ;
     before split-before
     after split-after ;
 
-HINTS: split-interval live-interval object ;
+HINTS: split-interval live-interval-state object ;

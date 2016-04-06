@@ -13,7 +13,6 @@ QUALIFIED: alien.data.private
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
 QUALIFIED: classes.tuple.private
-QUALIFIED: kernel
 QUALIFIED: kernel.private
 QUALIFIED: math.bitwise.private
 QUALIFIED: math.floats.private

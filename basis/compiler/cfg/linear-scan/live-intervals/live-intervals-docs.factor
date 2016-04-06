@@ -1,6 +1,6 @@
-USING: compiler.cfg compiler.cfg.instructions
-compiler.cfg.linear-scan.allocation cpu.architecture help.markup help.syntax
-kernel math sequences ;
+USING: compiler.cfg compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation help.markup help.syntax kernel
+math sequences ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 HELP: <live-interval>
@@ -8,7 +8,8 @@ HELP: <live-interval>
   { "vreg" "virtual register" }
   { "live-interval" live-interval-state }
 }
-{ $description "Creates a new live interval for a virtual register. Initially the range is empty." } ;
+{ $description "Creates a new live interval for a virtual register. Initially the ranges are empty and it has no uses." }
+{ $see-also vreg>live-interval } ;
 
 HELP: block-from
 { $values { "bb" basic-block } { "n" integer } }
@@ -23,29 +24,43 @@ HELP: cfg>sync-points
 { $description "Creates a sequence of all sync points in the cfg." }
 { $see-also sync-point } ;
 
+HELP: clobber-insn
+{ $class-description "Instructions that clobber registers but are allowed to produce outputs in registers. Inputs are in spill slots, except for inputs coalesced with the output, in which case that input will be in a register." } ;
+
 HELP: compute-live-intervals
 { $values { "cfg" cfg } { "intervals/sync-points" sequence } }
 { $description "Computes the live intervals and sync points of a cfg." }
 { $notes "The instructions must be numbered." } ;
 
+HELP: hairy-clobber-insn
+{ $class-description "Instructions that clobber registers. They receive inputs and  produce outputs in spill slots." } ;
+
 HELP: find-use
 { $values
   { "insn#" integer }
-  { "live-interval" live-interval }
+  { "live-interval" live-interval-state }
   { "vreg-use/f" vreg-use }
 }
 { $description "Finds the live intervals " { $link vreg-use } " at the given instruction number, if it has one." } ;
 
-HELP: finish-live-intervals
-{ $values { "live-intervals" sequence } }
-{ $description "Since live intervals are computed in a backward order, we have to reverse some sequences, and compute the start and end." } ;
+HELP: finish-live-interval
+{ $values { "live-interval" live-interval-state } }
+{ $description "Reverses the 'ranges' and 'uses' of the live-interval since those are computed in the reverse order." } ;
 
 HELP: from
 { $var-description "An integer representing a sequence number one lower than all numbers in the currently processed block." } ;
 
 HELP: intervals-intersect?
-{ $values { "interval1" live-interval } { "interval2" live-interval } { "?" boolean } }
+{ $values
+  { "interval1" live-interval-state }
+  { "interval2" live-interval-state }
+  { "?" boolean }
+}
 { $description "Checks if two live intervals intersect each other." } ;
+
+HELP: last-use?
+{ $values { "insn#" integer } { "uses" sequence } { "use/f" $maybe vreg-use } }
+{ $description "Maybe gets the last " { $link vreg-use } " of a " { $link live-interval-state } "." } ;
 
 HELP: live-interval-state
 { $class-description "A class encoding the \"liveness\" of a virtual register. It has the following slots:"
@@ -63,8 +78,6 @@ HELP: live-interval-state
         { $slot "spill-to" }
         { { $link spill-slot } " to use for spilling, if it needs to be spilled." }
     }
-    { { $slot "start" } { "Earliest insn# where the interval is live." } }
-    { { $slot "end" } { "Latest insn# where the interval is live." } }
     {
         { $slot "ranges" }
         { "Inclusive ranges where the live interval is live. This is because the [start,end] interval can have gaps." }
@@ -79,27 +92,42 @@ HELP: live-interval-state
 HELP: live-intervals
 { $var-description "Mapping from vreg to " { $link live-interval-state } "." } ;
 
+HELP: record-def
+{ $values { "vreg" integer } { "n" integer } { "spill-slot?" boolean } }
+{ $description "Records that the 'vreg' is defined at the instruction numbered 'n'." } ;
+
 HELP: record-temp
 { $values { "vreg" number } { "n" number } }
 { $description "Assigns the interval [n,n] to vreg:s live interval." } ;
 
 HELP: sync-point
-{ $class-description "A location where all registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
+{ $class-description "A location where all live registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
   { $table
     { { $slot "n" } { "Set from an instructions sequence number." } }
     { { $slot "keep-dst?" } { "Boolean that determines whether registers are spilled around this sync point." } }
   }
 }
-{ $see-also insn } ;
+{ $see-also cfg>sync-points clobber-insn hairy-clobber-insn insn } ;
 
 HELP: to
 { $var-description "An integer representing a sequence number equal to the highest number in the currently processed block." } ;
 
+HELP: uses-vregs*
+{ $values { "insn" insn } { "seq" sequence } }
+{ $description "Like " { $link uses-vregs } " except it also includes gc-maps base pointers. The point is to make their values available even if the base pointers themselves are never used again." } ;
+
 ARTICLE: "compiler.cfg.linear-scan.live-intervals" "Live interval utilities"
-"This vocab contains words for managing live intervals."
+"This vocab contains words for managing live intervals. The main word is " { $link compute-live-intervals } " which goes through the " { $link cfg } " and returns a sequence of " { $link live-interval-state } " instances which encodes all liveness information for it."
 $nl
 "Liveness classes and constructors:"
-{ $subsections <live-interval> live-interval } ;
+{ $subsections <live-interval> live-interval-state }
+"Recording liveness info:"
+{ $subsections
+  compute-live-intervals*
+  record-def
+  record-use
+  record-temp
+} ;
 
 
 ABOUT: "compiler.cfg.linear-scan.live-intervals"

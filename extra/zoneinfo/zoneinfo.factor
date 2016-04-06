@@ -3,7 +3,7 @@
 USING: accessors assocs combinators combinators.short-circuit
 combinators.smart fry io.encodings.utf8 io.files kernel
 math.parser math.statistics memoize namespaces sequences
-splitting unicode.case calendar arrays ;
+splitting unicode calendar arrays ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -32,8 +32,6 @@ TUPLE: raw-leap year month day hms corr r/s ;
 
 TUPLE: zone name ;
 TUPLE: rule name from to at-time ;
-TUPLE: link ;
-TUPLE: leap ;
 
 : rule-to ( m string -- m n )
     {
@@ -41,9 +39,6 @@ TUPLE: leap ;
         { "max" [ 1/0. ] }
         [ string>number ]
     } case ;
-
-: raw-rule>rule ( raw-rule -- rule )
-    ;
 
 : parse-rule ( seq -- rule )
     [
@@ -60,9 +55,6 @@ TUPLE: leap ;
             [ ]
         } spread
     ] input<sequence raw-rule boa ;
-
-: raw-zone>zone ( raw-zone -- zone )
-    ;
 
 : parse-zone ( seq -- zone )
     {
@@ -82,9 +74,6 @@ TUPLE: leap ;
         [ 3 tail harvest ]
     } cleave raw-zone boa ;
 
-: raw-link>link ( raw-link -- link )
-    ;
-
 : parse-link ( seq -- link )
     [
         {
@@ -93,9 +82,6 @@ TUPLE: leap ;
             [ ]
         } spread
     ] input<sequence raw-link boa ;
-
-: raw-leap>leap ( raw-leap -- leap )
-    ;
 
 : parse-leap ( seq -- link )
     [
@@ -113,10 +99,10 @@ TUPLE: leap ;
 : parse-line ( seq -- tuple )
     dup first >lower
     {
-        { "zone" [ parse-zone dup last-zone set raw-zone>zone ] }
-        { "rule" [ parse-rule raw-rule>rule ] }
-        { "link" [ parse-link raw-link>link ] }
-        { "leap" [ parse-leap raw-leap>leap ] }
+        { "zone" [ parse-zone dup last-zone set ] }
+        { "rule" [ parse-rule ] }
+        { "link" [ parse-link ] }
+        { "leap" [ parse-leap ] }
         [ drop harvest parse-partial-zone ]
     } case ;
 
@@ -131,7 +117,6 @@ MEMO: zoneinfo-files ( -- seq )
 
 MEMO: zoneinfo-array ( -- seq )
     zoneinfo-files concat ;
-
 
 : raw-rule-map ( -- assoc )
     zoneinfo-array [ raw-rule? ] filter [ name>> ] collect-by ;

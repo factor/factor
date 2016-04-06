@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lists lists.lazy promises kernel sequences strings math
 arrays splitting quotations combinators namespaces locals
-unicode.case unicode.categories sequences.deep accessors ;
+unicode sequences.deep accessors ;
 IN: parser-combinators
 
 ! Parser combinator protocol

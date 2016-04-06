@@ -4,10 +4,10 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa cocoa.application cocoa.classes
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
 cocoa.views combinators core-foundation.strings core-graphics
-core-graphics.types core-text io.encodings.utf8 kernel locals
-math math.rectangles namespaces opengl sequences threads
+core-graphics.types core-text io.encodings.utf8 kernel literals
+locals math math.rectangles namespaces opengl sequences threads
 ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.private ;
+ui.private unicode ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -24,12 +24,20 @@ IN: ui.backend.cocoa.views
         [ ]
     } case ;
 
-CONSTANT: modifiers
-    {
-        { S+ 0x20000 }
-        { C+ 0x40000 }
-        { A+ 0x100000 }
-        { M+ 0x80000 }
+CONSTANT: NSAlphaShiftKeyMask 0x10000
+CONSTANT: NSShiftKeyMask      0x20000
+CONSTANT: NSControlKeyMask    0x40000
+CONSTANT: NSAlternateKeyMask  0x80000
+CONSTANT: NSCommandKeyMask    0x100000
+CONSTANT: NSNumericPadKeyMask 0x200000
+CONSTANT: NSHelpKeyMask       0x400000
+CONSTANT: NSFunctionKeyMask   0x800000
+
+CONSTANT: modifiers {
+        { S+ $ NSShiftKeyMask }
+        { C+ $ NSControlKeyMask }
+        { A+ $ NSCommandKeyMask }
+        { M+ $ NSAlternateKeyMask }
     }
 
 CONSTANT: key-codes
@@ -156,6 +164,7 @@ CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInput
 
     METHOD: void prepareOpenGL [
+        self SUPER-> prepareOpenGL
 
         self SEL: setWantsBestResolutionOpenGLSurface:
         -> respondsToSelector: c-bool> [

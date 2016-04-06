@@ -71,14 +71,14 @@ PRIVATE>
 : next-power-of-2-bits ( m -- numbits )
     dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
 
-:: ((random-integer)) ( m obj -- n )
+:: random-integer-loop ( m obj -- n )
     obj random-32* 32 m next-power-of-2-bits 32 - [ dup 0 > ] [
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
     ] while drop [ m * ] [ neg shift ] bi* ; inline
 
 GENERIC# (random-integer) 1 ( m obj -- n )
-M: fixnum (random-integer) ( m obj -- n ) ((random-integer)) ;
-M: bignum (random-integer) ( m obj -- n ) ((random-integer)) ;
+M: fixnum (random-integer) ( m obj -- n ) random-integer-loop ;
+M: bignum (random-integer) ( m obj -- n ) random-integer-loop ;
 
 : random-integer ( m -- n )
     random-generator get (random-integer) ;
@@ -105,7 +105,7 @@ M: hashtable random
         [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
     ] if-zero ;
 
-M: unordered-set random members random ;
+M: sets:set random members random ;
 
 M: hash-set random
     dup cardinality [ drop f ] [

@@ -3,7 +3,7 @@
 USING: alien.libraries.finder arrays assocs
 combinators.short-circuit io io.encodings.utf8 io.files
 io.files.info io.launcher kernel sequences sets splitting system
-unicode.categories ;
+unicode ;
 IN: alien.libraries.finder.linux
 
 <PRIVATE
@@ -32,7 +32,7 @@ CONSTANT: mach-map {
     mach-map cpu of { "libc6" } or ;
 
 : name-matches? ( lib triple -- ? )
-    first swap ?head [ ?first ".-" member? ] [ drop f ] if ;
+    first swap ?head [ ?first CHAR: . = ] [ drop f ] if ;
 
 : arch-matches? ( lib triple -- ? )
     [ drop ldconfig-arch ] [ second swap subset? ] bi* ;

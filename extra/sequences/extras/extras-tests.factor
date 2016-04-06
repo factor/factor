@@ -1,7 +1,6 @@
-USING: arrays ascii io io.streams.string kernel make math
-math.vectors random sequences sequences.extras strings
-tools.test vectors ;
-
+USING: accessors arrays ascii io io.streams.string kernel make
+math math.vectors random sequences sequences.extras strings
+tools.test vectors vocabs ;
 IN: sequences.extras.tests
 
 { { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } } [ "abcd" all-subseqs ] unit-test
@@ -47,10 +46,44 @@ IN: sequences.extras.tests
 { { "hello," " " "world!" " " " " } }
 [ "hello, world!  " [ blank? ] slice-when [ >string ] map ] unit-test
 
-{ "hello" } [ "hello" 0 rotate ] unit-test
-{ "llohe" } [ "hello" 2 rotate ] unit-test
+{ t }
+[ "abc" sequence>slice slice? ] unit-test
+
+{ "abc" }
+[ "abc" sequence>slice >string ] unit-test
+
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 2 4 rot <slice> ] bi slices-overlap? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 1 2 rot <slice> ] bi slices-overlap? ] unit-test
+{ f } [ "abcdef" [ 0 3 rot <slice> ] [ 3 6 rot <slice> ] bi slices-overlap? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 2 4 rot <slice> ] bi slices-touch? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 1 2 rot <slice> ] bi slices-touch? ] unit-test
+{ t } [ "abcdef" [ 0 3 rot <slice> ] [ 3 6 rot <slice> ] bi slices-touch? ] unit-test
+{ f } [ "abcdef" [ 0 3 rot <slice> ] [ 4 6 rot <slice> ] bi slices-touch? ] unit-test
+
+{ "abcdef" } [
+    "abcdef" [ 0 3 rot <slice> ] [ 3 6 rot <slice> ] bi merge-slices >string
+] unit-test
+
+{ "abcdef" } [
+    "abcdef" [ 3 6 rot <slice> ] [ 0 3 rot <slice> ] bi merge-slices >string
+] unit-test
+
+{ "abc" } [
+    "abcdef" [ 0 3 rot <slice> ] [ 0 3 rot <slice> ] bi merge-slices >string
+] unit-test
+
+
+{ "hello" "hello" } [ "hello" dup 0 rotate ] unit-test
+{ "hello" "llohe" } [ "hello" dup 2 rotate ] unit-test
+{ "hello" "lohel" } [ "hello" dup 13 rotate ] unit-test
+{ "hello" "ohell" } [ "hello" dup -1 rotate ] unit-test
+{ "hello" "lohel" } [ "hello" dup -12 rotate ] unit-test
+
 { "hello" } [ "hello" dup 0 rotate! ] unit-test
-{ "lohel" } [ "hello" dup 3 rotate! ] unit-test
+{ "llohe" } [ "hello" dup 2 rotate! ] unit-test
+{ "lohel" } [ "hello" dup 13 rotate! ] unit-test
+{ "ohell" } [ "hello" dup -1 rotate! ] unit-test
+{ "lohel" } [ "hello" dup -12 rotate! ] unit-test
 
 { { } } [ { } [ ] map-concat ] unit-test
 { V{ 0 0 1 0 1 2 } } [ 4 iota [ iota ] map-concat ] unit-test
@@ -181,3 +214,17 @@ IN: sequences.extras.tests
 { { 0 3 } } [ "ABA" "ABAABA" start-all ] unit-test
 { 1 } [ "ABA" "ABABA" count-subseq ] unit-test
 { 2 } [ "ABA" "ABABA" count-subseq* ] unit-test
+
+{ 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
+
+{
+    {
+        { 2 4 }
+        { 3 6 }
+        { 4 8 }
+    }
+} [ { 2 3 4 } [ 2 * ] map-zip ] unit-test
+
+{ }
+[ "test:" all-words [ name>> over prepend ] map-zip 2drop ] unit-test
+

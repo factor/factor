@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators constructors io.encodings.utf8
 io.files kernel math math.parser sequences splitting
-unicode.categories ;
+unicode ;
 IN: resolv-conf
 
 TUPLE: network ip netmask ;

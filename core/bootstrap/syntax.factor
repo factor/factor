@@ -8,7 +8,6 @@ IN: bootstrap.syntax
     "syntax" create-vocab drop
 
     {
-        "!"
         "\""
         "("
         ":"

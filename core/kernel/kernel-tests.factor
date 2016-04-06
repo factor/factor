@@ -1,8 +1,7 @@
-USING: arrays byte-arrays kernel kernel.private literals math
-memory namespaces sequences tools.test math.private quotations
-continuations prettyprint io.streams.string debugger assocs
-sequences.private accessors locals.backend grouping words
-system alien alien.accessors kernel.private ;
+USING: accessors alien alien.accessors arrays assocs byte-arrays
+continuations debugger grouping io.streams.string kernel
+kernel.private literals locals.backend math memory namespaces
+prettyprint sequences sequences.private tools.test words ;
 IN: kernel.tests
 
 { 0 } [ f size ] unit-test
@@ -30,14 +29,14 @@ IN: kernel.tests
 
 ! Make sure we report the correct error on stack underflow
 [ clear drop ] [
-    2 head ${ "kernel-error" ERROR-DATASTACK-UNDERFLOW } =
+    2 head ${ KERNEL-ERROR ERROR-DATASTACK-UNDERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test
 
 [
     3 [ { } set-retainstack ] dip ]
-    [ 2 head ${ "kernel-error" ERROR-RETAINSTACK-UNDERFLOW } =
+    [ 2 head ${ KERNEL-ERROR ERROR-RETAINSTACK-UNDERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test
@@ -56,19 +55,19 @@ IN: kernel.tests
 >>
 
 [ overflow-d ] [
-    2 head ${ "kernel-error" ERROR-DATASTACK-OVERFLOW } =
+    2 head ${ KERNEL-ERROR ERROR-DATASTACK-OVERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test
 
 [ overflow-d-alt ] [
-    2 head ${ "kernel-error" ERROR-DATASTACK-OVERFLOW } =
+    2 head ${ KERNEL-ERROR ERROR-DATASTACK-OVERFLOW } =
 ] must-fail-with
 
 { } [ [ :c ] with-string-writer drop ] unit-test
 
 [ overflow-r ] [
-    2 head ${ "kernel-error" ERROR-RETAINSTACK-OVERFLOW } =
+    2 head ${ KERNEL-ERROR ERROR-RETAINSTACK-OVERFLOW } =
 ] must-fail-with
 
 { } [ :c ] unit-test

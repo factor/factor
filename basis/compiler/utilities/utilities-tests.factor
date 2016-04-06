@@ -1,5 +1,4 @@
 USING: compiler.utilities kernel tools.test ;
-IN: compiler.utilities.tests
 
 {
     9

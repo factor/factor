@@ -3,9 +3,9 @@
 USING: calendar combinators compiler.units continuations
 graphviz.dot images.viewer io.backend io.directories
 io.encodings.8-bit.latin1 io.encodings.utf8 io.files
-io.files.unique io.launcher io.standard-paths kernel locals make
-namespaces sequences summary system threads unicode.case vocabs
-webbrowser words ;
+io.files.temp io.files.unique io.launcher io.standard-paths
+kernel locals make namespaces sequences summary system threads
+unicode vocabs webbrowser words ;
 IN: graphviz.render
 
 <PRIVATE
@@ -115,16 +115,16 @@ PRIVATE>
         [ unsupported-preview-format ]
     } case ;
 
-:: with-preview ( graph quot: ( path -- ) -- )
+:: with-preview ( ..a graph quot: ( ..a path -- ..b ) -- ..b )
     [
         "preview" ".dot" [| code-file |
             "preview" preview-extension [| image-file |
                 graph code-file ?encoding write-dot
                 code-file image-file try-preview-command
-                image-file quot call( path -- )
+                image-file quot call
             ] cleanup-unique-file
         ] cleanup-unique-file
-    ] with-temp-directory ;
+    ] with-temp-directory ; inline
 
 PRIVATE>
 

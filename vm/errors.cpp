@@ -19,7 +19,10 @@ void fatal_error(const char* msg, cell tagged) {
   std::cout << "fatal_error: " << msg;
   std::cout << ": " << (void*)tagged;
   std::cout << std::endl << std::endl;
-  current_vm()->dump_memory_layout(std::cout);
+  factor_vm* vm = current_vm();
+  if (vm->data) {
+    vm->dump_memory_layout(std::cout);
+  }
   abort();
 }
 
@@ -57,7 +60,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
 
     /* Now its safe to allocate and GC */
     cell error_object =
-        allot_array_4(special_objects[OBJ_ERROR], tag_fixnum(error),
+        allot_array_4(tag_fixnum(KERNEL_ERROR), tag_fixnum(error),
                       arg1.value(), arg2.value());
     ctx->push(error_object);
 

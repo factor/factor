@@ -1,6 +1,4 @@
-USING: accessors eval strings.parser strings.parser.private
-tools.test ;
-IN: strings.parser.tests
+USING: accessors kernel eval strings.parser tools.test ;
 
 { "Hello\n\rworld" } [ "Hello\\n\\rworld" unescape-string ] unit-test
 
@@ -16,6 +14,9 @@ IN: strings.parser.tests
 { "foobarbaz" } [ "\"foo\\\nbar\\\r\nbaz\"" eval( -- obj ) ] unit-test
 
 { "\"abc\"" } [ "\"\\\"abc\\\"\"" eval( -- string ) ] unit-test
+[ "\"" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
+[ "\"abc" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
+[ "\"abc\n\n" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
 
 { "\"\\" } [ "\"\\" ] unit-test
 

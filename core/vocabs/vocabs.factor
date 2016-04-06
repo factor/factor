@@ -100,9 +100,12 @@ ERROR: no-vocab name ;
     dictionary get values [ vocab-words ] map concat ;
 
 : words-named ( str -- seq )
-    dictionary get values
-    [ vocab-words-assoc at ] with map
-    sift ;
+    dictionary get
+    [ values [ vocab-words-assoc at ] with map sift ]
+    [
+        [ ":" split1 swap ] dip at
+        [ vocab-words-assoc at [ suffix ] when* ] [ drop ] if*
+    ] 2bi ;
 
 : child-vocab? ( prefix name -- ? )
     swap [ drop t ] [

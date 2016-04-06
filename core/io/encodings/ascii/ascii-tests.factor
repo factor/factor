@@ -1,5 +1,5 @@
-USING: io.encodings.string io.encodings.ascii tools.test strings arrays ;
-IN: io.encodings.ascii.tests
+USING: arrays io.encodings.ascii io.encodings.string strings
+tools.test ;
 
 { B{ CHAR: f CHAR: o CHAR: o } } [ "foo" ascii encode ] unit-test
 [ { 128 } >string ascii encode ] must-fail

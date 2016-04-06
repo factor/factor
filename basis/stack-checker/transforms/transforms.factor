@@ -13,7 +13,7 @@ IN: stack-checker.transforms
     [ error-continuation get current-word get transform-expansion-error ]
     recover ;
 
-:: ((apply-transform)) ( quot values stack rstate -- )
+:: apply-literal-values-transform ( quot values stack rstate -- )
     rstate recursive-state [ stack quot call-transformer ] with-variable
     values [ length shorten-d ] [ #drop, ] bi
     rstate infer-quot ;
@@ -31,7 +31,7 @@ IN: stack-checker.transforms
                 [ [ literal value>> ] map ]
                 [ first literal recursion>> ] tri
             ] if
-            ((apply-transform))
+            apply-literal-values-transform
         ] }
         { [ dup input-values? ] [ drop current-word get unknown-macro-input ] }
         [ drop current-word get bad-macro-input ]

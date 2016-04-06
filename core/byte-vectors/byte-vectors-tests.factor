@@ -1,5 +1,5 @@
-USING: tools.test byte-vectors vectors sequences kernel
-prettyprint math ;
+USING: byte-vectors math prettyprint sequences tools.test
+vectors ;
 IN: byte-vectors.tests
 
 { 0 } [ 123 <byte-vector> length ] unit-test

@@ -11,7 +11,6 @@ enum special_object {
   OBJ_CALLCC_1,        /* used to pass the value in callcc1 */
 
   ERROR_HANDLER_QUOT = 5, /* quotation called when VM throws an error */
-  OBJ_ERROR,              /* a marker consed onto kernel errors */
 
   OBJ_CELL_SIZE = 7, /* sizeof(cell) */
   OBJ_CPU,           /* CPU architecture */

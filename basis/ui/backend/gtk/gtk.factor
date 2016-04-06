@@ -1,26 +1,25 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct combinators continuations
-destructors environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
-gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
-io.encodings.binary io.encodings.utf8 io.files kernel libc literals
-locals math math.bitwise math.vectors namespaces sequences strings
-system threads ui ui.backend ui.backend.gtk.input-methods
+alien.strings arrays assocs classes.struct combinators
+continuations destructors environment gdk.ffi gdk.gl.ffi
+gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
+gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.binary
+io.encodings.utf8 io.files kernel libc literals locals math
+math.bitwise math.vectors namespaces sequences strings system
+threads ui ui.backend ui.backend.gtk.input-methods
 ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private vocabs.loader ;
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.pixel-formats.private ui.private
+vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
 
-TUPLE: handle ;
-TUPLE: window-handle < handle window fullscreen? im-context ;
+TUPLE: window-handle window im-context fullscreen? ;
 
 : <window-handle> ( window im-context -- window-handle )
-    window-handle new
-        swap >>im-context
-        swap >>window ;
+    f window-handle boa ;
 
 : connect-signal-with-data ( object signal-name callback data -- )
     [ utf8 string>alien ] 2dip g_signal_connect drop ;
@@ -257,14 +256,14 @@ CONSTANT: action-key-codes
     2drop window relayout t ;
 
 : on-configure ( win event user-data -- ? )
-    drop swap window dup active?>> 100 = [
+    drop swap window dup active?>> [
         swap GdkEventConfigure memory>struct
         [ event-loc >>window-loc ] [ event-dim >>dim ] bi
         relayout-1
     ] [ 2drop ] if f ;
 
 : on-map ( win event user-data -- ? )
-    2drop window 100 >>active? drop t ;
+    2drop window t >>active? drop t ;
 
 : on-delete ( win event user-data -- ? )
     2drop window ungraft t ;
@@ -486,7 +485,8 @@ M: gtk-ui-backend (close-window) ( handle -- )
     window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 
-M: gtk-ui-backend resize-window [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
+M: gtk-ui-backend resize-window
+    [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
 
 M: gtk-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*
@@ -537,8 +537,8 @@ M:: gtk-ui-backend system-alert ( caption text -- )
 
 M: gtk-ui-backend (with-ui)
     [
-        0 gint <ref> f void* <ref> gtk_init
-        0 gint <ref> f void* <ref> gtk_gl_init
+        f f gtk_init
+        f f gtk_gl_init
         load-icon
         init-clipboard
         start-ui
@@ -547,7 +547,7 @@ M: gtk-ui-backend (with-ui)
         ] with-destructors
     ] ui-running ;
 
-os unix? os macosx? not and [
+os linux? [
     gtk-ui-backend ui-backend set-global
 ] when
 

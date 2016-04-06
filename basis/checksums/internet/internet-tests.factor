@@ -1,9 +1,7 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
 USING: checksums checksums.internet tools.test ;
-
-IN: checksums
+IN: checksums.internet.tests
 
 { B{ 255 255 } } [ { } internet checksum-bytes ] unit-test
 { B{ 254 255 } } [ { 1 } internet checksum-bytes ] unit-test

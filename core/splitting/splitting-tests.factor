@@ -1,5 +1,4 @@
-USING: splitting tools.test kernel sequences arrays strings ascii math ;
-IN: splitting.tests
+USING: ascii kernel math sequences splitting strings tools.test ;
 
 { "hello" "world ." } [ "hello world ." " " split1 ] unit-test
 { "hello" "world-+." } [ "hello-+world-+." "-+" split1 ] unit-test

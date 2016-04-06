@@ -46,13 +46,13 @@ ERROR: vocab-root-required root ;
     [ drop '[ _ over vocab-dir? [ >vocab-link ] [ <vocab-prefix> ] if ] map! ]
     2tri ;
 
-: ((disk-vocabs-recursive)) ( root prefix -- )
+: disk-vocabs-recursive% ( root prefix -- )
     dupd vocab-name (disk-vocab-children) [ % ] keep
-    [ ((disk-vocabs-recursive)) ] with each ;
+    [ disk-vocabs-recursive% ] with each ;
 
 : (disk-vocabs-recursive) ( root prefix -- seq )
     [ ensure-vocab-root ] dip
-    [ ((disk-vocabs-recursive)) ] { } make ;
+    [ disk-vocabs-recursive% ] { } make ;
 
 : no-rooted ( seq -- seq' ) [ find-vocab-root ] reject ;
 

@@ -288,14 +288,11 @@ struct factor_vm {
   bignum* bignum_gcd(bignum* a_, bignum* b_);
 
   //data heap
-  void init_card_decks();
   void set_data_heap(data_heap* data_);
   void init_data_heap(cell young_size, cell aging_size, cell tenured_size);
   void primitive_size();
   data_heap_room data_room();
   void primitive_data_room();
-  void begin_scan();
-  void end_scan();
   cell instances(cell type);
   void primitive_all_instances();
 
@@ -335,8 +332,8 @@ struct factor_vm {
   /* the write barrier must be called any time we are potentially storing a
      pointer from an older generation to a younger one */
   inline void write_barrier(cell* slot_ptr) {
-    *(char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
-    *(char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
+    *(unsigned char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
+    *(unsigned char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
   }
 
   inline void write_barrier(object* obj, cell size) {
@@ -599,7 +596,6 @@ struct factor_vm {
   void primitive_code_blocks();
 
   // callbacks
-  void init_callbacks(cell size);
   void primitive_free_callback();
   void primitive_callback();
   void primitive_callback_room();

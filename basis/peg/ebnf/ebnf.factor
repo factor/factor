@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-effects kernel make math.parser multiline namespaces parser peg
-peg.parsers quotations sequences sequences.deep splitting
-stack-checker strings strings.parser summary unicode.categories
-words ;
+effects kernel make math math.parser multiline namespaces parser
+peg peg.parsers quotations sequences sequences.deep splitting
+stack-checker strings strings.parser summary unicode
+vocabs.parser words ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
 IN: peg.ebnf
@@ -429,7 +429,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
             drop
         ] [
             [
-                "FROM: locals => [let :> ; FROM: sequences => nth ; FROM: kernel => nip over ; [let " %
+                "[let " %
                 [
                     over ebnf-var? [
                         " " % # " over nth :> " %
@@ -447,8 +447,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
 
 M: ebnf-var build-locals ( code ast -- code )
     [
-        "FROM: locals => [let :> ; FROM: kernel => dup nip ; [let " %
-        " dup :> " % name>> %
+        "[let dup :> " % name>> %
         " " %
         %
         " nip ]" %
@@ -470,7 +469,15 @@ ERROR: bad-effect quot effect ;
     [ parser>> (transform) ]
     [ code>> insert-escapes ]
     [ parser>> ] tri build-locals
-    string-lines parse-lines ;
+    ! Add words we need for build-locals, then remove them
+    ! so we don't pollute the manifest qualified-vocabs
+    ! and also so restarts don't add multiple times
+    qualified-vocabs length
+    "locals" { "[let" ":>" } add-words-from
+    "kernel" { "dup" "nip" "over" } add-words-from
+    "sequences" { "nth" } add-words-from
+    [ string-lines parse-lines ] dip
+    dup 3 + qualified-vocabs delete-slice ;
 
 M: ebnf-action (transform) ( ast -- parser )
     ebnf-transform check-action-effect action ;

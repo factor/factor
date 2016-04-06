@@ -9,7 +9,7 @@ TUPLE: bit-set { table bit-array read-only } ;
 : <bit-set> ( capacity -- bit-set )
     <bit-array> bit-set boa ; inline
 
-INSTANCE: bit-set unordered-set
+INSTANCE: bit-set set
 
 M: bit-set in?
     over integer? [ table>> ?nth ] [ 2drop f ] if ; inline

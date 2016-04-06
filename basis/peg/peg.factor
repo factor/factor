@@ -3,8 +3,7 @@
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units effects.parser fry
 generalizations kernel locals make math math.order namespaces
-quotations sequences sets splitting unicode.categories vectors
-words ;
+quotations sequences sets splitting unicode vectors words ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -112,9 +111,9 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 
 : process-rule-result ( p result -- result )
     [
-        nip [ ast>> ] [ remaining>> ] bi input-from pos set
+        nip [ ast>> ] [ remaining>> ] bi input-from pos namespaces:set
     ] [
-        pos set fail
+        pos namespaces:set fail
     ] if* ;
 
 : eval-rule ( rule -- ast )
@@ -139,7 +138,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     pos>> <= or ;
 
 : setup-growth ( h p -- )
-    pos set dup involved-set>> clone >>eval-set drop ;
+    pos namespaces:set dup involved-set>> clone >>eval-set drop ;
 
 : (grow-lr) ( h p r: ( -- result ) m -- )
     [ [ setup-growth ] 2keep ] 2dip
@@ -155,7 +154,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     [ [ heads set-at ] 2keep ] 2dip
     pick over [ (grow-lr) ] 2dip
     swap heads delete-at
-    dup pos>> pos set ans>>
+    dup pos>> pos namespaces:set ans>>
     ; inline
 
 :: (setup-lr) ( l s -- )
@@ -209,9 +208,9 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 
 :: apply-non-memo-rule ( r p -- ast )
     fail r rule-id f lrstack get left-recursion boa :> lr
-    lr lrstack set lr p memo-entry boa dup p r rule-id set-memo :> m
+    lr lrstack namespaces:set lr p memo-entry boa dup p r rule-id set-memo :> m
     r eval-rule :> ans
-    lrstack get next>> lrstack set
+    lrstack get next>> lrstack namespaces:set
     pos get m pos<<
     lr head>> [
         m ans>> left-recursion? [
@@ -224,7 +223,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     ] if ; inline
 
 : apply-memo-rule ( r m -- ast )
-    [ ans>> ] [ pos>> ] bi pos set
+    [ ans>> ] [ pos>> ] bi pos namespaces:set
     dup left-recursion? [
         [ setup-lr ] keep seed>>
     ] [
@@ -303,7 +302,11 @@ SYMBOL: delayed
     ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
-    swap [ execute( -- result ) [ error-stack get first throw ] unless* ] with-packrat ;
+    swap [
+        execute( -- result )
+        [ error-stack get ?first [ throw ]
+        [ pos get input get f <parse-error> throw ] if* ] unless*
+    ] with-packrat ;
 
 : (parse) ( input parser -- result )
     dup word? [ compile ] unless compiled-parse ;
@@ -330,7 +333,7 @@ TUPLE: token-parser symbol ;
 : parse-token ( input string -- result )
     ! Parse the string, returning a parse result
     [ ?head-slice ] keep swap [
-        <parse-result> f f f add-error
+        <parse-result>
     ] [
         [ seq>> pos get swap ] dip "'" "'" surround 1vector add-error f
     ] if ;
@@ -341,15 +344,15 @@ M: token-parser (compile) ( peg -- quot )
 TUPLE: satisfy-parser quot ;
 
 : parse-satisfy ( input quot -- result )
-    swap dup empty? [
-        2drop f
+    swap [
+        drop f
     ] [
         unclip-slice rot dupd call [
             <parse-result>
         ] [
             2drop f
         ] if
-    ] if ; inline
+    ] if-empty ; inline
 
 M: satisfy-parser (compile)
     quot>> '[ input-slice _ parse-satisfy ] ;
@@ -497,7 +500,7 @@ TUPLE: sp-parser parser ;
 
 M: sp-parser (compile)
     parser>> compile-parser-quot '[
-        input-slice [ blank? ] trim-head-slice input-from pos set @
+        input-slice [ blank? ] trim-head-slice input-from pos namespaces:set @
     ] ;
 
 TUPLE: delay-parser quot ;

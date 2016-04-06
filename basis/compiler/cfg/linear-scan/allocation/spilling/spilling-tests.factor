@@ -11,11 +11,9 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
        { vreg 45 }
        { spill-to T{ spill-slot { n 8 } } }
        { spill-rep double-rep }
-       { start 22 }
-       { end 47 }
-       { ranges { { 22 47 } { 67 68 } { 69 72 } } }
+       { ranges V{ { 22 47 } { 67 68 } { 69 72 } } }
        { uses
-         {
+         V{
              T{ vreg-use
                 { n 28 }
                 { use-rep double-rep }
@@ -38,28 +36,33 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
     test-live-interval last-use-rep
 ] unit-test
 
+! spill-before
+{ f } [
+    30 <live-interval> spill-before
+] unit-test
+
 ! trim-after-ranges
 {
     T{ live-interval-state
-       { ranges { { 25 30 } { 40 50 } } }
-       { uses { T{ vreg-use { n 25 } } } }
+       { ranges V{ { 25 30 } { 40 50 } } }
+       { uses V{ T{ vreg-use { n 25 } } } }
     }
 } [
     T{ live-interval-state
-       { ranges { { 0 10 } { 20 30 } { 40 50 } } }
-       { uses { T{ vreg-use { n 25 } } } }
+       { ranges V{ { 0 10 } { 20 30 } { 40 50 } } }
+       { uses V{ T{ vreg-use { n 25 } } } }
     } dup trim-after-ranges
 ] unit-test
 
 {
     T{ live-interval-state
-       { ranges { { 10 23 } } }
-       { uses { T{ vreg-use { n 10 } } } }
+       { ranges V{ { 10 23 } } }
+       { uses V{ T{ vreg-use { n 10 } } } }
     }
 } [
     T{ live-interval-state
-       { ranges { { 20 23 } } }
-       { uses { T{ vreg-use { n 10 } } } }
+       { ranges V{ { 20 23 } } }
+       { uses V{ T{ vreg-use { n 10 } } } }
     }
     dup trim-after-ranges
 ] unit-test
@@ -67,12 +70,12 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
 ! trim-before-ranges
 {
     T{ live-interval-state
-       { ranges { { 0 10 } { 20 21 } } }
-       { uses { T{ vreg-use { n 20 } } } }
+       { ranges V{ { 0 10 } { 20 21 } } }
+       { uses V{ T{ vreg-use { n 20 } } } }
     }
 } [
     T{ live-interval-state
-       { ranges { { 0 10 } { 20 30 } { 40 50 } } }
-       { uses { T{ vreg-use { n 20 } } } }
+       { ranges V{ { 0 10 } { 20 30 } { 40 50 } } }
+       { uses V{ T{ vreg-use { n 20 } } } }
     } dup trim-before-ranges
 ] unit-test

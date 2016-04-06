@@ -45,7 +45,7 @@ TUPLE: anon-var ;
         dup stack-var? [ n>> [ or ] keep max ] [ drop ] if
     ] reduce ;
 
-:: interpolate-quot ( str quot -- quot' )
+:: (interpolate-quot) ( str quot -- quot' )
     str parse-interpolate :> args
     args max-stack-var    :> vars
 
@@ -67,15 +67,24 @@ TUPLE: anon-var ;
 
 PRIVATE>
 
+: interpolate-quot ( str -- quot )
+    [ [ get ] ] (interpolate-quot) ;
+
 MACRO: interpolate ( str -- quot )
-    [ [ get ] ] interpolate-quot ;
+    interpolate-quot ;
 
 : interpolate>string ( str -- newstr )
     [ interpolate ] with-string-writer ; inline
 
-: interpolate-locals ( str -- quot )
-    [ dup search [ [ ] ] [ [ get ] ] ?if ] interpolate-quot ;
+: interpolate-locals-quot ( str -- quot )
+    [ dup search [ [ ] ] [ [ get ] ] ?if ] (interpolate-quot) ;
+
+MACRO: interpolate-locals ( str -- quot )
+    interpolate-locals-quot ;
+
+: interpolate-locals>string ( str -- newstr )
+    [ interpolate-locals ] with-string-writer ; inline
 
 SYNTAX: [I
     "I]" parse-multiline-string
-    interpolate-locals append! ;
+    interpolate-locals-quot append! ;

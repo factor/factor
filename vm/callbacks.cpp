@@ -18,10 +18,6 @@ callback_heap::~callback_heap() {
   seg = NULL;
 }
 
-void factor_vm::init_callbacks(cell size) {
-  callbacks = new callback_heap(size, this);
-}
-
 bool callback_heap::return_takes_param_p() {
 #if defined(FACTOR_X86) || defined(FACTOR_AMD64)
   return true;

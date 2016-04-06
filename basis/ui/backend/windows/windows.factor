@@ -271,7 +271,7 @@ CONSTANT: window-control>ex-style
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     ! wParam and lParam are unused
     ! only paint if width/height both > 0
-    3drop window 100 >>active? relayout-1 yield ;
+    3drop window t >>active? relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
@@ -411,9 +411,9 @@ CONSTANT: exclude-keys-wm-char
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
     {
-        { [ over SC_MINIMIZE = ] [ 0 set-window-active ] }
-        { [ over SC_RESTORE = ] [ 100 set-window-active ] }
-        { [ over SC_MAXIMIZE = ] [ 100 set-window-active ] }
+        { [ over SC_MINIMIZE = ] [ f set-window-active ] }
+        { [ over SC_RESTORE = ] [ t set-window-active ] }
+        { [ over SC_MAXIMIZE = ] [ t set-window-active ] }
         { [ dup alpha? ] [ 4drop 0 ] }
         { [ t ] [ DefWindowProc ] }
     } cond ;
@@ -483,7 +483,7 @@ SYMBOL: nc-buttons
         drop
     ] [
         [ SetCapture drop ] keep
-        mouse-captured set
+        mouse-captured namespaces:set
     ] if ;
 
 : release-capture ( -- )

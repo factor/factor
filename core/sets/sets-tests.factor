@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sets tools.test kernel prettyprint hash-sets sorting
-math sequences bit-sets bit-arrays ;
+USING: bit-arrays bit-sets kernel math sequences sets sorting
+tools.test ;
 IN: sets.tests
 
 { V{ 1 2 3 } } [ 3 V{ 1 2 } clone [ adjoin ] keep ] unit-test
@@ -111,18 +111,18 @@ IN: sets.tests
 { H{ { 3 H{ { 1 1 } { 2 2 } } } } } [ H{ } clone 1 3 pick conjoin-at 2 3 pick conjoin-at ] unit-test
 
 TUPLE: null-set ;
-INSTANCE: null-set unordered-set
+INSTANCE: null-set set
 M: null-set members drop f ;
 
 { 0 } [ T{ null-set } cardinality ] unit-test
 { f } [ T{ null-set } members ] unit-test
 { t } [ T{ null-set } T{ null-set } set-like T{ null-set } = ] unit-test
 
-{ t } [ T{ null-set } unordered-set? ] unit-test
-{ t } [ HS{ } unordered-set? ] unit-test
-{ t } [ { } unordered-set? ] unit-test
-{ t } [ 5 <bit-set> unordered-set? ] unit-test
-{ f } [ H{ } unordered-set? ] unit-test
+{ t } [ T{ null-set } set? ] unit-test
+{ t } [ HS{ } set? ] unit-test
+{ t } [ { } set? ] unit-test
+{ t } [ 5 <bit-set> set? ] unit-test
+{ f } [ H{ } set? ] unit-test
 
 { HS{ } } [ HS{ } [ clear-set ] keep ] unit-test
 { HS{ } } [ HS{ 1 2 3 } [ clear-set ] keep ] unit-test

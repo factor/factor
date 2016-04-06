@@ -1,12 +1,10 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs alien alien.syntax continuations io
-kernel math math.parser namespaces make prettyprint quotations
-sequences debugger db db.postgresql.lib db.postgresql.ffi
-db.tuples db.types tools.annotations math.ranges
-combinators classes classes.tuple locals words tools.walker
-db.private nmake accessors random db.queries destructors
-db.tuples.private db.postgresql db.errors.postgresql splitting ;
+USING: accessors classes.tuple combinators db
+db.postgresql.errors db.postgresql.ffi db.postgresql.lib
+db.private db.queries db.tuples db.tuples.private db.types
+destructors kernel make math math.parser namespaces nmake random
+sequences splitting ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty database username password ;

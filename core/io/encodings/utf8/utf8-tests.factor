@@ -1,5 +1,5 @@
-USING: io.encodings.utf8 tools.test io.encodings.string strings arrays
-bootstrap.unicode kernel sequences ;
+USING: arrays io.encodings.string io.encodings.utf8 kernel
+sequences strings tools.test ;
 IN: io.encodings.utf8.tests
 
 : decode-utf8-w/stream ( array -- newarray )

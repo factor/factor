@@ -51,9 +51,6 @@ IN: sequences.extras
         ] each
     ] each ; inline
 
-: subseq-as ( from to seq exemplar -- subseq )
-    [ check-slice subseq>copy (copy) ] dip like ;
-
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
 
@@ -152,14 +149,68 @@ PRIVATE>
 : cut-slice* ( seq n -- before after )
     [ head-slice* ] [ tail-slice* ] 2bi ;
 
+: ?<slice> ( from to/f sequence -- slice )
+    over [ nip [ length ] [ ] bi ] unless <slice> ; inline
+
+: sequence>slice ( sequence -- slice )
+    [ drop 0 ] [ length ] [ ] tri <slice> ; inline
+
+: slice-order-by-from ( slice1 slice2 -- slice-lt slice-gt )
+    2dup [ from>> ] bi@ > [ swap ] when ; inline
+
+: ordered-slices-range ( slice-lt slice-gt -- to from )
+    [ to>> ] [ from>> ] bi* ;
+
+: unordered-slices-range ( slice1 slice2 -- to from )
+    slice-order-by-from ordered-slices-range ;
+
+: ordered-slices-overlap? ( slice-lt slice-gt -- ? )
+    ordered-slices-range > ; inline
+
+: unordered-slices-overlap? ( slice1 slice2 -- ? )
+    unordered-slices-range > ; inline
+
+: slices-overlap? ( slice1 slice2 -- ? )
+    unordered-slices-overlap? ;
+
+: ordered-slices-touch? ( slice-lt slice-gt -- ? )
+    ordered-slices-range >= ; inline
+
+: unordered-slices-touch? ( slice1 slice2 -- ? )
+    unordered-slices-range >= ; inline
+
+: slices-touch? ( slice1 slice2 -- ? )
+    unordered-slices-touch? ;
+
+ERROR: slices-don't-touch slice1 slice2 ;
+
+: merge-slices ( slice1 slice2 -- slice/* )
+    slice-order-by-from
+    2dup ordered-slices-touch? [
+        [ from>> ] [ [ to>> ] [ seq>> ] bi ] bi* <slice>
+    ] [
+        slices-don't-touch
+    ] if ;
+
 : rotate ( seq n -- seq' )
-    cut prepend ;
+    over length mod dup 0 >= [ cut ] [ abs cut* ] if prepend ;
+
+ERROR: underlying-mismatch slice1 slice2 ;
+: ensure-same-underlying ( slice1 slice2 -- slice1 slice2 )
+    2dup [ seq>> ] bi@ eq? [ underlying-mismatch ] unless ;
+
+: span-slices ( slice1 slice2 -- slice )
+    ensure-same-underlying
+    [ [ from>> ] bi@ min ]
+    [ [ to>> ] bi@ max ]
+    [ drop seq>> ] 2tri <slice> ;
 
 :: rotate! ( seq n -- )
-    n seq bounds-check length :> end
-    0 n [ 2dup = ] [
+    seq length :> len
+    n len mod dup 0 < [ len + ] when seq bounds-check drop 0 over
+    [ 2dup = ] [
         [ seq exchange-unsafe ] [ [ 1 + ] bi@ ] 2bi
-        dup end = [ drop over ] when
+        dup len = [ drop over ] when
         2over = [ -rot nip over ] when
     ] until 3drop ;
 
@@ -189,7 +240,7 @@ PRIVATE>
     over empty? [ 2drop { } ] [
         [ [ first ] dip call ] 2keep rot dup [
             >resizable [ [ push-all ] curry compose ] keep
-            [ 1 ] 3dip [ (each) (each-integer) ] dip
+            [ 1 ] 3dip [ setup-each (each-integer) ] dip
         ] curry dip like
     ] if ; inline
 
@@ -208,16 +259,16 @@ PRIVATE>
 
 <PRIVATE
 
-: ((each-from)) ( i seq -- n quot )
+: (setup-each-from) ( i seq -- n quot )
     [ length over [-] swap ] keep '[ _ + _ nth-unsafe ] ; inline
 
-: (each-from) ( i seq quot -- n quot' )
-    [ ((each-from)) ] dip compose ; inline
+: setup-each-from ( i seq quot -- n quot' )
+    [ (setup-each-from) ] dip compose ; inline
 
 PRIVATE>
 
 : map-from-as ( ... seq quot: ( ... elt -- ... newelt ) i exemplar -- ... newseq )
-    [ -rot (each-from) ] dip map-integers ; inline
+    [ -rot setup-each-from ] dip map-integers ; inline
 
 : map-from ( ... seq quot: ( ... elt -- ... newelt ) i -- ... newseq )
     pick map-from-as ; inline
@@ -319,7 +370,7 @@ PRIVATE>
 <PRIVATE
 
 : (2each-index) ( seq1 seq2 quot -- n quot' )
-    [ ((2each)) [ keep ] curry ] dip compose ; inline
+    [ setup-2each [ keep ] curry ] dip compose ; inline
 
 PRIVATE>
 
@@ -551,3 +602,6 @@ PRIVATE>
 
 : count-subseq* ( subseq seq -- n )
     start-all* length ; inline
+
+: map-zip ( quot: ( x -- y ) -- alist )
+    '[ _ keep swap ] map>alist ; inline

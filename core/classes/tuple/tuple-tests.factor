@@ -1,13 +1,11 @@
 USING: accessors arrays assocs calendar classes classes.algebra
 classes.private classes.tuple classes.tuple.private columns
-compiler.errors compiler.units continuations definitions
-effects eval generic generic.single generic.standard grouping
-io.streams.string kernel kernel.private math math.constants
-math.order namespaces parser parser.notes prettyprint
-quotations random see sequences sequences.private slots
-slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol fry literals memory
-combinators.short-circuit ;
+combinators.short-circuit compiler.errors compiler.units
+definitions eval generic generic.single io.streams.string kernel
+kernel.private literals math math.constants memory namespaces
+parser parser.notes see sequences sequences.private slots
+splitting strings threads tools.test vectors vocabs words
+words.symbol ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -548,7 +546,8 @@ must-fail-with
 
 [ 444444444444444444444444444444444444444444444444433333 >bignum "asdf" declared-types boa ]
 [
-    ${ "kernel-error" ERROR-OUT-OF-FIXNUM-RANGE 444444444444444444444444444444444444444444444444433333 f } =
+    ${ KERNEL-ERROR ERROR-OUT-OF-FIXNUM-RANGE
+       444444444444444444444444444444444444444444444444433333 f } =
 ] must-fail-with
 
 ! Check bignum coercer
@@ -700,6 +699,16 @@ TUPLE: boa-coercer-test { x array-capacity } ;
 { fixnum } [ 0 >bignum boa-coercer-test boa x>> class-of ] unit-test
 
 { T{ boa-coercer-test f 0 } } [ T{ boa-coercer-test } ] unit-test
+
+TUPLE: boa-iac { x integer-array-capacity initial: 77 } ;
+
+{ fixnum bignum 77 } [
+    30 boa-iac boa x>> class-of
+    10 >bignum boa-iac boa x>> class-of
+    boa-iac new x>>
+] unit-test
+
+[ -99 boa-iac boa ] [ bad-slot-value? ] must-fail-with
 
 ! Make sure that tuple reshaping updates code heap roots
 TUPLE: code-heap-ref ;

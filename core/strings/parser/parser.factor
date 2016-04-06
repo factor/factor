@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators kernel kernel.private
-lexer math math.parser namespaces sbufs sequences splitting
-strings ;
+USING: accessors assocs combinators continuations kernel
+kernel.private lexer math math.parser namespaces sbufs sequences
+splitting strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -35,9 +35,13 @@ name>char-hook [
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
-        CHAR: } over index cut-slice
-        [ >string name>char-hook get call( name -- char ) ] dip
-        rest-slice
+        CHAR: } over index cut-slice [
+            dup hex> [
+                nip
+            ] [
+                >string name>char-hook get call( name -- char )
+            ] if*
+        ] dip rest-slice
     ] [
         6 cut-slice [ hex> ] dip
     ] if ;
@@ -67,28 +71,6 @@ PRIVATE>
     CHAR: \\ over index [
         [ [ length <sbuf> ] keep ] dip (unescape-string)
     ] when* "" like ;
-
-<PRIVATE
-
-: (parse-short-string) ( accum str -- accum m )
-    { sbuf slice } declare
-    dup [ "\"\\" member? ] find [
-        [ cut-slice [ append! ] dip rest-slice ] dip
-        CHAR: " = [
-            from>>
-        ] [
-            next-escape [ suffix! ] dip (parse-short-string)
-        ] if
-    ] [
-        "Unterminated string" throw
-    ] if* ;
-
-PRIVATE>
-
-: parse-short-string ( -- str )
-    SBUF" " clone lexer get [
-        swap tail-slice (parse-short-string) [ "" like ] dip
-    ] change-lexer-column ;
 
 <PRIVATE
 
@@ -126,7 +108,7 @@ PRIVATE>
     [ column>> ] [ line-text>> ] bi
     [ "\"\\" member? ] find-from ;
 
-DEFER: (parse-full-string)
+DEFER: (parse-string)
 
 : parse-found-token ( accum lexer i elt -- )
     { sbuf lexer fixnum fixnum } declare
@@ -135,12 +117,12 @@ DEFER: (parse-full-string)
         dup dup [ next-char ] bi@
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
-        (parse-full-string)
+        (parse-string)
     ] [
         advance-char drop
     ] if ;
 
-: (parse-full-string) ( accum lexer -- )
+: (parse-string) ( accum lexer -- )
     { sbuf lexer } declare
     dup still-parsing? [
         dup find-next-token [
@@ -148,15 +130,24 @@ DEFER: (parse-full-string)
         ] [
             drop 2dup next-line%
             CHAR: \n pick push
-            (parse-full-string)
+            (parse-string)
         ] if*
     ] [
-        throw-unexpected-eof
+        "Unterminated string" throw
     ] if ;
+
+: rewind-lexer-on-error ( quot -- )
+    lexer get [ line>> ] [ line-text>> ] [ column>> ] tri
+    [
+        lexer get [ column<< ] [ line-text<< ] [ line<< ] tri
+        rethrow
+    ] 3curry recover ; inline
 
 PRIVATE>
 
-: parse-full-string ( -- str )
-    SBUF" " clone [
-        lexer get (parse-full-string)
-    ] keep unescape-string ;
+: parse-string ( -- str )
+    [
+        SBUF" " clone [
+            lexer get (parse-string)
+        ] keep unescape-string
+    ] rewind-lexer-on-error ;

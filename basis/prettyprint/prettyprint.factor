@@ -38,9 +38,9 @@ IN: prettyprint
 : error-in-pprint ( obj -- str )
     class-of name>> "~pprint error: " "~" surround ;
 
-: .b ( n -- ) >bin print ;
-: .o ( n -- ) >oct print ;
-: .h ( n -- ) >hex print ;
+: .b ( n -- ) >bin "0b" prepend print ;
+: .o ( n -- ) >oct "0o" prepend print ;
+: .h ( n -- ) >hex "0x" prepend print ;
 
 : stack. ( seq -- )
     [

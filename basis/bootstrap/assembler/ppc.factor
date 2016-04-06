@@ -378,76 +378,6 @@ IN: bootstrap.ppc
     4 MTCTR BCTR
 ] JIT-EXECUTE jit-define
 
-! Special primitives
-[
-    frame-reg 3 MR
-
-    3 vm-reg MR
-    "begin_callback" jit-call
-
-    jit-load-context
-    jit-restore-context
-
-    ! Call quotation
-    3 frame-reg MR
-    jit-call-quot
-
-    jit-save-context
-
-    3 vm-reg MR
-    "end_callback" jit-call
-] \ c-to-factor define-sub-primitive
-
-[
-    ! Unwind stack frames
-    1 4 MR
-
-    ! Load VM pointer into vm-reg, since we're entering from
-    ! C code
-    vm-reg jit-load-vm
-
-    ! Load ds and rs registers
-    jit-load-context
-    jit-restore-context
-
-    ! We have changed the stack; load return address again
-    0 1 lr-save jit-load-cell
-    0 MTLR
-
-    ! Call quotation
-    jit-jump-quot
-] \ unwind-native-frames define-sub-primitive
-
-[
-    7 0 LI
-    7 1 lr-save jit-save-cell
-
-    ! Load callstack object
-    6 ds-reg 0 jit-load-cell
-    ds-reg ds-reg cell-size SUBI
-    ! Get ctx->callstack_bottom
-    jit-load-context
-    3 ctx-reg context-callstack-bottom-offset jit-load-cell
-    ! Get top of callstack object -- 'src' for memcpy
-    4 6 callstack-top-offset ADDI
-    ! Get callstack length, in bytes --- 'len' for memcpy
-    7 callstack-length-offset LI
-    5 6 7 jit-load-cell-x
-    5 5 jit-shift-tag-bits
-    ! Compute new stack pointer -- 'dst' for memcpy
-    3 3 5 SUB
-    ! Install new stack pointer
-    1 3 MR
-    ! Call memcpy; arguments are now in the correct registers
-    1 1 -16 cell-size * jit-save-cell-update
-    "factor_memcpy" jit-call
-    1 1 0 jit-load-cell
-    ! Return with new callstack
-    0 1 lr-save jit-load-cell
-    0 MTLR
-    BLR
-] \ set-callstack define-sub-primitive
-
 [
     jit-save-context
     4 vm-reg MR
@@ -456,137 +386,6 @@ IN: bootstrap.ppc
 [ jit-call-quot ]
 [ jit-jump-quot ]
 \ lazy-jit-compile define-combinator-primitive
-
-! Objects
-[
-    3 ds-reg 0 jit-load-cell
-    3 3 tag-mask get ANDI.
-    3 3 tag-bits get jit-shift-left-logical-imm
-    3 ds-reg 0 jit-save-cell
-] \ tag define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell   ! Load m
-    4 ds-reg cell-size neg jit-load-cell-update ! Load obj
-    3 3 jit-shift-fixnum-slot  ! Shift to a cell-size multiple
-    4 4 jit-mask-tag-bits      ! Clear tag bits on obj
-    3 4 3 jit-load-cell-x      ! Load cell at &obj[m]
-    3 ds-reg 0 jit-save-cell   ! Push the result to the stack
-] \ slot define-sub-primitive
-
-[
-    ! load string index from stack
-    3 ds-reg cell-size neg jit-load-cell
-    3 3 jit-shift-tag-bits
-    ! load string from stack
-    4 ds-reg 0 jit-load-cell
-    ! load character
-    4 4 string-offset ADDI
-    3 3 4 LBZX
-    3 3 tag-bits get jit-shift-left-logical-imm
-    ! store character to stack
-    ds-reg ds-reg cell-size SUBI
-    3 ds-reg 0 jit-save-cell
-] \ string-nth-fast define-sub-primitive
-
-! Shufflers
-[
-    ds-reg dup cell-size SUBI
-] \ drop define-sub-primitive
-
-[
-    ds-reg dup 2 cell-size * SUBI
-] \ 2drop define-sub-primitive
-
-[
-    ds-reg dup 3 cell-size * SUBI
-] \ 3drop define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    3 ds-reg cell-size jit-save-cell-update
-] \ dup define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell
-    ds-reg dup 2 cell-size * ADDI
-    3 ds-reg 0 jit-save-cell
-    4 ds-reg cell-size neg jit-save-cell
-] \ 2dup define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell
-    5 ds-reg cell-size neg 2 * jit-load-cell
-    ds-reg dup cell-size 3 * ADDI
-    3 ds-reg 0 jit-save-cell
-    4 ds-reg cell-size neg jit-save-cell
-    5 ds-reg cell-size neg 2 * jit-save-cell
-] \ 3dup define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    ds-reg dup cell-size SUBI
-    3 ds-reg 0 jit-save-cell
-] \ nip define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    ds-reg dup cell-size 2 * SUBI
-    3 ds-reg 0 jit-save-cell
-] \ 2nip define-sub-primitive
-
-[
-    3 ds-reg cell-size neg jit-load-cell
-    3 ds-reg cell-size jit-save-cell-update
-] \ over define-sub-primitive
-
-[
-    3 ds-reg cell-size neg 2 * jit-load-cell
-    3 ds-reg cell-size jit-save-cell-update
-] \ pick define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell
-    4 ds-reg 0 jit-save-cell
-    3 ds-reg cell-size jit-save-cell-update
-] \ dupd define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell
-    3 ds-reg cell-size neg jit-save-cell
-    4 ds-reg 0 jit-save-cell
-] \ swap define-sub-primitive
-
-[
-    3 ds-reg cell-size neg jit-load-cell
-    4 ds-reg cell-size neg 2 * jit-load-cell
-    3 ds-reg cell-size neg 2 * jit-save-cell
-    4 ds-reg cell-size neg jit-save-cell
-] \ swapd define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell
-    5 ds-reg cell-size neg 2 * jit-load-cell
-    4 ds-reg cell-size neg 2 * jit-save-cell
-    3 ds-reg cell-size neg jit-save-cell
-    5 ds-reg 0 jit-save-cell
-] \ rot define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell
-    5 ds-reg cell-size neg 2 * jit-load-cell
-    3 ds-reg cell-size neg 2 * jit-save-cell
-    5 ds-reg cell-size neg jit-save-cell
-    4 ds-reg 0 jit-save-cell
-] \ -rot define-sub-primitive
-
-[ jit->r ] \ load-local define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )
@@ -599,116 +398,11 @@ IN: bootstrap.ppc
     3 \ f type-number LI
     3 ds-reg 0 jit-save-cell ;
 
-: define-jit-compare ( insn word -- )
-    [ [ jit-compare ] curry ] dip define-sub-primitive ;
-
-\ BEQ \ eq? define-jit-compare
-\ BGE \ fixnum>= define-jit-compare
-\ BLE \ fixnum<= define-jit-compare
-\ BGT \ fixnum> define-jit-compare
-\ BLT \ fixnum< define-jit-compare
-
-! Math
-[
-    3 ds-reg 0 jit-load-cell
-    ds-reg ds-reg cell-size SUBI
-    4 ds-reg 0 jit-load-cell
-    3 3 4 OR
-    3 3 tag-mask get ANDI.
-    4 \ f type-number LI
-    0 3 0 jit-compare-cell-imm
-    [ 0 swap BNE ] [ 4 1 tag-fixnum LI ] jit-conditional*
-    4 ds-reg 0 jit-save-cell
-] \ both-fixnums? define-sub-primitive
-
 : jit-math ( insn -- )
     3 ds-reg 0 jit-load-cell
     4 ds-reg cell-size neg jit-load-cell-update
     [ 5 3 4 ] dip execute( dst src1 src2 -- )
     5 ds-reg 0 jit-save-cell ;
-
-[ \ ADD jit-math ] \ fixnum+fast define-sub-primitive
-
-[ \ SUBF jit-math ] \ fixnum-fast define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell-update
-    4 4 jit-shift-tag-bits
-    5 3 4 jit-multiply-low
-    5 ds-reg 0 jit-save-cell
-] \ fixnum*fast define-sub-primitive
-
-[ \ AND jit-math ] \ fixnum-bitand define-sub-primitive
-
-[ \ OR jit-math ] \ fixnum-bitor define-sub-primitive
-
-[ \ XOR jit-math ] \ fixnum-bitxor define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    3 3 NOT
-    3 3 tag-mask get XORI
-    3 ds-reg 0 jit-save-cell
-] \ fixnum-bitnot define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell ! Load amount to shift
-    3 3 jit-shift-tag-bits   ! Shift out tag bits
-    ds-reg ds-reg cell-size SUBI
-    4 ds-reg 0 jit-load-cell ! Load value to shift
-    5 4 3 jit-shift-left-logical    ! Shift left
-    6 3 NEG                         ! Negate shift amount
-    7 4 6 jit-shift-right-algebraic ! Shift right
-    7 7 jit-mask-tag-bits           ! Mask out tag bits
-    0 3 0 jit-compare-cell-imm
-    [ 0 swap BGT ] [ 5 7 MR ] jit-conditional*
-    5 ds-reg 0 jit-save-cell
-] \ fixnum-shift-fast define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    ds-reg ds-reg cell-size SUBI
-    4 ds-reg 0 jit-load-cell
-    5 4 3 jit-divide
-    6 5 3 jit-multiply-low
-    7 4 6 SUB
-    7 ds-reg 0 jit-save-cell
-] \ fixnum-mod define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    ds-reg ds-reg cell-size SUBI
-    4 ds-reg 0 jit-load-cell
-    5 4 3 jit-divide
-    5 5 tag-bits get jit-shift-left-logical-imm
-    5 ds-reg 0 jit-save-cell
-] \ fixnum/i-fast define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    4 ds-reg cell-size neg jit-load-cell
-    5 4 3 jit-divide
-    6 5 3 jit-multiply-low
-    7 4 6 SUB
-    5 5 tag-bits get jit-shift-left-logical-imm
-    5 ds-reg cell-size neg jit-save-cell
-    7 ds-reg 0 jit-save-cell
-] \ fixnum/mod-fast define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    3 3 jit-shift-fixnum-slot
-    3 rs-reg 3 jit-load-cell-x
-    3 ds-reg 0 jit-save-cell
-] \ get-local define-sub-primitive
-
-[
-    3 ds-reg 0 jit-load-cell
-    ds-reg ds-reg cell-size SUBI
-    3 3 jit-shift-fixnum-slot
-    rs-reg rs-reg 3 SUB
-] \ drop-locals define-sub-primitive
 
 ! Overflowing fixnum arithmetic
 :: jit-overflow ( insn func -- )
@@ -726,29 +420,6 @@ IN: bootstrap.ppc
         func jit-call
     ]
     jit-conditional* ;
-
-[ [ ADDO. ] "overflow_fixnum_add" jit-overflow ] \ fixnum+ define-sub-primitive
-
-[ [ SUBFO. ] "overflow_fixnum_subtract" jit-overflow ] \ fixnum- define-sub-primitive
-
-[
-    ds-reg ds-reg cell-size SUBI
-    jit-save-context
-    3 ds-reg 0 jit-load-cell
-    3 3 jit-shift-tag-bits
-    4 ds-reg cell-size jit-load-cell
-    0 0 LI
-    0 MTXER
-    6 3 4 jit-multiply-low-ov-rc
-    6 ds-reg 0 jit-save-cell
-    [ 0 swap BNS ]
-    [
-        4 4 jit-shift-tag-bits
-        5 vm-reg MR
-        "overflow_fixnum_multiply" jit-call
-    ]
-    jit-conditional*
-] \ fixnum* define-sub-primitive
 
 ! Contexts
 :: jit-switch-context ( reg -- )
@@ -782,8 +453,6 @@ IN: bootstrap.ppc
     3 jit-switch-context
     jit-push-param ;
 
-[ jit-set-context ] \ (set-context) define-sub-primitive
-
 : jit-pop-quot-and-param ( -- )
     3 ds-reg 0 jit-load-cell
     4 ds-reg cell-size neg jit-load-cell
@@ -804,17 +473,10 @@ IN: bootstrap.ppc
     jit-push-param
     jit-jump-quot ;
 
-[ jit-start-context ] \ (start-context) define-sub-primitive
-
 : jit-delete-current-context ( -- )
     jit-load-context
     3 vm-reg MR
     "delete_context" jit-call ;
-
-[
-    jit-delete-current-context
-    jit-set-context
-] \ (set-context-and-delete) define-sub-primitive
 
 : jit-start-context-and-delete ( -- )
     jit-save-context
@@ -829,8 +491,328 @@ IN: bootstrap.ppc
     ds-reg ds-reg cell-size SUBI
     jit-jump-quot ;
 
-[
-    jit-start-context-and-delete
-] \ (start-context-and-delete) define-sub-primitive
+! # All ppc subprimitives
+{
+    ! ## Contexts
+    { (set-context) [ jit-set-context ] }
+    { (set-context-and-delete) [
+        jit-delete-current-context
+        jit-set-context
+    ] }
+    { (start-context) [ jit-start-context ] }
+    { (start-context-and-delete) [
+        jit-start-context-and-delete
+    ] }
+
+    ! ## Entry points
+    { c-to-factor [
+        frame-reg 3 MR
+
+        3 vm-reg MR
+        "begin_callback" jit-call
+
+        jit-load-context
+        jit-restore-context
+
+        ! Call quotation
+        3 frame-reg MR
+        jit-call-quot
+
+        jit-save-context
+
+        3 vm-reg MR
+        "end_callback" jit-call
+    ] }
+    { unwind-native-frames [
+        ! Unwind stack frames
+        1 4 MR
+
+        ! Load VM pointer into vm-reg, since we're entering from
+        ! C code
+        vm-reg jit-load-vm
+
+        ! Load ds and rs registers
+        jit-load-context
+        jit-restore-context
+
+        ! We have changed the stack; load return address again
+        0 1 lr-save jit-load-cell
+        0 MTLR
+
+        ! Call quotation
+        jit-jump-quot
+    ] }
+
+    ! ## Fixnums
+
+    ! ### Add
+    { fixnum+ [ [ ADDO. ] "overflow_fixnum_add" jit-overflow ] }
+    { fixnum+fast [ \ ADD jit-math ] }
+
+    ! ### Bit stuff
+    { fixnum-bitand [ \ AND jit-math ] }
+    { fixnum-bitnot [
+        3 ds-reg 0 jit-load-cell
+        3 3 NOT
+        3 3 tag-mask get XORI
+        3 ds-reg 0 jit-save-cell
+    ] }
+    { fixnum-bitor [ \ OR jit-math ] }
+    { fixnum-bitxor [ \ XOR jit-math ] }
+    { fixnum-shift-fast [
+        3 ds-reg 0 jit-load-cell ! Load amount to shift
+        3 3 jit-shift-tag-bits   ! Shift out tag bits
+        ds-reg ds-reg cell-size SUBI
+        4 ds-reg 0 jit-load-cell ! Load value to shift
+        5 4 3 jit-shift-left-logical    ! Shift left
+        6 3 NEG                         ! Negate shift amount
+        7 4 6 jit-shift-right-algebraic ! Shift right
+        7 7 jit-mask-tag-bits           ! Mask out tag bits
+        0 3 0 jit-compare-cell-imm
+        [ 0 swap BGT ] [ 5 7 MR ] jit-conditional*
+        5 ds-reg 0 jit-save-cell
+    ] }
+
+    ! ### Comparisons
+    { both-fixnums? [
+        3 ds-reg 0 jit-load-cell
+        ds-reg ds-reg cell-size SUBI
+        4 ds-reg 0 jit-load-cell
+        3 3 4 OR
+        3 3 tag-mask get ANDI.
+        4 \ f type-number LI
+        0 3 0 jit-compare-cell-imm
+        [ 0 swap BNE ] [ 4 1 tag-fixnum LI ] jit-conditional*
+        4 ds-reg 0 jit-save-cell
+    ] }
+    { eq? [ \ BEQ jit-compare ] }
+    { fixnum> [ \ BGT jit-compare ] }
+    { fixnum>= [ \ BGE jit-compare ] }
+    { fixnum< [ \ BLT jit-compare ] }
+    { fixnum<= [ \ BLE jit-compare ] }
+
+    ! ### Div/mod
+    { fixnum-mod [
+        3 ds-reg 0 jit-load-cell
+        ds-reg ds-reg cell-size SUBI
+        4 ds-reg 0 jit-load-cell
+        5 4 3 jit-divide
+        6 5 3 jit-multiply-low
+        7 4 6 SUB
+        7 ds-reg 0 jit-save-cell
+    ] }
+    { fixnum/i-fast [
+        3 ds-reg 0 jit-load-cell
+        ds-reg ds-reg cell-size SUBI
+        4 ds-reg 0 jit-load-cell
+        5 4 3 jit-divide
+        5 5 tag-bits get jit-shift-left-logical-imm
+        5 ds-reg 0 jit-save-cell
+    ] }
+    { fixnum/mod-fast [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        5 4 3 jit-divide
+        6 5 3 jit-multiply-low
+        7 4 6 SUB
+        5 5 tag-bits get jit-shift-left-logical-imm
+        5 ds-reg cell-size neg jit-save-cell
+        7 ds-reg 0 jit-save-cell
+    ] }
+
+    ! ### Mul
+    { fixnum* [
+        ds-reg ds-reg cell-size SUBI
+        jit-save-context
+        3 ds-reg 0 jit-load-cell
+        3 3 jit-shift-tag-bits
+        4 ds-reg cell-size jit-load-cell
+        0 0 LI
+        0 MTXER
+        6 3 4 jit-multiply-low-ov-rc
+        6 ds-reg 0 jit-save-cell
+        [ 0 swap BNS ]
+        [
+            4 4 jit-shift-tag-bits
+            5 vm-reg MR
+            "overflow_fixnum_multiply" jit-call
+        ]
+        jit-conditional*
+    ] }
+    { fixnum*fast [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell-update
+        4 4 jit-shift-tag-bits
+        5 3 4 jit-multiply-low
+        5 ds-reg 0 jit-save-cell
+    ] }
+
+    ! ### Sub
+    { fixnum- [ [ SUBFO. ] "overflow_fixnum_subtract" jit-overflow ] }
+    { fixnum-fast [ \ SUBF jit-math ] }
+
+    ! ## Locals
+    { drop-locals [
+        3 ds-reg 0 jit-load-cell
+        ds-reg ds-reg cell-size SUBI
+        3 3 jit-shift-fixnum-slot
+        rs-reg rs-reg 3 SUB
+    ] }
+    { get-local [
+        3 ds-reg 0 jit-load-cell
+        3 3 jit-shift-fixnum-slot
+        3 rs-reg 3 jit-load-cell-x
+        3 ds-reg 0 jit-save-cell
+    ] }
+    { load-local [ jit->r ] }
+
+    ! ## Misc
+    { set-callstack [
+        7 0 LI
+        7 1 lr-save jit-save-cell
+
+        ! Load callstack object
+        6 ds-reg 0 jit-load-cell
+        ds-reg ds-reg cell-size SUBI
+        ! Get ctx->callstack_bottom
+        jit-load-context
+        3 ctx-reg context-callstack-bottom-offset jit-load-cell
+        ! Get top of callstack object -- 'src' for memcpy
+        4 6 callstack-top-offset ADDI
+        ! Get callstack length, in bytes --- 'len' for memcpy
+        7 callstack-length-offset LI
+        5 6 7 jit-load-cell-x
+        5 5 jit-shift-tag-bits
+        ! Compute new stack pointer -- 'dst' for memcpy
+        3 3 5 SUB
+        ! Install new stack pointer
+        1 3 MR
+        ! Call memcpy; arguments are now in the correct registers
+        1 1 -16 cell-size * jit-save-cell-update
+        "factor_memcpy" jit-call
+        1 1 0 jit-load-cell
+        ! Return with new callstack
+        0 1 lr-save jit-load-cell
+        0 MTLR
+        BLR
+    ] }
+
+    ! ## Objects
+    { slot [
+        3 ds-reg 0 jit-load-cell   ! Load m
+        4 ds-reg cell-size neg jit-load-cell-update ! Load obj
+        3 3 jit-shift-fixnum-slot  ! Shift to a cell-size multiple
+        4 4 jit-mask-tag-bits      ! Clear tag bits on obj
+        3 4 3 jit-load-cell-x      ! Load cell at &obj[m]
+        3 ds-reg 0 jit-save-cell   ! Push the result to the stack
+    ] }
+    { string-nth-fast [
+        ! load string index from stack
+        3 ds-reg cell-size neg jit-load-cell
+        3 3 jit-shift-tag-bits
+        ! load string from stack
+        4 ds-reg 0 jit-load-cell
+        ! load character
+        4 4 string-offset ADDI
+        3 3 4 LBZX
+        3 3 tag-bits get jit-shift-left-logical-imm
+        ! store character to stack
+        ds-reg ds-reg cell-size SUBI
+        3 ds-reg 0 jit-save-cell
+    ] }
+    { tag [
+        3 ds-reg 0 jit-load-cell
+        3 3 tag-mask get ANDI.
+        3 3 tag-bits get jit-shift-left-logical-imm
+        3 ds-reg 0 jit-save-cell
+    ] }
+
+    ! ## Shufflers
+
+    ! ### Drops
+    { drop [ ds-reg dup cell-size SUBI ] }
+    { 2drop [ ds-reg dup 2 cell-size * SUBI ] }
+    { 3drop [ ds-reg dup 3 cell-size * SUBI ] }
+
+    ! ### Dups
+    { dup [
+        3 ds-reg 0 jit-load-cell
+        3 ds-reg cell-size jit-save-cell-update
+    ] }
+    { 2dup [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        ds-reg dup 2 cell-size * ADDI
+        3 ds-reg 0 jit-save-cell
+        4 ds-reg cell-size neg jit-save-cell
+    ] }
+    { 3dup [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        5 ds-reg cell-size neg 2 * jit-load-cell
+        ds-reg dup cell-size 3 * ADDI
+        3 ds-reg 0 jit-save-cell
+        4 ds-reg cell-size neg jit-save-cell
+        5 ds-reg cell-size neg 2 * jit-save-cell
+    ] }
+    { dupd [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        4 ds-reg 0 jit-save-cell
+        3 ds-reg cell-size jit-save-cell-update
+    ] }
+
+    ! ### Misc shufflers
+    { over [
+        3 ds-reg cell-size neg jit-load-cell
+        3 ds-reg cell-size jit-save-cell-update
+    ] }
+    { pick [
+        3 ds-reg cell-size neg 2 * jit-load-cell
+        3 ds-reg cell-size jit-save-cell-update
+    ] }
+
+    ! ### Nips
+    { nip [
+        3 ds-reg 0 jit-load-cell
+        ds-reg dup cell-size SUBI
+        3 ds-reg 0 jit-save-cell
+    ] }
+    { 2nip [
+        3 ds-reg 0 jit-load-cell
+        ds-reg dup cell-size 2 * SUBI
+        3 ds-reg 0 jit-save-cell
+    ] }
+
+    ! ### Swaps
+    { -rot [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        5 ds-reg cell-size neg 2 * jit-load-cell
+        3 ds-reg cell-size neg 2 * jit-save-cell
+        5 ds-reg cell-size neg jit-save-cell
+        4 ds-reg 0 jit-save-cell
+    ] }
+    { rot [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        5 ds-reg cell-size neg 2 * jit-load-cell
+        4 ds-reg cell-size neg 2 * jit-save-cell
+        3 ds-reg cell-size neg jit-save-cell
+        5 ds-reg 0 jit-save-cell
+    ] }
+    { swap [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        3 ds-reg cell-size neg jit-save-cell
+        4 ds-reg 0 jit-save-cell
+    ] }
+    { swapd [
+        3 ds-reg cell-size neg jit-load-cell
+        4 ds-reg cell-size neg 2 * jit-load-cell
+        3 ds-reg cell-size neg 2 * jit-save-cell
+        4 ds-reg cell-size neg jit-save-cell
+    ] }
+} define-sub-primitives
 
 [ "bootstrap.ppc" forget-vocab ] with-compilation-unit

@@ -1,18 +1,71 @@
-USING: accessors alien alien.accessors alien.c-types alien.data arrays assocs
-byte-arrays classes classes.algebra classes.struct classes.tuple.private
-combinators.short-circuit compiler.tree compiler.tree.builder
-compiler.tree.checker compiler.tree.debugger compiler.tree.def-use
-compiler.tree.normalization compiler.tree.optimizer compiler.tree.propagation
-compiler.tree.propagation.info compiler.tree.recursive effects fry
-generic.single hashtables kernel kernel.private layouts locals math
-math.floats.private math.functions math.integers.private math.intervals
-math.libm math.order math.private quotations sets sequences sequences.private
-slots.private sorting specialized-arrays strings strings.private system
-tools.test vectors vocabs words ;
+USING: accessors alien alien.accessors alien.c-types alien.data arrays
+assocs byte-arrays classes classes.algebra classes.struct
+classes.tuple.private combinators.short-circuit compiler.tree
+compiler.tree.builder compiler.tree.debugger compiler.tree.optimizer
+compiler.tree.propagation.info effects fry generic.single hashtables
+kernel kernel.private layouts literals locals math math.floats.private
+math.functions math.integers.private math.intervals math.libm
+math.order math.private quotations sequences sequences.private sets
+slots.private sorting specialized-arrays strings strings.private
+system tools.test vectors vocabs words ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
 IN: compiler.tree.propagation.tests
+
+! Arrays
+{ V{ array } } [
+    [ 10 f <array> ] final-classes
+] unit-test
+
+{ V{ array } } [
+    [ { array } declare ] final-classes
+] unit-test
+
+{ V{ array } } [
+    [ 10 f <array> swap [ ] [ ] if ] final-classes
+] unit-test
+
+{
+    T{ value-info-state
+       { class integer }
+       { interval $[ array-capacity-interval ] }
+    }
+} [
+    [ dup "foo" <array> drop ] final-info first
+] unit-test
+
+! Byte arrays
+{ V{ 3 } } [
+    [ 3 <byte-array> length ] final-literals
+] unit-test
+
+{ t } [
+    [ dup <byte-array> drop ] final-info first
+    integer-array-capacity <class-info> =
+] unit-test
+
+! Strings
+{ V{ 3 } } [
+    [ 3 f <string> length ] final-literals
+] unit-test
+
+{ V{ t } } [
+    [ { string } declare string? ] final-classes
+] unit-test
+
+{ V{ string } } [
+    [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
+] unit-test
+
+{
+    V{ $[
+        integer-array-capacity <class-info>
+        integer <class-info>
+    ] }
+} [
+    [ 2dup <string> drop ] final-info
+] unit-test
 
 { { } } [
     all-words [
@@ -33,12 +86,6 @@ IN: compiler.tree.propagation.tests
 { V{ fixnum } } [ [ 1 [ ] dip ] final-classes ] unit-test
 
 { V{ fixnum object } } [ [ 1 swap ] final-classes ] unit-test
-
-{ V{ array } } [ [ 10 f <array> ] final-classes ] unit-test
-
-{ V{ array } } [ [ { array } declare ] final-classes ] unit-test
-
-{ V{ array } } [ [ 10 f <array> swap [ ] [ ] if ] final-classes ] unit-test
 
 { V{ fixnum } } [ [ dup fixnum? [ ] [ drop 3 ] if ] final-classes ] unit-test
 
@@ -464,9 +511,7 @@ cell-bits 32 = [
 
 { V{ 3 } } [ [ [ "yay" ] [ "hah" ] if length ] final-literals ] unit-test
 
-{ V{ 3 } } [ [ 3 <byte-array> length ] final-literals ] unit-test
 
-{ V{ 3 } } [ [ 3 f <string> length ] final-literals ] unit-test
 
 ! Slot propagation
 TUPLE: prop-test-tuple { x integer } ;
@@ -678,20 +723,12 @@ M: array iterate first t ; inline
     [ { assoc } declare hashtable instance? ] final-classes
 ] unit-test
 
-{ V{ t } } [
-    [ { string } declare string? ] final-classes
-] unit-test
-
 { V{ POSTPONE: f } } [
     [ 3 string? ] final-classes
 ] unit-test
 
 { V{ fixnum } } [
     [ { fixnum } declare [ ] curry obj>> ] final-classes
-] unit-test
-
-{ V{ fixnum } } [
-    [ { fixnum fixnum } declare iota [ nth-unsafe ] curry call ] final-classes
 ] unit-test
 
 { V{ f } } [
@@ -832,10 +869,6 @@ MIXIN: empty-mixin
 
 { V{ POSTPONE: f } } [
     [ { word object } declare equal? ] final-classes
-] unit-test
-
-{ V{ string } } [
-    [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ] unit-test
 
 { t } [ [ dup t xor or ] final-classes first true-class? ] unit-test

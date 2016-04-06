@@ -2,7 +2,7 @@ USING: accessors arrays classes.intersection classes.maybe
 classes.union compiler.units continuations definitions effects
 eval generic generic.standard hashtables io io.streams.duplex
 io.streams.string kernel listener make math namespaces parser
-prettyprint prettyprint.config prettyprint.private
+prettyprint prettyprint.backend prettyprint.config prettyprint.private
 prettyprint.sections see sequences splitting
 strings tools.continuations tools.continuations.private
 tools.test vectors vocabs.parser words ;
@@ -15,8 +15,8 @@ IN: prettyprint.tests
 { "0x1000" } [ 16 number-base [ 4096 unparse ] with-variable ] unit-test
 { "1.0" } [ 1.0 unparse ] unit-test
 { "8.0" } [ 8.0 unparse ] unit-test
-{ "8.0" } [ 2 number-base [ 8.0 unparse ] with-variable ] unit-test
-{ "8.0" } [ 8 number-base [ 8.0 unparse ] with-variable ] unit-test
+[ 2 number-base [ 8.0 unparse ] with-variable ] [ unsupported-number-base? ] must-fail-with
+[ 8 number-base [ 8.0 unparse ] with-variable ] [ unsupported-number-base? ] must-fail-with
 { "0x1.0p3" } [ 16 number-base [ 8.0 unparse ] with-variable ] unit-test
 { "1267650600228229401496703205376" } [ 1 100 shift unparse ] unit-test
 

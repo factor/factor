@@ -5,9 +5,9 @@ IN: compiler.cfg.linear-scan.allocation.splitting.tests
 
 : test-interval-easy ( -- interval )
     T{ live-interval-state
-       { ranges { { 5 8 } { 12 20 } } }
+       { ranges V{ { 5 8 } { 12 20 } } }
        { uses
-         {
+         V{
              T{ vreg-use { n 3 } { def-rep int-rep } }
              T{ vreg-use { n 15 } { def-rep int-rep } }
          }
@@ -17,12 +17,12 @@ IN: compiler.cfg.linear-scan.allocation.splitting.tests
 ! split-interval
 {
     T{ live-interval-state
-       { ranges { { 5 8 } } }
-       { uses { T{ vreg-use { n 3 } { def-rep int-rep } } } }
+       { ranges V{ { 5 8 } } }
+       { uses V{ T{ vreg-use { n 3 } { def-rep int-rep } } } }
     }
     T{ live-interval-state
-       { ranges { { 12 20 } } }
-       { uses { T{ vreg-use { n 15 } { def-rep int-rep } } } }
+       { ranges V{ { 12 20 } } }
+       { uses V{ T{ vreg-use { n 15 } { def-rep int-rep } } } }
     }
 } [
     test-interval-easy 10 split-interval

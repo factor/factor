@@ -1,5 +1,5 @@
 USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax
-math sequences kernel ;
+kernel math memory sequences ;
 IN: compiler.cfg.save-contexts
 
 HELP: insert-save-contexts
@@ -17,9 +17,10 @@ HELP: save-context-offset
 { $description { $link ##save-context } " must be placed after instructions that modify the context, or instructions that read parameter registers." } ;
 
 ARTICLE: "compiler.cfg.save-contexts" "Insert context saves"
-"Inserts " { $link ##save-context } " in blocks that need them."
+"Inserts " { $link ##save-context } " in blocks that need them. If an instruction does something that might trigger a GC sweep, such as calling a C function, then the context must be saved before."
 $nl
 "Main word:"
-{ $subsections insert-save-contexts } ;
+{ $subsections insert-save-contexts }
+{ $notes "The " { $link ##call-gc } " instruction does not need a context save because the primitive implementing the instruction (" { $link minor-gc } ") already saves the context for us." } ;
 
 ABOUT: "compiler.cfg.save-contexts"

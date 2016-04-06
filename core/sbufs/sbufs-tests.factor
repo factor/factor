@@ -1,6 +1,5 @@
 USING: classes kernel math namespaces sbufs sequences
 sequences.private strings tools.test ;
-IN: sbufs.tests
 
 { 5 } [ "Hello" >sbuf length ] unit-test
 

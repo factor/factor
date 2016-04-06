@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa.messages compiler.units core-foundation.bundles
 hashtables init io kernel lexer namespaces sequences vocabs ;
-QUALIFIED: cocoa.messages
 IN: cocoa
 
 SYMBOL: sent-messages

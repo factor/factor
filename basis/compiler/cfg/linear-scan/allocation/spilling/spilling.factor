@@ -3,9 +3,9 @@
 USING: accessors assocs combinators
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
-compiler.cfg.registers compiler.utilities fry kernel linked-assocs locals
-math namespaces sequences ;
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.ranges compiler.utilities fry kernel
+linked-assocs locals math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 : trim-before-ranges ( live-interval -- )
@@ -37,7 +37,6 @@ ERROR: bad-live-ranges interval ;
             [ ]
             [ assign-spill ]
             [ trim-before-ranges ]
-            [ compute-start/end ]
             [ check-ranges ]
         } cleave
     ] if ;
@@ -58,16 +57,15 @@ ERROR: bad-live-ranges interval ;
             [ ]
             [ assign-reload ]
             [ trim-after-ranges ]
-            [ compute-start/end ]
             [ check-ranges ]
         } cleave
     ] if ;
 
-: split-for-spill ( live-interval n -- before after )
+: split-for-spill ( live-interval n -- before/f after/f )
     split-interval [ spill-before ] [ spill-after ] bi* ;
 
 : find-next-use ( live-interval new -- n )
-    [ uses>> ] [ start>> ] bi*
+    [ uses>> ] [ live-interval-start ] bi*
     '[ [ spill-slot?>> not ] [ n>> ] bi _ >= and ] find nip
     [ n>> ] [ 1/0. ] if* ;
 
@@ -98,18 +96,17 @@ ERROR: bad-live-ranges interval ;
 
 : spill ( live-interval n -- )
     split-for-spill
-    [ [ add-handled ] when* ]
-    [ [ add-unhandled ] when* ] bi* ;
+    [ [ add-handled ] when* ] [ [ add-unhandled ] when* ] bi* ;
 
 :: spill-intersecting-active ( new reg -- )
     new active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
-    '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
+    '[ _ remove-nth! drop new live-interval-start spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
     new inactive-intervals-for [
         dup reg>> reg = [
             dup new intervals-intersect? [
-                new start>> spill f
+                new live-interval-start spill f
             ] [ drop t ] if
         ] [ drop t ] if
     ] filter! drop ;

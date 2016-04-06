@@ -1,8 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes.maybe eval generic.single kernel tools.test
-math classes accessors slots classes.algebra
-classes.algebra.private ;
+USING: accessors classes classes.algebra classes.algebra.private
+classes.maybe eval generic.single kernel math slots tools.test ;
 IN: classes.maybe.tests
 
 { t } [ 3 maybe{ integer } instance? ] unit-test

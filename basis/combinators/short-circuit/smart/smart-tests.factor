@@ -1,5 +1,4 @@
-USING: kernel math tools.test combinators.short-circuit.smart ;
-IN: combinators.short-circuit.smart.tests
+USING: combinators.short-circuit.smart kernel math tools.test ;
 
 { t } [       { [ 1 ] [ 2 ] [ 3 ] }          &&  3 = ] unit-test
 { t } [ 3     { [ 0 > ] [ odd? ] [ 2 + ] }    &&  5 = ] unit-test

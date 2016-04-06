@@ -1,6 +1,6 @@
 USING: bootstrap.image tools.test system io io.encodings.ascii
 io.pathnames io.files io.files.info io.files.temp kernel
-tools.deploy.config tools.deploy.config.editor
+tools.deploy.config tools.deploy.config.editor literals
 tools.deploy.backend math sequences io.launcher arrays
 namespaces continuations layouts accessors urls math.parser
 io.directories splitting tools.deploy tools.deploy.test vocabs ;
@@ -18,12 +18,17 @@ delete-staging-images
 
 { } [ "hello-world" shake-and-bake 550000 small-enough? ] unit-test
 
+! XXX: deploy-path is "resource:" by default, but deploying there in a
+! test would pollute the Factor directory, so deploy test to temp.
 { { "Hello world" } } [
-    f open-directory-after-deploy? [
+    H{
+        { open-directory-after-deploy? f }
+        { deploy-directory $[ temp-directory ] }
+    } [
         "hello-world" deploy
         "hello-world" deploy-path 1array
         ascii [ lines ] with-process-reader
-    ] with-variable
+    ] with-variables
 ] unit-test
 
 { } [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
@@ -32,10 +37,8 @@ delete-staging-images
 { } [ "hello-ui" shake-and-bake 2242000 small-enough? ] unit-test
 
 { "math-threads-compiler-io-ui" } [
-    "hello-ui" deploy-config [
-        bootstrap-profile staging-image-name file-name
-        "." split second
-    ] with-variables
+    "hello-ui" deploy-config config>profile
+    staging-image-name file-name "." split second
 ] unit-test
 
 ! [ ] [ "maze" shake-and-bake 1520000 small-enough? ] unit-test
@@ -152,7 +155,7 @@ os macosx? [
 { t } [
     "tools.deploy.test.18" shake-and-bake
     deploy-test-command ascii [ readln ] with-process-reader
-    test-image temp-file =
+    test-image-path =
 ] unit-test
 
 { } [ "resource:LICENSE.txt" "license.txt" temp-file copy-file ] unit-test

@@ -4,14 +4,6 @@ IN: checksums
 HELP: checksum
 { $class-description "The class of checksum algorithms." } ;
 
-HELP: hex-string
-{ $values { "seq" sequence } { "str" string } }
-{ $description "Converts a sequence of values from 0-255 to a string of hex numbers from 0-ff." }
-{ $examples
-    { $example "USING: checksums io ;" "B{ 1 2 3 4 } hex-string print" "01020304" }
-}
-{ $notes "Numbers are zero-padded on the left." } ;
-
 HELP: checksum-stream
 { $values { "stream" "an input stream" } { "checksum" "a checksum specifier" } { "value" byte-array } }
 { $contract "Computes the checksum of all data read from the stream." }
@@ -69,7 +61,6 @@ $nl
 "Utilities:"
 { $subsections
     checksum-file
-    hex-string
 }
 "Checksum implementations:"
 { $subsections "checksums.crc32" }

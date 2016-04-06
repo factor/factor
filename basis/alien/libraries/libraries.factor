@@ -78,7 +78,9 @@ M: library dispose dll>> [ dispose ] when* ;
     pick lookup-library [
         [ 2over same-library? not ] keep swap
         [ change-dll drop ] [ 4drop ] if
-    ] [ add-library ] if* ;
+    ] [
+        make-library swap libraries get set-at
+    ] if* ;
 
 : library-abi ( library -- abi )
     lookup-library [ abi>> ] [ cdecl ] if* ;

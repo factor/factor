@@ -48,7 +48,7 @@ TUPLE: bw-noise-gadget < image-control timers cnt old-cnt fps-model ;
     [ start-animation ] [ start-fps ] bi ;
 
 : stop-animation ( gadget -- )
-    timers>> [ [ stop-timer ] each ] [ 0 swap set-length ] bi ;
+    timers>> [ [ stop-timer ] each ] [ delete-all ] bi ;
 
 M: bw-noise-gadget graft* [ call-next-method ] [ setup-timers ] bi ;
 

@@ -47,13 +47,11 @@ cell factor_vm::clone_object(cell obj_) {
 
   if (immediate_p(obj.value()))
     return obj.value();
-  else {
-    cell size = object_size(obj.value());
-    object* new_obj = allot_object(obj.type(), size);
-    memcpy(new_obj, obj.untagged(), size);
-    new_obj->set_hashcode(0);
-    return tag_dynamic(new_obj);
-  }
+  cell size = object_size(obj.value());
+  object* new_obj = allot_object(obj.type(), size);
+  memcpy(new_obj, obj.untagged(), size);
+  new_obj->set_hashcode(0);
+  return tag_dynamic(new_obj);
 }
 
 /* Allocates memory */
@@ -63,8 +61,7 @@ void factor_vm::primitive_clone() { ctx->replace(clone_object(ctx->peek())); }
 cell factor_vm::object_size(cell tagged) {
   if (immediate_p(tagged))
     return 0;
-  else
-    return untag<object>(tagged)->size();
+  return untag<object>(tagged)->size();
 }
 
 /* Allocates memory */

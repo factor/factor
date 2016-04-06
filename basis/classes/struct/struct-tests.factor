@@ -1,14 +1,14 @@
 ! (c)Joe Groff bsd license
 USING: accessors alien alien.c-types alien.data alien.syntax
-ascii assocs byte-arrays classes.struct
-classes.struct.prettyprint classes.struct.prettyprint.private
-classes.tuple.parser classes.tuple.private classes.tuple
-combinators compiler.tree.debugger compiler.units delegate
-destructors io.encodings.utf8 io.pathnames io.streams.string
-kernel libc literals math mirrors namespaces prettyprint
-prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval layouts generic.single classes
-vocabs generic classes.private definitions specialized-arrays.private ;
+assocs byte-arrays classes classes.private classes.struct
+classes.struct.prettyprint.private classes.tuple
+classes.tuple.parser classes.tuple.private combinators
+compiler.tree.debugger compiler.units definitions delegate
+destructors eval generic generic.single io.encodings.utf8
+io.streams.string kernel layouts lexer libc literals math
+mirrors namespaces parser prettyprint prettyprint.config see
+sequences specialized-arrays specialized-arrays.private
+system tools.test vocabs ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char

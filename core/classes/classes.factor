@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators definitions kernel
+USING: accessors assocs combinators definitions graphs kernel
 make namespaces quotations sequences sets words words.symbol ;
 IN: classes
 
@@ -24,12 +24,12 @@ SYMBOL: class-or-cache
 SYMBOL: next-method-quot-cache
 
 : init-caches ( -- )
-    H{ } clone class<=-cache set
-    H{ } clone class-not-cache set
-    H{ } clone classes-intersect-cache set
-    H{ } clone class-and-cache set
-    H{ } clone class-or-cache set
-    H{ } clone next-method-quot-cache set ;
+    H{ } clone class<=-cache namespaces:set
+    H{ } clone class-not-cache namespaces:set
+    H{ } clone classes-intersect-cache namespaces:set
+    H{ } clone class-and-cache namespaces:set
+    H{ } clone class-or-cache namespaces:set
+    H{ } clone next-method-quot-cache namespaces:set ;
 
 : reset-caches ( -- )
     class<=-cache get clear-assoc
@@ -135,18 +135,6 @@ GENERIC: implementors ( class/classes -- seq )
 : class-usage ( class -- seq )
     update-map get at members ;
 
-<PRIVATE
-
-: (closure) ( obj set quot: ( elt -- seq ) -- )
-    2over ?adjoin [
-        [ dip ] keep [ (closure) ] 2curry each
-    ] [ 3drop ] if ; inline recursive
-
-: closure ( obj quot -- set )
-    HS{ } clone [ swap (closure) ] keep ; inline
-
-PRIVATE>
-
 : class-usages ( class -- seq )
     [ class-usage ] closure members ;
 
@@ -157,12 +145,10 @@ M: sequence implementors [ implementors ] gather ;
 <PRIVATE
 
 : update-map+ ( class -- )
-    dup class-uses update-map get
-    [ adjoin-at ] curry with each ;
+    dup class-uses update-map get add-vertex ;
 
 : update-map- ( class -- )
-    dup class-uses update-map get
-    [ at delete ] curry with each ;
+    dup class-uses update-map get remove-vertex ;
 
 : implementors-map+ ( class -- )
     [ HS{ } clone ] dip implementors-map get set-at ;

@@ -1,5 +1,4 @@
-USING: biassocs assocs namespaces tools.test hashtables kernel ;
-IN: biassocs.tests
+USING: assocs biassocs hashtables kernel namespaces tools.test ;
 
 <bihash> "h" set
 

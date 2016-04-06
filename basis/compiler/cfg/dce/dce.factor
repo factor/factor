@@ -21,9 +21,9 @@ SYMBOL: allocations
     allocations get in? ;
 
 : init-dead-code ( -- )
-    H{ } clone liveness-graph set
-    HS{ } clone live-vregs set
-    HS{ } clone allocations set ;
+    H{ } clone liveness-graph namespaces:set
+    HS{ } clone live-vregs namespaces:set
+    HS{ } clone allocations namespaces:set ;
 
 GENERIC: build-liveness-graph ( insn -- )
 

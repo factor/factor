@@ -1,11 +1,9 @@
-USING: accessors arrays assocs combinators.short-circuit
-continuations formatting graphviz graphviz.attributes
-graphviz.dot graphviz.notation graphviz.render
-graphviz.render.private images.loader.private io.directories
-io.directories.hierarchy io.files io.files.unique io.launcher
-io.pathnames kernel locals make math math.combinatorics
-math.parser memoize namespaces sequences sequences.extras sets
-splitting system tools.test ;
+USING: accessors arrays assocs continuations formatting graphviz
+graphviz.notation graphviz.render graphviz.render.private
+images.loader.private io.directories io.encodings.8-bit.latin1
+io.encodings.ascii io.encodings.utf8 io.files io.launcher kernel
+locals make math math.combinatorics math.parser namespaces
+sequences sequences.extras sets splitting system tools.test ;
 IN: graphviz.tests
 
 ! XXX hack
@@ -40,8 +38,7 @@ SYMBOLS: supported-layouts supported-formats ;
 ! -O flag, so just look to see that there seems to be some sort
 ! of output.
 : graphviz-output-appears-to-exist? ( base -- ? )
-    current-directory get directory-files
-    [ swap head? ] with count 1 = ;
+    "." directory-files [ swap head? ] with count 1 = ;
 
 : next! ( seq -- elt ) [ first ] [ 1 rotate! ] bi ;
 
@@ -51,13 +48,10 @@ SYMBOLS: supported-layouts supported-formats ;
     [
         graph "smoke-test" -T -K graphviz
         "smoke-test" graphviz-output-appears-to-exist?
-    ] cleanup-unique-working-directory ;
+    ] with-test-directory ;
 
 : preview-smoke-test ( graph -- pass? )
-    f "pass?" [
-        [ exists? "pass?" set ] with-preview
-        "pass?" get
-    ] with-variable ;
+    [ exists? ] with-preview ;
 
 : K_n ( n -- graph )
     <graph>
@@ -298,21 +292,10 @@ default-graphviz-program [
         [ preview-format-test ] attempt-all
     ] [ unsupported-preview-format? ] must-fail-with
 
-    { t }
-    [
-        USE: io.encodings.8-bit.latin1
-        latin1 encoding-test
-    ] unit-test
+    { t } [ latin1 encoding-test ] unit-test
 
-    { t }
-    [
-        USE: io.encodings.utf8
-        utf8 encoding-test
-    ] unit-test
+    { t } [ utf8 encoding-test ] unit-test
 
-    [
-        USE: io.encodings.ascii
-        ascii encoding-test
-    ] [ unsupported-encoding? ] must-fail-with
+    [ ascii encoding-test ] [ unsupported-encoding? ] must-fail-with
 
 ] when

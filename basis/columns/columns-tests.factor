@@ -1,5 +1,5 @@
-USING: columns sequences kernel namespaces arrays tools.test math ;
-IN: columns.tests
+USING: arrays columns kernel math namespaces sequences
+tools.test ;
 
 ! Columns
 { { 1 2 3 } { 4 5 6 } { 7 8 9 } } [ clone ] map "seq" set

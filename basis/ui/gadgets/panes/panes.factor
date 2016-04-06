@@ -99,6 +99,9 @@ M: pane selected-children
 
 : smash-pane ( pane -- gadget ) [ pane-nl ] [ output>> smash-line ] bi ;
 
+: pane-lines ( str -- lines )
+    string-lines [ { "" } ] when-empty ;
+
 : pane-write ( seq pane -- )
     [ pane-nl ] [ current>> stream-write ]
     bi-curry interleave ;
@@ -117,10 +120,10 @@ M: pane-stream stream-write1
     [ current>> stream-write1 ] do-pane-stream ;
 
 M: pane-stream stream-write
-    [ [ string-lines ] dip pane-write ] do-pane-stream ;
+    [ [ pane-lines ] dip pane-write ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ [ string-lines ] 2dip pane-format ] do-pane-stream ;
+    [ [ pane-lines ] 2dip pane-format ] do-pane-stream ;
 
 M: pane-stream dispose drop ;
 
@@ -439,8 +442,3 @@ pane H{
 
 GENERIC: content-gadget ( object -- gadget/f )
 M: object content-gadget drop f ;
-
-M: string content-gadget
-    '[ _ write ] make-pane <scroller>
-        { 450 100 } >>pref-dim
-    <wrapper> ;

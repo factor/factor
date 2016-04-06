@@ -9,16 +9,14 @@ static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 inline cell factor_vm::from_signed_cell(fixnum x) {
   if (x < fixnum_min || x > fixnum_max)
     return tag<bignum>(fixnum_to_bignum(x));
-  else
-    return tag_fixnum(x);
+  return tag_fixnum(x);
 }
 
 /* Allocates memory */
 inline cell factor_vm::from_unsigned_cell(cell x) {
   if (x > (cell)fixnum_max)
     return tag<bignum>(cell_to_bignum(x));
-  else
-    return tag_fixnum(x);
+  return tag_fixnum(x);
 }
 
 /* Allocates memory */

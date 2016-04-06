@@ -48,8 +48,6 @@ IN: bootstrap.syntax
         "Call stack literals are not supported" throw
     ] define-core-syntax
 
-    "!" [ lexer get next-line ] define-core-syntax
-
     "IN:" [ scan-token set-current-vocab ] define-core-syntax
 
     "<PRIVATE" [ begin-private ] define-core-syntax
@@ -83,21 +81,21 @@ IN: bootstrap.syntax
     "f" [ f suffix! ] define-core-syntax
 
     "CHAR:" [
-        scan-token {
+        lexer get parse-raw [ "token" throw-unexpected-eof ] unless* {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape >string "" assert= ] }
             [ name>char-hook get call( name -- char ) ]
         } cond suffix!
     ] define-core-syntax
 
-    "\"" [ parse-full-string suffix! ] define-core-syntax
+    "\"" [ parse-string suffix! ] define-core-syntax
 
     "SBUF\"" [
-        lexer get skip-blank parse-full-string >sbuf suffix!
+        lexer get skip-blank parse-string >sbuf suffix!
     ] define-core-syntax
 
     "P\"" [
-        lexer get skip-blank parse-short-string <pathname> suffix!
+        lexer get skip-blank parse-string <pathname> suffix!
     ] define-core-syntax
 
     "[" [ parse-quotation suffix! ] define-core-syntax

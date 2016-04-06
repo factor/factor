@@ -681,7 +681,7 @@ usage() {
     $ECHO "  deps-macosx - install git on MacOSX using port"
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
-    $ECHO "  update - git pull, recompile, download a boot image, bootstrap"
+    $ECHO "  update|latest - git pull, recompile, download a boot image, bootstrap"
     $ECHO "  bootstrap - bootstrap with existing boot image"
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
@@ -713,6 +713,7 @@ case "$1" in
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; download_and_bootstrap ;;
+    latest) update; download_and_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;

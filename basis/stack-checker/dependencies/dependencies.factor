@@ -75,7 +75,7 @@ GENERIC: satisfied? ( dependency -- ? )
 TUPLE: depends-on-class-predicate class1 class2 result ;
 
 : add-depends-on-class-predicate ( class1 class2 result -- )
-    \ depends-on-class-predicate add-conditional-dependency ;
+    depends-on-class-predicate add-conditional-dependency ;
 
 M: depends-on-class-predicate satisfied?
     {
@@ -87,7 +87,7 @@ M: depends-on-class-predicate satisfied?
 TUPLE: depends-on-instance-predicate object class result ;
 
 : add-depends-on-instance-predicate ( object class result -- )
-    \ depends-on-instance-predicate add-conditional-dependency ;
+    depends-on-instance-predicate add-conditional-dependency ;
 
 M: depends-on-instance-predicate satisfied?
     {
@@ -99,7 +99,7 @@ TUPLE: depends-on-next-method class generic next-method ;
 
 : add-depends-on-next-method ( class generic next-method -- )
     over add-depends-on-conditionally
-    \ depends-on-next-method add-conditional-dependency ;
+    depends-on-next-method add-conditional-dependency ;
 
 M: depends-on-next-method satisfied?
     {
@@ -111,7 +111,7 @@ TUPLE: depends-on-method class generic method ;
 
 : add-depends-on-method ( class generic method -- )
     over add-depends-on-conditionally
-    \ depends-on-method add-conditional-dependency ;
+    depends-on-method add-conditional-dependency ;
 
 M: depends-on-method satisfied?
     {
@@ -123,7 +123,7 @@ TUPLE: depends-on-tuple-layout class layout ;
 
 : add-depends-on-tuple-layout ( class layout -- )
     [ drop add-depends-on-conditionally ]
-    [ \ depends-on-tuple-layout add-conditional-dependency ] 2bi ;
+    [ depends-on-tuple-layout add-conditional-dependency ] 2bi ;
 
 M: depends-on-tuple-layout satisfied?
     [ class>> tuple-layout ] [ layout>> ] bi eq? ;
@@ -132,7 +132,7 @@ TUPLE: depends-on-flushable word ;
 
 : add-depends-on-flushable ( word -- )
     [ add-depends-on-conditionally ]
-    [ \ depends-on-flushable add-conditional-dependency ] bi ;
+    [ depends-on-flushable add-conditional-dependency ] bi ;
 
 M: depends-on-flushable satisfied?
     word>> flushable? ;
@@ -141,15 +141,15 @@ TUPLE: depends-on-final class ;
 
 : add-depends-on-final ( word -- )
     [ add-depends-on-conditionally ]
-    [ \ depends-on-final add-conditional-dependency ] bi ;
+    [ depends-on-final add-conditional-dependency ] bi ;
 
 M: depends-on-final satisfied?
     class>> { [ class? ] [ final-class? ] } 1&& ;
 
 : init-dependencies ( -- )
-    H{ } clone dependencies set
-    H{ } clone generic-dependencies set
-    HS{ } clone conditional-dependencies set ;
+    H{ } clone dependencies namespaces:set
+    H{ } clone generic-dependencies namespaces:set
+    HS{ } clone conditional-dependencies namespaces:set ;
 
 : without-dependencies ( quot -- )
     [

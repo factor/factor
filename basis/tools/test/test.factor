@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
 compiler.units continuations debugger effects fry
-generalizations io kernel lexer locals macros namespaces parser
-prettyprint quotations sequences sequences.generalizations
-source-files source-files.errors source-files.errors.debugger
-splitting stack-checker summary tools.errors unicode.case vocabs
-vocabs.files vocabs.metadata vocabs.parser words ;
+generalizations io io.files.temp io.files.unique kernel lexer
+locals macros namespaces parser prettyprint quotations sequences
+sequences.generalizations source-files source-files.errors
+source-files.errors.debugger splitting stack-checker summary
+tools.errors unicode vocabs vocabs.files vocabs.metadata
+vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
@@ -31,7 +32,10 @@ T{ error-type-holder
 SYMBOL: verbose-tests?
 t verbose-tests? set-global
 
-: <test-failure> ( error experiment file line# -- test-failure )
+SYMBOL: restartable-tests?
+t restartable-tests? set-global
+
+: <test-failure> ( error experiment path line# -- test-failure )
     test-failure new
         swap >>line#
         swap >>path
@@ -41,7 +45,7 @@ t verbose-tests? set-global
 
 <PRIVATE
 
-: failure ( error experiment file line# -- )
+: failure ( error experiment path line# -- )
     "--> test failed!" print
     <test-failure> test-failures get push
     notify-error-observers ;
@@ -125,7 +129,11 @@ PRIVATE>
 : run-test-file ( path -- )
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
-        '[ _ run-file ] [ file-failure ] recover
+        '[ _ run-file ] [
+            restartable-tests? get
+            [ dup compute-restarts empty? not ] [ f ] if
+            [ rethrow ] [ file-failure ] if
+        ] recover
     ] with-variable ;
 
 SYMBOL: forget-tests?
@@ -149,6 +157,12 @@ SYMBOL: forget-tests?
 : test-vocabs ( vocabs -- ) [ test-vocab ] each ;
 
 PRIVATE>
+
+: with-test-file ( ..a quot: ( ..a path -- ..b ) -- ..b )
+    '[ "" "" _ cleanup-unique-file ] with-temp-directory ; inline
+
+: with-test-directory ( ..a quot: ( ..a -- ..b ) -- ..b )
+    [ cleanup-unique-directory ] with-temp-directory ; inline
 
 TEST: unit-test
 TEST: must-infer-as

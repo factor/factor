@@ -1,6 +1,5 @@
 USING: accessors assocs continuations fry hashtables kernel make
-math namespaces sequences slots.private tools.test ;
-IN: hashtables.tests
+math namespaces sequences tools.test ;
 
 { H{ } } [ { } [ dup ] H{ } map>assoc ] unit-test
 

@@ -3,7 +3,7 @@
 USING: kernel namespaces xml.tokenize xml.state xml.name
 xml.data accessors arrays make xml.char-classes fry assocs sequences
 math xml.errors sets combinators io.encodings io.encodings.iana
-unicode.case xml.dtd strings xml.entities unicode.categories ;
+unicode xml.dtd strings xml.entities ;
 IN: xml.elements
 
 : take-interpolated ( quot -- interpolated )
@@ -121,8 +121,8 @@ DEFER: make-tag ! Is this unavoidable?
 
 : take-internal-subset ( -- dtd )
     [
-        H{ } clone pe-table set
-        t in-dtd? set
+        H{ } clone pe-table namespaces:set
+        t in-dtd? namespaces:set
         dtd-loop
         pe-table get
     ] { } make swap extra-entities get swap <dtd> ;

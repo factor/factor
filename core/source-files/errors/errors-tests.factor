@@ -1,5 +1,5 @@
 USING: assocs compiler.errors compiler.units definitions
-namespaces source-files.errors tools.test words ;
+namespaces tools.test words ;
 IN: source-files.errors.tests
 
 DEFER: forget-test

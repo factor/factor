@@ -7,8 +7,7 @@ fry kernel namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.live-intervals.tests
 
 : <live-interval-for-ranges> ( ranges -- live-interval )
-    10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep
-    dup compute-start/end ;
+    10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep ;
 
 ! cfg>sync-points
 {
@@ -24,6 +23,21 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 } [
     25 T{ live-interval-state { uses V{ } } } find-use
     25 T{ live-interval-state { uses V{ T{ vreg-use { n 25 } } } } } find-use
+] unit-test
+
+! finish-live-interval
+{
+    V{ { 5 10 } { 21 30 } }
+} [
+    { { 21 30 } { 5 10 } } <live-interval-for-ranges>
+    dup finish-live-interval ranges>>
+] unit-test
+
+! insn>sync-point
+{ f f t } [
+    T{ ##call-gc } insn>sync-point keep-dst?>>
+    T{ ##callback-outputs } insn>sync-point keep-dst?>>
+    T{ ##unbox } insn>sync-point keep-dst?>>
 ] unit-test
 
 ! intervals-intersect?
@@ -77,4 +91,18 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     H{ { 4 int-rep } { 8 int-rep } { 9 int-rep } } representations set
     <basic-block> [ H{ { 4 4 } { 8 8 } { 9 9 } } 2array 1array live-outs set ]
     [ handle-live-out ] bi live-intervals get
+] unit-test
+
+! record-def
+{
+    T{ live-interval-state
+       { vreg 37 }
+       { ranges V{ { 20 20 } } }
+       { uses V{ T{ vreg-use { n 20 } { def-rep int-rep } } } }
+    }
+} [
+    H{ { 37 37 } } leader-map set
+    H{ { 37 int-rep } } representations set
+    37 20 f record-def
+    37 vreg>live-interval
 ] unit-test

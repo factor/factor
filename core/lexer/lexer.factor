@@ -57,7 +57,7 @@ ERROR: unexpected want got ;
         [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
     ] dip or ; inline
 
-: change-lexer-column ( lexer quot -- )
+: change-lexer-column ( ..a lexer quot: ( ..a col line -- ..b newcol ) -- ..b )
     [ check-lexer [ column>> ] [ line-text>> ] bi ] prepose
     keep column<< ; inline
 
@@ -94,7 +94,7 @@ M: lexer skip-word
 : still-parsing-line? ( lexer -- ? )
     check-lexer [ column>> ] [ line-length>> ] bi < ;
 
-: (parse-token) ( lexer -- str )
+: (parse-raw) ( lexer -- str )
     check-lexer {
         [ column>> ]
         [ skip-word ]
@@ -102,12 +102,24 @@ M: lexer skip-word
         [ line-text>> ]
     } cleave subseq ;
 
-: parse-token ( lexer -- str/f )
+: parse-raw ( lexer -- str/f )
     dup still-parsing? [
         dup skip-blank
         dup still-parsing-line?
-        [ (parse-token) ] [ dup next-line parse-token ] if
+        [ (parse-raw) ] [ dup next-line parse-raw ] if
     ] [ drop f ] if ;
+
+DEFER: parse-token
+
+: skip-comments ( lexer str -- str' )
+    dup "!" = [
+        drop [ next-line ] keep parse-token
+    ] [
+        nip
+    ] if ;
+
+: parse-token ( lexer -- str/f )
+    dup parse-raw [ skip-comments ] [ drop f ] if* ;
 
 : ?scan-token ( -- str/f ) lexer get parse-token ;
 

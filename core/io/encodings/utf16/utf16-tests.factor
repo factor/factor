@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel tools.test io.encodings.utf16 arrays sbufs
-io.streams.byte-array sequences io.encodings io strings
-io.encodings.string alien.c-types alien.strings accessors classes ;
-IN: io.encodings.utf16.tests
+USING: arrays io.encodings.string io.encodings.utf16 strings
+tools.test ;
 
 { { CHAR: x } } [ B{ 0 CHAR: x } utf16be decode >array ] unit-test
 { { 0x1D11E } } [ B{ 0xD8 0x34 0xDD 0x1E } utf16be decode >array ] unit-test

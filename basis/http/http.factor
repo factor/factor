@@ -134,6 +134,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
 TUPLE: request
 method
 url
+proxy-url
 version
 header
 post-data
@@ -143,8 +144,14 @@ redirects ;
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
 
+: basic-auth ( username password -- str )
+    ":" glue >base64 "Basic " "" prepend-as ;
+
 : set-basic-auth ( request username password -- request )
-    ":" glue >base64 "Basic " "" prepend-as "Authorization" set-header ;
+    basic-auth "Authorization" set-header ;
+
+: set-proxy-basic-auth ( request username password -- request )
+    basic-auth "Proxy-Authorization" set-header ;
 
 : <request> ( -- request )
     request new
@@ -152,6 +159,7 @@ redirects ;
         <url>
             H{ } clone >>query
         >>url
+        <url> >>proxy-url
         H{ } clone >>header
         V{ } clone >>cookies
         "close" "connection" set-header

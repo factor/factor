@@ -1,4 +1,4 @@
-USING: unicode.normalize kernel tools.test sequences
+USING: unicode kernel tools.test sequences
 simple-flat-file io.encodings.utf8 io.files splitting math.parser
 locals math quotations assocs combinators unicode.normalize.private ;
 IN: unicode.normalize.tests

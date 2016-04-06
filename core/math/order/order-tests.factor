@@ -1,5 +1,4 @@
-USING: kernel math.order tools.test ;
-IN: math.order.tests
+USING: math.order tools.test ;
 
 { +lt+ } [ "ab" "abc" <=> ] unit-test
 { +gt+ } [ "abc" "ab" <=> ] unit-test

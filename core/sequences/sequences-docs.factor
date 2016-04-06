@@ -267,10 +267,16 @@ HELP: first4
 { $errors "Throws an error if the sequence has less than four elements." } ;
 
 HELP: array-capacity
-{ $values { "array" array } { "n" "a non-negative fixnum" } }
-{ $class-description "A predicate class whose instances are valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
+{ $class-description "A predicate class whose instances are fixnums of valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
 { $description "Low-level array length accessor." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." }
+{ $see-also integer-array-capacity } ;
+
+HELP: integer-array-capacity
+{ $class-description "A predicate class whose instances are integer of valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
+{ $description "Low-level array length accessor." }
+{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." }
+{ $see-also array-capacity } ;
 
 HELP: array-nth
 { $values { "n" "a non-negative fixnum" } { "array" array } { "elt" object } }
@@ -982,6 +988,11 @@ HELP: glue
 HELP: subseq
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "subseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } "." }
+{ $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
+
+HELP: subseq-as
+{ $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "exemplar" sequence } { "subseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } " of type " { $snippet "exemplar" } "." }
 { $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
 
 HELP: clone-like
@@ -1731,6 +1742,7 @@ $nl
 "Extracting a subsequence:"
 { $subsections
     subseq
+    subseq-as
     head
     tail
     head*

@@ -1,5 +1,5 @@
-USING: math accessors slots strings generic.single kernel
-tools.test generic words parser eval math.functions arrays ;
+USING: accessors arrays generic.single kernel math
+math.functions slots tools.test words ;
 IN: slots.tests
 
 TUPLE: r/w-test foo ;

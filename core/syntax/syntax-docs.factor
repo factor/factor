@@ -26,11 +26,6 @@ $nl
 $nl
 "While parsing words supporting arbitrary syntax can be defined, the default set is found in the " { $vocab-link "syntax" } " vocabulary and provides the basis for all further syntactic interaction with Factor." ;
 
-ARTICLE: "syntax-comments" "Comments"
-{ $subsections
-    POSTPONE: !
-} ;
-
 ARTICLE: "syntax-immediate" "Parse time evaluation"
 "Code can be evaluated at parse time. This is a rarely-used feature; one use-case is " { $link "loading-libs" } ", where you want to execute some code before the words in a source file are compiled."
 { $subsections
@@ -260,7 +255,6 @@ ARTICLE: "syntax" "Syntax"
     "parser-algorithm"
     "word-search"
     "top-level-forms"
-    "syntax-comments"
     "syntax-literals"
     "syntax-immediate"
 } ;
@@ -657,11 +651,6 @@ HELP: (
 }
 { $see-also "effects" }
 ;
-
-HELP: !
-{ $syntax "! comment..." }
-{ $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." } ;
 
 HELP: NAN:
 { $syntax "NAN: payload" }

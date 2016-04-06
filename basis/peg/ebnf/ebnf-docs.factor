@@ -58,7 +58,7 @@ HELP: EBNF:
     }
 } ;
 
-ARTICLE: "peg.ebnf.strings" "Strings"
+ARTICLE: "peg.ebnf.strings" "EBNF Rule: Strings"
 "A string in a rule will match that sequence of characters from the input string. "
 "The string is delimited by matching single or double quotes. "
 "Factor's escape sequences are interpreted: " { $link "escape" } ". "
@@ -87,7 +87,7 @@ ARTICLE: "peg.ebnf.strings" "Strings"
     }
 } ;
 
-ARTICLE: "peg.ebnf.any" "Any"
+ARTICLE: "peg.ebnf.any" "EBNF Rule: Any"
 "A full stop character (.) will match any single token in the input string. "
 "The AST resulting from this is the token itself."
 { $examples
@@ -98,7 +98,7 @@ ARTICLE: "peg.ebnf.any" "Any"
     }
 } ;
 
-ARTICLE: "peg.ebnf.sequence" "Sequence"
+ARTICLE: "peg.ebnf.sequence" "EBNF Rule: Sequence"
 "Any white space separated rule element is considered a sequence. Each rule "
 "in the sequence is matched from the input stream, consuming the input as it "
 "goes. The AST result is a vector containing the results of each rule element in "
@@ -112,7 +112,7 @@ ARTICLE: "peg.ebnf.sequence" "Sequence"
 }
 ;
 
-ARTICLE: "peg.ebnf.grouping" "Group"
+ARTICLE: "peg.ebnf.grouping" "EBNF Rule: Group"
 "Any sequence of rules may be grouped using parentheses (" { $snippet "()" } "). "
 "The parenthesized sequence can then be modified as a group. Parentheses also "
 "delimit sets of choices separated by pipe (|) characters."
@@ -134,8 +134,8 @@ $nl
 }
 ;
 
-ARTICLE: "peg.ebnf.choice" "Choice"
-"Any rule element separated by a pipe character (|) is considered a choice. Choices "
+ARTICLE: "peg.ebnf.choice" "EBNF Rule: Choice"
+"Any rule element separated by a pipe character (|) is considered a " { $strong "choice" } ". Choices "
 "are matched against the input stream in order. If a match succeeds then the remaining "
 "choices are discarded and the result of the match is the AST result of the choice."
 { $examples
@@ -155,9 +155,10 @@ ARTICLE: "peg.ebnf.choice" "Choice"
        "Peg parsing error at character position 0.\nExpected 'a' or 'b' or 'c'\nGot 'd'"
     }
 }
+{ $notes "Due to parser caching, rules can't re-use parsers that have already failed earlier in the choice." }
 ;
 
-ARTICLE: "peg.ebnf.ignore" "Ignore"
+ARTICLE: "peg.ebnf.ignore" "EBNF Rule: Ignore"
 "Any rule element followed by a tilde (~) will be matched, and its results "
 "discarded from the AST."
 { $examples
@@ -169,7 +170,7 @@ ARTICLE: "peg.ebnf.ignore" "Ignore"
 }
 ;
 
-ARTICLE: "peg.ebnf.option" "Option"
+ARTICLE: "peg.ebnf.option" "EBNF Rule: Option"
 "Any rule element followed by a question mark (?) is considered optional. The "
 "rule is tested against the input. If it succeeds the result is stored in the AST. "
 "If it fails then the parse still succeeds and false (f) is stored in the AST."
@@ -187,7 +188,7 @@ ARTICLE: "peg.ebnf.option" "Option"
 }
 ;
 
-ARTICLE: "peg.ebnf.character-class" "Character Class"
+ARTICLE: "peg.ebnf.character-class" "EBNF Rule: Character Class"
 "Character class matching can be done using a range of characters defined in "
 "square brackets. Multiple ranges can be included in a single character class "
 "definition. The syntax for the range is a start character, followed by a minus "
@@ -203,7 +204,7 @@ ARTICLE: "peg.ebnf.character-class" "Character Class"
 }
 ;
 
-ARTICLE: "peg.ebnf.one-or-more" "One or more"
+ARTICLE: "peg.ebnf.one-or-more" "EBNF Rule: One or more"
 "Any rule element followed by a plus (+) matches one or more instances of the rule "
 "from the input string. The AST result is the vector of the AST results from "
 "the matched rule."
@@ -216,7 +217,7 @@ ARTICLE: "peg.ebnf.one-or-more" "One or more"
 }
 ;
 
-ARTICLE: "peg.ebnf.zero-or-more" "Zero or more"
+ARTICLE: "peg.ebnf.zero-or-more" "EBNF Rule: Zero or more"
 "Any rule element followed by an asterisk (*) matches zero or more instances of the rule "
 "from the input string. The AST result is the vector of the AST results from "
 "the matched rule. This will be empty if there are no matches."
@@ -234,7 +235,7 @@ ARTICLE: "peg.ebnf.zero-or-more" "Zero or more"
 }
 ;
 
-ARTICLE: "peg.ebnf.and" "And"
+ARTICLE: "peg.ebnf.and" "EBNF Rule: And"
 "Any rule element prefixed by an ampersand (&) performs the Parsing Expression "
 "Grammar 'And Predicate' match. It attempts to match the rule against the input "
 "string. It will cause the parse to succeed or fail depending on if the rule "
@@ -250,7 +251,7 @@ ARTICLE: "peg.ebnf.and" "And"
 }
 ;
 
-ARTICLE: "peg.ebnf.not" "Not"
+ARTICLE: "peg.ebnf.not" "EBNF Rule: Not"
 "Any rule element prefixed by an exclamation mark (!) performs the Parsing Expression "
 "Grammar 'Not Predicate' match. It attempts to match the rule against the input "
 "string. It will cause the parse to succeed if the rule match fails, and to fail "
@@ -266,7 +267,7 @@ ARTICLE: "peg.ebnf.not" "Not"
 }
 ;
 
-ARTICLE: "peg.ebnf.action" "Action"
+ARTICLE: "peg.ebnf.action" "EBNF Action"
 "An action is a quotation that is run after a rule matches. The quotation "
 "consumes the AST of the rule match and leaves a new AST as the result. "
 "The stack effect of the action can be " { $snippet "( ast -- ast )" } " or "
@@ -292,7 +293,7 @@ ARTICLE: "peg.ebnf.action" "Action"
 }
 ;
 
-ARTICLE: "peg.ebnf.semantic-action" "Semantic Action"
+ARTICLE: "peg.ebnf.semantic-action" "EBNF Semantic Action"
 "Semantic actions allow providing a quotation that gets run on the AST of a "
 "matched rule that returns success or failure. The result of the parse is decided by "
 "the result of the semantic action. The stack effect for the quotation is "
@@ -307,12 +308,12 @@ ARTICLE: "peg.ebnf.semantic-action" "Semantic Action"
     { $example
        "USING: prettyprint peg.ebnf math math.parser ;"
        "\"2\" [EBNF rule=[0-9] ?[ digit> odd? ]? EBNF] ."
-       "Sequence index out of bounds\nindex 0\nseq   V{ }"
+       "Peg parsing error at character position 0.\nExpected \nGot '2'"
     }
 }
 ;
 
-ARTICLE: "peg.ebnf.variable" "Variable"
+ARTICLE: "peg.ebnf.variable" "EBNF Variable"
 "Variables names can be suffixed to a rule element using the colon character (:) "
 "followed by the variable name. These can then be used in rule actions to refer to "
 "the AST result of the rule element with that variable name."
@@ -325,8 +326,8 @@ ARTICLE: "peg.ebnf.variable" "Variable"
 }
 ;
 
-ARTICLE: "peg.ebnf.foreign-rules" "Foreign Rules"
-"Rules can call out to other peg.ebnf defined parsers. The result of "
+ARTICLE: "peg.ebnf.foreign-rules" "EBNF Foreign Rules"
+"Rules can call out to other " { $vocab-link "peg.ebnf" } " defined parsers. The result of "
 "the foreign call then becomes the AST of the successful parse. Foreign rules "
 "are invoked using '<foreign word-name>' or '<foreign word-name rule>'. The "
 "latter allows calling a specific rule in a previously designed peg.ebnf parser. "
@@ -357,7 +358,7 @@ ARTICLE: "peg.ebnf.foreign-rules" "Foreign Rules"
 }
 ;
 
-ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
+ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
 "It is possible to override the tokenizer in an EBNF defined parser. "
 "Usually the input sequence to be parsed is an array of characters or a string. "
 "Terminals in a rule match successive characters in the array or string. "

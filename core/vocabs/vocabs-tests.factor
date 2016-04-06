@@ -1,6 +1,4 @@
-! Unit tests for vocabs vocabulary
-USING: vocabs tools.test ;
-IN: vocabs.tests
+USING: tools.test vocabs ;
 
 { f } [ "kernel" vocab-main ] unit-test
 

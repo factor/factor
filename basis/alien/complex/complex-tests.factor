@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors tools.test alien.complex classes.struct kernel
-alien.c-types alien.syntax namespaces math ;
+USING: accessors alien.c-types alien.complex classes.struct math
+namespaces tools.test ;
 IN: alien.complex.tests
 
 STRUCT: complex-holder

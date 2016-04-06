@@ -1,6 +1,5 @@
 USING: byte-arrays kernel math sequences sequences.private
 tools.test ;
-IN: byte-arrays.tests
 
 { 6 B{ 1 2 3 } } [
     6 B{ 1 2 3 } resize-byte-array

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences unicode.categories.syntax math math.order
+USING: kernel sequences unicode.categories math math.order
 combinators hints combinators.short-circuit ;
 IN: xml.char-classes
 

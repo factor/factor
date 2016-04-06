@@ -819,19 +819,19 @@ UNION: allocation-insn
     ##box-displaced-alien ;
 
 UNION: conditional-branch-insn
-##compare-branch
-##compare-imm-branch
-##compare-integer-branch
-##compare-integer-imm-branch
-##test-branch
-##test-imm-branch
-##compare-float-ordered-branch
-##compare-float-unordered-branch
-##test-vector-branch
-##check-nursery-branch
-##fixnum-add
-##fixnum-sub
-##fixnum-mul ;
+    ##compare-branch
+    ##compare-imm-branch
+    ##compare-integer-branch
+    ##compare-integer-imm-branch
+    ##test-branch
+    ##test-imm-branch
+    ##compare-float-ordered-branch
+    ##compare-float-unordered-branch
+    ##test-vector-branch
+    ##check-nursery-branch
+    ##fixnum-add
+    ##fixnum-sub
+    ##fixnum-mul ;
 
 ! For alias analysis
 UNION: read-insn ##slot ##slot-imm ##vm-field ##alien-global ;
@@ -855,26 +855,7 @@ TUPLE: gc-map scrub-d scrub-r gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
 
-! Instructions that clobber registers. They receive inputs and
-! produce outputs in spill slots.
-UNION: hairy-clobber-insn
-##call-gc
-alien-call-insn
-##callback-inputs
-##callback-outputs
-##unbox-long-long ;
-
-! Instructions that clobber registers but are allowed to produce
-! outputs in registers. Inputs are in spill slots, except for
-! inputs coalesced with the output, in which case that input
-! will be in a register.
-UNION: clobber-insn
-hairy-clobber-insn
-##unbox
-##box
-##box-long-long ;
-
 UNION: def-is-use-insn
-##box-alien
-##box-displaced-alien
-##unbox-any-c-ptr ;
+    ##box-alien
+    ##box-displaced-alien
+    ##unbox-any-c-ptr ;

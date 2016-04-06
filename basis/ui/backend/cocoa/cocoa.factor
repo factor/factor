@@ -13,8 +13,7 @@ ui.gadgets.worlds ui.pixel-formats ui.pixel-formats.private
 ui.private words.symbol ;
 IN: ui.backend.cocoa
 
-TUPLE: handle ;
-TUPLE: window-handle < handle view window ;
+TUPLE: window-handle view window ;
 
 C: <window-handle> window-handle
 
@@ -144,7 +143,7 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window install-window-delegate
     view window <window-handle> world handle<<
     window f -> makeKeyAndOrderFront:
-    100 world active?<< ;
+    t world active?<< ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
     [
@@ -180,19 +179,17 @@ M: cocoa-ui-backend raise-window* ( world -- )
         NSApp 1 -> activateIgnoringOtherApps:
     ] when* ;
 
-GENERIC: (gl-context) ( handle -- context )
-M: window-handle (gl-context) view>> -> openGLContext ;
+M: window-handle select-gl-context ( handle -- )
+    view>> -> openGLContext -> makeCurrentContext ;
 
-M: handle select-gl-context ( handle -- )
-    (gl-context) -> makeCurrentContext ;
-
-M: handle flush-gl-context ( handle -- )
-    (gl-context) -> flushBuffer ;
+M: window-handle flush-gl-context ( handle -- )
+    view>> -> openGLContext -> flushBuffer ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
-M: cocoa-ui-backend resize-window [ handle>> window>> ] [ first2 ] bi* <CGSize> -> setContentSize: ;
+M: cocoa-ui-backend resize-window
+    [ handle>> window>> ] [ first2 ] bi* <CGSize> -> setContentSize: ;
 
 M: cocoa-ui-backend system-alert
     NSAlert -> alloc -> init -> autorelease [

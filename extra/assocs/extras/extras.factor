@@ -44,3 +44,11 @@ GENERIC: delete-value-at ( value assoc -- )
 
 M: assoc delete-value-at
     [ value-at* ] keep swap [ delete-at ] [ 2drop ] if ;
+
+ERROR: key-exists value key assoc ;
+: set-once-at ( value key assoc -- )
+    2dup ?at [
+        key-exists
+    ] [
+        drop set-at
+    ] if ;

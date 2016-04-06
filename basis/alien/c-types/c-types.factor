@@ -1,10 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors arrays byte-arrays
-classes combinators compiler.units cpu.architecture delegate
-fry kernel layouts locals macros math math.order quotations
-sequences system words words.symbol summary ;
-QUALIFIED: math
+USING: accessors alien alien.accessors arrays classes
+combinators compiler.units cpu.architecture delegate fry kernel
+layouts macros math math.order present quotations sequences
+summary system words words.symbol ;
 IN: alien.c-types
 
 SYMBOLS:
@@ -50,6 +49,9 @@ PREDICATE: c-type-word < word
 
 TUPLE: pointer { to initial: void read-only } ;
 C: <pointer> pointer
+
+M: pointer present
+    to>> present "pointer: " prepend ;
 
 UNION: c-type-name
     c-type-word pointer ;

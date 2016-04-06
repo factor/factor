@@ -29,11 +29,11 @@ SYMBOL: blank-line
     and [ nl ] when ;
 
 : ($blank-line) ( -- )
-    nl nl blank-line last-element set ;
+    nl nl blank-line last-element namespaces:set ;
 
 : ($span) ( quot -- )
     last-block? [ nl ] when
-    span last-element set
+    span last-element namespaces:set
     call ; inline
 
 GENERIC: print-element ( element -- )
@@ -58,9 +58,9 @@ M: f print-element drop ;
 
 : ($block) ( quot -- )
     ?nl
-    span last-element set
+    span last-element namespaces:set
     call
-    block last-element set ; inline
+    block last-element namespaces:set ; inline
 
 ! Some spans
 
@@ -84,7 +84,7 @@ ALIAS: $slot $snippet
 
 : $nl ( children -- )
     drop nl last-element get [ nl ] when
-    blank-line last-element set ;
+    blank-line last-element namespaces:set ;
 
 ! Some blocks
 : ($heading) ( children quot -- )
@@ -472,6 +472,9 @@ M: f ($instance) ($link) ;
         "This word should only be called from inside the "
         { $link with-pprint } " combinator."
     } $notes ;
+
+: $content ( element -- )
+    first article-content print-content nl ;
 
 GENERIC: elements* ( elt-type element -- )
 

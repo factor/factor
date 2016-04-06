@@ -103,6 +103,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : do-all ( -- )
     f parser-quiet? set-global
+    f restartable-tests? set-global
     ".." [
         run-mason-rc check-user-init-errors [ 1 exit ] when
         bootstrap-time get boot-time-file to-file

@@ -1,10 +1,7 @@
-USING: accessors alien arrays definitions generic assocs
-hashtables io kernel math namespaces parser prettyprint
-sequences strings tools.test vectors words quotations classes
-classes.private classes.union classes.mixin classes.predicate
-classes.algebra classes.union.private source-files
-compiler.units kernel.private sorting vocabs io.streams.string
-eval see math.private slots generic.single ;
+USING: accessors alien assocs classes classes.algebra
+classes.predicate classes.union classes.union.private
+compiler.units eval io.streams.string kernel math math.private
+parser quotations see sequences slots strings tools.test words ;
 IN: classes.union.tests
 
 ! DEFER: bah

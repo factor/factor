@@ -2,8 +2,6 @@ USING: alien help.syntax help.markup libc kernel.private
 byte-arrays strings hashtables alien.syntax alien.strings
 sequences io.encodings.string debugger destructors vocabs.loader
 classes.struct math kernel ;
-QUALIFIED: math
-QUALIFIED: sequences
 IN: alien.c-types
 
 HELP: heap-size

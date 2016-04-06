@@ -10,6 +10,9 @@ HELP: download-failed
 HELP: too-many-redirects
 { $error-description "Thrown by " { $link http-request } " if the server returns a chain of than " { $link max-redirects } " redirections." } ;
 
+HELP: invalid-proxy
+{ $error-description "Thrown by " { $link http-request } " if the proxy url is not valid." } ;
+
 HELP: <get-request>
 { $values { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP GET request for retrieving the URL." }
@@ -281,6 +284,14 @@ $nl
     "http.client.encoding"
     "http.client.errors"
 }
+"For authentication, only Basic Access Authentication is implemented, using the username/password from the target or proxy url. Alternatively, the " { $link set-basic-auth } " or " { $link set-proxy-basic-auth } " words can be called on the " { $link request } " object."
+$nl
+"The http client can use an HTTP proxy transparently, by using the " { $link "http.proxy-variables" } ". Additionally, the proxy variables can be ignored by setting the " { $slot "proxy-url" } " slot of each " { $link request } " manually:"
+{ $list
+    { "Setting " { $slot "proxy-url" } " to " { $link f } " prevents http.client from using a proxy." }
+    { "Setting the slots of the default empty url in " { $slot "proxy-url" } " overrides the corresponding values from the proxy variables." }
+}
+
 { $see-also "urls" } ;
 
 ABOUT: "http.client"

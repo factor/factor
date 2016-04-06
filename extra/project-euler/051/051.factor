@@ -34,8 +34,8 @@ IN: project-euler.051
 SYMBOL: family-count
 SYMBOL: large-families
 : reset-globals ( -- )
-    H{ } clone family-count set
-    H{ } clone large-families set ;
+    H{ } clone family-count namespaces:set
+    H{ } clone large-families namespaces:set ;
 
 : digits-positions ( str -- positions )
     H{ } clone [ '[ swap _ push-at ] each-index ] keep ;

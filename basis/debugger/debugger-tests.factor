@@ -1,5 +1,5 @@
-USING: accessors alien.syntax continuations debugger kernel literals
-namespaces tools.test ;
+USING: accessors alien.syntax continuations debugger kernel
+kernel.private literals namespaces tools.test ;
 IN: debugger.tests
 
 { } [ [ drop ] [ error. ] recover ] unit-test
@@ -11,7 +11,7 @@ IN: debugger.tests
     T{ test-failure
        { error
          {
-             "kernel-error"
+             $[ KERNEL-ERROR ]
              10
              {
                  B{

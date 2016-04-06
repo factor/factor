@@ -3,9 +3,9 @@
 USING: assocs hashtables kernel math sequences vectors ;
 IN: sets
 
-! unordered-set protocol
-! The word name ``set`` is for dynamic variables.
-MIXIN: unordered-set
+! Set protocol
+MIXIN: set
+
 GENERIC: adjoin ( elt set -- )
 GENERIC: ?adjoin ( elt set -- ? )
 GENERIC: in? ( elt set -- ? )
@@ -36,15 +36,15 @@ M: f clear-set drop ; inline
 ! Defaults for some methods.
 ! Override them for efficiency
 
-M: unordered-set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
+M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
 
-M: unordered-set null? members null? ; inline
+M: set null? cardinality zero? ; inline
 
-M: unordered-set cardinality members length ;
+M: set cardinality members length ;
 
-M: unordered-set clear-set [ members ] keep [ delete ] curry each ;
+M: set clear-set [ members ] keep [ delete ] curry each ;
 
-M: unordered-set set-like drop ; inline
+M: set set-like drop ; inline
 
 <PRIVATE
 
@@ -56,7 +56,7 @@ M: unordered-set set-like drop ; inline
 
 PRIVATE>
 
-M: unordered-set union [ (union) ] keep set-like ;
+M: set union [ (union) ] keep set-like ;
 
 <PRIVATE
 
@@ -77,11 +77,11 @@ M: unordered-set union [ (union) ] keep set-like ;
 
 PRIVATE>
 
-M: unordered-set intersect [ (intersect) ] keep set-like ;
+M: set intersect [ (intersect) ] keep set-like ;
 
-M: unordered-set diff [ (diff) ] keep set-like ;
+M: set diff [ (diff) ] keep set-like ;
 
-M: unordered-set intersects?
+M: set intersects?
     small/large sequence/tester any? ;
 
 <PRIVATE
@@ -91,17 +91,17 @@ M: unordered-set intersects?
 
 PRIVATE>
 
-M: unordered-set subset?
+M: set subset?
     2dup [ cardinality ] bi@ > [ 2drop f ] [ (subset?) ] if ;
 
-M: unordered-set set=
+M: set set=
     2dup [ cardinality ] bi@ eq? [ (subset?) ] [ 2drop f ] if ;
 
-M: unordered-set fast-set ;
+M: set fast-set ;
 
-M: unordered-set duplicates drop f ;
+M: set duplicates drop f ;
 
-M: unordered-set all-unique? drop t ;
+M: set all-unique? drop t ;
 
 <PRIVATE
 
@@ -115,7 +115,7 @@ M: unordered-set all-unique? drop t ;
 PRIVATE>
 
 ! Sequences are sets
-INSTANCE: sequence unordered-set
+INSTANCE: sequence set
 
 M: sequence in?
     member? ; inline

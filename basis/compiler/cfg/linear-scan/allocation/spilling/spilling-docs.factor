@@ -4,14 +4,14 @@ compiler.cfg.linear-scan.live-intervals help.markup help.syntax math ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 HELP: assign-spill
-{ $values { "live-interval" live-interval } }
+{ $values { "live-interval" live-interval-state } }
 { $description "Assigns a spill slot for the live interval." }
 { $see-also assign-spill-slot } ;
 
 HELP: spill-after
 { $values
   { "after" live-interval-state }
-  { "after/f" { $link live-interval-state } " or " { $link f } }
+  { "after/f" { $maybe live-interval-state } }
 }
 { $description "If the interval has no more usages after the spill location, then it is the first child of an interval that was split.  We spill the value and let the resolve pass insert a reload later. An interval may be split if it overlaps a " { $link sync-point } "." }
 { $see-also spill-before } ;
@@ -30,10 +30,10 @@ HELP: spill-before
 
 HELP: split-for-spill
 { $values
-  { "live-interval" live-interval }
+  { "live-interval" live-interval-state }
   { "n" integer }
-  { "before" live-interval }
-  { "after" live-interval }
+  { "before/f" { $maybe live-interval-state } }
+  { "after/f" { $maybe live-interval-state } }
 } { $description "During register allocation an interval needs to be split so that the 'after' part of it can be placed in a spill slot." } ;
 
 HELP: spill-intersecting
@@ -57,7 +57,7 @@ HELP: spill-partially-available
 { $description "A register would be available for part of the new interval's lifetime if all active and inactive intervals using that register were split and spilled." } ;
 
 HELP: trim-before-ranges
-{ $values { "live-interval" live-interval } }
+{ $values { "live-interval" live-interval-state } }
 { $description "Extends the last intervals range to one after the last use point and removes all intervals beyond that." } ;
 
 ARTICLE: "compiler.cfg.linear-scan.allocation.spilling" "Spill slot assignment"

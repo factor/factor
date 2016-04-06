@@ -1,5 +1,4 @@
 USING: layouts math tools.test ;
-IN: system.tests
 
 { t } [ cell integer? ] unit-test
 { t } [ bootstrap-cell integer? ] unit-test

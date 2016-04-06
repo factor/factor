@@ -74,7 +74,7 @@ M: object establish-connection
         drop
     ] if* ; inline
 
-M: object ((client))
+M: object remote>handle
     [ protocol-family SOCK_STREAM ] [ protocol ] bi socket-fd
     [ init-client-socket ] [ ?bind-client ] [ ] tri ;
 

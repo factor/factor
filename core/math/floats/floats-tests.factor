@@ -1,6 +1,5 @@
-USING: kernel math math.constants math.order tools.test sequences
-grouping ;
-IN: math.floats.tests
+USING: grouping kernel math math.constants math.order sequences
+tools.test ;
 
 { t } [ 0.0 float? ] unit-test
 { t } [ 3.1415 number? ] unit-test

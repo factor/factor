@@ -1,5 +1,5 @@
-USING: compiler definitions compiler.units tools.test arrays sequences words kernel
-accessors namespaces fry eval quotations math ;
+USING: arrays compiler compiler.units definitions eval fry
+kernel math namespaces quotations sequences tools.test words ;
 IN: compiler.units.tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer

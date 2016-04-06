@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io.files io.encodings.ascii kernel splitting
-accessors math.parser ascii io assocs strings math namespaces make
-sorting combinators math.order arrays unicode.normalize unicode.data
-locals macros sequences.deep words unicode.breaks quotations
-combinators.short-circuit simple-flat-file ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit kernel locals make math math.order
+math.parser namespaces sequences simple-flat-file splitting
+strings unicode.data ;
 IN: unicode.collation
 
 <PRIVATE
+
 SYMBOL: ducet
 
 TUPLE: weight primary secondary tertiary ignorable? ;
@@ -112,6 +112,7 @@ ducet get-global insert-helpers
             [ [ variable-weight ] each ]
         } cleave
     ] { } make ;
+
 PRIVATE>
 
 : completely-ignorable? ( weight -- ? )
@@ -124,36 +125,3 @@ PRIVATE>
         [ swap ignorable?>> or ]
         [ swap completely-ignorable? or not ] 2bi
     ] filter nip ;
-
-: collation-key ( string -- key )
-    nfd string>graphemes graphemes>weights
-    filter-ignorable weights>bytes ;
-
-<PRIVATE
-: insensitive= ( str1 str2 levels-removed -- ? )
-    [
-        [ collation-key ] dip
-        [ [ 0 = not ] trim-tail but-last ] times
-    ] curry same? ;
-PRIVATE>
-
-: primary= ( str1 str2 -- ? )
-    3 insensitive= ;
-
-: secondary= ( str1 str2 -- ? )
-    2 insensitive= ;
-
-: tertiary= ( str1 str2 -- ? )
-    1 insensitive= ;
-
-: quaternary= ( str1 str2 -- ? )
-    0 insensitive= ;
-
-: w/collation-key ( str -- {str,key} )
-    [ collation-key ] keep 2array ;
-
-: sort-strings ( strings -- sorted )
-    [ w/collation-key ] map natural-sort values ;
-
-: string<=> ( str1 str2 -- <=> )
-    [ w/collation-key ] compare ;

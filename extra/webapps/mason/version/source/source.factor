@@ -29,23 +29,25 @@ IN: webapps.mason.version.source
         download-images
     ] with-directory ;
 
-: (make-source-release) ( version -- path )
+: zip-source ( version -- path )
     [ { "zip" "-qr9" } ] dip source-release-name file-name
     [ suffix "factor" suffix try-process ] keep ;
 
 : make-source-release ( version git-id -- path )
-    "Creating source release..." print flush [
-        [
-            clone-factor prepare-source (make-source-release)
-            "Package created: " write absolute-path dup print
-        ] with-unique-directory drop
-    ] with-temp-directory ;
+    "Creating source release..." print flush
+    clone-factor prepare-source zip-source
+    "Package created: " write absolute-path dup print ;
 
-: upload-source-release ( package version -- )
+: upload-source-release ( path version -- )
     "Uploading source release..." print flush
     [ package-username get package-host get ] dip
     remote-source-release-name
     upload-safely ;
 
 : do-source-release ( version git-id -- )
-    [ make-source-release ] [ drop upload-source-release ] 2bi ;
+    [
+        [
+            [ make-source-release ]
+            [ drop upload-source-release ] 2bi
+        ] cleanup-unique-directory
+    ] with-temp-directory ;

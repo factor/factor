@@ -9,7 +9,6 @@ compiler.cfg.gvn.graph
 compiler.cfg.predecessors
 compiler.cfg.renaming.functor
 compiler.cfg.rpo ;
-QUALIFIED: assocs
 IN: compiler.cfg.gvn.avail
 
 : defined ( bb -- vregs )

@@ -68,7 +68,7 @@ IN: io.files.windows.tests
 ] unit-test
 
 ! set-file-attributes & save-image
-{ ${ "kernel-error" ERROR-IO EIO f } } [
+{ ${ KERNEL-ERROR ERROR-IO EIO f } } [
     [
         "read-only.image" temp-file {
             [ ?delete-file ]

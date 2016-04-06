@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences regexp.transition-tables fry assocs
-accessors locals math sorting arrays sets hashtables regexp.dfa
-combinators.short-circuit regexp.classes ;
+USING: accessors arrays assocs combinators.short-circuit fry
+hashtables kernel locals math regexp.classes
+regexp.transition-tables sequences sets sorting ;
 IN: regexp.minimize
 
 : table>state-numbers ( table -- assoc )

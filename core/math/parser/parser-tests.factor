@@ -1,6 +1,4 @@
-USING: kernel layouts literals math math.parser sequences
-tools.test ;
-IN: math.parser.tests
+USING: layouts literals math math.parser sequences tools.test ;
 
 { f }
 [ f string>number ]
@@ -54,6 +52,8 @@ unit-test
 [ "e" string>number ]
 unit-test
 
+{ f } [ "1/0" string>number ] unit-test
+{ f } [ "-1/0" string>number ] unit-test
 { 1/2 } [ "1/2" string>number ] unit-test
 { -1/2 } [ "-1/2" string>number ] unit-test
 { 2 } [ "4/2" string>number ] unit-test

@@ -1,4 +1,4 @@
-USING: checksums checksums.crc32 kernel math tools.test namespaces ;
+USING: checksums checksums.crc32 tools.test ;
 
 { B{ 0 0 0 0 } } [ "" crc32 checksum-bytes ] unit-test
 

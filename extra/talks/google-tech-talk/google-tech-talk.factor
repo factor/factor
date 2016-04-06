@@ -45,7 +45,7 @@ CONSTANT: google-slides
         { $code "10 dup 0 < [ 1 - ] [ 1 + ] if ." }
         { $code "10 [ \"Hello Googlers!\" print ] times" }
         { $code
-            "USING: io.encodings.ascii unicode.case ;"
+            "USING: io.encodings.ascii unicode ;"
             "{ \"tomato\" \"orange\" \"banana\" }"
             "\"out.txt\" ascii ["
             "    [ >upper print ] each"
@@ -246,7 +246,7 @@ CONSTANT: google-slides
     }
     { $slide "Unicode strings"
         "Unicode-aware case conversion, char classes, collation, word breaks, and so on..."
-        { $code "USE: unicode.case" "\"ß\" >upper ." }
+        { $code "USE: unicode" "\"ß\" >upper ." }
     }
     { $slide "Unicode strings"
         "All external byte I/O is encoded/decoded"

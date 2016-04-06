@@ -1,6 +1,5 @@
-USING: kernel tools.test base64 strings sequences
-io.encodings.string io.encodings.ascii ;
-IN: base64.tests
+USING: base64 io.encodings.ascii io.encodings.string kernel
+sequences strings tools.test ;
 
 { "abcdefghijklmnopqrstuvwxyz" } [ "abcdefghijklmnopqrstuvwxyz" ascii encode >base64 base64> ascii decode
 ] unit-test

@@ -1,9 +1,7 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-USING: kernel tools.test math assocs channels channels.remote
-channels.remote.private ;
-IN: channels.remote.tests
+USING: assocs channels channels.remote channels.remote.private
+kernel tools.test ;
 
 { t } [
     remote-channels assoc?

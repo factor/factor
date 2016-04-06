@@ -151,7 +151,7 @@ HOOK: signal-error. os ( obj -- )
 PREDICATE: vm-error < array
     dup length 2 < [ drop f ] [
         {
-            [ first-unsafe "kernel-error" = ]
+            [ first-unsafe KERNEL-ERROR = ]
             [ second-unsafe 0 kernel-error-count 1 - between? ]
         } 1&&
     ] if ;
@@ -310,8 +310,8 @@ M: no-word-in-vocab summary
 M: no-word-in-vocab error. summary print ;
 
 M: ambiguous-use-error summary
-    words>> first name>>
-    "More than one vocabulary defines a word named “" "”" surround ;
+    name>>
+    "The name “" "” resolves to more than one word." surround ;
 
 M: ambiguous-use-error error. summary print ;
 

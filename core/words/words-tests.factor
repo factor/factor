@@ -1,7 +1,6 @@
-USING: arrays generic assocs kernel math namespaces
-sequences tools.test words definitions parser quotations
-vocabs continuations classes.tuple compiler.units
-io.streams.string accessors eval words.symbol grouping ;
+USING: accessors arrays compiler.units definitions eval generic
+io.streams.string kernel math namespaces parser sequences
+tools.test vocabs words words.symbol ;
 IN: words.tests
 
 { 4 } [

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators fry io io.files io.streams.string kernel
 make math memoize namespaces sbufs sequences sequences.private
-unicode.categories ;
+unicode ;
 IN: csv
 
 SYMBOL: delimiter

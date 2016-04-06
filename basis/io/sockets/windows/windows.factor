@@ -67,7 +67,7 @@ M: object (get-remote-address) ( socket addrspec -- sockaddr )
 : bind-socket ( win32-socket sockaddr len -- )
     [ handle>> ] 2dip bind socket-error ;
 
-M: object ((client)) ( addrspec -- handle )
+M: object remote>handle ( addrspec -- handle )
     [ SOCK_STREAM open-socket ] keep
     [
         bind-local-address get
