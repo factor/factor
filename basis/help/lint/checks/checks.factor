@@ -78,6 +78,7 @@ SYMBOL: vocab-articles
         [ parsing-word? ]
         [ "declared-effect" word-prop not ]
         [ constant? ]
+        [ "word-help" word-prop not ]
     } 1|| ;
 
 : skip-check-values? ( word element -- ? )
