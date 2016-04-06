@@ -30,4 +30,3 @@ M: windows default-temp-directory
 
 M: windows default-cache-directory
     get-appdata-directory "factorcode.org\\Factor" append-path ;
-
