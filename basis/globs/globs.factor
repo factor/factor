@@ -60,16 +60,16 @@ Main = Concatenation End
 ! TODO: make case-fold an option, off by default
 ! TODO: maybe make case-fold an option on regexp
 
-DEFER: glob-directory%
+DEFER: glob%
 
 : glob-entries ( path -- entries )
     directory-entries [ name>> "." head? ] reject ;
 
-: ?glob-directory% ( root remaining entry -- )
+: ?glob% ( root remaining entry -- )
     over empty? [
         2drop ,
     ] [
-        directory? [ glob-directory% ] [ 2drop ] if
+        directory? [ glob% ] [ 2drop ] if
     ] if ;
 
 :: glob-wildcard% ( root globs -- )
@@ -94,7 +94,7 @@ DEFER: glob-directory%
                          dup ,
                     ] [
                         entry directory? [
-                            dupd glob-directory%
+                            dupd glob%
                         ] [
                             drop
                         ] if
@@ -104,7 +104,7 @@ DEFER: glob-directory%
         } cond
 
         { [ entry directory? ] [ next-glob ] } 0&& [
-            globs glob-directory%
+            globs glob%
         ] [
             drop
         ] if
@@ -116,7 +116,7 @@ DEFER: glob-directory%
     root glob-entries [| entry |
         entry name>> >case-fold glob matches? [
             root entry name>> append-path
-            remaining entry ?glob-directory%
+            remaining entry ?glob%
         ] when
     ] each ;
 
@@ -124,12 +124,12 @@ DEFER: glob-directory%
     globs unclip :> ( remaining glob )
 
     root glob append-path dup exists? [
-        remaining over file-info ?glob-directory%
+        remaining over file-info ?glob%
     ] [
         drop
     ] if ;
 
-: glob-directory% ( root globs -- )
+: glob% ( root globs -- )
     dup ?first {
         { f [ 2drop ] }
         { "**" [ glob-wildcard% ] }
@@ -155,5 +155,5 @@ DEFER: glob-directory%
 
 PRIVATE>
 
-: glob-directory ( glob -- files )
-    glob-path [ glob-directory% ] { } make ;
+: glob ( glob -- files )
+    glob-path [ glob% ] { } make ;
