@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 io.directories io.files io.files.info io.pathnames kernel locals
-make peg.ebnf regexp regexp.combinators sequences splitting
-strings system unicode ;
+make peg.ebnf regexp regexp.combinators sequences strings system
+unicode ;
 IN: globs
 
 : not-path-separator ( -- sep )
@@ -62,10 +62,10 @@ DEFER: glob-directory%
     directory-entries [ name>> "." head? ] reject ;
 
 : ?glob-directory% ( root remaining entry -- )
-    directory? [
-        glob-directory%
+    over empty? [
+        2drop ,
     ] [
-        empty? [ , ] [ drop ] if
+        directory? [ glob-directory% ] [ 2drop ] if
     ] if ;
 
 :: glob-wildcard% ( root globs -- )
