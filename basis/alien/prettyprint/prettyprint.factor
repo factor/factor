@@ -78,7 +78,7 @@ M: typedef-word synopsis*
     ] tri ; inline
 
 M: alien-function-alias-word definer
-    drop \ FUNCTION-ALIAS: \ ; ;
+    drop \ FUNCTION-ALIAS: f ;
 M: alien-function-alias-word definition drop f ;
 M: alien-function-alias-word synopsis*
     {
@@ -88,9 +88,10 @@ M: alien-function-alias-word synopsis*
         [ pprint-word ]
         [ [ def>> third text ] pprint-function ]
     } cleave ;
+M: alien-function-alias-word declarations. drop ;
 
 M: alien-function-word definer
-    drop \ FUNCTION: \ ; ;
+    drop \ FUNCTION: f ;
 M: alien-function-word synopsis*
     {
         [ seeing-word ]
@@ -100,7 +101,7 @@ M: alien-function-word synopsis*
     } cleave ;
 
 M: alien-callback-type-word definer
-    drop \ CALLBACK: \ ; ;
+    drop \ CALLBACK: f ;
 M: alien-callback-type-word definition drop f ;
 M: alien-callback-type-word synopsis*
     {
