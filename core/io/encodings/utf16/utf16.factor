@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators io io.binary
 io.encodings kernel math math.private namespaces sbufs
-sequences sequences.private splitting strings.private vectors ;
+sequences sequences.private splitting strings strings.private
+vectors ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be
@@ -115,13 +116,13 @@ M: utf16le encode-char ( char stream encoding -- )
 
 M: utf16le encode-string
     drop
-    over aux>>
+    over dup string? [ aux>> ] [ drop t ] if
     [ [ char>utf16le ] curry each ]
     [ ascii-string>utf16le ] if ;
 
 M: utf16be encode-string
     drop
-    over aux>>
+    over dup string? [ aux>> ] [ drop t ] if
     [ [ char>utf16be ] curry each ]
     [ ascii-string>utf16be ] if ;
 
