@@ -4,7 +4,7 @@ io.directories io.encodings.8-bit.latin1 io.encodings.ascii
 io.encodings.binary io.encodings.string io.encodings.utf16
 io.encodings.utf8 io.files io.files.private io.pathnames kernel
 locals make math sequences specialized-arrays system threads
-tools.test vocabs ;
+tools.test vocabs io.encodings ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 IN: io.files.tests
 
@@ -250,8 +250,13 @@ CONSTANT: pt-array-1
 ] unit-test
 
 [| path |
-    [ path ascii [ { } write ] with-file-writer ]
-    [ no-method? ] must-fail-with
+    [ path ascii [ { 129 } write ] with-file-writer ]
+    [ encode-error? ] must-fail-with
+] with-test-file
+
+[| path |
+    { }
+    [ path ascii [ { } write ] with-file-writer ] unit-test
 ] with-test-file
 
 [| path |
