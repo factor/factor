@@ -151,10 +151,10 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ] [ bad-vreg? ] must-fail-with
 
 ! vregs>regs
-{ H{ { 44 RBX } { 33 RAX } } } [
+{ { { 33 RAX } { 44 RBX } } } [
     { { 33 int-rep 33 f } { 44 int-rep 44 f } } setup-vreg-spills
     H{ { 33 RAX } { 44 RBX } } pending-interval-assoc set
-    { 33 44 } vregs>regs
+    { { 33 33 } { 44 44 } } vregs>regs
 ] unit-test
 
 
