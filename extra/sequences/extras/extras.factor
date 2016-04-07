@@ -149,8 +149,10 @@ PRIVATE>
 : cut-slice* ( seq n -- before after )
     [ head-slice* ] [ tail-slice* ] 2bi ;
 
-: ?<slice> ( from to/f sequence -- slice )
-    over [ nip [ length ] [ ] bi ] unless <slice> ; inline
+: ?<slice> ( from/f to/f sequence -- slice )
+    [ [ 0 ] unless* ] 2dip
+    over [ nip [ length ] [ ] bi ] unless
+    <slice> ; inline
 
 : sequence>slice ( sequence -- slice )
     [ drop 0 ] [ length ] [ ] tri <slice> ; inline
