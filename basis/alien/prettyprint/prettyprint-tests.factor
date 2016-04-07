@@ -9,7 +9,7 @@ FUNCTION: int function_test ( float x, int[4][FOO] y, char* z, ushort *w )
 { "USING: alien.c-types alien.syntax ;
 IN: alien.prettyprint.tests
 FUNCTION: int function_test
-    ( float x, int[4][FOO] y, char* z, ushort* w ) ; inline
+    ( float x, int[4][FOO] y, char* z, ushort* w )
 " } [
     [ \ function_test see ] with-string-writer
 ] unit-test
@@ -20,7 +20,7 @@ FUNCTION-ALIAS: function-test int function_test
 { "USING: alien.c-types alien.syntax ;
 IN: alien.prettyprint.tests
 FUNCTION-ALIAS: function-test int function_test
-    ( float x, int[4][FOO] y, char* z, ushort* w ) ; inline
+    ( float x, int[4][FOO] y, char* z, ushort* w )
 " } [
     [ \ function-test see ] with-string-writer
 ] unit-test
@@ -66,7 +66,7 @@ CALLBACK: void callback-test ( int x, float[4] y )
 
 { "USING: alien.c-types alien.syntax ;
 IN: alien.prettyprint.tests
-CALLBACK: void callback-test ( int x, float[4] y ) ;
+CALLBACK: void callback-test ( int x, float[4] y )
 " } [
     [ \ callback-test see ] with-string-writer
 ] unit-test
