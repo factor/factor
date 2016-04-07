@@ -1,12 +1,16 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.linearization compiler.cfg.liveness compiler.cfg.registers
+USING: accessors assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.cfg.renaming.functor
-compiler.cfg.ssa.destruction.leaders cpu.architecture
-fry heaps kernel make math namespaces sequences sets ;
+compiler.cfg.linear-scan.live-intervals compiler.cfg.linearization
+compiler.cfg.liveness compiler.cfg.registers
+compiler.cfg.renaming.functor compiler.cfg.ssa.destruction.leaders fry
+heaps kernel make math namespaces sequences ;
 IN: compiler.cfg.linear-scan.assignment
+
+: heap-pop-while ( heap quot: ( key -- ? ) -- values )
+    '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
+    [ over heap-pop* ] produce 2nip ; inline
 
 ! This contains both active and inactive intervals; any interval
 ! such that start <= insn# <= end is in this set.
@@ -61,10 +65,6 @@ SYMBOL: machine-live-outs
 : compute-live-out ( bb -- )
     [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
 
-: heap-pop-while ( heap quot: ( key -- ? ) -- values )
-    '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
-    [ over heap-pop* ] produce 2nip ; inline
-
 : insert-spill ( live-interval -- )
     [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
 
@@ -104,11 +104,6 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 : assign-derived-roots ( gc-map -- )
     [ [ [ vreg>spill-slot ] bi@ ] assoc-map ] change-derived-roots drop ;
 
-: assign-registers-in-insn ( insn -- )
-    dup assign-all-registers dup gc-map-insn? [
-        gc-map>> [ assign-gc-roots ] [ assign-derived-roots ] bi
-    ] [ drop ] if ;
-
 : begin-block ( bb -- )
     {
         [ basic-block namespaces:set ]
@@ -117,23 +112,26 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
         [ compute-live-in ]
     } cleave ;
 
+: handle-gc-map-insn ( insn -- )
+    dup , gc-map>> [ assign-gc-roots ] [ assign-derived-roots ] bi ;
+
 : assign-registers-in-block ( bb -- )
     dup begin-block
     [
         [
             [
-                {
-                    [ insn#>> prepare-insn ]
-                    [ assign-registers-in-insn ]
-                    [ , ]
-                } cleave
+                [ insn#>> prepare-insn ]
+                [ assign-all-registers ]
+                [ dup gc-map-insn? [ handle-gc-map-insn ] [ , ] if ] tri
             ] each
         ] V{ } make
     ] change-instructions compute-live-out ;
 
+: live-intervals>min-heap ( live-intervals -- min-heap )
+    [ [ live-interval-start ] map ] keep zip >min-heap ;
+
 : init-assignment ( live-intervals -- )
-    [ [ live-interval-start ] map ] keep zip
-    >min-heap unhandled-intervals namespaces:set
+    live-intervals>min-heap unhandled-intervals namespaces:set
     <min-heap> pending-interval-heap namespaces:set
     H{ } clone pending-interval-assoc namespaces:set
     H{ } clone machine-live-ins namespaces:set

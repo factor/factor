@@ -19,25 +19,29 @@ HELP: assign-gc-roots
 
 HELP: assign-registers-in-block
 { $values { "bb" basic-block } }
-{ $description "Assigns registers and also inserts " { $link ##reload } " and " { $link ##spill } " instructions." } ;
+{ $description "Assigns registers to vregs and also inserts " { $link ##reload } " and " { $link ##spill } " instructions." } ;
 
 HELP: assign-registers
 { $values { "cfg" cfg } { "live-intervals" sequence } }
 { $description "Uses the live intervals in the sequence to assign physical registers to all instructions in the cfg. The live intervals must first have had their physical registers assigned by " { $link allocate-registers } "." } ;
 
-HELP: assign-registers-in-insn
+HELP: assign-all-registers
 { $values { "insn" insn } }
-{ $description "Assigns physical registers and spill slots for the virtual registers used by the instruction." } ;
+{ $description "Assigns physical registers for the virtual registers used and defined by the instruction." } ;
 
 HELP: compute-live-in
 { $values { "bb" basic-block } }
 { $description "Computes the live in registers for a basic block." }
 { $see-also machine-live-ins } ;
 
+HELP: expire-old-intervals
+{ $values { "n" integer } { "pending-heap" min-heap } }
+{ $description "Expires all intervals older than the cutoff point." } ;
+
 HELP: insert-reload
 { $values { "live-interval" live-interval-state } }
 { $description "Inserts a " { $link ##reload } " instruction for a live interval." }
-{ $see-also insert-spill } ;
+{ $see-also handle-reload insert-spill } ;
 
 HELP: machine-edge-live-ins
 { $var-description "Mapping from basic blocks to predecessors to values which are live on a particular incoming edge." } ;

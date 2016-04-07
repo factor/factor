@@ -22,6 +22,33 @@ IN: compiler.cfg.linear-scan.assignment.tests
     (setup-vreg-spills)
     [ representations set ] [ leader-map set ] [ spill-slots set ] tri* ;
 
+! activate-new-intervals
+{
+    {
+        T{ ##reload
+           { dst RBX }
+           { rep tagged-rep }
+           { src T{ spill-slot } }
+        }
+    }
+} [
+    ! Setup
+    H{ } clone pending-interval-assoc set
+    <min-heap> pending-interval-heap set
+    30 {
+        T{ live-interval-state
+           { vreg 789 }
+           { reg RBX }
+           { reload-from T{ spill-slot } }
+           { reload-rep tagged-rep }
+           { ranges V{ { 30 30  } } }
+           { uses
+             V{ T{ vreg-use { n 26 } { use-rep tagged-rep } } }
+           }
+        }
+    } live-intervals>min-heap [ activate-new-intervals ] { } make
+] unit-test
+
 ! assign-gc-roots
 {
     T{ gc-map { gc-roots { T{ spill-slot { n 7 } } } } }
@@ -122,6 +149,14 @@ IN: compiler.cfg.linear-scan.assignment.tests
       { 46 double-rep 45 f } } setup-vreg-spills
     46 vreg>reg
 ] [ bad-vreg? ] must-fail-with
+
+! vregs>regs
+{ H{ { 44 RBX } { 33 RAX } } } [
+    { { 33 int-rep 33 f } { 44 int-rep 44 f } } setup-vreg-spills
+    H{ { 33 RAX } { 44 RBX } } pending-interval-assoc set
+    { 33 44 } vregs>regs
+] unit-test
+
 
 { { 3 56 } } [
     { { 3 7 } { -1 56 } { -1 3 } } >min-heap [ -1 = ] heap-pop-while
