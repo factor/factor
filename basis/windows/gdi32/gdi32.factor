@@ -1848,7 +1848,7 @@ FUNCTION: BOOL SetPixelFormat ( HDC hDC, int iPixelFormat, PFD* ppfd )
 ! FUNCTION: SetTextAlign
 ! FUNCTION: SetTextCharacterExtra
 FUNCTION: COLORREF SetTextColor ( HDC hdc, COLORREF crColor )
-! FUNCTION: SetTextColor ( HDC hDC, 
+! FUNCTION: SetTextColor ( HDC hDC,  
 ! FUNCTION: SetTextJustification
 ! FUNCTION: SetViewportExtEx
 ! FUNCTION: SetViewportOrgEx
