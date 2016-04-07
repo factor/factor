@@ -1,9 +1,10 @@
 USING: alien alien.c-types alien.data arrays classes.struct
 compiler.units continuations destructors fry generic.single io
 io.directories io.encodings.8-bit.latin1 io.encodings.ascii
-io.encodings.binary io.encodings.string io.files
-io.files.private io.pathnames kernel locals make math sequences
-specialized-arrays system threads tools.test vocabs ;
+io.encodings.binary io.encodings.string io.encodings.utf16
+io.encodings.utf8 io.files io.files.private io.pathnames kernel
+locals make math sequences specialized-arrays system threads
+tools.test vocabs ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 IN: io.files.tests
 
@@ -269,4 +270,25 @@ CONSTANT: pt-array-1
         "resource:core" absolute-path
         [ cwd = ] [ cd ] [ cwd = ] tri
     ] cwd '[ _ dup cd cwd = ] [ ] cleanup
+] unit-test
+
+{ t } [
+    [
+        [ 0 1 "å" <slice> swap utf8 set-file-contents ]
+        [ utf8 file-contents ] bi "å" =
+    ] with-test-file
+] unit-test
+
+{ t } [
+    [
+        [ 0 1 "å" <slice> swap utf16 set-file-contents ]
+        [ utf16 file-contents ] bi "å" =
+    ] with-test-file
+] unit-test
+
+{ t } [
+    [
+        [ 0 1 "a" <slice> swap ascii set-file-contents ]
+        [ ascii file-contents ] bi "a" =
+    ] with-test-file
 ] unit-test
