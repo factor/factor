@@ -14,9 +14,12 @@ M: ascii encode-char
 
 GENERIC: ascii> ( string -- byte-array )
 
+M: object ascii>
+    [ dup 127 <= [ encode-error ] unless ] B{ } map-as ; inline
+
 M: string ascii>
     dup aux>>
-    [ [ dup 127 <= [ encode-error ] unless ] B{ } map-as ]
+    [ call-next-method ]
     [ string>byte-array-fast ] if ; inline
 
 PRIVATE>

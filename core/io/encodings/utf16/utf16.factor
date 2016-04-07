@@ -114,17 +114,29 @@ M: utf16le encode-char ( char stream encoding -- )
 : ascii-string>utf16be ( string stream -- )
     [ 1 swap ascii-string>utf16-byte-array ] dip stream-write ; inline
 
-M: utf16le encode-string
-    drop
-    over dup string? [ aux>> ] [ drop t ] if
-    [ [ char>utf16le ] curry each ]
-    [ ascii-string>utf16le ] if ;
+GENERIC# encode-string-utf16le 1 ( string stream -- )
 
-M: utf16be encode-string
-    drop
-    over dup string? [ aux>> ] [ drop t ] if
-    [ [ char>utf16be ] curry each ]
-    [ ascii-string>utf16be ] if ;
+M: object encode-string-utf16le
+    [ char>utf16le ] curry each ; inline
+
+M: string encode-string-utf16le
+    over aux>>
+    [ call-next-method ]
+    [ ascii-string>utf16le ] if ; inline
+
+M: utf16le encode-string drop encode-string-utf16le ;
+
+GENERIC# encode-string-utf16be 1 ( string stream -- )
+
+M: object encode-string-utf16be
+    [ char>utf16be ] curry each ; inline
+
+M: string encode-string-utf16be
+    over aux>>
+    [ call-next-method ]
+    [ ascii-string>utf16be ] if ; inline
+
+M: utf16be encode-string drop encode-string-utf16be ;
 
 M: utf16le guess-encoded-length drop 2 * ; inline
 M: utf16le guess-decoded-length drop 2 /i ; inline
