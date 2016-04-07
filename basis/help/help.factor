@@ -31,7 +31,7 @@ GENERIC: word-help* ( word -- content )
                 first2 dup effect? [ \ $quotation swap 2array ] when
             ] [
                 object
-            ] if
+            ] if [ effect>string ] dip
         ] { } map>assoc
     ] bi@ append members $values ;
 
