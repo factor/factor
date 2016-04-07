@@ -22,7 +22,7 @@ M: double-quoted-expr expand expr>> ;
 
 M: variable-expr expand expr>> os-env ;
 
-M: glob-expr expand expr>> glob-directory ;
+M: glob-expr expand expr>> glob ;
 
 M: factor-expr expand expr>> eval>string ;
 
