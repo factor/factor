@@ -119,7 +119,7 @@ GENERIC: error-in-thread ( error thread -- * )
 
 SYMBOL: thread-error-hook ! ( error thread -- * )
 
-thread-error-hook [ [ die drop throw ] ] initialize
+thread-error-hook [ [ die drop rethrow ] ] initialize
 
 M: object error-in-thread
     thread-error-hook get-global call( error thread -- * ) ;
@@ -128,7 +128,7 @@ M: object error-in-thread
 
 SYMBOL: callback-error-hook ! ( error -- * )
 
-callback-error-hook [ [ die throw ] ] initialize
+callback-error-hook [ [ die rethrow ] ] initialize
 
 : rethrow ( error -- * )
     dup save-error
