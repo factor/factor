@@ -35,8 +35,8 @@ ERROR: not-spilled-error vreg ;
     dup vreg>reg dup spill-slot?
     [ nip ] [ drop leader not-spilled-error ] if ;
 
-: vregs>regs ( vregs -- assoc )
-    [ dup vreg>reg ] H{ } map>assoc ;
+: vregs>regs ( assoc -- assoc' )
+    [ vreg>reg ] assoc-map ;
 
 SYMBOL: unhandled-intervals
 
@@ -46,7 +46,7 @@ SYMBOL: machine-live-ins
     machine-live-ins get at ;
 
 : compute-live-in ( bb -- )
-    [ live-in keys vregs>regs ] keep machine-live-ins get set-at ;
+    [ live-in vregs>regs ] keep machine-live-ins get set-at ;
 
 SYMBOL: machine-edge-live-ins
 
@@ -54,7 +54,7 @@ SYMBOL: machine-edge-live-ins
     machine-edge-live-ins get at at ;
 
 : compute-edge-live-in ( bb -- )
-    [ edge-live-ins get at [ keys vregs>regs ] assoc-map ] keep
+    [ edge-live-ins get at [ vregs>regs ] assoc-map ] keep
     machine-edge-live-ins get set-at ;
 
 SYMBOL: machine-live-outs
@@ -63,7 +63,7 @@ SYMBOL: machine-live-outs
     machine-live-outs get at ;
 
 : compute-live-out ( bb -- )
-    [ live-out keys vregs>regs ] keep machine-live-outs get set-at ;
+    [ live-out vregs>regs ] keep machine-live-outs get set-at ;
 
 : insert-spill ( live-interval -- )
     [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
