@@ -18,7 +18,7 @@ TUPLE: io-thread < thread ;
     "I/O wait"
     io-thread new-thread ;
 
-M: io-thread error-in-thread die drop throw ;
+M: io-thread error-in-thread die drop rethrow ;
 
 : start-io-thread ( -- )
     t io-thread-running? set-global

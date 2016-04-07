@@ -15,7 +15,7 @@ IN: debugger.threads
 ! ( error thread -- * )
 [
     dup initial-thread get-global eq? [
-        die drop throw
+        die drop rethrow
     ] [
         [
             error-in-thread. nl

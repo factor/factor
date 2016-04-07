@@ -13,7 +13,7 @@ IN: ui.debugger
 
 ! ( error -- * )
 [
-    ui-running? [ dup error-alert ] [ dup print-error ] if die
+    ui-running? [ dup error-alert ] [ dup print-error ] if die rethrow
 ] callback-error-hook set-global
 
 M: world-error error.
