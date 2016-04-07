@@ -4,7 +4,7 @@ USING: accessors alien.data alien.parser arrays assocs
 byte-arrays classes.struct classes.struct.private combinators
 combinators.short-circuit cuda cuda.ffi fry generalizations
 io.backend kernel locals macros math namespaces sequences
-variants words ;
+variants vocabs.loader words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda.libraries
 
@@ -201,3 +201,5 @@ ERROR: bad-cuda-abi abi ;
 : add-cuda-library ( name abi path -- )
     normalize-path <cuda-library>
     dup name>> cuda-libraries get-global set-at ;
+
+{ "cuda.libraries" "prettyprint" } "cuda.prettyprint" require-when
