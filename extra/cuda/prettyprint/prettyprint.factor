@@ -26,4 +26,3 @@ M: cuda-function-word synopsis*
        [ definer. ]
        [ [ pprint-word ] pprint-cuda-function ]
    } cleave ;
-

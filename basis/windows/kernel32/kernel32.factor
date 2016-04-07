@@ -1700,7 +1700,7 @@ ALIAS: OpenFileMapping OpenFileMappingW
 ! FUNCTION: OpenJobObjectA
 ! FUNCTION: OpenJobObjectW
 ! FUNCTION: OpenMutexA
-! FUNCTION: OpenMutexW 
+! FUNCTION: OpenMutexW  
 FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId )
 ! FUNCTION: OpenProfileUserMapping
 ! FUNCTION: OpenSemaphoreA
