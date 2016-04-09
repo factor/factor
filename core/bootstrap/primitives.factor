@@ -129,20 +129,23 @@ call( -- ) ! syntax-quot
 : define-builtin ( symbol slotspec -- )
     [ [ define-builtin-predicate ] keep ] dip define-builtin-slots ;
 
-"fixnum" "math" create-word register-builtin
-"bignum" "math" create-word register-builtin
-"tuple" "kernel" create-word register-builtin
-"float" "math" create-word register-builtin
+{
+    { "alien" "alien" }
+    { "array" "arrays" }
+    { "bignum" "math" }
+    { "byte-array" "byte-arrays" }
+    { "callstack" "kernel" }
+    { "dll" "alien" }
+    { "fixnum" "math" }
+    { "float" "math" }
+    { "quotation" "quotations" }
+    { "string" "strings" }
+    { "tuple" "kernel" }
+    { "word" "words" }
+    { "wrapper" "kernel" }
+} [ create-word register-builtin ] assoc-each
+
 "f" "syntax" lookup-word register-builtin
-"array" "arrays" create-word register-builtin
-"wrapper" "kernel" create-word register-builtin
-"callstack" "kernel" create-word register-builtin
-"string" "strings" create-word register-builtin
-"quotation" "quotations" create-word register-builtin
-"dll" "alien" create-word register-builtin
-"alien" "alien" create-word register-builtin
-"word" "words" create-word register-builtin
-"byte-array" "byte-arrays" create-word register-builtin
 
 ! We need this before defining c-ptr below
 "f" "syntax" lookup-word { } define-builtin
