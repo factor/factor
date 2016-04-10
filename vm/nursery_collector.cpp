@@ -40,7 +40,7 @@ void factor_vm::collect_nursery() {
     event->started_code_scan();
   collector.trace_code_heap_roots(&code->points_to_nursery);
   if (event)
-    event->ended_code_scan(collector.code_blocks_scanned);
+    event->ended_code_scan(code->points_to_nursery.size());
 
   collector.cheneys_algorithm();
 
