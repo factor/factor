@@ -137,13 +137,13 @@ HINTS: >title string ;
 : >case-fold ( string -- fold )
     >upper >lower ;
 
-: lower? ( string -- ? ) dup >lower = ;
+: lower? ( string -- ? ) dup >lower sequence= ;
 
-: upper? ( string -- ? ) dup >upper = ;
+: upper? ( string -- ? ) dup >upper sequence= ;
 
-: title? ( string -- ? ) dup >title = ;
+: title? ( string -- ? ) dup >title sequence= ;
 
-: case-fold? ( string -- ? ) dup >case-fold = ;
+: case-fold? ( string -- ? ) dup >case-fold sequence= ;
 
 : nfd ( string -- nfd )
     [ (nfd) ] with-string ;
