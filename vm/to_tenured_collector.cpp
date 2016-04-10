@@ -23,7 +23,7 @@ void factor_vm::collect_to_tenured() {
     event->started_code_scan();
   collector.trace_code_heap_roots(&code->points_to_aging);
   if (event)
-    event->ended_code_scan(collector.code_blocks_scanned);
+    event->ended_code_scan(code->points_to_aging.size());
 
   collector.visitor.visit_mark_stack(&mark_stack);
 
