@@ -207,6 +207,9 @@ ERROR: underlying-mismatch slice1 slice2 ;
     [ [ to>> ] bi@ max ]
     [ drop seq>> ] 2tri <slice> ;
 
+: ?span-slices ( slice1/f slice2/f -- slice )
+    2dup and [ span-slices ] [ or ] if ;
+
 :: rotate! ( seq n -- )
     seq length :> len
     n len mod dup 0 < [ len + ] when seq bounds-check drop 0 over
