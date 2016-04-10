@@ -570,7 +570,7 @@ HELP: filter!
 
 HELP: reject
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "subseq" "a new sequence" } }
-{ $description "Applies the quotation to each element in turn, and outputs a new sequence removing with the elements of the original sequence for which the quotation output a true value." } ;
+{ $description "Applies the quotation to each element in turn, and outputs a new sequence removing the elements of the original sequence for which the quotation outputs a true value." } ;
 
 HELP: reject-as
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "exemplar" sequence } { "subseq" "a new sequence" } }
