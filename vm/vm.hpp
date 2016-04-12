@@ -592,7 +592,6 @@ struct factor_vm {
   void primitive_modify_code_heap();
   void primitive_code_room();
   void primitive_strip_stack_traces();
-  cell code_blocks();
   void primitive_code_blocks();
 
   // callbacks

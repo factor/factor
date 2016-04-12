@@ -192,9 +192,8 @@ void factor_vm::primitive_strip_stack_traces() {
 }
 
 /* Allocates memory */
-cell factor_vm::code_blocks() {
+void factor_vm::primitive_code_blocks() {
   std::vector<cell> objects;
-
   auto code_block_accumulator = [&](code_block* block, cell size) {
     objects.push_back(block->owner);
     objects.push_back(block->parameters);
@@ -215,10 +214,7 @@ cell factor_vm::code_blocks() {
     objects.push_back(entry_point);
   };
   each_code_block(code_block_accumulator);
-  return std_vector_to_array(objects);
+  ctx->push(std_vector_to_array(objects));
 }
-
-/* Allocates memory */
-void factor_vm::primitive_code_blocks() { ctx->push(code_blocks()); }
 
 }
