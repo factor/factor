@@ -15,8 +15,7 @@ TUPLE: parts in out ;
 
 : partition>class ( parts -- class )
     [ out>> [ <not-class> ] map ]
-    [ in>> <and-class> ] bi
-    prefix <and-class> ;
+    [ in>> <and-class> ] bi prefix <and-class> ;
 
 : singleton-partition ( integer non-integers -- {class,partition} )
     dupd
@@ -25,9 +24,9 @@ TUPLE: parts in out ;
     2array ;
 
 : add-out ( seq partition -- partition' )
-    [ out>> append ] [ in>> ] bi swap parts boa ;
+    [ nip in>> ] [ out>> append ] 2bi parts boa ;
 
-: intersection ( seq -- elts )
+: intersection ( seq -- elts/f )
     [ f ] [ unclip [ intersect ] reduce ] if-empty ;
 
 : meaningful-integers ( partition table -- integers )
@@ -39,27 +38,21 @@ TUPLE: parts in out ;
 
 : add-integers ( partitions classes integers -- partitions )
     class-integers '[
-        [ _ meaningful-integers ] keep add-out
+        [ _ meaningful-integers ] [ ] bi add-out
     ] map ;
 
 :: class-partitions ( classes -- assoc )
     classes [ integer? ] partition :> ( integers classes )
 
     classes powerset-partition classes integers add-integers
-    [ [ partition>class ] keep 2array ] map [ first ] filter
+    [ [ partition>class ] [ ] bi 2array ] map sift-keys
     integers [ classes singleton-partition ] map append ;
 
 : new-transitions ( transitions -- assoc ) ! assoc is class, partition
-    values [ keys ] gather
-    [ tagged-epsilon? ] reject
-    class-partitions ;
+    values [ keys ] gather [ tagged-epsilon? ] reject class-partitions ;
 
 : get-transitions ( partition state-transitions -- next-states )
     [ in>> ] dip '[ _ at ] gather sift ;
-
-: preserving-epsilon ( state-transitions quot -- new-state-transitions )
-    [ [ drop tagged-epsilon? ] assoc-filter ] bi
-    assoc-union H{ } assoc-like ; inline
 
 : disambiguate ( nfa -- nfa )
     expand-ors [
@@ -67,6 +60,8 @@ TUPLE: parts in out ;
             [
                 _ swap '[ _ get-transitions ] assoc-map
                 harvest-values
-            ] preserving-epsilon
+            ] [
+                [ drop tagged-epsilon? ] assoc-filter
+            ] bi H{ } assoc-union-as
         ] assoc-map
     ] change-transitions ;
