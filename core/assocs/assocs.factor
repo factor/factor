@@ -155,9 +155,12 @@ M: assoc values [ nip ] { } assoc>map ;
 : assoc-union! ( assoc1 assoc2 -- assoc1 )
     over [ set-at ] with-assoc assoc-each ;
 
-: assoc-union ( assoc1 assoc2 -- union )
-    [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
+: assoc-union-as ( assoc1 assoc2 exemplar -- union )
+    [ [ [ assoc-size ] bi@ + ] dip new-assoc ] 3keep drop
     [ assoc-union! ] bi@ ;
+
+: assoc-union ( assoc1 assoc2 -- union )
+    over assoc-union-as ;
 
 : assoc-combine ( seq -- union )
     H{ } clone [ assoc-union! ] reduce ;
