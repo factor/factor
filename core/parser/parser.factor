@@ -104,8 +104,11 @@ ERROR: staging-violation word ;
         V{ } clone swap execute-parsing first
     ] when ;
 
+ERROR: classoid-expected object ;
+
 : scan-class ( -- class )
-    scan-object \ f or ;
+    scan-object \ f or
+    dup classoid? [ classoid-expected ] unless ;
 
 : parse-until-step ( accum end -- accum ? )
     ?scan-datum {
