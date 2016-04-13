@@ -1,13 +1,12 @@
-USING: accessors fry ftp.server io.backend io.encodings.ascii
-io.files io.pathnames io.servers kernel tools.test urls ;
+USING: accessors fry ftp.server io.encodings.ascii io.files
+io.pathnames io.servers kernel tools.test urls ;
 FROM: ftp.client => ftp-get ;
 IN: ftp.server.tests
 
 CONSTANT: test-file-contents "Files are so boring anymore."
 
 : create-test-file ( -- path )
-    test-file-contents "ftp.server" normalize-path
-    [ ascii set-file-contents ] keep ;
+    test-file-contents "ftp.server" [ ascii set-file-contents ] keep ;
 
 : test-ftp-server ( quot: ( server path -- ) -- )
     '[
