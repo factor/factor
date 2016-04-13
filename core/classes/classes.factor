@@ -196,6 +196,7 @@ GENERIC: metaclass-changed ( use class -- )
             2bi
         ]
         [ 2drop t "class" set-word-prop ]
+        [ 2drop f "defining-class" set-word-prop ]
         [ 2drop update-map+ ]
         [ nip ?metaclass-changed ]
     } 3cleave ;
