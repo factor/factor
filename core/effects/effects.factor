@@ -128,8 +128,8 @@ M: effect clone
     pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
     [ [ "x" <array> ] bi@ ] dip <terminated-effect> ;
 
-ERROR: bad-stack-effect word expected got ;
+ERROR: bad-stack-effect word got expected ;
 
 : check-stack-effect ( word effect -- )
     over stack-effect 2dup effect=
-    [ 3drop ] [ swap bad-stack-effect ] if ;
+    [ 3drop ] [ bad-stack-effect ] if ;
