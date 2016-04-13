@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes.algebra combinators
+USING: accessors assocs classes classes.algebra combinators
 combinators.short-circuit compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.codegen compiler.crossref
@@ -141,7 +141,7 @@ M: optimizing-compiler update-call-sites ( class generic -- words )
     ! Words containing call sites with inferred type 'class'
     ! which inlined a method on 'generic'
     generic-call-sites-of keys swap '[
-        _ 2dup [ valid-classoid? ] both?
+        _ 2dup [ classoid? ] both?
         [ classes-intersect? ] [ 2drop f ] if
     ] filter ;
 

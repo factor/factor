@@ -20,8 +20,6 @@ M: maybe instance?
 M: maybe normalize-class
     maybe-class-or ;
 
-M: maybe valid-classoid? class>> valid-classoid? ;
-
 M: maybe rank-class drop 6 ;
 
 M: maybe (flatten-class)
