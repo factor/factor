@@ -246,16 +246,10 @@ M: tuple-class update-class
         [ define-tuple-prototype ]
     } cleave ;
 
-! The "defining-class" word-prop is to ensure that the tuple being
-! defined becomes a classoid as it's being parsed so that it can
-! be used as the type of its own slots.
 : define-new-tuple-class ( class superclass slots -- )
-    {
-        [ drop f f tuple-class define-class ]
-        [ nip "slots" set-word-prop ]
-        [ 2drop update-classes ]
-        [ 2drop f "defining-class" set-word-prop ]
-    } 3cleave ;
+    [ drop f f tuple-class define-class ]
+    [ nip "slots" set-word-prop ]
+    [ 2drop update-classes ] 3tri ;
 
 : subclasses ( class -- classes )
     class-usages [ tuple-class? ] filter ;
