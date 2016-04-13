@@ -62,8 +62,5 @@ M: f lol2 drop "lol22" ;
 { "lol22" } [ f lol2 ] unit-test
 [ 3 lol2 ] [ no-method? ] must-fail-with
 
-{ t } [ \ + <maybe> classoid? ] unit-test
-{ f } [ \ + <maybe> valid-classoid? ] unit-test
-
 [ "IN: classes-tests maybe{ 1 2 3 }" eval( -- ) ]
 [ error>> not-classoids? ] must-fail-with
