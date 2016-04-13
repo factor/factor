@@ -47,8 +47,7 @@ TUPLE: anonymous-complement { class read-only } ;
 INSTANCE: anonymous-complement classoid
 
 : <anonymous-complement> ( object -- classoid )
-    dup classoid? [ 1array not-classoids ] unless
-    anonymous-complement boa ;
+    check-classoid anonymous-complement boa ;
 
 M: anonymous-complement rank-class drop 3 ;
 
@@ -78,14 +77,6 @@ M: object normalize-class ;
     [ 2dup [ rank-class ] bi@ > [ swap ] when ] 2dip 2cache ; inline
 
 PRIVATE>
-
-GENERIC: valid-classoid? ( obj -- ? )
-
-M: word valid-classoid? class? ;
-M: anonymous-union valid-classoid? members>> [ valid-classoid? ] all? ;
-M: anonymous-intersection valid-classoid? participants>> [ valid-classoid? ] all? ;
-M: anonymous-complement valid-classoid? class>> valid-classoid? ;
-M: object valid-classoid? drop f ;
 
 : only-classoid? ( obj -- ? )
     dup classoid? [ class? not ] [ drop f ] if ;
