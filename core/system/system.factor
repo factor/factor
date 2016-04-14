@@ -1,7 +1,7 @@
-! copyright (c) 2007, 2010 slava pestov.
+! Copyright (c) 2007, 2010 slava pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs continuations init io kernel kernel.private make
-math.parser namespaces sequences splitting ;
+math math.parser namespaces sequences ;
 IN: system
 
 PRIMITIVE: (exit) ( n -- * )
@@ -24,12 +24,11 @@ UNION: unix macosx linux ;
 
 : vm-git-label ( -- string ) \ vm-git-label get-global ;
 
-: split-vm-git-label ( -- ref git-id )
-    vm-git-label "-" split1-last ;
+: vm-git-ref ( -- string )
+    vm-git-label CHAR: - over last-index head ;
 
-: vm-git-ref ( -- string ) split-vm-git-label drop ;
-
-: vm-git-id ( -- string ) split-vm-git-label nip ;
+: vm-git-id ( -- string )
+    vm-git-label CHAR: - over last-index 1 + tail ;
 
 : vm-compiler ( -- string ) \ vm-compiler get-global ;
 
@@ -51,20 +50,17 @@ CONSTANT: string>os-hash H{
     { "linux" linux }
 }
 
-: key-for-value ( key hash -- val )
-    >alist [ second = ] with find nip first ;
-
 : string>cpu ( str -- class )
     string>cpu-hash at ;
 
 : cpu>string ( class -- str )
-    string>cpu-hash key-for-value ;
+    string>cpu-hash value-at ;
 
 : string>os ( str -- class )
     string>os-hash at ;
 
 : os>string ( class -- str )
-    string>os-hash key-for-value ;
+    string>os-hash value-at ;
 
 PRIVATE>
 
@@ -80,7 +76,8 @@ PRIVATE>
         "Factor " % vm-version %
         " " % cpu cpu>string %
         " (" % build # ", " %
-        split-vm-git-label [ % "-" % ] [ 10 short head % ] bi* ", " %
+        vm-git-ref % "-" %
+        vm-git-id 10 short head % ", " %
         vm-compile-time % ")\n[" %
         vm-compiler % "] on " % os os>string %
     ] "" make ;
