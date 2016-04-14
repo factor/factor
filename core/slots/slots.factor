@@ -229,9 +229,7 @@ M: string make-slot
 : peel-off-class ( slot-spec array -- slot-spec array )
     dup empty? [
         dup first classoid? [
-            [ first init-slot-class ]
-            [ rest ]
-            bi
+            [ first init-slot-class ] [ rest ] bi
         ] when
     ] unless ;
 
