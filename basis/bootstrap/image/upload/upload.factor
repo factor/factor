@@ -51,7 +51,7 @@ M: windows scp-name "pscp" ;
     ] { } make try-process ;
 
 : append-build ( path -- path' )
-    vm-git-label "-" split1-last nip "." glue ;
+    vm-git-id "." glue ;
 
 : checksum-lines-append-build ( -- )
     "checksums.txt" utf8 [
