@@ -20,16 +20,22 @@ CONSTANT: test-file-contents "Files are so boring anymore."
 
 { t } [
     [
-        [ ftp-get ]
-        [ path>> file-name ascii file-contents ] bi
+        ! give client its own directory so we don't overwrite the ftp server's file
+        [
+            [ ftp-get ]
+            [ path>> file-name ascii file-contents ] bi
+        ] with-test-directory
     ] test-ftp-server test-file-contents =
 ] unit-test
 
 [
 
     [
-        "/" >>path
-        [ ftp-get ]
-        [ path>> file-name ascii file-contents ] bi
+        ! give client its own directory so we don't overwrite the ftp server's file
+        [
+            "/" >>path
+            [ ftp-get ]
+            [ path>> file-name ascii file-contents ] bi
+        ] with-test-directory
     ] test-ftp-server test-file-contents =
 ] must-fail
