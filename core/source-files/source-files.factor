@@ -9,7 +9,7 @@ IN: source-files
 SYMBOL: source-files
 
 TUPLE: source-file
-path
+{ path string }
 top-level-form
 checksum
 definitions
@@ -26,14 +26,9 @@ main ;
     new-definitions get >>definitions drop ;
 
 : <source-file> ( path -- source-file )
-    \ source-file new
-        swap >>path
-        <definitions> >>definitions ;
-
-ERROR: invalid-source-file-path path ;
+    f f <definitions> f source-file boa ;
 
 : path>source-file ( path -- source-file )
-    dup string? [ invalid-source-file-path ] unless
     source-files get [ <source-file> ] cache ;
 
 : reset-checksums ( -- )
