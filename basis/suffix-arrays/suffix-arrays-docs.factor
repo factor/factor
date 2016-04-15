@@ -19,13 +19,6 @@ HELP: suffixes
      { "suffixes-seq" "a sequence of slices" } }
 { $description "Returns a sequence of tail slices of the input string." } ;
 
-HELP: from-to
-{ $values
-     { "index" integer } { "begin" sequence } { "suffix-array" "a suffix-array" }
-     { "from/f" "an integer or f" } { "to/f" "an integer or f" } }
-{ $description "Finds the bounds of the suffix array that match the input sequence. A return value of " { $link f } " means that the endpoint is included." }
-{ $notes "Slices are [m,n) and we want (m,n) so we increment." } ;
-
 HELP: query
 { $values
      { "begin" sequence } { "suffix-array" "a suffix-array" }
