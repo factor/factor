@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings io.backend kernel memory.private sequences
-system ;
+USING: alien.strings io.backend kernel sequences system ;
 IN: memory
 
 PRIMITIVE: all-instances ( -- array )
