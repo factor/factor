@@ -192,7 +192,7 @@ DEFER: seq-delegate
 
 { t } [
     seq-delegate
-    sequence-protocol \ protocol-consult word-prop
+    sequence-protocol "protocol-consult" word-prop
     key?
 ] unit-test
 
@@ -205,7 +205,7 @@ DEFER: seq-delegate
 
 { f } [
     seq-delegate
-    sequence-protocol \ protocol-consult word-prop
+    sequence-protocol "protocol-consult" word-prop
     key?
 ] unit-test
 
