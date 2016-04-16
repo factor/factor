@@ -19,10 +19,13 @@ IN: help.stylesheet
 : font-size-heading ( -- n )
     4/3 default-font-size * >integer ;
 
+: font-size-span ( -- n )
+    13/12 default-font-size * >integer ;
+
 SYMBOL: default-span-style
 H{
     { font-name $ default-sans-serif-font-name }
-    { font-size $ default-font-size }
+    { font-size $ font-size-span }
     { font-style plain }
 } default-span-style set-global
 
