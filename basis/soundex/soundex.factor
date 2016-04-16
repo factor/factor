@@ -3,6 +3,8 @@
 USING: ascii kernel sequences tr ;
 IN: soundex
 
+<PRIVATE
+
 TR: soundex-digits
     "AEHIOUWYBFPVCGJKQSXZDTLMNR"
     "AEHIOUWY111122222222334556" ;
@@ -22,6 +24,8 @@ TR: soundex-digits
 
 : ?replace-first ( seq first -- seq )
     over first digit? [ over set-first ] [ drop ] if ;
+
+PRIVATE>
 
 : soundex ( string -- soundex )
     >upper [ LETTER? ] filter [
