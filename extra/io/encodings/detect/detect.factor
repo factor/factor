@@ -25,7 +25,7 @@ default-8bit-encoding [ latin1 ] initialize
     prolog-tag prolog-encoding name>encoding [ ascii ] unless* ;
 
 : valid-utf8? ( bytes -- ? )
-    utf8 decode 1 head-slice* replacement-char swap member? not ;
+    utf8 decode but-last-slice replacement-char swap member? not ;
 
 PRIVATE>
 
