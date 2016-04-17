@@ -18,7 +18,7 @@ ARTICLE: "lists.lazy" "Lazy lists"
 ARTICLE: { "lists.lazy" "combinators" } "Combinators for manipulating lazy lists"
 "The following combinators create lazy lists from other lazy lists:"
 { $subsections
-    lazy-map
+    lmap-lazy
     lfilter
     luntil
     lwhile
@@ -50,7 +50,7 @@ ARTICLE: { "lists.lazy" "manipulation" } "Manipulating lazy lists"
 "To make new lazy lists from old ones:"
 { $subsections
     <memoized-cons>
-    lappend
+    lappend-lazy
     lconcat
     lcartesian-product
     lcartesian-product*
@@ -82,31 +82,31 @@ HELP: <memoized-cons>
 { $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." }
 { $see-also cons car cdr nil nil? } ;
 
-{ lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
+{ lmap-lazy ltake lfilter lappend-lazy lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
-HELP: lazy-map
+HELP: lmap-lazy
 { $values { "list" "a cons object" } { "quot" { $quotation ( obj -- X ) } } { "result" "resulting cons object" } }
-{ $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map-state> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-map } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: ltake
 { $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
-{ $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-take> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-take } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lfilter
 { $values { "list" "a cons object" } { "quot" { $quotation ( -- X ) } } { "result" "resulting cons object" } }
-{ $description "Perform a similar functionality to that of the " { $link filter } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-filter> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Perform a similar functionality to that of the " { $link filter } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-filter } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lwhile
 { $values { "list" "a cons object" } { "quot" { $quotation ( x -- ? ) } } { "result" "resulting cons object" } }
-{ $description "Outputs a lazy list containing the first items in the list as long as " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link <lazy-while> } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Outputs a lazy list containing the first items in the list as long as " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: luntil
 { $values { "list" "a cons object" } { "quot" { $quotation ( x -- ? ) } } { "result" "resulting cons object" } }
-{ $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link <lazy-while> } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
-HELP: lappend
+HELP: lappend-lazy
 { $values { "list1" "a cons object" } { "list2" "a cons object" } { "result" "a lazy list of list2 appended to list1" } }
-{ $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-append> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } ;
+{ $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-append } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } ;
 
 HELP: lfrom-by
 { $values { "n" integer } { "quot" { $quotation ( n -- o ) } } { "lazy-from-by" "a lazy list of integers" } }
@@ -121,7 +121,7 @@ HELP: sequence-tail>list
 { $description "Convert the sequence into a list, starting from " { $snippet "index" } "." }
 { $see-also >list } ;
 
-{ leach foldl lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
+{ leach foldl lmap-lazy ltake lfilter lappend-lazy lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lconcat
 { $values { "list" "a list of lists" } { "result" "a list" } }

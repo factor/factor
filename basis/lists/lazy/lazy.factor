@@ -4,31 +4,27 @@ USING: accessors arrays combinators io kernel lists math
 promises quotations sequences ;
 IN: lists.lazy
 
-M: promise car ( promise -- car )
-    force car ;
+M: promise car force car ;
 
-M: promise cdr ( promise -- cdr )
-    force cdr ;
+M: promise cdr force cdr ;
 
-M: promise nil? ( cons -- ? )
-    force nil? ;
+M: promise nil? force nil? ;
 
-! Both 'car' and 'cdr' are promises
-TUPLE: lazy-cons-state car cdr ;
+TUPLE: lazy-cons-state
+    { car promise }
+    { cdr promise } ;
+
+C: <lazy-cons-state> lazy-cons-state
 
 : lazy-cons ( car cdr -- promise )
-    [ T{ promise f f t f } clone ] 2dip
-    [ <promise> ] bi@ \ lazy-cons-state boa
-    >>value ;
+    [ <promise> ] bi@ <lazy-cons-state>
+    [ f t ] dip promise boa ;
 
-M: lazy-cons-state car ( lazy-cons -- car )
-    car>> force ;
+M: lazy-cons-state car car>> force ;
 
-M: lazy-cons-state cdr ( lazy-cons -- cdr )
-    cdr>> force ;
+M: lazy-cons-state cdr cdr>> force ;
 
-M: lazy-cons-state nil? ( lazy-cons -- ? )
-    nil eq? ;
+M: lazy-cons-state nil? nil eq? ;
 
 : 1lazy-list ( a -- lazy-cons )
     [ nil ] lazy-cons ;
@@ -41,49 +37,47 @@ M: lazy-cons-state nil? ( lazy-cons -- ? )
 
 TUPLE: memoized-cons original car cdr nil? ;
 
-: not-memoized ( -- obj ) { } ;
-
-: not-memoized? ( obj -- ? ) not-memoized eq? ;
+SYMBOL: +not-memoized+
 
 : <memoized-cons> ( cons -- memoized-cons )
-    not-memoized not-memoized not-memoized
+    +not-memoized+ +not-memoized+ +not-memoized+
     memoized-cons boa ;
 
-M: memoized-cons car ( memoized-cons -- car )
-    dup car>> not-memoized? [
+M: memoized-cons car
+    dup car>> +not-memoized+ eq? [
         dup original>> car [ >>car drop ] keep
     ] [
         car>>
     ] if ;
 
-M: memoized-cons cdr ( memoized-cons -- cdr )
-    dup cdr>> not-memoized? [
+M: memoized-cons cdr
+    dup cdr>> +not-memoized+ eq? [
         dup original>> cdr [ >>cdr drop ] keep
     ] [
         cdr>>
     ] if ;
 
-M: memoized-cons nil? ( memoized-cons -- ? )
-    dup nil?>> not-memoized? [
-        dup original>> nil?  [ >>nil? drop ] keep
+M: memoized-cons nil?
+    dup nil?>> +not-memoized+ eq? [
+        dup original>> nil? [ >>nil? drop ] keep
     ] [
         nil?>>
     ] if ;
 
-TUPLE: lazy-map-state cons quot ;
+TUPLE: lazy-map cons quot ;
 
-C: <lazy-map-state> lazy-map-state
+C: <lazy-map> lazy-map
 
-: lazy-map ( list quot -- result )
-    over nil? [ 2drop nil ] [ <lazy-map-state> <memoized-cons> ] if ;
+: lmap-lazy ( list quot -- result )
+    over nil? [ 2drop nil ] [ <lazy-map> <memoized-cons> ] if ;
 
-M: lazy-map-state car ( lazy-map -- car )
+M: lazy-map car
     [ cons>> car ] [ quot>> call( old -- new ) ] bi ;
 
-M: lazy-map-state cdr ( lazy-map -- cdr )
-    [ cons>> cdr ] [ quot>> lazy-map ] bi ;
+M: lazy-map cdr
+    [ cons>> cdr ] [ quot>> lmap-lazy ] bi ;
 
-M: lazy-map-state nil? ( lazy-map -- ? )
+M: lazy-map nil?
     cons>> nil? ;
 
 TUPLE: lazy-take n cons ;
@@ -93,14 +87,13 @@ C: <lazy-take> lazy-take
 : ltake ( n list -- result )
     over zero? [ 2drop nil ] [ <lazy-take> ] if ;
 
-M: lazy-take car ( lazy-take -- car )
+M: lazy-take car
     cons>> car ;
 
-M: lazy-take cdr ( lazy-take -- cdr )
-    [ n>> 1 - ] keep
-    cons>> cdr ltake ;
+M: lazy-take cdr
+    [ n>> 1 - ] [ cons>> cdr ltake ] bi ;
 
-M: lazy-take nil? ( lazy-take -- ? )
+M: lazy-take nil?
     dup n>> zero? [ drop t ] [ cons>> nil? ] if ;
 
 TUPLE: lazy-until cons quot ;
@@ -110,15 +103,15 @@ C: <lazy-until> lazy-until
 : luntil ( list quot -- result )
     over nil? [ drop ] [ <lazy-until> ] if ;
 
-M: lazy-until car ( lazy-until -- car )
+M: lazy-until car
     cons>> car ;
 
-M: lazy-until cdr ( lazy-until -- cdr )
+M: lazy-until cdr
     [ [ cons>> cdr ] [ quot>> ] bi ]
     [ [ cons>> car ] [ quot>> ] bi call( elt -- ? ) ] bi
     [ 2drop nil ] [ luntil ] if ;
 
-M: lazy-until nil? ( lazy-until -- ? )
+M: lazy-until nil?
     drop f ;
 
 TUPLE: lazy-while cons quot ;
@@ -128,13 +121,13 @@ C: <lazy-while> lazy-while
 : lwhile ( list quot -- result )
     over nil? [ drop ] [ <lazy-while> ] if ;
 
-M: lazy-while car ( lazy-while -- car )
+M: lazy-while car
     cons>> car ;
 
-M: lazy-while cdr ( lazy-while -- cdr )
+M: lazy-while cdr
     [ cons>> cdr ] keep quot>> lwhile ;
 
-M: lazy-while nil? ( lazy-while -- ? )
+M: lazy-while nil?
     [ car ] keep quot>> call( elt -- ? ) not ;
 
 TUPLE: lazy-filter cons quot ;
@@ -144,47 +137,47 @@ C: <lazy-filter> lazy-filter
 : lfilter ( list quot -- result )
     over nil? [ 2drop nil ] [ <lazy-filter> <memoized-cons> ] if ;
 
+<PRIVATE
+
 : car-filter? ( lazy-filter -- ? )
     [ cons>> car ] [ quot>> ] bi call( elt -- ? ) ;
 
 : skip ( lazy-filter -- )
     dup cons>> cdr >>cons drop ;
 
-M: lazy-filter car ( lazy-filter -- car )
+PRIVATE>
+
+M: lazy-filter car
     dup car-filter? [ cons>> ] [ dup skip ] if car ;
 
-M: lazy-filter cdr ( lazy-filter -- cdr )
+M: lazy-filter cdr
     dup car-filter? [
         [ cons>> cdr ] [ quot>> ] bi lfilter
     ] [
         dup skip cdr
     ] if ;
 
-M: lazy-filter nil? ( lazy-filter -- ? )
-    dup cons>> nil? [
-        drop t
-    ] [
-        dup car-filter? [
-            drop f
-        ] [
-            dup skip nil?
-        ] if
-    ] if ;
+M: lazy-filter nil?
+    {
+        { [ dup cons>> nil? ] [ drop t ] }
+        { [ dup car-filter? ] [ drop f ] }
+        [ dup skip nil? ]
+    } cond ;
 
 TUPLE: lazy-append list1 list2 ;
 
 C: <lazy-append> lazy-append
 
-: lappend ( list1 list2 -- result )
+: lappend-lazy ( list1 list2 -- result )
     over nil? [ nip ] [ <lazy-append> ] if ;
 
-M: lazy-append car ( lazy-append -- car )
+M: lazy-append car
     list1>> car ;
 
-M: lazy-append cdr ( lazy-append -- cdr )
-    [ list1>> cdr ] [ list2>> ] bi lappend ;
+M: lazy-append cdr
+    [ list1>> cdr ] [ list2>> ] bi lappend-lazy ;
 
-M: lazy-append nil? ( lazy-append -- ? )
+M: lazy-append nil?
      drop f ;
 
 TUPLE: lazy-from-by n quot ;
@@ -194,14 +187,13 @@ TUPLE: lazy-from-by n quot ;
 : lfrom ( n -- list )
     [ 1 + ] lfrom-by ;
 
-M: lazy-from-by car ( lazy-from-by -- car )
+M: lazy-from-by car
     n>> ;
 
-M: lazy-from-by cdr ( lazy-from-by -- cdr )
-    [ n>> ] keep
-    quot>> [ call( old -- new ) ] keep lfrom-by ;
+M: lazy-from-by cdr
+    [ n>> ] [ quot>> ] bi [ call( old -- new ) ] keep lfrom-by ;
 
-M: lazy-from-by nil? ( lazy-from-by -- ? )
+M: lazy-from-by nil?
     drop f ;
 
 TUPLE: lazy-zip list1 list2 ;
@@ -209,17 +201,17 @@ TUPLE: lazy-zip list1 list2 ;
 C: <lazy-zip> lazy-zip
 
 : lzip ( list1 list2 -- lazy-zip )
-        over nil? over nil? or
-        [ 2drop nil ] [ <lazy-zip> ] if ;
+    over nil? over nil? or
+    [ 2drop nil ] [ <lazy-zip> ] if ;
 
-M: lazy-zip car ( lazy-zip -- car )
-        [ list1>> car ] keep list2>> car 2array ;
+M: lazy-zip car
+    [ list1>> car ] keep list2>> car 2array ;
 
-M: lazy-zip cdr ( lazy-zip -- cdr )
-        [ list1>> cdr ] keep list2>> cdr lzip ;
+M: lazy-zip cdr
+    [ list1>> cdr ] keep list2>> cdr lzip ;
 
-M: lazy-zip nil? ( lazy-zip -- ? )
-        drop f ;
+M: lazy-zip nil?
+    drop f ;
 
 TUPLE: sequence-cons index seq ;
 
@@ -232,13 +224,13 @@ C: <sequence-cons> sequence-cons
         <sequence-cons>
     ] if ;
 
-M: sequence-cons car ( sequence-cons -- car )
+M: sequence-cons car
     [ index>> ] [ seq>> nth ] bi ;
 
-M: sequence-cons cdr ( sequence-cons -- cdr )
+M: sequence-cons cdr
     [ index>> 1 + ] [ seq>> sequence-tail>list ] bi ;
 
-M: sequence-cons nil? ( sequence-cons -- ? )
+M: sequence-cons nil?
     drop f ;
 
 M: sequence >list 0 swap sequence-tail>list ;
@@ -255,17 +247,17 @@ DEFER: lconcat
 : lconcat ( list -- result )
     dup nil? [ drop nil ] [ uncons (lconcat) ] if ;
 
-M: lazy-concat car ( lazy-concat -- car )
+M: lazy-concat car
     car>> car ;
 
-M: lazy-concat cdr ( lazy-concat -- cdr )
+M: lazy-concat cdr
     [ car>> cdr ] keep cdr>> (lconcat) ;
 
-M: lazy-concat nil? ( lazy-concat -- ? )
+M: lazy-concat nil?
     dup car>> nil? [ cdr>> nil?  ] [ drop f ] if ;
 
 : lcartesian-product ( list1 list2 -- result )
-    swap [ swap [ 2array ] with lazy-map  ] with lazy-map  lconcat ;
+    swap [ swap [ 2array ] with lmap-lazy  ] with lmap-lazy lconcat ;
 
 : lcartesian-product* ( lists -- result )
     dup nil? [
@@ -274,15 +266,15 @@ M: lazy-concat nil? ( lazy-concat -- ? )
         uncons
         [ car lcartesian-product ] [ cdr ] bi
         list>array swap [
-            swap [ swap [ suffix ] with lazy-map  ] with lazy-map  lconcat
+            swap [ swap [ suffix ] with lmap-lazy ] with lmap-lazy lconcat
         ] reduce
     ] if ;
 
 : lcomp ( list quot -- result )
-    [ lcartesian-product* ] dip lazy-map ;
+    [ lcartesian-product* ] dip lmap-lazy ;
 
 : lcomp* ( list guards quot -- result )
-    [ [ lcartesian-product* ] dip [ lfilter ] each ] dip lazy-map ;
+    [ [ lcartesian-product* ] dip [ lfilter ] each ] dip lmap-lazy ;
 
 DEFER: lmerge
 
@@ -312,7 +304,7 @@ C: <lazy-io> lazy-io
 : llines ( stream -- result )
     f f [ stream-readln ] <lazy-io> ;
 
-M: lazy-io car ( lazy-io -- car )
+M: lazy-io car
     dup car>> [
         nip
     ] [
@@ -320,21 +312,19 @@ M: lazy-io car ( lazy-io -- car )
         call( stream -- value ) [ >>car ] [ drop nil ] if*
     ] if* ;
 
-M: lazy-io cdr ( lazy-io -- cdr )
+M: lazy-io cdr
     dup cdr>> dup [
         nip
     ] [
-        drop dup
-        [ stream>> ]
-        [ quot>> ]
-        [ car ] tri [
+        drop dup [ stream>> ] [ quot>> ] [ car ] tri
+        [
             [ f f ] dip <lazy-io> [ >>cdr drop ] keep
         ] [
             3drop nil
         ] if
     ] if ;
 
-M: lazy-io nil? ( lazy-io -- ? )
+M: lazy-io nil?
     car nil? ;
 
 INSTANCE: sequence-cons list
@@ -343,7 +333,7 @@ INSTANCE: promise list
 INSTANCE: lazy-io list
 INSTANCE: lazy-concat list
 INSTANCE: lazy-cons-state list
-INSTANCE: lazy-map-state list
+INSTANCE: lazy-map list
 INSTANCE: lazy-take list
 INSTANCE: lazy-append list
 INSTANCE: lazy-from-by list

@@ -42,7 +42,7 @@ M: object nil? drop f ;
 
 : cadr ( list -- elt ) cdr car ; inline
 
-: 2car ( list -- car caar ) [ car ] [ cadr ] bi ; inline
+: 2car ( list -- car cadr ) [ car ] [ cadr ] bi ; inline
 
 : 3car ( list -- car cadr caddr ) [ car ] [ cadr ] [ cdr cadr ] tri ; inline
 
