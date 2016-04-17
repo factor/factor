@@ -25,7 +25,7 @@ IN: lists.lazy.tests
 ] unit-test
 
 { { 4 5 6 } } [
-    3 { 1 2 3 } >list [ + ] with lazy-map list>array
+    3 { 1 2 3 } >list [ + ] with lmap-lazy list>array
 ] unit-test
 
 { { 1 2 4 8 16 } } [

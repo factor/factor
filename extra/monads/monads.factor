@@ -127,7 +127,7 @@ M: list-monad fail   2drop nil ;
 
 M: list monad-of drop list-monad ;
 
-M: list >>= '[ _ swap lazy-map lconcat ] ;
+M: list >>= '[ _ swap lmap-lazy lconcat ] ;
 
 ! State
 SINGLETON: state-monad
