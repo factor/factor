@@ -168,33 +168,22 @@ PRIVATE>
 : secure-protocol? ( protocol -- ? )
     "https" = ;
 
-<PRIVATE
-
-GENERIC# >secure-addr 1 ( addrspec host -- addrspec' )
-
-PRIVATE>
-
 : url-addr ( url -- addr )
     [
         [ host>> ]
         [ port>> ]
         [ protocol>> protocol-port ]
         tri or <inet>
-    ]
-    [ host>> ]
-    [ protocol>> ] tri
-    secure-protocol? [ >secure-addr ] [ drop ] if ;
+    ] [
+        dup protocol>> secure-protocol?
+        [ host>> <secure> ] [ drop ] if
+    ] bi ;
 
 : set-url-addr ( url addr -- url )
     [ host>> >>host ] [ port>> >>port ] bi ;
 
 : ensure-port ( url -- url' )
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
-
-! Secure sockets
-UNION: abstract-inet inet inet4 inet6 ;
-
-M: abstract-inet >secure-addr <secure> ;
 
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
