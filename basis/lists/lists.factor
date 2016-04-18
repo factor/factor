@@ -42,9 +42,9 @@ M: object nil? drop f ;
 
 : cadr ( list -- elt ) cdr car ; inline
 
-: 2car ( list -- car cadr ) [ car ] [ cadr ] bi ; inline
+: 2car ( list -- car cadr ) uncons car ; inline
 
-: 3car ( list -- car cadr caddr ) [ car ] [ cadr ] [ cdr cadr ] tri ; inline
+: 3car ( list -- car cadr caddr ) uncons uncons car ; inline
 
 : lnth ( n list -- elt ) swap [ cdr ] times car ; inline
 
@@ -62,7 +62,9 @@ PRIVATE>
     swapd leach ; inline
 
 :: foldr ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
-    list nil? [ identity ] [
+    list nil? [
+        identity
+    ] [
         list cdr identity quot foldr
         list car quot call
     ] if ; inline recursive
@@ -80,9 +82,7 @@ PRIVATE>
     [ lreverse ] dip [ swons ] foldl ;
 
 : lcut ( list index -- before after )
-    [ nil ] dip
-    [ [ unswons ] dip cons ] times
-    lreverse swap ;
+    [ nil ] dip [ [ unswons ] dip cons ] times lreverse swap ;
 
 : sequence>list ( sequence -- list )
     <reversed> nil [ swons ] reduce ;

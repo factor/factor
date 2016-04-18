@@ -17,11 +17,11 @@ IN: lists.lazy.tests
 ] unit-test
 
 { { 5 6 6 7 7 8 } } [
-  { 1 2 3 } >list { 4 5 } >list 2list [ first2 + ] lcomp list>array
+  { 1 2 3 } >list { 4 5 } >list 2list [ + ] lcartesian-map list>array
 ] unit-test
 
 { { 5 6 7 8 } } [
-  { 1 2 3 } >list { 4 5 } >list 2list { [ first odd? ] } [ first2 + ] lcomp* list>array
+  { 1 2 3 } >list { 4 5 } >list 2list { [ drop odd? ] } [ + ] lcartesian-map* list>array
 ] unit-test
 
 { { 4 5 6 } } [
