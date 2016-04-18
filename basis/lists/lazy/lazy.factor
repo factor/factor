@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators io kernel lists math
+USING: accessors arrays combinators io kernel lists locals math
 promises quotations sequences ;
 IN: lists.lazy
 
@@ -10,9 +10,7 @@ M: promise cdr force cdr ;
 
 M: promise nil? force nil? ;
 
-TUPLE: lazy-cons-state
-    { car promise }
-    { cdr promise } ;
+TUPLE: lazy-cons-state { car promise } { cdr promise } ;
 
 C: <lazy-cons-state> lazy-cons-state
 
@@ -24,7 +22,7 @@ M: lazy-cons-state car car>> force ;
 
 M: lazy-cons-state cdr cdr>> force ;
 
-M: lazy-cons-state nil? nil eq? ;
+M: lazy-cons-state nil? car nil? ;
 
 : 1lazy-list ( a -- lazy-cons )
     [ nil ] lazy-cons ;
@@ -100,7 +98,7 @@ TUPLE: lazy-until cons quot ;
 
 C: <lazy-until> lazy-until
 
-: luntil ( list quot -- result )
+: luntil ( list quot: ( elt -- ? ) -- result )
     over nil? [ drop ] [ <lazy-until> ] if ;
 
 M: lazy-until car
@@ -118,7 +116,7 @@ TUPLE: lazy-while cons quot ;
 
 C: <lazy-while> lazy-while
 
-: lwhile ( list quot -- result )
+: lwhile ( list quot: ( elt -- ? ) -- result )
     over nil? [ drop ] [ <lazy-while> ] if ;
 
 M: lazy-while car
@@ -134,34 +132,34 @@ TUPLE: lazy-filter cons quot ;
 
 C: <lazy-filter> lazy-filter
 
-: lfilter ( list quot -- result )
+: lfilter ( list quot: ( elt -- ? ) -- result )
     over nil? [ 2drop nil ] [ <lazy-filter> <memoized-cons> ] if ;
 
 <PRIVATE
 
-: car-filter? ( lazy-filter -- ? )
+: car-filtered? ( lazy-filter -- ? )
     [ cons>> car ] [ quot>> ] bi call( elt -- ? ) ;
 
-: skip ( lazy-filter -- )
-    dup cons>> cdr >>cons drop ;
+: skip ( lazy-filter -- lazy-filter )
+    [ cdr ] change-cons ;
 
 PRIVATE>
 
 M: lazy-filter car
-    dup car-filter? [ cons>> ] [ dup skip ] if car ;
+    dup car-filtered? [ cons>> ] [ skip ] if car ;
 
 M: lazy-filter cdr
-    dup car-filter? [
+    dup car-filtered? [
         [ cons>> cdr ] [ quot>> ] bi lfilter
     ] [
-        dup skip cdr
+        skip cdr
     ] if ;
 
 M: lazy-filter nil?
     {
         { [ dup cons>> nil? ] [ drop t ] }
-        { [ dup car-filter? ] [ drop f ] }
-        [ dup skip nil? ]
+        { [ dup car-filtered? ] [ drop f ] }
+        [ skip nil? ]
     } cond ;
 
 TUPLE: lazy-append list1 list2 ;
@@ -182,9 +180,9 @@ M: lazy-append nil?
 
 TUPLE: lazy-from-by n quot ;
 
-: lfrom-by ( n quot: ( n -- o ) -- lazy-from-by ) lazy-from-by boa ; inline
+: lfrom-by ( n quot: ( n -- o ) -- result ) lazy-from-by boa ; inline
 
-: lfrom ( n -- list )
+: lfrom ( n -- result )
     [ 1 + ] lfrom-by ;
 
 M: lazy-from-by car
@@ -200,8 +198,8 @@ TUPLE: lazy-zip list1 list2 ;
 
 C: <lazy-zip> lazy-zip
 
-: lzip ( list1 list2 -- lazy-zip )
-    over nil? over nil? or
+: lzip ( list1 list2 -- result )
+    2dup [ nil? ] either?
     [ 2drop nil ] [ <lazy-zip> ] if ;
 
 M: lazy-zip car
@@ -241,8 +239,12 @@ C: <lazy-concat> lazy-concat
 
 DEFER: lconcat
 
+<PRIVATE
+
 : (lconcat) ( car cdr -- list )
     over nil? [ nip lconcat ] [ <lazy-concat> ] if ;
+
+PRIVATE>
 
 : lconcat ( list -- result )
     dup nil? [ drop nil ] [ uncons (lconcat) ] if ;
@@ -257,7 +259,7 @@ M: lazy-concat nil?
     dup car>> nil? [ cdr>> nil?  ] [ drop f ] if ;
 
 : lcartesian-product ( list1 list2 -- result )
-    swap [ swap [ 2array ] with lmap-lazy  ] with lmap-lazy lconcat ;
+    swap [ swap [ 2array ] with lmap-lazy ] with lmap-lazy lconcat ;
 
 : lcartesian-product* ( lists -- result )
     dup nil? [
@@ -270,28 +272,32 @@ M: lazy-concat nil?
         ] reduce
     ] if ;
 
-: lcomp ( list quot -- result )
-    [ lcartesian-product* ] dip lmap-lazy ;
+: lcartesian-map ( list quot: ( elt1 elt2 -- newelt ) -- result )
+    [ lcartesian-product* ] dip [ first2 ] prepose lmap-lazy ;
 
-: lcomp* ( list guards quot -- result )
+: lcartesian-map* ( list guards quot: ( elt1 elt2 -- newelt ) -- result )
+    [ [ [ first2 ] prepose ] map ] [ [ first2 ] prepose ] bi*
     [ [ lcartesian-product* ] dip [ lfilter ] each ] dip lmap-lazy ;
 
 DEFER: lmerge
 
-: (lmerge) ( list1 list2 -- result )
-    over [ car ] curry -rot
+<PRIVATE
+
+:: (lmerge) ( list1 list2 -- result )
+    [ list1 car ]
     [
-        dup [ car ] curry -rot
-        [
-            [ cdr ] bi@ lmerge
-        ] 2curry lazy-cons
-    ] 2curry lazy-cons ;
+        [ list2 car ]
+        [ list1 cdr list2 cdr lmerge ]
+        lazy-cons
+    ] lazy-cons ;
+
+PRIVATE>
 
 : lmerge ( list1 list2 -- result )
     {
         { [ over nil? ] [ nip ] }
         { [ dup nil? ] [ drop ] }
-        { [ t ] [ (lmerge) ] }
+        [ (lmerge) ]
     } cond ;
 
 TUPLE: lazy-io stream car cdr quot ;
@@ -308,7 +314,7 @@ M: lazy-io car
     dup car>> [
         nip
     ] [
-        [ ] [ stream>> ] [ quot>> ] tri
+        dup [ stream>> ] [ quot>> ] bi
         call( stream -- value ) [ >>car ] [ drop nil ] if*
     ] if* ;
 

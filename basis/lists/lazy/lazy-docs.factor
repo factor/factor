@@ -23,8 +23,8 @@ ARTICLE: { "lists.lazy" "combinators" } "Combinators for manipulating lazy lists
     luntil
     lwhile
     lfrom-by
-    lcomp
-    lcomp*
+    lcartesian-map
+    lcartesian-map*
 } ;
 
 ARTICLE: { "lists.lazy" "io" } "Lazy list I/O"
@@ -82,7 +82,7 @@ HELP: <memoized-cons>
 { $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." }
 { $see-also cons car cdr nil nil? } ;
 
-{ lmap-lazy ltake lfilter lappend-lazy lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
+{ lmap-lazy ltake lfilter lappend-lazy lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcartesian-map lcartesian-map* lmerge lwhile luntil } related-words
 
 HELP: lmap-lazy
 { $values { "list" "a cons object" } { "quot" { $quotation ( obj -- X ) } } { "result" "resulting cons object" } }
@@ -93,15 +93,15 @@ HELP: ltake
 { $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-take } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lfilter
-{ $values { "list" "a cons object" } { "quot" { $quotation ( -- X ) } } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation ( elt -- ? ) } } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link filter } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-filter } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lwhile
-{ $values { "list" "a cons object" } { "quot" { $quotation ( x -- ? ) } } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation ( elt -- ? ) } } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first items in the list as long as " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: luntil
-{ $values { "list" "a cons object" } { "quot" { $quotation ( x -- ? ) } } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation ( elt -- ? ) } } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lappend-lazy
@@ -121,7 +121,7 @@ HELP: sequence-tail>list
 { $description "Convert the sequence into a list, starting from " { $snippet "index" } "." }
 { $see-also >list } ;
 
-{ leach foldl lmap-lazy ltake lfilter lappend-lazy lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
+{ leach foldl lmap-lazy ltake lfilter lappend-lazy lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcartesian-map lcartesian-map* lmerge lwhile luntil } related-words
 
 HELP: lconcat
 { $values { "list" "a list of lists" } { "result" "a list" } }
@@ -135,15 +135,15 @@ HELP: lcartesian-product*
 { $values { "lists" "a list of lists" } { "result" "list of cartesian products" } }
 { $description "Given a list of lists, return a list containing the cartesian product of those lists." } ;
 
-HELP: lcomp
-{ $values { "list" "a list of lists" } { "quot" { $quotation ( seq -- X ) } } { "result" "the resulting list" } }
+HELP: lcartesian-map
+{ $values { "list" "a list of lists" } { "quot" { $quotation ( elt1 elt2 -- newelt ) } } { "result" "the resulting list" } }
 { $description "Get the cartesian product of the lists in " { $snippet "list" } " and call " { $snippet "quot" } " call with each element from the cartesian product on the stack, the result of which is returned in the final " { $snippet "list" } "." } ;
 
-HELP: lcomp*
-{ $values { "list" "a list of lists" } { "guards" "a sequence of quotations with stack effect ( seq -- bool )" } { "quot" { $quotation ( seq -- X ) } } { "result" "a list" } }
+HELP: lcartesian-map*
+{ $values { "list" "a list of lists" } { "guards" "a sequence of quotations with stack effect ( elt1 elt2 -- ? )" } { "quot" { $quotation ( elt1 elt2 -- newelt ) } } { "result" "a list" } }
 { $description "Get the cartesian product of the lists in " { $snippet "list" } ", filter it by applying each guard quotation to it and call " { $snippet "quot" } " call with each element from the remaining cartesian product items on the stack, the result of which is returned in the final " { $snippet "list" } "." }
 { $examples
-  { $code "{ 1 2 3 } >list { 4 5 6 } >list 2list { [ first odd? ] } [ first2 + ] lcomp*" }
+  { $code "{ 1 2 3 } >list { 4 5 6 } >list 2list { [ drop odd? ] } [ + ] lcartesian-map*" }
 } ;
 
 HELP: lmerge
