@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings kernel sequences io simple-flat-file sets math
-combinators.short-circuit io.binary arrays assocs namespaces
-locals accessors combinators biassocs byte-arrays parser literals ;
+USING: accessors assocs biassocs byte-arrays combinators
+combinators.short-circuit io io.binary io.encodings kernel
+literals locals math namespaces sequences simple-flat-file ;
 IN: io.encodings.iso2022
 
 SINGLETON: iso2022
@@ -18,7 +18,7 @@ SYMBOL: jis212
 "vocab:io/encodings/iso2022/212.txt" flat-file>biassoc jis212 set-global
 
 SYMBOL: ascii
-128 iota unique >biassoc ascii set-global
+128 iota dup zip >biassoc ascii set-global
 
 TUPLE: iso2022-state type ;
 
