@@ -1,9 +1,8 @@
 ! Copyright © 2008 Reginald Keith Ford II
 ! 24, the Factor game!
-
-USING: accessors backtrack continuations io kernel math
-math.parser prettyprint quotations random sequences shuffle ;
-
+USING: accessors backtrack combinators continuations io kernel
+math math.parser prettyprint quotations random sequences shuffle
+;
 IN: 24-game
 
 : nop ( -- ) ;
@@ -54,20 +53,22 @@ CONSTANT: (operators) { + - * / rot swap q }
     bi ;
 
 : end-game ( array -- )
-    dup { 24 } =
-    [ drop "You WON!" ]
-    [ first number>string " is not 24... You lose." append ]
-    if print ;
+    dup { 24 } = [
+        drop "You WON!"
+    ] [
+        first number>string " is not 24... You lose." append
+    ] if print ;
 
-: (24-game) ( array -- )
-    dup length 1 =
-    [ end-game ] [
-        dup last "quit" =
-        [ drop "you're a quitter" print ]
-        [ try-operator (24-game) ]
-        if
-    ] if ;
+: quit-game ( array -- )
+    drop "you're a quitter" print ;
 
-: 24-game ( -- ) make-24 (24-game) ;
+: play-24 ( array -- )
+    {
+        { [ dup length 1 = ] [ end-game ] }
+        { [ dup last "quit" = ] [ quit-game ] }
+        [ try-operator play-24 ]
+    } cond ;
+
+: 24-game ( -- ) make-24 play-24 ;
 
 MAIN: 24-game
