@@ -14,7 +14,7 @@ HELP: >rgba
 ARTICLE: "colors.protocol" "Color protocol"
 "Abstract superclass for colors:"
 { $subsections color }
-"All color objects must are required to implement a method on the " { $link >rgba } " generic word."
+"All color objects are required to implement a method on the " { $link >rgba } " generic word."
 $nl
 "Optionally, they can provide methods on the accessors " { $link red>> } ", " { $link green>> } ", " { $link blue>> } " and " { $link alpha>> } ", either by defining slots with the appropriate names, or with methods which calculate the color component values. The accessors should return color components which are real numbers in the range between 0 and 1."
 $nl
