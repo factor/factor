@@ -9,5 +9,5 @@ IN: ctags.tests
 
 { t } [
   "if\t" "resource:extra/unix/unix.factor" normalize-path "\t91" 3append 1array
-  { { if { "resource:extra/unix/unix.factor" 91 } } } ctags =
+  { { if { "resource:extra/unix/unix.factor" 91 } } } make-ctags =
 ] unit-test
