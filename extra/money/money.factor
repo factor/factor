@@ -7,8 +7,6 @@ IN: money
 SYMBOL: currency-token
 CHAR: $ currency-token set-global
 
-<PRIVATE
-
 : dollars/cents ( dollars -- dollars cents )
     100 * 100 /mod round ;
 
@@ -17,16 +15,12 @@ CHAR: $ currency-token set-global
     [ <reversed> 3 group "," join <reversed> ]
     [ 2 CHAR: 0 pad-head ] bi* "." glue ;
 
-PRIVATE>
-
 : money>string ( number -- string )
     dollars/cents format-money currency-token get prefix ;
 
 : money. ( number -- ) money>string print ;
 
 ERROR: not-an-integer x ;
-
-<PRIVATE
 
 : split-decimal ( str -- neg? dollars cents )
     "." split1 [ "-" ?head swap ] dip ;
@@ -36,7 +30,5 @@ ERROR: not-an-integer x ;
     [
         [ dup string>number [ nip ] [ not-an-integer ] if* ] bi@
     ] keep length 10^ / + swap [ neg ] when ;
-
-PRIVATE>
 
 SYNTAX: DECIMAL: scan-token parse-decimal suffix! ;
