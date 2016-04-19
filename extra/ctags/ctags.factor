@@ -20,13 +20,13 @@ IN: ctags
         [ number>string % ] tri*
     ] "" make ;
 
-: ctags ( alist -- seq )
+: make-ctags ( alist -- seq )
     [ first2 ctag ] { } assoc>map ;
 
 PRIVATE>
 
-: make-ctags ( -- ctags )
-    all-words locations sort-keys ctags ;
+: ctags ( -- ctags )
+    all-words locations sort-keys make-ctags ;
 
 : write-ctags ( path -- )
-    [ make-ctags ] dip ascii set-file-lines ;
+    [ ctags ] dip ascii set-file-lines ;
