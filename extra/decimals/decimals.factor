@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit kernel lexer math
-math.functions math.parser parser sequences splitting
-locals math.order ;
+USING: accessors combinators.short-circuit kernel lexer locals
+math math.functions math.order math.parser sequences splitting ;
 IN: decimals
 
 TUPLE: decimal { mantissa read-only } { exponent read-only } ;
 
-: <decimal> ( mantissa exponent -- decimal ) decimal boa ;
+C: <decimal> decimal
 
 : >decimal< ( decimal -- mantissa exponent )
     [ mantissa>> ] [ exponent>> ] bi ; inline
@@ -23,6 +22,7 @@ TUPLE: decimal { mantissa read-only } { exponent read-only } ;
 SYNTAX: DECIMAL: parse-decimal suffix! ;
 
 : decimal>ratio ( decimal -- ratio ) >decimal< 10^ * ;
+
 : decimal>float ( decimal -- ratio ) decimal>ratio >float ;
 
 : scale-mantissas ( D1 D2 -- m1 m2 exp )
@@ -42,8 +42,7 @@ SYNTAX: DECIMAL: parse-decimal suffix! ;
 ERROR: decimal-types-expected d1 d2 ;
 
 : guard-decimals ( obj1 obj2 -- D1 D2 )
-    2dup [ decimal? ] both?
-    [ decimal-types-expected ] unless ;
+    2dup [ decimal? ] both? [ decimal-types-expected ] unless ;
 
 M: decimal equal?
     {
@@ -58,8 +57,7 @@ M: decimal equal?
     } 2&& ;
 
 M: decimal before?
-    guard-decimals scale-decimals
-    [ mantissa>> ] bi@ < ;
+    guard-decimals scale-decimals [ mantissa>> ] bi@ < ;
 
 : D-abs ( D -- D' )
     [ mantissa>> abs ] [ exponent>> ] bi <decimal> ;
@@ -74,9 +72,7 @@ M: decimal before?
     guard-decimals [ >decimal< ] bi@ swapd + [ * ] dip <decimal> ;
 
 :: D/ ( D1 D2 a -- D3 )
-    D1 D2 guard-decimals 2drop
-    D1 >decimal< :> ( m1 e1 )
-    D2 >decimal< :> ( m2 e2 )
+    D1 D2 guard-decimals [ >decimal< ] bi@ :> ( m1 e1 m2 e2 )
     m1 a 10^ *
     m2 /i
 
