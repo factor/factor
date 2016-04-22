@@ -10,10 +10,6 @@ HELP: ##alien-invoke
   "An instruction for calling a function in a dynamically linked library. It has the following slots:"
   { $table
     {
-        { $slot "gc-map" }
-        { "If the invoked c-function calls Factor code which triggers a gc, then a " { $link gc-map } " might be necessary." }
-    }
-    {
         { $slot "reg-inputs" }
         { "Registers to use for the arguments to the function call. Each sequence item is a 3-tuple consisting of a " { $link spill-slot } ", register representation and a register." }
     }
@@ -25,10 +21,14 @@ HELP: ##alien-invoke
         { $slot "reg-outputs" }
         { "If the called function returns a value, then this slot is a one-element sequence containing a 3-tuple describing which register is used for the return value." }
     }
+    {
+        { $slot "gc-map" }
+        { "If the invoked C function calls Factor code which triggers a GC, then a " { $link gc-map } " is necessary to find the roots." }
+    }
     { { $slot "symbols" } { "Name of the function to call." } }
-    { { $slot "dll" } { "A dll handle." } }
+    { { $slot "dll" } { "A dll handle or " { $link f } "." } }
   }
-  "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } " but on " { $link x86.64 } " the first six arguments are passed in registers and only then is the stack used."
+  "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } ", in " { $link x86.64 } " the first six arguments are passed in registers and then stack parameters are used for the remainder."
 }
 { $see-also %alien-invoke } ;
 
@@ -42,6 +42,11 @@ HELP: ##allot
     { { $slot "temp" } { "Temporary register to clobber." } }
   }
 } ;
+
+HELP: ##box
+{ $class-description
+  "This instruction boxes a value into a tagged pointer."
+} { $see-also %box } ;
 
 HELP: ##box-alien
 { $class-description
@@ -220,10 +225,9 @@ HELP: ##set-slot-imm
     { { $slot "slot" } { "Slot index." } }
     { { $slot "tag" } { "Type tag for obj." } }
   }
-} ;
+}
+{ $see-also ##set-slot %set-slot-imm } ;
 
-{ ##set-slot %set-slot } related-words
-{ ##set-slot-imm %set-slot-imm } related-words
 { ##set-slot-imm ##set-slot } related-words
 
 HELP: ##single>double-float
