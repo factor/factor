@@ -67,7 +67,7 @@ struct startup_fixup {
   cell size(code_block* compiled) { return compiled->size(*this); }
 };
 
-void factor_vm::fixup_data(cell data_offset, cell code_offset) {
+void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
   startup_fixup fixup(data_offset, code_offset);
   slot_visitor<startup_fixup> visitor(this, fixup);
   visitor.visit_all_roots();
@@ -77,9 +77,7 @@ void factor_vm::fixup_data(cell data_offset, cell code_offset) {
     visitor.visit_slots(obj);
     switch (obj->type()) {
       case ALIEN_TYPE: {
-
         alien* ptr = (alien*)obj;
-
         if (to_boolean(ptr->base))
           ptr->update_address();
         else
@@ -97,12 +95,8 @@ void factor_vm::fixup_data(cell data_offset, cell code_offset) {
     }
   };
   data->tenured->iterate(start_object_updater, fixup);
-}
 
-void factor_vm::fixup_code(cell data_offset, cell code_offset) {
-  startup_fixup fixup(data_offset, code_offset);
   auto updater = [&](code_block* compiled, cell size) {
-    slot_visitor<startup_fixup> visitor(this, fixup);
     visitor.visit_code_block_objects(compiled);
     cell rel_base = compiled->entry_point() - fixup.code_offset;
     visitor.visit_instruction_operands(compiled, rel_base);
@@ -178,9 +172,7 @@ void factor_vm::load_image(vm_parameters* p) {
 
   cell data_offset = data->tenured->start - h.data_relocation_base;
   cell code_offset = code->allocator->start - h.code_relocation_base;
-
-  fixup_data(data_offset, code_offset);
-  fixup_code(data_offset, code_offset);
+  fixup_heaps(data_offset, code_offset);
 
   /* Store image path name */
   special_objects[OBJ_IMAGE] = allot_alien(false_object, (cell)p->image_path);

@@ -107,7 +107,7 @@ struct factor_vm {
   /* Set if we're in the jit */
   volatile fixnum current_jit_count;
 
-  /* Mark stack */
+  /* Mark stack used for mark & sweep GC */
   std::vector<cell> mark_stack;
 
   /* If not NULL, we push GC events here */
@@ -604,8 +604,7 @@ struct factor_vm {
   void load_code_heap(FILE* file, image_header* h, vm_parameters* p);
   bool save_image(const vm_char* saving_filename, const vm_char* filename);
   void primitive_save_image();
-  void fixup_data(cell data_offset, cell code_offset);
-  void fixup_code(cell data_offset, cell code_offset);
+  void fixup_heaps(cell data_offset, cell code_offset);
   FILE* open_image(vm_parameters* p);
   void load_image(vm_parameters* p);
   bool read_embedded_image_footer(FILE* file, embedded_image_footer* footer);
