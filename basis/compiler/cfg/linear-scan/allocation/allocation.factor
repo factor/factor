@@ -25,12 +25,9 @@ IN: compiler.cfg.linear-scan.allocation
         [ inactive-positions ] [ active-positions ] 2bi
     ] keep alist-max ;
 
-: no-free-registers? ( result -- ? )
-    second 0 = ; inline
-
 : assign-register ( new registers -- )
     dupd register-status {
-        { [ dup no-free-registers? ] [ drop assign-blocked-register ] }
+        { [ dup second 0 = ] [ drop assign-blocked-register ] }
         { [ 2dup register-available? ] [ register-available ] }
         [ drop assign-blocked-register ]
     } cond ;
