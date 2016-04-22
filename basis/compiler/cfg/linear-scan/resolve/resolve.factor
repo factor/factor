@@ -10,9 +10,9 @@ kernel locals make namespaces sequences ;
 IN: compiler.cfg.linear-scan.resolve
 
 TUPLE: location
-{ reg read-only }
-{ rep read-only }
-{ reg-class read-only } ;
+    { reg read-only }
+    { rep read-only }
+    { reg-class read-only } ;
 
 : <location> ( reg rep -- location )
     dup reg-class-of location boa ;
