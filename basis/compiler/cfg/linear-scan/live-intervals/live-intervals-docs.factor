@@ -32,9 +32,6 @@ HELP: compute-live-intervals
 { $description "Computes the live intervals and sync points of a cfg." }
 { $notes "The instructions must be numbered." } ;
 
-HELP: hairy-clobber-insn
-{ $class-description "Instructions that clobber registers. They receive inputs and  produce outputs in spill slots." } ;
-
 HELP: find-use
 { $values
   { "insn#" integer }
@@ -49,6 +46,13 @@ HELP: finish-live-interval
 
 HELP: from
 { $var-description "An integer representing a sequence number one lower than all numbers in the currently processed block." } ;
+
+HELP: hairy-clobber-insn
+{ $class-description "Instructions that clobber registers. They receive inputs and produce outputs in spill slots." } ;
+
+HELP: insn>sync-point
+{ $values { "insn" insn } { "sync-point/f" { $maybe sync-point } } }
+{ $description "If the instruction clobbers arbitrary registers, then a sync point for it is emitted. Most instructions don't so then " { $link f } " is returned instead." } ;
 
 HELP: intervals-intersect?
 { $values
@@ -127,6 +131,11 @@ $nl
   record-def
   record-use
   record-temp
+}
+"Sync point handling:"
+{ $subsections
+  cfg>sync-points
+  insn>sync-point
 } ;
 
 

@@ -1,6 +1,7 @@
 USING: compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.stack-frame compiler.tree help.markup help.syntax kernel
-math namespaces sequences vectors words ;
+compiler.cfg.stack-frame compiler.tree cpu.x86.assembler.operands
+help.markup help.syntax kernel math namespaces sequences vectors words
+;
 IN: compiler.cfg
 
 HELP: basic-block
@@ -33,7 +34,7 @@ HELP: cfg
     { { $slot "word" } { "The " { $link word } " the cfg is produced from." } }
     { { $slot "post-order" } { "The blocks of the cfg in a post order traversal " { $link sequence } "." } }
     { { $slot "stack-frame" } { { $link stack-frame } " of the cfg." } }
-    { { $slot "frame-pointer?" } { "Whether the cfg needs a frame pointer. Only cfgs generated for " { $link #alien-callback } " nodes does need it." } }
+    { { $slot "frame-pointer?" } { "Whether the cfg needs a frame pointer. Only cfgs generated for " { $link #alien-callback } " nodes does need it. If the slot is " { $link t } ", then the frame pointer register (" { $link RBP } " on x86.64 archs) will not be clobbered by register allocation. See " { $vocab-link "compiler.cfg.linear-scan" } " for details." } }
   }
 }
 { $see-also <cfg> post-order } ;
