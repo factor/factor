@@ -1,10 +1,9 @@
-USING: arrays byte-arrays compiler.cfg.gc-checks
-compiler.cfg.gc-checks.private compiler.cfg.debugger
-compiler.cfg.registers compiler.cfg.instructions compiler.cfg
-compiler.cfg.predecessors compiler.cfg.rpo cpu.architecture
-tools.test kernel vectors namespaces accessors sequences alien
-memory classes make combinators.short-circuit
-compiler.cfg.comparisons compiler.test compiler.cfg.utilities ;
+USING: accessors alien arrays byte-arrays combinators.short-circuit
+compiler.cfg compiler.cfg.comparisons compiler.cfg.debugger
+compiler.cfg.gc-checks compiler.cfg.gc-checks.private
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
+compiler.cfg.utilities compiler.test cpu.architecture kernel layouts
+math memory namespaces sequences tools.test ;
 IN: compiler.cfg.gc-checks.tests
 
 ! insert-gc-check?
@@ -15,7 +14,13 @@ IN: compiler.cfg.gc-checks.tests
 
 ! allocation-size
 { t } [
-    V{ T{ ##box-alien f 0 1 } } allocation-size 123 <alien> size =
+    V{ T{ ##box-alien f 0 1 } } allocation-size
+    123 <alien> size =
+] unit-test
+
+{ t } [
+    V{ T{ ##box-alien } T{ ##replace } } allocation-size
+    5 cells data-alignment get align =
 ] unit-test
 
 ! add-gc-checks
