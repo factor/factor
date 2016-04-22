@@ -1,4 +1,5 @@
-USING: compiler.codegen.labels cpu.x86.assembler help.markup help.syntax ;
+USING: compiler.codegen.labels cpu.x86.assembler.private help.markup
+help.syntax ;
 IN: cpu.x86.assembler
 
 HELP: JE
@@ -11,3 +12,15 @@ HELP: JE
     "000000e9fcc71fe0: 0f8400000000  jz dword 0xe9fcc71fe6"
   }
 } ;
+
+HELP: MOV
+{ $values { "dst" "destination" "src" "source" } }
+{ $description "Moves a value from one place to another." } ;
+
+HELP: (MOV-I)
+{ $values { "dst" "destination" "src" "immediate value" } }
+{ $description "MOV where the src is immediate." } ;
+
+ARTICLE: "cpu.x86.assembler" "x86 assembler" "This vocab implements an assembler for x86 architectures." ;
+
+ABOUT: "cpu.x86.assembler"
