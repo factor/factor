@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit compiler.cfg
 compiler.cfg.instructions compiler.cfg.rpo cpu.architecture deques fry
-kernel locals make math namespaces sequences sets ;
+heaps kernel locals math sequences sets ;
 IN: compiler.cfg.utilities
 
 : block>cfg ( bb -- cfg )
@@ -92,3 +92,10 @@ IN: compiler.cfg.utilities
 
 : slurp/replenish-deque ( ... deque quot: ( ... obj -- ... seq ) -- ... )
       over '[ @ _ push-all-front ] slurp-deque ; inline
+
+: heap-members ( heap -- seq )
+    data>> [ value>> ] map ;
+
+: heap-pop-while ( heap quot: ( key -- ? ) -- values )
+    '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
+    [ over heap-pop* ] produce 2nip ; inline

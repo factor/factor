@@ -11,9 +11,14 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 
 ! cfg>sync-points
 {
-    V{ T{ sync-point { n 0 } } }
+    V{
+        T{ sync-point { n 2 } }
+    }
 } [
-    V{ T{ ##call-gc } } insns>cfg
+    V{
+        T{ ##call-gc }
+        T{ ##callback-inputs }
+    } insns>cfg
     [ number-instructions ] [ cfg>sync-points ] bi
 ] unit-test
 
@@ -35,7 +40,7 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 
 ! insn>sync-point
 { f f t } [
-    T{ ##call-gc } insn>sync-point keep-dst?>>
+    T{ ##call-gc } insn>sync-point
     T{ ##callback-outputs } insn>sync-point keep-dst?>>
     T{ ##unbox } insn>sync-point keep-dst?>>
 ] unit-test

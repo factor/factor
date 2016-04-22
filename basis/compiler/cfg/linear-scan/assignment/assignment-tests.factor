@@ -1,9 +1,10 @@
-USING: accessors arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.assignment
+USING: accessors arrays compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
-cpu.x86.assembler.operands grouping heaps kernel make namespaces random
-sequences sorting tools.test ;
+compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
+cpu.architecture cpu.x86.assembler.operands heaps kernel make
+namespaces sequences sorting tools.test ;
 IN: compiler.cfg.linear-scan.assignment.tests
 
 : cherry-pick ( seq indices -- seq' )
@@ -49,14 +50,6 @@ IN: compiler.cfg.linear-scan.assignment.tests
     } live-intervals>min-heap [ activate-new-intervals ] { } make
 ] unit-test
 
-! assign-gc-roots
-{
-    T{ gc-map { gc-roots { T{ spill-slot { n 7 } } } } }
-} [
-    { { 23 int-rep 23 T{ spill-slot { n 7 } } } } setup-vreg-spills
-    <gc-map> 23 1array >>gc-roots [ assign-gc-roots ] keep
-] unit-test
-
 ! assign-insn-defs
 {
     T{ ##peek { dst RAX } { loc T{ ds-loc } } { insn# 0 } }
@@ -97,9 +90,11 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ] unit-test
 
 ! expire-old-intervals
-{ 3 } [
+{ 3 H{ } } [
+    H{ { 25 RBX } } clone pending-interval-assoc set
     90 { 50 90 95 120 } [ 25 <live-interval> 2array ] map >min-heap
     [ expire-old-intervals ] keep heap-size
+    pending-interval-assoc get
 ] unit-test
 
 ! insert-reload

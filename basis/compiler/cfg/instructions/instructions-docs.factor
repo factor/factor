@@ -357,10 +357,13 @@ HELP: gc-map
   { $table
     {
         { $slot "gc-roots" }
-        { "First a " { $link sequence } " of vregs that will be spilled during a gc. It is assigned in the " { $vocab-link "compiler.cfg.liveness" } " compiler pass. Then it is converted to a sequence of " { $link spill-slot } "s in " { $link assign-registers } "." }
+        { { $link sequence } " of vregs or spill-slots" }
     }
-    { { $slot "derived-roots" } { "An " { $link assoc } " of pairs of spill slots." } }
+    {
+        { $slot "derived-roots" }
+        { "An " { $link assoc } " of pairs of vregs or spill slots." } }
   }
+  "The 'gc-roots' and 'derived-roots' slots are initially vreg integers referencing objects that are live during the gc call and needs to be spilled so that they can be traced. In the " { $link emit-gc-map-insn } " word in " { $vocab-link "compiler.cfg.linear-scan.assignment" } " they are converted to spill slots which the collector is able to trace."
 }
 { $see-also emit-gc-info-bitmaps fill-gc-map } ;
 

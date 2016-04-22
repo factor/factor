@@ -1,21 +1,14 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.allocation
-compiler.cfg.linear-scan.allocation.state compiler.cfg.liveness
-compiler.cfg.registers heaps help.markup help.syntax math sequences ;
+compiler.cfg.linear-scan.allocation
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.live-intervals compiler.cfg.liveness
+compiler.cfg.registers heaps help.markup help.syntax math quotations
+sequences ;
 IN: compiler.cfg.linear-scan.assignment
 
 HELP: add-pending
 { $values { "live-interval" live-interval-state } }
 { $description "Adds a live interval to the pending interval set." } ;
-
-HELP: assign-derived-roots
-{ $values { "gc-map" gc-map } }
-{ $description "Assigns pairs of spill slots for all derived roots in a gc map." } ;
-{ assign-gc-roots assign-derived-roots } related-words
-
-HELP: assign-gc-roots
-{ $values { "gc-map" gc-map } }
-{ $description "Assigns spill slots for all gc roots in a gc map." } ;
 
 HELP: assign-registers-in-block
 { $values { "bb" basic-block } }
@@ -29,14 +22,22 @@ HELP: assign-all-registers
 { $values { "insn" insn } }
 { $description "Assigns physical registers for the virtual registers used and defined by the instruction." } ;
 
+HELP: change-insn-gc-roots
+{ $values { "gc-map-insn" gc-map-insn } { "quot" quotation } }
+{ $description "Applies the quotation to all vregs in the instructions " { $link gc-map } "." } ;
+
 HELP: compute-live-in
 { $values { "bb" basic-block } }
 { $description "Computes the live in registers for a basic block." }
 { $see-also machine-live-ins } ;
 
+HELP: emit-##call-gc
+{ $values { "insn" ##call-gc } }
+{ $description "Emits a " { $link ##call-gc } " instruction and the " { $link ##reload } " and " { $link ##spill } " instructions it requires. ##call-gc aren't counted as sync points, so the instruction requires special handling." } ;
+
 HELP: expire-old-intervals
 { $values { "n" integer } { "pending-heap" min-heap } }
-{ $description "Expires all intervals older than the cutoff point." } ;
+{ $description "Expires all intervals older than the cutoff point. First they are removed from the 'pending-heap' and " { $link pending-interval-assoc } ". Then " { $link ##spill } " instructions are inserted for each interval that was removed." } ;
 
 HELP: insert-reload
 { $values { "live-interval" live-interval-state } }
@@ -74,15 +75,28 @@ HELP: vreg>spill-slot
 { $description "Converts a vreg number to a spill slot." } ;
 
 ARTICLE: "compiler.cfg.linear-scan.assignment" "Assigning registers to live intervals"
-"The " { $vocab-link "compiler.cfg.linear-scan.assignment" } " assigns registers to live intervals." $nl
+"The " { $vocab-link "compiler.cfg.linear-scan.assignment" } " assigns registers to live intervals. Before this compiler pass, all values in the " { $link cfg } " were represented as simple integers called \"virtual registers\" or vregs. In this pass, using the live interval data computed in the register allocation pass (" { $vocab-link "compiler.cfg.linear-scan.allocation" } "), those vregs are translated into physical registers."
+$nl
+"Since there is an infinite number of vregs but the number of physical registers is limited, some values must be spilled. So this pass also handles spilling decisions and inserts " { $link ##spill } " and " { $link ##reload } " instructions where needed."
+$nl
+"GC maps:"
+{ $subsections
+  change-insn-gc-roots
+  emit-##call-gc
+}
 "Pending intervals:"
 { $subsections
   activate-interval
   add-pending
   pending-interval-assoc
+  expire-old-intervals
   remove-pending
 }
 "Vreg transformations:"
-{ $subsections vreg>reg vreg>spill-slot vregs>regs } ;
+{ $subsections
+  vreg>reg
+  vreg>spill-slot
+  vregs>regs
+} ;
 
 ABOUT: "compiler.cfg.linear-scan.assignment"
