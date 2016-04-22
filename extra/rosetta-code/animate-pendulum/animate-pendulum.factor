@@ -54,7 +54,6 @@ M: pendulum-gadget ungraft*
     pendulum-gadget new
     { 500 500 } >>pref-dim ;
 
-: pendulum-main ( -- )
-    [ <pendulum-gadget> "pendulum" open-window ] with-ui ;
-
-MAIN: pendulum-main
+MAIN-WINDOW: pendulum-main
+    { { title "pendulum" } }
+    <pendulum-gadget> >>gadgets ;

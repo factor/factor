@@ -67,7 +67,6 @@ M: bw-noise-gadget ungraft* [ stop-animation ] [ call-next-method ] bi ;
     [ fps-model>> fps-gadget ]
     [ <pile> swap add-gadget swap add-gadget ] bi ;
 
-: open-noise-window ( -- )
-    [ <bw-noise-gadget> with-fps "Black and White noise" open-window ] with-ui ;
-
-MAIN: open-noise-window
+MAIN-WINDOW: open-noise-window
+    { { title "Black and White noise" } }
+    <bw-noise-gadget> >>gadgets ;
