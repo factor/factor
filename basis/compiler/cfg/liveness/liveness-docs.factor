@@ -1,5 +1,6 @@
-USING: assocs compiler.cfg compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.representations hash-sets help.markup help.syntax kernel
+USING: assocs compiler.cfg compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.representations
+cpu.architecture hash-sets help.markup help.syntax kernel math
 sequences ;
 IN: compiler.cfg.liveness
 
@@ -12,7 +13,7 @@ HELP: compute-live-sets
 { $description "Main entry point for vocab. Pass must only be run after representation selection. In this pass " { $slot "gc-roots" } " are set." } ;
 
 HELP: edge-live-ins
-{ $var-description "Assoc mapping basic blocks to sequences of sets of vregs; each sequence is in correspondence with a predecessor." } ;
+{ $var-description { $link assoc } " mapping basic blocks to sequences of sets of vregs; each sequence is in correspondence with a predecessor." } ;
 
 HELP: fill-gc-map
 { $values { "live-set" assoc } { "gc-map" gc-map } }
@@ -50,6 +51,21 @@ HELP: lookup-base-pointer
 { $description "Tries to figure out what the base pointer for a vreg is. Can't use cache here because of infinite recursion inside the quotation passed to cache" }
 { $see-also base-pointers } ;
 
+HELP: visit-gc-root
+{ $values
+  { "vreg" integer }
+  { "derived-roots" assoc }
+  { "gc-roots" sequence }
+}
+{ $description "Handles a vreg that is live at a gc point. The vreg is handled in three ways depending on its representation:"
+  { $list
+    { "If it is " { $link tagged-rep } ", then the vreg contains a pointer to an object and it is added to the 'gc-roots' sequence." }
+    { "If it is " { $link int-rep } " and the vreg has a base pointer, then it is added to the 'derived-roots' assoc along with that base pointer." }
+    "Otherwise the vreg does not contain an object reference and nothing is done with it."
+  }
+}
+{ $see-also lookup-base-pointer } ;
+
 ARTICLE: "compiler.cfg.liveness" "Liveness analysis"
 "Similar to http://en.wikipedia.org/wiki/Liveness_analysis, with three additions:"
 $nl
@@ -63,6 +79,11 @@ $nl
 { $subsections
   live-in live-in? live-ins
   live-out live-out? live-outs
+}
+"Filling GC maps:"
+{ $subsections
+  lookup-base-pointer
+  visit-gc-root
 } ;
 
 ABOUT: "compiler.cfg.liveness"

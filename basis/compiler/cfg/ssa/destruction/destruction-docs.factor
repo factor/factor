@@ -12,6 +12,8 @@ HELP: destruct-ssa
 { $description "Main entry point for the SSA destruction compiler pass." } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
+"SSA destruction compiler pass. It is preceeded by " { $vocab-link "compiler.cfg.save-contexts" } " and followed by " { $vocab-link "compiler.cfg.linear-scan" } "."
+$nl
 "Because of the design of the register allocator, this pass has three peculiar properties."
 { $list
   { "Instead of renaming vreg usages in the CFG, a map from vregs to canonical representatives is computed. This allows the register allocator to use the original SSA names to get reaching definitions. See " { $link leader-map } "." }
