@@ -92,8 +92,6 @@ M:: trails-gadget draw-gadget* ( GADGET -- )
 
   dup start-trails-thread ;
 
-: trails-window ( -- ) [ <trails-gadget> "Trails" open-window ] with-ui ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-MAIN: trails-window
+MAIN-WINDOW: trails-window
+    { { title "Trails" } }
+    <trails-gadget> >>gadgets ;

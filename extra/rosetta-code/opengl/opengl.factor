@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.rectangles opengl.gl sequences ui
-ui.gadgets ui.render ;
+USING: accessors kernel math math.rectangles opengl.gl
+sequences ui ui.gadgets ui.render ;
 IN: rosetta-code.opengl
 
 ! http://rosettacode.org/wiki/OpenGL
@@ -35,7 +35,6 @@ M: triangle-gadget pref-dim* drop { 640 480 } ;
 M: triangle-gadget draw-gadget*
     rect-bounds nip first2 reshape paint ;
 
-: triangle-window ( -- )
-   [ triangle-gadget new "Triangle" open-window ] with-ui ;
-
-MAIN: triangle-window
+MAIN-WINDOW: triangle-window
+    { { title "Triangle" } }
+    triangle-gadget new >>gadgets ;
