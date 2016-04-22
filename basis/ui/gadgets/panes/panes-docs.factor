@@ -3,7 +3,14 @@ ui.gadgets.panes.private ;
 IN: ui.gadgets.panes
 
 HELP: pane
-{ $class-description "A pane " { $link gadget } " displays formatted text which is written to a " { $link pane-stream } " targetting the pane. Panes are created by calling " { $link <pane> } " or " { $link <pane-control> } "." } ;
+{ $class-description "A pane " { $link gadget } " displays formatted text which is written to a " { $link pane-stream } " targetting the pane. Panes are created by calling " { $link <pane> } " or " { $link <pane-control> } ". Panes have the following slots"
+  { $table
+    {
+        { $slot "input" }
+        { "A gadget that receives input events and writes to the pane's input stream." }
+    }
+  }
+} ;
 
 HELP: <pane>
 { $values { "pane" "a new " { $link pane } } }

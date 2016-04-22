@@ -2,6 +2,10 @@ USING: accessors concurrency.flags help.markup help.syntax kernel
 math.rectangles models strings ui.gadgets.private ;
 IN: ui.gadgets
 
+HELP: <gadget>
+{ $values { "gadget" "a new " { $link gadget } } }
+{ $description "Creates a new gadget." } ;
+
 HELP: control-value
 { $values { "control" gadget } { "value" object } }
 { $description "Outputs the value of the control's model." } ;
@@ -10,14 +14,15 @@ HELP: gadget-child
 { $values { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the first child of the gadget. Typically this word is used with gadgets which are known to have an only child." } ;
 
+HELP: notify
+{ $values { "gadget" gadget } }
+{ $description "Notifies the gadget that it has a graft message to handle." }
+{ $see-also graft* ungraft* } ;
+
 HELP: nth-gadget
 { $values { "n" "a non-negative integer" } { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the " { $snippet "n" } "th child of the gadget." }
 { $errors "Throws an error if " { $snippet "n" } " is negative or greater than or equal to the number of children." } ;
-
-HELP: <gadget>
-{ $values { "gadget" "a new " { $link gadget } } }
-{ $description "Creates a new gadget." } ;
 
 HELP: relative-loc
 { $values { "fromgadget" gadget } { "togadget" gadget } { "loc" "a pair of integers" } }
@@ -145,10 +150,6 @@ HELP: add-gadgets
 { $notes "This may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
 { $side-effects "parent" } ;
 
-HELP: parents
-{ $values { "gadget" gadget } { "seq" "a sequence of gadgets" } }
-{ $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
-
 HELP: child?
 { $values { "parent" gadget } { "child" gadget } { "?" boolean } }
 { $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
@@ -176,6 +177,10 @@ HELP: layout-later
 { $values { "gadget" gadget } }
 { $description "Adds the gadget to the " { $link layout-queue } " and notifies the UI thread that there is a gadget to layout. If the length of the queue is larger than " { $link layout-queue-limit } ", then the current thread is yielded so that the UI thread has a chance to run." } ;
 
+HELP: parents
+{ $values { "gadget" gadget } { "seq" "a sequence of gadgets" } }
+{ $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
+
 HELP: screen-loc
 { $values { "gadget" gadget } { "loc" "a pair of integers" } }
 { $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
@@ -183,6 +188,10 @@ HELP: screen-loc
 HELP: set-control-value
 { $values { "value" object } { "control" gadget } }
 { $description "Sets the value of the control's model." } ;
+
+HELP: unqueue-graft
+{ $values { "gadget" gadget } }
+{ $description "Removes the gadget from the " { $link graft-queue } "." } ;
 
 HELP: ui-notify-flag
 { $var-description "A " { $link flag } " raised to notify the UI thread that there is work to do." }
@@ -195,5 +204,12 @@ $nl
 { $subsections
     control-value
     set-control-value
+}
+"Graft handling:"
+{ $subsections
+  graft
+  notify
+  ungraft
+  unqueue-graft
 }
 { $see-also "models" } ;
