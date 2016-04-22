@@ -6,8 +6,6 @@ compiler.cfg.liveness compiler.cfg.rpo kernel math namespaces
 sequences ;
 IN: compiler.cfg.ssa.interference.live-ranges
 
-! Live ranges for interference testing
-
 <PRIVATE
 
 SYMBOLS: local-def-indices local-kill-indices ;
@@ -16,9 +14,6 @@ SYMBOLS: local-def-indices local-kill-indices ;
     defs-vregs [ local-def-indices get set-at ] with each ;
 
 : record-uses ( n insn -- )
-    ! Record live intervals so that all but the first input interfere
-    ! with the output. This lets us coalesce the output with the
-    ! first input.
     dup uses-vregs [ 2drop ] [
         swap def-is-use-insn?
         [ [ first local-kill-indices get set-at ] [ rest-slice ] 2bi ] unless
