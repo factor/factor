@@ -23,3 +23,7 @@ H{ } clone copies set
 { 1 } [ 3 resolve-copy ] unit-test
 { 1 } [ 4 resolve-copy ] unit-test
 { 0 } [ 6 resolve-copy ] unit-test
+
+{ 1234 } [
+    H{ { 1234 1234 } } copies set 1234 resolve-copy
+] unit-test

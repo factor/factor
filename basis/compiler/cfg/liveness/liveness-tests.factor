@@ -1,9 +1,9 @@
-USING: accessors alien assocs compiler.cfg.comparisons compiler.cfg.liveness
-compiler.cfg compiler.cfg.debugger compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.registers
-compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
-cpu.x86.assembler.operands dlists math namespaces sequences kernel system
-tools.test vectors ;
+USING: accessors alien assocs compiler.cfg compiler.cfg.comparisons
+compiler.cfg.debugger compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.liveness compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
+cpu.architecture cpu.x86.assembler.operands kernel math namespaces
+sequences system tools.test ;
 IN: compiler.cfg.liveness.tests
 QUALIFIED: sets
 
@@ -72,6 +72,11 @@ QUALIFIED: sets
         { 125 tagged-rep }
     } representations set
     { 123 124 125 } sets:unique gc-roots
+] unit-test
+
+! gen-uses
+{ H{ { 37 37 } } } [
+    H{ } clone [ T{ ##replace f 37 D: 0 0 } gen-uses ] keep
 ] unit-test
 
 ! kill-defs
