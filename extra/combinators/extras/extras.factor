@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators combinators.smart fry generalizations
-kernel macros math quotations sequences
+kernel macros math quotations sequences locals math.order
 sequences.generalizations sequences.private system ;
 IN: combinators.extras
 
@@ -57,3 +57,34 @@ MACRO: smart-plox ( true -- quot )
 
 : swap-when ( x y quot: ( x -- n ) quot: ( n n -- ? ) -- x' y' )
     '[ _ _ 2dup _ bi@ @ [ swap ] when ] call ; inline
+
+
+! ?1arg-result-falsify
+
+: 1falsify ( obj/f -- obj/f ) ; inline
+: 2falsify ( obj1 obj2 -- obj1/f obj2/f ) 2dup and [ 2drop f f ] unless ; inline
+: 3falsify ( obj1 obj2 obj3 -- obj1/f obj2/f obj3/f ) 3dup and and [ 3drop f f f ] unless ; inline
+
+MACRO: n-and ( n -- quot )
+    1 [-] [ and ] n*quot ;
+
+MACRO: n*obj ( n obj -- quot )
+    1quotation n*quot ;
+
+MACRO:: n-falsify ( n -- quot )
+    [ n ndup n n-and [ n ndrop n f n*obj ] unless ] ;
+
+! plox
+: ?1res ( ..a obj/f quot -- ..b )
+    dupd when ; inline
+
+! when both args are true, call quot. otherwise dont
+: ?2res ( ..a obj1 obj2 quot: ( obj1 obj2 -- ? ) -- ..b )
+    [ 2dup and ] dip [ 2drop f ] if ; inline
+
+! try the quot, keep the original arg if quot is true
+: ?1arg ( obj quot: ( obj -- ? ) -- obj/f )
+    [ ?1res ] 2keep drop '[ _ ] [ f ] if ; inline
+
+: ?2arg ( obj1 obj2 quot: ( obj1 obj2 -- ? ) -- obj1/f obj2/f )
+    [ ?2res ] 3keep drop '[ _ _ ] [ f f ] if ; inline
