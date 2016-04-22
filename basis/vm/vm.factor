@@ -27,6 +27,19 @@ STRUCT: zone
     { end cell_t }
     { size cell_t } ;
 
+! dispatch-statistics should be kept in sync with:
+!   vm/dispatch.hpp
+STRUCT: dispatch-statistics
+    { megamorphic-cache-hits cell_t }
+    { megamorphic-cache-misses cell_t }
+
+    { cold-call-to-ic-transitions cell_t }
+    { ic-to-pic-transitions cell_t }
+    { pic-to-mega-transitions cell_t }
+
+    { pic-tag-count cell_t }
+    { pic-tuple-count cell_t } ;
+
 STRUCT: vm
     { ctx context* }
     { spare-ctx context* }
@@ -85,19 +98,6 @@ STRUCT: gc-event
 { code-sweep-time cell_t }
 { compaction-time cell_t }
 { temp-time ulonglong } ;
-
-! dispatch-statistics should be kept in sync with:
-!   vm/dispatch.hpp
-STRUCT: dispatch-statistics
-{ megamorphic-cache-hits cell_t }
-{ megamorphic-cache-misses cell_t }
-
-{ cold-call-to-ic-transitions cell_t }
-{ ic-to-pic-transitions cell_t }
-{ pic-to-mega-transitions cell_t }
-
-{ pic-tag-count cell_t }
-{ pic-tuple-count cell_t } ;
 
 ! gc-info should be kept in sync with:
 !   vm/gc_info.hpp

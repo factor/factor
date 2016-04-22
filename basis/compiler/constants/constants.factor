@@ -29,11 +29,16 @@ CONSTANT: deck-bits 18
 : segment-start-offset ( -- n ) 0 bootstrap-cells ; inline
 : segment-end-offset ( -- n ) 2 bootstrap-cells ; inline
 
-! Offsets in vm struct
-: vm-context-offset ( -- n ) 0 bootstrap-cells ; inline
-: vm-spare-context-offset ( -- n ) 1 bootstrap-cells ; inline
-: vm-signal-handler-addr-offset ( -- n ) 8 bootstrap-cells ; inline
-: vm-fault-flag-offset ( -- n ) 9 bootstrap-cells ; inline
+! Offsets in vm struct. Should be kept in sync with:
+!   vm/vm.hpp
+: vm-context-offset ( -- n )
+    0 bootstrap-cells ; inline
+: vm-spare-context-offset ( -- n )
+    1 bootstrap-cells ; inline
+: vm-signal-handler-addr-offset ( -- n )
+    8 bootstrap-cells ; inline
+: vm-fault-flag-offset ( -- n )
+    9 bootstrap-cells ; inline
 : vm-special-object-offset ( n -- offset )
     bootstrap-cells 10 bootstrap-cells + ;
 
