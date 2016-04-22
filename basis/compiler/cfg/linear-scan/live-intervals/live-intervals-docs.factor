@@ -25,7 +25,7 @@ HELP: cfg>sync-points
 { $see-also sync-point } ;
 
 HELP: clobber-insn
-{ $class-description "Instructions that clobber registers but are allowed to produce outputs in registers. Inputs are in spill slots, except for inputs coalesced with the output, in which case that input will be in a register." } ;
+{ $class-description "Instructions that clobber registers but are allowed to produce outputs in registers. Inputs are in spill slots, except for inputs coalesced with the output, in which case that input will be in a register. Each instruction that is a member of the clobber-insn class requires a " { $link sync-point } "." } ;
 
 HELP: compute-live-intervals
 { $values { "cfg" cfg } { "intervals/sync-points" sequence } }
@@ -48,7 +48,8 @@ HELP: from
 { $var-description "An integer representing a sequence number one lower than all numbers in the currently processed block." } ;
 
 HELP: hairy-clobber-insn
-{ $class-description "Instructions that clobber registers. They receive inputs and produce outputs in spill slots." } ;
+{ $class-description "Instructions that clobber registers. They receive inputs and produce outputs in spill slots." }
+{ $notes "The " { $link ##call-gc } " instruction is not included in the class even though it clobbers registers because it is handled specially." } ;
 
 HELP: insn>sync-point
 { $values { "insn" insn } { "sync-point/f" { $maybe sync-point } } }
@@ -135,6 +136,8 @@ $nl
 "Sync point handling:"
 { $subsections
   cfg>sync-points
+  clobber-insn
+  hairy-clobber-insn
   insn>sync-point
 } ;
 
