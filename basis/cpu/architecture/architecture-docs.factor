@@ -1,8 +1,7 @@
 USING: alien assocs classes compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stack-frame
-cpu.x86.assembler cpu.x86.assembler.operands help.markup
-help.syntax kernel layouts literals math multiline system vm
-words ;
+compiler.cfg.registers compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands help.markup help.syntax kernel layouts
+literals math multiline sequences strings system vm words ;
 IN: cpu.architecture
 
 <<
@@ -108,6 +107,21 @@ HELP: param-regs
 { $values { "abi" "a calling convention symbol" } { "regs" assoc } }
 { $description "Retrieves the order in which machine registers are used for parameters for the given calling convention." } ;
 
+HELP: %alien-invoke
+{ $values
+  { "reg-inputs" sequence }
+  { "stack-inputs" sequence }
+  { "reg-outputs" sequence }
+  { "dead-outputs" sequence }
+  { "cleanup" integer }
+  { "stack-size" integer }
+  { "symbols" string }
+  { "dll" { $maybe dll } }
+  { "gc-map" gc-map }
+}
+{ $description "Machine code emitter for the " { $link ##alien-invoke } " instruction." } ;
+
+
 HELP: %allot
 { $values
   { "dst" "destination register symbol" }
@@ -176,6 +190,13 @@ HELP: %horizontal-add-vector
   }
 } ;
 
+HELP: %load-double
+{ $values
+  { "reg" "destination register symbol" }
+  { "val" float }
+} { $description "Loads a literal floating point value into a register. On x86, this corresponds to the " { $link MOVSD } " instruction." }
+{ $see-also ##load-double } ;
+
 HELP: %load-immediate
 { $values { "reg" "a register symbol" } { "val" "a value" } }
 { $description "Emits code for loading an immediate value into a register. On " { $link x86 } ", if val is 0, then an " { $link XOR } " instruction is emitted instead of " { $link MOV } " because the former is shorter." }
@@ -230,6 +251,22 @@ HELP: %save-context
 { $values { "temp1" "a register symbol" } { "temp2" "a register symbol" } }
 { $description "Emits machine code for saving pointers to the callstack, datastack and retainstack in the current context field struct." }
 { $examples { $unchecked-example $[ ex-%save-context ] } } ;
+
+HELP: %set-slot
+{ $values
+  { "src" "register containing the element" }
+  { "obj" "register containing the object" }
+  { "slot" "register containing the slot index" }
+  { "scale" fixnum }
+  { "tag" "type tag for the builtin" }
+} { $description "Emits machine code for " { $link ##set-slot } " instructions." }
+{ $examples
+  { $unchecked-example
+    "USING: cpu.architecture prettyprint ;"
+    "[ RAX RBX RCX 3 2 %set-slot ] B{ } make disassemble"
+    "0000000000f1fda0: 488944cbfe  mov [rbx+rcx*8-0x2], rax"
+  }
+} ;
 
 HELP: %store-memory-imm
 { $values

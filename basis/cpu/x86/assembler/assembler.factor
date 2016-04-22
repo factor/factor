@@ -210,7 +210,6 @@ GENERIC: POP ( op -- )
 M: register POP f 0x58 short-operand ;
 M: operand POP { 0b000 f 0x8f } 1-operand ;
 
-! MOV where the src is immediate.
 <PRIVATE
 
 GENERIC# (MOV-I) 1 ( dst src -- )
