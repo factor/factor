@@ -52,9 +52,6 @@ ERROR: bad-math-inverse ;
 : pull-inverse ( math-inverse revquot const -- revquot* quot )
     assure-constant rot first compose ;
 
-: ?word-prop ( word/object name -- value/f )
-    over word? [ word-prop ] [ 2drop f ] if ;
-
 : undo-literal ( object -- quot ) [ =/fail ] curry ;
 
 PREDICATE: normal-inverse < word "inverse" word-prop >boolean ;
