@@ -3,8 +3,8 @@
 USING: accessors arrays combinators combinators.short-circuit
 kernel math.rectangles math.vectors models models.product
 models.range namespaces sequences ui.gadgets ui.gadgets.frames
-ui.gadgets.grids ui.gadgets.sliders ui.gadgets.viewports
-ui.gestures ;
+ui.gadgets.grids ui.gadgets.private ui.gadgets.sliders
+ui.gadgets.viewports ui.gestures ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame column-header viewport x y follows ;
@@ -96,10 +96,12 @@ M: rect update-scroller swap (scroll>rect) ;
 M: f update-scroller drop (update-scroller) ;
 
 M: scroller layout*
-    [ call-next-method ] [
-        dup follows>>
-        [ update-scroller ] [ >>follows drop ] 2bi
-    ] bi ;
+    {
+      [ call-next-method ]
+      [ dup follows>> [ update-scroller ] [ >>follows drop ] 2bi ]
+      [ [ x>> ] [ y>> ] bi [ forget-pref-dim ] bi@ ]
+      [ call-next-method ]
+    } cleave ;
 
 M: scroller focusable-child*
     viewport>> ;
