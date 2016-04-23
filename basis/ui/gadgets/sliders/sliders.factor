@@ -235,7 +235,11 @@ PRIVATE>
         swap >>model
         16 >>line
         dup orientation>> {
+            [ <slider-pen> >>interior ]
             [ <thumb> >>thumb ]
             [ <elevator> >>elevator ]
             [ drop dup add-thumb-to-elevator 1 track-add ]
+            [ <up-button> f track-add ]
+            [ <down-button> f track-add ]
+            [ drop <gadget> { 1 1 } >>dim f track-add ]
         } cleave ;
