@@ -224,7 +224,7 @@ M: slider-pen pen-pref-dim
     enabled>> pen-pref-dim ;
 
 M: slider pref-dim*
-    [ slider-enabled? [ { 14 14 } ] [ { 0 0 } ] if ]
+    [ dup slider-enabled? [ dup interior>> pen-pref-dim ] [ drop { 0 0 } ] if ]
     [ drop { 100 100 } ]
     [ orientation>> ] tri set-axis ;
 
