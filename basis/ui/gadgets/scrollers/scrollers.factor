@@ -97,10 +97,10 @@ M: f update-scroller drop (update-scroller) ;
 
 M: scroller layout*
     {
-      [ call-next-method ]
-      [ dup follows>> [ update-scroller ] [ >>follows drop ] 2bi ]
-      [ [ x>> ] [ y>> ] bi [ forget-pref-dim ] bi@ ]
-      [ call-next-method ]
+        [ call-next-method ]
+        [ dup follows>> [ update-scroller ] [ >>follows drop ] 2bi ]
+        [ [ x>> ] [ y>> ] bi [ forget-pref-dim ] bi@ ]
+        [ call-next-method ]
     } cleave ;
 
 M: scroller focusable-child*
