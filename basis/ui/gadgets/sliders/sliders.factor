@@ -224,8 +224,9 @@ M: slider-pen pen-pref-dim
     enabled>> pen-pref-dim ;
 
 M: slider pref-dim*
-    [ dup interior>> pen-pref-dim ] [ drop { 100 100 } ] [ orientation>> ] tri
-    set-axis ;
+    [ slider-enabled? [ { 14 14 } ] [ { 0 0 } ] if ]
+    [ drop { 100 100 } ]
+    [ orientation>> ] tri set-axis ;
 
 PRIVATE>
 
@@ -234,7 +235,6 @@ PRIVATE>
         swap >>model
         16 >>line
         dup orientation>> {
-            [ <slider-pen> >>interior ]
             [ <thumb> >>thumb ]
             [ <elevator> >>elevator ]
             [ drop dup add-thumb-to-elevator 1 track-add ]
