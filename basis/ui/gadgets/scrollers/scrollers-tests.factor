@@ -41,7 +41,7 @@ IN: ui.gadgets.scrollers.tests
 { } [ "s" get layout ] unit-test
 
 "s" get [
-    [ { 34 34 } ] [ "s" get viewport>> dim>> ] unit-test
+    [ { 36 36 } ] [ "s" get viewport>> dim>> ] unit-test
 
     [ { 100 100 } ] [ "s" get viewport>> gadget-child pref-dim ] unit-test
 
