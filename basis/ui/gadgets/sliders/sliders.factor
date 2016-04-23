@@ -238,7 +238,4 @@ PRIVATE>
             [ <thumb> >>thumb ]
             [ <elevator> >>elevator ]
             [ drop dup add-thumb-to-elevator 1 track-add ]
-            [ <up-button> f track-add ]
-            [ <down-button> f track-add ]
-            [ drop <gadget> { 1 1 } >>dim f track-add ]
         } cleave ;
