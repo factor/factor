@@ -186,7 +186,6 @@ struct factor_vm {
   void primitive_identity_hashcode();
   void compute_identity_hashcode(object* obj);
   void primitive_compute_identity_hashcode();
-  cell object_size(cell tagged);
   cell clone_object(cell obj_);
   void primitive_clone();
   void primitive_become();
@@ -559,13 +558,11 @@ struct factor_vm {
   void primitive_fclose();
 
   // code_block
-  cell compute_entry_point_address(cell obj);
   cell compute_entry_point_pic_address(word* w, cell tagged_quot);
   cell compute_entry_point_pic_address(cell w_);
   cell compute_entry_point_pic_tail_address(cell w_);
   cell compute_external_address(instruction_operand op);
 
-  cell code_block_owner(code_block* compiled);
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
   cell compute_dlsym_address(array* literals, cell index, bool toc);
