@@ -30,7 +30,7 @@ enum special_object {
 
   OBJ_STARTUP_QUOT = 20, /* startup quotation */
   OBJ_GLOBAL,            /* global namespace */
-  OBJ_SHUTDOWN_QUOT,     /* shutdown quotation */
+  OBJ_UNUSED = 22,
 
   /* Quotation compilation in quotations.cpp */
   JIT_PROLOG = 23,
