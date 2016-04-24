@@ -527,7 +527,7 @@ def build(ctx):
     glob = cwd.ant_glob(pat)
 
     ctx.install_files(libdir, glob, cwd = cwd, relative_trick = True)
-    ctx.install_files(libdir, 'license.txt', cwd = cwd)
+    ctx.install_files(libdir, 'LICENSE.txt', cwd = cwd)
 
     # Install stuff in misc
     sharedir = '${PREFIX}/share/factor'
