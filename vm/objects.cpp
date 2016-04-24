@@ -2,6 +2,13 @@
 
 namespace factor {
 
+/* Size of the object pointed to by a tagged pointer */
+cell object_size(cell tagged) {
+  if (immediate_p(tagged))
+    return 0;
+  return untag<object>(tagged)->size();
+}
+
 void factor_vm::primitive_special_object() {
   fixnum n = untag_fixnum(ctx->peek());
   ctx->replace(special_objects[n]);
@@ -56,13 +63,6 @@ cell factor_vm::clone_object(cell obj_) {
 
 /* Allocates memory */
 void factor_vm::primitive_clone() { ctx->replace(clone_object(ctx->peek())); }
-
-/* Size of the object pointed to by a tagged pointer */
-cell factor_vm::object_size(cell tagged) {
-  if (immediate_p(tagged))
-    return 0;
-  return untag<object>(tagged)->size();
-}
 
 /* Allocates memory */
 void factor_vm::primitive_size() {
