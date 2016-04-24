@@ -28,9 +28,8 @@ IN: tools.deploy.shaker
     "Stripping startup hooks" show
     {
         "alien.strings"
-        "cpu.x86"
+        "cpu.x86.features"
         "environment"
-        "libc"
     }
     [ startup-hooks get delete-at ] each
     deploy-threads? get [
@@ -41,9 +40,11 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         {
+            "compiler.units"
+            "source-files.errors"
             "vocabs"
             "vocabs.cache"
-            "source-files.errors"
+            "vocabs.loader"
         } [ startup-hooks get delete-at ] each
     ] when ;
 
