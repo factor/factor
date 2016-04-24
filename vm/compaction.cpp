@@ -83,7 +83,7 @@ void factor_vm::collect_compact_impl() {
 #endif
 
   if (event)
-    event->started_compaction();
+    event->reset_timer();
 
   tenured_space* tenured = data->tenured;
   mark_bits* data_forwarding_map = &tenured->state;
