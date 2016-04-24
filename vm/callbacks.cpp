@@ -2,6 +2,14 @@
 
 namespace factor {
 
+bool return_takes_param_p() {
+#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
+  return true;
+#else
+  return false;
+#endif
+}
+
 callback_heap::callback_heap(cell size, factor_vm* parent) {
   seg = new segment(size, true);
   if (!seg)
@@ -16,14 +24,6 @@ callback_heap::~callback_heap() {
   allocator = NULL;
   delete seg;
   seg = NULL;
-}
-
-bool callback_heap::return_takes_param_p() {
-#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
-  return true;
-#else
-  return false;
-#endif
 }
 
 instruction_operand callback_heap::callback_operand(code_block* stub,
