@@ -280,9 +280,6 @@ IN: tools.deploy.shaker
     [ [ "No method" throw ] ( -- * ) define-temp ] with-compilation-unit ;
 
 : strip-default-methods ( -- )
-    ! In a development image, each generic has its own default method.
-    ! This gives better error messages for runtime type errors, but
-    ! takes up space. For deployment we merge them all together.
     strip-debugger? [
         "Stripping default methods" show
         [ single-generic? ] instances
@@ -428,10 +425,6 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-c-io ( -- )
-    ! On all platforms, if deploy-io is 1, we strip out C streams.
-    ! On Unix, if deploy-io is 3, we strip out C streams as well.
-    ! On Windows, even if deploy-io is 3, C streams are still used
-    ! for the console, so don't strip it there.
     strip-io?
     native-io? os windows? not and
     or [
@@ -457,8 +450,6 @@ IN: tools.deploy.shaker
     [ compress-object? ] [ ] "objects" compress ;
 
 : remain-compiled ( old new -- old new )
-    ! Quotations which were formerly compiled must remain
-    ! compiled.
     2dup [
         2dup [ quotation-compiled? ] [ quotation-compiled? not ] bi* and
         [ nip jit-compile ] [ 2drop ] if
@@ -607,8 +598,6 @@ SYMBOL: deploy-vocab
     ] recover ; inline
 
 : (deploy) ( final-image vocab-manifest-out vocab config -- )
-    ! Does the actual work of a deployment in the slave
-    ! stage2 image
     [
         [
             strip-debugger? [
