@@ -18,7 +18,7 @@ gc_event::gc_event(gc_op op, factor_vm* parent)
   start_time = nano_count();
 }
 
-void gc_event::started_card_scan() { temp_time = nano_count(); }
+void gc_event::reset_timer() { temp_time = nano_count(); }
 
 void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_) {
   cards_scanned += cards_scanned_;
@@ -26,26 +26,18 @@ void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_) {
   card_scan_time = (cell)(nano_count() - temp_time);
 }
 
-void gc_event::started_code_scan() { temp_time = nano_count(); }
-
 void gc_event::ended_code_scan(cell code_blocks_scanned_) {
   code_blocks_scanned += code_blocks_scanned_;
   code_scan_time = (cell)(nano_count() - temp_time);
 }
 
-void gc_event::started_data_sweep() { temp_time = nano_count(); }
-
 void gc_event::ended_data_sweep() {
   data_sweep_time = (cell)(nano_count() - temp_time);
 }
 
-void gc_event::started_code_sweep() { temp_time = nano_count(); }
-
 void gc_event::ended_code_sweep() {
   code_sweep_time = (cell)(nano_count() - temp_time);
 }
-
-void gc_event::started_compaction() { temp_time = nano_count(); }
 
 void gc_event::ended_compaction() {
   compaction_time = (cell)(nano_count() - temp_time);
