@@ -44,7 +44,6 @@ IN: tools.deploy.shaker
             "source-files.errors"
             "vocabs"
             "vocabs.cache"
-            "vocabs.loader"
         } [ startup-hooks get delete-at ] each
     ] when ;
 
