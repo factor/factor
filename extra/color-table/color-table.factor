@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants combinators.smart formatting
-kernel literals models sorting.human sorting.slots strings ui
-ui.gadgets.scrollers ui.gadgets.tables ;
+USING: accessors colors.constants colors.hex combinators
+combinators.smart formatting kernel literals models
+sorting.human sorting.slots strings ui ui.gadgets.scrollers
+ui.gadgets.tables ;
 IN: color-table
 
 ! ui.gadgets.tables demo
@@ -18,15 +19,17 @@ M: color-renderer filled-column
     drop 0 ;
 
 M: color-renderer column-titles
-    drop { "Color" "Name" "Red" "Green" "Blue" } ;
+    drop { "Color" "Name" "Red" "Green" "Blue" "Hex" } ;
 
 M: color-renderer row-columns
     drop [
         full-block-string swap
-        dup named-color
-        [ red>> "%.5f" sprintf ]
-        [ green>> "%.5f" sprintf ]
-        [ blue>> "%.5f" sprintf ] tri
+        dup named-color {
+            [ red>> "%.5f" sprintf ]
+            [ green>> "%.5f" sprintf ]
+            [ blue>> "%.5f" sprintf ]
+            [ rgba>hex ]
+        } cleave
     ] output>array ;
 
 M: color-renderer row-color
@@ -44,5 +47,5 @@ M: color-renderer row-value
         10 >>min-rows
         10 >>max-rows ;
 
-MAIN-WINDOW: color-table-demo { { title "Colors" } { pref-dim { 450 300 } } }
+MAIN-WINDOW: color-table-demo { { title "Colors" } { pref-dim { 500 300 } } }
     <color-table> <scroller> >>gadgets ;
