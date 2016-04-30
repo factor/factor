@@ -335,7 +335,9 @@ SYMBOL: foo
 {
     V{ T{ ##call { word set-slot } } T{ ##branch } }
 } [
-    [ f call-node-1 emit-node ] V{ } make drop
+    [
+         <basic-block> dup set-basic-block call-node-1 emit-node
+    ] V{ } make drop
     predecessors>> first instructions>>
 ] cfg-unit-test
 
