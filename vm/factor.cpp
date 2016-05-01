@@ -209,13 +209,6 @@ void factor_vm::pass_args_to_factor(int argc, vm_char** argv) {
   special_objects[OBJ_ARGS] = args.elements.value();
 }
 
-void factor_vm::start_factor(vm_parameters* p) {
-  if (p->fep)
-    factorbug();
-
-  c_to_factor_toplevel(special_objects[OBJ_STARTUP_QUOT]);
-}
-
 void factor_vm::stop_factor() {
   c_to_factor_toplevel(special_objects[OBJ_SHUTDOWN_QUOT]);
 }
@@ -245,7 +238,11 @@ void factor_vm::start_standalone_factor(int argc, vm_char** argv) {
   init_parameters_from_args(&p, argc, argv);
   init_factor(&p);
   pass_args_to_factor(argc, argv);
-  start_factor(&p);
+
+  if (p.fep)
+    factorbug();
+
+  c_to_factor_toplevel(special_objects[OBJ_STARTUP_QUOT]);
 }
 
 factor_vm* new_factor_vm() {
