@@ -19,7 +19,8 @@ IN: colors.constants
 MEMO: colors ( -- assoc )
     "resource:basis/colors/constants/rgb.txt"
     "resource:basis/colors/constants/factor-colors.txt"
-    [ utf8 file-lines parse-colors ] bi@ assoc-union ;
+    "resource:basis/colors/constants/solarized-colors.txt"
+    [ utf8 file-lines parse-colors ] tri@ assoc-union assoc-union ;
 
 PRIVATE>
 
