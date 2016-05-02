@@ -44,11 +44,9 @@ typedef HANDLE THREADHANDLE;
 #ifdef _MSC_VER
 #define FTELL ftell
 #define FSEEK fseek
-#define SNPRINTF _snprintf
 #else
 #define FTELL ftello64
 #define FSEEK fseeko64
-#define SNPRINTF snprintf
 #endif
 
 #define FACTOR_OS_STRING "windows"
