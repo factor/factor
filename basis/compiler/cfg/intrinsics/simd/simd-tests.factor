@@ -1,11 +1,10 @@
 ! (c)2009 Joe Groff bsd license
-USING: arrays assocs biassocs byte-arrays byte-arrays.hex
-classes compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
+USING: accessors arrays assocs biassocs byte-arrays classes
+compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics.simd compiler.cfg.intrinsics.simd.backend
-compiler.cfg.registers compiler.cfg.stacks.height compiler.cfg.stacks.local
-compiler.test compiler.tree compiler.tree.propagation.info
-cpu.architecture fry hashtables kernel locals make namespaces sequences
-system tools.test words ;
+compiler.cfg.stacks.local compiler.test compiler.tree
+compiler.tree.propagation.info cpu.architecture fry kernel locals make
+namespaces sequences system tools.test words ;
 IN: compiler.cfg.intrinsics.simd.tests
 
 :: test-node ( rep -- node )
@@ -50,10 +49,9 @@ IN: compiler.cfg.intrinsics.simd.tests
 
 : test-compiler-env ( -- x )
     H{ } clone
-    T{ basic-block }
-    [ \ basic-block pick set-at ]
-    [ 0 swap associate \ ds-heights pick set-at ]
-    [ 0 swap associate \ rs-heights pick set-at ] tri
+    T{ basic-block } 0 >>ds-height 0 >>rs-height
+    \ basic-block pick set-at
+
     initial-height-state \ height-state pick set-at
     HS{ } clone \ local-peek-set pick set-at
     H{ } clone \ replaces pick set-at

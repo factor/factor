@@ -1,15 +1,14 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg.registers fry kernel math
-namespaces ;
+USING: accessors compiler.cfg.registers kernel math ;
 IN: compiler.cfg.stacks.height
 
-SYMBOLS: ds-heights rs-heights ;
-
 : record-stack-heights ( ds-height rs-height bb -- )
-    [ ds-heights get set-at ] [ rs-heights get set-at ] bi-curry bi* ;
+    [ rs-height<< ] keep ds-height<< ;
 
 GENERIC# untranslate-loc 1 ( loc bb -- loc' )
 
-M: ds-loc untranslate-loc [ n>> ] [ ds-heights get at ] bi* + <ds-loc> ;
-M: rs-loc untranslate-loc [ n>> ] [ rs-heights get at ] bi* + <rs-loc> ;
+M: ds-loc untranslate-loc ( loc bb -- loc' )
+    [ n>> ] [ ds-height>> ] bi* + <ds-loc> ;
+M: rs-loc untranslate-loc ( loc bb -- loc' )
+    [ n>> ] [ rs-height>> ] bi* + <rs-loc> ;

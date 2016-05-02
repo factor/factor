@@ -9,7 +9,8 @@ TUPLE: basic-block < identity-tuple
     { instructions vector }
     { successors vector }
     { predecessors vector }
-    { kill-block? boolean } ;
+    { kill-block? boolean }
+    ds-height rs-height ;
 
 : <basic-block> ( -- bb )
     basic-block new
