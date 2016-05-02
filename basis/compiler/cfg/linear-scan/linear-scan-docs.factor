@@ -11,7 +11,7 @@ HELP: allocate-and-assign-registers
 
 HELP: linear-scan
 { $values { "cfg" cfg } }
-{ $description "Entry point for the linear scan register alloation pass." } ;
+{ $description "Entry point for the linear scan register allocation pass." } ;
 
 ARTICLE: "compiler.cfg.linear-scan" "Linear-scan register allocation"
 "Linear scan to assign physical registers. SSA liveness must have been computed already. It also spills registers that are live during gc calls."

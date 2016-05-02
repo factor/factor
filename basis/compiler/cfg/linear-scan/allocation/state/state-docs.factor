@@ -58,7 +58,7 @@ HELP: next-spill-slot
 { $description "Creates a new " { $link spill-slot } " of the given size and also allocates space in the " { $link cfg } " in the cfg for it." } ;
 
 HELP: progress
-{ $var-description "Start index of current live interval. We ensure that all live intervals added to the unhandled set have a start index strictly greater than this one. This ensures that we can catch infinite loop situations. We also ensure that all live intervals added to the handled set have an end index strictly smaller than this one. This helps catch bugs." }
+{ $var-description "Start index of current live interval. We ensure that all live intervals added to the unhandled set have a start index greater than or equal to this one. This ensures that we can catch infinite loop situations. We also ensure that all live intervals added to the handled set have an end index strictly smaller than this one. This helps catch bugs." }
 { $see-also check-handled check-unhandled } ;
 
 HELP: register-available?

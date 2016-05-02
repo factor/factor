@@ -67,7 +67,7 @@ void factor_vm::collect_sweep_impl() {
   gc_event* event = current_gc->event;
 
   if (event)
-    event->started_data_sweep();
+    event->reset_timer();
   data->tenured->sweep();
   if (event)
     event->ended_data_sweep();
@@ -75,7 +75,7 @@ void factor_vm::collect_sweep_impl() {
   update_code_roots_for_sweep();
 
   if (event)
-    event->started_code_sweep();
+    event->reset_timer();
   code->sweep();
   if (event)
     event->ended_code_sweep();

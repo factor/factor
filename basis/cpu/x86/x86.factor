@@ -602,11 +602,11 @@ M:: x86 %dispatch ( src temp -- )
     [ (align-code) ]
     bi ;
 
-M:: x86 %spill ( src rep dst -- )
-    dst src rep %copy ;
+M: x86 %spill ( src rep dst -- )
+    -rot %copy ;
 
-M:: x86 %reload ( dst rep src -- )
-    dst src rep %copy ;
+M: x86 %reload ( dst rep src -- )
+    swap %copy ;
 
 M:: x86 %local-allot ( dst size align offset -- )
     dst offset local-allot-offset special-offset stack@ LEA ;
@@ -656,8 +656,12 @@ M:: x86 %alien-assembly ( reg-inputs
     reg-outputs [ first3 %load-reg-param ] each
     dead-outputs [ first2 %discard-reg-param ] each ;
 
-M: x86 %alien-invoke ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map -- )
-    '[ _ _ _ %c-invoke ] %alien-assembly ;
+M: x86 %alien-invoke ( reg-inputs stack-inputs
+                       reg-outputs dead-outputs
+                       cleanup
+                       stack-size
+                       symbols dll gc-map -- )
+                       '[ _ _ _ %c-invoke ] %alien-assembly ;
 
 M:: x86 %alien-indirect ( src reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map -- )
     reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [

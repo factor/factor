@@ -92,7 +92,6 @@ ifdef CONFIG
 		vm/mark_bits.hpp \
 		vm/free_list.hpp \
 		vm/fixup.hpp \
-		vm/free_list_allocator.hpp \
 		vm/write_barrier.hpp \
 		vm/object_start_map.hpp \
 		vm/aging_space.hpp \

@@ -159,7 +159,7 @@ HELP: cadr
 
 HELP: lappend
 { $values { "list1" list } { "list2" list } { "newlist" list } }
-{ $description "Appends the two lists to form a new list. The first list must be finite. The result is a strict cons cell, and the first list is exausted." } ;
+{ $description "Appends the two lists to form a new list. The first list must be finite. The result is a strict cons cell, and the first list is exhausted." } ;
 
 HELP: lcut
 { $values { "list" list } { "index" integer } { "before" cons } { "after" cons } }

@@ -165,8 +165,6 @@ M:: <pong> draw-gadget* ( PONG -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: pong-window ( -- ) pong [ "PONG" open-window ] [ start-pong-thread ] bi ;
-
-: pong-main ( -- ) [ pong-window ] with-ui ;
-
-MAIN: pong-window
+MAIN-WINDOW: pong-window
+    { { title "PONG" } }
+    pong [ >>gadgets ] [ start-pong-thread ] bi ;

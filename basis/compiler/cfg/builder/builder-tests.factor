@@ -1,9 +1,10 @@
 USING: accessors alien alien.accessors arrays assocs byte-arrays
 combinators.short-circuit compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.blocks compiler.cfg.checker compiler.cfg.debugger
-compiler.cfg.instructions compiler.cfg.optimizer
-compiler.cfg.registers compiler.cfg.stacks.local
-compiler.cfg.utilities compiler.test compiler.tree
+compiler.cfg.instructions compiler.cfg.linearization
+compiler.cfg.optimizer compiler.cfg.registers
+compiler.cfg.stacks.local compiler.cfg.utilities compiler.test
+compiler.tree compiler.tree.builder compiler.tree.optimizer
 compiler.tree.propagation.info cpu.architecture fry hashtables io
 kernel kernel.private locals make math math.intervals
 math.partial-dispatch math.private namespaces prettyprint sbufs
@@ -244,11 +245,10 @@ SYMBOL: foo
     \ foo f begin-cfg word>>
 ] cfg-unit-test
 
-! make-input-map
-{
-    { { 37 D: 2 } { 81 D: 1 } { 92 D: 0 } }
-} [
-    T{ #shuffle { in-d { 37 81 92 } } } make-input-map
+! build-cfg
+{ 5 } [
+    [ dup ] build-tree optimize-tree gensym build-cfg
+    first linearization-order length
 ] unit-test
 
 ! emit-branch
@@ -335,7 +335,9 @@ SYMBOL: foo
 {
     V{ T{ ##call { word set-slot } } T{ ##branch } }
 } [
-    [ f call-node-1 emit-node ] V{ } make drop
+    [
+         <basic-block> dup set-basic-block call-node-1 emit-node
+    ] V{ } make drop
     predecessors>> first instructions>>
 ] cfg-unit-test
 
@@ -380,6 +382,12 @@ SYMBOL: foo
     <basic-block> dup set-basic-block end-word instructions>>
 ] unit-test
 
+! make-input-map
+{
+    { { 37 D: 2 } { 81 D: 1 } { 92 D: 0 } }
+} [
+    T{ #shuffle { in-d { 37 81 92 } } } make-input-map
+] unit-test
 
 ! store-shuffle
 {

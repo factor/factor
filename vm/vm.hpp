@@ -107,7 +107,7 @@ struct factor_vm {
   /* Set if we're in the jit */
   volatile fixnum current_jit_count;
 
-  /* Mark stack */
+  /* Mark stack used for mark & sweep GC */
   std::vector<cell> mark_stack;
 
   /* If not NULL, we push GC events here */
@@ -186,7 +186,6 @@ struct factor_vm {
   void primitive_identity_hashcode();
   void compute_identity_hashcode(object* obj);
   void primitive_compute_identity_hashcode();
-  cell object_size(cell tagged);
   cell clone_object(cell obj_);
   void primitive_clone();
   void primitive_become();
@@ -559,13 +558,11 @@ struct factor_vm {
   void primitive_fclose();
 
   // code_block
-  cell compute_entry_point_address(cell obj);
   cell compute_entry_point_pic_address(word* w, cell tagged_quot);
   cell compute_entry_point_pic_address(cell w_);
   cell compute_entry_point_pic_tail_address(cell w_);
   cell compute_external_address(instruction_operand op);
 
-  cell code_block_owner(code_block* compiled);
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
   cell compute_dlsym_address(array* literals, cell index, bool toc);
@@ -592,7 +589,6 @@ struct factor_vm {
   void primitive_modify_code_heap();
   void primitive_code_room();
   void primitive_strip_stack_traces();
-  cell code_blocks();
   void primitive_code_blocks();
 
   // callbacks
@@ -605,8 +601,7 @@ struct factor_vm {
   void load_code_heap(FILE* file, image_header* h, vm_parameters* p);
   bool save_image(const vm_char* saving_filename, const vm_char* filename);
   void primitive_save_image();
-  void fixup_data(cell data_offset, cell code_offset);
-  void fixup_code(cell data_offset, cell code_offset);
+  void fixup_heaps(cell data_offset, cell code_offset);
   FILE* open_image(vm_parameters* p);
   void load_image(vm_parameters* p);
   bool read_embedded_image_footer(FILE* file, embedded_image_footer* footer);

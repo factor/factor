@@ -11,10 +11,10 @@ SLOT: out-d
     dup begin-local-analysis instructions>> building set ;
 
 : end-basic-block ( block -- )
-    [ end-local-analysis ] when* building off ;
+    end-local-analysis building off ;
 
 : (begin-basic-block) ( block -- block' )
-    <basic-block> swap [ over connect-bbs ] when* dup set-basic-block ;
+    <basic-block> dup set-basic-block [ connect-bbs ] keep ;
 
 : begin-basic-block ( block -- block' )
     dup end-basic-block (begin-basic-block) ;
@@ -54,6 +54,6 @@ SLOT: out-d
     sift [ f ] [
         dup first second height-state set
         [ first ] map
-        f begin-basic-block
+        <basic-block> dup set-basic-block
         [ connect-Nto1-bbs ] keep
     ] if-empty ;

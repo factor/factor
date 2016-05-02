@@ -1,21 +1,25 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg
+USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linearization
 compiler.cfg.liveness compiler.cfg.registers
-compiler.cfg.renaming.functor compiler.cfg.ssa.destruction.leaders fry
-heaps kernel make math namespaces sequences ;
+compiler.cfg.renaming.functor compiler.cfg.ssa.destruction.leaders
+compiler.cfg.utilities fry heaps kernel make math namespaces sequences
+;
 IN: compiler.cfg.linear-scan.assignment
-
-: heap-pop-while ( heap quot: ( key -- ? ) -- values )
-    '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
-    [ over heap-pop* ] produce 2nip ; inline
+QUALIFIED: sets
 
 ! This contains both active and inactive intervals; any interval
 ! such that start <= insn# <= end is in this set.
 SYMBOL: pending-interval-heap
 SYMBOL: pending-interval-assoc
+
+: insert-spill ( live-interval -- )
+    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
+
+: handle-spill ( live-interval -- )
+    dup spill-to>> [ insert-spill ] [ drop ] if ;
 
 : add-pending ( live-interval -- )
     [ dup live-interval-end pending-interval-heap get heap-push ]
@@ -25,15 +29,12 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
+: vreg>spill-slot ( vreg -- slot )
+    dup rep-of lookup-spill-slot ;
+
 : vreg>reg ( vreg -- reg/spill-slot )
     dup leader dup pending-interval-assoc get at
     [ 2nip ] [ swap rep-of lookup-spill-slot ] if* ;
-
-ERROR: not-spilled-error vreg ;
-
-: vreg>spill-slot ( vreg -- spill-slot )
-    dup vreg>reg dup spill-slot?
-    [ nip ] [ drop leader not-spilled-error ] if ;
 
 : vregs>regs ( assoc -- assoc' )
     [ vreg>reg ] assoc-map ;
@@ -65,12 +66,6 @@ SYMBOL: machine-live-outs
 : compute-live-out ( bb -- )
     [ live-out vregs>regs ] keep machine-live-outs get set-at ;
 
-: insert-spill ( live-interval -- )
-    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
-
-: handle-spill ( live-interval -- )
-    dup spill-to>> [ insert-spill ] [ drop ] if ;
-
 : expire-interval ( live-interval -- )
     [ remove-pending ] [ handle-spill ] bi ;
 
@@ -98,12 +93,6 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 : assign-all-registers ( insn -- )
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
-: assign-gc-roots ( gc-map -- )
-    gc-roots>> [ vreg>spill-slot ] map! drop ;
-
-: assign-derived-roots ( gc-map -- )
-    [ [ [ vreg>spill-slot ] bi@ ] assoc-map ] change-derived-roots drop ;
-
 : begin-block ( bb -- )
     {
         [ basic-block namespaces:set ]
@@ -112,8 +101,39 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
         [ compute-live-in ]
     } cleave ;
 
-: handle-gc-map-insn ( insn -- )
-    dup , gc-map>> [ assign-gc-roots ] [ assign-derived-roots ] bi ;
+: change-insn-gc-roots ( gc-map-insn quot: ( x -- x ) -- )
+    [ gc-map>> ] dip [ swap gc-roots>> swap map! drop ]
+    [ '[ [ [ @ ] bi@ ] assoc-map ] change-derived-roots drop ] 2bi ; inline
+
+: spill-required? ( live-interval root-leaders n -- ? )
+    [ [ vreg>> ] dip sets:in? ] [ swap covers? ] bi-curry* bi or ;
+
+: spill-intervals ( root-leaders n -- live-intervals )
+    [ pending-interval-heap get heap-members ] 2dip
+    '[ _ _ spill-required? ] filter ;
+
+: spill/reload ( interval -- {reg,rep,slot} )
+    [ reg>> ] [ vreg>> dup rep-of dup swapd assign-spill-slot ] bi 3array ;
+
+: spill/reloads ( intervals -- spill/reloads )
+    [ spill/reload ] map ;
+
+: spill/reloads-for-call-gc ( ##call-gc -- spill-seq )
+    [ gc-map>> gc-roots>> ] [ insn#>> ] bi spill-intervals spill/reloads ;
+
+: emit-##call-gc ( insn -- )
+    dup spill/reloads-for-call-gc
+    dup [ first3 ##spill, ] each
+    swap ,
+    [ first3 ##reload, ] each ;
+
+: emit-gc-map-insn ( gc-map-insn -- )
+    [ [ leader ] change-insn-gc-roots ]
+    [ dup ##call-gc? [ emit-##call-gc ] [ , ] if ]
+    [ [ vreg>spill-slot ] change-insn-gc-roots ] tri ;
+
+: emit-insn ( insn -- )
+    dup gc-map-insn? [ emit-gc-map-insn ] [ , ] if ;
 
 : assign-registers-in-block ( bb -- )
     dup begin-block
@@ -122,7 +142,7 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
             [
                 [ insn#>> prepare-insn ]
                 [ assign-all-registers ]
-                [ dup gc-map-insn? [ handle-gc-map-insn ] [ , ] if ] tri
+                [ emit-insn ] tri
             ] each
         ] V{ } make
     ] change-instructions compute-live-out ;

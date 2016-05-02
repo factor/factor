@@ -158,9 +158,10 @@ os macosx? [
     test-image-path =
 ] unit-test
 
-{ } [ "resource:LICENSE.txt" "license.txt" temp-file copy-file ] unit-test
-
-{ } [ "tools.deploy.test.19" shake-and-bake run-temp-image ] unit-test
+{ } [
+    "resource:LICENSE.txt" "local-license.txt" temp-file copy-file
+    "tools.deploy.test.19" shake-and-bake run-temp-image
+] unit-test
 
 { } [ "tools.deploy.test.20" shake-and-bake ] unit-test
 

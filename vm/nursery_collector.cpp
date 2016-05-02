@@ -28,7 +28,7 @@ void factor_vm::collect_nursery() {
   gc_event* event = current_gc->event;
 
   if (event)
-    event->started_card_scan();
+    event->reset_timer();
   collector.trace_cards(data->tenured, card_points_to_nursery,
                         card_points_to_nursery);
   collector.trace_cards(data->aging, card_points_to_nursery, 0xff);
@@ -37,10 +37,10 @@ void factor_vm::collect_nursery() {
     event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
 
   if (event)
-    event->started_code_scan();
+    event->reset_timer();
   collector.trace_code_heap_roots(&code->points_to_nursery);
   if (event)
-    event->ended_code_scan(collector.code_blocks_scanned);
+    event->ended_code_scan(code->points_to_nursery.size());
 
   collector.cheneys_algorithm();
 

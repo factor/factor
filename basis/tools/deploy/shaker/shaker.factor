@@ -28,9 +28,8 @@ IN: tools.deploy.shaker
     "Stripping startup hooks" show
     {
         "alien.strings"
-        "cpu.x86"
+        "cpu.x86.features"
         "environment"
-        "libc"
     }
     [ startup-hooks get delete-at ] each
     deploy-threads? get [
@@ -41,9 +40,10 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         {
+            "compiler.units"
+            "source-files.errors"
             "vocabs"
             "vocabs.cache"
-            "source-files.errors"
         } [ startup-hooks get delete-at ] each
     ] when ;
 
@@ -131,11 +131,7 @@ IN: tools.deploy.shaker
                 "boa-check"
                 "coercer"
                 "combination"
-                "generic-call-sites"
-                "effect-dependencies"
-                "definition-dependencies"
                 "conditional-dependencies"
-                "dependency-checks"
                 "constant"
                 "constraints"
                 "custom-inlining"
@@ -144,10 +140,20 @@ IN: tools.deploy.shaker
                 "default"
                 "default-method"
                 "default-output-classes"
+                "definition-dependencies"
+                "dependency-checks"
                 "derived-from"
                 "ebnf-parser"
+                "effect-dependencies"
                 "engines"
                 "forgotten"
+
+                "generic-call-sites"
+
+                "help"
+                "help-loc"
+                "help-parent"
+
                 "identities"
                 "inline"
                 "inlined-block"
@@ -155,7 +161,9 @@ IN: tools.deploy.shaker
                 "instances"
                 "interval"
                 "intrinsic"
+
                 "lambda"
+                "layout"
                 "loc"
                 "local-reader"
                 "local-reader?"
@@ -163,12 +171,13 @@ IN: tools.deploy.shaker
                 "local-writer?"
                 "local?"
                 "low-order"
+
                 "macro"
                 "members"
                 "memo-quot"
-                "methods"
                 "method-class"
                 "method-generic"
+                "methods"
                 "modular-arithmetic"
                 "no-compile"
                 "owner-generic"
@@ -177,11 +186,14 @@ IN: tools.deploy.shaker
                 "predicate"
                 "predicate-definition"
                 "predicating"
+
                 "reader"
                 "reading"
                 "recursive"
                 "register"
                 "register-size"
+                "related"
+
                 "shuffle"
                 "slots"
                 "special"

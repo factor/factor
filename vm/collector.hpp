@@ -60,25 +60,19 @@ struct gc_workhorse : no_fixup {
 };
 
 template <typename TargetGeneration, typename Policy> struct collector {
-  factor_vm* parent;
   data_heap* data;
-  code_heap* code;
   TargetGeneration* target;
   slot_visitor<gc_workhorse<TargetGeneration, Policy> > visitor;
   cell cards_scanned;
   cell decks_scanned;
-  cell code_blocks_scanned;
   cell scan;
 
   collector(factor_vm* parent, TargetGeneration* target, Policy policy)
-      : parent(parent),
-        data(parent->data),
-        code(parent->code),
+      : data(parent->data),
         target(target),
         visitor(parent, gc_workhorse<TargetGeneration, Policy>(parent, target, policy)),
         cards_scanned(0),
-        decks_scanned(0),
-        code_blocks_scanned(0) {
+        decks_scanned(0) {
     scan = target->start + target->occupied_space();
   }
 
@@ -88,7 +82,6 @@ template <typename TargetGeneration, typename Policy> struct collector {
       visitor.visit_code_block_objects(compiled);
       visitor.visit_embedded_literals(compiled);
       compiled->flush_icache();
-      code_blocks_scanned++;
     }
   }
 

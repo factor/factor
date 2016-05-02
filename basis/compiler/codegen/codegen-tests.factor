@@ -1,7 +1,13 @@
-USING: compiler.codegen compiler.codegen.labels
-compiler.codegen.relocation tools.test cpu.architecture math
-kernel make compiler.constants words ;
+USING: compiler.cfg.utilities compiler.codegen compiler.codegen.labels
+compiler.constants cpu.architecture kernel make math tools.test ;
 IN: compiler.codegen.tests
+
+! useless-branch?
+{ t f } [
+    { } 0 insns>block { } 1 insns>block useless-branch?
+    { } 0 insns>block { } 20 insns>block useless-branch?
+] unit-test
+
 
 { } [ [ ] with-fixup drop ] unit-test
 { } [ [ \ + %call ] with-fixup drop ] unit-test

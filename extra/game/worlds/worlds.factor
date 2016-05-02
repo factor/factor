@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors audio.engine combinators concurrency.promises
 destructors game.input game.loop kernel math parser sequences
-threads ui ui.gadgets ui.gadgets.worlds words.constant ;
+threads ui ui.gadgets ui.gadgets.worlds vocabs.parser words.constant ;
 IN: game.worlds
 
 TUPLE: game-world < world
@@ -81,7 +81,7 @@ M: game-world apply-world-attributes
 
 SYNTAX: GAME:
     scan-new-word
-    game-attributes parse-main-window-attributes
+    game-attributes parse-window-attributes
     2dup define-attributes-word
     parse-definition
-    define-main-window ;
+    [ define-window ] [ 2drop current-vocab main<< ] 3bi ;

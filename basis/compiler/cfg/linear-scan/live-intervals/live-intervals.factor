@@ -87,7 +87,6 @@ M: insn compute-live-intervals* drop ;
     ] [ uses-vregs ] if ;
 
 UNION: hairy-clobber-insn
-    ##call-gc
     alien-call-insn
     ##callback-inputs
     ##callback-outputs

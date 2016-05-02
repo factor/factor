@@ -161,8 +161,11 @@ ARTICLE: "ui-windows" "Top-level windows"
 { $subsections ungraft* }
 "The root of the gadget hierarchy in a window is a special gadget which is rarely operated on directly, but it is helpful to know it exists:"
 { $subsections world }
-"There is also syntax for defining a main window as the entry point for a vocabulary:"
-{ $subsections POSTPONE: MAIN-WINDOW: } ;
+"There is also syntax for defining window words, including a main window that is the entry point for a vocabulary:"
+{ $subsections
+    POSTPONE: WINDOW:
+    POSTPONE: MAIN-WINDOW:
+} ;
 
 ARTICLE: "ui-backend" "Developing UI backends"
 "None of the words documented in this section should be called directly by user code. They are only of interest when developing new UI backends."
@@ -340,6 +343,20 @@ HELP: textured-background
 HELP: dialog-window
 { $description "Provides a hint to the window manager to create a floating, dialog-style window. Currently, this is only implemented for the GTK backend." } ;
 
+HELP: WINDOW:
+{ $syntax "WINDOW: window-word { attributes }
+    attribute-code ;" }
+{ $description "Defines a word for the current vocabulary named " { $snippet "window-word" } " that opens a UI window when run. The " { $snippet "attributes" } " specify the key-value pairs of the window's " { $link world-attributes } ". The " { $snippet "attribute-code" } " is run with the " { $snippet "world-attributes" } " on the stack; this allows the word to construct gadget objects to place in the " { $snippet "gadget" } " slot or set other runtime-dependent world attributes." }
+{ $examples
+"From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
+{ $code
+"USING: accessors ui ui.gadgets.labels ;
+IN: hello-ui
+
+WINDOW: hello { { title \"Hi\" } }
+    \"Hello world\" <label> >>gadgets ;"
+} } ;
+
 HELP: MAIN-WINDOW:
 { $syntax "MAIN-WINDOW: window-word { attributes }
     attribute-code ;" }
@@ -353,6 +370,8 @@ IN: hello-ui
 MAIN-WINDOW: hello { { title \"Hi\" } }
     \"Hello world\" <label> >>gadgets ;"
 } } ;
+
+{ POSTPONE: WINDOW: POSTPONE: MAIN-WINDOW: } related-words
 
 ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
 "The following window controls can be placed in a " { $link world } " window:"
