@@ -26,16 +26,12 @@ void factor_vm::primitive_identity_hashcode() {
   ctx->replace(tag_fixnum(obj->hashcode()));
 }
 
-void factor_vm::compute_identity_hashcode(object* obj) {
+void factor_vm::primitive_compute_identity_hashcode() {
+  object* obj = untag<object>(ctx->pop());
   object_counter++;
   if (object_counter == 0)
     object_counter++;
   obj->set_hashcode((cell)obj ^ object_counter);
-}
-
-void factor_vm::primitive_compute_identity_hashcode() {
-  object* obj = untag<object>(ctx->pop());
-  compute_identity_hashcode(obj);
 }
 
 void factor_vm::primitive_set_slot() {
