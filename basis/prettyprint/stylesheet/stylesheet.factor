@@ -1,13 +1,11 @@
 ! Copyright (C) 2009 Keith Lazuka, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors colors.constants combinators
+USING: assocs colors combinators
 combinators.short-circuit hashtables io.styles kernel literals
-namespaces sequences words words.symbol ;
+namespaces sequences ui.gadgets.theme words words.symbol ;
 IN: prettyprint.stylesheet
 
 <PRIVATE
-
-CONSTANT: dim-color COLOR: gray35
 
 { POSTPONE: USING: POSTPONE: USE: POSTPONE: IN: }
 [
@@ -27,7 +25,7 @@ M: word word-style
 
 M: highlighted-word word-style
     call-next-method
-    COLOR: DarkSlateGray foreground pick set-at ;
+    highlighted-word-color foreground pick set-at ;
 
 <PRIVATE
 
@@ -40,7 +38,7 @@ M: highlighted-word word-style
 PRIVATE>
 
 : string-style ( str -- style )
-    COLOR: LightSalmon4 colored-presentation-style ;
+    string-color colored-presentation-style ;
 
 : vocab-style ( vocab -- style )
     dim-color colored-presentation-style ;
@@ -48,7 +46,7 @@ PRIVATE>
 SYMBOL: stack-effect-style
 
 H{
-    { foreground COLOR: FactorDarkGreen }
+    { foreground $ stack-effect-color }
     { font-style plain }
 } stack-effect-style set-global
 
