@@ -33,13 +33,15 @@ void factor_vm::collect_aging() {
 
     if (event)
       event->reset_timer();
-    collector.trace_cards(data->tenured, card_points_to_aging, 0xff);
-    if (event)
-      event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
+    collector.visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
+    if (event) {
+      event->ended_card_scan(collector.visitor.cards_scanned,
+                             collector.visitor.decks_scanned);
+    }
 
     if (event)
       event->reset_timer();
-    collector.trace_code_heap_roots(&code->points_to_aging);
+    collector.visitor.visit_code_heap_roots(&code->points_to_aging);
     if (event)
       event->ended_code_scan(code->points_to_aging.size());
 
