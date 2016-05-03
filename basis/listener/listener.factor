@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors colors.constants
 combinators.short-circuit compiler.units continuations debugger
-fry io io.styles kernel lexer locals math math.parser namespaces
-parser parser.notes prettyprint sequences sets
-source-files.errors system vocabs vocabs.loader vocabs.parser ;
+fry io io.styles kernel lexer literals locals math math.parser
+namespaces parser parser.notes prettyprint sequences sets
+source-files.errors system ui.gadgets.theme vocabs vocabs.loader
+vocabs.parser ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -16,8 +17,8 @@ GENERIC# prompt. 1 ( stream prompt -- )
 
 M: object prompt.
     nip H{
-        { background T{ rgba f 1 0.7 0.7 1 } }
-        { foreground COLOR: black }
+        { background $ prompt-background-color }
+        { foreground $ text-color }
     } format bl flush ;
 
 : parse-lines-interactive ( lines -- quot/f )
