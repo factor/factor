@@ -114,15 +114,21 @@ This is used by GC's sweep and compact phases, and the implementation of the
 modify-code-heap primitive.
 
 Iteration is driven by visit_*() methods. Some of them define GC roots:
-- visit_context_code_blocks()
-- visit_callback_code_blocks() */
+ - visit_context_code_blocks()
+ - visit_callback_code_blocks()
+*/
 
 template <typename Fixup> struct slot_visitor {
   factor_vm* parent;
   Fixup fixup;
+  cell cards_scanned;
+  cell decks_scanned;
 
   slot_visitor<Fixup>(factor_vm* parent, Fixup fixup)
-      : parent(parent), fixup(fixup) {}
+  : parent(parent),
+    fixup(fixup),
+    cards_scanned(0),
+    decks_scanned(0) {}
 
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
@@ -143,6 +149,14 @@ template <typename Fixup> struct slot_visitor {
   void visit_object(object* obj);
   void visit_mark_stack(std::vector<cell>* mark_stack);
   void visit_instruction_operands(code_block* block, cell rel_base);
+
+  template <typename SourceGeneration>
+  cell visit_card(SourceGeneration* gen, cell index, cell start);
+
+  template <typename SourceGeneration>
+  void visit_cards(SourceGeneration* gen, card mask, card unmask);
+
+  void visit_code_heap_roots(std::set<code_block*>* remembered_set);
 };
 
 template <typename Fixup>
@@ -515,5 +529,82 @@ void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
   };
   block->each_instruction_operand(visit_func);
 }
+
+template <typename Fixup>
+template <typename SourceGeneration>
+cell slot_visitor<Fixup>::visit_card(SourceGeneration* gen,
+                                     cell index, cell start) {
+  cell heap_base = parent->data->start;
+  cell start_addr = heap_base + index * card_size;
+  cell end_addr = start_addr + card_size;
+
+  /* Forward to the next object whose address is in the card. */
+  if (!start || (start + ((object*)start)->size()) < start_addr) {
+    /* Optimization because finding the objects in a memory range is
+       expensive. It helps a lot when tracing consecutive cards. */
+    cell gen_start_card = (gen->start - heap_base) / card_size;
+    start = gen->starts
+        .find_object_containing_card(index - gen_start_card);
+  }
+
+  while (start && start < end_addr) {
+    visit_partial_objects(start, start_addr, end_addr);
+    if ((start + ((object*)start)->size()) >= end_addr) {
+      /* The object can overlap the card boundary, then the
+         remainder of it will be handled in the next card
+         tracing if that card is marked. */
+      break;
+    }
+    start = gen->next_object_after(start);
+  }
+  return start;
+}
+
+template <typename Fixup>
+template <typename SourceGeneration>
+void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
+                                      card mask, card unmask) {
+  card_deck* decks = parent->data->decks;
+  card_deck* cards = parent->data->cards;
+  cell heap_base = parent->data->start;
+
+  cell first_deck = (gen->start - heap_base) / deck_size;
+  cell last_deck = (gen->end - heap_base) / deck_size;
+
+  /* Address of last traced object. */
+  cell start = 0;
+  for (cell di = first_deck; di < last_deck; di++) {
+    if (decks[di] & mask) {
+      decks[di] &= ~unmask;
+      decks_scanned++;
+
+      cell first_card = cards_per_deck * di;
+      cell last_card = first_card + cards_per_deck;
+
+      for (cell ci = first_card; ci < last_card; ci++) {
+        if (cards[ci] & mask) {
+          cards[ci] &= ~unmask;
+          cards_scanned++;
+
+          start = visit_card(gen, ci, start);
+          if (!start) {
+            /* At end of generation, no need to scan more cards. */
+            return;
+          }
+        }
+      }
+    }
+  }
+}
+
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_code_heap_roots(std::set<code_block*>* remembered_set) {
+    FACTOR_FOR_EACH(*remembered_set) {
+      code_block* compiled = *iter;
+      visit_code_block_objects(compiled);
+      visit_embedded_literals(compiled);
+      compiled->flush_icache();
+    }
+  }
 
 }

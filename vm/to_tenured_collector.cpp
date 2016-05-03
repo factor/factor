@@ -5,7 +5,7 @@ namespace factor {
 void factor_vm::collect_to_tenured() {
   /* Copy live objects from aging space to tenured space. */
   collector<tenured_space, to_tenured_policy> collector(this,
-                                                        this->data->tenured,
+                                                        data->tenured,
                                                         to_tenured_policy(this));
 
   mark_stack.clear();
@@ -15,13 +15,15 @@ void factor_vm::collect_to_tenured() {
 
   if (event)
     event->reset_timer();
-  collector.trace_cards(data->tenured, card_points_to_aging, 0xff);
-  if (event)
-    event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
+  collector.visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
+  if (event) {
+    event->ended_card_scan(collector.visitor.cards_scanned,
+                           collector.visitor.decks_scanned);
+  }
 
   if (event)
     event->reset_timer();
-  collector.trace_code_heap_roots(&code->points_to_aging);
+  collector.visitor.visit_code_heap_roots(&code->points_to_aging);
   if (event)
     event->ended_code_scan(code->points_to_aging.size());
 

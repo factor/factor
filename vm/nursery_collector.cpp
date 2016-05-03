@@ -29,16 +29,18 @@ void factor_vm::collect_nursery() {
 
   if (event)
     event->reset_timer();
-  collector.trace_cards(data->tenured, card_points_to_nursery,
-                        card_points_to_nursery);
-  collector.trace_cards(data->aging, card_points_to_nursery, 0xff);
+  collector.visitor.visit_cards(data->tenured, card_points_to_nursery,
+                                card_points_to_nursery);
+  collector.visitor.visit_cards(data->aging, card_points_to_nursery, 0xff);
 
-  if (event)
-    event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
+  if (event) {
+    event->ended_card_scan(collector.visitor.cards_scanned,
+                           collector.visitor.decks_scanned);
+  }
 
   if (event)
     event->reset_timer();
-  collector.trace_code_heap_roots(&code->points_to_nursery);
+  collector.visitor.visit_code_heap_roots(&code->points_to_nursery);
   if (event)
     event->ended_code_scan(code->points_to_nursery.size());
 
