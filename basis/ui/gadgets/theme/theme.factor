@@ -1,4 +1,5 @@
-! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
+! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: io.pathnames sequences ui.images vocabs ;
 IN: ui.gadgets.theme
 
