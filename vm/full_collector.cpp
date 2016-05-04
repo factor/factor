@@ -42,9 +42,8 @@ void factor_vm::update_code_roots_for_sweep() {
 void factor_vm::collect_mark_impl() {
   gc_workhorse<tenured_space, full_policy>
       workhorse(this, this->data->tenured, full_policy(this));
-
-  slot_visitor<gc_workhorse<tenured_space, full_policy> >
-                visitor(this, workhorse);
+  slot_visitor<gc_workhorse<tenured_space, full_policy>>
+      visitor(this, workhorse);
 
   mark_stack.clear();
 
