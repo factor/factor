@@ -101,6 +101,7 @@ CONSTANT: next 1
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
+        [ theme-font-colors ] change-editor
         "Search" >>default-text
         10 >>min-cols
         10 >>max-cols

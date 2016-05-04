@@ -134,7 +134,7 @@ PRIVATE>
     <button-pen> ;
 
 : border-button-label-theme ( gadget -- )
-    dup label? [ [ clone t >>bold? ] change-font ] when drop ;
+    dup label? [ [ clone t >>bold? text-color >>foreground ] change-font ] when drop ;
 
 : border-button-theme ( gadget -- gadget )
     dup gadget-child border-button-label-theme

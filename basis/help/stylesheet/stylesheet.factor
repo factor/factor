@@ -26,6 +26,7 @@ SYMBOL: default-span-style
 H{
     { font-name $ default-sans-serif-font-name }
     { font-size $ font-size-span }
+    { foreground $ text-color }
     { font-style plain }
 } default-span-style set-global
 

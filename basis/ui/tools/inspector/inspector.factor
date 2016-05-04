@@ -73,8 +73,8 @@ M: hashtable make-slot-descriptions
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <arrow> inspector-renderer <table>
         [ invoke-primary-operation ] >>action
-        monospace-font >>font
-        COLOR: dark-gray >>column-line-color
+        monospace-font >>font theme-font-colors
+        line-color >>column-line-color
         6 >>gap
         15 >>min-rows
         15 >>max-rows
