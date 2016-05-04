@@ -59,25 +59,4 @@ struct gc_workhorse : no_fixup {
   }
 };
 
-template <typename TargetGeneration, typename Policy> struct collector {
-  data_heap* data;
-  TargetGeneration* target;
-  slot_visitor<gc_workhorse<TargetGeneration, Policy> > visitor;
-  cell scan;
-
-  collector(factor_vm* parent, TargetGeneration* target, Policy policy)
-      : data(parent->data),
-        target(target),
-        visitor(parent, gc_workhorse<TargetGeneration, Policy>(parent, target, policy)) {
-    scan = target->start + target->occupied_space();
-  }
-
-  void cheneys_algorithm() {
-    while (scan && scan < this->target->here) {
-      this->visitor.visit_object((object*)scan);
-      scan = this->target->next_object_after(scan);
-    }
-  }
-};
-
 }

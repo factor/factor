@@ -26,26 +26,26 @@ void factor_vm::collect_aging() {
        raised. */
     current_gc->op = collect_to_tenured_op;
 
-    collector<tenured_space, to_tenured_policy> collector(this,
-                                                          data->tenured,
-                                                          to_tenured_policy(this));
+    gc_workhorse<tenured_space, to_tenured_policy>
+        workhorse(this, data->tenured, to_tenured_policy(this));
+    slot_visitor<gc_workhorse<tenured_space, to_tenured_policy>>
+        visitor(this, workhorse);
+
     gc_event* event = current_gc->event;
 
     if (event)
       event->reset_timer();
-    collector.visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
-    if (event) {
-      event->ended_card_scan(collector.visitor.cards_scanned,
-                             collector.visitor.decks_scanned);
-    }
+    visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
+    if (event)
+      event->ended_card_scan(visitor.cards_scanned, visitor.decks_scanned);
 
     if (event)
       event->reset_timer();
-    collector.visitor.visit_code_heap_roots(&code->points_to_aging);
+    visitor.visit_code_heap_roots(&code->points_to_aging);
     if (event)
       event->ended_code_scan(code->points_to_aging.size());
 
-    collector.visitor.visit_mark_stack(&mark_stack);
+    visitor.visit_mark_stack(&mark_stack);
   }
   {
     /* If collection fails here, do a to_tenured collection. */
@@ -54,12 +54,15 @@ void factor_vm::collect_aging() {
     std::swap(data->aging, data->aging_semispace);
     data->reset_aging();
 
-    collector<aging_space, aging_policy> collector(this,
-                                                   data->aging,
-                                                   aging_policy(this));
+    aging_space *target = data->aging;
+    gc_workhorse<aging_space, aging_policy>
+        workhorse(this, target, aging_policy(this));
+    slot_visitor<gc_workhorse<aging_space, aging_policy>>
+        visitor(this, workhorse);
+    cell scan = target->start + target->occupied_space();
 
-    collector.visitor.visit_all_roots();
-    collector.cheneys_algorithm();
+    visitor.visit_all_roots();
+    visitor.cheneys_algorithm(target, scan);
 
     data->reset_nursery();
     code->clear_remembered_set();

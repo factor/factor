@@ -152,11 +152,12 @@ template <typename Fixup> struct slot_visitor {
 
   template <typename SourceGeneration>
   cell visit_card(SourceGeneration* gen, cell index, cell start);
-
   template <typename SourceGeneration>
   void visit_cards(SourceGeneration* gen, card mask, card unmask);
-
   void visit_code_heap_roots(std::set<code_block*>* remembered_set);
+
+  template <typename TargetGeneration>
+  void cheneys_algorithm(TargetGeneration* gen, cell scan);
 };
 
 template <typename Fixup>
@@ -599,12 +600,21 @@ void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_code_heap_roots(std::set<code_block*>* remembered_set) {
-    FACTOR_FOR_EACH(*remembered_set) {
-      code_block* compiled = *iter;
-      visit_code_block_objects(compiled);
-      visit_embedded_literals(compiled);
-      compiled->flush_icache();
-    }
+  FACTOR_FOR_EACH(*remembered_set) {
+    code_block* compiled = *iter;
+    visit_code_block_objects(compiled);
+    visit_embedded_literals(compiled);
+    compiled->flush_icache();
   }
+}
+
+template <typename Fixup>
+template <typename TargetGeneration>
+void slot_visitor<Fixup>::cheneys_algorithm(TargetGeneration* gen, cell scan) {
+  while (scan && scan < gen->here) {
+    visit_object((object*)scan);
+    scan = gen->next_object_after(scan);
+  }
+}
 
 }
