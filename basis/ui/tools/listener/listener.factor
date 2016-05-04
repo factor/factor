@@ -73,6 +73,7 @@ M: color-completion (word-at-caret) 2drop f ;
 
 : <interactor> ( -- gadget )
     interactor new-editor
+        theme-font-colors
         <flag> >>flag
         dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model
@@ -95,12 +96,18 @@ M: interactor stream-element-type drop +character+ ;
 GENERIC: (print-input) ( object -- )
 
 M: input (print-input)
-    dup presented associate
-    [ string>> H{ { font-style bold } } format ] with-nesting nl ;
+    dup presented associate [
+        string>>
+        H{ { font-style bold } { foreground $ text-color } }
+        format
+    ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: " H{ { font-name "sans-serif" } { font-style bold } }
-    format . ;
+    "Command: "
+    H{ { font-name "sans-serif" }
+       { font-style bold }
+       { foreground $ text-color }
+    } format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;

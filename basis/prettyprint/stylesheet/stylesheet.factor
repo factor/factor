@@ -21,7 +21,8 @@ GENERIC: word-style ( word -- style )
 
 M: word word-style
     [ presented associate ]
-    [ "word-style" word-prop ] bi assoc-union! ;
+    [ "word-style" word-prop ] bi assoc-union!
+    text-color foreground pick set-at ;
 
 M: highlighted-word word-style
     call-next-method

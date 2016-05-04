@@ -21,7 +21,7 @@ M: labeled-gadget focusable-child* content>> ;
 
 : add-title-bar ( title track -- track )
     swap >label
-    [ t >>bold? ] change-font
+    [ t >>bold? text-color >>foreground ] change-font
     { 0 4 } <border>
     title-bar-interior >>interior
     f track-add ;
