@@ -3,7 +3,7 @@
 USING: accessors arrays colors.constants combinators fonts fry
 kernel make math.functions models namespaces sequences splitting
 strings ui.baseline-alignment ui.gadgets ui.gadgets.tracks
-ui.pens.solid ui.render ui.text ;
+ui.pens.solid ui.render ui.text ui.tools.common ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
@@ -92,7 +92,7 @@ M: label-control model-changed
         swap >>model ;
 
 : text-theme ( gadget -- gadget )
-    monospace-font >>font ;
+    monospace-font >>font theme-font-colors ;
 
 : reverse-video-theme ( label -- label )
     sans-serif-font reverse-video-font >>font

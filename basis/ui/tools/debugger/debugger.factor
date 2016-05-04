@@ -36,7 +36,7 @@ M: restart-renderer row-columns
     [ error>> <error-pane> add-gadget ]
     [
         dup restart-hook>> [
-            [ "To continue, pick one of the options below:" <label> add-gadget ] dip
+            [ "To continue, pick one of the options below:" <label> theme-font-colors add-gadget ] dip
             restart-list>> add-gadget
         ] [ drop ] if
     ] bi ;

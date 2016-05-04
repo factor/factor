@@ -49,3 +49,6 @@ SLOT: scroller
 
 : white-interior ( track -- track )
     content-background <solid> >>interior ;
+
+: theme-font-colors ( gadget -- gadget )
+    [ content-background >>background text-color >>foreground ] change-font ;

@@ -28,7 +28,7 @@ M: stack-entry-renderer row-value drop object>> ;
         10 >>max-rows
         40 >>min-cols
         40 >>max-cols
-        monospace-font >>font
+        monospace-font >>font theme-font-colors
         [ i:inspector ] >>action
         t >>single-click? ;
 

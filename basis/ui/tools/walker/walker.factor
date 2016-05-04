@@ -78,9 +78,9 @@ M: thread-status model-changed
 : add-thread-status ( track -- track )
     horizontal <track> { 5 5 } >>gap
         "Thread:" <label>
-            dup font>> t >>bold? drop
+            [ t >>bold? text-color >>foreground ] change-font
             f track-add
-        self name>> <label> f track-add
+        self name>> <label> [ text-color >>foreground ] change-font f track-add
         over status>> <thread-status>
             dup font>> t >>bold? drop
             f track-add
