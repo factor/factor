@@ -351,7 +351,7 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
 }
 "The " { $link S+ } " modifier is only ever used with the above action keys; alphanumeric input input with the shift key is delivered without the " { $link S+ } " modifier set, instead the input itself is upper case. For example, the gesture corresponding to " { $snippet "s" } " with the Control and Shift keys pressed is presented as "
 { $code "T{ key-down f { C+ } \"S\" }" }
-"The " { $snippet "RET" } " and " { $snippet "TAB" } " keys are never delivered in their literal form (" { $snippet "\"\\n\"" } " and " { $snippet "\"\\t\"" } ;
+"The " { $snippet "RET" } " and " { $snippet "TAB" } " keys are never delivered in their literal form (" { $snippet "\"\\n\"" } " and " { $snippet "\"\\t\"" } ")." ;
 
 ARTICLE: "ui-user-input" "Free-form keyboard input"
 "Whereas keyboard gestures are intended to be used for keyboard shortcuts, certain gadgets such as text fields need to accept free-form keyboard input. This can be done by implementing a generic word:"

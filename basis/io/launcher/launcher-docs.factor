@@ -28,10 +28,10 @@ $nl
 "To specify redirection, set the " { $snippet "stdin" } ", " { $snippet "stdout" } " and " { $snippet "stderr" } " slots of a " { $link process } " to one of the following values:"
 { $list
     { { $link f } " - default value; the stream is either inherited from the current process, or is a " { $link <process-stream> } " pipe" }
-    { { $link +closed+ } " - the stream is closed; reads will return end of file and writes will fails" }
+    { { $link +closed+ } " - the stream is closed; reads will return end of file and writes will fail" }
     { { $link +stdout+ } " - a special value for the " { $snippet "stderr" } " slot only, indicating that the standard output and standard error streams should be merged" }
     { "a path name - the stream is sent to the given file, which must exist for input and is created automatically on output" }
-    { "an " { $link appender } " wrapping a path name - output is sent to the end given file, as with " { $link <file-appender> } }
+    { "an " { $link appender } " wrapping a path name - output is sent to the end of the given file, as with " { $link <file-appender> } }
     { "a file stream or a socket - the stream is connected to the given Factor stream, which cannot be used again from within Factor and must be closed after the process has been started" }
 } ;
 
