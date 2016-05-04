@@ -54,3 +54,34 @@ CONSTANT: error-summary-background HEXCOLOR: F4D9D9
 
 CONSTANT: content-background COLOR: white
 CONSTANT: text-color COLOR: black
+
+CONSTANT: link-color COLOR: DodgerBlue4
+CONSTANT: url-color COLOR: DodgerBlue4
+CONSTANT: title-color COLOR: gray20
+CONSTANT: heading-color COLOR: FactorDarkSlateBlue
+CONSTANT: snippet-color COLOR: DarkOrange4
+CONSTANT: output-color COLOR: DarkOrange4
+CONSTANT: warning-background-color COLOR: gray90
+CONSTANT: code-background-color COLOR: FactorLightTan
+
+CONSTANT: tip-background-color COLOR: lavender
+
+CONSTANT: prompt-background-color T{ rgba f 1 0.7 0.7 1 }
+
+CONSTANT: dim-color COLOR: gray35
+CONSTANT: highlighted-word-color COLOR: DarkSlateGray
+CONSTANT: string-color COLOR: LightSalmon4
+CONSTANT: stack-effect-color COLOR: FactorDarkGreen
+
+CONSTANT: vocab-background-color COLOR: FactorLightTan
+CONSTANT: vocab-border-color COLOR: FactorDarkTan
+
+CONSTANT: field-border-color COLOR: gray
+
+CONSTANT: selection-color T{ rgba f 0.8 0.8 1.0 1.0 }
+
+CONSTANT: panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 }
+
+CONSTANT: focus-border-color COLOR: dark-gray
+
+CONSTANT: labeled-border-color COLOR: grey85
