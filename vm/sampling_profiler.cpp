@@ -39,26 +39,16 @@ void factor_vm::record_sample(bool prolog_p) {
                                        special_objects[OBJ_CURRENT_THREAD]));
 }
 
-struct record_callstack_sample_iterator {
-  std::vector<cell>* sample_callstacks;
-  bool skip_p;
-
-  record_callstack_sample_iterator(std::vector<cell>* sample_callstacks,
-                                   bool prolog_p)
-      : sample_callstacks(sample_callstacks), skip_p(prolog_p) {}
-
-  void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
-    if (skip_p)
-      skip_p = false;
-    else
-      sample_callstacks->push_back(owner->owner);
-  }
-};
-
 void factor_vm::record_callstack_sample(cell* begin, cell* end, bool prolog_p) {
   *begin = sample_callstacks.size();
 
-  record_callstack_sample_iterator recorder(&sample_callstacks, prolog_p);
+  bool skip_p = prolog_p;
+  auto recorder = [&](cell frame_top, cell size, code_block* owner, cell addr) {
+    if (skip_p)
+      skip_p = false;
+    else
+      sample_callstacks.push_back(owner->owner);
+  };
   iterate_callstack(ctx, recorder);
 
   *end = sample_callstacks.size();
