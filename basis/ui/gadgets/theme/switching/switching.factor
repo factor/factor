@@ -20,7 +20,7 @@ IN: ui.gadgets.theme.switching
     deprecated-style warning-background-color page-color (update-style)
     table-style line-color table-border (update-style) ;
 
-: light-theme ( -- ) light new theme set-global update-stylesheet ;
-: dark-theme ( -- ) dark new theme set-global update-stylesheet ;
+: light-mode ( -- ) light-theme theme set-global update-stylesheet ;
+: dark-mode ( -- ) dark-theme theme set-global update-stylesheet ;
 
-light-theme
+light-mode
