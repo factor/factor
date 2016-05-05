@@ -27,6 +27,8 @@ TIP: "To save time on reloading big libraries such as the " { $vocab-link "furna
 
 TIP: "Use the " { $link leaks. } " combinator to track down resource leaks." ;
 
+TIP: "Use " { $link light-mode } " and " { $link dark-mode } " for a light or dark user interface." ;
+
 HELP: TIP:
 { $syntax "TIP: content ;" }
 { $values { "content" "a markup element" } }
