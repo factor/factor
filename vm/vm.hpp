@@ -190,7 +190,6 @@ struct factor_vm {
   void primitive_become();
 
   // sampling_profiler
-  void clear_samples();
   void record_sample(bool prolog_p);
   void record_callstack_sample(cell* begin, cell* end, bool prolog_p);
   void start_sampling_profiler(fixnum rate);

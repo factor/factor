@@ -67,19 +67,12 @@ void factor_vm::set_sampling_profiler(fixnum rate) {
     end_sampling_profiler();
 }
 
-void factor_vm::clear_samples() {
-  // Swapping into temporaries releases the vector's allocated storage,
-  // whereas clear() would leave the allocation as-is
-  std::vector<profiling_sample> sample_graveyard;
-  std::vector<cell> sample_callstack_graveyard;
-  samples.swap(sample_graveyard);
-  sample_callstacks.swap(sample_callstack_graveyard);
-}
-
 void factor_vm::start_sampling_profiler(fixnum rate) {
   samples_per_second = rate;
   safepoint.sample_counts.clear();
-  clear_samples();
+  // Release the memory consumed by colleting samples.
+  samples.shrink_to_fit();
+  sample_callstacks.shrink_to_fit();
   samples.reserve(10 * rate);
   sample_callstacks.reserve(100 * rate);
   atomic::store(&sampling_profiler_p, true);
