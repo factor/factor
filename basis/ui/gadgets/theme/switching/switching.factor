@@ -1,4 +1,4 @@
-! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
+! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry hashtables help.stylesheet io.styles kernel
 namespaces ui.gadgets.theme ;
