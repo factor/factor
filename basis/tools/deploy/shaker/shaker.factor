@@ -163,7 +163,6 @@ IN: tools.deploy.shaker
                 "intrinsic"
 
                 "lambda"
-                "layout"
                 "loc"
                 "local-reader"
                 "local-reader?"
