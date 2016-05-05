@@ -12,7 +12,7 @@ ifdef CONFIG
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
 
-	CXXFLAGS += -std=c++11 -stdlib=libc++
+	CXXFLAGS += -std=c++11
 
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG
