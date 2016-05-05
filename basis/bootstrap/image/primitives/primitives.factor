@@ -782,7 +782,6 @@ CONSTANT: all-primitives {
         {
             { "profiling" ( ? -- ) "sampling_profiler" { object } { } f }
             { "(get-samples)" ( -- samples/f ) "get_samples" { } { object } f }
-            { "(clear-samples)" ( -- ) "clear_samples" { } { } f }
         }
     }
     {

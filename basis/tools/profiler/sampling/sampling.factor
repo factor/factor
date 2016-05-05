@@ -9,7 +9,6 @@ IN: tools.profiler.sampling
 <PRIVATE
 PRIMITIVE: (get-samples) ( -- samples/f )
 PRIMITIVE: profiling ( ? -- )
-PRIMITIVE: (clear-samples) ( -- )
 PRIVATE>
 
 SYMBOL: samples-per-second

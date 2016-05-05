@@ -14,6 +14,5 @@ TUPLE: boom ;
 { } [ [ 300,000 iota [ sq sq sq ] map drop ] profile flat profile. ] unit-test
 { } [ [ 300,000 iota [ sq sq sq ] map drop ] profile top-down profile. ] unit-test
 
-(clear-samples)
 f raw-profile-data set-global
 gc
