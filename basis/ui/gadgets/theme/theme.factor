@@ -7,10 +7,10 @@ IN: ui.gadgets.theme
     "vocab:ui/gadgets/theme/" prepend-path ".tiff" append <image-name> ;
 
 SYMBOL: theme
-TUPLE: light ;
-TUPLE: dark ;
+SINGLETON: light-theme
+SINGLETON: dark-theme
 
-light new theme set-global
+light-theme theme set-global
 
 HOOK: toolbar-background theme ( -- color )
 HOOK: toolbar-button-pressed-background theme ( -- color )
