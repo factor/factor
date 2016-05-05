@@ -148,6 +148,4 @@ void factor_vm::primitive_get_samples() {
   }
 }
 
-void factor_vm::primitive_clear_samples() { clear_samples(); }
-
 }
