@@ -1,6 +1,6 @@
-USING: byte-arrays calendar kernel math memory namespaces
-random threads tools.profiler.sampling
-tools.profiler.sampling.private tools.test sequences ;
+USING: byte-arrays calendar kernel math memory namespaces parser
+random sequences threads tools.profiler.sampling
+tools.profiler.sampling.private tools.test ;
 IN: tools.profiler.sampling.tests
 
 ! Make sure the profiler doesn't blow up the VM
@@ -16,3 +16,11 @@ TUPLE: boom ;
 
 f raw-profile-data set-global
 gc
+
+{ t 0 } [
+    ! Seed the samples data
+    [ "resource:basis/tools/memory/memory.factor" run-file ] profile
+    (get-samples) length 0 >
+    ! Should clear it
+    [ ] profile (get-samples) length
+] unit-test

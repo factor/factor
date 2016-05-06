@@ -71,8 +71,11 @@ void factor_vm::start_sampling_profiler(fixnum rate) {
   samples_per_second = rate;
   safepoint.sample_counts.clear();
   // Release the memory consumed by colleting samples.
+  samples.clear();
   samples.shrink_to_fit();
+  sample_callstacks.clear();
   sample_callstacks.shrink_to_fit();
+
   samples.reserve(10 * rate);
   sample_callstacks.reserve(100 * rate);
   atomic::store(&sampling_profiler_p, true);
