@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry hashtables help.stylesheet help.tips io.styles
-kernel listener namespaces ui.gadgets.theme ;
+kernel listener namespaces ui.gadgets.theme ui.tools.listener ;
 IN: ui.gadgets.theme.switching
 
 : (update-style) ( style color elt -- )
@@ -21,7 +21,9 @@ IN: ui.gadgets.theme.switching
     table-style line-color table-border (update-style)
     prompt-style prompt-background-color background (update-style)
     prompt-style text-color foreground (update-style)
-    tip-of-the-day-style tip-background-color page-color (update-style) ;
+    tip-of-the-day-style tip-background-color page-color (update-style)
+    listener-input-style text-color foreground (update-style)
+    listener-word-style text-color foreground (update-style) ;
 
 : light-mode ( -- ) light-theme theme set-global update-stylesheet ;
 : dark-mode ( -- ) dark-theme theme set-global update-stylesheet ;
