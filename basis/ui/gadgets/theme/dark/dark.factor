@@ -18,7 +18,7 @@ M: dark-theme button-clicked-text-color COLOR: white ;
 
 M: dark-theme line-color COLOR: solarized-base01 ;
 
-M: dark-theme column-title-background COLOR: solarized-base01 ;
+M: dark-theme column-title-background HEXCOLOR: 2F4D5B ;
 
 M: dark-theme roll-button-rollover-border COLOR: gray50 ;
 M: dark-theme roll-button-selected-background COLOR: dark-gray ;
