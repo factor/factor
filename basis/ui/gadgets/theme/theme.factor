@@ -94,3 +94,6 @@ HOOK: panel-background-color theme ( -- color )
 HOOK: focus-border-color theme ( -- color )
 
 HOOK: labeled-border-color theme ( -- color )
+
+<< "ui.gadgets.theme.light" require >>
+<< "ui.gadgets.theme.dark" require >>
