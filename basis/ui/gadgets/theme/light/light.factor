@@ -62,7 +62,7 @@ M: light-theme title-color COLOR: gray20 ;
 M: light-theme heading-color COLOR: FactorDarkSlateBlue ;
 M: light-theme snippet-color COLOR: DarkOrange4 ;
 M: light-theme output-color COLOR: DarkOrange4 ;
-M: light-theme warning-background-color COLOR: gray90 ;
+M: light-theme warning-background-color T{ rgba f 1 0.7 0.7 1 } ;
 M: light-theme code-background-color COLOR: FactorLightTan ;
 
 M: light-theme tip-background-color COLOR: lavender ;
