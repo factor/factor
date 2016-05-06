@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: images.testing io.directories images.png sequences ;
+USING: accessors images.png images.testing io.directories
+io.encodings.binary io.files sequences tools.test ;
 IN: images.png.tests
 
 ! Test files from PngSuite (http://www.libpng.org/pub/png/pngsuite.html)
@@ -75,6 +76,10 @@ IN: images.png.tests
         "z06n2c08.png"
         "z09n2c08.png"
     } [ png-image decode-test ] each
+
+    { "ICC Profile" } [
+        "1529.png" binary <file-reader> load-png icc-profile>> name>>
+    ] unit-test
 ] with-directory
 
 ! Test pngsuite
@@ -245,7 +250,6 @@ IN: images.png.tests
         "z06n2c08.png"
         "z09n2c08.png"
     } [ png-image decode-test ] each
-
 ] with-directory
 
 "vocab:images/testing/png/suite/bads" [
