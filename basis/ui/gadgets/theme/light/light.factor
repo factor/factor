@@ -80,9 +80,7 @@ M: light-theme vocab-border-color COLOR: FactorDarkTan ;
 M: light-theme field-border-color COLOR: gray ;
 
 M: light-theme selection-color T{ rgba f 0.8 0.8 1.0 1.0 } ;
-
 M: light-theme panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 } ;
-
 M: light-theme focus-border-color COLOR: dark-gray ;
 
 M: light-theme labeled-border-color COLOR: grey85 ;
