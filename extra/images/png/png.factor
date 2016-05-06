@@ -43,7 +43,7 @@ CONSTANT: block-width   { 8 4 4 2 2 1 1 }
     loading-png new
     V{ } clone >>chunks ;
 
-TUPLE: png-chunk length type data ;
+TUPLE: png-chunk type data ;
 
 : <png-chunk> ( -- png-chunk )
     png-chunk new ; inline
@@ -62,7 +62,7 @@ ERROR: bad-checksum ;
 
 : read-png-chunks ( loading-png -- loading-png )
     <png-chunk>
-    4 read be> [ >>length ] [ 4 + ] bi
+    4 read be> 4 +
     read dup crc32 checksum-bytes
     4 read = [ bad-checksum ] unless
     4 cut-slice
