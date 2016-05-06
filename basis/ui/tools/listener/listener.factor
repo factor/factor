@@ -95,19 +95,26 @@ M: interactor stream-element-type drop +character+ ;
 
 GENERIC: (print-input) ( object -- )
 
+SYMBOL: listener-input-style
+H{
+    { font-style bold }
+    { foreground $ text-color }
+} listener-input-style set-global
+
+SYMBOL: listener-word-style
+H{
+    { font-name "sans-serif" }
+    { font-style bold }
+    { foreground $ text-color }
+} listener-word-style set-global
+
 M: input (print-input)
     dup presented associate [
-        string>>
-        H{ { font-style bold } { foreground $ text-color } }
-        format
+        string>> listener-input-style get-global format
     ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: "
-    H{ { font-name "sans-serif" }
-       { font-style bold }
-       { foreground $ text-color }
-    } format . ;
+    "Command: " listener-word-style get-global format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
