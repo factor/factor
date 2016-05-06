@@ -60,8 +60,8 @@ M: light-theme link-color COLOR: DodgerBlue4 ;
 M: light-theme url-color COLOR: DodgerBlue4 ;
 M: light-theme title-color COLOR: gray20 ;
 M: light-theme heading-color COLOR: FactorDarkSlateBlue ;
-M: light-theme snippet-color COLOR: DarkOrange4 ;
-M: light-theme output-color COLOR: DarkOrange4 ;
+M: light-theme snippet-color COLOR: solarized-orange ;
+M: light-theme output-color COLOR: solarized-orange ;
 M: light-theme warning-background-color T{ rgba f 1 0.7 0.7 1 } ;
 M: light-theme code-background-color COLOR: FactorLightTan ;
 
@@ -69,10 +69,10 @@ M: light-theme tip-background-color COLOR: lavender ;
 
 M: light-theme prompt-background-color T{ rgba f 1 0.7 0.7 1 } ;
 
-M: light-theme dim-color COLOR: gray35 ;
-M: light-theme highlighted-word-color COLOR: DarkSlateGray ;
-M: light-theme string-color COLOR: LightSalmon4 ;
-M: light-theme stack-effect-color COLOR: FactorDarkGreen ;
+M: light-theme dim-color COLOR: solarized-cyan ;
+M: light-theme highlighted-word-color COLOR: solarized-green ;
+M: light-theme string-color COLOR: solarized-magenta ;
+M: light-theme stack-effect-color COLOR: solarized-orange ;
 
 M: light-theme vocab-background-color COLOR: FactorLightTan ;
 M: light-theme vocab-border-color COLOR: FactorDarkTan ;
