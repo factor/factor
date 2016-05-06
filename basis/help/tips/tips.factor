@@ -28,7 +28,6 @@ SYNTAX: TIP:
 : a-tip ( -- tip ) tips get random ;
 
 SYMBOL: tip-of-the-day-style
-
 H{
     { page-color $ tip-background-color }
     { inset { 5 5 } }
