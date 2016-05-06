@@ -1,21 +1,22 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays checksums
-checksums.crc32 combinators compression.inflate fry grouping
-images images.loader io io.binary io.encodings.ascii
-io.encodings.binary io.encodings.string io.streams.byte-array
-io.streams.throwing kernel locals math math.bitwise
-math.functions math.order math.ranges sequences sorting ;
+USING: accessors arrays assocs checksums checksums.crc32 combinators
+compression.inflate fry grouping images images.loader io io.binary
+io.encodings.8-bit.latin1 io.encodings.ascii io.encodings.binary
+io.encodings.string io.streams.byte-array io.streams.throwing kernel
+locals math math.bitwise math.functions sequences sorting splitting ;
 QUALIFIED: bitstreams
 IN: images.png
 
 SINGLETON: png-image
 "png" png-image ?register-image-class
 
+TUPLE: icc-profile name data ;
+
 TUPLE: loading-png
     chunks
     width height bit-depth color-type compression-method
-    filter-method interlace-method uncompressed ;
+    filter-method interlace-method icc-profile ;
 
 CONSTANT: filter-none 0
 CONSTANT: filter-sub 1
@@ -77,6 +78,9 @@ ERROR: bad-checksum ;
 : find-chunks ( loading-png string -- chunk )
     [ chunks>> ] dip '[ type>> _ = ] filter ;
 
+: read-png-string ( -- str )
+    { 0 } read-until drop latin1 decode ;
+
 : parse-ihdr-chunk ( loading-png -- loading-png )
     dup "IHDR" find-chunk data>> {
         [ [ 0 4 ] dip subseq be> >>width ]
@@ -87,6 +91,16 @@ ERROR: bad-checksum ;
         [ [ 11 ] dip nth >>filter-method ]
         [ [ 12 ] dip nth >>interlace-method ]
     } cleave ;
+
+: <icc-profile> ( byte-array -- icc-profile )
+    binary [
+        read-png-string read1 drop contents zlib-inflate
+    ] with-byte-reader icc-profile boa ;
+
+: parse-iccp-chunk ( loading-png -- loading-png )
+    dup "iCCP" find-chunk [
+        data>> <icc-profile> >>icc-profile
+    ] when* ;
 
 : find-compressed-bytes ( loading-png -- bytes )
     "IDAT" find-chunks [ data>> ] map concat ;
@@ -353,6 +367,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             read-png-header
             read-png-chunks
             parse-ihdr-chunk
+            parse-iccp-chunk
         ] throw-on-eof
     ] with-input-stream ;
 
