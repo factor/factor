@@ -15,11 +15,14 @@ GENERIC# prompt. 1 ( stream prompt -- )
     manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if*
     auto-use? get [ " auto-use" append ] when ;
 
+SYMBOL: prompt-style
+H{
+    { background $ prompt-background-color }
+    { foreground $ text-color }
+} prompt-style set-global
+
 M: object prompt.
-    nip H{
-        { background $ prompt-background-color }
-        { foreground $ text-color }
-    } format bl flush ;
+    nip prompt-style get-global format bl flush ;
 
 : parse-lines-interactive ( lines -- quot/f )
     [ parse-lines ] with-compilation-unit ;
