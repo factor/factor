@@ -88,9 +88,7 @@ HOOK: vocab-border-color theme ( -- color )
 HOOK: field-border-color theme ( -- color )
 
 HOOK: selection-color theme ( -- color )
-
 HOOK: panel-background-color theme ( -- color )
-
 HOOK: focus-border-color theme ( -- color )
 
 HOOK: labeled-border-color theme ( -- color )
