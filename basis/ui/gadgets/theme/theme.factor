@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.pathnames sequences ui.images vocabs ;
+USING: io.pathnames sequences ui.images vocabs namespaces ;
 IN: ui.gadgets.theme
 
 : theme-image ( name -- image-name )
