@@ -13,10 +13,12 @@ SINGLETON: png-image
 
 TUPLE: icc-profile name data ;
 
+TUPLE: itext keyword language translated-keyword text ;
+
 TUPLE: loading-png
     chunks
     width height bit-depth color-type compression-method
-    filter-method interlace-method icc-profile ;
+    filter-method interlace-method icc-profile itexts ;
 
 CONSTANT: filter-none 0
 CONSTANT: filter-sub 1
@@ -97,10 +99,21 @@ ERROR: bad-checksum ;
         read-png-string read1 drop contents zlib-inflate
     ] with-byte-reader icc-profile boa ;
 
+: <itext> ( byte-array -- itext )
+    binary [
+        read-png-string
+        ! Skip compression flag and method
+        read1 read1 2drop
+        read-png-string read-png-string read-png-string
+    ] with-byte-reader itext boa ;
+
 : parse-iccp-chunk ( loading-png -- loading-png )
     dup "iCCP" find-chunk [
         data>> <icc-profile> >>icc-profile
     ] when* ;
+
+: parse-itext-chunks ( loading-png -- loading-png )
+    dup "iTXt" find-chunks [ data>> <itext> ] map >>itexts ;
 
 : find-compressed-bytes ( loading-png -- bytes )
     "IDAT" find-chunks [ data>> ] map concat ;
@@ -368,6 +381,7 @@ ERROR: invalid-color-type/bit-depth loading-png ;
             read-png-chunks
             parse-ihdr-chunk
             parse-iccp-chunk
+            parse-itext-chunks
         ] throw-on-eof
     ] with-input-stream ;
 

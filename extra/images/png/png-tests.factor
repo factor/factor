@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors images.png images.testing io.directories
-io.encodings.binary io.files sequences tools.test ;
+io.encodings.binary io.files kernel sequences tools.test ;
 IN: images.png.tests
 
 ! Test files from PngSuite (http://www.libpng.org/pub/png/pngsuite.html)
@@ -78,8 +78,18 @@ IN: images.png.tests
     } [ png-image decode-test ] each
 
     { "ICC Profile" } [
-        "1529.png" binary <file-reader> load-png icc-profile>> name>>
+        "1529.png" binary <file-reader> load-png
+        icc-profile>> name>>
     ] unit-test
+
+    {
+        "XML:com.adobe.xmp"
+        "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 5.4.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\">\n         <exif:PixelXDimension>77</exif:PixelXDimension>\n         <exif:PixelYDimension>71</exif:PixelYDimension>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+    } [
+        "1529.png" binary <file-reader> load-png
+        itexts>> first [ keyword>> ] [ text>> ] bi
+    ] unit-test
+
 ] with-directory
 
 ! Test pngsuite
