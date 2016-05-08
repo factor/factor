@@ -8,7 +8,7 @@ make models namespaces sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.editors ui.gadgets.editors.private
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.labels.private
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.tracks
+ui.theme ui.gadgets.toolbar ui.gadgets.tracks
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
 ui.render ui.text ui.tools.browser.history
 ui.tools.browser.popups ui.tools.common vocabs ;

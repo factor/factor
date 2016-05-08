@@ -8,7 +8,7 @@ math.vectors models models.arrow namespaces opengl sequences
 sorting splitting timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-ui.gadgets.theme ui.gestures ui.pens.solid ui.render ui.text
+ui.theme ui.gestures ui.pens.solid ui.render ui.text
 unicode ;
 EXCLUDE: fonts => selection ;
 IN: ui.gadgets.editors

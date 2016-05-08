@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors.constants definitions help.markup
 help.stylesheet io io.styles kernel literals namespaces parser
-random sequences ui.gadgets.theme ;
+random sequences ui.theme ;
 IN: help.tips
 
 SYMBOL: tips

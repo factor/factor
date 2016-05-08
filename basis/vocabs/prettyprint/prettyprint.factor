@@ -3,7 +3,7 @@
 USING: accessors arrays assocs colors fry io
 io.styles kernel literals make math.order namespaces parser
 prettyprint.backend prettyprint.sections prettyprint.stylesheet
-sequences sets sorting ui.gadgets.theme vocabs vocabs.parser ;
+sequences sets sorting ui.theme vocabs vocabs.parser ;
 FROM: io.styles => inset ;
 IN: vocabs.prettyprint
 

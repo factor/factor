@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs colors combinators
 combinators.short-circuit hashtables io.styles kernel literals
-namespaces sequences ui.gadgets.theme words words.symbol ;
+namespaces sequences ui.theme words words.symbol ;
 IN: prettyprint.stylesheet
 
 <PRIVATE
