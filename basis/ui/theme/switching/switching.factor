@@ -1,8 +1,8 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry hashtables help.stylesheet help.tips io.styles
-kernel listener namespaces ui.gadgets.theme ui.tools.listener ;
-IN: ui.gadgets.theme.switching
+kernel listener namespaces ui.theme ui.tools.listener ;
+IN: ui.theme.switching
 
 : (update-style) ( style color elt -- )
     '[ _ _ rot ?set-at ] change-global ;

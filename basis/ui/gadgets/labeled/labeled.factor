@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors.constants kernel system ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.theme ui.gadgets.tracks ui.pens.gradient
+ui.theme ui.gadgets.tracks ui.pens.gradient
 ui.pens.solid ui.tools.common ;
 IN: ui.gadgets.labeled
 
