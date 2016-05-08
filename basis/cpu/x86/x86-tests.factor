@@ -1,8 +1,8 @@
 USING: compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.registers compiler.codegen.gc-maps
 compiler.codegen.relocation cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.features kernel kernel.private layouts make math math.libm
-namespaces sequences system tools.test ;
+cpu.x86.assembler.operands cpu.x86.features kernel kernel.private
+layouts make math math.libm namespaces sequences system tools.test ;
 IN: cpu.x86.tests
 
 { } [
@@ -10,6 +10,15 @@ IN: cpu.x86.tests
     [ ##sqrt? ] contains-insn?
     sse2?
     assert=
+] unit-test
+
+! %add-imm
+{
+    B{ 72 255 192 }
+    B{ 72 131 192 29 }
+} [
+    [ RAX RAX 1 %add-imm ] B{ } make
+    [ RAX RAX 29 %add-imm ] B{ } make
 ] unit-test
 
 ! %call-gc
