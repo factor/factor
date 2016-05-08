@@ -1,6 +1,18 @@
 USING: compiler.codegen.labels cpu.x86.assembler.private help.markup
-help.syntax ;
+help.syntax sequences ;
 IN: cpu.x86.assembler
+
+HELP: 1-operand
+{ $values { "operand" "operand" } { "reg,rex.w,opcode" sequence } }
+{ $description "Used for encoding some instructions with one operand." } ;
+
+HELP: DEC
+{ $values { "dst" "register" } }
+{ $description "Emits a DEC instruction." } ;
+
+HELP: INC
+{ $values { "dst" "register" } }
+{ $description "Emits an INC instruction." } ;
 
 HELP: JE
 { $values { "dst" "destination address or " { $link label } } }

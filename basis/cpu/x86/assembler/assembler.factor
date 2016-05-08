@@ -336,6 +336,12 @@ GENERIC: SUB ( dst src -- )
 M: immediate SUB { 0b101 t 0x80 } immediate-1/4 ;
 M: operand SUB 0o050 2-operand ;
 
+: INC ( dst -- )
+    { 0b000 t 0xff } 1-operand ;
+
+: DEC ( dst -- )
+    { 0b001 t 0xff } 1-operand ;
+
 GENERIC: XOR ( dst src -- )
 M: immediate XOR { 0b110 t 0x80 } immediate-1/4 ;
 M: operand XOR 0o060 2-operand ;
