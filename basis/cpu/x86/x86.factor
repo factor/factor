@@ -130,9 +130,17 @@ M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
     dst ; inline
 
 M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
-M: x86 %add-imm 2over eq? [ nip ADD ] [ [+] LEA ] if ;
+M: x86 %add-imm ( dst src1 src2 -- )
+    2over eq? [
+        nip { { 1 [ INC ] } { -1 [ DEC ] } [ ADD ] } case
+    ] [ [+] LEA ] if ;
+
 M: x86 %sub     int-rep two-operand SUB ;
-M: x86 %sub-imm 2over eq? [ nip SUB ] [ neg [+] LEA ] if ;
+M: x86 %sub-imm ( dst src1 src2 -- )
+    2over eq? [
+        nip { { 1 [ DEC ] } { -1 [ INC ] } [ SUB ] } case
+    ] [ neg [+] LEA ] if ;
+
 M: x86 %mul     int-rep two-operand IMUL2 ;
 M: x86 %mul-imm IMUL3 ;
 M: x86 %and     int-rep two-operand AND ;
