@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs colors.constants fonts fry io.styles kernel literals
-math namespaces sequences ui.gadgets.theme ;
+math namespaces sequences ui.theme ;
 IN: help.stylesheet
 
 : wrap-margin-full ( -- n )

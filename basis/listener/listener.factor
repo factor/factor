@@ -4,7 +4,7 @@ USING: accessors colors colors.constants
 combinators.short-circuit compiler.units continuations debugger
 fry io io.styles kernel lexer literals locals math math.parser
 namespaces parser parser.notes prettyprint sequences sets
-source-files.errors system ui.gadgets.theme vocabs vocabs.loader
+source-files.errors system ui.theme vocabs vocabs.loader
 vocabs.parser ;
 IN: listener
 
