@@ -2,11 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar debugger fry io io.encodings.utf8 io.launcher
 irc.client irc.client.chats kernel make mason.common mason.git
-math sequences threads timers ;
+math namespaces sequences threads timers ;
 IN: irc.gitbot
 
+SYMBOL: nickserv-handle
+SYMBOL: nickserv-password
+
 : bot-profile ( -- obj )
-    "irc.freenode.org" 6667 "stackoid" f <irc-profile> ;
+    "irc.freenode.org" 6667
+    nickserv-handle get "stackoid2" or
+    nickserv-password get <irc-profile> ;
 
 : bot-channel ( -- seq ) "#concatenative" ;
 
