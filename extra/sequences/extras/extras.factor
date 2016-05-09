@@ -610,3 +610,9 @@ PRIVATE>
 
 : map-zip ( quot: ( x -- y ) -- alist )
     '[ _ keep swap ] map>alist ; inline
+
+: map-keys ( assoc quot: ( key -- key' ) -- assoc )
+    '[ _ dip ] assoc-map ; inline
+
+: map-values ( assoc quot: ( value -- value' ) -- assoc )
+    '[ swap _ dip swap ] assoc-map ; inline
