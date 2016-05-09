@@ -33,7 +33,8 @@ M: object handle-message drop ;
 
 : git-log ( from to -- lines )
     [
-        "git-log" ,
+        "git" ,
+        "log" ,
         "--no-merges" ,
         "--pretty=format:%h %an: %s" ,
         ".." glue ,
