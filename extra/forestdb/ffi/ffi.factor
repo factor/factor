@@ -138,7 +138,8 @@ STRUCT: fdb_config
     { num_bgflusher_threads size_t }
     { encryption_key fdb_encryption_key }
     { block_reusing_threshold size_t }
-    { num_keeping_headers size_t } ;
+    { num_keeping_headers size_t }
+    { breakpad_minidump_dir char* } ;
 
 STRUCT: fdb_kvs_config
     { create_if_missing bool }
