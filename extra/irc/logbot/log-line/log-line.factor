@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors irc.messages irc.messages.base kernel make ;
+USING: accessors irc.messages irc.messages.base kernel make
+combinators ;
 EXCLUDE: sequences => join ;
 IN: irc.logbot.log-line
 
@@ -20,24 +21,46 @@ M: action >log-line
 M: privmsg >log-line
     [ "<" % dup sender>> % "> " % text>> % ] "" make ;
 
+: prefix% ( string -- )
+    " [" % % "]" % ;
+
 M: join >log-line
-    [ "* " % sender>> % " has joined the channel." % ] "" make ;
+    [
+        [ "* " % sender>> % ]
+        [ prefix>> prefix% " has joined the channel." % ] bi
+    ] "" make ;
 
 M: part >log-line
-    [ "* " % dup sender>> % " has left the channel" %
-      comment>> dot-or-parens % ] "" make ;
+    [
+        [ "* " % sender>> % ]
+        [ prefix>> prefix% " has left the channel" % ]
+        [ comment>> dot-or-parens % ] tri
+    ] "" make ;
 
 M: quit >log-line
-    [ "* " % dup sender>> % " has quit" %
-      comment>> dot-or-parens % ] "" make ;
+    [
+        [ "* " % sender>> % ]
+        [ prefix>> prefix% " has quit" % ]
+        [ comment>> dot-or-parens % ] tri
+    ] "" make ;
 
 M: kick >log-line
-    [ "* " % dup sender>> % " has kicked " % dup user>> %
-      " from the channel" % comment>> dot-or-parens % ] "" make ;
+    [
+        {
+            [ "* " % sender>> % ]
+            [ " has kicked " % user>> % ]
+            [ " from the channel" % comment>> dot-or-parens % ]
+         } cleave
+    ] "" make ;
 
 M: participant-mode >log-line
-    [ "* " % dup sender>> % " has set mode " % dup mode>> %
-      " to " % parameter>> % ] "" make ;
+    [
+        {
+            [ "* " % sender>> % ]
+            [ " has set mode " % mode>> % ]
+            [ " to " % parameter>> % ]
+        } cleave
+     ] "" make ;
 
 M: nick >log-line
     [ "* " % dup sender>> % " is now known as " % nickname>> % ] "" make ;
