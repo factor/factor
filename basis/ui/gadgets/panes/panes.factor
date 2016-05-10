@@ -9,7 +9,7 @@ ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
 ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
 ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
-ui.traverse ;
+ui.theme ui.traverse ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes

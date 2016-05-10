@@ -1,13 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors inspector namespaces kernel models fry
-colors.constants models.arrow prettyprint sequences mirrors assocs
-classes io io.styles arrays hashtables math.order sorting refs fonts
-ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ui.gadgets.tables ui.theme
-ui.gadgets.toolbar ui.gadgets.status-bar
-ui.gadgets.labeled ui.tools.common ui combinators ui.gadgets.worlds ;
+colors.constants models.arrow prettyprint sequences mirrors
+assocs classes io io.styles arrays hashtables math.order sorting
+refs fonts ui.tools.browser ui.commands ui.operations ui.gadgets
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.slots
+ui.gadgets.theme ui.gadgets.tracks ui.gestures
+ui.gadgets.buttons ui.gadgets.tables ui.theme ui.gadgets.toolbar
+ui.gadgets.status-bar ui.gadgets.labeled ui.tools.common ui
+combinators ui.gadgets.worlds ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;

@@ -63,8 +63,12 @@ HOOK: title-color theme ( -- color )
 HOOK: heading-color theme ( -- color )
 HOOK: snippet-color theme ( -- color )
 HOOK: output-color theme ( -- color )
+HOOK: deprecated-background-color theme ( -- color )
+HOOK: deprecated-border-color theme ( -- color )
 HOOK: warning-background-color theme ( -- color )
+HOOK: warning-border-color theme ( -- color )
 HOOK: code-background-color theme ( -- color )
+HOOK: help-path-border-color theme ( -- color )
 
 HOOK: tip-background-color theme ( -- color )
 
@@ -86,7 +90,10 @@ HOOK: focus-border-color theme ( -- color )
 
 HOOK: labeled-border-color theme ( -- color )
 
+HOOK: table-border-color theme ( -- color )
+
 SINGLETON: light-theme
+theme [ light-theme ] initialize
 
 M: light-theme toolbar-background COLOR: grey95 ;
 M: light-theme toolbar-button-pressed-background COLOR: dark-gray ;
@@ -141,22 +148,25 @@ M: light-theme content-background COLOR: white ;
 M: light-theme text-color COLOR: black ;
 
 M: light-theme link-color COLOR: DodgerBlue4 ;
-M: light-theme url-color COLOR: DodgerBlue4 ;
 M: light-theme title-color COLOR: gray20 ;
 M: light-theme heading-color COLOR: FactorDarkSlateBlue ;
-M: light-theme snippet-color COLOR: solarized-orange ;
-M: light-theme output-color COLOR: solarized-orange ;
-M: light-theme warning-background-color T{ rgba f 1 0.7 0.7 1 } ;
+M: light-theme snippet-color COLOR: DarkOrange4 ;
+M: light-theme output-color COLOR: DarkOrange4 ;
+M: light-theme deprecated-background-color COLOR: gray90 ;
+M: light-theme deprecated-border-color COLOR: red ;
+M: light-theme warning-background-color COLOR: gray90 ;
+M: light-theme warning-border-color COLOR: red ;
 M: light-theme code-background-color COLOR: FactorLightTan ;
+M: light-theme help-path-border-color COLOR: FactorLightTan ;
 
 M: light-theme tip-background-color COLOR: lavender ;
 
 M: light-theme prompt-background-color T{ rgba f 1 0.7 0.7 1 } ;
 
-M: light-theme dim-color COLOR: solarized-cyan ;
-M: light-theme highlighted-word-color COLOR: solarized-green ;
-M: light-theme string-color COLOR: solarized-magenta ;
-M: light-theme stack-effect-color COLOR: solarized-orange ;
+M: light-theme dim-color COLOR: gray35 ;
+M: light-theme highlighted-word-color COLOR: DarkSlateGray ;
+M: light-theme string-color COLOR: LightSalmon4 ;
+M: light-theme stack-effect-color COLOR: FactorDarkGreen ;
 
 M: light-theme vocab-background-color COLOR: FactorLightTan ;
 M: light-theme vocab-border-color COLOR: FactorDarkTan ;
@@ -168,6 +178,8 @@ M: light-theme panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 } ;
 M: light-theme focus-border-color COLOR: dark-gray ;
 
 M: light-theme labeled-border-color COLOR: grey85 ;
+
+M: light-theme table-border-color COLOR: FactorTan ;
 
 SINGLETON: dark-theme
 
@@ -224,13 +236,16 @@ M: dark-theme content-background COLOR: solarized-base03 ;
 M: dark-theme text-color COLOR: grey75 ;
 
 M: dark-theme link-color COLOR: solarized-blue ;
-M: dark-theme url-color COLOR: solarized-blue ;
 M: dark-theme title-color COLOR: grey75 ;
 M: dark-theme heading-color COLOR: grey75 ;
 M: dark-theme snippet-color COLOR: solarized-orange ;
 M: dark-theme output-color COLOR: solarized-orange ;
+M: dark-theme deprecated-background-color HEXCOLOR: 6E2E32 ;
+M: dark-theme deprecated-border-color COLOR: red ;
 M: dark-theme warning-background-color HEXCOLOR: 6E2E32 ;
+M: dark-theme warning-border-color COLOR: red ;
 M: dark-theme code-background-color HEXCOLOR: 2F4D5B ;
+M: dark-theme help-path-border-color HEXCOLOR: 2F4D5B ;
 
 M: dark-theme tip-background-color HEXCOLOR: 2F4D5B ;
 
@@ -252,4 +267,4 @@ M: dark-theme focus-border-color COLOR: solarized-base01 ;
 
 M: dark-theme labeled-border-color COLOR: solarized-base01 ;
 
-light-theme theme set-global
+M: dark-theme table-border-color COLOR: solarized-base01 ;

@@ -9,7 +9,7 @@ ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.theme ui.gadgets.tracks ui.gadgets.worlds
 ui.gadgets.wrappers ui.gestures ui.images ui.operations
-ui.pens.solid ui.tools.common ui.tools.listener.history
+ui.pens.solid ui.theme ui.tools.common ui.tools.listener.history
 ui.tools.listener.popups vocabs words ;
 IN: ui.tools.listener.completion
 
