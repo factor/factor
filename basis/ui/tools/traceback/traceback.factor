@@ -5,7 +5,7 @@ kernel models models.arrow prettyprint sequences ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar
-ui.gadgets.theme ui.gadgets.tracks
+ui.theme ui.gadgets.tracks
 ui.gestures ui.tools.common ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
@@ -28,7 +28,7 @@ M: stack-entry-renderer row-value drop object>> ;
         10 >>max-rows
         40 >>min-cols
         40 >>max-cols
-        monospace-font >>font
+        monospace-font >>font theme-font-colors
         [ i:inspector ] >>action
         t >>single-click? ;
 

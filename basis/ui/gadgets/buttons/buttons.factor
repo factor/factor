@@ -3,7 +3,7 @@
 USING: accessors assocs colors combinators combinators.short-circuit
 combinators.smart fry kernel locals math.vectors memoize models
 namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.theme ui.gadgets.worlds
+ui.gadgets.labels ui.gadgets.packs ui.theme ui.gadgets.theme ui.gadgets.worlds
 ui.gestures ui.pens ui.pens.image ui.pens.solid ui.pens.tile ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
@@ -134,7 +134,7 @@ PRIVATE>
     <button-pen> ;
 
 : border-button-label-theme ( gadget -- )
-    dup label? [ [ clone t >>bold? ] change-font ] when drop ;
+    dup label? [ [ clone t >>bold? text-color >>foreground ] change-font ] when drop ;
 
 : border-button-theme ( gadget -- gadget )
     dup gadget-child border-button-label-theme

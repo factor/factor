@@ -5,7 +5,7 @@ colors.constants models.arrow prettyprint sequences mirrors assocs
 classes io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ui.gadgets.tables ui.gadgets.theme
+ui.gadgets.buttons ui.gadgets.tables ui.theme
 ui.gadgets.toolbar ui.gadgets.status-bar
 ui.gadgets.labeled ui.tools.common ui combinators ui.gadgets.worlds ;
 IN: ui.tools.inspector
@@ -73,8 +73,8 @@ M: hashtable make-slot-descriptions
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <arrow> inspector-renderer <table>
         [ invoke-primary-operation ] >>action
-        monospace-font >>font
-        COLOR: dark-gray >>column-line-color
+        monospace-font >>font theme-font-colors
+        line-color >>column-line-color
         6 >>gap
         15 >>min-rows
         15 >>max-rows

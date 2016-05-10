@@ -6,7 +6,7 @@ debugger prettyprint help editors fonts ui ui.commands
 ui.debugger ui.gestures ui.gadgets ui.pens.solid
 ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.presentations ui.gadgets.panes
-ui.gadgets.viewports ui.gadgets.tables ui.gadgets.theme
+ui.gadgets.viewports ui.gadgets.tables ui.theme
 ui.gadgets.tracks ui.gadgets.toolbar
 ui.gadgets.scrollers ui.gadgets.borders ui.gadgets.status-bar
 ui.tools.traceback ui.tools.inspector ui.tools.browser ui.tools.common ;
@@ -36,7 +36,7 @@ M: restart-renderer row-columns
     [ error>> <error-pane> add-gadget ]
     [
         dup restart-hook>> [
-            [ "To continue, pick one of the options below:" <label> add-gadget ] dip
+            [ "To continue, pick one of the options below:" <label> theme-font-colors add-gadget ] dip
             restart-list>> add-gadget
         ] [ drop ] if
     ] bi ;

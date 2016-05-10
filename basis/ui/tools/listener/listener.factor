@@ -9,7 +9,7 @@ math models models.arrow models.delay namespaces parser
 prettyprint sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme
+ui.gadgets.scrollers ui.gadgets.status-bar ui.theme
 ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
 ui.pens.solid ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
@@ -73,6 +73,7 @@ M: color-completion (word-at-caret) 2drop f ;
 
 : <interactor> ( -- gadget )
     interactor new-editor
+        theme-font-colors
         <flag> >>flag
         dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model
@@ -94,13 +95,26 @@ M: interactor stream-element-type drop +character+ ;
 
 GENERIC: (print-input) ( object -- )
 
+SYMBOL: listener-input-style
+H{
+    { font-style bold }
+    { foreground $ text-color }
+} listener-input-style set-global
+
+SYMBOL: listener-word-style
+H{
+    { font-name "sans-serif" }
+    { font-style bold }
+    { foreground $ text-color }
+} listener-word-style set-global
+
 M: input (print-input)
-    dup presented associate
-    [ string>> H{ { font-style bold } } format ] with-nesting nl ;
+    dup presented associate [
+        string>> listener-input-style get-global format
+    ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: " H{ { font-name "sans-serif" } { font-style bold } }
-    format . ;
+    "Command: " listener-word-style get-global format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;

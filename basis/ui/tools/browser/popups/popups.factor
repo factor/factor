@@ -32,7 +32,7 @@ TUPLE: links-popup < wrapper ;
         30 >>max-cols ;
 
 : <links-popup> ( model quot title -- gadget )
-    [ <links-table> COLOR: white <solid> >>interior ] dip
+    [ <links-table> content-background <solid> >>interior ] dip
     popup-color <labeled> links-popup new-wrapper ;
 
 links-popup H{

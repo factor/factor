@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs colors colors.constants fry io
-io.styles kernel make math.order namespaces parser
+USING: accessors arrays assocs colors fry io
+io.styles kernel literals make math.order namespaces parser
 prettyprint.backend prettyprint.sections prettyprint.stylesheet
-sequences sets sorting vocabs vocabs.parser ;
+sequences sets sorting ui.theme vocabs vocabs.parser ;
 FROM: io.styles => inset ;
 IN: vocabs.prettyprint
 
@@ -91,8 +91,8 @@ PRIVATE>
         "at the top of the source file:" print nl
     ] with-style
     {
-        { page-color COLOR: FactorLightTan }
-        { border-color COLOR: FactorDarkTan }
+        { page-color $ vocab-background-color }
+        { border-color $ vocab-border-color }
         { inset { 5 5 } }
     } [ manifest get pprint-manifest ] with-nesting
     nl nl
