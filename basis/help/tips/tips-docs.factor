@@ -1,6 +1,6 @@
 USING: debugger editors help help.apropos help.markup
 help.syntax help.vocabs memory see stack-checker
-tools.destructors tools.time ui.theme.switching ;
+tools.destructors tools.time ;
 IN: help.tips
 
 TIP: "To look at the most recent error, run " { $link :error } ". To look at the most recent error's callstack, run " { $link :c } "." ;
@@ -26,8 +26,6 @@ TIP: "Try some simple demo applications, then look at the source code in " { $sn
 TIP: "To save time on reloading big libraries such as the " { $vocab-link "furnace" } " web framework, save the image after loading them using the " { $link save } " word." ;
 
 TIP: "Use the " { $link leaks. } " combinator to track down resource leaks." ;
-
-TIP: "Use " { $link light-mode } " and " { $link dark-mode } " for a light or dark user interface." ;
 
 HELP: TIP:
 { $syntax "TIP: content ;" }

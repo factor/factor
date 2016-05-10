@@ -4,7 +4,7 @@ USING: accessors colors colors.constants
 combinators.short-circuit compiler.units continuations debugger
 fry io io.styles kernel lexer literals locals math math.parser
 namespaces parser parser.notes prettyprint sequences sets
-source-files.errors system ui.theme vocabs vocabs.loader
+source-files.errors system vocabs vocabs.loader
 vocabs.parser ;
 IN: listener
 
@@ -17,8 +17,8 @@ GENERIC# prompt. 1 ( stream prompt -- )
 
 SYMBOL: prompt-style
 H{
-    { background $ prompt-background-color }
-    { foreground $ text-color }
+    { background T{ rgba f 1 0.7 0.7 1 } }
+    { foreground COLOR: black }
 } prompt-style set-global
 
 M: object prompt.

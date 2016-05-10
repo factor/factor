@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors.constants combinators fonts fry
 kernel make math.functions models namespaces sequences splitting
-strings ui.baseline-alignment ui.gadgets ui.gadgets.tracks
-ui.pens.solid ui.render ui.text ui.tools.common ;
+strings ui.baseline-alignment ui.gadgets ui.gadgets.theme
+ui.gadgets.tracks ui.pens.solid ui.render ui.text ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.

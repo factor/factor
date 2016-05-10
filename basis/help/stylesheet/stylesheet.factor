@@ -108,12 +108,13 @@ H{
 SYMBOL: url-style
 H{
     { font-name $ default-monospace-font-name }
-    { foreground $ url-color }
+    { foreground $ link-color }
 } url-style set-global
 
 SYMBOL: warning-style
 H{
     { page-color $ warning-background-color }
+    { border-color $ warning-border-color }
     { inset { 5 5 } }
     { wrap-margin $ wrap-margin-full }
 } warning-style set-global
@@ -121,6 +122,7 @@ H{
 SYMBOL: deprecated-style
 H{
     { page-color $ warning-background-color }
+    { border-color $ warning-border-color }
     { inset { 5 5 } }
     { wrap-margin $ wrap-margin-full }
 } deprecated-style set-global

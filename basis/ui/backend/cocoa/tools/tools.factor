@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax cocoa cocoa.nibs cocoa.application
-cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.runtime
-cocoa.subclassing core-foundation core-foundation.strings
-help.topics kernel memory namespaces parser system ui
-ui.tools.browser ui.tools.listener ui.backend.cocoa eval
-locals listener vocabs.refresh ;
+USING: alien.syntax cocoa cocoa.application cocoa.classes
+cocoa.dialogs cocoa.nibs cocoa.pasteboard cocoa.runtime
+cocoa.subclassing core-foundation.strings eval kernel listener
+locals memory namespaces system ui.backend.cocoa
+ui.theme.switching ui.tools.browser ui.tools.listener
+vocabs.refresh ;
 FROM: alien.c-types => int void ;
 IN: ui.backend.cocoa.tools
 
@@ -27,9 +27,9 @@ CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
 
     METHOD: int applicationShouldHandleReopen: id app hasVisibleWindows: int flag [ flag 0 = [ show-listener ] when 1 ] ;
 
-    METHOD: id factorListener: id app [ show-listener f ] ;
+    METHOD: id showFactorListener: id app [ show-listener f ] ;
 
-    METHOD: id factorBrowser: id app [ show-browser f ] ;
+    METHOD: id showFactorBrowser: id app [ show-browser f ] ;
 
     METHOD: id newFactorListener: id app [ listener-window f ] ;
 
@@ -40,6 +40,10 @@ CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
     METHOD: id saveFactorImage: id app [ save f ] ;
 
     METHOD: id saveFactorImageAs: id app [ menu-save-image f ] ;
+
+    METHOD: id switchLightTheme: id app [ light-mode f ] ;
+
+    METHOD: id switchDarkTheme: id app [ dark-mode f ] ;
 
     METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
 ;
