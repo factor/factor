@@ -58,7 +58,6 @@ HOOK: content-background theme ( -- color )
 HOOK: text-color theme ( -- color )
 
 HOOK: link-color theme ( -- color )
-HOOK: url-color theme ( -- color )
 HOOK: title-color theme ( -- color )
 HOOK: heading-color theme ( -- color )
 HOOK: snippet-color theme ( -- color )
