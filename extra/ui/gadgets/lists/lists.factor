@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors math.vectors classes.tuple math.rectangles colors
-kernel locals sequences models opengl math math.order namespaces
-ui.commands ui.gestures ui.render ui.gadgets ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.presentations ui.gadgets.viewports
-ui.gadgets.packs ;
+USING: accessors kernel locals math math.order math.rectangles
+math.vectors models namespaces opengl sequences ui.commands
+ui.gadgets ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.presentations ui.gadgets.scrollers
+ui.gadgets.viewports ui.gestures ui.render ui.theme ;
 IN: ui.gadgets.lists
 
 TUPLE: list < pack index presenter color hook ;
