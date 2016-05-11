@@ -35,18 +35,6 @@ IN: combinators.extras.tests
 { "123" "1" } [ "1" "123" [ length ] [ < ] swap-when ] unit-test
 
 
-{ t } [ "resource:" [ exists? ] 1arg >boolean ] unit-test
-{ f } [ f [ exists? ] 1arg ] unit-test
-{ f } [ "/homeasdfasdf123123" [ exists? ] 1arg ] unit-test
-
-
-
-
-{ f f } [ f f 2 n-falsify ] unit-test
-{ f f } [ 100 200 2 n-falsify ] unit-test
-
-{ f f } [ 100 f f  2 n-falsify-unless ] unit-test
-{ f f } [ 100 200 f  2 n-falsify-unless ] unit-test
-
-{ 100 f } [ 100 f t  2 n-falsify-unless ] unit-test
-{ 100 200 } [ 100 200 t  2 n-falsify-unless ] unit-test
+{ t } [ "resource:" [ exists? ] ?1arg >boolean ] unit-test
+{ f } [ f [ exists? ] ?1arg ] unit-test
+{ f } [ "/homeasdfasdf123123" [ exists? ] ?1arg ] unit-test
