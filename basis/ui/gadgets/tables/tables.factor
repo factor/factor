@@ -40,7 +40,7 @@ single-click?
 { gap initial: 2 }
 column-widths total-width
 focus-border-color
-{ mouse-color initial: COLOR: black }
+mouse-color
 column-line-color
 selection-required?
 selection-index
@@ -142,7 +142,7 @@ M: table layout*
 
 : draw-moused-row ( table -- )
     dup mouse-index>> [
-        dup mouse-color>> gl-color
+        dup mouse-color>> [ text-color ] unless* gl-color
         dup mouse-index>> row-bounds gl-rect
     ] [ drop ] if ;
 
