@@ -40,10 +40,6 @@ ERROR: bad-method-effect ;
 : check-method-effect ( effect -- )
     last-word generic-effect method-effect= [ bad-method-effect ] unless ;
 
-: ?execute-parsing ( word/number -- seq )
-    dup parsing-word?
-    [ V{ } clone swap execute-parsing ] [ 1array ] if ;
-
 : parse-method-definition ( -- quot )
     scan-datum {
         { \ ( [ ")" parse-effect check-method-effect parse-definition ] }
