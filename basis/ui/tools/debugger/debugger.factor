@@ -49,7 +49,7 @@ PRIVATE>
         swap >>restarts
         swap >>continuation
         swap >>error
-        dup <restart-list> >>restart-list
+        dup <restart-list> theme-font-colors >>restart-list
         dup <error-display> margins white-interior f track-add
         add-toolbar ;
 
