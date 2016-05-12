@@ -55,3 +55,7 @@ PRIVATE>
 
 : switch-theme ( theme -- )
     theme set-global update-stylesheet ;
+
+: light-mode ( -- ) light-theme switch-theme ;
+
+: dark-mode ( -- ) dark-theme switch-theme ;
