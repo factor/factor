@@ -98,6 +98,10 @@ ERROR: staging-violation word ;
     dup changed-definitions get in? [ staging-violation ] when
     (execute-parsing) ;
 
+: ?execute-parsing ( word/number -- seq )
+    dup parsing-word?
+    [ V{ } clone swap execute-parsing ] [ 1array ] if ;
+
 : scan-object ( -- object )
     scan-datum
     dup parsing-word? [
