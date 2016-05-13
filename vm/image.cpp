@@ -43,9 +43,12 @@ vm_parameters::vm_parameters() {
   callback_size = 256;
 }
 
-void vm_parameters::init_from_args(int argc, vm_char** argv) {
-  executable_path = argv[0];
+vm_parameters::~vm_parameters() {
+  free((vm_char *)image_path);
+  free((vm_char *)executable_path);
+}
 
+void vm_parameters::init_from_args(int argc, vm_char** argv) {
   int i = 0;
 
   for (i = 1; i < argc; i++) {
@@ -73,8 +76,13 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
       ;
     else if (factor_arg(arg, STRING_LITERAL("-callbacks=%d"), &callback_size))
       ;
-    else if (STRNCMP(arg, STRING_LITERAL("-i="), 3) == 0)
-      image_path = arg + 3;
+    else if (STRNCMP(arg, STRING_LITERAL("-i="), 3) == 0) {
+      /* In case you specify -i more than once. */
+      if (image_path) {
+        free((vm_char *)image_path);
+      }
+      image_path = safe_strdup(arg + 3);
+    }
     else if (STRCMP(arg, STRING_LITERAL("-fep")) == 0)
       fep = true;
     else if (STRCMP(arg, STRING_LITERAL("-nosignals")) == 0)
@@ -255,9 +263,6 @@ void factor_vm::load_image(vm_parameters* p) {
   cell data_offset = data->tenured->start - h.data_relocation_base;
   cell code_offset = code->allocator->start - h.code_relocation_base;
   fixup_heaps(data_offset, code_offset);
-
-  /* Store image path name */
-  special_objects[OBJ_IMAGE] = allot_alien(false_object, (cell)p->image_path);
 }
 
 /* Save the current image to disk. We don't throw any exceptions here
