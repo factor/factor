@@ -13,6 +13,8 @@ factor_vm::factor_vm(THREADHANDLE thread)
       signal_pipe_input(0),
       signal_pipe_output(0),
       gc_off(false),
+      data(NULL),
+      callbacks(NULL),
       current_gc(NULL),
       current_gc_p(false),
       current_jit_count(0),
@@ -32,6 +34,13 @@ factor_vm::~factor_vm() {
   FACTOR_FOR_EACH(unused_contexts) {
     delete *iter;
   }
+  FACTOR_FOR_EACH(active_contexts) {
+    delete *iter;
+  }
+  if (callbacks)
+    delete callbacks;
+  if (data)
+    delete data;
   if (signal_callstack_seg) {
     delete signal_callstack_seg;
     signal_callstack_seg = NULL;
