@@ -154,7 +154,6 @@ struct factor_vm {
   void delete_context();
   void init_contexts(cell datastack_size_, cell retainstack_size_,
                      cell callstack_size_);
-  void delete_contexts();
   cell begin_callback(cell quot);
   void end_callback();
   void primitive_current_callback();
