@@ -45,6 +45,7 @@ struct vm_parameters {
   cell callback_size;
 
   vm_parameters();
+  ~vm_parameters();
   void init_from_args(int argc, vm_char** argv);
 };
 

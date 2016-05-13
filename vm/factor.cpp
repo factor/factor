@@ -56,15 +56,12 @@ void factor_vm::init_factor(vm_parameters* p) {
   /* OS-specific initialization */
   early_init();
 
-  const vm_char* executable_path = vm_executable_path();
-
-  if (executable_path)
-    p->executable_path = executable_path;
+  p->executable_path = vm_executable_path();
 
   if (p->image_path == NULL) {
     if (embedded_image_p()) {
       p->embedded_image = true;
-      p->image_path = p->executable_path;
+      p->image_path = safe_strdup(p->executable_path);
     } else
       p->image_path = default_image_path();
   }
@@ -82,7 +79,8 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   cell aliens[][2] = {
     {OBJ_CPU,             (cell)FACTOR_CPU_STRING},
-    {OBJ_EXECUTABLE,      (cell)p->executable_path},
+    {OBJ_EXECUTABLE,      (cell)safe_strdup(p->executable_path)},
+    {OBJ_IMAGE,           (cell)safe_strdup(p->image_path)},
     {OBJ_OS,              (cell)FACTOR_OS_STRING},
     {OBJ_VM_COMPILE_TIME, (cell)FACTOR_COMPILE_TIME},
     {OBJ_VM_COMPILER,     (cell)FACTOR_COMPILER_VERSION},
