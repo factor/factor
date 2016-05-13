@@ -27,7 +27,10 @@ factor_vm::factor_vm(THREADHANDLE thread)
 }
 
 factor_vm::~factor_vm() {
-  delete_contexts();
+  FACTOR_ASSERT(!ctx);
+  FACTOR_FOR_EACH(unused_contexts) {
+    delete *iter;
+  }
   if (signal_callstack_seg) {
     delete signal_callstack_seg;
     signal_callstack_seg = NULL;

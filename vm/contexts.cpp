@@ -94,13 +94,6 @@ void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_,
   spare_ctx = new_context();
 }
 
-void factor_vm::delete_contexts() {
-  FACTOR_ASSERT(!ctx);
-  FACTOR_FOR_EACH(unused_contexts) {
-    delete *iter;
-  }
-}
-
 context* factor_vm::new_context() {
   context* new_context;
 
