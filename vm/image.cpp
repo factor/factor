@@ -343,14 +343,15 @@ void factor_vm::primitive_save_image() {
 
 bool factor_vm::embedded_image_p() {
   const vm_char* vm_path = vm_executable_path();
-  if (!vm_path)
-    return false;
   FILE* file = OPEN_READ(vm_path);
-  if (!file)
+  if (!file) {
+    free((vm_char *)vm_path);
     return false;
+  }
   embedded_image_footer footer;
   bool embedded_p = read_embedded_image_footer(file, &footer);
   fclose(file);
+  free((vm_char *)vm_path);
   return embedded_p;
 }
 
