@@ -3,7 +3,8 @@
 namespace factor {
 
 factor_vm::factor_vm(THREADHANDLE thread)
-    : nursery(0, 0),
+    : ctx(NULL),
+      nursery(0, 0),
       faulting_p(false),
       thread(thread),
       callback_id(0),
