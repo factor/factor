@@ -694,9 +694,6 @@ struct factor_vm {
   void set_fpu_state(cell state);
 
   // factor
-  void default_parameters(vm_parameters* p);
-  bool factor_arg(const vm_char* str, const vm_char* arg, cell* value);
-  void init_parameters_from_args(vm_parameters* p, int argc, vm_char** argv);
   void prepare_boot_image();
   void init_factor(vm_parameters* p);
   void pass_args_to_factor(int argc, vm_char** argv);

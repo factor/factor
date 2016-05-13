@@ -2,6 +2,88 @@
 
 namespace factor {
 
+bool factor_arg(const vm_char* str, const vm_char* arg, cell* value) {
+  int val;
+  if (SSCANF(str, arg, &val) > 0) {
+    *value = val;
+    return true;
+  }
+  return false;
+}
+
+vm_parameters::vm_parameters() {
+  embedded_image = false;
+  image_path = NULL;
+
+  datastack_size = 32 * sizeof(cell);
+  retainstack_size = 32 * sizeof(cell);
+
+#if defined(FACTOR_PPC)
+  callstack_size = 256 * sizeof(cell);
+#else
+  callstack_size = 128 * sizeof(cell);
+#endif
+
+  code_size = 64;
+  young_size = sizeof(cell) / 4;
+  aging_size = sizeof(cell) / 2;
+  tenured_size = 24 * sizeof(cell);
+
+  max_pic_size = 3;
+
+  fep = false;
+  signals = true;
+
+#ifdef WINDOWS
+  console = GetConsoleWindow() != NULL;
+#else
+  console = true;
+#endif
+
+  callback_size = 256;
+}
+
+void vm_parameters::init_from_args(int argc, vm_char** argv) {
+  executable_path = argv[0];
+
+  int i = 0;
+
+  for (i = 1; i < argc; i++) {
+    vm_char* arg = argv[i];
+    if (STRCMP(arg, STRING_LITERAL("--")) == 0)
+      break;
+    else if (factor_arg(arg, STRING_LITERAL("-datastack=%d"),
+                        &datastack_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-retainstack=%d"),
+                        &retainstack_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-callstack=%d"),
+                        &callstack_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-young=%d"), &young_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-aging=%d"), &aging_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-tenured=%d"), &tenured_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-codeheap=%d"), &code_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-pic=%d"), &max_pic_size))
+      ;
+    else if (factor_arg(arg, STRING_LITERAL("-callbacks=%d"), &callback_size))
+      ;
+    else if (STRNCMP(arg, STRING_LITERAL("-i="), 3) == 0)
+      image_path = arg + 3;
+    else if (STRCMP(arg, STRING_LITERAL("-fep")) == 0)
+      fep = true;
+    else if (STRCMP(arg, STRING_LITERAL("-nosignals")) == 0)
+      signals = false;
+    else if (STRCMP(arg, STRING_LITERAL("-console")) == 0)
+      console = true;
+  }
+}
+
 void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   p->tenured_size = std::max((h->data_size * 3) / 2, p->tenured_size);
 
