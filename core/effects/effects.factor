@@ -54,7 +54,12 @@ M: string effect>string ;
 M: object effect>string drop "object" ;
 M: word effect>string name>> ;
 M: integer effect>string number>string ;
-M: pair effect>string first2-unsafe [ effect>string ] bi@ ": " glue ;
+M: pair effect>string
+    first2-unsafe over [
+        [ effect>string ] bi@ ": " glue
+    ] [
+        nip effect>string ":" prepend
+    ] if ;
 
 : stack-picture ( seq -- string )
     [ [ effect>string % CHAR: \s , ] each ] "" make ;
