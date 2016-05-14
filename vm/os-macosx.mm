@@ -22,8 +22,9 @@ void early_init(void) {
   }
 }
 
+/* You must free() this yourself. */
 const char* vm_executable_path(void) {
-  return [[[NSBundle mainBundle] executablePath] UTF8String];
+  return safe_strdup([[[NSBundle mainBundle] executablePath] UTF8String]);
 }
 
 const char* default_image_path(void) {
