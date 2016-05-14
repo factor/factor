@@ -35,7 +35,7 @@ ERROR: bad-standalone-effect obj ;
     dup parsing-word? [
         ?execute-parsing dup length 1 =
         [ first ] [ bad-standalone-effect ] if
-    ] when "_" swap 2array ;
+    ] when f swap 2array ;
 PRIVATE>
 
 : parse-effect-token ( first? var end -- var more? )

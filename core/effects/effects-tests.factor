@@ -56,5 +56,8 @@ IN: effects.tests
 { ( x -- ) } [ ( a b -- ) curry-effect ] unit-test
 
 ! test unnamed types
-{ ( _: fixnum -- _: float ) } [ ( :fixnum -- :float ) ] unit-test
-{ ( _: union{ fixnum bignum } -- ) } [ ( :union{ fixnum bignum } -- ) ] unit-test
+{ ( :fixnum -- :float ) } [ ( :fixnum -- :float ) ] unit-test
+{ ( :union{ fixnum bignum } -- ) } [ ( :union{ fixnum bignum } -- ) ] unit-test
+
+{ "( :( :integer -- :integer ) :float -- :bignum )" }
+[ ( :( :integer -- :integer ) :float -- :bignum ) unparse ] unit-test
