@@ -74,7 +74,7 @@ M: hashtable make-slot-descriptions
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <arrow> inspector-renderer <table>
         [ invoke-primary-operation ] >>action
-        monospace-font >>font theme-font-colors
+        monospace-font >>font
         line-color >>column-line-color
         6 >>gap
         15 >>min-rows

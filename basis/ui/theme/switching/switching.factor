@@ -1,8 +1,8 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry hashtables help.stylesheet help.tips io.styles
-kernel listener namespaces prettyprint.stylesheet sequences
-ui.theme ui.tools.listener vocabs.prettyprint words ;
+USING: assocs fonts fry hashtables help.stylesheet help.tips
+io.styles kernel listener namespaces prettyprint.stylesheet
+sequences ui.theme ui.tools.listener vocabs.prettyprint words ;
 IN: ui.theme.switching
 
 <PRIVATE
@@ -11,6 +11,10 @@ IN: ui.theme.switching
     '[ _ _ rot ?set-at ] change-global ;
 
 : update-stylesheet ( -- )
+    ! fonts
+    text-color default-font-foreground-color set-global
+    content-background default-font-background-color set-global
+
     ! help.stylesheet
     default-span-style text-color foreground update-style
     link-style link-color foreground update-style

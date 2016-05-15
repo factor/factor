@@ -74,7 +74,6 @@ M: color-completion (word-at-caret) 2drop f ;
 
 : <interactor> ( -- gadget )
     interactor new-editor
-        theme-font-colors
         <flag> >>flag
         dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model

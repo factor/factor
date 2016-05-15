@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals math math.order math.rectangles
-math.vectors models namespaces opengl sequences ui.commands
-ui.gadgets ui.gadgets.labels ui.gadgets.packs
+USING: accessors fonts kernel locals math math.order
+math.rectangles math.vectors models namespaces opengl sequences
+ui.commands ui.gadgets ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.presentations ui.gadgets.scrollers
 ui.gadgets.viewports ui.gestures ui.render ui.theme ;
 IN: ui.gadgets.lists
@@ -32,7 +32,8 @@ TUPLE: list < pack index presenter color hook ;
     hook>> [ [ list? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
-    [ call( elt -- obj ) ] [ drop ] 2bi [ >label text-theme ] dip
+    [ call( elt -- obj ) ] [ drop ] 2bi
+    [ >label monospace-font >>font ] dip
     <presentation>
     swap >>hook ; inline
 

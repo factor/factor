@@ -67,10 +67,10 @@ M: label cap-height*
 <PRIVATE
 
 : label-background ( label -- color )
-    gadget-background background get or ; inline
+    gadget-background [ background get ] unless* ; inline
 
 : label-foreground ( label -- color )
-    gadget-foreground foreground get or ; inline
+    gadget-foreground [ foreground get ] unless* ; inline
 
 PRIVATE>
 
@@ -90,13 +90,6 @@ M: label-control model-changed
 : <label-control> ( model -- gadget )
     "" label-control new-label
         swap >>model ;
-
-: text-theme ( gadget -- gadget )
-    monospace-font >>font theme-font-colors ;
-
-: reverse-video-theme ( label -- label )
-    sans-serif-font reverse-video-font >>font
-    COLOR: black <solid> >>interior ;
 
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;

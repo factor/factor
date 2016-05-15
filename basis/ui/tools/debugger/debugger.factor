@@ -36,7 +36,7 @@ M: restart-renderer row-columns
     [ error>> <error-pane> add-gadget ]
     [
         dup restart-hook>> [
-            [ "To continue, pick one of the options below:" <label> theme-font-colors add-gadget ] dip
+            [ "To continue, pick one of the options below:" <label> add-gadget ] dip
             restart-list>> add-gadget
         ] [ drop ] if
     ] bi ;
@@ -49,7 +49,7 @@ PRIVATE>
         swap >>restarts
         swap >>continuation
         swap >>error
-        dup <restart-list> theme-font-colors >>restart-list
+        dup <restart-list> >>restart-list
         dup <error-display> margins white-interior f track-add
         add-toolbar ;
 
