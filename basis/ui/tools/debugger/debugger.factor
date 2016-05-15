@@ -7,9 +7,10 @@ ui.debugger ui.gestures ui.gadgets ui.pens.solid
 ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.presentations ui.gadgets.panes
 ui.gadgets.viewports ui.gadgets.tables ui.theme
-ui.gadgets.theme ui.gadgets.tracks ui.gadgets.toolbar
-ui.gadgets.scrollers ui.gadgets.borders ui.gadgets.status-bar
-ui.tools.traceback ui.tools.inspector ui.tools.browser ui.tools.common ;
+ui.gadgets.tracks ui.gadgets.toolbar ui.gadgets.scrollers
+ui.gadgets.borders ui.gadgets.status-bar ui.theme.images
+ui.tools.traceback ui.tools.inspector ui.tools.browser
+ui.tools.common ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;

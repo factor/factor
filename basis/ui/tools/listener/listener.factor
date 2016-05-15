@@ -10,10 +10,9 @@ prettyprint sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.theme
-ui.gadgets.theme
 ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
-ui.pens.solid ui.tools.browser ui.tools.common ui.tools.debugger
-ui.tools.error-list ui.tools.listener.completion
+ui.pens.solid ui.theme.images ui.tools.browser ui.tools.common
+ui.tools.debugger ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener

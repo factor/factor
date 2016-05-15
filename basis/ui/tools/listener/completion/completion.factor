@@ -7,9 +7,9 @@ kernel math math.vectors models.arrow models.delay parser
 present sequences sets splitting tools.completion ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
-ui.gadgets.theme ui.gadgets.tracks ui.gadgets.worlds
-ui.gadgets.wrappers ui.gestures ui.images ui.operations
-ui.pens.solid ui.theme ui.tools.common ui.tools.listener.history
+ui.gadgets.tracks ui.gadgets.worlds ui.gadgets.wrappers
+ui.gestures ui.images ui.operations ui.pens.solid ui.theme
+ui.theme.images ui.tools.common ui.tools.listener.history
 ui.tools.listener.popups vocabs words ;
 IN: ui.tools.listener.completion
 

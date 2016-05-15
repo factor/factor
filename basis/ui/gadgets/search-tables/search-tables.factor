@@ -4,8 +4,8 @@ USING: accessors calendar combinators.short-circuit delegate fry
 kernel locals models models.delay models.search
 ui.baseline-alignment ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.editors ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme
-ui.gadgets.tracks ui.gestures ui.pens ui.pens.image ;
+ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.tracks
+ui.gestures ui.pens ui.pens.image ui.theme.images ;
 IN: ui.gadgets.search-tables
 
 TUPLE: search-table < track table field ;
