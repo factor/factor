@@ -321,7 +321,7 @@ M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
     swap dup empty?
-    [ 2drop ] [ <label> text-theme add-gadget drop ] if ;
+    [ 2drop ] [ <label> monospace-font >>font add-gadget drop ] if ;
 
 M: pack stream-write gadget-write ;
 
