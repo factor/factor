@@ -3,8 +3,9 @@
 USING: accessors assocs colors combinators combinators.short-circuit
 combinators.smart fry kernel locals math.vectors memoize models
 namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.packs ui.theme ui.gadgets.theme ui.gadgets.worlds
-ui.gestures ui.pens ui.pens.image ui.pens.solid ui.pens.tile ;
+ui.gadgets.labels ui.gadgets.packs ui.theme ui.gadgets.worlds
+ui.gestures ui.pens ui.pens.image ui.pens.solid ui.pens.tile
+ui.theme.images ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
