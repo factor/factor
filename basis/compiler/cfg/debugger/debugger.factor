@@ -28,7 +28,7 @@ M: word test-builder
     [ build-optimized-tree ] keep build-cfg ;
 
 : run-passes ( cfgs passes -- cfgs' )
-    '[ dup cfg set dup _ apply-passes ] map ;
+    '[ dup cfg set dup _ apply-passes ] map ; inline
 
 : test-ssa ( quot -- cfgs )
     test-builder { optimize-cfg } run-passes ;
