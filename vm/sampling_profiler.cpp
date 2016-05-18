@@ -57,13 +57,10 @@ void factor_vm::record_callstack_sample(cell* begin, cell* end, bool prolog_p) {
 }
 
 void factor_vm::set_sampling_profiler(fixnum rate) {
-  bool sampling_p = !!rate;
-  if (sampling_p == !!atomic::load(&sampling_profiler_p))
-    return;
-
-  if (sampling_p)
+  bool running_p = (bool)atomic::load(&sampling_profiler_p);
+  if (rate > 0 && !running_p)
     start_sampling_profiler(rate);
-  else
+  else if (rate == 0 && running_p)
     end_sampling_profiler();
 }
 
