@@ -22,5 +22,5 @@ gc
     [ "resource:basis/tools/memory/memory.factor" run-file ] profile
     (get-samples) length 0 >
     ! Should clear it
-    [ ] profile (get-samples) length
+    gc [ ] profile (get-samples) length
 ] unit-test
