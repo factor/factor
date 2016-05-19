@@ -1,5 +1,5 @@
 USING: compiler.codegen.labels cpu.x86.assembler.private help.markup
-help.syntax sequences ;
+help.syntax kernel math sequences ;
 IN: cpu.x86.assembler
 
 HELP: 1-operand
@@ -30,9 +30,17 @@ HELP: MOV
 { $description "Moves a value from one place to another." } ;
 
 HELP: (MOV-I)
-{ $values { "dst" "destination" "src" "immediate value" } }
-{ $description "MOV where the src is immediate." } ;
+{ $values { "dst" "destination" } { "src" "immediate value" } }
+{ $description "MOV where 'src' is immediate. If dst is a 64-bit register and the 'src' value fits in 32 bits, then zero extension is taken advantage of by downgrading 'dst' to a 32-bit register. That way, the instruction gets a shorter encoding." } ;
 
-ARTICLE: "cpu.x86.assembler" "X86 assembler" "This vocab implements an assembler for x86 architectures." ;
+HELP: zero-extendable?
+{ $values { "imm" integer } { "?" boolean } }
+{ $description "All positive 32-bit numbers are zero extendable except for 0 which is the value used for relocations." } ;
+
+ARTICLE: "cpu.x86.assembler" "X86 assembler"
+"This vocab implements an assembler for x86 architectures."
+$nl
+"Instructions:"
+{ $subsections MOV } ;
 
 ABOUT: "cpu.x86.assembler"
