@@ -87,7 +87,7 @@ M: x86 %replace-imm
     {
         { [ dup not ] [ drop \ f type-number MOV ] }
         { [ dup fixnum? ] [ tag-fixnum MOV ] }
-        [ [ 0xffffffff MOV ] dip rc-absolute rel-literal ]
+        [ [ 0 MOV ] dip rc-absolute rel-literal ]
     } cond ;
 
 M: x86 %clear ( loc -- )
@@ -598,9 +598,9 @@ M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
 
 M:: x86 %dispatch ( src temp -- )
     ! Load jump table base.
-    temp 0xffffffff MOV
-    building get length :> start
+    temp 0 MOV
     0 rc-absolute-cell rel-here
+    building get length :> start
     ! Add jump table base
     temp src 0x7f [++] JMP
     building get length :> end
