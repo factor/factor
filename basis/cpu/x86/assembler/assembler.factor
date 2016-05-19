@@ -212,13 +212,23 @@ M: operand POP { 0b000 f 0x8f } 1-operand ;
 
 <PRIVATE
 
+: zero-extendable? ( imm -- ? )
+    1 32 2^ 1 - between? ;
+
 GENERIC# (MOV-I) 1 ( dst src -- )
 
 M: register (MOV-I)
-    dup byte?
-    [ [ t 0xb0 short-operand ] [ 1, ] bi* ]
-    [ [ t 0xb8 short-operand ] [ cell, ] bi* ]
-    if ;
+    {
+        {
+            [ dup byte? ]
+            [ [ t 0xb0 short-operand ] [ 1, ] bi* ]
+        }
+        {
+            [ dup zero-extendable? ]
+            [ [ 32-bit-version-of t 0xb8 short-operand ] [ 4, ] bi* ]
+        }
+        [ [ t 0xb8 short-operand ] [ cell, ] bi* ]
+    } cond ;
 
 M: operand (MOV-I)
     { 0b000 t 0xc6 }
