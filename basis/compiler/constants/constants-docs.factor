@@ -5,6 +5,9 @@ HELP: context-callstack-save-offset
 { $values { "n" integer } }
 { $description "Offset in bytes in the " { $link context } " struct to where the c callstack is saved." } ;
 
+HELP: rc-absolute-cell
+{ $description "Indicates that the relocation is an absolute address to an object in the VM." } ;
+
 HELP: rt-cards-offset
 { $description "Relocation offset type for the cards table." }
 { $see-also rel-cards-offset } ;
@@ -63,6 +66,37 @@ $nl
   string-offset
   tuple-class-offset
   word-entry-point-offset
+}
+"Relocation classes:"
+{
+    rc-absolute-cell
+    rc-absolute
+    rc-relative
+    rc-absolute-ppc-2/2
+    rc-absolute-ppc-2
+    rc-relative-ppc-2-pc
+    rc-relative-ppc-3-pc
+    rc-absolute-2
+    rc-absolute-1
+    rc-absolute-ppc-2/2/2/2
+}
+"Relocation types:"
+{
+    rt-dlsym
+    rt-entry-point
+    rt-entry-point-pic
+    rt-entry-point-pic-tail
+    rt-here
+    rt-this
+    rt-literal
+    rt-untagged
+    rt-megamorphic-cache-hits
+    rt-vm
+    rt-cards-offset
+    rt-decks-offset
+    rt-dlsym-toc
+    rt-inline-cache-miss
+    rt-safepoint
 } ;
 
 ABOUT: "compiler.constants"
