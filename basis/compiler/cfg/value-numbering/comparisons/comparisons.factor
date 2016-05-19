@@ -246,17 +246,11 @@ M: ##compare-integer-imm rewrite
 : simplify-test ( insn -- insn )
     dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
 
-: simplify-test-branch ( insn -- insn )
-    dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
-
-: (simplify-test-imm) ( insn -- src1 src2 cc )
-    [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
-
 : simplify-test-imm ( insn -- insn )
-    [ dst>> ] [ (simplify-test-imm) ] [ temp>> ] tri ##test-imm new-insn ; inline
+    [ dst>> ] [ (simplify-test) ] [ temp>> ] tri ##test-imm new-insn ; inline
 
 : simplify-test-imm-branch ( insn -- insn )
-    (simplify-test-imm) ##test-imm-branch new-insn ; inline
+    (simplify-test) ##test-imm-branch new-insn ; inline
 
 : >test-imm ( insn ? -- insn' )
     (>compare-imm) [ vreg>integer ] dip next-vreg
@@ -286,7 +280,7 @@ M: ##test-branch rewrite
         { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm-branch ] }
         { [ dup diagonal? ] [
             {
-                { [ dup src1>> vreg>insn ##and? ] [ simplify-test-branch ] }
+                { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
                 { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm-branch ] }
                 [ drop f ]
             } cond
