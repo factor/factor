@@ -8,14 +8,6 @@ compiler.cfg.value-numbering.rewrite cpu.architecture kernel
 math math.order namespaces sequences vectors ;
 IN: compiler.cfg.value-numbering.comparisons
 
-! Optimizations performed here:
-!
-! 1) Eliminating intermediate boolean values when the result of
-! a comparison is used by a compare-branch
-! 2) Folding comparisons where both inputs are literal
-! 3) Folding comparisons where both inputs are congruent
-! 4) Converting compare instructions into compare-imm instructions
-
 : fold-compare-imm? ( insn -- ? )
     src1>> vreg>insn literal-insn? ;
 
@@ -101,7 +93,7 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
 : fold-compare-imm-branch ( insn -- insn/f )
     evaluate-compare-imm fold-branch ;
 
-: >test-branch ( insn -- insn )
+: >test-branch ( insn -- insn' )
     [ src1>> ] [ src1>> ] [ cc>> ] tri ##test-branch new-insn ;
 
 M: ##compare-imm-branch rewrite
