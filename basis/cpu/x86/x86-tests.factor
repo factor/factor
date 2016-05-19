@@ -12,6 +12,15 @@ IN: cpu.x86.tests
     assert=
 ] unit-test
 
+! (%compare-tagged)
+cpu x86.64? [
+    {
+        B{ 72 129 248 255 255 255 255 }
+    } [
+        init-relocation [ RAX RAX (%compare-tagged) ] B{ } make
+    ] unit-test
+] when
+
 ! %add-imm
 {
     B{ 72 255 192 }
@@ -19,6 +28,14 @@ IN: cpu.x86.tests
 } [
     [ RAX RAX 1 %add-imm ] B{ } make
     [ RAX RAX 29 %add-imm ] B{ } make
+] unit-test
+
+! %alien-invoke
+{ 1 } [
+    init-relocation init-gc-maps [
+        { } { } { } { } 0 0 { } "dll" T{ gc-map { scrub-d V{ 0 } } } %alien-invoke
+    ] B{ } make drop
+    gc-maps get length
 ] unit-test
 
 ! %call-gc
@@ -34,19 +51,21 @@ IN: cpu.x86.tests
     gc-maps get length
 ] unit-test
 
-! %alien-invoke
-{ 1 } [
-    init-relocation init-gc-maps [
-        { } { } { } { } 0 0 { } "dll" T{ gc-map { scrub-d V{ 0 } } } %alien-invoke
-    ] B{ } make drop
-    gc-maps get length
-] unit-test
-
 ! %clear
 { t } [
     [ D: 0 %clear ] B{ } make
     cpu x86.32? B{ 199 6 144 18 0 0 } B{ 73 199 6 144 18 0 0 } ? =
 ] unit-test
+
+! %dispatch
+cpu x86.64? [
+    {
+        B{ 72 187 0 0 0 0 0 0 0 0 72 255 100 3 6 0 }
+    }
+    [
+        init-relocation [ RAX RBX %dispatch ] B{ } make
+    ] unit-test
+] when
 
 ! %prologue
 { t } [
@@ -58,3 +77,13 @@ IN: cpu.x86.tests
     [ 8 cells %prologue ] B{ } make
     [ stack-reg 7 cells SUB ] B{ } make =
 ] unit-test
+
+!  %replace-imm
+cpu x86.64? [
+    {
+        B{ 73 199 6 0 0 0 0 }
+    }
+    [
+        init-relocation [ 34.0 D: 0 %replace-imm ] B{ } make
+    ] unit-test
+] when
