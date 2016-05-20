@@ -61,7 +61,7 @@ M: x86 test-instruction? t ;
 
 M: x86 immediate-store? immediate-comparand? ;
 
-M: x86 %load-immediate [ dup XOR ] [ MOV ] if-zero ;
+M: x86 %load-immediate [ 32-bit-version-of dup XOR ] [ MOV ] if-zero ;
 
 M: x86 %load-reference
     [ swap 0 MOV rc-absolute-cell rel-literal ]
