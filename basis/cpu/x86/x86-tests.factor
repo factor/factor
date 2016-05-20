@@ -74,6 +74,11 @@ cpu x86.64? [
     ] unit-test
 ] when
 
+! %load-immediate
+{ B{ 49 201 } } [
+    [ RCX 0 %load-immediate ] B{ } make
+] unit-test
+
 ! %prologue
 { t } [
     [ 2 cells %prologue ] B{ } make
