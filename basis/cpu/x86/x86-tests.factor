@@ -30,6 +30,13 @@ cpu x86.64? [
     [ RAX RAX 29 %add-imm ] B{ } make
 ] unit-test
 
+! %and-imm
+{
+    B{ 131 225 6 }
+} [
+    [ RCX RCX 0x6 %and-imm ] B{ } make
+] unit-test
+
 ! %alien-invoke
 { 1 } [
     init-relocation init-gc-maps [
