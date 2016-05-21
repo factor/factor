@@ -148,11 +148,17 @@ M: byte-array encode-kv ;
 
 : fdb-commit-wal-flush ( -- ) FDB_COMMIT_MANUAL_WAL_FLUSH fdb-commit ;
 
-: fdb-compact ( new-path -- )
+: fdb-compact-to-path ( new-path -- )
     [ get-file-handle ] dip absolute-path
     fdb_compact fdb-check-error ;
 
-: fdb-compact-commit ( new-path -- )
+: fdb-compact ( -- )
+    get-file-handle f fdb_compact fdb-check-error ;
+
+: fdb-compact-commit-to-path ( path -- )
+    fdb-compact-to-path fdb-commit-wal-flush ;
+
+: fdb-compact-commit ( -- )
     fdb-compact fdb-commit-wal-flush ;
 
 
@@ -308,11 +314,15 @@ PRIVATE>
     [ fdb_open fdb-check-error ] 3keep
     2drop void* deref <fdb-file-handle> ;
 
+: fdb-default-config-auto-commit ( -- config )
+    fdb_get_default_config
+        FDB_SEQTREE_USE >>seqtree_opt ;
+        ! FDB_COMPACTION_AUTO >>compaction_mode
+        ! t >>auto_commit ;
+
 ! Make SEQTREES by default
 : fdb-open-default-config ( path -- file-handle )
-    fdb_get_default_config
-        FDB_SEQTREE_USE >>seqtree_opt
-    fdb-open ;
+    fdb-default-config-auto-commit fdb-open ;
 
 : fdb-kvs-open-config ( name config -- kvs-handle )
     [
