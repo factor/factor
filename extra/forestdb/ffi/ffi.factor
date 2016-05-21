@@ -25,6 +25,7 @@ TYPEDEF: void* fdb_custom_cmp_variable
 TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_kvs_handle
 TYPEDEF: void* fdb_iterator
+TYPEDEF: void* fdb_changes_callback_fn
 
 ENUM: fdb_open_flags < uint32_t
     { FDB_OPEN_FLAG_CREATE 1 }
@@ -57,7 +58,13 @@ ENUM: fdb_iterator_opt_t < uint16_t
     { FDB_ITR_NONE 0 }
     { FDB_ITR_NO_DELETES 2 }
     { FDB_ITR_SKIP_MIN_KEY 4 }
-    { FDB_ITR_SKIP_MAX_KEY 8 } ;
+    { FDB_ITR_SKIP_MAX_KEY 8 }
+    { FDB_ITR_NO_VALUES 0x10 } ; ! only keys and metadata for fdb_changes_since
+
+ENUM: fdb_changes_decision < int32_t
+    { FDB_CHANGES_PRESERVE 1 }
+    { FDB_CHANGES_CLEAN 0 }
+    { FDB_CHANGES_CANCEL -1 } ;
 
 ENUM: fdb_iterator_seek_opt_t < uint8_t
     { FDB_ITR_SEEK_HIGHER 0 }
@@ -182,8 +189,8 @@ ENUM: fdb_latency_stat_type < uint8_t
     { FDB_LATENCY_SETS 0 }
     { FDB_LATENCY_GETS 1 }
     { FDB_LATENCY_COMMITS 2 }
-    { FDB_LATENCY_SNAPSHOTS 3 }
-    { FDB_LATENCY_SNAPSHOT_DUR 4 }
+    { FDB_LATENCY_SNAP_INMEM 3 }
+    { FDB_LATENCY_SNAP_DUR 4 }
     { FDB_LATENCY_COMPACTS 5 }
     { FDB_LATENCY_ITR_INIT 6 }
     { FDB_LATENCY_ITR_SEQ_INIT 7 }
@@ -195,8 +202,15 @@ ENUM: fdb_latency_stat_type < uint8_t
     { FDB_LATENCY_ITR_SEEK_MAX 13 }
     { FDB_LATENCY_ITR_SEEK_MIN 14 }
     { FDB_LATENCY_ITR_CLOSE 15 }
-    { FDB_LATENCY_NUM_STATS 16 } ;
-
+    { FDB_LATENCY_OPEN 16 }
+    { FDB_LATENCY_KVS_OPEN 17 }
+    { FDB_LATENCY_SNAP_CLONE 18 }
+    { FDB_LATENCY_WAL_INS 19 }
+    { FDB_LATENCY_WAL_FIND 20 }
+    { FDB_LATENCY_WAL_COMMIT 21 }
+    { FDB_LATENCY_WAL_FLUSH 22 }
+    { FDB_LATENCY_WAL_RELEASE 23 }
+    { FDB_LATENCY_NUM_STATS 24 } ;
 
 STRUCT: fdb_latency_stat
     { lat_count uint64_t }
@@ -291,7 +305,9 @@ ENUM: fdb_status
     { FDB_RESULT_ELOOP -69 }
     { FDB_RESULT_ENAMETOOLONG -70 }
     { FDB_RESULT_EOVERFLOW -71 }
-    { FDB_RESULT_EAGAIN -72 } ;
+    { FDB_RESULT_EAGAIN -72 }
+    { FDB_RESULT_CANCELLED -73 }
+    { FDB_RESULT_LAST -73 } ; ! update this
 
 ! End fdb_errors.h
 
@@ -346,6 +362,11 @@ FUNCTION: fdb_status fdb_iterator_seek_to_min ( fdb_iterator* iterator )
 FUNCTION: fdb_status fdb_iterator_seek_to_max ( fdb_iterator* iterator )
 FUNCTION: fdb_status fdb_iterator_close ( fdb_iterator* iterator )
 
+FUNCTION: fdb_status fdb_changes_since ( fdb_kvs_handle *handle,
+                             fdb_seqnum_t since,
+                             fdb_iterator_opt_t opt,
+                             fdb_changes_callback_fn callback,
+                             void *ctx )
 FUNCTION: fdb_status fdb_compact ( fdb_file_handle* fhandle, c-string new_filename )
 FUNCTION: fdb_status fdb_compact_with_cow ( fdb_file_handle* fhandle, c-string new_filename )
 FUNCTION: fdb_status fdb_compact_upto ( fdb_file_handle* fhandle, c-string new_filename, fdb_snapshot_marker_t marker )
@@ -369,6 +390,10 @@ FUNCTION: fdb_status fdb_get_all_snap_markers (
     fdb_file_handle* fhandle,
     fdb_snapshot_info_t** markers,
     uint64_t* size )
+
+FUNCTION: fdb_seqnum_t fdb_get_available_rollback_seq (
+    fdb_kvs_handle* handle,
+    uint64_t request_seqno )
 
 FUNCTION: fdb_status fdb_free_snap_markers ( fdb_snapshot_info_t* markers, uint64_t size )
 FUNCTION: fdb_status fdb_free_kvs_name_list ( fdb_kvs_name_list* kvs_name_list )

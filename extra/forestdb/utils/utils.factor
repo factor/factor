@@ -4,16 +4,19 @@ USING: assocs continuations forestdb.lib fry io.directories
 io.files.temp kernel math.parser math.ranges sequences ;
 IN: forestdb.utils
 
-: test-db-0 ( -- path ) "0.forestdb.0" temp-file ;
-: test-db-1 ( -- path ) "1.forestdb.0" temp-file ;
-
-: with-forestdb-tester ( path quot -- )
+: with-forestdb-test-db-kvs ( name quot -- )
     '[
-        "default" _ with-kvs
-    ] with-forestdb ; inline
+        "forestdb-test" ".db" [
+            _ _ with-forestdb-kvs 
+        ] cleanup-unique-file
+    ] with-temp-directory ; inline
 
-: delete-test-db-0 ( -- ) [ test-db-0 delete-file ] ignore-errors ;
-: delete-test-db-1 ( -- ) [ test-db-1 delete-file ] ignore-errors ;
+: with-forestdb-test-db ( quot -- )
+    '[
+        "forestdb-test" ".db" [
+            "default" _ with-forestdb-kvs 
+        ] cleanup-unique-file
+    ] with-temp-directory ; inline
 
 : make-kv-nth ( n -- key val )
     number>string [ "key" prepend ] [ "val" prepend ] bi ;
