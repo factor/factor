@@ -1,7 +1,8 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs continuations forestdb.lib fry io.directories
-io.files.temp kernel math.parser math.ranges sequences ;
+io.files.temp io.files.unique kernel math.parser math.ranges
+sequences ;
 IN: forestdb.utils
 
 : with-forestdb-test-db-kvs ( name quot -- )

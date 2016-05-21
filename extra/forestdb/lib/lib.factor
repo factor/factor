@@ -316,9 +316,10 @@ PRIVATE>
 
 : fdb-default-config-auto-commit ( -- config )
     fdb_get_default_config
-        FDB_SEQTREE_USE >>seqtree_opt ;
-        ! FDB_COMPACTION_AUTO >>compaction_mode
-        ! t >>auto_commit ;
+        FDB_SEQTREE_USE >>seqtree_opt
+        FDB_COMPACTION_AUTO >>compaction_mode
+        1 >>compactor_sleep_duration
+        t >>auto_commit ;
 
 ! Make SEQTREES by default
 : fdb-open-default-config ( path -- file-handle )
@@ -358,6 +359,11 @@ PRIVATE>
     [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb_iterator_next ] dip
     with-fdb-map ; inline
 
+! : changes-cb ( handle doc ctx -- changes_decision )
+!    ;
+
+! : fdb-changes-since ( seqnum iterator_opt cb ctx -- seq )
+!    f 101 FDB_ITR_NONE fdb_changes_since ;
 
 : with-kvs ( name quot -- )
     [
