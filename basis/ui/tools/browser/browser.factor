@@ -11,7 +11,7 @@ ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
 ui.theme ui.gadgets.toolbar ui.gadgets.tracks
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
 ui.render ui.text ui.theme.images ui.tools.common
-ui.tools.browser.history ui.tools.browser.popups vocabs ;
+ui.tools.browser.history ui.tools.browser.popups unicode vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -97,7 +97,7 @@ CONSTANT: next 1
     <scroller> >>scroller scroller>> white-interior 1 track-add ;
 
 : search-browser ( string browser -- )
-    '[ <apropos-search> _ show-help ] unless-empty ;
+    '[ [ blank? ] trim <apropos-search> _ show-help ] unless-empty ;
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
