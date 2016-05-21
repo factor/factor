@@ -137,7 +137,7 @@ $nl
   }
   {
       { $snippet "\"predicating\"" }
-      " Set on class predicates, stores the corresponding class word"
+      "Set on class predicates, stores the corresponding class word."
   }
   {
       { { $snippet "\"reading\"" } ", " { $snippet "\"writing\"" } }

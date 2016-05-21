@@ -2,7 +2,7 @@ USING: help.markup help.syntax calendar quotations system ;
 IN: timers
 
 HELP: timer
-{ $class-description "A timer. Can be passed to " { $link stop-timer } "." } ;
+{ $class-description "A timer. Can be passed to " { $link start-timer } ", " { $link stop-timer } " and " { $link restart-timer } "." } ;
 
 HELP: start-timer
 { $values { "timer" timer } }
