@@ -314,16 +314,22 @@ PRIVATE>
     [ fdb_open fdb-check-error ] 3keep
     2drop void* deref <fdb-file-handle> ;
 
-: fdb-default-config-auto-commit ( -- config )
+: fdb-config-normal-commit ( -- config )
     fdb_get_default_config
-        FDB_SEQTREE_USE >>seqtree_opt
+        FDB_SEQTREE_USE >>seqtree_opt ;
+
+: fdb-config-auto-commit ( -- config )
+    fdb-config-normal-commit
         FDB_COMPACTION_AUTO >>compaction_mode
         1 >>compactor_sleep_duration
         t >>auto_commit ;
 
 ! Make SEQTREES by default
-: fdb-open-default-config ( path -- file-handle )
-    fdb-default-config-auto-commit fdb-open ;
+: fdb-open-auto-commit ( path -- file-handle )
+    fdb-config-auto-commit fdb-open ;
+
+: fdb-open-normal-commit ( path -- file-handle )
+    fdb-config-normal-commit fdb-open ;
 
 : fdb-kvs-open-config ( name config -- kvs-handle )
     [
@@ -376,7 +382,7 @@ PRIVATE>
 
 : with-forestdb ( path quot -- )
     [
-        [ fdb-open-default-config &dispose current-fdb-file-handle ] dip with-variable
+        [ fdb-open-normal-commit &dispose current-fdb-file-handle ] dip with-variable
     ] with-destructors ; inline
 
 : with-forestdb-kvs ( path name quot -- )
