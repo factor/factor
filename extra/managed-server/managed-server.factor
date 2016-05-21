@@ -103,3 +103,8 @@ M: managed-server handle-client*
         swap >>insecure
         f >>timeout
         H{ } clone >>clients ; inline
+
+: new-managed-server* ( encoding class -- server )
+    new-threaded-server
+        f >>timeout
+        H{ } clone >>clients ; inline
