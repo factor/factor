@@ -229,7 +229,6 @@ these lines in your .emacs:
     "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only"
-    "SLOT:"
     "STRING:" "SYNTAX:"
     "UNIFORM-TUPLE:"
     "VARIANT:" "VERTEX-FORMAT:"))
@@ -301,7 +300,7 @@ these lines in your .emacs:
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
    '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "GAME" "HELP" "LIBRARY"
-     "MAIN" "MAIN-WINDOW" "STRING" "SYMBOL" "VAR")))
+     "MAIN" "MAIN-WINDOW" "SLOT" "STRING" "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
 (defconst factor-symbols-lines-regex
@@ -882,6 +881,7 @@ With prefix, non-existing files will be created."
     (modify-syntax-entry ?# "_" table)
     (modify-syntax-entry ?! "_" table)
     (modify-syntax-entry ?\n ">   " table)
+    (modify-syntax-entry ?\\ "_" table)
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?@ "_" table)
     (modify-syntax-entry ?? "_" table)
