@@ -30,11 +30,11 @@ HELP: JE
 } ;
 
 HELP: MOV
-{ $values { "dst" "destination" "src" "source" } }
+{ $values { "dst" "destination" } { "src" "source" } }
 { $description "Moves a value from one place to another." } ;
 
 HELP: immediate-1/4
-{ $values { "dst" "dst" } { "imm" "imm" } { "reg,rex.w,opcode" } }
+{ $values { "dst" "dst" } { "imm" "imm" } { "reg,rex.w,opcode" sequence } }
 { $description "If imm is a byte, compile the opcode and the byte. Otherwise, set the 8-bit operand flag in the opcode, and compile the cell. The 'reg' is not really a register, but a value for the 'reg' field of the mod-r/m byte." } ;
 
 HELP: zero-extendable?
