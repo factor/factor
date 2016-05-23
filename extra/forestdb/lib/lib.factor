@@ -339,7 +339,7 @@ PRIVATE>
     [ fdb_kvs_open fdb-check-error ] 3keep 2drop
     void* deref <fdb-kvs-handle> ;
 
-: fdb-kvs-open ( name -- kvs-handle )
+: fdb-kvs-open-default-config ( name -- kvs-handle )
     get-kvs-default-config fdb-kvs-open-config ;
 
 : with-fdb-map ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
@@ -371,24 +371,30 @@ PRIVATE>
 ! : fdb-changes-since ( seqnum iterator_opt cb ctx -- seq )
 !    f 101 FDB_ITR_NONE fdb_changes_since ;
 
-: with-kvs ( name quot -- )
-    [
-        [ fdb-kvs-open &dispose current-fdb-kvs-handle ] dip with-variable
-    ] with-destructors ; inline
 
-
-: with-default-kvs ( quot -- )
-    [ "default" ] dip with-kvs ; inline
-
-: with-forestdb ( path quot -- )
-    [
-        [ fdb-open-normal-commit &dispose current-fdb-file-handle ] dip with-variable
-    ] with-destructors ; inline
-
-: with-forestdb-kvs ( path name quot -- )
+: with-kvs-name-config ( name config quot -- )
     '[
-        _ _ with-kvs
-    ] with-forestdb ; inline
+        _ _ fdb-kvs-open-config &dispose current-fdb-kvs-handle _ with-variable
+    ] with-destructors ; inline
+
+: with-kvs-name ( name quot -- )
+    [ fdb_get_default_kvs_config ] dip with-kvs-name-config ; inline
+
+
+: with-forestdb-file-handle ( path config quot -- )
+    '[
+        _ _ fdb-open &dispose current-fdb-file-handle _ with-variable
+    ] with-destructors ; inline
+
+: with-forestdb-path-config-kvs-name-config ( path config kvs-name kvs-config quot -- )
+    '[
+        _ _ with-kvs-name-config
+    ] with-forestdb-file-handle ; inline
+
+: with-forestdb-path-config-kvs-name ( path config kvs-name quot -- )
+    '[
+        _ _ with-kvs-name
+    ] with-forestdb-file-handle ; inline
 
 /*
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION

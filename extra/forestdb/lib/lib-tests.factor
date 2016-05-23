@@ -15,8 +15,8 @@ IN: forestdb.lib
         "test123" [
             "key123" "val123" fdb-set-kv
             "key123" fdb-get-kv
-        ] with-kvs
-    ] with-forestdb-test-db
+        ] with-kvs-name
+    ] with-forestdb-test-manual
 ] unit-test
 
 { "val12345" } [
@@ -24,8 +24,8 @@ IN: forestdb.lib
         "test123" [
             "key123" "val12345" fdb-set-kv
             "key123" fdb-get-kv
-        ] with-kvs
-    ] with-forestdb-test-db
+        ] with-kvs-name
+    ] with-forestdb-test-manual
 ] unit-test
 
 ! Get
@@ -39,7 +39,7 @@ IN: forestdb.lib
         "key1" "meta" "val" [
             fdb_doc>doc [ key>> ] [ body>> ] bi 2array
         ] with-create-doc
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 
@@ -53,7 +53,7 @@ IN: forestdb.lib
             fdb-get
             fdb_doc>doc [ key>> ] [ meta>> ] [ body>> ] tri 3array
         ] with-create-doc
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 
@@ -67,7 +67,7 @@ IN: forestdb.lib
             fdb-get-byseq fdb_doc>doc
             [ key>> ] [ meta>> ] [ body>> ] tri 3array
         ] with-doc
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 {
@@ -80,14 +80,14 @@ IN: forestdb.lib
             fdb-get-byseq fdb_doc>doc
             [ key>> ] [ meta>> ] [ body>> ] tri 3array
         ] with-doc
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 ! Filename is only valid inside with-forestdb
 { f } [
     [
         fdb-get-info filename>> alien>native-string empty?
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 ! Test fdb_doc_create
@@ -96,7 +96,7 @@ IN: forestdb.lib
        "key123" "meta blah" "some body" [
             [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri
         ] with-create-doc
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 { 7 8 15 } [
@@ -105,7 +105,7 @@ IN: forestdb.lib
             [ "new meta" "some other body" fdb-doc-update ]
             [ [ keylen>> ] [ metalen>> ] [ bodylen>> ] tri ] bi
         ] with-create-doc
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 { 1 1 } [
@@ -113,7 +113,7 @@ IN: forestdb.lib
         1 set-kv-n
         fdb-commit-normal
         fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 { 6 5 } [
@@ -122,7 +122,7 @@ IN: forestdb.lib
         5 set-kv-nth
         fdb-commit-normal
         fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 { 5 5 } [
@@ -130,7 +130,7 @@ IN: forestdb.lib
         5 set-kv-n
         fdb-commit-normal
         fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 ! Snapshots
@@ -143,7 +143,7 @@ IN: forestdb.lib
         FDB_SNAPSHOT_INMEM [
             fdb-get-kvs-info [ last_seqnum>> ] [ doc_count>> ] bi
         ] with-forestdb-snapshot
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 */
 
@@ -259,7 +259,7 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 ! All the keys
@@ -280,7 +280,7 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 ! Test that keys at extremes get returned
@@ -297,7 +297,7 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 {
@@ -313,7 +313,7 @@ IN: forestdb.lib
                   fdb_doc>doc [ seqnum>> ] [ key>> ] [ body>> ] tri 3array ,
             ] with-fdb-normal-iterator
         ] { } make
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 
@@ -328,7 +328,7 @@ IN: forestdb.lib
             fdb_doc>doc
         ] with-fdb-byseq-map
         [ seqnum>> ] map
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 ! XXX: Behavior changed here
@@ -345,7 +345,7 @@ IN: forestdb.lib
             ! fdb_doc>doc
         ! ] with-fdb-byseq-map
         ! [ [ seqnum>> ] [ deleted?>> ] bi 2array ] map
-    ! ] with-forestdb-test-db
+    ! ] with-forestdb-test-manual
 ! ] unit-test
 
 ! Test new behavior
@@ -360,7 +360,7 @@ IN: forestdb.lib
             fdb_doc>doc
         ] with-fdb-byseq-map
         [ [ seqnum>> ] [ deleted?>> ] bi 2array ] map
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
 
 {
@@ -382,5 +382,5 @@ IN: forestdb.lib
                 [ [ key>> ] [ keylen>> ] bi alien/length>string ] bi 2array ,
             ] with-fdb-byseq-each
         ] { } make
-    ] with-forestdb-test-db
+    ] with-forestdb-test-manual
 ] unit-test
