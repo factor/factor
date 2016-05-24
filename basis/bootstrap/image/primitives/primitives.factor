@@ -177,7 +177,7 @@ CONSTANT: all-primitives {
             {
                 "resize-byte-array" ( n byte-array -- new-byte-array )
                 "resize_byte_array"
-                { integer byte-array } { byte-array } f
+                { integer-array-capacity byte-array } { byte-array } f
             }
         }
     }

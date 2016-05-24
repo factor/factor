@@ -45,6 +45,11 @@ IN: compiler.tree.propagation.tests
     integer-array-capacity <class-info> =
 ] unit-test
 
+{ t } [
+    [ dupd resize-byte-array drop ] final-info first
+    integer-array-capacity <class-info> =
+] unit-test
+
 ! Strings
 { V{ 3 } } [
     [ 3 f <string> length ] final-literals
