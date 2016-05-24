@@ -270,6 +270,22 @@ SYMBOL: foo
     predecessors>> first instructions>>
 ] cfg-unit-test
 
+! emit-if
+{ V{ 3 2 } } [
+    <basic-block> dup set-basic-block ##branch,
+    T{ #if
+       { in-d { 9 } }
+       { children
+         {
+             { T{ #push { literal 3 } { out-d { 6 } } } }
+             { T{ #push { literal 2 } { out-d { 7 } } } }
+         }
+       }
+       { live-branches { t t } }
+    } emit-if
+    predecessors>> [ instructions>> first val>> ] map
+] cfg-unit-test
+
 ! emit-loop-call
 { 1 "good" } [
     V{ } 0 insns>block dup set-basic-block
