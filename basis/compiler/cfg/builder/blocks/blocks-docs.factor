@@ -67,8 +67,12 @@ HELP: emit-trivial-block
 { $examples { $unchecked-example $[ ex-emit-trivial-block ] } } ;
 
 HELP: end-branch
-{ $values { "block" basic-block } { "pair/f" "two-tuple" } }
-{ $description "pair is { final-bb final-height }" } ;
+{ $values
+  { "block/f" { $maybe basic-block } }
+  { "pair/f" "two-tuple" }
+}
+{ $description "The pair is a two tuple on the format { final-bb final-height }." }
+{ $see-also with-branch } ;
 
 HELP: set-basic-block
 { $values { "basic-block" basic-block } }
