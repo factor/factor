@@ -42,8 +42,7 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
     WIN32_FIND_DATA <struct> [
-        FindFirstFile
-        [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep
+        FindFirstFile check-invalid-handle
         FindClose win32-error=0/f
     ] keep ;
 
