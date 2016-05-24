@@ -211,6 +211,9 @@ M: operand POP { 0b000 f 0x8f } 1-operand ;
 : zero-extendable? ( imm -- ? )
     1 32 2^ 1 - between? ;
 
+: maybe-zero-extend ( reg imm -- reg' imm )
+    dup zero-extendable? [ [ 32-bit-version-of ] dip ] when ;
+
 GENERIC# (MOV-I) 1 ( dst src -- )
 
 M: register (MOV-I)
@@ -336,8 +339,7 @@ M: operand SBB 0o030 2-operand ;
 
 GENERIC: AND ( dst src -- )
 M: immediate AND ( dst src -- )
-    dup zero-extendable? [ [ 32-bit-version-of ] dip ] when
-    { 0b100 t 0x80 } immediate-1/4 ;
+    maybe-zero-extend { 0b100 t 0x80 } immediate-1/4 ;
 M: operand AND 0o040 2-operand ;
 
 GENERIC: SUB ( dst src -- )
@@ -360,7 +362,8 @@ M: immediate CMP ( dst src -- )
 M: operand CMP 0o070 2-operand ;
 
 GENERIC: TEST ( dst src -- )
-M: immediate TEST { 0b0 t 0xf7 } immediate-4 ;
+M: immediate TEST ( dst src -- )
+    maybe-zero-extend { 0b0 t 0xf7 } immediate-4 ;
 M: operand TEST 0o204 2-operand ;
 
 : XCHG ( dst src -- ) 0o207 2-operand ;
