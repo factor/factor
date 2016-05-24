@@ -244,6 +244,9 @@ M: windows file-systems ( -- array )
 : set-file-write-time ( path timestamp -- )
     [ f f ] dip set-file-times ;
 
-M: windows file-readable? file-info >boolean ;
+M: windows file-readable?
+    normalize-path open-read-handle
+    dup [ CloseHandle win32-error=0/f ] when* >boolean ;
+
 M: windows file-writable? file-info attributes>> +read-only+ swap member? not ;
 M: windows file-executable? file-executable-type windows-executable? ;
