@@ -76,7 +76,7 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
         [ GetFileInformationByHandle win32-error=0/f ] keep
     ] keep CloseHandle win32-error=0/f ;
 
-: get-file-information-stat ( path -- BY_HANDLE_FILE_INFORMATION )
+: get-file-information-stat ( path -- file-info )
     dup
     GENERIC_READ FILE_SHARE_READ f
     OPEN_EXISTING FILE_FLAG_BACKUP_SEMANTICS f
