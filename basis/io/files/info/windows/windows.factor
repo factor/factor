@@ -76,15 +76,20 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
         [ GetFileInformationByHandle win32-error=0/f ] keep
     ] keep CloseHandle win32-error=0/f ;
 
-: get-file-information-stat ( path -- file-info )
-    dup
+: valid-handle? ( handle -- boolean )
+    INVALID_HANDLE_VALUE = not ; inline
+
+: open-read-handle ( path -- handle/f )
     GENERIC_READ FILE_SHARE_READ f
     OPEN_EXISTING FILE_FLAG_BACKUP_SEMANTICS f
-    CreateFileW dup INVALID_HANDLE_VALUE = [
-        drop find-first-file-stat WIN32_FIND_DATA>file-info
-    ] [
+    CreateFileW [ valid-handle? ] keep f ? ;
+
+: get-file-information-stat ( path -- file-info )
+    dup open-read-handle dup [
         nip
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
+    ] [
+        drop find-first-file-stat WIN32_FIND_DATA>file-info
     ] if ;
 
 M: windows file-info ( path -- info )
