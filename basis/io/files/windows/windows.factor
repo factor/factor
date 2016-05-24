@@ -404,7 +404,7 @@ M: windows home
     WIN32_FIND_STREAM_DATA <struct>
     0
     [ FindFirstStream ] keepd
-    over -1 <alien> = [
+    over INVALID_HANDLE_VALUE = [
         2drop throw-win32-error
     ] [
         1vector swap file-streams-rest
