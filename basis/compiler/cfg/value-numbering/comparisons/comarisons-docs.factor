@@ -7,7 +7,7 @@ HELP: >test-branch
 
 HELP: rewrite-into-test?
 { $values { "insn" insn } { "?" boolean } }
-{ $description "Whether the comparison instruction can be rewritten into a test instruction." } ;
+{ $description "Whether the comparison instruction can be trivially rewritten into a test instruction." } ;
 
 ARTICLE: "compiler.cfg.value-numbering.comparisons" "Comparisons GVN"
 "Optimizations performed here:"
