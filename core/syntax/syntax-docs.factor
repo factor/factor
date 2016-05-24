@@ -804,8 +804,8 @@ HELP: ERROR:
         "ERROR: invalid-values x y ;"
         ""
         "TUPLE: invalid-values x y ;"
-        ": throw-invalid-values ( x y -- * )"
-        "    invalid-values boa throw ;"
+        ": invalid-values ( x y -- * )"
+        "    \\ invalid-values boa throw ;"
     }
 } ;
 
