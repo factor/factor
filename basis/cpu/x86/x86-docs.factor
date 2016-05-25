@@ -1,5 +1,6 @@
-USING: cpu.x86.assembler cpu.x86.assembler.operands.private help.markup
-help.syntax layouts math ;
+USING: compiler.cfg.registers cpu.x86.assembler
+cpu.x86.assembler.operands.private help.markup help.syntax layouts
+math ;
 IN: cpu.x86
 
 HELP: %boolean
@@ -81,6 +82,10 @@ HELP: load-zone-offset
     "0000000001b48f80: 498d4d10  lea rcx, [r13+0x10]"
   }
 } ;
+
+HELP: loc>operand
+{ $values { "loc" loc } { "operand" indirect } }
+{ $description "Converts a stack location to an operand passable to the " { $link MOV } " instruction." } ;
 
 HELP: store-tagged
 { $values { "dst" "a register symbol" } { "tag" "a builtin class" } }
