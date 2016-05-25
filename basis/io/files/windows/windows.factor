@@ -360,7 +360,7 @@ M: windows normalize-path ( string -- string' )
     ] if ;
 
 M: windows CreateFile-flags ( DWORD -- DWORD )
-    FILE_FLAG_OVERLAPPED bitor ;
+    flags{ FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } bitor ;
 
 <PRIVATE
 
