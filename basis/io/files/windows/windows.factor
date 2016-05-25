@@ -248,11 +248,7 @@ M: windows init-stdio
 : maybe-create-file ( path -- win32-file ? )
     ! return true if file was just created
     flags{ GENERIC_READ GENERIC_WRITE }
-    share-mode
-    f
-    OPEN_ALWAYS
-    0 CreateFile-flags
-    f CreateFileW dup win32-error=0/f <win32-file>
+    OPEN_ALWAYS 0 open-file
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
