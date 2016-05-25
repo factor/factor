@@ -4,7 +4,7 @@
 ! highlighted correctly by FUEL. So if you change something in the
 ! syntax highlighting and it breaks, things will be badly hightlighted
 ! here.
-USING: alien.syntax help.syntax math ;
+USING: alien.syntax kernel math ;
 IN: strange-syntax
 
 TUPLE: a-tuple slot1 slot2 { slot3 integer } ;
@@ -47,3 +47,6 @@ SYNTAX: ID-SYNTAX ;
 >>
 
 ID-SYNTAX ID-SYNTAX
+
+! ! Numbers
+{ -55 -0x10 100,00 1,000,000 0x2000,0000 0b01 } drop
