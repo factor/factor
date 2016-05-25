@@ -262,7 +262,7 @@ these lines in your .emacs:
   (regexp-opt factor-declaration-words 'symbols))
 
 (defconst factor-integer-regex
-  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9][0-9,]*\\)\\_>")
+  (one-symbol "-?\\(?:0[xob][0-9a-fA-F][0-9a-fA-F,]*\\|[0-9][0-9,]*\\)"))
 
 (defconst factor-raw-float-regex
   "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
@@ -439,6 +439,7 @@ these lines in your .emacs:
                  "P" 'factor-font-lock-parsing-word
                  "V" 'factor-font-lock-vocabulary-name
                  "T" 'factor-font-lock-type-name
+                 "N" 'factor-font-lock-number
                  "W" 'factor-font-lock-word)))
 
 (defun factor-group-name-to-face (group-name)
@@ -476,7 +477,7 @@ these lines in your .emacs:
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
     ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
     ,(factor-syntax factor-types-lines-regex '("P" "T"))
-    (,factor-integer-regex . 'factor-font-lock-number)
+    ,(factor-syntax factor-integer-regex '("N"))
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
     ,(factor-syntax factor-type-definition-regex '("P" "T"))
