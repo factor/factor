@@ -17,7 +17,7 @@ ifdef CONFIG
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
-		CFLAGS += -O3 -g
+		CFLAGS += -O3
 	endif
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
