@@ -99,7 +99,8 @@ $nl
       {
           { $snippet "\"inline\"" } ", "
           { $snippet "\"foldable\"" } ", "
-          { $snippet "flushable" }
+          { $snippet "\"flushable\""  } ", "
+          { $snippet "\"recursive\""  }
       }
       { $link "declarations" }
   }
