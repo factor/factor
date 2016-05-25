@@ -80,8 +80,8 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
     INVALID_HANDLE_VALUE = not ; inline
 
 : open-read-handle ( path -- handle/f )
-    GENERIC_READ FILE_SHARE_READ f
-    OPEN_EXISTING FILE_FLAG_BACKUP_SEMANTICS f
+    GENERIC_READ share-mode f
+    OPEN_EXISTING 0 CreateFile-flags f
     CreateFileW [ valid-handle? ] keep f ? ;
 
 : get-file-information-stat ( path -- file-info )
