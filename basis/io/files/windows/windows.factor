@@ -245,14 +245,6 @@ M: windows init-stdio
 : (open-append) ( path -- win32-file )
     GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
 
-: open-existing ( path -- win32-file )
-    flags{ GENERIC_READ GENERIC_WRITE }
-    share-mode
-    f
-    OPEN_EXISTING
-    FILE_FLAG_BACKUP_SEMANTICS
-    f CreateFileW dup win32-error=0/f <win32-file> ;
-
 : maybe-create-file ( path -- win32-file ? )
     ! return true if file was just created
     flags{ GENERIC_READ GENERIC_WRITE }

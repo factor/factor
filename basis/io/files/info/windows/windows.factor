@@ -232,7 +232,7 @@ M: windows file-systems ( -- array )
     ! timestamp order: creation access write
     [
         [
-            normalize-path open-existing &dispose handle>>
+            normalize-path open-r/w &dispose handle>>
         ] 3dip (set-file-times)
     ] with-destructors ;
 
