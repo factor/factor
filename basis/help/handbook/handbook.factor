@@ -22,7 +22,7 @@ ARTICLE: "conventions" "Conventions"
     { "combinator"            { "a word taking a quotation or another word as input; a higher-order function. See " { $link "combinators" } } }
     { "definition specifier"  { "an instance of " { $link definition } " which implements the " { $link "definition-protocol" } } }
     { "generalized boolean"   { "an object interpreted as a boolean; a value of " { $link f } " denotes false and anything else denotes true" } }
-    { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
+    { "generic word"          { "a word whose behavior depends on the class of one of its inputs. See " { $link "generic" } } }
     { "method"                { "a specialized behavior of a generic word on a class. See " { $link "generic" } } }
     { "object"                { "any datum which can be identified" } }
     { "ordering specifier"    { "see " { $link "order-specifiers" } } }
