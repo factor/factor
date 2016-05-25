@@ -11,6 +11,7 @@ cpu.x86.assembler.operands cpu.x86.assembler.private cpu.x86.features
 cpu.x86.features.private fry io kernel layouts locals make math
 math.order memory namespaces sequences system vm vocabs ;
 QUALIFIED-WITH: alien.c-types c
+FROM: kernel.private => declare ;
 FROM: math => float ;
 IN: cpu.x86
 
@@ -61,7 +62,8 @@ M: x86 test-instruction? t ;
 
 M: x86 immediate-store? immediate-comparand? ;
 
-M: x86 %load-immediate [ 32-bit-version-of dup XOR ] [ MOV ] if-zero ;
+M: x86 %load-immediate ( reg val -- )
+    { fixnum } declare [ 32-bit-version-of dup XOR ] [ MOV ] if-zero ;
 
 M: x86 %load-reference
     [ swap 0 MOV rc-absolute-cell rel-literal ]
