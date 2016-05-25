@@ -73,40 +73,6 @@ init-relocation [ RAX RBX 3 -14 RCX RDX %write-barrier ] B{ } make disassemble
 ;
 >>
 
-HELP: double-2-rep
-{ $var-description "Representation for a pair of doubles." } ;
-
-HELP: signed-rep
-{ $values { "rep" representation } { "rep'" representation } }
-{ $description "Maps any representation to its signed counterpart, if it has one." } ;
-
-HELP: rep-size
-{ $values { "rep" representation } { "n" integer } }
-{ $description "Size in bytes of a representation." } ;
-
-HELP: immediate-arithmetic?
-{ $values { "n" number } { "?" boolean } }
-{ $description
-  "Can this value be an immediate operand for " { $link %add-imm } ", "
-  { $link %sub-imm } ", or " { $link %mul-imm } "?"
-} ;
-
-HELP: machine-registers
-{ $values { "assoc" assoc } }
-{ $description "Mapping from register class to machine registers. Only registers not reserved by the Factor VM are included." } ;
-
-HELP: vm-stack-space
-{ $values { "n" number } }
-{ $description "Parameter space to reserve in anything making VM calls." } ;
-
-HELP: complex-addressing?
-{ $values { "?" boolean } }
-{ $description "Specifies if " { $link %slot } ", " { $link %set-slot } " and " { $link %write-barrier } " accept the 'scale' and 'tag' parameters, and if %load-memory and %store-memory work." } ;
-
-HELP: param-regs
-{ $values { "abi" "a calling convention symbol" } { "regs" assoc } }
-{ $description "Retrieves the order in which machine registers are used for parameters for the given calling convention." } ;
-
 HELP: %alien-invoke
 { $values
   { "reg-inputs" sequence }
@@ -134,6 +100,14 @@ HELP: %allot
   "In this example 40 bytes is allocated and a tagged pointer to the memory is put in " { $link RAX } ":"
   { $unchecked-example $[ ex-%allot ] }
 } ;
+
+HELP: %and-imm
+{ $values
+  { "dst" "destination register" }
+  { "src1" "first source register" }
+  { "src2" "second source register" }
+}
+{ $description "Emits an " { $link AND } " instruction between a register and an immediate." } ;
 
 HELP: %box
 { $values
@@ -234,7 +208,7 @@ HELP: %replace-imm
   { "src" integer }
   { "loc" loc }
 }
-{ $description "Emits machine code for putting an integer on the stack." }
+{ $description "Emits machine code for putting a literal on the stack." }
 { $examples
   { $unchecked-example
     "USING: cpu.architecture make ;"
@@ -268,6 +242,14 @@ HELP: %set-slot
   }
 } ;
 
+HELP: %shl-imm
+{ $values
+  { "dst" "register" }
+  { "src1" "register" }
+  { "src2" integer }
+} { $description "Bitshifts the value in a register left by a constant." }
+{ $see-also ##shl-imm } ;
+
 HELP: %store-memory-imm
 { $values
   { "value" "source register" }
@@ -284,6 +266,14 @@ HELP: %store-memory-imm
     "0000000002800ae0: f2480f114305  movsd [rbx+0x5], xmm0"
   }
 } ;
+
+HELP: %test-imm-branch
+{ $values
+  { "label" "branch destination" }
+  { "src1" "register" }
+  { "src2" "immediate" }
+  { "cc" "comparison symbol" }
+} { $description "Emits a TEST instruction with a register and an immediate, followed by a branch." } ;
 
 HELP: %vector>scalar
 { $values
@@ -305,6 +295,39 @@ HELP: %write-barrier
 { $description "Generates code for the " { $link ##write-barrier } " instruction." }
 { $examples { $unchecked-example $[ ex-%write-barrier ] } } ;
 
+HELP: double-2-rep
+{ $var-description "Representation for a pair of doubles." } ;
+
+HELP: signed-rep
+{ $values { "rep" representation } { "rep'" representation } }
+{ $description "Maps any representation to its signed counterpart, if it has one." } ;
+
+HELP: rep-size
+{ $values { "rep" representation } { "n" integer } }
+{ $description "Size in bytes of a representation." } ;
+
+HELP: immediate-arithmetic?
+{ $values { "n" number } { "?" boolean } }
+{ $description
+  "Can this value be an immediate operand for " { $link %add-imm } ", "
+  { $link %sub-imm } ", or " { $link %mul-imm } "?"
+} ;
+
+HELP: machine-registers
+{ $values { "assoc" assoc } }
+{ $description "Mapping from register class to machine registers. Only registers not reserved by the Factor VM are included." } ;
+
+HELP: vm-stack-space
+{ $values { "n" number } }
+{ $description "Parameter space to reserve in anything making VM calls." } ;
+
+HELP: complex-addressing?
+{ $values { "?" boolean } }
+{ $description "Specifies if " { $link %slot } ", " { $link %set-slot } " and " { $link %write-barrier } " accept the 'scale' and 'tag' parameters, and if %load-memory and %store-memory work." } ;
+
+HELP: param-regs
+{ $values { "abi" "a calling convention symbol" } { "regs" assoc } }
+{ $description "Retrieves the order in which machine registers are used for parameters for the given calling convention." } ;
 HELP: test-instruction?
 { $values { "?" boolean } }
 { $description "Does the current architecture have a test instruction? Used on x86 to rewrite some " { $link CMP } " instructions to less expensive " { $link TEST } "s." } ;
