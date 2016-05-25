@@ -229,7 +229,7 @@ M: windows init-stdio
 : open-file ( path access-mode create-mode flags -- handle )
     [
         [ share-mode default-security-attributes ] 2dip
-        CreateFile-flags f CreateFile opened-file
+        CreateFile-flags f CreateFileW opened-file
     ] with-destructors ;
 
 : open-r/w ( path -- win32-file )
