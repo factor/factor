@@ -38,8 +38,8 @@ PRIVATE>
 
 : unique-files ( prefix suffixes -- paths )
     '[
-        _ _ [
-            random-file-name glue
+        _ _ random-file-name '[
+            _ glue
             dup touch-unique-file
         ] with map
     ] unique-retries get retry [ absolute-path ] map ;
@@ -48,7 +48,7 @@ PRIVATE>
     prefix suffix unique-file :> path
     [ path quot call ] [ path delete-file ] [ ] cleanup ; inline
 
-:: cleanup-unique-files ( ..a prefix suffixes quot: ( ..a path -- ..b ) -- ..b )
+:: cleanup-unique-files ( ..a prefix suffixes quot: ( ..a paths -- ..b ) -- ..b )
     prefix suffixes unique-files :> paths
     [ paths quot call ] [ paths [ delete-file ] each ] [ ] cleanup ; inline
 

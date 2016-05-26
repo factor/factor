@@ -47,3 +47,11 @@ IN: io.files.unique.tests
         ] with-unique-directory drop
     ] with-temp-directory
 ] unit-test
+
+{ 29 } [
+    [
+        "unique-files-" { "-test.0" "-test.1" } [
+            [ file-name ] map first2 mismatch
+        ] cleanup-unique-files
+    ] with-temp-directory
+] unit-test
