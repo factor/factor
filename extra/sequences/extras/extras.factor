@@ -93,27 +93,27 @@ IN: sequences.extras
 
 <PRIVATE
 
-: (index-selector-for) ( quot length exampler -- selector accum )
+: (index-selector-as) ( quot length exampler -- selector accum )
     new-resizable [ [ push-if-index ] 2curry ] keep ; inline
 
-: (selector-for*) ( quot length exemplar -- selector accum )
+: (selector-as*) ( quot length exemplar -- selector accum )
     new-resizable [ [ push-if* ] 2curry ] keep ; inline
 
 PRIVATE>
 
-: index-selector-for ( quot exemplar -- selector accum )
-    [ length ] keep (index-selector-for) ; inline
+: index-selector-as ( quot exemplar -- selector accum )
+    [ length ] keep (index-selector-as) ; inline
 
 : index-selector ( quot -- selector accum )
-    V{ } index-selector-for ; inline
+    V{ } index-selector-as ; inline
 
-: selector-for* ( quot exemplar -- selector accum )
-    [ length ] keep (selector-for*) ; inline
+: selector-as* ( quot exemplar -- selector accum )
+    [ length ] keep (selector-as*) ; inline
 
-: selector* ( quot -- selector accum ) V{ } selector-for* ; inline
+: selector* ( quot -- selector accum ) V{ } selector-as* ; inline
 
 : filter-index-as ( ... seq quot: ( ... elt i -- ... ? ) exemplar -- ... seq' )
-    pick length over [ (index-selector-for) [ each-index ] dip ] 2curry dip like ; inline
+    pick length over [ (index-selector-as) [ each-index ] dip ] 2curry dip like ; inline
 
 : filter-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... seq' )
     over filter-index-as ; inline
@@ -251,7 +251,7 @@ PRIVATE>
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
     [ pick ] dip swap length over
-    [ (selector-for) [ compose each ] dip ] 2curry dip like ; inline
+    [ (selector-as) [ compose each ] dip ] 2curry dip like ; inline
 
 : map-filter ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) -- ... subseq )
     pick map-filter-as ; inline

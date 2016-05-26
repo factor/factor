@@ -95,19 +95,19 @@ MACRO: (ncollect) ( n -- quot )
 : mnmap ( m*seq quot m n -- result*n )
     2dup '[ [ _ npick ] dip swap _ dupn ] 2dip mnmap-as ; inline
 
-: ncollector-for ( quot exemplar... n -- quot' vec... )
+: ncollector-as ( quot exemplar... n -- quot' vec... )
     5 dupn '[
         [ [ length ] keep new-resizable ] _ napply
         [ [ [ push ] _ apply-curry _ spread* ] _ ncurry compose ] _ nkeep
     ] call ; inline
 
 : ncollector ( quot n -- quot' vec... )
-    [ V{ } swap dupn ] keep ncollector-for ; inline
+    [ V{ } swap dupn ] keep ncollector-as ; inline
 
 : nproduce-as ( pred quot exemplar... n -- seq... )
     7 dupn '[
         _ ndup
-        [ _ ncollector-for [ while ] _ ndip ]
+        [ _ ncollector-as [ while ] _ ndip ]
         _ ncurry _ ndip
         [ like ] _ apply-curry _ spread*
     ] call ; inline

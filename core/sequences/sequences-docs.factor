@@ -1944,12 +1944,13 @@ ARTICLE: "sequences-combinator-implementation" "Implementing sequence combinator
 "Creating a new sequence unconditionally:"
 { $subsections
     collector
-    collector-for
+    collector-as
+    collector-for-as
 }
 "Creating a new sequence conditionally:"
 { $subsections
     selector
-    selector-for
+    selector-as
     2selector
 } ;
 

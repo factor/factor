@@ -297,11 +297,11 @@ T{ doc
 
 <PRIVATE
 
-: collector-for-when ( quot exemplar -- quot' vec )
+: collector-when-as ( quot exemplar -- quot' vec )
     [ length ] keep new-resizable [ [ over [ push ] [ 2drop ] if ] curry compose ] keep ; inline
 
 : collector-when ( quot -- quot' vec )
-    V{ } collector-for-when ; inline
+    V{ } collector-when-as ; inline
 
 PRIVATE>
 
