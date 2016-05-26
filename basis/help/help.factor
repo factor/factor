@@ -8,12 +8,30 @@ namespaces prettyprint sequences sets sorting vocabs words
 words.symbol ;
 IN: help
 
+<PRIVATE
+
+: default-word-help ( word -- elements )
+    stack-effect [ in>> ] [ out>> ] bi [
+        [
+            dup pair? [
+                first2 dup effect? [ \ $quotation swap 2array ] when
+            ] [
+                object
+            ] if [ effect>string ] dip
+        ] { } map>assoc
+    ] bi@ append members \ $values prefix 1array ;
+
+PRIVATE>
+
 GENERIC: word-help* ( word -- content )
 
 : word-help ( word -- content )
     dup "help" word-prop [ ] [
-        dup word-help* dup
-       [ swap 2array 1array ] [ 2drop f ] if
+        dup word-help* dup [
+            swap 2array 1array
+        ] [
+            drop dup class? [ drop f ] [ default-word-help ] if
+        ] if
     ] ?if ;
 
 : $predicate ( element -- )
@@ -24,20 +42,7 @@ GENERIC: word-help* ( word -- content )
         " class." ,
     ] { } make $description ;
 
-: $default ( element -- )
-    first stack-effect [ in>> ] [ out>> ] bi [
-        [
-            dup pair? [
-                first2 dup effect? [ \ $quotation swap 2array ] when
-            ] [
-                object
-            ] if [ effect>string ] dip
-        ] { } map>assoc
-    ] bi@ append members $values ;
-
-M: word word-help* drop \ $default ;
-
-M: class word-help* drop f ;
+M: word word-help* drop f ;
 
 M: predicate word-help* drop \ $predicate ;
 
