@@ -551,19 +551,19 @@ PRIVATE>
 
 <PRIVATE
 
-: (selector-for) ( quot length exemplar -- selector accum )
+: (selector-as) ( quot length exemplar -- selector accum )
     new-resizable [ [ push-if ] 2curry ] keep ; inline
 
 PRIVATE>
 
-: selector-for ( quot exemplar -- selector accum )
-    [ length ] keep (selector-for) ; inline
+: selector-as ( quot exemplar -- selector accum )
+    [ length ] keep (selector-as) ; inline
 
 : selector ( quot -- selector accum )
-    V{ } selector-for ; inline
+    V{ } selector-as ; inline
 
 : filter-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
-    pick length over [ (selector-for) [ each ] dip ] 2curry dip like ; inline
+    pick length over [ (selector-as) [ each ] dip ] 2curry dip like ; inline
 
 : filter ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-as ; inline
@@ -583,14 +583,20 @@ PRIVATE>
 : partition ( ... seq quot: ( ... elt -- ... ? ) -- ... trueseq falseseq )
     over [ 2selector [ each ] 2dip ] dip [ like ] curry bi@ ; inline
 
-: collector-for ( quot exemplar -- quot' vec )
+: collector-for-as ( seq quot exemplar -- seq quot' vec )
+    [ over length ] dip new-resizable [ [ push ] curry compose ] keep ; inline
+
+: collector-as ( quot exemplar -- quot' vec )
     [ length ] keep new-resizable [ [ push ] curry compose ] keep ; inline
 
+: collector-for ( seq quot -- seq quot' vec )
+    V{ } collector-for-as ; inline
+
 : collector ( quot -- quot' vec )
-    V{ } collector-for ; inline
+    V{ } collector-as ; inline
 
 : produce-as ( ..a pred: ( ..a -- ..b ? ) quot: ( ..b -- ..a obj ) exemplar -- ..b seq )
-    dup [ collector-for [ while ] dip ] curry dip like ; inline
+    dup [ collector-as [ while ] dip ] curry dip like ; inline
 
 : produce ( ..a pred: ( ..a -- ..b ? ) quot: ( ..b -- ..a obj ) -- ..b seq )
     { } produce-as ; inline
