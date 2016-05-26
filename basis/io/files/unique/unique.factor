@@ -38,10 +38,14 @@ PRIVATE>
 
 : unique-files ( prefix suffixes -- paths )
     '[
-        _ _ random-file-name '[
-            _ glue
-            dup touch-unique-file
-        ] with map
+        V{ } clone [
+            _ _ random-file-name '[
+                _ glue
+                dup touch-unique-file suffix!
+            ] with each { } like
+        ] [
+            [ [ delete-file ] each ] [ rethrow ] bi*
+        ] recover
     ] unique-retries get retry [ absolute-path ] map ;
 
 :: cleanup-unique-file ( ..a prefix suffix quot: ( ..a path -- ..b ) -- ..b )
