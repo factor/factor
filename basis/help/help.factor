@@ -10,7 +10,9 @@ IN: help
 
 <PRIVATE
 
-: default-word-help ( word -- elements )
+GENERIC: default-word-help ( word -- elements )
+
+M: word default-word-help
     stack-effect [ in>> ] [ out>> ] bi [
         [
             dup pair? [
@@ -21,17 +23,19 @@ IN: help
         ] { } map>assoc
     ] bi@ append members \ $values prefix 1array ;
 
+M: class default-word-help drop f ;
+
 PRIVATE>
 
 GENERIC: word-help* ( word -- content )
 
 : word-help ( word -- content )
     dup "help" word-prop [ ] [
-        dup word-help* dup [
+        dup word-help* [
             swap 2array 1array
         ] [
-            drop dup class? [ drop f ] [ default-word-help ] if
-        ] if
+            default-word-help
+        ] if*
     ] ?if ;
 
 : $predicate ( element -- )
