@@ -23,6 +23,15 @@ M: word default-word-help
         ] { } map>assoc
     ] bi@ append members \ $values prefix 1array ;
 
+M: predicate default-word-help
+    { $values { "object" object } { "?" boolean } }
+    [
+        \ $description ,
+        "Tests if the object is an instance of the " ,
+        swap "predicating" word-prop <$link> ,
+        " class." ,
+    ] { } make 2array ;
+
 M: class default-word-help drop f ;
 
 PRIVATE>
@@ -30,25 +39,7 @@ PRIVATE>
 GENERIC: word-help* ( word -- content )
 
 : word-help ( word -- content )
-    dup "help" word-prop [ ] [
-        dup word-help* [
-            swap 2array 1array
-        ] [
-            default-word-help
-        ] if*
-    ] ?if ;
-
-: $predicate ( element -- )
-    { { "object" object } { "?" boolean } } $values
-    [
-        "Tests if the object is an instance of the " ,
-        first "predicating" word-prop <$link> ,
-        " class." ,
-    ] { } make $description ;
-
-M: word word-help* drop f ;
-
-M: predicate word-help* drop \ $predicate ;
+    dup "help" word-prop [ ] [ default-word-help ] ?if ;
 
 : all-articles ( -- seq )
     articles get keys
