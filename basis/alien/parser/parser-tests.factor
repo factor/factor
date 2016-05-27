@@ -1,8 +1,39 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types alien.parser alien.syntax
-continuations debugger eval parser tools.test vocabs.parser
-words ;
+compiler.units continuations debugger eval kernel namespaces parser
+sequences sets tools.test vocabs.parser words ;
 IN: alien.parser.tests
+
+! (CREATE-C-TYPE)
+{ "hello" } [
+    [ "hello" (CREATE-C-TYPE) ] with-compilation-unit
+    name>>
+] unit-test
+
+! Check that it deletes from old-definitions
+{ 0 } [
+    [
+        "hello" current-vocab create-word
+        old-definitions get first adjoin
+        "hello" (CREATE-C-TYPE) drop
+        old-definitions get first cardinality
+    ] with-compilation-unit
+] unit-test
+
+! make-callback-type
+{ "what-type" } [
+    [ f void "what-type" { } { } make-callback-type ] with-compilation-unit
+    2drop name>>
+] unit-test
+
+{ 0 } [
+    [
+        "hello" current-vocab create-word
+        old-definitions get first adjoin
+        f void "hello" { } { } make-callback-type 3drop
+        old-definitions get first cardinality
+    ] with-compilation-unit
+] unit-test
 
 TYPEDEF: char char2
 

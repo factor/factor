@@ -59,7 +59,7 @@ ERROR: *-in-c-type-name name ;
     dup "*" tail?
     [ *-in-c-type-name ] when ;
 
-: (CREATE-C-TYPE) ( word -- word )
+: (CREATE-C-TYPE) ( name -- word )
     validate-c-type-name current-vocab create-word {
         [ fake-definition ]
         [ set-last-word ]
@@ -146,8 +146,7 @@ PRIVATE>
     '[ [ _ _ _ ] dip alien-callback ] ;
 
 :: make-callback-type ( lib return type-name types names -- word quot effect )
-    type-name current-vocab create-word :> type-word
-    type-word [ reset-generic ] [ reset-c-type ] bi
+    type-name (CREATE-C-TYPE) :> type-word
     void* type-word typedef
     type-word names return function-effect "callback-effect" set-word-prop
     type-word lib "callback-library" set-word-prop
