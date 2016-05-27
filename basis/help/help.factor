@@ -24,14 +24,15 @@ M: word word-help*
         ] { } map>assoc
     ] bi@ append members \ $values prefix 1array ;
 
-M: predicate word-help*
-    { $values { "object" object } { "?" boolean } }
+: $predicate ( element -- )
+    { { "object" object } { "?" boolean } } $values
     [
-        \ $description ,
         "Tests if the object is an instance of the " ,
-        swap "predicating" word-prop <$link> ,
+        first "predicating" word-prop <$link> ,
         " class." ,
-    ] { } make 2array ;
+    ] { } make $description ;
+
+M: predicate word-help* \ $predicate swap 2array 1array ;
 
 M: class word-help* drop f ;
 
