@@ -5,6 +5,8 @@ lexer namespaces parser sequences sets tools.test vocabs.parser words
 ;
 IN: alien.parser.tests
 
+<<
+
 : with-parsing ( lines quot -- )
     [ <lexer> ] [ '[ _ with-compilation-unit ] ] bi* with-lexer ; inline
 
@@ -43,6 +45,8 @@ IN: alien.parser.tests
 { t } [
     { "ayae" } [ parse-enum-name new-definitions get first in? ] with-parsing
 ] unit-test
+
+>>
 
 TYPEDEF: char char2
 
