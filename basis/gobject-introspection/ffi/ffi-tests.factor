@@ -4,6 +4,8 @@ tools.test ;
 IN: gobject-introspection.ffi.tests
 
 ! callback
+<<
+
 {
     T{ return
        { type T{ simple-type { name "none" } } }
@@ -28,3 +30,5 @@ IN: gobject-introspection.ffi.tests
 { void } [
     "none" f simple-type boa "none" return boa return-c-type
 ] unit-test
+
+>>
