@@ -30,7 +30,7 @@ IN: alien.parser.tests
     ] with-parsing
 ] unit-test
 
-{ 0 } [
+{ 1 } [
     { } [
         "hello" current-vocab create-word
         old-definitions get first adjoin
@@ -109,4 +109,9 @@ TYPEDEF: int alien-parser-test-int ! reasonably unique name...
         ! after restart, we end up here
         "OK!"
     ] [ :1 ] recover
+] unit-test
+
+! Redefinitions
+{ } [
+    [ C-TYPE: hi TYPEDEF: void* hi ] with-compilation-unit
 ] unit-test

@@ -103,3 +103,49 @@ DEFER: struct-redefined
 ]
 [ error>> error>> redefine-error? ]
 must-fail-with
+
+[
+    "IN: alien.c-types.tests
+    USE: alien.syntax
+    USE: alien.c-types
+    CALLBACK: void cb987 ( )
+    CALLBACK: void cb987 ( )" eval( -- )
+]
+[ error>> error>> redefine-error? ]
+must-fail-with
+
+[
+    "IN: alien.c-types.tests
+    USE: alien.syntax
+    USE: alien.c-types
+    FUNCTION: void func987 ( )
+    FUNCTION: void func987 ( )" eval( -- )
+]
+[ error>> error>> redefine-error? ]
+must-fail-with
+
+! generic -> callback
+"IN: alien.c-types.tests
+USE: alien.syntax
+USE: alien.c-types
+GENERIC: foo-func ( x -- )
+" eval( -- )
+
+"IN: alien.c-types.tests
+USE: alien.syntax
+USE: alien.c-types
+CALLBACK: void foo-func ( )
+" eval( -- )
+
+! generic -> typedef
+"IN: alien.c-types.tests
+USE: alien.syntax
+USE: alien.c-types
+GENERIC: foo-func ( x -- )
+" eval( -- )
+
+"IN: alien.c-types.tests
+USE: alien.syntax
+USE: alien.c-types
+TYPEDEF: void* foo-func
+" eval( -- )
