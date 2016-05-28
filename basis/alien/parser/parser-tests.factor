@@ -1,38 +1,47 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types alien.parser alien.syntax
-compiler.units continuations debugger eval kernel namespaces parser
-sequences sets tools.test vocabs.parser words ;
+USING: accessors alien.c-types alien.parser alien.parser.private
+alien.syntax compiler.units continuations debugger eval fry kernel
+lexer namespaces parser sequences sets tools.test vocabs.parser words
+;
 IN: alien.parser.tests
+
+: with-parsing ( lines quot -- )
+    [ <lexer> ] [ '[ _ with-compilation-unit ] ] bi* with-lexer ; inline
 
 ! (CREATE-C-TYPE)
 { "hello" } [
-    [ "hello" (CREATE-C-TYPE) ] with-compilation-unit
-    name>>
+    { "hello" } [ CREATE-C-TYPE name>> ] with-parsing
 ] unit-test
 
 ! Check that it deletes from old-definitions
 { 0 } [
-    [
+    { } [
         "hello" current-vocab create-word
         old-definitions get first adjoin
         "hello" (CREATE-C-TYPE) drop
         old-definitions get first cardinality
-    ] with-compilation-unit
+    ] with-parsing
 ] unit-test
 
 ! make-callback-type
 { "what-type" } [
-    [ f void "what-type" { } { } make-callback-type ] with-compilation-unit
-    2drop name>>
+    { } [
+        void "what-type" f { } { } make-callback-type 2drop name>>
+    ] with-parsing
 ] unit-test
 
 { 0 } [
-    [
+    { } [
         "hello" current-vocab create-word
         old-definitions get first adjoin
-        f void "hello" { } { } make-callback-type 3drop
+        void "hello" f { } { } make-callback-type 3drop
         old-definitions get first cardinality
-    ] with-compilation-unit
+    ] with-parsing
+] unit-test
+
+! parse-enum-name
+{ t } [
+    { "ayae" } [ parse-enum-name new-definitions get first in? ] with-parsing
 ] unit-test
 
 TYPEDEF: char char2

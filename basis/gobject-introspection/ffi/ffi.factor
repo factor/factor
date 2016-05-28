@@ -180,9 +180,9 @@ M: type type>data-type
 
 : def-callback-type ( callback -- )
     {
-        [ drop current-library get ]
         [ return>> return-c-type ]
         [ c-type>> ]
+        [ drop current-library get ]
         [ ?suffix-parameters-with-error parameter-names&types ]
     } cleave make-callback-type define-inline ;
 
@@ -258,9 +258,9 @@ M: array-type field-type>c-type type>c-type ;
 
 :: def-signal ( signal type -- )
     signal {
-        [ drop current-library get ]
         [ return>> return-c-type ]
         [ type signal-name ]
+        [ drop current-library get ]
         [
             parameters>> type type>parameter prefix
             user-data-parameter suffix parameter-names&types
