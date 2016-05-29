@@ -660,10 +660,6 @@ struct factor_vm {
   void primitive_quotation_compiled_p();
 
   // dispatch
-  cell search_lookup_alist(cell table, cell klass);
-  cell search_lookup_hash(cell table, cell klass, cell hashcode);
-  cell nth_superclass(tuple_layout* layout, fixnum echelon);
-  cell nth_hashcode(tuple_layout* layout, fixnum echelon);
   cell lookup_tuple_method(cell obj, cell methods);
   cell lookup_method(cell obj, cell methods);
   void primitive_lookup_method();
