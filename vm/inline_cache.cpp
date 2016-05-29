@@ -47,13 +47,8 @@ struct inline_cache_jit : public jit {
 
 /* Allocates memory */
 void inline_cache_jit::emit_check(cell klass) {
-  cell code_template;
-  if (TAG(klass) == FIXNUM_TYPE)
-    code_template = parent->special_objects[PIC_CHECK_TAG];
-  else
-    code_template = parent->special_objects[PIC_CHECK_TUPLE];
-
-  emit_with_literal(code_template, klass);
+  cell i = TAG(klass) == FIXNUM_TYPE ? PIC_CHECK_TAG : PIC_CHECK_TUPLE;
+  emit_with_literal(parent->special_objects[i], klass);
 }
 
 /* index: 0 = top of stack, 1 = item underneath, etc
