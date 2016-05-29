@@ -2,20 +2,16 @@
 
 namespace factor {
 
-cell factor_vm::search_lookup_alist(cell table, cell klass) {
+static cell search_lookup_alist(cell table, cell klass) {
   array* elements = untag<array>(table);
-  fixnum index = array_capacity(elements) - 2;
-  while (index >= 0) {
+  for (fixnum index = array_capacity(elements) - 2; index >= 0; index -= 2) {
     if (array_nth(elements, index) == klass)
       return array_nth(elements, index + 1);
-    else
-      index -= 2;
   }
-
   return false_object;
 }
 
-cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode) {
+static cell search_lookup_hash(cell table, cell klass, cell hashcode) {
   array* buckets = untag<array>(table);
   cell bucket = array_nth(buckets, hashcode & (array_capacity(buckets) - 1));
   if (TAG(bucket) == ARRAY_TYPE)
@@ -23,12 +19,12 @@ cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode) {
   return bucket;
 }
 
-cell factor_vm::nth_superclass(tuple_layout* layout, fixnum echelon) {
+static cell nth_superclass(tuple_layout* layout, fixnum echelon) {
   cell* ptr = (cell*)(layout + 1);
   return ptr[echelon * 2];
 }
 
-cell factor_vm::nth_hashcode(tuple_layout* layout, fixnum echelon) {
+static cell nth_hashcode(tuple_layout* layout, fixnum echelon) {
   cell* ptr = (cell*)(layout + 1);
   return ptr[echelon * 2 + 1];
 }
