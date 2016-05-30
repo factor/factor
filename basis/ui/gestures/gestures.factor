@@ -82,20 +82,20 @@ TUPLE: button-up mods # ;   C: <button-up> button-up
 TUPLE: button-down mods # ; C: <button-down> button-down
 
 SINGLETONS:
-motion
-mouse-scroll
-mouse-enter mouse-leave
-lose-focus gain-focus ;
+    motion
+    mouse-scroll
+    mouse-enter mouse-leave
+    lose-focus gain-focus ;
 
 ! Higher-level actions
 SINGLETONS:
-undo-action redo-action
-cut-action copy-action paste-action
-delete-action select-all-action
-left-action right-action up-action down-action
-zoom-in-action zoom-out-action
-new-action open-action save-action save-as-action
-revert-action close-action ;
+    undo-action redo-action
+    cut-action copy-action paste-action
+    delete-action select-all-action
+    left-action right-action up-action down-action
+    zoom-in-action zoom-out-action
+    new-action open-action save-action save-as-action
+    revert-action close-action ;
 
 UNION: action
 undo-action redo-action
