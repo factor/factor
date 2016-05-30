@@ -104,7 +104,7 @@ bool quotation_jit::stack_frame_p() {
   return true;
 }
 
-bool quotation_jit::trivial_quotation_p(array* elements) {
+static bool trivial_quotation_p(array* elements) {
   return array_capacity(elements) == 1 &&
       TAG(array_nth(elements, 0)) == WORD_TYPE;
 }

@@ -14,7 +14,6 @@ struct quotation_jit : public jit {
   void init_quotation(cell quot);
   void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
   bool primitive_call_p(cell i, cell length);
-  bool trivial_quotation_p(array* elements);
   void emit_quotation(cell quot);
   void emit_epilog(bool needed);
   bool fast_if_p(cell i, cell length);

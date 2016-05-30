@@ -566,7 +566,6 @@ struct factor_vm {
                                code_block* compiled,
                                array* parameters,
                                cell index);
-  cell compute_here_address(cell arg, cell offset, code_block* compiled);
   void initialize_code_block(code_block* compiled, cell literals);
   void initialize_code_block(code_block* compiled);
   void fixup_labels(array* labels, code_block* compiled);
@@ -664,7 +663,6 @@ struct factor_vm {
   cell lookup_method(cell obj, cell methods);
   void primitive_lookup_method();
   cell object_class(cell obj);
-  cell method_cache_hashcode(cell klass, array* array);
   void update_method_cache(cell cache, cell klass, cell method);
   void primitive_mega_cache_miss();
   void primitive_reset_dispatch_stats();
@@ -673,12 +671,10 @@ struct factor_vm {
   // inline cache
   void init_inline_caching(int max_size);
   void deallocate_inline_cache(cell return_address);
-  cell determine_inline_cache_type(array* cache_entries);
   void update_pic_count(cell type);
   code_block* compile_inline_cache(fixnum index, cell generic_word_,
                                    cell methods_, cell cache_entries_,
                                    bool tail_call_p);
-  cell inline_cache_size(cell cache_entries);
   cell add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_);
   void update_pic_transitions(cell pic_size);
   cell inline_cache_miss(cell return_address);
