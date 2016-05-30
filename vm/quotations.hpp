@@ -4,6 +4,7 @@ struct quotation_jit : public jit {
   data_root<array> elements;
   bool compiling, relocate;
 
+  /* Allocates memory */
   quotation_jit(cell owner, bool compiling, bool relocate, factor_vm* vm)
       : jit(code_block_unoptimized, owner, vm),
         elements(false_object, vm),
@@ -11,6 +12,7 @@ struct quotation_jit : public jit {
         relocate(relocate) {}
   ;
 
+  cell nth(cell index);
   void init_quotation(cell quot);
   void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
   bool primitive_call_p(cell i, cell length);
