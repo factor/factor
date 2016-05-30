@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators continuations io.backend io.directories io.files
 io.files.temp io.files.windows io.pathnames kernel kernel.private libc
-literals memory sequences splitting tools.test windows.kernel32 ;
+literals memory sequences splitting tools.test windows.kernel32
+io.files.unique destructors ;
 IN: io.files.windows.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
@@ -77,4 +78,12 @@ IN: io.files.windows.tests
             [ save-image ]
         } cleave
     ] [ ] recover
+] unit-test
+
+! test that we can open a shared file
+! https://github.com/factor/factor/pull/1636
+{ } [
+    "open-file-" "-test.txt" [
+        [ open-write ] [ open-read ] bi [ dispose ] bi@
+    ] cleanup-unique-file
 ] unit-test
