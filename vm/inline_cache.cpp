@@ -40,16 +40,9 @@ struct inline_cache_jit : public jit {
       : jit(code_block_pic, generic_word, vm) {}
   ;
 
-  void emit_check(cell klass);
   void compile_inline_cache(fixnum index, cell generic_word_, cell methods_,
                             cell cache_entries_, bool tail_call_p);
 };
-
-/* Allocates memory */
-void inline_cache_jit::emit_check(cell klass) {
-  cell i = TAG(klass) == FIXNUM_TYPE ? PIC_CHECK_TAG : PIC_CHECK_TUPLE;
-  emit_with_literal(parent->special_objects[i], klass);
-}
 
 /* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
@@ -68,6 +61,8 @@ void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_,
   /* Generate machine code to determine the object's class. */
   emit_with_literal(parent->special_objects[PIC_LOAD],
                     tag_fixnum(-index * sizeof(cell)));
+
+  /* Put the tag of the object, or class of the tuple in a register. */
   emit(parent->special_objects[inline_cache_type]);
 
   /* Generate machine code to check, in turn, if the class is one of the cached
@@ -75,7 +70,18 @@ void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_,
   for (cell i = 0; i < array_capacity(cache_entries.untagged()); i += 2) {
     /* Class equal? */
     cell klass = array_nth(cache_entries.untagged(), i);
-    emit_check(klass);
+
+    cell check_type = PIC_CHECK_TAG;
+    if (TAG(klass) != FIXNUM_TYPE)
+      check_type = PIC_CHECK_TUPLE;
+
+    /* The tag check can be skipped if it is the first one and we are
+       checking for the fixnum type which is 0. That is because the
+       AND instruction in the PIC_TAG template already sets the zero
+       flag. */
+    if (i > 0 || inline_cache_type == PIC_TUPLE || klass > 0) {
+      emit_with_literal(parent->special_objects[check_type], klass);
+    }
 
     /* Yes? Jump to method */
     cell method = array_nth(cache_entries.untagged(), i + 1);
