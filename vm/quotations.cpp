@@ -92,13 +92,17 @@ bool quotation_jit::special_subprimitive_p(cell obj) {
          obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
 }
 
-/* All quotations wants a stack frame, except those that contain calls
-   to the special subprimitives. See #295. */
+/* All quotations wants a stack frame, except if they contain:
+
+     1) calls to the special subprimitives, see #295.
+     2) mega cache lookups, see #651 */
 bool quotation_jit::stack_frame_p() {
   cell length = array_capacity(elements.untagged());
   for (cell i = 0; i < length; i++) {
     cell obj = array_nth(elements.untagged(), i);
-    if (TAG(obj) == WORD_TYPE && special_subprimitive_p(obj))
+    cell tag = TAG(obj);
+    if ((tag == WORD_TYPE && special_subprimitive_p(obj)) ||
+        (tag == ARRAY_TYPE && mega_lookup_p(i, length)))
       return false;
   }
   return true;
@@ -225,13 +229,8 @@ void quotation_jit::iterate_quotation() {
       case ARRAY_TYPE:
         /* Method dispatch */
         if (mega_lookup_p(i, length)) {
-          fixnum index = untag_fixnum(array_nth(elements.untagged(), i + 1));
-          /* Load the object from the datastack, then remove our stack frame. */
-          emit_with_literal(parent->special_objects[PIC_LOAD],
-                            tag_fixnum(-index * sizeof(cell)));
-          emit_epilog(stack_frame);
           tail_call = true;
-
+          fixnum index = untag_fixnum(array_nth(elements.untagged(), i + 1));
           emit_mega_cache_lookup(array_nth(elements.untagged(), i), index,
                                  array_nth(elements.untagged(), i + 2));
           i += 3;
@@ -266,7 +265,9 @@ void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index,
   data_root<array> methods(methods_, parent);
   data_root<array> cache(cache_, parent);
 
-  /* The object must be on the top of the datastack at this point. */
+  /* Load the object from the datastack. */
+  emit_with_literal(parent->special_objects[PIC_LOAD],
+                    tag_fixnum(-index * sizeof(cell)));
 
   /* Do a cache lookup. */
   emit_with_literal(parent->special_objects[MEGA_LOOKUP], cache.value());
