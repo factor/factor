@@ -24,6 +24,10 @@ H{
 M: object prompt.
     nip prompt-style get-global format bl flush ;
 
+: with-ctrl-break ( quot -- )
+    enable-ctrl-break
+    [ disable-ctrl-break ] [ ] cleanup ; inline
+
 : parse-lines-interactive ( lines -- quot/f )
     [ parse-lines ] with-compilation-unit ;
 
@@ -120,7 +124,7 @@ t error-summary? set-global
 
     [
         read-quot [
-            '[ datastack _ with-datastack ]
+            '[ [ datastack _ with-datastack ] with-ctrl-break ]
             [ call-error-hook datastack ]
             recover
         ] [ return ] if*
