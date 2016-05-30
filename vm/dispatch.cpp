@@ -82,7 +82,7 @@ cell factor_vm::object_class(cell obj) {
   return tag_fixnum(tag);
 }
 
-cell factor_vm::method_cache_hashcode(cell klass, array* array) {
+static cell method_cache_hashcode(cell klass, array* array) {
   cell capacity = (array_capacity(array) >> 1) - 1;
   return ((klass >> TAG_BITS) & capacity) << 1;
 }

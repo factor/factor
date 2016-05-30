@@ -16,7 +16,7 @@ void factor_vm::deallocate_inline_cache(cell return_address) {
 
 /* Figure out what kind of type check the PIC needs based on the methods
    it contains */
-cell factor_vm::determine_inline_cache_type(array* cache_entries) {
+static cell determine_inline_cache_type(array* cache_entries) {
   for (cell i = 0; i < array_capacity(cache_entries); i += 2) {
     /* Is it a tuple layout? */
     if (TAG(array_nth(cache_entries, i)) == ARRAY_TYPE) {
@@ -62,7 +62,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_,
   data_root<array> cache_entries(cache_entries_, parent);
 
   cell inline_cache_type =
-      parent->determine_inline_cache_type(cache_entries.untagged());
+      determine_inline_cache_type(cache_entries.untagged());
   parent->update_pic_count(inline_cache_type);
 
   /* Generate machine code to determine the object's class. */
@@ -72,8 +72,7 @@ void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_,
 
   /* Generate machine code to check, in turn, if the class is one of the cached
    * entries. */
-  cell i;
-  for (i = 0; i < array_capacity(cache_entries.untagged()); i += 2) {
+  for (cell i = 0; i < array_capacity(cache_entries.untagged()); i += 2) {
     /* Class equal? */
     cell klass = array_nth(cache_entries.untagged(), i);
     emit_check(klass);
@@ -117,10 +116,6 @@ code_block* factor_vm::compile_inline_cache(fixnum index, cell generic_word_,
   code_block* code = jit.to_code_block(JIT_FRAME_SIZE);
   initialize_code_block(code);
   return code;
-}
-
-cell factor_vm::inline_cache_size(cell cache_entries) {
-  return array_capacity(untag_check<array>(cache_entries)) / 2;
 }
 
 /* Allocates memory */
@@ -172,7 +167,7 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
   data_root<word> generic_word(ctx->pop(), this);
   data_root<object> object(((cell*)ctx->datastack)[-index], this);
 
-  cell pic_size = inline_cache_size(cache_entries.value());
+  cell pic_size = array_capacity(cache_entries.untagged()) / 2;
 
   update_pic_transitions(pic_size);
 

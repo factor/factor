@@ -2,7 +2,7 @@
 
 namespace factor {
 
-cell code_block_owner(code_block* compiled) {
+static cell code_block_owner(code_block* compiled) {
   cell owner = compiled->owner;
 
   /* Cold generic word call sites point to quotations that call the
@@ -18,7 +18,7 @@ cell code_block_owner(code_block* compiled) {
   return wrap->object;
 }
 
-cell compute_entry_point_address(cell obj) {
+static cell compute_entry_point_address(cell obj) {
   switch (TAG(obj)) {
     case WORD_TYPE:
       return untag<word>(obj)->entry_point;
@@ -30,6 +30,13 @@ cell compute_entry_point_address(cell obj) {
   }
 }
 
+static cell compute_here_address(cell arg, cell offset, code_block* compiled) {
+  fixnum n = untag_fixnum(arg);
+  if (n >= 0)
+    return compiled->entry_point() + offset + n;
+  return compiled->entry_point() - n;
+}
+
 cell code_block::owner_quot() const {
   if (!optimized_p() && TAG(owner) == WORD_TYPE)
     return untag<word>(owner)->def;
@@ -37,7 +44,8 @@ cell code_block::owner_quot() const {
 }
 
 /* If the code block is an unoptimized quotation, we can calculate the
-   scan offset. In all other cases -1 is returned. */
+   scan offset. In all other cases -1 is returned.
+   Allocates memory (quot_code_offset_to_scan) */
 cell code_block::scan(factor_vm* vm, cell addr) const {
   if (type() != code_block_unoptimized) {
     return tag_fixnum(-1);
@@ -212,14 +220,6 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   return ext_addr;
 }
 
-cell factor_vm::compute_here_address(cell arg, cell offset,
-                                     code_block* compiled) {
-  fixnum n = untag_fixnum(arg);
-  if (n >= 0)
-    return compiled->entry_point() + offset + n;
-  return compiled->entry_point() - n;
-}
-
 struct initial_code_block_visitor {
   factor_vm* parent;
   cell literals;
@@ -243,7 +243,7 @@ struct initial_code_block_visitor {
       case RT_ENTRY_POINT_PIC_TAIL:
         return parent->compute_entry_point_pic_tail_address(next_literal());
       case RT_HERE:
-        return parent->compute_here_address(
+        return compute_here_address(
             next_literal(), op.rel.offset(), op.compiled);
       case RT_UNTAGGED:
         return untag_fixnum(next_literal());
