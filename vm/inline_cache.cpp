@@ -34,58 +34,60 @@ void factor_vm::update_pic_count(cell type) {
 }
 
 struct inline_cache_jit : public jit {
-  fixnum index;
-
   inline_cache_jit(cell generic_word, factor_vm* vm)
       : jit(code_block_pic, generic_word, vm) {}
-  ;
 
-  void compile_inline_cache(fixnum index, cell generic_word_, cell methods_,
-                            cell cache_entries_, bool tail_call_p);
+  void emit_check_and_jump(cell ic_type, cell i, cell klass, cell method);
+  void emit_inline_cache(fixnum index, cell generic_word_, cell methods_,
+                         cell cache_entries_, bool tail_call_p);
 };
+
+void inline_cache_jit::emit_check_and_jump(cell ic_type, cell i,
+                                           cell klass, cell method) {
+  /* Class equal? */
+  cell check_type = PIC_CHECK_TAG;
+  if (TAG(klass) != FIXNUM_TYPE)
+      check_type = PIC_CHECK_TUPLE;
+
+  /* The tag check can be skipped if it is the first one and we are
+     checking for the fixnum type which is 0. That is because the
+     AND instruction in the PIC_TAG template already sets the zero
+     flag. */
+  if (!(i == 0 && ic_type == PIC_TAG && klass == 0)) {
+    emit_with_literal(parent->special_objects[check_type], klass);
+  }
+
+  /* Yes? Jump to method */
+  emit_with_literal(parent->special_objects[PIC_HIT], method);
+}
 
 /* index: 0 = top of stack, 1 = item underneath, etc
    cache_entries: array of class/method pairs */
 /* Allocates memory */
-void inline_cache_jit::compile_inline_cache(fixnum index, cell generic_word_,
-                                            cell methods_, cell cache_entries_,
-                                            bool tail_call_p) {
+void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
+                                         cell methods_, cell cache_entries_,
+                                         bool tail_call_p) {
   data_root<word> generic_word(generic_word_, parent);
   data_root<array> methods(methods_, parent);
   data_root<array> cache_entries(cache_entries_, parent);
 
-  cell inline_cache_type =
-      determine_inline_cache_type(cache_entries.untagged());
-  parent->update_pic_count(inline_cache_type);
+  cell ic_type = determine_inline_cache_type(cache_entries.untagged());
+  parent->update_pic_count(ic_type);
 
   /* Generate machine code to determine the object's class. */
   emit_with_literal(parent->special_objects[PIC_LOAD],
                     tag_fixnum(-index * sizeof(cell)));
 
   /* Put the tag of the object, or class of the tuple in a register. */
-  emit(parent->special_objects[inline_cache_type]);
+  emit(parent->special_objects[ic_type]);
 
   /* Generate machine code to check, in turn, if the class is one of the cached
-   * entries. */
+     entries. */
   for (cell i = 0; i < array_capacity(cache_entries.untagged()); i += 2) {
-    /* Class equal? */
     cell klass = array_nth(cache_entries.untagged(), i);
-
-    cell check_type = PIC_CHECK_TAG;
-    if (TAG(klass) != FIXNUM_TYPE)
-      check_type = PIC_CHECK_TUPLE;
-
-    /* The tag check can be skipped if it is the first one and we are
-       checking for the fixnum type which is 0. That is because the
-       AND instruction in the PIC_TAG template already sets the zero
-       flag. */
-    if (i > 0 || inline_cache_type == PIC_TUPLE || klass > 0) {
-      emit_with_literal(parent->special_objects[check_type], klass);
-    }
-
-    /* Yes? Jump to method */
     cell method = array_nth(cache_entries.untagged(), i + 1);
-    emit_with_literal(parent->special_objects[PIC_HIT], method);
+
+    emit_check_and_jump(ic_type, i, klass, method);
   }
 
   /* If none of the above conditionals tested true, then execution "falls
@@ -117,8 +119,8 @@ code_block* factor_vm::compile_inline_cache(fixnum index, cell generic_word_,
   data_root<array> cache_entries(cache_entries_, this);
 
   inline_cache_jit jit(generic_word.value(), this);
-  jit.compile_inline_cache(index, generic_word.value(), methods.value(),
-                           cache_entries.value(), tail_call_p);
+  jit.emit_inline_cache(index, generic_word.value(), methods.value(),
+                        cache_entries.value(), tail_call_p);
   code_block* code = jit.to_code_block(JIT_FRAME_SIZE);
   initialize_code_block(code);
   return code;
