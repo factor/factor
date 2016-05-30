@@ -35,21 +35,6 @@ struct jit {
     emit_with_literal(parent->special_objects[JIT_PUSH_IMMEDIATE], literal);
   }
 
-  /* Allocates memory (literal(), emit())*/
-  void word_jump(cell word_) {
-    data_root<word> word(word_, parent);
-#ifndef FACTOR_AMD64
-    literal(tag_fixnum(xt_tail_pic_offset));
-#endif
-    literal(word.value());
-    emit(parent->special_objects[JIT_WORD_JUMP]);
-  }
-
-  /* Allocates memory */
-  void word_call(cell word) {
-    emit_with_literal(parent->special_objects[JIT_WORD_CALL], word);
-  }
-
   bool emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p);
 
   fixnum get_position() {
@@ -57,8 +42,8 @@ struct jit {
       /* If this is still on, emit() didn't clear it,
          so the offset was out of bounds */
       return -1;
-    } else
-      return position;
+    }
+    return position;
   }
 
   void set_position(fixnum position_) {

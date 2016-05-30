@@ -28,6 +28,21 @@ struct quotation_jit : public jit {
   bool word_safepoint_p(cell obj);
   bool no_non_safepoint_words_p();
   void iterate_quotation();
+
+  /* Allocates memory */
+  void word_call(cell word) {
+    emit_with_literal(parent->special_objects[JIT_WORD_CALL], word);
+  }
+
+  /* Allocates memory (literal(), emit())*/
+  void word_jump(cell word_) {
+    data_root<word> word(word_, parent);
+#ifndef FACTOR_AMD64
+    literal(tag_fixnum(xt_tail_pic_offset));
+#endif
+    literal(word.value());
+    emit(parent->special_objects[JIT_WORD_JUMP]);
+  }
 };
 
 VM_C_API cell lazy_jit_compile(cell quot, factor_vm* parent);

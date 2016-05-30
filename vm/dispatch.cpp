@@ -119,30 +119,4 @@ void factor_vm::primitive_dispatch_stats() {
   ctx->push(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
 }
 
-/* Allocates memory */
-void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index,
-                                           cell cache_) {
-  data_root<array> methods(methods_, parent);
-  data_root<array> cache(cache_, parent);
-
-  /* The object must be on the top of the datastack at this point. */
-
-  /* Do a cache lookup. */
-  emit_with_literal(parent->special_objects[MEGA_LOOKUP], cache.value());
-
-  /* If we end up here, the cache missed. */
-  emit(parent->special_objects[JIT_PROLOG]);
-
-  /* Push index, method table and cache on the stack. */
-  push(methods.value());
-  push(tag_fixnum(index));
-  push(cache.value());
-  word_call(parent->special_objects[MEGA_MISS_WORD]);
-
-  /* Now the new method has been stored into the cache, and its on
-     the stack. */
-  emit(parent->special_objects[JIT_EPILOG]);
-  emit(parent->special_objects[JIT_EXECUTE]);
-}
-
 }
