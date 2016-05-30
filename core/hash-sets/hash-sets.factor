@@ -8,9 +8,9 @@ vectors ;
 IN: hash-sets
 
 TUPLE: hash-set
-{ count array-capacity }
-{ deleted array-capacity }
-{ array array } ;
+    { count array-capacity }
+    { deleted array-capacity }
+    { array array } ;
 
 <PRIVATE
 

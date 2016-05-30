@@ -18,21 +18,21 @@ SYMBOLS:
 SINGLETON: void
 
 TUPLE: abstract-c-type
-{ class class initial: object }
-{ boxed-class class initial: object }
-{ boxer-quot callable }
-{ unboxer-quot callable }
-{ getter callable }
-{ setter callable }
-{ size integer }
-{ signed boolean }
-{ align integer }
-{ align-first integer } ;
+    { class class initial: object }
+    { boxed-class class initial: object }
+    { boxer-quot callable }
+    { unboxer-quot callable }
+    { getter callable }
+    { setter callable }
+    { size integer }
+    { signed boolean }
+    { align integer }
+    { align-first integer } ;
 
 TUPLE: c-type < abstract-c-type
-boxer
-unboxer
-{ rep initial: int-rep } ;
+    boxer
+    unboxer
+    { rep initial: int-rep } ;
 
 : <c-type> ( -- c-type )
     \ c-type new ; inline

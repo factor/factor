@@ -51,16 +51,16 @@ PRIVATE>
 SYMBOL: initial-thread
 
 TUPLE: thread
-{ name string }
-{ quot callable initial: [ ] }
-{ exit-handler callable initial: [ ] }
-{ id integer }
-{ context box }
-state
-runnable
-mailbox
-{ variables hashtable }
-sleep-entry ;
+    { name string }
+    { quot callable initial: [ ] }
+    { exit-handler callable initial: [ ] }
+    { id integer }
+    { context box }
+    state
+    runnable
+    mailbox
+    { variables hashtable }
+    sleep-entry ;
 
 : self ( -- thread )
     OBJ-CURRENT-THREAD special-object { thread } declare ; inline

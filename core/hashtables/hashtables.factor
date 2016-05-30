@@ -5,9 +5,9 @@ math.private sequences sequences.private slots.private vectors ;
 IN: hashtables
 
 TUPLE: hashtable
-{ count array-capacity }
-{ deleted array-capacity }
-{ array array } ;
+    { count array-capacity }
+    { deleted array-capacity }
+    { array array } ;
 
 <PRIVATE
 
