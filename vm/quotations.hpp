@@ -25,8 +25,7 @@ struct quotation_jit : public jit {
   bool declare_p(cell i, cell length);
   bool special_subprimitive_p(cell obj);
   cell word_stack_frame_size(cell obj);
-  bool word_safepoint_p(cell obj);
-  bool no_non_safepoint_words_p();
+  bool stack_frame_p();
   void iterate_quotation();
 
   /* Allocates memory */
