@@ -14,7 +14,9 @@ IN: io.files.windows
 
 SLOT: file
 
-HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
+: CreateFile-flags ( DWORD -- DWORD )
+    flags{ FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } bitor ;
+
 HOOK: open-append os ( path -- win32-file )
 
 TUPLE: win32-file < win32-handle ptr ;
@@ -358,9 +360,6 @@ M: windows normalize-path ( string -- string' )
         normalize-separators
         prepend-prefix
     ] if ;
-
-M: windows CreateFile-flags ( DWORD -- DWORD )
-    flags{ FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } bitor ;
 
 <PRIVATE
 
