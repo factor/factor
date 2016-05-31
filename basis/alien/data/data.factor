@@ -125,7 +125,7 @@ ERROR: local-allocation-error ;
 
 : (cleanup-allot) ( -- )
     ! Inhibit TCO in order for the last word in the quotation
-    ! to still be abl to access scope-allocated data.
+    ! to still be able to access scope-allocated data.
     ;
 
 MACRO: (simple-local-allot) ( c-type -- quot )
