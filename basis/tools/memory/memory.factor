@@ -101,8 +101,8 @@ PRIVATE>
 
 : collect-gc-events ( quot -- gc-events )
     enable-gc-events
-    [ ] [ disable-gc-events drop ] cleanup
-    disable-gc-events [ gc-event memory>struct ] map ; inline
+    [ disable-gc-events ] [ drop ] cleanup
+    [ gc-event memory>struct ] map ; inline
 
 <PRIVATE
 
