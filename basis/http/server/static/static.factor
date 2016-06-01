@@ -66,7 +66,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
     [ file-name ]
     [ drop f ]
     [
-        [ file-name ] [ [ [ file>html ] map ] with-directory-files ] bi
+        [ file-name ] [ [ natural-sort [ file>html ] map ] with-directory-files ] bi
         [XML <h1><-></h1> <ul><-></ul> XML]
     ] tri
     simple-page ;
