@@ -61,7 +61,7 @@ M: secure remote>handle ( addrspec -- handle )
     [ addrspec>> remote>handle ] [ hostname>> ] bi <ssl-socket> ;
 
 M: secure (get-local-address) ( handle remote -- sockaddr )
-    [ file>> ] [ addrspec>> ] bi* (get-local-address) ;
+    addrspec>> (get-local-address) ;
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
