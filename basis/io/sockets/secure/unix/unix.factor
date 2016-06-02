@@ -24,8 +24,6 @@ M: secure (get-local-address) addrspec>> (get-local-address) ;
 M: secure establish-connection ( client-out remote -- )
     addrspec>> [ establish-connection ] [ secure-connection ] 2bi ;
 
-M: secure (server) addrspec>> (server) ;
-
 M: secure (accept)
     [
         addrspec>> (accept) [ |dispose f <ssl-socket> ] dip
