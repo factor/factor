@@ -62,6 +62,8 @@ C: <secure> secure
 
 M: secure present addrspec>> present " (secure)" append ;
 
+M: secure (server) addrspec>> (server) ;
+
 CONSULT: inet secure addrspec>> ;
 
 M: secure resolve-host ( secure -- seq )
