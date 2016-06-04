@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar images images.viewer kernel math
 math.parser models models.arrow random sequences threads timers
-ui ui.gadgets ui.gadgets.labels ui.gadgets.packs ;
+ui ui.gadgets ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.status-bar ui.gadgets.worlds ;
 IN: rosetta-code.image-noise
 
 : bits>pixels ( bits -- bits' pixels )
@@ -23,7 +24,7 @@ IN: rosetta-code.image-noise
         L >>component-order
         ubyte-components >>component-type ;
 
-TUPLE: bw-noise-gadget < image-control timers cnt old-cnt fps-model ;
+TUPLE: bw-noise-gadget < image-control timers cnt old-cnt ;
 
 : animate-image ( control -- )
     [ 1 + ] change-cnt
@@ -33,10 +34,11 @@ TUPLE: bw-noise-gadget < image-control timers cnt old-cnt fps-model ;
     [ cnt>> ] [ old-cnt<< ] bi ;
 
 : fps ( gadget -- fps )
-    [ cnt>> ] [ old-cnt>> ] bi - ;
+    [ cnt>> ] [ old-cnt>> ] bi -
+    number>string "FPS: " prepend ;
 
 : fps-monitor ( gadget -- )
-    [ fps ] [ update-cnt ] [ fps-model>> set-model ] tri ;
+    [ fps ] [ update-cnt ] [ show-status ] tri ;
 
 : start-animation ( gadget -- )
     [ [ animate-image ] curry 1 nanoseconds every ] [ timers>> push ] bi ;
@@ -56,17 +58,9 @@ M: bw-noise-gadget ungraft* [ stop-animation ] [ call-next-method ] bi ;
 
 : <bw-noise-gadget> ( -- gadget )
     <random-bw-image> <model> bw-noise-gadget new-image-gadget*
-    0 >>cnt 0 >>old-cnt 0 <model> >>fps-model V{ } clone >>timers ;
+    0 >>cnt 0 >>old-cnt V{ } clone >>timers ;
 
-: fps-gadget ( model -- gadget )
-    [ number>string ] <arrow> <label-control>
-    "FPS: " <label>
-    <shelf> swap add-gadget swap add-gadget ;
+: open-noise-window ( -- )
+    [ <bw-noise-gadget> "Black and White noise" open-status-window ] with-ui ;
 
-: with-fps ( gadget -- gadget' )
-    [ fps-model>> fps-gadget ]
-    [ <pile> swap add-gadget swap add-gadget ] bi ;
-
-MAIN-WINDOW: open-noise-window
-    { { title "Black and White noise" } }
-    <bw-noise-gadget> with-fps >>gadgets ;
+MAIN: open-noise-window
