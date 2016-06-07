@@ -32,7 +32,7 @@ struct jit {
 
   /* Allocates memory */
   void push(cell literal) {
-    emit_with_literal(parent->special_objects[JIT_PUSH_IMMEDIATE], literal);
+    emit_with_literal(parent->special_objects[JIT_PUSH_LITERAL], literal);
   }
 
   bool emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p);
