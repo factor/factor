@@ -162,15 +162,14 @@ template <typename Fixup> struct slot_visitor {
 
 template <typename Fixup>
 cell slot_visitor<Fixup>::visit_pointer(cell pointer) {
-  if (immediate_p(pointer))
-    return pointer;
-
   object* untagged = fixup.fixup_data(untag<object>(pointer));
   return RETAG(untagged, TAG(pointer));
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_handle(cell* handle) {
-  *handle = visit_pointer(*handle);
+  if (!immediate_p(*handle)) {
+    *handle = visit_pointer(*handle);
+  }
 }
 
 template <typename Fixup>
@@ -386,8 +385,10 @@ void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
 
   auto update_literal_refs = [&](instruction_operand op) {
     if (op.rel.type() == RT_LITERAL) {
-      fixnum value = op.load_value(op.pointer);
-      op.store_value(visit_pointer(value));
+      cell value = op.load_value(op.pointer);
+      if (!immediate_p(value)) {
+        op.store_value(visit_pointer(value));
+      }
     }
   };
   compiled->each_instruction_operand(update_literal_refs);
@@ -505,28 +506,29 @@ void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
                                                      cell rel_base) {
   auto visit_func = [&](instruction_operand op){
     cell old_offset = rel_base + op.rel.offset();
-    cell value = op.load_value(old_offset);
+    cell old_value = op.load_value(old_offset);
     switch (op.rel.type()) {
       case RT_LITERAL: {
-        value = visit_pointer(value);
+        if (!immediate_p(old_value)) {
+          op.store_value(visit_pointer(old_value));
+        }
         break;
       }
       case RT_ENTRY_POINT:
       case RT_ENTRY_POINT_PIC:
       case RT_ENTRY_POINT_PIC_TAIL:
       case RT_HERE: {
-        cell offset = TAG(value);
-        code_block* compiled = (code_block*)UNTAG(value);
-        value = RETAG(fixup.fixup_code(compiled), offset);
+        cell offset = TAG(old_value);
+        code_block* compiled = (code_block*)UNTAG(old_value);
+        op.store_value(RETAG(fixup.fixup_code(compiled), offset));
         break;
       }
       case RT_UNTAGGED:
         break;
       default:
-        value = parent->compute_external_address(op);
+        op.store_value(parent->compute_external_address(op));
         break;
     }
-    op.store_value(value);
   };
   block->each_instruction_operand(visit_func);
 }
