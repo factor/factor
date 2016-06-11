@@ -3,7 +3,7 @@ IN: concurrency.mailboxes
 
 HELP: <mailbox>
 { $values { "mailbox" mailbox } }
-{ $description "A mailbox is an object that can be used for safe thread communication. Items can be put in the mailbox and retrieved in a FIFO order. If the mailbox is empty when a get operation is performed then the thread will block until another thread places something in the mailbox. If multiple threads are waiting on the same mailbox, only one of the waiting threads will be unblocked to thread the get operation." } ;
+{ $description "A mailbox is an object that can be used for safe thread communication. Items can be put in the mailbox and retrieved in a FIFO order. If the mailbox is empty when a get operation is performed, then the thread will block until another thread places something in the mailbox. If multiple threads are waiting on the same mailbox, only one of the waiting threads will be unblocked to thread the get operation." } ;
 
 HELP: mailbox-empty?
 { $values { "mailbox" mailbox }
@@ -33,7 +33,7 @@ HELP: block-if-empty
 
 HELP: mailbox-get
 { $values { "mailbox" mailbox } { "obj" object } }
-{ $description "Get the first item put into the mailbox. If it is empty the thread blocks until an item is put into it. The thread then resumes, leaving the item on the stack." } ;
+{ $description "Get the first item put into the mailbox. If it is empty, the thread blocks until an item is put into it. The thread then resumes, leaving the item on the stack." } ;
 
 HELP: mailbox-get-all
 { $values { "mailbox" mailbox } { "array" array } }
