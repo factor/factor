@@ -25,5 +25,9 @@ IN: peg.javascript.tokenizer.tests
 ] unit-test
 
 {
-  V{ T{ ast-string { value "abc\"def\"" } } }
+    V{ T{ ast-string { value "abc\"def\"" } } }
 } [ "\"abc\\\"def\\\"\"" tokenize-javascript ] unit-test
+
+{
+    V{ T{ ast-string { value "\b\f\n\r\t\v'\"\\" } } }
+} [ "\"\\b\\f\\n\\r\\t\\v\\'\\\"\\\\\"" tokenize-javascript ] unit-test
