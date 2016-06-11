@@ -8,7 +8,7 @@ IN: peg.javascript.tokenizer
 
 USE: prettyprint
 
-EBNF: tokenize-javascript 
+EBNF: tokenize-javascript
 Letter            = [a-zA-Z]
 Digit             = [0-9]
 Digits            = Digit+
@@ -43,14 +43,15 @@ Keyword           =  ("break"
                     | "var"
                     | "void"
                     | "while"
-                    | "with") !(NameRest) 
+                    | "with") !(NameRest)
 Name              = !(Keyword) iName  => [[ ast-name boa ]]
 Number            =   Digits:ws '.' Digits:fs => [[ ws "." fs 3array "" concat-as string>number ast-number boa ]]
-                    | Digits => [[ >string string>number ast-number boa ]]  
+                    | Digits => [[ >string string>number ast-number boa ]]
 
-EscapeChar        =   "\\n" => [[ 10 ]]
-                    | "\\r" => [[ 13 ]]
-                    | "\\t" => [[ 9 ]]
+EscapeChar        =   "\\n"  => [[ CHAR: \n ]]
+                    | "\\r"  => [[ CHAR: \r ]]
+                    | "\\t"  => [[ CHAR: \t ]]
+                    | "\\\"" => [[ CHAR: \" ]]
 StringChars1       = (EscapeChar | !('"""') .)* => [[ >string ]]
 StringChars2       = (EscapeChar | !('"') .)* => [[ >string ]]
 StringChars3       = (EscapeChar | !("'") .)* => [[ >string ]]
