@@ -17,7 +17,12 @@ HELP: cd
 HELP: current-directory
 { $description "A variable holding the current directory as an absolute path. Words that use the filesystem do so in relation to this variable."
 $nl
-"This variable should never be set directly; instead, use " { $link set-current-directory } " or " { $link with-directory } ". This preserves the invariant that the value of this variable is an absolute path." } ;
+  "This variable should never be set directly; instead, use " { $link set-current-directory } " or " { $link with-directory } ". This preserves the invariant that the value of this variable is an absolute path." } ;
+
+HELP: make-parent-directories
+{ $values { "path" "a pathname string" } }
+{ $description "Creates all parent directories of the path which do not yet exist." }
+{ $errors "Throws an error if the directories could not be created." } ;
 
 HELP: set-current-directory
 { $values { "path" "a pathname string" } }

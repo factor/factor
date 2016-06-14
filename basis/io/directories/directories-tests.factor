@@ -158,6 +158,8 @@ io.launcher io.pathnames kernel sequences tools.test ;
         [ "touch bar" try-output-process ] with-directory
     ] unit-test
 
+    { t } [
+        "one/two/three" make-parent-directories parent-directory exists?
+    ] unit-test
+
 ] with-test-directory
-
-

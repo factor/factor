@@ -18,7 +18,7 @@ IN: vocabs.metadata.resources
     [ append-path ] curry bi@
     dup file-info directory?
     [ drop make-directories ]
-    [ swap [ parent-directory make-directories ] [ copy-file ] bi ] if ;
+    [ swap make-parent-directories copy-file ] if ;
 
 PRIVATE>
 
