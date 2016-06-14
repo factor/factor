@@ -72,11 +72,5 @@ ERROR: not-a-string-number string ;
 : path-fdb-duplicates ( path -- seq )
     directory-files [ canonical-fdb-name ] map members ;
 
-: ensure-fdb-directory ( filename -- filename )
-    [ make-directories ] keep ;
-
-: ensure-fdb-filename-directory ( filename -- filename )
-    [ parent-directory make-directories ] keep ;
-
 ! : path>next-vnode-version-name ( path -- path' )
     ! [ file-name ]
