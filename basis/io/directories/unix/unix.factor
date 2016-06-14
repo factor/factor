@@ -29,7 +29,6 @@ M: unix delete-directory ( path -- )
     normalize-path [ rmdir ] unix-system-call drop ;
 
 M: unix copy-file ( from to -- )
-    [ normalize-path ] bi@
     [ call-next-method ]
     [ [ file-permissions ] dip swap set-file-permissions ] 2bi ;
 

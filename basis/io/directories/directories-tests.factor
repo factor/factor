@@ -138,6 +138,12 @@ io.launcher io.pathnames kernel sequences tools.test ;
         "copy-destination/copy-tree-test/a/b/c/d" ascii file-contents
     ] unit-test
 
+    ! copy-file
+    { } [
+        "resource:LICENSE.txt" "test" copy-file
+    ] unit-test
+
+    ! copy-file-into
     { } [
         "copy-destination/copy-tree-test/a/b/c/d" "." copy-file-into
     ] unit-test
