@@ -15,9 +15,11 @@ namespace factor {
       _(check_datastack) _(clone) _(code_blocks) _(code_room)                  \
       _(compact_gc) _(compute_identity_hashcode) _(context_object)             \
       _(context_object_for) _(current_callback) _(data_room)                   \
-      _(datastack_for) _(die) _(disable_gc_events) _(dispatch_stats)           \
+      _(datastack_for) _(die) _(disable_ctrl_break) _(disable_gc_events)       \
+      _(dispatch_stats)                                                        \
       _(displaced_alien) _(dlclose) _(dll_validp) _(dlopen) _(dlsym)           \
-      _(dlsym_raw) _(double_bits) _(enable_gc_events) _(existsp) _(exit)       \
+      _(dlsym_raw) _(double_bits) _(enable_ctrl_break) _(enable_gc_events)     \
+      _(existsp) _(exit)                                                       \
       _(fclose) _(fflush) _(fgetc) _(fixnum_divint) _(fixnum_divmod)           \
       _(fixnum_shift) _(fixnum_to_bignum) _(fixnum_to_float) _(float_add)      \
       _(float_bits) _(float_divfloat) _(float_eq) _(float_greater)             \
