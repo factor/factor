@@ -477,6 +477,14 @@ void handle_ctrl_c() {
   sigaction_safe(SIGINT, &fep_sigaction, NULL);
 }
 
+void factor_vm::primitive_disable_ctrl_break() {
+  stop_on_ctrl_break = false;
+}
+
+void factor_vm::primitive_enable_ctrl_break() {
+  stop_on_ctrl_break = true;
+}
+
 void abort() {
   sig_t ret;
   do {

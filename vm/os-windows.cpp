@@ -296,6 +296,50 @@ void handle_ctrl_c() {
   SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
+const int ctrl_break_sleep = 10; /* msec */
+
+static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
+  bool ctrl_break_handled = false;
+  factor_vm* vm = static_cast<factor_vm*>(parent_vm);
+  while (vm->stop_on_ctrl_break) {
+    if (GetAsyncKeyState(VK_CANCEL) >= 0) { /* Ctrl-Break is released. */
+      ctrl_break_handled = false;  /* Wait for the next press. */
+    } else if (!ctrl_break_handled) {
+      /* Check if the VM thread has the same Id as the thread Id of the
+         currently active window. Note that thread Id is not a handle. */
+      DWORD fg_thd_id = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+      if ((fg_thd_id == vm->thread_id) && !vm->fep_p) {
+        vm->enqueue_fep();
+        ctrl_break_handled = true;
+      }
+    }
+    Sleep(ctrl_break_sleep);
+  }
+  return 0;
+}
+
+void factor_vm::primitive_disable_ctrl_break() {
+  stop_on_ctrl_break = false;
+  if (ctrl_break_thread != NULL) {
+    DWORD wait_result = WaitForSingleObject(ctrl_break_thread,
+                                            2 * ctrl_break_sleep);
+    if (wait_result != WAIT_OBJECT_0)
+      TerminateThread(ctrl_break_thread, 0);
+    CloseHandle(ctrl_break_thread);
+    ctrl_break_thread = NULL;
+  }
+}
+
+void factor_vm::primitive_enable_ctrl_break() {
+  stop_on_ctrl_break = true;
+  if (ctrl_break_thread == NULL) {
+    DisableProcessWindowsGhosting();
+    ctrl_break_thread = CreateThread(NULL, 0, factor::ctrl_break_thread_proc,
+                                     static_cast<LPVOID>(this), 0, NULL);
+    SetThreadPriority(ctrl_break_thread, THREAD_PRIORITY_ABOVE_NORMAL);
+  }
+}
+
 void lock_console() {}
 
 void unlock_console() {}

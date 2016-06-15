@@ -397,6 +397,7 @@ struct factor_vm {
   void factorbug_usage(bool advanced_p);
   void factorbug();
   void primitive_die();
+  volatile bool stop_on_ctrl_break;
 
   // arrays
   inline void set_array_nth(array* array, cell slot, cell value);
@@ -709,6 +710,11 @@ struct factor_vm {
 
 // os-windows
 #if defined(WINDOWS)
+  /* Id of the main thread we run in. Used for Ctrl-Break handling. */
+  DWORD thread_id;
+
+  HANDLE ctrl_break_thread;
+
   HANDLE sampler_thread;
   void sampler_thread_loop();
 
