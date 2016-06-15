@@ -26,7 +26,7 @@ HELP: CONSULT:
 HELP: BROADCAST:
 { $syntax "BROADCAST: group class
     code ;" }
-{ $values { "group" "a protocol, generic word or tuple class" } { "class" "a class" } { "code" "code to get the object to which the method should be forwarded" } }
+{ $values { "group" "a protocol, generic word or tuple class" } { "class" "a class" } { "code" "code to get the sequence of objects to all of which the method should be forwarded" } }
 { $description "Declares that objects of " { $snippet "class" } " will delegate the generic words contained in " { $snippet "group" } " to every object in the sequence returned by executing " { $snippet "code" } " with the original object as an input. " { $snippet "BROADCAST:" } " will overwrite any existing methods on " { $snippet "class" } " for the members of " { $snippet "group" } ", but new methods can be added after the " { $snippet "BROADCAST:" } " to override the delegation. Every generic word in " { $snippet "group" } " must return no outputs; otherwise, a " { $link broadcast-words-must-have-no-outputs } " error will be raised." } ;
 
 HELP: SLOT-PROTOCOL:
