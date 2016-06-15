@@ -34,8 +34,6 @@ M: windows addrspec-of-family ( af -- addrspec )
         [ drop f ]
     } case ;
 
-HOOK: WSASocket-flags io-backend ( -- DWORD )
-
 TUPLE: win32-socket < win32-file ;
 
 : <win32-socket> ( handle -- win32-socket )
@@ -52,7 +50,7 @@ M: win32-socket dispose* ( stream -- )
 
 : open-socket ( addrspec type -- win32-socket )
     [ drop protocol-family ] [ swap protocol ] 2bi
-    f 0 WSASocket-flags WSASocket
+    f 0 WSA_FLAG_OVERLAPPED WSASocket
     dup socket-error
     opened-socket ;
 
@@ -100,9 +98,6 @@ M: windows (broadcast) ( datagram -- datagram )
 
 : malloc-int ( n -- alien )
     int <ref> malloc-byte-array ; inline
-
-M: windows WSASocket-flags ( -- DWORD )
-    WSA_FLAG_OVERLAPPED ; inline
 
 : get-ConnectEx-ptr ( socket -- void* )
     SIO_GET_EXTENSION_FUNCTION_POINTER
