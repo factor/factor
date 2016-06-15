@@ -397,6 +397,8 @@ struct factor_vm {
   void factorbug_usage(bool advanced_p);
   void factorbug();
   void primitive_die();
+  void primitive_enable_ctrl_break();
+  void primitive_disable_ctrl_break();
   volatile bool stop_on_ctrl_break;
 
   // arrays

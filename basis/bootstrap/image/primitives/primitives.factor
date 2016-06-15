@@ -730,6 +730,8 @@ CONSTANT: all-primitives {
         "system"
         {
             { "(exit)" ( n -- * ) "exit" { integer } { } f }
+            { "disable-ctrl-break" ( -- ) "disable_ctrl_break" { } { } f }
+            { "enable-ctrl-break" ( -- ) "enable_ctrl_break" { } { } f }
             { "nano-count" ( -- ns ) "nano_count" { } { integer } make-flushable }
         }
     }
