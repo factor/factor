@@ -8,14 +8,26 @@ HELP: secure-socket-timeout
 HELP: TLSv1
 { $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
 $nl
-"TLSv1 is the newest protocol for secure socket communications." } ;
+"TLSv1 is an older protocol for secure socket communications." } ;
+
+HELP: TLSv1.1
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"TLSv1.1 is an older protocol for secure socket communications." } ;
+
+HELP: TLSv1.2
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"TLSv1.2 is the newest protocol for secure socket communications." } ;
 
 ARTICLE: "ssl-methods" "SSL/TLS methods"
 "The " { $snippet "method" } " slot of a " { $link secure-config } " can be set to one of the following values:"
 { $subsections
     TLSv1
+    TLSv1.1
+    TLSv1.2
 }
-"The default value is " { $link TLSv1 } "." ;
+"The default value is " { $link TLSv1.2 } "." ;
 
 HELP: secure-config
 { $class-description "Instances represent secure socket configurations." } ;
@@ -119,6 +131,9 @@ HELP: upgrade-buffers-full
 { $error-description "Thrown if " { $link send-secure-handshake } " or " { $link accept-secure-handshake } " is called when there is still data which hasn't been read or written." }
 { $notes "Clients should ensure to " { $link flush } " their last command to the server before calling " { $link send-secure-handshake } "." } ;
 
+HELP: no-tls-supported
+{ $error-description "If you see this error, make sure you have all the necessary libraries installed (libssl and libcrypto) with at least one of " { $link "ssl-methods" } " supported." } ;
+
 ARTICLE: "ssl-errors" "Secure socket errors"
 "Secure sockets can throw one of several errors in addition to the usual I/O errors:"
 { $subsections
@@ -135,7 +150,7 @@ ARTICLE: "ssl-errors" "Secure socket errors"
 ARTICLE: "io.sockets.secure" "Secure sockets (SSL, TLS)"
 "The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets using the OpenSSL library."
 $nl
-"At present, this vocabulary only works on Unix, and not on Windows."
+"On Windows make sure you have the appropriate DLLs available, e.g. libcrypto-37.dll and libssl-38.dll."
 $nl
 "This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (" { $url "http://www.openssl.org/" } "), cryptographic software written by Eric Young (eay@cryptsoft.com) and software written by Tim Hudson (tjh@cryptsoft.com)."
 { $subsections
