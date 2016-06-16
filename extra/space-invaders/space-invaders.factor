@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
+! Space Invaders: http://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774
 USING: accessors alien.c-types alien.data arrays
 combinators cpu.8080 cpu.8080.emulator io.pathnames kernel
 locals math math.order openal openal.alut opengl.gl sequences
@@ -10,8 +11,9 @@ QUALIFIED: system
 SPECIALIZED-ARRAY: uchar
 IN: space-invaders
 
-TUPLE: space-invaders < cpu port1 port2i port2o port3o port4lo
-port4hi port5o bitmap sounds looping? ;
+TUPLE: space-invaders < cpu
+    port1 port2i port2o port3o port4lo port4hi port5o
+    bitmap sounds looping? ;
 
 CONSTANT: game-width 224
 CONSTANT: game-height 256
@@ -340,7 +342,7 @@ M: space-invaders update-video
     ! concurrent process. Messages can be sent to
     ! signal key presses, etc.
     dup quit?>> [
-        2drop
+        exit-openal 2drop
     ] [
         [ sync-frame ] dip {
             [ cpu>> gui-frame ]
