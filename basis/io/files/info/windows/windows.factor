@@ -201,7 +201,7 @@ CONSTANT: names-buf-length 16384
 
 ! Windows may return a volume which looks up to path ""
 ! For now, treat it like there is not a volume here
-: volume>paths ( string -- array )
+: (volume>paths) ( string -- array )
     [
         names-buf-length
         [ ushort malloc-array &free ] keep
@@ -211,6 +211,14 @@ CONSTANT: names-buf-length 16384
         { 0 } split-slice harvest
         [ { } ] [ [ { 0 } append alien>native-string ] map ] if-empty
     ] with-destructors ;
+
+! Suppress T{ windows-error f 2 "The system cannot find the file specified." }
+: volume>paths ( string -- array )
+    [ (volume>paths) ] curry
+    [
+        dup { [ windows-error? ] [ n>> ERROR_FILE_NOT_FOUND = ] } 1&&
+        [ drop { } ] [ rethrow ] if
+    ] recover ;
 
 ! Can error with T{ windows-error f 21 "The device is not ready." }
 ! if there is a D: that is not ready, for instance. Ignore these drives.
