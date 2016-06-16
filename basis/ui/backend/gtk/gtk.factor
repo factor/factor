@@ -219,7 +219,7 @@ CONSTANT: action-key-codes
 ! in the docs and tools.deploy.shaker.gtk-icon
 : get-icon-data ( -- byte-array/f )
     [
-        "resource:misc/icons/Factor_48x48.png" binary file-contents
+        "resource:misc/icons/Factor_128x128.png" binary file-contents
     ] [ drop f ] recover ;
 
 : load-icon ( -- )
