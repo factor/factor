@@ -48,6 +48,6 @@ ARTICLE: "ui.gadgets.layout" "GUI Layout"
 "Like in the StringTemplate framework for java, placeholders are defined using $ PLACERHOLDER-NAME $ "
 "Using PLACEHOLDER-NAME again sets it as the current insertion point. "
 "For examples using normal layout, see the " { $vocab-link "sudokus" } " demo. "
-"For examples of templating, see the " { $vocab-link "recipes" } " demo. " ;
+"For examples of templating, see the " { $vocab-link "recipes" } " demo." ;
 
 ABOUT: "ui.gadgets.layout"

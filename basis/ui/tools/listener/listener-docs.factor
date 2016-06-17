@@ -95,6 +95,6 @@ TIP: "If a word's vocabulary is loaded, but not in the search path, you can use 
 
 TIP: "Scroll the listener from the keyboard by pressing " { $command listener-gadget "scrolling" com-page-up } " and " { $command listener-gadget "scrolling" com-page-down } "." ;
 
-TIP: "Press " { $command tool "common" refresh-all } " or run " { $link refresh-all } " to reload changed source files from disk. " ;
+TIP: "Press " { $command tool "common" refresh-all } " or run " { $link refresh-all } " to reload changed source files from disk." ;
 
 ABOUT: "ui-listener"

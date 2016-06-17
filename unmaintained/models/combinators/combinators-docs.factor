@@ -36,6 +36,6 @@ HELP: #1
 ARTICLE: "models.combinators" "Extending models"
 "The " { $vocab-link "models.combinators" } " library expands models to have discrete start and end times. "
 "Also, it provides methods of manipulating and combining models, expecially useful when programming user interfaces: "
-"The output models of some gadgets (see " { $vocab-link "ui.gadgets.controls" } " ) can be manipulated and used as the input models of others. " ;
+"The output models of some gadgets (see " { $vocab-link "ui.gadgets.controls" } " ) can be manipulated and used as the input models of others." ;
 
 ABOUT: "models.combinators"
