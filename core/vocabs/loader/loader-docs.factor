@@ -30,10 +30,11 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
 ARTICLE: "vocabs.icons" "Vocabulary icons"
 "An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". If any of the following files exist inside the vocabulary directory, they will be used as icons when the application is deployed."
 { $list
-    { { $snippet "icon.ico" } " on Windows" }
+    { { $snippet "icon.ico" } " on Windows and Linux" }
     { { $snippet "icon.icns" } " on MacOS X" }
-    { { $snippet "icon.png" } " on Linux and *BSD" }
-} ;
+    { { $snippet "icon.png" } " on Linux" }
+}
+"The icon file will be embedded in the vocab's image file." ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies using the vocabulary loader. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
