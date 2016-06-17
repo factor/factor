@@ -1,5 +1,5 @@
-USING: alien.syntax classes.struct gdk.ffi kernel system tools.test
-ui.backend.gtk ui.gestures ;
+USING: alien.syntax classes.struct gdk.ffi kernel sequences system
+tools.test ui.backend.gtk ui.gestures ;
 IN: ui.backend.gtk.tests
 
 : gdk-key-release-event ( -- event )
@@ -59,3 +59,7 @@ os linux? [
         gdk-space-key-press-event key-event>gesture
     ] unit-test
 ] when
+
+{ 9854 } [
+    "gpu.demos.bunny" vocab-icon-data length
+] unit-test

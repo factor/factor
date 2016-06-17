@@ -1,16 +1,15 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct combinators
-continuations destructors environment gdk.ffi gdk.gl.ffi
-gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.binary
-io.encodings.utf8 io.files kernel libc literals locals math
-math.bitwise math.vectors namespaces sequences strings system
-threads ui ui.backend ui.backend.gtk.input-methods
-ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.pixel-formats.private ui.private
+alien.strings arrays assocs classes.struct combinators continuations
+destructors environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
+gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
+io.encodings.binary io.encodings.utf8 io.files io.pathnames kernel
+libc literals locals math math.bitwise math.vectors namespaces
+sequences strings system threads ui ui.backend
+ui.backend.gtk.input-methods ui.backend.gtk.io ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
 vocabs.loader ;
 IN: ui.backend.gtk
 
@@ -215,15 +214,25 @@ CONSTANT: action-key-codes
 : on-focus-out ( win event user-data -- ? )
     2drop window unfocus-world t ;
 
-! This word gets replaced when deploying. See 'Vocabulary icons'
-! in the docs and tools.deploy.shaker.gtk-icon
-: get-icon-data ( -- byte-array/f )
+CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
+
+: default-icon-data ( -- byte-array/f )
     [
-        "resource:misc/icons/Factor_128x128.png" binary file-contents
+        default-icon-path binary file-contents
     ] [ drop f ] recover ;
 
+SYMBOL: icon-data
+
+icon-data [ default-icon-data ] initialize
+
+: vocab-icon-data ( vocab-name -- byte-array )
+    dup vocab-dir { "icon.png" "icon.ico" } [
+        append-path vocab-append-path
+    ] 2with map default-icon-path suffix
+    [ exists? ] find nip binary file-contents ;
+
 : load-icon ( -- )
-    get-icon-data [
+    icon-data get [
         [
             data>GInputStream &g_object_unref
             GInputStream>GdkPixbuf gtk_window_set_default_icon
