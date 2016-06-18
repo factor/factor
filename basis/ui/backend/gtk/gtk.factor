@@ -562,9 +562,6 @@ os linux? [
     gtk-ui-backend ui-backend set-global
 ] when
 
-{ "ui.backend.gtk" "io.backend.unix" }
-"ui.backend.gtk.io.unix" require-when
-
 { "ui.backend.gtk" "ui.gadgets.editors" }
 "ui.backend.gtk.input-methods.editors" require-when
 
