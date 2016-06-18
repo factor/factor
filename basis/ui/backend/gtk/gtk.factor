@@ -113,6 +113,7 @@ CONSTANT: action-key-codes
         { $ GDK_KEY_KP_Enter "ENTER" }
         { $ GDK_KEY_Escape "ESC" }
         { $ GDK_KEY_Delete "DELETE" }
+        { $ GDK_KEY_Insert "INSERT" }
         { $ GDK_KEY_Home "HOME" }
         { $ GDK_KEY_Left "LEFT" }
         { $ GDK_KEY_Up "UP" }
@@ -197,8 +198,9 @@ CONSTANT: action-key-codes
     ] dip window send-scroll t ;
 
 : key-sym ( event -- sym/f action? )
-    keyval>> dup action-key-codes at [ t ]
-    [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
+    keyval>> dup action-key-codes at [ t ] [
+        gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f
+    ] ?if ;
 
 : key-event>gesture ( event -- key-gesture )
     [ event-modifiers ] [ key-sym ] [
