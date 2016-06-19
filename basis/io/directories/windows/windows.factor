@@ -36,10 +36,6 @@ M: windows delete-file ( path -- )
     [ (delete-file) ]
     [ \ file-delete-failed boa rethrow ] recover ;
 
-M: windows copy-file ( from to -- )
-    make-parent-directories
-    [ normalize-path ] bi@ 0 CopyFile win32-error=0/f ;
-
 M: windows make-directory ( path -- )
     normalize-path
     f CreateDirectory win32-error=0/f ;
