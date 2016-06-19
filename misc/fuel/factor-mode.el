@@ -362,10 +362,6 @@ these lines in your .emacs:
   (format "^\\(%s:\\) " (regexp-opt (append factor-no-indent-def-starts
                                             factor-indent-def-starts))))
 
-(defconst factor-definition-end-regex
-  (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
-          factor-declaration-words-regex))
-
 (defconst factor-single-liner-regex
   (regexp-opt '("ABOUT:"
                 "ALIAS:"
@@ -389,6 +385,10 @@ these lines in your .emacs:
   (format "^USING: \\|\\(%s\\)\\|\\(^%s .*\\)"
           factor-definition-start-regex
           factor-single-liner-regex))
+
+(defconst factor-definition-end-regex
+  (format "\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)"
+          factor-declaration-words-regex))
 
 (defconst factor-end-of-def-line-regex
   (format "^.*%s" factor-definition-end-regex))
@@ -591,9 +591,6 @@ these lines in your .emacs:
 (defsubst factor-at-end-of-def ()
   (looking-at factor-end-of-def-regex))
 
-(defsubst factor-looking-at-emptiness ()
-  (looking-at "^[ ]*$\\|$"))
-
 (defsubst factor-is-last-char (pos)
   (save-excursion
     (goto-char (1+ pos))
@@ -604,11 +601,6 @@ these lines in your .emacs:
            (goto-char pos)
            (beginning-of-line)
            (point))))
-
-(defun factor-previous-non-blank ()
-  (forward-line -1)
-  (while (and (not (bobp)) (factor-looking-at-emptiness))
-    (forward-line -1)))
 
 (defsubst factor-beginning-of-defun (&optional times)
   (re-search-backward factor-begin-of-def-regex nil t times))
@@ -760,9 +752,10 @@ these lines in your .emacs:
     (when (factor-at-begin-of-def) 0)))
 
 (defsubst factor-previous-non-empty ()
+  "Move caret to the beginning of the last non-empty line."
   (forward-line -1)
   (while (and (not (bobp))
-              (factor-looking-at-emptiness))
+              (looking-at "^[ ]*$\\|$"))
     (forward-line -1)))
 
 (defun factor-indent-setter-line ()
