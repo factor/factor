@@ -27,7 +27,6 @@ CONSTANT: NoSymbol 0
 ! Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
 !   state in various key-, mouse-, and button-related events.
 
-
 ! modifier names.  Used to build a SetModifierMapping request or
 ! to read a GetModifierMapping request.  These correspond to the
 ! masks defined above.
@@ -136,31 +135,31 @@ CONSTANT: RevertToParent 2
 ! * ERROR CODES
 ! *****************************************************************
 
-CONSTANT: Success 0 ! everything's okay
-CONSTANT: BadRequest 1 ! bad request code
-CONSTANT: BadValue 2 ! int parameter out of range
-CONSTANT: BadWindow 3 ! parameter not a Window
-CONSTANT: BadPixmap 4 ! parameter not a Pixmap
-CONSTANT: BadAtom 5 ! parameter not an Atom
-CONSTANT: BadCursor 6 ! parameter not a Cursor
-CONSTANT: BadFont 7 ! parameter not a Font
-CONSTANT: BadMatch 8 ! parameter mismatch
-CONSTANT: BadDrawable 9 ! parameter not a Pixmap or Window
-CONSTANT: BadAccess 10 ! depending on context:
-                       !         - key/button already grabbed
-                       !         - attempt to free an illegal
-                       !           cmap entry
-                       !        - attempt to store into a read-only
-                       !           color map entry.
-                       !        - attempt to modify the access control
-                       !           list from other than the local host.
-CONSTANT: BadAlloc 11 ! insufficient resources
-CONSTANT: BadColor 12 ! no such colormap
-CONSTANT: BadGC 13 ! parameter not a GC
-CONSTANT: BadIDChoice 14 ! choice not in range or already used
-CONSTANT: BadName 15 ! font or color name doesn't exist
-CONSTANT: BadLength 16 ! Request length incorrect
-CONSTANT: BadImplementation 17 ! server is defective
+CONSTANT: Success 0         ! everything's okay
+CONSTANT: BadRequest 1      ! bad request code
+CONSTANT: BadValue 2        ! int parameter out of range
+CONSTANT: BadWindow 3       ! parameter not a Window
+CONSTANT: BadPixmap 4       ! parameter not a Pixmap
+CONSTANT: BadAtom 5         ! parameter not an Atom
+CONSTANT: BadCursor 6       ! parameter not a Cursor
+CONSTANT: BadFont 7         ! parameter not a Font
+CONSTANT: BadMatch 8        ! parameter mismatch
+CONSTANT: BadDrawable 9     ! parameter not a Pixmap or Window
+CONSTANT: BadAccess 10      ! depending on context:
+                            !         - key/button already grabbed
+                            !         - attempt to free an illegal
+                            !           cmap entry
+                            !        - attempt to store into a read-only
+                            !           color map entry.
+                            !        - attempt to modify the access control
+                            !           list from other than the local host.
+CONSTANT: BadAlloc 11       ! insufficient resources
+CONSTANT: BadColor 12       ! no such colormap
+CONSTANT: BadGC 13          ! parameter not a GC
+CONSTANT: BadIDChoice 14    ! choice not in range or already used
+CONSTANT: BadName 15        ! font or color name doesn't exist
+CONSTANT: BadLength 16      ! Request length incorrect
+CONSTANT: BadImplementation 17  ! server is defective
 
 CONSTANT: FirstExtensionError 128
 CONSTANT: LastExtensionError 255
@@ -260,8 +259,8 @@ CONSTANT: YXBanded 3
 
 ! CoordinateMode for drawing routines
 
-CONSTANT: CoordModeOrigin 0 ! relative to the origin
-CONSTANT: CoordModePrevious 1 ! relative to previous point
+CONSTANT: CoordModeOrigin 0     ! relative to the origin
+CONSTANT: CoordModePrevious 1   ! relative to previous point
 
 ! Polygon shapes
 
@@ -291,9 +290,9 @@ CONSTANT: FontChange 255
 
 ! ImageFormat -- PutImage, GetImage
 
-CONSTANT: XYBitmap 0 ! depth 1, XYFormat
-CONSTANT: XYPixmap 1 ! depth == drawable depth
-CONSTANT: ZPixmap 2 ! depth == drawable depth
+CONSTANT: XYBitmap 0    ! depth 1, XYFormat
+CONSTANT: XYPixmap 1    ! depth == drawable depth
+CONSTANT: ZPixmap 2     ! depth == drawable depth
 
 ! *****************************************************************
 ! *  COLOR MAP STUFF
@@ -301,8 +300,8 @@ CONSTANT: ZPixmap 2 ! depth == drawable depth
 
 ! For CreateColormap
 
-CONSTANT: AllocNone 0 ! create map with no entries
-CONSTANT: AllocAll 1 ! allocate entire map writeable
+CONSTANT: AllocNone 0   ! create map with no entries
+CONSTANT: AllocAll 1    ! allocate entire map writeable
 
 
 ! Flags used in StoreNamedColor, StoreColors
@@ -317,9 +316,9 @@ CONSTANT: AllocAll 1 ! allocate entire map writeable
 
 ! QueryBestSize Class
 
-CONSTANT: CursorShape 0 ! largest size that can be displayed
-CONSTANT: TileShape 1 ! size tiled fastest
-CONSTANT: StippleShape 2 ! size stippled fastest
+CONSTANT: CursorShape 0     ! largest size that can be displayed
+CONSTANT: TileShape 1       ! size tiled fastest
+CONSTANT: StippleShape 2    ! size stippled fastest
 
 ! *****************************************************************
 ! * KEYBOARD/POINTER STUFF
@@ -395,7 +394,6 @@ CONSTANT: StaticColor 2
 CONSTANT: PseudoColor 3
 CONSTANT: TrueColor 4
 CONSTANT: DirectColor 5
-
 
 ! Byte order  used in imageByteOrder and bitmapBitOrder
 
