@@ -1,14 +1,13 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays alien.c-types alien.data alien.syntax ascii
+USING: accessors alien.c-types alien.data alien.syntax arrays ascii
 assocs classes.struct combinators combinators.short-circuit
-command-line environment io.encodings.ascii io.encodings.string
-io.encodings.utf8 kernel literals locals math namespaces
-sequences specialized-arrays strings ui ui.backend ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
-x11 x11.clipboard x11.constants x11.events x11.glx x11.io
-x11.windows x11.xim x11.xlib ;
+environment io.encodings.ascii io.encodings.string io.encodings.utf8
+kernel literals locals math namespaces sequences specialized-arrays
+strings ui ui.backend ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private x11 x11.clipboard x11.constants
+x11.events x11.glx x11.io x11.keysymdef x11.windows x11.xim x11.xlib ;
 FROM: libc => system ;
 SPECIALIZED-ARRAYS: uchar ulong ;
 IN: ui.backend.x11
@@ -104,47 +103,47 @@ CONSTANT: modifiers
 
 CONSTANT: key-codes
     H{
-        { 0xFF08 "BACKSPACE" }
-        { 0xFF09 "TAB"       }
-        { 0xFE20 "TAB"       }
-        { 0xFF0D "RET"       }
-        { 0xFF8D "ENTER"     }
-        { 0xFF1B "ESC"       }
-        { 0xFFFF "DELETE"    }
-        { 0xFF50 "HOME"      }
-        { 0xFF51 "LEFT"      }
-        { 0xFF52 "UP"        }
-        { 0xFF53 "RIGHT"     }
-        { 0xFF54 "DOWN"      }
-        { 0xFF55 "PAGE_UP"   }
-        { 0xFF56 "PAGE_DOWN" }
-        { 0xFF57 "END"       }
-        { 0xFF58 "BEGIN"     }
-        { 0xFFBE "F1"        }
-        { 0xFFBF "F2"        }
-        { 0xFFC0 "F3"        }
-        { 0xFFC1 "F4"        }
-        { 0xFFC2 "F5"        }
-        { 0xFFC3 "F6"        }
-        { 0xFFC4 "F7"        }
-        { 0xFFC5 "F8"        }
-        { 0xFFC6 "F9"        }
+        { $ XK_BackSpace "BACKSPACE" }
+        { $ XK_Tab "TAB" }
+        { $ XK_ISO_Left_Tab "TAB" }
+        { $ XK_Return "RET" }
+        { $ XK_KP_Enter "ENTER" }
+        { $ XK_Escape "ESC" }
+        { $ XK_Delete "DELETE" }
+        { $ XK_Home "HOME" }
+        { $ XK_Left "LEFT" }
+        { $ XK_Up "UP" }
+        { $ XK_Right "RIGHT" }
+        { $ XK_Down "DOWN" }
+        { $ XK_Page_Up "PAGE_UP" }
+        { $ XK_Page_Down "PAGE_DOWN" }
+        { $ XK_End "END" }
+        { $ XK_Begin "BEGIN" }
+        { $ XK_F1 "F1" }
+        { $ XK_F2 "F2" }
+        { $ XK_F3 "F3" }
+        { $ XK_F4 "F4" }
+        { $ XK_F5 "F5" }
+        { $ XK_F6 "F6" }
+        { $ XK_F7 "F7" }
+        { $ XK_F8 "F8" }
+        { $ XK_F9 "F9" }
 
-        { 0xFFE1 f } ! Left shift
-        { 0xFFE2 f } ! Right shift
-        { 0xFFE3 f } ! Left control
-        { 0xFFE4 f } ! Right control
-        { 0xFFE5 f } ! Caps lock
-        { 0xFFE6 f } ! Shift lock
+        { $ XK_Shift_L f }
+        { $ XK_Shift_R f }
+        { $ XK_Control_L f }
+        { $ XK_Control_R f }
+        { $ XK_Caps_Lock f }
+        { $ XK_Shift_Lock f }
 
-        { 0xFFE7 f } ! Left meta
-        { 0xFFE8 f } ! Right meta
-        { 0xFFE9 f } ! Left alt
-        { 0xFFEA f } ! Right alt
-        { 0xFFEB f } ! Left super
-        { 0xFFEC f } ! Right super
-        { 0xFFED f } ! Left hyper
-        { 0xFFEE f } ! Right hyper
+        { $ XK_Meta_L f }
+        { $ XK_Meta_R f }
+        { $ XK_Alt_L f }
+        { $ XK_Alt_R f }
+        { $ XK_Super_L f }
+        { $ XK_Super_R f }
+        { $ XK_Hyper_L f }
+        { $ XK_Hyper_R f }
     }
 
 : key-code ( keysym -- keycode action? )
@@ -412,4 +411,5 @@ x11-ui-backend ui-backend set-global
 M: x11-ui-backend ui-backend-available?
     "DISPLAY" os-env >boolean ;
 
-M: x11-ui-backend resize-window [ dpy get ] 2dip [ handle>> window>> ] [ first2 ] bi* XResizeWindow drop ;
+M: x11-ui-backend resize-window
+    [ dpy get ] 2dip [ handle>> window>> ] [ first2 ] bi* XResizeWindow drop ;
