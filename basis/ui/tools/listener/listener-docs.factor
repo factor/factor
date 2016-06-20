@@ -1,7 +1,7 @@
-USING: help.markup help.syntax help.tips io kernel listener sequences
-ui.commands ui.gadgets.editors ui.gadgets.panes ui.operations
-ui.tools.common ui.tools.listener.completion vocabs vocabs.refresh
-words ;
+USING: help.markup help.syntax help.tips io kernel listener
+sequences system ui.commands ui.gadgets.editors ui.gadgets.panes
+ui.operations ui.tools.common ui.tools.listener.completion
+vocabs vocabs.refresh words ;
 IN: ui.tools.listener
 
 HELP: <listener-gadget>
@@ -96,5 +96,7 @@ TIP: "If a word's vocabulary is loaded, but not in the search path, you can use 
 TIP: "Scroll the listener from the keyboard by pressing " { $command listener-gadget "scrolling" com-page-up } " and " { $command listener-gadget "scrolling" com-page-down } "." ;
 
 TIP: "Press " { $command tool "common" refresh-all } " or run " { $link refresh-all } " to reload changed source files from disk." ;
+
+TIP: "On Windows: use C+Break to interrupt tight loops in your code started in the listener, such as" { $code "[ t ] [ ] while" } "Caution: this may crash the Factor runtime if the code uses cooperative multitasking or asynchronous I/O." ;
 
 ABOUT: "ui-listener"
