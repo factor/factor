@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs boxes calendar classes
+USING: accessors arrays ascii assocs boxes calendar classes columns
 combinators combinators.short-circuit deques fry kernel make math
-math.order math.parser math.vectors namespaces sequences system timers
-ui.gadgets ui.gadgets.private words ;
+math.order math.parser math.vectors namespaces sequences sets system
+timers ui.gadgets ui.gadgets.private words ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )
@@ -232,6 +232,10 @@ SYMBOL: drag-timer
     ] [
         focus<<
     ] if ;
+
+: modifier ( mod modifiers -- seq )
+    [ second swap bitand 0 > ] with filter
+    0 <column> members [ f ] [ >array ] if-empty ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;

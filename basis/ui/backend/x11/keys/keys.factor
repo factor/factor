@@ -1,7 +1,6 @@
 ! Copyright (C) 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs columns kernel literals math sequences
-sets ui.gestures x11.keysymdef ;
+USING: accessors assocs kernel literals ui.gestures x11.keysymdef ;
 IN: ui.backend.x11.keys
 
 CONSTANT: modifiers
@@ -62,10 +61,6 @@ CONSTANT: codes
 
 : code>sym ( code -- name/code/f action? )
     dup codes at* [ nip dup t and ] when ;
-
-: modifier ( mod modifiers -- seq )
-    [ second swap bitand 0 > ] with filter
-    0 <column> members [ f ] [ >array ] if-empty ;
 
 : event-modifiers ( event -- seq )
     state>> modifiers modifier ;
