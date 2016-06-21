@@ -1,6 +1,6 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
-compiler.cfg.registers hash-sets hashtables help.markup help.syntax
-sequences ;
+compiler.cfg.registers compiler.cfg.stacks hash-sets hashtables
+help.markup help.syntax math sequences ;
 IN: compiler.cfg.stacks.local
 
 HELP: emit-changes
@@ -37,12 +37,22 @@ HELP: loc>vreg
 { $values { "loc" loc } { "vreg" "virtual register" } }
 { $description "Maps a stack location to a virtual register." } ;
 
+HELP: local-kill-set
+{ $values
+  { "ds-height" integer }
+  { "rs-height" integer }
+  { "state" sequence }
+  { "set" hash-set }
+}
+{ $description "The set of stack locations that was killed." }
+{ $see-also compute-local-kill-set } ;
+
 HELP: local-peek-set
 { $var-description "A " { $link hash-set } " used during local block analysis to keep track of peeked stack locations." } ;
 
 HELP: peek-loc
-{ $values { "loc" loc } { "vreg" "virtaul register" } }
-{ $description "Retrieves the virtual register at the given stack location." } ;
+{ $values { "loc" loc } { "vreg" "virtual register" } }
+{ $description "Retrieves the virtual register at the given stack location. If no register has been stored at that location, then a new vreg is returned." } ;
 
 HELP: replace-loc
 { $values { "vreg" "virtual register" } { "loc" loc } }
@@ -53,7 +63,7 @@ HELP: replace-sets
 { $var-description "An " { $link assoc } " in which each key is a " { $link basic-block } " and each value a " { $link hash-set } " with locations that were replaced in that block." } ;
 
 HELP: replaces
-{ $var-description "An " { $link assoc } " that maps from stack locations to virtual registers that were put on the stack." }
+{ $var-description "An " { $link assoc } " that maps from stack locations to virtual registers that were put on the stack during the local analysis phase. " { $link ds-push } " and similar words writes to it." }
 { $see-also replace-loc } ;
 
 HELP: translate-local-loc

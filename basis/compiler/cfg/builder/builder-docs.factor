@@ -107,6 +107,10 @@ HELP: end-word
 }
 { $description "Ends the word by adding a basic block containing a " { $link ##return } " instructions to the " { $link cfg } "." } ;
 
+HELP: height-changes
+{ $values { "#shuffle" #shuffle } { "height-changes" sequence } }
+{ $description "Returns a two-tuple which represents how much the " { $link #shuffle } " node increases or decreases the data and retainstacks." } ;
+
 HELP: trivial-branch?
 { $values
   { "nodes" "a " { $link sequence } " of " { $link node } " instances" }
@@ -129,6 +133,8 @@ HELP: with-cfg-builder
 ARTICLE: "compiler.cfg.builder"
 "Final stage of compilation generates machine code from dataflow IR"
 "The compiler first builds an SSA IR tree of the word to be compiled (see " { $vocab-link "compiler.tree.builder" } ") then this vocab converts it to a CFG IR tree. The result is not in SSA form; this is constructed later by calling compiler.cfg.ssa.construction:construct-ssa."
+$nl
+"Each tree node type has its own implementation of the " { $link emit-node } " generic. In that word, cfg instructions (tuples prefixed with ##) are outputted to basic blocks and the cfg constructed."
 $nl
 "Main word:"
 { $subsections
@@ -161,6 +167,11 @@ $nl
     emit-loop
     emit-recursive
     end-branch
+}
+"Helpers for " { $link #shuffle } ":"
+{
+    $subsections
+    height-changes
 } ;
 
 ABOUT: "compiler.cfg.builder"
