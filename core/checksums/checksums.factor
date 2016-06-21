@@ -23,9 +23,11 @@ GENERIC: initialize-checksum-state ( checksum -- checksum-state )
 
 GENERIC: checksum-block ( bytes checksum-state -- )
 
+GENERIC# add-checksum-bytes 1 ( checksum-state bytes -- checksum-state' )
+
 GENERIC: get-checksum ( checksum-state -- value )
 
-: add-checksum-bytes ( checksum-state data -- checksum-state )
+M: checksum-state add-checksum-bytes ( checksum-state data -- checksum-state' )
     over bytes>> [ push-all ] keep
     [ dup length pick block-size>> >= ]
     [
