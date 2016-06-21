@@ -19,6 +19,10 @@ HELP: rt-decks-offset
 { $description "Relocation offset type for the decks table." }
 { $see-also rel-decks-offset } ;
 
+HELP: rt-literal
+{ $description "Relocation type for a literal. The literal can be either an immediate such as a fixnum or " { $link f } " or an object reference." }
+{ $see-also rel-literal } ;
+
 HELP: string-offset
 { $values { "n" integer } }
 { $description "hm" } ;
