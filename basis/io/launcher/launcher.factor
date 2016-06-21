@@ -13,6 +13,7 @@ TUPLE: process < identity-tuple
 
 command
 detached
+hidden
 
 environment
 environment-mode

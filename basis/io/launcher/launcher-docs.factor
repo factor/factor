@@ -11,6 +11,9 @@ ARTICLE: "io.launcher.detached" "Running processes in the background"
 "By default, " { $link run-process } " waits for the process to complete. To run a process without waiting for it to finish, set the " { $snippet "detached" } " slot of a " { $link process } ", or use the following word:"
 { $subsections run-detached } ;
 
+ARTICLE: "io.launcher.hidden" "Running hidden processes"
+"By default, child processes can create and display their own (console and other) windows. To signal to a process that it should stay hidden, set the " { $snippet "hidden" } " slot of the " { $link process } " before running it. The processes are free to ignore this signal." ;
+
 ARTICLE: "io.launcher.environment" "Setting environment variables"
 "The " { $snippet "environment" } " slot of a " { $link process } " contains an association mapping environment variable names to values. The interpretation of environment variables is operating system-specific."
 $nl
@@ -338,6 +341,7 @@ ARTICLE: "io.launcher" "Operating system processes"
     "io.launcher.lifecycle"
     "io.launcher.command"
     "io.launcher.detached"
+    "io.launcher.hidden"
     "io.launcher.environment"
     "io.launcher.redirection"
     "io.launcher.priority"
