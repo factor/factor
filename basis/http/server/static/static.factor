@@ -9,7 +9,7 @@ sorting logging calendar.format accessors splitting io io.files
 io.files.info io.directories io.pathnames io.encodings.binary
 fry xml.entities destructors urls html xml.syntax
 html.templates.fhtml http http.server http.server.responses
-http.server.redirection xml.writer ;
+http.server.redirection xml.writer locals ;
 QUALIFIED: sets
 
 TUPLE: file-responder root hook special index-names allow-listings ;
@@ -58,18 +58,54 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 \ serve-file NOTICE add-input-logging
 
+:: file-html-template ( href size modified -- xml )
+    [XML
+        <tr>
+            <td><a href=<-href->><-href-></a></td>
+            <td align="right"><-modified-></td>
+            <td align="right"><-size-></td>
+        </tr>
+    XML] ;
+
 : file>html ( name -- xml )
-    dup link-info directory? [ "/" append ] when
-    dup [XML <li><a href=<->><-></a></li> XML] ;
+    dup link-info [
+        dup directory?
+        [ drop "/" append "-" ]
+        [ size>> number>string ] if
+    ] [ modified>> ] bi file-html-template ;
+
+: parent-dir-link ( -- xml )
+    "../" "" "" file-html-template ;
+
+: ?parent-dir-link ( -- xml/f )
+    url get [ path>> "/" = [ "" ] [ parent-dir-link ] if ] [ "" ] if* ;
+
+: listing-title ( -- title )
+    url get [ path>> "Index of " prepend ] [ "" ] if* ;
+
+:: listing-html-template ( title listing ?parent -- xml )
+    [XML <h1><-title-></h1>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Last modified</th>
+                <th>Size</th>
+            </tr>
+            <tr><th colspan="5"><hr/></th></tr>
+            <-?parent->
+            <-listing->
+            <tr><th colspan="5"><hr/></th></tr>
+        </table>
+    XML] ;
+
+: listing ( path -- seq-xml )
+    [ natural-sort [ file>html ] map ] with-directory-files ;
+
+: listing-body ( title path -- xml )
+    listing ?parent-dir-link listing-html-template ;
 
 : directory>html ( path -- xml )
-    [ file-name ]
-    [ drop f ]
-    [
-        [ file-name ] [ [ natural-sort [ file>html ] map ] with-directory-files ] bi
-        [XML <h1><-></h1> <ul><-></ul> XML]
-    ] tri
-    simple-page ;
+    [ listing-title f over ] dip listing-body simple-page ;
 
 : list-directory ( directory -- response )
     file-responder get allow-listings>> [
