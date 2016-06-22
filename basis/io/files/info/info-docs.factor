@@ -7,8 +7,9 @@ HELP: file-info
 { $errors "Throws an error if the file does not exist." } ;
 
 HELP: link-info
-{ $values { "path" "a pathname string" } { "info" "a file-info tuple" } }
-{ $description "Queries the file system for metadata. If path refers to a symbolic link, information about the symbolic link itself is returned. If the file does not exist, an exception is thrown." } ;
+{ $values { "path" "a pathname string" } { "info" file-info-tuple } }
+{ $description "Queries the file system for metadata. If " { $snippet "path" } " refers to a symbolic link, information about the symbolic link itself is returned.  See the article " { $link "file-types" } " for a list of metadata symbols." }
+{ $errors "Throws an error if the file does not exist." } ;
 
 { file-info link-info } related-words
 
