@@ -47,7 +47,6 @@ CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
 : get-video-info ( video-id -- video-info )
     video-info-url clone
         3 "asv" set-query-param
-        "detailpage" "el" set-query-param
         "en_US" "hl" set-query-param
         swap "video_id" set-query-param
     http-get nip query>assoc ;
@@ -64,10 +63,15 @@ CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
     [ "\"#$%'*,./:;<>?^|~\\" member? ] reject
     200 short head ;
 
+: downloadable? ( video-info -- ? )
+    "use_cipher_signature" of "False" = ;
+
 : download-video ( video-id -- )
     get-video-info [
+        downloadable? [ "Video is encrypted." throw ] unless
+    ] [
         video-formats [ "type" of "video/mp4" head? ] find nip
         video-download-url
     ] [
         "title" of sanitize ".mp4" append download-to
-    ] bi ;
+    ] tri ;
