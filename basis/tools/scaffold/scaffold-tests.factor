@@ -20,6 +20,14 @@ IN: tools.scaffold.tests
     [ \ undocumented-word (help.) ] with-string-writer
 ] unit-test
 
+{
+"HELP: iota-tuple
+{ $class-description \"\" } ;
+" }
+[
+    [ \ iota-tuple (help.) ] with-string-writer
+] unit-test
+
 { sequence t } [ "seq" lookup-type ] unit-test
 { sequence t } [ "seq'" lookup-type ] unit-test
 { sequence t } [ "newseq" lookup-type ] unit-test
