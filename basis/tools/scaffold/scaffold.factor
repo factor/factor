@@ -185,6 +185,10 @@ M: object add-using ( object -- )
         ] if
     ] when* ;
 
+: class-description. ( word -- )
+    drop
+    "{ $class-description \"\" } ;" print ;
+
 : symbol-description. ( word -- )
     drop
     "{ $var-description \"\" } ;" print ;
@@ -194,11 +198,11 @@ M: object add-using ( object -- )
     "{ $description \"\" } ;" print ;
 
 : docs-body. ( word/symbol -- )
-    dup symbol? [
-        symbol-description.
-    ] [
-        [ $values. ] [ $description. ] bi
-    ] if ;
+    {
+        { [ dup class? ] [ class-description. ] }
+        { [ dup symbol? ] [ symbol-description. ] }
+        [ [ $values. ] [ $description. ] bi ]
+    } cond ;
 
 : docs-header. ( word -- )
     "HELP: " write name>> print ;
