@@ -355,9 +355,6 @@ these lines in your .emacs:
 (defconst factor-no-indent-def-starts
   '("ARTICLE" "HELP" "SPECIALIZED-ARRAYS"))
 
-(defconst factor-indent-def-start-regex
-  (format "^\\(%s:\\)\\( \\|\n\\)" (regexp-opt factor-indent-def-starts)))
-
 (defconst factor-definition-start-regex
   (format "^\\(%s:\\) " (regexp-opt (append factor-no-indent-def-starts
                                             factor-indent-def-starts))))
@@ -390,12 +387,9 @@ these lines in your .emacs:
   (format "\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)"
           factor-declaration-words-regex))
 
-(defconst factor-end-of-def-line-regex
-  (format "^.*%s" factor-definition-end-regex))
-
 (defconst factor-end-of-def-regex
-  (format "\\(%s\\)\\|\\(^%s .*\\)"
-          factor-end-of-def-line-regex
+  (format "^.*%s\\|^%s .*"
+          factor-definition-end-regex
           factor-single-liner-regex))
 
 (defconst factor-word-signature-regex
@@ -585,9 +579,6 @@ these lines in your .emacs:
 (defsubst factor-at-begin-of-def ()
   (looking-at factor-begin-of-def-regex))
 
-(defsubst factor-at-begin-of-indent-def ()
-  (looking-at factor-indent-def-start-regex))
-
 (defsubst factor-at-end-of-def ()
   (looking-at factor-end-of-def-regex))
 
@@ -774,6 +765,12 @@ these lines in your .emacs:
         (save-excursion
           (factor-previous-non-empty)
           (current-indentation)))))
+
+(defconst factor-indent-def-start-regex
+  (format "^\\(%s:\\)\\( \\|\n\\)" (regexp-opt factor-indent-def-starts)))
+
+(defsubst factor-at-begin-of-indent-def ()
+  (looking-at factor-indent-def-start-regex))
 
 (defun factor-indent-continuation ()
   (save-excursion
