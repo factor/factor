@@ -75,6 +75,7 @@ $nl
 { $vocab-subsection "SHA checksums" "checksums.sha" }
 { $vocab-subsection "Adler-32 checksum" "checksums.adler-32" }
 { $vocab-subsection "OpenSSL checksums" "checksums.openssl" }
-{ $vocab-subsection "Internet checksum" "checksums.internet" } ;
+{ $vocab-subsection "Internet checksum" "checksums.internet" }
+{ $vocab-subsection "Checksum using an external utility" "checksums.process" } ;
 
 ABOUT: "checksums"
