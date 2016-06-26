@@ -58,6 +58,9 @@ $nl
 }
 "Checksums should implement at least one of " { $link checksum-bytes } " and " { $link checksum-stream } ". Implementing " { $link checksum-lines } " is optional."
 $nl
+"In the default implementation " { $link checksum-bytes } " is abstract, and " { $link checksum-stream } " is implemented by calling it with the stream contents fully read into memory. If you want your checksum to be the other way around, that is, "  { $link checksum-bytes } " to be implemented by calling " { $link checksum-stream } ", consider using the " { $snippet "stream-checksum" } " mixin:"
+{ $vocab-subsection "stream-checksum" "checksums.stream" }
+$nl
 "Utilities:"
 { $subsections
     checksum-file
