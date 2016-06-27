@@ -21,6 +21,7 @@ TYPEDEF: REFGUID REFIID
 TYPEDEF: REFGUID REFCLSID
 
 FUNCTION: HRESULT CoCreateInstance ( REFGUID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFGUID riid, LPUNKNOWN out_ppv )
+FUNCTION: HRESULT CoCreateGuid ( GUID* pguid )
 FUNCTION: BOOL IsEqualGUID ( REFGUID rguid1, REFGUID rguid2 )
 FUNCTION: int StringFromGUID2 ( REFGUID rguid, LPOLESTR lpsz, int cchMax )
 FUNCTION: HRESULT CLSIDFromString ( LPOLESTR lpsz, REFGUID out_rguid )
@@ -133,6 +134,9 @@ TUPLE: ole32-error code message ;
 
 CONSTANT: GUID-STRING-LENGTH
     $[ "{01234567-89ab-cdef-0123-456789abcdef}" length ]
+
+: create-guid ( -- GUID )
+    GUID <struct> dup CoCreateGuid check-ole32-error ;
 
 : string>guid ( string -- guid )
     "{-}" split harvest
