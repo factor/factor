@@ -166,9 +166,7 @@ struct factor_vm {
   cell retainstack_to_array(context* ctx);
   void primitive_retainstack_for();
   cell array_to_stack(array* array, cell bottom);
-  void set_datastack(context* ctx, array* array);
   void primitive_set_datastack();
-  void set_retainstack(context* ctx, array* array);
   void primitive_set_retainstack();
   void primitive_check_datastack();
   void primitive_load_locals();
