@@ -107,19 +107,6 @@ segment::segment(cell size_, bool executable_p) {
   set_border_locked(true);
 }
 
-void segment::set_border_locked(bool locked) {
-  int pagesize = getpagesize();
-  cell lo = start - pagesize;
-  if (!set_memory_locked(lo, pagesize, locked)) {
-    fatal_error("Cannot (un)protect low guard page", lo);
-  }
-
-  cell hi = end;
-  if (!set_memory_locked(hi, pagesize, locked)) {
-    fatal_error("Cannot (un)protect high guard page", hi);
-  }
-}
-
 segment::~segment() {
   SYSTEM_INFO si;
   GetSystemInfo(&si);
