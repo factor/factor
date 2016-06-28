@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010, 2016 Slava Pestov, Alexander Ilin
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data checksums
-checksums.stream destructors io kernel openssl openssl.libcrypto
+checksums.stream destructors fry io kernel openssl openssl.libcrypto
 sequences ;
 IN: checksums.openssl
 
@@ -35,6 +35,9 @@ M: evp-md-context dispose*
 : set-digest ( name ctx -- )
     handle>> swap digest-named f EVP_DigestInit_ex ssl-error ;
 
+: checksum-method ( data checksum method: ( ctx data -- ctx' ) -- value )
+    [ initialize-checksum-state ] dip '[ swap @ get-checksum ] with-disposal ; inline
+
 PRIVATE>
 
 M: openssl-checksum initialize-checksum-state ( checksum -- evp-md-context )
@@ -50,7 +53,7 @@ M: evp-md-context get-checksum ( ctx -- value )
     memory>byte-array ;
 
 M: openssl-checksum checksum-bytes ( bytes checksum -- value )
-    initialize-checksum-state [ swap add-checksum-bytes get-checksum ] with-disposal ;
+    [ add-checksum-bytes ] checksum-method ;
 
 M: openssl-checksum checksum-stream ( stream checksum -- value )
-    initialize-checksum-state [ swap add-checksum-stream get-checksum ] with-disposal ;
+    [ add-checksum-stream ] checksum-method ;
