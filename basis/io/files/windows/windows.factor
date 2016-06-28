@@ -76,7 +76,7 @@ SYMBOL: master-completion-port
             { [ dup integer? ] [ ] }
             { [ dup array? ] [
                 first dup eof?
-                [ drop 0 ] [ n>win32-error-string throw ] if
+                [ drop 0 ] [ throw-windows-error ] if
             ] }
         } cond
     ] with-timeout ;
@@ -147,7 +147,7 @@ M: windows handle-length ( handle -- n/f )
         GetLastError {
             { [ dup expected-io-error? ] [ drop f ] }
             { [ dup eof? ] [ drop t ] }
-            [ n>win32-error-string throw ]
+            [ throw-windows-error ]
         } cond
     ] [ f ] if ;
 
