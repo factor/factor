@@ -294,7 +294,7 @@ HELP: when-zero
 
 HELP: unless-zero
 { $values
-     { "n" number } { "quot" "the second quotation of an " { $link if-empty } } }
+     { "n" number } { "quot" "the second quotation of an " { $link if-zero } } }
 { $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
     { $example
