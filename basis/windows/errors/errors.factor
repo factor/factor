@@ -717,9 +717,6 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
     [ drop "Unknown error 0x" id 0xffff,ffff bitand >hex append ]
     [ alien>native-string [ blank? ] trim ] if ;
 
-: win32-error-string ( -- str )
-    GetLastError n>win32-error-string ;
-
 ERROR: windows-error n string ;
 
 : (win32-error) ( n -- )
