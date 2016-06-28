@@ -730,7 +730,7 @@ ERROR: windows-error n string ;
 : win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
 : win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
 : win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
-: win32-error<>0 ( n -- ) [ win32-error ] unless-zero ;
+: win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
 
 : check-invalid-handle ( handle -- handle )
     dup INVALID_HANDLE_VALUE = [ win32-error ] when ;
