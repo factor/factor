@@ -719,23 +719,18 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
 
 ERROR: windows-error n string ;
 
-: (win32-error) ( n -- )
-    [ dup win32-error-string windows-error ] unless-zero ;
+: throw-windows-error ( n -- * )
+    dup n>win32-error-string windows-error ;
 
-: win32-error ( -- )
-    GetLastError (win32-error) ;
+: n>win32-error-check ( n -- )
+    [ throw-windows-error ] unless-zero ;
 
+! Note that win32-error* words throw GetLastError code.
+: win32-error ( -- ) GetLastError n>win32-error-check ;
 : win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
 : win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
 : win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
-: win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
-
-: n>win32-error-check ( n -- )
-    dup ERROR_SUCCESS = [
-        drop
-    ] [
-        dup n>win32-error-string windows-error
-    ] if ;
+: win32-error<>0 ( n -- ) [ win32-error ] unless-zero ;
 
 : check-invalid-handle ( handle -- handle )
     dup INVALID_HANDLE_VALUE = [ win32-error ] when ;
