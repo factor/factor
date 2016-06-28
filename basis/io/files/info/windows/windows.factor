@@ -19,7 +19,7 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 
 : get-compressed-file-size ( path -- n )
     { DWORD } [ GetCompressedFileSize ] with-out-parameters
-    over INVALID_FILE_SIZE = [ win32-error-string throw ] [ >64bit ] if ;
+    over INVALID_FILE_SIZE = [ win32-error ] [ >64bit ] if ;
 
 : set-windows-size-on-disk ( file-info path -- file-info )
     over attributes>> +compressed+ swap member? [
@@ -183,7 +183,7 @@ CONSTANT: names-buf-length 16384
     [ path-length FindNextVolume ] with-out-parameters
     swap 0 = [
         GetLastError ERROR_NO_MORE_FILES =
-        [ drop f ] [ win32-error-string throw ] if
+        [ drop f ] [ win32-error ] if
     ] [ alien>native-string ] if ;
 
 : find-volumes ( -- array )
