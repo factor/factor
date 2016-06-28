@@ -456,7 +456,7 @@ xyz
     \"TIME_ZONE_INFORMATION\" <c-object>
     dup GetTimeZoneInformation {
         { TIME_ZONE_ID_INVALID [
-            win32-error-string throw
+            win32-error
         ] }
         { TIME_ZONE_ID_STANDARD [
             TIME_ZONE_INFORMATION-Bias
