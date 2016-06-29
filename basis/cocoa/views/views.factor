@@ -5,6 +5,7 @@ sequences ;
 IN: cocoa.views
 
 CONSTANT: NSOpenGLPFAAllRenderers 1
+CONSTANT: NSOpenGLPFATripleBuffer 3
 CONSTANT: NSOpenGLPFADoubleBuffer 5
 CONSTANT: NSOpenGLPFAStereo 6
 CONSTANT: NSOpenGLPFAAuxBuffers 7
@@ -38,14 +39,24 @@ CONSTANT: NSOpenGLPFACompliant 83
 CONSTANT: NSOpenGLPFAScreenMask 84
 CONSTANT: NSOpenGLPFAPixelBuffer 90
 CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
+CONSTANT: NSOpenGLPFAAcceleratedCompute 97
 CONSTANT: NSOpenGLPFAOpenGLProfile 99
 CONSTANT: NSOpenGLPFAVirtualScreenCount 128
 
 CONSTANT: NSOpenGLCPSwapInterval 222
+CONSTANT: NSOpenGLCPSurfaceOrder 235
 CONSTANT: NSOpenGLCPSurfaceOpacity 236
+CONSTANT: NSOpenGLCPSurfaceBackingSize 304
+CONSTANT: NSOpenGLCPReclaimResources 308
+CONSTANT: NSOpenGLCPCurrentRendererID 309
+CONSTANT: NSOpenGLCPGPUVertexProcessing 310
+CONSTANT: NSOpenGLCPGPUFragmentProcessing 311
+CONSTANT: NSOpenGLCPHasDrawable 314
+CONSTANT: NSOpenGLCPMPSwapsInFlight 315
 
+CONSTANT: NSOpenGLProfileVersionLegacy 0x1000
 CONSTANT: NSOpenGLProfileVersion3_2Core 0x3200
-CONSTANT: kCGLOGLPVersion_GL4_Core 0x4100
+CONSTANT: NSOpenGLProfileVersion4_1Core 0x4100
 
 : <GLView> ( class dim pixel-format -- view )
     [ -> alloc ]
