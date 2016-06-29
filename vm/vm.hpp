@@ -202,9 +202,6 @@ struct factor_vm {
   void verify_memory_protection_error(cell addr);
   void divide_by_zero_error();
   void primitive_unimplemented();
-  void memory_signal_handler_impl();
-  void synchronous_signal_handler_impl();
-  void fp_signal_handler_impl();
 
   // bignum
   int bignum_equal_p(bignum* x, bignum* y);
