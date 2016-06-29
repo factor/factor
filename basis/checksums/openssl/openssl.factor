@@ -17,6 +17,8 @@ INSTANCE: openssl-checksum stream-checksum
 
 C: <openssl-checksum> openssl-checksum
 
+<PRIVATE
+
 TUPLE: evp-md-context < disposable handle ;
 
 : <evp-md-context> ( -- ctx )
@@ -25,8 +27,6 @@ TUPLE: evp-md-context < disposable handle ;
 
 M: evp-md-context dispose*
     handle>> EVP_MD_CTX_destroy ;
-
-<PRIVATE
 
 : digest-named ( name -- md )
     dup EVP_get_digestbyname
