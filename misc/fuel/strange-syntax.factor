@@ -12,12 +12,18 @@ TUPLE: a-tuple slot1 slot2 { slot3 integer } ;
 
     USING: tools.test ;
 
+
+! ! Strings
+"containing \"escapes" drop
+
 ! ! Symbol names
 
 ! All slashes are symbol constituents.
 : hack/slash ( -- x ) 10 ;
 
 : slash\hack ( -- y ) 20 ;
+
+TUPLE: oh\no ;
 
 ! As are quotes
 : don't-do-that ( x -- y ) ;
