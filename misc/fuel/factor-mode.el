@@ -183,7 +183,7 @@ these lines in your .emacs:
 ;;; Regexps galore:
 
 ;; Utility regexp used by other regexps to match a Factor symbol name
-(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\|\\s(\\|\\s)\\)+\\)")
+(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\|\\s(\\|\\s)\\|\\s\\\\)+\\)")
 (setq-local ws+ "[ \n\t]+")
 (setq-local symbols-to-semicolon "\\([^;\t]*\\)\\(;\\)")
 
@@ -872,7 +872,6 @@ With prefix, non-existing files will be created."
     (modify-syntax-entry ?# "_" table)
     (modify-syntax-entry ?! "_" table)
     (modify-syntax-entry ?\n ">   " table)
-    (modify-syntax-entry ?\\ "_" table)
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?@ "_" table)
     (modify-syntax-entry ?? "_" table)
