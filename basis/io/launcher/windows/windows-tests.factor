@@ -224,6 +224,10 @@ SYMBOLS: out-path err-path ;
     out-path get-global utf8 file-contents
 ] unit-test
 
+{ t "This is a hidden process.\r\n" } [
+    "cmd /c echo.This is a hidden process." utf8 (process-stream) hidden>> swap stream-contents
+] unit-test
+
 [ "IN: scratchpad " ] [
     console-vm-path "-run=listener" 2array
     ascii [ "USE: system 0 exit" print flush lines last ] with-process-stream

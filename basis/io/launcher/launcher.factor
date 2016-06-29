@@ -255,7 +255,7 @@ PRIVATE>
             (pipe) |dispose
             (pipe) |dispose {
                 [
-                    rot >process
+                    rot >process t >>hidden
                         [ swap in>> or ] change-stdin
                         [ swap out>> or ] change-stdout
                     run-detached
