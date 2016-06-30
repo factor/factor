@@ -1,15 +1,15 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays checksums
-checksums.common checksums.stream combinators fry grouping hints
-kernel kernel.private literals locals macros math math.bitwise
+checksums.common combinators fry grouping hints kernel
+kernel.private literals locals macros math math.bitwise
 math.functions sequences sequences.private specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5
 
 SINGLETON: md5
 
-INSTANCE: md5 stream-checksum
+INSTANCE: md5 block-checksum
 
 TUPLE: md5-state < checksum-state
 { state uint-array }
@@ -200,9 +200,5 @@ M: md5-state get-checksum
     clone
     [ bytes>> f ] [ bytes-read>> pad-last-block ] [ ] tri
     [ [ checksum-block ] curry each ] [ md5>checksum ] bi ;
-
-M: md5 checksum-stream
-    drop
-    [ <md5-state> ] dip add-checksum-stream get-checksum ;
 
 PRIVATE>

@@ -7,7 +7,7 @@ sequences.generalizations sequences.private ;
 IN: checksums.sha
 
 MIXIN: sha
-INSTANCE: sha checksum
+INSTANCE: sha block-checksum
 
 SINGLETON: sha1
 INSTANCE: sha1 sha
@@ -404,13 +404,5 @@ M:: sha1-state checksum-block ( bytes state -- )
 M: sha1-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-256>checksum ] bi ;
-
-M: sha checksum-stream
-    initialize-checksum-state swap add-checksum-stream
-    get-checksum ;
-
-M: sha checksum-bytes
-    initialize-checksum-state swap add-checksum-bytes
-    get-checksum ;
 
 PRIVATE>
