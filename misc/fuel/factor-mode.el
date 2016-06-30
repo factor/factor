@@ -183,7 +183,8 @@ these lines in your .emacs:
 ;;; Regexps galore:
 
 ;; Utility regexp used by other regexps to match a Factor symbol name
-(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\|\\s(\\|\\s)\\|\\s\\\\)+\\)")
+(setq-local symbol-nc "\\(?:\\sw\\|\\s_\\|\\s(\\|\\s)\\|\\s\\\\)+")
+(setq-local symbol (format "\\(%s\\)" symbol-nc))
 (setq-local ws+ "[ \n\t]+")
 (setq-local symbols-to-semicolon "\\([^;\t]*\\)\\(;\\)")
 
@@ -320,10 +321,10 @@ these lines in your .emacs:
   (one-symbol "<[^ >]+>"))
 
 (defconst factor-getter-regex
-  (one-symbol "\\(?:\\sw\\|\\s_\\)+>>"))
+  (one-symbol (concat symbol-nc ">>")))
 
 (defconst factor-setter-regex
-  (one-symbol ">>\\(?:\\sw\\|\\s_\\)+\\|\\(?:\\sw\\|\\s_\\)+<<"))
+  (one-symbol (format ">>%s\\|%s<<" symbol-nc symbol-nc)))
 
 (defconst factor-stack-effect-regex
   "\\( ( [^)]* )\\)\\|\\( (( [^)]* ))\\)")
@@ -502,7 +503,8 @@ these lines in your .emacs:
      (4 'factor-font-lock-type-name nil t)
      ;; A slot is either a single symbol or a sequence along the
      ;; lines: { foo initial: "bar }
-     ("\\(\\(?:\\sw\\|\\s_\\)+\\)\\|\\(?:{[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[^}]+\\)"
+     (,(format
+        "\\(?:{[ \n]+%s[^}]+\\)}\\|%s" symbol symbol)
       (factor-find-end-of-def)
       nil
       (1 'factor-font-lock-symbol nil t)
