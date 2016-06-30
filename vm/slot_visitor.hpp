@@ -178,19 +178,6 @@ void slot_visitor<Fixup>::visit_object_array(cell* start, cell* end) {
     visit_handle(start++);
 }
 
-template <typename Fixup>
-void slot_visitor<Fixup>::visit_partial_objects(cell start,
-                                                cell card_start,
-                                                cell card_end) {
-  cell *scan_start = (cell*)start + 1;
-  cell *scan_end = scan_start + ((object*)start)->slot_count();
-
-  scan_start = std::max(scan_start, (cell*)card_start);
-  scan_end = std::min(scan_end, (cell*)card_end);
-
-  visit_object_array(scan_start, scan_end);
-}
-
 template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {
   if (obj->type() == CALLSTACK_TYPE)
     visit_callstack_object((callstack*)obj);
@@ -531,6 +518,19 @@ void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
     }
   };
   block->each_instruction_operand(visit_func);
+}
+
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_partial_objects(cell start,
+                                                cell card_start,
+                                                cell card_end) {
+  cell *scan_start = (cell*)start + 1;
+  cell *scan_end = scan_start + ((object*)start)->slot_count();
+
+  scan_start = std::max(scan_start, (cell*)card_start);
+  scan_end = std::min(scan_end, (cell*)card_end);
+
+  visit_object_array(scan_start, scan_end);
 }
 
 template <typename Fixup>

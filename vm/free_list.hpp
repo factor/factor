@@ -109,8 +109,8 @@ template <typename Block> Block* free_list_allocator<Block>::allot(cell size) {
   if (block) {
     block = free_blocks.split_free_block(block, size);
     return (Block*)block;
-  } else
-    return NULL;
+  }
+  return NULL;
 }
 
 template <typename Block> void free_list_allocator<Block>::free(Block* block) {
