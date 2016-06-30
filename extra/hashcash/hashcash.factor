@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Diego Martinelli.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays calendar calendar.format checksums
-checksums.openssl classes.tuple fry kernel make math math.functions
-math.parser math.ranges present random sequences splitting strings ;
+USING: accessors calendar calendar.format checksums
+checksums.openssl classes.tuple fry io.encodings.ascii
+io.encodings.string kernel math math.functions math.parser
+math.ranges present random sequences splitting ;
 IN: hashcash
 
 ! Hashcash implementation
@@ -49,7 +50,7 @@ M: hashcash string>>
 <PRIVATE
 
 : sha1-checksum ( str -- bytes )
-    openssl-sha1 checksum-bytes ; inline
+    ascii encode openssl-sha1 checksum-bytes ; inline
 
 : set-suffix ( tuple guess -- tuple )
     >hex >>suffix ;
