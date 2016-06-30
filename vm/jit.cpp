@@ -3,11 +3,12 @@
 namespace factor {
 
 /* Simple code generator used by:
-- quotation compiler (quotations.cpp),
-- megamorphic caches (dispatch.cpp),
-- polymorphic inline caches (inline_cache.cpp) */
+   - quotation compiler (quotations.cpp),
+   - megamorphic caches (dispatch.cpp),
+   - polymorphic inline caches (inline_cache.cpp) */
 
-/* Allocates memory (`code` and `relocation` initializers create growable_byte_array) */
+/* Allocates memory (`code` and `relocation` initializers create
+   growable_byte_array) */
 jit::jit(code_block_type type, cell owner, factor_vm* vm)
     : type(type),
       owner(owner, vm),
@@ -105,8 +106,8 @@ bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p) {
 }
 
 /* Facility to convert compiled code offsets to quotation offsets.
-Call jit_compute_offset() with the compiled code offset, then emit
-code, and at the end jit->position is the quotation position. */
+   Call jit_compute_offset() with the compiled code offset, then emit
+   code, and at the end jit->position is the quotation position. */
 void jit::compute_position(cell offset_) {
   computing_offset_p = true;
   position = 0;
