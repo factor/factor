@@ -1,7 +1,6 @@
 USING: alien.c-types classes.struct kernel math sequences
-specialized-arrays
-specialized-arrays.instances.alien.c-types.uchar tools.test
-windows.com.syntax windows.kernel32 windows.ole32 ;
+sets specialized-arrays tools.test windows.com.syntax
+windows.kernel32 windows.ole32 ;
 SPECIALIZED-ARRAY: uchar
 IN: windows.ole32.tests
 
