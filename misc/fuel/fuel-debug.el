@@ -185,17 +185,6 @@ the debugger."
     (when (not (member n ref))
       (put-text-property 0 (length n) 'font-lock-face face n))))
 
-(defun fuel-debug--insert-uses (uses)
-  (let* ((file (or file fuel-debug--file))
-         (old (with-current-buffer (find-file-noselect file)
-                (sort (factor-find-usings t) 'string<)))
-         (new (sort uses 'string<)))
-    (when (not (cl-equalp old new))
-      (fuel-debug--highlight-names old new 'fuel-font-lock-debug-unneeded-vocab)
-      (newline)
-      (fuel-debug--insert-vlist "Correct vocabulary list:" new)
-      new)))
-
 (defun fuel-debug--display-uses (ret)
   (when (setq fuel-debug--uses (fuel-debug--uses ret))
     (newline)
