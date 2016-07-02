@@ -178,7 +178,7 @@ these lines in your .emacs:
 ;;; Regexps galore:
 
 ;; Utility regexp used by other regexps to match a Factor symbol name
-(setq-local symbol-nc "\\(?:\\sw\\|\\s_\\|\\s(\\|\\s)\\|\\s\\\\)+")
+(setq-local symbol-nc "\\(?:\\sw\\|\\s_\\|\"\\|\\s(\\|\\s)\\|\\s\\\\)+")
 (setq-local symbol (format "\\(%s\\)" symbol-nc))
 (setq-local ws+ "[ \n\t]+")
 (setq-local symbols-to-semicolon "\\([^;\t]*\\)\\(;\\)")
@@ -390,7 +390,11 @@ these lines in your .emacs:
   (concat (syntax-begin '("PREDICATE")) ws+ symbol ws+ "\\(<\\)" ws+ symbol))
 
 (defconst factor-alien-function-regex
-  (concat (syntax-begin '("GL-FUNCTION" "FUNCTION" "GL-CALLBACK" "CALLBACK"))
+  (concat (syntax-begin '("CALLBACK"
+                          "FUNCTION"
+                          "GL-CALLBACK"
+                          "GL-FUNCTION"
+                          "X-FUNCTION"))
           ws+ symbol
           ws+ symbol ws+))
 
