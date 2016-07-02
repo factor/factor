@@ -275,15 +275,16 @@ these lines in your .emacs:
 (defconst factor-bad-string-regex
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
-(defconst factor-word-starters
-  '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
-    "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
-    "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::"))
-
 (defconst factor-word-definition-regex
   (concat
-   (format "\\_<\\(%s\\)" (regexp-opt factor-word-starters))
+   (one-symbol (regexp-opt
+                '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
+                  "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
+                  "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::")))
    ws+ symbol))
+
+(defconst factor-method-definition-regex
+  (syntax-and-2-symbols '("M" "M:" "BEFORE" "AFTER")))
 
 ;; [parsing-word] [vocab-word]
 (defconst factor-vocab-ref-regex
@@ -454,8 +455,7 @@ these lines in your .emacs:
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
     ,(factor-syntax factor-type-definition-regex '("P" "T"))
-    ,(factor-syntax (syntax-and-2-symbols '("M" "M:" "BEFORE" "AFTER"))
-                    '("P" "T" "W"))
+    ,(factor-syntax factor-method-definition-regex '("P" "T" "W"))
 
     ;; Highlights tuple and struct definitions. The TUPLE/STRUCT
     ;; parsing word, class name and optional parent classes are
