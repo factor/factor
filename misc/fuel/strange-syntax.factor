@@ -51,7 +51,9 @@ C-TYPE: cairo_snurface_t
 ! ! CHAR
 : stuff-with-chars ( -- K \n )
     CHAR: K
-    CHAR: \n ;
+    CHAR: \n
+    CHAR: \"        ! <- \" should be highlighted
+    drop ;
 
 ! ! MAIN
 : majn ( -- ) ;
