@@ -67,3 +67,11 @@ IN: checksums.sha.tests
     <sha-224-state> "asdf" binary <byte-reader> add-checksum-stream
     [ get-checksum ] [ get-checksum ] bi =
 ] unit-test
+
+
+CONSTANT: bytes-a B{ 0 1 0 0 0 0 0 0 }
+CONSTANT: bytes-b B{ 1 2 3 4 5 6 7 8 }
+{ t } [
+    sha1 initialize-checksum-state bytes-a bytes-b append add-checksum-bytes get-checksum
+    sha1 initialize-checksum-state bytes-a add-checksum-bytes bytes-b add-checksum-bytes get-checksum
+] unit-test
