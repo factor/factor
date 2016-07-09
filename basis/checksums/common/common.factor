@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors checksums grouping io
 io.backend io.binary io.encodings.binary io.files kernel make
-math sequences ;
+math sequences locals ;
 IN: checksums.common
 
 : calculate-pad-length ( length -- length' )
@@ -38,19 +38,32 @@ GENERIC: checksum-block ( bytes checksum-state -- )
 
 GENERIC: get-checksum ( checksum-state -- value )
 
-: add-checksum-bytes ( checksum-state data -- checksum-state' )
-    [
-        over bytes>> [ push-all ] keep
-        [ dup length pick block-size>> >= ]
-        [
-            over block-size>> cut-slice [
-                over checksum-block
-                [ block-size>> ] keep [ + ] change-bytes-read
-            ] dip
-        ] while
-        >byte-vector >>bytes
-    ] keep
-    length 64 mod [ + ] curry change-bytes-read ;
+: next-level ( n size -- n' )
+    2dup mod [ + ] [ - + ] if-zero ; inline
+
+! Update the bytes-read before calculating checksum in case checksum uses
+! this in the calculation.
+:: add-checksum-bytes ( state data -- state' )
+    state block-size>> :> block-size
+    state bytes>> length :> initial-len
+    data length :> data-len
+    initial-len data-len + :> total-len
+    total-len block-size /mod :> ( n extra )
+    data state bytes>> [ push-all ] keep :> all-bytes
+    n zero? [
+        state [ data-len + ] change-bytes-read drop
+    ] [
+        all-bytes block-size <groups> [ length 64 = ] partition [
+            [ state [ block-size next-level ] change-bytes-read drop state checksum-block ] each
+            BV{ } clone state bytes<<
+        ] [
+            [
+                first
+                [ length state [ + ] change-bytes-read drop ]
+                [ >byte-vector state bytes<< ] bi
+            ] unless-empty
+        ] bi*
+    ] if state ;
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
     [ [ add-checksum-bytes ] each-block ] with-input-stream ;
