@@ -50,7 +50,7 @@ GENERIC: get-checksum ( checksum-state -- value )
         ] while
         >byte-vector >>bytes
     ] keep
-    length [ + ] curry change-bytes-read ;
+    length 64 mod [ + ] curry change-bytes-read ;
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
     [ [ add-checksum-bytes ] each-block ] with-input-stream ;
