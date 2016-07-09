@@ -39,16 +39,18 @@ GENERIC: checksum-block ( bytes checksum-state -- )
 GENERIC: get-checksum ( checksum-state -- value )
 
 : add-checksum-bytes ( checksum-state data -- checksum-state' )
-    over bytes>> [ push-all ] keep
-    [ dup length pick block-size>> >= ]
     [
-        over block-size>> cut-slice [
-            over checksum-block
-            [ block-size>> ] keep [ + ] change-bytes-read
-        ] dip
-    ] while
-    >byte-vector
-    [ >>bytes ] [ length [ + ] curry change-bytes-read ] bi ;
+        over bytes>> [ push-all ] keep
+        [ dup length pick block-size>> >= ]
+        [
+            over block-size>> cut-slice [
+                over checksum-block
+                [ block-size>> ] keep [ + ] change-bytes-read
+            ] dip
+        ] while
+        >byte-vector >>bytes
+    ] keep
+    length [ + ] curry change-bytes-read ;
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
     [ [ add-checksum-bytes ] each-block ] with-input-stream ;
