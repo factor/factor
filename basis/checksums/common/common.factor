@@ -38,9 +38,6 @@ GENERIC: checksum-block ( bytes checksum-state -- )
 
 GENERIC: get-checksum ( checksum-state -- value )
 
-: next-level ( n size -- n' )
-    2dup mod [ + ] [ - + ] if-zero ; inline
-
 ! Update the bytes-read before calculating checksum in case
 ! checksum uses this in the calculation.
 :: add-checksum-bytes ( checksum-state data -- checksum-state' )
