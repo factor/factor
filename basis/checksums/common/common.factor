@@ -41,29 +41,25 @@ GENERIC: get-checksum ( checksum-state -- value )
 : next-level ( n size -- n' )
     2dup mod [ + ] [ - + ] if-zero ; inline
 
-! Update the bytes-read before calculating checksum in case checksum uses
-! this in the calculation.
-:: add-checksum-bytes ( state data -- state' )
-    state block-size>> :> block-size
-    state bytes>> length :> initial-len
-    data length :> data-len
-    initial-len data-len + :> total-len
-    total-len block-size /mod :> ( n extra )
-    data state bytes>> [ push-all ] keep :> all-bytes
-    n zero? [
-        state [ data-len + ] change-bytes-read drop
-    ] [
-        all-bytes block-size <groups> [ length 64 = ] partition [
-            [ state [ block-size next-level ] change-bytes-read drop state checksum-block ] each
-            BV{ } clone state bytes<<
-        ] [
-            [
-                first
-                [ length state [ + ] change-bytes-read drop ]
-                [ >byte-vector state bytes<< ] bi
-            ] unless-empty
-        ] bi*
-    ] if state ;
+! Update the bytes-read before calculating checksum in case
+! checksum uses this in the calculation.
+:: add-checksum-bytes ( checksum-state data -- checksum-state' )
+    checksum-state block-size>> :> block-size
+    checksum-state bytes>> length :> initial-len
+    initial-len data length + block-size /mod :> ( n extra )
+    data checksum-state bytes>> [ push-all ] keep :> all-bytes
+    all-bytes block-size <groups>
+    extra zero? [ f ] [ unclip-last-slice ] if :> ( blocks remain )
+
+    checksum-state [ initial-len - ] change-bytes-read drop
+
+    blocks [
+        checksum-state [ block-size + ] change-bytes-read
+        checksum-block
+    ] each
+
+    checksum-state [ extra + ] change-bytes-read
+    remain [ >byte-vector ] [ BV{ } clone ] if* >>bytes ;
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
     [ [ add-checksum-bytes ] each-block ] with-input-stream ;
