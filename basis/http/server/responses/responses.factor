@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.parser http accessors kernel xml.syntax xml.writer
-io io.streams.string io.encodings.utf8 ;
+USING: accessors fry http io io.encodings.utf8 io.files
+io.streams.string kernel math math.parser parser sequences
+splitting unicode words xml.syntax xml.writer ;
 IN: http.server.responses
 
 : <content> ( body content-type -- response )
@@ -33,17 +34,18 @@ IN: http.server.responses
         swap >>message
         swap >>code ;
 
-: <304> ( -- response )
-    304 "Not modified" <trivial-response> ;
-
-: <400> ( -- response )
-    400 "Bad request" <trivial-response> ;
-
-: <403> ( -- response )
-    403 "Forbidden" <trivial-response> ;
-
-: <404> ( -- response )
-    404 "Not found" <trivial-response> ;
-
-: <405> ( -- response )
-    405 "Method Not Allowed" <trivial-response> ;
+<<
+"vocab:http/server/responses/http-status-codes.txt"
+utf8 file-lines [ [ blank? ] trim ] map
+dup [ "Value" head? ] find drop 1 + tail
+[ "Unassigned" swap subseq? ] reject
+[
+    "[RFC" over start head " " split1 [ blank? ] trim
+    [
+        [
+            "<" ">" surround create-word-in dup reset-generic
+        ] keep string>number
+    ] dip '[ _ _ <trivial-response> ] ( -- response )
+    define-declared
+] each
+>>
