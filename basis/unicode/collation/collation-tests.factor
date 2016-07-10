@@ -1,15 +1,6 @@
-USING: io io.files splitting grouping unicode
-sequences kernel io.encodings.utf8 math.parser math.order
-tools.test assocs words ;
+USING: assocs grouping io.encodings.utf8 io.files kernel
+math.order math.parser sequences splitting tools.test unicode ;
 IN: unicode.collation.tests
-
-: parse-test ( -- strings )
-    "vocab:unicode/collation/CollationTest_SHIFTED.txt"
-    utf8 file-lines 5 tail
-    [ ";" split1 drop " " split [ hex> ] "" map-as ] map ;
-
-: test-two ( str1 str2 -- )
-    [ +lt+ ] -rot [ string<=> ] 2curry unit-test ;
 
 : test-equality ( str1 str2 -- ? ? ? ? )
     { primary= secondary= tertiary= quaternary= }
@@ -25,5 +16,9 @@ IN: unicode.collation.tests
 [ { "HELLO" "goodbye" "good bye" "hello" } sort-strings ]
 unit-test
 
-parse-test 2 <clumps>
-[ test-two ] assoc-each
+{ { } } [
+    "vocab:unicode/collation/CollationTest_SHIFTED.txt"
+    utf8 file-lines 5 tail
+    [ ";" split1 drop " " split [ hex> ] "" map-as ] map
+    2 clump [ string<=> +lt+ eq? ] assoc-reject
+] unit-test
