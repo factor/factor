@@ -27,10 +27,10 @@ IN: unicode.normalize.tests
         ] with all?
     ] assoc-all? ;
 
-{ { } } [
+{ 17768 { } } [
     "vocab:unicode/normalize/NormalizationTest.txt" data
     [ 5 head [ " " split [ hex> ] "" map-as ] map ] map
-    [
+    [ length ] keep [
         {
             [ { { 2 { 1 2 3 } } { 4 { 4 5 } } } [ nfc ] check? ]
             [ { { 3 { 1 2 3 } } { 5 { 4 5 } } } [ nfd ] check? ]

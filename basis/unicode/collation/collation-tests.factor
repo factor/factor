@@ -16,9 +16,10 @@ IN: unicode.collation.tests
 [ { "HELLO" "goodbye" "good bye" "hello" } sort-strings ]
 unit-test
 
-{ { } } [
+{ 152853 { } } [
     "vocab:unicode/collation/CollationTest_SHIFTED.txt"
     utf8 file-lines 5 tail
     [ ";" split1 drop " " split [ hex> ] "" map-as ] map
-    2 clump [ string<=> +lt+ eq? ] assoc-reject
+    2 clump [ length ] keep
+    [ string<=> +lt+ eq? ] assoc-reject
 ] unit-test
