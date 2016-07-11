@@ -6,7 +6,7 @@ IN: gdbm.tests
 
 : db-path ( -- filename ) cpu name>> "-test.db" append temp-file ;
 
-: CLEANUP ( -- ) [ db-path delete-file ] ignore-errors ;
+: CLEANUP ( -- ) db-path ?delete-file ;
 
 : test.db ( -- gdbm ) <gdbm> db-path >>name ;
 

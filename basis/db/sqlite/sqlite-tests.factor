@@ -7,7 +7,7 @@ IN: db.sqlite.tests
 : db-path ( -- path ) "test-" cell number>string ".db" 3append temp-file ;
 : test.db ( -- sqlite-db ) db-path <sqlite-db> ;
 
-{ } [ [ db-path delete-file ] ignore-errors ] unit-test
+db-path ?delete-file
 
 { } [
     test.db [

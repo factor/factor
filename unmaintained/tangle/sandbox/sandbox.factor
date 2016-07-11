@@ -3,7 +3,7 @@ IN: tangle.sandbox
 
 : db-path "tangle-sandbox.db" temp-file ;
 : sandbox-db db-path sqlite-db ;
-: delete-db [ db-path delete-file ] ignore-errors ;
+: delete-db db-path ?delete-file ;
 
 : make-sandbox ( tangle -- )
     [

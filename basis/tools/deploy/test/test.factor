@@ -11,7 +11,7 @@ IN: tools.deploy.test
     test-image temp-file ;
 
 : shake-and-bake ( vocab -- )
-    [ test-image-path delete-file ] ignore-errors
+    test-image-path ?delete-file
     [
         [ vm-path test-image temp-file ] dip
         dup deploy-config make-deploy-image drop
