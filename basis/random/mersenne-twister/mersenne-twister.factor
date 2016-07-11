@@ -64,9 +64,7 @@ PRIVATE>
 
 M: mersenne-twister seed-random
     init-mt-seq >>seq
-    [ mt-generate ]
-    [ 0 >>i drop ]
-    [ ] tri ;
+    dup mt-generate ;
 
 M: mersenne-twister random-32*
     [ next-index ]
