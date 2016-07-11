@@ -7,7 +7,7 @@ SYMBOL: context
 
 : db-path "semantic-db-test.db" temp-file ;
 : test-db db-path sqlite-db ;
-: delete-db [ db-path delete-file ] ignore-errors ;
+: delete-db db-path ?delete-file ;
 
 delete-db
 

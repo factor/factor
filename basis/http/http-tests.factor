@@ -229,7 +229,7 @@ http.server.dispatchers db.tuples ;
     "Goodbye" assert= ;
 
 { } [
-    [ test-db-file delete-file ] ignore-errors
+    test-db-file ?delete-file
 
     test-db [
         init-furnace-tables

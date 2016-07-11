@@ -13,7 +13,7 @@ IN: io.launcher.unix.tests
     { t } [ "launcher-test-1" exists? ] unit-test
 
     { } [
-        [ "launcher-test-1" delete-file ] ignore-errors
+        "launcher-test-1" ?delete-file
     ] unit-test
 
     { } [
@@ -29,7 +29,7 @@ IN: io.launcher.unix.tests
     ] unit-test
 
     { } [
-        [ "launcher-test-1" delete-file ] ignore-errors
+        "launcher-test-1" ?delete-file
     ] unit-test
 
     { } [

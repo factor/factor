@@ -4,7 +4,7 @@ USING: continuations db db.tuples io.directories io.files.temp kernel
 locals sequences site-watcher.db tools.test webapps.utils ;
 IN: site-watcher.tests
 
-[ "site-watcher.db" temp-file delete-file ] ignore-errors
+"site-watcher.db" temp-file ?delete-file
 
 :: fake-sites ( -- seq )
     "site-watcher.db" <temp-sqlite-db> [

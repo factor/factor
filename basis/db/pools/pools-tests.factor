@@ -9,7 +9,7 @@ io.directories namespaces accessors kernel math destructors ;
 ! Test behavior after image save/load
 USE: db.sqlite
 
-[ "pool-test.db" temp-file delete-file ] ignore-errors
+"pool-test.db" temp-file ?delete-file
 
 { } [ "pool-test.db" temp-file <sqlite-db> <db-pool> "pool" set ] unit-test
 

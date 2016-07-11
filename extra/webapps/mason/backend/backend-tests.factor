@@ -2,7 +2,7 @@ USING: accessors calendar continuations db io.directories
 io.files.temp kernel tools.test webapps.mason.backend webapps.utils ;
 IN: webapps.mason.backend.tests
 
-[ "mason-test.db" temp-file delete-file ] ignore-errors
+"mason-test.db" temp-file ?delete-file
 
 { 0 1 2 } [
     ! Do it in a with-transaction to simulate semantics of

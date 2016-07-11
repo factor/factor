@@ -49,7 +49,7 @@ M: foo call-responder*
     <action>
         [ [ ] <text-content> exit-with ] >>display ;
 
-[ "auth-test.db" temp-file delete-file ] ignore-errors
+"auth-test.db" temp-file ?delete-file
 
 "auth-test.db" temp-file <sqlite-db> [
 
