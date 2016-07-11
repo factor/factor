@@ -185,8 +185,8 @@ M: md5-state checksum-block
             [ (process-md5-block-I) ]
         } 2cleave
     ] [
-        nip update-md5
-    ] 2bi ;
+        update-md5
+    ] bi ;
 
 : md5>checksum ( md5 -- bytes )
     state>> underlying>> byte-array>le ;
