@@ -17,7 +17,7 @@ ERROR: not-a-json-number string ;
             { "Infinity" [ 1/0. ] }
             { "-Infinity" [ -1/0. ] }
             { "NaN" [ 0/0. ] }
-            [ dup string>number [ nip ] [ not-a-json-number ] if* ]
+            [ dup string>number [ ] [ not-a-json-number ] ?if ]
         } case
     ] dip ;
 

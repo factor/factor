@@ -304,7 +304,7 @@ M: array-type field-type>c-type type>c-type ;
     [
         [
             dup find-existing-boxed-type
-            [ nip ] [ c-type>> defer-c-type ] if*
+            [ ] [ c-type>> defer-c-type ] ?if
         ]
         [ name>> qualified-name ] bi
         boxed-info new swap register-type
