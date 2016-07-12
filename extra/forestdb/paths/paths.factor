@@ -23,7 +23,7 @@ ERROR: not-an-fdb-filename string ;
 ERROR: not-a-string-number string ;
 
 : ?string>number ( string -- n )
-    dup string>number dup [ nip ] [ not-a-string-number ] if ;
+    dup string>number [ ] [ not-a-string-number ] ?if ;
 
 : change-string-number ( string quot -- string' )
     [ [ string>number ] dip call number>string ] 2keep drop

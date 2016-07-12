@@ -16,7 +16,7 @@ sequences.private strings tools.test ;
     CHAR: H 0 SBUF" hello world" [ set-nth ] keep first
 ] unit-test
 
-{ SBUF" x" } [ 1 <sbuf> CHAR: x >bignum over push ] unit-test
+{ SBUF" x" } [ 1 <sbuf> CHAR: x >bignum suffix! ] unit-test
 
 { fixnum } [ 1 >bignum SBUF" " new-sequence length class-of ] unit-test
 

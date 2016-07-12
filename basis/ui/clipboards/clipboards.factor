@@ -22,7 +22,7 @@ M: clipboard set-clipboard-contents contents<< ;
 GENERIC: paste-clipboard ( gadget clipboard -- )
 
 M: object paste-clipboard
-    clipboard-contents dup [ swap user-input ] [ 2drop ] if ;
+    clipboard-contents [ swap user-input ] [ drop ] if* ;
 
 GENERIC: copy-clipboard ( string gadget clipboard -- )
 
