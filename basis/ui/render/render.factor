@@ -92,7 +92,7 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
     [ { 0 0 } ] dip dim>> gl-fill-rect ;
 
 : draw-standard-background ( object -- )
-    dup interior>> dup [ draw-interior ] [ 2drop ] if ;
+    dup interior>> [ draw-interior ] [ drop ] if* ;
 
 : draw-background ( gadget -- )
     origin get [
