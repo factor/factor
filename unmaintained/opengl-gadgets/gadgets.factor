@@ -34,7 +34,7 @@ C: <entry> cache-entry
 
 : get-entry ( gadget -- {texture,dims} )
     dup cache-key* textures get at
-    [ nip ] [ make-entry ] if* ;
+    [ ] [ make-entry ] ?if ;
 
 : get-dims ( gadget -- dims )
     get-entry dims>> ;

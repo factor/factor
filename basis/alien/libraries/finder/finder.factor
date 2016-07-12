@@ -19,6 +19,6 @@ HOOK: find-library* os ( name -- path/f )
 ! or "library_not_found" as a last resort for better debugging.
 : find-library-from-list ( seq -- path/f )
     dup [ find-library* ] map-find drop
-    [ nip ] [ ?first "library_not_found" or ] if* ;
+    [ ] [ ?first "library_not_found" or ] ?if ;
 
 "alien.libraries.finder." os name>> append require

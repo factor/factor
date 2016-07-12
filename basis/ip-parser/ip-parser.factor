@@ -59,7 +59,7 @@ ERROR: more-than-8-components ;
 <PRIVATE
 
 : ipv6-component ( str -- n )
-    dup hex> [ nip ] [ bad-ipv6-component ] if* ;
+    dup hex> [ ] [ bad-ipv6-component ] ?if ;
 
 : split-ipv6 ( string -- seq )
     ":" split CHAR: . over last member? [ unclip-last ] [ f ] if

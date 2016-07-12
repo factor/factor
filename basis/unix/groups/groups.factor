@@ -51,7 +51,7 @@ PRIVATE>
     ] [
         group-struct [ gr_name>> ] [ f ] if*
     ] if*
-    [ nip ] [ number>string ] if* ;
+    [ ] [ number>string ] ?if ;
 
 : group-id ( string -- id/f )
     group-struct dup [ gr_gid>> ] when ;

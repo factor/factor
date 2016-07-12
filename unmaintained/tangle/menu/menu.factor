@@ -13,7 +13,7 @@ RELATION: before
     get-menus [ node-content = ] with find nip ;
 
 : ensure-menu ( name -- node )
-    dup get-menu [ nip ] [ create-node ] if* ;
+    dup get-menu [ ] [ create-node ] ?if ;
 
 : load-menu ( name -- menu )
     get-menu subitem-of-relation get-node-tree-s ;
