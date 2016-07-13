@@ -8,6 +8,7 @@
 ;; Factor indentation using the SMIE framework.
 
 ;;; Code:
+(require 'smie)
 
 (defcustom factor-block-offset 4
   "Indentation of Factor statements."
