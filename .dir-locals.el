@@ -11,4 +11,4 @@
                         (c-set-offset 'member-init-intro '++)
                         (c-set-offset 'statement-cont '++)
                         (c-set-offset 'arglist-intro '++)))))
- (factor-mode . ((factor-indent-level . 4))))
+ (factor-mode . ((factor-block-offset . 4))))
