@@ -18,6 +18,13 @@ M: simple-lint-error error. summary print ;
 SYMBOL: vocabs-quot
 SYMBOL: vocab-articles
 
+: no-ui-disposables ( seq -- seq' )
+    [
+        class-of name>> {
+            "line" "single-texture" "multi-texture"
+        } member?
+    ] reject ;
+
 : check-example ( element -- )
     [
         '[
@@ -28,11 +35,7 @@ SYMBOL: vocab-articles
             ] keep
             last assert=
         ] vocabs-quot get call( quot -- )
-    ] leaks members [
-        class-of name>> {
-            "line" "single-texture" "multi-texture"
-        } member?
-    ] reject length [
+    ] leaks members no-ui-disposables length [
         "%d disposable(s) leaked in example" sprintf simple-lint-error
     ] unless-zero ;
 
