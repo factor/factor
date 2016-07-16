@@ -16,7 +16,6 @@ M: simple-lint-error summary message>> ;
 M: simple-lint-error error. summary print ;
 
 SYMBOL: vocabs-quot
-SYMBOL: all-vocabs-list
 SYMBOL: vocab-articles
 
 : check-example ( element -- )
@@ -29,7 +28,11 @@ SYMBOL: vocab-articles
             ] keep
             last assert=
         ] vocabs-quot get call( quot -- )
-    ] leaks members length [
+    ] leaks members [
+        class-of name>> {
+            "line" "single-texture" "multi-texture"
+        } member?
+    ] reject length [
         "%d disposable(s) leaked in example" sprintf simple-lint-error
     ] unless-zero ;
 
@@ -108,9 +111,6 @@ SYMBOL: vocab-articles
 : check-see-also ( element -- )
     \ $see-also swap elements [ rest all-unique? ] all?
     [ "$see-also are not unique" simple-lint-error ] unless ;
-
-: vocab-exists? ( name -- ? )
-    [ lookup-vocab ] [ all-vocabs-list get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [
