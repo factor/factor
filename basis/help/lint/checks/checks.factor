@@ -21,7 +21,10 @@ SYMBOL: vocab-articles
 : no-ui-disposables ( seq -- seq' )
     [
         class-of name>> {
-            "line" "single-texture" "multi-texture"
+            "single-texture" "multi-texture" ! opengl.textures
+            "line" ! core-text
+            "layout" ! ui.text.pango
+            "script-string" ! windows.uniscribe
         } member?
     ] reject ;
 
