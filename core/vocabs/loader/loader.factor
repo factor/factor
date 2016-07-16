@@ -55,6 +55,9 @@ PRIVATE>
         ] if
     ] cache ;
 
+: vocab-exists? ( name -- ? )
+    dup lookup-vocab [ ] [ find-vocab-root ] ?if ;
+
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
 
