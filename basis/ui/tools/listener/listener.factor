@@ -44,9 +44,6 @@ M: interactor manifest>>
         manifest swap assoc-stack
     ] if ;
 
-: vocab-exists? ( name -- ? )
-    '[ _ { [ lookup-vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
-
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
 M: vocab-completion (word-at-caret)
