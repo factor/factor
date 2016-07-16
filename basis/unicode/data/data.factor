@@ -51,7 +51,7 @@ CONSTANT: categories {
 <PRIVATE
 
 MEMO: categories-map ( -- hashtable )
-    categories <enum> [ swap ] H{ } assoc-map-as ;
+    categories H{ } zip-index-as ;
 
 CONSTANT: num-chars 0x2FA1E
 

@@ -6,7 +6,7 @@ regexp.transition-tables sequences sets sorting ;
 IN: regexp.minimize
 
 : table>state-numbers ( table -- assoc )
-    transitions>> keys <enum> [ swap ] H{ } assoc-map-as ;
+    transitions>> keys H{ } zip-index-as ;
 
 : number-states ( table -- newtable )
     dup table>state-numbers transitions-at ;
