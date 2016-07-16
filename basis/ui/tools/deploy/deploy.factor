@@ -5,7 +5,7 @@ tools.deploy.config.editor tools.deploy vocabs namespaces
 models.mapping sequences system accessors fry ui.gadgets ui.render
 ui.gadgets.packs ui.gadgets.labels ui.gadgets.editors ui.gadgets.borders ui.gadgets.buttons ui.gadgets.toolbar ui.gestures ui.commands assocs
 ui.gadgets.tracks ui ui.tools.listener ui.tools.browser
-ui.gadgets.worlds ;
+ui.tools.common ui.gadgets.worlds ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget < pack vocab settings ;
@@ -110,7 +110,7 @@ deploy-gadget "toolbar" f {
 
 : deploy-tool ( vocab -- )
     vocab-name
-    [ <deploy-gadget> { 10 10 } <border> ]
+    [ <deploy-gadget> { 10 10 } <border> white-interior ]
     [
         <world-attributes>
             swap "Deploying “" "”" surround >>title
