@@ -81,8 +81,11 @@ M: real pprint*
         [ unsupported-number-base ]
     } case ;
 
+: payload-nan? ( f -- ? )
+    dup fp-nan? [ fp-nan-payload 0x8000000000000 = not ] [ drop f ] if ;
+
 M: float pprint*
-    dup fp-nan? [
+    dup payload-nan? [
         \ NAN: [ double>bits >hex text ] pprint-prefix
     ] [
         call-next-method
