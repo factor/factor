@@ -630,6 +630,14 @@ M: field pref-dim*
     [ [ line-gadget-width ] [ drop second ] 2bi 2array ]
     tri border-pref-dim ;
 
+: next-focus ( gadget -- ) focus-next>> [ request-focus ] when* ;
+: prev-focus ( gadget -- ) focus-prev>> [ request-focus ] when* ;
+
+field H{
+    { T{ key-down f f "TAB" } [ next-focus ] }
+    { T{ key-down f { S+ } "TAB" } [ prev-focus ] }
+} set-gestures
+
 TUPLE: model-field < field field-model ;
 
 : <model-field> ( model -- gadget )
@@ -691,3 +699,5 @@ M: action-field default-text<< editor>> default-text<< ;
 action-field H{
     { T{ key-down f f "RET" } [ invoke-action-field ] }
 } set-gestures
+
+M: field focus-chainable? drop t ;
