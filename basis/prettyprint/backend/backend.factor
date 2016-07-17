@@ -82,8 +82,8 @@ M: real pprint*
     } case ;
 
 : nan-with-payload? ( f -- ? )
-    [ fp-nan? ] [ 0/0. fp-bitwise= not ]
-    bi and ; inline
+    [ fp-nan? ] [ 0/0. fp-bitwise= not ] [ -0/0. fp-bitwise= not ]
+    tri and and ; inline
 
 M: float pprint*
     dup nan-with-payload? [

@@ -21,6 +21,7 @@ IN: prettyprint.tests
 { "1267650600228229401496703205376" } [ 1 100 shift unparse ] unit-test
 { "NAN: 7ff80000deafbeef" } [ NAN: 7ff80000deafbeef unparse ] unit-test
 { "0/0." } [ 0/0. unparse ] unit-test
+{ "-0/0." } [ -0/0. unparse ] unit-test
 
 { "+" } [ \ + unparse ] unit-test
 

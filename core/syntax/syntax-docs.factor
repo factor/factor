@@ -97,7 +97,8 @@ ARTICLE: "syntax-floats" "Float syntax"
 { $table
 { "Positive infinity" { $snippet "1/0." } }
 { "Negative infinity" { $snippet "-1/0." } }
-{ "Not-a-number" { $snippet "0/0." } }
+{ "Not-a-number (positive)" { $snippet "0/0." } }
+{ "Not-a-number (negative)" { $snippet "-0/0." } }
 }
 "A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
