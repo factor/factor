@@ -169,12 +169,20 @@ CONSTANT: min-magnitude-2 -1074
         [ make-float-bin-exponent ]
     } cond ;
 
+: bignum-neg ( n -- -n )
+    dup first-bignum bignum=
+    [ drop most-negative-fixnum ] [ neg ] if ; inline
+
+: nan-neg ( n -- -n )
+    double>bits 63 2^ bitxor bits>double ; inline
+
 : ?neg ( n/f -- -n/f )
     [
-        dup bignum? [
-            dup first-bignum bignum=
-            [ drop most-negative-fixnum ] [ neg ] if
-        ] [ neg ] if
+        {
+            { [ dup bignum? ] [ bignum-neg ] }
+            { [ dup fp-nan? ] [ nan-neg ] }
+            [ neg ]
+        } cond
     ] [ f ] if* ; inline
 
 : ?add-ratio ( m n/f -- m+n/f )
