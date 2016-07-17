@@ -563,7 +563,7 @@ PRIVATE>
 
 M: float >base
     {
-        { [ over fp-nan? ] [ 2drop "0/0." ] }
+        { [ over fp-nan? ] [ drop fp-sign "-0/0." "0/0." ? ] }
         { [ over 1/0. =  ] [ 2drop "1/0." ] }
         { [ over -1/0. = ] [ 2drop "-1/0." ] }
         { [ over  0.0 fp-bitwise= ] [ 2drop  "0.0" ] }
