@@ -5,14 +5,12 @@ accessors regexp.transition-tables regexp.parser
 regexp.classes regexp.negation ;
 IN: regexp.minimize.tests
 
-{ t } [ 1 2 H{ { { 1 2 } t } } same-partition? ] unit-test
-{ t } [ 2 1 H{ { { 1 2 } t } } same-partition? ] unit-test
-{ f } [ 2 3 H{ { { 1 2 } t } } same-partition? ] unit-test
+{ t } [ 1 2 HS{ { 1 2 } } same-partition? ] unit-test
+{ t } [ 2 1 HS{ { 1 2 } } same-partition? ] unit-test
+{ f } [ 2 3 HS{ { 1 2 } } same-partition? ] unit-test
 
 { H{ { 1 1 } { 2 1 } { 3 3 } { 4 3 } } }
-[ { { 1 1 } { 1 2 } { 2 2 } { 3 3 } { 3 4 } { 4 4 } } [ t ] H{ } map>assoc partition>classes ] unit-test
-
-{ { { 1 2 } { 3 4 } } } [ H{ { "elephant" 1 } { "tiger" 3 } } H{ { "elephant" 2 } { "tiger" 4 } } assemble-values ] unit-test
+[ HS{ { 1 1 } { 1 2 } { 2 2 } { 3 3 } { 3 4 } { 4 4 } } partition>classes ] unit-test
 
 : regexp-states ( string -- n )
     parse-regexp ast>dfa transitions>> assoc-size ;
@@ -51,8 +49,6 @@ IN: regexp.minimize.tests
         { final-states HS{ 3 6 } }
     } combine-states
 ] unit-test
-
-[ [ ] [ ] while-changes ] must-infer
 
 { H{ { T{ or-class f { 2 1 } } 3 } { 4 5 } } }
 [ H{ { 1 3 } { 2 3 } { 4 5 } } combine-state-transitions ] unit-test
