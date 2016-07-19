@@ -17,7 +17,7 @@ HELP: with-file-reader-progress
 { $examples
     "Loop through the Factor image file, discarding each character as it's read and updating a progress bar:"
     { $unchecked-example "USING: system progress-bars.models prettyprint io.encodings.binary threads ;
-image binary [
+image-path binary [
     [ 4096 read yield ] loop
 ] with-file-reader-progress"
 ""
