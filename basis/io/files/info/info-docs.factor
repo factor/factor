@@ -11,18 +11,18 @@ HELP: link-info
 { $description "Queries the file system for metadata. If " { $snippet "path" } " refers to a symbolic link, information about the symbolic link itself is returned.  See the article " { $link "file-types" } " for a list of metadata symbols." }
 { $errors "Throws an error if the file does not exist." } ;
 
-{ file-info link-info } related-words
+{ file-info link-info file-info-tuple } related-words
 
 HELP: directory?
-{ $values { "file-info" file-info } { "?" boolean } }
+{ $values { "file-info" file-info-tuple } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
 HELP: regular-file?
-{ $values { "file-info" file-info } { "?" boolean } }
+{ $values { "file-info" file-info-tuple } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a normal file." } ;
 
 HELP: symbolic-link?
-{ $values { "file-info" file-info } { "?" boolean } }
+{ $values { "file-info" file-info-tuple } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a symbolic link." } ;
 
 HELP: file-systems
