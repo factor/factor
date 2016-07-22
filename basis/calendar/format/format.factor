@@ -286,6 +286,9 @@ ERROR: invalid-timestamp-format ;
 : hms>timestamp ( str -- timestamp )
     [ (hms>timestamp) ] with-string-reader ;
 
+: hm>timestamp ( str -- timestamp )
+    ":00" append hms>timestamp ;
+
 : (ymd>timestamp) ( -- timestamp )
     read-ymd <date-gmt> ;
 
