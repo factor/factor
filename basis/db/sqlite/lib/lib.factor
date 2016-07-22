@@ -133,6 +133,24 @@ ERROR: sqlite-sql-error < sql-error n string ;
 : sqlite-column-name ( handle index -- string ) sqlite3_column_name ;
 : sqlite-column-type ( handle index -- string ) sqlite3_column_type ;
 
+
+: sqlite3-column-null ( sqlite n obj -- obj/f )
+    [ sqlite3_column_type SQLITE_NULL = f ] dip ? ; inline
+
+! sqlite_column_int returns 0 for both a ``0`` and for ``NULL``
+! so call sqlite3_column_type if it's 0
+: sqlite3-column-int ( handle index -- int/f )
+    2dup sqlite3_column_int dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
+
+: sqlite3-column-int64 ( handle index -- int/f )
+    2dup sqlite3_column_int64 dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
+
+: sqlite3-column-uint64 ( handle index -- int/f )
+    2dup sqlite3_column_uint64 dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
+
+: sqlite3-column-double ( handle index -- int/f )
+    2dup sqlite3_column_double dup 0.0 = [ sqlite3-column-null ] [ 2nip ] if ;
+
 : sqlite-column-blob ( handle index -- byte-array/f )
     [ sqlite3_column_bytes ] 2keep
     pick zero? [
@@ -146,12 +164,12 @@ ERROR: sqlite-sql-error < sql-error n string ;
     {
         { +db-assigned-id+ [ sqlite3_column_int64  ] }
         { +random-id+ [ sqlite3-column-uint64 ] }
-        { INTEGER [ sqlite3_column_int ] }
-        { BIG-INTEGER [ sqlite3_column_int64 ] }
-        { SIGNED-BIG-INTEGER [ sqlite3_column_int64 ] }
+        { INTEGER [ sqlite3-column-int ] }
+        { BIG-INTEGER [ sqlite3-column-int64 ] }
+        { SIGNED-BIG-INTEGER [ sqlite3-column-int64 ] }
         { UNSIGNED-BIG-INTEGER [ sqlite3-column-uint64 ] }
-        { BOOLEAN [ sqlite3_column_int 1 = ] }
-        { DOUBLE [ sqlite3_column_double ] }
+        { BOOLEAN [ sqlite3-column-int 1 = ] }
+        { DOUBLE [ sqlite3-column-double ] }
         { TEXT [ sqlite3_column_text ] }
         { VARCHAR [ sqlite3_column_text ] }
         { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
