@@ -151,6 +151,12 @@ uint64_t nano_count() {
   static uint32_t hi = 0;
   static uint32_t lo = 0;
 
+  // Note: on older systems QueryPerformanceCounter may be unreliable
+  // until you add /usepmtimer to Boot.ini. I had an issue where two
+  // nano_count calls would show a difference of about 1 second,
+  // while actually about 80 seconds have passed. The /usepmtimer
+  // switch cured the issue on that PC (WinXP Pro SP3 32-bit).
+  // See also http://www.virtualdub.org/blog/pivot/entry.php?id=106
   LARGE_INTEGER count;
   BOOL ret = QueryPerformanceCounter(&count);
   if (ret == 0)
