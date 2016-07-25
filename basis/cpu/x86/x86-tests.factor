@@ -2,7 +2,8 @@ USING: compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.registers compiler.codegen.gc-maps
 compiler.codegen.relocation cpu.architecture cpu.x86 cpu.x86.assembler
 cpu.x86.assembler.operands cpu.x86.features kernel kernel.private
-layouts make math math.libm namespaces sequences system tools.test ;
+layouts literals make math math.libm namespaces sequences system
+tools.test ;
 IN: cpu.x86.tests
 
 { } [
@@ -77,6 +78,13 @@ cpu x86.64? [
 ! %load-immediate
 { B{ 49 201 } } [
     [ RCX 0 %load-immediate ] B{ } make
+] unit-test
+
+! %prepare-varargs
+${
+    cpu x86.64? B{ 49 192 } B{ } ?
+} [
+    [ %prepare-var-args ] B{ } make
 ] unit-test
 
 ! %prologue

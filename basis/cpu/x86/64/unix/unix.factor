@@ -44,5 +44,3 @@ M: x86.64 dummy-stack-params? f ;
 M: x86.64 dummy-int-params? f ;
 
 M: x86.64 dummy-fp-params? f ;
-
-M: x86.64 %prepare-var-args RAX RAX XOR ;
