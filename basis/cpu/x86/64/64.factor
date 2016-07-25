@@ -112,7 +112,7 @@ M: x86.64 %end-callback ( -- )
     param-reg-0 vm-reg MOV
     "end_callback" f f %c-invoke ;
 
-M: x86.64 %prepare-var-args ( -- ) RAX RAX XOR ;
+M: x86.64 %prepare-var-args ( -- ) EAX EAX XOR ;
 
 M: x86.64 stack-cleanup 3drop 0 ;
 
