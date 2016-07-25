@@ -101,6 +101,11 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 "A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
+"To see the 64 bit value of " { $snippet "0/0." } " on your platform, execute the following code :"
+{ $code
+    "USING: io math math.parser ;"
+    "\"NAN: \" write 0/0. double>bits >hex print"
+}
 "Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
     "8.0 0x1.0p3 = ."

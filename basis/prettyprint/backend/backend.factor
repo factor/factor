@@ -81,8 +81,12 @@ M: real pprint*
         [ unsupported-number-base ]
     } case ;
 
+: nan-with-payload? ( f -- ? )
+    [ fp-nan? ] [ 0/0. fp-bitwise= not ]
+    bi and ; inline
+
 M: float pprint*
-    dup fp-nan? [
+    dup nan-with-payload? [
         \ NAN: [ double>bits >hex text ] pprint-prefix
     ] [
         number-base get {
