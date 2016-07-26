@@ -112,7 +112,7 @@ ARTICLE: "compositional-combinators" "Compositional combinators"
 { $subsections curry compose }
 "Derived operations:"
 { $subsections 2curry 3curry with prepose }
-"These operations run in constant time, and in many cases are optimized out altogether by the " { $link "compiler" } ". " { $link "fry" } " are an abstraction built on top of these operations, and code that uses this abstraction is often clearer than direct calls to the below words."
+"These operations run in constant time, and in many cases are optimized out altogether by the " { $link "compiler" } ". " { $link "fry" } " are an abstraction built on top of these operations, and code that uses this abstraction is often clearer than direct calls to the above words."
 $nl
 "Curried dataflow combinators can be used to build more complex dataflow by combining cleave, spread and apply patterns in various ways."
 { $subsections "curried-dataflow" }
