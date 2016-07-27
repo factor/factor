@@ -22,6 +22,7 @@ M: windows find-emacsclient
 M: emacsclient editor-command ( file line -- command )
     [
         emacsclient-path get [ find-emacsclient ] unless* ,
+        "-a=emacs" ,
         "--no-wait" ,
         number>string "+" prepend ,
         ,
