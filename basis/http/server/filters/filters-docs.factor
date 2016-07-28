@@ -2,7 +2,7 @@ USING: help.markup help.syntax http.server ;
 IN: http.server.filters
 
 HELP: filter-responder
-{ $description "The class of filter responders. This class is intended to be subclassed." } ;
+{ $class-description "The class of filter responders. This class is intended to be subclassed." } ;
 
 ARTICLE: "http.server.filters" "HTTP responder filters"
 "The " { $vocab-link "http.server.filters" } " vocabulary implements the common pattern where one responder wraps another, doing some processing before calling the wrapped responder."

@@ -28,7 +28,7 @@ $nl
 ABOUT: "byte-arrays"
 
 HELP: byte-array
-{ $description "The class of byte arrays. See " { $link "syntax-byte-arrays" } " for syntax and " { $link "byte-arrays" } " for general information." } ;
+{ $class-description "The class of byte arrays. See " { $link "syntax-byte-arrays" } " for syntax and " { $link "byte-arrays" } " for general information." } ;
 
 HELP: <byte-array>
 { $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }

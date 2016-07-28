@@ -22,7 +22,7 @@ $nl
 ABOUT: "byte-vectors"
 
 HELP: byte-vector
-{ $description "The class of resizable byte vectors. See " { $link "byte-vectors" } " for information." } ;
+{ $class-description "The class of resizable byte vectors. See " { $link "byte-vectors" } " for information." } ;
 
 HELP: <byte-vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "byte-vector" byte-vector } }

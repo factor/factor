@@ -245,7 +245,7 @@ HELP: undefined
 } ;
 
 HELP: primitive
-{ $description "The class of primitive words." } ;
+{ $class-description "The class of primitive words." } ;
 
 HELP: word-prop
 { $values { "word" word } { "name" "a property name" } { "value" "a property value" } }

@@ -22,7 +22,7 @@ $nl
 ABOUT: "bit-vectors"
 
 HELP: bit-vector
-{ $description "The class of resizable bit vectors. See " { $link "bit-vectors" } " for information." } ;
+{ $class-description "The class of resizable bit vectors. See " { $link "bit-vectors" } " for information." } ;
 
 HELP: <bit-vector>
 { $values { "capacity" "a positive integer specifying initial capacity" } { "vector" bit-vector } }
