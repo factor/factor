@@ -28,7 +28,7 @@ $nl
 ABOUT: "vectors"
 
 HELP: vector
-{ $description "The class of resizable vectors. See " { $link "syntax-vectors" } " for syntax and " { $link "vectors" } " for general information." } ;
+{ $class-description "The class of resizable vectors. See " { $link "syntax-vectors" } " for syntax and " { $link "vectors" } " for general information." } ;
 
 HELP: <vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "vector" vector } }

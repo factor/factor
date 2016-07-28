@@ -27,7 +27,7 @@ $nl
 ABOUT: "strings"
 
 HELP: string
-{ $description "The class of fixed-length character strings. See " { $link "syntax-strings" } " for syntax and " { $link "strings" } " for general information." } ;
+{ $class-description "The class of fixed-length character strings. See " { $link "syntax-strings" } " for syntax and " { $link "strings" } " for general information." } ;
 
 HELP: string-nth
 { $values { "n" fixnum } { "string" string } { "ch" "the character at the " { $snippet "n" } "th index" } }
