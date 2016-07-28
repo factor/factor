@@ -253,11 +253,12 @@ HELP: [-1,1]?
 
 HELP: abs
 { $values { "x" number } { "y" "a non-negative real number" } }
-{ $description "Computes the absolute value of a complex number." } ;
+{ $description "Computes the absolute value of a number." }
+{ $see-also absq } ;
 
 HELP: absq
 { $values { "x" number } { "y" "a non-negative real number" } }
-{ $description "Computes the squared absolute value of a complex number. This is marginally more efficient than " { $link abs } "." } ;
+{ $description "Computes the squared absolute value of a number. For complex numbers this is marginally more efficient than " { $link abs } "." } ;
 
 HELP: ^
 { $values { "x" number } { "y" number } { "z" number } }
