@@ -58,7 +58,7 @@ ARTICLE: "hashtables.utilities" "Hashtable utilities"
 ABOUT: "hashtables"
 
 HELP: hashtable
-{ $description "The class of hashtables. See " { $link "syntax-hashtables" } " for syntax and " { $link "hashtables" } " for general information." } ;
+{ $class-description "The class of hashtables. See " { $link "syntax-hashtables" } " for syntax and " { $link "hashtables" } " for general information." } ;
 
 HELP: hash@
 { $values { "key" "a key" } { "array" "the underlying array of a hashtable" } { "i" "the index to begin hashtable search" } }
