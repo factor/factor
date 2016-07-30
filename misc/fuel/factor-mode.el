@@ -449,6 +449,7 @@ these lines in your .emacs:
     ,(factor-syntax factor-declaration-words-regex '("C"))
     ,(factor-syntax factor-word-definition-regex '("P" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
+    ,(factor-syntax (syntax-and-2-symbols '("LOG")) '("P" "W" ""))
     ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
     ,(factor-syntax factor-types-lines-regex '("P" "T"))
     ,(factor-syntax factor-integer-regex '("N"))
@@ -479,14 +480,18 @@ these lines in your .emacs:
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-parsing-word nil t)
      (4 'factor-font-lock-type-name nil t)
-     ;; A slot is either a single symbol or a sequence along the
-     ;; lines: { foo initial: "bar }
+     ;; This allows three different slot styles:
+     ;; 1) foo 2) { foo initial: 123 } 3) { foo initial: { 123 } }
      (,(format
-        "\\(?:{[ \n]+%s[^}]+\\)}\\|%s" symbol symbol)
+        "{%s%s[^}]+}%s}\\|{%s%s[^}]+}\\|%s"
+        ws+ symbol ws+
+        ws+ symbol
+        symbol)
       (factor-find-end-of-def)
       nil
       (1 'factor-font-lock-symbol nil t)
-      (2 'factor-font-lock-symbol nil t)))
+      (2 'factor-font-lock-symbol nil t)
+      (3 'factor-font-lock-symbol nil t)))
     ,(factor-syntax factor-predicate-regex '("P" "T" "P" "T"))
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.

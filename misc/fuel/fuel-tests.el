@@ -52,5 +52,6 @@
              (fuel-help--find-in))
            "foob")))
 
+;; fuel-xref
 (ert-deftest fuel-xref-name ()
   (should (equal (buffer-name (fuel-xref--buffer)) "*fuel xref*")))
