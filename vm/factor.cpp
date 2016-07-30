@@ -9,7 +9,7 @@ void init_globals() { init_mvm(); }
 void factor_vm::prepare_boot_image() {
   std::cout << "*** Stage 2 early init... " << std::flush;
 
-  // Compile all words.
+  /* Compile all words. */
   data_root<array> words(instances(WORD_TYPE), this);
 
   cell n_words = array_capacity(words.untagged());
@@ -21,7 +21,7 @@ void factor_vm::prepare_boot_image() {
   }
   update_code_heap_words(true);
 
-  // Initialize all quotations
+  /* Initialize all quotations */
   data_root<array> quotations(instances(QUOTATION_TYPE), this);
 
   cell n_quots = array_capacity(quotations.untagged());
