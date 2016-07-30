@@ -140,4 +140,4 @@ inspector-gadget "multi-touch" f {
 : inspector ( obj -- )
     <model> inspect-model ;
 
-{ 550 400 } inspector-gadget set-tool-dim
+inspector-gadget { 550 400 } set-tool-dim

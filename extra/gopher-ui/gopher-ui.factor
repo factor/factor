@@ -13,7 +13,7 @@ IN: gopher-ui
 
 TUPLE: gopher-gadget < tool history scroller url-field ;
 
-{ 600 600 } gopher-gadget set-tool-dim
+gopher-gadget { 600 600 } set-tool-dim
 
 M: gopher-gadget history-value
     [ control-value ] [ scroller>> scroll-position ]
