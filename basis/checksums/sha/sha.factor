@@ -23,7 +23,7 @@ INSTANCE: sha-256 sha
 
 <PRIVATE
 
-TUPLE: sha1-state < checksum-state
+TUPLE: sha1-state < block-checksum-state
 { K uint-array }
 { H uint-array }
 { W uint-array }
@@ -47,7 +47,7 @@ CONSTANT: K-sha1
         4 uint-array{ } nappend-as
     ]
 
-TUPLE: sha2-state < checksum-state
+TUPLE: sha2-state < block-checksum-state
 { K uint-array }
 { H uint-array }
 { word-size fixnum } ;

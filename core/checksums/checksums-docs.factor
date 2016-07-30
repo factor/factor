@@ -55,15 +55,22 @@ $nl
     checksum-bytes
     checksum-stream
     checksum-lines
+    checksum-file
 }
 "Checksums should implement at least one of " { $link checksum-bytes } " and " { $link checksum-stream } ". Implementing " { $link checksum-lines } " is optional."
 $nl
-"Utilities:"
+"Checksums can also implement a stateful checksum protocol that allows users to push bytes when needed and then at a later point request the checksum value. The default implementation is not very efficient, storing all of the bytes and then calling " { $link checksum-bytes } " when " { $link get-checksum } " is requested."
+$nl
 { $subsections
-    checksum-file
+    initialize-checksum-state
+    add-checksum-bytes
+    add-checksum-stream
+    add-checksum-lines
+    add-checksum-file
+    get-checksum
 }
 "Checksum implementations:"
-{ $subsections "checksums.crc32" }
+{ $vocab-subsection "CRC32 checksum" "checksums.crc32" }
 { $vocab-subsection "MD5 checksum" "checksums.md5" }
 { $vocab-subsection "SHA checksums" "checksums.sha" }
 { $vocab-subsection "Adler-32 checksum" "checksums.adler-32" }

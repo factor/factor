@@ -1,14 +1,15 @@
 ! Copyright (C) 2008, 2010, 2016 Slava Pestov, Alexander Ilin
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data checksums destructors
-io kernel openssl openssl.libcrypto sequences ;
+USING: accessors alien.c-types alien.data checksums
+checksums.common destructors kernel openssl openssl.libcrypto
+sequences ;
 IN: checksums.openssl
 
 ERROR: unknown-digest name ;
 
 TUPLE: openssl-checksum name ;
 
-INSTANCE: openssl-checksum checksum
+INSTANCE: openssl-checksum block-checksum
 
 CONSTANT: openssl-md5 T{ openssl-checksum f "md5" }
 
@@ -33,29 +34,16 @@ M: evp-md-context dispose*
 : set-digest ( name ctx -- )
     handle>> swap digest-named f EVP_DigestInit_ex ssl-error ;
 
-: with-evp-md-context ( ... checksum quot: ( ... ctx -- ... ) -- ... )
-    [
-        maybe-init-ssl name>> <evp-md-context>
-        [ set-digest ] keep
-    ] dip with-disposal ; inline
+M: openssl-checksum initialize-checksum-state ( checksum -- evp-md-context )
+    maybe-init-ssl name>> <evp-md-context> [ set-digest ] keep ;
 
-: digest-value ( ctx -- value )
+M: evp-md-context add-checksum-bytes ( ctx bytes -- ctx' )
+    [ dup handle>> ] dip dup length EVP_DigestUpdate ssl-error ;
+
+M: evp-md-context get-checksum ( ctx -- value )
     handle>>
     { { int EVP_MAX_MD_SIZE } int }
     [ EVP_DigestFinal_ex ssl-error ] with-out-parameters
     memory>byte-array ;
 
-: digest-update ( ctx bytes -- ctx )
-    [ dup handle>> ] dip dup length EVP_DigestUpdate ssl-error ;
-
 PRIVATE>
-
-M: openssl-checksum checksum-bytes
-    [ swap digest-update digest-value ] with-evp-md-context ;
-
-M: openssl-checksum checksum-stream
-    [
-        swap
-        [ [ digest-update ] each-block ] with-input-stream
-        digest-value
-    ] with-evp-md-context ;
