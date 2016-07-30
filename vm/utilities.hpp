@@ -1,6 +1,6 @@
 namespace factor {
 
-// Poor mans range-based for loops.
+/* Poor man's range-based for-loops. */
 #define FACTOR_FOR_EACH(iterable)                               \
   for (auto iter = (iterable).begin(),    \
            _end = (iterable).end();                             \
