@@ -54,6 +54,20 @@ HOOK: (directory-entries) os ( path -- seq )
 : with-directory-files ( path quot -- )
     '[ "" directory-files @ ] with-directory ; inline
 
+: qualified-directory-entries ( path -- seq )
+    absolute-path
+    dup directory-entries [ [ append-path ] change-name ] with map! ;
+
+: qualified-directory-files ( path -- seq )
+    absolute-path
+    dup directory-files [ append-path ] with map! ;
+
+: with-qualified-directory-files ( path quot -- )
+    '[ "" qualified-directory-files @ ] with-directory ; inline
+
+: with-qualified-directory-entries ( path quot -- )
+    '[ "" qualified-directory-entries @ ] with-directory ; inline
+
 ! Touching files
 HOOK: touch-file io-backend ( path -- )
 
