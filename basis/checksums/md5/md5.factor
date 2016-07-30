@@ -11,7 +11,7 @@ SINGLETON: md5
 
 INSTANCE: md5 block-checksum
 
-TUPLE: md5-state < checksum-state
+TUPLE: md5-state < block-checksum-state
 { state uint-array }
 { old-state uint-array } ;
 
