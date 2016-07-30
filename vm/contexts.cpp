@@ -140,9 +140,9 @@ VM_C_API void delete_context(factor_vm* parent) {
 /* Allocates memory (init_context()) */
 VM_C_API void reset_context(factor_vm* parent) {
 
-  // The function is used by (start-context-and-delete) which expects
-  // the top two datastack items to be preserved after the context has
-  // been resetted.
+  /* The function is used by (start-context-and-delete) which expects
+     the top two datastack items to be preserved after the context has
+     been reset. */
 
   context* ctx = parent->ctx;
   cell arg1 = ctx->pop();

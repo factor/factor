@@ -35,7 +35,7 @@ data_heap::data_heap(bump_allocator* vm_nursery,
   aging = new aging_space(aging_size, tenured->end);
   aging_semispace = new aging_space(aging_size, aging->end);
 
-  // Initialize vm nursery
+  /* Initialize vm nursery */
   vm_nursery->here = aging_semispace->end;
   vm_nursery->start = aging_semispace->end;
   vm_nursery->end = vm_nursery->start + young_size;
