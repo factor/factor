@@ -1,15 +1,21 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs combinators formatting fry grouping
-hashtables io io.binary io.directories io.encodings.binary
-io.files kernel math math.parser memoize pack sequences
-sequences.generalizations splitting strings system ;
+USING: accessors assocs combinators formatting fry grouping hashtables
+io io.binary io.directories io.encodings.binary io.files
+io.files.types io.pathnames kernel math math.parser memoize pack
+sequences sequences.generalizations splitting strings system ;
 
 IN: terminfo
 
 ! Reads compiled terminfo files
-! typically located in /usr/share/terminfo
+! typically located in any of the directories below.
+CONSTANT: TERMINFO-DIRS {
+    "~/.terminfo"
+    "/etc/terminfo"
+    "/lib/terminfo"
+    "/usr/share/terminfo"
+}
 
 <PRIVATE
 
@@ -69,18 +75,27 @@ PRIVATE>
 : file>terminfo ( path -- terminfo )
     binary [ read-terminfo ] with-file-reader ;
 
-HOOK: terminfo-path os ( name -- path )
+HOOK: terminfo-relative-path os ( name -- path )
 
-M: macosx terminfo-path ( name -- path )
-    [ first >hex ] keep "/usr/share/terminfo/%s/%s" sprintf ;
+M: macosx terminfo-relative-path ( name -- path )
+    [ first >hex ] keep "%s/%s" sprintf ;
 
-M: linux terminfo-path ( name -- path )
-    [ first ] keep "/usr/share/terminfo/%c/%s" sprintf ;
+M: linux terminfo-relative-path ( name -- path )
+    [ first ] keep "%c/%s" sprintf ;
+
+: terminfo-path ( name -- path )
+    terminfo-relative-path TERMINFO-DIRS [ swap append-path ] with map
+    [ exists? ] find nip ;
+
+: terminfo-names-for-path ( path -- names )
+    [
+        [ type>> +directory+ = ] filter
+        [ name>> directory-files ] map concat
+    ] with-directory-entries ;
 
 MEMO: terminfo-names ( -- names )
-    "/usr/share/terminfo" [
-        [ directory-files ] map concat
-    ] with-directory-files ;
+    TERMINFO-DIRS [ exists? ] filter
+    [ terminfo-names-for-path ] map concat ;
 
 <PRIVATE
 
