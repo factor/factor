@@ -1,8 +1,6 @@
 USING: accessors ;
 IN: strange
 
-TUPLE: oh\no { and/again initial: "meh" } ;
-
 ! FUEL Syntax Demo
 !
 ! The purpose of this file is to test that corner cases are
@@ -12,11 +10,12 @@ TUPLE: oh\no { and/again initial: "meh" } ;
 USING: alien.syntax kernel math ;
 IN: strange-syntax
 
-TUPLE: a-tuple slot1 slot2 { slot3 integer } ;
+TUPLE: a-tuple slot1 slot2 { slot3 integer } { slot4 initial: "hi" } ;
   TUPLE: second-one ;
 
     USING: tools.test ;
 
+TUPLE: initial-array { slot2 initial: { 123 } } slot3 ;
 
 ! ! Strings
 "containing \"escapes" drop
@@ -36,6 +35,8 @@ TUPLE: tup
 
 : slash\hack ( m -- y )
     get\it>> dup >>get\it ;
+
+LOG: what ever
 
 TUPLE: oh\no { and/again initial: "meh" } ;
 
