@@ -190,7 +190,7 @@ M: interactor dispose drop ;
 
 TUPLE: listener-gadget < tool error-summary output scroller input ;
 
-{ 600 700 } listener-gadget set-tool-dim
+listener-gadget { 600 700 } set-tool-dim
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;

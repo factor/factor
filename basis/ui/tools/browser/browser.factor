@@ -16,7 +16,7 @@ IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
 
-{ 650 700 } browser-gadget set-tool-dim
+browser-gadget { 650 700 } set-tool-dim
 
 M: browser-gadget history-value
     [ control-value ] [ scroller>> scroll-position ]
