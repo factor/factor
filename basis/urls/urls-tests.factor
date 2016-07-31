@@ -1,95 +1,121 @@
-USING: accessors arrays assocs io.sockets io.sockets.secure
-kernel linked-assocs present prettyprint tools.test urls ;
+USING: accessors arrays assocs io.sockets io.sockets.secure kernel
+linked-assocs present prettyprint sequences tools.test urls ;
 IN: urls.tests
 
-CONSTANT: urls
+CONSTANT: urls {
     {
-        {
-            T{ url
-                { protocol "http" }
-                { host "www.apple.com" }
-                { port 1234 }
-                { path "/a/path" }
-                { query LH{ { "a" "b" } } }
-                { anchor "foo" }
-            }
-            "http://www.apple.com:1234/a/path?a=b#foo"
-        }
-        {
-            T{ url
-                { protocol "http" }
-                { host "www.apple.com" }
-                { path "/a/path" }
-                { query LH{ { "a" "b" } } }
-                { anchor "foo" }
-            }
-            "http://www.apple.com/a/path?a=b#foo"
-        }
-        {
-            T{ url
-                { protocol "http" }
-                { host "www.apple.com" }
-                { port 1234 }
-                { path "/another/fine/path" }
-                { anchor "foo" }
-            }
-            "http://www.apple.com:1234/another/fine/path#foo"
-        }
-        {
-            T{ url
-                { path "/a/relative/path" }
-                { anchor "foo" }
-            }
-            "/a/relative/path#foo"
-        }
-        {
-            T{ url
-                { path "/a/relative/path" }
-            }
-            "/a/relative/path"
-        }
-        {
-            T{ url
-                { path "a/relative/path" }
-            }
-            "a/relative/path"
-        }
-        {
-            T{ url
-                { path "bar" }
-                { query LH{ { "a" "b" } } }
-            }
-            "bar?a=b"
-        }
-        {
-            T{ url
-                { protocol "ftp" }
-                { host "ftp.kernel.org" }
-                { username "slava" }
-                { path "/" }
-            }
-            "ftp://slava@ftp.kernel.org/"
-        }
-        {
-            T{ url
-                { protocol "ftp" }
-                { host "ftp.kernel.org" }
-                { username "slava" }
-                { password "secret" }
-                { path "/" }
-            }
-            "ftp://slava:secret@ftp.kernel.org/"
-        }
-        {
-            T{ url
-               { protocol "http" }
-               { host "foo.com" }
-               { path "/" }
-               { query LH{ { "a" f } } }
-            }
-            "http://foo.com/?a"
-        }
+        T{ url
+           { protocol "http" }
+           { host "www.apple.com" }
+           { port 1234 }
+           { path "/a/path" }
+           { query LH{ { "a" "b" } } }
+           { anchor "foo" }
+         }
+        "http://www.apple.com:1234/a/path?a=b#foo"
     }
+    {
+        T{ url
+           { protocol "http" }
+           { host "www.apple.com" }
+           { path "/a/path" }
+           { query LH{ { "a" "b" } } }
+           { anchor "foo" }
+         }
+        "http://www.apple.com/a/path?a=b#foo"
+    }
+    {
+        T{ url
+           { protocol "http" }
+           { host "www.apple.com" }
+           { port 1234 }
+           { path "/another/fine/path" }
+           { anchor "foo" }
+         }
+        "http://www.apple.com:1234/another/fine/path#foo"
+    }
+    {
+        T{ url
+           { path "/a/relative/path" }
+           { anchor "foo" }
+         }
+        "/a/relative/path#foo"
+    }
+    {
+        T{ url
+           { path "/a/relative/path" }
+         }
+        "/a/relative/path"
+    }
+    {
+        T{ url
+           { path "a/relative/path" }
+         }
+        "a/relative/path"
+    }
+    {
+        T{ url
+           { path "bar" }
+           { query LH{ { "a" "b" } } }
+         }
+        "bar?a=b"
+    }
+    {
+        T{ url
+           { protocol "ftp" }
+           { host "ftp.kernel.org" }
+           { username "slava" }
+           { path "/" }
+         }
+        "ftp://slava@ftp.kernel.org/"
+    }
+    {
+        T{ url
+           { protocol "ftp" }
+           { host "ftp.kernel.org" }
+           { username "slava" }
+           { password "secret" }
+           { path "/" }
+         }
+        "ftp://slava:secret@ftp.kernel.org/"
+    }
+    {
+        T{ url
+           { protocol "http" }
+           { host "foo.com" }
+           { path "/" }
+           { query LH{ { "a" f } } }
+         }
+        "http://foo.com/?a"
+    }
+    ! Capital letters, digits, hyphen, plus and period are allowed
+    ! characters in the scheme
+    ! part. https://tools.ietf.org/html/rfc1738#section-5
+    {
+        T{ url
+           { protocol "foo.bar" }
+           { host "www.google.com" }
+           { path "/" }
+         }
+        "foo.bar://www.google.com/"
+    }
+    {
+        T{ url
+           { protocol "foo.-bar" }
+           { host "www.google.com" }
+           { path "/" }
+         }
+        "foo.-bar://www.google.com/"
+    }
+    {
+        T{ url
+           { protocol "t1000" }
+           { host "www.google.com" }
+           { path "/" }
+         }
+        "t1000://www.google.com/"
+    }
+}
 
 urls [
     [ 1array ] [ [ >url ] curry ] bi* unit-test
@@ -292,4 +318,10 @@ urls [
     "bar" "bar" set-query-param
     "baz" "baz" set-query-param
     present
+] unit-test
+
+! Scheme characters are
+! case-insensitive. https://tools.ietf.org/html/rfc3986#section-3.1
+{ URL" http://www.google.com/" } [
+    URL" http://www.google.com/"
 ] unit-test

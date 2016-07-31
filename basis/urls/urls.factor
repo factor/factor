@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry io.pathnames
+USING: accessors arrays ascii assocs combinators fry io.pathnames
 io.sockets io.sockets.secure kernel lexer linked-assocs make
 math.parser namespaces peg.ebnf present sequences splitting
 strings strings.parser urls.encoding vocabs.loader ;
@@ -37,7 +37,7 @@ M: url >url ;
 
 EBNF: parse-url
 
-protocol = [a-z+]+                  => [[ url-decode ]]
+protocol = [a-zA-Z0-9.+-]+          => [[ url-decode ]]
 username = [^/:@#?]+                => [[ url-decode ]]
 password = [^/:@#?]+                => [[ url-decode ]]
 pathname = [^#?]+                   => [[ url-decode ]]
@@ -66,7 +66,7 @@ M: string >url
     parse-url {
         [
             first [
-                [ first >>protocol ]
+                [ first >lower >>protocol ]
                 [
                     second
                     [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
