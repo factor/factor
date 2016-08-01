@@ -59,9 +59,6 @@ M: double-rep next-reg-param
 : init-regs ( regs -- )
     [ <reversed> >vector swap set ] assoc-each ;
 
-: with-param-regs ( abi quot -- )
-    '[ param-regs init-regs 0 stack-params set @ ] with-scope ; inline
-
 SYMBOLS: stack-values reg-values ;
 
 :: next-parameter ( vreg rep on-stack? odd-register? -- )
