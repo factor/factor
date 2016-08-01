@@ -46,9 +46,6 @@ CONSTANT: vm-reg         16
 
 enable-float-intrinsics
 
-M: ppc vector-regs ( -- reg-class )
-    float-regs ;
-
 M: ppc machine-registers ( -- assoc )
     {
         { int-regs $[ 3 12 [a,b] 17 29 [a,b] append ] }
