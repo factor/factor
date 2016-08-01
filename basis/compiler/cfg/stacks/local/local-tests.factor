@@ -6,27 +6,6 @@ tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.local.tests
 
-! loc>vreg
-{ 1 } [
-    D: 0 loc>vreg
-] cfg-unit-test
-
-! stack-changes
-{
-    {
-        T{ ##copy { dst 1 } { src 25 } { rep any-rep } }
-        T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
-    }
-} [
-    { { D: 0 25 } { R: 0 26 } } replaces>copy-insns
-] cfg-unit-test
-
-! replace-loc
-{ 80 } [
-    80 D: 77 replace-loc
-    D: 77 peek-loc
-] cfg-unit-test
-
 ! end-local-analysis
 {
     HS{ }
@@ -46,6 +25,41 @@ IN: compiler.cfg.stacks.local.tests
     [ 0 0 rot record-stack-heights ]
     [ [ 3 D: 3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
     [ replace-sets get at ] tri
+] cfg-unit-test
+
+! kill-locations
+{
+    { 10 11 12 13 14 15 }
+    { }
+    { }
+    { -6 -5 -4 -3 }
+} [
+    -10 -16 kill-locations
+    0 0 kill-locations
+    2 6 kill-locations
+    6 2 kill-locations
+] unit-test
+
+
+! loc>vreg
+{ 1 } [
+    D: 0 loc>vreg
+] cfg-unit-test
+
+! replace-loc
+{ 80 } [
+    80 D: 77 replace-loc
+    D: 77 peek-loc
+] cfg-unit-test
+
+! stack-changes
+{
+    {
+        T{ ##copy { dst 1 } { src 25 } { rep any-rep } }
+        T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
+    }
+} [
+    { { D: 0 25 } { R: 0 26 } } replaces>copy-insns
 ] cfg-unit-test
 
 ! remove-redundant-replaces
