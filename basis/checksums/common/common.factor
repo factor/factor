@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays byte-vectors checksums destructors
-grouping io io.backend io.binary io.encodings.binary io.files
-kernel make math sequences locals ;
+USING: accessors byte-arrays byte-vectors checksums grouping
+io.binary kernel locals make math sequences ;
 IN: checksums.common
 
 : calculate-pad-length ( length -- length' )
@@ -22,8 +21,6 @@ INSTANCE: block-checksum checksum
 TUPLE: block-checksum-state < checksum-state
     { bytes-read integer }
     { block-size integer } ;
-
-M: block-checksum-state dispose drop ;
 
 GENERIC: checksum-block ( bytes checksum-state -- )
 
@@ -48,11 +45,7 @@ M:: block-checksum-state add-checksum-bytes ( state data -- state )
     remain [ >byte-vector ] [ BV{ } clone ] if* >>bytes ;
 
 M: block-checksum checksum-bytes
-    initialize-checksum-state [
-        swap add-checksum-bytes get-checksum
-    ] with-disposal ;
+    [ swap add-checksum-bytes get-checksum ] with-checksum-state ;
 
 M: block-checksum checksum-stream
-    initialize-checksum-state [
-        swap add-checksum-stream get-checksum
-    ] with-disposal ;
+    [ swap add-checksum-stream get-checksum ] with-checksum-state ;
