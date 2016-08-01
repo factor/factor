@@ -19,8 +19,6 @@ IN: cpu.x86
 M: label JMP 0 JMP rc-relative label-fixup ;
 M: label JUMPcc [ 0 ] dip JUMPcc rc-relative label-fixup ;
 
-M: x86 vector-regs float-regs ;
-
 HOOK: stack-reg cpu ( -- reg )
 
 HOOK: reserved-stack-space cpu ( -- n )
