@@ -9,8 +9,10 @@ compiler.tree cpu.architecture fry kernel layouts make math namespaces
 sequences sequences.generalizations words ;
 IN: compiler.cfg.builder.alien
 
-: with-param-regs* ( quot -- reg-values stack-values )
+: with-param-regs ( abi quot -- reg-values stack-values )
     '[
+        param-regs init-regs
+        0 stack-params set
         V{ } clone reg-values set
         V{ } clone stack-values set
         @
@@ -18,7 +20,7 @@ IN: compiler.cfg.builder.alien
         stack-values get
         stack-params get
         struct-return-area get
-    ] with-param-regs
+    ] with-scope
     struct-return-area set
     stack-params set ; inline
 
@@ -47,7 +49,7 @@ IN: compiler.cfg.builder.alien
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
-    ] with-param-regs* ;
+    ] with-param-regs ;
 
 : prepare-caller-return ( params -- reg-outputs dead-outputs )
     return>> [ { } ] [ base-type load-return ] if-void { } ;
@@ -137,7 +139,7 @@ M: #alien-assembly emit-node ( block node -- block' )
     '[
         _ prepare-struct-callee struct-return-area set
         _ [ base-type ] map (callee-parameters)
-    ] with-param-regs* ;
+    ] with-param-regs ;
 
 : callee-return ( params -- reg-inputs )
     return>> [ { } ] [
