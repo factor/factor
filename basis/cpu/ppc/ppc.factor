@@ -1054,7 +1054,6 @@ M: ppc %reload ( dst rep src -- )
         { scalar-rep [ scratch-reg swap LI 1 scratch-reg LVX ] }
     } case ;
 
-M: ppc %loop-entry           ( -- ) ;
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 M: ppc immediate-bitwise?    ( n -- ? ) 0 65535 between? ;
 M: ppc immediate-store?      ( n -- ? ) immediate-comparand? ;
