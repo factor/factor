@@ -292,3 +292,9 @@ HELP: with-local-address
 HELP: protocol-port
 { $values { "protocol" "a protocol string" } { "port" { $maybe integer } } }
 { $description "Outputs the port number associated with a protocol, or " { $link f } " if the protocol is unknown." } ;
+
+HELP: port-protocol
+{ $values { "port" integer } { "protocol" { $maybe "a protocol string" } } }
+{ $description "Outputs the protocol associated with a port number, or " { $link f } " if the port number is unknown." } ;
+
+{ protocol-port port-protocol } related-words
