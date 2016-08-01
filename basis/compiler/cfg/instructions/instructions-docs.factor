@@ -2,8 +2,8 @@ USING: alien arrays assocs byte-arrays classes combinators
 compiler.cfg compiler.cfg.builder compiler.cfg.intrinsics.fixnum
 compiler.cfg.linear-scan.assignment compiler.cfg.liveness
 compiler.cfg.ssa.destruction compiler.cfg.value-numbering
-compiler.codegen.gc-maps cpu.architecture help.markup help.syntax
-kernel layouts math sequences slots.private system vm ;
+compiler.codegen.gc-maps compiler.tree cpu.architecture help.markup
+help.syntax kernel layouts math sequences slots.private system vm ;
 IN: compiler.cfg.instructions
 
 HELP: ##alien-invoke
@@ -31,7 +31,17 @@ HELP: ##alien-invoke
   }
   "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } ", in " { $link x86.64 } " the first six arguments are passed in registers and then stack parameters are used for the remainder."
 }
-{ $see-also %alien-invoke } ;
+{ $see-also #alien-invoke %alien-invoke } ;
+
+HELP: ##alien-indirect
+{ $class-description
+  "An instruction representing an indirect alien call. The first item on the datastack is a pointer to the function to call and the parameters follows. It has the following slots:"
+  { $table
+    { { $slot "src" } { "Spill slot containing the function pointer." } }
+    { { $slot "reg-outputs" } { "Sequence of output values passed in registers." } }
+  }
+}
+{ $see-also alien-indirect %alien-indirect } ;
 
 HELP: ##allot
 { $class-description
