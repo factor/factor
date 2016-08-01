@@ -692,8 +692,6 @@ M: x86 %callback-outputs ( reg-inputs -- )
     %end-callback
     [ first3 %store-reg-param ] each ;
 
-M: x86 %loop-entry 16 alignment [ NOP ] times ;
-
 M:: x86 %save-context ( temp1 temp2 -- )
     ! Save Factor stack pointers in case the C code calls a
     ! callback which does a GC, which must reliably trace

@@ -518,8 +518,6 @@ HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 HOOK: %spill cpu ( src rep dst -- )
 HOOK: %reload cpu ( dst rep src -- )
 
-HOOK: %loop-entry cpu ( -- )
-
 HOOK: fused-unboxing? cpu ( -- ? )
 
 HOOK: immediate-arithmetic? cpu ( n -- ? )
