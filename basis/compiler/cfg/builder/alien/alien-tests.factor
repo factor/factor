@@ -88,6 +88,6 @@ cpu x86.32?
     V{ }
     f f
 } [
-    cdecl [ ] with-param-regs*
+    cdecl [ ] with-param-regs
     reg-values get stack-values get
 ] unit-test
