@@ -173,6 +173,9 @@ os unix? [
 { 80 } [ "http" protocol-port ] unit-test
 { f } [ f protocol-port ] unit-test
 
+{ "http" } [ 80 port-protocol ] unit-test
+{ f } [ f port-protocol ] unit-test
+
 [ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] must-fail-with
 
 [ ] [ B{ 1 2 3 } f 9000 <inet4> send-once ] unit-test
