@@ -82,9 +82,19 @@ cpu x86.64? [
 
 ! %prepare-varargs
 ${
-    cpu x86.64? B{ 49 192 } B{ } ?
+    ! xor eax, eax
+    cpu x86.64? os unix? and B{ 49 192 } B{ } ?
+    ! mov al, 2
+    cpu x86.64? os unix? and B{ 176 2 } B{ } ?
 } [
-    [ %prepare-var-args ] B{ } make
+    [ { } %prepare-var-args ] B{ } make
+    [
+        {
+            { T{ spill-slot } int-rep RDI }
+            { T{ spill-slot { n 0 } } float-rep XMM0 }
+            { T{ spill-slot { n 8 } } double-rep XMM1 }
+        } %prepare-var-args
+    ] B{ } make
 ] unit-test
 
 ! %prologue

@@ -1,6 +1,6 @@
 USING: compiler.cfg.registers cpu.x86.assembler
-cpu.x86.assembler.operands.private help.markup help.syntax layouts
-math ;
+cpu.x86.assembler.operands cpu.x86.assembler.operands.private
+help.markup help.syntax layouts math sequences system ;
 IN: cpu.x86
 
 HELP: %boolean
@@ -11,6 +11,10 @@ HELP: %boolean
 }
 { $description "Helper word for emitting conditional move instructions." }
 { $see-also CMOVL CMOVLE CMOVG CMOVGE CMOVE CMOVNE } ;
+
+HELP: %prepare-var-args
+{ $values { "reg-inputs" sequence } }
+{ $description "Emits code needed for calling variadic functions. On " { $link unix } " " { $link x86.64 } ", the " { $link AL } " register must contain the number of float registers used. " } ;
 
 HELP: JLE
 { $values { "dst" "destination offset (relative to the instruction pointer register)" } }

@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types assocs combinators
-compiler.cfg.intrinsics compiler.codegen.gc-maps
-compiler.codegen.labels compiler.codegen.relocation
-compiler.constants cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.features kernel layouts locals
-math sequences specialized-arrays system vocabs ;
+USING: alien alien.c-types assocs combinators compiler.cfg.intrinsics
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.constants cpu.architecture
+cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86.features
+kernel locals math sequences specialized-arrays system vocabs ;
 SPECIALIZED-ARRAY: uint
 IN: cpu.x86.64
 
@@ -111,8 +110,6 @@ M: x86.64 %begin-callback ( -- )
 M: x86.64 %end-callback ( -- )
     param-reg-0 vm-reg MOV
     "end_callback" f f %c-invoke ;
-
-M: x86.64 %prepare-var-args ( -- ) EAX EAX XOR ;
 
 M: x86.64 stack-cleanup 3drop 0 ;
 

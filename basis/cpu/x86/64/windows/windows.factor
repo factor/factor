@@ -23,3 +23,6 @@ M: x86.64 dummy-stack-params? f ;
 M: x86.64 dummy-int-params? t ;
 
 M: x86.64 dummy-fp-params? t ;
+
+M: x86.64 %prepare-var-args ( reg-inputs -- )
+    drop ;
