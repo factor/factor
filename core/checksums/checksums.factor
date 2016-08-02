@@ -38,7 +38,7 @@ GENERIC: initialize-checksum-state ( checksum -- checksum-state )
 GENERIC# add-checksum-bytes 1 ( checksum-state data -- checksum-state )
 GENERIC: get-checksum ( checksum-state -- value )
 
-: with-checksum-state ( ... checksum quot: ( ... checksum-state -- ..b ) -- ..b value )
+: with-checksum-state ( ..a checksum quot: ( ..a checksum-state -- ..b ) -- ..b )
     [ initialize-checksum-state ] dip with-disposal ; inline
 
 : add-checksum-stream ( checksum-state stream -- checksum-state )
