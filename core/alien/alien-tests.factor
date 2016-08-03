@@ -123,3 +123,6 @@ SYMBOL: foo
     fill-and-free-callback-heap
     call-cb
 ] unit-test
+
+[ void { } cdecl [ ] alien-assembly ] [ callsite-not-compiled? ] must-fail-with
+[ void f "flor" { } alien-invoke ] [ callsite-not-compiled? ] must-fail-with
