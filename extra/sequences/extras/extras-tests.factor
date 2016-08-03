@@ -21,6 +21,21 @@ IN: sequences.extras.tests
 { "abc" "   " } [ "abc" "" CHAR: \s pad-longest ] unit-test
 { "abc..." "foobar" } [ "abc" "foobar" CHAR: . pad-longest ] unit-test
 
+{
+    {
+        "ABC"
+        "ABC"
+        "ABC"
+        "ABC"
+        "ABC-"
+        "-ABC-"
+        "-ABC--"
+        "--ABC--"
+    }
+} [
+    "ABC" 8 iota [ CHAR: - pad-center ] with map
+] unit-test
+
 { { 0 1 0 1 } } [
     { 0 0 0 0 } { 1 3 } over [ 1 + ] change-nths
 ] unit-test
