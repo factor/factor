@@ -2,9 +2,8 @@
 
 namespace factor {
 
-// glibc lies about the contents of the fpstate the kernel provides, hiding the
-// FXSR
-// environment
+/* glibc lies about the contents of the fpstate the kernel provides, hiding the
+   FXSR environment */
 struct _fpstate {
   /* Regular FPU environment */
   unsigned long cw;

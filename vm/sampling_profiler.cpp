@@ -67,7 +67,7 @@ void factor_vm::set_sampling_profiler(fixnum rate) {
 void factor_vm::start_sampling_profiler(fixnum rate) {
   samples_per_second = rate;
   safepoint.sample_counts.clear();
-  // Release the memory consumed by collecting samples.
+  /* Release the memory consumed by collecting samples. */
   samples.clear();
   samples.shrink_to_fit();
   sample_callstacks.clear();

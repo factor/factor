@@ -4,13 +4,13 @@ VM_C_API void init_globals();
 factor_vm* new_factor_vm();
 VM_C_API void start_standalone_factor(int argc, vm_char** argv);
 
-// image
+/* image */
 bool factor_arg(const vm_char* str, const vm_char* arg, cell* value);
 
-// objects
+/* objects */
 cell object_size(cell tagged);
 
-// os-*
+/* os-* */
 void open_console();
 void close_console();
 void lock_console();

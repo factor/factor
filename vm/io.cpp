@@ -34,7 +34,7 @@ size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
   return items_read;
 }
 
-// Call fclose() once only. Issues #1335, #908.
+/* Call fclose() once only. Issues #1335, #908. */
 int raw_fclose(FILE* stream) {
   if (fclose(stream) == EOF && errno != EINTR)
     return -1;

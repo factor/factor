@@ -2,14 +2,14 @@ namespace factor {
 
 /* The compiled code heap is structured into blocks. */
 struct code_block {
-  // header format (bits indexed with least significant as zero):
-  // bit   0  : free?
-  // bits  1-2: type (as a code_block_type)
-  // if not free:
-  //   bits  3-23: code size / 8
-  //   bits 24-31: stack frame size / 16
-  // if free:
-  //   bits  3-end: code size / 8
+  /* header format (bits indexed with least significant as zero):
+     bit   0  : free?
+     bits  1-2: type (as a code_block_type)
+     if not free:
+       bits  3-23: code size / 8
+       bits 24-31: stack frame size / 16
+     if free:
+       bits  3-end: code size / 8 */
   cell header;
   cell owner;      /* tagged pointer to word, quotation or f */
   cell parameters; /* tagged pointer to array or f */

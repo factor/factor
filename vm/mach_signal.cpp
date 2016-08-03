@@ -187,7 +187,7 @@ static void* mach_exception_thread(void* arg) {
       abort();
     }
   }
-  return NULL;  // quiet warning
+  return NULL;  /* quiet warning */
 }
 
 /* Initialize the Mach exception handler thread. */
