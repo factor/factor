@@ -11,10 +11,18 @@ IN: help
 GENERIC: word-help* ( word -- content )
 
 : word-help ( word -- content )
-    dup "help" word-prop [ ] [
-        dup word-help* dup
-       [ swap 2array 1array ] [ 2drop f ] if
-    ] ?if ;
+    dup "help" word-prop [ ] [ word-help* ] ?if ;
+
+M: word word-help*
+    stack-effect [ in>> ] [ out>> ] bi [
+        [
+            dup pair? [
+                first2 dup effect? [ \ $quotation swap 2array ] when
+            ] [
+                object
+            ] if [ effect>string ] dip
+        ] { } map>assoc
+    ] bi@ append members \ $values prefix 1array ;
 
 : $predicate ( element -- )
     { { "object" object } { "?" boolean } } $values
@@ -24,22 +32,9 @@ GENERIC: word-help* ( word -- content )
         " class." ,
     ] { } make $description ;
 
-: $default ( element -- )
-    first stack-effect [ in>> ] [ out>> ] bi [
-        [
-            dup pair? [
-                first2 dup effect? [ \ $quotation swap 2array ] when
-            ] [
-                object
-            ] if [ effect>string ] dip
-        ] { } map>assoc
-    ] bi@ append members $values ;
-
-M: word word-help* drop \ $default ;
+M: predicate word-help* \ $predicate swap 2array 1array ;
 
 M: class word-help* drop f ;
-
-M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )
     articles get keys

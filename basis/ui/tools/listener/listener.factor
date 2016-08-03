@@ -9,10 +9,10 @@ math models models.arrow models.delay namespaces parser
 prettyprint sequences source-files.errors strings system threads
 tools.errors.model ui ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.theme
+ui.gadgets.scrollers ui.gadgets.status-bar ui.theme
 ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
-ui.pens.solid ui.tools.browser ui.tools.common ui.tools.debugger
-ui.tools.error-list ui.tools.listener.completion
+ui.pens.solid ui.theme.images ui.tools.browser ui.tools.common
+ui.tools.debugger ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener
@@ -43,9 +43,6 @@ M: interactor manifest>>
         interactor-continuation name>>
         manifest swap assoc-stack
     ] if ;
-
-: vocab-exists? ( name -- ? )
-    '[ _ { [ lookup-vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
 
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
@@ -94,13 +91,26 @@ M: interactor stream-element-type drop +character+ ;
 
 GENERIC: (print-input) ( object -- )
 
+SYMBOL: listener-input-style
+H{
+    { font-style bold }
+    { foreground $ text-color }
+} listener-input-style set-global
+
+SYMBOL: listener-word-style
+H{
+    { font-name "sans-serif" }
+    { font-style bold }
+    { foreground $ text-color }
+} listener-word-style set-global
+
 M: input (print-input)
-    dup presented associate
-    [ string>> H{ { font-style bold } } format ] with-nesting nl ;
+    dup presented associate [
+        string>> listener-input-style get-global format
+    ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: " H{ { font-name "sans-serif" } { font-style bold } }
-    format . ;
+    "Command: " listener-word-style get-global format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
@@ -180,7 +190,7 @@ M: interactor dispose drop ;
 
 TUPLE: listener-gadget < tool error-summary output scroller input ;
 
-{ 600 700 } listener-gadget set-tool-dim
+listener-gadget { 600 700 } set-tool-dim
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
@@ -353,7 +363,7 @@ M: object accept-completion-hook 2drop ;
 M: interactor stream-read-quot ( stream -- quot/f )
     dup interactor-yield dup array? [
         over interactor-finish try-parse
-        [ nip ] [ stream-read-quot ] if*
+        [ ] [ stream-read-quot ] ?if
     ] [ nip ] if ;
 
 : interactor-operation ( gesture interactor -- ? )

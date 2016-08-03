@@ -192,7 +192,7 @@ M: x86.32 %end-callback ( -- )
     ! MINGW ABI incompatibility disaster
     [ large-struct? ] [ mingw eq? os windows? not or ] bi* and ;
 
-M: x86.32 %prepare-var-args ( -- ) ;
+M: x86.32 %prepare-var-args ( reg-inputs -- ) drop ;
 
 M:: x86.32 stack-cleanup ( stack-size return abi -- n )
     ! a) Functions which are stdcall/fastcall/thiscall have to

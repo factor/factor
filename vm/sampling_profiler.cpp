@@ -39,26 +39,16 @@ void factor_vm::record_sample(bool prolog_p) {
                                        special_objects[OBJ_CURRENT_THREAD]));
 }
 
-struct record_callstack_sample_iterator {
-  std::vector<cell>* sample_callstacks;
-  bool skip_p;
-
-  record_callstack_sample_iterator(std::vector<cell>* sample_callstacks,
-                                   bool prolog_p)
-      : sample_callstacks(sample_callstacks), skip_p(prolog_p) {}
-
-  void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
-    if (skip_p)
-      skip_p = false;
-    else
-      sample_callstacks->push_back(owner->owner);
-  }
-};
-
 void factor_vm::record_callstack_sample(cell* begin, cell* end, bool prolog_p) {
   *begin = sample_callstacks.size();
 
-  record_callstack_sample_iterator recorder(&sample_callstacks, prolog_p);
+  bool skip_p = prolog_p;
+  auto recorder = [&](cell frame_top, cell size, code_block* owner, cell addr) {
+    if (skip_p)
+      skip_p = false;
+    else
+      sample_callstacks.push_back(owner->owner);
+  };
   iterate_callstack(ctx, recorder);
 
   *end = sample_callstacks.size();
@@ -67,29 +57,22 @@ void factor_vm::record_callstack_sample(cell* begin, cell* end, bool prolog_p) {
 }
 
 void factor_vm::set_sampling_profiler(fixnum rate) {
-  bool sampling_p = !!rate;
-  if (sampling_p == !!atomic::load(&sampling_profiler_p))
-    return;
-
-  if (sampling_p)
+  bool running_p = (atomic::load(&sampling_profiler_p) != 0);
+  if (rate > 0 && !running_p)
     start_sampling_profiler(rate);
-  else
+  else if (rate == 0 && running_p)
     end_sampling_profiler();
-}
-
-void factor_vm::clear_samples() {
-  // Swapping into temporaries releases the vector's allocated storage,
-  // whereas clear() would leave the allocation as-is
-  std::vector<profiling_sample> sample_graveyard;
-  std::vector<cell> sample_callstack_graveyard;
-  samples.swap(sample_graveyard);
-  sample_callstacks.swap(sample_callstack_graveyard);
 }
 
 void factor_vm::start_sampling_profiler(fixnum rate) {
   samples_per_second = rate;
   safepoint.sample_counts.clear();
-  clear_samples();
+  // Release the memory consumed by collecting samples.
+  samples.clear();
+  samples.shrink_to_fit();
+  sample_callstacks.clear();
+  sample_callstacks.shrink_to_fit();
+
   samples.reserve(10 * rate);
   sample_callstacks.reserve(100 * rate);
   atomic::store(&sampling_profiler_p, true);
@@ -157,7 +140,5 @@ void factor_vm::primitive_get_samples() {
     ctx->push(samples_array.value());
   }
 }
-
-void factor_vm::primitive_clear_samples() { clear_samples(); }
 
 }

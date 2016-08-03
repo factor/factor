@@ -1,6 +1,6 @@
-USING: arrays checksums checksums.sha checksums.sha.private
-io.encodings.binary io.streams.byte-array kernel math.parser
-sequences tools.test ;
+USING: arrays checksums checksums.common checksums.sha
+checksums.sha.private io.encodings.binary io.streams.byte-array
+kernel math.parser sequences tools.test random ;
 IN: checksums.sha.tests
 
 : test-checksum ( text identifier -- checksum )
@@ -66,4 +66,46 @@ IN: checksums.sha.tests
 } [
     <sha-224-state> "asdf" binary <byte-reader> add-checksum-stream
     [ get-checksum ] [ get-checksum ] bi =
+] unit-test
+
+
+CONSTANT: bytes-a B{ 0 1 0 0 0 0 0 0 }
+CONSTANT: bytes-b B{ 1 2 3 4 5 6 7 8 }
+{ t } [
+    sha1 initialize-checksum-state bytes-a bytes-b append add-checksum-bytes get-checksum
+    sha1 initialize-checksum-state bytes-a add-checksum-bytes bytes-b add-checksum-bytes get-checksum =
+] unit-test
+
+: incremental-checksum ( algorithm seqs -- checksum )
+    [ initialize-checksum-state ] dip
+    [ add-checksum-bytes ] each get-checksum ;
+
+: one-go-checksum ( algorithm seqs -- checksum )
+    [ initialize-checksum-state ] dip
+    concat add-checksum-bytes get-checksum ;
+
+ERROR: checksums-differ algorithm seq incremental-checksum one-go-checksum ;
+: compare-checksum-calculations ( algorithm seq -- ? )
+    2dup [ incremental-checksum ] [ one-go-checksum ] 2bi 2dup = [
+        2drop 2drop t
+    ] [
+        checksums-differ
+    ] if ;
+
+{ t } [ 100 iota [ drop sha1 100 [ 100 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
+{ t } [ 100 iota [ drop sha1 20 [ 20 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
+{ t } [ 100 iota [ drop sha1 10 [ 10 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
+
+{ t } [ sha1 {
+    B{ 105 27 166 214 73 114 110 }
+    B{ 39 162 16 218 0 42 }
+    B{ 129 235 197 233 }
+    B{ 61 29 254 66 67 }
+    B{ 28 236 253 45 240 123 134 191 22 }
+    B{ 220 27 205 59 27 48 }
+    B{ 249 2 196 177 74 195 12 131 91 }
+    B{ 174 102 159 89 250 38 230 5 }
+    B{ 126 22 231 253 118 64 }
+    B{ 185 127 20 126 123 35 204 243 43 }
+    } compare-checksum-calculations
 ] unit-test

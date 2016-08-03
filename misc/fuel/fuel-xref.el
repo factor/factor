@@ -152,7 +152,10 @@ cursor at the first ocurrence of the used word."
   (fuel-popup--display (current-buffer)))
 
 (defun fuel-xref--callers (word)
-  (fuel-xref--eval<x--y> (list :quote word) 'fuel-callers-xref ""))
+  (fuel-xref--eval<x--y>
+   (list :quote word)
+   'fuel-callers-xref
+   (factor-current-vocab)))
 
 (defun fuel-xref--show-callers (word)
   (let ((res (fuel-xref--callers word)))
@@ -164,7 +167,10 @@ cursor at the first ocurrence of the used word."
   (mapcar 'cadar (fuel-xref--callers word)))
 
 (defun fuel-xref--show-callees (word)
-  (let ((res (fuel-xref--eval<x--y> (list :quote word) 'fuel-callees-xref "")))
+  (let ((res (fuel-xref--eval<x--y>
+              (list :quote word)
+              'fuel-callees-xref
+              (factor-current-vocab))))
     (with-current-buffer (fuel-xref--buffer)
       (setq fuel-xref--word nil)
       (fuel-xref--display-word-groups word "used by" res))))
@@ -258,7 +264,7 @@ With prefix argument, force reload of vocabulary list."
   "Show a list of words in current file.
 With prefix argument, ask for the vocab."
   (interactive "P")
-  (let ((vocab (or (and (not arg) (factor-find-in))
+  (let ((vocab (or (and (not arg) (factor-current-vocab))
                    (fuel-completion--read-vocab nil))))
     (when vocab
       (fuel-xref--show-vocab-words vocab))))

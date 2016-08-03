@@ -23,7 +23,7 @@ $nl
 ABOUT: "sbufs"
 
 HELP: sbuf
-{ $description "The class of resizable character strings. See " { $link "syntax-sbufs" } " for syntax and " { $link "sbufs" } " for general information." } ;
+{ $class-description "The class of resizable character strings. See " { $link "syntax-sbufs" } " for syntax and " { $link "sbufs" } " for general information." } ;
 
 HELP: <sbuf>
 { $values { "n" "a positive integer specifying initial capacity" } { "sbuf" sbuf } }

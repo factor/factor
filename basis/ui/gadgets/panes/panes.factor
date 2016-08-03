@@ -1,14 +1,15 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes combinators destructors fonts
-fry io io.styles kernel locals math.rectangles math.vectors
-memoize models namespaces sequences sorting splitting strings
-ui.baseline-alignment ui.clipboards ui.gadgets
-ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
-ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
-ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
-ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
-ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
+USING: accessors assocs classes combinators destructors
+documents.private fonts fry io io.styles kernel locals
+math.rectangles math.vectors memoize models namespaces sequences
+sorting splitting strings ui.baseline-alignment ui.clipboards
+ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
+ui.gadgets.grids ui.gadgets.icons ui.gadgets.incremental
+ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
+ui.gadgets.paragraphs ui.gadgets.presentations
+ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
+ui.gestures ui.images ui.pens.solid ui.render ui.theme
 ui.traverse ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
@@ -99,9 +100,6 @@ M: pane selected-children
 
 : smash-pane ( pane -- gadget ) [ pane-nl ] [ output>> smash-line ] bi ;
 
-: pane-lines ( str -- lines )
-    string-lines [ { "" } ] when-empty ;
-
 : pane-write ( seq pane -- )
     [ pane-nl ] [ current>> stream-write ]
     bi-curry interleave ;
@@ -120,10 +118,10 @@ M: pane-stream stream-write1
     [ current>> stream-write1 ] do-pane-stream ;
 
 M: pane-stream stream-write
-    [ [ pane-lines ] dip pane-write ] do-pane-stream ;
+    [ [ split-lines ] dip pane-write ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ [ pane-lines ] 2dip pane-format ] do-pane-stream ;
+    [ [ split-lines ] 2dip pane-format ] do-pane-stream ;
 
 M: pane-stream dispose drop ;
 
@@ -321,7 +319,7 @@ M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
     swap dup empty?
-    [ 2drop ] [ <label> text-theme add-gadget drop ] if ;
+    [ 2drop ] [ <label> monospace-font >>font add-gadget drop ] if ;
 
 M: pack stream-write gadget-write ;
 

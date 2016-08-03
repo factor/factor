@@ -10,7 +10,6 @@ IN: compiler.cfg.builder.alien.boxing
 
 SYMBOL: struct-return-area
 
-! pairs have shape { rep on-stack? }
 GENERIC: flatten-c-type ( c-type -- pairs )
 
 M: c-type flatten-c-type

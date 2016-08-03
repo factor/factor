@@ -3,7 +3,7 @@
 USING: accessors arrays combinators fry kernel math
 math.functions math.order math.ranges math.vectors namespaces
 opengl sequences ui.gadgets ui.gadgets.scrollers
-ui.gadgets.viewports ui.render ui.text ;
+ui.gadgets.viewports ui.render ui.text ui.theme ;
 IN: ui.gadgets.line-support
 
 ! Some code shared by table and editor gadgets

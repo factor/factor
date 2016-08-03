@@ -61,7 +61,7 @@ M: utf16be decode-char
     ] [ append-nums ] if ;
 
 : begin-utf16le ( stream byte -- stream char )
-    over stream-read1 dup [ double-le ] [ 2drop replacement-char ] if ;
+    over stream-read1 [ double-le ] [ drop replacement-char ] if* ;
 
 M: utf16le decode-char
     drop dup stream-read1 dup [ begin-utf16le ] when nip ;

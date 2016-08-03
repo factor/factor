@@ -11,14 +11,13 @@ cpu.x86.assembler.operands cpu.x86.assembler.private cpu.x86.features
 cpu.x86.features.private fry io kernel layouts locals make math
 math.order memory namespaces sequences system vm vocabs ;
 QUALIFIED-WITH: alien.c-types c
+FROM: kernel.private => declare ;
 FROM: math => float ;
 IN: cpu.x86
 
 ! Add some methods to the assembler to be more useful to the backend
 M: label JMP 0 JMP rc-relative label-fixup ;
 M: label JUMPcc [ 0 ] dip JUMPcc rc-relative label-fixup ;
-
-M: x86 vector-regs float-regs ;
 
 HOOK: stack-reg cpu ( -- reg )
 
@@ -61,7 +60,8 @@ M: x86 test-instruction? t ;
 
 M: x86 immediate-store? immediate-comparand? ;
 
-M: x86 %load-immediate [ dup XOR ] [ MOV ] if-zero ;
+M: x86 %load-immediate ( reg val -- )
+    { fixnum } declare [ 32-bit-version-of dup XOR ] [ MOV ] if-zero ;
 
 M: x86 %load-reference
     [ swap 0 MOV rc-absolute-cell rel-literal ]
@@ -87,7 +87,7 @@ M: x86 %replace-imm
     {
         { [ dup not ] [ drop \ f type-number MOV ] }
         { [ dup fixnum? ] [ tag-fixnum MOV ] }
-        [ [ 0xffffffff MOV ] dip rc-absolute rel-literal ]
+        [ [ 0 MOV ] dip rc-absolute rel-literal ]
     } cond ;
 
 M: x86 %clear ( loc -- )
@@ -130,9 +130,17 @@ M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
     dst ; inline
 
 M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
-M: x86 %add-imm 2over eq? [ nip ADD ] [ [+] LEA ] if ;
+M: x86 %add-imm ( dst src1 src2 -- )
+    2over eq? [
+        nip { { 1 [ INC ] } { -1 [ DEC ] } [ ADD ] } case
+    ] [ [+] LEA ] if ;
+
 M: x86 %sub     int-rep two-operand SUB ;
-M: x86 %sub-imm 2over eq? [ nip SUB ] [ neg [+] LEA ] if ;
+M: x86 %sub-imm ( dst src1 src2 -- )
+    2over eq? [
+        nip { { 1 [ DEC ] } { -1 [ INC ] } [ SUB ] } case
+    ] [ neg [+] LEA ] if ;
+
 M: x86 %mul     int-rep two-operand IMUL2 ;
 M: x86 %mul-imm IMUL3 ;
 M: x86 %and     int-rep two-operand AND ;
@@ -590,9 +598,9 @@ M:: x86 %compare-imm-branch ( label src1 src2 cc -- )
 
 M:: x86 %dispatch ( src temp -- )
     ! Load jump table base.
-    temp 0xffffffff MOV
-    building get length :> start
+    temp 0 MOV
     0 rc-absolute-cell rel-here
+    building get length :> start
     ! Add jump table base
     temp src 0x7f [++] JMP
     building get length :> end
@@ -637,20 +645,19 @@ HOOK: %discard-reg-param cpu ( rep reg -- )
 : %store-return ( dst rep -- )
     dup return-reg %store-reg-param ;
 
-HOOK: %prepare-var-args cpu ( -- )
+HOOK: %prepare-var-args cpu ( reg-inputs -- )
 
 HOOK: %cleanup cpu ( n -- )
 
 M:: x86 %alien-assembly ( reg-inputs
-                         stack-inputs
-                         reg-outputs
-                         dead-outputs
-                         cleanup
-                         stack-size
-                         quot -- )
+                          stack-inputs
+                          reg-outputs
+                          dead-outputs
+                          cleanup
+                          stack-size
+                          quot -- )
     stack-inputs [ first3 %store-stack-param ] each
-    reg-inputs [ first3 %store-reg-param ] each
-    %prepare-var-args
+    reg-inputs [ [ first3 %store-reg-param ] each ] [ %prepare-var-args ] bi
     quot call( -- )
     cleanup %cleanup
     reg-outputs [ first3 %load-reg-param ] each
@@ -663,7 +670,10 @@ M: x86 %alien-invoke ( reg-inputs stack-inputs
                        symbols dll gc-map -- )
                        '[ _ _ _ %c-invoke ] %alien-assembly ;
 
-M:: x86 %alien-indirect ( src reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map -- )
+M:: x86 %alien-indirect ( src
+                          reg-inputs stack-inputs
+                          reg-outputs dead-outputs
+                          cleanup stack-size gc-map -- )
     reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
         src ?spill-slot CALL
         gc-map gc-map-here
@@ -681,8 +691,6 @@ HOOK: %end-callback cpu ( -- )
 M: x86 %callback-outputs ( reg-inputs -- )
     %end-callback
     [ first3 %store-reg-param ] each ;
-
-M: x86 %loop-entry 16 alignment [ NOP ] times ;
 
 M:: x86 %save-context ( temp1 temp2 -- )
     ! Save Factor stack pointers in case the C code calls a

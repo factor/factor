@@ -213,7 +213,7 @@ The word's body is put in a new method for the generic."
   (save-excursion
     (factor-beginning-of-defun)
     (or (and (looking-at factor-method-definition-regex)
-             (match-string-no-properties 2))
+             (match-string-no-properties 3))
         (and (looking-at factor-word-definition-regex)
              (match-string-no-properties 2)))))
 

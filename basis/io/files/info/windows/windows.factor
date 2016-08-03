@@ -76,15 +76,21 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
         [ GetFileInformationByHandle win32-error=0/f ] keep
     ] keep CloseHandle win32-error=0/f ;
 
-: get-file-information-stat ( path -- BY_HANDLE_FILE_INFORMATION )
-    dup
-    GENERIC_READ FILE_SHARE_READ f
-    OPEN_EXISTING FILE_FLAG_BACKUP_SEMANTICS f
-    CreateFileW dup INVALID_HANDLE_VALUE = [
-        drop find-first-file-stat WIN32_FIND_DATA>file-info
-    ] [
+: valid-handle? ( handle -- boolean )
+    INVALID_HANDLE_VALUE = not ; inline
+
+: open-read-handle ( path -- handle/f )
+    ! Parameters of CreateFileW here should match those in open-read.
+    GENERIC_READ share-mode f
+    OPEN_EXISTING 0 CreateFile-flags f
+    CreateFileW [ valid-handle? ] keep f ? ;
+
+: get-file-information-stat ( path -- file-info )
+    dup open-read-handle dup [
         nip
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
+    ] [
+        drop find-first-file-stat WIN32_FIND_DATA>file-info
     ] if ;
 
 M: windows file-info ( path -- info )
@@ -195,7 +201,7 @@ CONSTANT: names-buf-length 16384
 
 ! Windows may return a volume which looks up to path ""
 ! For now, treat it like there is not a volume here
-: volume>paths ( string -- array )
+: (volume>paths) ( string -- array )
     [
         names-buf-length
         [ ushort malloc-array &free ] keep
@@ -205,6 +211,14 @@ CONSTANT: names-buf-length 16384
         { 0 } split-slice harvest
         [ { } ] [ [ { 0 } append alien>native-string ] map ] if-empty
     ] with-destructors ;
+
+! Suppress T{ windows-error f 2 "The system cannot find the file specified." }
+: volume>paths ( string -- array )
+    [ (volume>paths) ] curry
+    [
+        dup { [ windows-error? ] [ n>> ERROR_FILE_NOT_FOUND = ] } 1&&
+        [ drop { } ] [ rethrow ] if
+    ] recover ;
 
 ! Can error with T{ windows-error f 21 "The device is not ready." }
 ! if there is a D: that is not ready, for instance. Ignore these drives.
@@ -226,7 +240,7 @@ M: windows file-systems ( -- array )
     ! timestamp order: creation access write
     [
         [
-            normalize-path open-existing &dispose handle>>
+            normalize-path open-r/w &dispose handle>>
         ] 3dip (set-file-times)
     ] with-destructors ;
 
@@ -239,6 +253,9 @@ M: windows file-systems ( -- array )
 : set-file-write-time ( path timestamp -- )
     [ f f ] dip set-file-times ;
 
-M: windows file-readable? file-info >boolean ;
+M: windows file-readable?
+    normalize-path open-read-handle
+    dup [ CloseHandle win32-error=0/f ] when* >boolean ;
+
 M: windows file-writable? file-info attributes>> +read-only+ swap member? not ;
 M: windows file-executable? file-executable-type windows-executable? ;

@@ -127,3 +127,6 @@ MACRO: nweave ( n -- quot )
 
 : nbi-curry ( n -- )
     [ bi-curry ] swap call-n ; inline
+
+MACRO: map-compose ( quots quot -- quot' )
+    '[ _ compose ] map '[ _ ] ;

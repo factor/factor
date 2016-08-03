@@ -1,8 +1,52 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types alien.parser alien.syntax
-continuations debugger eval parser tools.test vocabs.parser
-words ;
+USING: accessors alien.c-types alien.parser alien.parser.private
+alien.syntax compiler.units continuations debugger eval fry kernel
+lexer namespaces parser sequences sets tools.test vocabs.parser words
+;
 IN: alien.parser.tests
+
+<<
+
+: with-parsing ( lines quot -- )
+    [ <lexer> ] [ '[ _ with-compilation-unit ] ] bi* with-lexer ; inline
+
+! (CREATE-C-TYPE)
+{ "hello" } [
+    { "hello" } [ CREATE-C-TYPE name>> ] with-parsing
+] unit-test
+
+! Check that it deletes from old-definitions
+{ 0 } [
+    { } [
+        "hello" current-vocab create-word
+        old-definitions get first adjoin
+        "hello" (CREATE-C-TYPE) drop
+        old-definitions get first cardinality
+    ] with-parsing
+] unit-test
+
+! make-callback-type
+{ "what-type" } [
+    { } [
+        void "what-type" f { } { } make-callback-type 2drop name>>
+    ] with-parsing
+] unit-test
+
+{ 1 } [
+    { } [
+        "hello" current-vocab create-word
+        old-definitions get first adjoin
+        void "hello" f { } { } make-callback-type 3drop
+        old-definitions get first cardinality
+    ] with-parsing
+] unit-test
+
+! parse-enum-name
+{ t } [
+    { "ayae" } [ parse-enum-name new-definitions get first in? ] with-parsing
+] unit-test
+
+>>
 
 TYPEDEF: char char2
 
@@ -69,4 +113,9 @@ TYPEDEF: int alien-parser-test-int ! reasonably unique name...
         ! after restart, we end up here
         "OK!"
     ] [ :1 ] recover
+] unit-test
+
+! Redefinitions
+{ } [
+    [ C-TYPE: hi TYPEDEF: void* hi ] with-compilation-unit
 ] unit-test

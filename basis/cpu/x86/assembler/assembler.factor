@@ -165,10 +165,6 @@ M: register displacement, drop ;
     over integer? [ first3 0b10 opcode-or 3array ] when ;
 
 : immediate-1/4 ( dst imm reg,rex.w,opcode -- )
-    ! If imm is a byte, compile the opcode and the byte.
-    ! Otherwise, set the 8-bit operand flag in the opcode, and
-    ! compile the cell. The 'reg' is not really a register, but
-    ! a value for the 'reg' field of the mod-r/m byte.
     over fits-in-byte? [
         immediate-fits-in-size-bit immediate-1
     ] [
@@ -212,13 +208,26 @@ M: operand POP { 0b000 f 0x8f } 1-operand ;
 
 <PRIVATE
 
+: zero-extendable? ( imm -- ? )
+    1 32 2^ 1 - between? ;
+
+: maybe-zero-extend ( reg imm -- reg' imm )
+    dup zero-extendable? [ [ 32-bit-version-of ] dip ] when ;
+
 GENERIC# (MOV-I) 1 ( dst src -- )
 
 M: register (MOV-I)
-    dup byte?
-    [ [ t 0xb0 short-operand ] [ 1, ] bi* ]
-    [ [ t 0xb8 short-operand ] [ cell, ] bi* ]
-    if ;
+    {
+        {
+            [ dup byte? ]
+            [ [ t 0xb0 short-operand ] [ 1, ] bi* ]
+        }
+        {
+            [ dup zero-extendable? ]
+            [ [ 32-bit-version-of t 0xb8 short-operand ] [ 4, ] bi* ]
+        }
+        [ [ t 0xb8 short-operand ] [ cell, ] bi* ]
+    } cond ;
 
 M: operand (MOV-I)
     { 0b000 t 0xc6 }
@@ -329,23 +338,32 @@ M: immediate SBB { 0b011 t 0x80 } immediate-1/4 ;
 M: operand SBB 0o030 2-operand ;
 
 GENERIC: AND ( dst src -- )
-M: immediate AND { 0b100 t 0x80 } immediate-1/4 ;
+M: immediate AND ( dst src -- )
+    maybe-zero-extend { 0b100 t 0x80 } immediate-1/4 ;
 M: operand AND 0o040 2-operand ;
 
 GENERIC: SUB ( dst src -- )
 M: immediate SUB { 0b101 t 0x80 } immediate-1/4 ;
 M: operand SUB 0o050 2-operand ;
 
+: INC ( dst -- )
+    { 0b000 t 0xff } 1-operand ;
+
+: DEC ( dst -- )
+    { 0b001 t 0xff } 1-operand ;
+
 GENERIC: XOR ( dst src -- )
 M: immediate XOR { 0b110 t 0x80 } immediate-1/4 ;
 M: operand XOR 0o060 2-operand ;
 
 GENERIC: CMP ( dst src -- )
-M: immediate CMP { 0b111 t 0x80 } immediate-1/4 ;
+M: immediate CMP ( dst src -- )
+    { 0b111 t 0x80 } immediate-1/4 ;
 M: operand CMP 0o070 2-operand ;
 
 GENERIC: TEST ( dst src -- )
-M: immediate TEST { 0b0 t 0xf7 } immediate-4 ;
+M: immediate TEST ( dst src -- )
+    maybe-zero-extend { 0b0 t 0xf7 } immediate-4 ;
 M: operand TEST 0o204 2-operand ;
 
 : XCHG ( dst src -- ) 0o207 2-operand ;

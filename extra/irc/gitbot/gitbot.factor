@@ -1,13 +1,17 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry irc.client irc.client.chats kernel namespaces
-sequences threads io.launcher io splitting
-make mason.common mason.git calendar math timers
-io.encodings.8-bit.latin1 debugger ;
+USING: calendar debugger fry io io.encodings.utf8 io.launcher
+irc.client irc.client.chats kernel make mason.common mason.git
+math namespaces sequences threads timers ;
 IN: irc.gitbot
 
+SYMBOL: nickserv-handle
+SYMBOL: nickserv-password
+
 : bot-profile ( -- obj )
-    "irc.freenode.org" 6667 "stackoid" f <irc-profile> ;
+    "irc.freenode.org" 6667
+    nickserv-handle get "stackoid2" or
+    nickserv-password get <irc-profile> ;
 
 : bot-channel ( -- seq ) "#concatenative" ;
 
@@ -29,12 +33,13 @@ M: object handle-message drop ;
 
 : git-log ( from to -- lines )
     [
-        "git-log" ,
+        "git" ,
+        "log" ,
         "--no-merges" ,
         "--pretty=format:%h %an: %s" ,
         ".." glue ,
     ] { } make
-    latin1 [ lines ] with-process-reader ;
+    utf8 [ lines ] with-process-reader ;
 
 : updates ( from to -- lines )
     git-log reverse

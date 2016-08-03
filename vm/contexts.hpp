@@ -1,8 +1,7 @@
 namespace factor {
 
-// Context object count and identifiers must be kept in sync with:
-//   core/kernel/kernel.factor
-
+/* Context object count and identifiers must be kept in sync with:
+     core/kernel/kernel.factor */
 static const cell context_object_count = 4;
 
 enum context_object {
@@ -20,7 +19,7 @@ static const cell stack_reserved = 16384;
 
 struct context {
 
-  // First 4 fields accessed directly by compiler. See basis/vm/vm.factor
+  /* First 5 fields accessed directly by compiler. See basis/vm/vm.factor */
 
   /* Factor callstack pointers */
   cell callstack_top;
@@ -43,7 +42,7 @@ struct context {
      set-context-object primitives */
   cell context_objects[context_object_count];
 
-  context(cell datastack_size, cell retainstack_size, cell callstack_size);
+  context(cell ds_size, cell rs_size, cell cs_size);
   ~context();
 
   void reset_datastack();

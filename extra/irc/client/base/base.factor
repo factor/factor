@@ -29,7 +29,13 @@ GENERIC: chat-name ( irc-message -- name )
 M: mode       chat-name name>> ;
 M: to-target  chat-name target>> ;
 M: to-me      chat-name sender>> ;
-M: to-channel chat-name channel>> ;
+
+! to-channel messages are things like JOIN
+! Freenode's join looks like:
+! ":flogbot2_!~flogbot2@c-50-174-221-28.hsd1.ca.comcast.net JOIN #concatenative-bots"
+! The channel>> field is empty and it's in parameters instead.
+! This fixes chat> for these kinds of messages.
+M: to-channel chat-name dup channel>> [ ] [ parameters>> ?first ] ?if ;
 
 GENERIC: chat> ( obj -- chat/f )
 M: string      chat> irc> chats>> at ;

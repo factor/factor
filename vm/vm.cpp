@@ -3,7 +3,8 @@
 namespace factor {
 
 factor_vm::factor_vm(THREADHANDLE thread)
-    : nursery(0, 0),
+    : ctx(NULL),
+      nursery(0, 0),
       faulting_p(false),
       thread(thread),
       callback_id(0),
@@ -12,6 +13,7 @@ factor_vm::factor_vm(THREADHANDLE thread)
       signal_pipe_input(0),
       signal_pipe_output(0),
       gc_off(false),
+      data(NULL), code(NULL), callbacks(NULL),
       current_gc(NULL),
       current_gc_p(false),
       current_jit_count(0),
@@ -27,7 +29,22 @@ factor_vm::factor_vm(THREADHANDLE thread)
 }
 
 factor_vm::~factor_vm() {
-  delete_contexts();
+  free(alien_offset(special_objects[OBJ_EXECUTABLE]));
+  free(alien_offset(special_objects[OBJ_IMAGE]));
+  close_console();
+  FACTOR_ASSERT(!ctx);
+  FACTOR_FOR_EACH(unused_contexts) {
+    delete *iter;
+  }
+  FACTOR_FOR_EACH(active_contexts) {
+    delete *iter;
+  }
+  if (callbacks)
+    delete callbacks;
+  if (data)
+    delete data;
+  if (code)
+    delete code;
   if (signal_callstack_seg) {
     delete signal_callstack_seg;
     signal_callstack_seg = NULL;

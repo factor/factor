@@ -121,45 +121,40 @@ void factor_vm::divide_by_zero_error() {
 void factor_vm::primitive_unimplemented() { not_implemented_error(); }
 
 /* Allocates memory */
-void factor_vm::memory_signal_handler_impl() {
-  if (code->safepoint_p(signal_fault_addr)) {
-    safepoint.handle_safepoint(this, signal_fault_pc);
+void memory_signal_handler_impl() {
+  factor_vm* vm = current_vm();
+  if (vm->code->safepoint_p(vm->signal_fault_addr)) {
+    vm->safepoint.handle_safepoint(vm, vm->signal_fault_pc);
   }
   else {
-    vm_error_type type = ctx->address_to_error(signal_fault_addr);
-    cell number = from_unsigned_cell(signal_fault_addr);
-    general_error(type, number, false_object);
+    vm_error_type type = vm->ctx->address_to_error(vm->signal_fault_addr);
+    cell number = vm->from_unsigned_cell(vm->signal_fault_addr);
+    vm->general_error(type, number, false_object);
   }
-  if (!signal_resumable) {
+  if (!vm->signal_resumable) {
     /* In theory we should only get here if the callstack overflowed during a
        safepoint */
-    general_error(ERROR_CALLSTACK_OVERFLOW, false_object, false_object);
+    vm->general_error(ERROR_CALLSTACK_OVERFLOW, false_object, false_object);
   }
-}
-
-/* Allocates memory */
-void memory_signal_handler_impl() {
-  current_vm()->memory_signal_handler_impl();
-}
-
-/* Allocates memory */
-void factor_vm::synchronous_signal_handler_impl() {
-  general_error(ERROR_SIGNAL, from_unsigned_cell(signal_number), false_object);
 }
 
 /* Allocates memory */
 void synchronous_signal_handler_impl() {
-  current_vm()->synchronous_signal_handler_impl();
-}
-
-/* Allocates memory (fp_trap_error())*/
-void factor_vm::fp_signal_handler_impl() {
-  /* Clear pending exceptions to avoid getting stuck in a loop */
-  set_fpu_state(get_fpu_state());
-
-  general_error(ERROR_FP_TRAP, tag_fixnum(signal_fpu_status), false_object);
+  factor_vm* vm = current_vm();
+  vm->general_error(ERROR_SIGNAL,
+                    vm->from_unsigned_cell(vm->signal_number),
+                    false_object);
 }
 
 /* Allocates memory */
-void fp_signal_handler_impl() { current_vm()->fp_signal_handler_impl(); }
+void fp_signal_handler_impl() {
+  factor_vm* vm = current_vm();
+
+  /* Clear pending exceptions to avoid getting stuck in a loop */
+  vm->set_fpu_state(vm->get_fpu_state());
+
+  vm->general_error(ERROR_FP_TRAP,
+                    tag_fixnum(vm->signal_fpu_status),
+                    false_object);
+}
 }

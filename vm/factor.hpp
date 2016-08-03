@@ -4,6 +4,9 @@ VM_C_API void init_globals();
 factor_vm* new_factor_vm();
 VM_C_API void start_standalone_factor(int argc, vm_char** argv);
 
+// image
+bool factor_arg(const vm_char* str, const vm_char* arg, cell* value);
+
 // objects
 cell object_size(cell tagged);
 

@@ -14,7 +14,9 @@ IN: io.files.windows
 
 SLOT: file
 
-HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
+: CreateFile-flags ( DWORD -- DWORD )
+    flags{ FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } bitor ;
+
 HOOK: open-append os ( path -- win32-file )
 
 TUPLE: win32-file < win32-handle ptr ;
@@ -227,7 +229,7 @@ M: windows init-stdio
 : open-file ( path access-mode create-mode flags -- handle )
     [
         [ share-mode default-security-attributes ] 2dip
-        CreateFile-flags f CreateFile opened-file
+        CreateFile-flags f CreateFileW opened-file
     ] with-destructors ;
 
 : open-r/w ( path -- win32-file )
@@ -243,22 +245,10 @@ M: windows init-stdio
 : (open-append) ( path -- win32-file )
     GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
 
-: open-existing ( path -- win32-file )
-    flags{ GENERIC_READ GENERIC_WRITE }
-    share-mode
-    f
-    OPEN_EXISTING
-    FILE_FLAG_BACKUP_SEMANTICS
-    f CreateFileW dup win32-error=0/f <win32-file> ;
-
 : maybe-create-file ( path -- win32-file ? )
     ! return true if file was just created
     flags{ GENERIC_READ GENERIC_WRITE }
-    share-mode
-    f
-    OPEN_ALWAYS
-    0 CreateFile-flags
-    f CreateFileW dup win32-error=0/f <win32-file>
+    OPEN_ALWAYS 0 open-file
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
@@ -358,9 +348,6 @@ M: windows normalize-path ( string -- string' )
         normalize-separators
         prepend-prefix
     ] if ;
-
-M: windows CreateFile-flags ( DWORD -- DWORD )
-    FILE_FLAG_OVERLAPPED bitor ;
 
 <PRIVATE
 

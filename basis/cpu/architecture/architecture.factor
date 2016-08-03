@@ -150,18 +150,17 @@ SINGLETONS: int-regs float-regs ;
 UNION: reg-class int-regs float-regs ;
 CONSTANT: reg-classes { int-regs float-regs }
 
-! On x86, vectors and floats are stored in the same register bank
-! On PowerPC they are distinct
-HOOK: vector-regs cpu ( -- reg-class )
-
 GENERIC: reg-class-of ( rep -- reg-class )
 
 M: tagged-rep reg-class-of drop int-regs ;
 M: int-rep reg-class-of drop int-regs ;
 M: float-rep reg-class-of drop float-regs ;
 M: double-rep reg-class-of drop float-regs ;
-M: vector-rep reg-class-of drop vector-regs ;
-M: scalar-rep reg-class-of drop vector-regs ;
+
+! Note that on PowerPC, vectors and floats are stored in different
+! register banks. But Factor doesn't support SIMD on that platform.
+M: vector-rep reg-class-of drop float-regs ;
+M: scalar-rep reg-class-of drop float-regs ;
 
 GENERIC: rep-size ( rep -- n ) foldable
 
@@ -517,8 +516,6 @@ HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 
 HOOK: %spill cpu ( src rep dst -- )
 HOOK: %reload cpu ( dst rep src -- )
-
-HOOK: %loop-entry cpu ( -- )
 
 HOOK: fused-unboxing? cpu ( -- ? )
 

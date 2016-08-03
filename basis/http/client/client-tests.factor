@@ -44,11 +44,15 @@ IN: http.client.tests
 { "DELETE" } [ "http://arc.com" <delete-request> method>> ] unit-test
 { "TRACE" } [ "http://concatenative.org" <trace-request> method>> ] unit-test
 { "OPTIONS" } [ "http://factorcode.org" <options-request> method>> ] unit-test
-{ t } [
-    "https://alice.sni.velox.ch" http-get nip
-    [ "Great!" swap subseq? ]
-    [ "TLS SNI Test Site: alice.sni.velox.ch" swap subseq? ] bi and
-] unit-test
+
+! Do not re-enable this for the test suite.
+! We should replace this with a similar test that does not
+! hit the velox.ch website.
+! { t } [
+    ! "https://alice.sni.velox.ch" http-get nip
+    ! [ "Great!" swap subseq? ]
+    ! [ "TLS SNI Test Site: alice.sni.velox.ch" swap subseq? ] bi and
+! ] unit-test
 
 { t } [
     {

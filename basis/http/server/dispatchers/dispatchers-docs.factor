@@ -8,14 +8,14 @@ HELP: new-dispatcher
 { $description "Creates a new instance of a subclass of " { $link dispatcher } "." } ;
 
 HELP: dispatcher
-{ $description "The class of dispatchers. May be subclassed, in which case subclasses should be constructed by calling " { $link new-dispatcher } "." } ;
+{ $class-description "The class of dispatchers. May be subclassed, in which case subclasses should be constructed by calling " { $link new-dispatcher } "." } ;
 
 HELP: <dispatcher>
 { $values { "dispatcher" dispatcher } }
 { $description "Creates a new pathname dispatcher." } ;
 
 HELP: vhost-dispatcher
-{ $description "The class of virtual host dispatchers." } ;
+{ $class-description "The class of virtual host dispatchers." } ;
 
 HELP: <vhost-dispatcher>
 { $values { "dispatcher" vhost-dispatcher } }

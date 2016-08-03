@@ -149,7 +149,7 @@ IN: bootstrap.ppc
 [
     3 jit-load-literal-arg
     3 ds-reg cell-size jit-save-cell-update
-] JIT-PUSH-IMMEDIATE jit-define
+] JIT-PUSH-LITERAL jit-define
 
 [
     jit-save-context

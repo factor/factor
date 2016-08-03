@@ -7,6 +7,11 @@ locals.backend math math.private memory namespaces sequences
 slots.private strings.private vocabs ;
 IN: bootstrap.x86
 
+: temp0/32 ( -- reg )
+    temp0 32-bit-version-of ;
+: temp1/32 ( -- reg )
+    temp1 32-bit-version-of ;
+
 big-endian off
 
 ! C to Factor entry point
@@ -83,7 +88,7 @@ big-endian off
     ds-reg bootstrap-cell ADD
     ! store literal on datastack
     ds-reg [] temp0 MOV
-] JIT-PUSH-IMMEDIATE jit-define
+] JIT-PUSH-LITERAL jit-define
 
 [
     0 CALL f rc-relative rel-word-pic
@@ -231,19 +236,19 @@ big-endian off
     temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
 ] PIC-LOAD jit-define
 
-[ temp1 tag-mask get AND ] PIC-TAG jit-define
+[ temp1/32 tag-mask get AND ] PIC-TAG jit-define
 
 [
     temp0 temp1 MOV
-    temp1 tag-mask get AND
-    temp1 tuple type-number CMP
+    temp1/32 tag-mask get AND
+    temp1/32 tuple type-number CMP
     [ JNE ]
     [ temp1 temp0 tuple-class-offset [+] MOV ]
     jit-conditional
 ] PIC-TUPLE jit-define
 
 [
-    temp1 0x7f CMP f rc-absolute-1 rel-untagged
+    temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
 ] PIC-CHECK-TAG jit-define
 
 [ 0 JE f rc-relative rel-word ] PIC-HIT jit-define
@@ -253,9 +258,9 @@ big-endian off
 [
     ! class = ...
     temp0 temp1 MOV
-    temp1 tag-mask get AND
-    temp1 tag-bits get SHL
-    temp1 tuple type-number tag-fixnum CMP
+    temp1/32 tag-mask get AND
+    temp1/32 tag-bits get SHL
+    temp1/32 tuple type-number tag-fixnum CMP
     [ JNE ]
     [ temp1 temp0 tuple-class-offset [+] MOV ]
     jit-conditional
@@ -484,9 +489,9 @@ big-endian off
         ! load from stack
         temp0 ds-reg [] MOV
         ! compute tag
-        temp0 tag-mask get AND
+        temp0/32 tag-mask get AND
         ! tag the tag
-        temp0 tag-bits get SHL
+        temp0/32 tag-bits get SHL
         ! push to stack
         ds-reg [] temp0 MOV
     ] }

@@ -23,3 +23,15 @@ IN: peg.javascript.tokenizer.tests
 { V{ T{ ast-regexp f "<(w+)[^>]*?)/>" "g" } } } [
   "/<(\\w+)[^>]*?)\\/>/g" tokenize-javascript
 ] unit-test
+
+{
+    V{ T{ ast-string { value "abc\"def\"" } } }
+} [ "\"abc\\\"def\\\"\"" tokenize-javascript ] unit-test
+
+{
+    V{ T{ ast-string { value "\b\f\n\r\t\v'\"\\" } } }
+} [ "\"\\b\\f\\n\\r\\t\\v\\'\\\"\\\\\"" tokenize-javascript ] unit-test
+
+{
+    V{ T{ ast-string { value "abc" } } }
+} [ "\"\\x61\\u0062\\u{63}\"" tokenize-javascript ] unit-test

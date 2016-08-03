@@ -21,7 +21,7 @@ TIP: "Power tools: " { $links see edit help about apropos time infer. } ;
 
 TIP: "Tips of the day implement the " { $link "definition-protocol" } " and new tips of the day can be defined using the " { $link POSTPONE: TIP: } " parsing word." ;
 
-TIP: "Try some simple demo applications, then look at the source code in " { $snippet "extra/" } ": " { $snippet "\"demos\" run" } ;
+TIP: "Try some simple demo applications:" { $code "\"demos\" run" } "Then look at the source code in " { $snippet "extra/" } "." ;
 
 TIP: "To save time on reloading big libraries such as the " { $vocab-link "furnace" } " web framework, save the image after loading them using the " { $link save } " word." ;
 

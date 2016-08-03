@@ -21,11 +21,7 @@ HOOK: init-stdio io-backend ( -- )
 
 HOOK: io-multiplex io-backend ( nanos -- )
 
-HOOK: normalize-directory io-backend ( path -- path' )
-
 HOOK: normalize-path io-backend ( path -- path' )
-
-M: object normalize-directory normalize-path ;
 
 : set-io-backend ( io-backend -- )
     io-backend set-global init-io init-stdio

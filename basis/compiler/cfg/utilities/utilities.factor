@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators.short-circuit compiler.cfg
+USING: accessors arrays assocs combinators.short-circuit compiler.cfg
 compiler.cfg.instructions compiler.cfg.rpo cpu.architecture deques fry
-heaps kernel locals math sequences sets ;
+heaps kernel locals macros math sequences sets ;
 IN: compiler.cfg.utilities
 
 : block>cfg ( bb -- cfg )
@@ -87,8 +87,8 @@ IN: compiler.cfg.utilities
     [ [ of ] with map first2 connect-bbs ] with each ;
 
 ! Abstract generic stuff
-: apply-passes ( obj passes -- )
-    [ execute( x -- ) ] with each ;
+MACRO: apply-passes ( passes -- quot: ( obj -- ) )
+    unclip-last [ [ 1array \ dup prefix ] map [ ] concat-as ] dip suffix ;
 
 : slurp/replenish-deque ( ... deque quot: ( ... obj -- ... seq ) -- ... )
       over '[ @ _ push-all-front ] slurp-deque ; inline

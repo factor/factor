@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants combinators kernel math ;
+USING: accessors colors.constants combinators kernel math
+namespaces ;
 IN: fonts
 
 CONSTANT: default-serif-font-name "serif"
@@ -9,16 +10,18 @@ CONSTANT: default-monospace-font-name "monospace"
 
 CONSTANT: default-font-size 12
 
-TUPLE: font
-name
-size
-bold?
-italic?
-{ foreground initial: COLOR: black }
-{ background initial: COLOR: white } ;
+SYMBOL: default-font-foreground-color
+COLOR: black default-font-foreground-color set-global
+
+SYMBOL: default-font-background-color
+COLOR: white default-font-background-color set-global
+
+TUPLE: font name size bold? italic? foreground background ;
 
 : <font> ( -- font )
-    font new ; inline
+    font new
+        default-font-foreground-color get >>foreground
+        default-font-background-color get >>background ; inline
 
 : font-with-foreground ( font color -- font' )
     [ clone ] dip >>foreground ; inline

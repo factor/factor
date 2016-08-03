@@ -1,13 +1,16 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays checksums checksums.common combinators
-combinators.smart fry grouping io.binary kernel kernel.private
-literals locals math math.bitwise math.ranges sequences
-sequences.generalizations sequences.private ;
+USING: accessors alien.c-types arrays checksums checksums.common
+combinators combinators.smart fry grouping io.binary kernel
+kernel.private literals locals math math.bitwise math.ranges
+sequences sequences.generalizations sequences.private
+specialized-arrays ;
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: ulong
 IN: checksums.sha
 
 MIXIN: sha
-INSTANCE: sha checksum
+INSTANCE: sha block-checksum
 
 SINGLETON: sha1
 INSTANCE: sha1 sha
@@ -20,14 +23,14 @@ INSTANCE: sha-256 sha
 
 <PRIVATE
 
-TUPLE: sha1-state < checksum-state
-{ K array }
-{ H array }
-{ W array }
+TUPLE: sha1-state < block-checksum-state
+{ K uint-array }
+{ H uint-array }
+{ W uint-array }
 { word-size fixnum } ;
 
 CONSTANT: initial-H-sha1
-    {
+    uint-array{
         0x67452301
         0xefcdab89
         0x98badcfe
@@ -41,12 +44,12 @@ CONSTANT: K-sha1
         20 0x6ed9eba1 <repetition>
         20 0x8f1bbcdc <repetition>
         20 0xca62c1d6 <repetition>
-        4 { } nappend-as
+        4 uint-array{ } nappend-as
     ]
 
-TUPLE: sha2-state < checksum-state
-{ K array }
-{ H array }
+TUPLE: sha2-state < block-checksum-state
+{ K uint-array }
+{ H uint-array }
 { word-size fixnum } ;
 
 TUPLE: sha2-short < sha2-state ;
@@ -72,19 +75,19 @@ CONSTANT: g 6
 CONSTANT: h 7
 
 CONSTANT: initial-H-224
-    {
+    uint-array{
         0xc1059ed8 0x367cd507 0x3070dd17 0xf70e5939
         0xffc00b31 0x68581511 0x64f98fa7 0xbefa4fa4
     }
 
 CONSTANT: initial-H-256
-    {
+    uint-array{
         0x6a09e667 0xbb67ae85 0x3c6ef372 0xa54ff53a
         0x510e527f 0x9b05688c 0x1f83d9ab 0x5be0cd19
     }
 
 CONSTANT: initial-H-384
-    {
+    ulong-array{
         0xcbbb9d5dc1059ed8
         0x629a292a367cd507
         0x9159015a3070dd17
@@ -96,7 +99,7 @@ CONSTANT: initial-H-384
     }
 
 CONSTANT: initial-H-512
-    {
+    ulong-array{
         0x6a09e667f3bcc908
         0xbb67ae8584caa73b
         0x3c6ef372fe94f82b
@@ -108,7 +111,7 @@ CONSTANT: initial-H-512
     }
 
 CONSTANT: K-256
-    {
+    uint-array{
         0x428a2f98 0x71374491 0xb5c0fbcf 0xe9b5dba5
         0x3956c25b 0x59f111f1 0x923f82a4 0xab1c5ed5
         0xd807aa98 0x12835b01 0x243185be 0x550c7dc3
@@ -128,8 +131,7 @@ CONSTANT: K-256
     }
 
 CONSTANT: K-384
-    {
-
+    ulong-array{
         0x428a2f98d728ae22 0x7137449123ef65cd 0xb5c0fbcfec4d3b2f 0xe9b5dba58189dbbc
         0x3956c25bf348b538 0x59f111f1b605d019 0x923f82a4af194f9b 0xab1c5ed5da6d8118
         0xd807aa98a3030242 0x12835b0145706fbe 0x243185be4ee4b28c 0x550c7dc3d5ffb4e2
@@ -238,7 +240,7 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
     ] [ bitxor ] reduce-outputs ; inline
 
 : prepare-M-256 ( n seq -- )
-    { array } declare
+    { uint-array } declare
     {
         [ [ 16 - ] dip nth-unsafe ]
         [ [ 15 - ] dip nth-unsafe s0-256 ]
@@ -248,7 +250,7 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
     } 2cleave set-nth-unsafe ; inline
 
 : prepare-M-512 ( n seq -- )
-    { array } declare
+    { ulong-array } declare
     {
         [ [ 16 - ] dip nth-unsafe ]
         [ [ 15 - ] dip nth-unsafe s0-512 ]
@@ -301,11 +303,9 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
     T1 T2 w+ a H set-nth-unsafe ; inline
 
 : prepare-message-schedule ( seq sha2 -- w-seq )
-    [ word-size>> <groups> [ be> ] map ]
-    [
-        block-size>> [ 0 pad-tail 16 ] keep [a,b) over
-        '[ _ prepare-M-256 ] each
-    ] bi ; inline
+    [ word-size>> <groups> ] [ block-size>> <uint-array> ] bi
+    [ '[ [ be> ] dip _ set-nth-unsafe ] each-index ]
+    [ 16 over length [a,b) over '[ _ prepare-M-256 ] each ] bi ; inline
 
 :: process-chunk ( M block-size cloned-H sha2 -- )
     block-size [
@@ -320,7 +320,7 @@ M: sha2-short checksum-block
     [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi ;
 
 : sequence>byte-array ( seq n -- bytes )
-    '[ _ >be ] map B{ } concat-as ; inline
+    '[ _ >be ] { } map-as B{ } concat-as ; inline
 
 : sha1>checksum ( sha2 -- bytes )
     H>> 4 sequence>byte-array ; inline
@@ -344,7 +344,7 @@ M: sha-256-state get-checksum
     [ pad-last-short-block ] [ sha-256>checksum ] bi ;
 
 : sha1-W ( t seq -- )
-    { array } declare
+    { uint-array } declare
     {
         [ [ 3 - ] dip nth-unsafe ]
         [ [ 8 - ] dip nth-unsafe bitxor ]
@@ -354,9 +354,9 @@ M: sha-256-state get-checksum
     } 2cleave set-nth-unsafe ; inline
 
 : prepare-sha1-message-schedule ( seq -- w-seq )
-    4 <groups> [ be> ] map
-    80 0 pad-tail 16 80 [a,b) over
-    '[ _ sha1-W ] each ; inline
+    4 <groups> 80 <uint-array>
+    [ '[ [ be> ] dip _ set-nth-unsafe ] each-index ]
+    [ 16 80 [a,b) over '[ _ sha1-W ] each ] bi ; inline
 
 : sha1-f ( B C D n -- f_nbcd )
     20 /i
@@ -404,13 +404,5 @@ M:: sha1-state checksum-block ( bytes state -- )
 M: sha1-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-256>checksum ] bi ;
-
-M: sha checksum-stream
-    initialize-checksum-state swap add-checksum-stream
-    get-checksum ;
-
-M: sha checksum-bytes
-    initialize-checksum-state swap add-checksum-bytes
-    get-checksum ;
 
 PRIVATE>

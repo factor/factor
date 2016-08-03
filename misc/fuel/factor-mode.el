@@ -21,6 +21,7 @@
 (require 'font-lock)
 (require 'ring)
 (require 'fuel-base)
+(require 'factor-smie)
 
 ;;; Customization:
 
@@ -38,12 +39,6 @@
   "Whether to always ask for file creation when cycling to a
 source/docs/tests file. When set to false, you'll be asked only once."
   :type 'boolean
-  :group 'factor)
-
-(defcustom factor-indent-level 4
-  "Indentation of Factor statements."
-  :type 'integer
-  :safe 'integerp
   :group 'factor)
 
 (defcustom factor-comment-column 32
@@ -183,7 +178,8 @@ these lines in your .emacs:
 ;;; Regexps galore:
 
 ;; Utility regexp used by other regexps to match a Factor symbol name
-(setq-local symbol "\\(\\(?:\\sw\\|\\s_\\|\\s(\\|\\s)\\)+\\)")
+(setq-local symbol-nc "\\(?:\\sw\\|\\s_\\|\"\\|\\s(\\|\\s)\\|\\s\\\\)+")
+(setq-local symbol (format "\\(%s\\)" symbol-nc))
 (setq-local ws+ "[ \n\t]+")
 (setq-local symbols-to-semicolon "\\([^;\t]*\\)\\(;\\)")
 
@@ -229,7 +225,6 @@ these lines in your .emacs:
     "METHOD:"
     "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "read-only"
-    "SLOT:"
     "STRING:" "SYNTAX:"
     "UNIFORM-TUPLE:"
     "VARIANT:" "VERTEX-FORMAT:"))
@@ -263,7 +258,7 @@ these lines in your .emacs:
   (regexp-opt factor-declaration-words 'symbols))
 
 (defconst factor-integer-regex
-  "\\_<-?\\(0[xob][0-9a-fA-F]+\\|[0-9][0-9,]*\\)\\_>")
+  (one-symbol "-?\\(?:0[xob][0-9a-fA-F][0-9a-fA-F,]*\\|[0-9][0-9,]*\\)"))
 
 (defconst factor-raw-float-regex
   "[0-9]*\\.[0-9]*\\([eEpP][+-]?[0-9]+\\)?")
@@ -280,15 +275,16 @@ these lines in your .emacs:
 (defconst factor-bad-string-regex
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
-(defconst factor-word-starters
-  '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
-    "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
-    "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::"))
-
 (defconst factor-word-definition-regex
   (concat
-   (format "\\_<\\(%s\\)" (regexp-opt factor-word-starters))
+   (one-symbol (regexp-opt
+                '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
+                  "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
+                  "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::")))
    ws+ symbol))
+
+(defconst factor-method-definition-regex
+  (syntax-and-2-symbols '("M" "M:" "BEFORE" "AFTER")))
 
 ;; [parsing-word] [vocab-word]
 (defconst factor-vocab-ref-regex
@@ -301,7 +297,7 @@ these lines in your .emacs:
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
    '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "GAME" "HELP" "LIBRARY"
-     "MAIN" "MAIN-WINDOW" "STRING" "SYMBOL" "VAR")))
+     "MAIN" "MAIN-WINDOW" "SLOT" "STRING" "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
 (defconst factor-symbols-lines-regex
@@ -321,10 +317,10 @@ these lines in your .emacs:
   (one-symbol "<[^ >]+>"))
 
 (defconst factor-getter-regex
-  (one-symbol "\\(?:\\sw\\|\\s_\\)+>>"))
+  (one-symbol (concat symbol-nc ">>")))
 
 (defconst factor-setter-regex
-  (one-symbol ">>\\(?:\\sw\\|\\s_\\)+\\|\\(?:\\sw\\|\\s_\\)+<<"))
+  (one-symbol (format ">>%s\\|%s<<" symbol-nc symbol-nc)))
 
 (defconst factor-stack-effect-regex
   "\\( ( [^)]* )\\)\\|\\( (( [^)]* ))\\)")
@@ -335,37 +331,9 @@ these lines in your .emacs:
 
 (defconst factor-sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
-(defconst factor-indent-def-starts
-  '("" ":"
-    "AFTER" "BEFORE"
-    "COM-INTERFACE" "CONSULT"
-    "ENUM" "ERROR"
-    "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
-    "INTERSECTION:"
-    "M" "M:" "MACRO" "MACRO:"
-    "MAIN-WINDOW:" "MEMO" "MEMO:" "METHOD"
-    "SYNTAX"
-    "PREDICATE" "PRIMITIVE" "PROTOCOL"
-    "SINGLETONS"
-    "STRUCT" "SYMBOLS" "TAG" "TUPLE"
-    "TYPED" "TYPED:"
-    "UNIFORM-TUPLE"
-    "UNION-STRUCT" "UNION"
-    "VARIANT" "VERTEX-FORMAT"))
-
-(defconst factor-no-indent-def-starts
-  '("ARTICLE" "HELP" "SPECIALIZED-ARRAYS"))
-
-(defconst factor-indent-def-start-regex
-  (format "^\\(%s:\\)\\( \\|\n\\)" (regexp-opt factor-indent-def-starts)))
-
 (defconst factor-definition-start-regex
   (format "^\\(%s:\\) " (regexp-opt (append factor-no-indent-def-starts
                                             factor-indent-def-starts))))
-
-(defconst factor-definition-end-regex
-  (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
-          factor-declaration-words-regex))
 
 (defconst factor-single-liner-regex
   (regexp-opt '("ABOUT:"
@@ -391,12 +359,13 @@ these lines in your .emacs:
           factor-definition-start-regex
           factor-single-liner-regex))
 
-(defconst factor-end-of-def-line-regex
-  (format "^.*%s" factor-definition-end-regex))
+(defconst factor-definition-end-regex
+  (format "\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)"
+          factor-declaration-words-regex))
 
 (defconst factor-end-of-def-regex
-  (format "\\(%s\\)\\|\\(^%s .*\\)"
-          factor-end-of-def-line-regex
+  (format "^.*%s\\|^%s .*"
+          factor-definition-end-regex
           factor-single-liner-regex))
 
 (defconst factor-word-signature-regex
@@ -422,7 +391,11 @@ these lines in your .emacs:
   (concat (syntax-begin '("PREDICATE")) ws+ symbol ws+ "\\(<\\)" ws+ symbol))
 
 (defconst factor-alien-function-regex
-  (concat (syntax-begin '("GL-FUNCTION" "FUNCTION" "GL-CALLBACK" "CALLBACK"))
+  (concat (syntax-begin '("CALLBACK"
+                          "FUNCTION"
+                          "GL-CALLBACK"
+                          "GL-FUNCTION"
+                          "X-FUNCTION"))
           ws+ symbol
           ws+ symbol ws+))
 
@@ -440,6 +413,7 @@ these lines in your .emacs:
                  "P" 'factor-font-lock-parsing-word
                  "V" 'factor-font-lock-vocabulary-name
                  "T" 'factor-font-lock-type-name
+                 "N" 'factor-font-lock-number
                  "W" 'factor-font-lock-word)))
 
 (defun factor-group-name-to-face (group-name)
@@ -475,14 +449,14 @@ these lines in your .emacs:
     ,(factor-syntax factor-declaration-words-regex '("C"))
     ,(factor-syntax factor-word-definition-regex '("P" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
+    ,(factor-syntax (syntax-and-2-symbols '("LOG")) '("P" "W" ""))
     ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
     ,(factor-syntax factor-types-lines-regex '("P" "T"))
-    (,factor-integer-regex . 'factor-font-lock-number)
+    ,(factor-syntax factor-integer-regex '("N"))
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
     ,(factor-syntax factor-type-definition-regex '("P" "T"))
-    ,(factor-syntax (syntax-and-2-symbols '("M" "M:" "BEFORE" "AFTER"))
-                    '("P" "T" "W"))
+    ,(factor-syntax factor-method-definition-regex '("P" "T" "W"))
 
     ;; Highlights tuple and struct definitions. The TUPLE/STRUCT
     ;; parsing word, class name and optional parent classes are
@@ -506,13 +480,18 @@ these lines in your .emacs:
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-parsing-word nil t)
      (4 'factor-font-lock-type-name nil t)
-     ;; A slot is either a single symbol or a sequence along the
-     ;; lines: { foo initial: "bar }
-     ("\\(\\(?:\\sw\\|\\s_\\)+\\)\\|\\(?:{[ \n]+\\(\\(?:\\sw\\|\\s_\\)+\\)[^}]+\\)"
+     ;; This allows three different slot styles:
+     ;; 1) foo 2) { foo initial: 123 } 3) { foo initial: { 123 } }
+     (,(format
+        "{%s%s[^}]+}%s}\\|{%s%s[^}]+}\\|%s"
+        ws+ symbol ws+
+        ws+ symbol
+        symbol)
       (factor-find-end-of-def)
       nil
       (1 'factor-font-lock-symbol nil t)
-      (2 'factor-font-lock-symbol nil t)))
+      (2 'factor-font-lock-symbol nil t)
+      (3 'factor-font-lock-symbol nil t)))
     ,(factor-syntax factor-predicate-regex '("P" "T" "P" "T"))
     ;; Highlights alien function definitions. Types in stack effect
     ;; declarations are given a bold face.
@@ -571,86 +550,21 @@ these lines in your .emacs:
 (defsubst factor-brackets-start ()
   (nth 1 (syntax-ppss)))
 
-(defun factor-brackets-end ()
-  (save-excursion
-    (goto-char (factor-brackets-start))
-    (condition-case nil
-        (progn (forward-sexp)
-               (1- (point)))
-      (error -1))))
-
-(defsubst factor-indentation-at (pos)
-  (save-excursion (goto-char pos) (current-indentation)))
-
-(defsubst factor-at-begin-of-def ()
-  (looking-at factor-begin-of-def-regex))
-
-(defsubst factor-at-begin-of-indent-def ()
-  (looking-at factor-indent-def-start-regex))
-
-(defsubst factor-at-end-of-def ()
-  (looking-at factor-end-of-def-regex))
-
-(defsubst factor-looking-at-emptiness ()
-  (looking-at "^[ ]*$\\|$"))
-
-(defsubst factor-is-last-char (pos)
-  (save-excursion
-    (goto-char (1+ pos))
-    (looking-at-p "[ ]*$")))
-
-(defsubst factor-line-offset (pos)
-  (- pos (save-excursion
-           (goto-char pos)
-           (beginning-of-line)
-           (point))))
-
-(defun factor-previous-non-blank ()
-  (forward-line -1)
-  (while (and (not (bobp)) (factor-looking-at-emptiness))
-    (forward-line -1)))
-
 (defsubst factor-beginning-of-defun (&optional times)
   (re-search-backward factor-begin-of-def-regex nil t times))
 
 (defsubst factor-end-of-defun ()
   (re-search-forward factor-end-of-def-regex nil t))
 
-(defun factor-beginning-of-block-pos ()
+(defsubst factor-end-of-defun-pos ()
   (save-excursion
-    (if (> (factor-brackets-depth) 0)
-        (factor-brackets-start)
-      (factor-beginning-of-defun)
-      (point))))
-
-(defun factor-at-setter-line ()
-  (save-excursion
-    (beginning-of-line)
-    (when (re-search-forward factor-setter-regex
-                             (line-end-position)
-                             t)
-      (let* ((to (match-beginning 0))
-             (from (factor-beginning-of-block-pos)))
-        (goto-char from)
-        (let ((depth (factor-brackets-depth)))
-          (and (or (re-search-forward factor-constructor-regex to t)
-                   (re-search-forward factor-setter-regex to t))
-               (= depth (factor-brackets-depth))))))))
-
-(defun factor-at-constructor-line ()
-  (save-excursion
-    (beginning-of-line)
-    (re-search-forward factor-constructor-regex (line-end-position) t)))
+    (re-search-forward factor-end-of-def-regex nil t)
+    (point)))
 
 (defun factor-on-vocab ()
   "t if point is on a vocab name. We just piggyback on
   font-lock's pretty accurate information."
   (eq (get-char-property (point) 'face) 'factor-font-lock-vocabulary-name))
-
-(defsubst factor-end-of-defun-pos ()
-  (save-excursion
-    (re-search-forward factor-end-of-def-regex nil t)
-    (point)))
 
 (defun factor-find-end-of-def (&rest foo)
   (save-excursion
@@ -726,94 +640,6 @@ these lines in your .emacs:
         (goto-char (point-max))
         (push (concat (factor-find-in) ".private") usings))
       usings)))
-
-
-;;; Indentation:
-
-(defsubst factor-increased-indentation (&optional i)
-  (+ (or i (current-indentation)) factor-indent-level))
-
-(defsubst factor-decreased-indentation (&optional i)
-  (- (or i (current-indentation)) factor-indent-level))
-
-(defun factor-indent-in-brackets ()
-  (save-excursion
-    (beginning-of-line)
-    (when (> (factor-brackets-depth) 0)
-      (let* ((bs (factor-brackets-start))
-             (be (factor-brackets-end))
-             (ln (line-number-at-pos)))
-        (when (> ln (line-number-at-pos bs))
-          (cond ((and (> be 0)
-                      (= (- be (point)) (current-indentation))
-                      (= ln (line-number-at-pos be)))
-                 (factor-indentation-at bs))
-                ((or (factor-is-last-char bs)
-                     (not (eq ?\ (char-after (1+ bs)))))
-                 (factor-increased-indentation
-                  (factor-indentation-at bs)))
-                (t (+ 2 (factor-line-offset bs)))))))))
-
-(defun factor-indent-definition ()
-  (save-excursion
-    (beginning-of-line)
-    (when (factor-at-begin-of-def) 0)))
-
-(defsubst factor-previous-non-empty ()
-  (forward-line -1)
-  (while (and (not (bobp))
-              (factor-looking-at-emptiness))
-    (forward-line -1)))
-
-(defun factor-indent-setter-line ()
-  (when (factor-at-setter-line)
-    (or (save-excursion
-          (let ((indent (and (factor-at-constructor-line)
-                             (current-indentation))))
-            (while (not (or indent
-                            (bobp)
-                            (factor-at-begin-of-def)
-                            (factor-at-end-of-def)))
-              (if (factor-at-constructor-line)
-                  (setq indent (factor-increased-indentation))
-                (forward-line -1)))
-            indent))
-        (save-excursion
-          (factor-previous-non-empty)
-          (current-indentation)))))
-
-(defun factor-indent-continuation ()
-  (save-excursion
-    (factor-previous-non-empty)
-    (cond ((or (factor-at-end-of-def)
-               (factor-at-setter-line))
-           (factor-decreased-indentation))
-          ((factor-at-begin-of-indent-def)
-           (factor-increased-indentation))
-          (t (current-indentation)))))
-
-(defun factor-calculate-indentation ()
-  "Calculate Factor indentation for line at point."
-  (or (and (bobp) 0)
-      (factor-indent-definition)
-      (factor-indent-in-brackets)
-      (factor-indent-setter-line)
-      (factor-indent-continuation)
-      0))
-
-(defun factor-indent-line (&optional ignored)
-  "Indents the current Factor line."
-  (interactive)
-  (let ((target (factor-calculate-indentation))
-        (pos (- (point-max) (point))))
-    (if (= target (current-indentation))
-        (if (< (current-column) (current-indentation))
-            (back-to-indentation))
-      (beginning-of-line)
-      (delete-horizontal-space)
-      (indent-to target)
-      (if (> (- (point-max) pos) (point))
-          (goto-char (- (point-max) pos))))))
 
 
 ;;; Buffer cycling:
@@ -954,9 +780,14 @@ With prefix, non-existing files will be created."
   (setq-local electric-indent-chars
               (append '(?\] ?\} ?\n) electric-indent-chars))
 
-  (setq-local indent-line-function 'factor-indent-line)
   ;; No tabs for you!!
   (setq-local indent-tabs-mode nil)
+
+  (add-hook 'smie-indent-functions #'factor-smie-indent nil t)
+  (smie-setup factor-smie-grammar #'factor-smie-rules
+              :forward-token #'factor-smie-forward-token
+              :backward-token #'factor-smie-backward-token)
+  (setq-local smie-indent-basic factor-block-offset)
 
   (setq-local beginning-of-defun-function 'factor-beginning-of-defun)
   (setq-local end-of-defun-function 'factor-end-of-defun)

@@ -4,8 +4,8 @@ USING: accessors arrays assocs colors.constants
 definitions.icons fry help help.topics kernel math.rectangles
 models.arrow namespaces sequences tools.crossref ui.gadgets
 ui.gadgets.glass ui.gadgets.labeled ui.gadgets.search-tables
-ui.gadgets.tables ui.gadgets.theme ui.gadgets.wrappers ui.gestures ui.images
-ui.operations ui.pens.solid ;
+ui.gadgets.tables ui.gadgets.wrappers ui.gestures ui.images
+ui.operations ui.pens.solid ui.theme ui.theme.images ;
 FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.tools.browser.popups
 
@@ -32,7 +32,7 @@ TUPLE: links-popup < wrapper ;
         30 >>max-cols ;
 
 : <links-popup> ( model quot title -- gadget )
-    [ <links-table> COLOR: white <solid> >>interior ] dip
+    [ <links-table> content-background <solid> >>interior ] dip
     popup-color <labeled> links-popup new-wrapper ;
 
 links-popup H{

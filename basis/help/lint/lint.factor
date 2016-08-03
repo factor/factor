@@ -80,7 +80,6 @@ PRIVATE>
 : help-lint ( prefix -- )
     [
         auto-use? off
-        all-disk-vocab-names all-vocabs-list set
         group-articles vocab-articles set
         loaded-child-vocab-names
         [ check-vocab ] each

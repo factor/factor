@@ -98,4 +98,4 @@ PRIVATE>
     (measure-metrics) combine-metrics ;
 
 : measure-height ( children sizes -- height )
-    (measure-metrics) dup [ combine-metrics + ] [ 3drop ] if ;
+    (measure-metrics) [ combine-metrics + ] [ 2drop ] if* ;

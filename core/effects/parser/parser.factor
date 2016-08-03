@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators continuations effects kernel
-lexer make namespaces parser sequences sets splitting
-vocabs.parser words ;
+USING: accessors arrays combinators continuations effects
+kernel lexer make namespaces parser sequences sets
+splitting vocabs.parser words ;
 IN: effects.parser
 
 DEFER: parse-effect
@@ -19,6 +19,7 @@ SYMBOL: effect-var
 : effect-opener? ( token -- token ? ) dup { f "(" "--" } member? ; inline
 : effect-closer? ( token -- token ? ) dup ")" sequence= ; inline
 : row-variable? ( token -- token' ? ) ".." ?head ; inline
+: standalone-type? ( token -- token' ? ) ":" ?head ; inline
 
 : parse-effect-var ( first? var name -- var )
     nip
@@ -27,6 +28,14 @@ SYMBOL: effect-var
 
 : parse-effect-value ( token -- value )
     ":" ?tail [ scan-object 2array ] when ;
+
+ERROR: bad-standalone-effect obj ;
+: parse-standalone-type ( obj -- var )
+    parse-datum
+    dup parsing-word? [
+        ?execute-parsing dup length 1 =
+        [ first ] [ bad-standalone-effect ] if
+    ] when f swap 2array ;
 PRIVATE>
 
 : parse-effect-token ( first? var end -- var more? )
@@ -35,7 +44,10 @@ PRIVATE>
         { [ effect-opener? ] [ bad-effect ] }
         { [ effect-closer? ] [ stack-effect-omits-dashes ] }
         { [ row-variable? ] [ parse-effect-var t ] }
-        [ [ drop ] 2dip parse-effect-value , t ]
+        [
+            [ drop ] 2dip standalone-type?
+            [ parse-standalone-type ] [ parse-effect-value ] if , t
+        ]
     } cond ;
 
 : parse-effect-tokens ( end -- var tokens )

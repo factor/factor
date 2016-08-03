@@ -177,7 +177,7 @@ CONSTANT: all-primitives {
             {
                 "resize-byte-array" ( n byte-array -- new-byte-array )
                 "resize_byte_array"
-                { integer byte-array } { byte-array } f
+                { integer-array-capacity byte-array } { byte-array } f
             }
         }
     }
@@ -782,7 +782,6 @@ CONSTANT: all-primitives {
         {
             { "profiling" ( ? -- ) "sampling_profiler" { object } { } f }
             { "(get-samples)" ( -- samples/f ) "get_samples" { } { object } f }
-            { "(clear-samples)" ( -- ) "clear_samples" { } { } f }
         }
     }
     {

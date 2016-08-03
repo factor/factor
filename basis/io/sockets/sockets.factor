@@ -459,6 +459,9 @@ M: invalid-local-address summary
 : protocol-port ( protocol -- port )
     [ f getservbyname [ port>> htons ] [ f ] if* ] [ f ] if* ;
 
+: port-protocol ( port -- protocol )
+    [ htons f getservbyport [ name>> ] [ f ] if* ] [ f ] if* ;
+
 : <any-port-local-inet4> ( -- inet4 ) f 0 <inet4> ;
 : <any-port-local-inet6> ( -- inet6 ) f 0 <inet6> ;
 

@@ -77,7 +77,7 @@ M: inet6 >insecure 1array ;
 M: local >insecure 1array ;
 M: integer >insecure internet-server 1array ;
 M: string >insecure internet-server 1array ;
-M: array >insecure [ >insecure ] map ;
+M: array >insecure [ >insecure ] map concat ;
 M: f >insecure ;
 
 : >secure ( addrspec -- addrspec' )

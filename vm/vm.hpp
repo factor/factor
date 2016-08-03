@@ -154,7 +154,6 @@ struct factor_vm {
   void delete_context();
   void init_contexts(cell datastack_size_, cell retainstack_size_,
                      cell callstack_size_);
-  void delete_contexts();
   cell begin_callback(cell quot);
   void end_callback();
   void primitive_current_callback();
@@ -167,9 +166,7 @@ struct factor_vm {
   cell retainstack_to_array(context* ctx);
   void primitive_retainstack_for();
   cell array_to_stack(array* array, cell bottom);
-  void set_datastack(context* ctx, array* array);
   void primitive_set_datastack();
-  void set_retainstack(context* ctx, array* array);
   void primitive_set_retainstack();
   void primitive_check_datastack();
   void primitive_load_locals();
@@ -184,14 +181,12 @@ struct factor_vm {
   void primitive_special_object();
   void primitive_set_special_object();
   void primitive_identity_hashcode();
-  void compute_identity_hashcode(object* obj);
   void primitive_compute_identity_hashcode();
   cell clone_object(cell obj_);
   void primitive_clone();
   void primitive_become();
 
   // sampling_profiler
-  void clear_samples();
   void record_sample(bool prolog_p);
   void record_callstack_sample(cell* begin, cell* end, bool prolog_p);
   void start_sampling_profiler(fixnum rate);
@@ -199,7 +194,6 @@ struct factor_vm {
   void set_sampling_profiler(fixnum rate);
   void primitive_sampling_profiler();
   void primitive_get_samples();
-  void primitive_clear_samples();
 
   // errors
   void general_error(vm_error_type error, cell arg1, cell arg2);
@@ -208,9 +202,6 @@ struct factor_vm {
   void verify_memory_protection_error(cell addr);
   void divide_by_zero_error();
   void primitive_unimplemented();
-  void memory_signal_handler_impl();
-  void synchronous_signal_handler_impl();
-  void fp_signal_handler_impl();
 
   // bignum
   int bignum_equal_p(bignum* x, bignum* y);
@@ -570,7 +561,6 @@ struct factor_vm {
                                code_block* compiled,
                                array* parameters,
                                cell index);
-  cell compute_here_address(cell arg, cell offset, code_block* compiled);
   void initialize_code_block(code_block* compiled, cell literals);
   void initialize_code_block(code_block* compiled);
   void fixup_labels(array* labels, code_block* compiled);
@@ -664,15 +654,10 @@ struct factor_vm {
   void primitive_quotation_compiled_p();
 
   // dispatch
-  cell search_lookup_alist(cell table, cell klass);
-  cell search_lookup_hash(cell table, cell klass, cell hashcode);
-  cell nth_superclass(tuple_layout* layout, fixnum echelon);
-  cell nth_hashcode(tuple_layout* layout, fixnum echelon);
   cell lookup_tuple_method(cell obj, cell methods);
   cell lookup_method(cell obj, cell methods);
   void primitive_lookup_method();
   cell object_class(cell obj);
-  cell method_cache_hashcode(cell klass, array* array);
   void update_method_cache(cell cache, cell klass, cell method);
   void primitive_mega_cache_miss();
   void primitive_reset_dispatch_stats();
@@ -681,12 +666,10 @@ struct factor_vm {
   // inline cache
   void init_inline_caching(int max_size);
   void deallocate_inline_cache(cell return_address);
-  cell determine_inline_cache_type(array* cache_entries);
   void update_pic_count(cell type);
   code_block* compile_inline_cache(fixnum index, cell generic_word_,
                                    cell methods_, cell cache_entries_,
                                    bool tail_call_p);
-  cell inline_cache_size(cell cache_entries);
   cell add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_);
   void update_pic_transitions(cell pic_size);
   cell inline_cache_miss(cell return_address);
@@ -698,13 +681,9 @@ struct factor_vm {
   void set_fpu_state(cell state);
 
   // factor
-  void default_parameters(vm_parameters* p);
-  bool factor_arg(const vm_char* str, const vm_char* arg, cell* value);
-  void init_parameters_from_args(vm_parameters* p, int argc, vm_char** argv);
   void prepare_boot_image();
   void init_factor(vm_parameters* p);
   void pass_args_to_factor(int argc, vm_char** argv);
-  void start_factor(vm_parameters* p);
   void stop_factor();
   void start_embedded_factor(vm_parameters* p);
   void start_standalone_factor(int argc, vm_char** argv);

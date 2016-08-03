@@ -3,8 +3,7 @@
 USING: accessors kernel memoize namespaces ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.buttons.private
 ui.gadgets.glass ui.gadgets.menus ui.gadgets.status-bar
-ui.gadgets.theme ui.gadgets.worlds ui.gestures
-ui.operations ui.pens.solid ;
+ui.gadgets.worlds ui.gestures ui.operations ui.pens.solid ui.theme ;
 IN: ui.gadgets.presentations
 
 TUPLE: presentation < button object hook ;

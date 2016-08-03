@@ -72,8 +72,6 @@ void factor_vm::end_gc() {
 }
 
 void factor_vm::start_gc_again() {
-  end_gc();
-
   switch (current_gc->op) {
     case collect_nursery_op:
       /* Nursery collection can fail if aging does not have enough
@@ -92,9 +90,6 @@ void factor_vm::start_gc_again() {
       critical_error("in start_gc_again, bad GC op", current_gc->op);
       break;
   }
-
-  if (gc_events)
-    current_gc->event = new gc_event(current_gc->op, this);
 }
 
 void factor_vm::set_current_gc_op(gc_op op) {

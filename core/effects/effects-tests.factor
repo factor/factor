@@ -1,5 +1,5 @@
 USING: accessors effects effects.parser eval kernel prettyprint
-sequences tools.test ;
+sequences tools.test math ;
 IN: effects.tests
 
 { t } [ { "a" } { "a" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
@@ -54,3 +54,10 @@ IN: effects.tests
 { ( -- x ) } [ ( c -- d ) curry-effect ] unit-test
 { ( -- x x ) } [ ( -- d ) curry-effect ] unit-test
 { ( x -- ) } [ ( a b -- ) curry-effect ] unit-test
+
+! test unnamed types
+{ ( :fixnum -- :float ) } [ ( :fixnum -- :float ) ] unit-test
+{ ( :union{ fixnum bignum } -- ) } [ ( :union{ fixnum bignum } -- ) ] unit-test
+
+{ "( :( :integer -- :integer ) :float -- :bignum )" }
+[ ( :( :integer -- :integer ) :float -- :bignum ) unparse ] unit-test

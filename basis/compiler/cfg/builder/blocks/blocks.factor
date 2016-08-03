@@ -39,7 +39,7 @@ SLOT: out-d
 : begin-branch ( block -- block' )
     height-state [ clone-height-state ] change (begin-basic-block) ;
 
-: end-branch ( block -- pair/f )
+: end-branch ( block/f -- pair/f )
     dup [
         ##branch,
         end-local-analysis

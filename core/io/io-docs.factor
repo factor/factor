@@ -264,12 +264,12 @@ HELP: with-output-stream
 
 HELP: with-streams
 { $values { "input" "an input stream" } { "output" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "input" } " and " { $link output-stream } " rebound to " { $snippet "output" } ". The stream is closed if the quotation returns or throws an error." } ;
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "input" } " and " { $link output-stream } " rebound to " { $snippet "output" } ". The streams are closed if the quotation returns or throws an error." } ;
 
 HELP: with-streams*
 { $values { "input" "an input stream" } { "output" "an output stream" } { "quot" quotation } }
 { $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "input" } " and " { $link output-stream } " rebound to " { $snippet "output" } "." }
-{ $notes "This word does not close the stream. Compare with " { $link with-streams } "." } ;
+{ $notes "This word does not close the streams. Compare with " { $link with-streams } "." } ;
 
 { with-input-stream with-input-stream* } related-words
 

@@ -6,20 +6,6 @@ kernel.private locals math sequences sequences.extras sorting
 strings system unicode vocabs ;
 IN: io.directories.search
 
-: qualified-directory-entries ( path -- seq )
-    absolute-path
-    dup directory-entries [ [ append-path ] change-name ] with map! ;
-
-: qualified-directory-files ( path -- seq )
-    absolute-path
-    dup directory-files [ append-path ] with map! ;
-
-: with-qualified-directory-files ( path quot -- )
-    '[ "" qualified-directory-files @ ] with-directory ; inline
-
-: with-qualified-directory-entries ( path quot -- )
-    '[ "" qualified-directory-entries @ ] with-directory ; inline
-
 <PRIVATE
 
 TUPLE: directory-iterator

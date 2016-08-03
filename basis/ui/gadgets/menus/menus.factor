@@ -3,8 +3,8 @@
 USING: accessors kernel locals math.rectangles math.vectors
 namespaces opengl sequences sorting ui.commands ui.gadgets
 ui.gadgets.buttons ui.gadgets.glass ui.gadgets.packs
-ui.gadgets.theme ui.gadgets.worlds ui.gestures ui.operations
-ui.pens ui.pens.solid ui.tools.common ;
+ui.gadgets.worlds ui.gestures ui.operations
+ui.pens ui.pens.solid ui.theme ui.tools.common ;
 IN: ui.gadgets.menus
 
 : show-menu ( owner menu -- )

@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays sequences math splitting make assocs
-kernel layouts system alien.c-types classes.struct
-cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86 cpu.x86.64 compiler.cfg.builder.alien
-compiler.cfg.builder.alien.boxing compiler.cfg.registers ;
+USING: accessors alien.c-types arrays assocs
+compiler.cfg.builder.alien.boxing cpu.architecture cpu.x86
+cpu.x86.assembler cpu.x86.assembler.operands kernel layouts make math
+math.order sequences splitting system ;
 IN: cpu.x86.64.unix
 
 M: x86.64 param-regs
@@ -45,4 +44,6 @@ M: x86.64 dummy-int-params? f ;
 
 M: x86.64 dummy-fp-params? f ;
 
-M: x86.64 %prepare-var-args RAX RAX XOR ;
+M: x86.64 %prepare-var-args ( reg-inputs -- )
+    [ second reg-class-of float-regs? ] count 8 min
+    [ EAX EAX XOR ] [ <byte> AL swap MOV ] if-zero ;

@@ -33,8 +33,9 @@ void free_list::add_to_free_list(free_heap_block* block) {
 
 free_heap_block* free_list::find_free_block(cell size) {
   /* Check small free lists */
-  if (size / data_alignment < free_list_count) {
-    std::vector<free_heap_block*>& blocks = small_blocks[size / data_alignment];
+  cell bucket = size / data_alignment;
+  if (bucket < free_list_count) {
+    std::vector<free_heap_block*>& blocks = small_blocks[bucket];
     if (blocks.size() == 0) {
       /* Round up to a multiple of 'size' */
       cell large_block_size = ((allocation_page_size + size - 1) / size) * size;

@@ -2,20 +2,16 @@
 
 namespace factor {
 
-cell factor_vm::search_lookup_alist(cell table, cell klass) {
+static cell search_lookup_alist(cell table, cell klass) {
   array* elements = untag<array>(table);
-  fixnum index = array_capacity(elements) - 2;
-  while (index >= 0) {
+  for (fixnum index = array_capacity(elements) - 2; index >= 0; index -= 2) {
     if (array_nth(elements, index) == klass)
       return array_nth(elements, index + 1);
-    else
-      index -= 2;
   }
-
   return false_object;
 }
 
-cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode) {
+static cell search_lookup_hash(cell table, cell klass, cell hashcode) {
   array* buckets = untag<array>(table);
   cell bucket = array_nth(buckets, hashcode & (array_capacity(buckets) - 1));
   if (TAG(bucket) == ARRAY_TYPE)
@@ -23,12 +19,12 @@ cell factor_vm::search_lookup_hash(cell table, cell klass, cell hashcode) {
   return bucket;
 }
 
-cell factor_vm::nth_superclass(tuple_layout* layout, fixnum echelon) {
+static cell nth_superclass(tuple_layout* layout, fixnum echelon) {
   cell* ptr = (cell*)(layout + 1);
   return ptr[echelon * 2];
 }
 
-cell factor_vm::nth_hashcode(tuple_layout* layout, fixnum echelon) {
+static cell nth_hashcode(tuple_layout* layout, fixnum echelon) {
   cell* ptr = (cell*)(layout + 1);
   return ptr[echelon * 2 + 1];
 }
@@ -86,7 +82,7 @@ cell factor_vm::object_class(cell obj) {
   return tag_fixnum(tag);
 }
 
-cell factor_vm::method_cache_hashcode(cell klass, array* array) {
+static cell method_cache_hashcode(cell klass, array* array) {
   cell capacity = (array_capacity(array) >> 1) - 1;
   return ((klass >> TAG_BITS) & capacity) << 1;
 }
@@ -121,32 +117,6 @@ void factor_vm::primitive_reset_dispatch_stats() {
 /* Allocates memory */
 void factor_vm::primitive_dispatch_stats() {
   ctx->push(tag<byte_array>(byte_array_from_value(&dispatch_stats)));
-}
-
-/* Allocates memory */
-void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index,
-                                           cell cache_) {
-  data_root<array> methods(methods_, parent);
-  data_root<array> cache(cache_, parent);
-
-  /* The object must be on the top of the datastack at this point. */
-
-  /* Do a cache lookup. */
-  emit_with_literal(parent->special_objects[MEGA_LOOKUP], cache.value());
-
-  /* If we end up here, the cache missed. */
-  emit(parent->special_objects[JIT_PROLOG]);
-
-  /* Push index, method table and cache on the stack. */
-  push(methods.value());
-  push(tag_fixnum(index));
-  push(cache.value());
-  word_call(parent->special_objects[MEGA_MISS_WORD]);
-
-  /* Now the new method has been stored into the cache, and its on
-     the stack. */
-  emit(parent->special_objects[JIT_EPILOG]);
-  emit(parent->special_objects[JIT_EXECUTE]);
 }
 
 }

@@ -19,7 +19,7 @@ GENERIC: random-32* ( obj -- n )
 GENERIC: random-bytes* ( n obj -- byte-array )
 
 M: object random-bytes*
-    [ integer>fixnum-strict [ <byte-array> ] keep ] dip
+    [ integer>fixnum-strict [ (byte-array) ] keep ] dip
     [ over 4 >= ] [
         [ 4 - ] dip
         [ random-32* 2over c:int c:set-alien-value ] keep

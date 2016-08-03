@@ -7,20 +7,15 @@ IN: db.sqlite.errors
 TUPLE: unparsed-sqlite-error error ;
 C: <unparsed-sqlite-error> unparsed-sqlite-error
 
-SINGLETONS: table-exists table-missing ;
-
-: sqlite-table-error ( table message -- error )
-    {
-        { table-exists [ <sql-table-exists> ] }
-    } case ;
-
 EBNF: parse-sqlite-sql-error
 
-TableMessage = " already exists" => [[ table-exists ]]
+AlreadyExists = " already exists"
 
 SqliteError =
-    "table " (!(TableMessage).)+:table TableMessage:message
-      => [[ table >string message sqlite-table-error ]]
+    "table " (!(AlreadyExists).)+:table AlreadyExists
+      => [[ table >string <sql-table-exists> ]]
+    | "index " (!(AlreadyExists).)+:name AlreadyExists
+      => [[ name >string <sql-index-exists> ]]
     | "no such table: " .+:table
       => [[ table >string <sql-table-missing> ]]
     | .*:error

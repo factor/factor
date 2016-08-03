@@ -5,7 +5,7 @@ IN: words
 ARTICLE: "interned-words" "Looking up and creating words"
 "A word is said to be " { $emphasis "interned" } " if it is a member of the vocabulary named by its vocabulary slot. Otherwise, the word is " { $emphasis "uninterned" } "."
 $nl
-"Words whose names are known at parse time -- that is, most words making up your program -- can be referenced in source code by stating their name. However, the parser itself, and sometimes code you write, will need to create look up words dynamically."
+"Words whose names are known at parse time -- that is, most words making up your program -- can be referenced in source code by stating their name. However, the parser itself, and sometimes code you write, will need to look up words dynamically."
 $nl
 "Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "word-search" } ")."
 { $subsections
@@ -99,7 +99,8 @@ $nl
       {
           { $snippet "\"inline\"" } ", "
           { $snippet "\"foldable\"" } ", "
-          { $snippet "flushable" }
+          { $snippet "\"flushable\""  } ", "
+          { $snippet "\"recursive\""  }
       }
       { $link "declarations" }
   }
@@ -137,7 +138,7 @@ $nl
   }
   {
       { $snippet "\"predicating\"" }
-      " Set on class predicates, stores the corresponding class word"
+      "Set on class predicates, stores the corresponding class word."
   }
   {
       { { $snippet "\"reading\"" } ", " { $snippet "\"writing\"" } }
@@ -244,7 +245,7 @@ HELP: undefined
 } ;
 
 HELP: primitive
-{ $description "The class of primitive words." } ;
+{ $class-description "The class of primitive words." } ;
 
 HELP: word-prop
 { $values { "word" word } { "name" "a property name" } { "value" "a property value" } }

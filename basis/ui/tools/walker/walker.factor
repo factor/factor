@@ -4,7 +4,7 @@ USING: accessors assocs colors colors.constants combinators
 concurrency.messaging formatting fry inspector kernel make
 models models.arrow namespaces sequences threads tools.walker ui
 ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.toolbar
+ui.gadgets.status-bar ui.theme ui.gadgets.toolbar
 ui.gadgets.tracks ui.gestures ui.pens.solid ui.tools.browser
 ui.tools.common ui.tools.listener ui.tools.traceback ;
 IN: ui.tools.walker
@@ -78,7 +78,7 @@ M: thread-status model-changed
 : add-thread-status ( track -- track )
     horizontal <track> { 5 5 } >>gap
         "Thread:" <label>
-            dup font>> t >>bold? drop
+            [ t >>bold? ] change-font
             f track-add
         self name>> <label> f track-add
         over status>> <thread-status>

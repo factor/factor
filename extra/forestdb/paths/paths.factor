@@ -23,7 +23,7 @@ ERROR: not-an-fdb-filename string ;
 ERROR: not-a-string-number string ;
 
 : ?string>number ( string -- n )
-    dup string>number dup [ nip ] [ not-a-string-number ] if ;
+    dup string>number [ ] [ not-a-string-number ] ?if ;
 
 : change-string-number ( string quot -- string' )
     [ [ string>number ] dip call number>string ] 2keep drop
@@ -71,12 +71,6 @@ ERROR: not-a-string-number string ;
 
 : path-fdb-duplicates ( path -- seq )
     directory-files [ canonical-fdb-name ] map members ;
-
-: ensure-fdb-directory ( filename -- filename )
-    [ make-directories ] keep ;
-
-: ensure-fdb-filename-directory ( filename -- filename )
-    [ parent-directory make-directories ] keep ;
 
 ! : path>next-vnode-version-name ( path -- path' )
     ! [ file-name ]

@@ -1,11 +1,10 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings arrays
-byte-arrays classes.struct combinators constructors
-continuations destructors forestdb.ffi forestdb.paths fry
-generalizations io.encodings.string io.encodings.utf8
-io.pathnames kernel libc math multiline namespaces sequences
-strings ;
+USING: accessors alien.c-types alien.data alien.strings byte-arrays
+classes.struct combinators constructors continuations destructors
+forestdb.ffi fry generalizations io.directories io.encodings.string
+io.encodings.utf8 io.pathnames kernel libc math multiline namespaces
+sequences strings ;
 QUALIFIED: sets
 IN: forestdb.lib
 
@@ -148,11 +147,17 @@ M: byte-array encode-kv ;
 
 : fdb-commit-wal-flush ( -- ) FDB_COMMIT_MANUAL_WAL_FLUSH fdb-commit ;
 
-: fdb-compact ( new-path -- )
+: fdb-compact-to-path ( new-path -- )
     [ get-file-handle ] dip absolute-path
     fdb_compact fdb-check-error ;
 
-: fdb-compact-commit ( new-path -- )
+: fdb-compact ( -- )
+    get-file-handle f fdb_compact fdb-check-error ;
+
+: fdb-compact-commit-to-path ( path -- )
+    fdb-compact-to-path fdb-commit-wal-flush ;
+
+: fdb-compact-commit ( -- )
     fdb-compact fdb-commit-wal-flush ;
 
 
@@ -291,11 +296,11 @@ T{ doc
 
 <PRIVATE
 
-: collector-for-when ( quot exemplar -- quot' vec )
+: collector-when-as ( quot exemplar -- quot' vec )
     [ length ] keep new-resizable [ [ over [ push ] [ 2drop ] if ] curry compose ] keep ; inline
 
 : collector-when ( quot -- quot' vec )
-    V{ } collector-for-when ; inline
+    V{ } collector-when-as ; inline
 
 PRIVATE>
 
@@ -304,15 +309,26 @@ PRIVATE>
 
 : fdb-open ( path config -- file-handle )
     [ f void* <ref> ] 2dip
-    [ absolute-path ensure-fdb-filename-directory ] dip
+    [ make-parent-directories ] dip
     [ fdb_open fdb-check-error ] 3keep
     2drop void* deref <fdb-file-handle> ;
 
-! Make SEQTREES by default
-: fdb-open-default-config ( path -- file-handle )
+: fdb-config-normal-commit ( -- config )
     fdb_get_default_config
-        FDB_SEQTREE_USE >>seqtree_opt
-    fdb-open ;
+        FDB_SEQTREE_USE >>seqtree_opt ;
+
+: fdb-config-auto-commit ( -- config )
+    fdb-config-normal-commit
+        FDB_COMPACTION_AUTO >>compaction_mode
+        1 >>compactor_sleep_duration
+        t >>auto_commit ;
+
+! Make SEQTREES by default
+: fdb-open-auto-commit ( path -- file-handle )
+    fdb-config-auto-commit fdb-open ;
+
+: fdb-open-normal-commit ( path -- file-handle )
+    fdb-config-normal-commit fdb-open ;
 
 : fdb-kvs-open-config ( name config -- kvs-handle )
     [
@@ -322,7 +338,7 @@ PRIVATE>
     [ fdb_kvs_open fdb-check-error ] 3keep 2drop
     void* deref <fdb-kvs-handle> ;
 
-: fdb-kvs-open ( name -- kvs-handle )
+: fdb-kvs-open-default-config ( name -- kvs-handle )
     get-kvs-default-config fdb-kvs-open-config ;
 
 : with-fdb-map ( start-key end-key fdb_iterator_opt_t iterator-init iterator-next quot: ( obj -- ) -- )
@@ -348,25 +364,36 @@ PRIVATE>
     [ FDB_ITR_NONE \ fdb-iterator-byseq-init \ fdb_iterator_next ] dip
     with-fdb-map ; inline
 
+! : changes-cb ( handle doc ctx -- changes_decision )
+!    ;
 
-: with-kvs ( name quot -- )
-    [
-        [ fdb-kvs-open &dispose current-fdb-kvs-handle ] dip with-variable
-    ] with-destructors ; inline
+! : fdb-changes-since ( seqnum iterator_opt cb ctx -- seq )
+!    f 101 FDB_ITR_NONE fdb_changes_since ;
 
 
-: with-default-kvs ( quot -- )
-    [ "default" ] dip with-kvs ; inline
-
-: with-forestdb ( path quot -- )
-    [
-        [ fdb-open-default-config &dispose current-fdb-file-handle ] dip with-variable
-    ] with-destructors ; inline
-
-: with-forestdb-kvs ( path name quot -- )
+: with-kvs-name-config ( name config quot -- )
     '[
-        _ _ with-kvs
-    ] with-forestdb ; inline
+        _ _ fdb-kvs-open-config &dispose current-fdb-kvs-handle _ with-variable
+    ] with-destructors ; inline
+
+: with-kvs-name ( name quot -- )
+    [ fdb_get_default_kvs_config ] dip with-kvs-name-config ; inline
+
+
+: with-forestdb-file-handle ( path config quot -- )
+    '[
+        _ _ fdb-open &dispose current-fdb-file-handle _ with-variable
+    ] with-destructors ; inline
+
+: with-forestdb-path-config-kvs-name-config ( path config kvs-name kvs-config quot -- )
+    '[
+        _ _ with-kvs-name-config
+    ] with-forestdb-file-handle ; inline
+
+: with-forestdb-path-config-kvs-name ( path config kvs-name quot -- )
+    '[
+        _ _ with-kvs-name
+    ] with-forestdb-file-handle ; inline
 
 /*
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION

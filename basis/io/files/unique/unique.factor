@@ -36,9 +36,25 @@ PRIVATE>
         dup touch-unique-file
     ] unique-retries get retry absolute-path ;
 
+: unique-files ( prefix suffixes -- paths )
+    '[
+        V{ } clone [
+            _ _ random-file-name '[
+                _ glue
+                dup touch-unique-file suffix!
+            ] with each { } like
+        ] [
+            [ [ delete-file ] each ] [ rethrow ] bi*
+        ] recover
+    ] unique-retries get retry [ absolute-path ] map ;
+
 :: cleanup-unique-file ( ..a prefix suffix quot: ( ..a path -- ..b ) -- ..b )
     prefix suffix unique-file :> path
     [ path quot call ] [ path delete-file ] [ ] cleanup ; inline
+
+:: cleanup-unique-files ( ..a prefix suffixes quot: ( ..a paths -- ..b ) -- ..b )
+    prefix suffixes unique-files :> paths
+    [ paths quot call ] [ paths [ delete-file ] each ] [ ] cleanup ; inline
 
 : unique-directory ( -- path )
     [

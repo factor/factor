@@ -1,13 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors inspector namespaces kernel models fry
-colors.constants models.arrow prettyprint sequences mirrors assocs
-classes io io.styles arrays hashtables math.order sorting refs fonts
-ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ui.gadgets.tables ui.gadgets.theme
-ui.gadgets.toolbar ui.gadgets.status-bar
-ui.gadgets.labeled ui.tools.common ui combinators ui.gadgets.worlds ;
+colors.constants models.arrow prettyprint sequences mirrors
+assocs classes io io.styles arrays hashtables math.order sorting
+refs fonts ui.tools.browser ui.commands ui.operations ui.gadgets
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.slots
+ui.gadgets.tracks ui.gestures ui.gadgets.buttons
+ui.gadgets.tables ui.theme ui.gadgets.toolbar
+ui.gadgets.status-bar ui.gadgets.labeled ui.tools.common ui
+combinators ui.gadgets.worlds ui.theme.images ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -74,7 +75,7 @@ M: hashtable make-slot-descriptions
     [ make-slot-descriptions ] <arrow> inspector-renderer <table>
         [ invoke-primary-operation ] >>action
         monospace-font >>font
-        COLOR: dark-gray >>column-line-color
+        line-color >>column-line-color
         6 >>gap
         15 >>min-rows
         15 >>max-rows
@@ -139,4 +140,4 @@ inspector-gadget "multi-touch" f {
 : inspector ( obj -- )
     <model> inspect-model ;
 
-{ 550 400 } inspector-gadget set-tool-dim
+inspector-gadget { 550 400 } set-tool-dim

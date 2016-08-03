@@ -139,11 +139,15 @@ MACRO: typed ( quot word effect -- quot' )
     [ drop [ swap "typed-word" set-word-prop ] [ [ 1quotation ] dip ] 2bi ] dip
     [ typed ] 3curry ;
 
-: typed-def ( word def effect -- quot )
-    dup {
+: typed-def? ( effect -- quot )
+    {
         [ effect-in-types typed-stack-effect? ]
         [ effect-out-types typed-stack-effect? ]
-    } 1|| [ (typed-def) ] [ nip no-types-specified ] if ;
+    } 1|| ;
+
+: typed-def ( word def effect -- quot )
+    dup typed-def?
+    [ (typed-def) ] [ nip no-types-specified ] if ;
 
 M: typed-word subwords
     [ call-next-method ]

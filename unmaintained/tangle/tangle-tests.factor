@@ -3,7 +3,7 @@ IN: tangle.tests
 
 : db-path "tangle-test.db" temp-file ;
 : test-db db-path sqlite-db ;
-: delete-db [ db-path delete-file ] ignore-errors ;
+: delete-db db-path ?delete-file ;
 
 : test-tangle ( -- )
     ensure-root "foo" create-file "bar" create-file "pluck_eggs" create-file

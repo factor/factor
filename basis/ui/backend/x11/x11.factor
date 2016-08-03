@@ -1,14 +1,13 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays alien.c-types alien.data alien.syntax ascii
+USING: accessors alien.c-types alien.data alien.syntax arrays ascii
 assocs classes.struct combinators combinators.short-circuit
-command-line environment io.encodings.ascii io.encodings.string
-io.encodings.utf8 kernel literals locals math namespaces
-sequences specialized-arrays strings ui ui.backend ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
-x11 x11.clipboard x11.constants x11.events x11.glx x11.io
-x11.windows x11.xim x11.xlib ;
+environment io.encodings.ascii io.encodings.string io.encodings.utf8
+kernel literals locals math namespaces sequences specialized-arrays
+strings ui ui.backend ui.backend.x11.keys ui.clipboards ui.event-loop
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.pixel-formats.private ui.private x11 x11.clipboard
+x11.constants x11.events x11.glx x11.io x11.windows x11.xim x11.xlib ;
 FROM: libc => system ;
 SPECIALIZED-ARRAYS: uchar ulong ;
 IN: ui.backend.x11
@@ -95,63 +94,8 @@ M: x11-ui-backend (pixel-format-attribute)
         { int } [ glXGetConfig drop ] with-out-parameters
     ] if-empty ;
 
-CONSTANT: modifiers
-    {
-        { S+ 0x1 }
-        { C+ 0x4 }
-        { A+ 0x8 }
-    }
-
-CONSTANT: key-codes
-    H{
-        { 0xFF08 "BACKSPACE" }
-        { 0xFF09 "TAB"       }
-        { 0xFE20 "TAB"       }
-        { 0xFF0D "RET"       }
-        { 0xFF8D "ENTER"     }
-        { 0xFF1B "ESC"       }
-        { 0xFFFF "DELETE"    }
-        { 0xFF50 "HOME"      }
-        { 0xFF51 "LEFT"      }
-        { 0xFF52 "UP"        }
-        { 0xFF53 "RIGHT"     }
-        { 0xFF54 "DOWN"      }
-        { 0xFF55 "PAGE_UP"   }
-        { 0xFF56 "PAGE_DOWN" }
-        { 0xFF57 "END"       }
-        { 0xFF58 "BEGIN"     }
-        { 0xFFBE "F1"        }
-        { 0xFFBF "F2"        }
-        { 0xFFC0 "F3"        }
-        { 0xFFC1 "F4"        }
-        { 0xFFC2 "F5"        }
-        { 0xFFC3 "F6"        }
-        { 0xFFC4 "F7"        }
-        { 0xFFC5 "F8"        }
-        { 0xFFC6 "F9"        }
-
-        { 0xFFE1 f } ! Left shift
-        { 0xFFE2 f } ! Right shift
-        { 0xFFE3 f } ! Left control
-        { 0xFFE4 f } ! Right control
-        { 0xFFE5 f } ! Caps lock
-        { 0xFFE6 f } ! Shift lock
-
-        { 0xFFE7 f } ! Left meta
-        { 0xFFE8 f } ! Right meta
-        { 0xFFE9 f } ! Left alt
-        { 0xFFEA f } ! Right alt
-        { 0xFFEB f } ! Left super
-        { 0xFFEC f } ! Right super
-        { 0xFFED f } ! Left hyper
-        { 0xFFEE f } ! Right hyper
-    }
-
-: key-code ( keysym -- keycode action? )
-    dup key-codes at* [ nip dup t and ] [ [ 1string ] dip ] if ;
-
-: event-modifiers ( event -- seq )
-    state>> modifiers modifier ;
+: key-code ( code -- string/f action? )
+    code>sym [ dup integer? [ 1string ] when ] dip ;
 
 : valid-input? ( string gesture -- ? )
     over empty? [ 2drop f ] [
@@ -412,4 +356,5 @@ x11-ui-backend ui-backend set-global
 M: x11-ui-backend ui-backend-available?
     "DISPLAY" os-env >boolean ;
 
-M: x11-ui-backend resize-window [ dpy get ] 2dip [ handle>> window>> ] [ first2 ] bi* XResizeWindow drop ;
+M: x11-ui-backend resize-window
+    [ dpy get ] 2dip [ handle>> window>> ] [ first2 ] bi* XResizeWindow drop ;

@@ -1,8 +1,7 @@
 ! Copyright © 2008 Reginald Keith Ford II
 ! 24, the Factor game!
-USING: accessors backtrack combinators continuations io kernel
-math math.parser prettyprint quotations random sequences shuffle
-;
+USING: accessors backtrack combinators continuations formatting fry io
+kernel math prettyprint quotations random sequences shuffle ;
 IN: 24-game
 
 : nop ( -- ) ;
@@ -39,13 +38,14 @@ CONSTANT: (operators) { + - * / rot swap q }
 : operators ( array -- operators )
     length 3 < [ \ rot (operators) remove ] [ (operators) ] if ;
 
-: find-operator ( string operators -- word/f )
-    [ name>> = ] with find nip ;
+: find-operator ( operators string -- word/f )
+    '[ name>> _ = ] find nip ;
 
 : get-operator ( operators -- word )
-    "Operators: " write dup pprint nl flush
-    readln over find-operator dup
-    [ "Command not found..." print get-operator ] unless nip ;
+    dup "Operators: %u\n" printf flush
+    dup readln find-operator [ ] [
+        "Operator not found..." print get-operator
+    ] ?if ;
 
 : try-operator ( array -- array )
     [ pprint nl ]
@@ -53,10 +53,10 @@ CONSTANT: (operators) { + - * / rot swap q }
     bi ;
 
 : end-game ( array -- )
-    dup { 24 } = [
+    first dup 24 = [
         drop "You WON!"
     ] [
-        first number>string " is not 24... You lose." append
+        "%d is not 24... You lose." sprintf
     ] if print ;
 
 : quit-game ( array -- )

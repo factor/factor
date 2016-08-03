@@ -1,6 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math tools.test combinators.extras sequences ;
+USING: combinators.extras io.files kernel math sequences
+tools.test ;
 IN: combinators.extras.tests
 
 { "a b" }
@@ -32,3 +33,8 @@ IN: combinators.extras.tests
 
 { "1" "123" } [ "1" "123" [ length ] [ > ] swap-when ] unit-test
 { "123" "1" } [ "1" "123" [ length ] [ < ] swap-when ] unit-test
+
+
+{ t } [ "resource:" [ exists? ] ?1arg >boolean ] unit-test
+{ f } [ f [ exists? ] ?1arg ] unit-test
+{ f } [ "/homeasdfasdf123123" [ exists? ] ?1arg ] unit-test

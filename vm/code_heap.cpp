@@ -92,7 +92,6 @@ code_block* code_heap::code_block_for_address(cell address) {
 cell code_heap::frame_predecessor(cell frame_top) {
   cell addr = *(cell*)frame_top;
   FACTOR_ASSERT(seg->in_segment_p(addr));
-  //FACTOR_ASSERT(addr != 0);
   code_block* owner = code_block_for_address(addr);
   cell frame_size = owner->stack_frame_size_for_address(addr);
   return frame_top + frame_size;
@@ -111,8 +110,8 @@ void code_heap::initialize_all_blocks_set() {
 }
 
 /* Update pointers to words referenced from all code blocks.
-Only needed after redefining an existing word.
-If generic words were redefined, inline caches need to be reset. */
+   Only needed after redefining an existing word.
+   If generic words were redefined, inline caches need to be reset. */
 void factor_vm::update_code_heap_words(bool reset_inline_caches) {
   auto word_updater = [&](code_block* block, cell size) {
     update_word_references(block, reset_inline_caches);

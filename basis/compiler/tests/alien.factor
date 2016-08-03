@@ -414,12 +414,12 @@ FUNCTION: int ffi_test_37 ( void* func )
 [ 7 ] [ callback-9 [ ffi_test_37 ] with-callback ] unit-test
 
 STRUCT: test_struct_13
-{ x1 float }
-{ x2 float }
-{ x3 float }
-{ x4 float }
-{ x5 float }
-{ x6 float } ;
+    { x1 float }
+    { x2 float }
+    { x3 float }
+    { x4 float }
+    { x5 float }
+    { x6 float } ;
 
 : make-test-struct-13 ( -- alien )
     test_struct_13 <struct>
@@ -436,10 +436,10 @@ FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s )
 
 ! Joe Groff found this problem
 STRUCT: double-rect
-{ a double }
-{ b double }
-{ c double }
-{ d double } ;
+    { a double }
+    { b double }
+    { c double }
+    { d double } ;
 
 : <double-rect> ( a b c d -- foo )
     double-rect <struct>
@@ -933,6 +933,26 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
         [ alien-address ] map drop
     ] times
 ] unit-test
+
+! Varargs with non-float parameters works.
+FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, int a, int b )
+FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, int a, int b, int c )
+
+{ 30 60  } [
+    2 10 20 do-sum-ints2
+    3 10 20 30 do-sum-ints3
+] unit-test
+
+! Varargs with non-floats doesn't work on windows
+FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, double a, double b )
+FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, double a, double b, double c )
+
+os windows? [
+    { 27.0 22.0 } [
+        2 7 20 do-sum-doubles2
+        3 5 10 7 do-sum-doubles3
+    ] unit-test
+] unless
 
 FUNCTION: int bug1021_test_2 ( int a, char* b, void* c )
 FUNCTION: void* bug1021_test_3 ( c-string a )

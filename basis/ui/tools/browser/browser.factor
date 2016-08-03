@@ -8,15 +8,15 @@ make models namespaces sequences sets ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.editors ui.gadgets.editors.private
 ui.gadgets.glass ui.gadgets.labels ui.gadgets.labels.private
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.theme ui.gadgets.toolbar ui.gadgets.tracks
+ui.theme ui.gadgets.toolbar ui.gadgets.tracks
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
-ui.render ui.text ui.tools.browser.history
-ui.tools.browser.popups ui.tools.common vocabs ;
+ui.render ui.text ui.theme.images ui.tools.common
+ui.tools.browser.history ui.tools.browser.popups unicode vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
 
-{ 650 700 } browser-gadget set-tool-dim
+browser-gadget { 650 700 } set-tool-dim
 
 M: browser-gadget history-value
     [ control-value ] [ scroller>> scroll-position ]
@@ -97,7 +97,7 @@ CONSTANT: next 1
     <scroller> >>scroller scroller>> white-interior 1 track-add ;
 
 : search-browser ( string browser -- )
-    '[ <apropos-search> _ show-help ] unless-empty ;
+    '[ [ blank? ] trim <apropos-search> _ show-help ] unless-empty ;
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>

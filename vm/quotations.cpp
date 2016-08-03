@@ -37,77 +37,77 @@ includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
 so this results in a big speedup for relatively little effort. */
 
+inline cell quotation_jit::nth(cell index) {
+  return array_nth(elements.untagged(), index);
+}
+
 void quotation_jit::init_quotation(cell quot) {
   elements = untag<quotation>(quot)->array;
 }
 
 bool quotation_jit::fast_if_p(cell i, cell length) {
   return (i + 3) == length &&
-      TAG(array_nth(elements.untagged(), i + 1)) == QUOTATION_TYPE &&
-      array_nth(elements.untagged(), i + 2) == parent->special_objects[JIT_IF_WORD];
+      TAG(nth(i + 1)) == QUOTATION_TYPE &&
+      nth(i + 2) == parent->special_objects[JIT_IF_WORD];
 }
 
 bool quotation_jit::primitive_call_p(cell i, cell length) {
   cell jit_primitive_word = parent->special_objects[JIT_PRIMITIVE_WORD];
-  return (i + 2) <= length &&
-      array_nth(elements.untagged(), i + 1) == jit_primitive_word;
+  return (i + 2) <= length && nth(i + 1) == jit_primitive_word;
 }
 
 bool quotation_jit::fast_dip_p(cell i, cell length) {
   cell jit_dip_word = parent->special_objects[JIT_DIP_WORD];
-  return (i + 2) <= length &&
-      array_nth(elements.untagged(), i + 1) == jit_dip_word;
+  return (i + 2) <= length && nth(i + 1) == jit_dip_word;
 }
 
 bool quotation_jit::fast_2dip_p(cell i, cell length) {
   cell jit_2dip_word = parent->special_objects[JIT_2DIP_WORD];
-  return (i + 2) <= length &&
-      array_nth(elements.untagged(), i + 1) == jit_2dip_word;
+  return (i + 2) <= length && nth(i + 1) == jit_2dip_word;
 }
 
 bool quotation_jit::fast_3dip_p(cell i, cell length) {
   cell jit_3dip_word = parent->special_objects[JIT_3DIP_WORD];
-  return (i + 2) <= length &&
-      array_nth(elements.untagged(), i + 1) == jit_3dip_word;
+  return (i + 2) <= length && nth(i + 1) == jit_3dip_word;
 }
 
 bool quotation_jit::declare_p(cell i, cell length) {
   cell jit_declare_word = parent->special_objects[JIT_DECLARE_WORD];
-  return (i + 2) <= length &&
-      array_nth(elements.untagged(), i + 1) == jit_declare_word;
+  return (i + 2) <= length && nth(i + 1) == jit_declare_word;
 }
 
 bool quotation_jit::mega_lookup_p(cell i, cell length) {
   return (i + 4) <= length &&
-      TAG(array_nth(elements.untagged(), i + 1)) == FIXNUM_TYPE &&
-      TAG(array_nth(elements.untagged(), i + 2)) == ARRAY_TYPE &&
-      array_nth(elements.untagged(), i + 3) == parent->special_objects[MEGA_LOOKUP_WORD];
+      TAG(nth(i + 1)) == FIXNUM_TYPE &&
+      TAG(nth(i + 2)) == ARRAY_TYPE &&
+      nth(i + 3) == parent->special_objects[MEGA_LOOKUP_WORD];
 }
 
+/* Subprimitives should be flagged with whether they require a stack frame.
+   See #295. */
 bool quotation_jit::special_subprimitive_p(cell obj) {
-  // Subprimitives should be flagged with whether they require a stack frame.
-  // See #295.
   return obj == parent->special_objects[SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[LEAF_SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
 }
 
-bool quotation_jit::word_safepoint_p(cell obj) {
-  return !special_subprimitive_p(obj);
-}
+/* All quotations wants a stack frame, except if they contain:
 
-/* true if there are no non-safepoint words in the quoation... */
-bool quotation_jit::no_non_safepoint_words_p() {
+     1) calls to the special subprimitives, see #295.
+     2) mega cache lookups, see #651 */
+bool quotation_jit::stack_frame_p() {
   cell length = array_capacity(elements.untagged());
   for (cell i = 0; i < length; i++) {
-    cell obj = array_nth(elements.untagged(), i);
-    if (TAG(obj) == WORD_TYPE && !word_safepoint_p(obj))
+    cell obj = nth(i);
+    cell tag = TAG(obj);
+    if ((tag == WORD_TYPE && special_subprimitive_p(obj)) ||
+        (tag == ARRAY_TYPE && mega_lookup_p(i, length)))
       return false;
   }
   return true;
 }
 
-bool quotation_jit::trivial_quotation_p(array* elements) {
+static bool trivial_quotation_p(array* elements) {
   return array_capacity(elements) == 1 &&
       TAG(array_nth(elements, 0)) == WORD_TYPE;
 }
@@ -139,11 +139,11 @@ void quotation_jit::emit_quotation(cell quot_) {
 
 /* Allocates memory (parameter(), literal(), emit_epilog, emit_with_literal)*/
 void quotation_jit::iterate_quotation() {
-  bool no_non_safepoint_words = no_non_safepoint_words_p();
+  bool stack_frame = stack_frame_p();
 
   set_position(0);
 
-  if (no_non_safepoint_words) {
+  if (stack_frame) {
     emit(parent->special_objects[JIT_SAFEPOINT]);
     emit(parent->special_objects[JIT_PROLOG]);
   }
@@ -153,8 +153,7 @@ void quotation_jit::iterate_quotation() {
 
   for (cell i = 0; i < length; i++) {
     set_position(i);
-
-    data_root<object> obj(array_nth(elements.untagged(), i), parent);
+    data_root<object> obj(nth(i), parent);
 
     switch (obj.type()) {
       case WORD_TYPE:
@@ -162,10 +161,10 @@ void quotation_jit::iterate_quotation() {
         if (to_boolean(obj.as<word>()->subprimitive)) {
           tail_call = emit_subprimitive(obj.value(),     /* word */
                                         i == length - 1, /* tail_call_p */
-                                        no_non_safepoint_words);    /* stack_frame_p */
+                                        stack_frame);  /* stack_frame_p */
         }                                                /* Everything else */
         else if (i == length - 1) {
-          emit_epilog(no_non_safepoint_words);
+          emit_epilog(stack_frame);
           tail_call = true;
           word_jump(obj.value());
         } else
@@ -199,13 +198,11 @@ void quotation_jit::iterate_quotation() {
         /* 'if' preceded by two literal quotations (this is why if and ? are
            mutually recursive in the library, but both still work) */
         if (fast_if_p(i, length)) {
-          emit_epilog(no_non_safepoint_words);
+          emit_epilog(stack_frame);
           tail_call = true;
-
-          emit_quotation(array_nth(elements.untagged(), i));
-          emit_quotation(array_nth(elements.untagged(), i + 1));
+          emit_quotation(nth(i));
+          emit_quotation(nth(i + 1));
           emit(parent->special_objects[JIT_IF]);
-
           i += 2;
         } /* dip */
         else if (fast_dip_p(i, length)) {
@@ -228,15 +225,8 @@ void quotation_jit::iterate_quotation() {
       case ARRAY_TYPE:
         /* Method dispatch */
         if (mega_lookup_p(i, length)) {
-          fixnum index = untag_fixnum(array_nth(elements.untagged(), i + 1));
-          /* Load the object from the datastack, then remove our stack frame. */
-          emit_with_literal(parent->special_objects[PIC_LOAD],
-                            tag_fixnum(-index * sizeof(cell)));
-          emit_epilog(no_non_safepoint_words);
           tail_call = true;
-
-          emit_mega_cache_lookup(array_nth(elements.untagged(), i), index,
-                                 array_nth(elements.untagged(), i + 2));
+          emit_mega_cache_lookup(nth(i), untag_fixnum(nth(i + 1)), nth(i + 2));
           i += 3;
         } /* Non-optimizing compiler ignores declarations */
         else if (declare_p(i, length))
@@ -252,7 +242,7 @@ void quotation_jit::iterate_quotation() {
 
   if (!tail_call) {
     set_position(length);
-    emit_epilog(no_non_safepoint_words);
+    emit_epilog(stack_frame);
     emit(parent->special_objects[JIT_RETURN]);
   }
 }
@@ -261,6 +251,34 @@ cell quotation_jit::word_stack_frame_size(cell obj) {
   if (special_subprimitive_p(obj))
     return SIGNAL_HANDLER_STACK_FRAME_SIZE;
   return JIT_FRAME_SIZE;
+}
+
+/* Allocates memory */
+void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index,
+                                           cell cache_) {
+  data_root<array> methods(methods_, parent);
+  data_root<array> cache(cache_, parent);
+
+  /* Load the object from the datastack. */
+  emit_with_literal(parent->special_objects[PIC_LOAD],
+                    tag_fixnum(-index * sizeof(cell)));
+
+  /* Do a cache lookup. */
+  emit_with_literal(parent->special_objects[MEGA_LOOKUP], cache.value());
+
+  /* If we end up here, the cache missed. */
+  emit(parent->special_objects[JIT_PROLOG]);
+
+  /* Push index, method table and cache on the stack. */
+  push(methods.value());
+  push(tag_fixnum(index));
+  push(cache.value());
+  word_call(parent->special_objects[MEGA_MISS_WORD]);
+
+  /* Now the new method has been stored into the cache, and its on
+     the stack. */
+  emit(parent->special_objects[JIT_EPILOG]);
+  emit(parent->special_objects[JIT_EXECUTE]);
 }
 
 /* Allocates memory */

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors.constants kernel system ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.theme ui.gadgets.tracks ui.pens.gradient
+ui.theme ui.gadgets.tracks ui.pens.gradient
 ui.pens.solid ui.tools.common ;
 IN: ui.gadgets.labeled
 
@@ -51,7 +51,7 @@ PRIVATE>
     add-content-area ;
 
 : <framed-labeled> ( gadget title color -- labeled )
-    <labeled> COLOR: grey85 <solid> >>boundary ;
+    <labeled> labeled-border-color <solid> >>boundary ;
 
 : <labeled-gadget> ( gadget title -- labeled )
     vertical labeled-gadget new-track with-lines
@@ -62,5 +62,5 @@ PRIVATE>
     { 5 5 } <border>
     content-background <solid> >>interior
     1 track-add
-    COLOR: grey85 <solid> >>boundary
+    labeled-border-color <solid> >>boundary
     { 3 3 } <border> ;

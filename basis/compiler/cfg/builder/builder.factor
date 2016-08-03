@@ -158,7 +158,7 @@ M: #push emit-node ( block node -- block' )
     [ make-input-map ] [ mapping>> ] [ extract-outputs ] tri
     [ first2 [ [ of of peek-loc ] 2with map ] dip 2array ] 2with map ;
 
-M: #shuffle emit-node ( block node -- block' )
+M: #shuffle emit-node ( block node -- block )
     [ out-vregs/stack ] keep store-height-changes
     [ first2 store-vregs ] each ;
 

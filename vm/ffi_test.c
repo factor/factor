@@ -1,8 +1,7 @@
-/* This file is linked into the runtime for the sole purpose
- * of testing FFI code. */
 #include "ffi_test.h"
 
 #include <assert.h>
+#include <stdarg.h>
 #include <string.h>
 
 void ffi_test_0(void) {}
@@ -332,6 +331,29 @@ struct ulonglong_pair ffi_test_63() {
   ullp.b = 0x1234567891234567;
   return ullp;
 }
+
+int ffi_test_64(int n, ...) {
+    va_list ap;
+    va_start(ap, n);
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += va_arg(ap, int);
+    }
+    va_end(ap);
+    return sum;
+}
+
+double ffi_test_65(int n, ...) {
+    va_list ap;
+    va_start(ap, n);
+    double sum = 0.0;
+    for (int i = 0; i < n; i++) {
+        sum += va_arg(ap, double);
+    }
+    va_end(ap);
+    return sum;
+}
+
 
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);

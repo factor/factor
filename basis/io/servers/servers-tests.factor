@@ -1,6 +1,6 @@
-USING: accessors calendar concurrency.promises fry io
-io.encodings.ascii io.servers
-io.servers.private io.sockets kernel namespaces
+USING: accessors arrays calendar concurrency.promises fry io
+io.encodings.ascii io.encodings.utf8 io.servers
+io.servers.private io.sockets kernel namespaces scratchpad
 sequences threads tools.test ;
 IN: io.servers
 
@@ -53,3 +53,20 @@ ipv6-supported? [
         [ inet6? ] any?
     ] unit-test
 ] unless
+
+
+! Test that we can listen on several ports at once.
+TUPLE: my-threaded-server < threaded-server ;
+
+{ } [
+    utf8 my-threaded-server new-threaded-server
+        "127.0.0.1" 0 <inet4>
+        "127.0.0.1" 0 <inet4>
+        2array >>insecure
+
+        "127.0.0.1" 0 <inet4>
+        "127.0.0.1" 0 <inet4>
+        2array >>secure
+
+        start-server stop-server
+] unit-test

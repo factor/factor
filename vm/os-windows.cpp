@@ -37,7 +37,7 @@ void factor_vm::ffi_dlclose(dll* dll) {
 
 BOOL factor_vm::windows_stat(vm_char* path) {
   BY_HANDLE_FILE_INFORMATION bhfi;
-  HANDLE h = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL,
+  HANDLE h = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
                          OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
   if (h == INVALID_HANDLE_VALUE) {
@@ -107,19 +107,6 @@ segment::segment(cell size_, bool executable_p) {
   set_border_locked(true);
 }
 
-void segment::set_border_locked(bool locked) {
-  int pagesize = getpagesize();
-  cell lo = start - pagesize;
-  if (!set_memory_locked(lo, pagesize, locked)) {
-    fatal_error("Cannot (un)protect low guard page", lo);
-  }
-
-  cell hi = end;
-  if (!set_memory_locked(hi, pagesize, locked)) {
-    fatal_error("Cannot (un)protect high guard page", hi);
-  }
-}
-
 segment::~segment() {
   SYSTEM_INFO si;
   GetSystemInfo(&si);
@@ -164,6 +151,12 @@ uint64_t nano_count() {
   static uint32_t hi = 0;
   static uint32_t lo = 0;
 
+  // Note: on older systems QueryPerformanceCounter may be unreliable
+  // until you add /usepmtimer to Boot.ini. I had an issue where two
+  // nano_count calls would show a difference of about 1 second,
+  // while actually about 80 seconds have passed. The /usepmtimer
+  // switch cured the issue on that PC (WinXP Pro SP3 32-bit).
+  // See also http://www.virtualdub.org/blog/pivot/entry.php?id=106
   LARGE_INTEGER count;
   BOOL ret = QueryPerformanceCounter(&count);
   if (ret == 0)
@@ -371,6 +364,7 @@ void factor_vm::end_sampling_profiler_timer() {
       WaitForSingleObject(sampler_thread, 3000 * (DWORD) samples_per_second);
   if (wait_result != WAIT_OBJECT_0)
     TerminateThread(sampler_thread, 0);
+  CloseHandle(sampler_thread);
   sampler_thread = NULL;
 }
 

@@ -16,8 +16,17 @@ M: simple-lint-error summary message>> ;
 M: simple-lint-error error. summary print ;
 
 SYMBOL: vocabs-quot
-SYMBOL: all-vocabs-list
 SYMBOL: vocab-articles
+
+: no-ui-disposables ( seq -- seq' )
+    [
+        class-of name>> {
+            "single-texture" "multi-texture" ! opengl.textures
+            "line" ! core-text
+            "layout" ! ui.text.pango
+            "script-string" ! windows.uniscribe
+        } member?
+    ] reject ;
 
 : check-example ( element -- )
     [
@@ -29,7 +38,7 @@ SYMBOL: vocab-articles
             ] keep
             last assert=
         ] vocabs-quot get call( quot -- )
-    ] leaks members length [
+    ] leaks members no-ui-disposables length [
         "%d disposable(s) leaked in example" sprintf simple-lint-error
     ] unless-zero ;
 
@@ -108,9 +117,6 @@ SYMBOL: vocab-articles
 : check-see-also ( element -- )
     \ $see-also swap elements [ rest all-unique? ] all?
     [ "$see-also are not unique" simple-lint-error ] unless ;
-
-: vocab-exists? ( name -- ? )
-    [ lookup-vocab ] [ all-vocabs-list get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [

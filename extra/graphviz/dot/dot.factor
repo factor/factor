@@ -50,7 +50,7 @@ M: subgraph dot.
     "subgraph " write [ id. ] [ statements. ] bi ;
 
 : attribute, ( attr value -- )
-    dup [ quote-string "%s=%s," printf ] [ 2drop ] if ;
+    [ quote-string "%s=%s," printf ] [ drop ] if* ;
 
 : attributes. ( attrs -- )
     "[" write

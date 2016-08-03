@@ -141,8 +141,8 @@ IN: math.integers.tests
 
 ! We don't care if this fails or returns 0 (its CPU-specific)
 ! as long as it doesn't crash
-{ } [ [ 0 0 /i drop ] ignore-errors ] unit-test
-{ } [ [ 100000000000000000 0 /i drop ] ignore-errors ] unit-test
+[ 0 0 /i drop ] must-fail
+[ 100000000000000000 0 /i drop ] must-fail
 
 { -2 } [ 1 bitnot ] unit-test
 { -2 } [ 1 >bignum bitnot ] unit-test

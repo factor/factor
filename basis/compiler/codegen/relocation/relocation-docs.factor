@@ -49,6 +49,10 @@ HELP: rel-decks-offset
 { $values { "class" "a relocation class" } }
 { $description "Adds a decks offset relocation. It is used for marking cards when emitting write barriers." } ;
 
+HELP: rel-literal
+{ $values { "literal" "a literal" } { "class" "a relocation class" } }
+{ $description "Adds a refrence to a literal value to the current code offset." } ;
+
 HELP: rel-safepoint
 { $values { "class" "a relocation class" } }
 { $description "Adds a safe point to the " { $link relocation-table } " for the current code offset. This word is used by the " { $link %safepoint } " generator." } ;

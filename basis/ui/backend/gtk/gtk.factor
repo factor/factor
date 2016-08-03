@@ -1,17 +1,16 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct combinators
-continuations destructors environment gdk.ffi gdk.gl.ffi
-gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io.encodings.binary
-io.encodings.utf8 io.files kernel libc literals locals math
-math.bitwise math.vectors namespaces sequences strings system
-threads ui ui.backend ui.backend.gtk.input-methods
-ui.backend.gtk.io ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.pixel-formats.private ui.private
-vocabs.loader ;
+alien.strings arrays assocs classes.struct combinators continuations
+destructors environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi
+gobject-introspection.standard-types gobject.ffi gtk.ffi gtk.gl.ffi
+io.encodings.binary io.encodings.utf8 io.files io.pathnames kernel
+libc literals locals math math.bitwise math.vectors namespaces
+sequences strings system threads ui ui.backend
+ui.backend.gtk.input-methods ui.backend.gtk.io ui.backend.x11.keys
+ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -98,48 +97,6 @@ CONSTANT: events-mask
         GDK_FOCUS_CHANGE_MASK
     }
 
-CONSTANT: modifiers
-    {
-        { S+ $ GDK_SHIFT_MASK }
-        { C+ $ GDK_CONTROL_MASK }
-        { A+ $ GDK_MOD1_MASK }
-    }
-
-CONSTANT: action-key-codes
-    H{
-        { $ GDK_KEY_BackSpace "BACKSPACE" }
-        { $ GDK_KEY_Tab "TAB" }
-        { $ GDK_KEY_ISO_Left_Tab "TAB" }
-        { $ GDK_KEY_Return "RET" }
-        { $ GDK_KEY_KP_Enter "ENTER" }
-        { $ GDK_KEY_Escape "ESC" }
-        { $ GDK_KEY_Delete "DELETE" }
-        { $ GDK_KEY_Home "HOME" }
-        { $ GDK_KEY_Left "LEFT" }
-        { $ GDK_KEY_Up "UP" }
-        { $ GDK_KEY_Right "RIGHT" }
-        { $ GDK_KEY_Down "DOWN" }
-        { $ GDK_KEY_Page_Up "PAGE_UP" }
-        { $ GDK_KEY_Page_Down "PAGE_DOWN" }
-        { $ GDK_KEY_End "END" }
-        { $ GDK_KEY_Begin "BEGIN" }
-        { $ GDK_KEY_F1 "F1" }
-        { $ GDK_KEY_F2 "F2" }
-        { $ GDK_KEY_F3 "F3" }
-        { $ GDK_KEY_F4 "F4" }
-        { $ GDK_KEY_F5 "F5" }
-        { $ GDK_KEY_F6 "F6" }
-        { $ GDK_KEY_F7 "F7" }
-        { $ GDK_KEY_F8 "F8" }
-        { $ GDK_KEY_F9 "F9" }
-        { $ GDK_KEY_F10 "F10" }
-        { $ GDK_KEY_F11 "F11" }
-        { $ GDK_KEY_F12 "F12" }
-    }
-
-: event-modifiers ( event -- seq )
-    state>> modifiers modifier ;
-
 : event-loc ( event -- loc )
     [ x>> ] [ y>> ] bi [ >fixnum ] bi@ 2array ;
 
@@ -197,12 +154,11 @@ CONSTANT: action-key-codes
         [ scroll-direction ] [ event-loc ] bi
     ] dip window send-scroll t ;
 
-: key-sym ( event -- sym/f action? )
-    keyval>> dup action-key-codes at [ t ]
-    [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
+: key-sym ( keyval -- string/f action? )
+    code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
 
 : key-event>gesture ( event -- key-gesture )
-    [ event-modifiers ] [ key-sym ] [
+    [ event-modifiers ] [ keyval>> key-sym ] [
         type>> GDK_KEY_PRESS = [ <key-down> ] [ <key-up> ] if
     ] tri ;
 
@@ -215,15 +171,25 @@ CONSTANT: action-key-codes
 : on-focus-out ( win event user-data -- ? )
     2drop window unfocus-world t ;
 
-! This word gets replaced when deploying. See 'Vocabulary icons'
-! in the docs and tools.deploy.shaker.gtk-icon
-: get-icon-data ( -- byte-array/f )
+CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
+
+: default-icon-data ( -- byte-array/f )
     [
-        "resource:misc/icons/Factor_48x48.png" binary file-contents
+        default-icon-path binary file-contents
     ] [ drop f ] recover ;
 
+SYMBOL: icon-data
+
+icon-data [ default-icon-data ] initialize
+
+: vocab-icon-data ( vocab-name -- byte-array )
+    dup vocab-dir { "icon.png" "icon.ico" } [
+        append-path vocab-append-path
+    ] 2with map default-icon-path suffix
+    [ exists? ] find nip binary file-contents ;
+
 : load-icon ( -- )
-    get-icon-data [
+    icon-data get [
         [
             data>GInputStream &g_object_unref
             GInputStream>GdkPixbuf gtk_window_set_default_icon
@@ -550,9 +516,6 @@ M: gtk-ui-backend (with-ui)
 os linux? [
     gtk-ui-backend ui-backend set-global
 ] when
-
-{ "ui.backend.gtk" "io.backend.unix" }
-"ui.backend.gtk.io.unix" require-when
 
 { "ui.backend.gtk" "ui.gadgets.editors" }
 "ui.backend.gtk.input-methods.editors" require-when

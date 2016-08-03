@@ -14,7 +14,7 @@ HELP: send
 HELP: receive
 { $values { "message" object }
 }
-{ $description "Return a message from the current threads mailbox. If the box is empty, suspend the thread until another thread places an item in the mailbox (usually via the " { $link send } " word." }
+{ $description "Return a message from the current threads mailbox. If the box is empty, suspend the thread until another thread places an item in the mailbox (usually via the " { $link send } " word)." }
 { $see-also send receive-if } ;
 
 HELP: receive-if

@@ -20,7 +20,7 @@ node "node"
 : load-node ( id -- node ) f <node> select-tuple ;
 
 : node-content ( node -- content )
-    dup content>> [ nip ] [ select-tuple content>> ] if* ;
+    dup content>> [ ] [ select-tuple content>> ] ?if ;
 
 : node= ( node node -- ? ) [ id>> ] same? ;
 

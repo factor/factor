@@ -1,6 +1,6 @@
-USING: unicode kernel tools.test sequences
-simple-flat-file io.encodings.utf8 io.files splitting math.parser
-locals math quotations assocs combinators unicode.normalize.private ;
+USING: assocs combinators.short-circuit kernel locals math
+math.parser sequences simple-flat-file splitting tools.test
+unicode unicode.normalize.private ;
 IN: unicode.normalize.tests
 
 { "ab\u000323\u000302cd" } [ "ab\u000302" "\u000323cd" string-append ] unit-test
@@ -20,24 +20,22 @@ IN: unicode.normalize.tests
 { "\u001112\u001161\u0011ab" } [ "\u00d55c" nfd ] unit-test
 { "\u00d55c" } [ "\u001112\u001161\u0011ab" nfc ] unit-test
 
-: parse-test ( -- tests )
-    "vocab:unicode/normalize/NormalizationTest.txt" data
-    [ 5 head [ " " split [ hex> ] "" map-as ] map ] map ;
-
-:: assert= ( test spec quot -- )
+:: check? ( test spec quot -- ? )
     spec [
         [
-            [ 1 - test nth ] bi@
-            [ 1quotation ] [ quot curry ] bi* unit-test
-        ] with each
-    ] assoc-each ;
+            [ 1 - test nth ] bi@ quot call( str -- str' ) =
+        ] with all?
+    ] assoc-all? ;
 
-: run-line ( test -- )
-    {
-        [ { { 2 { 1 2 3 } } { 4 { 4 5 } } } [ nfc ] assert= ]
-        [ { { 3 { 1 2 3 } } { 5 { 4 5 } } } [ nfd ] assert= ]
-        [ { { 4 { 1 2 3 4 5 } } } [ nfkc ] assert= ]
-        [ { { 5 { 1 2 3 4 5 } } } [ nfkd ] assert= ]
-    } cleave ;
-
-parse-test [ run-line ] each
+{ 17768 { } } [
+    "vocab:unicode/normalize/NormalizationTest.txt" data
+    [ 5 head [ " " split [ hex> ] "" map-as ] map ] map
+    [ length ] keep [
+        {
+            [ { { 2 { 1 2 3 } } { 4 { 4 5 } } } [ nfc ] check? ]
+            [ { { 3 { 1 2 3 } } { 5 { 4 5 } } } [ nfd ] check? ]
+            [ { { 4 { 1 2 3 4 5 } } } [ nfkc ] check? ]
+            [ { { 5 { 1 2 3 4 5 } } } [ nfkd ] check? ]
+        } 1&&
+    ] reject
+] unit-test

@@ -3,7 +3,7 @@
 USING: accessors eval kernel math.vectors parser prettyprint
 refs sequences ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.scrollers ui.gadgets.toolbar ui.gadgets.tracks
-ui.gestures ;
+ui.gestures ui.tools.common ;
 IN: ui.gadgets.slots
 
 TUPLE: update-object ;
@@ -68,7 +68,7 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
         add-toolbar
         <source-editor> >>text
         dup text>> <scroller> 1 track-add
-        dup revert ;
+        dup revert white-interior ;
 
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
 

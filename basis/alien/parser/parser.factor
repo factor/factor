@@ -59,10 +59,11 @@ ERROR: *-in-c-type-name name ;
     dup "*" tail?
     [ *-in-c-type-name ] when ;
 
-: (CREATE-C-TYPE) ( word -- word )
+: (CREATE-C-TYPE) ( name -- word )
     validate-c-type-name current-vocab create-word {
         [ fake-definition ]
         [ set-last-word ]
+        [ reset-generic ]
         [ reset-c-type ]
         [ ]
     } cleave ;
@@ -85,7 +86,7 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ define-enum-value ]
     [ [ 2array suffix! ] [ enum>number 1 + ] bi ] 2bi ;
 
-: parse-enum-name ( -- name )
+: parse-enum-name ( -- word )
     CREATE-C-TYPE dup save-location ;
 
 : parse-enum-base-type ( -- base-type token )
@@ -145,17 +146,15 @@ PRIVATE>
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
 
-:: make-callback-type ( lib return type-name types names -- word quot effect )
-    type-name current-vocab create-word :> type-word
-    type-word [ reset-generic ] [ reset-c-type ] bi
+:: make-callback-type ( return function library types names -- word quot effect )
+    function create-function :> type-word
     void* type-word typedef
     type-word names return function-effect "callback-effect" set-word-prop
-    type-word lib "callback-library" set-word-prop
-    type-word return types lib library-abi callback-quot ( quot -- alien ) ;
+    type-word library "callback-library" set-word-prop
+    type-word return types library library-abi callback-quot ( quot -- alien ) ;
 
 : (CALLBACK:) ( -- word quot effect )
-    current-library get
-    scan-function-name scan-c-args make-callback-type ;
+    (FUNCTION:) make-callback-type ;
 
 PREDICATE: alien-function-alias-word < word
     def>> {

@@ -20,29 +20,31 @@ void factor_vm::collect_nursery() {
 
   /* Copy live objects from the nursery (as determined by the root set and
      marked cards in aging and tenured) to aging space. */
-  nursery_policy policy(this->data->nursery);
-  collector<aging_space, nursery_policy>
-      collector(this, this->data->aging, policy);
+  gc_workhorse<aging_space, nursery_policy>
+      workhorse(this, data->aging, nursery_policy(data->nursery));
+  slot_visitor<gc_workhorse<aging_space, nursery_policy>>
+      visitor(this, workhorse);
 
-  collector.visitor.visit_all_roots();
+  cell scan = data->aging->start + data->aging->occupied_space();
+
+  visitor.visit_all_roots();
   gc_event* event = current_gc->event;
 
   if (event)
     event->reset_timer();
-  collector.trace_cards(data->tenured, card_points_to_nursery,
-                        card_points_to_nursery);
-  collector.trace_cards(data->aging, card_points_to_nursery, 0xff);
-
+  visitor.visit_cards(data->tenured, card_points_to_nursery,
+                      card_points_to_nursery);
+  visitor.visit_cards(data->aging, card_points_to_nursery, 0xff);
   if (event)
-    event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
+    event->ended_card_scan(visitor.cards_scanned, visitor.decks_scanned);
 
   if (event)
     event->reset_timer();
-  collector.trace_code_heap_roots(&code->points_to_nursery);
+  visitor.visit_code_heap_roots(&code->points_to_nursery);
   if (event)
     event->ended_code_scan(code->points_to_nursery.size());
 
-  collector.cheneys_algorithm();
+  visitor.cheneys_algorithm(data->aging, scan);
 
   data->reset_nursery();
   code->points_to_nursery.clear();
