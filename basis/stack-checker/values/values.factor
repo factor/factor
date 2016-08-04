@@ -8,9 +8,6 @@ IN: stack-checker.values
 
 SYMBOL: known-values
 
-: init-known-values ( -- )
-    H{ } clone known-values set ;
-
 : known ( value -- known )
     known-values get at ;
 

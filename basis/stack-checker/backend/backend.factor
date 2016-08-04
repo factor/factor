@@ -151,7 +151,7 @@ M: object apply-object push-literal ;
 : with-infer ( quot -- effect visitor )
     [
         init-inference
-        init-known-values
+        H{ } clone known-values set
         stack-visitor off
         call
         end-infer

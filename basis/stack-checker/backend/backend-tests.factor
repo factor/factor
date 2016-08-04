@@ -1,6 +1,7 @@
-USING: accessors classes.tuple compiler.tree stack-checker.backend tools.test
-kernel namespaces stack-checker.state stack-checker.values
-stack-checker.visitor sequences assocs ;
+USING: accessors assocs classes.tuple compiler.tree kernel namespaces
+sequences stack-checker.backend stack-checker.recursive-state
+stack-checker.state stack-checker.values stack-checker.visitor
+tools.test ;
 IN: stack-checker.backend.tests
 
 { } [
@@ -32,7 +33,7 @@ IN: stack-checker.backend.tests
     V{ 3 9 8 }
     H{ { 8 input-parameter } { 9 input-parameter } { 3 input-parameter } }
 } [
-    init-known-values
+    H{ } clone known-values set
     V{ } clone stack-visitor set
     V{ 3 9 8 } introduce-values
     stack-visitor get first out-d>>
