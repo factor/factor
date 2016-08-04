@@ -29,7 +29,7 @@ $nl
 $nl
 "Clicking a presentation with the left mouse button invokes a default operation, which usually views the object in some way. For example, clicking a presentation of a word jumps to the word definition in the " { $link "ui-browser" } "."
 $nl
-"Clicking and holding the right mouse button on a presentation displays a popup menu listing available operations."
+"Clicking the right mouse button on a presentation displays a popup menu listing available operations."
 $nl
 "For more about presentation gadgets, see " { $link "ui.gadgets.presentations" } "." ;
 
