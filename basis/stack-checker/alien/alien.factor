@@ -37,22 +37,22 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     return-prep-quot infer-quot-here ;
 
 : pop-return ( params -- params )
-    pop-literal [ add-depends-on-c-type ] [ nip >>return ] bi ;
+    pop-literal [ add-depends-on-c-type ] [ >>return ] bi ;
 
 : pop-library ( params -- params )
-    pop-literal nip >>library ;
+    pop-literal >>library ;
 
 : pop-function ( params -- params )
-    pop-literal nip >>function ;
+    pop-literal >>function ;
 
 : pop-params ( params -- params )
-    pop-literal [ [ add-depends-on-c-type ] each ] [ nip >>parameters ] bi ;
+    pop-literal [ [ add-depends-on-c-type ] each ] [ >>parameters ] bi ;
 
 : pop-abi ( params -- params )
-    pop-literal nip >>abi ;
+    pop-literal >>abi ;
 
 : pop-quot ( params -- params )
-    pop-literal nip >>quot ;
+    pop-literal >>quot ;
 
 : infer-alien-invoke ( -- )
     alien-invoke-params new
@@ -145,7 +145,7 @@ M: callable wrap-callback-quot
     ] with-scope ;
 
 : infer-alien-callback ( -- )
-    pop-literal nip [
+    pop-literal [
         alien-callback-params new
         pop-abi
         pop-params

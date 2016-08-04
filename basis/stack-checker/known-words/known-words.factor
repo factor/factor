@@ -85,7 +85,7 @@ IN: stack-checker.known-words
     [ bad-declaration-error ] unless ;
 
 : infer-declare ( -- )
-    pop-literal nip check-declaration
+    pop-literal check-declaration
     [ length ensure-d ] keep zip
     #declare, ;
 
@@ -160,7 +160,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ compose [ infer-compose ] "special" set-word-prop
 
 : infer-execute ( -- )
-    pop-literal nip
+    pop-literal
     dup word? [
         apply-object
     ] [
@@ -179,7 +179,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ <tuple-boa> [ infer-<tuple-boa> ] "special" set-word-prop
 
 : infer-effect-unsafe ( word -- )
-    pop-literal nip
+    pop-literal
     add-effect-input
     apply-word/effect ;
 
@@ -194,7 +194,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ call-effect-unsafe [ infer-call-effect-unsafe ] "special" set-word-prop
 
 : infer-load-locals ( -- )
-    pop-literal nip
+    pop-literal
     consume-d dup copy-values dup output-r
     [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
 
@@ -206,7 +206,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ load-local [ infer-load-local ] "special" set-word-prop
 
 :: infer-get-local ( -- )
-    pop-literal nip 1 swap - :> n
+    pop-literal 1 swap - :> n
     n consume-r :> in-r
     in-r first copy-value 1array :> out-d
     in-r copy-values :> out-r
@@ -220,7 +220,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ get-local [ infer-get-local ] "special" set-word-prop
 
 : infer-drop-locals ( -- )
-    f f pop-literal nip consume-r f f #shuffle, ;
+    f f pop-literal consume-r f f #shuffle, ;
 
 \ drop-locals [ infer-drop-locals ] "special" set-word-prop
 

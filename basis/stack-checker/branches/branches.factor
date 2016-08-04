@@ -167,5 +167,5 @@ M: declared-effect curried/composed? known>> curried/composed? ;
 
 : infer-dispatch ( -- )
     \ dispatch combinator set
-    pop-literal nip infer-branches
+    pop-literal infer-branches
     [ #dispatch, ] dip compute-phi-function ;

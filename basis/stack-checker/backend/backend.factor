@@ -66,12 +66,10 @@ IN: stack-checker.backend
 : push-literal ( obj -- )
     literals get push ;
 
-: pop-literal ( -- rstate obj )
+: pop-literal ( -- obj )
     literals get [
-        pop-d
-        [ 1array #drop, ]
-        [ literal [ recursion>> ] [ value>> ] bi ] bi
-    ] [ pop recursive-state get swap ] if-empty ;
+        pop-d [ 1array #drop, ] [ literal value>> ] bi
+    ] [ pop ] if-empty ;
 
 : literals-available? ( n -- literals ? )
     literals get 2dup length <= [
