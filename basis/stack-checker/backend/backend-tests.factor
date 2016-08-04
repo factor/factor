@@ -64,6 +64,20 @@ IN: stack-checker.backend.tests
     node-seqs-eq?
 ] unit-test
 
+! pop-literal
+{
+    2
+} [
+    V{ 1 2 } clone literals set pop-literal
+] unit-test
+
+{
+    4321
+} [
+    init-inference 4321 <literal> make-known push-d pop-literal
+] unit-test
+
+
 : foo ( x -- )
     drop ;
 
