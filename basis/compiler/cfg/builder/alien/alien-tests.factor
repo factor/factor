@@ -52,7 +52,7 @@ cpu x86.64? [
         }
         V{ }
     } [
-        void { int float double char } cdecl { } { } f "func"
+        void { int float double char } cdecl f "func"
         alien-invoke-params boa caller-parameters
     ] cfg-unit-test
 ] when

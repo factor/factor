@@ -8,27 +8,28 @@ stack-checker.visitor strings words ;
 FROM: kernel.private => declare ;
 IN: stack-checker.alien
 
-TUPLE: alien-node-params
-return parameters
-{ abi abi initial: cdecl }
-in-d
-out-d ;
+TUPLE: alien-node-params return parameters { abi abi initial: cdecl } ;
 
-TUPLE: alien-invoke-params < alien-node-params library { function string } ;
+TUPLE: alien-invoke-params < alien-node-params
+    library
+    { function string } ;
 
 TUPLE: alien-indirect-params < alien-node-params ;
 
-TUPLE: alien-assembly-params < alien-node-params { quot callable } ;
+TUPLE: alien-assembly-params < alien-node-params
+    { quot callable } ;
 
-TUPLE: alien-callback-params < alien-node-params xt ;
+TUPLE: alien-callback-params < alien-node-params
+    xt ;
 
 : param-prep-quot ( params -- quot )
     parameters>> [ lookup-c-type c-type-unboxer-quot ] map deep-spread>quot ;
 
-: alien-stack ( params extra -- )
-    over parameters>> length + consume-d >>in-d
-    dup return>> void? 0 1 ? produce-d >>out-d
-    drop ;
+: alien-inputs/outputs ( params -- in-d out-d )
+    [
+        [ parameters>> length ]
+        [ alien-indirect-params? 1 0 ? ] bi + consume-d
+    ] [ return>> void? 0 1 ? produce-d ] bi ;
 
 : return-prep-quot ( params -- quot )
     return>> [ [ ] ] [ lookup-c-type c-type-boxer-quot ] if-void ;
@@ -65,10 +66,8 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     dup library>> library-abi >>abi
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
-    ! Magic #: consume exactly the number of inputs
-    dup 0 alien-stack
-    ! Add node to IR
-    dup #alien-invoke,
+    ! Consume inputs and outputs and add node to IR
+    dup dup alien-inputs/outputs #alien-invoke,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -80,10 +79,8 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     pop-return
     ! Coerce parameters to required types
     dup param-prep-quot '[ _ [ >c-ptr ] bi* ] infer-quot-here
-    ! Magic #: consume the function pointer, too
-    dup 1 alien-stack
-    ! Add node to IR
-    dup #alien-indirect,
+    ! Consume inputs and outputs and add node to IR
+    dup dup alien-inputs/outputs #alien-indirect,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -96,10 +93,8 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     pop-return
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
-    ! Magic #: consume exactly the number of inputs
-    dup 0 alien-stack
-    ! Add node to IR
-    dup #alien-assembly,
+    ! Consume inputs and outputs and add node to IR
+    dup dup alien-inputs/outputs #alien-assembly,
     ! Quotation which coerces return value to required type
     infer-return ;
 
