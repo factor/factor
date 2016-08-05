@@ -1,15 +1,15 @@
 namespace factor {
 
 struct profiling_sample_count {
-  /* Number of samples taken before the safepoint that recorded the sample */
+  // Number of samples taken before the safepoint that recorded the sample
   fixnum sample_count;
-  /* Number of samples taken during GC */
+  // Number of samples taken during GC
   fixnum gc_sample_count;
-  /* Number of samples taken during unoptimized compiler */
+  // Number of samples taken during unoptimized compiler
   fixnum jit_sample_count;
-  /* Number of samples taken during foreign code execution */
+  // Number of samples taken during foreign code execution
   fixnum foreign_sample_count;
-  /* Number of samples taken during code execution in non-Factor threads */
+  // Number of samples taken during code execution in non-Factor threads
   fixnum foreign_thread_sample_count;
 
   profiling_sample_count(fixnum sample_count, fixnum gc_sample_count,
@@ -32,9 +32,9 @@ struct profiling_sample_count {
 };
 
 struct profiling_sample {
-  /* Sample counts */
+  // Sample counts
   profiling_sample_count counts;
-  /* Active thread during sample */
+  // Active thread during sample
   cell thread;
   /* The callstack at safepoint time. Indexes to the beginning and ending
      code_block entries in the vm sample_callstacks array. */
