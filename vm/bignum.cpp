@@ -1737,7 +1737,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   /* clone the bignums so we can modify them in-place */
   size_a = BIGNUM_LENGTH(a);
   data_root<bignum> c(allot_bignum(size_a, 0), this);
-  /* c = allot_bignum(size_a, 0); */
+  // c = allot_bignum(size_a, 0);
   scan_a = BIGNUM_START_PTR(a);
   a_end = scan_a + size_a;
   scan_c = BIGNUM_START_PTR(c);
@@ -1808,7 +1808,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
         return c.untagged();
       }
 
-      /* copy 'b' to 'a' */
+      // copy 'b' to 'a'
       scan_a = BIGNUM_START_PTR(a);
       scan_b = BIGNUM_START_PTR(b);
       a_end = scan_a + size_a;
@@ -1819,7 +1819,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
         *(scan_a++) = 0;
       size_a = size_b;
 
-      /* copy 'c' to 'b' */
+      // copy 'c' to 'b'
       scan_b = BIGNUM_START_PTR(b);
       scan_c = BIGNUM_START_PTR(c);
       size_c = BIGNUM_LENGTH(c);
@@ -1858,7 +1858,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
         s -= (B * *scan_a);
         t += (D * *scan_a++);
         *scan_c++ = (bignum_digit_type)(s & BIGNUM_DIGIT_MASK);
-        /* *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK); */
+        //*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
         s >>= BIGNUM_DIGIT_LENGTH;
         t >>= BIGNUM_DIGIT_LENGTH;
       }
@@ -1875,7 +1875,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
         s += (A * *scan_a);
         t -= (C * *scan_a++);
         *scan_c++ = (bignum_digit_type)(s & BIGNUM_DIGIT_MASK);
-        /* *scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK); */
+        //*scan_d++ = (bignum_digit_type) (t & BIGNUM_DIGIT_MASK);
         s >>= BIGNUM_DIGIT_LENGTH;
         t >>= BIGNUM_DIGIT_LENGTH;
       }
@@ -1883,7 +1883,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
     BIGNUM_ASSERT(s == 0);
     BIGNUM_ASSERT(t == 0);
 
-    /* update size_a and size_b to remove any zeroes at end */
+    // update size_a and size_b to remove any zeros at end
     while (size_a > 0 && *(--scan_a) == 0)
       size_a--;
     while (size_b > 0 && *(--scan_b) == 0)

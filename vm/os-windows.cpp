@@ -41,7 +41,7 @@ BOOL factor_vm::windows_stat(vm_char* path) {
                          OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
   if (h == INVALID_HANDLE_VALUE) {
-    /* FindFirstFile is the only call that can stat c:\pagefile.sys */
+    // FindFirstFile is the only call that can stat c:\pagefile.sys
     WIN32_FIND_DATA st;
     HANDLE h;
 
@@ -151,12 +151,12 @@ uint64_t nano_count() {
   static uint32_t hi = 0;
   static uint32_t lo = 0;
 
-  /* Note: on older systems QueryPerformanceCounter may be unreliable
-     until you add /usepmtimer to Boot.ini. I had an issue where two
-     nano_count calls would show a difference of about 1 second,
-     while actually about 80 seconds have passed. The /usepmtimer
-     switch cured the issue on that PC (WinXP Pro SP3 32-bit).
-     See also http://www.virtualdub.org/blog/pivot/entry.php?id=106 */
+  // Note: on older systems QueryPerformanceCounter may be unreliable
+  // until you add /usepmtimer to Boot.ini. I had an issue where two
+  // nano_count calls would show a difference of about 1 second,
+  // while actually about 80 seconds have passed. The /usepmtimer
+  // switch cured the issue on that PC (WinXP Pro SP3 32-bit).
+  // See also http://www.virtualdub.org/blog/pivot/entry.php?id=106
   LARGE_INTEGER count;
   BOOL ret = QueryPerformanceCounter(&count);
   if (ret == 0)
@@ -246,7 +246,7 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
    cancellation requests to unblock the thread. */
 VOID CALLBACK dummy_cb (ULONG_PTR dwParam) { }
 
-/* CancelSynchronousIo is not in Windows XP */
+// CancelSynchronousIo is not in Windows XP
 #if _WIN32_WINNT >= 0x0600
 static void wake_up_thread(HANDLE thread) {
   if (!CancelSynchronousIo(thread)) {

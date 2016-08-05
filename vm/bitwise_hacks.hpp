@@ -59,11 +59,11 @@ inline cell popcount(cell x) {
   cell ks = 24;
 #endif
 
-  x = x - ((x >> 1) & k1);         /* put count of each 2 bits into those 2 bits */
-  x = (x & k2) + ((x >> 2) & k2);  /* put count of each 4 bits into those 4 bits */
-  x = (x + (x >> 4)) & k4;         /* put count of each 8 bits into those 8 bits */
-  x = (x * kf) >> ks;  /* returns 8 most significant bits of x + (x<<8) + */
-                          (x<<16) + (x<<24) + ... */
+  x = x - ((x >> 1) & k1);         // put count of each 2 bits into those 2 bits
+  x = (x & k2) + ((x >> 2) & k2);  // put count of each 4 bits into those 4 bits
+  x = (x + (x >> 4)) & k4;         // put count of each 8 bits into those 8 bits
+  x = (x * kf) >> ks;  // returns 8 most significant bits of x + (x<<8) +
+                       // (x<<16) + (x<<24) + ...
 
   return x;
 #endif
