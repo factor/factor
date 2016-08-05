@@ -9,7 +9,7 @@ struct startargs {
   vm_char** argv;
 };
 
-/* arg must be new'ed because we're going to delete it! */
+// arg must be new'ed because we're going to delete it!
 void* start_standalone_factor_thread(void* arg) {
   factor_vm* newvm = new_factor_vm();
   startargs* args = (startargs*)arg;

@@ -110,14 +110,14 @@ inline static cell tag_fixnum(fixnum untagged) {
 
 struct object {
   NO_TYPE_CHECK;
-  /* header format (bits indexed with least significant as zero):
-     bit 0      : free?
-     if not forwarding:
-       bit 1      : forwarding pointer?
-       bit 2-5    : tag
-       bit 7-end  : hashcode
-     if forwarding:
-       bit 2-end  : forwarding pointer */
+  // header format (bits indexed with least significant as zero):
+  // bit 0      : free?
+  // if not forwarding:
+  //   bit 1      : forwarding pointer?
+  //   bit 2-5    : tag
+  //   bit 7-end  : hashcode
+  // if forwarding:
+  //   bit 2-end  : forwarding pointer
   cell header;
 
   template <typename Fixup> cell base_size(Fixup fixup) const;
