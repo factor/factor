@@ -1,6 +1,7 @@
-USING: accessors alien.c-types alien.private kernel kernel.private
-math namespaces stack-checker.alien stack-checker.state
-stack-checker.values threads.private tools.test ;
+USING: accessors alien alien.c-types alien.private kernel
+kernel.private literals math namespaces stack-checker.alien
+stack-checker.state stack-checker.values system threads.private
+tools.test ;
 IN: stack-checker.alien.tests
 
 ! alien-inputs/outputs
@@ -31,7 +32,17 @@ IN: stack-checker.alien.tests
 ] unit-test
 
 ! wrap-callback-quot
-{
+${
+    cpu x86.32?
+    [
+        [
+            { integer integer } declare [ [ ] dip ] dip
+            "hello" >integer
+        ] [
+            dup current-callback eq?
+            [ drop ] [ wait-for-callback ] if
+        ] do-callback
+    ]
     [
         [
             { fixnum fixnum } declare [ [ ] dip ] dip
@@ -40,9 +51,8 @@ IN: stack-checker.alien.tests
             dup current-callback eq?
             [ drop ] [ wait-for-callback ] if
         ] do-callback
-    ]
+    ] ?
 } [
-    alien-node-params new
-    int >>return { int int } >>parameters
+    int { int int } cdecl alien-node-params boa
     [ "hello" ] wrap-callback-quot
 ] unit-test
