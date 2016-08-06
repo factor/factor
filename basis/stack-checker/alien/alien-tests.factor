@@ -15,7 +15,7 @@ IN: stack-checker.alien.tests
     V{ } clone literals set
     30 \ <value> set-global
     alien-node-params new int >>return { int int } >>parameters
-    alien-inputs/outputs
+    inputs/outputs
 ] unit-test
 
 {
@@ -28,7 +28,7 @@ IN: stack-checker.alien.tests
     V{ } clone literals set
     30 \ <value> set-global
     alien-indirect-params new int >>return { int int } >>parameters
-    alien-inputs/outputs
+    inputs/outputs
 ] unit-test
 
 ! wrap-callback-quot
