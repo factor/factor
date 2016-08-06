@@ -8,10 +8,8 @@ stack-checker.errors stack-checker.inlining
 stack-checker.visitor.dummy ;
 IN: stack-checker
 
-GENERIC: infer ( quot -- effect )
-
-M: callable infer ( quot -- effect )
-    (infer) ;
+: infer ( quot -- effect )
+    [ infer-quot-here ] with-infer drop ;
 
 : infer. ( quot -- )
     ! Safe to call from inference transforms.
