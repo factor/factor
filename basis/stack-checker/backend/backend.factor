@@ -157,9 +157,6 @@ M: object apply-object push-literal ;
         stack-visitor get
     ] with-scope ; inline
 
-: (infer) ( quot -- effect )
-    [ infer-quot-here ] with-infer drop ;
-
 : ?quotation-effect ( in -- effect/f )
     dup pair? [ second dup effect? [ drop f ] unless ] [ drop f ] if ;
 
