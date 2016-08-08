@@ -64,7 +64,6 @@ TUPLE: cuckoo-filter buckets checksum size ;
     } 0|| [
         cuckoo-filter [ 1 + ] change-size drop t
     ] [
-        cuckoo-filter checksum>> :> checksum
         2 random zero? i1 i2 ? :> i!
         max-cuckoo-count [
             drop
