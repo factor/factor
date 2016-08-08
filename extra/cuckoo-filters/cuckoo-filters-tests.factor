@@ -12,7 +12,7 @@ cuckoo-filters kernel math.parser sequences tools.test ;
     } 2cleave
 ] unit-test
 
-{ 250,000 0 } [
+{ 250,000 250,000 0 } [
     250,000 <cuckoo-filter>
     250,000 [ number>string ] { } map-integers
     [
@@ -23,6 +23,7 @@ cuckoo-filters kernel math.parser sequences tools.test ;
             } 1&&
         ] count swap
     ]
-    [ [ over cuckoo-delete drop ] each ] bi
+    [ [ over cuckoo-lookup ] count swap ]
+    [ [ over cuckoo-delete drop ] each ] tri
     size>>
 ] unit-test
