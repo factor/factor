@@ -54,43 +54,43 @@ TUPLE: cuckoo-filter buckets checksum size ;
 : <cuckoo-filter> ( capacity -- cuckoo-filter )
     <cuckoo-buckets> sha1 0 cuckoo-filter boa ;
 
-:: cuckoo-insert ( obj cuckoo-filter -- ? )
-    obj cuckoo-filter tag-indices :> ( tag! i1 i2 )
+:: cuckoo-insert ( bytes cuckoo-filter -- ? )
+    bytes cuckoo-filter tag-indices :> ( tag! i1 i2 )
     cuckoo-filter buckets>> :> buckets
-    buckets length :> cuckoo-size
+    buckets length :> n
     {
-        [ tag i1 cuckoo-size mod buckets nth bucket-insert ]
-        [ tag i2 cuckoo-size mod buckets nth bucket-insert ]
+        [ tag i1 n mod buckets nth bucket-insert ]
+        [ tag i2 n mod buckets nth bucket-insert ]
     } 0|| [
         cuckoo-filter [ 1 + ] change-size drop t
     ] [
         cuckoo-filter checksum>> :> checksum
-        { i1 i2 } random :> i!
+        2 random zero? i1 i2 ? :> i!
         max-cuckoo-count [
             drop
-            tag i cuckoo-size mod buckets nth bucket-swap tag!
+            tag i n mod buckets nth bucket-swap tag!
             tag i alt-index i!
 
-            tag i cuckoo-size mod buckets nth bucket-insert
+            tag i n mod buckets nth bucket-insert
             dup [ cuckoo-filter [ 1 + ] change-size drop ] when
         ] find-integer >boolean
     ] if ;
 
-:: cuckoo-lookup ( obj cuckoo-filter -- ? )
-    obj cuckoo-filter tag-indices :> ( tag i1 i2 )
+:: cuckoo-lookup ( bytes cuckoo-filter -- ? )
+    bytes cuckoo-filter tag-indices :> ( tag i1 i2 )
     cuckoo-filter buckets>> :> buckets
-    buckets length :> cuckoo-size
+    buckets length :> n
     {
-        [ tag i1 cuckoo-size mod buckets nth bucket-lookup ]
-        [ tag i2 cuckoo-size mod buckets nth bucket-lookup ]
+        [ tag i1 n mod buckets nth bucket-lookup ]
+        [ tag i2 n mod buckets nth bucket-lookup ]
     } 0|| ;
 
-:: cuckoo-delete ( obj cuckoo-filter -- ? )
-    obj cuckoo-filter tag-indices :> ( tag i1 i2 )
+:: cuckoo-delete ( bytes cuckoo-filter -- ? )
+    bytes cuckoo-filter tag-indices :> ( tag i1 i2 )
     cuckoo-filter buckets>> :> buckets
-    buckets length :> cuckoo-size
+    buckets length :> n
     {
-        [ tag i1 cuckoo-size mod buckets nth bucket-delete ]
-        [ tag i2 cuckoo-size mod buckets nth bucket-delete ]
+        [ tag i1 n mod buckets nth bucket-delete ]
+        [ tag i2 n mod buckets nth bucket-delete ]
     } 0||
     dup [ cuckoo-filter [ 1 - ] change-size drop ] when ;
