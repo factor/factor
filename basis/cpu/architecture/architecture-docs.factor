@@ -1,4 +1,4 @@
-USING: alien assocs classes compiler.cfg.instructions
+USING: alien assocs byte-arrays classes compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stack-frame cpu.x86.assembler
 cpu.x86.assembler.operands help.markup help.syntax kernel layouts
 literals math multiline sequences strings system vm words ;
@@ -133,6 +133,10 @@ HELP: %call
 { $values { "word" word } }
 { $description "Emits code for calling a Factor word." } ;
 
+HELP: %c-invoke
+{ $values { "symbols" byte-array } { "dll" dll } { "gc-map" gc-map } }
+{ $description "Emits code for calling an FFI function." } ;
+
 HELP: %context
 { $values { "dst" "a register symbol" } }
 { $description "Emits machine code for putting a pointer to the context field of the " { $link vm } " in a register." }
@@ -202,6 +206,10 @@ HELP: %local-allot
 }
 { $description "Emits machine code for stack \"allocating\" a chunk of memory. No memory is really allocated and instead a pointer to it is just put in the destination register." }
 { $see-also ##local-allot } ;
+
+HELP: reg-class-of
+{ $values { "rep" representation } { "reg-class" reg-class } }
+{ $description "Register class for values of the given representation." } ;
 
 HELP: %replace-imm
 { $values
@@ -275,6 +283,9 @@ HELP: %test-imm-branch
   { "cc" "comparison symbol" }
 } { $description "Emits a TEST instruction with a register and an immediate, followed by a branch." } ;
 
+HELP: %unbox
+{ $description "Call a function to convert a tagged pointer into a value that can be passed to a C function, or returned from a callback." } ;
+
 HELP: %vector>scalar
 { $values
   { "dst" "destination register" }
@@ -295,16 +306,29 @@ HELP: %write-barrier
 { $description "Generates code for the " { $link ##write-barrier } " instruction." }
 { $examples { $unchecked-example $[ ex-%write-barrier ] } } ;
 
+HELP: complex-addressing?
+{ $values { "?" boolean } }
+{ $description "Specifies if " { $link %slot } ", " { $link %set-slot } " and " { $link %write-barrier } " accept the 'scale' and 'tag' parameters, and if %load-memory and %store-memory work." } ;
+
 HELP: double-2-rep
 { $var-description "Representation for a pair of doubles." } ;
 
-HELP: signed-rep
-{ $values { "rep" representation } { "rep'" representation } }
-{ $description "Maps any representation to its signed counterpart, if it has one." } ;
+HELP: dummy-fp-params?
+{ $values { "?" boolean } }
+{ $description "Whether the architecture's ABI uses dummy floating point parameters. If it does, then the corresponding floating point register is 'dummy allocated' when an integer register is allocated." } { $see-also dummy-int-params? } ;
 
-HELP: rep-size
-{ $values { "rep" representation } { "n" integer } }
-{ $description "Size in bytes of a representation." } ;
+HELP: dummy-int-params?
+{ $values { "?" boolean } }
+{ $description "Whether the architecture's ABI uses dummy integer parameters. If it does, then the corresponding integer register is 'dummy allocated' when a floating point register is allocated." } { $see-also dummy-fp-params? } ;
+
+HELP: fused-unboxing?
+{ $values { "?" boolean } }
+{ $description "Whether this architecture support " { $link %load-float } ", " { $link %load-double } ", and " { $link %load-vector } "." } ;
+
+HELP: gc-root-offset
+{ $values { "spill-slot" spill-slot } { "n" integer } }
+{ $description "Offset in the " { $link stack-frame } " for the word being constructed where the spill slot is located. The value is given in " { $link cell } " units." }
+{ $see-also gc-info } ;
 
 HELP: immediate-arithmetic?
 { $values { "n" number } { "?" boolean } }
@@ -313,28 +337,29 @@ HELP: immediate-arithmetic?
   { $link %sub-imm } ", or " { $link %mul-imm } "?"
 } ;
 
+HELP: immediate-bitwise?
+{ $values { "n" number } { "?" boolean } }
+{ $description "Can this value be an immediate operand for %and-imm, %or-imm, or %xor-imm?" } ;
+
+HELP: immediate-comparand?
+{ $values { "n" number } { "?" boolean } }
+{ $description "Can this value be an immediate operand for %compare-imm or %compare-imm-branch?" } ;
+
+HELP: immediate-store?
+{ $values { "n" number } { "?" boolean } }
+{ $description "Can this value be an immediate operand for %replace-imm?" } ;
+
 HELP: machine-registers
 { $values { "assoc" assoc } }
 { $description "Mapping from register class to machine registers. Only registers not reserved by the Factor VM are included." } ;
 
-HELP: vm-stack-space
-{ $values { "n" number } }
-{ $description "Parameter space to reserve in anything making VM calls." } ;
-
-HELP: complex-addressing?
-{ $values { "?" boolean } }
-{ $description "Specifies if " { $link %slot } ", " { $link %set-slot } " and " { $link %write-barrier } " accept the 'scale' and 'tag' parameters, and if %load-memory and %store-memory work." } ;
-
 HELP: param-regs
 { $values { "abi" "a calling convention symbol" } { "regs" assoc } }
 { $description "Retrieves the order in which machine registers are used for parameters for the given calling convention." } ;
-HELP: test-instruction?
-{ $values { "?" boolean } }
-{ $description "Does the current architecture have a test instruction? Used on x86 to rewrite some " { $link CMP } " instructions to less expensive " { $link TEST } "s." } ;
 
-HELP: fused-unboxing?
-{ $values { "?" boolean } }
-{ $description "Whether this architecture support " { $link %load-float } ", " { $link %load-double } ", and " { $link %load-vector } "." } ;
+HELP: rep-size
+{ $values { "rep" representation } { "n" integer } }
+{ $description "Size in bytes of a representation." } ;
 
 HELP: return-regs
 { $values { "regs" assoc } }
@@ -343,6 +368,10 @@ HELP: return-regs
 HELP: return-struct-in-registers?
 { $values { "c-type" class } { "?" boolean } }
 { $description "Whether the size of the struct is so small that it will be returned in registers or not." } ;
+
+HELP: signed-rep
+{ $values { "rep" representation } { "rep'" representation } }
+{ $description "Maps any representation to its signed counterpart, if it has one." } ;
 
 HELP: stack-cleanup
 { $values
@@ -360,10 +389,13 @@ HELP: stack-cleanup
   }
 } ;
 
-HELP: gc-root-offset
-{ $values { "spill-slot" spill-slot } { "n" integer } }
-{ $description "Offset in the " { $link stack-frame } " for the word being constructed where the spill slot is located. The value is given in " { $link cell } " units." }
-{ $see-also gc-info } ;
+HELP: test-instruction?
+{ $values { "?" boolean } }
+{ $description "Does the current architecture have a test instruction? Used on x86 to rewrite some " { $link CMP } " instructions to less expensive " { $link TEST } "s." } ;
+
+HELP: vm-stack-space
+{ $values { "n" number } }
+{ $description "Parameter space to reserve in anything making VM calls." } ;
 
 ARTICLE: "cpu.architecture" "CPU architecture description model"
 "The " { $vocab-link "cpu.architecture" } " vocab contains generic words and hooks that serves as an api for the compiler towards the cpu architecture."
@@ -371,19 +403,28 @@ $nl
 "Architecture support checks:"
 { $subsections
   complex-addressing?
+  dummy-int-params?
+  dummy-fp-params?
   float-right-align-on-stack?
   fused-unboxing?
   test-instruction?
 }
 "Control flow code emitters:"
 { $subsections %call %jump %jump-label %return }
+"Foreign function interface:"
+{ $subsections %c-invoke }
 "Moving values around:"
 { $subsections %replace %replace-imm }
 "Register categories:"
-{ $subsections machine-registers param-regs return-regs }
+{ $subsections
+  machine-registers
+  param-regs
+  return-regs
+}
 "Representation metadata:"
 { $subsections
   narrow-vector-rep
+  reg-class-of
   rep-component-type
   rep-length
   rep-size
@@ -400,6 +441,14 @@ $nl
   %write-barrier
 }
 "Spilling:"
-{ $subsections gc-root-offset } ;
+{ $subsections gc-root-offset }
+"Value as immediate checks:"
+{ $subsections
+  immediate-arithmetic?
+  immediate-bitwise?
+  immediate-comparand?
+  immediate-store?
+  immediate-shift-count?
+} ;
 
 ABOUT: "cpu.architecture"

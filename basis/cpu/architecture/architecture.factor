@@ -23,69 +23,69 @@ SINGLETONS: float-rep double-rep ;
 
 ! On x86, floating point registers are really vector registers
 SINGLETONS:
-char-16-rep
-uchar-16-rep
-short-8-rep
-ushort-8-rep
-int-4-rep
-uint-4-rep
-longlong-2-rep
-ulonglong-2-rep ;
+    char-16-rep
+    uchar-16-rep
+    short-8-rep
+    ushort-8-rep
+    int-4-rep
+    uint-4-rep
+    longlong-2-rep
+    ulonglong-2-rep ;
 
 ! Scalar values in the high component of a vector register
 SINGLETONS:
-char-scalar-rep
-uchar-scalar-rep
-short-scalar-rep
-ushort-scalar-rep
-int-scalar-rep
-uint-scalar-rep
-longlong-scalar-rep
-ulonglong-scalar-rep ;
+    char-scalar-rep
+    uchar-scalar-rep
+    short-scalar-rep
+    ushort-scalar-rep
+    int-scalar-rep
+    uint-scalar-rep
+    longlong-scalar-rep
+    ulonglong-scalar-rep ;
 
 SINGLETONS:
-float-4-rep
-double-2-rep ;
+    float-4-rep
+    double-2-rep ;
 
 UNION: int-vector-rep
-char-16-rep
-uchar-16-rep
-short-8-rep
-ushort-8-rep
-int-4-rep
-uint-4-rep
-longlong-2-rep
-ulonglong-2-rep ;
+    char-16-rep
+    uchar-16-rep
+    short-8-rep
+    ushort-8-rep
+    int-4-rep
+    uint-4-rep
+    longlong-2-rep
+    ulonglong-2-rep ;
 
 UNION: signed-int-vector-rep
-char-16-rep
-short-8-rep
-int-4-rep
-longlong-2-rep ;
+    char-16-rep
+    short-8-rep
+    int-4-rep
+    longlong-2-rep ;
 
 UNION: unsigned-int-vector-rep
-uchar-16-rep
-ushort-8-rep
-uint-4-rep
-ulonglong-2-rep ;
+    uchar-16-rep
+    ushort-8-rep
+    uint-4-rep
+    ulonglong-2-rep ;
 
 UNION: scalar-rep
-char-scalar-rep
-uchar-scalar-rep
-short-scalar-rep
-ushort-scalar-rep
-int-scalar-rep
-uint-scalar-rep
-longlong-scalar-rep
-ulonglong-scalar-rep ;
+    char-scalar-rep
+    uchar-scalar-rep
+    short-scalar-rep
+    ushort-scalar-rep
+    int-scalar-rep
+    uint-scalar-rep
+    longlong-scalar-rep
+    ulonglong-scalar-rep ;
 
 UNION: float-vector-rep
-float-4-rep
-double-2-rep ;
+    float-4-rep
+    double-2-rep ;
 
 UNION: vector-rep
-int-vector-rep
-float-vector-rep ;
+    int-vector-rep
+    float-vector-rep ;
 
 CONSTANT: vector-reps
     {
@@ -102,13 +102,13 @@ CONSTANT: vector-reps
     }
 
 UNION: representation
-any-rep
-tagged-rep
-int-rep
-float-rep
-double-rep
-vector-rep
-scalar-rep ;
+    any-rep
+    tagged-rep
+    int-rep
+    float-rep
+    double-rep
+    vector-rep
+    scalar-rep ;
 
 : signed-rep ( rep -- rep' )
     {
@@ -520,16 +520,8 @@ HOOK: %reload cpu ( dst rep src -- )
 HOOK: fused-unboxing? cpu ( -- ? )
 
 HOOK: immediate-arithmetic? cpu ( n -- ? )
-
-! Can this value be an immediate operand for %and-imm, %or-imm,
-! or %xor-imm?
 HOOK: immediate-bitwise? cpu ( n -- ? )
-
-! Can this value be an immediate operand for %compare-imm or
-! %compare-imm-branch?
 HOOK: immediate-comparand? cpu ( n -- ? )
-
-! Can this value be an immediate operand for %replace-imm?
 HOOK: immediate-store? cpu ( obj -- ? )
 
 M: object immediate-comparand? ( n -- ? )
@@ -556,10 +548,7 @@ HOOK: value-struct? cpu ( c-type -- ? )
 ! If t, all parameters are shadowed by dummy stack parameters
 HOOK: dummy-stack-params? cpu ( -- ? )
 
-! If t, all FP parameters are shadowed by dummy int parameters
 HOOK: dummy-int-params? cpu ( -- ? )
-
-! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
 ! If t, long longs are never passed in param regs
@@ -577,8 +566,6 @@ HOOK: float-right-align-on-stack? cpu ( -- ? )
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )
 
-! Call a function to convert a tagged pointer into a value that
-! can be passed to a C function, or returned from a callback
 HOOK: %unbox cpu ( dst src func rep -- )
 
 HOOK: %unbox-long-long cpu ( dst1 dst2 src func -- )
