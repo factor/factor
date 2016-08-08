@@ -649,32 +649,32 @@ HOOK: %prepare-var-args cpu ( reg-inputs -- )
 
 HOOK: %cleanup cpu ( n -- )
 
-M:: x86 %alien-assembly ( reg-inputs
-                          stack-inputs
-                          reg-outputs
-                          dead-outputs
-                          cleanup
-                          stack-size
+M:: x86 %alien-assembly ( varargs? reg-inputs stack-inputs
+                          reg-outputs dead-outputs
+                          cleanup stack-size
                           quot -- )
     stack-inputs [ first3 %store-stack-param ] each
-    reg-inputs [ [ first3 %store-reg-param ] each ] [ %prepare-var-args ] bi
+    reg-inputs [ first3 %store-reg-param ] each
+    varargs? [ reg-inputs %prepare-var-args ] when
     quot call( -- )
     cleanup %cleanup
     reg-outputs [ first3 %load-reg-param ] each
     dead-outputs [ first2 %discard-reg-param ] each ;
 
-M: x86 %alien-invoke ( reg-inputs stack-inputs
+M: x86 %alien-invoke ( varargs? reg-inputs stack-inputs
                        reg-outputs dead-outputs
-                       cleanup
-                       stack-size
+                       cleanup stack-size
                        symbols dll gc-map -- )
-                       '[ _ _ _ %c-invoke ] %alien-assembly ;
+    '[ _ _ _ %c-invoke ] %alien-assembly ;
 
 M:: x86 %alien-indirect ( src
-                          reg-inputs stack-inputs
+                          varargs? reg-inputs stack-inputs
                           reg-outputs dead-outputs
-                          cleanup stack-size gc-map -- )
-    reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
+                          cleanup stack-size
+                          gc-map -- )
+    varargs? reg-inputs stack-inputs
+    reg-outputs dead-outputs
+    cleanup stack-size [
         src ?spill-slot CALL
         gc-map gc-map-here
     ] %alien-assembly ;

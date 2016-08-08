@@ -53,6 +53,6 @@ ${
         ] do-callback
     ] ?
 } [
-    int { int int } cdecl alien-node-params boa
+    int { int int } cdecl f alien-node-params boa
     [ "hello" ] wrap-callback-quot
 ] unit-test

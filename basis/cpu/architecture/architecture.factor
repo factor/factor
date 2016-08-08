@@ -580,11 +580,21 @@ HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %c-invoke cpu ( symbols dll gc-map -- )
 
-HOOK: %alien-invoke cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map -- )
+HOOK: %alien-invoke cpu ( varargs? reg-inputs stack-inputs
+                          reg-outputs dead-outputs
+                          cleanup stack-size
+                          symbols dll gc-map -- )
 
-HOOK: %alien-indirect cpu ( src reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map -- )
+HOOK: %alien-indirect cpu ( src
+                            varargs? reg-inputs stack-inputs
+                            reg-outputs dead-outputs
+                            cleanup stack-size
+                            gc-map -- )
 
-HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
+HOOK: %alien-assembly cpu ( varargs? reg-inputs stack-inputs
+                            reg-outputs dead-outputs
+                            cleanup stack-size
+                            quot -- )
 
 HOOK: %callback-inputs cpu ( reg-outputs stack-outputs -- )
 

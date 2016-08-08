@@ -8,7 +8,9 @@ stack-checker.visitor strings words ;
 FROM: kernel.private => declare ;
 IN: stack-checker.alien
 
-TUPLE: alien-node-params return parameters { abi abi initial: cdecl } ;
+TUPLE: alien-node-params
+    return parameters
+    { abi abi initial: cdecl } varargs? ;
 
 TUPLE: alien-invoke-params < alien-node-params
     library

@@ -61,10 +61,19 @@ cpu x86.64? [
         ] if
         V{ }
     } [
-        void { int float double char } cdecl f "func"
+        void { int float double char } cdecl f f "func"
         alien-invoke-params boa caller-parameters
     ] cfg-unit-test
 ] when
+
+! prepare-caller-return
+${
+    cpu x86.32? { { 1 int-rep EAX } } { { 1 int-rep RAX } } ?
+    cpu x86.32? { { 2 double-rep ST0 } } { { 2 double-rep XMM0 } } ?
+} [
+    T{ alien-invoke-params { return int } } prepare-caller-return
+    T{ alien-invoke-params { return double } } prepare-caller-return
+] cfg-unit-test
 
 ! unbox-parameters
 
