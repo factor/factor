@@ -1,8 +1,8 @@
 ! Copyright (C) 2016 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays checksums checksums.sha
-combinators.short-circuit io.binary kernel locals math
+USING: accessors alien alien.c-types alien.data arrays checksums
+checksums.sha combinators.short-circuit kernel locals math
 math.bitwise random sequences ;
 
 IN: cuckoo-filters
@@ -27,7 +27,7 @@ CONSTANT: bucket-size 4
     #buckets [ bucket-size f <array> ] replicate ;
 
 : tag-index ( hash -- tag index )
-    4 cut 4 head [ be> ] bi@ ;
+    4 over <displaced-alien> [ uint deref ] bi@ ;
 
 : alt-index ( tag index -- altindex )
     [ 0x5bd1e995 w* ] [ bitxor ] bi* ;
