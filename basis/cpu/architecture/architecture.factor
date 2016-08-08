@@ -571,9 +571,6 @@ HOOK: long-long-on-stack? cpu ( -- ? )
 ! (r3, r5, etc) register.
 HOOK: long-long-odd-register? cpu ( -- ? )
 
-! If t, floats are never passed in param regs
-HOOK: float-on-stack? cpu ( -- ? )
-
 ! If t, put floats in the second word of a double word on the stack
 HOOK: float-right-align-on-stack? cpu ( -- ? )
 

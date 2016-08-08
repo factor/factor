@@ -120,8 +120,6 @@ M: x86.64 %safepoint
 
 M: x86.64 long-long-on-stack? f ;
 
-M: x86.64 float-on-stack? f ;
-
 M: x86.64 struct-return-on-stack? f ;
 
 M: x86.64 (cpuid) ( rax rcx regs -- )

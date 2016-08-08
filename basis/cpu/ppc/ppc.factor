@@ -355,9 +355,6 @@ M: ppc return-regs ( -- regs )
 M: ppc return-struct-in-registers? ( c-type -- ? )
     lookup-c-type return-in-registers?>> ;
 
-! If t, floats are never passed in param regs
-M: ppc float-on-stack? ( -- ? ) f ;
-
 ! If t, the struct return pointer is never passed in a param reg
 M: ppc struct-return-on-stack? ( -- ? ) f ;
 

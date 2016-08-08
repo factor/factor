@@ -371,7 +371,6 @@ $nl
 "Architecture support checks:"
 { $subsections
   complex-addressing?
-  float-on-stack?
   float-right-align-on-stack?
   fused-unboxing?
   test-instruction?
