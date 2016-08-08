@@ -450,7 +450,10 @@ M:: ppc %c-invoke ( name dll gc-map -- )
     } case
     rep scratch-reg-class rep vreg %spill ;
 
-:: emit-alien-insn ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
+:: emit-alien-insn ( varargs? reg-inputs stack-inputs
+                     reg-outputs dead-outputs
+                     cleanup stack-size
+                     quot -- )
     stack-inputs [ first3 store-stack-param ] each
     reg-inputs [ first3 store-reg-param ] each
     quot call
@@ -458,14 +461,17 @@ M:: ppc %c-invoke ( name dll gc-map -- )
     dead-outputs [ first2 discard-reg-param ] each
     ; inline
 
-M: ppc %alien-invoke ( reg-inputs stack-inputs reg-outputs
-                       dead-outputs cleanup stack-size
+M: ppc %alien-invoke ( varargs? reg-inputs stack-inputs
+                       reg-outputs dead-outputs
+                       cleanup stack-size
                        symbols dll gc-map -- )
     '[ _ _ _ %c-invoke ] emit-alien-insn ;
 
-M:: ppc %alien-indirect ( src reg-inputs stack-inputs
-                          reg-outputs dead-outputs cleanup
-                          stack-size gc-map -- )
+M:: ppc %alien-indirect ( src
+                          varargs? reg-inputs stack-inputs
+                          reg-outputs dead-outputs
+                          cleanup stack-size
+                          gc-map -- )
     reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
         has-toc [
             11 src load-param
@@ -479,9 +485,10 @@ M:: ppc %alien-indirect ( src reg-inputs stack-inputs
         gc-map gc-map-here
     ] emit-alien-insn ;
 
-M: ppc %alien-assembly ( reg-inputs stack-inputs reg-outputs
-                         dead-outputs cleanup stack-size quot
-                         -- )
+M: ppc %alien-assembly ( varargs? reg-inputs stack-inputs
+                         reg-outputs dead-outputs
+                         cleanup stack-size
+                         quot -- )
     '[ _ call( -- ) ] emit-alien-insn ;
 
 M: ppc %callback-inputs ( reg-outputs stack-outputs -- )

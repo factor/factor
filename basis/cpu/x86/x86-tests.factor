@@ -41,7 +41,7 @@ cpu x86.64? [
 ! %alien-invoke
 { 1 } [
     init-relocation init-gc-maps [
-        { } { } { } { } 0 0 { } "dll" T{ gc-map { scrub-d V{ 0 } } } %alien-invoke
+        f { } { } { } { } 0 0 { } "dll" T{ gc-map { scrub-d V{ 0 } } } %alien-invoke
     ] B{ } make drop
     gc-maps get length
 ] unit-test
