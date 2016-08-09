@@ -55,7 +55,7 @@ HELP: commands
 HELP: define-command-map
 { $values { "class" "a class word" } { "group" string } { "blurb" { $maybe string } } { "pairs" "a sequence of gesture/word pairs" } }
 { $description
-    "Defines a command map on the specified gadget class. The " { $snippet "specs" } " parameter is a sequence of pairs " { $snippet "{ gesture word }" } ". The words must be valid commands; see " { $link define-command } "."
+    "Defines a command map on the specified gadget class. The " { $snippet "blurb" } " is an optional description. The " { $snippet "pairs" } " parameter is a sequence of pairs " { $snippet "{ gesture word }" } ". The " { $snippet "gesture" } " may be " { $link f } " if you are defining  a \"toolbar\" " { $snippet "group" } ". The " { $snippet "word" } "s must be valid commands; see " { $link define-command } "."
 }
 { $notes "Only one of " { $link define-command-map } " and " { $link set-gestures } " can be used on a given gadget class, since each word will overwrite the other word's definitions." } ;
 
