@@ -62,7 +62,7 @@ TUPLE: cuckoo-filter buckets checksum size ;
         [ fp i1 n mod buckets nth bucket-insert ]
         [ fp i2 n mod buckets nth bucket-insert ]
     } 0|| [
-        cuckoo-filter [ 1 + ] change-size drop t
+        t
     ] [
         2 random zero? i1 i2 ? :> i!
         max-cuckoo-count [
@@ -71,9 +71,9 @@ TUPLE: cuckoo-filter buckets checksum size ;
             fp i alt-index i!
 
             fp i n mod buckets nth bucket-insert
-            dup [ cuckoo-filter [ 1 + ] change-size drop ] when
         ] find-integer >boolean
-    ] if ;
+    ] if
+    dup [ cuckoo-filter [ 1 + ] change-size drop ] when ;
 
 :: cuckoo-lookup ( bytes cuckoo-filter -- ? )
     bytes cuckoo-filter hash-indices :> ( fp i1 i2 )
