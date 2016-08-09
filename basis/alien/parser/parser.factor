@@ -74,7 +74,6 @@ ERROR: *-in-c-type-name name ;
 <PRIVATE
 GENERIC: return-type-name ( type -- name )
 
-M: object return-type-name drop "void" ;
 M: word return-type-name name>> ;
 M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
 
