@@ -46,6 +46,11 @@ IN: alien.parser.tests
     { "ayae" } [ parse-enum-name new-definitions get first in? ] with-parsing
 ] unit-test
 
+! return-type-name
+{ "void" } [
+    void return-type-name
+] unit-test
+
 >>
 
 TYPEDEF: char char2
