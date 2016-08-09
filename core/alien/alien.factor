@@ -94,7 +94,7 @@ ERROR: callsite-not-compiled word ;
 : alien-indirect ( args... funcptr return parameters abi -- return... )
     \ alien-indirect callsite-not-compiled ;
 
-: alien-invoke ( args... return library function parameters -- return... )
+: alien-invoke ( args... return library function parameters varargs? -- return... )
     \ alien-invoke callsite-not-compiled ;
 
 <PRIVATE

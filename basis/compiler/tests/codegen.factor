@@ -257,8 +257,8 @@ TUPLE: id obj ;
     { float } declare dup 0 =
     [ drop 1 ] [
         dup 0 >=
-        [ 2 double "libm" "pow" { double double } alien-invoke ]
-        [ -0.5 double "libm" "pow" { double double } alien-invoke ]
+        [ 2 double "libm" "pow" { double double } f alien-invoke ]
+        [ -0.5 double "libm" "pow" { double double } f alien-invoke ]
         if
     ] if ;
 
@@ -476,8 +476,8 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 : gc-root-messup ( a -- b )
     dup [
         1024 (byte-array) 2array
-        10 void* "libc" "malloc" { ulong } alien-invoke
-        void "libc" "free" { void* } alien-invoke
+        10 void* "libc" "malloc" { ulong } f alien-invoke
+        void "libc" "free" { void* } f alien-invoke
     ] when ;
 
 [ ] [ 2000 [ "hello" clone dup gc-root-messup first eq? t assert= ] times ] unit-test

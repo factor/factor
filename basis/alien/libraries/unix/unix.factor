@@ -3,7 +3,7 @@ io.pathnames system ;
 IN: alien.libraries.unix
 
 : (dlerror) ( -- string )
-    \ c-string f "dlerror" { } alien-invoke ; inline
+    \ c-string f "dlerror" { } f alien-invoke ; inline
 
 M: unix dlerror (dlerror) ;
 

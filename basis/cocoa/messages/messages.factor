@@ -12,7 +12,7 @@ IN: cocoa.messages
 SPECIALIZED-ARRAY: void*
 
 : make-sender ( signature function -- quot )
-    [ over first , f , , second , \ alien-invoke , ] [ ] make ;
+    [ over first , f , , second , f , \ alien-invoke , ] [ ] make ;
 
 : sender-stub-name ( signature -- str )
     first2 [ name>> ] [

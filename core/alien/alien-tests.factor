@@ -125,4 +125,4 @@ SYMBOL: foo
 ] unit-test
 
 [ void { } cdecl [ ] alien-assembly ] [ callsite-not-compiled? ] must-fail-with
-[ void f "flor" { } alien-invoke ] [ callsite-not-compiled? ] must-fail-with
+[ void f "flor" { } f alien-invoke ] [ callsite-not-compiled? ] must-fail-with

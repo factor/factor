@@ -202,7 +202,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "funtimes_"
-            { pointer: { c:char 12 } pointer: c:longlong pointer: c:float pointer: complex-float pointer: c:short c:long }
+            { pointer: { c:char 12 } pointer: c:longlong pointer: c:float pointer: complex-float pointer: c:short c:long } f
             alien-invoke
         ] 6 nkeep
         ! [fortran-results>]
@@ -227,7 +227,7 @@ intel-unix-abi fortran-abi [
             [ { [ drop ] } spread ]
         } 1 ncleave
         ! [fortran-invoke]
-        [ c:float "funpack" "fun_times_" { pointer: { c:float 0 } } alien-invoke ]
+        [ c:float "funpack" "fun_times_" { pointer: { c:float 0 } } f alien-invoke ]
         1 nkeep
         ! [fortran-results>]
         shuffle( reta aa -- reta aa )
@@ -245,7 +245,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { pointer: complex-float pointer: { c:float 0 } }
+            { pointer: complex-float pointer: { c:float 0 } } f
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
@@ -262,7 +262,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { pointer: { c:char 20 } long }
+            { pointer: { c:char 20 } long } f
             alien-invoke
         ] 2 nkeep
         ! [fortran-results>]
@@ -288,7 +288,7 @@ intel-unix-abi fortran-abi [
         ! [fortran-invoke]
         [
             c:void "funpack" "fun_times_"
-            { pointer: { c:char 10 } long pointer: { c:char 20 } pointer: c:float pointer: { c:char 30 } c:long c:long }
+            { pointer: { c:char 10 } long pointer: { c:char 20 } pointer: c:float pointer: { c:char 30 } c:long c:long } f
             alien-invoke
         ] 7 nkeep
         ! [fortran-results>]
