@@ -54,9 +54,8 @@ IN: compiler.cfg.builder.alien
 : prepare-caller-return ( params -- reg-outputs )
     return>> [ { } ] [ base-type load-return ] if-void ;
 
-: caller-stack-frame ( params -- cleanup stack-size )
-    [ stack-params get ] dip [ return>> ] [ abi>> ] bi stack-cleanup
-    stack-params get ;
+: caller-stack-cleanup ( params stack-size -- cleanup )
+    swap [ return>> ] [ abi>> ] bi stack-cleanup ;
 
 : check-dlsym ( symbol library -- )
     {
@@ -91,7 +90,7 @@ IN: compiler.cfg.builder.alien
         [ varargs?>> ]
         [ caller-parameters ]
         [ prepare-caller-return { } ]
-        [ caller-stack-frame ]
+        [ stack-params get [ caller-stack-cleanup ] keep ]
     } cleave ;
 
 M: #alien-invoke emit-node ( block node -- block' )

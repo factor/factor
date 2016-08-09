@@ -66,6 +66,12 @@ cpu x86.64? [
     ] cfg-unit-test
 ] when
 
+! caller-stack-cleanup
+{ 0 } [
+    alien-node-params new long >>return cdecl >>abi 25
+    caller-stack-cleanup
+] unit-test
+
 ! prepare-caller-return
 ${
     cpu x86.32? { { 1 int-rep EAX } } { { 1 int-rep RAX } } ?
