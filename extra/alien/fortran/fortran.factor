@@ -329,8 +329,8 @@ M: character-type (<fortran-result>)
     return parameters fortran-sig>c-sig :> ( c-return c-parameters )
     function fortran-name>symbol-name :> c-function
     [args>args]
-    c-return library c-function c-parameters \ alien-invoke
-    5 [ ] nsequence
+    c-return library c-function c-parameters f \ alien-invoke
+    6 [ ] nsequence
     c-parameters length \ nkeep
     [ ] 3sequence ;
 

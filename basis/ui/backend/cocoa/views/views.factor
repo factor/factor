@@ -170,10 +170,10 @@ CLASS: FactorView < NSOpenGLView
         -> respondsToSelector: c-bool> [
 
             self SEL: setWantsBestResolutionOpenGLSurface: 1
-            void f "objc_msgSend" { id SEL char } alien-invoke
+            void f "objc_msgSend" { id SEL char } f alien-invoke
 
             self SEL: backingScaleFactor
-            double f "objc_msgSend" { id SEL } alien-invoke
+            double f "objc_msgSend" { id SEL } f alien-invoke
 
             dup 1.0 > [
                 gl-scale-factor set-global t retina? set-global
@@ -416,7 +416,7 @@ CLASS: FactorWindowDelegate < NSObject
         -> respondsToSelector: c-bool> [
 
             SEL: backingScaleFactor
-            double f "objc_msgSend" { id SEL } alien-invoke
+            double f "objc_msgSend" { id SEL } f alien-invoke
 
             [ [ 1.0 > ] keep f ? gl-scale-factor set-global ]
             [ 1.0 > retina? set-global ] bi

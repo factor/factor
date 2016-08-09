@@ -136,13 +136,13 @@ unit-test
 [ stdcall ] [ "f-stdcall" lookup-library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
-    int "f-stdcall" "ffi_test_18" { int int int int }
+    int "f-stdcall" "ffi_test_18" { int int int int } f
     alien-invoke gc ;
 
 [ 25 ] [ 2 3 4 5 ffi_test_18 ] unit-test
 
 : ffi_test_19 ( x y z -- BAR )
-    BAR "f-stdcall" "ffi_test_19" { long long long }
+    BAR "f-stdcall" "ffi_test_19" { long long long } f
     alien-invoke gc ;
 
 [ 11 6 -7 ] [
@@ -150,9 +150,9 @@ unit-test
 ] unit-test
 
 : multi_ffi_test_18 ( w x y z w' x' y' z' -- int int )
-    [ int "f-stdcall" "ffi_test_18" { int int int int } alien-invoke ]
+    [ int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke ]
     4 ndip
-    int "f-stdcall" "ffi_test_18" { int int int int } alien-invoke
+    int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke
     gc ;
 
 [ 25 85 ] [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
@@ -181,7 +181,7 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
 : ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
     int
     "f-cdecl" "ffi_test_31"
-    { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int }
+    { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
     alien-invoke gc 3 ;
 
 [ 861 3 ] [ 42 [ ] each-integer ffi_test_31 ] unit-test
@@ -189,7 +189,7 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
 : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
     float
     "f-cdecl" "ffi_test_31_point_5"
-    { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float }
+    { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
     alien-invoke ;
 
 [ 861.0 ] [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
@@ -646,18 +646,18 @@ os windows? [
 [ fastcall ] [ "f-fastcall" lookup-library abi>> ] unit-test
 
 : ffi_test_49 ( x -- int )
-    int "f-fastcall" "ffi_test_49" { int }
+    int "f-fastcall" "ffi_test_49" { int } f
     alien-invoke gc ;
 : ffi_test_50 ( x y -- int )
-    int "f-fastcall" "ffi_test_50" { int int }
+    int "f-fastcall" "ffi_test_50" { int int } f
     alien-invoke gc ;
 : ffi_test_51 ( x y z -- int )
-    int "f-fastcall" "ffi_test_51" { int int int }
+    int "f-fastcall" "ffi_test_51" { int int int } f
     alien-invoke gc ;
 : multi_ffi_test_51 ( x y z x' y' z' -- int int )
-    [ int "f-fastcall" "ffi_test_51" { int int int } alien-invoke ]
+    [ int "f-fastcall" "ffi_test_51" { int int int } f alien-invoke ]
     3dip
-    int "f-fastcall" "ffi_test_51" { int int int } alien-invoke gc ;
+    int "f-fastcall" "ffi_test_51" { int int int } f alien-invoke gc ;
 
 [ 4 ] [ 3 ffi_test_49 ] unit-test
 [ 8 ] [ 3 4 ffi_test_50 ] unit-test
@@ -665,16 +665,16 @@ os windows? [
 [ 13 22 ] [ 3 4 5 6 7 8 multi_ffi_test_51 ] unit-test
 
 : ffi_test_52 ( x y z -- int )
-    int "f-fastcall" "ffi_test_52" { int float int }
+    int "f-fastcall" "ffi_test_52" { int float int } f
     alien-invoke gc ;
 : ffi_test_53 ( x y z w -- int )
-    int "f-fastcall" "ffi_test_53" { int float int int }
+    int "f-fastcall" "ffi_test_53" { int float int int } f
     alien-invoke gc ;
 : ffi_test_57 ( x y -- test-struct-11 )
-    test-struct-11 "f-fastcall" "ffi_test_57" { int int }
+    test-struct-11 "f-fastcall" "ffi_test_57" { int int } f
     alien-invoke gc ;
 : ffi_test_58 ( x y z -- test-struct-11 )
-    test-struct-11 "f-fastcall" "ffi_test_58" { int int int }
+    test-struct-11 "f-fastcall" "ffi_test_58" { int int int } f
     alien-invoke gc ;
 
 ! Make sure that large longlong/ulonglong are correctly dealt with
@@ -938,7 +938,7 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
 FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, int a, int b )
 FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, int a, int b, int c )
 
-{ 30 60  } [
+{ 30 60 } [
     2 10 20 do-sum-ints2
     3 10 20 30 do-sum-ints3
 ] unit-test

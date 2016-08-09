@@ -77,7 +77,7 @@ IN: compiler.cfg.builder.tests
     [ [ t ] loop ]
     [ [ dup ] loop ]
     [ [ 2 ] [ 3 throw ] if 4 ]
-    [ int f "malloc" { int } alien-invoke ]
+    [ int f "malloc" { int } f alien-invoke ]
     [ int { int } cdecl alien-indirect ]
     [ int { int } cdecl [ ] alien-callback ]
     [ swap - + * ]

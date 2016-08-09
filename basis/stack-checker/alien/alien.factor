@@ -41,27 +41,31 @@ TUPLE: alien-callback-params < alien-node-params
 : infer-return ( params -- )
     return-prep-quot infer-quot-here ;
 
-: pop-return ( params -- params )
-    pop-literal [ add-depends-on-c-type ] [ >>return ] bi ;
-
-: pop-library ( params -- params )
-    pop-literal >>library ;
+: pop-abi ( params -- params )
+    pop-literal >>abi ;
 
 : pop-function ( params -- params )
     pop-literal >>function ;
 
+: pop-library ( params -- params )
+    pop-literal >>library ;
+
 : pop-params ( params -- params )
     pop-literal [ [ add-depends-on-c-type ] each ] [ >>parameters ] bi ;
-
-: pop-abi ( params -- params )
-    pop-literal >>abi ;
 
 : pop-quot ( params -- params )
     pop-literal >>quot ;
 
+: pop-return ( params -- params )
+    pop-literal [ add-depends-on-c-type ] [ >>return ] bi ;
+
+: pop-varargs? ( params -- params )
+    pop-literal >>varargs? ;
+
 : infer-alien-invoke ( -- )
     alien-invoke-params new
     ! Compile-time parameters
+    pop-varargs?
     pop-params
     pop-function
     pop-library

@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.enums alien.libraries
-arrays classes classes.parser combinators
-combinators.short-circuit compiler.units effects fry kernel
-lexer locals math namespaces parser sequences splitting
-vocabs.parser words ;
+arrays classes classes.parser combinators combinators.short-circuit
+compiler.units effects fry kernel lexer locals math namespaces parser
+sequences splitting vocabs.parser words ;
 IN: alien.parser
 
 SYMBOL: current-library
@@ -122,9 +121,6 @@ PRIVATE>
         scan-token
     ] until drop types names [ >array ] bi@ ;
 
-: function-quot ( return library function types -- quot )
-    '[ _ _ _ _ alien-invoke ] ;
-
 : function-effect ( names return -- effect )
     [ { } ] [ return-type-name 1array ] if-void <effect> ;
 
@@ -132,7 +128,7 @@ PRIVATE>
     create-word-in dup reset-generic ;
 
 :: (make-function) ( return function library types names -- quot effect )
-    return library function types function-quot
+    return library function types '[ _ _ _ _ f alien-invoke ]
     names return function-effect ;
 
 :: make-function ( return function library types names -- word quot effect )
@@ -157,7 +153,7 @@ PRIVATE>
 
 PREDICATE: alien-function-alias-word < word
     def>> {
-        [ length 5 = ]
+        [ length 6 = ]
         [ last \ alien-invoke eq? ]
     } 1&& ;
 
