@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math.rectangles models opengl.gl
-ui.gadgets ui.gadgets.worlds ui.gestures ui.pens ;
+USING: help.markup help.syntax kernel math.rectangles models
+opengl.gl ui.gadgets ui.gadgets.worlds ui.gestures ui.pens ;
 IN: ui.render
 
 HELP: clip
@@ -16,7 +16,7 @@ HELP: gadget
         { { $snippet "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
         { { $snippet "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
         { { $snippet "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
-      { { $snippet "graft-state" } { "This two tuple represents the current graft state of the gadget and what its next state will become." } }
+        { { $snippet "graft-state" } { " - a pair of " { $link boolean } " values that represent the current graft state of the gadget and what its next state will become." } }
         { { $snippet "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
         { { $snippet "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
         { { $snippet "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
