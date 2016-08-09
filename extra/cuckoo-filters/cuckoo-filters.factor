@@ -16,7 +16,7 @@ CONSTANT: max-cuckoo-count 500
 ! The maximum load factor we allow before growing the capacity
 CONSTANT: max-load-factor 0.96
 
-! The number of tags to store in each bucket
+! The number of fingerprint to store in each bucket
 CONSTANT: bucket-size 4
 
 : #buckets ( capacity -- #buckets )
@@ -26,14 +26,14 @@ CONSTANT: bucket-size 4
 : <cuckoo-buckets> ( capacity -- buckets )
     #buckets [ bucket-size f <array> ] replicate ;
 
-: tag-index ( hash -- tag index )
+: hash-index ( hash -- fingerprint index )
     4 over <displaced-alien> [ uint deref ] bi@ ;
 
-: alt-index ( tag index -- altindex )
+: alt-index ( fingerprint index -- alt-index )
     [ 0x5bd1e995 w* ] [ bitxor ] bi* ;
 
-: tag-indices ( bytes cuckoo-filter -- tag i1 i2 )
-    checksum>> checksum-bytes tag-index 2dup alt-index ;
+: hash-indices ( bytes cuckoo-filter -- fingerprint index alt-index )
+    checksum>> checksum-bytes hash-index 2dup alt-index ;
 
 : bucket-lookup ( fingerprint bucket -- ? )
     member? ;
@@ -55,41 +55,41 @@ TUPLE: cuckoo-filter buckets checksum size ;
     <cuckoo-buckets> sha1 0 cuckoo-filter boa ;
 
 :: cuckoo-insert ( bytes cuckoo-filter -- ? )
-    bytes cuckoo-filter tag-indices :> ( tag! i1 i2 )
+    bytes cuckoo-filter hash-indices :> ( fp! i1 i2 )
     cuckoo-filter buckets>> :> buckets
     buckets length :> n
     {
-        [ tag i1 n mod buckets nth bucket-insert ]
-        [ tag i2 n mod buckets nth bucket-insert ]
+        [ fp i1 n mod buckets nth bucket-insert ]
+        [ fp i2 n mod buckets nth bucket-insert ]
     } 0|| [
         cuckoo-filter [ 1 + ] change-size drop t
     ] [
         2 random zero? i1 i2 ? :> i!
         max-cuckoo-count [
             drop
-            tag i n mod buckets nth bucket-swap tag!
-            tag i alt-index i!
+            fp i n mod buckets nth bucket-swap fp!
+            fp i alt-index i!
 
-            tag i n mod buckets nth bucket-insert
+            fp i n mod buckets nth bucket-insert
             dup [ cuckoo-filter [ 1 + ] change-size drop ] when
         ] find-integer >boolean
     ] if ;
 
 :: cuckoo-lookup ( bytes cuckoo-filter -- ? )
-    bytes cuckoo-filter tag-indices :> ( tag i1 i2 )
+    bytes cuckoo-filter hash-indices :> ( fp i1 i2 )
     cuckoo-filter buckets>> :> buckets
     buckets length :> n
     {
-        [ tag i1 n mod buckets nth bucket-lookup ]
-        [ tag i2 n mod buckets nth bucket-lookup ]
+        [ fp i1 n mod buckets nth bucket-lookup ]
+        [ fp i2 n mod buckets nth bucket-lookup ]
     } 0|| ;
 
 :: cuckoo-delete ( bytes cuckoo-filter -- ? )
-    bytes cuckoo-filter tag-indices :> ( tag i1 i2 )
+    bytes cuckoo-filter hash-indices :> ( fp i1 i2 )
     cuckoo-filter buckets>> :> buckets
     buckets length :> n
     {
-        [ tag i1 n mod buckets nth bucket-delete ]
-        [ tag i2 n mod buckets nth bucket-delete ]
+        [ fp i1 n mod buckets nth bucket-delete ]
+        [ fp i2 n mod buckets nth bucket-delete ]
     } 0||
     dup [ cuckoo-filter [ 1 - ] change-size drop ] when ;
