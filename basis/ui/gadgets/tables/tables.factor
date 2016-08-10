@@ -9,7 +9,7 @@ ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.images ui.pens.solid ui.render ui.text ui.theme ;
 IN: ui.gadgets.tables
 
-! Row rendererer protocol
+! Row renderer protocol
 GENERIC: prototype-row ( renderer -- columns )
 GENERIC: column-alignment ( renderer -- alignment )
 GENERIC: filled-column ( renderer -- n )
