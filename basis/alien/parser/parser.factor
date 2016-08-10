@@ -151,18 +151,6 @@ PRIVATE>
 : (CALLBACK:) ( -- word quot effect )
     (FUNCTION:) make-callback-type ;
 
-PREDICATE: alien-function-alias-word < word
-    def>> {
-        [ length 6 = ]
-        [ last \ alien-invoke eq? ]
-    } 1&& ;
-
-PREDICATE: alien-function-word < alien-function-alias-word
-    [ def>> third ] [ name>> ] bi = ;
-
-PREDICATE: alien-callback-type-word < typedef-word
-    "callback-effect" word-prop >boolean ;
-
 : global-quot ( type word -- quot )
     swap [ name>> current-library get ] dip
     '[ _ _ address-of 0 _ alien-value ] ;
