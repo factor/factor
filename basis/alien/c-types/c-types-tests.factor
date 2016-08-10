@@ -59,6 +59,23 @@ C-TYPE: opaque
 { t } [ void* lookup-c-type pointer: opaque lookup-c-type = ] unit-test
 [ opaque lookup-c-type ] [ no-c-type? ] must-fail-with
 
+! c-type-string
+{
+    "c-string[ascii]"
+    "foo*"
+    "int[5]"
+    "int**"
+    "MyFunkyString*"
+    "opaque*"
+} [
+    { c-string ascii } c-type-string
+    pointer: foo c-type-string
+    { int 5 } c-type-string
+    pointer: pointer: int c-type-string
+    pointer: MyFunkyString c-type-string
+    pointer: opaque c-type-string
+] unit-test
+
 [ "
     USING: alien.syntax ;
     IN: alien.c-types.tests

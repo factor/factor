@@ -71,10 +71,6 @@ ERROR: *-in-c-type-name name ;
     scan-token (CREATE-C-TYPE) ;
 
 <PRIVATE
-GENERIC: return-type-name ( type -- name )
-
-M: word return-type-name name>> ;
-M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
 
 : parse-pointers ( type name -- type' name' )
     "*" ?head
@@ -122,7 +118,7 @@ PRIVATE>
     ] until drop types names [ >array ] bi@ ;
 
 : function-effect ( names return -- effect )
-    [ { } ] [ return-type-name 1array ] if-void <effect> ;
+    [ { } ] [ c-type-string 1array ] if-void <effect> ;
 
 : create-function ( name -- word )
     create-word-in dup reset-generic ;
