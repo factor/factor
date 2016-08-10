@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.enums alien.strings
 alien.syntax arrays assocs combinators combinators.short-circuit
-definitions effects kernel math.parser prettyprint prettyprint.backend
+definitions effects kernel math.parser prettyprint.backend
 prettyprint.custom prettyprint.sections see see.private sequences
 words ;
 IN: alien.prettyprint
@@ -21,25 +21,20 @@ M: c-type-word definition drop f ;
 M: c-type-word declarations. drop ;
 
 <PRIVATE
-GENERIC: pointer-string ( pointer -- string/f )
-M: object pointer-string drop f ;
-M: word pointer-string [ record-vocab ] [ name>> ] bi ;
-M: pointer pointer-string to>> pointer-string [ CHAR: * suffix ] [ f ] if* ;
+GENERIC: record-pointer ( pointer -- )
+M: object record-pointer drop ;
+M: word record-pointer record-vocab ;
+M: pointer record-pointer to>> record-pointer ;
 
-GENERIC: c-type-string ( c-type -- string )
-
-M: word c-type-string [ record-vocab ] [ name>> ] bi ;
-M: pointer c-type-string dup pointer-string [ ] [ unparse ] ?if ;
-M: wrapper c-type-string wrapped>> c-type-string ;
-M: array c-type-string
-    unclip
-    [ [ unparse "[" "]" surround ] map ]
-    [ c-type-string ] bi*
-    prefix concat ;
+GENERIC: record-c-type ( c-type -- )
+M: word record-c-type record-vocab ;
+M: pointer record-c-type record-pointer ;
+M: wrapper record-c-type wrapped>> record-c-type ;
+M: array record-c-type first record-c-type ;
 PRIVATE>
 
 : pprint-c-type ( c-type -- )
-    [ c-type-string ] keep present-text ;
+    [ record-c-type ] [ c-type-string ] [ ] tri present-text ;
 
 M: pointer pprint*
     <flow \ pointer: pprint-word to>> pprint* block> ;
