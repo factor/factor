@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators alien alien.enums
-alien.strings alien.c-types alien.parser alien.syntax arrays
-assocs effects math.parser prettyprint prettyprint.backend
-prettyprint.custom prettyprint.sections definitions see
-see.private sequences strings words ;
+USING: accessors alien alien.c-types alien.enums alien.strings
+alien.syntax arrays assocs combinators combinators.short-circuit
+definitions effects kernel math.parser prettyprint prettyprint.backend
+prettyprint.custom prettyprint.sections see see.private sequences
+words ;
 IN: alien.prettyprint
 
 M: alien pprint*
@@ -77,6 +77,12 @@ M: typedef-word synopsis*
         ")" text block>
     ] tri ; inline
 
+PREDICATE: alien-function-alias-word < word
+    def>> {
+        [ length 6 = ]
+        [ last \ alien-invoke eq? ]
+    } 1&& ;
+
 M: alien-function-alias-word definer
     drop \ FUNCTION-ALIAS: f ;
 M: alien-function-alias-word definition drop f ;
@@ -90,6 +96,9 @@ M: alien-function-alias-word synopsis*
     } cleave ;
 M: alien-function-alias-word declarations. drop ;
 
+PREDICATE: alien-function-word < alien-function-alias-word
+    [ def>> third ] [ name>> ] bi = ;
+
 M: alien-function-word definer
     drop \ FUNCTION: f ;
 M: alien-function-word synopsis*
@@ -99,6 +108,9 @@ M: alien-function-word synopsis*
         [ definer. ]
         [ [ pprint-word ] pprint-function ]
     } cleave ;
+
+PREDICATE: alien-callback-type-word < typedef-word
+    "callback-effect" word-prop >boolean ;
 
 M: alien-callback-type-word definer
     drop \ CALLBACK: f ;
