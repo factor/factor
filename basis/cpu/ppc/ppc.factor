@@ -44,8 +44,6 @@ CONSTANT: ds-reg         14
 CONSTANT: rs-reg         15
 CONSTANT: vm-reg         16
 
-enable-float-intrinsics
-
 M: ppc machine-registers ( -- assoc )
     {
         { int-regs $[ 3 12 [a,b] 17 29 [a,b] append ] }
@@ -1058,6 +1056,9 @@ M: ppc %reload ( dst rep src -- )
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 M: ppc immediate-bitwise?    ( n -- ? ) 0 65535 between? ;
 M: ppc immediate-store?      ( n -- ? ) immediate-comparand? ;
+
+M: ppc enable-cpu-features ( -- )
+    enable-float-intrinsics ;
 
 USE: vocabs
 {

@@ -207,10 +207,6 @@ HELP: %local-allot
 { $description "Emits machine code for stack \"allocating\" a chunk of memory. No memory is really allocated and instead a pointer to it is just put in the destination register." }
 { $see-also ##local-allot } ;
 
-HELP: reg-class-of
-{ $values { "rep" representation } { "reg-class" reg-class } }
-{ $description "Register class for values of the given representation." } ;
-
 HELP: %replace-imm
 { $values
   { "src" integer }
@@ -325,6 +321,9 @@ HELP: fused-unboxing?
 { $values { "?" boolean } }
 { $description "Whether this architecture support " { $link %load-float } ", " { $link %load-double } ", and " { $link %load-vector } "." } ;
 
+HELP: enable-cpu-features
+{ $description "This word is run when compiling the compiler during bootstrap and enables optional features that the processor is found to support." } ;
+
 HELP: gc-root-offset
 { $values { "spill-slot" spill-slot } { "n" integer } }
 { $description "Offset in the " { $link stack-frame } " for the word being constructed where the spill slot is located. The value is given in " { $link cell } " units." }
@@ -360,6 +359,10 @@ HELP: param-regs
 HELP: rep-size
 { $values { "rep" representation } { "n" integer } }
 { $description "Size in bytes of a representation." } ;
+
+HELP: reg-class-of
+{ $values { "rep" representation } { "reg-class" reg-class } }
+{ $description "Register class for values of the given representation." } ;
 
 HELP: return-regs
 { $values { "regs" assoc } }

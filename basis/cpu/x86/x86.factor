@@ -774,28 +774,40 @@ M: x86 immediate-bitwise? ( n -- ? )
         { cc/<>= [ src1 src2 compare call( a b -- ) label JP ] }
     } case ;
 
-enable-min/max
-enable-log2
-
 M:: x86 %bit-test ( dst src1 src2 temp -- )
     src1 src2 BT
     dst temp \ CMOVB (%boolean) ;
 
-enable-bit-test
+M: x86 enable-cpu-features ( -- )
+    enable-min/max
+    enable-log2
+    enable-bit-test
 
-: check-sse ( -- )
+    ! The result of reading 4 bytes from memory is a fixnum on
+    ! x86-64.
+    cpu x86.64? [ enable-alien-4-intrinsics ] when
+
+    ! These words uses alien-assembly
+    optimizing-compiler compiler-impl [
+        { (sse-version) popcnt? } compile
+    ] with-variable
+
+    ! SSE floats
     "Checking for multimedia extensions... " write flush
     sse-version
     [ sse-string " detected" append print ]
-    [ 20 < "cpu.x86.x87" "cpu.x86.sse" ? require ] bi ;
+    [
+        20 < [ "cpu.x86.x87" require ] [
+            "cpu.x86.sse" require
+            enable-float-min/max
+        ] if
+    ] bi
 
-: check-popcnt ( -- )
+    ! POPCNT
     enable-popcnt? [
         "Building with POPCNT support" print
         enable-bit-count
-    ] when ;
+    ] when
 
-: check-cpu-features ( -- )
-    [ { (sse-version) popcnt? } compile ] with-optimizer
-    check-sse
-    check-popcnt ;
+    enable-float-intrinsics
+    enable-fsqrt ;

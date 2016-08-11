@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.private classes
-classes.tuple.private compiler.units hashtables
+classes.tuple.private compiler.units cpu.architecture hashtables
 hashtables.private io kernel libc math math.parser memory
 namespaces namespaces.private quotations quotations.private
 sbufs sequences sequences.private splitting system vectors
@@ -19,6 +19,8 @@ IN: bootstrap.compiler
 { "boostrap.compiler" "debugger" } "alien.debugger" require-when
 
 "cpu." cpu name>> append require
+
+enable-cpu-features
 
 enable-optimizer
 

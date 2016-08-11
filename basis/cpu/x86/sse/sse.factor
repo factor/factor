@@ -923,7 +923,3 @@ M: x86.64 %scalar>integer ( dst src rep -- )
 M: x86 %vector>scalar %copy ;
 
 M: x86 %scalar>vector %copy ;
-
-enable-float-intrinsics
-enable-float-min/max
-enable-fsqrt
