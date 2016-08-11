@@ -328,8 +328,6 @@ HELP: assoc-partition
 }
 { $description "Calls a predicate quotation on each key of the input assoc. If the test yields true, the key/value pair is added to " { $snippet "true-assoc" } "; if false, it's added to " { $snippet "false-assoc" } "." } ;
 
-{ assoc-partition partition } related-words
-
 HELP: assoc-any?
 { $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "?" boolean } }
 { $description "Tests if the assoc contains an entry satisfying a predicate by applying the quotation to each entry in turn. Iteration stops if an entry is found for which the quotation outputs a true value." } ;
