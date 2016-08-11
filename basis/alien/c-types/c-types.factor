@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors arrays classes combinators
 compiler.units cpu.architecture delegate fry kernel layouts macros
-math math.order prettyprint quotations sequences summary system words
+math math.order math.parser quotations sequences summary system words
 words.symbol ;
 IN: alien.c-types
 
@@ -507,11 +507,12 @@ M: pointer pointer-string to>> pointer-string [ CHAR: * suffix ] [ f ] if* ;
 
 GENERIC: c-type-string ( c-type -- string )
 
+M: integer c-type-string number>string ;
 M: word c-type-string name>> ;
 M: pointer c-type-string pointer-string ;
 M: wrapper c-type-string wrapped>> c-type-string ;
 M: array c-type-string
     unclip
-    [ [ unparse "[" "]" surround ] map ]
+    [ [ c-type-string "[" "]" surround ] map ]
     [ c-type-string ] bi*
     prefix concat ;
