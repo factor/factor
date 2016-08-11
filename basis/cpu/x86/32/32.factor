@@ -238,5 +238,3 @@ M: x86.32 (cpuid) ( eax ecx regs -- )
         EDI 12 [+] EDX MOV
         EDI POP
     ] alien-assembly ;
-
-check-cpu-features
