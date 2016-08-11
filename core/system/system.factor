@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2010 slava pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs continuations init io kernel kernel.private make
+USING: accessors assocs continuations init io kernel kernel.private make
 math math.parser namespaces sequences ;
 IN: system
 
@@ -53,14 +53,8 @@ CONSTANT: string>os-hash H{
 : string>cpu ( str -- class )
     string>cpu-hash at ;
 
-: cpu>string ( class -- str )
-    string>cpu-hash value-at ;
-
 : string>os ( str -- class )
     string>os-hash at ;
-
-: os>string ( class -- str )
-    string>os-hash value-at ;
 
 PRIVATE>
 
@@ -74,12 +68,12 @@ PRIVATE>
     ! formatting vocab not available in this context.
     [
         "Factor " % vm-version %
-        " " % cpu cpu>string %
+        " " % cpu name>> %
         " (" % build # ", " %
         vm-git-ref % "-" %
         vm-git-id 10 short head % ", " %
         vm-compile-time % ")\n[" %
-        vm-compiler % "] on " % os os>string %
+        vm-compiler % "] on " % os name>> %
     ] "" make ;
 
 : exit ( n -- * )
