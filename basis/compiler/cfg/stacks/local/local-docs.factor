@@ -20,7 +20,7 @@ HELP: height-state>insns
 { $examples
   "In this example the datastacks height is increased by 4 and the retainstacks decreased by 2."
   { $example
-    "USING: compiler.cfg.stacks.local prettyprint ;"
+    "USING: compiler.cfg.debugger compiler.cfg.stacks.local prettyprint ;"
     "{ { 0 4 } { 0 -2 } } height-state>insns ."
     "{ T{ ##inc { loc D: 4 } } T{ ##inc { loc R: -2 } } }"
   }
