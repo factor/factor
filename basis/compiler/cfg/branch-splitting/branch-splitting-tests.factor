@@ -1,7 +1,6 @@
-USING: accessors assocs compiler.cfg.utilities compiler.cfg
-compiler.cfg.branch-splitting compiler.cfg.debugger
-compiler.cfg.predecessors compiler.cfg.rpo compiler.cfg.instructions fry kernel
-tools.test namespaces sequences vectors ;
+USING: accessors assocs compiler.cfg.branch-splitting
+compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.rpo
+compiler.cfg.utilities compiler.test fry kernel namespaces tools.test ;
 IN: compiler.cfg.branch-splitting.tests
 
 : get-predecessors ( cfg -- assoc )

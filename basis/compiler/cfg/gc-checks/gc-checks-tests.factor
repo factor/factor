@@ -1,9 +1,9 @@
 USING: accessors alien arrays byte-arrays combinators.short-circuit
-compiler.cfg compiler.cfg.comparisons compiler.cfg.debugger
-compiler.cfg.gc-checks compiler.cfg.gc-checks.private
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.utilities compiler.test cpu.architecture kernel layouts
-math memory namespaces sequences tools.test ;
+compiler.cfg compiler.cfg.comparisons compiler.cfg.gc-checks
+compiler.cfg.gc-checks.private compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.utilities
+compiler.test cpu.architecture kernel layouts math memory namespaces
+sequences tools.test ;
 IN: compiler.cfg.gc-checks.tests
 
 ! insert-gc-check?

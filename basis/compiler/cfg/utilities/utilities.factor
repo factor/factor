@@ -83,9 +83,6 @@ IN: compiler.cfg.utilities
 : connect-Nto1-bbs ( froms to -- )
     '[ _ connect-bbs ] each ;
 
-: make-edges ( block-map edgelist -- )
-    [ [ of ] with map first2 connect-bbs ] with each ;
-
 ! Abstract generic stuff
 MACRO: apply-passes ( passes -- quot: ( obj -- ) )
     unclip-last [ [ 1array \ dup prefix ] map [ ] concat-as ] dip suffix ;

@@ -1,9 +1,9 @@
 USING: accessors alien assocs compiler.cfg compiler.cfg.comparisons
-compiler.cfg.debugger compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.liveness compiler.cfg.registers
-compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
-cpu.architecture cpu.x86.assembler.operands kernel math namespaces
-sequences system tools.test ;
+compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.liveness
+compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
+compiler.cfg.utilities compiler.test cpu.architecture
+cpu.x86.assembler.operands kernel math namespaces sequences system
+tools.test ;
 IN: compiler.cfg.liveness.tests
 QUALIFIED: sets
 

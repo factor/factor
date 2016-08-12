@@ -1,10 +1,6 @@
-USING: arrays sequences kernel namespaces accessors compiler.cfg
-compiler.cfg.instructions
-compiler.cfg.registers
-compiler.cfg.debugger
-compiler.cfg.representations.coalescing
-compiler.cfg.utilities
-tools.test ;
+USING: compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.representations.coalescing compiler.cfg.utilities
+compiler.test kernel namespaces tools.test ;
 IN: compiler.cfg.representations.coalescing.tests
 
 : test-scc ( -- )

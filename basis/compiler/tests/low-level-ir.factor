@@ -1,10 +1,9 @@
-USING: accessors assocs combinators compiler compiler.cfg
-compiler.cfg.debugger compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.linear-scan
-compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
-compiler.cfg.utilities compiler.codegen compiler.units cpu.architecture
-hashtables kernel namespaces sequences tools.test vectors words layouts
-literals math arrays alien.c-types alien.syntax math.private ;
+USING: alien.c-types arrays assocs combinators compiler.cfg
+compiler.cfg.build-stack-frame compiler.cfg.instructions
+compiler.cfg.linear-scan compiler.cfg.registers
+compiler.cfg.ssa.destruction compiler.cfg.utilities compiler.codegen
+compiler.test compiler.units cpu.architecture hashtables kernel
+layouts literals math namespaces sequences tools.test words ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
