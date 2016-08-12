@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel tools.test accessors vectors sequences namespaces
-arrays compiler.cfg.def-use compiler.cfg compiler.cfg.debugger
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.utilities
-cpu.architecture ;
+USING: compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.utilities compiler.test namespaces
+tools.test ;
 IN: compiler.cfg.def-use.tests
 
 ! compute-insns

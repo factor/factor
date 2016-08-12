@@ -1,12 +1,11 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.debugger
-compiler.cfg.graphviz compiler.cfg.gvn
-compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
-compiler.cfg.optimizer compiler.cfg.utilities continuations formatting graphviz
-graphviz.notation graphviz.render io.directories kernel
-math.parser namespaces prettyprint sequences sorting splitting
-tools.annotations ;
+USING: accessors assocs compiler.cfg compiler.cfg.graphviz
+compiler.cfg.gvn compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
+compiler.cfg.optimizer compiler.cfg.utilities compiler.test
+continuations formatting graphviz.notation graphviz.render
+io.directories kernel math.parser namespaces prettyprint sequences
+sorting splitting tools.annotations ;
 IN: compiler.cfg.gvn.testing
 
 GENERIC: expr>str ( expr -- str )

@@ -1,9 +1,8 @@
-USING: compiler.cfg.debugger compiler.cfg.instructions
-compiler.cfg.registers compiler.codegen.gc-maps
-compiler.codegen.relocation cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.features kernel kernel.private
-layouts literals make math math.libm namespaces sequences system
-tools.test ;
+USING: compiler.cfg.instructions compiler.cfg.registers
+compiler.codegen.gc-maps compiler.codegen.relocation compiler.test
+cpu.architecture cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
+cpu.x86.features kernel kernel.private layouts literals make math
+math.libm namespaces sequences system tools.test ;
 IN: cpu.x86.tests
 
 { } [

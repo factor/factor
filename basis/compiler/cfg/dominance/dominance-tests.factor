@@ -1,7 +1,6 @@
-USING:  accessors arrays assocs compiler.cfg compiler.cfg.dominance
-compiler.cfg.dominance.private compiler.cfg.debugger compiler.cfg.predecessors
-compiler.cfg.utilities grouping kernel math.ranges namespaces sequences sets
-tools.test vectors ;
+USING: accessors arrays assocs compiler.cfg.dominance
+compiler.cfg.dominance.private compiler.cfg.utilities compiler.test
+grouping kernel math.ranges namespaces sequences sets tools.test ;
 IN: compiler.cfg.dominance.tests
 
 : test-dominance ( -- )

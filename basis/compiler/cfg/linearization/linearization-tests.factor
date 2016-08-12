@@ -1,6 +1,6 @@
-USING: accessors assocs compiler.cfg.debugger compiler.cfg
-compiler.cfg.linearization compiler.cfg.linearization.private
-compiler.cfg.utilities dlists kernel make namespaces sequences tools.test ;
+USING: accessors assocs compiler.cfg.linearization
+compiler.cfg.linearization.private compiler.cfg.utilities
+compiler.test kernel make namespaces sequences tools.test ;
 IN: compiler.cfg.linearization.tests
 
 ! linearization-order

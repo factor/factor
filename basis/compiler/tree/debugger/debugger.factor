@@ -184,22 +184,6 @@ SYMBOL: node-count
     make-report report. ;
 
 ! More utilities
-
-: final-info ( quot -- seq )
-    build-tree
-    analyze-recursive
-    normalize
-    propagate
-    compute-def-use
-    dup check-nodes
-    last node-input-infos ;
-
-: final-classes ( quot -- seq )
-    final-info [ class>> ] map ;
-
-: final-literals ( quot -- seq )
-    final-info [ literal>> ] map ;
-
 : cleaned-up-tree ( quot -- nodes )
     [
         build-tree

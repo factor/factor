@@ -1,11 +1,9 @@
-USING: accessors compiler.cfg compiler.cfg.debugger
+USING: accessors compiler.cfg compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.representations.preferred cpu.architecture kernel
-namespaces tools.test sequences arrays system literals layouts
-math compiler.constants compiler.cfg.representations.conversion
-compiler.cfg.representations.rewrite
-compiler.cfg.comparisons compiler.cfg.utilities
-make ;
+compiler.cfg.representations.conversion
+compiler.cfg.representations.preferred compiler.cfg.utilities
+compiler.constants compiler.test cpu.architecture kernel layouts
+literals make math namespaces sequences system tools.test ;
 FROM: alien.c-types => char ;
 IN: compiler.cfg.representations
 

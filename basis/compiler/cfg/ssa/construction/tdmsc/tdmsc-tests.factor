@@ -1,6 +1,6 @@
-USING: accessors arrays compiler.cfg compiler.cfg.debugger
+USING: accessors arrays compiler.cfg
 compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities
-kernel namespaces sequences tools.test ;
+compiler.test kernel namespaces sequences tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.ssa.construction.tdmsc.tests
 

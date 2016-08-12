@@ -1,10 +1,9 @@
-USING: accessors alien assocs combinators.short-circuit
-compiler.cfg compiler.cfg.comparisons compiler.cfg.dce
-compiler.cfg.debugger compiler.cfg.instructions
+USING: accessors alien assocs combinators.short-circuit compiler.cfg
+compiler.cfg.comparisons compiler.cfg.dce compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.representations
 compiler.cfg.ssa.destruction compiler.cfg.utilities
-compiler.cfg.value-numbering cpu.architecture kernel layouts
-literals math namespaces sequences system tools.test ;
+compiler.cfg.value-numbering compiler.test cpu.architecture kernel
+layouts literals math namespaces sequences system tools.test ;
 ! need cfg simd loaded for some tests
 USE: compiler.cfg.value-numbering.simd
 QUALIFIED-WITH: alien.c-types c

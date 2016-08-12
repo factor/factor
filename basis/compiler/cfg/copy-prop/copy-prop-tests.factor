@@ -1,6 +1,6 @@
-USING: accessors compiler.cfg  compiler.cfg.copy-prop compiler.cfg.debugger
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.utilities
-cpu.architecture kernel namespaces tools.test ;
+USING: accessors compiler.cfg.copy-prop compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.utilities compiler.test
+cpu.architecture namespaces tools.test ;
 IN: compiler.cfg.copy-prop.tests
 
 : test-copy-propagation ( -- )

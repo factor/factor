@@ -1,17 +1,14 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple compiler.cfg
-compiler.cfg.builder compiler.cfg.def-use
-compiler.cfg.finalization compiler.cfg.gc-checks
+compiler.cfg.builder compiler.cfg.finalization compiler.cfg.gc-checks
 compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.optimizer compiler.cfg.registers
-compiler.cfg.representations
-compiler.cfg.representations.preferred compiler.cfg.rpo
-compiler.cfg.save-contexts
-compiler.cfg.utilities compiler.tree.builder
-compiler.tree.optimizer compiler.units fry hashtables io kernel math
-namespaces prettyprint prettyprint.backend prettyprint.custom
-prettyprint.sections quotations random sequences vectors words strings ;
+compiler.cfg.representations compiler.cfg.save-contexts
+compiler.cfg.utilities compiler.tree.builder compiler.tree.optimizer
+fry io kernel namespaces prettyprint prettyprint.backend
+prettyprint.custom prettyprint.sections quotations sequences strings
+words ;
 FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 
@@ -91,38 +88,3 @@ M: insn insn. tuple>array but-last [
 M: ds-loc pprint* \ D: pprint-loc ;
 
 M: rs-loc pprint* \ R: pprint-loc ;
-
-: resolve-phis ( bb -- )
-    [
-        [ [ [ get ] dip ] assoc-map ] change-inputs drop
-    ] each-phi ;
-
-: test-bb ( insns n -- )
-    [ insns>block dup ] keep set resolve-phis ;
-
-: edge ( from to -- )
-    [ get ] bi@ 1vector >>successors drop ;
-
-: edges ( from tos -- )
-    [ get ] [ [ get ] V{ } map-as ] bi* >>successors drop ;
-
-: test-diamond ( -- )
-    0 1 edge
-    1 { 2 3 } edges
-    2 4 edge
-    3 4 edge ;
-
-: fake-representations ( cfg -- )
-    post-order [
-        instructions>> [
-            [ [ temp-vregs ] [ temp-vreg-reps ] bi zip ]
-            [ [ defs-vregs ] [ defs-vreg-reps ] bi zip ]
-            bi append
-        ] map concat
-    ] map concat >hashtable representations set ;
-
-: count-insns ( quot insn-check -- ? )
-    [ test-regs [ cfg>insns ] map concat ] dip count ; inline
-
-: contains-insn? ( quot insn-check -- ? )
-    count-insns 0 > ; inline
