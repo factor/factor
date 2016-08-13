@@ -81,10 +81,3 @@ M: insn insn. tuple>array but-last [
 : ssa. ( quot/word -- ) test-ssa cfgs. ;
 : flat. ( quot/word -- ) test-flat cfgs. ;
 : regs. ( quot/word -- ) test-regs cfgs. ;
-
-! Prettyprinting
-: pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
-
-M: ds-loc pprint* \ D: pprint-loc ;
-
-M: rs-loc pprint* \ R: pprint-loc ;
