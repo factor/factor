@@ -170,13 +170,11 @@ M: optimizing-compiler to-recompile ( -- words )
 M: optimizing-compiler process-forgotten-words
     [ delete-compiled-xref ] each ;
 
-: with-optimizer ( quot -- )
-    [ optimizing-compiler compiler-impl ] dip with-variable ; inline
-
 : enable-optimizer ( -- )
     optimizing-compiler compiler-impl set-global ;
 
 : disable-optimizer ( -- )
     f compiler-impl set-global ;
 
+{ "prettyprint" "compiler" } "compiler.prettyprint" require-when
 { "threads" "compiler" } "compiler.threads" require-when

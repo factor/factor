@@ -20,7 +20,7 @@ HELP: height-state>insns
 { $examples
   "In this example the datastacks height is increased by 4 and the retainstacks decreased by 2."
   { $example
-    "USING: compiler.cfg.debugger compiler.cfg.stacks.local prettyprint ;"
+    "USING: compiler.cfg.stacks.local prettyprint ;"
     "{ { 0 4 } { 0 -2 } } height-state>insns ."
     "{ T{ ##inc { loc D: 4 } } T{ ##inc { loc R: -2 } } }"
   }
@@ -71,7 +71,7 @@ HELP: translate-local-loc
 { $description "Translates an absolute stack location to one that is relative to the given height state." }
 { $examples
   { $example
-    "USING: compiler.cfg.stacks.local compiler.cfg.registers compiler.cfg.debugger namespaces prettyprint ;"
+    "USING: compiler.cfg.stacks.local compiler.cfg.registers namespaces prettyprint ;"
     "D: 7 { { 3 0 } { 0 0 } } translate-local-loc ."
     "D: 4"
   }
