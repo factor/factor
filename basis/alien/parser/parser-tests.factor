@@ -1,8 +1,8 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types alien.parser alien.parser.private
 alien.syntax compiler.units continuations debugger eval fry kernel
-lexer namespaces parser sequences sets tools.test vocabs.parser words
-;
+lexer namespaces parser sequences sets summary tools.test
+vocabs.parser words ;
 IN: alien.parser.tests
 
 <<
@@ -44,6 +44,11 @@ IN: alien.parser.tests
 ! parse-enum-name
 { t } [
     { "ayae" } [ parse-enum-name new-definitions get first in? ] with-parsing
+] unit-test
+
+! validate-c-type-name
+{ "Cannot define a C type “hello*” that ends with an asterisk (*)" } [
+    [ "hello*" validate-c-type-name ] [ ] recover summary
 ] unit-test
 
 >>
