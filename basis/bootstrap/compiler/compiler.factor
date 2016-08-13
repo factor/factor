@@ -16,7 +16,6 @@ IN: bootstrap.compiler
 ] unless
 
 { "boostrap.compiler" "prettyprint" } "alien.prettyprint" require-when
-{ "boostrap.compiler" "debugger" } "alien.debugger" require-when
 
 "cpu." cpu name>> append require
 

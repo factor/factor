@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.enums alien.libraries
 arrays classes classes.parser combinators combinators.short-circuit
 compiler.units effects fry kernel lexer locals math namespaces parser
-sequences splitting vocabs.parser words ;
+sequences splitting summary vocabs.parser words ;
 IN: alien.parser
 
 SYMBOL: current-library
@@ -53,6 +53,11 @@ ERROR: bad-array-type ;
     } remove-word-props ;
 
 ERROR: *-in-c-type-name name ;
+
+M: *-in-c-type-name summary
+    name>>
+    "Cannot define a C type “"
+    "” that ends with an asterisk (*)" surround ;
 
 : validate-c-type-name ( name -- name )
     dup "*" tail?
