@@ -25,22 +25,20 @@ void profiling_sample_count::clear() volatile {
   atomic::fence();
 }
 
-profiling_sample::profiling_sample(factor_vm* vm, bool prolog_p,
-                                   profiling_sample_count const& counts,
-                                   cell thread)
-    : counts(counts), thread(thread) {
-  vm->record_callstack_sample(&callstack_begin, &callstack_end, prolog_p);
-}
+profiling_sample::profiling_sample(profiling_sample_count const& counts, cell thread,
+                                   cell callstack_begin, cell callstack_end)
+    : counts(counts), thread(thread),
+      callstack_begin(callstack_begin),
+      callstack_end(callstack_end) { }
 
 void factor_vm::record_sample(bool prolog_p) {
   profiling_sample_count counts = safepoint.sample_counts.record_counts();
-  if (!counts.empty())
-    samples.push_back(profiling_sample(this, prolog_p, counts,
-                                       special_objects[OBJ_CURRENT_THREAD]));
-}
-
-void factor_vm::record_callstack_sample(cell* begin, cell* end, bool prolog_p) {
-  *begin = sample_callstacks.size();
+  if (counts.empty()) {
+    return;
+  }
+  /* Appends the callstack, which is just a sequence of quotation or
+     word references, to sample_callstacks. */
+  cell begin = sample_callstacks.size();
 
   bool skip_p = prolog_p;
   auto recorder = [&](cell frame_top, cell size, code_block* owner, cell addr) {
@@ -50,10 +48,12 @@ void factor_vm::record_callstack_sample(cell* begin, cell* end, bool prolog_p) {
       sample_callstacks.push_back(owner->owner);
   };
   iterate_callstack(ctx, recorder);
+  cell end = sample_callstacks.size();
+  std::reverse(sample_callstacks.begin() + begin, sample_callstacks.end());
 
-  *end = sample_callstacks.size();
-
-  std::reverse(sample_callstacks.begin() + *begin, sample_callstacks.end());
+  /* Add the sample. */
+  cell thread = special_objects[OBJ_CURRENT_THREAD];
+  samples.push_back(profiling_sample(counts, thread, begin, end));
 }
 
 void factor_vm::set_sampling_profiler(fixnum rate) {

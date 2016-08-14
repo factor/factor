@@ -47,8 +47,8 @@ struct profiling_sample {
      code_block entries in the vm sample_callstacks array. */
   cell callstack_begin, callstack_end;
 
-  profiling_sample(factor_vm* vm, bool prolog_p,
-                   profiling_sample_count const& counts, cell thread);
+  profiling_sample(profiling_sample_count const& counts, cell thread,
+                   cell callstack_begin, cell callstack_end);
 };
 
 }
