@@ -32,7 +32,7 @@ profiling_sample::profiling_sample(profiling_sample_count const& counts, cell th
       callstack_end(callstack_end) { }
 
 void factor_vm::record_sample(bool prolog_p) {
-  profiling_sample_count counts = safepoint.sample_counts.record_counts();
+  profiling_sample_count counts = sample_counts.record_counts();
   if (counts.empty()) {
     return;
   }
@@ -66,7 +66,7 @@ void factor_vm::set_sampling_profiler(fixnum rate) {
 
 void factor_vm::start_sampling_profiler(fixnum rate) {
   samples_per_second = rate;
-  safepoint.sample_counts.clear();
+  sample_counts.clear();
   /* Release the memory consumed by collecting samples. */
   samples.clear();
   samples.shrink_to_fit();

@@ -124,7 +124,7 @@ void factor_vm::primitive_unimplemented() { not_implemented_error(); }
 void memory_signal_handler_impl() {
   factor_vm* vm = current_vm();
   if (vm->code->safepoint_p(vm->signal_fault_addr)) {
-    vm->safepoint.handle_safepoint(vm, vm->signal_fault_pc);
+    vm->handle_safepoint(vm->signal_fault_pc);
   }
   else {
     vm_error_type type = vm->ctx->address_to_error(vm->signal_fault_addr);

@@ -12,13 +12,6 @@ struct profiling_sample_count {
   /* Number of samples taken during code execution in non-Factor threads */
   fixnum foreign_thread_sample_count;
 
-  profiling_sample_count()
-      : sample_count(0),
-        gc_sample_count(0),
-        jit_sample_count(0),
-        foreign_sample_count(0),
-        foreign_thread_sample_count(0) {}
-
   profiling_sample_count(fixnum sample_count, fixnum gc_sample_count,
                          fixnum jit_sample_count, fixnum foreign_sample_count,
                          fixnum foreign_thread_sample_count)
