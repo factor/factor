@@ -170,7 +170,7 @@ void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 
   factor_vm* vm = current_vm_p();
   if (vm) {
-    vm->safepoint.enqueue_fep(vm);
+    vm->enqueue_fep();
     enqueue_signal(vm, signal);
   } else
     fatal_error("Foreign thread received signal", signal);
@@ -184,8 +184,7 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     vm = thread_vms.begin()->second;
   }
   if (atomic::load(&vm->sampling_profiler_p))
-    vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap),
-                                  foreign_thread);
+    vm->enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), foreign_thread);
   else if (!foreign_thread)
     enqueue_signal(vm, signal);
 }

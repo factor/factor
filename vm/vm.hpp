@@ -87,6 +87,7 @@ struct factor_vm {
   /* State kept by the sampling profiler */
   std::vector<profiling_sample> samples;
   std::vector<cell> sample_callstacks;
+  volatile profiling_sample_count sample_counts;
 
   /* GC is off during heap walking */
   bool gc_off;
@@ -145,8 +146,8 @@ struct factor_vm {
   /* Are we already handling a fault? Used to catch double memory faults */
   static bool fatal_erroring_p;
 
-  /* Safepoint state */
-  volatile safepoint_state safepoint;
+  /* Two fep_p variants, one might be redundant. */
+  volatile cell safepoint_fep_p;
 
   /* contexts */
   context* new_context();
@@ -678,6 +679,11 @@ struct factor_vm {
   void unwind_native_frames(cell quot, cell to);
   cell get_fpu_state();
   void set_fpu_state(cell state);
+
+  /* safepoints */
+  void handle_safepoint(cell pc);
+  void enqueue_samples(cell samples, cell pc, bool foreign_thread_p);
+  void enqueue_fep();
 
   /* factor */
   void prepare_boot_image();

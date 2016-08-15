@@ -275,7 +275,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
          actually support native threads. */
       FACTOR_ASSERT(thread_vms.size() == 1);
       factor_vm* vm = thread_vms.begin()->second;
-      vm->safepoint.enqueue_fep(vm);
+      vm->enqueue_fep();
 
       /* Before leaving the ctrl_handler, try and wake up the main
          thread. */
@@ -344,7 +344,7 @@ void factor_vm::sampler_thread_loop() {
       continue;
 
     cell pc = get_thread_pc(thread);
-    safepoint.enqueue_samples(this, samples, pc, false);
+    enqueue_samples(samples, pc, false);
   }
 }
 
