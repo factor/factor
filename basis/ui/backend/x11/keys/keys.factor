@@ -40,7 +40,7 @@ CONSTANT: codes
         { $ XK_F9 "F9" }
         { $ XK_F10 "F10" }
         { $ XK_F11 "F11" }
-        { $ XK_F11 "F12" }
+        { $ XK_F12 "F12" }
 
         { $ XK_Shift_L f }
         { $ XK_Shift_R f }
