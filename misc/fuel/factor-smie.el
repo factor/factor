@@ -55,14 +55,14 @@
 
 (defun factor-smie-token (dir)
   (pcase dir
-    ('forward (forward-comment (point-max)))
-    ('backward (forward-comment (- (point)))))
+    (`forward (forward-comment (point-max)))
+    (`backward (forward-comment (- (point)))))
   (let ((tok (buffer-substring-no-properties
               (point)
               (let ((syntax "w_\\\""))
                 (pcase dir
-                  ('forward (skip-syntax-forward syntax))
-                  ('backward (skip-syntax-backward syntax)))
+                  (`forward (skip-syntax-forward syntax))
+                  (`backward (skip-syntax-backward syntax)))
                 (point)))))
     ;; Token normalization. This way we only need one rule in
     ;; factor-smie-grammar.
