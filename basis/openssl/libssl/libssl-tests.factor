@@ -28,8 +28,13 @@ IN: openssl.libssl.tests
 : new-ssl ( -- ssl )
     new-ctx SSL_new ;
 
-! Test default options
-{ { f f f f f } } [ new-ctx all-opts [ has-opt ] with map ] unit-test
+! Test default options. Some Linuxes (Arch) disables SSL_OP_NO_SSLv2
+! by default, so we don't test that option.
+{
+    { f f f f }
+} [
+    new-ctx all-opts [ has-opt ] with map rest
+] unit-test
 
 ! Test setting options
 { 5 } [
