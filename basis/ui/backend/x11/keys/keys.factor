@@ -8,6 +8,7 @@ CONSTANT: modifiers
         { S+ 0x1 }
         { C+ 0x4 }
         { A+ 0x8 }
+        { M+ 0x40 }
     }
 
 CONSTANT: codes

@@ -47,6 +47,22 @@ IN: ui.backend.gtk.tests
        { is_modifier 1 }
     } ;
 
+: gdk-windows-key-release-event ( -- event )
+    S{ GdkEventKey
+       { type 9 }
+       { window ALIEN: 1a71d80 }
+       { send_event 0 }
+       { time 47998769 }
+       { state 67108928 }
+       { keyval 119 }
+       { length 1 }
+       { string ALIEN: 2017640 }
+       { hardware_keycode 25 }
+       { group 0 }
+       { is_modifier 0 }
+    } ;
+
+
 ! The Mac build servers doesn't have the gtk libs
 os linux? [
     ! key-event>gesture
@@ -54,10 +70,12 @@ os linux? [
         T{ key-down f f "F2" }
         T{ key-up f f "H" }
         T{ key-down f f " " }
+        T{ key-up { mods { M+ } } { sym "w" } }
     } [
         gdk-key-press-event key-event>gesture
         gdk-key-release-event key-event>gesture
         gdk-space-key-press-event key-event>gesture
+        gdk-windows-key-release-event key-event>gesture
     ] unit-test
 
     ! key-sym
