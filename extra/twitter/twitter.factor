@@ -19,9 +19,9 @@ twitter-source [ "factor" ] initialize
         call
     ] with-scope ; inline
 
-: twitter-url ( string -- string' )
+: twitter-url ( string -- url )
     ssl-supported?
-    "https://api.twitter.com/" "http://api.twitter.com/" ? prepend ;
+    "https://api.twitter.com/" "http://api.twitter.com/" ? prepend >url ;
 
 PRIVATE>
 
@@ -33,7 +33,7 @@ PRIVATE>
     ] with-twitter-oauth ;
 
 : twitter-authorize-url ( token -- url )
-    "oauth/authorize" twitter-url >url
+    "oauth/authorize" twitter-url
         swap key>> "oauth_token" set-query-param ;
 
 : obtain-twitter-access-token ( request-token verifier -- access-token )
