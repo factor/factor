@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.strings arrays
-byte-arrays hashtables io io.encodings.string kernel math
-namespaces sequences strings continuations x11 x11.xlib
-accessors io.encodings.utf8 literals ;
+USING: alien.c-types alien.data byte-arrays continuations
+io.encodings.string io.encodings.utf8 kernel literals math namespaces
+sequences x11 x11.X x11.xlib ;
 IN: x11.xim
 
 SYMBOL: xim

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.struct combinators
-combinators.short-circuit kernel math.order namespaces
-x11 x11.xlib ;
+combinators.short-circuit kernel math.order namespaces x11 x11.X
+x11.xlib ;
 IN: x11.events
 
 GENERIC: expose-event ( event window -- )
