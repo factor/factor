@@ -1,17 +1,26 @@
-! Copyright (C) 2005, 2006 Eduardo Cavazos and Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Eduardo Cavazos and Alex Chapman, 2016 Björn Lindqvist
+! http://factorcode.org/license.txt for BSD license.
 
-! Based on X.h
+! Selected parts of /usr/include/X11/X.h
+USING: alien.c-types alien.syntax math ;
+IN: x11.X
 
-USING: alien alien.c-types alien.syntax math x11.xlib ;
-IN: x11.constants
-
+! Resources
+TYPEDEF: ulong XID
 TYPEDEF: ulong Mask
+TYPEDEF: ulong Atom
+TYPEDEF: XID Window
+TYPEDEF: XID Drawable
+TYPEDEF: XID Font
+TYPEDEF: XID Pixmap
+TYPEDEF: XID Cursor
+TYPEDEF: XID Colormap
+TYPEDEF: XID GContext
+TYPEDEF: XID KeySym
 
 TYPEDEF: uchar KeyCode
 
-! Reserved Resource and Constant Definitions
-
+! Reserved resource and constant definitions
 CONSTANT: ParentRelative 1
 CONSTANT: CopyFromParent 0
 CONSTANT: PointerWindow 0
@@ -24,8 +33,87 @@ CONSTANT: AllTemporary 0
 CONSTANT: CurrentTime 0
 CONSTANT: NoSymbol 0
 
-! Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
-!   state in various key-, mouse-, and button-related events.
+CONSTANT: None 0
+
+! Input Event Masks. Used as event-mask window attribute and as
+! arguments to Grab requests. Not to be confused with event names.
+: NoEventMask              ( -- n ) 0 ; inline
+: KeyPressMask             ( -- n ) 0 2^ ; inline
+: KeyReleaseMask           ( -- n ) 1 2^ ; inline
+: ButtonPressMask          ( -- n ) 2 2^ ; inline
+: ButtonReleaseMask        ( -- n ) 3 2^ ; inline
+: EnterWindowMask          ( -- n ) 4 2^ ; inline
+: LeaveWindowMask          ( -- n ) 5 2^ ; inline
+: PointerMotionMask        ( -- n ) 6 2^ ; inline
+: PointerMotionHintMask    ( -- n ) 7 2^ ; inline
+: Button1MotionMask        ( -- n ) 8 2^ ; inline
+: Button2MotionMask        ( -- n ) 9 2^ ; inline
+: Button3MotionMask        ( -- n ) 10 2^ ; inline
+: Button4MotionMask        ( -- n ) 11 2^ ; inline
+: Button5MotionMask        ( -- n ) 12 2^ ; inline
+: ButtonMotionMask         ( -- n ) 13 2^ ; inline
+: KeymapStateMask          ( -- n ) 14 2^ ; inline
+: ExposureMask             ( -- n ) 15 2^ ; inline
+: VisibilityChangeMask     ( -- n ) 16 2^ ; inline
+: StructureNotifyMask      ( -- n ) 17 2^ ; inline
+: ResizeRedirectMask       ( -- n ) 18 2^ ; inline
+: SubstructureNotifyMask   ( -- n ) 19 2^ ; inline
+: SubstructureRedirectMask ( -- n ) 20 2^ ; inline
+: FocusChangeMask          ( -- n ) 21 2^ ; inline
+: PropertyChangeMask       ( -- n ) 22 2^ ; inline
+: ColormapChangeMask       ( -- n ) 23 2^ ; inline
+: OwnerGrabButtonMask      ( -- n ) 24 2^ ; inline
+
+! Event names. Used in "type" field in XEvent structures. Not to be
+! confused with event masks above. They start from 2 because 0 and 1
+! are reserved in the protocol for errors and replies.
+CONSTANT: KeyPress              2
+CONSTANT: KeyRelease            3
+CONSTANT: ButtonPress           4
+CONSTANT: ButtonRelease         5
+CONSTANT: MotionNotify          6
+CONSTANT: EnterNotify           7
+CONSTANT: LeaveNotify           8
+CONSTANT: FocusIn               9
+CONSTANT: FocusOut              10
+CONSTANT: KeymapNotify          11
+CONSTANT: Expose                12
+CONSTANT: GraphicsExpose        13
+CONSTANT: NoExpose              14
+CONSTANT: VisibilityNotify      15
+CONSTANT: CreateNotify          16
+CONSTANT: DestroyNotify         17
+CONSTANT: UnmapNotify           18
+CONSTANT: MapNotify             19
+CONSTANT: MapRequest            20
+CONSTANT: ReparentNotify        21
+CONSTANT: ConfigureNotify       22
+CONSTANT: ConfigureRequest      23
+CONSTANT: GravityNotify         24
+CONSTANT: ResizeRequest         25
+CONSTANT: CirculateNotify       26
+CONSTANT: CirculateRequest      27
+CONSTANT: PropertyNotify        28
+CONSTANT: SelectionClear        29
+CONSTANT: SelectionRequest      30
+CONSTANT: SelectionNotify       31
+CONSTANT: ColormapNotify        32
+CONSTANT: ClientMessage         33
+CONSTANT: MappingNotify         34
+CONSTANT: GenericEvent          35
+CONSTANT: LASTEvent             36
+
+! Key masks. Used as modifiers to GrabButton and GrabKey, results of
+! QueryPointer, state in various key-, mouse-, and button-related
+! events.
+: ShiftMask   ( -- n ) 1 0 shift ; inline
+: LockMask    ( -- n ) 1 1 shift ; inline
+: ControlMask ( -- n ) 1 2 shift ; inline
+: Mod1Mask    ( -- n ) 1 3 shift ; inline
+: Mod2Mask    ( -- n ) 1 4 shift ; inline
+: Mod3Mask    ( -- n ) 1 5 shift ; inline
+: Mod4Mask    ( -- n ) 1 6 shift ; inline
+: Mod5Mask    ( -- n ) 1 7 shift ; inline
 
 ! modifier names.  Used to build a SetModifierMapping request or
 ! to read a GetModifierMapping request.  These correspond to the
@@ -39,16 +127,25 @@ CONSTANT: Mod3MapIndex 5
 CONSTANT: Mod4MapIndex 6
 CONSTANT: Mod5MapIndex 7
 
-
-! button masks.  Used in same manner as Key masks above. Not to be confused
-! with button names below.
-
+! button masks. Used in same manner as Key masks above. Not to be
+! confused with button names below.
+: Button1Mask ( -- n ) 1 8  shift ; inline
+: Button2Mask ( -- n ) 1 9  shift ; inline
+: Button3Mask ( -- n ) 1 10 shift ; inline
+: Button4Mask ( -- n ) 1 11 shift ; inline
+: Button5Mask ( -- n ) 1 12 shift ; inline
 
 : AnyModifier          ( -- n ) 15 2^ ; ! used in GrabButton, GrabKey
 
-! button names. Used as arguments to GrabButton and as detail in ButtonPress
-! and ButtonRelease events.  Not to be confused with button masks above.
-! Note that 0 is already defined above as "AnyButton".
+! button names. Used as arguments to GrabButton and as detail in
+! ButtonPress and ButtonRelease events.  Not to be confused with
+! button masks above. Note that 0 is already defined above as
+! "AnyButton".  */
+CONSTANT: Button1 1
+CONSTANT: Button2 2
+CONSTANT: Button3 3
+CONSTANT: Button4 4
+CONSTANT: Button5 5
 
 ! Notify modes
 
@@ -174,11 +271,44 @@ CONSTANT: LastExtensionError 255
 CONSTANT: InputOutput 1
 CONSTANT: InputOnly 2
 
+! ConfigureWindow structure
+: CWX           ( -- n ) 0 2^ ; inline
+: CWY           ( -- n ) 1 2^ ; inline
+: CWWidth       ( -- n ) 2 2^ ; inline
+: CWHeight      ( -- n ) 3 2^ ; inline
+: CWBorderWidth ( -- n ) 4 2^ ; inline
+: CWSibling     ( -- n ) 5 2^ ; inline
+: CWStackMode   ( -- n ) 6 2^ ; inline
+
+! Bit Gravity
+
+CONSTANT: ForgetGravity         0
+CONSTANT: NorthWestGravity      1
+CONSTANT: NorthGravity          2
+CONSTANT: NorthEastGravity      3
+CONSTANT: WestGravity           4
+CONSTANT: CenterGravity         5
+CONSTANT: EastGravity           6
+CONSTANT: SouthWestGravity      7
+CONSTANT: SouthGravity          8
+CONSTANT: SouthEastGravity      9
+CONSTANT: StaticGravity         10
+
+! Window gravity + bit gravity above
+
+CONSTANT: UnmapGravity          0
+
 ! Used in CreateWindow for backing-store hint
 
 CONSTANT: NotUseful 0
 CONSTANT: WhenMapped 1
 CONSTANT: Always 2
+
+! Used in GetWindowAttributes reply
+CONSTANT: IsUnmapped            0
+CONSTANT: IsUnviewable          1
+CONSTANT: IsViewable            2
+
 
 ! Used in ChangeSaveSet
 
@@ -213,6 +343,25 @@ CONSTANT: PropModeAppend 2
 ! *****************************************************************
 ! * GRAPHICS DEFINITIONS
 ! *****************************************************************
+
+! graphics functions, as in GC.alu
+
+CONSTANT: GXclear               0x0
+CONSTANT: GXand                 0x1
+CONSTANT: GXandReverse          0x2
+CONSTANT: GXcopy                0x3
+CONSTANT: GXandInverted         0x4
+CONSTANT: GXnoop                0x5
+CONSTANT: GXxor                 0x6
+CONSTANT: GXor                  0x7
+CONSTANT: GXnor                 0x8
+CONSTANT: GXequiv               0x9
+CONSTANT: GXinvert              0xa
+CONSTANT: GXorReverse           0xb
+CONSTANT: GXcopyInverted        0xc
+CONSTANT: GXorInverted          0xd
+CONSTANT: GXnand                0xe
+CONSTANT: GXset                 0xf
 
 ! LineStyle
 
@@ -272,6 +421,33 @@ CONSTANT: Convex 2 ! wholly convex
 
 CONSTANT: ArcChord 0 ! join endpoints of arc
 CONSTANT: ArcPieSlice 1 ! join endpoints to center of arc
+
+! GC components: masks used in CreateGC, CopyGC, ChangeGC, OR'ed into
+! GC.stateChanges
+
+: GCFunction          ( -- n ) 0 2^ ; inline
+: GCPlaneMask         ( -- n ) 1 2^ ; inline
+: GCForeground        ( -- n ) 2 2^ ; inline
+: GCBackground        ( -- n ) 3 2^ ; inline
+: GCLineWidth         ( -- n ) 4 2^ ; inline
+: GCLineStyle         ( -- n ) 5 2^ ; inline
+: GCCapStyle          ( -- n ) 6 2^ ; inline
+: GCJoinStyle         ( -- n ) 7 2^ ; inline
+: GCFillStyle         ( -- n ) 8 2^ ; inline
+: GCFillRule          ( -- n ) 9 2^ ; inline
+: GCTile              ( -- n ) 10 2^ ; inline
+: GCStipple           ( -- n ) 11 2^ ; inline
+: GCTileStipXOrigin   ( -- n ) 12 2^ ; inline
+: GCTileStipYOrigin   ( -- n ) 13 2^ ; inline
+: GCFont              ( -- n ) 14 2^ ; inline
+: GCSubwindowMode     ( -- n ) 15 2^ ; inline
+: GCGraphicsExposures ( -- n ) 16 2^ ; inline
+: GCClipXOrigin       ( -- n ) 17 2^ ; inline
+: GCClipYOrigin       ( -- n ) 18 2^ ; inline
+: GCClipMask          ( -- n ) 19 2^ ; inline
+: GCDashOffset        ( -- n ) 20 2^ ; inline
+: GCDashList          ( -- n ) 21 2^ ; inline
+: GCArcMode           ( -- n ) 22 2^ ; inline
 
 ! *****************************************************************
 ! * FONTS
@@ -399,11 +575,3 @@ CONSTANT: DirectColor 5
 
 CONSTANT: LSBFirst 0
 CONSTANT: MSBFirst 1
-
-! *****************************************************************
-! * EXTENDED WINDOW MANAGER HINTS
-! *****************************************************************
-
-CONSTANT: _NET_WM_STATE_REMOVE 0
-CONSTANT: _NET_WM_STATE_ADD 1
-CONSTANT: _NET_WM_STATE_TOGGLE 2
