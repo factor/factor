@@ -55,6 +55,12 @@ ERROR: can't-deploy-library-file library ;
         [ delete-file ] each
     ] with-directory-files ;
 
+: input-image-name ( profile -- name )
+    but-last [ my-boot-image-name ] [ staging-image-name ] if-empty ;
+
+: run-factor ( vm-path flags -- )
+    swap prefix dup . run-with-output ; inline
+
 : staging-command-line ( profile -- flags )
     [
         [
@@ -62,26 +68,16 @@ ERROR: can't-deploy-library-file library ;
             [ staging-image-name "-output-image=" prepend , ]
             [ " " join "-include=" prepend , ] bi
         ] [
-            [ "-i=" my-boot-image-name append , ] [
-                but-last staging-image-name "-i=" prepend ,
-                "-resource-path=" "" resource-path append ,
-                "-run=tools.deploy.restage" ,
-            ] if-empty
+            input-image-name "-i=" prepend ,
+            "-resource-path=" "" resource-path append ,
+            "-run=tools.deploy.restage" ,
         ] bi
     ] { } make ;
 
-: run-factor ( vm-path flags -- )
-    swap prefix dup . run-with-output ; inline
-
-DEFER: ?make-staging-image
-
 : make-staging-image ( profile -- )
-    dup [ but-last ?make-staging-image ] unless-empty
-    vm-path swap staging-command-line run-factor ;
-
-: ?make-staging-image ( profile -- )
-    dup staging-image-name exists?
-    [ drop ] [ make-staging-image ] if ;
+    { } [ suffix ] accumulate* [ staging-image-name exists? ] reject
+    [ staging-command-line ] map
+    [ vm-path swap run-factor ] each ;
 
 : make-deploy-config ( vocab -- file )
     [ deploy-config vocab-roots get vocab-roots associate assoc-union unparse-use ]
@@ -114,7 +110,7 @@ DEFER: ?make-staging-image
     vocab "vocab-manifest-" prepend temp-file :> manifest-file
     image vocab manifest-file profile deploy-command-line :> flags
 
-    profile ?make-staging-image
+    profile make-staging-image
     vm flags run-factor
     manifest-file parse-vocab-manifest-file ;
 
