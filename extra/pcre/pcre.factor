@@ -1,10 +1,10 @@
-! Copyright (C) 2013 Björn Lindqvist
+! Copyright (C) 2013, 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.enums alien.strings arrays assocs combinators fry
 io.encodings.string io.encodings.utf8 kernel literals math
-math.bitwise pcre.ffi sequences splitting strings ;
+math.bitwise math.parser pcre.ffi sequences splitting strings ;
 QUALIFIED: regexp
 IN: pcre
 
@@ -155,3 +155,6 @@ M: regexp:regexp findall
 
 : split ( subject obj -- strings )
     dupd findall [ first second ] map split-subseqs ;
+
+: version ( -- r )
+    pcre_version " " splitting:split1 drop string>number ;

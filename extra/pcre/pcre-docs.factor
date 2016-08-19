@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences strings ;
+USING: help.markup help.syntax math sequences strings ;
 IN: pcre
 
 ARTICLE: "pcre" "PCRE binding"
@@ -35,5 +35,9 @@ HELP: findall
     "}"
   }
 } ;
+
+HELP: version
+{ $values { "f" float } }
+{ $description "Version number of the PCRE library, expressed as a float." } ;
 
 ABOUT: "pcre"
