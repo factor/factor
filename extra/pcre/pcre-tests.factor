@@ -105,7 +105,7 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 
 ! This used to work in 8.36, but might have changed in later versions.
 ! See: https://bugs.exim.org/show_bug.cgi?id=1875
-pcre_version " " splitting:split1 drop string>number 8.36 <= [
+version 8.36 <= [
     { t t } [
         "(?s)." <compiled-pcre> PCRE_DOTALL has-option?
         "(?i)x" <compiled-pcre> PCRE_CASELESS has-option?
