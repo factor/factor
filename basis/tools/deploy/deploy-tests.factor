@@ -180,3 +180,5 @@ os macosx? [
 { } [ "tools.deploy.test.21" drop 1260000 small-enough? ] unit-test
 
 { } [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test
+
+{ } [ "tools.deploy.test.23" shake-and-bake ] unit-test
