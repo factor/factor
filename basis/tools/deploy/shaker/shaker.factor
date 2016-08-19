@@ -1,17 +1,15 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.libraries accessors io.backend
-io.encodings.utf8 io.files io.streams.c init fry namespaces math
-make assocs kernel parser parser.notes lexer strings.parser
-vocabs sequences sequences.deep sequences.private words memory
-kernel.private continuations io vocabs.loader system strings
-sets vectors quotations byte-arrays sorting compiler.units
-definitions generic generic.standard generic.single
-compiler.crossref compiler.errors source-files.errors
-tools.deploy.config combinators combinators.private classes
-vocabs.loader.private classes.builtin slots.private grouping
-command-line io.pathnames memoize namespaces.private
-hashtables locals source-files ;
+USING: accessors alien.libraries arrays assocs byte-arrays classes
+classes.builtin combinators combinators.private command-line
+compiler.crossref compiler.errors compiler.units continuations
+definitions fry generic generic.single generic.standard grouping
+hashtables init io io.backend io.encodings.utf8 io.files io.pathnames
+io.streams.c kernel kernel.private locals make math memoize memory
+namespaces parser parser.notes quotations sequences sequences.deep
+sequences.private sets slots.private source-files source-files.errors
+strings strings.parser system tools.deploy.config vocabs vocabs.loader
+vocabs.loader.private vocabs.parser words ;
 QUALIFIED: classes.private
 IN: tools.deploy.shaker
 
@@ -365,6 +363,7 @@ IN: tools.deploy.shaker
                 vocabs:require-hook
                 vocabs:vocab-observers
                 vocabs.loader:add-vocab-root-hook
+                vocabs.parser:manifest
                 word
                 parser-quiet?
             } %
