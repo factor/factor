@@ -27,7 +27,15 @@ CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
     { "year" "month" "day" } [ pcre_get_stringnumber ] with map
 ] unit-test
 
-{ t } [ "foo" <compiled-pcre> PCRE_UTF8 has-option? ] unit-test
+{ t } [
+    "foo" <compiled-pcre> PCRE_UTF8 has-option?
+] unit-test
+
+! This option is not present on old PCRE versions.
+{ t } [
+    "foo" <compiled-pcre> version 8.10 >
+    [ PCRE_UCP has-option? ] [ PCRE_UCP has-option? not ] if
+] unit-test
 
 os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 

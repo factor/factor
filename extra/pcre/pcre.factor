@@ -4,8 +4,7 @@
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.enums alien.strings arrays assocs combinators fry
 io.encodings.string io.encodings.utf8 kernel literals math
-math.bitwise math.parser pcre.ffi sequences splitting strings ;
-QUALIFIED: regexp
+math.bitwise math.parser pcre.ffi regexp sequences splitting strings ;
 IN: pcre
 
 ERROR: bad-option what ;
@@ -13,6 +12,9 @@ ERROR: bad-option what ;
 ERROR: malformed-regexp expr error ;
 
 ERROR: pcre-error value ;
+
+: version ( -- f )
+    pcre_version " " splitting:split1 drop string>number ;
 
 <PRIVATE
 
@@ -75,7 +77,8 @@ ERROR: pcre-error value ;
 : options ( pcre -- opts )
     f PCRE_INFO_OPTIONS pcre-fullinfo ;
 
-CONSTANT: default-opts flags{ PCRE_UTF8 PCRE_UCP }
+: default-opts ( -- opts )
+    PCRE_UTF8 version 8.10 >= [ PCRE_UCP bitor ] when ;
 
 : (pcre) ( expr -- pcre err-message err-offset )
     default-opts { c-string int } [ f pcre_compile ] with-out-parameters ;
@@ -155,6 +158,3 @@ M: regexp:regexp findall
 
 : split ( subject obj -- strings )
     dupd findall [ first second ] map split-subseqs ;
-
-: version ( -- r )
-    pcre_version " " splitting:split1 drop string>number ;
