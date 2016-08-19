@@ -2,8 +2,6 @@
 
 namespace factor {
 
-void factor_vm::init_inline_caching(int max_size) { max_pic_size = max_size; }
-
 void factor_vm::deallocate_inline_cache(cell return_address) {
   /* Find the call target. */
   void* old_entry_point = get_call_target(return_address);

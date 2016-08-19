@@ -664,7 +664,6 @@ struct factor_vm {
   void primitive_dispatch_stats();
 
   /* inline cache */
-  void init_inline_caching(int max_size);
   void deallocate_inline_cache(cell return_address);
   void update_pic_count(cell type);
   code_block* compile_inline_cache(fixnum index, cell generic_word_,

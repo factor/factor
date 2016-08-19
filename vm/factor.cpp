@@ -72,7 +72,7 @@ void factor_vm::init_factor(vm_parameters* p) {
   callbacks = new callback_heap(p->callback_size, this);
   load_image(p);
   init_c_io();
-  init_inline_caching((int)p->max_pic_size);
+  max_pic_size = (int)p->max_pic_size;
   special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
   special_objects[OBJ_ARGS] = false_object;
   special_objects[OBJ_EMBEDDED] = false_object;
