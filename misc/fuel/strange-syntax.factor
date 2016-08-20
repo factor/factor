@@ -1,4 +1,5 @@
-USING: accessors ;
+USING: accessors alien.c-types alien.syntax byte-arrays.hex kernel
+literals logging math ;
 IN: strange
 
 ! FUEL Syntax Demo
@@ -36,7 +37,9 @@ TUPLE: tup
 : slash\hack ( m -- y )
     get\it>> dup >>get\it ;
 
-LOG: what ever
+: very-weird[33] ( -- ) ;
+
+LOG: what NOTICE
 
 TUPLE: oh\no { and/again initial: "meh" } ;
 
@@ -77,3 +80,13 @@ ID-SYNTAX ID-SYNTAX
 ! ! Containers
 V{ 1 2 3 } drop
 HS{ 9 8 3 } drop
+
+flags{ 10 20 } drop
+
+! TODO: Highlight contents too.
+HEX{ ab cd ef } drop
+
+! ! Alien functions
+FUNCTION: int futimes ( int id, timeval[2] times )
+FUNCTION: int booyah ( int x )
+FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
