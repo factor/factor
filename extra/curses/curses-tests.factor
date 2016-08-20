@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar curses kernel threads tools.test
-strings sequences random ;
+USING: calendar curses curses.ffi kernel random sequences threads
+tools.test ;
 IN: curses.tests
 
 : hello-curses ( -- )
@@ -24,6 +24,8 @@ IN: curses.tests
     ] with-curses ;
 
 curses-ok? [
-    [ ] [ hello-curses ] unit-test
-    [ ] [ hello-curses-color ] unit-test
+    { } [ hello-curses ] unit-test
+    has_colors [
+        { } [ hello-curses-color ] unit-test
+    ] when
 ] when
