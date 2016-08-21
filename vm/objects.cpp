@@ -2,7 +2,7 @@
 
 namespace factor {
 
-/* Size of the object pointed to by a tagged pointer */
+// Size of the object pointed to by a tagged pointer
 cell object_size(cell tagged) {
   if (immediate_p(tagged))
     return 0;
@@ -44,7 +44,7 @@ void factor_vm::primitive_set_slot() {
   write_barrier(slot_ptr);
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::clone_object(cell obj_) {
   data_root<object> obj(obj_, this);
 
@@ -57,10 +57,10 @@ cell factor_vm::clone_object(cell obj_) {
   return tag_dynamic(new_obj);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_clone() { ctx->replace(clone_object(ctx->peek())); }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_size() {
   ctx->replace(from_unsigned_cell(object_size(ctx->peek())));
 }
@@ -79,9 +79,9 @@ struct slot_become_fixup : no_fixup {
   }
 };
 
-/* classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
-   to coalesce equal but distinct quotations and wrappers. */
-/* Calls gc */
+// classes.tuple uses this to reshape tuples; tools.deploy.shaker uses this
+// to coalesce equal but distinct quotations and wrappers.
+// Calls gc
 void factor_vm::primitive_become() {
   primitive_minor_gc();
   array* new_objects = untag_check<array>(ctx->pop());
@@ -91,7 +91,7 @@ void factor_vm::primitive_become() {
   if (capacity != array_capacity(old_objects))
     critical_error("bad parameters to become", 0);
 
-  /* Build the forwarding map */
+  // Build the forwarding map
   std::map<object*, object*> become_map;
 
   for (cell i = 0; i < capacity; i++) {
@@ -101,7 +101,7 @@ void factor_vm::primitive_become() {
       become_map[untag<object>(old_ptr)] = untag<object>(new_ptr);
   }
 
-  /* Update all references to old objects to point to new objects */
+  // Update all references to old objects to point to new objects
   {
     slot_visitor<slot_become_fixup> visitor(this,
                                             slot_become_fixup(&become_map));
@@ -120,8 +120,8 @@ void factor_vm::primitive_become() {
     each_code_block(code_block_become_func);
   }
 
-  /* Since we may have introduced old->new references, need to revisit
-     all objects and code blocks on a minor GC. */
+  // Since we may have introduced old->new references, need to revisit
+  // all objects and code blocks on a minor GC.
   data->mark_all_cards();
 }
 

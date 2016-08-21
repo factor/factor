@@ -2,26 +2,26 @@
 
 namespace factor {
 
-/* Allocates memory */
+// Allocates memory
 byte_array* factor_vm::allot_byte_array(cell size) {
   byte_array* array = allot_uninitialized_array<byte_array>(size);
   memset(array + 1, 0, size);
   return array;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_byte_array() {
   cell size = unbox_array_size();
   ctx->push(tag<byte_array>(allot_byte_array(size)));
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_uninitialized_byte_array() {
   cell size = unbox_array_size();
   ctx->push(tag<byte_array>(allot_uninitialized_array<byte_array>(size)));
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_resize_byte_array() {
   data_root<byte_array> array(ctx->pop(), this);
   check_tagged(array);
@@ -29,21 +29,21 @@ void factor_vm::primitive_resize_byte_array() {
   ctx->push(tag<byte_array>(reallot_array(array.untagged(), capacity)));
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_byte_array::grow_bytes(cell len) {
   count += len;
   if (count >= array_capacity(elements.untagged()))
     elements = elements.parent->reallot_array(elements.untagged(), count * 2);
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_byte_array::append_bytes(void* elts, cell len) {
   cell old_count = count;
   grow_bytes(len);
   memcpy(&elements->data<uint8_t>()[old_count], elts, len);
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_byte_array::append_byte_array(cell byte_array_) {
   data_root<byte_array> byte_array(byte_array_, elements.parent);
 
@@ -58,7 +58,7 @@ void growable_byte_array::append_byte_array(cell byte_array_) {
   count += len;
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_byte_array::trim() {
   factor_vm* parent = elements.parent;
   elements = parent->reallot_array(elements.untagged(), count);

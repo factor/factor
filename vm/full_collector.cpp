@@ -24,10 +24,10 @@ struct full_policy {
   }
 };
 
-/* After a sweep, invalidate any code heap roots which are not marked,
-   so that if a block makes a tail call to a generic word, and the PIC
-   compiler triggers a GC, and the caller block gets GCd as a result,
-   the PIC code won't try to overwrite the call site */
+// After a sweep, invalidate any code heap roots which are not marked,
+// so that if a block makes a tail call to a generic word, and the PIC
+// compiler triggers a GC, and the caller block gets GCd as a result,
+// the PIC code won't try to overwrite the call site
 void factor_vm::update_code_roots_for_sweep() {
   mark_bits* state = &code->allocator->state;
 
@@ -85,12 +85,12 @@ void factor_vm::collect_full() {
   collect_sweep_impl();
 
   if (data->low_memory_p()) {
-    /* Full GC did not free up enough memory. Grow the heap. */
+    // Full GC did not free up enough memory. Grow the heap.
     set_current_gc_op(collect_growing_heap_op);
     collect_growing_heap(0);
   } else if (data->high_fragmentation_p()) {
-    /* Enough free memory, but it is not contiguous. Perform a
-       compaction. */
+    // Enough free memory, but it is not contiguous. Perform a
+    // compaction.
     set_current_gc_op(collect_compact_op);
     collect_compact_impl();
   }

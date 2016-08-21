@@ -133,13 +133,13 @@ data_heap_room factor_vm::data_room() {
   return room;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_data_room() {
   data_heap_room room = data_room();
   ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::instances(cell type) {
   primitive_full_gc();
 
@@ -152,7 +152,7 @@ cell factor_vm::instances(cell type) {
   return std_vector_to_array(objects);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_all_instances() {
   ctx->push(instances(TYPE_COUNT));
 }

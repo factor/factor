@@ -306,27 +306,27 @@ void factor_vm::unix_init_signals() {
     sigaction_safe(SIGALRM, &sample_sigaction, NULL);
   }
 
-  /* We don't use SA_IGN here because then the ignore action is inherited
-     by subprocesses, which we don't want. There is a unit test in
-     io.launcher.unix for this. */
+  // We don't use SA_IGN here because then the ignore action is inherited
+  // by subprocesses, which we don't want. There is a unit test in
+  // io.launcher.unix for this.
   {
     struct sigaction ignore_sigaction;
     init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
     sigaction_safe(SIGPIPE, &ignore_sigaction, NULL);
-    /* We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP */
+    // We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP
     sigaction_safe(SIGUSR2, &ignore_sigaction, NULL);
   }
 }
 
-/* On Unix, shared fds such as stdin cannot be set to non-blocking mode
-   (http://homepages.tesco.net/J.deBoynePollard/FGA/dont-set-shared-file-descriptors-to-non-blocking-mode.html)
-   so we kludge around this by spawning a thread, which waits on a control pipe
-   for a signal, upon receiving this signal it reads one block of data from
-   stdin and writes it to a data pipe. Upon completion, it writes a 4-byte
-   integer to the size pipe, indicating how much data was written to the data
-   pipe.
+// On Unix, shared fds such as stdin cannot be set to non-blocking mode
+// (http://homepages.tesco.net/J.deBoynePollard/FGA/dont-set-shared-file-descriptors-to-non-blocking-mode.html)
+// so we kludge around this by spawning a thread, which waits on a control pipe
+// for a signal, upon receiving this signal it reads one block of data from
+// stdin and writes it to a data pipe. Upon completion, it writes a 4-byte
+// integer to the size pipe, indicating how much data was written to the data
+// pipe.
 
-   The read end of the size pipe can be set to non-blocking. */
+// The read end of the size pipe can be set to non-blocking.
 extern "C" {
 int stdin_read;
 int stdin_write;
@@ -402,8 +402,8 @@ void* stdin_loop(void* arg) {
       fatal_error("stdin_loop: bad data on control fd", buf[0]);
 
     for (;;) {
-      /* If we fep, the parent thread will grab stdin_mutex and send us
-         SIGUSR2 to interrupt the read() call. */
+      // If we fep, the parent thread will grab stdin_mutex and send us
+      // SIGUSR2 to interrupt the read() call.
       pthread_mutex_lock(&stdin_mutex);
       pthread_mutex_unlock(&stdin_mutex);
       ssize_t bytes = read(0, buf, sizeof(buf));
@@ -440,9 +440,9 @@ void open_console() {
   pthread_mutex_init(&stdin_mutex, NULL);
 }
 
-/* This method is used to kill the stdin_loop before exiting from factor.
-   A Nvidia driver bug on Linux is the reason this has to be done, see:
-     http://www.nvnews.net/vbulletin/showthread.php?t=164619 */
+// This method is used to kill the stdin_loop before exiting from factor.
+// An Nvidia driver bug on Linux is the reason this has to be done, see:
+//   http://www.nvnews.net/vbulletin/showthread.php?t=164619
 void close_console() {
   if (stdin_thread_initialized_p) {
     pthread_cancel(stdin_thread);
@@ -452,9 +452,9 @@ void close_console() {
 
 void lock_console() {
   FACTOR_ASSERT(stdin_thread_initialized_p);
-  /* Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
-     any read() it has in progress. When the stdin loop iterates again, it will
-     try to lock the same mutex and wait until unlock_console() is called. */
+  // Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
+  // any read() it has in progress. When the stdin loop iterates again, it will
+  // try to lock the same mutex and wait until unlock_console() is called.
   pthread_mutex_lock(&stdin_mutex);
   pthread_kill(stdin_thread, SIGUSR2);
 }

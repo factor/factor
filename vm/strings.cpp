@@ -2,7 +2,7 @@
 
 namespace factor {
 
-/* Allocates memory */
+// Allocates memory
 string* factor_vm::allot_string_internal(cell capacity) {
   string* str = allot<string>(string_size(capacity));
 
@@ -13,7 +13,7 @@ string* factor_vm::allot_string_internal(cell capacity) {
   return str;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::fill_string(string* str_, cell start, cell capacity,
                             cell fill) {
   data_root<string> str(str_, this);
@@ -39,14 +39,14 @@ void factor_vm::fill_string(string* str_, cell start, cell capacity,
   }
 }
 
-/* Allocates memory */
+// Allocates memory
 string* factor_vm::allot_string(cell capacity, cell fill) {
   data_root<string> str(allot_string_internal(capacity), this);
   fill_string(str.untagged(), 0, capacity, fill);
   return str.untagged();
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_string() {
   cell initial = to_cell(ctx->pop());
   cell length = unbox_array_size();
@@ -60,7 +60,7 @@ bool factor_vm::reallot_string_in_place_p(string* str, cell capacity) {
          capacity <= string_capacity(str);
 }
 
-/* Allocates memory */
+// Allocates memory
 string* factor_vm::reallot_string(string* str_, cell capacity) {
   data_root<string> str(str_, this);
 
@@ -97,7 +97,7 @@ string* factor_vm::reallot_string(string* str_, cell capacity) {
   }
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_resize_string() {
   data_root<string> str(ctx->pop(), this);
   check_tagged(str);

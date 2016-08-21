@@ -74,19 +74,19 @@ void factor_vm::end_gc() {
 void factor_vm::start_gc_again() {
   switch (current_gc->op) {
     case collect_nursery_op:
-      /* Nursery collection can fail if aging does not have enough
-         free space to fit all live objects from nursery. */
+      // Nursery collection can fail if aging does not have enough
+      // free space to fit all live objects from nursery.
       current_gc->op = collect_aging_op;
       break;
     case collect_aging_op:
-      /* Aging collection can fail if the aging semispace cannot fit
-         all the live objects from the other aging semispace and the
-         nursery. */
+      // Aging collection can fail if the aging semispace cannot fit
+      // all the live objects from the other aging semispace and the
+      // nursery.
       current_gc->op = collect_to_tenured_op;
       break;
     default:
-      /* Nothing else should fail mid-collection due to insufficient
-         space in the target generation. */
+      // Nothing else should fail mid-collection due to insufficient
+      // space in the target generation.
       critical_error("in start_gc_again, bad GC op", current_gc->op);
       break;
   }
@@ -102,10 +102,10 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   FACTOR_ASSERT(!gc_off);
   FACTOR_ASSERT(!current_gc);
 
-  /* Important invariant: tenured space must have enough contiguous free
-     space to fit the entire contents of the aging space and nursery. This is
-     because when doing a full collection, objects from younger generations
-     are promoted before any unreachable tenured objects are freed. */
+  // Important invariant: tenured space must have enough contiguous free
+  // space to fit the entire contents of the aging space and nursery. This is
+  // because when doing a full collection, objects from younger generations
+  // are promoted before any unreachable tenured objects are freed.
   FACTOR_ASSERT(!data->high_fragmentation_p());
 
   current_gc = new gc_state(op, this);
@@ -113,8 +113,8 @@ void factor_vm::gc(gc_op op, cell requested_size) {
     ctx->callstack_seg->set_border_locked(false);
   atomic::store(&current_gc_p, true);
 
-  /* Keep trying to GC higher and higher generations until we don't run
-     out of space in the target generation. */
+  // Keep trying to GC higher and higher generations until we don't run
+  // out of space in the target generation.
   for (;;) {
     try {
       if (gc_events)
@@ -125,19 +125,19 @@ void factor_vm::gc(gc_op op, cell requested_size) {
           collect_nursery();
           break;
         case collect_aging_op:
-          /* We end up here if the above fails. */
+          // We end up here if the above fails.
           collect_aging();
           if (data->high_fragmentation_p()) {
-            /* Change GC op so that if we fail again, we crash. */
+            // Change GC op so that if we fail again, we crash.
             set_current_gc_op(collect_full_op);
             collect_full();
           }
           break;
         case collect_to_tenured_op:
-          /* We end up here if the above fails. */
+          // We end up here if the above fails.
           collect_to_tenured();
           if (data->high_fragmentation_p()) {
-            /* Change GC op so that if we fail again, we crash. */
+            // Change GC op so that if we fail again, we crash.
             set_current_gc_op(collect_full_op);
             collect_full();
           }
@@ -159,7 +159,7 @@ void factor_vm::gc(gc_op op, cell requested_size) {
       break;
     }
     catch (const must_start_gc_again&) {
-      /* We come back here if the target generation is full. */
+      // We come back here if the target generation is full.
       start_gc_again();
       continue;
     }
@@ -173,7 +173,7 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   delete current_gc;
   current_gc = NULL;
 
-  /* Check the invariant again, just in case. */
+  // Check the invariant again, just in case.
   FACTOR_ASSERT(!data->high_fragmentation_p());
 }
 
@@ -189,18 +189,17 @@ void factor_vm::primitive_compact_gc() {
   gc(collect_compact_op, 0);
 }
 
-/*
- * It is up to the caller to fill in the object's fields in a meaningful
- * fashion!
- */
-/* Allocates memory */
+// It is up to the caller to fill in the object's fields in a meaningful
+// fashion!
+
+// Allocates memory
 object* factor_vm::allot_large_object(cell type, cell size) {
-  /* If tenured space does not have enough room, collect and compact */
+  // If tenured space does not have enough room, collect and compact
   cell requested_size = size + data->high_water_mark();
   if (!data->tenured->can_allot_p(requested_size)) {
     primitive_compact_gc();
 
-    /* If it still won't fit, grow the heap */
+    // If it still won't fit, grow the heap
     if (!data->tenured->can_allot_p(requested_size)) {
       gc(collect_growing_heap_op, size);
     }
@@ -208,9 +207,9 @@ object* factor_vm::allot_large_object(cell type, cell size) {
 
   object* obj = data->tenured->allot(size);
 
-  /* Allows initialization code to store old->new pointers
-     without hitting the write barrier in the common case of
-     a nursery allocation */
+  // Allows initialization code to store old->new pointers
+  // without hitting the write barrier in the common case of
+  // a nursery allocation
   write_barrier(obj, size);
 
   obj->initialize(type);
@@ -221,8 +220,8 @@ void factor_vm::primitive_enable_gc_events() {
   gc_events = new std::vector<gc_event>();
 }
 
-/* Allocates memory (byte_array_from_value, result.add) */
-/* XXX: Remember that growable_array has a data_root already */
+// Allocates memory (byte_array_from_value, result.add)
+// XXX: Remember that growable_array has a data_root already
 void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
     growable_array result(this);

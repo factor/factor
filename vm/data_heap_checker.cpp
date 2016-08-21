@@ -1,7 +1,7 @@
 #include "master.hpp"
 
-/* A tool to debug write barriers. Call check_data_heap() to ensure that all
-cards that should be marked are actually marked. */
+// A tool to debug write barriers. Call check_data_heap() to ensure that all
+// cards that should be marked are actually marked.
 
 namespace factor {
 

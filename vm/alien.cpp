@@ -2,8 +2,8 @@
 
 namespace factor {
 
-/* gets the address of an object representing a C pointer, with the
-intention of storing the pointer across code which may potentially GC. */
+// gets the address of an object representing a C pointer, with the
+// intention of storing the pointer across code which may potentially GC.
 char* factor_vm::pinned_alien_offset(cell obj) {
   switch (TAG(obj)) {
     case ALIEN_TYPE: {
@@ -19,12 +19,12 @@ char* factor_vm::pinned_alien_offset(cell obj) {
       return NULL;
     default:
       type_error(ALIEN_TYPE, obj);
-      return NULL; /* can't happen */
+      return NULL; // can't happen
   }
 }
 
-/* make an alien */
-/* Allocates memory */
+// make an alien
+// Allocates memory
 cell factor_vm::allot_alien(cell delegate_, cell displacement) {
   if (displacement == 0)
     return delegate_;
@@ -46,13 +46,13 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement) {
   return new_alien.value();
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::allot_alien(cell address) {
   return allot_alien(false_object, address);
 }
 
-/* make an alien pointing at an offset of another alien */
-/* Allocates memory */
+// make an alien pointing at an offset of another alien
+// Allocates memory
 void factor_vm::primitive_displaced_alien() {
   cell alien = ctx->pop();
   cell displacement = to_cell(ctx->pop());
@@ -69,20 +69,20 @@ void factor_vm::primitive_displaced_alien() {
   }
 }
 
-/* address of an object representing a C pointer. Explicitly throw an error
-if the object is a byte array, as a sanity check. */
-/* Allocates memory (from_unsigned_cell can allocate) */
+// address of an object representing a C pointer. Explicitly throw an error
+// if the object is a byte array, as a sanity check.
+// Allocates memory (from_unsigned_cell can allocate)
 void factor_vm::primitive_alien_address() {
   ctx->replace(from_unsigned_cell((cell)pinned_alien_offset(ctx->peek())));
 }
 
-/* pop ( alien n ) from datastack, return alien's address plus n */
+// pop ( alien n ) from datastack, return alien's address plus n
 void* factor_vm::alien_pointer() {
   fixnum offset = to_fixnum(ctx->pop());
   return alien_offset(ctx->pop()) + offset;
 }
 
-/* define words to read/write values at an alien address */
+// define words to read/write values at an alien address
 #define DEFINE_ALIEN_ACCESSOR(name, type, from, to)                     \
   VM_C_API void primitive_alien_##name(factor_vm * parent) {            \
     parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
@@ -95,8 +95,8 @@ void* factor_vm::alien_pointer() {
 
 EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)
 
-/* open a native library and push a handle */
-/* Allocates memory */
+// open a native library and push a handle
+// Allocates memory
 void factor_vm::primitive_dlopen() {
   data_root<byte_array> path(ctx->pop(), this);
   check_tagged(path);
@@ -106,8 +106,8 @@ void factor_vm::primitive_dlopen() {
   ctx->push(library.value());
 }
 
-/* look up a symbol in a native library */
-/* Allocates memory */
+// look up a symbol in a native library
+// Allocates memory
 void factor_vm::primitive_dlsym() {
   data_root<object> library(ctx->pop(), this);
   data_root<byte_array> name(ctx->peek(), this);
@@ -126,8 +126,8 @@ void factor_vm::primitive_dlsym() {
     ctx->replace(allot_alien(ffi_dlsym(NULL, sym)));
 }
 
-/* look up a symbol in a native library */
-/* Allocates memory */
+// look up a symbol in a native library
+// Allocates memory
 void factor_vm::primitive_dlsym_raw() {
   data_root<object> library(ctx->pop(), this);
   data_root<byte_array> name(ctx->peek(), this);
@@ -146,7 +146,7 @@ void factor_vm::primitive_dlsym_raw() {
     ctx->replace(allot_alien(ffi_dlsym_raw(NULL, sym)));
 }
 
-/* close a native library handle */
+// close a native library handle
 void factor_vm::primitive_dlclose() {
   dll* d = untag_check<dll>(ctx->pop());
   if (d->handle != NULL)
@@ -161,7 +161,7 @@ void factor_vm::primitive_dll_validp() {
     ctx->replace(special_objects[OBJ_CANONICAL_TRUE]);
 }
 
-/* gets the address of an object representing a C pointer */
+// gets the address of an object representing a C pointer
 char* factor_vm::alien_offset(cell obj) {
   switch (TAG(obj)) {
     case BYTE_ARRAY_TYPE:
@@ -172,7 +172,7 @@ char* factor_vm::alien_offset(cell obj) {
       return NULL;
     default:
       type_error(ALIEN_TYPE, obj);
-      return NULL; /* can't happen */
+      return NULL; // can't happen
   }
 }
 

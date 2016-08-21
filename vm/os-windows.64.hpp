@@ -7,7 +7,7 @@ namespace factor {
 
 #define MXCSR(ctx) (ctx)->MxCsr
 
-/* Must match the stack-frame-size constant in
-   basis/bootstap/assembler/x86.64.windows.factor */
+// Must match the stack-frame-size constant in
+// basis/bootstap/assembler/x86.64.windows.factor
 static const unsigned JIT_FRAME_SIZE = 64;
 }

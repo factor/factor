@@ -145,11 +145,11 @@ void free_list_allocator<Block>::sweep(Iterator& iter) {
   cell end = this->end;
 
   while (start != end) {
-    /* find next unmarked block */
+    // find next unmarked block
     start = state.next_unmarked_block_after(start);
 
     if (start != end) {
-      /* find size */
+      // find size
       cell size = state.unmarked_block_size(start);
       FACTOR_ASSERT(size > 0);
 
@@ -168,8 +168,8 @@ template <typename Block> void free_list_allocator<Block>::sweep() {
   sweep(null_sweep);
 }
 
-/* The forwarding map must be computed first by calling
-   state.compute_forwarding(). */
+// The forwarding map must be computed first by calling
+// state.compute_forwarding().
 template <typename Block>
 template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
@@ -186,13 +186,13 @@ void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
   };
   iterate(compact_block_func, fixup);
 
-  /* Now update the free list; there will be a single free block at
-     the end */
+  // Now update the free list; there will be a single free block at
+  // the end
   free_blocks.initial_free_list(start, end, dest_addr - start);
 }
 
-/* During compaction we have to be careful and measure object sizes
-   differently */
+// During compaction we have to be careful and measure object sizes
+// differently
 template <typename Block>
 template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {

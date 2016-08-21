@@ -22,7 +22,7 @@ void early_init(void) {
   }
 }
 
-/* You must free() this yourself. */
+// You must free() this yourself.
 const char* vm_executable_path(void) {
   return safe_strdup([[[NSBundle mainBundle] executablePath] UTF8String]);
 }
@@ -66,7 +66,7 @@ void factor_vm::init_signals(void) {
   mach_initialize();
 }
 
-/* Amateurs at Apple: implement this function, properly! */
+// Amateurs at Apple: implement this function, properly!
 Protocol* objc_getProtocol(char* name) {
   if (strcmp(name, "NSTextInput") == 0)
     return @protocol(NSTextInput);

@@ -4,8 +4,8 @@ inline cell align_page(cell a) { return align(a, getpagesize()); }
 
 bool set_memory_locked(cell base, cell size, bool locked);
 
-/* segments set up guard pages to check for under/overflow.
-size must be a multiple of the page size */
+// segments set up guard pages to check for under/overflow.
+// size must be a multiple of the page size
 struct segment {
   cell start;
   cell size;

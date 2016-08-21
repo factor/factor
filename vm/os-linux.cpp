@@ -5,9 +5,9 @@ namespace factor {
 const char* vm_executable_path() {
   ssize_t bufsiz = 4096;
 
-  /* readlink is called in a loop with increasing buffer sizes in case
-     someone tries to run Factor from a incredibly deeply nested
-     path. */
+  // readlink is called in a loop with increasing buffer sizes in case
+  // someone tries to run Factor from a incredibly deeply nested
+  // path.
   while (true) {
     char* buf = new char[bufsiz + 1];
     ssize_t size= readlink("/proc/self/exe", buf, bufsiz);
@@ -15,13 +15,13 @@ const char* vm_executable_path() {
       fatal_error("Cannot read /proc/self/exe", errno);
     } else {
       if (size < bufsiz) {
-        /* Buffer was large enough, return string. */
+        // Buffer was large enough, return string.
         buf[size] = '\0';
         const char* ret = safe_strdup(buf);
         delete[] buf;
         return ret;
       } else {
-        /* Buffer wasn't big enough, double it and try again. */
+        // Buffer wasn't big enough, double it and try again.
         delete[] buf;
         bufsiz *= 2;
       }

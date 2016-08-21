@@ -17,136 +17,136 @@ struct factor_vm {
   //   basis/vm/vm.factor
   //   basis/compiler/constants/constants.factor
 
-  /* Current context */
+  // Current context
   context* ctx;
 
-  /* Spare context -- for callbacks */
+  // Spare context -- for callbacks
   context* spare_ctx;
 
-  /* New objects are allocated here, use the data->nursery reference
-     instead from c++ code. */
+  // New objects are allocated here, use the data->nursery reference
+  // instead from c++ code.
   bump_allocator nursery;
 
-  /* Add this to a shifted address to compute write barrier offsets */
+  // Add this to a shifted address to compute write barrier offsets
   cell cards_offset;
   cell decks_offset;
 
-  /* cdecl signal handler address, used by signal handler subprimitives */
+  // cdecl signal handler address, used by signal handler subprimitives
   cell signal_handler_addr;
 
-  /* are we handling a memory error? used to detect double faults */
+  // are we handling a memory error? used to detect double faults
   cell faulting_p;
 
-  /* Various special objects, accessed by special-object and
-	set-special-object primitives */
+  // Various special objects, accessed by special-object and
+  // set-special-object primitives
   cell special_objects[special_object_count];
 
   // THESE FIELDS ARE ACCESSED DIRECTLY FROM FACTOR.
   // ^^^^^^
   //
 
-  /* Handle to the main thread we run in */
+  // Handle to the main thread we run in
   THREADHANDLE thread;
 
-  /* Data stack and retain stack sizes */
+  // Data stack and retain stack sizes
   cell datastack_size, retainstack_size, callstack_size;
 
-  /* Stack of callback IDs */
+  // Stack of callback IDs
   std::vector<int> callback_ids;
 
-  /* Next callback ID */
+  // Next callback ID
   int callback_id;
 
-  /* List of callback function descriptors for PPC */
+  // List of callback function descriptors for PPC
   std::list<void**> function_descriptors;
 
-  /* Pooling unused contexts to make context allocation cheaper */
+  // Pooling unused contexts to make context allocation cheaper
   std::list<context*> unused_contexts;
 
-  /* Active contexts, for tracing by the GC */
+  // Active contexts, for tracing by the GC
   std::set<context*> active_contexts;
 
-  /* External entry points */
+  // External entry points
   c_to_factor_func_type c_to_factor_func;
 
-  /* Is profiling enabled? */
+  // Is profiling enabled?
   volatile cell sampling_profiler_p;
   fixnum samples_per_second;
 
-  /* Global variables used to pass fault handler state from signal handler
-     to VM */
+  // Global variables used to pass fault handler state from signal handler
+  // to VM
   bool signal_resumable;
   cell signal_number;
   cell signal_fault_addr;
   cell signal_fault_pc;
   unsigned int signal_fpu_status;
 
-  /* Pipe used to notify Factor multiplexer of signals */
+  // Pipe used to notify Factor multiplexer of signals
   int signal_pipe_input, signal_pipe_output;
 
-  /* State kept by the sampling profiler */
+  // State kept by the sampling profiler
   std::vector<profiling_sample> samples;
   std::vector<cell> sample_callstacks;
   volatile profiling_sample_count sample_counts;
 
-  /* GC is off during heap walking */
+  // GC is off during heap walking
   bool gc_off;
 
-  /* Data heap */
+  // Data heap
   data_heap* data;
 
-  /* Code heap */
+  // Code heap
   code_heap* code;
 
-  /* Pinned callback stubs */
+  // Pinned callback stubs
   callback_heap* callbacks;
 
-  /* Only set if we're performing a GC */
+  // Only set if we're performing a GC
   gc_state* current_gc;
   volatile cell current_gc_p;
 
-  /* Set if we're in the jit */
+  // Set if we're in the jit
   volatile fixnum current_jit_count;
 
-  /* Mark stack used for mark & sweep GC */
+  // Mark stack used for mark & sweep GC
   std::vector<cell> mark_stack;
 
-  /* If not NULL, we push GC events here */
+  // If not NULL, we push GC events here
   std::vector<gc_event>* gc_events;
 
-  /* If a runtime function needs to call another function which potentially
-     allocates memory, it must wrap any references to the data and code
-     heaps with data_root and code_root smart pointers, which register
-     themselves here. See data_roots.hpp and code_roots.hpp */
+  // If a runtime function needs to call another function which potentially
+  // allocates memory, it must wrap any references to the data and code
+  // heaps with data_root and code_root smart pointers, which register
+  // themselves here. See data_roots.hpp and code_roots.hpp
 
   std::vector<cell*> data_roots;
   std::vector<code_root*> code_roots;
 
-  /* Debugger */
+  // Debugger
   bool fep_p;
   bool fep_help_was_shown;
   bool fep_disabled;
   bool full_output;
 
-  /* Method dispatch statistics */
+  // Method dispatch statistics
   dispatch_statistics dispatch_stats;
 
-  /* Number of entries in a polymorphic inline cache */
+  // Number of entries in a polymorphic inline cache
   cell max_pic_size;
 
-  /* Incrementing object counter for identity hashing */
+  // Incrementing object counter for identity hashing
   cell object_counter;
 
-  /* Sanity check to ensure that monotonic counter doesn't decrease */
+  // Sanity check to ensure that monotonic counter doesn't decrease
   uint64_t last_nano_count;
 
-  /* Stack for signal handlers, only used on Unix */
+  // Stack for signal handlers, only used on Unix
   segment* signal_callstack_seg;
 
-  /* Are we already handling a fault? Used to catch double memory faults */
+  // Are we already handling a fault? Used to catch double memory faults
   static bool fatal_erroring_p;
 
-  /* Two fep_p variants, one might be redundant. */
+  // Two fep_p variants, one might be redundant.
   volatile cell safepoint_fep_p;
 
   // contexts
@@ -241,7 +241,7 @@ struct factor_vm {
   void bignum_destructive_unnormalization(bignum* bn, int shift_right);
   bignum_digit_type bignum_digit_divide(
       bignum_digit_type uh, bignum_digit_type ul, bignum_digit_type v,
-      bignum_digit_type* q) /* return value */;
+      bignum_digit_type* q); // return value
   bignum_digit_type bignum_digit_divide_subtract(bignum_digit_type v1,
                                                  bignum_digit_type v2,
                                                  bignum_digit_type guess,
@@ -297,9 +297,9 @@ struct factor_vm {
 
   template <typename Iterator> inline void each_object(Iterator& iterator) {
 
-    /* The nursery can't be iterated because there may be gaps between
-       the objects (see factor_vm::reallot_array) so we require it to
-       be empty first. */
+    // The nursery can't be iterated because there may be gaps between
+    // the objects (see factor_vm::reallot_array) so we require it to
+    // be empty first.
     FACTOR_ASSERT(data->nursery->occupied_space() == 0);
 
     gc_off = true;
@@ -319,8 +319,8 @@ struct factor_vm {
     each_object(each_object_func);
   }
 
-  /* the write barrier must be called any time we are potentially storing a
-     pointer from an older generation to a younger one */
+  // the write barrier must be called any time we are potentially storing a
+  // pointer from an older generation to a younger one
   inline void write_barrier(cell* slot_ptr) {
     *(unsigned char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
     *(unsigned char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
@@ -361,7 +361,7 @@ struct factor_vm {
   object* allot_object(cell type, cell size);
   object* allot_large_object(cell type, cell size);
 
-  /* Allocates memory */
+  // Allocates memory
   template <typename Type> Type* allot(cell size) {
     return (Type*)allot_object(Type::type_number, size);
   }

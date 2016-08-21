@@ -2,16 +2,16 @@
 
 namespace factor {
 
-/* Simple wrappers for ANSI C I/O functions, used for bootstrapping.
+// Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 
-Note the ugly loop logic in almost every function; we have to handle EINTR
-and restart the operation if the system call was interrupted. Naive
-applications don't do this, but then they quickly fail if one enables
-itimer()s or other signals.
+// Note the ugly loop logic in almost every function; we have to handle EINTR
+// and restart the operation if the system call was interrupted. Naive
+// applications don't do this, but then they quickly fail if one enables
+// itimer()s or other signals.
 
-The Factor library provides platform-specific code for Unix and Windows
-with many more capabilities so these words are not usually used in
-normal operation. */
+// The Factor library provides platform-specific code for Unix and Windows
+// with many more capabilities so these words are not usually used in
+// normal operation.
 
 size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
   FACTOR_ASSERT(nitems > 0);
@@ -48,7 +48,7 @@ void factor_vm::init_c_io() {
   special_objects[OBJ_STDERR] = allot_alien(false_object, (cell)stderr);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::io_error_if_not_EINTR() {
   if (errno == EINTR)
     return;
@@ -186,7 +186,7 @@ void factor_vm::primitive_fgetc() {
     ctx->replace(tag_fixnum(c));
 }
 
-/* Allocates memory (from_unsigned_cell())*/
+// Allocates memory (from_unsigned_cell())
 void factor_vm::primitive_fread() {
   FILE* file = pop_file_handle();
   void* buf = (void*)alien_offset(ctx->pop());
@@ -244,9 +244,9 @@ void factor_vm::primitive_fclose() {
     io_error_if_not_EINTR();
 }
 
-/* This function is used by FFI I/O. Accessing the errno global directly is
-not portable, since on some libc's errno is not a global but a funky macro that
-reads thread-local storage. */
+// This function is used by FFI I/O. Accessing the errno global directly is
+// not portable, since on some libc's errno is not a global but a funky macro that
+// reads thread-local storage.
 VM_C_API int err_no() { return errno; }
 
 VM_C_API void set_err_no(int err) { errno = err; }

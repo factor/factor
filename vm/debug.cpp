@@ -365,7 +365,7 @@ struct code_block_printer {
   }
 };
 
-/* Dump all code blocks for debugging */
+// Dump all code blocks for debugging
 void factor_vm::dump_code_heap(ostream& out) {
   code_block_printer printer(this, out);
   code->allocator->iterate(printer);
@@ -460,10 +460,10 @@ void factor_vm::factorbug() {
     cin >> setw(1024) >> cmd >> setw(0);
     if (!cin.good()) {
       if (!seen_command) {
-        /* If we exit with an EOF immediately, then
-           dump stacks. This is useful for builder and
-           other cases where Factor is run with stdin
-           redirected to /dev/null */
+        // If we exit with an EOF immediately, then
+        // dump stacks. This is useful for builder and
+        // other cases where Factor is run with stdin
+        // redirected to /dev/null
         fep_disabled = true;
 
         print_datastack(cout);

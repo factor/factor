@@ -52,9 +52,9 @@ struct compaction_fixup {
   }
 };
 
-/* After a compaction, invalidate any code heap roots which are not
-marked, and also slide the valid roots up so that call sites can be updated
-correctly in case an inline cache compilation triggered compaction. */
+// After a compaction, invalidate any code heap roots which are not
+// marked, and also slide the valid roots up so that call sites can be updated
+// correctly in case an inline cache compilation triggered compaction.
 void factor_vm::update_code_roots_for_compaction() {
 
   mark_bits* state = &code->allocator->state;
@@ -63,7 +63,7 @@ void factor_vm::update_code_roots_for_compaction() {
     code_root* root = *iter;
     cell block = root->value & (~data_alignment + 1);
 
-    /* Offset of return address within 16-byte allocation line */
+    // Offset of return address within 16-byte allocation line
     cell offset = root->value - block;
 
     if (root->valid && state->marked_p(block)) {
@@ -74,7 +74,7 @@ void factor_vm::update_code_roots_for_compaction() {
   }
 }
 
-/* Compact data and code heaps */
+// Compact data and code heaps
 void factor_vm::collect_compact_impl() {
   gc_event* event = current_gc->event;
 
@@ -89,7 +89,7 @@ void factor_vm::collect_compact_impl() {
   mark_bits* data_forwarding_map = &tenured->state;
   mark_bits* code_forwarding_map = &code->allocator->state;
 
-  /* Figure out where blocks are going to go */
+  // Figure out where blocks are going to go
   data_forwarding_map->compute_forwarding();
   code_forwarding_map->compute_forwarding();
 
@@ -103,11 +103,11 @@ void factor_vm::collect_compact_impl() {
 
     forwarder.visit_uninitialized_code_blocks();
 
-    /* Object start offsets get recomputed by the object_compaction_updater */
+    // Object start offsets get recomputed by the object_compaction_updater
     data->tenured->starts.clear_object_start_offsets();
 
-    /* Slide everything in tenured space up, and update data and code heap
-       pointers inside objects. */
+    // Slide everything in tenured space up, and update data and code heap
+    // pointers inside objects.
     auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
       forwarder.visit_slots(new_addr);
       forwarder.visit_object_code_block(new_addr);
@@ -115,8 +115,8 @@ void factor_vm::collect_compact_impl() {
     };
     tenured->compact(compact_object_func, fixup, &data_finger);
 
-    /* Slide everything in the code heap up, and update data and code heap
-       pointers inside code blocks. */
+    // Slide everything in the code heap up, and update data and code heap
+    // pointers inside code blocks.
     auto compact_code_func = [&](code_block* old_addr,
                                  code_block* new_addr,
                                  cell size) {
@@ -132,9 +132,9 @@ void factor_vm::collect_compact_impl() {
 
   update_code_roots_for_compaction();
 
-  /* Each callback has a relocation with a pointer to a code block in
-     the code heap. Since the code heap has now been compacted, those
-     pointers are invalid and we need to update them. */
+  // Each callback has a relocation with a pointer to a code block in
+  // the code heap. Since the code heap has now been compacted, those
+  // pointers are invalid and we need to update them.
   auto callback_updater = [&](code_block* stub, cell size) {
     callbacks->update(stub);
   };
@@ -151,7 +151,7 @@ void factor_vm::collect_compact() {
   collect_compact_impl();
 
   if (data->high_fragmentation_p()) {
-    /* Compaction did not free up enough memory. Grow the heap. */
+    // Compaction did not free up enough memory. Grow the heap.
     set_current_gc_op(collect_growing_heap_op);
     collect_growing_heap(0);
   }
@@ -160,7 +160,7 @@ void factor_vm::collect_compact() {
 }
 
 void factor_vm::collect_growing_heap(cell requested_size) {
-  /* Grow the data heap and copy all live objects to the new heap. */
+  // Grow the data heap and copy all live objects to the new heap.
   data_heap* old = data;
   set_data_heap(data->grow(&nursery, requested_size));
   collect_mark_impl();
