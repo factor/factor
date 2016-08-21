@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar colors.constants
 combinators combinators.short-circuit documents
-documents.elements fry grouping kernel locals make math
+documents.elements fry grouping kernel strings locals make math
 math.functions math.order math.ranges math.rectangles
 math.vectors models models.arrow namespaces opengl sequences
 sorting splitting timers ui.baseline-alignment ui.clipboards
