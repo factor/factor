@@ -77,7 +77,7 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
     else if (factor_arg(arg, STRING_LITERAL("-callbacks=%d"), &callback_size))
       ;
     else if (STRNCMP(arg, STRING_LITERAL("-i="), 3) == 0) {
-      /* In case you specify -i more than once. */
+      // In case you specify -i more than once.
       if (image_path) {
         free((vm_char *)image_path);
       }
@@ -231,8 +231,8 @@ FILE* factor_vm::open_image(vm_parameters* p) {
   return file;
 }
 
-/* Read an image file from disk, only done once during startup */
-/* This function also initializes the data and code heaps */
+// Read an image file from disk, only done once during startup
+// This function also initializes the data and code heaps
 void factor_vm::load_image(vm_parameters* p) {
   FILE* file = open_image(p);
   if (file == NULL) {
@@ -257,7 +257,7 @@ void factor_vm::load_image(vm_parameters* p) {
 
   raw_fclose(file);
 
-  /* Certain special objects in the image are known to the runtime */
+  // Certain special objects in the image are known to the runtime
   memcpy(special_objects, h.special_objects, sizeof(special_objects));
 
   cell data_offset = data->tenured->start - h.data_relocation_base;
@@ -265,9 +265,9 @@ void factor_vm::load_image(vm_parameters* p) {
   fixup_heaps(data_offset, code_offset);
 }
 
-/* Save the current image to disk. We don't throw any exceptions here
-   because if the 'then-die' argument is t it is not safe to do
-   so. Instead we signal failure by returning false. */
+// Save the current image to disk. We don't throw any exceptions here
+// because if the 'then-die' argument is t it is not safe to do
+// so. Instead we signal failure by returning false.
 bool factor_vm::save_image(const vm_char* saving_filename,
                            const vm_char* filename) {
   image_header h;
@@ -301,39 +301,39 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   return true;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_save_image() {
-  /* We unbox this before doing anything else. This is the only point
-     where we might throw an error, so we have to throw an error here since
-     later steps destroy the current image. */
+  // We unbox this before doing anything else. This is the only point
+  // where we might throw an error, so we have to throw an error here since
+  // later steps destroy the current image.
   bool then_die = to_boolean(ctx->pop());
   byte_array* path2 = untag_check<byte_array>(ctx->pop());
   byte_array* path1 = untag_check<byte_array>(ctx->pop());
 
-  /* Copy the paths to non-gc memory to avoid them hanging around in
-     the saved image. */
+  // Copy the paths to non-gc memory to avoid them hanging around in
+  // the saved image.
   vm_char* path1_saved = safe_strdup(path1->data<vm_char>());
   vm_char* path2_saved = safe_strdup(path2->data<vm_char>());
 
   if (then_die) {
-    /* strip out special_objects data which is set on startup anyway */
+    // strip out special_objects data which is set on startup anyway
     for (cell i = 0; i < special_object_count; i++)
       if (!save_special_p(i))
         special_objects[i] = false_object;
 
-    /* dont trace objects only reachable from context stacks so we don't
-       get volatile data saved in the image. */
+    // dont trace objects only reachable from context stacks so we don't
+    // get volatile data saved in the image.
     active_contexts.clear();
     code->uninitialized_blocks.clear();
 
-    /* I think clearing the callback heap should be fine too. */
+    // I think clearing the callback heap should be fine too.
     callbacks->allocator->initial_free_list(0);
   }
 
-  /* do a full GC to push everything remaining into tenured space */
+  // do a full GC to push everything remaining into tenured space
   primitive_compact_gc();
 
-  /* Save the image */
+  // Save the image
   bool ret = save_image(path1_saved, path2_saved);
   if (then_die) {
     exit(ret ? 0 : 1);

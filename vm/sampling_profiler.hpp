@@ -36,8 +36,8 @@ struct profiling_sample {
   profiling_sample_count counts;
   // Active thread during sample
   cell thread;
-  /* The callstack at safepoint time. Indexes to the beginning and ending
-     code_block entries in the vm sample_callstacks array. */
+  // The callstack at safepoint time. Indexes to the beginning and ending
+  // code_block entries in the vm sample_callstacks array.
   cell callstack_begin, callstack_end;
 
   profiling_sample(profiling_sample_count const& counts, cell thread,

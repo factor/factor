@@ -1,6 +1,6 @@
 namespace factor {
 
-/* Generated with PRIMITIVE in primitives.cpp */
+// Generated with PRIMITIVE in primitives.cpp
 
 #define EACH_PRIMITIVE(_)                                                      \
   _(alien_address) _(all_instances) _(array) _(array_to_quotation) _(become)   \

@@ -12,7 +12,7 @@ void early_init() {}
 #define SUFFIX ".image"
 #define SUFFIX_LEN 6
 
-/* You must free() the result yourself. */
+// You must free() the result yourself.
 const char* default_image_path() {
   const char* path = vm_executable_path();
 

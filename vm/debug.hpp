@@ -4,7 +4,7 @@ extern bool factor_print_p;
 
 #ifdef FACTOR_DEBUG
 
-/* To chop the directory path of the __FILE__ macro. */
+// To chop the directory path of the __FILE__ macro.
 inline const char* abbrev_path(const char* path) {
   const char* p1 = strrchr(path, '\\');
   const char* p2 = strrchr(path, '/');

@@ -34,7 +34,7 @@ void critical_error(const char* msg, cell tagged) {
   current_vm()->factorbug();
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
 
   data_root<object> arg1(arg1_, this);
@@ -42,38 +42,38 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
 
   faulting_p = true;
 
-  /* If we had an underflow or overflow, data or retain stack
-     pointers might be out of bounds, so fix them before allocating
-     anything */
+  // If we had an underflow or overflow, data or retain stack
+  // pointers might be out of bounds, so fix them before allocating
+  // anything
   ctx->fix_stacks();
 
-  /* If error was thrown during heap scan, we re-enable the GC */
+  // If error was thrown during heap scan, we re-enable the GC
   gc_off = false;
 
-  /* If the error handler is set, we rewind any C stack frames and
-     pass the error to user-space. */
+  // If the error handler is set, we rewind any C stack frames and
+  // pass the error to user-space.
   if (!current_gc && to_boolean(special_objects[ERROR_HANDLER_QUOT])) {
 #ifdef FACTOR_DEBUG
-    /* Doing a GC here triggers all kinds of funny errors */
+    // Doing a GC here triggers all kinds of funny errors
     primitive_compact_gc();
 #endif
 
-    /* Now its safe to allocate and GC */
+    // Now its safe to allocate and GC
     cell error_object =
         allot_array_4(tag_fixnum(KERNEL_ERROR), tag_fixnum(error),
                       arg1.value(), arg2.value());
     ctx->push(error_object);
 
-    /* Clear the data roots since arg1 and arg2's destructors won't be
-       called. */
+    // Clear the data roots since arg1 and arg2's destructors won't be
+    // called.
     data_roots.clear();
 
-    /* The unwind-native-frames subprimitive will clear faulting_p
-       if it was successfully reached. */
+    // The unwind-native-frames subprimitive will clear faulting_p
+    // if it was successfully reached.
     unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
                          ctx->callstack_top);
-  } /* Error was thrown in early startup before error handler is set, so just
-       crash. */
+  } // Error was thrown in early startup before error handler is set, so just
+    // crash.
   else {
     std::cout << "You have triggered a bug in Factor. Please report.\n";
     std::cout << "error: " << error << std::endl;
@@ -88,19 +88,19 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
   }
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::type_error(cell type, cell tagged) {
   general_error(ERROR_TYPE, tag_fixnum(type), tagged);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::not_implemented_error() {
   general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
 }
 
 void factor_vm::verify_memory_protection_error(cell addr) {
-  /* Called from the OS-specific top halves of the signal handlers to
-     make sure it's safe to dispatch to memory_signal_handler_impl. */
+  // Called from the OS-specific top halves of the signal handlers to
+  // make sure it's safe to dispatch to memory_signal_handler_impl.
   if (fatal_erroring_p)
     fa_diddly_atal_error();
   if (faulting_p && !code->safepoint_p(addr))
@@ -111,16 +111,16 @@ void factor_vm::verify_memory_protection_error(cell addr) {
     fatal_error("Memory protection fault during gc", addr);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::divide_by_zero_error() {
   general_error(ERROR_DIVIDE_BY_ZERO, false_object, false_object);
 }
 
-/* For testing purposes */
-/* Allocates memory */
+// For testing purposes
+// Allocates memory
 void factor_vm::primitive_unimplemented() { not_implemented_error(); }
 
-/* Allocates memory */
+// Allocates memory
 void memory_signal_handler_impl() {
   factor_vm* vm = current_vm();
   if (vm->code->safepoint_p(vm->signal_fault_addr)) {
@@ -132,13 +132,13 @@ void memory_signal_handler_impl() {
     vm->general_error(type, number, false_object);
   }
   if (!vm->signal_resumable) {
-    /* In theory we should only get here if the callstack overflowed during a
-       safepoint */
+    // In theory we should only get here if the callstack overflowed during a
+    // safepoint
     vm->general_error(ERROR_CALLSTACK_OVERFLOW, false_object, false_object);
   }
 }
 
-/* Allocates memory */
+// Allocates memory
 void synchronous_signal_handler_impl() {
   factor_vm* vm = current_vm();
   vm->general_error(ERROR_SIGNAL,
@@ -146,11 +146,11 @@ void synchronous_signal_handler_impl() {
                     false_object);
 }
 
-/* Allocates memory */
+// Allocates memory
 void fp_signal_handler_impl() {
   factor_vm* vm = current_vm();
 
-  /* Clear pending exceptions to avoid getting stuck in a loop */
+  // Clear pending exceptions to avoid getting stuck in a loop
   vm->set_fpu_state(vm->get_fpu_state());
 
   vm->general_error(ERROR_FP_TRAP,

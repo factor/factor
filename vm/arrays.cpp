@@ -2,7 +2,7 @@
 
 namespace factor {
 
-/* Allocates memory */
+// Allocates memory
 array* factor_vm::allot_array(cell capacity, cell fill_) {
   data_root<object> fill(fill_, this);
   array* new_array = allot_uninitialized_array<array>(capacity);
@@ -10,7 +10,7 @@ array* factor_vm::allot_array(cell capacity, cell fill_) {
   return new_array;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_array() {
   cell fill = ctx->pop();
   cell capacity = unbox_array_size();
@@ -18,7 +18,7 @@ void factor_vm::primitive_array() {
   ctx->push(tag<array>(new_array));
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_) {
   data_root<object> v1(v1_, this);
   data_root<object> v2(v2_, this);
@@ -32,7 +32,7 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_) {
   return a.value();
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_resize_array() {
   data_root<array> a(ctx->pop(), this);
   check_tagged(a);
@@ -40,7 +40,7 @@ void factor_vm::primitive_resize_array() {
   ctx->push(tag<array>(reallot_array(a.untagged(), capacity)));
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
 
   cell element_count = elements.size();
@@ -57,7 +57,7 @@ cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
   return objects.value();
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_array::add(cell elt_) {
   factor_vm* parent = elements.parent;
   data_root<object> elt(elt_, parent);
@@ -67,7 +67,7 @@ void growable_array::add(cell elt_) {
   parent->set_array_nth(elements.untagged(), count++, elt.value());
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_array::append(array* elts_) {
   factor_vm* parent = elements.parent;
   data_root<array> elts(elts_, parent);
@@ -82,7 +82,7 @@ void growable_array::append(array* elts_) {
                           array_nth(elts.untagged(), index));
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_array::trim() {
   factor_vm* parent = elements.parent;
   elements = parent->reallot_array(elements.untagged(), count);

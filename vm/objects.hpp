@@ -7,32 +7,32 @@ namespace factor {
 static const cell special_object_count = 85;
 
 enum special_object {
-  OBJ_WALKER_HOOK = 3, /* non-local exit hook, used by library only */
-  OBJ_CALLCC_1,        /* used to pass the value in callcc1 */
+  OBJ_WALKER_HOOK = 3, // non-local exit hook, used by library only
+  OBJ_CALLCC_1,        // used to pass the value in callcc1
 
-  ERROR_HANDLER_QUOT = 5, /* quotation called when VM throws an error */
+  ERROR_HANDLER_QUOT = 5, // quotation called when VM throws an error
 
-  OBJ_CELL_SIZE = 7, /* sizeof(cell) */
-  OBJ_CPU,           /* CPU architecture */
-  OBJ_OS,            /* operating system name */
+  OBJ_CELL_SIZE = 7, // sizeof(cell)
+  OBJ_CPU,           // CPU architecture
+  OBJ_OS,            // operating system name
 
-  OBJ_ARGS = 10, /* command line arguments */
-  OBJ_STDIN,     /* stdin FILE* handle */
-  OBJ_STDOUT,    /* stdout FILE* handle */
+  OBJ_ARGS = 10, // command line arguments
+  OBJ_STDIN,     // stdin FILE* handle
+  OBJ_STDOUT,    // stdout FILE* handle
 
-  OBJ_IMAGE = 13, /* image path name */
-  OBJ_EXECUTABLE, /* runtime executable path name */
+  OBJ_IMAGE = 13, // image path name
+  OBJ_EXECUTABLE, // runtime executable path name
 
-  OBJ_EMBEDDED = 15,  /* are we embedded in another app? */
-  OBJ_EVAL_CALLBACK,  /* used when Factor is embedded in a C app */
-  OBJ_YIELD_CALLBACK, /* used when Factor is embedded in a C app */
-  OBJ_SLEEP_CALLBACK, /* used when Factor is embedded in a C app */
+  OBJ_EMBEDDED = 15,  // are we embedded in another app?
+  OBJ_EVAL_CALLBACK,  // used when Factor is embedded in a C app
+  OBJ_YIELD_CALLBACK, // used when Factor is embedded in a C app
+  OBJ_SLEEP_CALLBACK, // used when Factor is embedded in a C app
 
-  OBJ_STARTUP_QUOT = 20, /* startup quotation */
-  OBJ_GLOBAL,            /* global namespace */
-  OBJ_SHUTDOWN_QUOT,     /* shutdown quotation */
+  OBJ_STARTUP_QUOT = 20, // startup quotation
+  OBJ_GLOBAL,            // global namespace
+  OBJ_SHUTDOWN_QUOT,     // shutdown quotation
 
-  /* Quotation compilation in quotations.cpp */
+  // Quotation compilation in quotations.cpp
   JIT_PROLOG = 23,
   JIT_PRIMITIVE_WORD,
   JIT_PRIMITIVE,
@@ -54,8 +54,8 @@ enum special_object {
   JIT_EXECUTE,
   JIT_DECLARE_WORD,
 
-  /* External entry points. These are defined in the files in
-     bootstrap/assembler/ */
+  // External entry points. These are defined in the files in
+  // bootstrap/assembler/
   C_TO_FACTOR_WORD = 43,
   LAZY_JIT_COMPILE_WORD,
   UNWIND_NATIVE_FRAMES_WORD,
@@ -66,14 +66,14 @@ enum special_object {
   WIN_EXCEPTION_HANDLER,
   UNUSED2,
 
-  /* Incremented on every modify-code-heap call; invalidates call( inline
-     caching */
+  // Incremented on every modify-code-heap call; invalidates call( inline
+  // caching
   REDEFINITION_COUNTER = 52,
 
-  /* Callback stub generation in callbacks.cpp */
+  // Callback stub generation in callbacks.cpp
   CALLBACK_STUB = 53,
 
-  /* Polymorphic inline cache generation in inline_cache.cpp */
+  // Polymorphic inline cache generation in inline_cache.cpp
   PIC_LOAD = 54,
   PIC_TAG,
   PIC_TUPLE,
@@ -83,16 +83,16 @@ enum special_object {
   PIC_MISS_WORD,
   PIC_MISS_TAIL_WORD,
 
-  /* Megamorphic cache generation in dispatch.cpp */
+  // Megamorphic cache generation in dispatch.cpp
   MEGA_LOOKUP = 62,
   MEGA_LOOKUP_WORD,
   MEGA_MISS_WORD,
 
-  OBJ_UNDEFINED = 65, /* default quotation for undefined words */
+  OBJ_UNDEFINED = 65, // default quotation for undefined words
 
-  OBJ_STDERR = 66, /* stderr FILE* handle */
+  OBJ_STDERR = 66, // stderr FILE* handle
 
-  OBJ_STAGE2 = 67, /* have we bootstrapped? */
+  OBJ_STAGE2 = 67, // have we bootstrapped?
 
   OBJ_CURRENT_THREAD = 68,
 
@@ -100,30 +100,30 @@ enum special_object {
   OBJ_RUN_QUEUE = 70,
   OBJ_SLEEP_QUEUE = 71,
 
-  OBJ_VM_COMPILER = 72, /* version string of the compiler we were built with */
+  OBJ_VM_COMPILER = 72, // version string of the compiler we were built with
 
   OBJ_WAITING_CALLBACKS = 73,
 
-  OBJ_SIGNAL_PIPE = 74, /* file descriptor for pipe used to communicate signals
-                           only used on unix */
-  OBJ_VM_COMPILE_TIME = 75, /* when the binary was built */
-  OBJ_VM_VERSION = 76, /* factor version */
-  OBJ_VM_GIT_LABEL = 77, /* git label (git describe --all --long) */
+  OBJ_SIGNAL_PIPE = 74, // file descriptor for pipe used to communicate signals
+                        //  only used on unix
+  OBJ_VM_COMPILE_TIME = 75, // when the binary was built
+  OBJ_VM_VERSION = 76, // factor version
+  OBJ_VM_GIT_LABEL = 77, // git label (git describe --all --long)
 
-  /* Canonical truth value. In Factor, 't' */
+  // Canonical truth value. In Factor, 't'
   OBJ_CANONICAL_TRUE = 78,
 
-  /* Canonical bignums. These needs to be kept in the image in case
-     some heap objects refer to them. */
+  // Canonical bignums. These needs to be kept in the image in case
+  // some heap objects refer to them.
   OBJ_BIGNUM_ZERO,
   OBJ_BIGNUM_POS_ONE,
   OBJ_BIGNUM_NEG_ONE = 81,
 };
 
-/* save-image-and-exit discards special objects that are filled in on startup
-   anyway, to reduce image size */
+// save-image-and-exit discards special objects that are filled in on startup
+// anyway, to reduce image size
 inline static bool save_special_p(cell i) {
-  /* Need to fix the order here. */
+  // Need to fix the order here.
   return (i >= OBJ_STARTUP_QUOT && i <= LEAF_SIGNAL_HANDLER_WORD) ||
       (i >= REDEFINITION_COUNTER && i <= OBJ_UNDEFINED) ||
       i == OBJ_STAGE2 ||

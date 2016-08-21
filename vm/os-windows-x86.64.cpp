@@ -26,19 +26,19 @@ struct seh_data {
 };
 
 void factor_vm::c_to_factor_toplevel(cell quot) {
-  /* The annoying thing about Win64 SEH is that the offsets in
-   * function tables are 32-bit integers, and the exception handler
-   * itself must reside between the start and end pointers, so
-   * we stick everything at the beginning of the code heap and
-   * generate a small trampoline that jumps to the real
-   * exception handler. */
+  // The annoying thing about Win64 SEH is that the offsets in
+  // function tables are 32-bit integers, and the exception handler
+  // itself must reside between the start and end pointers, so
+  // we stick everything at the beginning of the code heap and
+  // generate a small trampoline that jumps to the real
+  // exception handler.
 
   seh_data* seh_area = (seh_data*)code->seh_area;
   cell base = code->seg->start;
 
-  /* Should look at generating this with the Factor assembler */
+  // Should look at generating this with the Factor assembler
 
-  /* mov rax,0 */
+  // mov rax,0
   seh_area->handler[0] = 0x48;
   seh_area->handler[1] = 0xb8;
   seh_area->handler[2] = 0x0;
@@ -50,12 +50,12 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   seh_area->handler[8] = 0x0;
   seh_area->handler[9] = 0x0;
 
-  /* jmp rax */
+  // jmp rax
   seh_area->handler[10] = 0x48;
   seh_area->handler[11] = 0xff;
   seh_area->handler[12] = 0xe0;
 
-  /* Store address of exception handler in the operand of the 'mov' */
+  // Store address of exception handler in the operand of the 'mov'
   cell handler = (cell)&factor::exception_handler;
   memcpy(&seh_area->handler[2], &handler, sizeof(cell));
 

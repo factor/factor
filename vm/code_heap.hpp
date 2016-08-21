@@ -7,29 +7,29 @@ const cell seh_area_size = 0;
 #endif
 
 struct code_heap {
-  /* The actual memory area */
+  // The actual memory area
   segment* seg;
 
-  /* Memory area reserved for safepoint guard page */
+  // Memory area reserved for safepoint guard page
   cell safepoint_page;
 
-  /* Memory area reserved for SEH. Only used on Windows */
+  // Memory area reserved for SEH. Only used on Windows
   char* seh_area;
 
-  /* Memory allocator */
+  // Memory allocator
   free_list_allocator<code_block>* allocator;
 
   std::set<cell> all_blocks;
 
-  /* Keys are blocks which need to be initialized by initialize_code_block().
-     Values are literal tables. Literal table arrays are GC roots until the
-     time the block is initialized, after which point they are discarded. */
+  // Keys are blocks which need to be initialized by initialize_code_block().
+  // Values are literal tables. Literal table arrays are GC roots until the
+  // time the block is initialized, after which point they are discarded.
   std::map<code_block*, cell> uninitialized_blocks;
 
-  /* Code blocks which may reference objects in the nursery */
+  // Code blocks which may reference objects in the nursery
   std::set<code_block*> points_to_nursery;
 
-  /* Code blocks which may reference objects in aging space or the nursery */
+  // Code blocks which may reference objects in aging space or the nursery
   std::set<code_block*> points_to_aging;
 
   explicit code_heap(cell size);

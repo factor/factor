@@ -3,7 +3,7 @@
 namespace factor {
 
 void factor_vm::collect_to_tenured() {
-  /* Copy live objects from aging space to tenured space. */
+  // Copy live objects from aging space to tenured space.
   gc_workhorse<tenured_space, to_tenured_policy>
       workhorse(this, data->tenured, to_tenured_policy(this));
   slot_visitor<gc_workhorse<tenured_space, to_tenured_policy>>
