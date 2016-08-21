@@ -6,7 +6,7 @@ documents.elements fry grouping kernel locals make math
 math.functions math.order math.ranges math.rectangles
 math.vectors models models.arrow namespaces opengl sequences
 sorting splitting timers ui.baseline-alignment ui.clipboards
-ui.commands ui.gadgets ui.gadgets.borders
+ui.commands ui.gadgets ui.gadgets.borders strings
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 ui.theme ui.gestures ui.pens.solid ui.render ui.text
 unicode ;
@@ -212,6 +212,36 @@ M: editor draw-gadget*
     dup compute-selection selected-lines [
         [ draw-lines ] [ draw-caret ] bi
     ] with-variable ;
+
+<PRIVATE
+
+: row,col-dim ( font r c -- dim )
+    CHAR: x <string> swap
+    CHAR: \n <string>
+    append text-dim ;
+
+: min-dim ( font editor -- dim )
+    [ min-rows>> [ 0 ] unless* ]
+    [ min-cols>> [ 0 ] unless* ] bi
+    row,col-dim ;
+    
+: max-dim ( font editor -- dim )
+    ! hopefully no one goes over 5000
+    [ max-rows>> [ 5000 ] unless* ]
+    [ max-cols>> [ 5000 ] unless* ] bi
+    row,col-dim ;
+    
+: txt-dim ( font editor -- dim )
+    control-value text-dim ;
+    
+PRIVATE>
+
+: editor-constrained-dim ( editor -- dim )
+    [ font>> ] keep
+    [ max-dim ]
+    [ txt-dim ]
+    [ min-dim ] 
+    2tri vmax vmin { 1 0 } v+ ;
 
 M: editor pref-dim*
     ! Add some space for the caret.
