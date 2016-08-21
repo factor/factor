@@ -213,9 +213,24 @@ M: editor draw-gadget*
         [ draw-lines ] [ draw-caret ] bi
     ] with-variable ;
 
+: dim-by-minmax ( editor -- dim ) 
+    [ font>> ] keep
+        [ dup max-rows>> "" resize-string [ drop CHAR: \n ] map
+            swap max-cols>> "" resize-string [ drop CHAR: x ] map append text-dim ]
+        [ control-value text-dim ]
+        [ dup min-rows>> "" resize-string [ drop CHAR: \n ] map
+            swap min-cols>> "" resize-string [ drop CHAR: x ] map append text-dim ]
+    2tri vmax vmin { 1 0 } v+ ;
+
+: dim-by-text ( editor -- dim )
+    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
+
 M: editor pref-dim*
     ! Add some space for the caret.
-    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
+    dup { [ min-cols>> ] [ min-rows>> ] [ max-cols>> ] [ max-rows>> ] } cleave and and and
+    [ dim-by-minmax ]
+    [ dim-by-text ]
+    if ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 
