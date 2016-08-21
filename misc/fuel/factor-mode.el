@@ -215,7 +215,6 @@ these lines in your .emacs:
   '(":" "::" ";" ":>" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "ARTICLE:"
     "B"
-    "COLOR:"
     "CONSULT:" "call-next-method"
     "EBNF:" ";EBNF"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
@@ -456,7 +455,7 @@ these lines in your .emacs:
     ,(factor-syntax factor-word-definition-regex '("P" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("LOG")) '("P" "W" ""))
-    ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
+    ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "COLOR" "NAN" "HEXCOLOR")) '("P" "CT"))
     ,(factor-syntax factor-types-lines-regex '("P" "T"))
 
     (,factor-float-regex . 'factor-font-lock-number)
