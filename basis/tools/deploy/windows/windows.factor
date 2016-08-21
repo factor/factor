@@ -33,7 +33,7 @@ M: windows deploy*
         [ drop embed-ico ]
         [ drop deployed-image-name ]
         [ drop namespace make-deploy-image-executable ]
-        [ nip "resource:" [ copy-resources ] [ copy-libraries ] 3bi ]
+        [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
         [ nip open-directory-after-deploy? get [ open-file ] [ drop ] if ]
     } 2cleave ;
 
