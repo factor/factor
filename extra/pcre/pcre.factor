@@ -14,7 +14,7 @@ ERROR: malformed-regexp expr error ;
 ERROR: pcre-error value ;
 
 : version ( -- f )
-    pcre_version " " splitting:split1 drop string>number ;
+    pcre_version " -" splitting:split first string>number ;
 
 <PRIVATE
 
