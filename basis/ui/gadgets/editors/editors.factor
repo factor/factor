@@ -213,24 +213,37 @@ M: editor draw-gadget*
         [ draw-lines ] [ draw-caret ] bi
     ] with-variable ;
 
-: dim-by-minmax ( editor -- dim ) 
-    [ font>> ] keep
-        [ dup max-rows>> "" resize-string [ drop CHAR: \n ] map
-            swap max-cols>> "" resize-string [ drop CHAR: x ] map append text-dim ]
-        [ control-value text-dim ]
-        [ dup min-rows>> "" resize-string [ drop CHAR: \n ] map
-            swap min-cols>> "" resize-string [ drop CHAR: x ] map append text-dim ]
-    2tri vmax vmin { 1 0 } v+ ;
+<PRIVATE
 
-: dim-by-text ( editor -- dim )
-    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
+: row,col-dim ( font r c -- dim )
+    "" resize-string [ drop CHAR: x ] map
+    swap "" resize-string [ drop CHAR: \n ] map 
+    append text-dim ;
+
+: min-dim ( font editor -- dim )
+    [ min-rows>> 0 [ and ] most ]
+    [ min-cols>> 0 [ and ] most ] bi
+    row,col-dim ;
+    
+: max-dim ( font editor -- dim )
+    ! hopefully no one goes over 5000
+    [ max-rows>> 5000 [ and ] most ]
+    [ max-cols>> 5000 [ and ] most ] bi
+    row,col-dim ;
+    
+: txt-dim ( font editor -- dim )
+    control-value text-dim ;
+    
+PRIVATE>
 
 M: editor pref-dim*
     ! Add some space for the caret.
-    dup { [ min-cols>> ] [ min-rows>> ] [ max-cols>> ] [ max-rows>> ] } cleave and and and
-    [ dim-by-minmax ]
-    [ dim-by-text ]
-    if ;
+    ! Now respects min/max-row/col parameters
+    [ font>> ] keep
+    [ max-dim ]
+    [ txt-dim ]
+    [ min-dim ] 
+    2tri vmax vmin { 1 0 } v+ ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 
