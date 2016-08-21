@@ -36,8 +36,8 @@ void factor_vm::record_sample(bool prolog_p) {
   if (counts.empty()) {
     return;
   }
-  /* Appends the callstack, which is just a sequence of quotation or
-     word references, to sample_callstacks. */
+  // Appends the callstack, which is just a sequence of quotation or
+  // word references, to sample_callstacks.
   cell begin = sample_callstacks.size();
 
   bool skip_p = prolog_p;
@@ -51,7 +51,7 @@ void factor_vm::record_sample(bool prolog_p) {
   cell end = sample_callstacks.size();
   std::reverse(sample_callstacks.begin() + begin, sample_callstacks.end());
 
-  /* Add the sample. */
+  // Add the sample.
   cell thread = special_objects[OBJ_CURRENT_THREAD];
   samples.push_back(profiling_sample(counts, thread, begin, end));
 }
@@ -89,7 +89,7 @@ void factor_vm::primitive_sampling_profiler() {
   set_sampling_profiler(to_fixnum(ctx->pop()));
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_get_samples() {
   if (atomic::load(&sampling_profiler_p) || samples.empty()) {
     ctx->push(false_object);

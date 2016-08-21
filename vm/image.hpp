@@ -13,13 +13,13 @@ struct embedded_image_footer {
 struct image_header {
   cell magic;
   cell version;
-  /* base address of data heap when image was saved */
+  // base address of data heap when image was saved
   cell data_relocation_base;
-  /* size of heap */
+  // size of heap
   cell data_size;
-  /* base address of code heap when image was saved */
+  // base address of code heap when image was saved
   cell code_relocation_base;
-  /* size of code heap */
+  // size of code heap
   cell code_size;
 
   cell reserved_1;
@@ -27,7 +27,7 @@ struct image_header {
   cell reserved_3;
   cell reserved_4;
 
-  /* Initial user environment */
+  // Initial user environment
   cell special_objects[special_object_count];
 };
 

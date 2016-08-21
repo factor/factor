@@ -19,11 +19,10 @@ struct aging_policy {
 };
 
 void factor_vm::collect_aging() {
-  /* Promote objects referenced from tenured space to tenured space, copy
-     everything else to the aging semi-space, and reset the nursery pointer. */
+  // Promote objects referenced from tenured space to tenured space, copy
+  // everything else to the aging semi-space, and reset the nursery pointer.
   {
-    /* Change the op so that if we fail here, an assertion will be
-       raised. */
+    // Change the op so that if we fail here, an assertion will be raised.
     current_gc->op = collect_to_tenured_op;
 
     gc_workhorse<tenured_space, to_tenured_policy>
@@ -48,7 +47,7 @@ void factor_vm::collect_aging() {
     visitor.visit_mark_stack(&mark_stack);
   }
   {
-    /* If collection fails here, do a to_tenured collection. */
+    // If collection fails here, do a to_tenured collection.
     current_gc->op = collect_aging_op;
 
     std::swap(data->aging, data->aging_semispace);

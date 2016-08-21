@@ -55,7 +55,7 @@ BOOL factor_vm::windows_stat(vm_char* path) {
   return ret;
 }
 
-/* You must free() this yourself. */
+// You must free() this yourself.
 const vm_char* factor_vm::default_image_path() {
   vm_char full_path[MAX_UNICODE_PATH];
   vm_char* ptr;
@@ -76,7 +76,7 @@ const vm_char* factor_vm::default_image_path() {
   return safe_strdup(temp_path);
 }
 
-/* You must free() this yourself. */
+// You must free() this yourself.
 const vm_char* factor_vm::vm_executable_path() {
   vm_char full_path[MAX_UNICODE_PATH];
   if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
@@ -126,13 +126,13 @@ long getpagesize() {
 
 
 bool move_file(const vm_char* path1, const vm_char* path2) {
-  /* MoveFileEx returns FALSE on fail. */
+  // MoveFileEx returns FALSE on fail.
   BOOL val = MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
   if (val == FALSE) {
-    /* MoveFileEx doesn't set errno, which primitive_save_image()
-       reads the error code from. Instead of converting from
-       GetLastError() to errno values, we ust set it to the generic
-       EIO value. */
+    // MoveFileEx doesn't set errno, which primitive_save_image()
+    // reads the error code from. Instead of converting from
+    // GetLastError() to errno values, we ust set it to the generic
+    // EIO value.
     errno = EIO;
   }
   return val == TRUE;
@@ -173,8 +173,8 @@ uint64_t nano_count() {
 #ifdef FACTOR_64
   hi = count.HighPart;
 #else
-  /* On VirtualBox, QueryPerformanceCounter does not increment
-	the high part every time the low part overflows.  Workaround. */
+  // On VirtualBox, QueryPerformanceCounter does not increment
+  // the high part every time the low part overflows.  Workaround.
   if (lo > count.LowPart)
     hi++;
 #endif
@@ -217,7 +217,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 #else
       signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
 
-      /* This seems to have no effect */
+      // This seems to have no effect
       X87SW(c) = 0;
 #endif
       MXCSR(c) &= 0xffffffc0;
@@ -241,9 +241,9 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
   return vm->exception_handler(e, frame, c, dispatch);
 }
 
-/* On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
-   calls. It doesn't on Windows, so we need to manually send some
-   cancellation requests to unblock the thread. */
+// On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
+// calls. It doesn't on Windows, so we need to manually send some
+// cancellation requests to unblock the thread.
 VOID CALLBACK dummy_cb (ULONG_PTR dwParam) { }
 
 // CancelSynchronousIo is not in Windows XP
@@ -251,8 +251,8 @@ VOID CALLBACK dummy_cb (ULONG_PTR dwParam) { }
 static void wake_up_thread(HANDLE thread) {
   if (!CancelSynchronousIo(thread)) {
     DWORD err = GetLastError();
-    /* CancelSynchronousIo() didn't find anything to cancel, let's try
-       with QueueUserAPC() instead. */
+    // CancelSynchronousIo() didn't find anything to cancel, let's try
+    // with QueueUserAPC() instead.
     if (err == ERROR_NOT_FOUND) {
       if (!QueueUserAPC(&dummy_cb, thread, NULL)) {
         fatal_error("QueueUserAPC() failed", GetLastError());
@@ -269,16 +269,15 @@ static void wake_up_thread(HANDLE thread) {}
 static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
   switch (dwCtrlType) {
     case CTRL_C_EVENT: {
-      /* The CtrlHandler runs in its own thread without stopping the main
-         thread. Since in practice nobody uses the multi-VM stuff yet, we just
-         grab the first VM we can get. This will not be a good idea when we
-         actually support native threads. */
+      // The CtrlHandler runs in its own thread without stopping the main
+      // thread. Since in practice nobody uses the multi-VM stuff yet, we just
+      // grab the first VM we can get. This will not be a good idea when we
+      // actually support native threads.
       FACTOR_ASSERT(thread_vms.size() == 1);
       factor_vm* vm = thread_vms.begin()->second;
       vm->enqueue_fep();
 
-      /* Before leaving the ctrl_handler, try and wake up the main
-         thread. */
+      // Before leaving the ctrl_handler, try and wake up the main thread.
       wake_up_thread(factor::boot_thread);
       return TRUE;
     }

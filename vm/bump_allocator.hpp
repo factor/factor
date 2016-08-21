@@ -1,7 +1,7 @@
 namespace factor {
 
 struct bump_allocator {
-  /* offset of 'here' and 'end' is hardcoded in compiler backends */
+  // offset of 'here' and 'end' is hardcoded in compiler backends
   cell here;
   cell start;
   cell end;
@@ -27,9 +27,9 @@ struct bump_allocator {
   void flush() {
     here = start;
 #ifdef FACTOR_DEBUG
-    /* In case of bugs, there may be bogus references pointing to the
-       memory space after the gc has run. Filling it with a pattern
-       makes accesses to such shadow data fail hard. */
+    // In case of bugs, there may be bogus references pointing to the
+    // memory space after the gc has run. Filling it with a pattern
+    // makes accesses to such shadow data fail hard.
     memset_cell((void*)start, 0xbaadbaad, size);
 #endif
   }

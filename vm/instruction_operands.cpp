@@ -9,7 +9,7 @@ instruction_operand::instruction_operand(relocation_entry rel,
       index(index),
       pointer(compiled->entry_point() + rel.offset()) {}
 
-/* Load a 32-bit value from a PowerPC LIS/ORI sequence */
+// Load a 32-bit value from a PowerPC LIS/ORI sequence
 fixnum instruction_operand::load_value_2_2() {
   uint32_t* ptr = (uint32_t*)pointer;
   cell hi = (ptr[-2] & 0xffff);
@@ -17,7 +17,7 @@ fixnum instruction_operand::load_value_2_2() {
   return hi << 16 | lo;
 }
 
-/* Load a 64-bit value from a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
+// Load a 64-bit value from a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence
 fixnum instruction_operand::load_value_2_2_2_2() {
   uint32_t* ptr = (uint32_t*)pointer;
   uint64_t hhi = (ptr[-5] & 0xffff);
@@ -28,7 +28,7 @@ fixnum instruction_operand::load_value_2_2_2_2() {
   return (cell)val;
 }
 
-/* Load a value from a bitfield of a PowerPC instruction */
+// Load a value from a bitfield of a PowerPC instruction
 fixnum instruction_operand::load_value_masked(cell mask, cell bits,
                                               cell shift) {
   int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
@@ -77,14 +77,14 @@ code_block* instruction_operand::load_code_block() {
   return ((code_block*)load_value(pointer) - 1);
 }
 
-/* Store a 32-bit value into a PowerPC LIS/ORI sequence */
+// Store a 32-bit value into a PowerPC LIS/ORI sequence
 void instruction_operand::store_value_2_2(fixnum value) {
   uint32_t* ptr = (uint32_t*)pointer;
   ptr[-2] = ((ptr[-2] & ~0xffff) | ((value >> 16) & 0xffff));
   ptr[-1] = ((ptr[-1] & ~0xffff) | (value & 0xffff));
 }
 
-/* Store a 64-bit value into a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
+// Store a 64-bit value into a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence
 void instruction_operand::store_value_2_2_2_2(fixnum value) {
   uint64_t val = value;
   uint32_t* ptr = (uint32_t*)pointer;
@@ -94,7 +94,7 @@ void instruction_operand::store_value_2_2_2_2(fixnum value) {
   ptr[-1] = ((ptr[-1] & ~0xffff) | ((val >> 0) & 0xffff));
 }
 
-/* Store a value into a bitfield of a PowerPC instruction */
+// Store a value into a bitfield of a PowerPC instruction
 void instruction_operand::store_value_masked(fixnum value, cell mask,
                                              cell shift) {
   uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));

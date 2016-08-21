@@ -32,22 +32,22 @@ void free_list::add_to_free_list(free_heap_block* block) {
 }
 
 free_heap_block* free_list::find_free_block(cell size) {
-  /* Check small free lists */
+  // Check small free lists
   cell bucket = size / data_alignment;
   if (bucket < free_list_count) {
     std::vector<free_heap_block*>& blocks = small_blocks[bucket];
     if (blocks.size() == 0) {
-      /* Round up to a multiple of 'size' */
+      // Round up to a multiple of 'size'
       cell large_block_size = ((allocation_page_size + size - 1) / size) * size;
 
-      /* Allocate a block this big */
+      // Allocate a block this big
       free_heap_block* large_block = find_free_block(large_block_size);
       if (!large_block)
         return NULL;
 
       large_block = split_free_block(large_block, large_block_size);
 
-      /* Split it up into pieces and add each piece back to the free list */
+      // Split it up into pieces and add each piece back to the free list
       for (cell offset = 0; offset < large_block_size; offset += size) {
         free_heap_block* small_block = large_block;
         large_block = (free_heap_block*)((cell)large_block + size);
@@ -64,7 +64,7 @@ free_heap_block* free_list::find_free_block(cell size) {
 
     return block;
   } else {
-    /* Check large free list */
+    // Check large free list
     free_heap_block key;
     key.make_free(size);
     large_block_set::iterator iter = large_blocks.lower_bound(&key);
@@ -87,7 +87,7 @@ free_heap_block* free_list::find_free_block(cell size) {
 free_heap_block* free_list::split_free_block(free_heap_block* block,
                                              cell size) {
   if (block->size() != size) {
-    /* split the block in two */
+    // split the block in two
     free_heap_block* split = (free_heap_block*)((cell)block + size);
     split->make_free(block->size() - size);
     block->make_free(size);

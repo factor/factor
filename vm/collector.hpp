@@ -25,7 +25,7 @@ struct gc_workhorse : no_fixup {
       return obj;
     }
 
-    /* is there another forwarding pointer? */
+    // is there another forwarding pointer?
     while (obj->forwarding_pointer_p()) {
       object* dest = obj->forwarding_pointer();
       obj = dest;

@@ -49,10 +49,10 @@ void callback_heap::update(code_block* stub) {
 }
 
 code_block* callback_heap::add(cell owner, cell return_rewind) {
-  /* code_template is a 2-tuple where the first element contains the
-     relocations and the second a byte array of compiled assembly
-     code. The code assumes that there are four relocations on x86 and
-     three on ppc. */
+  // code_template is a 2-tuple where the first element contains the
+  // relocations and the second a byte array of compiled assembly
+  // code. The code assumes that there are four relocations on x86 and
+  // three on ppc.
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   tagged<byte_array> insns(array_nth(code_template.untagged(), 1));
   cell size = array_capacity(insns.untagged());
@@ -71,12 +71,12 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   memcpy((void*)stub->entry_point(), insns->data<void>(), size);
 
-  /* Store VM pointer in two relocations. */
+  // Store VM pointer in two relocations.
   store_callback_operand(stub, 0, (cell)parent);
   store_callback_operand(stub, 2, (cell)parent);
 
-  /* On x86, the RET instruction takes an argument which depends on
-     the callback's calling convention */
+  // On x86, the RET instruction takes an argument which depends on
+  // the callback's calling convention
   if (return_takes_param_p())
     store_callback_operand(stub, 3, return_rewind);
 
@@ -84,7 +84,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   return stub;
 }
 
-/* Allocates memory (add(), allot_alien())*/
+// Allocates memory (add(), allot_alien())
 void factor_vm::primitive_callback() {
   cell return_rewind = to_cell(ctx->pop());
   tagged<word> w(ctx->pop());
@@ -101,7 +101,7 @@ void factor_vm::primitive_free_callback() {
   callbacks->allocator->free(stub);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_callback_room() {
   allocator_room room = callbacks->allocator->as_allocator_room();
   ctx->push(tag<byte_array>(byte_array_from_value(&room)));

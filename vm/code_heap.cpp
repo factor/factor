@@ -13,7 +13,7 @@ code_heap::code_heap(cell size) {
 
   allocator = new free_list_allocator<code_block>(seg->end - start, start);
 
-  /* See os-windows-x86.64.cpp for seh_area usage */
+  // See os-windows-x86.64.cpp for seh_area usage
   safepoint_page = seg->start;
   seh_area = (char*)seg->start + getpagesize();
 }
@@ -82,10 +82,11 @@ code_block* code_heap::code_block_for_address(cell address) {
   --blocki;
   code_block* found_block = (code_block*)*blocki;
   FACTOR_ASSERT(found_block->entry_point() <=
-                address /* XXX this isn't valid during fixup. should store the
-                               size in the map
-                              && address - found_block->entry_point() <
-                                 found_block->size()*/);
+                address // XXX this isn't valid during fixup. should store the
+                        //     size in the map
+                        //    && address - found_block->entry_point() <
+                        //       found_block->size()
+                );
   return found_block;
 }
 
@@ -97,7 +98,7 @@ cell code_heap::frame_predecessor(cell frame_top) {
   return frame_top + frame_size;
 }
 
-/* Recomputes the all_blocks set of code blocks */
+// Recomputes the all_blocks set of code blocks
 void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
   auto all_blocks_set_inserter = [&](code_block* block, cell size) {
@@ -109,9 +110,9 @@ void code_heap::initialize_all_blocks_set() {
 #endif
 }
 
-/* Update pointers to words referenced from all code blocks.
-   Only needed after redefining an existing word.
-   If generic words were redefined, inline caches need to be reset. */
+// Update pointers to words referenced from all code blocks.
+// Only needed after redefining an existing word.
+// If generic words were redefined, inline caches need to be reset.
 void factor_vm::update_code_heap_words(bool reset_inline_caches) {
   auto word_updater = [&](code_block* block, cell size) {
     update_word_references(block, reset_inline_caches);
@@ -119,8 +120,8 @@ void factor_vm::update_code_heap_words(bool reset_inline_caches) {
   each_code_block(word_updater);
 }
 
-/* Fix up new words only.
-Fast path for compilation units that only define new words. */
+// Fix up new words only.
+// Fast path for compilation units that only define new words.
 void factor_vm::initialize_code_blocks() {
 
   FACTOR_FOR_EACH(code->uninitialized_blocks) {
@@ -129,7 +130,7 @@ void factor_vm::initialize_code_blocks() {
   code->uninitialized_blocks.clear();
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_modify_code_heap() {
   bool reset_inline_caches = to_boolean(ctx->pop());
   bool update_existing_words = to_boolean(ctx->pop());
@@ -177,7 +178,7 @@ void factor_vm::primitive_modify_code_heap() {
     initialize_code_blocks();
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_code_room() {
   allocator_room room = code->allocator->as_allocator_room();
   ctx->push(tag<byte_array>(byte_array_from_value(&room)));
@@ -190,7 +191,7 @@ void factor_vm::primitive_strip_stack_traces() {
   each_code_block(stack_trace_stripper);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_code_blocks() {
   std::vector<cell> objects;
   auto code_block_accumulator = [&](code_block* block, cell size) {
@@ -201,12 +202,12 @@ void factor_vm::primitive_code_blocks() {
     objects.push_back(tag_fixnum(block->type()));
     objects.push_back(tag_fixnum(block->size()));
 
-    /* Note: the entry point is always a multiple of the heap
-       alignment (16 bytes). We cannot allocate while iterating
-       through the code heap, so it is not possible to call
-       from_unsigned_cell() here. It is OK, however, to add it as
-       if it were a fixnum, and have library code shift it to the
-       left by 4. */
+    // Note: the entry point is always a multiple of the heap
+    // alignment (16 bytes). We cannot allocate while iterating
+    // through the code heap, so it is not possible to call
+    // from_unsigned_cell() here. It is OK, however, to add it as
+    // if it were a fixnum, and have library code shift it to the
+    // left by 4.
     cell entry_point = block->entry_point();
     FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
     FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);

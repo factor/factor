@@ -18,8 +18,8 @@ struct nursery_policy {
 
 void factor_vm::collect_nursery() {
 
-  /* Copy live objects from the nursery (as determined by the root set and
-     marked cards in aging and tenured) to aging space. */
+  // Copy live objects from the nursery (as determined by the root set and
+  // marked cards in aging and tenured) to aging space.
   gc_workhorse<aging_space, nursery_policy>
       workhorse(this, data->aging, nursery_policy(data->nursery));
   slot_visitor<gc_workhorse<aging_space, nursery_policy>>

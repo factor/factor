@@ -4,8 +4,8 @@ namespace factor {
 
 void init_globals() { init_mvm(); }
 
-/* Compile code in boot image so that we can execute the startup quotation */
-/* Allocates memory */
+// Compile code in boot image so that we can execute the startup quotation
+// Allocates memory
 void factor_vm::prepare_boot_image() {
   std::cout << "*** Stage 2 early init... " << std::flush;
 
@@ -38,22 +38,22 @@ void factor_vm::prepare_boot_image() {
 }
 
 void factor_vm::init_factor(vm_parameters* p) {
-  /* Kilobytes */
+  // Kilobytes
   p->datastack_size = align_page(p->datastack_size << 10);
   p->retainstack_size = align_page(p->retainstack_size << 10);
   p->callstack_size = align_page(p->callstack_size << 10);
   p->callback_size = align_page(p->callback_size << 10);
 
-  /* Megabytes */
+  // Megabytes
   p->young_size <<= 20;
   p->aging_size <<= 20;
   p->tenured_size <<= 20;
   p->code_size <<= 20;
 
-  /* Disable GC during init as a sanity check */
+  // Disable GC during init as a sanity check
   gc_off = true;
 
-  /* OS-specific initialization */
+  // OS-specific initialization
   early_init();
 
   p->executable_path = vm_executable_path();
@@ -96,7 +96,7 @@ void factor_vm::init_factor(vm_parameters* p) {
     special_objects[idx] = allot_alien(false_object, aliens[n][1]);
   }
 
-  /* We can GC now */
+  // We can GC now
   gc_off = false;
 
   if (!to_boolean(special_objects[OBJ_STAGE2]))
@@ -110,7 +110,7 @@ void factor_vm::init_factor(vm_parameters* p) {
 
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::pass_args_to_factor(int argc, vm_char** argv) {
   growable_array args(this);
 
