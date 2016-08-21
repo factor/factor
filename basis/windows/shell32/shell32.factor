@@ -78,10 +78,18 @@ CONSTANT: SHGFP_TYPE_DEFAULT 1
 
 LIBRARY: shell32
 
-FUNCTION: HRESULT SHGetFolderPathW ( HWND hwndOwner, int nFolder, HANDLE hToken, DWORD dwReserved, LPTSTR pszPath )
+FUNCTION: HRESULT SHGetFolderPathW ( HWND hwndOwner,
+                                     int nFolder,
+                                     HANDLE hToken,
+                                     DWORD dwReserved,
+                                     LPTSTR pszPath )
 ALIAS: SHGetFolderPath SHGetFolderPathW
 
-FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, INT nShowCmd )
+FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd,
+                                    LPCTSTR lpOperation,
+                                    LPCTSTR lpFile,
+                                    LPCTSTR lpParameters,
+                                    LPCTSTR lpDirectory, INT nShowCmd )
 ALIAS: ShellExecute ShellExecuteW
 
 CONSTANT: SHGFI_ICON 0x000000100
@@ -110,13 +118,11 @@ STRUCT: SHFILEINFO
     { szDisplayName TCHAR[MAX_PATH] }
     { szTypeName TCHAR[80] } ;
 
-FUNCTION: DWORD_PTR SHGetFileInfoW (
-    LPCTSTR pszPath,
-    DWORD dwFileAttributes,
-    SHFILEINFO *psfi,
-    UINT cbFileInfo,
-    UINT uFlags
-)
+FUNCTION: DWORD_PTR SHGetFileInfoW ( LPCTSTR pszPath,
+                                     DWORD dwFileAttributes,
+                                     SHFILEINFO *psfi,
+                                     UINT cbFileInfo,
+                                     UINT uFlags )
 
 : shell32-file-info ( path -- err struct )
     normalize-path
@@ -260,20 +266,53 @@ COM-INTERFACE: IEnumIDList IUnknown {000214F2-0000-0000-C000-000000000046}
     HRESULT Clone ( IEnumIDList** ppenum ) ;
 
 COM-INTERFACE: IShellFolder IUnknown {000214E6-0000-0000-C000-000000000046}
-    HRESULT ParseDisplayName ( HWND hwndOwner, void* pbcReserved, LPOLESTR lpszDisplayName, ULONG* pchEaten, LPITEMIDLIST* ppidl, ULONG* pdwAttributes )
-    HRESULT EnumObjects ( HWND hwndOwner, SHCONTF grfFlags, IEnumIDList** ppenumIDList )
-    HRESULT BindToObject ( LPCITEMIDLIST pidl, void* pbcReserved, REFGUID riid, void** ppvOut )
-    HRESULT BindToStorage ( LPCITEMIDLIST pidl, void* pbcReserved, REFGUID riid, void** ppvObj )
-    HRESULT CompareIDs ( LPARAM lParam, LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2 )
-    HRESULT CreateViewObject ( HWND hwndOwner, REFGUID riid, void** ppvOut )
-    HRESULT GetAttributesOf ( UINT cidl, LPCITEMIDLIST* apidl, SFGAOF* rgfInOut )
-    HRESULT GetUIObjectOf ( HWND hwndOwner, UINT cidl, LPCITEMIDLIST* apidl, REFGUID riid, UINT* prgfInOut, void** ppvOut )
-    HRESULT GetDisplayNameOf ( LPCITEMIDLIST pidl, SHGDNF uFlags, STRRET* lpName )
-    HRESULT SetNameOf ( HWND hwnd, LPCITEMIDLIST pidl, LPCOLESTR lpszName, SHGDNF uFlags, LPITEMIDLIST* ppidlOut ) ;
+    HRESULT ParseDisplayName ( HWND hwndOwner,
+                               void* pbcReserved,
+                               LPOLESTR lpszDisplayName,
+                               ULONG* pchEaten,
+                               LPITEMIDLIST* ppidl,
+                               ULONG* pdwAttributes )
+    HRESULT EnumObjects ( HWND hwndOwner,
+                          SHCONTF grfFlags,
+                          IEnumIDList** ppenumIDList )
+    HRESULT BindToObject ( LPCITEMIDLIST pidl,
+                           void* pbcReserved,
+                           REFGUID riid,
+                           void** ppvOut )
+    HRESULT BindToStorage ( LPCITEMIDLIST pidl,
+                            void* pbcReserved,
+                            REFGUID riid,
+                            void** ppvObj )
+    HRESULT CompareIDs ( LPARAM lParam,
+                         LPCITEMIDLIST pidl1,
+                         LPCITEMIDLIST pidl2 )
+    HRESULT CreateViewObject ( HWND hwndOwner,
+                               REFGUID riid,
+                               void** ppvOut )
+    HRESULT GetAttributesOf ( UINT cidl,
+                              LPCITEMIDLIST* apidl,
+                              SFGAOF* rgfInOut )
+    HRESULT GetUIObjectOf ( HWND hwndOwner,
+                            UINT cidl,
+                            LPCITEMIDLIST* apidl,
+                            REFGUID riid,
+                            UINT* prgfInOut,
+                            void** ppvOut )
+    HRESULT GetDisplayNameOf ( LPCITEMIDLIST pidl,
+                               SHGDNF uFlags,
+                               STRRET* lpName )
+    HRESULT SetNameOf ( HWND hwnd,
+                        LPCITEMIDLIST pidl,
+                        LPCOLESTR lpszName,
+                        SHGDNF uFlags,
+                        LPITEMIDLIST* ppidlOut ) ;
 
 FUNCTION: HRESULT SHGetDesktopFolder ( IShellFolder** ppshf )
 
-FUNCTION: UINT DragQueryFileW ( HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch )
+FUNCTION: UINT DragQueryFileW ( HDROP hDrop,
+                                UINT iFile,
+                                LPWSTR lpszFile,
+                                UINT cch )
 ALIAS: DragQueryFile DragQueryFileW
 
 FUNCTION: BOOL IsUserAnAdmin ( )
