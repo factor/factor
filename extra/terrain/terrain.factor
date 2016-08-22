@@ -152,7 +152,7 @@ terrain-world H{
     GRAVITY v+ ;
 
 : clamp-coords ( coords dim -- coords' )
-    [ { 0 0 } vmax ] dip { 2 2 } v- vmin ;
+    { 0 0 } swap { 2 2 } v- vclamp ;
 
 :: pixel-indices ( coords dim -- indices )
     coords vfloor v>integer dim clamp-coords :> floor-coords

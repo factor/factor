@@ -276,3 +276,6 @@ PRIVATE>
 
 : v~ ( a b epsilon -- ? )
     [ ~ ] curry 2all? ; inline
+
+: vclamp ( v min max -- w )
+    rot vmin vmax ; inline

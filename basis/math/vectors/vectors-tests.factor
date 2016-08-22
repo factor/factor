@@ -47,3 +47,8 @@ SPECIALIZED-ARRAY: int
 { { 1 5 3 } } [
     { t f t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
 ] unit-test
+
+! vclamp
+{ { 0 30 100 } } [
+    { -10 30 120 } { 0 0 0 } { 100 100 100 } vclamp
+] unit-test

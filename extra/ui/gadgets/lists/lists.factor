@@ -101,7 +101,7 @@ M: list focusable-child* drop t ;
     [ list select-index ] when* ;
 
 : clamp-loc ( point max -- point )
-    vmin { 0 0 } vmax ;
+    { 0 0 } swap vclamp ;
 
 : select-at ( point list -- )
     [ dim>> clamp-loc ] keep
