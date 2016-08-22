@@ -1,11 +1,9 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: kernel present system webbrowser windows.shell32
+USING: io.pathnames kernel present system webbrowser windows.shell32
 windows.user32 ;
-
 IN: webbrowser.windows
 
 M: windows open-file ( path -- )
-    [ f "open" ] dip present f f
+    absolute-path [ f "open" ] dip present f f
     SW_SHOWNORMAL ShellExecute drop ;
