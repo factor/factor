@@ -8,15 +8,14 @@ IN: ui.gadgets.line-support
 
 ! Some code shared by table and editor gadgets
 TUPLE: line-gadget < gadget
-font selection-color
-min-rows max-rows
-min-cols max-cols
-line-leading line-height
-pref-viewport-dim ;
+    font selection-color
+    min-rows max-rows
+    min-cols max-cols
+    line-leading line-height
+    pref-viewport-dim ;
 
 : new-line-gadget ( class -- gadget )
-    new
-        selection-color >>selection-color ;
+    new selection-color >>selection-color ;
 
 GENERIC: line-leading* ( gadget -- n )
 

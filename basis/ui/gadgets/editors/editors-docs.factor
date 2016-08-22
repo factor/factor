@@ -1,21 +1,23 @@
-USING: documents help.markup help.syntax ui.gadgets
-ui.gadgets.scrollers models strings ui.commands sequences
-ui.text colors fonts help.tips ;
+USING: colors documents fonts help.markup help.syntax help.tips models
+sequences strings ui.commands ui.gadgets ui.gadgets.line-support
+ui.gadgets.scrollers ;
 IN: ui.gadgets.editors
+
+HELP: <multiline-editor>
+{ $values { "editor" multiline-editor } }
+{ $description "Creates a new multi-line editor gadget." } ;
 
 HELP: editor
 { $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
 $nl
 "Editors have the following slots:"
 { $list
-    { { $snippet "font" } " - a " { $link font } "." }
-    { { $snippet "color" } " - a " { $link color } "." }
     { { $snippet "caret-color" } " - a " { $link color } "." }
-    { { $snippet "selection-color" } " - a " { $link color } "." }
     { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
     { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
     { { $snippet "focused?" } " - a boolean." }
-} } ;
+} }
+{ $see-also line-gadget } ;
 
 HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
