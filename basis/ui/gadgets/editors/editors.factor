@@ -215,25 +215,22 @@ M: editor draw-gadget*
 
 <PRIVATE
 
-: row,col-dim ( font r c -- dim )
-    CHAR: x <string> swap
-    CHAR: \n <string>
-    append text-dim ;
+: col,row-dim ( font c r -- dim )
+    2array swap "m" text-dim v* ;
 
 : min-dim ( font editor -- dim )
-    [ min-rows>> [ 0 ] unless* ]
-    [ min-cols>> [ 0 ] unless* ] bi
-    row,col-dim ;
-
+    [ min-cols>> [ 0 ] unless* ]
+    [ min-rows>> [ 0 ] unless* ] bi
+    col,row-dim ;
+    
 : max-dim ( font editor -- dim )
-    ! hopefully no one goes over 5000
-    [ max-rows>> [ 5000 ] unless* ]
-    [ max-cols>> [ 5000 ] unless* ] bi
-    row,col-dim ;
-
+    [ max-cols>> [ 1/0. ] unless* ]
+    [ max-rows>> [ 1/0. ] unless* ] bi
+    col,row-dim ;
+    
 : txt-dim ( font editor -- dim )
     control-value text-dim ;
-
+    
 PRIVATE>
 
 : editor-constrained-dim ( editor -- dim )
