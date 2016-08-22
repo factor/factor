@@ -224,23 +224,23 @@ M: editor draw-gadget*
     [ min-rows>> [ 0 ] unless* ]
     [ min-cols>> [ 0 ] unless* ] bi
     row,col-dim ;
-
+    
 : max-dim ( font editor -- dim )
     ! hopefully no one goes over 5000
     [ max-rows>> [ 5000 ] unless* ]
     [ max-cols>> [ 5000 ] unless* ] bi
     row,col-dim ;
-
+    
 : txt-dim ( font editor -- dim )
     control-value text-dim ;
-
+    
 PRIVATE>
 
 : editor-constrained-dim ( editor -- dim )
     [ font>> ] keep
     [ max-dim ]
     [ txt-dim ]
-    [ min-dim ]
+    [ min-dim ] 
     2tri vmax vmin { 1 0 } v+ ;
 
 M: editor pref-dim*
