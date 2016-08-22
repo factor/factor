@@ -242,7 +242,7 @@ PRIVATE>
 
 M: editor pref-dim*
     ! Add some space for the caret.
-    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
+    editor-constrained-dim ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 
