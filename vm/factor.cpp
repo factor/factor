@@ -2,8 +2,6 @@
 
 namespace factor {
 
-void init_globals() { init_mvm(); }
-
 // Compile code in boot image so that we can execute the startup quotation
 // Allocates memory
 void factor_vm::prepare_boot_image() {

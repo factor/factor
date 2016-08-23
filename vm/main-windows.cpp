@@ -9,7 +9,7 @@ VM_C_API int wmain(int argc, wchar_t** argv) {
     factor::fatal_error("DuplicateHandle() failed", GetLastError());
     return 1;
   }
-  factor::init_globals();
+  factor::init_mvm();
   factor::start_standalone_factor(argc, argv);
   return 0;
 }
