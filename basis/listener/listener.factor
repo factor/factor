@@ -24,8 +24,16 @@ H{
 M: object prompt.
     nip prompt-style get-global format bl flush ;
 
+SYMBOL: handle-ctrl-break
+
+: maybe-enable-ctrl-break ( -- )
+    handle-ctrl-break get-global [ enable-ctrl-break ] when ;
+
 : with-ctrl-break ( quot -- )
-    enable-ctrl-break
+    maybe-enable-ctrl-break
+    ! Always call disable-ctrl-break, no matter what handle-ctrl-break
+    ! says: it might've been changed just now by the user in the Listener.
+    ! It's a no-op if it's not enabled.
     [ disable-ctrl-break ] [ ] cleanup ; inline
 
 : parse-lines-interactive ( lines -- quot/f )
