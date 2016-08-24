@@ -13,7 +13,7 @@
 !
 ! https://www.x.org/releases/X11R7.6/doc/libX11/specs/libX11/libX11.html
 USING: accessors alien.c-types alien.data alien.syntax classes.struct
-kernel literals math x11.syntax x11.X ;
+io.encodings.ascii kernel literals math x11.X x11.syntax ;
 FROM: alien.c-types => short ;
 IN: x11.xlib
 
@@ -51,7 +51,7 @@ STRUCT: Display
     { free_funcs void* }
     { fd int } ;
 
-X-FUNCTION: Display* XOpenDisplay ( void* display_name )
+X-FUNCTION: Display* XOpenDisplay ( c-string[ascii] display_name )
 
 ! 2.2 Obtaining Information about the Display, Image Formats, or Screens
 
