@@ -1,8 +1,51 @@
-USING: io io.files io.files.temp io.directories io.launcher
-kernel namespaces prettyprint tools.test db.sqlite db sequences
-continuations db.types db.tuples unicode accessors arrays
-sorting layouts math.parser ;
+USING: accessors arrays db db.sqlite db.tuples db.types io.directories
+io.files.temp kernel layouts literals math.parser namespaces sequences
+sorting splitting tools.test ;
 IN: db.sqlite.tests
+
+: normalize ( str -- str' )
+    " \n" split harvest " " join ;
+
+! delete-trigger-restrict
+${
+    {
+        "CREATE TRIGGER fkd_TREE_NODE_NODE_ID_id "
+        "BEFORE DELETE ON NODE "
+        "FOR EACH ROW BEGIN "
+        "SELECT RAISE(ROLLBACK, "
+                      "'delete on table \"NODE\" violates "
+                      "foreign key constraint \"fkd_TREE_NODE_NODE_ID_id\"') "
+        "WHERE (SELECT ID FROM NODE WHERE ID = OLD.ID) IS NOT NULL; END;"
+    } concat
+} [
+    {
+        { "table-name" "TREE" }
+        { "table-id" "NODE" }
+        { "foreign-table-name" "NODE"}
+        { "foreign-table-id" "ID" }
+    } [ delete-trigger-restrict ] with-variables
+    normalize
+] unit-test
+
+! insert-trigger
+${
+    {
+        "CREATE TRIGGER fki_TREE_NODE_NODE_ID_id "
+        "BEFORE INSERT ON TREE "
+        "FOR EACH ROW BEGIN "
+        "SELECT RAISE(ROLLBACK, "
+                      "'insert on table \"TREE\" violates "
+                      "foreign key constraint \"fki_TREE_NODE_NODE_ID_id\"') "
+        "WHERE (SELECT ID FROM NODE WHERE ID = NEW.NODE) IS NULL; END;"
+    } concat
+} [
+    {
+        { "table-name" "TREE" }
+        { "table-id" "NODE" }
+        { "foreign-table-name" "NODE"}
+        { "foreign-table-id" "ID" }
+    } [ insert-trigger ] with-variables normalize
+] unit-test
 
 : db-path ( -- path ) "test-" cell number>string ".db" 3append temp-file ;
 : test.db ( -- sqlite-db ) db-path <sqlite-db> ;
