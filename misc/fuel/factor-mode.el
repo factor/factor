@@ -216,8 +216,9 @@ these lines in your .emacs:
     "ABOUT:" "ARTICLE:"
     "B"
     "CONSULT:" "call-next-method"
-    "EBNF:" ";EBNF"
+    ";EBNF"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
+    ";FUNCTOR"
     "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HINTS:"
@@ -280,7 +281,7 @@ these lines in your .emacs:
   (concat
    (one-symbol (regexp-opt
                 '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
-                  "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
+                  "IDENTITY-MEMO:" "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
                   "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::")))
    ws+ symbol))
 
@@ -297,8 +298,9 @@ these lines in your .emacs:
 ;; [parsing-word] [symbol-word]
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
-   '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "GAME" "HELP" "LIBRARY"
-     "MAIN" "MAIN-WINDOW" "SLOT" "STRING" "SYMBOL" "VAR")))
+   '("&" "CONSTANT" "DESTRUCTOR" "EBNF" "FORGET" "FUNCTOR"
+     "GAME" "HELP" "LIBRARY" "MAIN" "MAIN-WINDOW" "SLOT" "STRING"
+     "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
 (defconst factor-symbols-lines-regex
