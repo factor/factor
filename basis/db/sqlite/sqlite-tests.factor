@@ -15,7 +15,7 @@ ${
         "SELECT RAISE(ROLLBACK, "
                       "'delete on table \"NODE\" violates "
                       "foreign key constraint \"fkd_TREE_NODE_NODE_ID_id\"') "
-        "WHERE (SELECT ID FROM NODE WHERE ID = OLD.ID) IS NOT NULL; END;"
+        "WHERE (SELECT NODE FROM TREE WHERE NODE = OLD.ID) IS NOT NULL; END;"
     } concat
 } [
     {
@@ -203,6 +203,7 @@ watch "WATCH" {
         watch boa insert-tuple
         watch new select-tuple
         user>> f user boa select-tuple
+        user new "mark" >>username delete-tuples
     ] with-db
 ] unit-test
 

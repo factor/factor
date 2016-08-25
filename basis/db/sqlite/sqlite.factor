@@ -243,7 +243,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
             SELECT RAISE(ROLLBACK, 'delete on table \"${foreign-table-name}\" violates foreign key constraint \"fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
-            WHERE (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
+            WHERE (SELECT ${table-id} FROM ${table-name} WHERE ${table-id} = OLD.${foreign-table-id}) IS NOT NULL;
         END;
     " interpolate>string ;
 
