@@ -121,8 +121,9 @@
 (defun fuel-debug--uses-cont (retort)
   (let ((uses (fuel-debug--uses retort))
         (err (fuel-eval--retort-error retort)))
-    (if uses (fuel-debug--uses-display uses)
-      (fuel-debug--uses-display-err retort))))
+    (if err
+        (fuel-debug--uses-display-err retort)
+      (fuel-debug--uses-display uses))))
 
 (defun fuel-debug--uses-display (uses)
   (let* ((inhibit-read-only t)
@@ -164,7 +165,7 @@
   (let ((inhibit-read-only t)
         (file fuel-debug--uses-file)
         (uses fuel-debug--uses))
-    (when (and uses file)
+    (when file
       (insert "\nDone!")
       (fuel-debug--uses-clean)
       (fuel-popup--quit)
