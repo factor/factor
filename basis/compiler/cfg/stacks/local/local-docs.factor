@@ -54,6 +54,10 @@ HELP: peek-loc
 { $values { "loc" loc } { "vreg" "virtual register" } }
 { $description "Retrieves the virtual register at the given stack location. If no register has been stored at that location, then a new vreg is returned." } ;
 
+HELP: record-stack-heights
+{ $values { "ds-height" number } { "rs-height" number } { "bb" basic-block } }
+{ $description "Sets the data and retain stack heights in relation to the cfg of this basic block." } ;
+
 HELP: replace-loc
 { $values { "vreg" "virtual register" } { "loc" loc } }
 { $description "Registers that the absolute stack location " { $snippet "loc" } " should be overwritten with the contents of the virtual register." }
