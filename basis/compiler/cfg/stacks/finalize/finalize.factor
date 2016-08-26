@@ -1,11 +1,17 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg.checker compiler.cfg
-compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.rpo
-compiler.cfg.stacks.global compiler.cfg.stacks.height
-compiler.cfg.stacks.local compiler.cfg.utilities fry kernel
-locals make math sequences sets ;
+USING: accessors compiler.cfg compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.stacks.global
+compiler.cfg.stacks.local compiler.cfg.utilities fry kernel locals
+make math sequences sets ;
 IN: compiler.cfg.stacks.finalize
+
+GENERIC# untranslate-loc 1 ( loc bb -- loc' )
+
+M: ds-loc untranslate-loc ( loc bb -- loc' )
+    [ n>> ] [ ds-height>> ] bi* + <ds-loc> ;
+M: rs-loc untranslate-loc ( loc bb -- loc' )
+    [ n>> ] [ rs-height>> ] bi* + <rs-loc> ;
 
 :: inserting-peeks ( from to -- set )
     to anticip-in
