@@ -55,10 +55,7 @@ IN: compiler.cfg.intrinsics.simd.tests
     initial-height-state \ height-state pick set-at
     HS{ } clone \ local-peek-set pick set-at
     H{ } clone \ replaces pick set-at
-    H{ } <biassoc> \ locs>vregs pick set-at
-    H{ } clone \ peek-sets pick set-at
-    H{ } clone \ replace-sets pick set-at
-    H{ } clone \ kill-sets pick set-at ;
+    H{ } <biassoc> \ locs>vregs pick set-at ;
 
 : make-classes ( quot -- seq )
     { } make [ class-of ] map ; inline

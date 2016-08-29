@@ -1,7 +1,8 @@
-USING: assocs compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stacks.local compiler.cfg.utilities compiler.test
-cpu.architecture kernel kernel.private make math namespaces
-sequences.private slots.private tools.test ;
+USING: accessors assocs compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks.local
+compiler.cfg.utilities compiler.test cpu.architecture kernel
+kernel.private make math namespaces sequences.private slots.private
+tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.local.tests
 
@@ -14,7 +15,7 @@ IN: compiler.cfg.stacks.local.tests
     V{ } 137 insns>block
     [ 0 0 rot record-stack-heights ]
     [ [ "eh" , end-local-analysis ] V{ } make drop ]
-    [ [ peek-sets ] [ replace-sets ] [ kill-sets ] tri [ get at ] 2tri@ ] tri
+    [ [ peeks>> ] [ replaces>> ] [ kills>> ] tri ] tri
 ] cfg-unit-test
 
 {
@@ -23,7 +24,7 @@ IN: compiler.cfg.stacks.local.tests
     V{ } 137 insns>block
     [ 0 0 rot record-stack-heights ]
     [ [ 3 D: 3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
-    [ replace-sets get at ] tri
+    [ replaces>> ] tri
 ] cfg-unit-test
 
 ! kill-locations

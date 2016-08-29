@@ -41,15 +41,13 @@ IN: compiler.cfg.stacks.local
     [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
     append >hash-set ;
 
-SYMBOLS: height-state peek-sets replace-sets kill-sets locs>vregs ;
+SYMBOLS: height-state locs>vregs local-peek-set replaces ;
 
 : inc-stack ( loc -- )
     height-state get swap modify-height ;
 
 : loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
 : vreg>loc ( vreg -- loc/f ) locs>vregs get value-at ;
-
-SYMBOLS: local-peek-set replaces ;
 
 : replaces>copy-insns ( replaces -- insns )
     [ [ loc>vreg ] dip ] assoc-map parallel-copy ;
@@ -83,10 +81,8 @@ SYMBOLS: local-peek-set replaces ;
     [ [ loc>vreg ] dip = ] assoc-reject ;
 
 : end-local-analysis ( basic-block -- )
-    [
-        replaces get remove-redundant-replaces
-        [ height-state get emit-changes ]
-        [ keys >hash-set swap replace-sets get set-at ] bi
-    ]
-    [ [ local-peek-set get ] dip peek-sets get set-at ]
-    [ [ compute-local-kill-set ] keep kill-sets get set-at ] tri ;
+    replaces get remove-redundant-replaces
+    [ height-state get emit-changes ] keep
+    keys >hash-set >>replaces
+    local-peek-set get >>peeks
+    dup compute-local-kill-set >>kills drop ;

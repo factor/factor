@@ -36,6 +36,18 @@ HELP: basic-block
         { $slot "rs-height" }
         "The retainstacks height at the entry of the block. Used during cfg construction."
     }
+    {
+        { $slot "replaces" }
+        { "Used by " { $vocab-link "compiler.cfg.stacks.local" } " for local stack analysis." }
+    }
+    {
+        { $slot "peeks" }
+        { "Used by " { $vocab-link "compiler.cfg.stacks.local" } " for local stack analysis." }
+    }
+    {
+        { $slot "kills" }
+        { "Used by " { $vocab-link "compiler.cfg.stacks.local" } " for local stack analysis." }
+    }
   }
 }
 { $notes "A basic-block is an " { $link identity-tuple } " becase it is used as a hash table key by the compiler." } ;

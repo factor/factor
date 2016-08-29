@@ -8,9 +8,6 @@ IN: compiler.cfg.stacks
 
 : begin-stack-analysis ( -- )
     <bihash> locs>vregs set
-    H{ } clone peek-sets set
-    H{ } clone replace-sets set
-    H{ } clone kill-sets set
     initial-height-state height-state set ;
 
 : end-stack-analysis ( cfg -- )
