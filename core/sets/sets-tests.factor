@@ -100,8 +100,14 @@ IN: sets.tests
 { { 1 } } [ { 1 2 3 } { 2 3 4 } without ] unit-test
 { { 1 1 } } [ { 1 1 2 3 3 } { 2 3 4 4 } without ] unit-test
 
+! combine
 { { 1 2 3 } } [ { { 1 } { 2 } { 1 3 } } combine ] unit-test
 { f } [ { } combine ] unit-test
+
+! refine
+{ { 2 } } [
+    { { 2 3 } { 2 4 } { 9 8 4 2 } } refine
+] unit-test
 
 { { 1 4 9 16 25 36 } }
 [ { { 1 2 3 } { 4 5 6 } } [ [ sq ] map ] gather ] unit-test

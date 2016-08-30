@@ -149,6 +149,9 @@ M: sequence clear-set
 : intersection ( sets -- set/f )
     [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
 
+: refine ( sets -- set/f )
+    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
+
 : gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )
     map concat members ; inline
 
