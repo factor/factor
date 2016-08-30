@@ -3,10 +3,6 @@
 USING: accessors compiler.cfg.dataflow-analysis kernel sequences sets ;
 IN: compiler.cfg.stacks.global
 
-! Should exists somewhere else
-: refine ( sets -- set )
-    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
-
 : transfer-peeked-locs ( set bb -- set' )
     [ replaces>> diff ] [ peeks>> union ] bi ;
 

@@ -224,3 +224,7 @@ HELP: cardinality
 HELP: combine
 { $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
 { $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
+
+HELP: refine
+{ $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
+{ $description "Outputs the intersection of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
