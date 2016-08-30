@@ -6,9 +6,8 @@ compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.optimizer compiler.cfg.registers
 compiler.cfg.representations compiler.cfg.save-contexts
 compiler.cfg.utilities compiler.tree.builder compiler.tree.optimizer
-fry io kernel namespaces prettyprint prettyprint.backend
-prettyprint.custom prettyprint.sections quotations sequences strings
-words ;
+formatting fry io kernel namespaces prettyprint quotations sequences
+strings words ;
 FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.debugger
 
@@ -55,24 +54,34 @@ M: insn insn. tuple>array but-last [
         dup string? [ print ] [ pprint ] if
     ] interleave nl ;
 
-: block. ( bb -- )
-    "=== Basic block #" write dup number>> . nl
-    dup instructions>> [ insn. ] each nl
+: block-header. ( bb -- )
+    [ number>> ] [ kill-block?>> "(k)" "" ? ] bi
+    "=== Basic block #%d %s\n\n" printf ;
+
+: instructions. ( bb -- )
+    instructions>> [ insn. ] each nl ;
+
+: successors. ( bb -- )
     successors>> [
-        "Successors: " write
-        [ number>> unparse ] map ", " join print nl
+        [ number>> unparse ] map ", " join
+        "Successors: %s\n\n" printf
     ] unless-empty ;
 
+: block. ( bb -- )
+    [ block-header. ] [ instructions. ] [ successors. ] tri ;
+
+: cfg-header. ( cfg -- )
+    [ word>> ] [ label>> ] bi "=== word: %u, label: %u\n\n" printf ;
+
+: blocks. ( cfg -- )
+    linearization-order [ block. ] each ;
+
+: stack-frame. ( cfg -- )
+    stack-frame>> "=== stack frame: %u\n" printf ;
+
 : cfg. ( cfg -- )
-    [
-        dup linearization-order number-blocks
-        "=== word: " write
-        dup word>> pprint
-        ", label: " write
-        dup label>> pprint nl nl
-        dup linearization-order [ block. ] each
-        "=== stack frame: " write
-        stack-frame>> .
+    dup linearization-order number-blocks [
+        [ cfg-header. ] [ blocks. ] [ stack-frame. ] tri
     ] with-scope ;
 
 : cfgs. ( cfgs -- )
