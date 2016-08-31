@@ -37,10 +37,10 @@ ERROR: bad-peek dst loc ;
     [ dup n>> 0 < [ 2drop ] [ ##replace, ] if ] each-insertion ;
 
 : visit-edge ( from to -- )
-    2dup [ kill-block?>> ] both? [ 2drop ] [
-        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch, ] V{ } make
+    2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch, ] V{ } make
+    dup length 1 > [
         insert-basic-block
-    ] if ;
+    ] [ 3drop ] if ;
 
 : visit-block ( bb -- )
     [ predecessors>> ] keep '[ _ visit-edge ] each ;
