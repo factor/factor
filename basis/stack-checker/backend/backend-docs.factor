@@ -63,3 +63,17 @@ HELP: required-stack-effect
 HELP: with-infer
 { $values { "quot" quotation } { "effect" effect } { "visitor" "a visitor, if any" } }
 { $description "Initializes the inference engine and then runs the given quotation which is supposed to perform the inferencing." } ;
+
+ARTICLE: "stack-checker.backend" "Stack effect inference implementation"
+"Contains words for manipulating the compile-time data and retainstacks:"
+{ $subsections
+  peek-d
+  pop-d
+  pop-literal
+  pop-r
+  push-d
+  push-literal
+  push-r
+} ;
+
+ABOUT: "stack-checker.backend"

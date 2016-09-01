@@ -1,5 +1,9 @@
-USING: compiler.tree help.markup help.syntax kernel sequences words ;
+USING: compiler.tree help.markup help.syntax kernel sequences vectors
+;
 IN: stack-checker.visitor
+
+HELP: stack-visitor
+{ $var-description { $link vector } " that collects tree nodes when the SSA tree is built." } ;
 
 HELP: #>r,
 { $values { "inputs" sequence } { "outputs" sequence } }

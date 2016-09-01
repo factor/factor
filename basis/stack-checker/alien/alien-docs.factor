@@ -1,4 +1,4 @@
-USING: alien alien.c-types compiler.tree effects help.markup help.syntax
+USING: alien alien.c-types compiler.tree help.markup help.syntax
 quotations sequences ;
 IN: stack-checker.alien
 
@@ -38,6 +38,9 @@ HELP: callback-parameter-quot
   }
 } ;
 
+HELP: infer-alien-assembly
+{ $description "Infers " { $link alien-assembly } " calls." } ;
+
 HELP: infer-alien-invoke
 { $description "Appends the necessary SSA nodes for performing an " { $link alien-invoke } " call to the IR tree being constructed." } ;
 
@@ -61,3 +64,13 @@ HELP: wrap-callback-quot
     "]"
   }
 } ;
+
+ARTICLE: "stack-checker.alien" "Inferring alien words" "This vocab contains code for inferring the words that form part of the alien FFI: " { $link alien-invoke } ", " { $link alien-indirect } ", " { $link alien-assembly } " and " { $link alien-callback } ". The words performing the inferring are:"
+{ $subsections
+  infer-alien-invoke
+  infer-alien-indirect
+  infer-alien-assembly
+  infer-alien-callback
+} ;
+
+ABOUT: "stack-checker.alien"
