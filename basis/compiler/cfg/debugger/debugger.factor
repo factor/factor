@@ -51,7 +51,7 @@ M: ##phi insn.
 M: insn insn. tuple>array but-last [
         bl
     ] [
-        dup string? [ print ] [ pprint ] if
+        dup string? [ write ] [ pprint ] if
     ] interleave nl ;
 
 : block-header. ( bb -- )
