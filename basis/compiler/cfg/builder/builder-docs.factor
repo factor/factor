@@ -37,11 +37,7 @@ T{ basic-block
 STRING: ex-make-input-map
 USING: compiler.cfg.builder prettyprint ;
 T{ #shuffle { in-d { 37 81 92 } } } make-input-map .
-H{
-    { 81 T{ ds-loc { n 1 } } }
-    { 37 T{ ds-loc { n 2 } } }
-    { 92 T{ ds-loc } }
-}
+{ { 37 D: 2 } { 81 D: 1 } { 92 D: 0 } }
 ;
 >>
 
@@ -109,7 +105,18 @@ HELP: end-word
 
 HELP: height-changes
 { $values { "#shuffle" #shuffle } { "height-changes" sequence } }
-{ $description "Returns a two-tuple which represents how much the " { $link #shuffle } " node increases or decreases the data and retainstacks." } ;
+{ $description "Returns a two-tuple which represents how much the " { $link #shuffle } " node increases or decreases the data and retainstacks." }
+{ $examples
+  { $example
+    "USING: compiler.cfg.builder compiler.tree prettyprint ;"
+    "T{ #shuffle { in-d { 37 81 92 } } { out-d { 20 } } } height-changes ."
+    "{ -2 0 }"
+  }
+} ;
+
+HELP: out-vregs/stack
+{ $values { "#shuffle" #shuffle } { "seq" sequence } }
+{ $description "Returns a sequence of what vregs are on which stack locations after the shuffle instruction." } ;
 
 HELP: trivial-branch?
 { $values
@@ -172,6 +179,7 @@ $nl
 {
     $subsections
     height-changes
+    out-vregs/stack
 } ;
 
 ABOUT: "compiler.cfg.builder"
