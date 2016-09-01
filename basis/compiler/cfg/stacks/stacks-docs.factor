@@ -8,8 +8,8 @@ HELP: ds-push
 { $description "Used when translating the " { $link #push } " SSA node to CFG form. The node pushes a literal value onto the data stack." } ;
 
 HELP: begin-stack-analysis
-{ $description "Initializes a set of variables related to stack analysis of Factor words." }
-{ $see-also height-state } ;
+{ $description "Initializes a set of variables related to global stack analysis of Factor words." }
+{ $see-also begin-local-analysis height-state } ;
 
 HELP: end-stack-analysis
 { $values { "cfg" cfg } }
@@ -36,3 +36,14 @@ HELP: 2inputs
 HELP: 3inputs
 { $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } { "vreg3" "a vreg" } }
 { $description "Lifts the three topmost values from the datastack and stores them in virtual registers. The datastacks height is adjusted afterwards." } ;
+
+ARTICLE: "compiler.cfg.stacks" "Generating instructions for accessing the data and retain stacks" "This vocab contains utility words for manipulating the analysis data and retain stacks."
+$nl
+"When nodes in the dataflow IR pushes or pops items from the stacks, instructions for performing those actions aren't immediately emitted. Instead the analysis stacks are manipulated and when the stack analysis phase is complete, optimal stack shuffling code is emitted. This way, exactly the same instructions are emitted for equivalent qutations such as [ dup drop ] and [ ]."
+$nl
+"Popping from the datastack:"
+{ $subsections 2inputs 3inputs ds-drop }
+"Pushing to the datastack:"
+{ $subsections ds-push store-vregs } ;
+
+ABOUT: "compiler.cfg.stacks"

@@ -13,6 +13,7 @@ HELP: stack-frame
   "The stack frame is also aligned to a 16 byte boundary. It has the following slots:"
   { $table
     { { $slot "total-size" } { "Total size of the stack frame." } }
+    { { $slot "params" } { "Reserved parameter space." } }
     { { $slot "allot-area-base" } { "Base offset of the allocation area." } }
     { { $slot "allot-area-size" } { "Number of bytes requires for the allocation area." } }
     { { $slot "allot-area-align" } { "This slot is always at least " { $link cell } " bytes." } }

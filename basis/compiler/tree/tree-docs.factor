@@ -1,6 +1,6 @@
-USING: alien assocs help.markup help.syntax kernel kernel.private quotations
-sequences stack-checker.alien stack-checker.inlining stack-checker.values
-stack-checker.visitor words ;
+USING: alien assocs help.markup help.syntax kernel kernel.private
+quotations sequences stack-checker.alien stack-checker.inlining
+stack-checker.values stack-checker.visitor words ;
 IN: compiler.tree
 
 HELP: node
@@ -14,7 +14,7 @@ HELP: #alien-invoke
 { $see-also alien-invoke } ;
 
 HELP: #alien-callback
-{ $class-description "SSA tree node that constructs an alien callback." } ;
+{ $class-description "SSA tree node that constructs an alien callback. It is not a subclass of " { $link #alien-node } ". " } ;
 
 HELP: #call
 { $class-description "SSA tree node that calls a word. It has the following slots:"
