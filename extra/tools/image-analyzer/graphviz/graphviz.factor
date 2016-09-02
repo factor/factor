@@ -1,9 +1,9 @@
-! Copyright (C) 2013 Björn Lindqvist
+! Copyright (C) 2015 - 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors alien.strings assocs classes fry graphviz
-graphviz.attributes graphviz.notation math.bitwise sequences
-sets system tools.image-analyzer.references tools.image-analyzer.vm
-vocabs.parser ;
+graphviz.attributes graphviz.notation math.bitwise sequences sets
+system tools.image-analyzer.references tools.image-analyzer.utils
+tools.image-analyzer.vm vocabs.parser ;
 IN: tools.image-analyzer.graphviz
 FROM: arrays => 1array 2array ;
 FROM: byte-arrays => >byte-array ;
@@ -63,7 +63,7 @@ CONSTANT: node-colors {
 
 : add-root-node ( graph ptr index -- graph )
     over 15 mask 1 <= [ 2drop ] [
-        [ swap 15 unmask add-edge ] keep <root-node> add
+        [ swap untag add-edge ] keep <root-node> add
     ] if ;
 
 : add-root-nodes ( graph image -- graph )
