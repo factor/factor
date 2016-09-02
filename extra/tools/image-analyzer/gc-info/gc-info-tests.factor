@@ -26,13 +26,15 @@ QUALIFIED: opencl
     [ gc-map-needed? ] filter ;
 
 : tally-gc-maps ( gc-maps -- seq/f )
-    [ f ] [ {
-        [ [ scrub-d>> length ] map supremum ]
-        [ [ scrub-r>> length ] map supremum ]
-        [ [ gc-root-offsets ] map largest-spill-slot ]
-        [ [ derived-root-offsets ] map [ keys ] map largest-spill-slot ]
-        [ length ]
-    } cleave 5 narray ] if-empty ;
+    [ f ] [
+        {
+            [ [ scrub-d>> length ] map supremum ]
+            [ [ scrub-r>> length ] map supremum ]
+            [ [ gc-root-offsets ] map largest-spill-slot ]
+            [ [ derived-root-offsets ] map [ keys ] map largest-spill-slot ]
+            [ length ]
+        } cleave 5 narray
+    ] if-empty ;
 
 ! Like word>gc-info but uses the compiler
 : word>gc-info-expected ( word -- seq/f )
@@ -87,7 +89,6 @@ QUALIFIED: opencl
     [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
 ] unit-test
 
-
 ! Originally from llvm.types, but llvm moved to unmaintained
 TYPEDEF: void* LLVMTypeRef
 TYPEDEF: void* LLVMTypeHandleRef
@@ -102,7 +103,7 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 
 ! base-pointer-groups
 { t } [
-    \ resolve-types
+\ resolve-types
     [ base-pointer-groups-expected ] [ base-pointer-groups-decoded ] bi =
 ] unit-test
 
@@ -147,3 +148,7 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 { t } [
     \ opencl:cl-queue-kernel deterministic-gc-info?
 ] unit-test
+
+
+
+! TODO: try on 32 bit \ feedback-format:
