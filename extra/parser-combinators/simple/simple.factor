@@ -11,9 +11,9 @@ IN: parser-combinators.simple
   [ digit? ] satisfy <*> [ string>number ] <@ ;
 
 : string-parser ( -- parser )
-  [ CHAR: " = ] satisfy
-  [ CHAR: " = not ] satisfy <*> &>
-  [ CHAR: " = ] satisfy <& [ >string ] <@  ;
+  [ CHAR: \" = ] satisfy
+  [ CHAR: \" = not ] satisfy <*> &>
+  [ CHAR: \" = ] satisfy <& [ >string ] <@  ;
 
 : bold-parser ( -- parser )
   "*" token

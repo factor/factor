@@ -59,9 +59,9 @@ M: json-null stream-json-print
 PRIVATE>
 
 M: string stream-json-print
-    CHAR: " over stream-write1 swap [
+    CHAR: \" over stream-write1 swap [
         {
-            { CHAR: "  [ "\\\"" over stream-write ] }
+            { CHAR: \"  [ "\\\"" over stream-write ] }
             { CHAR: \\ [ "\\\\" over stream-write ] }
             { CHAR: /  [
                 json-escape-slashes? get
@@ -87,7 +87,7 @@ M: string stream-json-print
                 ] if
             ]
         } case
-    ] each CHAR: " swap stream-write1 ;
+    ] each CHAR: \" swap stream-write1 ;
 
 M: integer stream-json-print
     [ number>string ] [ stream-write ] bi* ;

@@ -74,7 +74,7 @@ ERROR: header-file-missing path ;
 : handle-include ( preprocessor-state sequence-parser -- )
     skip-whitespace/comments advance dup previous {
         { CHAR: < [ CHAR: > take-until-object read-standard-include ] }
-        { CHAR: " [ CHAR: " take-until-object read-local-include ] }
+        { CHAR: \" [ CHAR: \" take-until-object read-local-include ] }
         [ bad-include-line ]
     } case ;
 

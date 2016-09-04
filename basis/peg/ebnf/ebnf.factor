@@ -114,7 +114,7 @@ C: <ebnf> ebnf
         [
             [ CHAR: \ = ] satisfy
             [ "\"\\" member? ] satisfy 2seq ,
-            [ CHAR: " = not ] satisfy ,
+            [ CHAR: \" = not ] satisfy ,
         ] choice* repeat1 "\"" "\"" surrounded-by ,
         [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
     ] choice* [ "" flatten-as unescape-string ] action ;

@@ -64,10 +64,10 @@ TUPLE: CreateProcess-args
     [
         { [ drop CHAR: \ = ] [ nip "\\\"" member? ] } 2&&
     ] monotonic-split [
-        dup last CHAR: " = [
+        dup last CHAR: \" = [
             dup length 1 > [
                 ! String of backslashes + double-quote
-                length 1 - 2 * CHAR: \ <repetition> "\\\"" append
+                length 1 - 2 * CHAR: \\ <repetition> "\\\"" append
             ] [
                 ! Single double-quote
                 drop "\\\""

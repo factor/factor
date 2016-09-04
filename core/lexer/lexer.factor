@@ -85,7 +85,7 @@ GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word
     [
-        2dup nth CHAR: " eq? [ drop 1 + ] [ f skip ] if
+        2dup nth CHAR: \" eq? [ drop 1 + ] [ f skip ] if
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
