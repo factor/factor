@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.builder.blocks compiler.cfg.comparisons
-compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.intrinsics compiler.cfg.registers
+compiler.cfg.builder.blocks compiler.cfg.comparisons compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
 compiler.cfg.utilities cpu.architecture fry kernel locals make math
 namespaces sequences words ;
@@ -131,7 +130,7 @@ M: #call emit-node ( block node -- block' )
 M: #call-recursive emit-node ( block node -- block' )
     [ label>> id>> ] [ call-height ] bi emit-call ;
 
-M: #push emit-node ( block node -- block' )
+M: #push emit-node ( block node -- block )
     literal>> ^^load-literal ds-push ;
 
 ! #shuffle
@@ -145,22 +144,22 @@ M: #push emit-node ( block node -- block' )
     [ over length stack-locs zip ] 2bi@ append ;
 
 : height-changes ( #shuffle -- height-changes )
-    { [ out-d>> ] [ in-d>> ] [ out-r>> ] [ in-r>> ] } cleave
-    4array [ length ] map first4 [ - ] 2bi@ 2array ;
+    { [ out-d>> ] [ in-d>> ] [ out-r>> ] [ in-r>> ] } cleave 4array
+    [ length ] map first4 [ - ] 2bi@ 2array ;
 
 : store-height-changes ( #shuffle -- )
     height-changes { ds-loc rs-loc } [ new swap >>n inc-stack ] 2each ;
 
-: extract-outputs ( #shuffle -- seq )
-    [ out-d>> ds-loc 2array ] [ out-r>> rs-loc 2array ] bi 2array ;
+: extract-outputs ( #shuffle -- pair )
+    [ out-d>> ] [ out-r>> ] bi 2array ;
 
-: out-vregs/stack ( #shuffle -- seq )
+: out-vregs/stack ( #shuffle -- pair )
     [ make-input-map ] [ mapping>> ] [ extract-outputs ] tri
-    [ first2 [ [ of of peek-loc ] 2with map ] dip 2array ] 2with map ;
+    [ [ of of peek-loc ] 2with map ] 2with map ;
 
 M: #shuffle emit-node ( block node -- block )
     [ out-vregs/stack ] keep store-height-changes
-    [ first2 store-vregs ] each ;
+    first2 [ ds-loc store-vregs ] [ rs-loc store-vregs ] bi* ;
 
 ! #return
 : end-word ( block -- block' )
