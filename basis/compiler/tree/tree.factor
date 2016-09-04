@@ -54,11 +54,6 @@ TUPLE: #shuffle < #renaming mapping in-d out-d in-r out-r ;
 
 TUPLE: #terminate < node in-d in-r ;
 
-: <#terminate> ( in-d in-r -- node )
-    #terminate new
-        swap >>in-r
-        swap >>in-d ;
-
 TUPLE: #branch < node in-d children live-branches ;
 
 : new-branch ( value children class -- node )
@@ -137,9 +132,6 @@ TUPLE: #alien-assembly < #alien-node ;
 
 TUPLE: #alien-callback < node params child ;
 
-: <#alien-callback> ( params child -- node )
-    #alien-callback boa ;
-
 : node, ( node -- ) stack-visitor get push ;
 
 GENERIC: inputs/outputs ( #renaming -- inputs outputs )
@@ -163,7 +155,7 @@ M: vector #return, <#return> node, ;
 M: vector #enter-recursive, <#enter-recursive> node, ;
 M: vector #return-recursive, <#return-recursive> node, ;
 M: vector #call-recursive, <#call-recursive> node, ;
-M: vector #terminate, <#terminate> node, ;
+M: vector #terminate, #terminate boa node, ;
 M: vector #if, <#if> node, ;
 M: vector #dispatch, <#dispatch> node, ;
 M: vector #phi, <#phi> node, ;
@@ -173,4 +165,4 @@ M: vector #copy, <#copy> node, ;
 M: vector #alien-invoke, #alien-invoke boa node, ;
 M: vector #alien-indirect, #alien-indirect boa node, ;
 M: vector #alien-assembly, #alien-assembly boa node, ;
-M: vector #alien-callback, <#alien-callback> node, ;
+M: vector #alien-callback, #alien-callback boa node, ;
