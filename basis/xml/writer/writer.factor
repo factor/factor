@@ -48,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 : write-quoted ( string -- )
-    CHAR: " write1 write CHAR: " write1 ;
+    CHAR: \" write1 write CHAR: \" write1 ;
 
 : print-attrs ( assoc -- )
     [

@@ -43,7 +43,7 @@ SYMBOL: tagstack
     CHAR: ' (read-quote) ;
 
 : read-double-quote ( sequence-parser -- string )
-    CHAR: " (read-quote) ;
+    CHAR: \" (read-quote) ;
 
 : read-quote ( sequence-parser -- string )
     dup get+increment CHAR: ' =

@@ -24,7 +24,7 @@ UNION: dtd-acceptable
     [
         take-word pass-blank get-char {
             { CHAR: ' [ parse-quote ] }
-            { CHAR: " [ parse-quote ] }
+            { CHAR: \" [ parse-quote ] }
             [ drop take-external-id close ]
         } case
    ] dip '[ swap _ [ ?set-at ] change ] 2keep ;
