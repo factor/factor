@@ -1,8 +1,7 @@
-USING: alien ui.gadgets.panes ui.gadgets namespaces
-kernel sequences io io.styles io.streams.string tools.test
-prettyprint definitions help help.syntax help.markup
-help.stylesheet splitting ui.gadgets.debug models math summary
-inspector accessors help.topics see fry ;
+USING: accessors colors fonts fry help help.markup help.stylesheet
+help.syntax help.topics inspector io io.streams.string io.styles
+kernel math models namespaces prettyprint see sequences tools.test
+ui.gadgets ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private ;
 IN: ui.gadgets.panes.tests
 
 : #children ( -- n ) "pane" get children>> length ;
@@ -125,3 +124,30 @@ ARTICLE: "test-article-2" "This is a test article"
 
 { t } [ <test-pane> dup input>> child? ] unit-test
 { t } [ <test-pane> dup last-line>> child? ] unit-test
+
+! smash-line
+{
+    ""
+    T{ font
+       { name "sans-serif" }
+       { size 12 }
+       { foreground
+         T{ rgba
+            { red 0.0 }
+            { green 0.0 }
+            { blue 0.0 }
+            { alpha 1.0 }
+         }
+       }
+       { background
+         T{ rgba
+            { red 1.0 }
+            { green 1.0 }
+            { blue 1.0 }
+            { alpha 1.0 }
+         }
+       }
+    }
+} [
+    <pane> current>> smash-line [ text>> ] [ font>> ] bi
+] unit-test
