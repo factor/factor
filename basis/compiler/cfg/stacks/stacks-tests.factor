@@ -3,6 +3,15 @@ compiler.cfg.stacks compiler.cfg.stacks.local compiler.test kernel literals
 namespaces tools.test ;
 IN: compiler.cfg.stacks.tests
 
+! adjust-d
+{
+    { { 6 2 } { 3 4 } }
+    { { -4 2 } { 3 4 } }
+} [
+    { { 1 2 } { 3 4 } } [ height-state set 5 adjust-d ] keep
+    { { 1 2 } { 3 4 } } [ height-state set -5 adjust-d ] keep
+] unit-test
+
 {
     H{ { D: 1 4 } { D: 2 3 } { D: 0 5 } }
     { { 0 0 } { 0 0 } }
