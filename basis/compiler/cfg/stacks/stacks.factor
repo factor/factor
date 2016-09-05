@@ -59,6 +59,3 @@ IN: compiler.cfg.stacks
 
 : unary-op ( quot -- )
     [ ds-pop ] dip call ds-push ; inline
-
-: adjust-d ( n -- )
-    0 height-state get first [ + ] change-nth ;

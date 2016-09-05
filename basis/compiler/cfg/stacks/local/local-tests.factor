@@ -71,7 +71,7 @@ IN: compiler.cfg.stacks.local.tests
     replaces get remove-redundant-replaces
 ] cfg-unit-test
 
-! emit-changes
+! emit-insns
 {
     V{
         T{ ##copy { dst 1 } { src 3 } { rep any-rep } }
@@ -80,7 +80,7 @@ IN: compiler.cfg.stacks.local.tests
 } [
     3 D: 0 replace-loc [
         "eh" ,
-        replaces get height-state get emit-changes
+        replaces get height-state get emit-insns
     ] V{ } make
 ] cfg-unit-test
 

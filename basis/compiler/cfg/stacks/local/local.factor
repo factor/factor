@@ -52,7 +52,7 @@ SYMBOLS: height-state locs>vregs local-peek-set replaces ;
 : changes>insns ( replaces height-state -- insns )
     [ replaces>copy-insns ] [ height-state>insns ] bi* append ;
 
-: emit-changes ( replaces state -- )
+: emit-insns ( replaces state -- )
     building get pop -rot changes>insns % , ;
 
 : peek-loc ( loc -- vreg )
@@ -79,7 +79,9 @@ SYMBOLS: height-state locs>vregs local-peek-set replaces ;
 
 : end-local-analysis ( basic-block -- )
     replaces get remove-redundant-replaces
-    [ height-state get emit-changes ] keep
+    over kill-block?>> [
+        [ height-state get emit-insns ] keep
+    ] unless
     keys >hash-set >>replaces
     local-peek-set get >>peeks
     dup compute-local-kill-set >>kills drop ;
