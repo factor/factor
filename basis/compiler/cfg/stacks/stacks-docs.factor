@@ -15,10 +15,6 @@ HELP: end-stack-analysis
 { $values { "cfg" cfg } }
 { $description "Ends the stack analysis of the current cfg. This is the last step of the cfg construction (but comes before all optimization passes)." } ;
 
-HELP: adjust-d
-{ $values { "n" integer } }
-{ $description "Changes the current height of the data stack. The word is used when other instructions which adjust the stack height are emitted, such as " { $link ##call } " and " { $link ##alien-invoke } ". Since the stack height is adjusted without emitting " { ##inc } " instructions, the " { $link inc-stack } " word can't be used by them." } ;
-
 HELP: ds-drop
 { $description "Used to signal to the stack analysis that the datastacks height is decreased by one." } ;
 

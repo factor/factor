@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities
-kernel make math namespaces sequences ;
+compiler.cfg.registers compiler.cfg.stacks.local
+compiler.cfg.utilities kernel make math namespaces sequences ;
 IN: compiler.cfg.builder.blocks
 SLOT: in-d
 SLOT: out-d
@@ -28,7 +28,8 @@ SLOT: out-d
     [ out-d>> length ] [ in-d>> length ] bi - ;
 
 : emit-call-block ( word height block -- )
-    t swap kill-block?<< adjust-d ##call, ;
+    t swap kill-block?<<
+    <ds-loc> inc-stack ##call, ;
 
 : emit-trivial-call ( block word height -- block' )
     rot [ emit-call-block ] emit-trivial-block ;

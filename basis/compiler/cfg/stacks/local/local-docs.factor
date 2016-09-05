@@ -3,7 +3,7 @@ compiler.cfg.registers compiler.cfg.stacks hash-sets hashtables
 help.markup help.syntax kernel math sequences ;
 IN: compiler.cfg.stacks.local
 
-HELP: emit-changes
+HELP: emit-insns
 { $values { "replaces" sequence } { "state" sequence } }
 { $description "Insert height and stack changes prior to the last instruction." } ;
 
