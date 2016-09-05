@@ -14,9 +14,6 @@ IN: compiler.cfg.stacks.local
 : modify-height ( state loc -- )
     >loc< 0 1 ? rot nth [ + ] with map! drop ;
 
-: adjust ( state loc -- )
-    >loc< 0 1 ? rot nth dup first swapd + 0 rot set-nth ;
-
 : reset-emits ( state -- )
     [ 0 1 rot set-nth ] each ;
 

@@ -91,7 +91,6 @@ $nl
   translate-local-loc }
 "Words for writing the stack state:"
 { $subsections
-  adjust
   inc-stack
   modify-height
   replace-loc

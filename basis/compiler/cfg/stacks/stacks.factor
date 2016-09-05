@@ -61,4 +61,4 @@ IN: compiler.cfg.stacks
     [ ds-pop ] dip call ds-push ; inline
 
 : adjust-d ( n -- )
-    <ds-loc> height-state get swap adjust ;
+    0 height-state get first [ + ] change-nth ;
