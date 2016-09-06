@@ -85,46 +85,41 @@ IN: compiler.cfg.stacks.local.tests
 ] cfg-unit-test
 
 ! compute-local-kill-set
-{ 0 } [
-    V{ } 0 insns>block 0 0 pick record-stack-heights
-    compute-local-kill-set sets:cardinality
+{ HS{ } } [
+    0 0 0 0 height-state boa compute-local-kill-set
 ] unit-test
 
 { HS{ R: -4 } } [
-    V{ } 0 insns>block 4 4 pick record-stack-heights
-    { { 8 0 } { 3 0 } } height-state set
-    compute-local-kill-set
+    0 4 0 -1 height-state boa compute-local-kill-set
 ] unit-test
 
 { HS{ D: -1 D: -2 } } [
-    V{ } 0 insns>block [ 2 0 rot record-stack-heights ] keep
-    { { 0 0 } { 0 0 } } height-state set
-    compute-local-kill-set
-] cfg-unit-test
+    2 0 -2 0 height-state boa compute-local-kill-set
+] unit-test
 
-! translate-local-loc
+! global-loc>local
 { D: 2 } [
-    D: 3 { { 1 2 } { 3 4 } } translate-local-loc
+    D: 3 1 0 0 0 height-state boa global-loc>local
 ] unit-test
 
 ! height-state
 {
-    { { 3 3 } { 0 0 } }
+    T{ height-state f 0 0 3 0 }
 } [
     D: 3 inc-stack height-state get
 ] cfg-unit-test
 
 {
-    { { 5 3 } { 0 0 } }
+    T{ height-state f 2 0 3 0 }
 } [
-    { { 2 0 } { 0 0 } } height-state set
+    2 0 0 0 height-state boa height-state set
     D: 3 inc-stack height-state get
 ] cfg-unit-test
 
 {
     { T{ ##inc { loc D: 4 } } T{ ##inc { loc R: -2 } } }
 } [
-    { { 0 4  } { 0 -2 } } height-state>insns
+    0 0 4 -2 height-state boa height-state>insns
 ] unit-test
 
 { H{ { D: -1 40 } } } [

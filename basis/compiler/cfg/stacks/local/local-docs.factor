@@ -12,7 +12,29 @@ HELP: end-local-analysis
 { $description "Called to end the local analysis of a block. The word fills in the blocks slots " { $slot "replaces" } ", " { $slot "peeks" } " and " { $slot "kills" } " with what the blocks replaces, peeks and kill locations are." } ;
 
 HELP: height-state
-{ $var-description "A two-tuple used to keep track of the heights of the data and retain stacks in a " { $link basic-block } " The idea is that if the stack change instructions are tracked, then multiple changes can be folded into one. The first item is the datastacks current height and queued up height change. The second item is the same for the retain stack." } ;
+{ $description "A tuple which keeps track of the stacks heights and increments of a " { $link basic-block } " during local analysis. The idea is that if the stack change instructions are tracked, then multiple changes can be folded into one. It has the following slots:"
+  { $table
+    {
+        { $slot "ds-begin" }
+        "Datastack height at the beginning of the block."
+    }
+    {
+        { $slot "rs-begin" }
+        "Retainstack height at the beginning of the block."
+    }
+    {
+        { $slot "ds-inc" }
+        "Datastack change during the block."
+    }
+    {
+        { $slot "rs-inc" }
+        "Retainstack change during the block."
+    }
+  }
+}
+{ $see-also inc-stack reset-incs } ;
+
+! { $var-description "A two-tuple used to keep track of the heights of the data and retain stacks in a " { $link basic-block } " The idea is that if the stack change instructions are tracked, then multiple changes can be folded into one. The first item is the datastacks current height and queued up height change. The second item is the same for the retain stack." } ;
 
 HELP: height-state>insns
 { $values { "state" sequence } { "insns" sequence } }
@@ -21,7 +43,7 @@ HELP: height-state>insns
   "In this example the datastacks height is increased by 4 and the retainstacks decreased by 2."
   { $example
     "USING: compiler.cfg.stacks.local prettyprint ;"
-    "{ { 0 4 } { 0 -2 } } height-state>insns ."
+    "T{ height-state f 0 0 4 -2 } height-state>insns ."
     "{ T{ ##inc { loc D: 4 } } T{ ##inc { loc R: -2 } } }"
   }
 } ;
@@ -64,13 +86,13 @@ HELP: replaces
 { $var-description "An " { $link assoc } " that maps from stack locations to virtual registers that were put on the stack during the local analysis phase. " { $link ds-push } " and similar words writes to it." }
 { $see-also replace-loc } ;
 
-HELP: translate-local-loc
-{ $values { "loc" loc } { "state" "height state" }  { "loc'" loc } }
+HELP: global-loc>local
+{ $values { "loc" loc } { "height-state" height-state }  { "loc'" loc } }
 { $description "Translates an absolute stack location to one that is relative to the given height state." }
 { $examples
   { $example
     "USING: compiler.cfg.stacks.local compiler.cfg.registers namespaces prettyprint ;"
-    "D: 7 { { 3 0 } { 0 0 } } translate-local-loc ."
+    "D: 7 T{ height-state f 3 0 0 0 } global-loc>local ."
     "D: 4"
   }
 }
@@ -88,11 +110,11 @@ $nl
 "Words for reading the stack state:"
 { $subsections
   peek-loc
-  translate-local-loc }
+  global-loc>local
+}
 "Words for writing the stack state:"
 { $subsections
   inc-stack
-  modify-height
   replace-loc
 }
 "Beginning and ending analysis:"

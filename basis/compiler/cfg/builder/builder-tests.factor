@@ -367,7 +367,7 @@ SYMBOL: foo
 
 ! ! #shuffle
 {
-    { { 1 1 } { 0 0 } }
+    T{ height-state f 0 0 1 0 }
     H{ { D: -1 4 } { D: 0 4 } }
 } [
     4 D: 0 replace-loc
@@ -396,6 +396,11 @@ SYMBOL: foo
     }
 } [
     <basic-block> dup set-basic-block end-word instructions>>
+] unit-test
+
+! height-changes
+{ { -2 0 } } [
+    T{ #shuffle { in-d { 37 81 92 } } { out-d { 20 } } } height-changes
 ] unit-test
 
 ! make-input-map

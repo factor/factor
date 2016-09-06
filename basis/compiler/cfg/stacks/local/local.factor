@@ -1,47 +1,46 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg.instructions
-compiler.cfg.parallel-copy compiler.cfg.registers hash-sets kernel
+USING: accessors arrays assocs combinators compiler.cfg.instructions
+compiler.cfg.parallel-copy compiler.cfg.registers fry hash-sets kernel
 make math math.order namespaces sequences sets ;
 IN: compiler.cfg.stacks.local
 
-: current-height ( state -- ds rs )
-    first2 [ first ] bi@ ;
+TUPLE: height-state ds-begin rs-begin ds-inc rs-inc ;
 
 : >loc< ( loc -- n ds? )
     [ n>> ] [ ds-loc? ] bi ;
 
-: modify-height ( state loc -- )
-    >loc< 0 1 ? rot nth [ + ] with map! drop ;
+: ds-height ( height-state -- n )
+    [ ds-begin>> ] [ ds-inc>> ] bi + ;
 
-: reset-emits ( state -- )
-    [ 0 1 rot set-nth ] each ;
+: rs-height ( height-state -- n )
+    [ rs-begin>> ] [ rs-inc>> ] bi + ;
 
-: height-state>insns ( state -- insns )
-    [ second ] map { ds-loc rs-loc } [ new swap >>n ] 2map
+: global-loc>local ( loc height-state -- loc' )
+    [ clone dup >loc< ] dip swap [ ds-height ] [ rs-height ] if - >>n ;
+
+: inc-stack ( loc -- )
+    >loc< height-state get swap
+    [ [ + ] change-ds-inc ] [ [ + ] change-rs-inc ] if drop ;
+
+: height-state>insns ( height-state -- insns )
+    [ ds-inc>> ds-loc ] [ rs-inc>> rs-loc ] bi [ new swap >>n ] 2bi@ 2array
     [ n>> 0 = ] reject [ ##inc new swap >>loc ] map ;
 
-: translate-local-loc ( loc state -- loc' )
-    [ clone ] dip over >loc< 0 1 ? rot nth first - >>n ;
+: reset-incs ( height-state -- )
+    dup ds-inc>> '[ _ + ] change-ds-begin
+    dup rs-inc>> '[ _ + ] change-rs-begin
+    0 >>ds-inc 0 >>rs-inc drop ;
 
-: clone-height-state ( state -- state' )
-    [ clone ] map ;
-
-: initial-height-state ( -- state )
-    { { 0 0 } { 0 0 } } clone-height-state ;
-
-: kill-locations ( saved-height height -- seq )
+: kill-locations ( begin-height current-height -- seq )
     dupd [-] iota [ swap - ] with map ;
 
-: local-kill-set ( ds-height rs-height state -- set )
-    current-height swapd [ kill-locations ] 2bi@
+: local-kill-set ( ds-begin rs-begin ds-current rs-current  -- set )
+    swapd [ kill-locations ] 2bi@
     [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
     append >hash-set ;
 
-SYMBOLS: height-state locs>vregs local-peek-set replaces ;
-
-: inc-stack ( loc -- )
-    height-state get swap modify-height ;
+SYMBOLS: locs>vregs local-peek-set replaces ;
 
 : loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
 : vreg>loc ( vreg -- loc/f ) locs>vregs get value-at ;
@@ -56,21 +55,24 @@ SYMBOLS: height-state locs>vregs local-peek-set replaces ;
     building get pop -rot changes>insns % , ;
 
 : peek-loc ( loc -- vreg )
-    height-state get translate-local-loc dup replaces get at
+    height-state get global-loc>local
+    dup replaces get at
     [ ] [ dup local-peek-set get adjoin loc>vreg ] ?if ;
 
 : replace-loc ( vreg loc -- )
-    height-state get translate-local-loc replaces get set-at ;
+    height-state get global-loc>local
+    replaces get set-at ;
 
 : record-stack-heights ( ds-height rs-height bb -- )
     [ rs-height<< ] keep ds-height<< ;
 
-: compute-local-kill-set ( basic-block -- set )
-    [ ds-height>> ] [ rs-height>> ] bi height-state get local-kill-set ;
+: compute-local-kill-set ( height-state -- set )
+    { [ ds-begin>> ] [ rs-begin>> ] [ ds-height ] [ rs-height ] } cleave
+    local-kill-set ;
 
 : begin-local-analysis ( basic-block -- )
-    height-state get dup reset-emits
-    current-height rot record-stack-heights
+    height-state get reset-incs
+    height-state get [ ds-height ] [ rs-height ] bi rot record-stack-heights
     HS{ } clone local-peek-set namespaces:set
     H{ } clone replaces namespaces:set ;
 
@@ -84,4 +86,4 @@ SYMBOLS: height-state locs>vregs local-peek-set replaces ;
     ] unless
     keys >hash-set >>replaces
     local-peek-set get >>peeks
-    dup compute-local-kill-set >>kills drop ;
+    height-state get compute-local-kill-set >>kills drop ;
