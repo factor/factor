@@ -38,13 +38,13 @@ SLOT: out-d
     [ word>> ] [ call-height ] bi emit-trivial-call ;
 
 : begin-branch ( block -- block' )
-    height-state [ clone-height-state ] change (begin-basic-block) ;
+    height-state [ clone ] change (begin-basic-block) ;
 
 : end-branch ( block/f -- pair/f )
     dup [
         ##branch,
         end-local-analysis
-        height-state get clone-height-state 2array
+        height-state get clone 2array
     ] when* ;
 
 : with-branch ( block quot: ( ..a block -- ..b block' ) -- pair/f )

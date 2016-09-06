@@ -22,9 +22,10 @@ IN: compiler.cfg.builder.blocks.tests
 ! emit-call-block
 {
     V{ T{ ##call { word 2drop } } }
-    { { -2 -2 } { 0 0 } }
+    T{ height-state f 0 0 -2 0 }
 } [
-    \ 2drop -2 <basic-block> [ emit-call-block ] V{ } make height-state get
+    \ 2drop -2 <basic-block> [ emit-call-block ] V{ } make
+    height-state get
 ] cfg-unit-test
 
 ! emit-trivial-block
