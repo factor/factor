@@ -33,13 +33,14 @@ IN: compiler.cfg.stacks.local.tests
     { }
     { }
     { -6 -5 -4 -3 }
+    { -7 -6 -5 }
 } [
-    -10 -16 kill-locations
+    -10 -6 kill-locations
     0 0 kill-locations
-    2 6 kill-locations
-    6 2 kill-locations
+    2 4 kill-locations
+    6 -4 kill-locations
+    7 -3 kill-locations
 ] unit-test
-
 
 ! loc>vreg
 { 1 } [
