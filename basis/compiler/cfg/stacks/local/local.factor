@@ -32,14 +32,6 @@ TUPLE: height-state ds-begin rs-begin ds-inc rs-inc ;
     dup rs-inc>> '[ _ + ] change-rs-begin
     0 >>ds-inc 0 >>rs-inc drop ;
 
-: kill-locations ( begin-height current-height -- seq )
-    dupd [-] iota [ swap - ] with map ;
-
-: local-kill-set ( ds-begin rs-begin ds-current rs-current  -- set )
-    swapd [ kill-locations ] 2bi@
-    [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
-    append >hash-set ;
-
 SYMBOLS: locs>vregs local-peek-set replaces ;
 
 : loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
@@ -66,8 +58,16 @@ SYMBOLS: locs>vregs local-peek-set replaces ;
 : record-stack-heights ( ds-height rs-height bb -- )
     [ rs-height<< ] keep ds-height<< ;
 
+: kill-locations ( begin inc -- seq )
+    0 min neg iota [ swap - ] with map ;
+
+: local-kill-set ( ds-begin ds-inc rs-begin rs-inc -- set )
+    [ kill-locations ] 2bi@
+    [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
+    append >hash-set ;
+
 : compute-local-kill-set ( height-state -- set )
-    { [ ds-begin>> ] [ rs-begin>> ] [ ds-height ] [ rs-height ] } cleave
+    { [ ds-begin>> ] [ ds-inc>> ] [ rs-begin>> ] [ rs-inc>> ] } cleave
     local-kill-set ;
 
 : begin-local-analysis ( basic-block -- )

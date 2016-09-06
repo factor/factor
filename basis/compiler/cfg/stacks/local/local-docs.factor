@@ -34,8 +34,6 @@ HELP: height-state
 }
 { $see-also inc-stack reset-incs } ;
 
-! { $var-description "A two-tuple used to keep track of the heights of the data and retain stacks in a " { $link basic-block } " The idea is that if the stack change instructions are tracked, then multiple changes can be folded into one. The first item is the datastacks current height and queued up height change. The second item is the same for the retain stack." } ;
-
 HELP: height-state>insns
 { $values { "state" sequence } { "insns" sequence } }
 { $description "Converts a " { $link height-state } " tuple to 0-2 stack height change instructions." }
@@ -59,11 +57,11 @@ HELP: loc>vreg
 HELP: local-kill-set
 { $values
   { "ds-height" integer }
+  { "ds-inc" integer }
   { "rs-height" integer }
-  { "state" sequence }
-  { "set" hash-set }
+  { "rs-inc" integer }
 }
-{ $description "The set of stack locations that was killed." }
+{ $description "The set of stack locations that was killed. Locations on a stack are deemed killed if that stacks height is decremented." }
 { $see-also compute-local-kill-set } ;
 
 HELP: local-peek-set
