@@ -615,6 +615,8 @@ sky-condition raw ;
 : taf-body ( report str -- report )
     [ blank? ] split-when
 
+    [ "TAF" = ] find-one drop
+
     [ { "AMD" "COR" "RTD" } member? ] find-one drop
 
     [ re-station matches? ] find-one
@@ -679,7 +681,7 @@ sky-condition raw ;
     [ taf-report new ] dip [ >>raw ] keep
     string-lines [ [ blank? ] trim ] map
     rest dup first "TAF" = [ rest ] when
-    harvest unclip taf-body taf-partials ;
+    harvest unclip swapd taf-body swap taf-partials ;
 
 : taf-report. ( report -- )
     [
