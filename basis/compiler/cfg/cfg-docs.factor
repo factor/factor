@@ -1,7 +1,7 @@
 USING: compiler.cfg.instructions compiler.cfg.rpo
-compiler.cfg.stack-frame compiler.tree cpu.x86.assembler.operands
-help.markup help.syntax kernel math namespaces sequences vectors words
-;
+compiler.cfg.stack-frame compiler.cfg.stacks.local compiler.tree
+cpu.x86.assembler.operands help.markup help.syntax kernel math
+namespaces sequences vectors words ;
 IN: compiler.cfg
 
 HELP: basic-block
@@ -29,12 +29,8 @@ HELP: basic-block
         { "The first and the last block in a cfg and all blocks containing " { $link ##call } " instructions are kill blocks. Kill blocks can't be optimized so they are omitted from certain optimization steps." }
     }
     {
-        { $slot "ds-height" }
-        "The datastacks height at the entry of the block. Used during cfg construction."
-    }
-    {
-        { $slot "rs-height" }
-        "The retainstacks height at the entry of the block. Used during cfg construction."
+        { $slot "height" }
+        "Block's height as a " { $link height-state } ". What the heights of the block was at entry and how much they were increased in the block."
     }
     {
         { $slot "replaces" }

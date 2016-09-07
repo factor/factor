@@ -12,14 +12,3 @@ IN: compiler.cfg.stacks.finalize.tests
     [ successors>> first instructions>> first ]
     [ predecessors>> first instructions>> first ] bi*
 ] unit-test
-
-{
-    T{ ds-loc f 4 }
-    T{ rs-loc f 5 }
-} [
-    begin-stack-analysis
-    3 4 T{ basic-block }
-    [ record-stack-heights ]
-    [ D: 1 swap local-loc>global ]
-    [ R: 1 swap local-loc>global ] tri
-] unit-test
