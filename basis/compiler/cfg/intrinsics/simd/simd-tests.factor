@@ -49,10 +49,10 @@ IN: compiler.cfg.intrinsics.simd.tests
 
 : test-compiler-env ( -- x )
     H{ } clone
-    T{ basic-block } 0 >>ds-height 0 >>rs-height
+    T{ basic-block } 0 0 0 0 height-state boa >>height
     \ basic-block pick set-at
 
-    initial-height-state \ height-state pick set-at
+    0 0 0 0 height-state boa \ height-state pick set-at
     HS{ } clone \ local-peek-set pick set-at
     H{ } clone \ replaces pick set-at
     H{ } <biassoc> \ locs>vregs pick set-at ;

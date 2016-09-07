@@ -18,7 +18,7 @@ IN: compiler.cfg.stacks.finalize
 
 : each-insertion ( ... set bb quot: ( ... vreg loc -- ... ) -- ... )
     [ members ] 2dip
-    '[ [ loc>vreg ] [ _ local-loc>global ] bi @ ] each ; inline
+    '[ [ loc>vreg ] [ _ height>> local-loc>global ] bi @ ] each ; inline
 
 ERROR: bad-peek dst loc ;
 

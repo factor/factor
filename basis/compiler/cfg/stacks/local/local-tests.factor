@@ -13,23 +13,31 @@ IN: compiler.cfg.stacks.local.tests
     HS{ }
 } [
     V{ } 137 insns>block
-    [ 0 0 rot record-stack-heights ]
     [ [ "eh" , end-local-analysis ] V{ } make drop ]
-    [ [ peeks>> ] [ replaces>> ] [ kills>> ] tri ] tri
+    [ [ peeks>> ] [ replaces>> ] [ kills>> ] tri ] bi
 ] cfg-unit-test
 
 {
     HS{ D: 3 }
 } [
     V{ } 137 insns>block
-    [ 0 0 rot record-stack-heights ]
     [ [ 3 D: 3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
-    [ replaces>> ] tri
+    [ replaces>> ] bi
 ] cfg-unit-test
 
 ! local-loc>global
 { D: 6 } [
-    D: 3 <basic-block> 3 >>ds-height local-loc>global
+    D: 3 3 0 0 0 height-state boa
+    local-loc>global
+] unit-test
+
+{
+    D: 4
+    R: 5
+} [
+    3 4 0 0 height-state boa
+    [ D: 1 swap local-loc>global ]
+    [ R: 1 swap local-loc>global ] bi
 ] unit-test
 
 ! kill-locations

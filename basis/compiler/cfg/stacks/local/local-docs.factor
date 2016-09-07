@@ -3,6 +3,10 @@ compiler.cfg.registers compiler.cfg.stacks hash-sets hashtables
 help.markup help.syntax kernel math sequences ;
 IN: compiler.cfg.stacks.local
 
+HELP: begin-local-analysis
+{ $values { "basic-block" basic-block } }
+{ $description "Begins the local analysis of the block. The height slot of the block is initialized with the resulting height of the last block." } ;
+
 HELP: emit-insns
 { $values { "replaces" sequence } { "state" sequence } }
 { $description "Insert height and stack changes prior to the last instruction." } ;
@@ -87,10 +91,6 @@ HELP: peek-loc
 { $values { "loc" loc } { "vreg" "virtual register" } }
 { $description "Retrieves the virtual register at the given stack location. If no register has been stored at that location, then a new vreg is returned." } ;
 
-HELP: record-stack-heights
-{ $values { "ds-height" number } { "rs-height" number } { "bb" basic-block } }
-{ $description "Sets the data and retain stack heights in relation to the cfg of this basic block." } ;
-
 HELP: replace-loc
 { $values { "vreg" "virtual register" } { "loc" loc } }
 { $description "Registers that the absolute stack location " { $snippet "loc" } " should be overwritten with the contents of the virtual register." }
@@ -101,13 +101,15 @@ HELP: replaces
 { $see-also replace-loc } ;
 
 ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
-"Local stack analysis. For each " { $link basic-block } " in the " { $link cfg } ", three sets containing stack locations are built:"
+"For each " { $link basic-block } " in the " { $link cfg } ", local stack analysis is performed. The analysis is started right after the block is created with " { $link begin-local-analysis } " and finished with " { $link end-local-analysis } ", when the construction of the block is complete. During the analysis, three sets containing stack locations are built:"
 { $list
   { { $slot "peeks" } " all stack locations that the block reads before writing" }
   { { $slot "replaces" } " all stack locations that the block writes" }
   { { $slot "kills" } " all stack locations which become unavailable after the block ends because of the stack height being decremented. For example, if the block contains " { $link drop } ", then D: 0 will be contained in kills because that stack location will not be live anymore." }
 }
-"This is done while constructing the CFG."
+"This is done while constructing the CFG. These sets are then used by the " { $link end-stack-analysis } " word to emit optimal sequences of " { $link ##peek } " and " { $link ##replace } " instructions to the cfg."
+$nl
+"For example, the code [ dup dup dup ] will only execute ##peek once, instead of three time which a 'non-lazy' method would."
 $nl
 "Words for reading the stack state:"
 { $subsections
