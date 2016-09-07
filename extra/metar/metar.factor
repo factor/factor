@@ -40,7 +40,7 @@ ERROR: bad-location str ;
     ] [ drop f ] if ;
 
 : stations-data ( -- seq )
-    URL" http://weather.noaa.gov/data/nsd_cccc.txt"
+    URL" http://tgftp.nws.noaa.gov/data/nsd_cccc.txt"
     http-get nip CHAR: ; [ string>csv ] with-delimiter ;
 
 PRIVATE>
@@ -578,7 +578,7 @@ GENERIC: metar ( station -- metar )
 M: station metar cccc>> metar ;
 
 M: string metar
-    "http://weather.noaa.gov/pub/data/observations/metar/stations/%s.TXT"
+    "http://tgftp.nws.noaa.gov/data/observations/metar/stations/%s.TXT"
     sprintf http-get nip ;
 
 GENERIC: metar. ( station -- )
@@ -718,7 +718,7 @@ GENERIC: taf ( station -- taf )
 M: station taf cccc>> taf ;
 
 M: string taf
-    "http://weather.noaa.gov/pub/data/forecasts/taf/stations/%s.TXT"
+    "http://tgftp.nws.noaa.gov/data/forecasts/stations/%s.TXT"
     sprintf http-get nip ;
 
 GENERIC: taf. ( station -- )
