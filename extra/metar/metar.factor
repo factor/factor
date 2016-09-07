@@ -718,7 +718,7 @@ GENERIC: taf ( station -- taf )
 M: station taf cccc>> taf ;
 
 M: string taf
-    "http://tgftp.nws.noaa.gov/data/forecasts/stations/%s.TXT"
+    "http://tgftp.nws.noaa.gov/data/forecasts/taf/stations/%s.TXT"
     sprintf http-get nip ;
 
 GENERIC: taf. ( station -- )
