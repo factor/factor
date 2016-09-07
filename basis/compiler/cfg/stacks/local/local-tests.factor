@@ -1,4 +1,4 @@
-USING: accessors assocs compiler.cfg.instructions
+USING: accessors compiler.cfg compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks.local
 compiler.cfg.utilities compiler.test cpu.architecture kernel
 kernel.private make math namespaces sequences.private slots.private
@@ -26,6 +26,11 @@ IN: compiler.cfg.stacks.local.tests
     [ [ 3 D: 3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
     [ replaces>> ] tri
 ] cfg-unit-test
+
+! local-loc>global
+{ D: 6 } [
+    D: 3 <basic-block> 3 >>ds-height local-loc>global
+] unit-test
 
 ! kill-locations
 {
