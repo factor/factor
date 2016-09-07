@@ -20,6 +20,6 @@ IN: compiler.cfg.stacks.finalize.tests
     begin-stack-analysis
     3 4 T{ basic-block }
     [ record-stack-heights ]
-    [ D: 1 swap untranslate-loc ]
-    [ R: 1 swap untranslate-loc ] tri
+    [ D: 1 swap local-loc>global ]
+    [ R: 1 swap local-loc>global ] tri
 ] unit-test

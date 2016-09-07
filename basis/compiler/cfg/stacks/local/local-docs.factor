@@ -11,6 +11,18 @@ HELP: end-local-analysis
 { $values { "basic-block" basic-block } }
 { $description "Called to end the local analysis of a block. The word fills in the blocks slots " { $slot "replaces" } ", " { $slot "peeks" } " and " { $slot "kills" } " with what the blocks replaces, peeks and kill locations are." } ;
 
+HELP: global-loc>local
+{ $values { "loc" loc } { "height-state" height-state }  { "loc'" loc } }
+{ $description "Translates an absolute stack location to one that is relative to the given height state." }
+{ $examples
+  { $example
+    "USING: compiler.cfg.stacks.local compiler.cfg.registers namespaces prettyprint ;"
+    "D: 7 T{ height-state f 3 0 0 0 } global-loc>local ."
+    "D: 4"
+  }
+}
+{ $see-also height-state local-loc>global } ;
+
 HELP: height-state
 { $description "A tuple which keeps track of the stacks heights and increments of a " { $link basic-block } " during local analysis. The idea is that if the stack change instructions are tracked, then multiple changes can be folded into one. It has the following slots:"
   { $table
@@ -50,6 +62,10 @@ HELP: inc-stack
 { $values { "loc" loc } }
 { $description "Increases or decreases the data or retain stack depending on if loc is a " { $link ds-loc } " or " { $link rs-loc } " instance. An " { $link ##inc } " instruction will later be inserted." } ;
 
+HELP: local-loc>global
+{ $values { "loc" loc } { "bb" basic-block } { "loc'" loc } }
+{ $description "Translates a stack location relative to a block to an absolute one. The word does the opposite to " { $link global-loc>local } "." } ;
+
 HELP: loc>vreg
 { $values { "loc" loc } { "vreg" "virtual register" } }
 { $description "Maps a stack location to a virtual register." } ;
@@ -84,18 +100,6 @@ HELP: replaces
 { $var-description "An " { $link assoc } " that maps from stack locations to virtual registers that were put on the stack during the local analysis phase. " { $link ds-push } " and similar words writes to it." }
 { $see-also replace-loc } ;
 
-HELP: global-loc>local
-{ $values { "loc" loc } { "height-state" height-state }  { "loc'" loc } }
-{ $description "Translates an absolute stack location to one that is relative to the given height state." }
-{ $examples
-  { $example
-    "USING: compiler.cfg.stacks.local compiler.cfg.registers namespaces prettyprint ;"
-    "D: 7 T{ height-state f 3 0 0 0 } global-loc>local ."
-    "D: 4"
-  }
-}
-{ $see-also height-state } ;
-
 ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
 "Local stack analysis. For each " { $link basic-block } " in the " { $link cfg } ", three sets containing stack locations are built:"
 { $list
@@ -109,6 +113,7 @@ $nl
 { $subsections
   peek-loc
   global-loc>local
+  local-loc>global
 }
 "Words for writing the stack state:"
 { $subsections

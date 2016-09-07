@@ -19,6 +19,9 @@ TUPLE: height-state ds-begin rs-begin ds-inc rs-inc ;
 : global-loc>local ( loc height-state -- loc' )
     [ clone dup >loc< ] dip swap [ ds-height ] [ rs-height ] if - >>n ;
 
+: local-loc>global ( loc bb -- loc' )
+    [ clone dup >loc< ] dip swap [ ds-height>> ] [ rs-height>> ] if + >>n ;
+
 : inc-stack ( loc -- )
     >loc< height-state get swap
     [ [ + ] change-ds-inc ] [ [ + ] change-rs-inc ] if drop ;
@@ -72,7 +75,7 @@ SYMBOLS: locs>vregs local-peek-set replaces ;
 
 : begin-local-analysis ( basic-block -- )
     height-state get reset-incs
-    height-state get [ ds-height ] [ rs-height ] bi rot record-stack-heights
+    height-state get [ ds-begin>> ] [ rs-begin>> ] bi rot record-stack-heights
     HS{ } clone local-peek-set namespaces:set
     H{ } clone replaces namespaces:set ;
 
