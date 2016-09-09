@@ -81,7 +81,8 @@ M: ##dispatch generate-insn
 : with-fixup ( quot -- code )
     '[
         init-relocation
-        init-gc-maps
+        V{ } clone return-addresses set
+        V{ } clone gc-maps set
         init-fixup
         [
             @

@@ -1,8 +1,9 @@
 USING: compiler.cfg.instructions compiler.cfg.registers
-compiler.codegen.gc-maps compiler.codegen.relocation compiler.test
-cpu.architecture cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86.features kernel kernel.private layouts literals make math
-math.libm namespaces sequences system tools.test ;
+compiler.codegen compiler.codegen.gc-maps compiler.codegen.relocation
+compiler.test cpu.architecture cpu.x86 cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.features kernel kernel.private
+layouts literals make math math.libm namespaces sequences system
+tools.test ;
 IN: cpu.x86.tests
 
 { } [
@@ -39,23 +40,22 @@ cpu x86.64? [
 
 ! %alien-invoke
 { 1 } [
-    init-relocation init-gc-maps [
+    [
         f { } { } { } { } 0 0 { } "dll" T{ gc-map { scrub-d V{ 0 } } } %alien-invoke
-    ] B{ } make drop
-    gc-maps get length
+    ] with-fixup drop gc-maps get length
 ] unit-test
 
 ! %call-gc
 { V{ } } [
-    init-relocation init-gc-maps
-    [ T{ gc-map { scrub-d V{ } } } %call-gc ] B{ } make drop
-    gc-maps get
+    [
+        T{ gc-map { scrub-d V{ } } } %call-gc
+    ] with-fixup drop gc-maps get
 ] unit-test
 
 { 1 } [
-    init-relocation init-gc-maps
-    [ T{ gc-map { scrub-d V{ 0 0 } } } %call-gc ] B{ } make drop
-    gc-maps get length
+    [
+        T{ gc-map { scrub-d V{ 0 0 } } } %call-gc
+    ] with-fixup drop gc-maps get length
 ] unit-test
 
 ! %clear

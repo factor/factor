@@ -15,7 +15,8 @@ M: fake-cpu gc-root-offset ;
 
 [
     init-relocation
-    init-gc-maps
+    V{ } clone return-addresses set
+    V{ } clone gc-maps set
 
     50 <byte-array> %
 
