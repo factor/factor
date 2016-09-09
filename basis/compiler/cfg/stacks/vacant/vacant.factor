@@ -16,5 +16,5 @@ IN: compiler.cfg.stacks.vacant
     swap state>gc-data first2 -rot >>scrub-d swap >>scrub-r drop ;
 
 : fill-gc-maps ( cfg -- )
-    [ trace-stack-state2 ] [ cfg>insns [ gc-map-insn? ] filter ] bi
+    [ trace-stack-state ] [ cfg>insns [ gc-map-insn? ] filter ] bi
     [ [ insn#>> of ] [ gc-map>> ] bi set-gc-map ] with each ;
