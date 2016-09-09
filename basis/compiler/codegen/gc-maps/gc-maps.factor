@@ -68,10 +68,6 @@ SYMBOLS: return-addresses gc-maps ;
         return-addresses get length emit-uint
     ] B{ } make ;
 
-: init-gc-maps ( -- )
-    V{ } clone return-addresses set
-    V{ } clone gc-maps set ;
-
 : emit-gc-maps ( -- )
     serialize-gc-maps [
         length compiled-offset +
