@@ -4,14 +4,12 @@ namespace factor {
 //   basis/compiler/codegen/gc-maps/gc-maps.factor
 //   basis/vm/vm.factor
 struct gc_info {
-  uint32_t scrub_d_count;
-  uint32_t scrub_r_count;
   uint32_t gc_root_count;
   uint32_t derived_root_count;
   uint32_t return_address_count;
 
   cell callsite_bitmap_size() {
-    return scrub_d_count + scrub_r_count + gc_root_count;
+    return gc_root_count;
   }
 
   cell total_bitmap_size() {
@@ -32,21 +30,9 @@ struct gc_info {
     return (uint8_t*)base_pointer_map() - total_bitmap_bytes();
   }
 
-  cell callsite_scrub_d(cell index) {
-    cell base = 0;
-    return base + index * scrub_d_count;
-  }
-
-  cell callsite_scrub_r(cell index) {
-    cell base = return_address_count * scrub_d_count;
-    return base + index * scrub_r_count;
-  }
 
   cell callsite_gc_roots(cell index) {
-    cell base =
-        return_address_count * scrub_d_count +
-        return_address_count * scrub_r_count;
-    return base + index * gc_root_count;
+    return index * gc_root_count;
   }
 
   uint32_t lookup_base_pointer(cell index, cell derived_root) {

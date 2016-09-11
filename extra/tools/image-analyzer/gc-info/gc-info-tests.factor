@@ -27,13 +27,9 @@ QUALIFIED: opencl
 
 : tally-gc-maps ( gc-maps -- seq/f )
     [ f ] [
-        {
-            [ [ scrub-d>> length ] map supremum ]
-            [ [ scrub-r>> length ] map supremum ]
-            [ [ gc-root-offsets ] map largest-spill-slot ]
-            [ [ derived-root-offsets ] map [ keys ] map largest-spill-slot ]
-            [ length ]
-        } cleave 5 narray
+        [ [ gc-root-offsets ] map largest-spill-slot ]
+        [ [ derived-root-offsets ] map [ keys ] map largest-spill-slot ]
+        [ length ] tri 3array
     ] if-empty ;
 
 ! Like word>gc-info but uses the compiler

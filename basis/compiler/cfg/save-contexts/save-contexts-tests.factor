@@ -38,7 +38,7 @@ V{
 V{
     T{ ##inc f D: 3 }
     T{ ##box f 4 3 "from_signed_4" int-rep
-        T{ gc-map { scrub-d B{ 0 0 0 } } { scrub-r B{ } } { gc-roots { } } }
+       T{ gc-map { gc-roots { } } }
     }
 } 0 test-bb
 
@@ -49,7 +49,7 @@ V{
         T{ ##inc f D: 3 }
         T{ ##save-context f 5 6 }
         T{ ##box f 4 3 "from_signed_4" int-rep
-            T{ gc-map { scrub-d B{ 0 0 0 } } { scrub-r B{ } } { gc-roots { } } }
+            T{ gc-map { gc-roots { } } }
         }
     }
 } [

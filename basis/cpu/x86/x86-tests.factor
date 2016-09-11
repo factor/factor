@@ -41,20 +41,22 @@ cpu x86.64? [
 ! %alien-invoke
 { 1 } [
     [
-        f { } { } { } { } 0 0 { } "dll" T{ gc-map { scrub-d V{ 0 } } } %alien-invoke
+        f { } { } { } { } 0 0 { } "dll"
+        T{ gc-map { gc-roots V{ T{ spill-slot { n 0 } } } } }
+        %alien-invoke
     ] with-fixup drop gc-maps get length
 ] unit-test
 
 ! %call-gc
 { V{ } } [
     [
-        T{ gc-map { scrub-d V{ } } } %call-gc
+        T{ gc-map } %call-gc
     ] with-fixup drop gc-maps get
 ] unit-test
 
 { 1 } [
     [
-        T{ gc-map { scrub-d V{ 0 0 } } } %call-gc
+        T{ gc-map { gc-roots V{ T{ spill-slot { n 0 } } } } } %call-gc
     ] with-fixup drop gc-maps get length
 ] unit-test
 

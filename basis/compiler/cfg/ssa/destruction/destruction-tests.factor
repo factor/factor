@@ -51,10 +51,10 @@ IN: compiler.cfg.ssa.destruction.tests
            { stack-size 0 }
            { symbols "g_quark_to_string" }
            { dll DLL" libglib-2.0.so" }
-           { gc-map T{ gc-map { scrub-d { } } { scrub-r { } } } }
+           { gc-map T{ gc-map } }
            { insn# 14 }
         }
-        T{ ##call-gc { gc-map T{ gc-map { scrub-d { } } { scrub-r { } } } } }
+        T{ ##call-gc { gc-map T{ gc-map } } }
         T{ ##box-alien
            { dst 37 }
            { src 36 }

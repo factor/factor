@@ -399,7 +399,7 @@ HELP: gc-map
   }
   "The 'gc-roots' and 'derived-roots' slots are initially vreg integers referencing objects that are live during the gc call and needs to be spilled so that they can be traced. In the " { $link emit-gc-map-insn } " word in " { $vocab-link "compiler.cfg.linear-scan.assignment" } " they are converted to spill slots which the collector is able to trace."
 }
-{ $see-also emit-gc-info-bitmaps fill-gc-map } ;
+{ $see-also emit-gc-info-bitmap fill-gc-map } ;
 
 ARTICLE: "compiler.cfg.instructions" "Basic block instructions"
 "The " { $vocab-link "compiler.cfg.instructions" } " vocab contains all instruction classes used for generating CFG:s (Call Flow Graphs)."
