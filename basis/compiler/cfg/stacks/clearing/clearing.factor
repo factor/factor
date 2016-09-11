@@ -8,7 +8,8 @@ IN: compiler.cfg.stacks.clearing
     [ f ##clear boa ] map ;
 
 : dangerous-insn? ( state insn -- ? )
-    { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ;
+    [ { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ]
+    [ gc-map-insn? ] bi or ;
 
 : clearing-insns ( assoc insn -- insns' )
     [ insn#>> of ] keep 2dup dangerous-insn? [

@@ -237,7 +237,7 @@ IN: compiler.cfg.stacks.padding.tests
             10 V{
                 T{ ##inc f D: -3 }
                 T{ ##peek { dst 0 } { loc D: 0 } }
-                T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+                T{ ##alien-invoke { gc-map T{ gc-map } } }
             }
         }
     } [ over insns>block ] assoc-map dup
@@ -660,7 +660,7 @@ IN: compiler.cfg.stacks.padding.tests
 [
     V{
         T{ ##inc f D: 1 }
-        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+        T{ ##alien-invoke { gc-map T{ gc-map } } }
         T{ ##peek { loc D: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with

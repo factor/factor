@@ -18,11 +18,12 @@ IN: compiler.cfg.stacks.clearing.tests
 
 ! dangerous-insn?
 {
-    t f t
+    t f t t
 } [
     { { 0 { } } { 0 { } } } T{ ##peek { loc D: 0 } } dangerous-insn?
     { { 1 { } } { 0 { } } } T{ ##peek { loc D: 0 } } dangerous-insn?
     { { 2 { 0 1 } } { 0 { } } } T{ ##peek { loc D: 2 } } dangerous-insn?
+    { { 0 { } } { 3 { } } } T{ ##call-gc } dangerous-insn?
 ] unit-test
 
 ! state>clears

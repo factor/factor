@@ -223,31 +223,16 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
 }
 
 // primitive_minor_gc() is invoked by inline GC checks, and it needs to
-// fill in uninitialized stack locations before actually calling the GC.
-// See the documentation in compiler.cfg.stacks.vacant for details.
+// visit spill slots which references objects in the heap.
 
 // So for each call frame:
-//  - scrub some uninitialized locations
 //  - trace roots in spill slots
 
 template <typename Fixup> struct call_frame_slot_visitor {
   slot_visitor<Fixup>* visitor;
-  // NULL in case we're a visitor for a callstack object.
-  context* ctx;
 
-  void scrub_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
-    for (cell loc = 0; loc < count; loc++) {
-      if (bitmap_p(bitmap, base + loc)) {
-#ifdef DEBUG_GC_MAPS
-        FACTOR_PRINT("scrubbing stack location " << loc);
-#endif
-        *((cell*)stack - loc) = 0;
-      }
-    }
-  }
-
-  call_frame_slot_visitor(slot_visitor<Fixup>* visitor, context* ctx)
-      : visitor(visitor), ctx(ctx) {}
+  call_frame_slot_visitor(slot_visitor<Fixup>* visitor)
+      : visitor(visitor) {}
 
   // frame top -> [return address]
   //              [spill area]
@@ -275,18 +260,6 @@ template <typename Fixup> struct call_frame_slot_visitor {
     cell* stack_pointer = (cell*)frame_top;
     uint8_t* bitmap = info->gc_info_bitmap();
 
-    if (ctx) {
-      // Scrub vacant stack locations.
-      scrub_stack(ctx->datastack,
-                  bitmap,
-                  info->callsite_scrub_d(callsite),
-                  info->scrub_d_count);
-      scrub_stack(ctx->retainstack,
-                  bitmap,
-                  info->callsite_scrub_r(callsite),
-                  info->scrub_r_count);
-    }
-
     // Subtract old value of base pointer from every derived pointer.
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
@@ -305,9 +278,9 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
     for (cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++) {
       if (bitmap_p(bitmap, callsite_gc_roots + spill_slot)) {
-#ifdef DEBUG_GC_MAPS
+        #ifdef DEBUG_GC_MAPS
         FACTOR_PRINT("visiting GC root " << spill_slot);
-#endif
+        #endif
         visitor->visit_handle(stack_pointer + spill_slot);
       }
     }
@@ -324,13 +297,13 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack* stack) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(this, NULL);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(this);
   parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context* ctx) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(this, ctx);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(this);
   parent->iterate_callstack(ctx, call_frame_visitor, fixup);
 }
 

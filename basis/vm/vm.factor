@@ -102,8 +102,6 @@ STRUCT: gc-event
 ! gc-info should be kept in sync with:
 !   vm/gc_info.hpp
 STRUCT: gc-info
-    { scrub-d-count uint read-only }
-    { scrub-r-count uint read-only }
     { gc-root-count uint read-only }
     { derived-root-count uint read-only }
     { return-address-count uint read-only } ;
