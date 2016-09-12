@@ -44,7 +44,7 @@ HELP: dangerous-insn?
   }
   { $example
     "USING: compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks.clearing prettyprint ;"
-    "{ { 0 { } } { 3 { } } } T{ ##call-gc } dangerous-insn?"
+    "{ { 0 { } } { 3 { } } } T{ ##call-gc } dangerous-insn? ."
     "t"
   }
 } ;
