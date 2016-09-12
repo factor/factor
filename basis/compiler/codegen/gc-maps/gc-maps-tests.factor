@@ -105,7 +105,6 @@ cpu x86.64? [
         ] with-variable
     ] unit-test
 
-    ! scrub-d scrub-r gc-roots
     { 9 B{ 32 1 } } [
         32 cfg-w-spill-area-base cfg [
             { 0 24 } <gc-map/spills> 1array

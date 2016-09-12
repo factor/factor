@@ -309,8 +309,6 @@ void slot_visitor<Fixup>::visit_callstack(context* ctx) {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_context(context* ctx) {
-  // Callstack is visited first because it scrubs the data and retain
-  // stacks.
   visit_callstack(ctx);
 
   cell ds_ptr = ctx->datastack;
