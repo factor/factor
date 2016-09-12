@@ -81,7 +81,6 @@ common_source = [
     'free_list.cpp',
     'full_collector.cpp',
     'gc.cpp',
-    'gc_info.cpp',
     'image.cpp',
     'inline_cache.cpp',
     'instruction_operands.cpp',
