@@ -1,6 +1,7 @@
 ! (c)2010 Joe Groff bsd license
-USING: globs io.directories io.directories.hierarchy io.files.info
-io.pathnames kernel regexp sequences vocabs.loader vocabs.metadata ;
+USING: fry globs io.directories io.directories.hierarchy io.files.info
+io.pathnames kernel regexp sequences sets vocabs.loader
+vocabs.metadata ;
 IN: vocabs.metadata.resources
 
 <PRIVATE
@@ -21,13 +22,19 @@ PRIVATE>
         dup directory-tree-files [ append-path ] with map
     ] [ drop { } ] if swap prefix ;
 
-: filter-resources ( resource-globs vocab-files -- vocab-files' )
-    [ swap [ matches? ] with any? ] with filter ;
+ERROR: resource-missing pattern ;
+
+: match-pattern ( pattern files -- files' )
+    over <glob> '[ _ matches? ] filter
+    [ resource-missing ] [ nip ] if-empty ;
+
+: match-patterns ( patterns files -- files' )
+    '[ _ match-pattern ] map concat members ;
 
 : vocab-resource-files ( vocab -- filenames )
-    [ vocab-resources [ <glob> ] map ] [ vocab-dir-in-root ] bi
+    [ vocab-resources ] [ vocab-dir-in-root ] bi
     [
-        filter-resources [ expand-resource ] map concat
+        match-patterns [ expand-resource ] map concat
     ] with-directory-files ;
 
 : copy-vocab-resources ( dir vocab -- )
