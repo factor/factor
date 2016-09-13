@@ -24,11 +24,11 @@ PRIVATE>
 
 ERROR: resource-missing pattern ;
 
-: match-pattern ( pattern files -- files' )
+: match-pattern ( pattern filenames -- filenames' )
     over <glob> '[ _ matches? ] filter
     [ resource-missing ] [ nip ] if-empty ;
 
-: match-patterns ( patterns files -- files' )
+: match-patterns ( patterns filenames -- filenames' )
     '[ _ match-pattern ] map concat members ;
 
 : vocab-resource-files ( vocab -- filenames )
