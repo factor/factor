@@ -1,6 +1,10 @@
 ! (c)2010 Joe Groff bsd license
-USING: help.markup help.syntax kernel ;
+USING: help.markup help.syntax strings ;
 IN: vocabs.metadata.resources
+
+HELP: copy-vocab-resources
+{ $values { "dir" string } { "vocab" string } }
+{ $description "Copies all the vocabs resource files to the given directory." } ;
 
 HELP: expand-vocab-resource-files
 { $values
