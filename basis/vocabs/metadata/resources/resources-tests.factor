@@ -2,10 +2,14 @@
 USING: arrays globs sorting tools.test vocabs.metadata.resources ;
 IN: vocabs.metadata.resources.tests
 
-! filter-resources
+! match-pattern
 { { "hello.txt" } } [
-    "*.txt" <glob> 1array { "hello.txt" } filter-resources
+    "*.txt" { "hello.txt" } match-pattern
 ] unit-test
+
+[
+    "*.txt" { "foo.bar" "foo.factor" } match-pattern
+] [ resource-missing? ] must-fail-with
 
 ! vocab-resource-files
 { { "bar" "bas" "foo" } }
