@@ -23,7 +23,7 @@ dlls = [
     ('libcairo-2.dll', '816ce24100a0de30cd24852dbaa3dbfb', 'b2bb842451a11585d73b3eb65878ece9'),
     ('libcairo-gobject-2.dll', None, 'd16b292282398324baa2dd0408c9515e'),
     ('libcairo-script-interpreter-2.dll', None, '66eaa1bafa03beed6f1669e769013c25'),
-    ('libcrypto-37.dll', '71027d5bcbb28f76b22c04e3a1a54282', '4cd4965d6eb16075886c1ebe1e5c491b'),
+    ('libcrypto-37.dll', '05e7df384a0eb04b9ec7122e88704759', 'af41cb15c2c71cc1c6454cda6e6fce54'),
 
     ('libexpat-1.dll', None, '3091605d9f53431b964351d80fe34ddf'),
     ('libexpat.dll', None, '85c3f3058b8d6d6332b48542957b8419'),
@@ -67,7 +67,7 @@ dlls = [
     ('libpq.dll', None, '2cd1cb3e4ffaf05d046224b84cea8c97'),
     ('libpython27.dll', '45e9efbe2b2c9b98f4e08ca35e73b5ae', '9c23faac6e19bb86934c198333101b4e'),
 
-    ('libssl-38.dll', '1f969efa4413c2f815144c8c60f6031a', '0409d4408ca6e351f2a7f9983312a7d1'),
+    ('libssl-38.dll', 'a055c612296c6d9c30a09fa646f7b522', '76c84b5ac8c73f6056c287c9d6077cea'),
     ('libssp-0.dll', None, '51515b2264de2f8660cc46b7f3ebbc6b'),
     ('libstdc++-6.dll', None, '54a45223d73d6ea6dd5a1828d2b59195'),
 
@@ -82,7 +82,7 @@ dlls = [
     ('msvcr120.dll', '034ccadc1c073e4216e9466b720f9849', '9c861c079dd81762b6c54e37597b7712'),
     ('pcre.dll', '5d6cade5112191346afa3fa66252440a', 'ce9a046b8ac744d20015ef93e2d23a47'),
     ('snappy.dll', 'd5fb0ce7c811af02dcabd22b8a7ff42e', '4ee4bf3eec99ee1867980ceaad0a490e'),
-    ('sqlite3.dll', 'ee68b052a08fec0f574f2dae2003df27', 'e5a07bbb9dcff7e72142f589d7d0234c'),
+    ('sqlite3.dll', '875805c0713bfb771067ade3b34f149e', '023e167341d2ff6581608e6c281e620b'),
     ('zip32z64.dll', None, '10dc180ed4b49ddcd0ea2e61ae62259b'),
     ('zlib1.dll', '80e41408f6d641dc1c0f5353a0cc8125', '55c57c4c216ff91c8776ac2df0c5d94a'),
 ]
