@@ -171,7 +171,11 @@ CONSTANT: events-mask
 : on-focus-out ( win event user-data -- ? )
     2drop window unfocus-world t ;
 
-CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
+: default-icon-path ( -- path )
+    install-prefix dup "." =
+    [ drop "resource:misc/icons/Factor_128x128.png" ] [
+        "share/factor/icons/Factor_128x128.png" append-path
+    ] if ;
 
 : default-icon-data ( -- byte-array/f )
     [

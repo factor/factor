@@ -8,8 +8,9 @@ ifdef CONFIG
 
 	CFLAGS = -Wall \
 		-pedantic \
-		-DFACTOR_VERSION="$(VERSION)" \
-		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
+		-DFACTOR_VERSION="\"$(VERSION)\"" \
+		-DFACTOR_GIT_LABEL="\"$(GIT_LABEL)\"" \
+		-DINSTALL_PREFIX="\".\"" \
 		$(SITE_CFLAGS)
 
 	CXXFLAGS += -std=c++11

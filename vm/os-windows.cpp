@@ -185,13 +185,6 @@ uint64_t nano_count() {
 
 void sleep_nanos(uint64_t nsec) { Sleep((DWORD)(nsec / 1000000)); }
 
-typedef enum _EXCEPTION_DISPOSITION {
-  ExceptionContinueExecution = 0,
-  ExceptionContinueSearch = 1,
-  ExceptionNestedException = 2,
-  ExceptionCollidedUnwind = 3
-} EXCEPTION_DISPOSITION;
-
 LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                   void* dispatch) {
   switch (e->ExceptionCode) {

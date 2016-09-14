@@ -4,6 +4,7 @@
 *.o
 *.s
 *.exe
+*.exe.manifest
 Factor/factor
 *.a
 *.dll
@@ -11,7 +12,8 @@ Factor/factor
 *.exp
 *.res
 *.RES
-*.image
+*factor.image
+*.waf*
 factor.image.fresh
 *.dylib
 factor
@@ -32,3 +34,7 @@ checksums.txt
 *.so
 a.out
 Factor.app/Contents/_CodeSignature
+build/
+waf-*/
+.lock*
+*.pyc

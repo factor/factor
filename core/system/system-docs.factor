@@ -79,3 +79,7 @@ HELP: image-path
 HELP: vm-path
 { $values { "path" "a pathname string" } }
 { $description "Outputs the pathname of the currently running Factor VM." } ;
+
+! HELP: install-prefix
+! { $values { "path" "a pathname string" } }
+! { $description "A string giving the site-specific directory prefix where the platform independent Factor files are installed; by default, this is the string " { $snippet "/usr/local" } ". This can be set at build time with the " { $snippet "--prefix" } " argument to the waf script. The main collection of Factor library vocabularies is installed in the directory " { $snippet "prefix/lib/factor" } "." }

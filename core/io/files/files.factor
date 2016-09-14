@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings continuations init io io.backend
-io.encodings io.encodings.utf8 io.files.private io.pathnames
-kernel kernel.private namespaces sequences splitting system ;
+USING: alien.strings combinators init io io.backend io.encodings
+io.encodings.utf8 io.files.private io.pathnames kernel
+kernel.private namespaces sequences splitting system ;
 IN: io.files
 
 <PRIVATE
@@ -84,15 +84,22 @@ M: object cwd ( -- path ) "." ;
 
 PRIVATE>
 
+: default-resource-path ( -- path )
+    install-prefix dup "." =
+    [ drop image-path parent-directory ] [ "lib/factor" append-path ] if ;
+
 : init-resource-path ( -- )
-    OBJ-ARGS special-object [
-        alien>native-string "-resource-path=" ?head [ drop f ] unless
-    ] map-find drop
-    [ image-path parent-directory ] unless* "resource-path" set-global ;
+    OBJ-ARGS special-object
+    [ alien>native-string "-resource-path=" ?head [ drop f ] unless ] map-find drop
+    [ default-resource-path ] unless*
+    "resource-path" set-global ;
 
 [
     cwd current-directory set-global
     OBJ-IMAGE special-object alien>native-string cwd prepend-path \ image-path set-global
     OBJ-EXECUTABLE special-object alien>native-string cwd prepend-path \ vm-path set-global
+    ! install-prefix is hardcoded into the binary when Factor is
+    ! compiled and is always utf8.
+    OBJ-INSTALL-PREFIX special-object utf8 alien>string \ install-prefix set-global
     init-resource-path
 ] "io.files" add-startup-hook
