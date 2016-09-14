@@ -537,7 +537,3 @@ def build(ctx):
 
     # Install factor.image and boot image
     ctx.install_files(libdir, [image_target, boot_image_name])
-    ctx.symlink_as(
-        '${PREFIX}/bin/%s' % image_target,
-        '../lib/factor/%s' % image_target
-    )
