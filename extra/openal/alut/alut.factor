@@ -71,21 +71,24 @@ FUNCTION: void alutUnloadWAV ( ALenum format, void* data, ALsizei size, ALsizei 
 
 SYMBOL: init
 
+: throw-alut-error ( -- )
+    alutGetError alutGetErrorString throw ;
+
 : init-openal ( -- )
     init get-global expired? [
-        f f alutInit 0 = [ "Could not initialize OpenAL" throw ] when
+        f f alutInit 0 = [ throw-alut-error ] when
         1337 <alien> init set-global
     ] when ;
 
 : exit-openal ( -- )
     init get-global expired? [
-        alutExit 0 = [ "Could not close OpenAL" throw ] when
+        alutExit 0 = [ throw-alut-error ] when
         f init set-global
     ] unless ;
 
 : create-buffer-from-file ( filename -- buffer )
     alutCreateBufferFromFile dup AL_NONE = [
-        "create-buffer-from-file failed" throw
+        throw-alut-error
     ] when ;
 
 os macosx? "openal.alut.macosx" "openal.alut.other" ? require
