@@ -11,6 +11,7 @@ except ImportError:
 # (name, digest32, digest64). If digest is None, then the dll is not
 # available for that arch.
 dlls = [
+    ('alut.dll', '008d93e0844a0c71277eabc1f6e2a67f', ''),
     ('blas.dll', '63017771c424146f8ddcee266d7a9446', 'ec84cbbecb0573369de8f6e94b576035'),
     ('bzip2.dll', None, None),
     ('freetype6.dll', 'e7f5fa7772dd00ef6a2299ba27e8eccc', None),
@@ -80,6 +81,7 @@ dlls = [
     ('libzmq.dll', 'b4f44f1fbe1a36440758a47b6e2c46e6', '58797adaee268f600be05ef357cd9711'),
     ('msvcp120.dll', 'fd5cabbe52272bd76007b68186ebaf00', '46060c35f697281bc5e7337aee3722b1'),
     ('msvcr120.dll', '034ccadc1c073e4216e9466b720f9849', '9c861c079dd81762b6c54e37597b7712'),
+    ('OpenAL32.dll', '235355a8dd26903e75d5e812ecf50e53', ''),
     ('pcre.dll', '5d6cade5112191346afa3fa66252440a', 'ce9a046b8ac744d20015ef93e2d23a47'),
     ('snappy.dll', 'd5fb0ce7c811af02dcabd22b8a7ff42e', '4ee4bf3eec99ee1867980ceaad0a490e'),
     ('sqlite3.dll', '875805c0713bfb771067ade3b34f149e', '023e167341d2ff6581608e6c281e620b'),
