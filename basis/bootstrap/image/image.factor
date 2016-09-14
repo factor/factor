@@ -147,8 +147,6 @@ SYMBOL: big-endian
 
 SYMBOL: architecture
 
-H{ } clone special-objects set-global
-
 : emit ( cell -- ) bootstrapping-image get push ;
 
 : emit-64 ( cell -- )
@@ -531,6 +529,7 @@ PRIVATE>
         { parser-quiet? f }
         { auto-use? f }
     } assoc-union! [
+        H{ } clone special-objects set
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
         write-image
