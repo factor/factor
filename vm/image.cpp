@@ -210,31 +210,11 @@ char *threadsafe_strerror(int errnum) {
   return buf;
 }
 
-FILE* factor_vm::open_image(vm_parameters* p) {
-  if (!p->embedded_image)
-    return OPEN_READ(p->image_path);
-
-  FILE* file = OPEN_READ(p->executable_path);
-  if (file == NULL) {
-    std::cout << "Cannot open embedded image" << std::endl;
-    char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror:1: " << msg << std::endl;
-    free(msg);
-    exit(1);
-  }
-  embedded_image_footer footer;
-  if (!read_embedded_image_footer(file, &footer)) {
-    std::cout << "No embedded image" << std::endl;
-    exit(1);
-  }
-  safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
-  return file;
-}
-
 // Read an image file from disk, only done once during startup
 // This function also initializes the data and code heaps
 void factor_vm::load_image(vm_parameters* p) {
-  FILE* file = open_image(p);
+
+  FILE* file = OPEN_READ(p->image_path);
   if (file == NULL) {
     std::cout << "Cannot open image file: " << p->image_path << std::endl;
     char *msg = threadsafe_strerror(errno);
@@ -242,6 +222,15 @@ void factor_vm::load_image(vm_parameters* p) {
     free(msg);
     exit(1);
   }
+  if (p->embedded_image) {
+    embedded_image_footer footer;
+    if (!read_embedded_image_footer(file, &footer)) {
+      std::cout << "No embedded image" << std::endl;
+      exit(1);
+    }
+    safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
+  }
+
   image_header h;
   if (raw_fread(&h, sizeof(image_header), 1, file) != 1)
     fatal_error("Cannot read image header", 0);
