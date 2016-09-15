@@ -47,7 +47,9 @@ M: interactor manifest>>
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
 M: vocab-completion (word-at-caret)
-    drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
+    drop
+    [ dup vocab-exists? [ >vocab-link ] [ drop f ] if ]
+    [ 2drop f ] recover ;
 
 M: word-completion (word-at-caret)
     manifest>> [
