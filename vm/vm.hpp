@@ -592,7 +592,6 @@ struct factor_vm {
   bool save_image(const vm_char* saving_filename, const vm_char* filename);
   void primitive_save_image();
   void fixup_heaps(cell data_offset, cell code_offset);
-  FILE* open_image(vm_parameters* p);
   void load_image(vm_parameters* p);
   bool read_embedded_image_footer(FILE* file, embedded_image_footer* footer);
   bool embedded_image_p();
