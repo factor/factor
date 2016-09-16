@@ -24,8 +24,7 @@ reset-gl-function-pointers
 reset-gl-function-number-counter
 
 : gl-function-counter ( -- n )
-    +gl-function-counter+ get-global
-    dup 1 + +gl-function-counter+ set-global ;
+    +gl-function-counter+ counter ;
 
 : gl-function-pointer ( names n -- funptr )
     gl-function-context 2array dup +gl-function-pointers+ get-global at
