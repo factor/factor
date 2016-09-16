@@ -46,6 +46,9 @@ reset-gl-function-number-counter
     names return function-effect
     define-declared ;
 
+: gl-function-calling-convention ( -- symbol )
+    os windows? [ stdcall ] [ cdecl ] if ;
+
 SYNTAX: GL-FUNCTION:
     gl-function-calling-convention
     scan-function-name
