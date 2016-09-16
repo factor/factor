@@ -83,7 +83,6 @@ CONSTANT: default-components
     ] [
         "debugger" require
         "listener" require
-        "none" require
     ] if
 
     load-components
