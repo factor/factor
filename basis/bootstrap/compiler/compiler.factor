@@ -11,7 +11,7 @@ IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
 ! reference to 'eval' in a global variable
-"deploy-vocab" get "staging" get or [
+"staging" get [
     "alien.remote-control" require
 ] unless
 
