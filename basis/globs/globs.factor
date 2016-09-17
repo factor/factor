@@ -156,4 +156,6 @@ DEFER: glob%
 PRIVATE>
 
 : glob ( glob -- files )
-    glob-path [ glob% ] { } make ;
+    glob-path [
+        [ 1array f swap ] when-empty glob%
+    ] { } make ;
