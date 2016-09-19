@@ -1,13 +1,13 @@
 ! Copyright (C) 2016 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: checksums checksums.common destructors help.markup help.syntax
-kernel strings ;
+USING: ascii checksums checksums.common destructors help.markup
+help.syntax kernel strings ;
 IN: checksums.process
 
 ABOUT: "checksums.process"
 
 ARTICLE: "checksums.process" "Checksumming with External Utilities"
-"With the " { $vocab-link "checksums.process" } " vocabulary any console utility can be used to checksum data, provided it supports a certain interface: it should accept input data on STDIN and output result to STDOUT. The output should consist of the hexadecimal checksum string, terminated with \" *-\". For instance, all the checksums from the GNU CoreUtils package support this mode of operation as the default."
+"With the " { $vocab-link "checksums.process" } " vocabulary any console utility can be used to checksum data, provided it supports a certain interface: it should accept input data on STDIN and output result to STDOUT. The output should consist of the hexadecimal checksum string, terminated with a " { $link blank? } " character. For instance, all the checksums from the GNU CoreUtils package support this mode of operation as the default."
 $nl
 "The " { $link checksum-process } " tuple holds a launch descriptor (see " { $link "io.launcher.descriptors" } ") of the utility, e.g. \"sha1sum\". When the " { $link initialize-checksum-state } " method is called on it, a new instance of the checksum utility is started in the background. In Factor it is represented by the " { $link process-state } " tuple. You can then use " { $link add-checksum-bytes } " to stream data to it. When done, call " { $link get-checksum } " to read the resulting checksum and dispose of the tuple in one step. If you want to cancel the work without calling " { $link get-checksum } ", you must " { $link dispose } " of the tuple so that the underlying process is terminated."
 $nl
