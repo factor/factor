@@ -9,23 +9,23 @@ TUPLE: checksum-process launch-desc ;
 INSTANCE: checksum-process block-checksum
 C: <checksum-process> checksum-process
 
-TUPLE: process-state < disposable proc result ;
+TUPLE: process-state < disposable process result ;
 
 M: checksum-process initialize-checksum-state ( checksum -- checksum-state )
-    launch-desc>> binary <process-stream> process-state new-disposable swap >>proc ;
+    launch-desc>> binary <process-stream> process-state new-disposable swap >>process ;
 
 M: process-state dispose* ( process-state -- )
-    proc>> [ dispose ] when* ;
+    process>> [ dispose ] when* ;
 
 M: process-state add-checksum-bytes ( process-state bytes -- process-state' )
-    over proc>> stream-write ;
+    over process>> stream-write ;
 
 : trim-hash ( str -- str' )
     dup empty? [ dup [ blank? ] find drop [ head ] when* ] unless ;
 
 M: process-state get-checksum ( checksum-state -- value )
     dup result>> [
-        dup proc>> [
+        dup process>> [
             [
                 [ out>> dispose ] keep
                 stream-contents trim-hash hex-string>bytes
