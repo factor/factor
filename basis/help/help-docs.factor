@@ -1,6 +1,6 @@
-USING: arrays help.crossref help.markup help.stylesheet
-help.syntax help.topics io kernel math prettyprint quotations
-see sequences strings summary vocabs ;
+USING: arrays help.crossref help.lint help.markup
+help.stylesheet help.syntax help.topics io kernel math
+prettyprint quotations see sequences strings summary vocabs ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -316,7 +316,12 @@ HELP: $example
     "However the following is right:"
     { $markup-example { $example "USING: math prettyprint ;" "2 2 + ." "4" } }
     "Examples can incorporate a call to " { $link .s } " to show multiple output values; the convention is that you may assume the stack is empty before the example evaluates."
-} ;
+}
+{ $see-also $unchecked-example } ;
+
+HELP: $unchecked-example
+{ $values { "element" object } }
+{ $description "Same as " { $link $example } ", except " { $link help-lint } " ignores its contents and doesn't try to run the code and verify its output." } ;
 
 HELP: $markup-example
 { $values { "element" "a markup element" } }
