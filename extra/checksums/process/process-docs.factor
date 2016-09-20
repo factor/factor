@@ -13,14 +13,14 @@ $nl
 $nl
 "The " { $link checksum-bytes } " and the " { $link checksum-stream } " methods encapsulate the above protocol, including instantiation and disposal of the " { $link process-state } " tuple."
 { $examples
-    { $example "USING: byte-arrays checksums checksums.process ;"
+    { $unchecked-example "USING: byte-arrays checksums checksums.process ;"
     "\"test\" >byte-array \"sha1sum\" <checksum-process> checksum-bytes ."
     "B{
     169 74 143 229 204 177 155 166 28 76 8 115 211 145 233 135
     152 47 187 211
 }" }
     $nl
-    { $example "USING: checksums checksums.common checksums.process"
+    { $unchecked-example "USING: checksums checksums.common checksums.process"
     "io io.encodings.binary namespaces ;"
     "\"LICENSE.txt\" binary ["
     "    input-stream get \"sha1sum\" <checksum-process> checksum-stream"
