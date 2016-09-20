@@ -1,8 +1,7 @@
 ! Copyright (C) 2016 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii checksums checksums.common combinators
-destructors io io.encodings.binary io.launcher kernel math.parser
-sequences strings ;
+USING: accessors ascii checksums checksums.common destructors io
+io.encodings.binary io.launcher kernel math.parser sequences ;
 IN: checksums.process
 
 TUPLE: checksum-process launch-desc ;
@@ -11,19 +10,20 @@ C: <checksum-process> checksum-process
 
 TUPLE: process-state < disposable process result ;
 
-M: checksum-process initialize-checksum-state ( checksum -- checksum-state )
-    launch-desc>> binary <process-stream> process-state new-disposable swap >>process ;
+M: checksum-process initialize-checksum-state
+    launch-desc>> binary <process-stream>
+    process-state new-disposable swap >>process ;
 
-M: process-state dispose* ( process-state -- )
+M: process-state dispose*
     process>> [ dispose ] when* ;
 
-M: process-state add-checksum-bytes ( process-state bytes -- process-state' )
+M: process-state add-checksum-bytes
     over process>> stream-write ;
 
 : trim-hash ( str -- str' )
-    dup empty? [ dup [ blank? ] find drop [ head ] when* ] unless ;
+    dup [ blank? ] find drop [ head ] when* ;
 
-M: process-state get-checksum ( checksum-state -- value )
+M: process-state get-checksum
     dup result>> [
         dup process>> [
             [
