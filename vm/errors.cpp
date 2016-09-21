@@ -98,17 +98,19 @@ void factor_vm::not_implemented_error() {
   general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
 }
 
-void factor_vm::verify_memory_protection_error(cell addr) {
+void factor_vm::set_memory_protection_error(cell fault_addr, cell fault_pc) {
   // Called from the OS-specific top halves of the signal handlers to
   // make sure it's safe to dispatch to memory_signal_handler_impl.
   if (fatal_erroring_p)
     fa_diddly_atal_error();
-  if (faulting_p && !code->safepoint_p(addr))
-    fatal_error("Double fault", addr);
+  if (faulting_p && !code->safepoint_p(fault_addr))
+    fatal_error("Double fault", fault_addr);
   else if (fep_p)
-    fatal_error("Memory protection fault during low-level debugger", addr);
+    fatal_error("Memory protection fault during low-level debugger", fault_addr);
   else if (atomic::load(&current_gc_p))
-    fatal_error("Memory protection fault during gc", addr);
+    fatal_error("Memory protection fault during gc", fault_addr);
+  signal_fault_addr = fault_addr;
+  signal_fault_pc = fault_pc;
 }
 
 // Allocates memory

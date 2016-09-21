@@ -199,7 +199,7 @@ struct factor_vm {
   void general_error(vm_error_type error, cell arg1, cell arg2);
   void type_error(cell type, cell tagged);
   void not_implemented_error();
-  void verify_memory_protection_error(cell addr);
+  void set_memory_protection_error(cell fault_addr, cell fault_pc);
   void divide_by_zero_error();
   void primitive_unimplemented();
 
