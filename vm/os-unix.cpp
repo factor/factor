@@ -100,16 +100,9 @@ segment::segment(cell size_, bool executable_p) {
 
 segment::~segment() {
   int pagesize = getpagesize();
-  int retval = munmap((void*)(start - pagesize), pagesize + size + pagesize);
+  int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
   if (retval)
     fatal_error("Segment deallocation failed", 0);
-}
-
-void factor_vm::dispatch_signal(void* uap, void(handler)()) {
-  dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
-                          (cell*)&UAP_PROGRAM_COUNTER(uap),
-                          (cell)FUNCTION_CODE_POINTER(handler));
-  UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 }
 
 void factor_vm::start_sampling_profiler_timer() {
@@ -126,14 +119,19 @@ void factor_vm::end_sampling_profiler_timer() {
   setitimer(ITIMER_REAL, &timer, NULL);
 }
 
+void factor_vm::dispatch_signal(void* uap, void(handler)()) {
+  dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
+                          (cell*)&UAP_PROGRAM_COUNTER(uap),
+                          (cell)FUNCTION_CODE_POINTER(handler));
+  UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
+}
+
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 
   cell fault_addr = (cell)siginfo->si_addr;
   cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm();
-  vm->verify_memory_protection_error(fault_addr);
-  vm->signal_fault_addr = fault_addr;
-  vm->signal_fault_pc = fault_pc;
+  vm->set_memory_protection_error(fault_addr, fault_pc);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
 

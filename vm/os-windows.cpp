@@ -196,9 +196,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                   void* dispatch) {
   switch (e->ExceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:
-      signal_fault_addr = e->ExceptionInformation[1];
-      signal_fault_pc = c->EIP;
-      verify_memory_protection_error(signal_fault_addr);
+      set_memory_protection_error(e->ExceptionInformation[1], c->EIP);
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
                               (cell)factor::memory_signal_handler_impl);
       break;
