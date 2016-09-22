@@ -111,7 +111,6 @@ ifdef CONFIG
 		vm/generic_arrays.hpp \
 		vm/callstack.hpp \
 		vm/slot_visitor.hpp \
-		vm/collector.hpp \
 		vm/to_tenured_collector.hpp \
 		vm/arrays.hpp \
 		vm/math.hpp \
