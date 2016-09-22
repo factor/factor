@@ -200,7 +200,7 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   auto callback_slot_visitor = [&](code_block* stub, cell size) {
     visit_handle(&stub->owner);
   };
-  parent->callbacks->allocator->iterate(callback_slot_visitor);
+  parent->callbacks->allocator->iterate(callback_slot_visitor, no_fixup());
 
   FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
     iter->second = visit_pointer(iter->second);

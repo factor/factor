@@ -571,7 +571,7 @@ struct factor_vm {
 
   //code heap
   template <typename Iterator> void each_code_block(Iterator& iter) {
-    code->allocator->iterate(iter);
+    code->allocator->iterate(iter, no_fixup());
   }
 
   void update_code_heap_words(bool reset_inline_caches);
