@@ -368,7 +368,7 @@ struct code_block_printer {
 // Dump all code blocks for debugging
 void factor_vm::dump_code_heap(ostream& out) {
   code_block_printer printer(this, out);
-  code->allocator->iterate(printer);
+  code->allocator->iterate(printer, no_fixup());
   out << printer.reloc_size << " bytes used by relocation tables" << endl;
   out << printer.parameter_size << " bytes used by parameter tables" << endl;
 }

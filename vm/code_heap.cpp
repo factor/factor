@@ -73,7 +73,7 @@ void code_heap::verify_all_blocks_set() {
   auto all_blocks_set_verifier = [&](code_block* block, cell size) {
     FACTOR_ASSERT(all_blocks.find((cell)block) != all_blocks.end());
   };
-  allocator->iterate(all_blocks_set_verifier);
+  allocator->iterate(all_blocks_set_verifier, no_fixup());
 }
 
 code_block* code_heap::code_block_for_address(cell address) {
@@ -104,7 +104,7 @@ void code_heap::initialize_all_blocks_set() {
   auto all_blocks_set_inserter = [&](code_block* block, cell size) {
     all_blocks.insert((cell)block);
   };
-  allocator->iterate(all_blocks_set_inserter);
+  allocator->iterate(all_blocks_set_inserter, no_fixup());
 #ifdef FACTOR_DEBUG
   verify_all_blocks_set();
 #endif

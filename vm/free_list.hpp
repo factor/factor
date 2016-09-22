@@ -207,12 +207,6 @@ void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {
 }
 
 template <typename Block>
-template <typename Iterator>
-void free_list_allocator<Block>::iterate(Iterator& iter) {
-  iterate(iter, no_fixup());
-}
-
-template <typename Block>
 allocator_room free_list_allocator<Block>::as_allocator_room() {
   allocator_room room;
   room.size = size;

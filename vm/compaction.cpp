@@ -138,7 +138,7 @@ void factor_vm::collect_compact_impl() {
   auto callback_updater = [&](code_block* stub, cell size) {
     callbacks->update(stub);
   };
-  callbacks->allocator->iterate(callback_updater);
+  callbacks->allocator->iterate(callback_updater, no_fixup());
 
   code->initialize_all_blocks_set();
 
