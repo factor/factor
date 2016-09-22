@@ -120,16 +120,6 @@ void factor_vm::update_code_heap_words(bool reset_inline_caches) {
   each_code_block(word_updater);
 }
 
-// Fix up new words only.
-// Fast path for compilation units that only define new words.
-void factor_vm::initialize_code_blocks() {
-
-  FACTOR_FOR_EACH(code->uninitialized_blocks) {
-    initialize_code_block(iter->first, iter->second);
-  }
-  code->uninitialized_blocks.clear();
-}
-
 // Allocates memory
 void factor_vm::primitive_modify_code_heap() {
   bool reset_inline_caches = to_boolean(ctx->pop());
@@ -174,8 +164,14 @@ void factor_vm::primitive_modify_code_heap() {
 
   if (update_existing_words)
     update_code_heap_words(reset_inline_caches);
-  else
-    initialize_code_blocks();
+  else {
+    // Fast path for compilation units that only define new words.
+    FACTOR_FOR_EACH(code->uninitialized_blocks) {
+      initialize_code_block(iter->first, iter->second);
+    }
+    code->uninitialized_blocks.clear();
+  }
+  FACTOR_ASSERT(code->uninitialized_blocks.size() == 0);
 }
 
 // Allocates memory

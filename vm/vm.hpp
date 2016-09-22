@@ -575,7 +575,6 @@ struct factor_vm {
   }
 
   void update_code_heap_words(bool reset_inline_caches);
-  void initialize_code_blocks();
   void primitive_modify_code_heap();
   void primitive_code_room();
   void primitive_strip_stack_traces();
