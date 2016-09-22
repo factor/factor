@@ -1,5 +1,8 @@
 namespace factor {
 
+struct must_start_gc_again {
+};
+
 enum gc_op {
   collect_nursery_op,
   collect_aging_op,

@@ -2,25 +2,57 @@
 
 namespace factor {
 
-struct full_policy {
-  factor_vm* parent;
+struct full_collection_copier : no_fixup {
   tenured_space* tenured;
+  code_heap* code;
+  std::vector<cell> *mark_stack;
 
-  explicit full_policy(factor_vm* parent)
-      : parent(parent), tenured(parent->data->tenured) {}
+  full_collection_copier(tenured_space* tenured,
+                         code_heap* code,
+                         std::vector<cell> *mark_stack)
+      : tenured(tenured), code(code), mark_stack(mark_stack) { }
 
-  bool should_copy_p(object* untagged) {
-    return !tenured->contains_p(untagged);
+  object* fixup_data(object* obj) {
+    if (tenured->contains_p(obj)) {
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
+      }
+      return obj;
+    }
+
+    // Is there another forwarding pointer?
+    while (obj->forwarding_pointer_p()) {
+      object* dest = obj->forwarding_pointer();
+      obj = dest;
+    }
+
+    if (tenured->contains_p(obj)) {
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
+      }
+      return obj;
+    }
+
+    cell size = obj->size();
+    object* newpointer = tenured->allot(size);
+    if (!newpointer)
+      throw must_start_gc_again();
+    memcpy(newpointer, obj, size);
+    obj->forward_to(newpointer);
+
+    tenured->state.set_marked_p((cell)newpointer, newpointer->size());
+    mark_stack->push_back((cell)newpointer);
+    return newpointer;
   }
 
-  void promoted_object(object* obj) {
-    tenured->state.set_marked_p((cell)obj, obj->size());
-    parent->mark_stack.push_back((cell)obj);
-  }
-
-  void visited_object(object* obj) {
-    if (!tenured->state.marked_p((cell)obj))
-      promoted_object(obj);
+  code_block* fixup_code(code_block* compiled) {
+    if (!code->allocator->state.marked_p((cell)compiled)) {
+      code->allocator->state.set_marked_p((cell)compiled, compiled->size());
+      mark_stack->push_back((cell)compiled + 1);
+    }
+    return compiled;
   }
 };
 
@@ -40,10 +72,8 @@ void factor_vm::update_code_roots_for_sweep() {
 }
 
 void factor_vm::collect_mark_impl() {
-  gc_workhorse<tenured_space, full_policy>
-      workhorse(this, this->data->tenured, full_policy(this));
-  slot_visitor<gc_workhorse<tenured_space, full_policy>>
-      visitor(this, workhorse);
+  slot_visitor<full_collection_copier>
+      visitor(this, full_collection_copier(data->tenured, code, &mark_stack));
 
   mark_stack.clear();
 

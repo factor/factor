@@ -129,7 +129,6 @@ namespace factor { struct factor_vm; }
 #include "generic_arrays.hpp"
 #include "callstack.hpp"
 #include "slot_visitor.hpp"
-#include "collector.hpp"
 #include "to_tenured_collector.hpp"
 #include "arrays.hpp"
 #include "math.hpp"

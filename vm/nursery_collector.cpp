@@ -2,28 +2,40 @@
 
 namespace factor {
 
-struct nursery_policy {
+struct nursery_copier : no_fixup {
   bump_allocator* nursery;
+  aging_space* aging;
 
-  explicit nursery_policy(bump_allocator* nursery) : nursery(nursery) {}
+  nursery_copier(bump_allocator* nursery, aging_space* aging)
+      : nursery(nursery), aging(aging) { }
 
-  bool should_copy_p(object* obj) {
-    return nursery->contains_p(obj);
+  object* fixup_data(object* obj) {
+    if (!nursery->contains_p(obj)) {
+      return obj;
+    }
+
+    if (obj->forwarding_pointer_p()) {
+      object* dest = obj->forwarding_pointer();
+      FACTOR_ASSERT(!nursery->contains_p(dest));
+      return dest;
+    }
+
+    cell size = obj->size();
+    object* newpointer = aging->allot(size);
+    if (!newpointer)
+      throw must_start_gc_again();
+
+    memcpy(newpointer, obj, size);
+    obj->forward_to(newpointer);
+    return newpointer;
   }
-
-  void promoted_object(object* obj) {}
-
-  void visited_object(object* obj) {}
 };
 
 void factor_vm::collect_nursery() {
-
   // Copy live objects from the nursery (as determined by the root set and
   // marked cards in aging and tenured) to aging space.
-  gc_workhorse<aging_space, nursery_policy>
-      workhorse(this, data->aging, nursery_policy(data->nursery));
-  slot_visitor<gc_workhorse<aging_space, nursery_policy>>
-      visitor(this, workhorse);
+  slot_visitor<nursery_copier>
+      visitor(this, nursery_copier(data->nursery, data->aging));
 
   cell scan = data->aging->start + data->aging->occupied_space();
 
