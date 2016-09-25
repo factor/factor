@@ -20,7 +20,8 @@ static const cell data_alignment = 16;
 #define UNTAG(x) ((cell)(x) & ~TAG_MASK)
 #define RETAG(x, tag) (UNTAG(x) | (tag))
 
-// *** Tags ***
+// Type tags, should be kept in sync with:
+//   core/bootstrap/layouts/layouts.factor
 #define FIXNUM_TYPE 0
 #define F_TYPE 1
 #define ARRAY_TYPE 2
@@ -112,8 +113,8 @@ struct object {
   NO_TYPE_CHECK;
   // header format (bits indexed with least significant as zero):
   // bit 0      : free?
+  // bit 1      : forwarding pointer?
   // if not forwarding:
-  //   bit 1      : forwarding pointer?
   //   bit 2-5    : tag
   //   bit 7-end  : hashcode
   // if forwarding:
