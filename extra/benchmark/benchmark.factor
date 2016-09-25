@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs continuations debugger formatting fry help.markup
-io io.styles kernel math memory prettyprint sequences
-tools.profiler.sampling tools.test tools.time vocabs.hierarchy vocabs.loader ;
+io io.styles kernel math memory namespaces prettyprint sequences
+splitting tools.profiler.sampling tools.test tools.time
+vocabs.hierarchy vocabs.loader ;
 IN: benchmark
 
 : run-timing-benchmark ( vocab -- time )
@@ -11,8 +12,11 @@ IN: benchmark
 : run-profile-benchmark ( vocab -- profile )
     compact-gc '[ _ run ] profile most-recent-profile-data ;
 
-: find-benchmark-vocabs ( -- seq )
+: all-benchmark-vocabs ( -- seq )
     "benchmark" disk-child-vocab-names [ find-vocab-root ] filter ;
+
+: find-benchmark-vocabs ( -- seq )
+    "benchmarks" get " " split harvest [ all-benchmark-vocabs ] when-empty ;
 
 <PRIVATE
 
