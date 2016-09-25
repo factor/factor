@@ -1,7 +1,17 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry hash-sets kernel math prettyprint sequences
-sets sorting tools.test ;
+USING: accessors arrays fry hash-sets hash-sets.private kernel math
+prettyprint sequences sets sorting tools.test ;
+FROM: hashtables.private => tombstone ;
+
+! key@
+{
+    { { T{ tombstone } T{ tombstone } } f f }
+    { { T{ tombstone } 123 } 1 t }
+} [
+    "hi" 0 <hash-set> key@ 3array
+    123 HS{ 123 } key@ 3array
+] unit-test
 
 { { 1 2 3 } } [ HS{ 1 2 3 } members natural-sort ] unit-test
 

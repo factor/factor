@@ -32,8 +32,7 @@ TUPLE: hash-set
     ] if ; inline recursive
 
 : key@ ( key hash -- array n ? )
-    array>> dup length>> 0 eq?
-    [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
+    array>> 2dup hash@ 0 (key@) ; inline
 
 : <hash-array> ( n -- array )
     3 * 1 + 2/ next-power-of-2 +empty+ <array> ; inline
