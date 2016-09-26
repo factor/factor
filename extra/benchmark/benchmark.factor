@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs continuations debugger formatting fry help.markup
-io io.styles kernel math memory namespaces prettyprint sequences
-splitting tools.profiler.sampling tools.test tools.time
+USING: arrays assocs command-line continuations debugger formatting
+fry help.markup io io.styles kernel math memory namespaces prettyprint
+sequences tools.profiler.sampling tools.test tools.time
 vocabs.hierarchy vocabs.loader ;
 IN: benchmark
 
@@ -16,7 +16,7 @@ IN: benchmark
     "benchmark" disk-child-vocab-names [ find-vocab-root ] filter ;
 
 : find-benchmark-vocabs ( -- seq )
-    "benchmarks" get " " split harvest [ all-benchmark-vocabs ] when-empty ;
+    command-line get [ all-benchmark-vocabs ] when-empty ;
 
 <PRIVATE
 
