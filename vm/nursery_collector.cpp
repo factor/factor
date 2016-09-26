@@ -14,10 +14,13 @@ struct nursery_copier : no_fixup {
       return obj;
     }
 
-    if (obj->forwarding_pointer_p()) {
-      object* dest = obj->forwarding_pointer();
-      FACTOR_ASSERT(!nursery->contains_p(dest));
-      return dest;
+    // The while-loop is a needed micro-optimization.
+    while (obj->forwarding_pointer_p()) {
+      obj = obj->forwarding_pointer();
+    }
+
+    if (!nursery->contains_p(obj)) {
+      return obj;
     }
 
     cell size = obj->size();
