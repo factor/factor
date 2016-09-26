@@ -17,8 +17,7 @@ IN: tools.deploy.shaker
 
 : add-command-line-hook ( -- )
     [
-        (command-line) unclip
-        executable set-global
+        (command-line) rest
         command-line set-global
     ] "command-line" startup-hooks get set-at ;
 
