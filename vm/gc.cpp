@@ -72,23 +72,19 @@ void factor_vm::end_gc() {
 }
 
 void factor_vm::start_gc_again() {
-  switch (current_gc->op) {
-    case collect_nursery_op:
-      // Nursery collection can fail if aging does not have enough
-      // free space to fit all live objects from nursery.
-      current_gc->op = collect_aging_op;
-      break;
-    case collect_aging_op:
-      // Aging collection can fail if the aging semispace cannot fit
-      // all the live objects from the other aging semispace and the
-      // nursery.
-      current_gc->op = collect_to_tenured_op;
-      break;
-    default:
-      // Nothing else should fail mid-collection due to insufficient
-      // space in the target generation.
-      critical_error("in start_gc_again, bad GC op", current_gc->op);
-      break;
+  if (current_gc->op == collect_nursery_op) {
+    // Nursery collection can fail if aging does not have enough
+    // free space to fit all live objects from nursery.
+    current_gc->op = collect_aging_op;
+  } else if (current_gc->op == collect_aging_op) {
+    // Aging collection can fail if the aging semispace cannot fit
+    // all the live objects from the other aging semispace and the
+    // nursery.
+    current_gc->op = collect_to_tenured_op;
+  } else {
+    // Nothing else should fail mid-collection due to insufficient
+    // space in the target generation.
+    critical_error("in start_gc_again, bad GC op", current_gc->op);
   }
 }
 
@@ -161,7 +157,6 @@ void factor_vm::gc(gc_op op, cell requested_size) {
     catch (const must_start_gc_again&) {
       // We come back here if the target generation is full.
       start_gc_again();
-      continue;
     }
   }
 
