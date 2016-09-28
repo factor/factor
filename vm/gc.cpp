@@ -64,13 +64,6 @@ gc_state::~gc_state() {
   }
 }
 
-void factor_vm::end_gc() {
-  if (gc_events) {
-    current_gc->event->ended_gc(this);
-    gc_events->push_back(*current_gc->event);
-  }
-}
-
 void factor_vm::start_gc_again() {
   if (current_gc->op == collect_nursery_op) {
     // Nursery collection can fail if aging does not have enough
@@ -160,7 +153,10 @@ void factor_vm::gc(gc_op op, cell requested_size) {
     }
   }
 
-  end_gc();
+  if (gc_events) {
+    current_gc->event->ended_gc(this);
+    gc_events->push_back(*current_gc->event);
+  }
 
   atomic::store(&current_gc_p, false);
   if (ctx)
