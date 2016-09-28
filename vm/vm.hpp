@@ -338,7 +338,6 @@ struct factor_vm {
   void check_data_heap();
 
   // gc
-  void end_gc();
   void set_current_gc_op(gc_op op);
   void start_gc_again();
   void collect_nursery();
