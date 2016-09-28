@@ -19,11 +19,18 @@ struct code_heap {
   // Memory allocator
   free_list_allocator<code_block>* allocator;
 
+  // For fast lookup of blocks from addresses.
   std::set<cell> all_blocks;
 
-  // Keys are blocks which need to be initialized by initialize_code_block().
-  // Values are literal tables. Literal table arrays are GC roots until the
-  // time the block is initialized, after which point they are discarded.
+
+  // Code blocks are initialized in two steps in
+  // primitive_modify_code_heap() because they might reference each
+  // other. First they are all allocated and placed in this map with
+  // their literal tables which are GC roots until the block is
+  // initialized. Then they are all initialized by
+  // initialize_code_block() which resolves relocations and updates
+  // addresses. Uninitialized blocks instructions must not be visited
+  // by GC.
   std::map<code_block*, cell> uninitialized_blocks;
 
   // Code blocks which may reference objects in the nursery
