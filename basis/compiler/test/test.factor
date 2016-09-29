@@ -22,9 +22,6 @@ IN: compiler.test
 
 << \ compile-call t "no-compile" set-word-prop >>
 
-: compiler-test ( name -- )
-    "resource:basis/compiler/tests/" ".factor" surround run-test-file ;
-
 : init-cfg-test ( -- )
     reset-vreg-counter begin-stack-analysis
     <basic-block> dup basic-block set begin-local-analysis
