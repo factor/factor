@@ -485,6 +485,8 @@ void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
         break;
     }
   };
+  if (parent->code->uninitialized_p(block))
+    return;
   block->each_instruction_operand(visit_func);
 }
 
