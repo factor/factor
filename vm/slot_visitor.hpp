@@ -139,24 +139,32 @@ template <typename Fixup> struct slot_visitor {
   void visit_callstack_object(callstack* stack);
   void visit_callstack(context* ctx);
   void visit_context(context *ctx);
-  void visit_code_block_objects(code_block* compiled);
-  void visit_embedded_literals(code_block* compiled);
   void visit_object_code_block(object* obj);
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
-  void visit_embedded_code_pointers(code_block* compiled);
   void visit_object(object* obj);
   void visit_mark_stack(std::vector<cell>* mark_stack);
-  void visit_instruction_operands(code_block* block, cell rel_base);
+
 
   template <typename SourceGeneration>
   cell visit_card(SourceGeneration* gen, cell index, cell start);
   template <typename SourceGeneration>
   void visit_cards(SourceGeneration* gen, card mask, card unmask);
-  void visit_code_heap_roots(std::set<code_block*>* remembered_set);
+
 
   template <typename TargetGeneration>
   void cheneys_algorithm(TargetGeneration* gen, cell scan);
+
+  // Visits the data pointers in code blocks in the remembered set.
+  void visit_code_heap_roots(std::set<code_block*>* remembered_set);
+
+  // Visits pointers embedded in instructions in code blocks.
+  void visit_instruction_operands(code_block* block, cell rel_base);
+  void visit_embedded_code_pointers(code_block* compiled);
+  void visit_embedded_literals(code_block* compiled);
+
+  // Visits data pointers in code blocks.
+  void visit_code_block_objects(code_block* compiled);
 };
 
 template <typename Fixup>
@@ -323,7 +331,7 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
   // Clear out the space not visited with a known pattern. That makes
   // it easier to see if uninitialized reads are made.
   ctx->fill_stack_seg(ds_ptr, ds_seg, 0xbaadbadd);
-  ctx->fill_stack_seg(rs_ptr, rs_seg, 0xdaabdaab);
+  ctx->fill_stack_seg(rs_ptr, rs_seg, 0xdaabdabb);
 }
 
 template <typename Fixup>
@@ -352,8 +360,7 @@ void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
 template <typename Fixup> struct call_frame_code_block_visitor {
   Fixup fixup;
 
-  call_frame_code_block_visitor(Fixup fixup)
-      : fixup(fixup) {}
+  call_frame_code_block_visitor(Fixup fixup) : fixup(fixup) {}
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     code_block* compiled =
