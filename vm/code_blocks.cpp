@@ -301,7 +301,7 @@ code_block* factor_vm::allot_code_block(cell size, code_block_type type) {
     if (block == NULL) {
       std::cout << "Code heap used: " << code->allocator->occupied_space()
                 << "\n";
-      std::cout << "Code heap free: " << code->allocator->free_space() << "\n";
+      std::cout << "Code heap free: " << code->allocator->free_space << "\n";
       fatal_error("Out of memory in add-compiled-block", 0);
     }
   }

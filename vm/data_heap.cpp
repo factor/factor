@@ -93,7 +93,7 @@ bool data_heap::high_fragmentation_p() {
 }
 
 bool data_heap::low_memory_p() {
-  return tenured->free_space() <= high_water_mark();
+  return tenured->free_space <= high_water_mark();
 }
 
 void data_heap::mark_all_cards() {
@@ -123,9 +123,9 @@ data_heap_room factor_vm::data_room() {
   room.aging_free = data->aging->free_space();
   room.tenured_size = data->tenured->size;
   room.tenured_occupied = data->tenured->occupied_space();
-  room.tenured_total_free = data->tenured->free_space();
+  room.tenured_total_free = data->tenured->free_space;
   room.tenured_contiguous_free = data->tenured->largest_free_block();
-  room.tenured_free_block_count = data->tenured->free_block_count();
+  room.tenured_free_block_count = data->tenured->free_block_count;
   room.cards = data->cards_end - data->cards;
   room.decks = data->decks_end - data->decks;
   room.mark_stack = mark_stack.capacity() * sizeof(cell);
