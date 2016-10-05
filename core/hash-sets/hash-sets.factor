@@ -10,7 +10,10 @@ IN: hash-sets
 TUPLE: hash-set
     { count array-capacity }
     { deleted array-capacity }
-    { array array } ;
+    { array array initial: {
+          T{ tombstone } T{ tombstone } T{ tombstone } T{ tombstone }
+      }
+    } ;
 
 <PRIVATE
 

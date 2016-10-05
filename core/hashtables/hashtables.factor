@@ -4,10 +4,16 @@ USING: accessors arrays assocs kernel kernel.private math
 math.private sequences sequences.private slots.private vectors ;
 IN: hashtables
 
+! Required because the hashtable definition references tombstone.
+<PRIVATE PRIVATE>
+
 TUPLE: hashtable
     { count array-capacity }
     { deleted array-capacity }
-    { array array } ;
+    { array array initial: {
+          T{ tombstone } T{ tombstone } T{ tombstone } T{ tombstone }
+      }
+    } ;
 
 <PRIVATE
 
