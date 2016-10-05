@@ -1,5 +1,11 @@
-USING: accessors assocs continuations fry hashtables kernel make
-math namespaces sequences tools.test ;
+USING: accessors arrays assocs continuations fry hashtables
+hashtables.private kernel make math memory namespaces sequences
+tools.test ;
+
+! hash@
+{ 18 } [
+    77 20 f <array> hash@
+] unit-test
 
 { H{ } } [ { } [ dup ] H{ } map>assoc ] unit-test
 
@@ -182,5 +188,14 @@ H{ } "x" set
 
 { 1 } [ 2 "h" get at ] unit-test
 
+! Previously this could break as hashtable new created a backing an
+! empty backing array and the code assumed its length was > 0.
+{ f f } [
+    compact-gc 77 hashtable new [ clone ] change-array at*
+] unit-test
+
 ! Random test case
-{ "A" } [ 100 iota [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 of ] unit-test
+{ "A" } [
+    100 iota [ dup ] H{ } map>assoc 32 over
+    delete-at "A" 32 pick set-at 32 of
+] unit-test
