@@ -156,5 +156,3 @@ ERROR: sequence-expected obj ;
 
 : file-info-recursive ( path -- seq )
     [ dup ?file-info [ 2array ] [ drop f ] if* ] filter-files-by-depth ;
-
-os windows? [ "io.directories.search.windows" require ] when
