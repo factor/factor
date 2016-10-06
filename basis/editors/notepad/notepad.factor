@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: editors io.launcher kernel io.directories.search.windows
-math.parser namespaces sequences io.files arrays windows.shell32
-io.directories.search ;
+USING: arrays editors io.directories.search kernel namespaces
+sequences windows.shell32 ;
+
 IN: editors.notepad
 
 SINGLETON: notepad
