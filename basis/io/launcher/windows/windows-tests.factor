@@ -2,8 +2,9 @@ USING: accessors arrays assocs calendar
 combinators.short-circuit continuations environment eval
 hashtables io io.directories io.encodings.ascii
 io.encodings.utf8 io.files io.files.temp io.files.unique
-io.launcher io.launcher.windows io.pathnames kernel math
-namespaces parser sequences splitting system tools.test ;
+io.launcher io.launcher.private io.launcher.windows
+io.pathnames kernel math namespaces parser sequences
+splitting system tools.test ;
 IN: io.launcher.windows.tests
 
 [ "hello world" ] [ { "hello" "world" } join-arguments ] unit-test
