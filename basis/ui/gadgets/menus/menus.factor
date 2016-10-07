@@ -8,7 +8,7 @@ ui.pens ui.pens.solid ui.theme ui.tools.common ;
 IN: ui.gadgets.menus
 
 : show-menu ( owner menu -- )
-    [ find-world ] dip hand-loc get-global { 0 0 } <rect> show-glass ;
+    [ find-world ] dip hand-loc get-global point>rect show-glass ;
 
 GENERIC: <menu-item> ( target hook command -- button )
 
