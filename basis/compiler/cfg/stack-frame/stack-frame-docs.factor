@@ -2,9 +2,9 @@ USING: compiler.cfg.instructions cpu.x86 help.markup help.syntax layouts math ;
 IN: compiler.cfg.stack-frame
 
 HELP: stack-frame
-{ $class-description "Counts of, among other things, how much stack a compiled word needs. The stack frame is organized in the following fashion:"
+{ $class-description "Counts in bytes of the various sizes of the blocks of the stack frame. The stack frame is organized in the following fashion, from bottom to top:"
   { $list
-    "Parameter space:"
+    "Parameter space: space for parameters to FFI functions "
     "Allocation area: space for local allocations."
     "Spill area: space for register spills."
     { "Reserved stack space: only applicable on Windows x86.64. See " { $link reserved-stack-space } "." }

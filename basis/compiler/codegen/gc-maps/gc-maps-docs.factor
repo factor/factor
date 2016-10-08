@@ -27,7 +27,7 @@ HELP: emit-uint
 } ;
 
 HELP: emit-gc-maps
-{ $description "GC maps are emitted so that the end is aligned to a 16-byte boundary." } ;
+{ $description "One of the last stages in code generation are emitting the GC maps which are placed directly after the generated executable code. They are emitted so that the end is aligned to a 16-byte boundary." } ;
 
 HELP: gc-maps
 { $var-description "Variable that holds a sequence of " { $link gc-map } " tuples. Gc maps are added to the sequence by " { $link gc-map-here } "." } ;

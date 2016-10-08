@@ -10,7 +10,6 @@ IN: compiler.cfg.representations.rewrite
 ! Insert conversions. This introduces new temporaries, so we need
 ! to rename opearands too.
 
-! Mapping from vreg,rep pairs to vregs
 SYMBOL: alternatives
 
 :: (emit-def-conversion) ( dst preferred required -- new-dst' )
