@@ -223,8 +223,7 @@ void factor_vm::primitive_format_float() {
   try {
     localized_stream.imbue(std::locale(locale));
   } catch (const runtime_error&) {
-    byte_array* array = allot_byte_array(1);
-    array->data<char>()[0] = '\0';
+    byte_array* array = allot_byte_array(0);
     ctx->replace(tag<byte_array>(array));
     return;
   }
@@ -247,7 +246,7 @@ void factor_vm::primitive_format_float() {
   localized_stream << value;
   const std::string& tmp = localized_stream.str();
   const char* cstr = tmp.c_str();
-  size_t size = tmp.length()+1;
+  size_t size = tmp.length();
   byte_array* array = allot_byte_array(size);
   memcpy(array->data<char>(), cstr, size);
   ctx->replace(tag<byte_array>(array));
