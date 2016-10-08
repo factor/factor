@@ -689,7 +689,7 @@ CONSTANT: all-primitives {
         {
             {
                 "array>quotation" ( array -- quot ) "array_to_quotation"
-                { array } { quotation } make-foldable
+                { array } { quotation } make-flushable
             }
         }
     }
