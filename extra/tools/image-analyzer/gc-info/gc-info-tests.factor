@@ -3,7 +3,7 @@ classes.struct combinators.short-circuit compiler compiler.cfg
 compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.linearization compiler.codegen.gc-maps compiler.units fry
 generic grouping io io.encodings.binary io.streams.byte-array kernel
-math namespaces random sequences system tools.image-analyzer.gc-info
+literals math namespaces random sequences system tools.image-analyzer.gc-info
 tools.image-analyzer.utils tools.test vm vocabs words ;
 IN: tools.image-analyzer.gc-info.tests
 QUALIFIED: cpu.x86.features.private
@@ -72,7 +72,9 @@ QUALIFIED: opencl
 
 cpu x86.64? [
     {
-        { { 155 { ?{ f t t t t } { } } } }
+        ! The difference is because Windows stack references are
+        ! longer because of the home space.
+        { ${ os windows? 156 155 ? { ?{ f t t t t } { } } } }
     } [
         \ effects:<effect> word>gc-maps
     ] unit-test
