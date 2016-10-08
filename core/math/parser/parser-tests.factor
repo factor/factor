@@ -1,4 +1,5 @@
-USING: layouts literals math math.parser sequences tools.test ;
+USING: layouts literals math math.parser.private sequences tools.test ;
+IN: math.parser
 
 { f }
 [ f string>number ]
@@ -461,3 +462,14 @@ unit-test
 
 { "deadbeef" } [ B{ 222 173 190 239 } bytes>hex-string ] unit-test
 { B{ 222 173 190 239 } } [ "deADbeEF" hex-string>bytes ] unit-test
+
+{
+    B{ 49 46 53 53 69 43 48 53 }
+} [
+    155000.0 B{ } -1 3 B{ 69 0 } B{ 67 0 } (format-float)
+] unit-test
+
+! Missing locale
+{ "" } [
+    33.4 "" 4 4 "f" "missing" format-float
+] unit-test
