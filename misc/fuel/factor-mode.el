@@ -221,7 +221,6 @@ these lines in your .emacs:
     ";FUNCTOR"
     "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
-    "HINTS:"
     "initial:" "IMPLEMENT-STRUCTS:"
     "MATH:"
     "METHOD:"
@@ -456,7 +455,7 @@ these lines in your .emacs:
     ,(factor-syntax factor-declaration-words-regex '("C"))
     ,(factor-syntax factor-word-definition-regex '("P" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
-    ,(factor-syntax (syntax-and-2-symbols '("LOG")) '("P" "W" ""))
+    ,(factor-syntax (syntax-and-2-symbols '("HINTS" "LOG")) '("P" "W" ""))
     ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "COLOR" "NAN" "HEXCOLOR")) '("P" "CT"))
     ,(factor-syntax factor-types-lines-regex '("P" "T"))
 
