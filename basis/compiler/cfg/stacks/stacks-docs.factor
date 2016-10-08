@@ -27,11 +27,11 @@ HELP: store-vregs
 
 HELP: 2inputs
 { $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } }
-{ $description "Lifts the two topmost values from the datastack and stores them in virtual registers. The datastacks height is adjusted afterwards." } ;
+{ $description "Lifts the two topmost values from the datastack and stores them in virtual registers. The datastacks height is decremented by 2." } ;
 
 HELP: 3inputs
 { $values { "vreg1" "a vreg" } { "vreg2" "a vreg" } { "vreg3" "a vreg" } }
-{ $description "Lifts the three topmost values from the datastack and stores them in virtual registers. The datastacks height is adjusted afterwards." } ;
+{ $description "Lifts the three topmost values from the datastack and stores them in virtual registers. The datastacks height is decremented by 3." } ;
 
 ARTICLE: "compiler.cfg.stacks" "Generating instructions for accessing the data and retain stacks" "This vocab contains utility words for manipulating the analysis data and retain stacks."
 $nl
