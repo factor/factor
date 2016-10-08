@@ -404,7 +404,7 @@ CONSTANT: all-primitives {
                 "(format-float)" ( n fill width precision format locale -- byte-array )
                 "format_float"
                 { float byte-array fixnum fixnum byte-array byte-array } { byte-array }
-                make-foldable
+                make-flushable
             }
         }
     }
