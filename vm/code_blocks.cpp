@@ -87,13 +87,13 @@ void factor_vm::update_word_references(code_block* compiled,
                                        bool reset_inline_caches) {
   if (code->uninitialized_p(compiled)) {
     initialize_code_block(compiled);
-  // update_word_references() is always applied to every block in
-  // the code heap. Since it resets all call sites to point to
-  // their canonical entry point (cold entry point for non-tail calls,
-  // standard entry point for tail calls), it means that no PICs
-  // are referenced after this is done. So instead of polluting
-  // the code heap with dead PICs that will be freed on the next
-  // GC, we add them to the free list immediately.
+    // update_word_references() is always applied to every block in
+    // the code heap. Since it resets all call sites to point to
+    // their canonical entry point (cold entry point for non-tail calls,
+    // standard entry point for tail calls), it means that no PICs
+    // are referenced after this is done. So instead of polluting
+    // the code heap with dead PICs that will be freed on the next
+    // GC, we add them to the free list immediately.
   } else if (reset_inline_caches && compiled->pic_p()) {
     code->free(compiled);
   } else {
@@ -302,7 +302,7 @@ code_block* factor_vm::allot_code_block(cell size, code_block_type type) {
       std::cout << "Code heap used: " << code->allocator->occupied_space()
                 << "\n";
       std::cout << "Code heap free: " << code->allocator->free_space << "\n";
-      fatal_error("Out of memory in add-compiled-block", 0);
+      fatal_error("Out of memory in allot_code_block", 0);
     }
   }
 
