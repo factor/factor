@@ -1,11 +1,10 @@
 USING: accessors alien.c-types alien.syntax arrays assocs bit-arrays
-classes.struct combinators combinators.short-circuit compiler compiler.cfg
-compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.stack-frame compiler.codegen.gc-maps compiler.units fry generic
-grouping io io.encodings.binary io.streams.byte-array kernel math namespaces
-random sequences sequences.generalizations
-tools.image-analyzer.gc-info tools.image-analyzer.utils tools.test vm
-vocabs words ;
+classes.struct combinators.short-circuit compiler compiler.cfg
+compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.linearization compiler.codegen.gc-maps compiler.units fry
+generic grouping io io.encodings.binary io.streams.byte-array kernel
+math namespaces random sequences system tools.image-analyzer.gc-info
+tools.image-analyzer.utils tools.test vm vocabs words ;
 IN: tools.image-analyzer.gc-info.tests
 QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
@@ -71,6 +70,14 @@ QUALIFIED: opencl
     \ effects:<effect> word>gc-maps empty?
 ] unit-test
 
+cpu x86.64? [
+    {
+        { { 155 { ?{ f t t t t } { } } } }
+    } [
+        \ effects:<effect> word>gc-maps
+    ] unit-test
+] when
+
 { f } [
     \ + word>gc-maps empty?
 ] unit-test
@@ -102,7 +109,6 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 \ resolve-types
     [ base-pointer-groups-expected ] [ base-pointer-groups-decoded ] bi =
 ] unit-test
-
 
 ! Tough words #1227
 { t } [

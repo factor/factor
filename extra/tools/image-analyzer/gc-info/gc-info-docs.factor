@@ -8,11 +8,11 @@ HELP: word>gc-maps
 { $values { "word" word } { "gc-maps" assoc } }
 { $description "Main word of the vocab. Decodes the gc maps for a word into an assoc with the following format:"
   { $list
-    "Each key is the return addess of a gc callsite (delta relative to the start of the code block)."
+    "Each key is the return addess of a gc callsite (as an offset relative to the blocks entry point)."
     {
         "Each value is a two-tuple where:"
         { $list
-          "The first element is a three-tuple containing the scrub patterns for the datastack, retainstack and gc roots."
+          "The first element contains the scrub patterns for the gc roots."
           "The second element is a sequence of derived roots for the callsite."
         }
     }
@@ -22,7 +22,7 @@ HELP: word>gc-maps
   { $unchecked-example
     "USING: effects prettyprint ;"
     "\\ <effect> word>gc-maps ."
-    "{ { 153 { { ?{ t } ?{ t t t } ?{ f t t t t } } { } } } }"
+    "{ { 155 { ?{ f t t t t } { } } } }"
   }
 } ;
 
