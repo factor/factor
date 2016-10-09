@@ -133,7 +133,9 @@ M: word (print-input)
 
 : evaluate-input ( interactor -- )
     dup interactor-busy? [ drop ] [
-        [ control-value ] keep interactor-continue
+        [ control-value ]
+        [ interactor-finish ]
+        [ interactor-continue ] tri
     ] if ;
 
 : interactor-yield ( interactor -- obj )
@@ -147,10 +149,14 @@ M: word (print-input)
     ] [ drop f ] if ;
 
 : interactor-read ( interactor -- lines )
-    [ interactor-yield ] [ interactor-finish ] bi ;
+    interactor-yield ;
 
-M: interactor stream-readln
-    interactor-read dup [ first ] when ;
+M:: interactor stream-readln ( interactor -- str/f )
+    interactor interactor-read
+    dup [
+        unclip swap
+        [ interactor interactor-continue ] unless-empty
+    ] when ;
 
 : (call-listener) ( quot command listener -- )
     input>> dup interactor-busy? [ 3drop ] [
@@ -364,8 +370,7 @@ M: object accept-completion-hook 2drop ;
 
 M: interactor stream-read-quot ( stream -- quot/f )
     dup interactor-yield dup array? [
-        over interactor-finish try-parse
-        [ ] [ stream-read-quot ] ?if
+        try-parse [ ] [ stream-read-quot ] ?if
     ] [ nip ] if ;
 
 : interactor-operation ( gesture interactor -- ? )
