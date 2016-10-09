@@ -127,9 +127,14 @@ M: word (print-input)
     [ model>> clear-undo drop ] 2tri ;
 
 : interactor-eof ( interactor -- )
-    dup interactor-busy? [
-        f over interactor-continue
-    ] unless drop ;
+    dup interactor-busy? [ drop ] [
+        [
+            [ model>> doc-empty? not ]
+            [ control-value ]
+            [ interactor-finish ]
+            tri f ?
+        ] keep interactor-continue
+    ] if ;
 
 : evaluate-input ( interactor -- )
     dup interactor-busy? [ drop ] [
