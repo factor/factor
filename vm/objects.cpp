@@ -45,20 +45,18 @@ void factor_vm::primitive_set_slot() {
 }
 
 // Allocates memory
-cell factor_vm::clone_object(cell obj_) {
-  data_root<object> obj(obj_, this);
+void factor_vm::primitive_clone() {
+
+  data_root<object> obj(ctx->peek(), this);
 
   if (immediate_p(obj.value()))
-    return obj.value();
+    return;
   cell size = object_size(obj.value());
   object* new_obj = allot_object(obj.type(), size);
   memcpy(new_obj, obj.untagged(), size);
   new_obj->set_hashcode(0);
-  return tag_dynamic(new_obj);
+  ctx->replace(tag_dynamic(new_obj));
 }
-
-// Allocates memory
-void factor_vm::primitive_clone() { ctx->replace(clone_object(ctx->peek())); }
 
 // Allocates memory
 void factor_vm::primitive_size() {

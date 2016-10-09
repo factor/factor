@@ -183,7 +183,6 @@ struct factor_vm {
   void primitive_set_special_object();
   void primitive_identity_hashcode();
   void primitive_compute_identity_hashcode();
-  cell clone_object(cell obj_);
   void primitive_clone();
   void primitive_become();
 
