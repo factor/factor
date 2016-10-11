@@ -35,6 +35,10 @@ HELP: -rot  $complex-shuffle ;
 HELP: dupd  $complex-shuffle ;
 HELP: swapd $complex-shuffle ;
 
+HELP: callstack>array
+{ $values { "callstack" callstack } { "array" array } }
+{ $description "Converts the callstack to an array containing groups of three elements. The array is in reverse order so that the innermost frame comes first." } ;
+
 HELP: get-datastack
 { $values { "array" array } }
 { $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;

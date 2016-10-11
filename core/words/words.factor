@@ -52,7 +52,8 @@ M: word definition def>> ;
 
 <PRIVATE
 
-: caller ( callstack -- word ) callstack>array <reversed> third ;
+: caller ( callstack -- word )
+    callstack>array first ;
 
 PRIVATE>
 
