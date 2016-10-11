@@ -153,7 +153,7 @@ IN: kernel.tests
 
 ! Test traceback accuracy
 : last-frame ( -- pair )
-    error-continuation get call>> callstack>array 6 head* 3 tail* ;
+    6 9 error-continuation get call>> callstack>array subseq ;
 
 {
     { [ 1 2 [ 3 throw ] call 4 ] [ 1 2 [ 3 throw ] call 4 ] 3 }

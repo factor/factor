@@ -1,6 +1,6 @@
 USING: accessors arrays compiler.units definitions eval generic
-io.streams.string kernel math namespaces parser sequences
-tools.test vocabs words words.symbol ;
+io.streams.string kernel math namespaces parser sequences tools.test
+vocabs words words.private words.symbol ;
 IN: words.tests
 
 { 4 } [
@@ -134,3 +134,15 @@ DEFER: deferred
 ] unit-test
 
 [ "hi" word-code ] must-fail
+
+! Extra return values to defeat tco.
+: i-call1 ( -- w n )
+    get-callstack caller 20 ;
+
+! caller
+: i-call2 ( -- w x y )
+    i-call1 30 ;
+
+{ i-call2 } [
+    i-call2 2drop
+] unit-test
