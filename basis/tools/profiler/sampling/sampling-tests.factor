@@ -1,7 +1,13 @@
-USING: byte-arrays calendar kernel math memory namespaces parser
-random sequences threads tools.profiler.sampling
+USING: assocs byte-arrays calendar kernel math memory namespaces
+parser random sequences threads tools.profiler.sampling
 tools.profiler.sampling.private tools.test ;
 IN: tools.profiler.sampling.tests
+
+! collect-tops: top is the last element in the array
+{ 5 } [
+    { { 1 2 3 4 5 6 { 3 4 5 } } } 1 2 collect-tops
+    keys first
+] unit-test
 
 ! Make sure the profiler doesn't blow up the VM
 TUPLE: boom ;

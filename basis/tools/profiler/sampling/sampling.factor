@@ -41,7 +41,7 @@ PRIVATE>
 : sample-thread ( sample -- thread ) 5 swap nth ;
 : sample-callstack ( sample -- array ) 6 swap nth ;
 : unclip-callstack ( sample -- sample' callstack-top )
-    clone 6 over [ unclip swap ] change-nth ;
+    clone 6 over [ unclip-last swap ] change-nth ;
 
 : samples>time ( samples -- seconds )
     samples-per-second get-global / ;

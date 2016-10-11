@@ -49,7 +49,6 @@ void factor_vm::record_sample(bool prolog_p) {
   };
   iterate_callstack(ctx, recorder);
   cell end = sample_callstacks.size();
-  std::reverse(sample_callstacks.begin() + begin, sample_callstacks.end());
 
   // Add the sample.
   cell thread = special_objects[OBJ_CURRENT_THREAD];
