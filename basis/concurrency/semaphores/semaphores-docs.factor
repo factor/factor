@@ -40,7 +40,7 @@ ARTICLE: "concurrency.semaphores.examples" "Semaphore examples"
     "    ..."
     "] parallel-map"
 }
-"Here is a concrete example which fetches content from 5 different web sites, making no more than 3 requests at a time:"
+"Here is a concrete example which fetches content from 5 different web sites, making no more than 2 requests at a time:"
 { $code
     "USING: concurrency.combinators concurrency.semaphores
 fry http.client kernel urls ;
