@@ -152,14 +152,14 @@ void factor_vm::collect_compact() {
 
   if (data->high_fragmentation_p()) {
     // Compaction did not free up enough memory. Grow the heap.
-    set_current_gc_op(collect_growing_heap_op);
-    collect_growing_heap(0);
+    set_current_gc_op(collect_growing_data_heap_op);
+    collect_growing_data_heap(0);
   }
 
   code->flush_icache();
 }
 
-void factor_vm::collect_growing_heap(cell requested_size) {
+void factor_vm::collect_growing_data_heap(cell requested_size) {
   // Grow the data heap and copy all live objects to the new heap.
   data_heap* old = data;
   set_data_heap(data->grow(&nursery, requested_size));
