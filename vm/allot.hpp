@@ -12,7 +12,7 @@ inline object* factor_vm::allot_large_object(cell type, cell size) {
 
     // If it still won't fit, grow the heap
     if (!data->tenured->can_allot_p(requested_size)) {
-      gc(collect_growing_heap_op, size);
+      gc(collect_growing_data_heap_op, size);
     }
   }
 

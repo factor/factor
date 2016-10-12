@@ -9,7 +9,7 @@ enum gc_op {
   collect_to_tenured_op,
   collect_full_op,
   collect_compact_op,
-  collect_growing_heap_op
+  collect_growing_data_heap_op
 };
 
 struct gc_event {

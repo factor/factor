@@ -137,8 +137,8 @@ void factor_vm::gc(gc_op op, cell requested_size) {
         case collect_compact_op:
           collect_compact();
           break;
-        case collect_growing_heap_op:
-          collect_growing_heap(requested_size);
+        case collect_growing_data_heap_op:
+          collect_growing_data_heap(requested_size);
           break;
         default:
           critical_error("in gc, bad GC op", current_gc->op);

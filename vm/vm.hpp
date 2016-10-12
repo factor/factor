@@ -349,7 +349,7 @@ struct factor_vm {
   void collect_full();
   void collect_compact_impl();
   void collect_compact();
-  void collect_growing_heap(cell requested_size);
+  void collect_growing_data_heap(cell requested_size);
   void gc(gc_op op, cell requested_size);
   void primitive_minor_gc();
   void primitive_full_gc();
