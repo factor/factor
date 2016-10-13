@@ -285,33 +285,6 @@ void factor_vm::fixup_labels(array* labels, code_block* compiled) {
 
 // Might GC
 // Allocates memory
-code_block* factor_vm::allot_code_block(cell size, code_block_type type) {
-  code_block* block = code->allocator->allot(size + sizeof(code_block));
-
-  // If allocation failed, do a full GC and compact the code heap.
-  // A full GC that occurs as a result of the data heap filling up does not
-  // trigger a compaction. This setup ensures that most GCs do not compact
-  // the code heap, but if the code fills up, it probably means it will be
-  // fragmented after GC anyway, so its best to compact.
-  if (block == NULL) {
-    primitive_compact_gc();
-    block = code->allocator->allot(size + sizeof(code_block));
-
-    // Insufficient room even after code GC, give up
-    if (block == NULL) {
-      std::cout << "Code heap used: " << code->allocator->occupied_space()
-                << "\n";
-      std::cout << "Code heap free: " << code->allocator->free_space << "\n";
-      fatal_error("Out of memory in allot_code_block", 0);
-    }
-  }
-
-  block->set_type(type);
-  return block;
-}
-
-// Might GC
-// Allocates memory
 code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell labels_, cell owner_,
                                       cell relocation_, cell parameters_,
@@ -358,10 +331,6 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   this->code->uninitialized_blocks.insert(
       std::make_pair(compiled, literals.value()));
   this->code->all_blocks.insert((cell)compiled);
-
-  // next time we do a minor GC, we have to trace this code block, since
-  // the fields of the code_block struct might point into nursery or aging
-  this->code->write_barrier(compiled);
 
   return compiled;
 }
