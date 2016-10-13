@@ -278,7 +278,6 @@ struct factor_vm {
 
   //data heap
   void set_data_heap(data_heap* data_);
-  void init_data_heap(cell young_size, cell aging_size, cell tenured_size);
   void primitive_size();
   data_heap_room data_room();
   void primitive_data_room();

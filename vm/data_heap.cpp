@@ -56,7 +56,7 @@ data_heap::~data_heap() {
 
 data_heap* data_heap::grow(bump_allocator* vm_nursery, cell requested_bytes) {
   FACTOR_ASSERT(vm_nursery->occupied_space() == 0);
-  cell new_tenured_size = (tenured_size * 2) + requested_bytes;
+  cell new_tenured_size = 2 * tenured_size + requested_bytes;
   return new data_heap(vm_nursery, young_size, aging_size, new_tenured_size);
 }
 
@@ -105,11 +105,6 @@ void factor_vm::set_data_heap(data_heap* data_) {
   data = data_;
   cards_offset = (cell)data->cards - addr_to_card(data->start);
   decks_offset = (cell)data->decks - addr_to_deck(data->start);
-}
-
-void factor_vm::init_data_heap(cell young_size, cell aging_size,
-                               cell tenured_size) {
-  set_data_heap(new data_heap(&nursery, young_size, aging_size, tenured_size));
 }
 
 data_heap_room factor_vm::data_room() {
