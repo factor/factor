@@ -49,6 +49,7 @@ struct code_heap {
   void set_safepoint_guard(bool locked);
   void verify_all_blocks_set();
   void initialize_all_blocks_set();
+  cell high_water_mark() { return allocator->size / 20; }
 
   void sweep();
 
