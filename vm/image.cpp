@@ -95,8 +95,9 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
 void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   p->tenured_size = std::max((h->data_size * 3) / 2, p->tenured_size);
 
-  init_data_heap(p->young_size, p->aging_size, p->tenured_size);
-
+  data_heap *d = new data_heap(&nursery,
+                               p->young_size, p->aging_size, p->tenured_size);
+  set_data_heap(d);
   fixnum bytes_read =
       raw_fread((void*)data->tenured->start, 1, h->data_size, file);
 
