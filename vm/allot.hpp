@@ -6,20 +6,20 @@ namespace factor {
 // Allocates memory
 inline code_block* factor_vm::allot_code_block(cell size,
                                                code_block_type type) {
-  cell block_size = size + sizeof(code_block);
-  code_block* block = code->allocator->allot(block_size);
 
-  // If allocation failed, do a full GC and compact the code heap.
-  // A full GC that occurs as a result of the data heap filling up does not
-  // trigger a compaction. This setup ensures that most GCs do not compact
-  // the code heap, but if the code fills up, it probably means it will be
-  // fragmented after GC anyway, so its best to compact.
-  if (block == NULL) {
+  cell block_size = size + sizeof(code_block);
+  cell required_free = block_size + code->high_water_mark();
+  if (!code->allocator->can_allot_p(required_free)) {
+
+    // If allocation failed, do a full GC and compact the code heap.
+    // A full GC that occurs as a result of the data heap filling up does not
+    // trigger a compaction. This setup ensures that most GCs do not compact
+    // the code heap, but if the code fills up, it probably means it will be
+    // fragmented after GC anyway, so its best to compact.
     primitive_compact_gc();
-    block = code->allocator->allot(block_size);
 
     // Insufficient room even after code GC, give up
-    if (block == NULL) {
+    if (!code->allocator->can_allot_p(required_free)) {
       std::cout << "Code heap used: " << code->allocator->occupied_space()
                 << "\n";
       std::cout << "Code heap free: " << code->allocator->free_space << "\n";
@@ -27,6 +27,7 @@ inline code_block* factor_vm::allot_code_block(cell size,
       fatal_error("Out of memory in allot_code_block", 0);
     }
   }
+  code_block* block = code->allocator->allot(block_size);
 
   // next time we do a minor GC, we have to trace this code block, since
   // the fields of the code_block struct might point into nursery or aging
@@ -39,16 +40,15 @@ inline code_block* factor_vm::allot_code_block(cell size,
 // Allocates memory
 inline object* factor_vm::allot_large_object(cell type, cell size) {
   // If tenured space does not have enough room, collect and compact
-  cell requested_size = size + data->high_water_mark();
-  if (!data->tenured->can_allot_p(requested_size)) {
+  cell required_free = size + data->high_water_mark();
+  if (!data->tenured->can_allot_p(required_free)) {
     primitive_compact_gc();
 
     // If it still won't fit, grow the heap
-    if (!data->tenured->can_allot_p(requested_size)) {
+    if (!data->tenured->can_allot_p(required_free)) {
       gc(collect_growing_data_heap_op, size);
     }
   }
-
   object* obj = data->tenured->allot(size);
 
   // Allows initialization code to store old->new pointers
