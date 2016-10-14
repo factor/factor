@@ -106,6 +106,7 @@ PRIVATE>
 ! Multiple db
 : select ( integer -- ) 1array "SELECT" write-command ;
 : move ( integer key -- ) 2array "MOVE" write-command ;
+: swapdb ( old new -- ) 2array "SWAPDB" write-command ;
 : flushdb ( -- ) { "FLUSHDB" } write-resp ;
 : flushall ( -- ) { "FLUSHALL" } write-resp ;
 
