@@ -3,12 +3,18 @@
 USING: accessors kernel locals math.rectangles math.vectors
 namespaces opengl sequences sorting ui.commands ui.gadgets
 ui.gadgets.buttons ui.gadgets.glass ui.gadgets.packs
-ui.gadgets.worlds ui.gestures ui.operations
+ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.operations
 ui.pens ui.pens.solid ui.theme ui.tools.common ;
+
+FROM: ui.gadgets.wrappers => wrapper ;
+
 IN: ui.gadgets.menus
 
-: show-menu ( owner menu -- )
+: (show-menu) ( owner menu -- )
     [ find-world ] dip hand-loc get-global point>rect show-glass ;
+
+: show-menu ( owner menu -- )
+    [ (show-menu) ] keep request-focus ;
 
 GENERIC: <menu-item> ( target hook command -- button )
 
@@ -43,12 +49,19 @@ M: ---- <menu-item>
         { 0 5 } >>dim
         menu-border-color <separator-pen> >>interior ;
 
+TUPLE: menu < wrapper ;
+
+menu H{
+    { T{ key-down f f "ESC" } [ hide-glass ] }
+} set-gestures
+
 : <menu> ( gadgets -- menu )
     <menu-items>
     { 0 3 } >>gap
     margins
     menu-border-color <solid> >>boundary 
-    menu-background <solid> >>interior ;
+    menu-background <solid> >>interior
+    menu new-wrapper ;
 
 : <commands-menu> ( target hook commands -- menu )
     [ <menu-item> ] 2with map <menu> ;
