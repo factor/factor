@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros make namespaces sequences
-io.sockets.secure fry oauth urls ;
+io.sockets.secure fry oauth1 urls ;
 IN: twitter
 
 ! Configuration
