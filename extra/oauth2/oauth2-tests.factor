@@ -1,5 +1,18 @@
-USING: kernel oauth2 tools.test urls ;
+USING: accessors calendar kernel oauth2 tools.test urls ;
 IN: oauth2.tests
+
+! assoc>tokens
+{
+    "blah" "bleh" t
+} [
+    H{
+        { "expires_in" 3600 }
+        { "access_token" "blah" }
+        { "token_type" "Bearer" }
+        { "refresh_token" "bleh" }
+    } assoc>tokens
+    [ access>> ] [ refresh>> ] [ expiry>> timestamp? ] tri
+] unit-test
 
 ! oauth2>auth-uri
 {
@@ -12,14 +25,14 @@ IN: oauth2.tests
     { { "state" "abcd" } } oauth2 boa oauth2>auth-uri
 ] unit-test
 
-! token-params
+! tokens-params
 {
     {
+        { "code" "hej" }
         { "client_id" "1234" }
         { "client_secret" "password" }
         { "redirect_uri" "test-pest" }
         { "state" "abcd" }
-        { "code" "hej" }
         { "grant_type" "authorization_code" }
     }
 } [
@@ -27,5 +40,5 @@ IN: oauth2.tests
     "https://github.com/login/oauth/access_token"
     "test-pest"
     "1234" "password" "user" { { "state" "abcd" } } oauth2 boa
-    "hej" token-params
+    "hej" tokens-params
 ] unit-test
