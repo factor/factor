@@ -14,11 +14,11 @@ SYMBOL: access-token
 
 : configure-oauth2 ( client-id client-secret -- )
     [ auth-uri token-uri redirect-uri ] 2dip gmail-scope-ro { }
-    oauth2 boa \ oauth2 set ;
+    oauth2 boa oauth2 set ;
 
 : ensure-token ( -- )
     access-token [
-        [ \ oauth2 get console-flow ] unless*
+        [ oauth2 get console-flow ] unless*
     ] change ;
 
 : api-call ( method get-params -- result )
