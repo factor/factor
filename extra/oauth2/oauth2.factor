@@ -1,8 +1,39 @@
 ! Copyright (C) 2016 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs http.client io json.reader kernel
-sequences unicode urls webbrowser ;
+USING: accessors assocs calendar combinators http.client io
+json.reader kernel make math.order sequences unicode urls webbrowser ;
 IN: oauth2
+
+! Random utility
+: set-query-params ( url params -- url )
+    [ first2 swap set-query-param ] each ;
+
+: string+params>url ( string params -- url )
+    [ >url ] dip set-query-params ;
+
+: console-prompt ( query -- str/f )
+    write flush readln [ blank? ] trim
+    dup "" = [ drop f ] [ ] if ;
+
+: post-json-request ( params token-uri -- assoc )
+    <post-request> dup header>> "application/json" "Accept" rot set-at
+    http-request nip json> ;
+
+TUPLE: tokens access refresh expiry ;
+
+: assoc>expiry ( json -- expiry )
+    "expires_in" of [ seconds now time+ ] [ f ] if* ;
+
+: assoc>tokens ( json -- tokens )
+    [ "access_token" of ]
+    [ "refresh_token" of ]
+    [ assoc>expiry ] tri tokens boa ;
+
+: access-expired? ( tokens -- ? )
+    expiry>> [ now before? ] [ f ] if* ;
+
+: update-tokens ( tokens1 tokens2 -- tokens1 )
+    2dup expiry>> >>expiry drop access>> >>access ;
 
 TUPLE: oauth2
     auth-uri
@@ -13,56 +44,58 @@ TUPLE: oauth2
     scope
     extra-params ;
 
-: set-query-params ( url params -- url )
-    [ first2 swap set-query-param ] each ;
-
-: string+params>url ( string params -- url )
-    [ >url ] dip set-query-params ;
-
-: console-prompt ( query -- str )
-    write flush readln [ blank? ] trim ;
-
-: token-params ( oauth2 code -- params )
+: tokens-params ( oauth2 code -- params )
     [
-        [
-            [ client-id>> "client_id" swap 2array ]
-            [ client-secret>> "client_secret" swap 2array ]
-            [ redirect-uri>> "redirect_uri" swap 2array ] tri 3array
-        ] [ extra-params>> ] bi append
-    ] [
-        "code" swap 2array
-    ] bi* suffix {
-        { "grant_type" "authorization_code" }
-    } append ;
+        "code" ,,
+        {
+            [ client-id>> "client_id" ,, ]
+            [ client-secret>> "client_secret" ,, ]
+            [ redirect-uri>> "redirect_uri" ,, ]
+            [ extra-params>> %% ]
+        } cleave
+        "authorization_code" "grant_type" ,,
+    ] { } make ;
+
+: refresh-params ( oauth2 refresh -- params )
+    [
+        "refresh_token" ,,
+        [ client-id>> "client_id" ,, ]
+        [ client-secret>> "client_secret" ,, ]
+        [ extra-params>> %% ] tri
+        "refresh_token" "grant_type" ,,
+    ] { } make ;
 
 : auth-params ( oauth2 -- params )
     [
-        [ client-id>> "client_id" swap 2array ]
-        [ scope>> "scope" swap 2array ]
-        [ redirect-uri>> "redirect_uri" swap 2array ] tri 3array
-    ] [ extra-params>> ] bi append {
-        { "response_type" "code" }
-        { "access_type" "offline" }
-    } append ;
+        {
+            [ client-id>> "client_id" ,, ]
+            [ scope>> "scope" ,, ]
+            [ redirect-uri>> "redirect_uri" ,, ]
+            [ extra-params>> %% ]
+        } cleave
+        "code" "response_type" ,,
+        "offline" "access_type" ,,
+    ] { } make ;
 
 : oauth2>auth-uri ( oauth2 -- uri )
     [ auth-uri>> ] [ auth-params ] bi string+params>url ;
 
-: post-token-request ( params token-uri -- token )
-    <post-request> dup header>> "application/json" "Accept" rot set-at
-    http-request nip json> "access_token" of ;
-
 ! Other flows can be useful to support too.
-: console-flow ( oauth2 -- token )
-    [ oauth2>auth-uri open-url ] [
-        [ "Enter verification code: " console-prompt token-params ]
-        [ token-uri>> ] bi
-        post-token-request
-    ] bi ;
+: console-flow ( oauth2 -- tokens/f )
+    dup oauth2>auth-uri open-url
+    "Enter verification code: " console-prompt
+    [
+        dupd tokens-params swap token-uri>> post-json-request
+        assoc>tokens
+    ] [ drop f ] if* ;
+
+: refresh-flow ( oauth2 tokens -- tokens' )
+    dupd refresh>> refresh-params swap token-uri>> post-json-request
+    assoc>tokens ;
 
 ! Using the token to access secured resources.
 : add-token ( request url -- )
     "Bearer " prepend "Authorization" rot header>> set-at ;
 
-: oauth-http-get ( url token -- response data )
+: oauth-http-get ( url access-token -- response data )
     [ <get-request> dup ] dip add-token http-request ;
