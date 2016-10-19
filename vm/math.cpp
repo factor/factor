@@ -174,22 +174,22 @@ void factor_vm::primitive_bignum_shift() {
 
 void factor_vm::primitive_bignum_less() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag_boolean(bignum_compare(x, y) == bignum_comparison_less));
+  ctx->replace(tag_boolean(bignum_compare(x, y) == BIGNUM_COMPARISON_LESS));
 }
 
 void factor_vm::primitive_bignum_lesseq() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag_boolean(bignum_compare(x, y) != bignum_comparison_greater));
+  ctx->replace(tag_boolean(bignum_compare(x, y) != BIGNUM_COMPARISON_GREATER));
 }
 
 void factor_vm::primitive_bignum_greater() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag_boolean(bignum_compare(x, y) == bignum_comparison_greater));
+  ctx->replace(tag_boolean(bignum_compare(x, y) == BIGNUM_COMPARISON_GREATER));
 }
 
 void factor_vm::primitive_bignum_greatereq() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag_boolean(bignum_compare(x, y) != bignum_comparison_less));
+  ctx->replace(tag_boolean(bignum_compare(x, y) != BIGNUM_COMPARISON_LESS));
 }
 
 void factor_vm::primitive_bignum_not() {

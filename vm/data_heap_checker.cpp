@@ -6,18 +6,18 @@
 namespace factor {
 
 enum generation {
-  nursery_generation,
-  aging_generation,
-  tenured_generation
+  NURSERY_GENERATION,
+  AGING_GENERATION,
+  TENURED_GENERATION
 };
 
 inline generation generation_of(factor_vm* parent, object* obj) {
   if (parent->data->nursery->contains_p(obj))
-    return nursery_generation;
+    return NURSERY_GENERATION;
   else if (parent->data->aging->contains_p(obj))
-    return aging_generation;
+    return AGING_GENERATION;
   else if (parent->data->tenured->contains_p(obj))
-    return tenured_generation;
+    return TENURED_GENERATION;
   else {
     critical_error("Bad object", (cell)obj);
     return (generation)-1;
@@ -62,12 +62,12 @@ struct slot_checker {
       return;
 
     generation target = generation_of(parent, untag<object>(*slot_ptr));
-    if (gen == aging_generation && target == nursery_generation) {
+    if (gen == AGING_GENERATION && target == NURSERY_GENERATION) {
       check_write_barrier(slot_ptr, target, card_points_to_nursery);
-    } else if (gen == tenured_generation) {
-      if (target == nursery_generation) {
+    } else if (gen == TENURED_GENERATION) {
+      if (target == NURSERY_GENERATION) {
         check_write_barrier(slot_ptr, target, card_points_to_nursery);
-      } else if (target == aging_generation) {
+      } else if (target == AGING_GENERATION) {
         check_write_barrier(slot_ptr, target, card_points_to_aging);
       }
     }
