@@ -65,15 +65,15 @@ gc_state::~gc_state() {
 }
 
 void factor_vm::start_gc_again() {
-  if (current_gc->op == collect_nursery_op) {
+  if (current_gc->op == COLLECT_NURSERY_OP) {
     // Nursery collection can fail if aging does not have enough
     // free space to fit all live objects from nursery.
-    current_gc->op = collect_aging_op;
-  } else if (current_gc->op == collect_aging_op) {
+    current_gc->op = COLLECT_AGING_OP;
+  } else if (current_gc->op == COLLECT_AGING_OP) {
     // Aging collection can fail if the aging semispace cannot fit
     // all the live objects from the other aging semispace and the
     // nursery.
-    current_gc->op = collect_to_tenured_op;
+    current_gc->op = COLLECT_TO_TENURED_OP;
   } else {
     // Nothing else should fail mid-collection due to insufficient
     // space in the target generation.
@@ -110,34 +110,34 @@ void factor_vm::gc(gc_op op, cell requested_size) {
         current_gc->event->op = current_gc->op;
 
       switch (current_gc->op) {
-        case collect_nursery_op:
+        case COLLECT_NURSERY_OP:
           collect_nursery();
           break;
-        case collect_aging_op:
+        case COLLECT_AGING_OP:
           // We end up here if the above fails.
           collect_aging();
           if (data->high_fragmentation_p()) {
             // Change GC op so that if we fail again, we crash.
-            set_current_gc_op(collect_full_op);
+            set_current_gc_op(COLLECT_FULL_OP);
             collect_full();
           }
           break;
-        case collect_to_tenured_op:
+        case COLLECT_TO_TENURED_OP:
           // We end up here if the above fails.
           collect_to_tenured();
           if (data->high_fragmentation_p()) {
             // Change GC op so that if we fail again, we crash.
-            set_current_gc_op(collect_full_op);
+            set_current_gc_op(COLLECT_FULL_OP);
             collect_full();
           }
           break;
-        case collect_full_op:
+        case COLLECT_FULL_OP:
           collect_full();
           break;
-        case collect_compact_op:
+        case COLLECT_COMPACT_OP:
           collect_compact();
           break;
-        case collect_growing_data_heap_op:
+        case COLLECT_GROWING_DATA_HEAP_OP:
           collect_growing_data_heap(requested_size);
           break;
         default:
@@ -169,15 +169,15 @@ void factor_vm::gc(gc_op op, cell requested_size) {
 }
 
 void factor_vm::primitive_minor_gc() {
-  gc(collect_nursery_op, 0);
+  gc(COLLECT_NURSERY_OP, 0);
 }
 
 void factor_vm::primitive_full_gc() {
-  gc(collect_full_op, 0);
+  gc(COLLECT_FULL_OP, 0);
 }
 
 void factor_vm::primitive_compact_gc() {
-  gc(collect_compact_op, 0);
+  gc(COLLECT_COMPACT_OP, 0);
 }
 
 void factor_vm::primitive_enable_gc_events() {

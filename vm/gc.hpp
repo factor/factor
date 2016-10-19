@@ -4,12 +4,12 @@ struct must_start_gc_again {
 };
 
 enum gc_op {
-  collect_nursery_op,
-  collect_aging_op,
-  collect_to_tenured_op,
-  collect_full_op,
-  collect_compact_op,
-  collect_growing_data_heap_op
+  COLLECT_NURSERY_OP,
+  COLLECT_AGING_OP,
+  COLLECT_TO_TENURED_OP,
+  COLLECT_FULL_OP,
+  COLLECT_COMPACT_OP,
+  COLLECT_GROWING_DATA_HEAP_OP
 };
 
 struct gc_event {
