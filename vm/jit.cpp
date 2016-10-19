@@ -9,9 +9,8 @@ namespace factor {
 
 // Allocates memory (`code` and `relocation` initializers create
 // growable_byte_array)
-jit::jit(code_block_type type, cell owner, factor_vm* vm)
-    : type(type),
-      owner(owner, vm),
+jit::jit(cell owner, factor_vm* vm)
+    : owner(owner, vm),
       code(vm),
       relocation(vm),
       parameters(vm),
@@ -115,7 +114,7 @@ void jit::compute_position(cell offset_) {
 }
 
 // Allocates memory (trim(), add_code_block)
-code_block* jit::to_code_block(cell frame_size) {
+code_block* jit::to_code_block(code_block_type type, cell frame_size) {
   // Emit dummy GC info
   code.grow_bytes(alignment_for(code.count + 4, data_alignment));
   uint32_t dummy_gc_info = 0;

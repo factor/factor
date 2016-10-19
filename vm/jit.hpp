@@ -1,7 +1,6 @@
 namespace factor {
 
 struct jit {
-  code_block_type type;
   data_root<object> owner;
   growable_byte_array code;
   growable_byte_array relocation;
@@ -12,7 +11,7 @@ struct jit {
   cell offset;
   factor_vm* parent;
 
-  jit(code_block_type type, cell owner, factor_vm* parent);
+  jit(cell owner, factor_vm* parent);
   ~jit();
 
   void compute_position(cell offset);
@@ -51,7 +50,7 @@ struct jit {
       position = position_;
   }
 
-  code_block* to_code_block(cell frame_size);
+  code_block* to_code_block(code_block_type type, cell frame_size);
 
 private:
   jit(const jit&);
