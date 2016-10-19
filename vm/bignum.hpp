@@ -35,9 +35,9 @@ namespace factor {
 #define BIGNUM_OUT_OF_BAND ((bignum*)0)
 
 enum bignum_comparison {
-  bignum_comparison_equal = 0,
-  bignum_comparison_less = -1,
-  bignum_comparison_greater = 1
+  BIGNUM_COMPARISON_EQUAL = 0,
+  BIGNUM_COMPARISON_LESS = -1,
+  BIGNUM_COMPARISON_GREATER = 1
 };
 
 cell bignum_maybe_to_fixnum(bignum* bn);

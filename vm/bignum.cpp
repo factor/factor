@@ -62,17 +62,17 @@ int factor_vm::bignum_equal_p(bignum* x, bignum* y) {
 }
 
 enum bignum_comparison factor_vm::bignum_compare(bignum* x, bignum* y) {
-  return ((BIGNUM_ZERO_P(x)) ? ((BIGNUM_ZERO_P(y)) ? bignum_comparison_equal
+  return ((BIGNUM_ZERO_P(x)) ? ((BIGNUM_ZERO_P(y)) ? BIGNUM_COMPARISON_EQUAL
                                                    : (BIGNUM_NEGATIVE_P(y))
-                                    ? bignum_comparison_greater
-                                    : bignum_comparison_less)
+                                    ? BIGNUM_COMPARISON_GREATER
+                                    : BIGNUM_COMPARISON_LESS)
                              : (BIGNUM_ZERO_P(y))
-              ? ((BIGNUM_NEGATIVE_P(x)) ? bignum_comparison_less
-                                        : bignum_comparison_greater)
+              ? ((BIGNUM_NEGATIVE_P(x)) ? BIGNUM_COMPARISON_LESS
+                                        : BIGNUM_COMPARISON_GREATER)
               : (BIGNUM_NEGATIVE_P(x))
               ? ((BIGNUM_NEGATIVE_P(y)) ? (bignum_compare_unsigned(y, x))
-                                        : (bignum_comparison_less))
-              : ((BIGNUM_NEGATIVE_P(y)) ? (bignum_comparison_greater)
+                                        : (BIGNUM_COMPARISON_LESS))
+              : ((BIGNUM_NEGATIVE_P(y)) ? (BIGNUM_COMPARISON_GREATER)
                                         : (bignum_compare_unsigned(x, y))));
 }
 
@@ -203,17 +203,17 @@ void factor_vm::bignum_divide(bignum* numerator, bignum* denominator,
     int q_negative_p =
         ((BIGNUM_NEGATIVE_P(denominator)) ? (!r_negative_p) : r_negative_p);
     switch (bignum_compare_unsigned(numerator, denominator)) {
-      case bignum_comparison_equal: {
+      case BIGNUM_COMPARISON_EQUAL: {
         (*quotient) = (BIGNUM_ONE(q_negative_p));
         (*remainder) = (BIGNUM_ZERO());
         break;
       }
-      case bignum_comparison_less: {
+      case BIGNUM_COMPARISON_LESS: {
         (*quotient) = (BIGNUM_ZERO());
         (*remainder) = numerator;
         break;
       }
-      case bignum_comparison_greater: {
+      case BIGNUM_COMPARISON_GREATER: {
         if ((BIGNUM_LENGTH(denominator)) == 1) {
           bignum_digit_type digit = (BIGNUM_REF(denominator, 0));
           if (digit == 1) {
@@ -254,11 +254,11 @@ bignum* factor_vm::bignum_quotient(bignum* numerator, bignum* denominator) {
         ((BIGNUM_NEGATIVE_P(denominator)) ? (!(BIGNUM_NEGATIVE_P(numerator)))
                                           : (BIGNUM_NEGATIVE_P(numerator)));
     switch (bignum_compare_unsigned(numerator, denominator)) {
-      case bignum_comparison_equal:
+      case BIGNUM_COMPARISON_EQUAL:
         return (BIGNUM_ONE(q_negative_p));
-      case bignum_comparison_less:
+      case BIGNUM_COMPARISON_LESS:
         return (BIGNUM_ZERO());
-      case bignum_comparison_greater:
+      case BIGNUM_COMPARISON_GREATER:
       default: // to appease gcc -Wall
                {
         bignum* quotient;
@@ -291,11 +291,11 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
   if (BIGNUM_ZERO_P(numerator))
     return numerator;
   switch (bignum_compare_unsigned(numerator, denominator)) {
-    case bignum_comparison_equal:
+    case BIGNUM_COMPARISON_EQUAL:
       return (BIGNUM_ZERO());
-    case bignum_comparison_less:
+    case BIGNUM_COMPARISON_LESS:
       return numerator;
-    case bignum_comparison_greater:
+    case BIGNUM_COMPARISON_GREATER:
     default: // to appease gcc -Wall
              {
       bignum* remainder;
@@ -480,9 +480,9 @@ enum bignum_comparison factor_vm::bignum_compare_unsigned(bignum* x,
   bignum_length_type x_length = (BIGNUM_LENGTH(x));
   bignum_length_type y_length = (BIGNUM_LENGTH(y));
   if (x_length < y_length)
-    return (bignum_comparison_less);
+    return BIGNUM_COMPARISON_LESS;
   if (x_length > y_length)
-    return (bignum_comparison_greater);
+    return BIGNUM_COMPARISON_GREATER;
   {
     bignum_digit_type* start_x = (BIGNUM_START_PTR(x));
     bignum_digit_type* scan_x = (start_x + x_length);
@@ -491,12 +491,12 @@ enum bignum_comparison factor_vm::bignum_compare_unsigned(bignum* x,
       bignum_digit_type digit_x = (*--scan_x);
       bignum_digit_type digit_y = (*--scan_y);
       if (digit_x < digit_y)
-        return (bignum_comparison_less);
+        return BIGNUM_COMPARISON_LESS;
       if (digit_x > digit_y)
-        return (bignum_comparison_greater);
+        return BIGNUM_COMPARISON_GREATER;
     }
   }
-  return (bignum_comparison_equal);
+  return BIGNUM_COMPARISON_EQUAL;
 }
 
 // Addition
@@ -565,13 +565,13 @@ bignum* factor_vm::bignum_subtract_unsigned(bignum* x_, bignum* y_) {
 
   int negative_p = 0;
   switch (bignum_compare_unsigned(x.untagged(), y.untagged())) {
-    case bignum_comparison_equal:
+    case BIGNUM_COMPARISON_EQUAL:
       return (BIGNUM_ZERO());
-    case bignum_comparison_less:
+    case BIGNUM_COMPARISON_LESS:
       swap(x, y);
       negative_p = 1;
       break;
-    case bignum_comparison_greater:
+    case BIGNUM_COMPARISON_GREATER:
       negative_p = 0;
       break;
   }
@@ -1748,7 +1748,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   b = d;
 
   // Initial reduction: make sure that 0 <= b <= a.
-  if (bignum_compare(a.untagged(), b.untagged()) == bignum_comparison_less) {
+  if (bignum_compare(a.untagged(), b.untagged()) == BIGNUM_COMPARISON_LESS) {
     swap(a, b);
     std::swap(size_a, size_b);
   }
