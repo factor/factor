@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search classes
-classes.struct combinators combinators.smart continuations fry
-generalizations generic grouping io io.styles kernel make math
-math.order math.parser math.statistics memory layouts namespaces
-parser prettyprint sequences sequences.generalizations sorting
-splitting strings system vm words hints hashtables ;
+USING: accessors arrays assocs binary-search classes classes.struct
+combinators combinators.smart continuations fry grouping hashtables
+hints io io.styles kernel layouts math math.order math.parser
+math.statistics memory namespaces prettyprint sequences
+sequences.generalizations sorting vm ;
 IN: tools.memory
 
 <PRIVATE
@@ -186,6 +185,9 @@ SYMBOL: gc-events
 : gc-stats. ( -- )
     gc-events get compute-gc-stats gc-stats-table simple-table. ;
 
+: sum-phase-times ( events phase -- n )
+    '[ times>> _ swap nth ] map-sum nanos>string ; inline
+
 : gc-summary. ( -- )
     gc-events get {
         { "Collections:" [ length commas ] }
@@ -193,11 +195,11 @@ SYMBOL: gc-events
         { "Decks scanned:" [ [ decks-scanned>> ] map-sum commas ] }
         { "Code blocks scanned:" [ [ code-blocks-scanned>> ] map-sum commas ] }
         { "Total time:" [ [ total-time>> ] map-sum nanos>string ] }
-        { "Card scan time:" [ [ card-scan-time>> ] map-sum nanos>string ] }
-        { "Code block scan time:" [ [ code-scan-time>> ] map-sum nanos>string ] }
-        { "Data heap sweep time:" [ [ data-sweep-time>> ] map-sum nanos>string ] }
-        { "Code heap sweep time:" [ [ code-sweep-time>> ] map-sum nanos>string ] }
-        { "Compaction time:" [ [ compaction-time>> ] map-sum nanos>string ] }
+        { "Card scan time:" [ PHASE-CARD-SCAN sum-phase-times ] }
+        { "Code block scan time:" [ PHASE-CODE-SCAN sum-phase-times ] }
+        { "Data heap sweep time:" [ PHASE-DATA-SWEEP sum-phase-times ] }
+        { "Code heap sweep time:" [ PHASE-CODE-SWEEP sum-phase-times ] }
+        { "Data compaction time:" [ PHASE-DATA-COMPACTION sum-phase-times ] }
     } object-table. ;
 
 SINGLETONS: +unoptimized+ +optimized+ +profiling+ +pic+ ;

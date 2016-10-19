@@ -81,23 +81,27 @@ STRUCT: data-heap-room
 { decks cell_t }
 { mark-stack cell_t } ;
 
+CONSTANT: PHASE-CARD-SCAN 0
+CONSTANT: PHASE-CODE-SCAN 1
+CONSTANT: PHASE-DATA-SWEEP 2
+CONSTANT: PHASE-CODE-SWEEP 3
+CONSTANT: PHASE-DATA-COMPACTION 4
+
+! gc-event should be kept in sync with:
+!   vm/gc.hpp
 STRUCT: gc-event
-{ op uint }
-{ data-heap-before data-heap-room }
-{ code-heap-before mark-sweep-sizes }
-{ data-heap-after data-heap-room }
-{ code-heap-after mark-sweep-sizes }
-{ cards-scanned cell_t }
-{ decks-scanned cell_t }
-{ code-blocks-scanned cell_t }
-{ start-time ulonglong }
-{ total-time cell_t }
-{ card-scan-time cell_t }
-{ code-scan-time cell_t }
-{ data-sweep-time cell_t }
-{ code-sweep-time cell_t }
-{ compaction-time cell_t }
-{ temp-time ulonglong } ;
+    { op uint }
+    { data-heap-before data-heap-room }
+    { code-heap-before mark-sweep-sizes }
+    { data-heap-after data-heap-room }
+    { code-heap-after mark-sweep-sizes }
+    { cards-scanned cell_t }
+    { decks-scanned cell_t }
+    { code-blocks-scanned cell_t }
+    { start-time ulonglong }
+    { total-time cell_t }
+    { times cell_t[5] }
+    { temp-time ulonglong } ;
 
 ! gc-info should be kept in sync with:
 !   vm/gc_info.hpp

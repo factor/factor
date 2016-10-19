@@ -84,7 +84,7 @@ void factor_vm::collect_sweep_impl() {
     event->reset_timer();
   data->tenured->sweep();
   if (event)
-    event->ended_data_sweep();
+    event->ended_phase(PHASE_DATA_SWEEP);
 
   // After a sweep, invalidate any code heap roots which are not
   // marked, so that if a block makes a tail call to a generic word,
@@ -102,7 +102,7 @@ void factor_vm::collect_sweep_impl() {
     event->reset_timer();
   code->sweep();
   if (event)
-    event->ended_code_sweep();
+    event->ended_phase(PHASE_CODE_SWEEP);
 }
 
 void factor_vm::collect_full() {

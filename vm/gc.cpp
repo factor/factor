@@ -8,11 +8,7 @@ gc_event::gc_event(gc_op op, factor_vm* parent)
       decks_scanned(0),
       code_blocks_scanned(0),
       start_time(nano_count()),
-      card_scan_time(0),
-      code_scan_time(0),
-      data_sweep_time(0),
-      code_sweep_time(0),
-      compaction_time(0) {
+      times{0} {
   data_heap_before = parent->data_room();
   code_heap_before = parent->code->allocator->as_allocator_room();
   start_time = nano_count();
@@ -20,27 +16,8 @@ gc_event::gc_event(gc_op op, factor_vm* parent)
 
 void gc_event::reset_timer() { temp_time = nano_count(); }
 
-void gc_event::ended_card_scan(cell cards_scanned_, cell decks_scanned_) {
-  cards_scanned += cards_scanned_;
-  decks_scanned += decks_scanned_;
-  card_scan_time = (cell)(nano_count() - temp_time);
-}
-
-void gc_event::ended_code_scan(cell code_blocks_scanned_) {
-  code_blocks_scanned += code_blocks_scanned_;
-  code_scan_time = (cell)(nano_count() - temp_time);
-}
-
-void gc_event::ended_data_sweep() {
-  data_sweep_time = (cell)(nano_count() - temp_time);
-}
-
-void gc_event::ended_code_sweep() {
-  code_sweep_time = (cell)(nano_count() - temp_time);
-}
-
-void gc_event::ended_compaction() {
-  compaction_time = (cell)(nano_count() - temp_time);
+void gc_event::ended_phase(gc_phase phase) {
+  times[phase] = (cell)(nano_count() - temp_time);
 }
 
 void gc_event::ended_gc(factor_vm* parent) {

@@ -143,7 +143,7 @@ void factor_vm::collect_compact_impl() {
   code->initialize_all_blocks_set();
 
   if (event)
-    event->ended_compaction();
+    event->ended_phase(PHASE_DATA_COMPACTION);
 }
 
 void factor_vm::collect_compact() {
