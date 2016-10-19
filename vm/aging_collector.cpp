@@ -41,7 +41,7 @@ void factor_vm::collect_aging() {
   // everything else to the aging semi-space, and reset the nursery pointer.
   {
     // Change the op so that if we fail here, an assertion will be raised.
-    current_gc->op = collect_to_tenured_op;
+    current_gc->op = COLLECT_TO_TENURED_OP;
 
     slot_visitor<from_tenured_refs_copier>
         visitor(this, from_tenured_refs_copier(data->tenured, &mark_stack));
@@ -64,7 +64,7 @@ void factor_vm::collect_aging() {
   }
   {
     // If collection fails here, do a to_tenured collection.
-    current_gc->op = collect_aging_op;
+    current_gc->op = COLLECT_AGING_OP;
 
     std::swap(data->aging, data->aging_semispace);
     data->reset_aging();

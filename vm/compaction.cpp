@@ -97,8 +97,8 @@ void factor_vm::collect_compact_impl() {
   const code_block* code_finger = (code_block*)code->allocator->start;
 
   {
-    compaction_fixup fixup(data_forwarding_map, code_forwarding_map, &data_finger,
-                           &code_finger);
+    compaction_fixup fixup(data_forwarding_map, code_forwarding_map,
+                           &data_finger, &code_finger);
     slot_visitor<compaction_fixup> forwarder(this, fixup);
 
     forwarder.visit_uninitialized_code_blocks();
@@ -150,9 +150,9 @@ void factor_vm::collect_compact() {
   collect_mark_impl();
   collect_compact_impl();
 
+  // Compaction did not free up enough memory. Grow the data heap.
   if (data->high_fragmentation_p()) {
-    // Compaction did not free up enough memory. Grow the heap.
-    set_current_gc_op(collect_growing_data_heap_op);
+    set_current_gc_op(COLLECT_GROWING_DATA_HEAP_OP);
     collect_growing_data_heap(0);
   }
 

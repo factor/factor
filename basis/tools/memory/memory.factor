@@ -108,12 +108,12 @@ PRIVATE>
 
 : gc-op-string ( op -- string )
     {
-        { collect-nursery-op      [ "Copying from nursery" ] }
-        { collect-aging-op        [ "Copying from aging"   ] }
-        { collect-to-tenured-op   [ "Copying to tenured"   ] }
-        { collect-full-op         [ "Mark and sweep"       ] }
-        { collect-compact-op      [ "Mark and compact"     ] }
-        { collect-growing-heap-op [ "Grow heap"            ] }
+        { COLLECT-NURSERY-OP           [ "Copying from nursery" ] }
+        { COLLECT-AGING-OP             [ "Copying from aging"   ] }
+        { COLLECT-TO-TENURED-OP        [ "Copying to tenured"   ] }
+        { COLLECT-FULL-OP              [ "Mark and sweep"       ] }
+        { COLLECT-COMPACT-OP           [ "Mark and compact"     ] }
+        { COLLECT-GROWING-DATA-HEAP-OP [ "Grow heap"            ] }
     } case ;
 
 : (space-occupied) ( data-heap-room code-heap-room -- n )
@@ -203,12 +203,12 @@ SYMBOL: gc-events
 SINGLETONS: +unoptimized+ +optimized+ +profiling+ +pic+ ;
 
 TUPLE: code-block
-{ owner read-only }
-{ parameters read-only }
-{ relocation read-only }
-{ type read-only }
-{ size read-only }
-{ entry-point read-only } ;
+    { owner read-only }
+    { parameters read-only }
+    { relocation read-only }
+    { type read-only }
+    { size read-only }
+    { entry-point read-only } ;
 
 TUPLE: code-blocks { blocks groups } { cache hashtable } ;
 

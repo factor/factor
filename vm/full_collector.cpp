@@ -111,12 +111,12 @@ void factor_vm::collect_full() {
 
   if (data->low_memory_p()) {
     // Full GC did not free up enough memory. Grow the heap.
-    set_current_gc_op(collect_growing_data_heap_op);
+    set_current_gc_op(COLLECT_GROWING_DATA_HEAP_OP);
     collect_growing_data_heap(0);
   } else if (data->high_fragmentation_p()) {
     // Enough free memory, but it is not contiguous. Perform a
     // compaction.
-    set_current_gc_op(collect_compact_op);
+    set_current_gc_op(COLLECT_COMPACT_OP);
     collect_compact_impl();
   }
 

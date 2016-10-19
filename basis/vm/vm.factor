@@ -54,12 +54,12 @@ STRUCT: vm
     { retainstack-size cell_t }
     { callstack-size cell_t } ;
 
-CONSTANT: collect-nursery-op 0
-CONSTANT: collect-aging-op 1
-CONSTANT: collect-to-tenured-op 2
-CONSTANT: collect-full-op 3
-CONSTANT: collect-compact-op 4
-CONSTANT: collect-growing-heap-op 5
+CONSTANT: COLLECT-NURSERY-OP 0
+CONSTANT: COLLECT-AGING-OP 1
+CONSTANT: COLLECT-TO-TENURED-OP 2
+CONSTANT: COLLECT-FULL-OP 3
+CONSTANT: COLLECT-COMPACT-OP 4
+CONSTANT: COLLECT-GROWING-DATA-HEAP-OP 5
 
 STRUCT: copying-sizes
 { size cell_t }
