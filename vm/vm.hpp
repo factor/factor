@@ -341,7 +341,6 @@ struct factor_vm {
   void collect_nursery();
   void collect_aging();
   void collect_to_tenured();
-  void update_code_roots_for_sweep();
   void update_code_roots_for_compaction();
   void collect_mark_impl();
   void collect_sweep_impl();
