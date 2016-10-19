@@ -33,7 +33,7 @@ void factor_vm::update_pic_count(cell type) {
 
 struct inline_cache_jit : public jit {
   inline_cache_jit(cell generic_word, factor_vm* vm)
-      : jit(code_block_pic, generic_word, vm) {}
+      : jit(CODE_BLOCK_PIC, generic_word, vm) {}
 
   void emit_check_and_jump(cell ic_type, cell i, cell klass, cell method);
   void emit_inline_cache(fixnum index, cell generic_word_, cell methods_,

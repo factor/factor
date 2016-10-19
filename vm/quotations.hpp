@@ -6,7 +6,7 @@ struct quotation_jit : public jit {
 
   // Allocates memory
   quotation_jit(cell owner, bool compiling, bool relocate, factor_vm* vm)
-      : jit(code_block_unoptimized, owner, vm),
+      : jit(CODE_BLOCK_UNOPTIMIZED, owner, vm),
         elements(false_object, vm),
         compiling(compiling),
         relocate(relocate) {}

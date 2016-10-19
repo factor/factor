@@ -25,9 +25,9 @@ struct code_block {
     header = ((header & ~0x7) | (type << 1));
   }
 
-  bool pic_p() const { return type() == code_block_pic; }
+  bool pic_p() const { return type() == CODE_BLOCK_PIC; }
 
-  bool optimized_p() const { return type() == code_block_optimized; }
+  bool optimized_p() const { return type() == CODE_BLOCK_OPTIMIZED; }
 
   cell size() const {
     cell size;

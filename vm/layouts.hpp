@@ -76,9 +76,9 @@ static inline const char* type_name(cell type) {
 }
 
 enum code_block_type {
-  code_block_unoptimized,
-  code_block_optimized,
-  code_block_pic
+  CODE_BLOCK_UNOPTIMIZED,
+  CODE_BLOCK_OPTIMIZED,
+  CODE_BLOCK_PIC
 };
 
 // Constants used when floating-point trap exceptions are thrown
