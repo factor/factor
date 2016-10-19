@@ -56,21 +56,6 @@ struct full_collection_copier : no_fixup {
   }
 };
 
-// After a sweep, invalidate any code heap roots which are not marked,
-// so that if a block makes a tail call to a generic word, and the PIC
-// compiler triggers a GC, and the caller block gets GCd as a result,
-// the PIC code won't try to overwrite the call site
-void factor_vm::update_code_roots_for_sweep() {
-  mark_bits* state = &code->allocator->state;
-
-  FACTOR_FOR_EACH(code_roots) {
-    code_root* root = *iter;
-    cell block = root->value & (~data_alignment - 1);
-    if (root->valid && !state->marked_p(block))
-      root->valid = false;
-  }
-}
-
 void factor_vm::collect_mark_impl() {
   slot_visitor<full_collection_copier>
       visitor(this, full_collection_copier(data->tenured, code, &mark_stack));
@@ -101,7 +86,17 @@ void factor_vm::collect_sweep_impl() {
   if (event)
     event->ended_data_sweep();
 
-  update_code_roots_for_sweep();
+  // After a sweep, invalidate any code heap roots which are not
+  // marked, so that if a block makes a tail call to a generic word,
+  // and the PIC compiler triggers a GC, and the caller block gets GCd
+  // as a result, the PIC code won't try to overwrite the call site
+  mark_bits* state = &code->allocator->state;
+  FACTOR_FOR_EACH(code_roots) {
+    code_root* root = *iter;
+    cell block = root->value & (~data_alignment - 1);
+    if (root->valid && !state->marked_p(block))
+      root->valid = false;
+  }
 
   if (event)
     event->reset_timer();
