@@ -47,7 +47,7 @@ cell code_block::owner_quot() const {
 // scan offset. In all other cases -1 is returned.
 // Allocates memory (quot_code_offset_to_scan)
 cell code_block::scan(factor_vm* vm, cell addr) const {
-  if (type() != code_block_unoptimized) {
+  if (type() != CODE_BLOCK_UNOPTIMIZED) {
     return tag_fixnum(-1);
   }
 

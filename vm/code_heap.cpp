@@ -151,7 +151,7 @@ void factor_vm::primitive_modify_code_heap() {
         cell frame_size = untag_fixnum(array_nth(compiled_data, 5));
 
         code_block* compiled =
-            add_code_block(code_block_optimized, code, labels, word.value(),
+            add_code_block(CODE_BLOCK_OPTIMIZED, code, labels, word.value(),
                            relocation, parameters, literals, frame_size);
 
         word->entry_point = compiled->entry_point();
