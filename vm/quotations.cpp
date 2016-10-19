@@ -293,8 +293,8 @@ code_block* factor_vm::jit_compile_quotation(cell owner_, cell quot_,
 
   cell frame_size = compiler.word_stack_frame_size(owner_);
 
-  code_block* compiled = compiler.to_code_block(frame_size);
-
+  code_block* compiled = compiler.to_code_block(CODE_BLOCK_UNOPTIMIZED,
+                                                frame_size);
   if (relocating)
     initialize_code_block(compiled);
 

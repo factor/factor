@@ -32,8 +32,7 @@ void factor_vm::update_pic_count(cell type) {
 }
 
 struct inline_cache_jit : public jit {
-  inline_cache_jit(cell generic_word, factor_vm* vm)
-      : jit(CODE_BLOCK_PIC, generic_word, vm) {}
+  inline_cache_jit(cell generic_word, factor_vm* vm) : jit(generic_word, vm) {}
 
   void emit_check_and_jump(cell ic_type, cell i, cell klass, cell method);
   void emit_inline_cache(fixnum index, cell generic_word_, cell methods_,
@@ -119,7 +118,7 @@ code_block* factor_vm::compile_inline_cache(fixnum index, cell generic_word_,
   inline_cache_jit jit(generic_word.value(), this);
   jit.emit_inline_cache(index, generic_word.value(), methods.value(),
                         cache_entries.value(), tail_call_p);
-  code_block* code = jit.to_code_block(JIT_FRAME_SIZE);
+  code_block* code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
   initialize_code_block(code);
   return code;
 }
