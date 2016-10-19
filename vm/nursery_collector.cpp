@@ -50,14 +50,19 @@ void factor_vm::collect_nursery() {
   visitor.visit_cards(data->tenured, card_points_to_nursery,
                       card_points_to_nursery);
   visitor.visit_cards(data->aging, card_points_to_nursery, 0xff);
-  if (event)
-    event->ended_card_scan(visitor.cards_scanned, visitor.decks_scanned);
+  if (event) {
+    event->ended_phase(PHASE_CARD_SCAN);
+    event->cards_scanned += visitor.cards_scanned;
+    event->decks_scanned += visitor.decks_scanned;
+  }
 
   if (event)
     event->reset_timer();
   visitor.visit_code_heap_roots(&code->points_to_nursery);
-  if (event)
-    event->ended_code_scan(code->points_to_nursery.size());
+  if (event) {
+    event->ended_phase(PHASE_CODE_SCAN);
+    event->code_blocks_scanned += code->points_to_nursery.size();
+  }
 
   visitor.cheneys_algorithm(data->aging, scan);
 

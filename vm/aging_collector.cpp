@@ -51,15 +51,19 @@ void factor_vm::collect_aging() {
     if (event)
       event->reset_timer();
     visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
-    if (event)
-      event->ended_card_scan(visitor.cards_scanned, visitor.decks_scanned);
+    if (event) {
+      event->ended_phase(PHASE_CARD_SCAN);
+      event->cards_scanned += visitor.cards_scanned;
+      event->decks_scanned += visitor.decks_scanned;
+    }
 
     if (event)
       event->reset_timer();
     visitor.visit_code_heap_roots(&code->points_to_aging);
-    if (event)
-      event->ended_code_scan(code->points_to_aging.size());
-
+    if (event) {
+      event->ended_phase(PHASE_CODE_SCAN);
+      event->code_blocks_scanned += code->points_to_aging.size();
+    }
     visitor.visit_mark_stack(&mark_stack);
   }
   {
