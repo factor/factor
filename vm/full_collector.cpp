@@ -57,6 +57,10 @@ struct full_collection_copier : no_fixup {
 };
 
 void factor_vm::collect_mark_impl() {
+  gc_event* event = current_gc->event;
+  if (event)
+    event->reset_timer();
+
   slot_visitor<full_collection_copier>
       visitor(this, full_collection_copier(data->tenured, code, &mark_stack));
 
@@ -75,11 +79,13 @@ void factor_vm::collect_mark_impl() {
   data->reset_aging();
   data->reset_nursery();
   code->clear_remembered_set();
+
+  if (event)
+    event->ended_phase(PHASE_MARKING);
 }
 
 void factor_vm::collect_sweep_impl() {
   gc_event* event = current_gc->event;
-
   if (event)
     event->reset_timer();
   data->tenured->sweep();

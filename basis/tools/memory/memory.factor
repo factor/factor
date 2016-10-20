@@ -197,6 +197,7 @@ SYMBOL: gc-events
         { "Total time:" [ [ total-time>> ] map-sum nanos>string ] }
         { "Card scan time:" [ PHASE-CARD-SCAN sum-phase-times ] }
         { "Code block scan time:" [ PHASE-CODE-SCAN sum-phase-times ] }
+        { "Marking time:" [ PHASE-MARKING sum-phase-times ] }
         { "Data heap sweep time:" [ PHASE-DATA-SWEEP sum-phase-times ] }
         { "Code heap sweep time:" [ PHASE-CODE-SWEEP sum-phase-times ] }
         { "Data compaction time:" [ PHASE-DATA-COMPACTION sum-phase-times ] }
