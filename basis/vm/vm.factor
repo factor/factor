@@ -86,6 +86,7 @@ CONSTANT: PHASE-CODE-SCAN 1
 CONSTANT: PHASE-DATA-SWEEP 2
 CONSTANT: PHASE-CODE-SWEEP 3
 CONSTANT: PHASE-DATA-COMPACTION 4
+CONSTANT: PHASE-MARKING 5
 
 ! gc-event should be kept in sync with:
 !   vm/gc.hpp
@@ -100,7 +101,7 @@ STRUCT: gc-event
     { code-blocks-scanned cell_t }
     { start-time ulonglong }
     { total-time cell_t }
-    { times cell_t[5] }
+    { times cell_t[6] }
     { temp-time ulonglong } ;
 
 ! gc-info should be kept in sync with:

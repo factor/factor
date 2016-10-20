@@ -19,6 +19,7 @@ enum gc_phase {
   PHASE_DATA_SWEEP,
   PHASE_CODE_SWEEP,
   PHASE_DATA_COMPACTION,
+  PHASE_MARKING
 };
 
 struct gc_event {
@@ -32,7 +33,7 @@ struct gc_event {
   cell code_blocks_scanned;
   uint64_t start_time;
   cell total_time;
-  cell times[5];
+  cell times[6];
   uint64_t temp_time;
 
   gc_event(gc_op op, factor_vm* parent);
