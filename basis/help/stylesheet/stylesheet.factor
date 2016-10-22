@@ -135,7 +135,7 @@ H{
 SYMBOL: table-style
 H{
     { table-gap { 5 5 } }
-    { table-border $ line-color }
+    { table-border $ table-border-color }
 } table-style set-global
 
 SYMBOL: list-style
