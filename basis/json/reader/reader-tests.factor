@@ -42,6 +42,10 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { { 1 "two" 3.0 } } [ " [1, \"two\", 3.0] " json> ] unit-test
 { H{ } } [ "{}" json> ] unit-test
 
+! json object keys should be strings
+[ "{1:2}" json> ]
+[ not-a-json-object-key? ] must-fail-with
+
 ! the returned hashtable should be different every time
 { H{ } } [ "key" "value" "{}" json> ?set-at "{}" json> nip ] unit-test
 
