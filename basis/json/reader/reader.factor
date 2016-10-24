@@ -8,9 +8,6 @@ IN: json.reader
 
 <PRIVATE
 
-ERROR: not-a-json-number string ;
-ERROR: not-a-json-object-key object ;
-
 : json-number ( char stream -- num char )
     [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
     [
@@ -18,7 +15,7 @@ ERROR: not-a-json-object-key object ;
             { "Infinity" [ 1/0. ] }
             { "-Infinity" [ -1/0. ] }
             { "NaN" [ 0/0. ] }
-            [ dup string>number [ ] [ not-a-json-number ] ?if ]
+            [ string>number dup [ json-error ] unless ]
         } case
     ] dip ;
 
@@ -83,7 +80,7 @@ DEFER: (read-json-string)
 : v-pick-push ( accum -- accum )
     { vector } declare 3 check-length dup
     [ pop-unsafe ] [ second-last-unsafe ] bi
-    over string? [ over not-a-json-object-key ] unless
+    over string? [ json-error ] unless
     { vector } declare push ;
 
 : v-pop ( accum -- vector )
