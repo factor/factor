@@ -40,12 +40,9 @@ CONSTANT: A_PLUS_MOVIE CHAR: ;
 CONSTANT: A_PLUS_SOUND CHAR: <
 
 : gopher-get ( selector -- item-type byte-array )
-    "/" split1 "" or
-    [ dup length 1 > [ string>number ] [ first ] if ]
-    [
-        "?" split1 [ "\t" glue ] when*
-        "\r\n" append utf8 encode write flush contents
-    ] bi* ;
+    "/" split1 "" or [ first ] dip
+    "?" split1 [ "\t" glue ] when*
+    "\r\n" append utf8 encode write flush contents ;
 
 PRIVATE>
 
@@ -78,7 +75,7 @@ M: gopher-link >url
     ] [
         {
             [ host>> ] [ port>> ] [ type>> ] [ selector>> ]
-        } cleave "gopher://%s:%s/%s%s" sprintf
+        } cleave "gopher://%s:%s/%c%s" sprintf
     ] if >url ;
 
 : gopher-link. ( gopher-link -- )
