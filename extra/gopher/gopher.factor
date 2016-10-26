@@ -97,6 +97,9 @@ M: gopher-link >url
 : gopher-gif. ( object -- )
     "gif" (image-class) load-image* image. ;
 
+: gopher-image. ( path object -- path )
+    over image-class load-image* image. ;
+
 : gopher-menu. ( object -- )
     gopher-text [
         [ nl ] [ <gopher-link> gopher-link. ] if-empty
@@ -105,10 +108,12 @@ M: gopher-link >url
 PRIVATE>
 
 : gopher. ( url -- )
-    gopher swap {
+    dup url? [ >url ] unless
+    [ path>> ] [ gopher swap ] bi {
         { A_TEXT [ gopher-text. ] }
         { A_MENU [ gopher-menu. ] }
         { A_INDEX [ gopher-menu. ] }
         { A_GIF [ gopher-gif. ] }
+        { A_IMAGE [ gopher-image. ] }
         [ drop . ]
-    } case ;
+    } case drop ;
