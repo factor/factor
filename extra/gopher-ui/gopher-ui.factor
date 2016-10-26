@@ -38,7 +38,9 @@ M: gopher-gadget model-changed
     2bi ;
 
 : <url-field> ( gopher-gadget -- field )
-    '[ >url _ show-gopher ] <action-field> ;
+    '[ >url _ show-gopher ] <action-field>
+        "Gopher URL" >>default-text
+        white-interior ;
 
 : <gopher-pane> ( gopher-gadget -- gadget )
     model>> [ '[ _ [ gopher. ] when* ] try ] <pane-control> ;
@@ -51,14 +53,20 @@ M: gopher-gadget model-changed
         over <toolbar> f track-add
         swap url-field>> 1 track-add ;
 
+: add-gopher-toolbar ( track -- track )
+    dup <gopher-toolbar> format-toolbar f track-add ;
+
+: add-gopher-pane ( track -- track )
+    dup dup <gopher-pane> margins
+    <scroller> >>scroller scroller>> white-interior 1 track-add ;
+
 : <gopher-gadget> ( -- gadget )
-    vertical gopher-gadget new-track
+    vertical gopher-gadget new-track with-lines
         f <model> >>model
         dup <history> >>history
         dup <url-field> >>url-field
-        dup <gopher-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
-        dup <gopher-pane> { 3 3 } <border> { 1 1 } >>fill
-        <scroller> [ >>scroller ] [ 1 track-add ] bi ;
+        add-gopher-toolbar
+        add-gopher-pane ;
 
 : open-gopher-window ( url -- )
     <gopher-gadget>
