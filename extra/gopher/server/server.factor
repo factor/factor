@@ -56,7 +56,7 @@ TUPLE: gopher-server < threaded-server
             ".." swap parent-directory
             server serving-hostname>>
             server insecure>>
-            "1%-67s\t%s\t%s\t%d\r\n" sprintf
+            "1%-69s\t%s\t%s\t%d\r\n" sprintf
             utf8 encode write
         ] unless-empty
     ] bi
@@ -90,7 +90,7 @@ TUPLE: gopher-server < threaded-server
     ] if ;
 
 : read-gopher-path ( -- path )
-    readln dup [ "\t\r\n" member? ] find drop [ head ] when* 
+    readln dup [ "\t\r\n" member? ] find drop [ head ] when*
     trim-tail-separators ;
 
 : handle-gopher-client ( server -- )
