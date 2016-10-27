@@ -9,7 +9,7 @@ ui.gadgets.toolbar ui.gadgets.tracks ui.gadgets.viewports
 ui.gestures ui.operations ui.tools.browser
 ui.tools.browser.history ui.tools.common urls ;
 
-IN: gopher-ui
+IN: gopher.ui
 
 TUPLE: gopher-gadget < tool history scroller url-field ;
 
