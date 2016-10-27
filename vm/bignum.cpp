@@ -1703,7 +1703,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   data_root<bignum> ac(bignum_maybe_new_sign(a.untagged(), 0), this);
   data_root<bignum> bc(bignum_maybe_new_sign(b.untagged(), 0), this);
 
-  if (bignum_compare(ac.untagged(), bc.untagged()) == bignum_comparison_less) {
+  if (bignum_compare(ac.untagged(), bc.untagged()) == BIGNUM_COMPARISON_LESS) {
     swap(ac, bc);
   }
 
