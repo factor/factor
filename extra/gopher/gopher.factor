@@ -49,8 +49,7 @@ PRIVATE>
 ERROR: not-a-gopher-url url ;
 
 : gopher ( url -- item-type byte-array )
-    dup url? [ >url ] unless
-    dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
+    >url dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
         [ host>> ]
         [ port>> 70 or <inet> binary ]
         [ path>> rest [ "1/" ] when-empty ]
@@ -108,8 +107,7 @@ M: gopher-link >url
 PRIVATE>
 
 : gopher. ( url -- )
-    dup url? [ >url ] unless
-    [ path>> ] [ gopher swap ] bi {
+    >url [ path>> ] [ gopher swap ] bi {
         { A_TEXT [ gopher-text. ] }
         { A_MENU [ gopher-menu. ] }
         { A_INDEX [ gopher-menu. ] }

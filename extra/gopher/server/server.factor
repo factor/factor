@@ -48,6 +48,7 @@ TUPLE: gopher-server < threaded-server
 
 :: list-directory ( server path -- )
     path server serving-directory>> ?head drop [
+        [ "/" ] when-empty
         "i[%s]\t\terror.host\t1\r\n\r\n" sprintf
         utf8 encode write
     ] [
@@ -70,8 +71,8 @@ TUPLE: gopher-server < threaded-server
                 "%-40s %s %10s" sprintf
             ] [
                 path prepend-path
+                server serving-directory>> ?head drop
             ] bi
-            server serving-directory>> ?head drop
             server serving-hostname>>
             server insecure>>
             "%s%s\t%s\t%s\t%d\r\n" sprintf
