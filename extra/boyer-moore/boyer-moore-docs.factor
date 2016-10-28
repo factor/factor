@@ -22,7 +22,7 @@ HELP: search-from
   { "i/f" "the index of first match or " { $link f }  }
 }
 { $description "Performs an attempt to find the first "
-  "occurence of pattern in " { $snippet "seq" }
+  "occurrence of pattern in " { $snippet "seq" }
   " starting from " { $snippet "from" } " using "
   "Boyer-Moore search algorithm. Output is the index "
   "if the attempt was  succeessful and " { $link f }

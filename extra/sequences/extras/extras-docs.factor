@@ -192,7 +192,7 @@ HELP: unsurround
 HELP: start-all
 { $values
      { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
-{ $description "Outputs the starting indices of the non-overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the starting indices of the non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all ."
                "{ 0 }"
@@ -205,7 +205,7 @@ HELP: start-all
 HELP: start-all*
 { $values
     { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
-{ $description "Outputs the starting indices of the possibly overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the starting indices of the possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all* ."
                "{ 0 2 }"
@@ -214,7 +214,7 @@ HELP: start-all*
 HELP: count-subseq
 { $values
     { "subseq" sequence } { "seq" sequence } { "n" integer } }
-{ $description "Outputs the number of non-overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the number of non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq ."
                "1"
@@ -224,7 +224,7 @@ HELP: count-subseq
 HELP: count-subseq*
 { $values
     { "subseq" sequence } { "seq" sequence } { "n" integer } }
-{ $description "Outputs the number of possibly overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the number of possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq* ."
                "2"
