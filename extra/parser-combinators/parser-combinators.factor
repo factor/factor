@@ -257,7 +257,7 @@ LAZY: <*> ( parser -- parser )
     dup <*> <&:> { } succeed <|> ;
 
 : <+> ( parser -- parser )
-    ! Return a parser that accepts one or more occurences of the original
+    ! Return a parser that accepts one or more occurrences of the original
     ! parser.
     dup <*> <&:> ;
 
