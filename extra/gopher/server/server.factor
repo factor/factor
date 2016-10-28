@@ -93,7 +93,7 @@ TUPLE: gopher-server < threaded-server
     readln dup [ "\t\r\n" member? ] find drop [ head ] when*
     trim-tail-separators ;
 
-: handle-gopher-client ( server -- )
+M: gopher-server handle-client*
     dup serving-directory>> read-gopher-path append-path
     dup file-info type>> {
         { +directory+ [ send-directory ] }
@@ -110,8 +110,7 @@ PRIVATE>
         swap resolve-symlinks >>serving-directory
         "gopher.server" >>name
         binary >>encoding
-        5 minutes >>timeout
-        dup '[ _ handle-gopher-client ] >>handler ;
+        5 minutes >>timeout ;
 
 : start-gopher-server ( directory port -- server )
     <gopher-server> start-server ;
