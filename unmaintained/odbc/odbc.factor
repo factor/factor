@@ -147,7 +147,7 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
   SQL-HANDLE-STMT swap alloc-handle ;
 
 : temp-string ( length -- byte-array length )
-  [ CHAR: \space  <string> ascii string>alien ] keep ;
+  [ CHAR: space <string> ascii string>alien ] keep ;
 
 : odbc-init ( -- env )
   alloc-env-handle
@@ -189,7 +189,7 @@ C: <column> column
 
 : odbc-describe-column ( statement n -- column )
   dup >r
-  1024 CHAR: \space <string> ascii string>alien dup >r
+  1024 CHAR: space <string> ascii string>alien dup >r
   1024
   0 <short>
   0 <short> dup >r
@@ -233,7 +233,7 @@ C: <field> field
 : odbc-get-field ( statement column -- field )
   dup column? [ dupd odbc-describe-column ] unless dup >r number>>
   SQL-C-DEFAULT
-  8192 CHAR: \space <string> ascii string>alien dup >r
+  8192 CHAR: space <string> ascii string>alien dup >r
   8192
   f SQLGetData succeeded? [
     r> r> [ dereference-type-pointer ] keep <field>
