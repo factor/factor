@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel alien alien.strings alien.syntax
 combinators alien.c-types strings sequences namespaces make
-words math threads io.encodings.ascii ;
+words math threads io.encodings.ascii locals ;
 IN: odbc
 
 << "odbc" "odbc32.dll" stdcall add-library >>
@@ -157,7 +157,7 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
   ] keep ;
 
 : odbc-connect ( env dsn -- dbc )
-   >r alloc-dbc-handle dup r>
+   [ alloc-dbc-handle dup ] dip
    f swap dup length 1024 temp-string 0 short <ref> SQL-DRIVER-NOPROMPT
    SQLDriverConnect succeeded? [ "odbc-connect failed" throw ] unless ;
 
@@ -165,7 +165,7 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
   SQLDisconnect succeeded? [ "odbc-disconnect failed" throw ] unless ;
 
 : odbc-prepare ( dbc string -- statement )
-  >r alloc-stmt-handle dup r> dup length SQLPrepare succeeded? [ "odbc-prepare failed" throw ] unless ;
+  [ alloc-stmt-handle dup ] dip dup length SQLPrepare succeeded? [ "odbc-prepare failed" throw ] unless ;
 
 : odbc-free-statement ( statement -- )
   SQL-HANDLE-STMT swap SQLFreeHandle succeeded? [ "odbc-free-statement failed" throw ] unless ;
@@ -187,24 +187,24 @@ TUPLE: column nullable digits size type name number ;
 
 C: <column> column
 
-: odbc-describe-column ( statement n -- column )
-  dup >r
-  1024 CHAR: space <string> ascii string>alien dup >r
-  1024
-  0 short <ref>
-  0 short <ref> dup >r
-  0 uint <ref> dup >r
-  0 short <ref> dup >r
-  0 short <ref> dup >r
+:: odbc-describe-column ( statement columnNumber -- column )
+  1024 :> bufferLen
+  bufferLen CHAR: space <string> ascii string>alien :> columnName
+  0 short <ref> :> nameLengthPtr
+  0 short <ref> :> dataTypePtr
+  0 uint <ref> :> columnSizePtr
+  0 short <ref> :> decimalDigitsPtr
+  0 short <ref> :> nullablePtr
+  statement columnNumber columnName bufferLen nameLengthPtr
+  dataTypePtr columnSizePtr decimalDigitsPtr nullablePtr
   SQLDescribeCol succeeded? [
-    r> short deref
-    r> short deref
-    r> uint deref
-    r> short deref convert-sql-type
-    r> ascii alien>string
-    r> <column>
+    nullablePtr short deref
+    decimalDigitsPtr short deref
+    columnSizePtr uint deref
+    dataTypePtr short deref convert-sql-type
+    columnName ascii alien>string
+    columnNumber <column>
   ] [
-    r> drop r> drop r> drop r> drop r> drop r> drop
     "odbc-describe-column failed" throw
   ] if ;
 
@@ -230,15 +230,16 @@ TUPLE: field value column ;
 
 C: <field> field
 
-: odbc-get-field ( statement column -- field )
-  dup column? [ dupd odbc-describe-column ] unless dup >r number>>
-  SQL-C-DEFAULT
-  8192 CHAR: space <string> ascii string>alien dup >r
-  8192
-  f SQLGetData succeeded? [
-    r> r> [ dereference-type-pointer ] keep <field>
+:: odbc-get-field ( statement column! -- field )
+  column column? [ statement column odbc-describe-column column! ] unless
+  8192 :> bufferLen
+  bufferLen CHAR: space <string> ascii string>alien :> targetValuePtr
+
+  statement column number>> SQL-C-DEFAULT
+  targetValuePtr bufferLen f SQLGetData succeeded? [
+      targetValuePtr column [ dereference-type-pointer ] keep <field>
   ] [
-    r> drop r> [
+    column [
       "SQLGetData Failed for Column: " %
       dup name>> %
       " of type: " % dup type>> name>> %
