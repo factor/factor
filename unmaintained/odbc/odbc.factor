@@ -131,8 +131,8 @@ FUNCTION: SQLRETURN SQLDescribeCol ( SQLHSTMT statementHandle, SQLSMALLINT colum
 FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLSMALLINT targetType, SQLPOINTER targetValuePtr, SQLINTEGER bufferLength, SQLINTEGER* strlen_or_indPtr )
 
 : alloc-handle ( type parent -- handle )
-  f <void*> [ SQLAllocHandle ] keep swap succeeded? [
-    *void*
+  f void* <ref> [ SQLAllocHandle ] keep swap succeeded? [
+    void* deref
   ] [
     drop f
   ] if ;
@@ -158,7 +158,7 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
 
 : odbc-connect ( env dsn -- dbc )
    >r alloc-dbc-handle dup r>
-   f swap dup length 1024 temp-string 0 <short> SQL-DRIVER-NOPROMPT
+   f swap dup length 1024 temp-string 0 short <ref> SQL-DRIVER-NOPROMPT
    SQLDriverConnect succeeded? [ "odbc-connect failed" throw ] unless ;
 
 : odbc-disconnect ( dbc -- )
@@ -177,8 +177,8 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
   SQLFetch succeeded? ;
 
 : odbc-number-of-columns ( statement -- number )
-  0 <short> [ SQLNumResultCols succeeded? ] keep swap [
-    *short
+  0 short <ref> [ SQLNumResultCols succeeded? ] keep swap [
+    short deref
   ] [
     drop f
   ] if ;
@@ -191,16 +191,16 @@ C: <column> column
   dup >r
   1024 CHAR: space <string> ascii string>alien dup >r
   1024
-  0 <short>
-  0 <short> dup >r
-  0 <uint> dup >r
-  0 <short> dup >r
-  0 <short> dup >r
+  0 short <ref>
+  0 short <ref> dup >r
+  0 uint <ref> dup >r
+  0 short <ref> dup >r
+  0 short <ref> dup >r
   SQLDescribeCol succeeded? [
-    r> *short
-    r> *short
-    r> *uint
-    r> *short convert-sql-type
+    r> short deref
+    r> short deref
+    r> uint deref
+    r> short deref convert-sql-type
     r> ascii alien>string
     r> <column>
   ] [
@@ -216,13 +216,13 @@ C: <column> column
     { SQL-WCHAR [ ascii alien>string ] }
     { SQL-WCHARVAR [ ascii alien>string ] }
     { SQL-WLONGCHARVAR [ ascii alien>string ] }
-    { SQL-SMALLINT [ *short ] }
-    { SQL-INTEGER [ *long ] }
-    { SQL-REAL [ *float ] }
-    { SQL-FLOAT [ *double ] }
-    { SQL-DOUBLE [ *double ] }
-    { SQL-TINYINT [ *char  ] }
-    { SQL-BIGINT [ *longlong ] }
+    { SQL-SMALLINT [ short deref ] }
+    { SQL-INTEGER [ long deref ] }
+    { SQL-REAL [ float deref ] }
+    { SQL-FLOAT [ double deref ] }
+    { SQL-DOUBLE [ double deref ] }
+    { SQL-TINYINT [ char deref ] }
+    { SQL-BIGINT [ longlong deref ] }
     [ nip [ "Unknown SQL Type: " % name>> % ] "" make ]
   } case ;
 
