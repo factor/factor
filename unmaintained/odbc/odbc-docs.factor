@@ -80,7 +80,7 @@ HELP: odbc-get-field
 HELP: odbc-get-row-fields
 { $values { "statement" "an ODBC statement handle" } { "seq" "a sequence" } } 
 { $description 
-    "Returns a sequence of all field data for the current row. Note that this isnot the <field> objects, but the data for that field. This word can only be called once on a given row. Subsequent calls on the same row may fail on some ODBC drivers."
+    "Returns a sequence of all field data for the current row. Note that this is not the <field> objects, but the data for that field. This word can only be called once on a given row. Subsequent calls on the same row may fail on some ODBC drivers."
 } 
 { $see-also odbc-init odbc-connect odbc-disconnect odbc-prepare odbc-free-statement odbc-execute odbc-next-row odbc-number-of-columns odbc-describe-column odbc-get-field odbc-get-row-fields odbc-get-all-rows odbc-query } ;
 
