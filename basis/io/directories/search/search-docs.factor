@@ -5,7 +5,7 @@ IN: io.directories.search
 
 HELP: each-file
 { $values
-     { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
+    { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
 }
 { $description "Performs a directory traversal, breadth-first or depth-first, and calls the quotation on the full pathname of each file." }
 { $examples
@@ -17,43 +17,43 @@ HELP: each-file
 
 HELP: recursive-directory-files
 { $values
-     { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" }
-     { "paths" "a sequence of pathname strings" }
+    { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" }
+    { "paths" "a sequence of pathname strings" }
 }
 { $description "Traverses a directory path recursively and returns a sequence of files in a breadth-first or depth-first manner." } ;
 
 HELP: recursive-directory-entries
 { $values
-     { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" }
-     { "directory-entries" "a sequence of directory-entries" }
+    { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" }
+    { "directory-entries" "a sequence of directory-entries" }
 }
 { $description "Traverses a directory path recursively and returns a sequence of directory-entries in a breadth-first or depth-first manner." } ;
 
 HELP: find-file
 { $values
-     { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
-     { "path/f" "a pathname string or f" }
+    { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
+    { "path/f" "a pathname string or f" }
 }
 { $description "Finds the first file in the input directory matching the predicate quotation in a breadth-first or depth-first traversal." } ;
 
 HELP: find-in-directories
 { $values
-     { "directories" "a sequence of pathnames" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
-     { "path'/f" "a pathname string or f" }
+    { "directories" "a sequence of pathnames" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
+    { "path'/f" "a pathname string or f" }
 }
 { $description "Finds the first file in the input directories matching the predicate quotation in a breadth-first or depth-first traversal." } ;
 
 HELP: find-all-files
 { $values
-     { "path" "a pathname string" } { "quot" quotation }
-     { "paths" "a sequence of pathname strings" }
+    { "path" "a pathname string" } { "quot" quotation }
+    { "paths" "a sequence of pathname strings" }
 }
 { $description "Recursively finds all files in the input directory matching the predicate quotation." } ;
 
 HELP: find-all-in-directories
 { $values
-     { "directories" "a sequence of directory paths" } { "quot" quotation }
-     { "paths/f" "a sequence of pathname strings or f" }
+    { "directories" "a sequence of directory paths" } { "quot" quotation }
+    { "paths/f" "a sequence of pathname strings or f" }
 }
 { $description "Finds all files in the input directories matching the predicate quotation in a breadth-first or depth-first traversal." } ;
 
