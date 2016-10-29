@@ -166,7 +166,9 @@ PRIVATE>
 
 : odbc-connect ( env dsn -- dbc )
     [ alloc-dbc-handle dup ] dip
-    f swap dup length 1024 temp-string 0 short <ref> SQL-DRIVER-NOPROMPT SQLDriverConnect
+    f swap ascii string>alien dup length
+    1024 temp-string 0 short <ref>
+    SQL-DRIVER-NOPROMPT SQLDriverConnect
     succeeded? [ "odbc-connect failed" throw ] unless ;
 
 : odbc-disconnect ( dbc -- )
