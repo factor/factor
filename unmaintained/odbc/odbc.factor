@@ -147,8 +147,15 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
 : alloc-stmt-handle ( dbc -- handle )
   SQL-HANDLE-STMT swap alloc-handle ;
 
+<PRIVATE
+
+: alien-space-str ( len -- alien )
+    CHAR: space <string> ascii string>alien ;
+
+PRIVATE>
+
 : temp-string ( length -- byte-array length )
-  [ CHAR: space <string> ascii string>alien ] keep ;
+  [ alien-space-str ] keep ;
 
 : odbc-init ( -- env )
   alloc-env-handle
@@ -190,7 +197,7 @@ C: <column> column
 
 :: odbc-describe-column ( statement columnNumber -- column )
   1024 :> bufferLen
-  bufferLen CHAR: space <string> ascii string>alien :> columnName
+  bufferLen alien-space-str :> columnName
   0 short <ref> :> nameLengthPtr
   0 short <ref> :> dataTypePtr
   0 uint <ref> :> columnSizePtr
@@ -234,8 +241,7 @@ C: <field> field
 :: odbc-get-field ( statement column! -- field )
   column column? [ statement column odbc-describe-column column! ] unless
   8192 :> bufferLen
-  bufferLen CHAR: space <string> ascii string>alien :> targetValuePtr
-
+  bufferLen alien-space-str :> targetValuePtr
   statement column number>> SQL-C-DEFAULT
   targetValuePtr bufferLen f SQLGetData succeeded? [
       targetValuePtr column [ dereference-type-pointer ] keep <field>
