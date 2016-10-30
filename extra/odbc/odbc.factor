@@ -184,7 +184,7 @@ C: <column> column
     bufferLen alien-space-str :> columnName
     0 short <ref> :> nameLengthPtr
     0 short <ref> :> dataTypePtr
-    0 uint <ref> :> columnSizePtr
+    0 uint  <ref> :> columnSizePtr
     0 short <ref> :> decimalDigitsPtr
     0 short <ref> :> nullablePtr
     statement columnNumber columnName bufferLen nameLengthPtr
