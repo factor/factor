@@ -118,7 +118,12 @@ UNION: fixed-length array byte-array string ;
     } ?at drop ;
 
 : wrap-interval ( interval class -- interval' )
-    class-interval 2dup interval-subset? [ drop ] [ nip ] if ;
+    {
+        { [ over empty-interval eq? ] [ drop ] }
+        { [ over full-interval eq? ] [ nip class-interval ] }
+        { [ 2dup class-interval interval-subset? not ] [ nip class-interval ] }
+        [ drop ]
+    } cond ;
 
 : init-interval ( info -- info )
     dup [ interval>> full-interval or ] [ class>> ] bi wrap-interval >>interval
