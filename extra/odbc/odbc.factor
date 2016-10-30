@@ -242,7 +242,7 @@ C: <field> field
 
 : odbc-get-row-fields ( statement -- seq )
     [
-        dup odbc-number-of-columns [
+        dup odbc-number-of-columns iota [
             1 + odbc-get-field value>> ,
         ] with each
     ] { } make ;
