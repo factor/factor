@@ -83,7 +83,7 @@ IN: io.launcher.unix
     [ setup-process-group ] [ 2drop 249 _exit ] recover
     [ setup-priority ] [ 2drop 250 _exit ] recover
     [ setup-redirection ] [ 2drop 251 _exit ] recover
-    [ "." absolute-path cd ] [ 2drop 252 _exit ] recover
+    [ current-directory get cd ] [ 2drop 252 _exit ] recover
     [ setup-environment ] [ 2drop 253 _exit ] recover
     [ get-arguments exec-args-with-path ] [ 2drop 254 _exit ] recover
     255 _exit
