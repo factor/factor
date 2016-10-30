@@ -35,7 +35,7 @@ HELP: 3inputs
 
 ARTICLE: "compiler.cfg.stacks" "Generating instructions for accessing the data and retain stacks" "This vocab contains utility words for manipulating the analysis data and retain stacks."
 $nl
-"When nodes in the dataflow IR pushes or pops items from the stacks, instructions for performing those actions aren't immediately emitted. Instead the analysis stacks are manipulated and when the stack analysis phase is complete, optimal stack shuffling code is emitted. This way, exactly the same instructions are emitted for equivalent qutations such as [ dup drop ] and [ ]."
+"When nodes in the dataflow IR pushes or pops items from the stacks, instructions for performing those actions aren't immediately emitted. Instead the analysis stacks are manipulated and when the stack analysis phase is complete, optimal stack shuffling code is emitted. This way, exactly the same instructions are emitted for equivalent quotations such as [ dup drop ] and [ ]."
 $nl
 "Popping from the datastack:"
 { $subsections 2inputs 3inputs ds-drop }
