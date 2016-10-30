@@ -23,26 +23,26 @@ TYPEDEF: void* SQLHSTMT
 TYPEDEF: void* SQLHWND
 TYPEDEF: void* SQLPOINTER
 
-: SQL-HANDLE-ENV  ( -- number ) 1 ; inline
-: SQL-HANDLE-DBC  ( -- number ) 2 ; inline
-: SQL-HANDLE-STMT ( -- number ) 3 ; inline
-: SQL-HANDLE-DESC ( -- number ) 4 ; inline
+CONSTANT: SQL-HANDLE-ENV  1
+CONSTANT: SQL-HANDLE-DBC  2
+CONSTANT: SQL-HANDLE-STMT 3
+CONSTANT: SQL-HANDLE-DESC 4
 
-: SQL-NULL-HANDLE ( -- alien ) f ; inline
+CONSTANT: SQL-NULL-HANDLE f
 
-: SQL-ATTR-ODBC-VERSION ( -- number ) 200 ; inline
+CONSTANT: SQL-ATTR-ODBC-VERSION 200
 
 : SQL-OV-ODBC2 ( -- number ) 2 <alien> ; inline
 : SQL-OV-ODBC3 ( -- number ) 3 <alien> ; inline
 
-: SQL-SUCCESS ( -- number ) 0 ; inline
-: SQL-SUCCESS-WITH-INFO ( -- number ) 1 ; inline
-: SQL-NO-DATA-FOUND ( -- number ) 100 ; inline
+CONSTANT: SQL-SUCCESS 0
+CONSTANT: SQL-SUCCESS-WITH-INFO 1
+CONSTANT: SQL-NO-DATA-FOUND 100
 
-: SQL-DRIVER-NOPROMPT ( -- number ) 0 ; inline
-: SQL-DRIVER-PROMPT ( -- number ) 2 ; inline
+CONSTANT: SQL-DRIVER-NOPROMPT 0
+CONSTANT: SQL-DRIVER-PROMPT 2
 
-: SQL-C-DEFAULT ( -- number ) 99 ; inline
+CONSTANT: SQL-C-DEFAULT 99
 
 SYMBOL: SQL-CHAR
 SYMBOL: SQL-VARCHAR
