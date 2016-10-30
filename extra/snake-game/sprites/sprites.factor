@@ -1,4 +1,4 @@
-! Copyright (C) 2015 Your name.
+! Copyright (C) 2015 Sankaranarayanan Viswanathan.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-vectors formatting fry
 images images.loader kernel locals make math math.vectors
