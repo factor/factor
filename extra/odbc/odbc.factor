@@ -154,7 +154,8 @@ PRIVATE>
     SQLDisconnect succeeded? [ "odbc-disconnect failed" throw ] unless ;
 
 : odbc-prepare ( dbc string -- statement )
-    [ alloc-stmt-handle dup ] dip dup length SQLPrepare
+    [ alloc-stmt-handle dup ] dip ascii string>alien
+    dup length SQLPrepare
     succeeded? [ "odbc-prepare failed" throw ] unless ;
 
 : odbc-free-statement ( statement -- )
