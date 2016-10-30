@@ -1,8 +1,9 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.libraries
-alien.strings alien.syntax combinators io.encodings.ascii kernel
-locals make math sequences strings threads ;
+alien.strings alien.syntax combinators continuations
+io.encodings.ascii kernel locals make math sequences strings
+threads ;
 FROM: alien.c-types => float short ;
 IN: odbc
 
@@ -259,8 +260,10 @@ C: <field> field
 
 : odbc-query ( string dsn -- result )
     odbc-init swap odbc-connect [
-        swap odbc-prepare
-        dup odbc-execute
-        dup odbc-get-all-rows
-        swap odbc-free-statement
-    ] keep odbc-disconnect ;
+        [
+            swap odbc-prepare
+            dup odbc-execute
+            dup odbc-get-all-rows
+            swap odbc-free-statement
+        ] keep
+    ] [ odbc-disconnect ] [ ] cleanup ;
