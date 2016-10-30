@@ -65,29 +65,29 @@ SYMBOLS:
 
 : convert-sql-type ( number -- symbol )
     {
-        { 1 [ SQL-CHAR ] }
-        { 12  [ SQL-VARCHAR ] }
-        { -1  [ SQL-LONGVARCHAR ] }
-        { -8  [ SQL-WCHAR ] }
-        { -9  [ SQL-WCHARVAR ] }
+        {   1 [ SQL-CHAR ] }
+        {  12 [ SQL-VARCHAR ] }
+        {  -1 [ SQL-LONGVARCHAR ] }
+        {  -8 [ SQL-WCHAR ] }
+        {  -9 [ SQL-WCHARVAR ] }
         { -10 [ SQL-WLONGCHARVAR ] }
-        { 3 [ SQL-DECIMAL ] }
-        { 5 [ SQL-SMALLINT ] }
-        { 2 [ SQL-NUMERIC ] }
-        { 4 [ SQL-INTEGER ] }
-        { 7 [ SQL-REAL ] }
-        { 6 [ SQL-FLOAT ] }
-        { 8 [ SQL-DOUBLE ] }
-        { -7 [ SQL-BIT ] }
-        { -6 [ SQL-TINYINT ] }
-        { -5 [ SQL-BIGINT ] }
-        { -2 [ SQL-BINARY ] }
-        { -3 [ SQL-VARBINARY ] }
-        { -4 [ SQL-LONGVARBINARY ] }
-        { 91 [ SQL-TYPE-DATE ] }
-        { 92 [ SQL-TYPE-TIME ] }
-        { 93 [ SQL-TYPE-TIMESTAMP ] }
-        [ drop SQL-TYPE-UNKNOWN ]
+        {   3 [ SQL-DECIMAL ] }
+        {   5 [ SQL-SMALLINT ] }
+        {   2 [ SQL-NUMERIC ] }
+        {   4 [ SQL-INTEGER ] }
+        {   7 [ SQL-REAL ] }
+        {   6 [ SQL-FLOAT ] }
+        {   8 [ SQL-DOUBLE ] }
+        {  -7 [ SQL-BIT ] }
+        {  -6 [ SQL-TINYINT ] }
+        {  -5 [ SQL-BIGINT ] }
+        {  -2 [ SQL-BINARY ] }
+        {  -3 [ SQL-VARBINARY ] }
+        {  -4 [ SQL-LONGVARBINARY ] }
+        {  91 [ SQL-TYPE-DATE ] }
+        {  92 [ SQL-TYPE-TIME ] }
+        {  93 [ SQL-TYPE-TIMESTAMP ] }
+        [ drop  SQL-TYPE-UNKNOWN ]
     } case ;
 
 : succeeded? ( n -- bool )
