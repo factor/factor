@@ -4,7 +4,7 @@ IN: http
 
 HELP: <request>
 { $values { "request" request } }
-{ $description "Creates an empty request." } ;
+{ $description "Creates an empty request containing default headers." } ;
 
 HELP: request
 { $description "An HTTP request."
@@ -23,7 +23,7 @@ $nl
 
 HELP: <response>
 { $values { "response" response } }
-{ $description "Creates an empty response." } ;
+{ $description "Creates an empty response containing default headers." } ;
 
 HELP: response
 { $class-description "An HTTP response."

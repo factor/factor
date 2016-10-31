@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien classes classes.struct.private help.markup help.syntax
 kernel libc math sequences ;
 IN: classes.struct
@@ -170,6 +171,7 @@ ARTICLE: "classes.struct.c" "Passing structs to C functions"
 $nl
 "If a parameter is declared with a struct type, the parameter is passed by value. To pass a struct by reference, declare a parameter with a pointer to struct type."
 $nl
+{ $heading "C functions returning structs" }
 "If a C function is declared as returning a struct type, the struct is returned by value, and wrapped in an instance of the correct struct class automatically. If a C function is declared as returning a pointer to a struct, it will return an " { $link alien } " instance. This is because there is no way to distinguish between a pointer to a single struct and a pointer to an array of zero or more structs. It is up to the caller to wrap it in a struct using " { $link memory>struct } ", or a specialized array of structs using " { $snippet "<direct-T-array>" } ", respectively."
 $nl
 "An example of a struct declaration:"
