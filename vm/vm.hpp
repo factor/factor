@@ -660,9 +660,6 @@ struct factor_vm {
   // inline cache
   void deallocate_inline_cache(cell return_address);
   void update_pic_count(cell type);
-  code_block* compile_inline_cache(fixnum index, cell generic_word_,
-                                   cell methods_, cell cache_entries_,
-                                   bool tail_call_p);
   cell add_inline_cache_entry(cell cache_entries_, cell klass_, cell method_);
   void update_pic_transitions(cell pic_size);
   cell inline_cache_miss(cell return_address);
