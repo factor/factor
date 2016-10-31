@@ -67,7 +67,8 @@ void factor_vm::primitive_word_code() {
 
 void factor_vm::primitive_word_optimized_p() {
   word* w = untag_check<word>(ctx->peek());
-  ctx->replace(tag_boolean(w->code()->optimized_p()));
+  cell t = w->code()->type();
+  ctx->replace(tag_boolean(t == CODE_BLOCK_OPTIMIZED));
 }
 
 // Allocates memory
