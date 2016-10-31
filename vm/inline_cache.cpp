@@ -108,22 +108,6 @@ void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
 }
 
 // Allocates memory
-code_block* factor_vm::compile_inline_cache(fixnum index, cell generic_word_,
-                                            cell methods_, cell cache_entries_,
-                                            bool tail_call_p) {
-  data_root<word> generic_word(generic_word_, this);
-  data_root<array> methods(methods_, this);
-  data_root<array> cache_entries(cache_entries_, this);
-
-  inline_cache_jit jit(generic_word.value(), this);
-  jit.emit_inline_cache(index, generic_word.value(), methods.value(),
-                        cache_entries.value(), tail_call_p);
-  code_block* code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
-  initialize_code_block(code);
-  return code;
-}
-
-// Allocates memory
 cell factor_vm::add_inline_cache_entry(cell cache_entries_, cell klass_,
                                        cell method_) {
   data_root<array> cache_entries(cache_entries_, this);
@@ -176,20 +160,20 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
 
   update_pic_transitions(pic_size);
 
-  cell xt;
-
-  if (pic_size >= max_pic_size)
-    xt = generic_word->entry_point;
-  else {
+  cell xt = generic_word->entry_point;
+  if (pic_size < max_pic_size) {
     cell klass = object_class(object.value());
     cell method = lookup_method(object.value(), methods.value());
 
     data_root<array> new_cache_entries(
         add_inline_cache_entry(cache_entries.value(), klass, method), this);
 
-    xt = compile_inline_cache(index, generic_word.value(), methods.value(),
-                              new_cache_entries.value(), tail_call_site)
-        ->entry_point();
+    inline_cache_jit jit(generic_word.value(), this);
+    jit.emit_inline_cache(index, generic_word.value(), methods.value(),
+                          new_cache_entries.value(), tail_call_site);
+    code_block* code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
+    initialize_code_block(code);
+    xt = code->entry_point();
   }
 
   // Install the new stub.
