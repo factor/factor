@@ -1,9 +1,12 @@
 USING: bootstrap.image.private byte-arrays help.markup help.syntax
-io.pathnames math quotations sequences strings words ;
+io.pathnames math quotations sequences strings vectors words ;
 IN: bootstrap.image
 
 HELP: architecture
 { $var-description "Bootstrap architecture name" } ;
+
+HELP: bootstrapping-image
+{ $var-description "A " { $link vector } " holding the data of the generated image. For simplicity, each element holds 'cell' number of bytes." } ;
 
 HELP: define-sub-primitive
 { $values { "quot" quotation } { "word" word } }
@@ -12,7 +15,7 @@ HELP: define-sub-primitive
 
 HELP: jit-define
 { $values { "quot" quotation } { "n" integer } }
-{ $description "Runs a quotation generating assembly code. The code is added to the special-objects table being constructed for the bootstrap image." } ;
+{ $description "Runs a quotation generating assembly code. The code is added to the " { $link special-objects } " table being constructed for the bootstrap image." } ;
 
 HELP: make-image
 { $values { "arch" string } }
@@ -45,7 +48,7 @@ ARTICLE: "bootstrap.image" "Bootstrapping new images"
 { $subsections make-image }
 "The second bootstrapping stage is initiated by running the resulting bootstrap image:"
 { $code "./factor -i=boot.x86.32.image" }
-"This stage loads additional code, compiles all words, and dumps a final " { $snippet "factor.image" } "."
+"This stage loads additional code, compiles all words, and creates a final " { $snippet "factor.image" } "."
 $nl
 "The bootstrap process can be customized with command-line switches."
 { $see-also "runtime-cli-args" "bootstrap-cli-args" } ;

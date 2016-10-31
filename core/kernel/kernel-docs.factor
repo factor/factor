@@ -1,5 +1,5 @@
 USING: alien arrays classes combinators help.markup help.syntax
-kernel.private layouts math quotations system words ;
+kernel.private layouts math quotations system threads words ;
 IN: kernel
 
 HELP: JIT-PUSH-LITERAL
@@ -7,6 +7,9 @@ HELP: JIT-PUSH-LITERAL
 
 HELP: OBJ-UNDEFINED
 { $description "Default definition for undefined words" } ;
+
+HELP: OBJ-CURRENT-THREAD
+{ $description "Contains a reference to the running " { $link thread } " instance." } ;
 
 HELP: WIN-EXCEPTION-HANDLER
 { $description "This special object is an " { $link alien } " containing a pointer to the processes global exception handler. Only applicable on " { $link windows } "." } ;

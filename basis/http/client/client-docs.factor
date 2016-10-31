@@ -1,7 +1,7 @@
-USING: http help.markup help.syntax io.pathnames io.streams.string
-io.encodings.binary kernel urls
-urls.encoding byte-arrays strings assocs sequences destructors
-http.client.post-data.private io.encodings.8-bit.latin1 ;
+USING: assocs byte-arrays destructors help.markup help.syntax http
+http.client.post-data.private http.client.private
+io.encodings.8-bit.latin1 io.encodings.binary io.pathnames kernel
+sequences strings urls urls.encoding ;
 IN: http.client
 
 HELP: download-failed
@@ -143,6 +143,10 @@ HELP: http-request
 HELP: http-request*
 { $values { "request" request } { "response" response } { "data" sequence } }
 { $description "Sends an HTTP request to an HTTP server, and reads the response." } ;
+
+HELP: read-response-header
+{ $values { "response" response } }
+{ $description "Initializes the 'header', 'cookies', 'content-type', 'content-charset' and 'content-encoding' field of the response." } ;
 
 HELP: with-http-request
 { $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response" response } }
