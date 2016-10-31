@@ -27,8 +27,6 @@ struct code_block {
 
   bool pic_p() const { return type() == CODE_BLOCK_PIC; }
 
-  bool optimized_p() const { return type() == CODE_BLOCK_OPTIMIZED; }
-
   cell size() const {
     cell size;
     if (free_p())

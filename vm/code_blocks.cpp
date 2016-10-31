@@ -38,7 +38,7 @@ static cell compute_here_address(cell arg, cell offset, code_block* compiled) {
 }
 
 cell code_block::owner_quot() const {
-  if (!optimized_p() && TAG(owner) == WORD_TYPE)
+  if (type() != CODE_BLOCK_OPTIMIZED && TAG(owner) == WORD_TYPE)
     return untag<word>(owner)->def;
   return owner;
 }
