@@ -8,7 +8,7 @@ HELP: make-deploy-image
   { "vocab" string }
   { "config" assoc }
   { "manifest" string }
-} { $description "" } ;
+} ;
 
 HELP: make-boot-image
 { $description "If stage1 image doesn't exist, create it." } ;
