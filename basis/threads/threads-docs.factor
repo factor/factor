@@ -183,7 +183,7 @@ $nl
     "A thread that counts to 10:"
     { $code
       "USING: math.parser threads ;"
-      "[ 10 iota [ number>string write nl yield ] each ] \"test\" spawn"
+      "[ 10 iota [ number>string write nl yield ] each ] \"test\" spawn drop"
       "10 [ yield ] times"
       "0"
       "1"
