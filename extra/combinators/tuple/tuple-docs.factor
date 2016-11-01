@@ -22,7 +22,19 @@ HELP: make-tuple
     { "x" object } { "class" class } { "assoc" "a list of " { $link string } "/" { $link quotation } " pairs" }
     { "tuple" tuple }
 }
-{ $description "Constructs a " { $link tuple } " of " { $snippet "class" } " by calling the quotations making up the values of " { $snippet "assoc" } " on " { $snippet "x" } ", assigning the result of each call to the slot named by the corresponding key. The quotations must have the effect " { $snippet "( x -- slot-value )" } ". The order in which the quotations are called is undefined." } ;
+{ $description "Constructs a " { $link tuple } " of " { $snippet "class" } " by calling the quotations making up the values of " { $snippet "assoc" } " on " { $snippet "x" } ", assigning the result of each call to the slot named by the corresponding key. The quotations must have the effect " { $snippet "( x -- slot-value )" } ". The order in which the quotations are called is undefined." }
+{ $examples
+    { $example
+        "USING: combinators.tuple math prettyprint ;"
+        "IN: scratchpad"
+        "TUPLE: demo x y z ;"
+        "5 demo {"
+        "   { \"x\" [ 10 + ] }"
+        "   { \"y\" [ 100 / ] }"
+        "} make-tuple ."
+        "T{ demo { x 15 } { y 1/20 } }"
+    }
+} ;
 
 HELP: nmake-tuple
 { $values
