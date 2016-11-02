@@ -5,7 +5,7 @@ USING: accessors calendar combinators combinators.short-circuit
 formatting fry io io.directories io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.files.info
 io.files.types io.pathnames io.servers kernel locals math
-mime.types sequences splitting strings ;
+mime.types sequences splitting strings urls.encoding ;
 
 IN: gopher.server
 
@@ -72,6 +72,7 @@ TUPLE: gopher-server < threaded-server
             ] [
                 path prepend-path
                 server serving-directory>> ?head drop
+                url-encode
             ] bi
             server serving-hostname>>
             server insecure>>
@@ -91,7 +92,7 @@ TUPLE: gopher-server < threaded-server
 
 : read-gopher-path ( -- path )
     readln dup [ "\t\r\n" member? ] find drop [ head ] when*
-    trim-tail-separators ;
+    trim-tail-separators url-decode ;
 
 M: gopher-server handle-client*
     dup serving-directory>> read-gopher-path append-path
