@@ -147,19 +147,19 @@ PRIVATE>
         [ build-header-scroller ] [ build-scroller ] if ;
 
 : scroll>rect ( rect gadget -- )
-    dup find-scroller* dup [
+    dup find-scroller* [
         [ relative-scroll-rect ] keep
         swap >>follows
         relayout
-    ] [ 3drop ] if ;
+    ] [ 2drop ] if* ;
 
 : scroll>gadget ( gadget -- )
-    dup find-scroller* dup [
+    dup find-scroller* [
         swap >>follows
         relayout
     ] [
-        2drop
-    ] if ;
+        drop
+    ] if* ;
 
 : scroll>bottom ( gadget -- )
     find-scroller [ t >>follows relayout-1 ] when* ;
