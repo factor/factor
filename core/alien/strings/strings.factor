@@ -87,8 +87,18 @@ M: byte-array symbol>string utf8 alien>string ;
 
 M: array symbol>string [ utf8 alien>string ] map ", " join ;
 
+<PRIVATE
+
 : special-object>string ( n -- str )
     special-object utf8 alien>string ;
+
+: string>cpu ( str -- cpu )
+    { x86.32 x86.64 arm ppc.32 ppc.64 } [ name>> = ] with find nip ;
+
+: string>os ( str -- os )
+    { windows macosx linux } [ name>> = ] with find nip ;
+
+PRIVATE>
 
 [
     OBJ-CPU special-object>string string>cpu \ cpu set-global
