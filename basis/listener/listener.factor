@@ -37,8 +37,7 @@ SYMBOL: handle-ctrl-break
     [ disable-ctrl-break ] [ ] cleanup ; inline
 
 : parse-lines-interactive ( lines -- quot/f )
-    [ [ parse-lines ] with-ctrl-break
-    ] with-compilation-unit ;
+    [ [ parse-lines ] with-ctrl-break ] with-compilation-unit ;
 
 : read-quot-step ( lines -- quot/f )
     [ parse-lines-interactive ] [
