@@ -35,7 +35,6 @@ void factor_vm::handle_safepoint(cell pc) {
   faulting_p = false;
 
   if (atomic::load(&safepoint_fep_p)) {
-    atomic::store(&safepoint_fep_p, false);
     if (atomic::load(&sampling_profiler_p))
       end_sampling_profiler();
     std::cout << "Interrupted\n";
@@ -43,10 +42,12 @@ void factor_vm::handle_safepoint(cell pc) {
       /* Ctrl-Break throws an exception, interrupting the main thread, same
          as the "t" command in the factorbug debugger. But for Ctrl-Break to
          work we don't require the debugger to be activated, or even enabled. */
+      atomic::store(&safepoint_fep_p, false);
       general_error(ERROR_INTERRUPT, false_object, false_object);
       FACTOR_ASSERT(false);
     }
     factorbug();
+    atomic::store(&safepoint_fep_p, false);
   } else if (atomic::load(&sampling_profiler_p)) {
     FACTOR_ASSERT(code->seg->in_segment_p(pc));
     code_block* block = code->code_block_for_address(pc);
