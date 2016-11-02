@@ -5,6 +5,8 @@ math math.parser namespaces sequences ;
 IN: system
 
 PRIMITIVE: (exit) ( n -- * )
+PRIMITIVE: disable-ctrl-break ( -- )
+PRIMITIVE: enable-ctrl-break ( -- )
 PRIMITIVE: nano-count ( -- ns )
 
 SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
