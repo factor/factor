@@ -10,7 +10,6 @@ factor_vm::factor_vm(THREADHANDLE thread)
 #if defined(WINDOWS)
       thread_id(GetCurrentThreadId()),
       ctrl_break_thread(NULL),
-      stop_on_ctrl_break(false),
 #endif
       callback_id(0),
       c_to_factor_func(NULL),
@@ -30,7 +29,8 @@ factor_vm::factor_vm(THREADHANDLE thread)
       full_output(false),
       last_nano_count(0),
       signal_callstack_seg(NULL),
-      safepoint_fep_p(false) {
+      safepoint_fep_p(false),
+      stop_on_ctrl_break(false) {
   primitive_reset_dispatch_stats();
 }
 

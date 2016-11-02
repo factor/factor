@@ -149,6 +149,9 @@ struct factor_vm {
   // Two fep_p variants, one might be redundant.
   volatile cell safepoint_fep_p;
 
+  // Allow Ctrl-Break a busy loop in the Listener, only used on Windows
+  volatile bool stop_on_ctrl_break;
+
   // contexts
   context* new_context();
   void init_context(context* ctx);
@@ -395,7 +398,6 @@ struct factor_vm {
   void primitive_die();
   void primitive_enable_ctrl_break();
   void primitive_disable_ctrl_break();
-  volatile bool stop_on_ctrl_break;
 
   // arrays
   inline void set_array_nth(array* array, cell slot, cell value);
