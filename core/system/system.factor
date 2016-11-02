@@ -36,30 +36,6 @@ UNION: unix macosx linux ;
 
 : vm-compile-time ( -- string ) \ vm-compile-time get-global ;
 
-<PRIVATE
-
-CONSTANT: string>cpu-hash H{
-    { "x86.32" x86.32 }
-    { "x86.64" x86.64 }
-    { "arm" arm }
-    { "ppc.32" ppc.32 }
-    { "ppc.64" ppc.64 }
-}
-
-CONSTANT: string>os-hash H{
-    { "windows" windows }
-    { "macosx" macosx }
-    { "linux" linux }
-}
-
-: string>cpu ( str -- class )
-    string>cpu-hash at ;
-
-: string>os ( str -- class )
-    string>os-hash at ;
-
-PRIVATE>
-
 : image-path ( -- path ) \ image-path get-global ;
 
 : vm-path ( -- path ) \ vm-path get-global ;
