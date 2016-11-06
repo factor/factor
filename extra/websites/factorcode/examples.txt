@@ -54,7 +54,7 @@ USING: inspector io.files.info io.pathnames system tools.files ;
 
 home directory.
 home file-system-info free-space>> .
-image file-info describe
+image-path file-info describe
 ----
 USING: io kernel sequences ;
 
