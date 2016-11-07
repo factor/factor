@@ -5,7 +5,7 @@ namespace factor {
 // gets the address of an object representing a C pointer, with the
 // intention of storing the pointer across code which may potentially GC.
 char* factor_vm::pinned_alien_offset(cell obj) {
-  switch (tagged<object>(obj).type()) {
+  switch (TAG(obj)) {
     case ALIEN_TYPE: {
       alien* ptr = untag<alien>(obj);
       if (to_boolean(ptr->expired))
@@ -57,7 +57,7 @@ void factor_vm::primitive_displaced_alien() {
   cell alien = ctx->pop();
   cell displacement = to_cell(ctx->pop());
 
-  switch (tagged<object>(alien).type()) {
+  switch (TAG(alien)) {
     case BYTE_ARRAY_TYPE:
     case ALIEN_TYPE:
     case F_TYPE:
@@ -163,7 +163,7 @@ void factor_vm::primitive_dll_validp() {
 
 // gets the address of an object representing a C pointer
 char* factor_vm::alien_offset(cell obj) {
-  switch (tagged<object>(obj).type()) {
+  switch (TAG(obj)) {
     case BYTE_ARRAY_TYPE:
       return untag<byte_array>(obj)->data<char>();
     case ALIEN_TYPE:
