@@ -40,7 +40,7 @@ cell factor_vm::lookup_tuple_method(cell obj, cell methods) {
   while (echelon >= 0) {
     cell echelon_methods = array_nth(echelons, echelon);
 
-    if (TAG(echelon_methods) == WORD_TYPE)
+    if (tagged<object>(echelon_methods).type() == WORD_TYPE)
       return echelon_methods;
     else if (to_boolean(echelon_methods)) {
       cell klass = nth_superclass(layout, echelon);
