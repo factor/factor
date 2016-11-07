@@ -93,11 +93,10 @@ void factor_vm::primitive_become() {
   std::map<object*, object*> become_map;
 
   for (cell i = 0; i < capacity; i++) {
-    tagged<object> old_obj(array_nth(old_objects, i));
-    tagged<object> new_obj(array_nth(new_objects, i));
-
-    if (old_obj != new_obj)
-      become_map[old_obj.untagged()] = new_obj.untagged();
+    cell old_ptr = array_nth(old_objects, i);
+    cell new_ptr = array_nth(new_objects, i);
+    if (old_ptr != new_ptr)
+      become_map[untag<object>(old_ptr)] = untag<object>(new_ptr);
   }
 
   // Update all references to old objects to point to new objects
