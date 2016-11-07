@@ -74,18 +74,17 @@ struct code_block {
   void flush_icache() { factor::flush_icache((cell)this, size()); }
 
   template <typename Iterator> void each_instruction_operand(Iterator& iter) {
-    if (!to_boolean(relocation))
-      return;
+    if (to_boolean(relocation)) {
+      byte_array* rels = (byte_array*)UNTAG(relocation);
 
-    byte_array* rels = untag<byte_array>(relocation);
+      cell index = 0;
+      cell length = (rels->capacity >> TAG_BITS) / sizeof(relocation_entry);
 
-    cell index = 0;
-    cell length = untag_fixnum(rels->capacity) / sizeof(relocation_entry);
-
-    for (cell i = 0; i < length; i++) {
-      relocation_entry rel = rels->data<relocation_entry>()[i];
-      iter(instruction_operand(rel, this, index));
-      index += rel.number_of_parameters();
+      for (cell i = 0; i < length; i++) {
+        relocation_entry rel = rels->data<relocation_entry>()[i];
+        iter(instruction_operand(rel, this, index));
+        index += rel.number_of_parameters();
+      }
     }
   }
 

@@ -3,23 +3,28 @@
 namespace factor {
 
 static cell code_block_owner(code_block* compiled) {
-  cell owner = compiled->owner;
+  tagged<object> owner(compiled->owner);
 
   // Cold generic word call sites point to quotations that call the
   // inline-cache-miss and inline-cache-miss-tail primitives.
-  if (TAG(owner) != QUOTATION_TYPE)
-    return owner;
+  if (owner.type() == QUOTATION_TYPE) {
+    tagged<quotation> quot(owner.as<quotation>());
+    tagged<array> elements(quot->array);
 
-  quotation* quot = untag<quotation>(owner);
-  array* elements = untag<array>(quot->array);
+    FACTOR_ASSERT(array_capacity(elements.untagged()) == 5);
+    FACTOR_ASSERT(array_nth(elements.untagged(), 4) ==
+                  special_objects[PIC_MISS_WORD] ||
+                  array_nth(elements.untagged(), 4) ==
+                  special_objects[PIC_MISS_TAIL_WORD]);
 
-  FACTOR_ASSERT(array_capacity(elements) == 5);
-  wrapper* wrap = untag<wrapper>(array_nth(elements, 0));
-  return wrap->object;
+    tagged<wrapper> word_wrapper(array_nth(elements.untagged(), 0));
+    return word_wrapper->object;
+  }
+  return compiled->owner;
 }
 
 static cell compute_entry_point_address(cell obj) {
-  switch (TAG(obj)) {
+  switch (tagged<object>(obj).type()) {
     case WORD_TYPE:
       return untag<word>(obj)->entry_point;
     case QUOTATION_TYPE:
@@ -38,9 +43,10 @@ static cell compute_here_address(cell arg, cell offset, code_block* compiled) {
 }
 
 cell code_block::owner_quot() const {
-  if (type() != CODE_BLOCK_OPTIMIZED && TAG(owner) == WORD_TYPE)
-    return untag<word>(owner)->def;
-  return owner;
+  tagged<object> executing(owner);
+  if (type() != CODE_BLOCK_OPTIMIZED && executing->type() == WORD_TYPE)
+    executing = executing.as<word>()->def;
+  return executing.value();
 }
 
 // If the code block is an unoptimized quotation, we can calculate the
@@ -51,13 +57,13 @@ cell code_block::scan(factor_vm* vm, cell addr) const {
     return tag_fixnum(-1);
   }
 
-  cell ptr = owner;
-  if (TAG(ptr) == WORD_TYPE)
-    ptr = untag<word>(ptr)->def;
-  if (TAG(ptr) != QUOTATION_TYPE)
+  tagged<object> obj(owner);
+  if (obj.type() == WORD_TYPE)
+    obj = obj.as<word>()->def;
+  if (obj.type() != QUOTATION_TYPE)
     return tag_fixnum(-1);
   cell ofs = offset(addr);
-  return tag_fixnum(vm->quot_code_offset_to_scan(ptr, ofs));
+  return tag_fixnum(vm->quot_code_offset_to_scan(obj.value(), ofs));
 }
 
 cell factor_vm::compute_entry_point_pic_address(word* w, cell tagged_quot) {
