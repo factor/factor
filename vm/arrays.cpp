@@ -35,7 +35,7 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_) {
 // Allocates memory
 void factor_vm::primitive_resize_array() {
   data_root<array> a(ctx->pop(), this);
-  check_tagged(a);
+  a.untag_check(this);
   cell capacity = unbox_array_size();
   ctx->push(tag<array>(reallot_array(a.untagged(), capacity)));
 }

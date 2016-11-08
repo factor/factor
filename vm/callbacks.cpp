@@ -43,7 +43,7 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 }
 
 void callback_heap::update(code_block* stub) {
-  word* w = untag<word>(stub->owner);
+  word* w = (word*)UNTAG(stub->owner);
   store_callback_operand(stub, 1, w->entry_point);
   stub->flush_icache();
 }
@@ -88,7 +88,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 void factor_vm::primitive_callback() {
   cell return_rewind = to_cell(ctx->pop());
   tagged<word> w(ctx->pop());
-  check_tagged(w);
+  w.untag_check(this);
 
   cell func = callbacks->add(w.value(), return_rewind)->entry_point();
   CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);

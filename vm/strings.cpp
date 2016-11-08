@@ -100,7 +100,7 @@ string* factor_vm::reallot_string(string* str_, cell capacity) {
 // Allocates memory
 void factor_vm::primitive_resize_string() {
   data_root<string> str(ctx->pop(), this);
-  check_tagged(str);
+  str.untag_check(this);
   cell capacity = unbox_array_size();
   ctx->push(tag<string>(reallot_string(str.untagged(), capacity)));
 }
