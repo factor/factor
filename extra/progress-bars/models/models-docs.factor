@@ -13,7 +13,7 @@ HELP: with-file-reader-progress
 { $values
     { "path" "a pathname string" } { "encoding" "an encoding" } { "quot" quotation }
 }
-{ $description "Opens a file for reading, displays a progress bar, and calls the quotation for processing the file. The progress bar will automtically update every 100 milliseconds, but only if the quotation yields (by calling " { $link yield } ") so that the UI has a chance to redraw." }
+{ $description "Opens a file for reading, displays a progress bar, and calls the quotation for processing the file. The progress bar will automatically update every 100 milliseconds, but only if the quotation yields (by calling " { $link yield } ") so that the UI has a chance to redraw." }
 { $examples
     "Loop through the Factor image file, discarding each character as it's read and updating a progress bar:"
     { $unchecked-example "USING: system progress-bars.models prettyprint io.encodings.binary threads ;
