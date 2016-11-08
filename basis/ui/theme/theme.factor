@@ -153,7 +153,7 @@ M: light-theme snippet-color COLOR: DarkOrange4 ;
 M: light-theme output-color COLOR: DarkOrange4 ;
 M: light-theme deprecated-background-color COLOR: gray90 ;
 M: light-theme deprecated-border-color COLOR: red ;
-M: light-theme warning-background-color COLOR: gray90 ;
+M: light-theme warning-background-color HEXCOLOR: F4D9D9 ;
 M: light-theme warning-border-color COLOR: red ;
 M: light-theme code-background-color COLOR: FactorLightTan ;
 M: light-theme help-path-border-color COLOR: FactorLightTan ;
