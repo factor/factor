@@ -221,7 +221,7 @@ watch "WATCH" {
 { f } [
     TUPLE: num-test1 num ;
     num-test1 "NUM_TEST" { { "num" "NUM" INTEGER } } define-persistent
-    "resource:num-test-bad.db" <sqlite-db> [
+    test.db [
         num-test1 ensure-table
         num-test1 new insert-tuple
         num-test1 new select-tuple
@@ -231,7 +231,7 @@ watch "WATCH" {
 { f } [
     TUPLE: num-test2 num ;
     num-test2 "NUM_TEST" { { "num" "NUM" DOUBLE } } define-persistent
-    "resource:num-test-bad.db" <sqlite-db> [
+    test.db [
         num-test2 ensure-table
         num-test2 new insert-tuple
         num-test2 new select-tuple
@@ -241,7 +241,7 @@ watch "WATCH" {
 { f } [
     TUPLE: num-test3 num ;
     num-test3 "NUM_TEST" { { "num" "NUM" BOOLEAN } } define-persistent
-    "resource:num-test-bad.db" <sqlite-db> [
+    test.db [
         num-test3 ensure-table
         num-test3 new insert-tuple
         num-test3 new select-tuple
