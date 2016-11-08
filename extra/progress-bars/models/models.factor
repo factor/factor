@@ -13,6 +13,11 @@ SYMBOL: progress-bar
 : with-progress-bar ( quot -- )
     [ 0 <model> \ progress-bar ] dip with-variable ; inline
 
+: <progress-display> ( model n -- gadget )
+    [ '[ _ make-progress-bar ] <arrow> <label-control> ] keep
+    [ 0 ] dip make-progress-bar >>string
+    monospace-font >>font ;
+
 SYMBOL: file-size
 
 : update-file-progress ( -- n )
@@ -23,17 +28,12 @@ SYMBOL: file-size
         100 milliseconds sleep file-progress-loop
     ] unless ;
 
-: <file-progress-display> ( model n -- gadget )
-    [ '[ _ make-progress-bar ] <arrow> <label-control> ] keep
-    [ 0 ] dip make-progress-bar >>string
-    monospace-font >>font ;
-
 : with-file-reader-progress ( path encoding quot -- )
     '[
         _ dup file-info size>> file-size set
         _ _ [
             [ file-progress-loop ] "file-reader-progress" spawn drop
-            \ progress-bar get 40 <file-progress-display> gadget. yield
+            \ progress-bar get 40 <progress-display> gadget. yield
         ] prepose
         [ update-file-progress drop ] compose
         with-file-reader
