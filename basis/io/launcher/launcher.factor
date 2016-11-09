@@ -215,8 +215,9 @@ PRIVATE>
     (process-reader) drop ; inline
 
 : with-process-reader* ( desc encoding quot -- process status )
-    [ (process-reader) ] dip '[ _ with-input-stream ] dip
-    dup wait-for-process ; inline
+    [ (process-reader) ] dip '[
+        [ _ with-input-stream ] dip dup (wait-for-process)
+    ] with-timeout ; inline
 
 : with-process-reader ( desc encoding quot -- )
     with-process-reader* check-success ; inline
@@ -241,8 +242,9 @@ PRIVATE>
     (process-writer) drop ; inline
 
 : with-process-writer* ( desc encoding quot -- process status )
-    [ (process-writer) ] dip '[ _ with-output-stream ] dip
-    dup wait-for-process ; inline
+    [ (process-writer) ] dip '[
+        [ _ with-output-stream ] dip dup (wait-for-process)
+    ] with-timeout ; inline
 
 : with-process-writer ( desc encoding quot -- )
     with-process-writer* check-success ; inline
@@ -272,8 +274,9 @@ PRIVATE>
     (process-stream) drop ; inline
 
 : with-process-stream* ( desc encoding quot -- process status )
-    [ (process-stream) ] dip '[ _ with-stream ] dip
-    dup wait-for-process ; inline
+    [ (process-stream) ] dip '[
+        [ _ with-stream ] dip dup (wait-for-process)
+    ] with-timeout ; inline
 
 : with-process-stream ( desc encoding quot -- )
     with-process-stream* check-success ; inline
