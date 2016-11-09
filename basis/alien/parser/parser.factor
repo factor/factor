@@ -1,9 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien alien.c-types alien.enums alien.libraries
-arrays classes classes.parser combinators combinators.short-circuit
-compiler.units effects fry kernel lexer locals math namespaces parser
-sequences splitting summary vocabs.parser words ;
+arrays classes classes.parser combinators
+combinators.short-circuit compiler.units effects fry kernel
+lexer locals math math.order namespaces parser sequences
+splitting summary vocabs.parser words ;
+
 IN: alien.parser
 
 SYMBOL: current-library
@@ -102,12 +105,19 @@ M: *-in-c-type-name summary
     dup ";" = not
     [ swap parse-enum-member scan-token parse-enum-members ] [ 2drop ] if ;
 
+ERROR: enum-values-outside-c-type-interval name base-type values ;
+
+: check-enum-members ( name base-type members -- name base-type members )
+    over c-type-interval '[ second _ _ between? ] dupd reject
+    [ nip enum-values-outside-c-type-interval ] unless-empty ;
+
 PRIVATE>
 
 : parse-enum ( -- name base-type members )
     parse-enum-name
     parse-enum-base-type
-    [ V{ } clone 0 ] dip parse-enum-members ;
+    [ V{ } clone 0 ] dip parse-enum-members
+    check-enum-members ;
 
 : scan-function-name ( -- return function )
     scan-c-type scan-token parse-pointers ;
