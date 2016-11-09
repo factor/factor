@@ -124,10 +124,3 @@ TYPEDEF: int alien-parser-test-int ! reasonably unique name...
 { } [
     [ C-TYPE: hi TYPEDEF: void* hi ] with-compilation-unit
 ] unit-test
-
-[
-"IN: alien.parser.tests
-USING: alien.c-types alien.syntax ;
-ENUM: tv_peripherals_4 < uchar
-{ appletv 1 } { chromecast 2 } { roku 444 } ;" eval( -- )
-] [ error>> enum-values-outside-c-type-interval? ] must-fail-with
