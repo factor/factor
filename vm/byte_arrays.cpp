@@ -24,7 +24,7 @@ void factor_vm::primitive_uninitialized_byte_array() {
 // Allocates memory
 void factor_vm::primitive_resize_byte_array() {
   data_root<byte_array> array(ctx->pop(), this);
-  array.untag_check(this);
+  check_tagged(array);
   cell capacity = unbox_array_size();
   ctx->push(tag<byte_array>(reallot_array(array.untagged(), capacity)));
 }

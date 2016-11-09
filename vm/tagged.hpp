@@ -29,12 +29,6 @@ template <typename Type> struct tagged {
     return (Type*)(UNTAG(value_));
   }
 
-  Type* untag_check(factor_vm* parent) const {
-    if (!type_p())
-      parent->type_error(Type::type_number, value_);
-    return untagged();
-  }
-
   explicit tagged(cell tagged) : value_(tagged) {}
   explicit tagged(Type* untagged) : value_(factor::tag(untagged)) {}
 
@@ -57,10 +51,6 @@ template <typename Type> struct tagged {
     return tagged<NewType>(value_);
   }
 };
-
-template <typename Type> Type* factor_vm::untag_check(cell value) {
-  return tagged<Type>(value).untag_check(this);
-}
 
 template <typename Type> Type* untag(cell value) {
   return tagged<Type>(value).untagged();

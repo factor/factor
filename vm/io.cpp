@@ -162,8 +162,8 @@ void factor_vm::safe_fflush(FILE* stream) {
 void factor_vm::primitive_fopen() {
   data_root<byte_array> mode(ctx->pop(), this);
   data_root<byte_array> path(ctx->pop(), this);
-  mode.untag_check(this);
-  path.untag_check(this);
+  check_tagged(mode);
+  check_tagged(path);
 
   FILE* file;
   file = safe_fopen((char*)(path.untagged() + 1),

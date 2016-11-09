@@ -59,7 +59,7 @@ void factor_vm::primitive_word() {
 // Allocates memory (from_unsigned_cell allocates)
 void factor_vm::primitive_word_code() {
   data_root<word> w(ctx->pop(), this);
-  w.untag_check(this);
+  check_tagged(w);
 
   ctx->push(from_unsigned_cell(w->entry_point));
   ctx->push(from_unsigned_cell((cell)w->code() + w->code()->size()));
