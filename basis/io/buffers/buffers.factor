@@ -76,16 +76,22 @@ TYPED: buffer-write1 ( byte: fixnum buffer: buffer -- )
     [ [ ptr>> ] [ fill>> ] bi set-alien-unsigned-1 ]
     [ 1 swap buffer+ ] bi ; inline
 
+TYPED: buffer-find ( seps buffer: buffer -- n/f )
+    [
+        swap [ [ pos>> ] [ fill>> ] [ ptr>> ] tri ] dip
+        [ swap alien-unsigned-1 ] [ member-eq? ] bi-curry*
+        compose (find-integer)
+    ] [
+        [ pos>> - ] curry [ f ] if*
+    ] bi ; inline
+
 <PRIVATE
 
-: search-buffer-until ( pos fill ptr seps -- n )
-    [ iota ] 2dip
-    [ [ swap alien-unsigned-1 ] dip member-eq? ] 2curry
-    find-from drop ; inline
+: search-buffer-until ( seps buffer -- buffer n/f )
+    [ buffer-find ] keep swap ; inline
 
 : finish-buffer-until ( buffer n -- byte-array sep/f )
     [
-        over pos>> -
         over buffer-read
         swap buffer-pop
     ] [
@@ -96,6 +102,5 @@ TYPED: buffer-write1 ( byte: fixnum buffer: buffer -- )
 PRIVATE>
 
 TYPED: buffer-read-until ( seps buffer: buffer -- byte-array sep/f )
-    swap [ { [ ] [ pos>> ] [ fill>> ] [ ptr>> ] } cleave ] dip
     search-buffer-until
     finish-buffer-until ;
