@@ -1,10 +1,10 @@
 ! (c)2010 Joe Groff bsd license
-USING: accessors byte-arrays byte-arrays.hex combinators
-continuations fry io io.encodings io.encodings.8-bit.latin1
-io.encodings.ascii io.encodings.binary io.encodings.iana
-io.encodings.string io.encodings.utf16 io.encodings.utf32
-io.encodings.utf8 io.files io.streams.string kernel literals
-math namespaces sequences strings ;
+USING: accessors byte-arrays combinators continuations fry io
+io.encodings io.encodings.8-bit.latin1 io.encodings.ascii
+io.encodings.binary io.encodings.iana io.encodings.string
+io.encodings.utf16 io.encodings.utf32 io.encodings.utf8
+io.files io.streams.string kernel literals math namespaces
+sequences strings ;
 IN: io.encodings.detect
 
 SYMBOL: default-8bit-encoding
@@ -31,11 +31,11 @@ PRIVATE>
 
 : detect-byte-array ( bytes -- encoding )
     {
-        { [ dup HEX{ 0000FEFF } head? ] [ drop utf32be ] }
-        { [ dup HEX{ FFFE0000 } head? ] [ drop utf32le ] }
-        { [ dup HEX{ FEFF } head? ] [ drop utf16be ] }
-        { [ dup HEX{ FFFE } head? ] [ drop utf16le ] }
-        { [ dup HEX{ EF BB BF } head? ] [ drop utf8 ] }
+        { [ dup B{ 0x00 0x00 0xFE 0xFF } head? ] [ drop utf32be ] }
+        { [ dup B{ 0xFF 0xFE 0x00 0x00 } head? ] [ drop utf32le ] }
+        { [ dup B{ 0xFE 0xFF } head? ] [ drop utf16be ] }
+        { [ dup B{ 0xFF 0xFE } head? ] [ drop utf16le ] }
+        { [ dup B{ 0xEF 0xBB 0xBF } head? ] [ drop utf8 ] }
         { [ dup $[ "<?xml" >byte-array ] head? ] [ detect-xml-prolog ] }
         { [ 0 over member? ] [ drop binary ] }
         { [ dup empty? ] [ drop utf8 ] }

@@ -1,4 +1,4 @@
-USING: accessors alien.c-types alien.syntax byte-arrays.hex
+USING: accessors alien.c-types alien.syntax
 classes.struct colors.constants colors.hex kernel literals logging
 math ;
 IN: strange
@@ -83,9 +83,6 @@ V{ 1 2 3 } drop
 HS{ 9 8 3 } drop
 
 flags{ 10 20 } drop
-
-! TODO: Highlight contents too.
-HEX{ ab cd ef } drop
 
 ! ! Alien functions
 STRUCT: timeval
