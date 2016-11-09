@@ -183,6 +183,7 @@ ARTICLE: "db" "Database library"
 "Higher-level database help:"
 { $vocab-subsection "Database types" "db.types" }
 { $vocab-subsection "High-level tuple/database integration" "db.tuples" }
+$nl
 "Low-level database help:"
 { $subsections
     "db-protocol"
