@@ -515,7 +515,16 @@ struct factor_vm {
   inline double fixnum_to_float(cell tagged);
 
   // tagged
-  template <typename Type> Type* untag_check(cell value);
+  template <typename Type> void check_tagged(tagged<Type> t) {
+    if (!t.type_p())
+      type_error(Type::type_number, t.value_);
+  }
+
+  template <typename Type> Type* untag_check(cell value) {
+    tagged<Type> t(value);
+    check_tagged(t);
+    return t.untagged();
+  }
 
   // io
   void init_c_io();
