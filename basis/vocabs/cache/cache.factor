@@ -18,7 +18,15 @@ IN: vocabs.cache
 
 SINGLETON: cache-observer
 
-M: cache-observer vocab-changed drop reset-cache ;
+<PRIVATE
+
+: forgot-vocab? ( vocab -- ? )
+    vocab-name dictionary get key? not ;
+
+PRIVATE>
+
+M: cache-observer vocab-changed
+    drop dup forgot-vocab? [ reset-cache ] [ drop ] if ;
 
 [
     f changed-vocabs set-global
