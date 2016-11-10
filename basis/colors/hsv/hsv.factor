@@ -17,7 +17,7 @@ C: <hsva> hsva
 
 <PRIVATE
 
-: Hi ( hsv -- Hi ) hue>> 60 / floor 6 mod ; inline
+: Hi ( hsv -- Hi ) hue>> 60 / floor 6 mod >integer ; inline
 
 : f ( hsv -- f ) [ hue>> 60 / ] [ Hi ] bi - ; inline
 
