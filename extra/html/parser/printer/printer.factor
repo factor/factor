@@ -93,12 +93,11 @@ SYMBOL: tab-width
 SYMBOL: #indentations
 
 : prettyprint-html ( vector -- )
-    [
-        T{ html-prettyprinter } html-printer set
-        2 tab-width set
-        0 #indentations set
-        print-tags
-    ] with-scope ;
+    H{
+        { html-printer T{ html-prettyprinter } }
+        { tab-width 2 }
+        { #indentations 0 }
+    } [ print-tags ] with-variables ;
 
 : tabs ( -- vseq )
     tab-width get #indentations get 0 max * CHAR: \s <repetition> ;
