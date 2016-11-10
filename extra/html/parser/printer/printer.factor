@@ -91,12 +91,10 @@ M: src-printer print-closing-tag ( tag -- )
 
 SYMBOL: tab-width
 SYMBOL: #indentations
-SYMBOL: tagstack
 
 : prettyprint-html ( vector -- )
     [
         T{ html-prettyprinter } html-printer set
-        V{ } clone tagstack set
         2 tab-width set
         0 #indentations set
         print-tags
