@@ -1,5 +1,12 @@
-USING: help.markup help.syntax concurrency.messaging threads ;
+USING: help.markup help.syntax concurrency.messaging io.servers threads ;
 IN: concurrency.distributed
+
+HELP: local-node
+{ $var-description "A variable containing the " { $link threaded-server } " the current node is running on." } ;
+
+HELP: start-node
+{ $values { "addrspec" "an addrspec to listen on" } }
+{ $description "Starts a " { $link threaded-server } " for receiving messages from remote Factor instances." } ;
 
 ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
 "In this example the Factor instance associated with port 9000 will run "
@@ -11,7 +18,7 @@ ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
         "[ log-message ] \"logger\" spawn dup name>> register-remote-thread"
     }
 }
-"This spawns a thread waits for the messages. It registers that thread as a "
+"This spawns a thread waits for the messages. It registers that thread as "
 "able to be accessed remotely using " { $link register-remote-thread } "."
 $nl
 "The second Factor instance, the one associated with port 9001, can send "
@@ -38,7 +45,8 @@ $nl
 
 ARTICLE: "concurrency.distributed" "Distributed message passing"
 "The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing, inspired by Erlang and Termite." $nl
-"Instances of " { $link thread } " can be sent to remote threads, at which point they are converted to objects holding the thread ID and the current node's host name:"
+{ $subsections local-node start-node }
+"Instances of " { $link thread } " can be sent to remote nodes, at which point they are converted to objects holding the thread ID and the current node's addrspec:"
 { $subsections remote-thread }
 "The " { $vocab-link "serialize" } " vocabulary is used to convert Factor objects to byte arrays for transfer over a socket."
 { $subsections "concurrency.distributed.example" } ;

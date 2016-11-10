@@ -22,6 +22,8 @@ PRIVATE>
 : get-remote-thread ( name -- thread )
     dup registered-remote-threads at [ ] [ threads at ] ?if ;
 
+SYMBOL: local-node
+
 : handle-node-client ( -- )
     deserialize
     [ first2 get-remote-thread send ] [ stop-this-server ] if* ;
@@ -31,6 +33,9 @@ PRIVATE>
         swap >>insecure
         "concurrency.distributed" >>name
         [ handle-node-client ] >>handler ;
+
+: start-node ( addrspec -- )
+    <node-server> start-server local-node set-global ;
 
 TUPLE: remote-thread node id ;
 
@@ -44,10 +49,10 @@ M: remote-thread send ( message thread -- )
     send-remote-message ;
 
 M: thread (serialize) ( obj -- )
-    id>> [ insecure-addr ] dip <remote-thread> (serialize) ;
+    id>> [ local-node get insecure>> ] dip <remote-thread> (serialize) ;
 
-: stop-node ( node -- )
-    f swap send-remote-message ;
+: stop-node ( -- )
+    local-node get insecure>> f swap send-remote-message ;
 
 [
     H{ } clone \ registered-remote-threads set-global
