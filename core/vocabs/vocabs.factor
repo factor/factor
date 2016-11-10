@@ -85,8 +85,8 @@ GENERIC: vocab-changed ( vocab obj -- )
     vocab-observers get [ vocab-changed ] with each ;
 
 : create-vocab ( name -- vocab )
-    check-vocab-name dictionary get
-    [ <vocab> dup notify-vocab-observers ] cache ;
+    check-vocab-name dictionary get [ <vocab> ] cache
+    dup notify-vocab-observers ;
 
 ERROR: no-vocab name ;
 
