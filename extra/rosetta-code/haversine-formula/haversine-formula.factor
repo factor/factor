@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.constants math.functions
+USING: arrays kernel math math.functions math.trig
 math.vectors sequences ;
 IN: rosetta-code.haversine-formula
 
@@ -27,7 +27,7 @@ CONSTANT: R_earth 6372.8 ! in kilometers
 : haversininv ( y -- x ) 2 * 1 swap - acos ;
 
 : haversineDist ( as bs -- d )
-    [ [ 180 / pi * ] map ] bi@
+    [ [ deg>rad ] map ] bi@
     [ [ swap - haversin ] 2map ]
     [ [ first cos ] bi@ * 1 swap 2array ]
     2bi

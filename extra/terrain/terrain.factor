@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff, Doug Coleman. bsd license
 USING: accessors arrays combinators game.input game.loop
 game.input.scancodes grouping kernel literals locals
-math math.constants math.functions math.order
+math math.constants math.functions math.order math.trig
 math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays
@@ -69,12 +69,9 @@ TUPLE: terrain-world < game-world
     [ yaw>> 0.0 1.0 0.0 glRotatef ]
     [ location>> vneg first3 glTranslatef ] tri ;
 
-: degrees ( deg -- rad )
-    pi 180.0 / * ; inline
-
 TYPED: eye-rotate ( yaw: float pitch: float v: float-4 -- v': float-4 )
-    [ float-4{  0.0 -1.0 0.0 0.0 } swap degrees rotation-matrix4 ]
-    [ float-4{ -1.0  0.0 0.0 0.0 } swap degrees rotation-matrix4 m4. ]
+    [ float-4{  0.0 -1.0 0.0 0.0 } swap deg>rad rotation-matrix4 ]
+    [ float-4{ -1.0  0.0 0.0 0.0 } swap deg>rad rotation-matrix4 m4. ]
     [ m4.v ] tri* float-4{ t t t f } vand ;
 
 : forward-vector ( player -- v )
