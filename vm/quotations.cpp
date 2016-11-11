@@ -48,41 +48,40 @@ void quotation_jit::init_quotation(cell quot) {
 
 bool quotation_jit::fast_if_p(cell i, cell length) {
   return (i + 3) == length &&
-      (tagged<object>(array_nth(elements.untagged(), i + 1)).type() == QUOTATION_TYPE) &&
-      array_nth(elements.untagged(), i + 2) == parent->special_objects[JIT_IF_WORD];
+      TAG(nth(i + 1)) == QUOTATION_TYPE &&
+      nth(i + 2) == parent->special_objects[JIT_IF_WORD];
 }
 
 bool quotation_jit::primitive_call_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-      parent->special_objects[JIT_PRIMITIVE_WORD];
+  cell jit_primitive_word = parent->special_objects[JIT_PRIMITIVE_WORD];
+  return (i + 2) <= length && nth(i + 1) == jit_primitive_word;
 }
 
 bool quotation_jit::fast_dip_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-      parent->special_objects[JIT_DIP_WORD];
+  cell jit_dip_word = parent->special_objects[JIT_DIP_WORD];
+  return (i + 2) <= length && nth(i + 1) == jit_dip_word;
 }
 
 bool quotation_jit::fast_2dip_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-      parent->special_objects[JIT_2DIP_WORD];
+  cell jit_2dip_word = parent->special_objects[JIT_2DIP_WORD];
+  return (i + 2) <= length && nth(i + 1) == jit_2dip_word;
 }
 
 bool quotation_jit::fast_3dip_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-      parent->special_objects[JIT_3DIP_WORD];
+  cell jit_3dip_word = parent->special_objects[JIT_3DIP_WORD];
+  return (i + 2) <= length && nth(i + 1) == jit_3dip_word;
 }
 
 bool quotation_jit::declare_p(cell i, cell length) {
-  return (i + 2) <= length && array_nth(elements.untagged(), i + 1) ==
-      parent->special_objects[JIT_DECLARE_WORD];
+  cell jit_declare_word = parent->special_objects[JIT_DECLARE_WORD];
+  return (i + 2) <= length && nth(i + 1) == jit_declare_word;
 }
-
 
 bool quotation_jit::mega_lookup_p(cell i, cell length) {
   return (i + 4) <= length &&
-      (tagged<object>(array_nth(elements.untagged(), i + 1)).type() == FIXNUM_TYPE) &&
-      (tagged<object>(array_nth(elements.untagged(), i + 2)).type() == ARRAY_TYPE) &&
-      array_nth(elements.untagged(), i + 3) == parent->special_objects[MEGA_LOOKUP_WORD];
+      TAG(nth(i + 1)) == FIXNUM_TYPE &&
+      TAG(nth(i + 2)) == ARRAY_TYPE &&
+      nth(i + 3) == parent->special_objects[MEGA_LOOKUP_WORD];
 }
 
 // Subprimitives should be flagged with whether they require a stack frame.
@@ -99,8 +98,8 @@ bool quotation_jit::special_subprimitive_p(cell obj) {
 bool quotation_jit::stack_frame_p() {
   cell length = array_capacity(elements.untagged());
   for (cell i = 0; i < length; i++) {
-    cell obj = array_nth(elements.untagged(), i);
-    cell tag = tagged<object>(obj).type();
+    cell obj = nth(i);
+    cell tag = TAG(obj);
     if ((tag == WORD_TYPE && special_subprimitive_p(obj)) ||
         (tag == ARRAY_TYPE && mega_lookup_p(i, length)))
       return false;
