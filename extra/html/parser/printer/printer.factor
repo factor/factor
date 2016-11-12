@@ -1,7 +1,13 @@
-USING: accessors assocs combinators html.parser
-html.parser.utils io io.streams.string kernel math math.order
-namespaces sequences strings unicode ;
+USING: accessors assocs combinators fry html.parser
+html.parser.utils io io.streams.string kernel math namespaces
+sequences strings unicode ;
 IN: html.parser.printer
+
+SYMBOL: indentation "  " indentation set-global
+SYMBOL: #indentations
+
+: indent ( -- )
+    #indentations get indentation get '[ _ write ] times ;
 
 TUPLE: html-printer ;
 TUPLE: text-printer < html-printer ;
@@ -30,7 +36,8 @@ ERROR: unknown-tag-error tag ;
         [ unknown-tag-error ]
     } cond ;
 
-: print-tags ( vector -- ) [ print-tag ] each ;
+: print-tags ( vector -- )
+    0 #indentations [ [ print-tag ] each ] with-variable ;
 
 : html-text. ( vector -- )
     T{ text-printer } html-printer [ print-tags ] with-variable ;
@@ -46,23 +53,26 @@ ERROR: unknown-tag-error tag ;
 
 M: text-printer print-opening-tag
     name>> {
-        { "br" [ nl ] }
-        { "ol" [ nl ] }
-        { "ul" [ nl ] }
+        { "br" [ nl indent ] }
+        ! { "ol" [ nl indent ] }
+        ! { "ul" [ nl indent ] }
         { "li" [ " * " write ] }
+        { "blockquote" [ #indentations inc indent ] }
         [ drop ]
     } case ;
 
 M: text-printer print-closing-tag
-    name>>
-    [
-        { "p" "blockquote" "h1" "h2" "h3" "h4" "h5" }
-        member? [ nl nl ] when
-    ]
-    [
-        { "ul" "ol" "li" "tr" } member? [ nl ] when
-    ]
-    [ "td" = [ bl ] when ] tri ;
+    name>> {
+        [ "blockquote" = [ #indentations dec ] when ]
+        [
+            { "p" "blockquote" "h1" "h2" "h3" "h4" "h5" }
+            member? [ nl indent nl indent ] when
+        ]
+        [
+            { "ul" "ol" "li" "tr" } member? [ nl indent ] when
+        ]
+        [ "td" = [ bl ] when ]
+    } cleave ;
 
 M: text-printer print-comment-tag drop ;
 
@@ -80,38 +90,25 @@ M: html-printer print-dtd-tag ( tag -- )
 
 M: src-printer print-opening-tag ( tag -- )
     "<" write
-    [ name>> write ]
-    [ attributes>> dup assoc-empty? [ drop ] [ print-attributes ] if ] bi
+    [ name>> write ] [ attributes>> print-attributes ] bi
     ">" write ;
 
 M: src-printer print-closing-tag ( tag -- )
-    "</" write
-    name>> write
-    ">" write ;
-
-SYMBOL: tab-width
-SYMBOL: #indentations
+    "</" write name>> write ">" write ;
 
 : prettyprint-html ( vector -- )
-    H{
-        { html-printer T{ html-prettyprinter } }
-        { tab-width 2 }
-        { #indentations 0 }
-    } [ print-tags ] with-variables ;
-
-: tabs ( -- vseq )
-    tab-width get #indentations get 0 max * CHAR: \s <repetition> ;
+    T{ html-prettyprinter } html-printer [ print-tags ] with-variable ;
 
 M: html-prettyprinter print-opening-tag ( tag -- )
     name>>
-    [ tabs write "<" write write ">\n" write ]
+    [ indent "<" write write ">\n" write ]
     ! These tags usually don't have any closing tag associated with them.
     [ { "br" "img" } member? [ #indentations inc ] unless ] bi ;
 
 M: html-prettyprinter print-closing-tag ( tag -- )
     ! These tags usually don't have any closing tag associated with them.
     [ { "br" "img" } member? [ #indentations dec ] unless ]
-    [ tabs write "</" write name>> write ">\n" write ] bi ;
+    [ indent "</" write name>> write ">\n" write ] bi ;
 
 M: html-prettyprinter print-text-tag ( tag -- )
-    text>> [ blank? ] trim [ tabs write write "\n" write ] unless-empty ;
+    text>> [ blank? ] trim [ indent write "\n" write ] unless-empty ;
