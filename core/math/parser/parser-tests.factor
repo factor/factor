@@ -474,3 +474,16 @@ unit-test
 { "" } [
     33.4 "" 4 4 "f" "missing" format-float
 ] unit-test
+
+! Literal byte arrays are mutable, so (format-float) isn't foldable.
+: trouble ( -- str ba )
+    155000.0 B{ } -1 3 B{ 69 0 } [
+        B{ 67 0 } (format-float) >string
+    ] keep ;
+
+{
+    "1.55E+05"
+    "1.550e+05"
+} [
+    trouble CHAR: e 0 rot set-nth trouble drop
+] unit-test
