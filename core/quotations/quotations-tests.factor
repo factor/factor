@@ -16,13 +16,3 @@ IN: quotations
 { [ "hi" ] } [ "hi" 1quotation ] unit-test
 
 [ 1 \ + curry ] must-fail
-
-: trouble ( -- arr quot ) { 123 } dup array>quotation ;
-
-{ 999 } [
-    ! Call the quotation which compiles it.
-    trouble call drop
-    ! Change the array used for it.
-    999 0 rot set-nth
-    trouble nip call
-] unit-test
