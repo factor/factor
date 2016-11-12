@@ -9,7 +9,7 @@ IN: html.parser.printer.tests
 {
     "          "
 } [
-    [ 5 #indentations set 2 tab-width set tabs >string ] with-scope
+    5 #indentations [ [ indent ] with-string-writer ] with-variable
 ] unit-test
 
 {
