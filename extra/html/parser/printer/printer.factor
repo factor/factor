@@ -1,6 +1,6 @@
 USING: accessors assocs combinators fry html.parser
 html.parser.utils io io.streams.string kernel math namespaces
-sequences strings unicode ;
+regexp sequences strings unicode ;
 IN: html.parser.printer
 
 SYMBOL: indentation "  " indentation set-global
@@ -51,13 +51,18 @@ ERROR: unknown-tag-error tag ;
 : html-src ( vector -- string )
     [ html-src. ] with-string-writer ;
 
+SYMBOLS: preformatted? script? style? ;
+
 M: text-printer print-opening-tag
     name>> {
         { "br" [ nl indent ] }
-        ! { "ol" [ nl indent ] }
-        ! { "ul" [ nl indent ] }
+        { "ol" [ nl indent ] }
+        { "ul" [ nl indent ] }
         { "li" [ " * " write ] }
         { "blockquote" [ #indentations inc indent ] }
+        { "pre" [ preformatted? on ] }
+        { "script" [ script? on ] }
+        { "style" [ style? on ] }
         [ drop ]
     } case ;
 
@@ -71,44 +76,56 @@ M: text-printer print-closing-tag
         [
             { "ul" "ol" "li" "tr" } member? [ nl indent ] when
         ]
-        [ "td" = [ bl ] when ]
+        [ { "th" "td" } member? [ bl ] when ]
+        [ "pre" = [ preformatted? off ] when ]
+        [ "script" = [ script? off ] when ]
+        [ "style" = [ style? off ] when ]
     } cleave ;
 
 M: text-printer print-comment-tag drop ;
 
-M: html-printer print-text-tag ( tag -- )
+M: text-printer print-dtd-tag drop ;
+
+: collapse-spaces ( text -- text' )
+    preformatted? get [ R/ \s+/ " " re-replace ] unless ;
+
+M: text-printer print-text-tag
+    script? get style? get or
+    [ drop ] [ text>> collapse-spaces write ] if ;
+
+M: html-printer print-text-tag
     text>> write ;
 
-M: html-printer print-comment-tag ( tag -- )
+M: html-printer print-comment-tag
     "<!--" write text>> write "-->" write ;
 
-M: html-printer print-dtd-tag ( tag -- )
+M: html-printer print-dtd-tag
     "<!" write text>> write ">" write ;
 
 : print-attributes ( hashtable -- )
     [ [ bl write "=" write ] [ ?quote write ] bi* ] assoc-each ;
 
-M: src-printer print-opening-tag ( tag -- )
+M: src-printer print-opening-tag
     "<" write
     [ name>> write ] [ attributes>> print-attributes ] bi
     ">" write ;
 
-M: src-printer print-closing-tag ( tag -- )
+M: src-printer print-closing-tag
     "</" write name>> write ">" write ;
 
 : prettyprint-html ( vector -- )
     T{ html-prettyprinter } html-printer [ print-tags ] with-variable ;
 
-M: html-prettyprinter print-opening-tag ( tag -- )
+M: html-prettyprinter print-opening-tag
     name>>
     [ indent "<" write write ">\n" write ]
     ! These tags usually don't have any closing tag associated with them.
     [ { "br" "img" } member? [ #indentations inc ] unless ] bi ;
 
-M: html-prettyprinter print-closing-tag ( tag -- )
+M: html-prettyprinter print-closing-tag
     ! These tags usually don't have any closing tag associated with them.
     [ { "br" "img" } member? [ #indentations dec ] unless ]
     [ indent "</" write name>> write ">\n" write ] bi ;
 
-M: html-prettyprinter print-text-tag ( tag -- )
+M: html-prettyprinter print-text-tag
     text>> [ blank? ] trim [ indent write "\n" write ] unless-empty ;
