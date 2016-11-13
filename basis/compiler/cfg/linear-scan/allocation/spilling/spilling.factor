@@ -84,7 +84,7 @@ ERROR: bad-live-ranges interval ;
     find-use-positions ;
 
 : spill-status ( new -- use-pos )
-    H{ } <linked-assoc>
+    <linked-hash>
     [ inactive-positions ] [ active-positions ] [ nip ] 2tri
     >alist alist-max ;
 
