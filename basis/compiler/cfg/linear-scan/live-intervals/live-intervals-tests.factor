@@ -9,6 +9,17 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
 : <live-interval-for-ranges> ( ranges -- live-interval )
     10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep ;
 
+! (add-use)
+{
+    T{ vreg-use f 20 f f t }
+    T{ live-interval-state
+       { vreg 10 }
+       { uses V{ T{ vreg-use { n 20 } { spill-slot? t } } } }
+     }
+} [
+    20 10 <live-interval> [ t (add-use) ] keep
+] unit-test
+
 ! cfg>sync-points
 {
     V{
