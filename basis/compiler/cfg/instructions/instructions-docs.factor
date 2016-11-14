@@ -284,7 +284,11 @@ HELP: ##slot-imm
 } { $see-also %slot-imm } ;
 
 HELP: ##spill
-{ $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "." } ;
+{ $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "."
+  { $table
+    { { $slot "rep" } { "Register representation which is necessary when spilling SIMD registers." } }
+  }
+} { $see-also ##reload } ;
 
 HELP: ##store-memory-imm
 { $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass."

@@ -1,12 +1,18 @@
 USING: compiler.cfg.linear-scan
 compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals help.markup help.syntax math ;
+compiler.cfg.linear-scan.live-intervals cpu.architecture help.markup
+help.syntax math ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 HELP: assign-spill
 { $values { "live-interval" live-interval-state } }
 { $description "Assigns a spill slot for the live interval." }
 { $see-also assign-spill-slot } ;
+
+HELP: last-use-rep
+{ $values { "live-interval" live-interval-state } { "rep" representation } }
+{ $description "Gets the last usage representation for the interval. Used when determining what representation it should have when spilled." }
+{ $see-also first-use-rep } ;
 
 HELP: spill-after
 { $values
@@ -64,6 +70,8 @@ ARTICLE: "compiler.cfg.linear-scan.allocation.spilling" "Spill slot assignment"
 "Words and dynamic variables for assigning spill slots to spilled registers during the " { $link linear-scan } " compiler pass."
 $nl
 "Splitting live intervals:"
-{ $subsections split-for-spill } ;
+{ $subsections split-for-spill }
+"Usage representations:"
+{ $subsections first-use-rep last-use-rep } ;
 
 ABOUT: "compiler.cfg.linear-scan.allocation.spilling"

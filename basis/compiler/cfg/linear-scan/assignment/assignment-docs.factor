@@ -44,6 +44,11 @@ HELP: insert-reload
 { $description "Inserts a " { $link ##reload } " instruction for a live interval." }
 { $see-also handle-reload insert-spill } ;
 
+HELP: insert-spill
+{ $values { "live-interval" live-interval-state } }
+{ $description "Inserts a " { $link ##spill } " instruction for a live interval." }
+{ $see-also insert-reload } ;
+
 HELP: machine-edge-live-ins
 { $var-description "Mapping from basic blocks to predecessors to values which are live on a particular incoming edge." } ;
 
@@ -91,6 +96,11 @@ $nl
   pending-interval-assoc
   expire-old-intervals
   remove-pending
+}
+"Spilling & reloading:"
+{ $subsections
+  insert-reload
+  insert-spill
 }
 "Vreg transformations:"
 { $subsections
