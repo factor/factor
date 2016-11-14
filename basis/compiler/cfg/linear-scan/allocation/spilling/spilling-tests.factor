@@ -65,11 +65,12 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
 
 ! active-positions
 {
-    V{ { RAX 23 } }
+    LH{ { RAX 23 } }
 } [
     f machine-registers init-allocator
     H{ { 20 int-rep } } representations set
-    test-live-interval2 [ add-active ] keep active-positions2
+    test-live-interval2 [ add-active ] keep
+    <linked-hash> [ active-positions ] keep
 ] unit-test
 
 ! assign-spill
@@ -84,9 +85,10 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
 ! find-next-use
 
 ! inactive-positions
-{ V{ } } [
+{ LH{ } } [
     H{ { 10 int-rep } } representations set
-    T{ live-interval-state { vreg 10 } } inactive-positions2
+    T{ live-interval-state { vreg 10 } } <linked-hash>
+    [ inactive-positions ] keep
 ] unit-test
 
 ! last-use-rep
