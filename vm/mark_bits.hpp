@@ -118,10 +118,9 @@ struct mark_bits {
         cell clear_bit = rightmost_clear_bit(mask);
         return line_block(index * mark_bits_granularity + bit_index +
                           clear_bit);
-      } else {
-        // No unmarked blocks on this page. Keep looking
-        bit_index = 0;
       }
+      // No unmarked blocks on this page. Keep looking
+      bit_index = 0;
     }
 
     // No unmarked blocks were found
@@ -138,10 +137,9 @@ struct mark_bits {
         // Found an marked block on this page. Stop, it's hammer time
         cell set_bit = rightmost_set_bit(mask);
         return line_block(index * mark_bits_granularity + bit_index + set_bit);
-      } else {
-        // No marked blocks on this page. Keep looking
-        bit_index = 0;
       }
+      // No marked blocks on this page. Keep looking
+      bit_index = 0;
     }
 
     // No marked blocks were found
