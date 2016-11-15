@@ -112,7 +112,7 @@ struct mark_bits {
     cell bit_index = position.second;
 
     for (cell index = position.first; index < bits_size; index++) {
-      cell mask = ((fixnum)marked[index] >> bit_index);
+      cell mask = marked[index] >> bit_index;
       if (~mask) {
         // Found an unmarked block on this page. Stop, it's hammer time
         cell clear_bit = rightmost_clear_bit(mask);
@@ -132,7 +132,7 @@ struct mark_bits {
     cell bit_index = position.second;
 
     for (cell index = position.first; index < bits_size; index++) {
-      cell mask = (marked[index] >> bit_index);
+      cell mask = marked[index] >> bit_index;
       if (mask) {
         // Found an marked block on this page. Stop, it's hammer time
         cell set_bit = rightmost_set_bit(mask);
