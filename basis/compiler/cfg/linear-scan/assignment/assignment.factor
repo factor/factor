@@ -112,14 +112,19 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
     [ pending-interval-heap get heap-members ] 2dip
     '[ _ _ spill-required? ] filter ;
 
-: spill/reload ( interval -- {reg,rep,slot} )
-    [ reg>> ] [ vreg>> dup rep-of dup swapd assign-spill-slot ] bi 3array ;
+: rep-at-insn ( n interval -- rep )
+    (find-use) [ def-rep>> ] [ use-rep>> ] bi or ;
 
-: spill/reloads ( intervals -- spill/reloads )
-    [ spill/reload ] map ;
+: spill/reload ( n interval -- {reg,rep,slot} )
+    [ rep-at-insn ] keep [ reg>> ] [ vreg>> ] bi
+    pick assign-spill-slot swapd 3array ;
+
+: spill/reloads ( n intervals -- spill/reloads )
+    [ spill/reload ] with map ;
 
 : spill/reloads-for-call-gc ( ##call-gc -- spill-seq )
-    [ gc-map>> gc-roots>> ] [ insn#>> ] bi spill-intervals spill/reloads ;
+    [ gc-map>> gc-roots>> ] [ insn#>> ] bi
+    [ spill-intervals ] keep swap spill/reloads ;
 
 : emit-##call-gc ( insn -- )
     dup spill/reloads-for-call-gc

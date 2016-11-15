@@ -179,7 +179,7 @@ IN: compiler.cfg.linear-scan.assignment.tests
     } ;
 
 {
-    V{ { RDI float-rep T{ spill-slot } } }
+    V{ { RDI int-rep T{ spill-slot } } }
 } [
     f f <basic-block> <cfg> cfg set
     H{ } clone spill-slots set
