@@ -76,6 +76,7 @@ TUPLE: float-parse
     { point fixnum }
     { exponent }
     { magnitude } ;
+
 : inc-point-?dec-magnitude ( float-parse n -- float-parse' )
     zero? [ [ 1 fixnum-fast ] change-magnitude ] when
     [ 1 fixnum+fast ] change-point ; inline
