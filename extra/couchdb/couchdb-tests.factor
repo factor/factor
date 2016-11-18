@@ -8,7 +8,7 @@ IN: couchdb.tests
 ! to work.
 
 <default-server> "factor-test" <db> [
-    [ ] [ couch get create-db ] unit-test
+    [ ] [ couch get ensure-db ] unit-test
     [ couch get create-db ] must-fail
     [ ] [ couch get delete-db ] unit-test
     [ couch get delete-db ] must-fail
