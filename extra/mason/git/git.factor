@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit continuations
-debugger io io.directories io.directories.hierarchy
-io.encodings.utf8 io.files io.launcher io.sockets
-io.streams.string kernel mason.common mason.email sequences
+USING: accessors continuations debugger io io.directories
+io.directories.hierarchy io.encodings.utf8 io.files io.launcher
+io.sockets io.streams.string kernel mason.common mason.email sequences
 splitting ;
 IN: mason.git
 
@@ -55,19 +54,10 @@ IN: mason.git
     ] [ rethrow ] if ;
 
 : git-status-cmd ( -- cmd )
-    { "git" "status" } ;
-
-: git-status-failed ( error -- )
-    ! Exit code 1 means there's nothing to commit.
-    dup { [ process-failed? ] [ code>> 1 = ] } 1&&
-    [ drop ] [ rethrow ] if ;
+    { "git" "status" "--porcelain" } ;
 
 : git-status ( -- seq )
-    [
-        git-status-cmd utf8 [ lines ] with-process-reader*
-        { 0 1 } member? [ drop ] [ process-failed ] if
-        [ "#\t" head? ] filter
-    ] [ git-status-failed { } ] recover ;
+    git-status-cmd utf8 [ lines ] with-process-reader ;
 
 : check-repository ( -- seq )
     "factor" [ git-status ] with-directory ;
