@@ -156,9 +156,7 @@ ERROR: uninferable ;
     ] if ;
 
 : infer-value ( value-info -- effect/f )
-    [ (infer-value) ]
-    [ dup uninferable? [ 2drop f ] [ rethrow ] if ]
-    recover ;
+    '[ _ (infer-value) ] [ uninferable? ] ignore-error/f ;
 
 : (value>quot) ( value-info -- quot )
     dup literal?>> [

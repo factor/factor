@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays math io.backend io.files.info
+USING: byte-arrays fry math io.backend io.files.info
 io.files.windows kernel windows.kernel32
 windows.time windows.types windows accessors alien.c-types
 combinators generalizations system alien.strings
@@ -213,12 +213,10 @@ CONSTANT: names-buf-length 16384
     ] with-destructors ;
 
 ! Suppress T{ windows-error f 2 "The system cannot find the file specified." }
-: volume>paths ( string -- array )
-    [ (volume>paths) ] curry
-    [
-        dup { [ windows-error? ] [ n>> ERROR_FILE_NOT_FOUND = ] } 1&&
-        [ drop { } ] [ rethrow ] if
-    ] recover ;
+: volume>paths ( string -- array/f )
+    '[ _ (volume>paths) ] [
+        { [ windows-error? ] [ n>> ERROR_FILE_NOT_FOUND = ] } 1&&
+    ] ignore-error/f ;
 
 ! Can error with T{ windows-error f 21 "The device is not ready." }
 ! if there is a D: that is not ready, for instance. Ignore these drives.

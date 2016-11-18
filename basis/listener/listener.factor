@@ -1,10 +1,9 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants
-combinators.short-circuit compiler.units continuations debugger
-fry io io.styles kernel lexer literals locals math math.parser
-namespaces parser parser.notes prettyprint sequences sets
-source-files.errors system vocabs vocabs.loader
+USING: accessors colors colors.constants combinators.short-circuit
+compiler.units continuations debugger fry io io.styles kernel lexer
+locals math math.parser namespaces parser parser.notes prettyprint
+sequences sets source-files.errors system vocabs vocabs.loader
 vocabs.parser ;
 IN: listener
 
@@ -40,10 +39,8 @@ SYMBOL: handle-ctrl-break
     [ [ parse-lines ] with-ctrl-break ] with-compilation-unit ;
 
 : read-quot-step ( lines -- quot/f )
-    [ parse-lines-interactive ] [
-        dup error>> unexpected-eof?
-        [ 2drop f ] [ rethrow ] if
-    ] recover ;
+    '[ _ parse-lines-interactive ]
+    [ error>> unexpected-eof? ] ignore-error/f ;
 
 : read-quot-loop ( stream accum -- quot/f )
     over stream-readln dup [
