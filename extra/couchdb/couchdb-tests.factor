@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs couchdb kernel namespaces sequences strings tools.test ;
+USING: accessors assocs couchdb hashtables kernel namespaces
+random.data sequences strings tools.test ;
 IN: couchdb.tests
 
 ! You must have a CouchDB server (currently only the version from svn will
@@ -42,5 +43,12 @@ IN: couchdb.tests
        } save-doc ] unit-test
     [ t ] [ "id" get load-doc delete-doc string? ] unit-test
     [ "id" get load-doc ] must-fail
+
+    { t } [
+        "oga" "boga" associate
+        couch get db-url 10 random-string append
+        couch-put "ok" of
+    ] unit-test
+
     [ ] [ couch get delete-db ] unit-test
 ] with-couch

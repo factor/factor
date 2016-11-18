@@ -42,11 +42,14 @@ PREDICATE: file-exists-error < couchdb-error
 : couch-get ( url -- assoc )
     <get-request> couch-request ;
 
-: couch-put ( post-data url -- assoc )
-    <put-request> couch-request ;
+: <json-post-data> ( assoc -- post-data )
+    >json utf8 encode "application/json" <post-data> swap >>data ;
 
-: couch-post ( post-data url -- assoc )
-    <post-request> couch-request ;
+: couch-put ( assoc url -- assoc' )
+    [ <json-post-data> ] dip <put-request> couch-request ;
+
+: couch-post ( assoc url -- assoc' )
+    [ <json-post-data> ] dip <post-request> couch-request ;
 
 : couch-delete ( url -- assoc )
     <delete-request> couch-request ;
@@ -122,11 +125,8 @@ C: <db> db
     ! TODO: queries. Maybe pass in a hashtable with options
     db-url "_all_docs" append couch-get ;
 
-: <json-post-data> ( assoc -- post-data )
-    >json utf8 encode "application/json" <post-data> swap >>data ;
-
 : compact-db ( db -- )
-    f <json-post-data> swap db-url "_compact" append couch-post response-ok* ;
+    f swap db-url "_compact" append couch-post response-ok* ;
 
 ! documents
 : id> ( assoc -- id ) "_id" of ;
@@ -153,13 +153,13 @@ C: <db> db
     id> id-url ;
 
 : temp-view ( view -- results )
-    <json-post-data> couch get db-url "_temp_view" append couch-post ;
+    couch get db-url "_temp_view" append couch-post ;
 
 : temp-view-map ( map -- results )
     "map" associate temp-view ;
 
 : save-doc-as ( assoc id -- )
-    [ dup <json-post-data> ] dip id-url couch-put response-ok
+    dupd id-url couch-put response-ok
     [ copy-id ] [ copy-rev ] 2bi ;
 
 : save-new-doc ( assoc -- )

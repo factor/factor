@@ -161,7 +161,7 @@ TUPLE: couchdb-auth-provider
     ] H{ } make
     reserve-multiple
     [
-        user>user-hash >json
+        user>user-hash
         "" get-url
         couch-post
     ] [
@@ -219,7 +219,7 @@ M: couchdb-auth-provider update-user ( user provider -- )
         [ drop "_id" of get-url ]
         [ user>user-hash swapd
           2dup check-update drop
-          unify-users >json swap couch-put drop
+          unify-users swap couch-put drop
         ]
         tri
     ] with-variable ;
