@@ -118,15 +118,15 @@ C: <db> db
 : db-info ( db -- info )
     db-url couch-get ;
 
-: compact-db ( db -- )
-    f swap db-url "_compact" append couch-post response-ok* ;
-
 : all-docs ( db -- docs )
     ! TODO: queries. Maybe pass in a hashtable with options
     db-url "_all_docs" append couch-get ;
 
 : <json-post-data> ( assoc -- post-data )
     >json utf8 encode "application/json" <post-data> swap >>data ;
+
+: compact-db ( db -- )
+    f <json-post-data> swap db-url "_compact" append couch-post response-ok* ;
 
 ! documents
 : id> ( assoc -- id ) "_id" of ;
