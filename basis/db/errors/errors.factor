@@ -48,9 +48,6 @@ TUPLE: sql-index-exists < sql-error name ;
 : <sql-index-exists> ( name -- error )
     f swap sql-index-exists boa ;
 
-: ignore-error ( quot check: ( error -- ? ) -- )
-    '[ dup @ [ drop ] [ rethrow ] if ] recover ; inline
-
 : ignore-table-exists ( quot -- )
     [ sql-table-exists? ] ignore-error ; inline
 
