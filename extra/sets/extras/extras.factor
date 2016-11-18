@@ -35,5 +35,5 @@ IN: sets.extras
         '[ @ _ adjoin ] each
     ] keep ; inline
 
-: duplicates-by ( seq quot: ( elt -- key ) -- seq' )
+: unique-by ( seq quot: ( elt -- key ) -- seq' )
     over length <hash-set> '[ @ _ ?adjoin ] filter ; inline
