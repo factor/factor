@@ -1,7 +1,5 @@
-USING: arrays destructors kernel math openssl openssl.libssl sequences
+USING: destructors kernel math openssl openssl.libssl sequences
 tools.test ;
-USING: openssl ;
-
 IN: openssl.libssl.tests
 
 maybe-init-ssl
@@ -55,16 +53,5 @@ maybe-init-ssl
             SSL_want
             SSL_get_peer_certificate
         } [ execute( x -- x ) ] with map
-    ] with-destructors
-] unit-test
-
-: method>version-string ( method -- str )
-    new-ctx new-ssl SSL_get_version ;
-
-! SSL_get_version
-{ { "TLSv1" "TLSv1.1" "TLSv1.2" } } [
-    [
-        TLSv1_method TLSv1_1_method TLSv1_2_method 3array
-        [ method>version-string ] map
     ] with-destructors
 ] unit-test
