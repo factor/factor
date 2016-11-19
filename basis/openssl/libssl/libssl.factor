@@ -422,8 +422,9 @@ FUNCTION: int SSL_get_error ( SSL* ssl, int ret )
 FUNCTION: void SSL_set_connect_state ( SSL* ssl )
 
 FUNCTION: void SSL_set_accept_state ( SSL* ssl )
-
 FUNCTION: void SSL_free ( SSL* ssl )
+DESTRUCTOR: SSL_free
+
 FUNCTION: int SSL_accept ( SSL* ssl )
 FUNCTION: int SSL_connect ( SSL* ssl )
 FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num )
@@ -448,6 +449,7 @@ FUNCTION: SSL* SSL_load_client_CA_file ( c-string file )
 ! ------------------------------------------------------------------------------
 FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method )
 FUNCTION: void SSL_CTX_free ( SSL_CTX* ctx )
+DESTRUCTOR: SSL_CTX_free
 
 ! Load the certificates and private keys into the SSL_CTX
 FUNCTION: int SSL_CTX_use_certificate_chain_file ( SSL_CTX* ctx,
