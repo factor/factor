@@ -1,16 +1,14 @@
-USING:
-    arrays
-    kernel
-    math
-    openssl.libssl
-    sequences
-    tools.test ;
+USING: arrays kernel math openssl.libssl sequences tools.test ;
+USING: openssl ;
+
 IN: openssl.libssl.tests
 
-: all-opts ( -- opts )
+maybe-init-ssl
+
+! It looks like Arch and Ubuntu Linux in newer versions are disabling
+! SSLv2 and SSLv3 so we don't test those options.
+: tls-opts ( -- opts )
     {
-        SSL_OP_NO_SSLv2
-        SSL_OP_NO_SSLv3
         SSL_OP_NO_TLSv1
         SSL_OP_NO_TLSv1_1
         SSL_OP_NO_TLSv1_2
@@ -28,17 +26,15 @@ IN: openssl.libssl.tests
 : new-ssl ( -- ssl )
     new-ctx SSL_new ;
 
-! Test default options. Some Linuxes (Arch) disables SSL_OP_NO_SSLv2
-! by default, so we don't test that option.
 {
-    { f f f f }
+    { f f f }
 } [
-    new-ctx all-opts [ has-opt ] with map rest
+    new-ctx tls-opts [ has-opt ] with map
 ] unit-test
 
 ! Test setting options
-{ 5 } [
-    new-ctx all-opts [ [ set-opt ] [ has-opt ] 2bi ] with map [ t = ] count
+{ 3 } [
+    new-ctx tls-opts [ [ set-opt ] [ has-opt ] 2bi ] with map [ t = ] count
 ] unit-test
 
 ! Initial state
