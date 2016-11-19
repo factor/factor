@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes.struct combinators csv
-io.backend io.encodings.utf8 io.files.info io.files.info.unix
-io.pathnames kernel libc math math.parser sequences splitting
-strings system unix.statfs.linux unix.statvfs.linux ;
+USING: accessors assocs classes.struct combinators
+combinators.short-circuit continuations csv fry io.backend
+io.encodings.utf8 io.files.info io.files.info.unix io.pathnames kernel
+libc math math.parser sequences splitting strings system
+unix.statfs.linux unix.statvfs.linux ;
 FROM: csv => delimiter ;
 IN: io.files.info.unix.linux
 
@@ -67,15 +68,18 @@ frequency pass-number ;
     CHAR: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
-M: linux file-systems
-    parse-mtab [
-        [ mount-point>> file-system-info ] keep
+: mtab-entry>file-system-info ( mtab-entry -- file-system-info/f )
+    '[
+        _ [ mount-point>> file-system-info ] keep
         {
             [ file-system-name>> >>device-name ]
             [ mount-point>> >>mount-point ]
             [ type>> >>type ]
         } cleave
-    ] map ;
+    ] [ { [ libc-error? ] [ errno>> EACCES = ] } 1&& ] ignore-error/f ;
+
+M: linux file-systems
+    parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
 : (find-mount-point) ( path mtab-paths -- mtab-entry )
     2dup at* [
