@@ -1,5 +1,6 @@
 USING: accessors continuations http.client http.server io.servers
-io.sockets.secure io.sockets.secure.openssl kernel tools.test ;
+io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
+tools.test ;
 IN: io.sockets.secure.openssl.tests
 
 { 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
@@ -20,6 +21,10 @@ IN: io.sockets.secure.openssl.tests
 { f } [ "foo.bar.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
 { f } [ ".com" "*.badssl.com" subject-names-match? ] unit-test
 
+TUPLE: fake-fd fd ;
+
+M: fake-fd cancel-operation ( obj -- ) drop ;
+
 { f } [
-    33 <ssl-handle> [ maybe-handshake ] [ drop ] recover connected>>
+    33 fake-fd boa <ssl-handle> [ maybe-handshake ] [ drop ] recover connected>>
 ] unit-test
