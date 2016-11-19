@@ -21,6 +21,14 @@ CONSTANT: X509_FILETYPE_DEFAULT   3
 ALIAS: SSL_FILETYPE_ASN1 X509_FILETYPE_ASN1
 ALIAS: SSL_FILETYPE_PEM  X509_FILETYPE_PEM
 
+CONSTANT: SSL_SENT_SHUTDOWN 1
+CONSTANT: SSL_RECEIVED_SHUTDOWN 2
+
+CONSTANT: SSL_NOTHING 1
+CONSTANT: SSL_WRITING 2
+CONSTANT: SSL_READING 3
+CONSTANT: SSL_X509_LOOKUP 4
+
 CONSTANT: SSL_CTRL_NEED_TMP_RSA   1
 CONSTANT: SSL_CTRL_SET_TMP_RSA    2
 CONSTANT: SSL_CTRL_SET_TMP_DH     3
@@ -121,7 +129,6 @@ CONSTANT: SSL_CTRL_CHECK_PROTO_VERSION                    119
 CONSTANT: DTLS_CTRL_SET_LINK_MTU                          120
 CONSTANT: DTLS_CTRL_GET_LINK_MIN_MTU                      121
 
-
 CONSTANT: TLSEXT_NAMETYPE_host_name 0
 CONSTANT: TLSEXT_STATUSTYPE_ocsp 1
 
@@ -148,13 +155,29 @@ CONSTANT: TLSEXT_hash_num                                 7
 
 CONSTANT: TLSEXT_nid_unknown                              0x1000000
 
-
-
 CONSTANT: SSL_OP_NO_SSLv2 0x01000000
 CONSTANT: SSL_OP_NO_SSLv3 0x02000000
 CONSTANT: SSL_OP_NO_TLSv1 0x04000000
 CONSTANT: SSL_OP_NO_TLSv1_2 0x08000000
 CONSTANT: SSL_OP_NO_TLSv1_1 0x10000000
+
+CONSTANT: SSL_VERIFY_NONE 0
+CONSTANT: SSL_VERIFY_PEER 1
+CONSTANT: SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2
+CONSTANT: SSL_VERIFY_CLIENT_ONCE 4
+
+CONSTANT: SSL_SESS_CACHE_OFF    0x0000
+CONSTANT: SSL_SESS_CACHE_CLIENT 0x0001
+CONSTANT: SSL_SESS_CACHE_SERVER 0x0002
+
+CONSTANT: SSL_SESS_CACHE_BOTH flags{ SSL_SESS_CACHE_CLIENT SSL_SESS_CACHE_SERVER }
+
+CONSTANT: SSL_SESS_CACHE_NO_AUTO_CLEAR      0x0080
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_LOOKUP 0x0100
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_STORE  0x0200
+
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL
+    flags{ SSL_SESS_CACHE_NO_INTERNAL_LOOKUP SSL_SESS_CACHE_NO_INTERNAL_STORE }
 
 CONSTANT: SSL_ERROR_NONE             0
 CONSTANT: SSL_ERROR_SSL              1
@@ -188,7 +211,6 @@ LIBRARY: libssl
 ! ===============================================
 ! stack.h
 ! ===============================================
-
 STRUCT: stack_st
     { num int }
     { data char** }
@@ -200,7 +222,6 @@ TYPEDEF: stack_st _STACK
 ! ===============================================
 ! asn1t.h
 ! ===============================================
-
 C-TYPE: ASN1_ITEM
 
 ! ===============================================
@@ -216,7 +237,6 @@ STRUCT: ASN1_STRING
     { flags long } ;
 
 FUNCTION: int ASN1_STRING_cmp ( ASN1_STRING *a, ASN1_STRING *b )
-
 FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar **in, long len, ASN1_ITEM *it )
 
 ! ===============================================
@@ -227,7 +247,6 @@ TYPEDEF: ASN1_STRING ASN1_OCTET_STRING
 ! ===============================================
 ! x509.h
 ! ===============================================
-
 STRUCT: X509_EXTENSION
     { object void* }
     { critical void* }
@@ -269,7 +288,6 @@ CONSTANT: GEN_RID       8
 ! ===============================================
 ! ssl.h
 ! ===============================================
-
 STRUCT: ssl_method_st
     { version int }
     { ssl_new void* }
@@ -357,53 +375,39 @@ STRUCT: ssl_st
     { ctx SSL_CTX* } ;
 TYPEDEF: ssl_st SSL
 
-FUNCTION: c-string SSL_get_version ( SSL* ssl )
+! Must be called before any other action takes place
+FUNCTION: int SSL_library_init (  )
 
 ! Maps OpenSSL errors to strings
 FUNCTION: void SSL_load_error_strings (  )
+
+! Sets the default SSL version
+FUNCTION: ssl-method SSLv2_client_method (  )
+FUNCTION: ssl-method SSLv23_client_method (  )
+FUNCTION: ssl-method SSLv23_server_method (  )
+FUNCTION: ssl-method SSLv23_method (  ) ! SSLv3 but can rollback to v2
+FUNCTION: ssl-method SSLv3_client_method (  )
+FUNCTION: ssl-method SSLv3_server_method (  )
+FUNCTION: ssl-method SSLv3_method (  )
+FUNCTION: ssl-method TLSv1_client_method (  )
+FUNCTION: ssl-method TLSv1_server_method (  )
+FUNCTION: ssl-method TLSv1_method (  )
+FUNCTION: ssl-method TLSv1_1_method (  )
+FUNCTION: ssl-method TLSv1_2_method (  )
+
+FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses )
+FUNCTION: void RAND_seed ( void* buf, int num )
+FUNCTION: void* BIO_f_ssl (  )
+
+! ------------------------------------------------------------------------------
+! SSL
+! ------------------------------------------------------------------------------
+FUNCTION: c-string SSL_get_version ( SSL* ssl )
+
 FUNCTION: c-string SSL_state_string ( SSL* ssl )
 FUNCTION: c-string SSL_rstate_string ( SSL* ssl )
 FUNCTION: c-string SSL_state_string_long ( SSL* ssl )
 FUNCTION: c-string SSL_rstate_string_long ( SSL* ssl )
-
-! Must be called before any other action takes place
-FUNCTION: int SSL_library_init (  )
-
-! Sets the default SSL version
-FUNCTION: ssl-method SSLv2_client_method (  )
-
-FUNCTION: ssl-method SSLv23_client_method (  )
-
-FUNCTION: ssl-method SSLv23_server_method (  )
-
-FUNCTION: ssl-method SSLv23_method (  ) ! SSLv3 but can rollback to v2
-
-FUNCTION: ssl-method SSLv3_client_method (  )
-
-FUNCTION: ssl-method SSLv3_server_method (  )
-
-FUNCTION: ssl-method SSLv3_method (  )
-
-FUNCTION: ssl-method TLSv1_client_method (  )
-
-FUNCTION: ssl-method TLSv1_server_method (  )
-
-FUNCTION: ssl-method TLSv1_method (  )
-
-FUNCTION: ssl-method TLSv1_1_method (  )
-
-FUNCTION: ssl-method TLSv1_2_method (  )
-
-! Creates the context
-FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method )
-
-! Load the certificates and private keys into the SSL_CTX
-FUNCTION: int SSL_CTX_use_certificate_chain_file ( SSL_CTX* ctx,
-                                                   c-string file ) ! PEM type
-
-FUNCTION: int SSL_CTX_use_certificate ( SSL_CTX* ctx, X509* x )
-
-FUNCTION: SSL* SSL_new ( SSL_CTX* ctx )
 
 FUNCTION: int SSL_set_fd ( SSL* ssl, int fd )
 
@@ -419,7 +423,6 @@ FUNCTION: void SSL_set_connect_state ( SSL* ssl )
 
 FUNCTION: void SSL_set_accept_state ( SSL* ssl )
 
-
 FUNCTION: void SSL_free ( SSL* ssl )
 FUNCTION: int SSL_accept ( SSL* ssl )
 FUNCTION: int SSL_connect ( SSL* ssl )
@@ -428,55 +431,42 @@ FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
 FUNCTION: long SSL_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
 
 FUNCTION: int SSL_shutdown ( SSL* ssl )
-
-CONSTANT: SSL_SENT_SHUTDOWN 1
-CONSTANT: SSL_RECEIVED_SHUTDOWN 2
-
 FUNCTION: int SSL_get_shutdown ( SSL* ssl )
 
-FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, c-string sid_ctx, uint len )
-
-FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses )
-
 FUNCTION: int SSL_want ( SSL* ssl )
-
-CONSTANT: SSL_NOTHING 1
-CONSTANT: SSL_WRITING 2
-CONSTANT: SSL_READING 3
-CONSTANT: SSL_X509_LOOKUP 4
-
 FUNCTION: long SSL_get_verify_result ( SSL* ssl )
-
 FUNCTION: X509* SSL_get_peer_certificate ( SSL* s )
 
-FUNCTION: void SSL_CTX_free ( SSL_CTX* ctx )
-
-FUNCTION: void RAND_seed ( void* buf, int num )
-
 FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str )
-
 FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str )
-
-FUNCTION: int SSL_CTX_use_RSAPrivateKey_file ( SSL_CTX* ctx, int type )
-
-FUNCTION: int SSL_use_certificate_file ( SSL* ssl,
-                                         c-string str, int type )
-
-FUNCTION: int SSL_CTX_load_verify_locations ( SSL_CTX* ctx, c-string CAfile,
-                                              c-string CApath )
-
-FUNCTION: int SSL_CTX_set_default_verify_paths ( SSL_CTX* ctx )
-
-CONSTANT: SSL_VERIFY_NONE 0
-CONSTANT: SSL_VERIFY_PEER 1
-CONSTANT: SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2
-CONSTANT: SSL_VERIFY_CLIENT_ONCE 4
-
-FUNCTION: void SSL_CTX_set_verify ( SSL_CTX* ctx, int mode, void* callback )
-
-FUNCTION: void SSL_CTX_set_client_CA_list ( SSL_CTX* ctx, SSL* list )
+FUNCTION: int SSL_use_certificate_file ( SSL* ssl, c-string str, int type )
 
 FUNCTION: SSL* SSL_load_client_CA_file ( c-string file )
+
+! ------------------------------------------------------------------------------
+! SSL_CTX
+! ------------------------------------------------------------------------------
+FUNCTION: SSL_CTX* SSL_CTX_new ( ssl-method method )
+FUNCTION: void SSL_CTX_free ( SSL_CTX* ctx )
+
+! Load the certificates and private keys into the SSL_CTX
+FUNCTION: int SSL_CTX_use_certificate_chain_file ( SSL_CTX* ctx,
+                                                   c-string file ) ! PEM type
+FUNCTION: int SSL_CTX_use_certificate ( SSL_CTX* ctx, X509* x )
+
+FUNCTION: SSL* SSL_new ( SSL_CTX* ctx )
+
+
+FUNCTION: int SSL_CTX_set_default_verify_paths ( SSL_CTX* ctx )
+FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx,
+                                               c-string sid_ctx,
+                                               uint len )
+FUNCTION: int SSL_CTX_use_RSAPrivateKey_file ( SSL_CTX* ctx, int type )
+FUNCTION: int SSL_CTX_load_verify_locations ( SSL_CTX* ctx,
+                                              c-string CAfile,
+                                              c-string CApath )
+FUNCTION: void SSL_CTX_set_verify ( SSL_CTX* ctx, int mode, void* callback )
+FUNCTION: void SSL_CTX_set_client_CA_list ( SSL_CTX* ctx, SSL* list )
 
 ! Used to manipulate settings of the SSL_CTX and SSL objects.
 ! This function should never be called directly
@@ -499,8 +489,9 @@ FUNCTION: void SSL_CTX_set_tmp_dh_callback ( SSL_CTX* ctx, void* dh )
 
 FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa )
 
-FUNCTION: void* BIO_f_ssl (  )
-
+! ------------------------------------------------------------------------------
+! Misc
+! ------------------------------------------------------------------------------
 : SSL_set_tlsext_host_name ( ctx hostname -- n )
     [ SSL_CTRL_SET_TLSEXT_HOSTNAME TLSEXT_NAMETYPE_host_name ] dip
     SSL_ctrl ;
@@ -517,23 +508,9 @@ FUNCTION: void* BIO_f_ssl (  )
 : SSL_CTX_set_session_cache_mode ( ctx mode -- n )
     [ SSL_CTRL_SET_SESS_CACHE_MODE ] dip f SSL_CTX_ctrl ;
 
-CONSTANT: SSL_SESS_CACHE_OFF    0x0000
-CONSTANT: SSL_SESS_CACHE_CLIENT 0x0001
-CONSTANT: SSL_SESS_CACHE_SERVER 0x0002
-
-CONSTANT: SSL_SESS_CACHE_BOTH flags{ SSL_SESS_CACHE_CLIENT SSL_SESS_CACHE_SERVER }
-
-CONSTANT: SSL_SESS_CACHE_NO_AUTO_CLEAR      0x0080
-CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_LOOKUP 0x0100
-CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_STORE  0x0200
-
-CONSTANT: SSL_SESS_CACHE_NO_INTERNAL
-    flags{ SSL_SESS_CACHE_NO_INTERNAL_LOOKUP SSL_SESS_CACHE_NO_INTERNAL_STORE }
-
 ! ===============================================
 ! x509_vfy.h
 ! ===============================================
-
 <<
 
 SYMBOL: verify-messages
@@ -548,7 +525,6 @@ SYNTAX: X509_V_:
     [ 1quotation ( -- value ) define-inline ]
     [ verify-messages get set-at ]
     2bi ;
-
 >>
 
 X509_V_: OK 0
@@ -596,7 +572,6 @@ X509_V_: ERR_APPLICATION_VERIFICATION 50
 ! ===============================================
 ! obj_mac.h
 ! ===============================================
-
 CONSTANT: NID_commonName        13
 CONSTANT: NID_subject_alt_name  85
 CONSTANT: NID_issuer_alt_name   86
@@ -605,14 +580,20 @@ CONSTANT: NID_issuer_alt_name   86
 ! On Windows, some of the functions making up libressl
 ! are placed in libcrypto-37.dll
 ! ===============================================
-
 << os windows? [
     "libssl-windows"
     [ "libcrypto-37.dll" cdecl add-library ] [ current-library set ] bi
 ] when >>
 
+! ===============================================
 ! x509.h
+! ===============================================
+CONSTANT: X509_R_CERT_ALREADY_IN_HASH_TABLE 101
+
 FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len )
+! X509_NAME_oneline could return c-string but needs to be freed with OPENSSL_free
+FUNCTION: char* X509_NAME_oneline ( X509_NAME* a, char* buf, int size )
+
 FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos )
 FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx )
 FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a )
@@ -621,16 +602,6 @@ FUNCTION: int X509_check_trust ( X509* a, int id, int flags )
 FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc )
 FUNCTION: void X509_free ( X509 *a )
 DESTRUCTOR: X509_free
-
-C-TYPE: X509_STORE
-FUNCTION: X509_STORE* X509_STORE_new ( )
-
-CONSTANT: X509_R_CERT_ALREADY_IN_HASH_TABLE 101
-FUNCTION: int X509_STORE_add_cert ( X509_STORE* ctx, X509* x )
-
-! X509_NAME_oneline could return c-string but needs to be freed with OPENSSL_free
-FUNCTION: char* X509_NAME_oneline ( X509_NAME* a, char* buf, int size )
-
 FUNCTION: X509* d2i_X509 ( X509** px, uchar** in, int len )
 FUNCTION: int i2d_X509 ( X509* x, uchar** out )
 ! FUNCTION: X509* d2i_X509_bio ( BIO* bp, X509** x )
@@ -639,7 +610,12 @@ FUNCTION: int i2d_X509 ( X509* x, uchar** out )
 ! FUNCTION: int i2d_X509_fp ( FILE* fp, X509* x )
 FUNCTION: int i2d_re_X509_tbs ( X509* x, uchar** out )
 
+C-TYPE: X509_STORE
+FUNCTION: X509_STORE* X509_STORE_new ( )
+FUNCTION: int X509_STORE_add_cert ( X509_STORE* ctx, X509* x )
 
+! ===============================================
 ! stack.h
+! ===============================================
 FUNCTION: int sk_num ( _STACK *s )
 FUNCTION: void* sk_value ( _STACK *s, int v )
