@@ -261,8 +261,8 @@ SYMBOL: default-secure-context
 
 : maybe-handshake ( ssl-handle -- )
     dup connected>> [ drop ] [
-        t >>connected
-        [ do-ssl-accept ] with-timeout
+        [ [ do-ssl-accept ] with-timeout ]
+        [ t swap connected<< ] bi
     ] if ;
 
 ! Input ports

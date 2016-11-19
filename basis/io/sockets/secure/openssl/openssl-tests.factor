@@ -1,4 +1,4 @@
-USING: accessors http.client http.server io.servers
+USING: accessors continuations http.client http.server io.servers
 io.sockets.secure io.sockets.secure.openssl kernel tools.test ;
 IN: io.sockets.secure.openssl.tests
 
@@ -19,3 +19,7 @@ IN: io.sockets.secure.openssl.tests
 { t } [ "www.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
 { f } [ "foo.bar.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
 { f } [ ".com" "*.badssl.com" subject-names-match? ] unit-test
+
+{ f } [
+    33 <ssl-handle> [ maybe-handshake ] [ drop ] recover connected>>
+] unit-test
