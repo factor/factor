@@ -204,7 +204,7 @@ SYMBOL: default-secure-context
 : <ssl-handle> ( fd -- ssl )
     [
         ssl-handle new-disposable |dispose
-        current-secure-context handle>> SSL_new |dispose
+        current-secure-context handle>> SSL_new
         dup ssl-error >>handle
         swap >>file
         set-secure-cipher-list-only
