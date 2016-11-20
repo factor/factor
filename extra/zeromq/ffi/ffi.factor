@@ -71,22 +71,19 @@ FUNCTION: int zmq_term ( void* context )
 ! 0MQ message definition.
 !
 
-STRUCT: zmq_msg_t
-    { data uchar[32] } ;
-
-FUNCTION: int zmq_msg_init ( zmq_msg_t* msg )
-FUNCTION: int zmq_msg_init_size ( zmq_msg_t* msg, size_t size )
-FUNCTION: int zmq_msg_init_data ( zmq_msg_t* msg, void* data, size_t size, void* ffn, void* hint )
-FUNCTION: int zmq_msg_send ( zmq_msg_t* msg, void* s, int flags )
-FUNCTION: int zmq_msg_recv ( zmq_msg_t* msg, void* s, int flags )
-FUNCTION: int zmq_msg_close ( zmq_msg_t* msg )
-FUNCTION: int zmq_msg_move ( zmq_msg_t* dest, zmq_msg_t* src )
-FUNCTION: int zmq_msg_copy ( zmq_msg_t* dest, zmq_msg_t* src )
-FUNCTION: void* zmq_msg_data ( zmq_msg_t* msg )
-FUNCTION: size_t zmq_msg_size ( zmq_msg_t* msg )
-FUNCTION: int zmq_msg_more ( zmq_msg_t* msg )
-FUNCTION: int zmq_msg_get ( zmq_msg_t* msg, int option )
-FUNCTION: int zmq_msg_set ( zmq_msg_t* msg, int option, int optval )
+FUNCTION: int zmq_msg_init ( void* msg )
+FUNCTION: int zmq_msg_init_size ( void* msg, size_t size )
+FUNCTION: int zmq_msg_init_data ( void* msg, void* data, size_t size, void* ffn, void* hint )
+FUNCTION: int zmq_msg_send ( void* msg, void* s, int flags )
+FUNCTION: int zmq_msg_recv ( void* msg, void* s, int flags )
+FUNCTION: int zmq_msg_close ( void* msg )
+FUNCTION: int zmq_msg_move ( void* dest, void* src )
+FUNCTION: int zmq_msg_copy ( void* dest, void* src )
+FUNCTION: void* zmq_msg_data ( void* msg )
+FUNCTION: size_t zmq_msg_size ( void* msg )
+FUNCTION: int zmq_msg_more ( void* msg )
+FUNCTION: int zmq_msg_get ( void* msg, int option )
+FUNCTION: int zmq_msg_set ( void* msg, int option, int optval )
 
 !
 ! 0MQ socket definition.
@@ -200,8 +197,8 @@ FUNCTION: int zmq_send ( void* s, void* buf, size_t len, int flags )
 FUNCTION: int zmq_recv ( void* s, void* buf, size_t len, int flags )
 FUNCTION: int zmq_socket_monitor ( void* s, c-string addr, int events )
 
-FUNCTION: int zmq_sendmsg ( void* s, zmq_msg_t* msg, int flags )
-FUNCTION: int zmq_recvmsg ( void* s, zmq_msg_t* msg, int flags )
+FUNCTION: int zmq_sendmsg ( void* s, void* msg, int flags )
+FUNCTION: int zmq_recvmsg ( void* s, void* msg, int flags )
 
 ! Experimental
 FUNCTION: int zmq_sendiov ( void* s, void* iov, size_t count, int flags )
