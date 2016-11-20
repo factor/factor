@@ -17,7 +17,7 @@ TUPLE: url protocol username password host port path query anchor ;
     pick [ set-at ] [ delete-at drop ] if ;
 
 : set-query-param ( url value key -- url )
-    pick query>> <linked-hash> or [ set-or-delete ] keep >>query ;
+    pick query>> [ <linked-hash> ] unless* [ set-or-delete ] keep >>query ;
 
 ERROR: malformed-port ;
 
