@@ -41,13 +41,6 @@ int raw_fclose(FILE* stream) {
   return 0;
 }
 
-
-void factor_vm::init_c_io() {
-  special_objects[OBJ_STDIN] = allot_alien(false_object, (cell)stdin);
-  special_objects[OBJ_STDOUT] = allot_alien(false_object, (cell)stdout);
-  special_objects[OBJ_STDERR] = allot_alien(false_object, (cell)stderr);
-}
-
 // Allocates memory
 void factor_vm::io_error_if_not_EINTR() {
   if (errno == EINTR)
