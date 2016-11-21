@@ -14,6 +14,7 @@ bool factor_arg(const vm_char* str, const vm_char* arg, cell* value) {
 vm_parameters::vm_parameters() {
   embedded_image = false;
   image_path = NULL;
+  executable_path = NULL;
 
   datastack_size = 32 * sizeof(cell);
   retainstack_size = 32 * sizeof(cell);
