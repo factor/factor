@@ -71,13 +71,15 @@ void factor_vm::init_factor(vm_parameters* p) {
   init_contexts(p->datastack_size, p->retainstack_size, p->callstack_size);
   callbacks = new callback_heap(p->callback_size, this);
   load_image(p);
-  init_c_io();
   max_pic_size = (int)p->max_pic_size;
   special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
   special_objects[OBJ_ARGS] = false_object;
   special_objects[OBJ_EMBEDDED] = false_object;
 
   cell aliens[][2] = {
+    {OBJ_STDIN,           (cell)stdin},
+    {OBJ_STDOUT,          (cell)stdout},
+    {OBJ_STDERR,          (cell)stderr},
     {OBJ_CPU,             (cell)FACTOR_CPU_STRING},
     {OBJ_EXECUTABLE,      (cell)safe_strdup(p->executable_path)},
     {OBJ_IMAGE,           (cell)safe_strdup(p->image_path)},
