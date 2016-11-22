@@ -3,9 +3,8 @@
 
 USING: accessors ascii assocs calendar colors.constants
 formatting html.entities html.parser html.parser.analyzer
-html.parser.printer http.client io io.streams.string io.styles
-kernel make namespaces regexp sequences splitting urls
-wrap.strings xml xml.data xml.traversal ;
+html.parser.printer http.client io io.styles kernel namespaces
+sequences splitting urls wrap.strings xml xml.data xml.traversal ;
 FROM: xml.data => tag? ;
 
 IN: wikipedia
@@ -48,7 +47,7 @@ SYMBOL: language
     [ month-name ] [ day>> ] bi "%s_%s" sprintf wikipedia-url ;
 
 : (historical-events) ( timestamp -- seq )
-    historical-url scrape-html nip "ul" deep-tags-named ;
+    historical-url http-get nip string>xml "ul" deep-tags-named ;
 
 : items>sequence ( tag -- seq )
     children-tags [ deep-children>string ] map ;
