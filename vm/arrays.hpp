@@ -23,6 +23,7 @@ struct growable_array {
       : count(0),
         elements(parent->allot_array(capacity, false_object), parent) {}
 
+  void reallot_array(cell count);
   void add(cell elt);
   void append(array* elts);
   void trim();

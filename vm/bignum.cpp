@@ -797,7 +797,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
         bignum_destructive_unnormalization(u.untagged(), shift);
     }
 
-    q = bignum_trim(q.untagged());
+    q.set_untagged(bignum_trim(q.untagged()));
     *quotient = q.untagged();
   } else {
 
@@ -821,7 +821,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
       }
   }
 
-  u = bignum_trim(u.untagged());
+  u.set_untagged(bignum_trim(u.untagged()));
   if (remainder != NULL)
     *remainder = u.untagged();
 }
@@ -996,7 +996,7 @@ void factor_vm::bignum_divide_unsigned_medium_denominator(
       (*scan) = qj;
     }
 
-    q = bignum_trim(q.untagged());
+    q.set_untagged(bignum_trim(q.untagged()));
 
     if (remainder != ((bignum**)0)) {
       if (shift != 0)
@@ -1179,7 +1179,7 @@ void factor_vm::bignum_divide_unsigned_small_denominator(
 
   bignum_digit_type r = bignum_destructive_scale_down(q.untagged(), denominator);
 
-  q = bignum_trim(q.untagged());
+  q.set_untagged(bignum_trim(q.untagged()));
 
   if (remainder != ((bignum**)0))
     (*remainder) = bignum_digit_to_bignum(r, r_negative_p);
@@ -1797,7 +1797,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
       }
       data_root<bignum> e(bignum_trim(a.untagged()), this);
       data_root<bignum> f(bignum_trim(b.untagged()), this);
-      c = bignum_remainder(e.untagged(), f.untagged());
+      c.set_untagged(bignum_remainder(e.untagged(), f.untagged()));
       if (c.untagged() == BIGNUM_OUT_OF_BAND) {
         return c.untagged();
       }

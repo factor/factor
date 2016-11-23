@@ -58,12 +58,19 @@ cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
 }
 
 // Allocates memory
+void growable_array::reallot_array(cell count) {
+  array *a_old = elements.untagged();
+  array *a_new = elements.parent->reallot_array(a_old, count);
+  elements.set_untagged(a_new);
+}
+
+// Allocates memory
 void growable_array::add(cell elt_) {
   factor_vm* parent = elements.parent;
   data_root<object> elt(elt_, parent);
-  if (count == array_capacity(elements.untagged()))
-    elements = parent->reallot_array(elements.untagged(), count * 2);
-
+  if (count == array_capacity(elements.untagged())) {
+    reallot_array(2 * count);
+  }
   parent->set_array_nth(elements.untagged(), count++, elt.value());
 }
 
@@ -73,8 +80,7 @@ void growable_array::append(array* elts_) {
   data_root<array> elts(elts_, parent);
   cell capacity = array_capacity(elts.untagged());
   if (count + capacity > array_capacity(elements.untagged())) {
-    elements =
-        parent->reallot_array(elements.untagged(), (count + capacity) * 2);
+    reallot_array(2 * (count + capacity));
   }
 
   for (cell index = 0; index < capacity; index++)
@@ -84,8 +90,7 @@ void growable_array::append(array* elts_) {
 
 // Allocates memory
 void growable_array::trim() {
-  factor_vm* parent = elements.parent;
-  elements = parent->reallot_array(elements.untagged(), count);
+  reallot_array(count);
 }
 
 }
