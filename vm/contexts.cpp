@@ -81,18 +81,6 @@ context::~context() {
   delete callstack_seg;
 }
 
-// called on startup
-// Allocates memory (new_context())
-void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_,
-                              cell callstack_size_) {
-  datastack_size = datastack_size_;
-  retainstack_size = retainstack_size_;
-  callstack_size = callstack_size_;
-
-  ctx = NULL;
-  spare_ctx = new_context();
-}
-
 context* factor_vm::new_context() {
   context* new_context;
 

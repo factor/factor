@@ -68,7 +68,14 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   srand((unsigned int)nano_count());
   init_ffi();
-  init_contexts(p->datastack_size, p->retainstack_size, p->callstack_size);
+
+  datastack_size = p->datastack_size;
+  retainstack_size = p->retainstack_size;
+  callstack_size = p->callstack_size;
+
+  ctx = NULL;
+  spare_ctx = new_context();
+
   callbacks = new callback_heap(p->callback_size, this);
   load_image(p);
   max_pic_size = (int)p->max_pic_size;
