@@ -169,7 +169,6 @@ struct factor_vm {
   void primitive_datastack_for();
   cell retainstack_to_array(context* ctx);
   void primitive_retainstack_for();
-  cell array_to_stack(array* array, cell bottom);
   void primitive_set_datastack();
   void primitive_set_retainstack();
   void primitive_check_datastack();
@@ -683,7 +682,6 @@ struct factor_vm {
   void init_factor(vm_parameters* p);
   void pass_args_to_factor(int argc, vm_char** argv);
   void stop_factor();
-  void start_embedded_factor(vm_parameters* p);
   void start_standalone_factor(int argc, vm_char** argv);
   char* factor_eval_string(char* string);
   void factor_eval_free(char* result);
