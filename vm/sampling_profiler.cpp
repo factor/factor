@@ -119,21 +119,11 @@ void factor_vm::primitive_get_samples() {
       data_root<array> callstack(allot_array(callstack_size, false_object),
                                  this);
 
-      std::vector<cell>::const_iterator callstacks_begin =
-                                            sample_callstacks.begin(),
-                                        c_from_iter =
-                                            callstacks_begin +
-                                            from_iter->callstack_begin,
-                                        c_from_iter_end =
-                                            callstacks_begin +
-                                            from_iter->callstack_end;
-      cell c_to_i = 0;
-
-      for (; c_from_iter != c_from_iter_end; ++c_from_iter, ++c_to_i)
-        set_array_nth(callstack.untagged(), c_to_i, *c_from_iter);
-
+      for (cell i = 0; i < callstack_size; i++) {
+        set_array_nth(callstack.untagged(), i,
+                      sample_callstacks[from_iter->callstack_begin + i]);
+      }
       set_array_nth(sample.untagged(), 6, callstack.value());
-
       set_array_nth(samples_array.untagged(), to_i, sample.value());
     }
     ctx->push(samples_array.value());
