@@ -6,9 +6,8 @@ compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.optimizer compiler.cfg.registers
 compiler.cfg.representations compiler.cfg.save-contexts
 compiler.cfg.utilities compiler.tree.builder compiler.tree.optimizer
-formatting fry io kernel namespaces prettyprint quotations sequences
-strings words ;
-FROM: compiler.cfg.linearization => number-blocks ;
+formatting fry io kernel math namespaces prettyprint quotations
+sequences strings words ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-builder ( quot -- cfgs )
@@ -48,11 +47,13 @@ M: ##phi insn.
 
 ! XXX: pprint on a string prints the double quotes.
 ! This will cause graphviz to choke, so print without quotes.
-M: insn insn. tuple>array but-last [
-        bl
-    ] [
-        dup string? [ write ] [ pprint ] if
-    ] interleave nl ;
+: insn-number. ( n -- )
+    dup integer? [ "%4d " printf ] [ drop "     " printf ] if ;
+
+M: insn insn. ( insn -- )
+    tuple>array unclip-last insn-number. [
+        dup string? [ ] [ unparse ] if
+    ] map " " join write nl ;
 
 : block-header. ( bb -- )
     [ number>> ] [ kill-block?>> "(k)" "" ? ] bi
