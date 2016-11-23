@@ -43,7 +43,7 @@ inline cell quotation_jit::nth(cell index) {
 }
 
 void quotation_jit::init_quotation(cell quot) {
-  elements = untag<quotation>(quot)->array;
+  elements.set_value(untag<quotation>(quot)->array);
 }
 
 bool quotation_jit::fast_if_p(cell i, cell length) {

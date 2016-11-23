@@ -30,10 +30,18 @@ void factor_vm::primitive_resize_byte_array() {
 }
 
 // Allocates memory
+void growable_byte_array::reallot_array(cell count) {
+  byte_array *ba_old = elements.untagged();
+  byte_array *ba_new = elements.parent->reallot_array(ba_old, count);
+  elements.set_untagged(ba_new);
+}
+
+// Allocates memory
 void growable_byte_array::grow_bytes(cell len) {
   count += len;
-  if (count >= array_capacity(elements.untagged()))
-    elements = elements.parent->reallot_array(elements.untagged(), count * 2);
+  if (count >= array_capacity(elements.untagged())) {
+    reallot_array(2 * count);
+  }
 }
 
 // Allocates memory
@@ -49,9 +57,9 @@ void growable_byte_array::append_byte_array(cell byte_array_) {
 
   cell len = array_capacity(byte_array.untagged());
   cell new_size = count + len;
-  factor_vm* parent = elements.parent;
-  if (new_size >= array_capacity(elements.untagged()))
-    elements = parent->reallot_array(elements.untagged(), new_size * 2);
+  if (new_size >= array_capacity(elements.untagged())) {
+    reallot_array(2 * new_size);
+  }
 
   memcpy(&elements->data<uint8_t>()[count], byte_array->data<uint8_t>(), len);
 
@@ -60,8 +68,7 @@ void growable_byte_array::append_byte_array(cell byte_array_) {
 
 // Allocates memory
 void growable_byte_array::trim() {
-  factor_vm* parent = elements.parent;
-  elements = parent->reallot_array(elements.untagged(), count);
+  reallot_array(count);
 }
 
 }
