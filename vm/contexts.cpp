@@ -240,7 +240,7 @@ void factor_vm::primitive_retainstack_for() {
 }
 
 // returns pointer to top of stack
-cell factor_vm::array_to_stack(array* array, cell bottom) {
+static cell array_to_stack(array* array, cell bottom) {
   cell depth = array_capacity(array) * sizeof(cell);
   memcpy((void*)bottom, array + 1, depth);
   return bottom + depth - sizeof(cell);
