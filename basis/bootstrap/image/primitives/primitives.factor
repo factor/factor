@@ -357,10 +357,6 @@ CONSTANT: all-primitives {
                 "strip-stack-traces" ( -- ) "strip_stack_traces"
                 { } { } f
             }
-            {
-                "unimplemented" ( -- * ) "unimplemented"
-                { } { } f
-            }
         }
     }
     {
