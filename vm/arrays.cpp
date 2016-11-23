@@ -24,12 +24,12 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_) {
   data_root<object> v2(v2_, this);
   data_root<object> v3(v3_, this);
   data_root<object> v4(v4_, this);
-  data_root<array> a(allot_uninitialized_array<array>(4), this);
-  set_array_nth(a.untagged(), 0, v1.value());
-  set_array_nth(a.untagged(), 1, v2.value());
-  set_array_nth(a.untagged(), 2, v3.value());
-  set_array_nth(a.untagged(), 3, v4.value());
-  return a.value();
+  array *a = allot_uninitialized_array<array>(4);
+  set_array_nth(a, 0, v1.value());
+  set_array_nth(a, 1, v2.value());
+  set_array_nth(a, 2, v3.value());
+  set_array_nth(a, 3, v4.value());
+  return tag<array>(a);
 }
 
 // Allocates memory
