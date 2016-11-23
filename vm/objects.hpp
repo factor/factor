@@ -64,10 +64,13 @@ enum special_object {
   SIGNAL_HANDLER_WORD,
   LEAF_SIGNAL_HANDLER_WORD,
   WIN_EXCEPTION_HANDLER,
-  UNUSED2,
 
-  // Incremented on every modify-code-heap call; invalidates call( inline
-  // caching
+  // Vector used by the sampling profiler to store collected call
+  // frames.
+  OBJ_SAMPLE_CALLSTACKS = 51,
+
+  // Incremented on every modify-code-heap call; invalidates call(
+  // inline caching
   REDEFINITION_COUNTER = 52,
 
   // Callback stub generation in callbacks.cpp

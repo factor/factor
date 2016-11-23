@@ -214,10 +214,6 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
     iter->second = visit_pointer(iter->second);
   }
 
-  FACTOR_FOR_EACH(parent->sample_callstacks) {
-    visit_handle(&*iter);
-  }
-
   FACTOR_FOR_EACH(parent->samples) {
     visit_handle(&iter->thread);
   }

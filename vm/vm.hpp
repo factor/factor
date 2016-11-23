@@ -86,7 +86,6 @@ struct factor_vm {
 
   // State kept by the sampling profiler
   std::vector<profiling_sample> samples;
-  std::vector<cell> sample_callstacks;
   volatile profiling_sample_count sample_counts;
 
   // GC is off during heap walking
@@ -193,6 +192,8 @@ struct factor_vm {
   void set_sampling_profiler(fixnum rate);
   void primitive_sampling_profiler();
   void primitive_get_samples();
+  array* allot_growarr();
+  void growarr_add(array *growarr_, cell value);
 
   // errors
   void general_error(vm_error_type error, cell arg1, cell arg2);
