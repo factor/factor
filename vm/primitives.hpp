@@ -36,7 +36,7 @@ namespace factor {
       _(set_datastack) _(set_innermost_stack_frame_quotation)                  \
       _(set_retainstack) _(set_slot) _(set_special_object)                     \
       _(set_string_nth_fast) _(size) _(sleep) _(special_object) _(string)      \
-      _(strip_stack_traces) _(tuple) _(tuple_boa) _(unimplemented)             \
+      _(strip_stack_traces) _(tuple) _(tuple_boa)                              \
       _(uninitialized_byte_array) _(word) _(word_code) _(word_optimized_p)     \
       _(wrapper)
 

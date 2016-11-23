@@ -56,7 +56,6 @@ PRIMITIVE: signal-handler ( -- )
 PRIMITIVE: special-object ( n -- obj )
 PRIMITIVE: strip-stack-traces ( -- )
 PRIMITIVE: tag ( object -- n )
-PRIMITIVE: unimplemented ( -- * )
 PRIMITIVE: unwind-native-frames ( -- )
 PRIVATE>
 

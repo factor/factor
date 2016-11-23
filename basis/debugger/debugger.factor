@@ -134,9 +134,6 @@ HOOK: signal-error. os ( obj -- )
 : memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
 
-: primitive-error. ( error -- )
-    "Unimplemented primitive" print drop ;
-
 : fp-trap-error. ( error -- )
     "Floating point trap" print drop ;
 
@@ -158,7 +155,7 @@ PREDICATE: vm-error < array
     second {
         [ expired-error.           ]
         [ io-error.                ]
-        [ primitive-error.         ]
+        [ drop                     ]
         [ type-check-error.        ]
         [ divide-by-zero-error.    ]
         [ signal-error.            ]

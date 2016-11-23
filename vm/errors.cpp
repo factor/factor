@@ -93,11 +93,6 @@ void factor_vm::type_error(cell type, cell tagged) {
   general_error(ERROR_TYPE, tag_fixnum(type), tagged);
 }
 
-// Allocates memory
-void factor_vm::not_implemented_error() {
-  general_error(ERROR_NOT_IMPLEMENTED, false_object, false_object);
-}
-
 void factor_vm::set_memory_protection_error(cell fault_addr, cell fault_pc) {
   // Called from the OS-specific top halves of the signal handlers to
   // make sure it's safe to dispatch to memory_signal_handler_impl.
@@ -117,10 +112,6 @@ void factor_vm::set_memory_protection_error(cell fault_addr, cell fault_pc) {
 void factor_vm::divide_by_zero_error() {
   general_error(ERROR_DIVIDE_BY_ZERO, false_object, false_object);
 }
-
-// For testing purposes
-// Allocates memory
-void factor_vm::primitive_unimplemented() { not_implemented_error(); }
 
 // Allocates memory
 void memory_signal_handler_impl() {
