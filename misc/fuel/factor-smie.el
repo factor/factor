@@ -16,18 +16,20 @@
   :safe 'integerp
   :group 'factor)
 
+;; These prefixes starts a definition and causes the indent-level to
+;; increase.
 (defconst factor-indent-def-starts
   '("" ":"
     "AFTER" "BEFORE"
     "COM-INTERFACE" "CONSULT"
     "ENUM" "ERROR"
-    "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
+    "FROM"
     "IDENTITY-MEMO"
-    "INTERSECTION:"
+    "INTERSECTION"
     "M" "M:" "MACRO" "MACRO:"
     "MAIN-WINDOW" "MEMO" "MEMO:" "METHOD"
     "SYNTAX"
-    "PREDICATE" "PRIMITIVE" "PROTOCOL"
+    "PREDICATE" "PROTOCOL"
     "SINGLETONS"
     "STRUCT" "SYMBOLS" "TAG" "TUPLE"
     "TYPED" "TYPED:"
@@ -35,8 +37,14 @@
     "UNION-STRUCT" "UNION"
     "VARIANT" "VERTEX-FORMAT"))
 
+;; These prefixes starts a definition but does not cause the indent
+;; level to increase.
 (defconst factor-no-indent-def-starts
-  '("ARTICLE" "HELP" "SPECIALIZED-ARRAYS"))
+  '("ARTICLE"
+    "FUNCTION" "FUNCTION-ALIAS"
+    "HELP"
+    "PRIMITIVE"
+    "SPECIALIZED-ARRAYS"))
 
 (defconst factor-indent-def-regex
   (format "^\\(%s:\\)$" (regexp-opt factor-indent-def-starts)))
