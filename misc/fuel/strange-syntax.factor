@@ -89,9 +89,15 @@ STRUCT: timeval
     { sec long }
     { usec long } ;
 
-FUNCTION: int futimes ( int id, timeval[2] times )
+FUNCTION: int futimes ( int id,
+                        timeval[2] times,
+                        int x,
+                        int y )
 FUNCTION: int booyah ( int x )
 FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
 
 HEXCOLOR: ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
 2drop 2drop drop
+
+PRIMITIVE: one ( a -- b )
+PRIMITIVE: two ( c -- d )
