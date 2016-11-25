@@ -1,6 +1,7 @@
 USING: alien byte-arrays compiler.cfg compiler.cfg.instructions
-compiler.codegen.labels compiler.codegen.relocation cpu.architecture hashtables
-help.markup help.syntax literals make multiline sequences ;
+compiler.codegen.labels compiler.codegen.relocation cpu.architecture
+hashtables help.markup help.syntax literals make multiline quotations
+sequences ;
 IN: compiler.codegen
 
 <<
@@ -100,13 +101,21 @@ HELP: useless-branch?
 }
 { $description "If successor immediately follows bb in the linearization order, then a branch is is not needed." } ;
 
-HELP: init-fixup
-{ $description "Initializes variables needed for fixup." } ;
-
 HELP: check-fixup
 { $values { "seq" "a " { $link sequence } " of generated machine code." } }
 { $description "Used by " { $link with-fixup } " to ensure that the generated machine code is properly aligned." } ;
 
-ARTICLE: "compiler.codegen" "Code generation from MR (machine representation)" "Code generators for cfg instructions." ;
+HELP: with-fixup
+{ $values
+  { "quot" quotation }
+  { "code" sequence }
+}
+{ $description "Runs the quotation to emit compiled code. The output is a six-tuple with the same format as the one outputted by " { $link generate } "." } ;
+
+ARTICLE: "compiler.codegen" "Code generation from MR (machine representation)"
+"Code generators for cfg instructions."
+$nl
+"Combinators:"
+{ $subsections with-fixup } ;
 
 ABOUT: "compiler.codegen"

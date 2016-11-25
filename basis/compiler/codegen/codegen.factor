@@ -62,10 +62,6 @@ M: ##dispatch generate-insn
         instructions>> [ generate-insn ] each
     ] tri ;
 
-: init-fixup ( -- )
-    V{ } clone label-table set
-    V{ } clone binary-literal-table set ;
-
 : check-fixup ( seq -- )
     length data-alignment get mod 0 assert= ;
 
@@ -74,7 +70,8 @@ M: ##dispatch generate-insn
         init-relocation
         V{ } clone return-addresses set
         V{ } clone gc-maps set
-        init-fixup
+        V{ } clone label-table set
+        V{ } clone binary-literal-table set
         [
             @
             emit-binary-literals
