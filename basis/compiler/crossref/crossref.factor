@@ -12,20 +12,17 @@ SYMBOL: generic-call-site-crossref
 
 generic-call-site-crossref [ H{ } clone ] initialize
 
-: effect-dependencies-of ( word -- assoc )
+: all-dependencies-of ( word -- assoc )
     compiled-crossref get at ;
 
-: definition-dependencies-of ( word -- assoc )
-    effect-dependencies-of [ nip definition-dependency dependency>= ] assoc-filter ;
-
-: conditional-dependencies-of ( word -- assoc )
-    effect-dependencies-of [ nip conditional-dependency dependency>= ] assoc-filter ;
+: dependencies-of ( word dep-type -- assoc )
+    [ all-dependencies-of ] dip '[ nip _ dependency>= ] assoc-filter ;
 
 : outdated-definition-usages ( set -- assocs )
-    members [ word? ] filter [ definition-dependencies-of ] map ;
+    members [ word? ] filter [ definition-dependency dependencies-of ] map ;
 
 : outdated-effect-usages ( set -- assocs )
-    members [ word? ] filter [ effect-dependencies-of ] map ;
+    members [ word? ] filter [ all-dependencies-of ] map ;
 
 : dependencies-satisfied? ( word cache -- ? )
     [ "dependency-checks" word-prop ] dip
@@ -33,7 +30,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
 
 : outdated-conditional-usages ( set -- assocs )
     members H{ } clone '[
-        conditional-dependencies-of
+        conditional-dependency dependencies-of
         [ drop _ dependencies-satisfied? ] assoc-reject
     ] map ;
 
