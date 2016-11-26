@@ -11,6 +11,13 @@ IN: vocabs.metadata.resources.tests
     "*.txt" { "foo.bar" "foo.factor" } match-pattern
 ] [ resource-missing? ] must-fail-with
 
+! match-patterns
+{
+    { "a.txt" "b.pdf" }
+} [
+    { "*.txt" "*.pdf" } { "a.txt" "b.pdf" "a" } match-patterns
+] unit-test
+
 ! vocab-resource-files
 { { "bar" "bas" "foo" } }
 [ "vocabs.metadata.resources.test.1" vocab-resource-files natural-sort ] unit-test
