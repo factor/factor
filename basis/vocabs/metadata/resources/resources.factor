@@ -29,7 +29,7 @@ ERROR: resource-missing pattern ;
     [ resource-missing ] [ nip ] if-empty ;
 
 : match-patterns ( patterns filenames -- filenames' )
-    '[ _ match-pattern ] map concat members ;
+    '[ _ match-pattern ] gather ;
 
 : vocab-resource-files ( vocab -- filenames )
     [ vocab-resources ] [ vocab-dir-in-root ] bi
