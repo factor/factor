@@ -6,23 +6,18 @@ generic kernel math namespaces sequences sets words ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
 
-! Words that the current quotation depends on
 SYMBOL: dependencies
 
-SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
+SYMBOLS: +effect+ +conditional+ +definition+ ;
 
 : index>= ( obj1 obj2 seq -- ? )
     [ index ] curry bi@ >= ;
 
 : dependency>= ( how1 how2 -- ? )
-    {
-        effect-dependency
-        conditional-dependency
-        definition-dependency
-    } index>= ;
+    { +effect+ +conditional+ +definition+ } index>= ;
 
 : strongest-dependency ( how1 how2 -- how )
-    [ effect-dependency or ] bi@ [ dependency>= ] most ;
+    [ +effect+ or ] bi@ [ dependency>= ] most ;
 
 : depends-on ( word how -- )
     over primitive? [ 2drop ] [
@@ -32,13 +27,13 @@ SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
     ] if ;
 
 : add-depends-on-effect ( word -- )
-    effect-dependency depends-on ;
+    +effect+ depends-on ;
 
 : add-depends-on-conditionally ( word -- )
-    conditional-dependency depends-on ;
+    +conditional+ depends-on ;
 
 : add-depends-on-definition ( word -- )
-    definition-dependency depends-on ;
+    +definition+ depends-on ;
 
 GENERIC: add-depends-on-c-type ( c-type -- )
 

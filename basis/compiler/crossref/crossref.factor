@@ -19,7 +19,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     [ all-dependencies-of ] dip '[ nip _ dependency>= ] assoc-filter ;
 
 : outdated-definition-usages ( set -- assocs )
-    members [ word? ] filter [ definition-dependency dependencies-of ] map ;
+    members [ word? ] filter [ +definition+ dependencies-of ] map ;
 
 : outdated-effect-usages ( set -- assocs )
     members [ word? ] filter [ all-dependencies-of ] map ;
@@ -30,7 +30,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
 
 : outdated-conditional-usages ( set -- assocs )
     members H{ } clone '[
-        conditional-dependency dependencies-of
+        +conditional+ dependencies-of
         [ drop _ dependencies-satisfied? ] assoc-reject
     ] map ;
 
@@ -44,8 +44,8 @@ generic-call-site-crossref [ H{ } clone ] initialize
     concat f like "generic-call-sites" set-word-prop ;
 
 : split-dependencies ( assoc -- effect-deps cond-deps def-deps )
-    [ nip effect-dependency eq? ] assoc-partition
-    [ nip conditional-dependency eq? ] assoc-partition ;
+    [ nip +effect+ eq? ] assoc-partition
+    [ nip +conditional+ eq? ] assoc-partition ;
 
 : (store-dependencies) ( word assoc prop -- )
     [ keys f like ] dip set-word-prop ;
@@ -79,9 +79,9 @@ generic-call-site-crossref [ H{ } clone ] initialize
 
 : join-dependencies ( effect-deps cond-deps def-deps -- assoc )
     H{ } clone [
-        [ effect-dependency set-at-each ]
-        [ conditional-dependency set-at-each ]
-        [ definition-dependency set-at-each ] tri-curry tri*
+        [ +effect+ set-at-each ]
+        [ +conditional+ set-at-each ]
+        [ +definition+ set-at-each ] tri-curry tri*
     ] keep ;
 
 : load-dependencies ( word -- assoc )
