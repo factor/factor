@@ -14,39 +14,39 @@ IN: compiler.crossref.tests
         {
             10
             H{
-                { 20 definition-dependency }
-                { 30 conditional-dependency }
-                { 40 effect-dependency }
+                { 20 +definition+ }
+                { 30 +conditional+ }
+                { 40 +effect+ }
             }
         }
     } clone ;
 
 ! dependencies-of
 {
-    H{ { 20 definition-dependency } }
+    H{ { 20 +definition+ } }
 } [
     setup-crossref compiled-crossref [
-        10 definition-dependency dependencies-of
+        10 +definition+ dependencies-of
     ] with-variable
 ] unit-test
 
 {
-    H{ { 20 definition-dependency } { 30 conditional-dependency } }
+    H{ { 20 +definition+ } { 30 +conditional+ } }
 } [
     setup-crossref compiled-crossref [
-        10 conditional-dependency dependencies-of
+        10 +conditional+ dependencies-of
     ] with-variable
 ] unit-test
 
 ! join-dependencies
 {
     H{
-        { 1 effect-dependency }
-        { 2 effect-dependency }
-        { 3 conditional-dependency }
-        { 4 conditional-dependency }
-        { 5 definition-dependency }
-        { 6 definition-dependency }
+        { 1 +effect+ }
+        { 2 +effect+ }
+        { 3 +conditional+ }
+        { 4 +conditional+ }
+        { 5 +definition+ }
+        { 6 +definition+ }
     }
 } [
     { 1 2 } { 3 4 } { 5 6 } join-dependencies
