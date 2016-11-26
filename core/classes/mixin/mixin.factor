@@ -68,9 +68,7 @@ ERROR: check-mixin-class-error class ;
 
 PRIVATE>
 
-GENERIC# add-mixin-instance 1 ( class mixin -- )
-
-M: class add-mixin-instance
+: add-mixin-instance ( class mixin -- )
     [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
