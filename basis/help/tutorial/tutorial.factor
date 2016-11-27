@@ -105,8 +105,8 @@ $nl
 $nl
 "Add the following two lines to " { $snippet "palindrome-tests.factor" } ":"
 { $code
-    "[ f ] [ \"hello\" palindrome? ] unit-test"
-    "[ t ] [ \"racecar\" palindrome? ] unit-test"
+    "{ f } [ \"hello\" palindrome? ] unit-test"
+    "{ t } [ \"racecar\" palindrome? ] unit-test"
 }
 $nl
 "Now, you can run unit tests:"
@@ -115,9 +115,9 @@ $nl
 "It should report that all your tests have been run and there were no test failures, displaying the following output:"
 $nl
 { $snippet
-    "Unit Test: { [ f ] [ \"hello\" palindrome? ] }"
+    "Unit Test: { { f } [ \"hello\" palindrome? ] }"
     "\n"
-    "Unit Test: { [ t ] [ \"racecar\" palindrome? ] }"
+    "Unit Test: { { t } [ \"racecar\" palindrome? ] }"
 }
 $nl
 "Now you can read about " { $link "first-program-extend" } "." ;
