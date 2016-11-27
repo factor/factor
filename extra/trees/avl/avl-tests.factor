@@ -3,7 +3,7 @@ assocs accessors trees.avl.private trees.private ;
 IN: trees.avl.tests
 
 { "key1" 0 "key2" 0 } [
-    T{ avl-node f "key1" f f T{ avl-node f "key2" f f 1 } 2 }
+    T{ avl-node f "key1" f f T{ avl-node f "key2" f f f 1 } 2 }
     [ single-rotate ] go-left
     [ left>> dup key>> swap balance>> ] keep
     dup key>> swap balance>>
