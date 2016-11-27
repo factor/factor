@@ -23,10 +23,9 @@ TUPLE: avl-node < node balance ;
     '[ _ + ] change-balance ;
 
 : rotate ( node -- node )
-    dup
-    [ node+link ]
-    [ node-link ]
-    [ set-node+link ] tri
+    dup node+link
+    dup node-link
+    pick set-node+link
     [ set-node-link ] keep ;
 
 : single-rotate ( node -- node )
