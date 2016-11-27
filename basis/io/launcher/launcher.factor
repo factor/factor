@@ -4,8 +4,8 @@
 USING: accessors assocs calendar combinators concurrency.flags
 debugger destructors environment fry init io io.backend
 io.encodings io.encodings.utf8 io.pipes io.pipes.private
-io.ports io.streams.duplex io.timeouts kernel namespaces
-prettyprint sequences strings system threads vocabs ;
+io.ports io.streams.duplex io.timeouts kernel math math.order
+namespaces prettyprint sequences strings system threads vocabs ;
 
 IN: io.launcher
 
@@ -74,14 +74,23 @@ HOOK: (wait-for-processes) io-backend ( -- ? )
 <PRIVATE
 
 SYMBOL: wait-flag
+SYMBOL: wait-delay
 
 : wait-loop ( -- )
-    processes get assoc-empty?
-    [ wait-flag get-global lower-flag ]
-    [ (wait-for-processes) [ 100 milliseconds sleep ] when ] if ;
+    processes get assoc-empty? [
+        5 wait-delay set-global
+        wait-flag get-global lower-flag
+    ] [
+        (wait-for-processes) [
+            wait-delay [
+                [ milliseconds sleep ] [ 5 + 100 max ] bi
+            ] change-global
+        ] when
+    ] if ;
 
 : start-wait-thread ( -- )
     <flag> wait-flag set-global
+    5 wait-delay set-global
     [ wait-loop t ] "Process wait" spawn-server drop ;
 
 [
@@ -93,6 +102,11 @@ SYMBOL: wait-flag
     >>handle
     V{ } clone swap processes get set-at
     wait-flag get-global raise-flag ;
+
+: notify-exit ( process status -- )
+    >>status
+    [ processes get delete-at* drop [ resume ] each ] keep
+    f >>handle drop ;
 
 : pass-environment? ( process -- ? )
     dup environment>> assoc-empty? not
@@ -295,16 +309,6 @@ M: output-process-error error.
     utf8 (process-reader)
     [ [ stream-contents ] [ dup (wait-for-process) ] bi* ] with-timeout
     0 = [ 2drop ] [ output-process-error ] if ;
-
-<PRIVATE
-
-: notify-exit ( process status -- )
-    >>status
-    [ processes get delete-at* drop [ resume ] each ] keep
-    f >>handle
-    drop ;
-
-PRIVATE>
 
 {
     { [ os unix? ] [ "io.launcher.unix" require ] }
