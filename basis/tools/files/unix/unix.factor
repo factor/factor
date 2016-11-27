@@ -42,7 +42,7 @@ IN: tools.files.unix
         { [ dup S_IFLNK = ] [ drop "@" ] }
         { [ dup S_IFWHT = ] [ drop "%" ] }
         { [ dup S_IFSOCK = ] [ drop "=" ] }
-        { [ t ] [ drop "" ] }
+        [ drop "" ]
     } cond ;
 
 M: unix (directory.) ( path -- lines )

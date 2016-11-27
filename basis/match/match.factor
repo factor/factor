@@ -39,7 +39,7 @@ PREDICATE: match-var < word "match-var" word-prop ;
             2dup [ class-of ] same? [
                 [ tuple-slots ] bi@ [ (match) ] 2all?
             ] [ 2drop f ] if ] }
-        { [ t ] [ 2drop f ] }
+        [ 2drop f ]
     } cond ;
 
 : match ( value1 value2 -- bindings )
@@ -84,7 +84,7 @@ M: tuple replace-patterns tuple>array replace-patterns >tuple ;
     (match-first) drop ;
 
 : (match-all) ( seq pattern-seq -- )
-    [ nip ] [ (match-first) swap ] 2bi
+    [ (match-first) ] keep
     [ , [ swap (match-all) ] [ drop ] if* ] [ 2drop ] if* ;
 
 : match-all ( seq pattern-seq -- bindings-seq )

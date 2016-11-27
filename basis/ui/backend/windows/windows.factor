@@ -415,7 +415,7 @@ CONSTANT: exclude-keys-wm-char
         { [ over SC_RESTORE = ] [ t set-window-active ] }
         { [ over SC_MAXIMIZE = ] [ t set-window-active ] }
         { [ dup alpha? ] [ 4drop 0 ] }
-        { [ t ] [ DefWindowProc ] }
+        [ DefWindowProc ]
     } cond ;
 
 : cleanup-window ( handle -- )
