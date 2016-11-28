@@ -2,7 +2,13 @@ USING: help.markup help.syntax ;
 IN: stack-checker.dependencies
 
 HELP: +definition+
-{ $class-description "Word that indicates that the dependency is a definition dependency. It is a dependency among two words in which one word depends on the definition of the another. For example, if two words are defined as " { $snippet ": o ( -- ) i ;" } " and " { $snippet ": i ( -- ) ; inline" } ", then 'o' has a definition dependency to 'i' because 'i' is inline. If the definition of 'i' changes 'o' must be recompiled." } ;
+{ $description "Word that indicates that the dependency is a definition dependency. It is a dependency among two words in which one word depends on the definition of the another. For example, if two words are defined as " { $snippet ": o ( -- ) i ;" } " and " { $snippet ": i ( -- ) ; inline" } ", then 'o' has a definition dependency to 'i' because 'i' is inline. If the definition of 'i' changes 'o' must be recompiled." } ;
+
+HELP: +effect+
+{ $description "Word that indicates that the dependency is an effect dependency." } ;
+
+HELP: +conditional+
+{ $description "Word that indicates that the dependency is a conditional dependency." } ;
 
 HELP: dependencies
 { $var-description "Words that the current quotation depends on." } ;
