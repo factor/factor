@@ -1,5 +1,5 @@
-USING: accessors assocs compiler.crossref fry kernel namespaces
-sequences stack-checker.dependencies tools.test vocabs words ;
+USING: assocs compiler.crossref fry io kernel namespaces sequences
+stack-checker.dependencies tools.test vocabs words ;
 IN: compiler.crossref.tests
 
 ! Dependencies of all words should always be satisfied unless we're
@@ -21,6 +21,19 @@ IN: compiler.crossref.tests
         }
     } clone ;
 
+! compiled-unxref
+SYMBOL: kolobi
+{ f f } [
+    ! Setup a fake dependency; kolobi -> print
+    +effect+ kolobi compiled-crossref get \ print of set-at
+    kolobi { print } "dependencies" set-word-prop
+
+    ! Ensure it is being forgotten
+    kolobi compiled-unxref
+    kolobi "dependencies" word-prop
+    compiled-crossref get \ print of kolobi of
+] unit-test
+
 ! dependencies-of
 {
     H{ { 20 +definition+ } }
@@ -38,18 +51,15 @@ IN: compiler.crossref.tests
     ] with-variable
 ] unit-test
 
-! join-dependencies
+! remove-xref
+SYMBOLS: foo1 bar ;
 {
-    H{
-        { 1 +effect+ }
-        { 2 +effect+ }
-        { 3 +conditional+ }
-        { 4 +conditional+ }
-        { 5 +definition+ }
-        { 6 +definition+ }
-    }
+    H{ { foo1 H{ } } }
 } [
-    { 1 2 } { 3 4 } { 5 6 } join-dependencies
+    bar { foo1 }
+    H{
+        { foo1 H{ { bar +definition+ } } }
+    } clone [ remove-xref ] keep
 ] unit-test
 
 ! store-dependencies
@@ -63,10 +73,8 @@ IN: compiler.crossref.tests
 
 SYMBOL: foo
 {
-    { 20 } { 40 50 } { 30 }
+    { 40 50 20 30 }
 } [
-    foo [ setup-deps store-dependencies ] keep props>>
-    [ "definition-dependencies" of ]
-    [ "effect-dependencies" of ]
-    [ "conditional-dependencies" of ] tri
+    foo [ setup-deps store-dependencies ] keep "dependencies" word-prop
+    foo delete-compiled-xref
 ] unit-test

@@ -47,11 +47,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     [ rot '[ nip _ = ] assoc-filter keys ] dip set-word-prop ;
 
 : store-dependencies ( word assoc -- )
-    {
-        { +effect+ "effect-dependencies" }
-        { +conditional+ "conditional-dependencies" }
-        { +definition+ "definition-dependencies" }
-    } [ store-dependencies-of-type ] 2with assoc-each ;
+    keys "dependencies" set-word-prop ;
 
 : add-xref ( word dependencies crossref -- )
     rot '[
@@ -59,7 +55,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     ] assoc-each ;
 
 : remove-xref ( word dependencies crossref -- )
-    [ keys ] dip '[ _ at delete-at ] with each ;
+    '[ _ at delete-at ] with each ;
 
 : (compiled-xref) ( word dependencies generic-dependencies -- )
     compiled-crossref generic-call-site-crossref
@@ -72,21 +68,8 @@ generic-call-site-crossref [ H{ } clone ] initialize
     [ (compiled-xref) ]
     3tri ;
 
-: set-at-each ( keys assoc value -- )
-    '[ _ [ _ ] 2dip set-at ] each ;
-
-: join-dependencies ( effect-deps cond-deps def-deps -- assoc )
-    H{ } clone [
-        [ +effect+ set-at-each ]
-        [ +conditional+ set-at-each ]
-        [ +definition+ set-at-each ] tri-curry tri*
-    ] keep ;
-
-: load-dependencies ( word -- assoc )
-    [ "effect-dependencies" word-prop ]
-    [ "conditional-dependencies" word-prop ]
-    [ "definition-dependencies" word-prop ] tri
-    join-dependencies ;
+: load-dependencies ( word -- seq )
+    "dependencies" word-prop ;
 
 : (compiled-unxref) ( word dependencies variable -- )
     get remove-xref ;
@@ -98,9 +81,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     {
         [ dup load-dependencies compiled-crossref (compiled-unxref) ]
         [ dup generic-call-sites generic-call-site-crossref (compiled-unxref) ]
-        [ "effect-dependencies" remove-word-prop ]
-        [ "conditional-dependencies" remove-word-prop ]
-        [ "definition-dependencies" remove-word-prop ]
+        [ "dependencies" remove-word-prop ]
         [ "generic-call-sites" remove-word-prop ]
     } cleave ;
 

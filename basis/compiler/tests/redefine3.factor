@@ -1,6 +1,5 @@
-USING: accessors compiler compiler.units tools.test math parser
-kernel sequences sequences.private classes.mixin generic
-definitions arrays words assocs eval grouping ;
+USING: arrays classes.mixin compiler.crossref compiler.units eval
+generic kernel sequences tools.test words ;
 IN: compiler.tests.redefine3
 
 GENERIC: sheeple ( obj -- x )
@@ -14,7 +13,7 @@ M: empty-mixin sheeple drop "wake up" ; inline
 : sheeple-test ( -- string ) { } sheeple ;
 
 : compiled-use? ( key word -- ? )
-    "definition-dependencies" word-prop member-eq? ;
+    load-dependencies member-eq? ;
 
 [ "sheeple" ] [ sheeple-test ] unit-test
 [ t ] [ \ sheeple-test word-optimized? ] unit-test
