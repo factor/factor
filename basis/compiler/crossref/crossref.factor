@@ -43,17 +43,15 @@ generic-call-site-crossref [ H{ } clone ] initialize
 : set-generic-call-sites ( word alist -- )
     concat f like "generic-call-sites" set-word-prop ;
 
-: split-dependencies ( assoc -- effect-deps cond-deps def-deps )
-    [ nip +effect+ eq? ] assoc-partition
-    [ nip +conditional+ eq? ] assoc-partition ;
-
-: (store-dependencies) ( word assoc prop -- )
-    [ keys f like ] dip set-word-prop ;
+: store-dependencies-of-type ( word assoc symbol prop-name -- )
+    [ rot '[ nip _ = ] assoc-filter keys ] dip set-word-prop ;
 
 : store-dependencies ( word assoc -- )
-    split-dependencies
-    "effect-dependencies" "conditional-dependencies" "definition-dependencies"
-    [ (store-dependencies) ] tri-curry@ tri-curry* tri ;
+    {
+        { +effect+ "effect-dependencies" }
+        { +conditional+ "conditional-dependencies" }
+        { +definition+ "definition-dependencies" }
+    } [ store-dependencies-of-type ] 2with assoc-each ;
 
 : add-xref ( word dependencies crossref -- )
     rot '[

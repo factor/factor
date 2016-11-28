@@ -1,5 +1,5 @@
-USING: compiler.crossref fry kernel namespaces sequences
-stack-checker.dependencies tools.test vocabs words ;
+USING: accessors assocs compiler.crossref fry kernel namespaces
+sequences stack-checker.dependencies tools.test vocabs words ;
 IN: compiler.crossref.tests
 
 ! Dependencies of all words should always be satisfied unless we're
@@ -50,4 +50,23 @@ IN: compiler.crossref.tests
     }
 } [
     { 1 2 } { 3 4 } { 5 6 } join-dependencies
+] unit-test
+
+! store-dependencies
+: setup-deps ( -- assoc )
+    H{
+        { 20 +definition+ }
+        { 30 +conditional+ }
+        { 40 +effect+ }
+        { 50 +effect+ }
+    } ;
+
+SYMBOL: foo
+{
+    { 20 } { 40 50 } { 30 }
+} [
+    foo [ setup-deps store-dependencies ] keep props>>
+    [ "definition-dependencies" of ]
+    [ "effect-dependencies" of ]
+    [ "conditional-dependencies" of ] tri
 ] unit-test
