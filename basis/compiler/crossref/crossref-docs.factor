@@ -1,13 +1,21 @@
-USING: assocs help.markup help.syntax words ;
+USING: assocs help.markup help.syntax sequences words ;
 IN: compiler.crossref
 
 HELP: compiled-crossref
-{ $var-description "A hashtable that maps words to other words that depend on them. It also stores the types of the dependencies." } ;
+{ $var-description "A hashtable that maps words to other words that depend on them and their dependency types." } ;
+
+HELP: delete-compiled-xref
+{ $values { "word" word } }
+{ $description "Deletes cross-referencing data for a word. Used when the optimizing compiler forgets a word." } ;
 
 HELP: load-dependencies
-{ $values { "word" word } { "assoc" assoc } }
-{ $description "Creates an assoc where keys are the words the word depends on and values are the dependency type." } ;
+{ $values { "word" word } { "seq" sequence } }
+{ $description "Outputs a sequence of the words dependencies." } ;
+
+HELP: remove-xref
+{ $values { "word" word } { "dependencies" sequence } { "crossref" assoc } }
+{ $description "Removes a set of dependencies from the cross referencing table." } ;
 
 HELP: store-dependencies
 { $values { "word" word } { "assoc" assoc } }
-{ $description "Stores the dependencies in 'assoc' in the word attributes named \"effect-dependencies\", \"conditional-dependencies\" and \"definition-dependencies\"." } ;
+{ $description "Stores the dependencies in 'assoc' in the word attribute \"dependencies\"." } ;
