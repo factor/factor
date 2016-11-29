@@ -75,3 +75,9 @@ IN: math.factorials
 
 { V{ 3 5 7 29 31 211 2309 2311 } }
 [ 10,000 iota [ primorial-prime? ] filter ] unit-test
+
+{ 10 } [ 3628800 reverse-factorial ] unit-test
+{ 12 } [ 479001600 reverse-factorial ] unit-test
+{ 3 } [ 6 reverse-factorial ] unit-test
+{ 1 } [ 1 reverse-factorial ] unit-test
+{ f } [ 18 reverse-factorial ] unit-test

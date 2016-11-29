@@ -118,3 +118,6 @@ PRIVATE>
 
 : primorial-prime? ( n -- ? )
     { [ prime? ] [ 2 > ] [ [ primorial ] -prime? ] } 1&& ;
+
+: reverse-factorial ( m -- n )
+    1 1 [ 2over > ] [ 1 + [ * ] keep ] while [ = ] dip and ;
