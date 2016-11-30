@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals words summary slots quotations
-sequences assocs math arrays stack-checker effects continuations
-classes.tuple namespaces make vectors bit-arrays byte-arrays
-strings sbufs math.functions macros sequences.private
-combinators mirrors splitting combinators.smart
-combinators.short-circuit fry words.symbol generalizations
-sequences.generalizations classes ;
+USING: accessors arrays assocs bit-arrays byte-arrays classes
+classes.tuple combinators combinators.short-circuit
+combinators.smart continuations effects fry generalizations
+kernel locals macros make math math.functions namespaces
+quotations sbufs sequences sequences.generalizations slots
+splitting stack-checker strings summary vectors words
+words.symbol ;
 IN: inverse
 
 ERROR: fail ;
