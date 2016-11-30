@@ -23,9 +23,9 @@ ERROR: no-tls-supported ;
 
 MEMO: best-tls-method ( -- class )
     {
-        { [ \ TLSv1_2_method word>dlsym ] [ TLSv1.2 ] }
-        { [ \ TLSv1_1_method word>dlsym ] [ TLSv1.1 ] }
-        { [ \ TLSv1_method word>dlsym ] [ TLSv1 ] }
+        { [ "TLSv1_2_method" "libssl" dlsym? ] [ TLSv1.2 ] }
+        { [ "TLSv1_1_method" "libssl" dlsym? ] [ TLSv1.1 ] }
+        { [ "TLSv1_method" "libssl" dlsym? ] [ TLSv1 ] }
         [ no-tls-supported ]
     } cond ;
 

@@ -44,6 +44,14 @@ HELP: dlsym
 { $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" { $maybe alien } } }
 { $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable. If the symbol was not found, outputs " { $link f } "." } ;
 
+HELP: dlsym?
+{ $values
+  { "function" string }
+  { "library" string }
+  { "alien/f" { $maybe alien } }
+}
+{ $description "Outputs the alien dynamically loaded with the given name in the given library. If no symbol is loaded, output f." } ;
+
 HELP: make-library
 { $values
      { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
@@ -71,10 +79,6 @@ HELP: load-library
 HELP: remove-library
 { $values { "name" string } }
 { $description "Unloads a library and removes it from the internal list of libraries. The " { $snippet "name" } " parameter should be a name that was previously passed to " { $link add-library } ". If no library with that name exists, this word does nothing." } ;
-
-HELP: word>dlsym
-{ $values { "word" word } { "alien/f" maybe{ alien } } }
-{ $description "Takes a word which calls a C library function and outputs the address of the symbol it points to as an alien. If the symbol isn't loaded, outputs f." } ;
 
 ARTICLE: "loading-libs" "Loading native libraries"
 "Before calling a C library, you must associate its path name on disk with a logical name which Factor uses to identify the library:"

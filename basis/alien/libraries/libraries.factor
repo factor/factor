@@ -29,10 +29,6 @@ C: <library> library
 
 : lookup-library ( name -- library/f ) libraries get at ;
 
-: word>dlsym ( word -- alien/f )
-    def>> [ third ] [ second dup [ lookup-library dll>> ] when ] bi
-    dlsym ;
-
 : open-dll ( path -- dll dll-error/f )
     [ dlopen dup dll-valid? [ f ] [ dlerror ] if ]
     [ f f ] if* ;
@@ -45,6 +41,9 @@ C: <library> library
 
 : load-library ( name -- dll )
     lookup-library library-dll ;
+
+: dlsym? ( function library -- alien/f )
+    load-library dlsym ;
 
 M: dll dispose dlclose ;
 
