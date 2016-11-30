@@ -22,7 +22,7 @@ HELP: JLE
 
 HELP: reserved-stack-space
 { $values { "n" integer } }
-{ $description "Size in bytes of the register parameter area. It only exists on the windows x86.64 architecture, where it is 32 bytes and allocated by the caller. On all other platforms it is 0." } ;
+{ $description "Size in bytes of the register parameter area. It only exists on the windows " { $link x86.64 } " architecture, where it is 32 bytes and allocated by the caller. On all other platforms it is 0." } ;
 
 HELP: stack-reg
 { $values { "reg" "a register symbol" } }
