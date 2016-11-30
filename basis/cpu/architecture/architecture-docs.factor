@@ -137,6 +137,16 @@ HELP: %c-invoke
 { $values { "symbols" byte-array } { "dll" dll } { "gc-map" gc-map } }
 { $description "Emits code for calling an FFI function." } ;
 
+HELP: %check-nursery-branch
+{ $values
+  { "label" "label" }
+  { "size" integer }
+  { "cc" "comparison symbol" }
+  { "temp1" "first temporary register" }
+  { "temp2" "second temporary register" }
+}
+{ $description "Emits code for jumping to the nursery garbage collection block if an allocation of size 'size' requires a garbage collection." } ;
+
 HELP: %context
 { $values { "dst" "a register symbol" } }
 { $description "Emits machine code for putting a pointer to the context field of the " { $link vm } " in a register." }
@@ -254,6 +264,14 @@ HELP: %shl-imm
 } { $description "Bitshifts the value in a register left by a constant." }
 { $see-also ##shl-imm } ;
 
+HELP: %spill
+{ $values
+  { "src" "source register" }
+  { "rep" representation }
+  { "dst" spill-slot }
+} { $description "Emits machine code for spilling a register to a spill slot." }
+{ $see-also %reload } ;
+
 HELP: %store-memory-imm
 { $values
   { "value" "source register" }
@@ -317,6 +335,9 @@ HELP: dummy-int-params?
 { $values { "?" boolean } }
 { $description "Whether the architecture's ABI uses dummy integer parameters. If it does, then the corresponding integer register is 'dummy allocated' when a floating point register is allocated." } { $see-also dummy-fp-params? } ;
 
+HELP: float-regs
+{ $description "Floating point register class." } ;
+
 HELP: fused-unboxing?
 { $values { "?" boolean } }
 { $description "Whether this architecture support " { $link %load-float } ", " { $link %load-double } ", and " { $link %load-vector } "." } ;
@@ -348,6 +369,9 @@ HELP: immediate-store?
 { $values { "n" number } { "?" boolean } }
 { $description "Can this value be an immediate operand for %replace-imm?" } ;
 
+HELP: int-regs
+{ $description "Integer register class." } ;
+
 HELP: machine-registers
 { $values { "assoc" assoc } }
 { $description "Mapping from register class to machine registers. Only registers not reserved by the Factor VM are included." } ;
@@ -358,7 +382,8 @@ HELP: param-regs
 
 HELP: rep-size
 { $values { "rep" representation } { "n" integer } }
-{ $description "Size in bytes of a representation." } ;
+{ $description "Size in bytes of a representation." }
+{ $see representation } ;
 
 HELP: reg-class-of
 { $values { "rep" representation } { "reg-class" reg-class } }
@@ -392,13 +417,19 @@ HELP: stack-cleanup
   }
 } ;
 
+HELP: stack-frame-size
+{ $values
+  { "stack-frame" stack-frame }
+  { "n" integer }
+} { $description "Calculates the total size of a stack frame, including padding and alignment." } ;
+
 HELP: test-instruction?
 { $values { "?" boolean } }
 { $description "Does the current architecture have a test instruction? Used on x86 to rewrite some " { $link CMP } " instructions to less expensive " { $link TEST } "s." } ;
 
 HELP: vm-stack-space
 { $values { "n" number } }
-{ $description "Parameter space to reserve in anything making VM calls." } ;
+{ $description "Parameter space to reserve in anything making VM calls. Why is this set to 16 on x86.32?" } ;
 
 ARTICLE: "cpu.architecture" "CPU architecture description model"
 "The " { $vocab-link "cpu.architecture" } " vocab contains generic words and hooks that serves as an api for the compiler towards the cpu architecture."
@@ -412,12 +443,56 @@ $nl
   fused-unboxing?
   test-instruction?
 }
+"Arithmetic:"
+{ $subsections
+  %add
+  %add-imm
+  %sub
+  %sub-imm
+  %mul
+  %mul-imm
+  %neg
+}
+"Bit twiddling:"
+{ $subsections
+  %and
+  %and-imm
+  %not
+  %or
+  %or-imm
+  %sar
+  %sar-imm
+  %shl
+  %shl-imm
+  %shr
+  %shr-imm
+  %xor
+  %xor-imm
+}
 "Control flow code emitters:"
-{ $subsections %call %jump %jump-label %return }
+{ $subsections
+  %call
+  %epilogue
+  %jump
+  %jump-label
+  %prologue
+  %return
+  %safepoint
+}
 "Foreign function interface:"
 { $subsections %c-invoke }
+"Garbage collection:"
+{ $subsections
+  %call-gc
+  %check-nursery-branch
+}
 "Moving values around:"
-{ $subsections %replace %replace-imm }
+{ $subsections
+  %clear
+  %peek
+  %replace
+  %replace-imm
+}
 "Register categories:"
 { $subsections
   machine-registers
@@ -443,8 +518,8 @@ $nl
   %slot-imm
   %write-barrier
 }
-"Spilling:"
-{ $subsections gc-root-offset }
+"Spilling & reloading:"
+{ $subsections %spill %reload gc-root-offset }
 "Value as immediate checks:"
 { $subsections
   immediate-arithmetic?
