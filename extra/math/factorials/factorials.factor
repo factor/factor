@@ -123,5 +123,3 @@ PRIVATE>
     1 1 [ 2over > ] [ 1 + [ * ] keep ] while [ = ] dip and ;
 
 \ factorial [ reverse-factorial ] define-inverse
-
-\ reverse-factorial [ factorial ] define-inverse
