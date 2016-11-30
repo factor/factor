@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators combinators.short-circuit fry kernel math
-math.functions math.primes math.ranges memoize sequences ;
+USING: combinators combinators.short-circuit fry inverse kernel
+math math.functions math.primes math.ranges memoize sequences ;
 
 IN: math.factorials
 
@@ -121,3 +121,7 @@ PRIVATE>
 
 : reverse-factorial ( m -- n )
     1 1 [ 2over > ] [ 1 + [ * ] keep ] while [ = ] dip and ;
+
+\ factorial [ reverse-factorial ] define-inverse
+
+\ reverse-factorial [ factorial ] define-inverse
