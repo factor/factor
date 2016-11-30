@@ -1,20 +1,22 @@
 ! Copyright (C) 2010 Philipp Brüschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.syntax arrays assocs
-combinators destructors gdk.pixbuf.ffi glib.ffi gobject.ffi grouping images
-images.loader io kernel locals math sequences system
-specialized-arrays unicode ;
+USING: accessors alien.c-types alien.data alien.libraries alien.syntax
+arrays assocs combinators gdk.pixbuf.ffi glib.ffi gobject.ffi grouping
+images images.loader init io kernel locals math sequences
+specialized-arrays system unicode ;
 IN: images.loader.gtk
 SPECIALIZED-ARRAY: uchar
 
 SINGLETON: gtk-image
 
-os linux? [
-    ! Explicit type initialization needed for glib < 2.36.
-    g_type_init
-    { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" }
-    [ gtk-image register-image-class ] each
-] when
+[
+    os linux? \ g_type_init word>dlsym and [
+        ! Explicit type initialization needed for glib < 2.36.
+        g_type_init
+        { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" }
+        [ gtk-image register-image-class ] each
+    ] when
+] "images.loader.gtk" add-startup-hook
 
 <PRIVATE
 
