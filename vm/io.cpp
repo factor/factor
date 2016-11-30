@@ -153,20 +153,20 @@ void factor_vm::safe_fflush(FILE* stream) {
 }
 
 void factor_vm::primitive_fopen() {
-  data_root<byte_array> mode(ctx->pop(), this);
-  data_root<byte_array> path(ctx->pop(), this);
-  check_tagged(mode);
-  check_tagged(path);
+  byte_array *mode = untag_check<byte_array>(ctx->pop());
+  byte_array *path = untag_check<byte_array>(ctx->pop());
 
-  FILE* file;
-  file = safe_fopen((char*)(path.untagged() + 1),
-                    (char*)(mode.untagged() + 1));
+  FILE* file = safe_fopen((char*)(path + 1), (char*)(mode + 1));
   ctx->push(allot_alien((cell)file));
 }
 
-FILE* factor_vm::pop_file_handle() { return (FILE*)alien_offset(ctx->pop()); }
+FILE* factor_vm::pop_file_handle() {
+  return (FILE*)alien_offset(ctx->pop());
+}
 
-FILE* factor_vm::peek_file_handle() { return (FILE*)alien_offset(ctx->peek()); }
+FILE* factor_vm::peek_file_handle() {
+  return (FILE*)alien_offset(ctx->peek());
+}
 
 void factor_vm::primitive_fgetc() {
   FILE* file = peek_file_handle();
