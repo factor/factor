@@ -1,5 +1,4 @@
-USING: accessors alien alien.libraries alien.syntax kernel libc
-tools.test ;
+USING: accessors alien alien.libraries alien.syntax kernel tools.test ;
 IN: alien.libraries.tests
 
 { f } [ DLL" fadfasdfsada" dll-valid? ] unit-test
@@ -32,7 +31,7 @@ IN: alien.libraries.tests
     "blah" cdecl make-library [ path>> ] [ dll>> dll-valid? ] bi
 ] unit-test
 
-! word>dlsym
+! dlsym?
 { t } [
-    \ errno word>dlsym alien?
+    "errno" "libc" dlsym? alien?
 ] unit-test

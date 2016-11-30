@@ -10,7 +10,7 @@ SPECIALIZED-ARRAY: uchar
 SINGLETON: gtk-image
 
 [
-    os linux? \ g_type_init word>dlsym and [
+    os linux? "g_type_init" "gobject" dlsym? and [
         ! Explicit type initialization needed for glib < 2.36.
         g_type_init
         { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" }
