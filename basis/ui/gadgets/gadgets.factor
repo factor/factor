@@ -10,20 +10,20 @@ CONSTANT: horizontal { 1 0 }
 CONSTANT: vertical { 0 1 }
 
 TUPLE: gadget < rect
-pref-dim
-parent
-children
-{ orientation initial: { 0 1 } }
-focus
-{ visible? initial: t }
-root?
-clipped?
-layout-state
-{ graft-state initial: { f f } }
-graft-node
-interior
-boundary
-model ;
+    pref-dim
+    parent
+    children
+    { orientation initial: { 0 1 } }
+    focus
+    { visible? initial: t }
+    root?
+    clipped?
+    layout-state
+    { graft-state initial: { f f } }
+    graft-node
+    interior
+    boundary
+    model ;
 
 M: gadget equal? 2drop f ;
 

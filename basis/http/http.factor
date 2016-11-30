@@ -132,14 +132,14 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
     ] { } make "; " join ;
 
 TUPLE: request
-method
-url
-proxy-url
-version
-header
-post-data
-cookies
-redirects ;
+    method
+    url
+    proxy-url
+    version
+    header
+    post-data
+    cookies
+    redirects ;
 
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
@@ -171,15 +171,15 @@ redirects ;
 
 
 TUPLE: response
-version
-code
-message
-header
-cookies
-content-type
-content-charset
-content-encoding
-body ;
+    version
+    code
+    message
+    header
+    cookies
+    content-type
+    content-charset
+    content-encoding
+    body ;
 
 : <response> ( -- response )
     response new
@@ -207,10 +207,10 @@ M: response clone
     over cookies>> push ;
 
 TUPLE: raw-response
-version
-code
-message
-body ;
+    version
+    code
+    message
+    body ;
 
 : <raw-response> ( -- response )
     raw-response new
