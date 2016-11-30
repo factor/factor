@@ -33,5 +33,5 @@ IN: alien.libraries.tests
 
 ! dlsym?
 { t } [
-    "errno" "libc" dlsym? alien?
+    "err_no" "factor" dlsym? alien?
 ] unit-test
