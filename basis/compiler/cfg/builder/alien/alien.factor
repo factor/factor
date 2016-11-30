@@ -57,7 +57,7 @@ IN: compiler.cfg.builder.alien
 : caller-stack-cleanup ( params stack-size -- cleanup )
     swap [ return>> ] [ abi>> ] bi stack-cleanup ;
 
-: check-dlsym ( symbol library -- )
+: check-dlsym ( symbol library/f -- )
     {
         { [ dup library-dll dll-valid? not ] [
             [ library-dll dll-path ] [ dlerror>> ] bi
@@ -69,7 +69,7 @@ IN: compiler.cfg.builder.alien
         [ 2drop ]
     } cond ;
 
-: caller-linkage ( params -- symbol dll )
+: caller-linkage ( params -- symbol dll/f )
     [ function>> ] [ library>> lookup-library ] bi
     2dup check-dlsym library-dll ;
 
