@@ -1,46 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.syntax assocs help.markup
-help.syntax io.backend kernel namespaces strings ;
+USING: alien alien.syntax assocs help.markup help.syntax strings words
+;
 IN: alien.libraries
-
-HELP: make-library
-{ $values
-     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
-     { "library" library } }
-{ $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
-{ $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
-
-HELP: libraries
-{ $description "A global hashtable that keeps a list of open libraries. Use the " { $link add-library } " word to construct a library and add it with a single call." } ;
-
-HELP: library
-{ $values { "name" string } { "library" assoc } }
-{ $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
-    { $list
-        { { $snippet "name" } " - the full path of the C library binary" }
-        { { $snippet "abi" } " - the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
-        { { $snippet "dll" } " - an instance of the " { $link dll } " class; only set if the library is loaded" }
-    }
-} ;
-
-HELP: dlopen
-{ $values { "path" "a pathname string" } { "dll" "a DLL handle" } }
-{ $description "Opens a native library and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } "." }
-{ $errors "Throws an error if the library could not be found, or if loading fails for some other reason." }
-{ $notes "This is the low-level facility used to implement " { $link load-library } ". Use the latter instead." } ;
-
-HELP: dlsym
-{ $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" { $maybe alien } } }
-{ $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable. If the symbol was not found, outputs " { $link f } "." } ;
-
-HELP: dlclose
-{ $values { "dll" "a DLL handle" } }
-{ $description "Closes a DLL handle created by " { $link dlopen } ". This word might not be implemented on all platforms." } ;
-
-HELP: load-library
-{ $values { "name" string } { "dll" "a DLL handle" } }
-{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." } ;
 
 HELP: add-library
 { $values { "name" string } { "path" string } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } }
@@ -68,9 +30,51 @@ HELP: deploy-library
 { $values { "name" string } }
 { $description "Specifies that the logical library named " { $snippet "name" } " should be included during " { $link "tools.deploy" } ". " { $snippet "name" } " must be the name of a library previously loaded with " { $link add-library } "." } ;
 
+HELP: dlclose
+{ $values { "dll" "a DLL handle" } }
+{ $description "Closes a DLL handle created by " { $link dlopen } ". This word might not be implemented on all platforms." } ;
+
+HELP: dlopen
+{ $values { "path" "a pathname string" } { "dll" "a DLL handle" } }
+{ $description "Opens a native library and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } "." }
+{ $errors "Throws an error if the library could not be found, or if loading fails for some other reason." }
+{ $notes "This is the low-level facility used to implement " { $link load-library } ". Use the latter instead." } ;
+
+HELP: dlsym
+{ $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" { $maybe alien } } }
+{ $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable. If the symbol was not found, outputs " { $link f } "." } ;
+
+HELP: make-library
+{ $values
+     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
+     { "library" library } }
+{ $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
+{ $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
+
+HELP: libraries
+{ $description "A global hashtable that keeps a list of open libraries. Use the " { $link add-library } " word to construct a library and add it with a single call." } ;
+
+HELP: library
+{ $values { "name" string } { "library" assoc } }
+{ $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
+    { $list
+        { { $snippet "name" } " - the full path of the C library binary" }
+        { { $snippet "abi" } " - the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
+        { { $snippet "dll" } " - an instance of the " { $link dll } " class; only set if the library is loaded" }
+    }
+} ;
+
+HELP: load-library
+{ $values { "name" string } { "dll" "a DLL handle" } }
+{ $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." } ;
+
 HELP: remove-library
 { $values { "name" string } }
 { $description "Unloads a library and removes it from the internal list of libraries. The " { $snippet "name" } " parameter should be a name that was previously passed to " { $link add-library } ". If no library with that name exists, this word does nothing." } ;
+
+HELP: word>dlsym
+{ $values { "word" word } { "alien/f" maybe{ alien } } }
+{ $description "Takes a word which calls a C library function and outputs the address of the symbol it points to as an alien. If the symbol isn't loaded, outputs f." } ;
 
 ARTICLE: "loading-libs" "Loading native libraries"
 "Before calling a C library, you must associate its path name on disk with a logical name which Factor uses to identify the library:"

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.libraries calendar combinators delegate
-destructors io io.sockets io.sockets.private kernel memoize
-namespaces present sequences summary system vocabs ;
+destructors io io.sockets io.sockets.private kernel memoize namespaces
+openssl.libssl present sequences summary system vocabs ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -23,9 +23,9 @@ ERROR: no-tls-supported ;
 
 MEMO: best-tls-method ( -- class )
     {
-        { [ "TLSv1_2_method" "libssl" dlsym? ] [ TLSv1.2 ] }
-        { [ "TLSv1_1_method" "libssl" dlsym? ] [ TLSv1.1 ] }
-        { [ "TLSv1_method" "libssl" dlsym? ] [ TLSv1 ] }
+        { [ \ TLSv1_2_method word>dlsym ] [ TLSv1.2 ] }
+        { [ \ TLSv1_1_method word>dlsym ] [ TLSv1.1 ] }
+        { [ \ TLSv1_method word>dlsym ] [ TLSv1 ] }
         [ no-tls-supported ]
     } cond ;
 
