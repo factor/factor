@@ -1,21 +1,14 @@
-USING: tools.test kernel.private kernel arrays sequences
-math.private math generic words quotations alien alien.c-types
-alien.data strings sbufs sequences.private slots.private
-combinators definitions system layouts vectors
-math.partial-dispatch math.order math.functions accessors
-hashtables classes assocs io.encodings.utf8 io.encodings.ascii
-io.encodings fry slots sorting.private combinators.short-circuit
-grouping prettyprint generalizations
-compiler.tree
-compiler.tree.combinators
-compiler.tree.cleanup
-compiler.tree.builder
-compiler.tree.recursive
-compiler.tree.normalization
-compiler.tree.propagation
-compiler.tree.propagation.info
-compiler.tree.checker
-compiler.tree.debugger ;
+USING: accessors alien alien.c-types alien.data arrays assocs
+combinators combinators.short-circuit compiler.tree
+compiler.tree.builder compiler.tree.checker compiler.tree.cleanup
+compiler.tree.combinators compiler.tree.debugger
+compiler.tree.normalization compiler.tree.propagation
+compiler.tree.propagation.info generalizations grouping hashtables
+io.encodings io.encodings.ascii io.encodings.utf8 kernel
+kernel.private layouts math math.functions math.intervals math.order
+math.partial-dispatch math.private prettyprint quotations sequences
+sequences.private slots slots.private sorting.private tools.test
+vectors ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.tree.cleanup.tests
@@ -541,6 +534,51 @@ cell-bits 32 = [
     [ void { } cdecl [ ] alien-callback void { } cdecl alien-indirect ]
     \ >c-ptr inlined?
 ] unit-test
+
+MIXIN: foo-mix
+
+! cleanup-folding?
+: call-node-foldable2 ( -- node )
+    T{ #call
+       { word foo-mix? }
+       { in-d V{ 8815401 } }
+       { out-d { 8815405 } }
+       { info
+         H{
+             {
+                 8815401
+                 T{ value-info-state
+                    { class
+                      intersection{
+                          not{
+                              POSTPONE: f
+                          }
+                          not{ foo-mix }
+                      }
+                    }
+                    { interval
+                      full-interval
+                    }
+                  }
+             }
+             {
+                 8815405
+                 T{ value-info-state
+                    { class POSTPONE: f }
+                    { interval
+                      empty-interval
+                    }
+                    { literal? t }
+                  }
+             }
+         }
+       }
+    } ;
+
+{ t } [
+    call-node-foldable2 cleanup-folding?
+] unit-test
+
 
 ! cleanup-folding
 : call-node-foldable ( -- node )

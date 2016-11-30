@@ -1,7 +1,8 @@
-USING: accessors alien alien.c-types compiler.cfg compiler.cfg.builder
-compiler.cfg.builder.alien compiler.cfg.builder.alien.params
-compiler.cfg.builder.blocks compiler.cfg.instructions
-compiler.cfg.registers compiler.test compiler.tree.builder
+USING: accessors alien alien.c-types assocs compiler.cfg
+compiler.cfg.builder compiler.cfg.builder.alien
+compiler.cfg.builder.alien.params compiler.cfg.builder.blocks
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
+compiler.errors compiler.test compiler.tree.builder
 compiler.tree.optimizer cpu.architecture cpu.x86.assembler
 cpu.x86.assembler.operands kernel literals make namespaces sequences
 stack-checker.alien system tools.test words ;
@@ -41,6 +42,22 @@ IN: compiler.cfg.builder.alien.tests
     [ emit-callback-body drop ] V{ } make
 ] cfg-unit-test
 
+! caller-linkage
+{ "malloc" f } [
+    f f cdecl f f "malloc" alien-invoke-params boa
+    caller-linkage
+] unit-test
+
+SYMBOL: foo
+
+{ t "fdkjlsdflfd" } [
+    begin-stack-analysis \ foo f begin-cfg drop
+    f f cdecl f f "fdkjlsdflfd" alien-invoke-params boa
+    caller-linkage 2drop
+    linkage-errors get foo of error>>
+    [ no-such-symbol? ] [ name>> ] bi
+] unit-test
+
 ! caller-parameters
 cpu x86.64? [
     ${
@@ -70,6 +87,11 @@ cpu x86.64? [
 { 0 } [
     alien-node-params new long >>return cdecl >>abi 25
     caller-stack-cleanup
+] unit-test
+
+! check-dlsym
+{ } [
+    "malloc" f check-dlsym
 ] unit-test
 
 ! prepare-caller-return
