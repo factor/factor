@@ -1,4 +1,4 @@
-USING: accessors alien alien.c-types assocs compiler.cfg
+USING: accessors alien alien.c-types alien.strings assocs compiler.cfg
 compiler.cfg.builder compiler.cfg.builder.alien
 compiler.cfg.builder.alien.params compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
@@ -43,9 +43,13 @@ IN: compiler.cfg.builder.alien.tests
 ] cfg-unit-test
 
 ! caller-linkage
-{ "malloc" f } [
-    f f cdecl f f "malloc" alien-invoke-params boa
+${
+    "malloc"
+    os windows? "msvcrt.dll" f ?
+} [
+    f f cdecl f "libc" "malloc" alien-invoke-params boa
     caller-linkage
+    dup [ path>> alien>native-string ] when
 ] unit-test
 
 SYMBOL: foo
