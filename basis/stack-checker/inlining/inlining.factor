@@ -141,7 +141,7 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 
 : inline-word ( word -- )
     commit-literals
-    [ add-depends-on-definition ]
+    [ +definition+ depends-on ]
     [ declare-input-effects ]
     [
         dup inline-recursive-label [

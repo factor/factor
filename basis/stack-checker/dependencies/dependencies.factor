@@ -26,28 +26,18 @@ SYMBOLS: +effect+ +conditional+ +definition+ ;
         ] [ 3drop ] if
     ] if ;
 
-: add-depends-on-effect ( word -- )
-    +effect+ depends-on ;
-
-: add-depends-on-conditionally ( word -- )
-    +conditional+ depends-on ;
-
-: add-depends-on-definition ( word -- )
-    +definition+ depends-on ;
-
 GENERIC: add-depends-on-c-type ( c-type -- )
 
 M: void add-depends-on-c-type drop ;
 
-M: c-type-word add-depends-on-c-type add-depends-on-definition ;
+M: c-type-word add-depends-on-c-type +definition+ depends-on ;
 
 M: array add-depends-on-c-type
-    [ word? ] filter [ add-depends-on-definition ] each ;
+    [ word? ] filter [ +definition+ depends-on ] each ;
 
 M: pointer add-depends-on-c-type
     to>> add-depends-on-c-type ;
 
-! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
 
 : ?class-or ( class class/f -- class' )
@@ -57,8 +47,6 @@ SYMBOL: generic-dependencies
     generic-dependencies get
     [ [ ?class-or ] change-at ] [ 2drop ] if* ;
 
-! Conditional dependencies are re-evaluated when classes change;
-! if any fail, the word is recompiled
 SYMBOL: conditional-dependencies
 
 GENERIC: satisfied? ( dependency -- ? )
@@ -93,7 +81,7 @@ M: depends-on-instance-predicate satisfied?
 TUPLE: depends-on-next-method class generic next-method ;
 
 : add-depends-on-next-method ( class generic next-method -- )
-    over add-depends-on-conditionally
+    over +conditional+ depends-on
     depends-on-next-method add-conditional-dependency ;
 
 M: depends-on-next-method satisfied?
@@ -105,7 +93,7 @@ M: depends-on-next-method satisfied?
 TUPLE: depends-on-method class generic method ;
 
 : add-depends-on-method ( class generic method -- )
-    over add-depends-on-conditionally
+    over +conditional+ depends-on
     depends-on-method add-conditional-dependency ;
 
 M: depends-on-method satisfied?
@@ -117,7 +105,7 @@ M: depends-on-method satisfied?
 TUPLE: depends-on-tuple-layout class layout ;
 
 : add-depends-on-tuple-layout ( class layout -- )
-    [ drop add-depends-on-conditionally ]
+    [ drop +conditional+ depends-on ]
     [ depends-on-tuple-layout add-conditional-dependency ] 2bi ;
 
 M: depends-on-tuple-layout satisfied?
@@ -126,7 +114,7 @@ M: depends-on-tuple-layout satisfied?
 TUPLE: depends-on-flushable word ;
 
 : add-depends-on-flushable ( word -- )
-    [ add-depends-on-conditionally ]
+    [ +conditional+ depends-on ]
     [ depends-on-flushable add-conditional-dependency ] bi ;
 
 M: depends-on-flushable satisfied?
@@ -135,7 +123,7 @@ M: depends-on-flushable satisfied?
 TUPLE: depends-on-final class ;
 
 : add-depends-on-final ( word -- )
-    [ add-depends-on-conditionally ]
+    [ +conditional+ depends-on ]
     [ depends-on-final add-conditional-dependency ] bi ;
 
 M: depends-on-final satisfied?
