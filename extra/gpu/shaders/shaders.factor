@@ -614,7 +614,7 @@ SYNTAX: GLSL-PROGRAM:
     dup old-instances [
         f
         lexer get line>>
-        \ ; parse-until >array shaders-and-formats
+        parse-array-def shaders-and-formats
     ] dip
     program boa
     over reset-generic

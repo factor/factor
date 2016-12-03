@@ -22,7 +22,7 @@ M: tip set-where loc<< ;
 : add-tip ( tip -- ) tips get push ;
 
 SYNTAX: TIP:
-    parse-definition >array <tip>
+    parse-array-def <tip>
     [ save-location ] [ add-tip ] bi ;
 
 : a-tip ( -- tip ) tips get random ;

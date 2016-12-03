@@ -180,11 +180,11 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "UNION:" [
-        scan-new-class parse-definition define-union-class
+        scan-new-class parse-array-def define-union-class
     ] define-core-syntax
 
     "INTERSECTION:" [
-        scan-new-class parse-definition define-intersection-class
+        scan-new-class parse-array-def define-intersection-class
     ] define-core-syntax
 
     "MIXIN:" [

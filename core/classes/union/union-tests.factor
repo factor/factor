@@ -105,6 +105,11 @@ M: a-union test-generic ;
 
 { f } [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
 
+{ { fixnum } } [
+    "IN: classes.union.tests USE: math UNION: um fixnum ;" eval( -- )
+    "um" "classes.union.tests" lookup-word "members" word-prop
+] unit-test
+
 ! Test union{
 
 TUPLE: stuff { a union{ integer string } } ;
