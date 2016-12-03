@@ -30,7 +30,12 @@ TIP: "Use the " { $link leaks. } " combinator to track down resource leaks." ;
 HELP: TIP:
 { $syntax "TIP: content ;" }
 { $values { "content" "a markup element" } }
-{ $description "Defines a new tip of the day." } ;
+{ $description "Defines a new tip of the day." }
+{ $examples
+  { $unchecked-example
+    "TIP: \"Factor is a fun programming language.\" ;"
+  }
+} ;
 
 ARTICLE: "all-tips-of-the-day" "All tips of the day"
 { $tips-of-the-day } ;
