@@ -1,5 +1,5 @@
-USING: compiler.units definitions help.markup help.syntax kernel
-lexer math namespaces quotations sequences source-files strings
+USING: arrays compiler.units definitions help.markup help.syntax
+kernel lexer math namespaces quotations sequences source-files strings
 vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
@@ -49,7 +49,7 @@ ARTICLE: "defining-words" "Defining words"
 { $subsections parse-definition }
 "The " { $link POSTPONE: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
 { $see POSTPONE: ; }
-"There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } "." ;
+"There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } " or " { $link parse-array-def } "." ;
 
 ARTICLE: "parsing-tokens" "Parsing raw tokens"
 "So far we have seen how to read individual tokens, or read a sequence of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."
@@ -229,6 +229,11 @@ HELP: parse-definition
 { $values { "quot" "a new " { $link quotation } } }
 { $description "Parses objects from parser input until " { $link POSTPONE: ; } " and outputs a quotation with the results." }
 { $examples "This word is used to implement " { $link POSTPONE: : } "." }
+$parsing-note ;
+
+HELP: parse-array-def
+{ $values { "array" "a new " { $link array } } }
+{ $description "Like " { $link parse-definition } ", except the parsed sequence it outputted as an array." }
 $parsing-note ;
 
 HELP: bootstrap-syntax
