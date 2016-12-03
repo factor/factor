@@ -147,6 +147,9 @@ M: f parse-quotation \ ] parse-until >quotation ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
+: parse-array-def ( -- array )
+    \ ; parse-until >array ;
+
 ERROR: bad-number ;
 
 : scan-base ( base -- n )
