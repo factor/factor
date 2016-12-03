@@ -25,7 +25,7 @@ M: #push propagate-before
 GENERIC: add-depends-on-class ( obj -- )
 
 M: class add-depends-on-class
-    add-depends-on-conditionally ;
+    +conditional+ depends-on ;
 
 M: maybe add-depends-on-class
     class>> add-depends-on-class ;
@@ -118,7 +118,7 @@ ERROR: invalid-outputs #call infos ;
 : propagate-predicate ( #call word -- infos )
     [ in-d>> first value-info ]
     [ "predicating" word-prop ] bi*
-    [ nip add-depends-on-conditionally ]
+    [ nip +conditional+ depends-on ]
     [ predicate-output-infos 1array ] 2bi ;
 
 : default-output-value-infos ( #call word -- infos )
