@@ -50,8 +50,7 @@ TAG: KEYWORDS parse-rule-tag
     dup [ rule-set get ignore-case?>> <?insensitive-regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
-    <rule-set> dup rule-set set
-    {
+    rule-set get {
         { "SET" string>rule-set-name name<< }
         { "IGNORE_CASE" string>boolean ignore-case?<< }
         { "HIGHLIGHT_DIGITS" string>boolean highlight-digits?<< }
@@ -62,11 +61,11 @@ TAG: KEYWORDS parse-rule-tag
     } init-from-tag ;
 
 : parse-rules-tag ( tag -- rule-set )
-    [
+    <rule-set> rule-set [
         [ (parse-rules-tag) ] [ children-tags ] bi
         [ parse-rule-tag ] with each
         rule-set get
-    ] with-scope ;
+    ] with-variable ;
 
 : merge-rule-set-props ( props rule-set -- )
     [ assoc-union ] change-props drop ;
