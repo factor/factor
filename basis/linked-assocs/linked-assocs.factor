@@ -50,7 +50,7 @@ M: linked-assoc clone
 
 INSTANCE: linked-assoc assoc
 
-: >linked-hash ( assoc -- assoc )
+: >linked-hash ( assoc -- assoc' )
     [ <linked-hash> ] dip assoc-union! ;
 
 M: linked-assoc assoc-like
