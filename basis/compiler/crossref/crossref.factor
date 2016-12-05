@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators fry grouping kernel namespaces
-sequences sets stack-checker.dependencies words ;
+USING: assocs combinators compiler.units fry grouping kernel
+namespaces sequences sets stack-checker.dependencies words ;
 IN: compiler.crossref
 
 SYMBOL: compiled-crossref
@@ -19,10 +19,10 @@ generic-call-site-crossref [ H{ } clone ] initialize
     [ all-dependencies-of ] dip '[ nip _ dependency>= ] assoc-filter ;
 
 : outdated-definition-usages ( set -- assocs )
-    members [ word? ] filter [ +definition+ dependencies-of ] map ;
+    filter-word-defs [ +definition+ dependencies-of ] map ;
 
 : outdated-effect-usages ( set -- assocs )
-    members [ word? ] filter [ all-dependencies-of ] map ;
+    filter-word-defs [ all-dependencies-of ] map ;
 
 : dependencies-satisfied? ( word cache -- ? )
     [ "dependency-checks" word-prop ] dip

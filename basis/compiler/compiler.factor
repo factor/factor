@@ -166,7 +166,7 @@ M: optimizing-compiler to-recompile ( -- words )
         maybe-changed get new-words get diff
         outdated-conditional-usages %
 
-        changed-definitions get members [ word? ] filter dup zip ,
+        changed-definitions get filter-word-defs dup zip ,
     ] { } make assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words
