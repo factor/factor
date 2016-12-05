@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators continuations
-effects.parser fry generic.parser kernel lexer locals.errors
-locals.rewrite.closures locals.types make namespaces parser
-quotations sequences splitting vocabs.parser words ;
+USING: accessors arrays assocs effects.parser fry generic.parser
+kernel lexer locals.errors locals.rewrite.closures locals.types
+make namespaces parser quotations sequences splitting
+vocabs.parser words ;
 IN: locals.parser
 
 SYMBOL: in-lambda?
@@ -35,8 +35,7 @@ SINGLETON: lambda-parser
     '[
         in-lambda? on
         lambda-parser quotation-parser set
-        use-words @
-        qualified-vocabs pop* ! can't use unuse-words here
+        [ use-words @ ] [ unuse-words ] bi
     ] with-scope ; inline
 
 : (parse-lambda) ( assoc -- quot )
