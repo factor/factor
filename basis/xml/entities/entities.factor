@@ -39,4 +39,4 @@ CONSTANT: entities
     }
 
 : with-entities ( entities quot -- )
-    [ swap extra-entities set call ] with-scope ; inline
+    [ extra-entities ] dip with-variable ; inline
