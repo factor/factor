@@ -112,3 +112,31 @@ GENERIC: generic-predicate? ( a -- b )
 { } [ "IN: classes.tests TUPLE: generic-predicate ;" eval( -- ) ] unit-test
 
 { f } [ \ generic-predicate? generic? ] unit-test
+
+! all-contained-classes
+{
+    { maybe{ integer } integer fixnum bignum }
+} [
+    { maybe{ integer } } all-contained-classes
+] unit-test
+
+! contained-classes
+{
+    { fixnum bignum }
+    { integer }
+} [
+    integer contained-classes
+    maybe{ integer } contained-classes
+] unit-test
+
+! make-class-props
+{
+    H{
+        { "superclass" f }
+        { "members" { fixnum } }
+        { "metaclass" f }
+        { "participants" { } }
+    }
+} [
+    f { fixnum } { } f  make-class-props
+] unit-test

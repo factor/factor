@@ -72,17 +72,32 @@ ABOUT: "classes"
 HELP: class
 { $class-description "The class of all class words." } ;
 
+HELP: class-members
+{ $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
+{ $description "If " { $snippet "class" } " is a union class, outputs a sequence of its member classes, otherwise outputs " { $link f } "." } ;
+
 HELP: class-of
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $examples { $example "USING: classes prettyprint ;" "1.0 class-of ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class-of ." "point" } } ;
 
+HELP: class-usage
+{ $values { "class" class } { "seq" sequence } }
+{ $description "Lists all classes that uses or depends on this class." } ;
+
 HELP: classes
 { $values { "seq" "a sequence of class words" } }
 { $description "Finds all class words in the dictionary." } ;
 
-HELP: update-map
-{ $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
+HELP: contained-classes
+{ $values { "obj" class } { "members" sequence } }
+{ $description "Lists all classes contained in the class." }
+{ $see-also all-contained-classes } ;
+
+HELP: define-predicate
+{ $values { "class" class } { "quot" quotation } }
+{ $description "Defines a predicate word for a class." }
+$low-level-note ;
 
 HELP: predicate-def
 { $values { "obj" "a type object" } { "quot" quotation } }
@@ -98,11 +113,6 @@ HELP: predicate-def
 HELP: predicate-word
 { $values { "word" word } { "predicate" "a predicate word" } }
 { $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
-
-HELP: define-predicate
-{ $values { "class" class } { "quot" quotation } }
-{ $description "Defines a predicate word for a class." }
-$low-level-note ;
 
 HELP: superclass-of
 { $values { "class" class } { "super" class } }
@@ -140,11 +150,11 @@ HELP: subclass-of?
     }
 } ;
 
-{ superclass-of superclasses-of subclass-of? } related-words
+HELP: update-map
+{ $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." }
+{ $see-also class-usage } ;
 
-HELP: class-members
-{ $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
-{ $description "If " { $snippet "class" } " is a union class, outputs a sequence of its member classes, otherwise outputs " { $link f } "." } ;
+{ superclass-of superclasses-of subclass-of? } related-words
 
 HELP: class-participants
 { $values { "class" class } { "seq" "a sequence of intersection participants, or " { $link f } } }
