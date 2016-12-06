@@ -648,5 +648,7 @@ EXCLUDE: qualified.tests.bar => x ;
 
 ! parse-array-def
 { { 10 20 30 } } [
-    { "10 20 30 ;" } <lexer> [ parse-array-def ] with-lexer
+    [
+        { "10 20 30 ;" } <lexer> [ parse-array-def ] with-lexer
+    ] with-file-vocabs
 ] unit-test
