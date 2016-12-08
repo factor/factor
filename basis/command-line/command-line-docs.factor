@@ -115,7 +115,7 @@ ARTICLE: ".factor-roots" "Additional vocabulary roots file"
 $nl
 "A word to create this file:"
 { $subsections scaffold-factor-roots }
-"A word to run this file from an existing Factor session:"
+"A word to load this file from an existing Factor session:"
 { $subsections load-vocab-roots } ;
 
 ARTICLE: "rc-files" "Running code on startup"
