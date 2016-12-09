@@ -203,7 +203,7 @@ SYMBOL: gc-events
         { "Data compaction time:" [ PHASE-DATA-COMPACTION sum-phase-times ] }
     } object-table. ;
 
-SINGLETONS: +unoptimized+ +optimized+ +profiling+ +pic+ ;
+SINGLETONS: +unoptimized+ +optimized+ +pic+ ;
 
 TUPLE: code-block
     { owner read-only }
@@ -218,7 +218,7 @@ TUPLE: code-blocks { blocks groups } { cache hashtable } ;
 <PRIVATE
 
 : code-block-type ( n -- type )
-    { +unoptimized+ +optimized+ +profiling+ +pic+ } nth ;
+    { +unoptimized+ +optimized+ +pic+ } nth ;
 
 : <code-block> ( seq -- code-block )
     6 firstn-unsafe {
@@ -290,7 +290,6 @@ INSTANCE: code-blocks immutable-sequence
             { "Optimized code:" +optimized+ }
             { "Unoptimized code:" +unoptimized+ }
             { "Inline caches:" +pic+ }
-            { "Profiling stubs:" +profiling+ }
         }
     ] 2dip '[ _ _ code-block-table-row ] { } assoc>map
     simple-table. ;
