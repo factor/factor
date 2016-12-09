@@ -1,5 +1,5 @@
 USING: arrays assocs kernel math memory namespaces parser sequences
-tools.memory tools.memory.private tools.test tools.time ;
+tools.memory tools.memory.private tools.test tools.time vm ;
 IN: tools.memory.tests
 
 { } [ room. ] unit-test
@@ -16,13 +16,9 @@ IN: tools.memory.tests
     gc-events get [ space-reclaimed 0 < ] any?
 ] unit-test
 
-{ +pic+ } [
-    2 code-block-type
-] unit-test
-
 { t t t } [
     get-code-blocks code-block-stats nip
-    [ +unoptimized+ of 0 > ]
-    [ +optimized+ of 0 > ]
-    [ +pic+ of 0 > ] tri
+    [ CODE-BLOCK-UNOPTIMIZED of 0 > ]
+    [ CODE-BLOCK-OPTIMIZED of 0 > ]
+    [ CODE-BLOCK-PIC of 0 > ] tri
 ] unit-test

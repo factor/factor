@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs binary-search classes classes.struct
 combinators combinators.smart continuations fry grouping hashtables
-hints io io.styles kernel layouts math math.order math.parser
+hints io io.styles kernel layouts literals math math.order math.parser
 math.statistics memory namespaces prettyprint sequences
 sequences.generalizations sorting vm ;
 IN: tools.memory
@@ -203,8 +203,6 @@ SYMBOL: gc-events
         { "Data compaction time:" [ PHASE-DATA-COMPACTION sum-phase-times ] }
     } object-table. ;
 
-SINGLETONS: +unoptimized+ +optimized+ +pic+ ;
-
 TUPLE: code-block
     { owner read-only }
     { parameters read-only }
@@ -217,15 +215,12 @@ TUPLE: code-blocks { blocks groups } { cache hashtable } ;
 
 <PRIVATE
 
-: code-block-type ( n -- type )
-    { +unoptimized+ +optimized+ +pic+ } nth ;
-
 : <code-block> ( seq -- code-block )
     6 firstn-unsafe {
         [ ]
         [ ]
         [ ]
-        [ code-block-type ]
+        [ ]
         [ ]
         [ tag-bits get shift ]
     } spread code-block boa ; inline
@@ -287,9 +282,9 @@ INSTANCE: code-blocks immutable-sequence
 : code-block-table. ( counts sizes -- )
     [
         {
-            { "Optimized code:" +optimized+ }
-            { "Unoptimized code:" +unoptimized+ }
-            { "Inline caches:" +pic+ }
+            ${ "Optimized code:" CODE-BLOCK-OPTIMIZED }
+            ${ "Unoptimized code:" CODE-BLOCK-UNOPTIMIZED }
+            ${ "Inline caches:" CODE-BLOCK-PIC }
         }
     ] 2dip '[ _ _ code-block-table-row ] { } assoc>map
     simple-table. ;
