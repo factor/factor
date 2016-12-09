@@ -110,3 +110,7 @@ STRUCT: gc-info
     { gc-root-count uint read-only }
     { derived-root-count uint read-only }
     { return-address-count uint read-only } ;
+
+CONSTANT: CODE-BLOCK-UNOPTIMIZED 0
+CONSTANT: CODE-BLOCK-OPTIMIZED 1
+CONSTANT: CODE-BLOCK-PIC 2
