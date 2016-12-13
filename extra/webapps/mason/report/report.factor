@@ -17,7 +17,7 @@ IN: webapps.mason.report
         [ build-report ] >>display ;
 
 : report-link ( builder -- xml )
-    [ URL" report" ] dip
+    [ URL" report" clone ] dip
     [ os>> "os" set-query-param ]
     [ cpu>> "cpu" set-query-param ] bi
     [XML <a href=<->>Latest build report</a> XML] ;
