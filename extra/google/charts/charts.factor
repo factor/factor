@@ -71,7 +71,7 @@ PRIVATE>
 <PRIVATE
 
 : chart>url ( chart -- url )
-    [ URL" http://chart.googleapis.com/chart" ] dip {
+    [ URL" http://chart.googleapis.com/chart" clone ] dip {
         [ type>> "cht" set-query-param ]
         [
             [ width>> ] [ height>> ] bi 2dup and [
