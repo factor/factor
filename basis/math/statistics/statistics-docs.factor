@@ -214,8 +214,8 @@ HELP: cum-product
 { $description "Returns the cumulative product of " { $snippet "seq" } "." }
 { $examples
     { $example "USING: math.statistics prettyprint ;"
-               "{ 1 2 3 4 } cum-product ."
-               "{ 1 2 6 24 }"
+               "{ 2 3 4 } cum-product ."
+               "{ 2 6 24 }"
     }
 } ;
 
