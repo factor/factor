@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel splitting lists fry accessors assocs math.order
-math combinators namespaces urls.encoding xml.syntax xmode.code2html
-xml.data arrays strings vectors xml.writer io.streams.string locals
-unicode ;
+USING: accessors arrays assocs combinators fry io.streams.string
+kernel lists locals math math.order namespaces sequences splitting
+strings urls urls.encoding xml.data xml.syntax xml.writer
+xmode.code2html ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
@@ -33,7 +33,7 @@ TUPLE: line ;
 TUPLE: line-break ;
 
 : absolute-url? ( string -- ? )
-    { "http://" "https://" "ftp://" } [ head? ] with any? ;
+    >url protocol>> >boolean ;
 
 : simple-link-title ( string -- string' )
     dup absolute-url? [ "/" split1-last swap or ] unless ;
