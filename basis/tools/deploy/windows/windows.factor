@@ -33,7 +33,7 @@ M: windows deploy*
         [ drop deployed-image-name ]
         [ drop namespace make-deploy-image-executable ]
         [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
-        [ nip open-directory-after-deploy? get [ open-item ] [ drop ] if ]
+        [ nip maybe-open-deploy-directory ]
     } 2cleave ;
 
 M: windows deploy-path
