@@ -15,7 +15,7 @@ M: unix deploy*
         [ drop deployed-image-name ]
         [ drop namespace make-deploy-image-executable ]
         [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
-        [ nip open-directory-after-deploy? get [ open-file ] [ drop ] if ]
+        [ nip open-directory-after-deploy? get [ open-item ] [ drop ] if ]
     } 2cleave ;
 
 M: unix deploy-path

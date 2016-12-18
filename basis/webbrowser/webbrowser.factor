@@ -1,22 +1,17 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
 USING: accessors io.pathnames kernel sequences strings system
 ui.operations urls vocabs ;
-
 IN: webbrowser
 
-HOOK: open-file os ( path -- )
+HOOK: open-item os ( item -- )
 
 "webbrowser." os name>> append require
 
 : open-url ( url -- )
-    >url open-file ;
-
-[ pathname? ] \ open-file H{ } define-operation
-
-[ url? ] \ open-url H{ } define-operation
+    >url open-item ;
 
 PREDICATE: url-string < string >url protocol>> >boolean ;
 
-[ url-string? ] \ open-url H{ } define-operation
+[ pathname? ] \ open-item H{ } define-operation
+[ [ url? ] [ url-string? ] bi or ] \ open-url H{ } define-operation
