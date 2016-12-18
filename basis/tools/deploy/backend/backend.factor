@@ -4,7 +4,8 @@ USING: accessors assocs bootstrap.image hashtables io io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher io.pathnames
 kernel locals make namespaces prettyprint sequences splitting system
 tools.deploy.config tools.deploy.config.editor tools.deploy.embed
-tools.deploy.libraries vocabs.loader vocabs.metadata.resources ;
+tools.deploy.libraries vocabs.loader vocabs.metadata.resources
+webbrowser ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm-path )
@@ -120,6 +121,10 @@ ERROR: can't-deploy-library-file library ;
 
 SYMBOL: open-directory-after-deploy?
 t open-directory-after-deploy? set-global
+
+: maybe-open-deploy-directory ( directory -- )
+    absolute-path open-directory-after-deploy? get
+    [ open-item ] [ drop ] if ;
 
 HOOK: deploy* os ( vocab -- )
 
