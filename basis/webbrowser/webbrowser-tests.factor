@@ -1,4 +1,4 @@
-USING: io.pathnames tools.test ;
+USING: io.pathnames tools.test urls ;
 IN: webbrowser
 
 { t } [ "http://reddit.com" url-string? ] unit-test
@@ -8,3 +8,4 @@ IN: webbrowser
 { f } [ 123 url-string? ] unit-test
 
 { } [ "" absolute-path open-item ] unit-test
+{ } [ URL" http://www.google.com" open-item ] unit-test
