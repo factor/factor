@@ -81,7 +81,7 @@ IN: tools.deploy.macosx
     bundle-name
     [ "Contents/Resources" copy-resources ]
     [ "Contents/Frameworks" copy-libraries ] 2bi
-    open-directory-after-deploy? get [ bundle-name open-file ] when ;
+    open-directory-after-deploy? get [ bundle-name open-item ] when ;
 
 : deploy-app-bundle? ( vocab -- ? )
     deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;
