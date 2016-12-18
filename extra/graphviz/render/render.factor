@@ -135,7 +135,7 @@ PRIVATE>
     [ image-window ] with-preview ;
 
 : preview-open ( graph -- )
-    [ open-file 1 seconds sleep ] with-preview ;
+    [ open-item 1 seconds sleep ] with-preview ;
 
 <PRIVATE
 
