@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors furnace.actions furnace.alloy furnace.redirection
-html.forms http.server http.server.dispatchers math namespaces urls
-validators webapps.utils ;
+USING: accessors furnace.actions furnace.alloy
+furnace.redirection html.forms http.server
+http.server.dispatchers kernel math namespaces urls validators
+webapps.utils ;
 IN: webapps.calculator
 
 TUPLE: calculator < dispatcher ;
