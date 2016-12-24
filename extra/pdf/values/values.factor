@@ -33,11 +33,7 @@ M: t pdf-value drop "true" ;
 M: f pdf-value drop "false" ;
 
 M: color pdf-value
-    [ red>> ] [ green>> ] [ blue>> ] tri
-    "%f %f %f" sprintf ;
-
-M: gray pdf-value
-    gray>> dup dup "%f %f %f" sprintf ;
+    >rgba-components drop "%f %f %f" sprintf ;
 
 M: font pdf-value
     [
