@@ -4,23 +4,17 @@ USING: accessors colors.constants google.charts
 google.charts.private kernel math present sequences tools.test ;
 IN: google.charts.tests
 
-{ t } [
-
-    { 0 0 } <line>
-    { 0 0 } <line> COLOR: red >>background
-    [ chart>url present length ] bi@ <
-] unit-test
-
-{ t } [
-    { 0 0 } <line>
-    { 0 0 } <line> COLOR: red >>foreground
-    [ chart>url present length ] bi@ <
-] unit-test
+! The order of the constructors below is important, because we
+! are testing side-effects. If you remove the clone word from
+! chart>url implementation, the second object in each test
+! will incorrectly result in the same URL as the first one
+! (although the order of parameters in the URL may vary).
+! The order of tests is important for the same reason.
 
 { t } [
-    "" <formula>
     "" <formula> t >>data-scale
-    [ chart>url present length ] bi@ <
+    "" <formula>
+    [ chart>url present length ] bi@ >
 ] unit-test
 
 { t } [
@@ -30,13 +24,25 @@ IN: google.charts.tests
 ] unit-test
 
 { t } [
+    { 0 0 } <line> COLOR: red >>background
     { 0 0 } <line>
-    { 0 0 } <line> { 0 0 } >>margin
-    [ chart>url present length ] bi@ <
+    [ chart>url present length ] bi@ >
 ] unit-test
 
 { t } [
+    { 0 0 } <line> COLOR: red >>foreground
     { 0 0 } <line>
+    [ chart>url present length ] bi@ >
+] unit-test
+
+{ t } [
+    { 0 0 } <line> { 0 0 } >>margin
+    { 0 0 } <line>
+    [ chart>url present length ] bi@ >
+] unit-test
+
+{ t } [
     { 0 0 } <line> 5 >>bar-width
-    [ chart>url present length ] bi@ <
+    { 0 0 } <line>
+    [ chart>url present length ] bi@ >
 ] unit-test
