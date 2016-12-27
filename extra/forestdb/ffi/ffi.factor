@@ -27,6 +27,8 @@ TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_kvs_handle
 TYPEDEF: void* fdb_iterator
 TYPEDEF: void* fdb_changes_callback_fn
+TYPEDEF: void* voidref
+TYPEDEF: void* fdb_handle_stats_cb
 
 ENUM: fdb_open_flags < uint32_t
     { FDB_OPEN_FLAG_CREATE 1 }
@@ -126,6 +128,8 @@ STRUCT: fdb_filemgr_ops_t
     { fdatasync void* }
     { sync void* }
     { get_errno_str void* }
+    { mmap void* }
+    { munmap void* }
     { aio_init void* }
     { aio_prep_read void* }
     { aio_submit void* }
@@ -169,7 +173,9 @@ STRUCT: fdb_config
     { block_reusing_threshold size_t }
     { num_keeping_headers size_t }
     { breakpad_minidump_dir char* }
-    { custom_file_ops fdb_filemgr_ops_t* } ;
+    { custom_file_ops fdb_filemgr_ops_t* }
+    { num_background_threads size_t }
+    { bcache_flush_limit size_t } ;
 
 STRUCT: fdb_kvs_config
     { create_if_missing bool }
@@ -330,7 +336,11 @@ ENUM: fdb_status
     { FDB_RESULT_EOVERFLOW -71 }
     { FDB_RESULT_EAGAIN -72 }
     { FDB_RESULT_CANCELLED -73 }
-    { FDB_RESULT_LAST -73 } ; ! update this
+    { FDB_RESULT_ENGINE_NOT_INSTANTIATED -74 }
+    { FDB_RESULT_LOG_FILE_NOT_FOUND -75 }
+    { FDB_RESULT_LOCK_FAIL -76 }
+    { FDB_RESULT_LAST -76 }
+    ; ! update this
 
 ! End fdb_errors.h
 
@@ -452,3 +462,7 @@ FUNCTION: char* fdb_error_msg ( fdb_status err_code )
 FUNCTION: char* fdb_get_lib_version ( )
 FUNCTION: char* fdb_get_file_version ( fdb_file_handle* fhandle )
 FUNCTION: fdb_filemgr_ops_t* fdb_get_default_file_ops ( )
+
+FUNCTION: fdb_status fdb_fetch_handle_stats ( fdb_kvs_handle *handle,
+                                              fdb_handle_stats_cb callback,
+                                              void *ctx )
