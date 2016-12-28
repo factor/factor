@@ -1,4 +1,4 @@
-USING: alien.c-types assocs kernel make math namespaces
+USING: alien.c-types ascii assocs kernel make math namespaces
 sequences specialized-arrays tools.test ;
 IN: assocs.tests
 SPECIALIZED-ARRAY: double
@@ -307,3 +307,13 @@ unit-test
 {
     V{ { 11 0 } { 22 1 } { 33 2 } }
 } [ { 11 22 33 } V{ } zip-index-as ] unit-test
+
+{
+    H{
+        { 0 V{ 0 3 6 9 } }
+        { 1 V{ 1 4 7 } }
+        { 2 V{ 2 5 8 } }
+    }
+} [
+    10 iota [ 3 mod ] collect-by
+] unit-test
