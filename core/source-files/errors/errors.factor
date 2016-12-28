@@ -23,7 +23,7 @@ M: source-file-error compute-restarts error>> compute-restarts ;
     [ [ line#>> 0 or ] sort-with ] { } assoc-map-as sort-keys ;
 
 : group-by-source-file ( errors -- assoc )
-    H{ } clone [ [ push-at ] curry [ dup path>> ] prepose each ] keep ;
+    [ path>> ] collect-by ;
 
 TUPLE: error-type-holder type word plural icon quot forget-quot { fatal? initial: t } ;
 

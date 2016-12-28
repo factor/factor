@@ -239,6 +239,11 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
+: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry H{ } clone [
+        [ push-at ] curry compose each
+    ] keep ; inline
+
 M: sequence at*
     search-alist [ second t ] [ f ] if ;
 

@@ -99,15 +99,6 @@ IN: math.statistics.tests
 { H{ { 1 1/2 } { 2 1/6 } { 3 1/3 } } }
 [ { 1 1 1 1 1 1 2 2 3 3 3 3 } normalized-histogram ] unit-test
 
-{
-    V{ 0 3 6 9 }
-    V{ 1 4 7 }
-    V{ 2 5 8 }
-} [
-    10 iota [ 3 mod ] collect-by
-    [ 0 of ] [ 1 of ] [ 2 of ] tri
-] unit-test
-
 { 0 } [ { 1 } { 1 } sample-cov ] unit-test
 { 2/3 } [ { 1 2 3 } { 4 5 6 } population-cov ] unit-test
 
@@ -214,22 +205,6 @@ IN: math.statistics.tests
 
 { { 1 2 6 } }
 [ { 2 3 4 } cum-product1 ] unit-test
-
-{
-    H{
-        { 0 V{ 600 603 606 609 } }
-        { 1 V{ 601 604 607 610 } }
-        { 2 V{ 602 605 608 } }
-    }
-}
-[ 600 610 [a,b] [ 3 mod ] collect-by ] unit-test
-
-
-{
-    H{ { 0 V{ 0 3 6 9 } } { 1 V{ 1 4 7 10 } } { 2 V{ 2 5 8 } } }
-}
-[ 600 610 [a,b] [ 3 mod ] collect-index-by ] unit-test
-
 
 { { 1 } } [
     { 1 2 3 4 5 10 21 12 12 12 12203 3403 030 3022 2 2 }

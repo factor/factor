@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry io kernel math.parser sequences
-sorting math.statistics ;
+USING: accessors assocs io kernel math.parser sequences
+sorting ;
 IN: rosetta-code.top-rank
 
 ! http://rosettacode.org/wiki/Top_rank_per_group
