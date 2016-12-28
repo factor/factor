@@ -229,7 +229,7 @@ PRIVATE>
     histogram >alist [ second ] supremum-by first ;
 
 : minmax ( seq -- min max )
-    [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each ;
+    [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] 1 each-from ;
 
 : range ( seq -- x )
     minmax swap - ;
@@ -245,8 +245,7 @@ PRIVATE>
 
 : sample-var ( seq -- x ) 1 var-ddof ; inline
 
-: std-ddof ( seq n -- x )
-    var-ddof sqrt ; inline
+: std-ddof ( seq n -- x ) var-ddof sqrt ; inline
 
 : population-std ( seq -- x ) 0 std-ddof ; inline
 
