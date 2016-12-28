@@ -2,8 +2,8 @@
 USING: accessors assocs combinators combinators.short-circuit
 continuations formatting fry generalizations hashtables.identity
 io kernel kernel.private layouts locals math math.parser
-math.statistics math.vectors memory namespaces prettyprint
-sequences sequences.generalizations sets sorting ;
+math.vectors memory namespaces prettyprint sequences
+sequences.generalizations sets sorting ;
 IN: tools.profiler.sampling
 
 <PRIVATE
