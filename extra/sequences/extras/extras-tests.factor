@@ -3,7 +3,7 @@ math math.vectors random sequences sequences.extras strings
 tools.test vectors vocabs ;
 IN: sequences.extras.tests
 
-{ { { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
+{ V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
 { { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } } [ "abcd" all-subseqs ] unit-test
 
@@ -107,8 +107,8 @@ IN: sequences.extras.tests
 { "abc" } [ "abc" [ 1string ] map-concat ] unit-test
 { "abc" } [ { 97 98 99 } [ 1string ] map-concat ] unit-test
 { { 97 98 99 } } [ "abc" [ 1string ] { } map-concat-as ] unit-test
-{ "baz" { "foobaz" "barbaz" } }
-[ "baz" { { "foo" } { "bar" } } [ [ over append ] map ] map-concat ] unit-test
+{ { "foobaz" "barbaz" } }
+[ "baz" { { "foo" } { "bar" } } [ [ prepend ] with map ] with map-concat ] unit-test
 
 { { } } [ { } [ ] [ even? ] map-filter ] unit-test
 { "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test

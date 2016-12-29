@@ -22,12 +22,10 @@ IN: sequences.extras
 : all-subseqs ( seq -- seqs )
     dup length [1,b] [ clump ] with map concat ;
 
-:: each-subseq ( ... seq quot: ( ... x -- ... ) -- ... )
+:: each-subseq ( ... seq quot: ( ... subseq -- ... ) -- ... )
     seq length :> len
-    len [0,b] [
-        :> from
-        from len (a,b] [
-            :> to
+    len [0,b] [| from |
+        from len (a,b] [| to |
             from to seq subseq quot call
         ] each
     ] each ; inline
@@ -35,12 +33,12 @@ IN: sequences.extras
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
 
-: filter-all-subseqs-range ( ... seq range quot: ( ... x -- ... ) -- seq )
+: filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ) -- seq )
     [
         '[ <clumps> _ filter ] with map concat
     ] 3keep 2drop map-like ; inline
 
-: filter-all-subseqs ( ... seq quot: ( ... x -- ... ) -- seq )
+: filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ) -- seq )
     [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
 
 :: longest-subseq ( seq1 seq2 -- subseq )
@@ -186,6 +184,7 @@ ERROR: slices-don't-touch slice1 slice2 ;
     over length mod dup 0 >= [ cut ] [ abs cut* ] if prepend ;
 
 ERROR: underlying-mismatch slice1 slice2 ;
+
 : ensure-same-underlying ( slice1 slice2 -- slice1 slice2 )
     2dup [ seq>> ] bi@ eq? [ underlying-mismatch ] unless ;
 
@@ -231,10 +230,9 @@ PRIVATE>
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over empty? [ 2drop { } ] [
-        [ [ first ] dip call ] 2keep rot dup [
-            >resizable [ [ push-all ] curry compose ] keep
-            [ 1 ] 3dip [ setup-each (each-integer) ] dip
-        ] curry dip like
+        [ [ first ] dip call ] 2keep pick [
+            [ >resizable ] 2dip [ append! ] compose 1 each-from
+        ] dip like
     ] if ; inline
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
