@@ -4,23 +4,6 @@ sequences sequences.deep sequences.private sorting splitting
 vectors ;
 IN: sequences.extras
 
-: reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
-
-:: reduce-r ( seq identity quot: ( obj1 obj2 -- obj ) -- result )
-    seq [ identity ] [
-        unclip [ identity quot reduce-r ] [ quot call ] bi*
-    ] if-empty ; inline recursive
-
-! Quot must have static stack effect, unlike "reduce"
-:: reduce* ( seq identity quot: ( prev elt -- next ) -- result )
-    seq [ identity ] [
-        unclip identity swap quot call( prev elt -- next )
-        quot reduce*
-    ] if-empty ; inline recursive
-
-:: combos ( list1 list2 -- result )
-    list2 [ [ 2array ] curry list1 swap map ] map concat ;
-
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
     [ <enum> ] dip '[ nip @ ] assoc-filter ; inline
 

@@ -69,13 +69,6 @@ HELP: compact
     "Collapse multiple spaces in a string down to a single space"
     { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" compact ." "\"Hello, crazy world\"" } } ;
 
-HELP: combos
-{ $values
-    { "list1" sequence }
-    { "list2" sequence }
-    { "result" sequence } }
-{ $description "Returns all combinations of the first sequence with the second sequence.  The result is not uniquified: if the sequences contain duplicate elements, then the same pair may appear multiple times in the result sequence." } ;
-
 HELP: <evens>
 { $values { "seq" sequence } { "evens" evens } }
 { $description "Create a virtual sequence whose elements consist of the even-indexed elements from the original sequence." }
