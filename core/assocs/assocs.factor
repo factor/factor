@@ -293,8 +293,7 @@ M: enum set-at seq>> set-nth ; inline
 
 M: enum delete-at seq>> remove-nth! drop ; inline
 
-M: enum >alist ( enum -- alist )
-    seq>> [ length iota ] keep zip ; inline
+M: enum >alist ( enum -- alist ) ; inline
 
 M: enum keys seq>> length iota >array ; inline
 
