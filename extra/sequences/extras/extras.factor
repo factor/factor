@@ -21,10 +21,8 @@ IN: sequences.extras
 :: combos ( list1 list2 -- result )
     list2 [ [ 2array ] curry list1 swap map ] map concat ;
 
-: find-all ( seq quot: ( elt -- ? ) -- elts )
-    [ [ length iota ] keep ] dip
-    [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry
-    2map sift ; inline
+: find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
+    [ <enum> ] dip '[ nip @ ] assoc-filter ; inline
 
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
