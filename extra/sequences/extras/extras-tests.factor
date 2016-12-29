@@ -3,6 +3,8 @@ math math.vectors random sequences sequences.extras strings
 tools.test vectors vocabs ;
 IN: sequences.extras.tests
 
+{ { { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
+
 { { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } } [ "abcd" all-subseqs ] unit-test
 
 { { "a" "ab" "abc" "abcd" "b" "bc" "bcd" "c" "cd" "d" } }
