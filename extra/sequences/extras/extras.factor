@@ -230,9 +230,9 @@ PRIVATE>
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over empty? [ 2drop { } ] [
-        [ [ first ] dip call ] 2keep pick [
-            [ >resizable ] 2dip [ append! ] compose 1 each-from
-        ] dip like
+        [ [ first ] dip call ] 2keep rot [
+            >resizable [ '[ @ _ push-all ] 1 each-from ] keep
+        ] keep like
     ] if ; inline
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
