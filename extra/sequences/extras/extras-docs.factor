@@ -78,10 +78,10 @@ HELP: <evens>
 HELP: find-all
 { $values
     { "seq" sequence }
-    { "quot" { $quotation ( elt -- ? ) } }
+    { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "elts" "the indices of the matching elements" } }
 { $description "Similar to " { $link find } ", but finds all of the indices and elements that match the provided quotation, not just the first." }
-{ $notes "The result is provided as an array of arrays, whose first value is the index and whose second value is teh element." } ;
+{ $notes "The result is provided as an array of arrays, whose first value is the index and whose second value is the element." } ;
 
 HELP: first=
 { $values
