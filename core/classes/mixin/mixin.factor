@@ -18,11 +18,6 @@ M: mixin-class reset-class
 
 M: mixin-class rank-class drop 8 ;
 
-ERROR: not-a-mixin-class class ;
-
-: check-mixin-class ( mixin -- mixin )
-    dup mixin-class? [ not-a-mixin-class ] unless ;
-
 <PRIVATE
 
 : redefine-mixin-class ( class members -- )
@@ -32,7 +27,7 @@ ERROR: not-a-mixin-class class ;
     2tri ;
 
 : if-mixin-member? ( class mixin true false -- )
-    [ check-mixin-class 2dup class-members member-eq? ] 2dip if ; inline
+    [ 2dup class-members member-eq? ] 2dip if ; inline
 
 : change-mixin-class ( class mixin quot -- )
     [ [ class-members swap bootstrap-word ] dip call ] [ drop ] 2bi
@@ -66,8 +61,16 @@ ERROR: not-a-mixin-class class ;
 
 PRIVATE>
 
+ERROR: not-a-class object ;
+
+ERROR: not-a-mixin-class object ;
+
+: check-types ( class mixin -- class mixin )
+    [ dup class? [ not-a-class ] unless ]
+    [ dup mixin-class? [ not-a-mixin-class ] unless ] bi* ;
+
 : add-mixin-instance ( class mixin -- )
-    [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
+    check-types [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
     [ (remove-mixin-instance) ] [ 2drop ] if-mixin-member? ;
