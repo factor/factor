@@ -18,12 +18,10 @@ M: mixin-class reset-class
 
 M: mixin-class rank-class drop 8 ;
 
-ERROR: check-mixin-class-error class ;
+ERROR: not-a-mixin-class class ;
 
 : check-mixin-class ( mixin -- mixin )
-    dup mixin-class? [
-        check-mixin-class-error
-    ] unless ;
+    dup mixin-class? [ not-a-mixin-class ] unless ;
 
 <PRIVATE
 
