@@ -213,7 +213,7 @@ ERROR: invalid-timestamp-format ;
     string>number check-timestamp ;
 
 : parse-rfc822-gmt-offset ( string -- dt )
-    dup "GMT" = [ drop instant ] [
+    dup { "UTC" "GMT" } member? [ drop instant ] [
         unclip [
             2 cut [ string>number ] bi@ [ hours ] [ minutes ] bi* time+
         ] dip signed-gmt-offset
