@@ -81,10 +81,7 @@ IN: stack-checker.backend
 GENERIC: apply-object ( obj -- )
 
 M: wrapper apply-object
-    wrapped>>
-    [ dup word? [ +effect+ depends-on ] [ drop ] if ]
-    [ push-literal ]
-    bi ;
+    wrapped>> push-literal ;
 
 M: object apply-object push-literal ;
 

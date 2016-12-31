@@ -1,5 +1,5 @@
 USING: accessors assocs classes.tuple compiler.tree kernel namespaces
-sequences stack-checker.backend stack-checker.recursive-state
+sequences stack-checker.backend stack-checker.dependencies
 stack-checker.state stack-checker.values stack-checker.visitor
 tools.test ;
 IN: stack-checker.backend.tests
@@ -49,6 +49,24 @@ IN: stack-checker.backend.tests
     V{ 9 7 3 } (meta-d) set
     end-infer
     stack-visitor get first in-d>>
+] unit-test
+
+! apply-object
+SYMBOL: sam-sum
+
+{ H{ } } [
+    H{ } clone dependencies set
+    H{ } clone known-values set
+    init-inference
+    [ \ sam-sum ] first apply-object
+    dependencies get
+] unit-test
+
+{ V{ "abc" } } [
+    H{ } clone known-values set
+    init-inference
+    "abc" apply-object
+    literals get
 ] unit-test
 
 ! Because node is an identity-tuple
