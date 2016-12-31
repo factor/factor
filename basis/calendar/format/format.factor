@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar calendar.format.macros
+USING: accessors arrays assocs calendar calendar.format.macros
 combinators io io.streams.string kernel math math.functions
 math.order math.parser math.parser.private present sequences
 typed ;
@@ -212,12 +212,34 @@ ERROR: invalid-timestamp-format ;
 : checked-number ( str -- n )
     string>number check-timestamp ;
 
+CONSTANT: rfc822-named-zones H{
+    { "EST" -5 }
+    { "EDT" -4 }
+    { "CST" -6 }
+    { "CDT" -5 }
+    { "MST" -7 }
+    { "MDT" -6 }
+    { "PST" -8 }
+    { "PDT" -7 }
+}
+
+: parse-rfc822-military-offset ( string -- dt )
+    first CHAR: A - {
+        -1 -2 -3 -4 -5 -6 -7 -8 -9 f -10 -11 -12
+        1 2 3 4 5 6 7 8 9 10 11 12 0
+    } nth hours ;
+
 : parse-rfc822-gmt-offset ( string -- dt )
-    dup { "UTC" "GMT" } member? [ drop instant ] [
-        unclip [
-            2 cut [ string>number ] bi@ [ hours ] [ minutes ] bi* time+
-        ] dip signed-gmt-offset
-    ] if ;
+    {
+        { [ dup { "UTC" "GMT" } member? ] [ drop instant ] }
+        { [ dup length 1 = ] [ parse-rfc822-military-offset ] }
+        { [ dup rfc822-named-zones key? ] [ rfc822-named-zones at hours ] }
+        [
+            unclip [
+                2 cut [ string>number ] bi@ [ hours ] [ minutes ] bi* time+
+            ] dip signed-gmt-offset
+        ]
+    } cond ;
 
 : (rfc822>timestamp) ( -- timestamp )
     timestamp new

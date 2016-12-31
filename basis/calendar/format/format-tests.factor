@@ -37,6 +37,18 @@ kernel math.order sequences tools.test ;
     "-0500" parse-rfc822-gmt-offset
 ] unit-test
 
+{ T{ duration f 0 0 0 -1 0 0 } } [
+    "A" parse-rfc822-gmt-offset
+] unit-test
+
+{ T{ duration f 0 0 0 12 0 0 } } [
+    "Y" parse-rfc822-gmt-offset
+] unit-test
+j
+{ T{ duration f 0 0 0 -8 0 0 } } [
+    "PST" parse-rfc822-gmt-offset
+] unit-test
+
 { T{ timestamp f 2008 4 22 14 36 12 T{ duration f 0 0 0 0 0 0 } } } [
     "Tue, 22 Apr 2008 14:36:12 GMT" rfc822>timestamp
 ] unit-test
