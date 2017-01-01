@@ -124,7 +124,7 @@ M: inspector-gadget focusable-child*
 \ inspector-help H{ { +nullary+ t } } define-command
 
 inspector-gadget "toolbar" f {
-    { T{ update-object } com-refresh }
+    { T{ key-down f f "r" } com-refresh }
     { T{ key-down f f "p" } com-push }
     { T{ key-down f f "e" } com-edit-slot }
     { T{ key-down f f "F1" } inspector-help }
