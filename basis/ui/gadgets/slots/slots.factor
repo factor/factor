@@ -6,12 +6,6 @@ ui.gadgets.scrollers ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.tools.common ;
 IN: ui.gadgets.slots
 
-TUPLE: update-object ;
-
-TUPLE: update-slot ;
-
-TUPLE: edit-slot ;
-
 TUPLE: slot-editor < track ref close-hook update-hook text ;
 
 : revert ( slot-editor -- )
