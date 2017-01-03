@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Diego Martinelli.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar calendar.format checksums
-checksums.openssl classes.tuple fry io.encodings.ascii
-io.encodings.string kernel math math.functions math.parser
-math.ranges present random sequences splitting ;
+USING: accessors calendar checksums checksums.openssl classes.tuple
+formatting fry io.encodings.ascii io.encodings.string kernel math
+math.functions math.parser math.ranges present random sequences
+splitting ;
 IN: hashcash
 
 ! Hashcash implementation
@@ -20,9 +20,7 @@ IN: hashcash
 
 ! Return a string with today's date in the form YYMMDD
 : get-date ( -- str )
-    now [ year>> 100 mod pad-00 ]
-        [ month>> pad-00 ]
-        [ day>> pad-00 ] tri 3append ;
+    now "%y%m%d" strftime ;
 
 ! Random salt is formed by ascii characters
 ! between 33 and 126
