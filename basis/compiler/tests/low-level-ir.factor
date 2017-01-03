@@ -77,17 +77,17 @@ IN: compiler.tests.low-level-ir
     dup first eq?
 ] unit-test
 
-[ 4 ] [
+[ $[ tag-bits get ] ] [
     V{
-        T{ ##load-tagged f 0 4 }
+        T{ ##load-tagged f 0 $[ tag-bits get ] }
         T{ ##shl f 0 0 0 }
     } compile-test-bb
 ] unit-test
 
-[ 4 ] [
+[ $[ tag-bits get ] ] [
     V{
-        T{ ##load-tagged f 0 4 }
-        T{ ##shl-imm f 0 0 4 }
+        T{ ##load-tagged f 0 $[ tag-bits get ] }
+        T{ ##shl-imm f 0 0 $[ tag-bits get ] }
     } compile-test-bb
 ] unit-test
 
@@ -96,14 +96,14 @@ IN: compiler.tests.low-level-ir
         T{ ##load-reference f 1 B{ 31 67 52 } }
         T{ ##unbox-any-c-ptr f 2 1 }
         T{ ##load-memory-imm f 3 2 0 int-rep uchar }
-        T{ ##shl-imm f 0 3 4 }
+        T{ ##shl-imm f 0 3 $[ tag-bits get ] }
     } compile-test-bb
 ] unit-test
 
 [ 1 ] [
     V{
-        T{ ##load-tagged f 0 32 }
-        T{ ##add-imm f 0 0 -16 }
+        T{ ##load-tagged f 0 $[ 2 tag-fixnum ] }
+        T{ ##add-imm f 0 0 $[ -1 tag-fixnum ] }
     } compile-test-bb
 ] unit-test
 
