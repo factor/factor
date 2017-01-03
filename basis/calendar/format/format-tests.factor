@@ -44,7 +44,7 @@ kernel math.order sequences tools.test ;
 { T{ duration f 0 0 0 12 0 0 } } [
     "Y" parse-rfc822-gmt-offset
 ] unit-test
-j
+
 { T{ duration f 0 0 0 -8 0 0 } } [
     "PST" parse-rfc822-gmt-offset
 ] unit-test
