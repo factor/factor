@@ -159,8 +159,8 @@ M: metaclass-change-mixin metaclass-change-generic ;
 ! redefine-mixin-class
 { t } [
     [
-        SYMBOL: foo1
-        foo1 { foo1 } redefine-mixin-class
+        SYMBOLS: foo1 foo2 ;
+        foo1 { foo2 } redefine-mixin-class
         foo1 "mixin" word-prop
     ] with-compilation-unit
 ] unit-test
