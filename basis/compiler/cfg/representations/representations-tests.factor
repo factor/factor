@@ -897,3 +897,21 @@ cpu x86.64? [
         T{ ##replace f 1 D: 0 }
     } test-peephole
 ] unit-test
+
+! untag elimination for ##bit-count
+2 vreg-counter set-global
+
+{
+    V{
+        T{ ##peek f 0 D: 0 }
+        T{ ##bit-count f 3 0 }
+        T{ ##shl-imm f 1 3 $[ tag-bits get ] }
+        T{ ##replace f 1 D: 0 }
+    }
+} [
+    V{
+        T{ ##peek f 0 D: 0 }
+        T{ ##bit-count f 1 0 }
+        T{ ##replace f 1 D: 0 }
+    } test-peephole
+] unit-test

@@ -109,7 +109,8 @@ UNION: peephole-optimizable
     ##test-imm
     ##test
     ##test-imm-branch
-    ##test-branch ;
+    ##test-branch
+    ##bit-count ;
 
 GENERIC: compute-insn-costs ( insn -- )
 
