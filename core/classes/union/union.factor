@@ -50,18 +50,18 @@ M: class union-of-builtins?
 
 M: union-class update-class define-union-predicate ;
 
-: (define-union-class) ( class members -- )
-    f swap f union-class make-class-props (define-class) ;
-
 ERROR: cannot-reference-self class members ;
 
 : check-self-reference ( class members -- class members )
     2dup all-contained-classes member-eq? [ cannot-reference-self ] when ;
 
+: (define-union-class) ( class members -- )
+    check-self-reference f swap f union-class make-class-props (define-class) ;
+
 PRIVATE>
 
 : define-union-class ( class members -- )
-    [ check-self-reference (define-union-class) ]
+    [ (define-union-class) ]
     [ drop changed-conditionally ]
     [ drop update-classes ]
     2tri ;

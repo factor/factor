@@ -1,6 +1,6 @@
-USING: arrays assocs classes classes.algebra classes.mixin
-classes.mixin.private compiler.units continuations definitions eval
-hashtables kernel math parser sequences source-files strings
+USING: accessors arrays assocs classes classes.algebra classes.mixin
+classes.mixin.private classes.union.private compiler.units definitions
+eval hashtables kernel math parser sequences source-files strings
 tools.test vectors words ;
 IN: classes.mixin.tests
 
@@ -155,6 +155,15 @@ M: metaclass-change-mixin metaclass-change-generic ;
 { } [ [ metaclass-change forget-class ] with-compilation-unit ] unit-test
 
 { t } [ metaclass-change-mixin class-members empty? ] unit-test
+
+! Don't allow mixins to reference themselves
+[
+    "IN: issue-1652 MIXIN: bmix INSTANCE: bmix bmix" eval( -- )
+] [ error>> cannot-reference-self? ] must-fail-with
+
+[
+    "IN: issue-1652 MIXIN: a MIXIN: b INSTANCE: a b INSTANCE: b a" eval( -- )
+] [ error>> cannot-reference-self? ] must-fail-with
 
 ! redefine-mixin-class
 { t } [
