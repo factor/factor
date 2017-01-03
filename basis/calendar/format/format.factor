@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar calendar.format.macros
-combinators io io.streams.string kernel math math.functions
-math.order math.parser math.parser.private present sequences
-typed ;
+USING: accessors arrays assocs calendar calendar.english
+calendar.format.macros combinators io io.streams.string kernel math
+math.functions math.order math.parser math.parser.private present
+sequences typed ;
 IN: calendar.format
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
