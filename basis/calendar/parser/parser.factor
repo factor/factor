@@ -104,7 +104,7 @@ CONSTANT: rfc822-named-zones H{
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
         read-sp checked-number >>second
-        readln parse-rfc822-gmt-offset >>gmt-offset ;
+        " " read-until drop parse-rfc822-gmt-offset >>gmt-offset ;
 
 : rfc822>timestamp ( str -- timestamp )
     [ (rfc822>timestamp) ] with-string-reader ;
