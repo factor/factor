@@ -153,6 +153,11 @@ IN: calendar.parser.tests
     now dup timestamp>rfc822 rfc822>timestamp time- 1 seconds before?
 ] unit-test
 
-{ T{ timestamp f 2008 4 22 14 36 12 T{ duration f 0 0 0 0 0 0 } } } [
-    "Tue, 22 Apr 2008 14:36:12 GMT" rfc822>timestamp
+{ "Tue, 22 Apr 2008 14:36:12 GMT" } [
+    "Tue, 22 Apr 2008 14:36:12 GMT" rfc822>timestamp timestamp>rfc822
+] unit-test
+
+{ "Tue, 22 Apr 2008 14:36:12 GMT" } [
+    "Tue, 22 Apr 2008 14:36:12 GMT               "
+    rfc822>timestamp timestamp>rfc822
 ] unit-test
