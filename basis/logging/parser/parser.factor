@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors peg peg.parsers memoize kernel sequences
-logging arrays words strings vectors io io.files
-io.encodings.utf8 namespaces make combinators logging.server
-calendar calendar.format assocs prettyprint ;
+USING: accessors assocs calendar calendar.format calendar.parser
+combinators io io.encodings.utf8 io.files kernel logging
+logging.server make namespaces peg peg.parsers prettyprint sequences
+strings vectors words ;
 IN: logging.parser
 
 TUPLE: log-entry date level word-name message ;

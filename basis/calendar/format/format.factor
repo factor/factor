@@ -1,10 +1,18 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar calendar.english
-calendar.format.macros combinators io io.streams.string kernel math
-math.functions math.order math.parser math.parser.private present
-sequences typed ;
+USING: accessors arrays calendar calendar.english combinators io
+io.streams.string kernel macros math math.order math.parser
+math.parser.private present quotations sequences typed words ;
 IN: calendar.format
+
+MACRO: formatted ( spec -- quot )
+    [
+        {
+            { [ dup word? ] [ 1quotation ] }
+            { [ dup quotation? ] [ ] }
+            [ [ nip write ] curry [ ] like ]
+        } cond
+    ] map [ cleave ] curry ;
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
 
@@ -37,20 +45,6 @@ IN: calendar.format
 : YYYY ( time -- ) year>> write-0000 ;
 
 : YYYYY ( time -- ) year>> write-00000 ;
-
-: expect ( str -- )
-    read1 swap member? [ "Parse error" throw ] unless ;
-
-: read-00 ( -- n ) 2 read string>number ;
-
-: read-000 ( -- n ) 3 read string>number ;
-
-: read-0000 ( -- n ) 4 read string>number ;
-
-: hhmm>timestamp ( hhmm -- timestamp )
-    [
-        0 0 0 read-00 read-00 0 instant <timestamp>
-    ] with-string-reader ;
 
 GENERIC: day. ( obj -- )
 
@@ -160,162 +154,6 @@ M: timestamp year. ( timestamp -- )
 
 : timestamp>rfc3339 ( timestamp -- str )
     [ (timestamp>rfc3339) ] with-string-writer ;
-
-: signed-gmt-offset ( dt ch -- dt' )
-    { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case time* ;
-
-: read-rfc3339-gmt-offset ( ch -- dt )
-    {
-        { f [ instant ] }
-        { CHAR: Z [ instant ] }
-        [
-            [
-                read-00 hours
-                read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
-                time+
-            ] dip signed-gmt-offset
-        ]
-    } case ;
-
-: read-ymd ( -- y m d )
-    read-0000 "-" expect read-00 "-" expect read-00 ;
-
-: read-hms ( -- h m s )
-    read-00 ":" expect read-00 ":" expect read-00 ;
-
-: read-rfc3339-seconds ( s -- s' ch )
-    "+-Z" read-until [
-        [ string>number ] [ length 10^ ] bi / +
-    ] dip ;
-
-: (rfc3339>timestamp) ( -- timestamp )
-    read-ymd
-    "Tt \t" expect
-    read-hms
-    read1 { { CHAR: . [ read-rfc3339-seconds ] } [ ] } case
-    read-rfc3339-gmt-offset
-    <timestamp> ;
-
-: rfc3339>timestamp ( str -- timestamp )
-    [ (rfc3339>timestamp) ] with-string-reader ;
-
-ERROR: invalid-timestamp-format ;
-
-: check-timestamp ( obj/f -- obj )
-    [ invalid-timestamp-format ] unless* ;
-
-: read-token ( seps -- token )
-    [ read-until ] keep member? check-timestamp drop ;
-
-: read-sp ( -- token ) " " read-token ;
-
-: checked-number ( str -- n )
-    string>number check-timestamp ;
-
-CONSTANT: rfc822-named-zones H{
-    { "EST" -5 }
-    { "EDT" -4 }
-    { "CST" -6 }
-    { "CDT" -5 }
-    { "MST" -7 }
-    { "MDT" -6 }
-    { "PST" -8 }
-    { "PDT" -7 }
-}
-
-: parse-rfc822-military-offset ( string -- dt )
-    first CHAR: A - {
-        -1 -2 -3 -4 -5 -6 -7 -8 -9 f -10 -11 -12
-        1 2 3 4 5 6 7 8 9 10 11 12 0
-    } nth hours ;
-
-: parse-rfc822-gmt-offset ( string -- dt )
-    {
-        { [ dup { "UTC" "GMT" } member? ] [ drop instant ] }
-        { [ dup length 1 = ] [ parse-rfc822-military-offset ] }
-        { [ dup rfc822-named-zones key? ] [ rfc822-named-zones at hours ] }
-        [
-            unclip [
-                2 cut [ string>number ] bi@ [ hours ] [ minutes ] bi* time+
-            ] dip signed-gmt-offset
-        ]
-    } cond ;
-
-: (rfc822>timestamp) ( -- timestamp )
-    timestamp new
-        "," read-token day-abbreviations3 member? check-timestamp drop
-        read1 CHAR: \s assert=
-        read-sp checked-number >>day
-        read-sp month-abbreviations index 1 + check-timestamp >>month
-        read-sp checked-number >>year
-        ":" read-token checked-number >>hour
-        ":" read-token checked-number >>minute
-        read-sp checked-number >>second
-        readln parse-rfc822-gmt-offset >>gmt-offset ;
-
-: rfc822>timestamp ( str -- timestamp )
-    [ (rfc822>timestamp) ] with-string-reader ;
-
-: check-day-name ( str -- )
-    [ day-abbreviations3 member? ] [ day-names member? ] bi or
-    check-timestamp drop ;
-
-: (cookie-string>timestamp-1) ( -- timestamp )
-    timestamp new
-        "," read-token check-day-name
-        read1 CHAR: \s assert=
-        "-" read-token checked-number >>day
-        "-" read-token month-abbreviations index 1 + check-timestamp >>month
-        read-sp checked-number >>year
-        ":" read-token checked-number >>hour
-        ":" read-token checked-number >>minute
-        read-sp checked-number >>second
-        readln parse-rfc822-gmt-offset >>gmt-offset ;
-
-: cookie-string>timestamp-1 ( str -- timestamp )
-    [ (cookie-string>timestamp-1) ] with-string-reader ;
-
-: (cookie-string>timestamp-2) ( -- timestamp )
-    timestamp new
-        read-sp check-day-name
-        read-sp month-abbreviations index 1 + check-timestamp >>month
-        read-sp checked-number >>day
-        ":" read-token checked-number >>hour
-        ":" read-token checked-number >>minute
-        read-sp checked-number >>second
-        read-sp checked-number >>year
-        readln parse-rfc822-gmt-offset >>gmt-offset ;
-
-: cookie-string>timestamp-2 ( str -- timestamp )
-    [ (cookie-string>timestamp-2) ] with-string-reader ;
-
-: cookie-string>timestamp ( str -- timestamp )
-    {
-        [ cookie-string>timestamp-1 ]
-        [ cookie-string>timestamp-2 ]
-        [ rfc822>timestamp ]
-    } attempt-all-quots ;
-
-: (ymdhms>timestamp) ( -- timestamp )
-    read-ymd " " expect read-hms instant <timestamp> ;
-
-: ymdhms>timestamp ( str -- timestamp )
-    [ (ymdhms>timestamp) ] with-string-reader ;
-
-: (hms>timestamp) ( -- timestamp )
-    0 0 0 read-hms instant <timestamp> ;
-
-: hms>timestamp ( str -- timestamp )
-    [ (hms>timestamp) ] with-string-reader ;
-
-: hm>timestamp ( str -- timestamp )
-    ":00" append hms>timestamp ;
-
-: (ymd>timestamp) ( -- timestamp )
-    read-ymd <date-gmt> ;
-
-: ymd>timestamp ( str -- timestamp )
-    [ (ymd>timestamp) ] with-string-reader ;
 
 : (timestamp>ymd) ( timestamp -- )
     { YYYY "-" MM "-" DD } formatted ;
