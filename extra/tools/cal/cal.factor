@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors calendar combinators command-line
+USING: accessors calendar calendar.english combinators command-line
 formatting grouping io kernel math.parser math.ranges namespaces
 sequences sequences.extras strings.tables ;
 IN: tools.cal
