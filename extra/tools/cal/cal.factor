@@ -14,8 +14,7 @@ IN: tools.cal
     42 "  " pad-tail ;
 
 : month-header ( timestamp -- str )
-    "%B %Y" strftime
-    20 CHAR: \s pad-center ;
+    "%B %Y" strftime 20 CHAR: \s pad-center ;
 
 : year-header ( timestamp -- str )
     "%Y" strftime 64 CHAR: \s pad-center ;
