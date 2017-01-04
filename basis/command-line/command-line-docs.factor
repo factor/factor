@@ -1,4 +1,5 @@
-USING: help.markup help.syntax strings system vocabs vocabs.loader ;
+USING: help.markup help.syntax strings system tools.scaffold
+vocabs vocabs.loader ;
 IN: command-line
 
 HELP: run-bootstrap-init
@@ -112,7 +113,9 @@ $nl
 ARTICLE: ".factor-roots" "Additional vocabulary roots file"
 "The vocabulary roots file is named " { $snippet ".factor-roots" } ". If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
 $nl
-"A word to run this file from an existing Factor session:"
+"A word to create this file:"
+{ $subsections scaffold-factor-roots }
+"A word to load this file from an existing Factor session:"
 { $subsections load-vocab-roots } ;
 
 ARTICLE: "rc-files" "Running code on startup"
