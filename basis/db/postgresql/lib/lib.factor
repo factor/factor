@@ -83,7 +83,7 @@ M: postgresql-result-null summary ( obj -- str )
             ] }
             { BLOB [ dup [ malloc-byte-array/length ] [ 0 ] if ] }
             { DATE [ dup [ timestamp>ymd ] when default-param-value ] }
-            { TIME [ dup [ timestamp>hms ] when default-param-value ] }
+            { TIME [ dup [ duration>hms ] when default-param-value ] }
             { DATETIME [ dup [ timestamp>ymdhms ] when default-param-value ] }
             { TIMESTAMP [ dup [ timestamp>ymdhms ] when default-param-value ] }
             { URL [ dup [ present ] when default-param-value ] }
@@ -162,7 +162,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
         { TEXT [ pq-get-string ] }
         { VARCHAR [ pq-get-string ] }
         { DATE [ pq-get-string dup [ ymd>timestamp ] when ] }
-        { TIME [ pq-get-string dup [ hms>timestamp ] when ] }
+        { TIME [ pq-get-string dup [ hms>duration ] when ] }
         { TIMESTAMP [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { BLOB [ pq-get-blob ] }

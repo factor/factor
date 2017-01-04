@@ -7,3 +7,8 @@ IN: calendar.format.tests
 
 { }
 [ { 2008 2009 } [ year. ] each ] unit-test
+
+
+{ "03:01:59" } [
+    3 hours 1 >>minute 59 >>second duration>hms
+] unit-test

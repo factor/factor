@@ -186,9 +186,11 @@ TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
 
 M: timestamp present timestamp>string ;
 
-TYPED: duration>hm ( duration: duration -- string )
+! Duration formatting
+TYPED: duration>hms ( duration: duration -- str )
     [ duration>hours >integer 24 mod pad-00 ]
-    [ duration>minutes >integer 60 mod pad-00 ] bi ":" glue ;
+    [ duration>minutes >integer 60 mod pad-00 ]
+    [ second>> >integer 60 mod pad-00 ] tri 3array ":" join ;
 
 TYPED: duration>human-readable ( duration: duration -- string )
     [
@@ -204,5 +206,5 @@ TYPED: duration>human-readable ( duration: duration -- string )
                 [ number>string write ]
                 [ 1 > " days, " " day, " ? write ] bi
             ] unless-zero
-        ] [ duration>hm write ] tri
+        ] [ duration>hms write ] tri
     ] with-string-writer ;
