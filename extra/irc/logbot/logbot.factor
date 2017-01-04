@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Bruno Deferrari.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar calendar.format destructors fry io
-io.directories io.encodings.utf8 io.files io.pathnames
-irc.client irc.client.chats irc.logbot.log-line splitting
-irc.messages.base kernel make namespaces sequences threads ;
+USING: accessors calendar destructors formatting fry io io.directories
+io.encodings.utf8 io.files io.pathnames irc.client irc.client.chats
+irc.logbot.log-line irc.messages.base kernel namespaces sequences
+splitting threads ;
 IN: irc.logbot
 
 CONSTANT: bot-channel "#concatenative"
@@ -23,7 +23,7 @@ SYMBOL: current-stream
     nickserv-password get <irc-profile> ;
 
 : add-timestamp ( string timestamp -- string )
-    timestamp>hms [ "[" % % "] " % % ] "" make ;
+    "[%H:%M:%S] " strftime prepend ;
 
 : make-log-path ( -- path )
     ircbot-log-directory get default-log-directory or
@@ -31,7 +31,7 @@ SYMBOL: current-stream
     append-path ;
 
 : timestamp-path ( timestamp -- path )
-    timestamp>ymd ".log" append
+    "%Y-%m-%d.log" strftime
     make-log-path dup make-directories
     prepend-path ;
 
