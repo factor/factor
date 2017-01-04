@@ -237,13 +237,12 @@ http.server.dispatchers db.tuples ;
 ] unit-test
 
 : test-with-dispatcher ( dispatcher quot -- )
-    '[
-        main-responder set
+    [ main-responder ] dip '[
         <http-server> 0 >>insecure f >>secure
         [
             server-addrs random "addr" set @
         ] with-threaded-server
-    ] with-scope ; inline
+    ] with-variable ; inline
 
 USING: locals ;
 
