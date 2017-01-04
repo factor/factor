@@ -44,6 +44,13 @@ IN: calendar.parser.tests
     time- 1 seconds before?
 ] unit-test
 
+! hhmm>duration
+{
+    T{ duration { hour 10 } { minute 20 } }
+} [
+    "1020" hhmm>duration
+] unit-test
+
 ! parse-rfc822-gmt-offset
 { T{ duration f 0 0 0 0 0 0 } } [
     "GMT" parse-rfc822-gmt-offset
