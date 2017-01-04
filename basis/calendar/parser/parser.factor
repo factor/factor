@@ -27,11 +27,6 @@ ERROR: invalid-timestamp-format ;
 
 : read-sp ( -- token ) " " read-token ;
 
-: hhmm>timestamp ( hhmm -- timestamp )
-    [
-        0 0 0 read-00 read-00 0 instant <timestamp>
-    ] with-string-reader ;
-
 : signed-gmt-offset ( dt ch -- dt' )
     { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case time* ;
 
@@ -181,3 +176,7 @@ MACRO: attempt-all-quots ( quots -- quot )
 
 : ymd>timestamp ( str -- timestamp )
     [ (ymd>timestamp) ] with-string-reader ;
+
+! Duration parsing
+: hhmm>duration ( hhmm -- duration )
+    [ instant read-00 >>hour read-00 >>minute ] with-string-reader ;

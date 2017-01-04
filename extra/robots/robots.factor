@@ -63,7 +63,7 @@ visit-time request-rate crawl-delay unknowns ;
         { "crawl-delay" [ string>number >>crawl-delay ] }
         { "request-rate" [ string>number >>request-rate ] }
         {
-            "visit-time" [ "-" split1 [ hhmm>timestamp ] bi@ 2array
+            "visit-time" [ "-" split1 [ hhmm>duration ] bi@ 2array
             >>visit-time
         ] }
         [ pick unknowns>> push-at ]
