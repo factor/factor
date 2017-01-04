@@ -102,7 +102,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
         { DATE [ timestamp>ymd sqlite-bind-text-by-name ] }
-        { TIME [ timestamp>hms sqlite-bind-text-by-name ] }
+        { TIME [ duration>hms sqlite-bind-text-by-name ] }
         { DATETIME [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { TIMESTAMP [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
@@ -171,7 +171,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { TEXT [ sqlite3_column_text ] }
         { VARCHAR [ sqlite3_column_text ] }
         { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
-        { TIME [ sqlite3_column_text dup [ hms>timestamp ] when ] }
+        { TIME [ sqlite3_column_text dup [ hms>duration ] when ] }
         { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { BLOB [ sqlite-column-blob ] }

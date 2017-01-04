@@ -1,16 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.files.temp kernel tools.test db db.tuples classes
-db.types continuations namespaces math
-prettyprint calendar sequences db.sqlite math.intervals
-db.postgresql accessors random math.bitwise system
-math.ranges strings urls fry db.tuples.private db.private
-db.tester ;
+USING: accessors calendar calendar.parser classes continuations
+db.tester db.tuples db.types kernel math math.intervals math.ranges
+namespaces random sequences strings tools.test urls ;
 FROM: math.ranges => [a,b] ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
-ts date time blob factor-blob url ;
+    ts date time blob factor-blob url ;
 
 : <person> ( name age real ts date time blob factor-blob url -- person )
     person new
@@ -87,7 +84,7 @@ SYMBOL: person4
             3.14
             T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
             T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+            T{ duration f 0 0 0 12 34 56 }
             B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
         }
     ] [ T{ person f 3 } select-tuple ] unit-test
@@ -103,7 +100,7 @@ SYMBOL: person4
             3.14
             T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
             T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+            T{ duration f 0 0 0 12 34 56 }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
             URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
@@ -111,6 +108,21 @@ SYMBOL: person4
     ] [ T{ person f 4 } select-tuple ] unit-test
 
     [ ] [ person drop-table ] unit-test ;
+
+: teddy-data ( -- name age real ts date time blob factor-blob url )
+    "teddy" 10 3.14
+    "2008-03-05 16:24:11" ymdhms>timestamp
+    "2008-11-22 00:00:00" ymdhms>timestamp
+    "12:34:56" hms>duration
+    B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f f ;
+
+: eddie-data ( -- name age real ts date time blob factor-blob url )
+    "eddie" 10 3.14
+    "2008-03-05 16:24:11" ymdhms>timestamp
+    "2008-11-22 00:00:00" ymdhms>timestamp
+    "12:34:56" hms>duration
+    f H{ { 1 2 } { 3 4 } { 5 "lol" } }
+    URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" ;
 
 : db-assigned-person-schema ( -- )
     person "PERSON"
@@ -128,16 +140,8 @@ SYMBOL: person4
     } define-persistent
     "billy" 10 3.14 f f f f f f <person> person1 set
     "johnny" 10 3.14 f f f f f f <person> person2 set
-    "teddy" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f f <person> person3 set
-    "eddie" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"  <person> person4 set ;
+    teddy-data <person> person3 set
+    eddie-data <person> person4 set ;
 
 : user-assigned-person-schema ( -- )
     person "PERSON"
@@ -155,18 +159,8 @@ SYMBOL: person4
     } define-persistent
     1 "billy" 10 3.14 f f f f f f <user-assigned-person> person1 set
     2 "johnny" 10 3.14 f f f f f f <user-assigned-person> person2 set
-    3 "teddy" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
-        f f <user-assigned-person> person3 set
-    4 "eddie" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" <user-assigned-person> person4 set ;
-
+    3 teddy-data <user-assigned-person> person3 set
+    4 eddie-data <user-assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
@@ -625,6 +619,25 @@ compound-foo "COMPOUND_FOO"
 [ test-compound-primary-key ] test-sqlite
 [ test-compound-primary-key ] test-postgresql
 
+TUPLE: timez id time ;
+
+timez "TIMEZ"
+{
+    { "id" "ID" +db-assigned-id+ }
+    { "time" "TIME" TIME }
+} define-persistent
+
+: test-time-types ( -- )
+    timez ensure-table
+    timez new 3 hours >>time insert-tuple
+    {
+        T{ duration f 0 0 0 3 0 0 }
+    } [
+        timez new 3 hours >>time select-tuple time>>
+    ] unit-test ;
+
+[ test-time-types ] test-sqlite
+[ test-time-types ] test-postgresql
 
 TUPLE: example id data ;
 

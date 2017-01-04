@@ -162,15 +162,6 @@ MACRO: attempt-all-quots ( quots -- quot )
 : ymdhms>timestamp ( str -- timestamp )
     [ (ymdhms>timestamp) ] with-string-reader ;
 
-: (hms>timestamp) ( -- timestamp )
-    0 0 0 read-hms instant <timestamp> ;
-
-: hms>timestamp ( str -- timestamp )
-    [ (hms>timestamp) ] with-string-reader ;
-
-: hm>timestamp ( str -- timestamp )
-    ":00" append hms>timestamp ;
-
 : (ymd>timestamp) ( -- timestamp )
     read-ymd <date-gmt> ;
 
@@ -180,3 +171,7 @@ MACRO: attempt-all-quots ( quots -- quot )
 ! Duration parsing
 : hhmm>duration ( hhmm -- duration )
     [ instant read-00 >>hour read-00 >>minute ] with-string-reader ;
+
+: hms>duration ( str -- duration )
+    [ read-hms ] with-string-reader
+    instant swap >>second swap >>minute swap >>hour ;
