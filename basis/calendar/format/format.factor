@@ -167,12 +167,6 @@ TYPED: timestamp>ymd ( timestamp: timestamp -- str )
 TYPED: timestamp>hms ( timestamp: timestamp -- str )
     [ (timestamp>hms) ] with-string-writer ;
 
-: (timestamp>hm) ( timestamp -- )
-    { hh ":" mm } formatted ;
-
-TYPED: timestamp>hm ( timestamp: timestamp -- str )
-    [ (timestamp>hm) ] with-string-writer ;
-
 TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
     [
         >gmt
