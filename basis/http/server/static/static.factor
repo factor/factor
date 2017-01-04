@@ -5,7 +5,7 @@ DEFER: file-responder ! necessary for cgi-docs
 DEFER: <static> ! necessary for cgi-docs
 USING: calendar kernel math math.order math.parser namespaces
 parser sequences strings assocs hashtables debugger mime.types
-sorting logging calendar.format accessors splitting io io.files
+sorting logging calendar.parser accessors splitting io io.files
 io.files.info io.directories io.pathnames io.encodings.binary
 fry xml.entities destructors urls html xml.syntax
 html.templates.fhtml http http.server http.server.responses

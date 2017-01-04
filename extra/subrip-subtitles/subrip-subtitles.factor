@@ -1,6 +1,6 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar calendar.format
+USING: accessors arrays calendar calendar.parser
 io.encodings.utf8 io.files io.streams.string kernel math
 math.parser sequences splitting ascii ;
 IN: subrip-subtitles

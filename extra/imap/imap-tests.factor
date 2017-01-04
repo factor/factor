@@ -1,4 +1,4 @@
-USING: accessors arrays assocs calendar calendar.format
+USING: accessors arrays assocs calendar calendar.format calendar.parser
 combinators continuations destructors formatting fry grouping.extras imap
 imap.private io.streams.duplex kernel math math.parser math.ranges
 namespaces random sequences sets sorting uuid
