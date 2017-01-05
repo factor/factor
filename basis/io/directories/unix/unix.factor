@@ -17,8 +17,15 @@ M: unix touch-file ( path -- )
         touch-mode file-mode open-file close-file
     ] if ;
 
-M: unix move-file ( from to -- )
+M: unix move-file-atomically ( from to -- )
     [ normalize-path ] bi@ [ rename ] unix-system-call drop ;
+
+M: unix move-file ( from to -- )
+    [ move-file-atomically ] [
+        dup errno>> EXDEV = [
+            drop [ copy-file ] [ drop delete-file ] 2bi
+        ] [ rethrow ] if
+    ] recover ;
 
 M: unix delete-file ( path -- ) normalize-path unlink-file ;
 
