@@ -84,6 +84,7 @@ HOOK: delete-directory io-backend ( path -- )
 
 ! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )
+HOOK: move-file-atomically io-backend ( from to -- )
 
 : move-file-into ( from to -- )
     to-directory move-file ;

@@ -104,7 +104,13 @@ HELP: touch-file
 
 HELP: move-file
 { $values { "from" "a pathname string" } { "to" "a pathname string" } }
-{ $description "Moves or renames a file." }
+{ $description "Moves or renames a file. This operation is not guaranteed to be atomic. In particular, if you attempt to move a file across volumes, this will copy the file and then delete the original in a nontransactional manner." }
+{ $errors "Throws an error if the file does not exist or if the move operation fails." }
+{ $see-also move-file-atomically } ;
+
+HELP: move-file-atomically
+{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
+{ $description "Moves or renames a file as an atomic operation." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
 
 HELP: move-file-into
