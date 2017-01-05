@@ -396,7 +396,7 @@ M: windows home
     ] if ;
 
 : alternate-file-streams ( path -- streams )
-    file-streams [ cStreamName>> alien>native-string "::$DATA" = not ] filter ;
+    file-streams [ cStreamName>> alien>native-string "::$DATA" = ] reject ;
 
 : alternate-file-streams? ( path -- streams )
     alternate-file-streams empty? not ;
