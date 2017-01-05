@@ -304,14 +304,6 @@ HELP: before
     }
 } ;
 
-HELP: <zero>
-{ $values { "timestamp" timestamp } }
-{ $description "Returns a zero timestamp that consists of zeros for every slot. Used to see if timestamps are valid." } ;
-
-HELP: valid-timestamp?
-{ $values { "timestamp" timestamp } { "?" boolean } }
-{ $description "Tests if a timestamp is valid or not." } ;
-
 HELP: unix-1970
 { $values { "timestamp" timestamp } }
 { $description "Returns the beginning of UNIX time, or midnight, January 1, 1970." } ;
