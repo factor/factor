@@ -44,6 +44,25 @@ IN: calendar.parser.tests
     time- 1 seconds before?
 ] unit-test
 
+! cookie-string>timestamp-1
+{ "20160203102022" } [
+    "Friday, 03-Feb-2016 10:20:22 GMT" cookie-string>timestamp-1
+    timestamp>mdtm
+] unit-test
+
+[ "Friday, 03-Feb-2016 24:20:22 GMT" cookie-string>timestamp-1 ]
+[ not-in-interval? ] must-fail-with
+[ "Friday, 33-Feb-2016 12:20:22 GMT" cookie-string>timestamp-1 ]
+[ not-in-interval? ] must-fail-with
+
+! cookie-string>timestamp-2
+{ "19980903102022" } [
+    "Friday Sep 3 10:20:22 1998 GMT" cookie-string>timestamp-2 timestamp>mdtm
+] unit-test
+
+[ "Friday Sep 3 10:60:22 1998 GMT" cookie-string>timestamp-2  ]
+[ not-in-interval? ] must-fail-with
+
 ! hhmm>duration
 {
     T{ duration { hour 10 } { minute 20 } }
@@ -161,3 +180,9 @@ IN: calendar.parser.tests
     "Tue, 22 Apr 2008 14:36:12 GMT               "
     rfc822>timestamp timestamp>rfc822
 ] unit-test
+
+[ "Tue, 99 Apr 2008 14:36:12 GMT" rfc822>timestamp ]
+[ not-in-interval? ] must-fail-with
+
+[ "Wed, 29 Feb 2017 10:20:30 GMT" rfc822>timestamp ]
+[ not-in-interval? ] must-fail-with
