@@ -3,8 +3,8 @@
 
 USING: accessors assocs calendar combinators environment fonts
 formatting fry io io.streams.string kernel literals locals make
-math math.order math.ranges pdf.canvas pdf.values pdf.wrap
-sequences sequences.extras sorting splitting ui.text
+math math.order math.ranges namespaces pdf.canvas pdf.values
+pdf.wrap sequences sequences.extras sorting splitting ui.text
 xml.entities ;
 FROM: pdf.canvas => draw-text ;
 
@@ -353,14 +353,16 @@ M: table pdf-width
         "%%EOF" ,
     ] { } make "\n" join ;
 
+SYMBOLS: pdf-producer pdf-author pdf-creator ;
+
 TUPLE: pdf-info title timestamp producer author creator ;
 
 : <pdf-info> ( -- pdf-info )
     pdf-info new
         now >>timestamp
-        "Factor" >>producer
-        "USER" os-env "unknown" or >>author
-        "created with Factor" >>creator ;
+        pdf-producer get >>producer
+        pdf-author get >>author
+        pdf-creator get >>creator ;
 
 M: pdf-info pdf-value
     [
