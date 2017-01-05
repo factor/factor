@@ -345,7 +345,7 @@ SYMBOL: a
 <dispatcher>
     <action>
         [ a get-global "a" set-value ] >>init
-        [ [ "<html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
+        [ [ "<!DOCTYPE html><html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
         [ { { "a" [ v-integer ] } } validate-params ] >>validate
         [ "a" value a set-global URL" " <redirect> ] >>submit
     <conversations>

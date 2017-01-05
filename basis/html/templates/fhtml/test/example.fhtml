@@ -1,5 +1,5 @@
 <% USING: math ; %>
-
+<!DOCTYPE html>
 <html>
     <head><title>Simple Embedded Factor Example</title></head>
     <body>

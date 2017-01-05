@@ -7,6 +7,7 @@ IN: webapps.mason.backend.watchdog
 : crashed-builder-body ( crashed-builders -- string content-type )
     [ os/cpu [XML <li><-></li> XML] ] map
     <XML
+        <!DOCTYPE html>
         <html>
             <body>
                 <p>Machines which are not sending heartbeats:</p>

@@ -32,7 +32,7 @@ IN: html.parser.analyzer.tests
     T{ tag f text f "foo" f }
 }
 } [
-    "<html><head><title>foo</title></head></html>" parse-html
+    "<!DOCTYPE html><html><head><title>foo</title></head></html>" parse-html
     "title" find-between-first
 ] unit-test
 
