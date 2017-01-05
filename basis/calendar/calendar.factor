@@ -2,9 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel locals math math.functions
-math.order sequences summary system vocabs vocabs.loader
+math.intervals math.order sequences summary system vocabs vocabs.loader
 assocs ;
 IN: calendar
+
+ERROR: not-in-interval value interval ;
+
+: check-interval ( value interval -- value )
+    2dup interval-contains? [ drop ] [ not-in-interval ] if ;
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
@@ -31,7 +36,27 @@ TUPLE: timestamp
     { second real }
     { gmt-offset duration } ;
 
-C: <timestamp> timestamp
+CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
+
+GENERIC: leap-year? ( obj -- ? )
+
+M: integer leap-year? ( year -- ? )
+    dup 100 divisor? 400 4 ? divisor? ;
+
+M: timestamp leap-year? ( timestamp -- ? )
+    year>> leap-year? ;
+
+: (days-in-month) ( year month -- n )
+    dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
+
+:: <timestamp> ( year month day hour minute second gmt-offset -- timestamp )
+    year
+    month 1 12 [a,b] check-interval
+    day 1 year month (days-in-month) [a,b] check-interval
+    hour 0 23 [a,b] check-interval
+    minute 0 59 [a,b] check-interval
+    second 0 60 [a,b) check-interval
+    gmt-offset timestamp boa ;
 
 M: timestamp clone (clone) [ clone ] change-gmt-offset ;
 
@@ -49,8 +74,6 @@ M: timestamp clone (clone) [ clone ] change-gmt-offset ;
 
 : <year-gmt> ( year -- timestamp )
     1 1 <date-gmt> ; inline
-
-CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
 CONSTANT: average-month 30+5/12
 CONSTANT: months-per-year 12
@@ -122,14 +145,6 @@ M: timestamp easter ( timestamp -- timestamp )
 : milliseconds ( x -- duration ) 1000 / seconds ;
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
-
-GENERIC: leap-year? ( obj -- ? )
-
-M: integer leap-year? ( year -- ? )
-    dup 100 divisor? 400 4 ? divisor? ;
-
-M: timestamp leap-year? ( timestamp -- ? )
-    year>> leap-year? ;
 
 <PRIVATE
 
@@ -327,13 +342,6 @@ M: duration time-
         2drop <duration>
     ] if ;
 
-: <zero> ( -- timestamp )
-    0 0 0 <date-gmt> ; inline
-
-: valid-timestamp? ( timestamp -- ? )
-    clone instant >>gmt-offset
-    dup <zero> time- <zero> time+ = ;
-
 : unix-1970 ( -- timestamp )
     1970 <year-gmt> ; inline
 
@@ -370,9 +378,6 @@ GENERIC: days-in-year ( obj -- n )
 
 M: integer days-in-year ( year -- n ) leap-year? 366 365 ? ;
 M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
-
-: (days-in-month) ( year month -- n )
-    dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
 
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;
@@ -507,16 +512,11 @@ M: timestamp december clone 12 >>month ;
 : o'clock ( timestamp n -- new-timestamp )
     [ midnight ] dip >>hour ;
 
-ERROR: twelve-hour-expected n ;
-
-: check-twelve-hour ( n -- n )
-    dup 0 12 between? [ twelve-hour-expected ] unless ;
-
 : am ( timestamp n -- new-timestamp )
-    check-twelve-hour o'clock ;
+    0 12 [a,b] check-interval o'clock ;
 
 : pm ( timestamp n -- new-timestamp )
-    check-twelve-hour 12 + o'clock ;
+    0 12 [a,b] check-interval 12 + o'clock ;
 
 GENERIC: beginning-of-year ( object -- new-timestamp )
 M: timestamp beginning-of-year beginning-of-month 1 >>month ;
