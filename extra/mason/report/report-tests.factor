@@ -10,6 +10,7 @@ mason.report mason.common mason.config namespaces tools.test xml xml.writer ;
      [ ] [ "report" delete-file ] unit-test ;
 
 "builds" temp-file builds-dir [
+    builds-dir get
     [
         "resource:extra/mason/report/fake-data/" "." copy-tree
 
@@ -29,5 +30,5 @@ mason.report mason.common mason.config namespaces tools.test xml xml.writer ;
         [ status-error ] [ 1236 test-failed ] unit-test
         verify-report
 
-    ] with-temp-directory
+    ] with-directory
 ] with-variable
