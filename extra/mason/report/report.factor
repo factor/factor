@@ -32,7 +32,7 @@ IN: mason.report
     '[
         common-report
         _ call( -- xml )
-        [XML <!DOCTYPE html><html><body><-><-></body></html> XML]
+        [XML <div><-><-></div> XML]
         write-xml
     ] with-file-writer ; inline
 
