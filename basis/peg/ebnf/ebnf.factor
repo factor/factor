@@ -86,7 +86,7 @@ C: <ebnf> ebnf
 
 : filter-hidden ( seq -- seq )
     ! Remove elements that produce no AST from sequence
-    [ ebnf-ensure-not? ] reject [ ebnf-ensure? not ] filter ;
+    [ ebnf-ensure-not? ] reject [ ebnf-ensure? ] reject ;
 
 : syntax ( string -- parser )
     ! Parses the string, ignoring white space, and
