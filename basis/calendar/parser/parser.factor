@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.english combinators
-continuations io io.streams.string kernel macros math math.functions
-math.parser sequences ;
+continuations generalizations io io.streams.string kernel macros math
+math.functions math.parser sequences ;
 IN: calendar.parser
 
 : read-00 ( -- n ) 2 read string>number ;
@@ -94,17 +94,19 @@ CONSTANT: rfc822-named-zones H{
         ]
     } cond ;
 
+: read-hh:mm:ss ( -- hh mm ss )
+    ":" read-token checked-number
+    ":" read-token checked-number
+    read-sp checked-number ;
+
 : (rfc822>timestamp) ( -- timestamp )
-    timestamp new
-        "," read-token day-abbreviations3 member? check-timestamp drop
-        read1 CHAR: \s assert=
-        read-sp checked-number >>day
-        read-sp month-abbreviations index 1 + check-timestamp >>month
-        read-sp checked-number >>year
-        ":" read-token checked-number >>hour
-        ":" read-token checked-number >>minute
-        read-sp checked-number >>second
-        " " read-until drop parse-rfc822-gmt-offset >>gmt-offset ;
+    "," read-token day-abbreviations3 member? check-timestamp drop
+    read1 CHAR: \s assert=
+    read-sp checked-number
+    read-sp month-abbreviations index 1 + check-timestamp
+    read-sp checked-number -rot swap
+    read-hh:mm:ss
+    " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : rfc822>timestamp ( str -- timestamp )
     [ (rfc822>timestamp) ] with-string-reader ;
@@ -114,30 +116,24 @@ CONSTANT: rfc822-named-zones H{
     check-timestamp drop ;
 
 : (cookie-string>timestamp-1) ( -- timestamp )
-    timestamp new
-        "," read-token check-day-name
-        read1 CHAR: \s assert=
-        "-" read-token checked-number >>day
-        "-" read-token month-abbreviations index 1 + check-timestamp >>month
-        read-sp checked-number >>year
-        ":" read-token checked-number >>hour
-        ":" read-token checked-number >>minute
-        read-sp checked-number >>second
-        readln parse-rfc822-gmt-offset >>gmt-offset ;
+    "," read-token check-day-name
+    read1 CHAR: \s assert=
+    "-" read-token checked-number
+    "-" read-token month-abbreviations index 1 + check-timestamp
+    read-sp checked-number -rot swap
+    read-hh:mm:ss
+    " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : cookie-string>timestamp-1 ( str -- timestamp )
     [ (cookie-string>timestamp-1) ] with-string-reader ;
 
 : (cookie-string>timestamp-2) ( -- timestamp )
-    timestamp new
-        read-sp check-day-name
-        read-sp month-abbreviations index 1 + check-timestamp >>month
-        read-sp checked-number >>day
-        ":" read-token checked-number >>hour
-        ":" read-token checked-number >>minute
-        read-sp checked-number >>second
-        read-sp checked-number >>year
-        readln parse-rfc822-gmt-offset >>gmt-offset ;
+    read-sp check-day-name
+    read-sp month-abbreviations index 1 + check-timestamp
+    read-sp checked-number
+    read-hh:mm:ss
+    [ read-sp checked-number ] 5 ndip
+    " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : cookie-string>timestamp-2 ( str -- timestamp )
     [ (cookie-string>timestamp-2) ] with-string-reader ;
