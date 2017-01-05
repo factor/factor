@@ -10,5 +10,5 @@ ${ fixnum-bits } [ 0 trailing-zeros ] unit-test
 { t } [
     10 [
         10,000 [ random-units 10 estimate-cardinality ] [ / ] bi
-    ] replicate [ 1.0 0.10 ~ ] all?
+    ] replicate [ 1.0 0.15 ~ ] all? ! should be 4%?
 ] unit-test
