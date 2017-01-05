@@ -40,6 +40,7 @@ IN: webapps.numbers
   ! Display the string in a web page.
   [
     swap dup
+    "<!DOCTYPE html>" print
     <html>
       <head> <title> write </title> </head>
       <body>
@@ -51,6 +52,7 @@ IN: webapps.numbers
 
 : read-number ( -- )
   [
+    "<!DOCTYPE html>" print
     <html>
       <head> <title> "Enter a number" write </title> </head>
       <body>

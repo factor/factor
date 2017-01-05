@@ -145,10 +145,10 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 ] unit-test
 
 { } [
-    "<html>arbitrary <b>markup</b> for the win!</html>" "html" set-value
+    "<!DOCTYPE html><html>arbitrary <b>markup</b> for the win!</html>" "html" set-value
 ] unit-test
 
-{ "<html>arbitrary <b>markup</b> for the win!</html>" } [
+{ "<!DOCTYPE html><html>arbitrary <b>markup</b> for the win!</html>" } [
     [ "html" html render ] with-string-writer
 ] unit-test
 

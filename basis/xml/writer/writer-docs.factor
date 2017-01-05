@@ -56,10 +56,11 @@ HELP: indenter
 HELP: sensitive-tags
 { $var-description "Contains a sequence of " { $link name } "s where whitespace should be considered significant for prettyprinting purposes. The sequence can contain " { $link string } "s in place of names. For example, to preserve whitespace inside a " { $snippet "pre" } " tag:" }
 { $example "USING: xml.syntax xml.writer namespaces ;
-[XML <html> <head>   <title> something</title></head><body><pre>bing
+[XML <!DOCTYPE html> <html> <head>   <title> something</title></head><body><pre>bing
 bang
    bong</pre></body></html> XML] { \"pre\" } sensitive-tags [ pprint-xml ] with-variable"
 "
+<!DOCTYPE html>
 <html>
   <head>
     <title>

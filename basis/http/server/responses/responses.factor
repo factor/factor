@@ -20,6 +20,7 @@ IN: http.server.responses
 
 : trivial-response-body ( code message -- )
     <XML
+        <!DOCTYPE html>
         <html>
             <body>
                 <h1><-> <-></h1>
