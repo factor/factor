@@ -17,6 +17,9 @@ M: windows touch-file ( path -- )
 M: windows move-file ( from to -- )
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;
 
+M: windows move-file-atomically ( from to -- )
+    [ normalize-path ] bi@ 0 MoveFileEx win32-error=0/f ;
+
 ERROR: file-delete-failed path error ;
 
 : delete-file-throws ( path -- )
