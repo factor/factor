@@ -36,3 +36,18 @@ IN: trees.tests
     { 9 "nine" }
     { 4 "four" }
 } clone ] unit-test
+
+! test height
+{ 0 } [ TREE{ } height ] unit-test
+
+{ 2 } [ TREE{
+    { 7 "seven" }
+    { 9 "nine" }
+    { 4 "four" }
+} height ] unit-test
+
+{ 3 } [ TREE{
+    { 9 "seven" }
+    { 7 "nine" }
+    { 4 "four" }
+} height ] unit-test

@@ -1,4 +1,4 @@
-USING: help.syntax help.markup assocs ;
+USING: assocs help.markup help.syntax math ;
 IN: trees
 
 HELP: TREE{
@@ -17,6 +17,13 @@ HELP: >tree
 HELP: tree
 { $class-description "This is the class for unbalanced binary search trees. It is not usually intended to be used directly but rather as a basis for other trees." } ;
 
+HELP: height
+{ $values
+    { "tree" tree }
+    { "n" integer }
+}
+{ $description "Returns the height of " { $snippet "tree" } "." } ;
+
 ARTICLE: "trees" "Binary search trees"
 "This is a library for unbalanced binary search trees. It is not intended to be used directly in most situations but rather as a base class for new trees, because performance can degrade to linear time storage/retrieval by the number of keys. These binary search trees conform to the assoc protocol."
 { $subsections
@@ -24,6 +31,7 @@ ARTICLE: "trees" "Binary search trees"
     <tree>
     >tree
     POSTPONE: TREE{
+    height
 } ;
 
 ABOUT: "trees"
