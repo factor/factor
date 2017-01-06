@@ -24,7 +24,7 @@ $nl
     }
 } ;
 
-{ find find-from find-last find-last find-last-from search } related-words
+{ find find-from find-last find-last-from search } related-words
 
 HELP: sorted-index
 { $values { "obj" object } { "seq" "a sorted sequence" } { "i" "an index, or " { $link f } } }
