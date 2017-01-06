@@ -1,7 +1,8 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 
-USING: accessors binary-search colors.constants kernel locals
-math math.order opengl opengl.gl sequences
+USING: accessors arrays binary-search colors.constants
+combinators.short-circuit kernel locals math math.order
+math.rectangles math.statistics opengl opengl.gl sequences
 specialized-arrays.instances.alien.c-types.float ui.gadgets
 ui.render ;
 IN: charts
@@ -36,19 +37,48 @@ M: chart pref-dim* drop { 300 300 } ;
 : adjusted-head ( index elt seq -- seq' )
     [ finder find-from drop ] keep swap [ head ] when* ;
 
-:: in-bounds? ( bounds data -- ? )
-    bounds first data last first < not
-    bounds second data first first > not
-    and ;
+! : data-rect ( data -- rect )
+!    [ [ first first ] [ last first ] bi ] keep
+!    [ second ] map minmax swapd
+!    2array [ 2array ] dip <extent-rect> ;
 
-PRIVATE>
+: first-in-bounds? ( min,max pairs -- ? )
+    {
+        [ [ first ] dip last first > not ]
+        [ [ second ] dip first first < not ]
+    } 2&& ;
 
-: clip-data ( bounds data -- data' )
-    2dup in-bounds? [
+: second-in-bounds? ( min,max pairs -- ? )
+    [ second ] map minmax 2array
+    {
+        [ [ first ] dip second > not ]
+        [ [ second ] dip first < not ]
+    } 2&& ;
+
+! : pairs-in-bounds? ( bounds pairs -- ? )
+!    {
+!        [ [ first ] dip first-in-bounds? ]
+!        [ [ second ] dip second-in-bounds? ]
+!    } 2&& ;
+
+: clip-by-first ( min,max pairs -- pairs' )
+    2dup first-in-bounds? [
         [ dup first ] dip [ search-index ] keep adjusted-tail
         [ second ] dip [ search-index ] keep adjusted-head
     ] [
         2drop { } clone
+    ] if ;
+
+PRIVATE>
+
+! bounds: { { first-min first-max } { second-min second-max } }
+: clip-data ( bounds data -- data' )
+    dup empty? [ nip ] [
+        dupd [ first ] dip clip-by-first
+        dup empty? [ nip ] [
+            [ second ] dip [ second-in-bounds? ] keep swap
+            [ drop { } clone ] unless
+        ] if
     ] if ;
 
 ! Return the bottom-left and top-right corners of the visible area.
