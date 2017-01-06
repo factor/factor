@@ -25,3 +25,14 @@ IN: trees.tests
 { "replaced four" } [ test-tree 9 over delete-at 4 of ] unit-test
 { "nine" "replaced four" } [ test-tree 7 over delete-at 9 over at 4 rot at ] unit-test
 { "nine" } [ test-tree 7 over delete-at 4 over delete-at 9 of ] unit-test
+
+! test that cloning doesn't reshape the tree
+{ TREE{
+    { 7 "seven" }
+    { 9 "nine" }
+    { 4 "four" }
+} } [ TREE{
+    { 7 "seven" }
+    { 9 "nine" }
+    { 4 "four" }
+} clone ] unit-test
