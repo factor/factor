@@ -119,3 +119,7 @@ IN: trees.avl.tests
 { f } [ test-tree 9 over delete-at 9 of ] unit-test
 { "replaced seven" } [ test-tree 9 over delete-at 7 of ] unit-test
 { "nine" } [ test-tree 7 over delete-at 4 over delete-at 9 of ] unit-test
+
+! test assoc-size
+{ 3 } [ test-tree assoc-size ] unit-test
+{ 2 } [ test-tree 9 over delete-at assoc-size ] unit-test
