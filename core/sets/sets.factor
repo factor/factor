@@ -73,7 +73,7 @@ M: set union [ (union) ] keep set-like ;
     small/large sequence/tester filter ; inline
 
 : (diff) ( set1 set2 -- seq )
-    sequence/tester [ not ] compose filter ; inline
+    sequence/tester reject ; inline
 
 PRIVATE>
 
@@ -162,7 +162,7 @@ M: sequence clear-set
     tester filter ;
 
 : without ( seq set -- subseq )
-    tester [ not ] compose filter ;
+    tester reject ;
 
 : adjoin-all ( seq set -- )
     [ adjoin ] curry each ;
