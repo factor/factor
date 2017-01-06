@@ -227,3 +227,16 @@ M: tree assoc-size count>> ;
 M: tree pprint-delims drop \ TREE{ \ } ;
 M: tree >pprint-sequence >alist ;
 M: tree pprint-narrow? drop t ;
+
+<PRIVATE
+
+: node-height ( node -- n )
+    [
+        [ left>> ] [ right>> ] bi
+        [ node-height ] bi@ max 1 +
+    ] [ 0 ] if* ;
+
+PRIVATE>
+
+: height ( tree -- n )
+    root>> node-height ;
