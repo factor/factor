@@ -36,3 +36,16 @@ IN: trees.splay.tests
     100 iota [ dup zip >splay ] keep
     [ over delete-at ] each assoc-size
 ] unit-test
+
+: test-tree ( -- tree )
+    SPLAY{
+        { 7 "seven" }
+        { 9 "nine" }
+        { 4 "four" }
+        { 4 "replaced four" }
+        { 7 "replaced seven" }
+    } clone ;
+
+! test assoc-size
+{ 3 } [ test-tree assoc-size ] unit-test
+{ 2 } [ test-tree 9 over delete-at assoc-size ] unit-test
