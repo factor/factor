@@ -202,7 +202,18 @@ M: tree delete-at
 M: tree new-assoc
     2drop <tree> ;
 
-M: tree clone dup assoc-clone-like ;
+<PRIVATE
+
+: clone-nodes ( node -- node' )
+    dup [
+        clone
+        [ clone-nodes ] change-left
+        [ clone-nodes ] change-right
+    ] when ;
+
+PRIVATE>
+
+M: tree clone (clone) [ clone-nodes ] change-root ;
 
 : >tree ( assoc -- tree )
     T{ tree f f 0 } assoc-clone-like ;
