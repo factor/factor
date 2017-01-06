@@ -96,18 +96,19 @@ CONSTANT: right 1
 M: tree at*
     root>> node-at* ;
 
-: node-set ( value key node -- node )
+: node-set ( value key node -- node new? )
     2dup key>> key-side dup 0 eq? [
-        drop nip swap >>value
+        drop nip swap >>value f
     ] [
         [
-            [ node-link [ node-set ] [ swap <node> ] if* ] keep
-            [ set-node-link ] keep
+            [ node-link [ node-set ] [ swap <node> t ] if* ] keep
+            swap [ [ set-node-link ] keep ] dip
         ] with-side
     ] if ;
 
 M: tree set-at
-    [ [ node-set ] [ swap <node> ] if* ] change-root drop ;
+    [ [ node-set ] [ swap <node> t ] if* swap ] change-root
+    swap [ dup inc-count ] when drop ;
 
 : valid-node? ( node -- ? )
     [
@@ -183,21 +184,22 @@ DEFER: delete-node
         nip ! right but no left, or no children
     ] if* ;
 
-: delete-bst-node ( key node -- node )
+: delete-bst-node ( key node -- node deleted? )
     2dup key>> key-side dup 0 eq? [
-        drop nip delete-node
+        drop nip delete-node t
     ] [
         [
             [ node-link delete-bst-node ]
-            [ set-node-link ]
-            [ ] tri
+            [ swap [ set-node-link ] dip ]
+            [ swap ] tri
         ] with-side
     ] if ;
 
 PRIVATE>
 
 M: tree delete-at
-    [ delete-bst-node ] change-root drop ;
+    [ delete-bst-node swap ] change-root
+    swap [ dup dec-count ] when drop ;
 
 M: tree new-assoc
     2drop <tree> ;

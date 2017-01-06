@@ -51,3 +51,7 @@ IN: trees.tests
     { 7 "nine" }
     { 4 "four" }
 } height ] unit-test
+
+! test assoc-size
+{ 3 } [ test-tree assoc-size ] unit-test
+{ 2 } [ test-tree 9 over delete-at assoc-size ] unit-test
