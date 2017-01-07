@@ -97,16 +97,13 @@ SYMBOL: describe-words
 
 PRIVATE>
 
-: (fuel-word-help) ( name -- elem )
+: (fuel-word-help) ( name -- elem/f )
     fuel-find-word [
         [ auto-use? on (fuel-word-element) ] with-scope
     ] [ f ] if* ;
 
-: (fuel-word-synopsis) ( word usings -- str/f )
-    [
-        [ lookup-vocab ] filter interactive-vocabs [ append ] change
-        fuel-find-word [ synopsis ] [ f ] if*
-    ] with-scope ;
+: (fuel-word-synopsis) ( name -- str/f )
+    fuel-find-word [ synopsis ] [ f ] if* ;
 
 : (fuel-word-def) ( name -- str )
     fuel-find-word [ [ def>> pprint ] with-string-writer ] [ f ] if* ; inline
