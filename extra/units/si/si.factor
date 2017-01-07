@@ -73,7 +73,7 @@ IN: units.si
 : Np ( n -- neper ) { } { } <dimensioned> ;
 : B ( n -- bel ) 1.151292546497023 * Np ;
 : eV ( n -- electronvolt ) 1.60218e-19 * J ;
-: u ( n -- unified-atomic-mass-unit ) 1.66054e-27 * kg ;
+: u ( n -- unified-atomic-mass-unit ) 1.660539040e-27 * kg ;
 
 ! au has error of 30m, according to wikipedia
 : au ( n -- astronomical-unit ) 149597870691 * m ;
