@@ -31,23 +31,6 @@
   :group 'fuel-autodoc
   :type 'boolean)
 
-
-(defcustom fuel-autodoc-eval-using-form-p nil
-  "When enabled, automatically load vocabularies in USING: form
-to display autodoc messages.
-
-In order to show autodoc messages for words in a Factor buffer,
-the used vocabularies must be loaded in the Factor image. Setting
-this variable to `t' will do that automatically for you,
-asynchronously. That means that you'll be able to move around
-while the vocabs are being loaded, but no other FUEL
-functionality will be available until loading finishes (and it
-may take a while). Thus, this functionality is disabled by
-default. You can force loading the vocabs in a Factor buffer
-USING: form with \\[fuel-load-usings]."
-  :group 'fuel-autodoc
-  :type 'boolean)
-
 
 ;;; Eldoc function:
 
