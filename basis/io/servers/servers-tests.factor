@@ -1,7 +1,6 @@
-USING: accessors arrays calendar concurrency.promises fry io
-io.encodings.ascii io.encodings.utf8 io.servers
-io.servers.private io.sockets kernel namespaces scratchpad
-sequences threads tools.test ;
+USING: accessors arrays concurrency.flags fry io io.encodings.ascii
+io.encodings.utf8 io.servers.private io.sockets kernel namespaces
+sequences sets threads tools.test ;
 IN: io.servers
 
 { t } [ ascii <threaded-server> listen-on empty? ] unit-test
@@ -70,3 +69,15 @@ TUPLE: my-threaded-server < threaded-server ;
 
         start-server stop-server
 ] unit-test
+
+! add-running-server
+[
+    ascii <threaded-server> HS{ } clone 2dup adjoin
+    add-running-server
+] [ server-already-running? ] must-fail-with
+
+! stop-server
+[
+    ascii <threaded-server> <flag> >>server-stopped
+    stop-server
+] [ server-not-running? ] must-fail-with
