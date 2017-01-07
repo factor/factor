@@ -57,16 +57,16 @@ USING: form with \\[fuel-load-usings]."
   (let ((word (or word (factor-symbol-at-point)))
         (fuel-log--inhibit-p t))
     (when word
-      (let* ((usings (if fuel-autodoc-eval-using-form-p :usings t))
-             (cmd (if (factor-on-vocab)
-                      `(:fuel* (,word fuel-vocab-summary) :in t)
-                    `(:fuel* ((,word :usings fuel-word-synopsis)) t ,usings)))
-             (ret (fuel-eval--send/wait cmd fuel-autodoc--timeout))
-             (res (fuel-eval--retort-result ret)))
-        (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
-          (if fuel-autodoc-minibuffer-font-lock
-              (factor-font-lock-string res)
-            res))))))
+      (let ((cmd `(:fuel* (,word ,'fuel-word-synopsis)
+                          ,(factor-current-vocab)
+                          ,(factor-usings))))
+        (let* ((ret (fuel-eval--send/wait cmd fuel-autodoc--timeout))
+               (res (fuel-eval--retort-result ret)))
+          (if (not res)
+              (message "No synposis for '%s'" word)
+            (if fuel-autodoc-minibuffer-font-lock
+                (factor-font-lock-string res)
+              res)))))))
 
 (defvar-local fuel-autodoc--fallback-function nil)
 
