@@ -33,19 +33,11 @@ ERROR: server-already-running threaded-server ;
 
 <PRIVATE
 
-: must-be-running ( threaded-server -- threaded-server )
-    dup running-servers get in? [ server-not-running ] unless ;
+: add-running-server ( threaded-server running-servers -- )
+    2dup in? [ server-already-running ] [ adjoin ] if ;
 
-: must-not-be-running ( threaded-server -- threaded-server )
-    dup running-servers get in? [ server-already-running ] when ;
-
-: add-running-server ( threaded-server -- )
-    must-not-be-running
-    running-servers get adjoin ;
-
-: remove-running-server ( threaded-server -- )
-    must-be-running
-    running-servers get delete ;
+: remove-running-server ( threaded-server running-servers -- )
+    2dup in? [ delete ] [ drop server-not-running ] if ;
 
 PRIVATE>
 
@@ -181,7 +173,7 @@ PRIVATE>
             [ ] [ name>> ] bi
             [
                 set-servers
-                dup add-running-server
+                dup running-servers get add-running-server
                 dup servers>>
                 [
                     [ '[ _ _ [ start-accept-loop ] with-disposal ] ]
@@ -196,7 +188,7 @@ PRIVATE>
 
 : stop-server ( threaded-server -- )
     dup server-running? [
-        [ remove-running-server ]
+        [ running-servers get remove-running-server ]
         [
             [
                 [ secure-context>> [ &dispose drop ] when* ]
