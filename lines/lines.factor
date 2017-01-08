@@ -10,16 +10,10 @@ IN: charts.lines
 ! Data must be sorted by ascending x coordinate.
 TUPLE: line < gadget color data ;
 
+<PRIVATE
+
 : (line-vertices) ( seq -- vertices )
     concat [ 0.3 + ] float-array{ } map-as ;
-
-: draw-line ( seq -- )
-    dup dup length odd? [ [ 1 head* ] dip ] [ 1 head* ] if
-    1 tail append
-    [ (line-vertices) gl-vertex-pointer GL_LINES 0 ] keep
-    length glDrawArrays ;
-
-<PRIVATE
 
 : search-index ( elt seq -- index elt )
     [ first <=> ] with search ;
@@ -66,6 +60,12 @@ TUPLE: line < gadget color data ;
     ] if ;
 
 PRIVATE>
+
+: draw-line ( seq -- )
+    dup dup length odd? [ [ 1 head* ] dip ] [ 1 head* ] if
+    1 tail append
+    [ (line-vertices) gl-vertex-pointer GL_LINES 0 ] keep
+    length glDrawArrays ;
 
 ! bounds: { { first-min first-max } { second-min second-max } }
 : clip-data ( bounds data -- data' )
