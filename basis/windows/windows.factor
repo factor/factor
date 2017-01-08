@@ -20,6 +20,7 @@ CONSTANT: MAX_UNICODE_PATH 32768
     { "gl"          "opengl32.dll"       stdcall }
     { "glu"         "glu32.dll"          stdcall }
     { "ole32"       "ole32.dll"          stdcall }
+    { "shcore"      "shcore.dll"         stdcall }
     { "usp10"       "usp10.dll"          stdcall }
     { "psapi"       "psapi.dll"          stdcall }
     { "winmm"       "winmm.dll"          stdcall }
