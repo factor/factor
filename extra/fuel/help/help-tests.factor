@@ -9,7 +9,7 @@ IN: fuel.help.tests
         { $next-link articles "articles" }
     }
 } [
-    \ lookup-article (fuel-word-element) third
+    \ lookup-article word-element third
     [ first { $prev-link $next-link } member? ] filter
 ] unit-test
 
