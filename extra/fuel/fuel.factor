@@ -111,24 +111,24 @@ PRIVATE>
 : fuel-get-article-title ( name -- )
     articles get at [ article-title ] [ f ] if* fuel-eval-set-result ;
 
-: fuel-word-help ( name -- ) (fuel-word-help) fuel-eval-set-result ;
+: fuel-word-help ( name -- ) word-help fuel-eval-set-result ;
 
-: fuel-word-def ( name -- ) (fuel-word-def) fuel-eval-set-result ;
+: fuel-word-def ( name -- ) word-def fuel-eval-set-result ;
 
-: fuel-vocab-help ( name -- ) (fuel-vocab-help) fuel-eval-set-result ;
+: fuel-vocab-help ( name -- ) fuel.help:vocab-help fuel-eval-set-result ;
 
-: fuel-word-synopsis ( word -- ) (fuel-word-synopsis) fuel-eval-set-result ;
+: fuel-word-synopsis ( word -- ) word-synopsis fuel-eval-set-result ;
 
 : fuel-vocab-summary ( name -- )
-    (fuel-vocab-summary) fuel-eval-set-result ;
+    fuel.help:vocab-summary fuel-eval-set-result ;
 
 : fuel-index ( quot -- ) call( -- seq ) format-index fuel-eval-set-result ;
 
 : fuel-get-vocabs/tag ( tag -- )
-    (fuel-get-vocabs/tag) fuel-eval-set-result ;
+    get-vocabs/tag fuel-eval-set-result ;
 
 : fuel-get-vocabs/author ( author -- )
-    (fuel-get-vocabs/author) fuel-eval-set-result ;
+    get-vocabs/author fuel-eval-set-result ;
 
 ! Scaffold support
 
