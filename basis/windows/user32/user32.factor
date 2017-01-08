@@ -1898,7 +1898,7 @@ ALIAS: MessageBoxEx MessageBoxExW
 
 ! FUNCTION: ModifyMenuA
 ! FUNCTION: ModifyMenuW
-! FUNCTION: MonitorFromPoint
+FUNCTION: HMONITOR MonitorFromPoint ( POINT pt, DWORD dwFlags )
 ! FUNCTION: MonitorFromRect
 FUNCTION: HMONITOR MonitorFromWindow ( HWND hWnd, DWORD dwFlags )
 ! FUNCTION: mouse_event
