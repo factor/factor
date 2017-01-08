@@ -4,24 +4,23 @@ USING: accessors assocs compiler.units continuations fuel.eval
 fuel.help fuel.xref help.topics io.pathnames kernel namespaces parser
 sequences tools.scaffold vocabs vocabs.files vocabs.hierarchy
 vocabs.loader vocabs.metadata vocabs.parser words ;
-
 IN: fuel
 
 ! Evaluation
 
 : fuel-eval-restartable ( -- )
-    t fuel-eval-res-flag set-global ; inline
+    t eval-res-flag set-global ; inline
 
 : fuel-eval-non-restartable ( -- )
-    f fuel-eval-res-flag set-global ; inline
+    f eval-res-flag set-global ; inline
 
 : fuel-eval-in-context ( lines in usings -- )
-    (fuel-eval-in-context) ;
+    eval-in-context ;
 
 : fuel-eval-set-result ( obj -- )
-    clone fuel-eval-result set-global ; inline
+    clone eval-result set-global ; inline
 
-: fuel-retort ( -- ) fuel-send-retort ; inline
+: fuel-retort ( -- ) send-retort ; inline
 
 ! Loading files
 
