@@ -59,6 +59,12 @@ TUPLE: line < gadget color data ;
         2drop { } clone
     ] if ;
 
+! Split data into chunks to be drawn within the [ymin,ymax] limits.
+! Return the (empty?) sequence of chunks, possibly with some new
+! points at ymin and ymax at the gap bounds.
+: drawable-chunks ( ymin,ymax data -- chunks )
+    1array nip ;
+
 PRIVATE>
 
 : draw-line ( seq -- )
@@ -81,5 +87,6 @@ M: line draw-gadget*
     dup parent>> dup chart? [
         chart-axes swap
         [ color>> gl-color ] [ data>> ] bi
-        clip-data [ draw-line ] unless-empty
+        dupd clip-data [ second ] dip drawable-chunks
+        [ [ draw-line ] each ] unless-empty
     ] [ 2drop ] if ;
