@@ -1,11 +1,7 @@
-USING: accessors assocs compiler.units kernel lexer locals.backend
-locals.parser namespaces parser prettyprint sequences sorting
-tools.test vocabs vocabs.parser ;
-IN: locals.parser.tests
+USING: accessors assocs compiler.units kernel lexer
+locals.backend locals.parser parser prettyprint sequences
+tools.test vocabs.parser ;
 
-! XXX: remove the << and >> below and make test-all pass
-
-<<
 ! (::)
 {
     "dobiedoo"
@@ -26,7 +22,6 @@ IN: locals.parser.tests
         qualified-vocabs last words>> keys "um" swap member?
     ] with-compilation-unit
 ] unit-test
->>
 
 ! check-local-name
 { "hello" } [
@@ -58,15 +53,12 @@ IN: locals.parser.tests
     [ locals>> [ name>> ] map ] [ keys ] bi*
 ] unit-test
 
-<<
 {
     "V{ 99 :> kkk kkk }"
 } [
     [
-        "locals" use-vocab
         { "99 :> kkk kkk ;" } <lexer> [
             H{ } clone [ \ ; parse-until ] with-lambda-scope
         ] with-lexer
     ] with-compilation-unit unparse
 ] unit-test
->>
