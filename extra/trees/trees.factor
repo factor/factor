@@ -148,7 +148,7 @@ DEFER: delete-node
     dup node-link [
         [ nip ] dip (prune-extremity)
     ] [
-        [ delete-node ] [ set-node-link ] bi
+        [ delete-node swap set-node-link ] keep
     ] if* ;
 
 : prune-extremity ( node -- new-extremity )
