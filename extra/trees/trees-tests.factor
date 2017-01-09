@@ -1,4 +1,5 @@
-USING: trees assocs tools.test kernel sequences ;
+USING: accessors assocs kernel namespaces random tools.test
+trees trees.private ;
 IN: trees.tests
 
 : test-tree ( -- tree )
@@ -55,3 +56,21 @@ IN: trees.tests
 ! test assoc-size
 { 3 } [ test-tree assoc-size ] unit-test
 { 2 } [ test-tree 9 over delete-at assoc-size ] unit-test
+
+TUPLE: constant-random pattern ;
+M: constant-random random-32* pattern>> ;
+{ T{ tree
+    { root
+        T{ node
+            { key 2 }
+            { value 2 }
+            { left  T{ node { key 0 } { value 0 } } }
+            { right T{ node { key 3 } { value 3 } } }
+        }
+    } { count 3 } }
+} [
+    TREE{ { 1 1 } { 3 3 } { 2 2 } { 0 0 } } clone
+    T{ constant-random f 0xffffffff } random-generator [
+        1 over delete-at
+    ] with-variable
+] unit-test
