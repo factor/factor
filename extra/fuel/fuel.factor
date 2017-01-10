@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.units continuations fuel.eval
 fuel.help fuel.xref help.topics io.pathnames kernel namespaces parser
-sequences tools.scaffold vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata vocabs.parser words ;
+parser.notes sequences tools.scaffold vocabs vocabs.files
+vocabs.hierarchy vocabs.loader vocabs.metadata vocabs.parser words ;
 IN: fuel
 
 ! Evaluation
@@ -44,12 +44,15 @@ SYMBOL: :uses-suggestions
     restarts get [ is-suggested-restart ] filter
     dup length 1 = [ first continue-restart ] [ drop ] if ;
 
-: fuel-set-use-hook ( -- )
+: set-use-hook ( -- )
     [ manifest get auto-used>> clone :uses prefix fuel-eval-set-result ]
     print-use-hook set ;
 
-: (fuel-get-uses) ( lines -- )
-    [ parse-fresh drop ] curry with-compilation-unit ; inline
+: get-uses ( lines -- )
+    [
+        parser-quiet? on
+        parse-fresh drop
+    ] curry with-compilation-unit ; inline
 
 PRIVATE>
 
@@ -58,13 +61,13 @@ PRIVATE>
     [ try-suggested-restarts rethrow ] recover ; inline
 
 : fuel-run-file ( path -- )
-    [ fuel-set-use-hook run-file ] curry with-scope ; inline
+    [ set-use-hook run-file ] curry with-scope ; inline
 
 : fuel-with-autouse ( ..a quot: ( ..a -- ..b ) -- ..b )
-    [ auto-use? on fuel-set-use-hook call ] curry with-scope ; inline
+    [ set-use-hook call ] curry with-scope ; inline
 
 : fuel-get-uses ( lines -- )
-    [ (fuel-get-uses) ] curry fuel-with-autouse ;
+    [ get-uses ] curry fuel-with-autouse ;
 
 ! Edit locations
 
@@ -131,35 +134,44 @@ PRIVATE>
 
 ! Scaffold support
 
-: fuel-scaffold-name ( devname -- )
+: scaffold-name ( devname -- )
     [ developer-name set ] when* ;
 
 : fuel-scaffold-vocab ( root name devname -- )
-    [ fuel-scaffold-name dup [ scaffold-vocab ] dip ] with-scope
+    [ scaffold-name dup [ scaffold-vocab ] dip ] with-scope
     dup require vocab-source-path absolute-path fuel-eval-set-result ;
 
 : fuel-scaffold-help ( name devname -- )
-    [ fuel-scaffold-name dup require dup scaffold-docs ] with-scope
+    [ scaffold-name dup require dup scaffold-docs ] with-scope
     vocab-docs-path absolute-path fuel-eval-set-result ;
 
 : fuel-scaffold-tests ( name devname -- )
-    [ fuel-scaffold-name dup require dup scaffold-tests ] with-scope
+    [ scaffold-name dup require dup scaffold-tests ] with-scope
     vocab-tests-file absolute-path fuel-eval-set-result ;
 
 : fuel-scaffold-authors ( name devname -- )
-    [ fuel-scaffold-name dup require dup scaffold-authors ] with-scope
+    [ scaffold-name dup require dup scaffold-authors ] with-scope
     [ vocab-authors-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ;
 
 : fuel-scaffold-tags ( name tags -- )
     [ scaffold-tags ]
-    [ drop [ vocab-tags-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
+    [
+        drop [ vocab-tags-path ] keep swap
+        vocab-append-path absolute-path fuel-eval-set-result
+    ] 2bi ;
 
 : fuel-scaffold-summary ( name summary -- )
     [ scaffold-summary ]
-    [ drop [ vocab-summary-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
+    [
+        drop [ vocab-summary-path ] keep swap
+        vocab-append-path absolute-path fuel-eval-set-result
+    ] 2bi ;
 
 : fuel-scaffold-platforms ( name platforms -- )
     [ scaffold-platforms ]
-    [ drop [ vocab-platforms-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ] 2bi ;
+    [
+        drop [ vocab-platforms-path ] keep swap
+        vocab-append-path absolute-path fuel-eval-set-result
+    ] 2bi ;
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
