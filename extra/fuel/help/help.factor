@@ -12,9 +12,6 @@ IN: fuel.help
 : find-word ( name -- word/f )
     { [ search ] [ '[ name>> _ = ] all-words swap find nip ] } 1|| ;
 
-: value-str ( word -- str )
-    [ pprint-short ] with-string-writer ; inline
-
 : definition-str ( word -- str )
     [ see ] with-string-writer ; inline
 
@@ -47,7 +44,7 @@ SYMBOLS: $doc-path $next-link $prev-link ;
             [ parent-topics [ \ $doc-path prefix , ] unless-empty ]
             [ help:word-help % ]
             [ related-words [ \ $related swap 2array , ] unless-empty ]
-            [ get-global [ \ $value swap value-str 2array , ] when* ]
+            [ get-global [ \ $value swap unparse-short 2array , ] when* ]
             [ \ $definition swap definition-str 2array , ]
             [ methods-str [ \ $methods swap 2array , ] when* ]
         } cleave
