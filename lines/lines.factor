@@ -21,11 +21,12 @@ TUPLE: line < gadget color data ;
 : finder ( elt seq -- seq quot )
     [ first ] dip [ first = not ] with ; inline
 
-: adjusted-tail ( index elt seq -- seq' )
-    [ finder find-last-from drop ] keep swap [ 1 + tail ] when* ;
+: adjusted-tail-slice ( index elt seq -- slice )
+    [ finder find-last-from drop ] keep
+    swap [ 1 + tail-slice ] when* ;
 
-: adjusted-head ( index elt seq -- seq' )
-    [ finder find-from drop ] keep swap [ head ] when* ;
+: adjusted-head-slice ( index elt seq -- slice )
+    [ finder find-from drop ] keep swap [ head-slice ] when* ;
 
 ! : data-rect ( data -- rect )
 !    [ [ first first ] [ last first ] bi ] keep
@@ -53,8 +54,9 @@ TUPLE: line < gadget color data ;
 
 : clip-by-first ( min,max pairs -- pairs' )
     2dup first-in-bounds? [
-        [ dup first ] dip [ search-first ] keep adjusted-tail
-        [ second ] dip [ search-first ] keep adjusted-head
+        [ dup first ] dip [ search-first ] keep adjusted-tail-slice
+        [ second ] dip [ search-first ] keep adjusted-head-slice
+        dup like
     ] [
         2drop { } clone
     ] if ;
