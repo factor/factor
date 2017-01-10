@@ -15,7 +15,7 @@ TUPLE: line < gadget color data ;
 : (line-vertices) ( seq -- vertices )
     concat [ 0.3 + ] float-array{ } map-as ;
 
-: search-index ( elt seq -- index elt )
+: search-first ( elt seq -- index elt )
     [ first <=> ] with search ;
 
 : finder ( elt seq -- seq quot )
@@ -53,8 +53,8 @@ TUPLE: line < gadget color data ;
 
 : clip-by-first ( min,max pairs -- pairs' )
     2dup first-in-bounds? [
-        [ dup first ] dip [ search-index ] keep adjusted-tail
-        [ second ] dip [ search-index ] keep adjusted-head
+        [ dup first ] dip [ search-first ] keep adjusted-tail
+        [ second ] dip [ search-first ] keep adjusted-head
     ] [
         2drop { } clone
     ] if ;
