@@ -2,7 +2,7 @@
 
 USING: accessors arrays binary-search charts
 combinators.short-circuit kernel locals math math.order
-math.statistics opengl opengl.gl sequences
+math.statistics math.vectors opengl opengl.gl sequences
 specialized-arrays.instances.alien.c-types.float ui.gadgets
 ui.render ;
 IN: charts.lines
@@ -60,6 +60,8 @@ TUPLE: line < gadget color data ;
 !        [ [ first ] dip first-in-bounds? ]
 !        [ [ second ] dip second-in-bounds? ]
 !    } 2&& ;
+
+: calc-line-slope ( point1 point2 -- slope ) v- first2 swap / ;
 
 : clip-by-first ( min,max pairs -- pairs' )
     2dup first-in-bounds? [

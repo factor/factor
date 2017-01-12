@@ -1,7 +1,9 @@
 ! Copyright (C) 2017 Alexander Ilin.
 
-USING: tools.test charts.lines ;
+USING: tools.test charts.lines charts.lines.private ;
 IN: charts.lines.tests
+
+{ -2/3 } [ { 1 3 } { -2 5 } calc-line-slope ] unit-test
 
 { { } }
 [ { } { } clip-data ] unit-test
