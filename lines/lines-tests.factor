@@ -4,6 +4,10 @@ USING: tools.test charts.lines charts.lines.private ;
 IN: charts.lines.tests
 
 { -2/3 } [ { 1 3 } { -2 5 } calc-line-slope ] unit-test
+{ 3 } [ -2/3 1 { 1 3 } calc-y ] unit-test
+{ 5 } [ -2/3 -2 { 1 3 } calc-y ] unit-test
+{ 3 } [ -2/3 1 { -2 5 } calc-y ] unit-test
+{ 5 } [ -2/3 -2 { -2 5 } calc-y ] unit-test
 
 { { } }
 [ { } { } clip-data ] unit-test
