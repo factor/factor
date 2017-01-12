@@ -67,7 +67,7 @@ TUPLE: line < gadget color data ;
         adjusted-tail-slice
         [ second ] dip [ search-first? not ] keep
         adjusted-head-slice
-        dup like
+        dup slice? [ dup like ] when
     ] [
         2drop { } clone
     ] if ;
