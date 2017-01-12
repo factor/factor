@@ -1,8 +1,8 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 
 USING: accessors arrays binary-search charts
-combinators.short-circuit kernel math math.order math.statistics
-opengl opengl.gl sequences
+combinators.short-circuit kernel locals math math.order
+math.statistics opengl opengl.gl sequences
 specialized-arrays.instances.alien.c-types.float ui.gadgets
 ui.render ;
 IN: charts.lines
@@ -19,15 +19,23 @@ TUPLE: line < gadget color data ;
 : search-first ( elt seq -- index elt )
     [ first <=> ] with search ;
 
+: search-first? ( elt seq -- index elt exact-match? )
+    dupd search-first rot [ dup first ] dip = ;
+
 : finder ( elt seq -- seq quot )
     [ first ] dip [ first = not ] with ; inline
 
-: adjusted-tail-slice ( index elt seq -- slice )
-    [ finder find-last-from drop ] keep
-    swap [ 1 + tail-slice ] when* ;
+! Return a slice of the seq with all elements equal elt to the
+! left of the index, plus one that's not equal, if requested.
+:: adjusted-tail-slice ( index elt plus-one? seq -- slice )
+    index elt seq finder find-last-from drop seq swap
+    [ plus-one? [ 1 + ] unless tail-slice ] when* ;
 
-: adjusted-head-slice ( index elt seq -- slice )
-    [ finder find-from drop ] keep swap [ head-slice ] when* ;
+! Return a slice of the seq with all elements equal elt to the
+! right of the index, plus one that's not equal, if requested.
+:: adjusted-head-slice ( index elt plus-one? seq -- slice )
+    index elt seq finder find-from drop seq swap
+    [ plus-one? [ 1 + ] when short head-slice ] when* ;
 
 ! : data-rect ( data -- rect )
 !    [ [ first first ] [ last first ] bi ] keep
@@ -55,8 +63,10 @@ TUPLE: line < gadget color data ;
 
 : clip-by-first ( min,max pairs -- pairs' )
     2dup first-in-bounds? [
-        [ dup first ] dip [ search-first ] keep adjusted-tail-slice
-        [ second ] dip [ search-first ] keep adjusted-head-slice
+        [ dup first  ] dip [ search-first? not ] keep
+        adjusted-tail-slice
+        [ second ] dip [ search-first? not ] keep
+        adjusted-head-slice
         dup like
     ] [
         2drop { } clone
