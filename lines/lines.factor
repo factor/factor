@@ -7,7 +7,8 @@ specialized-arrays.instances.alien.c-types.float ui.gadgets
 ui.render ;
 IN: charts.lines
 
-! Data must be sorted by ascending x coordinate.
+! Data must be a sequence of { x y } coordinates sorted by
+! non-descending x vaues.
 TUPLE: line < gadget color data ;
 
 <PRIVATE
@@ -66,6 +67,9 @@ TUPLE: line < gadget color data ;
 ! points at ymin and ymax at the gap bounds.
 : drawable-chunks ( ymin,ymax data -- chunks )
     1array nip ;
+
+! Edge case: all x points may be outside the range, but the line may cross the visible frame. When there are no points directly on the x bounds those should be constructed and added (when needed, e.g. the line may not start with the leftmost x coordinate, even if it has a point to the left of the xmin: the line may enter the visible area from above).
+! If the data starts to the left of the bounds, and there is no point directly on the boundary, then one needs to be constructed and added to the data by finding the point of intersection between the left point and the next one to the right of it with the left boundary. This will guarantee to us that we do have points which are on the edges (if the line spreads beyond any of them).
 
 PRIVATE>
 
