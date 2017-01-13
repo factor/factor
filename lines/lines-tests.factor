@@ -9,6 +9,11 @@ IN: charts.lines.tests
 { 3 } [ -2/3 1 { -2 5 } calc-y ] unit-test
 { 5 } [ -2/3 -2 { -2 5 } calc-y ] unit-test
 
+{ 2 3 } [ { 1 2 3 } last2 ] unit-test
+{ 1 2 } [ { 1 2 } last2 ] unit-test
+[ { 1 } last2 ] must-fail
+[ { } last2 ] must-fail
+
 { { } }
 [ { } { } clip-data ] unit-test
 
