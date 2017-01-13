@@ -55,7 +55,7 @@ M: object max [ after? ] most ; inline
 
 : clamp ( x min max -- y ) [ max ] dip min ; inline
 
-: between? ( x y z -- ? )
+: between? ( x min max -- ? )
     pick after=? [ after=? ] [ 2drop f ] if ; inline
 
 : [-] ( x y -- z ) - 0 max ; inline
