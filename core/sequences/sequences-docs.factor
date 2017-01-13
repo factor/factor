@@ -1026,10 +1026,14 @@ HELP: head-slice*
 { $description "Outputs a virtual sequence sharing storage with all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
+{ head-slice head-slice* } related-words
+
 HELP: tail-slice*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with the last " { $snippet "n" } " elements of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+{ tail-slice tail-slice* } related-words
 
 HELP: head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
