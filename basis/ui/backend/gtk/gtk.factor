@@ -15,9 +15,9 @@ IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
 
-TUPLE: window-handle window im-context fullscreen? ;
+TUPLE: window-handle window drawable im-context fullscreen? ;
 
-: <window-handle> ( window im-context -- window-handle )
+: <window-handle> ( window drawable im-context -- window-handle )
     f window-handle boa ;
 
 : connect-signal-with-data ( object signal-name callback data -- )
@@ -219,14 +219,14 @@ icon-data [ default-icon-data ] initialize
 ! Window state events
 
 : on-expose ( win event user-data -- ? )
-    2drop window relayout t ;
+    2drop gtk_widget_get_toplevel window relayout t ;
 
-: on-configure ( win event user-data -- ? )
-    drop swap window dup active?>> [
-        swap GdkEventConfigure memory>struct
-        [ event-loc >>window-loc ] [ event-dim >>dim ] bi
-        relayout-1
-    ] [ 2drop ] if f ;
+: on-configure ( window event user-data -- ? )
+    drop swap dup gtk_widget_get_toplevel [ = ] keep window dup active?>> [
+        swap [ swap GdkEventConfigure memory>struct ] dip
+        [ event-loc >>window-loc drop ]
+        [ event-dim >>dim relayout-1 ] if
+    ] [ 3drop ] if f ;
 
 : on-map ( win event user-data -- ? )
     2drop window t >>active? drop t ;
@@ -234,11 +234,16 @@ icon-data [ default-icon-data ] initialize
 : on-delete ( win event user-data -- ? )
     2drop window ungraft t ;
 
+: connect-configure-signal ( winhandle -- )
+    [ window>> ] [ drawable>> ] bi "configure-event"
+    [ on-configure yield ] GtkWidget:configure-event
+    [ connect-signal ] 2curry bi@ ;
+
+: connect-expose-sigal ( drawable -- )
+    "expose-event" [ on-expose yield ]
+    GtkWidget:expose-event connect-signal ;
+
 :: connect-win-state-signals ( win -- )
-    win "expose-event" [ on-expose yield ]
-    GtkWidget:expose-event connect-signal
-    win "configure-event" [ on-configure yield ]
-    GtkWidget:configure-event connect-signal
     win "delete-event" [ on-delete yield ]
     GtkWidget:delete-event connect-signal
     win "map-event" [ on-map yield ]
@@ -395,19 +400,19 @@ M: gtk-ui-backend (pixel-format-attribute)
     with-out-parameters ;
 
 M: window-handle select-gl-context ( handle -- )
-    window>>
+    drawable>>
     [ gtk_widget_get_gl_window ] [ gtk_widget_get_gl_context ] bi
     gdk_gl_drawable_make_current drop ;
 
 M: window-handle flush-gl-context ( handle -- )
-    window>> gtk_widget_get_gl_window
+    drawable>> gtk_widget_get_gl_window
     gdk_gl_drawable_swap_buffers ;
 
 ! Window
 
 : configure-gl ( world -- )
     [
-        [ handle>> window>> ] [ handle>> ] bi*
+        [ handle>> drawable>> ] [ handle>> ] bi*
         f t GDK_GL_RGBA_TYPE gtk_widget_set_gl_capability drop
     ] with-world-pixel-format ;
 
@@ -420,9 +425,11 @@ M: window-handle flush-gl-context ( handle -- )
 
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
+    gtk_drawing_area_new :> drawable
+    win drawable gtk_container_add
     gtk_im_multicontext_new :> im
 
-    win im <window-handle> world handle<<
+    win drawable im <window-handle> world handle<<
 
     world win register-window
 
@@ -443,6 +450,8 @@ M:: gtk-ui-backend (open-window) ( world -- )
     win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
+    world handle>> connect-configure-signal
+    drawable connect-expose-sigal
 
     win world window-controls>> configure-window-controls
     win gtk_widget_show_all ;
