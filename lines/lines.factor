@@ -63,6 +63,7 @@ TUPLE: line < gadget color data ;
 
 : calc-line-slope ( point1 point2 -- slope ) v- first2 swap / ;
 : calc-y ( slope x point -- y ) first2 [ - * ] dip + ;
+: y-at ( x point1 point2 -- y ) dupd calc-line-slope -rot calc-y ;
 : last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
 
 ! Due to the way adjusted-tail-slice works, the first element of
@@ -70,8 +71,7 @@ TUPLE: line < gadget color data ;
 ! > min. Otherwise the first one would be = min.
 : left-cut ( min pairs -- seq )
     2dup first first < [
-        [ dupd first2 dupd calc-line-slope -rot calc-y 2array ] keep
-        rest-slice swap prefix
+        [ dupd first2 y-at 2array ] keep rest-slice swap prefix
     ] [
         nip
     ] if ;
@@ -81,8 +81,7 @@ TUPLE: line < gadget color data ;
 ! last is < max. Otherwise the last one would be = max.
 : right-cut ( max pairs -- seq )
     2dup last first < [
-        [ dupd last2 dupd calc-line-slope -rot calc-y 2array ] keep
-        but-last-slice swap suffix
+        [ dupd last2 y-at 2array ] keep but-last-slice swap suffix
     ] [
         nip
     ] if ;
