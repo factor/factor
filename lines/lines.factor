@@ -106,6 +106,10 @@ TUPLE: line < gadget color data ;
 : between<=> ( value min max -- <=> )
     3dup between? [ 3drop +eq+ ] [ nip > +gt+ +lt+ ? ] if ;
 
+! Drop chunks that are out of bounds, add extra points where needed.
+: (drawable-chunks) ( chunks min max -- chunks )
+    '[ first second _ _ between? ] filter harvest ;
+
 ! Split data into chunks to be drawn within the [ymin,ymax] limits.
 ! Return the (empty?) sequence of chunks, possibly with some new
 ! points at ymin and ymax at the gap bounds.
@@ -113,7 +117,7 @@ TUPLE: line < gadget color data ;
     first2 [
         '[ [ second _ _ between<=> ] bi@ = ]
         monotonic-split-slice
-    ] 2keep '[ first second _ _ between? not ] reject ;
+    ] 2keep (drawable-chunks) ;
 
 PRIVATE>
 
