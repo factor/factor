@@ -24,7 +24,7 @@ HELP: on-configure
   { "user-data" alien }
   { "?" boolean }
 }
-{ $description "Handles a configure event (" { $link GdkEventConfigure } " sent from the windowing system. If the world has been sent the on-map event from gtk then it is relayouted, otherwise nothing happens." } ;
+{ $description "Handles a configure event (" { $link GdkEventConfigure } ") sent from the windowing system. If the world has been sent the on-map event from gtk then it is updated, otherwise nothing happens. Resizing the window causes the world to be relayouted, but moving the window does not." } ;
 
 ARTICLE: "ui.backend.gtk" "Gtk-based UI backend"
 "GDK Event handlers:"
