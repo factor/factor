@@ -1,10 +1,10 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 
 USING: accessors arrays binary-search charts
-combinators.short-circuit kernel locals math math.order
+combinators.short-circuit fry kernel locals math math.order
 math.statistics math.vectors opengl opengl.gl sequences
-specialized-arrays.instances.alien.c-types.float ui.gadgets
-ui.render ;
+specialized-arrays.instances.alien.c-types.float
+splitting.monotonic ui.gadgets ui.render ;
 IN: charts.lines
 
 ! Data must be a sequence of { x y } coordinates sorted by
@@ -103,11 +103,15 @@ TUPLE: line < gadget color data ;
         2drop { } clone
     ] if ;
 
+: between<=> ( value min max -- <=> )
+    3dup between? [ 3drop +eq+ ] [ nip > +gt+ +lt+ ? ] if ;
+
 ! Split data into chunks to be drawn within the [ymin,ymax] limits.
 ! Return the (empty?) sequence of chunks, possibly with some new
 ! points at ymin and ymax at the gap bounds.
-: drawable-chunks ( ymin,ymax data -- chunks )
-    1array nip ;
+: drawable-chunks ( data ymin,ymax -- chunks )
+    first2 '[ [ second _ _ between<=> ] bi@ = ]
+    monotonic-split-slice ;
 
 PRIVATE>
 
@@ -131,6 +135,6 @@ M: line draw-gadget*
     dup parent>> dup chart? [
         chart-axes swap
         [ color>> gl-color ] [ data>> ] bi
-        dupd clip-data [ second ] dip drawable-chunks
+        dupd clip-data swap second drawable-chunks
         [ [ draw-line ] each ] unless-empty
     ] [ 2drop ] if ;
