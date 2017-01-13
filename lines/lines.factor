@@ -63,6 +63,7 @@ TUPLE: line < gadget color data ;
 
 : calc-line-slope ( point1 point2 -- slope ) v- first2 swap / ;
 : calc-y ( slope x point -- y ) first2 [ - * ] dip + ;
+: calc-x ( slope y point -- x ) first2 swap [ - swap / ] dip + ;
 : y-at ( x point1 point2 -- y ) dupd calc-line-slope -rot calc-y ;
 : last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
 
