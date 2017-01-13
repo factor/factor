@@ -5,7 +5,7 @@ HELP: search
 { $values { "seq" "a sorted sequence" } { "quot" { $quotation ( elt -- <=> ) } } { "i" "an index, or " { $link f } } { "elt" "an element, or " { $link f } } }
 { $description "Performs a binary search on a sequence, calling the quotation to decide whether to end the search (" { $link +eq+ } "), search lower (" { $link +lt+ } ") or search higher (" { $link +gt+ } ")."
 $nl
-"If the sequence is non-empty, outputs the index and value of the closest match, which is either an element for which the quotation output " { $link +eq+ } ", or failing that, least element for which the quotation output " { $link +lt+ } "."
+"If the sequence is non-empty, outputs the index and value of the closest match, which is either an element for which the quotation output " { $link +eq+ } ", or failing that, the least element for which the quotation output " { $link +lt+ } ", or if there were none of the above, the greatest element for which the quotation output " { $link +gt+ } "."
 $nl
 "If the sequence is empty, outputs " { $link f } " " { $link f } "." }
 { $notes "If the sequence has at least one element, this word always outputs a valid index, because it finds the closest match, not necessarily an exact one. In this respect its behavior differs from " { $link find } "." }
@@ -24,7 +24,7 @@ $nl
     }
 } ;
 
-{ find find-from find-last find-last find-last-from search } related-words
+{ find find-from find-last find-last-from search } related-words
 
 HELP: sorted-index
 { $values { "obj" object } { "seq" "a sorted sequence" } { "i" "an index, or " { $link f } } }

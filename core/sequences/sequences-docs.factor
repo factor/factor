@@ -850,8 +850,8 @@ HELP: collapse-slice
 
 HELP: <slice>
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "slice" slice } }
-{ $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
-{ $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." }
+{ $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } "." }
+{ $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " are out of bounds." }
 { $notes "Taking the slice of a slice outputs a slice of the underlying sequence, instead of a slice of a slice. This means that you cannot assume that the " { $snippet "from" } " and " { $snippet "to" } " slots of the resulting slice will be equal to the values you passed to " { $link <slice> } "." } ;
 
 { <slice> subseq } related-words
@@ -1026,10 +1026,14 @@ HELP: head-slice*
 { $description "Outputs a virtual sequence sharing storage with all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
+{ head-slice head-slice* } related-words
+
 HELP: tail-slice*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with the last " { $snippet "n" } " elements of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+{ tail-slice tail-slice* } related-words
 
 HELP: head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
