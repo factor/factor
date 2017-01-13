@@ -16,6 +16,9 @@ TUPLE: line < gadget color data ;
 : (line-vertices) ( seq -- vertices )
     concat [ 0.3 + ] float-array{ } map-as ;
 
+ALIAS: x first
+ALIAS: y second
+
 : search-first ( elt seq -- index elt )
     [ first <=> ] with search ;
 
