@@ -110,8 +110,10 @@ TUPLE: line < gadget color data ;
 ! Return the (empty?) sequence of chunks, possibly with some new
 ! points at ymin and ymax at the gap bounds.
 : drawable-chunks ( data ymin,ymax -- chunks )
-    first2 '[ [ second _ _ between<=> ] bi@ = ]
-    monotonic-split-slice ;
+    first2 [
+        '[ [ second _ _ between<=> ] bi@ = ]
+        monotonic-split-slice
+    ] 2keep '[ first second _ _ between? not ] reject ;
 
 PRIVATE>
 
