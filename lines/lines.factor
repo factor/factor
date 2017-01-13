@@ -65,12 +65,40 @@ TUPLE: line < gadget color data ;
 : calc-y ( slope x point -- y ) first2 [ - * ] dip + ;
 : last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
 
+! Due to the way adjusted-tail-slice works, the first element of
+! pairs is <= min, and if the first is < min, then the second is
+! > min. Otherwise the first one would be = min.
+: left-cut ( min pairs -- seq )
+    2dup first first < [
+        [ dupd first2 dupd calc-line-slope -rot calc-y 2array ] keep
+        rest-slice swap prefix
+    ] [
+        nip
+    ] if ;
+
+! Due to the way adjusted-head-slice works, the last element of
+! pairs is >= max, and if the last is > max, then the second to
+! last is < max. Otherwise the last one would be = max.
+: right-cut ( max pairs -- seq )
+    2dup last first < [
+        [ dupd last2 dupd calc-line-slope -rot calc-y 2array ] keep
+        but-last-slice swap suffix
+    ] [
+        nip
+    ] if ;
+
+! If the line spans beyond min or max, make sure there are points
+! with x = min and x = max in seq.
+: min-max-cut ( min,max pairs -- seq )
+    [ first2 ] dip right-cut left-cut ;
+
 : clip-by-first ( min,max pairs -- pairs' )
     2dup first-in-bounds? [
         [ dup first  ] dip [ search-first? not ] keep
         adjusted-tail-slice
-        [ second ] dip [ search-first? not ] keep
+        [ dup second ] dip [ search-first? not ] keep
         adjusted-head-slice
+        dup length 1 > [ min-max-cut ] [ nip ] if
         dup slice? [ dup like ] when
     ] [
         2drop { } clone
@@ -81,9 +109,6 @@ TUPLE: line < gadget color data ;
 ! points at ymin and ymax at the gap bounds.
 : drawable-chunks ( ymin,ymax data -- chunks )
     1array nip ;
-
-! Edge case: all x points may be outside the range, but the line may cross the visible frame. When there are no points directly on the x bounds those should be constructed and added (when needed, e.g. the line may not start with the leftmost x coordinate, even if it has a point to the left of the xmin: the line may enter the visible area from above).
-! If the data starts to the left of the bounds, and there is no point directly on the boundary, then one needs to be constructed and added to the data by finding the point of intersection between the left point and the next one to the right of it with the left boundary. This will guarantee to us that we do have points which are on the edges (if the line spreads beyond any of them).
 
 PRIVATE>
 
