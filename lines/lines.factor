@@ -114,6 +114,22 @@ ALIAS: y second
 : (drawable-chunks) ( chunks min max -- chunks )
     '[ first second _ _ between? ] filter harvest ;
 
+: calc-point-y ( slope y point -- xy ) over [ calc-x ] dip 2array ;
+
+: xyy>chunk ( x y1 y2 -- chunk )
+    [ over ] dip 2array [ 2array ] dip 2array ;
+
+:: 2-point-chunk ( left right ymin ymax -- chunk )
+    left last :> left-point right first :> right-point
+    left-point x right-point x = [
+        left-point x ymin ymax xyy>chunk
+    ] [
+        left-point right-point calc-line-slope :> slope
+        slope ymin left-point calc-point-y
+        slope ymax left-point calc-point-y
+        left-point y right-point y > [ swap ] when 2array
+    ] if ;
+
 ! Split data into chunks to be drawn within the [ymin,ymax] limits.
 ! Return the (empty?) sequence of chunks, possibly with some new
 ! points at ymin and ymax at the gap bounds.
