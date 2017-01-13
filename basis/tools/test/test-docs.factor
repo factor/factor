@@ -58,21 +58,25 @@ HELP: unit-test
 { $description "Runs a quotation with an empty stack, comparing the resulting stack with " { $snippet "output" } ". Elements are compared using " { $link = } ". Throws an error if the expected stack does not match the resulting stack." } ;
 
 HELP: must-fail
+{ $syntax "[ quot ] must-fail" }
 { $values { "quot" "a quotation run with an empty stack" } }
 { $description "Runs a quotation with an empty stack, expecting it to throw an error. If the quotation throws an error, this word returns normally. If the quotation does not throw an error, this word " { $emphasis "does" } " raise an error." }
 { $notes "This word is used to test boundary conditions and fail-fast behavior." } ;
 
 HELP: must-fail-with
+{ $syntax "[ pred ] [ quot ] must-fail-with" }
 { $values { "quot" "a quotation run with an empty stack" } { "pred" { $quotation ( error -- ? ) } } }
 { $description "Runs a quotation with an empty stack, expecting it to throw an error which must satisfy " { $snippet "pred" } ". If the quotation does not throw an error, or if the error does not match the predicate, the unit test fails." }
 { $notes "This word is used to test error handling code, ensuring that errors thrown by code contain the relevant debugging information." } ;
 
 HELP: must-infer
+{ $syntax "[ quot ] must-infer" }
 { $values { "quot" quotation } }
 { $description "Ensures that the quotation has a static stack effect without running it." }
 { $notes "This word is used to test that code will compile with the optimizing compiler for optimum performance. See " { $link "compiler" } "." } ;
 
 HELP: must-infer-as
+{ $syntax "{ effect } [ quot ] must-infer-as" }
 { $values { "effect" "a pair with shape " { $snippet "{ inputs outputs }" } } { "quot" quotation } }
 { $description "Ensures that the quotation has the indicated stack effect without running it." }
 { $notes "This word is used to test that code will compile with the optimizing compiler for optimum performance. See " { $link "compiler" } "." } ;
