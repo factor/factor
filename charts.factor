@@ -83,7 +83,7 @@ PRIVATE>
 
 ! Return the bottom-left and top-right corners of the visible area.
 : chart-axes ( chart -- seq )
-    drop { { 0 300 } { 300 0 } } ;
+    drop { { 0 300 } { 0 300 } } ;
 
 ! There are several things to do to present data on the screen.
 ! Map the data coordinates to the screen coordinates.
@@ -92,9 +92,9 @@ PRIVATE>
 
 M: line draw-gadget*
     dup parent>> dup chart? [
-        chart-axes drop
-        [ color>> gl-color ]
-        [ data>> draw-line ] bi
+        chart-axes swap
+        [ color>> gl-color ] [ data>> ] bi
+        clip-data [ draw-line ] unless-empty
     ] [ 2drop ] if ;
 
 ! chart new line new COLOR: blue >>color { { 0 100 } { 100 0 } { 100 50 } { 150 50 } { 200 100 } } >>data add-gadget gadget.
