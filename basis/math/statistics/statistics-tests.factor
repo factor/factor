@@ -13,7 +13,10 @@ IN: math.statistics.tests
 { 1.0 } [ { 1 1 1 } geometric-mean ] unit-test
 { t } [ 1000 1000 <array> geometric-mean 1000 .01 ~ ] unit-test
 { t } [ 100000 100000 <array> geometric-mean 100000 .01 ~ ] unit-test
-{ 1/3 } [ { 1 1 1 } harmonic-mean ] unit-test
+
+{ 1 } [ { 1 1 1 } harmonic-mean ] unit-test
+{ 12/7 } [ { 1 2 4 } harmonic-mean ] unit-test
+
 { 5+1/4 } [ { 1 3 5 7 } contraharmonic-mean ] unit-test
 { 18 } [ { 4 8 15 16 23 42 } 0 trimmed-mean ] unit-test
 { 15+1/2 } [ { 4 8 15 16 23 42 } 0.2 trimmed-mean ] unit-test
