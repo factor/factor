@@ -35,7 +35,7 @@ IN: math.statistics
     [ [ log ] map-sum ] [ length ] bi /f e^ ; inline
 
 : harmonic-mean ( seq -- x )
-    [ recip ] map-sum recip ; inline
+    [ [ recip ] map-sum ] [ length swap / ] bi ; inline
 
 : contraharmonic-mean ( seq -- x )
     [ sum-of-squares ] [ sum ] bi / ; inline

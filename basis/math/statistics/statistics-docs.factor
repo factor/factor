@@ -12,7 +12,7 @@ HELP: harmonic-mean
 { $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the harmonic mean of the elements in " { $snippet "seq" } ". The harmonic mean is appropriate when the average of rates is desired." }
 { $notes "Positive reals only." }
-{ $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "6/11" } }
+{ $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "18/11" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: kth-smallest
@@ -24,7 +24,8 @@ HELP: mean
 { $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the arithmetic mean of the elements in " { $snippet "seq" } "." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } mean ." "2" } }
-{ $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
+{ $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." }
+{ $see-also geometric-mean harmonic-mean } ;
 
 HELP: median
 { $values { "seq" sequence } { "x" "a non-negative real number" } }
