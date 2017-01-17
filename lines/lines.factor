@@ -172,8 +172,8 @@ ALIAS: y second
 PRIVATE>
 
 : draw-line ( seq -- )
-    dup dup length odd? [ [ 1 head* ] dip ] [ 1 head* ] if
-    1 tail append
+    dup [ 1 head-slice* ] over length odd? [ dip ] [ call ] if
+    1 tail-slice append
     [ (line-vertices) gl-vertex-pointer GL_LINES 0 ] keep
     length glDrawArrays ;
 
