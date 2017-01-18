@@ -1181,7 +1181,7 @@ HELP: unclip-last
 
 HELP: unclip-last-slice
 { $values { "seq" sequence } { "butlast-slice" slice } { "last" object } }
-{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last Unlike " { $link unclip-last } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
+{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last. Unlike " { $link unclip-last } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
 
 HELP: sum
 { $values { "seq" { $sequence number } } { "n" number } }
