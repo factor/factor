@@ -162,9 +162,9 @@ ALIAS: y second
 
 SYMBOL: elt
 
-: each2* ( seq quot: ( prev next -- next' ) -- )
+: each2* ( seq quot: ( prev next -- next' ) -- last )
     [ unclip-slice elt ] dip '[
-        [ elt get swap @ elt set ] each
+        [ elt get swap @ elt set ] each elt get
     ] with-variable ; inline
 
 :: (make-pair) ( prev next min max -- next' )
@@ -190,7 +190,10 @@ SYMBOL: elt
             ]
         }
         [
-            drop [ chunks [ min max (make-pair) ] each2* ] { } make
+            drop [
+                chunks [ min max (make-pair) ] each2*
+                dup first y min max between? [ , ] [ drop ] if
+            ] { } make
         ]
     } case ;
 
