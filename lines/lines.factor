@@ -1,9 +1,9 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 
-USING: accessors arrays binary-search charts
-combinators.short-circuit fry kernel locals math math.order
-math.statistics math.vectors opengl opengl.gl sequences
-specialized-arrays.instances.alien.c-types.float
+USING: accessors arrays binary-search charts combinators
+combinators.short-circuit fry kernel locals make math math.order
+math.statistics math.vectors namespaces opengl opengl.gl
+sequences specialized-arrays.instances.alien.c-types.float
 splitting.monotonic ui.gadgets ui.render ;
 IN: charts.lines
 
@@ -110,9 +110,6 @@ ALIAS: y second
 : between<=> ( value min max -- <=> )
     3dup between? [ 3drop +eq+ ] [ nip > +gt+ +lt+ ? ] if ;
 
-! Drop chunks that are out of bounds, add extra points where needed.
-: (drawable-chunks) ( chunks min max -- chunks )
-    '[ first second _ _ between? ] filter harvest ;
 
 : calc-point-y ( slope y point -- xy ) over [ calc-x ] dip 2array ;
 
@@ -159,6 +156,43 @@ ALIAS: y second
         ] if
         right rest-slice swap suffix
     ] if ;
+
+: first-point ( chunks -- first-point ) first first ;
+: last-point ( chunks -- last-point ) last last ;
+
+SYMBOL: elt
+
+: each2* ( seq quot: ( prev next -- next' ) -- )
+    [ unclip-slice elt ] dip '[
+        [ elt get swap @ elt set ] each
+    ] with-variable ; inline
+
+:: (make-pair) ( prev next min max -- next' )
+    prev next min max
+    prev next [ first y min max between<=> ] bi@ 2array
+    {
+        { { +gt+ +eq+ } [ fix-right-chunk       ] }
+        { { +lt+ +eq+ } [ fix-right-chunk       ] }
+        { { +eq+ +gt+ } [ fix-left-chunk , next ] }
+        { { +eq+ +lt+ } [ fix-left-chunk , next ] }
+        { { +gt+ +lt+ } [ 2-point-chunk  , next ] }
+        { { +lt+ +gt+ } [ 2-point-chunk  , next ] }
+        [ drop "same values - can't happen" throw ]
+    } case ;
+
+! Drop chunks that are out of bounds, add extra points where needed.
+:: (drawable-chunks) ( chunks min max -- chunks' )
+    chunks length {
+        { 0 [ chunks ] }
+        { 1 [
+                chunks dup first-point y min max between?
+                [ drop { } clone ] unless
+            ]
+        }
+        [
+            drop [ chunks [ min max (make-pair) ] each2* ] { } make
+        ]
+    } case ;
 
 ! Split data into chunks to be drawn within the [ymin,ymax] limits.
 ! Return the (empty?) sequence of chunks, possibly with some new
