@@ -79,6 +79,38 @@ IN: charts.lines.tests
     -3 3 fix-left-chunk
 ] unit-test
 
+! fix-right-chunk: y coord = top limit
+{
+    { { 5 3 } { 6 0 } }
+} [
+    { { -6 6 } { -3 4 } } { { 5 3 } { 6 0 } }
+    -3 3 fix-right-chunk
+] unit-test
+
+! fix-right-chunk: y coord = bottom limit
+{
+    { { 5 -3 } { 6 0 } }
+} [
+    { { -6 -6 } { -3 -4 } } { { 5 -3 } { 6 0 } }
+    -3 3 fix-right-chunk
+] unit-test
+
+! fix-right-chunk: going upwards
+{
+    { { -3 -3 } { -2 -2 } { 6 0 } }
+} [
+    { { -6 -6 } { -4 -4 } } { { -2 -2 } { 6 0 } }
+    -3 3 fix-right-chunk
+] unit-test
+
+! fix-right-chunk: going downwards
+{
+    { { -3 3 } { -2 2 } { 6 0 } }
+} [
+    { { -6 6 } { -4 4 } } { { -2 2 } { 6 0 } }
+    -3 3 fix-right-chunk
+] unit-test
+
 ! tight bounds
 {
     { { { 0 0 } { 0 1 } { 1 2 } { 1 3 } { 2 5 } } }
