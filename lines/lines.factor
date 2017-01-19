@@ -206,6 +206,11 @@ SYMBOL: elt
         monotonic-split-slice
     ] 2keep (drawable-chunks) ;
 
+: middle ( min max -- middle ) dupd swap - 2 / + ;
+
+: flip-y-axis ( chunks ymin,ymax -- chunks )
+    first2 middle 2 * '[ [ first2 _ swap - 2array ] map ] map ;
+
 PRIVATE>
 
 : draw-line ( seq -- )
@@ -228,6 +233,6 @@ M: line draw-gadget*
     dup parent>> dup chart? [
         chart-axes swap
         [ color>> gl-color ] [ data>> ] bi
-        dupd clip-data swap second drawable-chunks
-        [ [ draw-line ] each ] unless-empty
+        dupd clip-data swap second [ drawable-chunks ] keep
+        flip-y-axis [ [ draw-line ] each ] unless-empty
     ] [ 2drop ] if ;
