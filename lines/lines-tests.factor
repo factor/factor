@@ -220,6 +220,17 @@ IN: charts.lines.tests
     drawable-chunks [ { } like ] map
 ] unit-test
 
+{ 0 } [ -10 10 middle ] unit-test
+{ 15 } [ 10 20 middle ] unit-test
+{ -81/2 } [ -50 -31 middle ] unit-test
+
+{
+    { { { 0 300 } { 1 200 } { 2 150 } { 3 100 } { 4 0 } } }
+} [
+    { { { 0 0 } { 1 100 } { 2 150 } { 3 200 } { 4 300 } } }
+    { 0 300 } flip-y-axis
+] unit-test
+
 { { } }
 [ { } { } clip-data ] unit-test
 
