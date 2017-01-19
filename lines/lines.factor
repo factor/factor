@@ -154,7 +154,7 @@ ALIAS: y second
             left-point right-point calc-line-slope
             y-coord left-point calc-point-y
         ] if
-        right rest-slice swap suffix
+        right swap prefix
     ] if ;
 
 : first-point ( chunks -- first-point ) first first ;
