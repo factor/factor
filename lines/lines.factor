@@ -132,14 +132,14 @@ ALIAS: y second
     left-point y { [ ymin = ] [ ymax = ] } 1|| [
         left
     ] [
-        left-point y right-point y < ymin ymax ? :> y-coord
+        left-point y right-point y > ymin ymax ? :> y-coord
         left-point x right-point x = [
             left-point x y-coord 2array
         ] [
             left-point right-point calc-line-slope
             y-coord left-point calc-point-y
         ] if
-        left but-last-slice swap suffix
+        left swap suffix
     ] if ;
 
 :: fix-right-chunk ( left right ymin ymax -- right' )
