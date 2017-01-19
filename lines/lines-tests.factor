@@ -200,6 +200,26 @@ IN: charts.lines.tests
     drawable-chunks [ { } like ] map
 ] unit-test
 
+! single point sticks out to within the limits from below
+{
+    {
+        { { 1 1 } { 2 2 } { 3 1 } }
+    }
+} [
+    { { 0 0 } { 2 2 } { 4 0 } } { 1 5 }
+    drawable-chunks [ { } like ] map
+] unit-test
+
+! single point sticks out to within the limits from above
+{
+    {
+        { { 1 3 } { 2 2 } { 3 3 } }
+    }
+} [
+    { { 0 4 } { 2 2 } { 4 4 } } { 1 3 }
+    drawable-chunks [ { } like ] map
+] unit-test
+
 { { } }
 [ { } { } clip-data ] unit-test
 
