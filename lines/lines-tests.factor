@@ -23,6 +23,30 @@ IN: charts.lines.tests
 [ { 1 } last2 ] must-fail
 [ { } last2 ] must-fail
 
+! 2-point-chunk upwards
+{
+    { { -3 -3 } { 3 3 } }
+} [
+    { { -6 0 } { -5 -5 } } { { 5 5 } { 6 0 } }
+    -3 3 2-point-chunk
+] unit-test
+
+! 2-point-chunk downwards
+{
+    { { -3 3 } { 3 -3 } }
+} [
+    { { -6 0 } { -5 5 } } { { 5 -5 } { 6 0 } }
+    -3 3 2-point-chunk
+] unit-test
+
+! 2-point-chunk: same x coord
+{
+    { { -5 -3 } { -5 3 } }
+} [
+    { { -6 0 } { -5 -5 } } { { -5 5 } { 6 0 } }
+    -3 3 2-point-chunk
+] unit-test
+
 ! tight bounds
 {
     { { { 0 0 } { 0 1 } { 1 2 } { 1 3 } { 2 5 } } }
