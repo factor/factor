@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Alexander Ilin.
-
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences tools.test charts.lines
 charts.lines.private ;
 IN: charts.lines.tests
