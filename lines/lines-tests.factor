@@ -1,6 +1,6 @@
 ! Copyright (C) 2017 Alexander Ilin.
 
-USING: kernel sequences tools.test charts.lines
+USING: kernel math sequences tools.test charts.lines
 charts.lines.private ;
 IN: charts.lines.tests
 
@@ -229,6 +229,12 @@ IN: charts.lines.tests
 } [
     { { { 0 0 } { 1 100 } { 2 150 } { 3 200 } { 4 300 } } }
     { 0 300 } flip-y-axis
+] unit-test
+
+{
+    { 0 30 60 90 120 150 180 210 240 270 300 }
+} [
+    11 iota [ 10 + ] map [ 300 swap 20 10 scale ] map
 ] unit-test
 
 { { } }

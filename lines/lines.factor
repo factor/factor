@@ -211,6 +211,9 @@ SYMBOL: elt
 : flip-y-axis ( chunks ymin,ymax -- chunks )
     first2 middle 2 * '[ [ first2 _ swap - 2array ] map ] map ;
 
+! value' = (value - min) / (max - min) * width
+: scale ( width value max min -- value' ) neg [ + ] curry bi@ / * ;
+
 PRIVATE>
 
 : draw-line ( seq -- )
