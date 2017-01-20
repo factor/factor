@@ -25,13 +25,13 @@ ALIAS: y second
 : search-first? ( elt seq -- index elt exact-match? )
     dupd search-first rot [ dup first ] dip = ;
 
-! Return a slice of the seq with all elements equal elt to the
+! Return a slice of the seq with all elements equal to elt to the
 ! left of the index, plus one that's not equal, if requested.
 :: adjusted-tail-slice ( n elt plus-one? seq -- slice )
     n seq elt first '[ first _ = not ] find-last-from drop seq swap
     [ plus-one? [ 1 + ] unless tail-slice ] when* ;
 
-! Return a slice of the seq with all elements equal elt to the
+! Return a slice of the seq with all elements equal to elt to the
 ! right of the index, plus one that's not equal, if requested.
 :: adjusted-head-slice ( n elt plus-one? seq -- slice )
     n seq elt first '[ first _ = not ] find-from drop seq swap
