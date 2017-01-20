@@ -220,10 +220,6 @@ IN: charts.lines.tests
     drawable-chunks [ { } like ] map
 ] unit-test
 
-{ 0 } [ -10 10 middle ] unit-test
-{ 15 } [ 10 20 middle ] unit-test
-{ -81/2 } [ -50 -31 middle ] unit-test
-
 {
     { { { 0 300 } { 1 200 } { 2 150 } { 3 100 } { 4 0 } } }
 } [
