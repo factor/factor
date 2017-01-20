@@ -214,6 +214,22 @@ SYMBOL: elt
 ! value' = (value - min) / (max - min) * width
 : scale ( width value max min -- value' ) neg [ + ] curry bi@ / * ;
 
+! Return quotation that can be used in map operation.
+: scale-mapper ( width min,max -- quot: ( value -- value' ) )
+    first2 swap '[ _ swap _ _ scale ] ; inline
+
+! Sometimes no scaling is needed.
+! : scale-mapper ( width min,max -- quot: ( value -- value' ) )
+!    first2 swap 3dup - = [
+!        3drop [ ]
+!    ] [
+!        '[ _ swap _ _ scale ]
+!    ] if ; inline
+
+: scale-chunks ( chunks xwidth xmin,xmax yheight ymin,ymax -- chunks' )
+    scale-mapper [ scale-mapper ] dip swap
+    '[ [ first2 @ swap @ swap 2array ] map ] map ;
+
 PRIVATE>
 
 : draw-line ( seq -- )
@@ -233,9 +249,12 @@ PRIVATE>
     ] if ;
 
 M: line draw-gadget*
-    dup parent>> dup chart? [
-        chart-axes swap
-        [ color>> gl-color ] [ data>> ] bi
+    dup parent>> dup chart? [| line chart |
+        chart chart-axes
+        line [ color>> gl-color ] [ data>> ] bi
         dupd clip-data swap second [ drawable-chunks ] keep
-        flip-y-axis [ [ draw-line ] each ] unless-empty
+        flip-y-axis
+        chart chart-dim first2 [ chart chart-axes first2 ] dip swap
+        scale-chunks
+        [ [ draw-line ] each ] unless-empty
     ] [ 2drop ] if ;
