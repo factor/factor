@@ -68,9 +68,9 @@ ALIAS: y second
 : last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
 
 ! Due to the way adjusted-tail-slice works, the first element of
-! pairs is <= min, and if the first is < min, then the second is
-! > min. Otherwise the first one would be = min.
-: left-cut ( min pairs -- seq )
+! pairs is <= xmin, and if the first is < xmin, then the second is
+! > xmin. Otherwise the first one would be = xmin.
+: left-cut-x ( xmin pairs -- seq )
     2dup first x < [
         [ dupd first2 y-at 2array ] keep rest-slice swap prefix
     ] [
@@ -78,9 +78,9 @@ ALIAS: y second
     ] if ;
 
 ! Due to the way adjusted-head-slice works, the last element of
-! pairs is >= max, and if the last is > max, then the second to
-! last is < max. Otherwise the last one would be = max.
-: right-cut ( max pairs -- seq )
+! pairs is >= xmax, and if the last is > xmax, then the second to
+! last is < xmax. Otherwise the last one would be = xmax.
+: right-cut-x ( xmax pairs -- seq )
     2dup last x < [
         [ dupd last2 y-at 2array ] keep but-last-slice swap suffix
     ] [
@@ -90,7 +90,7 @@ ALIAS: y second
 ! If the line spans beyond min or max, make sure there are points
 ! with x = min and x = max in seq.
 : min-max-cut ( min,max pairs -- seq )
-    [ first2 ] dip right-cut left-cut ;
+    [ first2 ] dip right-cut-x left-cut-x ;
 
 : clip-by-x ( min,max pairs -- pairs' )
     2dup x-in-bounds? [
