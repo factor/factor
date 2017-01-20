@@ -1,5 +1,5 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
-
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays binary-search charts combinators
 combinators.short-circuit fry kernel locals make math math.order
 math.statistics math.vectors namespaces opengl opengl.gl
