@@ -199,10 +199,8 @@ ALIAS: y second
         monotonic-split-slice
     ] 2keep (drawable-chunks) ;
 
-: middle ( min max -- middle ) + 2 / ;
-
 : flip-y-axis ( chunks ymin,ymax -- chunks )
-    first2 middle 2 * '[ [ _ swap - ] assoc-map ] map ;
+    first2 + '[ [ _ swap - ] assoc-map ] map ;
 
 ! value' = (value - min) / (max - min) * width
 : scale ( width value max min -- value' ) neg [ + ] curry bi@ / * ;
