@@ -1,5 +1,5 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
-
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ui.gadgets ;
 IN: charts
 
