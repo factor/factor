@@ -1,6 +1,6 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays binary-search charts combinators
+USING: accessors arrays assocs binary-search charts combinators
 combinators.short-circuit fry kernel locals make math math.order
 math.statistics math.vectors namespaces opengl opengl.gl
 sequences specialized-arrays.instances.alien.c-types.float
@@ -25,19 +25,16 @@ ALIAS: y second
 : search-first? ( elt seq -- index elt exact-match? )
     dupd search-first rot [ dup first ] dip = ;
 
-: finder ( elt seq -- seq quot )
-    [ first ] dip [ first = not ] with ; inline
-
 ! Return a slice of the seq with all elements equal elt to the
 ! left of the index, plus one that's not equal, if requested.
-:: adjusted-tail-slice ( index elt plus-one? seq -- slice )
-    index elt seq finder find-last-from drop seq swap
+:: adjusted-tail-slice ( n elt plus-one? seq -- slice )
+    n seq elt first '[ first _ = not ] find-last-from drop seq swap
     [ plus-one? [ 1 + ] unless tail-slice ] when* ;
 
 ! Return a slice of the seq with all elements equal elt to the
 ! right of the index, plus one that's not equal, if requested.
-:: adjusted-head-slice ( index elt plus-one? seq -- slice )
-    index elt seq finder find-from drop seq swap
+:: adjusted-head-slice ( n elt plus-one? seq -- slice )
+    n seq elt first '[ first _ = not ] find-from drop seq swap
     [ plus-one? [ 1 + ] when short head-slice ] when* ;
 
 ! : data-rect ( data -- rect )
@@ -97,19 +94,18 @@ ALIAS: y second
 
 : clip-by-first ( min,max pairs -- pairs' )
     2dup first-in-bounds? [
-        [ dup first  ] dip [ search-first? not ] keep
+        [ dup first ] dip [ search-first? not ] keep
         adjusted-tail-slice
         [ dup second ] dip [ search-first? not ] keep
         adjusted-head-slice
         dup length 1 > [ min-max-cut ] [ nip ] if
         dup slice? [ dup like ] when
     ] [
-        2drop { } clone
+        2drop { }
     ] if ;
 
 : between<=> ( value min max -- <=> )
     3dup between? [ 3drop +eq+ ] [ nip > +gt+ +lt+ ? ] if ;
-
 
 : calc-point-y ( slope y point -- xy ) over [ calc-x ] dip 2array ;
 
@@ -117,7 +113,8 @@ ALIAS: y second
     [ over ] dip 2array [ 2array ] dip 2array ;
 
 :: 2-point-chunk ( left right ymin ymax -- chunk )
-    left last :> left-point right first :> right-point
+    left last :> left-point
+    right first :> right-point
     left-point x right-point x = [
         left-point x ymin ymax xyy>chunk
     ] [
@@ -128,7 +125,8 @@ ALIAS: y second
     ] if ;
 
 :: fix-left-chunk ( left right ymin ymax -- left' )
-    left last :> left-point right first :> right-point
+    left last :> left-point
+    right first :> right-point
     left-point y { [ ymin = ] [ ymax = ] } 1|| [
         left
     ] [
@@ -143,7 +141,8 @@ ALIAS: y second
     ] if ;
 
 :: fix-right-chunk ( left right ymin ymax -- right' )
-    left last :> left-point right first :> right-point
+    left last :> left-point
+    right first :> right-point
     right-point y { [ ymin = ] [ ymax = ] } 1|| [
         right
     ] [
@@ -158,14 +157,8 @@ ALIAS: y second
     ] if ;
 
 : first-point ( chunks -- first-point ) first first ;
+
 : last-point ( chunks -- last-point ) last last ;
-
-SYMBOL: elt
-
-: each2* ( seq quot: ( prev next -- next' ) -- last )
-    [ unclip-slice elt ] dip '[
-        [ elt get swap @ elt set ] each elt get
-    ] with-variable ; inline
 
 :: (make-pair) ( prev next min max -- next' )
     prev next min max
@@ -185,13 +178,13 @@ SYMBOL: elt
     chunks length {
         { 0 [ chunks ] }
         { 1 [
-                chunks dup first-point y min max between?
-                [ drop { } clone ] unless
+                chunks first-point y min max between?
+                chunks { } ?
             ]
         }
         [
             drop [
-                chunks [ min max (make-pair) ] each2*
+                chunks [ ] [ min max (make-pair) ] map-reduce
                 dup first y min max between? [ , ] [ drop ] if
             ] { } make
         ]
@@ -206,10 +199,10 @@ SYMBOL: elt
         monotonic-split-slice
     ] 2keep (drawable-chunks) ;
 
-: middle ( min max -- middle ) dupd swap - 2 / + ;
+: middle ( min max -- middle ) + 2 / ;
 
 : flip-y-axis ( chunks ymin,ymax -- chunks )
-    first2 middle 2 * '[ [ first2 _ swap - 2array ] map ] map ;
+    first2 middle 2 * '[ [ _ swap - ] assoc-map ] map ;
 
 ! value' = (value - min) / (max - min) * width
 : scale ( width value max min -- value' ) neg [ + ] curry bi@ / * ;
@@ -227,14 +220,13 @@ SYMBOL: elt
 !    ] if ; inline
 
 : scale-chunks ( chunks xwidth xmin,xmax yheight ymin,ymax -- chunks' )
-    scale-mapper [ scale-mapper ] dip swap
-    '[ [ first2 @ swap @ swap 2array ] map ] map ;
+    [ scale-mapper ] 2bi@ '[ [ _ _ bi* ] assoc-map ] map ;
 
 PRIVATE>
 
 : draw-line ( seq -- )
-    dup [ 1 head-slice* ] over length odd? [ dip ] [ call ] if
-    1 tail-slice append
+    dup [ but-last-slice ] over length odd? [ dip ] [ call ] if
+    rest-slice append
     [ (line-vertices) gl-vertex-pointer GL_LINES 0 ] keep
     length glDrawArrays ;
 
@@ -244,7 +236,7 @@ PRIVATE>
         dupd [ first ] dip clip-by-first
         dup empty? [ nip ] [
             [ second ] dip [ second-in-bounds? ] keep swap
-            [ drop { } clone ] unless
+            [ drop { } ] unless
         ] if
     ] if ;
 
@@ -256,5 +248,5 @@ M: line draw-gadget*
         flip-y-axis
         chart chart-dim first2 [ chart chart-axes first2 ] dip swap
         scale-chunks
-        [ [ draw-line ] each ] unless-empty
+        [ draw-line ] each
     ] [ 2drop ] if ;
