@@ -11,6 +11,10 @@ M: chart pref-dim* drop { 300 300 } ;
 : chart-axes ( chart -- seq )
     drop { { 0 300 } { 0 300 } } ;
 
+! Return the width and height of the visible area, in pixels.
+: chart-dim ( chart -- seq )
+    drop { 300 300 } ;
+
 ! There are several things to do to present data on the screen.
 ! Map the data coordinates to the screen coordinates.
 ! Cut off data outside the presentation window. When cutting off vertically, split the line into segments and add new points if necessary. Return an array of line segments.
