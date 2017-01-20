@@ -28,37 +28,37 @@ ALIAS: y second
 ! Return a slice of the seq with all elements equal to elt to the
 ! left of the index, plus one that's not equal, if requested.
 :: adjusted-tail-slice ( n elt plus-one? seq -- slice )
-    n seq elt first '[ first _ = not ] find-last-from drop seq swap
+    n seq elt x '[ x _ = not ] find-last-from drop seq swap
     [ plus-one? [ 1 + ] unless tail-slice ] when* ;
 
 ! Return a slice of the seq with all elements equal to elt to the
 ! right of the index, plus one that's not equal, if requested.
 :: adjusted-head-slice ( n elt plus-one? seq -- slice )
-    n seq elt first '[ first _ = not ] find-from drop seq swap
+    n seq elt x '[ x _ = not ] find-from drop seq swap
     [ plus-one? [ 1 + ] when short head-slice ] when* ;
 
 ! : data-rect ( data -- rect )
-!    [ [ first first ] [ last first ] bi ] keep
-!    [ second ] map minmax swapd
-!    2array [ 2array ] dip <extent-rect> ;
+!    [ [ first x ] [ last x ] bi ] keep
+!    [ y ] map minmax swapd
+!    [ 2array ] bi@ <extent-rect> ;
 
-: first-in-bounds? ( min,max pairs -- ? )
+: x-in-bounds? ( min,max pairs -- ? )
     {
-        [ [ first ] dip last first > not ]
-        [ [ second ] dip first first < not ]
+        [ [ first ] dip last x > not ]
+        [ [ second ] dip first x < not ]
     } 2&& ;
 
-: second-in-bounds? ( min,max pairs -- ? )
-    [ second ] map minmax 2array
+: y-in-bounds? ( min,max pairs -- ? )
+    [ y ] map minmax 2array
     {
         [ [ first ] dip second > not ]
         [ [ second ] dip first < not ]
     } 2&& ;
 
-! : pairs-in-bounds? ( bounds pairs -- ? )
+! : xy-in-bounds? ( bounds pairs -- ? )
 !    {
-!        [ [ first ] dip first-in-bounds? ]
-!        [ [ second ] dip second-in-bounds? ]
+!        [ [ first ] dip x-in-bounds? ]
+!        [ [ second ] dip y-in-bounds? ]
 !    } 2&& ;
 
 : calc-line-slope ( point1 point2 -- slope ) v- first2 swap / ;
@@ -71,7 +71,7 @@ ALIAS: y second
 ! pairs is <= min, and if the first is < min, then the second is
 ! > min. Otherwise the first one would be = min.
 : left-cut ( min pairs -- seq )
-    2dup first first < [
+    2dup first x < [
         [ dupd first2 y-at 2array ] keep rest-slice swap prefix
     ] [
         nip
@@ -81,7 +81,7 @@ ALIAS: y second
 ! pairs is >= max, and if the last is > max, then the second to
 ! last is < max. Otherwise the last one would be = max.
 : right-cut ( max pairs -- seq )
-    2dup last first < [
+    2dup last x < [
         [ dupd last2 y-at 2array ] keep but-last-slice swap suffix
     ] [
         nip
@@ -92,8 +92,8 @@ ALIAS: y second
 : min-max-cut ( min,max pairs -- seq )
     [ first2 ] dip right-cut left-cut ;
 
-: clip-by-first ( min,max pairs -- pairs' )
-    2dup first-in-bounds? [
+: clip-by-x ( min,max pairs -- pairs' )
+    2dup x-in-bounds? [
         [ dup first ] dip [ search-first? not ] keep
         adjusted-tail-slice
         [ dup second ] dip [ search-first? not ] keep
@@ -195,7 +195,7 @@ ALIAS: y second
 ! points at ymin and ymax at the gap bounds.
 : drawable-chunks ( data ymin,ymax -- chunks )
     first2 [
-        '[ [ second _ _ between<=> ] bi@ = ]
+        '[ [ y _ _ between<=> ] bi@ = ]
         monotonic-split-slice
     ] 2keep (drawable-chunks) ;
 
@@ -228,12 +228,12 @@ PRIVATE>
     [ (line-vertices) gl-vertex-pointer GL_LINES 0 ] keep
     length glDrawArrays ;
 
-! bounds: { { first-min first-max } { second-min second-max } }
+! bounds: { { xmin xmax } { ymin ymax } }
 : clip-data ( bounds data -- data' )
     dup empty? [ nip ] [
-        dupd [ first ] dip clip-by-first
+        dupd [ first ] dip clip-by-x
         dup empty? [ nip ] [
-            [ second ] dip [ second-in-bounds? ] keep swap
+            [ second ] dip [ y-in-bounds? ] keep swap
             [ drop { } ] unless
         ] if
     ] if ;
