@@ -25,7 +25,7 @@ Factor arguments:
     -codeheap=<int>     codeheap size in MiB
     -pic=<int>          max pic size
     -fep                enter fep mode immediately
-    -nosignals          turn off OS signal handling
+    -no-signals         turn off OS signal handling
     -console            open console if possible
     -roots=<paths>      a list of \"" write os windows? ";" ":" ? write "\"-delimited extra vocab roots
 
