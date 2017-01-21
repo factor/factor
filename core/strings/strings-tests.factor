@@ -12,20 +12,20 @@ vectors ;
 { "abc" } [ "ab" "c" append ] unit-test
 { "abc" } [ "a" "b" "c" 3append ] unit-test
 
-{ 3 } [ "hola" "a" start ] unit-test
-{ f } [ "hola" "x" start ] unit-test
-{ 0 } [ "a" "" start ] unit-test
+{ 3 } [ "a" "hola" start ] unit-test
+{ f } [ "x" "hola" start ] unit-test
+{ 0 } [ "" "a" start ] unit-test
 { 0 } [ "" "" start ] unit-test
 { 0 } [ "hola" "hola" start ] unit-test
-{ 1 } [ "hola" "ol" start ] unit-test
-{ f } [ "hola" "amigo" start ] unit-test
-{ f } [ "hola" "holaa" start ] unit-test
+{ 1 } [ "ol" "hola" start ] unit-test
+{ f } [ "amigo" "hola" start ] unit-test
+{ f } [ "holaa" "hola" start ] unit-test
 
 { "Beginning" } [ "Beginning and end" 9 head ] unit-test
 
 { f } [ CHAR: I "team" member? ] unit-test
-{ t } [ "team" "ea" subseq? ] unit-test
-{ f } [ "Factor" "actore" subseq? ] unit-test
+{ t } [ "ea" "team" subseq? ] unit-test
+{ f } [ "actore" "Factor" subseq? ] unit-test
 
 { "end" } [ "Beginning and end" 14 tail ] unit-test
 

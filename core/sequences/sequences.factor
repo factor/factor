@@ -972,21 +972,20 @@ PRIVATE>
 
 <PRIVATE
 
-: (start) ( seq subseq n length -- seq subseq ? )
+: (start) ( subseq seq n length -- subseq seq ? )
     [
-        [ 3dup ] dip [ + ] keep
-        [ swap nth-unsafe ] bi-curry@ bi* =
+        [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
     ] all-integers? nip ; inline
 
 PRIVATE>
 
-: start* ( seq subseq n -- i )
-    2over [ length ] bi@ [ - 1 + ] keep
+: start* ( subseq seq n -- i )
+    pick length [ pick length swap - 1 + ] keep
     [ (start) ] curry (find-integer) 2nip ;
 
-: start ( seq subseq -- i ) 0 start* ; inline
+: start ( subseq seq -- i ) 0 start* ; inline
 
-: subseq? ( seq subseq -- ? ) start >boolean ;
+: subseq? ( subseq seq -- ? ) start >boolean ;
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
     2dup mismatch [ 2dup min-length ] unless*

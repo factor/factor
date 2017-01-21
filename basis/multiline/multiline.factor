@@ -42,7 +42,7 @@ SYNTAX: STRING:
 :: (scan-multiline-string) ( i end lexer -- j )
     lexer line-text>> :> text
     lexer still-parsing? [
-        text end i start* [| j |
+        end text i start* [| j |
             i j text subseq % j end length +
         ] [
             text i short tail % CHAR: \n ,
