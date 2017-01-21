@@ -257,4 +257,44 @@ IN: charts.lines.tests
     } clip-data
 ] unit-test
 
-! TODO: add tests where after search there is no adjustment necessary, so that extra adjustment would take bad elements. Also, add tests for sequences fully outside the range.
+! no points within the viewport, complete calculation
+{
+    { { 1 1 } { 4 4 } }
+} [
+    { { 1 4 } { 1 4 } }
+    { { 0 0 } { 5 5 } } clip-data
+] unit-test
+
+! no points within the viewport, complete calculation
+{
+    { { 1 4 } { 4 1 } }
+} [
+    { { 1 4 } { 1 4 } }
+    { { 0 5 } { 5 0 } } clip-data
+] unit-test
+
+! no points within the viewport, complete calculation
+{
+    { { 1 3 } { 4 3 } }
+} [
+    { { 1 4 } { 1 4 } }
+    { { 0 3 } { 5 3 } } clip-data
+] unit-test
+
+! all data are to the left of viewport
+{
+    { }
+} [
+    { { 1 4 } { 1 4 } }
+    { { -1 0 } { 0 1 } { 0.5 1 } } clip-data
+] unit-test
+
+! all data are to the right of viewport
+{
+    { }
+} [
+    { { 1 4 } { 1 4 } }
+    { { 4.5 0 } { 5 1 } { 6 1 } } clip-data
+] unit-test
+
+! TODO: add tests where after search there is no adjustment necessary, so that extra adjustment would take bad elements.

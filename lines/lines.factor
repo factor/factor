@@ -71,7 +71,7 @@ ALIAS: y second
 ! pairs is <= xmin, and if the first is < xmin, then the second is
 ! > xmin. Otherwise the first one would be = xmin.
 : left-cut-x ( xmin pairs -- seq )
-    2dup first x < [
+    2dup first x > [
         [ dupd first2 y-at 2array ] keep rest-slice swap prefix
     ] [
         nip
