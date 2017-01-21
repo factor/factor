@@ -227,7 +227,7 @@ CONSTANT: compass-directions H{
     ] if ;
 
 : parse-weather ( str -- str' )
-    "VC" over subseq? [ "VC" "" replace t ] [ f ] if
+    dup "VC" subseq? [ "VC" "" replace t ] [ f ] if
     [ (parse-weather) ]
     [ [ " in the vicinity" append ] when ] bi* ;
 

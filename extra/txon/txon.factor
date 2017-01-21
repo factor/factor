@@ -41,8 +41,8 @@ DEFER: name/values
     parse-name [ parse-value ] dip associate ;
 
 : name=value ( string -- remain term )
-    [ blank? ] trim
-    ":`" over subseq? [ (name=value) ] [ f swap ] if ;
+    [ blank? ] trim dup ":`" subseq?
+    [ (name=value) ] [ f swap ] if ;
 
 : name/values ( string -- remain terms )
     [ dup { [ empty? not ] [ first CHAR: ` = not ] } 1&& ]

@@ -138,7 +138,7 @@ PRIVATE>
         { [ dup "/" head? ] [ nip ] }
         { [ dup empty? ] [ drop ] }
         { [ over "/" tail? ] [ append ] }
-        { [ "/" pick start not ] [ nip ] }
+        { [ over "/" start not ] [ nip ] }
         [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond ;
 
