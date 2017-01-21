@@ -7,7 +7,7 @@ IN: command-line.startup
 : cli-usage ( -- )
 "Usage: " write vm-path file-name write " [Factor arguments] [script] [script arguments]
 
-Common arguments:
+Factor arguments:
     -help               print this message and exit
     -i=<image>          load Factor image file <image> (default " write vm-path file-stem write ".image)
     -run=<vocab>        run the MAIN: entry point of <vocab>
