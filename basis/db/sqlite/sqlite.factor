@@ -259,7 +259,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
     "sql-spec" get modifiers>> [ +not-null+ = ] any? not ;
 
 : delete-cascade? ( -- ? )
-    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } subseq? ;
+    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;
 
 : sqlite-trigger, ( string -- )
     { } { } <simple-statement> 3, ;

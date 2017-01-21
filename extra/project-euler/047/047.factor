@@ -80,7 +80,7 @@ SYMBOL: sieve
     ] each sieve get ;
 
 : consecutive-under ( m limit -- n/f )
-    prime-tau-upto swap dup <repetition> start ;
+    prime-tau-upto [ dup <repetition> ] dip start ;
 
 PRIVATE>
 

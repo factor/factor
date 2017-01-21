@@ -137,7 +137,7 @@ SYMBOL: vocab-articles
             simple-lint-error
         ] when
     ] [
-        "  " subseq? [
+        "  " swap subseq? [
             "Paragraph text should not contain double spaces"
             simple-lint-error
         ] when

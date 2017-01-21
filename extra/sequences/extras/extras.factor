@@ -577,21 +577,21 @@ PRIVATE>
 : map-find-last-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-last-index ] (map-find-index) ; inline
 
-:: (start-all) ( seq subseq increment -- indices )
+:: (start-all) ( subseq seq increment -- indices )
     0
-    [ [ seq subseq ] dip start* dup ]
+    [ [ subseq seq ] dip start* dup ]
     [ [ increment + ] keep ] produce nip ;
 
-: start-all ( seq subseq -- indices )
-    dup length (start-all) ; inline
+: start-all ( subseq seq -- indices )
+    over length (start-all) ; inline
 
-: start-all* ( seq subseq -- indices )
+: start-all* ( subseq seq -- indices )
     1 (start-all) ; inline
 
-: count-subseq ( seq subseq -- n )
+: count-subseq ( subseq seq -- n )
     start-all length ; inline
 
-: count-subseq* ( seq subseq -- n )
+: count-subseq* ( subseq seq -- n )
     start-all* length ; inline
 
 : map-zip ( quot: ( x -- y ) -- alist )

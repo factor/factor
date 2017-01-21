@@ -32,7 +32,7 @@ TUPLE: maxlicense max-count current-count times ;
 
 : <maxlicense> ( -- max ) -1 0 V{ } clone \ maxlicense boa ; inline
 
-: out? ( line -- ? ) "OUT" subseq? ; inline
+: out? ( line -- ? ) [ "OUT" ] dip subseq? ; inline
 
 : line-time ( line -- time ) " " split harvest fourth ; inline
 

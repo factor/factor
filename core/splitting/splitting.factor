@@ -30,7 +30,7 @@ PRIVATE>
 : (split1) ( seq subseq snip-quot -- before after )
     [
         swap [
-            [ drop length ] [ swap start dup ] 2bi
+            [ drop length ] [ start dup ] 2bi
             [ [ nip ] [ + ] 2bi t ]
             [ 2drop f f f ]
             if

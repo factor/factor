@@ -45,7 +45,8 @@ C: <mime-variable> mime-variable
 
 : dump-until-separator ( multipart -- multipart )
     dup
-    [ bytes>> ] [ current-separator>> ] bi dupd start [
+    [ current-separator>> ] [ bytes>> ] bi
+    [ nip ] [ start ] 2bi [
         cut-slice
         [ mime-write ]
         [ over current-separator>> length short tail-slice >>bytes ] bi*
