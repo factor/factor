@@ -79,6 +79,8 @@ IN: charts.lines.tests
     -3 3 fix-left-chunk
 ] unit-test
 
+! TODO: add more tests for the recently discovered bugs in fix-left-chunk and fix-right-chunk
+
 ! fix-right-chunk: y coord = top limit
 {
     { { 5 3 } { 6 0 } }
@@ -192,8 +194,8 @@ IN: charts.lines.tests
 ! single-element sequences, same x coord
 {
     {
-        { { 0 0 } }
-        { { 0 3 } }
+        { { 0 0 } { 0 3 } }
+        { { 0 3 } { 0 0 } }
     }
 } [
     { { 0 -2 } { 0 0 } { 0 5 } { 0 3 } { 0 -1 } } { 0 3 }
