@@ -65,17 +65,23 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
     else if (factor_arg(arg, STRING_LITERAL("-callstack=%d"),
                         &callstack_size))
       ;
-    else if (factor_arg(arg, STRING_LITERAL("-young=%d"), &young_size))
+    else if (factor_arg(arg, STRING_LITERAL("-young=%d"),
+                        &young_size))
       ;
-    else if (factor_arg(arg, STRING_LITERAL("-aging=%d"), &aging_size))
+    else if (factor_arg(arg, STRING_LITERAL("-aging=%d"),
+                        &aging_size))
       ;
-    else if (factor_arg(arg, STRING_LITERAL("-tenured=%d"), &tenured_size))
+    else if (factor_arg(arg, STRING_LITERAL("-tenured=%d"),
+                        &tenured_size))
       ;
-    else if (factor_arg(arg, STRING_LITERAL("-codeheap=%d"), &code_size))
+    else if (factor_arg(arg, STRING_LITERAL("-codeheap=%d"),
+                        &code_size))
       ;
-    else if (factor_arg(arg, STRING_LITERAL("-pic=%d"), &max_pic_size))
+    else if (factor_arg(arg, STRING_LITERAL("-pic=%d"),
+                        &max_pic_size))
       ;
-    else if (factor_arg(arg, STRING_LITERAL("-callbacks=%d"), &callback_size))
+    else if (factor_arg(arg, STRING_LITERAL("-callbacks=%d"),
+                        &callback_size))
       ;
     else if (STRNCMP(arg, STRING_LITERAL("-i="), 3) == 0) {
       // In case you specify -i more than once.
@@ -86,7 +92,7 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
     }
     else if (STRCMP(arg, STRING_LITERAL("-fep")) == 0)
       fep = true;
-    else if (STRCMP(arg, STRING_LITERAL("-nosignals")) == 0)
+    else if (STRCMP(arg, STRING_LITERAL("-no-signals")) == 0)
       signals = false;
     else if (STRCMP(arg, STRING_LITERAL("-console")) == 0)
       console = true;
@@ -148,15 +154,21 @@ struct startup_fixup {
     return (code_block*)((cell)obj + code_offset);
   }
 
-  object* translate_data(const object* obj) { return fixup_data((object*)obj); }
+  object* translate_data(const object* obj) {
+    return fixup_data((object*)obj);
+  }
 
   code_block* translate_code(const code_block* compiled) {
     return fixup_code((code_block*)compiled);
   }
 
-  cell size(const object* obj) { return obj->size(*this); }
+  cell size(const object* obj) {
+    return obj->size(*this);
+  }
 
-  cell size(code_block* compiled) { return compiled->size(*this); }
+  cell size(code_block* compiled) {
+    return compiled->size(*this);
+  }
 };
 
 void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
@@ -205,7 +217,7 @@ bool factor_vm::read_embedded_image_footer(FILE* file,
 
 char *threadsafe_strerror(int errnum) {
   char *buf = (char *) malloc(STRERROR_BUFFER_SIZE);
-  if(!buf) {
+  if (!buf) {
     fatal_error("Out of memory in threadsafe_strerror, errno", errnum);
   }
   THREADSAFE_STRERROR(errnum, buf, STRERROR_BUFFER_SIZE);
