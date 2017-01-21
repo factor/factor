@@ -127,7 +127,10 @@ ALIAS: y second
 :: fix-left-chunk ( left right ymin ymax -- left' )
     left last :> left-point
     right first :> right-point
-    left-point y { [ ymin = ] [ ymax = ] } 1|| [
+    left-point y right-point y {
+        [ { [ drop ymin = ] [ > ] } 2&& ]
+        [ { [ drop ymax = ] [ < ] } 2&& ]
+    } 2|| [
         left
     ] [
         left-point y right-point y > ymin ymax ? :> y-coord
@@ -143,7 +146,10 @@ ALIAS: y second
 :: fix-right-chunk ( left right ymin ymax -- right' )
     left last :> left-point
     right first :> right-point
-    right-point y { [ ymin = ] [ ymax = ] } 1|| [
+    left-point y right-point y {
+        [ { [ ymin = nip ] [ < ] } 2&& ]
+        [ { [ ymax = nip ] [ > ] } 2&& ]
+    } 2|| [
         right
     ] [
         left-point y right-point y < ymin ymax ? :> y-coord
