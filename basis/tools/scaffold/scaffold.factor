@@ -20,7 +20,7 @@ ERROR: not-a-vocab-root string ;
     trim-tail-separators
     vocab-roots get member? ;
 
-: contains-dot? ( string -- ? ) ".." swap subseq? ;
+: contains-dot? ( string -- ? ) ".." subseq? ;
 
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
