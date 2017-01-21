@@ -25,7 +25,7 @@ M: template-lexer skip-word
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    [ line-text>> "<%" ] [ column>> ] bi start* ;
+    [ line-text>> "<%" ] [ column>> ] bi start ;
 
 : found-<% ( accum lexer col -- accum )
     [
