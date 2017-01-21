@@ -297,4 +297,11 @@ IN: charts.lines.tests
     { { 4.5 0 } { 5 1 } { 6 1 } } clip-data
 ] unit-test
 
+! just a little off the top
+{ t } [
+    { 0 99 }
+    { { 0 100 } { 100 0 } { 100 50 } { 150 50 } { 200 100 } }
+    y-in-bounds?
+] unit-test
+
 ! TODO: add tests where after search there is no adjustment necessary, so that extra adjustment would take bad elements.
