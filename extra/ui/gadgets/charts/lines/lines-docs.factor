@@ -1,14 +1,14 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: binary-search charts charts.lines.private colors
-help.markup help.syntax kernel sequences splitting.monotonic
-ui.gadgets ui.render ;
-IN: charts.lines
+USING: binary-search colors help.markup help.syntax kernel
+sequences splitting.monotonic ui.gadgets ui.gadgets.charts
+ui.gadgets.charts.lines.private ui.render ;
+IN: ui.gadgets.charts.lines
 
-ABOUT: { "charts.lines" "about" }
+ABOUT: { "ui.gadgets.charts.lines" "about" }
 
-ARTICLE: { "charts.lines" "about" } "Lines"
-" The " { $vocab-link "charts.lines" } " vocab implements the " { $link line } " gadget. See the " { $link { "charts.lines" "implementation" } } "." ;
+ARTICLE: { "ui.gadgets.charts.lines" "about" } "Lines"
+" The " { $vocab-link "ui.gadgets.charts.lines" } " vocab implements the " { $link line } " gadget. See the " { $link { "charts.lines" "implementation" } } "." ;
 
 ARTICLE: { "charts.lines" "implementation" } "Implementation details"
 "The " { $slot "data" } " in a " { $link line } " gadget should be sorted by non-descending " { $snippet "x" } " coordinate. In a large data set this allows to quickly find the left and right intersection points with the viewport using binary " { $link search } " and remove the irrelevant data from further processing: " { $link clip-by-x } ". If the resulting sequence is empty (i.e. the entire data set is completely to the left or to the right of the viewport), nothing is drawn (" { $link x-in-bounds? } ")."
@@ -59,17 +59,17 @@ HELP: y-at
 { $description "Given two points on a straight line and an " { $snippet "x" } " coordinate, calculate the " { $snippet "y" } " coordinate at " { $snippet "x" } " on that line." }
 { $examples
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "0 { 1 1 } { 5 5 } y-at ."
         "0"
     }
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "3 { 0 5 } { 5 5 } y-at ."
         "5"
     }
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "12 { 12 50 } { 15 15 } y-at ."
         "50"
     }
@@ -79,12 +79,12 @@ HELP: calc-x
 { $description "Given the " { $snippet "slope" } " of a line and a random " { $snippet "point" } " belonging to that line, calculate the " { $snippet "x" } " coordinate corresponding to the given " { $snippet "y" } "." }
 { $examples
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "1 5 { 1 1 } calc-x ."
         "5"
     }
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "0.5 10 { 0 0 } calc-x ."
         "20.0"
     }
@@ -94,12 +94,12 @@ HELP: calc-y
 { $description "Given the " { $snippet "slope" } " of a line and a random " { $snippet "point" } " belonging to that line, calculate the " { $snippet "y" } " coordinate corresponding to the given " { $snippet "x" } "." }
 { $examples
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "1 5 { 1 1 } calc-y ."
         "5"
     }
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "0.5 20 { 0 0 } calc-y ."
         "10.0"
     }
@@ -111,12 +111,12 @@ $nl
 "The formula for the calculation is " { $snippet "slope = (y1-y2) / (x1-x2)" } ", therefore it'll throw a division by zero error if both points have the same " { $snippet "x" } " coordinate." }
 { $examples
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "{ 1 1 } { 10 10 } calc-line-slope ."
         "1"
     }
     { $example
-        "USING: charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines.private prettyprint ;"
         "{ 0 0 } { 10 20 } calc-line-slope ."
         "2"
     }

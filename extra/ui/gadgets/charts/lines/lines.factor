@@ -1,11 +1,11 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search charts combinators
+USING: accessors arrays assocs binary-search combinators
 combinators.short-circuit fry kernel locals make math math.order
 math.statistics math.vectors namespaces opengl opengl.gl
 sequences specialized-arrays.instances.alien.c-types.float
-splitting.monotonic ui.gadgets ui.render ;
-IN: charts.lines
+splitting.monotonic ui.gadgets ui.gadgets.charts ui.render ;
+IN: ui.gadgets.charts.lines
 
 ! Data must be a sequence of { x y } coordinates sorted by
 ! non-descending x vaues.
