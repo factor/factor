@@ -148,7 +148,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
             ] with-out-parameters memory>byte-array
         ] with-destructors
     ] [
-        drop pq-get-is-null nip [ f ] [ B{ } clone ] if
+        drop pq-get-is-null nip f B{ } ?
     ] if ;
 
 : postgresql-column-typed ( handle row column type -- obj )

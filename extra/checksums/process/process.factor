@@ -30,6 +30,6 @@ M: process-state get-checksum
                 [ out>> dispose ] keep
                 stream-contents trim-hash hex-string>bytes
             ] with-disposal
-        ] [ B{ } clone ] if*
+        ] [ B{ } ] if*
         [ >>result ] keep
     ] unless* nip ;
