@@ -1,8 +1,8 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays charts charts.lines colors.constants
-kernel literals math math.constants math.functions sequences ui
-ui.gadgets ;
+kernel literals locals math math.constants math.functions
+sequences ui ui.gadgets ;
 IN: charts.demos
 
 CONSTANT: -pi $[ pi neg ]
@@ -12,10 +12,22 @@ CONSTANT: -pi $[ pi neg ]
     pi 2 * swap / [ * pi - dup sin 2array ] curry map
     ${ pi $[ pi sin ] } suffix ;
 
-: chart-demo ( -- )
+: cosine-wave ( steps -- seq )
+    [ iota ] keep
+    pi 2 * swap / [ * pi - dup cos 2array ] curry map
+    ${ pi $[ pi cos ] } suffix ;
+
+<PRIVATE
+
+:: (chart-demo) ( n -- )
     chart new ${ ${ -pi pi } { -1 1 } } >>axes
-    line new COLOR: blue >>color 40 sine-wave >>data
-    add-gadget "Chart" open-window ;
+    line new COLOR: blue >>color n sine-wave >>data add-gadget
+    line new COLOR: red >>color n cosine-wave >>data add-gadget
+    "Chart" open-window ;
+
+PRIVATE>
+
+: chart-demo ( -- ) 40 (chart-demo) ;
 
 MAIN: chart-demo
 
