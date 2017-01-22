@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io io.encodings.binary io.files
-io.streams.string kernel math namespaces sequences strings
-io.encodings.utf8 xml.data xml.errors xml.elements ascii
-xml.entities xml.state xml.autoencoding assocs xml.tokenize
-combinators.short-circuit xml.name splitting
-io.streams.byte-array combinators ;
+USING: accessors arrays ascii assocs combinators
+combinators.short-circuit io io.encodings.binary
+io.encodings.utf8 io.files io.streams.byte-array
+io.streams.string kernel namespaces sequences splitting strings
+xml.autoencoding xml.data xml.elements xml.errors xml.name
+xml.state xml.tokenize ;
 IN: xml
 
 <PRIVATE
