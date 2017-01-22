@@ -1,9 +1,9 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays charts charts.lines colors.constants
-kernel literals locals math math.constants math.functions
-sequences ui ui.gadgets ;
-IN: charts.demos
+USING: accessors arrays colors.constants kernel literals locals
+math math.constants math.functions sequences ui ui.gadgets
+ui.gadgets.charts ui.gadgets.charts.lines ;
+IN: ui.gadgets.charts.demos
 
 CONSTANT: -pi $[ pi neg ]
 
