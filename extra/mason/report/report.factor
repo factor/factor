@@ -27,7 +27,7 @@ IN: mason.report
     </table>
     XML] ;
 
-: with-report ( quot -- )
+: with-report ( quot: ( -- xml ) -- )
     [ "report" utf8 ] dip
     '[
         common-report
