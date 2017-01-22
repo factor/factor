@@ -230,7 +230,7 @@ ERROR: bad-filter n ;
     loading-png width>> pass adam7-subimage-width :> width
 
     height width * zero? [
-        B{ } clone
+        B{ }
     ] [
         byte-reader loading-png width height read-scanlines
     ] if ;
