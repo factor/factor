@@ -89,33 +89,33 @@ METHOD: distance { sequence sequence } v- norm ;
 
 ! A class for objects with a position
 
-TUPLE: <pos> pos ;
+TUPLE: pos pos ;
 
-METHOD: x { <pos> } pos>> first  ;
-METHOD: y { <pos> } pos>> second ;
+METHOD: x { pos } pos>> first  ;
+METHOD: y { pos } pos>> second ;
 
-METHOD: (x!) { number <pos> } pos>> set-first  ;
-METHOD: (y!) { number <pos> } pos>> set-second ;
+METHOD: (x!) { number pos } pos>> set-first  ;
+METHOD: (y!) { number pos } pos>> set-second ;
 
-METHOD: to-the-left-of?  { <pos> number } [ x ] dip < ;
-METHOD: to-the-right-of? { <pos> number } [ x ] dip > ;
+METHOD: to-the-left-of?  { pos number } [ x ] dip < ;
+METHOD: to-the-right-of? { pos number } [ x ] dip > ;
 
-METHOD: move-left-by  { <pos> number } [ pos>> ] dip move-left-by  ;
-METHOD: move-right-by { <pos> number } [ pos>> ] dip move-right-by ;
+METHOD: move-left-by  { pos number } [ pos>> ] dip move-left-by  ;
+METHOD: move-right-by { pos number } [ pos>> ] dip move-right-by ;
 
-METHOD: above? { <pos> number } [ y ] dip > ;
-METHOD: below? { <pos> number } [ y ] dip < ;
+METHOD: above? { pos number } [ y ] dip > ;
+METHOD: below? { pos number } [ y ] dip < ;
 
-METHOD: move-by { <pos> sequence } '[ _ v+ ] change-pos drop ;
+METHOD: move-by { pos sequence } '[ _ v+ ] change-pos drop ;
 
-METHOD: distance { <pos> <pos> } [ pos>> ] bi@ distance ;
+METHOD: distance { pos pos } [ pos>> ] bi@ distance ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! A class for objects with velocity. It inherits from <pos>. Hey, if
+! A class for objects with velocity. It inherits from pos. Hey, if
 ! it's moving it has a position right? Unless it's some alternate universe...
 
-TUPLE: <vel> < <pos> vel ;
+TUPLE: vel < pos vel ;
 
 : moving-up?   ( obj -- ? ) vel>> y 0 > ;
 : moving-down? ( obj -- ? ) vel>> y 0 < ;
@@ -130,15 +130,15 @@ TUPLE: <vel> < <pos> vel ;
 ! The 'pos' slot indicates the lower left hand corner of the
 ! rectangle. The 'dim' is holds the width and height.
 
-TUPLE: <rectangle> < <pos> dim ;
+TUPLE: rectangle < pos dim ;
 
-METHOD: width  { <rectangle> } dim>> first  ;
-METHOD: height { <rectangle> } dim>> second ;
+METHOD: width  { rectangle } dim>> first  ;
+METHOD: height { rectangle } dim>> second ;
 
-METHOD: left   { <rectangle> }    x             ;
-METHOD: right  { <rectangle> } [ x ] [ width ] bi + ;
-METHOD: bottom { <rectangle> }    y             ;
-METHOD: top    { <rectangle> } [ y ] [ height ] bi + ;
+METHOD: left   { rectangle }    x             ;
+METHOD: right  { rectangle } [ x ] [ width ] bi + ;
+METHOD: bottom { rectangle }    y             ;
+METHOD: top    { rectangle } [ y ] [ height ] bi + ;
 
 : bottom-left ( rectangle -- pos ) pos>> ;
 
@@ -147,40 +147,40 @@ METHOD: top    { <rectangle> } [ y ] [ height ] bi + ;
 
 : center ( rectangle -- seq ) [ center-x ] [ center-y ] bi 2array ;
 
-METHOD: to-the-left-of?  { <pos> <rectangle> } [ x ] [ left  ] bi* < ;
-METHOD: to-the-right-of? { <pos> <rectangle> } [ x ] [ right ] bi* > ;
+METHOD: to-the-left-of?  { pos rectangle } [ x ] [ left  ] bi* < ;
+METHOD: to-the-right-of? { pos rectangle } [ x ] [ right ] bi* > ;
 
-METHOD: below? { <pos> <rectangle> } [ y ] [ bottom ] bi* < ;
-METHOD: above? { <pos> <rectangle> } [ y ] [ top    ] bi* > ;
+METHOD: below? { pos rectangle } [ y ] [ bottom ] bi* < ;
+METHOD: above? { pos rectangle } [ y ] [ top    ] bi* > ;
 
-METHOD: horizontal-interval { <rectangle> }
+METHOD: horizontal-interval { rectangle }
   [ left ] [ right ] bi [a,b] ;
 
-METHOD: in-between-horizontally? { <pos> <rectangle> }
+METHOD: in-between-horizontally? { pos rectangle }
   [ x ] [ horizontal-interval ] bi* interval-contains? ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <extent> left right bottom top ;
+TUPLE: extent left right bottom top ;
 
-METHOD: left   { <extent> } left>>   ;
-METHOD: right  { <extent> } right>>  ;
-METHOD: bottom { <extent> } bottom>> ;
-METHOD: top    { <extent> } top>>    ;
+METHOD: left   { extent } left>>   ;
+METHOD: right  { extent } right>>  ;
+METHOD: bottom { extent } bottom>> ;
+METHOD: top    { extent } top>>    ;
 
-METHOD: width  { <extent> } [ right>> ] [ left>>   ] bi - ;
-METHOD: height { <extent> } [ top>>   ] [ bottom>> ] bi - ;
+METHOD: width  { extent } [ right>> ] [ left>>   ] bi - ;
+METHOD: height { extent } [ top>>   ] [ bottom>> ] bi - ;
 
-! METHOD: to-extent ( <rectangle> -- <extent> )
-!   { [ left>> ] [ right>> ] [ bottom>> ] [ top>> ] } cleave <extent> boa ;
+! METHOD: to-extent ( rectangle -- extent )
+!   { [ left>> ] [ right>> ] [ bottom>> ] [ top>> ] } cleave extent boa ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-METHOD: to-the-left-of?  { sequence <rectangle> } [ x ] [ left ] bi* < ;
-METHOD: to-the-right-of? { sequence <rectangle> } [ x ] [ right ] bi* > ;
+METHOD: to-the-left-of?  { sequence rectangle } [ x ] [ left ] bi* < ;
+METHOD: to-the-right-of? { sequence rectangle } [ x ] [ right ] bi* > ;
 
-METHOD: below? { sequence <rectangle> } [ y ] [ bottom ] bi* < ;
-METHOD: above? { sequence <rectangle> } [ y ] [ top    ] bi* > ;
+METHOD: below? { sequence rectangle } [ y ] [ bottom ] bi* < ;
+METHOD: above? { sequence rectangle } [ y ] [ top    ] bi* > ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -218,7 +218,7 @@ METHOD: above? { sequence <rectangle> } [ y ] [ top    ] bi* > ;
 
 GENERIC: within? ( a b -- ? )
 
-METHOD: within? { <pos> <rectangle> }
+METHOD: within? { pos rectangle }
   {
     [ left   to-the-right-of? ]
     [ right  to-the-left-of?  ]
