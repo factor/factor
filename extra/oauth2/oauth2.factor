@@ -1,15 +1,9 @@
 ! Copyright (C) 2016 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators http.client io
-json.reader kernel make math.order sequences unicode urls webbrowser ;
+json.reader kernel make math.order sequences unicode urls
+webbrowser ;
 IN: oauth2
-
-! Random utility
-: set-query-params ( url params -- url )
-    [ first2 swap set-query-param ] each ;
-
-: string+params>url ( string params -- url )
-    [ >url ] dip set-query-params ;
 
 : console-prompt ( query -- str/f )
     write flush readln [ blank? ] trim
@@ -78,7 +72,7 @@ TUPLE: oauth2
     ] { } make ;
 
 : oauth2>auth-uri ( oauth2 -- uri )
-    [ auth-uri>> ] [ auth-params ] bi string+params>url ;
+    [ auth-uri>> >url ] [ auth-params ] bi set-query-params ;
 
 ! Other flows can be useful to support too.
 : console-flow ( oauth2 -- tokens/f )
