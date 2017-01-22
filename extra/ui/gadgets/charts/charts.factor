@@ -1,7 +1,7 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel sequences ui.gadgets ;
-IN: charts
+IN: ui.gadgets.charts
 
 TUPLE: chart < gadget axes ;
 
