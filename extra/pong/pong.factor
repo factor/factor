@@ -4,8 +4,6 @@ grouping kernel locals math math.intervals math.order
 math.rectangles math.vectors namespaces opengl opengl.gl
 opengl.glu processing.shapes sequences sequences.generalizations
 shuffle threads ui ui.gadgets ui.gestures ui.render ;
-FROM: multi-methods => GENERIC: METHOD: ;
-FROM: syntax => M: ;
 IN: pong
 
 ! Inspired by this Ruby/Shoes version by why: http://gist.github.com/26431
@@ -14,7 +12,7 @@ IN: pong
 ! by Bill Mill.
 
 : clamp-to-interval ( x interval -- x )
-    [ from>> first max ] [ to>> first min ] bi ;
+    [ from>> first ] [ to>> first ] bi clamp ;
 
 TUPLE: play-field < rectangle ;
 
@@ -67,9 +65,9 @@ TUPLE: ball < vel
 
 GENERIC: draw ( obj -- )
 
-METHOD: draw { paddle } [ bottom-left ] [ dim>> ] bi draw-rectangle ;
+M: paddle draw [ bottom-left ] [ dim>> ] bi draw-rectangle ;
 
-METHOD: draw { ball } [ pos>> ] [ diameter>> 2 / ] bi draw-circle ;
+M: ball draw [ pos>> ] [ diameter>> 2 / ] bi draw-circle ;
 
 TUPLE: pong-gadget < gadget paused field ball player computer ;
 
