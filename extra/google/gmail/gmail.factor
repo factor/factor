@@ -1,6 +1,7 @@
 ! Copyright (C) 2016 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays json.reader kernel namespaces oauth2 sequences ;
+USING: accessors arrays json.reader kernel namespaces oauth2
+sequences urls ;
 IN: google.gmail
 
 CONSTANT: api-base "https://www.googleapis.com/gmail/v1/users"
@@ -29,7 +30,7 @@ SYMBOL: access-token
 
 : api-call ( method get-params -- result )
     ensure-token
-    [ api-base prepend ] dip string+params>url
+    [ api-base prepend >url ] dip set-query-params
     access-token get access>> oauth-http-get nip
     json> ;
 
