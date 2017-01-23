@@ -119,8 +119,8 @@ M: bignum (log2) bignum-log2 ; inline
 ! As an optimization to minimize the size of the operands of the bignum
 ! divisions we will do, we start by stripping any trailing zeros from
 ! the denominator and move it into the scale factor.
-! We want a result in ]2^54;2^53] to find the mantissa
-! in ]2^53,2^52] with 1 extra "guard" bit for rounding.
+! We want a 54 bit result, starting with leading 1, followed by
+! the 52 bit mantissa and then a guard bit: 1mmmmmmmmmm...mmmmmmmmmmmg
 ! So we shift the numerator to get the result of the integer division
 ! "num/den" in the range ]2^54; 2^53]; Our shift is only a guess
 ! based on the magnitude of the inputs, so it
@@ -148,12 +148,23 @@ M: bignum (log2) bignum-log2 ; inline
 ! "num/den" would be in the range ]2^55; 2^53]. After this step
 ! it will be in the range ]2^54; 2^53]. Compute "num/den" and the
 ! reminder used for rounding
+! For subnormals, after we know the final value of the exponent,
+! we shift the numerator again to get the correct precision.
+! We do it before rounding so that subnormals are correctly rounded.
 : (2/-with-epsilon) ( epsilon? num -- epsilon?' num' )
     [ 1 bitand zero? not or ] [ 2/ ] bi ; inline
+
+: (shift-with-epsilon) ( epsilon? num den scale -- epsilon?' num' den scale )
+    [
+        nip 1021 +
+        [ neg 2^ 1 - bitand zero? not or ] [ shift ] 2bi
+    ] 2keep ; inline
 
 : mantissa-and-guard ( epsilon? num den scale -- epsilon?' mantissa-and-guard rem scale' )
     2over /i log2 53 >
     [ [ (2/-with-epsilon) ] [ ] [ 1 + ] tri* ] when
+    ! At this point, the scale value is the exponent minus 1.
+    dup -1021 < [ (shift-with-epsilon) ] when
     [ /mod ] dip ; inline
 
 ! Third step: rounding
@@ -178,13 +189,18 @@ M: bignum (log2) bignum-log2 ; inline
     ] [ drop nip ] if ; inline
 
 ! Fourth step: post-scaling
-! Because of rounding, our mantissa with guard bit is now in the
-! range [2^54;2^53], so we have to handle 2^54 specially.
+! Because of rounding, our mantissa with guard bit may have overflowed
+! the 54 bit precision to 2^54 so we have to handle it specially.
+! For subnormals, the rounding may also have overflowed the precision,
+! but the overflowed value is actually the correct value by chance
+! (even in the case when the biggest subnormal is rounded up to
+! the smallest normal float) because we interpret it directly
+! as the bits of the resulting double.
 : scale-float ( mantissa scale -- float' )
-    ! At this point, the scale value is the exponent minus 1.
+    ! the scale value is the exponent minus 1.
     {
         { [ dup 1024 > ] [ 2drop 1/0. ] }
-        { [ dup -1021 < ] [ 1021 + shift bits>double ] } ! subnormals and underflow
+        { [ dup -1021 < ] [ drop bits>double ] } ! subnormals and underflow
         [ [ 52 2^ 1 - bitand ] dip 1022 + 52 shift bitor bits>double ]
     } cond ; inline
 
