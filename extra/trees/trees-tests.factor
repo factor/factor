@@ -1,5 +1,5 @@
-USING: accessors arrays assocs combinators kernel math
-math.combinatorics math.ranges namespaces random sequences
+USING: accessors arrays assocs combinators fry kernel locals
+math math.combinatorics math.ranges namespaces random sequences
 sequences.product tools.test trees trees.private ;
 IN: trees.tests
 
@@ -191,3 +191,72 @@ CONSTANT: test-tree2 TREE{
 [ 106 test-tree2 tailtree>alist[] keys ] unit-test
 { { 108 110 112 114 116 118 120 } }
 [ 106 test-tree2 tailtree>alist(] keys ] unit-test
+
+
+{ { { 10 10 } TREE{ { 20 20 } { 30 30 } } } } [
+    TREE{ { 20 20 } { 10 10 } { 30 30 } } clone [
+        pop-tree-left
+    ] keep 2array
+] unit-test
+
+{ { { 30 30 } TREE{ { 20 20 } { 10 10 } } } } [
+    TREE{ { 20 20 } { 10 10 } { 30 30 } } clone [
+        pop-tree-right
+    ] keep 2array
+] unit-test
+
+{ { { 20 20 } TREE{ } } } [
+    TREE{ { 20 20 } } clone [
+        pop-tree-right
+    ] keep 2array
+] unit-test
+
+{ { { 20 20 } TREE{ } } } [
+    TREE{ { 20 20 } } clone [
+        pop-tree-left
+    ] keep 2array
+] unit-test
+
+{ f } [ TREE{ } pop-tree-left ] unit-test
+{ f } [ TREE{ } pop-tree-right ] unit-test
+
+: with-limited-calls ( n quot -- quot' )
+    [let
+        0 :> count!
+        '[ count _ >=
+            [ "too many calls" throw ]
+            [ count 1 + count! @ ] if
+         ]
+    ] ; inline
+
+
+{ V{ { 10 10 } { 15 10 } { 20 20 }
+     { 15 20 } { 30 30 } { 35 30 }
+} } [
+    TREE{ { 20 20 } { 10 10 } { 30 30 } } clone V{ } clone [
+        dupd 6 [ [
+                over first {
+                    { [ dup 20 mod zero? ] [ drop [ first2 swap 5 - ] dip set-at ] }
+                    { [ dup 10 mod zero? ] [ drop [ first2 swap 5 + ] dip set-at ] }
+                    [ 3drop ]
+                } cond
+            ] [ push ] bi-curry* bi
+        ] with-limited-calls 2curry slurp-tree-left
+    ] keep
+] unit-test
+
+{ V{
+    { 30 30 } { 25 30 } { 20 20 }
+    { 25 20 } { 10 10 } {  5 10 } }
+} [
+    TREE{ { 20 20 } { 10 10 } { 30 30 } } clone V{ } clone [
+        dupd 6 [ [
+                over first {
+                    { [ dup 20 mod zero? ] [ drop [ first2 swap 5 + ] dip set-at ] }
+                    { [ dup 10 mod zero? ] [ drop [ first2 swap 5 - ] dip set-at ] }
+                    [ 3drop ]
+                } cond
+            ] [ push ] bi-curry* bi
+        ] with-limited-calls 2curry slurp-tree-right
+    ] keep
+] unit-test
