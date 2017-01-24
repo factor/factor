@@ -369,16 +369,12 @@ DEFER: delete-node
         ] with-side
     ] if ;
 
-PRIVATE>
-
 M: tree delete-at
     [ delete-bst-node swap ] change-root
     swap [ dup dec-count ] when drop ;
 
 M: tree new-assoc
     2drop <tree> ;
-
-<PRIVATE
 
 : clone-nodes ( node -- node' )
     dup [
@@ -387,24 +383,24 @@ M: tree new-assoc
         [ clone-nodes ] change-right
     ] when ;
 
-PRIVATE>
-
 M: tree clone (clone) [ clone-nodes ] change-root ;
+
+PRIVATE>
 
 : >tree ( assoc -- tree )
     T{ tree f f 0 } assoc-clone-like ;
 
-M: tree assoc-like drop dup tree? [ >tree ] unless ;
-
 SYNTAX: TREE{
     \ } [ >tree ] parse-literal ;
+
+<PRIVATE
+
+M: tree assoc-like drop dup tree? [ >tree ] unless ;
 
 M: tree assoc-size count>> ;
 M: tree pprint-delims drop \ TREE{ \ } ;
 M: tree >pprint-sequence >alist ;
 M: tree pprint-narrow? drop t ;
-
-<PRIVATE
 
 : node-height ( node -- n )
     [
