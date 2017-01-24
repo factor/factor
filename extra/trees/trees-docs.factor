@@ -1,4 +1,4 @@
-USING: assocs help.markup help.syntax math ;
+USING: arrays assocs help.markup help.syntax kernel math ;
 IN: trees
 
 HELP: TREE{
@@ -85,19 +85,118 @@ HELP: tailtree>alist[]
     subtree>alist() subtree>alist(] subtree>alist[) subtree>alist[]
 } related-words
 
+HELP: ceiling-entry
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Returns a key-value mapping associated with the least key greater than or equal to the given key, or " { $link f } " if there is no such key." } ;
+
+HELP: ceiling-key
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "key/f" { $maybe "a key" } }
+}
+{ $description "Returns the least key greater than or equal to the given key, or " { $link f } " if there is no such key." } ;
+
+HELP: floor-entry
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Returns a key-value mapping associated with the greatest key less than or equal to the given key, or " { $link f } " if there is no such key." } ;
+
+HELP: floor-key
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "key/f" { $maybe "a key" } }
+}
+{ $description "Returns the greatest key less than or equal to the given key, or " { $link f } " if there is no such key." } ;
+
+HELP: higher-entry
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Returns a key-value mapping associated with the least key strictly greater than the given key, or " { $link f } " if there is no such key." } ;
+
+HELP: higher-key
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "key/f" { $maybe "a key" } }
+}
+{ $description "Returns the least key strictly greater than the given key, or " { $link f } " if there is no such key." } ;
+
+HELP: lower-entry
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Returns a key-value mapping associated with the greatest key strictly less than the given key, or " { $link f } " if there is no such key." } ;
+
+HELP: lower-key
+{ $values
+    { "key" "a key" } { "tree" tree }
+    { "key/f" { $maybe "a key" } }
+}
+{ $description "Returns the greatest key strictly less than the given key, or " { $link f } " if there is no such key." } ;
+
+{ lower-key lower-entry higher-key higher-entry
+  floor-key floor-entry ceiling-key ceiling-entry } related-words
+
+HELP: last-entry
+{ $values
+    { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Returns a key-value mapping associated with the last (highest) key in this tree, or " { $link f } " if the tree is empty." } ;
+
+HELP: last-key
+{ $values
+    { "tree" tree }
+    { "key/f" { $maybe "a key" } }
+}
+{ $description "Returns the last (highest) key in this tree, or " { $link f } " if the tree is empty." } ;
+
+HELP: first-entry
+{ $values
+    { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Returns a key-value mapping associated with the first (lowest) key in this tree, or " { $link f } " if the tree is empty." } ;
+
+HELP: first-key
+{ $values
+    { "tree" tree }
+    { "key/f" { $maybe pair } }
+}
+{ $description "Returns the first (lowest) key in this tree, or " { $link f } " if the tree is empty." } ;
+
+{ first-key first-entry last-key last-entry } related-words
+
 ARTICLE: "trees" "Binary search trees"
-"This is a library for unbalanced binary search trees. It is not intended to be used directly in most situations but rather as a base class for new trees, because performance can degrade to linear time storage/retrieval by the number of keys. These binary search trees conform to the assoc protocol."
+"This is a library for unbalanced binary search " { $link tree } "s. It is not intended to be used directly in most situations but rather as a base class for new trees, because performance can degrade to linear time storage/retrieval by the number of keys. These binary search trees conform to the assoc protocol."
+"Constructing trees:"
 { $subsections
-    tree
     <tree>
     >tree
     POSTPONE: TREE{
-    height
 }
-"Trees support range operations:"
+"Operations on trees: "
+{ $subsections
+    height
+    first-entry first-key
+    last-entry last-key
+}
+"Range operations on trees:"
 { $subsections
     headtree>alist[) headtree>alist[] tailtree>alist(] tailtree>alist[]
     subtree>alist() subtree>alist(] subtree>alist[) subtree>alist[]
+}
+"Navigation operations on trees:"
+{ $subsections
+    lower-key lower-entry higher-key higher-entry
+    floor-key floor-entry ceiling-key ceiling-entry
 }
 ;
 
