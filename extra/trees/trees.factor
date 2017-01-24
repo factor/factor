@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit kernel locals make math math.order namespaces
-parser prettyprint.custom random ;
+combinators.short-circuit kernel locals make math math.order
+namespaces parser prettyprint.custom random sequences ;
 IN: trees
 
 TUPLE: tree root { count integer } ;
@@ -219,6 +219,91 @@ PRIVATE>
 
 : tailtree>alist(] ( from-key tree -- alist )
     [ root>> [ after? ] (node>subalist-left) ] { } make ;
+
+<PRIVATE
+
+: (nodepath-at) ( key node -- )
+    [
+        dup ,
+        2dup key>> = [
+            2drop
+        ] [
+            choose-branch (nodepath-at)
+        ] if
+    ] [ drop ] if* ;
+
+: nodepath-at ( key tree -- path )
+    [ root>> (nodepath-at) ] { } make ;
+
+: right-extremity ( node -- node' )
+    [ dup right>> dup ] [ nip ] while drop ;
+
+: left-extremity ( node -- node' )
+    [ dup left>> dup ] [ nip ] while drop ;
+
+: lower-node-in-child? ( key node -- ? )
+    [ nip left>> ] [ key>> = ] 2bi and ;
+
+: higher-node-in-child? ( key node -- ? )
+    [ nip right>> ] [ key>> = ] 2bi and ;
+
+: lower-node ( key tree -- node )
+    dupd nodepath-at
+    [ drop f ] [
+        reverse 2dup first lower-node-in-child?
+        [ nip first left>> right-extremity ]
+        [ [ key>> after? ] with find nip ] if
+    ] if-empty ;
+
+: higher-node ( key tree -- node )
+    dupd nodepath-at
+    [ drop f ] [
+        reverse 2dup first higher-node-in-child?
+        [ nip first right>> left-extremity ]
+        [ [ key>> before? ] with find nip ] if
+    ] if-empty ;
+
+: floor-node ( key tree -- node )
+    dupd nodepath-at [ drop f ] [
+        reverse [ key>> after=? ] with find nip
+    ] if-empty ;
+
+: ceiling-node ( key tree -- node )
+    dupd nodepath-at [ drop f ] [
+        reverse [ key>> before=? ] with find nip
+    ] if-empty ;
+
+: first-node ( tree -- node ) root>> dup [ left-extremity ] when ;
+
+: last-node ( tree -- node ) root>> dup [ right-extremity ] when ;
+
+: node>entry ( node -- entry ) [ key>> ] [ value>> ] bi 2array ;
+
+PRIVATE>
+
+: lower-entry ( key tree -- pair/f ) lower-node dup [ node>entry ] when ;
+
+: higher-entry ( key tree -- pair/f ) higher-node dup [ node>entry ] when ;
+
+: floor-entry ( key tree -- pair/f ) floor-node dup [ node>entry ] when ;
+
+: ceiling-entry ( key tree -- pair/f ) ceiling-node dup [ node>entry ] when ;
+
+: first-entry ( tree -- pair/f ) first-node dup [ node>entry ] when ;
+
+: last-entry ( tree -- pair/f ) last-node dup [ node>entry ] when ;
+
+: lower-key ( key tree -- key/f ) lower-node dup [ key>> ] when ;
+
+: higher-key ( key tree -- key/f ) higher-node dup [ key>> ] when ;
+
+: floor-key ( key tree -- key/f ) floor-node dup [ key>> ] when ;
+
+: ceiling-key ( key tree -- key/f ) ceiling-node dup [ key>> ] when ;
+
+: first-key ( tree -- key/f ) first-node dup [ key>> ] when ;
+
+: last-key ( tree -- key/f ) last-node dup [ key>> ] when ;
 
 <PRIVATE
 

@@ -90,6 +90,66 @@ CONSTANT: test-tree2 TREE{
         { 100 100 }
     }
 
+: test-tree2-lower-key ( key -- key' )
+    dup 2 mod 2 swap - - ;
+: test-tree2-higher-key ( key -- key' )
+    dup 2 mod 2 swap - + ;
+: test-tree2-floor-key ( key -- key' )
+    dup 2 mod - ;
+: test-tree2-ceiling-key ( key -- key' )
+    dup 2 mod + ;
+
+{ f } [ 99 test-tree2 lower-node ]  unit-test
+{ f } [ 100 test-tree2 lower-node ]  unit-test
+100 121 (a,b] [
+    [ test-tree2-lower-key 1array ] keep [ test-tree2 lower-node key>> ] curry unit-test
+] each
+
+99 120 [a,b) [
+    [ test-tree2-higher-key 1array ] keep [ test-tree2 higher-node key>> ] curry unit-test
+] each
+{ f } [ 120 test-tree2 higher-node ]  unit-test
+{ f } [ 121 test-tree2 higher-node ]  unit-test
+
+{ f } [ 99 test-tree2 floor-node ]  unit-test
+100 121 [a,b] [
+    [ test-tree2-floor-key 1array ] keep [ test-tree2 floor-node key>> ] curry unit-test
+] each
+
+99 120 [a,b] [
+    [ test-tree2-ceiling-key 1array ] keep [ test-tree2 ceiling-node key>> ] curry unit-test
+] each
+{ f } [ 121 test-tree2 ceiling-node ]  unit-test
+
+{ 100 } [ test-tree2 first-node key>> ] unit-test
+{ 120 } [ test-tree2 last-node key>> ] unit-test
+
+{ f } [ 99 test-tree2 lower-entry ] unit-test
+{ f } [ 99 test-tree2 lower-key ] unit-test
+{ f } [ 121 test-tree2 higher-entry ] unit-test
+{ f } [ 121 test-tree2 higher-key ] unit-test
+{ f } [ 99 test-tree2 floor-entry ] unit-test
+{ f } [ 99 test-tree2 floor-key ] unit-test
+{ f } [ 121 test-tree2 ceiling-entry ] unit-test
+{ f } [ 121 test-tree2 ceiling-key ] unit-test
+{ { 108 108 } } [ 110 test-tree2 lower-entry ] unit-test
+{ 108  } [ 110 test-tree2 lower-key ] unit-test
+{ { 112 112 } } [ 110 test-tree2 higher-entry ] unit-test
+{ 112 } [ 110 test-tree2 higher-key ] unit-test
+{ { 110 110 } } [ 110 test-tree2 floor-entry ] unit-test
+{ 110 } [ 110 test-tree2 floor-key ] unit-test
+{ { 110 110 } } [ 110 test-tree2 ceiling-entry ] unit-test
+{ 110 } [ 110 test-tree2 ceiling-key ] unit-test
+
+{ f } [ TREE{ } clone first-key ] unit-test
+{ f } [ TREE{ } clone first-entry ] unit-test
+{ f } [ TREE{ } clone last-key ] unit-test
+{ f } [ TREE{ } clone last-entry ] unit-test
+{ { 100 100 } } [ test-tree2 first-entry ] unit-test
+{ 100 } [ test-tree2 first-key ] unit-test
+{ { 120 120 } } [ test-tree2 last-entry ] unit-test
+{ 120 } [ test-tree2 last-key ] unit-test
+
 : ?a,b? ( a b ? ? -- range )
     2array {
         { { t t } [ [a,b] ] }
