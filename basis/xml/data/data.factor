@@ -1,9 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private assocs arrays
-delegate.protocols delegate vectors accessors multiline
-macros words quotations combinators slots fry strings
-combinators.short-circuit ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit delegate delegate.protocols fry kernel
+macros sequences slots strings vectors words ;
 IN: xml.data
 
 TUPLE: interpolated var ;
@@ -52,7 +51,7 @@ M: attrs set-at
     ] if* ;
 
 M: attrs assoc-size alist>> length ;
-M: attrs new-assoc drop V{ } new-sequence <attrs> ;
+M: attrs new-assoc drop <vector> <attrs> ;
 M: attrs >alist alist>> ;
 
 : >attrs ( assoc -- attrs )
