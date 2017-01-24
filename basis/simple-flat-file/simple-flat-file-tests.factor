@@ -7,7 +7,6 @@ IN: simple-flat-file.tests
 MEMO: <test1> ( -- code-table )
     "vocab:simple-flat-file/test1.txt" flat-file>biassoc ;
 
-
 { 0 } [ 0 <test1> at ] unit-test
 { 0 } [ 0 <test1> value-at ] unit-test
 
@@ -19,3 +18,6 @@ MEMO: <test1> ( -- code-table )
 
 { 0xAD31 } [ 0x8258 <test1> at ] unit-test
 { 0x8258 } [ 0xAD31 <test1> value-at ] unit-test
+
+{ 1 } [ "1" expand-range ] unit-test
+{ { 1 31 } } [ "1..1F" expand-range ] unit-test
