@@ -174,8 +174,39 @@ HELP: first-key
 
 { first-key first-entry last-key last-entry } related-words
 
+HELP: pop-tree-left
+{ $values
+    { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Removes and returns a key-value mapping associated with the lowest key in this map, or " { $link f } " if the map is empty." } ;
+
+HELP: pop-tree-right
+{ $values
+    { "tree" tree }
+    { "pair/f" { $maybe pair } }
+}
+{ $description "Removes and returns a key-value mapping associated with the highest key in this map, or " { $link f } " if the map is empty." } ;
+
+{ pop-tree-left pop-tree-right } related-words
+
+HELP: slurp-tree-left
+{ $values
+    { "tree" tree } { "quot" { $quotation ( ... entry -- ... ) } }
+}
+{ $description "Removes entries from a tree from the left (lowest key) and processes them with the quotation until the tree is empty." } ;
+
+HELP: slurp-tree-right
+{ $values
+    { "tree" tree } { "quot" { $quotation ( ... entry -- ... ) } }
+}
+{ $description "Removes entries from a tree from the right (highest key) and processes them with the quotation until the tree is empty." } ;
+
+{ slurp-tree-left slurp-tree-right } related-words
+
 ARTICLE: "trees" "Binary search trees"
-"This is a library for unbalanced binary search " { $link tree } "s. It is not intended to be used directly in most situations but rather as a base class for new trees, because performance can degrade to linear time storage/retrieval by the number of keys. These binary search trees conform to the assoc protocol."
+"The " { $vocab-link "trees" } " vocabulary is a library for unbalanced binary search trees. A " { $link tree } " is not intended to be used directly in most situations but rather as a base class for new trees, because performance can degrade to linear time storage/retrieval by the number of keys. These binary search trees conform to the assoc protocol."
+$nl
 "Constructing trees:"
 { $subsections
     <tree>
@@ -197,6 +228,11 @@ ARTICLE: "trees" "Binary search trees"
 { $subsections
     lower-key lower-entry higher-key higher-entry
     floor-key floor-entry ceiling-key ceiling-entry
+}
+"Pop/Slurp operations on trees:"
+{ $subsections
+    pop-tree-left pop-tree-right
+    slurp-tree-left slurp-tree-right
 }
 ;
 
