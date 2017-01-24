@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit kernel make math math.order namespaces
+combinators.short-circuit kernel locals make math math.order namespaces
 parser prettyprint.custom random ;
 IN: trees
 
@@ -122,16 +122,105 @@ M: tree set-at
 
 : valid-tree? ( tree -- ? ) root>> valid-node? ;
 
+: node-alist, ( node -- )
+    [ key>> ] [ value>> ] bi 2array , ;
+
 : (node>alist) ( node -- )
     [
         [ left>> (node>alist) ]
-        [ [ key>> ] [ value>> ] bi 2array , ]
+        [ node-alist, ]
         [ right>> (node>alist) ]
         tri
     ] when* ;
 
 M: tree >alist
     [ root>> (node>alist) ] { } make ;
+
+:: (node>subalist-right) ( to-key node end-comparator: ( key1 key2 -- ? ) -- )
+    node [
+        node key>> to-key end-comparator call :> node-left?
+
+        node left>> node-left? [ (node>alist) ] [
+            [ to-key ] dip end-comparator (node>subalist-right)
+        ] if
+
+        node-left? [
+            node [ node-alist, ] [
+                right>> [ to-key ] dip
+                end-comparator (node>subalist-right)
+            ] bi
+        ] when
+    ] when ; inline recursive
+
+:: (node>subalist-left) ( from-key node start-comparator: ( key1 key2 -- ? ) -- )
+    node [
+        node key>> from-key start-comparator call :> node-right?
+
+        node-right? [
+            node [
+                left>> [ from-key ] dip
+                start-comparator (node>subalist-left)
+            ] [ node-alist, ] bi
+        ] when
+
+        node right>> node-right? [ (node>alist) ] [
+            [ from-key ] dip start-comparator (node>subalist-left)
+        ] if
+    ] when ; inline recursive
+
+:: (node>subalist) ( from-key to-key node start-comparator: ( key1 key2 -- ? ) end-comparator: ( key1 key2 -- ? ) -- )
+    node [
+        node key>> from-key start-comparator call :> node-right?
+        node key>> to-key end-comparator call :> node-left?
+
+        node-right? [
+            from-key node left>> node-left?
+            [ start-comparator (node>subalist-left) ]
+            [
+                [ to-key ] dip start-comparator
+                end-comparator (node>subalist)
+            ] if
+        ] when
+
+        node-right? node-left? and [ node node-alist, ] when
+
+        node-left? [
+            to-key node right>> node-right?
+            [ end-comparator (node>subalist-right) ]
+            [
+                 [ from-key ] 2dip start-comparator
+                 end-comparator (node>subalist)
+            ] if
+        ] when
+    ] when ; inline recursive
+
+PRIVATE>
+
+: subtree>alist[) ( from-key to-key tree -- alist )
+    [ root>> [ after=? ] [ before? ] (node>subalist) ] { } make ;
+
+: subtree>alist(] ( from-key to-key tree -- alist )
+    [ root>> [ after? ] [ before=? ] (node>subalist) ] { } make ;
+
+: subtree>alist[] ( from-key to-key tree -- alist )
+    [ root>> [ after=? ] [ before=? ] (node>subalist) ] { } make ;
+
+: subtree>alist() ( from-key to-key tree -- alist )
+    [ root>> [ after? ] [ before? ] (node>subalist) ] { } make ;
+
+: headtree>alist[) ( to-key tree -- alist )
+    [ root>> [ before? ] (node>subalist-right) ] { } make ;
+
+: headtree>alist[] ( to-key tree -- alist )
+    [ root>> [ before=? ] (node>subalist-right) ] { } make ;
+
+: tailtree>alist[] ( from-key tree -- alist )
+    [ root>> [ after=? ] (node>subalist-left) ] { } make ;
+
+: tailtree>alist(] ( from-key tree -- alist )
+    [ root>> [ after? ] (node>subalist-left) ] { } make ;
+
+<PRIVATE
 
 M: tree clear-assoc
     0 >>count
