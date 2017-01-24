@@ -416,3 +416,37 @@ PRIVATE>
 
 : height ( tree -- n )
     root>> node-height ;
+
+<PRIVATE
+
+: (pop-tree-extremity) ( tree -- node/f )
+    dup root>> dup node-link
+    [ (prune-extremity) nip ]
+    [ [ delete-node swap root<< ] keep ] if* ;
+
+: pop-tree-extremity ( tree -- node/f )
+    [ (pop-tree-extremity) ] [ over [ dec-count ] [ drop ] if ] bi
+    node>entry ;
+
+: slurp-tree ( tree quot: ( ... entry -- ... ) -- ... )
+    [ drop [ count>> 0 = ] curry ]
+    [ [ [ pop-tree-extremity ] curry ] dip compose ] 2bi until ; inline
+
+: pop-tree ( tree -- entry )
+    dup root>> dup [
+        drop pop-tree-extremity
+    ] [ nip ] if ;
+
+PRIVATE>
+
+: pop-tree-left ( tree -- pair/f )
+    left [ pop-tree ] with-side ;
+
+: pop-tree-right ( tree -- pair/f )
+    right [ pop-tree ] with-side ;
+
+: slurp-tree-left ( tree quot: ( ... entry -- ... ) -- ... )
+    left [ slurp-tree ] with-side ; inline
+
+: slurp-tree-right ( tree quot: ( ... entry -- ... ) -- ... )
+    right [ slurp-tree ] with-side ; inline
