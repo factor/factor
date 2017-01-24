@@ -1,5 +1,6 @@
-USING: accessors assocs kernel namespaces random tools.test
-trees trees.private ;
+USING: accessors arrays assocs combinators kernel math
+math.combinatorics math.ranges namespaces random sequences
+sequences.product tools.test trees trees.private ;
 IN: trees.tests
 
 : test-tree ( -- tree )
@@ -74,3 +75,59 @@ M: constant-random random-32* pattern>> ;
         1 over delete-at
     ] with-variable
 ] unit-test
+
+CONSTANT: test-tree2 TREE{
+        { 110 110 }
+        { 114 114 }
+        { 106 106 }
+        { 108 108 }
+        { 104 104 }
+        { 112 112 }
+        { 116 116 }
+        { 118 118 }
+        { 120 120 }
+        { 102 102 }
+        { 100 100 }
+    }
+
+: ?a,b? ( a b ? ? -- range )
+    2array {
+        { { t t } [ [a,b] ] }
+        { { t f } [ [a,b) ] }
+        { { f t } [ (a,b] ] }
+        { { f f } [ (a,b) ] }
+    } case ;
+
+! subtree>alist
+: test-tree2-subtree>alist ( a b ? ? -- subalist )
+    ?a,b? >array [ even? ] filter [ dup 2array ] map ;
+
+: subtree>alist ( from-key to-key tree start-inclusive? end-inclusive? -- alist )
+    2array {
+        { { t f } [ subtree>alist[) ] }
+        { { f t } [ subtree>alist(] ] }
+        { { t t } [ subtree>alist[] ] }
+        { { f f } [ subtree>alist() ] }
+    } case ;
+
+99 121 [a,b] 2 all-combinations
+{ t f } dup 2array <product-sequence> 2array
+[ first2 [ first2 ] bi@
+    {
+        [ test-tree2-subtree>alist 1array ]
+        [ [ [ test-tree2 ] 2dip subtree>alist ] 2curry 2curry unit-test ]
+    } 4cleave
+] product-each
+
+{ { } } [ 100 120 TREE{ } clone subtree>alist[] ] unit-test
+{ { } } [ 120 TREE{ } clone headtree>alist[] ] unit-test
+{ { } } [ 100 TREE{ } clone tailtree>alist[] ] unit-test
+
+{ { 100 102 104 106 108 110 112 114 } }
+[ 114 test-tree2 headtree>alist[] keys ] unit-test
+{ { 100 102 104 106 108 110 112 } }
+[ 114 test-tree2 headtree>alist[) keys ] unit-test
+{ { 106 108 110 112 114 116 118 120 } }
+[ 106 test-tree2 tailtree>alist[] keys ] unit-test
+{ { 108 110 112 114 116 118 120 } }
+[ 106 test-tree2 tailtree>alist(] keys ] unit-test
