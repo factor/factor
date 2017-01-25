@@ -39,6 +39,18 @@ IN: trees.tests
     { 4 "four" }
 } clone ] unit-test
 
+! test that converting from any tree to a basic tree doesn't reshape
+! the tree
+{ TREE{
+    { 7 "seven" }
+    { 9 "nine" }
+    { 4 "four" }
+} } [ TREE{
+    { 7 "seven" }
+    { 9 "nine" }
+    { 4 "four" }
+} >tree ] unit-test
+
 ! test height
 { 0 } [ TREE{ } height ] unit-test
 

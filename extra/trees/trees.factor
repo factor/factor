@@ -1,8 +1,9 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit kernel locals make math math.order
-namespaces parser prettyprint.custom random sequences ;
+combinators.short-circuit deques dlists kernel locals make math
+math.order namespaces parser prettyprint.custom random sequences
+vectors ;
 IN: trees
 
 TUPLE: tree root { count integer } ;
@@ -122,13 +123,14 @@ M: tree set-at
 
 : valid-tree? ( tree -- ? ) root>> valid-node? ;
 
-: node-alist, ( node -- )
-    [ key>> ] [ value>> ] bi 2array , ;
+: node>entry ( node -- entry ) [ key>> ] [ value>> ] bi 2array ;
+
+: entry, ( node -- ) node>entry , ;
 
 : (node>alist) ( node -- )
     [
         [ left>> (node>alist) ]
-        [ node-alist, ]
+        [ entry, ]
         [ right>> (node>alist) ]
         tri
     ] when* ;
@@ -145,7 +147,7 @@ M: tree >alist
         ] if
 
         node-left? [
-            node [ node-alist, ] [
+            node [ entry, ] [
                 right>> [ to-key ] dip
                 end-comparator (node>subalist-right)
             ] bi
@@ -160,7 +162,7 @@ M: tree >alist
             node [
                 left>> [ from-key ] dip
                 start-comparator (node>subalist-left)
-            ] [ node-alist, ] bi
+            ] [ entry, ] bi
         ] when
 
         node right>> node-right? [ (node>alist) ] [
@@ -182,7 +184,7 @@ M: tree >alist
             ] if
         ] when
 
-        node-right? node-left? and [ node node-alist, ] when
+        node-right? node-left? and [ node entry, ] when
 
         node-left? [
             to-key node right>> node-right?
@@ -276,8 +278,6 @@ PRIVATE>
 : first-node ( tree -- node ) root>> dup [ left-extremity ] when ;
 
 : last-node ( tree -- node ) root>> dup [ right-extremity ] when ;
-
-: node>entry ( node -- entry ) [ key>> ] [ value>> ] bi 2array ;
 
 PRIVATE>
 
@@ -384,6 +384,25 @@ M: tree new-assoc
     ] when ;
 
 M: tree clone (clone) [ clone-nodes ] change-root ;
+
+: ?push-children ( node queue -- )
+    [ [ left>> ] [ right>> ] bi ]
+    [ [ over [ push-front ] [ 2drop ] if ] curry bi@ ] bi* ;
+
+: each-bfs-node ( tree quot: ( ... entry -- ... ) -- ... )
+    [ root>> <dlist> [ push-front ] keep dup ] dip
+    [
+        [ drop node>entry ] prepose
+        [ ?push-children ] 2bi
+    ] 2curry slurp-deque ; inline
+
+: >bfs-alist ( tree -- alist )
+    dup assoc-size <vector> [
+        [ push ] curry each-bfs-node
+    ] keep ;
+
+M: tree assoc-clone-like
+    [ dup tree? [ >bfs-alist ] when ] dip call-next-method ;
 
 PRIVATE>
 

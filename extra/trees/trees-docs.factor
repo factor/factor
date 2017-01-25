@@ -12,7 +12,7 @@ HELP: <tree>
 
 HELP: >tree
 { $values { "assoc" assoc } { "tree" tree } }
-{ $description "Converts any " { $link assoc } " into an unbalanced binary tree." } ;
+{ $description "Converts any " { $link assoc } " into an unbalanced binary tree. If the input assoc is any kind of " { $link tree } ", the elements are added in level order (breadth-first search) to copy it's shape." } ;
 
 HELP: tree
 { $class-description "This is the class for unbalanced binary search trees. It is not usually intended to be used directly but rather as a basis for other trees." } ;
