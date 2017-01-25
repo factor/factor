@@ -415,34 +415,25 @@ PRIVATE>
 
 <PRIVATE
 
-: (pop-tree-extremity) ( tree -- node/f )
-    dup root>> dup node-link
-    [ (prune-extremity) nip ]
-    [ [ delete-node swap root<< ] keep ] if* ;
-
-: pop-tree-extremity ( tree -- node/f )
-    [ (pop-tree-extremity) ] [ over [ dec-count ] [ drop ] if ] bi
-    node>entry ;
-
-: slurp-tree ( tree quot: ( ... entry -- ... ) -- ... )
-    [ drop [ count>> 0 = ] curry ]
-    [ [ [ pop-tree-extremity ] curry ] dip compose ] 2bi until ; inline
-
-: pop-tree ( tree -- entry )
-    dup root>> dup [
-        drop pop-tree-extremity
+: pop-tree-extremity ( tree node/f -- node/f )
+    dup [
+        [ key>> swap delete-at ] keep node>entry
     ] [ nip ] if ;
+
+:: slurp-tree ( tree quot: ( ... entry -- ... ) getter: ( tree -- node ) -- ... )
+    [ tree count>> 0 = ]
+    [ tree getter call quot call ] until ; inline
 
 PRIVATE>
 
-: pop-tree-left ( tree -- pair/f )
-    left [ pop-tree ] with-side ;
+: pop-tree-left ( tree -- node/f )
+    dup first-node pop-tree-extremity ;
 
-: pop-tree-right ( tree -- pair/f )
-    right [ pop-tree ] with-side ;
+: pop-tree-right ( tree -- node/f )
+    dup last-node pop-tree-extremity ;
 
 : slurp-tree-left ( tree quot: ( ... entry -- ... ) -- ... )
-    left [ slurp-tree ] with-side ; inline
+    [ pop-tree-left ] slurp-tree ; inline
 
 : slurp-tree-right ( tree quot: ( ... entry -- ... ) -- ... )
-    right [ slurp-tree ] with-side ; inline
+    [ pop-tree-right ] slurp-tree ; inline
