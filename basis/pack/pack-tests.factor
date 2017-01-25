@@ -1,5 +1,5 @@
-USING: io io.streams.string kernel namespaces make
-pack strings tools.test pack.private ;
+USING: alien.c-types io io.streams.string kernel make namespaces
+pack pack.private strings tools.test ;
 IN: pack.tests
 
 { B{ 1 0 2 0 0 3 0 0 0 4 0 0 0 0 0 0 0 5 } } [
@@ -58,3 +58,5 @@ IN: pack.tests
 { "cccc" } [ "4c" expand-pack-format ] unit-test
 { "cccccccccccc" } [ "12c" expand-pack-format ] unit-test
 { "iccqqq" } [ "1i2c3q" expand-pack-format ] unit-test
+
+{ B{ 1 0 0 0 } } [ 1 int32_t >n-byte-array ] unit-test
