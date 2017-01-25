@@ -486,8 +486,10 @@ $nl
     each-block
 }
 "Copying the contents of one stream to another:"
-{ $subsections stream-copy* }
-{ $subsections stream-copy } ;
+{ $subsections
+    stream-copy*
+    stream-copy
+} ;
 
 ARTICLE: "stream-examples" "Stream example"
 "Ask the user for their age, and print it back:"
