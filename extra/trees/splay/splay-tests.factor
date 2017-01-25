@@ -49,3 +49,8 @@ IN: trees.splay.tests
 ! test assoc-size
 { 3 } [ test-tree assoc-size ] unit-test
 { 2 } [ test-tree 9 over delete-at assoc-size ] unit-test
+
+! Test that converting trees doesn't give linked lists
+{
+    SPLAY{ { 1 1 } { 3 3 } { 2 2 } }
+} [ SPLAY{ { 1 1 } { 3 3 } { 2 2 } } >splay ] unit-test

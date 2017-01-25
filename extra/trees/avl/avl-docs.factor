@@ -1,4 +1,4 @@
-USING: help.syntax help.markup assocs ;
+USING: assocs help.markup help.syntax trees ;
 IN: trees.avl
 
 HELP: AVL{
@@ -12,7 +12,7 @@ HELP: <avl>
 
 HELP: >avl
 { $values { "assoc" assoc } { "avl" avl } }
-{ $description "Converts any " { $link assoc } " into an AVL tree." } ;
+{ $description "Converts any " { $link assoc } " into an AVL tree. If the input assoc is any kind of " { $link tree } ", the elements are added in level order (breadth-first search) to attempt to copy it's shape." } ;
 
 HELP: avl
 { $class-description "This is the class for AVL trees. These conform to the assoc protocol and have efficient (logarithmic time) storage and retrieval operations." } ;
