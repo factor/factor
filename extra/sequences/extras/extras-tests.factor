@@ -245,8 +245,8 @@ IN: sequences.extras.tests
 { }
 [ "test:" all-words [ name>> over prepend ] map-zip 2drop ] unit-test
 
-{ { 0 1 2 3 } } [ 8 iota [ 4 < ] take-while ] unit-test
-{ { } } [ { 15 16 } [ 4 < ] take-while ] unit-test
+{ { 0 1 2 3 } } [ 8 iota [ 4 < ] take-while >array ] unit-test
+{ { } } [ { 15 16 } [ 4 < ] take-while >array ] unit-test
 
-{ { 4 5 6 7 } } [ 8 iota [ 4 < ] drop-while ] unit-test
-{ { 15 16 } } [ { 15 16 } [ 4 < ] drop-while ] unit-test
+{ { 4 5 6 7 } } [ 8 iota [ 4 < ] drop-while >array ] unit-test
+{ { 15 16 } } [ { 15 16 } [ 4 < ] drop-while >array ] unit-test
