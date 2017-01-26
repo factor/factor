@@ -23,3 +23,8 @@ IN: money.tests
 
 { "$100.00" } [ DECIMAL: 100.0 money>string ] unit-test
 { "$0.00" } [ DECIMAL: 0.0 money>string ] unit-test
+
+{ "$1.00" } [ 1.0 money>string ] unit-test
+{ "$1.00" } [ 1 money>string ] unit-test
+{ "$1.50" } [ 1+1/2 money>string ] unit-test
+{ "$1.50" } [ 1.50 money>string ] unit-test
