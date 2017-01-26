@@ -602,3 +602,9 @@ PRIVATE>
 
 : map-values ( assoc quot: ( value -- value' ) -- assoc )
     '[ swap _ dip swap ] assoc-map ; inline
+
+: take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
+    [ '[ @ not ] find drop ] 2keep drop swap 0 or head-slice ; inline
+
+: drop-while ( ... seq quot: ( ... elt -- ... ? ) -- tail-slice )
+    [ '[ @ not ] find drop ] 2keep drop swap 0 or tail-slice ; inline
