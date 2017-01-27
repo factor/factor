@@ -247,6 +247,8 @@ IN: sequences.extras.tests
 
 { { 0 1 2 3 } } [ 8 iota [ 4 < ] take-while >array ] unit-test
 { { } } [ { 15 16 } [ 4 < ] take-while >array ] unit-test
+{ { 0 1 2 } } [ 3 iota [ 4 < ] take-while >array ] unit-test
 
 { { 4 5 6 7 } } [ 8 iota [ 4 < ] drop-while >array ] unit-test
 { { 15 16 } } [ { 15 16 } [ 4 < ] drop-while >array ] unit-test
+{ { } } [ 3 iota [ 4 < ] drop-while >array ] unit-test

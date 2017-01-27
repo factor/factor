@@ -604,7 +604,9 @@ PRIVATE>
     '[ swap _ dip swap ] assoc-map ; inline
 
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
-    [ '[ @ not ] find drop ] 2keep drop swap 0 or head-slice ; inline
+    [ '[ @ not ] find drop ] 2keep drop swap
+    [ dup length ] unless* head-slice ; inline
 
 : drop-while ( ... seq quot: ( ... elt -- ... ? ) -- tail-slice )
-    [ '[ @ not ] find drop ] 2keep drop swap 0 or tail-slice ; inline
+    [ '[ @ not ] find drop ] 2keep drop swap
+    [ dup length ] unless* tail-slice ; inline
