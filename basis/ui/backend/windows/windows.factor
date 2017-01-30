@@ -1,19 +1,15 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data alien.strings arrays assocs ui
-ui.private ui.gadgets ui.gadgets.private ui.backend
-ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
-kernel math math.vectors namespaces make sequences strings
-vectors words windows.dwmapi system-info.windows
-windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
-windows.messages windows.types windows.offscreen windows threads
-libc combinators fry combinators.short-circuit continuations
-command-line shuffle opengl ui.render math.bitwise locals
-accessors math.rectangles math.order calendar ascii sets io.crlf
-io.encodings.utf16n windows.errors literals ui.pixel-formats
-ui.pixel-formats.private memoize classes colors
-specialized-arrays classes.struct ;
+USING: accessors alien alien.data alien.strings arrays ascii assocs
+calendar classes classes.struct colors combinators continuations fry
+io io.crlf io.encodings.utf16n kernel libc literals locals make math
+math.bitwise namespaces sequences sets specialized-arrays strings
+threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.private windows.dwmapi windows.errors windows.gdi32
+windows.kernel32 windows.messages windows.offscreen windows.opengl32
+windows.types windows.user32 ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -26,7 +22,9 @@ C: <win> win
 
 <PRIVATE
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
+CONSTANT: perm-attribs { $ WGL_SUPPORT_OPENGL_ARB 1 }
+
+CONSTANT: attrib-table H{
     { double-buffered { $ WGL_DOUBLE_BUFFER_ARB 1 } }
     { stereo { $ WGL_STEREO_ARB 1 } }
     { offscreen { $ WGL_DRAW_TO_BITMAP_ARB 1 } }
@@ -57,7 +55,9 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
-    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { c:int c:int }
+    [ handle>> hDC>> ] dip
+    perm-attribs attrib-table pixel-format-attributes>int-array
+    f 1 { c:int c:int }
     [ wglChoosePixelFormatARB win32-error=0/f ] with-out-parameters drop ;
 
 CONSTANT: pfd-flag-map H{
