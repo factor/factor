@@ -49,15 +49,6 @@ M: cocoa-ui-backend (make-pixel-format)
 M: cocoa-ui-backend (free-pixel-format)
     handle>> -> release ;
 
-M: cocoa-ui-backend (pixel-format-attribute)
-    [ handle>> ] [ >NSOpenGLPFA ] bi*
-    [ drop f ]
-    [
-        first
-        { int } [ swap 0 -> getValues:forAttribute:forVirtualScreen: ]
-        with-out-parameters
-    ] if-empty ;
-
 TUPLE: pasteboard handle ;
 
 C: <pasteboard> pasteboard
