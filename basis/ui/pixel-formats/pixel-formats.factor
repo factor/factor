@@ -14,7 +14,7 @@ SYMBOLS:
     software-rendered
     backing-store
     multisampled
-    supersampled 
+    supersampled
     sample-alpha
     color-float ;
 
@@ -43,7 +43,6 @@ TUPLE: samples < pixel-format-attribute ;
 
 HOOK: (make-pixel-format) ui-backend ( world attributes -- pixel-format-handle )
 HOOK: (free-pixel-format) ui-backend ( pixel-format -- )
-HOOK: (pixel-format-attribute) ui-backend ( pixel-format attribute-name -- value )
 
 ERROR: invalid-pixel-format-attributes world attributes ;
 

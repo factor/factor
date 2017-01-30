@@ -94,14 +94,6 @@ M: x11-ui-backend (make-pixel-format)
 M: x11-ui-backend (free-pixel-format)
     handle>> XFree ;
 
-M: x11-ui-backend (pixel-format-attribute)
-    [ dpy get ] 2dip
-    [ handle>> ] [ >glx-visual ] bi*
-    [ 2drop f ] [
-        first
-        { int } [ glXGetConfig drop ] with-out-parameters
-    ] if-empty ;
-
 : key-code ( code -- string/f action? )
     code>sym [ dup integer? [ 1string ] when ] dip ;
 
