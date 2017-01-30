@@ -1,19 +1,21 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar calendar.format io io.encodings.ascii
-io.servers kernel threads ;
+USING: accessors calendar calendar.format command-line io
+io.encodings.ascii io.servers kernel math.parser namespaces
+sequences threads ;
 IN: time-server
 
 : handle-time-client ( -- )
     now timestamp>rfc822 print ;
 
-: <time-server> ( -- threaded-server )
+: <time-server> ( port -- threaded-server )
     ascii <threaded-server>
         "time-server" >>name
-        1234 >>insecure
+        swap >>insecure
         [ handle-time-client ] >>handler ;
 
-: start-time-server ( -- )
-    <time-server> start-server drop ;
+: time-server-main ( -- )
+    command-line get [ 1234 ] [ first string>number ] if-empty
+    <time-server> start-server wait-for-server ;
 
-MAIN: start-time-server
+MAIN: time-server-main
