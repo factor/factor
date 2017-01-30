@@ -1,5 +1,5 @@
-USING: accessors debugger kernel listener io.servers
-io.encodings.utf8 namespaces ;
+USING: accessors command-line debugger io.encodings.utf8
+io.servers kernel listener math.parser namespaces sequences ;
 
 IN: tty-server
 
@@ -14,6 +14,7 @@ IN: tty-server
         f >>timeout ;
 
 : run-tty-server ( -- )
-    9999 <tty-server> start-server drop ;
+    command-line get [ 9999 ] [ first string>number ] if-empty
+    <tty-server> start-server wait-for-server ;
 
 MAIN: run-tty-server
