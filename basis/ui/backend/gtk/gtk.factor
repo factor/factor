@@ -362,33 +362,30 @@ CONSTANT: window-controls>func-flags
     ] 2tri ;
 
 ! OpenGL and Pixel formats
+CONSTANT: perm-attribs ${ GDK_GL_USE_GL GDK_GL_RGBA }
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: gl-config-attribs
-    ${ GDK_GL_USE_GL GDK_GL_RGBA }
-    H{
-        { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
-        { stereo ${ GDK_GL_STEREO } }
-        ! { offscreen ${ GDK_GL_DRAWABLE_TYPE 2 } }
-        ! { fullscreen ${ GDK_GL_DRAWABLE_TYPE 1 } }
-        ! { windowed ${ GDK_GL_DRAWABLE_TYPE 1 } }
-        { color-bits ${ GDK_GL_BUFFER_SIZE } }
-        { red-bits ${ GDK_GL_RED_SIZE } }
-        { green-bits ${ GDK_GL_GREEN_SIZE } }
-        { blue-bits ${ GDK_GL_BLUE_SIZE } }
-        { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
-        { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
-        { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
-        { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
-        { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
-        { depth-bits ${ GDK_GL_DEPTH_SIZE } }
-        { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
-        { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
-        { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
-        { samples ${ GDK_GL_SAMPLES } }
-    }
+CONSTANT: attrib-table H{
+    { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
+    { stereo ${ GDK_GL_STEREO } }
+    { color-bits ${ GDK_GL_BUFFER_SIZE } }
+    { red-bits ${ GDK_GL_RED_SIZE } }
+    { green-bits ${ GDK_GL_GREEN_SIZE } }
+    { blue-bits ${ GDK_GL_BLUE_SIZE } }
+    { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
+    { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
+    { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
+    { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
+    { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
+    { depth-bits ${ GDK_GL_DEPTH_SIZE } }
+    { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
+    { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
+    { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
+    { samples ${ GDK_GL_SAMPLES } }
+}
 
 M: gtk-ui-backend (make-pixel-format)
-    nip >gl-config-attribs-int-array gdk_gl_config_new ;
+    nip perm-attribs attrib-table
+    pixel-format-attributes>int-array gdk_gl_config_new ;
 
 M: gtk-ui-backend (free-pixel-format)
     handle>> g_object_unref ;

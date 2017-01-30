@@ -1,6 +1,6 @@
-USING: alien.c-types alien.data accessors assocs classes
-destructors functors kernel lexer math parser sequences
-specialized-arrays ui.backend words ;
+USING: accessors alien.c-types alien.data assocs classes destructors
+fry functors kernel lexer math parser sequences specialized-arrays
+ui.backend words ;
 SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
 
@@ -56,6 +56,11 @@ TUPLE: pixel-format < disposable world handle ;
 
 M: pixel-format dispose*
     [ (free-pixel-format) ] [ f >>handle drop ] bi ;
+
+: pixel-format-attributes>int-array ( attrs perm table -- arr )
+    swapd '[ _ at ] map sift concat append
+    ! 0 happens to work as a sentinel value for all ui backends.
+    0 suffix int >c-array ;
 
 <PRIVATE
 
