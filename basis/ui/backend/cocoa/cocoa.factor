@@ -19,14 +19,17 @@ C: <window-handle> window-handle
 
 SINGLETON: cocoa-ui-backend
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
+CONSTANT: attrib-table H{
     { double-buffered { $ NSOpenGLPFADoubleBuffer } }
     { stereo { $ NSOpenGLPFAStereo } }
     { offscreen { $ NSOpenGLPFAOffScreen } }
     { fullscreen { $ NSOpenGLPFAFullScreen } }
     { windowed { $ NSOpenGLPFAWindow } }
     { accelerated { $ NSOpenGLPFAAccelerated } }
-    { software-rendered { $ NSOpenGLPFARendererID $ kCGLRendererGenericFloatID } }
+    { software-rendered {
+          $ NSOpenGLPFARendererID
+          $ kCGLRendererGenericFloatID }
+    }
     { backing-store { $ NSOpenGLPFABackingStore } }
     { multisampled { $ NSOpenGLPFAMultisample } }
     { supersampled { $ NSOpenGLPFASupersample } }
@@ -43,7 +46,7 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
 }
 
 M: cocoa-ui-backend (make-pixel-format)
-    nip >NSOpenGLPFA-int-array
+    nip { } attrib-table pixel-format-attributes>int-array
     NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
