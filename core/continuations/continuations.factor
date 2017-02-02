@@ -206,7 +206,6 @@ M: condition compute-restarts
 <PRIVATE
 
 : init-error-handler ( -- )
-    init-catchstack
     ! VM calls on error
     [
         OBJ-CURRENT-THREAD special-object error-thread set-global
