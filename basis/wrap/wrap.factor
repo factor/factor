@@ -13,15 +13,14 @@ C: <element> element
 : element-length ( element -- n )
     [ black>> ] [ white>> ] bi + ; inline
 
-TUPLE: paragraph line-max line-ideal lines head-width tail-cost ;
+TUPLE: paragraph line-max lines head-width tail-cost ;
 C: <paragraph> paragraph
 
 : if-one-line ( paragraph true false -- )
     [ dup lines>> 1list? ] 2dip if ; inline
 
 TYPED: top-fits? ( paragraph: paragraph -- ? )
-    [ head-width>> ]
-    [ [ line-ideal>> ] [ line-max>> ] if-one-line ] bi <= ; inline
+    [ head-width>> ] [ line-max>> ] bi <= ; inline
 
 TYPED: fits? ( paragraph: paragraph -- ? )
     ! Make this not count spaces at end
@@ -29,7 +28,7 @@ TYPED: fits? ( paragraph: paragraph -- ? )
 
 TYPED: paragraph-cost ( paragraph: paragraph -- cost )
     [ drop 0 ] [
-        [ head-width>> ] [ line-ideal>> - sq ] [ tail-cost>> ] tri +
+        [ head-width>> ] [ line-max>> - sq ] [ tail-cost>> ] tri +
     ] if-one-line ; inline
 
 : min-cost ( paragraphs -- paragraph )
@@ -37,7 +36,7 @@ TYPED: paragraph-cost ( paragraph: paragraph -- cost )
 
 TYPED: new-line ( paragraph: paragraph element: element -- paragraph )
     {
-        [ drop [ line-max>> ] [ line-ideal>> ] bi ]
+        [ drop line-max>> ]
         [ [ lines>> ] [ 1list ] bi* swons ]
         [ nip black>> ]
         [ drop paragraph-cost ]
@@ -53,19 +52,19 @@ TYPED: wrap-step ( paragraphs: array element: element -- paragraphs )
     2bi swap prefix { array } declare
     [ fits? ] filter ; inline
 
-: 1paragraph ( line-max line-ideal element -- paragraph )
+: 1paragraph ( line-max element -- paragraph )
     [ 1list 1list ] [ black>> ] bi 0 <paragraph> ;
 
 : post-process ( paragraph -- array )
     lines>> [ [ contents>> ] lmap>array ] lmap>array ;
 
-: initial-step ( line-max line-ideal elements -- elements paragraph )
-    reverse unclip [ -rot ] dip 1paragraph 1array ;
+: initial-step ( line-max elements -- elements paragraph )
+    reverse unclip swapd 1paragraph 1array ;
 
 PRIVATE>
 
-: wrap ( elements line-max line-ideal -- array )
-    rot [ 2drop { } ] [
+: wrap ( elements width -- array )
+    swap [ drop { } ] [
         initial-step
         [ wrap-step ] reduce
         min-cost
