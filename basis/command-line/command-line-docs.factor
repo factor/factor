@@ -54,7 +54,7 @@ ARTICLE: "runtime-cli-args" "Command line switches for the VM"
     { { $snippet "-codeheap=" { $emphasis "n" } } "Code heap size, megabytes" }
     { { $snippet "-pic=" { $emphasis "n" } } "Maximum inline cache size. Setting of 0 disables inline caching, >= 1 enables polymorphic inline caching" }
     { { $snippet "-fep" } "enter low-level debbugger, aka fep mode immediately" }
-    { { $snippet "-nosignals" } "turn off OS signal handling" }
+    { { $snippet "-no-signals" } "turn off OS signal handling" }
     { { $snippet "-console" } "open console if possible" }
 }
 "If an " { $snippet "-i=" } " switch is not present, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the Factor executable." ;
