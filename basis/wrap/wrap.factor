@@ -1,72 +1,46 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
+! Copyright (C) 2017 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.short-circuit
-fry kernel kernel.private lists locals math sequences typed ;
+USING: accessors arrays kernel locals math sequences
+sequences.private ;
 IN: wrap
 
-! black is the text length, white is the whitespace length
 TUPLE: element contents black white ;
+
 C: <element> element
 
-<PRIVATE
+:: wrap ( elements width -- array )
+    elements length integer>fixnum-strict :> #elements
+    elements [ black>> ] { } map-as :> black
+    elements [ white>> ] { } map-as :> white
 
-: element-length ( element -- n )
-    [ black>> ] [ white>> ] bi + ; inline
+    #elements 1 + f <array> :> minima
+    #elements 1 + 0 <array> :> breaks
 
-TUPLE: paragraph line-max lines head-width tail-cost ;
-C: <paragraph> paragraph
+    0 0 minima set-nth-unsafe
 
-: if-one-line ( paragraph true false -- )
-    [ dup lines>> 1list? ] 2dip if ; inline
+    minima [| base i |
+        0 i 1 + [ dup #elements <= ] [| j |
+            j 1 - black nth-unsafe + dup :> w
+            j 1 - white nth-unsafe +
 
-TYPED: top-fits? ( paragraph: paragraph -- ? )
-    [ head-width>> ] [ line-max>> ] bi <= ; inline
+            w width > [
+                j 1 - i = [
+                    0 j minima set-nth-unsafe
+                    i j breaks set-nth-unsafe
+                ] when #elements
+            ] [
+                base
+                j #elements = [ width w - sq + ] unless :> cost
+                j minima nth-unsafe [ cost >= ] [ t ] if* [
+                    cost j minima set-nth-unsafe
+                    i j breaks set-nth-unsafe
+                ] when j
+            ] if 1 +
+        ] while 2drop
+    ] each-index
 
-TYPED: fits? ( paragraph: paragraph -- ? )
-    ! Make this not count spaces at end
-    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ; inline
-
-TYPED: paragraph-cost ( paragraph: paragraph -- cost )
-    [ drop 0 ] [
-        [ head-width>> ] [ line-max>> - sq ] [ tail-cost>> ] tri +
-    ] if-one-line ; inline
-
-: min-cost ( paragraphs -- paragraph )
-    [ paragraph-cost ] infimum-by ; inline
-
-TYPED: new-line ( paragraph: paragraph element: element -- paragraph )
-    {
-        [ drop line-max>> ]
-        [ [ lines>> ] [ 1list ] bi* swons ]
-        [ nip black>> ]
-        [ drop paragraph-cost ]
-    } 2cleave <paragraph> ; inline
-
-TYPED: add-element ( paragraph: paragraph element: element -- )
-    [ '[ _ element-length + ] change-head-width ]
-    [ '[ unswons _ swons swons ] change-lines ] bi drop ; inline
-
-TYPED: wrap-step ( paragraphs: array element: element -- paragraphs )
-    [ [ min-cost ] dip new-line ]
-    [ dupd '[ _ add-element ] each ]
-    2bi swap prefix { array } declare
-    [ fits? ] filter ; inline
-
-: 1paragraph ( line-max element -- paragraph )
-    [ 1list 1list ] [ black>> ] bi 0 <paragraph> ;
-
-: post-process ( paragraph -- array )
-    lines>> [ [ contents>> ] lmap>array ] lmap>array ;
-
-: initial-step ( line-max elements -- elements paragraph )
-    reverse unclip swapd 1paragraph 1array ;
-
-PRIVATE>
-
-: wrap ( elements width -- array )
-    swap [ drop { } ] [
-        initial-step
-        [ wrap-step ] reduce
-        min-cost
-        post-process
-    ] if-empty ;
+    #elements [ dup 0 > ] [
+        [ breaks nth dup ] keep elements <slice>
+        [ contents>> ] map
+    ] produce nip reverse ;

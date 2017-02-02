@@ -39,7 +39,7 @@ word wrap."
 [ "hello how are you today?" 3 wrap-string ] unit-test
 
 { "aaa\nbb cc\nddddd" } [ "aaa bb cc ddddd" 6 wrap-string ] unit-test
-{ "aaa\nbb ccc\ndddddd" } [ "aaa bb ccc dddddd" 6 wrap-string ] unit-test
+{ "aaa bb\nccc\ndddddd" } [ "aaa bb ccc dddddd" 6 wrap-string ] unit-test
 { "aaa bb\ncccc\nddddd" } [ "aaa bb cccc ddddd" 6 wrap-string ] unit-test
 { "aaa bb\nccccccc\nddddddd" } [ "aaa bb ccccccc ddddddd" 6 wrap-string ] unit-test
 
