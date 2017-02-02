@@ -36,8 +36,8 @@ from within Factor for more information.
 " write ;
 
 : help? ( -- ? )
-    "help" get "-help" get or "h" get or
-    os windows? [ script get "/?" = ] [ f ] if or ;
+    "help" get "h" get or
+    os windows? [ script get "/?" = or ] when ;
 
 : command-line-startup ( -- )
     (command-line) parse-command-line
