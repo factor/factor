@@ -37,5 +37,5 @@ C: <wrapping-word> wrapping-word
 
 PRIVATE>
 
-: wrap-words ( words line-max line-ideal -- lines )
-    [ words>elements ] 2dip wrap [ concat ] map! ;
+: wrap-words ( words width -- lines )
+    [ words>elements ] dip wrap [ concat ] map! ;
