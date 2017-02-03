@@ -10,14 +10,14 @@ ARTICLE: "simple-flat-file" "Parsing simple flat files"
 { $subsections
     flat-file>biassoc
     load-interval-file
-    data
+    load-data-file
 } ;
 
 HELP: load-interval-file
 { $values { "filename" string } { "table" "an interval map" } }
 { $description "This loads a file that looks like Script.txt in the Unicode Character Database and converts it into an efficient interval map, where the keys are characters and the values are strings for the properties." } ;
 
-HELP: data
+HELP: load-data-file
 { $values { "filename" string } { "data" array } }
 { $description "This loads a file that's delineated by semicolons and lines, returning an array of lines, where each line is an array split by the semicolons, with whitespace trimmed off." } ;
 
