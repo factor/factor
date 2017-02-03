@@ -23,7 +23,8 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     " " split [ hex> ] "" map-as ;
 
 : parse-ducet ( file -- ducet )
-    data [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
+    load-data-file
+    [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
 "vocab:unicode/collation/allkeys.txt" parse-ducet ducet set-global
 
