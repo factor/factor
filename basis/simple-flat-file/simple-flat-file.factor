@@ -5,8 +5,11 @@ io.encodings.utf8 io.files kernel math.parser sequences sets
 splitting ;
 IN: simple-flat-file
 
+: drop-comment ( line -- line' )
+    dup [ "#@" member? ] find drop [ head ] when* ;
+
 : drop-comments ( seq -- newseq )
-    [ dup [ "#@" member? ] find drop [ head ] when* ] map harvest ;
+    [ drop-comment ] map harvest ;
 
 : split-column ( line -- columns )
     " \t" split harvest 2 short head 2 f pad-tail ;
