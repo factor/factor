@@ -26,7 +26,7 @@ IN: simple-flat-file
 : process-codetable-lines ( lines -- assoc )
     drop-comments [ parse-line ] map! ;
 
-: flat-file>biassoc ( filename -- biassoc )
+: load-codetable-file ( filename -- biassoc )
     utf8 file-lines process-codetable-lines >biassoc ;
 
 : split-; ( line -- array )

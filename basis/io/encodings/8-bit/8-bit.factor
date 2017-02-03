@@ -49,7 +49,7 @@ M: 8-bit-encoding <decoder>
 : load-encoding ( name iana-name file-name -- )
     [ create-encoding dup ]
     [ register-encoding ]
-    [ encoding-file flat-file>biassoc 8-bit boa ] tri*
+    [ encoding-file load-codetable-file 8-bit boa ] tri*
     swap 8-bit-encodings get-global set-at ;
 
 PRIVATE>
