@@ -5,7 +5,7 @@ IN: simple-flat-file.tests
 
 
 MEMO: <test1> ( -- code-table )
-    "vocab:simple-flat-file/test1.txt" flat-file>biassoc ;
+    "vocab:simple-flat-file/test1.txt" load-codetable-file ;
 
 { 0 } [ 0 <test1> at ] unit-test
 { 0 } [ 0 <test1> value-at ] unit-test

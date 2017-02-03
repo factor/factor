@@ -13,9 +13,9 @@ SYMBOL: jis201
 SYMBOL: jis208
 SYMBOL: jis212
 
-"vocab:io/encodings/iso2022/201.txt" flat-file>biassoc jis201 set-global
-"vocab:io/encodings/iso2022/208.txt" flat-file>biassoc jis208 set-global
-"vocab:io/encodings/iso2022/212.txt" flat-file>biassoc jis212 set-global
+"vocab:io/encodings/iso2022/201.txt" load-codetable-file jis201 set-global
+"vocab:io/encodings/iso2022/208.txt" load-codetable-file jis208 set-global
+"vocab:io/encodings/iso2022/212.txt" load-codetable-file jis212 set-global
 
 SYMBOL: ascii
 128 iota dup zip >biassoc ascii set-global

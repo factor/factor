@@ -44,7 +44,7 @@ SYMBOL: euc-table
 
 : setup-euc ( word file-name -- singleton-class biassoc )
     [ dup define-singleton-class ]
-    [ flat-file>biassoc ] bi* ;
+    [ load-codetable-file ] bi* ;
 
 :: define-recursive-methods ( class data words -- )
     words [| word |
