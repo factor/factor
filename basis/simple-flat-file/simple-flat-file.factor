@@ -29,7 +29,7 @@ IN: simple-flat-file
 : split-; ( line -- array )
     ";" split [ [ blank? ] trim ] map! ;
 
-: data ( filename -- data )
+: load-data-file ( filename -- data )
     utf8 file-lines drop-comments [ split-; ] map! ;
 
 : expand-range ( range -- range' )
@@ -45,4 +45,4 @@ IN: simple-flat-file
     dup values members [ intern ] curry assoc-map ;
 
 : load-interval-file ( filename -- table )
-    data intern-values expand-ranges ;
+    load-data-file intern-values expand-ranges ;

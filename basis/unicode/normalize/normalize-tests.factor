@@ -28,7 +28,7 @@ IN: unicode.normalize.tests
     ] assoc-all? ;
 
 { 17768 { } } [
-    "vocab:unicode/normalize/NormalizationTest.txt" data
+    "vocab:unicode/normalize/NormalizationTest.txt" load-data-file
     [ 5 head [ " " split [ hex> ] "" map-as ] map ] map
     [ length ] keep [
         {
