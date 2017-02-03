@@ -6,7 +6,7 @@ splitting ;
 IN: simple-flat-file
 
 : drop-comments ( seq -- newseq )
-    [ "#@" split first ] map harvest ;
+    [ dup [ "#@" member? ] find drop [ head ] when* ] map harvest ;
 
 : split-column ( line -- columns )
     " \t" split harvest 2 short head 2 f pad-tail ;
