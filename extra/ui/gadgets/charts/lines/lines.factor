@@ -4,7 +4,8 @@ USING: accessors arrays assocs binary-search combinators
 combinators.short-circuit fry kernel locals make math math.order
 math.statistics math.vectors namespaces opengl opengl.gl
 sequences specialized-arrays.instances.alien.c-types.float
-splitting.monotonic ui.gadgets ui.gadgets.charts ui.render ;
+splitting.monotonic ui.gadgets ui.gadgets.charts
+ui.gadgets.charts.utils ui.render ;
 IN: ui.gadgets.charts.lines
 
 ! Data must be a sequence of { x y } coordinates sorted by
@@ -207,9 +208,6 @@ ALIAS: y second
 
 : flip-y-axis ( chunks ymin,ymax -- chunks )
     first2 + '[ [ _ swap - ] assoc-map ] map ;
-
-! value' = (value - min) / (max - min) * width
-: scale ( width value max min -- value' ) neg [ + ] curry bi@ / * ;
 
 ! Return quotation that can be used in map operation.
 : scale-mapper ( width min,max -- quot: ( value -- value' ) )
