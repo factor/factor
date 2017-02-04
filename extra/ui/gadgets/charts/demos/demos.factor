@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors.constants kernel literals locals
 math math.constants math.functions sequences ui ui.gadgets
-ui.gadgets.charts ui.gadgets.charts.lines ;
+ui.gadgets.charts ui.gadgets.charts.axes ui.gadgets.charts.lines
+;
 IN: ui.gadgets.charts.demos
 
 CONSTANT: -pi $[ pi neg ]
@@ -23,6 +24,8 @@ CONSTANT: -pi $[ pi neg ]
     chart new ${ ${ -pi pi } { -1 1 } } >>axes
     line new COLOR: blue >>color n sine-wave >>data add-gadget
     line new COLOR: red >>color n cosine-wave >>data add-gadget
+    axis new add-gadget
+    axis new t >>vertical? add-gadget
     "Chart" open-window ;
 
 PRIVATE>
