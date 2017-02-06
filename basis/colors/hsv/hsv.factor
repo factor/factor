@@ -70,8 +70,7 @@ M:: rgba >hsva ( rgba -- hsva )
     ] if ;
 
 : complimentary-color ( color -- color' )
-    dup hsva? [ >hsva ] unless
-    {
+    >hsva {
         [ hue>> 180 + 360 mod ]
         [ saturation>> ]
         [ value>> ]
