@@ -13,3 +13,5 @@ ARTICLE: "colors.lab" "CIE 1976 LAB colors"
 }
 "For more information, see " { $url "https://en.wikipedia.org/wiki/Lab_color_space" }
 { $see-also "colors" } ;
+
+ABOUT: "colors.lab"
