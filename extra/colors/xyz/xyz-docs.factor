@@ -13,3 +13,5 @@ ARTICLE: "colors.xyz" "CIE 1931 XYZ colors"
 }
 "For more information, see " { $url "https://en.wikipedia.org/wiki/CIE_1931_color_space" }
 { $see-also "colors" } ;
+
+ABOUT: "colors.xyz"
