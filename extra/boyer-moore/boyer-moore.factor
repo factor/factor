@@ -70,8 +70,7 @@ PRIVATE>
 GENERIC: search-from ( seq from obj -- i/f )
 
 M: sequence search-from
-    dup length zero?
-    [ 3drop 0 ] [ <boyer-moore> (search-from) ] if ;
+    [ 2drop 0 ] [ <boyer-moore> (search-from) ] if-empty ;
 
 M: boyer-moore search-from (search-from) ;
 
