@@ -13,18 +13,15 @@ C: <assoc-heap> assoc-heap
 : <unique-max-heap> ( -- unique-heap )
     H{ } clone <max-heap> <assoc-heap> ;
 
-M: assoc-heap heap-push* ( value key assoc-heap -- entry )
+M: assoc-heap heap-push*
     pick over assoc>> key? [
         3drop f
     ] [
         [ assoc>> swapd set-at ] [ heap>> heap-push* ] 3bi
     ] if ;
 
-M: assoc-heap heap-pop ( assoc-heap -- value key )
-    heap>> heap-pop ;
+M: assoc-heap heap-pop heap>> heap-pop ;
 
-M: assoc-heap heap-peek ( assoc-heap -- value key )
-    heap>> heap-peek ;
+M: assoc-heap heap-peek heap>> heap-peek ;
 
-M: assoc-heap heap-empty? ( assoc-heap -- ? )
-    heap>> heap-empty? ;
+M: assoc-heap heap-empty? heap>> heap-empty? ;
