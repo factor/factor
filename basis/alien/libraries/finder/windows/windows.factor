@@ -31,4 +31,4 @@ PRIVATE>
 M: windows find-library*
     candidate-paths [
         { [ exists? ] [ file-info regular-file? ] } 1&&
-    ] map-find nip ;
+    ] find nip ;
