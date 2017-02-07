@@ -10,6 +10,7 @@ GENERIC: adjoin ( elt set -- )
 GENERIC: ?adjoin ( elt set -- ? )
 GENERIC: in? ( elt set -- ? )
 GENERIC: delete ( elt set -- )
+GENERIC: ?delete ( elt set -- ? )
 GENERIC: set-like ( set exemplar -- set' )
 GENERIC: fast-set ( set -- set' )
 GENERIC: members ( set -- seq )
@@ -37,6 +38,8 @@ M: f clear-set drop ; inline
 ! Override them for efficiency
 
 M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
+
+M: set ?delete 2dup in? [ delete t ] [ 2drop f ] if ;
 
 M: set null? cardinality zero? ; inline
 

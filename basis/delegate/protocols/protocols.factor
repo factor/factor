@@ -13,7 +13,7 @@ at* assoc-size >alist set-at assoc-clone-like
 delete-at clear-assoc new-assoc assoc-like ;
 
 PROTOCOL: set-protocol
-adjoin ?adjoin in? delete set-like fast-set members
+adjoin ?adjoin in? delete ?delete set-like fast-set members
 union intersect intersects? diff subset? set= duplicates
 all-unique? null? cardinality clear-set ;
 
