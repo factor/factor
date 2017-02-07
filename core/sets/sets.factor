@@ -106,17 +106,6 @@ M: set duplicates drop f ;
 
 M: set all-unique? drop t ;
 
-<PRIVATE
-
-: (pruned) ( elt set accum -- )
-    2over ?adjoin [ nip push ] [ 3drop ] if ; inline
-
-: pruned ( seq -- newseq )
-    [ f fast-set ] [ length <vector> ] bi
-    [ [ (pruned) ] 2curry each ] keep ;
-
-PRIVATE>
-
 ! Sequences are sets
 INSTANCE: sequence set
 
@@ -133,7 +122,7 @@ M: sequence set-like
     [ members ] dip like ;
 
 M: sequence members
-    [ pruned ] keep like ;
+    f fast-set [ ?adjoin ] curry filter ;
 
 M: sequence null?
     empty? ; inline
