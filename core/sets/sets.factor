@@ -41,7 +41,7 @@ M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
 
 M: set ?delete 2dup in? [ delete t ] [ 2drop f ] if ;
 
-M: set null? cardinality zero? ; inline
+M: set null? cardinality 0 = ; inline
 
 M: set cardinality members length ;
 
@@ -98,7 +98,7 @@ M: set subset?
     2dup [ cardinality ] bi@ > [ 2drop f ] [ (subset?) ] if ;
 
 M: set set=
-    2dup [ cardinality ] bi@ eq? [ (subset?) ] [ 2drop f ] if ;
+    2dup [ cardinality ] bi@ = [ (subset?) ] [ 2drop f ] if ;
 
 M: set fast-set ;
 
