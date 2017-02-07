@@ -1,6 +1,6 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs grouping kernel math random sequences sets
+USING: assocs fry grouping kernel math random sequences sets
 tools.test trees.splay ;
 IN: trees.splay.tests
 
@@ -8,7 +8,7 @@ IN: trees.splay.tests
     100 iota [ drop 100 random of drop ] with each ;
 
 : make-numeric-splay-tree ( n -- splay-tree )
-    iota <splay> [ [ conjoin ] curry each ] keep ;
+    iota <splay> [ '[ dup _ set-at ] each ] keep ;
 
 { t } [
     100 make-numeric-splay-tree dup randomize-numeric-splay-tree
