@@ -110,6 +110,11 @@ CONSTANT: doc-start { 0 0 }
 : with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
+: split-lines ( str -- seq )
+    [ string-lines ] keep ?last
+    [ "\r\n" member? ] [ t ] if*
+    [ "" suffix ] when ;
+
 PRIVATE>
 
 :: doc-range ( from to document -- string )
@@ -124,9 +129,7 @@ PRIVATE>
 
 :: set-doc-range ( string from to document -- )
     from to = string empty? and [
-        string string-lines
-        string ?last [ "\r\n" member? ] [ t ] if*
-        [ "" suffix ] when :> new-lines
+        string split-lines :> new-lines
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
