@@ -86,11 +86,11 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : d-product ( v -- d ) 1 scalar [ d* ] reduce ;
 
-: d-sum ( v -- d ) unclip-slice [ d+ ] reduce ;
+: d-sum ( v -- d ) [ ] [ d+ ] map-reduce ;
 
-: d-infimum ( v -- d ) unclip-slice [ d-min ] reduce ;
+: d-infimum ( v -- d ) [ ] [ d-min ] map-reduce ;
 
-: d-supremum ( v -- d ) unclip-slice [ d-max ] reduce ;
+: d-supremum ( v -- d ) [ ] [ d-max ] map-reduce ;
 
 \ d+ [ d- ] [ d- ] define-math-inverse
 \ d- [ d+ ] [ d- ] define-math-inverse

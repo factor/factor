@@ -213,7 +213,7 @@ M: assoc (deref-aliases)
      [ [ (deref-aliases) ] bi-curry@ bi ] with2 assoc-map! ;
 
 : merge-values ( seq -- assoc )
-    reverse unclip [ assoc-union ] reduce ;
+    reverse [ ] [ assoc-union ] map-reduce ;
 GENERIC: merge-value ( assoc value -- assoc' )
 M: sequence merge-value merge-values merge-value ;
 M: assoc merge-value over assoc-diff assoc-union! ;
