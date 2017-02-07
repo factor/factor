@@ -234,7 +234,7 @@ PRIVATE>
 
 GENERIC: apply-merge-keys ( already-applied-set obj -- obj' )
 : ?apply-merge-keys ( set obj -- obj' )
-    2dup swap in? [ nip ] [ 2dup swap adjoin apply-merge-keys ] if ;
+    2dup swap ?adjoin [ apply-merge-keys ] [ nip ] if ;
 M: sequence apply-merge-keys
     [ ?apply-merge-keys ] with map! ;
 M: object apply-merge-keys nip ;
