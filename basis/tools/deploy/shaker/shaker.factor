@@ -234,10 +234,12 @@ IN: tools.deploy.shaker
     "Clearing memoized word caches" show
     [ memoized? ] instances [ reset-memoized ] each ;
 
-: compiler-classes ( -- seq )
-    { "compiler" "stack-checker" }
-    [ loaded-child-vocab-names [ vocab-words ] map concat [ class? ] filter ]
-    map concat unique ;
+: compiler-classes ( -- set )
+    { "compiler" "stack-checker" } [
+        loaded-child-vocab-names
+        [ vocab-words ] map concat
+        [ class? ] filter
+    ] map concat fast-set ;
 
 : prune-decision-tree ( tree classes -- )
     [ tuple class>type ] 2dip '[
@@ -246,7 +248,7 @@ IN: tools.deploy.shaker
                 dup array? [
                     [
                         2 group
-                        [ drop _ key? ] assoc-reject
+                        [ drop _ in? ] assoc-reject
                         concat
                     ] map
                 ] when
