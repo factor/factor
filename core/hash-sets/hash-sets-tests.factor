@@ -11,8 +11,12 @@ sets sorting tools.test ;
 { f } [ 3 HS{ 0 1 2 } in? ] unit-test
 { HS{ 1 2 3 } } [ 3 HS{ 1 2 } clone [ adjoin ] keep ] unit-test
 { HS{ 1 2 } } [ 2 HS{ 1 2 } clone [ adjoin ] keep ] unit-test
+{ t } [ 1 HS{ } ?adjoin ] unit-test
+{ f } [ 1 HS{ 1 } ?adjoin ] unit-test
 { HS{ 1 2 3 } } [ 4 HS{ 1 2 3 } clone [ delete ] keep ] unit-test
 { HS{ 1 2 } } [ 3 HS{ 1 2 3 } clone [ delete ] keep ] unit-test
+{ t } [ 1 HS{ 1 } ?delete ] unit-test
+{ f } [ 1 HS{ } ?delete ] unit-test
 { HS{ 1 2 } } [ HS{ 1 2 } fast-set ] unit-test
 { { 1 2 } } [ HS{ 1 2 } members natural-sort ] unit-test
 

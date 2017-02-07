@@ -65,6 +65,14 @@ TUPLE: hash-set
 : (adjoin) ( key hash -- ? )
     dupd new-key@ [ set-nth-item ] dip ; inline
 
+: (delete) ( key hash -- ? )
+    [ nip ] [ key@ ] 2bi [
+        [ +tombstone+ ] 2dip set-nth-item
+        hash-deleted+ t
+    ] [
+        3drop f
+    ] if ; inline
+
 : (rehash) ( seq hash -- )
     [ (adjoin) drop ] curry each ; inline
 
@@ -98,12 +106,10 @@ M: hash-set clear-set
     [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;
 
 M: hash-set delete
-    [ nip ] [ key@ ] 2bi [
-        [ +tombstone+ ] 2dip set-nth-item
-        hash-deleted+
-    ] [
-        3drop
-    ] if ;
+    (delete) drop ;
+
+M: hash-set ?delete
+    (delete) ;
 
 M: hash-set cardinality
     [ count>> ] [ deleted>> ] bi - ; inline
