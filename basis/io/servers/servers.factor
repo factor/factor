@@ -34,10 +34,10 @@ ERROR: server-already-running threaded-server ;
 <PRIVATE
 
 : add-running-server ( threaded-server running-servers -- )
-    2dup in? [ server-already-running ] [ adjoin ] if ;
+    dupd ?adjoin [ drop ] [ server-already-running ] if ;
 
 : remove-running-server ( threaded-server running-servers -- )
-    2dup in? [ delete ] [ drop server-not-running ] if ;
+    dupd ?delete [ drop ] [ server-not-running ] if ;
 
 PRIVATE>
 
