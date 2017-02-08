@@ -169,12 +169,3 @@ M: sequence clear-set
 : intersect! ( set1 set2 -- set1 )
     dupd sequence/tester [ dup ] prepose [ not ] compose pick
     [ delete ] curry [ [ drop ] if ] curry compose each ;
-
-! Temporarily for compatibility
-
-: unique ( seq -- assoc )
-    [ dup ] H{ } map>assoc ;
-: conjoin ( elt assoc -- )
-    dupd set-at ;
-: conjoin-at ( value key assoc -- )
-    [ dupd ?set-at ] change-at ;

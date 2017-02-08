@@ -1,8 +1,9 @@
 USING: accessors arrays assocs compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
-compiler.cfg.ssa.interference cpu.architecture fry kernel make
-namespaces sequences sets sorting ;
+compiler.cfg.ssa.interference compiler.utilities
+cpu.architecture fry kernel make namespaces sequences sets
+sorting ;
 IN: compiler.cfg.ssa.destruction.coalescing
 
 : zip-scalar ( scalar seq -- pairs )

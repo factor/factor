@@ -108,10 +108,10 @@ PRIVATE>
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
     [ "#" split1 drop [ blank? ] trim-tail hex> ] map
-    [ 0 = ] reject ;
+    [ 0 = ] reject fast-set ;
 
 : remove-exclusions ( alist -- alist )
-    exclusions unique assoc-diff ;
+    exclusions [ nip sets:in? ] curry assoc-reject ;
 
 : process-canonical ( data -- hash hash )
     (process-decomposed) [ first* ] filter

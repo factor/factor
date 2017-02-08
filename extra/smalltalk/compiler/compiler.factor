@@ -67,9 +67,9 @@ M: ast-return compile-ast
 
 : block-lexenv ( block -- lexenv )
     [ [ arguments>> ] [ temporaries>> ] bi append ]
-    [ body>> [ assigned-locals ] map concat unique ] bi
+    [ body>> [ assigned-locals ] map concat fast-set ] bi
     '[
-        dup dup _ key?
+        dup dup _ in?
         [ <local-reader> ]
         [ <local> ]
         if

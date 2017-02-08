@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs fry kernel locals math math.order
-namespaces sequences vectors ;
+USING: arrays assocs fry hashtables kernel locals math
+math.order namespaces sequences vectors ;
 IN: compiler.utilities
 
 : flattener ( seq quot -- seq vector quot' )
@@ -47,3 +47,12 @@ yield-hook [ [ ] ] initialize
         ] unless
         destination'
     ] if ;
+
+: unique ( seq -- assoc )
+    [ dup ] H{ } map>assoc ;
+
+: conjoin ( elt assoc -- )
+    dupd set-at ;
+
+: conjoin-at ( value key assoc -- )
+    [ dupd ?set-at ] change-at ;
