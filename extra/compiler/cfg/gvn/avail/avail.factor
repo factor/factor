@@ -8,7 +8,8 @@ compiler.cfg.def-use
 compiler.cfg.gvn.graph
 compiler.cfg.predecessors
 compiler.cfg.renaming.functor
-compiler.cfg.rpo ;
+compiler.cfg.rpo
+compiler.utilities ;
 IN: compiler.cfg.gvn.avail
 
 : defined ( bb -- vregs )
