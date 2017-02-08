@@ -144,7 +144,7 @@ M: assoc values [ nip ] { } assoc>map ;
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
-    2dup [ assoc-size ] bi@ eq? [ assoc-subset? ] [ 2drop f ] if ;
+    2dup [ assoc-size ] bi@ = [ assoc-subset? ] [ 2drop f ] if ;
 
 : assoc-hashcode ( n assoc -- code )
     >alist hashcode* ;
