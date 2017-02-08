@@ -238,16 +238,18 @@ TUPLE: simd-test-failure
     word '[ _ execute ] ;
 
 : remove-float-words ( alist -- alist' )
-    { distance vsqrt n/v v/n v/ normalize } unique assoc-diff ;
+    { distance vsqrt n/v v/n v/ normalize }
+    '[ drop _ member? ] assoc-reject ;
 
 : remove-integer-words ( alist -- alist' )
-    { vlshift vrshift v*high v*hs+ } unique assoc-diff ;
+    { vlshift vrshift v*high v*hs+ }
+    '[ drop _ member? ] assoc-reject ;
 
 : boolean-ops ( -- words )
     { vand vandn vor vxor vnot vcount } ;
 
 : remove-boolean-words ( alist -- alist' )
-    boolean-ops unique assoc-diff ;
+    boolean-ops '[ drop _ member? ] assoc-reject ;
 
 : ops-to-check ( elt-class -- alist )
     [ vector-words >alist ] dip

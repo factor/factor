@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math quotations assocs.private
-sets ;
+USING: assocs.private help.markup help.syntax kernel math
+namespaces quotations sequences ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -102,11 +101,6 @@ $nl
     assoc-diff
     substitute
     extract-keys
-}
-"Adding elements to sets:"
-{ $subsections
-    conjoin
-    conjoin-at
 }
 "Destructive operations:"
 { $subsections

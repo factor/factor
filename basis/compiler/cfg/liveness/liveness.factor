@@ -1,11 +1,11 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.predecessors
-compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
-cpu.architecture deques dlists fry kernel locals namespaces
-sequences sets ;
+compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.rpo compiler.cfg.ssa.destruction.leaders
+compiler.cfg.utilities compiler.utilities cpu.architecture
+deques dlists fry kernel locals namespaces sequences sets ;
 IN: compiler.cfg.liveness
 
 SYMBOL: live-ins
