@@ -118,8 +118,6 @@ IN: sets.tests
 
 { H{ { 3 HS{ 1 2 } } } } [ H{ } clone 1 3 pick adjoin-at 2 3 pick adjoin-at ] unit-test
 
-{ H{ { 3 H{ { 1 1 } { 2 2 } } } } } [ H{ } clone 1 3 pick conjoin-at 2 3 pick conjoin-at ] unit-test
-
 TUPLE: null-set ;
 INSTANCE: null-set set
 M: null-set members drop f ;
