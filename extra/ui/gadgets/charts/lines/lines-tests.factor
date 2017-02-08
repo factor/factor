@@ -1,10 +1,12 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences tools.test ui.gadgets.charts.lines
-ui.gadgets.charts.lines.private ui.gadgets.charts.utils ;
+USING: kernel math math.ratios sequences tools.test
+ui.gadgets.charts.lines ui.gadgets.charts.lines.private
+ui.gadgets.charts.utils ;
 IN: ui.gadgets.charts.lines.tests
 
 { -2/3 } [ { 1 3 } { -2 5 } calc-line-slope ] unit-test
+[ { 5 0 } { 5 5 } calc-line-slope ] [ division-by-zero? ] must-fail-with
 { 3 } [ -2/3 1 { 1 3 } calc-y ] unit-test
 { 5 } [ -2/3 -2 { 1 3 } calc-y ] unit-test
 { 3 } [ -2/3 1 { -2 5 } calc-y ] unit-test
