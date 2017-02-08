@@ -1011,8 +1011,7 @@ PRIVATE>
 <PRIVATE
 
 : (map-find) ( seq quot find-quot -- result elt )
-    [ [ f ] 2dip [ [ nip ] dip call dup ] curry ] dip call
-    [ [ drop f ] unless ] dip ; inline
+    [ [ f ] 2dip [ nip ] prepose [ dup ] compose ] dip call nip ; inline
 
 PRIVATE>
 
