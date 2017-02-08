@@ -17,7 +17,7 @@ PRIVATE>
 
 : safe-prime? ( q -- ? )
     {
-        [ 1 - 2 / dup integer? [ prime? ] [ drop f ] if ]
+        [ dup odd? [ 1 - 2 / prime? ] [ drop f ] if ]
         [ prime? ]
     } 1&& ;
 
