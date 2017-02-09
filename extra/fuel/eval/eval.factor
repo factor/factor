@@ -63,7 +63,7 @@ t eval-res-flag set-global
     [ [ eval-error set-global ] [ print-error ] bi ] recover ;
 
 : eval-usings ( usings -- )
-    [ [ use-vocab ] curry [ drop ] recover ] each ;
+    [ [ use-vocab ] curry ignore-errors ] each ;
 
 : eval-in ( in -- )
     [ set-current-vocab ] when* ;
