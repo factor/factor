@@ -26,5 +26,5 @@ TUPLE: fake-fd fd ;
 M: fake-fd cancel-operation ( obj -- ) drop ;
 
 { f } [
-    33 fake-fd boa <ssl-handle> [ maybe-handshake ] [ drop ] recover connected>>
+    33 fake-fd boa <ssl-handle> [ maybe-handshake ] ignore-errors connected>>
 ] unit-test

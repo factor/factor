@@ -293,7 +293,7 @@ TUPLE: serialize-me id data ;
         { "id" "ID" +db-assigned-id+ }
         { "data" "DATA" FACTOR-BLOB }
     } define-persistent
-    [ serialize-me drop-table ] [ drop ] recover
+    [ serialize-me drop-table ] ignore-errors
     [ ] [ serialize-me create-table ] unit-test
 
     [ ] [ T{ serialize-me f f H{ { 1 2 } } } insert-tuple ] unit-test
@@ -327,7 +327,7 @@ TUPLE: exam id name score ;
         { "name" "NAME" TEXT }
         { "score" "SCORE" INTEGER }
     } define-persistent
-    [ exam drop-table ] [ drop ] recover
+    [ exam drop-table ] ignore-errors
     [ ] [ exam create-table ] unit-test
 
     [ ] [ T{ exam f f "Kyle" 100 } insert-tuple ] unit-test

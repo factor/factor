@@ -16,7 +16,7 @@ IN: io.files.unique.tests
 { t } [
     [
         current-directory get
-        [ [ "FAILDOG" throw ] cleanup-unique-directory ] [ drop ] recover
+        [ [ "FAILDOG" throw ] cleanup-unique-directory ] ignore-errors
         current-directory get =
     ] with-temp-directory
 ] unit-test

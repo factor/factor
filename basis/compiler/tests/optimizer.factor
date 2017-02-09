@@ -450,5 +450,5 @@ STRUCT: BitmapData { Scan0 void* } ;
 
 ! #1187
 { } [
-    10 [ [ minor-gc split-slice ] [ drop ] recover ] times
+    10 [ [ minor-gc split-slice ] ignore-errors ] times
 ] unit-test
