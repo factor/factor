@@ -266,8 +266,7 @@ M:: aes-decrypt (expand-key) ( K Nr -- sched )
     K Nr (expand-enc-key) dup length :> key-length
     [
         [ 4 >= ] [ key-length 4 - < ] bi and
-        [ subword ui32-rev> d-transform ]
-        [ ] if
+        [ subword ui32-rev> d-transform ] when
     ] map-index ;
 
 M: aes-decrypt (first-round) ( aes -- aes' )

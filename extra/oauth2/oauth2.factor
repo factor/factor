@@ -6,8 +6,7 @@ webbrowser ;
 IN: oauth2
 
 : console-prompt ( query -- str/f )
-    write flush readln [ blank? ] trim
-    dup "" = [ drop f ] [ ] if ;
+    write flush readln [ blank? ] trim [ f ] when-empty ;
 
 : post-json-request ( params token-uri -- assoc )
     <post-request> dup header>> "application/json" "Accept" rot set-at

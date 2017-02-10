@@ -13,8 +13,9 @@ TUPLE: readline-reader { prompt initial: f } ;
 INSTANCE: readline-reader input-stream
 
 M: readline-reader stream-readln
-    flush [ prompt>> dup [ " " append ] [ ] if readline ]
-    keep f >>prompt drop ;
+    flush
+    [ dup [ " " append ] when readline f ] change-prompt
+    drop ;
 
 M: readline-reader prompt.
     >>prompt drop ;
