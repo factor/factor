@@ -102,7 +102,7 @@ TUPLE: vbo
         B{ 0 0 0 } >>bitmap ;
 
 : make-texture ( pathname alt -- texture )
-    swap [ nip load-image ] [ ] if*
+    swap [ nip load-image ] when*
     [
         [ component-order>> ]
         [ component-type>> ] bi
