@@ -61,7 +61,7 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
         swap >>close-hook
         add-toolbar
         <source-editor> >>text
-        dup text>> <scroller> 1 track-add
+        dup text>> margins <scroller> 1 track-add
         dup revert white-interior ;
 
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
