@@ -1079,7 +1079,7 @@ HELP: rest
 
 HELP: head*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
-{ $description "Outputs a new sequence consisting of all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
+{ $description "Outputs a new sequence consisting of all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it removes the last " { $snippet "n" } " elements." }
 { $examples
     { $example "USING: sequences prettyprint ;"
         "{ 1 2 3 4 5 6 7 } 2 head* ."
