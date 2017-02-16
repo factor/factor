@@ -678,7 +678,7 @@ HELP: replace-slice
 { $description "Replaces a range of elements beginning at index " { $snippet "from" } " and ending before index " { $snippet "to" } " with a new sequence." }
 { $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." } ;
 
-{ push prefix suffix } related-words
+{ push push-either push-if pop pop* prefix suffix suffix! } related-words
 
 HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
@@ -757,8 +757,6 @@ HELP: last
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the last element of a sequence." }
 { $errors "Throws an error if the sequence is empty." } ;
-
-{ pop pop* } related-words
 
 HELP: pop*
 { $values { "seq" "a resizable mutable sequence" } }
@@ -908,7 +906,7 @@ HELP: append-as
     }
 } ;
 
-{ append append-as } related-words
+{ append append-as append! 3append 3append-as push-all } related-words
 
 HELP: prepend
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
@@ -962,8 +960,6 @@ HELP: 3append-as
         "SBUF\" abc\""
     }
 } ;
-
-{ 3append 3append-as } related-words
 
 HELP: surround
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
@@ -1108,6 +1104,12 @@ HELP: tail*
     }
 }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+{ tail tail* tail-slice tail-slice* } related-words
+{ head head* head-slice head-slice* } related-words
+{ cut cut* cut-slice } related-words
+{ unclip unclip-slice unclip-last unclip-last-slice } related-words
+{ first last but-last but-last-slice rest rest-slice } related-words
 
 HELP: shorter?
 { $values { "seq1" sequence } { "seq2" sequence } { "?" boolean } }
