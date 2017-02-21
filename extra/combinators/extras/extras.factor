@@ -1,8 +1,9 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators combinators.smart fry generalizations
-kernel macros math quotations sequences locals math.order
-sequences.generalizations sequences.private system ;
+USING: arrays assocs combinators combinators.smart fry
+generalizations kernel macros math quotations sequences locals
+math.order sequences.generalizations sequences.private
+stack-checker.transforms system words ;
 IN: combinators.extras
 
 : once ( quot -- ) call ; inline
@@ -88,3 +89,20 @@ MACRO:: n-falsify ( n -- quot )
 
 : ?2arg ( obj1 obj2 quot: ( obj1 obj2 -- ? ) -- obj1/f obj2/f )
     [ ?2res ] 3keep drop '[ _ _ ] [ f f ] if ; inline
+
+<<
+: alist>quot* ( default assoc -- quot )
+    [ rot \ if* 3array append [ ] like ] assoc-each ;
+
+: cond*>quot ( assoc -- quot )
+    [ dup pair? [ [ drop ] prepend [ t ] swap 2array ] unless ] map
+    reverse! [ no-cond ] swap alist>quot* ;
+
+DEFER: cond*
+\ cond* [ cond*>quot ] 1 define-transform
+\ cond* t "no-compile" set-word-prop
+>>
+: cond* ( assoc -- )
+    [ dup callable? [ drop t ] [ first call ] if ] map-find
+    [ dup callable? [ nip call ] [ second call ] if ]
+    [ no-cond ] if* ;
