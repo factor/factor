@@ -325,6 +325,24 @@ HELP: round
     { $example "USING: math.functions prettyprint ;" "4.4 round ." "4.0" }
 } ;
 
+HELP: round-to-even
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the whole number closest to " { $snippet "x" } ", rounding out at half, breaking ties towards even numbers. This is also known as banker's rounding or unbiased rounding." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "0.5 round-to-even ." "0.0" }
+    { $example "USING: math.functions prettyprint ;" "1.5 round-to-even ." "2.0" }
+} ;
+
+HELP: round-to-odd
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the whole number closest to " { $snippet "x" } ", rounding out at half, breaking ties towards odd numbers." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "0.5 round-to-odd ." "1.0" }
+    { $example "USING: math.functions prettyprint ;" "1.5 round-to-odd ." "1.0" }
+} ;
+
 HELP: roots
 { $values { "x" number } { "t" integer } { "seq" sequence } }
 { $description "Outputs the " { $snippet "t" } " roots of a number " { $snippet "x" } "." }
