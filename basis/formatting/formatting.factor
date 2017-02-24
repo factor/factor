@@ -4,7 +4,8 @@ USING: accessors arrays assocs calendar calendar.english combinators
 combinators.smart fry generalizations io io.streams.string
 kernel macros math math.functions math.parser namespaces
 peg.ebnf present prettyprint quotations sequences
-sequences.generalizations strings unicode vectors ;
+sequences.generalizations strings unicode vectors
+math.functions.integer-logs math.order ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -28,12 +29,62 @@ IN: formatting
 : >digits ( string -- digits )
     [ 0 ] [ string>number ] if-empty ;
 
-: format-simple ( x digits string -- string )
-    [ >float "" -1 ] 2dip "C" format-float ;
+: format-decimal-simple ( x digits -- string )
+    [
+        [ abs ] dip
+        [ 10^ * round-to-even >integer number>string ]
+        [ 1 + CHAR: 0 pad-head 2 CHAR: 0 pad-tail ]
+        [ 1 max cut* ] tri "." glue
+    ] curry keep neg? [ CHAR: - prefix ] when ;
 
-: format-scientific ( x digits -- string ) "e" format-simple ;
+: format-scientific-mantissa ( x log10x digits -- string )
+    swap - 10^ * round-to-even >integer
+    number>string 1 cut "." glue ;
 
-: format-decimal ( x digits -- string ) "f" format-simple ;
+: format-scientific-exponent ( log10x -- string )
+    number>string 2 CHAR: 0 pad-head
+    dup CHAR: - swap index "e" "e+" ? prepend ;
+
+: format-scientific-simple ( x digits -- string )
+    [
+        [ abs dup integer-log10 ] dip
+        [ format-scientific-mantissa ]
+        [ drop nip format-scientific-exponent ] 3bi append
+    ] curry keep neg? [ CHAR: - prefix ] when ;
+
+: format-float-fast ( x digits string -- string )
+    [ "" -1 ] 2dip "C" format-float ;
+
+: format-fast-scientific? ( x digits -- x' digits ? )
+    over float? [ t ]
+    [ 2dup
+        [ abs integer-log10 abs 308 < ]
+        [ 15 < ] bi* and
+        [ [ [ >float ] dip ] when ] keep
+    ] if ;
+
+: format-scientific ( x digits -- string )
+    format-fast-scientific?
+    [ "e" format-float-fast ]
+    [ format-scientific-simple ] if ;
+
+: format-fast-decimal? ( x digits -- x' digits ? )
+    over float? [ t ]
+    [
+        2dup
+        [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
+        [ over ratio?
+            [ [ abs integer-log10 ] dip
+              [ drop abs 308 < ] [ + 15 <= ] 2bi and ]
+            [ 2drop f ] if
+        ] 2bi or
+        [ [ [ >float ] dip ] when ] keep
+    ] if ; inline
+
+: format-decimal ( x digits -- string )
+    format-fast-decimal?
+    [ "f" format-float-fast ]
+    [ format-decimal-simple ] if ;
 
 ERROR: unknown-printf-directive ;
 
