@@ -200,6 +200,32 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 ceiling drop ] collect-fp-exceptions ] unit-test
 { { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 floor drop ] collect-fp-exceptions ] unit-test
 
+{ -5 } [ -4-3/5 round-to-even ] unit-test
+{ -4 } [ -4-1/2 round-to-even ] unit-test
+{ -4 } [ -4-2/5 round-to-even ] unit-test
+{ 5 } [ 4+3/5 round-to-even ] unit-test
+{ 4 } [ 4+1/2 round-to-even ] unit-test
+{ 4 } [ 4+2/5 round-to-even ] unit-test
+{ -5.0 } [ -4.6 round-to-even ] unit-test
+{ -4.0 } [ -4.5 round-to-even ] unit-test
+{ -4.0 } [ -4.4 round-to-even ] unit-test
+{ 5.0 } [ 4.6 round-to-even ] unit-test
+{ 4.0 } [ 4.5 round-to-even ] unit-test
+{ 4.0 } [ 4.4 round-to-even ] unit-test
+
+{ -5 } [ -4-3/5 round-to-odd ] unit-test
+{ -5 } [ -4-1/2 round-to-odd ] unit-test
+{ -4 } [ -4-2/5 round-to-odd ] unit-test
+{ 5 } [ 4+3/5 round-to-odd ] unit-test
+{ 5 } [ 4+1/2 round-to-odd ] unit-test
+{ 4 } [ 4+2/5 round-to-odd ] unit-test
+{ -5.0 } [ -4.6 round-to-odd ] unit-test
+{ -5.0 } [ -4.5 round-to-odd ] unit-test
+{ -4.0 } [ -4.4 round-to-odd ] unit-test
+{ 5.0 } [ 4.6 round-to-odd ] unit-test
+{ 5.0 } [ 4.5 round-to-odd ] unit-test
+{ 4.0 } [ 4.4 round-to-odd ] unit-test
+
 { 6 59967 } [ 3837888 factor-2s ] unit-test
 { 6 -59967 } [ -3837888 factor-2s ] unit-test
 
