@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: calendar kernel formatting tools.test system ;
+USING: calendar formatting kernel math math.functions sequences
+strings system tools.test ;
 IN: formatting.tests
 
 [ "%s" printf ] must-infer
@@ -21,12 +22,25 @@ IN: formatting.tests
 { "8.950" } [ 8.950179003580072 "%.3f" sprintf ] unit-test
 { "123.10" } [ 123.1 "%01.2f" sprintf ] unit-test
 { "1.2346" } [ 1.23456789 "%.4f" sprintf ] unit-test
+{ "100000000000000000.50000" } [ 17 10^ 1/2 + "%20.5f" sprintf ] unit-test
+{ "3.333333" } [ 3+1/3 "%f" sprintf ] unit-test
+{ "3.666667" } [ 3+2/3 "%f" sprintf ] unit-test
+{ "3.7" } [ 3+2/3 "%.1f" sprintf ] unit-test
+{ "-3.7" } [ -3-2/3 "%.1f" sprintf ] unit-test
+{ "-3.666667" } [ -3-2/3 "%f" sprintf ] unit-test
+{ "-3.333333" } [ -3-1/3 "%f" sprintf ] unit-test
+{ "3.14159265358979323846e+00" } [ 2646693125139304345 842468587426513207 / "%.20e" sprintf ] unit-test
+{ "-0.500" } [ -1/2 "%.3f" sprintf ] unit-test
+{ "0.010" } [ 1/100 "%.3f" sprintf ] unit-test
+{ "100000000000000000000000.000000" } [ 23 10^ "%f" sprintf ] unit-test
+{ "1.2" } [ 125/100 "%.1f" sprintf ] unit-test
+{ "1.4" } [ 135/100 "%.1f" sprintf ] unit-test
+{ "2.0" } [ 5/2 "%.0f" sprintf ] unit-test
+{ "4.0" } [ 7/2 "%.0f" sprintf ] unit-test
 { "  1.23" } [ 1.23456789 "%6.2f" sprintf ] unit-test
 { "001100" } [ 12 "%06b" sprintf ] unit-test
 { "==14" } [ 12 "%'=4o" sprintf ] unit-test
-
 { "foo: 1 bar: 2" } [ { 1 2 3 } "foo: %d bar: %s" vsprintf ] unit-test
-
 { "1.234000e+08" } [ 123400000 "%e" sprintf ] unit-test
 { "-1.234000e+08" } [ -123400000 "%e" sprintf ] unit-test
 { "1.234567e+08" } [ 123456700 "%e" sprintf ] unit-test
@@ -40,6 +54,36 @@ IN: formatting.tests
 { "-001.0E+01" } [ -10 "%+010.1E" sprintf ] unit-test
 { "+001.0E+01" } [ 10 "%+010.1E" sprintf ] unit-test
 { "+001.0E-01" } [ 0.1 "%+010.1E" sprintf ] unit-test
+{ " e1" } [ 0xe1 "% x" sprintf ] unit-test
+{ "+e1" } [ 0xe1 "%+x" sprintf ] unit-test
+{ "-e1" } [ -0xe1 "% x" sprintf ] unit-test
+{ "-e1" } [ -0xe1 "%+x" sprintf ] unit-test
+{ "1.00000e+1000" } [ 1000 10^ "%.5e" sprintf ] unit-test
+{ "1.00000e-1000" } [ -1000 10^ "%.5e" sprintf ] unit-test
+{ t } [
+    1000 10^ "%.5f" sprintf
+    "1" ".00000" 1000 CHAR: 0 <string> glue =
+] unit-test
+{ t } [
+    -1000 10^ "%.1004f" sprintf
+    "0." "10000" 999 CHAR: 0 <string> glue =
+] unit-test
+{ "-1.00000e+1000" } [ 1000 10^ neg "%.5e" sprintf ] unit-test
+{ "-1.00000e-1000" } [ -1000 10^ neg "%.5e" sprintf ] unit-test
+{ t } [
+    1000 10^ neg "%.5f" sprintf
+    "-1" ".00000" 1000 CHAR: 0 <string> glue =
+] unit-test
+{ t } [
+    -1000 10^ neg "%.1004f" sprintf
+    "-0." "10000" 999 CHAR: 0 <string> glue =
+] unit-test
+{ "9007199254740991.0" } [ 53 2^ 1 - "%.1f" sprintf ] unit-test
+{ "9007199254740992.0" } [ 53 2^ "%.1f" sprintf ] unit-test
+{ "9007199254740993.0" } [ 53 2^ 1 + "%.1f" sprintf ] unit-test
+{ "-9007199254740991.0" } [ 53 2^ 1 - neg "%.1f" sprintf ] unit-test
+{ "-9007199254740992.0" } [ 53 2^ neg "%.1f" sprintf ] unit-test
+{ "-9007199254740993.0" } [ 53 2^ 1 + neg "%.1f" sprintf ] unit-test
 
 { "ff" } [ 0xff "%x" sprintf ] unit-test
 { "FF" } [ 0xff "%X" sprintf ] unit-test
