@@ -173,6 +173,13 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { 5.0 } [ 4.5 round ] unit-test
 { 4.0 } [ 4.4 round ] unit-test
 
+{ -1 } [ -3/5 round ] unit-test
+{ -1 } [ -1/2 round ] unit-test
+{ 0 } [ -2/5 round ] unit-test
+{ 0 } [ 2/5 round ] unit-test
+{ 1 } [ 1/2 round ] unit-test
+{ 1 } [ 3/5 round ] unit-test
+
 { 6 59967 } [ 3837888 factor-2s ] unit-test
 { 6 -59967 } [ -3837888 factor-2s ] unit-test
 

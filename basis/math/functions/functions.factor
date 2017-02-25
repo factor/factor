@@ -355,7 +355,7 @@ GENERIC: round ( x -- y )
 M: integer round ; inline
 
 M: ratio round
-    >fraction [ /mod abs 2 * ] keep >= [ dup 0 < -1 1 ? + ] when ;
+    >fraction [ /mod dup abs 2 * ] keep >= [ 0 < -1 1 ? + ] [ drop ] if ;
 
 M: float round dup sgn 2 /f + truncate ;
 
