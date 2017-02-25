@@ -348,7 +348,10 @@ M: real atan >float atan ; inline
 
 : acot ( x -- y ) recip atan ; inline
 
-: truncate ( x -- y ) dup 1 mod - ; inline
+: truncate ( x -- y ) dup dup 1 mod - over float? [
+    over [ -1.0 > ] [ 0.0 < ] bi and
+    [ swap copysign ] [ nip ] if
+ ] [ nip ] if ; inline
 
 GENERIC: round ( x -- y )
 
