@@ -159,9 +159,9 @@ ARTICLE: "aliens" "Alien addresses"
     <displaced-alien>
     alien-address
 }
-"Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
+"Anywhere that an " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
-"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a " { $link pointer } " type such as " { $snippet "void*" } " takes care of the details."
+"Usually alien objects do not have to be created and dereferenced directly; instead declaring C function parameters and return values as having a " { $link pointer } " type such as " { $snippet "void*" } " takes care of the details."
 { $subsections
     "syntax-aliens"
     "alien-expiry"
