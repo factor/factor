@@ -348,10 +348,30 @@ M: real atan >float atan ; inline
 
 : acot ( x -- y ) recip atan ; inline
 
-: truncate ( x -- y ) dup dup 1 mod - over float? [
-    over [ -1.0 > ] [ 0.0 < ] bi and
-    [ swap copysign ] [ nip ] if
- ] [ nip ] if ; inline
+GENERIC: truncate ( x -- y )
+
+M: real truncate dup 1 mod - ;
+
+M: float truncate
+    dup double>bits
+    dup -52 shift 0x7ff bitand 0x3ff -
+    ! check for floats without fractional part (>= 2^52)
+    dup 52 < [
+        [ drop ] 2dip
+        dup 0 < [
+            ! the float is between -1.0 and 1.0,
+            ! the result is +/-0.0
+            drop -63 shift zero? 0.0 -0.0 ?
+        ] [
+            ! Put zeroes in the correct part of the mantissa
+            0x000fffffffffffff swap neg shift bitnot bitand
+            bits>double
+        ] if
+    ] [
+        ! check for nans and infinities and do an operation on them
+        ! to trigger fp exceptions if necessary
+        nip 0x400 = [ dup + ] when
+    ] if ; inline
 
 GENERIC: round ( x -- y )
 
