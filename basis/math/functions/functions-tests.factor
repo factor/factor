@@ -1,5 +1,5 @@
 USING: kernel literals math math.constants math.functions math.libm
-math.order math.ranges math.private sequences tools.test ;
+math.order math.ranges math.private sequences tools.test math.floats.env ;
 
 IN: math.functions.tests
 
@@ -168,6 +168,12 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { -4.0 } [ -4.0 floor ] unit-test
 { -4.0 } [ -4.0 ceiling ] unit-test
 
+! first floats without fractional part
+{ 0x1.0p52 } [ 0x1.0p52 truncate ] unit-test
+{ 0x1.0000000000001p52 } [ 0x1.0000000000001p52 truncate ] unit-test
+{ -0x1.0p52 } [ -0x1.0p52 truncate ] unit-test
+{ -0x1.0000000000001p52 } [ -0x1.0000000000001p52 truncate ] unit-test
+
 { -5 } [ -9/2 round ] unit-test
 { -4 } [ -22/5 round ] unit-test
 { 5 } [ 9/2 round ] unit-test
@@ -187,6 +193,12 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 
 { t } [ -0.3 round double>bits -0.0 double>bits = ] unit-test
 { t } [ 0.3 round double>bits 0.0 double>bits = ] unit-test
+
+! A signaling NaN should raise an exception
+{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 truncate drop ] collect-fp-exceptions ] unit-test
+{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 round drop ] collect-fp-exceptions ] unit-test
+{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 ceiling drop ] collect-fp-exceptions ] unit-test
+{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 floor drop ] collect-fp-exceptions ] unit-test
 
 { 6 59967 } [ 3837888 factor-2s ] unit-test
 { 6 -59967 } [ -3837888 factor-2s ] unit-test
