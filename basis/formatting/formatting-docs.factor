@@ -23,7 +23,9 @@ HELP: printf
         { { $snippet "%+Px" }        "Base 16 General format"              "real" }
         { { $snippet "%+PX" }        "Base 16 General format uppercase"    "real" }
         { { $snippet "%+Po" }        "Base  8 General format"              "real" }
+        { { $snippet "%+PO" }        "Base  8 General format uppercase"    "real" }
         { { $snippet "%+Pb" }        "Base  2 General format"              "real" }
+        { { $snippet "%+PB" }        "Base  2 General format uppercase"    "real" }
         { { $snippet "%+P.De" }      "Base 10 Scientific format"           "real" }
         { { $snippet "%+P.DE" }      "Base 10 Scientific format uppercase" "real" }
         { { $snippet "%+P.Df" }      "Base 10 Fixed format"                "real" }
