@@ -5,7 +5,7 @@ combinators.smart fry generalizations io io.streams.string
 kernel macros math math.functions math.parser namespaces
 peg.ebnf present prettyprint quotations sequences
 sequences.generalizations strings unicode vectors
-math.functions.integer-logs math.order ;
+math.functions.integer-logs splitting ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -33,8 +33,8 @@ IN: formatting
     [
         [ abs ] dip
         [ 10^ * round-to-even >integer number>string ]
-        [ 1 + CHAR: 0 pad-head 2 CHAR: 0 pad-tail ]
-        [ 1 max cut* ] tri "." glue
+        [ 1 + CHAR: 0 pad-head ]
+        [ cut* ] tri "." glue
     ] curry keep neg? [ CHAR: - prefix ] when ;
 
 : format-scientific-mantissa ( x log10x digits -- string )
@@ -63,10 +63,14 @@ IN: formatting
         [ [ [ >float ] dip ] when ] keep
     ] if ;
 
+: ?fix-nonsignificant-zero ( string digits -- string )
+    [ ".0" "." replace ] [ drop ] if-zero ;
+
 : format-scientific ( x digits -- string )
-    format-fast-scientific?
-    [ "e" format-float-fast ]
-    [ format-scientific-simple ] if ;
+    format-fast-scientific?  [
+        [ "e" format-float-fast ]
+        [ ?fix-nonsignificant-zero ] bi
+    ] [ format-scientific-simple ] if ;
 
 : format-fast-decimal? ( x digits -- x' digits ? )
     over float? [ t ]
@@ -82,9 +86,10 @@ IN: formatting
     ] if ; inline
 
 : format-decimal ( x digits -- string )
-    format-fast-decimal?
-    [ "f" format-float-fast ]
-    [ format-decimal-simple ] if ;
+    format-fast-decimal? [
+        [ "f" format-float-fast ]
+        [ ?fix-nonsignificant-zero ] bi
+    ] [ format-decimal-simple ] if ;
 
 ERROR: unknown-printf-directive ;
 
