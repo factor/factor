@@ -39,6 +39,7 @@ IN: formatting.tests
 { "  +1.0E+01" } [ 10 "%+10.1E" sprintf ] unit-test
 { "-001.0E+01" } [ -10 "%+010.1E" sprintf ] unit-test
 { "+001.0E+01" } [ 10 "%+010.1E" sprintf ] unit-test
+{ "+001.0E-01" } [ 0.1 "%+010.1E" sprintf ] unit-test
 
 { "ff" } [ 0xff "%x" sprintf ] unit-test
 { "FF" } [ 0xff "%X" sprintf ] unit-test
