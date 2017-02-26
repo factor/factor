@@ -89,7 +89,9 @@ IN: formatting.tests
 { "1.9p0" } [ 1.5625 "%x" sprintf ] unit-test
 { "1.9P0" } [ 1.5625 "%X" sprintf ] unit-test
 { "1.44p0" } [ 1.5625 "%o" sprintf ] unit-test
+{ "1.44P0" } [ 1.5625 "%O" sprintf ] unit-test
 { "1.1001p0" } [ 1.5625 "%b" sprintf ] unit-test
+{ "1.1001P0" } [ 1.5625 "%B" sprintf ] unit-test
 { "14+17/20" } [ 14+17/20 "%d" sprintf ] unit-test
 { "e+11/14" } [ 14+17/20 "%x" sprintf ] unit-test
 { "E+11/14" } [ 14+17/20 "%X" sprintf ] unit-test
