@@ -19,14 +19,14 @@ HELP: printf
         { { $snippet "%P.Du" }       "Unparsed format"            "object" }
         { { $snippet "%c" }          "Character format"           "char" }
         { { $snippet "%C" }          "Character format uppercase" "char" }
-        { { $snippet "%+Pd" }        "Integer format (base 10)"   "integer" }
-        { { $snippet "%+Po" }        "Octal format (base 8)"      "integer" }
-        { { $snippet "%+Pb" }        "Binary format (base 2)"     "integer" }
-        { { $snippet "%+P.De" }      "Scientific notation"        "real" }
-        { { $snippet "%+P.DE" }      "Scientific notation"        "real" }
-        { { $snippet "%+P.Df" }      "Fixed format"               "real" }
-        { { $snippet "%+Px" }        "Hexadecimal (base 16)"      "integer" }
-        { { $snippet "%+PX" }        "Hexadecimal (base 16) uppercase" "integer" }
+        { { $snippet "%+Pd" }        "Base 10 General format"              "real" }
+        { { $snippet "%+Px" }        "Base 16 General format"              "real" }
+        { { $snippet "%+PX" }        "Base 16 General format uppercase"    "real" }
+        { { $snippet "%+Po" }        "Base  8 General format"              "real" }
+        { { $snippet "%+Pb" }        "Base  2 General format"              "real" }
+        { { $snippet "%+P.De" }      "Base 10 Scientific format"           "real" }
+        { { $snippet "%+P.DE" }      "Base 10 Scientific format uppercase" "real" }
+        { { $snippet "%+P.Df" }      "Base 10 Fixed format"                "real" }
         { { $snippet "%[%?, %]" }    "Sequence format"            "sequence" }
         { { $snippet "%[%?: %? %]" } "Assocs format"              "assocs" }
     }
