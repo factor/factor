@@ -35,8 +35,10 @@ IN: formatting.tests
 { "100000000000000000000000.000000" } [ 23 10^ "%f" sprintf ] unit-test
 { "1.2" } [ 125/100 "%.1f" sprintf ] unit-test
 { "1.4" } [ 135/100 "%.1f" sprintf ] unit-test
-{ "2.0" } [ 5/2 "%.0f" sprintf ] unit-test
-{ "4.0" } [ 7/2 "%.0f" sprintf ] unit-test
+{ "2." } [ 5/2 "%.0f" sprintf ] unit-test
+{ "4." } [ 7/2 "%.0f" sprintf ] unit-test
+{ "2.e+00" } [ 5/2 "%.0e" sprintf ] unit-test
+{ "4.e+00" } [ 7/2 "%.0e" sprintf ] unit-test
 { "  1.23" } [ 1.23456789 "%6.2f" sprintf ] unit-test
 { "001100" } [ 12 "%06b" sprintf ] unit-test
 { "==14" } [ 12 "%'=4o" sprintf ] unit-test
@@ -84,6 +86,30 @@ IN: formatting.tests
 { "-9007199254740991.0" } [ 53 2^ 1 - neg "%.1f" sprintf ] unit-test
 { "-9007199254740992.0" } [ 53 2^ neg "%.1f" sprintf ] unit-test
 { "-9007199254740993.0" } [ 53 2^ 1 + neg "%.1f" sprintf ] unit-test
+
+{ "987654321098765432" } [ 987654321098765432 "%d" sprintf ] unit-test
+{ "987654321098765432.0" } [ 987654321098765432 "%.1f" sprintf ] unit-test
+{ "987654321098765432." } [ 987654321098765432 "%.0f" sprintf ] unit-test
+{ "9.8765432109876543200e+17" } [ 987654321098765432 "%.19e" sprintf ] unit-test
+{ "9.876543210987654320e+17" } [ 987654321098765432 "%.18e" sprintf ] unit-test
+{ "9.87654321098765432e+17" } [ 987654321098765432 "%.17e" sprintf ] unit-test
+{ "9.8765432109876543e+17" } [ 987654321098765432 "%.16e" sprintf ] unit-test
+{ "9.876543210987654e+17" } [ 987654321098765432 "%.15e" sprintf ] unit-test
+{ "9.87654321098765e+17" } [ 987654321098765432 "%.14e" sprintf ] unit-test
+{ "9.8765432109877e+17" } [ 987654321098765432 "%.13e" sprintf ] unit-test
+{ "9.876543210988e+17" } [ 987654321098765432 "%.12e" sprintf ] unit-test
+{ "9.87654321099e+17" } [ 987654321098765432 "%.11e" sprintf ] unit-test
+{ "9.8765432110e+17" } [ 987654321098765432 "%.10e" sprintf ] unit-test
+{ "9.876543211e+17" } [ 987654321098765432 "%.9e" sprintf ] unit-test
+{ "9.87654321e+17" } [ 987654321098765432 "%.8e" sprintf ] unit-test
+{ "9.8765432e+17" } [ 987654321098765432 "%.7e" sprintf ] unit-test
+{ "9.876543e+17" } [ 987654321098765432 "%.6e" sprintf ] unit-test
+{ "9.87654e+17" } [ 987654321098765432 "%.5e" sprintf ] unit-test
+{ "9.8765e+17" } [ 987654321098765432 "%.4e" sprintf ] unit-test
+{ "9.877e+17" } [ 987654321098765432 "%.3e" sprintf ] unit-test
+{ "9.88e+17" } [ 987654321098765432 "%.2e" sprintf ] unit-test
+{ "9.9e+17" } [ 987654321098765432 "%.1e" sprintf ] unit-test
+{ "1.e+18" } [ 987654321098765432 "%.0e" sprintf ] unit-test
 
 { "1.5625" } [ 1.5625 "%d" sprintf ] unit-test
 { "1.9p0" } [ 1.5625 "%x" sprintf ] unit-test
