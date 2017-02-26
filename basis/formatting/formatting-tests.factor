@@ -85,6 +85,17 @@ IN: formatting.tests
 { "-9007199254740992.0" } [ 53 2^ neg "%.1f" sprintf ] unit-test
 { "-9007199254740993.0" } [ 53 2^ 1 + neg "%.1f" sprintf ] unit-test
 
+{ "1.5625" } [ 1.5625 "%d" sprintf ] unit-test
+{ "1.9p0" } [ 1.5625 "%x" sprintf ] unit-test
+{ "1.9P0" } [ 1.5625 "%X" sprintf ] unit-test
+{ "1.44p0" } [ 1.5625 "%o" sprintf ] unit-test
+{ "1.1001p0" } [ 1.5625 "%b" sprintf ] unit-test
+{ "14+17/20" } [ 14+17/20 "%d" sprintf ] unit-test
+{ "e+11/14" } [ 14+17/20 "%x" sprintf ] unit-test
+{ "E+11/14" } [ 14+17/20 "%X" sprintf ] unit-test
+{ "16+21/24" } [ 14+17/20 "%o" sprintf ] unit-test
+{ "1110+10001/10100" } [ 14+17/20 "%b" sprintf ] unit-test
+
 { "ff" } [ 0xff "%x" sprintf ] unit-test
 { "FF" } [ 0xff "%X" sprintf ] unit-test
 { "0f" } [ 0xf "%02x" sprintf ] unit-test
