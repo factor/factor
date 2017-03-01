@@ -13,3 +13,9 @@ IN: sodium.ffi
 LIBRARY: sodium
 
 FUNCTION: int sodium_init ( )
+
+! randombytes_H
+FUNCTION: void randombytes_buf ( void* buf, size_t size )
+FUNCTION: uint32_t randombytes_random ( )
+FUNCTION: uint32_t randombytes_uniform ( uint32_t upper_bound )
+FUNCTION: void randombytes_stir ( )
