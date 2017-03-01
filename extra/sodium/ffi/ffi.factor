@@ -45,3 +45,11 @@ FUNCTION: int crypto_pwhash_str_verify (
     char* str[crypto_pwhash_STRBYTES],
     char* passwd, ulonglong passwdlen )
 FUNCTION: char* crypto_pwhash_primitive ( )
+
+! sodium_utils_H
+FUNCTION: void* sodium_malloc ( size_t size )
+FUNCTION: void* sodium_allocarray ( size_t count, size_t size )
+FUNCTION: void sodium_free ( void* ptr )
+FUNCTION: int sodium_mprotect_noaccess ( void* ptr )
+FUNCTION: int sodium_mprotect_readonly ( void* ptr )
+FUNCTION: int sodium_mprotect_readwrite ( void* ptr )
