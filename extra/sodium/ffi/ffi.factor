@@ -53,3 +53,25 @@ FUNCTION: void sodium_free ( void* ptr )
 FUNCTION: int sodium_mprotect_noaccess ( void* ptr )
 FUNCTION: int sodium_mprotect_readonly ( void* ptr )
 FUNCTION: int sodium_mprotect_readwrite ( void* ptr )
+
+! crypto_generichash_H
+TYPEDEF: void* crypto_generichash_state
+FUNCTION: size_t crypto_generichash_bytes_min ( )
+FUNCTION: size_t crypto_generichash_bytes_max ( )
+FUNCTION: size_t crypto_generichash_bytes ( )
+FUNCTION: size_t crypto_generichash_keybytes_min ( )
+FUNCTION: size_t crypto_generichash_keybytes_max ( )
+FUNCTION: size_t crypto_generichash_keybytes ( )
+FUNCTION: char* crypto_generichash_primitive ( )
+FUNCTION: size_t crypto_generichash_statebytes ( )
+FUNCTION: int crypto_generichash (
+    uchar* out, size_t outlen,
+    uchar* in, ulonglong inlen,
+    uchar* key, size_t keylen )
+FUNCTION: int crypto_generichash_init (
+    crypto_generichash_state* state,
+    uchar* key, size_t keylen, size_t outlen )
+FUNCTION: int crypto_generichash_update (
+    crypto_generichash_state* state, uchar* in, ulonglong inlen )
+FUNCTION: int crypto_generichash_final (
+    crypto_generichash_state* state, uchar* out, size_t outlen )
