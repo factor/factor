@@ -1,6 +1,7 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries alien.syntax combinators system ;
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators system ;
 IN: sodium.ffi
 
 << "sodium" {
@@ -10,3 +11,5 @@ IN: sodium.ffi
 } cond cdecl add-library >>
 
 LIBRARY: sodium
+
+FUNCTION: int sodium_init ( )
