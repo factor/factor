@@ -4,7 +4,10 @@ USING: accessors alien byte-arrays checksums checksums.common
 destructors kernel math sequences sodium sodium.ffi ;
 IN: checksums.sodium
 
-TUPLE: sodium-checksum { output-size fixnum } ;
+TUPLE: sodium-checksum
+    { output-size fixnum }
+    { key maybe{ byte-array } } ;
+
 INSTANCE: sodium-checksum block-checksum
 C: <sodium-checksum> sodium-checksum
 
@@ -18,10 +21,11 @@ TUPLE: sodium-state < disposable
 PRIVATE>
 
 M: sodium-checksum initialize-checksum-state
-    output-size>> sodium-state new-disposable swap >>output-size
+    [ key>> ] [ output-size>> ] bi
+    sodium-state new-disposable swap >>output-size
     crypto_generichash_statebytes sodium_malloc >>state
     [
-        [ state>> ] [ drop f 0 ] [ output-size>> ] tri
+        [ state>> ] [ drop swap dup length ] [ output-size>> ] tri
         crypto_generichash_init check0
     ] keep ;
 
