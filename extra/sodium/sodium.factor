@@ -26,4 +26,7 @@ ERROR: call-fail ;
 : crypto-pwhash-str-verify ( str password -- bool )
     [ utf8 encode ] bi@ dup length crypto_pwhash_str_verify 0 = ;
 
+: crypto-generichash ( out-bytes in-bytes key-bytes/f -- out-bytes' )
+    [ dup ] 2dip [ dup length ] tri@ crypto_generichash check0 ;
+
 [ sodium-init ] "sodium" add-startup-hook
