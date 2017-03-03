@@ -31,3 +31,7 @@ M: lru-cache set-at
             [ dlist>> ] tri (delete-at)
         ] [ drop ] if
     ] [ drop ] if* ;
+
+M: lru-cache clone
+    [ assoc>> clone ] [ dlist>> clone ] [ max-size>> ] tri
+    lru-cache boa ;
