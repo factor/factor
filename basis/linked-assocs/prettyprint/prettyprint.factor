@@ -1,8 +1,9 @@
-USING: accessors assocs hashtables kernel linked-assocs
+USING: accessors assocs classes hashtables kernel linked-assocs
 prettyprint.backend prettyprint.custom ;
 IN: linked-assocs.prettyprint
 
-PREDICATE: linked-hash < linked-assoc assoc>> hashtable? ;
+PREDICATE: linked-hash < linked-assoc
+    [ class-of linked-assoc = ] [ assoc>> hashtable? ] bi and ;
 
 M: linked-hash pprint-delims drop \ LH{ \ } ;
 
