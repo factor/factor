@@ -15,7 +15,7 @@ IN: io.standard-paths.windows
 : find-in-program-files ( base-directory quot -- path )
     t swap [
         [ program-files-directories ] dip '[ _ append-path ] map
-    ] 2dip find-in-directories ; inline
+    ] 2dip find-file-in-directories ; inline
 
 M: windows find-in-applications
     >lower
