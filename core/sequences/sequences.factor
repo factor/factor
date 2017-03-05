@@ -724,7 +724,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : (filter!) ( ... quot: ( ... elt -- ... ? ) store scan seq -- ... )
     2dup length < [
         [ move-unsafe ] 3keep
-        [ nth-unsafe pick call [ 1 + ] when ] 2keep
+        [ nth-unsafe -rot [ [ call ] keep ] dip rot [ 1 + ] when ] 2keep
         [ 1 + ] dip
         (filter!)
     ] [ nip set-length drop ] if ; inline recursive
