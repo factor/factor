@@ -1,6 +1,7 @@
 USING: combinators fry io.directories io.directories.hierarchy
 io.directories.search io.files.unique io.pathnames kernel
-namespaces sequences sorting splitting strings tools.test ;
+namespaces sequences sorting splitting strings system
+tools.test ;
 
 { t } [
     [
@@ -46,42 +47,49 @@ namespaces sequences sorting splitting strings tools.test ;
     [ drop f ] find-up-to-root
 ] unit-test
 
-{
-    V{
-        "/a"
-        "/a/a"
-        "/a/a/a"
-        "/a/b"
-        "/a/b/a"
-        "/b"
-        "/b/a"
-        "/b/a/a"
-        "/b/b"
-        "/b/b/a"
-        "/c"
-        "/c/a"
-        "/c/a/a"
-        "/c/b"
-        "/c/b/a"
+os linux? [
+    {
+        V{ 1 2 3 2 3 1 2 3 2 3 1 2 3 2 3 }
+        V{ 1 1 1 2 2 2 2 2 2 3 3 3 3 3 3 }
     }
-    V{
-        "/a"
-        "/b"
-        "/c"
-        "/a/a"
-        "/a/b"
-        "/b/a"
-        "/b/b"
-        "/c/a"
-        "/c/b"
-        "/a/a/a"
-        "/a/b/a"
-        "/b/a/a"
-        "/b/b/a"
-        "/c/a/a"
-        "/c/b/a"
+] [
+    {
+        V{
+            "/a"
+            "/a/a"
+            "/a/a/a"
+            "/a/b"
+            "/a/b/a"
+            "/b"
+            "/b/a"
+            "/b/a/a"
+            "/b/b"
+            "/b/b/a"
+            "/c"
+            "/c/a"
+            "/c/a/a"
+            "/c/b"
+            "/c/b/a"
+        }
+        V{
+            "/a"
+            "/b"
+            "/c"
+            "/a/a"
+            "/a/b"
+            "/b/a"
+            "/b/b"
+            "/c/a"
+            "/c/b"
+            "/a/a/a"
+            "/a/b/a"
+            "/b/a/a"
+            "/b/b/a"
+            "/c/a/a"
+            "/c/b/a"
+        }
     }
-} [
+] if [
     [
         "a" make-directory
         "a/a" make-directory
@@ -108,5 +116,10 @@ namespaces sequences sorting splitting strings tools.test ;
             "." recursive-directory-files
             current-directory get '[ _ ?head drop ] map
         ] with-variable
+
+        ! Linux doesn't return alphabetic ordering
+        os linux? [
+            [ [ path-components length ] map ] bi@
+        ] when
     ] with-test-directory
 ] unit-test
