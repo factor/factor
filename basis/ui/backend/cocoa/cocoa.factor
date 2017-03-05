@@ -196,7 +196,12 @@ M: cocoa-ui-backend system-alert
     ] [ 2drop ] if* ;
 
 CLASS: FactorApplicationDelegate < NSObject
+
     METHOD: void applicationDidUpdate: id obj [ reset-thread-timer ] ;
+
+    METHOD: char applicationShouldTerminateAfterLastWindowClosed: id app [
+        ui-stop-after-last-window? get 1 0 ?
+    ] ;
 ;
 
 : install-app-delegate ( -- )
