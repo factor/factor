@@ -6,7 +6,7 @@ IN: ui.backend
 SYMBOL: ui-backend
 
 SYMBOL: ui-stop-after-last-window?
-ui-stop-after-last-window? [ t ] initialize
+t ui-stop-after-last-window? set-global
 
 HOOK: set-title ui-backend ( string world -- )
 
