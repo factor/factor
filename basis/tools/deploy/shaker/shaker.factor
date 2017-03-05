@@ -21,6 +21,13 @@ IN: tools.deploy.shaker
         command-line set-global
     ] "command-line" startup-hooks get set-at ;
 
+: set-stop-after-last-window? ( -- )
+    get-namestack [ "stop-after-last-window?" swap key? ] any? [
+        "ui-stop-after-last-window?" "ui.backend" lookup-word [
+            "stop-after-last-window?" get swap set-global
+        ] when*
+    ] when ;
+
 : strip-startup-hooks ( -- )
     "Stripping startup hooks" show
     {
@@ -632,6 +639,7 @@ SYMBOL: deploy-vocab
                     "Vocabulary has no MAIN: word." print flush 1 exit
                 ] unless
             ] tri
+            set-stop-after-last-window?
             strip
             "Saving final image" show
             save-image-and-exit
