@@ -28,9 +28,9 @@ M: fail summary drop "Matching failed" ;
 : define-math-inverse ( word quot1 quot2 -- )
     pick 1quotation 3array "math-inverse" set-word-prop ;
 
-: define-pop-inverse ( word n quot -- )
-    [ dupd "pop-length" set-word-prop ] dip
-    "pop-inverse" set-word-prop ;
+:: define-pop-inverse ( word n quot -- )
+    word n "pop-length" set-word-prop
+    word quot "pop-inverse" set-word-prop ;
 
 ERROR: bad-math-inverse ;
 
@@ -76,14 +76,14 @@ ERROR: no-recursive-inverse ;
 SYMBOL: visited
 
 : flattenable? ( object -- ? )
-    { [ word? ] [ primitive? not ] [
-        { "inverse" "math-inverse" "pop-inverse" }
-        [ word-prop ] with any? not
-    ] } 1&& ;
+    {
+        [ word? ]
+        [ primitive? not ]
+        [ explicit-inverse? not ]
+    } 1&& ;
 
 : flatten ( quot -- expanded )
-    [
-        visited [ over suffix ] change
+    visited get over suffix visited [
         [
             dup flattenable? [
                 def>>
@@ -92,7 +92,7 @@ SYMBOL: visited
                 bi
             ] [ 1quotation ] if
         ] map concat
-    ] with-scope ;
+    ] with-variable ;
 
 ERROR: undefined-inverse ;
 
@@ -152,8 +152,7 @@ MACRO: undo ( quot -- quot ) [undo] ;
 ERROR: missing-literal ;
 
 : assert-literal ( n -- n )
-    dup
-    [ word? ] [ symbol? not ] bi and
+    dup { [ word? ] [ symbol? not ] } 1&&
     [ missing-literal ] when ;
 
 \ + [ - ] [ - ] define-math-inverse
