@@ -5,6 +5,9 @@ IN: ui.backend
 
 SYMBOL: ui-backend
 
+SYMBOL: ui-stop-after-last-window?
+ui-stop-after-last-window? [ t ] initialize
+
 HOOK: set-title ui-backend ( string world -- )
 
 HOOK: (set-fullscreen) ui-backend ( world ? -- )
