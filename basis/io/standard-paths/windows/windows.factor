@@ -13,9 +13,9 @@ IN: io.standard-paths.windows
     ] output>array harvest members ; inline
 
 : find-in-program-files ( base-directory quot -- path )
-    t swap [
-        [ program-files-directories ] dip '[ _ append-path ] map
-    ] 2dip find-file-in-directories ; inline
+    [ program-files-directories ]
+    [ '[ _ append-path ] map ]
+    [ find-file-in-directories ] tri* ; inline
 
 M: windows find-in-applications
     >lower
