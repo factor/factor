@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.enums alien.libraries
-arrays classes classes.parser combinators
-combinators.short-circuit compiler.units effects fry kernel
-lexer locals math namespaces parser sequences splitting
-vocabs.parser words ;
+arrays classes classes.parser combinators combinators.short-circuit
+compiler.units effects fry kernel lexer locals math namespaces parser
+sequences splitting summary vocabs.parser words ;
 IN: alien.parser
 
 SYMBOL: current-library
@@ -55,6 +54,11 @@ ERROR: bad-array-type ;
 
 ERROR: *-in-c-type-name name ;
 
+M: *-in-c-type-name summary
+    name>>
+    "Cannot define a C type “"
+    "” that ends with an asterisk (*)" surround ;
+
 : validate-c-type-name ( name -- name )
     dup "*" tail?
     [ *-in-c-type-name ] when ;
@@ -72,11 +76,6 @@ ERROR: *-in-c-type-name name ;
     scan-token (CREATE-C-TYPE) ;
 
 <PRIVATE
-GENERIC: return-type-name ( type -- name )
-
-M: object return-type-name drop "void" ;
-M: word return-type-name name>> ;
-M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
 
 : parse-pointers ( type name -- type' name' )
     "*" ?head
@@ -123,17 +122,14 @@ PRIVATE>
         scan-token
     ] until drop types names [ >array ] bi@ ;
 
-: function-quot ( return library function types -- quot )
-    '[ _ _ _ _ alien-invoke ] ;
-
 : function-effect ( names return -- effect )
-    [ { } ] [ return-type-name 1array ] if-void <effect> ;
+    [ { } ] [ c-type-string 1array ] if-void <effect> ;
 
 : create-function ( name -- word )
     create-word-in dup reset-generic ;
 
 :: (make-function) ( return function library types names -- quot effect )
-    return library function types function-quot
+    return library function types '[ _ _ _ _ f alien-invoke ]
     names return function-effect ;
 
 :: make-function ( return function library types names -- word quot effect )
@@ -155,18 +151,6 @@ PRIVATE>
 
 : (CALLBACK:) ( -- word quot effect )
     (FUNCTION:) make-callback-type ;
-
-PREDICATE: alien-function-alias-word < word
-    def>> {
-        [ length 5 = ]
-        [ last \ alien-invoke eq? ]
-    } 1&& ;
-
-PREDICATE: alien-function-word < alien-function-alias-word
-    [ def>> third ] [ name>> ] bi = ;
-
-PREDICATE: alien-callback-type-word < typedef-word
-    "callback-effect" word-prop >boolean ;
 
 : global-quot ( type word -- quot )
     swap [ name>> current-library get ] dip

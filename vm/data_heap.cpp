@@ -56,7 +56,7 @@ data_heap::~data_heap() {
 
 data_heap* data_heap::grow(bump_allocator* vm_nursery, cell requested_bytes) {
   FACTOR_ASSERT(vm_nursery->occupied_space() == 0);
-  cell new_tenured_size = (tenured_size * 2) + requested_bytes;
+  cell new_tenured_size = 2 * tenured_size + requested_bytes;
   return new data_heap(vm_nursery, young_size, aging_size, new_tenured_size);
 }
 
@@ -93,7 +93,7 @@ bool data_heap::high_fragmentation_p() {
 }
 
 bool data_heap::low_memory_p() {
-  return tenured->free_space() <= high_water_mark();
+  return tenured->free_space <= high_water_mark();
 }
 
 void data_heap::mark_all_cards() {
@@ -107,11 +107,6 @@ void factor_vm::set_data_heap(data_heap* data_) {
   decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
-void factor_vm::init_data_heap(cell young_size, cell aging_size,
-                               cell tenured_size) {
-  set_data_heap(new data_heap(&nursery, young_size, aging_size, tenured_size));
-}
-
 data_heap_room factor_vm::data_room() {
   data_heap_room room;
 
@@ -123,9 +118,9 @@ data_heap_room factor_vm::data_room() {
   room.aging_free = data->aging->free_space();
   room.tenured_size = data->tenured->size;
   room.tenured_occupied = data->tenured->occupied_space();
-  room.tenured_total_free = data->tenured->free_space();
+  room.tenured_total_free = data->tenured->free_space;
   room.tenured_contiguous_free = data->tenured->largest_free_block();
-  room.tenured_free_block_count = data->tenured->free_block_count();
+  room.tenured_free_block_count = data->tenured->free_block_count;
   room.cards = data->cards_end - data->cards;
   room.decks = data->decks_end - data->decks;
   room.mark_stack = mark_stack.capacity() * sizeof(cell);
@@ -133,13 +128,13 @@ data_heap_room factor_vm::data_room() {
   return room;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_data_room() {
   data_heap_room room = data_room();
   ctx->push(tag<byte_array>(byte_array_from_value(&room)));
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::instances(cell type) {
   primitive_full_gc();
 
@@ -152,7 +147,7 @@ cell factor_vm::instances(cell type) {
   return std_vector_to_array(objects);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_all_instances() {
   ctx->push(instances(TYPE_COUNT));
 }

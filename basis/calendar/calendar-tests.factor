@@ -1,15 +1,17 @@
 USING: accessors kernel math.order random threads tools.test ;
 IN: calendar
 
-{ f } [ 2004 12 32 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
-{ f } [ 2004  2 30 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
-{ f } [ 2003  2 29 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
-{ f } [ 2004 -2  9 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
-{ f } [ 2004 12  0 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
-{ f } [ 2004 12  1 24  0  0 instant <timestamp> valid-timestamp? ] unit-test
-{ f } [ 2004 12  1 23 60  0 instant <timestamp> valid-timestamp? ] unit-test
-{ f } [ 2004 12  1 23 59 60 instant <timestamp> valid-timestamp? ] unit-test
-{ t } [ now valid-timestamp? ] unit-test
+[ 2004 12 32 0   0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+[ 2004  2 30 0   0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+[ 2003  2 29 0   0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+[ 2004 -2  9 0   0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+[ 2004 12  0 0   0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+[ 2004 12  1 24  0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+[ 2004 12  1 23 60  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+[ 2004 12  1 23 59 60 instant <timestamp> ] [ not-in-interval? ] must-fail-with
+{ } [
+    2014 12 1 23 59 59+99/100 instant <timestamp> drop
+] unit-test
 
 { f } [ 1900 leap-year? ] unit-test
 { t } [ 1904 leap-year? ] unit-test
@@ -186,3 +188,9 @@ IN: calendar
 
 { 0 }
 [ gmt gmt-offset>> duration>seconds ] unit-test
+
+! am
+[ now 30 am ] [ not-in-interval? ] must-fail-with
+
+! pm
+[ now 30 pm ] [ not-in-interval? ] must-fail-with

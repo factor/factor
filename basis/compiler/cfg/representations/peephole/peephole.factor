@@ -281,3 +281,6 @@ M: ##not optimize-insn
         }
         [ call-next-method ]
     } cond ;
+
+M: ##bit-count optimize-insn
+    [ no-use-conversion ] [ finish ] [ emit-def-conversion ] tri ;

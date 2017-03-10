@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
-combinators.smart fry io.encodings.utf8 io.files kernel
-math.parser math.statistics memoize namespaces sequences
-splitting unicode calendar arrays ;
+USING: accessors arrays assocs calendar.english combinators
+combinators.smart io.encodings.utf8 io.files kernel math.parser
+memoize namespaces sequences splitting unicode ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths

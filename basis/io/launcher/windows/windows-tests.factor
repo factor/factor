@@ -2,8 +2,9 @@ USING: accessors arrays assocs calendar
 combinators.short-circuit continuations environment eval
 hashtables io io.directories io.encodings.ascii
 io.encodings.utf8 io.files io.files.temp io.files.unique
-io.launcher io.launcher.windows io.pathnames kernel math
-namespaces parser sequences splitting system tools.test ;
+io.launcher io.launcher.private io.launcher.windows
+io.pathnames kernel math namespaces parser sequences
+splitting system tools.test ;
 IN: io.launcher.windows.tests
 
 [ "hello world" ] [ { "hello" "world" } join-arguments ] unit-test
@@ -222,6 +223,10 @@ SYMBOLS: out-path err-path ;
     ] times
 
     out-path get-global utf8 file-contents
+] unit-test
+
+{ t "This is a hidden process.\r\n" } [
+    "cmd /c echo.This is a hidden process." utf8 (process-stream) hidden>> swap stream-contents
 ] unit-test
 
 [ "IN: scratchpad " ] [

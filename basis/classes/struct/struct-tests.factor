@@ -161,28 +161,28 @@ STRUCT: struct-test-string-ptr
 { "S{ struct-test-foo { x 0 } { y 7654 } { z f } }" }
 [
     H{ { boa-tuples? f } { c-object-pointers? f } } [
-        struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
+        struct-test-foo <struct> 7654 >>y unparse
     ] with-variables
 ] unit-test
 
 { "S@ struct-test-foo B{ 0 0 0 0 0 0 0 0 0 0 0 0 }" }
 [
     H{ { c-object-pointers? t } } [
-        12 <byte-array> struct-test-foo memory>struct [ pprint ] with-string-writer
+        12 <byte-array> struct-test-foo memory>struct unparse
     ] with-variables
 ] unit-test
 
 { "S{ struct-test-foo f 0 7654 f }" }
 [
     H{ { boa-tuples? t } { c-object-pointers? f } } [
-        struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
+        struct-test-foo <struct> 7654 >>y unparse
     ] with-variables
 ] unit-test
 
 { "S@ struct-test-foo f" }
 [
     H{ { c-object-pointers? f } } [
-        f struct-test-foo memory>struct [ pprint ] with-string-writer
+        f struct-test-foo memory>struct unparse
     ] with-variables
 ] unit-test
 

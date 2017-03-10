@@ -1,11 +1,9 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data arrays assocs kernel math math.parser
-namespaces sequences db.sqlite.ffi db combinators
-continuations db.types calendar.format serialize
-io.streams.byte-array byte-arrays io.encodings.binary
-io.backend db.errors present urls io.encodings.utf8
-io.encodings.string accessors shuffle io db.private ;
+USING: accessors alien.c-types alien.data arrays calendar.format
+calendar.parser combinators db db.errors db.sqlite.ffi db.types
+io.backend io.encodings.string io.encodings.utf8 kernel math
+namespaces present sequences serialize urls ;
 IN: db.sqlite.lib
 
 ERROR: sqlite-error < db-error n string ;
@@ -104,7 +102,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
         { DATE [ timestamp>ymd sqlite-bind-text-by-name ] }
-        { TIME [ timestamp>hms sqlite-bind-text-by-name ] }
+        { TIME [ duration>hms sqlite-bind-text-by-name ] }
         { DATETIME [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { TIMESTAMP [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
@@ -173,7 +171,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { TEXT [ sqlite3_column_text ] }
         { VARCHAR [ sqlite3_column_text ] }
         { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
-        { TIME [ sqlite3_column_text dup [ hms>timestamp ] when ] }
+        { TIME [ sqlite3_column_text dup [ hms>duration ] when ] }
         { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { BLOB [ sqlite-column-blob ] }

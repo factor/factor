@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hash-sets kernel locals sequences
+USING: assocs fry hash-sets kernel locals sequences
 sequences.extras sets ;
 IN: sets.extras
 
@@ -32,5 +32,8 @@ IN: sets.extras
 
 : mapped-set ( ... seq quot: ( ... elt -- ... newelt ) -- ... set )
     over length <hash-set> [
-        [ adjoin ] curry compose each
+        '[ @ _ adjoin ] each
     ] keep ; inline
+
+: unique-by ( seq quot: ( elt -- key ) -- seq' )
+    over length <hash-set> '[ @ _ ?adjoin ] filter ; inline

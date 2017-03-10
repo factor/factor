@@ -1,7 +1,13 @@
-USING: byte-arrays calendar kernel math memory namespaces parser
-random sequences threads tools.profiler.sampling
+USING: assocs byte-arrays calendar kernel kernel.private math memory
+namespaces parser random sequences threads tools.profiler.sampling
 tools.profiler.sampling.private tools.test ;
 IN: tools.profiler.sampling.tests
+
+! collect-tops: top is the last element in the array
+{ 5 } [
+    { { 1 2 3 4 5 6 { 3 4 5 } } } 1 2 collect-tops
+    keys first
+] unit-test
 
 ! Make sure the profiler doesn't blow up the VM
 TUPLE: boom ;
@@ -21,6 +27,10 @@ gc
     ! Seed the samples data
     [ "resource:basis/tools/memory/memory.factor" run-file ] profile
     (get-samples) length 0 >
+    OBJ-SAMPLE-CALLSTACKS special-object first 0 >
+] unit-test
+
+{ t } [
     ! On x86.64, [ ] profile doesn't generate any samples at all
     ! because it runs so quickly. On x86.32, one spurious sample is
     ! sometimes generated for some unknown reason.

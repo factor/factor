@@ -8,7 +8,7 @@ SYMBOL: currency-token
 CHAR: $ currency-token set-global
 
 : dollars/cents ( dollars -- dollars cents )
-    100 * 100 /mod round ;
+    100 * 100 /mod round >integer ;
 
 : format-money ( dollars cents -- string )
     [ number>string ] bi@

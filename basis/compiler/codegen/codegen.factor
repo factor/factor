@@ -1,18 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays classes combinators
-compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
-compiler.cfg.linearization compiler.cfg.stack-frame
-compiler.codegen.gc-maps compiler.codegen.labels
-compiler.codegen.relocation compiler.constants cpu.architecture
-fry generic.parser kernel layouts locals make math namespaces
-parser quotations sequences sequences.generalizations slots
+USING: accessors arrays assocs byte-arrays combinators compiler.cfg
+compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.linearization compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation compiler.constants
+cpu.architecture fry generic.parser kernel layouts locals make math
+namespaces parser quotations sequences sequences.generalizations slots
 words ;
 IN: compiler.codegen
-
-SYMBOL: insn-counts
-
-H{ } clone insn-counts set-global
 
 GENERIC: generate-insn ( insn -- )
 
@@ -64,16 +59,8 @@ M: ##dispatch generate-insn
     [ basic-block set ]
     [ lookup-label resolve-label ]
     [
-        instructions>> [
-            [ class-of insn-counts get-global inc-at ]
-            [ generate-insn ]
-            bi
-        ] each
+        instructions>> [ generate-insn ] each
     ] tri ;
-
-: init-fixup ( -- )
-    V{ } clone label-table set
-    V{ } clone binary-literal-table set ;
 
 : check-fixup ( seq -- )
     length data-alignment get mod 0 assert= ;
@@ -81,8 +68,10 @@ M: ##dispatch generate-insn
 : with-fixup ( quot -- code )
     '[
         init-relocation
-        init-gc-maps
-        init-fixup
+        V{ } clone return-addresses set
+        V{ } clone gc-maps set
+        V{ } clone label-table set
+        V{ } clone binary-literal-table set
         [
             @
             emit-binary-literals

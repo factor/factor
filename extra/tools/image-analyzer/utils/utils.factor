@@ -1,7 +1,10 @@
-USING: accessors alien alien.c-types alien.data arrays bit-arrays classes
-continuations destructors fry io io.streams.throwing kernel locals
-math namespaces sequences words ;
+USING: accessors alien alien.c-types alien.data arrays bit-arrays
+classes continuations destructors fry io io.streams.throwing kernel
+locals math math.bitwise namespaces sequences words ;
 IN: tools.image-analyzer.utils
+
+: untag ( ptr -- ptr' )
+    15 unmask ;
 
 : class-heap-size ( instance -- n )
     class-of heap-size ;

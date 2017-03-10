@@ -41,7 +41,7 @@ TUPLE: line words width height baseline ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
-    dup wrap-words [ <line> ] map! ;
+    wrap-words [ <line> ] map! ;
 
 : cached-wrapped ( paragraph -- wrapped-paragraph )
     dup wrapped>>

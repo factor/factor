@@ -1676,7 +1676,8 @@ FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
 ! FUNCTION: Module32NextW
 ! FUNCTION: MoveFileA
 ! FUNCTION: MoveFileExA
-! FUNCTION: MoveFileExW
+FUNCTION: BOOL MoveFileExW ( LPCSTR lpExistingFile, LPCSTR lpNewFileName, DWORD dwFlags )
+ALIAS: MoveFileEx MoveFileExW
 FUNCTION: BOOL MoveFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName )
 ALIAS: MoveFile MoveFileW
 ! FUNCTION: MoveFileWithProgressA

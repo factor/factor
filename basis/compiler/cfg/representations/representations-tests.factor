@@ -1,11 +1,9 @@
-USING: accessors compiler.cfg compiler.cfg.debugger
+USING: accessors compiler.cfg compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.representations.preferred cpu.architecture kernel
-namespaces tools.test sequences arrays system literals layouts
-math compiler.constants compiler.cfg.representations.conversion
-compiler.cfg.representations.rewrite
-compiler.cfg.comparisons compiler.cfg.utilities
-make ;
+compiler.cfg.representations.conversion
+compiler.cfg.representations.preferred compiler.cfg.utilities
+compiler.constants compiler.test cpu.architecture kernel layouts
+literals make math namespaces sequences system tools.test ;
 FROM: alien.c-types => char ;
 IN: compiler.cfg.representations
 
@@ -896,6 +894,24 @@ cpu x86.64? [
     V{
         T{ ##peek f 0 D: 0 }
         T{ ##not f 1 0 }
+        T{ ##replace f 1 D: 0 }
+    } test-peephole
+] unit-test
+
+! untag elimination for ##bit-count
+2 vreg-counter set-global
+
+{
+    V{
+        T{ ##peek f 0 D: 0 }
+        T{ ##bit-count f 3 0 }
+        T{ ##shl-imm f 1 3 $[ tag-bits get ] }
+        T{ ##replace f 1 D: 0 }
+    }
+} [
+    V{
+        T{ ##peek f 0 D: 0 }
+        T{ ##bit-count f 1 0 }
         T{ ##replace f 1 D: 0 }
     } test-peephole
 ] unit-test

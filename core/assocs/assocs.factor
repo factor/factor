@@ -144,7 +144,7 @@ M: assoc values [ nip ] { } assoc>map ;
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
-    2dup [ assoc-size ] bi@ eq? [ assoc-subset? ] [ 2drop f ] if ;
+    2dup [ assoc-size ] bi@ = [ assoc-subset? ] [ 2drop f ] if ;
 
 : assoc-hashcode ( n assoc -- code )
     >alist hashcode* ;
@@ -239,6 +239,11 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
+: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry H{ } clone [
+        [ push-at ] curry compose each
+    ] keep ; inline
+
 M: sequence at*
     search-alist [ second t ] [ f ] if ;
 
@@ -288,8 +293,7 @@ M: enum set-at seq>> set-nth ; inline
 
 M: enum delete-at seq>> remove-nth! drop ; inline
 
-M: enum >alist ( enum -- alist )
-    seq>> [ length iota ] keep zip ; inline
+M: enum >alist ( enum -- alist ) ; inline
 
 M: enum keys seq>> length iota >array ; inline
 

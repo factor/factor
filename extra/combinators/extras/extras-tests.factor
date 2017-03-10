@@ -38,3 +38,26 @@ IN: combinators.extras.tests
 { t } [ "resource:" [ exists? ] ?1arg >boolean ] unit-test
 { f } [ f [ exists? ] ?1arg ] unit-test
 { f } [ "/homeasdfasdf123123" [ exists? ] ?1arg ] unit-test
+
+{ "hi " "there" } [
+    "hi there" {
+        { [ "there" over start ] [ cut ] }
+        [ f ]
+    } cond*
+] unit-test
+
+{ "hi " "there" } [
+    "hi there" {
+        { [ "foo" over start ] [ head f ] }
+        { [ "there" over start ] [ cut ] }
+        [ f ]
+    } cond*
+] unit-test
+
+{ "hi there" f } [
+    "hi there" {
+        { [ "foo" over start ] [ head f ] }
+        { [ "bar" over start ] [ cut ] }
+        [ f ]
+    } cond*
+] unit-test

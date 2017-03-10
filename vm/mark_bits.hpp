@@ -51,13 +51,9 @@ struct mark_bits {
     return (bits[position.first] & ((cell)1 << position.second)) != 0;
   }
 
-  cell next_block_after(const cell block, const cell size) {
-    return block + size;
-  }
-
   void set_bitmap_range(cell* bits, const cell address, const cell size) {
     std::pair<cell, cell> start = bitmap_deref(address);
-    std::pair<cell, cell> end = bitmap_deref(next_block_after(address, size));
+    std::pair<cell, cell> end = bitmap_deref(address + size);
 
     cell start_mask = ((cell)1 << start.second) - 1;
     cell end_mask = ((cell)1 << end.second) - 1;
@@ -84,8 +80,8 @@ struct mark_bits {
     set_bitmap_range(marked, address, size);
   }
 
-  /* The eventual destination of a block after compaction is just the number
-     of marked blocks before it. Live blocks must be marked on entry. */
+  // The eventual destination of a block after compaction is just the number
+  // of marked blocks before it. Live blocks must be marked on entry.
   void compute_forwarding() {
     cell accum = 0;
     for (cell index = 0; index < bits_size; index++) {
@@ -94,8 +90,8 @@ struct mark_bits {
     }
   }
 
-  /* We have the popcount for every mark_bits_granularity entries; look
-     up and compute the rest */
+  // We have the popcount for every mark_bits_granularity entries; look
+  // up and compute the rest
   cell forward_block(const cell original) {
     FACTOR_ASSERT(marked_p(original));
     std::pair<cell, cell> position = bitmap_deref(original);
@@ -118,17 +114,16 @@ struct mark_bits {
     for (cell index = position.first; index < bits_size; index++) {
       cell mask = ((fixnum)marked[index] >> bit_index);
       if (~mask) {
-        /* Found an unmarked block on this page. Stop, it's hammer time */
+        // Found an unmarked block on this page. Stop, it's hammer time
         cell clear_bit = rightmost_clear_bit(mask);
         return line_block(index * mark_bits_granularity + bit_index +
                           clear_bit);
-      } else {
-        /* No unmarked blocks on this page. Keep looking */
-        bit_index = 0;
       }
+      // No unmarked blocks on this page. Keep looking
+      bit_index = 0;
     }
 
-    /* No unmarked blocks were found */
+    // No unmarked blocks were found
     return this->start + this->size;
   }
 
@@ -139,16 +134,15 @@ struct mark_bits {
     for (cell index = position.first; index < bits_size; index++) {
       cell mask = (marked[index] >> bit_index);
       if (mask) {
-        /* Found an marked block on this page. Stop, it's hammer time */
+        // Found an marked block on this page. Stop, it's hammer time
         cell set_bit = rightmost_set_bit(mask);
         return line_block(index * mark_bits_granularity + bit_index + set_bit);
-      } else {
-        /* No marked blocks on this page. Keep looking */
-        bit_index = 0;
       }
+      // No marked blocks on this page. Keep looking
+      bit_index = 0;
     }
 
-    /* No marked blocks were found */
+    // No marked blocks were found
     return this->start + this->size;
   }
 

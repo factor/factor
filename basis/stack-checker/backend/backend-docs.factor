@@ -1,5 +1,6 @@
-USING: compiler.tree effects help.markup help.syntax math quotations sequences
-stack-checker.state stack-checker.values stack-checker.visitor words ;
+USING: compiler.tree effects help.markup help.syntax kernel math
+quotations sequences stack-checker.state stack-checker.values
+stack-checker.visitor words ;
 IN: stack-checker.backend
 
 HELP: consume-d
@@ -42,6 +43,10 @@ HELP: pop-d
 { $description "Pops an item from the compile time datastack. If the datastack is empty, a new value is instead introduced." }
 { $see-also introduce-values } ;
 
+HELP: pop-literal
+{ $values { "obj" object } }
+{ $description "Used for popping a value off the datastack which is expected to be a literal." } ;
+
 HELP: push-d
 { $values { "obj" "object" } }
 { $description "Pushes an item onto the compile time data stack." } ;
@@ -58,3 +63,17 @@ HELP: required-stack-effect
 HELP: with-infer
 { $values { "quot" quotation } { "effect" effect } { "visitor" "a visitor, if any" } }
 { $description "Initializes the inference engine and then runs the given quotation which is supposed to perform the inferencing." } ;
+
+ARTICLE: "stack-checker.backend" "Stack effect inference implementation"
+"Contains words for manipulating the compile-time data and retainstacks:"
+{ $subsections
+  peek-d
+  pop-d
+  pop-literal
+  pop-r
+  push-d
+  push-literal
+  push-r
+} ;
+
+ABOUT: "stack-checker.backend"

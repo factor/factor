@@ -249,7 +249,7 @@ HELP: stack.
 
 HELP: callstack.
 { $values { "callstack" callstack } }
-{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame with " { $link => } "." } ;
+{ $description "Displays the " { $link callstack } " in a user friendly fashion with outermost stack frames first and innermost frames at the bottom. The current execution point in every call frame is highlighted with " { $link => } "." } ;
 
 HELP: .c
 { $description "Displays the contents of the call stack, with the top of the stack printed first." } ;

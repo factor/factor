@@ -850,8 +850,8 @@ HELP: collapse-slice
 
 HELP: <slice>
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "slice" slice } }
-{ $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
-{ $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." }
+{ $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } "." }
+{ $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " are out of bounds." }
 { $notes "Taking the slice of a slice outputs a slice of the underlying sequence, instead of a slice of a slice. This means that you cannot assume that the " { $snippet "from" } " and " { $snippet "to" } " slots of the resulting slice will be equal to the values you passed to " { $link <slice> } "." } ;
 
 { <slice> subseq } related-words
@@ -1026,10 +1026,14 @@ HELP: head-slice*
 { $description "Outputs a virtual sequence sharing storage with all elements of " { $snippet "seq" } " until the " { $snippet "n" } "th element from the end. In other words, it outputs a sequence of the first " { $snippet "l-n" } " elements of the input sequence, where " { $snippet "l" } " is its length." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
+{ head-slice head-slice* } related-words
+
 HELP: tail-slice*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with the last " { $snippet "n" } " elements of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+{ tail-slice tail-slice* } related-words
 
 HELP: head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
@@ -1177,7 +1181,7 @@ HELP: unclip-last
 
 HELP: unclip-last-slice
 { $values { "seq" sequence } { "butlast-slice" slice } { "last" object } }
-{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last Unlike " { $link unclip-last } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
+{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last. Unlike " { $link unclip-last } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
 
 HELP: sum
 { $values { "seq" { $sequence number } } { "n" number } }
@@ -1735,7 +1739,7 @@ $nl
 { $list
   "If you are using mutable state, the choice has to be made one way or another because of semantics; mutating a slice will change the underlying sequence."
   { "Using a slice can improve algorithmic complexity. For example, if each iteration of a loop decomposes a sequence using " { $link first } " and " { $link rest } ", then the loop will run in quadratic time, relative to the length of the sequence. Using " { $link rest-slice } " changes the loop to run in linear time, since " { $link rest-slice } " does not copy any elements. Taking a slice of a slice will “collapse” the slice so to avoid the double indirection, so it is safe to use slices in recursive code." }
-  "Accessing elements from a concrete sequence (such as a string or an array) is often faster than accessing elements from a slice, because slice access entails additional indirection. However, in some cases, if the slice is immediately consumed by an iteration combinator, the compiler can eliminate the slice allocation and indirect altogether."
+  "Accessing elements from a concrete sequence (such as a string or an array) is often faster than accessing elements from a slice, because slice access entails additional indirection. However, in some cases, if the slice is immediately consumed by an iteration combinator, the compiler can eliminate the slice allocation and indirection altogether."
   "If the slice outlives the original sequence, the original sequence will still remain in memory, since the slice will reference it. This can increase memory consumption unnecessarily."
 }
 { $heading "Subsequence operations" }

@@ -8,10 +8,10 @@ quotations strings words ;
 0b1111 tag-mask set
 4 tag-bits set
 
-14 num-types set
-
 32 mega-cache-size set
 
+! Type tags, should be kept in sync with:
+!   vm/layouts.hpp
 H{
     { fixnum 0 }
     { POSTPONE: f 1 }
@@ -28,5 +28,7 @@ H{
     { word 12 }
     { dll 13 }
 } type-numbers set
+
+14 num-types set
 
 2 header-bits set

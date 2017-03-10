@@ -1,19 +1,15 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data alien.strings arrays assocs ui
-ui.private ui.gadgets ui.gadgets.private ui.backend
-ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
-kernel math math.vectors namespaces make sequences strings
-vectors words windows.dwmapi system-info.windows
-windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
-windows.messages windows.types windows.offscreen windows threads
-libc combinators fry combinators.short-circuit continuations
-command-line shuffle opengl ui.render math.bitwise locals
-accessors math.rectangles math.order calendar ascii sets io.crlf
-io.encodings.utf16n windows.errors literals ui.pixel-formats
-ui.pixel-formats.private memoize classes colors
-specialized-arrays classes.struct ;
+USING: accessors alien alien.data alien.strings arrays ascii assocs
+calendar classes classes.struct colors combinators continuations fry
+io io.crlf io.encodings.utf16n kernel libc literals locals make math
+math.bitwise namespaces sequences sets specialized-arrays strings
+threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.private windows.dwmapi windows.errors windows.gdi32
+windows.kernel32 windows.messages windows.offscreen windows.opengl32
+windows.types windows.user32 ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -26,7 +22,9 @@ C: <win> win
 
 <PRIVATE
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
+CONSTANT: perm-attribs { $ WGL_SUPPORT_OPENGL_ARB 1 }
+
+CONSTANT: attrib-table H{
     { double-buffered { $ WGL_DOUBLE_BUFFER_ARB 1 } }
     { stereo { $ WGL_STEREO_ARB 1 } }
     { offscreen { $ WGL_DRAW_TO_BITMAP_ARB 1 } }
@@ -57,17 +55,10 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
-    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { c:int c:int }
+    [ handle>> hDC>> ] dip
+    perm-attribs attrib-table pixel-format-attributes>int-array
+    f 1 { c:int c:int }
     [ wglChoosePixelFormatARB win32-error=0/f ] with-out-parameters drop ;
-
-: arb-pixel-format-attribute ( pixel-format attribute -- value )
-    >WGL_ARB
-    [ drop f ] [
-        [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first c:int <ref> { c:int }
-        [ wglGetPixelFormatAttribivARB win32-error=0/f ]
-        with-out-parameters
-    ] if-empty ;
 
 CONSTANT: pfd-flag-map H{
     { double-buffered $ PFD_DOUBLEBUFFER }
@@ -117,52 +108,12 @@ CONSTANT: pfd-flag-map H{
     [ handle>> hDC>> ] [ >pfd ] bi*
     ChoosePixelFormat dup win32-error=0/f ;
 
-: get-pfd ( pixel-format -- pfd )
-    [ world>> handle>> hDC>> ] [ handle>> ] bi
-    PIXELFORMATDESCRIPTOR c:heap-size
-    PIXELFORMATDESCRIPTOR <struct>
-    [ DescribePixelFormat win32-error=0/f ] keep ;
-
-: pfd-flag? ( pfd flag -- ? )
-    [ dwFlags>> ] dip bitand c:c-bool> ;
-
-: (pfd-pixel-format-attribute) ( pfd attribute -- value )
-    {
-        { double-buffered [ PFD_DOUBLEBUFFER pfd-flag? ] }
-        { stereo [ PFD_STEREO pfd-flag? ] }
-        { offscreen [ PFD_DRAW_TO_BITMAP pfd-flag? ] }
-        { fullscreen [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
-        { windowed [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
-        { software-rendered [ PFD_GENERIC_FORMAT pfd-flag? ] }
-        { color-bits [ cColorBits>> ] }
-        { red-bits [ cRedBits>> ] }
-        { green-bits [ cGreenBits>> ] }
-        { blue-bits [ cBlueBits>> ] }
-        { alpha-bits [ cAlphaBits>> ] }
-        { accum-bits [ cAccumBits>> ] }
-        { accum-red-bits [ cAccumRedBits>> ] }
-        { accum-green-bits [ cAccumGreenBits>> ] }
-        { accum-blue-bits [ cAccumBlueBits>> ] }
-        { accum-alpha-bits [ cAccumAlphaBits>> ] }
-        { depth-bits [ cDepthBits>> ] }
-        { stencil-bits [ cStencilBits>> ] }
-        { aux-buffers [ cAuxBuffers>> ] }
-        [ 2drop f ]
-    } case ;
-
-: pfd-pixel-format-attribute ( pixel-format attribute -- value )
-    [ get-pfd ] dip (pfd-pixel-format-attribute) ;
-
 M: windows-ui-backend (make-pixel-format)
     over has-wglChoosePixelFormatARB?
     [ arb-make-pixel-format ] [ pfd-make-pixel-format ] if ;
 
 M: windows-ui-backend (free-pixel-format)
     drop ;
-
-M: windows-ui-backend (pixel-format-attribute)
-    over world>> has-wglChoosePixelFormatARB?
-    [ arb-pixel-format-attribute ] [ pfd-pixel-format-attribute ] if ;
 
 PRIVATE>
 
@@ -415,7 +366,7 @@ CONSTANT: exclude-keys-wm-char
         { [ over SC_RESTORE = ] [ t set-window-active ] }
         { [ over SC_MAXIMIZE = ] [ t set-window-active ] }
         { [ dup alpha? ] [ 4drop 0 ] }
-        { [ t ] [ DefWindowProc ] }
+        [ DefWindowProc ]
     } cond ;
 
 : cleanup-window ( handle -- )

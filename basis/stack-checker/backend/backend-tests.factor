@@ -1,6 +1,7 @@
-USING: accessors classes.tuple compiler.tree stack-checker.backend tools.test
-kernel namespaces stack-checker.state stack-checker.values
-stack-checker.visitor sequences assocs ;
+USING: accessors assocs classes.tuple compiler.tree kernel namespaces
+sequences stack-checker.backend stack-checker.dependencies
+stack-checker.state stack-checker.values stack-checker.visitor
+tools.test ;
 IN: stack-checker.backend.tests
 
 { } [
@@ -32,7 +33,7 @@ IN: stack-checker.backend.tests
     V{ 3 9 8 }
     H{ { 8 input-parameter } { 9 input-parameter } { 3 input-parameter } }
 } [
-    init-known-values
+    H{ } clone known-values set
     V{ } clone stack-visitor set
     V{ 3 9 8 } introduce-values
     stack-visitor get first out-d>>
@@ -50,6 +51,24 @@ IN: stack-checker.backend.tests
     stack-visitor get first in-d>>
 ] unit-test
 
+! apply-object
+SYMBOL: sam-sum
+
+{ H{ } } [
+    H{ } clone dependencies set
+    H{ } clone known-values set
+    init-inference
+    [ \ sam-sum ] first apply-object
+    dependencies get
+] unit-test
+
+{ V{ "abc" } } [
+    H{ } clone known-values set
+    init-inference
+    "abc" apply-object
+    literals get
+] unit-test
+
 ! Because node is an identity-tuple
 : node-seqs-eq? ( seq1 seq2 -- ? )
     [ [ tuple-slots ] map concat ] bi@ = ;
@@ -62,6 +81,20 @@ IN: stack-checker.backend.tests
     V{ T{ #introduce { out-d { 1 } } } T{ #return { in-d V{ } } } }
     node-seqs-eq?
 ] unit-test
+
+! pop-literal
+{
+    2
+} [
+    V{ 1 2 } clone literals set pop-literal
+] unit-test
+
+{
+    4321
+} [
+    init-inference 4321 <literal> make-known push-d pop-literal
+] unit-test
+
 
 : foo ( x -- )
     drop ;

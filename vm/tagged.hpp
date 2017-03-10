@@ -32,17 +32,16 @@ template <typename Type> struct tagged {
   explicit tagged(cell tagged) : value_(tagged) {}
   explicit tagged(Type* untagged) : value_(factor::tag(untagged)) {}
 
+  void set_value(const cell ptr) {
+    value_ = ptr;
+  }
+
+  void set_untagged(const Type *untagged) {
+    set_value(tag(untagged));
+  }
+
   Type* operator->() const { return untagged(); }
   cell* operator&() const { return &value_; }
-
-  const tagged<Type>& operator=(const Type* x) {
-    value_ = tag(x);
-    return *this;
-  }
-  const tagged<Type>& operator=(const cell& x) {
-    value_ = x;
-    return *this;
-  }
 
   bool operator==(const tagged<Type>& x) { return value_ == x.value_; }
   bool operator!=(const tagged<Type>& x) { return value_ != x.value_; }

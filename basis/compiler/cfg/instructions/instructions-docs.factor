@@ -11,6 +11,10 @@ HELP: ##alien-invoke
   "An instruction for calling a function in a dynamically linked library. It has the following slots:"
   { $table
     {
+        { $slot "dead-outputs" }
+        { "A sequence of return values from the function that the compiler.cfg.dce pass has figured out are not used." }
+    }
+    {
         { $slot "reg-inputs" }
         { "Registers to use for the arguments to the function call. Each sequence item is a 3-tuple consisting of a " { $link spill-slot } ", register representation and a register. When the function is called, the parameter is copied from the spill slot to the given register." }
     }
@@ -22,14 +26,18 @@ HELP: ##alien-invoke
         { $slot "reg-outputs" }
         { "If the called function returns a value, then this slot is a one-element sequence containing a 3-tuple describing which register is used for the return value." }
     }
-    {
-        { $slot "gc-map" }
-        { "If the invoked C function calls Factor code which triggers a GC, then a " { $link gc-map } " is necessary to find the roots." }
-    }
     { { $slot "symbols" } { "Name of the function to call." } }
     { { $slot "dll" } { "A dll handle or " { $link f } "." } }
+    {
+        { $slot "gc-map" }
+        {
+            "If the invoked C function calls Factor code which triggers a GC, then a "
+            { $link gc-map }
+            " is necessary to find the roots."
+        }
+    }
   }
-  "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } ", in " { $link x86.64 } " the first six arguments are passed in registers and then stack parameters are used for the remainder."
+  "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } ", in " { $link x86.64 } " on " { $link unix } ", the first six arguments are passed in registers and then stack parameters are used for the remainder."
 }
 { $see-also #alien-invoke %alien-invoke } ;
 
@@ -276,7 +284,11 @@ HELP: ##slot-imm
 } { $see-also %slot-imm } ;
 
 HELP: ##spill
-{ $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "." } ;
+{ $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "."
+  { $table
+    { { $slot "rep" } { "Register representation which is necessary when spilling SIMD registers." } }
+  }
+} { $see-also ##reload } ;
 
 HELP: ##store-memory-imm
 { $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass."
@@ -286,6 +298,7 @@ HELP: ##store-memory-imm
         { $slot "offset" }
         { "Offset in bytes from the address to where the data should be written." }
     }
+    { { $slot "rep" } { "Value representation in the vector register." } }
     { { $slot "src" } { "Vreg that contains the item to set." } }
   }
 }
@@ -390,7 +403,7 @@ HELP: gc-map
   }
   "The 'gc-roots' and 'derived-roots' slots are initially vreg integers referencing objects that are live during the gc call and needs to be spilled so that they can be traced. In the " { $link emit-gc-map-insn } " word in " { $vocab-link "compiler.cfg.linear-scan.assignment" } " they are converted to spill slots which the collector is able to trace."
 }
-{ $see-also emit-gc-info-bitmaps fill-gc-map } ;
+{ $see-also emit-gc-info-bitmap fill-gc-map } ;
 
 ARTICLE: "compiler.cfg.instructions" "Basic block instructions"
 "The " { $vocab-link "compiler.cfg.instructions" } " vocab contains all instruction classes used for generating CFG:s (Call Flow Graphs)."

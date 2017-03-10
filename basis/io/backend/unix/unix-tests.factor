@@ -128,7 +128,6 @@ sequences strings system threads tools.test ;
     [
         vm-path ,
         "-i=" image-path append ,
-        "-run=none" ,
         "-e=USING: destructors namespaces io calendar threads ; input-stream get dispose 1 seconds sleep" ,
     ] { } make try-process
 ] unit-test

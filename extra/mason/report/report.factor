@@ -27,12 +27,12 @@ IN: mason.report
     </table>
     XML] ;
 
-: with-report ( quot -- )
+: with-report ( quot: ( -- xml ) -- )
     [ "report" utf8 ] dip
     '[
         common-report
         _ call( -- xml )
-        [XML <html><body><-><-></body></html> XML]
+        [XML <div><-><-></div> XML]
         write-xml
     ] with-file-writer ; inline
 

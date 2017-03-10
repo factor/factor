@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff, see BSD license
 USING: accessors literals math math.affine-transforms
-math.functions multiline sequences svg tools.test xml
+math.functions math.trig multiline sequences svg tools.test xml
 xml.traversal ;
 IN: svg.tests
 
@@ -48,16 +48,16 @@ ${ { 2.0 0.0 } { 0.0 4.0 } { 0.0 0.0 } <affine-transform> } [
 
 { t } [
     "rotate(30 1.0,2.0)" svg-transform>affine-transform
-    { $[  30 degrees cos ] $[ 30 degrees sin ] }
-    { $[ -30 degrees sin ] $[ 30 degrees cos ] } {
-        $[ 1.0 30 degrees cos 1.0 * - 30 degrees sin 2.0 * + ]
-        $[ 2.0 30 degrees cos 2.0 * - 30 degrees sin 1.0 * - ]
+    { $[  30 deg>rad cos ] $[ 30 deg>rad sin ] }
+    { $[ -30 deg>rad sin ] $[ 30 deg>rad cos ] } {
+        $[ 1.0 30 deg>rad cos 1.0 * - 30 deg>rad sin 2.0 * + ]
+        $[ 2.0 30 deg>rad cos 2.0 * - 30 deg>rad sin 1.0 * - ]
     } <affine-transform> 0.001 a~
 ] unit-test
 
 ${
-    { $[  30 degrees cos ] $[ 30 degrees sin ] }
-    { $[ -30 degrees sin ] $[ 30 degrees cos ] }
+    { $[  30 deg>rad cos ] $[ 30 deg>rad sin ] }
+    { $[ -30 deg>rad sin ] $[ 30 deg>rad cos ] }
     { 1.0 2.0 } <affine-transform>
 } [
     "translate(1 2) rotate(30)" svg-transform>affine-transform

@@ -1,6 +1,6 @@
-USING: accessors continuations debugger eval io kernel
-kernel.private math memory namespaces sequences tools.test
-vectors words ;
+USING: accessors continuations debugger eval io kernel kernel.private
+math math.ratios memory namespaces sequences tools.test vectors words
+;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )
@@ -31,6 +31,11 @@ IN: continuations.tests
     [ "Hello" throw ] ignore-errors
     error get-global
     "Hello" =
+] unit-test
+
+{ 4 f } [
+    [ 20 5 / ] [ division-by-zero? ] ignore-error/f
+    [ 20 0 / ] [ division-by-zero? ] ignore-error/f
 ] unit-test
 
 "!!! The following error is part of the test" print

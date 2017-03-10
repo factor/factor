@@ -1,56 +1,44 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg.instructions
-compiler.cfg.parallel-copy compiler.cfg.registers
-compiler.cfg.stacks.height hash-sets kernel make math math.order
-namespaces sequences sets ;
+USING: accessors arrays assocs combinators compiler.cfg.instructions
+compiler.cfg.parallel-copy compiler.cfg.registers fry hash-sets kernel
+make math math.order namespaces sequences sets ;
 IN: compiler.cfg.stacks.local
 
-: current-height ( state -- ds rs )
-    first2 [ first ] bi@ ;
+TUPLE: height-state ds-begin rs-begin ds-inc rs-inc ;
 
 : >loc< ( loc -- n ds? )
     [ n>> ] [ ds-loc? ] bi ;
 
-: modify-height ( state loc -- )
-    >loc< 0 1 ? rot nth [ + ] with map! drop ;
+: ds-height ( height-state -- n )
+    [ ds-begin>> ] [ ds-inc>> ] bi + ;
 
-: adjust ( state loc -- )
-    >loc< 0 1 ? rot nth dup first swapd + 0 rot set-nth ;
+: rs-height ( height-state -- n )
+    [ rs-begin>> ] [ rs-inc>> ] bi + ;
 
-: reset-emits ( state -- )
-    [ 0 1 rot set-nth ] each ;
+: global-loc>local ( loc height-state -- loc' )
+    [ clone dup >loc< ] dip swap [ ds-height ] [ rs-height ] if - >>n ;
 
-: height-state>insns ( state -- insns )
-    [ second ] map { ds-loc rs-loc } [ new swap >>n ] 2map
-    [ n>> 0 = ] reject [ ##inc new swap >>loc ] map ;
-
-: translate-local-loc ( loc state -- loc' )
-    [ clone ] dip over >loc< 0 1 ? rot nth first - >>n ;
-
-: clone-height-state ( state -- state' )
-    [ clone ] map ;
-
-: initial-height-state ( -- state )
-    { { 0 0 } { 0 0 } } clone-height-state ;
-
-: kill-locations ( saved-height height -- seq )
-    dupd [-] iota [ swap - ] with map ;
-
-: local-kill-set ( ds-height rs-height state -- set )
-    current-height swapd [ kill-locations ] 2bi@
-    [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
-    append >hash-set ;
-
-SYMBOLS: height-state peek-sets replace-sets kill-sets locs>vregs ;
+: local-loc>global ( loc height-state -- loc' )
+    [ clone dup >loc< ] dip swap [ ds-begin>> ] [ rs-begin>> ] if + >>n ;
 
 : inc-stack ( loc -- )
-    height-state get swap modify-height ;
+    >loc< height-state get swap
+    [ [ + ] change-ds-inc ] [ [ + ] change-rs-inc ] if drop ;
+
+: height-state>insns ( height-state -- insns )
+    [ ds-inc>> ds-loc ] [ rs-inc>> rs-loc ] bi [ new swap >>n ] 2bi@ 2array
+    [ n>> 0 = ] reject [ ##inc new swap >>loc ] map ;
+
+: reset-incs ( height-state -- )
+    dup ds-inc>> '[ _ + ] change-ds-begin
+    dup rs-inc>> '[ _ + ] change-rs-begin
+    0 >>ds-inc 0 >>rs-inc drop ;
+
+SYMBOLS: locs>vregs local-peek-set replaces ;
 
 : loc>vreg ( loc -- vreg ) locs>vregs get [ drop next-vreg ] cache ;
 : vreg>loc ( vreg -- loc/f ) locs>vregs get value-at ;
-
-SYMBOLS: local-peek-set replaces ;
 
 : replaces>copy-insns ( replaces -- insns )
     [ [ loc>vreg ] dip ] assoc-map parallel-copy ;
@@ -58,22 +46,32 @@ SYMBOLS: local-peek-set replaces ;
 : changes>insns ( replaces height-state -- insns )
     [ replaces>copy-insns ] [ height-state>insns ] bi* append ;
 
-: emit-changes ( replaces state -- )
+: emit-insns ( replaces state -- )
     building get pop -rot changes>insns % , ;
 
 : peek-loc ( loc -- vreg )
-    height-state get translate-local-loc dup replaces get at
+    height-state get global-loc>local
+    dup replaces get at
     [ ] [ dup local-peek-set get adjoin loc>vreg ] ?if ;
 
 : replace-loc ( vreg loc -- )
-    height-state get translate-local-loc replaces get set-at ;
+    height-state get global-loc>local replaces get set-at ;
 
-: compute-local-kill-set ( basic-block -- set )
-    [ ds-height>> ] [ rs-height>> ] bi height-state get local-kill-set ;
+: kill-locations ( begin inc -- seq )
+    0 min neg iota [ swap - ] with map ;
+
+: local-kill-set ( ds-begin ds-inc rs-begin rs-inc -- set )
+    [ kill-locations ] 2bi@
+    [ [ <ds-loc> ] map ] [ [ <rs-loc> ] map ] bi*
+    append >hash-set ;
+
+: compute-local-kill-set ( height-state -- set )
+    { [ ds-begin>> ] [ ds-inc>> ] [ rs-begin>> ] [ rs-inc>> ] } cleave
+    local-kill-set ;
 
 : begin-local-analysis ( basic-block -- )
-    height-state get dup reset-emits
-    current-height rot record-stack-heights
+    height-state [ clone ] change
+    height-state get [ reset-incs ] keep >>height drop
     HS{ } clone local-peek-set namespaces:set
     H{ } clone replaces namespaces:set ;
 
@@ -81,10 +79,10 @@ SYMBOLS: local-peek-set replaces ;
     [ [ loc>vreg ] dip = ] assoc-reject ;
 
 : end-local-analysis ( basic-block -- )
-    [
-        replaces get remove-redundant-replaces
-        [ height-state get emit-changes ]
-        [ keys >hash-set swap replace-sets get set-at ] bi
-    ]
-    [ [ local-peek-set get ] dip peek-sets get set-at ]
-    [ [ compute-local-kill-set ] keep kill-sets get set-at ] tri ;
+    replaces get remove-redundant-replaces
+    over kill-block?>> [
+        [ height-state get emit-insns ] keep
+    ] unless
+    keys >hash-set >>replaces
+    local-peek-set get >>peeks
+    height-state get compute-local-kill-set >>kills drop ;

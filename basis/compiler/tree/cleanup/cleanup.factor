@@ -51,7 +51,7 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
 : record-folding ( #call -- )
     dup word>> predicate?
     [ record-predicate-folding ]
-    [ word>> add-depends-on-definition ]
+    [ word>> +definition+ depends-on ]
     if ;
 
 : cleanup-folding ( #call -- nodes )
@@ -68,7 +68,7 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
 : record-inlining ( #call -- )
     dup method>>
     [ add-method-dependency ]
-    [ word>> add-depends-on-definition ] if ;
+    [ word>> +definition+ depends-on ] if ;
 
 : cleanup-inlining ( #call -- nodes )
     [ record-inlining ] [ body>> cleanup-tree ] bi ;

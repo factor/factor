@@ -3,9 +3,10 @@ compiler.cfg.stacks compiler.cfg.stacks.local compiler.test kernel literals
 namespaces tools.test ;
 IN: compiler.cfg.stacks.tests
 
+! store-vregs
 {
     H{ { D: 1 4 } { D: 2 3 } { D: 0 5 } }
-    { { 0 0 } { 0 0 } }
+    T{ height-state f 0 0 0 0 }
 } [
     { 3 4 5 } ds-loc store-vregs
     replaces get
@@ -28,7 +29,7 @@ IN: compiler.cfg.stacks.tests
 {
     1
     2
-    { { -2 -2 } { 0 0 } }
+    T{ height-state f 0 0 -2 0 }
 } [
     2inputs height-state get
 ] cfg-unit-test

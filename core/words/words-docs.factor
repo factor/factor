@@ -148,6 +148,17 @@ $nl
       { $snippet "\"specializer\"" }
       { $link "hints" }
   }
+  {
+      {
+          { $snippet "\"dependencies\"" } ", "
+
+      }
+      { "Used by the optimizing compiler when forgetting words for fast dependency lookup. See " { $link "compilation-units"  } "." }
+  }
+  {
+      { $snippet "\"generic-call-sites\"" }
+      { "Set on some generic words." }
+  }
 }
 "Properties which are defined for classes only:"
 { $table

@@ -11,6 +11,11 @@ ARTICLE: "io.launcher.detached" "Running processes in the background"
 "By default, " { $link run-process } " waits for the process to complete. To run a process without waiting for it to finish, set the " { $snippet "detached" } " slot of a " { $link process } ", or use the following word:"
 { $subsections run-detached } ;
 
+ARTICLE: "io.launcher.hidden" "Running hidden processes"
+"By default, child processes can create and display their own (console and other) windows. To signal to a process that it should stay hidden, set the " { $slot "hidden" } " slot of the " { $link process } " before running it. The processes are free to ignore this signal."
+$nl
+"The " { $link <process-stream> } " and " { $link with-process-stream } " words set this flag. On Windows this helps to run console applications without flashing their windows in the foreground." ;
+
 ARTICLE: "io.launcher.environment" "Setting environment variables"
 "The " { $snippet "environment" } " slot of a " { $link process } " contains an association mapping environment variable names to values. The interpretation of environment variables is operating system-specific."
 $nl
@@ -193,7 +198,9 @@ HELP: <process-stream>
   { "desc" "a launch descriptor" }
   { "encoding" "an encoding descriptor" }
   { "stream" "a bidirectional stream" } }
-{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream with the given encoding." } ;
+{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream with the given encoding." }
+{ $notes "The process is started with the " { $slot "hidden" } " slot set to " { $link t } "." }
+{ $see-also "io.launcher.hidden" } ;
 
 HELP: <process-reader>
 { $values
@@ -216,7 +223,9 @@ HELP: with-process-stream
   { "encoding" "an encoding descriptor" }
   { "quot" quotation }
 }
-{ $description "Launches a process and redirects its input and output via a pair of pipes. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to these pipes." } ;
+{ $description "Launches a process and redirects its input and output via a pair of pipes. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to these pipes." }
+{ $notes "The process is started with the " { $slot "hidden" } " slot set to " { $link t } "." }
+{ $see-also "io.launcher.hidden" } ;
 
 HELP: with-process-reader
 { $values
@@ -338,6 +347,7 @@ ARTICLE: "io.launcher" "Operating system processes"
     "io.launcher.lifecycle"
     "io.launcher.command"
     "io.launcher.detached"
+    "io.launcher.hidden"
     "io.launcher.environment"
     "io.launcher.redirection"
     "io.launcher.priority"

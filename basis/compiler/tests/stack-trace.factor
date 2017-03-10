@@ -11,10 +11,10 @@ IN: compiler.tests.stack-trace
 : bar ( -- * ) foo 4 ;
 : baz ( -- * ) bar 5 ;
 [ baz ] [ 3 = ] must-fail-with
-[ t ] [
-    symbolic-stack-trace
-    2 head*
-    { baz bar foo } tail?
+{
+    { foo bar baz }
+} [
+    2 5 symbolic-stack-trace subseq
 ] unit-test
 
 : bleh ( seq -- seq' ) [ 3 + ] map [ 0 > ] filter ;

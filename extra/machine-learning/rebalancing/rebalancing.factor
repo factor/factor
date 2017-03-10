@@ -28,9 +28,12 @@ MEMO: probabilities-seq ( seq -- seq' )
 : equal-stratified-sample ( stratified-sequences -- elt )
     random random ; inline
 
+: collect-indices ( seq -- indices )
+    H{ } clone [ '[ swap _ push-at ] each-index ] keep ;
+
 : balance-labels ( X y n -- X' y' )
     [
-        dup [ ] collect-index-by
+        dup collect-indices
         values '[
             _ _ _ equal-stratified-sample
             '[ _ swap nth ] bi@ 2array
@@ -39,7 +42,7 @@ MEMO: probabilities-seq ( seq -- seq' )
 
 : skew-labels ( X y probs n -- X' y' )
     [
-        [ dup [ ] collect-index-by sort-keys values ] dip
+        [ dup collect-indices sort-keys values ] dip
         '[
             _ _ _ _ stratified-sample
             '[ _ swap nth ] bi@ 2array

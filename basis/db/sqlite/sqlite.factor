@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple combinators db db.private
-db.queries db.sqlite.errors db.sqlite.ffi db.sqlite.lib
-db.tuples db.tuples.private db.types destructors interpolate
-kernel locals math math.parser namespaces nmake random sequences
-sequences.deep ;
+USING: accessors classes.tuple combinators db db.private db.queries
+db.sqlite.errors db.sqlite.ffi db.sqlite.lib db.tuples
+db.tuples.private db.types destructors interpolate kernel locals math
+math.parser namespaces nmake random sequences sequences.deep ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -200,7 +199,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         CREATE TRIGGER fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'insert on table \"${table-name}\" violates foreign key constraint \"fki_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
+            SELECT RAISE(ROLLBACK, 'insert on table \"${table-name}\" violates foreign key constraint \"fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
             WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     " interpolate>string ;
@@ -210,7 +209,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         CREATE TRIGGER fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'insert on table \"${table-name}\" violates foreign key constraint \"fki_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
+            SELECT RAISE(ROLLBACK, 'insert on table \"${table-name}\" violates foreign key constraint \"fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
             WHERE NEW.${table-id} IS NOT NULL
                 AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
@@ -221,7 +220,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         CREATE TRIGGER fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'update on table \"${table-name}\" violates foreign key constraint \"fku_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
+            SELECT RAISE(ROLLBACK, 'update on table \"${table-name}\" violates foreign key constraint \"fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
             WHERE (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     " interpolate>string ;
@@ -231,7 +230,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         CREATE TRIGGER fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'update on table \"${table-name}\" violates foreign key constraint \"fku_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
+            SELECT RAISE(ROLLBACK, 'update on table \"${table-name}\" violates foreign key constraint \"fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
             WHERE NEW.${table-id} IS NOT NULL
                 AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
@@ -242,8 +241,8 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         CREATE TRIGGER fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'delete on table \"${foreign-table-name}\" violates foreign key constraint \"fkd_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
-            WHERE (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
+            SELECT RAISE(ROLLBACK, 'delete on table \"${foreign-table-name}\" violates foreign key constraint \"fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id\"')
+            WHERE (SELECT ${table-id} FROM ${table-name} WHERE ${table-id} = OLD.${foreign-table-id}) IS NOT NULL;
         END;
     " interpolate>string ;
 

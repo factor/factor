@@ -1,18 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple compiler.cfg
-compiler.cfg.builder compiler.cfg.def-use
-compiler.cfg.finalization compiler.cfg.gc-checks
+compiler.cfg.builder compiler.cfg.finalization compiler.cfg.gc-checks
 compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.optimizer compiler.cfg.registers
-compiler.cfg.representations
-compiler.cfg.representations.preferred compiler.cfg.rpo
-compiler.cfg.save-contexts
-compiler.cfg.utilities compiler.tree.builder
-compiler.tree.optimizer compiler.units fry hashtables io kernel math
-namespaces prettyprint prettyprint.backend prettyprint.custom
-prettyprint.sections quotations random sequences vectors words strings ;
-FROM: compiler.cfg.linearization => number-blocks ;
+compiler.cfg.representations compiler.cfg.save-contexts
+compiler.cfg.utilities compiler.tree.builder compiler.tree.optimizer
+formatting fry io kernel math namespaces prettyprint quotations
+sequences strings words ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-builder ( quot -- cfgs )
@@ -52,30 +47,42 @@ M: ##phi insn.
 
 ! XXX: pprint on a string prints the double quotes.
 ! This will cause graphviz to choke, so print without quotes.
-M: insn insn. tuple>array but-last [
-        bl
-    ] [
-        dup string? [ print ] [ pprint ] if
-    ] interleave nl ;
+: insn-number. ( n -- )
+    dup integer? [ "%4d " printf ] [ drop "     " printf ] if ;
 
-: block. ( bb -- )
-    "=== Basic block #" write dup number>> . nl
-    dup instructions>> [ insn. ] each nl
+M: insn insn. ( insn -- )
+    tuple>array unclip-last insn-number. [
+        dup string? [ ] [ unparse ] if
+    ] map " " join write nl ;
+
+: block-header. ( bb -- )
+    [ number>> ] [ kill-block?>> "(k)" "" ? ] bi
+    "=== Basic block #%d %s\n\n" printf ;
+
+: instructions. ( bb -- )
+    instructions>> [ insn. ] each nl ;
+
+: successors. ( bb -- )
     successors>> [
-        "Successors: " write
-        [ number>> unparse ] map ", " join print nl
+        [ number>> unparse ] map ", " join
+        "Successors: %s\n\n" printf
     ] unless-empty ;
 
+: block. ( bb -- )
+    [ block-header. ] [ instructions. ] [ successors. ] tri ;
+
+: cfg-header. ( cfg -- )
+    [ word>> ] [ label>> ] bi "=== word: %u, label: %u\n\n" printf ;
+
+: blocks. ( cfg -- )
+    linearization-order [ block. ] each ;
+
+: stack-frame. ( cfg -- )
+    stack-frame>> "=== stack frame: %u\n" printf ;
+
 : cfg. ( cfg -- )
-    [
-        dup linearization-order number-blocks
-        "=== word: " write
-        dup word>> pprint
-        ", label: " write
-        dup label>> pprint nl nl
-        dup linearization-order [ block. ] each
-        "=== stack frame: " write
-        stack-frame>> .
+    dup linearization-order number-blocks [
+        [ cfg-header. ] [ blocks. ] [ stack-frame. ] tri
     ] with-scope ;
 
 : cfgs. ( cfgs -- )
@@ -84,45 +91,3 @@ M: insn insn. tuple>array but-last [
 : ssa. ( quot/word -- ) test-ssa cfgs. ;
 : flat. ( quot/word -- ) test-flat cfgs. ;
 : regs. ( quot/word -- ) test-regs cfgs. ;
-
-! Prettyprinting
-: pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
-
-M: ds-loc pprint* \ D: pprint-loc ;
-
-M: rs-loc pprint* \ R: pprint-loc ;
-
-: resolve-phis ( bb -- )
-    [
-        [ [ [ get ] dip ] assoc-map ] change-inputs drop
-    ] each-phi ;
-
-: test-bb ( insns n -- )
-    [ insns>block dup ] keep set resolve-phis ;
-
-: edge ( from to -- )
-    [ get ] bi@ 1vector >>successors drop ;
-
-: edges ( from tos -- )
-    [ get ] [ [ get ] V{ } map-as ] bi* >>successors drop ;
-
-: test-diamond ( -- )
-    0 1 edge
-    1 { 2 3 } edges
-    2 4 edge
-    3 4 edge ;
-
-: fake-representations ( cfg -- )
-    post-order [
-        instructions>> [
-            [ [ temp-vregs ] [ temp-vreg-reps ] bi zip ]
-            [ [ defs-vregs ] [ defs-vreg-reps ] bi zip ]
-            bi append
-        ] map concat
-    ] map concat >hashtable representations set ;
-
-: count-insns ( quot insn-check -- ? )
-    [ test-regs [ cfg>insns ] map concat ] dip count ; inline
-
-: contains-insn? ( quot insn-check -- ? )
-    count-insns 0 > ; inline

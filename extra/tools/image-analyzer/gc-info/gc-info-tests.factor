@@ -1,11 +1,10 @@
 USING: accessors alien.c-types alien.syntax arrays assocs bit-arrays
-classes.struct combinators combinators.short-circuit compiler compiler.cfg
-compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.stack-frame compiler.codegen.gc-maps compiler.units fry generic
-grouping io io.encodings.binary io.streams.byte-array kernel math namespaces
-random sequences sequences.generalizations
-tools.image-analyzer.gc-info tools.image-analyzer.utils tools.test vm
-vocabs words ;
+classes.struct combinators.short-circuit compiler compiler.cfg
+compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.linearization compiler.codegen.gc-maps compiler.units fry
+generic grouping io io.encodings.binary io.streams.byte-array kernel
+math namespaces random sequences system tools.image-analyzer.gc-info
+tools.image-analyzer.utils tools.test vm vocabs words ;
 IN: tools.image-analyzer.gc-info.tests
 QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
@@ -26,13 +25,11 @@ QUALIFIED: opencl
     [ gc-map-needed? ] filter ;
 
 : tally-gc-maps ( gc-maps -- seq/f )
-    [ f ] [ {
-        [ [ scrub-d>> length ] map supremum ]
-        [ [ scrub-r>> length ] map supremum ]
+    [ f ] [
         [ [ gc-root-offsets ] map largest-spill-slot ]
         [ [ derived-root-offsets ] map [ keys ] map largest-spill-slot ]
-        [ length ]
-    } cleave 5 narray ] if-empty ;
+        [ length ] tri 3array
+    ] if-empty ;
 
 ! Like word>gc-info but uses the compiler
 : word>gc-info-expected ( word -- seq/f )
@@ -73,6 +70,23 @@ QUALIFIED: opencl
     \ effects:<effect> word>gc-maps empty?
 ] unit-test
 
+cpu x86.64? [
+    os windows? [
+        ! The difference is because Windows stack references are
+        ! longer because of the home space.
+        {
+            { 156 { ?{ f f f f f t t t t } { } } }
+        }
+    ] [
+        {
+            { 155 { ?{ f t t t t } { } } }
+        }
+    ] if
+    [
+        \ effects:<effect> word>gc-maps first
+    ] unit-test
+] when
+
 { f } [
     \ + word>gc-maps empty?
 ] unit-test
@@ -86,7 +100,6 @@ QUALIFIED: opencl
     all-words [ normal? ] filter 50 sample
     [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
 ] unit-test
-
 
 ! Originally from llvm.types, but llvm moved to unmaintained
 TYPEDEF: void* LLVMTypeRef
@@ -102,10 +115,9 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 
 ! base-pointer-groups
 { t } [
-    \ resolve-types
+\ resolve-types
     [ base-pointer-groups-expected ] [ base-pointer-groups-decoded ] bi =
 ] unit-test
-
 
 ! Tough words #1227
 { t } [
@@ -147,3 +159,7 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 { t } [
     \ opencl:cl-queue-kernel deterministic-gc-info?
 ] unit-test
+
+
+
+! TODO: try on 32 bit \ feedback-format:

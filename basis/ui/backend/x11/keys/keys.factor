@@ -1,13 +1,15 @@
 ! Copyright (C) 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel literals ui.gestures x11.keysymdef ;
+USING: accessors assocs kernel literals ui.gestures x11.X
+x11.keysymdef ;
 IN: ui.backend.x11.keys
 
 CONSTANT: modifiers
     {
-        { S+ 0x1 }
-        { C+ 0x4 }
-        { A+ 0x8 }
+        ${ S+ ShiftMask }
+        ${ C+ ControlMask }
+        ${ A+ Mod1Mask }
+        ${ M+ Mod4Mask }
     }
 
 CONSTANT: codes
@@ -40,7 +42,7 @@ CONSTANT: codes
         { $ XK_F9 "F9" }
         { $ XK_F10 "F10" }
         { $ XK_F11 "F11" }
-        { $ XK_F11 "F12" }
+        { $ XK_F12 "F12" }
 
         { $ XK_Shift_L f }
         { $ XK_Shift_R f }

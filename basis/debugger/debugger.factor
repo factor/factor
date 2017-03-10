@@ -1,16 +1,14 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.strings arrays assocs classes
+USING: accessors alien alien.strings arrays assocs classes
 classes.builtin classes.mixin classes.tuple classes.tuple.parser
-combinators combinators.short-circuit compiler.errors
-compiler.units continuations definitions destructors
-effects.parser fry generic generic.math generic.parser
-generic.single grouping io io.encodings io.styles kernel
-kernel.private lexer libc make math math.order math.parser
-math.ratios namespaces parser prettyprint sequences
-sequences.private slots source-files.errors strings
-strings.parser summary system vocabs vocabs.loader vocabs.parser
-words ;
+combinators combinators.short-circuit compiler.errors compiler.units
+continuations definitions destructors effects.parser fry generic
+generic.math generic.parser generic.single grouping io io.encodings
+io.styles kernel kernel.private lexer libc make math math.order
+math.parser math.ratios namespaces parser prettyprint sequences
+sequences.private slots source-files.errors strings strings.parser
+summary system vocabs vocabs.loader vocabs.parser words ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -136,9 +134,6 @@ HOOK: signal-error. os ( obj -- )
 : memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
 
-: primitive-error. ( error -- )
-    "Unimplemented primitive" print drop ;
-
 : fp-trap-error. ( error -- )
     "Floating point trap" print drop ;
 
@@ -160,7 +155,7 @@ PREDICATE: vm-error < array
     second {
         [ expired-error.           ]
         [ io-error.                ]
-        [ primitive-error.         ]
+        [ drop                     ]
         [ type-check-error.        ]
         [ divide-by-zero-error.    ]
         [ signal-error.            ]
@@ -375,7 +370,7 @@ M: bad-escape error.
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
-M: check-mixin-class-error summary drop "Not a mixin class" ;
+M: not-a-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary
     path>> "Cannot resolve vocab: " prepend ;
@@ -383,5 +378,8 @@ M: not-found-in-roots summary
 M: wrong-values summary drop "Quotation's stack effect does not match call site" ;
 
 M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
+
+M: callsite-not-compiled summary
+    drop "Caller not compiled with the optimizing compiler" ;
 
 { "threads" "debugger" } "debugger.threads" require-when

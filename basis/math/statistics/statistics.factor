@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators generalizations kernel locals math
-math.functions math.order math.vectors math.ranges sequences
-sequences.private sorting fry arrays grouping sets
-splitting.monotonic ;
+USING: arrays assocs combinators fry generalizations grouping
+kernel locals math math.functions math.order math.vectors
+sequences sequences.private sorting ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
@@ -36,7 +35,7 @@ IN: math.statistics
     [ [ log ] map-sum ] [ length ] bi /f e^ ; inline
 
 : harmonic-mean ( seq -- x )
-    [ recip ] map-sum recip ; inline
+    [ [ recip ] map-sum ] [ length swap / ] bi ; inline
 
 : contraharmonic-mean ( seq -- x )
     [ sum-of-squares ] [ sum ] bi / ; inline
@@ -208,36 +207,11 @@ PRIVATE>
 : trimean ( seq -- x )
     quartile first3 [ 2 * ] dip + + 4 / ;
 
-<PRIVATE
-
-: (sequence>assoc) ( seq map-quot insert-quot assoc -- assoc )
-    [ swap curry compose each ] keep ; inline
-
-: (sequence-index>assoc) ( seq map-quot insert-quot assoc -- assoc )
-    [ swap curry compose each-index ] keep ; inline
-
-PRIVATE>
-
-: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- assoc )
-    4 nrot (sequence>assoc) ; inline
-
-: sequence>assoc ( seq map-quot insert-quot exemplar -- assoc )
-    clone (sequence>assoc) ; inline
-
-: sequence-index>assoc ( seq map-quot insert-quot exemplar -- assoc )
-    clone (sequence-index>assoc) ; inline
-
-: sequence-index>hashtable ( seq map-quot insert-quot -- hashtable )
-    H{ } sequence-index>assoc ; inline
-
-: sequence>hashtable ( seq map-quot insert-quot -- hashtable )
-    H{ } sequence>assoc ; inline
-
 : histogram! ( hashtable seq -- hashtable )
-    [ ] [ inc-at ] sequence>assoc! ;
+    over '[ _ inc-at ] each ;
 
 : histogram-by ( seq quot: ( x -- bin ) -- hashtable )
-    [ inc-at ] sequence>hashtable ; inline
+    H{ } clone [ '[ @ _ inc-at ] each ] keep ; inline
 
 : histogram ( seq -- hashtable )
     [ ] histogram-by ;
@@ -248,12 +222,6 @@ PRIVATE>
 : normalized-histogram ( seq -- alist )
     [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
 
-: collect-index-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
-    [ dip swap ] curry [ push-at ] sequence-index>hashtable ; inline
-
-: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
-    [ keep swap ] curry [ push-at ] sequence>hashtable ; inline
-
 : equal-probabilities ( n -- array )
     dup recip <array> ; inline
 
@@ -261,7 +229,7 @@ PRIVATE>
     histogram >alist [ second ] supremum-by first ;
 
 : minmax ( seq -- min max )
-    [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each ;
+    [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] 1 each-from ;
 
 : range ( seq -- x )
     minmax swap - ;
@@ -277,8 +245,7 @@ PRIVATE>
 
 : sample-var ( seq -- x ) 1 var-ddof ; inline
 
-: std-ddof ( seq n -- x )
-    var-ddof sqrt ; inline
+: std-ddof ( seq n -- x ) var-ddof sqrt ; inline
 
 : population-std ( seq -- x ) 0 std-ddof ; inline
 
@@ -353,8 +320,8 @@ PRIVATE>
 : cum-mean ( seq -- seq' )
     0 swap [ [ + dup ] dip 1 + / ] map-index nip ;
 
-: cum-count ( seq quot -- seq' )
-    [ 0 ] dip '[ _ call [ 1 + ] when ] accumulate* ; inline
+: cum-count ( seq quot: ( elt -- ? ) -- seq' )
+    [ 0 ] dip '[ @ [ 1 + ] when ] accumulate* ; inline
 
 : cum-min ( seq -- seq' )
     dup ?first [ min ] accumulate* ;

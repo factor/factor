@@ -8,7 +8,7 @@ GIT_LABEL = git-label-missing
 
 !IF DEFINED(PLATFORM)
 
-LINK_FLAGS = /nologo shell32.lib
+LINK_FLAGS = /nologo shell32.lib user32.lib
 CL_FLAGS = /nologo /O2 /WX /W3 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERSION) /DFACTOR_GIT_LABEL=$(GIT_LABEL)
 CL_FLAGS_VISTA = /D_WIN32_WINNT=0x0600
 
@@ -67,10 +67,8 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\entry_points.obj \
 	vm\errors.obj \
 	vm\factor.obj \
-	vm\free_list.obj \
 	vm\full_collector.obj \
 	vm\gc.obj \
-	vm/gc_info.obj \
 	vm\image.obj \
 	vm\inline_cache.obj \
 	vm\instruction_operands.obj \
@@ -145,8 +143,8 @@ x86-64-vista:
 
 clean:
 	del vm\*.obj
+	if exist vm\factor.res del vm\factor.res
 	if exist factor.lib del factor.lib
-	if exist factor.res del factor.res
 	if exist factor.com del factor.com
 	if exist factor.exe del factor.exe
 	if exist factor.dll del factor.dll

@@ -34,5 +34,5 @@ M: maybe class-name
 M: maybe predicate-def
     class>> predicate-def [ [ t ] if* ] curry ;
 
-M: maybe classes-contained-by
+M: maybe contained-classes
     class>> 1array ;

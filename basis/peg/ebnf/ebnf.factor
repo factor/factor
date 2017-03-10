@@ -86,7 +86,7 @@ C: <ebnf> ebnf
 
 : filter-hidden ( seq -- seq )
     ! Remove elements that produce no AST from sequence
-    [ ebnf-ensure-not? ] reject [ ebnf-ensure? not ] filter ;
+    [ ebnf-ensure-not? ] reject [ ebnf-ensure? ] reject ;
 
 : syntax ( string -- parser )
     ! Parses the string, ignoring white space, and
@@ -114,7 +114,7 @@ C: <ebnf> ebnf
         [
             [ CHAR: \ = ] satisfy
             [ "\"\\" member? ] satisfy 2seq ,
-            [ CHAR: " = not ] satisfy ,
+            [ CHAR: \" = not ] satisfy ,
         ] choice* repeat1 "\"" "\"" surrounded-by ,
         [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
     ] choice* [ "" flatten-as unescape-string ] action ;

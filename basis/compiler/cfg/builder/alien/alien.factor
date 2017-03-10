@@ -51,14 +51,13 @@ IN: compiler.cfg.builder.alien
         (caller-parameters)
     ] with-param-regs ;
 
-: prepare-caller-return ( params -- reg-outputs dead-outputs )
-    return>> [ { } ] [ base-type load-return ] if-void { } ;
+: prepare-caller-return ( params -- reg-outputs )
+    return>> [ { } ] [ base-type load-return ] if-void ;
 
-: caller-stack-frame ( params -- cleanup stack-size )
-    [ stack-params get ] dip [ return>> ] [ abi>> ] bi stack-cleanup
-    stack-params get ;
+: caller-stack-cleanup ( params stack-size -- cleanup )
+    swap [ return>> ] [ abi>> ] bi stack-cleanup ;
 
-: check-dlsym ( symbol library -- )
+: check-dlsym ( symbol library/f -- )
     {
         { [ dup library-dll dll-valid? not ] [
             [ library-dll dll-path ] [ dlerror>> ] bi
@@ -70,7 +69,7 @@ IN: compiler.cfg.builder.alien
         [ 2drop ]
     } cond ;
 
-: caller-linkage ( params -- symbol dll )
+: caller-linkage ( params -- symbol dll/f )
     [ function>> ] [ library>> lookup-library ] bi
     2dup check-dlsym library-dll ;
 
@@ -83,15 +82,22 @@ IN: compiler.cfg.builder.alien
         base-type box-return ds-push
     ] if-void ;
 
+: params>alien-insn-params ( params --
+                             varargs? reg-inputs stack-inputs
+                             reg-outputs dead-outputs
+                             cleanup stack-size )
+    {
+        [ varargs?>> ]
+        [ caller-parameters ]
+        [ prepare-caller-return { } ]
+        [ stack-params get [ caller-stack-cleanup ] keep ]
+    } cleave ;
+
 M: #alien-invoke emit-node ( block node -- block' )
     params>>
     [
-        {
-            [ caller-parameters ]
-            [ prepare-caller-return ]
-            [ caller-stack-frame ]
-            [ caller-linkage ]
-        } cleave
+        [ params>alien-insn-params ]
+        [ caller-linkage ] bi
         <gc-map> ##alien-invoke,
     ]
     [ caller-return ] bi ;
@@ -100,9 +106,7 @@ M: #alien-indirect emit-node ( block node -- block' )
     params>>
     [
         [ ds-pop ^^unbox-any-c-ptr ] dip
-        [ caller-parameters ]
-        [ prepare-caller-return ]
-        [ caller-stack-frame ] tri
+        params>alien-insn-params
         <gc-map> ##alien-indirect,
     ]
     [ caller-return ] bi ;
@@ -110,12 +114,9 @@ M: #alien-indirect emit-node ( block node -- block' )
 M: #alien-assembly emit-node ( block node -- block' )
     params>>
     [
-        {
-            [ caller-parameters ]
-            [ prepare-caller-return ]
-            [ caller-stack-frame ]
-            [ quot>> ]
-        } cleave ##alien-assembly,
+        [ params>alien-insn-params ]
+        [ quot>> ] bi
+        ##alien-assembly,
     ]
     [ caller-return ] bi ;
 

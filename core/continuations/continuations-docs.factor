@@ -179,9 +179,18 @@ HELP: recover
 { $values { "try" { $quotation ( ..a -- ..b ) } } { "recovery" { $quotation ( ..a error -- ..b ) } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
+HELP: ignore-error
+{ $values { "quot" quotation } { "check" quotation } }
+{ $description "Calls the quotation. If an exception is thrown which is matched by the 'check' quotation it is ignored. Otherwise the error is rethrown." } ;
+
+HELP: ignore-error/f
+{ $values { "quot" quotation } { "check" quotation } }
+{ $description "Like " { $link ignore-error } ", but if a matched exception is thrown " { $link f } " is put on the stack." } ;
+
 HELP: ignore-errors
 { $values { "quot" quotation } }
-{ $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
+{ $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." }
+{ $notes "For safer alternatives to this word see " { $link ignore-error } " and " { $link ignore-error/f } "." } ;
 
 HELP: in-callback?
 { $values { "?" boolean } }

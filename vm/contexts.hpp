@@ -1,7 +1,7 @@
 namespace factor {
 
-/* Context object count and identifiers must be kept in sync with:
-     core/kernel/kernel.factor */
+// Context object count and identifiers must be kept in sync with:
+//   core/kernel/kernel.factor
 static const cell context_object_count = 4;
 
 enum context_object {
@@ -11,35 +11,35 @@ enum context_object {
   OBJ_IN_CALLBACK_P,
 };
 
-/* When the callstack fills up (e.g by to deep recursion), a callstack
-   overflow error is triggered. So before continuing executing on it
-   in general_error(), we chop off this many bytes to have some space
-   to work with. Mac OSX 64 bit needs more than 8192. See issue #1419. */
+// When the callstack fills up (e.g by to deep recursion), a callstack
+// overflow error is triggered. So before continuing executing on it
+// in general_error(), we chop off this many bytes to have some space
+// to work with. Mac OSX 64 bit needs more than 8192. See issue #1419.
 static const cell stack_reserved = 16384;
 
 struct context {
 
-  /* First 5 fields accessed directly by compiler. See basis/vm/vm.factor */
+  // First 5 fields accessed directly by compiler. See basis/vm/vm.factor
 
-  /* Factor callstack pointers */
+  // Factor callstack pointers
   cell callstack_top;
   cell callstack_bottom;
 
-  /* current datastack top pointer */
+  // current datastack top pointer
   cell datastack;
 
-  /* current retain stack top pointer */
+  // current retain stack top pointer
   cell retainstack;
 
-  /* C callstack pointer */
+  // C callstack pointer
   cell callstack_save;
 
   segment* datastack_seg;
   segment* retainstack_seg;
   segment* callstack_seg;
 
-  /* context-specific special objects, accessed by context-object and
-     set-context-object primitives */
+  // context-specific special objects, accessed by context-object and
+  // set-context-object primitives
   cell context_objects[context_object_count];
 
   context(cell ds_size, cell rs_size, cell cs_size);

@@ -78,12 +78,11 @@ CONSTANT: default-components
     ! Set dll paths
     os windows? [ "windows" require ] when
 
-    "staging" get "deploy-vocab" get or [
+    "staging" get [
         "stage2: deployment mode" print
     ] [
         "debugger" require
         "listener" require
-        "none" require
     ] if
 
     load-components
@@ -95,20 +94,16 @@ CONSTANT: default-components
     nano-count swap - bootstrap-time set-global
     print-report
 
-    "deploy-vocab" get [
-        "tools.deploy.shaker" run
+    "staging" get [
+        "vocab:bootstrap/finish-staging.factor" run-file
     ] [
-        "staging" get [
-            "vocab:bootstrap/finish-staging.factor" run-file
-        ] [
-            "vocab:bootstrap/finish-bootstrap.factor" run-file
-        ] if
-
-        f error set-global
-        f original-error set-global
-        f error-continuation set-global
-        "output-image" get save-image-and-exit
+        "vocab:bootstrap/finish-bootstrap.factor" run-file
     ] if
+
+    f error set-global
+    f original-error set-global
+    f error-continuation set-global
+    "output-image" get save-image-and-exit
 ] [
     drop
     [

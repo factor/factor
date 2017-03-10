@@ -114,7 +114,7 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
 : eval-ismaster-result ( node result -- )
    [
         [ "ismaster" ] dip at dup string?
-        [ >integer 1 = ] [ ] if >>master? drop
+        [ >integer 1 = ] when >>master? drop
    ] [
         [ "remote" ] dip at
         [ split-host-str <inet> f <mdb-node> >>remote ] when* drop

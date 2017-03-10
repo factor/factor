@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges project-euler.common sequences sets sorting assocs fry ;
+USING: fry kernel math math.ranges project-euler.common
+sequences sets ;
 IN: project-euler.023
 
 ! http://projecteuler.net/index.php?section=problems&id=23
@@ -42,9 +43,9 @@ IN: project-euler.023
     [1,b] [ abundant? ] filter ;
 
 : possible-sums ( seq -- seq )
-    H{ } clone
-    [ dupd '[ _ [ + _ conjoin ] with each ] each ]
-    keep keys ;
+    HS{ } clone
+    [ dupd '[ _ [ + _ adjoin ] with each ] each ]
+    keep members ;
 
 PRIVATE>
 

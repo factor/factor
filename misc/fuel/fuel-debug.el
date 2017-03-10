@@ -318,8 +318,9 @@ the debugger."
     (beginning-of-line)
     (open-line 2)
     (insert "USING: "))
-  (let ((start (point)))
-    (insert (mapconcat 'substring-no-properties uses " ") " ;")
+  (let ((start (point))
+        (tokens (append uses '(";"))))
+    (insert (mapconcat 'substring-no-properties tokens " "))
     (fill-region start (point) nil)))
 
 (defun fuel-debug-update-usings ()

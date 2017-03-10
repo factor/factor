@@ -110,24 +110,10 @@ CONSTANT: doc-start { 0 0 }
 : with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
-! XXX: This is the old string-lines behavior, it would be nice
-! if we could update documents to work with the new string-lines
-! behavior.
 : split-lines ( str -- seq )
-    dup [ "\r\n" member? ] any? [
-        "\n" split
-        [
-            but-last-slice [
-                "\r" ?tail drop "\r" split
-            ] map! drop
-        ] [
-            [ length 1 - ] keep [ "\r" split ] change-nth
-        ]
-        [ concat ]
-        tri
-    ] [
-        1array
-    ] if ;
+    [ string-lines ] keep ?last
+    [ "\r\n" member? ] [ t ] if*
+    [ "" suffix ] when ;
 
 PRIVATE>
 

@@ -18,11 +18,12 @@ struct growable_array {
   cell count;
   data_root<array> elements;
 
-  /* Allocates memory */
+  // Allocates memory
   growable_array(factor_vm* parent, cell capacity = 10)
       : count(0),
         elements(parent->allot_array(capacity, false_object), parent) {}
 
+  void reallot_array(cell count);
   void add(cell elt);
   void append(array* elts);
   void trim();

@@ -14,7 +14,7 @@ IN: compiler.cfg.linear-scan.allocation.spilling
 : trim-after-ranges ( live-interval -- )
     dup first-use n>> swap [ fix-lower-bound ] change-ranges drop ;
 
-: last-use-rep ( live-interval -- rep/f )
+: last-use-rep ( live-interval -- rep )
     last-use [ def-rep>> ] [ use-rep>> ] bi or ; inline
 
 : assign-spill ( live-interval -- )
@@ -84,7 +84,7 @@ ERROR: bad-live-ranges interval ;
     find-use-positions ;
 
 : spill-status ( new -- use-pos )
-    H{ } <linked-assoc>
+    <linked-hash>
     [ inactive-positions ] [ active-positions ] [ nip ] 2tri
     >alist alist-max ;
 

@@ -18,15 +18,6 @@ template <typename Type> struct data_root : public tagged<Type> {
     push();
   }
 
-  const data_root<Type>& operator=(const Type* x) {
-    tagged<Type>::operator=(x);
-    return *this;
-  }
-  const data_root<Type>& operator=(const cell& x) {
-    tagged<Type>::operator=(x);
-    return *this;
-  }
-
   ~data_root() {
     parent->data_roots.pop_back();
   }

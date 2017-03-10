@@ -1,18 +1,21 @@
-! Copyright (C) 2013 Björn Lindqvist
+! Copyright (C) 2015 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
 !
 ! Tools to follow references in the loaded image.
 USING: accessors arrays byte-arrays fry kernel layouts math
-math.bitwise math.order sequences sets slots.syntax
-tools.image-analyzer.relocations ;
+math.bitwise sequences slots.syntax tools.image-analyzer.relocations
+tools.image-analyzer.utils ;
 IN: tools.image-analyzer.references
 QUALIFIED-WITH: tools.image-analyzer.vm vm
 
 ! Edges in the heap
 GENERIC: pointers ( heap heap-node struct -- seq )
 
+: find-heap-node* ( heap untagged-ptr -- node )
+    '[ address>> _ = ] find nip ;
+
 : find-heap-node ( heap ptr -- node )
-    15 unmask '[ address>> _ = ] find nip ;
+    untag find-heap-node* ;
 
 : load-relocations ( heap code-block -- seq )
     relocation>> find-heap-node payload>> >byte-array byte-array>relocations
@@ -47,4 +50,4 @@ M: object pointers ( heap heap-node struct -- seq )
     3drop { } ;
 
 : collect-pointers ( heap heap-node -- seq )
-    dup object>> pointers [ 1 <= ] reject [ 15 unmask ] map ;
+    dup object>> pointers [ 1 <= ] reject [ untag ] map ;

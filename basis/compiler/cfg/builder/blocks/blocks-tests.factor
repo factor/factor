@@ -1,6 +1,6 @@
 USING: accessors compiler.cfg compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.stacks.local
-compiler.cfg.utilities compiler.test kernel namespaces sequences
+compiler.cfg.utilities compiler.test kernel make namespaces sequences
 tools.test ;
 IN: compiler.cfg.builder.blocks.tests
 
@@ -17,6 +17,15 @@ IN: compiler.cfg.builder.blocks.tests
 
 { f } [
     <basic-block> dup begin-branch eq?
+] cfg-unit-test
+
+! emit-call-block
+{
+    V{ T{ ##call { word 2drop } } }
+    T{ height-state f 0 0 -2 0 }
+} [
+    \ 2drop -2 <basic-block> [ emit-call-block ] V{ } make
+    height-state get
 ] cfg-unit-test
 
 ! emit-trivial-block

@@ -43,10 +43,8 @@ ifdef CONFIG
 		vm/entry_points.o \
 		vm/errors.o \
 		vm/factor.o \
-		vm/free_list.o \
 		vm/full_collector.o \
 		vm/gc.o \
-		vm/gc_info.o \
 		vm/image.o \
 		vm/inline_cache.o \
 		vm/instruction_operands.o \
@@ -104,7 +102,6 @@ ifdef CONFIG
 		vm/image.hpp \
 		vm/callbacks.hpp \
 		vm/dispatch.hpp \
-		vm/safepoints.hpp \
 		vm/vm.hpp \
 		vm/allot.hpp \
 		vm/tagged.hpp \
@@ -113,7 +110,6 @@ ifdef CONFIG
 		vm/generic_arrays.hpp \
 		vm/callstack.hpp \
 		vm/slot_visitor.hpp \
-		vm/collector.hpp \
 		vm/to_tenured_collector.hpp \
 		vm/arrays.hpp \
 		vm/math.hpp \
@@ -220,7 +216,7 @@ vm/resources.o:
 	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs vm/resources.o
 
 vm/ffi_test.o: vm/ffi_test.c
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<

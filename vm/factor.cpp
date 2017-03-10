@@ -4,8 +4,8 @@ namespace factor {
 
 void init_globals() { init_mvm(); }
 
-/* Compile code in boot image so that we can execute the startup quotation */
-/* Allocates memory */
+// Compile code in boot image so that we can execute the startup quotation
+// Allocates memory
 void factor_vm::prepare_boot_image() {
   std::cout << "*** Stage 2 early init... " << std::flush;
 
@@ -38,22 +38,22 @@ void factor_vm::prepare_boot_image() {
 }
 
 void factor_vm::init_factor(vm_parameters* p) {
-  /* Kilobytes */
+  // Kilobytes
   p->datastack_size = align_page(p->datastack_size << 10);
   p->retainstack_size = align_page(p->retainstack_size << 10);
   p->callstack_size = align_page(p->callstack_size << 10);
   p->callback_size = align_page(p->callback_size << 10);
 
-  /* Megabytes */
+  // Megabytes
   p->young_size <<= 20;
   p->aging_size <<= 20;
   p->tenured_size <<= 20;
   p->code_size <<= 20;
 
-  /* Disable GC during init as a sanity check */
+  // Disable GC during init as a sanity check
   gc_off = true;
 
-  /* OS-specific initialization */
+  // OS-specific initialization
   early_init();
 
   p->executable_path = vm_executable_path();
@@ -68,16 +68,25 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   srand((unsigned int)nano_count());
   init_ffi();
-  init_contexts(p->datastack_size, p->retainstack_size, p->callstack_size);
+
+  datastack_size = p->datastack_size;
+  retainstack_size = p->retainstack_size;
+  callstack_size = p->callstack_size;
+
+  ctx = NULL;
+  spare_ctx = new_context();
+
   callbacks = new callback_heap(p->callback_size, this);
   load_image(p);
-  init_c_io();
-  init_inline_caching((int)p->max_pic_size);
+  max_pic_size = (int)p->max_pic_size;
   special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
   special_objects[OBJ_ARGS] = false_object;
   special_objects[OBJ_EMBEDDED] = false_object;
 
   cell aliens[][2] = {
+    {OBJ_STDIN,           (cell)stdin},
+    {OBJ_STDOUT,          (cell)stdout},
+    {OBJ_STDERR,          (cell)stderr},
     {OBJ_CPU,             (cell)FACTOR_CPU_STRING},
     {OBJ_EXECUTABLE,      (cell)safe_strdup(p->executable_path)},
     {OBJ_IMAGE,           (cell)safe_strdup(p->image_path)},
@@ -96,7 +105,7 @@ void factor_vm::init_factor(vm_parameters* p) {
     special_objects[idx] = allot_alien(false_object, aliens[n][1]);
   }
 
-  /* We can GC now */
+  // We can GC now
   gc_off = false;
 
   if (!to_boolean(special_objects[OBJ_STAGE2]))
@@ -110,7 +119,7 @@ void factor_vm::init_factor(vm_parameters* p) {
 
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::pass_args_to_factor(int argc, vm_char** argv) {
   growable_array args(this);
 

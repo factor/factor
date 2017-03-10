@@ -44,8 +44,6 @@ CONSTANT: ds-reg         14
 CONSTANT: rs-reg         15
 CONSTANT: vm-reg         16
 
-enable-float-intrinsics
-
 M: ppc machine-registers ( -- assoc )
     {
         { int-regs $[ 3 12 [a,b] 17 29 [a,b] append ] }
@@ -355,9 +353,6 @@ M: ppc return-regs ( -- regs )
 M: ppc return-struct-in-registers? ( c-type -- ? )
     lookup-c-type return-in-registers?>> ;
 
-! If t, floats are never passed in param regs
-M: ppc float-on-stack? ( -- ? ) f ;
-
 ! If t, the struct return pointer is never passed in a param reg
 M: ppc struct-return-on-stack? ( -- ? ) f ;
 
@@ -453,7 +448,10 @@ M:: ppc %c-invoke ( name dll gc-map -- )
     } case
     rep scratch-reg-class rep vreg %spill ;
 
-:: emit-alien-insn ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
+:: emit-alien-insn ( varargs? reg-inputs stack-inputs
+                     reg-outputs dead-outputs
+                     cleanup stack-size
+                     quot -- )
     stack-inputs [ first3 store-stack-param ] each
     reg-inputs [ first3 store-reg-param ] each
     quot call
@@ -461,14 +459,17 @@ M:: ppc %c-invoke ( name dll gc-map -- )
     dead-outputs [ first2 discard-reg-param ] each
     ; inline
 
-M: ppc %alien-invoke ( reg-inputs stack-inputs reg-outputs
-                       dead-outputs cleanup stack-size
+M: ppc %alien-invoke ( varargs? reg-inputs stack-inputs
+                       reg-outputs dead-outputs
+                       cleanup stack-size
                        symbols dll gc-map -- )
     '[ _ _ _ %c-invoke ] emit-alien-insn ;
 
-M:: ppc %alien-indirect ( src reg-inputs stack-inputs
-                          reg-outputs dead-outputs cleanup
-                          stack-size gc-map -- )
+M:: ppc %alien-indirect ( src
+                          varargs? reg-inputs stack-inputs
+                          reg-outputs dead-outputs
+                          cleanup stack-size
+                          gc-map -- )
     reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
         has-toc [
             11 src load-param
@@ -482,9 +483,10 @@ M:: ppc %alien-indirect ( src reg-inputs stack-inputs
         gc-map gc-map-here
     ] emit-alien-insn ;
 
-M: ppc %alien-assembly ( reg-inputs stack-inputs reg-outputs
-                         dead-outputs cleanup stack-size quot
-                         -- )
+M: ppc %alien-assembly ( varargs? reg-inputs stack-inputs
+                         reg-outputs dead-outputs
+                         cleanup stack-size
+                         quot -- )
     '[ _ call( -- ) ] emit-alien-insn ;
 
 M: ppc %callback-inputs ( reg-outputs stack-outputs -- )
@@ -1054,6 +1056,9 @@ M: ppc %reload ( dst rep src -- )
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 M: ppc immediate-bitwise?    ( n -- ? ) 0 65535 between? ;
 M: ppc immediate-store?      ( n -- ? ) immediate-comparand? ;
+
+M: ppc enable-cpu-features ( -- )
+    enable-float-intrinsics ;
 
 USE: vocabs
 {

@@ -44,7 +44,7 @@ DEFER: (read-json-string)
 : (read-json-escape) ( stream accum -- accum )
     { sbuf } declare
     over stream-read1 {
-        { CHAR: " [ CHAR: " ] }
+        { CHAR: \" [ CHAR: \" ] }
         { CHAR: \\ [ CHAR: \\ ] }
         { CHAR: / [ CHAR: / ] }
         { CHAR: b [ CHAR: \b ] }

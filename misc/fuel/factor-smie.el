@@ -16,17 +16,20 @@
   :safe 'integerp
   :group 'factor)
 
+;; These prefixes starts a definition and causes the indent-level to
+;; increase.
 (defconst factor-indent-def-starts
   '("" ":"
     "AFTER" "BEFORE"
     "COM-INTERFACE" "CONSULT"
     "ENUM" "ERROR"
-    "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
-    "INTERSECTION:"
+    "FROM"
+    "IDENTITY-MEMO"
+    "INTERSECTION"
     "M" "M:" "MACRO" "MACRO:"
     "MAIN-WINDOW" "MEMO" "MEMO:" "METHOD"
     "SYNTAX"
-    "PREDICATE" "PRIMITIVE" "PROTOCOL"
+    "PREDICATE" "PROTOCOL"
     "SINGLETONS"
     "STRUCT" "SYMBOLS" "TAG" "TUPLE"
     "TYPED" "TYPED:"
@@ -34,8 +37,14 @@
     "UNION-STRUCT" "UNION"
     "VARIANT" "VERTEX-FORMAT"))
 
+;; These prefixes starts a definition but does not cause the indent
+;; level to increase.
 (defconst factor-no-indent-def-starts
-  '("ARTICLE" "HELP" "SPECIALIZED-ARRAYS"))
+  '("ARTICLE"
+    "FUNCTION" "FUNCTION-ALIAS"
+    "HELP"
+    "PRIMITIVE"
+    "SPECIALIZED-ARRAYS"))
 
 (defconst factor-indent-def-regex
   (format "^\\(%s:\\)$" (regexp-opt factor-indent-def-starts)))
@@ -55,14 +64,14 @@
 
 (defun factor-smie-token (dir)
   (pcase dir
-    ('forward (forward-comment (point-max)))
-    ('backward (forward-comment (- (point)))))
+    (`forward (forward-comment (point-max)))
+    (`backward (forward-comment (- (point)))))
   (let ((tok (buffer-substring-no-properties
               (point)
               (let ((syntax "w_\\\""))
                 (pcase dir
-                  ('forward (skip-syntax-forward syntax))
-                  ('backward (skip-syntax-backward syntax)))
+                  (`forward (skip-syntax-forward syntax))
+                  (`backward (skip-syntax-backward syntax)))
                 (point)))))
     ;; Token normalization. This way we only need one rule in
     ;; factor-smie-grammar.

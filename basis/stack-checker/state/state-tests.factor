@@ -7,7 +7,8 @@ IN: stack-checker.state.tests
     V{ 1 2 3 }
 } [
     0 \ <value> set-global
-    init-inference init-known-values
+    init-inference
+    H{ } clone known-values set
     V{ 1 2 3 } literals set commit-literals
     (meta-d) get
 ] unit-test

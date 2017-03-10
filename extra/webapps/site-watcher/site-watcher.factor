@@ -40,7 +40,7 @@ IN: webapps.site-watcher
     <protected>
         "update notification details" >>description ;
 
-: <site-watcher-app> ( -- dispatcher )
+: <site-watcher> ( -- dispatcher )
     site-watcher-app new-dispatcher
         <main-action> "" add-responder
         <watch-list-action> "watch-list" add-responder
@@ -63,11 +63,12 @@ IN: webapps.site-watcher
 : site-watcher-db ( -- db )
     "test.db" <temp-sqlite-db> ;
 
-<site-watcher-app>
-<login-config>
-<boilerplate> { site-watcher-app "site-watcher" } >>template
-site-watcher-db <alloy>
-main-responder set-global
+: <site-watcher-app> ( -- dispatcher )
+    <site-watcher>
+    <login-config>
+    <boilerplate>
+        { site-watcher-app "site-watcher" } >>template
+    site-watcher-db <alloy> ;
 
 M: site-watcher-app init-user-profile
     drop "username" value "email" value <account> insert-tuple ;
@@ -81,4 +82,5 @@ M: site-watcher-app init-user-profile
 : start-site-watcher ( -- )
     init-db
     site-watcher-db run-site-watcher
+    <site-watcher-app> main-responder set-global
     run-test-httpd ;

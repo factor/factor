@@ -6,7 +6,7 @@ sequences system tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor assocs hashtables prettyprint
 io.backend.unix cocoa io.encodings.utf8 io.backend
 cocoa.application cocoa.classes cocoa.plists
-combinators vocabs.metadata vocabs.loader ;
+combinators vocabs.metadata vocabs.loader webbrowser ;
 QUALIFIED-WITH: tools.deploy.unix unix
 IN: tools.deploy.macosx
 
@@ -70,30 +70,18 @@ IN: tools.deploy.macosx
 : bundle-name ( -- string )
     deploy-name get ".app" append ;
 
-: show-in-finder ( path -- )
-    [ NSWorkspace -> sharedWorkspace ]
-    [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
-    -> selectFile:inFileViewerRootedAtPath: drop ;
-
-: ?show-in-finder ( path -- )
-    open-directory-after-deploy? get [ show-in-finder ] [ drop ] if ;
-
 : deploy.app-image-name ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
 : deploy-app-bundle ( vocab -- )
-    deploy-directory get [
-        dup deploy-config [
-            bundle-name dup exists? [ delete-tree ] [ drop ] if
-            [ bundle-name create-app-dir ] keep
-            [ bundle-name deploy.app-image-name ] keep
-            namespace make-deploy-image
-            bundle-name
-            [ "Contents/Resources" copy-resources ]
-            [ "Contents/Frameworks" copy-libraries ] 2bi
-            bundle-name ?show-in-finder
-        ] with-variables
-    ] with-directory ;
+    bundle-name dup exists? [ delete-tree ] [ drop ] if
+    [ bundle-name create-app-dir ] keep
+    [ bundle-name deploy.app-image-name ] keep
+    namespace make-deploy-image
+    bundle-name
+    [ "Contents/Resources" copy-resources ]
+    [ "Contents/Frameworks" copy-libraries ] 2bi
+    bundle-name maybe-open-deploy-directory ;
 
 : deploy-app-bundle? ( vocab -- ? )
     deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;

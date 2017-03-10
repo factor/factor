@@ -47,7 +47,9 @@ M: interactor manifest>>
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
 M: vocab-completion (word-at-caret)
-    drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
+    drop
+    [ dup vocab-exists? [ >vocab-link ] [ drop f ] if ]
+    [ 2drop f ] recover ;
 
 M: word-completion (word-at-caret)
     manifest>> [
@@ -283,9 +285,10 @@ M: string listener-input
     [ set-editor-string ] [ request-focus ] bi ;
 
 : call-listener ( quot command -- )
-    get-ready-listener
-    '[ _ _ _ dup wait-for-listener (call-listener) ]
-    "Listener call" spawn drop ;
+    get-ready-listener '[
+        _ _ _ dup wait-for-listener
+        [ (call-listener) ] with-ctrl-break
+    ] "Listener call" spawn drop ;
 
 M: listener-command invoke-command ( target command -- )
     [ command-quot ] [ nip ] 2bi call-listener ;

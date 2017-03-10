@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: furnace furnace.actions furnace.redirection
-http.server.dispatchers html.forms validators urls accessors
-math kernel io.directories fry ;
+USING: accessors furnace.actions furnace.alloy
+furnace.redirection html.forms http.server
+http.server.dispatchers kernel math namespaces urls validators
+webapps.utils ;
 IN: webapps.calculator
 
 TUPLE: calculator < dispatcher ;
@@ -22,7 +23,7 @@ TUPLE: calculator < dispatcher ;
             { "y" [ v-number ] }
         } validate-params
 
-        URL" $calculator" "x" value "y" value + "z" set-query-param
+        URL" $calculator" clone "x" value "y" value + "z" set-query-param
         <redirect>
     ] >>submit ;
 
@@ -31,19 +32,14 @@ TUPLE: calculator < dispatcher ;
         <calculator-action> >>default ;
 
 ! Deployment example
-USING: db.sqlite furnace.alloy namespaces http.server ;
+: calculator-db ( -- db ) "calculator.db" <temp-sqlite-db> ;
 
-: calculator-db ( -- db ) "calculator.db" <sqlite-db> ;
+: <calculator-app> ( -- dispatcher )
+    <calculator> calculator-db <alloy> ;
 
-: run-calculator ( port -- )
-    '[
-        <calculator>
-            calculator-db <alloy>
-            main-responder set-global
-        _ httpd drop
-    ] with-resource-directory ;
+! Calculator runs at port 8081 and 8431
+: run-calculator ( -- )
+    <calculator-app> main-responder set-global
+    run-test-httpd ;
 
-: run-calculator-main ( -- )
-    8080 run-calculator ;
-
-MAIN: run-calculator-main
+MAIN: run-calculator

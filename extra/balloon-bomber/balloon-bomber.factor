@@ -21,7 +21,7 @@ CONSTANT: rom-info {
 
 : run-balloon ( -- )
     [
-        "Ballon Bomber" <balloon-bomber> rom-info run-rom
+        "Balloon Bomber" <balloon-bomber> rom-info run-rom
     ] with-ui ;
 
 MAIN: run-balloon

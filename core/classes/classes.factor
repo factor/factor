@@ -121,6 +121,15 @@ M: predicate reset-word
     ! Output f for non-classes to work with algebra code
     dup class? [ "participants" word-prop ] [ drop f ] if ;
 
+GENERIC: contained-classes ( obj -- members )
+
+M: object contained-classes
+    "members" word-prop ;
+
+: all-contained-classes ( members -- members' )
+    dup dup [ contained-classes ] map concat sift append
+    2dup set= [ drop members ] [ nip all-contained-classes ] if ;
+
 GENERIC: implementors ( class/classes -- seq )
 
 ! update-map

@@ -16,11 +16,6 @@ SYMBOLS: return-addresses gc-maps ;
         compiled-offset return-addresses get push
     ] [ drop ] if ;
 
-: emit-scrub ( seqs -- n )
-    ! seqs is a sequence of sequences of 0/1
-    dup longest length
-    [ '[ [ 0 = ] ?{ } map-as _ f pad-tail % ] each ] keep ;
-
 : integers>bits ( seq n -- bit-array )
     <bit-array> [ '[ [ t ] dip _ set-nth ] each ] keep ;
 
@@ -40,12 +35,9 @@ SYMBOLS: return-addresses gc-maps ;
 : gc-root-offsets ( gc-map -- offsets )
     gc-roots>> [ gc-root-offset ] map ;
 
-: emit-gc-info-bitmaps ( gc-maps -- counts )
-    [
-        [ [ scrub-d>> ] map emit-scrub ]
-        [ [ scrub-r>> ] map emit-scrub ]
-        [ [ gc-root-offsets ] map emit-gc-roots ] tri 3array
-    ] ?{ } make underlying>> % ;
+: emit-gc-info-bitmap ( gc-maps -- spill-count )
+    [ gc-root-offsets ] map
+    [ emit-gc-roots ] ?{ } make underlying>> % ;
 
 : emit-base-table ( alist longest -- )
     -1 <array> <enum> swap assoc-union! seq>> emit-uints ;
@@ -61,16 +53,12 @@ SYMBOLS: return-addresses gc-maps ;
 : serialize-gc-maps ( -- byte-array )
     [
         return-addresses get empty? [ { } ] [
-            gc-maps get [ emit-gc-info-bitmaps ] [ emit-base-tables ] bi suffix
+            gc-maps get [ emit-gc-info-bitmap ] [ emit-base-tables ] bi 2array
         ] if
         return-addresses get emit-uints
         emit-uints
         return-addresses get length emit-uint
     ] B{ } make ;
-
-: init-gc-maps ( -- )
-    V{ } clone return-addresses set
-    V{ } clone gc-maps set ;
 
 : emit-gc-maps ( -- )
     serialize-gc-maps [

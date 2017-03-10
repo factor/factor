@@ -1,9 +1,20 @@
-USING: alien arrays classes combinators help.markup help.syntax
-kernel.private layouts math quotations system words ;
+USING: alien arrays classes combinators heaps help.markup help.syntax
+kernel.private layouts math quotations sequences system threads words
+;
 IN: kernel
+
+HELP: OBJ-CURRENT-THREAD
+{ $description "Contains a reference to the running " { $link thread } " instance." } ;
 
 HELP: JIT-PUSH-LITERAL
 { $description "JIT code template for pushing literals unto the datastack." } ;
+
+HELP: OBJ-SAMPLE-CALLSTACKS
+{ $description "A " { $link sequence } " that contains all call frames that is being captured during sampling profiling. See the " { $vocab-link "tools.profiler.sampling" } " vocab." } ;
+
+HELP: OBJ-SLEEP-QUEUE
+{ $description "A " { $link min-heap } " containing sleeping threads." }
+{ $see-also sleep-queue } ;
 
 HELP: OBJ-UNDEFINED
 { $description "Default definition for undefined words" } ;
@@ -34,6 +45,10 @@ HELP: rot   $complex-shuffle ;
 HELP: -rot  $complex-shuffle ;
 HELP: dupd  $complex-shuffle ;
 HELP: swapd $complex-shuffle ;
+
+HELP: callstack>array
+{ $values { "callstack" callstack } { "array" array } }
+{ $description "Converts the callstack to an array containing groups of three elements. The array is in reverse order so that the innermost frame comes first." } ;
 
 HELP: get-datastack
 { $values { "array" array } }

@@ -17,7 +17,7 @@ C: <hsva> hsva
 
 <PRIVATE
 
-: Hi ( hsv -- Hi ) hue>> 60 / floor 6 mod ; inline
+: Hi ( hsv -- Hi ) hue>> 60 / floor 6 mod >integer ; inline
 
 : f ( hsv -- f ) [ hue>> 60 / ] [ Hi ] bi - ; inline
 
@@ -70,8 +70,7 @@ M:: rgba >hsva ( rgba -- hsva )
     ] if ;
 
 : complimentary-color ( color -- color' )
-    dup hsva? [ >hsva ] unless
-    {
+    >hsva {
         [ hue>> 180 + 360 mod ]
         [ saturation>> ]
         [ value>> ]

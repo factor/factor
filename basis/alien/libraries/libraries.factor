@@ -27,12 +27,7 @@ TUPLE: library { path string } dll dlerror { abi abi initial: cdecl } ;
 
 C: <library> library
 
-: lookup-library ( name -- library ) libraries get at ;
-
-ERROR: no-library-named name ;
-GENERIC: dlsym? ( name string/dll -- ? )
-M: string dlsym? dup lookup-library [ nip dll>> dlsym? ] [ no-library-named ] if* ;
-M: dll dlsym? dlsym >boolean ;
+: lookup-library ( name -- library/f ) libraries get at ;
 
 : open-dll ( path -- dll dll-error/f )
     [ dlopen dup dll-valid? [ f ] [ dlerror ] if ]
@@ -46,6 +41,9 @@ M: dll dlsym? dlsym >boolean ;
 
 : load-library ( name -- dll )
     lookup-library library-dll ;
+
+: dlsym? ( function library -- alien/f )
+    load-library dlsym ;
 
 M: dll dispose dlclose ;
 

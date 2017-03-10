@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals words summary slots quotations
-sequences assocs math arrays stack-checker effects continuations
-classes.tuple namespaces make vectors bit-arrays byte-arrays
-strings sbufs math.functions macros sequences.private
-combinators mirrors splitting combinators.smart
-combinators.short-circuit fry words.symbol generalizations
-sequences.generalizations classes ;
+USING: accessors arrays assocs bit-arrays byte-arrays classes
+classes.tuple combinators combinators.short-circuit
+combinators.smart continuations effects fry generalizations
+kernel locals macros make math math.functions namespaces
+quotations sbufs sequences sequences.generalizations slots
+splitting stack-checker strings summary vectors words
+words.symbol ;
 IN: inverse
 
 ERROR: fail ;
@@ -28,9 +28,9 @@ M: fail summary drop "Matching failed" ;
 : define-math-inverse ( word quot1 quot2 -- )
     pick 1quotation 3array "math-inverse" set-word-prop ;
 
-: define-pop-inverse ( word n quot -- )
-    [ dupd "pop-length" set-word-prop ] dip
-    "pop-inverse" set-word-prop ;
+:: define-pop-inverse ( word n quot -- )
+    word n "pop-length" set-word-prop
+    word quot "pop-inverse" set-word-prop ;
 
 ERROR: bad-math-inverse ;
 
@@ -76,14 +76,14 @@ ERROR: no-recursive-inverse ;
 SYMBOL: visited
 
 : flattenable? ( object -- ? )
-    { [ word? ] [ primitive? not ] [
-        { "inverse" "math-inverse" "pop-inverse" }
-        [ word-prop ] with any? not
-    ] } 1&& ;
+    {
+        [ word? ]
+        [ primitive? not ]
+        [ explicit-inverse? not ]
+    } 1&& ;
 
 : flatten ( quot -- expanded )
-    [
-        visited [ over suffix ] change
+    visited get over suffix visited [
         [
             dup flattenable? [
                 def>>
@@ -92,7 +92,7 @@ SYMBOL: visited
                 bi
             ] [ 1quotation ] if
         ] map concat
-    ] with-scope ;
+    ] with-variable ;
 
 ERROR: undefined-inverse ;
 
@@ -152,8 +152,7 @@ MACRO: undo ( quot -- quot ) [undo] ;
 ERROR: missing-literal ;
 
 : assert-literal ( n -- n )
-    dup
-    [ word? ] [ symbol? not ] bi and
+    dup { [ word? ] [ symbol? not ] } 1&&
     [ missing-literal ] when ;
 
 \ + [ - ] [ - ] define-math-inverse

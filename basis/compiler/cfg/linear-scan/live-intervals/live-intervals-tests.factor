@@ -3,11 +3,22 @@ compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.ranges
 compiler.cfg.liveness compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
-fry kernel namespaces sequences tools.test ;
+cpu.x86.assembler.operands fry kernel namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.live-intervals.tests
 
 : <live-interval-for-ranges> ( ranges -- live-interval )
     10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep ;
+
+! (add-use)
+{
+    T{ vreg-use f 20 f f t }
+    T{ live-interval-state
+       { vreg 10 }
+       { uses V{ T{ vreg-use { n 20 } { spill-slot? t } } } }
+     }
+} [
+    20 10 <live-interval> [ t (add-use) ] keep
+] unit-test
 
 ! cfg>sync-points
 {
@@ -20,6 +31,61 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
         T{ ##callback-inputs }
     } insns>cfg
     [ number-instructions ] [ cfg>sync-points ] bi
+] unit-test
+
+: test-interval ( -- live-interval )
+    T{ live-interval-state
+       { vreg 235 }
+       { reg RDI }
+       { ranges V{ { 88 94 } { 100 154 } } }
+       { uses
+         V{
+             T{ vreg-use
+                { n 88 }
+                { def-rep tagged-rep }
+              }
+             T{ vreg-use
+                { n 90 }
+                { def-rep int-rep }
+                { use-rep tagged-rep }
+              }
+             T{ vreg-use
+                { n 100 }
+                { def-rep tagged-rep }
+              }
+             T{ vreg-use
+                { n 102 }
+                { def-rep int-rep }
+                { use-rep tagged-rep }
+              }
+             T{ vreg-use { n 144 } { use-rep int-rep } }
+             T{ vreg-use { n 146 } { use-rep int-rep } }
+             T{ vreg-use
+                { n 148 }
+                { def-rep int-rep }
+                { use-rep int-rep }
+              }
+             T{ vreg-use
+                { n 150 }
+                { def-rep tagged-rep }
+                { use-rep int-rep }
+              }
+             T{ vreg-use
+                { n 154 }
+                { use-rep tagged-rep }
+              }
+         } }
+       } ;
+
+! (find-use)
+{
+    T{ vreg-use
+       { n 102 }
+       { def-rep int-rep }
+       { use-rep tagged-rep }
+     }
+} [
+    128 test-interval (find-use)
 ] unit-test
 
 ! find-use

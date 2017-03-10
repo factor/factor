@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Niklas Waern.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct locals sequences x11.syntax x11.xlib ;
+USING: alien alien.c-types alien.libraries alien.syntax classes.struct
+locals sequences x11.X x11.syntax x11.xlib ;
 EXCLUDE: math => float ;
 IN: x11.xinput2.ffi
 

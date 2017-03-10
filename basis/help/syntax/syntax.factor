@@ -7,14 +7,14 @@ IN: help.syntax
 SYNTAX: HELP:
     scan-word bootstrap-word
     [ >link save-location ]
-    [ [ \ ; parse-until >array ] dip set-word-help ]
+    [ [ parse-array-def ] dip set-word-help ]
     bi ;
 
 ERROR: article-expects-name-and-title got ;
 
 SYNTAX: ARTICLE:
     location [
-        \ ; parse-until >array
+        parse-array-def
         dup length 2 < [ article-expects-name-and-title ] when
         [ first2 ] [ 2 tail ] bi <article>
         over add-article >link

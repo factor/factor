@@ -1,15 +1,15 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays assocs
-classes classes.struct combinators concurrency.flags
-continuations debugger destructors init io io.backend
-io.backend.windows io.files io.files.private io.files.windows
-io.launcher io.launcher.private io.pathnames io.pipes
-io.pipes.windows io.ports kernel libc locals make math
-namespaces prettyprint sequences specialized-arrays splitting
-splitting.monotonic strings system threads windows
+classes classes.struct combinators combinators.short-circuit
+concurrency.flags continuations debugger destructors init io
+io.backend io.backend.windows io.files io.files.private
+io.files.windows io.launcher io.launcher.private io.pathnames
+io.pipes io.pipes.windows io.ports kernel libc literals locals
+make math namespaces prettyprint sequences specialized-arrays
+splitting splitting.monotonic strings system threads windows
 windows.errors windows.handles windows.kernel32 windows.types
-combinators.short-circuit ;
+windows.user32 ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
@@ -64,10 +64,10 @@ TUPLE: CreateProcess-args
     [
         { [ drop CHAR: \ = ] [ nip "\\\"" member? ] } 2&&
     ] monotonic-split [
-        dup last CHAR: " = [
+        dup last CHAR: \" = [
             dup length 1 > [
                 ! String of backslashes + double-quote
-                length 1 - 2 * CHAR: \ <repetition> "\\\"" append
+                length 1 - 2 * CHAR: \\ <repetition> "\\\"" append
             ] [
                 ! Single double-quote
                 drop "\\\""
@@ -123,7 +123,13 @@ TUPLE: CreateProcess-args
     ] when ;
 
 : fill-startup-info ( process args -- process args )
-    dup lpStartupInfo>> STARTF_USESTDHANDLES >>dwFlags drop ;
+    over hidden>> [ dup lpStartupInfo>> ] dip
+    [
+        flags{ STARTF_USESTDHANDLES STARTF_USESHOWWINDOW } >>dwFlags
+        SW_HIDE >>wShowWindow
+    ] [
+        STARTF_USESTDHANDLES >>dwFlags
+    ] if drop ;
 
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args

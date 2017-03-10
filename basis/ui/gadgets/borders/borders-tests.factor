@@ -1,6 +1,12 @@
 IN: ui.gadgets.borders.tests
-USING: tools.test accessors namespaces kernel ui.gadgets
-ui.gadgets.borders ui.gadgets.borders.private math.rectangles ;
+USING: accessors kernel math.rectangles namespaces tools.test
+ui.gadgets ui.gadgets.borders ui.gadgets.borders.private
+ui.gadgets.editors ;
+
+! border-pref-dim
+{ { 20 20 } } [
+    <multiline-editor> { 5 5 } <border> { 10 10 } border-pref-dim
+] unit-test
 
 { { 110 210 } } [ <gadget> { 100 200 } >>dim { 5 5 } <border> pref-dim ] unit-test
 

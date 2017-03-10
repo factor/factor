@@ -153,7 +153,7 @@ HINTS: (next-permutation) array ;
 PRIVATE>
 
 : next-permutation ( seq -- seq )
-    dup [ ] [ drop (next-permutation) ] if-empty ;
+    dup empty? [ (next-permutation) ] unless ;
 
 
 ! Combinadic-based combination methodology

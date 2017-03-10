@@ -61,6 +61,14 @@ io.buffers kernel libc namespaces sequences strings tools.test ;
 { "hello" CHAR: \s } [ " " "b" get buffer-read-until [ >string ] dip ] unit-test
 "b" get dispose
 
+"hello world" string>buffer "b" set
+{ "hello worl" CHAR: d } [ "d" "b" get buffer-read-until [ >string ] dip ] unit-test
+"b" get dispose
+
+"hello world" string>buffer "b" set
+{ "hello world" f } [ "\n" "b" get buffer-read-until [ >string ] dip ] unit-test
+"b" get dispose
+
 { 4 B{ 1 2 3 4 0 0 0 0 0 0 } } [
     10 <buffer>
     [ B{ 1 2 3 4 } binary-object rot buffer-write ]

@@ -24,3 +24,5 @@ IN: sets.extras.tests
 { "" } [ "aabbcc" non-repeating ] unit-test
 
 { HS{ 0 10 20 30 40 } } [ 5 iota [ 10 * ] mapped-set ] unit-test
+
+{ { 1 2 4 } } [ { 1 2 3 4 5 } [ 2/ ] unique-by ] unit-test

@@ -9,7 +9,7 @@ ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.images ui.pens.solid ui.render ui.text ui.theme ;
 IN: ui.gadgets.tables
 
-! Row rendererer protocol
+! Row renderer protocol
 GENERIC: prototype-row ( renderer -- columns )
 GENERIC: column-alignment ( renderer -- alignment )
 GENERIC: filled-column ( renderer -- n )
@@ -66,6 +66,9 @@ rows ;
 
 GENERIC: cell-dim ( font cell -- width height padding )
 GENERIC: draw-cell ( font cell -- )
+
+M: f cell-dim 2drop 0 0 0 ;
+M: f draw-cell 2drop ;
 
 : single-line ( str -- str' )
     dup [ "\r\n" member? ] any? [ string-lines " " join ] when ;

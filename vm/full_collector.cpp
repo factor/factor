@@ -2,48 +2,67 @@
 
 namespace factor {
 
-struct full_policy {
-  factor_vm* parent;
+struct full_collection_copier : no_fixup {
   tenured_space* tenured;
+  code_heap* code;
+  std::vector<cell> *mark_stack;
 
-  explicit full_policy(factor_vm* parent)
-      : parent(parent), tenured(parent->data->tenured) {}
+  full_collection_copier(tenured_space* tenured,
+                         code_heap* code,
+                         std::vector<cell> *mark_stack)
+      : tenured(tenured), code(code), mark_stack(mark_stack) { }
 
-  bool should_copy_p(object* untagged) {
-    return !tenured->contains_p(untagged);
+  object* fixup_data(object* obj) {
+    if (tenured->contains_p(obj)) {
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
+      }
+      return obj;
+    }
+
+    // Is there another forwarding pointer?
+    while (obj->forwarding_pointer_p()) {
+      object* dest = obj->forwarding_pointer();
+      obj = dest;
+    }
+
+    if (tenured->contains_p(obj)) {
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
+      }
+      return obj;
+    }
+
+    cell size = obj->size();
+    object* newpointer = tenured->allot(size);
+    if (!newpointer)
+      throw must_start_gc_again();
+    memcpy(newpointer, obj, size);
+    obj->forward_to(newpointer);
+
+    tenured->state.set_marked_p((cell)newpointer, newpointer->size());
+    mark_stack->push_back((cell)newpointer);
+    return newpointer;
   }
 
-  void promoted_object(object* obj) {
-    tenured->state.set_marked_p((cell)obj, obj->size());
-    parent->mark_stack.push_back((cell)obj);
-  }
-
-  void visited_object(object* obj) {
-    if (!tenured->state.marked_p((cell)obj))
-      promoted_object(obj);
+  code_block* fixup_code(code_block* compiled) {
+    if (!code->allocator->state.marked_p((cell)compiled)) {
+      code->allocator->state.set_marked_p((cell)compiled, compiled->size());
+      mark_stack->push_back((cell)compiled + 1);
+    }
+    return compiled;
   }
 };
 
-/* After a sweep, invalidate any code heap roots which are not marked,
-   so that if a block makes a tail call to a generic word, and the PIC
-   compiler triggers a GC, and the caller block gets GCd as a result,
-   the PIC code won't try to overwrite the call site */
-void factor_vm::update_code_roots_for_sweep() {
-  mark_bits* state = &code->allocator->state;
-
-  FACTOR_FOR_EACH(code_roots) {
-    code_root* root = *iter;
-    cell block = root->value & (~data_alignment - 1);
-    if (root->valid && !state->marked_p(block))
-      root->valid = false;
-  }
-}
-
 void factor_vm::collect_mark_impl() {
-  gc_workhorse<tenured_space, full_policy>
-      workhorse(this, this->data->tenured, full_policy(this));
-  slot_visitor<gc_workhorse<tenured_space, full_policy>>
-      visitor(this, workhorse);
+  gc_event* event = current_gc->event;
+  if (event)
+    event->reset_timer();
+
+  slot_visitor<full_collection_copier>
+      visitor(this, full_collection_copier(data->tenured, code, &mark_stack));
 
   mark_stack.clear();
 
@@ -60,24 +79,36 @@ void factor_vm::collect_mark_impl() {
   data->reset_aging();
   data->reset_nursery();
   code->clear_remembered_set();
+
+  if (event)
+    event->ended_phase(PHASE_MARKING);
 }
 
 void factor_vm::collect_sweep_impl() {
   gc_event* event = current_gc->event;
-
   if (event)
     event->reset_timer();
   data->tenured->sweep();
   if (event)
-    event->ended_data_sweep();
+    event->ended_phase(PHASE_DATA_SWEEP);
 
-  update_code_roots_for_sweep();
+  // After a sweep, invalidate any code heap roots which are not
+  // marked, so that if a block makes a tail call to a generic word,
+  // and the PIC compiler triggers a GC, and the caller block gets GCd
+  // as a result, the PIC code won't try to overwrite the call site
+  mark_bits* state = &code->allocator->state;
+  FACTOR_FOR_EACH(code_roots) {
+    code_root* root = *iter;
+    cell block = root->value & (~data_alignment - 1);
+    if (root->valid && !state->marked_p(block))
+      root->valid = false;
+  }
 
   if (event)
     event->reset_timer();
   code->sweep();
   if (event)
-    event->ended_code_sweep();
+    event->ended_phase(PHASE_CODE_SWEEP);
 }
 
 void factor_vm::collect_full() {
@@ -85,13 +116,13 @@ void factor_vm::collect_full() {
   collect_sweep_impl();
 
   if (data->low_memory_p()) {
-    /* Full GC did not free up enough memory. Grow the heap. */
-    set_current_gc_op(collect_growing_heap_op);
-    collect_growing_heap(0);
+    // Full GC did not free up enough memory. Grow the heap.
+    set_current_gc_op(COLLECT_GROWING_DATA_HEAP_OP);
+    collect_growing_data_heap(0);
   } else if (data->high_fragmentation_p()) {
-    /* Enough free memory, but it is not contiguous. Perform a
-       compaction. */
-    set_current_gc_op(collect_compact_op);
+    // Enough free memory, but it is not contiguous. Perform a
+    // compaction.
+    set_current_gc_op(COLLECT_COMPACT_OP);
     collect_compact_impl();
   }
 

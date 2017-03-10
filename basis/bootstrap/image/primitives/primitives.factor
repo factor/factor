@@ -314,10 +314,6 @@ CONSTANT: all-primitives {
             }
             { "become" ( old new -- ) "become" { array array } { } f }
             {
-                "callstack-bounds" ( -- start end ) "callstack_bounds"
-                { } { alien alien } make-flushable
-            }
-            {
                 "check-datastack" ( array in# out# -- ? ) "check_datastack"
                 { array integer integer } { object } make-flushable
             }
@@ -361,10 +357,6 @@ CONSTANT: all-primitives {
                 "strip-stack-traces" ( -- ) "strip_stack_traces"
                 { } { } f
             }
-            {
-                "unimplemented" ( -- * ) "unimplemented"
-                { } { } f
-            }
         }
     }
     {
@@ -404,7 +396,7 @@ CONSTANT: all-primitives {
                 "(format-float)" ( n fill width precision format locale -- byte-array )
                 "format_float"
                 { float byte-array fixnum fixnum byte-array byte-array } { byte-array }
-                make-foldable
+                make-flushable
             }
         }
     }
@@ -689,7 +681,7 @@ CONSTANT: all-primitives {
         {
             {
                 "array>quotation" ( array -- quot ) "array_to_quotation"
-                { array } { quotation } make-foldable
+                { array } { quotation } make-flushable
             }
         }
     }
@@ -730,6 +722,8 @@ CONSTANT: all-primitives {
         "system"
         {
             { "(exit)" ( n -- * ) "exit" { integer } { } f }
+            { "disable-ctrl-break" ( -- ) "disable_ctrl_break" { } { } f }
+            { "enable-ctrl-break" ( -- ) "enable_ctrl_break" { } { } f }
             { "nano-count" ( -- ns ) "nano_count" { } { integer } make-flushable }
         }
     }
@@ -780,7 +774,7 @@ CONSTANT: all-primitives {
     {
         "tools.profiler.sampling.private"
         {
-            { "profiling" ( ? -- ) "sampling_profiler" { object } { } f }
+            { "profiling" ( n -- ) "sampling_profiler" { object } { } f }
             { "(get-samples)" ( -- samples/f ) "get_samples" { } { object } f }
         }
     }

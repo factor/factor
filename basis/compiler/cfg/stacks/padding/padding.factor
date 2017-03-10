@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.dataflow-analysis
-compiler.cfg.instructions compiler.cfg.linearization compiler.cfg.registers
+compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.stacks.local fry kernel math math.order namespaces
 sequences ;
 QUALIFIED: sets
@@ -99,7 +99,7 @@ M: padding join-sets ( sets bb dfa -- set )
 : uniquely-number-instructions ( cfg -- )
     cfg>insns [ swap insn#<< ] each-index ;
 
-: trace-stack-state2 ( cfg -- assoc )
+: trace-stack-state ( cfg -- assoc )
     H{ } clone stack-record set
     [ uniquely-number-instructions ] [ compute-padding-sets ] bi
     stack-record get ;

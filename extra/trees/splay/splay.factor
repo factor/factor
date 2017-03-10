@@ -1,7 +1,7 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math.order parser
-prettyprint.custom trees trees.private typed ;
+prettyprint.custom sequences trees trees.private typed ;
 IN: trees.splay
 
 TUPLE: splay < tree ;
@@ -130,6 +130,9 @@ M: splay delete-at
 
 M: splay new-assoc
     2drop <splay> ;
+
+M: splay assoc-clone-like
+    [ dup tree? [ >bfs-alist reverse ] when ] dip call-next-method ;
 
 PRIVATE>
 

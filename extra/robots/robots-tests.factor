@@ -26,8 +26,8 @@ IN: robots.tests
             }
             { visit-time
                 {
-                    T{ timestamp { hour 2 } }
-                    T{ timestamp { hour 5 } }
+                    T{ duration { hour 2 } }
+                    T{ duration { hour 5 } }
                 }
             }
             { request-rate 1 }

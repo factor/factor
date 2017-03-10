@@ -37,7 +37,6 @@ PRIMITIVE: (execute) ( word -- )
 PRIMITIVE: (identity-hashcode) ( obj -- code )
 PRIMITIVE: become ( old new -- )
 PRIMITIVE: c-to-factor ( -- )
-PRIMITIVE: callstack-bounds ( -- start end )
 PRIMITIVE: check-datastack ( array in# out# -- ? )
 PRIMITIVE: compute-identity-hashcode ( obj -- )
 PRIMITIVE: context-object ( n -- obj )
@@ -57,7 +56,6 @@ PRIMITIVE: signal-handler ( -- )
 PRIMITIVE: special-object ( n -- obj )
 PRIMITIVE: strip-stack-traces ( -- )
 PRIMITIVE: tag ( object -- n )
-PRIMITIVE: unimplemented ( -- * )
 PRIMITIVE: unwind-native-frames ( -- )
 PRIVATE>
 
@@ -366,6 +364,8 @@ CONSTANT: SET-FPU-STATE-WORD 47
 CONSTANT: SIGNAL-HANDLER-WORD 48
 CONSTANT: LEAF-SIGNAL-HANDLER-WORD 49
 CONSTANT: WIN-EXCEPTION-HANDLER 50
+
+CONSTANT: OBJ-SAMPLE-CALLSTACKS 51
 
 CONSTANT: REDEFINITION-COUNTER 52
 

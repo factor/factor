@@ -40,23 +40,19 @@ CONSTANT: A_PLUS_MOVIE CHAR: ;
 CONSTANT: A_PLUS_SOUND CHAR: <
 
 : gopher-get ( selector -- item-type byte-array )
-    "/" split1 "" or
-    [ dup length 1 > [ string>number ] [ first ] if ]
-    [
-        "?" split1 [ "\t" glue ] when*
-        "\r\n" append utf8 encode write flush contents
-    ] bi* ;
+    "/" split1 "" or [ first ] dip
+    "?" split1 [ "\t" glue ] when*
+    "\r\n" append utf8 encode write flush contents ;
 
 PRIVATE>
 
 ERROR: not-a-gopher-url url ;
 
 : gopher ( url -- item-type byte-array )
-    dup url? [ >url ] unless
-    dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
+    >url dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
         [ host>> ]
         [ port>> 70 or <inet> binary ]
-        [ path>> rest [ "1/" ] when-empty ]
+        [ path>> rest url-encode [ "1/" ] when-empty ]
         [ query>> [ assoc>query url-decode "?" glue ] when* ]
     } cleave '[
         1 minutes input-stream get set-timeout
@@ -78,7 +74,7 @@ M: gopher-link >url
     ] [
         {
             [ host>> ] [ port>> ] [ type>> ] [ selector>> ]
-        } cleave "gopher://%s:%s/%s%s" sprintf
+        } cleave "gopher://%s:%s/%c%s" sprintf
     ] if >url ;
 
 : gopher-link. ( gopher-link -- )
@@ -100,6 +96,9 @@ M: gopher-link >url
 : gopher-gif. ( object -- )
     "gif" (image-class) load-image* image. ;
 
+: gopher-image. ( path object -- path )
+    over image-class load-image* image. ;
+
 : gopher-menu. ( object -- )
     gopher-text [
         [ nl ] [ <gopher-link> gopher-link. ] if-empty
@@ -108,10 +107,11 @@ M: gopher-link >url
 PRIVATE>
 
 : gopher. ( url -- )
-    gopher swap {
+    >url [ path>> ] [ gopher swap ] bi {
         { A_TEXT [ gopher-text. ] }
         { A_MENU [ gopher-menu. ] }
         { A_INDEX [ gopher-menu. ] }
         { A_GIF [ gopher-gif. ] }
+        { A_IMAGE [ gopher-image. ] }
         [ drop . ]
-    } case ;
+    } case drop ;

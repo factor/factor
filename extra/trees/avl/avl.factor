@@ -23,10 +23,9 @@ TUPLE: avl-node < node balance ;
     '[ _ + ] change-balance ;
 
 : rotate ( node -- node )
-    dup
-    [ node+link ]
-    [ node-link ]
-    [ set-node+link ] tri
+    dup node+link
+    dup node-link
+    pick set-node+link
     [ set-node-link ] keep ;
 
 : single-rotate ( node -- node )
@@ -64,24 +63,25 @@ TUPLE: avl-node < node balance ;
 
 DEFER: avl-set
 
-: avl-insert ( value key node -- node taller? )
+: avl-insert ( value key node -- node taller? created? )
     2dup key>> before? left right ? [
-        [ node-link avl-set ] keep swap
-        [ [ set-node-link ] keep ] dip
-        [ current-side get increase-balance balance-insert ]
-        [ f ] if
+        [ node-link avl-set ] keep -rot
+        [ [ set-node-link ] keep ] 2dip swap
+        [ [ current-side get increase-balance balance-insert ] dip ]
+        [ f swap ] if
     ] with-side ;
 
-: (avl-set) ( value key node -- node taller? )
+: (avl-set) ( value key node -- node taller? created? )
     2dup key>> = [
-        -rot pick key<< >>value f
+        -rot pick key<< >>value f f
     ] [ avl-insert ] if ;
 
-: avl-set ( value key node -- node taller? )
-    [ (avl-set) ] [ swap <avl-node> t ] if* ;
+: avl-set ( value key node -- node taller? created? )
+    [ (avl-set) ] [ swap <avl-node> t t ] if* ;
 
 M: avl set-at ( value key node -- )
-    [ avl-set drop ] change-root drop ;
+    [ avl-set nip swap ] change-root
+    swap [ dup inc-count ] when drop ;
 
 : delete-select-rotate ( node -- node shorter? )
     dup node+link balance>> zero? [
@@ -148,7 +148,8 @@ M: avl-node avl-delete ( key node -- node shorter? deleted? )
     ] if-zero ;
 
 M: avl delete-at ( key node -- )
-    [ avl-delete 2drop ] change-root drop ;
+    [ avl-delete nip swap ] change-root
+    swap [ dup dec-count ] when drop ;
 
 M: avl new-assoc 2drop <avl> ;
 

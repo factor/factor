@@ -67,12 +67,15 @@ HOOK: process-forgotten-words compiler-impl ( words -- )
 : compile ( words -- )
     recompile t f modify-code-heap ;
 
+: filter-word-defs ( defset -- words )
+    members [ word? ] filter ;
+
 ! Non-optimizing compiler
 M: f update-call-sites
     2drop { } ;
 
 M: f to-recompile
-    changed-definitions get members [ word? ] filter ;
+    changed-definitions get filter-word-defs ;
 
 M: f recompile
     [ dup def>> ] { } map>assoc ;
@@ -117,8 +120,7 @@ M: object always-bump-effect-counter? drop f ;
 <PRIVATE
 
 : changed-vocabs ( set -- vocabs )
-    members [ word? ] filter
-    [ vocabulary>> dup [ lookup-vocab ] when ] map ;
+    filter-word-defs [ vocabulary>> dup [ lookup-vocab ] when ] map ;
 
 : updated-definitions ( -- set )
     HS{ } clone

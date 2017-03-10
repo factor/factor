@@ -6,12 +6,6 @@ ui.gadgets.scrollers ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.tools.common ;
 IN: ui.gadgets.slots
 
-TUPLE: update-object ;
-
-TUPLE: update-slot ;
-
-TUPLE: edit-slot ;
-
 TUPLE: slot-editor < track ref close-hook update-hook text ;
 
 : revert ( slot-editor -- )
@@ -67,7 +61,7 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
         swap >>close-hook
         add-toolbar
         <source-editor> >>text
-        dup text>> <scroller> 1 track-add
+        dup text>> margins <scroller> 1 track-add
         dup revert white-interior ;
 
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;

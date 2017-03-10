@@ -58,6 +58,8 @@ tools.test ;
     ! { "a/b/c/d/e" "a/b/h/e" "a/e" "a/e/g/e" }
     { "a/e/f" "a/e/g" }
     { "a/b" "a/e" }
+    { "a" }
+    { "a/b" }
 } [
 
     [
@@ -85,5 +87,7 @@ tools.test ;
         ! "**/**/e" glob natural-sort
         "**/e/**" glob natural-sort
         "a/**" glob natural-sort
+        "a" glob natural-sort
+        "a/b" glob natural-sort
     ] with-test-directory
 ] unit-test

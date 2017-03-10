@@ -5,8 +5,8 @@ namespace factor {
 static cell code_block_owner(code_block* compiled) {
   cell owner = compiled->owner;
 
-  /* Cold generic word call sites point to quotations that call the
-     inline-cache-miss and inline-cache-miss-tail primitives. */
+  // Cold generic word call sites point to quotations that call the
+  // inline-cache-miss and inline-cache-miss-tail primitives.
   if (TAG(owner) != QUOTATION_TYPE)
     return owner;
 
@@ -38,16 +38,16 @@ static cell compute_here_address(cell arg, cell offset, code_block* compiled) {
 }
 
 cell code_block::owner_quot() const {
-  if (!optimized_p() && TAG(owner) == WORD_TYPE)
+  if (type() != CODE_BLOCK_OPTIMIZED && TAG(owner) == WORD_TYPE)
     return untag<word>(owner)->def;
   return owner;
 }
 
-/* If the code block is an unoptimized quotation, we can calculate the
-   scan offset. In all other cases -1 is returned.
-   Allocates memory (quot_code_offset_to_scan) */
+// If the code block is an unoptimized quotation, we can calculate the
+// scan offset. In all other cases -1 is returned.
+// Allocates memory (quot_code_offset_to_scan)
 cell code_block::scan(factor_vm* vm, cell addr) const {
-  if (type() != code_block_unoptimized) {
+  if (type() != CODE_BLOCK_UNOPTIMIZED) {
     return tag_fixnum(-1);
   }
 
@@ -79,21 +79,21 @@ cell factor_vm::compute_entry_point_pic_tail_address(cell w_) {
   return compute_entry_point_pic_address(w.untagged(), w->pic_tail_def);
 }
 
-/* Relocate new code blocks completely; updating references to literals,
-   dlsyms, and words. For all other words in the code heap, we only need
-   to update references to other words, without worrying about literals
-   or dlsyms. */
+// Relocate new code blocks completely; updating references to literals,
+// dlsyms, and words. For all other words in the code heap, we only need
+// to update references to other words, without worrying about literals
+// or dlsyms.
 void factor_vm::update_word_references(code_block* compiled,
                                        bool reset_inline_caches) {
   if (code->uninitialized_p(compiled)) {
     initialize_code_block(compiled);
-  /* update_word_references() is always applied to every block in
-     the code heap. Since it resets all call sites to point to
-     their canonical entry point (cold entry point for non-tail calls,
-     standard entry point for tail calls), it means that no PICs
-     are referenced after this is done. So instead of polluting
-     the code heap with dead PICs that will be freed on the next
-     GC, we add them to the free list immediately. */
+    // update_word_references() is always applied to every block in
+    // the code heap. Since it resets all call sites to point to
+    // their canonical entry point (cold entry point for non-tail calls,
+    // standard entry point for tail calls), it means that no PICs
+    // are referenced after this is done. So instead of polluting
+    // the code heap with dead PICs that will be freed on the next
+    // GC, we add them to the free list immediately.
   } else if (reset_inline_caches && compiled->pic_p()) {
     code->free(compiled);
   } else {
@@ -134,8 +134,7 @@ void factor_vm::update_word_references(code_block* compiled,
   }
 }
 
-/* Look up an external library symbol referenced by a compiled code
-   block */
+// Look up an external library symbol referenced by a compiled code block
 cell factor_vm::compute_dlsym_address(array* parameters,
                                       cell index,
                                       bool toc) {
@@ -248,15 +247,15 @@ struct initial_code_block_visitor {
   }
 };
 
-/* Perform all fixups on a code block */
+// Perform all fixups on a code block
 void factor_vm::initialize_code_block(code_block* compiled, cell literals) {
   initial_code_block_visitor visitor(this, literals);
   compiled->each_instruction_operand(visitor);
   compiled->flush_icache();
 
-  /* next time we do a minor GC, we have to trace this code block, since
-     the newly-installed instruction operands might point to literals in
-     nursery or aging */
+  // next time we do a minor GC, we have to trace this code block, since
+  // the newly-installed instruction operands might point to literals in
+  // nursery or aging
   code->write_barrier(compiled);
 }
 
@@ -267,7 +266,7 @@ void factor_vm::initialize_code_block(code_block* compiled) {
   code->uninitialized_blocks.erase(iter);
 }
 
-/* Fixup labels. This is done at compile time, not image load time */
+// Fixup labels. This is done at compile time, not image load time
 void factor_vm::fixup_labels(array* labels, code_block* compiled) {
   cell size = array_capacity(labels);
 
@@ -284,35 +283,8 @@ void factor_vm::fixup_labels(array* labels, code_block* compiled) {
   }
 }
 
-/* Might GC */
-/* Allocates memory */
-code_block* factor_vm::allot_code_block(cell size, code_block_type type) {
-  code_block* block = code->allocator->allot(size + sizeof(code_block));
-
-  /* If allocation failed, do a full GC and compact the code heap.
-     A full GC that occurs as a result of the data heap filling up does not
-     trigger a compaction. This setup ensures that most GCs do not compact
-     the code heap, but if the code fills up, it probably means it will be
-     fragmented after GC anyway, so its best to compact. */
-  if (block == NULL) {
-    primitive_compact_gc();
-    block = code->allocator->allot(size + sizeof(code_block));
-
-    /* Insufficient room even after code GC, give up */
-    if (block == NULL) {
-      std::cout << "Code heap used: " << code->allocator->occupied_space()
-                << "\n";
-      std::cout << "Code heap free: " << code->allocator->free_space() << "\n";
-      fatal_error("Out of memory in add-compiled-block", 0);
-    }
-  }
-
-  block->set_type(type);
-  return block;
-}
-
-/* Might GC */
-/* Allocates memory */
+// Might GC
+// Allocates memory
 code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell labels_, cell owner_,
                                       cell relocation_, cell parameters_,
@@ -330,7 +302,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
 
   compiled->owner = owner.value();
 
-  /* slight space optimization */
+  // slight space optimization
   if (relocation.type() == BYTE_ARRAY_TYPE &&
       array_capacity(relocation.untagged()) == 0)
     compiled->relocation = false_object;
@@ -343,39 +315,34 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   else
     compiled->parameters = parameters.value();
 
-  /* code */
+  // code
   memcpy(compiled + 1, code.untagged() + 1, code_length);
 
-  /* fixup labels */
+  // fixup labels
   if (to_boolean(labels.value()))
     fixup_labels(labels.as<array>().untagged(), compiled);
 
   compiled->set_stack_frame_size(frame_size_untagged);
 
-  /* Once we are ready, fill in literal and word references in this code
-     block's instruction operands. In most cases this is done right after this
-     method returns, except when compiling words with the non-optimizing
-     compiler at the beginning of bootstrap */
+  // Once we are ready, fill in literal and word references in this code
+  // block's instruction operands. In most cases this is done right after this
+  // method returns, except when compiling words with the non-optimizing
+  // compiler at the beginning of bootstrap
   this->code->uninitialized_blocks.insert(
       std::make_pair(compiled, literals.value()));
   this->code->all_blocks.insert((cell)compiled);
 
-  /* next time we do a minor GC, we have to trace this code block, since
-     the fields of the code_block struct might point into nursery or aging */
-  this->code->write_barrier(compiled);
-
   return compiled;
 }
 
-/* References to undefined symbols are patched up to call this function on
-   image load. It finds the symbol and library, and throws an error. */
+// References to undefined symbols are patched up to call this function on
+// image load. It finds the symbol and library, and throws an error.
 void factor_vm::undefined_symbol() {
   cell frame = ctx->callstack_top;
   cell return_address = *(cell*)frame;
   code_block* compiled = code->code_block_for_address(return_address);
 
-  /* Find the RT_DLSYM relocation nearest to the given return
-     address. */
+  // Find the RT_DLSYM relocation nearest to the given return address.
   cell symbol = false_object;
   cell library = false_object;
 

@@ -1,9 +1,7 @@
-USING: accessors compiler.cfg compiler.cfg.debugger
-compiler.cfg.dominance compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.ssa.construction assocs
-compiler.cfg.registers compiler.cfg.ssa.construction.private
-compiler.cfg.utilities cpu.architecture kernel namespaces sequences tools.test
-vectors ;
+USING: accessors assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.ssa.construction
+compiler.cfg.ssa.construction.private compiler.cfg.utilities
+compiler.test kernel namespaces sequences tools.test ;
 IN: compiler.cfg.ssa.construction.tests
 
 ! insert-phi-later

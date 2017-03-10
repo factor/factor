@@ -1,17 +1,15 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.libraries accessors io.backend
-io.encodings.utf8 io.files io.streams.c init fry namespaces math
-make assocs kernel parser parser.notes lexer strings.parser
-vocabs sequences sequences.deep sequences.private words memory
-kernel.private continuations io vocabs.loader system strings
-sets vectors quotations byte-arrays sorting compiler.units
-definitions generic generic.standard generic.single
-compiler.crossref compiler.errors source-files.errors
-tools.deploy.config combinators combinators.private classes
-vocabs.loader.private classes.builtin slots.private grouping
-command-line io.pathnames memoize namespaces.private
-hashtables locals source-files ;
+USING: accessors alien.libraries arrays assocs byte-arrays classes
+classes.builtin combinators combinators.private command-line
+compiler.crossref compiler.errors compiler.units continuations
+definitions fry generic generic.single generic.standard grouping
+hashtables init io io.backend io.encodings.utf8 io.files io.pathnames
+io.streams.c kernel kernel.private locals make math memoize memory
+namespaces parser parser.notes quotations sequences sequences.deep
+sequences.private sets slots.private source-files source-files.errors
+strings strings.parser system tools.deploy.config vocabs vocabs.loader
+vocabs.loader.private vocabs.parser words ;
 QUALIFIED: classes.private
 IN: tools.deploy.shaker
 
@@ -19,10 +17,16 @@ IN: tools.deploy.shaker
 
 : add-command-line-hook ( -- )
     [
-        (command-line) unclip
-        executable set-global
+        (command-line) rest
         command-line set-global
     ] "command-line" startup-hooks get set-at ;
+
+: set-stop-after-last-window? ( -- )
+    get-namestack [ "stop-after-last-window?" swap key? ] any? [
+        "ui-stop-after-last-window?" "ui.backend" lookup-word [
+            "stop-after-last-window?" get swap set-global
+        ] when*
+    ] when ;
 
 : strip-startup-hooks ( -- )
     "Stripping startup hooks" show
@@ -111,7 +115,6 @@ IN: tools.deploy.shaker
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
-    [ "no-def-strip" word-prop ] reject
     [ [ ] >>def drop ] each ;
 
 : strip-word-props ( stripped-props words -- )
@@ -131,7 +134,6 @@ IN: tools.deploy.shaker
                 "boa-check"
                 "coercer"
                 "combination"
-                "conditional-dependencies"
                 "constant"
                 "constraints"
                 "custom-inlining"
@@ -140,11 +142,10 @@ IN: tools.deploy.shaker
                 "default"
                 "default-method"
                 "default-output-classes"
-                "definition-dependencies"
+                "dependencies"
                 "dependency-checks"
                 "derived-from"
                 "ebnf-parser"
-                "effect-dependencies"
                 "engines"
                 "forgotten"
 
@@ -240,10 +241,12 @@ IN: tools.deploy.shaker
     "Clearing memoized word caches" show
     [ memoized? ] instances [ reset-memoized ] each ;
 
-: compiler-classes ( -- seq )
-    { "compiler" "stack-checker" }
-    [ loaded-child-vocab-names [ vocab-words ] map concat [ class? ] filter ]
-    map concat unique ;
+: compiler-classes ( -- set )
+    { "compiler" "stack-checker" } [
+        loaded-child-vocab-names
+        [ vocab-words ] map concat
+        [ class? ] filter
+    ] map concat fast-set ;
 
 : prune-decision-tree ( tree classes -- )
     [ tuple class>type ] 2dip '[
@@ -252,7 +255,7 @@ IN: tools.deploy.shaker
                 dup array? [
                     [
                         2 group
-                        [ drop _ key? ] assoc-reject
+                        [ drop _ in? ] assoc-reject
                         concat
                     ] map
                 ] when
@@ -365,6 +368,7 @@ IN: tools.deploy.shaker
                 vocabs:require-hook
                 vocabs:vocab-observers
                 vocabs.loader:add-vocab-root-hook
+                vocabs.parser:manifest
                 word
                 parser-quiet?
             } %
@@ -635,6 +639,7 @@ SYMBOL: deploy-vocab
                     "Vocabulary has no MAIN: word." print flush 1 exit
                 ] unless
             ] tri
+            set-stop-after-last-window?
             strip
             "Saving final image" show
             save-image-and-exit

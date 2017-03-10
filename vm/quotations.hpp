@@ -4,9 +4,9 @@ struct quotation_jit : public jit {
   data_root<array> elements;
   bool compiling, relocate;
 
-  /* Allocates memory */
+  // Allocates memory
   quotation_jit(cell owner, bool compiling, bool relocate, factor_vm* vm)
-      : jit(code_block_unoptimized, owner, vm),
+      : jit(owner, vm),
         elements(false_object, vm),
         compiling(compiling),
         relocate(relocate) {}
@@ -32,12 +32,12 @@ struct quotation_jit : public jit {
   bool stack_frame_p();
   void iterate_quotation();
 
-  /* Allocates memory */
+  // Allocates memory
   void word_call(cell word) {
     emit_with_literal(parent->special_objects[JIT_WORD_CALL], word);
   }
 
-  /* Allocates memory (literal(), emit())*/
+  // Allocates memory (literal(), emit())
   void word_jump(cell word_) {
     data_root<word> word(word_, parent);
 #ifndef FACTOR_AMD64

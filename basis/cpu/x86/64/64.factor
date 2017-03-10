@@ -120,8 +120,6 @@ M: x86.64 %safepoint
 
 M: x86.64 long-long-on-stack? f ;
 
-M: x86.64 float-on-stack? f ;
-
 M: x86.64 struct-return-on-stack? f ;
 
 M: x86.64 (cpuid) ( rax rcx regs -- )
@@ -136,13 +134,7 @@ M: x86.64 (cpuid) ( rax rcx regs -- )
         RSI 12 [+] EDX MOV
     ] alien-assembly ;
 
-! The result of reading 4 bytes from memory is a fixnum on
-! x86-64.
-enable-alien-4-intrinsics
-
 {
     { [ os unix? ] [ "cpu.x86.64.unix" require ] }
     { [ os windows? ] [ "cpu.x86.64.windows" require ] }
 } cond
-
-check-cpu-features

@@ -9,6 +9,9 @@ HELP: +db-assigned-id+
 HELP: +default+
 { $description "Allows a default value for a column to be provided." } ;
 
+HELP: +foreign-id+
+{ $description "Makes the column a foreign key, referencing a column in another table." } ;
+
 HELP: +not-null+
 { $description "Ensures that a column is not null." } ;
 
@@ -143,9 +146,10 @@ HELP: unknown-modifier
 
 ARTICLE: "db.types" "Database types"
 "The " { $vocab-link "db.types" } " vocabulary maps Factor types to database types." $nl
-"Primary keys:"
+"Primary and foreign keys:"
 { $subsections
     +db-assigned-id+
+    +foreign-id+
     +user-assigned-id+
     +random-id+
 }

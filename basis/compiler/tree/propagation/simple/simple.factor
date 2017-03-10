@@ -5,8 +5,8 @@ classes.algebra.private classes.maybe classes.tuple.private
 combinators combinators.short-circuit compiler.tree
 compiler.tree.propagation.constraints compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.tree.propagation.nodes
-compiler.tree.propagation.slots continuations fry kernel
-math.intervals sequences stack-checker.dependencies words ;
+compiler.tree.propagation.slots continuations fry kernel make
+sequences sets stack-checker.dependencies words ;
 IN: compiler.tree.propagation.simple
 
 M: #introduce propagate-before
@@ -21,20 +21,6 @@ M: #push propagate-before
 
 : set-value-infos ( infos values -- )
     [ set-value-info ] 2each ;
-
-GENERIC: add-depends-on-class ( obj -- )
-
-M: class add-depends-on-class
-    add-depends-on-conditionally ;
-
-M: maybe add-depends-on-class
-    class>> add-depends-on-class ;
-
-M: anonymous-union add-depends-on-class
-    members>> [ add-depends-on-class ] each ;
-
-M: anonymous-intersection add-depends-on-class
-    participants>> [ add-depends-on-class ] each ;
 
 M: #declare propagate-before
     ! We need to force the caller word to recompile when the
@@ -118,7 +104,7 @@ ERROR: invalid-outputs #call infos ;
 : propagate-predicate ( #call word -- infos )
     [ in-d>> first value-info ]
     [ "predicating" word-prop ] bi*
-    [ nip add-depends-on-conditionally ]
+    [ nip +conditional+ depends-on ]
     [ predicate-output-infos 1array ] 2bi ;
 
 : default-output-value-infos ( #call word -- infos )

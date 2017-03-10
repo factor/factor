@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators kernel kernel.private
-layouts make math math.private sbufs sequences sequences.private
-strings strings.private ;
+USING: accessors byte-arrays combinators kernel kernel.private layouts
+make math math.private sbufs sequences sequences.private strings ;
 IN: math.parser
 
 <PRIVATE
@@ -77,6 +76,7 @@ TUPLE: float-parse
     { point fixnum }
     { exponent }
     { magnitude } ;
+
 : inc-point-?dec-magnitude ( float-parse n -- float-parse' )
     zero? [ [ 1 fixnum-fast ] change-magnitude ] when
     [ 1 fixnum+fast ] change-point ; inline
@@ -114,7 +114,7 @@ TUPLE: float-parse
 ! Also, take some margin as the current float parsing algorithm
 ! does some rounding; For example,
 ! 0x1.0p-1074 is the smallest IE754 double, but floats down to
-! 0x0.fffffffffffffcp-1074 are parsed as 0x1.0p-1074
+! 0x0.8p-1074 (excluded) are parsed as 0x1.0p-1074
 CONSTANT: max-magnitude-10 309
 CONSTANT: min-magnitude-10 -323
 CONSTANT: max-magnitude-2 1027
@@ -542,18 +542,10 @@ M: ratio >base
 : format-string ( format -- format )
     0 suffix >byte-array ; foldable
 
-: format-head ( byte-array n -- string )
-    swap over 0 <string> [
-        [
-            [ [ nth-unsafe ] 2keep drop ]
-            [ set-string-nth-fast ] bi*
-        ] 2curry each-integer
-    ] keep ; inline
-
 : format-float ( n fill width precision format locale -- string )
     [
         [ format-string ] 4dip [ format-string ] bi@ (format-float)
-        dup [ 0 = ] find drop format-head
+        >string
     ] [
         "C" = [ [ "G" = ] [ "E" = ] bi or CHAR: E CHAR: e ? fix-float ]
         [ drop ] if

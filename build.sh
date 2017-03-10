@@ -139,8 +139,8 @@ gcc_version_ok() {
 
 	if [[ $GCC_MAJOR -lt 4
 		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -lt 7 )
-		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_THIRD -lt 3 )
-		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 8 && $GCC_THIRD -eq 0 )
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_PATCH -lt 3 )
+		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 8 && $GCC_PATCH -eq 0 )
 		]] ; then
 		echo "gcc version required >= 4.7.3, != 4.8.0, >= 4.8.1, got $GCC_VERSION"
 		return 1
@@ -364,6 +364,7 @@ echo_build_info() {
     $ECHO OS=$OS
     $ECHO ARCH=$ARCH
     $ECHO WORD=$WORD
+    $ECHO DEBUG=$DEBUG
     $ECHO FACTOR_BINARY=$FACTOR_BINARY
     $ECHO FACTOR_LIBRARY=$FACTOR_LIBRARY
     $ECHO FACTOR_IMAGE=$FACTOR_IMAGE

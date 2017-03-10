@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math quotations assocs.private
-sets ;
+USING: assocs.private help.markup help.syntax kernel math
+namespaces quotations sequences ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -102,11 +101,6 @@ $nl
     assoc-diff
     substitute
     extract-keys
-}
-"Adding elements to sets:"
-{ $subsections
-    conjoin
-    conjoin-at
 }
 "Destructive operations:"
 { $subsections
@@ -626,3 +620,24 @@ HELP: zip-index-as
 { $description "Zip a sequence with its index and return an associative list of type " { $snippet "exemplar" } " where the input sequence is the keys and the indices are the values." } ;
 
 { unzip zip zip-as zip-index zip-index-as } related-words
+
+HELP: collect-by
+{ $values
+    { "seq" sequence } { "quot" { $quotation ( ... obj -- ... key ) } }
+    { "assoc" assoc }
+}
+{ $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the elements that transformed to that key." }
+{ $examples
+    "Collect even and odd elements:"
+    { $example
+               "USING: assocs math prettyprint ;"
+               "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-by ."
+               "H{ { t V{ 11 13 13 11 } } { f V{ 12 14 14 12 } } }"
+    }
+    "Collect strings by length:"
+    { $example
+               "USING: assocs prettyprint sequences ;"
+               "{ \"one\" \"two\" \"three\" \"four\" \"five\" } [ length ] collect-by ."
+               "H{\n    { 3 V{ \"one\" \"two\" } }\n    { 4 V{ \"four\" \"five\" } }\n    { 5 V{ \"three\" } }\n}"
+    }
+} ;

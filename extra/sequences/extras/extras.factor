@@ -4,27 +4,8 @@ sequences sequences.deep sequences.private sorting splitting
 vectors ;
 IN: sequences.extras
 
-: reduce1 ( seq quot -- result ) [ unclip ] dip reduce ; inline
-
-:: reduce-r ( seq identity quot: ( obj1 obj2 -- obj ) -- result )
-    seq [ identity ] [
-        unclip [ identity quot reduce-r ] [ quot call ] bi*
-    ] if-empty ; inline recursive
-
-! Quot must have static stack effect, unlike "reduce"
-:: reduce* ( seq identity quot: ( prev elt -- next ) -- result )
-    seq [ identity ] [
-        unclip identity swap quot call( prev elt -- next )
-        quot reduce*
-    ] if-empty ; inline recursive
-
-:: combos ( list1 list2 -- result )
-    list2 [ [ 2array ] curry list1 swap map ] map concat ;
-
-: find-all ( seq quot: ( elt -- ? ) -- elts )
-    [ [ length iota ] keep ] dip
-    [ dupd call( a -- ? ) [ 2array ] [ 2drop f ] if ] curry
-    2map sift ; inline
+: find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
+    [ <enum> ] dip '[ nip @ ] assoc-filter ; inline
 
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
     [ swap ] 2dip each-from ; inline
@@ -41,12 +22,10 @@ IN: sequences.extras
 : all-subseqs ( seq -- seqs )
     dup length [1,b] [ clump ] with map concat ;
 
-:: each-subseq ( ... seq quot: ( ... x -- ... ) -- ... )
+:: each-subseq ( ... seq quot: ( ... subseq -- ... ) -- ... )
     seq length :> len
-    len [0,b] [
-        :> from
-        from len (a,b] [
-            :> to
+    len [0,b] [| from |
+        from len (a,b] [| to |
             from to seq subseq quot call
         ] each
     ] each ; inline
@@ -54,12 +33,12 @@ IN: sequences.extras
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
 
-: filter-all-subseqs-range ( ... seq range quot: ( ... x -- ... ) -- seq )
+: filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ) -- seq )
     [
         '[ <clumps> _ filter ] with map concat
     ] 3keep 2drop map-like ; inline
 
-: filter-all-subseqs ( ... seq quot: ( ... x -- ... ) -- seq )
+: filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ) -- seq )
     [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
 
 :: longest-subseq ( seq1 seq2 -- subseq )
@@ -81,6 +60,13 @@ IN: sequences.extras
 
 : pad-longest ( seq1 seq2 elt -- seq1 seq2 )
     [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
+
+:: pad-center ( seq n elt -- padded )
+    n seq length [-] :> extra
+    extra 2/ :> left
+    extra left - :> right
+    left elt <repetition> seq right elt <repetition>
+    seq 3append-as ;
 
 : change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
     [ change-nth ] 2curry each ; inline
@@ -198,6 +184,7 @@ ERROR: slices-don't-touch slice1 slice2 ;
     over length mod dup 0 >= [ cut ] [ abs cut* ] if prepend ;
 
 ERROR: underlying-mismatch slice1 slice2 ;
+
 : ensure-same-underlying ( slice1 slice2 -- slice1 slice2 )
     2dup [ seq>> ] bi@ eq? [ underlying-mismatch ] unless ;
 
@@ -243,10 +230,9 @@ PRIVATE>
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over empty? [ 2drop { } ] [
-        [ [ first ] dip call ] 2keep rot dup [
-            >resizable [ [ push-all ] curry compose ] keep
-            [ 1 ] 3dip [ setup-each (each-integer) ] dip
-        ] curry dip like
+        [ [ first ] dip call ] 2keep rot [
+            >resizable [ '[ @ _ push-all ] 1 each-from ] keep
+        ] keep like
     ] if ; inline
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
@@ -616,3 +602,11 @@ PRIVATE>
 
 : map-values ( assoc quot: ( value -- value' ) -- assoc )
     '[ swap _ dip swap ] assoc-map ; inline
+
+: take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
+    [ '[ @ not ] find drop ] 2keep drop swap
+    [ dup length ] unless* head-slice ; inline
+
+: drop-while ( ... seq quot: ( ... elt -- ... ? ) -- tail-slice )
+    [ '[ @ not ] find drop ] 2keep drop swap
+    [ dup length ] unless* tail-slice ; inline

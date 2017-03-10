@@ -213,7 +213,7 @@ M: assoc (deref-aliases)
      [ [ (deref-aliases) ] bi-curry@ bi ] with2 assoc-map! ;
 
 : merge-values ( seq -- assoc )
-    reverse unclip [ assoc-union ] reduce ;
+    reverse [ ] [ assoc-union ] map-reduce ;
 GENERIC: merge-value ( assoc value -- assoc' )
 M: sequence merge-value merge-values merge-value ;
 M: assoc merge-value over assoc-diff assoc-union! ;
@@ -234,7 +234,7 @@ PRIVATE>
 
 GENERIC: apply-merge-keys ( already-applied-set obj -- obj' )
 : ?apply-merge-keys ( set obj -- obj' )
-    2dup swap in? [ nip ] [ 2dup swap adjoin apply-merge-keys ] if ;
+    2dup swap ?adjoin [ apply-merge-keys ] [ nip ] if ;
 M: sequence apply-merge-keys
     [ ?apply-merge-keys ] with map! ;
 M: object apply-merge-keys nip ;

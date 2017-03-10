@@ -66,12 +66,10 @@ IN: stack-checker.backend
 : push-literal ( obj -- )
     literals get push ;
 
-: pop-literal ( -- rstate obj )
+: pop-literal ( -- obj )
     literals get [
-        pop-d
-        [ 1array #drop, ]
-        [ literal [ recursion>> ] [ value>> ] bi ] bi
-    ] [ pop recursive-state get swap ] if-empty ;
+        pop-d [ 1array #drop, ] [ literal value>> ] bi
+    ] [ pop ] if-empty ;
 
 : literals-available? ( n -- literals ? )
     literals get 2dup length <= [
@@ -83,10 +81,7 @@ IN: stack-checker.backend
 GENERIC: apply-object ( obj -- )
 
 M: wrapper apply-object
-    wrapped>>
-    [ dup word? [ add-depends-on-effect ] [ drop ] if ]
-    [ push-literal ]
-    bi ;
+    wrapped>> push-literal ;
 
 M: object apply-object push-literal ;
 
@@ -151,16 +146,13 @@ M: object apply-object push-literal ;
 : with-infer ( quot -- effect visitor )
     [
         init-inference
-        init-known-values
+        H{ } clone known-values set
         stack-visitor off
         call
         end-infer
         current-effect
         stack-visitor get
     ] with-scope ; inline
-
-: (infer) ( quot -- effect )
-    [ infer-quot-here ] with-infer drop ;
 
 : ?quotation-effect ( in -- effect/f )
     dup pair? [ second dup effect? [ drop f ] unless ] [ drop f ] if ;

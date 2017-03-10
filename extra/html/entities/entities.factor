@@ -1654,8 +1654,10 @@ CONSTANT: html5 H{
     { "quatint;" "\u002a16" }
     { "quest;" "?" }
     { "questeq;" "\u00225f" }
-    { "QUOT" " } { \"quot\" " }
-    { "QUOT;" " } { \"quot;\" " }
+    { "QUOT" "\"" }
+    { "QUOT;" "\"" }
+    { "quot" "\"" }
+    { "quot;" "\"" }
     { "rAarr;" "\u0021db" }
     { "race;" "\u00223d\u000331" }
     { "Racute;" "\u000154" }

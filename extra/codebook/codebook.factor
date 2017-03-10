@@ -96,7 +96,7 @@ TUPLE: code-file
     file mode>> load-mode :> rules
     f lines [| l i | l rules tokenize-line i 1 + line#len line#>string htmlize-tokens ]
     map-index concat nip :> html-lines
-    <XML <html>
+    <XML <!DOCTYPE html> <html>
         <head>
             <title><-name-></title>
             <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
@@ -116,7 +116,7 @@ TUPLE: code-file
     dir [
         files toc-list :> toc
 
-        <XML <html>
+        <XML <!DOCTYPE html> <html>
             <head>
                 <title><-name-></title>
                 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />

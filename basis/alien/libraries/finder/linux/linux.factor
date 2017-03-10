@@ -20,7 +20,7 @@ CONSTANT: mach-map {
         [
             " " split1 [ "()" in? ] trim "," split
             [ [ blank? ] trim ] map
-            [ "OS ABI:" head? ] reject
+            [ ": Linux" swap subseq? ] reject
         ] dip 3array
     ] map ;
 
@@ -49,4 +49,4 @@ PRIVATE>
 M: linux find-library*
     "lib" prepend ldconfig-find-soname [
         { [ exists? ] [ file-info regular-file? ] } 1&&
-    ] map-find nip ;
+    ] find nip ;

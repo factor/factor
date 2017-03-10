@@ -85,6 +85,7 @@ $nl
     vunordered?
     vmax
     vmin
+    vclamp
     vsupremum
     vinfimum
 }
@@ -301,6 +302,17 @@ HELP: vmin
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Creates a sequence where each element is the minimum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
+
+HELP: vclamp
+{ $values { "v" "a sequence of real numbers" } { "min" "a sequence of real numbers" } { "max" "a sequence of real numbers" } }
+{ $description "Creates a sequence where each element is clamped to the minimum and maximum elements of the " { $snippet "min" } " and " { $snippet "max" } " sequences." }
+{ $examples
+  { $example
+    "USING: math.vectors prettyprint ;"
+    "{ -10 30 120 } { 0 0 0 } { 100 100 100 } vclamp ."
+    "{ 0 30 100 }"
+  }
+} ;
 
 HELP: v.
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }

@@ -93,6 +93,7 @@ IN: sequences.tests
 { V{ 4 2 6 } } [ V{ 1 4 2 5 3 6 } clone [ 2 mod 0 = ] filter! ] unit-test
 
 { V{ 3 } } [ V{ 1 2 3 } clone 2 [ swap < ] curry filter! ] unit-test
+{ 4 V{ 1 2 3 } } [ 4 V{ 1 4 2 5 3 6 } [ dupd > ] filter! ] unit-test
 
 { "hello world how are you" }
 [ { "hello" "world" "how" "are" "you" } " " join ] unit-test

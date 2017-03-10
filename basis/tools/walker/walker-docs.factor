@@ -1,9 +1,9 @@
 IN: tools.walker
-USING: help.syntax help.markup tools.continuations sequences math words ;
+USING: help.syntax help.markup tools.annotations tools.continuations sequences math words ;
 
 HELP: breakpoint
 { $values { "word" word } }
-{ $description "Annotates a word definition to enter the single stepper when executed." }
+{ $description "Annotates a word definition to enter the single stepper when executed. Use " { $link reset } " to clear." }
 { $examples
     { $unchecked-example "USE: tools.walker \\ sq breakpoint"
         ""
@@ -12,7 +12,7 @@ HELP: breakpoint
 
 HELP: breakpoint-if
 { $values { "word" word } { "quot" { $quotation ( -- ? ) } } }
-{ $description "Annotates a word definition to enter the single stepper if the quotation yields true. The quotation has access to the datastack as it exists just before " { $snippet "word" } " is called." }
+{ $description "Annotates a word definition to enter the single stepper if the quotation yields true. The quotation has access to the datastack as it exists just before " { $snippet "word" } " is called. Use " { $link reset } " to clear." }
 { $examples
     "Break if the input to sq is 3:"
     { $unchecked-example

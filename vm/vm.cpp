@@ -7,11 +7,16 @@ factor_vm::factor_vm(THREADHANDLE thread)
       nursery(0, 0),
       faulting_p(false),
       thread(thread),
+#if defined(WINDOWS)
+      thread_id(GetCurrentThreadId()),
+      ctrl_break_thread(NULL),
+#endif
       callback_id(0),
       c_to_factor_func(NULL),
       sampling_profiler_p(false),
       signal_pipe_input(0),
       signal_pipe_output(0),
+      sample_counts(0, 0, 0, 0, 0),
       gc_off(false),
       data(NULL), code(NULL), callbacks(NULL),
       current_gc(NULL),
@@ -24,7 +29,8 @@ factor_vm::factor_vm(THREADHANDLE thread)
       full_output(false),
       last_nano_count(0),
       signal_callstack_seg(NULL),
-      safepoint() {
+      safepoint_fep_p(false),
+      stop_on_ctrl_break(false) {
   primitive_reset_dispatch_stats();
 }
 

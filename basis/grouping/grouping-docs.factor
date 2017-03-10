@@ -12,7 +12,7 @@ ARTICLE: "grouping" "Groups and clumps"
 { $subsections circular-clump }
 "A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
 { $subsections clumps <clumps> }
-"A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
+"A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences, wrapping around the end of the sequence:"
 { $subsections circular-clumps <circular-clumps> }
 "The difference can be summarized as the following:"
 { $list

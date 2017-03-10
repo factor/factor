@@ -1,6 +1,6 @@
 USING: accessors arrays assocs compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stacks.padding compiler.cfg.utilities kernel sequences sorting
-vectors tools.test ;
+compiler.cfg.stacks.padding compiler.cfg.utilities compiler.test kernel
+sequences sorting vectors tools.test ;
 IN: compiler.cfg.stacks.padding.tests
 
 ! classify-read: initialized locations
@@ -121,10 +121,10 @@ IN: compiler.cfg.stacks.padding.tests
 ] [ vacant-peek? ] must-fail-with
 
 : following-stack-state ( insns -- state )
-    T{ ##branch } suffix insns>cfg trace-stack-state2
+    T{ ##branch } suffix insns>cfg trace-stack-state
     >alist [ first ] sort-with last second ;
 
-! trace-stack-state2
+! trace-stack-state
 {
     H{
         {
@@ -145,7 +145,7 @@ IN: compiler.cfg.stacks.padding.tests
         T{ ##inc f D: 2 }
         T{ ##peek f f D: 2 }
         T{ ##inc f D: 0 }
-    } insns>cfg trace-stack-state2
+    } insns>cfg trace-stack-state
 ] unit-test
 
 {
@@ -156,7 +156,7 @@ IN: compiler.cfg.stacks.padding.tests
     }
 } [
     V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } }
-    insns>cfg trace-stack-state2
+    insns>cfg trace-stack-state
 ] unit-test
 
 ! The peek "causes" the vacant locations to become populated.
@@ -172,7 +172,7 @@ IN: compiler.cfg.stacks.padding.tests
         T{ ##peek { loc D: 3 } }
         T{ ##branch }
     }
-    insns>cfg trace-stack-state2
+    insns>cfg trace-stack-state
 ] unit-test
 
 : cfg1 ( -- cfg )
@@ -193,7 +193,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 2 { { 1 { } } { 0 { } } } }
         { 3 { { 1 { } } { 0 { } } } }
     }
-} [ cfg1 trace-stack-state2 ] unit-test
+} [ cfg1 trace-stack-state ] unit-test
 
 ! Same cfg structure as the bug1021:run-test word but with
 ! non-datastack instructions mostly omitted.
@@ -237,7 +237,7 @@ IN: compiler.cfg.stacks.padding.tests
             10 V{
                 T{ ##inc f D: -3 }
                 T{ ##peek { dst 0 } { loc D: 0 } }
-                T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+                T{ ##alien-invoke { gc-map T{ gc-map } } }
             }
         }
     } [ over insns>block ] assoc-map dup
@@ -271,7 +271,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 22 { { 4 { } } { 0 { } } } }
     }
 } [
-    bug1021-cfg trace-stack-state2
+    bug1021-cfg trace-stack-state
 ] unit-test
 
 ! Same cfg structure as the bug1289:run-test word but with
@@ -409,7 +409,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 31 { { 2 { 0 } } { 1 { } } } }
         { 32 { { 2 { 0 } } { 0 { } } } }
     }
-} [ bug1289-cfg trace-stack-state2 ] unit-test
+} [ bug1289-cfg trace-stack-state ] unit-test
 
 : bug-benchmark-terrain-cfg ( -- cfg )
     H{
@@ -578,7 +578,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 36 { { -1 { } } { 0 { } } } }
     }
 } [
-    bug-benchmark-terrain-cfg trace-stack-state2
+    bug-benchmark-terrain-cfg trace-stack-state
 ] unit-test
 
 
@@ -660,7 +660,7 @@ IN: compiler.cfg.stacks.padding.tests
 [
     V{
         T{ ##inc f D: 1 }
-        T{ ##alien-invoke { gc-map T{ gc-map { scrub-d { } } } } }
+        T{ ##alien-invoke { gc-map T{ gc-map } } }
         T{ ##peek { loc D: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with

@@ -21,7 +21,7 @@ HELP: images.
 { $values
     { "dirpath" "a pathname string" } { "extension" string }
 }
-{ $description "Renders each image at " { $snippet "dirpath" } " directly to the Listener tool." } ;
+{ $description "Renders each image at " { $snippet "dirpath" } " directly to the listener tool." } ;
 { images. image. } related-words
 
 HELP: load-reference-image

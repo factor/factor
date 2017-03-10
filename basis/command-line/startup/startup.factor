@@ -7,7 +7,7 @@ IN: command-line.startup
 : cli-usage ( -- )
 "Usage: " write vm-path file-name write " [Factor arguments] [script] [script arguments]
 
-Common arguments:
+Factor arguments:
     -help               print this message and exit
     -i=<image>          load Factor image file <image> (default " write vm-path file-stem write ".image)
     -run=<vocab>        run the MAIN: entry point of <vocab>
@@ -25,7 +25,7 @@ Common arguments:
     -codeheap=<int>     codeheap size in MiB
     -pic=<int>          max pic size
     -fep                enter fep mode immediately
-    -nosignals          turn off OS signal handling
+    -no-signals         turn off OS signal handling
     -console            open console if possible
     -roots=<paths>      a list of \"" write os windows? ";" ":" ? write "\"-delimited extra vocab roots
 
@@ -36,8 +36,8 @@ from within Factor for more information.
 " write ;
 
 : help? ( -- ? )
-    "help" get "-help" get or "h" get or
-    os windows? [ script get "/?" = ] [ f ] if or ;
+    "help" get "h" get or
+    os windows? [ script get "/?" = or ] when ;
 
 : command-line-startup ( -- )
     (command-line) parse-command-line

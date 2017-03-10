@@ -12,7 +12,7 @@ IN: cocoa.messages
 SPECIALIZED-ARRAY: void*
 
 : make-sender ( signature function -- quot )
-    [ over first , f , , second , \ alien-invoke , ] [ ] make ;
+    [ over first , f , , second , f , \ alien-invoke , ] [ ] make ;
 
 : sender-stub-name ( signature -- str )
     first2 [ name>> ] [
@@ -94,12 +94,12 @@ SYMBOL: class-init-hooks
 class-init-hooks [ H{ } clone ] initialize
 
 : (objc-class) ( name word -- class )
-    2dup execute dup [ 2nip ] [
-        drop over class-init-hooks get at [ call( -- ) ] when*
-        2dup execute dup [ 2nip ] [
-            2drop "No such class: " prepend throw
-        ] if
-    ] if ; inline
+    2dup execute [ 2nip ] [
+        over class-init-hooks get at [ call( -- ) ] when*
+        2dup execute [ 2nip ] [
+            drop "No such class: " prepend throw
+        ] if*
+    ] if* ; inline
 
 : objc-class ( string -- class )
     \ objc_getClass (objc-class) ;

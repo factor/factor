@@ -58,7 +58,7 @@ HELP: split-when
 
 HELP: split-when-slice
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "pieces" "a new array" } }
-{ $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces as slices. The pieces do not include the elements along which the sequence was split." } ;
+{ $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces as " { $link slice } "s. The pieces do not include the elements along which the sequence was split." } ;
 
 HELP: split-indices
 { $values { "seq" sequence } { "indices" sequence } { "pieces" "a new array" } }

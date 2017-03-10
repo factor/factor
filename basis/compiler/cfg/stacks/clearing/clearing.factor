@@ -1,6 +1,6 @@
-USING: accessors arrays assocs combinators.short-circuit
+USING: accessors assocs combinators.short-circuit
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.stacks compiler.cfg.stacks.padding kernel math sequences ;
+compiler.cfg.stacks compiler.cfg.stacks.padding kernel sequences ;
 IN: compiler.cfg.stacks.clearing
 
 : state>clears ( state -- clears )
@@ -8,7 +8,8 @@ IN: compiler.cfg.stacks.clearing
     [ f ##clear boa ] map ;
 
 : dangerous-insn? ( state insn -- ? )
-    { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ;
+    [ { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ]
+    [ gc-map-insn? ] bi or ;
 
 : clearing-insns ( assoc insn -- insns' )
     [ insn#>> of ] keep 2dup dangerous-insn? [
@@ -19,6 +20,6 @@ IN: compiler.cfg.stacks.clearing
     [ [ clearing-insns ] keep suffix ] with map V{ } concat-as ;
 
 : clear-uninitialized ( cfg -- )
-    [ trace-stack-state2 ] keep [
+    [ trace-stack-state ] keep [
         [ visit-insns ] change-instructions drop
     ] with each-basic-block ;

@@ -1,6 +1,6 @@
 namespace factor {
 
-/* Size sans alignment. */
+// Size sans alignment.
 template <typename Fixup>
 cell object::base_size(Fixup fixup) const {
   switch (type()) {
@@ -39,7 +39,7 @@ cell object::base_size(Fixup fixup) const {
   }
 }
 
-/* Size of the object pointed to by an untagged pointer */
+// Size of the object pointed to by an untagged pointer
 template <typename Fixup>
 cell object::size(Fixup fixup) const {
   if (free_p())
@@ -49,9 +49,9 @@ cell object::size(Fixup fixup) const {
 
 inline cell object::size() const { return size(no_fixup()); }
 
-/* The number of slots (cells) in an object which should be scanned by
-   the GC. The number can vary in arrays and tuples, in all other
-   types the number is a constant. */
+// The number of slots (cells) in an object which should be scanned by
+// the GC. The number can vary in arrays and tuples, in all other
+// types the number is a constant.
 template <typename Fixup>
 inline cell object::slot_count(Fixup fixup) const {
   if (free_p())
@@ -59,16 +59,16 @@ inline cell object::slot_count(Fixup fixup) const {
 
   cell t = type();
   if (t == ARRAY_TYPE) {
-    /* capacity + n slots */
+    // capacity + n slots
     return 1 + array_capacity((array*)this);
   } else if (t == TUPLE_TYPE) {
     tuple_layout* layout = (tuple_layout*)fixup.translate_data(
         untag<object>(((tuple*)this)->layout));
-    /* layout + n slots */
+    // layout + n slots
     return 1 + tuple_capacity(layout);
   } else {
     switch (t) {
-      /* these objects do not refer to other objects at all */
+      // these objects do not refer to other objects at all
       case FLOAT_TYPE:
       case BYTE_ARRAY_TYPE:
       case BIGNUM_TYPE:
@@ -81,7 +81,7 @@ inline cell object::slot_count(Fixup fixup) const {
       case WRAPPER_TYPE: return 1;
       default:
         critical_error("Invalid header in slot_count", (cell)this);
-        return 0; /* can't happen */
+        return 0; // can't happen
     }
   }
 }
@@ -90,33 +90,32 @@ inline cell object::slot_count() const {
   return slot_count(no_fixup());
 }
 
-/* Slot visitors iterate over the slots of an object, applying a functor to
-each one that is a non-immediate slot. The pointer is untagged first. The
-functor returns a new untagged object pointer. The return value may or may not
-equal the old one,
-however the new pointer receives the same tag before being stored back to the
-original location.
+// Slot visitors iterate over the slots of an object, applying a functor to
+// each one that is a non-immediate slot. The pointer is untagged first.
+// The functor returns a new untagged object pointer. The return value may
+// or may not equal the old one, however the new pointer receives the same
+// tag before being stored back to the original location.
 
-Slots storing immediate values are left unchanged and the visitor does inspect
-them.
+// Slots storing immediate values are left unchanged and the visitor does
+// inspect them.
 
-This is used by GC's copying, sweep and compact phases, and the implementation
-of the become primitive.
+// This is used by GC's copying, sweep and compact phases, and the
+// implementation of the become primitive.
 
-Iteration is driven by visit_*() methods. Only one of them define GC roots:
-- visit_all_roots()
+// Iteration is driven by visit_*() methods. Only one of them define GC
+// roots:
+//  - visit_all_roots()
 
-Code block visitors iterate over sets of code blocks, applying a functor to
-each one. The functor returns a new code_block pointer, which may or may not
-equal the old one. This is stored back to the original location.
+// Code block visitors iterate over sets of code blocks, applying a functor
+// to each one. The functor returns a new code_block pointer, which may or
+// may not equal the old one. This is stored back to the original location.
 
-This is used by GC's sweep and compact phases, and the implementation of the
-modify-code-heap primitive.
+// This is used by GC's sweep and compact phases, and the implementation of
+// the modify-code-heap primitive.
 
-Iteration is driven by visit_*() methods. Some of them define GC roots:
- - visit_context_code_blocks()
- - visit_callback_code_blocks()
-*/
+// Iteration is driven by visit_*() methods. Some of them define GC roots:
+//  - visit_context_code_blocks()
+//  - visit_callback_code_blocks()
 
 template <typename Fixup> struct slot_visitor {
   factor_vm* parent;
@@ -140,24 +139,32 @@ template <typename Fixup> struct slot_visitor {
   void visit_callstack_object(callstack* stack);
   void visit_callstack(context* ctx);
   void visit_context(context *ctx);
-  void visit_code_block_objects(code_block* compiled);
-  void visit_embedded_literals(code_block* compiled);
   void visit_object_code_block(object* obj);
   void visit_context_code_blocks();
   void visit_uninitialized_code_blocks();
-  void visit_embedded_code_pointers(code_block* compiled);
   void visit_object(object* obj);
   void visit_mark_stack(std::vector<cell>* mark_stack);
-  void visit_instruction_operands(code_block* block, cell rel_base);
+
 
   template <typename SourceGeneration>
   cell visit_card(SourceGeneration* gen, cell index, cell start);
   template <typename SourceGeneration>
   void visit_cards(SourceGeneration* gen, card mask, card unmask);
-  void visit_code_heap_roots(std::set<code_block*>* remembered_set);
+
 
   template <typename TargetGeneration>
   void cheneys_algorithm(TargetGeneration* gen, cell scan);
+
+  // Visits the data pointers in code blocks in the remembered set.
+  void visit_code_heap_roots(std::set<code_block*>* remembered_set);
+
+  // Visits pointers embedded in instructions in code blocks.
+  void visit_instruction_operands(code_block* block, cell rel_base);
+  void visit_embedded_code_pointers(code_block* compiled);
+  void visit_embedded_literals(code_block* compiled);
+
+  // Visits data pointers in code blocks.
+  void visit_code_block_objects(code_block* compiled);
 };
 
 template <typename Fixup>
@@ -201,14 +208,10 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   auto callback_slot_visitor = [&](code_block* stub, cell size) {
     visit_handle(&stub->owner);
   };
-  parent->callbacks->allocator->iterate(callback_slot_visitor);
+  parent->callbacks->allocator->iterate(callback_slot_visitor, no_fixup());
 
   FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
     iter->second = visit_pointer(iter->second);
-  }
-
-  FACTOR_FOR_EACH(parent->sample_callstacks) {
-    visit_handle(&*iter);
   }
 
   FACTOR_FOR_EACH(parent->samples) {
@@ -223,41 +226,24 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   }
 }
 
-/* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
-   uninitialized stack locations before actually calling the GC. See the
-   documentation in compiler.cfg.stacks.vacant for details.
+// primitive_minor_gc() is invoked by inline GC checks, and it needs to
+// visit spill slots which references objects in the heap.
 
-   So for each call frame:
+// So for each call frame:
+//  - trace roots in spill slots
 
-    - scrub some uninitialized locations
-    - trace roots in spill slots
-*/
 template <typename Fixup> struct call_frame_slot_visitor {
   slot_visitor<Fixup>* visitor;
-  /* NULL in case we're a visitor for a callstack object. */
-  context* ctx;
 
-  void scrub_stack(cell stack, uint8_t* bitmap, cell base, uint32_t count) {
-    for (cell loc = 0; loc < count; loc++) {
-      if (bitmap_p(bitmap, base + loc)) {
-#ifdef DEBUG_GC_MAPS
-        FACTOR_PRINT("scrubbing stack location " << loc);
-#endif
-        *((cell*)stack - loc) = 0;
-      }
-    }
-  }
+  call_frame_slot_visitor(slot_visitor<Fixup>* visitor)
+      : visitor(visitor) {}
 
-  call_frame_slot_visitor(slot_visitor<Fixup>* visitor, context* ctx)
-      : visitor(visitor), ctx(ctx) {}
+  // frame top -> [return address]
+  //              [spill area]
+  //              ...
+  //              [entry_point]
+  //              [size]
 
-  /*
-	frame top -> [return address]
-	             [spill area]
-	             ...
-	             [entry_point]
-	             [size]
-	*/
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     cell return_address = owner->offset(addr);
 
@@ -278,19 +264,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
     cell* stack_pointer = (cell*)frame_top;
     uint8_t* bitmap = info->gc_info_bitmap();
 
-    if (ctx) {
-      /* Scrub vacant stack locations. */
-      scrub_stack(ctx->datastack,
-                  bitmap,
-                  info->callsite_scrub_d(callsite),
-                  info->scrub_d_count);
-      scrub_stack(ctx->retainstack,
-                  bitmap,
-                  info->callsite_scrub_r(callsite),
-                  info->scrub_r_count);
-    }
-
-    /* Subtract old value of base pointer from every derived pointer. */
+    // Subtract old value of base pointer from every derived pointer.
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
@@ -303,19 +277,19 @@ template <typename Fixup> struct call_frame_slot_visitor {
       }
     }
 
-    /* Update all GC roots, including base pointers. */
+    // Update all GC roots, including base pointers.
     cell callsite_gc_roots = info->callsite_gc_roots(callsite);
 
     for (cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++) {
       if (bitmap_p(bitmap, callsite_gc_roots + spill_slot)) {
-#ifdef DEBUG_GC_MAPS
+        #ifdef DEBUG_GC_MAPS
         FACTOR_PRINT("visiting GC root " << spill_slot);
-#endif
+        #endif
         visitor->visit_handle(stack_pointer + spill_slot);
       }
     }
 
-    /* Add the base pointers to obtain new derived pointer values. */
+    // Add the base pointers to obtain new derived pointer values.
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
@@ -327,20 +301,18 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack* stack) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(this, NULL);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(this);
   parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context* ctx) {
-  call_frame_slot_visitor<Fixup> call_frame_visitor(this, ctx);
+  call_frame_slot_visitor<Fixup> call_frame_visitor(this);
   parent->iterate_callstack(ctx, call_frame_visitor, fixup);
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_context(context* ctx) {
-  /* Callstack is visited first because it scrubs the data and retain
-     stacks. */
   visit_callstack(ctx);
 
   cell ds_ptr = ctx->datastack;
@@ -352,10 +324,10 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
   visit_object_array(ctx->context_objects,
                      ctx->context_objects + context_object_count);
 
-  /* Clear out the space not visited with a known pattern. That makes
-     it easier to see if uninitialized reads are made. */
+  // Clear out the space not visited with a known pattern. That makes
+  // it easier to see if uninitialized reads are made.
   ctx->fill_stack_seg(ds_ptr, ds_seg, 0xbaadbadd);
-  ctx->fill_stack_seg(rs_ptr, rs_seg, 0xdaabdaab);
+  ctx->fill_stack_seg(rs_ptr, rs_seg, 0xdaabdabb);
 }
 
 template <typename Fixup>
@@ -384,8 +356,7 @@ void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
 template <typename Fixup> struct call_frame_code_block_visitor {
   Fixup fixup;
 
-  call_frame_code_block_visitor(Fixup fixup)
-      : fixup(fixup) {}
+  call_frame_code_block_visitor(Fixup fixup) : fixup(fixup) {}
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     code_block* compiled =
@@ -461,9 +432,9 @@ void slot_visitor<Fixup>::visit_object(object *ptr) {
     ((alien*)ptr)->update_address();
 }
 
-/* Pops items from the mark stack and visits them until the stack is
-   empty. Used when doing a full collection and when collecting to
-   tenured space. */
+// Pops items from the mark stack and visits them until the stack is
+// empty. Used when doing a full collection and when collecting to
+// tenured space.
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
   while (!mark_stack->empty()) {
@@ -483,11 +454,11 @@ void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
   }
 }
 
-/* Visits the instruction operands in a code block. If the operand is
-   a pointer to a code block or data object, then the fixup is applied
-   to it. Otherwise, if it is an external addess, that address is
-   recomputed. If it is an untagged number literal (RT_UNTAGGED) or an
-   immediate value, then nothing is done with it. */
+// Visits the instruction operands in a code block. If the operand is
+// a pointer to a code block or data object, then the fixup is applied
+// to it. Otherwise, if it is an external addess, that address is
+// recomputed. If it is an untagged number literal (RT_UNTAGGED) or an
+// immediate value, then nothing is done with it.
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
                                                      cell rel_base) {
@@ -517,6 +488,8 @@ void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
         break;
     }
   };
+  if (parent->code->uninitialized_p(block))
+    return;
   block->each_instruction_operand(visit_func);
 }
 
@@ -541,10 +514,10 @@ cell slot_visitor<Fixup>::visit_card(SourceGeneration* gen,
   cell start_addr = heap_base + index * card_size;
   cell end_addr = start_addr + card_size;
 
-  /* Forward to the next object whose address is in the card. */
+  // Forward to the next object whose address is in the card.
   if (!start || (start + ((object*)start)->size()) < start_addr) {
-    /* Optimization because finding the objects in a memory range is
-       expensive. It helps a lot when tracing consecutive cards. */
+    // Optimization because finding the objects in a memory range is
+    // expensive. It helps a lot when tracing consecutive cards.
     cell gen_start_card = (gen->start - heap_base) / card_size;
     start = gen->starts
         .find_object_containing_card(index - gen_start_card);
@@ -553,9 +526,9 @@ cell slot_visitor<Fixup>::visit_card(SourceGeneration* gen,
   while (start && start < end_addr) {
     visit_partial_objects(start, start_addr, end_addr);
     if ((start + ((object*)start)->size()) >= end_addr) {
-      /* The object can overlap the card boundary, then the
-         remainder of it will be handled in the next card
-         tracing if that card is marked. */
+      // The object can overlap the card boundary, then the
+      // remainder of it will be handled in the next card
+      // tracing if that card is marked.
       break;
     }
     start = gen->next_object_after(start);
@@ -574,7 +547,7 @@ void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
   cell first_deck = (gen->start - heap_base) / deck_size;
   cell last_deck = (gen->end - heap_base) / deck_size;
 
-  /* Address of last traced object. */
+  // Address of last traced object.
   cell start = 0;
   for (cell di = first_deck; di < last_deck; di++) {
     if (decks[di] & mask) {
@@ -591,7 +564,7 @@ void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
 
           start = visit_card(gen, ci, start);
           if (!start) {
-            /* At end of generation, no need to scan more cards. */
+            // At end of generation, no need to scan more cards.
             return;
           }
         }

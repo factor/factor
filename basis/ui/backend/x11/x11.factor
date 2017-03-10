@@ -6,13 +6,21 @@ environment io.encodings.ascii io.encodings.string io.encodings.utf8
 kernel literals locals math namespaces sequences specialized-arrays
 strings ui ui.backend ui.backend.x11.keys ui.clipboards ui.event-loop
 ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.pixel-formats.private ui.private x11 x11.clipboard
-x11.constants x11.events x11.glx x11.io x11.windows x11.xim x11.xlib ;
+ui.pixel-formats ui.private x11 x11.X x11.clipboard x11.events x11.glx
+x11.io x11.windows x11.xim x11.xlib ;
 FROM: libc => system ;
 SPECIALIZED-ARRAYS: uchar ulong ;
 IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
+
+! *****************************************************************
+! * EXTENDED WINDOW MANAGER HINTS
+! *****************************************************************
+
+CONSTANT: _NET_WM_STATE_REMOVE 0
+CONSTANT: _NET_WM_STATE_ADD 1
+CONSTANT: _NET_WM_STATE_TOGGLE 2
 
 : XA_NET_SUPPORTED ( -- atom ) "_NET_SUPPORTED" x-atom ;
 : XA_NET_WM_NAME ( -- atom ) "_NET_WM_NAME" x-atom ;
@@ -60,7 +68,8 @@ M: world configure-event
     ! In case dimensions didn't change
     relayout-1 ;
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_RGBA } H{
+CONSTANT: perm-attribs { $ GLX_RGBA }
+CONSTANT: attrib-table H{
     { double-buffered { $ GLX_DOUBLEBUFFER } }
     { stereo { $ GLX_STEREO } }
     { color-bits { $ GLX_BUFFER_SIZE } }
@@ -80,19 +89,11 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: glx-visual { $ GLX_RGBA } H{
 }
 
 M: x11-ui-backend (make-pixel-format)
-    [ drop dpy get scr get ] dip
-    >glx-visual-int-array glXChooseVisual ;
+    [ drop dpy get scr get ] dip perm-attribs attrib-table
+    pixel-format-attributes>int-array glXChooseVisual ;
 
 M: x11-ui-backend (free-pixel-format)
     handle>> XFree ;
-
-M: x11-ui-backend (pixel-format-attribute)
-    [ dpy get ] 2dip
-    [ handle>> ] [ >glx-visual ] bi*
-    [ 2drop f ] [
-        first
-        { int } [ glXGetConfig drop ] with-out-parameters
-    ] if-empty ;
 
 : key-code ( code -- string/f action? )
     code>sym [ dup integer? [ 1string ] when ] dip ;

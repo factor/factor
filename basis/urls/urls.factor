@@ -13,11 +13,14 @@ TUPLE: url protocol username password host port path query anchor ;
 : query-param ( url key -- value )
     swap query>> at ;
 
-: set-or-delete ( val key query -- )
+: set-or-delete ( value key query -- )
     pick [ set-at ] [ delete-at drop ] if ;
 
 : set-query-param ( url value key -- url )
     pick query>> [ <linked-hash> ] unless* [ set-or-delete ] keep >>query ;
+
+: set-query-params ( url params -- url )
+    [ swap set-query-param ] assoc-each ;
 
 ERROR: malformed-port ;
 

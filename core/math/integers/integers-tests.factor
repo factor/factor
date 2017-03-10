@@ -280,5 +280,13 @@ IN: math.integers.tests
 { 0x0.6p-1022 } [ 6 1026 2^ /f ] unit-test
 { 0x0.4p-1022 } [ 4 1026 2^ /f ] unit-test
 
+! bignum/f didn't round subnormals
+! biggest subnormal to smallest normal rounding
+{ 0x1.0p-1022 } [ 0xfffffffffffffffffffffffff 1122 2^ /f ] unit-test
+! almost half less than smallest subnormal to smallest subnormal rounding
+{ 0x1.0p-1074 } [ 0x8000000000000000000000001 1122 52 + 2^ /f ] unit-test
+! half less than smallest subnormal to 0
+{ 0.0 } [ 0x8000000000000000000000000 1122 52 + 2^ /f ] unit-test
+
 ! rounding triggering special case in post-scale
 { 1.0 } [ 300 2^ 1 - 300 2^ /f ] unit-test

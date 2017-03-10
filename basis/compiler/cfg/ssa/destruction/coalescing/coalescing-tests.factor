@@ -1,9 +1,9 @@
 USING: assocs compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.ssa.destruction.coalescing
-compiler.cfg.ssa.destruction.leaders compiler.cfg.ssa.interference
-compiler.cfg.utilities cpu.architecture grouping kernel make
+compiler.cfg.ssa.destruction.leaders
+compiler.cfg.ssa.interference compiler.cfg.utilities
+compiler.utilities cpu.architecture grouping kernel make
 namespaces random sequences tools.test ;
-QUALIFIED: sets
 IN: compiler.cfg.ssa.destruction.coalescing.tests
 
 ! eliminatable-copy?
@@ -104,7 +104,7 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
 
 { t } [
     10 [
-        { 2286 2287 2288 } sets:unique leader-map set
+        { 2286 2287 2288 } unique leader-map set
         2286 make-phi-inputs ##phi new-insn
         coalesce-now
         2286 leader

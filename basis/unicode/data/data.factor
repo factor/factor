@@ -77,7 +77,7 @@ PRIVATE>
 ! Loading data from UnicodeData.txt
 
 : load-data ( -- data )
-    "vocab:unicode/data/UnicodeData.txt" data ;
+    "vocab:unicode/data/UnicodeData.txt" load-data-file ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap ] with { } map>assoc
@@ -108,10 +108,10 @@ PRIVATE>
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
     [ "#" split1 drop [ blank? ] trim-tail hex> ] map
-    [ 0 = ] reject ;
+    [ 0 = ] reject fast-set ;
 
 : remove-exclusions ( alist -- alist )
-    exclusions unique assoc-diff ;
+    exclusions [ nip sets:in? ] curry assoc-reject ;
 
 : process-canonical ( data -- hash hash )
     (process-decomposed) [ first* ] filter
@@ -170,7 +170,7 @@ C: <code-point> code-point
 
 ! Extra properties {{[a,b],prop}}
 : parse-properties ( -- assoc )
-    "vocab:unicode/data/PropList.txt" data [
+    "vocab:unicode/data/PropList.txt" load-data-file [
         [
             ".." split1 [ dup ] unless*
             [ hex> ] bi@ 2array
@@ -187,7 +187,7 @@ C: <code-point> code-point
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "vocab:unicode/data/SpecialCasing.txt" data
+    "vocab:unicode/data/SpecialCasing.txt" load-data-file
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make ;
 

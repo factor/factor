@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants game.loop game.worlds gpu
-gpu.framebuffers gpu.util.wasd game.debug kernel literals locals
-make math math.constants math.matrices math.parser sequences
-alien.c-types specialized-arrays ui.gadgets.worlds ui.pixel-formats ;
+USING: accessors colors.constants game.debug game.loop
+game.worlds gpu gpu.framebuffers gpu.util.wasd kernel literals
+locals make math math.matrices math.parser math.trig sequences
+specialized-arrays ui.gadgets.worlds ui.pixel-formats ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: game.debug.tests
@@ -12,9 +12,6 @@ IN: game.debug.tests
     system-framebuffer {
         { default-attachment color }
     } clear-framebuffer ;
-
-: deg>rad ( d -- r )
-    180 / pi * ;
 
 :: draw-debug-tests ( world -- )
     world [ wasd-p-matrix ] [ wasd-mv-matrix ] bi m. :> mvp-matrix

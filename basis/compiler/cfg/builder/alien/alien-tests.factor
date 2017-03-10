@@ -1,9 +1,10 @@
-USING: accessors alien alien.c-types compiler.cfg compiler.cfg.builder
-compiler.cfg.builder.alien compiler.cfg.builder.alien.params
-compiler.cfg.builder.blocks compiler.cfg.instructions
-compiler.cfg.registers compiler.test compiler.tree.builder
+USING: accessors alien alien.c-types alien.strings assocs compiler.cfg
+compiler.cfg.builder compiler.cfg.builder.alien
+compiler.cfg.builder.alien.params compiler.cfg.builder.blocks
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
+compiler.errors compiler.test compiler.tree.builder
 compiler.tree.optimizer cpu.architecture cpu.x86.assembler
-cpu.x86.assembler.operands kernel make namespaces sequences
+cpu.x86.assembler.operands kernel literals make namespaces sequences
 stack-checker.alien system tools.test words ;
 IN: compiler.cfg.builder.alien.tests
 
@@ -41,21 +42,70 @@ IN: compiler.cfg.builder.alien.tests
     [ emit-callback-body drop ] V{ } make
 ] cfg-unit-test
 
+! caller-linkage
+${
+    "malloc"
+    os windows? "msvcrt.dll" f ?
+} [
+    f f cdecl f "libc" "malloc" alien-invoke-params boa
+    caller-linkage
+    dup [ path>> alien>native-string ] when
+] unit-test
+
+SYMBOL: foo
+
+{ t "fdkjlsdflfd" } [
+    begin-stack-analysis \ foo f begin-cfg drop
+    f f cdecl f f "fdkjlsdflfd" alien-invoke-params boa
+    caller-linkage 2drop
+    linkage-errors get foo of error>>
+    [ no-such-symbol? ] [ name>> ] bi
+] unit-test
+
 ! caller-parameters
 cpu x86.64? [
-    {
-        V{
-            { 1 int-rep RDI }
-            { 2 float-rep XMM0 }
-            { 3 double-rep XMM1 }
-            { 4 int-rep RSI }
-        }
+    ${
+        os windows? [
+            V{
+                { 1 int-rep RCX }
+                { 2 float-rep XMM1 }
+                { 3 double-rep XMM2 }
+                { 4 int-rep R9 }
+            }
+        ] [
+            V{
+                { 1 int-rep RDI }
+                { 2 float-rep XMM0 }
+                { 3 double-rep XMM1 }
+                { 4 int-rep RSI }
+            }
+        ] if
         V{ }
     } [
-        void { int float double char } cdecl { } { } f "func"
+        void { int float double char } cdecl f f "func"
         alien-invoke-params boa caller-parameters
     ] cfg-unit-test
 ] when
+
+! caller-stack-cleanup
+{ 0 } [
+    alien-node-params new long >>return cdecl >>abi 25
+    caller-stack-cleanup
+] unit-test
+
+! check-dlsym
+{ } [
+    "malloc" f check-dlsym
+] unit-test
+
+! prepare-caller-return
+${
+    cpu x86.32? { { 1 int-rep EAX } } { { 1 int-rep RAX } } ?
+    cpu x86.32? { { 2 double-rep ST0 } } { { 2 double-rep XMM0 } } ?
+} [
+    T{ alien-invoke-params { return int } } prepare-caller-return
+    T{ alien-invoke-params { return double } } prepare-caller-return
+] cfg-unit-test
 
 ! unbox-parameters
 

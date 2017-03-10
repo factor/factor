@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar.format combinators
-combinators.short-circuit fry globs http.client kernel make
-math.parser multiline namespaces present regexp
-regexp.combinators sequences sets splitting splitting.monotonic
-unicode urls ;
+USING: accessors arrays assocs calendar.parser combinators
+combinators.short-circuit fry globs http.client kernel math.parser
+namespaces present regexp regexp.combinators sequences splitting
+splitting.monotonic unicode urls ;
 IN: robots
 
 ! visit-time is GMT, request-rate is pages/second
@@ -64,7 +63,7 @@ visit-time request-rate crawl-delay unknowns ;
         { "crawl-delay" [ string>number >>crawl-delay ] }
         { "request-rate" [ string>number >>request-rate ] }
         {
-            "visit-time" [ "-" split1 [ hhmm>timestamp ] bi@ 2array
+            "visit-time" [ "-" split1 [ hhmm>duration ] bi@ 2array
             >>visit-time
         ] }
         [ pick unknowns>> push-at ]

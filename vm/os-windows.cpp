@@ -55,7 +55,7 @@ BOOL factor_vm::windows_stat(vm_char* path) {
   return ret;
 }
 
-/* You must free() this yourself. */
+// You must free() this yourself.
 const vm_char* factor_vm::default_image_path() {
   vm_char full_path[MAX_UNICODE_PATH];
   vm_char* ptr;
@@ -76,7 +76,7 @@ const vm_char* factor_vm::default_image_path() {
   return safe_strdup(temp_path);
 }
 
-/* You must free() this yourself. */
+// You must free() this yourself.
 const vm_char* factor_vm::vm_executable_path() {
   vm_char full_path[MAX_UNICODE_PATH];
   if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
@@ -126,13 +126,13 @@ long getpagesize() {
 
 
 bool move_file(const vm_char* path1, const vm_char* path2) {
-  /* MoveFileEx returns FALSE on fail. */
+  // MoveFileEx returns FALSE on fail.
   BOOL val = MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
   if (val == FALSE) {
-    /* MoveFileEx doesn't set errno, which primitive_save_image()
-       reads the error code from. Instead of converting from
-       GetLastError() to errno values, we ust set it to the generic
-       EIO value. */
+    // MoveFileEx doesn't set errno, which primitive_save_image()
+    // reads the error code from. Instead of converting from
+    // GetLastError() to errno values, we ust set it to the generic
+    // EIO value.
     errno = EIO;
   }
   return val == TRUE;
@@ -173,8 +173,8 @@ uint64_t nano_count() {
 #ifdef FACTOR_64
   hi = count.HighPart;
 #else
-  /* On VirtualBox, QueryPerformanceCounter does not increment
-	the high part every time the low part overflows.  Workaround. */
+  // On VirtualBox, QueryPerformanceCounter does not increment
+  // the high part every time the low part overflows.  Workaround.
   if (lo > count.LowPart)
     hi++;
 #endif
@@ -196,9 +196,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                   void* dispatch) {
   switch (e->ExceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:
-      signal_fault_addr = e->ExceptionInformation[1];
-      signal_fault_pc = c->EIP;
-      verify_memory_protection_error(signal_fault_addr);
+      set_memory_protection_error(e->ExceptionInformation[1], c->EIP);
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
                               (cell)factor::memory_signal_handler_impl);
       break;
@@ -217,7 +215,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 #else
       signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
 
-      /* This seems to have no effect */
+      // This seems to have no effect
       X87SW(c) = 0;
 #endif
       MXCSR(c) &= 0xffffffc0;
@@ -241,9 +239,9 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
   return vm->exception_handler(e, frame, c, dispatch);
 }
 
-/* On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
-   calls. It doesn't on Windows, so we need to manually send some
-   cancellation requests to unblock the thread. */
+// On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
+// calls. It doesn't on Windows, so we need to manually send some
+// cancellation requests to unblock the thread.
 VOID CALLBACK dummy_cb (ULONG_PTR dwParam) { }
 
 // CancelSynchronousIo is not in Windows XP
@@ -251,8 +249,8 @@ VOID CALLBACK dummy_cb (ULONG_PTR dwParam) { }
 static void wake_up_thread(HANDLE thread) {
   if (!CancelSynchronousIo(thread)) {
     DWORD err = GetLastError();
-    /* CancelSynchronousIo() didn't find anything to cancel, let's try
-       with QueueUserAPC() instead. */
+    // CancelSynchronousIo() didn't find anything to cancel, let's try
+    // with QueueUserAPC() instead.
     if (err == ERROR_NOT_FOUND) {
       if (!QueueUserAPC(&dummy_cb, thread, NULL)) {
         fatal_error("QueueUserAPC() failed", GetLastError());
@@ -269,16 +267,15 @@ static void wake_up_thread(HANDLE thread) {}
 static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
   switch (dwCtrlType) {
     case CTRL_C_EVENT: {
-      /* The CtrlHandler runs in its own thread without stopping the main
-         thread. Since in practice nobody uses the multi-VM stuff yet, we just
-         grab the first VM we can get. This will not be a good idea when we
-         actually support native threads. */
+      // The CtrlHandler runs in its own thread without stopping the main
+      // thread. Since in practice nobody uses the multi-VM stuff yet, we just
+      // grab the first VM we can get. This will not be a good idea when we
+      // actually support native threads.
       FACTOR_ASSERT(thread_vms.size() == 1);
       factor_vm* vm = thread_vms.begin()->second;
-      vm->safepoint.enqueue_fep(vm);
+      vm->enqueue_fep();
 
-      /* Before leaving the ctrl_handler, try and wake up the main
-         thread. */
+      // Before leaving the ctrl_handler, try and wake up the main thread.
       wake_up_thread(factor::boot_thread);
       return TRUE;
     }
@@ -295,6 +292,50 @@ void ignore_ctrl_c() {
 
 void handle_ctrl_c() {
   SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
+}
+
+const int ctrl_break_sleep = 10; /* msec */
+
+static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
+  bool ctrl_break_handled = false;
+  factor_vm* vm = static_cast<factor_vm*>(parent_vm);
+  while (vm->stop_on_ctrl_break) {
+    if (GetAsyncKeyState(VK_CANCEL) >= 0) { /* Ctrl-Break is released. */
+      ctrl_break_handled = false;  /* Wait for the next press. */
+    } else if (!ctrl_break_handled) {
+      /* Check if the VM thread has the same Id as the thread Id of the
+         currently active window. Note that thread Id is not a handle. */
+      DWORD fg_thd_id = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+      if ((fg_thd_id == vm->thread_id) && !vm->fep_p) {
+        vm->enqueue_fep();
+        ctrl_break_handled = true;
+      }
+    }
+    Sleep(ctrl_break_sleep);
+  }
+  return 0;
+}
+
+void factor_vm::primitive_disable_ctrl_break() {
+  stop_on_ctrl_break = false;
+  if (ctrl_break_thread != NULL) {
+    DWORD wait_result = WaitForSingleObject(ctrl_break_thread,
+                                            2 * ctrl_break_sleep);
+    if (wait_result != WAIT_OBJECT_0)
+      TerminateThread(ctrl_break_thread, 0);
+    CloseHandle(ctrl_break_thread);
+    ctrl_break_thread = NULL;
+  }
+}
+
+void factor_vm::primitive_enable_ctrl_break() {
+  stop_on_ctrl_break = true;
+  if (ctrl_break_thread == NULL) {
+    DisableProcessWindowsGhosting();
+    ctrl_break_thread = CreateThread(NULL, 0, factor::ctrl_break_thread_proc,
+                                     static_cast<LPVOID>(this), 0, NULL);
+    SetThreadPriority(ctrl_break_thread, THREAD_PRIORITY_ABOVE_NORMAL);
+  }
 }
 
 void lock_console() {}
@@ -344,7 +385,7 @@ void factor_vm::sampler_thread_loop() {
       continue;
 
     cell pc = get_thread_pc(thread);
-    safepoint.enqueue_samples(this, samples, pc, false);
+    enqueue_samples(samples, pc, false);
   }
 }
 

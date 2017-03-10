@@ -27,7 +27,7 @@ TUPLE: parts in out ;
     [ nip in>> ] [ out>> append ] 2bi parts boa ;
 
 : intersection ( seq -- elts/f )
-    [ f ] [ unclip [ intersect ] reduce ] if-empty ;
+    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
 
 : meaningful-integers ( partition table -- integers )
     [ [ in>> ] [ out>> ] bi ] dip

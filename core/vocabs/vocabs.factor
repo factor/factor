@@ -85,8 +85,8 @@ GENERIC: vocab-changed ( vocab obj -- )
     vocab-observers get [ vocab-changed ] with each ;
 
 : create-vocab ( name -- vocab )
-    check-vocab-name dictionary get
-    [ <vocab> dup notify-vocab-observers ] cache ;
+    check-vocab-name dictionary get [ <vocab> ] cache
+    dup notify-vocab-observers ;
 
 ERROR: no-vocab name ;
 
@@ -139,28 +139,20 @@ PREDICATE: runnable-vocab < vocab
 
 INSTANCE: vocab-spec definition-mixin
 
-: call-require-hook ( name -- )
-    require-hook get call( name -- ) ;
-
 GENERIC: require ( object -- )
 
 M: vocab require name>> require ;
 
 M: vocab-link require name>> require ;
 
-! When calling "foo.private" require, load "foo" instead, but only when
-! "foo.private" does not exist. The reason for this is that stage1 bootstrap
-! starts out with some .private vocabs that contain primitives, and
-! loading the public vocabs would cause circularity issues.
-M: string require ( vocab -- )
-    dup ".private" ?tail [
-        over lookup-vocab
-        [ 2drop ]
-        [ nip call-require-hook ]
-        if
-    ] [
-        nip call-require-hook
-    ] if ;
+! When calling "foo.private" require, load "foo" instead, but
+! only when "foo.private" does not exist. The reason for this is
+! that stage1 bootstrap starts out with some .private vocabs
+! that contain primitives, and loading the public vocabs would
+! cause circularity issues.
+M: string require
+    [ ".private" ?tail ] keep swap [ lookup-vocab not ] when
+    [ require-hook get call( name -- ) ] [ drop ] if ;
 
 : load-vocab ( name -- vocab )
     [ require ] [ lookup-vocab ] bi ;

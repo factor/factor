@@ -76,7 +76,7 @@ HELP: end-branch
 
 HELP: set-basic-block
 { $values { "basic-block" basic-block } }
-{ $description "Sets the given blocks as the current one by storing it in the basic-block dynamic variable. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;
+{ $description "Sets the given blocks as the current one. If it has any " { $slot "instructions" } " the current " { $link building } " is set to those." } ;
 
 HELP: with-branch
 { $values

@@ -4,7 +4,7 @@
 USING: accessors assocs calendar calendar.elapsed
 colors.constants colors.hex combinators formatting fry
 http.client io io.styles json json.reader kernel make math
-math.statistics sequences urls ;
+sequences urls ;
 
 IN: reddit
 

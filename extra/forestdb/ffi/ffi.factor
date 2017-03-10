@@ -19,6 +19,7 @@ CONSTANT: FDB_SNAPSHOT_INMEM -1
 
 TYPEDEF: uint64_t fdb_seqnum_t
 TYPEDEF: int64_t cs_off_t
+TYPEDEF: long fdb_ssize_t ! XXX: platform dependent?
 
 TYPEDEF: void* fdb_custom_cmp_fixed
 TYPEDEF: void* fdb_custom_cmp_variable
@@ -26,6 +27,8 @@ TYPEDEF: void* fdb_file_handle
 TYPEDEF: void* fdb_kvs_handle
 TYPEDEF: void* fdb_iterator
 TYPEDEF: void* fdb_changes_callback_fn
+TYPEDEF: void* voidref
+TYPEDEF: void* fdb_handle_stats_cb
 
 ENUM: fdb_open_flags < uint32_t
     { FDB_OPEN_FLAG_CREATE 1 }
@@ -114,6 +117,29 @@ STRUCT: fdb_encryption_key
     { algorithm fdb_encryption_algorithm_t }
     { bytes uint8_t[32] } ;
 
+STRUCT: fdb_filemgr_ops_t
+    { constructor void* }
+    { open void* }
+    { pwrite void* }
+    { pread void* }
+    { close void* }
+    { goto_eof void* }
+    { file_size void* }
+    { fdatasync void* }
+    { sync void* }
+    { get_errno_str void* }
+    { mmap void* }
+    { munmap void* }
+    { aio_init void* }
+    { aio_prep_read void* }
+    { aio_submit void* }
+    { aio_getevents void* }
+    { aio_destroy void* }
+    { get_fs_type void* }
+    { copy_file_range void* }
+    { destructor void* }
+    { ctx void* } ;
+
 ! cmp_fixed and cmp_variable have their own open() functions
 STRUCT: fdb_config
     { chunksize uint16_t }
@@ -146,7 +172,10 @@ STRUCT: fdb_config
     { encryption_key fdb_encryption_key }
     { block_reusing_threshold size_t }
     { num_keeping_headers size_t }
-    { breakpad_minidump_dir char* } ;
+    { breakpad_minidump_dir char* }
+    { custom_file_ops fdb_filemgr_ops_t* }
+    { num_background_threads size_t }
+    { bcache_flush_limit size_t } ;
 
 STRUCT: fdb_kvs_config
     { create_if_missing bool }
@@ -307,7 +336,11 @@ ENUM: fdb_status
     { FDB_RESULT_EOVERFLOW -71 }
     { FDB_RESULT_EAGAIN -72 }
     { FDB_RESULT_CANCELLED -73 }
-    { FDB_RESULT_LAST -73 } ; ! update this
+    { FDB_RESULT_ENGINE_NOT_INSTANTIATED -74 }
+    { FDB_RESULT_LOG_FILE_NOT_FOUND -75 }
+    { FDB_RESULT_LOCK_FAIL -76 }
+    { FDB_RESULT_LAST -76 }
+    ; ! update this
 
 ! End fdb_errors.h
 
@@ -382,6 +415,10 @@ FUNCTION: fdb_status fdb_get_file_info ( fdb_file_handle* fhandle, fdb_file_info
 FUNCTION: fdb_status fdb_get_kvs_info ( fdb_kvs_handle* handle, fdb_kvs_info* info )
 FUNCTION: fdb_status fdb_get_kvs_ops_info ( fdb_kvs_handle* handle, fdb_kvs_ops_info* info )
 FUNCTION: fdb_status fdb_get_latency_stats ( fdb_file_handle* fhandle, fdb_latency_stat* stats, fdb_latency_stat_type type )
+FUNCTION: fdb_status fdb_get_latency_histogram ( fdb_file_handle* fhandle,
+                                     char** stats,
+                                     size_t* stats_length,
+                                     fdb_latency_stat_type type )
 FUNCTION: c-string fdb_get_latency_stat_name ( fdb_latency_stat_type type )
 FUNCTION: fdb_status fdb_get_kvs_seqnum ( fdb_kvs_handle* handle, fdb_seqnum_t* seqnum )
 FUNCTION: fdb_status fdb_get_kvs_name_list ( fdb_kvs_handle* handle, fdb_kvs_name_list* kvs_name_list )
@@ -424,3 +461,8 @@ FUNCTION: fdb_status fdb_set_block_reusing_params ( fdb_file_handle* fhandle, si
 FUNCTION: char* fdb_error_msg ( fdb_status err_code )
 FUNCTION: char* fdb_get_lib_version ( )
 FUNCTION: char* fdb_get_file_version ( fdb_file_handle* fhandle )
+FUNCTION: fdb_filemgr_ops_t* fdb_get_default_file_ops ( )
+
+FUNCTION: fdb_status fdb_fetch_handle_stats ( fdb_kvs_handle *handle,
+                                              fdb_handle_stats_cb callback,
+                                              void *ctx )

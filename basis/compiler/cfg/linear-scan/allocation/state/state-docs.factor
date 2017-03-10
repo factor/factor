@@ -12,6 +12,10 @@ HELP: activate-intervals
 HELP: active-intervals
 { $var-description { $link assoc } " of active live intervals. The keys are register class symbols and the values vectors of " { $link live-interval-state } "." } ;
 
+HELP: active-intervals-for
+{ $values { "live-interval" live-interval-state } { "seq" sequence } }
+{ $description "Finds the active live intervals sharing the same register class as the given interval." } ;
+
 HELP: add-active
 { $values { "live-interval" live-interval-state } }
 { $description "Adds a live interval to the " { $link active-intervals } " assoc." }
@@ -69,7 +73,14 @@ HELP: registers
 { $var-description "Mapping from register classes to sequences of machine registers." } ;
 
 HELP: spill-slots
-{ $var-description "Mapping from pairs of vregs and represenation sizes to spill slots." } ;
+{ $var-description "Mapping from pairs of vregs and represenation sizes to spill slots." }
+{ $see-also init-allocator } ;
 
 HELP: unhandled-min-heap
 { $var-description { $link min-heap } " of all live intervals and sync points which still needs processing. It is used by " { $link (allocate-registers) } ". The key of the heap is a pair of values, " { $slot "start" } " and " { $slot "end" } " for the "  { $link live-interval-state } " tuple and " { $slot "n" } " and 1/0.0 for the " { $link sync-point } " tuple. That way smaller live intervals are always processed before larger ones and all live intervals before sync points." } ;
+
+ARTICLE: "compiler.cfg.linear-scan.allocation.state" "Live interval state"
+"Active intervals:"
+{ $subsections active-intervals active-intervals-for add-active } ;
+
+ABOUT: "compiler.cfg.linear-scan.allocation.state"

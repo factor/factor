@@ -151,6 +151,14 @@ callback-error-hook [ [ die rethrow ] ] initialize
 : ignore-errors ( quot -- )
     [ drop ] recover ; inline
 
+: ignore-error ( quot check: ( error -- ? ) -- )
+    [ dup ] prepose [ [ drop ] [ rethrow ] if ] compose
+    recover ; inline
+
+: ignore-error/f ( quot check: ( error -- ? ) -- )
+    [ dup ] prepose [ [ drop f ] [ rethrow ] if ] compose
+    recover ; inline
+
 : cleanup ( try cleanup-always cleanup-error -- )
     [ compose [ dip rethrow ] curry recover ] [ drop ] 2bi call ; inline
 
@@ -198,7 +206,6 @@ M: condition compute-restarts
 <PRIVATE
 
 : init-error-handler ( -- )
-    init-catchstack
     ! VM calls on error
     [
         OBJ-CURRENT-THREAD special-object error-thread set-global

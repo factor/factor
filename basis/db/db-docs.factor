@@ -60,7 +60,7 @@ HELP: bind-statement*
 HELP: <simple-statement>
 { $values { "string" string } { "in" sequence } { "out" sequence }
     { "statement" statement } }
-{ $description "Makes a new simple statement object from the given parameters.." }
+{ $description "Makes a new simple statement object from the given parameters." }
 { $warning "Using a simple statement can lead to SQL injection attacks in PostgreSQL. The Factor database implementation for SQLite only uses " { $link <prepared-statement> } " as the sole kind of statement; simple statements alias to prepared ones." } ;
 
 HELP: <prepared-statement>
@@ -183,6 +183,7 @@ ARTICLE: "db" "Database library"
 "Higher-level database help:"
 { $vocab-subsection "Database types" "db.types" }
 { $vocab-subsection "High-level tuple/database integration" "db.tuples" }
+$nl
 "Low-level database help:"
 { $subsections
     "db-protocol"

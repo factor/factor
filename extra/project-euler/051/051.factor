@@ -26,16 +26,16 @@
 
 ! for each prime number, count the families it belongs to. When one reaches count of 8, stop, and get the smallest number by replacing * with ones.
 
-USING: assocs kernel math math.combinatorics math.functions
-math.parser math.primes namespaces project-euler.common
-sequences sets strings grouping math.ranges arrays fry math.order ;
+USING: assocs fry kernel math math.combinatorics math.functions
+math.order math.parser math.primes math.ranges namespaces
+project-euler.common sequences sets ;
 IN: project-euler.051
 <PRIVATE
 SYMBOL: family-count
 SYMBOL: large-families
 : reset-globals ( -- )
     H{ } clone family-count namespaces:set
-    H{ } clone large-families namespaces:set ;
+    HS{ } clone large-families namespaces:set ;
 
 : digits-positions ( str -- positions )
     H{ } clone [ '[ swap _ push-at ] each-index ] keep ;
@@ -52,7 +52,7 @@ SYMBOL: large-families
     [ all-positions-combinations [ replace-positions-with-* ] with map ] with map concat ;
 
 : save-family ( family -- )
-    dup family-count get at 8 = [ large-families get conjoin ] [ drop ] if ;
+    dup family-count get at 8 = [ large-families get adjoin ] [ drop ] if ;
 : increment-family ( family -- )
    family-count get inc-at ;
 : handle-family ( family -- )
@@ -65,17 +65,19 @@ SYMBOL: large-families
     reset-globals
     n-digits-primes
     [ number>string families [ handle-family ] each ] each
-    large-families get ;
+    large-families get members ;
 
 : fill-*-with-ones ( str -- str )
     [ dup CHAR: * = [ drop CHAR: 1 ] when ] map ;
 
 ! recursively test all primes by length until we find an answer
 : (euler051) ( i -- answer )
-    dup test-n-digits-primes
-    dup assoc-size 0 >
-    [ nip values [ fill-*-with-ones string>number ] [ min ] map-reduce ]
-    [ drop 1 + (euler051) ] if ;
+    dup test-n-digits-primes [
+        1 + (euler051)
+    ] [
+        nip [ fill-*-with-ones string>number ] [ min ] map-reduce
+    ] if-empty ;
+
 PRIVATE>
 
 : euler051 ( -- answer )

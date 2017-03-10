@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.libraries calendar combinators delegate
-destructors io io.sockets io.sockets.private kernel memoize
-namespaces present sequences summary system vocabs ;
+destructors io io.sockets io.sockets.private kernel memoize namespaces
+openssl.libssl present sequences summary system vocabs ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout

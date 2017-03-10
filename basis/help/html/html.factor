@@ -15,7 +15,7 @@ IN: help.html
 : escape-char ( ch -- )
     dup ascii? [
         dup H{
-            { CHAR: " "__quo__" }
+            { CHAR: \" "__quo__" }
             { CHAR: * "__star__" }
             { CHAR: : "__colon__" }
             { CHAR: < "__lt__" }

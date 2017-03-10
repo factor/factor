@@ -8,7 +8,7 @@ namespace factor {
 enum vm_error_type {
   ERROR_EXPIRED = 0,
   ERROR_IO,
-  ERROR_NOT_IMPLEMENTED,
+  ERROR_UNUSED,
   ERROR_TYPE,
   ERROR_DIVIDE_BY_ZERO,
   ERROR_SIGNAL,

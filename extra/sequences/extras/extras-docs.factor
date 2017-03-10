@@ -69,13 +69,6 @@ HELP: compact
     "Collapse multiple spaces in a string down to a single space"
     { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" compact ." "\"Hello, crazy world\"" } } ;
 
-HELP: combos
-{ $values
-    { "list1" sequence }
-    { "list2" sequence }
-    { "result" sequence } }
-{ $description "Returns all combinations of the first sequence with the second sequence.  The result is not uniquified: if the sequences contain duplicate elements, then the same pair may appear multiple times in the result sequence." } ;
-
 HELP: <evens>
 { $values { "seq" sequence } { "evens" evens } }
 { $description "Create a virtual sequence whose elements consist of the even-indexed elements from the original sequence." }
@@ -85,10 +78,10 @@ HELP: <evens>
 HELP: find-all
 { $values
     { "seq" sequence }
-    { "quot" { $quotation ( elt -- ? ) } }
+    { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "elts" "the indices of the matching elements" } }
 { $description "Similar to " { $link find } ", but finds all of the indices and elements that match the provided quotation, not just the first." }
-{ $notes "The result is provided as an array of arrays, whose first value is the index and whose second value is teh element." } ;
+{ $notes "The result is provided as an array of arrays, whose first value is the index and whose second value is the element." } ;
 
 HELP: first=
 { $values
@@ -192,7 +185,7 @@ HELP: unsurround
 HELP: start-all
 { $values
      { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
-{ $description "Outputs the starting indices of the non-overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the starting indices of the non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all ."
                "{ 0 }"
@@ -205,7 +198,7 @@ HELP: start-all
 HELP: start-all*
 { $values
     { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
-{ $description "Outputs the starting indices of the possibly overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the starting indices of the possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all* ."
                "{ 0 2 }"
@@ -214,7 +207,7 @@ HELP: start-all*
 HELP: count-subseq
 { $values
     { "subseq" sequence } { "seq" sequence } { "n" integer } }
-{ $description "Outputs the number of non-overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the number of non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq ."
                "1"
@@ -224,7 +217,7 @@ HELP: count-subseq
 HELP: count-subseq*
 { $values
     { "subseq" sequence } { "seq" sequence } { "n" integer } }
-{ $description "Outputs the number of possibly overlapping occurences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
+{ $description "Outputs the number of possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq* ."
                "2"

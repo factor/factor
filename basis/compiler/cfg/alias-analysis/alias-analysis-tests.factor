@@ -436,13 +436,13 @@ IN: compiler.cfg.alias-analysis.tests
 {
     V{
         T{ ##allot f 0 }
-        T{ ##alien-indirect f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
+        T{ ##alien-indirect f f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }
     }
 } [
     V{
         T{ ##allot f 0 }
-        T{ ##alien-indirect f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
+        T{ ##alien-indirect f f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
         T{ ##set-slot-imm f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test

@@ -16,8 +16,8 @@ FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track
-output current input last-line prototype scrolls?
-selection-color caret mark selecting? ;
+    output current input last-line prototype scrolls?
+    selection-color caret mark selecting? ;
 
 TUPLE: pane-stream pane ;
 INSTANCE: pane-stream output-stream

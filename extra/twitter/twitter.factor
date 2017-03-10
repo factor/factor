@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros make namespaces sequences
-io.sockets.secure fry oauth urls ;
+io.sockets.secure fry oauth1 urls ;
 IN: twitter
 
 ! Configuration
@@ -19,9 +19,9 @@ twitter-source [ "factor" ] initialize
         call
     ] with-scope ; inline
 
-: twitter-url ( string -- string' )
+: twitter-url ( string -- url )
     ssl-supported?
-    "https://api.twitter.com/" "http://api.twitter.com/" ? prepend ;
+    "https://api.twitter.com/" "http://api.twitter.com/" ? prepend >url ;
 
 PRIVATE>
 
@@ -33,7 +33,7 @@ PRIVATE>
     ] with-twitter-oauth ;
 
 : twitter-authorize-url ( token -- url )
-    "oauth/authorize" twitter-url >url
+    "oauth/authorize" twitter-url
         swap key>> "oauth_token" set-query-param ;
 
 : obtain-twitter-access-token ( request-token verifier -- access-token )

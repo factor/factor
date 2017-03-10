@@ -1,13 +1,8 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings
-alien.syntax arrays assocs classes.struct combinators
-combinators.short-circuit constructors continuations destructors
-forestdb.ffi forestdb.utils fry generalizations io.directories
-io.encodings.string io.encodings.utf8 io.files.temp io.pathnames
-kernel layouts libc make math math.parser math.ranges multiline
-namespaces sequences system tools.test ;
-IN: forestdb.lib
+USING: accessors alien.strings arrays forestdb.lib forestdb.utils kernel
+make multiline sequences tools.test ;
+IN: forestdb.lib.tests
 
 ! Get/set by key/value
 { "val123" } [

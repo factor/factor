@@ -25,14 +25,21 @@ HELP: monotonic-split
      { "seq" sequence } { "quot" quotation }
      { "pieces" "a sequence of sequences" }
 }
-{ $description "Monotonically splits a sequence." }
+{ $description "Splits a sequence into subsequences, in which for all consecutive pairs of elements the quotation returns true." }
 { $examples
     { $example
         "USING: splitting.monotonic math prettyprint ;"
         "{ 1 2 3 2 3 4 } [ < ] monotonic-split ."
         "{ { 1 2 3 } { 2 3 4 } }"
     }
+    { $example
+        "USING: splitting.monotonic math prettyprint ;"
+        "{ 1 2 3 2 1 0 } [ < ] monotonic-split ."
+        "{ { 1 2 3 } { 2 } { 1 } { 0 } }"
+    }
 } ;
+
+{ monotonic-split monotonic-split-slice } related-words
 
 HELP: downward-slices
 { $values

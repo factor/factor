@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors arrays byte-arrays
-classes combinators compiler.units cpu.architecture delegate
-fry kernel layouts locals macros math math.order quotations
-sequences system words words.symbol summary ;
+USING: accessors alien alien.accessors arrays classes combinators
+compiler.units cpu.architecture delegate fry kernel layouts macros
+math math.order math.parser quotations sequences summary system words
+words.symbol ;
 IN: alien.c-types
 
 SYMBOLS:
@@ -499,3 +499,20 @@ M: double-2-rep rep-component-type drop double ;
 : c-type-clamp ( value c-type -- value' )
     dup { float double } member-eq?
     [ drop ] [ c-type-interval clamp ] if ; inline
+
+GENERIC: pointer-string ( pointer -- string/f )
+M: object pointer-string drop f ;
+M: word pointer-string name>> ;
+M: pointer pointer-string to>> pointer-string [ CHAR: * suffix ] [ f ] if* ;
+
+GENERIC: c-type-string ( c-type -- string )
+
+M: integer c-type-string number>string ;
+M: word c-type-string name>> ;
+M: pointer c-type-string pointer-string ;
+M: wrapper c-type-string wrapped>> c-type-string ;
+M: array c-type-string
+    unclip
+    [ [ c-type-string "[" "]" surround ] map ]
+    [ c-type-string ] bi*
+    prefix concat ;

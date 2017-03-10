@@ -237,13 +237,12 @@ http.server.dispatchers db.tuples ;
 ] unit-test
 
 : test-with-dispatcher ( dispatcher quot -- )
-    '[
-        main-responder set
+    [ main-responder ] dip '[
         <http-server> 0 >>insecure f >>secure
         [
             server-addrs random "addr" set @
         ] with-threaded-server
-    ] with-scope ; inline
+    ] with-variable ; inline
 
 USING: locals ;
 
@@ -346,7 +345,7 @@ SYMBOL: a
 <dispatcher>
     <action>
         [ a get-global "a" set-value ] >>init
-        [ [ "<html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
+        [ [ "<!DOCTYPE html><html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
         [ { { "a" [ v-integer ] } } validate-params ] >>validate
         [ "a" value a set-global URL" " <redirect> ] >>submit
     <conversations>

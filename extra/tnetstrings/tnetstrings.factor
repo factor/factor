@@ -44,7 +44,7 @@ DEFER: parse-tnetstring
 : parse-tnetstring ( data -- remain value )
     parse-payload {
         { CHAR: # [ string>number ] }
-        { CHAR: " [ ] }
+        { CHAR: \" [ ] }
         { CHAR: } [ parse-dict ] }
         { CHAR: ] [ parse-list ] }
         { CHAR: ! [ parse-bool ] }

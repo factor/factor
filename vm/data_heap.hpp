@@ -9,7 +9,7 @@ struct data_heap {
 
   segment* seg;
 
-  /* Borrowed reference to a factor_vm::nursery */
+  // Borrowed reference to a factor_vm::nursery
   bump_allocator* nursery;
   aging_space* aging;
   aging_space* aging_semispace;

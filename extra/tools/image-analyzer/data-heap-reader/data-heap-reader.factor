@@ -71,7 +71,7 @@ GENERIC: read-payload ( rel-base struct -- tuple )
     0 swap seek-past-padding { } ;
 
 : layout-address ( rel-base tuple -- address )
-    layout>> 15 unmask - neg ;
+    layout>> untag - neg ;
 
 M: array-payload read-payload ( rel-base object -- payload )
     nip read-array-payload ;

@@ -180,6 +180,8 @@ these lines in your .emacs:
 ;; Utility regexp used by other regexps to match a Factor symbol name
 (setq-local symbol-nc "\\(?:\\sw\\|\\s_\\|\"\\|\\s(\\|\\s)\\|\\s\\\\)+")
 (setq-local symbol (format "\\(%s\\)" symbol-nc))
+(setq-local c-symbol-nc "\\(?:\\sw\\|\\s_\\|\\[\\|\\]\\)+")
+(setq-local c-symbol (format "\\(%s\\)" c-symbol-nc))
 (setq-local ws+ "[ \n\t]+")
 (setq-local symbols-to-semicolon "\\([^;\t]*\\)\\(;\\)")
 
@@ -213,13 +215,12 @@ these lines in your .emacs:
   '(":" "::" ";" ":>" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "ARTICLE:"
     "B"
-    "COLOR:"
     "CONSULT:" "call-next-method"
-    "EBNF:" ";EBNF"
+    ";EBNF"
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
+    ";FUNCTOR"
     "GIR:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
-    "HINTS:"
     "initial:" "IMPLEMENT-STRUCTS:"
     "MATH:"
     "METHOD:"
@@ -239,7 +240,7 @@ these lines in your .emacs:
   (regexp-opt factor-constant-words 'symbols))
 
 (defconst factor-bracer-words
-  '("B" "BV" "C" "CS" "H" "HS" "S" "T" "V" "W"))
+  '("B" "BV" "C" "CS" "HEX" "H" "HS" "S" "T" "V" "W" "flags"))
 
 (defconst factor-brace-words-regex
   (format "%s{" (regexp-opt factor-bracer-words t)))
@@ -279,7 +280,7 @@ these lines in your .emacs:
   (concat
    (one-symbol (regexp-opt
                 '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
-                  "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
+                  "IDENTITY-MEMO:" "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
                   "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::")))
    ws+ symbol))
 
@@ -296,8 +297,9 @@ these lines in your .emacs:
 ;; [parsing-word] [symbol-word]
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
-   '("&" "CONSTANT" "DESTRUCTOR" "FORGET" "GAME" "HELP" "LIBRARY"
-     "MAIN" "MAIN-WINDOW" "SLOT" "STRING" "SYMBOL" "VAR")))
+   '("&" "CONSTANT" "DESTRUCTOR" "EBNF" "FORGET" "FUNCTOR"
+     "GAME" "HELP" "LIBRARY" "MAIN" "MAIN-WINDOW" "SLOT" "STRING"
+     "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
 (defconst factor-symbols-lines-regex
@@ -399,6 +401,11 @@ these lines in your .emacs:
           ws+ symbol
           ws+ symbol ws+))
 
+;; Regexp from hell that puts every type name in the first group,
+;; names and brackets in the second and third.
+(defconst factor-function-params-regex
+  (format "\\(?:%s%s\\(%s,?\\(?:%s)\\)?\\)\\|\\([()]\\)\\)" c-symbol ws+ c-symbol-nc ws+))
+
 (defconst factor-function-alias-regex
   (concat (syntax-begin '("FUNCTION-ALIAS"))
           ws+ symbol
@@ -418,7 +425,6 @@ these lines in your .emacs:
 
 (defun factor-group-name-to-face (group-name)
   (gethash group-name factor-group-name-to-face))
-
 
 (defun factor-groups-to-font-lock (groups)
   (let ((i 0))
@@ -449,10 +455,10 @@ these lines in your .emacs:
     ,(factor-syntax factor-declaration-words-regex '("C"))
     ,(factor-syntax factor-word-definition-regex '("P" "W"))
     ,(factor-syntax (syntax-and-2-symbols '("ALIAS")) '("P" "W" "W"))
-    ,(factor-syntax (syntax-and-2-symbols '("LOG")) '("P" "W" ""))
-    ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "NAN")) '("P" "CT"))
+    ,(factor-syntax (syntax-and-2-symbols '("HINTS" "LOG")) '("P" "W" ""))
+    ,(factor-syntax (syntax-and-1-symbol '("ALIEN" "CHAR" "COLOR" "NAN" "HEXCOLOR")) '("P" "CT"))
     ,(factor-syntax factor-types-lines-regex '("P" "T"))
-    ,(factor-syntax factor-integer-regex '("N"))
+
     (,factor-float-regex . 'factor-font-lock-number)
     (,factor-ratio-regex . 'factor-font-lock-ratio)
     ,(factor-syntax factor-type-definition-regex '("P" "T"))
@@ -499,9 +505,7 @@ these lines in your .emacs:
      (1 'factor-font-lock-parsing-word)
      (2 'factor-font-lock-type-name)
      (3 'factor-font-lock-word)
-     ;; Regexp from hell that puts every type name in the first group,
-     ;; names and brackets in the second and third.
-     ("\\(?:\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\(\\(?:\\sw\\|\\s_\\)+,?\\(?:[ \n]+)\\)?\\)\\|\\([()]\\)\\)"
+     (,factor-function-params-regex
       (factor-find-ending-bracket)
       nil
       (1 'factor-font-lock-type-in-stack-effect nil t)
@@ -514,12 +518,13 @@ these lines in your .emacs:
      (2 'factor-font-lock-word)
      (3 'factor-font-lock-type-name)
      (4 'factor-font-lock-word)
-     ("\\(?:\\(\\(?:\\sw\\|\\s_\\)+\\)[ \n]+\\(\\(?:\\sw\\|\\s_\\)+,?\\(?:[ \n]+)\\)?\\)\\|\\([()]\\)\\)"
+     (,factor-function-params-regex
       (factor-find-ending-bracket)
       nil
       (1 'factor-font-lock-type-in-stack-effect nil t)
       (2 'factor-font-lock-stack-effect nil t)
       (3 'factor-font-lock-stack-effect nil t)))
+    ,(factor-syntax factor-integer-regex '("N"))
     (factor-match-brackets . 'factor-font-lock-stack-effect)
     ,(factor-syntax factor-constructor-regex '("CO"))
     (,factor-setter-regex . 'factor-font-lock-setter-word)

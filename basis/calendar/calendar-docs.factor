@@ -26,54 +26,6 @@ HELP: <date>
     }
 } ;
 
-HELP: month-names
-{ $values { "value" object } }
-{ $description "Returns an array with the English names of all the months." }
-{ $warning "Do not use this array for looking up a month name directly. Use " { $link month-name } " instead." } ;
-
-HELP: month-name
-{ $values { "obj" { $or integer timestamp } } { "string" string } }
-{ $description "Looks up the month name and returns it as a string. January has an index of 1 instead of zero." } ;
-
-HELP: month-abbreviations
-{ $values { "value" array } }
-{ $description "Returns an array with the English abbreviated names of all the months." }
-{ $warning "Do not use this array for looking up a month name directly. Use " { $link month-abbreviation } " instead." } ;
-
-HELP: month-abbreviation
-{ $values { "n" integer } { "string" string } }
-{ $description "Looks up the abbreviated month name and returns it as a string. January has an index of 1 instead of zero." } ;
-
-HELP: day-names
-{ $values { "value" array } }
-{ $description "Returns an array with the English names of the days of the week." } ;
-
-HELP: day-name
-{ $values { "obj" { $or integer timestamp } } { "string" string } }
-{ $description "Looks up the day name and returns it as a string." } ;
-
-HELP: day-abbreviations2
-{ $values { "value" array } }
-{ $description "Returns an array with the abbreviated English names of the days of the week. This abbreviation is two characters long." } ;
-
-HELP: day-abbreviation2
-{ $values { "n" integer } { "string" string } }
-{ $description "Looks up the abbreviated day name and returns it as a string. This abbreviation is two characters long." } ;
-
-HELP: day-abbreviations3
-{ $values { "value" array } }
-{ $description "Returns an array with the abbreviated English names of the days of the week. This abbreviation is three characters long." } ;
-
-HELP: day-abbreviation3
-{ $values { "n" integer } { "string" string } }
-{ $description "Looks up the abbreviated day name and returns it as a string. This abbreviation is three characters long." } ;
-
-{
-    day-name day-names
-    day-abbreviation2 day-abbreviations2
-    day-abbreviation3 day-abbreviations3
-} related-words
-
 HELP: average-month
 { $values { "value" ratio } }
 { $description "The length of an average month averaged over 400 years. Used internally for adding an arbitrary real number of months to a timestamp." } ;
@@ -352,14 +304,6 @@ HELP: before
     }
 } ;
 
-HELP: <zero>
-{ $values { "timestamp" timestamp } }
-{ $description "Returns a zero timestamp that consists of zeros for every slot. Used to see if timestamps are valid." } ;
-
-HELP: valid-timestamp?
-{ $values { "timestamp" timestamp } { "?" boolean } }
-{ $description "Tests if a timestamp is valid or not." } ;
-
 HELP: unix-1970
 { $values { "timestamp" timestamp } }
 { $description "Returns the beginning of UNIX time, or midnight, January 1, 1970." } ;
@@ -617,21 +561,6 @@ ARTICLE: "relative-timestamps" "Relative timestamps"
     noon
 } ;
 
-ARTICLE: "days" "Day operations"
-"Naming days:"
-{ $subsections
-    day-abbreviation2
-    day-abbreviations2
-    day-abbreviation3
-    day-abbreviations3
-    day-name
-    day-names
-}
-"Calculating a Julian day number:"
-{ $subsections julian-day-number }
-"Calculate a timestamp:"
-{ $subsections julian-day-number>date } ;
-
 ARTICLE: "calendar-facts" "Calendar facts"
 "Calendar facts:"
 { $subsections
@@ -644,21 +573,16 @@ ARTICLE: "calendar-facts" "Calendar facts"
     days-in-month
     day-of-year
     day-of-week
-} ;
+}
+"Calculating a Julian day number:"
+{ $subsections julian-day-number }
+"Calculate a timestamp:"
+{ $subsections julian-day-number>date } ;
 
 ARTICLE: "years" "Year operations"
 "Leap year predicate:"
 { $subsections leap-year? }
 "Find the number of days in a year:"
 { $subsections days-in-year } ;
-
-ARTICLE: "months" "Month operations"
-"Naming months:"
-{ $subsections
-    month-name
-    month-names
-    month-abbreviation
-    month-abbreviations
-} ;
 
 ABOUT: "calendar"

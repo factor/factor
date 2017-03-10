@@ -140,11 +140,6 @@ IN: kernel.tests
 
 [ loop ] must-fail
 
-! Discovered on Windows
-: total-failure-1 ( -- a ) "" [ ] map unimplemented ;
-
-[ total-failure-1 ] must-fail
-
 { 1 1 2 2 3 3 } [ 1 2 3 [ dup ] tri@ ] unit-test
 { 1 4 9 } [ 1 2 3 [ sq ] tri@ ] unit-test
 [ [ sq ] tri@ ] must-infer
@@ -153,7 +148,7 @@ IN: kernel.tests
 
 ! Test traceback accuracy
 : last-frame ( -- pair )
-    error-continuation get call>> callstack>array 6 head* 3 tail* ;
+    6 9 error-continuation get call>> callstack>array subseq ;
 
 {
     { [ 1 2 [ 3 throw ] call 4 ] [ 1 2 [ 3 throw ] call 4 ] 3 }

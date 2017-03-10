@@ -1,6 +1,7 @@
 USING: alien alien.libraries compiler.cfg compiler.cfg.builder
-compiler.cfg.instructions compiler.tree help.markup help.syntax
-literals make multiline sequences stack-checker.alien strings ;
+compiler.cfg.instructions compiler.errors compiler.tree help.markup
+help.syntax literals make multiline sequences stack-checker.alien
+strings ;
 IN: compiler.cfg.builder.alien
 
 <<
@@ -21,7 +22,7 @@ HELP: caller-linkage
 { $values
   { "params" alien-node-params }
   { "symbol" string }
-  { "dll" dll }
+  { "dll/f" { $maybe dll } }
 }
 { $description "This word gets the name and library to use when linking to a function in a dynamically loaded dll. It is assumed that the library exports the undecorated name, regardless of calling convention." } ;
 
@@ -31,8 +32,8 @@ HELP: caller-return
 { $examples { $unchecked-example $[ ex-caller-return ] } } ;
 
 HELP: check-dlsym
-{ $values { "symbol" string } { "library" library } }
-{ $description "Checks that a symbol with the given name exists in the given library. Throws an error if not." } ;
+{ $values { "symbol" string } { "library/f" { $maybe library } } }
+{ $description "Checks that a symbol with the given name exists in the given library. Adds an error to the " { $link linkage-errors } " hash if not." } ;
 
 HELP: emit-callback-body
 { $values

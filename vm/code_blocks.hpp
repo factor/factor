@@ -1,6 +1,6 @@
 namespace factor {
 
-/* The compiled code heap is structured into blocks. */
+// The compiled code heap is structured into blocks.
 struct code_block {
   // header format (bits indexed with least significant as zero):
   // bit   0  : free?
@@ -11,9 +11,9 @@ struct code_block {
   // if free:
   //   bits  3-end: code size / 8
   cell header;
-  cell owner;      /* tagged pointer to word, quotation or f */
-  cell parameters; /* tagged pointer to array or f */
-  cell relocation; /* tagged pointer to byte-array or f */
+  cell owner;      // tagged pointer to word, quotation or f
+  cell parameters; // tagged pointer to array or f
+  cell relocation; // tagged pointer to byte-array or f
 
   bool free_p() const { return (header & 1) == 1; }
 
@@ -25,9 +25,7 @@ struct code_block {
     header = ((header & ~0x7) | (type << 1));
   }
 
-  bool pic_p() const { return type() == code_block_pic; }
-
-  bool optimized_p() const { return type() == code_block_optimized; }
+  bool pic_p() const { return type() == CODE_BLOCK_PIC; }
 
   cell size() const {
     cell size;
@@ -47,10 +45,10 @@ struct code_block {
 
   cell stack_frame_size_for_address(cell addr) const {
     cell natural_frame_size = stack_frame_size();
-    /* The first instruction in a code block is the prolog safepoint,
-       and a leaf procedure code block will record a frame size of zero.
-       If we're seeing a stack frame in either of these cases, it's a
-       fake "leaf frame" set up by the signal handler. */
+    // The first instruction in a code block is the prolog safepoint,
+    // and a leaf procedure code block will record a frame size of zero.
+    // If we're seeing a stack frame in either of these cases, it's a
+    // fake "leaf frame" set up by the signal handler.
     if (natural_frame_size == 0 || addr == entry_point())
       return LEAF_FRAME_SIZE;
     return natural_frame_size;
@@ -68,7 +66,7 @@ struct code_block {
 
   cell entry_point() const { return (cell)(this + 1); }
 
-  /* GC info is stored at the end of the block */
+  // GC info is stored at the end of the block
   gc_info* block_gc_info() const {
     return (gc_info*)((uint8_t*)this + size() - sizeof(gc_info));
   }

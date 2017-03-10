@@ -128,7 +128,7 @@ HELP: A+
 { $description "Alt key modifier." } ;
 
 HELP: M+
-{ $description "Meta key modifier. This is the Command key on Mac OS X." } ;
+{ $description "Meta key modifier. This is the Command key on Mac OS X and the Windows key on other Unices and Windows." } ;
 
 HELP: S+
 { $description "Shift key modifier." } ;
@@ -257,7 +257,7 @@ ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
     { { $link S+ } "Shift" }
     { { $link A+ } "Alt" }
     { { $link C+ } "Control" }
-    { { $link M+ } "Windows key" }
+    { { $link M+ } "Windows key (often called Super on Unix)" }
 }
 "On Windows, " { $link key-up } " gestures are not reported for all keyboard events."
 $nl
@@ -342,6 +342,10 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
   { $snippet "F6" }
   { $snippet "F7" }
   { $snippet "F8" }
+  { $snippet "F9" }
+  { $snippet "F10" }
+  { $snippet "F11" }
+  { $snippet "F12" }
   { $snippet "LEFT" }
   { $snippet "RIGHT" }
   { $snippet "DOWN" }

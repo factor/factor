@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license.
 
-! Selected parts of keysymdef.h
+! Selected parts of /usr/include/X11/keysymdef.h
 IN: x11.keysymdef
 
 ! TTY function keys, cleverly chosen to map to ASCII, for convenience

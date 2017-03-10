@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.private compiler.tree
-compiler.tree.propagation.call-effect compiler.units math effects kernel
-compiler.tree.builder compiler.tree.optimizer compiler.tree.debugger sequences
-eval fry kernel.private tools.test ;
+USING: accessors combinators combinators.private compiler.test
+compiler.tree compiler.tree.builder compiler.tree.debugger
+compiler.tree.optimizer compiler.tree.propagation.call-effect
+compiler.units effects eval fry kernel kernel.private math sequences
+tools.test ;
 IN: compiler.tree.propagation.call-effect.tests
 
 ! cached-effect

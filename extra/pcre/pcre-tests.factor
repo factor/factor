@@ -1,7 +1,8 @@
 USING: accessors arrays assocs continuations http.client kernel
-literals math.ranges pcre pcre.ffi pcre.private random sequences
-system tools.test ;
+literals math math.parser math.ranges pcre pcre.ffi pcre.private
+random sequences system tools.test ;
 QUALIFIED: regexp
+QUALIFIED: splitting
 IN: pcre.tests
 
 { { "Bords" "words" "word" } } [
@@ -26,7 +27,15 @@ CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
     { "year" "month" "day" } [ pcre_get_stringnumber ] with map
 ] unit-test
 
-{ t } [ "foo" <compiled-pcre> PCRE_UTF8 has-option? ] unit-test
+{ t } [
+    "foo" <compiled-pcre> PCRE_UTF8 has-option?
+] unit-test
+
+! This option is not present on old PCRE versions.
+{ t } [
+    "foo" <compiled-pcre> version 8.10 >
+    [ PCRE_UCP has-option? ] [ PCRE_UCP has-option? not ] if
+] unit-test
 
 os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 
@@ -102,16 +111,29 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 
 { t } [ "abcö" "\\p{Ll}{4}" matches? ] unit-test
 
-! Dotall mode, off by default
-{ f } [ "." <compiled-pcre> PCRE_DOTALL has-option? ] unit-test
-{ t } [ "(?s)." <compiled-pcre> PCRE_DOTALL has-option? ] unit-test
+! This used to work in 8.36, but might have changed in later versions.
+! See: https://bugs.exim.org/show_bug.cgi?id=1875
+version 8.36 <= [
+    { t t } [
+        "(?s)." <compiled-pcre> PCRE_DOTALL has-option?
+        "(?i)x" <compiled-pcre> PCRE_CASELESS has-option?
+    ] unit-test
+] when
 
 { f } [ "\n" "." matches? ] unit-test
 { t } [ "\n" "(?s)." matches? ] unit-test
 
-! Caseless mode, off by default
-{ { f t } } [
-    { "x" "(?i)x" } [ <compiled-pcre> PCRE_CASELESS has-option? ] map
+{ f t } [
+    "hello\nthere" "^.*$" <compiled-pcre> matches?
+    "hello\nthere" "(?s)^.*$" <compiled-pcre> matches?
+] unit-test
+
+! Modes off by default
+{ f f } [
+    ! Caseless mode
+    "x" <compiled-pcre> PCRE_CASELESS has-option?
+    ! Dotall mode
+    "." <compiled-pcre> PCRE_DOTALL has-option?
 ] unit-test
 
 ! Backreferences

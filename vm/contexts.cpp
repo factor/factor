@@ -50,7 +50,7 @@ vm_error_type context::address_to_error(cell addr) {
     return ERROR_RETAINSTACK_UNDERFLOW;
   if (retainstack_seg->overflow_p(addr))
     return ERROR_RETAINSTACK_OVERFLOW;
-  /* These are flipped because the callstack grows downwards. */
+  // These are flipped because the callstack grows downwards.
   if (callstack_seg->underflow_p(addr))
     return ERROR_CALLSTACK_OVERFLOW;
   if (callstack_seg->overflow_p(addr))
@@ -81,18 +81,6 @@ context::~context() {
   delete callstack_seg;
 }
 
-/* called on startup */
-/* Allocates memory (new_context()) */
-void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_,
-                              cell callstack_size_) {
-  datastack_size = datastack_size_;
-  retainstack_size = retainstack_size_;
-  callstack_size = callstack_size_;
-
-  ctx = NULL;
-  spare_ctx = new_context();
-}
-
 context* factor_vm::new_context() {
   context* new_context;
 
@@ -110,12 +98,12 @@ context* factor_vm::new_context() {
   return new_context;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::init_context(context* ctx) {
   ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
 }
 
-/* Allocates memory (init_context(), but not parent->new_context() */
+// Allocates memory (init_context(), but not parent->new_context()
 VM_C_API context* new_context(factor_vm* parent) {
   context* new_context = parent->new_context();
   parent->init_context(new_context);
@@ -137,7 +125,7 @@ VM_C_API void delete_context(factor_vm* parent) {
   parent->delete_context();
 }
 
-/* Allocates memory (init_context()) */
+// Allocates memory (init_context())
 VM_C_API void reset_context(factor_vm* parent) {
 
   // The function is used by (start-context-and-delete) which expects
@@ -153,7 +141,7 @@ VM_C_API void reset_context(factor_vm* parent) {
   parent->init_context(ctx);
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::begin_callback(cell quot_) {
   data_root<object> quot(quot_, this);
 
@@ -166,7 +154,7 @@ cell factor_vm::begin_callback(cell quot_) {
   return quot.value();
 }
 
-/* Allocates memory */
+// Allocates memory
 cell begin_callback(factor_vm* parent, cell quot) {
   return parent->begin_callback(quot);
 }
@@ -199,7 +187,7 @@ void factor_vm::primitive_context_object_for() {
   ctx->replace(other_ctx->context_objects[n]);
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
   fixnum depth = (fixnum)(top - bottom + sizeof(cell));
 
@@ -211,14 +199,14 @@ cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
   return tag<array>(a);
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::datastack_to_array(context* ctx) {
   return stack_to_array(ctx->datastack_seg->start,
                         ctx->datastack,
                         ERROR_DATASTACK_UNDERFLOW);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_datastack_for() {
   data_root<alien> alien_ctx(ctx->pop(), this);
   context* other_ctx = (context*)pinned_alien_offset(alien_ctx.value());
@@ -226,21 +214,21 @@ void factor_vm::primitive_datastack_for() {
   ctx->push(array);
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::retainstack_to_array(context* ctx) {
   return stack_to_array(ctx->retainstack_seg->start,
                         ctx->retainstack,
                         ERROR_RETAINSTACK_UNDERFLOW);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_retainstack_for() {
   context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
   ctx->replace(retainstack_to_array(other_ctx));
 }
 
-/* returns pointer to top of stack */
-cell factor_vm::array_to_stack(array* array, cell bottom) {
+// returns pointer to top of stack
+static cell array_to_stack(array* array, cell bottom) {
   cell depth = array_capacity(array) * sizeof(cell);
   memcpy((void*)bottom, array + 1, depth);
   return bottom + depth - sizeof(cell);
@@ -256,7 +244,7 @@ void factor_vm::primitive_set_retainstack() {
   ctx->retainstack = array_to_stack(arr, ctx->retainstack_seg->start);
 }
 
-/* Used to implement call( */
+// Used to implement call(
 void factor_vm::primitive_check_datastack() {
   fixnum out = to_fixnum(ctx->pop());
   fixnum in = to_fixnum(ctx->pop());

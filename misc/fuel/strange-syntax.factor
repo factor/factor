@@ -1,4 +1,6 @@
-USING: accessors ;
+USING: accessors alien.c-types alien.syntax
+classes.struct colors.constants colors.hex kernel literals logging
+math ;
 IN: strange
 
 ! FUEL Syntax Demo
@@ -36,7 +38,9 @@ TUPLE: tup
 : slash\hack ( m -- y )
     get\it>> dup >>get\it ;
 
-LOG: what ever
+: very-weird[33] ( -- ) ;
+
+LOG: what NOTICE
 
 TUPLE: oh\no { and/again initial: "meh" } ;
 
@@ -77,3 +81,23 @@ ID-SYNTAX ID-SYNTAX
 ! ! Containers
 V{ 1 2 3 } drop
 HS{ 9 8 3 } drop
+
+flags{ 10 20 } drop
+
+! ! Alien functions
+STRUCT: timeval
+    { sec long }
+    { usec long } ;
+
+FUNCTION: int futimes ( int id,
+                        timeval[2] times,
+                        int x,
+                        int y )
+FUNCTION: int booyah ( int x )
+FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
+
+HEXCOLOR: ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
+2drop 2drop drop
+
+PRIMITIVE: one ( a -- b )
+PRIMITIVE: two ( c -- d )

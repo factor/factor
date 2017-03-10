@@ -1,4 +1,5 @@
 USING: asn1 asn1.ldap io io.streams.string tools.test ;
+IN: asn1.tests
 
 { 6 } [
     "\u000002\u000001\u000006" [ asn-syntax read-ber ] with-string-reader

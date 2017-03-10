@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg.checker compiler.cfg
-compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.rpo
-compiler.cfg.stacks.global compiler.cfg.stacks.height
-compiler.cfg.stacks.local compiler.cfg.utilities fry kernel
-locals make math sequences sets ;
+USING: accessors compiler.cfg compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.stacks.global
+compiler.cfg.stacks.local compiler.cfg.utilities fry kernel locals
+make math sequences sets ;
 IN: compiler.cfg.stacks.finalize
 
 :: inserting-peeks ( from to -- set )
@@ -18,7 +17,8 @@ IN: compiler.cfg.stacks.finalize
     diff ;
 
 : each-insertion ( ... set bb quot: ( ... vreg loc -- ... ) -- ... )
-    [ members ] 2dip '[ [ loc>vreg ] [ _ untranslate-loc ] bi @ ] each ; inline
+    [ members ] 2dip
+    '[ [ loc>vreg ] [ _ height>> local-loc>global ] bi @ ] each ; inline
 
 ERROR: bad-peek dst loc ;
 
@@ -31,10 +31,10 @@ ERROR: bad-peek dst loc ;
     [ dup n>> 0 < [ 2drop ] [ ##replace, ] if ] each-insertion ;
 
 : visit-edge ( from to -- )
-    2dup [ kill-block?>> ] both? [ 2drop ] [
-        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch, ] V{ } make
+    2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch, ] V{ } make
+    dup length 1 > [
         insert-basic-block
-    ] if ;
+    ] [ 3drop ] if ;
 
 : visit-block ( bb -- )
     [ predecessors>> ] keep '[ _ visit-edge ] each ;

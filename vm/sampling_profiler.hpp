@@ -12,13 +12,6 @@ struct profiling_sample_count {
   // Number of samples taken during code execution in non-Factor threads
   fixnum foreign_thread_sample_count;
 
-  profiling_sample_count()
-      : sample_count(0),
-        gc_sample_count(0),
-        jit_sample_count(0),
-        foreign_sample_count(0),
-        foreign_thread_sample_count(0) {}
-
   profiling_sample_count(fixnum sample_count, fixnum gc_sample_count,
                          fixnum jit_sample_count, fixnum foreign_sample_count,
                          fixnum foreign_thread_sample_count)
@@ -43,12 +36,12 @@ struct profiling_sample {
   profiling_sample_count counts;
   // Active thread during sample
   cell thread;
-  /* The callstack at safepoint time. Indexes to the beginning and ending
-     code_block entries in the vm sample_callstacks array. */
+  // The callstack at safepoint time. Indexes to the beginning and ending
+  // code_block entries in the vm sample_callstacks array.
   cell callstack_begin, callstack_end;
 
-  profiling_sample(factor_vm* vm, bool prolog_p,
-                   profiling_sample_count const& counts, cell thread);
+  profiling_sample(profiling_sample_count const& counts, cell thread,
+                   cell callstack_begin, cell callstack_end);
 };
 
 }

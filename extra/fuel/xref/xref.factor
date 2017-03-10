@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs definitions help.topics io.pathnames
-kernel math math.order math.statistics memoize namespaces sequences sets
-sorting tools.completion tools.crossref vocabs vocabs.parser
-vocabs.hierarchy words ;
+USING: accessors arrays assocs definitions help.topics
+io.pathnames kernel memoize namespaces sequences sets sorting
+tools.completion tools.crossref vocabs vocabs.hierarchy
+vocabs.parser words ;
 
 IN: fuel.xref
 

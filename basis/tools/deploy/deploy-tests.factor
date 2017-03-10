@@ -73,7 +73,7 @@ os macosx? [
     "tools.deploy.test.3"
     "tools.deploy.test.4"
 } [
-    [ ] swap [
+    { } swap [
         shake-and-bake
         run-temp-image
     ] curry unit-test
@@ -91,16 +91,14 @@ M: quit-responder call-responder*
     quit-responder "quit" add-responder ;
 
 : test-httpd ( responder -- )
-    [
-        main-responder set
+    main-responder [
         <http-server>
             0 >>insecure
             f >>secure
         start-server
         servers>> first addr>> port>>
         dup number>string "port-number" temp-file ascii set-file-contents
-    ] with-scope
-    "port" set ;
+    ] with-variable "port" set ;
 
 { } [
     <dispatcher>
@@ -180,3 +178,5 @@ os macosx? [
 { } [ "tools.deploy.test.21" drop 1260000 small-enough? ] unit-test
 
 { } [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test
+
+{ } [ "tools.deploy.test.23" shake-and-bake ] unit-test

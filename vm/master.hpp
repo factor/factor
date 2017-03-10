@@ -11,7 +11,7 @@
 
 #include <errno.h>
 
-/* C headers */
+// C headers
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
@@ -22,7 +22,7 @@
 #include <wchar.h>
 #include <stdint.h>
 
-/* C++ headers */
+// C++ headers
 #include <algorithm>
 #include <list>
 #include <map>
@@ -37,7 +37,7 @@
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
 
-/* Record compiler version */
+// Record compiler version
 #if defined(__clang__)
 #define FACTOR_COMPILER_VERSION "Clang (GCC " __VERSION__ ")"
 #elif defined(__INTEL_COMPILER)
@@ -52,10 +52,10 @@
 #define FACTOR_COMPILER_VERSION "unknown"
 #endif
 
-/* Record compilation time */
+// Record compilation time
 #define FACTOR_COMPILE_TIME __TIMESTAMP__
 
-/* Detect target CPU type */
+// Detect target CPU type
 #if defined(__arm__)
 #define FACTOR_ARM
 #elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64)
@@ -82,10 +82,10 @@
 #define WINDOWS
 #endif
 
-/* Forward-declare this since it comes up in function prototypes */
+// Forward-declare this since it comes up in function prototypes
 namespace factor { struct factor_vm; }
 
-/* Factor headers */
+// Factor headers
 #include "assert.hpp"
 #include "debug.hpp"
 #include "layouts.hpp"
@@ -122,7 +122,6 @@ namespace factor { struct factor_vm; }
 #include "image.hpp"
 #include "callbacks.hpp"
 #include "dispatch.hpp"
-#include "safepoints.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
 #include "data_roots.hpp"
@@ -130,7 +129,6 @@ namespace factor { struct factor_vm; }
 #include "generic_arrays.hpp"
 #include "callstack.hpp"
 #include "slot_visitor.hpp"
-#include "collector.hpp"
 #include "to_tenured_collector.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
@@ -141,4 +139,4 @@ namespace factor { struct factor_vm; }
 #include "mvm.hpp"
 #include "factor.hpp"
 
-#endif /* __FACTOR_MASTER_H__ */
+#endif // __FACTOR_MASTER_H__

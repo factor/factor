@@ -2,28 +2,43 @@
 
 namespace factor {
 
-struct nursery_policy {
+struct nursery_copier : no_fixup {
   bump_allocator* nursery;
+  aging_space* aging;
 
-  explicit nursery_policy(bump_allocator* nursery) : nursery(nursery) {}
+  nursery_copier(bump_allocator* nursery, aging_space* aging)
+      : nursery(nursery), aging(aging) { }
 
-  bool should_copy_p(object* obj) {
-    return nursery->contains_p(obj);
+  object* fixup_data(object* obj) {
+    if (!nursery->contains_p(obj)) {
+      return obj;
+    }
+
+    // The while-loop is a needed micro-optimization.
+    while (obj->forwarding_pointer_p()) {
+      obj = obj->forwarding_pointer();
+    }
+
+    if (!nursery->contains_p(obj)) {
+      return obj;
+    }
+
+    cell size = obj->size();
+    object* newpointer = aging->allot(size);
+    if (!newpointer)
+      throw must_start_gc_again();
+
+    memcpy(newpointer, obj, size);
+    obj->forward_to(newpointer);
+    return newpointer;
   }
-
-  void promoted_object(object* obj) {}
-
-  void visited_object(object* obj) {}
 };
 
 void factor_vm::collect_nursery() {
-
-  /* Copy live objects from the nursery (as determined by the root set and
-     marked cards in aging and tenured) to aging space. */
-  gc_workhorse<aging_space, nursery_policy>
-      workhorse(this, data->aging, nursery_policy(data->nursery));
-  slot_visitor<gc_workhorse<aging_space, nursery_policy>>
-      visitor(this, workhorse);
+  // Copy live objects from the nursery (as determined by the root set and
+  // marked cards in aging and tenured) to aging space.
+  slot_visitor<nursery_copier>
+      visitor(this, nursery_copier(data->nursery, data->aging));
 
   cell scan = data->aging->start + data->aging->occupied_space();
 
@@ -35,14 +50,19 @@ void factor_vm::collect_nursery() {
   visitor.visit_cards(data->tenured, card_points_to_nursery,
                       card_points_to_nursery);
   visitor.visit_cards(data->aging, card_points_to_nursery, 0xff);
-  if (event)
-    event->ended_card_scan(visitor.cards_scanned, visitor.decks_scanned);
+  if (event) {
+    event->ended_phase(PHASE_CARD_SCAN);
+    event->cards_scanned += visitor.cards_scanned;
+    event->decks_scanned += visitor.decks_scanned;
+  }
 
   if (event)
     event->reset_timer();
   visitor.visit_code_heap_roots(&code->points_to_nursery);
-  if (event)
-    event->ended_code_scan(code->points_to_nursery.size());
+  if (event) {
+    event->ended_phase(PHASE_CODE_SCAN);
+    event->code_blocks_scanned += code->points_to_nursery.size();
+  }
 
   visitor.cheneys_algorithm(data->aging, scan);
 

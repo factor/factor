@@ -193,6 +193,7 @@ ARTICLE: "peg.ebnf.character-class" "EBNF Rule: Character Class"
 "square brackets. Multiple ranges can be included in a single character class "
 "definition. The syntax for the range is a start character, followed by a minus "
 "(-) followed by an end character. For example " { $snippet "[a-zA-Z]" } ". "
+"To include the minus (-) character in the class, make it the first or the last one: " { $snippet "[-0-9]" } " or " { $snippet "[a-z-]" } ". "
 "The AST resulting from the match is an integer of the character code for the "
 "character that matched."
 { $examples

@@ -19,14 +19,17 @@ C: <window-handle> window-handle
 
 SINGLETON: cocoa-ui-backend
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
+CONSTANT: attrib-table H{
     { double-buffered { $ NSOpenGLPFADoubleBuffer } }
     { stereo { $ NSOpenGLPFAStereo } }
     { offscreen { $ NSOpenGLPFAOffScreen } }
     { fullscreen { $ NSOpenGLPFAFullScreen } }
     { windowed { $ NSOpenGLPFAWindow } }
     { accelerated { $ NSOpenGLPFAAccelerated } }
-    { software-rendered { $ NSOpenGLPFARendererID $ kCGLRendererGenericFloatID } }
+    { software-rendered {
+          $ NSOpenGLPFARendererID
+          $ kCGLRendererGenericFloatID }
+    }
     { backing-store { $ NSOpenGLPFABackingStore } }
     { multisampled { $ NSOpenGLPFAMultisample } }
     { supersampled { $ NSOpenGLPFASupersample } }
@@ -43,20 +46,11 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: NSOpenGLPFA { } H{
 }
 
 M: cocoa-ui-backend (make-pixel-format)
-    nip >NSOpenGLPFA-int-array
+    nip { } attrib-table pixel-format-attributes>int-array
     NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
     handle>> -> release ;
-
-M: cocoa-ui-backend (pixel-format-attribute)
-    [ handle>> ] [ >NSOpenGLPFA ] bi*
-    [ drop f ]
-    [
-        first
-        { int } [ swap 0 -> getValues:forAttribute:forVirtualScreen: ]
-        with-out-parameters
-    ] if-empty ;
 
 TUPLE: pasteboard handle ;
 
@@ -202,7 +196,12 @@ M: cocoa-ui-backend system-alert
     ] [ 2drop ] if* ;
 
 CLASS: FactorApplicationDelegate < NSObject
+
     METHOD: void applicationDidUpdate: id obj [ reset-thread-timer ] ;
+
+    METHOD: char applicationShouldTerminateAfterLastWindowClosed: id app [
+        ui-stop-after-last-window? get 1 0 ?
+    ] ;
 ;
 
 : install-app-delegate ( -- )

@@ -1,28 +1,24 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs classes
-classes.algebra classes.tuple combinators.short-circuit fry
-generic kernel math namespaces sequences sets words ;
+USING: accessors alien.c-types arrays assocs classes classes.algebra
+classes.algebra.private classes.maybe classes.tuple
+combinators.short-circuit fry generic kernel math namespaces sequences
+sets words ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
 
-! Words that the current quotation depends on
 SYMBOL: dependencies
 
-SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
+SYMBOLS: +effect+ +conditional+ +definition+ ;
 
 : index>= ( obj1 obj2 seq -- ? )
     [ index ] curry bi@ >= ;
 
 : dependency>= ( how1 how2 -- ? )
-    {
-        effect-dependency
-        conditional-dependency
-        definition-dependency
-    } index>= ;
+    { +effect+ +conditional+ +definition+ } index>= ;
 
 : strongest-dependency ( how1 how2 -- how )
-    [ effect-dependency or ] bi@ [ dependency>= ] most ;
+    [ +effect+ or ] bi@ [ dependency>= ] most ;
 
 : depends-on ( word how -- )
     over primitive? [ 2drop ] [
@@ -31,28 +27,32 @@ SYMBOLS: effect-dependency conditional-dependency definition-dependency ;
         ] [ 3drop ] if
     ] if ;
 
-: add-depends-on-effect ( word -- )
-    effect-dependency depends-on ;
+GENERIC: add-depends-on-class ( classoid -- )
 
-: add-depends-on-conditionally ( word -- )
-    conditional-dependency depends-on ;
+M: class add-depends-on-class
+    +conditional+ depends-on ;
 
-: add-depends-on-definition ( word -- )
-    definition-dependency depends-on ;
+M: maybe add-depends-on-class
+    class>> add-depends-on-class ;
+
+M: anonymous-union add-depends-on-class
+    members>> [ add-depends-on-class ] each ;
+
+M: anonymous-intersection add-depends-on-class
+    participants>> [ add-depends-on-class ] each ;
 
 GENERIC: add-depends-on-c-type ( c-type -- )
 
 M: void add-depends-on-c-type drop ;
 
-M: c-type-word add-depends-on-c-type add-depends-on-definition ;
+M: c-type-word add-depends-on-c-type +definition+ depends-on ;
 
 M: array add-depends-on-c-type
-    [ word? ] filter [ add-depends-on-definition ] each ;
+    [ word? ] filter [ +definition+ depends-on ] each ;
 
 M: pointer add-depends-on-c-type
     to>> add-depends-on-c-type ;
 
-! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
 
 : ?class-or ( class class/f -- class' )
@@ -62,8 +62,6 @@ SYMBOL: generic-dependencies
     generic-dependencies get
     [ [ ?class-or ] change-at ] [ 2drop ] if* ;
 
-! Conditional dependencies are re-evaluated when classes change;
-! if any fail, the word is recompiled
 SYMBOL: conditional-dependencies
 
 GENERIC: satisfied? ( dependency -- ? )
@@ -98,7 +96,7 @@ M: depends-on-instance-predicate satisfied?
 TUPLE: depends-on-next-method class generic next-method ;
 
 : add-depends-on-next-method ( class generic next-method -- )
-    over add-depends-on-conditionally
+    over +conditional+ depends-on
     depends-on-next-method add-conditional-dependency ;
 
 M: depends-on-next-method satisfied?
@@ -110,7 +108,7 @@ M: depends-on-next-method satisfied?
 TUPLE: depends-on-method class generic method ;
 
 : add-depends-on-method ( class generic method -- )
-    over add-depends-on-conditionally
+    over +conditional+ depends-on
     depends-on-method add-conditional-dependency ;
 
 M: depends-on-method satisfied?
@@ -122,7 +120,7 @@ M: depends-on-method satisfied?
 TUPLE: depends-on-tuple-layout class layout ;
 
 : add-depends-on-tuple-layout ( class layout -- )
-    [ drop add-depends-on-conditionally ]
+    [ drop +conditional+ depends-on ]
     [ depends-on-tuple-layout add-conditional-dependency ] 2bi ;
 
 M: depends-on-tuple-layout satisfied?
@@ -131,7 +129,7 @@ M: depends-on-tuple-layout satisfied?
 TUPLE: depends-on-flushable word ;
 
 : add-depends-on-flushable ( word -- )
-    [ add-depends-on-conditionally ]
+    [ +conditional+ depends-on ]
     [ depends-on-flushable add-conditional-dependency ] bi ;
 
 M: depends-on-flushable satisfied?
@@ -140,16 +138,11 @@ M: depends-on-flushable satisfied?
 TUPLE: depends-on-final class ;
 
 : add-depends-on-final ( word -- )
-    [ add-depends-on-conditionally ]
+    [ +conditional+ depends-on ]
     [ depends-on-final add-conditional-dependency ] bi ;
 
 M: depends-on-final satisfied?
     class>> { [ class? ] [ final-class? ] } 1&& ;
-
-: init-dependencies ( -- )
-    H{ } clone dependencies namespaces:set
-    H{ } clone generic-dependencies namespaces:set
-    HS{ } clone conditional-dependencies namespaces:set ;
 
 : without-dependencies ( quot -- )
     [

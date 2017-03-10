@@ -3,15 +3,15 @@
 
 USING: cgi cgi.private kernel linked-assocs tools.test ;
 
-{ LH{ } } [ "" (query-string) ] unit-test
+{ LH{ } } [ "" query-string ] unit-test
 
 { LH{ { "a" { "1" } } { "b" { "2" } } } }
-[ "a=1&b=2" (query-string) ] unit-test
+[ "a=1&b=2" query-string ] unit-test
 
 { LH{ { "a" { "1" } } { "b" { "2" "3" } } } }
-[ "a=1&b=2&b=3" (query-string) ] unit-test
+[ "a=1&b=2&b=3" query-string ] unit-test
 
-{ LH{ } "text/html" } [ "text/html" (content-type) ] unit-test
+{ LH{ } "text/html" } [ "text/html" content-type ] unit-test
 
 { LH{ { "charset" { "utf-8" } } } "text/html" }
-[ "text/html; charset=utf-8" (content-type) ] unit-test
+[ "text/html; charset=utf-8" content-type ] unit-test

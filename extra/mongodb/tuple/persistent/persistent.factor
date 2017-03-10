@@ -104,8 +104,6 @@ M: tuple tuple>selector ( tuple -- assoc )
     prepare-assoc [ tuple>selector ] write-tuple-fields ;
 
 : assoc>tuple ( assoc -- tuple )
-   dup assoc?
-   [ [ dup tuple-info?
-       [ make-tuple ]
-       [ ] if ] [ drop ] recover
-   ] [ ] if ; inline recursive
+   dup assoc? [
+        [ dup tuple-info? [ make-tuple ] when ] ignore-errors
+   ] when ; inline recursive

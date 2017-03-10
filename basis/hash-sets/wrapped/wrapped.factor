@@ -36,6 +36,9 @@ M: wrapped-hash-set clear-set
 M: wrapped-hash-set delete
     wrapper@ delete ; inline
 
+M: wrapped-hash-set ?delete
+    wrapper@ ?delete ; inline
+
 M: wrapped-hash-set cardinality
     underlying>> cardinality ; inline
 

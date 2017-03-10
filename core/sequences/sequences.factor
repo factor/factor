@@ -635,16 +635,10 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
-<PRIVATE
-
-: (indices) ( elt i obj accum -- )
-    [ swap [ = ] dip ] dip [ push ] 2curry when ; inline
-
-PRIVATE>
-
 : indices ( obj seq -- indices )
-    swap V{ } clone
-    [ [ (indices) ] 2curry each-index ] keep ;
+    swap [ = ] curry [ swap ] prepose V{ } clone [
+        [ push ] curry [ [ drop ] if ] curry compose each-index
+    ] keep ;
 
 <PRIVATE
 
@@ -730,7 +724,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : (filter!) ( ... quot: ( ... elt -- ... ? ) store scan seq -- ... )
     2dup length < [
         [ move-unsafe ] 3keep
-        [ nth-unsafe pick call [ 1 + ] when ] 2keep
+        [ nth-unsafe -rot [ [ call ] keep ] dip rot [ 1 + ] when ] 2keep
         [ 1 + ] dip
         (filter!)
     ] [ nip set-length drop ] if ; inline recursive
@@ -1017,8 +1011,7 @@ PRIVATE>
 <PRIVATE
 
 : (map-find) ( seq quot find-quot -- result elt )
-    [ [ f ] 2dip [ [ nip ] dip call dup ] curry ] dip call
-    [ [ drop f ] unless ] dip ; inline
+    [ [ f ] 2dip [ nip ] prepose [ dup ] compose ] dip call nip ; inline
 
 PRIVATE>
 

@@ -1,11 +1,9 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators math namespaces make assocs
-sequences splitting sorting sets strings vectors hashtables
-quotations arrays byte-arrays math.parser calendar
-calendar.format present urls fry io io.encodings
-io.encodings.iana io.encodings.binary io.encodings.utf8 io.crlf
-ascii io.encodings.8-bit.latin1 http.parsers base64 mime.types ;
+USING: accessors arrays assocs base64 calendar calendar.format
+calendar.parser combinators fry hashtables http.parsers io io.crlf
+io.encodings.iana io.encodings.utf8 kernel make math math.parser
+mime.types present sequences sets sorting splitting urls ;
 IN: http
 
 CONSTANT: max-redirects 10
@@ -132,14 +130,14 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
     ] { } make "; " join ;
 
 TUPLE: request
-method
-url
-proxy-url
-version
-header
-post-data
-cookies
-redirects ;
+    method
+    url
+    proxy-url
+    version
+    header
+    post-data
+    cookies
+    redirects ;
 
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
@@ -171,15 +169,15 @@ redirects ;
 
 
 TUPLE: response
-version
-code
-message
-header
-cookies
-content-type
-content-charset
-content-encoding
-body ;
+    version
+    code
+    message
+    header
+    cookies
+    content-type
+    content-charset
+    content-encoding
+    body ;
 
 : <response> ( -- response )
     response new
@@ -207,10 +205,10 @@ M: response clone
     over cookies>> push ;
 
 TUPLE: raw-response
-version
-code
-message
-body ;
+    version
+    code
+    message
+    body ;
 
 : <raw-response> ( -- response )
     raw-response new

@@ -9,26 +9,31 @@ FROM: kernel.private => declare ;
 IN: stack-checker.alien
 
 TUPLE: alien-node-params
-return parameters
-{ abi abi initial: cdecl }
-in-d
-out-d ;
+    return parameters
+    { abi abi initial: cdecl } varargs? ;
 
-TUPLE: alien-invoke-params < alien-node-params library { function string } ;
+TUPLE: alien-invoke-params < alien-node-params
+    library
+    { function string } ;
 
 TUPLE: alien-indirect-params < alien-node-params ;
 
-TUPLE: alien-assembly-params < alien-node-params { quot callable } ;
+TUPLE: alien-assembly-params < alien-node-params
+    { quot callable } ;
 
-TUPLE: alien-callback-params < alien-node-params xt ;
+TUPLE: alien-callback-params < alien-node-params
+    xt ;
 
 : param-prep-quot ( params -- quot )
     parameters>> [ lookup-c-type c-type-unboxer-quot ] map deep-spread>quot ;
 
-: alien-stack ( params extra -- )
-    over parameters>> length + consume-d >>in-d
-    dup return>> void? 0 1 ? produce-d >>out-d
-    drop ;
+: stack-shape ( params -- in out )
+    [
+        [ parameters>> length ] [ alien-indirect-params? 1 0 ? ] bi +
+    ] [ return>> void? 0 1 ? ] bi ;
+
+: inputs/outputs ( params -- in-d out-d )
+    stack-shape [ consume-d ] [ produce-d ] bi* ;
 
 : return-prep-quot ( params -- quot )
     return>> [ [ ] ] [ lookup-c-type c-type-boxer-quot ] if-void ;
@@ -36,27 +41,31 @@ TUPLE: alien-callback-params < alien-node-params xt ;
 : infer-return ( params -- )
     return-prep-quot infer-quot-here ;
 
-: pop-return ( params -- params )
-    pop-literal [ add-depends-on-c-type ] [ nip >>return ] bi ;
-
-: pop-library ( params -- params )
-    pop-literal nip >>library ;
+: pop-abi ( params -- params )
+    pop-literal >>abi ;
 
 : pop-function ( params -- params )
-    pop-literal nip >>function ;
+    pop-literal >>function ;
+
+: pop-library ( params -- params )
+    pop-literal >>library ;
 
 : pop-params ( params -- params )
-    pop-literal [ [ add-depends-on-c-type ] each ] [ nip >>parameters ] bi ;
-
-: pop-abi ( params -- params )
-    pop-literal nip >>abi ;
+    pop-literal [ [ add-depends-on-c-type ] each ] [ >>parameters ] bi ;
 
 : pop-quot ( params -- params )
-    pop-literal nip >>quot ;
+    pop-literal >>quot ;
+
+: pop-return ( params -- params )
+    pop-literal [ add-depends-on-c-type ] [ >>return ] bi ;
+
+: pop-varargs? ( params -- params )
+    pop-literal >>varargs? ;
 
 : infer-alien-invoke ( -- )
     alien-invoke-params new
     ! Compile-time parameters
+    pop-varargs?
     pop-params
     pop-function
     pop-library
@@ -65,10 +74,8 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     dup library>> library-abi >>abi
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
-    ! Magic #: consume exactly the number of inputs
-    dup 0 alien-stack
-    ! Add node to IR
-    dup #alien-invoke,
+    ! Consume inputs and outputs and add node to IR
+    dup dup inputs/outputs #alien-invoke,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -80,10 +87,8 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     pop-return
     ! Coerce parameters to required types
     dup param-prep-quot '[ _ [ >c-ptr ] bi* ] infer-quot-here
-    ! Magic #: consume the function pointer, too
-    dup 1 alien-stack
-    ! Add node to IR
-    dup #alien-indirect,
+    ! Consume inputs and outputs and add node to IR
+    dup dup inputs/outputs #alien-indirect,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -96,10 +101,8 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     pop-return
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
-    ! Magic #: consume exactly the number of inputs
-    dup 0 alien-stack
-    ! Add node to IR
-    dup #alien-assembly,
+    ! Consume inputs and outputs and add node to IR
+    dup dup inputs/outputs #alien-assembly,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -131,8 +134,7 @@ M: callable wrap-callback-quot
     '[ _ _ do-callback ] >quotation ;
 
 : callback-effect ( params -- effect )
-    [ parameters>> length "x" <array> ]
-    [ return>> void? { } { "x" } ? ] bi <effect> ;
+    stack-shape [ "x" <array> ] bi@ <effect> ;
 
 : infer-callback-quot ( params quot -- child )
     [
@@ -145,7 +147,7 @@ M: callable wrap-callback-quot
     ] with-scope ;
 
 : infer-alien-callback ( -- )
-    pop-literal nip [
+    pop-literal [
         alien-callback-params new
         pop-abi
         pop-params

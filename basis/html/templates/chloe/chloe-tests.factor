@@ -32,7 +32,7 @@ IN: html.templates.chloe.tests
     ] with-scope
 ] unit-test
 
-{ "<html><head><title>Hello world</title></head><body>Blah blah</body></html>" } [
+{ "<!DOCTYPE html><html><head><title>Hello world</title></head><body>Blah blah</body></html>" } [
     [
         [
             "test2" test-template call-template

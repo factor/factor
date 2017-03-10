@@ -645,3 +645,10 @@ EXCLUDE: qualified.tests.bar => x ;
         { private? } use-first-word?
     ] with-variable
 ] unit-test
+
+! parse-array-def
+{ { 10 20 30 } } [
+    [
+        { "10 20 30 ;" } <lexer> [ parse-array-def ] with-lexer
+    ] with-file-vocabs
+] unit-test

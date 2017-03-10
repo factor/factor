@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays.hex crypto.aes crypto.aes.private
-crypto.aes.utils grouping kernel sequences tools.test ;
+USING: accessors crypto.aes crypto.aes.private crypto.aes.utils
+grouping kernel sequences tools.test ;
 IN: crypto.aes.tests
 
 ! fips-197 test vectors
-CONSTANT: plaintext HEX{ 32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34 }
-CONSTANT: key HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c }
+CONSTANT: plaintext B{ 0x32 0x43 0xf6 0xa8 0x88 0x5a 0x30 0x8d 0x31 0x31 0x98 0xa2 0xe0 0x37 0x07 0x34 }
+CONSTANT: key B{ 0x2b 0x7e 0x15 0x16 0x28 0xae 0xd2 0xa6 0xab 0xf7 0x15 0x88 0x09 0xcf 0x4f 0x3c }
 
 { {
         0x00 0x01 0x02 0x04 0x08 0x10
@@ -170,7 +170,7 @@ V{ 729683222 682545830 2885096840 164581180 2700803607 2287217841
    2893506291 435870753 684796225 1465647214 3491035560 3387827593
    3779005640 3059944614 }
 } [
-  HEX{ 2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c } ! AES-128 key expansion test vector from FIPS-197 (appendix)
+  B{ 0x2b 0x7e 0x15 0x16 0x28 0xae 0xd2 0xa6 0xab 0xf7 0x15 0x88 0x09 0xcf 0x4f 0x3c } ! AES-128 key expansion test vector from FIPS-197 (appendix)
         10 (expand-enc-key)
     ] unit-test
 

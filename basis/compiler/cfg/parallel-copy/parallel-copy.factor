@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.ssa.destruction.leaders cpu.architecture deques
-dlists fry kernel locals make namespaces sequences ;
-QUALIFIED: sets
+compiler.cfg.ssa.destruction.leaders compiler.utilities
+cpu.architecture deques dlists fry kernel locals make namespaces
+sequences ;
 IN: compiler.cfg.parallel-copy
 
 <PRIVATE
@@ -60,7 +60,7 @@ SYMBOL: temp-vregs
 
 : temp-vreg ( rep -- vreg )
     temp-vregs get [ next-vreg-rep ] cache
-    [ leader-map get sets:conjoin ] keep ;
+    [ leader-map get conjoin ] keep ;
 
 PRIVATE>
 

@@ -1,7 +1,7 @@
-USING: accessors alien.c-types alien.data arrays assocs
-bit-arrays.private classes.struct fry grouping io io.encodings.binary
-io.streams.byte-array kernel math math.statistics sequences
-sequences.repeating splitting tools.image-analyzer.utils vm ;
+USING: accessors alien.c-types assocs bit-arrays.private
+classes.struct fry grouping io io.encodings.binary
+io.streams.byte-array kernel math sequences tools.image-analyzer.utils
+vm ;
 IN: tools.image-analyzer.gc-info
 
 ! Utils
@@ -10,12 +10,6 @@ IN: tools.image-analyzer.gc-info
 
 : read-bits ( bit-count -- bit-array )
     [ bits>bytes read byte-array>bit-array ] keep head ;
-
-: (cut-points) ( counts times -- seq )
-    <repeats> cum-sum but-last ;
-
-: reshape-sequence ( seq counts times -- seqs )
-    [ (cut-points) split-indices ] keep <groups> flip ;
 
 : read-struct-safe ( struct -- instance/f )
     dup heap-size read [ swap memory>struct ] [ drop f ] if* ;
@@ -28,15 +22,12 @@ IN: tools.image-analyzer.gc-info
     [ return-address-count>> ] keep derived-root-count>>
     '[ _ read-ints ] replicate <reversed> ;
 
-: bit-counts ( gc-info -- counts )
-    struct-slot-values 3 head ;
-
 : (read-scrub-bits) ( gc-info -- seq )
-    [ bit-counts sum ] [ return-address-count>> ] bi * read-bits ;
+    [ gc-root-count>> ] [ return-address-count>> ] bi * read-bits ;
 
 : scrub-bits ( gc-info -- seq )
-    [ (read-scrub-bits) ] [ bit-counts ] [ return-address-count>> ] tri
-    [ 2drop { } ] [ reshape-sequence ] if-zero ;
+    [ (read-scrub-bits) ] [ gc-root-count>> ] bi
+    [ drop { } ] [ group ] if-zero ;
 
 : byte-array>gc-maps ( byte-array -- gc-maps )
     binary <byte-reader> <backwards-reader> [

@@ -1,7 +1,7 @@
-USING: arrays assocs classes classes.algebra classes.mixin
-compiler.units definitions eval hashtables io.streams.string
-kernel math parser sequences source-files strings tools.test
-vectors words ;
+USING: accessors arrays assocs classes classes.algebra classes.mixin
+classes.mixin.private classes.union.private compiler.units definitions
+eval hashtables kernel math parser sequences source-files strings
+tools.test vectors words ;
 IN: classes.mixin.tests
 
 ! Test mixins
@@ -119,14 +119,22 @@ MIXIN: move-instance-declaration-mixin
 { { string } } [ move-instance-declaration-mixin class-members ] unit-test
 
 MIXIN: silly-mixin
-SYMBOL: not-a-class
+SYMBOL: a-symbol
 
-[ [ \ not-a-class \ silly-mixin add-mixin-instance ] with-compilation-unit ] must-fail
+[
+    [
+        \ a-symbol \ silly-mixin add-mixin-instance
+    ] with-compilation-unit
+] [ not-a-class? ] must-fail-with
 
 SYMBOL: not-a-mixin
 TUPLE: a-class ;
 
-[ [ \ a-class \ not-a-mixin add-mixin-instance ] with-compilation-unit ] must-fail
+[
+    [
+        \ a-class \ not-a-mixin add-mixin-instance
+    ] with-compilation-unit
+] [ not-a-mixin-class? ] must-fail-with
 
 ! Changing a mixin member's metaclass should not remove it from the mixin
 MIXIN: metaclass-change-mixin
@@ -147,3 +155,21 @@ M: metaclass-change-mixin metaclass-change-generic ;
 { } [ [ metaclass-change forget-class ] with-compilation-unit ] unit-test
 
 { t } [ metaclass-change-mixin class-members empty? ] unit-test
+
+! Don't allow mixins to reference themselves
+[
+    "IN: issue-1652 MIXIN: bmix INSTANCE: bmix bmix" eval( -- )
+] [ error>> cannot-reference-self? ] must-fail-with
+
+[
+    "IN: issue-1652 MIXIN: a MIXIN: b INSTANCE: a b INSTANCE: b a" eval( -- )
+] [ error>> cannot-reference-self? ] must-fail-with
+
+! redefine-mixin-class
+{ t } [
+    [
+        SYMBOLS: foo1 foo2 ;
+        foo1 { foo2 } redefine-mixin-class
+        foo1 "mixin" word-prop
+    ] with-compilation-unit
+] unit-test

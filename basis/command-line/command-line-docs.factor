@@ -1,5 +1,4 @@
-USING: help.markup help.syntax parser vocabs.loader strings
-vocabs ;
+USING: help.markup help.syntax strings system vocabs vocabs.loader ;
 IN: command-line
 
 HELP: run-bootstrap-init
@@ -25,15 +24,11 @@ HELP: (command-line)
 { $values { "args" "a sequence of strings" } }
 { $description "Outputs the raw command line parameters which were passed to the Factor VM on startup."
 $nl
-"We recommend using the " { $link executable } " and " { $link command-line } " symbols instead." } ;
+"We recommend using the " { $link vm-path } " and " { $link command-line } " symbols instead." } ;
 
 HELP: command-line
 { $var-description "When Factor is run with a script, this variable contains the list of command line arguments which follow the name of the script on the command line. In deployed applications, it contains the full list of command line arguments. In all other cases it is set to " { $link f } "." }
-{ $see-also executable } ;
-
-HELP: executable
-{ $var-description "Provides the path to the executable binary, typically Factor.  However, in a deployed application this will be the path to the deployed binary that is being executed." }
-{ $see-also command-line } ;
+{ $see-also vm-path } ;
 
 HELP: main-vocab-hook
 { $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;
@@ -59,7 +54,7 @@ ARTICLE: "runtime-cli-args" "Command line switches for the VM"
     { { $snippet "-codeheap=" { $emphasis "n" } } "Code heap size, megabytes" }
     { { $snippet "-pic=" { $emphasis "n" } } "Maximum inline cache size. Setting of 0 disables inline caching, >= 1 enables polymorphic inline caching" }
     { { $snippet "-fep" } "enter low-level debbugger, aka fep mode immediately" }
-    { { $snippet "-nosignals" } "turn off OS signal handling" }
+    { { $snippet "-no-signals" } "turn off OS signal handling" }
     { { $snippet "-console" } "open console if possible" }
 }
 "If an " { $snippet "-i=" } " switch is not present, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the Factor executable." ;
@@ -96,8 +91,8 @@ $nl
 ARTICLE: "standard-cli-args" "Command line switches for general usage"
 "The following command line switches can be passed to a bootstrapped Factor image:"
 { $table
-    { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate. If you want Factor to exit immediately after, also specify " { $snippet "-run=none" } "." } }
-    { { $snippet "-run=" { $emphasis "vocab" } } { { $snippet { $emphasis "vocab" } } " is the name of a vocabulary with a " { $link POSTPONE: MAIN: } " hook to run on startup, for example " { $vocab-link "listener" } ", " { $vocab-link "ui.tools" } " or " { $vocab-link "none" } "." } }
+    { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate and then exit Factor." } }
+    { { $snippet "-run=" { $emphasis "vocab" } } { { $snippet { $emphasis "vocab" } } " is the name of a vocabulary with a " { $link POSTPONE: MAIN: } " hook to run on startup, for example " { $vocab-link "listener" } " or " { $vocab-link "ui.tools" } "." } }
     { { $snippet "-no-user-init" } { "Inhibits the running of user initialization files on startup. See " { $link "rc-files" } "." } }
 } ;
 
@@ -117,7 +112,7 @@ $nl
 ARTICLE: ".factor-roots" "Additional vocabulary roots file"
 "The vocabulary roots file is named " { $snippet ".factor-roots" } ". If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
 $nl
-"A word to run this file from an existing Factor session:"
+"A word to load this file from an existing Factor session:"
 { $subsections load-vocab-roots } ;
 
 ARTICLE: "rc-files" "Running code on startup"

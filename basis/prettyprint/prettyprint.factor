@@ -122,7 +122,7 @@ SYMBOL: =>
 PRIVATE>
 
 : callstack. ( callstack -- )
-    callstack>array 3 <groups>
+    callstack>array 3 <groups> reverse
     { { table-gap { 5 5 } } } [ [ callframe. ] each ] tabular-output nl ;
 
 : .c ( -- ) get-callstack callstack. ;

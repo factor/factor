@@ -669,14 +669,14 @@ literal: boxer gc-map ;
 ! { vreg rep stack#/reg }
 
 VREG-INSN: ##alien-invoke
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;
+literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;
 
 VREG-INSN: ##alien-indirect
 use: src/int-rep
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
+literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
 
 VREG-INSN: ##alien-assembly
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot ;
+literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot ;
 
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
@@ -851,7 +851,7 @@ UNION: gc-map-insn
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
-TUPLE: gc-map scrub-d scrub-r gc-roots derived-roots ;
+TUPLE: gc-map gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
 

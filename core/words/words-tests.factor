@@ -1,6 +1,6 @@
-USING: accessors arrays compiler.units definitions eval generic
-io.streams.string kernel math namespaces parser sequences
-tools.test vocabs words words.symbol ;
+USING: accessors arrays compiler.crossref compiler.units definitions
+eval generic io.streams.string kernel math namespaces parser sequences
+tools.test vocabs words words.private words.symbol ;
 IN: words.tests
 
 { 4 } [
@@ -125,12 +125,22 @@ DEFER: deferred
 
 { { } }
 [
+    ! No word can have dependencies to forgotten words.
     all-words [
-        [ "effect-dependencies" word-prop ]
-        [ "definition-dependencies" word-prop ]
-        [ "conditional-dependencies" word-prop ] tri
-        3append [ "forgotten" word-prop ] filter
+        load-dependencies [ "forgotten" word-prop ] filter
     ] map harvest
 ] unit-test
 
 [ "hi" word-code ] must-fail
+
+! Extra return values to defeat tco.
+: i-call1 ( -- w n )
+    get-callstack caller 20 ;
+
+! caller
+: i-call2 ( -- w x y )
+    i-call1 30 ;
+
+{ i-call2 } [
+    i-call2 2drop
+] unit-test

@@ -2,28 +2,18 @@ USING: bit-arrays byte-arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.stack-frame help.markup help.syntax kernel math sequences ;
 IN: compiler.codegen.gc-maps
 
-HELP: emit-gc-info-bitmaps
+HELP: emit-gc-info-bitmap
 { $values
   { "gc-maps" sequence }
-  { "counts" "counts of the three different types of gc checks" }
+  { "spill-count" "maximum number of spill slots" }
 }
-{ $description "Emits the scrub location data in the 'gc-maps' to the make sequence being created. The result is a concatenation of all datastack scrub locations, retainstack scrub locations and gc root locations converted into a byte-array. Given that byte-array and knowledge of the number of scrub locations, the original gc-map can be reconstructed."  } ;
+{ $description "Emits a bitmap of live locations of spill slots in the 'gc-maps' to the current make sequence." } ;
 
-HELP: emit-scrub
+HELP: emit-gc-roots
 { $values
-  { "seqs" "a sequence of sequences of 0/1" }
-  { "n" "length of the longest sequence" }
-}
-{ $description "Emits a space-efficient " { $link bit-array } " to the make sequence being created. The outputted array will be of length n times the number of sequences given. Each group of n elements in the array contains true values if the stack location should be scrubbed, and false if it shouldn't." }
-{ $examples
-  { $example
-    "USING: bit-arrays byte-arrays compiler.codegen.gc-maps make prettyprint ;"
-    "[ { B{ 0 } B{ 0 } B{ 1 1 1 0 } } emit-scrub ] ?{ } make . ."
-    "?{ t f f f t f f f f f f t }\n4"
-  }
-} ;
-
-{ emit-gc-info-bitmaps emit-scrub } related-words
+  { "seqs" "a sequence of sequences" }
+  { "n" "maximum number of spill slots" }
+} { $description "Emits the sequences of spill slots as a sequence of " { $link t } " and " { $link f } " values to the current make sequence." } ;
 
 HELP: emit-uint
 { $values { "n" integer } }
@@ -37,7 +27,7 @@ HELP: emit-uint
 } ;
 
 HELP: emit-gc-maps
-{ $description "GC maps are emitted so that the end is aligned to a 16-byte boundary." } ;
+{ $description "One of the last stages in code generation are emitting the GC maps which are placed directly after the generated executable code. They are emitted so that the end is aligned to a 16-byte boundary." } ;
 
 HELP: gc-maps
 { $var-description "Variable that holds a sequence of " { $link gc-map } " tuples. Gc maps are added to the sequence by " { $link gc-map-here } "." } ;
@@ -59,27 +49,22 @@ HELP: gc-map-here
 { $description "Registers the gc map in the " { $link gc-maps } " dynamic variable at the current compiled offset." } ;
 
 ARTICLE: "compiler.codegen.gc-maps" "GC maps"
-"The " { $vocab-link "compiler.codegen.gc-maps" } " handles generating code for keeping track of garbage collection maps. Every code block either ends with:"
+"The " { $vocab-link "compiler.codegen.gc-maps" } " vocab serializes a compiled words gc maps into a space-efficient format which is appended to the end of the code block."
+$nl
+"Every code block generated either ends with:"
 { $list "uint 0" }
 "or"
 { $list
   {
-      "bitmap, byte aligned, five subsequences:"
-      { $list
-        "scrubbed data stack locations"
-        "scrubbed retain stack locations"
-        "GC root spill slots"
-      }
+      "a bitmap representing the indices of the spill slots that contain roots in each gc map"
   }
   "uint[] base pointers"
   "uint[] return addresses"
-  "uint largest scrubbed data stack location"
-  "uint largest scrubbed retain stack location"
   "uint largest GC root spill slot"
   "uint largest derived root spill slot"
-  "int number of return addresses"
+  "int number of return addresses/gc maps"
 }
-"The " { $link gc-map } " tuples of the " { $link cfg } " are serialized to the above format and placed directly after the generated code."
+"For example, if there are three gc maps and each contain four roots, then bit 0-3 in the bitmap would indicate liveness of the first gc maps roots, 4-7 of the second and 8-11 of the third."
 $nl
 "Main entry point:"
 { $subsections emit-gc-maps } ;

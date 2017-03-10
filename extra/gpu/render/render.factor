@@ -505,10 +505,10 @@ DEFER: [bind-uniform-tuple]
 : parse-uniform-tuple-definition ( -- class superclass uniforms )
     scan-new-class scan-token {
         { ";" [ uniform-tuple f ] }
-        { "<" [ scan-word parse-definition [ first3 uniform boa ] map ] }
+        { "<" [ scan-word parse-array-def [ first3 uniform boa ] map ] }
         { "{" [
             uniform-tuple
-            \ } parse-until parse-definition swap prefix
+            \ } parse-until parse-array-def swap prefix
             [ first3 uniform boa ] map
         ] }
     } case ;
