@@ -33,3 +33,7 @@ USING: command-line namespaces tools.test ;
 { "a:b:c" } [ { "factor" "-roots=a:b:c" } parse-command-line
     "roots" get-global
 ] unit-test
+
+{ "a:b:c" } [ { "factor" "-roots=a:b:c" } parse-command-line
+    "roots" get-global
+] unit-test
