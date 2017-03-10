@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar colors.constants
 combinators combinators.short-circuit documents
-documents.elements fry grouping kernel locals make math
+documents.elements fry grouping kernel strings locals make math
 math.functions math.order math.ranges math.rectangles
 math.vectors models models.arrow namespaces opengl sequences
 sorting splitting timers ui.baseline-alignment ui.clipboards
@@ -213,9 +213,37 @@ M: editor draw-gadget*
         [ draw-lines ] [ draw-caret ] bi
     ] with-variable ;
 
+<PRIVATE
+
+: row,col-dim ( font r c -- dim )
+    "" resize-string [ drop CHAR: x ] map
+    swap "" resize-string [ drop CHAR: \n ] map 
+    append text-dim ;
+
+: min-dim ( font editor -- dim )
+    [ min-rows>> 0 [ and ] most ]
+    [ min-cols>> 0 [ and ] most ] bi
+    row,col-dim ;
+    
+: max-dim ( font editor -- dim )
+    ! hopefully no one goes over 5000
+    [ max-rows>> 5000 [ and ] most ]
+    [ max-cols>> 5000 [ and ] most ] bi
+    row,col-dim ;
+    
+: txt-dim ( font editor -- dim )
+    control-value text-dim ;
+    
+PRIVATE>
+
 M: editor pref-dim*
     ! Add some space for the caret.
-    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
+    ! Now respects min/max-row/col parameters
+    [ font>> ] keep
+    [ max-dim ]
+    [ txt-dim ]
+    [ min-dim ] 
+    2tri vmax vmin { 1 0 } v+ ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 
