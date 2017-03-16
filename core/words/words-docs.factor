@@ -173,7 +173,7 @@ $nl
 
     { { { $snippet "\"superclass\"" } ", " { $snippet "\"predicate-definition\"" } } { $link "predicates" } }
 
-    { { $snippet "\"members\"" } { $link "unions" } }
+    { { $snippet "\"members\"" } { $link "unions" } { $link "maybes" } }
 
     { { $snippet "\"slots\"" } { $link "slots" } }
 
