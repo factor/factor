@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: infix infix.private kernel locals math math.functions
-tools.test ;
+sequences tools.test ;
 IN: infix.tests
 
 { 0 } [ [infix 0 infix] ] unit-test
@@ -54,3 +54,11 @@ IN: infix.tests
 INFIX:: foo ( x y -- z ) x**2-abs(y) ;
 
 { 194 } [ 15 31 foo ] unit-test
+
+{ "foobar" } [
+    [let "foo" :> s
+        [let "bar" :> t
+            [infix append(s, t) infix]
+        ]
+    ]
+] unit-test
