@@ -134,7 +134,7 @@ ARTICLE: "furnace.actions.lifecycle" "Furnace action lifecycle"
 "Any one of the above steps can perform validation; if " { $link validation-failed } " is called during a POST request, the client is sent back to the page containing the form submission, with current form values and validation errors passed in a " { $link "furnace.conversations" } "." ;
 
 ARTICLE: "furnace.actions.impl" "Furnace actions implementation"
-"The following parametrized constructor should be called from constructors for subclasses of " { $link action } ":"
+"The following parameterized constructor should be called from constructors for subclasses of " { $link action } ":"
 { $subsections new-action } ;
 
 ARTICLE: "furnace.actions" "Furnace actions"
