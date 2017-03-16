@@ -56,9 +56,9 @@ INFIX:: foo ( x y -- z ) x**2-abs(y) ;
 { 194 } [ 15 31 foo ] unit-test
 
 { "foobar" } [
-    [let "foo" :> s
-        [let "bar" :> t
-            [infix append(s, t) infix]
+    [let "foo" :> foo
+        [let "bar" :> bar
+            [infix append(foo, bar) infix]
         ]
     ]
 ] unit-test
