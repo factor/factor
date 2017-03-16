@@ -33,7 +33,7 @@ ERROR: invalid-op string ;
 
 GENERIC: infix-codegen ( ast -- quot/number )
 
-M: ast-number infix-codegen value>> ;
+M: ast-value infix-codegen value>> ;
 
 M: ast-local infix-codegen
     name>> >local-word ;

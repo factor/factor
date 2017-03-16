@@ -62,3 +62,5 @@ INFIX:: foo ( x y -- z ) x**2-abs(y) ;
         ]
     ]
 ] unit-test
+
+{ "foobar" } [ [infix append("foo", "bar") infix] ] unit-test
