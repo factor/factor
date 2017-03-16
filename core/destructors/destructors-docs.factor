@@ -94,7 +94,7 @@ ARTICLE: "destructors-using" "Using destructors"
 ARTICLE: "destructors-extending" "Writing new destructors"
 "Superclass for disposable objects:"
 { $subsections disposable }
-"Parametrized constructor for disposable objects:"
+"Parameterized constructor for disposable objects:"
 { $subsections new-disposable }
 "Generic disposal word:"
 { $subsections dispose* }
