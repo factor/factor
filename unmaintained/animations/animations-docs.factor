@@ -20,7 +20,7 @@ HELP: animate
         "1/20 seconds animate ;"
         "46 ms elapsed\n17 ms elapsed"
     }
-    { $notes "The amount of time elapsed between these iterations will very." }
+    { $notes "The amount of time elapsed between these iterations will vary." }
 } ;
 
 HELP: reset-progress
@@ -43,7 +43,7 @@ HELP: progress
         "times ;"
         "31 ms elapsed\n18 ms elapsed\n16 ms elapsed"
     }
-    { $notes "The amount of time elapsed between these iterations will very." }
+    { $notes "The amount of time elapsed between these iterations will vary." }
 } ;
 
 ARTICLE: "animations" "Animations"
