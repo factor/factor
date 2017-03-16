@@ -5,7 +5,7 @@ strings vectors ;
 IN: infix.parser
 
 EBNF: parse-infix
-Number      = . ?[ ast-number? ]?
+Number      = . ?[ ast-value? ]?
 Identifier  = . ?[ string? ]?
 Array       = Identifier:i "[" Sum:s "]" => [[ i s ast-array boa ]]
 Slice1      = Identifier:i "[" Sum?:from ":" Sum?:to "]" => [[ i from to f ast-slice boa ]]

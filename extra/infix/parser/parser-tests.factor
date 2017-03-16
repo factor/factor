@@ -3,27 +3,27 @@
 USING: infix.ast infix.parser infix.tokenizer tools.test ;
 IN: infix.parser.tests
 
-{ T{ ast-number { value 1 } } } [ "1" build-infix-ast ] unit-test
-{ T{ ast-negation f T{ ast-number { value 1 } } } }
+{ T{ ast-value { value 1 } } } [ "1" build-infix-ast ] unit-test
+{ T{ ast-negation f T{ ast-value { value 1 } } } }
 [ "-1" build-infix-ast ] unit-test
 { T{ ast-op
     { left
         T{ ast-op
-            { left T{ ast-number { value 1 } } }
-            { right T{ ast-number { value 2 } } }
+            { left T{ ast-value { value 1 } } }
+            { right T{ ast-value { value 2 } } }
             { op "+" }
         }
     }
-    { right T{ ast-number { value 4 } } }
+    { right T{ ast-value { value 4 } } }
     { op "+" }
 } } [ "1+2+4" build-infix-ast ] unit-test
 
 { T{ ast-op
-    { left T{ ast-number { value 1 } } }
+    { left T{ ast-value { value 1 } } }
     { right
         T{ ast-op
-            { left T{ ast-number { value 2 } } }
-            { right T{ ast-number { value 3 } } }
+            { left T{ ast-value { value 2 } } }
+            { right T{ ast-value { value 3 } } }
             { op "*" }
         }
     }
@@ -31,8 +31,8 @@ IN: infix.parser.tests
 } } [ "1+2*3" build-infix-ast ] unit-test
 
 { T{ ast-op
-    { left T{ ast-number { value 1 } } }
-    { right T{ ast-number { value 2 } } }
+    { left T{ ast-value { value 1 } } }
+    { right T{ ast-value { value 2 } } }
     { op "+" }
 } } [ "(1+2)" build-infix-ast ] unit-test
 
@@ -44,13 +44,13 @@ IN: infix.parser.tests
     { arguments
         V{
             T{ ast-op
-                { left T{ ast-number { value 1 } } }
-                { right T{ ast-number { value 2 } } }
+                { left T{ ast-value { value 1 } } }
+                { right T{ ast-value { value 2 } } }
                 { op "+" }
             }
             T{ ast-op
-                { left T{ ast-number { value 2 } } }
-                { right T{ ast-number { value 3 } } }
+                { left T{ ast-value { value 2 } } }
+                { right T{ ast-value { value 3 } } }
                 { op "%" }
             }
         }
@@ -74,12 +74,12 @@ IN: infix.parser.tests
                             { left
                                 T{ ast-op
                                     { left
-                                        T{ ast-number
+                                        T{ ast-value
                                             { value 2 }
                                         }
                                     }
                                     { right
-                                        T{ ast-number
+                                        T{ ast-value
                                             { value 3 }
                                         }
                                     }
@@ -87,7 +87,7 @@ IN: infix.parser.tests
                                 }
                             }
                             { right
-                                T{ ast-number { value 4 } }
+                                T{ ast-value { value 4 } }
                             }
                             { op "+" }
                         }
@@ -97,16 +97,16 @@ IN: infix.parser.tests
             { op "+" }
         }
     }
-    { right T{ ast-number { value 2 } } }
+    { right T{ ast-value { value 2 } } }
     { op "/" }
 } } [ "(bar() + baz[2/ 3+4 ] )/2" build-infix-ast ] unit-test
 
 { T{ ast-op
-    { left T{ ast-number { value 1 } } }
+    { left T{ ast-value { value 1 } } }
     { right
         T{ ast-op
-            { left T{ ast-number { value 2 } } }
-            { right T{ ast-number { value 3 } } }
+            { left T{ ast-value { value 2 } } }
+            { right T{ ast-value { value 3 } } }
             { op "/" }
         }
     }
@@ -119,9 +119,9 @@ IN: infix.parser.tests
             { name "foo" }
             { arguments
                 V{
-                    T{ ast-number { value 2 } }
+                    T{ ast-value { value 2 } }
                     T{ ast-negation
-                        { term T{ ast-number { value 3 } } }
+                        { term T{ ast-value { value 3 } } }
                     }
                 }
             }
@@ -142,7 +142,7 @@ IN: infix.parser.tests
                                     { name "foo" }
                                     { arguments
                                         V{
-                                            T{ ast-number
+                                            T{ ast-value
                                                 { value 2 }
                                             }
                                         }
@@ -152,7 +152,7 @@ IN: infix.parser.tests
                             { right
                                 T{ ast-negation
                                     { term
-                                        T{ ast-number
+                                        T{ ast-value
                                             { value 1 }
                                         }
                                     }
@@ -163,7 +163,7 @@ IN: infix.parser.tests
                     }
                 }
             }
-            { right T{ ast-number { value 3 } } }
+            { right T{ ast-value { value 3 } } }
             { op "/" }
         }
     }
