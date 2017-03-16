@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators effects effects.parser fry
-infix.ast infix.parser kernel locals locals.parser math
-math.functions math.order math.ranges multiline namespaces
-parser quotations sequences summary vocabs.parser words ;
+USING: accessors combinators effects effects.parser fry
+infix.ast infix.parser kernel locals locals.parser locals.types
+math math.functions math.order math.ranges multiline parser
+quotations sequences summary vocabs.parser words ;
 IN: infix
 
 <PRIVATE
@@ -15,8 +15,8 @@ M: local-not-defined summary
     drop "local is not defined" ;
 
 : >local-word ( string -- word )
-    qualified-vocabs last words>> ?at
-    [ local-not-defined ] unless ;
+    dup search dup local?
+    [ nip ] [ drop local-not-defined ] if ;
 
 ERROR: invalid-op string ;
 
