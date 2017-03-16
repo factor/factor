@@ -16,7 +16,8 @@ ARTICLE: "slot-class-declaration" "Slot class declarations"
     { "The " { $link slots>tuple } " and " { $link >tuple } " words ensure that the values in the sequence satisfy the correct class predicates." }
     { { $link "tuple-redefinition" } " fills in new slots with initial values and ensures that changes to existing declarations result in incompatible values being replaced with the initial value of their respective slots." }
 }
-{ $subsections "slot-class-coercion" } ;
+{ $subsections "slot-class-coercion" }
+"The " { $link "maybes" } " are a useful way to specify class for an optional slot." ;
 
 ARTICLE: "slot-class-coercion" "Coercive slot declarations"
 "If the class of a slot is declared to be one of " { $link fixnum } " or " { $link float } ", then rather than testing values with the class predicate, writer words coerce values to the relevant type with " { $link >fixnum } " or " { $link >float } ". This may still result in error, but permits a wider range of values than a class predicate test. It also results in a possible loss of precision; for example, storing a large integer into a " { $link fixnum } " slot will silently overflow and discard high bits, and storing a ratio into a " { $link float } " slot may lose precision if the ratio is one which cannot be represented exactly with floating-point."
@@ -192,7 +193,7 @@ $nl
 }
 "Declaring a tuple class final prohibits other classes from subclassing it:"
 { $subsections POSTPONE: final }
-{ $see-also "call-next-method" "parameterized-constructors" "unions" "mixins" } ;
+{ $see-also "call-next-method" "parameterized-constructors" "unions" "mixins" "maybes" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
 "In addition to the slot reader and writer words which " { $link POSTPONE: TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
