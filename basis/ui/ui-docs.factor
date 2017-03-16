@@ -291,7 +291,7 @@ ARTICLE: "new-gadgets" "Implementing new gadgets"
 $nl
 "Bare gadgets can be constructed directly, which is useful if all you need is a custom appearance with no further behavior (see " { $link "ui-pen-protocol" } "):"
 { $subsections <gadget> }
-"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. Direct subclasses of " { $link gadget } " can be constructed using " { $link new } ", however some subclasses may define their own parametrized constructors (see " { $link "parametrized-constructors" } ")."
+"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. Direct subclasses of " { $link gadget } " can be constructed using " { $link new } ", however some subclasses may define their own parameterized constructors (see " { $link "parameterized-constructors" } ")."
 $nl
 "Further topics:"
 { $subsections

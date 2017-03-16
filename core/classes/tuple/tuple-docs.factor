@@ -36,10 +36,10 @@ ARTICLE: "tuple-declarations" "Tuple slot declarations"
     "slot-initial-values"
 } ;
 
-ARTICLE: "parametrized-constructors" "Parameterized constructors"
-"A " { $emphasis "parametrized constructor" } " is a word which directly or indirectly calls " { $link new } " or " { $link boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
+ARTICLE: "parameterized-constructors" "Parameterized constructors"
+"A " { $emphasis "parameterized constructor" } " is a word which directly or indirectly calls " { $link new } " or " { $link boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
 $nl
-"Parametrized constructors are useful in many situations, in particular with subclassing. For example, consider the following code:"
+"Parameterized constructors are useful in many situations, in particular with subclassing. For example, consider the following code:"
 { $code
     "TUPLE: vehicle max-speed occupants ;"
     ""
@@ -59,7 +59,7 @@ $nl
     "        swap >>max-altitude"
     "        swap >>max-speed ;"
 }
-"The two constructors depend on the implementation of " { $snippet "vehicle" } " because they are responsible for initializing the " { $snippet "occupants" } " slot to an empty vector. If this slot is changed to contain a hashtable instead, there will be two places instead of one. A better approach is to use a parametrized constructor for vehicles:"
+"The two constructors depend on the implementation of " { $snippet "vehicle" } " because they are responsible for initializing the " { $snippet "occupants" } " slot to an empty vector. If this slot is changed to contain a hashtable instead, there will be two places instead of one. A better approach is to use a parameterized constructor for vehicles:"
 { $code
     "TUPLE: vehicle max-speed occupants ;"
     ""
@@ -81,7 +81,7 @@ $nl
     "        swap >>max-altitude"
     "        swap >>max-speed ;"
 }
-"The naming convention for parametrized constructors is " { $snippet "new-" { $emphasis "class" } } "." ;
+"The naming convention for parameterized constructors is " { $snippet "new-" { $emphasis "class" } } "." ;
 
 ARTICLE: "tuple-constructors" "Tuple constructors"
 "Tuples are created by calling one of two constructor primitives:"
@@ -118,7 +118,7 @@ $nl
     "! Run-time error"
     "\"not a number\" 2 3 4 color boa"
 }
-{ $subsections "parametrized-constructors" } ;
+{ $subsections "parameterized-constructors" } ;
 
 ARTICLE: "tuple-inheritance-example" "Tuple subclassing example"
 "Rectangles, parallelograms and circles are all shapes. We support two operations on shapes:"
@@ -176,8 +176,8 @@ $nl
 $nl
 "The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrived relationships between classes."
 { $heading "Anti-pattern #3: subclassing to override a method definition" }
-"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document what subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
-{ $see-also "parametrized-constructors" } ;
+"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document what subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parameterized constructor."
+{ $see-also "parameterized-constructors" } ;
 
 ARTICLE: "tuple-subclassing" "Tuple subclassing"
 "Tuple subclassing can be used to express natural relationships between classes at the language level. For example, every car " { $emphasis "is a" } " vehicle, so if the " { $snippet "car" } " class subclasses the " { $snippet "vehicle" } " class, it can " { $emphasis "inherit" } " the slots and methods of " { $snippet "vehicle" } "."
@@ -192,7 +192,7 @@ $nl
 }
 "Declaring a tuple class final prohibits other classes from subclassing it:"
 { $subsections POSTPONE: final }
-{ $see-also "call-next-method" "parametrized-constructors" "unions" "mixins" } ;
+{ $see-also "call-next-method" "parameterized-constructors" "unions" "mixins" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
 "In addition to the slot reader and writer words which " { $link POSTPONE: TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
