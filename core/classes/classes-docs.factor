@@ -54,6 +54,7 @@ $nl
     "builtin-classes"
     "unions"
     "intersections"
+    "maybes"
     "mixins"
     "predicates"
     "singletons"
