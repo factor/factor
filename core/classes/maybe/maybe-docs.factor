@@ -11,8 +11,9 @@ ARTICLE: "maybes" "Maybe classes"
 "A slot with an empty " { $snippet "maybe{ }" } " class can only hold the " { $link POSTPONE: f } " value."
 { $examples
     { $example
+        "USING: prettyprint ;"
         "TUPLE: test-maybe { value maybe{ fixnum string } } ;"
-        "test-maybe new value>>"
+        "test-maybe new value>> ."
         "f"
     }
 }
