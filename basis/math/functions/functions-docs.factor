@@ -102,7 +102,7 @@ HELP: align
 
 HELP: e^
 { $values { "x" number } { "e^x" number } }
-{ $description "Exponential function, " { $snippet "y=e^x" } "." } ;
+{ $description "Exponential function, raises " { $link e } " to the power of " { $snippet "x" } "." } ;
 
 HELP: frexp
 { $values { "x" number } { "y" float } { "exp" integer } }
