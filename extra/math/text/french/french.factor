@@ -29,7 +29,7 @@ MEMO: units ( -- seq ) ! up to 10^99
 ! The only plurals we have to remove are "quatre-vingts" and "cents",
 ! which are also the only strings ending with "ts".
 : unpluralize ( str -- newstr ) dup "ts" tail? [ but-last ] when ;
-: pluralize ( str -- newstr ) CHAR: s suffix ;
+: pluralize ( str -- newstr ) dup "s" tail? [ CHAR: s suffix ] unless ;
 
 : space-append ( str1 str2 -- str ) " " glue ;
 
@@ -88,9 +88,28 @@ MEMO: units ( -- seq ) ! up to 10^99
         [ decompose ]
     } cond ;
 
+: ieme ( str -- str )
+    dup "ts" tail? [ but-last ] when
+    dup "e" tail? [ but-last ] when
+    dup "q" tail? [ CHAR: u suffix ] when
+    "ième" append ;
+
+: divisor ( n -- str )
+    {
+        { 2 [ "demi" ] }
+        { 3 [ "tiers" ] }
+        { 4 [ "quart" ] }
+        [ basic ieme ]
+    } case ;
+
 PRIVATE>
 
 GENERIC: number>text ( n -- str )
 
 M: integer number>text
     dup abs 102 10^ >= [ number>string ] [ basic ] if ;
+
+M: ratio number>text
+    >fraction [ [ number>text ] keep ] [ divisor ] bi*
+    swap abs 1 > [ pluralize ] when
+    space-append ;
