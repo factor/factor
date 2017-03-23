@@ -101,7 +101,7 @@ HELP: align
 { $notes "This word will give an incorrect result if " { $snippet "w" } " is not a power of 2." } ;
 
 HELP: e^
-{ $values { "x" number } { "y" number } }
+{ $values { "x" number } { "e^x" number } }
 { $description "Exponential function, " { $snippet "y=e^x" } "." } ;
 
 HELP: frexp
@@ -261,7 +261,7 @@ HELP: absq
 { $description "Computes the squared absolute value of a number. For complex numbers this is marginally more efficient than " { $link abs } "." } ;
 
 HELP: ^
-{ $values { "x" number } { "y" number } { "z" number } }
+{ $values { "x" number } { "y" number } { "x^y" number } }
 { $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
 { $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
 
@@ -270,7 +270,7 @@ HELP: nth-root
 { $description "Calculates the nth root of a number, such that " { $snippet "y^n=x" } "." } ;
 
 HELP: 10^
-{ $values { "x" number } { "y" number } }
+{ $values { "x" number } { "10^x" number } }
 { $description "Raises 10 to the power of " { $snippet "x" } ". If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
 
 HELP: divisor?
