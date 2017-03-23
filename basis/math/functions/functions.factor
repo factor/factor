@@ -61,7 +61,7 @@ PRIVATE>
 
 : polar> ( abs arg -- z ) cis * ; inline
 
-GENERIC: e^ ( x -- y )
+GENERIC: e^ ( x -- e^x )
 
 M: float e^ fexp ; inline
 
@@ -95,7 +95,7 @@ M: complex e^ >rect [ e^ ] dip polar> ; inline
 
 PRIVATE>
 
-: ^ ( x y -- z )
+: ^ ( x y -- x^y )
     {
         { [ over zero? ] [ 0^ ] }
         { [ dup integer? ] [ integer^ ] }
@@ -227,7 +227,7 @@ M: object log1+ 1 + log ; inline
 
 M: float log1+ dup -1.0 >= [ flog1+ ] [ 1.0 + 0.0 rect> log ] if ; inline
 
-: 10^ ( x -- y ) 10 swap ^ ; inline
+: 10^ ( x -- 10^x ) 10 swap ^ ; inline
 
 GENERIC: log10 ( x -- y ) foldable
 
