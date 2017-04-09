@@ -34,12 +34,12 @@ IN: formatting
         [ abs ] dip
         [ 10^ * round-to-even >integer number>string ]
         [ 1 + CHAR: 0 pad-head ]
-        [ cut* ] tri "." glue
+        [ cut* ] tri [ "." glue ] unless-empty
     ] curry keep neg? [ CHAR: - prefix ] when ;
 
 : format-scientific-mantissa ( x log10x digits -- string )
     swap - 10^ * round-to-even >integer
-    number>string 1 cut "." glue ;
+    number>string 1 cut [ "." glue ] unless-empty ;
 
 : format-scientific-exponent ( log10x -- string )
     number>string 2 CHAR: 0 pad-head
@@ -64,7 +64,7 @@ IN: formatting
     ] if ;
 
 : ?fix-nonsignificant-zero ( string digits -- string )
-    [ ".0" "." replace ] [ drop ] if-zero ;
+    [ ".0" "" replace ] [ drop ] if-zero ;
 
 : format-scientific ( x digits -- string )
     format-fast-scientific?  [
