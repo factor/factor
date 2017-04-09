@@ -37,12 +37,15 @@ IN: formatting
         [ cut* ] tri [ "." glue ] unless-empty
     ] curry keep neg? [ CHAR: - prefix ] when ;
 
-: format-scientific-mantissa ( x log10x digits -- string )
-    swap - 10^ * round-to-even >integer
-    number>string 1 cut [ "." glue ] unless-empty ;
+: format-scientific-mantissa ( x log10x digits -- string rounded-up? )
+    [ swap - 10^ * round-to-even >integer number>string ] keep
+    over length 1 - < [
+        [ but-last >string ] when ! 9.9 rounded to 1e+01
+        1 cut [ "." glue ] unless-empty
+    ] keep ;
 
-: format-scientific-exponent ( log10x -- string )
-    number>string 2 CHAR: 0 pad-head
+: format-scientific-exponent ( rounded-up? log10x -- string )
+    swap [ 1 + ] when number>string 2 CHAR: 0 pad-head
     dup CHAR: - swap index "e" "e+" ? prepend ;
 
 : format-scientific-simple ( x digits -- string )
