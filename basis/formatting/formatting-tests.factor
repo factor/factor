@@ -112,6 +112,9 @@ IN: formatting.tests
 { "9.88e+417" } [ 987654321098765432 10 400 ^ * "%.2e" sprintf ] unit-test
 { "9.9e+417" } [ 987654321098765432 10 400 ^ * "%.1e" sprintf ] unit-test
 { "1e+418" } [ 987654321098765432 10 400 ^ * "%.0e" sprintf ] unit-test
+{ "9e+417" } [ 937654321098765432 10 400 ^ * "%.0e" sprintf ] unit-test
+{ "1.0e+418" } [ 997654321098765432 10 400 ^ * "%.1e" sprintf ] unit-test
+{ "1.00e+418" } [ 999654321098765432 10 400 ^ * "%.2e" sprintf ] unit-test
 
 { "1.5625" } [ 1.5625 "%d" sprintf ] unit-test
 { "1.9p0" } [ 1.5625 "%x" sprintf ] unit-test
