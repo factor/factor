@@ -35,10 +35,12 @@ IN: formatting.tests
 { "100000000000000000000000.000000" } [ 23 10^ "%f" sprintf ] unit-test
 { "1.2" } [ 125/100 "%.1f" sprintf ] unit-test
 { "1.4" } [ 135/100 "%.1f" sprintf ] unit-test
-{ "2." } [ 5/2 "%.0f" sprintf ] unit-test
-{ "4." } [ 7/2 "%.0f" sprintf ] unit-test
-{ "2.e+00" } [ 5/2 "%.0e" sprintf ] unit-test
-{ "4.e+00" } [ 7/2 "%.0e" sprintf ] unit-test
+{ "2" } [ 5/2 "%.0f" sprintf ] unit-test
+{ "4" } [ 7/2 "%.0f" sprintf ] unit-test
+{ "2e+00" } [ 5/2 "%.0e" sprintf ] unit-test
+{ "4e+00" } [ 7/2 "%.0e" sprintf ] unit-test
+{ "1" } [ 1.0 "%.0f" sprintf ] unit-test
+{ "1e+00" } [ 1.0 "%.0e" sprintf ] unit-test
 { "  1.23" } [ 1.23456789 "%6.2f" sprintf ] unit-test
 { "001100" } [ 12 "%06b" sprintf ] unit-test
 { "==14" } [ 12 "%'=4o" sprintf ] unit-test
@@ -89,7 +91,7 @@ IN: formatting.tests
 
 { "987654321098765432" } [ 987654321098765432 "%d" sprintf ] unit-test
 { "987654321098765432.0" } [ 987654321098765432 "%.1f" sprintf ] unit-test
-{ "987654321098765432." } [ 987654321098765432 "%.0f" sprintf ] unit-test
+{ "987654321098765432" } [ 987654321098765432 "%.0f" sprintf ] unit-test
 { "9.8765432109876543200e+417" } [ 987654321098765432 10 400 ^ * "%.19e" sprintf ] unit-test
 { "9.876543210987654320e+417" } [ 987654321098765432 10 400 ^ * "%.18e" sprintf ] unit-test
 { "9.87654321098765432e+417" } [ 987654321098765432 10 400 ^ * "%.17e" sprintf ] unit-test
@@ -109,7 +111,7 @@ IN: formatting.tests
 { "9.877e+417" } [ 987654321098765432 10 400 ^ * "%.3e" sprintf ] unit-test
 { "9.88e+417" } [ 987654321098765432 10 400 ^ * "%.2e" sprintf ] unit-test
 { "9.9e+417" } [ 987654321098765432 10 400 ^ * "%.1e" sprintf ] unit-test
-{ "1.e+418" } [ 987654321098765432 10 400 ^ * "%.0e" sprintf ] unit-test
+{ "1e+418" } [ 987654321098765432 10 400 ^ * "%.0e" sprintf ] unit-test
 
 { "1.5625" } [ 1.5625 "%d" sprintf ] unit-test
 { "1.9p0" } [ 1.5625 "%x" sprintf ] unit-test
