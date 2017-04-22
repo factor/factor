@@ -187,10 +187,12 @@ TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
 M: timestamp present timestamp>string ;
 
 ! Duration formatting
-TYPED: duration>hms ( duration: duration -- str )
+TYPED: duration>hm ( duration: duration -- str )
     [ duration>hours >integer 24 mod pad-00 ]
-    [ duration>minutes >integer 60 mod pad-00 ]
-    [ second>> >integer 60 mod pad-00 ] tri 3array ":" join ;
+    [ duration>minutes >integer 60 mod pad-00 ] bi ":" glue ;
+
+TYPED: duration>hms ( duration: duration -- str )
+    [ duration>hm ] [ second>> >integer 60 mod pad-00 ] bi ":" glue ;
 
 TYPED: duration>human-readable ( duration: duration -- string )
     [
