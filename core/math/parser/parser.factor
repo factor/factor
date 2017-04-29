@@ -487,6 +487,9 @@ M: ratio >base
         [ drop "+" glue ]
     } case ;
 
+M: byte-array >base
+    [ >base ] curry { } map-as concat ;
+
 <PRIVATE
 
 : (fix-float) ( str-no-exponent -- newstr )
