@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.struct
-classes.tuple combinators combinators.short-circuit debugger
-definitions effects eval formatting fry grouping help
-help.markup help.topics io io.streams.string kernel macros math
-namespaces sequences sequences.deep sets splitting strings
-summary tools.destructors unicode vocabs vocabs.loader words
-words.constant words.symbol ;
+classes.tuple combinators combinators.short-circuit
+combinators.smart debugger definitions effects eval formatting
+fry grouping help help.markup help.topics io io.streams.string
+kernel macros math namespaces prettyprint sequences
+sequences.deep sets splitting strings summary tools.destructors
+unicode vocabs vocabs.loader words words.constant words.symbol ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
@@ -32,8 +32,9 @@ SYMBOL: vocab-articles
     [
         '[
             _ rest [
-                but-last "\n" join
-                [ (eval>string) ] call( code -- output )
+                but-last "\n" join parse-string [
+                    [ output>array [ . ] each ] call( quot -- )
+                ] with-string-writer
                 "\n" ?tail drop
             ] keep
             last assert=
