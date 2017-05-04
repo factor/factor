@@ -6,6 +6,7 @@ SINGLETON: emacsclient
 emacsclient editor-class set-global
 
 SYMBOL: emacsclient-path
+SYMBOL: emacsclient-args
 
 HOOK: find-emacsclient os ( -- path )
 
@@ -22,6 +23,7 @@ M: windows find-emacsclient
 M: emacsclient editor-command ( file line -- command )
     [
         emacsclient-path get [ find-emacsclient ] unless* ,
+        emacsclient-args get %
         "-a=emacs" ,
         "--no-wait" ,
         number>string "+" prepend ,
