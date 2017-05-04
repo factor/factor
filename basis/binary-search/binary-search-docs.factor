@@ -12,15 +12,15 @@ $nl
 { $examples
     "Searching for an integer in a sorted array:"
     { $example
-        "USING: binary-search math.order ;"
-        "{ -130 -40 10 90 160 170 280 } [ 50 >=< ] search"
-        "2\n10"
+        "USING: binary-search math.order prettyprint ;"
+        "{ -13 -4 1 9 16 17 28 } [ 5 >=< ] search . ."
+        "1\n2"
     }
     "Frequently, the quotation passed to " { $link search } " is constructed by " { $link curry } " or " { $link with } " in order to make the search key a parameter:"
     { $example
-        "USING: binary-search kernel math.order ;"
-        "50 { -130 -40 10 90 160 170 280 } [ <=> ] with search"
-        "2\n10"
+        "USING: binary-search kernel math.order prettyprint ;"
+        "5 { -13 -4 1 9 16 17 28 } [ <=> ] with search . ."
+        "1\n2"
     }
 } ;
 
