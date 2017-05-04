@@ -114,12 +114,12 @@ HELP: unless-empty
 { $examples "This word is equivalent to " { $link if-empty } " with an empty first quotation:"
     { $example
     "USING: sequences prettyprint ;"
-    "{ 4 5 6 } [ ] [ sum ] if-empty ."
+    "{ 4 5 6 } [ ] [ sum . ] if-empty"
     "15"
     }
     { $example
     "USING: sequences prettyprint ;"
-    "{ 4 5 6 } [ sum ] unless-empty ."
+    "{ 4 5 6 } [ sum . ] unless-empty"
     "15"
     }
 } ;
