@@ -299,12 +299,12 @@ HELP: unless-zero
 { $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
     { $example
     "USING: sequences math prettyprint ;"
-    "3 [ ] [ sq ] if-zero ."
+    "3 [ ] [ sq . ] if-zero"
     "9"
     }
     { $example
     "USING: sequences math prettyprint ;"
-    "3 [ sq ] unless-zero ."
+    "3 [ sq . ] unless-zero"
     "9"
     }
 } ;
