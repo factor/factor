@@ -120,6 +120,7 @@ SYNTAX: STRIP-TEASE:
     { T{ button-down } [ request-focus ] }
     { T{ key-down f f " " } [ next-page ] }
     { T{ key-down f f "DOWN" } [ next-page ] }
+    { T{ key-down f f "b" } [ prev-page ] }
     { T{ key-down f f "UP" } [ prev-page ] }
     { T{ key-down f f "q" } [ close-window ] }
     { T{ key-down f f "ESC" } [ close-window ] }
