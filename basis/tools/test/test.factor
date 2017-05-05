@@ -6,7 +6,7 @@ generalizations io io.files.temp io.files.unique kernel lexer
 locals macros namespaces parser prettyprint quotations sequences
 sequences.generalizations source-files source-files.errors
 source-files.errors.debugger splitting stack-checker summary
-tools.errors unicode vocabs vocabs.files vocabs.metadata
+system tools.errors unicode vocabs vocabs.files vocabs.metadata
 vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
@@ -185,6 +185,7 @@ M: test-failure error. ( error -- )
 : test-all ( -- ) loaded-vocab-names filter-don't-test test-vocabs ;
 
 : test-main ( -- )
-    command-line get [ [ load ] [ test ] bi ] each ;
+    command-line get [ [ load ] [ test ] bi ] each
+    test-failures get empty? [ 0 ] [ 1 ] if exit ;
 
 MAIN: test-main
