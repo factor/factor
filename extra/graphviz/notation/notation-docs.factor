@@ -406,7 +406,7 @@ $nl
     ""
     "    ! This is not OK:"
     "    [ 1 2 <edge> \"b\" =labelloc add ]"
-    "    [ 2drop \"not for edges!\" write ] recover"
+    "    [ drop \"not for edges!\" write ] recover drop"
     "not for edges!"
 }
 $nl
