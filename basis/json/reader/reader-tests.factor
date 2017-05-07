@@ -42,6 +42,14 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { { 1 "two" 3.0 } } [ " [1, \"two\", 3.0] " json> ] unit-test
 { H{ } } [ "{}" json> ] unit-test
 
+! json object keys should be strings
+[ "{1:2}" json> ]
+[ json-error? ] must-fail-with
+[ "{a:1}" json> ]
+[ json-error? ] must-fail-with
+[ "{true:2}" json> ]
+[ json-error? ] must-fail-with
+
 ! the returned hashtable should be different every time
 { H{ } } [ "key" "value" "{}" json> ?set-at "{}" json> nip ] unit-test
 
@@ -83,6 +91,6 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { t } [ "NaN" json> fp-nan? ] unit-test
 
 [ "<!doctype html>\n<html>\n<head>\n   " json> ]
-[ not-a-json-number? ] must-fail-with
+[ json-error? ] must-fail-with
 
 { H{ } } [ "" json> ] unit-test
