@@ -97,6 +97,6 @@ TIP: "Scroll the listener from the keyboard by pressing " { $command listener-ga
 
 TIP: "Press " { $command tool "common" refresh-all } " or run " { $link refresh-all } " to reload changed source files from disk." ;
 
-TIP: "On Windows: use C+Break to interrupt tight loops in your code started in the listener, such as" { $code "[ t ] [ ] while" } "Caution: this may crash the Factor runtime if the code uses cooperative multitasking or asynchronous I/O." ;
+TIP: "On Windows: use " { $snippet "C+Break" } " to interrupt tight loops in your code started in the listener, such as" { $code "[ t ] [ ] while" } "Caution: this may crash the Factor runtime if the code uses cooperative multitasking or asynchronous I/O." ;
 
 ABOUT: "ui-listener"
