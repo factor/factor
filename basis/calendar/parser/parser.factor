@@ -169,5 +169,4 @@ MACRO: attempt-all-quots ( quots -- quot )
     [ instant read-00 >>hour read-00 >>minute ] with-string-reader ;
 
 : hms>duration ( str -- duration )
-    [ read-hms ] with-string-reader
-    instant swap >>second swap >>minute swap >>hour ;
+    [ 0 0 0 read-hms <duration> ] with-string-reader ;
