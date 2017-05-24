@@ -141,7 +141,7 @@ SYMBOL: ui-thread
 
 PRIVATE>
 
-: find-window ( quot: ( world -- ? ) -- world )
+: find-window ( quot: ( world -- ? ) -- world/f )
     [ ui-windows get-global values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
     find-last nip ; inline
