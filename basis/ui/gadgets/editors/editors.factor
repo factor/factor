@@ -670,6 +670,13 @@ M: action-editor draw-gadget*
         call-next-method
     ] if ;
 
+M: action-editor pref-dim*
+    dup draw-default-text? [
+        [ font>> ] [ default-text>> ] bi text-dim { 1 0 } v+
+    ] [
+        call-next-method
+    ] if ;
+
 TUPLE: action-field < field quot ;
 
 : <action-field> ( quot: ( string -- ) -- gadget )
