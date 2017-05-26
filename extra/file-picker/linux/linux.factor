@@ -1,3 +1,5 @@
+! Copyright (C) 2014, 2015 John Benediktsson.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.strings alien.syntax
 destructors file-picker gobject-introspection.standard-types
 gtk.ffi io.encodings.string io.encodings.utf8 kernel system ;
