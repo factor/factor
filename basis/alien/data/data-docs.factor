@@ -184,7 +184,7 @@ $nl
 "Using C string types triggers automatic conversions:"
 { $list
     {
-    "Passing a Factor string to a C function expecting a " { $link c-string } " allocates a " { $link byte-array } " in the Factor heap; the string is then encoded to the requested encoding and a raw pointer is passed to the function."
+    "Passing a Factor string to a C function expecting a " { $link c-string } " allocates a " { $link byte-array } " in the Factor heap; the string is then encoded to the requested encoding and a raw pointer is passed to the function. "
     "Passing an already encoded " { $link byte-array } " also works and performs no conversion."
     }
     { "Returning a C string from a C function allocates a Factor string in the Factor heap; the memory pointed to by the returned pointer is then decoded with the requested encoding into the Factor string." }
