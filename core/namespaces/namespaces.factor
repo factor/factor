@@ -67,4 +67,6 @@ PRIVATE>
 : with-variables ( ns quot -- ) swap >n call ndrop ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
 : with-variable ( value key quot -- ) [ associate ] dip with-variables ; inline
+: with-variable-on ( key quot -- ) [ t swap associate ] dip with-variables ; inline
+: with-variable-off ( key quot -- ) [ f swap associate ] dip with-variables ; inline
 : with-global ( quot -- ) [ global ] dip with-variables ; inline
