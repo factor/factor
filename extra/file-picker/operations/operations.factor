@@ -5,7 +5,7 @@ kernel locals ui.commands ui.operations ;
 IN: file-picker.operations
 
 :: save-as ( data -- )
-    "" save-file-dialog [ binary [ data write ] with-file-writer ] when* ;
+    "" save-file-dialog [ data binary set-file-contents ] when* ;
 
 ! Right-click a byte-array presentation to open the Save As window.
 [ byte-array? ] \ save-as H{
