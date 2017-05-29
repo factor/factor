@@ -1,8 +1,11 @@
+! Copyright (C) 2014 John Benediktsson, Doug Coleman.
+! Copyright (C) 2017 Alexander Ilin.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
 alien.syntax classes.struct destructors file-picker
 io.encodings.string io.encodings.utf8 kernel libc literals math
-system windows windows.kernel32 windows.shell32 windows.types
-windows.user32 ;
+system windows windows.comdlg32 windows.kernel32 windows.shell32
+windows.types windows.user32 ;
 IN: file-picker.windows
 LIBRARY: shell32
 
@@ -70,4 +73,11 @@ M: windows open-file-dialog
         ] if*
     ] with-destructors ;
 
-M: windows save-file-dialog ;
+M: windows save-file-dialog
+    [
+        drop ! TODO: support supplying a suggested file name or path
+        OPENFILENAME [ malloc-struct &free ] [ heap-size ] bi >>lStructSize
+            MAX_UNICODE_PATH [ 2 calloc &free >>lpstrFile ] [ >>nMaxFile ] bi
+            OFN_OVERWRITEPROMPT >>Flags
+        dup GetSaveFileName zero? [ drop f ] [ lpstrFile>> ] if
+    ] with-destructors ;
