@@ -32,7 +32,7 @@ CONSTANT: NSCancelButton 0
 : open-dir-panel ( -- paths ) <NSDirPanel> (open-panel) ;
 
 : split-path ( path -- dir file )
-    "/" split1-last [ <NSString> ] bi@ ;
+    "/" split1-last [ "" or <NSString> ] bi@ ;
 
 : save-panel ( path -- path/f )
     [ <NSSavePanel> dup ] dip
