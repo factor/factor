@@ -122,7 +122,7 @@ SYNTAX: TEST:
         V{ } clone test-failures set
         call
         test-failures get
-    ] with-scope ; inline
+    ] with-scope notify-error-observers ; inline
 
 PRIVATE>
 
