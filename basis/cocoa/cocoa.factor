@@ -51,6 +51,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSBundle"
         "NSButton"
         "NSColorSpace"
+        "NSCustomTouchBarItem"
         "NSData"
         "NSDictionary"
         "NSError"

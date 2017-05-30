@@ -55,3 +55,9 @@ PRIVATE>
 
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;
+
+: enum>values ( enum -- seq )
+    "c-type" word-prop members>> values ;
+
+: enum>keys ( enum -- seq )
+    "c-type" word-prop members>> keys [ name>> ] map ;
