@@ -91,3 +91,19 @@ SYNTAX: HEREDOC:
         [ next-line ]
         [ parse-til-line-begins ]
     } cleave suffix! ;
+
+SYNTAX: [[ "]]" parse-multiline-string suffix! ;
+SYNTAX: [=[ "]=]" parse-multiline-string suffix! ;
+SYNTAX: [==[ "]==]" parse-multiline-string suffix! ;
+SYNTAX: [===[ "]===]" parse-multiline-string suffix! ;
+SYNTAX: [====[ "]====]" parse-multiline-string suffix! ;
+SYNTAX: [=====[ "]=====]" parse-multiline-string suffix! ;
+SYNTAX: [======[ "]======]" parse-multiline-string suffix! ;
+
+SYNTAX: ![[ "]]" parse-multiline-string drop ;
+SYNTAX: ![=[ "]=]" parse-multiline-string drop ;
+SYNTAX: ![==[ "]==]" parse-multiline-string drop ;
+SYNTAX: ![===[ "]===]" parse-multiline-string drop ;
+SYNTAX: ![====[ "]====]" parse-multiline-string drop ;
+SYNTAX: ![=====[ "]=====]" parse-multiline-string drop ;
+SYNTAX: ![======[ "]======]" parse-multiline-string drop ;
