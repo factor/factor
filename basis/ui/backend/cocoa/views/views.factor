@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs cocoa cocoa.application cocoa.classes
-cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
-cocoa.views combinators core-foundation.strings core-graphics
-core-graphics.types core-text io.encodings.utf8 kernel literals
-locals math math.rectangles namespaces opengl sequences threads
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.private unicode ;
+cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
+cocoa.types cocoa.views combinators core-foundation.strings
+core-graphics core-graphics.types core-text io.encodings.utf8
+kernel literals locals math math.rectangles namespaces opengl
+sequences threads ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.private ui.tools.listener
+vocabs.refresh ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -181,6 +182,29 @@ CLASS: FactorView < NSOpenGLView
             ] [ drop ] if
 
         ] when
+    ] ;
+
+    METHOD: void refreshAllAction [
+        [ refresh-all ] \ refresh-all call-listener
+    ] ;
+
+    METHOD: void autoUseAction [
+        [ com-auto-use ] \ com-auto-use call-listener
+    ] ;
+
+    METHOD: Class makeTouchBar [ default-touchbar self make-touchbar ] ;
+
+    METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
+        string CF>string
+        {
+            { "refresh-all-action" [
+                self "refresh-all-action" "refresh-all" "refreshAllAction" make-NSTouchBar-button
+            ] }
+            { "auto-use-action" [
+                self "auto-use-action" "auto-use" "autoUseAction" make-NSTouchBar-button
+            ] }
+            [ drop f ]
+        } case
     ] ;
 
     ! Rendering
