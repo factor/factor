@@ -1,14 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays fry math io.backend io.files.info
-io.files.windows kernel windows.kernel32
-windows.time windows.types windows accessors alien.c-types
-combinators generalizations system alien.strings
-sequences splitting windows.errors fry
-continuations destructors calendar ascii
-combinators.short-circuit literals locals classes.struct
-specialized-arrays alien.data libc windows.shell32 ;
-SPECIALIZED-ARRAY: ushort
+USING: accessors alien.c-types alien.data alien.strings ascii
+calendar classes.struct combinators combinators.short-circuit
+continuations destructors fry io.backend io.files.info
+io.files.windows kernel libc literals locals math sequences
+splitting system windows.errors windows.kernel32 windows.shell32
+windows.time windows.types ;
 IN: io.files.info.windows
 
 :: round-up-to ( n multiple -- n' )
