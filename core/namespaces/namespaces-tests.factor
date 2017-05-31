@@ -38,3 +38,7 @@ SYMBOL: toggle-test
 
 { t } [ [ test-initialize get-global ] { at* set-at } inlined? ] unit-test
 { t } [ [ test-initialize set-global ] { at* set-at } inlined? ] unit-test
+
+SYMBOL: bool-test
+{ t } [ bool-test [ bool-test get ] with-variable-on ] unit-test
+{ f } [ bool-test [ bool-test get ] with-variable-off ] unit-test
