@@ -23,7 +23,7 @@ SYMBOL: compiled
 : compiler-message ( string -- )
     "trace-compilation" get [ [ print flush ] with-global ] [ drop ] if ;
 
-: start ( word -- )
+: start-compilation ( word -- )
     dup name>> compiler-message
     H{ } clone dependencies namespaces:set
     H{ } clone generic-dependencies namespaces:set
@@ -55,7 +55,7 @@ M: word combinator? inline? ;
         [ [ combinator? ] [ unknown-macro-input? ] bi* and ]
     } 2|| ;
 
-: finish ( word -- )
+: finish-compilation ( word -- )
     ! Recompile callers if the word's stack effect changed, then
     ! save the word's dependencies so that if they change, the
     ! word can get recompiled too.
@@ -71,7 +71,7 @@ M: word combinator? inline? ;
 : deoptimize-with ( word def -- * )
     ! If the word failed to infer, compile it with the
     ! non-optimizing compiler.
-    swap [ finish ] [ compiled get set-at ] bi return ;
+    swap [ finish-compilation ] [ compiled get set-at ] bi return ;
 
 : not-compiled-def ( word error -- def )
     '[ _ _ not-compiled ] [ ] like ;
@@ -130,10 +130,10 @@ M: word combinator? inline? ;
     ! failed to infer.
     '[
         _ {
-            [ start ]
+            [ start-compilation ]
             [ frontend ]
             [ backend ]
-            [ finish ]
+            [ finish-compilation ]
         } cleave
     ] with-return ;
 
