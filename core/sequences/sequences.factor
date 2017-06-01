@@ -985,6 +985,9 @@ PRIVATE>
 
 : subseq-start ( subseq seq -- i ) 0 subseq-start-from ; inline
 
+ALIAS: start subseq-start
+ALIAS: start* subseq-start-from
+
 : subseq? ( subseq seq -- ? ) subseq-start >boolean ;
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
