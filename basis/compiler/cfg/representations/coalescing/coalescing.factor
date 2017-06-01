@@ -16,7 +16,7 @@ SYMBOL: components
         ] each
     ] simple-analysis ;
 
-GENERIC# visit-insn 1 ( insn disjoint-set -- )
+GENERIC#: visit-insn 1 ( insn disjoint-set -- )
 
 M: ##copy visit-insn
     [ [ dst>> ] [ src>> ] bi ] dip equate ;

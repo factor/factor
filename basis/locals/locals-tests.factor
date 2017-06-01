@@ -103,7 +103,7 @@ write-test-2 "q" set
 
 GENERIC: lambda-generic ( a b -- c )
 
-GENERIC# lambda-generic-1 1 ( a b -- c )
+GENERIC#: lambda-generic-1 1 ( a b -- c )
 
 M:: integer lambda-generic-1 ( a b -- c ) a b * ;
 
@@ -112,7 +112,7 @@ M:: string lambda-generic-1 ( a b -- c )
 
 M:: integer lambda-generic ( a b -- c ) a b lambda-generic-1 ;
 
-GENERIC# lambda-generic-2 1 ( a b -- c )
+GENERIC#: lambda-generic-2 1 ( a b -- c )
 
 M:: integer lambda-generic-2 ( a b -- c )
     a CHAR: x <string> b lambda-generic ;

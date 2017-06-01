@@ -55,7 +55,7 @@ SYNTAX: VARIANT-MEMBER:
 MACRO: unboa ( class -- quot )
     <wrapper> \ boa [ ] 2sequence [undo] ;
 
-GENERIC# (match-branch) 1 ( class quot -- class quot' )
+GENERIC#: (match-branch) 1 ( class quot -- class quot' )
 
 M: singleton-class (match-branch)
     \ drop prefix ;

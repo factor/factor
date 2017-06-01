@@ -34,8 +34,8 @@ MEMO: zmq-msg-size ( -- x )
 : <zmq_msg_t> ( -- byte-array )
     zmq-msg-size (byte-array) ;
 
-GENERIC# zmq-setopt 2 ( obj name value -- )
-GENERIC# zmq-getopt 1 ( obj name -- value )
+GENERIC#: zmq-setopt 2 ( obj name value -- )
+GENERIC#: zmq-getopt 1 ( obj name -- value )
 
 TUPLE: zmq-message underlying ;
 

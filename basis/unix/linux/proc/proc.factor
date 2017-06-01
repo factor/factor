@@ -278,7 +278,7 @@ TUPLE: proc-uptime up idle ;
 
 ! /proc/pid/*
 
-GENERIC# proc-pid-path 1 ( object string -- path )
+GENERIC#: proc-pid-path 1 ( object string -- path )
 
 M: integer proc-pid-path ( pid string -- path )
     [ "/proc/" ] 2dip

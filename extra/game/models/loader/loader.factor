@@ -26,7 +26,7 @@ types [ H{ } clone ] initialize
 
 PRIVATE>
 
-GENERIC# load-models* 2 ( obj encoding class -- models )
+GENERIC#: load-models* 2 ( obj encoding class -- models )
 
 GENERIC: stream>models ( stream class -- models )
 

@@ -40,7 +40,7 @@ M: mailbox mailbox-put
 : mailbox-peek ( mailbox -- obj )
     data>> peek-back ;
 
-GENERIC# mailbox-get-timeout 1 ( mailbox timeout -- obj )
+GENERIC#: mailbox-get-timeout 1 ( mailbox timeout -- obj )
 
 M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
 

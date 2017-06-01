@@ -61,7 +61,7 @@ M: indirect modifier
 
 M: register modifier drop 0b11 ;
 
-GENERIC# n, 1 ( value n -- )
+GENERIC#: n, 1 ( value n -- )
 
 M: integer n, >le % ;
 M: byte n, [ value>> ] dip n, ;
@@ -214,7 +214,7 @@ M: operand POP { 0b000 f 0x8f } 1-operand ;
 : maybe-zero-extend ( reg imm -- reg' imm )
     dup zero-extendable? [ [ 32-bit-version-of ] dip ] when ;
 
-GENERIC# (MOV-I) 1 ( dst src -- )
+GENERIC#: (MOV-I) 1 ( dst src -- )
 
 M: register (MOV-I)
     {
@@ -273,7 +273,7 @@ M: operand CALL { 0b010 t 0xff } 1-operand ;
 
 <PRIVATE
 
-GENERIC# JUMPcc 1 ( addr opcode -- )
+GENERIC#: JUMPcc 1 ( addr opcode -- )
 M: integer JUMPcc extended-opcode, 4, ;
 
 : SETcc ( dst opcode -- )

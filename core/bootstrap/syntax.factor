@@ -20,7 +20,7 @@ IN: bootstrap.syntax
         "DEFER:"
         "ERROR:"
         "FORGET:"
-        "GENERIC#"
+        "GENERIC#:"
         "GENERIC:"
         "HOOK:"
         "H{"

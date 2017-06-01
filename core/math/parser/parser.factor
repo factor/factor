@@ -464,7 +464,7 @@ M: fixnum (positive>dec)
 
 PRIVATE>
 
-GENERIC# >base 1 ( n radix -- str )
+GENERIC#: >base 1 ( n radix -- str )
 
 : number>string ( n -- str ) 10 >base ; inline
 

@@ -274,7 +274,7 @@ M: primitive-class class-member?
 TUPLE: condition question yes no ;
 C: <condition> condition
 
-GENERIC# answer 2 ( class from to -- new-class )
+GENERIC#: answer 2 ( class from to -- new-class )
 
 M:: object answer ( class from to -- new-class )
     class from = to class ? ;
@@ -291,7 +291,7 @@ M: or-class answer
 M: not-class answer
     [ class>> ] 2dip answer <not-class> ;
 
-GENERIC# substitute 1 ( class from to -- new-class )
+GENERIC#: substitute 1 ( class from to -- new-class )
 M: object substitute answer ;
 M: not-class substitute [ <not-class> ] bi@ answer ;
 

@@ -14,7 +14,7 @@ SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-GENERIC# seed-random 1 ( obj seed -- obj )
+GENERIC#: seed-random 1 ( obj seed -- obj )
 GENERIC: random-32* ( obj -- n )
 GENERIC: random-bytes* ( n obj -- byte-array )
 
@@ -76,7 +76,7 @@ PRIVATE>
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
     ] while drop [ m * ] [ neg shift ] bi* ; inline
 
-GENERIC# (random-integer) 1 ( m obj -- n )
+GENERIC#: (random-integer) 1 ( m obj -- n )
 M: fixnum (random-integer) ( m obj -- n ) random-integer-loop ;
 M: bignum (random-integer) ( m obj -- n ) random-integer-loop ;
 

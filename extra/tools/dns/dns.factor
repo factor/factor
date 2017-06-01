@@ -34,7 +34,7 @@ IN: tools.dns
     [ dns-AAAA-query aaaa-message. ]
     [ dns-MX-query mx-message. ] tri ;
 
-GENERIC# dns-host 1 ( servers domain -- )
+GENERIC#: dns-host 1 ( servers domain -- )
 
 M: sequence dns-host ( servers domain -- )
     '[ _ host ] with-dns-servers ;

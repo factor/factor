@@ -62,7 +62,7 @@ PREDICATE: consult-method < method
 M: consult-method reset-word
     [ call-next-method ] [ f "consultation" set-word-prop ] bi ;
 
-GENERIC# (consult-method-quot) 2 ( consultation quot word -- object )
+GENERIC#: (consult-method-quot) 2 ( consultation quot word -- object )
 
 M: consultation (consult-method-quot)
     '[ _ call _ execute ] nip ;

@@ -51,7 +51,7 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
 ERROR: bounds-error index seq ;
 
-GENERIC# bounds-check? 1 ( n seq -- ? )
+GENERIC#: bounds-check? 1 ( n seq -- ? )
 
 M: integer bounds-check? ( n seq -- ? )
     dupd length < [ 0 >= ] [ drop f ] if ; inline

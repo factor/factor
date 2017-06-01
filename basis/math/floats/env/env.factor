@@ -67,16 +67,16 @@ HOOK: (fp-env-registers) cpu ( -- registers )
 GENERIC: (set-fp-env-register) ( fp-env -- )
 
 GENERIC: (get-exception-flags) ( fp-env -- exceptions )
-GENERIC# (set-exception-flags) 1 ( fp-env exceptions -- fp-env )
+GENERIC#: (set-exception-flags) 1 ( fp-env exceptions -- fp-env )
 
 GENERIC: (get-fp-traps) ( fp-env -- exceptions )
-GENERIC# (set-fp-traps) 1 ( fp-env exceptions -- fp-env )
+GENERIC#: (set-fp-traps) 1 ( fp-env exceptions -- fp-env )
 
 GENERIC: (get-rounding-mode) ( fp-env -- mode )
-GENERIC# (set-rounding-mode) 1 ( fp-env mode -- fp-env )
+GENERIC#: (set-rounding-mode) 1 ( fp-env mode -- fp-env )
 
 GENERIC: (get-denormal-mode) ( fp-env -- mode )
-GENERIC# (set-denormal-mode) 1 ( fp-env mode -- fp-env )
+GENERIC#: (set-denormal-mode) 1 ( fp-env mode -- fp-env )
 
 : change-fp-env-registers ( quot -- )
     (fp-env-registers) swap [ (set-fp-env-register) ] compose each ; inline

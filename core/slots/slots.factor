@@ -33,7 +33,7 @@ PREDICATE: writer-method < method "writing" word-prop >boolean ;
     [ 2drop make-inline ]
     3tri ;
 
-GENERIC# reader-quot 1 ( class slot-spec -- quot )
+GENERIC#: reader-quot 1 ( class slot-spec -- quot )
 
 M: object reader-quot
     nip [
@@ -87,7 +87,7 @@ M: object instance-check-quot
         \ unless ,
     ] [ ] make ;
 
-GENERIC# writer-quot 1 ( class slot-spec -- quot )
+GENERIC#: writer-quot 1 ( class slot-spec -- quot )
 
 M: object writer-quot
     nip

@@ -205,7 +205,7 @@ INSTANCE: encoder plain-writer
 
 PRIVATE>
 
-GENERIC# re-encode 1 ( stream encoding -- newstream )
+GENERIC#: re-encode 1 ( stream encoding -- newstream )
 
 M: object re-encode <encoder> ;
 
@@ -218,7 +218,7 @@ M: encoder re-encode [ stream>> ] dip re-encode ;
     [ [ output-stream get ] dip re-encode ] dip
     with-output-stream* ; inline
 
-GENERIC# re-decode 1 ( stream encoding -- newstream )
+GENERIC#: re-decode 1 ( stream encoding -- newstream )
 
 M: object re-decode <decoder> ;
 

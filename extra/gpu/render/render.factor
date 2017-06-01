@@ -139,7 +139,7 @@ ERROR: invalid-uniform-type uniform ;
 
 GENERIC: render-vertex-indexes ( primitive-mode vertex-indexes -- )
 
-GENERIC# render-vertex-indexes-instanced 1 ( primitive-mode vertex-indexes instances -- )
+GENERIC#: render-vertex-indexes-instanced 1 ( primitive-mode vertex-indexes instances -- )
 
 GENERIC: gl-array-element-type ( array -- type )
 M: uchar-array  gl-array-element-type drop GL_UNSIGNED_BYTE  ; inline
@@ -264,14 +264,14 @@ GENERIC: >uniform-int-array ( sequence -- c-array )
 GENERIC: >uniform-uint-array ( sequence -- c-array )
 GENERIC: >uniform-float-array  ( sequence -- c-array )
 
-GENERIC# >uniform-bvec-array 1 ( sequence dim -- c-array )
-GENERIC# >uniform-ivec-array 1 ( sequence dim -- c-array )
-GENERIC# >uniform-uvec-array 1 ( sequence dim -- c-array )
-GENERIC# >uniform-vec-array  1 ( sequence dim -- c-array )
+GENERIC#: >uniform-bvec-array 1 ( sequence dim -- c-array )
+GENERIC#: >uniform-ivec-array 1 ( sequence dim -- c-array )
+GENERIC#: >uniform-uvec-array 1 ( sequence dim -- c-array )
+GENERIC#: >uniform-vec-array  1 ( sequence dim -- c-array )
 
-GENERIC# >uniform-matrix 2 ( sequence cols rows -- c-array )
+GENERIC#: >uniform-matrix 2 ( sequence cols rows -- c-array )
 
-GENERIC# >uniform-matrix-array 2 ( sequence cols rows -- c-array )
+GENERIC#: >uniform-matrix-array 2 ( sequence cols rows -- c-array )
 
 GENERIC: bind-uniform-bvec2 ( index sequence -- )
 GENERIC: bind-uniform-bvec3 ( index sequence -- )

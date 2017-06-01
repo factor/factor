@@ -11,7 +11,7 @@ IN: graphviz.notation
 
 <PRIVATE
 
-! GENERIC# =attr 1 ( graphviz-obj val -- graphviz-obj' )
+! GENERIC#: =attr 1 ( graphviz-obj val -- graphviz-obj' )
 ! M: edge/node =attr
 !   present over attributes>> attr<< ;
 ! M: sub/graph =attr

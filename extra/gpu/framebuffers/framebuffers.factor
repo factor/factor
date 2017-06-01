@@ -141,7 +141,7 @@ GENERIC: framebuffer-handle ( framebuffer -- handle )
 M: system-framebuffer framebuffer-handle drop 0 ;
 M: framebuffer framebuffer-handle handle>> ;
 
-GENERIC# allocate-framebuffer-attachment 1 ( framebuffer-attachment dim -- )
+GENERIC#: allocate-framebuffer-attachment 1 ( framebuffer-attachment dim -- )
 
 M: texture-attachment allocate-framebuffer-attachment
     [ [ texture>> ] [ level>> ] bi ] dip f allocate-texture ;

@@ -214,7 +214,7 @@ PRIVATE>
 : key-spec ( spec-quot -- spec-assoc )
     output>array >hashtable ; inline
 
-GENERIC# hint 1 ( mdb-query-msg index-hint -- mdb-query-msg )
+GENERIC#: hint 1 ( mdb-query-msg index-hint -- mdb-query-msg )
 
 M: mdb-query-msg hint
     >>hint ;

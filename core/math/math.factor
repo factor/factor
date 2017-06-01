@@ -119,9 +119,9 @@ MATH: /mod ( x y -- z w ) foldable
 MATH: bitand ( x y -- z ) foldable
 MATH: bitor  ( x y -- z ) foldable
 MATH: bitxor ( x y -- z ) foldable
-GENERIC# shift 1 ( x n -- y ) foldable
+GENERIC#: shift 1 ( x n -- y ) foldable
 GENERIC: bitnot ( x -- y ) foldable
-GENERIC# bit? 1 ( x n -- ? ) foldable
+GENERIC#: bit? 1 ( x n -- ? ) foldable
 
 GENERIC: abs ( x -- y ) foldable
 

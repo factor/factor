@@ -9,25 +9,25 @@ IN: math.vectors
 GENERIC: vneg ( v -- w )
 M: object vneg [ neg ] map ; inline
 
-GENERIC# v+n 1 ( v n -- w )
+GENERIC#: v+n 1 ( v n -- w )
 M: object v+n [ + ] curry map ; inline
 
 GENERIC: n+v ( n v -- w )
 M: object n+v [ + ] with map ; inline
 
-GENERIC# v-n 1 ( v n -- w )
+GENERIC#: v-n 1 ( v n -- w )
 M: object v-n [ - ] curry map ; inline
 
 GENERIC: n-v ( n v -- w )
 M: object n-v [ - ] with map ; inline
 
-GENERIC# v*n 1 ( v n -- w )
+GENERIC#: v*n 1 ( v n -- w )
 M: object v*n [ * ] curry map ; inline
 
 GENERIC: n*v ( n v -- w )
 M: object n*v [ * ] with map ; inline
 
-GENERIC# v/n 1 ( v n -- w )
+GENERIC#: v/n 1 ( v n -- w )
 M: object v/n [ / ] curry map ; inline
 
 GENERIC: n/v ( n v -- w )
@@ -116,31 +116,31 @@ M: object vbitxor [ bitxor ] 2map ; inline
 GENERIC: vbitnot ( v -- w )
 M: object vbitnot [ bitnot ] map ; inline
 
-GENERIC# vbroadcast 1 ( u n -- v )
+GENERIC#: vbroadcast 1 ( u n -- v )
 M:: object vbroadcast ( u n -- v ) u length n u nth <repetition> u like ; inline
 
-GENERIC# vshuffle-elements 1 ( v perm -- w )
+GENERIC#: vshuffle-elements 1 ( v perm -- w )
 M: object vshuffle-elements
     over length 0 pad-tail
     swap [ '[ _ nth ] ] keep map-as ; inline
 
-GENERIC# vshuffle2-elements 1 ( u v perm -- w )
+GENERIC#: vshuffle2-elements 1 ( u v perm -- w )
 M: object vshuffle2-elements
     [ append ] dip vshuffle-elements ; inline
 
-GENERIC# vshuffle-bytes 1 ( v perm -- w )
+GENERIC#: vshuffle-bytes 1 ( v perm -- w )
 
 GENERIC: vshuffle ( v perm -- w )
 M: array vshuffle ( v perm -- w )
     vshuffle-elements ; inline
 
-GENERIC# vlshift 1 ( v n -- w )
+GENERIC#: vlshift 1 ( v n -- w )
 M: object vlshift '[ _ shift ] map ; inline
-GENERIC# vrshift 1 ( v n -- w )
+GENERIC#: vrshift 1 ( v n -- w )
 M: object vrshift neg '[ _ shift ] map ; inline
 
-GENERIC# hlshift 1 ( v n -- w )
-GENERIC# hrshift 1 ( v n -- w )
+GENERIC#: hlshift 1 ( v n -- w )
+GENERIC#: hrshift 1 ( v n -- w )
 
 GENERIC: (vmerge-head) ( u v -- h )
 M: object (vmerge-head) over length 2 /i '[ _ head-slice ] bi@ [ zip ] keep concat-as ; inline

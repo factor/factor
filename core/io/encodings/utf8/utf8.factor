@@ -84,7 +84,7 @@ M: utf8 decode-until (decode-until) ;
 M: utf8 encode-char
     drop char>utf8 ;
 
-GENERIC# encode-string-utf8 1 ( string stream -- )
+GENERIC#: encode-string-utf8 1 ( string stream -- )
 
 M: object encode-string-utf8
     [ char>utf8 ] curry each ; inline

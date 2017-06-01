@@ -129,7 +129,7 @@ M: world request-focus-on ( child gadget -- )
     [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
     [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
 
-GENERIC# apply-world-attributes 1 ( world attributes -- world )
+GENERIC#: apply-world-attributes 1 ( world attributes -- world )
 
 M: world apply-world-attributes
     {
