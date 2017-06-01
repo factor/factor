@@ -107,7 +107,7 @@ GML: load ( name -- value ) over lookup-name ;
 
 ERROR: not-a-name object ;
 
-: check-name ( obj -- obj' ) dup name? [ not-a-name ] unless ; inline
+: check-name ( obj -- obj' ) dup gml-name? [ not-a-name ] unless ; inline
 
 GML: def ( name value -- ) swap check-name pick current-dict set-at ;
 GML: edef ( value name -- ) check-name pick current-dict set-at ;
