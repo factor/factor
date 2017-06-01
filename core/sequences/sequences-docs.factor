@@ -1146,11 +1146,11 @@ HELP: cut*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
 { $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
-HELP: start*
+HELP: subseq-start-from
 { $values { "subseq" sequence } { "seq" sequence } { "n" "a start index" } { "i" "a start index" } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
 
-HELP: start
+HELP: subseq-start
 { $values { "subseq" sequence } { "seq" sequence } { "i" "a start index" } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found." } ;
 
@@ -1859,7 +1859,7 @@ ARTICLE: "sequences-search" "Searching sequences"
     last-index-from
 }
 "Finding the start of a subsequence:"
-{ $subsections start start* }
+{ $subsections subseq-start subseq-start-from }
 "Finding the index of an element satisfying a predicate:"
 { $subsections
     find

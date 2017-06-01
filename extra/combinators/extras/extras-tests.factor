@@ -41,23 +41,23 @@ IN: combinators.extras.tests
 
 { "hi " "there" } [
     "hi there" {
-        { [ "there" over start ] [ cut ] }
+        { [ "there" over subseq-start ] [ cut ] }
         [ f ]
     } cond*
 ] unit-test
 
 { "hi " "there" } [
     "hi there" {
-        { [ "foo" over start ] [ head f ] }
-        { [ "there" over start ] [ cut ] }
+        { [ "foo" over subseq-start ] [ head f ] }
+        { [ "there" over subseq-start ] [ cut ] }
         [ f ]
     } cond*
 ] unit-test
 
 { "hi there" f } [
     "hi there" {
-        { [ "foo" over start ] [ head f ] }
-        { [ "bar" over start ] [ cut ] }
+        { [ "foo" over subseq-start ] [ head f ] }
+        { [ "bar" over subseq-start ] [ cut ] }
         [ f ]
     } cond*
 ] unit-test
