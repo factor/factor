@@ -4,7 +4,7 @@ IN: benchmark.sum-file
 
 <<
 "sum-file.txt" temp-file ascii [
-    100000 iota [ number>string print ] each
+    100000 <iota> [ number>string print ] each
 ] with-file-writer
 >>
 

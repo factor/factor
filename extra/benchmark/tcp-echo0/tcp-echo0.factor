@@ -8,7 +8,7 @@ IN: benchmark.tcp-echo0
 ! Max size here is 26 2^ 1 - because array-capacity limits on 32bit platforms
 CONSTANT: test-size0 $[ 23 2^ 1 - ]
 
-MEMO: test-bytes ( n -- byte-array ) iota >byte-array ;
+MEMO: test-bytes ( n -- byte-array ) <iota> >byte-array ;
 
 TUPLE: tcp-echo < threaded-server #times #bytes ;
 

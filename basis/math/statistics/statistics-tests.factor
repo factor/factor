@@ -183,7 +183,7 @@ IN: math.statistics.tests
 
 { { 0 0 0 } } [ { 1 1 1 } standardize ] unit-test
 
-{ { 0 1/4 1/2 3/4 1 } } [ 5 iota rescale ] unit-test
+{ { 0 1/4 1/2 3/4 1 } } [ 5 <iota> rescale ] unit-test
 
 
 {

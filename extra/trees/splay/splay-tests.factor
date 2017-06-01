@@ -5,10 +5,10 @@ tools.test trees.splay ;
 IN: trees.splay.tests
 
 : randomize-numeric-splay-tree ( splay-tree -- )
-    100 iota [ drop 100 random of drop ] with each ;
+    100 <iota> [ drop 100 random of drop ] with each ;
 
 : make-numeric-splay-tree ( n -- splay-tree )
-    iota <splay> [ '[ dup _ set-at ] each ] keep ;
+    <iota> <splay> [ '[ dup _ set-at ] each ] keep ;
 
 { t } [
     100 make-numeric-splay-tree dup randomize-numeric-splay-tree
@@ -33,7 +33,7 @@ IN: trees.splay.tests
 ] unit-test
 
 { 0 } [
-    100 iota [ dup zip >splay ] keep
+    100 <iota> [ dup zip >splay ] keep
     [ over delete-at ] each assoc-size
 ] unit-test
 

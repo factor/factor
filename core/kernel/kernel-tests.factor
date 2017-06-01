@@ -20,7 +20,7 @@ IN: kernel.tests
         { 1 2 8 }
         { 1 2 9 }
     }
-} [ 1 2 10 iota [ 3array ] 2with map ] unit-test
+} [ 1 2 10 <iota> [ 3array ] 2with map ] unit-test
 
 ! Don't leak extra roots if error is thrown
 { } [ 1000 [ [ 3 throw ] ignore-errors ] times ] unit-test

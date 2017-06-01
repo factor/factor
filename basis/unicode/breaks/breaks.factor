@@ -84,14 +84,14 @@ SYMBOL: table
 
 : make-grapheme-table ( -- )
     { CR } { LF } connect
-    { Control CR LF } graphemes iota disconnect
-    graphemes iota { Control CR LF } disconnect
+    { Control CR LF } graphemes <iota> disconnect
+    graphemes <iota> { Control CR LF } disconnect
     { L } { L V LV LVT } connect
     { LV V } { V T } connect
     { LVT T } { T } connect
-    graphemes iota { Extend } connect
-    graphemes iota { SpacingMark } connect
-    { Prepend } graphemes iota connect ;
+    graphemes <iota> { Extend } connect
+    graphemes <iota> { SpacingMark } connect
+    { Prepend } graphemes <iota> connect ;
 
 "grapheme-table" create-word-in
 graphemes init-table table
@@ -146,8 +146,8 @@ SYMBOL: check-number-after
 
 : make-word-table ( -- )
     { wCR } { wLF } connect
-    { wNewline wCR wLF } unicode-words iota disconnect
-    unicode-words iota { wNewline wCR wLF } disconnect
+    { wNewline wCR wLF } unicode-words <iota> disconnect
+    unicode-words <iota> { wNewline wCR wLF } disconnect
     { wALetter } { wMidLetter wMidNumLet } check-letter-after set-table
     { wMidLetter wMidNumLet } { wALetter } check-letter-before set-table
     { wNumeric wALetter } { wNumeric wALetter } connect

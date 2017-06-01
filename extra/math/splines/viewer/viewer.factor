@@ -8,7 +8,7 @@ IN: math.splines.viewer
 <PRIVATE
 : eval-polynomials ( polynomials-seq n -- xy-sequence )
     [
-        [ 1 + iota ] keep [
+        [ 1 + <iota> ] keep [
             /f swap [ polyval ] with map
         ] curry with map
     ] curry map concat ;

@@ -31,7 +31,7 @@ PRIVATE>
 : draw-grid-mesh ( grid-mesh -- )
     GL_ARRAY_BUFFER over buffer>> [
         [ 4 GL_FLOAT 0 f glVertexPointer ] dip
-        dup dim>> second iota [ draw-vertex-buffer-row ] with each
+        dup dim>> second <iota> [ draw-vertex-buffer-row ] with each
     ] with-gl-buffer ;
 
 : <grid-mesh> ( dim -- grid-mesh )

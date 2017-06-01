@@ -4,7 +4,7 @@ sorting tools.test vocabs ;
 { { } } [ { } natural-sort ] unit-test
 
 { { 270000000 270000001 } }
-[ T{ slice f 270000000 270000002 T{ iota-tuple f 270000002 } } natural-sort ]
+[ T{ slice f 270000000 270000002 T{ iota f 270000002 } } natural-sort ]
 unit-test
 
 { t } [

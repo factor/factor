@@ -13,7 +13,7 @@ IN: compiler.cfg.rpo
     ] [ drop ] if ; inline recursive
 
 : number-blocks ( blocks -- )
-    dup length iota <reversed>
+    dup length <iota> <reversed>
     [ >>number drop ] 2each ;
 
 : post-order ( cfg -- blocks )

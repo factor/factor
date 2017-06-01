@@ -338,7 +338,7 @@ M: ssl-handle dispose*
     X509_get_issuer_name x509name>string ;
 
 : name-stack>sequence ( name-stack -- seq )
-    dup sk_num iota [ sk_value GENERAL_NAME_st memory>struct ] with map ;
+    dup sk_num <iota> [ sk_value GENERAL_NAME_st memory>struct ] with map ;
 
 : alternative-dns-names ( certificate -- dns-names )
     NID_subject_alt_name f f X509_get_ext_d2i

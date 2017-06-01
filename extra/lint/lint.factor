@@ -29,7 +29,7 @@ CONSTANT: trivial-defs
     {
         [ ">" write ] [ "/>" write ] [ " " write ]
         [ 0 or + ]
-        [ dup length iota ]
+        [ dup length <iota> ]
         [ 0 swap copy ]
         [ dup length ]
         [ 0 swap ]

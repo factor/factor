@@ -21,7 +21,7 @@ IN: compiler.cfg.stacks.padding
     swap 2dup second member? [ 2drop 2 ] [ first >= [ 1 ] [ 0 ] if ] if ;
 
 : shift-stack ( n stack -- stack' )
-    first2 pick '[ _ + ] map [ 0 >= ] filter pick 0 max iota sets:union
+    first2 pick '[ _ + ] map [ 0 >= ] filter pick 0 max <iota> sets:union
     [ + ] dip 2array ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

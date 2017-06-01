@@ -9,7 +9,7 @@ IN: spelling
 CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
 : deletes ( word -- edits )
-    [ length iota ] keep '[ _ remove-nth ] map ;
+    [ length <iota> ] keep '[ _ remove-nth ] map ;
 
 : transposes ( word -- edits )
     [ length [1,b) ] keep '[
@@ -17,7 +17,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     ] map ;
 
 : replaces ( word -- edits )
-    [ length iota ] keep '[
+    [ length <iota> ] keep '[
         ALPHABET [
             swap _ clone [ set-nth-unsafe ] keep
         ] with { } map-as

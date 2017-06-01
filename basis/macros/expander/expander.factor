@@ -42,7 +42,7 @@ M: wrapper expand-macros* wrapped>> literal ;
     stack get pop end
     [ [ expand-macros ] [ ] map-as '[ _ dip ] % ]
     [
-        length iota [ <reversed> ] keep
+        length <iota> [ <reversed> ] keep
         [ '[ _ ndrop _ nnip call ] [ ] like ] 2map , \ dispatch ,
     ] bi ;
 

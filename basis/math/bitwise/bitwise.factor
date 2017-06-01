@@ -83,7 +83,7 @@ DEFER: byte-bit-count
 <<
 
 \ byte-bit-count
-256 iota [
+256 <iota> [
     8 <bits> 0 [ [ 1 + ] when ] reduce
 ] B{ } map-as '[ 0xff bitand _ nth-unsafe ]
 ( byte -- table ) define-declared

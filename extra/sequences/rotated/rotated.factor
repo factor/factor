@@ -23,4 +23,4 @@ M: rotated virtual-exemplar seq>> ;
 INSTANCE: rotated virtual-sequence
 
 : all-rotations ( seq -- seq' )
-    dup length iota [ <rotated> ] with map ;
+    dup length <iota> [ <rotated> ] with map ;

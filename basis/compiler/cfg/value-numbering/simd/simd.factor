@@ -13,7 +13,7 @@ IN: compiler.cfg.value-numbering.simd
 ! should be redone completely.
 
 : useless-shuffle-vector-imm? ( insn -- ? )
-    [ shuffle>> ] [ rep>> rep-length iota ] bi sequence= ;
+    [ shuffle>> ] [ rep>> rep-length <iota> ] bi sequence= ;
 
 : compose-shuffle-vector-imm ( outer inner -- insn' )
     2dup [ rep>> ] bi@ eq? [

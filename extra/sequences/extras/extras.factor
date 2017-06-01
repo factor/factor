@@ -207,7 +207,7 @@ ERROR: underlying-mismatch slice1 slice2 ;
     ] until 3drop ;
 
 : all-rotations ( seq -- seq' )
-    dup length iota [ rotate ] with map ;
+    dup length <iota> [ rotate ] with map ;
 
 <PRIVATE
 
@@ -295,7 +295,7 @@ PRIVATE>
 
 : round-robin ( seq -- newseq )
     [ { } ] [
-        [ longest length iota ] keep
+        [ longest length <iota> ] keep
         [ [ ?nth ] with map ] curry map concat sift
     ] if-empty ;
 

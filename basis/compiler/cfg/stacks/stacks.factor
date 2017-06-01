@@ -24,7 +24,7 @@ IN: compiler.cfg.stacks
     [ swap new swap >>n ] with map <reversed> ;
 
 : stack-locs ( loc-class n -- locs )
-    iota create-locs ;
+    <iota> create-locs ;
 
 : (load-vregs) ( n loc-class -- vregs )
     swap stack-locs [ peek-loc ] map ;

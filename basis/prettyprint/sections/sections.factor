@@ -325,7 +325,7 @@ SYMBOL: next
 
 : group-flow ( seq -- newseq )
     [
-        dup length iota [
+        dup length <iota> [
             2dup 1 - swap ?nth prev namespaces:set
             2dup 1 + swap ?nth next namespaces:set
             swap nth dup split-before dup , split-after

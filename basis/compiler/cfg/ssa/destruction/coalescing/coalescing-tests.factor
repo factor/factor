@@ -98,7 +98,7 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
 : make-phi-inputs ( -- assoc )
     H{ } clone [
         { 2287 2288 } [
-            10 iota 1 sample first rot set-at
+            10 <iota> 1 sample first rot set-at
         ] with each
     ] keep ;
 

@@ -92,9 +92,9 @@ ERROR: checksums-differ algorithm seq incremental-checksum one-go-checksum ;
         checksums-differ
     ] if ;
 
-{ t } [ 100 iota [ drop sha1 100 [ 100 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
-{ t } [ 100 iota [ drop sha1 20 [ 20 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
-{ t } [ 100 iota [ drop sha1 10 [ 10 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
+{ t } [ 100 <iota> [ drop sha1 100 [ 100 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
+{ t } [ 100 <iota> [ drop sha1 20 [ 20 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
+{ t } [ 100 <iota> [ drop sha1 10 [ 10 random random-bytes ] replicate compare-checksum-calculations ] all? ] unit-test
 
 { t } [ sha1 {
     B{ 105 27 166 214 73 114 110 }

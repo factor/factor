@@ -21,7 +21,7 @@ IN: html.parser.analyzer
    [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline
 
 : loopn-index ( n quot -- )
-    [ iota ] [ '[ @ not ] ] bi* find 2drop ; inline
+    [ <iota> ] [ '[ @ not ] ] bi* find 2drop ; inline
 
 : loopn ( n quot -- )
     [ drop ] prepose loopn-index ; inline

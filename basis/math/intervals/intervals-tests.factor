@@ -322,7 +322,7 @@ unary-ops [
     ] if ;
 
 binary-ops [
-    [ [ t ] ] dip '[ 8000 iota [ drop _ binary-test ] all? ] unit-test
+    [ [ t ] ] dip '[ 8000 <iota> [ drop _ binary-test ] all? ] unit-test
 ] each
 
 : comparison-ops ( -- alist )
@@ -339,7 +339,7 @@ binary-ops [
     second execute( a b -- ? ) dup incomparable eq? [ 2drop t ] [ = ] if ;
 
 comparison-ops [
-    [ [ t ] ] dip '[ 8000 iota [ drop _ comparison-test ] all? ] unit-test
+    [ [ t ] ] dip '[ 8000 <iota> [ drop _ comparison-test ] all? ] unit-test
 ] each
 
 { t } [ -10 10 [a,b] 0 100 [a,b] assume> 0 10 (a,b] = ] unit-test
@@ -377,7 +377,7 @@ comparison-ops [
 
 commutative-ops [
     [ [ t ] ] dip '[
-        8000 iota [
+        8000 <iota> [
             drop
             random-interval-or-empty random-interval-or-empty _
             [ execute ] [ swapd execute ] 3bi =

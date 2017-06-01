@@ -5,7 +5,7 @@ combinators hints fry sequences ;
 IN: benchmark.partial-sums
 
 ! Helper words
-: summing-integers ( n quot -- y ) [ 0.0 ] [ iota ] [ ] tri* '[ 1 + @ + ] each ; inline
+: summing-integers ( n quot -- y ) [ 0.0 ] [ <iota> ] [ ] tri* '[ 1 + @ + ] each ; inline
 : summing-floats ( n quot -- y ) '[ >float @ ] summing-integers ; inline
 : cube ( x -- y ) dup dup * * ; inline
 : -1^ ( n -- -1/1 ) 2 mod 2 * 1 - ; inline

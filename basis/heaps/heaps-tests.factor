@@ -31,7 +31,7 @@ IN: heaps.tests
     [ heap-push-all ] keep heap-pop-all ;
 
 : random-alist ( n -- alist )
-    iota [
+    <iota> [
         drop 32 random-bits dup number>string
     ] H{ } map>assoc >alist ;
 
@@ -57,7 +57,7 @@ IN: heaps.tests
 : test-entry-indices ( n -- ? )
     random-alist
     <min-heap> [ heap-push-all ] keep
-    data>> dup length iota swap [ index>> ] map sequence= ;
+    data>> dup length <iota> swap [ index>> ] map sequence= ;
 
 14 [
     [ t ] swap [ 2^ test-entry-indices ] curry unit-test

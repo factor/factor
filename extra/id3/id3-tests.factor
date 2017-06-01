@@ -43,4 +43,4 @@ IN: id3.tests
 
 
 { t }
-[ 10000 iota [ synchsafe>sequence sequence>synchsafe ] map [ < ] monotonic? ] unit-test
+[ 10000 <iota> [ synchsafe>sequence sequence>synchsafe ] map [ < ] monotonic? ] unit-test

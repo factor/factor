@@ -75,7 +75,7 @@ IN: compiler.cfg.intrinsics.allot
 :: zero-byte-array ( len reg -- )
     0 ^^load-literal :> elt
     reg ^^tagged>integer :> reg
-    len cell align cell /i iota [
+    len cell align cell /i <iota> [
         [ elt reg ] dip cells byte-array-offset + int-rep f ##store-memory-imm,
     ] each ;
 

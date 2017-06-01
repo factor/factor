@@ -7,13 +7,13 @@ sequences sequences.extras vectors ;
 IN: enigma
 
 : <alphabet> ( -- seq )
-    26 iota >array ;
+    26 <iota> >array ;
 
 : <cog> ( -- cog )
     <alphabet> randomize ;
 
 : <reflector> ( -- reflector )
-    <alphabet> dup length iota >vector [ dup empty? ] [
+    <alphabet> dup length <iota> >vector [ dup empty? ] [
         [
             [ delete-random ] [ delete-random ] bi
             pick exchange
@@ -40,7 +40,7 @@ TUPLE: enigma cogs prev-cogs reflector ;
             ln 1 + ln!
             cogs [ nth ] each reflector nth
             cogs reverse [ index ] each CHAR: a +
-            cogs length iota [ 6 * 1 + ln mod zero? ] filter
+            cogs length <iota> [ 6 * 1 + ln mod zero? ] filter
             cogs [ unclip prefix ] change-nths
         ] unless
     ] map ;

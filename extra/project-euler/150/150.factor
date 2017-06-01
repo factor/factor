@@ -52,9 +52,9 @@ IN: project-euler.150
 
 :: (euler150) ( m -- n )
     sums-triangle :> table
-    m iota [| x |
-        x 1 + iota [| y |
-            m x - iota [| z |
+    m <iota> [| x |
+        x 1 + <iota> [| y |
+            m x - <iota> [| z |
                 x z + table nth-unsafe
                 [ y z + 1 + swap nth-unsafe ]
                 [ y         swap nth-unsafe ] bi -

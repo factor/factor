@@ -91,7 +91,7 @@ IN: compiler.cfg.liveness.tests
 ! liveness-step
 { 3 } [
     init-liveness
-    3 iota [ <basic-block> swap >>number ] map <basic-block>
+    3 <iota> [ <basic-block> swap >>number ] map <basic-block>
     [ connect-Nto1-bbs ] keep liveness-step length
 ] unit-test
 

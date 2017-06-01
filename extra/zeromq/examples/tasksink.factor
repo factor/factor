@@ -14,7 +14,7 @@ IN: zeromq.examples.tasksink
         ! Start our clock now
         now
         ! Process 100 confirmations
-        100 iota [
+        100 <iota> [
             pick 0 zmq-recv drop
             10 rem zero? [ ":" ] [ "." ] if write flush
         ] each

@@ -44,7 +44,7 @@ yield
 { f } [ f get-global ] unit-test
 
 { { 0 3 6 9 12 15 18 21 24 27 } } [
-    10 iota [
+    10 <iota> [
         0 "i" tset
         [
             "i" [ yield 3 + ] tchange

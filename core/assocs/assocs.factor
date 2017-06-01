@@ -231,7 +231,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
      { } zip-as ; inline
 
 : zip-index-as ( values exemplar -- assoc )
-    [ dup length iota ] dip zip-as ; inline
+    [ dup length <iota> ] dip zip-as ; inline
 
 : zip-index ( values -- alist )
     { } zip-index-as ; inline
@@ -295,7 +295,7 @@ M: enum delete-at seq>> remove-nth! drop ; inline
 
 M: enum >alist ( enum -- alist ) ; inline
 
-M: enum keys seq>> length iota >array ; inline
+M: enum keys seq>> length <iota> >array ; inline
 
 M: enum values seq>> >array ; inline
 

@@ -79,7 +79,7 @@ ERROR: bad-tga-unsupported ;
     41 read ascii decode [ 0 = ] trim ; inline
 
 : read-author-comments ( -- string )
-    4 iota [ drop 81 read ascii decode [ 0 = ] trim ] map concat ; inline
+    4 <iota> [ drop 81 read ascii decode [ 0 = ] trim ] map concat ; inline
 
 : read-date-timestamp ( -- timestamp )
     timestamp new
@@ -132,16 +132,16 @@ ERROR: bad-tga-unsupported ;
     1 read le> 4 = ; inline
 
 : read-scan-line-table ( height -- scan-offsets )
-    iota [ drop 4 read le> ] map ; inline
+    <iota> [ drop 4 read le> ] map ; inline
 
 : read-postage-stamp-image ( depth -- postage-data )
     8 align 8 / 1 read le> 1 read le> * * read ; inline
 
 :: read-color-correction-table ( -- correction-table )
-    256 iota
+    256 <iota>
     [
         drop
-        4 iota
+        4 <iota>
         [
             drop
             2 read le> 65535 /f :> alpha
@@ -153,7 +153,7 @@ ERROR: bad-tga-unsupported ;
     ] map ; inline
 
 : read-developer-directory ( -- developer-directory )
-    2 read le> iota
+    2 read le> <iota>
     [
         drop
         2 read le>

@@ -76,7 +76,7 @@ ERROR: atlas-image-formats-dont-match images ;
     image dim>> first2 :> ( w h )
     image-placement loc>> first2 :> ( x y )
 
-    h iota [| row |
+    h <iota> [| row |
         0  row      w  image pixel-row-slice-at
         x  y row +  w  atlas set-pixel-row-at
     ] each ; inline

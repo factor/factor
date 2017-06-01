@@ -9,7 +9,7 @@ IN: benchmark.matrix-exponential-scalar
         { 0.0 0.0 0.0 0.0 }
         { 0.0 0.0 0.0 0.0 }
     }
-    iterations iota [| i |
+    iterations <iota> [| i |
         m i m^n i factorial >float m/n m+
     ] each ;
 

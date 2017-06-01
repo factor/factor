@@ -21,11 +21,11 @@ IN: tools.scaffold.tests
 ] unit-test
 
 {
-"HELP: iota-tuple
+"HELP: iota
 { $class-description \"\" } ;
 " }
 [
-    [ \ iota-tuple (help.) ] with-string-writer
+    [ \ iota (help.) ] with-string-writer
 ] unit-test
 
 { sequence t } [ "seq" lookup-type ] unit-test

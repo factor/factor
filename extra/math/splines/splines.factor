@@ -55,7 +55,7 @@ PRIVATE>
     acc ;
 
 :: <cubic-hermite-curve> ( p0 m0 p1 m1 -- polynomials )
-    p0 length iota [
+    p0 length <iota> [
         {
             [ p0 nth ] [ m0 nth ]
             [ p1 nth ] [ m1 nth ]

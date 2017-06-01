@@ -17,7 +17,7 @@ IN: benchmark.combinatorics
     ] with each ;
 
 : bench-permutations ( n -- )
-    iota {
+    <iota> {
         [ all-permutations drop ]
         [ [ drop ] each-permutation ]
         [ [ first 2 = ] find-permutation drop ]

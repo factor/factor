@@ -239,7 +239,7 @@ DEFER: uniform-texture-accessors
         [ uniform-tuple-texture-accessors ] if
     ] [
         2dup swap empty? not and [
-            iota [
+            <iota> [
                 [ swap nth ] swap prefix
                 over length 1 = [ swap first append ] [ swap suffix ] if
             ] with map
@@ -398,7 +398,7 @@ DEFER: [bind-uniform-tuple]
         { mat4x3-uniform { [ dim 0 ] dip 4 3 >uniform-matrix-array glUniformMatrix4x3fv } }
         { mat4-uniform   { [ dim 0 ] dip 4 4 >uniform-matrix-array glUniformMatrix4fv   } }
 
-        { texture-uniform { drop dim dup iota [ texture-unit + ] int-array{ } map-as glUniform1iv } }
+        { texture-uniform { drop dim dup <iota> [ texture-unit + ] int-array{ } map-as glUniform1iv } }
     } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
 
     type uniform-type-texture-units dim * texture-unit +
@@ -450,7 +450,7 @@ DEFER: [bind-uniform-tuple]
 :: [bind-uniform-struct] ( value>>-quot type texture-unit name dim -- texture-unit' quot )
     dim
     [
-        iota
+        <iota>
         [ [ [ swap nth ] swap prefix ] map ]
         [ [ number>string name "[" append "]." surround ] map ] bi
     ] [

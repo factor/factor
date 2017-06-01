@@ -24,22 +24,22 @@ IN: math.matrices
     1 <repetition> diagonal-matrix ; inline
 
 : eye ( m n k -- matrix )
-    [ [ iota ] bi@ ] dip neg '[ _ + = 1 0 ? ] cartesian-map ;
+    [ [ <iota> ] bi@ ] dip neg '[ _ + = 1 0 ? ] cartesian-map ;
 
 : hilbert-matrix ( m n -- matrix )
-    [ iota ] bi@ [ + 1 + recip ] cartesian-map ;
+    [ <iota> ] bi@ [ + 1 + recip ] cartesian-map ;
 
 : toeplitz-matrix ( n -- matrix )
-    iota dup [ - abs 1 + ] cartesian-map ;
+    <iota> dup [ - abs 1 + ] cartesian-map ;
 
 : hankel-matrix ( n -- matrix )
-    [ iota dup ] keep '[ + abs 1 + dup _ > [ drop 0 ] when ] cartesian-map ;
+    [ <iota> dup ] keep '[ + abs 1 + dup _ > [ drop 0 ] when ] cartesian-map ;
 
 : box-matrix ( r -- matrix )
     2 * 1 + dup '[ _ 1 <array> ] replicate ;
 
 : vandermonde-matrix ( u n -- matrix )
-    iota [ v^n ] with map reverse flip ;
+    <iota> [ v^n ] with map reverse flip ;
 
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c
@@ -207,10 +207,10 @@ ERROR: negative-power-matrix m n ;
     '[ _ map ] map ; inline
 
 : column-map ( matrix quot -- seq )
-    [ [ first length iota ] keep ] dip '[ _ col @ ] map ; inline
+    [ [ first length <iota> ] keep ] dip '[ _ col @ ] map ; inline
 
 : cartesian-square-indices ( n -- matrix )
-    iota dup cartesian-product ; inline
+    <iota> dup cartesian-product ; inline
 
 : cartesian-matrix-map ( matrix quot -- matrix' )
     [ [ first length cartesian-square-indices ] keep ] dip
@@ -227,17 +227,17 @@ ERROR: negative-power-matrix m n ;
 : sample-cov-matrix ( matrix -- cov ) 1 cov-matrix-ddof ; inline
 
 GENERIC: square-rows ( object -- matrix )
-M: integer square-rows iota square-rows ;
+M: integer square-rows <iota> square-rows ;
 M: sequence square-rows
     [ length ] keep >array '[ _ clone ] { } replicate-as ;
 
 GENERIC: square-cols ( object -- matrix )
-M: integer square-cols iota square-cols ;
+M: integer square-cols <iota> square-cols ;
 M: sequence square-cols
     [ length ] keep [ <array> ] with { } map-as ;
 
 : make-matrix-with-indices ( m n quot -- matrix )
-    [ [ iota ] bi@ ] dip '[ @ ] cartesian-map ; inline
+    [ [ <iota> ] bi@ ] dip '[ @ ] cartesian-map ; inline
 
 : null-matrix? ( matrix -- ? ) empty? ; inline
 
@@ -255,7 +255,7 @@ M: sequence square-cols
     { [ well-formed-matrix? ] [ dim all-eq? ] } 1&& ;
 
 : matrix-coordinates ( dim -- coordinates )
-    first2 [ iota ] bi@ cartesian-product ; inline
+    first2 [ <iota> ] bi@ cartesian-product ; inline
 
 : dimension-range ( matrix -- dim range )
     dim [ matrix-coordinates ] [ first [1,b] ] bi ;

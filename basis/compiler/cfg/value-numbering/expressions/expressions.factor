@@ -27,7 +27,7 @@ GENERIC: >expr ( insn -- expr )
     [
         [ , [ f <array> ] % ]
         [
-            dup iota [
+            dup <iota> [
                 - 1 - , [ swap [ set-array-nth ] keep ] %
             ] with each
         ] bi

@@ -5,7 +5,7 @@ sequences ;
 IN: benchmark.e-decimals
 
 : D-factorial ( n -- D! )
-    iota DECIMAL: 1 [ 0 <decimal> DECIMAL: 1 D+ D* ] reduce ; inline
+    <iota> DECIMAL: 1 [ 0 <decimal> DECIMAL: 1 D+ D* ] reduce ; inline
 
 :: calculate-e-decimals ( n -- e )
     n [1,b] DECIMAL: 1

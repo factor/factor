@@ -3,8 +3,8 @@
 USING: arrays sequences tools.test ;
 IN: sequences.shifted
 
-{ { 1 2 3 7 } } [ 4 iota -1 7 <shifted> >array ] unit-test
-{ { 7 0 1 2 } } [ 4 iota 1 7 <shifted> >array ] unit-test
-{ { 0 1 2 3 } } [ 4 iota 0 f <shifted> >array ] unit-test
-{ { f f f f } } [ 4 iota 4 f <shifted> >array ] unit-test
-{ { f f f f } } [ 4 iota -4 f <shifted> >array ] unit-test
+{ { 1 2 3 7 } } [ 4 <iota> -1 7 <shifted> >array ] unit-test
+{ { 7 0 1 2 } } [ 4 <iota> 1 7 <shifted> >array ] unit-test
+{ { 0 1 2 3 } } [ 4 <iota> 0 f <shifted> >array ] unit-test
+{ { f f f f } } [ 4 <iota> 4 f <shifted> >array ] unit-test
+{ { f f f f } } [ 4 <iota> -4 f <shifted> >array ] unit-test

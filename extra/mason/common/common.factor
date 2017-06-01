@@ -26,7 +26,7 @@ SYMBOL: current-git-id
     try-output-process ;
 
 : retry ( n quot -- )
-    [ iota ] dip
+    [ <iota> ] dip
     '[ drop @ f ] attempt-all drop ; inline
 
 : upload-process ( process -- )

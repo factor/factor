@@ -69,7 +69,7 @@ TYPED: write-random-fasta ( seed: float n: fixnum chars: byte-array floats: doub
 
 TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
     alu length :> kn
-    len iota [ k + kn mod alu nth-unsafe ] "" map-as print
+    len <iota> [ k + kn mod alu nth-unsafe ] "" map-as print
     k len + ;
 
 : write-repeat-fasta ( n alu desc id -- )

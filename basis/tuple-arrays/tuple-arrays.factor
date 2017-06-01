@@ -22,7 +22,7 @@ MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
 MACRO: write-tuple ( class -- quot )
     [ '[ [ _ boa ] undo ] ]
-    [ tuple-arity iota <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
+    [ tuple-arity <iota> <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
     bi '[ _ dip @ ] ;
 
 : check-final ( class -- )

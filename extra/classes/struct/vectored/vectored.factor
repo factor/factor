@@ -108,7 +108,7 @@ M: vectored-T struct-transpose
     [ vectored-element> ] T-array new map-as ; inline
 
 M: T-array struct-transpose
-    dup length [ nip iota ] [ drop ] [ nip (vectored-T) ] 2tri
+    dup length [ nip <iota> ] [ drop ] [ nip (vectored-T) ] 2tri
     [ [ [ nth ] [ set-nth ] bi-curry* bi ] 2curry each ] keep ; inline
 
 ;FUNCTOR

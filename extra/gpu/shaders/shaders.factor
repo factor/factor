@@ -392,7 +392,7 @@ M: vertex-array-object dispose
     '[ _ swap first2 bind-vertex-format ] each ; inline
 
 : (reset-vertex-array) ( -- )
-    GL_MAX_VERTEX_ATTRIBS get-gl-int iota [ glDisableVertexAttribArray ] each ; inline
+    GL_MAX_VERTEX_ATTRIBS get-gl-int <iota> [ glDisableVertexAttribArray ] each ; inline
 
 :: <multi-vertex-array-object> ( vertex-formats program-instance -- vertex-array )
     gen-vertex-array :> handle

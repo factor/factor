@@ -315,5 +315,5 @@ unit-test
         { 2 V{ 2 5 8 } }
     }
 } [
-    10 iota [ 3 mod ] collect-by
+    10 <iota> [ 3 mod ] collect-by
 ] unit-test

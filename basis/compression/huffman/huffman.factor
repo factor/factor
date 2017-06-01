@@ -27,7 +27,7 @@ TUPLE: huffman-code
 :: all-patterns ( huffman-code n -- seq )
     n log2 huffman-code size>> - :> free-bits
     free-bits 0 >
-    [ free-bits 2^ iota [ huffman-code code>> free-bits 2^ * + ] map ]
+    [ free-bits 2^ <iota> [ huffman-code code>> free-bits 2^ * + ] map ]
     [ huffman-code code>> free-bits neg 2^ /i 1array ] if ;
 
 :: huffman-each ( ... tdesc quot: ( ... huffman-code -- ... ) -- ... )

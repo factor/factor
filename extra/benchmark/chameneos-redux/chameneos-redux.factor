@@ -27,7 +27,7 @@ TUPLE: meeting-place count mailbox ;
         <mailbox> >>mailbox ;
 
 : make-creatures ( colors -- seq )
-    [ length iota ] [ ] bi [ <creature> ] 2map ;
+    [ length <iota> ] [ ] bi [ <creature> ] 2map ;
 
 : complement-color ( color1 color2 -- color3 )
     2dup = [ drop ] [

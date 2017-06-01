@@ -58,13 +58,13 @@ SYMBOLS: supported-layouts supported-formats ;
     [node "point" =shape ];
     [graph "t" =labelloc "circo" =layout ];
     over number>string "K " prepend =label
-    swap iota 2 [ first2 add-edge ] each-combination ;
+    swap <iota> 2 [ first2 add-edge ] each-combination ;
 
 :: partite-set ( n color -- cluster )
     color <cluster>
         color =color
         [node color =color ];
-        n iota [
+        n <iota> [
             number>string color prepend add-node
         ] each ;
 
@@ -78,7 +78,7 @@ SYMBOLS: supported-layouts supported-formats ;
     n m "K %d,%d" sprintf =label ;
 
 : add-cycle ( graph n -- graph' )
-    [ iota add-path ] [ 1 - 0 add-edge ] bi ;
+    [ <iota> add-path ] [ 1 - 0 add-edge ] bi ;
 
 : C_n ( n -- graph )
     <graph>
@@ -94,7 +94,7 @@ SYMBOLS: supported-layouts supported-formats ;
     over number>string "W " prepend =label
     over add-node
     over 1 - add-cycle
-    swap [ ] [ 1 - iota >array ] bi add-edge ;
+    swap [ ] [ 1 - <iota> >array ] bi add-edge ;
 
 : cluster-example ( -- graph )
     <digraph>
@@ -138,7 +138,7 @@ SYMBOLS: supported-layouts supported-formats ;
           ""       =label ];
     [edge "invis" =style ];
     0 [add-node "invis" =style "none" =shape ];
-    16 iota [
+    16 <iota> [
         [ 0 -- ] [ colored-circle add ] bi
     ] each ;
 

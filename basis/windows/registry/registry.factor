@@ -98,7 +98,7 @@ TUPLE: registry-enum-key ;
 
 
 :: reg-enum-keys ( registry-info -- seq )
-    registry-info sub-keys>> iota [
+    registry-info sub-keys>> <iota> [
         [ registry-info key>> ] dip
         registry-value-max-length TCHAR <c-array> dup :> registry-value
         registry-value length dup :> registry-value-length

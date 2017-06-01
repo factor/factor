@@ -3,7 +3,7 @@ USING: bloom-filters kernel math sequences ;
 IN: benchmark.bloom-filters
 
 : insert-data ( bloom-filter -- bloom-filter )
-    100 [ 2,000 iota [ over bloom-filter-insert ] each ] times ;
+    100 [ 2,000 <iota> [ over bloom-filter-insert ] each ] times ;
 
 : test-hit ( bloom-filter -- bloom-filter )
     100,000 [ 100 over bloom-filter-member? drop ] times ;

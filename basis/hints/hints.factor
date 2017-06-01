@@ -24,7 +24,7 @@ M: object specializer-declaration class-of ;
     "specializer" word-prop ;
 
 : make-specializer ( specs -- quot )
-    dup length iota <reversed>
+    dup length <iota> <reversed>
     [ (picker) 2array ] 2map
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [

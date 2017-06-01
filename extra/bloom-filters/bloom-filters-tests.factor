@@ -35,7 +35,7 @@ IN: bloom-filters.tests
 
 ! Should not generate bignum hash codes.  Enhanced double hashing may generate a
 ! lot of hash codes, and it's better to do this earlier than later.
-{ t } [ 10000 iota [ double-hashcodes [ fixnum? ] both? ] all? ] unit-test
+{ t } [ 10000 <iota> [ double-hashcodes [ fixnum? ] both? ] all? ] unit-test
 
 : empty-bloom-filter ( -- bloom-filter )
     0.01 2000 <bloom-filter> ;
@@ -50,24 +50,24 @@ IN: bloom-filters.tests
 { 1 } [ basic-insert-test-setup count>> ] unit-test
 
 : non-empty-bloom-filter ( -- bloom-filter )
-    1000 iota
+    1000 <iota>
     empty-bloom-filter
     [ [ bloom-filter-insert ] curry each ] keep ;
 
 : full-bloom-filter ( -- bloom-filter )
-    2000 iota
+    2000 <iota>
     empty-bloom-filter
     [ [ bloom-filter-insert ] curry each ] keep ;
 
 ! Should find what we put in there.
-{ t } [ 2000 iota
+{ t } [ 2000 <iota>
         full-bloom-filter
         [ bloom-filter-member? ] curry map
         [ ] all?
 ] unit-test
 
 ! We shouldn't have more than 0.01 false-positive rate.
-{ t } [ 1000 iota [ drop most-positive-fixnum random 1000 + ] map
+{ t } [ 1000 <iota> [ drop most-positive-fixnum random 1000 + ] map
         full-bloom-filter
         [ bloom-filter-member? ] curry map
         [ ] count

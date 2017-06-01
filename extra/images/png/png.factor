@@ -150,7 +150,7 @@ ERROR: bad-filter n ;
     prev width tail-slice :> b
     curr :> a
     curr width tail-slice :> x
-    x length iota
+    x length <iota>
     filter {
         { filter-none [ drop ] }
         { filter-sub [ [| n | n x nth n a nth + 256 wrap n x set-nth ] each ] }

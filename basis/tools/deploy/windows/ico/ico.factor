@@ -47,7 +47,7 @@ STRUCT: group-directory-entry
     ico-header heap-size bytes <displaced-alien>
     header ImageCount>> ico-directory-entry <c-direct-array> :> directory
 
-    directory dup length iota [ ico>group-directory-entry ] { } 2map-as
+    directory dup length <iota> [ ico>group-directory-entry ] { } 2map-as
         :> group-directory
     directory [ bytes ico-icon ] { } map-as :> icon-bytes
 

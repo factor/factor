@@ -91,7 +91,7 @@ MACRO: spread* ( n -- quot )
 MACRO: nspread* ( m n -- quot )
     [ drop [ ] ] [
         [ * 0 ] [ drop neg ] 2bi
-        <range> rest >array dup length iota <reversed>
+        <range> rest >array dup length <iota> <reversed>
         [
             '[ [ [ _ ndip ] curry ] _ ndip ]
         ] 2map dup rest-slice [ [ compose ] compose ] map! drop
@@ -122,7 +122,7 @@ MACRO: mnswap ( m n -- quot )
     1 + '[ _ -nrot ] swap '[ _ _ napply ] ;
 
 MACRO: nweave ( n -- quot )
-    [ dup iota <reversed> [ '[ _ _ mnswap ] ] with map ] keep
+    [ dup <iota> <reversed> [ '[ _ _ mnswap ] ] with map ] keep
     '[ _ _ ncleave ] ;
 
 : nbi-curry ( n -- )

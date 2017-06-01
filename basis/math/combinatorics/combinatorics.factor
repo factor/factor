@@ -17,7 +17,7 @@ GENERIC: nths-unsafe ( indices seq -- seq' )
 M: string nths-unsafe (nths-unsafe) ;
 M: array nths-unsafe (nths-unsafe) ;
 M: vector nths-unsafe (nths-unsafe) ;
-M: iota-tuple nths-unsafe (nths-unsafe) ;
+M: iota nths-unsafe (nths-unsafe) ;
 M: object nths-unsafe (nths-unsafe) ;
 
 : possible? ( n m -- ? )
@@ -57,8 +57,8 @@ MEMO: factorial ( n -- n! )
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
 
-: permutation-iota ( seq -- iota )
-    length factorial iota ; inline
+: permutation-iota ( seq -- <iota> )
+    length factorial <iota> ; inline
 
 PRIVATE>
 
@@ -101,7 +101,7 @@ DEFER: next-permutation
 <PRIVATE
 
 : permutations-quot ( seq quot -- seq quot' )
-    [ [ permutation-iota ] [ length iota >array ] [ ] tri ] dip
+    [ [ permutation-iota ] [ length <iota> >array ] [ ] tri ] dip
     '[ drop _ [ _ nths-unsafe @ ] keep next-permutation drop ] ; inline
 
 PRIVATE>
@@ -216,7 +216,7 @@ INSTANCE: combinations immutable-sequence
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
-    n k nCk iota k iota >array seq quot n
+    n k nCk <iota> k iota >array seq quot n
     '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination drop ] ; inline
 
 PRIVATE>

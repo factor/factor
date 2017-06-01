@@ -106,7 +106,7 @@ M: utf16le encode-char ( char stream encoding -- )
     set-nth-unsafe ; inline
 
 : ascii-string>utf16-byte-array ( off string -- byte-array )
-    [ length >fixnum [ iota ] [ 2 fixnum*fast <byte-array> ] bi ] keep
+    [ length >fixnum [ <iota> ] [ 2 fixnum*fast <byte-array> ] bi ] keep
     [ [ ascii-char>utf16-byte-array ] 2curry with each ] 2keep drop ; inline
 
 : ascii-string>utf16le ( string stream -- )

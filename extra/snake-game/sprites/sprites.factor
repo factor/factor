@@ -13,7 +13,7 @@ IN: snake-game.sprites
 
 :: image-part ( image x y w h -- image )
     image w h new-image-like :> new-image
-    h iota [| i |
+    h <iota> [| i |
         new-image bitmap>>
         x y i + w image pixel-row-slice-at
         append! drop
@@ -22,8 +22,8 @@ IN: snake-game.sprites
 :: generate-sprite-sheet ( image rows cols -- seq )
     cols rows 2array :> split-dims
     image dim>> split-dims [ / ] 2map first2 :> ( sw sh )
-    rows iota sh v*n :> ys
-    cols iota sh v*n :> xs
+    rows <iota> sh v*n :> ys
+    cols <iota> sh v*n :> xs
     ys xs [
         swap [ image ] 2dip sw sh image-part
     ] cartesian-map f join ;

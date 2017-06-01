@@ -172,8 +172,8 @@ ERROR: no-vorbis-in-ogg ;
     len max-len min :> len'
     pcm #channels void* <c-direct-array> :> channel*s
 
-    len' iota [| sample |
-        #channels iota [| channel |
+    len' <iota> [| sample |
+        #channels <iota> [| channel |
             channel channel*s nth len c:float <c-direct-array>
             sample swap nth
             float>short-sample short-buffer push

@@ -4,7 +4,7 @@ sequences ;
 IN: benchmark.linked-assocs
 
 : (linked-assocs-benchmark) ( -- )
-    10,000 iota <linked-hash> {
+    10,000 <iota> <linked-hash> {
         [ '[ 0 swap _ set-at ] each ]
         [ '[ _ at ] map-sum 0 assert= ]
         [ '[ dup _ set-at ] each ]

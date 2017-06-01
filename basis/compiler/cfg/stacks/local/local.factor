@@ -58,7 +58,7 @@ SYMBOLS: locs>vregs local-peek-set replaces ;
     height-state get global-loc>local replaces get set-at ;
 
 : kill-locations ( begin inc -- seq )
-    0 min neg iota [ swap - ] with map ;
+    0 min neg <iota> [ swap - ] with map ;
 
 : local-kill-set ( ds-begin ds-inc rs-begin rs-inc -- set )
     [ kill-locations ] 2bi@

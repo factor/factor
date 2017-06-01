@@ -10,13 +10,13 @@ IN: math.primes.miller-rabin
     n 1 - :> n-1
     n-1 factor-2s :> ( r s )
     0 :> a!
-    trials iota [
+    trials <iota> [
         drop
         2 n 2 - [a,b] random a!
         a s n ^mod 1 = [
             f
         ] [
-            r iota [
+            r <iota> [
                 2^ s * a swap n ^mod n-1 =
             ] any? not
         ] if

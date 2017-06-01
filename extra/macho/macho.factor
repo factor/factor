@@ -892,7 +892,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     [
         [ class-of heap-size ]
         [ >c-ptr <displaced-alien> ]
-        [ ncmds>> ] tri iota [
+        [ ncmds>> ] tri <iota> [
             drop read-command
         ] each drop
     ] { } make ;

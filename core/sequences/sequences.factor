@@ -102,18 +102,18 @@ M: f like drop [ f ] when-empty ; inline
 INSTANCE: f immutable-sequence
 
 ! Integer sequences
-TUPLE: iota-tuple { n integer read-only } ;
+TUPLE: iota { n integer read-only } ;
 
 ERROR: non-negative-integer-expected n ;
 
-: iota ( n -- iota )
+: <iota> ( n -- iota )
     dup 0 < [ non-negative-integer-expected ] when
-    iota-tuple boa ; inline
+    iota boa ; inline
 
-M: iota-tuple length n>> ; inline
-M: iota-tuple nth-unsafe drop ; inline
+M: iota length n>> ; inline
+M: iota nth-unsafe drop ; inline
 
-INSTANCE: iota-tuple immutable-sequence
+INSTANCE: iota immutable-sequence
 
 <PRIVATE
 
@@ -608,7 +608,7 @@ PRIVATE>
     (each-index) each-integer ; inline
 
 : map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
-    [ dup length iota ] 2dip 2map-as ; inline
+    [ dup length <iota> ] 2dip 2map-as ; inline
 
 : map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
     { } map-index-as ; inline
@@ -1059,7 +1059,7 @@ PRIVATE>
 
 GENERIC: sum ( seq -- n )
 M: object sum 0 [ + ] binary-reduce ; inline
-M: iota-tuple sum length dup 1 - * 2/ ; inline
+M: iota sum length dup 1 - * 2/ ; inline
 M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
@@ -1114,7 +1114,7 @@ PRIVATE>
 : generic-flip ( matrix -- newmatrix )
     [
         [ first-unsafe length 1 ] keep
-        [ length min ] setup-each (each-integer) iota
+        [ length min ] setup-each (each-integer) <iota>
     ] keep
     [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
 
@@ -1127,7 +1127,7 @@ USE: arrays
     { array } declare
     [
         [ first-unsafe array-length 1 ] keep
-        [ array-length min ] setup-each (each-integer) iota
+        [ array-length min ] setup-each (each-integer) <iota>
     ] keep
     [ [ { array } declare array-nth ] with { } map-as ] curry { } map-as ;
 

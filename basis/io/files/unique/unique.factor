@@ -26,7 +26,7 @@ SYMBOL: unique-retries
     unique-length get random-string ;
 
 : retry ( quot: ( -- ? ) n -- )
-    iota swap [ drop ] prepose attempt-all ; inline
+    <iota> swap [ drop ] prepose attempt-all ; inline
 
 PRIVATE>
 

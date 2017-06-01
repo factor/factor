@@ -24,7 +24,7 @@ IN: project-euler.024
 ! --------
 
 : euler024 ( -- answer )
-    999999 10 iota permutation digits>number ;
+    999999 10 <iota> permutation digits>number ;
 
 ! [ euler024 ] 100 ave-time
 ! 0 ms ave run time - 0.27 SD (100 trials)
