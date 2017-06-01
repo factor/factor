@@ -86,6 +86,14 @@ MACRO: (send) ( selector super? -- quot )
 
 : send ( receiver args... selector -- return... ) f (send) ; inline
 
+MACRO:: (?send) ( effect selector super? -- quot )
+    selector dup ?lookup-method effect or super?
+    [ make-prepare-send ] 2keep
+    super-message-senders message-senders ? get at
+    [ 1quotation append ] [ effect selector sender-stub 1quotation append ] if* ;
+
+: ?send ( receiver args... selector effect -- return... ) f (?send) ; inline
+
 : super-send ( receiver args... selector -- return... ) t (send) ; inline
 
 ! Runtime introspection

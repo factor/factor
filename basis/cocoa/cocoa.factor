@@ -14,6 +14,8 @@ SYMBOL: sent-messages
 
 SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
 
+SYNTAX: ?-> scan-token dup remember-send suffix! \ ?send suffix! ;
+
 SYNTAX: SEL:
     scan-token
     [ remember-send ]
