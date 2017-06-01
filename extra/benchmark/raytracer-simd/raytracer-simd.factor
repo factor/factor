@@ -140,8 +140,8 @@ CONSTANT: create-offsets
 
 : ray-pixel ( scene point -- ray-grid )
     [ 0.0 ] 2dip
-    oversampling iota [
-        oversampling iota [
+    oversampling <iota> [
+        oversampling <iota> [
             ss-point v+ normalize
             double-4{ 0.0 0.0 -4.0 0.0 } swap <ray>
             swap cast-ray +
@@ -149,8 +149,8 @@ CONSTANT: create-offsets
     ] 2with each ; inline no-compile
 
 : ray-trace ( scene -- grid )
-    size iota <reversed> [
-        size iota [
+    size <iota> <reversed> [
+        size <iota> [
             [ size 0.5 * - ] bi@ swap size
             0.0 double-4-boa ray-pixel
         ] 2with map

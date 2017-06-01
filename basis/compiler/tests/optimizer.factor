@@ -92,7 +92,7 @@ TUPLE: pred-test ;
 : double-label-2 ( a -- b )
     dup array? [ ] [ ] if 0 t double-label-1 ;
 
-[ 0 ] [ 10 iota double-label-2 ] unit-test
+[ 0 ] [ 10 <iota> double-label-2 ] unit-test
 
 ! regression
 GENERIC: void-generic ( obj -- * )
@@ -337,7 +337,7 @@ TUPLE: some-tuple x ;
 [ 5 ] [ { 1 2 { 3 { 4 5 } } } deep-find-test ] unit-test
 [ f ] [ { 1 2 { 3 { 4 } } } deep-find-test ] unit-test
 
-[ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 iota [ ] B{ } map-as ] compile-call ] unit-test
+[ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 <iota> [ ] B{ } map-as ] compile-call ] unit-test
 
 [ 0 ] [ 1234 [ { fixnum } declare -64 shift ] compile-call ] unit-test
 

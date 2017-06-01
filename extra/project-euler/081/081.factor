@@ -60,7 +60,7 @@ IN: project-euler.081
     3dup minimal-path-sum-to '[ _ + ] change-matrix ;
 
 : (euler081) ( matrix -- n )
-    dup first length iota dup
+    dup first length <iota> dup
     [ pick update-minimal-path-sum ] cartesian-each
     last last ;
 

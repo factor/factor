@@ -11,7 +11,7 @@ IN: benchmark.simd-1
     0.0 float-4-boa ; inline
 
 : make-points ( len -- points )
-    iota [ <point> ] float-4-array{ } map-as ; inline
+    <iota> [ <point> ] float-4-array{ } map-as ; inline
 
 : normalize-points ( points -- )
     [ normalize ] map! drop ; inline

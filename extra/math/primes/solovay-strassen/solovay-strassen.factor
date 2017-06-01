@@ -9,7 +9,7 @@ IN: math.primes.solovay-strassen
 <PRIVATE
 
 :: (solovay-strassen) ( n numtrials -- ? )
-    numtrials iota [
+    numtrials <iota> [
         drop
         n 1 - [1,b) random :> a
         a n simple-gcd 1 > [ t ] [

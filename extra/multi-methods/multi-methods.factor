@@ -22,7 +22,7 @@ SYMBOL: total
 : canonicalize-specializer-1 ( specializer -- specializer' )
     [
         [ class? ] filter
-        [ length iota <reversed> [ 1 + neg ] map ] keep zip
+        [ length <iota> <reversed> [ 1 + neg ] map ] keep zip
         [ length args [ max ] change ] keep
     ]
     [
@@ -112,7 +112,7 @@ SYMBOL: total
     swap predicate-def append ;
 
 : multi-predicate ( classes -- quot )
-    dup length iota <reversed>
+    dup length <iota> <reversed>
     [ picker 2array ] 2map
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [

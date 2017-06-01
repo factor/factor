@@ -28,9 +28,9 @@ STRUCT: yuv-buffer
         h >>uv_height
         w >>y_stride
         w >>uv_stride
-        w h * iota [ dup * ] B{ } map-as malloc-byte-array &free >>y
-        w h * 2/ iota [ dup dup * * ] B{ } map-as malloc-byte-array &free >>u
-        w h * 2/ iota [ dup * dup * ] B{ } map-as malloc-byte-array &free >>v ;
+        w h * <iota> [ dup * ] B{ } map-as malloc-byte-array &free >>y
+        w h * 2/ <iota> [ dup dup * * ] B{ } map-as malloc-byte-array &free >>u
+        w h * 2/ <iota> [ dup * dup * ] B{ } map-as malloc-byte-array &free >>v ;
 
 : clamp ( n -- n )
     255 min 0 max ; inline
@@ -75,12 +75,12 @@ STRUCT: yuv-buffer
 
 : yuv>rgb-row ( index rgb yuv y -- index )
     over stride
-    pick y_width>> iota
+    pick y_width>> <iota>
     [ yuv>rgb-pixel ] 4 nwith each ; inline
 
 TYPED: yuv>rgb ( rgb: byte-array yuv: yuv-buffer -- )
     [ 0 ] 2dip
-    dup y_height>> iota
+    dup y_height>> <iota>
     [ yuv>rgb-row ] 2with each
     drop ;
 

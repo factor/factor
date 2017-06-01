@@ -26,7 +26,7 @@ PRIVATE>
     '[ CHAR: \0 _ ? ] "" map-as append
     md5 checksum-bytes :> final!
 
-    1000 iota [
+    1000 <iota> [
         "" swap
         {
             [ 0 bit? password final ? append ]

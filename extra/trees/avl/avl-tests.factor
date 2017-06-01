@@ -126,4 +126,4 @@ IN: trees.avl.tests
 
 ! test that converting from a balanced tree doesn't reshape
 ! the tree
-{ t } [ 10 iota >array reverse dup zip >avl dup >avl = ] unit-test
+{ t } [ 10 <iota> >array reverse dup zip >avl dup >avl = ] unit-test

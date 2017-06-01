@@ -20,7 +20,7 @@ IN: rosetta-code.bitmap-bezier
 
 ! gives an interval of x from 0 to 1 to map the bezier function
 : t-interval ( x -- interval )
-    [ iota ] keep 1 - [ / ] curry map ;
+    [ <iota> ] keep 1 - [ / ] curry map ;
 
 ! turns a list of points into the list of lines between them
 : points-to-lines ( seq -- seq )

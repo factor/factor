@@ -316,7 +316,7 @@ cell 4 = [
 
 ! Bug with ##return node construction
 : return-recursive-bug ( nodes -- ? )
-    { fixnum } declare iota [
+    { fixnum } declare <iota> [
         dup 3 bitand 1 = [ drop t ] [
             dup 3 bitand 2 = [
                 return-recursive-bug

@@ -329,23 +329,23 @@ cell-bits 32 = [
 ] unit-test
 
 { t } [
-    [ { fixnum } declare iota [ drop ] each ]
+    [ { fixnum } declare <iota> [ drop ] each ]
     { < <-integer-fixnum +-integer-fixnum + } inlined?
 ] unit-test
 
 { t } [
-    [ { fixnum } declare iota 0 [ + ] reduce ]
+    [ { fixnum } declare <iota> 0 [ + ] reduce ]
     { < <-integer-fixnum nth-unsafe } inlined?
 ] unit-test
 
 { f } [
-    [ { fixnum } declare iota 0 [ + ] reduce ]
+    [ { fixnum } declare <iota> 0 [ + ] reduce ]
     \ +-integer-fixnum inlined?
 ] unit-test
 
 { t } [
     [
-        { integer } declare iota [ ] map
+        { integer } declare <iota> [ ] map
     ] \ integer>fixnum inlined?
 ] unit-test
 
@@ -388,7 +388,7 @@ cell-bits 32 = [
 
 { t } [
     [
-        { integer } declare iota [ 0 >= ] map
+        { integer } declare <iota> [ 0 >= ] map
     ] { >= fixnum>= } inlined?
 ] unit-test
 

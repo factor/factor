@@ -20,15 +20,15 @@ TYPED:: loop-step ( i j matrix: array old new step -- )
     i 1 + j 1 + matrix nth-unsafe set-nth-unsafe ; inline
 
 : lcs-initialize ( |str1| |str2| -- matrix )
-    iota [ drop 0 <array> ] with map ;
+    <iota> [ drop 0 <array> ] with map ;
 
 : levenshtein-initialize ( |str1| |str2| -- matrix )
-    [ iota ] bi@ [ [ + ] curry map ] with map ;
+    [ <iota> ] bi@ [ [ + ] curry map ] with map ;
 
 :: run-lcs ( old new init step -- matrix )
     old length 1 + new length 1 + init call :> matrix
-    old length iota [| i |
-        new length iota [| j |
+    old length <iota> [| i |
+        new length <iota> [| j |
             i j matrix old new step loop-step
         ] each
     ] each matrix ; inline

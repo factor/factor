@@ -8,7 +8,7 @@ CONSTANT: crc16-polynomial 0xa001
 
 CONSTANT: crc16-table V{ }
 
-256 iota [
+256 <iota> [
     8 [
         [ 2/ ] [ even? ] bi [ crc16-polynomial bitxor ] unless
     ] times

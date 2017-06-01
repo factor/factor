@@ -18,7 +18,7 @@ SYMBOL: jis212
 "vocab:io/encodings/iso2022/212.txt" load-codetable-file jis212 set-global
 
 SYMBOL: ascii
-128 iota dup zip >biassoc ascii set-global
+128 <iota> dup zip >biassoc ascii set-global
 
 TUPLE: iso2022-state type ;
 

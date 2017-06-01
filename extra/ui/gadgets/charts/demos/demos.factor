@@ -9,12 +9,12 @@ IN: ui.gadgets.charts.demos
 CONSTANT: -pi $[ pi neg ]
 
 : sine-wave ( steps -- seq )
-    [ iota ] keep
+    [ <iota> ] keep
     pi 2 * swap / [ * pi - dup sin 2array ] curry map
     ${ pi $[ pi sin ] } suffix ;
 
 : cosine-wave ( steps -- seq )
-    [ iota ] keep
+    [ <iota> ] keep
     pi 2 * swap / [ * pi - dup cos 2array ] curry map
     ${ pi $[ pi cos ] } suffix ;
 

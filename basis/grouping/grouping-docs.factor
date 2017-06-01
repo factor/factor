@@ -89,7 +89,7 @@ HELP: <groups>
 { $examples
     { $example
         "USING: arrays kernel prettyprint sequences grouping ;"
-        "9 iota >array 3 <groups>"
+        "9 <iota> >array 3 <groups>"
         "dup [ reverse! drop ] each concat >array ."
         "{ 2 1 0 5 4 3 8 7 6 }"
     }

@@ -234,7 +234,7 @@ IN: ui.gadgets.charts.lines.tests
 {
     { 0 30 60 90 120 150 180 210 240 270 300 }
 } [
-    11 iota [ 10 + ] map [ 300 swap 20 10 scale ] map
+    11 <iota> [ 10 + ] map [ 300 swap 20 10 scale ] map
 ] unit-test
 
 { { } }

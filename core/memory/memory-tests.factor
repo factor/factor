@@ -110,7 +110,7 @@ TUPLE: tup2 a b c d ;
     drop 2097103 <byte-array> ;
 
 : outer ( -- lag )
-    9 iota [ inner ] map
+    9 <iota> [ inner ] map
     ! D 0 is scrubbed, but if the branch calling 'inner' was
     ! called, then both D 0 and D 1 should have been scrubbed.
     0 9 1 tup2 boa ;

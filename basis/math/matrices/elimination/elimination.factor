@@ -42,7 +42,7 @@ SYMBOL: matrix
     [ [ clear-scale ] 2keep [ n*v ] dip v+ ] change-row ;
 
 : rows-from ( row# -- slice )
-    rows dup iota <slice> ;
+    rows dup <iota> <slice> ;
 
 : clear-col ( col# row# rows -- )
     [ nth-row ] dip [ [ 2dup ] dip (clear-col) ] each 2drop ;
@@ -79,9 +79,9 @@ SYMBOL: matrix
 
 : reduced ( matrix' -- matrix'' )
     [
-        rows iota <reversed> [
+        rows <iota> <reversed> [
             dup nth-row leading drop
-            [ swap dup iota clear-col ] [ drop ] if*
+            [ swap dup <iota> clear-col ] [ drop ] if*
         ] each
     ] with-matrix ;
 

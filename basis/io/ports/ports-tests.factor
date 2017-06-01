@@ -11,7 +11,7 @@ locals math namespaces sequences tools.test ;
     { } [
         path binary [
             [
-                100,000 iota
+                100,000 <iota>
                 0
                 100,000 int malloc-array &free [ copy ] keep write
             ] with-destructors
@@ -20,7 +20,7 @@ locals math namespaces sequences tools.test ;
 
     { t } [
         path binary [
-            100,000 4 * read int cast-array 100,000 iota sequence=
+            100,000 4 * read int cast-array 100,000 <iota> sequence=
         ] with-file-reader
     ] unit-test
 

@@ -36,7 +36,7 @@ IN: porter-stemmer
     [ 0 0 ] dip skip-consonants (consonant-seq) ;
 
 : stem-vowel? ( str -- ? )
-    [ length iota ] keep [ consonant? ] curry all? not ;
+    [ length <iota> ] keep [ consonant? ] curry all? not ;
 
 : double-consonant? ( i str -- ? )
     over 1 < [

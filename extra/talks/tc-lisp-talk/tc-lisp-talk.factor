@@ -56,7 +56,7 @@ CONSTANT: tc-lisp-slides
     { $slide "Non-static stack effect"
         "Not a good practice, nor useful"
         "Not compiled by the optimizing compiler"
-        { $code "100 iota [ ] each" }
+        { $code "100 <iota> [ ] each" }
     }
     { $slide "Module system"
         "Code divided up into vocabulary roots"
@@ -359,7 +359,7 @@ var price = (order == null ? null : order.price);" }
         [ 1 - fib ] [ 2 - fib ] bi +
     ] unless ;"
         }
-        { $code "36 iota [ fib ] map ." }
+        { $code "36 <iota> [ fib ] map ." }
     }
     { $slide "Memoized Fibonacci"
         "Change one word and it's efficient"
@@ -368,7 +368,7 @@ var price = (order == null ? null : order.price);" }
         [ 1 - fib ] [ 2 - fib ] bi +
     ] unless ;"
         }
-        { $code "36 iota [ fib ] map ." }
+        { $code "36 <iota> [ fib ] map ." }
     }
     { $slide "Destructors"
         "Deterministic resource disposal"

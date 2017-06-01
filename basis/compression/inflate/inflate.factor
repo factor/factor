@@ -59,7 +59,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     ] reduce
     [ dup array? [ second 0 <repetition> ] [ 1array ] if ] map concat
     nip swap cut 2array
-    [ [ length>> iota ] [ ] bi get-table ] map ;
+    [ [ length>> <iota> ] [ ] bi get-table ] map ;
 
 MEMO: static-huffman-tables ( -- obj )
     [
@@ -69,7 +69,7 @@ MEMO: static-huffman-tables ( -- obj )
         280 287 [a,b] length [ 8 ] replicate append
     ] append-outputs
     0 31 [a,b] length [ 5 ] replicate 2array
-    [ [ length>> iota ] [ ] bi get-table ] map ;
+    [ [ length>> <iota> ] [ ] bi get-table ] map ;
 
 CONSTANT: length-table
     {

@@ -162,7 +162,7 @@ CONSTANT: box-vertices
       { {  1 -1 -1 } {  1  1 -1 } } }
 
 CONSTANT: cylinder-vertices
-    $[ 12 iota [ 2pi 12 / * [ cos ] [ drop 0.0 ] [ sin ] tri 3array ] map ]
+    $[ 12 <iota> [ 2pi 12 / * [ cos ] [ drop 0.0 ] [ sin ] tri 3array ] map ]
 
 :: scale-cylinder-vertices ( radius half-height verts -- bot-verts top-verts )
     verts

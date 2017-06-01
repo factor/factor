@@ -20,7 +20,7 @@ sequences.private strings tools.test ;
 
 { fixnum } [ 1 >bignum SBUF" " new-sequence length class-of ] unit-test
 
-{ fixnum } [ 1 >bignum iota [ ] SBUF" " map-as length class-of ] unit-test
+{ fixnum } [ 1 >bignum <iota> [ ] SBUF" " map-as length class-of ] unit-test
 
 [ 1.5 SBUF" " new-sequence ] must-fail
 

@@ -22,7 +22,7 @@ MACRO: firstn ( n -- quot )
 
 MACRO: set-firstn-unsafe ( n -- quot )
     [ 1 + ]
-    [ iota [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
+    [ <iota> [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
     '[ _ -nrot _ spread drop ] ;
 
 MACRO: set-firstn ( n -- quot )

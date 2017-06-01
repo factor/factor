@@ -35,7 +35,7 @@ IN: sequences.extras.tests
         "--ABC--"
     }
 } [
-    "ABC" 8 iota [ CHAR: - pad-center ] with map
+    "ABC" 8 <iota> [ CHAR: - pad-center ] with map
 ] unit-test
 
 { { 0 1 0 1 } } [
@@ -103,7 +103,7 @@ IN: sequences.extras.tests
 { "lohel" } [ "hello" dup -12 rotate! ] unit-test
 
 { { } } [ { } [ ] map-concat ] unit-test
-{ V{ 0 0 1 0 1 2 } } [ 4 iota [ iota ] map-concat ] unit-test
+{ V{ 0 0 1 0 1 2 } } [ 4 <iota> [ iota ] map-concat ] unit-test
 { "abc" } [ "abc" [ 1string ] map-concat ] unit-test
 { "abc" } [ { 97 98 99 } [ 1string ] map-concat ] unit-test
 { { 97 98 99 } } [ "abc" [ 1string ] { } map-concat-as ] unit-test
@@ -112,12 +112,12 @@ IN: sequences.extras.tests
 
 { { } } [ { } [ ] [ even? ] map-filter ] unit-test
 { "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test
-{ { 0 4 16 36 64 } } [ 10 iota [ sq ] [ even? ] { } map-filter-as ] unit-test
+{ { 0 4 16 36 64 } } [ 10 <iota> [ sq ] [ even? ] { } map-filter-as ] unit-test
 
-{ V{ 0 4 16 36 64 } } [ 10 iota [ even? ] [ sq ] filter-map ] unit-test
-{ { 2 6 10 14 18 } } [ 10 iota [ odd? ] [ 2 * ] { } filter-map-as ] unit-test
+{ V{ 0 4 16 36 64 } } [ 10 <iota> [ even? ] [ sq ] filter-map ] unit-test
+{ { 2 6 10 14 18 } } [ 10 <iota> [ odd? ] [ 2 * ] { } filter-map-as ] unit-test
 
-{ 8 } [ 3 iota dup [ 1 + * ] 2map-sum ] unit-test
+{ 8 } [ 3 <iota> dup [ 1 + * ] 2map-sum ] unit-test
 { 4 } [ "hello" "jello" [ = ] 2count ] unit-test
 
 { { } } [ { } round-robin ] unit-test
@@ -149,12 +149,12 @@ IN: sequences.extras.tests
 { { { 5 8 0 } { 6 9 1 } { 7 10 2 } } } [ { 5 6 7 } { 8 9 10 } [ 3array ] 2map-index ] unit-test
 
 { { } } [ { } <evens> >array ] unit-test
-{ { 0 2 } } [ 4 iota <evens> >array ] unit-test
-{ { 0 2 4 } } [ 5 iota <evens> >array ] unit-test
+{ { 0 2 } } [ 4 <iota> <evens> >array ] unit-test
+{ { 0 2 4 } } [ 5 <iota> <evens> >array ] unit-test
 
 { { } } [ { } <odds> >array ] unit-test
-{ { 1 3 } } [ 5 iota <odds> >array ] unit-test
-{ { 1 3 5 } } [ 6 iota <odds> >array ] unit-test
+{ { 1 3 } } [ 5 <iota> <odds> >array ] unit-test
+{ { 1 3 5 } } [ 6 <iota> <odds> >array ] unit-test
 
 { 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
 { 0 } [ { 1 7 3 7 6 3 7 } arg-min ] unit-test
@@ -204,8 +204,8 @@ IN: sequences.extras.tests
 { { 1 2 3 } } [ { 1 2 3 } flatten1 ] unit-test
 { { 1 2 3 { { 4 } } } } [ { 1 { 2 } { 3 { { 4 } } } } flatten1 ] unit-test
 
-{ t 3 3 } [ 10 iota [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
-{ f f f } [ 10 iota [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
+{ t 3 3 } [ 10 <iota> [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
+{ f f f } [ 10 <iota> [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
 
 { "abcdef" } [ f f "abcdef" subseq* ] unit-test
 { "abcdef" } [ 0 f "abcdef" subseq* ] unit-test
@@ -218,13 +218,13 @@ IN: sequences.extras.tests
 { "" " foo" } [ " foo" [ blank? ] cut-when ] unit-test
 { "foo" " bar" } [ "foo bar" [ blank? ] cut-when ] unit-test
 
-{ { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 iota [ nth* ] curry map ] unit-test
+{ { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 <iota> [ nth* ] curry map ] unit-test
 
 { 1 "beef" } [ { "chicken" "beef" "moose" } [ length ] infimum-by* ] unit-test
 { 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] supremum-by* ] unit-test
 { 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
 
-{ 3/10 } [ 10 iota [ 3 < ] count* ] unit-test
+{ 3/10 } [ 10 <iota> [ 3 < ] count* ] unit-test
 
 { { 0 } } [ "ABA" "ABABA" start-all ] unit-test
 { { 0 2 } } [ "ABA" "ABABA" start-all* ] unit-test
@@ -245,10 +245,10 @@ IN: sequences.extras.tests
 { }
 [ "test:" all-words [ name>> over prepend ] map-zip 2drop ] unit-test
 
-{ { 0 1 2 3 } } [ 8 iota [ 4 < ] take-while >array ] unit-test
+{ { 0 1 2 3 } } [ 8 <iota> [ 4 < ] take-while >array ] unit-test
 { { } } [ { 15 16 } [ 4 < ] take-while >array ] unit-test
-{ { 0 1 2 } } [ 3 iota [ 4 < ] take-while >array ] unit-test
+{ { 0 1 2 } } [ 3 <iota> [ 4 < ] take-while >array ] unit-test
 
-{ { 4 5 6 7 } } [ 8 iota [ 4 < ] drop-while >array ] unit-test
+{ { 4 5 6 7 } } [ 8 <iota> [ 4 < ] drop-while >array ] unit-test
 { { 15 16 } } [ { 15 16 } [ 4 < ] drop-while >array ] unit-test
-{ { } } [ 3 iota [ 4 < ] drop-while >array ] unit-test
+{ { } } [ 3 <iota> [ 4 < ] drop-while >array ] unit-test

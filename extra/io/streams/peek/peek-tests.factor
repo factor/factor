@@ -115,7 +115,7 @@ IN: io.streams.peek.tests
 [
     [
         [
-            26 iota >byte-array <memory-stream> <peek-stream>
+            26 <iota> >byte-array <memory-stream> <peek-stream>
             4 over stream-peek ,
             6 over stream-peek ,
             2 over stream-read ,

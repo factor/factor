@@ -70,7 +70,7 @@ dup layout
 "s" set
 
 { t } [
-    10 iota [
+    10 <iota> [
         drop
         "g2" get scroll>gadget
         "s" get layout

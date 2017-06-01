@@ -48,7 +48,7 @@ IN: project-euler.common
 HINTS: count-digits fixnum ;
 
 : max-children ( seq -- seq )
-    [ dup length 1 - iota [ nth-pair max , ] with each ] { } make ;
+    [ dup length 1 - <iota> [ nth-pair max , ] with each ] { } make ;
 
 ! Propagate one row into the upper one
 : propagate ( bottom top -- newtop )

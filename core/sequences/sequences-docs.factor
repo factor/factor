@@ -1249,7 +1249,7 @@ HELP: selector
 { $description "Creates a new vector to accumulate the values which return true for a predicate. Returns a new quotation which accepts an object to be tested and stored in the collector if the test yields true. The collector is left on the stack for convenience." }
 { $examples
     { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
-               "10 iota [ even? ] selector [ each ] dip ."
+               "10 <iota> [ even? ] selector [ each ] dip ."
                "V{ 0 2 4 6 8 }"
     }
 }
@@ -1485,7 +1485,7 @@ HELP: binary-reduce
 { $description "Like " { $link reduce } ", but splits the sequence in half recursively until each sequence is small enough, and calls the quotation on these smaller sequences. If the quotation computes values that depend on the size of their input, such as bignum arithmetic, then this algorithm can be more efficient than using " { $link reduce } "." }
 { $examples "Computing factorial:"
     { $example "USING: prettyprint sequences math ;"
-    "40 iota rest-slice 1 [ * ] binary-reduce ."
+    "40 <iota> rest-slice 1 [ * ] binary-reduce ."
     "20397882081197443358640281739902897356800000000" }
 } ;
 
@@ -1583,13 +1583,13 @@ HELP: shorten
     "V{ 1 2 3 }"
 } } ;
 
-HELP: iota
+HELP: <iota>
 { $values { "n" integer } { "iota" iota } }
 { $description "Creates an immutable virtual sequence containing the integers from 0 to " { $snippet "n-1" } "." }
 { $examples
   { $example
     "USING: math sequences prettyprint ;"
-    "3 iota [ sq ] map ."
+    "3 <iota> [ sq ] map ."
     "{ 0 1 4 }"
   }
 } ;
@@ -1676,12 +1676,12 @@ $nl
 
 ARTICLE: "sequences-integers" "Counted loops"
 "A virtual sequence is defined for iterating over integers from zero."
-{ $subsection iota }
-"For example, calling " { $link iota } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops using words such as " { $link each } ":"
-{ $example "USING: sequences prettyprint ; 3 iota [ . ] each" "0\n1\n2" }
+{ $subsection <iota> }
+"For example, calling " { $link <iota> } " on the integer 3 produces a sequence containing the elements 0, 1, and 2. This is very useful for performing counted loops using words such as " { $link each } ":"
+{ $example "USING: sequences prettyprint ; 3 <iota> [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
 $nl
-"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link iota } "."
+"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link <iota> } "."
 $nl
 "More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
 

@@ -35,7 +35,7 @@ TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
 <PRIVATE
 
 : write-le ( x n -- )
-    iota [ nth-byte write1 ] with each ; inline
+    <iota> [ nth-byte write1 ] with each ; inline
 
 TYPED: write-int32 ( int: integer -- )
     INT32-SIZE write-le ; inline

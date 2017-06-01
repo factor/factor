@@ -49,7 +49,7 @@ TYPED: normal-noise-map ( seed: integer dim -- bytes )
 ERROR: invalid-perlin-noise-table table ;
 
 : <perlin-noise-table> ( -- table )
-    256 iota >byte-array randomize dup append ; inline
+    256 <iota> >byte-array randomize dup append ; inline
 
 : validate-table ( table -- table )
     dup { [ byte-array? ] [ length 512 >= ] } 1&&
@@ -120,7 +120,7 @@ TYPED:: perlin-noise ( table: byte-array point: float-4 -- value: float )
     faded trilerp ;
 
 MEMO: perlin-noise-map-coords ( dim -- coords )
-    first2 iota [| x y | x iota [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ;
+    first2 <iota> [| x y | x iota [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ;
 
 TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-array -- map: float-array )
     coords [| coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c:float )

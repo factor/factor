@@ -49,7 +49,7 @@ C: <snake-part> snake-part
     opposite-dir prefix [ >>dir ] 2map ;
 
 : all-indices ( -- points )
-    snake-game-dim first2 * iota ;
+    snake-game-dim first2 * <iota> ;
 
 : snake-occupied-locs ( snake head-loc -- points )
     [ dir>> relative-loc ] accumulate nip ;

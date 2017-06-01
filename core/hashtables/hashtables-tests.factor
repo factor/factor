@@ -3,10 +3,10 @@ math namespaces sequences tools.test ;
 
 { H{ } } [ { } [ dup ] H{ } map>assoc ] unit-test
 
-{ } [ 1000 iota [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
+{ } [ 1000 <iota> [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
 
 { V{ } }
-[ 1000 iota [ dup sq swap "testhash" get at = ] reject ]
+[ 1000 <iota> [ dup sq swap "testhash" get at = ] reject ]
 unit-test
 
 { t }
@@ -141,7 +141,7 @@ H{ } "x" set
 
 ! make sure growth and capacity use same load-factor
 { t } [
-    100 iota
+    100 <iota>
     [ [ <hashtable> ] map ]
     [ [ H{ } clone [ '[ dup _ set-at ] each-integer ] keep ] map ] bi
     [ [ array>> length ] bi@ = ] 2all?
@@ -183,4 +183,4 @@ H{ } "x" set
 { 1 } [ 2 "h" get at ] unit-test
 
 ! Random test case
-{ "A" } [ 100 iota [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 of ] unit-test
+{ "A" } [ 100 <iota> [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 of ] unit-test

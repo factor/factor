@@ -26,7 +26,7 @@ IN: compiler.cfg.builder.alien
 
 : unbox-parameters ( parameters -- vregs reps )
     [
-        [ length iota <reversed> ] keep
+        [ length <iota> <reversed> ] keep
         [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
         2 2 mnmap [ concat ] bi@
     ]

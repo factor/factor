@@ -151,10 +151,10 @@ M: sequence >col-array
 : ones ( shape -- shaped-array ) 1 repeated-shaped ;
 
 : increasing ( shape -- shaped-array )
-    [ shape-capacity iota >array ] [ ] bi <shaped-array> ;
+    [ shape-capacity <iota> >array ] [ ] bi <shaped-array> ;
 
 : decreasing ( shape -- shaped-array )
-    [ shape-capacity iota <reversed> >array ] [ ] bi <shaped-array> ;
+    [ shape-capacity <iota> <reversed> >array ] [ ] bi <shaped-array> ;
 
 : row-length ( shape -- n ) rest-slice product ; inline
 
@@ -215,7 +215,7 @@ ERROR: 2d-expected shaped ;
 
 ! : set-shaped-where ( .. elt sa quot -- )
     ! [
-        ! [ underlying>> [ length iota ] keep zip ]
+        ! [ underlying>> [ length <iota> ] keep zip ]
         ! [ ] bi
     ! ] dip '[ _ [ _ set- ] @ ] assoc-each ; inline
 
@@ -251,7 +251,7 @@ TUPLE: block-array shaped shape ;
     block-array boa ;
 
 : iteration-indices ( shaped -- seq )
-    [ iota ] [
+    [ <iota> ] [
         cartesian-product concat
         [ dup first array? [ first2 suffix ] when ] map
     ] map-reduce ;

@@ -206,7 +206,7 @@ HELP: foreground
 { $examples
     { $code
         "USING: colors.gray io.styles hashtables sequences kernel math ;"
-        "10 iota ["
+        "10 <iota> ["
         "    \"Hello world\\n\""
         "    swap 10 / 1 <gray> foreground associate format"
         "] each"
@@ -218,7 +218,7 @@ HELP: background
 { $examples
     { $code
         "USING: colors hashtables io io.styles kernel math sequences ;"
-        "10 iota ["
+        "10 <iota> ["
         "    \"Hello world\\n\""
         "    swap 10 / 1 over - over 1 <rgba>"
         "    background associate format"

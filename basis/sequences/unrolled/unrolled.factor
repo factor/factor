@@ -9,7 +9,7 @@ IN: sequences.unrolled
     swap '[ _ call( i -- ) ] each-integer ;
 
 << \ (unrolled-each-integer) [
-    iota [ '[ _ swap call( i -- ) ] ] [ ] map-as '[ _ cleave ]
+    <iota> [ '[ _ swap call( i -- ) ] ] [ ] map-as '[ _ cleave ]
 ] 1 define-partial-eval >>
 
 : (unrolled-collect) ( quot into -- quot' )
@@ -95,4 +95,4 @@ PRIVATE>
     4 npick unrolled-2map-as ; inline
 
 : unrolled-map-index ( seq len quot: ( x i -- newx ) -- newseq )
-    [ dup length iota ] 2dip unrolled-2map ; inline
+    [ dup length <iota> ] 2dip unrolled-2map ; inline

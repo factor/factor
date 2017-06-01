@@ -78,7 +78,7 @@ M: linux x>hid-bit-order
     } ; inline
 
 : x-bits>hid-bits ( bit-array -- bit-array )
-    256 iota [ 2array ] { } 2map-as [ first ] filter values
+    256 <iota> [ 2array ] { } 2map-as [ first ] filter values
     x>hid-bit-order [ nth ] curry map
     256 <bit-array> swap [ t swap pick set-nth ] each ;
 

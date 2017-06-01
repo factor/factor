@@ -388,7 +388,7 @@ HELP: add-node
   { $example
     "USING: accessors graphviz prettyprint sequences ;"
     "<graph>"
-    "    5 iota [ add-node ] each"
+    "    5 <iota> [ add-node ] each"
     "statements>> [ id>> . ] each"
     "\"0\"\n\"1\"\n\"2\"\n\"3\"\n\"4\""
   }
@@ -612,7 +612,7 @@ $nl
 ""
 "        over number>string \"K \" prepend =label"
 ""
-"        swap iota 2 [ first2 add-edge ] each-combination"
+"        swap <iota> 2 [ first2 add-edge ] each-combination"
 "    preview ;"
 }
 $nl
@@ -637,7 +637,7 @@ $nl
 "    color <cluster>"
 "        color =color"
 "        [node color =color ];"
-"        n iota ["
+"        n <iota> ["
 "            number>string color prepend add-node"
 "        ] each ;"
 ""
@@ -674,7 +674,7 @@ $nl
 "graphviz graphviz.notation graphviz.render ;"
 ""
 ": add-cycle ( graph n -- graph' )"
-"    [ iota add-path ] [ 1 - 0 add-edge ] bi ;"
+"    [ <iota> add-path ] [ 1 - 0 add-edge ] bi ;"
 ""
 ": C_n ( n -- )"
 "    <graph>"
@@ -703,7 +703,7 @@ $nl
 "graphviz graphviz.notation graphviz.render ;"
 ""
 ": add-cycle ( graph n -- graph' )"
-"    [ iota add-path ] [ 1 - 0 add-edge ] bi ;"
+"    [ <iota> add-path ] [ 1 - 0 add-edge ] bi ;"
 ""
 ": W_n ( n -- )"
 "    <graph>"
@@ -712,7 +712,7 @@ $nl
 "        over number>string \"W \" prepend =label"
 "        over add-node"
 "        over 1 - add-cycle"
-"        swap [ ] [ 1 - iota >array ] bi add-edge"
+"        swap [ ] [ 1 - <iota> >array ] bi add-edge"
 "    preview ;"
 }
 $nl
@@ -788,7 +788,7 @@ $nl
 ""
 "    0 [add-node \"invis\" =style \"none\" =shape ];"
 ""
-"    16 iota ["
+"    16 <iota> ["
 "        [ 0 -- ] [ colored-circle add ] bi"
 "    ] each"
 "preview"

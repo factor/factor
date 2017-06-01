@@ -26,18 +26,18 @@ IN: random.cmwc.tests
 }
 } [
     cmwc-4096
-    4096 iota uint >c-array 362436 <cmwc-seed> seed-random [
+    4096 <iota> uint >c-array 362436 <cmwc-seed> seed-random [
         10 [ random-32 ] replicate
     ] with-random
 ] unit-test
 
 { t } [
     cmwc-4096 [
-        4096 iota uint >c-array 362436 <cmwc-seed> seed-random [
+        4096 <iota> uint >c-array 362436 <cmwc-seed> seed-random [
             10 [ random-32 ] replicate
         ] with-random
     ] [
-        4096 iota uint >c-array 362436 <cmwc-seed> seed-random [
+        4096 <iota> uint >c-array 362436 <cmwc-seed> seed-random [
             10 [ random-32 ] replicate
         ] with-random
     ] bi =

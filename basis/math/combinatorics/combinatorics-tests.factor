@@ -30,9 +30,9 @@ IN: math.combinatorics.tests
 { { 0 1 3 2 } } [ { 0 0 1 0 } >permutation ] unit-test
 { { 1 2 0 6 3 5 4 } } [ { 1 1 0 3 0 1 0 } >permutation ] unit-test
 
-{ { 0 1 2 3 } } [ 0 4 iota permutation-indices ] unit-test
-{ { 0 1 3 2 } } [ 1 4 iota permutation-indices ] unit-test
-{ { 1 2 0 6 3 5 4 } } [ 859 7 iota permutation-indices ] unit-test
+{ { 0 1 2 3 } } [ 0 4 <iota> permutation-indices ] unit-test
+{ { 0 1 3 2 } } [ 1 4 <iota> permutation-indices ] unit-test
+{ { 1 2 0 6 3 5 4 } } [ 859 7 <iota> permutation-indices ] unit-test
 
 { { "a" "b" "c" "d" } } [ 0 { "a" "b" "c" "d" } permutation ] unit-test
 { { "d" "c" "b" "a" } } [ 23 { "a" "b" "c" "d" } permutation ] unit-test
@@ -102,7 +102,7 @@ IN: math.combinatorics.tests
 { { 2 1 3 } } [ { 1 2 3 } [ first 2 = ] find-permutation ] unit-test
 
 { { { 0 1 2 } { 0 2 1 } { 1 0 2 } { 1 2 0 } { 2 0 1 } { 2 1 0 } } }
-[ 3 iota <permutations> >array ] unit-test
+[ 3 <iota> <permutations> >array ] unit-test
 
 { { "as" "ad" "af" "sa" "sd" "sf" "da" "ds" "df" "fa" "fs" "fd" } }
 [ "asdf" 2 <k-permutations> >array ] unit-test

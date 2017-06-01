@@ -30,7 +30,7 @@ M: md5 initialize-checksum-state drop <md5-state> ;
     [ old-state<< ] [ state<< ] bi ; inline
 
 CONSTANT: T $[
-    80 iota [ sin abs 32 2^ * >integer ] uint-array{ } map-as
+    80 <iota> [ sin abs 32 2^ * >integer ] uint-array{ } map-as
 ]
 
 :: F ( X Y Z -- FXYZ )

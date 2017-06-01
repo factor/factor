@@ -64,7 +64,7 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     dup tuple? [ not-a-tuple ] unless ; inline
 
 : prepare-tuple-slots ( tuple -- n tuple )
-    check-tuple [ tuple-size iota ] keep ;
+    check-tuple [ tuple-size <iota> ] keep ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -98,7 +98,7 @@ GENERIC: slots>tuple ( seq class -- tuple )
 M: tuple-class slots>tuple ( seq class -- tuple )
     check-slots pad-slots
     tuple-layout <tuple> [
-        [ tuple-size iota ]
+        [ tuple-size <iota> ]
         [ [ set-array-nth ] curry ]
         bi 2each
     ] keep ;
@@ -372,7 +372,7 @@ M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
     [
         [ drop 1000003 ] dip
         [ class-of hashcode ] [ tuple-size ] bi
-        [ dup fixnum+fast 82520 fixnum+fast ] [ iota ] bi
+        [ dup fixnum+fast 82520 fixnum+fast ] [ <iota> ] bi
     ] 2keep [
         swapd array-nth hashcode* >fixnum rot fixnum-bitxor
         pick fixnum*fast [ [ fixnum+fast ] keep ] dip swap

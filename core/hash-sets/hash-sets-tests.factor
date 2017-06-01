@@ -51,7 +51,7 @@ sets sorting tools.test ;
 
 ! make sure growth and capacity use same load-factor
 { t } [
-    100 iota
+    100 <iota>
     [ [ <hash-set> ] map ]
     [ [ HS{ } clone [ '[ _ adjoin ] each-integer ] keep ] map ] bi
     [ [ array>> length ] bi@ = ] 2all?

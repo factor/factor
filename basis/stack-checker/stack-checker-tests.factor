@@ -459,7 +459,7 @@ DEFER: eee'
     ] [ 4drop ] if ; inline recursive
 : recursive-reduce ( seq i quot: ( prev elt -- next ) -- result )
     swapd [ 0 ] 2dip over length (recursive-reduce) ; inline
-{ 24995000 } [ 10000 iota 0 [ dup even? [ + ] [ drop ] if ] recursive-reduce ] unit-test
+{ 24995000 } [ 10000 <iota> 0 [ dup even? [ + ] [ drop ] if ] recursive-reduce ] unit-test
 { 3 1 } [ [ member? [ 1 + ] when ] curry recursive-reduce ] must-infer-as
 
 [ [ [ write write ] each      ] infer ] [ unbalanced-branches-error? ] must-fail-with

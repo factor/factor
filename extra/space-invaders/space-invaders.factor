@@ -322,7 +322,7 @@ CONSTANT: red   { 255   0   0 }
     plot-bitmap-pixel ;
 
 : do-bitmap-update ( bitmap value addr -- )
-    addr>xy swap 8 iota [ plot-bitmap-bits ] with with with each ;
+    addr>xy swap 8 <iota> [ plot-bitmap-bits ] with with with each ;
 
 M: space-invaders update-video
     over 0x2400 >= [

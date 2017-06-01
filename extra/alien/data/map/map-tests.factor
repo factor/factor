@@ -19,7 +19,7 @@ IN: alien.data.map.tests
         float-4{ 2.0 2.0 2.0 2.0 }
     }
 } [
-    3 iota [ float-4-with ] data-map( object -- float-4 )
+    3 <iota> [ float-4-with ] data-map( object -- float-4 )
     float-4 cast-array
 ] unit-test
 
@@ -30,7 +30,7 @@ IN: alien.data.map.tests
         float-4{ 8.0 9.0 10.0 11.0 }
     }
 } [
-    12 iota [ float-4-boa ] data-map( object[4] -- float-4 )
+    12 <iota> [ float-4-boa ] data-map( object[4] -- float-4 )
     float-4 cast-array
 ] unit-test
 

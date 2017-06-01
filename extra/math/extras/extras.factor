@@ -34,7 +34,7 @@ DEFER: bernoulli
 <PRIVATE
 
 : (bernoulli) ( p -- n )
-    [ iota ] [ 1 + ] bi [
+    [ <iota> ] [ 1 + ] bi [
         0 [ [ nCk ] [ bernoulli * ] bi + ] with reduce
     ] keep recip neg * ;
 
@@ -119,13 +119,13 @@ PRIVATE>
 
 : bartlett ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
-        [ iota ] [ 1 - 2 / ] bi [
+        [ <iota> ] [ 1 - 2 / ] bi [
             [ recip * ] [ >= ] 2bi [ 2 swap - ] when
         ] curry map
     ] if ;
 
 : [0,2pi] ( n -- seq )
-    [ iota ] [ 1 - 2pi swap / ] bi v*n ;
+    [ <iota> ] [ 1 - 2pi swap / ] bi v*n ;
 
 : hanning ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
@@ -202,7 +202,7 @@ PRIVATE>
     unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
-    [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
+    [ members ] keep over dup length <iota> H{ } zip-as '[ _ at ] map ;
 
 : digitize] ( seq bins -- seq' )
     '[ _ bisect-left ] map ;
@@ -309,12 +309,12 @@ PRIVATE>
 
 GENERIC: sum-squares ( seq -- n )
 M: object sum-squares [ sq ] map-sum ;
-M: iota-tuple sum-squares
+M: iota sum-squares
     length 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
 
 GENERIC: sum-cubes ( seq -- n )
 M: object sum-cubes [ 3 ^ ] map-sum ;
-M: iota-tuple sum-cubes sum sq ;
+M: iota sum-cubes sum sq ;
 
 : mobius ( n -- x )
     group-factors values [ 1 ] [

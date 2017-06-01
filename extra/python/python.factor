@@ -54,10 +54,10 @@ SPECIALIZED-ARRAY: void*
     [ rot py-list-set-item ] with each-index ;
 
 : py-tuple>array ( py-tuple -- arr )
-    dup py-tuple-size iota [ py-tuple-get-item ] with map ;
+    dup py-tuple-size <iota> [ py-tuple-get-item ] with map ;
 
 : py-list>vector ( py-list -- vector )
-    dup py-list-size iota [ py-list-get-item ] with V{ } map-as ;
+    dup py-list-size <iota> [ py-list-get-item ] with V{ } map-as ;
 
 DEFER: >py
 

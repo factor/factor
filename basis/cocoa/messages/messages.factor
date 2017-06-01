@@ -223,7 +223,7 @@ ERROR: no-objc-type name ;
     (free) ;
 
 : method-arg-types ( method -- args )
-    dup method_getNumberOfArguments iota
+    dup method_getNumberOfArguments <iota>
     [ method-arg-type ] with map ;
 
 : method-return-type ( method -- ctype )

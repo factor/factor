@@ -31,7 +31,7 @@ TUPLE: nurbs-curve
     c1 c2 c3 c4 float-array{ } 4sequence ;
 
 : order-knot-constants ( curve order -- knot-constants )
-    2dup [ knots>> length ] dip - iota
+    2dup [ knots>> length ] dip - <iota>
     [ order-index-knot-constants ] 2with map ;
 
 : knot-constants ( curve -- knot-constants )

@@ -171,7 +171,7 @@ PRIVATE>
 :: each-pixel ( ... image quot: ( ... x y pixel -- ... ) -- ... )
     image dim>> first2 :> ( width height )
     image bytes-per-pixel :> n
-    height width [ iota ] bi@ [| y x |
+    height width [ <iota> ] bi@ [| y x |
         y width * x + :> start
         start n * :> from
         from n + :> to

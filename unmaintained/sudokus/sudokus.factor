@@ -14,7 +14,7 @@ IN: sudokus
 :: solutions ( puzzle random? -- solutions )
     f puzzle random? [ indices [ f ] [ random? swap nth-or-lower ] if-empty ] [ index ] if
     [ :> pos
-      1 9 [a,b] 80 iota [ pos near ] filter [ puzzle nth ] map prune diff
+      1 9 [a,b] 80 <iota> [ pos near ] filter [ puzzle nth ] map prune diff
       [ 1array puzzle pos cut-slice rest surround ] map >list [ random? solutions ] bind
     ] [ puzzle list-monad return ] if* ;
 

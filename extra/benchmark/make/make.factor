@@ -9,13 +9,13 @@ IN: benchmark.make
     [ [ CHAR: a , ] times ] "" make ;
 
 : make-arrays ( n -- seq )
-    [ iota % ] { } make ;
+    [ <iota> % ] { } make ;
 
 : make-vectors ( n -- seq )
-    [ iota % ] V{ } make ;
+    [ <iota> % ] V{ } make ;
 
 : make-benchmark ( -- )
-    5,000 iota [
+    5,000 <iota> [
         [ make-strings ] [ make-arrays ] [ make-vectors ] tri
         3drop
     ] each ;

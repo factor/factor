@@ -134,7 +134,7 @@ TUPLE: jpeg-color-info
     data>>
     binary
     [
-        read1 iota
+        read1 <iota>
         [   drop
             read1 jpeg> color-info>> nth clone
             read1 16 /mod [ >>dc-huff-table ] [ >>ac-huff-table ] bi*
@@ -195,7 +195,7 @@ MEMO: yuv>bgr-matrix ( -- m )
     { 8 8 } coord-matrix [ { u v } [ wave ] 2map product ] map^2
     1 u v [ 0 = [ 2 sqrt / ] when ] bi@ 4 / m*n ;
 
-MEMO: dct-matrix ( -- m ) 64 iota [ 8 /mod dct-vect flatten ] map ;
+MEMO: dct-matrix ( -- m ) 64 <iota> [ 8 /mod dct-vect flatten ] map ;
 
 : mb-dim ( component -- dim )  [ h>> ] [ v>> ] bi 2array ;
 
@@ -265,7 +265,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     
 :: draw-macroblock-yuv444 ( mb blocks -- )
     mb { 8 8 } v* :> pos
-    3 iota [ [ blocks nth pos ] [ jpeg> draw-block ] bi ] each ;
+    3 <iota> [ [ blocks nth pos ] [ jpeg> draw-block ] bi ] each ;
 
 :: draw-macroblock-y ( mb blocks -- )
     mb { 8 8 } v* :> pos

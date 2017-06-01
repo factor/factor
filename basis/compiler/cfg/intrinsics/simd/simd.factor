@@ -76,7 +76,7 @@ CONSTANT: rep>half {
 : >variable-shuffle ( shuffle rep -- shuffle' )
     rep-component-type heap-size
     [ dup <repetition> >byte-array ]
-    [ iota >byte-array ] bi
+    [ <iota> >byte-array ] bi
     '[ _ n*v _ v+ ] map concat ;
 
 : ^load-immediate-shuffle ( shuffle rep -- dst )

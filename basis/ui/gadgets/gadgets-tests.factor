@@ -163,7 +163,7 @@ ui-running? [
         <flag> ui-notify-flag set-global
 
         [ fake-ui-loop ] "Fake UI" spawn drop
-        8001 iota [ layout-later ] each
+        8001 <iota> [ layout-later ] each
         ui-notify-flag get-global value>>
         layout-queue delete-all
     ] unit-test

@@ -74,7 +74,7 @@ SYMBOL: terms
     [ > ] with count ;
 
 : inversions ( seq -- n )
-    0 swap [ length iota ] keep [
+    0 swap [ length <iota> ] keep [
         [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
@@ -142,12 +142,12 @@ DEFER: (d)
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
-    over length iota [
+    over length <iota> [
         3dup bit? [ nth ] [ 2drop f ] if
     ] map sift 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ iota [ nth-basis-elt ] with map ;
+    natural-sort dup length 2^ <iota> [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
@@ -177,7 +177,7 @@ DEFER: (d)
     dim-im/ker-d ;
 
 : graded-ker/im-d ( graded-basis -- seq )
-    [ length iota ] keep [ (graded-ker/im-d) ] curry map ;
+    [ length <iota> ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
     basis graded graded-ker/im-d unzip but-last 0 prefix v- ;
@@ -189,8 +189,8 @@ DEFER: (d)
     dim-im/ker-d ;
 
 :: bigraded-ker/im-d ( basis -- seq )
-    basis length iota [| z |
-         basis first length iota [| u |
+    basis length <iota> [| z |
+         basis first length <iota> [| u |
             u z basis (bigraded-ker/im-d)
         ] map
     ] map ;
@@ -265,8 +265,8 @@ DEFER: (d)
     3array ;
 
 :: bigraded-triples ( grid -- triples )
-    grid length iota [| z |
-        grid first length iota [| u |
+    grid length <iota> [| z |
+        grid first length <iota> [| u |
             u z grid bigraded-triple
         ] map
     ] map ;

@@ -72,7 +72,7 @@ ERROR: pcre-error value ;
 
 : name-table-entries ( pcre extra -- addrs )
     [ name-table ] [ name-entry-size ] [ name-count ] 2tri
-    iota [ * + name-table-entry 2array ] 2with map ;
+    <iota> [ * + name-table-entry 2array ] 2with map ;
 
 : options ( pcre -- opts )
     f PCRE_INFO_OPTIONS pcre-fullinfo ;

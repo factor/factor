@@ -19,7 +19,7 @@ IN: rosetta-code.long-multiplication
 
 : longmult-seq ( xs ys -- zs )
     [ * ] cartesian-map
-    dup length iota [ 0 <repetition> ] map
+    dup length <iota> [ 0 <repetition> ] map
     [ prepend ] 2map
     [ ] [ [ 0 suffix ] dip v+ ] map-reduce ;
 
