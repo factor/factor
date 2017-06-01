@@ -279,7 +279,7 @@ these lines in your .emacs:
 (defconst factor-word-definition-regex
   (concat
    (one-symbol (regexp-opt
-                '(":" "::" "GENERIC:" "GENERIC#" "DEFER:" "HOOK:"
+                '(":" "::" "GENERIC:" "GENERIC#:" "DEFER:" "HOOK:"
                   "IDENTITY-MEMO:" "MACRO:" "MACRO::" "MATH:" "MEMO:" "MEMO::"
                   "POSTPONE:" "PRIMITIVE:" "SYNTAX:" "TYPED:" "TYPED::")))
    ws+ symbol))
@@ -343,7 +343,7 @@ these lines in your .emacs:
                 "CONSTANT:" "C-GLOBAL:" "C-TYPE:"
                 "DEFER:" "DESTRUCTOR:"
                 "FORGET:"
-                "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:"
+                "GAME:" "GENERIC:" "GENERIC#:" "GLSL-PROGRAM:"
                 "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"

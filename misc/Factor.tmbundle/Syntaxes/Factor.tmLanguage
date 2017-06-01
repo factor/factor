@@ -138,7 +138,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>(^|(?&lt;=\s))(GENERIC#)\s+([^\s]+)\s(\d+)\s</string>
+			<string>(^|(?&lt;=\s))(GENERIC#:)\s+([^\s]+)\s(\d+)\s</string>
 			<key>name</key>
 			<string>definition.word.generic.factor</string>
 		</dict>
