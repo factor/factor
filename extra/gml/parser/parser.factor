@@ -91,7 +91,7 @@ ArrayEnd = ']' => [[ exec" ]" ]]
 
 ExecArray = '{' Token*:ts Spaces '}' => [[ ts parse-proc ]]
 
-LiteralName = '/' Name:n => [[ n name ]]
+LiteralName = '/' Name:n => [[ n >gml-name ]]
 
 UseReg = "usereg" !(NameChar) => [[ <use-registers> ]]
 
@@ -99,9 +99,9 @@ ReadReg = ";" Name:n => [[ n <read-register> ]]
 ExecReg = ":" Name:n => [[ n <exec-register> ]]
 WriteReg = "!" Name:n => [[ n <write-register> ]]
 
-ExecName = Name:n => [[ n exec-name ]]
+ExecName = Name:n => [[ n >gml-exec-name ]]
 
-PathNameComponent = "." Name:n => [[ n name ]]
+PathNameComponent = "." Name:n => [[ n >gml-name ]]
 PathName = PathNameComponent+ => [[ <pathname> ]]
 
 Token = Spaces

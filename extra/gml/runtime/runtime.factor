@@ -6,13 +6,13 @@ vectors words generalizations sequences.generalizations
 effects.parser gml.types ;
 IN: gml.runtime
 
-TUPLE: name < identity-tuple { string read-only } ;
+TUPLE: gml-name < identity-tuple { string read-only } ;
 
-SYMBOL: names
+SYMBOL: gml-names
 
-names [ H{ } clone ] initialize
+gml-names [ H{ } clone ] initialize
 
-: name ( string -- name ) names get-global [ \ name boa ] cache ;
+: >gml-name ( string -- name ) gml-names get-global [ \ gml-name boa ] cache ;
 
 TUPLE: gml { operand-stack vector } { dictionary-stack vector } ;
 
@@ -49,13 +49,13 @@ EXEC: object over push-operand ;
 EXEC: proc array>> pick <proc> over push-operand ;
 
 ! Executable names
-TUPLE: exec-name < identity-tuple name ;
+TUPLE: gml-exec-name < identity-tuple name ;
 
-MEMO: exec-name ( string -- name ) name \ exec-name boa ;
+MEMO: >gml-exec-name ( string -- name ) >gml-name \ gml-exec-name boa ;
 
-SYNTAX: exec" lexer get skip-blank parse-string exec-name suffix! ;
+SYNTAX: exec" lexer get skip-blank parse-string >gml-exec-name suffix! ;
 
-ERROR: unbound-name { name name } ;
+ERROR: unbound-name { name gml-name } ;
 
 : lookup-name ( name gml -- value )
     dupd dictionary-stack>> assoc-stack
@@ -77,7 +77,7 @@ M: word exec-proc primitive-effect execute-effect-unsafe ;
 
 M: object exec-proc (exec) ;
 
-EXEC: exec-name name>> over lookup-name exec-proc ;
+EXEC: gml-exec-name name>> over lookup-name exec-proc ;
 
 ! Registers
 ERROR: unbound-register name ;
@@ -129,8 +129,8 @@ EXEC:: pathname ( registers gml obj -- registers gml )
     registers gml ;
 
 ! List building and stuff
-TUPLE: marker < identity-tuple ;
-CONSTANT: marker T{ marker }
+TUPLE: gml-marker < identity-tuple ;
+CONSTANT: marker T{ gml-marker }
 
 ERROR: no-marker-found ;
 ERROR: gml-stack-underflow ;
@@ -177,7 +177,7 @@ SYMBOL: global-dictionary
 global-dictionary [ H{ } clone ] initialize
 
 : add-primitive ( word name -- )
-    name global-dictionary get-global set-at ;
+    >gml-name global-dictionary get-global set-at ;
 
 : define-gml-primitive ( word name effect def -- )
     [ '[ _ add-primitive ] keep ]
