@@ -60,7 +60,7 @@ patterns: [
         name: "entity.name.generic.factor"
       "5":
         name: "comment.stack-effect.factor"
-    match: "(^|(?<=\\s))(GENERIC#)\\s+([^\\s]+)\\s(\\d+)\\s"
+    match: "(^|(?<=\\s))(GENERIC#:)\\s+([^\\s]+)\\s(\\d+)\\s"
     name: "definition.word.generic.factor"
   }
   {
