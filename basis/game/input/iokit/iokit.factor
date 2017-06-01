@@ -338,7 +338,7 @@ M: iokit-game-input-backend get-controllers ( -- sequence )
     +controller-states+ get-global keys [ controller boa ] map ;
 
 : ?join ( pre post sep -- string )
-    2over start [ swap 2nip ] [ [ 2array ] dip join ] if ;
+    2over subseq-start [ swap 2nip ] [ [ 2array ] dip join ] if ;
 
 M: iokit-game-input-backend product-string ( controller -- string )
     handle>>

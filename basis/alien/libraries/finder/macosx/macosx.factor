@@ -121,7 +121,7 @@ PRIVATE>
 
 : framework-find ( name -- path )
     dup dyld-find [ nip ] [
-        ".framework" over start [
+        ".framework" over subseq-start [
             dupd head
         ] [
             [ ".framework" append ] keep

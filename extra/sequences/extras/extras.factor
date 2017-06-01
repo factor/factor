@@ -579,7 +579,7 @@ PRIVATE>
 
 :: (start-all) ( subseq seq increment -- indices )
     0
-    [ [ subseq seq ] dip start* dup ]
+    [ [ subseq seq ] dip subseq-start-from dup ]
     [ [ increment + ] keep ] produce nip ;
 
 : start-all ( subseq seq -- indices )

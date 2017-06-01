@@ -12,14 +12,14 @@ vectors ;
 { "abc" } [ "ab" "c" append ] unit-test
 { "abc" } [ "a" "b" "c" 3append ] unit-test
 
-{ 3 } [ "a" "hola" start ] unit-test
-{ f } [ "x" "hola" start ] unit-test
-{ 0 } [ "" "a" start ] unit-test
-{ 0 } [ "" "" start ] unit-test
-{ 0 } [ "hola" "hola" start ] unit-test
-{ 1 } [ "ol" "hola" start ] unit-test
-{ f } [ "amigo" "hola" start ] unit-test
-{ f } [ "holaa" "hola" start ] unit-test
+{ 3 } [ "a" "hola" subseq-start ] unit-test
+{ f } [ "x" "hola" subseq-start ] unit-test
+{ 0 } [ "" "a" subseq-start ] unit-test
+{ 0 } [ "" "" subseq-start ] unit-test
+{ 0 } [ "hola" "hola" subseq-start ] unit-test
+{ 1 } [ "ol" "hola" subseq-start ] unit-test
+{ f } [ "amigo" "hola" subseq-start ] unit-test
+{ f } [ "holaa" "hola" subseq-start ] unit-test
 
 { "Beginning" } [ "Beginning and end" 9 head ] unit-test
 
