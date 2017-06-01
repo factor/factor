@@ -277,7 +277,7 @@ M: tuple-class update-class
     dup final-class? [ bad-superclass ] when
     dup class? [ bad-superclass ] unless drop ;
 
-GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
+GENERIC#: (define-tuple-class) 2 ( class superclass slots -- )
 
 : thrower-effect ( slots -- effect )
     [ name>> ] map { "*" } <effect> ;

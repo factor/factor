@@ -91,7 +91,7 @@ ERROR: bad-slot-name class slot ;
 : parse-slot-values ( class slots -- values )
     [ (parse-slot-values) ] { } make ;
 
-GENERIC# boa>object 1 ( class slots -- tuple )
+GENERIC#: boa>object 1 ( class slots -- tuple )
 
 M: tuple-class boa>object
     swap slots>tuple ;

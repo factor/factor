@@ -7,7 +7,7 @@ namespaces sequences sequences.private strings strings.private
 system system.private ;
 IN: alien.strings
 
-GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
+GENERIC#: alien>string 1 ( c-ptr encoding -- string/f )
 
 M: c-ptr alien>string
     [ <memory-stream> ] [ <decoder> ] bi*
@@ -24,7 +24,7 @@ ERROR: invalid-c-string string ;
 : check-string ( string -- )
     0 over member-eq? [ invalid-c-string ] [ drop ] if ;
 
-GENERIC# string>alien 1 ( string encoding -- byte-array )
+GENERIC#: string>alien 1 ( string encoding -- byte-array )
 
 M: c-ptr string>alien drop ;
 

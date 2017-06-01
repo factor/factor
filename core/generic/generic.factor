@@ -186,7 +186,7 @@ M: method forget*
         [ call-next-method ] bi
     ] if ;
 
-GENERIC# check-combination-effect 1 ( combination effect -- )
+GENERIC#: check-combination-effect 1 ( combination effect -- )
 
 M: object check-combination-effect 2drop ;
 

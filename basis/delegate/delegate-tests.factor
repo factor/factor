@@ -12,7 +12,7 @@ C: <goodbye> goodbye
 
 GENERIC: foo ( x -- y )
 GENERIC: bar ( a -- b )
-GENERIC# whoa 1 ( s t -- w )
+GENERIC#: whoa 1 ( s t -- w )
 PROTOCOL: baz foo { bar 0 } { whoa 1 } ;
 
 : hello-test ( hello/goodbye -- array )

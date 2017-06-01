@@ -228,7 +228,7 @@ M: number +second ( timestamp n -- timestamp )
 
 PRIVATE>
 
-GENERIC# time+ 1 ( time1 time2 -- time3 )
+GENERIC#: time+ 1 ( time1 time2 -- time3 )
 
 M: timestamp time+
     [ clone ] dip (time+) drop ;

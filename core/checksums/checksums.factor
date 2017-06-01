@@ -35,7 +35,7 @@ M: checksum-state clone
     new BV{ } clone >>bytes ;
 
 GENERIC: initialize-checksum-state ( checksum -- checksum-state )
-GENERIC# add-checksum-bytes 1 ( checksum-state data -- checksum-state )
+GENERIC#: add-checksum-bytes 1 ( checksum-state data -- checksum-state )
 GENERIC: get-checksum ( checksum-state -- value )
 
 : with-checksum-state ( ..a checksum quot: ( ..a checksum-state -- ..b ) -- ..b )

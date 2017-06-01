@@ -63,6 +63,6 @@ M: standard-combination inline-cache-quots
 M: standard-combination mega-cache-quot
     combination get #>> make-empty-cache \ mega-cache-lookup [ ] 4sequence ;
 
-M: standard-generic definer drop \ GENERIC# f ;
+M: standard-generic definer drop \ GENERIC#: f ;
 
 M: simple-generic definer drop \ GENERIC: f ;

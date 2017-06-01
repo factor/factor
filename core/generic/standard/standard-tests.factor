@@ -194,7 +194,7 @@ M: byte-array small-lo-tag drop "byte-array" ;
 ] must-fail
 { } [ "IN: generic.standard.tests GENERIC: unhappy ( x -- x )" eval( -- ) ] unit-test
 
-GENERIC# complex-combination 1 ( a b -- c )
+GENERIC#: complex-combination 1 ( a b -- c )
 M: string complex-combination drop ;
 M: object complex-combination nip ;
 
@@ -368,13 +368,13 @@ M: c funky* "c" , call-next-method ;
 [ "IN: generic.standard.tests GENERIC: broken-generic ( -- )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
-[ "IN: generic.standard.tests GENERIC# broken-generic# -1 ( a -- b )" eval( -- ) ]
+[ "IN: generic.standard.tests GENERIC#: broken-generic# -1 ( a -- b )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
-[ "IN: generic.standard.tests GENERIC# broken-generic# 1 ( a -- b )" eval( -- ) ]
+[ "IN: generic.standard.tests GENERIC#: broken-generic# 1 ( a -- b )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
-[ "IN: generic.standard.tests GENERIC# broken-generic# 2/3 ( a b c -- )" eval( -- ) ]
+[ "IN: generic.standard.tests GENERIC#: broken-generic# 2/3 ( a b c -- )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
 

@@ -22,7 +22,7 @@ SYMBOL: json-escape-unicode?
 f json-escape-unicode? set-global
 
 ! Writes the object out to a stream in JSON format
-GENERIC# stream-json-print 1 ( obj stream -- )
+GENERIC#: stream-json-print 1 ( obj stream -- )
 
 : json-print ( obj -- )
     output-stream get stream-json-print ;

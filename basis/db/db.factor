@@ -41,8 +41,8 @@ TUPLE: result-set sql in-params out-params handle n max ;
 GENERIC: query-results ( query -- result-set )
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
-GENERIC# row-column 1 ( result-set column -- obj )
-GENERIC# row-column-typed 1 ( result-set column -- sql )
+GENERIC#: row-column 1 ( result-set column -- obj )
+GENERIC#: row-column-typed 1 ( result-set column -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 

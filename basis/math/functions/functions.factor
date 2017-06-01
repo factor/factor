@@ -32,7 +32,7 @@ M: real sqrt
 : (^n) ( z w -- z^w )
     dup fixnum? [ (^fixnum) ] [ (^bignum) ] if ; inline
 
-GENERIC# ^n 1 ( z w -- z^w ) foldable
+GENERIC#: ^n 1 ( z w -- z^w ) foldable
 
 M: fixnum ^n (^n) ;
 
@@ -168,7 +168,7 @@ M: integer frexp
 
 DEFER: copysign
 
-GENERIC# ldexp 1 ( x exp -- y )
+GENERIC#: ldexp 1 ( x exp -- y )
 
 M: float ldexp
     over fp-special? [ over zero? ] unless* [ drop ] [

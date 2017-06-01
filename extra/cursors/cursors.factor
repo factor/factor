@@ -40,8 +40,8 @@ GENERIC: dec-cursor ( cursor -- cursor' )
 MIXIN: random-access-cursor
 INSTANCE: random-access-cursor bidirectional-cursor
 
-GENERIC# cursor+ 1 ( cursor n -- cursor' )
-GENERIC# cursor- 1 ( cursor n -- cursor' )
+GENERIC#: cursor+ 1 ( cursor n -- cursor' )
+GENERIC#: cursor- 1 ( cursor n -- cursor' )
 GENERIC: cursor-distance ( cursor cursor -- n )
 GENERIC: cursor<  ( cursor cursor -- ? )
 GENERIC: cursor>  ( cursor cursor -- ? )
@@ -391,7 +391,7 @@ M: pusher-cursor set-cursor-value growable>> push ; inline
 : new-growable-cursor ( begin end exemplar -- cursor result )
     [ swap cursor-distance-hint ] dip new-resizable [ <pusher-cursor> ] keep ; inline
 
-GENERIC# new-sequence-cursor 1 ( begin end exemplar -- cursor result )
+GENERIC#: new-sequence-cursor 1 ( begin end exemplar -- cursor result )
 
 M: random-access-cursor new-sequence-cursor
     [ swap cursor-distance ] dip new-sequence [ begin-cursor ] keep ; inline

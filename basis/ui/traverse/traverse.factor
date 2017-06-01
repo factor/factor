@@ -89,7 +89,7 @@ M: node gadget-text*
 : gadget-at-path ( parent path -- gadget )
     [ swap nth-gadget ] each ;
 
-GENERIC# leaves* 1 ( tree set -- )
+GENERIC#: leaves* 1 ( tree set -- )
 
 M: node leaves* [ children>> ] dip leaves* ;
 

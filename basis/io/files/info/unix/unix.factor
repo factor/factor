@@ -111,7 +111,7 @@ M: unix stat>type ( stat -- type )
     [ dup stat-mode ] 2dip
     [ bitor ] [ unmask ] if [ chmod ] unix-system-call drop ;
 
-GENERIC# file-mode? 1 ( obj mask -- ? )
+GENERIC#: file-mode? 1 ( obj mask -- ? )
 
 M: integer file-mode? mask? ;
 M: string file-mode? [ stat-mode ] dip mask? ;

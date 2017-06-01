@@ -203,7 +203,7 @@ M: cube-map-face     texture-data-gl-target
 
 PRIVATE>
 
-GENERIC# allocate-texture 3 ( tdt level dim data -- )
+GENERIC#: allocate-texture 3 ( tdt level dim data -- )
 
 M: texture-1d-data-target allocate-texture ( tdt level dim data -- )
     [ ] [ glTexImage1D ] (allocate-texture) ;
@@ -214,7 +214,7 @@ M: texture-2d-data-target allocate-texture ( tdt level dim data -- )
 M: texture-3d-data-target allocate-texture ( tdt level dim data -- )
     [ first3 ] [ glTexImage3D ] (allocate-texture) ;
 
-GENERIC# allocate-compressed-texture 3 ( tdt level dim compressed-data -- )
+GENERIC#: allocate-compressed-texture 3 ( tdt level dim compressed-data -- )
 
 M: texture-1d-data-target allocate-compressed-texture ( tdt level dim compressed-data -- )
     [ ] [ glCompressedTexImage1D ] (allocate-compressed-texture) ;
@@ -225,7 +225,7 @@ M: texture-2d-data-target allocate-compressed-texture ( tdt level dim compressed
 M: texture-3d-data-target allocate-compressed-texture ( tdt level dim compressed-data -- )
     [ first3 ] [ glCompressedTexImage3D ] (allocate-compressed-texture) ;
 
-GENERIC# update-texture 4 ( tdt level loc dim data -- )
+GENERIC#: update-texture 4 ( tdt level loc dim data -- )
 
 M: texture-1d-data-target update-texture ( tdt level loc dim data -- )
     [ ] [ glTexSubImage1D ] (update-texture) ;
@@ -236,7 +236,7 @@ M: texture-2d-data-target update-texture ( tdt level loc dim data -- )
 M: texture-3d-data-target update-texture ( tdt level loc dim data -- )
     [ first3 ] [ glTexSubImage3D ] (update-texture) ;
 
-GENERIC# update-compressed-texture 4 ( tdt level loc dim compressed-data -- )
+GENERIC#: update-compressed-texture 4 ( tdt level loc dim compressed-data -- )
 
 M: texture-1d-data-target update-compressed-texture ( tdt level loc dim compressed-data -- )
     [ ] [ glCompressedTexSubImage1D ] (update-compressed-texture) ;
@@ -251,7 +251,7 @@ M: texture-3d-data-target update-compressed-texture ( tdt level loc dim compress
     { [ dim>> ] [ bitmap>> ] [ component-order>> ] [ component-type>> ] } cleave
     <texture-data> ; inline
 
-GENERIC# texture-dim 1 ( tdt level -- dim )
+GENERIC#: texture-dim 1 ( tdt level -- dim )
 
 M:: texture-1d-data-target texture-dim ( tdt level -- dim )
     tdt bind-tdt :> texture

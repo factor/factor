@@ -139,8 +139,8 @@ M: integer forget-robustness-generic ;
 ] with-compilation-unit
 
 ! rapido found this one
-GENERIC# m1 0 ( s n -- n )
-GENERIC# m2 1 ( s n -- v )
+GENERIC#: m1 0 ( s n -- n )
+GENERIC#: m2 1 ( s n -- v )
 
 TUPLE: t1 ;
 

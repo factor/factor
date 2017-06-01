@@ -16,7 +16,7 @@ IN: compiler.cfg.gc-checks
 : blocks-with-gc ( cfg -- bbs )
     post-order [ insert-gc-check? ] filter ;
 
-GENERIC# gc-check-offsets* 1 ( call-index seen-allocation? insn n -- call-index seen-allocation? )
+GENERIC#: gc-check-offsets* 1 ( call-index seen-allocation? insn n -- call-index seen-allocation? )
 
 :: gc-check-here ( call-index seen-allocation? insn insn-index -- call-index seen-allocation? )
     seen-allocation? [ call-index , ] when

@@ -66,11 +66,11 @@ GENERIC: >layout ( gadget -- layout )
 M: gadget >layout f <layout> ;
 M: layout >layout ;
 
-GENERIC# (add-gadget-at) 2 ( parent item n -- )
+GENERIC#: (add-gadget-at) 2 ( parent item n -- )
 M: gadget (add-gadget-at) -rot [ add-gadget ] keep insert-gadget ;
 M: track (add-gadget-at) -rot >layout [ add-layout ] keep [ gadget>> insert-gadget ] [ size>> insert-size ] 3bi ;
 
-GENERIC# add-gadget-at 1 ( item location -- )
+GENERIC#: add-gadget-at 1 ( item location -- )
 M: object add-gadget-at insertion-point -rot (add-gadget-at) ;
 M: model add-gadget-at parent>> dup book:book? [ "No models in books" throw ]
    [ dup model>> dup collection? [ nip swap add-connection ] [ drop [ 1array <collection> ] dip model<< ] if ] if ;

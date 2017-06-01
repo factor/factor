@@ -438,7 +438,7 @@ DEFER: foo
     {
         "IN: parser.tests"
         "USING: math arrays kernel ;"
-        "GENERIC# change-combination 1 ( obj a -- b )"
+        "GENERIC#: change-combination 1 ( obj a -- b )"
         "M: integer change-combination 2drop 1 ;"
         "M: array change-combination 2drop 2 ;"
     } "\n" join <string-reader> "change-combination-test" parse-stream drop

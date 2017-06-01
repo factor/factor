@@ -42,8 +42,8 @@ C: <end> end
     [ [ two>> ] [ three>> ] bi ] 2dip bi* ; inline
 
 GENERIC: merge ( t t -- t )
-GENERIC# block-merge 1 ( t t -- t )
-GENERIC# end-merge 1 ( t t -- t )
+GENERIC#: block-merge 1 ( t t -- t )
+GENERIC#: end-merge 1 ( t t -- t )
 M: block merge block-merge ;
 M: end   merge end-merge ;
 M: block block-merge [ [ two>>   ] bi@ merge ]

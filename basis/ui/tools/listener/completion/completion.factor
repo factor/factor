@@ -126,7 +126,7 @@ M: object completion-string present ;
 
 M: method completion-string method-completion-string ;
 
-GENERIC# accept-completion-hook 1 ( item popup -- )
+GENERIC#: accept-completion-hook 1 ( item popup -- )
 
 : insert-completion ( item popup -- )
     [ completion-string ] [ completion-loc/doc/elt ] bi* set-elt-string ;
