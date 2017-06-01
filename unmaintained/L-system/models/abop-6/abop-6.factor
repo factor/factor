@@ -31,4 +31,4 @@ IN: L-system.models.abop-6
 : main ( -- ) [ L-system abop-6 "L-system" open-window ] with-ui ;
 
 MAIN: main
-  
+
