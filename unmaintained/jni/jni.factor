@@ -19,4 +19,4 @@ USING: kernel jni-internals namespaces ;
   "java/io/PrintStream" "env" get find-class ! jstr out class
   "println" "(I)V" "env" get get-method-id ! jstr out id
   rot "env" get call1 ;
-  
+
