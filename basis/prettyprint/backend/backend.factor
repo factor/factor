@@ -211,8 +211,8 @@ M: tuple pprint*
     [ number>string "~" " more~" surround text ] when* ;
 
 M: quotation pprint-delims drop \ [ \ ] ;
-M: curry pprint-delims drop \ [ \ ] ;
-M: compose pprint-delims drop \ [ \ ] ;
+M: curried pprint-delims drop \ [ \ ] ;
+M: composed pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;
@@ -274,8 +274,8 @@ M: byte-vector pprint* pprint-object ;
 
 M: hashtable pprint*
     [ pprint-object ] with-extra-nesting-level ;
-M: curry pprint* pprint-object ;
-M: compose pprint* pprint-object ;
+M: curried pprint* pprint-object ;
+M: composed pprint* pprint-object ;
 M: hash-set pprint* pprint-object ;
 M: anonymous-union pprint* pprint-object ;
 M: anonymous-intersection pprint* pprint-object ;

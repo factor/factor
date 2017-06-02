@@ -139,8 +139,8 @@ M: callable infer-branch
 
 GENERIC: curried/composed? ( known -- ? )
 M: object curried/composed? drop f ;
-M: curried curried/composed? drop t ;
-M: composed curried/composed? drop t ;
+M: curried-effect curried/composed? drop t ;
+M: composed-effect curried/composed? drop t ;
 M: declared-effect curried/composed? known>> curried/composed? ;
 
 : declare-if-effects ( -- )

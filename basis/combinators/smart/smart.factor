@@ -33,14 +33,14 @@ IDENTITY-MEMO: inputs/outputs ( quot -- in out )
     ] if*
 ] "special" set-word-prop
 
-M: curried infer-known*
+M: curried-effect infer-known*
     quot>> infer-known dup [
         curry-effect
     ] [
         drop f
     ] if ;
 
-M: composed infer-known*
+M: composed-effect infer-known*
     [ quot1>> ] [ quot2>> ] bi
     [ infer-known ] bi@
     2dup and [ compose-effects ] [ 2drop f ] if ;

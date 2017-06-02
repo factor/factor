@@ -253,8 +253,8 @@ CONSTANT: vpri-slides
         { { $link quotation } ", " { $link curry } " and " { $link compose } " are classes" }
         { $code
             "GENERIC: call ( quot -- )"
-            "M: curry call uncurry call ;"
-            "M: compose call uncompose slip call ;"
+            "M: curried call uncurry call ;"
+            "M: composed call uncompose slip call ;"
             "M: quotation call (call) ;"
         }
         { "So " { $link curry } ", " { $link compose } " are library features" }

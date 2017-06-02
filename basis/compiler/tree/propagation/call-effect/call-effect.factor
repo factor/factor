@@ -28,7 +28,7 @@ M: +unknown+ curry-effect* ;
 
 M: effect curry-effect* curry-effect ;
 
-M: curry cached-effect
+M: curried cached-effect
     quot>> cached-effect curry-effect* ;
 
 : compose-effects* ( effect1 effect2 -- effect' )
@@ -36,9 +36,6 @@ M: curry cached-effect
         { [ 2dup [ effect? ] both? ] [ compose-effects ] }
         { [ 2dup [ +unknown+ eq? ] either? ] [ 2drop +unknown+ ] }
     } cond ;
-
-M: compose cached-effect
-    [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
 
 : safe-infer ( quot -- effect )
     error get-global error-continuation get-global
@@ -111,9 +108,9 @@ M: quotation cached-effect
 
 GENERIC: already-inlined-quot? ( quot -- ? )
 
-M: curry already-inlined-quot? quot>> already-inlined-quot? ;
+M: curried already-inlined-quot? quot>> already-inlined-quot? ;
 
-M: compose already-inlined-quot?
+M: composed already-inlined-quot?
     [ first>> already-inlined-quot? ]
     [ second>> already-inlined-quot? ] bi or ;
 
@@ -121,9 +118,9 @@ M: quotation already-inlined-quot? already-inlined? ;
 
 GENERIC: add-quot-to-history ( quot -- )
 
-M: curry add-quot-to-history quot>> add-quot-to-history ;
+M: curried add-quot-to-history quot>> add-quot-to-history ;
 
-M: compose add-quot-to-history
+M: composed add-quot-to-history
     [ first>> add-quot-to-history ]
     [ second>> add-quot-to-history ] bi ;
 
@@ -149,8 +146,8 @@ ERROR: uninferable ;
         [ safe-infer dup +unknown+ = [ uninferable ] when ] tri
     ] [
         dup class>> {
-            { \ curry [ slots>> third (infer-value) remove-effect-input ] }
-            { \ compose [ slots>> last2 [ (infer-value) ] bi@ compose-effects ] }
+            { \ curried [ slots>> third (infer-value) remove-effect-input ] }
+            { \ composed [ slots>> last2 [ (infer-value) ] bi@ compose-effects ] }
             [ uninferable ]
         } case
     ] if ;
@@ -163,11 +160,11 @@ ERROR: uninferable ;
         literal>> [ add-quot-to-history ] [ '[ drop @ ] ] bi
     ] [
         dup class>> {
-            { \ curry [
+            { \ curried [
                 slots>> third (value>quot)
                 '[ [ obj>> ] [ quot>> @ ] bi ]
             ] }
-            { \ compose [
+            { \ composed [
                 slots>> last2 [ (value>quot) ] bi@
                 '[ [ first>> @ ] [ second>> @ ] bi ]
             ] }

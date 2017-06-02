@@ -48,7 +48,7 @@ gc
 
         array? hashtable? vector?
         tuple? sbuf? tombstone?
-        curry? compose? callable?
+        curried? composed? callable?
         quotation?
 
         curry compose uncurry
