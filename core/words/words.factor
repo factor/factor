@@ -17,11 +17,6 @@ PRIMITIVE: word-optimized? ( word -- ? )
 PRIMITIVE: (word) ( name vocab hashcode -- word )
 PRIVATE>
 
-! Need a dummy word here because BUILTIN: word is not a real word
-! and parse-datum looks for things that are actually words instead of
-! also looking for classes
-: word ( -- * ) "dummy word" throw ;
-
 : last-word ( -- word ) \ last-word get-global ;
 
 : set-last-word ( word -- ) \ last-word set-global ;
