@@ -41,7 +41,7 @@ IN: concurrency.combinators.tests
 { 20 }
 [
     V{ } clone
-    10 <iota> 10 iota pick [ [ push ] [ push ] bi ] curry 2parallel-each
+    10 <iota> 10 <iota> pick [ [ push ] [ push ] bi ] curry 2parallel-each
     length
 ] unit-test
 

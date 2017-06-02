@@ -56,7 +56,7 @@ vectors math math.order ;
 ] unit-test
 
 { t } [
-    10000 <iota> >persistent-vector 752 [ ppop ] times dup length iota sequence=
+    10000 <iota> >persistent-vector 752 [ ppop ] times dup length <iota> sequence=
 ] unit-test
 
 { t } [
