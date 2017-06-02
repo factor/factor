@@ -278,49 +278,48 @@ slots>tuple 1quotation ( -- value ) define-inline
 slots>tuple 1quotation ( -- value ) define-inline
 
 ! Some tuple classes
-"curry" "kernel" create-word
+
+"curried" "kernel" create-word
 tuple
 {
     { "obj" read-only }
     { "quot" read-only }
 } prepare-slots define-tuple-class
 
-"curry" "kernel" lookup-word
+"curry" "kernel" create-word
 {
     [ f "inline" set-word-prop ]
     [ make-flushable ]
-    [ ]
-    [
-        [
-            callable instance-check-quot %
-            tuple-layout ,
-            \ <tuple-boa> ,
-        ] [ ] make
-    ]
 } cleave
+
+"curry" "kernel" lookup-word
+[
+    callable instance-check-quot %
+    "curried" "kernel" lookup-word tuple-layout ,
+    \ <tuple-boa> ,
+] [ ] make
 ( obj quot -- curry ) define-declared
 
-"compose" "kernel" create-word
+"composed" "kernel" create-word
 tuple
 {
     { "first" read-only }
     { "second" read-only }
 } prepare-slots define-tuple-class
 
-"compose" "kernel" lookup-word
+"compose" "kernel" create-word
 {
     [ f "inline" set-word-prop ]
     [ make-flushable ]
-    [ ]
-    [
-        [
-            callable instance-check-quot [ dip ] curry %
-            callable instance-check-quot %
-            tuple-layout ,
-            \ <tuple-boa> ,
-        ] [ ] make
-    ]
 } cleave
+
+"compose" "kernel" lookup-word
+[
+    callable instance-check-quot [ dip ] curry %
+    callable instance-check-quot %
+    "composed" "kernel" lookup-word tuple-layout ,
+    \ <tuple-boa> ,
+] [ ] make
 ( quot1 quot2 -- compose ) define-declared
 
 "* Declaring primitives..." print flush

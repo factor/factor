@@ -105,14 +105,14 @@ GENERIC: infer-call* ( value known -- )
 M: literal-tuple infer-call*
     [ 1array #drop, ] [ infer-literal-quot ] bi* ;
 
-M: curried infer-call*
+M: curried-effect infer-call*
     swap push-d
     [ uncurry ] infer-quot-here
     [ quot>> known pop-d [ set-known ] keep ]
     [ obj>> known pop-d [ set-known ] keep ] bi
     push-d (infer-call) ;
 
-M: composed infer-call*
+M: composed-effect infer-call*
     swap push-d
     [ uncompose ] infer-quot-here
     [ quot2>> known pop-d [ set-known ] keep ]
@@ -151,11 +151,11 @@ M: object infer-call* \ call bad-macro-input ;
     2 consume-d dup first2 quot call make-known
     [ push-d ] [ 1array ] bi word #call, ; inline
 
-: infer-curry ( -- ) [ <curried> ] \ curry infer-builder ;
+: infer-curry ( -- ) [ <curried-effect> ] \ curry infer-builder ;
 
 \ curry [ infer-curry ] "special" set-word-prop
 
-: infer-compose ( -- ) [ <composed> ] \ compose infer-builder ;
+: infer-compose ( -- ) [ <composed-effect> ] \ compose infer-builder ;
 
 \ compose [ infer-compose ] "special" set-word-prop
 

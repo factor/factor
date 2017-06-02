@@ -1,10 +1,10 @@
 USING: hashtables help.markup help.syntax math quotations sequences words ;
 IN: stack-checker.values
 
-HELP: curried
+HELP: curried-effect
 { $class-description "Result of curry." } ;
 
-HELP: composed
+HELP: composed-effect
 { $class-description "Result of compose." } ;
 
 HELP: input-parameter
