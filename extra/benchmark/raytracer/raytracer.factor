@@ -148,7 +148,7 @@ DEFER: create
     [ oversampling /f ] bi@ 0.0 double-array{ } 3sequence ;
 
 : ss-grid ( -- ss-grid )
-    oversampling <iota> [ oversampling iota [ ss-point ] with map ] map ;
+    oversampling <iota> [ oversampling <iota> [ ss-point ] with map ] map ;
 
 : ray-grid ( point ss-grid -- ray-grid )
     [

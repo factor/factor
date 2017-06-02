@@ -216,7 +216,7 @@ INSTANCE: combinations immutable-sequence
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
-    n k nCk <iota> k iota >array seq quot n
+    n k nCk <iota> k <iota> >array seq quot n
     '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination drop ] ; inline
 
 PRIVATE>
