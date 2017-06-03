@@ -37,6 +37,9 @@ M: curried cached-effect
         { [ 2dup [ +unknown+ eq? ] either? ] [ 2drop +unknown+ ] }
     } cond ;
 
+M: composed cached-effect
+    [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
+
 : safe-infer ( quot -- effect )
     error get-global error-continuation get-global
     [ [ [ infer ] [ 2drop +unknown+ ] recover ] without-dependencies ] 2dip
