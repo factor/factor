@@ -13,13 +13,13 @@ CL_FLAGS = /nologo /O2 /WX /W3 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERS
 CL_FLAGS_VISTA = /D_WIN32_WINNT=0x0600
 
 !IF "$(PLATFORM)" == "x86-32"
-LINK_FLAGS = $(LINK_FLAGS) /safeseh
+LINK_FLAGS = $(LINK_FLAGS) /safeseh /largeaddressaware
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
 SUBSYSTEM_COM_FLAGS = console,"5.01"
 SUBSYSTEM_EXE_FLAGS = windows,"5.01"
 
 !ELSEIF "$(PLATFORM)" == "x86-32-vista"
-LINK_FLAGS = $(LINK_FLAGS) /safeseh
+LINK_FLAGS = $(LINK_FLAGS) /safeseh /largeaddressaware
 CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
 SUBSYSTEM_COM_FLAGS = console
