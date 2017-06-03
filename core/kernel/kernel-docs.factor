@@ -1,6 +1,5 @@
 USING: alien arrays classes combinators heaps help.markup help.syntax
-kernel.private layouts math quotations sequences system threads words
-;
+kernel.private layouts math quotations sequences system threads words ;
 IN: kernel
 
 HELP: OBJ-CURRENT-THREAD
@@ -775,9 +774,8 @@ HELP: most
 { $description "If the quotation yields a true value when applied to " { $snippet "x" } " and " { $snippet "y" } ", outputs " { $snippet "x" } ", otherwise outputs " { $snippet "y" } "." } ;
 
 HELP: curry
-{ $values { "obj" object } { "quot" callable } { "curry" curry } }
+{ $values { "obj" object } { "quot" callable } { "curry" curried } }
 { $description "Partial application. Outputs a " { $link callable } " which first pushes " { $snippet "obj" } " and then calls " { $snippet "quot" } "." }
-{ $class-description "The class of objects created by " { $link curry } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; a reference to the object and a reference to the underlying quotation." }
 { $notes "Even if " { $snippet "obj" } " is a word, it will be pushed as a literal."
 $nl
 "This operation is efficient and does not copy the quotation." }
@@ -787,8 +785,13 @@ $nl
     { $example "USING: kernel math prettyprint sequences ;" "{ 1 2 3 } 2 [ - ] curry map ." "{ -1 0 1 }" }
 } ;
 
+HELP: curried
+{ $class-description "The class of objects created by " { $link curry } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; a reference to the object and a reference to the underlying quotation." } ;
+
+{ curry curried compose prepose composed } related-words
+
 HELP: 2curry
-{ $values { "obj1" object } { "obj2" object } { "quot" callable } { "curry" curry } }
+{ $values { "obj1" object } { "obj2" object } { "quot" callable } { "curry" curried } }
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } " and " { $snippet "obj2" } " and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
@@ -796,12 +799,12 @@ HELP: 2curry
 } ;
 
 HELP: 3curry
-{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" callable } { "curry" curry } }
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" callable } { "curry" curried } }
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } ", and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
 HELP: with
-{ $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curry" curry } }
+{ $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curry" curried } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
@@ -819,12 +822,12 @@ HELP: 2with
   { "param2" object }
   { "obj" object }
   { "quot" { $quotation ( param1 param2 elt -- ... ) } }
-  { "curry" curry }
+  { "curry" curried }
 }
 { $description "Partial application on the left of two parameters." } ;
 
 HELP: compose
-{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
+{ $values { "quot1" callable } { "quot2" callable } { "compose" composed } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes
     "The following two lines are equivalent:"
@@ -835,13 +838,13 @@ HELP: compose
     "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
-
 HELP: prepose
-{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
+{ $values { "quot1" callable } { "quot2" callable } { "compose" composed } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot2" } " followed by " { $snippet "quot1" } "." }
 { $notes "See " { $link compose } " for details." } ;
 
-{ compose prepose } related-words
+HELP: composed
+{ $class-description "The class of objects created by " { $link compose } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; references to the first and second underlying quotations." } ;
 
 HELP: dip
 { $values { "x" object } { "quot" quotation } }
@@ -941,6 +944,20 @@ $nl
     swapd
     rot
     -rot
+} ;
+
+ARTICLE: "callables" "Callables"
+"Aside from " { $link "quotations" } ", there are two other callables that efficiently combine computations."
+$nl
+"Currying an object onto a quotation:"
+{ $subsections
+    curry
+    curried
+}
+"Composing two quotations:"
+{ $subsections
+    compose
+    composed
 } ;
 
 ARTICLE: "shuffle-words" "Shuffle words"

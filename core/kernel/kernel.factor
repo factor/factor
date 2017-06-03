@@ -178,19 +178,19 @@ DEFER: if
     dup dup 2tri* ; inline
 
 ! Quotation building
-: 2curry ( obj1 obj2 quot -- curry )
+: 2curry ( obj1 obj2 quot -- curried )
     curry curry ; inline
 
-: 3curry ( obj1 obj2 obj3 quot -- curry )
+: 3curry ( obj1 obj2 obj3 quot -- curried )
     curry curry curry ; inline
 
-: with ( param obj quot -- obj curry )
+: with ( param obj quot -- obj curried )
     swapd [ swapd call ] 2curry ; inline
 
-: 2with ( param1 param2 obj quot -- obj curry )
+: 2with ( param1 param2 obj quot -- obj curried )
     with with ; inline
 
-: prepose ( quot1 quot2 -- compose )
+: prepose ( quot1 quot2 -- composed )
     swap compose ; inline
 
 ! Curried cleavers
