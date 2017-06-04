@@ -33,7 +33,7 @@ check-numbering? on
     ! live range
     {
         T{ ##load-integer f 1 0 }
-        T{ ##replace-imm f D: 0 "hi" }
+        T{ ##replace-imm f d: 0 "hi" }
         T{ ##branch }
     } insns>cfg
     [ cfg set ] [ number-instructions ] [ compute-live-intervals ] tri

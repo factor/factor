@@ -56,27 +56,27 @@ IN: compiler.cfg.linear-scan.assignment.tests
 } [
     H{ { 37 RAX } } pending-interval-assoc set
     { { 37 int-rep 37 f } } setup-vreg-spills
-    T{ ##peek f 37 D: 0 0 } [ assign-insn-defs ] keep
+    T{ ##peek f 37 d: 0 0 } [ assign-insn-defs ] keep
 ] unit-test
 
 ! assign-all-registers
 {
-    T{ ##replace-imm f 20 D: 0 f }
-    T{ ##replace f RAX D: 0 f }
+    T{ ##replace-imm f 20 d: 0 f }
+    T{ ##replace f RAX d: 0 f }
 } [
     ! It doesn't do anything because ##replace-imm isn't a vreg-insn.
-    T{ ##replace-imm { src 20 } { loc D: 0 } } [ assign-all-registers ] keep
+    T{ ##replace-imm { src 20 } { loc d: 0 } } [ assign-all-registers ] keep
 
     ! This one does something.
     H{ { 37 RAX } } pending-interval-assoc set
     H{ { 37 37 } } leader-map set
-    T{ ##replace { src 37 } { loc D: 0 } } clone
+    T{ ##replace { src 37 } { loc d: 0 } } clone
     [ assign-all-registers ] keep
 ] unit-test
 
 ! assign-registers
 { } [
-    V{ T{ ##inc { loc D: 3 } { insn# 7 } } } 0 insns>block block>cfg { }
+    V{ T{ ##inc { loc d: 3 } { insn# 7 } } } 0 insns>block block>cfg { }
     assign-registers
 ] unit-test
 
@@ -85,7 +85,7 @@ IN: compiler.cfg.linear-scan.assignment.tests
     V{ T{ ##inc { loc T{ ds-loc { n 3 } } } { insn# 7 } } }
 } [
     { } init-assignment
-    V{ T{ ##inc { loc D: 3 } { insn# 7 } } } 0 insns>block
+    V{ T{ ##inc { loc d: 3 } { insn# 7 } } } 0 insns>block
     [ assign-registers-in-block ] keep instructions>>
 ] unit-test
 

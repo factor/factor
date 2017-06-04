@@ -62,7 +62,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##replace f 3 D: 0 }
+    T{ ##replace f 3 d: 0 }
     T{ ##return }
 } 3 test-bb
 
@@ -98,7 +98,7 @@ V{
 {
     V{
         T{ ##phi f 6 H{ { 1 4 } { 2 5 } } }
-        T{ ##replace f 6 D: 0 }
+        T{ ##replace f 6 d: 0 }
         T{ ##return }
     }
 } [
@@ -111,9 +111,9 @@ reset-counters
 
 V{ } 0 test-bb
 V{ } 1 test-bb
-V{ T{ ##peek f 0 D: 0 } } 2 test-bb
-V{ T{ ##peek f 0 D: 0 } } 3 test-bb
-V{ T{ ##replace f 0 D: 0 } } 4 test-bb
+V{ T{ ##peek f 0 d: 0 } } 2 test-bb
+V{ T{ ##peek f 0 d: 0 } } 3 test-bb
+V{ T{ ##replace f 0 d: 0 } } 4 test-bb
 V{ } 5 test-bb
 V{ } 6 test-bb
 
@@ -129,7 +129,7 @@ V{ } 6 test-bb
 {
     V{
         T{ ##phi f 3 H{ { 2 1 } { 3 2 } } }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     }
 } [
     4 get instructions>>

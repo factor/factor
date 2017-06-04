@@ -42,7 +42,7 @@ IN: compiler.cfg.intrinsics.fixnum.tests
            { src 321 }
            { rep any-rep }
         }
-        T{ ##inc { loc D: -1 } }
+        T{ ##inc { loc d: -1 } }
         T{ ##branch }
     }
     77

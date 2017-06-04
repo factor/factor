@@ -58,7 +58,7 @@ HELP: height-state>insns
   { $example
     "USING: compiler.cfg.stacks.local prettyprint ;"
     "T{ height-state f 0 0 4 -2 } height-state>insns ."
-    "{ T{ ##inc { loc D: 4 } } T{ ##inc { loc R: -2 } } }"
+    "{ T{ ##inc { loc d: 4 } } T{ ##inc { loc r: -2 } } }"
   }
 } ;
 
@@ -105,7 +105,7 @@ ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
 { $list
   { { $slot "peeks" } " all stack locations that the block reads before writing" }
   { { $slot "replaces" } " all stack locations that the block writes" }
-  { { $slot "kills" } " all stack locations which become unavailable after the block ends because of the stack height being decremented. For example, if the block contains " { $link drop } ", then D: 0 will be contained in kills because that stack location will not be live anymore." }
+  { { $slot "kills" } " all stack locations which become unavailable after the block ends because of the stack height being decremented. For example, if the block contains " { $link drop } ", then d: 0 will be contained in kills because that stack location will not be live anymore." }
 }
 "This is done while constructing the CFG. These sets are then used by the " { $link end-stack-analysis } " word to emit optimal sequences of " { $link ##peek } " and " { $link ##replace } " instructions to the cfg."
 $nl

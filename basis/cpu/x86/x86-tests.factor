@@ -62,7 +62,7 @@ cpu x86.64? [
 
 ! %clear
 { t } [
-    [ D: 0 %clear ] B{ } make
+    [ d: 0 %clear ] B{ } make
     cpu x86.32? B{ 199 6 144 18 0 0 } B{ 73 199 6 144 18 0 0 } ? =
 ] unit-test
 
@@ -115,6 +115,6 @@ cpu x86.64? [
         B{ 73 199 6 0 0 0 0 }
     }
     [
-        init-relocation [ 34.0 D: 0 %replace-imm ] B{ } make
+        init-relocation [ 34.0 d: 0 %replace-imm ] B{ } make
     ] unit-test
 ] when

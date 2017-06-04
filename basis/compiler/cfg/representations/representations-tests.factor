@@ -59,12 +59,12 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 1 D: 0 }
-    T{ ##peek f 2 D: 1 }
+    T{ ##peek f 1 d: 0 }
+    T{ ##peek f 2 d: 1 }
     T{ ##add-float f 3 1 2 }
-    T{ ##replace f 3 D: 0 }
-    T{ ##replace f 3 D: 1 }
-    T{ ##replace f 3 D: 2 }
+    T{ ##replace f 3 d: 0 }
+    T{ ##replace f 3 d: 1 }
+    T{ ##replace f 3 d: 2 }
     T{ ##branch }
 } 1 test-bb
 
@@ -87,20 +87,20 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 1 D: 0 }
+    T{ ##peek f 1 d: 0 }
     T{ ##branch }
 } 1 test-bb
 
 V{
     T{ ##add-float f 2 1 1 }
-    T{ ##replace f 2 D: 0 }
+    T{ ##replace f 2 d: 0 }
     T{ ##epilogue }
     T{ ##return }
 } 2 test-bb
 
 V{
     T{ ##add-float f 3 1 1 }
-    T{ ##replace f 3 D: 0 }
+    T{ ##replace f 3 d: 0 }
     T{ ##epilogue }
     T{ ##return }
 } 3 test-bb
@@ -112,7 +112,7 @@ V{
 
 {
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##branch }
     }
 } [ 1 get instructions>> ] unit-test
@@ -125,19 +125,19 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 1 D: 0 }
+    T{ ##peek f 1 d: 0 }
     T{ ##branch }
 } 1 test-bb
 
 V{
-    T{ ##replace f 1 R: 0 }
+    T{ ##replace f 1 r: 0 }
     T{ ##epilogue }
     T{ ##return }
 } 2 test-bb
 
 V{
     T{ ##mul f 2 1 1 }
-    T{ ##replace f 2 D: 0 }
+    T{ ##replace f 2 d: 0 }
     T{ ##branch }
 } 3 test-bb
 
@@ -155,7 +155,7 @@ V{
 
 {
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##branch }
     }
 } [ 1 get instructions>> ] unit-test
@@ -168,7 +168,7 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 1 D: 0 }
+    T{ ##peek f 1 d: 0 }
     T{ ##branch }
 } 1 test-bb
 
@@ -180,8 +180,8 @@ V{
 V{
     T{ ##add f 2 1 1 }
     T{ ##mul f 3 1 1 }
-    T{ ##replace f 2 D: 0 }
-    T{ ##replace f 3 D: 1 }
+    T{ ##replace f 2 d: 0 }
+    T{ ##replace f 3 d: 1 }
     T{ ##branch }
 } 3 test-bb
 
@@ -201,7 +201,7 @@ V{
 
 {
     V{
-        T{ ##peek f 4 D: 0 }
+        T{ ##peek f 4 d: 0 }
         T{ ##sar-imm f 1 4 $[ tag-bits get ] }
         T{ ##branch }
     }
@@ -214,10 +214,10 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 1 D: 0 }
-    T{ ##peek f 2 D: 0 }
+    T{ ##peek f 1 d: 0 }
+    T{ ##peek f 2 d: 0 }
     T{ ##vector>scalar f 3 2 int-4-rep }
-    T{ ##replace f 3 D: 0 }
+    T{ ##replace f 3 d: 0 }
     T{ ##branch }
 } 1 test-bb
 
@@ -251,7 +251,7 @@ V{
 
 V{
     T{ ##phi f 3 H{ { 1 1 } { 2 2 } } }
-    T{ ##replace f 3 D: 0 }
+    T{ ##replace f 3 d: 0 }
     T{ ##branch }
 } 3 test-bb
 
@@ -282,8 +282,8 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 0 D: 0 }
-    T{ ##peek f 1 D: 1 }
+    T{ ##peek f 0 d: 0 }
+    T{ ##peek f 1 d: 1 }
     T{ ##add f 2 0 1 }
     T{ ##branch }
 } 1 test-bb
@@ -295,7 +295,7 @@ V{
 
 V{
     T{ ##phi f 4 H{ { 1 2 } { 2 3 } } }
-    T{ ##replace f 4 D: 0 }
+    T{ ##replace f 4 d: 0 }
     T{ ##branch }
 } 3 test-bb
 
@@ -323,10 +323,10 @@ cpu x86.32? [
     } 0 test-bb
 
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##load-reference f 2 0.5 }
         T{ ##add-float f 3 1 2 }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
         T{ ##branch }
     } 1 test-bb
 
@@ -349,7 +349,7 @@ cpu x86.32? [
     } 0 test-bb
 
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##compare-imm-branch f 1 2 cc= }
     } 1 test-bb
 
@@ -365,9 +365,9 @@ cpu x86.32? [
 
     V{
         T{ ##phi f 4 H{ { 2 2 } { 3 3 } } }
-        T{ ##peek f 5 D: 0 }
+        T{ ##peek f 5 d: 0 }
         T{ ##add-float f 6 4 5 }
-        T{ ##replace f 6 D: 0 }
+        T{ ##replace f 6 d: 0 }
     } 4 test-bb
 
     V{
@@ -398,14 +398,14 @@ cpu x86.32? [
 
 { f } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##tagged>integer f 2 1 }
         T{ ##add-float f 3 0 0 }
         T{ ##store-memory-imm f 3 2 0 float-rep f }
         T{ ##store-memory-imm f 3 2 4 float-rep f }
         T{ ##mul-float f 4 0 0 }
-        T{ ##replace f 4 D: 0 }
+        T{ ##replace f 4 d: 0 }
     } test-peephole
     [ ##single>double-float? ] any?
 ] unit-test
@@ -414,12 +414,12 @@ cpu x86.32? [
 {
     V{
         T{ ##load-tagged f 1 $[ 100 tag-fixnum ] }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     }
 } [
     V{
         T{ ##load-integer f 1 100 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -428,18 +428,18 @@ cpu x86.32? [
 
 {
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##sar-imm f 2 1 1 }
         T{ ##add f 4 2 2 }
         T{ ##shl-imm f 3 4 $[ tag-bits get ] }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##shl-imm f 2 1 3 }
         T{ ##add f 3 2 2 }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -447,35 +447,35 @@ cpu x86.32? [
 
 {
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##shl-imm f 2 1 $[ 10 tag-bits get - ] }
         T{ ##add f 4 2 2 }
         T{ ##shl-imm f 3 4 $[ tag-bits get ] }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##shl-imm f 2 1 10 }
         T{ ##add f 3 2 2 }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     } test-peephole
 ] unit-test
 
 {
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##copy f 2 1 int-rep }
         T{ ##add f 5 2 2 }
         T{ ##shl-imm f 3 5 $[ tag-bits get ] }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##shl-imm f 2 1 $[ tag-bits get ] }
         T{ ##add f 3 2 2 }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -484,13 +484,13 @@ cpu x86.32? [
     V{
         T{ ##load-integer f 1 100 }
         T{ ##shl-imm f 2 1 $[ 3 tag-bits get + ] }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     }
 } [
     V{
         T{ ##load-integer f 1 100 }
         T{ ##shl-imm f 2 1 3 }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -498,15 +498,15 @@ cpu x86.32? [
 ! need to be tagged
 {
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##shl-imm f 1 0 3 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##shl-imm f 1 0 3 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -534,16 +534,16 @@ cpu x86.32? [
 ! Peephole optimization if input to ##sar-imm is tagged
 {
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##sar-imm f 7 1 $[ 3 tag-bits get + ] }
         T{ ##shl-imm f 2 7 $[ tag-bits get ] }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##sar-imm f 2 1 3 }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -555,13 +555,13 @@ cpu x86.32? [
         T{ ##load-integer f 1 100 }
         T{ ##sar-imm f 7 1 3 }
         T{ ##shl-imm f 2 7 $[ tag-bits get ] }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     }
 } [
     V{
         T{ ##load-integer f 1 100 }
         T{ ##sar-imm f 2 1 3 }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -569,7 +569,7 @@ cpu x86.32? [
 ! need to be tagged
 {
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##sar-imm f 1 0 $[ 3 tag-bits get + ] }
         T{ ##load-integer f 3 100 }
         T{ ##load-integer f 4 100 }
@@ -577,7 +577,7 @@ cpu x86.32? [
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##sar-imm f 1 0 3 }
         T{ ##load-integer f 3 100 }
         T{ ##load-integer f 4 100 }
@@ -638,7 +638,7 @@ cpu x86.32? [
         T{ ##load-integer f 3 100 }
         T{ ##add f 7 2 3 }
         T{ ##shl-imm f 4 7 $[ tag-bits get ] }
-        T{ ##replace f 4 D: 0 }
+        T{ ##replace f 4 d: 0 }
     }
 } [
     V{
@@ -647,38 +647,38 @@ cpu x86.32? [
         T{ ##sar-imm f 2 1 3 }
         T{ ##load-integer f 3 100 }
         T{ ##add f 4 2 3 }
-        T{ ##replace f 4 D: 0 }
+        T{ ##replace f 4 d: 0 }
     } test-peephole
 ] unit-test
 
 ! Tag/untag elimination
 {
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##add-imm f 2 1 $[ 100 tag-fixnum ] }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 1 D: 0 }
+        T{ ##peek f 1 d: 0 }
         T{ ##add-imm f 2 1 100 }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     } test-peephole
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##add f 2 0 1 }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##add f 2 0 1 }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -688,17 +688,17 @@ cpu x86.64? [
 
     [
         V{
-            T{ ##peek f 0 D: 0 }
+            T{ ##peek f 0 d: 0 }
             T{ ##sar-imm f 5 0 $[ tag-bits get ] }
             T{ ##add-imm f 6 5 $[ 30 2^ ] }
             T{ ##shl-imm f 2 6 $[ tag-bits get ] }
-            T{ ##replace f 2 D: 0 }
+            T{ ##replace f 2 d: 0 }
         }
     ] [
         V{
-            T{ ##peek f 0 D: 0 }
+            T{ ##peek f 0 d: 0 }
             T{ ##add-imm f 2 0 $[ 30 2^ ] }
-            T{ ##replace f 2 D: 0 }
+            T{ ##replace f 2 d: 0 }
         } test-peephole
     ] unit-test
 
@@ -707,13 +707,13 @@ cpu x86.64? [
             T{ ##load-integer f 0 100 }
             T{ ##mul-imm f 7 0 $[ 30 2^ ] }
             T{ ##shl-imm f 1 7 $[ tag-bits get ] }
-            T{ ##replace f 1 D: 0 }
+            T{ ##replace f 1 d: 0 }
         }
     ] [
         V{
             T{ ##load-integer f 0 100 }
             T{ ##mul-imm f 1 0 $[ 30 2^ ] }
-            T{ ##replace f 1 D: 0 }
+            T{ ##replace f 1 d: 0 }
         } test-peephole
     ] unit-test
 ] when
@@ -721,15 +721,15 @@ cpu x86.64? [
 ! Tag/untag elimination for ##mul-imm
 {
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##mul-imm f 1 0 100 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##mul-imm f 1 0 100 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -737,108 +737,108 @@ cpu x86.64? [
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##sar-imm f 5 1 $[ tag-bits get ] }
         T{ ##add-imm f 2 5 30 }
         T{ ##mul-imm f 3 2 $[ 100 tag-fixnum ] }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##add-imm f 2 1 30 }
         T{ ##mul-imm f 3 2 100 }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     } test-peephole
 ] unit-test
 
 ! Tag/untag elimination for ##compare-integer and ##test
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##test f 2 0 1 cc= }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##test f 2 0 1 cc= }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     } test-peephole
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##compare-integer f 2 0 1 cc= }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##compare-integer f 2 0 1 cc= }
-        T{ ##replace f 2 D: 0 }
+        T{ ##replace f 2 d: 0 }
     } test-peephole
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##compare-integer-branch f 0 1 cc= }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##compare-integer-branch f 0 1 cc= }
     } test-peephole
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##test-branch f 0 1 cc= }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##test-branch f 0 1 cc= }
     } test-peephole
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##compare-integer-imm-branch f 0 $[ 10 tag-fixnum ] cc= }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##compare-integer-imm-branch f 0 10 cc= }
     } test-peephole
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##test-imm-branch f 0 $[ 10 tag-fixnum ] cc= }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##test-imm-branch f 0 10 cc= }
     } test-peephole
 ] unit-test
@@ -846,15 +846,15 @@ cpu x86.64? [
 ! Tag/untag elimination for ##neg
 {
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##neg f 1 0 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##neg f 1 0 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -862,21 +862,21 @@ cpu x86.64? [
 
 {
     V{
-        T{ ##peek { dst 0 } { loc D: 0 } }
-        T{ ##peek { dst 1 } { loc D: 1 } }
+        T{ ##peek { dst 0 } { loc d: 0 } }
+        T{ ##peek { dst 1 } { loc d: 1 } }
         T{ ##sar-imm { dst 5 } { src1 0 } { src2 4 } }
         T{ ##sar-imm { dst 6 } { src1 1 } { src2 4 } }
         T{ ##mul { dst 2 } { src1 5 } { src2 6 } }
         T{ ##mul-imm { dst 3 } { src1 2 } { src2 -16 } }
-        T{ ##replace { src 3 } { loc D: 0 } }
+        T{ ##replace { src 3 } { loc d: 0 } }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
-        T{ ##peek f 1 D: 1 }
+        T{ ##peek f 0 d: 0 }
+        T{ ##peek f 1 d: 1 }
         T{ ##mul f 2 0 1 }
         T{ ##neg f 3 2 }
-        T{ ##replace f 3 D: 0 }
+        T{ ##replace f 3 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -885,16 +885,16 @@ cpu x86.64? [
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##not f 3 0 }
         T{ ##xor-imm f 1 3 $[ tag-mask get ] }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##not f 1 0 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     } test-peephole
 ] unit-test
 
@@ -903,15 +903,15 @@ cpu x86.64? [
 
 {
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##bit-count f 3 0 }
         T{ ##shl-imm f 1 3 $[ tag-bits get ] }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     }
 } [
     V{
-        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 0 d: 0 }
         T{ ##bit-count f 1 0 }
-        T{ ##replace f 1 D: 0 }
+        T{ ##replace f 1 d: 0 }
     } test-peephole
 ] unit-test

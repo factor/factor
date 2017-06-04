@@ -36,7 +36,7 @@ V{
 4 vreg-counter set-global
 
 V{
-    T{ ##inc f D: 3 }
+    T{ ##inc f d: 3 }
     T{ ##box f 4 3 "from_signed_4" int-rep
        T{ gc-map { gc-roots { } } }
     }
@@ -46,7 +46,7 @@ V{
 
 {
     V{
-        T{ ##inc f D: 3 }
+        T{ ##inc f d: 3 }
         T{ ##save-context f 5 6 }
         T{ ##box f 4 3 "from_signed_4" int-rep
             T{ gc-map { gc-roots { } } }

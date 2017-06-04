@@ -144,7 +144,7 @@ IN: compiler.cfg.gc-checks.tests
 
 V{
     T{ ##inc f 3 }
-    T{ ##replace f 0 D: 1 }
+    T{ ##replace f 0 d: 1 }
 } 0 test-bb
 
 V{
@@ -181,8 +181,8 @@ V{
 } 0 test-bb
 
 V{
-    T{ ##peek f 2 D: 0 }
-    T{ ##inc { loc D: 3 } }
+    T{ ##peek f 2 d: 0 }
+    T{ ##inc { loc d: 3 } }
     T{ ##branch }
 } 1 test-bb
 
@@ -196,7 +196,7 @@ V{
 } 3 test-bb
 
 V{
-    T{ ##replace f 2 D: 1 }
+    T{ ##replace f 2 d: 1 }
     T{ ##branch }
 } 4 test-bb
 

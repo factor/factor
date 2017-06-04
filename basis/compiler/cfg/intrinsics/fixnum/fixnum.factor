@@ -41,7 +41,7 @@ IN: compiler.cfg.intrinsics.fixnum
     '[ _ ^^compare-integer ] binary-op ;
 
 : emit-no-overflow-case ( dst block -- final-bb )
-    [ swap D: -2 inc-stack ds-push ] with-branch ;
+    [ swap d: -2 inc-stack ds-push ] with-branch ;
 
 : emit-overflow-case ( word block -- final-bb )
     [ -1 swap [ emit-call-block ] keep ] with-branch ;

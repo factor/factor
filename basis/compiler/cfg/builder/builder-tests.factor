@@ -368,9 +368,9 @@ SYMBOL: foo
 ! ! #shuffle
 {
     T{ height-state f 0 0 1 0 }
-    H{ { D: -1 4 } { D: 0 4 } }
+    H{ { d: -1 4 } { d: 0 4 } }
 } [
-    4 D: 0 replace-loc
+    4 d: 0 replace-loc
     f T{ #shuffle
        { mapping { { 2 4 } { 3 4 } } }
        { in-d V{ 4 } }
@@ -405,21 +405,21 @@ SYMBOL: foo
 
 ! make-input-map
 {
-    { { 37 D: 2 } { 81 D: 1 } { 92 D: 0 } }
+    { { 37 d: 2 } { 81 d: 1 } { 92 d: 0 } }
 } [
     T{ #shuffle { in-d { 37 81 92 } } } make-input-map
 ] unit-test
 
 ! store-shuffle
 {
-    H{ { D: 2 1 } }
+    H{ { d: 2 1 } }
 } [
     f T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
     emit-node drop replaces get
 ] cfg-unit-test
 
 {
-    H{ { D: -1 1 } { D: 0 1 } }
+    H{ { d: -1 1 } { d: 0 1 } }
 } [
     f T{ #shuffle
        { in-d { 7 } }

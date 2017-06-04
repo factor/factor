@@ -33,7 +33,7 @@ IN: compiler.cfg.builder.alien.tests
         T{ ##load-integer { dst 2 } { val 3 } }
         T{ ##copy { dst 4 } { src 1 } { rep any-rep } }
         T{ ##copy { dst 3 } { src 2 } { rep any-rep } }
-        T{ ##inc { loc D: 2 } }
+        T{ ##inc { loc d: 2 } }
         T{ ##branch }
     }
 } [
