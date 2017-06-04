@@ -43,6 +43,9 @@ t restartable-tests? set-global
         swap >>error
         error-continuation get >>continuation ;
 
+SYMBOL: long-unit-tests-enabled?
+long-unit-tests-enabled? [ t ] initialize
+
 <PRIVATE
 
 : notify-test-failed ( error experiment path line# -- )
@@ -57,9 +60,6 @@ SYMBOL: current-test-file
 
 :: (unit-test) ( output input -- error/f failed? tested? )
     [ { } input with-datastack output assert-sequence= f f ] [ t ] recover t ;
-
-SYMBOL: long-unit-tests-enabled?
-long-unit-tests-enabled? [ t ] initialize
 
 : (long-unit-test) ( output input -- error/f failed? tested? )
     long-unit-tests-enabled? get [ (unit-test) ] [ 2drop f f f ] if ;
