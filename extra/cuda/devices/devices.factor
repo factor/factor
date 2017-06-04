@@ -61,6 +61,10 @@ IN: cuda.devices
         ]
     } cleave ;
 
+: cuda-devices. ( -- )
+    init-cuda
+    enumerate-cuda-devices [ cuda-device. ] each ;
+
 : cuda. ( -- )
     init-cuda
     "CUDA Version: " write cuda-version number>string print nl
