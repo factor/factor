@@ -13,6 +13,6 @@ IN: fuel.help.tests
     [ first { $prev-link $next-link } member? ] filter
 ] unit-test
 
-{ { $next-link POSTPONE: unit-test "unit-test" } } [
+{ { $next-link postpone: unit-test "unit-test" } } [
     \ unit-test >link \ $next-link next/prev-link
 ] unit-test

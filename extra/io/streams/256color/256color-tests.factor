@@ -4,8 +4,8 @@
 USING: colors.constants io.streams.256color
 io.streams.256color.private tools.test ;
 
-{ 16 } [ COLOR: black color>256color ] unit-test
-{ 196 } [ COLOR: red color>256color ] unit-test
-{ 46 } [ COLOR: green color>256color ] unit-test
-{ 21 } [ COLOR: blue color>256color ] unit-test
-{ 231 } [ COLOR: white color>256color ] unit-test
+{ 16 } [ color: black color>256color ] unit-test
+{ 196 } [ color: red color>256color ] unit-test
+{ 46 } [ color: green color>256color ] unit-test
+{ 21 } [ color: blue color>256color ] unit-test
+{ 231 } [ color: white color>256color ] unit-test

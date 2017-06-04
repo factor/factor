@@ -3,7 +3,7 @@ kernel combinators combinators.private tools.deploy.config ;
 IN: tools.deploy
 
 ARTICLE: "prepare-deploy" "Preparing to deploy an application"
-"In order to deploy an application as a stand-alone image, the application's vocabulary must first be given a " { $link POSTPONE: MAIN: } " hook. Then, a " { $emphasis "deployment configuration" } " must be created."
+"In order to deploy an application as a stand-alone image, the application's vocabulary must first be given a " { $link postpone: MAIN: } " hook. Then, a " { $emphasis "deployment configuration" } " must be created."
 { $subsections
     "deploy-config"
     "deploy-flags"
@@ -35,17 +35,17 @@ $nl
 ARTICLE: "tools.deploy.caveats" "Deploy tool caveats"
 { $heading "Behavior of " { $link boa } }
 "In deployed applications, the " { $link boa } " word does not verify that the parameters on the stack satisfy the tuple's slot declarations, if any. This reduces deploy image size but can make bugs harder to track down. Make sure your program is fully debugged before deployment."
-{ $heading "Behavior of " { $link POSTPONE: execute( } }
-"Similarly, the " { $link POSTPONE: execute( } " word does not check word stack effects in deployed applications, since stack effects are stripped out, and so it behaves exactly like " { $link POSTPONE: execute-effect-unsafe } "."
-{ $heading "Behavior of " { $link POSTPONE: call-next-method } }
-"The " { $link POSTPONE: call-next-method } " word does not check if the input is of the right type in deployed applications."
+{ $heading "Behavior of " { $link postpone: execute( } }
+"Similarly, the " { $link postpone: execute( } " word does not check word stack effects in deployed applications, since stack effects are stripped out, and so it behaves exactly like " { $link postpone: execute-effect-unsafe } "."
+{ $heading "Behavior of " { $link postpone: call-next-method } }
+"The " { $link postpone: call-next-method } " word does not check if the input is of the right type in deployed applications."
 { $heading "Error reporting" }
 "If the " { $link deploy-reflection } " level in the configuration is low enough, the debugger is stripped out, and error messages can be rather cryptic. Increase the reflection level to get readable error messages."
 { $heading "Choosing the right deploy flags" }
 "Finding the correct deploy flags is a trial and error process; you must find a tradeoff between deployed image size and correctness. If your program uses dynamic language features, you may need to elect to strip out fewer subsystems in order to have full functionality." ;
 
 ARTICLE: "tools.deploy" "Application deployment"
-"The stand-alone application deployment tool, implemented in the " { $vocab-link "tools.deploy" } " vocabulary, compiles a vocabulary down to a native executable which runs the vocabulary's " { $link POSTPONE: MAIN: } " hook. Deployed executables do not depend on Factor being installed, and do not expose any source code, and thus are suitable for delivering commercial end-user applications."
+"The stand-alone application deployment tool, implemented in the " { $vocab-link "tools.deploy" } " vocabulary, compiles a vocabulary down to a native executable which runs the vocabulary's " { $link postpone: MAIN: } " hook. Deployed executables do not depend on Factor being installed, and do not expose any source code, and thus are suitable for delivering commercial end-user applications."
 $nl
 "Most of the time, the words in the " { $vocab-link "tools.deploy" } " vocabulary should not be used directly; instead, use " { $link "ui.tools.deploy" } "."
 $nl
@@ -61,7 +61,7 @@ ABOUT: "tools.deploy"
 
 HELP: deploy
 { $values { "vocab" "a vocabulary specifier" } }
-{ $description "Deploys " { $snippet "vocab" } " into a packaged application. This will create a directory containing the Factor VM, a deployed image set up to run the " { $link POSTPONE: MAIN: } " entry point of " { $snippet "vocab" } " at startup, and any " { $link "deploy-resources" } " and shared libraries the application depends on. On Mac OS X, the deployment directory will be a standard " { $snippet ".app" } " bundle executable from Finder. To only generate the Factor image, use " { $link deploy-image-only } "." } ;
+{ $description "Deploys " { $snippet "vocab" } " into a packaged application. This will create a directory containing the Factor VM, a deployed image set up to run the " { $link postpone: MAIN: } " entry point of " { $snippet "vocab" } " at startup, and any " { $link "deploy-resources" } " and shared libraries the application depends on. On Mac OS X, the deployment directory will be a standard " { $snippet ".app" } " bundle executable from Finder. To only generate the Factor image, use " { $link deploy-image-only } "." } ;
 
 HELP: deploy-image-only
 { $values { "vocab" "a vocabulary specifier" } { "image" "a pathname" } }

@@ -20,7 +20,7 @@ SYMBOL: tetrominoes
         { 0 2 }
         { 0 3 }
       }
-    } COLOR: cyan
+    } color: cyan
   ] [
     {
       {         { 1 0 }
@@ -37,11 +37,11 @@ SYMBOL: tetrominoes
         { 0 1 } { 1 1 }
                 { 1 2 }
       }
-    } COLOR: purple
+    } color: purple
   ] [
     { { { 0 0 } { 1 0 }
         { 0 1 } { 1 1 } }
-    } COLOR: yellow
+    } color: yellow
   ] [
     {
       { { 0 0 } { 1 0 } { 2 0 }
@@ -58,7 +58,7 @@ SYMBOL: tetrominoes
         { 0 1 }
         { 0 2 } { 1 2 }
       }
-    } COLOR: orange
+    } color: orange
   ] [
     {
       { { 0 0 } { 1 0 } { 2 0 }
@@ -75,7 +75,7 @@ SYMBOL: tetrominoes
         { 0 1 }
         { 0 2 }
       }
-    } COLOR: blue
+    } color: blue
   ] [
     {
       {          { 1 0 } { 2 0 }
@@ -85,7 +85,7 @@ SYMBOL: tetrominoes
         { 0 1 } { 1 1 }
                 { 1 2 }
       }
-    } COLOR: green
+    } color: green
   ] [
     {
       {
@@ -96,7 +96,7 @@ SYMBOL: tetrominoes
         { 0 1 } { 1 1 }
         { 0 2 }
       }
-    } COLOR: red
+    } color: red
   ]
 } [ first2 <tetromino> ] map tetrominoes set-global
 

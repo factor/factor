@@ -20,5 +20,5 @@ HELP: find-library
   { $code
     "<< \"sqlite\" \"sqlite3\" find-library cdecl add-library >>"
   }
-  "Note the parse time evaluation with " { $link POSTPONE: << } "."
+  "Note the parse time evaluation with " { $link postpone: << } "."
 } ;

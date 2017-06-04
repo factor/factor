@@ -31,4 +31,4 @@ ERROR: no-such-color name ;
 : named-color ( name -- color )
     dup colors at [ ] [ no-such-color ] ?if ;
 
-SYNTAX: COLOR: scan-token named-color suffix! ;
+SYNTAX: color: scan-token named-color suffix! ;

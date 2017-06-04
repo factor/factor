@@ -94,176 +94,176 @@ HOOK: table-border-color theme ( -- color )
 SINGLETON: light-theme
 theme [ light-theme ] initialize
 
-M: light-theme toolbar-background COLOR: grey95 ;
-M: light-theme toolbar-button-pressed-background COLOR: dark-gray ;
+M: light-theme toolbar-background color: grey95 ;
+M: light-theme toolbar-button-pressed-background color: dark-gray ;
 
-M: light-theme menu-background COLOR: grey95 ;
-M: light-theme menu-border-color COLOR: grey75 ;
+M: light-theme menu-background color: grey95 ;
+M: light-theme menu-border-color color: grey75 ;
 
-M: light-theme status-bar-background COLOR: FactorDarkSlateBlue ;
-M: light-theme status-bar-foreground COLOR: white ;
+M: light-theme status-bar-background color: FactorDarkSlateBlue ;
+M: light-theme status-bar-foreground color: white ;
 
-M: light-theme button-text-color COLOR: FactorDarkSlateBlue ;
-M: light-theme button-clicked-text-color COLOR: white ;
+M: light-theme button-text-color color: FactorDarkSlateBlue ;
+M: light-theme button-clicked-text-color color: white ;
 
-M: light-theme line-color COLOR: grey75 ;
+M: light-theme line-color color: grey75 ;
 
-M: light-theme column-title-background COLOR: grey95 ;
+M: light-theme column-title-background color: grey95 ;
 
-M: light-theme roll-button-rollover-border COLOR: gray50 ;
-M: light-theme roll-button-selected-background COLOR: dark-gray ;
+M: light-theme roll-button-rollover-border color: gray50 ;
+M: light-theme roll-button-selected-background color: dark-gray ;
 
-M: light-theme source-files-color COLOR: MediumSeaGreen ;
-M: light-theme errors-color COLOR: chocolate1 ;
-M: light-theme details-color COLOR: SteelBlue3 ;
+M: light-theme source-files-color color: MediumSeaGreen ;
+M: light-theme errors-color color: chocolate1 ;
+M: light-theme details-color color: SteelBlue3 ;
 
-M: light-theme debugger-color COLOR: chocolate1 ;
-M: light-theme completion-color COLOR: magenta ;
+M: light-theme debugger-color color: chocolate1 ;
+M: light-theme completion-color color: magenta ;
 
-M: light-theme data-stack-color COLOR: DodgerBlue ;
-M: light-theme retain-stack-color COLOR: HotPink ;
-M: light-theme call-stack-color COLOR: GreenYellow ;
+M: light-theme data-stack-color color: DodgerBlue ;
+M: light-theme retain-stack-color color: HotPink ;
+M: light-theme call-stack-color color: GreenYellow ;
 
-M: light-theme title-bar-gradient { COLOR: white COLOR: grey90 } ;
+M: light-theme title-bar-gradient { color: white color: grey90 } ;
 
-M: light-theme popup-color COLOR: yellow2 ;
+M: light-theme popup-color color: yellow2 ;
 
-M: light-theme object-color COLOR: aquamarine2 ;
-M: light-theme contents-color COLOR: orchid2 ;
+M: light-theme object-color color: aquamarine2 ;
+M: light-theme contents-color color: orchid2 ;
 
-M: light-theme help-header-background HEXCOLOR: F4EFD9 ;
+M: light-theme help-header-background hexcolor: F4EFD9 ;
 
-M: light-theme thread-status-stopped-background HEXCOLOR: F4D9D9 ;
-M: light-theme thread-status-suspended-background HEXCOLOR: F4EAD9 ;
-M: light-theme thread-status-running-background HEXCOLOR: EDF4D9 ;
+M: light-theme thread-status-stopped-background hexcolor: F4D9D9 ;
+M: light-theme thread-status-suspended-background hexcolor: F4EAD9 ;
+M: light-theme thread-status-running-background hexcolor: EDF4D9 ;
 
-M: light-theme thread-status-stopped-foreground HEXCOLOR: F42300 ;
-M: light-theme thread-status-suspended-foreground HEXCOLOR: F37B00 ;
-M: light-theme thread-status-running-foreground HEXCOLOR: 3FCA00 ;
+M: light-theme thread-status-stopped-foreground hexcolor: F42300 ;
+M: light-theme thread-status-suspended-foreground hexcolor: F37B00 ;
+M: light-theme thread-status-running-foreground hexcolor: 3FCA00 ;
 
-M: light-theme error-summary-background HEXCOLOR: F4D9D9 ;
+M: light-theme error-summary-background hexcolor: F4D9D9 ;
 
-M: light-theme content-background COLOR: white ;
-M: light-theme text-color COLOR: black ;
+M: light-theme content-background color: white ;
+M: light-theme text-color color: black ;
 
-M: light-theme link-color COLOR: DodgerBlue4 ;
-M: light-theme title-color COLOR: gray20 ;
-M: light-theme heading-color COLOR: FactorDarkSlateBlue ;
-M: light-theme snippet-color COLOR: DarkOrange4 ;
-M: light-theme output-color COLOR: DarkOrange4 ;
-M: light-theme deprecated-background-color HEXCOLOR: F4EAD9 ;
-M: light-theme deprecated-border-color HEXCOLOR: F37B00 ;
-M: light-theme warning-background-color HEXCOLOR: F4D9D9 ;
-M: light-theme warning-border-color HEXCOLOR: F42300 ;
-M: light-theme code-background-color COLOR: FactorLightTan ;
-M: light-theme help-path-border-color COLOR: FactorLightTan ;
+M: light-theme link-color color: DodgerBlue4 ;
+M: light-theme title-color color: gray20 ;
+M: light-theme heading-color color: FactorDarkSlateBlue ;
+M: light-theme snippet-color color: DarkOrange4 ;
+M: light-theme output-color color: DarkOrange4 ;
+M: light-theme deprecated-background-color hexcolor: F4EAD9 ;
+M: light-theme deprecated-border-color hexcolor: F37B00 ;
+M: light-theme warning-background-color hexcolor: F4D9D9 ;
+M: light-theme warning-border-color hexcolor: F42300 ;
+M: light-theme code-background-color color: FactorLightTan ;
+M: light-theme help-path-border-color color: FactorLightTan ;
 
-M: light-theme tip-background-color COLOR: lavender ;
+M: light-theme tip-background-color color: lavender ;
 
 M: light-theme prompt-background-color T{ rgba f 1 0.7 0.7 1 } ;
 
-M: light-theme dim-color COLOR: gray35 ;
-M: light-theme highlighted-word-color COLOR: DarkSlateGray ;
-M: light-theme string-color COLOR: LightSalmon4 ;
-M: light-theme stack-effect-color COLOR: FactorDarkGreen ;
+M: light-theme dim-color color: gray35 ;
+M: light-theme highlighted-word-color color: DarkSlateGray ;
+M: light-theme string-color color: LightSalmon4 ;
+M: light-theme stack-effect-color color: FactorDarkGreen ;
 
-M: light-theme vocab-background-color COLOR: FactorLightTan ;
-M: light-theme vocab-border-color COLOR: FactorDarkTan ;
+M: light-theme vocab-background-color color: FactorLightTan ;
+M: light-theme vocab-border-color color: FactorDarkTan ;
 
-M: light-theme field-border-color COLOR: gray ;
+M: light-theme field-border-color color: gray ;
 
 M: light-theme selection-color T{ rgba f 0.8 0.8 1.0 1.0 } ;
 M: light-theme panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 } ;
-M: light-theme focus-border-color COLOR: dark-gray ;
+M: light-theme focus-border-color color: dark-gray ;
 
-M: light-theme labeled-border-color COLOR: grey85 ;
+M: light-theme labeled-border-color color: grey85 ;
 
-M: light-theme table-border-color COLOR: FactorTan ;
+M: light-theme table-border-color color: FactorTan ;
 
 SINGLETON: dark-theme
 
-M: dark-theme toolbar-background COLOR: solarized-base02 ;
-M: dark-theme toolbar-button-pressed-background COLOR: solarized-base0 ;
+M: dark-theme toolbar-background color: solarized-base02 ;
+M: dark-theme toolbar-button-pressed-background color: solarized-base0 ;
 
-M: dark-theme menu-background COLOR: solarized-base02 ;
-M: dark-theme menu-border-color COLOR: solarized-base01 ;
+M: dark-theme menu-background color: solarized-base02 ;
+M: dark-theme menu-border-color color: solarized-base01 ;
 
-M: dark-theme status-bar-background COLOR: FactorDarkSlateBlue ;
-M: dark-theme status-bar-foreground COLOR: white ;
+M: dark-theme status-bar-background color: FactorDarkSlateBlue ;
+M: dark-theme status-bar-foreground color: white ;
 
-M: dark-theme button-text-color COLOR: solarized-base1 ;
-M: dark-theme button-clicked-text-color COLOR: white ;
+M: dark-theme button-text-color color: solarized-base1 ;
+M: dark-theme button-clicked-text-color color: white ;
 
-M: dark-theme line-color COLOR: solarized-base01 ;
+M: dark-theme line-color color: solarized-base01 ;
 
-M: dark-theme column-title-background HEXCOLOR: 2F4D5B ;
+M: dark-theme column-title-background hexcolor: 2F4D5B ;
 
-M: dark-theme roll-button-rollover-border COLOR: gray50 ;
-M: dark-theme roll-button-selected-background COLOR: dark-gray ;
+M: dark-theme roll-button-rollover-border color: gray50 ;
+M: dark-theme roll-button-selected-background color: dark-gray ;
 
-M: dark-theme source-files-color COLOR: solarized-green ;
-M: dark-theme errors-color COLOR: solarized-red ;
-M: dark-theme details-color COLOR: solarized-blue ;
+M: dark-theme source-files-color color: solarized-green ;
+M: dark-theme errors-color color: solarized-red ;
+M: dark-theme details-color color: solarized-blue ;
 
-M: dark-theme debugger-color COLOR: solarized-red ;
-M: dark-theme completion-color COLOR: solarized-violet ;
+M: dark-theme debugger-color color: solarized-red ;
+M: dark-theme completion-color color: solarized-violet ;
 
-M: dark-theme data-stack-color COLOR: solarized-blue ;
-M: dark-theme retain-stack-color COLOR: solarized-magenta ;
-M: dark-theme call-stack-color COLOR: solarized-green ;
+M: dark-theme data-stack-color color: solarized-blue ;
+M: dark-theme retain-stack-color color: solarized-magenta ;
+M: dark-theme call-stack-color color: solarized-green ;
 
-M: dark-theme title-bar-gradient { COLOR: solarized-base01 COLOR: solarized-base02 } ;
+M: dark-theme title-bar-gradient { color: solarized-base01 color: solarized-base02 } ;
 
-M: dark-theme popup-color COLOR: solarized-yellow ;
+M: dark-theme popup-color color: solarized-yellow ;
 
-M: dark-theme object-color COLOR: solarized-cyan ;
-M: dark-theme contents-color COLOR: solarized-magenta ;
+M: dark-theme object-color color: solarized-cyan ;
+M: dark-theme contents-color color: solarized-magenta ;
 
-M: dark-theme help-header-background HEXCOLOR: 2F4D5B ;
+M: dark-theme help-header-background hexcolor: 2F4D5B ;
 
-M: dark-theme thread-status-stopped-background HEXCOLOR: 492d33 ;
-M: dark-theme thread-status-suspended-background HEXCOLOR: 3c4a24 ;
-M: dark-theme thread-status-running-background HEXCOLOR: 2c4f24 ;
+M: dark-theme thread-status-stopped-background hexcolor: 492d33 ;
+M: dark-theme thread-status-suspended-background hexcolor: 3c4a24 ;
+M: dark-theme thread-status-running-background hexcolor: 2c4f24 ;
 
-M: dark-theme thread-status-stopped-foreground COLOR: solarized-red ;
-M: dark-theme thread-status-suspended-foreground COLOR: solarized-yellow ;
-M: dark-theme thread-status-running-foreground COLOR: solarized-green ;
+M: dark-theme thread-status-stopped-foreground color: solarized-red ;
+M: dark-theme thread-status-suspended-foreground color: solarized-yellow ;
+M: dark-theme thread-status-running-foreground color: solarized-green ;
 
-M: dark-theme error-summary-background HEXCOLOR: 6E2E32 ;
+M: dark-theme error-summary-background hexcolor: 6E2E32 ;
 
-M: dark-theme content-background COLOR: solarized-base03 ;
-M: dark-theme text-color COLOR: grey75 ;
+M: dark-theme content-background color: solarized-base03 ;
+M: dark-theme text-color color: grey75 ;
 
-M: dark-theme link-color COLOR: solarized-blue ;
-M: dark-theme title-color COLOR: grey75 ;
-M: dark-theme heading-color COLOR: grey75 ;
-M: dark-theme snippet-color COLOR: solarized-orange ;
-M: dark-theme output-color COLOR: solarized-orange ;
-M: dark-theme deprecated-background-color HEXCOLOR: 3c4a24 ;
-M: dark-theme deprecated-border-color COLOR: solarized-yellow ;
-M: dark-theme warning-background-color HEXCOLOR: 492d33 ;
-M: dark-theme warning-border-color COLOR: solarized-red ;
-M: dark-theme code-background-color HEXCOLOR: 2F4D5B ;
-M: dark-theme help-path-border-color HEXCOLOR: 2F4D5B ;
+M: dark-theme link-color color: solarized-blue ;
+M: dark-theme title-color color: grey75 ;
+M: dark-theme heading-color color: grey75 ;
+M: dark-theme snippet-color color: solarized-orange ;
+M: dark-theme output-color color: solarized-orange ;
+M: dark-theme deprecated-background-color hexcolor: 3c4a24 ;
+M: dark-theme deprecated-border-color color: solarized-yellow ;
+M: dark-theme warning-background-color hexcolor: 492d33 ;
+M: dark-theme warning-border-color color: solarized-red ;
+M: dark-theme code-background-color hexcolor: 2F4D5B ;
+M: dark-theme help-path-border-color hexcolor: 2F4D5B ;
 
-M: dark-theme tip-background-color HEXCOLOR: 2F4D5B ;
+M: dark-theme tip-background-color hexcolor: 2F4D5B ;
 
-M: dark-theme prompt-background-color HEXCOLOR: 922f31 ;
+M: dark-theme prompt-background-color hexcolor: 922f31 ;
 
-M: dark-theme dim-color COLOR: solarized-cyan ;
-M: dark-theme highlighted-word-color COLOR: solarized-green ;
-M: dark-theme string-color COLOR: solarized-magenta ;
-M: dark-theme stack-effect-color COLOR: solarized-orange ;
+M: dark-theme dim-color color: solarized-cyan ;
+M: dark-theme highlighted-word-color color: solarized-green ;
+M: dark-theme string-color color: solarized-magenta ;
+M: dark-theme stack-effect-color color: solarized-orange ;
 
-M: dark-theme vocab-background-color COLOR: solarized-base01 ;
-M: dark-theme vocab-border-color COLOR: solarized-base01 ;
+M: dark-theme vocab-background-color color: solarized-base01 ;
+M: dark-theme vocab-border-color color: solarized-base01 ;
 
-M: dark-theme field-border-color COLOR: solarized-base01 ;
+M: dark-theme field-border-color color: solarized-base01 ;
 
-M: dark-theme selection-color COLOR: solarized-base01 ;
+M: dark-theme selection-color color: solarized-base01 ;
 M: dark-theme panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 } ;
-M: dark-theme focus-border-color COLOR: solarized-base01 ;
+M: dark-theme focus-border-color color: solarized-base01 ;
 
-M: dark-theme labeled-border-color COLOR: solarized-base01 ;
+M: dark-theme labeled-border-color color: solarized-base01 ;
 
-M: dark-theme table-border-color COLOR: solarized-base01 ;
+M: dark-theme table-border-color color: solarized-base01 ;

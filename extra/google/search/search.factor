@@ -31,12 +31,12 @@ PRIVATE>
 : write-heading ( str -- )
     H{
         { font-size 14 }
-        { background COLOR: light-gray }
+        { background color: light-gray }
     } format nl ;
 
 : write-title ( str -- )
     H{
-        { foreground COLOR: blue }
+        { foreground color: blue }
     } format nl ;
 
 : write-content ( str -- )
@@ -45,7 +45,7 @@ PRIVATE>
 : write-url ( str -- )
     dup >url H{
         { font-name "monospace" }
-        { foreground COLOR: dark-green }
+        { foreground color: dark-green }
     } [ write-object ] with-style nl ;
 
 PRIVATE>

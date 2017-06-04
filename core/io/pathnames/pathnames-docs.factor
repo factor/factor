@@ -142,7 +142,7 @@ ARTICLE: "io.pathnames.presentations" "Pathname presentations"
     <pathname>
 }
 "Literal pathname presentations:"
-{ $subsections POSTPONE: P" }
+{ $subsections postpone: P" }
 "Many words that accept pathname strings can also work on pathname presentations." ;
 
 ARTICLE: "io.pathnames" "Pathnames"

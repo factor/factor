@@ -160,17 +160,17 @@ HELP: mouse-state
 { keyboard-state read-keyboard } related-words
 
 HELP: button-delta
-{ $values { "old?" boolean } { "new?" boolean } { "delta" { $link pressed } ", " { $link released } ", or " { $link POSTPONE: f } } }
-{ $description "Outputs a symbol representing the change in a key or button's state given a \"before\" and \"after\" sample of its state. Outputs " { $link pressed } " if " { $snippet "old?" } " is false and " { $snippet "new?" } " is true, " { $link released } " if " { $snippet "old?" } " is true and " { $snippet "new?" } " is false, or " { $link POSTPONE: f } " if the two inputs have the same boolean value." } ;
+{ $values { "old?" boolean } { "new?" boolean } { "delta" { $link pressed } ", " { $link released } ", or " { $link postpone: f } } }
+{ $description "Outputs a symbol representing the change in a key or button's state given a \"before\" and \"after\" sample of its state. Outputs " { $link pressed } " if " { $snippet "old?" } " is false and " { $snippet "new?" } " is true, " { $link released } " if " { $snippet "old?" } " is true and " { $snippet "new?" } " is false, or " { $link postpone: f } " if the two inputs have the same boolean value." } ;
 
 HELP: buttons-delta
-{ $values { "old-buttons" sequence } { "new-buttons" sequence } { "delta" "an array of " { $link pressed } ", " { $link released } ", or " { $link POSTPONE: f } } }
-{ $description "Outputs an array of symbols representing the change in a set of keys or buttons' states given \"before\" and \"after\" samples of their state. For each corresponding pair of values in the two input sequences, outputs " { $link pressed } " if " { $snippet "old-buttons" } " contains a false and " { $snippet "new-buttons" } " a true value, " { $link released } " if " { $snippet "old-buttons" } " contains true and " { $snippet "new-buttons" } " false, or " { $link POSTPONE: f } " if the two elements have the same boolean value."
+{ $values { "old-buttons" sequence } { "new-buttons" sequence } { "delta" "an array of " { $link pressed } ", " { $link released } ", or " { $link postpone: f } } }
+{ $description "Outputs an array of symbols representing the change in a set of keys or buttons' states given \"before\" and \"after\" samples of their state. For each corresponding pair of values in the two input sequences, outputs " { $link pressed } " if " { $snippet "old-buttons" } " contains a false and " { $snippet "new-buttons" } " a true value, " { $link released } " if " { $snippet "old-buttons" } " contains true and " { $snippet "new-buttons" } " false, or " { $link postpone: f } " if the two elements have the same boolean value."
 $nl
 "This word can be used with two samples of a " { $link keyboard-state } "'s " { $snippet "keys" } " slot or of a " { $link mouse-state } "'s or " { $link controller-state } "'s " { $snippet "buttons" } " slot to convert the button states into pressed/released values. Remember to " { $link clone } " state objects to record snapshots of their state." } ;
 
 HELP: buttons-delta-as
-{ $values { "old-buttons" sequence } { "new-buttons" sequence } { "exemplar" sequence } { "delta" "a sequence of " { $link pressed } ", " { $link released } ", or " { $link POSTPONE: f } } }
+{ $values { "old-buttons" sequence } { "new-buttons" sequence } { "exemplar" sequence } { "delta" "a sequence of " { $link pressed } ", " { $link released } ", or " { $link postpone: f } } }
 { $description "Like " { $link buttons-delta } ", but returns a sequence matching the type of the " { $snippet "exemplar" } "." } ;
 
 { button-delta buttons-delta buttons-delta-as } related-words

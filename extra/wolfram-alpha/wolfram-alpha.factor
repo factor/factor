@@ -27,7 +27,7 @@ PRIVATE>
     query "pod" tags-named [
         [
             "title" attr "%s:\n" sprintf H{
-                { foreground COLOR: slate-gray }
+                { foreground color: slate-gray }
                 { font-name "sans-serif" }
                 { font-style bold }
             } format

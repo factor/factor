@@ -17,7 +17,7 @@ GENERIC#: prompt. 1 ( stream prompt -- )
 SYMBOL: prompt-style
 H{
     { background T{ rgba f 1 0.7 0.7 1 } }
-    { foreground COLOR: black }
+    { foreground color: black }
 } prompt-style set-global
 
 M: object prompt.

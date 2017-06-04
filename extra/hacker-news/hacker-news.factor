@@ -27,17 +27,17 @@ IN: hacker-news
 : write-title ( title url -- )
     '[
         _ presented ,,
-        ui-running? COLOR: black COLOR: white ? foreground ,,
+        ui-running? color: black color: white ? foreground ,,
     ] H{ } make format ;
 
 : write-link ( title url -- )
     '[
         _ presented ,,
-        HEXCOLOR: 888888 foreground ,,
+        hexcolor: 888888 foreground ,,
     ] H{ } make format ;
 
 : write-text ( str -- )
-    H{ { foreground HEXCOLOR: 888888 } } format ;
+    H{ { foreground hexcolor: 888888 } } format ;
 
 : post>user-url ( post -- user-url )
     "by" of "http://news.ycombinator.com/user?id=" prepend >url ;
@@ -75,8 +75,8 @@ PRIVATE>
     H{
         { font-size 20 }
         { font-style bold }
-        { background HEXCOLOR: ff6600 }
-        { foreground COLOR: black }
+        { background hexcolor: ff6600 }
+        { foreground color: black }
     } assoc-union format nl ;
 
 : hacker-news. ( -- )

@@ -21,7 +21,7 @@ HELP: words.
 HELP: about
 { $values { "vocab" "a vocabulary specifier" } }
 { $description
-    "Displays the main help article for the vocabulary. The main help article is set with the " { $link POSTPONE: ABOUT: } " parsing word."
+    "Displays the main help article for the vocabulary. The main help article is set with the " { $link postpone: ABOUT: } " parsing word."
 } ;
 
 ARTICLE: "browsing-help" "Browsing documentation"

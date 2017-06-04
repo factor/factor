@@ -150,6 +150,6 @@ PRIVATE>
 
 : complete-char? ( tokens -- ? ) "char:" complete-token? ;
 
-: complete-color? ( tokens -- ? ) "COLOR:" complete-token? ;
+: complete-color? ( tokens -- ? ) "color:" complete-token? ;
 
 : complete-pathname? ( tokens -- ? ) "P\"" complete-token? ;

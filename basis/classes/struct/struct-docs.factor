@@ -31,7 +31,7 @@ HELP: <struct>
 HELP: STRUCT:
 { $syntax "STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
-{ $description "Defines a new " { $link struct } " type. The syntax is nearly identical to " { $link POSTPONE: TUPLE: } "; however, there are some additional restrictions on struct types:"
+{ $description "Defines a new " { $link struct } " type. The syntax is nearly identical to " { $link postpone: TUPLE: } "; however, there are some additional restrictions on struct types:"
 { $list
 { "Struct classes cannot have a superclass defined." }
 { "The slots of a struct must all have a type declared. The type must be a C type." }
@@ -42,42 +42,42 @@ HELP: STRUCT:
 HELP: S{
 { $syntax "S{ class slots... }" }
 { $values { "class" "a " { $link struct } " class word" } { "slots" "slot values" } }
-{ $description "Marks the beginning of a literal struct. The syntax is identical to tuple literal syntax with " { $link POSTPONE: T{ } { $snippet " }" } "; either the assoc syntax (that is, " { $snippet "S{ class { slot value } { slot value } ... }" } ") or the simple syntax (" { $snippet "S{ class f value value ... }" } ") can be used." } ;
+{ $description "Marks the beginning of a literal struct. The syntax is identical to tuple literal syntax with " { $link postpone: T{ } { $snippet " }" } "; either the assoc syntax (that is, " { $snippet "S{ class { slot value } { slot value } ... }" } ") or the simple syntax (" { $snippet "S{ class f value value ... }" } ") can be used." } ;
 
 HELP: S@
 { $syntax "S@ class alien" }
 { $values { "class" "a " { $link struct } " class word" } { "alien" "a literal alien" } }
 { $description "Marks the beginning of a literal struct at a specific C address. The prettyprinter uses this syntax when the memory backing a struct object is invalid. This syntax should not generally be used in source code." } ;
 
-{ POSTPONE: S{ POSTPONE: S@ } related-words
+{ postpone: S{ postpone: S@ } related-words
 
 HELP: UNION-STRUCT:
 { $syntax "UNION-STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
-{ $description "Defines a new " { $link struct } " type where all of the slots share the same storage. See " { $link POSTPONE: STRUCT: } " for details on the syntax." } ;
+{ $description "Defines a new " { $link struct } " type where all of the slots share the same storage. See " { $link postpone: STRUCT: } " for details on the syntax." } ;
 
 HELP: PACKED-STRUCT:
 { $syntax "PACKED-STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
-{ $description "Defines a new " { $link struct } " type with no alignment padding between slots or at the end. In all other respects, behaves like " { $link POSTPONE: STRUCT: } "." } ;
+{ $description "Defines a new " { $link struct } " type with no alignment padding between slots or at the end. In all other respects, behaves like " { $link postpone: STRUCT: } "." } ;
 
 HELP: define-struct-class
 { $values
     { "class" class } { "slots" "a sequence of " { $link struct-slot-spec } "s" }
 }
-{ $description "Defines a new " { $link struct } " class. This is the runtime equivalent of the " { $link POSTPONE: STRUCT: } " syntax." } ;
+{ $description "Defines a new " { $link struct } " class. This is the runtime equivalent of the " { $link postpone: STRUCT: } " syntax." } ;
 
 HELP: define-packed-struct-class
 { $values
     { "class" class } { "slots" "a sequence of " { $link struct-slot-spec } "s" }
 }
-{ $description "Defines a new " { $link struct } " class. This is the runtime equivalent of the " { $link POSTPONE: PACKED-STRUCT: } " syntax." } ;
+{ $description "Defines a new " { $link struct } " class. This is the runtime equivalent of the " { $link postpone: PACKED-STRUCT: } " syntax." } ;
 
 HELP: define-union-struct-class
 { $values
     { "class" class } { "slots" "a sequence of " { $link struct-slot-spec } "s" }
 }
-{ $description "Defines a new " { $link struct } " class where all of the slots share the same storage. This is the runtime equivalent of the " { $link POSTPONE: UNION-STRUCT: } " syntax." } ;
+{ $description "Defines a new " { $link struct } " class where all of the slots share the same storage. This is the runtime equivalent of the " { $link postpone: UNION-STRUCT: } " syntax." } ;
 
 HELP: malloc-struct
 { $values
@@ -111,7 +111,7 @@ HELP: read-struct
 HELP: struct
 { $class-description "The parent class of all struct types." } ;
 
-{ struct POSTPONE: STRUCT: POSTPONE: UNION-STRUCT: } related-words
+{ struct postpone: STRUCT: postpone: UNION-STRUCT: } related-words
 
 HELP: struct-class
 { $class-description "The metaclass of all " { $link struct } " classes." } ;
@@ -145,10 +145,10 @@ ARTICLE: "classes.struct.examples" "Struct class examples"
 } ;
 
 ARTICLE: "classes.struct.define" "Defining struct classes"
-"Struct classes are defined using a syntax similar to the " { $link POSTPONE: TUPLE: } " syntax for defining tuple classes:"
-{ $subsections POSTPONE: STRUCT: POSTPONE: PACKED-STRUCT: }
+"Struct classes are defined using a syntax similar to the " { $link postpone: TUPLE: } " syntax for defining tuple classes:"
+{ $subsections postpone: STRUCT: postpone: PACKED-STRUCT: }
 "Union structs are also supported, which behave like structs but share the same memory for all the slots."
-{ $subsections POSTPONE: UNION-STRUCT: } ;
+{ $subsections postpone: UNION-STRUCT: } ;
 
 ARTICLE: "classes.struct.create" "Creating instances of structs"
 "Structs can be allocated with " { $link new } "- and " { $link boa } "-like constructor words. Additional words are provided for building structs from C memory and from existing buffers:"
@@ -163,8 +163,8 @@ ARTICLE: "classes.struct.create" "Creating instances of structs"
     (struct)
     (malloc-struct)
 }
-"Structs have literal syntax, similar to " { $link POSTPONE: T{ } " for tuples:"
-{ $subsections POSTPONE: S{ } ;
+"Structs have literal syntax, similar to " { $link postpone: T{ } " for tuples:"
+{ $subsections postpone: S{ } ;
 
 ARTICLE: "classes.struct.c" "Passing structs to C functions"
 "Structs can be passed and returned by value, or by reference."

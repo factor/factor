@@ -19,6 +19,6 @@ IN: ui.pens.gradient.tests
         100.0
     }
 } [
-    { 1 0 } { 100 100 } { COLOR: red COLOR: green COLOR: blue }
+    { 1 0 } { 100 100 } { color: red color: green color: blue }
     gradient-vertices
 ] unit-test

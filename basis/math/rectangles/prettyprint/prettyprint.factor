@@ -5,7 +5,7 @@ IN: math.rectangles.prettyprint
 
 M: rect pprint*
     [
-        \ RECT: [
+        \ rect: [
             [ loc>> ] [ dim>> ] bi [ pprint* ] bi@
         ] pprint-prefix
     ] check-recursion ;

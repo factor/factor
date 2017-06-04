@@ -6,9 +6,9 @@ IN: classes.maybe
 ABOUT: "maybes"
 
 ARTICLE: "maybes" "Maybe classes"
-"A " { $snippet "maybe" } " is an anonymous union class (" { $link "unions" } ") of its members and the " { $link POSTPONE: f } " class. An object is an instance of a " { $snippet "maybe" } " class if it is either an instance of any of its participants, or " { $link POSTPONE: f } "." $nl
-"The " { $snippet "maybe" } " classes are used to declare typed slots that are optional for a tuple. Without this mechanism it would be an error to assign " { $link POSTPONE: f } " to such a typed slot, and therefore any tuple containing them without specifying an " { $link POSTPONE: initial: } " value could not be created with the word " { $link new } "." $nl
-"A slot with an empty " { $snippet "maybe{ }" } " class can only hold the " { $link POSTPONE: f } " value."
+"A " { $snippet "maybe" } " is an anonymous union class (" { $link "unions" } ") of its members and the " { $link postpone: f } " class. An object is an instance of a " { $snippet "maybe" } " class if it is either an instance of any of its participants, or " { $link postpone: f } "." $nl
+"The " { $snippet "maybe" } " classes are used to declare typed slots that are optional for a tuple. Without this mechanism it would be an error to assign " { $link postpone: f } " to such a typed slot, and therefore any tuple containing them without specifying an " { $link postpone: initial: } " value could not be created with the word " { $link new } "." $nl
+"A slot with an empty " { $snippet "maybe{ }" } " class can only hold the " { $link postpone: f } " value."
 { $examples
     { $example
         "USING: prettyprint ;"
@@ -17,4 +17,4 @@ ARTICLE: "maybes" "Maybe classes"
         "f"
     }
 }
-{ $see-also "unions" POSTPONE: maybe{ } ;
+{ $see-also "unions" postpone: maybe{ } ;

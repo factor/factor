@@ -105,7 +105,7 @@ IN: simd-demo
     [ v* ] [ [ 1.0 ] dip n-v v* ] bi-curry* bi v+ ;
 
 \\ interpolate optimizer-report." }
-"Note that using " { $link declare } " is not recommended. Safer ways of getting type information for the input parameters to a word include defining methods on a generic word (the value being dispatched upon has a statically known type in the method body), as well as using " { $link "hints" } " and " { $link POSTPONE: inline } " declarations."
+"Note that using " { $link declare } " is not recommended. Safer ways of getting type information for the input parameters to a word include defining methods on a generic word (the value being dispatched upon has a statically known type in the method body), as well as using " { $link "hints" } " and " { $link postpone: inline } " declarations."
 $nl
 "Here is a better version of the " { $snippet "interpolate" } " words above that uses hints:"
 { $code
@@ -121,7 +121,7 @@ HINTS: interpolate float-4 float-4 float-4 ;
 \\ interpolate optimizer-report. " }
 "This time, the optimizer report lists calls to both SIMD primitives and high-level vector words, because hints cause two code paths to be generated. The " { $snippet "optimized." } " word can be used to make sure that the fast code path consists entirely of calls to primitives."
 $nl
-"If the " { $snippet "interpolate" } " word was to be used in several places with different types of vectors, it would be best to declare it " { $link POSTPONE: inline } "."
+"If the " { $snippet "interpolate" } " word was to be used in several places with different types of vectors, it would be best to declare it " { $link postpone: inline } "."
 $nl
 "In the " { $snippet "interpolate" } " word, there is still a call to the " { $link <tuple-boa> } " primitive, because the return value at the end is being boxed on the heap. In the next example, no memory allocation occurs at all because the SIMD vectors are stored inside a struct class (see " { $link "classes.struct" } "); also note the use of inlining:"
 { $code

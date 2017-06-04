@@ -27,11 +27,11 @@ HELP: <multi-vertex-array>
 
 HELP: feedback-format:
 { $syntax "feedback-format: vertex-format" }
-{ $description "When used as part of a " { $link POSTPONE: GLSL-PROGRAM: } " definition, this syntax specifies the " { $link vertex-format } " in which transform feedback output will be generated." } ;
+{ $description "When used as part of a " { $link postpone: GLSL-PROGRAM: } " definition, this syntax specifies the " { $link vertex-format } " in which transform feedback output will be generated." } ;
 
 HELP: GLSL-PROGRAM:
 { $syntax "GLSL-PROGRAM: program-name shader shader ... [vertex-format vertex-format ...] [feedback-format: vertex-format] ;" }
-{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. If any " { $link vertex-format } "s are specified, their attributes will be pre-assigned attribute indexes at link time, to ensure that their indexes remain constant if the program is refreshed with " { $link refresh-program } ". A transform feedback vertex format may optionally be specified with " { $link POSTPONE: feedback-format: } "; if the program is used to collect transform feedback, the given vertex format will be used for the output." }
+{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. If any " { $link vertex-format } "s are specified, their attributes will be pre-assigned attribute indexes at link time, to ensure that their indexes remain constant if the program is refreshed with " { $link refresh-program } ". A transform feedback vertex format may optionally be specified with " { $link postpone: feedback-format: } "; if the program is used to collect transform feedback, the given vertex format will be used for the output." }
 { $notes "Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
 HELP: GLSL-SHADER-FILE:
@@ -56,9 +56,9 @@ HELP: VERTEX-FORMAT:
 
 HELP: VERTEX-STRUCT:
 { $syntax "VERTEX-STRUCT: struct-name format-name" }
-{ $description "Defines a struct class (like " { $link POSTPONE: STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
+{ $description "Defines a struct class (like " { $link postpone: STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
 
-{ POSTPONE: GLSL-PROGRAM: POSTPONE: GLSL-SHADER-FILE: POSTPONE: GLSL-SHADER: } related-words
+{ postpone: GLSL-PROGRAM: postpone: GLSL-SHADER-FILE: postpone: GLSL-SHADER: } related-words
 
 HELP: attribute-index
 { $values
@@ -72,7 +72,7 @@ HELP: <vertex-array>
     { "vertex-buffer" "a " { $link buffer } " or " { $link buffer-ptr } } { "program-instance" program-instance }
     { "vertex-array" vertex-array }
 }
-{ $description "Creates a new " { $link vertex-array } " from the entire contents of a single " { $link buffer } " for use with a " { $link program-instance } ". The data in " { $snippet "buffer" } " is taken in the first " { $link vertex-format } " specified in the program instance's originating " { $link POSTPONE: GLSL-PROGRAM: } " definition. If the program has no associated vertex formats, an error will be thrown. To specify a different vertex format, use " { $link <vertex-array*> } "." } ;
+{ $description "Creates a new " { $link vertex-array } " from the entire contents of a single " { $link buffer } " for use with a " { $link program-instance } ". The data in " { $snippet "buffer" } " is taken in the first " { $link vertex-format } " specified in the program instance's originating " { $link postpone: GLSL-PROGRAM: } " definition. If the program has no associated vertex formats, an error will be thrown. To specify a different vertex format, use " { $link <vertex-array*> } "." } ;
 
 HELP: <vertex-array*>
 { $values
@@ -94,13 +94,13 @@ HELP: define-vertex-format
 { $values
     { "class" class } { "vertex-attributes" sequence }
 }
-{ $description "Defines a new " { $link vertex-format } " with the binary format specified by the " { $link vertex-attribute } " tuple values in " { $snippet "vertex-attributes" } ". The runtime equivalent of " { $link POSTPONE: VERTEX-FORMAT: } ". This word must be called inside a compilation unit." } ;
+{ $description "Defines a new " { $link vertex-format } " with the binary format specified by the " { $link vertex-attribute } " tuple values in " { $snippet "vertex-attributes" } ". The runtime equivalent of " { $link postpone: VERTEX-FORMAT: } ". This word must be called inside a compilation unit." } ;
 
 HELP: define-vertex-struct
 { $values
     { "class" word } { "vertex-format" vertex-format }
 }
-{ $description "Defines a new struct C type from a " { $link vertex-format } ". The runtime equivalent of " { $link POSTPONE: VERTEX-STRUCT: } ". This word must be called inside a compilation unit." } ;
+{ $description "Defines a new struct C type from a " { $link vertex-format } ". The runtime equivalent of " { $link postpone: VERTEX-STRUCT: } ". This word must be called inside a compilation unit." } ;
 
 HELP: fragment-shader
 { $class-description "This " { $link shader-kind } " indicates that a " { $link shader } " is a fragment shader." } ;
@@ -123,7 +123,7 @@ HELP: output-index
 { $notes "Named fragment shader outputs require OpenGL 3.0 or later and GLSL 1.30 or later, or OpenGL 2.0 or later and GLSL 1.20 or earlier with the " { $snippet "GL_EXT_gpu_shader4" } " extension." } ;
 
 HELP: program
-{ $class-description "A " { $snippet "program" } " provides a specification for linking a " { $link program-instance } " in a graphics context. Programs are defined with " { $link POSTPONE: GLSL-PROGRAM: } " and instantiated for a context with " { $link <program-instance> } "." } ;
+{ $class-description "A " { $snippet "program" } " provides a specification for linking a " { $link program-instance } " in a graphics context. Programs are defined with " { $link postpone: GLSL-PROGRAM: } " and instantiated for a context with " { $link <program-instance> } "." } ;
 
 HELP: program-instance
 { $class-description "A " { $snippet "program-instance" } " is a shader " { $link program } " that has been compiled and linked for a graphics context using " { $link <program-instance> } "." } ;
@@ -135,20 +135,20 @@ HELP: refresh-program
 { $description "Rereads the source code for every " { $link shader } " in " { $link program } " and attempts to refresh all the existing " { $link shader-instance } "s and " { $link program-instance } "s for those shaders. If any of the new source code fails to compile or link, the existing valid shader and program instances will remain untouched. However, subsequent attempts to compile new shader or program instances will still attempt to use the new source code. If the compilation and linking succeed, the existing shader and program instances will be updated on the fly to reference the newly compiled code." } ;
 
 HELP: shader
-{ $class-description "A " { $snippet "shader" } " provides a block of GLSL source code that can be compiled into a " { $link shader-instance } " in a graphics context. Shaders are defined with " { $link POSTPONE: GLSL-SHADER: } " or " { $link POSTPONE: GLSL-SHADER-FILE: } " and instantiated for a context with " { $link <shader-instance> } "." } ;
+{ $class-description "A " { $snippet "shader" } " provides a block of GLSL source code that can be compiled into a " { $link shader-instance } " in a graphics context. Shaders are defined with " { $link postpone: GLSL-SHADER: } " or " { $link postpone: GLSL-SHADER-FILE: } " and instantiated for a context with " { $link <shader-instance> } "." } ;
 
 HELP: shader-instance
 { $class-description "A " { $snippet "shader-instance" } " is a " { $link shader } " that has been compiled for a graphics context using " { $link <shader-instance> } "." } ;
 
 HELP: shader-kind
-{ $class-description "A " { $snippet "shader-kind" } " value is passed as part of a " { $link POSTPONE: GLSL-SHADER: } " or " { $link POSTPONE: GLSL-SHADER-FILE: } " definition to indicate the kind of " { $link shader } " being defined."
+{ $class-description "A " { $snippet "shader-kind" } " value is passed as part of a " { $link postpone: GLSL-SHADER: } " or " { $link postpone: GLSL-SHADER-FILE: } " definition to indicate the kind of " { $link shader } " being defined."
 { $list
 { { $link vertex-shader } "s run during primitive assembly and map input vertex data to positions in screen space for rasterization." }
 { { $link fragment-shader } "s run as part of rasterization and decide the final rendered output of a primitive as the outputs of the vertex shader are interpolated across its surface." }
 } } ;
 
 HELP: too-many-feedback-formats-error
-{ $class-description "This error is thrown when a " { $link POSTPONE: GLSL-PROGRAM: } " definition attempts to include more than one " { $link vertex-format } " for transform feedback formatting." } ;
+{ $class-description "This error is thrown when a " { $link postpone: GLSL-PROGRAM: } " definition attempts to include more than one " { $link vertex-format } " for transform feedback formatting." } ;
 
 HELP: invalid-link-feedback-format-error
 { $class-description "This error is thrown when the " { $link vertex-format } " specified as the transform feedback output format of a " { $link program } " is not suitable for the purpose. Transform feedback formats do not support padding (fields with a name of " { $link f } ")." } ;
@@ -189,7 +189,7 @@ HELP: vertex-attribute
 { $class-description "This tuple type is passed to " { $link define-vertex-format } " to define a new " { $link vertex-format } " type." } ;
 
 HELP: vertex-format
-{ $class-description "This class encompasses all vertex formats defined by " { $link POSTPONE: VERTEX-FORMAT: } ". A vertex format defines the binary layout of vertex attribute data in a " { $link buffer } " for use as part of a " { $link vertex-array } ". See the " { $link POSTPONE: VERTEX-FORMAT: } " documentation for details on how vertex formats are defined." } ;
+{ $class-description "This class encompasses all vertex formats defined by " { $link postpone: VERTEX-FORMAT: } ". A vertex format defines the binary layout of vertex attribute data in a " { $link buffer } " for use as part of a " { $link vertex-array } ". See the " { $link postpone: VERTEX-FORMAT: } " documentation for details on how vertex formats are defined." } ;
 
 HELP: vertex-format-size
 { $values
@@ -201,9 +201,9 @@ HELP: vertex-format-size
 ARTICLE: "gpu.shaders" "Shader objects"
 "The " { $vocab-link "gpu.shaders" } " vocabulary supports defining, compiling, and linking " { $link shader } "s into " { $link program } "s that run on the GPU and control rendering."
 { $subsections
-    POSTPONE: GLSL-PROGRAM:
-    POSTPONE: GLSL-SHADER:
-    POSTPONE: GLSL-SHADER-FILE:
+    postpone: GLSL-PROGRAM:
+    postpone: GLSL-SHADER:
+    postpone: GLSL-SHADER-FILE:
 }
 "A program must be instantiated for each graphics context it is used in:"
 { $subsections <program-instance> }
@@ -215,7 +215,7 @@ ARTICLE: "gpu.shaders" "Shader objects"
     <multi-vertex-array>
     <vertex-array*>
     <vertex-array>
-    POSTPONE: VERTEX-FORMAT:
+    postpone: VERTEX-FORMAT:
 } ;
 
 ABOUT: "gpu.shaders"

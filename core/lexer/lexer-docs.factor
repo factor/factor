@@ -74,7 +74,7 @@ HELP: still-parsing?
 HELP: each-token
 { $values { "end" string } { "quot" { $quotation ( ... token -- ... ) } } }
 { $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read." }
-{ $examples "This word is used to implement " { $link POSTPONE: USING: } "." }
+{ $examples "This word is used to implement " { $link postpone: USING: } "." }
 $parsing-note ;
 
 HELP: map-tokens

@@ -43,7 +43,7 @@ M: color-renderer row-value
     color-renderer
     <table>
         5 >>gap
-        COLOR: dark-gray >>column-line-color
+        color: dark-gray >>column-line-color
         10 >>min-rows
         10 >>max-rows ;
 

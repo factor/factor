@@ -9,7 +9,7 @@ HELP: game-attributes
 { { $snippet "tick-interval-nanos" } " specifies the number of nanoseconds between consecutive calls to the world's " { $link tick-game-world } " method by the game loop. An integer greater than zero must be provided." }
 { { $snippet "use-game-input?" } " specifies whether the game world should initialize the " { $vocab-link "game.input" } " library for use by the game. False by default." }
 { { $snippet "use-audio-engine?" } " specifies whether the game world should manage an " { $link audio-engine } " instance. False by default." }
-{ { $snippet "audio-engine-device" } " specifies the string name of the OpenAL device the audio engine, if any, should try to open. The default value of " { $link POSTPONE: f } " attempts to open the default OpenAL device." }
+{ { $snippet "audio-engine-device" } " specifies the string name of the OpenAL device the audio engine, if any, should try to open. The default value of " { $link postpone: f } " attempts to open the default OpenAL device." }
 { { $snippet "audio-engine-voice-count" } " determines the number of independent voices the audio engine will make available. This determines how many individual audio clips can play simultaneously. This cannot exceed the OpenAL implementation's limit on supported voices." }
 } ;
 
@@ -18,8 +18,8 @@ HELP: game-world
 $nl
 "The game-world tuple has the following publicly accessible slots:"
 { $list
-{ { $snippet "game-loop" } " contains the " { $link game-loop } " instance managed by the game world. If the world is inactive, this slot will contain " { $link POSTPONE: f } "." }
-{ { $snippet "audio-engine" } " contains the " { $link audio-engine } " instance managed by the game world. If the world is inactive, or the " { $snippet "use-audio-engine?" } " slot of the " { $link game-attributes } " object used to initialize the world was false, this slot will contain " { $link POSTPONE: f } "." }
+{ { $snippet "game-loop" } " contains the " { $link game-loop } " instance managed by the game world. If the world is inactive, this slot will contain " { $link postpone: f } "." }
+{ { $snippet "audio-engine" } " contains the " { $link audio-engine } " instance managed by the game world. If the world is inactive, or the " { $snippet "use-audio-engine?" } " slot of the " { $link game-attributes } " object used to initialize the world was false, this slot will contain " { $link postpone: f } "." }
 } } ;
 
 HELP: begin-game-world

@@ -44,7 +44,7 @@ $nl
 }
 "The optimizing compiler also trades off compile time for performance of generated code, so loading certain vocabularies might take a while. Saving the image after loading vocabularies can save you a lot of time that you would spend waiting for the same code to load in every coding session; see " { $link "images" } " for information."
 $nl
-"Most code you write will run with the optimizing compiler. Sometimes, the non-optimizing compiler is used, for example for listener interactions, or for running the quotation passed to " { $link POSTPONE: call( } "."
+"Most code you write will run with the optimizing compiler. Sometimes, the non-optimizing compiler is used, for example for listener interactions, or for running the quotation passed to " { $link postpone: call( } "."
 { $subsections
     "compiler-errors"
     "hints"

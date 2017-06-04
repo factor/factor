@@ -96,10 +96,10 @@ ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
 }
 "Literal syntax:"
 { $subsections
-    POSTPONE: smatrix{
-    POSTPONE: dmatrix{
-    POSTPONE: cmatrix{
-    POSTPONE: zmatrix{
+    postpone: smatrix{
+    postpone: dmatrix{
+    postpone: cmatrix{
+    postpone: zmatrix{
 } ;
 
 
@@ -307,6 +307,6 @@ HELP: zmatrix{
 { $description "Construct a literal " { $link complex-double-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
 {
-    POSTPONE: smatrix{ POSTPONE: dmatrix{
-    POSTPONE: cmatrix{ POSTPONE: zmatrix{
+    postpone: smatrix{ postpone: dmatrix{
+    postpone: cmatrix{ postpone: zmatrix{
 } related-words

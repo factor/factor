@@ -159,7 +159,7 @@ $nl
 { $subsections "alien.enums" }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
 { $subsections "alien.destructors" }
-"C struct and union types can be defined with " { $link POSTPONE: STRUCT: } " and " { $link POSTPONE: UNION-STRUCT: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
+"C struct and union types can be defined with " { $link postpone: STRUCT: } " and " { $link postpone: UNION-STRUCT: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
 
 HELP: malloc-string
 { $values { "string" string } { "encoding" "an encoding descriptor" } { "alien" c-ptr } }
@@ -179,7 +179,7 @@ HELP: <c-direct-array>
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
 
 ARTICLE: "c-strings" "C strings"
-"C string types are arrays with shape " { $snippet "{ c-string encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $link c-string } " is an alias for " { $snippet "{ c-string utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors. In " { $link POSTPONE: TYPEDEF: } ", " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: STRUCT: } " definitions, the shorthand syntax " { $snippet "c-string[encoding]" } " can be used to specify the string encoding."
+"C string types are arrays with shape " { $snippet "{ c-string encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $link c-string } " is an alias for " { $snippet "{ c-string utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors. In " { $link postpone: TYPEDEF: } ", " { $link postpone: FUNCTION: } ", " { $link postpone: CALLBACK: } ", and " { $link postpone: STRUCT: } " definitions, the shorthand syntax " { $snippet "c-string[encoding]" } " can be used to specify the string encoding."
 $nl
 "Using C string types triggers automatic conversions:"
 { $list
@@ -188,7 +188,7 @@ $nl
     "Passing an already encoded " { $link byte-array } " also works and performs no conversion."
     }
     { "Returning a C string from a C function allocates a Factor string in the Factor heap; the memory pointed to by the returned pointer is then decoded with the requested encoding into the Factor string." }
-    { "Reading " { $link c-string } " slots of "  { $link POSTPONE: STRUCT: } " or " { $link POSTPONE: UNION-STRUCT: } " returns Factor strings." }
+    { "Reading " { $link c-string } " slots of "  { $link postpone: STRUCT: } " or " { $link postpone: UNION-STRUCT: } " returns Factor strings." }
 }
 $nl
 "Care must be taken if the C function expects a pointer to a string with its length represented by another parameter rather than a null terminator. Passing the result of calling " { $link length } " on the string object will not suffice. This is because a Factor string of " { $emphasis "n" } " characters will not necessarily encode to " { $emphasis "n" } " bytes. The correct idiom for C functions which take a string with a length is to first encode the string using " { $link encode } ", and then pass the resulting byte array together with the length of this byte array."

@@ -284,7 +284,7 @@ HINTS: recursive-inline-hang-3 array ;
 ! Infinite expansion
 TUPLE: cons car cdr ;
 
-UNION: improper-list cons POSTPONE: f ;
+UNION: improper-list cons postpone: f ;
 
 PREDICATE: list < improper-list
     [ cdr>> list instance? ] [ t ] if* ;

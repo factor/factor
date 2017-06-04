@@ -211,7 +211,7 @@ $nl
 { $subsections
     <tree>
     >tree
-    POSTPONE: TREE{
+    postpone: TREE{
 }
 "Operations on trees: "
 { $subsections

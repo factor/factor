@@ -20,9 +20,9 @@ HELP: GB
 { $description "A shorthand for " { $link gl-break } "." } ;
 
 HELP: gl-break
-{ $description "Suspends the current thread and activates the walker like " { $link break } ", but also preserves the current OpenGL context, saves it to " { $link G-world } " for interactive use through " { $link G } ", and restores the current context when the suspended thread is continued. The shorthand word " { $link POSTPONE: GB } " can also be used." } ;
+{ $description "Suspends the current thread and activates the walker like " { $link break } ", but also preserves the current OpenGL context, saves it to " { $link G-world } " for interactive use through " { $link G } ", and restores the current context when the suspended thread is continued. The shorthand word " { $link postpone: GB } " can also be used." } ;
 
-{ G F G-world POSTPONE: GB gl-break } related-words
+{ G F G-world postpone: GB gl-break } related-words
 
 ARTICLE: "opengl.debug" "Interactive debugging of OpenGL applications"
 "The " { $vocab-link "opengl.debug" } " vocabulary provides words to assist with interactive debugging of OpenGL applications in the Factor UI."

@@ -93,7 +93,7 @@ HELP: define-uniform-tuple
 { $values
     { "class" class } { "superclass" class } { "uniforms" sequence }
 }
-{ $description "Defines a new " { $link uniform-tuple } " as a subclass of " { $snippet "superclass" } " with the slots specified by the " { $link uniform } " tuple values in " { $snippet "uniforms" } ". The runtime equivalent of " { $link POSTPONE: UNIFORM-TUPLE: } ". This word must be called inside a compilation unit." } ;
+{ $description "Defines a new " { $link uniform-tuple } " as a subclass of " { $snippet "superclass" } " with the slots specified by the " { $link uniform } " tuple values in " { $snippet "uniforms" } ". The runtime equivalent of " { $link postpone: UNIFORM-TUPLE: } ". This word must be called inside a compilation unit." } ;
 
 HELP: float-uniform
 { $class-description "This " { $link uniform-type } " indicates that a slot of a " { $link uniform-tuple } " corresponds to a float uniform parameter." } ;
@@ -258,10 +258,10 @@ HELP: uniform
 { $class-description "Values of this tuple type are passed to " { $link define-uniform-tuple } " to define a new " { $link uniform-tuple } " type." } ;
 
 HELP: uniform-tuple
-{ $class-description "The base class for tuple types defined with " { $link POSTPONE: UNIFORM-TUPLE: } ". A uniform tuple is used as part of a " { $link render-set } " to supply values for a shader program's uniform parameters. See the " { $link POSTPONE: UNIFORM-TUPLE: } " documentation for details on how uniform tuples are defined and used." } ;
+{ $class-description "The base class for tuple types defined with " { $link postpone: UNIFORM-TUPLE: } ". A uniform tuple is used as part of a " { $link render-set } " to supply values for a shader program's uniform parameters. See the " { $link postpone: UNIFORM-TUPLE: } " documentation for details on how uniform tuples are defined and used." } ;
 
 HELP: uniform-type
-{ $class-description { $snippet "uniform-type" } " values are used as part of a " { $link POSTPONE: UNIFORM-TUPLE: } " definition to define the types of uniform slots." } ;
+{ $class-description { $snippet "uniform-type" } " values are used as part of a " { $link postpone: UNIFORM-TUPLE: } " definition to define the types of uniform slots." } ;
 
 HELP: ushort-indexes
 { $class-description "This " { $link index-type } " indicates that an " { $link index-elements } " or " { $link multi-index-elements } " buffer consists of two-byte unsigned short indexes." } ;
@@ -303,7 +303,7 @@ ARTICLE: "gpu.render" "Rendering"
     render-set
 }
 { $link uniform-tuple } "s provide Factor types for containing and submitting shader uniform parameters:"
-{ $subsections POSTPONE: UNIFORM-TUPLE: }
+{ $subsections postpone: UNIFORM-TUPLE: }
 ;
 
 ABOUT: "gpu.render"

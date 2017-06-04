@@ -52,7 +52,7 @@ $nl
     ignore-errors
 }
 "Syntax sugar for defining errors:"
-{ $subsections POSTPONE: ERROR: }
+{ $subsections postpone: ERROR: }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
 { $subsections
     "errors-restartable"

@@ -75,4 +75,4 @@ HELP: literalize
     { $example "USING: math prettyprint quotations sequences ;" "[ + ] [ literalize ] map ." "[ \\ + ]" }
 } ;
 
-{ literalize curry <wrapper> POSTPONE: \ POSTPONE: W{ } related-words
+{ literalize curry <wrapper> postpone: \ postpone: W{ } related-words

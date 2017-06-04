@@ -74,16 +74,16 @@ M: definition-completion row-columns
 
 M: word-completion row-color
     [ vocabulary>> ] [ manifest>> ] bi* {
-        { [ dup not ] [ COLOR: black ] }
-        { [ 2dup search-vocab-names>> in? ] [ COLOR: black ] }
-        { [ over ".private" tail? ] [ COLOR: dark-red ] }
-        [ COLOR: dark-gray ]
+        { [ dup not ] [ color: black ] }
+        { [ 2dup search-vocab-names>> in? ] [ color: black ] }
+        { [ over ".private" tail? ] [ color: dark-red ] }
+        [ color: dark-gray ]
     } cond 2nip ;
 
 M: vocab-completion row-color
     drop dup vocab? [
-        name>> ".private" tail? COLOR: dark-red COLOR: black ?
-    ] [ drop COLOR: dark-gray ] if ;
+        name>> ".private" tail? color: dark-red color: black ?
+    ] [ drop color: dark-gray ] if ;
 
 M: color-completion row-color
     drop named-color ;

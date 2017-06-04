@@ -25,8 +25,8 @@ $nl
 { $subsections make-descriptive }
 "To define words which throw descriptive errors, use the following words:"
 { $subsections
-    POSTPONE: DESCRIPTIVE:
-    POSTPONE: DESCRIPTIVE::
+    postpone: DESCRIPTIVE:
+    postpone: DESCRIPTIVE::
 } ;
 
 ABOUT: "descriptive"

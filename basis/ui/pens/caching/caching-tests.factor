@@ -11,7 +11,7 @@ IN: ui.pens.caching.tests
     float-array{ 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 }
     float-array{ 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 }
 } [
-    "hi" <label> { COLOR: white COLOR: black } <gradient>
+    "hi" <label> { color: white color: black } <gradient>
     [ compute-pen ] keep
     [ last-dim>> ] [ last-vertices>> ] [ last-colors>> ] tri
 ] unit-test

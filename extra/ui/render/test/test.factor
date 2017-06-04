@@ -52,21 +52,21 @@ M: take-screenshot draw-boundary
     <shelf>
         take-screenshot new >>boundary
         <gadget>
-            COLOR: black <solid> >>interior
+            color: black <solid> >>interior
             { 98 98 } >>dim
         { 1 1 } <border> add-gadget
         <gadget>
-            COLOR: gray <solid> >>boundary
+            color: gray <solid> >>boundary
             { 94 94 } >>dim
         { 3 3 } <border>
-            COLOR: red <solid> >>boundary
+            color: red <solid> >>boundary
         add-gadget
             <line-gadget> <line-gadget> <line-gadget> 3array
             <line-gadget> <line-gadget> <line-gadget> 3array
             <line-gadget> <line-gadget> <line-gadget> 3array
         3array <grid>
             { 5 5 } >>gap
-            COLOR: blue <grid-lines> >>boundary
+            color: blue <grid-lines> >>boundary
         add-gadget ;
 
 : ui-render-test ( -- )

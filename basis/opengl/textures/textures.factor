@@ -304,7 +304,7 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
     GL_TEXTURE_2D [
         GL_TEXTURE_BIT [
             GL_TEXTURE_COORD_ARRAY [
-                COLOR: white gl-color
+                color: white gl-color
                 call
             ] do-enabled-client-state
         ] do-attribs

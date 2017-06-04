@@ -490,9 +490,9 @@ ARTICLE: "peg.ebnf" "EBNF"
 "EBNF syntax. It provides three parsing words described below. These words all "
 "accept the same EBNF syntax. The difference is in how they are used. "
 { $subsections
-    POSTPONE: <EBNF
-    POSTPONE: [EBNF
-    POSTPONE: EBNF:
+    postpone: <EBNF
+    postpone: [EBNF
+    postpone: EBNF:
 }
 "The EBNF syntax is composed of a series of rules of the form:"
 { $code

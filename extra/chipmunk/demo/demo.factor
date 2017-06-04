@@ -51,7 +51,7 @@ CONSTANT: image-bitmap B{
     x bitnot 7 bitand neg shift 1 bitand 1 = ;
 
 :: make-ball ( x y -- shape )
-    cpBodyAlloc 1.0 NAN: 0 cpBodyInit
+    cpBodyAlloc 1.0 nan: 0 cpBodyInit
     x y cpv >>p :> body
     cpCircleShapeAlloc body 0.95 0 0 cpv cpCircleShapeInit
     dup shape>>
@@ -119,7 +119,7 @@ M:: chipmunk-world begin-game-world ( world -- )
         ] each
     ] each
 
-    space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody :> body
+    space cpBodyAlloc nan: 0 dup cpBodyInit cpSpaceAddBody :> body
     body -1000 -10 cpv >>p drop
     body 400 0 cpv >>v drop
 

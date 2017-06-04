@@ -129,7 +129,7 @@ PRIVATE>
     ] 2dip <tile-pen> ;
 
 : <border-button-pen> ( -- pen )
-    "button" os windows? [ COLOR: grey95 ] [ transparent ] if button-text-color
+    "button" os windows? [ color: grey95 ] [ transparent ] if button-text-color
     <border-button-state-pen> dup
     "button-clicked" transparent button-clicked-text-color
     <border-button-state-pen> dup dup

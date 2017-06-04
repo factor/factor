@@ -39,7 +39,7 @@ PRIVATE>
 
 M: axis draw-gadget*
     dup parent>> dup chart? [| axis chart |
-        COLOR: black axis default-color
+        color: black axis default-color
         chart axis chart-dims [ axis-pos ] keep first2 swap scale
         chart dim>> first2 axis axis-line draw-line
     ] [ 2drop ] if ;

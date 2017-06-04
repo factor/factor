@@ -13,7 +13,7 @@ HELP: [infix
         "[infix 8+2*3 infix] ."
         "14"
     } $nl
-    { $link POSTPONE: [infix } " isn't that useful by itself, as it can only access literal numbers and no variables. It is designed to be used together with locals; for example with " { $link POSTPONE: :: } " :"
+    { $link postpone: [infix } " isn't that useful by itself, as it can only access literal numbers and no variables. It is designed to be used together with locals; for example with " { $link postpone: :: } " :"
     { $example
         "USING: infix locals math.functions prettyprint ;"
         "IN: scratchpad"
@@ -28,8 +28,8 @@ HELP: [infix
 ARTICLE: "infix" "Infix notation"
 "The " { $vocab-link "infix" } " vocabulary implements support for infix notation in Factor source code."
 { $subsections
-    POSTPONE: [infix
-    POSTPONE: INFIX::
+    postpone: [infix
+    postpone: INFIX::
 }
 "The usual infix math operators are supported:"
 { $list

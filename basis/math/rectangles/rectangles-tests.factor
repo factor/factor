@@ -2,39 +2,39 @@ USING: tools.test math.rectangles prettyprint io.streams.string
 kernel accessors ;
 IN: math.rectangles.tests
 
-{ RECT: { 10 10 } { 20 20 } }
+{ rect: { 10 10 } { 20 20 } }
 [
-    RECT: { 10 10 } { 50 50 }
-    RECT: { -10 -10 } { 40 40 }
+    rect: { 10 10 } { 50 50 }
+    rect: { -10 -10 } { 40 40 }
     rect-intersect
 ] unit-test
 
-{ RECT: { 200 200 } { 0 0 } }
+{ rect: { 200 200 } { 0 0 } }
 [
-    RECT: { 100 100 } { 50 50 }
-    RECT: { 200 200 } { 40 40 }
+    rect: { 100 100 } { 50 50 }
+    rect: { 200 200 } { 40 40 }
     rect-intersect
 ] unit-test
 
 { f } [
-    RECT: { 100 100 } { 50 50 }
-    RECT: { 200 200 } { 40 40 }
+    rect: { 100 100 } { 50 50 }
+    rect: { 200 200 } { 40 40 }
     contains-rect?
 ] unit-test
 
 { t } [
-    RECT: { 100 100 } { 50 50 }
-    RECT: { 120 120 } { 40 40 }
+    rect: { 100 100 } { 50 50 }
+    rect: { 120 120 } { 40 40 }
     contains-rect?
 ] unit-test
 
 { f } [
-    RECT: { 1000 100 } { 50 50 }
-    RECT: { 120 120 } { 40 40 }
+    rect: { 1000 100 } { 50 50 }
+    rect: { 120 120 } { 40 40 }
     contains-rect?
 ] unit-test
 
-{ RECT: { 10 20 } { 20 20 } } [
+{ rect: { 10 20 } { 20 20 } } [
     {
         { 20 20 }
         { 10 40 }
@@ -42,5 +42,5 @@ IN: math.rectangles.tests
     } rect-containing
 ] unit-test
 
-! Prettyprint for RECT: didn't do nesting check properly
-{ } [ [ RECT: f f dup >>dim . ] with-string-writer drop ] unit-test
+! Prettyprint for rect: didn't do nesting check properly
+{ } [ [ rect: f f dup >>dim . ] with-string-writer drop ] unit-test

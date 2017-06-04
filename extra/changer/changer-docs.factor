@@ -28,9 +28,9 @@ ARTICLE: "changer" "Changer syntax"
 $nl
 "Syntax word to change tuple slots:"
 { $subsections
-    POSTPONE: change:
+    postpone: change:
 }
-"Macro to implement " { $link POSTPONE: change: } ":"
+"Macro to implement " { $link postpone: change: } ":"
 { $subsections
     inline-changer
 } ;

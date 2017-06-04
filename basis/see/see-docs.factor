@@ -31,12 +31,12 @@ HELP: definer
     { $example "USING: definitions prettyprint ;"
                "IN: scratchpad"
                ": foo ( -- ) ; \\ foo definer . ."
-               ";\nPOSTPONE: :"
+               ";\npostpone: :"
     }
     { $example "USING: definitions prettyprint ;"
                "IN: scratchpad"
                "SYMBOL: foo \\ foo definer . ."
-               "f\nPOSTPONE: SYMBOL:"
+               "f\npostpone: SYMBOL:"
     }
 }
 { $notes "This word is used in the implementation of " { $link see } "." } ;

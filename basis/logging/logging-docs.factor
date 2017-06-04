@@ -87,7 +87,7 @@ ARTICLE: "logging.messages" "Logging messages"
     log-critical
 }
 "A utility for defining words which just log and do nothing else:"
-{ $subsections POSTPONE: LOG: }
+{ $subsections postpone: LOG: }
 "Annotating words to log; this uses the " { $link "tools.annotations" } " feature:"
 { $subsections
     add-input-logging

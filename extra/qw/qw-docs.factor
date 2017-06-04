@@ -14,6 +14,6 @@ qw{ pop quiz my hive of big wild ex tranny jocks } ."
 ARTICLE: "qw" "Quoted words"
 "The " { $vocab-link "qw" } " vocabulary offers a shorthand syntax for arrays-of-strings literals." $nl
 "Construct an array of strings:"
-{ $subsections POSTPONE: qw{ } ;
+{ $subsections postpone: qw{ } ;
 
 ABOUT: "qw"

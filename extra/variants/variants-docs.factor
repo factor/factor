@@ -13,7 +13,7 @@ VARIANT: class-name
     .
     .
     ; " }
-{ $description "Defines " { $snippet "class-name" } " as a union of the following " { $link singleton-class } " and " { $link tuple-class } " definitions. Each " { $snippet "singleton" } " word is defined as a " { $snippet "singleton-class" } ", and each " { $snippet "tuple" } " word is defined as a " { $snippet "tuple-class" } " with the given set of " { $snippet "slot" } "s, using the same syntax for slot specifiers as " { $link POSTPONE: TUPLE: } ". Typed tuple slots can recursively reference the variant " { $snippet "class-name" } " being defined. For " { $snippet "tuple" } " types, a " { $link boa } " constructor word " { $snippet "<tuple>" } " is defined as well." }
+{ $description "Defines " { $snippet "class-name" } " as a union of the following " { $link singleton-class } " and " { $link tuple-class } " definitions. Each " { $snippet "singleton" } " word is defined as a " { $snippet "singleton-class" } ", and each " { $snippet "tuple" } " word is defined as a " { $snippet "tuple-class" } " with the given set of " { $snippet "slot" } "s, using the same syntax for slot specifiers as " { $link postpone: TUPLE: } ". Typed tuple slots can recursively reference the variant " { $snippet "class-name" } " being defined. For " { $snippet "tuple" } " types, a " { $link boa } " constructor word " { $snippet "<tuple>" } " is defined as well." }
 { $examples { $code "
 USING: kernel variants ;
 IN: scratchpad
@@ -62,15 +62,15 @@ HELP: unboa
 { $description "Decomposes a tuple of type " { $snippet "class" } " into its component slot values by order of arguments. The inverse of " { $link boa } "." } ;
 
 HELP: variant-class
-{ $class-description "This class comprises class names that have been defined with " { $link POSTPONE: VARIANT: } ". When a " { $snippet "variant-class" } " is used as the type of a specialized " { $link tuple } " slot, the variant's first member type is used as the default " { $link initial-value } "." } ;
+{ $class-description "This class comprises class names that have been defined with " { $link postpone: VARIANT: } ". When a " { $snippet "variant-class" } " is used as the type of a specialized " { $link tuple } " slot, the variant's first member type is used as the default " { $link initial-value } "." } ;
 
-{ POSTPONE: VARIANT: variant-class match } related-words
+{ postpone: VARIANT: variant-class match } related-words
 
 ARTICLE: "variants" "Algebraic data types"
 "The " { $vocab-link "variants" } " vocabulary provides syntax and combinators for defining and manipulating algebraic data types."
 { $subsections
-    POSTPONE: VARIANT:
-    POSTPONE: VARIANT-MEMBER:
+    postpone: VARIANT:
+    postpone: VARIANT-MEMBER:
     variant-class
     match
 } ;

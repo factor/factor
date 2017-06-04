@@ -31,7 +31,7 @@ IN: rosetta-code.ternary-logic
 !   algorithm and is preferable to binary logic.
 
 SINGLETON: m
-UNION: trit t m POSTPONE: f ;
+UNION: trit t m postpone: f ;
 
 GENERIC: >trit ( object -- trit )
 M: trit >trit ;

@@ -27,7 +27,7 @@ focused? blink blink-timer ;
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
-    COLOR: red >>caret-color
+    color: red >>caret-color
     monospace-font >>font ; inline
 
 PRIVATE>

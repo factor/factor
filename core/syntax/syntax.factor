@@ -76,7 +76,7 @@ IN: bootstrap.syntax
         scan-token scan-token "=>" expect scan-token add-renamed-word
     ] define-core-syntax
 
-    "NAN:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
+    "nan:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
 
     "f" [ f suffix! ] define-core-syntax
 
@@ -109,7 +109,7 @@ IN: bootstrap.syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
     "HS{" [ \ } [ >hash-set ] parse-literal ] define-core-syntax
 
-    "POSTPONE:" [ scan-word suffix! ] define-core-syntax
+    "postpone:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
     "inline" [ last-word make-inline ] define-core-syntax

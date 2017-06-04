@@ -15,9 +15,9 @@ HELP: define-dual
     { "word" word }
 }
 { $description "Defines a word " { $snippet "d[word]" } " in the " { $vocab-link "math.dual" } " vocabulary that operates on dual numbers." }
-{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments.  This can be set using " { $link POSTPONE: DERIVATIVE: } "." } ;
+{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments.  This can be set using " { $link postpone: DERIVATIVE: } "." } ;
 
-{ define-dual dual-op POSTPONE: DERIVATIVE: } related-words
+{ define-dual dual-op postpone: DERIVATIVE: } related-words
 
 HELP: dual
 { $class-description "The class of dual numbers with non-zero epsilon part." } ;
@@ -27,7 +27,7 @@ HELP: dual-op
     { "word" word }
 }
 { $description "Similar to " { $link execute } ", but promotes word to operate on duals." }
-{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments. This can be set using " { $link POSTPONE: DERIVATIVE: } ". Once a derivative has been defined for a word, dual-op makes it easy to extend the definition to dual numbers." }
+{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments. This can be set using " { $link postpone: DERIVATIVE: } ". Once a derivative has been defined for a word, dual-op makes it easy to extend the definition to dual numbers." }
 { $examples
     { $unchecked-example "USING: math math.dual math.derivatives.syntax math.functions ;"
     "DERIVATIVE: sin [ cos * ]"

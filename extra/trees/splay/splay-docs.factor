@@ -23,7 +23,7 @@ ARTICLE: "trees.splay" "Splay trees"
     splay
     <splay>
     >splay
-    POSTPONE: SPLAY{
+    postpone: SPLAY{
 } ;
 
 ABOUT: "trees.splay"

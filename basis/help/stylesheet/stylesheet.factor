@@ -54,7 +54,7 @@ H{
     { font-style bold }
     { wrap-margin $ wrap-margin-full }
     { foreground $ title-color }
-    { page-color COLOR: FactorLightTan }
+    { page-color color: FactorLightTan }
     { inset { 5 5 } }
 } title-style set-global
 

@@ -9,7 +9,7 @@ IN: math.floats.half.tests
 { 0xbe00 } [ -1.5  half>bits ] unit-test
 { 0x7c00 } [  1/0. half>bits ] unit-test
 { 0xfc00 } [ -1/0. half>bits ] unit-test
-{ 0x7eaa } [ NAN: aaaaaaaaaaaaa half>bits ] unit-test
+{ 0x7eaa } [ nan: aaaaaaaaaaaaa half>bits ] unit-test
 
 ! too-big floats overflow to infinity
 { 0x7c00 } [   65536.0 half>bits ] unit-test

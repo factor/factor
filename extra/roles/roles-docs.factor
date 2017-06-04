@@ -33,27 +33,27 @@ $nl
 "Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." } ;
 
 {
-    POSTPONE: ROLE:
-    POSTPONE: ROLE-TUPLE:
+    postpone: ROLE:
+    postpone: ROLE-TUPLE:
 } related-words
 
 HELP: role
 { $class-description "The superclass of all role classes. A " { $snippet "role" } " is a " { $link mixin-class } " that includes a set of slot definitions that can be added to " { $link tuple } " classes alongside other " { $snippet "role" } "s." } ;
 
 HELP: multiple-inheritance-attempted
-{ $class-description "This error is thrown if a " { $link POSTPONE: ROLE-TUPLE: } " definition attempts to inherit more than one " { $link tuple } " class." } ;
+{ $class-description "This error is thrown if a " { $link postpone: ROLE-TUPLE: } " definition attempts to inherit more than one " { $link tuple } " class." } ;
 
 HELP: role-slot-overlap
-{ $class-description "This error is thrown if a " { $link POSTPONE: ROLE-TUPLE: } " or " { $link POSTPONE: ROLE: } " definition attempts to inherit a set of " { $link role } "s in which more than one attempts to define the same slot." } ;
+{ $class-description "This error is thrown if a " { $link postpone: ROLE-TUPLE: } " or " { $link postpone: ROLE: } " definition attempts to inherit a set of " { $link role } "s in which more than one attempts to define the same slot." } ;
 
 ARTICLE: "roles" "Roles"
-"The " { $vocab-link "roles" } " vocabulary provides a form of tuple interface that can be implemented by concrete tuple classes. A " { $link role } " definition is a mixin class that also prescribes a set of tuple slots. Roles are not tuple classes by themselves and cannot be instantiated by " { $link new } ". The vocabulary extends " { $link POSTPONE: ROLE-TUPLE: } " syntax to allow concrete tuple types to declare membership to one or more roles, automatically including their prescribed slots." $nl
+"The " { $vocab-link "roles" } " vocabulary provides a form of tuple interface that can be implemented by concrete tuple classes. A " { $link role } " definition is a mixin class that also prescribes a set of tuple slots. Roles are not tuple classes by themselves and cannot be instantiated by " { $link new } ". The vocabulary extends " { $link postpone: ROLE-TUPLE: } " syntax to allow concrete tuple types to declare membership to one or more roles, automatically including their prescribed slots." $nl
 "The role superclass:"
 { $subsections role }
 "Syntax for making a new role:"
-{ $subsection POSTPONE: ROLE: }
+{ $subsection postpone: ROLE: }
 "Syntax for making tuples that use roles:"
-{ $subsection POSTPONE: ROLE-TUPLE: }
+{ $subsection postpone: ROLE-TUPLE: }
 "Errors with roles:"
 { $subsections multiple-inheritance-attempted role-slot-overlap } ;
 

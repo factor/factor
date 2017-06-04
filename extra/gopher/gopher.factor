@@ -83,7 +83,7 @@ M: gopher-link >url
     ] [
         [ name>> ] keep [
             presented ,,
-            COLOR: blue foreground ,,
+            color: blue foreground ,,
         ] H{ } make format nl
     ] if ;
 

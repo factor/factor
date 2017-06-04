@@ -11,30 +11,30 @@ IN: xmode.highlight
 <PRIVATE
 
 CONSTANT: STYLES H{
-    { "NULL"     H{ { foreground HEXCOLOR: 000000 } } }
-    { "COMMENT1" H{ { foreground HEXCOLOR: cc0000 } } }
-    { "COMMENT2" H{ { foreground HEXCOLOR: ff8400 } } }
-    { "COMMENT3" H{ { foreground HEXCOLOR: 6600cc } } }
-    { "COMMENT4" H{ { foreground HEXCOLOR: cc6600 } } }
-    { "DIGIT"    H{ { foreground HEXCOLOR: ff0000 } } }
-    { "FUNCTION" H{ { foreground HEXCOLOR: 9966ff } } }
-    { "INVALID"  H{ { background HEXCOLOR: ffffcc }
-                    { foreground HEXCOLOR: ff0066 } } }
-    { "KEYWORD1" H{ { foreground HEXCOLOR: 006699 }
+    { "NULL"     H{ { foreground hexcolor: 000000 } } }
+    { "COMMENT1" H{ { foreground hexcolor: cc0000 } } }
+    { "COMMENT2" H{ { foreground hexcolor: ff8400 } } }
+    { "COMMENT3" H{ { foreground hexcolor: 6600cc } } }
+    { "COMMENT4" H{ { foreground hexcolor: cc6600 } } }
+    { "DIGIT"    H{ { foreground hexcolor: ff0000 } } }
+    { "FUNCTION" H{ { foreground hexcolor: 9966ff } } }
+    { "INVALID"  H{ { background hexcolor: ffffcc }
+                    { foreground hexcolor: ff0066 } } }
+    { "KEYWORD1" H{ { foreground hexcolor: 006699 }
                     { font-style bold } } }
-    { "KEYWORD2" H{ { foreground HEXCOLOR: 009966 }
+    { "KEYWORD2" H{ { foreground hexcolor: 009966 }
                     { font-style bold } } }
-    { "KEYWORD3" H{ { foreground HEXCOLOR: 0099ff }
+    { "KEYWORD3" H{ { foreground hexcolor: 0099ff }
                     { font-style bold } } }
-    { "KEYWORD4" H{ { foreground HEXCOLOR: 66ccff }
+    { "KEYWORD4" H{ { foreground hexcolor: 66ccff }
                     { font-style bold } } }
-    { "LABEL"    H{ { foreground HEXCOLOR: 02b902 } } }
-    { "LITERAL1" H{ { foreground HEXCOLOR: ff00cc } } }
-    { "LITERAL2" H{ { foreground HEXCOLOR: cc00cc } } }
-    { "LITERAL3" H{ { foreground HEXCOLOR: 9900cc } } }
-    { "LITERAL4" H{ { foreground HEXCOLOR: 6600cc } } }
-    { "MARKUP"   H{ { foreground HEXCOLOR: 0000ff } } }
-    { "OPERATOR" H{ { foreground HEXCOLOR: 000000 }
+    { "LABEL"    H{ { foreground hexcolor: 02b902 } } }
+    { "LITERAL1" H{ { foreground hexcolor: ff00cc } } }
+    { "LITERAL2" H{ { foreground hexcolor: cc00cc } } }
+    { "LITERAL3" H{ { foreground hexcolor: 9900cc } } }
+    { "LITERAL4" H{ { foreground hexcolor: 6600cc } } }
+    { "MARKUP"   H{ { foreground hexcolor: 0000ff } } }
+    { "OPERATOR" H{ { foreground hexcolor: 000000 }
                     { font-style bold } } }
 }
 

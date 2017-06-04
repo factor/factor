@@ -21,7 +21,7 @@ IN: core-text.tests
 :: test-typographic-bounds ( string font -- ? )
     [
         font test-font &CFRelease :> ctfont
-        string ctfont COLOR: white <CTLine> &CFRelease :> ctline
+        string ctfont color: white <CTLine> &CFRelease :> ctline
         ctfont ctline compute-line-metrics {
             [ width>> float? ]
             [ ascent>> float? ]

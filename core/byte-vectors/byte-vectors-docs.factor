@@ -15,7 +15,7 @@ $nl
     <byte-vector>
 }
 "Literal syntax:"
-{ $subsections POSTPONE: BV{ }
+{ $subsections postpone: BV{ }
 "If you don't care about initial capacity, a more elegant way to create a new byte vector is to write:"
 { $code "BV{ } clone" } ;
 
@@ -36,5 +36,5 @@ HELP: >byte-vector
 HELP: BV{
 { $syntax "BV{ elements... }" }
 { $values { "elements" "a list of bytes" } }
-{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." }
+{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link postpone: } } "." }
 { $examples { $code "BV{ 1 2 3 12 }" } } ;

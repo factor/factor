@@ -22,6 +22,6 @@ HELP: wrapping-word
 { $see-also wrap-words } ;
 
 HELP: <wrapping-word>
-{ $values { "key" object } { "width" integer } { "break?" { { $link t } " or " { $link POSTPONE: f } } } { "wrapping-word" wrapping-word } }
+{ $values { "key" object } { "width" integer } { "break?" { { $link t } " or " { $link postpone: f } } } { "wrapping-word" wrapping-word } }
 { $description "Creates a " { $link wrapping-word } " object with the given parameters." }
 { $see-also wrap-words } ;

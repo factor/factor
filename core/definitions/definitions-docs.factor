@@ -52,7 +52,7 @@ $nl
 ARTICLE: "definitions" "Definitions"
 "A " { $emphasis "definition" } " is an artifact read from a source file. Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary."
 $nl
-"Definitions are defined using parsing words. Examples of definitions together with their defining parsing words are words (" { $link POSTPONE: : } "), methods (" { $link POSTPONE: M: } "), and vocabularies (" { $link POSTPONE: IN: } ")."
+"Definitions are defined using parsing words. Examples of definitions together with their defining parsing words are words (" { $link postpone: : } "), methods (" { $link postpone: M: } "), and vocabularies (" { $link postpone: IN: } ")."
 $nl
 "All definitions share some common traits:"
 { $list
@@ -68,7 +68,7 @@ $nl
     "compilation-units"
 }
 "A parsing word to remove definitions:"
-{ $subsections POSTPONE: FORGET: }
+{ $subsections postpone: FORGET: }
 { $see-also "see" "parser" "source-files" "words" "generic" "help-impl" } ;
 
 ABOUT: "definitions"

@@ -2,7 +2,7 @@ USING: multi-methods tools.test math sequences namespaces system
 kernel strings ;
 IN: multi-methods.tests
 
-[ { POSTPONE: f integer } ] [ { f integer } canonicalize-specializer-0 ] unit-test
+[ { postpone: f integer } ] [ { f integer } canonicalize-specializer-0 ] unit-test
 
 : setup-canon-test ( -- )
     0 args set

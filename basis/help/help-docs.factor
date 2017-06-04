@@ -91,11 +91,11 @@ ARTICLE: "writing-help" "Writing documentation"
 $nl
 "A pair of parsing words are used to define free-standing articles and to associate documentation with words:"
 { $subsections
-    POSTPONE: ARTICLE:
-    POSTPONE: HELP:
+    postpone: ARTICLE:
+    postpone: HELP:
 }
 "A parsing word defines the main help article for a vocabulary:"
-{ $subsections POSTPONE: ABOUT: }
+{ $subsections postpone: ABOUT: }
 "The " { $emphasis "content" } " in both cases is a " { $emphasis "markup element" } ", a recursive structure taking one of the following forms:"
 { $list
     { "a string," }
@@ -311,7 +311,7 @@ HELP: $example
 { $values { "element" "a markup element of the form " { $snippet "{ inputs... output }" } } }
 { $description "Prints a clickable example with sample output. The markup element must be an array of strings. All but the last string are joined by newlines and taken as the input text, and the last string is the output. The example becomes clickable if the output stream supports it, and clicking it opens a listener window with the input text inserted at the input prompt." }
 { $examples
-    "The input text must contain a correct " { $link POSTPONE: USING: } " declaration, and output text should be a string of what the input prints when executed, not the final stack contents or anything like that. So the following is an incorrect example:"
+    "The input text must contain a correct " { $link postpone: USING: } " declaration, and output text should be a string of what the input prints when executed, not the final stack contents or anything like that. So the following is an incorrect example:"
     { $markup-example { $unchecked-example "2 2 +" "4" } }
     "However the following is right:"
     { $markup-example { $example "USING: math prettyprint ;" "2 2 + ." "4" } }
@@ -524,4 +524,4 @@ HELP: ABOUT:
 
 HELP: vocab-help
 { $values { "vocab-spec" "a vocabulary specifier" } { "help" "a help article" } }
-{ $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link POSTPONE: ABOUT: } "." } ;
+{ $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link postpone: ABOUT: } "." } ;

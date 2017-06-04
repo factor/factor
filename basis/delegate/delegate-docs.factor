@@ -4,18 +4,18 @@ IN: delegate
 HELP: define-protocol
 { $values { "protocol" "a word for the new protocol" } { "wordlist" "a sequence of words" } }
 { $description "Defines a symbol as a protocol." }
-{ $notes "Usually, " { $link POSTPONE: PROTOCOL: } " should be used instead. This is only for runtime use." } ;
+{ $notes "Usually, " { $link postpone: PROTOCOL: } " should be used instead. This is only for runtime use." } ;
 
 HELP: PROTOCOL:
 { $syntax "PROTOCOL: protocol-name words... ;" }
 { $description "Defines an explicit protocol, which can be used as a basis for delegation." } ;
 
-{ define-protocol POSTPONE: PROTOCOL: } related-words
+{ define-protocol postpone: PROTOCOL: } related-words
 
 HELP: define-consult
 { $values { "consultation" consultation } }
 { $description "Defines a class to consult, using the quotation, on the generic words contained in the group." }
-{ $notes "Usually, " { $link POSTPONE: CONSULT: } " should be used instead. This is only for runtime use." } ;
+{ $notes "Usually, " { $link postpone: CONSULT: } " should be used instead. This is only for runtime use." } ;
 
 HELP: CONSULT:
 { $syntax "CONSULT: group class
@@ -33,9 +33,9 @@ HELP: SLOT-PROTOCOL:
 { $syntax "SLOT-PROTOCOL: protocol-name slots... ;" }
 { $description "Defines a protocol consisting of reader and writer words for the listed slot names." } ;
 
-{ define-protocol POSTPONE: PROTOCOL: } related-words
+{ define-protocol postpone: PROTOCOL: } related-words
 
-{ define-consult POSTPONE: BROADCAST: POSTPONE: CONSULT: } related-words
+{ define-consult postpone: BROADCAST: postpone: CONSULT: } related-words
 
 HELP: group-words
 { $values { "group" "a group" } { "words" "an array of words" } }
@@ -52,15 +52,15 @@ $nl
 $nl
 "Defining new protocols:"
 { $subsections
-    POSTPONE: PROTOCOL:
+    postpone: PROTOCOL:
     define-protocol
 }
 "Defining new protocols consisting of slot accessors:"
-{ $subsections POSTPONE: SLOT-PROTOCOL: }
+{ $subsections postpone: SLOT-PROTOCOL: }
 "Defining consultation:"
 { $subsections
-    POSTPONE: BROADCAST:
-    POSTPONE: CONSULT:
+    postpone: BROADCAST:
+    postpone: CONSULT:
     define-consult
 }
 "Every tuple class has an associated protocol consisting of all of its slot accessor methods. The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ;

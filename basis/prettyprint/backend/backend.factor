@@ -54,7 +54,7 @@ M: word pprint-class pprint-word ;
     <block swap pprint-word call block> ; inline
 
 M: parsing-word pprint*
-    \ POSTPONE: [ pprint-word ] pprint-prefix ;
+    \ postpone: [ pprint-word ] pprint-prefix ;
 
 M: word pprint*
     [ pprint-word ] [ ?start-group ] [ ?end-group ] tri ;
@@ -83,7 +83,7 @@ M: real pprint*
 
 M: float pprint*
     dup fp-nan? [
-        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
+        \ nan: [ fp-nan-payload >hex text ] pprint-prefix
     ] [
         number-base get {
             { 10 [ number>string text ] }

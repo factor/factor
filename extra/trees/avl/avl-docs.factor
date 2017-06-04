@@ -23,7 +23,7 @@ ARTICLE: "trees.avl" "AVL trees"
     avl
     <avl>
     >avl
-    POSTPONE: AVL{
+    postpone: AVL{
 } ;
 
 ABOUT: "trees.avl"

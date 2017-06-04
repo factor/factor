@@ -32,4 +32,4 @@ PRIVATE>
 : flex-hex>rgba ( str -- rgba )
     flex-hex hex>rgba ;
 
-SYNTAX: FLEXHEXCOLOR: scan-token flex-hex>rgba suffix! ;
+SYNTAX: FLEXhexcolor: scan-token flex-hex>rgba suffix! ;

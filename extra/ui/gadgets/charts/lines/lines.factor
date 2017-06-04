@@ -246,7 +246,7 @@ PRIVATE>
 M: line draw-gadget*
     dup parent>> dup chart? [| line chart |
         chart chart-axes
-        COLOR: black line [ default-color ] [ data>> ] bi
+        color: black line [ default-color ] [ data>> ] bi
         dupd clip-data swap second [ drawable-chunks ] keep
         flip-y-axis
         chart chart-dim first2 [ chart chart-axes first2 ] dip swap

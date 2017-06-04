@@ -2,4 +2,4 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: colors colors.constants tools.test ;
 
-{ t } [ COLOR: light-green rgba? ] unit-test
+{ t } [ color: light-green rgba? ] unit-test

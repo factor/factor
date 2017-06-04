@@ -7,9 +7,9 @@ IN: prettyprint.stylesheet
 
 <PRIVATE
 
-{ POSTPONE: USING: POSTPONE: USE: POSTPONE: IN: }
+{ postpone: USING: postpone: USE: postpone: IN: }
 [
-    { { foreground COLOR: gray35 } }
+    { { foreground color: gray35 } }
     "word-style" set-word-prop
 ] each
 
@@ -28,7 +28,7 @@ M: word word-style
 
 SYMBOL: highlighted-word-style
 H{
-    { foreground COLOR: DarkSlateGray }
+    { foreground color: DarkSlateGray }
 } highlighted-word-style set-global
 
 M: highlighted-word word-style
@@ -36,7 +36,7 @@ M: highlighted-word word-style
 
 SYMBOL: base-string-style
 H{
-    { foreground COLOR: LightSalmon4 }
+    { foreground color: LightSalmon4 }
 } base-string-style set-global
 
 : string-style ( str -- style )
@@ -44,7 +44,7 @@ H{
 
 SYMBOL: base-vocab-style
 H{
-    { foreground COLOR: gray35 }
+    { foreground color: gray35 }
 } base-vocab-style set-global
 
 : vocab-style ( vocab -- style )
@@ -52,7 +52,7 @@ H{
 
 SYMBOL: stack-effect-style
 H{
-    { foreground COLOR: FactorDarkGreen }
+    { foreground color: FactorDarkGreen }
     { font-style plain }
 } stack-effect-style set-global
 

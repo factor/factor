@@ -59,7 +59,7 @@ IN: math.functions.tests
 { -0.0 } [ -0.0 1 ldexp ] unit-test
 { 1/0. } [ 1/0. 1 ldexp ] unit-test
 { -1/0. } [ -1/0. 1 ldexp ] unit-test
-{ t } [ NAN: 90210 dup 1 ldexp [ fp-nan-payload ] same? ] unit-test
+{ t } [ nan: 90210 dup 1 ldexp [ fp-nan-payload ] same? ] unit-test
 { 49152.0 } [ 12.0 12 ldexp ] unit-test
 { 0x1.8p-9 } [ 12.0 -12 ldexp ] unit-test
 { 49152 } [ 12 12 ldexp ] unit-test

@@ -55,7 +55,7 @@ SINGLETON: metrics-paint
 
 M: metrics-paint draw-boundary
     drop
-    COLOR: red gl-color
+    color: red gl-color
     [ dim>> ] [ >label< line-metrics ] bi
     [ [ first ] [ ascent>> ] bi* [ nip 0 swap 2array ] [ 2array ] 2bi gl-line ]
     [ drop { 0 0 } swap gl-rect ]

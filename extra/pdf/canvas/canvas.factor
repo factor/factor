@@ -50,7 +50,7 @@ foreground background page-color inset line-height metrics ;
                 [ drop f f ]
             } case [ >>bold? ] [ >>italic? ] bi* drop
         ]
-        [ foreground of COLOR: black or >>foreground ]
+        [ foreground of color: black or >>foreground ]
         [ background of f or >>background ]
         [ page-color of f or >>page-color ]
         [ inset of { 0 0 } or >>inset ]

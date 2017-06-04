@@ -23,7 +23,7 @@ $nl
 ARTICLE: "compilation-units" "Compilation units"
 "A " { $emphasis "compilation unit" } " scopes a group of related definitions. They are compiled and entered into the system in one atomic operation."
 $nl
-"When a source file is being parsed, all definitions are part of a single compilation unit, unless the " { $link POSTPONE: << } " parsing word is used to create nested compilation units."
+"When a source file is being parsed, all definitions are part of a single compilation unit, unless the " { $link postpone: << } " parsing word is used to create nested compilation units."
 $nl
 "Words defined in a compilation unit may not be called until the compilation unit is finished. The parser detects this case for parsing words and throws a " { $link staging-violation } ". Similarly, an attempt to use a macro from a word defined in the same compilation unit will throw a " { $link transform-expansion-error } ". Calling any other word from within its own compilation unit throws an " { $link undefined } " error."
 $nl
