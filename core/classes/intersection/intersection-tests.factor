@@ -39,7 +39,7 @@ M: t4 g drop t4 ;
 
 PREDICATE: odd-integer < integer odd? ;
 
-! [ TUPLE: omg { a intersection{ fixnum odd-integer } initial: 2 } ;" eval( -- ) ]
+! [ "TUPLE: omg { a intersection{ fixnum odd-integer } initial: 2 } ;" eval( -- ) ]
 ! [ bad-initial-value? ] must-fail-with
 
 TUPLE: omg { a intersection{ fixnum odd-integer } initial: 1 } ;
