@@ -1,1 +1,0 @@
-Cellular Automata Explorer (one dimensional, two state)
