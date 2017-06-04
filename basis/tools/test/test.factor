@@ -45,39 +45,44 @@ t restartable-tests? set-global
 
 <PRIVATE
 
-: failure ( error experiment path line# -- )
+: notify-test-failed ( error experiment path line# -- )
     "--> test failed!" print
     <test-failure> test-failures get push
     notify-error-observers ;
 
 SYMBOL: current-test-file
 
-: file-failure ( error -- )
-    [ f current-test-file get ] keep error-line failure ;
+: notify-test-file-failed ( error -- )
+    [ f current-test-file get ] keep error-line notify-test-failed ;
 
-:: (unit-test) ( output input -- error ? )
-    [ { } input with-datastack output assert-sequence= f f ] [ t ] recover ;
+:: (unit-test) ( output input -- error/f failed? tested? )
+    [ { } input with-datastack output assert-sequence= f f ] [ t ] recover t ;
+
+SYMBOL: long-unit-tests-enabled?
+long-unit-tests-enabled? [ t ] initialize
+
+: (long-unit-test) ( output input -- error/f failed? tested? )
+    long-unit-tests-enabled? get [ (unit-test) ] [ 2drop f f f ] if ;
 
 : short-effect ( effect -- pair )
     [ in>> length ] [ out>> length ] bi 2array ;
 
-:: (must-infer-as) ( effect quot -- error ? )
-    [ quot infer short-effect effect assert= f f ] [ t ] recover ;
+:: (must-infer-as) ( effect quot -- error/f failed? tested? )
+    [ quot infer short-effect effect assert= f f ] [ t ] recover t ;
 
-:: (must-infer) ( quot -- error ? )
-    [ quot infer drop f f ] [ t ] recover ;
+:: (must-infer) ( quot -- error/f failed? tested? )
+    [ quot infer drop f f ] [ t ] recover t ;
 
-TUPLE: did-not-fail ;
-CONSTANT: did-not-fail-literal T{ did-not-fail }
+SINGLETON: did-not-fail
 
 M: did-not-fail summary drop "Did not fail" ;
 
-:: (must-fail-with) ( quot pred -- error ? )
-    [ { } quot with-datastack drop did-not-fail-literal t ]
-    [ dup pred call( error -- ? ) [ drop f f ] [ t ] if ] recover ;
+:: (must-fail-with) ( quot pred -- error/f failed? tested? )
+    [ { } quot with-datastack drop did-not-fail t ]
+    [ dup pred call( error -- ? ) [ drop f f ] [ t ] if ] recover t ;
 
-:: (must-fail) ( quot -- error ? )
-    [ { } quot with-datastack drop did-not-fail-literal t ] [ drop f f ] recover ;
+:: (must-fail) ( quot -- error/f failed? tested? )
+    [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover t ;
 
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
@@ -92,14 +97,16 @@ MACRO: <experiment> ( word -- quot )
     [ first write ": " write ]
     [ rest verbose-tests? get [ . ] [ short. ] if flush ] bi ;
 
-:: experiment ( word: ( -- error ? ) line# -- )
+:: experiment ( word: ( -- error/f failed? tested? ) line# -- )
     word <experiment> :> e
     e experiment.
     word execute [
-        current-test-file get [
-            e current-test-file get line# failure
-        ] [ rethrow ] if
-    ] [ drop ] if ; inline
+        [
+            current-test-file get [
+                e current-test-file get line# notify-test-failed
+            ] [ rethrow ] if
+        ] [ drop ] if
+    ] [ 2drop "Warning: test skipped!" print ] if ; inline
 
 : parse-test ( accum word -- accum )
     literalize suffix!
@@ -132,7 +139,7 @@ PRIVATE>
         '[ _ run-file ] [
             restartable-tests? get
             [ dup compute-restarts empty? not ] [ f ] if
-            [ rethrow ] [ file-failure ] if
+            [ rethrow ] [ notify-test-file-failed ] if
         ] recover
     ] with-variable ;
 
@@ -165,6 +172,7 @@ PRIVATE>
     [ cleanup-unique-directory ] with-temp-directory ; inline
 
 TEST: unit-test
+TEST: long-unit-test
 TEST: must-infer-as
 TEST: must-infer
 TEST: must-fail-with
