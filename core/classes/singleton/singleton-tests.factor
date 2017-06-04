@@ -6,7 +6,7 @@ SINGLETON: bzzt
 { t } [ bzzt bzzt eq? ] unit-test
 
 GENERIC: zammo ( obj -- str )
-{ } [ M: bzzt zammo drop "yes!" ; ] unit-test
+M: bzzt zammo drop "yes!" ;
 { "yes!" } [ bzzt zammo ] unit-test
 
 SINGLETON: omg
