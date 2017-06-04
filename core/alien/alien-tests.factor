@@ -56,7 +56,7 @@ cell 8 = [
     ] unit-test
 ] when
 
-{ "ALIEN: 1234" } [ 0x1234 <alien> unparse ] unit-test
+{ "alien: 1234" } [ 0x1234 <alien> unparse ] unit-test
 
 { } [ 0 B{ 1 2 3 } <displaced-alien> drop ] unit-test
 

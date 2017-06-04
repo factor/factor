@@ -46,7 +46,7 @@ SPECIALIZED-ARRAY: foo
 { f } [ B{ } binary-zero? ] unit-test
 { t } [ S{ foo f 0 f f } binary-zero? ] unit-test
 { f } [ S{ foo f 1 f f } binary-zero? ] unit-test
-{ f } [ S{ foo f 0 ALIEN: 8 f } binary-zero? ] unit-test
+{ f } [ S{ foo f 0 alien: 8 f } binary-zero? ] unit-test
 { f } [ S{ foo f 0 f t } binary-zero? ] unit-test
 { t t f } [
     foo-array{

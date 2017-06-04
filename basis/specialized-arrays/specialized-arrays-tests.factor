@@ -45,7 +45,7 @@ SPECIALIZED-ARRAYS: bool uchar ushort char uint float ulonglong ;
 { f } [ [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] compile-call ] unit-test
 
 { ushort-array{ 0 0 0 } } [
-    3 ALIEN: 123 100 <direct-ushort-array> new-sequence
+    3 alien: 123 100 <direct-ushort-array> new-sequence
     [ drop 0 ] map!
 ] unit-test
 
@@ -83,7 +83,7 @@ SPECIALIZED-ARRAY: test-struct
     ] with-destructors
 ] unit-test
 
-{ } [ ALIEN: 123 10 <direct-test-struct-array> drop ] unit-test
+{ } [ alien: 123 10 <direct-test-struct-array> drop ] unit-test
 
 { } [
     [
@@ -113,13 +113,13 @@ STRUCT: fixed-string { text char[64] } ;
 
 SPECIALIZED-ARRAY: fixed-string
 
-{ { ALIEN: 100 ALIEN: 140 ALIEN: 180 ALIEN: 1c0 } } [
-    ALIEN: 100 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
+{ { alien: 100 alien: 140 alien: 180 alien: 1c0 } } [
+    alien: 100 4 <direct-fixed-string-array> [ (underlying)>> ] { } map-as
 ] unit-test
 
 ! Ensure that byte-length works with direct arrays
 { 400 } [
-    ALIEN: 123 100 <direct-int-array> byte-length
+    alien: 123 100 <direct-int-array> byte-length
 ] unit-test
 
 { } [

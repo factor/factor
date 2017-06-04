@@ -451,7 +451,7 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 ] unit-test
 
 ! ##box-displaced-alien is a def-is-use instruction
-[ ALIEN: 3e9 ] [
+[ alien: 3e9 ] [
     [
         f
         100 [ 10 swap <displaced-alien> ] times

@@ -225,8 +225,8 @@ CONSTRUCTOR: <info> fdb-info ( filename new-filename doc-count space-used file-s
 ! Example fdb_doc and converted doc
 S{ fdb_doc
     { keylen 4 } { metalen 0 } { bodylen 4 } { size_ondisk 0 }
-    { key ALIEN: 1002f2f10 } { seqnum 5 } { offset 4256 }
-    { meta ALIEN: 1002dc790 } { body f } { deleted f }
+    { key alien: 1002f2f10 } { seqnum 5 } { offset 4256 }
+    { meta alien: 1002dc790 } { body f } { deleted f }
 }
 T{ doc
     { seqnum 5 }

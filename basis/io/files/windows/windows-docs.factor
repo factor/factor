@@ -8,6 +8,6 @@ HELP: open-read
   { $unchecked-example
     "USING: io.files.windows prettyprint ;"
     "\"resource:core/kernel/kernel.factor\" absolute-path open-read ."
-    "T{ win32-file { handle ALIEN: 234 } { ptr 0 } }"
+    "T{ win32-file { handle alien: 234 } { ptr 0 } }"
   }
 } ;

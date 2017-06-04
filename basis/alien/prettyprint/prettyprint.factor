@@ -11,7 +11,7 @@ M: alien pprint*
     {
         { [ dup expired? ] [ drop \ BAD-ALIEN pprint-word ] }
         { [ dup pinned-c-ptr? not ] [ drop "( displaced alien )" text ] }
-        [ \ ALIEN: [ alien-address >hex text ] pprint-prefix ]
+        [ \ alien: [ alien-address >hex text ] pprint-prefix ]
     } cond ;
 
 M: dll pprint* dll-path dup "DLL\" " "\"" pprint-string ;

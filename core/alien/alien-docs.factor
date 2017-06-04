@@ -149,7 +149,7 @@ HELP: alien-assembly
 ARTICLE: "alien-expiry" "Alien expiry"
 "When an image is loaded, any alien objects which persisted from the previous session are marked as having expired. This is because the C pointers they contain are almost certainly no longer valid."
 $nl
-"For this reason, the " { $link POSTPONE: ALIEN: } " word should not be used in source files, since loading the source file then saving the image will result in the literal becoming expired. Use " { $link <alien> } " instead, and ensure the word calling " { $link <alien> } " is not declared " { $link POSTPONE: flushable } "."
+"For this reason, the " { $link POSTPONE: alien: } " word should not be used in source files, since loading the source file then saving the image will result in the literal becoming expired. Use " { $link <alien> } " instead, and ensure the word calling " { $link <alien> } " is not declared " { $link POSTPONE: flushable } "."
 { $subsections expired? } ;
 
 ARTICLE: "aliens" "Alien addresses"

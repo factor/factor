@@ -41,7 +41,7 @@ M: object g drop "object" ;
         123.456 ,
         1/6 ,
         C{ 1 2 } ,
-        ALIEN: 1234 ,
+        alien: 1234 ,
     ] { } make ;
 
 : dispatch3-benchmark ( -- )
