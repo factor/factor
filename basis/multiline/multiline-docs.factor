@@ -16,18 +16,18 @@ HELP: /*
     }
 } ;
 
-HELP: HEREDOC:
-{ $syntax "HEREDOC: marker\n...text...\nmarker" }
+HELP: heredoc:
+{ $syntax "heredoc: marker\n...text...\nmarker" }
 { $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
-{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link postpone: HEREDOC: } " until the end of the line containing " { $link postpone: HEREDOC: } ". Text is captured until a line is found containing exactly this delimiter string." }
+{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link postpone: heredoc: } " until the end of the line containing " { $link postpone: heredoc: } ". Text is captured until a line is found containing exactly this delimiter string." }
 { $warning "Whitespace is significant." }
 { $examples
     { $example "USING: multiline prettyprint ;"
-               "HEREDOC: END\nx\nEND\n."
+               "heredoc: END\nx\nEND\n."
                "\"x\\n\""
     }
     { $example "USING: multiline prettyprint sequences ;"
-               "2 5 HEREDOC: zap\nfoo\nbar\nzap\nsubseq ."
+               "2 5 heredoc: zap\nfoo\nbar\nzap\nsubseq ."
                "\"o\\nb\""
     }
 } ;
@@ -41,7 +41,7 @@ ARTICLE: "multiline" "Multiline"
 "Multiline strings:"
 { $subsections
     postpone: STRING:
-    postpone: HEREDOC:
+    postpone: heredoc:
 }
 "Multiline comments:"
 { $subsections postpone: /* }

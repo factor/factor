@@ -84,7 +84,7 @@ PRIVATE>
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
 
-SYNTAX: HEREDOC:
+SYNTAX: heredoc:
     lexer get {
         [ skip-blank ]
         [ rest-of-line ]

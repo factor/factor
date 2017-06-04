@@ -10,62 +10,62 @@ bar
 { "foo\nbar\n" } [ test-it ] unit-test
 
 
-! HEREDOC:
+! heredoc:
 
-{ "foo\nbar\n" } [ HEREDOC: END
+{ "foo\nbar\n" } [ heredoc: END
 foo
 bar
 END
 ] unit-test
 
-{ "" } [ HEREDOC: END
+{ "" } [ heredoc: END
 END
 ] unit-test
 
-{ " END\n" } [ HEREDOC: END
+{ " END\n" } [ heredoc: END
  END
 END
 ] unit-test
 
-{ "\n" } [ HEREDOC: END
+{ "\n" } [ heredoc: END
 
 END
 ] unit-test
 
-{ "x\n" } [ HEREDOC: END
+{ "x\n" } [ heredoc: END
 x
 END
 ] unit-test
 
-{ "x\n" } [ HEREDOC:       END
+{ "x\n" } [ heredoc:       END
 x
 END
 ] unit-test
 
 ! there's a space after xyz
-{ "xyz \n" } [ HEREDOC: END
+{ "xyz \n" } [ heredoc: END
 xyz 
 END
 ] unit-test
 
-{ "} ! * # \" «\n" } [ HEREDOC: END
+{ "} ! * # \" «\n" } [ heredoc: END
 } ! * # " «
 END
 ] unit-test
 
-{ 21 "foo\nbar\n" " HEREDOC: FOO\n FOO\n" 22 } [ 21 HEREDOC: X
+{ 21 "foo\nbar\n" " heredoc: FOO\n FOO\n" 22 } [ 21 heredoc: X
 foo
 bar
 X
-HEREDOC: END
- HEREDOC: FOO
+heredoc: END
+ heredoc: FOO
  FOO
 END
 22 ] unit-test
 
 { "lol\n xyz\n" }
 [
-HEREDOC: xyz
+heredoc: xyz
 lol
  xyz
 xyz
