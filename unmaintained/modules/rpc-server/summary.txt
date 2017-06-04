@@ -1,1 +1,0 @@
-Serve factor words as rpcs

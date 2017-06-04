@@ -1,9 +1,0 @@
-! Default system ircui-rc file
-! Copy into .ircui-rc in your home directory and then change username and such
-! To find your home directory, type "home ." into a Factor listener
-
-USING: irc.client irc.ui ;
-
-"irc.freenode.org" 8001 "factor-irc" f ! server port nick password
-{ "#concatenative" "#terrorisland" } ! all the channels you want to autojoin
-server-open

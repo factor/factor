@@ -117,7 +117,7 @@ The Factor source tree is organized as follows:
 * `basis/` - Factor basis library, compiler, tools
 * `extra/` - more libraries and applications
 * `misc/` - editor modes, icons, etc
-* `unmaintained/` - unmaintained contributions, please help!
+* `unmaintained/` - now at [factor-unmaintained](https://github.com/factor/factor-unmaintained)
 
 ## Community
 
