@@ -13,12 +13,12 @@ Number            =   Digits '.' Digits => [[ "" concat-as string>number ast-val
 String            = '"' [^"]* '"' => [[ second >string ast-value boa ]]
 Space             = [ \t\n\r]
 Spaces            = Space* => [[ ignore ]]
-NameFirst         = Letter | "_" => [[ CHAR: _ ]]
+NameFirst         = Letter | "_" => [[ char: _ ]]
 NameRest          = NameFirst | Digit
 Name              = NameFirst NameRest* => [[ first2 swap prefix >string ]]
-Special           =   [+*/%(),] | "-" => [[ CHAR: - ]]
-                    | "[" => [[ CHAR: [ ]] | "]" => [[ CHAR: ] ]]
-                    | ":" => [[ CHAR: : ]]
+Special           =   [+*/%(),] | "-" => [[ char: - ]]
+                    | "[" => [[ char: [ ]] | "]" => [[ char: ] ]]
+                    | ":" => [[ char: : ]]
 Tok               = Spaces (Name | Number | String | Special )
 End               = !(.)
 Toks              = Tok* Spaces End

@@ -21,7 +21,7 @@ ERROR: bad-array-type ;
 : (parse-c-type) ( string -- type )
     {
         { [ "*" ?tail ] [ (parse-c-type) <pointer> ] }
-        { [ CHAR: ] over member? ] [ parse-array-type ] }
+        { [ char: ] over member? ] [ parse-array-type ] }
         { [ dup search ] [ parse-word ] }
         [ parse-word ]
     } cond ;

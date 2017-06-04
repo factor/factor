@@ -197,7 +197,7 @@ cell {
 assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
-    [ CHAR: = ] 2keep index-from swap subseq
+    [ char: = ] 2keep index-from swap subseq
     objc>struct-types get at* [ drop void* ] unless ;
 
 ERROR: no-objc-type name ;
@@ -209,9 +209,9 @@ ERROR: no-objc-type name ;
 : (parse-objc-type) ( i string -- ctype )
     [ [ 1 + ] dip ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
-        { [ dup CHAR: ^ = ] [ 3drop void* ] }
-        { [ dup CHAR: { = ] [ drop objc-struct-type ] }
-        { [ dup CHAR: [ = ] [ 3drop void* ] }
+        { [ dup char: ^ = ] [ 3drop void* ] }
+        { [ dup char: { = ] [ drop objc-struct-type ] }
+        { [ dup char: [ = ] [ 3drop void* ] }
         [ 2nip decode-type ]
     } cond ;
 

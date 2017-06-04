@@ -10,71 +10,71 @@ ERROR: no-morse-ch ch ;
 
 <PRIVATE
 
-CONSTANT: dot-char CHAR: .
-CONSTANT: dash-char CHAR: -
-CONSTANT: char-gap-char CHAR: \s
-CONSTANT: word-gap-char CHAR: /
-CONSTANT: unknown-char CHAR: ?
+CONSTANT: dot-char char: .
+CONSTANT: dash-char char: -
+CONSTANT: char-gap-char char: \s
+CONSTANT: word-gap-char char: /
+CONSTANT: unknown-char char: ?
 
 PRIVATE>
 
 CONSTANT: morse-code-table $[
     H{
-        { CHAR: a ".-"    }
-        { CHAR: b "-..."  }
-        { CHAR: c "-.-."  }
-        { CHAR: d "-.."   }
-        { CHAR: e "."     }
-        { CHAR: f "..-."  }
-        { CHAR: g "--."   }
-        { CHAR: h "...."  }
-        { CHAR: i ".."    }
-        { CHAR: j ".---"  }
-        { CHAR: k "-.-"   }
-        { CHAR: l ".-.."  }
-        { CHAR: m "--"    }
-        { CHAR: n "-."    }
-        { CHAR: o "---"   }
-        { CHAR: p ".--."  }
-        { CHAR: q "--.-"  }
-        { CHAR: r ".-."   }
-        { CHAR: s "..."   }
-        { CHAR: t "-"     }
-        { CHAR: u "..-"   }
-        { CHAR: v "...-"  }
-        { CHAR: w ".--"   }
-        { CHAR: x "-..-"  }
-        { CHAR: y "-.--"  }
-        { CHAR: z "--.."  }
-        { CHAR: 1 ".----" }
-        { CHAR: 2 "..---" }
-        { CHAR: 3 "...--" }
-        { CHAR: 4 "....-" }
-        { CHAR: 5 "....." }
-        { CHAR: 6 "-...." }
-        { CHAR: 7 "--..." }
-        { CHAR: 8 "---.." }
-        { CHAR: 9 "----." }
-        { CHAR: 0 "-----" }
-        { CHAR: . ".-.-.-" }
-        { CHAR: , "--..--" }
-        { CHAR: ? "..--.." }
-        { CHAR: ' ".----." }
-        { CHAR: ! "-.-.--" }
-        { CHAR: / "-..-."  }
-        { CHAR: ( "-.--."  }
-        { CHAR: ) "-.--.-" }
-        { CHAR: & ".-..."  }
-        { CHAR: : "---..." }
-        { CHAR: ; "-.-.-." }
-        { CHAR: = "-...- " }
-        { CHAR: + ".-.-."  }
-        { CHAR: - "-....-" }
-        { CHAR: _ "..--.-" }
-        { CHAR: \" ".-..-." }
-        { CHAR: $ "...-..-" }
-        { CHAR: @ ".--.-." }
-        { CHAR: \s "/" }
+        { char: a ".-"    }
+        { char: b "-..."  }
+        { char: c "-.-."  }
+        { char: d "-.."   }
+        { char: e "."     }
+        { char: f "..-."  }
+        { char: g "--."   }
+        { char: h "...."  }
+        { char: i ".."    }
+        { char: j ".---"  }
+        { char: k "-.-"   }
+        { char: l ".-.."  }
+        { char: m "--"    }
+        { char: n "-."    }
+        { char: o "---"   }
+        { char: p ".--."  }
+        { char: q "--.-"  }
+        { char: r ".-."   }
+        { char: s "..."   }
+        { char: t "-"     }
+        { char: u "..-"   }
+        { char: v "...-"  }
+        { char: w ".--"   }
+        { char: x "-..-"  }
+        { char: y "-.--"  }
+        { char: z "--.."  }
+        { char: 1 ".----" }
+        { char: 2 "..---" }
+        { char: 3 "...--" }
+        { char: 4 "....-" }
+        { char: 5 "....." }
+        { char: 6 "-...." }
+        { char: 7 "--..." }
+        { char: 8 "---.." }
+        { char: 9 "----." }
+        { char: 0 "-----" }
+        { char: . ".-.-.-" }
+        { char: , "--..--" }
+        { char: ? "..--.." }
+        { char: ' ".----." }
+        { char: ! "-.-.--" }
+        { char: / "-..-."  }
+        { char: ( "-.--."  }
+        { char: ) "-.--.-" }
+        { char: & ".-..."  }
+        { char: : "---..." }
+        { char: ; "-.-.-." }
+        { char: = "-...- " }
+        { char: + ".-.-."  }
+        { char: - "-....-" }
+        { char: _ "..--.-" }
+        { char: \" ".-..-." }
+        { char: $ "...-..-" }
+        { char: @ ".--.-." }
+        { char: \s "/" }
     } >biassoc
 ]
 
@@ -102,7 +102,7 @@ CONSTANT: morse-code-table $[
     "/" split [ trim-blanks morse>word ] map " " join ;
 
 : replace-underscores ( str -- str' )
-    [ dup CHAR: _ = [ drop CHAR: - ] when ] map ;
+    [ dup char: _ = [ drop char: - ] when ] map ;
 
 PRIVATE>
 

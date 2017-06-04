@@ -44,25 +44,25 @@ DEFER: (read-json-string)
 : (read-json-escape) ( stream accum -- accum )
     { sbuf } declare
     over stream-read1 {
-        { CHAR: \" [ CHAR: \" ] }
-        { CHAR: \\ [ CHAR: \\ ] }
-        { CHAR: / [ CHAR: / ] }
-        { CHAR: b [ CHAR: \b ] }
-        { CHAR: f [ CHAR: \f ] }
-        { CHAR: n [ CHAR: \n ] }
-        { CHAR: r [ CHAR: \r ] }
-        { CHAR: t [ CHAR: \t ] }
-        { CHAR: u [ over read-json-escape-unicode ] }
+        { char: \" [ char: \" ] }
+        { char: \\ [ char: \\ ] }
+        { char: / [ char: / ] }
+        { char: b [ char: \b ] }
+        { char: f [ char: \f ] }
+        { char: n [ char: \n ] }
+        { char: r [ char: \r ] }
+        { char: t [ char: \t ] }
+        { char: u [ over read-json-escape-unicode ] }
         [ ]
     } case [ suffix! (read-json-string) ] [ json-error ] if* ;
 
 : (read-json-string) ( stream accum -- accum )
     { sbuf } declare
     "\\\"" pick stream-read-until [ append! ] dip
-    CHAR: \" = [ nip ] [ (read-json-escape) ] if ;
+    char: \" = [ nip ] [ (read-json-escape) ] if ;
 
 : read-json-string ( stream -- str )
-    "\\\"" over stream-read-until CHAR: \" =
+    "\\\"" over stream-read-until char: \" =
     [ nip ] [ >sbuf (read-json-escape) { sbuf } declare "" like ] if ;
 
 : second-last-unsafe ( seq -- second-last )
@@ -108,20 +108,20 @@ DEFER: (read-json-string)
     ! 2dup 1string swap . . ! Great for debug...
     { object vector object } declare
     {
-        { CHAR: \" [ over read-json-string suffix! ] }
-        { CHAR: [  [ json-open-array ] }
-        { CHAR: ,  [ v-over-push ] }
-        { CHAR: ]  [ json-close-array ] }
-        { CHAR: {  [ json-open-hash ] }
-        { CHAR: :  [ v-pick-push ] }
-        { CHAR: }  [ json-close-hash ] }
-        { CHAR: \s [ ] }
-        { CHAR: \t [ ] }
-        { CHAR: \r [ ] }
-        { CHAR: \n [ ] }
-        { CHAR: t  [ "rue" pick json-expect t suffix! ] }
-        { CHAR: f  [ "alse" pick json-expect f suffix! ] }
-        { CHAR: n  [ "ull" pick json-expect json-null suffix! ] }
+        { char: \" [ over read-json-string suffix! ] }
+        { char: [  [ json-open-array ] }
+        { char: ,  [ v-over-push ] }
+        { char: ]  [ json-close-array ] }
+        { char: {  [ json-open-hash ] }
+        { char: :  [ v-pick-push ] }
+        { char: }  [ json-close-hash ] }
+        { char: \s [ ] }
+        { char: \t [ ] }
+        { char: \r [ ] }
+        { char: \n [ ] }
+        { char: t  [ "rue" pick json-expect t suffix! ] }
+        { char: f  [ "alse" pick json-expect f suffix! ] }
+        { char: n  [ "ull" pick json-expect json-null suffix! ] }
         [ pick json-number [ suffix! ] dip [ scan ] when*  ]
     } case ;
 

@@ -148,7 +148,7 @@ PRIVATE>
 
 PRIVATE>
 
-: complete-char? ( tokens -- ? ) "CHAR:" complete-token? ;
+: complete-char? ( tokens -- ? ) "char:" complete-token? ;
 
 : complete-color? ( tokens -- ? ) "COLOR:" complete-token? ;
 

@@ -353,7 +353,7 @@ M: ssl-handle dispose*
     "*." ?head [
         {
             [ tail? ]
-            [ [ [ CHAR: . = ] count ] bi@ - 1 <= ]
+            [ [ [ char: . = ] count ] bi@ - 1 <= ]
         } 2&&
     ] [
         =

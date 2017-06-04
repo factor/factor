@@ -14,12 +14,12 @@ USING: tools.test lcs ;
 { "abd" } [ "faxbcd" "abdef" lcs ] unit-test
 
 { {
-        T{ delete f CHAR: f }
-        T{ retain f CHAR: a }
-        T{ delete f CHAR: x }
-        T{ retain f CHAR: b }
-        T{ delete f CHAR: c }
-        T{ retain f CHAR: d }
-        T{ insert f CHAR: e }
-        T{ insert f CHAR: f }
+        T{ delete f char: f }
+        T{ retain f char: a }
+        T{ delete f char: x }
+        T{ retain f char: b }
+        T{ delete f char: c }
+        T{ retain f char: d }
+        T{ insert f char: e }
+        T{ insert f char: f }
 } } [ "faxbcd" "abdef" lcs-diff ] unit-test

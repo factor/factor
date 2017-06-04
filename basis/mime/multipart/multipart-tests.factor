@@ -71,7 +71,7 @@ SYMBOL: mime-test-server
     mime-test-server get insecure>> ;
 
 : a-stream ( n -- stream )
-    CHAR: a <string> <string-reader> ;
+    char: a <string> <string-reader> ;
 
 { } [
     [

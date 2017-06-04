@@ -66,7 +66,7 @@ HINTS: count-digits fixnum ;
 PRIVATE>
 
 : alpha-value ( str -- n )
-    >lower [ CHAR: a - 1 + ] map-sum ;
+    >lower [ char: a - 1 + ] map-sum ;
 
 : mediant ( a/c b/d -- (a+b)/(c+d) )
     2>fraction [ + ] 2bi@ / ;

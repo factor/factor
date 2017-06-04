@@ -16,7 +16,7 @@ IN: bootstrap.syntax
         "B{"
         "BV{"
         "C:"
-        "CHAR:"
+        "char:"
         "DEFER:"
         "ERROR:"
         "FORGET:"

@@ -7,7 +7,7 @@ EBNF: test-Character
 test         = <foreign parse-smalltalk Character>
 ;EBNF
 
-{ CHAR: a } [ "a" test-Character ] unit-test
+{ char: a } [ "a" test-Character ] unit-test
 
 EBNF: test-Comment
 test         = <foreign parse-smalltalk Comment>
@@ -40,7 +40,7 @@ test         = <foreign parse-smalltalk Literal>
 { 12.4e7 } [ "12.4e7" test-Literal ] unit-test
 { 12.4e-7 } [ "12.4e-7" test-Literal ] unit-test
 { -12.4e7 } [ "-12.4e7" test-Literal ] unit-test
-{ CHAR: x } [ "$x" test-Literal ] unit-test
+{ char: x } [ "$x" test-Literal ] unit-test
 { "Hello, world" } [ "'Hello, world'" test-Literal ] unit-test
 { "Hello, 'funny' world" } [ "'Hello, ''funny'' world'" test-Literal ] unit-test
 { T{ symbol f "foo" } } [ "#foo" test-Literal ] unit-test

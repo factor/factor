@@ -13,8 +13,8 @@ C: <decimal> decimal
 
 : string>decimal ( string -- decimal )
     "." split1
-    [ [ CHAR: 0 = ] trim-head [ "0" ] when-empty ]
-    [ [ CHAR: 0 = ] trim-tail [ "" ] when-empty ] bi*
+    [ [ char: 0 = ] trim-head [ "0" ] when-empty ]
+    [ [ char: 0 = ] trim-tail [ "" ] when-empty ] bi*
     [ append string>number ] [ nip length neg ] 2bi <decimal> ;
 
 : parse-decimal ( -- decimal ) scan-token string>decimal ;

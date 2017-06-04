@@ -64,7 +64,7 @@ M: trace-step-state summary
 
 : print-depth ( continuation -- )
     call>> callstack-depth
-    [ CHAR: \s <string> write ]
+    [ char: \s <string> write ]
     [ number>string write ": " write ] bi ;
 
 : trace-into? ( continuation -- ? )

@@ -6,10 +6,10 @@ IN: ascii
 
 : ascii? ( ch -- ? ) 0 127 between? ; inline
 : blank? ( ch -- ? ) " \t\n\r" member? ; inline
-: letter? ( ch -- ? ) CHAR: a CHAR: z between? ; inline
-: LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ; inline
-: digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ; inline
-: printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ; inline
+: letter? ( ch -- ? ) char: a char: z between? ; inline
+: LETTER? ( ch -- ? ) char: A char: Z between? ; inline
+: digit? ( ch -- ? ) char: 0 char: 9 between? ; inline
+: printable? ( ch -- ? ) char: \s char: ~ between? ; inline
 : control? ( ch -- ? ) { [ 0 0x1F between? ] [ 0x7F = ] } 1|| ; inline
 : quotable? ( ch -- ? ) { [ printable? ] [ "\"\\" member? not ] } 1&& ; inline
 : Letter? ( ch -- ? ) { [ letter? ] [ LETTER? ] } 1|| ; inline

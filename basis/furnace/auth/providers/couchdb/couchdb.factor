@@ -111,7 +111,7 @@ TUPLE: couchdb-auth-provider
     url>user ;
 
 : strip-hash ( hash1 -- hash2 )
-    [ drop first CHAR: _ = ] assoc-reject ;
+    [ drop first char: _ = ] assoc-reject ;
 
 : at-or-k ( key hash -- newkey )
     dupd at [ nip ] when* ;

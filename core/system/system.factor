@@ -27,10 +27,10 @@ UNION: unix macosx linux ;
 : vm-git-label ( -- string ) \ vm-git-label get-global ;
 
 : vm-git-ref ( -- string )
-    vm-git-label CHAR: - over last-index head ;
+    vm-git-label char: - over last-index head ;
 
 : vm-git-id ( -- string )
-    vm-git-label CHAR: - over last-index 1 + tail ;
+    vm-git-label char: - over last-index 1 + tail ;
 
 : vm-compiler ( -- string ) \ vm-compiler get-global ;
 

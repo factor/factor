@@ -147,20 +147,20 @@ CONSTANT: GUID-STRING-LENGTH
 : guid>string ( guid -- string )
     [
         [ "{" ] dip {
-            [ Data1>> >hex 8 CHAR: 0 pad-head "-" ]
-            [ Data2>> >hex 4 CHAR: 0 pad-head "-" ]
-            [ Data3>> >hex 4 CHAR: 0 pad-head "-" ]
+            [ Data1>> >hex 8 char: 0 pad-head "-" ]
+            [ Data2>> >hex 4 char: 0 pad-head "-" ]
+            [ Data3>> >hex 4 char: 0 pad-head "-" ]
             [
                 Data4>> [
                     {
-                        [ >hex 2 CHAR: 0 pad-head ]
-                        [ >hex 2 CHAR: 0 pad-head "-" ]
-                        [ >hex 2 CHAR: 0 pad-head ]
-                        [ >hex 2 CHAR: 0 pad-head ]
-                        [ >hex 2 CHAR: 0 pad-head ]
-                        [ >hex 2 CHAR: 0 pad-head ]
-                        [ >hex 2 CHAR: 0 pad-head ]
-                        [ >hex 2 CHAR: 0 pad-head ]
+                        [ >hex 2 char: 0 pad-head ]
+                        [ >hex 2 char: 0 pad-head "-" ]
+                        [ >hex 2 char: 0 pad-head ]
+                        [ >hex 2 char: 0 pad-head ]
+                        [ >hex 2 char: 0 pad-head ]
+                        [ >hex 2 char: 0 pad-head ]
+                        [ >hex 2 char: 0 pad-head ]
+                        [ >hex 2 char: 0 pad-head ]
                     } spread
                 ] input<sequence "}"
             ]

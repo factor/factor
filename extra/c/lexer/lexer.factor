@@ -20,7 +20,7 @@ IN: c.lexer
         dup "//" take-sequence [
             [
                 [
-                    { [ current CHAR: \n = ] [ sequence-parse-end? ] } 1||
+                    { [ current char: \n = ] [ sequence-parse-end? ] } 1||
                 ] take-until
             ] [
                 advance drop
@@ -40,7 +40,7 @@ IN: c.lexer
 
 : take-define-identifier ( sequence-parser -- string )
     skip-whitespace/comments
-    [ current { [ blank? ] [ CHAR: ( = ] } 1|| ] take-until ;
+    [ current { [ blank? ] [ char: ( = ] } 1|| ] take-until ;
 
 :: take-quoted-string ( sequence-parser escape-char quote-char -- string )
     sequence-parser n>> :> start-n
@@ -69,18 +69,18 @@ IN: c.lexer
     } case ;
 
 : take-token ( sequence-parser -- string/f )
-    CHAR: \ CHAR: \" take-token* ;
+    char: \ char: \" take-token* ;
 
 : c-identifier-begin? ( ch -- ? )
-    CHAR: a CHAR: z [a,b]
-    CHAR: A CHAR: Z [a,b]
-    { CHAR: _ } 3append member? ;
+    char: a char: z [a,b]
+    char: A char: Z [a,b]
+    { char: _ } 3append member? ;
 
 : c-identifier-ch? ( ch -- ? )
-    CHAR: a CHAR: z [a,b]
-    CHAR: A CHAR: Z [a,b]
-    CHAR: 0 CHAR: 9 [a,b]
-    { CHAR: _ } 4 nappend member? ;
+    char: a char: z [a,b]
+    char: A char: Z [a,b]
+    char: 0 char: 9 [a,b]
+    { char: _ } 4 nappend member? ;
 
 : (take-c-identifier) ( sequence-parser -- string/f )
     dup current c-identifier-begin? [

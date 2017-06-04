@@ -37,10 +37,10 @@ M: ^ question>quot
     drop [ { [ drop zero? ] [ [ 1 - ] dip ?nth "\r\n" member? ] } 2|| ] ;
 
 M: $unix question>quot
-    drop [ { [ length = ] [ ?nth CHAR: \n = ] } 2|| ] ;
+    drop [ { [ length = ] [ ?nth char: \n = ] } 2|| ] ;
 
 M: ^unix question>quot
-    drop [ { [ drop zero? ] [ [ 1 - ] dip ?nth CHAR: \n = ] } 2|| ] ;
+    drop [ { [ drop zero? ] [ [ 1 - ] dip ?nth char: \n = ] } 2|| ] ;
 
 M: word-break question>quot
     drop [ word-break-at? ] ;

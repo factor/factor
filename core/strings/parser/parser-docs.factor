@@ -7,7 +7,7 @@ HELP: bad-escape
 HELP: escape
 { $values { "escape" "a single-character escape" } { "ch" "a character" } }
 { $description "Converts from a single-character escape code and the corresponding character." }
-{ $examples { $example "USING: kernel prettyprint strings.parser ;" "CHAR: n escape CHAR: \\n = ." "t" } } ;
+{ $examples { $example "USING: kernel prettyprint strings.parser ;" "char: n escape char: \\n = ." "t" } } ;
 
 HELP: parse-string
 { $values { "str" "a new " { $link string } } }

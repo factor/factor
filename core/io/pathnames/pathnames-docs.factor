@@ -7,7 +7,7 @@ HELP: path-separator?
 { $description "Tests if the code point is a platform-specific path separator." }
 { $examples
     "On Unix:"
-    { $example "USING: io.pathnames prettyprint ;" "CHAR: / path-separator? ." "t" }
+    { $example "USING: io.pathnames prettyprint ;" "char: / path-separator? ." "t" }
 } ;
 
 HELP: parent-directory

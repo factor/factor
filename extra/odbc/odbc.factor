@@ -130,7 +130,7 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
 <PRIVATE
 
 : alien-space-str ( len -- alien )
-    CHAR: space <string> ascii string>alien ;
+    char: space <string> ascii string>alien ;
 
 PRIVATE>
 

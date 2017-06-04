@@ -22,8 +22,8 @@ IN: tools.wc
     0 [
        aligned-slices [
            uchar-16 cast-array swap
-           [ CHAR: \n uchar-16-with v= vcount + >fixnum ] reduce
-       ] [ [ CHAR: \n = ] count + >fixnum ] bi*
+           [ char: \n uchar-16-with v= vcount + >fixnum ] reduce
+       ] [ [ char: \n = ] count + >fixnum ] bi*
     ] each-block-slice ; inline
 
 : wc-stdin ( -- n )

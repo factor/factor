@@ -18,7 +18,7 @@ ERROR: bad-heredoc identifier ;
     dup next-line-text [
         dup ";" =
         [ drop next-line ]
-        [ % CHAR: \n , (parse-here) ] if
+        [ % char: \n , (parse-here) ] if
     ] [ ";" throw-unexpected-eof ] if ;
 
 PRIVATE>
@@ -45,7 +45,7 @@ SYNTAX: STRING:
         end text i subseq-start-from [| j |
             i j text subseq % j end length +
         ] [
-            text i short tail % CHAR: \n ,
+            text i short tail % char: \n ,
             lexer next-line
             0 end lexer (scan-multiline-string)
         ] if*
@@ -66,7 +66,7 @@ SYNTAX: STRING:
         lexer line-text>> begin-text sequence= [
             lexer begin-text advance-same-line
         ] [
-            lexer line-text>> % CHAR: \n ,
+            lexer line-text>> % char: \n ,
             lexer next-line
             begin-text lexer (parse-til-line-begins)
         ] if

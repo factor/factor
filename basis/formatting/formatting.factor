@@ -14,12 +14,12 @@ IN: formatting
     [ ] [ compose ] reduce ; inline
 
 : fix-sign ( string -- string )
-    dup first CHAR: 0 = [
-        dup [ [ CHAR: 0 = not ] [ digit? ] bi and ] find
+    dup first char: 0 = [
+        dup [ [ char: 0 = not ] [ digit? ] bi and ] find
         [
             1 - swap 2dup nth {
-                { CHAR: - [ remove-nth "-" prepend ] }
-                { CHAR: + [ remove-nth "+" prepend ] }
+                { char: - [ remove-nth "-" prepend ] }
+                { char: + [ remove-nth "+" prepend ] }
                 [ drop nip ]
             } case
         ] [ drop ] if
@@ -39,15 +39,15 @@ ERROR: unknown-printf-directive ;
 
 EBNF: parse-printf
 
-zero      = "0"                  => [[ CHAR: 0 ]]
+zero      = "0"                  => [[ char: 0 ]]
 char      = "'" (.)              => [[ second ]]
 
-pad-char  = (zero|char)?         => [[ CHAR: \s or ]]
+pad-char  = (zero|char)?         => [[ char: \s or ]]
 pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0 = [ drop [ ] ] when ]]
 
-sign_     = [+ ]                 => [[ '[ dup CHAR: - swap index [ _ prefix ] unless ] ]]
+sign_     = [+ ]                 => [[ '[ dup char: - swap index [ _ prefix ] unless ] ]]
 sign      = (sign_)?             => [[ [ ] or ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
@@ -123,10 +123,10 @@ MACRO: sprintf ( format-string -- quot )
 <PRIVATE
 
 : pad-00 ( n -- string )
-    number>string 2 CHAR: 0 pad-head ; inline
+    number>string 2 char: 0 pad-head ; inline
 
 : pad-000 ( n -- string )
-    number>string 3 CHAR: 0 pad-head ; inline
+    number>string 3 char: 0 pad-head ; inline
 
 : >time ( timestamp -- string )
     [ hour>> ] [ minute>> ] [ second>> floor ] tri

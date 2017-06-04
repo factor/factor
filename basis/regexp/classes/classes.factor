@@ -55,7 +55,7 @@ M: digit-class class-member? ( obj class -- ? )
     drop digit? ; inline
 
 : c-identifier-char? ( ch -- ? )
-    { [ alpha? ] [ CHAR: _ = ] } 1|| ;
+    { [ alpha? ] [ char: _ = ] } 1|| ;
 
 M: c-identifier-class class-member? ( obj class -- ? )
     drop c-identifier-char? ; inline
@@ -76,16 +76,16 @@ M: java-printable-class class-member? ( obj class -- ? )
     drop java-printable? ; inline
 
 M: non-newline-blank-class class-member? ( obj class -- ? )
-    drop { [ blank? ] [ CHAR: \n = not ] } 1&& ; inline
+    drop { [ blank? ] [ char: \n = not ] } 1&& ; inline
 
 M: control-character-class class-member? ( obj class -- ? )
     drop control? ; inline
 
 : hex-digit? ( ch -- ? )
     {
-        [ CHAR: A CHAR: F between? ]
-        [ CHAR: a CHAR: f between? ]
-        [ CHAR: 0 CHAR: 9 between? ]
+        [ char: A char: F between? ]
+        [ char: a char: f between? ]
+        [ char: 0 char: 9 between? ]
     } 1|| ;
 
 M: hex-digit-class class-member? ( obj class -- ? )
@@ -93,8 +93,8 @@ M: hex-digit-class class-member? ( obj class -- ? )
 
 : java-blank? ( ch -- ? )
     {
-        CHAR: \s CHAR: \t CHAR: \n
-        0xb 0x7 CHAR: \r
+        char: \s char: \t char: \n
+        0xb 0x7 char: \r
     } member? ;
 
 M: java-blank-class class-member? ( obj class -- ? )

@@ -36,5 +36,5 @@ M: crc32 checksum-bytes
 
 M: crc32 checksum-lines
     init-crc32
-    [ [ (crc32) ] each CHAR: \n (crc32) ] each
+    [ [ (crc32) ] each char: \n (crc32) ] each
     finish-crc32 ; inline

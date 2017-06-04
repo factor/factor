@@ -142,7 +142,7 @@ $nl
 "We begin by writing a word which removes blanks and non-alphabetical characters from a string, and then converts the string to lower case. We call this word " { $snippet "normalize" } ". To figure out how to write this word, we begin with some interactive experimentation in the listener."
 $nl
 "Start by pushing a character on the stack; notice that characters are really just integers:"
-{ $code "CHAR: a" }
+{ $code "char: a" }
 $nl
 "Now, use the " { $link Letter? } " word to test if it is an alphabetical character, upper or lower case:"
 { $unchecked-example "Letter? ." "t" }
@@ -151,7 +151,7 @@ $nl
 "This gives the expected result."
 $nl
 "Now try with a non-alphabetical character:"
-{ $code "CHAR: #" }
+{ $code "char: #" }
 { $unchecked-example "Letter? ." "f" }
 $nl
 "What we want to do is given a string, remove all characters which do not match the " { $link Letter? } " predicate. Let's push a string on the stack:"

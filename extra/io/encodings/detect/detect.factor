@@ -13,7 +13,7 @@ default-8bit-encoding [ latin1 ] initialize
 <PRIVATE
 
 : prolog-tag ( bytes -- string )
-    CHAR: > over index [ 1 + head-slice ] when* >string ;
+    char: > over index [ 1 + head-slice ] when* >string ;
 
 : prolog-encoding ( string -- iana-encoding )
     '[

@@ -61,7 +61,7 @@ ERROR: vocab-root-required root ;
 
 : unrooted-disk-vocabs ( prefix -- seq )
     [ loaded-vocab-names no-rooted ] dip
-    dup empty? [ CHAR: . suffix ] unless
+    dup empty? [ char: . suffix ] unless
     '[ vocab-name _ one-level-only? ] filter ;
 
 : unrooted-disk-vocabs-recursive ( prefix -- seq )

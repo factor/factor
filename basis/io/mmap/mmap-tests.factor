@@ -7,7 +7,7 @@ SPECIALIZED-ARRAY: uint
 
 [| path |
     "12345" path ascii set-file-contents
-    { } [ path [ char <mapped-array> CHAR: 2 0 pick set-nth drop ] with-mapped-file ] unit-test
+    { } [ path [ char <mapped-array> char: 2 0 pick set-nth drop ] with-mapped-file ] unit-test
     { 5 } [ path [ char <mapped-array> length ] with-mapped-file ] unit-test
     { 5 } [ path [ char <mapped-array> length ] with-mapped-file-reader ] unit-test
     { "22345" } [ path ascii file-contents ] unit-test

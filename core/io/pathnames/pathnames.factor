@@ -65,7 +65,7 @@ ERROR: no-parent-directory path ;
     {
         { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
-        { [ dup second CHAR: : = ] [ t ] }
+        { [ dup second char: : = ] [ t ] }
         [ f ]
     } cond ;
 

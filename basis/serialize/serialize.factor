@@ -62,22 +62,22 @@ SYMBOL: serialized
 : serialize-shared ( obj quot -- )
     [
         dup object-id
-        [ CHAR: o write1 serialize-cell drop ]
+        [ char: o write1 serialize-cell drop ]
     ] dip if* ; inline
 
 M: f (serialize) ( obj -- )
-    drop CHAR: n write1 ;
+    drop char: n write1 ;
 
 M: integer (serialize) ( obj -- )
     [
-        CHAR: z write1
+        char: z write1
     ] [
-        dup 0 < [ neg CHAR: m ] [ CHAR: p ] if write1
+        dup 0 < [ neg char: m ] [ char: p ] if write1
         serialize-cell
     ] if-zero ;
 
 M: float (serialize) ( obj -- )
-    CHAR: F write1
+    char: F write1
     double>bits serialize-cell ;
 
 : serialize-seq ( obj code -- )
@@ -90,7 +90,7 @@ M: float (serialize) ( obj -- )
 
 M: tuple (serialize) ( obj -- )
     [
-        CHAR: T write1
+        char: T write1
         [ class-of (serialize) ]
         [ add-object ]
         [ tuple-slots (serialize) ]
@@ -98,23 +98,23 @@ M: tuple (serialize) ( obj -- )
     ] serialize-shared ;
 
 M: array (serialize) ( obj -- )
-    CHAR: a serialize-seq ;
+    char: a serialize-seq ;
 
 M: quotation (serialize) ( obj -- )
     [
-        CHAR: q write1
+        char: q write1
         [ >array (serialize) ] [ add-object ] bi
     ] serialize-shared ;
 
 M: hashtable (serialize) ( obj -- )
     [
-        CHAR: h write1
+        char: h write1
         [ add-object ] [ >alist (serialize) ] bi
     ] serialize-shared ;
 
 M: byte-array (serialize) ( obj -- )
     [
-        CHAR: A write1
+        char: A write1
         [ add-object ]
         [ length serialize-cell ]
         [ write ] tri
@@ -122,7 +122,7 @@ M: byte-array (serialize) ( obj -- )
 
 M: string (serialize) ( obj -- )
     [
-        CHAR: s write1
+        char: s write1
         [ add-object ]
         [
             utf8 encode
@@ -132,11 +132,11 @@ M: string (serialize) ( obj -- )
     ] serialize-shared ;
 
 : serialize-true ( word -- )
-    drop CHAR: t write1 ;
+    drop char: t write1 ;
 
 : serialize-gensym ( word -- )
     [
-        CHAR: G write1
+        char: G write1
         [ add-object ]
         [ def>> (serialize) ]
         [ props>> (serialize) ]
@@ -144,7 +144,7 @@ M: string (serialize) ( obj -- )
     ] serialize-shared ;
 
 : serialize-word ( word -- )
-    CHAR: w write1
+    char: w write1
     [ name>> (serialize) ]
     [ vocabulary>> (serialize) ]
     bi ;
@@ -157,7 +157,7 @@ M: word (serialize) ( obj -- )
     } cond ;
 
 M: wrapper (serialize) ( obj -- )
-    CHAR: W write1
+    char: W write1
     wrapped>> (serialize) ;
 
 DEFER: (deserialize)
@@ -246,22 +246,22 @@ SYMBOL: deserialized
 : deserialize* ( -- object ? )
     read1 [
         {
-            { CHAR: A [ deserialize-byte-array ] }
-            { CHAR: F [ deserialize-float ] }
-            { CHAR: T [ deserialize-tuple ] }
-            { CHAR: W [ deserialize-wrapper ] }
-            { CHAR: a [ deserialize-array ] }
-            { CHAR: h [ deserialize-hashtable ] }
-            { CHAR: m [ deserialize-negative-integer ] }
-            { CHAR: n [ deserialize-false ] }
-            { CHAR: t [ deserialize-true ] }
-            { CHAR: o [ deserialize-unknown ] }
-            { CHAR: p [ deserialize-positive-integer ] }
-            { CHAR: q [ deserialize-quotation ] }
-            { CHAR: s [ deserialize-string ] }
-            { CHAR: w [ deserialize-word ] }
-            { CHAR: G [ deserialize-word ] }
-            { CHAR: z [ deserialize-zero ] }
+            { char: A [ deserialize-byte-array ] }
+            { char: F [ deserialize-float ] }
+            { char: T [ deserialize-tuple ] }
+            { char: W [ deserialize-wrapper ] }
+            { char: a [ deserialize-array ] }
+            { char: h [ deserialize-hashtable ] }
+            { char: m [ deserialize-negative-integer ] }
+            { char: n [ deserialize-false ] }
+            { char: t [ deserialize-true ] }
+            { char: o [ deserialize-unknown ] }
+            { char: p [ deserialize-positive-integer ] }
+            { char: q [ deserialize-quotation ] }
+            { char: s [ deserialize-string ] }
+            { char: w [ deserialize-word ] }
+            { char: G [ deserialize-word ] }
+            { char: z [ deserialize-zero ] }
         } case t
     ] [
         f f

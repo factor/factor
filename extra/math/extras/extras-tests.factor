@@ -96,7 +96,7 @@ IN: math.extras.test
 { f } [ { 1 1 2 2 } majority ] unit-test
 { 2 } [ { 1 1 2 2 2 } majority ] unit-test
 { 3 } [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
-{ CHAR: C } [ "AAACCBBCCCBCC" majority ] unit-test
+{ char: C } [ "AAACCBBCCCBCC" majority ] unit-test
 
 { -5 } [ -4-3/5 round-to-even ] unit-test
 { -4 } [ -4-1/2 round-to-even ] unit-test

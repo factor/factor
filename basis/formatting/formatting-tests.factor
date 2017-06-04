@@ -47,7 +47,7 @@ IN: formatting.tests
 { "2008-09-10" } [ 2008 9 10 "%04d-%02d-%02d" sprintf ] unit-test
 { "Hello, World!" } [ "Hello, World!" "%s" sprintf ] unit-test
 { "printf test" } [ "printf test" sprintf ] unit-test
-{ "char a = 'a'" } [ CHAR: a "char %c = 'a'" sprintf ] unit-test
+{ "char a = 'a'" } [ char: a "char %c = 'a'" sprintf ] unit-test
 { "00" } [ 0x0 "%02x" sprintf ] unit-test
 { "ff" } [ 0xff "%02x" sprintf ] unit-test
 { "0 message(s)" } [ 0 "message" "%d %s(s)" sprintf ] unit-test

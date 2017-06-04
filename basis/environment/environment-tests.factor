@@ -21,7 +21,7 @@ os unix? [
 { f } [ "factor-test-key-1" os-env ] unit-test
 
 { } [
-    32766 CHAR: a <string> "factor-test-key-long" set-os-env
+    32766 char: a <string> "factor-test-key-long" set-os-env
 ] unit-test
 { 32766 } [ "factor-test-key-long" os-env length ] unit-test
 { } [ "factor-test-key-long" unset-os-env ] unit-test

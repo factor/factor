@@ -11,7 +11,7 @@ HELP: 1token
 } { $description
     "Calls 1string on a character and returns a parser that matches that character."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" CHAR: a 1token parse ." "\"a\"" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" char: a 1token parse ." "\"a\"" }
 } { $see-also string-parser } ;
 
 HELP: (list-of)

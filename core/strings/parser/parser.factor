@@ -9,19 +9,19 @@ ERROR: bad-escape char ;
 
 : escape ( escape -- ch )
     H{
-        { CHAR: a  CHAR: \a }
-        { CHAR: b  CHAR: \b }
-        { CHAR: e  CHAR: \e }
-        { CHAR: f  CHAR: \f }
-        { CHAR: n  CHAR: \n }
-        { CHAR: r  CHAR: \r }
-        { CHAR: t  CHAR: \t }
-        { CHAR: s  CHAR: \s }
-        { CHAR: v  CHAR: \v }
-        { CHAR: \s CHAR: \s }
-        { CHAR: 0  CHAR: \0 }
-        { CHAR: \\ CHAR: \\ }
-        { CHAR: \" CHAR: \" }
+        { char: a  char: \a }
+        { char: b  char: \b }
+        { char: e  char: \e }
+        { char: f  char: \f }
+        { char: n  char: \n }
+        { char: r  char: \r }
+        { char: t  char: \t }
+        { char: s  char: \s }
+        { char: v  char: \v }
+        { char: \s char: \s }
+        { char: 0  char: \0 }
+        { char: \\ char: \\ }
+        { char: \" char: \" }
     } ?at [ bad-escape ] unless ;
 
 SYMBOL: name>char-hook
@@ -35,7 +35,7 @@ name>char-hook [
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
-        CHAR: } over index cut-slice [
+        char: } over index cut-slice [
             dup hex> [
                 nip
             ] [
@@ -48,8 +48,8 @@ name>char-hook [
 
 : next-escape ( str -- ch str' )
     unclip-slice {
-        { CHAR: u [ unicode-escape ] }
-        { CHAR: x [ hex-escape ] }
+        { char: u [ unicode-escape ] }
+        { char: x [ hex-escape ] }
         [ escape swap ]
     } case ;
 
@@ -60,7 +60,7 @@ name>char-hook [
     [
         cut-slice [ append! ] dip
         rest-slice next-escape [ suffix! ] dip
-        CHAR: \\ over index (unescape-string)
+        char: \\ over index (unescape-string)
     ] [
         append!
     ] if* ;
@@ -68,7 +68,7 @@ name>char-hook [
 PRIVATE>
 
 : unescape-string ( str -- str' )
-    CHAR: \\ over index [
+    char: \\ over index [
         [ [ length <sbuf> ] keep ] dip (unescape-string)
     ] when* "" like ;
 
@@ -113,7 +113,7 @@ DEFER: (parse-string)
 : parse-found-token ( accum lexer i elt -- )
     { sbuf lexer fixnum fixnum } declare
     [ over lexer-subseq pick push-all ] dip
-    CHAR: \ = [
+    char: \ = [
         dup dup [ next-char ] bi@
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
@@ -129,7 +129,7 @@ DEFER: (parse-string)
             parse-found-token
         ] [
             drop 2dup next-line%
-            CHAR: \n pick push
+            char: \n pick push
             (parse-string)
         ] if*
     ] [

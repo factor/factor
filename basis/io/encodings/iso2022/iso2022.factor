@@ -33,10 +33,10 @@ M: iso2022 <decoder>
 
 CONSTANT: ESC 0x16
 
-CONSTANT: switch-ascii B{ $ ESC CHAR: ( CHAR: B }
-CONSTANT: switch-jis201 B{ $ ESC CHAR: ( CHAR: J }
-CONSTANT: switch-jis208 B{ $ ESC CHAR: $ CHAR: B }
-CONSTANT: switch-jis212 B{ $ ESC CHAR: $ CHAR: ( CHAR: D }
+CONSTANT: switch-ascii B{ $ ESC char: ( char: B }
+CONSTANT: switch-jis201 B{ $ ESC char: ( char: J }
+CONSTANT: switch-jis208 B{ $ ESC char: $ char: B }
+CONSTANT: switch-jis212 B{ $ ESC char: $ char: ( char: D }
 
 : find-type ( char -- code type )
     {
@@ -62,19 +62,19 @@ M:: iso2022-state encode-char ( char stream encoding -- )
 
 : read-escape ( stream -- type/f )
     dup stream-read1 {
-        { CHAR: ( [
+        { char: ( [
             stream-read1 {
-                { CHAR: B [ ascii get-global ] }
-                { CHAR: J [ jis201 get-global ] }
+                { char: B [ ascii get-global ] }
+                { char: J [ jis201 get-global ] }
                 [ drop f ]
             } case
         ] }
-        { CHAR: $ [
+        { char: $ [
             dup stream-read1 {
-                { CHAR: @ [ drop jis208 get-global ] } ! want: JIS X 0208-1978
-                { CHAR: B [ drop jis208 get-global ] }
-                { CHAR: ( [
-                    stream-read1 CHAR: D = jis212 get-global f ?
+                { char: @ [ drop jis208 get-global ] } ! want: JIS X 0208-1978
+                { char: B [ drop jis208 get-global ] }
+                { char: ( [
+                    stream-read1 char: D = jis212 get-global f ?
                 ] }
                 [ 2drop f ]
             } case

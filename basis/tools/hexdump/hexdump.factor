@@ -13,17 +13,17 @@ IN: tools.hexdump
     [ >hex write "h" write nl ] bi ;
 
 : write-offset ( lineno -- )
-    16 * >hex 8 CHAR: 0 pad-head write "h: " write ;
+    16 * >hex 8 char: 0 pad-head write "h: " write ;
 
 : >hex-digit ( digit -- str )
-    >hex 2 CHAR: 0 pad-head ;
+    >hex 2 char: 0 pad-head ;
 
 : >hex-digits ( bytes -- str )
     [ >hex-digit " " append ] { } map-as concat
-    48 CHAR: \s pad-tail ;
+    48 char: \s pad-tail ;
 
 : >ascii ( bytes -- str )
-    [ [ printable? ] keep CHAR: . ? ] "" map-as ;
+    [ [ printable? ] keep char: . ? ] "" map-as ;
 
 : write-hex-line ( bytes lineno -- )
     write-offset [ >hex-digits write ] [ >ascii write ] bi nl ;

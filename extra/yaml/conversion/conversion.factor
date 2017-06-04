@@ -92,7 +92,7 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
 : construct-int ( str -- n ) string>number ;
 
 : construct-infinity ( str -- -inf/+inf )
-    first CHAR: - = -1/0. 1/0. ? ;
+    first char: - = -1/0. 1/0. ? ;
 
 : construct-float ( str -- x )
     {
@@ -107,11 +107,11 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
 ! - months, days and hours on 1 digit
 ! preprocess to fix this mess...
 : yaml>rfc3339 ( str -- str' )
-    R/ -[0-9][^0-9]/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
-    R/ -[0-9][^0-9]/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
-    R/ [^0-9][0-9]:/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
+    R/ -[0-9][^0-9]/ [ [ char: 0 1 ] dip insert-nth ] re-replace-with
+    R/ -[0-9][^0-9]/ [ [ char: 0 1 ] dip insert-nth ] re-replace-with
+    R/ [^0-9][0-9]:/ [ [ char: 0 1 ] dip insert-nth ] re-replace-with
     R/ [ \t]+/ " " re-replace
-    CHAR: : over index cut CHAR: space swap remove append ;
+    char: : over index cut char: space swap remove append ;
 
 : construct-timestamp ( obj -- obj' )
     dup R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ matches?

@@ -14,7 +14,7 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 
 : parse-weight ( string -- weight )
     "]" split but-last [
-        weight new swap rest unclip CHAR: * = swapd >>ignorable?
+        weight new swap rest unclip char: * = swapd >>ignorable?
         swap "." split first3 [ hex> ] tri@
         [ >>primary ] [ >>secondary ] [ >>tertiary ] tri*
     ] map ;

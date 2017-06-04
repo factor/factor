@@ -15,19 +15,19 @@ IN: help.html
 : escape-char ( ch -- )
     dup ascii? [
         dup H{
-            { CHAR: \" "__quo__" }
-            { CHAR: * "__star__" }
-            { CHAR: : "__colon__" }
-            { CHAR: < "__lt__" }
-            { CHAR: > "__gt__" }
-            { CHAR: ? "__que__" }
-            { CHAR: \\ "__back__" }
-            { CHAR: | "__pipe__" }
-            { CHAR: / "__slash__" }
-            { CHAR: , "__comma__" }
-            { CHAR: @ "__at__" }
-            { CHAR: # "__hash__" }
-            { CHAR: % "__percent__" }
+            { char: \" "__quo__" }
+            { char: * "__star__" }
+            { char: : "__colon__" }
+            { char: < "__lt__" }
+            { char: > "__gt__" }
+            { char: ? "__que__" }
+            { char: \\ "__back__" }
+            { char: | "__pipe__" }
+            { char: / "__slash__" }
+            { char: , "__comma__" }
+            { char: @ "__at__" }
+            { char: # "__hash__" }
+            { char: % "__percent__" }
         } at [ % ] [ , ] ?if
     ] [ number>string "__" "__" surround % ] if ;
 
@@ -87,7 +87,7 @@ M: pathname url-of
      XML] ;
 
 : bijective-base26 ( n -- name )
-    [ dup 0 > ] [ 1 - 26 /mod CHAR: a + ] "" produce-as nip reverse! ;
+    [ dup 0 > ] [ 1 - 26 /mod char: a + ] "" produce-as nip reverse! ;
 
 : css-class ( style classes -- name )
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;

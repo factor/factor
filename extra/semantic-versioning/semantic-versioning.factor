@@ -17,8 +17,8 @@ PRIVATE>
 
 : split-version ( string -- array )
     "+" split1 [
-        dup [ [ digit? not ] [ CHAR: . = not ] bi and ] find [
-            [ cut ] [ CHAR: - = [ rest [ f ] when-empty ] when ] bi*
+        dup [ [ digit? not ] [ char: . = not ] bi and ] find [
+            [ cut ] [ char: - = [ rest [ f ] when-empty ] when ] bi*
         ] [ drop f ] if*
         [ "." split [ string>number 0 or ] map 3 0 pad-tail ] dip
     ] dip 3array ;

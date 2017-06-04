@@ -80,7 +80,7 @@ IN: bootstrap.syntax
 
     "f" [ f suffix! ] define-core-syntax
 
-    "CHAR:" [
+    "char:" [
         lexer get parse-raw [ "token" throw-unexpected-eof ] unless* {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape >string "" assert= ] }

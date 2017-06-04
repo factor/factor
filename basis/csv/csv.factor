@@ -7,7 +7,7 @@ IN: csv
 
 SYMBOL: delimiter
 
-CHAR: , delimiter set-global
+char: , delimiter set-global
 
 <PRIVATE
 
@@ -20,9 +20,9 @@ DEFER: quoted-field,
     2over stream-read1 swap over =
     [ nip ] [
         {
-            { CHAR: \"    [ [ CHAR: \" , ] when quoted-field, ] }
-            { CHAR: \n   [ ] } ! Error: cr inside string?
-            { CHAR: \r   [ ] } ! Error: lf inside string?
+            { char: \"    [ [ char: \" , ] when quoted-field, ] }
+            { char: \n   [ ] } ! Error: cr inside string?
+            { char: \r   [ ] } ! Error: lf inside string?
             [ [ , drop f maybe-escaped-quote ] when* ]
         } case
      ] if ; inline recursive
@@ -45,7 +45,7 @@ DEFER: quoted-field,
     swap ?trim [ drop ] 2dip ; inline
 
 : field ( delimiter stream field-seps quote-seps -- sep/f field )
-    pick stream-read-until dup CHAR: \" = [
+    pick stream-read-until dup char: \" = [
         drop [ drop quoted-field ] [ continue-field ] if-empty
     ] [ [ 3drop ] 2dip swap ?trim ] if ;
 
@@ -89,10 +89,10 @@ PRIVATE>
     '[ dup "\n\"\r" member? [ drop t ] [ _ = ] if ] any? ; inline
 
 : escape-quotes ( cell stream -- )
-    CHAR: \" over stream-write1 swap [
+    char: \" over stream-write1 swap [
         [ over stream-write1 ]
-        [ dup CHAR: \" = [ over stream-write1 ] [ drop ] if ] bi
-    ] each CHAR: \" swap stream-write1 ;
+        [ dup char: \" = [ over stream-write1 ] [ drop ] if ] bi
+    ] each char: \" swap stream-write1 ;
 
 : escape-if-required ( cell delimiter stream -- )
     [ dupd needs-escaping? ] dip

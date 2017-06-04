@@ -116,8 +116,8 @@ M: string string-lines
         2dup [ "\r\n" member? ] find-from swapd [
             over [ [ nip length ] keep ] unless
             [ "" subseq-as suffix! ] 2keep [ 1 + ] dip
-        ] dip CHAR: \r eq? [
-            2dup ?nth CHAR: \n eq? [ [ 1 + ] dip ] when
+        ] dip char: \r eq? [
+            2dup ?nth char: \n eq? [ [ 1 + ] dip ] when
         ] when
     ] while 2drop { } like ;
 

@@ -49,7 +49,7 @@ HELP: range
 }
 { $description
     "Returns a parser that matches a single character that lies within the range of characters given, inclusive." }
-{ $examples { $code ": digit ( -- parser ) CHAR: 0 CHAR: 9 range ;" } } ;
+{ $examples { $code ": digit ( -- parser ) char: 0 char: 9 range ;" } } ;
 
 HELP: seq
 { $values
@@ -137,7 +137,7 @@ HELP: action
     "from that parse. The result of the quotation is then used as the final AST. This can be used "
     "for manipulating the parse tree to produce a AST better suited for the task at hand rather than "
     "the default AST. If the quotation returns " { $link fail } " then the parser fails." }
-{ $code "CHAR: 0 CHAR: 9 range [ to-digit ] action" } ;
+{ $code "char: 0 char: 9 range [ to-digit ] action" } ;
 
 HELP: sp
 { $values

@@ -13,7 +13,7 @@ IN: sequences.parser.tests
 { "foo" ";bar" }
 [
     "foo;bar" [
-        [ CHAR: ; take-until-object ] [ take-rest ] bi
+        [ char: ; take-until-object ] [ take-rest ] bi
     ] parse-sequence
 ] unit-test
 

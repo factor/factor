@@ -15,7 +15,7 @@ SINGLETON: pbm-image
         read1 dup blank?
         [ t ]
         [
-            dup CHAR: # =
+            dup char: # =
             [ "\n" read-until 2drop t ]
             [ f ] if
         ] if
@@ -28,8 +28,8 @@ SINGLETON: pbm-image
 
 : read-ascii-bits ( -- )
     read1 {
-        { CHAR: 1 [ 0 , read-ascii-bits ] }
-        { CHAR: 0 [ 255 , read-ascii-bits ] }
+        { char: 1 [ 0 , read-ascii-bits ] }
+        { char: 0 [ 255 , read-ascii-bits ] }
         { f [ ] }
         [ drop read-ascii-bits ]
     } case ;

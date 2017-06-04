@@ -174,7 +174,7 @@ ARTICLE: "escape" "Character escape codes"
 ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type. Integers representing Unicode code points can be read by specifying a literal character, or an escaped representation thereof."
 { $subsections
-    POSTPONE: CHAR:
+    POSTPONE: char:
     POSTPONE: "
     "escape"
 }
@@ -589,17 +589,17 @@ HELP: IN:
 { $values { "vocabulary" "a new vocabulary name" } }
 { $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist. After the vocabulary has been created, it can be listed in " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " declarations." } ;
 
-HELP: CHAR:
-{ $syntax "CHAR: token" }
+HELP: char:
+{ $syntax "char: token" }
 { $values { "token" "a literal character, escape code, or Unicode code point name" } }
 { $description "Adds a Unicode code point to the parse tree." }
 { $examples
     { $code
-        "CHAR: x"
-        "CHAR: \\u000032"
-        "CHAR: \\u{exclamation-mark}"
-        "CHAR: exclamation-mark"
-        "CHAR: ugaritic-letter-samka"
+        "char: x"
+        "char: \\u000032"
+        "char: \\u{exclamation-mark}"
+        "char: exclamation-mark"
+        "char: ugaritic-letter-samka"
     }
 } ;
 

@@ -74,7 +74,7 @@ CONSTANT: default-uuids-to-cache 100
     default-couch-host default-couch-port <server> ;
 
 : (server-url) ( server -- )
-    "http://" % [ host>> % ] [ CHAR: : , port>> number>string % ] bi CHAR: / , ; inline
+    "http://" % [ host>> % ] [ char: : , port>> number>string % ] bi char: / , ; inline
 
 : server-url ( server -- url )
     [ (server-url) ] "" make ;
@@ -102,7 +102,7 @@ TUPLE: db { server server } { name string } ;
 C: <db> db
 
 : (db-url) ( db -- )
-    [ server>> server-url % ] [ name>> % ] bi CHAR: / , ; inline
+    [ server>> server-url % ] [ name>> % ] bi char: / , ; inline
 
 : db-url ( db -- url )
     [ (db-url) ] "" make ;

@@ -41,14 +41,14 @@ IN: uuid
     ] dip 76 shift bitor ;
 
 : uuid>string ( n -- string )
-    >hex 32 CHAR: 0 pad-head
-    [ CHAR: - 20 ] dip insert-nth
-    [ CHAR: - 16 ] dip insert-nth
-    [ CHAR: - 12 ] dip insert-nth
-    [ CHAR: - 8 ] dip insert-nth ;
+    >hex 32 char: 0 pad-head
+    [ char: - 20 ] dip insert-nth
+    [ char: - 16 ] dip insert-nth
+    [ char: - 12 ] dip insert-nth
+    [ char: - 8 ] dip insert-nth ;
 
 : string>uuid ( string -- n )
-    [ CHAR: - = ] reject hex> ;
+    [ char: - = ] reject hex> ;
 
 PRIVATE>
 
