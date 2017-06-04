@@ -19,7 +19,7 @@ C: <decimal> decimal
 
 : parse-decimal ( -- decimal ) scan-token string>decimal ;
 
-SYNTAX: DECIMAL: parse-decimal suffix! ;
+SYNTAX: decimal: parse-decimal suffix! ;
 
 : decimal>ratio ( decimal -- ratio ) >decimal< 10^ * ;
 

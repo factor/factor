@@ -31,4 +31,4 @@ ERROR: not-an-integer x ;
         [ dup string>number [ ] [ not-an-integer ] ?if ] bi@
     ] keep length 10^ / + swap [ neg ] when ;
 
-SYNTAX: DECIMAL: scan-token parse-decimal suffix! ;
+SYNTAX: decimal: scan-token parse-decimal suffix! ;

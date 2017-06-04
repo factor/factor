@@ -10,24 +10,24 @@ IN: taxes.usa.federal
 
 : federal-single ( -- triples )
     {
-        {      0   2650 DECIMAL: 0   }
-        {   2650  10300 DECIMAL: .10 }
-        {  10300  33960 DECIMAL: .15 }
-        {  33960  79725 DECIMAL: .25 }
-        {  79725 166500 DECIMAL: .28 }
-        { 166500 359650 DECIMAL: .33 }
-        { 359650   1/0. DECIMAL: .35 }
+        {      0   2650 decimal: 0   }
+        {   2650  10300 decimal: .10 }
+        {  10300  33960 decimal: .15 }
+        {  33960  79725 decimal: .25 }
+        {  79725 166500 decimal: .28 }
+        { 166500 359650 decimal: .33 }
+        { 359650   1/0. decimal: .35 }
     } ;
 
 : federal-married ( -- triples )
     {
-        {      0   8000 DECIMAL: 0   }
-        {   8000  23550 DECIMAL: .10 }
-        {  23550  72150 DECIMAL: .15 }
-        {  72150 137850 DECIMAL: .25 }
-        { 137850 207700 DECIMAL: .28 }
-        { 207700 365100 DECIMAL: .33 }
-        { 365100   1/0. DECIMAL: .35 }
+        {      0   8000 decimal: 0   }
+        {   8000  23550 decimal: .10 }
+        {  23550  72150 decimal: .15 }
+        {  72150 137850 decimal: .25 }
+        { 137850 207700 decimal: .28 }
+        { 207700 365100 decimal: .33 }
+        { 365100   1/0. decimal: .35 }
     } ;
 
 SINGLETON: federal

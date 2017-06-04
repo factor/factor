@@ -8,18 +8,18 @@ IN: taxes.usa.mn
 ! Minnesota
 : mn-single ( -- triples )
     {
-        {     0  1950  DECIMAL: 0     }
-        {  1950 23750  DECIMAL: .0535 }
-        { 23750 73540  DECIMAL: .0705 }
-        { 73540 1/0.   DECIMAL: .0785 }
+        {     0  1950  decimal: 0     }
+        {  1950 23750  decimal: .0535 }
+        { 23750 73540  decimal: .0705 }
+        { 73540 1/0.   decimal: .0785 }
     } ;
 
 : mn-married ( -- triples )
     {
-        {      0   7400 DECIMAL: 0     }
-        {   7400  39260 DECIMAL: .0535 }
-        {  39260 133980 DECIMAL: .0705 }
-        { 133980   1/0. DECIMAL: .0785 }
+        {      0   7400 decimal: 0     }
+        {   7400  39260 decimal: .0535 }
+        {  39260 133980 decimal: .0705 }
+        { 133980   1/0. decimal: .0785 }
     } ;
 
 : <mn> ( -- obj )
