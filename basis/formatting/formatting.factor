@@ -4,7 +4,8 @@ USING: accessors arrays assocs calendar calendar.english combinators
 combinators.smart fry generalizations io io.streams.string
 kernel macros math math.functions math.parser namespaces
 peg.ebnf present prettyprint quotations sequences
-sequences.generalizations strings unicode vectors ;
+sequences.generalizations strings unicode vectors
+math.functions.integer-logs splitting ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -28,12 +29,70 @@ IN: formatting
 : >digits ( string -- digits )
     [ 0 ] [ string>number ] if-empty ;
 
-: format-simple ( x digits string -- string )
-    [ >float "" -1 ] 2dip "C" format-float ;
+: format-decimal-simple ( x digits -- string )
+    [
+        [ abs ] dip
+        [ 10^ * round-to-even >integer number>string ]
+        [ 1 + CHAR: 0 pad-head ]
+        [ cut* ] tri [ "." glue ] unless-empty
+    ] curry keep neg? [ CHAR: - prefix ] when ;
 
-: format-scientific ( x digits -- string ) "e" format-simple ;
+: format-scientific-mantissa ( x log10x digits -- string rounded-up? )
+    [ swap - 10^ * round-to-even >integer number>string ] keep
+    over length 1 - < [
+        [ but-last >string ] when ! 9.9 rounded to 1e+01
+        1 cut [ "." glue ] unless-empty
+    ] keep ;
 
-: format-decimal ( x digits -- string ) "f" format-simple ;
+: format-scientific-exponent ( rounded-up? log10x -- string )
+    swap [ 1 + ] when number>string 2 CHAR: 0 pad-head
+    dup CHAR: - swap index "e" "e+" ? prepend ;
+
+: format-scientific-simple ( x digits -- string )
+    [
+        [ abs dup integer-log10 ] dip
+        [ format-scientific-mantissa ]
+        [ drop nip format-scientific-exponent ] 3bi append
+    ] curry keep neg? [ CHAR: - prefix ] when ;
+
+: format-float-fast ( x digits string -- string )
+    [ "" -1 ] 2dip "C" format-float ;
+
+: format-fast-scientific? ( x digits -- x' digits ? )
+    over float? [ t ]
+    [ 2dup
+        [ abs integer-log10 abs 308 < ]
+        [ 15 < ] bi* and
+        [ [ [ >float ] dip ] when ] keep
+    ] if ;
+
+: ?fix-nonsignificant-zero ( string digits -- string )
+    [ ".0" "" replace ] [ drop ] if-zero ;
+
+: format-scientific ( x digits -- string )
+    format-fast-scientific?  [
+        [ "e" format-float-fast ]
+        [ ?fix-nonsignificant-zero ] bi
+    ] [ format-scientific-simple ] if ;
+
+: format-fast-decimal? ( x digits -- x' digits ? )
+    over float? [ t ]
+    [
+        2dup
+        [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
+        [ over ratio?
+            [ [ abs integer-log10 ] dip
+              [ drop abs 308 < ] [ + 15 <= ] 2bi and ]
+            [ 2drop f ] if
+        ] 2bi or
+        [ [ [ >float ] dip ] when ] keep
+    ] if ; inline
+
+: format-decimal ( x digits -- string )
+    format-fast-decimal? [
+        [ "f" format-float-fast ]
+        [ ?fix-nonsignificant-zero ] bi
+    ] [ format-decimal-simple ] if ;
 
 ERROR: unknown-printf-directive ;
 
@@ -47,7 +106,7 @@ pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0 = [ drop [ ] ] when ]]
 
-sign_     = [+ ]                 => [[ '[ dup CHAR: - swap index [ _ prefix ] unless ] ]]
+sign_     = [+ ]                 => [[ '[ dup first CHAR: - = [ _ prefix ] unless ] ]]
 sign      = (sign_)?             => [[ [ ] or ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
@@ -62,9 +121,11 @@ fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
 fmt-s     = "s"                  => [[ [ present ] ]]
 fmt-S     = "S"                  => [[ [ present >upper ] ]]
 fmt-u     = "u"                  => [[ [ unparse ] ]]
-fmt-d     = "d"                  => [[ [ >integer number>string ] ]]
-fmt-o     = "o"                  => [[ [ >integer >oct ] ]]
-fmt-b     = "b"                  => [[ [ >integer >bin ] ]]
+fmt-d     = "d"                  => [[ [ number>string ] ]]
+fmt-o     = "o"                  => [[ [ >oct ] ]]
+fmt-O     = "O"                  => [[ [ >oct >upper ] ]]
+fmt-b     = "b"                  => [[ [ >bin ] ]]
+fmt-B     = "B"                  => [[ [ >bin >upper ] ]]
 fmt-e     = digits "e"           => [[ first '[ _ format-scientific ] ]]
 fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
 fmt-f     = digits "f"           => [[ first '[ _ format-decimal ] ]]
@@ -75,7 +136,7 @@ unknown   = (.)*                 => [[ unknown-printf-directive ]]
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S|fmt-u
 strings   = pad width strings_   => [[ <reversed> compose-all ]]
 
-numbers_  = fmt-d|fmt-o|fmt-b|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
+numbers_  = fmt-d|fmt-o|fmt-O|fmt-b|fmt-B|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
 
 types     = strings|numbers

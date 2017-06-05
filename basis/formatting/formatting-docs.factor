@@ -19,20 +19,22 @@ HELP: printf
         { { $snippet "%P.Du" }       "Unparsed format"            "object" }
         { { $snippet "%c" }          "Character format"           "char" }
         { { $snippet "%C" }          "Character format uppercase" "char" }
-        { { $snippet "%+Pd" }        "Integer format (base 10)"   "integer" }
-        { { $snippet "%+Po" }        "Octal format (base 8)"      "integer" }
-        { { $snippet "%+Pb" }        "Binary format (base 2)"     "integer" }
-        { { $snippet "%+P.De" }      "Scientific notation"        "integer, float" }
-        { { $snippet "%+P.DE" }      "Scientific notation"        "integer, float" }
-        { { $snippet "%+P.Df" }      "Fixed format"               "integer, float" }
-        { { $snippet "%+Px" }        "Hexadecimal (base 16)"      "integer" }
-        { { $snippet "%+PX" }        "Hexadecimal (base 16) uppercase" "integer" }
+        { { $snippet "%LPd" }        "Base 10 General format"              "real" }
+        { { $snippet "%LPx" }        "Base 16 General format"              "real" }
+        { { $snippet "%LPX" }        "Base 16 General format uppercase"    "real" }
+        { { $snippet "%LPo" }        "Base  8 General format"              "real" }
+        { { $snippet "%LPO" }        "Base  8 General format uppercase"    "real" }
+        { { $snippet "%LPb" }        "Base  2 General format"              "real" }
+        { { $snippet "%LPB" }        "Base  2 General format uppercase"    "real" }
+        { { $snippet "%LP.De" }      "Base 10 Scientific format"           "real" }
+        { { $snippet "%LP.DE" }      "Base 10 Scientific format uppercase" "real" }
+        { { $snippet "%LP.Df" }      "Base 10 Fixed format"                "real" }
         { { $snippet "%[%?, %]" }    "Sequence format"            "sequence" }
         { { $snippet "%[%?: %? %]" } "Assocs format"              "assocs" }
     }
     $nl
-    "A plus sign (" { $snippet "+" } ") is used to optionally specify that the number should be "
-    "formatted with a " { $snippet "+" } " preceeding it if positive."
+    "Leading (" { $snippet "L" } ") is used to optionally prefix a plus sign (" { $snippet "\"+\"" } ") or space (" { $snippet "\" \"" } ") "
+    "if the formatted number is positive."
     $nl
     "Padding (" { $snippet "P" } ") is used to optionally specify the minimum width of the result "
     "string, the padding character, and the alignment.  By default, the padding "
@@ -78,8 +80,10 @@ HELP: printf
         "##12" }
     { $example
         "USING: formatting ;"
-        "1234 \"%+d\" printf"
-        "+1234" }
+        " 1234 \"%+d\\n\" printf"
+        "-1234 \"%+d\\n\" printf"
+        " 1234 \"% d\\n\" printf"
+        "+1234\n-1234\n 1234" }
     { $example
         "USING: formatting ;"
         "{ 1 2 3 } \"%[%d, %]\" printf"

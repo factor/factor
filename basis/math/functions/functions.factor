@@ -348,16 +348,71 @@ M: real atan >float atan ; inline
 
 : acot ( x -- y ) recip atan ; inline
 
-: truncate ( x -- y ) dup 1 mod - ; inline
+GENERIC: truncate ( x -- y )
+
+M: real truncate dup 1 mod - ;
+
+M: float truncate
+    dup double>bits
+    dup -52 shift 0x7ff bitand 0x3ff -
+    ! check for floats without fractional part (>= 2^52)
+    dup 52 < [
+        [ drop ] 2dip
+        dup 0 < [
+            ! the float is between -1.0 and 1.0,
+            ! the result is +/-0.0
+            drop -63 shift zero? 0.0 -0.0 ?
+        ] [
+            ! Put zeroes in the correct part of the mantissa
+            0x000fffffffffffff swap neg shift bitnot bitand
+            bits>double
+        ] if
+    ] [
+        ! check for nans and infinities and do an operation on them
+        ! to trigger fp exceptions if necessary
+        nip 0x400 = [ dup + ] when
+    ] if ; inline
 
 GENERIC: round ( x -- y )
 
+GENERIC: round-to-even ( x -- y )
+
+GENERIC: round-to-odd ( x -- y )
+
 M: integer round ; inline
 
-M: ratio round
-    >fraction [ /mod abs 2 * ] keep >= [ dup 0 < -1 1 ? + ] when ;
+M: integer round-to-even ; inline
+
+M: integer round-to-odd ; inline
+
+: (round-tiebreak?) ( quotient rem denom tiebreak-quot -- q ? )
+    [ [ > ] ] dip [ 2dip = and ] curry 3bi or ; inline
+
+: (round-to-even?) ( quotient rem denom -- quotient ? )
+    [ >integer odd? ] (round-tiebreak?) ; inline
+
+: (round-to-odd?) ( quotient rem denom -- quotient ? )
+    [ >integer even? ] (round-tiebreak?) ; inline
+
+: (ratio-round) ( x round-quot -- y )
+    [ >fraction [ /mod dup swapd abs 2 * ] keep ] [ call ] bi*
+    [ swap 0 < -1 1 ? + ] [ nip ] if ; inline
+
+: (float-round) ( x round-quot -- y )
+    [ dup 1 mod [ - ] keep dup swapd abs 0.5 ] [ call ] bi*
+    [ swap 0.0 < -1.0 1.0 ? + ] [ nip ] if ; inline
+
+M: ratio round [ >= ] (ratio-round) ;
+
+M: ratio round-to-even [ (round-to-even?) ] (ratio-round) ;
+
+M: ratio round-to-odd [ (round-to-odd?) ] (ratio-round) ;
 
 M: float round dup sgn 2 /f + truncate ;
+
+M: float round-to-even [ (round-to-even?) ] (float-round) ;
+
+M: float round-to-odd [ (round-to-odd?) ] (float-round) ;
 
 : floor ( x -- y )
     dup 1 mod
