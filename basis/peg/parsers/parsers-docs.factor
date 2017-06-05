@@ -21,7 +21,7 @@ HELP: (list-of)
     { "repeat1?" boolean }
     { "parser" "a parser" }
 } { $description
-    "Returns a parser that returns a list of items separated by the separator parser.  Does not hide the separators."
+    "Returns a parser that returns a list of items separated by the separator parser. Does not hide the separators."
 } { $see-also list-of list-of-many } ;
 
 HELP: list-of
@@ -30,10 +30,10 @@ HELP: list-of
     { "separator" "a parser" }
     { "parser" "a parser" }
 } { $description
-    "Returns a parser that returns a list of items separated by the separator parser.  Hides the separators and matches a list of one or more items."
+    "Returns a parser that returns a list of items separated by the separator parser. Hides the separators and matches a list of one or more items."
 } { $notes "Use " { $link list-of-many } " to ensure a list contains two or more items." }
 { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of parse  ." "V{ \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of parse ." "V{ \"a\" }" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also list-of-many } ;
 
@@ -43,7 +43,7 @@ HELP: list-of-many
     { "separator" "a parser" }
     { "parser" "a parser" }
 } { $description
-    "Returns a parser that returns a list of items separated by the separator parser.  Hides the separators and matches a list of two or more items."
+    "Returns a parser that returns a list of items separated by the separator parser. Hides the separators and matches a list of two or more items."
 } { $notes "Use " { $link list-of } " to return a list of only one item."
 } { $examples
     { $code "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of-many parse => exception" }
@@ -122,7 +122,7 @@ HELP: pack
     { "end" "a parser" }
     { "parser" "a parser" }
 } { $description
-    "Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
+    "Returns a parser that parses the begin, body, and end parsers in order. The begin and end parsers are hidden."
 } { $examples
     { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" \"hi\" token integer-parser \"bye\" token pack parse ." "123" }
 } { $see-also surrounded-by } ;
@@ -134,7 +134,7 @@ HELP: surrounded-by
     { "end" string }
     { "parser'" "a parser" }
 } { $description
-    "Calls token on begin and end to make them into string parsers.  Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
+    "Calls token on begin and end to make them into string parsers. Returns a parser that parses the begin, body, and end parsers in order. The begin and end parsers are hidden."
 } { $examples
     { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" integer-parser \"hi\" \"bye\" surrounded-by parse ." "123" }
 } { $see-also pack } ;
@@ -176,4 +176,4 @@ HELP: range-pattern
     { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse 1string ." "\"a\"" }
     { $code "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse => exception" }
 }
-}  ;
+} ;

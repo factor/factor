@@ -59,7 +59,7 @@ HELP: qualified-directory-files
 
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." }
+{ $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ". Restores the current directory after the quotation is called." }
 { $examples
     "Print all files in your home directory which are larger than a megabyte:"
     { $code
@@ -75,7 +75,7 @@ home [
 
 HELP: with-directory-entries
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Calls the quotation with the directory entries on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+{ $description "Calls the quotation with the directory entries on the stack and with the directory set as the " { $link current-directory } ". Restores the current directory after the quotation is called." } ;
 
 HELP: delete-file
 { $values { "path" "a pathname string" } }

@@ -96,7 +96,7 @@ HELP: m/version
 
 HELP: m/noop
 { $description
-    "Used as a keep-alive.  Also flushes any outstanding quiet gets."
+    "Used as a keep-alive. Also flushes any outstanding quiet gets."
 } ;
 
 HELP: m/stats

@@ -8,7 +8,7 @@ HELP: run-invaders
 "Run the Space Invaders emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
 "location of the Space Invaders ROM files. See "
-{ $link { "space-invaders" "space-invaders" } } "  for details."
+{ $link { "space-invaders" "space-invaders" } } " for details."
 } ;
 
 ARTICLE: { "space-invaders" "space-invaders" } "Space Invaders Emulator"

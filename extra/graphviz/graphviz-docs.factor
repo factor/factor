@@ -75,7 +75,7 @@ HELP: <digraph>
 "Constructs an empty, non-strict, directed " { $link graph } "."
 }
 { $notes
-"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <digraph> } " automatically generates one, just as in "  { $link <anon> } "."
+"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <digraph> } " automatically generates one, just as in " { $link <anon> } "."
 
 $nl
 
@@ -142,7 +142,7 @@ HELP: <graph>
 "Constructs an empty, non-strict, undirected " { $link graph } "."
 }
 { $notes
-"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <graph> } " automatically generates one, just as in "  { $link <anon> } "."
+"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <graph> } " automatically generates one, just as in " { $link <anon> } "."
 
 $nl
 
@@ -191,7 +191,7 @@ HELP: <strict-digraph>
 "Constructs an empty, strict, directed " { $link graph } "."
 }
 { $notes
-"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <strict-digraph> } " automatically generates one, just as in "  { $link <anon> } "."
+"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <strict-digraph> } " automatically generates one, just as in " { $link <anon> } "."
 
 $nl
 
@@ -200,7 +200,7 @@ $nl
 
 $nl
 
-"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one "  { $link edge } " between any two " { $link node } "s, so duplicates are ignored by Graphviz."
+"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one " { $link edge } " between any two " { $link node } "s, so duplicates are ignored by Graphviz."
 }
 { $examples
     { $example "USING: graphviz prettyprint ;" "<strict-digraph> graph? ." "t" }
@@ -221,7 +221,7 @@ HELP: <strict-graph>
 "Constructs an empty, strict, undirected " { $link graph } "."
 }
 { $notes
-"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <strict-graph> } " automatically generates one, just as in "  { $link <anon> } "."
+"Because it's rare for " { $link graph } " " { $slot "id" } "s to be meaningful or useful, " { $link <strict-graph> } " automatically generates one, just as in " { $link <anon> } "."
 
 $nl
 
@@ -230,7 +230,7 @@ $nl
 
 $nl
 
-"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one "  { $link edge } " between any two " { $link node } "s, so duplicates are ignored by Graphviz."
+"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one " { $link edge } " between any two " { $link node } "s, so duplicates are ignored by Graphviz."
 }
 { $examples
     { $example "USING: graphviz prettyprint ;" "<strict-graph> graph? ." "t" }

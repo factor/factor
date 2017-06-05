@@ -16,7 +16,7 @@ HELP: search
 { $values
   { "string" string }
   { "parser" "a peg based parser" }
-  { "seq"    sequence }
+  { "seq" sequence }
 }
 { $description
     "Returns a sequence containing the parse results of all substrings "

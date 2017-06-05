@@ -127,7 +127,7 @@ HELP: ensure-index
   { $unchecked-example "USING: mongodb.driver ;"
     "\"db\" \"127.0.0.1\" 27017 <mdb>"
     "[ \"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> ensure-index ] with-db" "" }
-  { $unchecked-example  "USING: mongodb.driver ;"
+  { $unchecked-example "USING: mongodb.driver ;"
     "\"db\" \"127.0.0.1\" 27017 <mdb>" "[ \"mycollection\" nameIdx [ \"name\" asc ] keyspec <index-spec> t >>unique? ensure-index ] with-db" "" } } ;
 
 HELP: explain.

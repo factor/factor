@@ -67,7 +67,8 @@ HELP: define-persistent
 { $description "Defines a relation from a Factor " { $snippet "tuple class" } " to a SQL database table name. The format for the slot specifiers is as follows:"
 { $list
     { "a slot name from the " { $snippet "tuple class" } }
-    { "the name of a database column that maps to the slot" }        { "a database type (see " { $link "db.types" } ")" }
+    { "the name of a database column that maps to the slot" }
+    { "a database type (see " { $link "db.types" } ")" }
 } "Throws an error if the slot name (column one from each row) is not a slot in the tuple or its superclases." }
 { $examples
     { $code "USING: db.tuples db.types ;"

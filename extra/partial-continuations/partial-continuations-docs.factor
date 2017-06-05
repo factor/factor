@@ -8,7 +8,7 @@ HELP: breset
 
 HELP: bshift
 { $values { "r" "the " { $link breset } " in scope" } { "quot" { $quotation ( pcc -- v ) } } }
-{ $description "Calls the quotation with the partial continuation  on the stack. The quotation should have stack effect " { $snippet "( pcc -- v )" } ". The partial continuation can be called with " { $link call } " and has stack effect " { $snippet "( a -- b )" } "." }
+{ $description "Calls the quotation with the partial continuation on the stack. The quotation should have stack effect " { $snippet "( pcc -- v )" } ". The partial continuation can be called with " { $link call } " and has stack effect " { $snippet "( a -- b )" } "." }
 { $notes "It is important to note that even if the quotation discards items on the stack, the stack will be restored to the way it was before it is called (which is true of continuation usage in general)." } ;
 
 ARTICLE: "partial-continuations" "Partial continuations"

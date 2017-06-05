@@ -166,6 +166,6 @@ $nl
 HELP: run-script
 { $values { "file" "a pathname string" } }
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used. If the source file contains a " { $link POSTPONE: MAIN: } " declaration, the main entry point of the file will be also be executed. Loading messages will be suppressed." }
-{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation or executing the main entry point." }  ;
+{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation or executing the main entry point." } ;
 
 ABOUT: "command-line"

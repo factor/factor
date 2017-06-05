@@ -8,7 +8,7 @@ HELP: run-balloon
 "Run the Balloon Bomber emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
 "location of the Balloon Bomber ROM files. See "
-{ $link { "balloon-bomber" "balloon-bomber" } } "  for details."
+{ $link { "balloon-bomber" "balloon-bomber" } } " for details."
 } ;
 
 ARTICLE: { "balloon-bomber" "balloon-bomber" } "Balloon Bomber Emulator"

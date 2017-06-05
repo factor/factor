@@ -8,6 +8,6 @@ HELP: latin5
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.8-bit.latin5" "Latin5 encoding"
-"The " { $vocab-link "io.encodings.8-bit.latin5" }  " vocabulary provides the " { $link latin5 } " encoding." ;
+"The " { $vocab-link "io.encodings.8-bit.latin5" } " vocabulary provides the " { $link latin5 } " encoding." ;
 
 ABOUT: "io.encodings.8-bit.latin5"

@@ -15,7 +15,7 @@ HELP: define-dual
     { "word" word }
 }
 { $description "Defines a word " { $snippet "d[word]" } " in the " { $vocab-link "math.dual" } " vocabulary that operates on dual numbers." }
-{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments.  This can be set using " { $link POSTPONE: DERIVATIVE: } "." } ;
+{ $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments. This can be set using " { $link POSTPONE: DERIVATIVE: } "." } ;
 
 { define-dual dual-op POSTPONE: DERIVATIVE: } related-words
 

@@ -54,7 +54,7 @@ HELP: <basic-block>
 
 HELP: <cfg>
 { $values { "word" word } { "label" "label" } { "entry" basic-block } { "cfg" cfg } }
-{ $description "Constructor for " { $link cfg } ". " { $slot "spill-area-size" } " and " { $slot "spill-area-align" } " are set to default values." }  ;
+{ $description "Constructor for " { $link cfg } ". " { $slot "spill-area-size" } " and " { $slot "spill-area-align" } " are set to default values." } ;
 
 
 HELP: cfg

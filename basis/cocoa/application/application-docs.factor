@@ -10,7 +10,7 @@ HELP: <NSString>
 
 HELP: with-autorelease-pool
 { $values { "quot" quotation } }
-{ $description "Sets up a new " { $snippet "NSAutoreleasePool"  } ", calls the quotation and frees the pool." } ;
+{ $description "Sets up a new " { $snippet "NSAutoreleasePool" } ", calls the quotation and frees the pool." } ;
 
 HELP: NSApp
 { $values { "app" "an " { $snippet "NSApplication" } } }

@@ -117,14 +117,14 @@ HELP: clamp-texcoord-to-edge
 { $class-description "This " { $link texture-wrap } " value clamps texture coordinates to a texture image's edge." } ;
 
 HELP: cube-map-axis
-{ $class-description "Objects of this class are stored in the " { $snippet "axis" } " slot of a " { $link cube-map-face } " to choose the referenced face: " { $link +X } ", "  { $link +Y } ", " { $link +Z } ", " { $link -X } ", " { $link -Y } ", or " { $link -Z } "."
+{ $class-description "Objects of this class are stored in the " { $snippet "axis" } " slot of a " { $link cube-map-face } " to choose the referenced face: " { $link +X } ", " { $link +Y } ", " { $link +Z } ", " { $link -X } ", " { $link -Y } ", or " { $link -Z } "."
 } ;
 
 HELP: cube-map-face
 { $class-description "A " { $snippet "cube-map-face" } " tuple references a single face of a " { $link texture-cube-map } " object for use with " { $link allocate-texture } ", " { $link update-texture } ", or " { $link read-texture } "."
 { $list
 { "The " { $snippet "texture" } " slot indicates the cube map texture being referenced." }
-{ "The " { $snippet "axis" } " slot indicates which face to reference: " { $link +X } ", "  { $link +Y } ", " { $link +Z } ", " { $link -X } ", " { $link -Y } ", or " { $link -Z } "." }
+{ "The " { $snippet "axis" } " slot indicates which face to reference: " { $link +X } ", " { $link +Y } ", " { $link +Z } ", " { $link -X } ", " { $link -Y } ", or " { $link -Z } "." }
 } } ;
 
 HELP: filter-linear

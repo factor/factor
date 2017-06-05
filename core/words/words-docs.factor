@@ -99,8 +99,8 @@ $nl
       {
           { $snippet "\"inline\"" } ", "
           { $snippet "\"foldable\"" } ", "
-          { $snippet "\"flushable\""  } ", "
-          { $snippet "\"recursive\""  }
+          { $snippet "\"flushable\"" } ", "
+          { $snippet "\"recursive\"" }
       }
       { $link "declarations" }
   }
@@ -153,7 +153,7 @@ $nl
           { $snippet "\"dependencies\"" } ", "
 
       }
-      { "Used by the optimizing compiler when forgetting words for fast dependency lookup. See " { $link "compilation-units"  } "." }
+      { "Used by the optimizing compiler when forgetting words for fast dependency lookup. See " { $link "compilation-units" } "." }
   }
   {
       { $snippet "\"generic-call-sites\"" }
@@ -306,7 +306,7 @@ HELP: <word>
 
 HELP: <uninterned-word>
 { $values { "name" string } { "word" word } }
-{ $description "Creates an uninterned word with the specified name,  that is not equal to any other word in the system." }
+{ $description "Creates an uninterned word with the specified name, that is not equal to any other word in the system." }
 { $notes "Unlike " { $link create-word } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: gensym

@@ -10,7 +10,7 @@ HELP: >yaml
     { "obj" object }
     { "str" string }
 }
-{ $description "Serializes the object into a YAML formatted string with one document representing the object."  } ;
+{ $description "Serializes the object into a YAML formatted string with one document representing the object." } ;
 
 HELP: >yaml-docs
 { $values
@@ -87,7 +87,7 @@ HELP: scalar-value
     { "obj" object }
     { "obj'" object }
 }
-{ $description "If " { $snippet "obj" } " is hashtable, returns it's default value, else return " { $snippet "obj" } " itself."  } ;
+{ $description "If " { $snippet "obj" } " is hashtable, returns it's default value, else return " { $snippet "obj" } " itself." } ;
 
 ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
 { $heading "Types mapping" }
@@ -232,7 +232,7 @@ t emitter-unicode set
   H{
     { \"name\" \"Mark McGwire\" }
     { \"hr\" 65 }
-    { \"avg\"  0.278 }
+    { \"avg\" 0.278 }
   }
   H{
     { \"name\" \"Sammy Sosa\" }

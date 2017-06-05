@@ -200,7 +200,7 @@ HELP: smart-if*
 { $values
     { "pred" quotation } { "true" quotation } { "false" quotation }
 }
-{ $description "A version of " { $link if } " that takes three quotations, where the first quotation is a predicate that preserves any inputs it consumes, the second is the " { $snippet "true" } " branch, and the third is the " { $snippet "false" } " branch. If the " { $snippet "true" }  " branch is taken, the values are left on the stack and the quotation is called. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped and the quotation is called." } ;
+{ $description "A version of " { $link if } " that takes three quotations, where the first quotation is a predicate that preserves any inputs it consumes, the second is the " { $snippet "true" } " branch, and the third is the " { $snippet "false" } " branch. If the " { $snippet "true" } " branch is taken, the values are left on the stack and the quotation is called. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped and the quotation is called." } ;
 
 HELP: smart-unless
 { $values
@@ -212,7 +212,7 @@ HELP: smart-unless*
 { $values
     { "pred" quotation } { "false" quotation }
 }
-{ $description "A version of " { $link unless } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "false" } " branch. If the " { $snippet "true" }  " branch is taken, the values are left on the stack. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped and the quotation is called." } ;
+{ $description "A version of " { $link unless } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "false" } " branch. If the " { $snippet "true" } " branch is taken, the values are left on the stack. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped and the quotation is called." } ;
 
 HELP: smart-when
 { $values
@@ -224,7 +224,7 @@ HELP: smart-when*
 { $values
     { "pred" quotation } { "true" quotation }
 }
-{ $description "A version of " { $link when } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "true" } " branch. If the " { $snippet "true" }  " branch is taken, the values are left on the stack and the quotation is called. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped." } ;
+{ $description "A version of " { $link when } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "true" } " branch. If the " { $snippet "true" } " branch is taken, the values are left on the stack and the quotation is called. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped." } ;
 
 HELP: smart-with
 { $values

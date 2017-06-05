@@ -3,7 +3,7 @@ IN: vocabs.files
 
 HELP: vocab-tests-path
 { $values { "vocab" "a vocabulary specifier" } { "path" "pathname string to test file" } }
-{ $description "Outputs a pathname where the unit test file for " { $snippet "vocab" } " is located.  Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
+{ $description "Outputs a pathname where the unit test file for " { $snippet "vocab" } " is located. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
 
 HELP: vocab-tests-file
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "pathname string to test file" } }

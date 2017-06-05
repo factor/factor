@@ -84,7 +84,7 @@ HELP: doc-string
 
 HELP: set-doc-string
 { $values { "string" string } { "document" document } }
-{ $description "Sets the contents of the document to a string,  which may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators." }
+{ $description "Sets the contents of the document to a string, which may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators." }
 { $side-effects "document" } ;
 
 HELP: clear-doc

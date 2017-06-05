@@ -9,7 +9,7 @@ HELP: build-alien
     { "Agraph_t*" c-ptr }
     { "graph" graph }
 }
-{ $description "Constructs a C representation of the given " { $link graph } " in memory by using the " { $vocab-link "graphviz.ffi" } " vocabulary to destructively modify " {  $snippet "Agraph_t*" } " (a " { $link c-ptr } " created by " { $link agopen } ")." }
+{ $description "Constructs a C representation of the given " { $link graph } " in memory by using the " { $vocab-link "graphviz.ffi" } " vocabulary to destructively modify " { $snippet "Agraph_t*" } " (a " { $link c-ptr } " created by " { $link agopen } ")." }
 { $notes "User code should not call this word directly. Use the " { $vocab-link "graphviz.render" } " vocabulary instead." }
 { $errors "Throws " { $link non-graph-error } " if applied to anything other than an instance of " { $link graph } "."
 $nl

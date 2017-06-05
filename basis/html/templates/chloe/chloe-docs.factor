@@ -53,7 +53,7 @@ HELP: process-children
 
 HELP: compile-children>string
 { $values { "tag" tag } }
-{ $description "Compiles the tag so that the output it generates is written to a string, which is pushed on the stack when the template runs. A subsequent " { $link [code] } " call must be made with a quotation which consumes the string." }  ;
+{ $description "Compiles the tag so that the output it generates is written to a string, which is pushed on the stack when the template runs. A subsequent " { $link [code] } " call must be made with a quotation which consumes the string." } ;
 
 HELP: compile-with-scope
 { $values { "quot" quotation } }
