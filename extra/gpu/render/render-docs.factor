@@ -116,7 +116,7 @@ HELP: index-range
 } } ;
 
 HELP: index-type
-{ $class-description "The " { $snippet "index-type" } " slot of an " { $link index-elements } " or " { $link multi-index-elements } " tuple indicates the type of the index array's elements: one-byte " { $link ubyte-indexes } ", two-byte " { $link ushort-indexes } ", or four-byte " { $link uint-indexes } "."  } ;
+{ $class-description "The " { $snippet "index-type" } " slot of an " { $link index-elements } " or " { $link multi-index-elements } " tuple indicates the type of the index array's elements: one-byte " { $link ubyte-indexes } ", two-byte " { $link ushort-indexes } ", or four-byte " { $link uint-indexes } "." } ;
 
 { index-type ubyte-indexes ushort-indexes uint-indexes } related-words
 
@@ -194,7 +194,7 @@ HELP: points-mode
 { $class-description "This " { $link primitive-mode } " value instructs " { $link render } " to generate a point for each indexed vertex array element." } ;
 
 HELP: primitive-mode
-{ $class-description "The " { $snippet "primitive-mode" } " slot of a " { $link render-set } " tells " { $link render } " what kind of primitives to generate and how to assemble them from the selected elements of the active " { $link vertex-array } "."  }
+{ $class-description "The " { $snippet "primitive-mode" } " slot of a " { $link render-set } " tells " { $link render } " what kind of primitives to generate and how to assemble them from the selected elements of the active " { $link vertex-array } "." }
 { $list
 { { $link points-mode } " causes each element to generate a point." }
 { { $link lines-mode } " causes each pair of elements to generate a disconnected line." }

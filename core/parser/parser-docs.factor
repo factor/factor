@@ -273,7 +273,7 @@ HELP: parse-file
 HELP: run-file
 { $values { "path" "a pathname string" } }
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used." }
-{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." }  ;
+{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." } ;
 
 HELP: ?run-file
 { $values { "path" "a pathname string" } }

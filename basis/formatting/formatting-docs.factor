@@ -35,7 +35,7 @@ HELP: printf
     "formatted with a " { $snippet "+" } " preceeding it if positive."
     $nl
     "Padding (" { $snippet "P" } ") is used to optionally specify the minimum width of the result "
-    "string, the padding character, and the alignment.  By default, the padding "
+    "string, the padding character, and the alignment. By default, the padding "
     "character defaults to a space and the alignment defaults to right-aligned. "
     "For example:"
     $nl

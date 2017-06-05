@@ -84,10 +84,10 @@ HELP: implicit-end
 { implicit-start implicit-end } related-words
 
 HELP: merge
-{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-merge } " for !!merge keys and the value associated with this key will not be merged into the enclosing mapping. You can then call ?apply-merge-key on such a mapping to perform the merge."  } ;
+{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-merge } " for !!merge keys and the value associated with this key will not be merged into the enclosing mapping. You can then call ?apply-merge-key on such a mapping to perform the merge." } ;
 
 HELP: value
-{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-value } " for !!value keys and the value associated with this key will replace the enclosing mapping. You can then call scalar-value on such a mapping to get the default value."  } ;
+{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-value } " for !!value keys and the value associated with this key will replace the enclosing mapping. You can then call scalar-value on such a mapping to get the default value." } ;
 ABOUT: "yaml-config"
 { yaml-merge merge } related-words
 { yaml-value value } related-words

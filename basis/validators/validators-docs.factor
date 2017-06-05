@@ -3,7 +3,7 @@ strings ;
 IN: validators
 
 HELP: v-checkbox
-{ $values { "str" string } {  "?" boolean } }
+{ $values { "str" string } { "?" boolean } }
 { $description "Converts the string value of a checkbox component (either \"on\" or \"off\") to a boolean value." } ;
 
 HELP: v-captcha

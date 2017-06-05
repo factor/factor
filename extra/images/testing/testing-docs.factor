@@ -29,7 +29,7 @@ HELP: load-reference-image
     { "path" "a pathname string" }
     { "image" image }
 }
-{ $description "Loads the " { $link { "images" "testing" "reference" } } " that corresponds to the original image at " { $snippet "path" } " into memory."  } ;
+{ $description "Loads the " { $link { "images" "testing" "reference" } } " that corresponds to the original image at " { $snippet "path" } " into memory." } ;
 
 HELP: ls
 { $values

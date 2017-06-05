@@ -104,7 +104,7 @@ HELP: set-block-merging
 
 HELP: set-block-pool
 { $values { "?" boolean } }
-{ $description "If set, this option causes all subsequent free blocks to be placed in the global pool. The default is " { $link f } "."  } ;
+{ $description "If set, this option causes all subsequent free blocks to be placed in the global pool. The default is " { $link f } "." } ;
 
 HELP: set-cache-size
 { $values { "size" integer } }

@@ -180,7 +180,7 @@ HELP: ?nth
 
 HELP: ?set-nth
 { $values { "elt" object } { "n" integer } { "seq" sequence } }
-{ $description "A forgiving version of " { $link set-nth } ".  If the index is out of bounds, does nothing." } ;
+{ $description "A forgiving version of " { $link set-nth } ". If the index is out of bounds, does nothing." } ;
 
 HELP: ?first
 { $values { "seq" sequence } { "elt/f" { $maybe object } } }

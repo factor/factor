@@ -17,7 +17,7 @@ HELP: harmonic-mean
 
 HELP: kth-smallest
 { $values { "seq" sequence } { "k" integer } { "elt" object } }
-{ $description "Returns the kth smallest element.  This is semantically equivalent to " { $snippet "swap natural-sort nth" } ", and is therefore zero-indexed.  " { $snippet "k" } " may not be larger than the highest index of " { $snippet "sequence" } "." }
+{ $description "Returns the kth smallest element. This is semantically equivalent to " { $snippet "swap natural-sort nth" } ", and is therefore zero-indexed. " { $snippet "k" } " may not be larger than the highest index of " { $snippet "sequence" } "." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 3 1 2 } 1 kth-smallest ." "2" } } ;
 
 HELP: mean

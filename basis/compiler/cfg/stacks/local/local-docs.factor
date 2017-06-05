@@ -16,7 +16,7 @@ HELP: end-local-analysis
 { $description "Called to end the local analysis of a block. The word fills in the blocks slots " { $slot "replaces" } ", " { $slot "peeks" } " and " { $slot "kills" } " with what the blocks replaces, peeks and kill locations are." } ;
 
 HELP: global-loc>local
-{ $values { "loc" loc } { "height-state" height-state }  { "loc'" loc } }
+{ $values { "loc" loc } { "height-state" height-state } { "loc'" loc } }
 { $description "Translates an absolute stack location to one that is relative to the given height state." }
 { $examples
   { $example

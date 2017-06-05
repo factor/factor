@@ -8,6 +8,6 @@ HELP: latin/arabic
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.8-bit.arabic" "Arabic encoding"
-"The " { $vocab-link "io.encodings.8-bit.arabic" }  " vocabulary provides the " { $link latin/arabic } " encoding." ;
+"The " { $vocab-link "io.encodings.8-bit.arabic" } " vocabulary provides the " { $link latin/arabic } " encoding." ;
 
 ABOUT: "io.encodings.8-bit.arabic"

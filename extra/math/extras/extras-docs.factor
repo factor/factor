@@ -101,7 +101,7 @@ HELP: round-to-decimal
 
 HELP: round-to-even
 { $values { "x" real } { "y" real } }
-{ $description "Rounds " { $snippet "x" } " towards the nearest even number.  This is also known as banker's rounding or unbiased rounding." }
+{ $description "Rounds " { $snippet "x" } " towards the nearest even number. This is also known as banker's rounding or unbiased rounding." }
 { $examples
     { $example "USING: math.extras prettyprint ;" "0.5 round-to-even ." "0.0" }
     { $example "USING: math.extras prettyprint ;" "1.5 round-to-even ." "2.0" } } ;

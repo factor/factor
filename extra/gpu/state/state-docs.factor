@@ -59,7 +59,7 @@ HELP: <mask-state>
 
 HELP: <multisample-state>
 { $values
-    { "multisample?" boolean  } { "sample-alpha-to-coverage?" boolean } { "sample-alpha-to-one?" boolean } { "sample-coverage" { $maybe float } } { "invert-sample-coverage?" boolean }
+    { "multisample?" boolean } { "sample-alpha-to-coverage?" boolean } { "sample-alpha-to-one?" boolean } { "sample-coverage" { $maybe float } } { "invert-sample-coverage?" boolean }
     { "multisample-state" multisample-state }
 }
 { $description "Constructs a " { $link multisample-state } " tuple." } ;

@@ -88,15 +88,15 @@ HELP: random-bits*
 
 HELP: with-random
 { $values { "obj" "a random number generator" } { "quot" quotation } }
-{ $description "Calls the quotation with the random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
+{ $description "Calls the quotation with the random number generator in a dynamic variable. All random numbers will be generated using this random number generator." } ;
 
 HELP: with-secure-random
 { $values { "quot" quotation } }
-{ $description "Calls the quotation with the secure random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
+{ $description "Calls the quotation with the secure random number generator in a dynamic variable. All random numbers will be generated using this random number generator." } ;
 
 HELP: with-system-random
 { $values { "quot" quotation } }
-{ $description "Calls the quotation with the system's random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
+{ $description "Calls the quotation with the system's random number generator in a dynamic variable. All random numbers will be generated using this random number generator." } ;
 
 { with-random with-secure-random with-system-random } related-words
 

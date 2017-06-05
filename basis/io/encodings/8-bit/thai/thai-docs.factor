@@ -8,6 +8,6 @@ HELP: latin/thai
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.8-bit.thai" "Thai encoding"
-"The " { $vocab-link "io.encodings.8-bit.thai" }  " vocabulary provides the " { $link latin/thai } " encoding." ;
+"The " { $vocab-link "io.encodings.8-bit.thai" } " vocabulary provides the " { $link latin/thai } " encoding." ;
 
 ABOUT: "io.encodings.8-bit.thai"
