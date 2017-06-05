@@ -4,7 +4,7 @@ USING: system io.directories alien.strings
 io.pathnames io.backend io.files.windows destructors
 kernel accessors calendar windows windows.errors
 windows.kernel32 alien.c-types sequences splitting
-fry continuations classes.struct ;
+fry continuations classes.struct windows.time ;
 IN: io.directories.windows
 
 M: windows touch-file ( path -- )
@@ -58,7 +58,7 @@ M: windows delete-directory ( path -- )
         ] unless drop f
     ] when ;
 
-TUPLE: windows-directory-entry < directory-entry attributes ;
+TUPLE: windows-directory-entry < directory-entry attributes size ;
 
 C: <windows-directory-entry> windows-directory-entry
 
@@ -67,8 +67,10 @@ C: <windows-directory-entry> windows-directory-entry
     [
         dwFileAttributes>>
         [ win32-file-type ] [ win32-file-attributes ] bi
-    ] bi
-    dupd remove <windows-directory-entry> ; inline
+        dupd remove
+    ]
+    [ [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ] tri
+    <windows-directory-entry> ; inline
 
 M: windows (directory-entries) ( path -- seq )
     "\\" ?tail drop "\\*" append
