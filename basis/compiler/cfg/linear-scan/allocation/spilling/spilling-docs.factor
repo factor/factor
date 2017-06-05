@@ -19,7 +19,7 @@ HELP: spill-after
   { "after" live-interval-state }
   { "after/f" { $maybe live-interval-state } }
 }
-{ $description "If the interval has no more usages after the spill location, then it is the first child of an interval that was split.  We spill the value and let the resolve pass insert a reload later. An interval may be split if it overlaps a " { $link sync-point } "." }
+{ $description "If the interval has no more usages after the spill location, then it is the first child of an interval that was split. We spill the value and let the resolve pass insert a reload later. An interval may be split if it overlaps a " { $link sync-point } "." }
 { $see-also spill-before } ;
 
 HELP: spill-available

@@ -29,7 +29,7 @@ HELP: gen-uses
 
 HELP: kill-defs
 { $values { "live-set" assoc } { "insn" insn } }
-{ $description "If liveness analysis is run after SSA destruction, we need to kill vregs that have been coalesced with others (they won't have been renamed from their original values in the CFG). Otherwise, we get a bunch of stray uses that wind up live-in/out when they shouldn't be.  However, we must take care to still report the original vregs in the live-sets, because they have information associated with them (like representations) that would get lost if we just used the leaders for everything." } ;
+{ $description "If liveness analysis is run after SSA destruction, we need to kill vregs that have been coalesced with others (they won't have been renamed from their original values in the CFG). Otherwise, we get a bunch of stray uses that wind up live-in/out when they shouldn't be. However, we must take care to still report the original vregs in the live-sets, because they have information associated with them (like representations) that would get lost if we just used the leaders for everything." } ;
 
 HELP: live-in
 { $values { "bb" basic-block } { "set" assoc } }

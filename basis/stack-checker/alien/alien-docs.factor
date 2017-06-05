@@ -22,7 +22,7 @@ HELP: param-prep-quot
 { $examples
   { $unchecked-example
     "USING: alien.c-types prettyprint stack-checker.alien ;"
-    "T{ alien-invoke-params { parameters { void* c-string int } } }  param-prep-quot ."
+    "T{ alien-invoke-params { parameters { void* c-string int } } } param-prep-quot ."
     "[ [ [ [ ] dip >c-ptr ] dip \\ utf8 string>alien ] dip >fixnum ]"
   }
 } ;

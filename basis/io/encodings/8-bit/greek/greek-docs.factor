@@ -8,6 +8,6 @@ HELP: latin/greek
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "io.encodings.8-bit.greek" "Greek encoding"
-"The " { $vocab-link "io.encodings.8-bit.greek" }  " vocabulary provides the " { $link latin/greek } " encoding." ;
+"The " { $vocab-link "io.encodings.8-bit.greek" } " vocabulary provides the " { $link latin/greek } " encoding." ;
 
 ABOUT: "io.encodings.8-bit.greek"

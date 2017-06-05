@@ -33,7 +33,7 @@ HELP: throw-on-eof
 } ;
 
 ARTICLE: "io.streams.throwing" "Throwing exceptions on stream exhaustion"
-"The " { $vocab-link "io.streams.throwing" } " vocabulary implements combinators for changing the behavior of a stream to throw an exception upon exhaustion instead of returning " { $link f } "."  $nl
+"The " { $vocab-link "io.streams.throwing" } " vocabulary implements combinators for changing the behavior of a stream to throw an exception upon exhaustion instead of returning " { $link f } "." $nl
 "A general combinator to wrap any stream:"
 { $subsections stream-throw-on-eof }
 "A combinator for the " { $link input-stream } " variable:"

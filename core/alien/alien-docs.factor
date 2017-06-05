@@ -58,7 +58,7 @@ HELP: expired?
 { $description "Tests if the alien is a relic from an earlier session. A byte array is never considered to have expired, whereas passing " { $link f } " always yields true." } ;
 
 HELP: <bad-alien>
-{ $values  { "alien" c-ptr } }
+{ $values { "alien" c-ptr } }
 { $description "Constructs an invalid alien pointer that has expired." } ;
 
 HELP: <displaced-alien>

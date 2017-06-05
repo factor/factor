@@ -9,8 +9,8 @@ STRING: ex-caller-return
 USING: compiler.cfg.builder.alien make prettyprint ;
 [
     T{ ##alien-invoke { reg-outputs { { 1 int-rep RAX } } } } ,
-    T{ alien-invoke-params { return pointer: void } }  caller-return
-] { } make  .
+    T{ alien-invoke-params { return pointer: void } } caller-return
+] { } make .
 {
     T{ ##alien-invoke { reg-outputs { { 1 int-rep RAX } } } }
     T{ ##box-alien { dst 116 } { src 1 } { temp 115 } }

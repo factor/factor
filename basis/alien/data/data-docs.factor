@@ -188,7 +188,7 @@ $nl
     "Passing an already encoded " { $link byte-array } " also works and performs no conversion."
     }
     { "Returning a C string from a C function allocates a Factor string in the Factor heap; the memory pointed to by the returned pointer is then decoded with the requested encoding into the Factor string." }
-    { "Reading " { $link c-string } " slots of "  { $link POSTPONE: STRUCT: } " or " { $link POSTPONE: UNION-STRUCT: } " returns Factor strings." }
+    { "Reading " { $link c-string } " slots of " { $link POSTPONE: STRUCT: } " or " { $link POSTPONE: UNION-STRUCT: } " returns Factor strings." }
 }
 $nl
 "Care must be taken if the C function expects a pointer to a string with its length represented by another parameter rather than a null terminator. Passing the result of calling " { $link length } " on the string object will not suffice. This is because a Factor string of " { $emphasis "n" } " characters will not necessarily encode to " { $emphasis "n" } " bytes. The correct idiom for C functions which take a string with a length is to first encode the string using " { $link encode } ", and then pass the resulting byte array together with the length of this byte array."

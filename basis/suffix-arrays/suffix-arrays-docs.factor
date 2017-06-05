@@ -8,7 +8,7 @@ HELP: >suffix-array
 { $values
      { "seq" sequence }
      { "array" array } }
-{ $description "Creates a suffix array from the input sequence.  Suffix arrays are arrays of slices." } ;
+{ $description "Creates a suffix array from the input sequence. Suffix arrays are arrays of slices." } ;
 
 HELP: SA{
 { $description "Creates a new literal suffix array at parse-time." } ;

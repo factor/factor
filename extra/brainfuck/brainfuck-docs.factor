@@ -9,7 +9,7 @@ HELP: run-brainfuck
 { $values { "code" string } }
 { $description
     "A brainfuck program is a sequence of eight commands that are "
-    "executed sequentially.  An instruction pointer begins at the first "
+    "executed sequentially. An instruction pointer begins at the first "
     "command, and each command is executed until the program terminates "
     "when the instruction pointer moves beyond the last command.\n"
     "\n"

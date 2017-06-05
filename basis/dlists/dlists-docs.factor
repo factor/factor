@@ -46,7 +46,7 @@ HELP: dlist-any?
 
 HELP: dlist-find
 { $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } { "?" boolean } }
-{ $description "Applies the quotation to each element of the " { $link dlist } " in turn, until it outputs a true value or the end of the " { $link dlist } " is reached.  Outputs either the object it found or " { $link f } ", and a boolean which is true if an object is found." }
+{ $description "Applies the quotation to each element of the " { $link dlist } " in turn, until it outputs a true value or the end of the " { $link dlist } " is reached. Outputs either the object it found or " { $link f } ", and a boolean which is true if an object is found." }
 { $notes "Returns a boolean to allow dlists to store " { $link f } "."
     $nl
     "This operation is O(n)."
@@ -64,7 +64,7 @@ HELP: dlist-length
 
 HELP: delete-node-if*
 { $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } { "?" boolean } }
-{ $description "Calls " { $link dlist-find } " on the " { $link dlist } " and deletes the node returned, if any.  Returns the value of the deleted node and a boolean to allow the deleted value to distinguished from " { $link f } ", for nothing deleted." }
+{ $description "Calls " { $link dlist-find } " on the " { $link dlist } " and deletes the node returned, if any. Returns the value of the deleted node and a boolean to allow the deleted value to distinguished from " { $link f } ", for nothing deleted." }
 { $notes "This operation is O(n)." } ;
 
 HELP: delete-node-if

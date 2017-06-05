@@ -246,7 +246,7 @@ HELP: font-size
         "{ 12 18 24 72 }"
         "[ \"Bigger\" swap font-size associate format nl ] each"
     }
-}  ;
+} ;
 
 HELP: font-style
 { $description "Character style. Font style, one of " { $link plain } ", " { $link bold } ", " { $link italic } ", or " { $link bold-italic } "." }
@@ -257,7 +257,7 @@ HELP: font-style
         "{ plain bold italic bold-italic }"
         "[ [ name>> ] keep font-style associate format nl ] each"
     }
-}  ;
+} ;
 
 HELP: presented
 { $description "Character and paragraph style. An object associated with the text. In the Factor UI, this is shown as a clickable presentation of the object; left-clicking invokes a default command, and right-clicking shows a menu of commands." } ;

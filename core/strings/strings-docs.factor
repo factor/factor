@@ -35,7 +35,7 @@ HELP: string-nth
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
 
 HELP: set-string-nth
-{ $values { "ch" "a character" } { "n" fixnum } { "string" string }  }
+{ $values { "ch" "a character" } { "n" fixnum } { "string" string } }
 { $description "Unsafe string mutator, used to define " { $link set-nth } " on strings." }
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
 

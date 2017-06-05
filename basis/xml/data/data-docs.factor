@@ -163,7 +163,7 @@ HELP: <simple-name>
 { $description "Converts a string into an XML name with an empty prefix and URL." } ;
 
 HELP: element-decl
-{ $class-description "Describes the class of element declarations, like <!ELEMENT  greeting (#PCDATA)>." } ;
+{ $class-description "Describes the class of element declarations, like <!ELEMENT greeting (#PCDATA)>." } ;
 
 HELP: <element-decl>
 { $values { "name" name } { "content-spec" string } { "element-decl" entity-decl } }

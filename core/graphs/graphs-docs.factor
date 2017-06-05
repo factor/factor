@@ -19,7 +19,7 @@ ABOUT: "graphs"
 
 HELP: add-vertex
 { $values { "vertex" object } { "edges" sequence } { "graph" "an " { $link assoc } " mapping vertices to " { $link hash-set } " of edges" } }
-{ $description "Adds a vertex to a directed graph, with " { $snippet "edges" } "  as the outward edges from the vertex." }
+{ $description "Adds a vertex to a directed graph, with " { $snippet "edges" } " as the outward edges from the vertex." }
 { $side-effects "graph" } ;
 
 HELP: remove-vertex

@@ -25,7 +25,7 @@ HELP: 2map!
     { "seq1" sequence }
     { "seq2" sequence }
     { "quot" { $quotation ( ... elt1 elt2 -- ... newelt ) } } }
-{ $description "Applies the quotation to each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } ", yielding a new element, and storing it back into " { $snippet "seq1" } ".  Returns " { $snippet "seq1" } "." }
+{ $description "Applies the quotation to each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } ", yielding a new element, and storing it back into " { $snippet "seq1" } ". Returns " { $snippet "seq1" } "." }
 { $see-also 2map map! } ;
 
 HELP: 2map-index
@@ -34,7 +34,7 @@ HELP: 2map-index
     { "seq2" sequence }
     { "quot" { $quotation ( ... elt1 elt2 index -- ... newelt ) } }
     { "newseq" sequence } }
-{ $description "Calls the quotation with each pair of elements of the two sequences and their index on the stack, with the index on the top of the stack.  Collects the outputs of the quotation and outputs them into a new sequence of the same type as the first sequence." }
+{ $description "Calls the quotation with each pair of elements of the two sequences and their index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them into a new sequence of the same type as the first sequence." }
 { $see-also 2map map-index } ;
 
 HELP: count*
@@ -63,7 +63,7 @@ HELP: compact
     { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "elt" object }
     { "seq'" sequence } }
-{ $description "Generate a new sequence where all runs of elements for which the predicate returns true are replaced by a single instance of " { $snippet "elt" } ".  Runs at the beginning or end of the sequence for which the predicate returns true are removed." }
+{ $description "Generate a new sequence where all runs of elements for which the predicate returns true are replaced by a single instance of " { $snippet "elt" } ". Runs at the beginning or end of the sequence for which the predicate returns true are removed." }
 { $see-also collapse }
 { $examples
     "Collapse multiple spaces in a string down to a single space"

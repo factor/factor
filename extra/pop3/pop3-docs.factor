@@ -105,7 +105,7 @@ HELP: pop3-account
         { { $slot "messages" } { "A sequence of email tuples in the mailbox containing each email's headers, number, uidl, and size." } }
     }
 "The " { $slot "host" } " is required; the rest are either set by default or optional." $nl
-"The " { $slot "user" } " and " { $slot "pwd" } " must either be set before using " { $link connect } " or immediately after it with the " { $link >user } " and  " { $link >pwd } " words."
+"The " { $slot "user" } " and " { $slot "pwd" } " must either be set before using " { $link connect } " or immediately after it with the " { $link >user } " and " { $link >pwd } " words."
 } ;
 
 HELP: message
