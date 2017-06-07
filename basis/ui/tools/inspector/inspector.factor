@@ -1,14 +1,15 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors inspector namespaces kernel models fry
-colors.constants models.arrow prettyprint sequences mirrors
-assocs classes io io.styles arrays hashtables math.order sorting
-refs fonts ui.tools.browser ui.commands ui.operations ui.gadgets
+USING: accessors arrays assocs classes colors colors.constants
+combinators fonts fry hashtables inspector io io.styles kernel
+math math.order math.parser mirrors models models.arrow
+namespaces prettyprint refs sequences sorting ui ui.commands
+ui.gadgets ui.gadgets.buttons ui.gadgets.labeled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.slots
-ui.gadgets.tracks ui.gestures ui.gadgets.buttons
-ui.gadgets.tables ui.theme ui.gadgets.toolbar
-ui.gadgets.status-bar ui.gadgets.labeled ui.tools.common ui
-combinators ui.gadgets.worlds ui.theme.images ;
+ui.gadgets.status-bar ui.gadgets.tables
+ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
+ui.gadgets.worlds ui.gestures ui.operations ui.theme
+ui.theme.images ui.tools.browser ui.tools.common ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -71,16 +72,32 @@ M: object make-slot-descriptions
 M: hashtable make-slot-descriptions
     call-next-method [ key-string>> ] sort-with ;
 
+! If model is a sequence, get its maximum index, measure its width
+! and use that as the first column width (or the first column title
+! width, whichever is greater). This improves performance when
+! inspecting big arrays.
+: first-column-width ( table model -- width )
+    value>> dup sequence? [
+        length 1 - 1array
+    ] [
+        make-mirror keys
+    ] if [ unparse-short ] map
+    over renderer>> column-titles first suffix
+    row-column-widths supremum ;
+
 : <inspector-table> ( model -- table )
-    [ make-slot-descriptions ] <arrow> inspector-renderer <table>
-        [ invoke-primary-operation ] >>action
-        monospace-font >>font
-        line-color >>column-line-color
-        6 >>gap
-        15 >>min-rows
-        15 >>max-rows
-        40 >>min-cols
-        40 >>max-cols ;
+    [
+        [ make-slot-descriptions ] <arrow> inspector-renderer <table>
+            [ invoke-primary-operation ] >>action
+            line-color >>column-line-color
+            6 >>gap
+            15 >>min-rows
+            15 >>max-rows
+            40 >>min-cols
+            40 >>max-cols
+            monospace-font >>font
+            dup
+    ] keep first-column-width 0 2array >>fixed-column-widths ;
 
 : <inspector-gadget> ( model -- gadget )
     vertical inspector-gadget new-track with-lines
