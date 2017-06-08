@@ -159,7 +159,7 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { -5.0 } [ -4.5 floor ] unit-test
 { -4.0 } [ -4.5 ceiling ] unit-test
 
-{ t } [ -0.3 truncate double>bits -0.0 double>bits = ] unit-test
+{ t } [ -0.3 truncate double>bits 0.0 double>bits = ] unit-test
 { t } [ -0.3 ceiling double>bits -0.0 double>bits = ] unit-test
 { t } [ 0.3 floor double>bits 0.0 double>bits = ] unit-test
 { t } [ 0.3 truncate double>bits 0.0 double>bits = ] unit-test

@@ -360,8 +360,10 @@ M: float truncate
         [ drop ] 2dip
         dup 0 < [
             ! the float is between -1.0 and 1.0,
-            ! the result is +/-0.0
-            drop -63 shift zero? 0.0 -0.0 ?
+            ! the result could be +/-0.0, but we will
+            ! return 0.0 instead similar to other
+            ! languages
+            2drop 0.0 ! -63 shift zero? 0.0 -0.0 ?
         ] [
             ! Put zeroes in the correct part of the mantissa
             0x000fffffffffffff swap neg shift bitnot bitand
