@@ -1,5 +1,5 @@
 USING: base64 io.encodings.ascii io.encodings.string kernel
-sequences strings tools.test ;
+sequences splitting strings tools.test ;
 
 { "abcdefghijklmnopqrstuvwxyz" } [ "abcdefghijklmnopqrstuvwxyz" ascii encode >base64 base64> ascii decode
 ] unit-test
@@ -24,3 +24,18 @@ sequences strings tools.test ;
 
 [ { 33 52 17 40 12 51 33 43 18 33 23 } base64> ]
 [ malformed-base64? ] must-fail-with
+
+{
+    {
+        B{ 123 34 97 108 103 34 58 34 72 83 50 53 54 34 125 }
+        B{ 123 34 115 117 98 34 58 34 74 111 101 34 125 }
+        B{
+            138 151 175 68 219 145 63 161 223 148 111 28 20 169 230
+            80 251 114 166 187 145 11 135 219 212 53 173 160 178 250
+            217 38
+        }
+    }
+} [
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2UifQ.ipevRNuRP6HflG8cFKnmUPtypruRC4fb1DWtoLL62SY"
+    "." split [ base64> ] map
+] unit-test

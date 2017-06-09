@@ -84,7 +84,7 @@ PRIVATE>
     4 "\n\r" pick read-ignoring dup length {
         { 0 [ 2drop ] }
         { 4 [ decode4 (decode-base64) ] }
-        [ malformed-base64 ]
+        [ drop 4 CHAR: = pad-tail decode4 (decode-base64) ]
     } case ;
 
 PRIVATE>
