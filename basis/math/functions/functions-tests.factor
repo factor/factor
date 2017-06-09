@@ -191,7 +191,7 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { 1 } [ 1/2 round ] unit-test
 { 1 } [ 3/5 round ] unit-test
 
-{ t } [ -0.3 round double>bits -0.0 double>bits = ] unit-test
+{ t } [ -0.3 round double>bits 0.0 double>bits = ] unit-test
 { t } [ 0.3 round double>bits 0.0 double>bits = ] unit-test
 
 ! A signaling NaN should raise an exception
