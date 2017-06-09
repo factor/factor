@@ -36,9 +36,13 @@ CONSTANT: SQL-ATTR-ODBC-VERSION 200
 : SQL-OV-ODBC2 ( -- number ) 2 <alien> ; inline
 : SQL-OV-ODBC3 ( -- number ) 3 <alien> ; inline
 
-CONSTANT: SQL-SUCCESS 0
-CONSTANT: SQL-SUCCESS-WITH-INFO 1
-CONSTANT: SQL-NO-DATA-FOUND 100
+CONSTANT: SQL_ERROR 0
+CONSTANT: SQL_SUCCESS 0
+CONSTANT: SQL_SUCCESS_WITH_INFO 1
+CONSTANT: SQL_INVALID_HANDLE -2
+CONSTANT: SQL_NO_DATA 100
+
+CONSTANT: SQL_NO_DATA_FOUND 100
 
 CONSTANT: SQL-DRIVER-NOPROMPT 0
 CONSTANT: SQL-DRIVER-PROMPT 2
@@ -94,8 +98,8 @@ SYMBOLS:
 : succeeded? ( n -- bool )
     ! Did the call succeed (SQL-SUCCESS or SQL-SUCCESS-WITH-INFO)
     {
-        { SQL-SUCCESS [ t ] }
-        { SQL-SUCCESS-WITH-INFO [ t ] }
+        { SQL_SUCCESS [ t ] }
+        { SQL_SUCCESS_WITH_INFO [ t ] }
         [ drop f ]
     } case ;
 
@@ -110,6 +114,15 @@ FUNCTION: SQLRETURN SQLFetch ( SQLHSTMT statementHandle )
 FUNCTION: SQLRETURN SQLNumResultCols ( SQLHSTMT statementHandle, SQLSMALLINT* columnCountPtr )
 FUNCTION: SQLRETURN SQLDescribeCol ( SQLHSTMT statementHandle, SQLSMALLINT columnNumber, SQLCHAR* columnName, SQLSMALLINT bufferLength, SQLSMALLINT* nameLengthPtr, SQLSMALLINT* dataTypePtr, SQLUINTEGER* columnSizePtr, SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr )
 FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLSMALLINT targetType, SQLPOINTER targetValuePtr, SQLINTEGER bufferLength, SQLINTEGER* strlen_or_indPtr )
+FUNCTION: SQLRETURN SQLGetDiagRec (
+     SQLSMALLINT     HandleType,
+     SQLHANDLE       Handle,
+     SQLSMALLINT     RecNumber,
+     SQLCHAR*       SQLState,
+     SQLINTEGER*    NativeErrorPtr,
+     SQLCHAR*       MessageText,
+     SQLSMALLINT     BufferLength,
+     SQLSMALLINT*   TextLengthPtr )
 
 : alloc-handle ( type parent -- handle )
     f void* <ref> [ SQLAllocHandle ] keep swap succeeded? [
