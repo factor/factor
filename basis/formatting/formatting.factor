@@ -121,22 +121,20 @@ fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
 fmt-s     = "s"                  => [[ [ present ] ]]
 fmt-S     = "S"                  => [[ [ present >upper ] ]]
 fmt-u     = "u"                  => [[ [ unparse ] ]]
-fmt-d     = "d"                  => [[ [ number>string ] ]]
-fmt-o     = "o"                  => [[ [ >oct ] ]]
-fmt-O     = "O"                  => [[ [ >oct >upper ] ]]
-fmt-b     = "b"                  => [[ [ >bin ] ]]
-fmt-B     = "B"                  => [[ [ >bin >upper ] ]]
+fmt-d     = "d"                  => [[ [ >integer number>string ] ]]
+fmt-o     = "o"                  => [[ [ >integer >oct ] ]]
+fmt-b     = "b"                  => [[ [ >integer >bin ] ]]
 fmt-e     = digits "e"           => [[ first '[ _ format-scientific ] ]]
 fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
 fmt-f     = digits "f"           => [[ first '[ _ format-decimal ] ]]
-fmt-x     = "x"                  => [[ [ >hex ] ]]
-fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
+fmt-x     = "x"                  => [[ [ >integer >hex ] ]]
+fmt-X     = "X"                  => [[ [ >integer >hex >upper ] ]]
 unknown   = (.)*                 => [[ unknown-printf-directive ]]
 
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S|fmt-u
 strings   = pad width strings_   => [[ <reversed> compose-all ]]
 
-numbers_  = fmt-d|fmt-o|fmt-O|fmt-b|fmt-B|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
+numbers_  = fmt-d|fmt-o|fmt-b|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
 
 types     = strings|numbers
