@@ -1,5 +1,5 @@
-
-USING: help.syntax help.markup kernel prettyprint sequences strings ;
+USING: assocs help.markup help.syntax kernel math prettyprint
+sequences strings ;
 
 IN: formatting
 
@@ -13,24 +13,22 @@ HELP: printf
     "padding, and decimals."
     $nl
     { $table
-        { { $snippet "%%" }          "Single %"                   "" }
-        { { $snippet "%P.Ds" }       "String format"              "string" }
-        { { $snippet "%P.DS" }       "String format uppercase"    "string" }
-        { { $snippet "%P.Du" }       "Unparsed format"            "object" }
-        { { $snippet "%c" }          "Character format"           "char" }
-        { { $snippet "%C" }          "Character format uppercase" "char" }
-        { { $snippet "%LPd" }        "Base 10 General format"              "real" }
-        { { $snippet "%LPx" }        "Base 16 General format"              "real" }
-        { { $snippet "%LPX" }        "Base 16 General format uppercase"    "real" }
-        { { $snippet "%LPo" }        "Base  8 General format"              "real" }
-        { { $snippet "%LPO" }        "Base  8 General format uppercase"    "real" }
-        { { $snippet "%LPb" }        "Base  2 General format"              "real" }
-        { { $snippet "%LPB" }        "Base  2 General format uppercase"    "real" }
-        { { $snippet "%LP.De" }      "Base 10 Scientific format"           "real" }
-        { { $snippet "%LP.DE" }      "Base 10 Scientific format uppercase" "real" }
-        { { $snippet "%LP.Df" }      "Base 10 Fixed format"                "real" }
-        { { $snippet "%[%?, %]" }    "Sequence format"            "sequence" }
-        { { $snippet "%[%?: %? %]" } "Assocs format"              "assocs" }
+        { { $snippet "%%" }          "Single %" "" }
+        { { $snippet "%P.Ds" }       "String" { $link string } }
+        { { $snippet "%P.DS" }       "String uppercase" { $link string } }
+        { { $snippet "%P.Du" }       "Unparsed" { $link object } }
+        { { $snippet "%c" }          "Character" "char" }
+        { { $snippet "%C" }          "Character uppercase" "char" }
+        { { $snippet "%LPd" }        "Integer decimal (base 10)" { $link real } }
+        { { $snippet "%LPx" }        "Integer hexadecimal (base 16)" { $link real } }
+        { { $snippet "%LPX" }        "Integer hexadecimal uppercase (base 16)" { $link real } }
+        { { $snippet "%LPo" }        "Integer octal (base 8)" { $link real } }
+        { { $snippet "%LPb" }        "Integer binary (base 2)" { $link real } }
+        { { $snippet "%LP.De" }      "Scientific (base 10)" { $link real } }
+        { { $snippet "%LP.DE" }      "Scientific uppercase (base 10)" { $link real } }
+        { { $snippet "%LP.Df" }      "Fixed (base 10)" { $link real } }
+        { { $snippet "%[%?, %]" }    "Sequence" { $link sequence } }
+        { { $snippet "%[%?: %? %]" } "Assocs" { $link assoc } }
     }
     $nl
     "Leading (" { $snippet "L" } ") is used to optionally prefix a plus sign (" { $snippet "\"+\"" } ") or space (" { $snippet "\" \"" } ") "

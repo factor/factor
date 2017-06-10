@@ -116,19 +116,6 @@ IN: formatting.tests
 { "1.0e+418" } [ 997654321098765432 10 400 ^ * "%.1e" sprintf ] unit-test
 { "1.00e+418" } [ 999654321098765432 10 400 ^ * "%.2e" sprintf ] unit-test
 
-{ "1.5625" } [ 1.5625 "%d" sprintf ] unit-test
-{ "1.9p0" } [ 1.5625 "%x" sprintf ] unit-test
-{ "1.9P0" } [ 1.5625 "%X" sprintf ] unit-test
-{ "1.44p0" } [ 1.5625 "%o" sprintf ] unit-test
-{ "1.44P0" } [ 1.5625 "%O" sprintf ] unit-test
-{ "1.1001p0" } [ 1.5625 "%b" sprintf ] unit-test
-{ "1.1001P0" } [ 1.5625 "%B" sprintf ] unit-test
-{ "14+17/20" } [ 14+17/20 "%d" sprintf ] unit-test
-{ "e+11/14" } [ 14+17/20 "%x" sprintf ] unit-test
-{ "E+11/14" } [ 14+17/20 "%X" sprintf ] unit-test
-{ "16+21/24" } [ 14+17/20 "%o" sprintf ] unit-test
-{ "1110+10001/10100" } [ 14+17/20 "%b" sprintf ] unit-test
-
 { "ff" } [ 0xff "%x" sprintf ] unit-test
 { "FF" } [ 0xff "%X" sprintf ] unit-test
 { "0f" } [ 0xf "%02x" sprintf ] unit-test
