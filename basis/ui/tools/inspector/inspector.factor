@@ -1,14 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors inspector namespaces kernel models fry
-colors.constants models.arrow prettyprint sequences mirrors
-assocs classes io io.styles arrays hashtables math.order sorting
-refs fonts ui.tools.browser ui.commands ui.operations ui.gadgets
+USING: accessors arrays assocs classes combinators fonts fry
+hashtables inspector io io.styles kernel math.vectors mirrors
+models models.arrow namespaces prettyprint refs sequences
+sorting ui ui.commands ui.gadgets ui.gadgets.labeled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.slots
-ui.gadgets.tracks ui.gestures ui.gadgets.buttons
-ui.gadgets.tables ui.theme ui.gadgets.toolbar
-ui.gadgets.status-bar ui.gadgets.labeled ui.tools.common ui
-combinators ui.gadgets.worlds ui.theme.images ;
+ui.gadgets.status-bar ui.gadgets.tables
+ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
+ui.gadgets.worlds ui.gestures ui.operations ui.theme
+ui.tools.browser ui.tools.common ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -71,8 +71,21 @@ M: object make-slot-descriptions
 M: hashtable make-slot-descriptions
     call-next-method [ key-string>> ] sort-with ;
 
+TUPLE: inspector-table < table ;
+
+! Improve performance for big arrays or large hashtables by
+! only calculating column width for the longest key.
+M: inspector-table compute-column-widths
+    dup rows>> [ drop 0 { } ] [
+        [ drop gap>> ]
+        [ initial-widths ]
+        [ keys longest "" 2array row-column-widths ] 2tri
+        vmax [ compute-total-width ] keep
+    ] if-empty ;
+
 : <inspector-table> ( model -- table )
-    [ make-slot-descriptions ] <arrow> inspector-renderer <table>
+    [ make-slot-descriptions ] <arrow> inspector-renderer
+    inspector-table new-table
         [ invoke-primary-operation ] >>action
         monospace-font >>font
         line-color >>column-line-color
