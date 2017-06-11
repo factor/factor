@@ -99,7 +99,9 @@ M: image-name draw-cell nip draw-image ;
 : compute-total-width ( gap widths -- total )
     swap [ column-offsets drop ] keep - ;
 
-: compute-column-widths ( table -- total widths )
+GENERIC: compute-column-widths ( table -- total widths )
+
+M: table compute-column-widths
     dup rows>> [ drop 0 { } ] [
         [ drop gap>> ] [ initial-widths ] [ ] 2tri
         [ row-column-widths vmax ] with each
