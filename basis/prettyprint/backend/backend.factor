@@ -85,11 +85,7 @@ M: float pprint*
     dup fp-nan? [
         \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
     ] [
-        number-base get {
-            { 10 [ number>string text ] }
-            { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
-            [ unsupported-number-base ]
-        } case
+        call-next-method
     ] if ;
 
 M: f pprint* drop \ f pprint-word ;
