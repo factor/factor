@@ -81,6 +81,9 @@ M: hashtable make-slot-descriptions
     [ unparse-short ] map over renderer>> column-titles first suffix
     row-column-widths supremum ;
 
+: fix-column-widths ( table model -- table )
+    dupd first-column-width 0 2array >>fixed-column-widths ;
+
 : <inspector-table> ( model -- table )
     [
         [ make-slot-descriptions ] <arrow> inspector-renderer <table>
@@ -92,8 +95,7 @@ M: hashtable make-slot-descriptions
             40 >>min-cols
             40 >>max-cols
             monospace-font >>font
-            dup
-    ] keep first-column-width 0 2array >>fixed-column-widths ;
+    ] keep fix-column-widths ;
 
 : <inspector-gadget> ( model -- gadget )
     vertical inspector-gadget new-track with-lines
