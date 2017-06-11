@@ -38,9 +38,9 @@ IN: prettyprint
 : error-in-pprint ( obj -- str )
     class-of name>> "~pprint error: " "~" surround ;
 
-: .b ( n -- ) >bin "0b" prepend print ;
-: .o ( n -- ) >oct "0o" prepend print ;
-: .h ( n -- ) >hex "0x" prepend print ;
+: .b ( n -- ) 2 number-base [ . ] with-variable ;
+: .o ( n -- ) 8 number-base [ . ] with-variable ;
+: .h ( n -- ) 16 number-base [ . ] with-variable ;
 
 : stack. ( seq -- )
     [
