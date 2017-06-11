@@ -72,17 +72,13 @@ M: object make-slot-descriptions
 M: hashtable make-slot-descriptions
     call-next-method [ key-string>> ] sort-with ;
 
-! If model is a sequence, get its maximum index, measure its width
-! and use that as the first column width (or the first column title
-! width, whichever is greater). This improves performance when
-! inspecting big arrays.
+! If model is an enum, get its maximum index, measure its width
+! rendered in the table, and use that as the first column width (or
+! the first column title width, whichever is greater). This
+! improves performance when inspecting big arrays.
 : first-column-width ( table model -- width )
-    value>> dup sequence? [
-        length 1 - 1array
-    ] [
-        make-mirror keys
-    ] if [ unparse-short ] map
-    over renderer>> column-titles first suffix
+    value>> make-mirror dup enum? [ length 1 - 1array ] [ keys ] if
+    [ unparse-short ] map over renderer>> column-titles first suffix
     row-column-widths supremum ;
 
 : <inspector-table> ( model -- table )
