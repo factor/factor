@@ -85,7 +85,7 @@ GENERIC: draw-line ( line index gadget -- )
 <PRIVATE
 
 : clamp ( dim unit min max -- dim' )
-    [ -1/0. or * ] [ 1/.0 or * ] bi-curry* bi
+    [ -1/0. or * ] [ 1/0. or * ] bi-curry* bi
     [ max ] [ min ] bi* ;
 
 : em ( font -- x ) "m" text-width ;
