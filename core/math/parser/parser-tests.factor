@@ -318,6 +318,14 @@ unit-test
 {  -8 } [ "-0o10" string>number ] unit-test
 {  -2 } [ "-0b10" string>number ] unit-test
 
+{ 16 } [ "0X10" string>number ] unit-test
+{  8 } [ "0O10" string>number ] unit-test
+{  2 } [ "0B10" string>number ] unit-test
+
+{ -16 } [ "-0X10" string>number ] unit-test
+{  -8 } [ "-0O10" string>number ] unit-test
+{  -2 } [ "-0B10" string>number ] unit-test
+
 { f } [ "01a" string>number ] unit-test
 { f } [ "0x1g" string>number ] unit-test
 { f } [ "0o18" string>number ] unit-test

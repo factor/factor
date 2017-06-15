@@ -306,11 +306,11 @@ DEFER: @neg-digit
 : with-radix-char ( i number-parse n radix-quot nonradix-quot -- n/f )
     [
         rot {
-            { CHAR: b [ drop  2 ->radix require-next-digit ] }
-            { CHAR: o [ drop  8 ->radix require-next-digit ] }
-            { CHAR: x [ drop 16 ->radix require-next-digit ] }
+            { [ dup "bB" member-eq? ] [ 2drop  2 ->radix require-next-digit ] }
+            { [ dup "oO" member-eq? ] [ 2drop  8 ->radix require-next-digit ] }
+            { [ dup "xX" member-eq? ] [ 2drop 16 ->radix require-next-digit ] }
             [ [ drop ] 2dip swap call ]
-        } case
+        } cond
     ] 2curry next-digit ; inline
 
 : @pos-first-digit ( i number-parse n char -- n/f )
