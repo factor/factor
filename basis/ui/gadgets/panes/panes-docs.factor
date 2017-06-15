@@ -75,7 +75,7 @@ ARTICLE: "ui.gadgets.panes" "Pane gadgets"
     pane-stream
     <pane-stream>
 }
-"In addition to the stream output words (" { $link "stream-protocol" } ", pane streams can have gadgets written to them:"
+"In addition to the stream output words (" { $link "stream-protocol" } "), pane streams can have gadgets written to them:"
 { $subsections
     write-gadget
     print-gadget
