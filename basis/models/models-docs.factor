@@ -60,15 +60,19 @@ HELP: remove-connection
 { $values { "observer" object } { "model" model } }
 { $contract "Unregisters an object no longer interested in being notified of changes to the model's value." } ;
 
+HELP: update-model
+{ $values { "model" model } }
+{ $description "Notifies the model that its " { $slot "value" } " slot has been updated by " { $link set-model } "." } ;
+
 HELP: set-model
 { $values { "value" object } { "model" model } }
-{ $description "Changes the value of a model and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
+{ $description "Changes the value of a model, calls " { $link update-model } " to notify it, then calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
 HELP: ?set-model
 { $values { "value" object } { "model" model } }
 { $description "Similar to " { $link set-model } ", but only sets the value if the new value is different." } ;
 
-{ set-model change-model change-model* (change-model) push-model pop-model } related-words
+{ set-model ?set-model change-model change-model* (change-model) push-model pop-model } related-words
 
 HELP: change-model
 { $values { "model" model } { "quot" { $quotation ( ..a obj -- ..b newobj ) } } }
@@ -161,7 +165,9 @@ ARTICLE: "models-impl" "Implementing models"
 $nl
 "Models can execute hooks when activated:"
 { $subsections model-activated }
-"Models can override requests to change their value, for example to perform validation:"
-{ $subsections set-model } ;
+"To avoid recursive updating and do proper notifications, you should set the model values via:"
+{ $subsections set-model }
+"Models are notified when their values are changed:"
+{ $subsections update-model } ;
 
 ABOUT: "models"
