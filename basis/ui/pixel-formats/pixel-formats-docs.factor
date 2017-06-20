@@ -25,7 +25,7 @@ ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
     sample-alpha
     color-float
 }
-"Integer attributes are represented by a " { $link tuple } " with a single " { $snippet "value" } "slot:"
+"Integer attributes are represented by a " { $link tuple } " with a single " { $snippet "value" } " slot:"
 { $subsections
     color-bits
     red-bits
