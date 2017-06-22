@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals math math.functions
-math.order sequences ui.gadgets ;
+math.order sequences sequences.extras ui.gadgets ;
 IN: ui.baseline-alignment
 
 SYMBOL: +baseline+
@@ -43,9 +43,6 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     second swap [ baseline ] [ cap-height ] bi
     [ dup [ 2dup - ] [ f ] if ] dip
     gadget-metrics boa ; inline
-
-: ?supremum ( seq -- n/f )
-    sift [ f ] [ supremum ] if-empty ;
 
 : max-ascent ( seq -- n )
     [ ascent>> ] map ?supremum ;
