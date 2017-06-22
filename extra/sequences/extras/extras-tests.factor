@@ -223,6 +223,16 @@ IN: sequences.extras.tests
 { 1 "beef" } [ { "chicken" "beef" "moose" } [ length ] infimum-by* ] unit-test
 { 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] supremum-by* ] unit-test
 { 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
+{ f } [ f ?supremum ] unit-test
+{ f } [ { } ?supremum ] unit-test
+{ f } [ { f } ?supremum ] unit-test
+{ 3 } [ { 1 f 3 2 } ?supremum ] unit-test
+{ 3 } [ { 1 3 2 } ?supremum ] unit-test
+{ f } [ f ?infimum ] unit-test
+{ f } [ { } ?infimum ] unit-test
+{ f } [ { f } ?infimum ] unit-test
+{ 1 } [ { 1 f 3 2 } ?infimum ] unit-test
+{ 1 } [ { 1 3 2 } ?infimum ] unit-test
 
 { 3/10 } [ 10 <iota> [ 3 < ] count* ] unit-test
 

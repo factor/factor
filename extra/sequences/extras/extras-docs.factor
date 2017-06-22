@@ -1,6 +1,32 @@
 USING: help.markup help.syntax kernel math sequences ;
 IN: sequences.extras
 
+HELP: ?supremum
+{ $values
+    { "seq/f" { $maybe sequence } }
+    { "elt/f" { $maybe object } }
+}
+{ $description "Outputs the greatest element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
+{ $examples
+    { $example "USING: prettyprint sequences.extras ;"
+    "{ 1 f 3 2 } ?supremum ."
+    "3" }
+} ;
+
+HELP: ?infimum
+{ $values
+    { "seq/f" { $maybe sequence } }
+    { "elt/f" { $maybe object } }
+}
+{ $description "Outputs the least element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
+{ $examples
+    { $example "USING: prettyprint sequences.extras ;"
+    "{ 1 f 3 2 } ?infimum ."
+    "1" }
+} ;
+
+{ ?supremum ?infimum } related-words
+
 HELP: 2count
 { $values
     { "seq1" sequence }
