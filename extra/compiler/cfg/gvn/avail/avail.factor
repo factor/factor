@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel namespaces sequences
-sets
+sequences.extras sets
 compiler.cfg
 compiler.cfg.dataflow-analysis
 compiler.cfg.def-use
@@ -24,12 +24,9 @@ M: avail transfer-set drop defined assoc-union ;
 
 : available? ( vn -- ? ) basic-block get avail-in key? ;
 
-: best-vreg ( available-vregs -- vreg )
-    [ f ] [ infimum ] if-empty ;
-
 : >avail-vreg ( vreg -- vreg/f )
     final-iteration? get [
-        congruence-class [ available? ] filter best-vreg
+        congruence-class [ available? ] filter ?infimum
     ] when ;
 
 : available-uses? ( insn -- ? )
