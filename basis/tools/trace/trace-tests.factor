@@ -1,6 +1,6 @@
 IN: tools.trace.tests
-USING: tools.trace tools.test tools.continuations kernel math combinators
-sequences ;
+USING: combinators kernel math sequences tools.continuations
+tools.test tools.trace tools.trace.private ;
 
 { { 3 2 1 } } [ { 1 2 3 } [ reverse ] trace ] unit-test
 
@@ -22,9 +22,15 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 
 { 6 } [ [ case-breakpoint-test ] trace ] unit-test
 
-: call(-breakpoint-test ( -- x )
+: call-op-para-breakpoint-test ( -- x )
     [ break 1 ] call( -- x ) 2 + ;
 
-\ call(-breakpoint-test don't-step-into
+\ call-op-para-breakpoint-test don't-step-into
 
-{ 3 } [ [ call(-breakpoint-test ] trace ] unit-test
+{ 3 } [ [ call-op-para-breakpoint-test ] trace ] unit-test
+
+{ f t t } [
+    \ + into?
+    \ dip into?
+    \ sq into?
+] unit-test
