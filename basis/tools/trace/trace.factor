@@ -1,16 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.promises models tools.continuations kernel
-sequences concurrency.messaging locals continuations threads
-namespaces namespaces.private make assocs accessors io strings
-prettyprint math math.parser words effects summary io.styles classes
-generic.math combinators.short-circuit kernel.private quotations ;
+USING: accessors classes combinators.short-circuit effects
+generic.math io io.styles kernel kernel.private make math.parser
+namespaces prettyprint quotations sequences strings summary
+tools.continuations words ;
 IN: tools.trace
-
-SYMBOL: exclude-vocabs
-SYMBOL: include-vocabs
-
-exclude-vocabs { "math" "accessors" } swap set-global
 
 <PRIVATE
 
@@ -19,27 +13,14 @@ exclude-vocabs { "math" "accessors" } swap set-global
 
 SYMBOL: end
 
-: include? ( vocab -- ? )
-    include-vocabs get [ member? ] [ drop t ] if* ;
-
-: exclude? ( vocab -- ? )
-    exclude-vocabs get [ member? ] [ drop f ] if* ;
-
 : into? ( obj -- ? )
     {
         [ word? ]
         [ predicate? not ]
         [ math-generic? not ]
         [
-            {
-                [ inline? ]
-                [
-                    {
-                        [ vocabulary>> include? ]
-                        [ vocabulary>> exclude? not ]
-                    } 1&&
-                ]
-            } 1||
+            [ inline? ]
+            [ vocabulary>> { "math" "accessors" } member? not ] bi or
         ]
     } 1&& ;
 
