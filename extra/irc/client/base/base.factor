@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs concurrency.mailboxes io kernel namespaces
-strings words.symbol irc.client.chats irc.messages ;
-EXCLUDE: sequences => join ;
+USING: accessors assocs concurrency.mailboxes io irc.client.chats
+irc.messages kernel namespaces sequences strings words.symbol ;
 IN: irc.client.base
 
 SYMBOL: current-irc-client
@@ -18,7 +17,7 @@ SYMBOL: current-irc-client
     \ current-irc-client swap with-variable ; inline
 
 UNION: to-target privmsg notice ;
-UNION: to-channel join part topic kick rpl-channel-modes
+UNION: to-channel irc.messages:join part topic kick rpl-channel-modes
                   topic rpl-names rpl-names-end ;
 UNION: to-one-chat to-target to-channel mode ;
 UNION: to-many-chats nick quit ;

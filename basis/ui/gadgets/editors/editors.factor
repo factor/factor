@@ -1,22 +1,19 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.short-circuit documents
-documents.elements fry grouping kernel locals make math
-math.functions math.order math.ranges math.rectangles
-math.vectors models models.arrow namespaces opengl sequences
-sorting splitting timers ui.baseline-alignment ui.clipboards
-ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-ui.theme ui.gestures ui.pens.solid ui.render ui.text
-unicode ;
-EXCLUDE: fonts => selection ;
+USING: accessors arrays assocs calendar colors.constants combinators
+combinators.short-circuit documents documents.elements fonts fry
+grouping kernel locals make math math.functions math.order math.ranges
+math.rectangles math.vectors models models.arrow namespaces opengl
+sequences sorting splitting timers ui.baseline-alignment ui.clipboards
+ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.line-support
+ui.gadgets.menus ui.gadgets.scrollers ui.gestures ui.pens.solid
+ui.render ui.text ui.theme unicode ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
-caret-color
-caret mark
-focused? blink blink-timer ;
+    caret-color
+    caret mark
+    focused? blink blink-timer ;
 
 <PRIVATE
 
@@ -384,7 +381,7 @@ editor "editing" f {
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
 
-: paste-selection ( editor -- ) selection get paste-clipboard ;
+: paste-selection ( editor -- ) ui.clipboards:selection get paste-clipboard ;
 
 : com-cut ( editor -- ) clipboard get editor-cut ;
 
