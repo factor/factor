@@ -73,13 +73,16 @@ $nl
 
 ABOUT: "definitions"
 
+HELP: changed-definition
+{ $values { "defspec" "definition" } }
+{ $description "Adds the definitio to the unit's " { $link changed-definitions } "." } ;
+
+HELP: changed-definitions
+{ $var-description "A set that contains all words and vocabs whose definitions have changed or are new. " }
+{ $see-also changed-definition } ;
+
 HELP: changed-effects
 { $var-description "A set that contains all words whose stack effects have changed in the compilation unit." } ;
-
-HELP: set-where
-{ $values { "loc" "a " { $snippet "{ path line# }" } " pair" } { "defspec" "a definition specifier" } }
-{ $description "Sets the definition's location." }
-{ $notes "This word is used by the parser." } ;
 
 HELP: forget
 { $values { "defspec" "a definition specifier" } }
@@ -91,9 +94,17 @@ HELP: forget-all
 { $description "Forgets every definition in a sequence." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
+HELP: maybe-changed
+{ $var-description "The set of definitions that has maybe changed in the compilation unit. For example, if a union class is redefined it will be added to this set because it is possible but not certain that it has become different." } ;
+
 HELP: outdated-generics
 { $var-description "A " { $link hash-set } " where newly defined generic words are kept until they are being remade." }
 { $see-also remake-generic remake-generics } ;
+
+HELP: set-where
+{ $values { "loc" "a " { $snippet "{ path line# }" } " pair" } { "defspec" "a definition specifier" } }
+{ $description "Sets the definition's location." }
+{ $notes "This word is used by the parser." } ;
 
 HELP: where
 { $values { "defspec" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }

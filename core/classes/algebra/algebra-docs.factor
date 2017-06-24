@@ -1,5 +1,5 @@
-USING: classes classes.private help.markup help.syntax kernel
-math sequences ;
+USING: classes classes.algebra.private classes.private help.markup
+help.syntax kernel math sequences ;
 IN: classes.algebra
 
 ARTICLE: "class-operations" "Class operations"
@@ -49,22 +49,30 @@ HELP: class<=
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 <= class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
-HELP: sort-classes
-{ $values { "seq" "a sequence of class" } { "newseq" "a new sequence of classes" } }
-{ $description "Outputs a linear sort of a sequence of classes. Larger classes come before their subclasses." } ;
+HELP: class-and
+{ $values { "first" class } { "second" class } { "class" class } }
+{ $description "Outputs the largest anonymous class contained in both " { $snippet "class1" } " and " { $snippet "class2" } "." } ;
+
+HELP: class-not
+{ $values { "class" class } { "complement" class } }
+{ $description "Outputs the complement class of 'class'." } ;
 
 HELP: class-or
 { $values { "first" class } { "second" class } { "class" class } }
 { $description "Outputs the smallest anonymous class containing both " { $snippet "class1" } " and " { $snippet "class2" } "." } ;
 
-HELP: class-and
-{ $values { "first" class } { "second" class } { "class" class } }
-{ $description "Outputs the largest anonymous class contained in both " { $snippet "class1" } " and " { $snippet "class2" } "." } ;
-
 HELP: classes-intersect?
 { $values { "first" class } { "second" class } { "?" boolean } }
 { $description "Tests if two classes have a non-empty intersection. If the intersection is empty, no object can be an instance of both classes at once." } ;
 
+HELP: normalize-class
+{ $values { "class" class } { "class'" class } }
+{ $description "Normalizes a class in such a way that it becomes easier to perform algebra on it." } ;
+
 HELP: smallest-class
 { $values { "classes" "a sequence of class words" } { "class/f" { $maybe class } } }
 { $description "Outputs a minimum class from the given sequence." } ;
+
+HELP: sort-classes
+{ $values { "seq" "a sequence of class" } { "newseq" "a new sequence of classes" } }
+{ $description "Outputs a linear sort of a sequence of classes. Larger classes come before their subclasses." } ;

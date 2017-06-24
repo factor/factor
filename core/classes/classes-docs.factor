@@ -100,6 +100,10 @@ HELP: define-predicate
 { $description "Defines a predicate word for a class." }
 $low-level-note ;
 
+HELP: metaclass-changed
+{ $values { "use" class } { "class" class } }
+{ $description "Notifies the class 'class' that its metaclass 'use' has changed." } ;
+
 HELP: predicate-def
 { $values { "obj" "a type object" } { "quot" quotation } }
 { $description "Outputs a quotation that can be used to check if objects are an instance of the given type." }
