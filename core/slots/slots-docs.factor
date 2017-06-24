@@ -116,6 +116,23 @@ $nl
 
 ABOUT: "slots"
 
+HELP: bad-initial-value
+{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " if a slot has an impossible initial value. "
+  { $examples
+    { $unchecked-example
+      "TUPLE: a { b integer initial: \"invalid\" } ;"
+      "1: TUPLE: a { b integer initial: \"invalid\" } ;"
+      "                                              ^"
+      "Incompatible initial value"
+      "name          \"b\""
+      "initial-value \"invalid\""
+      "class         integer"
+      ""
+      "Type :help for debugging help."
+    }
+  }
+} ;
+
 HELP: slot-spec
 { $class-description "A slot specification. The " { $snippet "\"slots\"" } " word property of " { $link builtin-class } " and " { $link tuple-class } " instances holds sequences of slot specifications."
 $nl

@@ -1,6 +1,6 @@
-USING: compiler.units.private definitions help.markup help.syntax kernel
-kernel.private parser quotations sequences source-files stack-checker.errors
-words ;
+USING: classes.tuple.private compiler.units.private definitions
+help.markup help.syntax kernel kernel.private parser quotations
+sequences source-files stack-checker.errors words ;
 IN: compiler.units
 
 ARTICLE: "compilation-units-internals" "Compilation units internals"
@@ -18,7 +18,14 @@ $nl
 "A hook to be called at the end of the compilation unit. If the optimizing compiler is loaded, this compiles new words with the " { $link "compiler" } ":"
 { $subsections recompile }
 "Low-level compiler interface exported by the Factor VM:"
-{ $subsections modify-code-heap } ;
+{ $subsections modify-code-heap }
+"Variables maintaining state within a compilation unit."
+{ $subsections
+  changed-definitions
+  maybe-changed
+  outdated-generics
+  outdated-tuples
+} ;
 
 ARTICLE: "compilation-units" "Compilation units"
 "A " { $emphasis "compilation unit" } " scopes a group of related definitions. They are compiled and entered into the system in one atomic operation."
@@ -45,6 +52,12 @@ HELP: bump-effect-counter?
 { $values { "?" boolean } }
 { $description "Whether the " { $link REDEFINITION-COUNTER } " should be increased." } ;
 
+HELP: new-definitions
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link current-source-file } "." } ;
+
+HELP: forgotten-definitions
+{ $var-description "All definitions (words and vocabs) that have been forgotten in the current compilation unit." } ;
+
 HELP: old-definitions
 { $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link current-source-file } " the most recent time it was loaded." } ;
 
@@ -56,9 +69,6 @@ HELP: redefine-error
 HELP: remember-definition
 { $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
-
-HELP: new-definitions
-{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link current-source-file } "." } ;
 
 HELP: with-compilation-unit
 { $values { "quot" quotation } }
@@ -80,7 +90,7 @@ HELP: recompile
 
 HELP: to-recompile
 { $values { "words" sequence } }
-{ $description "Sequence of words that will be recompiled by the compilation unit." } ;
+{ $description "Sequence of words that will be recompiled by the compilation unit. The non-optimizing compiler only recompiles words whose definitions has changed. But the optimizing compiler, which can perform optimizations such as inlining, recompiles words that depends on the changed words." } ;
 
 HELP: no-compilation-unit
 { $values { "word" word } }

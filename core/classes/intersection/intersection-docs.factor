@@ -4,7 +4,7 @@ layouts classes.private classes compiler.units ;
 IN: classes.intersection
 
 ARTICLE: "intersections" "Intersection classes"
-"An object is an instance of a intersection class if it is an instance of all of its participants."
+"An object is an instance of an intersection class if it is an instance of all of its participants."
 { $subsections POSTPONE: INTERSECTION: }
 { $subsections define-intersection-class }
 "Intersection classes can be introspected:"

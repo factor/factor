@@ -1,8 +1,7 @@
-USING: arrays assocs classes.tuple combinators command-line
-effects generic generic.math generic.single help.markup
-help.syntax io.pathnames kernel math parser sequences
-vocabs.loader vocabs.parser words words.alias words.constant
-words.symbol ;
+USING: arrays assocs classes.algebra.private classes.tuple combinators
+command-line effects generic generic.math generic.single help.markup
+help.syntax io.pathnames kernel math parser sequences vocabs.loader
+vocabs.parser words words.alias words.constant words.symbol ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -363,6 +362,11 @@ HELP: B{
 { $values { "elements" "a list of integers" } }
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "B{ 1 2 3 }" } } ;
+
+HELP: intersection{
+{ $syntax "intersection{ elements... }" }
+{ $values { "elements" "a list of classoids" } }
+{ $description "Marks the beginning of a literal " { $link anonymous-intersection } " class." } ;
 
 HELP: H{
 { $syntax "H{ { key value }... }" }

@@ -174,10 +174,23 @@ $nl
     { { { $snippet "\"superclass\"" } ", " { $snippet "\"predicate-definition\"" } } { $link "predicates" } }
 
     { { $snippet "\"members\"" } { $link "unions" } { $link "maybes" } }
-
+    {
+        { $snippet "\"instances\"" }
+        { "Lists the instances of the mixin class and where they are defined - " { $link "mixins" } }
+    }
+    {
+        { $snippet "\"predicate\"" }
+        { "A quotation that tests if the top of the stack is an instance of this class - " { $link "class-predicates" } }
+    }
     { { $snippet "\"slots\"" } { $link "slots" } }
-
-    { { $snippet "\"predicate\"" } { "A quotation that tests if the top of the stack is an instance of this class - " { $link "class-predicates" } } }
+    {
+        {
+            { $snippet "\"superclass\"" } ", "
+            { $snippet "\"predicate-definition\"" }
+        }
+        { $link "predicates" }
+    }
+    { { $snippet "\"type\"" } { $link "builtin-classes" } }
 } ;
 
 ARTICLE: "word.private" "Word implementation details"
@@ -240,7 +253,8 @@ ABOUT: "words"
 
 HELP: changed-effect
 { $values { "word" word } }
-{ $description "Signals to the compilation unit that the word has changed. It causes all words that depend on it to be recompiled in response." } ;
+{ $description "Signals to the compilation unit that the effect of the word has changed. It causes all words that depend on it to be recompiled in response." }
+{ $see-also changed-effects } ;
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;

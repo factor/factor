@@ -86,7 +86,11 @@ HELP: vocab-roots
 HELP: add-vocab-root
 { $values { "root" "a pathname string" } }
 { $description "Adds a directory pathname to the list of vocabulary roots." }
-{ $see-also ".factor-roots" } ;
+{ $see-also ".factor-roots" add-vocab-root-hook } ;
+
+HELP: add-vocab-root-hook
+{ $var-description "A quotation that is run when a vocab root is added." }
+{ $see-also add-vocab-root } ;
 
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
