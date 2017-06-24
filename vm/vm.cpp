@@ -16,7 +16,7 @@ factor_vm::factor_vm(THREADHANDLE thread)
       sampling_profiler_p(false),
       signal_pipe_input(0),
       signal_pipe_output(0),
-      sample_counts(0, 0, 0, 0, 0),
+      current_sample(0, 0, 0, 0, 0),
       gc_off(false),
       data(NULL), code(NULL), callbacks(NULL),
       current_gc(NULL),

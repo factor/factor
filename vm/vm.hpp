@@ -86,7 +86,7 @@ struct factor_vm {
 
   // State kept by the sampling profiler
   std::vector<profiling_sample> samples;
-  volatile profiling_sample_count sample_counts;
+  volatile profiling_sample current_sample;
 
   // GC is off during heap walking
   bool gc_off;

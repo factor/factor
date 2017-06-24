@@ -15,21 +15,22 @@ void factor_vm::enqueue_samples(cell samples,
 
   if (!atomic::load(&sampling_profiler_p))
     return;
-  atomic::fetch_add(&sample_counts.sample_count, samples);
+  atomic::fetch_add(&current_sample.sample_count, samples);
 
   if (foreign_thread_p)
-    atomic::fetch_add(&sample_counts.foreign_thread_sample_count, samples);
+    atomic::fetch_add(&current_sample.foreign_thread_sample_count, samples);
   else {
     if (atomic::load(&current_gc_p))
-      atomic::fetch_add(&sample_counts.gc_sample_count, samples);
+      atomic::fetch_add(&current_sample.gc_sample_count, samples);
     if (atomic::load(&current_jit_count) > 0)
-      atomic::fetch_add(&sample_counts.jit_sample_count, samples);
+      atomic::fetch_add(&current_sample.jit_sample_count, samples);
     if (!code->seg->in_segment_p(pc))
-      atomic::fetch_add(&sample_counts.foreign_sample_count, samples);
+      atomic::fetch_add(&current_sample.foreign_sample_count, samples);
   }
   code->set_safepoint_guard(true);
 }
 
+// Allocates memory (record_sample)
 void factor_vm::handle_safepoint(cell pc) {
   code->set_safepoint_guard(false);
   faulting_p = false;

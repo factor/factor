@@ -36,11 +36,11 @@ void factor_vm::growarr_add(array *growarr_, cell elt_) {
   set_array_nth(growarr.untagged(), 0, tag_fixnum(count + 1));
 }
 
-profiling_sample_count profiling_sample_count::record_counts() volatile {
+profiling_sample profiling_sample::record_counts() volatile {
   atomic::fence();
-  profiling_sample_count returned(sample_count, gc_sample_count,
-                                  jit_sample_count, foreign_sample_count,
-                                  foreign_thread_sample_count);
+  profiling_sample returned(sample_count, gc_sample_count,
+                            jit_sample_count, foreign_sample_count,
+                            foreign_thread_sample_count);
   atomic::fetch_subtract(&sample_count, returned.sample_count);
   atomic::fetch_subtract(&gc_sample_count, returned.gc_sample_count);
   atomic::fetch_subtract(&jit_sample_count, returned.jit_sample_count);
@@ -50,7 +50,7 @@ profiling_sample_count profiling_sample_count::record_counts() volatile {
   return returned;
 }
 
-void profiling_sample_count::clear() volatile {
+void profiling_sample::clear_counts() volatile {
   sample_count = 0;
   gc_sample_count = 0;
   jit_sample_count = 0;
@@ -59,16 +59,10 @@ void profiling_sample_count::clear() volatile {
   atomic::fence();
 }
 
-profiling_sample::profiling_sample(profiling_sample_count const& counts, cell thread,
-                                   cell callstack_begin, cell callstack_end)
-    : counts(counts), thread(thread),
-      callstack_begin(callstack_begin),
-      callstack_end(callstack_end) { }
-
 // Allocates memory (sample_callstacks2->add)
 void factor_vm::record_sample(bool prolog_p) {
-  profiling_sample_count counts = sample_counts.record_counts();
-  if (counts.empty()) {
+  profiling_sample result = current_sample.record_counts();
+  if (result.empty()) {
     return;
   }
   // Appends the callstack, which is just a sequence of quotation or
@@ -89,8 +83,10 @@ void factor_vm::record_sample(bool prolog_p) {
   cell end = growarr_capacity(callstacks.untagged());
 
   // Add the sample.
-  cell thread = special_objects[OBJ_CURRENT_THREAD];
-  samples.push_back(profiling_sample(counts, thread, begin, end));
+  result.thread = special_objects[OBJ_CURRENT_THREAD];
+  result.callstack_begin = begin;
+  result.callstack_end = end;
+  samples.push_back(result);
 }
 
 void factor_vm::set_sampling_profiler(fixnum rate) {
@@ -104,7 +100,7 @@ void factor_vm::set_sampling_profiler(fixnum rate) {
 void factor_vm::start_sampling_profiler(fixnum rate) {
   special_objects[OBJ_SAMPLE_CALLSTACKS] = tag<array>(allot_growarr());
   samples_per_second = rate;
-  sample_counts.clear();
+  current_sample.clear_counts();
   // Release the memory consumed by collecting samples.
   samples.clear();
   samples.shrink_to_fit();
@@ -141,15 +137,15 @@ void factor_vm::primitive_get_samples() {
     data_root<array> sample(allot_array(7, false_object), this);
 
     set_array_nth(sample.untagged(), 0,
-                  tag_fixnum(from_iter->counts.sample_count));
+                  tag_fixnum(from_iter->sample_count));
     set_array_nth(sample.untagged(), 1,
-                  tag_fixnum(from_iter->counts.gc_sample_count));
+                  tag_fixnum(from_iter->gc_sample_count));
     set_array_nth(sample.untagged(), 2,
-                  tag_fixnum(from_iter->counts.jit_sample_count));
+                  tag_fixnum(from_iter->jit_sample_count));
     set_array_nth(sample.untagged(), 3,
-                  tag_fixnum(from_iter->counts.foreign_sample_count));
+                  tag_fixnum(from_iter->foreign_sample_count));
     set_array_nth(sample.untagged(), 4,
-                  tag_fixnum(from_iter->counts.foreign_thread_sample_count));
+                  tag_fixnum(from_iter->foreign_thread_sample_count));
 
     set_array_nth(sample.untagged(), 5, from_iter->thread);
 
