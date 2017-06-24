@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry splitting ascii calendar accessors combinators
 arrays classes.tuple math.order words assocs strings irc.messages.base
-combinators.short-circuit math ;
-EXCLUDE: sequences => join ;
+combinators.short-circuit math sequences ;
 IN: irc.messages
 
 ! connection

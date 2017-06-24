@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays byte-arrays classes.struct combinators destructors
-io.backend.unix io.encodings.ascii io.encodings.utf8 io.files
-io.pathnames io.sockets.private kernel libc locals math
-namespaces sequences system unix unix.ffi vocabs ;
-EXCLUDE: io.sockets => accept ;
+byte-arrays classes.struct combinators destructors io.backend.unix
+io.encodings.ascii io.encodings.utf8 io.files io.pathnames io.sockets
+io.sockets.private kernel libc locals math namespaces sequences system
+unix unix.ffi vocabs ;
 IN: io.sockets.unix
 
 : socket-fd ( domain type protocol -- fd )
@@ -95,7 +94,7 @@ M: object (server)
 
 : do-accept ( server addrspec -- fd sockaddr )
     [ handle>> handle-fd ] [ empty-sockaddr/size int <ref> ] bi*
-    [ accept ] 2keep drop ; inline
+    [ unix.ffi:accept ] 2keep drop ; inline
 
 M: object (accept)
     2dup do-accept over 0 >= [
