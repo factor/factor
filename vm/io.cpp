@@ -132,7 +132,7 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
       whence = SEEK_END;
       break;
     default:
-      critical_error("Bad value for whence", whence);
+      general_error(ERROR_IO, tag_fixnum(EINVAL), false_object);
   }
 
   for (;;) {

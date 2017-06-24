@@ -1,5 +1,5 @@
-USING: alien.c-types alien.data io io.encodings.ascii io.files
-io.pathnames io.streams.c kernel math specialized-arrays
+USING: alien alien.c-types alien.data debugger io io.encodings.ascii
+io.files io.pathnames io.streams.c kernel math specialized-arrays
 strings tools.test ;
 SPECIALIZED-ARRAY: int
 
@@ -33,3 +33,5 @@ SPECIALIZED-ARRAY: int
 
 ] with-test-directory
 
+
+[ 3 10 99 <alien> fseek ] [ vm-error? ] must-fail-with
