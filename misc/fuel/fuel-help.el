@@ -83,6 +83,10 @@
 
 (defvar fuel-help--history (fuel-help--make-history))
 
+;; https://github.com/jaor/geiser/issues/7
+(eval-after-load "session.el"
+  '(add-to-list 'session-globals-exclude 'fuel-help--history))
+
 
 ;;; Page cache:
 
