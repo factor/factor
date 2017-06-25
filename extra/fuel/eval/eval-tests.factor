@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations fuel fuel.eval io.streams.string kernel math
-namespaces random.data sequences strings tools.test vocabs.parser ;
+namespaces random.data sequences tools.test vocabs.parser ;
 IN: fuel.eval.tests
 
 ! pop-restarts
@@ -36,4 +36,13 @@ IN: fuel.eval.tests
         ] with-string-writer
         f eval-result set-global
     ] with-manifest
+] unit-test
+
+{
+    "(nil nil \"9\\n\")\n<~FUEL~>\n"
+} [
+    [
+        { "3 sq . " } "hi99"
+        { "math" "prettyprint" "kernel" } eval-in-context
+    ] with-string-writer
 ] unit-test
