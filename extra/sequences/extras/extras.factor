@@ -559,6 +559,16 @@ PRIVATE>
 : infimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ before? ] select-by* ; inline
 
+: ?supremum ( seq/f -- elt/f )
+    [ f ] [
+        [ ] [ 2dup and [ max ] [ dupd ? ] if ] map-reduce
+    ] if-empty ;
+
+: ?infimum ( seq/f -- elt/f )
+    [ f ] [
+        [ ] [ 2dup and [ min ] [ dupd ? ] if ] map-reduce
+    ] if-empty ;
+
 : change-last ( seq quot -- )
     [ drop length 1 - ] [ change-nth ] 2bi ; inline
 
