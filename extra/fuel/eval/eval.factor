@@ -1,14 +1,12 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations debugger fuel.pprint io
-io.streams.string kernel listener namespaces prettyprint.config sequences
-vocabs.parser ;
+USING: arrays continuations debugger fuel.pprint io io.streams.string
+kernel listener namespaces prettyprint.config sequences vocabs.parser
+;
 IN: fuel.eval
 
-TUPLE: status manifest restarts ;
-
-SYMBOL: status-stack
-V{ } clone status-stack set-global
+SYMBOL: restarts-stack
+V{ } clone restarts-stack set-global
 
 SYMBOL: eval-error
 f eval-error set-global
@@ -26,24 +24,13 @@ t eval-res-flag set-global
     eval-res-flag get-global ;
 
 : push-status ( -- )
-    manifest get clone restarts get-global clone status boa
-    status-stack get push ;
+    restarts get-global clone restarts-stack get push ;
 
 : pop-restarts ( restarts -- )
     eval-restartable? [ drop ] [ clone restarts set-global ] if ;
 
 : pop-status ( -- )
-    status-stack get [
-        pop
-        [ manifest>> clone manifest set ]
-        [ restarts>> pop-restarts ]
-        bi
-    ] unless-empty ;
-
-: forget-status ( -- )
-    f eval-error set-global
-    f eval-result set-global
-    f eval-output set-global ;
+    restarts-stack get [ pop pop-restarts ] unless-empty ;
 
 : send-retort ( -- )
     eval-error get-global
@@ -53,7 +40,10 @@ t eval-res-flag set-global
     flush nl "<~FUEL~>" write nl flush ;
 
 : begin-eval ( -- )
-    push-status forget-status ;
+    push-status
+    f eval-error set-global
+    f eval-result set-global
+    f eval-output set-global ;
 
 : end-eval ( output -- )
     eval-output set-global send-retort pop-status ;
@@ -70,5 +60,8 @@ t eval-res-flag set-global
 
 : eval-in-context ( lines in usings -- )
     begin-eval
-    [ eval-usings eval-in eval ] with-string-writer
-    end-eval ;
+    [
+        { "fuel" "syntax" } prepend
+        <manifest> manifest set
+        [ eval-usings eval-in eval ] with-string-writer
+    ] with-scope end-eval ;
