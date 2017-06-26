@@ -33,7 +33,7 @@ typedef char symbol_char;
 
 #ifdef _GNU_SOURCE
 extern "C" {
-  extern int __xpg_strerror_r (int __errnum, char *__buf, size_t __buflen) __THROW __nonnull ((2));
+  extern int __xpg_strerror_r (int __errnum, char *__buf, size_t __buflen);
 }
 #define strerror_r __xpg_strerror_r
 #endif
