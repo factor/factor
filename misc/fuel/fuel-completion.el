@@ -49,10 +49,6 @@
     (completing-read "Vocab name: " vocabs nil nil
                      init-input (or history fuel-completion--vocab-history))))
 
-(defsubst fuel-completion--vocab-list (prefix)
-  (fuel-eval--retort-result
-   (fuel-eval--send/wait `(:fuel* (,prefix fuel-get-vocabs/prefix) t t))))
-
 (defun fuel-completion--words (prefix vocabs)
   (let ((vs (if vocabs (cons :array vocabs) 'f))
         (us (or vocabs 't)))
