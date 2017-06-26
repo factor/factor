@@ -297,11 +297,10 @@ With prefix, the current page is deleted from history."
 (defun fuel-help-clean-history ()
   "Clean up the help browser cache of visited pages."
   (interactive)
-  (when (y-or-n-p "Clean browsing history? ")
-    (fuel-help--cache-clear)
-    (setq fuel-help--history (fuel-help--make-history))
-    (fuel-help-refresh))
-  (message ""))
+  (fuel-help--cache-clear)
+  (setq fuel-help--history (fuel-help--make-history))
+  (fuel-help-refresh)
+  (message "Browsing history cleaned"))
 
 (defun fuel-help-edit ()
   "Edit the current article or word help."
