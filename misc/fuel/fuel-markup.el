@@ -337,10 +337,11 @@
 (defun fuel-markup--index (e)
   (let* ((q (fuel-markup--index-quotation (cadr e)))
          (cmd `(:fuel* ((,q fuel-index)) "fuel"
-                       ("builtins" "help" "help.topics" "classes"
-                        "classes.builtin" "classes.tuple"
-                        "classes.singleton" "classes.union"
-                        "classes.intersection" "classes.predicate")))
+                       ("assocs" "builtins" "classes" "classes.builtin"
+                        "classes.intersection" "classes.predicate"
+                        "classes.singleton"  "classes.tuple" "classes.union"
+                        "help" "help.topics" "namespaces" "sequences"
+                        "vocabs" "words")))
          (subs (fuel-eval--retort-result (fuel-eval--send/wait cmd 200))))
     (when subs
       (let ((start (point))

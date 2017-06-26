@@ -362,7 +362,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 
 ARTICLE: "handbook-library-reference" "Libraries"
 "This index lists articles from loaded vocabularies which are not subsections of any other article. To explore more vocabularies, see " { $link "vocab-index" } "."
-{ $index [ orphan-articles { "help.home" "handbook" } diff ] } ;
+{ $index [ orphan-articles ] } ;
 
 ARTICLE: "handbook" "Factor handbook"
 { $heading "Getting started" }
@@ -388,7 +388,6 @@ ARTICLE: "handbook" "Factor handbook"
   "primitive-index"
   "error-index"
   "class-index"
-}
-;
+} ;
 
 ABOUT: "handbook"
