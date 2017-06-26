@@ -20,7 +20,7 @@ IN: fuel
 : fuel-eval-set-result ( obj -- )
     clone eval-result set-global ; inline
 
-: fuel-retort ( -- ) send-retort ; inline
+: fuel-retort ( -- ) f f "" send-retort ; inline
 
 ! Loading files
 
