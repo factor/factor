@@ -14,18 +14,18 @@ IN: fuel.eval.tests
 
 ! push-status
 { 1 } [
-    V{ } clone [ status-stack set-global ] keep push-status
+    V{ } clone [ restarts-stack set-global ] keep push-status
     length
     pop-status
 ] unit-test
 
 ! Make sure prettyprint doesn't limit output.
 { t } [
-    1000 random-string eval-result set-global
+    f 1000 random-string ""
     [ send-retort ] with-string-writer length 1000 >
-    f eval-result set-global
 ] unit-test
 
+! eval-in-context
 {
     "(nil \"IN: kernel PRIMITIVE: dup ( x -- x x )\" \"\")\n<~FUEL~>\n"
 } [
@@ -34,7 +34,19 @@ IN: fuel.eval.tests
             V{ "\"dup\"" "fuel-word-synopsis" } "scratchpad"
             V{ "fuel" "kernel" "syntax" } eval-in-context
         ] with-string-writer
-        f eval-result set-global
+    ] with-manifest
+] unit-test
+
+{
+    "(nil \"IN: http.server : <500> ( error -- response )\" \"\")\n<~FUEL~>\n"
+} [
+    USE: http.server
+    [
+        [
+            V{ "\"<500>\"" "fuel-word-synopsis" }
+            "http.server"
+            V{ "fuel" "kernel" "syntax" } eval-in-context
+        ] with-string-writer
     ] with-manifest
 ] unit-test
 
