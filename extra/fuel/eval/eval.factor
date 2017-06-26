@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays continuations debugger fuel.pprint io io.streams.string
-kernel listener namespaces parser.notes prettyprint.config sequences
-vocabs.parser ;
+USING: accessors arrays continuations debugger fuel.pprint io
+io.streams.string kernel listener namespaces parser.notes
+prettyprint.config sequences sets vocabs.parser ;
 IN: fuel.eval
 
 SYMBOL: restarts-stack
@@ -46,14 +46,22 @@ t eval-res-flag set-global
 : eval-in ( in -- )
     [ set-current-vocab ] when* ;
 
-: eval-in-context ( lines in usings -- )
+: eval-in-context ( lines in usings/f -- )
     begin-eval
     [
         parser-quiet? on
-        ! These vocabs are always needed in the manifest. syntax for
-        ! obvious reasons, fuel for FUEL stuff and debugger for the :N
-        ! words.
-        { "fuel" "syntax" "debugger" } prepend
-        <manifest> manifest set
+        [
+            ! The idea is that a correct usings list should always be
+            ! specified. But a lot of code in FUEL sends empty usings
+            ! lists so then we have to use the current manifests
+            ! vocabs instead.
+            manifest get search-vocab-names>> members
+        ] [
+            ! These vocabs are always needed in the manifest. syntax for
+            ! obvious reasons, fuel for FUEL stuff and debugger for the :N
+            ! words.
+            { "fuel" "syntax" "debugger" } prepend
+        ] if-empty
+        <manifest> manifest namespaces:set
         [ eval-usings eval-in eval ] with-string-writer
     ] with-scope end-eval ;
