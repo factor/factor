@@ -75,7 +75,8 @@ SYMBOL: describe-words
     disk-vocabs-for-prefix do-vocab-list ; inline
 
 : vocab-describe-words ( name -- element )
-    [ words. ] with-string-writer \ describe-words swap 2array ; inline
+    [ words. ] with-string-writer dup "\n" = [ drop f ] when
+    \ describe-words swap 2array ; inline
 
 : vocab-element ( name -- element )
     dup require \ article swap dup >vocab-link

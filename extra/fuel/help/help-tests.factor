@@ -16,3 +16,9 @@ IN: fuel.help.tests
 { { $next-link POSTPONE: unit-test "unit-test" } } [
     \ unit-test >link \ $next-link next/prev-link
 ] unit-test
+
+{
+    { describe-words f }
+} [
+    "help.handbook" vocab-describe-words
+] unit-test
