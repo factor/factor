@@ -41,8 +41,8 @@ M: class word-help* drop f ;
     all-words [ word-help ] filter append ;
 
 : orphan-articles ( -- seq )
-    articles get keys
-    [ article-parent ] reject ;
+    articles get keys [ article-parent ] reject
+    { "help.home" "handbook" } diff ;
 
 : xref-help ( -- )
     all-articles [ xref-article ] each ;

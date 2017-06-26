@@ -525,3 +525,7 @@ HELP: ABOUT:
 HELP: vocab-help
 { $values { "vocab-spec" "a vocabulary specifier" } { "help" "a help article" } }
 { $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link POSTPONE: ABOUT: } "." } ;
+
+HELP: orphan-articles
+{ $values { "seq" "vocab names" } }
+{ $description "Retrieves all vocabs without parents, except for 'help.home' and 'handbook' which are special." } ;
