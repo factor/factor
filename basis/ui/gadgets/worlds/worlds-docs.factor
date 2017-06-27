@@ -128,6 +128,10 @@ HELP: draw-world*
 { $values { "world" world } }
 { $description "Called when " { $snippet "world" } " needs to be redrawn. The world's OpenGL context is current when this method is called." } ;
 
+HELP: ui-error-hook
+{ $var-description "A quotation that is called if an error occurs in the UI updating thread." }
+{ $see-also ui-error } ;
+
 ARTICLE: "ui.gadgets.worlds-subclassing" "Subclassing worlds"
 "The " { $link world } " gadget can be subclassed, giving Factor code full control of the window's OpenGL context. The following generic words can be overridden to replace standard UI behavior:"
 { $subsections
