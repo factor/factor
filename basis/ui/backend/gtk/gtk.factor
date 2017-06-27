@@ -513,6 +513,9 @@ M: gtk-ui-backend (with-ui)
         ] with-destructors
     ] ui-running ;
 
+M: gtk-ui-backend stop-event-loop
+    gtk_main_quit ;
+
 os linux? [
     gtk-ui-backend ui-backend set-global
 ] when
