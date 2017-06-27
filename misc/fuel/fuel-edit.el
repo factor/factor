@@ -38,11 +38,6 @@
         ((eq method 'frame) (find-file-other-frame file))
         (t (find-file file))))
 
-(defun fuel-edit--looking-at-vocab ()
-  (save-excursion
-    (factor-beginning-of-defun)
-    (looking-at "USING:\\|USE:\\|IN:")))
-
 (defun fuel-edit--try-edit (ret)
   (let* ((err (fuel-eval--retort-error ret))
          (loc (fuel-eval--retort-result ret)))
@@ -94,7 +89,7 @@ With prefix, asks for the word to edit."
                    (fuel-completion--read-word "Edit word: ")))
          (cmd `(:fuel* ((:quote ,word) fuel-get-word-location)))
          (marker (and (not arg) (point-marker))))
-    (if (and (not arg) (fuel-edit--looking-at-vocab))
+    (if (and (not arg) (factor-on-vocab))
         (fuel-edit-vocabulary nil word)
       (fuel-edit--try-edit (fuel-eval--send/wait cmd)))
     (when marker (ring-insert find-tag-marker-ring marker))))

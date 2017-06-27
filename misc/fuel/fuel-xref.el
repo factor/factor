@@ -215,7 +215,7 @@ With prefix argument, ask for word."
     (when word
       (message "Looking up %s's users ..." word)
       (if (and (not arg)
-               (fuel-edit--looking-at-vocab))
+               (factor-on-vocab))
           (fuel-xref--show-vocab-usage word)
         (fuel-xref--show-callers word)))))
 
@@ -230,7 +230,7 @@ With prefix argument, ask for word."
     (when word
       (message "Looking up %s's callees ..." word)
       (if (and (not arg)
-               (fuel-edit--looking-at-vocab))
+               (factor-on-vocab))
           (fuel-xref--show-vocab-uses word)
         (fuel-xref--show-callees word)))))
 
