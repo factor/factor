@@ -64,7 +64,7 @@ M: debugger focusable-child*
 GENERIC: error-in-debugger? ( error -- ? )
 
 M: world-error error-in-debugger?
-    world>> children>> [ f ] [ first debugger? ] if-empty ;
+    world>> children>> ?first debugger? ;
 
 M: object error-in-debugger? drop f ;
 
