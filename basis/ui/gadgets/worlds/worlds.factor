@@ -217,7 +217,7 @@ ui-error-hook [ [ rethrow ] ] initialize
                 dup [ draw-world* ] with-gl-context
                 flush-layout-cache-hook get call( -- )
             ] [
-                swap f >>active? <world-error> ui-error
+                swap f >>active? <world-error> throw
             ] recover
         ] with-variable
     ] [ drop ] if ;

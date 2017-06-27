@@ -35,4 +35,9 @@ HOOK: ui-backend-available? ui-backend ( -- ? )
 M: object ui-backend-available?
     f ;
 
+HOOK: stop-event-loop ui-backend ( -- )
+
+M: object stop-event-loop
+    ;
+
 [ ui-backend-available? "ui.tools" "listener" ? ] main-vocab-hook set-global
