@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: calendar formatting kernel math math.functions sequences
-strings system tools.test ;
+USING: calendar formatting kernel literals math math.functions
+sequences strings system tools.test ;
 IN: formatting.tests
 
 [ "%s" printf ] must-infer
@@ -33,14 +33,9 @@ IN: formatting.tests
 { "-0.500" } [ -1/2 "%.3f" sprintf ] unit-test
 { "0.010" } [ 1/100 "%.3f" sprintf ] unit-test
 { "100000000000000000000000.000000" } [ 23 10^ "%f" sprintf ] unit-test
-{ "1.2" } [ 125/100 "%.1f" sprintf ] unit-test
 { "1.4" } [ 135/100 "%.1f" sprintf ] unit-test
-{ "2" } [ 5/2 "%.0f" sprintf ] unit-test
 { "4" } [ 7/2 "%.0f" sprintf ] unit-test
-{ "2e+00" } [ 5/2 "%.0e" sprintf ] unit-test
-{ "4e+00" } [ 7/2 "%.0e" sprintf ] unit-test
 { "1" } [ 1.0 "%.0f" sprintf ] unit-test
-{ "1e+00" } [ 1.0 "%.0e" sprintf ] unit-test
 { "  1.23" } [ 1.23456789 "%6.2f" sprintf ] unit-test
 { "001100" } [ 12 "%06b" sprintf ] unit-test
 { "==14" } [ 12 "%'=4o" sprintf ] unit-test
@@ -88,7 +83,6 @@ IN: formatting.tests
 { "-9007199254740991.0" } [ 53 2^ 1 - neg "%.1f" sprintf ] unit-test
 { "-9007199254740992.0" } [ 53 2^ neg "%.1f" sprintf ] unit-test
 { "-9007199254740993.0" } [ 53 2^ 1 + neg "%.1f" sprintf ] unit-test
-
 { "987654321098765432" } [ 987654321098765432 "%d" sprintf ] unit-test
 { "987654321098765432.0" } [ 987654321098765432 "%.1f" sprintf ] unit-test
 { "987654321098765432" } [ 987654321098765432 "%.0f" sprintf ] unit-test
@@ -165,3 +159,12 @@ IN: formatting.tests
 { t } [ "October" testtime "%B" strftime = ] unit-test
 { t } [ "Thu Oct 09 12:03:15 2008" testtime "%c" strftime = ] unit-test
 { t } [ "PM" testtime "%p" strftime = ] unit-test
+
+! Differences on Windows due to rounding mode (#1792).
+${ os windows? "1.3" "1.2" ? } [ 125/100 "%.1f" sprintf ] unit-test
+${ os windows? "3" "2" ? } [ 5/2 "%.0f" sprintf ] unit-test
+! Differences on Windows due to setprecision(0)
+${ os windows? "2.500000e+00" "2e+00" ? } [ 5/2 "%.0e" sprintf ] unit-test
+${ os windows? "3.500000e+00" "4e+00" ? } [ 7/2 "%.0e" sprintf ] unit-test
+
+{ "1e+00" } [ 1.0 "%.0e" sprintf ] unit-test
