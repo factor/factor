@@ -1,22 +1,20 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes colors.constants
-combinators combinators.short-circuit compiler.units debugger
-documents fry help help.apropos help.crossref help.home
-help.markup help.stylesheet help.topics io.styles kernel locals
-make models namespaces sequences sets ui ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.editors ui.gadgets.editors.private
-ui.gadgets.glass ui.gadgets.labels ui.gadgets.labels.private
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.theme ui.gadgets.toolbar ui.gadgets.tracks
-ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
-ui.render ui.text ui.theme.images ui.tools.common
-ui.tools.browser.history ui.tools.browser.popups unicode vocabs ;
+USING: accessors arrays assocs classes combinators
+combinators.short-circuit compiler.units debugger fonts fry help
+help.apropos help.crossref help.home help.markup help.stylesheet
+help.topics io.styles kernel locals make math.vectors models
+namespaces sequences sets ui ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
+ui.gadgets.tracks ui.gadgets.viewports ui.gadgets.worlds ui.gestures
+ui.pens.solid ui.theme ui.tools.browser.history
+ui.tools.browser.popups ui.tools.common unicode vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
 
-browser-gadget { 650 700 } set-tool-dim
+browser-gadget default-font-size { 54 58 } n*v set-tool-dim
 
 M: browser-gadget history-value
     [ control-value ] [ scroller>> scroll-position ]
