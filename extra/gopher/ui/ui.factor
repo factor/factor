@@ -1,19 +1,18 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays debugger fry gopher gopher.private
-kernel models present sequences ui ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.toolbar ui.gadgets.tracks ui.gadgets.viewports
-ui.gestures ui.operations ui.tools.browser
+USING: accessors arrays debugger fonts fry gopher gopher.private
+kernel math.vectors models present sequences ui ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
+ui.gadgets.viewports ui.gestures ui.operations ui.tools.browser
 ui.tools.browser.history ui.tools.common urls ;
 
 IN: gopher.ui
 
 TUPLE: gopher-gadget < tool history scroller url-field ;
 
-gopher-gadget { 600 600 } set-tool-dim
+gopher-gadget default-font-size { 50 50 } n*v set-tool-dim
 
 M: gopher-gadget history-value
     [ control-value ] [ scroller>> scroll-position ]

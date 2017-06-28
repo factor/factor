@@ -153,4 +153,4 @@ inspector-gadget "multi-touch" f {
 : inspector ( obj -- )
     <model> inspect-model ;
 
-inspector-gadget { 550 400 } set-tool-dim
+inspector-gadget default-font-size { 46 33 } n*v set-tool-dim
