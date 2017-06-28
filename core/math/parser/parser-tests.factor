@@ -475,7 +475,13 @@ unit-test
 {
     B{ 49 46 53 53 69 43 48 53 }
 } [
-    155000.0 B{ } -1 3 B{ 69 0 } B{ 67 0 } (format-float)
+    155000.0 B{ 0 } -1 3 B{ 69 0 } B{ 67 0 } (format-float)
+] unit-test
+
+{
+    B{ 32 32 32 32 32 32 32 49 46 53 53 69 43 48 53 }
+} [
+    155000.0 B{ 0 } 15 3 B{ 69 0 } B{ 67 0 } (format-float)
 ] unit-test
 
 ! Missing locale
