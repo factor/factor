@@ -149,7 +149,6 @@ help:
 	@echo ""
 	@echo "DEBUG=1  compile VM with debugging information"
 	@echo "SITE_CFLAGS=...  additional optimization flags"
-	@echo "NO_UI=1  don't link with X11 libraries (ignored on Mac OS X)"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 ALL = factor factor-ffi-test factor-lib
