@@ -11,7 +11,6 @@ ECHO=echo
 OS=
 ARCH=
 WORD=
-NO_UI=${NO_UI-}
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 SCRIPT_ARGS="$*"
@@ -218,8 +217,6 @@ check_library_exists() {
     $CC $GCC_TEST -o $GCC_OUT -l $1 2>&-
     if [[ $? -ne 0 ]] ; then
         $ECHO "not found."
-        $ECHO "***Factor will compile NO_UI=1"
-        NO_UI=1
     else
         $ECHO "found."
     fi
@@ -230,25 +227,21 @@ check_library_exists() {
 }
 
 check_X11_libraries() {
-    if [ -z "$NO_UI" ]; then
-        check_library_exists GL
-        check_library_exists X11
-        check_library_exists pango-1.0
-    fi
+    check_library_exists GL
+    check_library_exists X11
+    check_library_exists pango-1.0
 }
 
 check_gtk_libraries() {
-    if [ -z "$NO_UI" ]; then
-        check_library_exists gobject-2.0
-        check_library_exists gtk-x11-2.0
-        check_library_exists gdk-x11-2.0
-        check_library_exists gdk_pixbuf-2.0
-        check_library_exists gtkglext-x11-1.0
-        check_library_exists atk-1.0
-        check_library_exists gio-2.0
-        check_library_exists gdkglext-x11-1.0
-        check_library_exists pango-1.0
-    fi
+    check_library_exists gobject-2.0
+    check_library_exists gtk-x11-2.0
+    check_library_exists gdk-x11-2.0
+    check_library_exists gdk_pixbuf-2.0
+    check_library_exists gtkglext-x11-1.0
+    check_library_exists atk-1.0
+    check_library_exists gio-2.0
+    check_library_exists gdkglext-x11-1.0
+    check_library_exists pango-1.0
 }
 
 
@@ -543,7 +536,7 @@ make_clean() {
 }
 
 make_factor() {
-    invoke_make CC=$CC CXX=$CXX NO_UI=$NO_UI $MAKE_TARGET -j5
+    invoke_make CC=$CC CXX=$CXX $MAKE_TARGET -j5
 }
 
 make_clean_factor() {
