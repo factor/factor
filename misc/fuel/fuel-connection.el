@@ -40,7 +40,7 @@
 
 (defun fuel-con--make-request (str cont &optional sender-buffer)
   (list :fuel-connection-request
-        (cons :id (random))
+        (cons :id (+ 10000 (random 89999)))
         (cons :string str)
         (cons :continuation cont)
         (cons :buffer (or sender-buffer (current-buffer)))))
