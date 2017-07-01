@@ -139,10 +139,12 @@ STRUCT: EVP_MD_CTX
     { flags ulong }
     { md_data void* } ;
 
-! Initialize ciphers and digest tables
+! ------------------------------------------------------------------------------
+! API < 1.1.0, removed in new versions
+! ------------------------------------------------------------------------------
 FUNCTION: void OpenSSL_add_all_ciphers (  )
-
 FUNCTION: void OpenSSL_add_all_digests (  )
+! ------------------------------------------------------------------------------
 
 ! Clean them up before exiting
 FUNCTION: void EVP_cleanup (  )
