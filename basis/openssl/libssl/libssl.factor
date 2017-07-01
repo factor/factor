@@ -319,7 +319,7 @@ STRUCT: ssl_method_st
     { ssl_ctx_callback_ctrl void* } ;
 TYPEDEF: ssl_method_st* ssl-method
 
-STRUCT: ssl_st
+STRUCT: SSL
     { version int }
     { type int }
     { method ssl_method_st* }
@@ -372,13 +372,30 @@ STRUCT: ssl_st
     { psk_client_callback void* }
     { psk_server_callback void* }
     { ctx SSL_CTX* } ;
-TYPEDEF: ssl_st SSL
 
-! Must be called before any other action takes place
+! ------------------------------------------------------------------------------
+! API >= 1.1.0
+! ------------------------------------------------------------------------------
+CONSTANT: OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS 0x00000001
+CONSTANT: OPENSSL_INIT_LOAD_CRYPTO_STRINGS    0x00000002
+CONSTANT: OPENSSL_INIT_NO_LOAD_SSL_STRINGS    0x00100000
+CONSTANT: OPENSSL_INIT_LOAD_SSL_STRINGS       0x00200000
+CONSTANT: OPENSSL_INIT_ADD_ALL_CIPHERS        0x00000004
+CONSTANT: OPENSSL_INIT_ADD_ALL_DIGESTS        0x00000008
+CONSTANT: OPENSSL_INIT_NO_ADD_ALL_CIPHERS     0x00000010
+CONSTANT: OPENSSL_INIT_NO_ADD_ALL_DIGESTS     0x00000020
+
+
+FUNCTION: int OPENSSL_init_ssl ( uint64_t opts, void *settings )
+! ------------------------------------------------------------------------------
+! API < 1.1.0, removed in new versions
+! ------------------------------------------------------------------------------
+! Initialization functions
 FUNCTION: int SSL_library_init (  )
 
 ! Maps OpenSSL errors to strings
 FUNCTION: void SSL_load_error_strings (  )
+! ------------------------------------------------------------------------------
 
 ! Sets the default SSL version
 FUNCTION: ssl-method SSLv2_client_method (  )
@@ -590,18 +607,22 @@ FUNCTION: void X509_free ( X509 *a )
 DESTRUCTOR: X509_free
 FUNCTION: X509* d2i_X509 ( X509** px, uchar** in, int len )
 FUNCTION: int i2d_X509 ( X509* x, uchar** out )
-! FUNCTION: X509* d2i_X509_bio ( BIO* bp, X509** x )
-! FUNCTION: X509* d2i_X509_fp ( FILE* fp, X509** x )
-! FUNCTION: int i2d_X509_bio ( BIO* bp, X509* x )
-! FUNCTION: int i2d_X509_fp ( FILE* fp, X509* x )
 FUNCTION: int i2d_re_X509_tbs ( X509* x, uchar** out )
 
 C-TYPE: X509_STORE
 FUNCTION: X509_STORE* X509_STORE_new ( )
 FUNCTION: int X509_STORE_add_cert ( X509_STORE* ctx, X509* x )
 
-! ===============================================
-! stack.h
-! ===============================================
+! ------------------------------------------------------------------------------
+! API >= 1.1.0
+! ------------------------------------------------------------------------------
+FUNCTION: int OPENSSL_sk_num ( _STACK *s )
+FUNCTION: void* OPENSSL_sk_value ( _STACK *s, int v )
+
+! ------------------------------------------------------------------------------
+! API < 1.1.0, removed in new versions
+! ------------------------------------------------------------------------------
 FUNCTION: int sk_num ( _STACK *s )
 FUNCTION: void* sk_value ( _STACK *s, int v )
+
+! ------------------------------------------------------------------------------
