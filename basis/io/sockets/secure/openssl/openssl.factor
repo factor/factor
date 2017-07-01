@@ -337,8 +337,16 @@ M: ssl-handle dispose*
 : issuer-name ( certificate -- issuer )
     X509_get_issuer_name x509name>string ;
 
+: sk-value ( stack v -- obj )
+    ssl-new-api? get-global [ OPENSSL_sk_value ] [ sk_value ] if ;
+
+: sk-num ( stack -- num )
+    ssl-new-api? get-global [ OPENSSL_sk_num ] [ sk_num ] if ;
+
 : name-stack>sequence ( name-stack -- seq )
-    dup sk_num <iota> [ sk_value GENERAL_NAME_st memory>struct ] with map ;
+    dup sk-num <iota> [
+        sk-value GENERAL_NAME_st memory>struct
+    ] with map ;
 
 : alternative-dns-names ( certificate -- dns-names )
     NID_subject_alt_name f f X509_get_ext_d2i

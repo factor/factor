@@ -1,5 +1,5 @@
-USING: destructors kernel math openssl openssl.libssl sequences
-tools.test ;
+USING: destructors kernel math namespaces openssl openssl.libssl
+sequences tools.test ;
 IN: openssl.libssl.tests
 
 maybe-init-ssl
@@ -37,18 +37,26 @@ maybe-init-ssl
 ] unit-test
 
 ! Test setting options
-{ 3 } [
+{ t } [
     [
         new-tls1-ctx tls-opts [ [ set-opt ] [ has-opt ] 2bi ] with map
         [ t = ] count
     ] with-destructors
+    ssl-new-api? get-global 0 3 ? =
 ] unit-test
 
 ! Initial state
-{ { "before/connect initialization" "read header" 1 f } } [
+{ t } [
+    [ new-tls1-ctx new-ssl SSL_state_string_long ] with-destructors
+    ssl-new-api? get-global
+    "before SSL initialization" "before/connect initialization" ? =
+] unit-test
+
+{
+    { "read header" 1 f }
+} [
     [
         new-tls1-ctx new-ssl {
-            SSL_state_string_long
             SSL_rstate_string_long
             SSL_want
             SSL_get_peer_certificate
