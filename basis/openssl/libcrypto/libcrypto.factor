@@ -140,10 +140,19 @@ STRUCT: EVP_MD_CTX
     { md_data void* } ;
 
 ! ------------------------------------------------------------------------------
+! API >= 1.1.0
+! ------------------------------------------------------------------------------
+FUNCTION: ulong OpenSSL_version_num ( )
+FUNCTION: EVP_MD_CTX* EVP_MD_CTX_new ( )
+FUNCTION: void EVP_MD_CTX_free ( EVP_MD_CTX* ctx )
+
+! ------------------------------------------------------------------------------
 ! API < 1.1.0, removed in new versions
 ! ------------------------------------------------------------------------------
 FUNCTION: void OpenSSL_add_all_ciphers (  )
 FUNCTION: void OpenSSL_add_all_digests (  )
+FUNCTION: EVP_MD_CTX* EVP_MD_CTX_create ( )
+FUNCTION: void EVP_MD_CTX_destroy ( EVP_MD_CTX* ctx )
 ! ------------------------------------------------------------------------------
 
 ! Clean them up before exiting
@@ -154,11 +163,6 @@ FUNCTION: EVP_MD* EVP_get_digestbyname ( c-string name )
 FUNCTION: void EVP_MD_CTX_init ( EVP_MD* ctx )
 
 FUNCTION: int EVP_MD_CTX_cleanup ( EVP_MD_CTX* ctx )
-
-FUNCTION: EVP_MD_CTX* EVP_MD_CTX_create ( )
-
-FUNCTION: void EVP_MD_CTX_destroy ( EVP_MD_CTX* ctx )
-
 FUNCTION: int EVP_MD_CTX_copy_ex ( EVP_MD_CTX* out, EVP_MD_CTX* in )
 
 FUNCTION: int EVP_DigestInit_ex ( EVP_MD_CTX* ctx, EVP_MD* type, ENGINE* impl )

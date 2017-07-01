@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010, 2016 Slava Pestov, Alexander Ilin
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data checksums
-checksums.common destructors kernel openssl openssl.libcrypto
-sequences ;
+USING: accessors alien.c-types alien.data checksums checksums.common
+destructors kernel namespaces openssl openssl.libcrypto sequences ;
 IN: checksums.openssl
 
 ERROR: unknown-digest name ;
@@ -21,12 +20,17 @@ C: <openssl-checksum> openssl-checksum
 
 TUPLE: evp-md-context < disposable handle ;
 
+: evp-md-ctx-new ( -- ctx )
+    ssl-new-api? get-global [ EVP_MD_CTX_new ] [ EVP_MD_CTX_create ] if ;
+
+: evp-md-ctx-free ( ctx -- )
+    ssl-new-api? get-global [ EVP_MD_CTX_free ] [ EVP_MD_CTX_destroy ] if ;
+
 : <evp-md-context> ( -- ctx )
-    evp-md-context new-disposable
-    EVP_MD_CTX_create >>handle ;
+    evp-md-context new-disposable evp-md-ctx-new >>handle ;
 
 M: evp-md-context dispose*
-    handle>> EVP_MD_CTX_destroy ;
+    handle>> evp-md-ctx-free ;
 
 : digest-named ( name -- md )
     dup EVP_get_digestbyname [ ] [ unknown-digest ] ?if ;
