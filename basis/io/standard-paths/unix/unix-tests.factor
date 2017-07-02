@@ -14,7 +14,7 @@ IN: io.standard-paths.unix.tests
     ! find-in-path uses the PATH environment variable which does
     ! not include this directory, so we do.
     "/sbin:" "PATH" os-env append "PATH" [
-        "ifconfig" find-in-path
-        { "/sbin/ifconfig" "/usr/bin/ifconfig" } member?
+        "ps" find-in-path
+        { "/sbin/ps" "/usr/bin/ps" } member?
     ] with-os-env
 ] unit-test
