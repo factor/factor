@@ -1,14 +1,25 @@
 USING: kernel math math.parser random io ;
 IN: numbers-game
 
-: read-number ( -- n ) readln string>number ;
+: printfl ( s -- )
+    print flush ;
+
+: writefl ( s -- )
+    write flush ;
+
+: read-number ( -- n )
+    readln string>number ;
 
 : guess-banner ( -- )
-    "I'm thinking of a number between 0 and 100." print ;
-: guess-prompt ( -- ) "Enter your guess: " write ;
-: too-high ( -- ) "Too high" print ;
-: too-low ( -- ) "Too low" print ;
-: correct ( -- ) "Correct - you win!" print ;
+    "I'm thinking of a number between 0 and 100." printfl ;
+
+: guess-prompt ( -- ) "Enter your guess: " writefl ;
+
+: too-high ( -- ) "Too high" printfl ;
+
+: too-low ( -- ) "Too low" printfl ;
+
+: correct ( -- ) "Correct - you win!" printfl ;
 
 : inexact-guess ( actual guess -- )
      < [ too-high ] [ too-low ] if ;
