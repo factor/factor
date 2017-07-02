@@ -10,11 +10,8 @@ IN: io.standard-paths.unix.tests
 ] unit-test
 
 { t } [
-    ! On Ubuntu, the path is ``/sbin/ifconfig``, however
-    ! find-in-path uses the PATH environment variable which does
-    ! not include this directory, so we do.
     "/sbin:" "PATH" os-env append "PATH" [
         "ps" find-in-path
-        { "/sbin/ps" "/usr/bin/ps" } member?
+        { "/bin/ps" "/sbin/ps" "/usr/bin/ps" } member?
     ] with-os-env
 ] unit-test
