@@ -41,7 +41,7 @@ SYMBOL: total
     ] assoc-map ;
 
 : canonicalize-specializer-3 ( specializer -- specializer' )
-    [ total get object <array> <enum> ] dip assoc-union! seq>> ;
+    [ total get object <array> <enumerated> ] dip assoc-union! seq>> ;
 
 : canonicalize-specializers ( methods -- methods' hooks )
     [

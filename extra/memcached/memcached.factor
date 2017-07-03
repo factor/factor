@@ -184,10 +184,10 @@ PRIVATE>
 
 : m/getseq ( keys -- vals )
     [ H{ } clone ] dip
-    [ <enum> [ m/getq ] assoc-each ]
+    [ <enumerated> [ m/getq ] assoc-each ]
     [ length 10 + NOOP <request> swap >>opaque send-request ]
     [
-        <enum> [
+        <enumerated> [
             assoc-size 10 + '[
                 _ read-header [ check-opaque ] keep swap
             ]

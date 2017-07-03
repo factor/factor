@@ -281,32 +281,32 @@ M: f assoc-like drop dup assoc-empty? [ drop f ] when ; inline
 
 INSTANCE: sequence assoc
 
-TUPLE: enum { seq read-only } ;
+TUPLE: enumerated { seq read-only } ;
 
-C: <enum> enum
+C: <enumerated> enumerated
 
-M: enum at*
+M: enumerated at*
     seq>> 2dup bounds-check?
     [ nth-unsafe t ] [ 2drop f f ] if ; inline
 
-M: enum set-at seq>> set-nth ; inline
+M: enumerated set-at seq>> set-nth ; inline
 
-M: enum delete-at seq>> remove-nth! drop ; inline
+M: enumerated delete-at seq>> remove-nth! drop ; inline
 
-M: enum >alist ( enum -- alist ) ; inline
+M: enumerated >alist ( enumerated -- alist ) ; inline
 
-M: enum keys seq>> length <iota> >array ; inline
+M: enumerated keys seq>> length <iota> >array ; inline
 
-M: enum values seq>> >array ; inline
+M: enumerated values seq>> >array ; inline
 
-M: enum assoc-size seq>> length ; inline
+M: enumerated assoc-size seq>> length ; inline
 
-M: enum clear-assoc seq>> delete-all ; inline
+M: enumerated clear-assoc seq>> delete-all ; inline
 
-INSTANCE: enum assoc
+INSTANCE: enumerated assoc
 
-M: enum length seq>> length ; inline
+M: enumerated length seq>> length ; inline
 
-M: enum nth-unsafe dupd seq>> nth-unsafe 2array ; inline
+M: enumerated nth-unsafe dupd seq>> nth-unsafe 2array ; inline
 
-INSTANCE: enum immutable-sequence
+INSTANCE: enumerated immutable-sequence

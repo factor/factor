@@ -43,7 +43,7 @@ TUPLE: huffman-code
     [ nip '[ _ swap _ set-at ] each ] 3bi ;
 
 :: reverse-table ( tdesc n -- rtable )
-   n f <array> <enum> :> table
+   n f <array> <enumerated> :> table
    tdesc [ n table update-reverse-table ] huffman-each
    table seq>> ;
 

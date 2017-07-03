@@ -40,7 +40,7 @@ SYMBOLS: return-addresses gc-maps ;
     [ emit-gc-roots ] ?{ } make underlying>> % ;
 
 : emit-base-table ( alist longest -- )
-    -1 <array> <enum> swap assoc-union! seq>> emit-uints ;
+    -1 <array> <enumerated> swap assoc-union! seq>> emit-uints ;
 
 : derived-root-offsets ( gc-map -- offsets )
     derived-roots>> [ [ gc-root-offset ] bi@ ] assoc-map ;

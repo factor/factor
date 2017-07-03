@@ -60,7 +60,7 @@ PRIVATE>
     [ fail f ] [ unsafe-amb ] if-empty ; inline
 
 MACRO: amb-execute ( seq -- quot )
-    [ length 1 - ] [ <enum> [ 1quotation ] assoc-map ] bi
+    [ length 1 - ] [ <enumerated> [ 1quotation ] assoc-map ] bi
     '[ _ 0 unsafe-number-from-to nip _ case ] ;
 
 : if-amb ( true false -- ? )

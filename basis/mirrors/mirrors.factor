@@ -59,5 +59,5 @@ GENERIC: make-mirror ( obj -- assoc )
 M: hashtable make-mirror ;
 M: hash-set make-mirror members make-mirror ;
 M: integer make-mirror drop f ;
-M: sequence make-mirror <enum> ;
+M: sequence make-mirror <enumerated> ;
 M: object make-mirror <mirror> ;

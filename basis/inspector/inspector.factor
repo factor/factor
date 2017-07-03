@@ -20,7 +20,7 @@ SYMBOL: +number-rows+
 
 GENERIC: add-numbers ( alist -- table' )
 
-M: enum add-numbers ;
+M: enumerated add-numbers ;
 
 M: assoc add-numbers
     +number-rows+ get [ [ prefix ] map-index ] when ;

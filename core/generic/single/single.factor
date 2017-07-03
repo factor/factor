@@ -157,7 +157,7 @@ GENERIC: compile-engine ( engine -- obj )
     [ over assumed [ compile-engine ] with-variable ] assoc-map ;
 
 : direct-dispatch-table ( assoc n -- table )
-    default get <array> <enum> swap assoc-union! seq>> ;
+    default get <array> <enumerated> swap assoc-union! seq>> ;
 
 : tag-number ( class -- n ) "type" word-prop ;
 
@@ -184,7 +184,7 @@ M: tuple-dispatch-engine compile-engine
     tuple assumed [
         echelons>> compile-engines
         dup keys supremum 1 + f <array>
-        <enum> swap assoc-union! seq>>
+        <enumerated> swap assoc-union! seq>>
     ] with-variable ;
 
 PREDICATE: predicate-engine-word < word "owner-generic" word-prop ;

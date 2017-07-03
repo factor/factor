@@ -13,5 +13,5 @@ IN: math.transforms.bwt
 
 : ibwt ( i newseq -- seq )
     [ length ]
-    [ <enum> sort-values '[ _ nth first2 ] ]
+    [ <enumerated> sort-values '[ _ nth first2 ] ]
     [ replicate-as ] tri nip ;
