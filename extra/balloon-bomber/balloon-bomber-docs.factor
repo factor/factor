@@ -11,9 +11,9 @@ HELP: run-balloon
 { $link { "balloon-bomber" "balloon-bomber" } } " for details."
 } ;
 
-ARTICLE: { "balloon-bomber" "balloon-bomber" } "Balloon Bomber Emulator"
+ARTICLE: "balloon-bomber" "Balloon Bomber Emulator"
 "Provides an emulation of the original 8080 Arcade Game 'Balloon Bomber'." $nl
-"More information on the arcade game can be obtained from " { $url "http://www.mamedb.com/game/ballbomb" } "." $nl
+"More information on the arcade game can be obtained from " { $url "https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Balloon_Bomber/11301" } "." $nl
 "To play the game you need the ROM files for the arcade game. They should "
 "be placed in a directory called 'ballbomb' in the location specified by "
 "the variable " { $link rom-root } ". The specific files needed are:"
@@ -37,3 +37,5 @@ ARTICLE: { "balloon-bomber" "balloon-bomber" } "Balloon Bomber Emulator"
 }
 "If you save the Factor image while a game is running, when you restart "
 "the image the game continues where it left off." ;
+
+ABOUT: "balloon-bomber"

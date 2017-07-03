@@ -1,8 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-! Balloon Bomber: http://www.mamedb.com/game/ballbomb
-!
+! Balloon Bomber: https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Balloon_Bomber/11301
 USING: kernel space-invaders ui ;
 IN: balloon-bomber
 

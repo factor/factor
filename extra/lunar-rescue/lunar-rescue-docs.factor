@@ -11,9 +11,9 @@ HELP: run-lunar
 { $link { "lunar-rescue" "lunar-rescue" } } " for details."
 } ;
 
-ARTICLE: { "lunar-rescue" "lunar-rescue" } "Lunar Rescue Emulator"
+ARTICLE: "lunar-rescue" "Lunar Rescue Emulator"
 "Provides an emulation of the original 8080 Arcade Game 'Lunar Rescue'." $nl
-"More information on the arcade game can be obtained from " { $url "http://www.mamedb.com/game/lrescue" } "." $nl
+"More information on the arcade game can be obtained from " { $url "https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Lunar_Rescue/14294" } "." $nl
 "To play the game you need the ROM files for the arcade game. They should "
 "be placed in a directory called " { $snippet "lrescue" } " in the location specified by "
 "the variable " { $link rom-root } ". The specific files needed are:"
@@ -38,3 +38,5 @@ ARTICLE: { "lunar-rescue" "lunar-rescue" } "Lunar Rescue Emulator"
 }
 "If you save the Factor image while a game is running, when you restart "
 "the image the game continues where it left off." ;
+
+ABOUT: "lunar-rescue"
