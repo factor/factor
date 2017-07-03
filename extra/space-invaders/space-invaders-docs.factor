@@ -8,12 +8,12 @@ HELP: run-invaders
 "Run the Space Invaders emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
 "location of the Space Invaders ROM files. See "
-{ $link { "space-invaders" "space-invaders" } } " for details."
+{ $link "space-invaders" } " for details."
 } ;
 
-ARTICLE: { "space-invaders" "space-invaders" } "Space Invaders Emulator"
+ARTICLE: "space-invaders" "Space Invaders Emulator"
 "Provides an emulation of the original 8080 Arcade Game 'Space Invaders'." $nl
-"More information on the arcade game can be obtained from " { $url "http://www.mamedb.com/game/invaders" } "." $nl
+"More information on the arcade game can be obtained from " { $url "http://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774" } "." $nl
 "To play the game you need the ROM files for the arcade game. They should "
 "be placed in a directory called 'invaders' in the location specified by "
 "the variable " { $link rom-root } ". The specific files needed are:"
@@ -37,4 +37,4 @@ ARTICLE: { "space-invaders" "space-invaders" } "Space Invaders Emulator"
 "If you save the Factor image while a game is running, when you restart "
 "the image the game continues where it left off." ;
 
-ABOUT: { "space-invaders" "space-invaders" }
+ABOUT: "space-invaders"
