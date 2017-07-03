@@ -5,7 +5,7 @@ literals locals make math math.bitwise multiline sequences
 slots.syntax ui.backend.windows vocabs.loader windows.errors
 windows.gdi32 windows.kernel32 windows.types windows.user32
 ui.gadgets.worlds ;
-IN: fullscreen
+IN: windows.fullscreen
 
 : hwnd>hmonitor ( HWND -- HMONITOR )
     MONITOR_DEFAULTTOPRIMARY MonitorFromWindow ;
