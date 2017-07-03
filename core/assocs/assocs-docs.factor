@@ -19,19 +19,19 @@ $nl
 ARTICLE: "enums" "Enumerations"
 "An enumeration provides a view of a sequence as an assoc mapping integer indices to elements:"
 { $subsections
-    enum
-    <enum>
+    enumerated
+    <enumerated>
 }
 "Inverting a permutation using enumerations:"
-{ $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enum> sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
+{ $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enumerated> sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
 
-HELP: enum
+HELP: enumerated
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
 $nl
 "Enumerations are mutable; note that deleting a key calls " { $link remove-nth! } ", which results in all subsequent elements being shifted down." } ;
 
-HELP: <enum>
-{ $values { "seq" sequence } { "enum" enum } }
+HELP: <enumerated>
+{ $values { "seq" sequence } { "enumerated" enumerated } }
 { $description "Creates a new enumeration." } ;
 
 ARTICLE: "assocs-protocol" "Associative mapping protocol"

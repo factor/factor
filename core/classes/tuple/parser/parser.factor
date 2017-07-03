@@ -103,7 +103,7 @@ M: tuple-class boa>object
     over [ slot-named* ] dip check-slot-exists drop ;
 
 : assoc>object ( class slots values -- tuple )
-    [ [ [ initial>> ] map <enum> ] keep ] dip
+    [ [ [ initial>> ] map <enumerated> ] keep ] dip
     swap [ [ slot-named-checked ] curry dip ] curry assoc-map
     assoc-union! seq>> boa>object ;
 

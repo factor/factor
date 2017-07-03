@@ -129,7 +129,7 @@ PRIVATE>
     swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
-    <enum> sort-values keys ;
+    <enumerated> sort-values keys ;
 
 <PRIVATE
 

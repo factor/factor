@@ -152,7 +152,7 @@ MACRO: interpolate-xml ( xml -- quot )
     [ [ var>> , ] each-interpolated ] { } make ;
 
 : nenum ( ... n -- assoc )
-    narray <enum> ; inline
+    narray <enumerated> ; inline
 
 : collect ( accum variables -- accum ? )
     {

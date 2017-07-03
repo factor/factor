@@ -26,7 +26,7 @@ ERROR: bad-zlib-header ;
 CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 : get-table ( values size -- table )
-    16 f <array> <enum>
+    16 f <array> <enumerated>
     [ '[ _ push-at ] 2each ] keep
     seq>> rest-slice [ natural-sort ] map ; inline
 
