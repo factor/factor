@@ -16,7 +16,7 @@ HELP: find-so
 { $values { "namespec" "library name" } { "so-name/f" { $maybe string } } }
 { $description "Looks up the library named 'namespec' from the system cache." } ;
 
-ARTICLE: "ldcache" "ldcache"
+ARTICLE: "ldcache" "LD Cache"
 "Vocab for interfacing with the '/etc/ld.so.cache' Unix file." ;
 
 ABOUT: "ldcache"
