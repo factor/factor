@@ -119,6 +119,7 @@ ERROR: unsupported-endian-type endian slot ;
         first2 [ slot>endian-slot ] dip 2array
     ] [
         {
+            { [ dup bool = ] [ 2drop bool ] }
             { [ dup char = ] [ 2drop char ] }
             { [ dup uchar = ] [ 2drop uchar ] }
             { [ dup c:short = ] [ { le16 be16 } endian-slot ] }
@@ -128,6 +129,7 @@ ERROR: unsupported-endian-type endian slot ;
             { [ dup longlong = ] [ { le64 be64 } endian-slot ] }
             { [ dup ulonglong = ] [ { ule64 ube64 } endian-slot ] }
             { [ dup endian-c-type? ] [ nip ] }
+            { [ dup pointer? ] [ nip ] }
             [ unsupported-endian-type ]
         } cond
     ] if ;
