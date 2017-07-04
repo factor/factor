@@ -37,7 +37,6 @@ TUPLE: label-fixup-state { label label } { class integer } { offset integer } ;
     [ [ compute-relative-label ] map concat ]
     bi* ;
 
-! Binary literals
 SYMBOL: binary-literal-table
 
 : add-binary-literal ( obj -- label )

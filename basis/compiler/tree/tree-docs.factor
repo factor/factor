@@ -33,7 +33,11 @@ HELP: #call-recursive
 { $see-also #recursive } ;
 
 HELP: #declare
-{ $class-description "SSA tree node emitted when " { $link declare } " declarations are encountered." } ;
+{ $class-description "SSA tree node emitted when " { $link declare } " declarations are encountered. It has the following slots:"
+  { $table
+    { { $slot "declaration" } { { $link assoc } " that maps values to the types they are declared as." } }
+  }
+} ;
 
 HELP: #enter-recursive
 { $class-description "This node works is placed first in the 'child' " { $link sequence } " for " { $link #recursive } " nodes and works like a header for it." }
@@ -99,6 +103,21 @@ ARTICLE: "compiler.tree" "High-level optimizer operating on lexical tree SSA IR"
   #enter-recursive
   #recursive
   #return-recursive
+  #terminate
+}
+"Nodes for alien ffi:"
+{ $subsections
+  #alien-node
+  #alien-invoke
+  #alien-indirect
+  #alien-assembly
+  #alien-callback
+}
+"Nodes for branching:"
+{ $subsections
+  #dispatch
+  #if
+  #phi
 } ;
 
 ABOUT: "compiler.tree"

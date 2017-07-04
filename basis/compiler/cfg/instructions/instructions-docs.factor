@@ -62,6 +62,10 @@ HELP: ##allot
   }
 } ;
 
+HELP: ##bit-count
+{ $class-description "Specialized instruction for counting the number of lit bits in an integer." }
+{ $see-also %bit-count } ;
+
 HELP: ##box
 { $class-description
   "This instruction boxes a value into a tagged pointer."
@@ -521,6 +525,7 @@ $nl
 { $subsections
   ##add-vector
   ##add-sub-vector
+  ##bit-count
   ##compare-float-ordered-branch
   ##div-vector
   ##horizontal-add-vector
