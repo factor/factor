@@ -8,7 +8,7 @@ HELP: run-lunar
 "Run the Lunar Rescue emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
 "location of the Lunar Rescue ROM files. See "
-{ $link { "lunar-rescue" "lunar-rescue" } } " for details."
+{ $link "lunar-rescue" } " for details."
 } ;
 
 ARTICLE: "lunar-rescue" "Lunar Rescue Emulator"
