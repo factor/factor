@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors irc.messages irc.messages.base kernel make
-combinators ;
-EXCLUDE: sequences => join ;
+combinators sequences ;
 IN: irc.logbot.log-line
 
 : dot-or-parens ( string -- string )
@@ -24,7 +23,7 @@ M: privmsg >log-line
 : prefix% ( string -- )
     " [" % % "]" % ;
 
-M: join >log-line
+M: irc.messages:join >log-line
     [
         [ "* " % sender>> % ]
         [ prefix>> prefix% " has joined the channel." % ] bi
