@@ -158,6 +158,7 @@
     ($tag . fuel-markup--tag)
     ($tags . fuel-markup--tags)
     ($unchecked-example . fuel-markup--example)
+    ($url . fuel-markup--url)
     ($value . fuel-markup--value)
     ($values . fuel-markup--values)
     ($values-x/y . fuel-markup--values-x/y)
@@ -276,6 +277,20 @@
   (when (stringp (cadr e))
     (fuel-markup--put-face (cadr e) 'fuel-font-lock-markup-strong)
     (insert (cadr e))))
+
+(define-button-type 'fuel-markup--url
+  'action 'fuel-markup--follow-url
+  'face 'fuel-font-lock-markup-link
+  'follow-link nil)
+
+(defun fuel-markup--follow-url (button)
+  (browse-url (button-get button 'markup-link)))
+
+(defun fuel-markup--url (e)
+  (let ((url (cadr e)))
+    (insert-text-button url
+                        :type 'fuel-markup--url
+                        'markup-link url)))
 
 (defun fuel-markup--snippet (e)
   (insert (mapconcat #'(lambda (s)
