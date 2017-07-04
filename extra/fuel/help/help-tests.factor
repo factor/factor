@@ -28,3 +28,9 @@ IN: fuel.help.tests
     "io" vocab-help-article?
     "help.lint" vocab-help-article?
 ] unit-test
+
+{
+    { "handbook" "io.servers" }
+} [
+    "server-config" article-parents
+] unit-test

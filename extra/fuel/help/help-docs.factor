@@ -1,5 +1,9 @@
-USING: fuel.help.private help.markup help.syntax strings ;
+USING: fuel.help.private help.markup help.syntax sequences strings ;
 IN: fuel.help
+
+HELP: article-parents
+{ $values { "article-name" string } {  "parents" sequence } }
+{ $description "All the parent articles for the article and ensures that the ancestor always is 'handbook'." } ;
 
 HELP:  get-article
 { $values { "name" string } { "str" string } }

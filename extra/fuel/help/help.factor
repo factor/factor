@@ -12,14 +12,22 @@ SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
 : common-crumbs ( -- crumbs )
     { "handbook" "vocab-index" } [ dup article-title \ article 3array ] map ;
 
-: vocab-own-crumbs ( vocab -- crumbs )
+: vocab-own-crumbs ( vocab-name -- crumbs )
     "." split unclip [
         [ CHAR: . suffix ] dip append
     ] accumulate swap suffix
     [ dup "." split last \ vocab 3array ] map ;
 
-: vocab-crumbs ( vocab -- crumbs )
+: vocab-crumbs ( vocab-name -- crumbs )
     vocab-own-crumbs common-crumbs prepend ;
+
+: article-parents ( article-name -- parents )
+    [ article-parent ] follow
+    dup last "handbook" = [ "handbook" suffix ] unless
+    reverse but-last ;
+
+: article-crumbs ( article-name -- crumbs )
+    article-parents [ dup article-title \ article 3array ] map ;
 
 <PRIVATE
 
@@ -134,8 +142,16 @@ PRIVATE>
 : format-index ( seq -- seq )
     [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
 
+: article-element ( name -- element )
+    \ article swap dup lookup-article
+    [ nip title>> ]
+    [
+        [ article-crumbs \ $fuel-nav-crumbs prefix ] [ content>> ] bi*
+        \ $nl prefix swap prefix
+    ] 2bi 3array ;
+
 : vocab-help-article?  ( name -- ? )
     dup lookup-vocab [ help>> = ] [ drop f ] if* ;
 
 : get-article ( name -- str )
-    dup vocab-help-article? [ vocab-help ] [ lookup-article ] if ;
+    dup vocab-help-article? [ vocab-help ] [ article-element ] if ;
