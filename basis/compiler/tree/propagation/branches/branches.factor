@@ -8,7 +8,6 @@ namespaces sequences stack-checker.branches ;
 FROM: sets => union ;
 IN: compiler.tree.propagation.branches
 
-! For conditionals, an assoc of child node # --> constraint
 GENERIC: child-constraints ( node -- seq )
 
 M: #if child-constraints

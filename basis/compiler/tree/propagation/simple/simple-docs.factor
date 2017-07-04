@@ -1,5 +1,6 @@
-USING: compiler.tree compiler.tree.propagation.info help.markup
-help.syntax quotations sequences words ;
+USING: classes compiler.tree compiler.tree.propagation.info
+help.markup help.syntax quotations sequences
+stack-checker.dependencies words ;
 IN: compiler.tree.propagation.simple
 
 HELP: call-outputs-quot
@@ -15,8 +16,7 @@ HELP: propagate-predicate
 { $values { "#call" #call } { "word" word } { "infos" sequence } }
 { $description "We need to force the caller word to recompile when the class is redefined, since now we're making assumptions but the class definition itself." } ;
 
-ARTICLE: "compiler.tree.propagation.simple"
-"Propagation for straight-line code"
+ARTICLE: "compiler.tree.propagation.simple" "Propagation for straight-line code"
 "Propagation for straight-line code" ;
 
 ABOUT: "compiler.tree.propagation.simple"

@@ -1,4 +1,4 @@
-USING: assocs help.markup help.syntax sequences words ;
+USING: assocs help.markup help.syntax kernel sequences words ;
 IN: compiler.crossref
 
 HELP: compiled-crossref
@@ -7,6 +7,10 @@ HELP: compiled-crossref
 HELP: delete-compiled-xref
 { $values { "word" word } }
 { $description "Deletes cross-referencing data for a word. Used when the optimizing compiler forgets a word." } ;
+
+HELP: dependencies-satisfied?
+{ $values { "word" word } { "cache" assoc } { "?" boolean } }
+{ $description "Checks if all the words dependencies are satisfied or not." } ;
 
 HELP: load-dependencies
 { $values { "word" word } { "seq" sequence } }
@@ -19,3 +23,8 @@ HELP: remove-xref
 HELP: store-dependencies
 { $values { "word" word } { "assoc" assoc } }
 { $description "Stores the dependencies in 'assoc' in the word attribute \"dependencies\"." } ;
+
+ARTICLE: "compiler.crossref"  "Crossreferencing word dependencies."
+"A vocab that keeps track on how words depends on each other and their dependence types." ;o
+
+ABOUT: "compiler.crossref"

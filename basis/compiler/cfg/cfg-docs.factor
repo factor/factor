@@ -78,3 +78,10 @@ HELP: cfg-changed
 HELP: spill-offset
 { $values { "n" integer } { "offset" integer } }
 { $description "Offset in the current " { $link stack-frame } " to byte at index 'n' in the spill area." } ;
+
+ARTICLE: "compiler.cfg" "Control Flow Graph IR"
+"The compiler.cfg vocab and subvocabs implements the part of the optimizing compiler that analyzes code in the CFG format. The vocab " { $vocab-link "compiler.cfg.builder" } " defines words for building the CFG from SSA IR and the rest of the vocabs in the hierarchy optimization steps that are then applied to it. The graph is then passed to the " { $vocab-link "compiler.codegen" } " vocab which emits machine code."
+$nl
+"The main datatype in the vocab is the " { $link cfg } " tuple. It represents the CFG of a Factor word. The cfg tuple has a slot 'entry' pointing to a " { $link basic-block } ". This block in turn points to other basic blocks, and together they form the call flow graph of the word." ;
+
+ABOUT: "compiler.cfg"
