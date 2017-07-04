@@ -3,9 +3,23 @@
 USING: accessors arrays assocs combinators combinators.short-circuit
 fry help help.crossref help.markup help.markup.private help.topics
 help.vocabs io io.streams.string kernel make namespaces parser
-prettyprint see sequences summary vocabs vocabs.hierarchy
+prettyprint see sequences splitting summary vocabs vocabs.hierarchy
 vocabs.metadata vocabs.parser words ;
 IN: fuel.help
+
+SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
+
+: common-crumbs ( -- crumbs )
+    { "handbook" "vocab-index" } [ dup article-title \ article 3array ] map ;
+
+: vocab-own-crumbs ( vocab -- crumbs )
+    "." split unclip [
+        [ CHAR: . suffix ] dip append
+    ] accumulate swap suffix
+    [ dup "." split last \ vocab 3array ] map ;
+
+: vocab-crumbs ( vocab -- crumbs )
+    vocab-own-crumbs common-crumbs prepend ;
 
 <PRIVATE
 
@@ -26,8 +40,6 @@ IN: fuel.help
 : parent-topics ( word -- seq )
     help-path [ dup article-title swap 2array ] map ; inline
 
-SYMBOLS: $doc-path $next-link $prev-link ;
-
 : next/prev-link ( link link-symbol -- 3arr )
     swap [ name>> ] [ [ link-long-text ] with-string-writer ] bi 3array ;
 
@@ -35,7 +47,7 @@ SYMBOLS: $doc-path $next-link $prev-link ;
     \ article swap dup article-title swap
     [
         {
-            [ \ $vocabulary swap vocabulary>> 2array , ]
+            [ vocabulary>> vocab-crumbs \ $fuel-nav-crumbs prefix , ]
             [
                 >link
                 [ prev-article [ \ $prev-link next/prev-link , ] when* ]
@@ -82,6 +94,7 @@ SYMBOL: describe-words
     dup require \ article swap dup >vocab-link
     [
         {
+            [ name>> vocab-crumbs but-last \ $fuel-nav-crumbs prefix , ]
             [ vocab-authors [ \ $authors prefix , ] when* ]
             [ vocab-tags [ \ $tags prefix , ] when* ]
             [ summary [ { $heading "Summary" } swap 2array , ] when* ]
@@ -120,3 +133,9 @@ PRIVATE>
 
 : format-index ( seq -- seq )
     [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
+
+: vocab-help-article?  ( name -- ? )
+    dup lookup-vocab [ help>> = ] [ drop f ] if* ;
+
+: get-article ( name -- str )
+    dup vocab-help-article? [ vocab-help ] [ lookup-article ] if ;
