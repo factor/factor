@@ -9,7 +9,7 @@ specialized-arrays ui ui.gadgets ui.gestures ui.render ;
 QUALIFIED: threads
 QUALIFIED: system
 SPECIALIZED-ARRAY: uchar
-IN: space-invaders
+IN: roms.space-invaders
 
 TUPLE: space-invaders < cpu
     port1 port2i port2o port3o port4lo port4hi port5o
@@ -55,16 +55,16 @@ CONSTANT: SOUND-UFO-HIT      8
 : init-sounds ( cpu -- )
     init-openal {
         [ 9 gen-sources swap sounds<< ]
-        [ SOUND-SHOT "vocab:space-invaders/resources/Shot.wav" init-sound ]
-        [ SOUND-UFO "vocab:space-invaders/resources/Ufo.wav" init-sound ]
+        [ SOUND-SHOT "vocab:roms/space-invaders/resources/Shot.wav" init-sound ]
+        [ SOUND-UFO "vocab:roms/space-invaders/resources/Ufo.wav" init-sound ]
         [ sounds>> SOUND-UFO swap nth AL_LOOPING AL_TRUE set-source-param ]
-        [ SOUND-BASE-HIT "vocab:space-invaders/resources/BaseHit.wav" init-sound ]
-        [ SOUND-INVADER-HIT "vocab:space-invaders/resources/InvHit.Wav" init-sound ]
-        [ SOUND-WALK1 "vocab:space-invaders/resources/Walk1.wav" init-sound ]
-        [ SOUND-WALK2 "vocab:space-invaders/resources/Walk2.wav" init-sound ]
-        [ SOUND-WALK3 "vocab:space-invaders/resources/Walk3.wav" init-sound ]
-        [ SOUND-WALK4 "vocab:space-invaders/resources/Walk4.wav" init-sound ]
-        [ SOUND-UFO-HIT "vocab:space-invaders/resources/UfoHit.wav" init-sound ]
+        [ SOUND-BASE-HIT "vocab:roms/space-invaders/resources/BaseHit.wav" init-sound ]
+        [ SOUND-INVADER-HIT "vocab:roms/space-invaders/resources/InvHit.Wav" init-sound ]
+        [ SOUND-WALK1 "vocab:roms/space-invaders/resources/Walk1.wav" init-sound ]
+        [ SOUND-WALK2 "vocab:roms/space-invaders/resources/Walk2.wav" init-sound ]
+        [ SOUND-WALK3 "vocab:roms/space-invaders/resources/Walk3.wav" init-sound ]
+        [ SOUND-WALK4 "vocab:roms/space-invaders/resources/Walk4.wav" init-sound ]
+        [ SOUND-UFO-HIT "vocab:roms/space-invaders/resources/UfoHit.wav" init-sound ]
         [ f swap looping?<< ]
     } cleave ;
 

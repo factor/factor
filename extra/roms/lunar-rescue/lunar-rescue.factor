@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Lunar Rescue: https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Lunar_Rescue/14294
-USING: kernel space-invaders ui ;
-IN: lunar-rescue
+USING: kernel roms.space-invaders ui ;
+IN: roms.lunar-rescue
 
 TUPLE: lunar-rescue < space-invaders ;
 

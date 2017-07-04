@@ -1,30 +1,31 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup cpu.8080.emulator ;
-IN: space-invaders
+IN: roms.balloon-bomber
 
-HELP: run-invaders
+HELP: run-balloon
 { $description
-"Run the Space Invaders emulator in a new window." $nl
+"Run the Balloon Bomber emulator in a new window." $nl
 { $link rom-root } " must be set to the directory containing the "
-"location of the Space Invaders ROM files. See "
-{ $link "space-invaders" } " for details."
+"location of the Balloon Bomber ROM files. See "
+{ $link "balloon-bomber" } " for details."
 } ;
 
-ARTICLE: "space-invaders" "Space Invaders Emulator"
-"Provides an emulation of the original 8080 Arcade Game 'Space Invaders'." $nl
-"More information on the arcade game can be obtained from " { $url "http://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774" } "." $nl
+ARTICLE: "balloon-bomber" "Balloon Bomber Emulator"
+"Provides an emulation of the original 8080 Arcade Game 'Balloon Bomber'." $nl
+"More information on the arcade game can be obtained from " { $url "https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Balloon_Bomber/11301" } "." $nl
 "To play the game you need the ROM files for the arcade game. They should "
-"be placed in a directory called 'invaders' in the location specified by "
+"be placed in a directory called 'ballbomb' in the location specified by "
 "the variable " { $link rom-root } ". The specific files needed are:"
 { $list
-  "invaders/invaders.e"
-  "invaders/invaders.f"
-  "invaders/invaders.g"
-  "invaders/invaders.h"
+  "ballbomb/tn01"
+  "ballbomb/tn02"
+  "ballbomb/tn03"
+  "ballbomb/tn04"
+  "ballbomb/tn05-1"
 }
 "These are the same ROM files as used by MAME. To run the game use the "
-{ $link run-invaders } " word." $nl
+{ $link run-balloon } " word." $nl
 "Keys:"
 { $table
   { "Backspace" "Insert Coin" }
@@ -37,4 +38,4 @@ ARTICLE: "space-invaders" "Space Invaders Emulator"
 "If you save the Factor image while a game is running, when you restart "
 "the image the game continues where it left off." ;
 
-ABOUT: "space-invaders"
+ABOUT: "balloon-bomber"
