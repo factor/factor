@@ -31,9 +31,6 @@ MEMO: vocab-file-contents ( vocab name -- seq )
 : vocab-resources ( vocab -- patterns )
     dup vocab-resources-path vocab-file-contents ;
 
-: set-vocab-resources ( patterns vocab -- )
-    dup vocab-resources-path set-vocab-file-contents ;
-
 : vocab-summary-path ( vocab -- string )
     vocab-dir "summary.txt" append-path ;
 
@@ -55,34 +52,17 @@ M: vocab summary
 
 M: vocab-link summary vocab-summary ;
 
-: set-vocab-summary ( string vocab -- )
-    [ 1array ] dip
-    dup vocab-summary-path
-    set-vocab-file-contents ;
-
 : vocab-tags-path ( vocab -- string )
     vocab-dir "tags.txt" append-path ;
 
 : vocab-tags ( vocab -- tags )
     dup vocab-tags-path vocab-file-contents ;
 
-: set-vocab-tags ( tags vocab -- )
-    dup vocab-tags-path set-vocab-file-contents ;
-
-: add-vocab-tags ( tags vocab -- )
-    [ vocab-tags append members ] keep set-vocab-tags ;
-
-: remove-vocab-tags ( tags vocab -- )
-    [ vocab-tags swap diff ] keep set-vocab-tags ;
-
 : vocab-authors-path ( vocab -- string )
     vocab-dir "authors.txt" append-path ;
 
 : vocab-authors ( vocab -- authors )
     dup vocab-authors-path vocab-file-contents ;
-
-: set-vocab-authors ( authors vocab -- )
-    dup vocab-authors-path set-vocab-file-contents ;
 
 : vocab-platforms-path ( vocab -- string )
     vocab-dir "platforms.txt" append-path ;
@@ -93,10 +73,6 @@ ERROR: bad-platform name ;
     dup vocab-platforms-path vocab-file-contents
     [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
 
-: set-vocab-platforms ( platforms vocab -- )
-    [ [ name>> ] map ] dip
-    dup vocab-platforms-path set-vocab-file-contents ;
-
 : supported-platform? ( platforms -- ? )
     [ t ] [ [ os swap class<= ] any? ] if-empty ;
 
@@ -105,9 +81,6 @@ ERROR: bad-platform name ;
         [ vocab-tags "not loaded" swap member? ]
         [ vocab-platforms supported-platform? not ]
     } 1|| ;
-
-: filter-don't-load ( vocabs -- vocabs' )
-    [ vocab-name don't-load? ] reject ;
 
 : don't-test? ( vocab -- ? )
     vocab-tags "not tested" swap member? ;
