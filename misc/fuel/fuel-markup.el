@@ -106,7 +106,7 @@
     ($author . fuel-markup--author)
     ($authors . fuel-markup--authors)
     ($class-description . fuel-markup--class-description)
-    ($code . fuel-markup--code)
+    ($code . (lambda (e) (fuel-markup--code e t)))
     ($command . fuel-markup--command)
     ($command-map . fuel-markup--null)
     ($complex-shuffle . fuel-markup--complex-shuffle)
@@ -118,7 +118,7 @@
     ($emphasis . fuel-markup--emphasis)
     ($error-description . fuel-markup--error-description)
     ($errors . fuel-markup--errors)
-    ($example . fuel-markup--example)
+    ($example . (lambda (e) (fuel-markup--code e t)))
     ($examples . fuel-markup--examples)
     ($fuel-nav-crumbs . fuel-markup--nav-crumbs)
     ($heading . fuel-markup--heading)
@@ -160,7 +160,7 @@
     ($table . fuel-markup--table)
     ($tag . fuel-markup--tag)
     ($tags . fuel-markup--tags)
-    ($unchecked-example . fuel-markup--example)
+    ($unchecked-example . (lambda (e) (fuel-markup--code e t)))
     ($url . fuel-markup--url)
     ($value . fuel-markup--value)
     ($values . fuel-markup--values)
@@ -303,10 +303,11 @@
                      (cdr e)
                      " ")))
 
-(defun fuel-markup--code (e)
+(defun fuel-markup--code (e indent)
   (fuel-markup--insert-nl-if-nb)
   (newline)
   (dolist (snip (cdr e))
+    (when indent (insert "    "))
     (if (stringp snip)
         (insert (factor-font-lock-string snip))
       (fuel-markup--print snip))
@@ -319,13 +320,6 @@
 (defun fuel-markup--syntax (e)
   (fuel-markup--insert-heading "Syntax")
   (fuel-markup--print (cons '$code (cdr e)))
-  (newline))
-
-(defun fuel-markup--example (e)
-  (fuel-markup--insert-newline)
-  (dolist (s (cdr e))
-    (fuel-markup--snippet (list '$snippet s))
-    (newline))
   (newline))
 
 (defun fuel-markup--markup-example (e)
@@ -563,11 +557,11 @@ the 'words.' word emits."
 
 (defun fuel-markup--definition (e)
   (fuel-markup--insert-heading "Definition")
-  (fuel-markup--code (cons '$code (cdr e))))
+  (fuel-markup--code (cons '$code (cdr e)) nil))
 
 (defun fuel-markup--methods (e)
   (fuel-markup--insert-heading "Methods")
-  (fuel-markup--code (cons '$code (cdr e))))
+  (fuel-markup--code (cons '$code (cdr e)) nil))
 
 (defun fuel-markup--value (e)
   (fuel-markup--insert-heading "Variable value")
@@ -675,7 +669,7 @@ the 'words.' word emits."
          (res (and (not (fuel-eval--retort-error ret))
                    (fuel-eval--retort-output ret))))
     (if res
-        (fuel-markup--code (list '$code res))
+        (fuel-markup--code (list '$code res) nil)
       (fuel-markup--snippet (list '$snippet " " word)))))
 
 (defun fuel-markup--see (e)
