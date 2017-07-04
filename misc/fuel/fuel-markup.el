@@ -110,7 +110,6 @@
     ($contract . fuel-markup--contract)
     ($curious . fuel-markup--curious)
     ($definition . fuel-markup--definition)
-    ($describe-vocab . fuel-markup--describe-vocab)
     ($description . fuel-markup--description)
     ($doc-path . fuel-markup--doc-path)
     ($emphasis . fuel-markup--emphasis)
@@ -163,6 +162,7 @@
     ($values . fuel-markup--values)
     ($values-x/y . fuel-markup--values-x/y)
     ($var-description . fuel-markup--var-description)
+    ($vocab . fuel-markup--vocab)
     ($vocab-link . fuel-markup--vocab-link)
     ($vocab-links . fuel-markup--vocab-links)
     ($vocab-subsection . fuel-markup--vocab-subsection)
@@ -380,7 +380,7 @@
                       (cdr e))))
     (fuel-markup--table (cons '$table rows))))
 
-(defun fuel-markup--describe-vocab (e)
+(defun fuel-markup--vocab (e)
   (fuel-markup--insert-nl-if-nb)
   (let* ((cmd `(:fuel* ((,(cadr e) fuel-vocab-help)) "fuel" t))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
@@ -435,6 +435,8 @@
     (reverse elems)))
 
 (defun fuel-markup--parse-words-desc (desc)
+  "This function parses the text descripiton of the vocab that
+the 'words.' word emits."
   (with-temp-buffer
     (insert desc)
     (goto-char (point-min))
