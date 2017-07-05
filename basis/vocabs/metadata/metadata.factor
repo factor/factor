@@ -85,9 +85,6 @@ ERROR: bad-platform name ;
 : don't-test? ( vocab -- ? )
     vocab-tags "not tested" swap member? ;
 
-: filter-don't-test ( vocabs -- vocabs' )
-    [ don't-test? ] reject ;
-
 TUPLE: unsupported-platform vocab requires ;
 
 : throw-unsupported-platform ( vocab requires -- )
