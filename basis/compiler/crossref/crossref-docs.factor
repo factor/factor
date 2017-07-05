@@ -25,6 +25,6 @@ HELP: store-dependencies
 { $description "Stores the dependencies in 'assoc' in the word attribute \"dependencies\"." } ;
 
 ARTICLE: "compiler.crossref"  "Crossreferencing word dependencies."
-"A vocab that keeps track on how words depends on each other and their dependence types." ;o
+"A vocab that keeps track on how words depends on each other and their dependence types." ;
 
 ABOUT: "compiler.crossref"
