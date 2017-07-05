@@ -742,14 +742,25 @@ With prefix, non-existing files will be created."
     (modify-syntax-entry ?\] ")[" table)
     table))
 
+(defun factor-setup-buffer-font-lock ()
+  (setq-local comment-start "! ")
+  (setq-local comment-end "")
+  (setq-local comment-column factor-comment-column)
+  (setq-local comment-start-skip "!+ *")
+  (setq-local parse-sexp-ignore-comments t)
+  (setq-local parse-sexp-lookup-properties t)
+  (setq-local font-lock-defaults '(factor-font-lock-keywords))
+  ;; Some syntactic constructs are often split over multiple lines so
+  ;; we need to setup multiline font-lock.
+  (setq-local font-lock-multiline t)
+  (add-hook 'font-lock-extend-region-functions 'factor-font-lock-extend-region)
+  (setq-local syntax-propertize-function 'factor-syntax-propertize))
+
 (defun factor-font-lock-string (str)
   "Fontify STR as if it was Factor code."
   (with-temp-buffer
     (set-syntax-table factor-mode-syntax-table)
-    (setq-local parse-sexp-ignore-comments t)
-    (setq-local parse-sexp-lookup-properties t)
-    (setq-local font-lock-defaults '(factor-font-lock-keywords nil nil nil nil))
-
+    (factor-setup-buffer-font-lock)
     (insert str)
     (let ((font-lock-verbose nil))
       (font-lock-fontify-buffer))
@@ -765,20 +776,7 @@ With prefix, non-existing files will be created."
 (define-derived-mode factor-mode prog-mode "Factor"
   "A mode for editing programs written in the Factor programming language.
 \\{factor-mode-map}"
-
-  (setq-local comment-start "! ")
-  (setq-local comment-end "")
-  (setq-local comment-column factor-comment-column)
-  (setq-local comment-start-skip "!+ *")
-  (setq-local parse-sexp-ignore-comments t)
-  (setq-local parse-sexp-lookup-properties t)
-  (setq-local font-lock-defaults '(factor-font-lock-keywords))
-  ;; Some syntactic constructs are often split over multiple lines so
-  ;; we need to setup multiline font-lock.
-  (setq-local font-lock-multiline t)
-  (add-hook 'font-lock-extend-region-functions 'factor-font-lock-extend-region)
-  (setq-local syntax-propertize-function 'factor-syntax-propertize)
-
+  (factor-setup-buffer-font-lock)
   (define-key factor-mode-map [remap ff-get-other-file]
     'factor-visit-other-file)
 
