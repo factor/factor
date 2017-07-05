@@ -93,3 +93,8 @@ TUPLE: tuple2 d ;
     { { 3 { 2 4 } } { 1 { 2 0 0 0 } } { 0 { 1 } } { 1 { 1 } } }
     { length-test<=> <=> } sort-values-by
 ] unit-test
+
+{ { { "apples" 1 } { "bananas" 2 } { "cherries" 3 } } } [
+    H{ { "apples" 1 } { "bananas" 2 } { "cherries" 3 } }
+    { { sequences:length <=> } } sort-keys-by
+] unit-test
