@@ -266,7 +266,8 @@ the vocabulary name."
   (setq-local comint-use-prompt-regexp nil)
   (setq-local comint-prompt-read-only fuel-listener-prompt-read-only-p)
   (fuel-listener--setup-completion)
-  (fuel-listener--setup-stack-mode))
+  (fuel-listener--setup-stack-mode)
+  (set-syntax-table (fuel-syntax-table)))
 
 (define-key fuel-listener-mode-map "\C-a" 'fuel-listener--bol)
 
