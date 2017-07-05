@@ -80,7 +80,44 @@
       (save-buffer buffer))
     (cons file buffer)))
 
-
+;; I think it is correct to put almost all punctuation characters in
+;; the word class because Factor words can be made up of almost
+;; anything. Otherwise you get incredibly annoying regexps.
+(defun fuel-syntax-table ()
+    (let ((table (make-syntax-table prog-mode-syntax-table)))
+    (modify-syntax-entry ?\" "\"" table)
+    (modify-syntax-entry ?# "_" table)
+    (modify-syntax-entry ?! "_" table)
+    (modify-syntax-entry ?\n ">   " table)
+    (modify-syntax-entry ?$ "_" table)
+    (modify-syntax-entry ?@ "_" table)
+    (modify-syntax-entry ?? "_" table)
+    (modify-syntax-entry ?_ "_" table)
+    (modify-syntax-entry ?: "_" table)
+    (modify-syntax-entry ?< "_" table)
+    (modify-syntax-entry ?> "_" table)
+    (modify-syntax-entry ?. "_" table)
+    (modify-syntax-entry ?, "_" table)
+    (modify-syntax-entry ?& "_" table)
+    (modify-syntax-entry ?| "_" table)
+    (modify-syntax-entry ?% "_" table)
+    (modify-syntax-entry ?= "_" table)
+    (modify-syntax-entry ?/ "_" table)
+    (modify-syntax-entry ?+ "_" table)
+    (modify-syntax-entry ?* "_" table)
+    (modify-syntax-entry ?- "_" table)
+    (modify-syntax-entry ?\; "_" table)
+    (modify-syntax-entry ?\' "_" table)
+    (modify-syntax-entry ?^ "_" table)
+    (modify-syntax-entry ?~ "_" table)
+    (modify-syntax-entry ?\( "()" table)
+    (modify-syntax-entry ?\) ")(" table)
+    (modify-syntax-entry ?\{ "(}" table)
+    (modify-syntax-entry ?\} "){" table)
+    (modify-syntax-entry ?\[ "(]" table)
+    (modify-syntax-entry ?\] ")[" table)
+    table))
+
 (provide 'fuel-base)
 
 ;;; fuel-base.el ends here
