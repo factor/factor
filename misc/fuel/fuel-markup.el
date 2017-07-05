@@ -436,7 +436,7 @@ or lists."
     (reverse elems)))
 
 (defun fuel-markup--parse-words-desc (desc)
-  "This function parses the text descripiton of the vocab that
+  "This function parses the text description of the vocab that
 the 'words.' word emits."
   (with-temp-buffer
     (insert desc)
