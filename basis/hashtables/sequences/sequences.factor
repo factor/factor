@@ -6,6 +6,8 @@ hashtables.wrapped kernel parser sequences vocabs.loader ;
 
 IN: hashtables.sequences
 
+ERROR: not-a-sequence object ;
+
 TUPLE: sequence-wrapper < wrapped-key ;
 
 C: <sequence-wrapper> sequence-wrapper
@@ -23,7 +25,8 @@ TUPLE: sequence-hashtable < wrapped-hashtable ;
 : <sequence-hashtable> ( n -- shashtable )
     <hashtable> sequence-hashtable boa ; inline
 
-M: sequence-hashtable wrap-key drop <sequence-wrapper> ;
+M: sequence-hashtable wrap-key
+    drop dup sequence? [ <sequence-wrapper> ] [ not-a-sequence ] if ;
 
 M: sequence-hashtable clone
     underlying>> clone sequence-hashtable boa ; inline

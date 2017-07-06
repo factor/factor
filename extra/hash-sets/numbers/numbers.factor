@@ -6,6 +6,8 @@ math.hashcodes parser sequences vocabs.loader ;
 
 IN: hash-sets.numbers
 
+ERROR: not-a-number object ;
+
 TUPLE: number-wrapper < wrapped-key ;
 
 C: <number-wrapper> number-wrapper
@@ -23,7 +25,8 @@ TUPLE: number-hash-set < wrapped-hash-set ;
 : <number-hash-set> ( n -- shash-set )
     <hash-set> number-hash-set boa ; inline
 
-M: number-hash-set wrap-key drop <number-wrapper> ;
+M: number-hash-set wrap-key
+    drop dup number? [ <number-wrapper> ] [ not-a-number ] if ;
 
 M: number-hash-set clone
     underlying>> clone number-hash-set boa ; inline
