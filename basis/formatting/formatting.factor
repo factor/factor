@@ -66,13 +66,10 @@ IN: formatting
         [ [ [ >float ] dip ] when ] keep
     ] if ;
 
-: ?fix-nonsignificant-zero ( string digits -- string )
-    [ ".0" "" replace ] [ drop ] if-zero ;
-
 : format-scientific ( x digits -- string )
     format-fast-scientific?  [
         [ "e" format-float-fast ]
-        [ ?fix-nonsignificant-zero ] bi
+        [ [ ".0e" "e" replace ] [ drop ] if-zero ] bi
     ] [ format-scientific-simple ] if ;
 
 : format-fast-decimal? ( x digits -- x' digits ? )
@@ -91,7 +88,7 @@ IN: formatting
 : format-decimal ( x digits -- string )
     format-fast-decimal? [
         [ "f" format-float-fast ]
-        [ ?fix-nonsignificant-zero ] bi
+        [ [ ".0" ?tail drop ] [ drop ] if-zero ] bi
     ] [ format-decimal-simple ] if ;
 
 ERROR: unknown-printf-directive ;

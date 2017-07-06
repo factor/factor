@@ -106,6 +106,9 @@ IN: formatting.tests
 { "9.877e+417" } [ 987654321098765432 10 400 ^ * "%.3e" sprintf ] unit-test
 { "9.88e+417" } [ 987654321098765432 10 400 ^ * "%.2e" sprintf ] unit-test
 { "9.9e+417" } [ 987654321098765432 10 400 ^ * "%.1e" sprintf ] unit-test
+! This works even on windows (even though %.0e is special on
+! windows) because it doesn't use the fast formatter from the
+! system
 { "1e+418" } [ 987654321098765432 10 400 ^ * "%.0e" sprintf ] unit-test
 { "9e+417" } [ 937654321098765432 10 400 ^ * "%.0e" sprintf ] unit-test
 { "1.0e+418" } [ 997654321098765432 10 400 ^ * "%.1e" sprintf ] unit-test
@@ -167,5 +170,4 @@ ${ os windows? "3" "2" ? } [ 5/2 "%.0f" sprintf ] unit-test
 ! Differences on Windows due to setprecision(0)
 ${ os windows? "2.500000e+00" "2e+00" ? } [ 5/2 "%.0e" sprintf ] unit-test
 ${ os windows? "3.500000e+00" "4e+00" ? } [ 7/2 "%.0e" sprintf ] unit-test
-
-{ "1e+00" } [ 1.0 "%.0e" sprintf ] unit-test
+${ os windows? "1.000000e+00" "1e+00" ? } [ 1.0 "%.0e" sprintf ] unit-test
