@@ -5,9 +5,6 @@ USING: accessors arrays assocs hashtables kernel sequences
 vocabs.loader ;
 IN: hashtables.wrapped
 
-TUPLE: wrapped-key
-    { underlying read-only } ;
-
 TUPLE: wrapped-hashtable
     { underlying hashtable read-only } ;
 

@@ -6,9 +6,6 @@ vocabs.loader ;
 
 IN: hash-sets.wrapped
 
-TUPLE: wrapped-key
-    { underlying read-only } ;
-
 TUPLE: wrapped-hash-set
     { underlying hash-set read-only } ;
 
