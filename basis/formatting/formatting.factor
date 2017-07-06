@@ -61,7 +61,7 @@ IN: formatting
 : format-fast-scientific? ( x digits -- x' digits ? )
     over float? [ t ]
     [ 2dup
-        [ abs integer-log10 abs 308 < ]
+        [ [ t ] [ abs integer-log10 abs 308 < ] if-zero ]
         [ 15 < ] bi* and
         [ [ [ >float ] dip ] when ] keep
     ] if ;
