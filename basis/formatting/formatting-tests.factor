@@ -36,6 +36,7 @@ IN: formatting.tests
 { "1.4" } [ 135/100 "%.1f" sprintf ] unit-test
 { "4" } [ 7/2 "%.0f" sprintf ] unit-test
 { "1" } [ 1.0 "%.0f" sprintf ] unit-test
+{ "0.0e+00" } [ 0 "%.1e" sprintf ] unit-test
 { "  1.23" } [ 1.23456789 "%6.2f" sprintf ] unit-test
 { "001100" } [ 12 "%06b" sprintf ] unit-test
 { "==14" } [ 12 "%'=4o" sprintf ] unit-test
