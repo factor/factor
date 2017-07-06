@@ -7,6 +7,8 @@ vocabs.loader ;
 
 IN: hashtables.numbers
 
+ERROR: not-a-number object ;
+
 TUPLE: number-wrapper < wrapped-key ;
 
 C: <number-wrapper> number-wrapper
@@ -24,7 +26,8 @@ TUPLE: number-hashtable < wrapped-hashtable ;
 : <number-hashtable> ( n -- shashtable )
     <hashtable> number-hashtable boa ; inline
 
-M: number-hashtable wrap-key drop <number-wrapper> ;
+M: number-hashtable wrap-key
+    drop dup number? [ <number-wrapper> ] [ not-a-number ] if ;
 
 M: number-hashtable clone
     underlying>> clone number-hashtable boa ; inline
