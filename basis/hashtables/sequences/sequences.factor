@@ -6,9 +6,10 @@ hashtables.wrapped kernel parser sequences vocabs.loader ;
 
 IN: hashtables.sequences
 
-ERROR: not-a-sequence object ;
+<PRIVATE
 
-TUPLE: sequence-wrapper < wrapped-key ;
+TUPLE: sequence-wrapper
+    { underlying sequence read-only } ;
 
 C: <sequence-wrapper> sequence-wrapper
 
@@ -20,13 +21,14 @@ M: sequence-wrapper equal?
 M: sequence-wrapper hashcode*
     underlying>> [ sequence-hashcode ] recursive-hashcode ; inline
 
+PRIVATE>
+
 TUPLE: sequence-hashtable < wrapped-hashtable ;
 
 : <sequence-hashtable> ( n -- shashtable )
     <hashtable> sequence-hashtable boa ; inline
 
-M: sequence-hashtable wrap-key
-    drop dup sequence? [ <sequence-wrapper> ] [ not-a-sequence ] if ;
+M: sequence-hashtable wrap-key drop <sequence-wrapper> ;
 
 M: sequence-hashtable clone
     underlying>> clone sequence-hashtable boa ; inline

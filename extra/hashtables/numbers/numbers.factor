@@ -7,9 +7,10 @@ vocabs.loader ;
 
 IN: hashtables.numbers
 
-ERROR: not-a-number object ;
+<PRIVATE
 
-TUPLE: number-wrapper < wrapped-key ;
+TUPLE: number-wrapper
+    { underlying number read-only } ;
 
 C: <number-wrapper> number-wrapper
 
@@ -21,13 +22,14 @@ M: number-wrapper equal?
 M: number-wrapper hashcode*
     nip underlying>> number-hashcode ; inline
 
+PRIVATE>
+
 TUPLE: number-hashtable < wrapped-hashtable ;
 
 : <number-hashtable> ( n -- shashtable )
     <hashtable> number-hashtable boa ; inline
 
-M: number-hashtable wrap-key
-    drop dup number? [ <number-wrapper> ] [ not-a-number ] if ;
+M: number-hashtable wrap-key drop <number-wrapper> ;
 
 M: number-hashtable clone
     underlying>> clone number-hashtable boa ; inline

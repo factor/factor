@@ -6,9 +6,10 @@ math.hashcodes parser sequences vocabs.loader ;
 
 IN: hash-sets.numbers
 
-ERROR: not-a-number object ;
+<PRIVATE
 
-TUPLE: number-wrapper < wrapped-key ;
+TUPLE: number-wrapper
+    { underlying number read-only } ;
 
 C: <number-wrapper> number-wrapper
 
@@ -20,13 +21,14 @@ M: number-wrapper equal?
 M: number-wrapper hashcode*
     nip underlying>> number-hashcode ; inline
 
+PRIVATE>
+
 TUPLE: number-hash-set < wrapped-hash-set ;
 
 : <number-hash-set> ( n -- shash-set )
     <hash-set> number-hash-set boa ; inline
 
-M: number-hash-set wrap-key
-    drop dup number? [ <number-wrapper> ] [ not-a-number ] if ;
+M: number-hash-set wrap-key drop <number-wrapper> ;
 
 M: number-hash-set clone
     underlying>> clone number-hash-set boa ; inline

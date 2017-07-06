@@ -4,7 +4,10 @@ USING: accessors hash-sets hash-sets.wrapped kernel parser
 sequences sets sets.private vocabs.loader ;
 IN: hash-sets.identity
 
-TUPLE: identity-wrapper < wrapped-key identity-hashcode ;
+<PRIVATE
+
+TUPLE: identity-wrapper
+    { underlying read-only } identity-hashcode ;
 
 : <identity-wrapper> ( wrapped-key -- identity-wrapper )
     dup identity-hashcode identity-wrapper boa ; inline
@@ -15,6 +18,8 @@ M: identity-wrapper equal?
     [ 2drop f ] if ; inline
 
 M: identity-wrapper hashcode* nip identity-hashcode>> ; inline
+
+PRIVATE>
 
 TUPLE: identity-hash-set < wrapped-hash-set ;
 
