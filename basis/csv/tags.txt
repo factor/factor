@@ -1,3 +1,2 @@
-regexp
 parsing
 text

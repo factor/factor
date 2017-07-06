@@ -1,2 +1,2 @@
 collections
-sequences
+assocs
