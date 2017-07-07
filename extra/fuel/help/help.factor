@@ -9,7 +9,10 @@ IN: fuel.help
 
 SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
 
-: common-crumbs ( -- crumbs )
+: articles-crumbs ( seq -- crumbs )
+    [ dup article-title \ article 3array ] map ;
+
+: base-crumbs ( -- crumbs )
     { "handbook" "vocab-index" } [ dup article-title \ article 3array ] map ;
 
 : vocab-own-crumbs ( vocab-name -- crumbs )
@@ -19,7 +22,7 @@ SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
     [ dup "." split last \ vocab 3array ] map ;
 
 : vocab-crumbs ( vocab-name -- crumbs )
-    vocab-own-crumbs common-crumbs prepend ;
+    vocab-own-crumbs base-crumbs prepend ;
 
 : article-parents ( article-name -- parents )
     [ article-parent ] follow
@@ -131,13 +134,19 @@ PRIVATE>
 : vocab-help ( name -- str )
     dup empty? [ vocab-children-help ] [ vocab-element ] if ;
 
+: add-crumb ( crumbs article -- crumbs' )
+    dup article-name 2array suffix ;
+
+: simple-element ( title content crumbs -- element )
+    \ $fuel-nav-crumbs prefix prefix \ article -rot 3array ;
+
 : get-vocabs/author ( author -- element )
-    [ "Vocabularies by " prepend \ $heading swap 2array ]
-    [ authored do-vocab-list ] bi 2array ;
+    [ "Vocabularies by " prepend ] [ authored do-vocab-list ] bi
+    base-crumbs "vocab-authors" add-crumb simple-element ;
 
 : get-vocabs/tag ( tag -- element )
-    [ "Vocabularies tagged " prepend \ $heading swap 2array ]
-    [ tagged do-vocab-list ] bi 2array ;
+    [ "Vocabularies tagged " prepend ] [ tagged do-vocab-list ] bi
+    base-crumbs "vocab-tags" add-crumb simple-element ;
 
 : format-index ( seq -- seq )
     [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
@@ -153,5 +162,5 @@ PRIVATE>
 : vocab-help-article?  ( name -- ? )
     dup lookup-vocab [ help>> = ] [ drop f ] if* ;
 
-: get-article ( name -- str )
+: get-article ( name -- element )
     dup vocab-help-article? [ vocab-help ] [ article-element ] if ;

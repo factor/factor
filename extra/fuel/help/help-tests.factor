@@ -34,3 +34,12 @@ IN: fuel.help.tests
 } [
     "server-config" article-parents
 ] unit-test
+
+{
+    {
+        { "handbook" "Factor handbook" article }
+        { "first-program" "Your first program" article }
+    }
+} [
+    "first-program-test" article-crumbs
+] unit-test
