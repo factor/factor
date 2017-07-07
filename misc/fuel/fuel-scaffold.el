@@ -54,7 +54,9 @@
     (nth 1 (fuel-eval--send/wait cmd))))
 
 (defun fuel-scaffold--dev-name ()
-  (or (let ((cmd '(:fuel* (developer-name get :get) "fuel")))
+  (or (let ((cmd '(:fuel* (developer-name get :get)
+                          "fuel"
+                          ("namespaces" "tools.scaffold"))))
         (fuel-eval--retort-result (fuel-eval--send/wait cmd)))
       fuel-scaffold-developer-name
       user-full-name
