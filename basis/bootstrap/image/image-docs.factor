@@ -1,5 +1,6 @@
 USING: bootstrap.image.private byte-arrays help.markup help.syntax
-io.pathnames math quotations sequences strings vectors words ;
+io.pathnames kernel.private math quotations sequences strings vectors
+words ;
 IN: bootstrap.image
 
 HELP: architecture
@@ -37,7 +38,7 @@ HELP: make-jit-no-params
   { "quot" quotation }
   { "code" sequence }
 }
-{ $description "Like " { $link make-jit } ", except the assembler code can't contain any relocation parameters. The word is used to generate the code templatees that the JIT uses to compile quotations." } ;
+{ $description "Like " { $link make-jit } ", except the assembler code can't contain any parameters. The word is used to generate the code templates (like " { $link JIT-3DIP } " that the JIT uses to compile quotations. The output is a two-tuple containing byte-arrays. The first item are the relocations and the second the machine code." } ;
 
 HELP: sub-primitives
 { $var-description "An assoc that is set during bootstrapping. It contains symbols defining sub primitives as key, and generated assembly code for those symbols as values." } ;
