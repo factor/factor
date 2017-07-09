@@ -27,7 +27,8 @@ HELP: symbolic-link?
 
 HELP: file-systems
 { $values { "array" array } }
-{ $description "Returns an array of " { $link file-system-info } " objects returned by iterating the mount points and calling " { $link file-system-info } " on each." } ;
+{ $description "Returns an array of " { $link file-system-info } " objects returned by iterating the mount points and calling " { $link file-system-info } " on each." }
+{ $notes "File systems that the process doesn't have access to aren't included." } ;
 
 HELP: file-system-info
 { $values

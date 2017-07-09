@@ -6,7 +6,7 @@ HELP: article-children
 { $description "Outputs a sequence of all subsections of " { $snippet "topic" } "." } ;
 
 HELP: article-parent
-{ $values { "topic" "an article name or a word" } { "parent" "an article name or a word" } }
+{ $values { "topic" "an article name or a word" } { "parent/f" "an article name or a word" } }
 { $description "Outputs a help topic which contains " { $snippet "topic" } " as a subsection, or " { $link f } "." } ;
 
 HELP: help-path

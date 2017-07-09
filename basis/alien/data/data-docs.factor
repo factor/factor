@@ -8,13 +8,27 @@ HELP: >c-array
 { $values { "seq" sequence } { "c-type" "a C type" } { "array" byte-array } }
 { $description "Outputs a freshly allocated byte-array whose elements are C type values from the given sequence." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
-{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." }
+{ $examples
+    { $unchecked-example
+        "USING: alien.c-types alien.data prettyprint ;"
+        "{ 1.0 2.0 3.0 } alien.c-types:float >c-array ."
+        "float-array{ 1.0 2.0 3.0 }"
+    }
+} ;
 
 HELP: <c-array>
 { $values { "len" "a non-negative integer" } { "c-type" "a C type" } { "array" byte-array } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
 { $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
-{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." }
+{ $examples
+  { $unchecked-example
+    "USING: alien.c-types alien.data prettyprint ;"
+    "10 void* <c-array> ."
+    "void*-array{ f f f f f f f f f f }"
+  }
+} ;
 
 HELP: c-array{
 { $description "Literal syntax, consists of a C-type followed by a series of values terminated by " { $snippet "}" } }
@@ -138,8 +152,17 @@ ARTICLE: "c-pointers" "Passing pointers to C functions"
 "The Factor garbage collector can move byte arrays around, and code passing byte arrays, or objects backed by byte arrays, must obey important guidelines. See " { $link "byte-arrays-gc" } "." } ;
 
 ARTICLE: "c-boxes" "C value boxes"
-"Sometimes it is useful to create a byte array storing a single C value, like a struct with a single field. A pair of utility macros exist to make this more convenient:"
-{ $subsections <ref> deref } ;
+"Sometimes it is useful to create a byte array storing a single C value, like a struct with a single field. A pair of utility words exist to make this more convenient:"
+{ $subsections <ref> deref }
+"These words can be used to in conjuction with, or instead of, " { $link with-out-parameters } " to handle \"out-parameters\". For example, if a function is declared in the following way:"
+{ $code
+  "FUNCTION: int do_foo ( int* a )"
+}
+"and writes to the pointer 'a', then it can be called like this:"
+{  $code
+   "1234 int <ref> [ do_foo ] keep int deref"
+}
+"The stack will then contain the two integers emitted by the 'do_foo' function." ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."
@@ -217,9 +240,21 @@ HELP: deref
 { $values { "c-ptr" c-ptr } { "c-type" "a C type" } { "value" object } }
 { $description "Loads a C value from a byte array." }
 { $examples
-    { $example "USING: alien.c-types alien.data prettyprint sequences ;" "321 int <ref> int deref ." "321" }
+  { $example
+    "USING: alien.c-types alien.data prettyprint sequences ;"
+    "321 int <ref> int deref ."
+    "321" }
 } ;
 
 ARTICLE: "c-out-params" "Output parameters in C"
 "A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
-{ $subsection with-out-parameters } ;
+{ $subsection with-out-parameters }
+"The idiom is commonly used for passing back an error message if the function calls fails. For example, if a function is declared in the following way:"
+{ $code
+  "FUNCTION: int do_frob ( int arg1, char** errptr )"
+}
+"Then it could return 1 on error and 0 otherwise. A correct way to call it would be:"
+{ $code
+  "1234 { c-string } [ do_frob ] with-out-parameters"
+}
+"which would put the functions return value and error string on the stack." ;
