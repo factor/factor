@@ -35,6 +35,7 @@ FUNCTION: LLVMModuleRef LLVMModuleCreateWithName ( c-string ModuleID )
 FUNCTION: void LLVMDisposeModule ( LLVMModuleRef M )
 FUNCTION: void LLVMDumpModule ( LLVMModuleRef M )
 FUNCTION: LLVMBool LLVMVerifyModule ( LLVMModuleRef M, int Action, char **OutMessage )
+FUNCTION: c-string LLVMGetTarget ( LLVMModuleRef M )
 DESTRUCTOR: LLVMDisposeModule
 
 ! Types
@@ -54,6 +55,7 @@ FUNCTION: LLVMValueRef LLVMAddFunction ( LLVMModuleRef M,
                                          LLVMTypeRef FunctionTy )
 FUNCTION: LLVMValueRef LLVMGetParam ( LLVMValueRef Fn,
                                       unsigned index )
+FUNCTION: c-string LLVMGetValueName ( LLVMValueRef Val )
 
 ! Basic blocks
 FUNCTION: LLVMBasicBlockRef LLVMAppendBasicBlock ( LLVMValueRef Fn,
@@ -86,3 +88,21 @@ FUNCTION: LLVMBool LLVMCreateExecutionEngineForModule (
     char **OutMessage )
 FUNCTION: void LLVMDisposeExecutionEngine ( LLVMExecutionEngineRef E )
 DESTRUCTOR: LLVMDisposeExecutionEngine
+
+! Memory buffers
+FUNCTION: LLVMBool LLVMCreateMemoryBufferWithContentsOfFile (
+    c-string Path,
+    LLVMMemoryBufferRef* OutMemBuf,
+    c-string* OutMessage )
+FUNCTION: void LLVMDisposeMemoryBuffer ( LLVMMemoryBufferRef MemBuf )
+FUNCTION: size_t LLVMGetBufferSize ( LLVMMemoryBufferRef MemBuf )
+FUNCTION: int LLVMParseBitcode ( LLVMMemoryBufferRef MemBuf,
+                                 LLVMModuleRef* OutModule,
+                                 c-string* OutMessage )
+
+! Module providers
+FUNCTION: LLVMModuleProviderRef LLVMCreateModuleProviderForExistingModule ( LLVMModuleRef M )
+FUNCTION: void LLVMDisposeModuleProvider ( LLVMModuleProviderRef MP )
+
+! Messages
+FUNCTION: void LLVMDisposeMessage ( char *Message )
