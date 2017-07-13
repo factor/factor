@@ -5,7 +5,7 @@ alien.syntax ldcache ;
 IN: llvm.ffi
 
 <<
-"llvm" "LLVM-3.8" find-so cdecl add-library
+"llvm" "LLVM-3.9" find-so cdecl add-library
 >>
 
 LIBRARY: llvm
@@ -29,6 +29,26 @@ TYPEDEF: void* LLVMValueRef
 TYPEDEF: void* LLVMBasicBlockRef
 TYPEDEF: void* LLVMBuilderRef
 TYPEDEF: void* LLVMMemoryBufferRef
+TYPEDEF: void* LLVMTargetRef
+TYPEDEF: void* LLVMPassRegistryRef
+
+! Type types
+ENUM: LLVMTypeKind
+  LLVMVoidTypeKind
+  LLVMFloatTypeKind
+  LLVMDoubleTypeKind
+  LLVMX86_FP80TypeKind
+  LLVMFP128TypeKind
+  LLVMPPC_FP128TypeKind
+  LLVMLabelTypeKind
+  LLVMMetadataTypeKind
+  LLVMIntegerTypeKind
+  LLVMFunctionTypeKind
+  LLVMStructTypeKind
+  LLVMArrayTypeKind
+  LLVMPointerTypeKind
+  LLVMOpaqueTypeKind
+  LLVMVectorTypeKind ;
 
 ! Modules
 FUNCTION: LLVMModuleRef LLVMModuleCreateWithName ( c-string ModuleID )
@@ -36,7 +56,6 @@ FUNCTION: void LLVMDisposeModule ( LLVMModuleRef M )
 FUNCTION: void LLVMDumpModule ( LLVMModuleRef M )
 FUNCTION: LLVMBool LLVMVerifyModule ( LLVMModuleRef M, int Action, char **OutMessage )
 FUNCTION: c-string LLVMGetTarget ( LLVMModuleRef M )
-DESTRUCTOR: LLVMDisposeModule
 
 ! Types
 FUNCTION: LLVMTypeRef LLVMInt1Type ( )
@@ -48,6 +67,7 @@ FUNCTION: LLVMTypeRef LLVMIntType ( unsigned NumBits )
 FUNCTION: LLVMTypeRef LLVMFunctionType ( LLVMTypeRef ReturnType,
                                          LLVMTypeRef* ParamTypes,
                                          unsigned ParamCount, int IsVarArg )
+FUNCTION: LLVMTypeKind LLVMGetTypeKind ( LLVMTypeRef Ty )
 
 ! Values
 FUNCTION: LLVMValueRef LLVMAddFunction ( LLVMModuleRef M,
@@ -56,6 +76,8 @@ FUNCTION: LLVMValueRef LLVMAddFunction ( LLVMModuleRef M,
 FUNCTION: LLVMValueRef LLVMGetParam ( LLVMValueRef Fn,
                                       unsigned index )
 FUNCTION: c-string LLVMGetValueName ( LLVMValueRef Val )
+FUNCTION: unsigned LLVMCountParams ( LLVMValueRef Fn )
+FUNCTION: LLVMTypeRef LLVMTypeOf ( LLVMValueRef Val )
 
 ! Basic blocks
 FUNCTION: LLVMBasicBlockRef LLVMAppendBasicBlock ( LLVMValueRef Fn,
@@ -79,15 +101,19 @@ FUNCTION: LLVMValueRef LLVMBuildSub ( LLVMBuilderRef Builder,
                                       c-string Name )
 FUNCTION: LLVMValueRef LLVMBuildRet ( LLVMBuilderRef Builder,
                                       LLVMValueRef V )
-DESTRUCTOR: LLVMDisposeBuilder
 
-! Engines
+! Execution Engines
 FUNCTION: LLVMBool LLVMCreateExecutionEngineForModule (
     LLVMExecutionEngineRef* OutEE,
     LLVMModuleRef M,
     char **OutMessage )
 FUNCTION: void LLVMDisposeExecutionEngine ( LLVMExecutionEngineRef E )
-DESTRUCTOR: LLVMDisposeExecutionEngine
+FUNCTION: uint64_t LLVMGetGlobalValueAddress ( LLVMExecutionEngineRef E, c-string name )
+FUNCTION: LLVMBool LLVMFindFunction ( LLVMExecutionEngineRef E,
+                                      c-string name,
+                                      LLVMValueRef OutFn )
+FUNCTION: void* LLVMGetPointerToGlobal ( LLVMExecutionEngineRef EE,
+                                         LLVMValueRef Global )
 
 ! Memory buffers
 FUNCTION: LLVMBool LLVMCreateMemoryBufferWithContentsOfFile (
@@ -96,6 +122,7 @@ FUNCTION: LLVMBool LLVMCreateMemoryBufferWithContentsOfFile (
     c-string* OutMessage )
 FUNCTION: void LLVMDisposeMemoryBuffer ( LLVMMemoryBufferRef MemBuf )
 FUNCTION: size_t LLVMGetBufferSize ( LLVMMemoryBufferRef MemBuf )
+! Deprecated and should be replaced with LLVMParseBitcode2.
 FUNCTION: int LLVMParseBitcode ( LLVMMemoryBufferRef MemBuf,
                                  LLVMModuleRef* OutModule,
                                  c-string* OutMessage )
@@ -104,5 +131,22 @@ FUNCTION: int LLVMParseBitcode ( LLVMMemoryBufferRef MemBuf,
 FUNCTION: LLVMModuleProviderRef LLVMCreateModuleProviderForExistingModule ( LLVMModuleRef M )
 FUNCTION: void LLVMDisposeModuleProvider ( LLVMModuleProviderRef MP )
 
+! Targets
+FUNCTION: LLVMTargetRef LLVMGetFirstTarget ( )
+FUNCTION: c-string LLVMGetTargetName ( LLVMTargetRef T )
+
 ! Messages
 FUNCTION: void LLVMDisposeMessage ( char *Message )
+
+! Pass Registry
+FUNCTION: LLVMPassRegistryRef LLVMGetGlobalPassRegistry ( )
+
+! Initialization
+FUNCTION: void LLVMInitializeCore ( LLVMPassRegistryRef PR )
+FUNCTION: void LLVMLinkInMCJIT ( )
+FUNCTION: void LLVMInitializeX86AsmPrinter ( )
+FUNCTION: void LLVMInitializeX86TargetInfo ( )
+FUNCTION: void LLVMInitializeX86Target ( )
+FUNCTION: void LLVMInitializeX86TargetMC ( )
+
+! Removed symbols: LLVMCreateJITCompiler
