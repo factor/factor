@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Matthew Willis, 2017 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax ldcache ;
+USING: alien alien.c-types alien.libraries alien.syntax kernel
+ldcache ;
 IN: llvm.ffi
 
 <<
-"llvm" "LLVM-3.9" find-so cdecl add-library
+"llvm" "LLVM-3.9" find-so [ cdecl add-library ] [ drop ] if*
 >>
 
 LIBRARY: llvm
@@ -34,21 +34,23 @@ TYPEDEF: void* LLVMPassRegistryRef
 
 ! Type types
 ENUM: LLVMTypeKind
-  LLVMVoidTypeKind
-  LLVMFloatTypeKind
-  LLVMDoubleTypeKind
-  LLVMX86_FP80TypeKind
-  LLVMFP128TypeKind
-  LLVMPPC_FP128TypeKind
-  LLVMLabelTypeKind
-  LLVMMetadataTypeKind
-  LLVMIntegerTypeKind
-  LLVMFunctionTypeKind
-  LLVMStructTypeKind
-  LLVMArrayTypeKind
-  LLVMPointerTypeKind
-  LLVMOpaqueTypeKind
-  LLVMVectorTypeKind ;
+    LLVMVoidTypeKind
+    LLVMHalfTypeKind
+    LLVMFloatTypeKind
+    LLVMDoubleTypeKind
+    LLVMX86_FP80TypeKind
+    LLVMFP128TypeKind
+    LLVMPPC_FP128TypeKind
+    LLVMLabelTypeKind
+    LLVMIntegerTypeKind
+    LLVMFunctionTypeKind
+    LLVMStructTypeKind
+    LLVMArrayTypeKind
+    LLVMPointerTypeKind
+    LLVMVectorTypeKind
+    LLVMMetadataTypeKind
+    LLVMX86_MMXTypeKind
+    LLVMTokenTypeKind ;
 
 ! Modules
 FUNCTION: LLVMModuleRef LLVMModuleCreateWithName ( c-string ModuleID )
@@ -68,6 +70,9 @@ FUNCTION: LLVMTypeRef LLVMFunctionType ( LLVMTypeRef ReturnType,
                                          LLVMTypeRef* ParamTypes,
                                          unsigned ParamCount, int IsVarArg )
 FUNCTION: LLVMTypeKind LLVMGetTypeKind ( LLVMTypeRef Ty )
+FUNCTION: LLVMTypeRef LLVMGetReturnType ( LLVMTypeRef FunctionTy )
+FUNCTION: LLVMTypeRef LLVMGetElementType ( LLVMTypeRef Ty )
+FUNCTION: unsigned LLVMGetIntTypeWidth ( LLVMTypeRef IntegerTy )
 
 ! Values
 FUNCTION: LLVMValueRef LLVMAddFunction ( LLVMModuleRef M,
@@ -78,6 +83,7 @@ FUNCTION: LLVMValueRef LLVMGetParam ( LLVMValueRef Fn,
 FUNCTION: c-string LLVMGetValueName ( LLVMValueRef Val )
 FUNCTION: unsigned LLVMCountParams ( LLVMValueRef Fn )
 FUNCTION: LLVMTypeRef LLVMTypeOf ( LLVMValueRef Val )
+FUNCTION: void LLVMDumpValue ( LLVMValueRef Val )
 
 ! Basic blocks
 FUNCTION: LLVMBasicBlockRef LLVMAppendBasicBlock ( LLVMValueRef Fn,
