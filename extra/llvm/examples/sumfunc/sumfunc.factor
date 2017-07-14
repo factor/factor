@@ -1,61 +1,32 @@
-USING: alien.c-types alien.data arrays destructors kernel llvm.ffi
-locals math sequences ;
+USING: accessors alien.c-types alien.data arrays destructors kernel
+llvm.ffi llvm.wrappers sequences ;
 IN: llvm.examples.sumfunc
 
 ! From:
 ! https://pauladamsmith.com/blog/2015/01/how-to-get-started-with-llvm-c-api.html
-ERROR: llvm-verify message ;
+: add-function ( module name type -- value )
+    [ value>> ] 2dip LLVMAddFunction ;
 
-: declare-function ( module name ret params -- value )
-    [ void* >c-array ] [ length ] bi 0 LLVMFunctionType LLVMAddFunction ;
+: dump-module ( module -- )
+    value>> LLVMDumpModule ;
 
-: verify-module ( module -- )
-    ! Does it leak?
-    LLVMReturnStatusAction
-    { c-string } [ LLVMVerifyModule ] with-out-parameters
-    swap 0 = [ drop ] [ llvm-verify ] if ;
-
-: with-module ( name quot -- )
-    [
-        swap LLVMModuleCreateWithName
-        &LLVMDisposeModule
-        [ swap call ]
-        [ dup verify-module LLVMDumpModule ] bi
-    ] with-destructors ; inline
-
-: with-builder ( quot -- )
-    [
-        LLVMCreateBuilder &LLVMDisposeBuilder swap call
-    ] with-destructors ; inline
-
-
-: create-execution-engine-for-module ( module -- engine )
-    [ f LLVMExecutionEngineRef <ref> dup ] dip f
-    LLVMCreateExecutionEngineForModule drop
-    LLVMExecutionEngineRef deref ;
-
-: with-execution-engine ( module quot -- )
-    [
-        swap create-execution-engine-for-module
-        &LLVMDisposeExecutionEngine
-        swap call
-    ] with-destructors ; inline
+: create-sum-type ( -- type )
+    LLVMInt32Type LLVMInt32Type LLVMInt32Type 2array
+    [ void* >c-array ] [ length ] bi 0 LLVMFunctionType ;
 
 : create-sum-body ( sum -- )
-    [
+    dup <builder> [
+        value>>
         ! sum builder
-        over "entry" LLVMAppendBasicBlock
-        ! sum builder bb
-        dupd LLVMPositionBuilderAtEnd
-        ! sum builder
-        swap dupd [ 0 LLVMGetParam ] [ 1 LLVMGetParam ] bi
+        swap dupd
+        [ 0 LLVMGetParam ] [ 1 LLVMGetParam ] bi
         ! builder builder p0 p1
         "tmp" LLVMBuildAdd
         LLVMBuildRet drop
-    ] with-builder ;
+    ] with-disposal ;
 
-:: create-sum-function ( -- )
-    "my_module" [
-        "sum" LLVMInt32Type LLVMInt32Type LLVMInt32Type 2array
-        declare-function create-sum-body
-    ] with-module ;
+: create-sum-function ( -- )
+    "my_module" <module> [
+        [ "sum" create-sum-type add-function create-sum-body ]
+        [ verify-module ] [ dump-module ] tri
+    ] with-disposal ;
