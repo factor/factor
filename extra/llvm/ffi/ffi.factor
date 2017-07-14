@@ -24,7 +24,6 @@ TYPEDEF: void* LLVMModuleRef
 TYPEDEF: void* LLVMPassManagerRef
 TYPEDEF: void* LLVMModuleProviderRef
 TYPEDEF: void* LLVMTypeRef
-TYPEDEF: void* LLVMTypeHandleRef
 TYPEDEF: void* LLVMValueRef
 TYPEDEF: void* LLVMBasicBlockRef
 TYPEDEF: void* LLVMBuilderRef
@@ -60,19 +59,58 @@ FUNCTION: LLVMBool LLVMVerifyModule ( LLVMModuleRef M, int Action, char **OutMes
 FUNCTION: c-string LLVMGetTarget ( LLVMModuleRef M )
 
 ! Types
+
+! ! Basic  types
+FUNCTION: LLVMTypeRef LLVMFloatType ( )
+FUNCTION: LLVMTypeRef LLVMDoubleType ( )
+
+FUNCTION: LLVMTypeRef LLVMX86FP80Type ( )
+FUNCTION: LLVMTypeRef LLVMFP128Type ( )
+FUNCTION: LLVMTypeRef LLVMPPCFP128Type ( )
+
+FUNCTION: LLVMTypeRef LLVMVoidType ( )
+FUNCTION: LLVMTypeRef LLVMLabelType ( )
+FUNCTION: LLVMTypeRef LLVMOpaqueType ( )
+
+! ! Integer type
 FUNCTION: LLVMTypeRef LLVMInt1Type ( )
 FUNCTION: LLVMTypeRef LLVMInt8Type ( )
 FUNCTION: LLVMTypeRef LLVMInt16Type ( )
 FUNCTION: LLVMTypeRef LLVMInt32Type ( )
 FUNCTION: LLVMTypeRef LLVMInt64Type ( )
 FUNCTION: LLVMTypeRef LLVMIntType ( unsigned NumBits )
+FUNCTION: unsigned LLVMGetIntTypeWidth ( LLVMTypeRef IntegerTy )
+
+! ! Array type
+FUNCTION: LLVMTypeRef LLVMArrayType ( LLVMTypeRef ElementType, unsigned ElementCount )
+FUNCTION: unsigned LLVMGetArrayLength ( LLVMTypeRef ArrayTy )
+
+! ! Pointer type
+FUNCTION: LLVMTypeRef LLVMPointerType ( LLVMTypeRef ElementType, unsigned AddressSpace )
+
+! ! Vector type
+FUNCTION: LLVMTypeRef LLVMVectorType ( LLVMTypeRef ElementType, unsigned ElementCount )
+FUNCTION: unsigned LLVMGetVectorSize ( LLVMTypeRef VectorTy )
+
+! ! Function type
 FUNCTION: LLVMTypeRef LLVMFunctionType ( LLVMTypeRef ReturnType,
                                          LLVMTypeRef* ParamTypes,
                                          unsigned ParamCount, int IsVarArg )
-FUNCTION: LLVMTypeKind LLVMGetTypeKind ( LLVMTypeRef Ty )
 FUNCTION: LLVMTypeRef LLVMGetReturnType ( LLVMTypeRef FunctionTy )
+FUNCTION: int LLVMIsFunctionVarArg ( LLVMTypeRef FunctionTy )
+FUNCTION: unsigned LLVMCountParamTypes ( LLVMTypeRef FunctionTy )
+FUNCTION: void LLVMGetParamTypes ( LLVMTypeRef FunctionTy, LLVMTypeRef* Dest )
+
+! ! Struct type
+FUNCTION: LLVMTypeRef LLVMStructType ( LLVMTypeRef* ElementTypes,
+                                       unsigned ElementCount, int Packed )
+FUNCTION: int LLVMIsPackedStruct ( LLVMTypeRef StructTy )
+FUNCTION: unsigned LLVMCountStructElementTypes ( LLVMTypeRef StructTy )
+FUNCTION: void LLVMGetStructElementTypes ( LLVMTypeRef StructTy, LLVMTypeRef* Dest )
+
+! ! Type util
+FUNCTION: LLVMTypeKind LLVMGetTypeKind ( LLVMTypeRef Ty )
 FUNCTION: LLVMTypeRef LLVMGetElementType ( LLVMTypeRef Ty )
-FUNCTION: unsigned LLVMGetIntTypeWidth ( LLVMTypeRef IntegerTy )
 
 ! Values
 FUNCTION: LLVMValueRef LLVMAddFunction ( LLVMModuleRef M,
@@ -155,4 +193,4 @@ FUNCTION: void LLVMInitializeX86TargetInfo ( )
 FUNCTION: void LLVMInitializeX86Target ( )
 FUNCTION: void LLVMInitializeX86TargetMC ( )
 
-! Removed symbols: LLVMCreateJITCompiler
+! Removed symbols: LLVMCreateJITCompiler, LLVMCreateTypeHandle
