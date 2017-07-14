@@ -4,6 +4,14 @@ IN: llvm.ffi.tests
 
 { } [
     "my_module" LLVMModuleCreateWithName
-    dup LLVMDumpModule
+    ! dup LLVMDumpModule
     LLVMDisposeModule
+] unit-test
+
+{ 10 } [
+    LLVMInt32Type 10 LLVMVectorType LLVMGetVectorSize
+] unit-test
+
+{ 32 } [
+    LLVMInt32Type LLVMGetIntTypeWidth
 ] unit-test
