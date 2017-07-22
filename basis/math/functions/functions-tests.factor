@@ -82,11 +82,11 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { 4.0 } [ 10000.0 log10 ] unit-test
 { $ log10-factorial-1000 t } [ 1000 factorial [ log10 ] [ bignum? ] bi ] unit-test
 
-{ t } [ 1 e^ e 1.e-10 ~ ] unit-test
-{ f } [ 1 e^ 0/0. 1.e-10 ~ ] unit-test
-{ f } [ 0/0. 1 e^ 1.e-10 ~ ] unit-test
-{ t } [ 1.0 e^ e 1.e-10 ~ ] unit-test
-{ t } [ -1 e^ e * 1.0 1.e-10 ~ ] unit-test
+{ e 1.e-10 } [ 1 e^ ] unit-test~
+{ 0/0. 1.e-10 } [ 1 e^ ] unit-test~
+{ 1.e-10 } [ 0/0. 1 e^ ] unit-test~
+{ e 1.e-10 } [ 1.0 e^ ] unit-test~
+{ 1.0 1.e-10 } [ -1 e^ e * ] unit-test~
 { f } [ 1/0. 1/0. 1.e-10 ~ ] unit-test
 { f } [ 1/0. -1/0. 1.e-10 ~ ] unit-test
 { f } [ 1/0. 0/0. 1.e-10 ~ ] unit-test
@@ -120,12 +120,13 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { f } [ 10 atanh real? ] unit-test
 { f } [ 10.0 atanh real? ] unit-test
 
-{ t } [ 10 asin sin 10 1.e-10 ~ ] unit-test
+{ 10 1.e-10 } [ 10 asin sin ] unit-test~
+{ -100 1.e-10 } [ -100 atan tan ] unit-test~
+{ 10 1.e-10 } [ 10 asinh sinh ] unit-test~
+{ 10 1.e-10 } [ 10 atanh tanh ] unit-test~
+{ 0.5 1.e-10 } [ 0.5 atanh tanh ] unit-test~
+
 { t } [ -1 sqrt neg dup acos cos 1.e-10 ~ ] unit-test
-{ t } [ -100 atan tan -100 1.e-10 ~ ] unit-test
-{ t } [ 10 asinh sinh 10 1.e-10 ~ ] unit-test
-{ t } [ 10 atanh tanh 10 1.e-10 ~ ] unit-test
-{ t } [ 0.5 atanh tanh 0.5 1.e-10 ~ ] unit-test
 
 { t } [ 0 42 divisor? ] unit-test
 { t } [ 42 7 divisor? ] unit-test
