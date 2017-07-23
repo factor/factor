@@ -44,12 +44,12 @@ MACRO: set-slot ( name -- quot: ( value tuple -- ) )
 MACRO: slots ( names -- quot: ( tuple -- values... ) )
     [ '[ _ slot ] ] { } map-as '[ _ cleave ] ;
 
-MACRO: {slots} ( names -- quot: ( tuple -- {values} ) )
+MACRO: slots>array ( names -- quot: ( tuple -- values ) )
     dup length '[ _ slots _ narray ] ;
 
 MACRO: set-slots ( names -- quot: ( values... tuple -- ) )
     [ [ '[ _ set-slot ] ] [ ] map-as ] [ length dup ] bi
     '[ @ _ cleave-curry _ spread* ] ;
 
-MACRO: {set-slots} ( names -- quot: ( {values} tuple -- ) )
+MACRO: array>set-slots ( names -- quot: ( values tuple -- ) )
     [ length ] keep '[ [ _ firstn ] dip _ set-slots ] ;

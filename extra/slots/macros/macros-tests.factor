@@ -58,7 +58,7 @@ TUPLE: foo a b c ;
 
 { { 2 1 3 } } [
     T{ foo { a 1 } { b 2 } { c 3 } }
-    { "b" "a" "c" } {slots}
+    { "b" "a" "c" } slots>array
 ] unit-test
 
 { T{ foo { a "one" } { b "two" } { c "three" } } } [
@@ -70,5 +70,5 @@ TUPLE: foo a b c ;
 { T{ foo { a "one" } { b "two" } { c "three" } } } [
     { "two" "one" "three" }
     T{ foo { a 1 } { b 2 } { c 3 } } clone
-    [ { "b" "a" "c" } {set-slots} ] keep
+    [ { "b" "a" "c" } array>set-slots ] keep
 ] unit-test
