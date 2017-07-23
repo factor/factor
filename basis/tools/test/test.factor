@@ -67,7 +67,7 @@ SYMBOL: current-test-file
 : (unit-test-comparator) ( output input comparator -- error/f failed? tested? )
     swapd '[
         { } _ with-datastack
-        _ >quotation _ compose with-datastack f
+        _ >quotation _ compose with-datastack first dup not
     ] [ t ] recover t ; inline
 
 : (unit-test~) ( output input -- error/f failed? tested? )

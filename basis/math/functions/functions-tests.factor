@@ -82,15 +82,15 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { 4.0 } [ 10000.0 log10 ] unit-test
 { $ log10-factorial-1000 t } [ 1000 factorial [ log10 ] [ bignum? ] bi ] unit-test
 
-{ e 1.e-10 } [ 1 e^ ] unit-test~
-{ 0/0. 1.e-10 } [ 1 e^ ] unit-test~
-{ 1.e-10 } [ 0/0. 1 e^ ] unit-test~
-{ e 1.e-10 } [ 1.0 e^ ] unit-test~
-{ 1.0 1.e-10 } [ -1 e^ e * ] unit-test~
+{ f } [ 1 e^ 0/0. 1.e-10 ~ ] unit-test
+{ f } [ 0/0. 1 e^ 1.e-10 ~ ] unit-test
 { f } [ 1/0. 1/0. 1.e-10 ~ ] unit-test
 { f } [ 1/0. -1/0. 1.e-10 ~ ] unit-test
 { f } [ 1/0. 0/0. 1.e-10 ~ ] unit-test
 { f } [ 0/0. -1/0. 1.e-10 ~ ] unit-test
+
+{ e 1.e-10 } [ 1 e^ ] unit-test~
+{ 1.0 1.e-10 } [ -1 e^ e * ] unit-test~
 
 { 1.0 } [ 0 cosh ] unit-test
 { 1.0 } [ 0.0 cosh ] unit-test
