@@ -11,6 +11,7 @@ SPECIALIZED-ARRAYS:
     c:float c:double ;
 IN: math.vectors.simd.intrinsics
 
+! Word props are added later
 : assert-positive ( x -- y ) ;
 
 <PRIVATE
