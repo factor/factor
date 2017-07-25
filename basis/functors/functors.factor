@@ -84,9 +84,10 @@ FUNCTOR-SYNTAX: M:
 
 FUNCTOR-SYNTAX: C:
     scan-param suffix!
-    scan-param suffix!
-    scan-effect
-    [ [ [ boa ] curry ] append! ] dip suffix!
+    scan-param [
+        suffix!
+        [ [ boa ] curry ] append!
+    ] keep suffix! \ boa-effect suffix!
     \ define-declared* suffix! ;
 
 FUNCTOR-SYNTAX: :
