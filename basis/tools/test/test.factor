@@ -71,10 +71,10 @@ SYMBOL: current-test-file
     ] [ t ] recover t ; inline
 
 : (unit-test~) ( output input -- error/f failed? tested? )
-    [ ~ ] (unit-test-comparator) ;
+    [ 3dup ~ [ 3drop t ] [ drop assert ] if ] (unit-test-comparator) ;
 
 : (unit-test-v~) ( output input -- error/f failed? tested? )
-    [ v~ ] (unit-test-comparator) ;
+    [ 3dup v~ [ 3drop t ] [ drop assert ] if ] (unit-test-comparator) ;
 
 : short-effect ( effect -- pair )
     [ in>> length ] [ out>> length ] bi 2array ;
