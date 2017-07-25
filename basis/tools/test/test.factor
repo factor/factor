@@ -66,15 +66,16 @@ SYMBOL: current-test-file
 
 : (unit-test-comparator) ( output input comparator -- error/f failed? tested? )
     swapd '[
-        { } _ with-datastack
-        _ >quotation _ compose with-datastack first dup not
+        { } _ with-datastack _ >quotation
+        [ 3dup @ [ 3drop t ] [ drop assert ] if ] compose
+        with-datastack first dup not
     ] [ t ] recover t ; inline
 
 : (unit-test~) ( output input -- error/f failed? tested? )
-    [ 3dup ~ [ 3drop t ] [ drop assert ] if ] (unit-test-comparator) ;
+    [ ~ ] (unit-test-comparator) ;
 
 : (unit-test-v~) ( output input -- error/f failed? tested? )
-    [ 3dup v~ [ 3drop t ] [ drop assert ] if ] (unit-test-comparator) ;
+    [ v~ ] (unit-test-comparator) ;
 
 : short-effect ( effect -- pair )
     [ in>> length ] [ out>> length ] bi 2array ;
