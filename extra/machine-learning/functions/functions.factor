@@ -11,6 +11,10 @@ IN: machine-learning.functions
 : leaky-relu ( x a -- x' )
     over 0 < [ * ] [ drop ] if ; inline
 
+! https://arxiv.org/pdf/1706.02515.pdf
+: selu ( x a -- x' )
+    over 0 < [ [ [ e^ ] dip * ] keep - ] [ drop ] if ; inline
+
 : default-leaky-relu ( x -- x' )
     .01 leaky-relu ; inline
 
