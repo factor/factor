@@ -33,6 +33,9 @@ DEFER: make-parent-directories
 : make-parent-directories ( filename -- filename )
     dup parent-directory make-directories ;
 
+: with-ensure-directory ( path quot -- )
+    [ absolute-path dup make-directories current-directory ] dip with-variable ; inline
+
 ! Listing directories
 TUPLE: directory-entry name type ;
 

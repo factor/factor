@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel system sequences combinators
-vocabs vocabs.loader io.files.types math ;
+vocabs vocabs.loader io.files io.files.types math ;
 IN: io.files.info
 
 ! File info
@@ -9,6 +9,9 @@ TUPLE: file-info-tuple type size size-on-disk permissions created modified
 accessed ;
 
 HOOK: file-info os ( path -- info )
+
+: ?file-info ( path -- info/f )
+    dup exists? [ file-info ] [ drop f ] if ; inline
 
 HOOK: link-info os ( path -- info )
 
