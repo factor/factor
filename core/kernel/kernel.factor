@@ -196,21 +196,21 @@ DEFER: if
 ! Curried cleavers
 <PRIVATE
 
-: [curry] ( quot -- quot' ) [ curry ] curry ; inline
+: currier ( quot -- quot' ) [ curry ] curry ; inline
 
 PRIVATE>
 
-: bi-curry ( x p q -- p' q' ) [ [curry] ] bi@ bi ; inline
+: bi-curry ( x p q -- p' q' ) [ currier ] bi@ bi ; inline
 
-: tri-curry ( x p q r -- p' q' r' ) [ [curry] ] tri@ tri ; inline
+: tri-curry ( x p q r -- p' q' r' ) [ currier ] tri@ tri ; inline
 
-: bi-curry* ( x y p q -- p' q' ) [ [curry] ] bi@ bi* ; inline
+: bi-curry* ( x y p q -- p' q' ) [ currier ] bi@ bi* ; inline
 
-: tri-curry* ( x y z p q r -- p' q' r' ) [ [curry] ] tri@ tri* ; inline
+: tri-curry* ( x y z p q r -- p' q' r' ) [ currier ] tri@ tri* ; inline
 
-: bi-curry@ ( x y q -- p' q' ) [curry] bi@ ; inline
+: bi-curry@ ( x y q -- p' q' ) currier bi@ ; inline
 
-: tri-curry@ ( x y z q -- p' q' r' ) [curry] tri@ ; inline
+: tri-curry@ ( x y z q -- p' q' r' ) currier tri@ ; inline
 
 ! Booleans
 UNION: boolean POSTPONE: t POSTPONE: f ;
