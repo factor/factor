@@ -3,11 +3,11 @@ cocoa.types compiler.test core-graphics.types kernel math memory
 namespaces tools.test ;
 IN: cocoa.tests
 
-CLASS: Foo < NSObject
+<CLASS: Foo < NSObject
     METHOD: void foo: NSRect rect [
         gc rect "x" set
     ] ;
-;
+;CLASS>
 
 : test-foo ( -- )
     Foo -> alloc -> init
@@ -21,9 +21,9 @@ CLASS: Foo < NSObject
 { 101.0 } [ "x" get CGRect-w ] unit-test
 { 102.0 } [ "x" get CGRect-h ] unit-test
 
-CLASS: Bar < NSObject
+<CLASS: Bar < NSObject
     METHOD: NSRect bar [ test-foo "x" get ] ;
-;
+;CLASS>
 
 { } [
     Bar [
@@ -39,11 +39,11 @@ CLASS: Bar < NSObject
 { 102.0 } [ "x" get CGRect-h ] unit-test
 
 ! Make sure that we can add methods
-CLASS: Bar < NSObject
+<CLASS: Bar < NSObject
     METHOD: NSRect bar [ test-foo "x" get ] ;
 
     METHOD: int babb: int x [ x sq ] ;
-;
+;CLASS>
 
 { 144 } [
     Bar [

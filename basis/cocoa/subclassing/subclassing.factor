@@ -74,11 +74,13 @@ C: <cocoa-protocol> cocoa-protocol
 SYNTAX: COCOA-PROTOCOL:
     scan-token <cocoa-protocol> suffix! ;
 
-SYNTAX: CLASS:
+SYMBOL: ;CLASS>
+
+SYNTAX: <CLASS:
     scan-token
     "<" expect
     scan-token
-    \ ; parse-until [ cocoa-protocol? ] partition
+    \ ;CLASS> parse-until [ cocoa-protocol? ] partition
     [ [ name>> ] map ] dip define-objc-class ;
 
 : (parse-selector) ( -- )
