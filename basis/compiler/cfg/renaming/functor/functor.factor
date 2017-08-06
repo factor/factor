@@ -12,7 +12,7 @@ IN: compiler.cfg.renaming.functor
     '[ [ _ ] dip changer-word [ ] 2sequence ] map [ ] join
     [ drop ] append ;
 
-FUNCTOR: define-renaming ( NAME DEF-QUOT USE-QUOT TEMP-QUOT -- )
+<FUNCTOR: define-renaming ( NAME DEF-QUOT USE-QUOT TEMP-QUOT -- )
 
 rename-insn-defs DEFINES ${NAME}-insn-defs
 rename-insn-uses DEFINES ${NAME}-insn-uses
@@ -83,6 +83,6 @@ insn-classes get [ insn-temp-slots empty? ] reject [
     define
 ] each
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: RENAMING: scan-token scan-object scan-object scan-object define-renaming ;

@@ -34,7 +34,7 @@ MACRO: write-tuple ( class -- quot )
 
 PRIVATE>
 
-FUNCTOR: define-tuple-array ( CLASS -- )
+<FUNCTOR: define-tuple-array ( CLASS -- )
 
 CLASS IS ${CLASS}
 
@@ -71,6 +71,6 @@ M: CLASS-array like drop dup CLASS-array? [ >CLASS-array ] unless ; inline
 
 INSTANCE: CLASS-array sequence
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: TUPLE-ARRAY: scan-word define-tuple-array ;

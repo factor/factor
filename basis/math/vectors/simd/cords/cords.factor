@@ -8,7 +8,7 @@ IN: math.vectors.simd.cords
 <<
 <PRIVATE
 
-FUNCTOR: (define-simd-128-cord) ( A/2 A -- )
+<FUNCTOR: (define-simd-128-cord) ( A/2 A -- )
 
 A-rep    IS            ${A/2}-rep
 >A/2     IS            >${A/2}
@@ -72,7 +72,7 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
     A-rep >>rep
 \ A typedef
 
-;FUNCTOR
+;FUNCTOR>
 
 : define-simd-128-cord ( A/2 T -- )
     [ define-specialized-cord ]

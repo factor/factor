@@ -5,7 +5,7 @@ IN: functors.tests
 
 <<
 
-FUNCTOR: define-box ( T -- )
+<FUNCTOR: define-box ( T -- )
 
 B DEFINES-CLASS ${T}-box
 <B> DEFINES <${B}>
@@ -16,7 +16,7 @@ TUPLE: B { value T } ;
 
 C: <B> B ( T -- B )
 
-;FUNCTOR
+;FUNCTOR>
 
 \ float define-box
 
@@ -30,7 +30,7 @@ C: <B> B ( T -- B )
     [ execute ] [ execute ] bi ; inline
 <<
 
-FUNCTOR: wrapper-test ( W -- )
+<FUNCTOR: wrapper-test ( W -- )
 
 WW DEFINES ${W}${W}
 
@@ -38,7 +38,7 @@ WHERE
 
 : WW ( a -- b ) \ W twice ;
 
-;FUNCTOR
+;FUNCTOR>
 
 \ sq wrapper-test
 
@@ -48,7 +48,7 @@ WHERE
 
 <<
 
-FUNCTOR: wrapper-test-2 ( W -- )
+<FUNCTOR: wrapper-test-2 ( W -- )
 
 W DEFINES ${W}
 
@@ -56,7 +56,7 @@ WHERE
 
 : W ( a b -- c ) \ + execute ;
 
-;FUNCTOR
+;FUNCTOR>
 
 "blah" wrapper-test-2
 
@@ -66,7 +66,7 @@ WHERE
 
 <<
 
-FUNCTOR: symbol-test ( W -- )
+<FUNCTOR: symbol-test ( W -- )
 
 W DEFINES ${W}
 
@@ -74,7 +74,7 @@ WHERE
 
 SYMBOL: W
 
-;FUNCTOR
+;FUNCTOR>
 
 "blorgh" symbol-test
 
@@ -84,7 +84,7 @@ SYMBOL: W
 
 <<
 
-FUNCTOR: generic-test ( W -- )
+<FUNCTOR: generic-test ( W -- )
 
 W DEFINES ${W}
 
@@ -94,7 +94,7 @@ GENERIC: W ( a -- b )
 M: object W ;
 M: integer W 1 + ;
 
-;FUNCTOR
+;FUNCTOR>
 
 "snurv" generic-test
 
@@ -126,7 +126,7 @@ M: integer W 1 + ;
 
 test-redefinition
 
-FUNCTOR: redefine-test ( W -- )
+<FUNCTOR: redefine-test ( W -- )
 
 W-word DEFINES ${W}-word
 W-tuple DEFINES-CLASS ${W}-tuple
@@ -141,7 +141,7 @@ GENERIC: W-generic ( a -- b )
 M: W-tuple W-generic ;
 SYMBOL: W-symbol
 
-;FUNCTOR
+;FUNCTOR>
 
 [ [ ] ] [
     "IN: functors.tests
@@ -152,7 +152,7 @@ test-redefinition
 
 <<
 
-FUNCTOR: define-a-struct ( T NAME TYPE N -- )
+<FUNCTOR: define-a-struct ( T NAME TYPE N -- )
 
 T-class DEFINES-CLASS ${T}
 
@@ -165,7 +165,7 @@ STRUCT: T-class
     { z TYPE initial: 5 }
     { float { c:float 2 } } ;
 
-;FUNCTOR
+;FUNCTOR>
 
 "a-struct" "nemo" c:char 2 define-a-struct
 
@@ -213,7 +213,7 @@ STRUCT: T-class
 
 <<
 
-FUNCTOR: define-an-inline-word ( W -- )
+<FUNCTOR: define-an-inline-word ( W -- )
 
 W DEFINES ${W}
 W-W DEFINES ${W}-${W}
@@ -223,7 +223,7 @@ WHERE
 : W ( -- ) ; inline
 : W-W ( -- ) W W ;
 
-;FUNCTOR
+;FUNCTOR>
 
 "an-inline-word" define-an-inline-word
 
@@ -234,7 +234,7 @@ WHERE
 
 <<
 
-FUNCTOR: define-a-final-class ( T W -- )
+<FUNCTOR: define-a-final-class ( T W -- )
 
 T DEFINES-CLASS ${T}
 W DEFINES ${W}
@@ -245,7 +245,7 @@ TUPLE: T ; final
 
 : W ( -- ) ;
 
-;FUNCTOR
+;FUNCTOR>
 
 "a-final-tuple" "a-word" define-a-final-class
 

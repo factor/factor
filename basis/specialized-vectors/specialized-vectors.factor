@@ -13,7 +13,7 @@ MIXIN: specialized-vector
 
 <PRIVATE
 
-FUNCTOR: define-vector ( T -- )
+<FUNCTOR: define-vector ( T -- )
 
 V DEFINES-CLASS ${T}-vector
 
@@ -56,7 +56,7 @@ SYNTAX: V{ \ } [ >V ] parse-literal ;
 INSTANCE: V specialized-vector
 INSTANCE: V growable
 
-;FUNCTOR
+;FUNCTOR>
 
 : specialized-vector-vocab ( c-type -- vocab )
     [

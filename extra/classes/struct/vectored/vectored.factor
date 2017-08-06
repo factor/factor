@@ -45,7 +45,7 @@ MACRO: (vectored-element>) ( struct-class -- quot: ( elt -- struct ) )
 SLOT: (n)
 SLOT: (vectored)
 
-FUNCTOR: define-vectored-accessors ( S>> S<< T -- )
+<FUNCTOR: define-vectored-accessors ( S>> S<< T -- )
 
 WHERE
 
@@ -54,14 +54,14 @@ M: T S>>
 M: T S<<
     [ (n)>> ] [ (vectored)>> S>> ] bi set-nth-unsafe ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 PRIVATE>
 
 GENERIC: struct-transpose ( structstruct -- ssttrruucctt )
 GENERIC: vectored-element> ( elt -- struct )
 
-FUNCTOR: define-vectored-struct ( T -- )
+<FUNCTOR: define-vectored-struct ( T -- )
 
 T-array [ T array-class-of ]
 
@@ -111,7 +111,7 @@ M: T-array struct-transpose
     dup length [ nip <iota> ] [ drop ] [ nip (vectored-T) ] 2tri
     [ [ [ nth ] [ set-nth ] bi-curry* bi ] 2curry each ] keep ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: VECTORED-STRUCT:
     scan-word define-vectored-struct ;

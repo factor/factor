@@ -4,7 +4,7 @@ USING: classes functors growable kernel math sequences
 sequences.private ;
 IN: vectors.functor
 
-FUNCTOR: define-vector ( V A <A> -- )
+<FUNCTOR: define-vector ( V A <A> -- )
 
 <V> DEFINES <${V}>
 >V  DEFINES >${V}
@@ -32,4 +32,4 @@ M: V equal? over V instance? [ sequence= ] [ 2drop f ] if ;
 
 INSTANCE: V growable
 
-;FUNCTOR
+;FUNCTOR>

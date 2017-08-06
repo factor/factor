@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types classes.struct functors
 kernel math math.functions quotations ;
 IN: alien.complex.functor
 
-FUNCTOR: define-complex-type ( N T -- )
+<FUNCTOR: define-complex-type ( N T -- )
 
 N-type IS ${N}
 
@@ -29,4 +29,4 @@ T-class lookup-c-type
 complex >>boxed-class
 drop
 
-;FUNCTOR
+;FUNCTOR>
