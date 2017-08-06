@@ -124,11 +124,11 @@ MACRO: if-literals-match ( quots -- quot )
         ] [ 2drop bad-simd-intrinsic ] if
     ] ;
 
-CONSTANT: [unary]        [ ds-drop  ds-pop ]
-CONSTANT: [unary/param]  [ [ -2 <ds-loc> inc-stack ds-pop ] dip ]
-CONSTANT: [binary]       [ ds-drop 2inputs ]
-CONSTANT: [binary/param] [ [ -2 <ds-loc> inc-stack 2inputs ] dip ]
-CONSTANT: [quaternary]
+CONSTANT: unary        [ ds-drop  ds-pop ]
+CONSTANT: unary/param  [ [ -2 <ds-loc> inc-stack ds-pop ] dip ]
+CONSTANT: binary       [ ds-drop 2inputs ]
+CONSTANT: binary/param [ [ -2 <ds-loc> inc-stack 2inputs ] dip ]
+CONSTANT: quaternary
     [
         ds-drop
         D: 3 peek-loc
@@ -138,20 +138,20 @@ CONSTANT: [quaternary]
         -4 <ds-loc> inc-stack
     ]
 
-:: [emit-vector-op] ( trials params-quot op-quot literal-preds -- quot )
+:: emit-vector-op ( trials params-quot op-quot literal-preds -- quot )
     params-quot trials op-quot literal-preds
     '[ [ _ dip _ @ ds-push ] _ if-literals-match ] ;
 
 MACRO: emit-v-vector-op ( trials -- quot )
-    [unary] [ v-vector-op ] { [ representation? ] } [emit-vector-op] ;
+    unary [ v-vector-op ] { [ representation? ] } emit-vector-op ;
 MACRO: emit-vl-vector-op ( trials literal-pred -- quot )
-    [ [unary/param] [ vl-vector-op ] { [ representation? ] } ] dip prefix [emit-vector-op] ;
+    [ unary/param [ vl-vector-op ] { [ representation? ] } ] dip prefix emit-vector-op ;
 MACRO: emit-vv-vector-op ( trials -- quot )
-    [binary] [ vv-vector-op ] { [ representation? ] } [emit-vector-op] ;
+    binary [ vv-vector-op ] { [ representation? ] } emit-vector-op ;
 MACRO: emit-vvl-vector-op ( trials literal-pred -- quot )
-    [ [binary/param] [ vvl-vector-op ] { [ representation? ] } ] dip prefix [emit-vector-op] ;
+    [ binary/param [ vvl-vector-op ] { [ representation? ] } ] dip prefix emit-vector-op ;
 MACRO: emit-vvvv-vector-op ( trials -- quot )
-    [quaternary] [ vvvv-vector-op ] { [ representation? ] } [emit-vector-op] ;
+    quaternary [ vvvv-vector-op ] { [ representation? ] } emit-vector-op ;
 
 MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- quot )
     literal-pred imm-trials literal-pred var-trials
