@@ -247,7 +247,7 @@ M: blas-matrix-base equal?
 
 <<
 
-FUNCTOR: (define-blas-matrix) ( TYPE T U C -- )
+<FUNCTOR: (define-blas-matrix) ( TYPE T U C -- )
 
 VECTOR      IS ${TYPE}-blas-vector
 <VECTOR>    IS <${TYPE}-blas-vector>
@@ -296,7 +296,7 @@ SYNTAX: XMATRIX{ \ } [ >MATRIX ] parse-literal ;
 M: MATRIX pprint-delims
     drop \ XMATRIX{ \ } ;
 
-;FUNCTOR
+;FUNCTOR>
 
 
 : define-real-blas-matrix ( TYPE T -- )

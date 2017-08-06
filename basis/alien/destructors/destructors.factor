@@ -6,7 +6,7 @@ IN: alien.destructors
 
 TUPLE: alien-destructor alien ;
 
-FUNCTOR: define-destructor ( F -- )
+<FUNCTOR: define-destructor ( F -- )
 
 F-destructor DEFINES-CLASS ${F}-destructor
 <F-destructor> DEFINES <${F}-destructor>
@@ -27,6 +27,6 @@ M: F-destructor dispose alien>> F N ndrop ;
 
 : |F ( alien -- alien ) dup <F-destructor> |dispose drop ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: DESTRUCTOR: scan-word define-destructor ;

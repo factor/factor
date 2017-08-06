@@ -5,7 +5,7 @@ destructors fry functors kernel locals sequences serialize
 tokyo.alien.tcutil tokyo.utils vectors ;
 IN: tokyo.assoc-functor
 
-FUNCTOR: define-tokyo-assoc-api ( T N -- )
+<FUNCTOR: define-tokyo-assoc-api ( T N -- )
 
 DBGET      IS ${T}get
 DBPUT      IS ${T}put
@@ -57,4 +57,4 @@ M: TYPE equal? assoc= ;
 
 M: TYPE hashcode* assoc-hashcode ;
 
-;FUNCTOR
+;FUNCTOR>

@@ -38,7 +38,7 @@ GENERIC: direct-like ( alien len exemplar -- seq )
 M: byte-array nth-c-ptr <displaced-alien> ; inline
 M: byte-array direct-like drop uchar <c-direct-array> ; inline
 
-FUNCTOR: define-array ( T -- )
+<FUNCTOR: define-array ( T -- )
 
 A          DEFINES-CLASS ${T}-array
 <A>        DEFINES <${A}>
@@ -103,7 +103,7 @@ M: A vs* [ * \ T c-type-clamp ] 2map ; inline
 
 M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 : specialized-array-vocab ( c-type -- vocab )
     [

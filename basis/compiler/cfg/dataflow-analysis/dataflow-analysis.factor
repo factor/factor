@@ -57,7 +57,7 @@ MIXIN: dataflow-analysis
 M: dataflow-analysis join-sets 2drop assoc-refine ;
 M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
-FUNCTOR: define-analysis ( name -- )
+<FUNCTOR: define-analysis ( name -- )
 
 name DEFINES-CLASS ${name}
 name-ins DEFINES ${name}-ins
@@ -77,7 +77,7 @@ SYMBOL: name-outs
 
 : name-out ( bb -- set ) name-outs get at ;
 
-;FUNCTOR
+;FUNCTOR>
 
 ! ! ! Forward dataflow analysis
 
@@ -88,7 +88,7 @@ M: forward-analysis block-order  drop reverse-post-order ;
 M: forward-analysis successors   drop successors>> ;
 M: forward-analysis predecessors drop predecessors>> ;
 
-FUNCTOR: define-forward-analysis ( name -- )
+<FUNCTOR: define-forward-analysis ( name -- )
 
 name IS ${name}
 name-ins IS ${name}-ins
@@ -103,7 +103,7 @@ INSTANCE: name forward-analysis
     name run-dataflow-analysis
     [ name-ins set ] [ name-outs set ] bi* ;
 
-;FUNCTOR
+;FUNCTOR>
 
 ! ! ! Backward dataflow analysis
 
@@ -114,7 +114,7 @@ M: backward-analysis block-order  drop post-order ;
 M: backward-analysis successors   drop predecessors>> ;
 M: backward-analysis predecessors drop successors>> ;
 
-FUNCTOR: define-backward-analysis ( name -- )
+<FUNCTOR: define-backward-analysis ( name -- )
 
 name IS ${name}
 name-ins IS ${name}-ins
@@ -129,7 +129,7 @@ INSTANCE: name backward-analysis
     \ name run-dataflow-analysis
     [ name-outs set ] [ name-ins set ] bi* ;
 
-;FUNCTOR
+;FUNCTOR>
 
 PRIVATE>
 
