@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel db.errors peg.ebnf strings sequences math
 combinators.short-circuit accessors math.parser quoting
-locals ;
+locals multiline ;
 IN: db.postgresql.errors
 
-EBNF: parse-postgresql-sql-error
+EBNF: parse-postgresql-sql-error [=[
 
 Error = "ERROR:" [ ]+
 
@@ -35,18 +35,18 @@ UnknownError = .* => [[ >string <sql-unknown-error> ]]
 
 PostgresqlSqlError = (TableError | DatabaseError | FunctionError | SyntaxError | UnknownError) 
 
-;EBNF
+]=]
 
 
 TUPLE: parse-postgresql-location column line text ;
 C: <parse-postgresql-location> parse-postgresql-location
 
-EBNF: parse-postgresql-line-error
+EBNF: parse-postgresql-line-error [=[
 
 Line = "LINE " [0-9]+:line ": " .+:sql
     => [[ f line >string string>number sql >string <parse-postgresql-location> ]] 
 
-;EBNF
+]=]
 
 :: set-caret-position ( error caret-line -- error )
     caret-line length

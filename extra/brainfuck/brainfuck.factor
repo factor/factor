@@ -3,7 +3,7 @@
 
 USING: accessors assocs command-line fry io io.encodings.binary
 io.files io.streams.string kernel macros math namespaces
-peg.ebnf prettyprint sequences ;
+peg.ebnf prettyprint sequences multiline ;
 
 IN: brainfuck
 
@@ -49,7 +49,7 @@ TUPLE: brainfuck pointer memory ;
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ;
 
-EBNF: parse-brainfuck
+EBNF: parse-brainfuck [=[
 
 inc-ptr  = (">")+  => [[ length '[ _ (>) ] ]]
 dec-ptr  = ("<")+  => [[ length '[ _ (<) ] ]]
@@ -66,7 +66,7 @@ loop  = "[" {loop|ops}+ "]" => [[ second compose-all '[ [ (?) ] _ while ] ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
-;EBNF
+]=]
 
 PRIVATE>
 

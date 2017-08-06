@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences
+USING: kernel accessors sequences multiline
 peg peg.ebnf peg.javascript.ast peg.javascript.tokenizer ;
 IN: peg.javascript.parser
 
@@ -18,7 +18,7 @@ IN: peg.javascript.parser
 ! This operates a character at a time. Using this 'nl' in the parser
 ! allows us to detect newlines when we need to for the semicolon
 ! insertion rule, but ignore it in all other places.
-EBNF: javascript
+EBNF: javascript [=[
 tokenizer         = default
 nl                = "\r\n" | "\n"
 
@@ -197,4 +197,4 @@ SrcElem            =   "function" Name:n FuncRest:f                  => [[ n f a
                      | Stmt
 SrcElems           = SrcElem*                                      => [[ ast-begin boa ]]
 TopLevel           = SrcElems Spaces
-;EBNF
+]=]

@@ -1,5 +1,5 @@
 USING: accessors arrays combinators io kernel math.parser peg prettyprint
-sequences strings unicode peg.ebnf ;
+sequences strings unicode peg.ebnf multiline ;
 IN: llvm.examples.kaleidoscope
 
 TUPLE: ast-binop lhs rhs operator ;
@@ -10,7 +10,7 @@ TUPLE: ast-unop expr ;
 TUPLE: ast-call name args ;
 TUPLE: ast-if condition true false ;
 
-EBNF: tokenize-kaleidoscope
+EBNF: tokenize-kaleidoscope [=[
 Letter            = [a-zA-Z]
 Digit             = [0-9]
 Digits            = Digit+
@@ -27,9 +27,9 @@ Special           = "(" | ")" | "*" | "+" | "/" | "-" | "<" | ">" | ","
 Keyword           = ("def" | "extern" | "if" | "then" | "else") !(NameRest)
 Tok               = Spaces (Keyword | Name | Number | Special)
 Toks              = Tok* Spaces
-;EBNF
+]=]
 
-EBNF: parse-kaleidoscope
+EBNF: parse-kaleidoscope [=[
 tokenizer         = <foreign tokenize-kaleidoscope Tok>
 Name              = . ?[ ast-name?   ]?         => [[ value>> ]]
 Number            = . ?[ ast-number? ]?         => [[ value>> ]]
@@ -55,4 +55,4 @@ SrcElem           = "def" Name:n "(" Name*:fs ")" CondExpr:expr => [[ n fs expr 
                   | RelExpr
 SrcElems          = SrcElem*
 TopLevel          = SrcElems
-;EBNF
+]=]

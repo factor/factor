@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit interval-maps kernel locals
-math.parser memoize peg.ebnf regexp.ast regexp.classes sequences
-sets splitting strings unicode unicode.data unicode.script ;
+math.parser memoize multiline peg.ebnf regexp.ast regexp.classes
+sequences sets splitting strings unicode unicode.data unicode.script ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -126,7 +126,7 @@ ERROR: nonexistent-option name ;
 !       add greedy and nongreedy forms of matching
 ! (once it's all implemented)
 
-EBNF: parse-regexp
+EBNF: parse-regexp [=[
 
 CharacterInBracket = !("}") Character
 
@@ -217,4 +217,4 @@ Alternation = Concatenation:c ("|" Concatenation)*:a
 End = !(.)
 
 Main = Alternation End
-;EBNF
+]=]

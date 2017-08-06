@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.short-circuit
 io.directories io.files io.files.info io.pathnames kernel locals
 make peg.ebnf regexp regexp.combinators sequences strings system
-unicode ;
+unicode multiline ;
 IN: globs
 
 : not-path-separator ( -- sep )
@@ -12,7 +12,7 @@ IN: globs
 : wild-path-separator ( -- sep )
     os windows? R/ [^\\/\\][\\/\\]|[^\\/\\]/ R/ [^\\/][\\/]|[^\\/]/ ? ; foldable
 
-EBNF: <glob>
+EBNF: <glob> [=[
 
 Character = "\\" .:c => [[ c 1string <literal> ]]
           | !(","|"}") . => [[ 1string <literal> ]]
@@ -45,7 +45,7 @@ End = !(.)
 
 Main = Concatenation End
 
-;EBNF
+]=]
 
 : glob-matches? ( input glob -- ? )
     [ >case-fold ] bi@ <glob> matches? ;
