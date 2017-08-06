@@ -5,7 +5,7 @@ combinators.smart fry generalizations io io.streams.string
 kernel macros math math.functions math.parser namespaces
 peg.ebnf present prettyprint quotations sequences
 sequences.generalizations strings unicode vectors
-math.functions.integer-logs splitting ;
+math.functions.integer-logs splitting multiline ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -93,7 +93,7 @@ IN: formatting
 
 ERROR: unknown-printf-directive ;
 
-EBNF: parse-printf
+EBNF: parse-printf [=[
 
 zero      = "0"                  => [[ CHAR: 0 ]]
 char      = "'" (.)              => [[ second ]]
@@ -146,7 +146,7 @@ plain-text = (!("%").)+          => [[ >string ]]
 
 text      = (formats|plain-text)* => [[ ]]
 
-;EBNF
+]=]
 
 : printf-quot ( format-string -- format-quot n )
     parse-printf [ [ callable? ] count ] keep [
@@ -211,7 +211,7 @@ MACRO: sprintf ( format-string -- quot )
 
 : week-of-year-monday ( timestamp -- n ) 1 week-of-year ; inline
 
-EBNF: parse-strftime
+EBNF: parse-strftime [=[
 
 fmt-%     = "%"                  => [[ "%" ]]
 fmt-a     = "a"                  => [[ [ day-of-week day-abbreviation3 ] ]]
@@ -247,7 +247,7 @@ plain-text = (!("%").)+          => [[ >string ]]
 
 text      = (formats|plain-text)* => [[ ]]
 
-;EBNF
+]=]
 
 PRIVATE>
 

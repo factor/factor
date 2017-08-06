@@ -3,7 +3,7 @@
 USING: accessors arrays ascii assocs combinators fry io.pathnames
 io.sockets io.sockets.secure kernel lexer linked-assocs make
 math.parser namespaces peg.ebnf present sequences splitting
-strings strings.parser urls.encoding vocabs.loader ;
+strings strings.parser urls.encoding vocabs.loader multiline ;
 IN: urls
 
 TUPLE: url protocol username password host port path query anchor ;
@@ -38,7 +38,7 @@ M: url >url ;
 
 <PRIVATE
 
-EBNF: parse-url
+EBNF: parse-url [=[
 
 protocol = [a-zA-Z0-9.+-]+          => [[ url-decode ]]
 username = [^/:@#?]+                => [[ url-decode ]]
@@ -60,7 +60,7 @@ url      = (((protocol "://") => [[ first ]] auth hostname)
            ("?" query               => [[ second ]])?
            ("#" anchor              => [[ second ]])?
 
-;EBNF
+]=]
 
 PRIVATE>
 

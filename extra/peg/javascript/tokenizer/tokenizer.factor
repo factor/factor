@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings arrays math.parser peg peg.ebnf peg.javascript.ast ;
+USING: kernel sequences strings arrays math.parser peg peg.ebnf
+peg.javascript.ast multiline ;
 IN: peg.javascript.tokenizer
 
 ! Grammar for JavaScript. Based on OMeta-JS example from:
@@ -8,7 +9,7 @@ IN: peg.javascript.tokenizer
 
 USE: prettyprint
 
-EBNF: tokenize-javascript
+EBNF: tokenize-javascript [=[
 Letter            = [a-zA-Z]
 Digit             = [0-9]
 Digits            = Digit+
@@ -87,4 +88,4 @@ Special            =   "("    | ")"   | "{"   | "}"   | "["   | "]"   | ","   | 
                      | "^"
 Tok                = Spaces (Name | Keyword | Number | Str | RegExp | Special )
 Toks               = Tok* Spaces
-;EBNF
+]=]

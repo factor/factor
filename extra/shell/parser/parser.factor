@@ -1,5 +1,5 @@
-USING: accessors kernel peg peg.ebnf sequences sequences.deep
-strings ;
+USING: accessors kernel multiline peg peg.ebnf sequences
+sequences.deep strings ;
 
 IN: shell.parser
 
@@ -41,7 +41,7 @@ TUPLE: factor-expr        expr ;
 : ast>factor-expr ( ast -- obj )
     second >string factor-expr boa ;
 
-EBNF: expr
+EBNF: expr [=[
 
 space = " "
 
@@ -89,4 +89,4 @@ pipeline = _ command _ (in-file)? _ "|" _ (command _ "|" _)* command _ (to-file 
 
 submission = (pipeline | basic)
 
-;EBNF
+]=]

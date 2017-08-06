@@ -3,7 +3,7 @@
 USING: accessors arrays assocs fry kernel math
 math.affine-transforms math.functions math.parser math.trig
 peg.ebnf sequences sequences.squish splitting strings xml.data
-xml.syntax ;
+xml.syntax multiline ;
 
 IN: svg
 
@@ -17,7 +17,7 @@ XML-NS: inkscape-name http://www.inkscape.org/namespaces/inkscape
     [ string>number ] [ [ string>number 10^ ] [ 1 ] if* ] bi* *
     >float ;
 
-EBNF: svg-transform>affine-transform
+EBNF: svg-transform>affine-transform [=[
 
 transforms =
     transform:m comma-wsp+ transforms:n => [[ m n a. ]]
@@ -77,7 +77,7 @@ wsp = [ \t\r\n]
 transform-list = wsp* transforms?:t wsp*
     => [[ t [ identity-transform ] unless* ]]
 
-;EBNF
+]=]
 
 : tag-transform ( tag -- transform )
     "transform" svg-name attr svg-transform>affine-transform ;
@@ -96,7 +96,7 @@ TUPLE: elliptical-arc radii x-axis-rotation large-arc? sweep? p relative? ;
 : (set-relative) ( args rel -- args )
     '[ [ _ >>relative? drop ] each ] keep ;
 
-EBNF: svg-path>array
+EBNF: svg-path>array [=[
 
 moveto-drawto-command-groups =
     moveto-drawto-command-group:first wsp* moveto-drawto-command-groups:rest
@@ -219,7 +219,7 @@ wsp = [ \t\r\n]
 
 svg-path = wsp* moveto-drawto-command-groups?:x wsp* => [[ x ]]
 
-;EBNF
+]=]
 
 : tag-d ( tag -- d )
     "d" svg-name attr svg-path>array ;

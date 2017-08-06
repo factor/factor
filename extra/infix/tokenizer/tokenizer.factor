@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: infix.ast kernel peg peg.ebnf math.parser sequences
-strings ;
+strings multiline ;
 IN: infix.tokenizer
 
-EBNF: tokenize-infix
+EBNF: tokenize-infix [=[
 Letter            = [a-zA-Z]
 Digit             = [0-9]
 Digits            = Digit+
@@ -22,4 +22,4 @@ Special           =   [+*/%(),] | "-" => [[ CHAR: - ]]
 Tok               = Spaces (Name | Number | String | Special )
 End               = !(.)
 Toks              = Tok* Spaces End
-;EBNF
+]=]
