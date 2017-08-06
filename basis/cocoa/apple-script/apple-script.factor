@@ -12,5 +12,5 @@ IN: cocoa.apple-script
     f -> executeAndReturnError: drop ;
 
 SYNTAX: APPLESCRIPT:
-    scan-new-word ";APPLESCRIPT" parse-multiline-string
+    scan-new-word scan-object
     [ run-apple-script ] curry ( -- ) define-declared ;
