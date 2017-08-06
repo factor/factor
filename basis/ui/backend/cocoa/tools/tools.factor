@@ -21,7 +21,7 @@ IN: ui.backend.cocoa.tools
     image-path save-panel [ save-image ] when* ;
 
 ! Handle Open events from the Finder
-CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
+<CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
 
     METHOD: void application: id app openFiles: id files [ files finder-run-files ] ;
 
@@ -46,7 +46,7 @@ CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
     METHOD: id switchDarkTheme: id app [ dark-mode f ] ;
 
     METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
-;
+;CLASS>
 
 : install-app-delegate ( -- )
     NSApp FactorWorkspaceApplicationDelegate install-delegate ;
@@ -57,7 +57,7 @@ CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
     dup [ quot call( string -- result/f ) ] when
     [ pboard set-pasteboard-string ] when* ;
 
-CLASS: FactorServiceProvider < NSObject
+<CLASS: FactorServiceProvider < NSObject
 
     METHOD: void evalInListener: id pboard userData: id userData error: id error
     [ pboard error [ eval-listener f ] do-service ] ;
@@ -67,7 +67,7 @@ CLASS: FactorServiceProvider < NSObject
         pboard error
         [ [ (eval>string) ] with-interactive-vocabs ] do-service
     ] ;
-;
+;CLASS>
 
 : register-services ( -- )
     NSApp

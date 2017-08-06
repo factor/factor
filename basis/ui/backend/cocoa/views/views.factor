@@ -161,7 +161,7 @@ CONSTANT: selector>action H{
     selector>action at
     [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ;
 
-CLASS: FactorView < NSOpenGLView
+<CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInput
 
     METHOD: void prepareOpenGL [
@@ -388,7 +388,7 @@ CLASS: FactorView < NSOpenGLView
         self remove-observer
         self SUPER-> dealloc
     ] ;
-;
+;CLASS>
 
 : sync-refresh-to-screen ( GLView -- )
     -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 int <ref>
@@ -400,7 +400,7 @@ CLASS: FactorView < NSOpenGLView
 : save-position ( world window -- )
     -> frame CGRect-top-left 2array >>window-loc drop ;
 
-CLASS: FactorWindowDelegate < NSObject
+<CLASS: FactorWindowDelegate < NSObject
 
     METHOD: void windowDidMove: id notification
     [
@@ -444,7 +444,7 @@ CLASS: FactorWindowDelegate < NSObject
             [ 1.0 > retina? set-global ] bi
         ] [ drop ] if
     ] ;
-;
+;CLASS>
 
 : install-window-delegate ( window -- )
     FactorWindowDelegate install-delegate ;
