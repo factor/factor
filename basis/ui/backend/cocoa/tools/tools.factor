@@ -48,7 +48,7 @@ IN: ui.backend.cocoa.tools
     METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
 ;CLASS>
 
-: install-app-delegate ( -- )
+: install-workspace-delegate ( -- )
     NSApp FactorWorkspaceApplicationDelegate install-delegate ;
 
 ! Service support; evaluate Factor code from other apps
@@ -77,7 +77,7 @@ IN: ui.backend.cocoa.tools
 FUNCTION: void NSUpdateDynamicServices ( )
 
 [
-    install-app-delegate
+    install-workspace-delegate
     "Factor.nib" load-nib
     register-services
 ] cocoa-startup-hook set-global
