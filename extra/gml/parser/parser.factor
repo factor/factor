@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: accessors kernel arrays strings math.parser peg peg.ebnf
-gml.types gml.runtime sequences sequences.deep locals combinators math ;
+multiline gml.types gml.runtime sequences sequences.deep locals
+combinators math ;
 IN: gml.parser
 
 TUPLE: comment string ;
