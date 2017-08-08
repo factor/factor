@@ -165,7 +165,6 @@ CONSTANT: selector>action H{
     COCOA-PROTOCOL: NSTextInput
 
     METHOD: void prepareOpenGL [
-        self SUPER-> prepareOpenGL
 
         self SEL: setWantsBestResolutionOpenGLSurface:
         -> respondsToSelector: c-bool> [
