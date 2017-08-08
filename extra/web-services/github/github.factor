@@ -4,7 +4,7 @@ USING: assocs cli.git concurrency.combinators
 concurrency.semaphores formatting fry http.client io
 io.directories json.reader kernel locals math namespaces
 sequences ;
-IN: github
+IN: web-services.github
 
 SYMBOL: github-username
 SYMBOL: github-token
