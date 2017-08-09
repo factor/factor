@@ -1,11 +1,13 @@
 ! Copyright (C) 2009 Matthew Willis, 2017 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax kernel
-ldcache ;
+USING: alien alien.c-types alien.libraries alien.syntax combinators
+kernel ldcache system ;
 IN: llvm.ffi
 
-<<
-"llvm" "LLVM-3.9" find-so [ cdecl add-library ] [ drop ] if*
+<< "llvm" {
+    { [ os linux? ] [ "LLVM-3.9" find-so [ cdecl add-library ] [ drop ] if* ] }
+    [ drop ]
+} cond
 >>
 
 LIBRARY: llvm
@@ -70,7 +72,6 @@ FUNCTION: LLVMTypeRef LLVMPPCFP128Type ( )
 
 FUNCTION: LLVMTypeRef LLVMVoidType ( )
 FUNCTION: LLVMTypeRef LLVMLabelType ( )
-FUNCTION: LLVMTypeRef LLVMOpaqueType ( )
 
 ! ! Integer type
 FUNCTION: LLVMTypeRef LLVMInt1Type ( )
@@ -193,4 +194,4 @@ FUNCTION: void LLVMInitializeX86TargetInfo ( )
 FUNCTION: void LLVMInitializeX86Target ( )
 FUNCTION: void LLVMInitializeX86TargetMC ( )
 
-! Removed symbols: LLVMCreateJITCompiler, LLVMCreateTypeHandle
+! Removed symbols: LLVMCreateJITCompiler, LLVMCreateTypeHandle, LLVMOpaqueType
