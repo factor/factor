@@ -33,7 +33,7 @@ IN: windows.dragdrop-listener
 TUPLE: listener-dragdrop hWnd last-drop-effect ;
 
 : <listener-dragdrop> ( hWnd -- object )
-    DROPEFFECT_NONE listener-dragdrop construct-boa ;
+    DROPEFFECT_NONE listener-dragdrop boa ;
 
 SYMBOL: +listener-dragdrop-wrapper+
 {
