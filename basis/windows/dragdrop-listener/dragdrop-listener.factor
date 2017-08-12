@@ -1,8 +1,9 @@
-USING: alien.strings io.encodings.utf16n windows.com
-windows.com.wrapper combinators windows.kernel32 windows.ole32
-windows.shell32 kernel accessors windows.types
-prettyprint namespaces ui.tools.listener ui.tools.workspace
-alien.data alien sequences math classes.struct ;
+USING: accessors alien.accessors alien.data alien.strings
+classes.struct io.encodings.utf16n kernel make math namespaces
+prettyprint sequences specialized-arrays
+ui.gadgets.worlds ui.tools.listener windows.com
+windows.com.wrapper windows.kernel32 windows.ole32
+windows.shell32 windows.types ;
 SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
 
