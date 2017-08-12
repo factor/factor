@@ -68,7 +68,6 @@ SYMBOL: +listener-dragdrop-wrapper+
 } <com-wrapper> +listener-dragdrop-wrapper+ set-global
 
 : dragdrop-listener-window ( -- )
-    get-workspace parent>> handle>> hWnd>>
-    dup <listener-dragdrop>
+    world get handle>> hWnd>> dup <listener-dragdrop>
     +listener-dragdrop-wrapper+ get-global com-wrap
-    [ RegisterDragDrop ole32-error ] with-com-interface ;
+    [ RegisterDragDrop check-ole32-error ] with-com-interface ;
