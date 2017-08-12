@@ -42,12 +42,12 @@ SYMBOL: +listener-dragdrop-wrapper+
                 2drop
                 filenames-from-data-object
                 length 1 = [ DROPEFFECT_COPY ] [ DROPEFFECT_NONE ] if
-                dup 0
-            ] dip set-ulong-nth
+                dup
+            ] dip 0 set-alien-unsigned-4
             >>last-drop-effect drop
             S_OK
         ] [ ! DragOver
-            [ 2drop last-drop-effect>> 0 ] dip set-ulong-nth
+            [ 2drop last-drop-effect>> ] dip 0 set-alien-unsigned-4
             S_OK
         ] [ ! DragLeave
             drop S_OK
@@ -60,8 +60,7 @@ SYMBOL: +listener-dragdrop-wrapper+
                     eval-listener
                     DROPEFFECT_COPY
                 ] [ 2drop DROPEFFECT_NONE ] if
-                0
-            ] dip set-ulong-nth
+            ] dip 0 set-alien-unsigned-4
             S_OK
         ]
     } }
