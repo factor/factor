@@ -1,3 +1,6 @@
+! Copyright (C) 2008, 2009 Joe Groff, Slava Pestov.
+! Copyright (C) 2017 Alexander Ilin.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.data alien.strings
 classes.struct io.encodings.utf16n kernel make math namespaces
 prettyprint sequences specialized-arrays
