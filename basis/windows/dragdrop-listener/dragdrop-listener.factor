@@ -7,8 +7,11 @@ windows.shell32 windows.types ;
 SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
 
+: filecount-from-hdrop ( hdrop -- n )
+    0xFFFFFFFF f 0 DragQueryFile ;
+
 : filenames-from-hdrop ( hdrop -- filenames )
-    dup 0xFFFFFFFF f 0 DragQueryFile ! get count of files
+    dup filecount-from-hdrop
     [
         2dup f 0 DragQueryFile 1 + ! get size of filename buffer
         dup WCHAR <c-array>
