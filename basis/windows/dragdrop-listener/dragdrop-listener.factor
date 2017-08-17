@@ -36,6 +36,9 @@ IN: windows.dragdrop-listener
 : filenames-from-data-object ( data-object -- filenames )
     \ filenames-from-hdrop swap handle-data-object ;
 
+: filecount-from-data-object ( data-object -- n )
+    \ filecount-from-hdrop swap handle-data-object ;
+
 TUPLE: listener-dragdrop hWnd last-drop-effect ;
 
 : <listener-dragdrop> ( hWnd -- object )
@@ -46,9 +49,8 @@ SYMBOL: +listener-dragdrop-wrapper+
     { IDropTarget {
         [ ! HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
             [
-                2drop
-                filenames-from-data-object
-                length 1 = [ DROPEFFECT_COPY ] [ DROPEFFECT_NONE ] if
+                2drop filecount-from-data-object
+                1 = DROPEFFECT_COPY DROPEFFECT_NONE ?
                 dup
             ] dip 0 set-alien-unsigned-4
             >>last-drop-effect drop
