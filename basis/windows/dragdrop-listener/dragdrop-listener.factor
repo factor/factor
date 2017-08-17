@@ -11,7 +11,7 @@ IN: windows.dragdrop-listener
     0xFFFFFFFF f 0 DragQueryFile ;
 
 : filenames-from-hdrop ( hdrop -- filenames )
-    dup filecount-from-hdrop
+    dup filecount-from-hdrop <iota>
     [
         2dup f 0 DragQueryFile 1 + ! get size of filename buffer
         dup WCHAR <c-array>
