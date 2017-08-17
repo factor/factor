@@ -60,7 +60,7 @@ SYMBOL: +listener-dragdrop-wrapper+
                     first unparse [ "USE: parser " % % " run-file" % ] "" make
                     eval-listener
                     DROPEFFECT_COPY
-                ] [ 2drop DROPEFFECT_NONE ] if
+                ] [ drop DROPEFFECT_NONE ] if
             ] dip 0 set-alien-unsigned-4
             S_OK
         ]
