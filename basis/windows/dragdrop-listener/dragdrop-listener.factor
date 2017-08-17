@@ -19,7 +19,7 @@ IN: windows.dragdrop-listener
         utf16n alien>string
     ] with map ;
 
-: filenames-from-data-object ( data-object -- filenames )
+: handle-data-object ( handler:  ( hdrop -- x ) data-object -- filenames )
     FORMATETC <struct>
         CF_HDROP         >>cfFormat
         f                >>ptd
@@ -29,9 +29,12 @@ IN: windows.dragdrop-listener
     STGMEDIUM <struct>
     [ IDataObject::GetData ] keep swap succeeded? [
         dup data>>
-        [ filenames-from-hdrop ] with-global-lock
+        [ rot execute( hdrop -- x ) ] with-global-lock
         swap ReleaseStgMedium
-    ] [ drop f ] if ;
+    ] [ 2drop f ] if ;
+
+: filenames-from-data-object ( data-object -- filenames )
+    \ filenames-from-hdrop swap handle-data-object ;
 
 TUPLE: listener-dragdrop hWnd last-drop-effect ;
 
