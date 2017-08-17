@@ -37,7 +37,7 @@ TUPLE: listener-dragdrop hWnd last-drop-effect ;
 
 SYMBOL: +listener-dragdrop-wrapper+
 {
-    { "IDropTarget" {
+    { IDropTarget {
         [ ! DragEnter
             [
                 2drop
