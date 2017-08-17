@@ -38,7 +38,7 @@ TUPLE: listener-dragdrop hWnd last-drop-effect ;
 SYMBOL: +listener-dragdrop-wrapper+
 {
     { IDropTarget {
-        [ ! DragEnter
+        [ ! HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
             [
                 2drop
                 filenames-from-data-object
@@ -47,12 +47,12 @@ SYMBOL: +listener-dragdrop-wrapper+
             ] dip 0 set-alien-unsigned-4
             >>last-drop-effect drop
             S_OK
-        ] [ ! DragOver
+        ] [ ! HRESULT DragOver ( DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
             [ 2drop last-drop-effect>> ] dip 0 set-alien-unsigned-4
             S_OK
-        ] [ ! DragLeave
+        ] [ ! HRESULT DragLeave ( )
             drop S_OK
-        ] [ ! Drop
+        ] [ ! HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
             [
                 2drop nip
                 filenames-from-data-object
