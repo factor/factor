@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays concurrency.combinators concurrency.semaphores fry
 io.directories io.files.info io.launcher io.pathnames kernel
-math namespaces sequences splitting system-info ;
+math namespaces sequences splitting system-info.linux ;
 IN: cli.git
 
 SYMBOL: cli-git-num-parallel
-cli-git-num-parallel [ cpus 2 * ] initialize
+cli-git-num-parallel [ hyperthreads 2 * ] initialize
 
 : git-clone-as ( ssh-url path -- process )
     [ { "git" "clone" } ] 2dip 2array append run-process ;
@@ -34,4 +34,3 @@ cli-git-num-parallel [ cpus 2 * ] initialize
             _ [ update-repository ] with-semaphore
         ] parallel-each
     ] with-ensure-directory ;
-
