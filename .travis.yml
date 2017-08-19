@@ -1,0 +1,62 @@
+
+language: cpp
+compiler:
+  - clang
+  - gcc
+os:
+  - linux
+  - osx
+branches:
+  only:
+    - master
+sudo: required
+dist: trusty
+services:
+  - postgresql
+  - redis-server
+addons:
+  apt:
+    packages:
+      - links
+      - libblas-dev
+      - libfftw3-dev
+      - libmagic-dev
+      - libsnappy-dev
+      - libzmq-dev
+      - libpq-dev
+      - cmake
+      - libaio-dev
+      - libsnappy-dev
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions cmake > /dev/null || brew install cmake; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions libmagic > /dev/null || brew install libmagic; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions memcached > /dev/null || brew install memcached; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions redis > /dev/null || brew install redis; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions zeromq > /dev/null || brew install zeromq; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions postgresql > /dev/null || brew install postgresql; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions fftw > /dev/null || brew install fftw; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start redis; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
+  - >
+    wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz &&
+    ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) &&
+    ( [[ "$TRAVIS_OS_NAME" != "osx" ]] && sudo ldconfig || true )
+  - >
+      ( git clone -b v1.2 git://github.com/couchbase/forestdb &&
+      cd forestdb && mkdir build && cd build && cmake ../ &&
+      make all &&
+      [[ "$TRAVIS_OS_NAME" != "osx" ]] && ( sudo cp libforestdb.so /usr/lib && sudo ldconfig ) || ( true )
+      )
+script: >
+  ( echo "=== Bootstrap ===" ;  ./build.sh net-bootstrap < /dev/null ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ] )  &&
+  ( echo "=== Factor Configure Postgresql ===" ; ./factor -e='USING: db.postgresql namespaces memory ; T{ postgresql-db f "localhost" f f f f "postgres" "" } \ postgresql-db set-global save' ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ] ) &&
+  ( echo "=== Factor Configure Imap ===" ; ./factor -e='USING: imap namespaces memory environment accessors ; T{ imap-settings { host "imap.gmail.com" }  } "FACTOR_IMAP_USER" os-env >>email "FACTOR_IMAP_PASSWORD" os-env >>password \ imap-settings set-global save' ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ] ) &&
+  ( echo "=== Mkdir ===" ; mkdir -p mason/builds ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ] ) &&
+  ( echo "=== Factor tests ===" ; cd mason/builds && ../../factor -run=mason.test < /dev/null | awk 'NR<1000 || /^Loading resource|Unit Test/' ; ret=${PIPESTATUS[0]} ; echo "=== $ret ==="; [ $ret == 0 ]) &&
+  ( echo "=== Factor report === " ; cd mason && ../factor -e='USING: mason.config mason.report namespaces ; "." builds-dir [ successful-report ] with-variable'  ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ]) &&
+  ( echo "=== Dump report === " ;[[ "$TRAVIS_OS_NAME" != "osx" ]] && links -dump mason/report || cat mason/report  ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ]) &&
+  [ ! -s mason/test-all-errors ]
