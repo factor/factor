@@ -10,6 +10,8 @@ windows.shell32 windows.types ;
 SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
 
+CONSTANT: E_OUTOFMEMORY -2147024882 ! 0x8007000e
+
 : filecount-from-hdrop ( hdrop -- n )
     0xFFFFFFFF f 0 DragQueryFile ;
 
@@ -85,5 +87,8 @@ SYMBOL: +listener-dragdrop-wrapper+
 
 : dragdrop-listener-window ( -- )
     world get handle>> hWnd>> dup <listener-dragdrop>
-    +listener-dragdrop-wrapper+ get-global com-wrap
-    [ RegisterDragDrop check-ole32-error ] with-com-interface ;
+    +listener-dragdrop-wrapper+ get-global com-wrap [
+        2dup RegisterDragDrop dup E_OUTOFMEMORY =
+        [ drop ole-initialize RegisterDragDrop ] [ 2nip ] if
+        check-ole32-error
+    ] with-com-interface ;
