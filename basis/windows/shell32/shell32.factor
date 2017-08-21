@@ -309,10 +309,16 @@ COM-INTERFACE: IShellFolder IUnknown {000214E6-0000-0000-C000-000000000046}
 
 FUNCTION: HRESULT SHGetDesktopFolder ( IShellFolder** ppshf )
 
+FUNCTION: void DragAcceptFiles ( HWND hWnd, BOOL fAccept )
+
 FUNCTION: UINT DragQueryFileW ( HDROP hDrop,
                                 UINT iFile,
                                 LPWSTR lpszFile,
                                 UINT cch )
 ALIAS: DragQueryFile DragQueryFileW
+
+FUNCTION: BOOL DragQueryPoint ( HDROP hDrop, POINT* lppt )
+
+FUNCTION: void DragFinish ( HDROP hDrop )
 
 FUNCTION: BOOL IsUserAnAdmin ( )
