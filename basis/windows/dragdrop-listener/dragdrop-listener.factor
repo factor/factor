@@ -5,24 +5,12 @@ USING: accessors alien.accessors alien.data alien.strings
 classes.struct io.encodings.utf16n kernel make math namespaces
 prettyprint sequences specialized-arrays
 ui.gadgets.worlds ui.tools.listener windows.com
-windows.com.wrapper windows.kernel32 windows.ole32
-windows.shell32 windows.types ;
+windows.com.wrapper windows.dropfiles windows.kernel32
+windows.ole32 windows.shell32 windows.types ;
 SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
 
 CONSTANT: E_OUTOFMEMORY -2147024882 ! 0x8007000e
-
-: filecount-from-hdrop ( hdrop -- n )
-    0xFFFFFFFF f 0 DragQueryFile ;
-
-: filenames-from-hdrop ( hdrop -- filenames )
-    dup filecount-from-hdrop <iota>
-    [
-        2dup f 0 DragQueryFile 1 + ! get size of filename buffer
-        dup WCHAR <c-array>
-        [ swap DragQueryFile drop ] keep
-        utf16n alien>string
-    ] with map ;
 
 : handle-data-object ( handler:  ( hdrop -- x ) data-object -- filenames )
     FORMATETC <struct>
