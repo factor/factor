@@ -148,11 +148,23 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     [ lex-factor ] dip swap 2array ;
 
 : strict-upper? ( string -- ? )
-    [ { [ CHAR: A CHAR: Z between? ] [ "#:-" member? ] } 1|| ] all? ;
+    [ { [ CHAR: A CHAR: Z between? ] [ ":-" member? ] } 1|| ] all? ;
 
 ! <a <a: but not <a>
-: section? ( string -- ? )
-    { [ "<" head? ] [ ">" tail? not ] } 1&& ;
+: section-open? ( string -- ? )
+    {
+        [ "<" head? ]
+        [ length 2 >= ]
+        [ rest strict-upper? ]
+        [ ">" tail? not ]
+    } 1&& ;
+
+: section-close? ( string -- ? )
+    {
+        [ length 2 >= ]
+        [ but-last strict-upper? ]
+        [ ">" tail? ]
+    } 1&& ;
 
 ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
 : read-colon ( n string slice -- n' string colon )
@@ -198,7 +210,7 @@ ERROR: mismatched-terminator n string slice ;
 
 : lex-factor ( n/f string -- n'/f string literal )
     over [
-        skip-whitespace "\"\\!:[{(<\s\r\n" slice-til-either {
+        skip-whitespace "\"\\!:[{(<>\s\r\n" slice-til-either {
             ! { CHAR: ` [ read-backtick ] }
             { CHAR: " [ read-string ] }
             { CHAR: \ [ read-backslash ] }
@@ -217,13 +229,24 @@ ERROR: mismatched-terminator n string slice ;
                 ! FOO: a b <asdf>
                 ! FOO: a b <asdf asdf>
                 [ slice-til-whitespace drop ] dip span-slices
+
                 ! if we are in a FOO: and we hit a <BAR or <BAR:
                 ! then end the FOO:
-                dup section? strict-upper get and [
-                    length swap [ - ] dip f
-                    strict-upper off
+                dup section-open? [
+                    strict-upper get [
+                        length swap [ - ] dip f strict-upper off
+                    ] [
+                        read-acute
+                    ] if
+                ] when
+            ] }
+            { CHAR: > [
+                dup section-close? [
+                    strict-upper get [
+                        length swap [ - ] dip f strict-upper off
+                    ] when
                 ] [
-                    read-acute
+                    [ slice-til-whitespace drop ] dip span-slices ! >= >> etc
                 ] if
             ] }
             { CHAR: [ [ read-bracket ] }
