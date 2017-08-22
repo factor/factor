@@ -52,7 +52,23 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
 DEFER: lex-factor
 ERROR: lex-expected-but-got-eof n string expected ;
 ! For implementing [ { (
-: lex-until ( n string tags -- n' string payload )
+: lex-until ( n string tag-sequence -- n' string payload )
+    3dup '[
+        [
+            lex-factor dup [ , ] when* [
+                dup [
+                    ! } gets a chance, but then also full seq { } after recursion...
+                    [ _ ] dip '[ _ sequence= ] any? not
+                ] [
+                    drop t ! loop again?
+                ] if
+            ] [
+                _ _ _ lex-expected-but-got-eof
+            ] if*
+        ] loop
+    ] { } make ;
+
+: lex-colon-until ( n string tag-sequence -- n' string payload )
     '[
         [
             lex-factor dup [ , ] when* [
@@ -63,7 +79,7 @@ ERROR: lex-expected-but-got-eof n string expected ;
                     drop t ! loop again?
                 ] if
             ] [
-                f
+                f ! need to error here if { } unmatched
             ] if*
         ] loop
     ] { } make ;
@@ -83,7 +99,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array lex-until ] dip
-                1 cut-slice* rot 3array ] } ! ( foo )
+                1 cut-slice* rot unclip-last 4array ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
         } cond
     ] ;
@@ -118,7 +134,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     ] if ;
 
 : read-til-semicolon ( n string slice -- n' string semi )
-    dup '[ but-last ";" append ";" 2array lex-until ] dip
+    dup '[ but-last ";" append ";" 2array lex-colon-until ] dip
     swap 2array ;
 
 : read-word-or-til-semicolon ( n string slice -- n' string obj )
@@ -133,6 +149,10 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 
 : strict-upper? ( string -- ? )
     [ { [ CHAR: A CHAR: Z between? ] [ "#:-" member? ] } 1|| ] all? ;
+
+! <a <a: but not <a>
+: section? ( string -- ? )
+    { [ "<" head? ] [ ">" tail? not ] } 1&& ;
 
 ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
 : read-colon ( n string slice -- n' string colon )
@@ -150,7 +170,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     ] if ;
 
 : read-acute ( n string slice -- n' string acute )
-    ;
+    [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
 
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( n string slice -- n' string obj )
@@ -178,7 +198,7 @@ ERROR: mismatched-terminator n string slice ;
 
 : lex-factor ( n/f string -- n'/f string literal )
     over [
-        skip-whitespace "\"\\!:[{(\s\r\n" slice-til-either {
+        skip-whitespace "\"\\!:[{(<\s\r\n" slice-til-either {
             ! { CHAR: ` [ read-backtick ] }
             { CHAR: " [ read-string ] }
             { CHAR: \ [ read-backslash ] }
@@ -191,10 +211,24 @@ ERROR: mismatched-terminator n string slice ;
                     read-colon
                 ] if
             ] }
+            { CHAR: < [
+                ! FOO: a b <BAR: ;BAR>
+                ! FOO: a b <BAR BAR>
+                ! FOO: a b <asdf>
+                ! FOO: a b <asdf asdf>
+                [ slice-til-whitespace drop ] dip span-slices
+                ! if we are in a FOO: and we hit a <BAR or <BAR:
+                ! then end the FOO:
+                dup section? strict-upper get and [
+                    length swap [ - ] dip f
+                    strict-upper off
+                ] [
+                    read-acute
+                ] if
+            ] }
             { CHAR: [ [ read-bracket ] }
             { CHAR: { [ read-brace ] }
             { CHAR: ( [ read-paren ] }
-            { CHAR: < [ read-acute ] }
             { CHAR: \s [ read-token-or-whitespace ] }
             { CHAR: \r [ read-token-or-whitespace ] }
             { CHAR: \n [ read-token-or-whitespace ] }

@@ -16,6 +16,13 @@ IN: modern.slices
 : matching-delimiter-string ( string -- string' )
     [ matching-delimiter ] map ;
 
+: matching-section-delimiter ( string -- string' )
+    dup ":" tail? [
+        rest but-last ";" ">" surround
+    ] [
+        rest ">" append
+    ] if ;
+
 ERROR: unexpected-end n string ;
 : nth-check-eof ( n string -- nth )
     2dup ?nth [ 2nip ] [ unexpected-end ] if* ;
