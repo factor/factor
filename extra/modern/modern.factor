@@ -26,19 +26,20 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
     [| n string tag! ch |
         ch {
             { CHAR: = [
+                tag 1 cut-slice* drop tag! ! tag of (=( is ( here, fix it
                 n string openstr1 slice-til-separator-inclusive [ -1 modify-from ] dip :> ( n' string' opening ch )
                 ch open-ch = [ tag openstr2 n string ch long-opening-mismatch ] unless
                 opening matching-delimiter-string :> needle
 
                 n' string' needle slice-til-string :> ( n'' string'' payload closing )
                 n'' string
-                payload closing tag opening 4array
+                tag opening payload closing 4array
             ] }
             { open-ch [
                 tag 1 cut-slice* swap tag! 1 modify-to :> opening
                 n 1 + string closestr2 slice-til-string :> ( n' string' payload closing )
                 n' string
-                payload closing tag opening 4array
+                tag opening payload closing 4array
             ] }
             [ [ tag openstr2 n string ] dip long-opening-mismatch ]
         } case
@@ -82,7 +83,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array lex-until ] dip
-                1 cut-slice* -rot 3array ] } ! ( foo )
+                1 cut-slice* rot 3array ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
         } cond
     ] ;
