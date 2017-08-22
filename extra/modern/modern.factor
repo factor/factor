@@ -10,6 +10,8 @@ IN: modern
 ERROR: string-expected-got-eof n string ;
 ERROR: long-opening-mismatch tag open n string ch ;
 
+SYMBOL: strict-upper
+
 SYMBOL: delimiter-stack
 : push-delimiter-stack ( obj -- ) delimiter-stack get push ;
 : pop-delimiter-stack ( -- obj ) delimiter-stack get pop ;
@@ -49,45 +51,21 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
 DEFER: lex-factor
 ERROR: lex-expected-but-got-eof n string expected ;
 ! For implementing [ { (
-: lex-until ( n string tags -- n' string payload closing )
-    pick [
-        3dup '[
-            [
-                lex-factor dup , [
-                    dup [
-                        ! } gets a chance, but then also full seq { } after recursion...
-                        [ _ ] dip '[ _ sequence= ] any? not
-                    ] [
-                        drop t ! loop again?
-                    ] if
+: lex-until ( n string tags -- n' string payload )
+    '[
+        [
+            lex-factor dup [ , ] when* [
+                dup [
+                    ! } gets a chance, but then also full seq { } after recursion...
+                    [ _ ] dip '[ _ sequence= ] any? not
                 ] [
-                    _ _ _ lex-expected-but-got-eof
-                ] if*
-            ] loop
-        ] { } make unclip-last
-    ] [
-        lex-expected-but-got-eof
-    ] if ;
-
-: lex-colon-until ( n string tags -- n' string payload closing )
-    pick [
-        3dup '[
-            [
-                lex-factor dup [ , ] when* [
-                    dup [
-                        ! } gets a chance, but then also full seq { } after recursion...
-                        [ _ ] dip '[ _ sequence= ] any? not
-                    ] [
-                        drop t ! loop again?
-                    ] if
-                ] [
-                    _ _ _ lex-expected-but-got-eof
-                ] if*
-            ] loop
-        ] { } make unclip-last
-    ] [
-        lex-expected-but-got-eof
-    ] if ;
+                    drop t ! loop again?
+                ] if
+            ] [
+                f
+            ] if*
+        ] loop
+    ] { } make ;
 
 : split-double-dash ( seq -- seqs )
     dup [ { [ "--" sequence= ] } 1&& ] split-when
@@ -104,7 +82,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array lex-until ] dip
-                1 cut-slice* 2swap 4array ] } ! ( foo )
+                1 cut-slice* -rot 3array ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
         } cond
     ] ;
@@ -139,8 +117,8 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     ] if ;
 
 : read-til-semicolon ( n string slice -- n' string semi )
-    dup '[ but-last ";" append ";" 2array lex-colon-until ] dip
-    -rot 3array ;
+    dup '[ but-last ";" append ";" 2array lex-until ] dip
+    swap 2array ;
 
 : read-word-or-til-semicolon ( n string slice -- n' string obj )
     2over next-char-from* "\s\r\n" member? [
@@ -165,7 +143,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
         ] if
     ] [
         {
-            { [ dup strict-upper? ] [ B read-til-semicolon ] }
+            { [ dup strict-upper? ] [ strict-upper on read-til-semicolon strict-upper off ] }
             [ read-lowercase-colon ]
         } cond
     ] if ;
@@ -204,7 +182,14 @@ ERROR: mismatched-terminator n string slice ;
             { CHAR: " [ read-string ] }
             { CHAR: \ [ read-backslash ] }
             { CHAR: ! [ read-exclamation ] }
-            { CHAR: : [ read-colon ] }
+            { CHAR: : [
+                dup strict-upper? strict-upper get and [
+                    length swap [ - ] dip f
+                    strict-upper off
+                ] [
+                    read-colon
+                ] if
+            ] }
             { CHAR: [ [ read-bracket ] }
             { CHAR: { [ read-brace ] }
             { CHAR: ( [ read-paren ] }
