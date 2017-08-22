@@ -99,7 +99,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array lex-until ] dip
-                1 cut-slice* rot unclip-last 4array ] } ! ( foo )
+                swap unclip-last 3array ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
         } cond
     ] ;
@@ -130,12 +130,18 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     2over ?nth CHAR: [ = [
         [ 1 + ] 2dip 2over ?nth read-double-matched-bracket
     ] [
-        [ slice-til-eol drop dup ] dip 1 cut-slice* 4array
+        [ slice-til-eol drop ] dip swap 2array
     ] if ;
 
 : read-til-semicolon ( n string slice -- n' string semi )
     dup '[ but-last ";" append ";" 2array lex-colon-until ] dip
-    swap 2array ;
+    swap
+    ! Remove the ; from the paylaod if present
+    dup ?last ";" sequence= [
+        unclip-last 3array
+    ] [
+        2array
+    ] if ;
 
 : read-word-or-til-semicolon ( n string slice -- n' string obj )
     2over next-char-from* "\s\r\n" member? [

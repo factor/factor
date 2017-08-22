@@ -1,8 +1,11 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel locals math math.private
-sequences sequences.extras sequences.private unicode ;
+USING: accessors assocs fry kernel locals math sequences
+sequences.deep sequences.extras strings unicode ;
 IN: modern.slices
+
+: >strings ( seq -- str )
+    [ dup slice? [ >string ] when ] deep-map ;
 
 : matching-delimiter ( ch -- ch' )
     H{
