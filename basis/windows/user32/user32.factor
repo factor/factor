@@ -1008,6 +1008,18 @@ STRUCT: DEVMODE
 TYPEDEF: DEVMODE* PDEVMODE
 TYPEDEF: DEVMODE* LPDEVMODE
 
+CONSTANT: MSGFLT_ADD    1
+CONSTANT: MSGFLT_REMOVE 2
+
+CONSTANT: MSGFLT_RESET    0
+CONSTANT: MSGFLT_ALLOW    1
+CONSTANT: MSGFLT_DISALLOW 2
+
+STRUCT: CHANGEFILTERSTRUCT
+    { cbSize DWORD }
+    { ExtStatus DWORD } ;
+TYPEDEF: CHANGEFILTERSTRUCT* PCHANGEFILTERSTRUCT
+
 LIBRARY: user32
 
 FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags )
@@ -1052,6 +1064,16 @@ ALIAS: ChangeDisplaySettingsEx ChangeDisplaySettingsExW
 ALIAS: ChangeDisplaySettings ChangeDisplaySettingsW
 ! FUNCTION: ChangeMenuA
 ! FUNCTION: ChangeMenuW
+
+FUNCTION: BOOL ChangeWindowMessageFilter (
+                UINT message,
+                DWORD dwFlag )
+FUNCTION: BOOL ChangeWindowMessageFilterEx (
+                HWND hWnd,
+                UINT message,
+                DWORD action,
+                PCHANGEFILTERSTRUCT pChangeFilterStruct )
+
 ! FUNCTION: CharLowerA
 ! FUNCTION: CharLowerBuffA
 ! FUNCTION: CharLowerBuffW
