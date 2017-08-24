@@ -79,6 +79,9 @@ M: user-input-tuple send-queued-gesture
 TUPLE: drag # ;             C: <drag> drag
 TUPLE: button-up mods # ;   C: <button-up> button-up
 TUPLE: button-down mods # ; C: <button-down> button-down
+TUPLE: file-drop mods ;     C: <file-drop> file-drop
+
+SYMBOL: dropped-files
 
 SINGLETONS:
     motion

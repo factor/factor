@@ -261,7 +261,9 @@ ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
 }
 "On Windows, " { $link key-up } " gestures are not reported for all keyboard events."
 $nl
-{ $link "multitouch-gestures" } " are only supported on Mac OS X." ;
+{ $link "multitouch-gestures" } " are only supported on Mac OS X."
+$nl
+{ $link "filedrop-gestures" } " are only supported on Windows." ;
 
 ARTICLE: "ui-gestures" "UI gestures"
 "User actions such as keyboard input and mouse button clicks deliver " { $emphasis "gestures" } " to gadgets. If the direct receiver of the gesture does not handle it, the gesture is passed on to the receiver's parent, and this way it travels up the gadget hierarchy. Gestures which are not handled at some point are ignored."
@@ -283,6 +285,7 @@ $nl
 { $subsections
     "mouse-gestures"
     "multitouch-gestures"
+    "filedrop-gestures"
 }
 "Guidelines for cross-platform applications:"
 { $subsections "gesture-differences" }
@@ -417,6 +420,18 @@ $nl
     zoom-in-action
     zoom-out-action
 } ;
+
+ARTICLE: "filedrop-gestures" "File drop gestures"
+"File drop gestures are only supported on Windows. When user drags-and-drops a file or a group of files from another application, the following gesture can be handled:"
+{ $subsections file-drop } ;
+
+HELP: file-drop
+{ $class-description "File drop gesture. The " { $slot "mods" } " slot contains the keyboard modifiers active at the time of the drop (see " { $link "keyboard-gestures" } "). The " { $link dropped-files } " global variable contains an array of full paths of the files that were dropped."
+$nl
+"The " { $link hand-loc } " global variable contains the drop location. If the user dropped files onto the non-client area of a window (the caption or the border), the gesture will not be triggered, but the contents of the " { $link dropped-files } " will be updated." } ;
+
+HELP: dropped-files
+{ $var-description "The global variable holds an array of full paths of the files that were dropped by the last " { $link file-drop } " gesture." } ;
 
 ARTICLE: "action-gestures" "Action gestures"
 "Action gestures exist to keep keyboard shortcuts for common application operations consistent."
