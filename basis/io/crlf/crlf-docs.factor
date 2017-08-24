@@ -14,3 +14,5 @@ HELP: read-crlf
 HELP: read-?crlf
 { $values { "seq" sequence } }
 { $description "Reads until the next LF (line feed) or CRLF (carriage return followed by line feed) from the current input stream, throwing an error if CR is present without immediately being followed by LF." } ;
+
+{ crlf>lf lf>crlf } related-words
