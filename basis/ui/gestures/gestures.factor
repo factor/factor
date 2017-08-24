@@ -360,6 +360,8 @@ M: button-down gesture>string
         #>> [ " " % # ] when*
     ] "" make ;
 
+M: file-drop gesture>string drop "Drop files" ;
+
 M: left-action gesture>string drop "Swipe left" ;
 
 M: right-action gesture>string drop "Swipe right" ;
