@@ -444,6 +444,11 @@ interactor "completion" f {
 
 \ com-auto-use H{ { +nullary+ t } { +listener+ t } } define-command
 
+: com-file-drop ( -- files )
+    dropped-files get-global ;
+
+\ com-file-drop H{ { +nullary+ t } { +listener+ t } } define-command
+
 listener-gadget "toolbar" f {
     { f restart-listener }
     { T{ key-down f { A+ } "u" } com-auto-use }
@@ -470,6 +475,11 @@ listener-gadget "touchbar" f {
     { f refresh-all }
     { f com-auto-use }
     { f com-help }
+} define-command-map
+
+listener-gadget "file-drop" "Files can be drag-and-dropped onto the listener."
+{
+    { T{ file-drop f f } com-file-drop }
 } define-command-map
 
 M: listener-gadget graft*
