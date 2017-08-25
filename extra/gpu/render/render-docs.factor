@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax byte-arrays classes
 gpu.buffers gpu.framebuffers gpu.shaders gpu.textures help.markup
 help.syntax images kernel math sequences

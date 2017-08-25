@@ -1,4 +1,5 @@
-! (c) 2011 Joe Groff bsd license
+! Copyright (C) 2011 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math slots.macros tools.test ;
 IN: slots.macros.tests
 

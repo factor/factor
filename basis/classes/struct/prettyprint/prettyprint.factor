@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009, 2011 Joe Groff, Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data
 alien.prettyprint arrays assocs classes classes.struct
 combinators combinators.short-circuit continuations fry kernel

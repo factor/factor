@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009, 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: classes.struct math.matrices.simd math.vectors.simd math
 literals math.constants math.functions specialized-arrays tools.test ;
 QUALIFIED-WITH: alien.c-types c
