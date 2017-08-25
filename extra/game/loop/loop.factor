@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers alien.c-types calendar classes.struct
 continuations destructors fry kernel math math.order memory
 namespaces sequences system ui ui.gadgets.worlds vm

@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.data byte-arrays destructors help.markup help.syntax
 kernel math quotations ;
 IN: gpu.buffers

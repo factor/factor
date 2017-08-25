@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar calendar.format
 combinators combinators.short-circuit fry io io.backend
 io.directories io.directories.hierarchy io.encodings.binary

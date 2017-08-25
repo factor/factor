@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel pair-rocket tools.test ;
 IN: pair-rocket.tests
 

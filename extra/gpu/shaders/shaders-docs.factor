@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.struct gpu.buffers help.markup help.syntax
 images kernel math multiline quotations sequences strings words ;
 IN: gpu.shaders

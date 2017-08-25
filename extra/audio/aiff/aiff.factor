@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data audio
 audio.chunked-file classes.struct combinators
 combinators.short-circuit endian io io.binary
