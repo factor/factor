@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple compiler.units kernel qw roles sequences
 tools.test ;
 IN: roles.tests

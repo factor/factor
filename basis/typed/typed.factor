@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009, 2010, 2011 Joe Groff, Slava Pestov, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry generalizations
 hints math kernel kernel.private namespaces parser quotations

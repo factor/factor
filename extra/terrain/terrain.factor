@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff, Doug Coleman. bsd license
+! Copyright (C) 2009 Joe Groff, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators game.input game.loop
 game.input.scancodes grouping kernel literals locals
 math math.constants math.functions math.order math.trig

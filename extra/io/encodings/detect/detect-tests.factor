@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays io.encodings.8-bit.koi8-r
 io.encodings.8-bit.latin1 io.encodings.binary
 io.encodings.detect io.encodings.utf16 io.encodings.utf32

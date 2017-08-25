@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators io io.streams.string kernel
 math math.parser roles sequences strings variants words ;
 IN: cuda.ptx

@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data audio classes.struct fry
 calendar timers combinators combinators.short-circuit
 destructors generalizations kernel literals locals math openal

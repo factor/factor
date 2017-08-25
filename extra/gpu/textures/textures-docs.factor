@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien byte-arrays classes gpu.buffers help.markup help.syntax
 images kernel math ;
 IN: gpu.textures

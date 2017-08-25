@@ -1,4 +1,5 @@
-! (c)2012 Joe Groff bsd license
+! Copyright (C) 2012 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: environment io.files.temp io.pathnames sequences system
 xdg ;
 IN: io.files.temp.unix

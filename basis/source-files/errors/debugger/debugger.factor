@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors debugger io kernel make math.parser
 prettyprint source-files.errors summary ;
 IN: source-files.errors.debugger

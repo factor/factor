@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs classes combinators
 combinators.short-circuit fry kernel locals math math.vectors
 math.vectors.simd math.vectors.simd.intrinsics sequences ;

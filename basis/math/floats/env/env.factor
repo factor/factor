@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax arrays assocs biassocs combinators
 combinators.short-circuit continuations generalizations kernel
 literals locals math math.bitwise sequences sets system

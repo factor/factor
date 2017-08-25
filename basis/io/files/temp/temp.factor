@@ -1,4 +1,5 @@
-! (c)2012 Joe Groff bsd license
+! Copyright (C) 2012 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators init io.directories io.pathnames kernel
 namespaces system vocabs ;
 IN: io.files.temp
