@@ -308,6 +308,7 @@ FUNCTION: CUresult cuDeviceGetCount ( int* count )
 FUNCTION: CUresult cuDeviceGetName ( char* name, int len, CUdevice dev )
 FUNCTION: CUresult cuDeviceComputeCapability ( int* major, int* minor, CUdevice dev )
 FUNCTION: CUresult cuDeviceTotalMem ( uint* bytes, CUdevice dev )
+FUNCTION: CUresult cuDeviceTotalMem_v2 ( ulonglong* bytes, CUdevice dev )
 FUNCTION: CUresult cuDeviceGetProperties ( CUdevprop* prop, CUdevice dev )
 FUNCTION: CUresult cuDeviceGetAttribute ( int* pi, CUdevice_attribute attrib, CUdevice dev )
 
