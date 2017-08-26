@@ -47,10 +47,10 @@ CONSTANT: attrib-table H{
 
 M: cocoa-ui-backend (make-pixel-format)
     nip { } attrib-table pixel-format-attributes>int-array
-    NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
+    NSOpenGLPixelFormat send\ alloc swap send\ initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
-    handle>> -> release ;
+    handle>> send\ release ;
 
 TUPLE: pasteboard handle ;
 
@@ -63,7 +63,7 @@ M: pasteboard set-clipboard-contents
     handle>> set-pasteboard-string ;
 
 : init-clipboard ( -- )
-    NSPasteboard -> generalPasteboard <pasteboard>
+    NSPasteboard send\ generalPasteboard <pasteboard>
     clipboard set-global
     <clipboard> selection set-global ;
 
@@ -76,32 +76,32 @@ M: pasteboard set-clipboard-contents
     ! after register-window.
     dup { 0 0 } = [
         drop
-        ui-windows get-global length 1 <= [ -> center ] [
+        ui-windows get-global length 1 <= [ send\ center ] [
             ui-windows get-global last second window-loc>>
-            dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
-            -> setFrameTopLeftPoint:
+            dupd first2 <CGPoint> send\ cascadeTopLeftFromPoint:
+            send\ setFrameTopLeftPoint:
         ] if
-    ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
+    ] [ first2 <CGPoint> send\ setFrameTopLeftPoint: ] if ;
 
 M: cocoa-ui-backend set-title ( string world -- )
-    handle>> window>> swap <NSString> -> setTitle: ;
+    handle>> window>> swap <NSString> send\ setTitle: ;
 
 : enter-fullscreen ( world -- )
     handle>> view>>
-    NSScreen -> mainScreen
-    f -> enterFullScreenMode:withOptions:
+    NSScreen send\ mainScreen
+    f send\ enterFullScreenMode:withOptions:
     drop ;
 
 : exit-fullscreen ( world -- )
     handle>>
-    [ view>> f -> exitFullScreenModeWithOptions: ]
-    [ [ window>> ] [ view>> ] bi -> makeFirstResponder: drop ] bi ;
+    [ view>> f send\ exitFullScreenModeWithOptions: ]
+    [ [ window>> ] [ view>> ] bi send\ makeFirstResponder: drop ] bi ;
 
 M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: cocoa-ui-backend (fullscreen?) ( world -- ? )
-    handle>> view>> -> isInFullScreenMode zero? not ;
+    handle>> view>> send\ isInFullScreenMode zero? not ;
 
 ! XXX: Until someone tests OSX with a tiling window manager,
 ! dialog-window is the same as normal-title-window
@@ -121,8 +121,8 @@ CONSTANT: window-control>styleMask
     window-controls>> window-control>styleMask symbols>flags ;
 
 : make-context-transparent ( view -- )
-    -> openGLContext
-    0 int <ref> NSOpenGLCPSurfaceOpacity -> setValues:forParameter: ;
+    send\ openGLContext
+    0 int <ref> NSOpenGLCPSurfaceOpacity send\ setValues:forParameter: ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]
@@ -130,27 +130,27 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     world window-controls>> textured-background swap member-eq?
     [ view make-context-transparent ] when
     view world [ world>NSRect ] [ world>styleMask ] bi <ViewWindow> :> window
-    view -> release
+    view send\ release
     world view register-window
     window world window-loc>> auto-position
     world window save-position
     window install-window-delegate
     view window <window-handle> world handle<<
-    window f -> makeKeyAndOrderFront:
+    window f send\ makeKeyAndOrderFront:
     t world active?<< ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
     [
-        view>> dup -> isInFullScreenMode zero?
+        view>> dup send\ isInFullScreenMode zero?
         [ drop ]
-        [ f -> exitFullScreenModeWithOptions: ] if
-    ] [ window>> -> release ] bi ;
+        [ f send\ exitFullScreenModeWithOptions: ] if
+    ] [ window>> send\ release ] bi ;
 
 M: cocoa-ui-backend (grab-input) ( handle -- )
     0 CGAssociateMouseAndMouseCursorPosition drop
     CGMainDisplayID CGDisplayHideCursor drop
-    window>> -> frame CGRect>rect rect-center
-    NSScreen -> screens 0 -> objectAtIndex: -> frame CGRect-h
+    window>> send\ frame CGRect>rect rect-center
+    NSScreen send\ screens 0 send\ objectAtIndex: send\ frame CGRect-h
     [ drop first ] [ swap second - ] 2bi <CGPoint>
     [ GetCurrentButtonState zero? not ] [ yield ] while
     CGWarpMouseCursorPosition drop ;
@@ -163,35 +163,35 @@ M: cocoa-ui-backend (ungrab-input) ( handle -- )
 M: cocoa-ui-backend close-window ( gadget -- )
     find-world [
         handle>> [
-            window>> -> close
+            window>> send\ close
         ] when*
     ] when* ;
 
 M: cocoa-ui-backend raise-window* ( world -- )
     handle>> [
-        window>> dup f -> orderFront: -> makeKeyWindow
-        NSApp 1 -> activateIgnoringOtherApps:
+        window>> dup f send\ orderFront: send\ makeKeyWindow
+        NSApp 1 send\ activateIgnoringOtherApps:
     ] when* ;
 
 M: window-handle select-gl-context ( handle -- )
-    view>> -> openGLContext -> makeCurrentContext ;
+    view>> send\ openGLContext send\ makeCurrentContext ;
 
 M: window-handle flush-gl-context ( handle -- )
-    view>> -> openGLContext -> flushBuffer ;
+    view>> send\ openGLContext send\ flushBuffer ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
 M: cocoa-ui-backend resize-window
-    [ handle>> window>> ] [ first2 ] bi* <CGSize> -> setContentSize: ;
+    [ handle>> window>> ] [ first2 ] bi* <CGSize> send\ setContentSize: ;
 
 M: cocoa-ui-backend system-alert
-    NSAlert -> alloc -> init -> autorelease [
+    NSAlert send\ alloc send\ init send\ autorelease [
         {
-            [ swap <NSString> -> setInformativeText: ]
-            [ swap <NSString> -> setMessageText: ]
-            [ "OK" <NSString> -> addButtonWithTitle: drop ]
-            [ -> runModal drop ]
+            [ swap <NSString> send\ setInformativeText: ]
+            [ swap <NSString> send\ setMessageText: ]
+            [ "OK" <NSString> send\ addButtonWithTitle: drop ]
+            [ send\ runModal drop ]
         } cleave
     ] [ 2drop ] if* ;
 
@@ -222,7 +222,7 @@ M: cocoa-ui-backend (with-ui)
             stop-io-thread
             init-thread-timer
             reset-thread-timer
-            NSApp -> run
+            NSApp send\ run
         ] ui-running
     ] with-cocoa ;
 

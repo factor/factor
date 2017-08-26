@@ -6,15 +6,15 @@ IN: cocoa.nibs
 
 : load-nib ( name -- )
     NSBundle
-    swap <NSString> NSApp -> loadNibNamed:owner:
+    swap <NSString> NSApp send\ loadNibNamed:owner:
     drop ;
 
 : nib-named ( nib-name -- anNSNib )
-    <NSString> NSNib -> alloc swap f -> initWithNibNamed:bundle:
-    dup [ -> autorelease ] when ;
+    <NSString> NSNib send\ alloc swap f send\ initWithNibNamed:bundle:
+    dup [ send\ autorelease ] when ;
 
 : nib-objects ( anNSNib -- objects/f )
     f
-    { void* } [ -> instantiateNibWithOwner:topLevelObjects: ]
+    { void* } [ send\ instantiateNibWithOwner:topLevelObjects: ]
     with-out-parameters
     swap [ CF>array ] [ drop f ] if ;

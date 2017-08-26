@@ -12,7 +12,7 @@ IN: ui.backend.cocoa.tools
 : finder-run-files ( alien -- )
     CF>string-array listener-run-files
     NSApp NSApplicationDelegateReplySuccess
-    -> replyToOpenOrPrint: ;
+    send\ replyToOpenOrPrint: ;
 
 : menu-run-files ( -- )
     open-panel [ listener-run-files ] when* ;
@@ -71,8 +71,8 @@ IN: ui.backend.cocoa.tools
 
 : register-services ( -- )
     NSApp
-    FactorServiceProvider -> alloc -> init
-    -> setServicesProvider: ;
+    FactorServiceProvider send\ alloc send\ init
+    send\ setServicesProvider: ;
 
 FUNCTION: void NSUpdateDynamicServices ( )
 

@@ -59,21 +59,21 @@ CONSTANT: NSOpenGLProfileVersion3_2Core 0x3200
 CONSTANT: NSOpenGLProfileVersion4_1Core 0x4100
 
 : <GLView> ( class dim pixel-format -- view )
-    [ -> alloc ]
+    [ send\ alloc ]
     [ [ 0 0 ] dip first2 <CGRect> ]
     [ handle>> ] tri*
-    -> initWithFrame:pixelFormat:
-    dup 1 -> setPostsBoundsChangedNotifications:
-    dup 1 -> setPostsFrameChangedNotifications: ;
+    send\ initWithFrame:pixelFormat:
+    dup 1 send\ setPostsBoundsChangedNotifications:
+    dup 1 send\ setPostsFrameChangedNotifications: ;
 
 : view-dim ( view -- dim )
-    -> bounds
+    send\ bounds
     [ CGRect-w >fixnum ] [ CGRect-h >fixnum ] bi
     2array ;
 
 : mouse-location ( view event -- loc )
     [
-        -> locationInWindow f -> convertPoint:fromView:
+        send\ locationInWindow f send\ convertPoint:fromView:
         [ x>> ] [ y>> ] bi
-    ] [ drop -> frame CGRect-h ] 2bi
+    ] [ drop send\ frame CGRect-h ] 2bi
     swap - [ >integer ] bi@ 2array ;

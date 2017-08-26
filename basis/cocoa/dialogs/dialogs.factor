@@ -5,27 +5,27 @@ core-foundation.strings kernel splitting ;
 IN: cocoa.dialogs
 
 : <NSOpenPanel> ( -- panel )
-    NSOpenPanel -> openPanel
-    dup 1 -> setCanChooseFiles:
-    dup 0 -> setCanChooseDirectories:
-    dup 1 -> setResolvesAliases:
-    dup 1 -> setAllowsMultipleSelection: ;
+    NSOpenPanel send\ openPanel
+    dup 1 send\ setCanChooseFiles:
+    dup 0 send\ setCanChooseDirectories:
+    dup 1 send\ setResolvesAliases:
+    dup 1 send\ setAllowsMultipleSelection: ;
 
 : <NSDirPanel> ( -- panel ) <NSOpenPanel>
-   dup 1 -> setCanChooseDirectories: ;
+   dup 1 send\ setCanChooseDirectories: ;
 
 : <NSSavePanel> ( -- panel )
-    NSSavePanel -> savePanel
-    dup 1 -> setCanChooseFiles:
-    dup 0 -> setCanChooseDirectories:
-    dup 0 -> setAllowsMultipleSelection: ;
+    NSSavePanel send\ savePanel
+    dup 1 send\ setCanChooseFiles:
+    dup 0 send\ setCanChooseDirectories:
+    dup 0 send\ setAllowsMultipleSelection: ;
 
 CONSTANT: NSOKButton 1
 CONSTANT: NSCancelButton 0
 
 : (open-panel) ( panel -- paths )
-    dup -> runModal NSOKButton =
-    [ -> filenames CF>string-array ] [ drop f ] if ;
+    dup send\ runModal NSOKButton =
+    [ send\ filenames CF>string-array ] [ drop f ] if ;
 
 : open-panel ( -- paths ) <NSOpenPanel> (open-panel) ;
 
@@ -36,5 +36,5 @@ CONSTANT: NSCancelButton 0
 
 : save-panel ( path -- path/f )
     [ <NSSavePanel> dup ] dip
-    split-path -> runModalForDirectory:file: NSOKButton =
-    [ -> filename CF>string ] [ drop f ] if ;
+    split-path send\ runModalForDirectory:file: NSOKButton =
+    [ send\ filename CF>string ] [ drop f ] if ;

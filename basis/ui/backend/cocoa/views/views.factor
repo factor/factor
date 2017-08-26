@@ -17,8 +17,8 @@ IN: ui.backend.cocoa.views
 
 ! Issue #1453
 : button ( event -- n )
-    ! Cocoa -> Factor UI button mapping
-    -> buttonNumber {
+    ! Cocoa send\ Factor UI button mapping
+    send\ buttonNumber {
         { 0 [ 1 ] }
         { 1 [ 3 ] }
         { 2 [ 2 ] }
@@ -69,11 +69,11 @@ CONSTANT: key-codes
     }
 
 : key-code ( event -- string ? )
-    dup -> keyCode key-codes at
-    [ t ] [ -> charactersIgnoringModifiers CF>string f ] ?if ;
+    dup send\ keyCode key-codes at
+    [ t ] [ send\ charactersIgnoringModifiers CF>string f ] ?if ;
 
 : event-modifiers ( event -- modifiers )
-    -> modifierFlags modifiers modifier ;
+    send\ modifierFlags modifiers modifier ;
 
 : key-event>gesture ( event -- modifiers keycode action? )
     [ event-modifiers ] [ key-code ] bi ;
@@ -82,7 +82,7 @@ CONSTANT: key-codes
     swap window [ propagate-key-gesture ] [ drop ] if* ;
 
 : interpret-key-event ( view event -- )
-    NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
+    NSArray swap send\ arrayWithObject: send\ interpretKeyEvents: ;
 
 : send-key-down-event ( view event -- )
     [ key-event>gesture <key-down> send-key-event ]
@@ -110,7 +110,7 @@ CONSTANT: key-codes
     [ send-button-up ] [ 2drop ] if* ;
 
 : send-scroll$ ( view event -- )
-    [ nip [ -> deltaX ] [ -> deltaY ] bi [ neg ] bi@ 2array ]
+    [ nip [ send\ deltaX ] [ send\ deltaY ] bi [ neg ] bi@ 2array ]
     [ mouse-location ]
     [ drop window ]
     2tri
@@ -167,7 +167,7 @@ CONSTANT: selector>action H{
     METHOD: void prepareOpenGL [
 
         self SEL: setWantsBestResolutionOpenGLSurface:
-        -> respondsToSelector: c-bool> [
+        send\ respondsToSelector: c-bool> [
 
             self SEL: setWantsBestResolutionOpenGLSurface: 1
             void f "objc_msgSend" { id SEL char } f alien-invoke
@@ -245,8 +245,8 @@ CONSTANT: selector>action H{
     METHOD: char validateUserInterfaceItem: id event
     [
         self window [
-            event -> action utf8 alien>string validate-action
-            [ >c-bool ] [ drop self event SUPER-> validateUserInterfaceItem: ] if
+            event send\ action utf8 alien>string validate-action
+            [ >c-bool ] [ drop self event super\ validateUserInterfaceItem: ] if
         ] [ 0 ] if*
     ] ;
 
@@ -278,7 +278,7 @@ CONSTANT: selector>action H{
     METHOD: void magnifyWithEvent: id event
     [
         self event
-        dup -> deltaZ sgn {
+        dup send\ deltaZ sgn {
             {  1 [ zoom-in-action send-action$ ] }
             { -1 [ zoom-out-action send-action$ ] }
             {  0 [ 2drop ] }
@@ -288,12 +288,12 @@ CONSTANT: selector>action H{
     METHOD: void swipeWithEvent: id event
     [
         self event
-        dup -> deltaX sgn {
+        dup send\ deltaX sgn {
             {  1 [ left-action send-action$ ] }
             { -1 [ right-action send-action$ ] }
             {  0
                 [
-                    dup -> deltaY sgn {
+                    dup send\ deltaY sgn {
                         {  1 [ up-action send-action$ ] }
                         { -1 [ down-action send-action$ ] }
                         {  0 [ 2drop ] }
@@ -353,7 +353,7 @@ CONSTANT: selector>action H{
 
     METHOD: void unmarkText [ ] ;
 
-    METHOD: id validAttributesForMarkedText [ NSArray -> array ] ;
+    METHOD: id validAttributesForMarkedText [ NSArray send\ array ] ;
 
     METHOD: id attributedSubstringFromRange: NSRange range [ f ] ;
 
@@ -376,7 +376,7 @@ CONSTANT: selector>action H{
 
     METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
     [
-        self frame pixelFormat SUPER-> initWithFrame:pixelFormat:
+        self frame pixelFormat super\ initWithFrame:pixelFormat:
         dup dup add-resize-observer
     ] ;
 
@@ -385,41 +385,41 @@ CONSTANT: selector>action H{
     METHOD: void dealloc
     [
         self remove-observer
-        self SUPER-> dealloc
+        self super\ dealloc
     ] ;
 ;CLASS>
 
 : sync-refresh-to-screen ( GLView -- )
-    -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 int <ref>
+    send\ openGLContext send\ CGLContextObj NSOpenGLCPSwapInterval 1 int <ref>
     CGLSetParameter drop ;
 
 : <FactorView> ( dim pixel-format -- view )
     [ FactorView ] 2dip <GLView> [ sync-refresh-to-screen ] keep ;
 
 : save-position ( world window -- )
-    -> frame CGRect-top-left 2array >>window-loc drop ;
+    send\ frame CGRect-top-left 2array >>window-loc drop ;
 
 <CLASS: FactorWindowDelegate < NSObject
 
     METHOD: void windowDidMove: id notification
     [
-        notification -> object -> contentView window
-        [ notification -> object save-position ] when*
+        notification send\ object send\ contentView window
+        [ notification send\ object save-position ] when*
     ] ;
 
     METHOD: void windowDidBecomeKey: id notification
     [
-        notification -> object -> contentView window
+        notification send\ object send\ contentView window
         [ focus-world ] when*
     ] ;
 
     METHOD: void windowDidResignKey: id notification
     [
         forget-rollover
-        notification -> object -> contentView :> view
+        notification send\ object send\ contentView :> view
         view window :> window
         window [
-            view -> isInFullScreenMode 0 =
+            view send\ isInFullScreenMode 0 =
             [ window unfocus-world ] when
         ] when
     ] ;
@@ -428,16 +428,16 @@ CONSTANT: selector>action H{
 
     METHOD: void windowWillClose: id notification
     [
-        notification -> object -> contentView
+        notification send\ object send\ contentView
         [ window ungraft ] [ unregister-window ] bi
     ] ;
 
     METHOD: void windowDidChangeBackingProperties: id notification
     [
 
-        notification -> object dup SEL: backingScaleFactor
-        -> respondsToSelector: c-bool> [
-            { double { id SEL } } ?-> backingScaleFactor
+        notification send\ object dup SEL: backingScaleFactor
+        send\ respondsToSelector: c-bool> [
+            { double { id SEL } } ?send\ backingScaleFactor
 
             [ [ 1.0 > ] keep f ? gl-scale-factor set-global ]
             [ 1.0 > retina? set-global ] bi

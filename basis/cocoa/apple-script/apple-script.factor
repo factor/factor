@@ -7,9 +7,9 @@ multiline words ;
 IN: cocoa.apple-script
 
 : run-apple-script ( str -- )
-    [ NSAppleScript -> alloc ] dip
-    <NSString> -> initWithSource: -> autorelease
-    f -> executeAndReturnError: drop ;
+    [ NSAppleScript send\ alloc ] dip
+    <NSString> send\ initWithSource: send\ autorelease
+    f send\ executeAndReturnError: drop ;
 
 SYNTAX: \APPLESCRIPT:
     scan-new-word scan-object

@@ -10,8 +10,8 @@ IMPORT: WebView
 : rect ( -- rect ) 0 0 700 500 <CGRect> ;
 
 : <WebView> ( -- id )
-    WebView -> alloc
-    rect f f -> initWithFrame:frameName:groupName: ;
+    WebView send\ alloc
+    rect f f send\ initWithFrame:frameName:groupName: ;
 
 CONSTANT: window-style
     flags{
@@ -25,12 +25,12 @@ CONSTANT: window-style
     <WebView> rect window-style <ViewWindow> ;
 
 : load-url ( window url -- )
-    [ -> contentView ] [ <NSString> ] bi* -> setMainFrameURL: ;
+    [ send\ contentView ] [ <NSString> ] bi* send\ setMainFrameURL: ;
 
 : webkit-demo ( -- )
     <WebWindow>
-    [ -> center ]
-    [ f -> makeKeyAndOrderFront: ]
+    [ send\ center ]
+    [ f send\ makeKeyAndOrderFront: ]
     [ "http://factorcode.org" load-url ] tri ;
 
 : run-webkit-demo ( -- )

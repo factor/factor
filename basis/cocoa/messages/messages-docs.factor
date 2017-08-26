@@ -14,7 +14,7 @@ HELP: super-send
 HELP: objc-class
 { $values { "string" string } { "class" alien } }
 { $description "Outputs the Objective C class named by " { $snippet "string" } ". This class can then be used as the receiver in message sends calling class methods, for example:"
-{ $code "NSMutableArray -> alloc" } }
+{ $code "NSMutableArray send\ alloc" } }
 { $errors "Throws an error if there is no class named by " { $snippet "string" } "." } ;
 
 HELP: objc-meta-class

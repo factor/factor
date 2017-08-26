@@ -17,7 +17,7 @@ CONSTANT: NS-EACH-BUFFER-SIZE 16
     ] with-destructors ; inline
 
 :: (NSFastEnumeration-each) ( ... object quot: ( ... elt -- ) state stackbuf count -- ... )
-    object state stackbuf count -> countByEnumeratingWithState:objects:count: :> items-count
+    object state stackbuf count send\ countByEnumeratingWithState:objects:count: :> items-count
     items-count 0 = [
         state itemsPtr>> [ items-count id <c-direct-array> ] [ stackbuf ] if* :> items
         items-count <iota> [ items nth quot call ] each

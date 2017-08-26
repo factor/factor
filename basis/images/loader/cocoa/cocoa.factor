@@ -15,9 +15,9 @@ os macosx? [
 
 : <CGImage> ( byte-array -- image-rep )
     [ NSBitmapImageRep ] dip
-    <CFData> -> autorelease
-    -> imageRepWithData:
-    -> CGImage ;
+    <CFData> send\ autorelease
+    send\ imageRepWithData:
+    send\ CGImage ;
 
 :: CGImage>image ( image -- image )
     image CGImageGetWidth :> w
@@ -29,7 +29,7 @@ os macosx? [
 : image>CGImage ( image -- image )
     [ bitmap>> ] [ dim>> first2 ] bi 8 pick 4 *
     bitmap-color-space bitmap-flags
-    CGBitmapContextCreate -> autorelease
+    CGBitmapContextCreate send\ autorelease
     CGBitmapContextCreateImage ;
 
 M: ns-image stream>image*
