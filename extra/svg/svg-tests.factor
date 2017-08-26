@@ -103,11 +103,11 @@ ${
     " svg-path>array
 ] unit-test
 
-STRING: test-svg-string
+CONSTANT: test-svg-string [[
 <svg xmlns="http://www.w3.org/2000/svg">
         <path transform="translate(1 2)" d="M -1 -1 l 2 2" />
 </svg>
-;
+]]
 
 : test-svg-path ( -- obj )
     test-svg-string string>xml body>> children-tags first ;

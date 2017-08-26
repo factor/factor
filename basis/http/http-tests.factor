@@ -25,7 +25,7 @@ IN: http.tests
 { "localhost:8080" } [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
 { "localhost:8443" } [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
 
-STRING: read-request-test-1
+CONSTANT: read-request-test-1 [[
 POST /bar HTTP/1.1
 Some-Header: 1
 Some-Header: 2
@@ -33,7 +33,7 @@ Content-Length: 4
 Content-type: application/octet-stream
 
 blah
-;
+]]
 
 {
     T{ request
@@ -52,14 +52,14 @@ blah
     ] with-string-reader
 ] unit-test
 
-STRING: read-request-test-1'
+CONSTANT: read-request-test-1' [[
 POST /bar HTTP/1.1
 content-length: 4
 content-type: application/octet-stream
 some-header: 1; 2
 
 blah
-;
+]]
 
 ${ read-request-test-1' } [
     read-request-test-1 lf>crlf
@@ -69,11 +69,11 @@ ${ read-request-test-1' } [
     string-lines "\n" join
 ] unit-test
 
-STRING: read-request-test-2
+CONSTANT: read-request-test-2 [[
 HEAD  /bar   HTTP/1.1
 Host: www.sex.com
 
-;
+]]
 
 {
     T{ request
@@ -91,11 +91,11 @@ Host: www.sex.com
     ] with-string-reader
 ] unit-test
 
-STRING: read-request-test-2'
+CONSTANT: read-request-test-2' [[
 HEAD  /bar   HTTP/1.1
 Host: www.sex.com:101
 
-;
+]]
 
 {
     T{ request
@@ -113,15 +113,15 @@ Host: www.sex.com:101
     ] with-string-reader
 ] unit-test
 
-STRING: read-request-test-3
+CONSTANT: read-request-test-3 [[
 GET nested HTTP/1.0
 
-;
+]]
 
-STRING: read-request-test-4
+CONSTANT: read-request-test-4 [[
 GET /blah HTTP/1.0
 Host: "www.amazon.com"
-;
+]]
 
 { "www.amazon.com" }
 [
@@ -129,12 +129,12 @@ Host: "www.amazon.com"
     "host" header
 ] unit-test
 
-STRING: read-response-test-1
+CONSTANT: read-response-test-1 [[
 HTTP/1.1 404 not found
 Content-Type: text/html; charset=UTF-8
 
 blah
-;
+]]
 
 {
     T{ response
@@ -153,11 +153,11 @@ blah
 ] unit-test
 
 
-STRING: read-response-test-1'
+CONSTANT: read-response-test-1' [[
 HTTP/1.1 404 not found
 content-type: text/html; charset=UTF-8
 
-;
+]]
 
 ${ read-response-test-1' } [
     URL" http://localhost/" url set
@@ -178,12 +178,12 @@ ${ read-response-test-1' } [
     dup parse-set-cookie first unparse-set-cookie =
 ] unit-test
 
-STRING: read-response-test-2
+CONSTANT: read-response-test-2 [[
 HTTP/1.1 200 Content follows
 Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
 
 
-;
+]]
 
 { 2 } [
     read-response-test-2 lf>crlf
@@ -191,12 +191,12 @@ Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
     cookies>> length
 ] unit-test
 
-STRING: read-response-test-3
+CONSTANT: read-response-test-3 [[
 HTTP/1.1 200 Content follows
 Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 
 
-;
+]]
 
 { 1 } [
     read-response-test-3 lf>crlf

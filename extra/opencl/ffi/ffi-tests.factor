@@ -7,7 +7,7 @@ FROM: alien.c-types => float ;
 SPECIALIZED-ARRAYS: float void* ;
 IN: opencl.ffi.tests
 
-STRING: kernel-source
+CONSTANT: kernel-source [[
 __kernel void square(
     __global float* input,
     __global float* output,
@@ -17,7 +17,7 @@ __kernel void square(
     if (i < count)
         output[i] = input[i] * input[i];
 }
-;
+]]
 
 ERROR: cl-error err ;
 : cl-success ( err -- )

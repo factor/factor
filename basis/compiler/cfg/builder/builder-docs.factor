@@ -5,7 +5,7 @@ sequences vectors words ;
 IN: compiler.cfg.builder
 
 <<
-STRING: ex-emit-call
+CONSTANT: ex-emit-call [[
 USING: compiler.cfg.builder compiler.cfg.builder.blocks compiler.cfg.stacks
 kernel make prettyprint ;
 begin-stack-analysis <basic-block> set-basic-block
@@ -32,13 +32,13 @@ T{ basic-block
         }
     }
 }
-;
+]]
 
-STRING: ex-make-input-map
+CONSTANT: ex-make-input-map [[
 USING: compiler.cfg.builder prettyprint ;
 T{ #shuffle { in-d { 37 81 92 } } } make-input-map .
 { { 37 d:  2 } { 81 d:  1 } { 92 d:  0 } }
-;
+]]
 >>
 
 HELP: build-cfg

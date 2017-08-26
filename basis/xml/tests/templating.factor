@@ -20,16 +20,16 @@ M: object (r-ref) drop ;
 
 ! Example
 
-STRING: sample-doc
+CONSTANT: sample-doc [[
 <html xmlns:f='http://littledan.onigirihouse.com/namespaces/replace'>
 <body>
 <span f:sub='foo'/>
 <div f:sub='bar'/>
 <p f:sub='baz'>paragraph</p>
 </body></html>
-;
+]]
 
-STRING: expected-result
+CONSTANT: expected-result [[
 <?xml version="1.0" encoding="UTF-8"?>
 <html xmlns:f="http://littledan.onigirihouse.com/namespaces/replace">
   <body>
@@ -43,7 +43,7 @@ STRING: expected-result
     <p f:sub="baz"/>
   </body>
 </html>
-;
+]]
 
 : test-refs ( -- string )
     [

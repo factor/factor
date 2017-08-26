@@ -6,7 +6,7 @@ macros locals ;
 FROM: opengl.demo-support => rect-vertices ;
 IN: bunny.outlined
 
-STRING: outlined-pass1-fragment-shader-main-source
+CONSTANT: outlined-pass1-fragment-shader-main-source [[
 varying vec3 normal;
 vec4 cel_light();
 
@@ -17,9 +17,9 @@ main()
     gl_FragData[1] = vec4(normal, 1);
 }
 
-;
+]]
 
-STRING: outlined-pass2-vertex-shader-source
+CONSTANT: outlined-pass2-vertex-shader-source [[
 varying vec2 coord;
 
 void
@@ -29,9 +29,9 @@ main()
     coord = (gl_Vertex * vec4(0.5) + vec4(0.5)).xy;
 }
 
-;
+]]
 
-STRING: outlined-pass2-fragment-shader-source
+CONSTANT: outlined-pass2-fragment-shader-source [[
 uniform sampler2D colormap, normalmap, depthmap;
 uniform vec4 line_color;
 varying vec2 coord;
@@ -111,7 +111,7 @@ main()
     gl_FragColor = mix(texture2D(colormap, coord), line_color, border_factor(coord));
 }
 
-;
+]]
 
 TUPLE: bunny-outlined
     gadget

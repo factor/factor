@@ -7,11 +7,11 @@ IN: furnace.actions.tests
     [ "a" param "b" param [ string>number ] bi@ + ] >>display
 "action-1" set
 
-STRING: action-request-test-1
+CONSTANT: action-request-test-1 [[
 GET http://foo/bar?a=12&b=13 HTTP/1.1
 
 blah
-;
+]]
 
 { 25 } [
     action-request-test-1 lf>crlf
@@ -25,11 +25,11 @@ blah
     [ "a" param string>number sq ] >>display
 "action-2" set
 
-STRING: action-request-test-2
+CONSTANT: action-request-test-2 [[
 GET http://foo/bar/123 HTTP/1.1
 
 blah
-;
+]]
 
 { 25 } [
     action-request-test-2 lf>crlf

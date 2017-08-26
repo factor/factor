@@ -1,7 +1,7 @@
 USING: multiline ;
 IN: terrain.shaders
 
-STRING: sky-vertex-shader
+CONSTANT: sky-vertex-shader [[
 
 uniform float sky_theta;
 varying vec3 direction;
@@ -19,9 +19,9 @@ void main()
         * (gl_ModelViewMatrixInverse * vec4(p.xyz, 0.0)).xyz;
 }
 
-;
+]]
 
-STRING: sky-pixel-shader
+CONSTANT: sky-pixel-shader [[
 
 uniform sampler2D sky;
 uniform float sky_gradient, sky_theta;
@@ -37,9 +37,9 @@ void main()
     gl_FragColor = mix(SKY_COLOR_A, SKY_COLOR_B, sin(6.28*t));
 }
 
-;
+]]
 
-STRING: terrain-vertex-shader
+CONSTANT: terrain-vertex-shader [[
 
 uniform sampler2D heightmap;
 uniform vec4 component_scale;
@@ -59,9 +59,9 @@ void main()
     heightcoords = gl_Vertex.xz;
 }
 
-;
+]]
 
-STRING: terrain-pixel-shader
+CONSTANT: terrain-pixel-shader [[
 
 uniform sampler2D heightmap;
 uniform vec4 component_scale;
@@ -79,4 +79,4 @@ void main()
     gl_FragColor = texture2D(heightmap, heightcoords);
 }
 
-;
+]]

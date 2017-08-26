@@ -5,7 +5,7 @@ generalizations combinators ui.gadgets.worlds
 literals ui.pixel-formats ;
 IN: spheres
 
-STRING: plane-vertex-shader
+CONSTANT: plane-vertex-shader [[
 varying vec3 object_position;
 void
 main()
@@ -13,9 +13,9 @@ main()
     object_position = gl_Vertex.xyz;
     gl_Position = ftransform();
 }
-;
+]]
 
-STRING: plane-fragment-shader
+CONSTANT: plane-fragment-shader [[
 uniform float checker_size_inv;
 uniform vec4 checker_color_1, checker_color_2;
 varying vec3 object_position;
@@ -37,9 +37,9 @@ main()
         ? mix(checker_color_1, checker_color_2, distance_factor)
         : mix(checker_color_2, checker_color_1, distance_factor);
 }
-;
+]]
 
-STRING: sphere-vertex-shader
+CONSTANT: sphere-vertex-shader [[
 attribute vec3 center;
 attribute float radius;
 attribute vec4 surface_color;
@@ -58,9 +58,9 @@ main()
     vcolor = surface_color;
     vradius = radius;
 }
-;
+]]
 
-STRING: sphere-solid-color-fragment-shader
+CONSTANT: sphere-solid-color-fragment-shader [[
 uniform vec3 light_position;
 varying vec4 vcolor;
 
@@ -76,9 +76,9 @@ sphere_color(vec3 point, vec3 normal)
 
     return ambient * vcolor + diffuse * vec4(d * vcolor.rgb, vcolor.a);
 }
-;
+]]
 
-STRING: sphere-texture-fragment-shader
+CONSTANT: sphere-texture-fragment-shader [[
 uniform samplerCube surface_texture;
 
 vec4
@@ -87,9 +87,9 @@ sphere_color(vec3 point, vec3 normal)
     vec3 reflect = reflect(normalize(point), normal);
     return textureCube(surface_texture, reflect * gl_NormalMatrix);
 }
-;
+]]
 
-STRING: sphere-main-fragment-shader
+CONSTANT: sphere-main-fragment-shader [[
 varying float vradius;
 varying vec3 sphere_position;
 varying vec4 world_position;
@@ -109,7 +109,7 @@ main()
     gl_FragDepth = (transformed_surface.z/transformed_surface.w + 1.0) * 0.5;
 	gl_FragColor = sphere_color(world_surface.xyz, surface);
 }
-;
+]]
 
 TUPLE: spheres-world < demo-world
     plane-program solid-sphere-program texture-sphere-program

@@ -4,7 +4,7 @@ USING: elf.nm io io.streams.string kernel literals multiline strings
 system tools.test ;
 IN: elf.nm.tests
 
-STRING: validation-output
+CONSTANT: validation-output [[
 0000000000000000 absolute         init.c
 000000000040046c .text            call_gmon_start
 0000000000000000 absolute         crtstuff.c
@@ -44,7 +44,7 @@ STRING: validation-output
 0000000000400524 .text            main
 00000000004003f0 .init            _init
 
-;
+]]
 
 cpu ppc? [
     { $ validation-output }

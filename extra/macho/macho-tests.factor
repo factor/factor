@@ -4,7 +4,7 @@ USING: accessors alien io io.streams.string kernel literals macho
 multiline sequences strings system tools.test ;
 IN: macho.tests
 
-STRING: validation-output
+CONSTANT: validation-output [[
 0000000100000f1c __stub_helper    stub helpers
 0000000100001040 __program_vars  _pvars
 0000000100001068 __data          _NXArgc
@@ -19,7 +19,7 @@ STRING: validation-output
 0000000000000000                 _printf
 0000000000000000                 dyld_stub_binder
 
-;
+]]
 
 cpu ppc? [
     { $ validation-output }

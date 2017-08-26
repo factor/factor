@@ -1,11 +1,11 @@
 USING: eval multiline sequences tools.test ;
 IN: multiline.tests
 
-STRING: test-it
+CONSTANT: test-it [[
 foo
 bar
 
-;
+]]
 
 { "foo\nbar\n" } [ test-it ] unit-test
 
@@ -71,7 +71,7 @@ lol
 xyz
 ] unit-test
 
-/*
+![[
 <<
 SYNTAX: \MULTILINE-LITERAL: parse-here suffix! ;
 >>
@@ -91,4 +91,4 @@ bar
 ;
 }" eval
 ] must-fail
-*/
+]]

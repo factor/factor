@@ -3,7 +3,7 @@ help.syntax literals make math multiline quotations sequences ;
 IN: compiler.cfg.builder.blocks
 
 <<
-STRING: ex-emit-trivial-block
+CONSTANT: ex-emit-trivial-block [[
 USING: compiler.cfg.builder.blocks make prettyprint ;
 begin-stack-analysis <basic-block> dup set-basic-block [ gensym ##call, drop ] emit-trivial-block predecessors>> first .
 T{ basic-block
@@ -24,7 +24,7 @@ T{ basic-block
         }
     }
 }
-;
+]]
 >>
 
 HELP: begin-basic-block

@@ -5,12 +5,12 @@ sequences ;
 IN: compiler.codegen
 
 <<
-STRING: generate-ex
+CONSTANT: generate-ex [[
 USING: compiler.cfg.debugger io prettyprint ;
 [ "hello\n" write ] test-regs first dup cfg set generate [ . ] [ 4 swap nth disassemble ] bi
-;
+]]
 
-STRING: generate-ex-answer
+CONSTANT: generate-ex-answer [[
 {
     { }
     { "hello\n" output-stream assoc-stack stream-write }
@@ -51,7 +51,7 @@ STRING: generate-ex-answer
 0000000001cc4cfa: 0000                  add [rax], al
 0000000001cc4cfc: 0000                  add [rax], al
 0000000001cc4cfe: 0000                  add [rax], al
-;
+]]
 >>
 
 HELP: emit-branch

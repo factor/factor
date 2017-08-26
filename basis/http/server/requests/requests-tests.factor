@@ -34,7 +34,7 @@ IN: http.server.requests.tests
 ] unit-test
 
 ! multipart/form-data
-STRING: test-multipart/form-data
+CONSTANT: test-multipart/form-data [[
 POST / HTTP/1.1
 Accept: */*
 Accept-Encoding: gzip, deflate
@@ -50,7 +50,7 @@ Content-Disposition: form-data; name="text"; filename="upload.txt"
 hello
 --768de80194d942619886d23f1337aa15--
 
-;
+]]
 {
     "upload.txt"
     H{
@@ -65,7 +65,7 @@ hello
 ! Error handling
 ! If the incoming request is not valid, read-request should throw an
 ! appropriate error.
-STRING: test-multipart/form-data-missing-boundary
+CONSTANT: test-multipart/form-data-missing-boundary [[
 POST / HTTP/1.1
 Accept: */*
 Accept-Encoding: gzip, deflate
@@ -81,7 +81,7 @@ Content-Disposition: form-data; name="text"; filename="upload.txt"
 hello
 --768de80194d942619886d23f1337aa15--
 
-;
+]]
 [ test-multipart/form-data-missing-boundary string>request ]
 [ no-boundary? ] must-fail-with
 

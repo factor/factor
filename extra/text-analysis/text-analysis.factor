@@ -177,7 +177,7 @@ TUPLE: text-analysis #paragraphs #sentences #chars #words
     ]
     [ words-per-sentence 0.0496 * ] bi + ;
 
-STRING: text-report-format
+CONSTANT: text-report-format [[
 Number of paragraphs           %d
 Number of sentences            %d
 Number of words                %d
@@ -194,7 +194,7 @@ SMOG grade                     %2.2f
 Automated Readability index    %2.2f
 Dale-Chall readability         %2.2f
 
-;
+]]
 
 PRIVATE>
 
