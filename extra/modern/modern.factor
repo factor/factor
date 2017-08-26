@@ -275,7 +275,7 @@ ERROR: mismatched-terminator n string slice ;
             [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
             over "\\" head? [
                 drop
-                dup "\\" sequence= [ read-backslash ] when
+                dup "\\" sequence= [ read-backslash ] [ merge-slice-til-whitespace ] if
             ] [
                 (lex-factor)
             ] if

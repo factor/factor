@@ -88,3 +88,6 @@ IN: modern.tests
 
 { { { "\\" "(" } } } [ "\\ (" string>literals >strings ] unit-test
 
+{ { "\\[[" } } [ "\\[[" string>literals >strings ] unit-test
+{ { "\\[=[" } } [ "\\[=[" string>literals >strings ] unit-test
+{ { "\\[==[" } } [ "\\[==[" string>literals >strings ] unit-test
