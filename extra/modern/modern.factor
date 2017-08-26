@@ -199,14 +199,15 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     [ take-comment ] [ merge-slice-til-whitespace ] if ;
 
 ERROR: backslash-expects-whitespace slice ;
+ERROR: no-backslash-payload n string slice ;
 : read-backslash ( n string slice -- n' string obj )
-    2over peek-from blank? [
+    merge-slice-til-whitespace dup "\\" tail? [
         ! \ foo, M\ foo
-        [ skip-blank-from slice-til-whitespace drop dup ] dip 1 cut-slice* 4array
-    ] [
-        ! M\N
-        merge-slice-til-whitespace
-    ] if ;
+        [
+                skip-blank-from slice-til-whitespace drop
+                dup [ no-backslash-payload ] unless
+        ] dip swap 2array
+    ] when ;
 
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
@@ -219,10 +220,8 @@ ERROR: mismatched-terminator n string slice ;
 
 : lex-factor ( n/f string -- n'/f string literal )
     over [
-        skip-whitespace "\"\\!:[{(<>\s\r\n" slice-til-either {
-            ! { CHAR: ` [ read-backtick ] }
+        skip-whitespace "\"!:[{(<>\s\r\n" slice-til-either {
             { CHAR: \" [ read-string ] }
-            { CHAR: \\ [ read-backslash ] }
             { CHAR: \! [ read-exclamation ] }
             { CHAR: \: [
                 merge-slice-til-whitespace
@@ -266,7 +265,7 @@ ERROR: mismatched-terminator n string slice ;
             { CHAR: \r [ read-token-or-whitespace ] }
             { CHAR: \n [ read-token-or-whitespace ] }
             { f [ f like ] }
-        } case
+        } case dup "\\" tail? [ read-backslash ] when
     ] [
         f
     ] if ; inline
@@ -289,3 +288,4 @@ ERROR: mismatched-terminator n string slice ;
 : lex-core ( -- assoc ) core-bootstrap-vocabs lex-vocabs ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;
 : lex-extra ( -- assoc ) extra-vocabs lex-vocabs ;
+: lex-all ( -- assoc ) lex-core lex-basis lex-extra 3append ;

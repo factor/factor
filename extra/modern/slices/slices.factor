@@ -64,17 +64,23 @@ ERROR: unexpected-end n string ;
     pick [ drop t ] [ length -rot nip f ] if ; inline
 
 : skip-blank-from ( n string -- n' string )
-    [ [ blank? not ] find-from* 2drop ] keep ; inline
+    over [
+        [ [ blank? not ] find-from* 2drop ] keep
+    ] when ; inline
 
 : skip-til-eol-from ( n string -- n' string )
     [ [ "\r\n" member? ] find-from* 2drop ] keep ; inline
 
 ! Don't include the whitespace in the slice
 :: slice-til-whitespace ( n string -- n' string slice/f ch/f )
-    n string [ "\s\r\n" member? ] find-from :> ( n' ch )
-    n' string
-    n n' string ?<slice>
-    ch ; inline
+    n [
+        n string [ "\s\r\n" member? ] find-from :> ( n' ch )
+        n' string
+        n n' string ?<slice>
+        ch
+    ] [
+        f string f f
+    ] if ; inline
 
 :: slice-until' ( n string quot -- n' string slice/f ch/f )
     n string quot find-from :> ( n' ch )
