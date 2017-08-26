@@ -8,7 +8,7 @@ IN: infix.tokenizer.tests
 { V{ T{ ast-value f 3 } CHAR: / CHAR: ( T{ ast-value f 3 } CHAR: + T{ ast-value f 4 } CHAR: ) } }
 [ "3/(3+4)" tokenize-infix ] unit-test
 { V{ "foo"  CHAR: ( "x" CHAR: , "y" CHAR: , "z" CHAR: ) } } [ "foo(x,y,z)" tokenize-infix ] unit-test
-{ V{ "arr"  CHAR: [ "x" CHAR: + T{ ast-value f 3 } CHAR: ] } }
+{ V{ "arr"  CHAR: \[ "x" CHAR: + T{ ast-value f 3 } CHAR: ] } }
 [ "arr[x+3]" tokenize-infix ] unit-test
 [ "1.0.4" tokenize-infix ] must-fail
 { V{ CHAR: + CHAR: ] T{ ast-value f 3.4 } CHAR: , "bar" } }

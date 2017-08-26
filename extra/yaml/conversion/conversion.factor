@@ -111,7 +111,7 @@ CONSTANT: YAML_SET_TAG "tag:yaml.org,2002:set"
     R/ -[0-9][^0-9]/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
     R/ [^0-9][0-9]:/ [ [ CHAR: 0 1 ] dip insert-nth ] re-replace-with
     R/ [ \t]+/ " " re-replace
-    CHAR: : over index cut CHAR: space swap remove append ;
+    CHAR: \: over index cut CHAR: space swap remove append ;
 
 : construct-timestamp ( obj -- obj' )
     dup R/ [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ matches?

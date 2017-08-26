@@ -32,7 +32,7 @@ DEFER: name/values
 
 : parse-value ( string -- remain value )
     dup find-` [
-        dup 1 - pick ?nth CHAR: : =
+        dup 1 - pick ?nth CHAR: \: =
         [ drop name/values ] [ cut swap (parse-value) ] if
         [ rest [ blank? ] trim-head ] dip
     ] [ f swap ] if* ;

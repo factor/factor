@@ -23,7 +23,7 @@ IN: ini-file
         { CHAR: \\  CHAR: \\ }
         { CHAR: ?   CHAR: ? }
         { CHAR: ;   CHAR: ; }
-        { CHAR: [   CHAR: [ }
+        { CHAR: \[   CHAR: \[ }
         { CHAR: ]   CHAR: ] }
         { CHAR: =   CHAR: = }
     } ?at [ bad-escape ] unless ;
@@ -54,7 +54,7 @@ USE: xml.entities
         { CHAR: \\   "\\\\" }
         { CHAR: ?    "\\?"  }
         { CHAR: ;    "\\;"  }
-        { CHAR: [    "\\["  }
+        { CHAR: \[    "\\["  }
         { CHAR: ]    "\\]"  }
         { CHAR: =    "\\="  }
     } escape-string-by ;
@@ -87,7 +87,7 @@ SYMBOL: option
 : section? ( line -- index/f )
     {
         [ length 1 > ]
-        [ first CHAR: [ = ]
+        [ first CHAR: \[ = ]
         [ CHAR: ] swap last-index ]
     } 1&& ;
 

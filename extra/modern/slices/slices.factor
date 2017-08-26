@@ -10,10 +10,10 @@ IN: modern.slices
 : matching-delimiter ( ch -- ch' )
     H{
         { CHAR: ( CHAR: ) }
-        { CHAR: [ CHAR: ] }
-        { CHAR: { CHAR: } }
+        { CHAR: \[ CHAR: ] }
+        { CHAR: \{ CHAR: } }
         { CHAR: < CHAR: > }
-        { CHAR: : CHAR: ; }
+        { CHAR: \: CHAR: ; }
     } ?at drop ;
 
 : matching-delimiter-string ( string -- string' )

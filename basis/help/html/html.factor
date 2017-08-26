@@ -17,7 +17,7 @@ IN: help.html
         dup H{
             { CHAR: \" "__quo__" }
             { CHAR: * "__star__" }
-            { CHAR: : "__colon__" }
+            { CHAR: \: "__colon__" }
             { CHAR: < "__lt__" }
             { CHAR: > "__gt__" }
             { CHAR: ? "__que__" }

@@ -81,7 +81,7 @@ M: irc-message set-irc-command
         [ prefix>> ]
         [ command>> ]
         [ parameters>> " " join ]
-        [ trailing>> dup [ CHAR: : prefix ] when ]
+        [ trailing>> dup [ CHAR: \: prefix ] when ]
     } cleave 4array sift " " join ;
 
 <PRIVATE

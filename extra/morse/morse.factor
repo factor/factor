@@ -65,7 +65,7 @@ CONSTANT: morse-code-table $[
         { CHAR: ( "-.--."  }
         { CHAR: ) "-.--.-" }
         { CHAR: & ".-..."  }
-        { CHAR: : "---..." }
+        { CHAR: \: "---..." }
         { CHAR: ; "-.-.-." }
         { CHAR: = "-...- " }
         { CHAR: + ".-.-."  }

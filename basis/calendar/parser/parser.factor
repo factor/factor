@@ -37,7 +37,7 @@ ERROR: invalid-timestamp-format ;
         [
             [
                 read-00 hours
-                read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
+                read1 { { CHAR: \: [ read-00 ] } { f [ 0 ] } } case minutes
                 time+
             ] dip signed-gmt-offset
         ]

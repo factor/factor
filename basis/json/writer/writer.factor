@@ -111,7 +111,7 @@ M: real stream-json-print
     [ >float number>string ] [ stream-write ] bi* ;
 
 M: sequence stream-json-print
-    CHAR: [ over stream-write1 swap
+    CHAR: \[ over stream-write1 swap
     over '[ CHAR: , _ stream-write1 ]
     pick '[ _ stream-json-print ] interleave
     CHAR: ] swap stream-write1 ;
@@ -130,7 +130,7 @@ M: float json-coerce float>json ;
 M: real json-coerce >float number>string ;
 
 :: json-print-assoc ( obj stream -- )
-    CHAR: { stream stream-write1 obj >alist
+    CHAR: \{ stream stream-write1 obj >alist
     [ CHAR: , stream stream-write1 ]
     json-friendly-keys? get
     json-coerce-keys? get '[
@@ -140,7 +140,7 @@ M: real json-coerce >float number>string ;
             [ _ [ json-coerce ] when ] if
             stream stream-json-print
         ] [
-            CHAR: : stream stream-write1
+            CHAR: \: stream stream-write1
             stream stream-json-print
         ] bi*
     ] interleave

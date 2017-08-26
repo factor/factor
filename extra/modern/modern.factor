@@ -45,8 +45,8 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
      ] ;
 
 : read-double-matched-paren ( n string tag ch -- n' string seq ) CHAR: ( read-double-matched ;
-: read-double-matched-bracket ( n string tag ch -- n' string seq ) CHAR: [ read-double-matched ;
-: read-double-matched-brace ( n string tag ch -- n' string seq ) CHAR: { read-double-matched ;
+: read-double-matched-bracket ( n string tag ch -- n' string seq ) CHAR: \[ read-double-matched ;
+: read-double-matched-brace ( n string tag ch -- n' string seq ) CHAR: \{ read-double-matched ;
 
 DEFER: lex-factor
 ERROR: lex-expected-but-got-eof n string expected ;
@@ -103,8 +103,8 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         } cond
     ] ;
 
-: read-bracket ( n string slice -- n' string slice' ) CHAR: [ read-matched ;
-: read-brace ( n string slice -- n' string slice' ) CHAR: { read-matched ;
+: read-bracket ( n string slice -- n' string slice' ) CHAR: \[ read-matched ;
+: read-brace ( n string slice -- n' string slice' ) CHAR: \{ read-matched ;
 : read-paren ( n string slice -- n' string slice' ) CHAR: ( read-matched ;
 : read-string-payload ( n string -- n' string )
     over [
@@ -126,7 +126,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     tag 1 cut-slice* 4array ;
 
 : take-comment ( n string slice -- n' string comment )
-    2over ?nth CHAR: [ = [
+    2over ?nth CHAR: \[ = [
         [ 1 + ] 2dip 2over ?nth read-double-matched-bracket
     ] [
         [ slice-til-eol drop ] dip swap 2array
@@ -233,7 +233,7 @@ ERROR: mismatched-terminator n string slice ;
             { CHAR: " [ read-string ] }
             { CHAR: \ [ read-backslash ] }
             { CHAR: ! [ read-exclamation ] }
-            { CHAR: : [
+            { CHAR: \: [
                 dup strict-upper? strict-upper get and [
                     length swap [ - ] dip f
                     strict-upper off
@@ -267,8 +267,8 @@ ERROR: mismatched-terminator n string slice ;
                     [ slice-til-whitespace drop ] dip span-slices ! >= >> etc
                 ] if
             ] }
-            { CHAR: [ [ read-bracket ] }
-            { CHAR: { [ read-brace ] }
+            { CHAR: \[ [ read-bracket ] }
+            { CHAR: \{ [ read-brace ] }
             { CHAR: ( [ read-paren ] }
             { CHAR: \s [ read-token-or-whitespace ] }
             { CHAR: \r [ read-token-or-whitespace ] }
