@@ -96,7 +96,7 @@ FUNCTION: int futimes ( int id,
 FUNCTION: int booyah ( int x )
 FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
 
-hexcolor: ffffff color: green nan: 1234 char: m ALIEN: 93
+hexcolor: ffffff color: green nan: 1234 char: m alien: 93
 2drop 2drop drop
 
 PRIMITIVE: one ( a -- b )

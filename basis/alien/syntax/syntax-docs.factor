@@ -7,15 +7,15 @@ HELP: DLL"
 { $values { "path" "a pathname string" } }
 { $description "Constructs a DLL handle at parse time." } ;
 
-HELP: ALIEN:
-{ $syntax "ALIEN: address" }
+HELP: alien:
+{ $syntax "alien: address" }
 { $values { "address" "a non-negative hexadecimal integer" } }
 { $description "Creates an alien object at parse time." }
 { $notes "Alien objects are invalidated between image saves and loads, and hence source files should not contain alien literals; this word is for interactive use only. See " { $link "alien-expiry" } " for details." } ;
 
 ARTICLE: "syntax-aliens" "Alien object literal syntax"
 { $subsections
-    postpone: ALIEN:
+    postpone: alien:
     postpone: DLL"
 } ;
 

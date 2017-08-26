@@ -440,10 +440,10 @@ M: object bad-push-test-case "foo" throw ; inline
 
 STRUCT: BitmapData { Scan0 void* } ;
 
-[ ALIEN: 123 ] [
+[ alien: 123 ] [
     [
         { BitmapData }
-        [ BitmapData memory>struct ALIEN: 123 >>Scan0 drop ]
+        [ BitmapData memory>struct alien: 123 >>Scan0 drop ]
         with-out-parameters Scan0>>
     ] compile-call
 ] unit-test

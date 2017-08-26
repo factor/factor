@@ -437,8 +437,8 @@ ERROR: bug-in-fixnum* x y a b ;
     [ ] [ "s" get free ] unit-test
 ] when
 
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare void* <ref> ] compile-call void* deref ] unit-test
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare void* <ref> ] compile-call void* deref ] unit-test
+[ alien: 1234 ] [ alien: 1234 [ { alien } declare void* <ref> ] compile-call void* deref ] unit-test
+[ alien: 1234 ] [ alien: 1234 [ { c-ptr } declare void* <ref> ] compile-call void* deref ] unit-test
 [ f ] [ f [ { postpone: f } declare void* <ref> ] compile-call void* deref ] unit-test
 
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
@@ -478,15 +478,15 @@ ERROR: bug-in-fixnum* x y a b ;
     ] compile-call
 ] unit-test
 
-[ ALIEN: 123 ] [
+[ alien: 123 ] [
     0x123 [ <alien> ] compile-call
 ] unit-test
 
-[ ALIEN: 123 ] [
+[ alien: 123 ] [
     0x123 [ { fixnum } declare <alien> ] compile-call
 ] unit-test
 
-[ ALIEN: 123 ] [
+[ alien: 123 ] [
     [ 0x123 <alien> ] compile-call
 ] unit-test
 
@@ -502,16 +502,16 @@ ERROR: bug-in-fixnum* x y a b ;
     [ 0 <alien> ] compile-call
 ] unit-test
 
-[ ALIEN: 321 ] [
-    0 ALIEN: 321 [ <displaced-alien> ] compile-call
+[ alien: 321 ] [
+    0 alien: 321 [ <displaced-alien> ] compile-call
 ] unit-test
 
-[ ALIEN: 321 ] [
-    0 ALIEN: 321 [ { fixnum c-ptr } declare <displaced-alien> ] compile-call
+[ alien: 321 ] [
+    0 alien: 321 [ { fixnum c-ptr } declare <displaced-alien> ] compile-call
 ] unit-test
 
-[ ALIEN: 321 ] [
-    ALIEN: 321 [ 0 swap <displaced-alien> ] compile-call
+[ alien: 321 ] [
+    alien: 321 [ 0 swap <displaced-alien> ] compile-call
 ] unit-test
 
 [ B{ 0 1 2 3 4 } ] [
@@ -526,8 +526,8 @@ ERROR: bug-in-fixnum* x y a b ;
     underlying>>
 ] unit-test
 
-[ ALIEN: 1234 ALIEN: 2234 ] [
-    ALIEN: 234 [
+[ alien: 1234 alien: 2234 ] [
+    alien: 234 [
         { c-ptr } declare
         [ 0x1000 swap <displaced-alien> ]
         [ 0x2000 swap <displaced-alien> ] bi

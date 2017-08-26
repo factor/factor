@@ -15,6 +15,6 @@ HELP: load-module
   { $unchecked-example
     "USING: io.pathnames llvm.reader ;"
     "\"resource:extra/llvm/wrappers/add.bc\" absolute-path load-module"
-    "T{ module { value ALIEN: 1be7120 } }"
+    "T{ module { value alien: 1be7120 } }"
   }
 } ;

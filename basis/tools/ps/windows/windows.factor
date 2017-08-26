@@ -62,7 +62,7 @@ IN: tools.ps.windows
         PVOID heap-size
         read-process-memory
         PVOID deref :> args-offset
-        args-offset ALIEN: 0 = [
+        args-offset alien: 0 = [
             f
         ] [
             handle
