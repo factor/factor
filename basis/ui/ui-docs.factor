@@ -53,6 +53,10 @@ HELP: fullscreen?
 
 { fullscreen? set-fullscreen } related-words
 
+HELP: find-windows
+{ $values { "quot" { $quotation ( world -- ? ) } } { "seq" sequence } }
+{ $description "Finds all native windows such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting an empty sequence if no such gadget could be found. The front-most native window is the last in the " { $snippet "seq" } "." } ;
+
 HELP: find-window
 { $values { "quot" { $quotation ( world -- ? ) } } { "world/f" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;

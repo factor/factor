@@ -140,10 +140,13 @@ SYMBOL: ui-running
 
 PRIVATE>
 
-: find-window ( quot: ( world -- ? ) -- world/f )
+: find-windows ( quot: ( world -- ? ) -- seq )
     [ ui-windows get-global values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
-    find-last nip ; inline
+    filter ; inline
+
+: find-window ( quot: ( world -- ? ) -- world/f )
+    find-windows ?last ; inline
 
 : ui-running? ( -- ? )
     ui-running get-global ;
