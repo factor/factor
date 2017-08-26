@@ -277,7 +277,7 @@ ERROR: mismatched-terminator n string slice ;
                 drop
                 dup "\\" sequence= [ read-backslash ] [ merge-slice-til-whitespace ] if
             ] [
-                (lex-factor)
+                over "\\" tail? [ drop read-backslash ] [ (lex-factor) ] if
             ] if
         ] [
             (lex-factor)

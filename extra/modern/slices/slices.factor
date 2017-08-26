@@ -82,14 +82,14 @@ ERROR: unexpected-end n string ;
         f string f f
     ] if ; inline
 
-:: slice-until' ( n string quot -- n' string slice/f ch/f )
+:: (slice-until) ( n string quot -- n' string slice/f ch/f )
     n string quot find-from :> ( n' ch )
     n' string
     n n' string ?<slice>
     ch ; inline
 
 : slice-until ( n string quot -- n' string slice/f )
-    slice-until' drop ; inline
+    (slice-until) drop ; inline
 
 :: slice-til-not-whitespace ( n string -- n' string slice/f ch/f )
     n [
@@ -147,13 +147,13 @@ ERROR: unexpected-end n string ;
 : slice-before ( slice -- slice' )
     [ drop 0 ] [ from>> ] [ seq>> ] tri <slice> ;
 
-: ?nth' ( n/f string/f -- obj/f )
-    over [ ?nth ] [ 2drop f ] if ;
+: (?nth) ( n/f string/f -- obj/f )
+    over [ (?nth) ] [ 2drop f ] if ;
 
 :: merge-slice-til-eol-slash' ( n string slice -- n' string slice/f ch/f )
     n string merge-slice-til-eol-slash'' :> ( n' string' slice' ch' )
     ch' char: \\ = [
-        n' 1 + string' ?nth' "\r\n" member? [
+        n' 1 + string' (?nth) "\r\n" member? [
             n' 2 + string' slice slice' span-slices merge-slice-til-eol-slash'
         ] [
             "omg" throw
