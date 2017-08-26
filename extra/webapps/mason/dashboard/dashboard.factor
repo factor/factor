@@ -6,10 +6,10 @@ webapps.mason.utils ;
 IN: webapps.mason.downloads
 
 CONSTANT: CRASHED
-[XML <span style="background-color: yellow;">CRASHED</span> XML]
+XML-CHUNK[[ <span style="background-color: yellow;">CRASHED</span> ]]
 
 CONSTANT: BROKEN
-[XML <span style="background-color: red; color: white;">BROKEN</span> XML]
+XML-CHUNK[[ <span style="background-color: red; color: white;">BROKEN</span> ]]
 
 : builder-status ( builder -- status/f )
     {
@@ -22,10 +22,10 @@ CONSTANT: BROKEN
     [ os/cpu ] sort-with
     [
         [ report-url ] [ os/cpu ] [ builder-status ] tri
-        [XML <li><a href=<->><-></a> <-></li> XML]
+        XML-CHUNK[[ <li><a href=<->><-></a> <-></li> ]]
     ] map
-    [ [XML <p>No machines.</p> XML] ]
-    [ [XML <ul><-></ul> XML] ]
+    [ XML-CHUNK[[ <p>No machines.</p> ]] ]
+    [ XML-CHUNK[[ <ul><-></ul> ]] ]
     if-empty ;
 
 : <dashboard-action> ( -- action )

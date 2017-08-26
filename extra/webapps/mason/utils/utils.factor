@@ -7,7 +7,7 @@ webapps.mason.version.data xml.syntax ;
 IN: webapps.mason.utils
 
 : link ( url label -- xml )
-    [XML <a href=<->><-></a> XML] ;
+    XML-CHUNK[[ <a href=<->><-></a> ]] ;
 
 : validate-os/cpu ( -- )
     {
@@ -35,7 +35,7 @@ IN: webapps.mason.utils
             ?
         ] [ drop f ] if
     ] bi
-    2array sift [ [XML <li><-></li> XML] ] map [XML <ul><-></ul> XML] ;
+    2array sift [ XML-CHUNK[[ <li><-></li> ]] ] map XML-CHUNK[[ <ul><-></ul> ]] ;
 
 : download-url ( string -- string' )
     "http://downloads.factorcode.org/" prepend ;

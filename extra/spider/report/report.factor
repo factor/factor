@@ -56,18 +56,18 @@ SYMBOL: time-std
 : info-table ( alist -- html )
     [
         first2 dupd 1000000 /f
-        [XML
+        XML-CHUNK[[
         <tr><td><a href=<->><-></a></td><td><-> seconds</td></tr>
-        XML]
-    ] map [XML <table border="1"><-></table> XML] ;
+        ]]
+    ] map XML-CHUNK[[ <table border="1"><-></table> ]] ;
 
 : report-broken-pages ( -- html )
     broken-pages get info-table ;
 
 : report-network-failures ( -- html )
     network-failures get [
-        dup [XML <li><a href=<->><-></a></li> XML]
-    ] map [XML <ul><-></ul> XML] ;
+        dup XML-CHUNK[[ <li><a href=<->><-></a></li> ]]
+    ] map XML-CHUNK[[ <ul><-></ul> ]] ;
 
 : slowest-pages-table ( -- html )
     slowest-pages get info-table ;
@@ -76,31 +76,31 @@ SYMBOL: time-std
     mean-time get
     median-time get
     time-std get
-    [XML
+    XML-CHUNK[[
     <table border="1">
     <tr><th>Mean</th><td><-> seconds</td></tr>
     <tr><th>Median</th><td><-> seconds</td></tr>
     <tr><th>Standard deviation</th><td><-> seconds</td></tr>
     </table>
-    XML] ;
+    ]] ;
 
 : report-timings ( -- html )
     slowest-pages-table
     timing-summary-table
-    [XML
+    XML-CHUNK[[
     <h3>Slowest pages</h3>
     <->
 
     <h3>Summary</h3>
     <->
-    XML] ;
+    ]] ;
 
 : generate-report ( -- html )
     url get dup
     report-broken-pages
     report-network-failures
     report-timings
-    [XML
+    XML-CHUNK[[
     <h1>Spider report</h1>
     URL: <a href=<->><-></a>
 
@@ -112,7 +112,7 @@ SYMBOL: time-std
 
     <h2>Load times</h2>
     <->
-    XML] ;
+    ]] ;
 
 : spider-report ( spider -- html )
     [ "Spider report" f ] dip

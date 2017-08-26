@@ -74,12 +74,12 @@ CHLOE: a
     [
         [ a-attrs ]
         [ compile-children>xml-string ] bi
-        [ <unescaped> [XML <a><-></a> XML] second swap >>attrs ]
+        [ <unescaped> XML-CHUNK[[ <a><-></a> ]] second swap >>attrs ]
         [xml-code]
     ] compile-with-scope ;
 
 CHLOE: base
-    compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
+    compile-a-url [ XML-CHUNK[[ <base href=<->/> ]] ] [xml-code] ;
 
 : hidden-nested-fields ( -- xml )
     nested-forms get " " join f like nested-forms-key
@@ -93,7 +93,7 @@ CHLOE: base
         _ render-hidden
         hidden-nested-fields
         form-modifications
-        [XML <div style="display: none;"><-><-><-></div> XML]
+        XML-CHUNK[[ <div style="display: none;"><-><-><-></div> ]]
     ] [code] ;
 
 : (compile-form-attrs) ( method action -- )
@@ -122,18 +122,18 @@ CHLOE: form
         [ hidden-fields ]
         [ compile-children>xml-string ] tri
         [
-            <unescaped> [XML <form><-><-></form> XML] second
+            <unescaped> XML-CHUNK[[ <form><-><-></form> ]] second
                 swap >>attrs
             write-xml
         ] [code]
     ] compile-with-scope ;
 
 : button-tag-markup ( -- xml )
-    <XML
+    XML-DOC[[
         <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
             <div style="display: inline;"><button type="submit"></button></div>
         </t:form>
-    XML> body>> clone ;
+    ]] body>> clone ;
 
 : add-tag-attrs ( attrs tag -- )
     attrs>> swap assoc-union! drop ;

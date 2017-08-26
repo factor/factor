@@ -59,13 +59,13 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 \ serve-file NOTICE add-input-logging
 
 :: file-html-template ( href size modified -- xml )
-    [XML
+    XML-CHUNK[[
         <tr>
             <td><a href=<-href->><-href-></a></td>
             <td align="right"><-modified-></td>
             <td align="right"><-size-></td>
         </tr>
-    XML] ;
+    ]] ;
 
 : file>html ( name infos -- xml )
     [
@@ -84,7 +84,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
     url get [ path>> "Index of " prepend ] [ "" ] if* ;
 
 :: listing-html-template ( title listing ?parent CO-N CO-M CO-S -- xml )
-    [XML <h1><-title-></h1>
+    XML-CHUNK[[ <h1><-title-></h1>
         <table>
             <tr>
                 <th><a href=<-CO-N->>Name</a></th>
@@ -96,7 +96,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
             <-listing->
             <tr><th colspan="5"><hr/></th></tr>
         </table>
-    XML] ;
+    ]] ;
 
 : sort-column ( -- column ) params get "C" of "N" or ;
 

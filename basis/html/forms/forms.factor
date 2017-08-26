@@ -109,6 +109,6 @@ C: <validation-error-state> validation-error-state
 : render-validation-errors ( -- )
     form get errors>>
     [
-        [ [XML <li><-></li> XML] ] map
-        [XML <ul class="errors"><-></ul> XML] write-xml
+        [ XML-CHUNK[[ <li><-></li> ]] ] map
+        XML-CHUNK[[ <ul class="errors"><-></ul> ]] write-xml
     ] unless-empty ;

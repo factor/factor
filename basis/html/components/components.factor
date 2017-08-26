@@ -46,10 +46,10 @@ M: label render*
 SINGLETON: hidden
 
 M: hidden render*
-    drop [XML <input value=<-> name=<-> type="hidden"/> XML] ;
+    drop XML-CHUNK[[ <input value=<-> name=<-> type="hidden"/> ]] ;
 
 : render-field ( value name size type -- xml )
-    [XML <input value=<-> name=<-> size=<-> type=<->/> XML] ;
+    XML-CHUNK[[ <input value=<-> name=<-> size=<-> type=<->/> ]] ;
 
 TUPLE: field size ;
 
@@ -77,12 +77,12 @@ TUPLE: textarea rows cols ;
 M:: textarea render* ( value name area -- xml )
     area rows>> :> rows
     area cols>> :> cols
-    [XML
+    XML-CHUNK[[
          <textarea
             name=<-name->
             rows=<-rows->
             cols=<-cols->><-value-></textarea>
-    XML] ;
+    ]] ;
 
 ! Choice
 TUPLE: choice size multiple choices ;
@@ -92,7 +92,7 @@ TUPLE: choice size multiple choices ;
 
 : render-option ( text selected? -- xml )
     "selected" and swap
-    [XML <option selected=<->><-></option> XML] ;
+    XML-CHUNK[[ <option selected=<->><-></option> ]] ;
 
 : render-options ( value choice -- xml )
     [ choices>> value ] [ multiple>> ] bi
@@ -103,10 +103,10 @@ M:: choice render* ( value name choice -- xml )
     choice size>> :> size
     choice multiple>> "true" and :> multiple
     value choice render-options :> contents
-    [XML <select
+    XML-CHUNK[[ <select
         name=<-name->
         size=<-size->
-        multiple=<-multiple->><-contents-></select> XML] ;
+        multiple=<-multiple->><-contents-></select> ]] ;
 
 ! Checkboxes
 TUPLE: checkbox label ;
@@ -116,9 +116,9 @@ TUPLE: checkbox label ;
 
 M: checkbox render*
     [ "true" and ] [ ] [ label>> ] tri*
-    [XML <input
+    XML-CHUNK[[ <input
         type="checkbox"
-        checked=<-> name=<->><-></input> XML] ;
+        checked=<-> name=<->><-></input> ]] ;
 
 ! Link components
 GENERIC: link-title ( obj -- string )
@@ -142,7 +142,7 @@ TUPLE: link target ;
 M: link render*
     nip swap
     [ target>> ] [ [ link-href ] [ link-title ] bi ] bi*
-    [XML <a target=<-> href=<->><-></a> XML] ;
+    XML-CHUNK[[ <a target=<-> href=<->><-></a> ]] ;
 
 ! XMode code component
 TUPLE: code mode ;

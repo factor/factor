@@ -7,7 +7,7 @@ IN: xmode.code2html
     [
         [ str>> ] [ id>> ] bi [
             name>> swap
-            [XML <span class=<->><-></span> XML]
+            XML-CHUNK[[ <span class=<->><-></span> ]]
         ] when*
     ] map ;
 
@@ -21,14 +21,14 @@ IN: xmode.code2html
 : default-stylesheet ( -- xml )
     "resource:basis/xmode/code2html/stylesheet.css"
     utf8 file-contents
-    [XML <style><-></style> XML] ;
+    XML-CHUNK[[ <style><-></style> ]] ;
 
 :: htmlize-stream ( path stream -- xml )
     stream stream-lines
     [ "" ] [ path over first find-mode htmlize-lines ]
     if-empty :> input
     default-stylesheet :> stylesheet
-    <XML <!DOCTYPE html> <html>
+    XML-DOC[[ <!DOCTYPE html> <html>
         <head>
             <-stylesheet->
             <title><-path-></title>
@@ -36,7 +36,7 @@ IN: xmode.code2html
         <body>
             <pre><-input-></pre>
         </body>
-    </html> XML> ;
+    </html> ]] ;
 
 : htmlize-file ( path -- )
     dup utf8 [

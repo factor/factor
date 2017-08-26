@@ -27,8 +27,8 @@ CONSTANT: tc-lisp-slides
         { $code
         "USING: splitting xml.writer xml.syntax ;
 { \"one\" \"two\" \"three\" }
-[ [XML <item><-></item> XML] ] map
-<XML <doc><-></doc> XML> pprint-xml"
+[ XML-CHUNK[[ <item><-></item> ]] ] map
+XML-DOC[[ <doc><-></doc> ]] pprint-xml"
         }
     }
     { $slide "Differences between Factor and Lisp"

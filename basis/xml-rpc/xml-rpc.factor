@@ -16,34 +16,34 @@ GENERIC: item>xml ( object -- xml )
 M: integer item>xml
     dup 31 2^ neg 31 2^ 1 - between?
     [ "Integers must fit in 32 bits" throw ] unless
-    [XML <i4><-></i4> XML] ;
+    XML-CHUNK[[ <i4><-></i4> ]] ;
 
 M: boolean item>xml
-    "1" "0" ? [XML <boolean><-></boolean> XML] ;
+    "1" "0" ? XML-CHUNK[[ <boolean><-></boolean> ]] ;
 
 M: float item>xml
-    number>string [XML <double><-></double> XML] ;
+    number>string XML-CHUNK[[ <double><-></double> ]] ;
 
 M: string item>xml
-    [XML <string><-></string> XML] ;
+    XML-CHUNK[[ <string><-></string> ]] ;
 
 : struct-member ( name value -- tag )
     over string? [ "Struct member name must be string" throw ] unless
     item>xml
-    [XML
+    XML-CHUNK[[
         <member>
             <name><-></name>
             <value><-></value>
         </member>
-    XML] ;
+    ]] ;
 
 M: hashtable item>xml
     [ struct-member ] { } assoc>map
-    [XML <struct><-></struct> XML] ;
+    XML-CHUNK[[ <struct><-></struct> ]] ;
 
 M: array item>xml
-    [ item>xml [XML <value><-></value> XML] ] map
-    [XML <array><data><-></data></array> XML] ;
+    [ item>xml XML-CHUNK[[ <value><-></value> ]] ] map
+    XML-CHUNK[[ <array><data><-></data></array> ]] ;
 
 TUPLE: base64 string ;
 
@@ -51,33 +51,33 @@ C: <base64> base64
 
 M: base64 item>xml
     string>> >base64
-    [XML <base64><-></base64> XML] ;
+    XML-CHUNK[[ <base64><-></base64> ]] ;
 
 : params ( seq -- xml )
-    [ item>xml [XML <param><value><-></value></param> XML] ] map
-    [XML <params><-></params> XML] ;
+    [ item>xml XML-CHUNK[[ <param><value><-></value></param> ]] ] map
+    XML-CHUNK[[ <params><-></params> ]] ;
 
 : method-call ( name seq -- xml )
     params
-    <XML
+    XML-DOC[[
         <methodCall>
             <methodName><-></methodName>
             <->
         </methodCall>
-    XML> ;
+    ]] ;
 
 : return-params ( seq -- xml )
-    params <XML <methodResponse><-></methodResponse> XML> ;
+    params XML-DOC[[ <methodResponse><-></methodResponse> ]] ;
 
 : return-fault ( fault-code fault-string -- xml )
     [ "faultString" ,, "faultCode" ,, ] H{ } make item>xml
-    <XML
+    XML-DOC[[
         <methodResponse>
             <fault>
                 <value><-></value>
             </fault>
         </methodResponse>
-    XML> ;
+    ]] ;
 
 TUPLE: rpc-method name params ;
 

@@ -55,10 +55,10 @@ XML-NS: foo http://blah.com
   y
   <foo/>
 </x>" } [
-    let[ "one" :> a "two" :> c "y" :> x [XML <-x-> <foo/> XML] :> d
-        <XML
+    let[ "one" :> a "two" :> c "y" :> x XML-CHUNK[[ <-x-> <foo/> ]] :> d
+        XML-DOC[[
             <x> <-a-> <b val=<-c->/> <-d-> </x>
-        XML> pprint-xml>string
+        ]] pprint-xml>string
     ]
 ] unit-test
 
@@ -75,69 +75,69 @@ XML-NS: foo http://blah.com
   </item>
 </doc>" } [
     "one two three" " " split
-    [ [XML <item><-></item> XML] ] map
-    <XML <doc><-></doc> XML> pprint-xml>string
+    [ XML-CHUNK[[ <item><-></item> ]] ] map
+    XML-DOC[[ <doc><-></doc> ]] pprint-xml>string
 ] unit-test
 
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <x number=\"3\" url=\"http://factorcode.org/\" string=\"hello\" word=\"drop\"/>" }
 [ 3 f "http://factorcode.org/" "hello" \ drop
-  <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
+  XML-DOC[[ <x number=<-> false=<-> url=<-> string=<-> word=<->/> ]]
   pprint-xml>string  ] unit-test
 
-{ "<x>3</x>" } [ 3 [XML <x><-></x> XML] xml>string ] unit-test
-{ "<x></x>" } [ f [XML <x><-></x> XML] xml>string ] unit-test
+{ "<x>3</x>" } [ 3 XML-CHUNK[[ <x><-></x> ]] xml>string ] unit-test
+{ "<x></x>" } [ f XML-CHUNK[[ <x><-></x> ]] xml>string ] unit-test
 
-[ [XML <-> XML] ] must-infer
-[ [XML <foo><-></foo> <bar val=<->/> XML] ] must-infer
+[ XML-CHUNK[[ <-> ]] ] must-infer
+[ XML-CHUNK[[ <foo><-></foo> <bar val=<->/> ]] ] must-infer
 
-{ xml-chunk } [ [ [XML <foo/> XML] ] first class-of ] unit-test
-{ xml } [ [ <XML <foo/> XML> ] first class-of ] unit-test
-{ xml-chunk } [ [ [XML <foo val=<->/> XML] ] third class-of ] unit-test
-{ xml } [ [ <XML <foo val=<->/> XML> ] third class-of ] unit-test
-{ 1 } [ [ [XML <foo/> XML] ] length ] unit-test
-{ 1 } [ [ <XML <foo/> XML> ] length ] unit-test
+{ xml-chunk } [ [ XML-CHUNK[[ <foo/> ]] ] first class-of ] unit-test
+{ xml } [ [ XML-DOC[[ <foo/> ]] ] first class-of ] unit-test
+{ xml-chunk } [ [ XML-CHUNK[[ <foo val=<->/> ]] ] third class-of ] unit-test
+{ xml } [ [ XML-DOC[[ <foo val=<->/> ]] ] third class-of ] unit-test
+{ 1 } [ [ XML-CHUNK[[ <foo/> ]] ] length ] unit-test
+{ 1 } [ [ XML-DOC[[ <foo/> ]] ] length ] unit-test
 
-{ "" } [ [XML XML] concat ] unit-test
+{ "" } [ XML-CHUNK[[ ]] concat ] unit-test
 
-{ "foo" } [ [XML <a>foo</a> XML] [ [XML <a><-></a> XML] ] undo ] unit-test
-{ "foo" } [ [XML <a bar='foo'/> XML] [ [XML <a bar=<-> /> XML] ] undo ] unit-test
-{ "foo" "baz" } [ [XML <a bar='foo'>baz</a> XML] [ [XML <a bar=<->><-></a> XML] ] undo ] unit-test
+{ "foo" } [ XML-CHUNK[[ <a>foo</a> ]] [ XML-CHUNK[[ <a><-></a> ]] ] undo ] unit-test
+{ "foo" } [ XML-CHUNK[[ <a bar='foo'/> ]] [ XML-CHUNK[[ <a bar=<-> /> ]] ] undo ] unit-test
+{ "foo" "baz" } [ XML-CHUNK[[ <a bar='foo'>baz</a> ]] [ XML-CHUNK[[ <a bar=<->><-></a> ]] ] undo ] unit-test
 
 : dispatch ( xml -- string )
     {
-        { [ [XML <a><-></a> XML] ] [ "a" prepend ] }
-        { [ [XML <b><-></b> XML] ] [ "b" prepend ] }
-        { [ [XML <b val='yes'/> XML] ] [ "byes" ] }
-        { [ [XML <b val=<->/> XML] ] [ "bno" prepend ] }
+        { [ XML-CHUNK[[ <a><-></a> ]] ] [ "a" prepend ] }
+        { [ XML-CHUNK[[ <b><-></b> ]] ] [ "b" prepend ] }
+        { [ XML-CHUNK[[ <b val='yes'/> ]] ] [ "byes" ] }
+        { [ XML-CHUNK[[ <b val=<->/> ]] ] [ "bno" prepend ] }
     } switch ;
 
-{ "apple" } [ [XML <a>pple</a> XML] dispatch ] unit-test
-{ "banana" } [ [XML <b>anana</b> XML] dispatch ] unit-test
-{ "byes" } [ [XML <b val="yes"/> XML] dispatch ] unit-test
-{ "bnowhere" } [ [XML <b val="where"/> XML] dispatch ] unit-test
-{ "baboon" } [ [XML <b val="something">aboon</b> XML] dispatch ] unit-test
-{ "apple" } [ <XML <a>pple</a> XML> dispatch ] unit-test
-{ "apple" } [ <XML <a>pple</a> XML> body>> dispatch ] unit-test
+{ "apple" } [ XML-CHUNK[[ <a>pple</a> ]] dispatch ] unit-test
+{ "banana" } [ XML-CHUNK[[ <b>anana</b> ]] dispatch ] unit-test
+{ "byes" } [ XML-CHUNK[[ <b val="yes"/> ]] dispatch ] unit-test
+{ "bnowhere" } [ XML-CHUNK[[ <b val="where"/> ]] dispatch ] unit-test
+{ "baboon" } [ XML-CHUNK[[ <b val="something">aboon</b> ]] dispatch ] unit-test
+{ "apple" } [ XML-DOC[[ <a>pple</a> ]] dispatch ] unit-test
+{ "apple" } [ XML-DOC[[ <a>pple</a> ]] body>> dispatch ] unit-test
 
 : dispatch-doc ( xml -- string )
     {
-        { [ <XML <a><-></a> XML> ] [ "a" prepend ] }
-        { [ <XML <b><-></b> XML> ] [ "b" prepend ] }
-        { [ <XML <b val='yes'/> XML> ] [ "byes" ] }
-        { [ <XML <b val=<->/> XML> ] [ "bno" prepend ] }
+        { [ XML-DOC[[ <a><-></a> ]] ] [ "a" prepend ] }
+        { [ XML-DOC[[ <b><-></b> ]] ] [ "b" prepend ] }
+        { [ XML-DOC[[ <b val='yes'/> ]] ] [ "byes" ] }
+        { [ XML-DOC[[ <b val=<->/> ]] ] [ "bno" prepend ] }
     } switch ;
 
-{ "apple" } [ <XML <a>pple</a> XML> dispatch-doc ] unit-test
-{ "apple" } [ [XML <a>pple</a> XML] dispatch-doc ] unit-test
-{ "apple" } [ <XML <a>pple</a> XML> body>> dispatch-doc ] unit-test
+{ "apple" } [ XML-DOC[[ <a>pple</a> ]] dispatch-doc ] unit-test
+{ "apple" } [ XML-CHUNK[[ <a>pple</a> ]] dispatch-doc ] unit-test
+{ "apple" } [ XML-DOC[[ <a>pple</a> ]] body>> dispatch-doc ] unit-test
 
 ! Make sure nested XML documents interpolate correctly
 {
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><color><blue>it's blue!</blue></color>"
 } [
-    "it's blue!" <XML <blue><-></blue> XML>
-    <XML <color><-></color> XML> xml>string
+    "it's blue!" XML-DOC[[ <blue><-></blue> ]]
+    XML-DOC[[ <color><-></color> ]] xml>string
 ] unit-test
 
 {
@@ -147,5 +147,5 @@ XML-NS: foo http://blah.com
     "asdf"
     "asdf" f f <tag>
     "asdf2" <xml>
-    <XML <a><-></a> XML> xml>string
+    XML-DOC[[ <a><-></a> ]] xml>string
 ] unit-test

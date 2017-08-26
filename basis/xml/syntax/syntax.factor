@@ -170,11 +170,13 @@ MACRO: interpolate-xml ( xml -- quot )
 
 PRIVATE>
 
-SYNTAX: <XML
-    "XML>" [ string>doc ] parse-def ;
+SYNTAX: \XML-DOC[[ "]]" [ string>doc ] parse-def ;
+SYNTAX: \XML-DOC[=[ "]=]" [ string>doc ] parse-def ;
+SYNTAX: \XML-DOC[==[ "]==]" [ string>doc ] parse-def ;
 
-SYNTAX: [XML
-    "XML]" [ string>chunk ] parse-def ;
+SYNTAX: \XML-CHUNK[[ "]]" [ string>chunk ] parse-def ;
+SYNTAX: \XML-CHUNK[=[ "]=]" [ string>chunk ] parse-def ;
+SYNTAX: \XML-CHUNK[==[ "]==]" [ string>chunk ] parse-def ;
 
 USE: vocabs.loader
 

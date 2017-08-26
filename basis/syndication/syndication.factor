@@ -119,23 +119,23 @@ M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
         [ date>> timestamp>rfc3339 ]
         [ description>> ]
     } cleave
-    [XML
+    XML-CHUNK[[
         <entry>
             <title type="html"><-></title>
             <link rel="alternate" href=<-> />
             <published><-></published>
             <content type="html"><-></content>
         </entry>
-    XML] ;
+    ]] ;
 
 : feed>xml ( feed -- xml )
     [ title>> ]
     [ url>> present ]
     [ entries>> [ entry>xml ] map ] tri
-    <XML
+    XML-DOC[[
         <feed xmlns="http://www.w3.org/2005/Atom">
             <title><-></title>
             <link rel="alternate" href=<-> />
             <->
         </feed>
-    XML> ;
+    ]] ;

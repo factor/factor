@@ -35,29 +35,29 @@ HELP: TAG:
 ARTICLE: { "xml.syntax" "literals" } "XML literals"
 "The following words provide syntax for XML literals:"
 { $subsections
-    postpone: <XML
-    postpone: [XML
+    postpone: XML-DOC[[
+    postpone: XML-CHUNK[[
 }
 "These can be used for creating an XML literal, which can be used with variables or a fry-like syntax to interpolate data into XML."
 { $subsections { "xml.syntax" "interpolation" } } ;
 
-HELP: <XML
-{ $syntax "<XML <?xml version=\"1.0\"?><document>...</document> XML>" }
+HELP: XML-DOC[[
+{ $syntax "XML-DOC[[ <?xml version=\"1.0\"?><document>...</document> ]]" }
 { $description "This gives syntax for literal XML documents. When evaluated, there is an XML document (" { $link xml } ") on the stack. It can be used for interpolation as well, if interpolation slots are used. For more information about XML interpolation, see " { $link { "xml.syntax" "interpolation" } } "." } ;
 
-HELP: [XML
-{ $syntax "[XML foo <x>...</x> bar <y>...</y> baz XML]" }
+HELP: XML-CHUNK[[
+{ $syntax "XML-CHUNK[[ foo <x>...</x> bar <y>...</y> baz ]]" }
 { $description "This gives syntax for literal XML documents. When evaluated, there is an XML chunk (" { $link xml-chunk } ") on the stack. For more information about XML interpolation, see " { $link { "xml.syntax" "interpolation" } } "." } ;
 
 ARTICLE: { "xml.syntax" "interpolation" } "XML interpolation syntax"
-"XML interpolation has two forms for each of the words " { $link postpone: <XML } " and " { $link postpone: [XML } ": a fry-like form and a locals form. To splice locals in, use the syntax " { $snippet "<-variable->" } ". To splice something in from the stack, in the style of " { $vocab-link "fry" } ", use the syntax " { $snippet "<->" } ". An XML interpolation form may only use one of these styles."
+"XML interpolation has two forms for each of the words " { $link postpone: XML-DOC[[ } " and " { $link postpone: XML-CHUNK[[ } ": a fry-like form and a locals form. To splice locals in, use the syntax " { $snippet "<-variable->" } ". To splice something in from the stack, in the style of " { $vocab-link "fry" } ", use the syntax " { $snippet "<->" } ". An XML interpolation form may only use one of these styles."
 $nl
-"These forms can be used where a tag might go, as in " { $snippet "[XML <foo><-></foo> XML]" } " or where an attribute might go, as in " { $snippet "[XML <foo bar=<->/> XML]" } ". When an attribute is spliced in, it is not included if the value is " { $snippet "f" } " and if the value is not a string, the value is put through " { $link present } ". Here is an example of the fry style of XML interpolation:"
+"These forms can be used where a tag might go, as in " { $snippet "XML-CHUNK[[ <foo><-></foo> ]]" } " or where an attribute might go, as in " { $snippet "XML-CHUNK[[ <foo bar=<->/> ]]" } ". When an attribute is spliced in, it is not included if the value is " { $snippet "f" } " and if the value is not a string, the value is put through " { $link present } ". Here is an example of the fry style of XML interpolation:"
 { $example
 "USING: splitting xml.writer xml.syntax ;
 \"one two three\" \" \" split
-[ [XML <item><-></item> XML] ] map
-<XML <doc><-></doc> XML> pprint-xml"
+[ XML-CHUNK[[ <item><-></item> ]] ] map
+XML-DOC[[ <doc><-></doc> ]] pprint-xml"
 
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <doc>
@@ -80,14 +80,14 @@ let[
     URL\" http://factorcode.org/\" :> url
     \"hello\" :> string
     \\ drop :> word
-    <XML
+    XML-DOC[[
         <x
             number=<-number->
             false=<-false->
             url=<-url->
             string=<-string->
             word=<-word-> />
-    XML> pprint-xml
+    ]] pprint-xml
 ]"
 
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -96,12 +96,12 @@ let[
 { $example "USING: xml.syntax inverse ;
 : dispatch ( xml -- string )
     {
-        { [ [XML <a><-></a> XML] ] [ \"a\" prepend ] }
-        { [ [XML <b><-></b> XML] ] [ \"b\" prepend ] }
-        { [ [XML <b val='yes'/> XML] ] [ \"yes\" ] }
-        { [ [XML <b val=<->/> XML] ] [ \"no\" prepend ] }
+        { [ XML-CHUNK[[ <a><-></a> ]] ] [ \"a\" prepend ] }
+        { [ XML-CHUNK[[ <b><-></b> ]] ] [ \"b\" prepend ] }
+        { [ XML-CHUNK[[ <b val='yes'/> ]] ] [ \"yes\" ] }
+        { [ XML-CHUNK[[ <b val=<->/> ]] ] [ \"no\" prepend ] }
     } switch ;
-[XML <a>pple</a> XML] dispatch write"
+XML-CHUNK[[ <a>pple</a> ]] dispatch write"
 "apple" } ;
 
 HELP: XML-NS:

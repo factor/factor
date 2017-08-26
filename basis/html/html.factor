@@ -10,7 +10,7 @@ M: empty-prolog write-xml drop ;
 : <empty-prolog> ( -- prolog ) \ empty-prolog new ;
 
 : simple-page ( title head body -- xml )
-    <XML
+    XML-DOC[[
         <!DOCTYPE html>
         <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
             <head>
@@ -19,13 +19,13 @@ M: empty-prolog write-xml drop ;
             </head>
             <body><-></body>
         </html>
-    XML> <empty-prolog> >>prolog ;
+    ]] <empty-prolog> >>prolog ;
 
 : render-error ( message -- xml )
-    [XML <span class="error"><-></span> XML] ;
+    XML-CHUNK[[ <span class="error"><-></span> ]] ;
 
 : simple-link ( xml url -- xml' )
-    url-encode swap [XML <a href=<->><-></a> XML] ;
+    url-encode swap XML-CHUNK[[ <a href=<->><-></a> ]] ;
 
 : simple-image ( url -- xml )
-    url-encode [XML <img src=<-> /> XML] ;
+    url-encode XML-CHUNK[[ <img src=<-> /> ]] ;

@@ -71,8 +71,8 @@ IN: xml.writer.tests
 { } [
     { 1 2 3 4 } [
         [ number>string ] [ sq number>string ] bi
-        [XML <tr><td><-></td><td><-></td></tr> XML]
-    ] map [XML <h2>Timings</h2> <table><-></table> XML]
+        XML-CHUNK[[ <tr><td><-></td><td><-></td></tr> ]]
+    ] map XML-CHUNK[[ <h2>Timings</h2> <table><-></table> ]]
     pprint-xml
 ] unit-test
 

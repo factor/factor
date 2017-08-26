@@ -19,14 +19,14 @@ IN: http.server.responses
     "text/html" <content> ;
 
 : trivial-response-body ( code message -- )
-    <XML
+    XML-DOC[[
         <!DOCTYPE html>
         <html>
             <body>
                 <h1><-> <-></h1>
             </body>
         </html>
-    XML> write-xml ;
+    ]] write-xml ;
 
 : <trivial-response> ( code message -- response )
     2dup [ trivial-response-body ] with-string-writer

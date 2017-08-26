@@ -5,8 +5,8 @@ webapps.mason.backend xml.syntax xml.writer ;
 IN: webapps.mason.backend.watchdog
 
 : crashed-builder-body ( crashed-builders -- string content-type )
-    [ os/cpu [XML <li><-></li> XML] ] map
-    <XML
+    [ os/cpu XML-CHUNK[[ <li><-></li> ]] ] map
+    XML-DOC[[
         <!DOCTYPE html>
         <html>
             <body>
@@ -15,7 +15,7 @@ IN: webapps.mason.backend.watchdog
                 <a href="http://builds.factorcode.org/dashboard">Dashboard</a>
             </body>
         </html>
-    XML> xml>string
+    ]] xml>string
     "text/html" ;
 
 : crashed-builder-subject ( crashed-builders -- string )

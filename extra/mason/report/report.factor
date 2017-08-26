@@ -8,7 +8,7 @@ IN: mason.report
 
 : git-link ( id -- link )
     [ "http://github.com/factor/factor/commit/" "" prepend-as ] keep
-    [XML <a href=<->><-></a> XML] ;
+    XML-CHUNK[[ <a href=<->><-></a> ]] ;
 
 : common-report ( -- xml )
     target-os get
@@ -17,7 +17,7 @@ IN: mason.report
     disk-usage
     build-dir
     current-git-id get git-link
-    [XML
+    XML-CHUNK[[
     <h1>Build report for <->/<-></h1>
     <table>
     <tr><td>Build machine:</td><td><-></td></tr>
@@ -25,14 +25,14 @@ IN: mason.report
     <tr><td>Build directory:</td><td><-></td></tr>
     <tr><td>GIT ID:</td><td><-></td></tr>
     </table>
-    XML] ;
+    ]] ;
 
 : with-report ( quot: ( -- xml ) -- )
     [ "report" utf8 ] dip
     '[
         common-report
         _ call( -- xml )
-        [XML <div><-><-></div> XML]
+        XML-CHUNK[[ <div><-><-></div> ]]
         write-xml
     ] with-file-writer ; inline
 
@@ -44,13 +44,13 @@ IN: mason.report
         error [ error. ] with-string-writer :> error
         file utf8 400 file-tail :> output
 
-        [XML
+        XML-CHUNK[[
         <h2><-what-></h2>
         Build output:
         <pre><-output-></pre>
         Launcher error:
         <pre><-error-></pre>
-        XML]
+        ]]
     ] with-report
     status-error ;
 
@@ -73,30 +73,30 @@ IN: mason.report
         html-help-time-file
     } [
         dup eval-file nanos>time
-        [XML <tr><td><-></td><td><-></td></tr> XML]
-    ] map [XML <h2>Timings</h2> <table><-></table> XML] ;
+        XML-CHUNK[[ <tr><td><-></td><td><-></td></tr> ]]
+    ] map XML-CHUNK[[ <h2>Timings</h2> <table><-></table> ]] ;
 
 : error-dump ( heading vocabs-file messages-file -- xml )
     [ eval-file ] dip over empty? [ 3drop f ] [
         [ ]
-        [ [ [XML <li><-></li> XML] ] map [XML <ul><-></ul> XML] ]
+        [ [ XML-CHUNK[[ <li><-></li> ]] ] map XML-CHUNK[[ <ul><-></ul> ]] ]
         [ utf8 file-contents ]
         tri*
-        [XML <h1><-></h1> <-> Details: <pre><-></pre> XML]
+        XML-CHUNK[[ <h1><-></h1> <-> Details: <pre><-></pre> ]]
     ] if ;
 
 : benchmarks-table ( assoc -- xml )
     [
         1,000,000,000 /f
-        [XML <tr><td><-></td><td><-></td></tr> XML]
+        XML-CHUNK[[ <tr><td><-></td><td><-></td></tr> ]]
     ] { } assoc>map
-    [XML
+    XML-CHUNK[[
         <h2>Benchmarks</h2>
         <table>
             <tr><th>Benchmark</th><th>Time (seconds)</th></tr>
             <->
         </table>
-    XML] ;
+    ]] ;
 
 : successful-report ( -- )
     [

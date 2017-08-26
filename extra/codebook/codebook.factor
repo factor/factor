@@ -16,23 +16,23 @@ IN: codebook
 
 CONSTANT: codebook-style
     {
-        { COMMENT1 [ [XML <i><font color="#555555"><-></font></i> XML] ] }
-        { COMMENT2 [ [XML <i><font color="#555555"><-></font></i> XML] ] }
-        { COMMENT3 [ [XML <i><font color="#555555"><-></font></i> XML] ] }
-        { COMMENT4 [ [XML <i><font color="#555555"><-></font></i> XML] ] }
-        { DIGIT    [ [XML    <font color="#333333"><-></font>     XML] ] }
-        { FUNCTION [ [XML <b><font color="#111111"><-></font></b> XML] ] }
-        { KEYWORD1 [ [XML <b><font color="#111111"><-></font></b> XML] ] }
-        { KEYWORD2 [ [XML <b><font color="#111111"><-></font></b> XML] ] }
-        { KEYWORD3 [ [XML <b><font color="#111111"><-></font></b> XML] ] }
-        { KEYWORD4 [ [XML <b><font color="#111111"><-></font></b> XML] ] }
-        { LABEL    [ [XML <b><font color="#333333"><-></font></b> XML] ] }
-        { LITERAL1 [ [XML    <font color="#333333"><-></font>     XML] ] }
-        { LITERAL2 [ [XML    <font color="#333333"><-></font>     XML] ] }
-        { LITERAL3 [ [XML    <font color="#333333"><-></font>     XML] ] }
-        { LITERAL4 [ [XML    <font color="#333333"><-></font>     XML] ] }
-        { MARKUP   [ [XML <b><font color="#333333"><-></font></b> XML] ] }
-        { OPERATOR [ [XML <b><font color="#111111"><-></font></b> XML] ] }
+        { COMMENT1 [ XML-CHUNK[[ <i><font color="#555555"><-></font></i> ]] ] }
+        { COMMENT2 [ XML-CHUNK[[ <i><font color="#555555"><-></font></i> ]] ] }
+        { COMMENT3 [ XML-CHUNK[[ <i><font color="#555555"><-></font></i> ]] ] }
+        { COMMENT4 [ XML-CHUNK[[ <i><font color="#555555"><-></font></i> ]] ] }
+        { DIGIT    [ XML-CHUNK[[    <font color="#333333"><-></font>     ]] ] }
+        { FUNCTION [ XML-CHUNK[[ <b><font color="#111111"><-></font></b> ]] ] }
+        { KEYWORD1 [ XML-CHUNK[[ <b><font color="#111111"><-></font></b> ]] ] }
+        { KEYWORD2 [ XML-CHUNK[[ <b><font color="#111111"><-></font></b> ]] ] }
+        { KEYWORD3 [ XML-CHUNK[[ <b><font color="#111111"><-></font></b> ]] ] }
+        { KEYWORD4 [ XML-CHUNK[[ <b><font color="#111111"><-></font></b> ]] ] }
+        { LABEL    [ XML-CHUNK[[ <b><font color="#333333"><-></font></b> ]] ] }
+        { LITERAL1 [ XML-CHUNK[[    <font color="#333333"><-></font>     ]] ] }
+        { LITERAL2 [ XML-CHUNK[[    <font color="#333333"><-></font>     ]] ] }
+        { LITERAL3 [ XML-CHUNK[[    <font color="#333333"><-></font>     ]] ] }
+        { LITERAL4 [ XML-CHUNK[[    <font color="#333333"><-></font>     ]] ] }
+        { MARKUP   [ XML-CHUNK[[ <b><font color="#333333"><-></font></b> ]] ] }
+        { OPERATOR [ XML-CHUNK[[ <b><font color="#111111"><-></font></b> ]] ] }
         [ drop ]
     }
 
@@ -70,7 +70,7 @@ TUPLE: code-file
 : toc-list ( files -- list )
     [ name>> ] map natural-sort [
         [ file-html-name ] keep
-        [XML <li><a href=<->><-></a></li> XML]
+        XML-CHUNK[[ <li><a href=<->><-></a></li> ]]
     ] map ;
 
 ! insert zero-width non-joiner between all characters so words can wrap anywhere
@@ -82,7 +82,7 @@ TUPLE: code-file
 : htmlize-tokens ( tokens line# -- html-tokens )
     swap [
         [ str>> zwnj ] [ id>> ] bi codebook-style case
-    ] map [XML <tt><font size="-2" color="#666666"><-></font> <-></tt> XML]
+    ] map XML-CHUNK[[ <tt><font size="-2" color="#666666"><-></font> <-></tt> ]]
     "\n" 2array ;
 
 : line#>string ( i line#len -- i-string )
@@ -96,7 +96,7 @@ TUPLE: code-file
     file mode>> load-mode :> rules
     f lines |[ l i | l rules tokenize-line i 1 + line#len line#>string htmlize-tokens ]
     map-index concat nip :> html-lines
-    <XML <!DOCTYPE html> <html>
+    XML-DOC[[ <!DOCTYPE html> <html>
         <head>
             <title><-name-></title>
             <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
@@ -106,7 +106,7 @@ TUPLE: code-file
             <pre><-html-lines-></pre>
             <mbp:pagebreak xmlns:mbp="http://www.mobipocket.com/mbp" />
         </body>
-    </html> XML> ;
+    </html> ]] ;
 
 :: code>toc-html ( dir name files -- html )
     "Generating HTML table of contents" print flush
@@ -116,7 +116,7 @@ TUPLE: code-file
     dir [
         files toc-list :> toc
 
-        <XML <!DOCTYPE html> <html>
+        XML-DOC[[ <!DOCTYPE html> <html>
             <head>
                 <title><-name-></title>
                 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
@@ -130,7 +130,7 @@ TUPLE: code-file
                 <ul><-toc-></ul>
                 <mbp:pagebreak xmlns:mbp="http://www.mobipocket.com/mbp" />
             </body>
-        </html> XML>
+        </html> ]]
     ] with-directory ;
 
 :: code>ncx ( dir name files -- xml )
@@ -141,13 +141,13 @@ TUPLE: code-file
         name file-html-name :> filename
         i 2 + number>string :> istr
 
-        [XML <navPoint class="book" id=<-filename-> playOrder=<-istr->>
+        XML-CHUNK[[ <navPoint class="book" id=<-filename-> playOrder=<-istr->>
             <navLabel><text><-name-></text></navLabel>
             <content src=<-filename-> />
-        </navPoint> XML]
+        </navPoint> ]]
     ] map-index :> file-nav-points
 
-    <XML <?xml version="1.0" encoding="UTF-8" ?>
+    XML-DOC[[ <?xml version="1.0" encoding="UTF-8" ?>
     <ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
         <navMap>
             <navPoint class="book" id="toc" playOrder="1">
@@ -156,7 +156,7 @@ TUPLE: code-file
             </navPoint>
             <-file-nav-points->
         </navMap>
-    </ncx> XML> ;
+    </ncx> ]] ;
 
 :: code>opf ( dir name files -- xml )
     "Generating OPF manifest" print flush
@@ -164,12 +164,12 @@ TUPLE: code-file
 
     files [
         name>> file-html-name dup
-        [XML <item id=<-> href=<-> media-type="text/html" /> XML]
+        XML-CHUNK[[ <item id=<-> href=<-> media-type="text/html" /> ]]
     ] map :> html-manifest
 
-    files [ name>> file-html-name [XML <itemref idref=<-> /> XML] ] map :> html-spine
+    files [ name>> file-html-name XML-CHUNK[[ <itemref idref=<-> /> ]] ] map :> html-spine
 
-    <XML <?xml version="1.0" encoding="UTF-8" ?>
+    XML-DOC[[ <?xml version="1.0" encoding="UTF-8" ?>
     <package
         version="2.0"
         xmlns="http://www.idpf.org/2007/opf"
@@ -192,7 +192,7 @@ TUPLE: code-file
         <guide>
             <reference type="toc" title="Table of Contents" href="_toc.html" />
         </guide>
-    </package> XML> ;
+    </package> ]] ;
 
 : write-dest-file ( xml name ext -- )
     append utf8 [ write-xml ] with-file-writer ;

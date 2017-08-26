@@ -69,11 +69,11 @@ M: pathname url-of
 
 : help-stylesheet ( stylesheet -- xml )
     "vocab:help/html/stylesheet.css" ascii file-contents
-    swap "\n" glue [XML <style><-></style> XML] ;
+    swap "\n" glue XML-CHUNK[[ <style><-></style> ]] ;
 
 : help-navbar ( -- xml )
     "conventions" >link topic>filename
-    [XML
+    XML-CHUNK[[
         <div class="navbar">
         <b> Factor Documentation </b> |
         <a href="/">Home</a> |
@@ -84,7 +84,7 @@ M: pathname url-of
         </form>
         <a href="http://factorcode.org" style="float:right; padding: 4px;">factorcode.org</a>
         </div>
-     XML] ;
+     ]] ;
 
 : bijective-base26 ( n -- name )
     [ dup 0 > ] [ 1 - 26 /mod char: a + ] "" produce-as nip reverse! ;

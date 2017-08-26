@@ -199,7 +199,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 ! Test xml in html components
 { } [
-    [XML <foo/> XML] "xmltest" set-value
+    XML-CHUNK[[ <foo/> ]] "xmltest" set-value
 ] unit-test
 
 { "<foo/>" } [
