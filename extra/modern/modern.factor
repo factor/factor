@@ -309,12 +309,15 @@ ERROR: mismatched-terminator n string slice ;
 : lex-vocabs ( vocabs -- assoc )
     [ [ vocab>literals ] [ nip ] recover ] map-zip ;
 
-: failing-vocabs ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
+: failed-lexing ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
 
 : lex-core ( -- assoc ) core-bootstrap-vocabs lex-vocabs ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;
 : lex-extra ( -- assoc ) extra-vocabs lex-vocabs ;
-: lex-all ( -- assoc ) lex-core lex-basis lex-extra 3append ;
+: lex-roots ( -- assoc ) lex-core lex-basis lex-extra 3append ;
 
 : lex-docs ( -- assoc ) all-docs-paths lex-paths ;
 : lex-tests ( -- assoc ) all-tests-paths lex-paths ;
+
+: lex-all ( -- assoc )
+    lex-roots lex-docs lex-tests 3append ;
