@@ -3,23 +3,23 @@
 USING: help.syntax help.markup math math.functions prettyprint locals sequences ;
 IN: infix
 
-HELP: [infix
-{ $syntax "[infix ... infix]" }
+HELP: \infix[[
+{ $syntax "infix[[ ... ]]" }
 { $description "Parses the infix code inside the brackets, converts it to stack code and executes it." }
 { $examples
     { $example
         "USING: infix prettyprint ;"
         "IN: scratchpad"
-        "[infix 8+2*3 infix] ."
+        "infix[[ 8+2*3 ]] ."
         "14"
     } $nl
-    { $link postpone: \[infix } " isn't that useful by itself, as it can only access literal numbers and no variables. It is designed to be used together with locals; for example with " { $link postpone: \:: } " :"
+    { $link postpone: \infix[[ } " isn't that useful by itself, as it can only access literal numbers and no variables. It is designed to be used together with locals; for example with " { $link postpone: \:: } " :"
     { $example
         "USING: infix locals math.functions prettyprint ;"
         "IN: scratchpad"
         ":: quadratic-equation ( a b c -- z- z+ )"
-        "    [infix (-b-sqrt(b*b-4*a*c)) / (2*a) infix]"
-        "    [infix (-b+sqrt(b*b-4*a*c)) / (2*a) infix] ;"
+        "    infix[[ (-b-sqrt(b*b-4*a*c)) / (2*a) ]]"
+        "    infix[[ (-b+sqrt(b*b-4*a*c)) / (2*a) ]] ;"
         "1 0 -1 quadratic-equation . ."
         "1.0\n-1.0"
     }
@@ -28,7 +28,7 @@ HELP: [infix
 ARTICLE: "infix" "Infix notation"
 "The " { $vocab-link "infix" } " vocabulary implements support for infix notation in Factor source code."
 { $subsections
-    postpone: \[infix
+    postpone: \infix[[
     postpone: \INFIX::
 }
 "The usual infix math operators are supported:"
@@ -43,7 +43,7 @@ ARTICLE: "infix" "Infix notation"
 "The standard precedence rules apply: Grouping with parentheses before " { $snippet "*" } ", " { $snippet "/" } "and " { $snippet "%" } " before " { $snippet "+" } " and " { $snippet "-" } "."
 { $example
     "USE: infix"
-    "[infix 5-40/10*2 infix] ."
+    "infix[[ 5-40/10*2 ]] ."
     "-3"
 }
 $nl
@@ -55,34 +55,34 @@ $nl
 { $example
     "USING: infix locals math.functions ;"
     ":: binary_entropy ( p -- h )"
-    "    [infix -(p*log(p) + (1-p)*log(1-p)) / log(2) infix] ;"
-    "[infix binary_entropy( sqrt(0.25) ) infix] ."
+    "    infix[[ -(p*log(p) + (1-p)*log(1-p)) / log(2) ]] ;"
+    "infix[[ binary_entropy( sqrt(0.25) ) ]] ."
     "1.0"
 }
 $nl
 "You can access " { $vocab-link "sequences" } " inside infix expressions with the familiar " { $snippet "seq[index]" } " notation."
 { $example
     "USING: arrays locals infix ;"
-    "let[ { 1 2 3 4 } :> myarr [infix myarr[4/2]*3 infix] ] ."
+    "let[ { 1 2 3 4 } :> myarr infix[[ myarr[4/2]*3 ]] ] ."
     "9"
 }
 $nl
 "You can create sub-" { $vocab-link "sequences" } " inside infix expressions using " { $snippet "seq[from:to]" } " notation."
 { $example
     "USING: arrays locals infix ;"
-    "let[ \"foobar\" :> s [infix s[0:3] infix] ] ."
+    "let[ \"foobar\" :> s infix[[ s[0:3] ]] ] ."
     "\"foo\""
 }
 $nl
 "Additionally, you can step through " { $vocab-link "sequences" } " with " { $snippet "seq[from:to:step]" } " notation."
 { $example
     "USING: arrays locals infix ;"
-    "let[ \"reverse\" :> s [infix s[::-1] infix] ] ."
+    "let[ \"reverse\" :> s infix[[ s[::-1] ]] ] ."
     "\"esrever\""
 }
 { $example
     "USING: arrays locals infix ;"
-    "let[ \"0123456789\" :> s [infix s[::2] infix] ] ."
+    "let[ \"0123456789\" :> s infix[[ s[::2] ]] ] ."
     "\"02468\""
 }
 ;

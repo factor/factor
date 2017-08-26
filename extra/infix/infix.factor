@@ -126,8 +126,8 @@ M: ast-function infix-codegen
 
 PRIVATE>
 
-SYNTAX: [infix
-    "infix]" parse-infix-quotation suffix! \ call suffix! ;
+SYNTAX: \infix[[
+    "]]" parse-infix-quotation suffix! \ call suffix! ;
 
 <PRIVATE
 
