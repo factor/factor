@@ -11,7 +11,6 @@ ERROR: string-expected-got-eof n string ;
 ERROR: long-opening-mismatch tag open n string ch ;
 
 SYMBOL: strict-upper
-
 SYMBOL: delimiter-stack
 : push-delimiter-stack ( obj -- ) delimiter-stack get push ;
 : pop-delimiter-stack ( -- obj ) delimiter-stack get pop ;
@@ -150,8 +149,18 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         merge-slice-til-whitespace
     ] if ;
 
+: terminator? ( slice -- ? )
+    {
+        [ ";" sequence= ]
+    } 1|| ;
+
+ERROR: token-expected n string obj ;
+ERROR: unexpected-terminator n string slice ;
 : read-lowercase-colon ( n string slice -- n' string lowercase-colon )
-    [ lex-factor ] dip swap 2array ;
+    [
+        lex-factor dup [ token-expected ] unless
+        dup terminator? [ unexpected-terminator ] when
+    ] dip swap 2array ;
 
 : strict-upper? ( string -- ? )
     [ { [ CHAR: A CHAR: Z between? ] [ ":-" member? ] } 1|| ] all? ;

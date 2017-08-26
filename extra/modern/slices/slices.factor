@@ -95,7 +95,7 @@ ERROR: unexpected-end n string ;
         n string f f
     ] if ; inline
 
-: skip-whitespace ( n string -- n' string )
+: skip-whitespace ( n/f string -- n'/f string )
     slice-til-not-whitespace 2drop ;
 
 : empty-slice-end ( seq -- slice )
@@ -169,7 +169,7 @@ ERROR: unexpected-end n string ;
         [ [ 1 - ] change-to ] dip
     ] when ;
 
-:: slice-til-either ( n string tokens -- n'/f string slice/f ch )
+:: slice-til-either ( n string tokens -- n'/f string slice/f ch/f )
     n [
         n string '[ tokens member? ] find-from
         dup "\s\r\n" member? [
