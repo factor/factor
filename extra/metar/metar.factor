@@ -41,7 +41,7 @@ ERROR: bad-location str ;
 
 : stations-data ( -- seq )
     URL" http://tgftp.nws.noaa.gov/data/nsd_cccc.txt"
-    http-get nip CHAR: ; [ string>csv ] with-delimiter ;
+    http-get nip CHAR: \; [ string>csv ] with-delimiter ;
 
 PRIVATE>
 

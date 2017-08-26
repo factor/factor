@@ -22,7 +22,7 @@ IN: ini-file
         { CHAR: \"   CHAR: \" }
         { CHAR: \\  CHAR: \\ }
         { CHAR: ?   CHAR: ? }
-        { CHAR: ;   CHAR: ; }
+        { CHAR: \;   CHAR: \; }
         { CHAR: \[   CHAR: \[ }
         { CHAR: \]   CHAR: \] }
         { CHAR: =   CHAR: = }
@@ -53,7 +53,7 @@ USE: xml.entities
         { CHAR: \"    "\\\"" }
         { CHAR: \\   "\\\\" }
         { CHAR: ?    "\\?"  }
-        { CHAR: ;    "\\;"  }
+        { CHAR: \;    "\\;"  }
         { CHAR: \[    "\\["  }
         { CHAR: \]    "\\]"  }
         { CHAR: =    "\\="  }

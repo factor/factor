@@ -73,7 +73,7 @@ CONSTANT: CHARS H{
     { CHAR: \!   0x00A1 }
     { CHAR: \"   0x201E }
     { CHAR: .   0x02D9 }
-    { CHAR: ;   0x061B }
+    { CHAR: \;   0x061B }
     { CHAR: \[   CHAR: \]   }
     { CHAR: \(   CHAR: \)   }
     { CHAR: \{   CHAR: \}   }

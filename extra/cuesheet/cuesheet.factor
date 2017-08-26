@@ -55,7 +55,7 @@ ERROR: unknown-syntax syntax ;
 <PRIVATE
 
 : trim-comments ( str -- str' )
-    dup [ CHAR: ; = ] find drop [ head ] when* ;
+    dup [ CHAR: \; = ] find drop [ head ] when* ;
 
 : trim-quotes ( str -- str' )
     [ CHAR: \" = ] trim ;

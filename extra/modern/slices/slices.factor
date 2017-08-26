@@ -13,7 +13,7 @@ IN: modern.slices
         { CHAR: \[ CHAR: \] }
         { CHAR: \{ CHAR: \} }
         { CHAR: < CHAR: > }
-        { CHAR: \: CHAR: ; }
+        { CHAR: \: CHAR: \; }
     } ?at drop ;
 
 : matching-delimiter-string ( string -- string' )
