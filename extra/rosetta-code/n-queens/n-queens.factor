@@ -9,7 +9,7 @@ IN: rosetta-code.n-queens
 ! solve the puzzle with a board of side NxN.
 
 :: safe?  ( board q -- ? )
-    [let q board nth :> x
+    let[ q board nth :> x
       q <iota> [
          x swap
          [ board nth ] keep

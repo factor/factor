@@ -14,7 +14,7 @@ M: xyYa >rgba
 
 M: xyYa >xyza
     [
-        [let
+        let[
             [ x>> ] [ y>> ] [ Y>> ] tri :> ( x y Y )
             x y / Y *
             Y
@@ -30,7 +30,7 @@ M: xyYa >xyYa ; inline
 
 M: xyza >xyYa
     [
-        [let
+        let[
             [ x>> ] [ y>> ] [ z>> ] tri :> ( x y z )
             x y z + +
             [ x swap / ]

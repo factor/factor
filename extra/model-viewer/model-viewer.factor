@@ -156,7 +156,7 @@ TUPLE: vbo
 :: <model-uniforms> ( world -- uniforms )
     world model-state>>
     [ textures>> ] [ bumps>> ] [ kas>> ] tri
-    [| texture bump ka |
+    |[ texture bump ka |
         world wasd-mv-matrix
         world wasd-p-matrix
         texture bump ka

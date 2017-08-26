@@ -575,7 +575,7 @@ M:: elf sections ( elf -- sections )
     elf elf-header>> :> elf-header
 
     elf-header elf-sections
-    [| name header |
+    |[ name header |
         elf-header header elf-section-data :> data
         name elf-header header data section boa
     ] { } assoc>map ;
@@ -584,7 +584,7 @@ M:: elf sections ( elf -- sections )
     elf elf-header>> :> elf-header
 
     elf-header elf-program-headers
-    [| header |
+    |[ header |
         elf-header header elf-segment-data :> data
         elf-header header data segment boa
     ] { } map-as ;
@@ -596,7 +596,7 @@ M:: segment sections ( segment -- sections )
     program-header elf-header
     elf-section-headers
     elf-segment-sections
-    [| header |
+    |[ header |
         elf-header header elf-section-name :> name
         elf-header header elf-section-data :> data
         name elf-header header data section boa
@@ -607,7 +607,7 @@ M:: segment sections ( segment -- sections )
     section data>> :> data
 
     elf-header data elf-symbols
-    [| name sym |
+    |[ name sym |
         name elf-header sym f symbol boa
     ] { } assoc>map ;
 

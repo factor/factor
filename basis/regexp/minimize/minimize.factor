@@ -25,8 +25,8 @@ IN: regexp.minimize
     ! Partition table is sorted-array => ?
     transition-table transitions>> keys natural-sort :> states
     states length 2/ sq <hash-set> :> out
-    states [| s1 i1 |
-        states [| s2 |
+    states |[ s1 i1 |
+        states |[ s2 |
             s1 s2 transition-table initially-same?
             [ s1 s2 2array out adjoin ] when
         ] i1 each-from

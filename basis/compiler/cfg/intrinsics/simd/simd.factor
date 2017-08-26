@@ -127,7 +127,7 @@ CONSTANT: rep>half {
     {
         [ ^(compare-vector) ]
         [ ^minmax-compare-vector ]
-        { unsigned-int-vector-rep [| src1 src2 rep cc |
+        { unsigned-int-vector-rep |[ src1 src2 rep cc |
             rep sign-bit-mask ^^load-literal :> sign-bits
             src1 sign-bits rep ^^xor-vector
             src2 sign-bits rep ^^xor-vector
@@ -139,12 +139,12 @@ CONSTANT: rep>half {
     {
         [ ^^unpack-vector-head ]
         { unsigned-int-vector-rep [ [ ^^zero-vector ] [ ^^merge-vector-head ] bi ] }
-        { signed-int-vector-rep [| src rep |
+        { signed-int-vector-rep |[ src rep |
             src src rep ^^merge-vector-head :> merged
             rep rep-component-type heap-size 8 * :> bits
             merged bits rep widen-vector-rep ^^shr-vector-imm
         ] }
-        { signed-int-vector-rep [| src rep |
+        { signed-int-vector-rep |[ src rep |
             rep ^^zero-vector :> zero
             zero src rep cc> ^compare-vector :> sign
             src sign rep ^^merge-vector-head
@@ -156,12 +156,12 @@ CONSTANT: rep>half {
         [ ^^unpack-vector-tail ]
         [ [ ^^tail>head-vector ] [ ^^unpack-vector-head ] bi ]
         { unsigned-int-vector-rep [ [ ^^zero-vector ] [ ^^merge-vector-tail ] bi ] }
-        { signed-int-vector-rep [| src rep |
+        { signed-int-vector-rep |[ src rep |
             src src rep ^^merge-vector-tail :> merged
             rep rep-component-type heap-size 8 * :> bits
             merged bits rep widen-vector-rep ^^shr-vector-imm
         ] }
-        { signed-int-vector-rep [| src rep |
+        { signed-int-vector-rep |[ src rep |
             rep ^^zero-vector :> zero
             zero src rep cc> ^compare-vector :> sign
             src sign rep ^^merge-vector-tail
@@ -174,7 +174,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : ^(sum-vector-2) ( src rep -- dst )
     {
         [ dupd ^^horizontal-add-vector ]
-        [| src rep |
+        |[ src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector
@@ -187,7 +187,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
             [ dupd ^^horizontal-add-vector ]
             [ dupd ^^horizontal-add-vector ] bi
         ]
-        [| src rep |
+        |[ src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector :> src'
@@ -206,7 +206,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
             [ dupd ^^horizontal-add-vector ]
             [ dupd ^^horizontal-add-vector ] tri
         ]
-        [| src rep |
+        |[ src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector :> src'
@@ -233,7 +233,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
                 [ dupd ^^horizontal-add-vector ]
             } cleave
         ]
-        [| src rep |
+        |[ src rep |
             src src rep ^^merge-vector-head :> head
             src src rep ^^merge-vector-tail :> tail
             head tail rep ^^add-vector :> src'
@@ -268,7 +268,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : ^sum-vector ( src rep -- dst )
     {
         { float-vector-rep [ ^(sum-vector) ] }
-        { fixnum-vector-rep [| src rep |
+        { fixnum-vector-rep |[ src rep |
             src rep ^unpack-vector-head :> head
             src rep ^unpack-vector-tail :> tail
             rep widen-vector-rep :> wide-rep
@@ -287,7 +287,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : ^shuffle-2-vectors-imm ( src1 src2 shuffle rep -- dst )
     [ rep-length 0 pad-tail ] keep {
-        { double-2-rep [| src1 src2 shuffle rep |
+        { double-2-rep |[ src1 src2 shuffle rep |
             shuffle first2 [ 4 mod ] bi@ :> ( i j )
             {
                 { [ i j [ 2 < ] both? ] [
@@ -339,12 +339,12 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : emit-simd-v+- ( node -- )
     {
         [ ^^add-sub-vector ]
-        { float-vector-rep [| src1 src2 rep |
+        { float-vector-rep |[ src1 src2 rep |
             rep ^load-add-sub-vector :> signs
             src2 signs rep ^^xor-vector :> src2'
             src1 src2' rep ^^add-vector
         ] }
-        { int-vector-rep   [| src1 src2 rep |
+        { int-vector-rep   |[ src1 src2 rep |
             rep ^load-add-sub-vector :> signs
             src2  signs rep ^^xor-vector :> src2'
             src2' signs rep ^^sub-vector :> src2''
@@ -411,7 +411,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : emit-simd-vavg ( node -- )
     {
         [ ^^avg-vector ]
-        { float-vector-rep [| src1 src2 rep |
+        { float-vector-rep |[ src1 src2 rep |
             src1 src2 rep ^^add-vector
             rep ^load-half-vector rep ^^mul-vector
         ] }
@@ -446,7 +446,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { unsigned-int-vector-rep [ drop ] }
         [ ^^abs-vector ]
         { float-vector-rep [ [ ^load-neg-zero-vector ] [ swapd ^^andn-vector ] bi ] }
-        { int-vector-rep [| src rep |
+        { int-vector-rep |[ src rep |
             rep ^^zero-vector :> zero
             zero src rep ^^sub-vector :> -src
             zero src rep cc> ^compare-vector :> sign
@@ -584,7 +584,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vpack-signed ( node -- )
     {
-        { double-2-rep [| src1 src2 rep |
+        { double-2-rep |[ src1 src2 rep |
             src1 double-2-rep ^^float-pack-vector :> dst-head
             src2 double-2-rep ^^float-pack-vector :> dst-tail
             dst-head dst-tail { 0 1 0 1 } float-4-rep ^^shuffle-vector-halves-imm

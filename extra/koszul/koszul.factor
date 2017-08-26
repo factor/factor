@@ -189,8 +189,8 @@ DEFER: (d)
     dim-im/ker-d ;
 
 :: bigraded-ker/im-d ( basis -- seq )
-    basis length <iota> [| z |
-         basis first length <iota> [| u |
+    basis length <iota> |[ z |
+         basis first length <iota> |[ u |
             u z basis (bigraded-ker/im-d)
         ] map
     ] map ;
@@ -229,7 +229,7 @@ DEFER: (d)
 :: laplacian-kernel ( basis1 basis2 basis3 -- basis )
     basis1 basis2 basis3 laplacian-matrix :> lap
     lap empty-matrix? [ f ] [
-        lap nullspace [| x |
+        lap nullspace |[ x |
             basis2 x [ [ wedge (alt+) ] 2each ] with-terms
         ] map
     ] if ;
@@ -265,8 +265,8 @@ DEFER: (d)
     3array ;
 
 :: bigraded-triples ( grid -- triples )
-    grid length <iota> [| z |
-        grid first length <iota> [| u |
+    grid length <iota> |[ z |
+        grid first length <iota> |[ u |
             u z grid bigraded-triple
         ] map
     ] map ;

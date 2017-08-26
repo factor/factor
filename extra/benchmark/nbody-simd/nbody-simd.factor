@@ -59,7 +59,7 @@ SPECIALIZED-ARRAY: body
     dup init-bodies ; inline
 
 :: each-pair ( ... bodies pair-quot: ( ... other-body body -- ... ) each-quot: ( ... body -- ... ) -- )
-    bodies [| body i |
+    bodies |[ body i |
         body each-quot call
         bodies i 1 + tail-slice [
             body pair-quot call

@@ -36,9 +36,9 @@ CONSTANT: 256colors H{
 }
 
 ! Add the RGB colors
-intensities [| r i |
-    intensities [| g j |
-        intensities [| b k |
+intensities |[ r i |
+    intensities |[ g j |
+        intensities |[ b k |
             i 36 * j 6 * + k + 16 +
             r g b 3array
             256colors set-at

@@ -63,7 +63,7 @@ CONSTANT: limit 400
     item-no table nth :> prev
     item-no 1 + table nth :> curr
     item-no items nth :> item
-    limit [1,b] [| weight |
+    limit [1,b] |[ weight |
         weight prev nth
         weight item weight>> - dup 0 >=
         [ prev nth item value>> + max ]
@@ -78,7 +78,7 @@ CONSTANT: limit 400
 :: extract-packed-items ( table -- items )
     [
         limit :> weight!
-        items length <iota> <reversed> [| item-no |
+        items length <iota> <reversed> |[ item-no |
             item-no table nth :> prev
             item-no 1 + table nth :> curr
             weight [ curr nth ] [ prev nth ] bi =

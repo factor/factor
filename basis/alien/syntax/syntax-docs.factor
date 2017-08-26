@@ -99,7 +99,7 @@ HELP: CALLBACK:
     { $code
         "CALLBACK: bool FakeCallback ( int message, void* payload )"
         ": MyFakeCallback ( -- alien )"
-        "    [| message payload |"
+        "    |[ message payload |"
         "        \"message #\" write"
         "        message number>string write"
         "        \" received\" write nl"

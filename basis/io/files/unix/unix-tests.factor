@@ -30,7 +30,7 @@ tools.test unix unix.groups unix.users ;
 { "/lib/bux/" } [ "/usr" "/lib/bux/" append-path ] unit-test
 { t } [ "/foo" absolute-path? ] unit-test
 
-[| path |
+|[ path |
 
     { 0o777 } [
         path flags{ USER-ALL GROUP-ALL OTHER-ALL } set-file-permissions
@@ -117,7 +117,7 @@ tools.test unix unix.groups unix.users ;
 
 ] with-test-file
 
-[| path |
+|[ path |
 
     { t } [
         path now

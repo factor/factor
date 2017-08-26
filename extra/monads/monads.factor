@@ -28,11 +28,11 @@ M: monad fail   monad-of fail   ;
 : >>   ( mvalue k -- mvalue' ) '[ drop _ ] bind ;
 
 :: lift-m2 ( m1 m2 f monad -- m3 )
-    m1 [| x1 | m2 [| x2 | x1 x2 f monad return ] bind ] bind ;
+    m1 |[ x1 | m2 |[ x2 | x1 x2 f monad return ] bind ] bind ;
 
 :: apply ( mvalue mquot monad -- result )
-    mvalue [| value |
-        mquot [| quot |
+    mvalue |[ value |
+        mquot |[ quot |
             value quot call( value -- mvalue ) monad return
         ] bind
     ] bind ;

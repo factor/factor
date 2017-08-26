@@ -31,7 +31,7 @@ PRIVATE>
 M: hsla >rgba
     {
         [ hue>> ] [ saturation>> ] [ lightness>> ] [ alpha>> ]
-    } cleave [| h s l |
+    } cleave |[ h s l |
         s zero? [
             l l l
         ] [
@@ -50,7 +50,7 @@ M: object >hsla >rgba >hsla ;
 M: hsla >hsla ; inline
 
 M: rgba >hsla
-    >rgba-components [| r g b |
+    >rgba-components |[ r g b |
         r g b min min :> min-c
         r g b max max :> max-c
         min-c max-c + 2 / :> l

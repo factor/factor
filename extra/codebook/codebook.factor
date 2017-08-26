@@ -94,7 +94,7 @@ TUPLE: code-file
     dir [ file [ name>> ] [ encoding>> ] bi file-lines ] with-directory :> lines
     lines length 1 + number>string length :> line#len
     file mode>> load-mode :> rules
-    f lines [| l i | l rules tokenize-line i 1 + line#len line#>string htmlize-tokens ]
+    f lines |[ l i | l rules tokenize-line i 1 + line#len line#>string htmlize-tokens ]
     map-index concat nip :> html-lines
     <XML <!DOCTYPE html> <html>
         <head>
@@ -136,7 +136,7 @@ TUPLE: code-file
 :: code>ncx ( dir name files -- xml )
     "Generating NCX table of contents" print flush
 
-    files [| file i |
+    files |[ file i |
         file name>> :> name
         name file-html-name :> filename
         i 2 + number>string :> istr
@@ -231,7 +231,7 @@ codebook-output-path [ "resource:codebooks" ] initialize
             src-dir name files code>toc-html
             "_toc.html" "" write-dest-file
 
-            files [| file |
+            files |[ file |
                 src-dir file code>html
                 file name>> file-html-name "" write-dest-file
             ] each

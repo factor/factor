@@ -55,7 +55,7 @@ XML-NS: foo http://blah.com
   y
   <foo/>
 </x>" } [
-    [let "one" :> a "two" :> c "y" :> x [XML <-x-> <foo/> XML] :> d
+    let[ "one" :> a "two" :> c "y" :> x [XML <-x-> <foo/> XML] :> d
         <XML
             <x> <-a-> <b val=<-c->/> <-d-> </x>
         XML> pprint-xml>string

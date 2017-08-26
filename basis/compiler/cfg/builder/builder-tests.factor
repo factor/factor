@@ -131,7 +131,7 @@ IN: compiler.cfg.builder.tests
     byte-array
     alien
     postpone: f
-} [| class |
+} |[ class |
     {
         alien-signed-1
         alien-signed-2
@@ -142,7 +142,7 @@ IN: compiler.cfg.builder.tests
         alien-cell
         alien-float
         alien-double
-    } [| word |
+    } |[ word |
         { class } word '[ _ declare 10 _ execute ] unit-test-builder
         { class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each
@@ -154,7 +154,7 @@ IN: compiler.cfg.builder.tests
         set-alien-unsigned-1
         set-alien-unsigned-2
         set-alien-unsigned-4
-    } [| word |
+    } |[ word |
         { fixnum class } word '[ _ declare 10 _ execute ] unit-test-builder
         { fixnum class fixnum } word '[ _ declare _ execute ] unit-test-builder
     ] each

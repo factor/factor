@@ -25,7 +25,7 @@ M:: boilerplate call-responder* ( path responder -- response )
     path responder call-next-method
     responder init>> call( -- )
     dup wrap-boilerplate? [
-        clone [| body |
+        clone |[ body |
             [
                 body
                 responder template>> resolve-template-path <chloe>

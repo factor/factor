@@ -19,7 +19,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
         [ drop 1string ]
         [ nip 2 swap <string> ]
     } 2cleave :> ( openstr2 openstr1 closestr2 )
-    [| n string tag! ch |
+    |[ n string tag! ch |
         ch {
             { char: = [
                 tag 1 cut-slice* drop tag! ! tag of (=( is ( here, fix it
@@ -89,7 +89,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         [ drop "=" swap prefix ]
         [ nip 1string ]
     } 2cleave :> ( openstreq closestr1 )  ! [= ]
-    [| n string tag |
+    |[ n string tag |
         n string tag
         2over nth-check-eof {
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((

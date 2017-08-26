@@ -39,7 +39,7 @@ M: insn gc-check-offsets* 2drop ;
     ! Divide a basic block into sections, where every section
     ! other than the first requires a GC check.
     [
-        insns 0 seq [| insns from to |
+        insns 0 seq |[ insns from to |
             from to insns subseq ,
             insns to
         ] each
@@ -79,7 +79,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
     ! the previous block, and the previous block's GC call.
     bbs length 1 - :> len
     len [ <gc-call> ] replicate :> gc-calls
-    len [| n |
+    len |[ n |
         n bbs nth :> bb
         n 1 + bbs nth :> next-bb
         n gc-calls nth :> gc-call

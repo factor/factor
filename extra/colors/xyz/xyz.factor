@@ -26,7 +26,7 @@ PRIVATE>
 
 M: xyza >rgba
     [
-        [let
+        let[
             [ x>> ] [ y>> ] [ z>> ] tri :> ( x y z )
             x 3.2404542 * y -1.5371385 * z -0.4985314 * + +
             x -0.9692660 * y 1.8760108 * z 0.0415560 * + +
@@ -50,7 +50,7 @@ PRIVATE>
 
 M: rgba >xyza
     [
-        [let
+        let[
             [ red>> ] [ green>> ] [ blue>> ] tri
             [ invert-rgb-compand ] tri@ :> ( r g b )
             r 0.4124564 * g 0.3575761 * b 0.1804375 * + +

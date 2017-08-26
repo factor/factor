@@ -153,10 +153,10 @@ ERROR: bad-filter n ;
     x length <iota>
     filter {
         { filter-none [ drop ] }
-        { filter-sub [ [| n | n x nth n a nth + 256 wrap n x set-nth ] each ] }
-        { filter-up [ [| n | n x nth n b nth + 256 wrap n x set-nth ] each ] }
-        { filter-average [ [| n | n x nth n a nth n b nth + 2/ + 256 wrap n x set-nth ] each ] }
-        { filter-paeth [ [| n | n x nth n a nth n b nth n c nth paeth + 256 wrap n x set-nth ] each ] }
+        { filter-sub [ |[ n | n x nth n a nth + 256 wrap n x set-nth ] each ] }
+        { filter-up [ |[ n | n x nth n b nth + 256 wrap n x set-nth ] each ] }
+        { filter-average [ |[ n | n x nth n a nth n b nth + 2/ + 256 wrap n x set-nth ] each ] }
+        { filter-paeth [ |[ n | n x nth n a nth n b nth n c nth paeth + 256 wrap n x set-nth ] each ] }
         [ bad-filter ]
     } case
     curr width tail ;

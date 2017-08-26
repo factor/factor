@@ -96,7 +96,7 @@ M: #phi propagate-before ( #phi -- )
     bi ;
 
 :: update-constraints ( new old -- )
-    new [| key value | key old [ value union ] change-at ] assoc-each ;
+    new |[ key value | key old [ value union ] change-at ] assoc-each ;
 
 : include-child-constraints ( i -- )
     infer-children-data get nth constraints of last

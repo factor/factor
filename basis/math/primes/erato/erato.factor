@@ -47,7 +47,7 @@ PRIVATE>
 :: sieve ( n -- sieve )
     n integer>fixnum-strict init-sieve :> sieve
     sieve upper-bound >fixnum :> upper
-    3 upper sqrt 2 <range> [| i |
+    3 upper sqrt 2 <range> |[ i |
         i sieve marked-unsafe? [
             i upper sieve unmark-multiples
         ] when

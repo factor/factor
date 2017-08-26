@@ -244,7 +244,7 @@ PRIVATE>
     ] if ;
 
 M: line draw-gadget*
-    dup parent>> dup chart? [| line chart |
+    dup parent>> dup chart? |[ line chart |
         chart chart-axes
         color: black line [ default-color ] [ data>> ] bi
         dupd clip-data swap second [ drawable-chunks ] keep

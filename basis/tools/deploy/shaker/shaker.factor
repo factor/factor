@@ -428,7 +428,7 @@ IN: tools.deploy.shaker
     '[ _ member? ] [ string? ] bi or ;
 
 : strip-globals ( -- )
-    strip-globals? [| |
+    strip-globals? |[ |
         "Stripping globals" show
         stripped-globals :> to-strip
         cleared-globals :> to-clear

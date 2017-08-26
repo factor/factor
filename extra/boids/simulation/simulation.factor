@@ -63,7 +63,7 @@ GENERIC: force ( neighbors boid behaviour -- force )
     [ [ + ] keep mod ] 2map ;
 
 :: simulate ( boids behaviours dt -- boids )
-    boids [| boid |
+    boids |[ boid |
         boid boids behaviours
         [ [ (force) ] keep weight>> v*n ] 2with map vsum :> a
 

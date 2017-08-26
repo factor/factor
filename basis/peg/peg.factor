@@ -608,7 +608,7 @@ PRIVATE>
 ERROR: parse-failed input word ;
 
 SYNTAX: \PEG:
-    [let
+    let[
         (:) :> ( word def effect )
         [
             [

@@ -76,7 +76,7 @@ DEFER: glob%
     globs ?second :> next-glob
     next-glob dup pair? [ second ] [ drop f ] if :> next-glob-regexp
 
-    root glob-entries [| entry |
+    root glob-entries |[ entry |
         root entry name>> append-path
         {
             { [ next-glob not ] [ dup , ] }
@@ -113,7 +113,7 @@ DEFER: glob%
 :: glob-pattern% ( root globs -- )
     globs unclip second :> ( remaining glob )
 
-    root glob-entries [| entry |
+    root glob-entries |[ entry |
         entry name>> >case-fold glob matches? [
             root entry name>> append-path
             remaining entry ?glob%

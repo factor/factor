@@ -44,7 +44,7 @@ M: persistent-hash keys >alist [ first ] map ;
 M: persistent-hash values >alist [ second ] map ;
 
 :: >persistent-hash ( assoc -- phash )
-    T{ persistent-hash } assoc [| ph k v | v k ph new-at ] assoc-each ;
+    T{ persistent-hash } assoc |[ ph k v | v k ph new-at ] assoc-each ;
 
 M: persistent-hash equal?
     over persistent-hash? [ assoc= ] [ 2drop f ] if ;

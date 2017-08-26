@@ -167,7 +167,7 @@ PRIVATE>
 :: combination-indices ( x! p n -- seq )
     x 1 + x!
     p 0 <array> :> c 0 :> k! 0 :> r!
-    p 1 - [| i |
+    p 1 - |[ i |
         i [ 0 ] [ 1 - c nth ] if-zero i c set-nth
         [ k x < ] [
             i c [ 1 + ] change-nth

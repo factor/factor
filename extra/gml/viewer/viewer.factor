@@ -45,7 +45,7 @@ TUPLE: b-rep-vertices
     float-4-vector{ } clone :> vertices
     ushort-vector{ } clone :> indices
 
-    0 b-rep faces>> [| count face |
+    0 b-rep faces>> |[ count face |
         face selected face-selected? :> selected?
         face dup base-face>> eq? [
             face edge>> face-color
@@ -94,7 +94,7 @@ M: sequence selected-vectors [ selected-vectors ] map concat ;
     b-rep vertices>> >index-hash :> vertex-indices
     b-rep edges>> length <ushort-vector> :> edge-indices
 
-    b-rep edges>> [| e |
+    b-rep edges>> |[ e |
         e opposite-edge>> :> o
         e vertex-indices selected edge-vertex-index [ offset + ] dip :> ( from e-selected? )
         o vertex-indices selected edge-vertex-index [ offset + ] dip :> ( to   o-selected? )

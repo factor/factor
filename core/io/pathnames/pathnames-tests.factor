@@ -52,7 +52,7 @@ system tools.test ;
 { t } [ "resource:core" absolute-path? ] unit-test
 { f } [ "" absolute-path? ] unit-test
 
-[| path |
+|[ path |
     { } [ 2 [ path touch-file ] times ] unit-test
 ] with-test-file
 

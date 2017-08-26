@@ -11,24 +11,24 @@ ERROR: triangulated-face-must-be-base ;
 <PRIVATE
 
 : tess-begin ( -- callback )
-    [| primitive-type vertices-h |
+    |[ primitive-type vertices-h |
         primitive-type GL_TRIANGLES =
         [ "unexpected primitive type" throw ] unless
     ] GLUtessBeginDataCallback ;
 
 : tess-end ( -- callback )
-    [| vertices-h |
+    |[ vertices-h |
         ! nop
     ] GLUtessEndDataCallback ;
 
 : tess-vertex ( -- callback )
-    [| vertex-h vertices-h |
+    |[ vertex-h vertices-h |
         vertex-h alien-handle-ptr>
         vertices-h alien-handle-ptr> push
     ] GLUtessVertexDataCallback ;
 
 : tess-edge-flag ( -- callback )
-    [| flag vertices-h |
+    |[ flag vertices-h |
         ! nop
     ] GLUtessEdgeFlagDataCallback ;
 
@@ -51,7 +51,7 @@ PRIVATE>
 
         4 double malloc-array &free :> vertex-buf
 
-        face [| ring |
+        face |[ ring |
             tess gluTessBeginContour
 
             ring edge>> [

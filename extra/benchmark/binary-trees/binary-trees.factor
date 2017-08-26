@@ -35,7 +35,7 @@ CONSTANT: min-depth 4
 :: long-lived-tree ( max-depth -- )
     0 max-depth bottom-up-tree
 
-    min-depth max-depth 2 <range> [| depth |
+    min-depth max-depth 2 <range> |[ depth |
         max-depth depth - min-depth + 2^ [
             [1,b] 0 [
                 dup neg

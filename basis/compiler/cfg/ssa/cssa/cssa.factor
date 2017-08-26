@@ -26,7 +26,7 @@ SYMBOLS: edge-copies phi-copies ;
     { dst dst' } phi-copies get push
     dst' insn dst<<
 
-    preds [| pred |
+    preds |[ pred |
         pred inputs [ pred rep convert-operand ] change-at
     ] each ;
 

@@ -133,7 +133,7 @@ IN: io.launcher.unix.tests
 
 ! Killed processes were exiting with code 0 on FreeBSD
 { f } [
-    [let
+    let[
         <promise> :> p
         <promise> :> s
 

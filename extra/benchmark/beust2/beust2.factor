@@ -6,7 +6,7 @@ IN: benchmark.beust2
 ! http://crazybob.org/BeustSequence.java.html
 
 :: (count-numbers) ( remaining first value used max listener: ( -- ) -- ? )
-    10 first - <iota> [| i |
+    10 first - <iota> |[ i |
         i first + :> digit
         digit 2^ :> mask
         i value + :> value'

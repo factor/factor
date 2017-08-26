@@ -8,7 +8,7 @@ MEMO: strings ( -- str )
     0 100 [a,b) 1 [ + ] accumulate* [ number>string ] map ;
 
 :: add-delete-mix ( hash keys -- )
-    keys [| k |
+    keys |[ k |
         0 k hash set-at
         k hash delete-at
     ] each

@@ -12,7 +12,7 @@ IN: euler.b-rep.subdivision
 :: edge-points ( edges edge-indices face-indices face-points -- edge-pts )
     edges length 0 <array> :> edge-pts
 
-    edges [| edge n |
+    edges |[ edge n |
         edge opposite-edge>> :> opposite-edge
         opposite-edge edge-indices at :> opposite-n
 
@@ -31,9 +31,9 @@ IN: euler.b-rep.subdivision
     edge-pts ; inline
 
 :: vertex-points ( vertices edge-indices face-indices edge-pts face-points -- vertex-pts )
-    vertices [| vertex |
+    vertices |[ vertex |
         0 double-4{ 0 0 0 0 } double-4{ 0 0 0 0 }
-        vertex edge>> [| valence face-sum edge-sum edge |
+        vertex edge>> |[ valence face-sum edge-sum edge |
             valence 1 +
             face-sum edge face>> face-indices at face-points nth position>> v+
             edge-sum edge next-edge>> vertex>> position>> v+
@@ -63,7 +63,7 @@ TYPED:: subdivide ( brep: b-rep -- brep': b-rep )
     V{ } clone :> sub-faces
 
     vertices [
-        edge>> [| edg |
+        edge>> |[ edg |
             edg edge-indices at edge-pts nth :> point-a
             edg next-edge>> :> next-edg
             next-edg vertex>> :> next-vertex

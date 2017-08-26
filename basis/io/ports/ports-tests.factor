@@ -6,7 +6,7 @@ locals math namespaces sequences tools.test ;
 ! Make sure that writing malloced storage to a file works, and
 ! also make sure that writes larger than the buffer size work
 
-[| path |
+|[ path |
 
     { } [
         path binary [

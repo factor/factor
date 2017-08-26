@@ -113,7 +113,7 @@ IN: math.vectors.simd.intrinsics
 :: (vshuffle) ( a elts rep -- c )
     a rep byte>rep-array :> a'
     rep <rep-array> :> c'
-    elts rep rep-length [| from to |
+    elts rep rep-length |[ from to |
         from rep rep-length 1 - bitand
            a' nth-unsafe
         to c' set-nth-unsafe
@@ -125,7 +125,7 @@ IN: math.vectors.simd.intrinsics
     b rep byte>rep-array :> b'
     a' b' cord-append :> ab'
     rep <rep-array> :> c'
-    elts rep rep-length [| from to |
+    elts rep rep-length |[ from to |
         from rep rep-length dup + 1 - bitand
            ab' nth-unsafe
         to c' set-nth-unsafe
@@ -148,7 +148,7 @@ PRIVATE>
 :: (simd-v+-)              ( a b rep -- c )
     a b rep 2byte>rep-array :> ( a' b' )
     rep <rep-array> :> c'
-    0  rep rep-length [ 1 -  2 <range> ] [ 2 /i ] bi [| n |
+    0  rep rep-length [ 1 -  2 <range> ] [ 2 /i ] bi |[ n |
         n     a' nth-unsafe n     b' nth-unsafe -
         n     c' set-nth-unsafe
 
@@ -215,7 +215,7 @@ PRIVATE>
 :: (simd-vmerge-head)      ( a b rep -- c )
     a b rep 2byte>rep-array :> ( a' b' )
     rep <rep-array> :> c'
-    rep rep-length 2 /i [| n |
+    rep rep-length 2 /i |[ n |
         n a' nth-unsafe n 2 *     c' set-nth-unsafe
         n b' nth-unsafe n 2 * 1 + c' set-nth-unsafe
     ] unrolled-each-integer
@@ -224,7 +224,7 @@ PRIVATE>
     a b rep 2byte>rep-array :> ( a' b' )
     rep <rep-array> :> c'
     rep rep-length 2 /i :> len
-    len [| n |
+    len |[ n |
         n len + a' nth-unsafe n 2 *     c' set-nth-unsafe
         n len + b' nth-unsafe n 2 * 1 + c' set-nth-unsafe
     ] unrolled-each-integer

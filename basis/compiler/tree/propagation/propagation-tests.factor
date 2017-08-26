@@ -834,7 +834,7 @@ MIXIN: empty-mixin
     [ { fixnum integer } declare bitand ] final-classes
 ] unit-test
 
-{ V{ double-array } } [ [| | double-array{ } ] final-classes ] unit-test
+{ V{ double-array } } [ |[ | double-array{ } ] final-classes ] unit-test
 
 { V{ t } } [ [ macosx unix? ] final-literals ] unit-test
 

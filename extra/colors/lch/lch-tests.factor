@@ -7,9 +7,9 @@ sequences tools.test ;
 IN: colors.lch
 
 { t } [
-    0.0 1.0 0.1 <range> [| r |
-        0.0 1.0 0.1 <range> [| g |
-            0.0 1.0 0.1 <range> [| b |
+    0.0 1.0 0.1 <range> |[ r |
+        0.0 1.0 0.1 <range> |[ g |
+            0.0 1.0 0.1 <range> |[ b |
                 r g b 1.0 <rgba> dup >LCHuv >rgba
                 [ >rgba-components 4array ] bi@
                 [ 0.00001 ~ ] 2all?
@@ -19,9 +19,9 @@ IN: colors.lch
 ] unit-test
 
 { t } [
-    0.0 1.0 0.1 <range> [| r |
-        0.0 1.0 0.1 <range> [| g |
-            0.0 1.0 0.1 <range> [| b |
+    0.0 1.0 0.1 <range> |[ r |
+        0.0 1.0 0.1 <range> |[ g |
+            0.0 1.0 0.1 <range> |[ b |
                 r g b 1.0 <rgba> dup >LCHab >rgba
                 [ >rgba-components 4array ] bi@
                 [ 0.00001 ~ ] 2all?

@@ -38,7 +38,7 @@ M: horizontal-axis chart-dims
 PRIVATE>
 
 M: axis draw-gadget*
-    dup parent>> dup chart? [| axis chart |
+    dup parent>> dup chart? |[ axis chart |
         color: black axis default-color
         chart axis chart-dims [ axis-pos ] keep first2 swap scale
         chart dim>> first2 axis axis-line draw-line

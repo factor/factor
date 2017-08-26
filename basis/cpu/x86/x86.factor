@@ -352,7 +352,7 @@ M: x86.64 has-small-reg? 2drop t ;
     ] if ; inline
 
 :: (%convert-integer) ( dst src bits quot -- )
-    dst { src } bits [| new-dst |
+    dst { src } bits |[ new-dst |
         new-dst src int-rep %copy
         new-dst dup bits n-bit-version-of quot call
         dst new-dst int-rep %copy
@@ -375,7 +375,7 @@ M: x86 %convert-integer ( dst src c-type -- )
     } case ;
 
 :: %alien-integer-getter ( dst exclude address bits quot -- )
-    dst exclude bits [| new-dst |
+    dst exclude bits |[ new-dst |
         new-dst dup bits n-bit-version-of dup address MOV
         quot call
         dst new-dst int-rep %copy
@@ -388,7 +388,7 @@ M: x86 %convert-integer ( dst src c-type -- )
     [ MOVSX ] %alien-integer-getter ; inline
 
 :: %alien-integer-setter ( value exclude address bits -- )
-    value exclude bits [| new-value |
+    value exclude bits |[ new-value |
         new-value value int-rep %copy
         address new-value bits n-bit-version-of MOV
     ] with-small-register ; inline

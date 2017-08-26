@@ -23,7 +23,7 @@ M: luva >rgba >xyza >rgba ;
 
 M: luva >xyza
     [
-        [let
+        let[
             wp_x wp_y wp_z xyz-to-uv :> ( u_wp v_wp )
             [ l>> ] [ u>> ] [ v>> ] tri :> ( l u v )
 
@@ -52,7 +52,7 @@ M: luva >luva ; inline
 
 M: xyza >luva
     [
-        [let
+        let[
             wp_x wp_y wp_z xyz-to-uv :> ( u_wp v_wp )
             [ x>> ] [ y>> ] [ z>> ] tri :> ( x_ y_ z_ )
             x_ y_ z_ xyz-to-uv :> ( u_ v_ )

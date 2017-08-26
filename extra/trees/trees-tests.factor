@@ -233,7 +233,7 @@ CONSTANT: test-tree2 TREE{
 { f } [ TREE{ } pop-tree-right ] unit-test
 
 : with-limited-calls ( n quot -- quot' )
-    [let
+    let[
         0 :> count!
         '[ count _ >=
             [ "too many calls" throw ]

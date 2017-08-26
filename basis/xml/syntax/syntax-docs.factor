@@ -74,7 +74,7 @@ $nl
 "Here is an example of the locals version:"
 { $example
 "USING: locals urls xml.syntax xml.writer ;
-[let
+let[
     3 :> number
     f :> false
     URL\" http://factorcode.org/\" :> url

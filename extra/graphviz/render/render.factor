@@ -117,8 +117,8 @@ PRIVATE>
 
 :: with-preview ( ..a graph quot: ( ..a path -- ..b ) -- ..b )
     [
-        "preview" ".dot" [| code-file |
-            "preview" preview-extension [| image-file |
+        "preview" ".dot" |[ code-file |
+            "preview" preview-extension |[ image-file |
                 graph code-file ?encoding write-dot
                 code-file image-file try-preview-command
                 image-file quot call

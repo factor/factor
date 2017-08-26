@@ -26,7 +26,7 @@ PRIVATE>
 
 M: yuva >rgba
     { [ y>> ] [ u>> ] [ v>> ] [ alpha>> ] } cleave
-    [| y u v |
+    |[ y u v |
         y 1 Wr - Vmax / v * +
 
         y

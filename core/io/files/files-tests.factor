@@ -42,7 +42,7 @@ SPECIALIZED-ARRAY: int
     [ " " read-until [ ascii decode ] dip ] with-file-reader
 ] unit-test
 
-[| path |
+|[ path |
     { } [
         "It seems Jobs has lost his grasp on reality again.\n"
         path latin1 set-file-contents
@@ -72,7 +72,7 @@ SPECIALIZED-ARRAY: int
 ] unit-test
 
 ! Writing specialized arrays to binary streams should work
-[| path |
+|[ path |
     { } [
         path binary [
             int-array{ 1 2 3 } write
@@ -87,7 +87,7 @@ SPECIALIZED-ARRAY: int
     ] unit-test
 ] with-test-file
 
-[| path |
+|[ path |
     { } [
         BV{ 0 1 2 } path binary set-file-contents
     ] unit-test
@@ -104,7 +104,7 @@ SPECIALIZED-ARRAY: pt
 CONSTANT: pt-array-1
     pt-array{ S{ pt f 1 1 } S{ pt f 2 2 } S{ pt f 3 3 } }
 
-[| path |
+|[ path |
     { } [
         pt-array-1 path binary set-file-contents
     ] unit-test
@@ -116,7 +116,7 @@ CONSTANT: pt-array-1
 ] with-test-file
 
 ! Slices should support >c-ptr and byte-length
-[| path |
+|[ path |
     { } [
         pt-array-1 rest-slice
         path binary set-file-contents
@@ -136,7 +136,7 @@ CONSTANT: pt-array-1
 ] unit-test
 
 ! Writing strings to binary streams should fail
-[| path |
+|[ path |
     [
         path binary [ "OMGFAIL" write ] with-file-writer
     ] must-fail
@@ -166,7 +166,7 @@ CONSTANT: pt-array-1
 ] with-test-directory
 
 ! File seeking tests
-[| path |
+|[ path |
     { B{ 3 2 3 4 5 } } [
         path binary [
             B{ 1 2 3 4 5 } write
@@ -179,7 +179,7 @@ CONSTANT: pt-array-1
     ] unit-test
 ] with-test-file
 
-[| path |
+|[ path |
     { B{ 1 2 3 4 3 } } [
         path binary [
             B{ 1 2 3 4 5 } write
@@ -192,7 +192,7 @@ CONSTANT: pt-array-1
     ] unit-test
 ] with-test-file
 
-[| path |
+|[ path |
     { B{ 1 2 3 4 5 0 3 } } [
         path binary [
             B{ 1 2 3 4 5 } write
@@ -205,7 +205,7 @@ CONSTANT: pt-array-1
     ] unit-test
 ] with-test-file
 
-[| path |
+|[ path |
     { B{ 3 } } [
         B{ 1 2 3 4 5 } path binary set-file-contents
         path binary [
@@ -218,7 +218,7 @@ CONSTANT: pt-array-1
     ] unit-test
 ] with-test-file
 
-[| path |
+|[ path |
 
     { B{ 2 } } [
         B{ 1 2 3 4 5 } path binary set-file-contents
@@ -249,17 +249,17 @@ CONSTANT: pt-array-1
     ] with-file-reader
 ] unit-test
 
-[| path |
+|[ path |
     [ path ascii [ { 129 } write ] with-file-writer ]
     [ encode-error? ] must-fail-with
 ] with-test-file
 
-[| path |
+|[ path |
     { }
     [ path ascii [ { } write ] with-file-writer ] unit-test
 ] with-test-file
 
-[| path |
+|[ path |
     [ path binary [ "" write ] with-file-writer ]
     [ no-method? ] must-fail-with
 ] with-test-file

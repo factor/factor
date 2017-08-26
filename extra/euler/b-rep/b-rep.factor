@@ -226,7 +226,7 @@ ERROR: b-rep-not-empty b-rep ;
 :: connecting-edge ( e0 e1 -- edge/f )
     e1 vertex>> :> target-vertex
     e0 vertex>> target-vertex eq? [ f ] [
-        f e0 [| ret edge |
+        f e0 |[ ret edge |
             edge opposite-edge>> vertex>> target-vertex eq?
             [ edge edge f ]
             [ f edge vertex-cw dup e0 eq? not ] if

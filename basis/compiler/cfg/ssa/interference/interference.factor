@@ -141,7 +141,7 @@ TUPLE: iterator seq n ;
 
 :: linear-interference-test ( seq -- ? )
     V{ } clone :> dom
-    seq [| vreg |
+    seq |[ vreg |
         dom vreg find-parent
         { [ ] [ vreg same-sets? not ] [ vreg swap vregs-interfere? ] } 1&&
         [ t ] [ vreg dom push f ] if

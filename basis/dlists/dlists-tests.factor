@@ -117,7 +117,7 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
     [ prev>> ] [ next>> ] bi 2array { f f } assert= ;
 
 { V{ } } [ <dlist> 1 <my-node> over push-node-back [ [ back>> ] [ ] bi delete-node ] [ ] bi dlist>sequence ] unit-test
-[ V{ 1 2 } t ] [| |
+[ V{ 1 2 } t ] |[ |
     <dlist> :> dl
         1 <my-node> :> n1 n1 dl push-node-back
         2 <my-node> :> n2 n2 dl push-node-back
@@ -127,7 +127,7 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
     dl dlist>sequence dup >dlist dl =
 ] unit-test
 
-[ V{ 1 3 } t ] [| |
+[ V{ 1 3 } t ] |[ |
     <dlist> :> dl
         1 <my-node> :> n1 n1 dl push-node-back
         2 <my-node> :> n2 n2 dl push-node-back
@@ -137,7 +137,7 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
     dl dlist>sequence dup >dlist dl =
 ] unit-test
 
-[ V{ 2 3 } t ] [| |
+[ V{ 2 3 } t ] |[ |
     <dlist> :> dl
         1 <my-node> :> n1 n1 dl push-node-back
         2 <my-node> :> n2 n2 dl push-node-back

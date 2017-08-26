@@ -158,7 +158,7 @@ HINTS: next* { spot } ;
 :: parse-text ( -- string )
     depth get zero? :> no-text
     0 :> pos!
-    [| char |
+    |[ char |
         pos char assure-no-]]> pos!
         no-text [
             char blank? char char: < eq? or [

@@ -146,7 +146,7 @@ TUPLE: simd-test-failure
     ! seq: sequence of inputs
     ! test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
     ! eq-quot: ( result1 result2 -- ? )
-    seq [| input |
+    seq |[ input |
         input test-quot call :> ( input-quot code-quot )
         input-quot [ class-of ] { } map-as :> input-classes
         input-classes code-quot '[ _ declare @ ] :> code-quot'

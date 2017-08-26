@@ -110,7 +110,7 @@ M: editor ungraft*
     point second editor y>line {
         { [ dup 0 < ] [ drop { 0 0 } ] }
         { [ dup editor model>> last-line# > ] [ drop editor model>> doc-end ] }
-        [| n |
+        |[ n |
             n
             point first
             editor font>>

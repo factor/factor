@@ -32,7 +32,7 @@ M: window-controls-demo-world pref-dim*
 
 : window-controls-demo ( -- )
     attributes-template V{ } clone window-control-sets-to-test
-    [| title attributes windows controls |
+    |[ title attributes windows controls |
         f attributes
             title >>title
             controls >>window-controls

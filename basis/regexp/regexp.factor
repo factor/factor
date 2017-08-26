@@ -56,7 +56,7 @@ PRIVATE>
 
 :: (next-match) ( i string regexp quot: ( i string regexp -- j ) reverse? -- start end ? )
     i string regexp quot call dup
-    [| j | reverse? [ j i ] [ i j ] if string ] [ drop f f f ] if ; inline
+    |[ j | reverse? [ j i ] [ i j ] if string ] [ drop f f f ] if ; inline
 
 :: next-match ( i string regexp quot: ( i string regexp -- j ) reverse? -- start end ? )
     f f f
@@ -69,7 +69,7 @@ PRIVATE>
 
 :: (each-match-forward) ( ... i string regexp quot: ( ... start end string -- ... ) -- ... )
     i string length <= [
-        i string regexp do-next-match [| start end |
+        i string regexp do-next-match |[ start end |
             start end string quot call
             start end eq? [ end 1 +  ] [ end ] if
             string regexp quot (each-match-forward)
@@ -78,7 +78,7 @@ PRIVATE>
 
 :: (each-match-backward) ( ... i string regexp quot: ( ... start end string -- ... ) -- ... )
     i -1 >= [
-        i string regexp do-next-match [| start end |
+        i string regexp do-next-match |[ start end |
             start 1 + end 1 + string quot call
             start end eq? [ start 1 - ] [ start ] if
             string regexp quot (each-match-backward)
@@ -115,7 +115,7 @@ PRIVATE>
 <PRIVATE
 
 :: (re-split) ( string regexp quot: ( from to seq -- slice ) -- new-slices )
-    0 string regexp [| end start end' string |
+    0 string regexp |[ end start end' string |
         end' ! leave it on the stack for the next iteration
         end start string quot call
     ] map-matches

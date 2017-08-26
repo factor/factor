@@ -171,8 +171,8 @@ M: object apply-object push-literal ;
 :: declare-input-effects ( word -- )
     H{ } clone :> variables
     V{ } clone :> branches
-    word stack-effect in>> <reversed> [| in n |
-        in ?quotation-effect [| effect |
+    word stack-effect in>> <reversed> |[ in n |
+        in ?quotation-effect |[ effect |
             word effect variables branches n declare-effect-d
         ] when*
     ] each-index ;

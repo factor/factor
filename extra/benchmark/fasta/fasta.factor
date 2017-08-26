@@ -74,16 +74,16 @@ TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
 
 : write-repeat-fasta ( n alu desc id -- )
     write-description
-    [let
+    let[
         :> alu
         0 :> k!
-        [| len | k len alu make-repeat-fasta k! ] split-lines
+        |[ len | k len alu make-repeat-fasta k! ] split-lines
     ] ;
 
 : fasta ( n out -- )
     homo-sapiens make-cumulative
     IUB make-cumulative
-    [let
+    let[
         :> ( n out IUB-chars IUB-floats homo-sapiens-chars homo-sapiens-floats )
         initial-seed :> seed
 

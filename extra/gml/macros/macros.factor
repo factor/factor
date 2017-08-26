@@ -28,7 +28,7 @@ MACRO:: log-euler-op ( class def inputs -- quot )
     class inputs def inputs '[ [ current-macro get [ _ boa save-euler-op ] [ _ ndrop ] if ] _ _ nbi ] ;
 
 SYNTAX: \LOG-GML:
-    [let
+    let[
         (GML:) :> ( word name effect def )
 
         name "-record" append create-word-in :> record-class

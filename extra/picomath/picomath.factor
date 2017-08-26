@@ -305,7 +305,7 @@ PRIVATE>
     {
         { [ dup 0 < ] [ "invalid input" throw ] }
         { [ dup 254 > ] [
-                            1 + [| x |
+                            1 + |[ x |
                                 x 0.5 - x log * x -
                                 0.5 2 pi * log * +
                                 1.0 12.0 x * / +

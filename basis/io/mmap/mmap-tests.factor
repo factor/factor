@@ -5,7 +5,7 @@ specialized-arrays.instances.alien.c-types.uint tools.test ;
 
 SPECIALIZED-ARRAY: uint
 
-[| path |
+|[ path |
     "12345" path ascii set-file-contents
     { } [ path [ char <mapped-array> char: 2 0 pick set-nth drop ] with-mapped-file ] unit-test
     { 5 } [ path [ char <mapped-array> length ] with-mapped-file ] unit-test
@@ -15,7 +15,7 @@ SPECIALIZED-ARRAY: uint
     { t } [ path uint [ sum ] with-mapped-array-reader integer? ] unit-test
 ] with-test-file
 
-[| path |
+|[ path |
     [ path [ drop ] with-mapped-file ] [ bad-mmap-size? ] must-fail-with
 ] with-test-file
 

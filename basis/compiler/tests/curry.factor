@@ -46,7 +46,7 @@ IN: compiler.tests.curry
         [ call f ] curry assoc-find 3drop
     ] { } make ; inline
 
-[ t ] [| |
+[ t ] |[ |
     1000 <iota> [ drop 1,000,000 random 1,000,000 random ] H{ } map>assoc :> a-hashtable
     a-hashtable [ [ drop , ] funky-assoc>map ] compile-call
     a-hashtable keys =

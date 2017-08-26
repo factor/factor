@@ -30,7 +30,7 @@ CONSTANT: _NET_WM_STATE_TOGGLE 2
 
 : supported-net-wm-hints ( -- seq )
     { Atom int ulong ulong pointer: Atom }
-    [| type format n-atoms bytes-after atoms |
+    |[ type format n-atoms bytes-after atoms |
         dpy get
         root get
         XA_NET_SUPPORTED
@@ -47,7 +47,7 @@ CONSTANT: _NET_WM_STATE_TOGGLE 2
         Success assert=
     ]
     with-out-parameters
-    [| type format n-atoms bytes-after atoms |
+    |[ type format n-atoms bytes-after atoms |
         atoms n-atoms ulong <c-direct-array> >array
         atoms XFree
     ] call ;

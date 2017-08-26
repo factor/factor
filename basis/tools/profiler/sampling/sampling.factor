@@ -146,7 +146,7 @@ PRIVATE>
 
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
-    samples [| sample |
+    samples |[ sample |
         sample sample-callstack members [ ignore-word? ] reject [
             per-word-samples sample counts+at
         ] each
@@ -177,7 +177,7 @@ PRIVATE>
 
 :: collect-cross-section ( samples depth -- cross-section )
     IH{ } clone :> per-word-samples
-    samples [| sample |
+    samples |[ sample |
         depth sample sample-callstack [ ignore-word? ] trim-tail nth-or-last :> word
         word [
             word per-word-samples sample counts+at

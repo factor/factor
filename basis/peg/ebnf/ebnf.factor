@@ -429,7 +429,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
             drop
         ] [
             [
-                "[let " %
+                "let[ " %
                 [
                     over ebnf-var? [
                         " " % # " over nth :> " %
@@ -447,7 +447,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
 
 M: ebnf-var build-locals ( code ast -- code )
     [
-        "[let dup :> " % name>> %
+        "let[ dup :> " % name>> %
         " " %
         %
         " nip ]" %
@@ -473,7 +473,7 @@ ERROR: bad-effect quot effect ;
     ! so we don't pollute the manifest qualified-vocabs
     ! and also so restarts don't add multiple times
     qualified-vocabs length
-    "locals" { "[let" ":>" } add-words-from
+    "locals" { "let[" ":>" } add-words-from
     "kernel" { "dup" "nip" "over" } add-words-from
     "sequences" { "nth" } add-words-from
     [ string-lines parse-lines ] dip

@@ -163,7 +163,7 @@ M: mdb-collection create-collection ( collection -- )
     [ "$cmd" = ] [ "system" head? ] bi or ;
 
 : check-collection ( collection -- fq-collection )
-    [let
+    let[
         mdb-instance :> instance
         instance name>> :> instance-name
         dup mdb-collection? [ name>> ] when

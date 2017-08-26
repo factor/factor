@@ -46,9 +46,9 @@ PRIVATE>
     [ first length [ { 0 } ] replicate ]
     bi :> ( n acc )
 
-    control-points [| pt i |
+    control-points |[ pt i |
         n i bernstein-polynomial-ith :> poly
-        pt [| v j |
+        pt |[ v j |
             j acc [ v poly n*p p+ ] change-nth
         ] each-index
     ] each-index

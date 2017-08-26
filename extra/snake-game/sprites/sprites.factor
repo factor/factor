@@ -13,7 +13,7 @@ IN: snake-game.sprites
 
 :: image-part ( image x y w h -- image )
     image w h new-image-like :> new-image
-    h <iota> [| i |
+    h <iota> |[ i |
         new-image bitmap>>
         x y i + w image pixel-row-slice-at
         append! drop

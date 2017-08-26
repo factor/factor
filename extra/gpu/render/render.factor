@@ -459,7 +459,7 @@ DEFER: [bind-uniform-tuple]
     ] if* :> ( quot-prefixes name-prefixes )
     type all-uniform-tuple-slots :> uniforms
 
-    texture-unit quot-prefixes name-prefixes [| quot-prefix name-prefix |
+    texture-unit quot-prefixes name-prefixes |[ quot-prefix name-prefix |
         uniforms name-prefix [bind-uniform-tuple]
         quot-prefix prepend
     ] 2map :> ( texture-unit' value-cleave )

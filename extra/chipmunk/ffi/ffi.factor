@@ -453,7 +453,7 @@ TYPED: cpPolyShapeContainsVert ( poly: cpPolyShape v: cpVect -- ? )
 
 TYPED: cpPolyShapeContainsVertPartial ( poly: cpPolyShape v: cpVect n: cpVect -- ? )
     rot [ numVerts>> ] [ tAxes>> swap cpPolyShapeAxis <c-direct-array> ] bi -rot
-    [| axis v n |
+    |[ axis v n |
         axis n>> n cpvdot 0.0 < 0
         [ 0.0 ]
         [ axis n>> v cpvdot axis d>> - ]

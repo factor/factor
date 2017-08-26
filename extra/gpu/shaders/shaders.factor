@@ -551,7 +551,7 @@ SYNTAX: \geometry-shader-vertices-out:
 
 TYPED:: refresh-program ( program: program -- )
     program shaders>> [ refresh-shader-source ] each
-    program instances>> [| world old-instance |
+    program instances>> |[ world old-instance |
         old-instance valid-handle? [
             world [
                 [
@@ -559,7 +559,7 @@ TYPED:: refresh-program ( program: program -- )
                     program new-shader-instances (link-program) |dispose :> new-program-instance
 
                     old-instance new-program-instance become-program-instance
-                    new-shader-instances [| new-shader-instance |
+                    new-shader-instances |[ new-shader-instance |
                         world new-shader-instance shader>> instances>> at
                             new-shader-instance become-shader-instance
                     ] each

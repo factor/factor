@@ -942,9 +942,9 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     ] with-mapped-file-reader ; inline
 
 : macho-nm ( path -- )
-    [| macho |
+    |[ macho |
         macho load-commands segment-commands sections-array :> sections
-        macho load-commands symtab-commands [| symtab |
+        macho load-commands symtab-commands |[ symtab |
             macho symtab symbols [
                 [ drop n_value>> "%016x " printf ]
                 [
@@ -963,8 +963,8 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     } 1&& ;
 
 : dylib-exports ( path -- symbol-names )
-    [| macho |
-        macho load-commands symtab-commands [| symtab |
+    |[ macho |
+        macho load-commands symtab-commands |[ symtab |
             macho symtab symbols
             [ [ dylib-export? ] filter ]
             [ [ c-symbol-name ] curry { } map-as ] bi*

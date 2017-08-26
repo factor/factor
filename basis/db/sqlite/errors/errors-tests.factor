@@ -3,7 +3,7 @@
 USING: accessors combinators.short-circuit db db.errors
 db.sqlite kernel locals tools.test ;
 
-[| path |
+|[ path |
 
     path <sqlite-db> [
 

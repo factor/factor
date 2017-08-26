@@ -27,7 +27,7 @@ TUPLE: an-observer { i integer } ;
 M: an-observer model-changed nip [ 1 + ] change-i drop ;
 
 { 1 0 } [
-    [let
+    let[
         1 <model> :> m1
         2 <model> :> m2
         { m1 m2 } <product> :> c

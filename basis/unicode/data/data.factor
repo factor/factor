@@ -144,7 +144,7 @@ PRIVATE>
 
 :: process-category ( data -- category-listing )
     num-chars <byte-array> :> table
-    2 data (process-data) [| char cat |
+    2 data (process-data) |[ char cat |
         cat categories-map at char table ?set-nth
     ] assoc-each table fill-ranges ;
 

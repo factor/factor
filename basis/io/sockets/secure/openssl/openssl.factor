@@ -82,7 +82,7 @@ ERROR: file-expected path ;
 
 : password-callback ( -- alien )
     int { void* int bool void* } cdecl
-    [| buf size rwflag password! |
+    |[ buf size rwflag password! |
         password [ B{ 0 } password! ] unless
 
         password strlen :> len

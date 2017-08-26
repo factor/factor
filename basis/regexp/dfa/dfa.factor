@@ -14,7 +14,7 @@ IN: regexp.dfa
         new-question state table set-at
         state nfa transitions>> at
         [ drop tagged-epsilon? ] assoc-filter
-        [| trans to |
+        |[ trans to |
             to [
                 table nfa
                 trans tag>> new-question 2array <and-class>
@@ -56,7 +56,7 @@ IN: regexp.dfa
         pop :> state
         state dfa transitions>> ensure-state
         state nfa find-transitions
-        [| trans |
+        |[ trans |
             state trans nfa find-closure :> new-state
             new-state visited-states new-states add-todo-states
             state new-state trans dfa set-transition

@@ -19,8 +19,8 @@ C: <element> element
 
     0 0 minima set-nth-unsafe
 
-    minima [| base i |
-        0 i 1 + [ dup #elements <= ] [| j |
+    minima |[ base i |
+        0 i 1 + [ dup #elements <= ] |[ j |
             j 1 - black nth-unsafe + dup :> w
             j 1 - white nth-unsafe +
 

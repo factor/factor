@@ -25,7 +25,7 @@ os linux? [
         [ gdk_pixbuf_get_n_channels ]
         [ gdk_pixbuf_get_bits_per_sample ]
     } cleave
-    [let :> ( pixels w h rowstride channels bps )
+    let[ :> ( pixels w h rowstride channels bps )
         bps channels * 7 + 8 /i w * :> bytes-per-row
 
         bytes-per-row rowstride =

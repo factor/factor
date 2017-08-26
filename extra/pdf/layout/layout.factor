@@ -214,7 +214,7 @@ M: table-row pdf-render
     {
         [ drop ?line-break ]
         [
-            [let
+            let[
                 over y>> :> start-y
                 over y>> :> max-y!
                 [

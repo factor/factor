@@ -72,7 +72,7 @@ M: end h2 dup failure? [ <failure> <block> ] unless ;
 
 : first-row ( n -- t )
     [ <failure> <success> <failure> ] dip
-    1 - [| a b c | b c <block> a b ] times 2drop ;
+    1 - |[ a b c | b c <block> a b ] times 2drop ;
 
 GENERIC: total ( t -- n )
 M: block total [ total ] dup choice + ;

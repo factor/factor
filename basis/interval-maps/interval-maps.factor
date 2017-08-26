@@ -60,7 +60,7 @@ PRIVATE>
     ! Makes 2array keys
     [
         alist sort-keys unclip swap [ first2 dupd ] dip
-        [| oldkey oldval key val | ! Underneath is start
+        |[ oldkey oldval key val | ! Underneath is start
             oldkey 1 + key =
             oldval val = and
             [ oldkey 2array oldval 2array , key ] unless

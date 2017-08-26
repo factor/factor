@@ -550,7 +550,7 @@ PRIVATE>
     (current-cl-device) [ handle>> ] bi@ CL_KERNEL_WORK_GROUP_SIZE kernel-work-group-info-size_t ; inline
 
 :: cl-queue-kernel ( kernel args sizes dependent-events -- event )
-    args [| arg idx | kernel idx arg bind-kernel-arg ] each-index
+    args |[ arg idx | kernel idx arg bind-kernel-arg ] each-index
     (current-cl-queue) handle>>
     kernel handle>>
     sizes [ length f ] [ [ ] size_t-array{ } map-as f ] bi

@@ -27,8 +27,8 @@ TYPED:: loop-step ( i j matrix: array old new step -- )
 
 :: run-lcs ( old new init step -- matrix )
     old length 1 + new length 1 + init call :> matrix
-    old length <iota> [| i |
-        new length <iota> [| j |
+    old length <iota> |[ i |
+        new length <iota> |[ j |
             i j matrix old new step loop-step
         ] each
     ] each matrix ; inline

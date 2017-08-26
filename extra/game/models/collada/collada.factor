@@ -93,10 +93,10 @@ M: z-up >y-up-axis!
 
 :: collect-sources ( sources vertices inputs -- seq )
     inputs
-    [| input |
+    |[ input |
         input "source" x@ rest vertices first =
         [
-            vertices second [| vertex |
+            vertices second |[ vertex |
                 vertex first
                 input "offset" x@ string>number
                 vertex second rest sources at source boa

@@ -18,7 +18,7 @@ PRIVATE>
 
 :: random-lines ( n -- lines )
     V{ } clone :> accum
-    [| line line# |
+    |[ line line# |
         line# n <= [
             line accum push
         ] [

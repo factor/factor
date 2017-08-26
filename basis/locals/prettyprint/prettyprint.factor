@@ -6,7 +6,7 @@ IN: locals.prettyprint
 
 : pprint-var ( var -- )
     ! Prettyprint a read/write local as its writer, just like
-    ! in the input syntax: [| x! | ... x 3 + x! ]
+    ! in the input syntax: |[ x! | ... x 3 + x! ]
     dup local-reader? [
         "local-writer" word-prop
     ] when pprint-word ;
@@ -15,7 +15,7 @@ IN: locals.prettyprint
 
 M: lambda pprint*
     <flow
-    \ [| pprint-word
+    \ |[ pprint-word
     dup vars>> pprint-vars
     "|" text
     f <inset body>> pprint-elements block>
@@ -27,7 +27,7 @@ M: lambda pprint*
     <block body>> pprint-elements block>
     \ ] pprint-word ;
 
-M: let pprint* \ [let pprint-let ;
+M: let pprint* \ let[ pprint-let ;
 
 M: def pprint*
     dup local>> word?

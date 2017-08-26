@@ -73,7 +73,7 @@ PRIVATE>
         hUpdate RT_GROUP_ICON id 0 group dup byte-length
         UpdateResource drop
 
-        icons [| icon i |
+        icons |[ icon i |
             hUpdate RT_ICON i 1 + MAKEINTRESOURCE 0 icon dup byte-length
             UpdateResource drop
         ] each-index

@@ -6,7 +6,7 @@ locals.errors locals.types make quotations sequences vectors
 words ;
 IN: locals.rewrite.sugar
 
-! Step 1: rewrite [| into :> forms, turn
+! Step 1: rewrite |[ into :> forms, turn
 ! literals with locals in them into code which constructs
 ! the literal after pushing locals on the stack
 

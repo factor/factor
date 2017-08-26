@@ -66,7 +66,7 @@ M:: sfmt generate ( sfmt -- )
     state n>> :> n
     state mask>> :> mask
 
-    n m - >fixnum <iota> [| i |
+    n m - >fixnum <iota> |[ i |
         i array nth-unsafe
         i m + array nth-unsafe
         mask state r1>> state r2>> formula :> r

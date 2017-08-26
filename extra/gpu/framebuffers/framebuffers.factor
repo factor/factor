@@ -164,11 +164,11 @@ M: renderbuffer framebuffer-attachment-dim
 
 :: each-attachment-target ( framebuffer quot: ( attachment-target attachment -- ) -- )
     framebuffer color-attachments>>
-    [| attachment n | n GL_COLOR_ATTACHMENT0 + attachment quot call ] each-index
+    |[ attachment n | n GL_COLOR_ATTACHMENT0 + attachment quot call ] each-index
     framebuffer depth-attachment>>
-    [| attachment | GL_DEPTH_ATTACHMENT attachment quot call ] when*
+    |[ attachment | GL_DEPTH_ATTACHMENT attachment quot call ] when*
     framebuffer stencil-attachment>>
-    [| attachment | GL_STENCIL_ATTACHMENT attachment quot call ] when* ; inline
+    |[ attachment | GL_STENCIL_ATTACHMENT attachment quot call ] when* ; inline
 
 GENERIC: bind-framebuffer-attachment ( attachment-target attachment -- )
 
@@ -331,12 +331,12 @@ TYPED:: clear-framebuffer-attachment ( framebuffer: any-framebuffer
                                        value -- )
     GL_DRAW_FRAMEBUFFER framebuffer framebuffer-handle glBindFramebuffer
     attachment-ref {
-        { system-attachment [| side face |
+        { system-attachment |[ side face |
             float-type
             side face gl-system-attachment
             value (clear-color-attachment)
         ] }
-        { color-attachment [| i |
+        { color-attachment |[ i |
             framebuffer i (color-attachment-type)
             GL_COLOR_ATTACHMENT0 i +
             value (clear-color-attachment)

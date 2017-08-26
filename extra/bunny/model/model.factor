@@ -48,7 +48,7 @@ CONSTANT: model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
     model-url model-path [ ?download-to ] keep ;
 
 :: (draw-triangle) ( ns vs triple -- )
-    triple [| elt |
+    triple |[ elt |
         elt ns nth gl-normal
         elt vs nth gl-vertex
     ] each ;

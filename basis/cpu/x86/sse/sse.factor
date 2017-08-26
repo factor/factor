@@ -895,7 +895,7 @@ M: x86 %integer>scalar drop MOVD ;
         ] }
         { char-scalar-rep [
             dst 32-bit-version-of src MOVD
-            dst { } 8 [| tmp-dst |
+            dst { } 8 |[ tmp-dst |
                 tmp-dst dst int-rep %copy
                 tmp-dst tmp-dst 8-bit-version-of MOVSX
                 dst tmp-dst int-rep %copy
@@ -903,7 +903,7 @@ M: x86 %integer>scalar drop MOVD ;
         ] }
         { uchar-scalar-rep [
             dst 32-bit-version-of src MOVD
-            dst { } 8 [| tmp-dst |
+            dst { } 8 |[ tmp-dst |
                 tmp-dst dst int-rep %copy
                 tmp-dst tmp-dst 8-bit-version-of MOVZX
                 dst tmp-dst int-rep %copy

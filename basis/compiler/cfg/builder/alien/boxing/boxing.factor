@@ -39,18 +39,18 @@ M: object flatten-struct-type-return
 :: explode-struct ( src c-type -- vregs reps )
     c-type flatten-struct-type :> reps
     reps keys dup component-offsets
-    [| rep offset | src offset rep f ^^load-memory-imm ] 2map
+    |[ rep offset | src offset rep f ^^load-memory-imm ] 2map
     reps ;
 
 :: explode-struct-return ( src c-type -- vregs reps )
     c-type flatten-struct-type-return :> reps
     reps keys dup component-offsets
-    [| rep offset | src offset rep f ^^load-memory-imm ] 2map
+    |[ rep offset | src offset rep f ^^load-memory-imm ] 2map
     reps ;
 
 :: implode-struct ( src vregs reps -- )
     vregs reps dup component-offsets
-    [| vreg rep offset | vreg src offset rep f ##store-memory-imm, ] 3each ;
+    |[ vreg rep offset | vreg src offset rep f ##store-memory-imm, ] 3each ;
 
 GENERIC: unbox ( src c-type -- vregs reps )
 

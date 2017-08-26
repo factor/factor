@@ -36,8 +36,8 @@ SINGLETON: pbm-image
 
 :: read-binary-bits ( width height -- )
     width 8 align 8 / height * read
-    width 8 align 8 / <groups> [| row |
-        width <iota> [| n |
+    width 8 align 8 / <groups> |[ row |
+        width <iota> |[ n |
             n 8 / floor row nth
             n 8 mod 7 swap - bit?
             [ 0 ] [ 255 ] if ,

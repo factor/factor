@@ -20,7 +20,7 @@ TUPLE: pool
 
 :: copy-tuple ( from to -- to )
     from tuple-size :> size
-    size [| n | n from array-nth n to set-array-nth ] each-integer
+    size |[ n | n from array-nth n to set-array-nth ] each-integer
     to ; inline
 
 : (pool-new) ( pool -- object )

@@ -14,7 +14,7 @@ M: laba >rgba >xyza >rgba ;
 
 M: laba >xyza
     [
-        [let
+        let[
             [ l>> ] [ a>> ] [ b>> ] tri :> ( l a b )
             l 16 + 116 / :> fy
             a 500 / fy + :> fx
@@ -53,7 +53,7 @@ M: rgba >laba >xyza >laba ;
 
 M: xyza >laba
     [
-        [let
+        let[
             [ x>> wp_x / ] [ y>> wp_y / ] [ z>> wp_z / ] tri
             [
                 dup xyz_epsilon >

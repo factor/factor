@@ -293,7 +293,7 @@ PRIVATE>
 
 <PRIVATE
 :: update-related-words ( words -- affected-words )
-    words words [| affected word |
+    words words |[ affected word |
         word "related" [ affected union words ] change-word-prop
     ] reduce ;
 

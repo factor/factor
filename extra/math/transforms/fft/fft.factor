@@ -12,7 +12,7 @@ DEFER: (fft)
 :: (slow-fft) ( seq inverse? -- seq' )
     seq length :> N
     inverse? 1 -1 ? 2pi * N / N <iota> n*v :> omega
-    N <iota> [| k |
+    N <iota> |[ k |
         0 seq omega [ k * cis * + ] 2each
         inverse? [ N / ] when
     ] map ; inline
