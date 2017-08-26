@@ -24,8 +24,8 @@ HELP: breakpoint-if
 HELP: B
 { $description "An alias for " { $link break } ", defined in the " { $vocab-link "syntax" } " vocabulary so that it is always available." } ;
 
-HELP: B:
-{ $description "A breakpoint for parsing words. When this word is executed, it copies the definition of the following parsing word, prepends a " { $link break } " to it so that it is the first word to be executed when the definition is called, and calls this new definition.\n\nWhen the walker tool opens, execution will still be inside " { $link postpone: B: } ". To step out of B: and into the parsing word, do just that: jump out with O, then into with I." } ;
+HELP: b:
+{ $description "A breakpoint for parsing words. When this word is executed, it copies the definition of the following parsing word, prepends a " { $link break } " to it so that it is the first word to be executed when the definition is called, and calls this new definition.\n\nWhen the walker tool opens, execution will still be inside " { $link postpone: \b: } ". To step out of B: and into the parsing word, do just that: jump out with O, then into with I." } ;
 
 HELP: step-into
 { $var-description "Signal set to the walker thread to step into the word." } ;
@@ -42,7 +42,7 @@ $nl
 { $subsections
     break
     postpone: B
-    postpone: B:
+    postpone: \b:
 }
 "Note that because the walker calls various core library and UI words while rendering its own user interface, setting a breakpoint on a word such as " { $link append } " or " { $link + } " will hang the UI." ;
 

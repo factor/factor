@@ -19,8 +19,8 @@ ARTICLE: "reading-ahead" "Reading ahead"
     ?scan-token
     ?scan-datum
 }
-"A simple example is the " { $link postpone: \ } " word:"
-{ $see postpone: \ } ;
+"A simple example is the " { $link postpone: \\ } " word:"
+{ $see postpone: \\ } ;
 
 ARTICLE: "parsing-word-nest" "Nested structure"
 "Recall that the parser loop calls parsing words with an accumulator vector on the stack. The parser loop can be invoked recursively with a new, empty accumulator; the result can then be added to the original accumulator. This is how parsing words for object literals are implemented; object literals can nest arbitrarily deep."
@@ -33,7 +33,7 @@ $nl
 { $subsections parse-until }
 "Words such as " { $link postpone: ] } " use a declaration which causes them to throw an error when an unpaired occurrence is encountered:"
 { $subsections postpone: delimiter }
-{ $see-also postpone: { postpone: H{ postpone: V{ postpone: W{ postpone: T{ postpone: } } ;
+{ $see-also postpone: { postpone: \H{ postpone: \V{ postpone: \W{ postpone: \T{ postpone: \} } ;
 
 ARTICLE: "defining-words" "Defining words"
 "Defining words add definitions to the dictionary without modifying the parse tree. The simplest example is the " { $link postpone: SYMBOL: } " word."
