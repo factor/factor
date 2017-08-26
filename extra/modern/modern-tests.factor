@@ -57,13 +57,13 @@ IN: modern.tests
 { { "<<foo<" } } [ "<<foo<" string>literals >strings ] unit-test
 { { "<<foo<<" } } [ "<<foo<<" string>literals >strings ] unit-test
 
-! Backslash
+! Backslash \AVL{ foo\bar foo\bar{
 {
-    { { "SYNTAX\\" "AVL{" } }
-} [ "SYNTAX\\ AVL{" string>literals >strings ] unit-test
+    { { "SYNTAX:" { "\\AVL{" } } }
+} [ "SYNTAX: \\AVL{" string>literals >strings ] unit-test
 
-[ "\\" string>literals >strings ] must-fail
-[ "SYNTAX\\" string>literals >strings ] must-fail
+{ { "\\" } } [ "\\" string>literals >strings ] unit-test
+{ { "\\FOO" } } [ "\\FOO" string>literals >strings ] unit-test
 
 {
     { "foo\\bar" }
@@ -74,3 +74,11 @@ IN: modern.tests
 {
     { { "foo\\bar{" { "1" } "}" } }
 } [ "foo\\bar{ 1 }" string>literals >strings ] unit-test
+
+{ { { "char:" "\\{" } } } [ "char: \\{" string>literals >strings ] unit-test
+[ "char: {" string>literals >strings ] must-fail
+[ "char: [" string>literals >strings ] must-fail
+[ "char: {" string>literals >strings ] must-fail
+[ "char: \"" string>literals >strings ] must-fail
+{ { { "char:" "\\\\" } } } [ "char: \\\\" string>literals >strings ] unit-test
+{ { { "char:" "\\" } } } [ "char: \\" string>literals >strings ] unit-test

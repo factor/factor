@@ -199,15 +199,6 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     [ take-comment ] [ merge-slice-til-whitespace ] if ;
 
 ERROR: backslash-expects-whitespace slice ;
-ERROR: no-backslash-payload n string slice ;
-: read-backslash ( n string slice -- n' string obj )
-    merge-slice-til-whitespace dup "\\" tail? [
-        ! \ foo, M\ foo
-        [
-                skip-blank-from slice-til-whitespace drop
-                dup [ no-backslash-payload ] unless
-        ] dip swap 2array
-    ] when ;
 
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
@@ -218,53 +209,70 @@ ERROR: no-backslash-payload n string slice ;
 ERROR: mismatched-terminator n string slice ;
 : read-terminator ( n string slice -- n' string slice ) ;
 
+: (lex-factor) ( n/f string slice/f ch/f -- n'/f string literal )
+    {
+        { char: \" [ read-string ] }
+        { char: \! [ read-exclamation ] }
+        { char: \: [
+            merge-slice-til-whitespace
+            dup strict-upper? strict-upper get and [
+                length swap [ - ] dip f
+                strict-upper off
+            ] [
+                read-colon
+            ] if
+        ] }
+        { char: < [
+            ! FOO: a b <BAR: ;BAR>
+            ! FOO: a b <BAR BAR>
+            ! FOO: a b <asdf>
+            ! FOO: a b <asdf asdf>
+
+            ! if we are in a FOO: and we hit a <BAR or <BAR:
+            ! then end the FOO:
+            [ slice-til-whitespace drop ] dip span-slices
+            dup section-open? [
+                strict-upper get [
+                    length swap [ - ] dip f strict-upper off
+                ] [
+                    read-acute
+                ] if
+            ] when
+        ] }
+        { char: > [
+            [ slice-til-whitespace drop ] dip span-slices
+            dup section-close? [
+                strict-upper get [
+                    length swap [ - ] dip f strict-upper off
+                ] when
+            ] when
+        ] }
+        { char: \[ [ read-bracket ] }
+        { char: \{ [ read-brace ] }
+        { char: \( [ read-paren ] }
+        { char: \s [ read-token-or-whitespace ] }
+        { char: \r [ read-token-or-whitespace ] }
+        { char: \n [ read-token-or-whitespace ] }
+        { f [ f like ] }
+    } case ;
+
 : lex-factor ( n/f string -- n'/f string literal )
     over [
-        skip-whitespace "\"!:[{(<>\s\r\n" slice-til-either {
-            { char: \" [ read-string ] }
-            { char: \! [ read-exclamation ] }
-            { char: \: [
-                merge-slice-til-whitespace
-                dup strict-upper? strict-upper get and [
-                    length swap [ - ] dip f
-                    strict-upper off
-                ] [
-                    read-colon
-                ] if
-            ] }
-            { char: < [
-                ! FOO: a b <BAR: ;BAR>
-                ! FOO: a b <BAR BAR>
-                ! FOO: a b <asdf>
-                ! FOO: a b <asdf asdf>
-
-                ! if we are in a FOO: and we hit a <BAR or <BAR:
-                ! then end the FOO:
-                [ slice-til-whitespace drop ] dip span-slices
-                dup section-open? [
-                    strict-upper get [
-                        length swap [ - ] dip f strict-upper off
-                    ] [
-                        read-acute
-                    ] if
-                ] when
-            ] }
-            { char: > [
-                [ slice-til-whitespace drop ] dip span-slices
-                dup section-close? [
-                    strict-upper get [
-                        length swap [ - ] dip f strict-upper off
-                    ] when
-                ] when
-            ] }
-            { char: \[ [ read-bracket ] }
-            { char: \{ [ read-brace ] }
-            { char: \( [ read-paren ] }
-            { char: \s [ read-token-or-whitespace ] }
-            { char: \r [ read-token-or-whitespace ] }
-            { char: \n [ read-token-or-whitespace ] }
-            { f [ f like ] }
-        } case dup "\\" tail? [ read-backslash ] when
+        skip-whitespace "\"\\!:[{(<>\s\r\n" slice-til-either
+        ! \foo foo\bar \foo{
+        dup char: \\ = [
+            drop
+            ! foo\ so far, could be foo\bar{
+            ! remove the \ and continue til delimiter/eof
+            [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
+            over "\\" head? [
+                drop
+            ] [
+                (lex-factor)
+            ] if
+        ] [
+            (lex-factor)
+        ] if
     ] [
         f
     ] if ; inline
