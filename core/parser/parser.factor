@@ -69,6 +69,9 @@ ERROR: number-expected ;
 : scan-word ( -- word )
     ?scan-token parse-word ;
 
+: scan-syntax-word ( -- word )
+    ?scan-token "\\" ?head drop parse-word ;
+
 : scan-number ( -- number )
     ?scan-token parse-number ;
 

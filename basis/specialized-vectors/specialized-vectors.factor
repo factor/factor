@@ -76,14 +76,14 @@ PRIVATE>
     [ specialized-vector-vocab ] [ '[ _ define-vector ] ] bi
     generate-vocab ;
 
-SYNTAX: SPECIALIZED-VECTORS:
+SYNTAX: \SPECIALIZED-VECTORS:
     ";" [
         parse-c-type
         [ define-array-vocab use-vocab ]
         [ define-vector-vocab use-vocab ] bi
     ] each-token ;
 
-SYNTAX: SPECIALIZED-VECTOR:
+SYNTAX: \SPECIALIZED-VECTOR:
     scan-c-type
     [ define-array-vocab use-vocab ]
     [ define-vector-vocab use-vocab ] bi ;

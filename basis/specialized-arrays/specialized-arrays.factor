@@ -168,10 +168,10 @@ M: c-type-word c-array-type?
 
 M: pointer c-array-type? drop void* c-array-type? ;
 
-SYNTAX: SPECIALIZED-ARRAYS:
+SYNTAX: \SPECIALIZED-ARRAYS:
     ";" [ parse-c-type define-array-vocab use-vocab ] each-token ;
 
-SYNTAX: SPECIALIZED-ARRAY:
+SYNTAX: \SPECIALIZED-ARRAY:
     scan-c-type define-array-vocab use-vocab ;
 
 { "specialized-arrays" "prettyprint" } "specialized-arrays.prettyprint" require-when

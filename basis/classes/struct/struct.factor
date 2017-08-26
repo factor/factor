@@ -378,16 +378,16 @@ PRIVATE>
     dup [ name>> ] map check-duplicate-slots ;
 PRIVATE>
 
-SYNTAX: STRUCT:
+SYNTAX: \STRUCT:
     parse-struct-definition define-struct-class ;
 
-SYNTAX: PACKED-STRUCT:
+SYNTAX: \PACKED-STRUCT:
     parse-struct-definition define-packed-struct-class ;
 
-SYNTAX: UNION-STRUCT:
+SYNTAX: \UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
-SYNTAX: S{
+SYNTAX: \S{
     scan-word dup struct-slots parse-tuple-literal-slots suffix! ;
 
 SYNTAX: S@
@@ -412,7 +412,7 @@ SYNTAX: S@
 
 PRIVATE>
 
-FUNCTOR-SYNTAX: STRUCT:
+FUNCTOR-SYNTAX: \STRUCT:
     scan-param suffix!
     [ 8 <vector> ] append!
     [ parse-struct-slots* ] [ ] while

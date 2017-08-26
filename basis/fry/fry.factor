@@ -145,4 +145,4 @@ M: callable fry ( quot -- quot' )
         ] bi
     ] if-empty ;
 
-SYNTAX: '[ parse-quotation fry append! ;
+SYNTAX: \'[ parse-quotation fry append! ;

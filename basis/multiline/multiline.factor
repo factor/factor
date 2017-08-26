@@ -32,7 +32,7 @@ ERROR: text-found-before-eol string ;
         (parse-here)
     ] "" make but-last ;
 
-SYNTAX: STRING:
+SYNTAX: \STRING:
     scan-new-word
     parse-here 1quotation
     ( -- string ) define-inline ;
@@ -84,7 +84,7 @@ PRIVATE>
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
 
-SYNTAX: HEREDOC:
+SYNTAX: \HEREDOC:
     lexer get {
         [ skip-blank ]
         [ rest-of-line ]
@@ -92,18 +92,18 @@ SYNTAX: HEREDOC:
         [ parse-til-line-begins ]
     } cleave suffix! ;
 
-SYNTAX: [[ "]]" parse-multiline-string suffix! ;
-SYNTAX: [=[ "]=]" parse-multiline-string suffix! ;
-SYNTAX: [==[ "]==]" parse-multiline-string suffix! ;
-SYNTAX: [===[ "]===]" parse-multiline-string suffix! ;
-SYNTAX: [====[ "]====]" parse-multiline-string suffix! ;
-SYNTAX: [=====[ "]=====]" parse-multiline-string suffix! ;
-SYNTAX: [======[ "]======]" parse-multiline-string suffix! ;
+SYNTAX: \[[ "]]" parse-multiline-string suffix! ;
+SYNTAX: \[=[ "]=]" parse-multiline-string suffix! ;
+SYNTAX: \[==[ "]==]" parse-multiline-string suffix! ;
+SYNTAX: \[===[ "]===]" parse-multiline-string suffix! ;
+SYNTAX: \[====[ "]====]" parse-multiline-string suffix! ;
+SYNTAX: \[=====[ "]=====]" parse-multiline-string suffix! ;
+SYNTAX: \[======[ "]======]" parse-multiline-string suffix! ;
 
-SYNTAX: ![[ "]]" parse-multiline-string drop ;
-SYNTAX: ![=[ "]=]" parse-multiline-string drop ;
-SYNTAX: ![==[ "]==]" parse-multiline-string drop ;
-SYNTAX: ![===[ "]===]" parse-multiline-string drop ;
-SYNTAX: ![====[ "]====]" parse-multiline-string drop ;
-SYNTAX: ![=====[ "]=====]" parse-multiline-string drop ;
-SYNTAX: ![======[ "]======]" parse-multiline-string drop ;
+SYNTAX: \![[ "]]" parse-multiline-string drop ;
+SYNTAX: \![=[ "]=]" parse-multiline-string drop ;
+SYNTAX: \![==[ "]==]" parse-multiline-string drop ;
+SYNTAX: \![===[ "]===]" parse-multiline-string drop ;
+SYNTAX: \![====[ "]====]" parse-multiline-string drop ;
+SYNTAX: \![=====[ "]=====]" parse-multiline-string drop ;
+SYNTAX: \![======[ "]======]" parse-multiline-string drop ;

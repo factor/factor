@@ -88,7 +88,7 @@ M: valist assoc-like
 
 INSTANCE: valist assoc
 
-SYNTAX: VA{ \ } [ >valist ] parse-literal ;
+SYNTAX: \VA{ \ } [ >valist ] parse-literal ;
 
 M: valist pprint-delims drop \ VA{ \ } ;
 M: valist >pprint-sequence >alist ;

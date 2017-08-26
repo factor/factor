@@ -73,4 +73,4 @@ INSTANCE: CLASS-array sequence
 
 ;FUNCTOR>
 
-SYNTAX: TUPLE-ARRAY: scan-word define-tuple-array ;
+SYNTAX: \TUPLE-ARRAY: scan-word define-tuple-array ;

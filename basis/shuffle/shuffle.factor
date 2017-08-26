@@ -11,7 +11,7 @@ MACRO: shuffle-effect ( effect -- quot )
     [ [ of '[ _ swap nth ] ] with map ] 2bi
     '[ @ _ cleave ] ;
 
-SYNTAX: shuffle(
+SYNTAX: \shuffle(
     ")" parse-effect suffix! \ shuffle-effect suffix! ;
 
 : tuck ( x y -- y x y ) swap over ; inline deprecated

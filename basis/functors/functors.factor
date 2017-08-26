@@ -51,7 +51,7 @@ M: object (fake-quotations>) , ;
     [ parse-definition* ] dip
     suffix! ;
 
-FUNCTOR-SYNTAX: TUPLE:
+FUNCTOR-SYNTAX: \TUPLE:
     scan-param suffix!
     scan-token {
         { ";" [ tuple suffix! f suffix! ] }
@@ -67,15 +67,15 @@ FUNCTOR-SYNTAX: TUPLE:
 FUNCTOR-SYNTAX: final
     [ last-word make-final ] append! ;
 
-FUNCTOR-SYNTAX: SINGLETON:
+FUNCTOR-SYNTAX: \SINGLETON:
     scan-param suffix!
     \ define-singleton-class suffix! ;
 
-FUNCTOR-SYNTAX: MIXIN:
+FUNCTOR-SYNTAX: \MIXIN:
     scan-param suffix!
     \ define-mixin-class suffix! ;
 
-FUNCTOR-SYNTAX: M:
+FUNCTOR-SYNTAX: \M:
     scan-param suffix!
     scan-param suffix!
     [ create-method-in dup \ method set ] append!
@@ -170,4 +170,4 @@ DEFER: ;FUNCTOR> delimiter
 
 PRIVATE>
 
-SYNTAX: <FUNCTOR: (<FUNCTOR:) define-declared ;
+SYNTAX: \<FUNCTOR: (<FUNCTOR:) define-declared ;

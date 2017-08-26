@@ -14,7 +14,7 @@ IN: eval
 : eval ( str effect -- )
     [ (eval) ] with-file-vocabs ; inline
 
-SYNTAX: eval( \ eval parse-call-paren ;
+SYNTAX: \eval( \ eval parse-call-paren ;
 
 : (eval>string) ( str -- output )
     [
