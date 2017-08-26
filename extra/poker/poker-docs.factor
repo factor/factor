@@ -6,7 +6,7 @@ HELP: best-holdem-hand
 { $description "Creates a new poker hand containing the best possible combination of the cards specified in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: kernel poker prettyprint ;"
-        "HAND{ AS KD JC KH 2D 2S KC } best-holdem-hand drop value>hand-name ."
+        "hand{ AS KD JC KH 2D 2S KC } best-holdem-hand drop value>hand-name ."
         "\"Full House\""
     }
 } ;

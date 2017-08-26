@@ -147,18 +147,18 @@ ERROR: unsupported-endian-type endian slot ;
     [ compute-struct-offsets ] [ drop 1 ]
     (define-struct-class) ;
 
-SYNTAX: LE-STRUCT:
+SYNTAX: \LE-STRUCT:
     parse-struct-definition
     little-endian define-endian-struct-class ;
 
-SYNTAX: BE-STRUCT:
+SYNTAX: \BE-STRUCT:
     parse-struct-definition
     big-endian define-endian-struct-class ;
 
-SYNTAX: LE-PACKED-STRUCT:
+SYNTAX: \LE-PACKED-STRUCT:
     parse-struct-definition
     little-endian define-endian-packed-struct-class ;
 
-SYNTAX: BE-PACKED-STRUCT:
+SYNTAX: \BE-PACKED-STRUCT:
     parse-struct-definition
     big-endian define-endian-packed-struct-class ;

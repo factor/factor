@@ -2,4 +2,4 @@
 USING: lexer sequences parser ;
 IN: qw
 
-SYNTAX: qw{ "}" parse-tokens suffix! ;
+SYNTAX: \qw{ "}" parse-tokens suffix! ;

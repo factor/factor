@@ -607,7 +607,7 @@ PRIVATE>
 
 ERROR: parse-failed input word ;
 
-SYNTAX: PEG:
+SYNTAX: \PEG:
     [let
         (:) :> ( word def effect )
         [

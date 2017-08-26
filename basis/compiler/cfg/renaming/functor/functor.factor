@@ -85,4 +85,4 @@ insn-classes get [ insn-temp-slots empty? ] reject [
 
 ;FUNCTOR>
 
-SYNTAX: RENAMING: scan-token scan-object scan-object scan-object define-renaming ;
+SYNTAX: \RENAMING: scan-token scan-object scan-object scan-object define-renaming ;

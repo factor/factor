@@ -14,7 +14,7 @@ GENERIC: variable-setter ( word -- word' )
 M: variable variable-setter "variable-setter" word-prop ;
 M: local-reader variable-setter "local-writer" word-prop ;
 
-SYNTAX: set:
+SYNTAX: \set:
     scan-object variable-setter suffix! ;
 
 : [variable-getter] ( variable -- quot )
@@ -34,7 +34,7 @@ SYNTAX: set:
 : define-variable ( word -- )
     dup [ [variable-getter] ] [ [variable-setter] ] bi (define-variable) ;
 
-SYNTAX: VAR:
+SYNTAX: \VAR:
     scan-new-word define-variable ;
 
 M: variable definer drop \ VAR: f ;
@@ -58,7 +58,7 @@ PREDICATE: typed-variable < variable
         [ initial-value drop swap set-global ]
     } 2cleave (define-variable) ;
 
-SYNTAX: TYPED-VAR:
+SYNTAX: \TYPED-VAR:
     scan-new-word scan-object define-typed-variable ;
 
 M: typed-variable definer drop \ TYPED-VAR: f ;
@@ -77,7 +77,7 @@ PREDICATE: global-variable < variable
 : define-global ( word -- )
     global-box new [ [global-getter] ] [ [global-setter] ] bi (define-variable) ;
 
-SYNTAX: GLOBAL:
+SYNTAX: \GLOBAL:
     scan-new-word define-global ;
 
 M: global-variable definer drop \ GLOBAL: f ;
@@ -91,7 +91,7 @@ INTERSECTION: typed-global-variable
     [ [ [global-getter] ] dip [typed-getter] ]
     [ [ [global-setter] ] dip [typed-setter] ] 2bi (define-variable) ;
 
-SYNTAX: TYPED-GLOBAL:
+SYNTAX: \TYPED-GLOBAL:
     scan-new-word scan-object define-typed-global ;
 
 M: typed-global-variable definer drop \ TYPED-GLOBAL: f ;

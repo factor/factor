@@ -49,7 +49,7 @@ reset-gl-function-number-counter
 : gl-function-calling-convention ( -- symbol )
     os windows? [ stdcall ] [ cdecl ] if ;
 
-SYNTAX: GL-FUNCTION:
+SYNTAX: \GL-FUNCTION:
     gl-function-calling-convention
     scan-function-name
     "{" expect "}" parse-tokens over suffix

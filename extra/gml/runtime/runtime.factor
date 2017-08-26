@@ -37,9 +37,9 @@ FROM: kernel.private => declare ;
     scan-word \ (exec) create-method-in
     swap call( -- quot ) [ is-gml ] prepend ;
 
-SYNTAX: EXEC: [ parse-definition ] (EXEC:) define ;
+SYNTAX: \EXEC: [ parse-definition ] (EXEC:) define ;
 
-SYNTAX: EXEC:: [ [ parse-definition ] parse-locals-definition drop ] (EXEC:) define ;
+SYNTAX: \EXEC:: [ [ parse-definition ] parse-locals-definition drop ] (EXEC:) define ;
 
 >>
 
@@ -53,7 +53,7 @@ TUPLE: gml-exec-name < identity-tuple name ;
 
 MEMO: >gml-exec-name ( string -- name ) >gml-name \ gml-exec-name boa ;
 
-SYNTAX: exec" lexer get skip-blank parse-string >gml-exec-name suffix! ;
+SYNTAX: \exec" lexer get skip-blank parse-string >gml-exec-name suffix! ;
 
 ERROR: unbound-name { name gml-name } ;
 
@@ -191,10 +191,10 @@ global-dictionary [ H{ } clone ] initialize
 : (GML:) ( -- word name effect def )
     scan-gml-name scan-effect parse-definition ;
 
-SYNTAX: GML:
+SYNTAX: \GML:
     (GML:) define-gml-primitive ;
 
-SYNTAX: GML::
+SYNTAX: \GML::
     [let
         scan-gml-name :> ( word name )
         word [ parse-definition ] parse-locals-definition :> ( word def effect )

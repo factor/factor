@@ -181,7 +181,7 @@ M: persistent-vector equal?
 : >persistent-vector ( seq -- pvec )
     T{ persistent-vector } like ;
 
-SYNTAX: PV{ \ } [ >persistent-vector ] parse-literal ;
+SYNTAX: \PV{ \ } [ >persistent-vector ] parse-literal ;
 
 M: persistent-vector pprint-delims drop \ PV{ \ } ;
 M: persistent-vector >pprint-sequence ;

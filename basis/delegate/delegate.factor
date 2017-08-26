@@ -109,11 +109,11 @@ PRIVATE>
 : define-consult ( consultation -- )
     [ register-consult ] [ consult-methods ] bi ;
 
-SYNTAX: CONSULT:
+SYNTAX: \CONSULT:
     scan-word scan-word parse-definition <consultation>
     [ save-location ] [ define-consult ] bi ;
 
-SYNTAX: BROADCAST:
+SYNTAX: \BROADCAST:
     scan-word scan-word parse-definition <broadcast>
     [ save-location ] [ define-consult ] bi ;
 
@@ -176,7 +176,7 @@ PRIVATE>
         [ initialize-protocol-props ] 2tri
     ] 2bi ;
 
-SYNTAX: PROTOCOL:
+SYNTAX: \PROTOCOL:
     scan-new-word parse-definition define-protocol ;
 
 PREDICATE: protocol < word protocol-words ; ! Subclass of symbol?
@@ -190,7 +190,7 @@ M: protocol definer drop \ PROTOCOL: \ ; ;
 
 M: protocol group-words protocol-words ;
 
-SYNTAX: SLOT-PROTOCOL:
+SYNTAX: \SLOT-PROTOCOL:
     scan-new-word ";"
     [ [ reader-word ] [ writer-word ] bi 2array ]
     map-tokens concat define-protocol ;

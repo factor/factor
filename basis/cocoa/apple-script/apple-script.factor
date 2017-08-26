@@ -11,6 +11,6 @@ IN: cocoa.apple-script
     <NSString> -> initWithSource: -> autorelease
     f -> executeAndReturnError: drop ;
 
-SYNTAX: APPLESCRIPT:
+SYNTAX: \APPLESCRIPT:
     scan-new-word scan-object
     [ run-apple-script ] curry ( -- ) define-declared ;

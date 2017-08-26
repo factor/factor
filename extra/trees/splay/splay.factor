@@ -139,7 +139,7 @@ PRIVATE>
 : >splay ( assoc -- tree )
     T{ splay f f 0 } assoc-clone-like ;
 
-SYNTAX: SPLAY{
+SYNTAX: \SPLAY{
     \ } [ >splay ] parse-literal ;
 
 M: splay assoc-like

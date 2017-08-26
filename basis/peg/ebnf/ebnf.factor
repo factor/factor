@@ -537,7 +537,7 @@ ERROR: could-not-parse-ebnf ;
 
 PRIVATE>
 
-SYNTAX: EBNF:
+SYNTAX: \EBNF:
     reset-tokenizer
     scan-new-word dup scan-object
     ebnf>quot swapd
@@ -549,13 +549,13 @@ SYNTAX: EBNF:
     ebnf>quot nip
     suffix! \ call suffix! reset-tokenizer ;
 
-SYNTAX: EBNF[[ "]]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: EBNF[=[ "]=]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: EBNF[==[ "]==]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: EBNF[===[ "]===]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: EBNF[====[ "]====]" parse-multiline-string define-inline-ebnf ;
+SYNTAX: \EBNF[[ "]]" parse-multiline-string define-inline-ebnf ;
+SYNTAX: \EBNF[=[ "]=]" parse-multiline-string define-inline-ebnf ;
+SYNTAX: \EBNF[==[ "]==]" parse-multiline-string define-inline-ebnf ;
+SYNTAX: \EBNF[===[ "]===]" parse-multiline-string define-inline-ebnf ;
+SYNTAX: \EBNF[====[ "]====]" parse-multiline-string define-inline-ebnf ;
 
-SYNTAX: EBNF-PARSER:
+SYNTAX: \EBNF-PARSER:
     reset-tokenizer
     scan-new-word
     scan-object parse-ebnf main of '[ _ ]

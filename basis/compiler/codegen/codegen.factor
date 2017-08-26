@@ -117,7 +117,7 @@ M: ##epilogue generate-insn
         [ insn-slot-quot ] map cleave>quot
     ] dip suffix ;
 
-SYNTAX: CODEGEN:
+SYNTAX: \CODEGEN:
     scan-word [ \ generate-insn create-method-in ] keep scan-word
     codegen-method-body define ;
 
@@ -268,7 +268,7 @@ CODEGEN: ##reload %reload
 ! Conditional branches
 <<
 
-SYNTAX: CONDITIONAL:
+SYNTAX: \CONDITIONAL:
     scan-word [ \ generate-conditional-insn create-method-in ] keep scan-word
     codegen-method-body define ;
 

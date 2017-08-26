@@ -229,13 +229,13 @@ HOOK: system-alert ui-backend ( caption text -- )
 : define-window ( word attributes quot -- )
     '[ [ f _ clone @ open-window ] with-ui ] ( -- ) define-declared ;
 
-SYNTAX: WINDOW:
+SYNTAX: \WINDOW:
     scan-new-word
     world-attributes parse-window-attributes
     parse-definition
     define-window ;
 
-SYNTAX: MAIN-WINDOW:
+SYNTAX: \MAIN-WINDOW:
     scan-new-word
     world-attributes parse-window-attributes
     parse-definition

@@ -4,15 +4,15 @@ USING: alien.parser cuda.libraries fry kernel lexer namespaces
 parser ;
 IN: cuda.syntax
 
-SYNTAX: CUDA-LIBRARY:
+SYNTAX: \CUDA-LIBRARY:
     scan-token scan-word scan-object
     '[ _ _ add-cuda-library ]
     [ current-cuda-library set-global ] bi ;
 
-SYNTAX: CUDA-FUNCTION:
+SYNTAX: \CUDA-FUNCTION:
     scan-token [ create-word-in current-cuda-library get ] keep
     scan-c-args define-cuda-function ;
 
-SYNTAX: CUDA-GLOBAL:
+SYNTAX: \CUDA-GLOBAL:
     scan-token [ create-word-in current-cuda-library get ] keep
     define-cuda-global ;

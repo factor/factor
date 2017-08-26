@@ -35,7 +35,7 @@ PRIVATE>
     [ [ [ dup ] 2dip [descriptive] ] keep define-declared ]
     3bi ;
 
-SYNTAX: DESCRIPTIVE: (:) define-descriptive ;
+SYNTAX: \DESCRIPTIVE: (:) define-descriptive ;
 
 PREDICATE: descriptive < word
     "descriptive-definition" word-prop >boolean ;
@@ -45,7 +45,7 @@ M: descriptive definer drop \ DESCRIPTIVE: \ ; ;
 M: descriptive definition
     "descriptive-definition" word-prop ;
 
-SYNTAX: DESCRIPTIVE:: (::) define-descriptive ;
+SYNTAX: \DESCRIPTIVE:: (::) define-descriptive ;
 
 INTERSECTION: descriptive-lambda descriptive lambda-word ;
 

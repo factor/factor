@@ -25,7 +25,7 @@ PREDICATE: generated-xml-error < tuple class-of "xml-error-class" word-prop ;
         ]
     } 3cleave ;
 
-SYNTAX: XML-ERROR:
+SYNTAX: \XML-ERROR:
     parse-tuple-definition pick save-location
     define-xml-error-class ;
 

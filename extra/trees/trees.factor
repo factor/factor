@@ -409,7 +409,7 @@ PRIVATE>
 : >tree ( assoc -- tree )
     T{ tree f f 0 } assoc-clone-like ;
 
-SYNTAX: TREE{
+SYNTAX: \TREE{
     \ } [ >tree ] parse-literal ;
 
 <PRIVATE

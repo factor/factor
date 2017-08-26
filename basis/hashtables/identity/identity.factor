@@ -41,7 +41,7 @@ M: identity-hashtable assoc-like
 
 M: identity-hashtable new-assoc drop <identity-hashtable> ;
 
-SYNTAX: IH{ \ } [ >identity-hashtable ] parse-literal ;
+SYNTAX: \IH{ \ } [ >identity-hashtable ] parse-literal ;
 
 { "hashtables.identity" "prettyprint" } "hashtables.identity.prettyprint" require-when
 { "hashtables.identity" "mirrors" } "hashtables.identity.mirrors" require-when

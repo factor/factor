@@ -29,6 +29,6 @@ SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs
 
 PRIVATE>
 
-SYNTAX: CATEGORY: parse-category define-category ;
+SYNTAX: \CATEGORY: parse-category define-category ;
 
-SYNTAX: CATEGORY-NOT: parse-category define-not-category ;
+SYNTAX: \CATEGORY-NOT: parse-category define-not-category ;

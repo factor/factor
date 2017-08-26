@@ -352,7 +352,7 @@ PRIVATE>
     ]
     [ "vertex-format-attributes" set-word-prop ] 2bi ;
 
-SYNTAX: VERTEX-FORMAT:
+SYNTAX: \VERTEX-FORMAT:
     scan-new-class parse-definition
     [ first4 vertex-attribute boa ] map
     define-vertex-format ;
@@ -361,7 +361,7 @@ SYNTAX: VERTEX-FORMAT:
     vertex-format-attributes [ vertex-attribute>struct-slot ] map
     define-struct-class ;
 
-SYNTAX: VERTEX-STRUCT:
+SYNTAX: \VERTEX-STRUCT:
     scan-new-class scan-word define-vertex-struct ;
 
 TUPLE: vertex-array-object < gpu-object
@@ -544,9 +544,9 @@ TUPLE: feedback-format
 
 PRIVATE>
 
-SYNTAX: feedback-format:
+SYNTAX: \feedback-format:
     scan-object feedback-format boa suffix! ;
-SYNTAX: geometry-shader-vertices-out:
+SYNTAX: \geometry-shader-vertices-out:
     scan-object geometry-shader-vertices-out boa suffix! ;
 
 TYPED:: refresh-program ( program: program -- )
@@ -585,7 +585,7 @@ TYPED: <program-instance> ( program: program -- instance: program-instance )
 
 PRIVATE>
 
-SYNTAX: GLSL-SHADER:
+SYNTAX: \GLSL-SHADER:
     scan-new dup
     dup old-instances [
         scan-word
@@ -597,7 +597,7 @@ SYNTAX: GLSL-SHADER:
     over reset-generic
     define-constant ;
 
-SYNTAX: GLSL-SHADER-FILE:
+SYNTAX: \GLSL-SHADER-FILE:
     scan-new dup
     dup old-instances [
         scan-word execute( -- kind )
@@ -609,7 +609,7 @@ SYNTAX: GLSL-SHADER-FILE:
     over reset-generic
     define-constant ;
 
-SYNTAX: GLSL-PROGRAM:
+SYNTAX: \GLSL-PROGRAM:
     scan-new dup
     dup old-instances [
         f

@@ -4,11 +4,11 @@ USING: combinators combinators.smart fry kernel lexer quotations
 sequences sequences.generalizations slots words ;
 IN: slots.syntax
 
-SYNTAX: slots[
+SYNTAX: \slots[
     "]" [ reader-word 1quotation ] map-tokens
     '[ _ cleave ] append! ;
 
-SYNTAX: slots{
+SYNTAX: \slots{
     "}" [ reader-word 1quotation ] map-tokens
     '[ [ _ cleave ] output>array ] append! ;
 
@@ -18,23 +18,23 @@ SYNTAX: slots{
 : writer-word<< ( name -- word )
     ">>" prepend "accessors" lookup-word ;
 
-SYNTAX: set-slots[
+SYNTAX: \set-slots[
     "]" [ >>writer-word 1quotation ] map-tokens
     '[ _ spread ] append! ;
 
-SYNTAX: set-slots{
+SYNTAX: \set-slots{
     "}" [ >>writer-word 1quotation ] map-tokens
     [ length ] [ ] bi
     '[ _ firstn _ spread ] append! ;
 
-SYNTAX: copy-slots{
+SYNTAX: \copy-slots{
     "}" [
         [ reader-word 1quotation ]
         [ writer-word<< 1quotation ] bi append
     ] map-tokens
     '[ swap _ cleave ] append! ;
 
-SYNTAX: get[ postpone: slots[ ;
-SYNTAX: get{ postpone: slots{ ;
-SYNTAX: set[ postpone: set-slots[ ;
-SYNTAX: set{ postpone: set-slots{ ;
+SYNTAX: \get[ postpone: slots[ ;
+SYNTAX: \get{ postpone: slots{ ;
+SYNTAX: \set[ postpone: set-slots[ ;
+SYNTAX: \set{ postpone: set-slots{ ;

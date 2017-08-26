@@ -9,7 +9,7 @@ FROM: mongodb.tuple.persistent => assoc>tuple ;
 
 IN: mongodb.tuple
 
-SYNTAX: MDBTUPLE:
+SYNTAX: \MDBTUPLE:
     parse-tuple-definition
     mdb-check-slots
     define-tuple-class ;

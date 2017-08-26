@@ -16,7 +16,7 @@ SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
 
 SYNTAX: ?-> scan-token dup remember-send suffix! \ ?send suffix! ;
 
-SYNTAX: SEL:
+SYNTAX: \SEL:
     scan-token
     [ remember-send ]
     [ <selector> suffix! \ cocoa.messages:selector suffix! ] bi ;
@@ -34,9 +34,9 @@ frameworks [ V{ } clone ] initialize
 
 [ frameworks get [ load-framework ] each ] "cocoa" add-startup-hook
 
-SYNTAX: FRAMEWORK: scan-token [ load-framework ] [ frameworks get push ] bi ;
+SYNTAX: \FRAMEWORK: scan-token [ load-framework ] [ frameworks get push ] bi ;
 
-SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
+SYNTAX: \IMPORT: scan-token [ ] import-objc-class ;
 
 "Importing Cocoa classes..." print
 

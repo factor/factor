@@ -3,7 +3,7 @@
 USING: alien.syntax alien.parser words x11.io sequences kernel ;
 IN: x11.syntax
 
-SYNTAX: X-FUNCTION:
+SYNTAX: \X-FUNCTION:
     (FUNCTION:) make-function
     [ \ awaken-event-loop suffix ] dip
     define-declared ;

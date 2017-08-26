@@ -17,5 +17,5 @@ TUPLE: promise quot forced? value ;
 : make-lazy-quot ( quot effect -- quot )
     in>> length '[ _ _ ncurry <promise> ] ;
 
-SYNTAX: LAZY:
+SYNTAX: \LAZY:
     (:) [ make-lazy-quot ] keep define-declared ;

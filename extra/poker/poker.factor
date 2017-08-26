@@ -225,5 +225,5 @@ ERROR: bad-suit-symbol ch ;
 : string>hand-name ( string -- string' )
     string>value value>hand-name ;
 
-SYNTAX: HAND{
+SYNTAX: \hand{
     "}" [ card> ] map-tokens suffix! ;

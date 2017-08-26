@@ -3,5 +3,5 @@
 USING: ui.gadgets prettyprint.backend prettyprint.custom ;
 IN: ui.gadgets.prettyprint
 
-! Don't print gadgets with RECT: syntax
+! Don't print gadgets with rect: syntax
 M: gadget pprint* pprint-tuple ;

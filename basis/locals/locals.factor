@@ -13,15 +13,15 @@ SYNTAX: [| parse-lambda append! ;
 
 SYNTAX: [let parse-let append! ;
 
-SYNTAX: :: (::) define-declared ;
+SYNTAX: \:: (::) define-declared ;
 
-SYNTAX: M:: (M::) define ;
+SYNTAX: \M:: (M::) define ;
 
-SYNTAX: MACRO:: (::) define-macro ;
+SYNTAX: \MACRO:: (::) define-macro ;
 
-SYNTAX: MEMO:: (::) define-memoized ;
+SYNTAX: \MEMO:: (::) define-memoized ;
 
-SYNTAX: IDENTITY-MEMO:: (::) define-identity-memoized ;
+SYNTAX: \IDENTITY-MEMO:: (::) define-identity-memoized ;
 
 {
     "locals.macros"

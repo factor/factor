@@ -536,7 +536,7 @@ PRIVATE>
 : define-uniform-tuple ( class superclass uniforms -- )
     (define-uniform-tuple) ; inline
 
-SYNTAX: UNIFORM-TUPLE:
+SYNTAX: \UNIFORM-TUPLE:
     parse-uniform-tuple-definition define-uniform-tuple ;
 
 <PRIVATE

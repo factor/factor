@@ -6,37 +6,37 @@ strings.parser vocabs words ;
 << "alien.arrays" require >> ! needed for bootstrap
 IN: alien.syntax
 
-SYNTAX: DLL" lexer get skip-blank parse-string dlopen suffix! ;
+SYNTAX: \DLL" lexer get skip-blank parse-string dlopen suffix! ;
 
-SYNTAX: ALIEN: 16 scan-base <alien> suffix! ;
+SYNTAX: \ALIEN: 16 scan-base <alien> suffix! ;
 
-SYNTAX: BAD-ALIEN <bad-alien> suffix! ;
+SYNTAX: \BAD-ALIEN <bad-alien> suffix! ;
 
-SYNTAX: LIBRARY: scan-token current-library set ;
+SYNTAX: \LIBRARY: scan-token current-library set ;
 
-SYNTAX: FUNCTION:
+SYNTAX: \FUNCTION:
     (FUNCTION:) make-function define-inline ;
 
-SYNTAX: FUNCTION-ALIAS:
+SYNTAX: \FUNCTION-ALIAS:
     scan-token create-function
     (FUNCTION:) (make-function) define-inline ;
 
-SYNTAX: CALLBACK:
+SYNTAX: \CALLBACK:
     (CALLBACK:) define-inline ;
 
-SYNTAX: TYPEDEF:
+SYNTAX: \TYPEDEF:
     scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
-SYNTAX: ENUM:
+SYNTAX: \ENUM:
     parse-enum (define-enum) ;
 
-SYNTAX: C-TYPE:
+SYNTAX: \C-TYPE:
     void CREATE-C-TYPE typedef ;
 
-SYNTAX: &:
+SYNTAX: \&:
     scan-token current-library get '[ _ _ address-of ] append! ;
 
-SYNTAX: C-GLOBAL: scan-c-type scan-new-word define-global ;
+SYNTAX: \C-GLOBAL: scan-c-type scan-new-word define-global ;
 
-SYNTAX: pointer:
+SYNTAX: \pointer:
     scan-c-type <pointer> suffix! ;

@@ -17,7 +17,7 @@ SYMBOL: _
 : define-match-vars ( seq -- )
     [ define-match-var ] each ;
 
-SYNTAX: MATCH-VARS: ! vars ...
+SYNTAX: \MATCH-VARS: ! vars ...
     ";" [ define-match-var ] each-token ;
 
 PREDICATE: match-var < word "match-var" word-prop ;

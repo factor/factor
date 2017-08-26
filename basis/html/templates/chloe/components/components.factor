@@ -31,7 +31,7 @@ M: tuple-class component-tag ( tag class -- )
     [ compile-component-attrs ] 2bi
     render-quot [code] ;
 
-SYNTAX: COMPONENT:
+SYNTAX: \COMPONENT:
     scan-word
     [ name>> ] [ '[ _ component-tag ] ] bi
     define-chloe-tag ;

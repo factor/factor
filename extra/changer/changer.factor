@@ -8,4 +8,4 @@ MACRO: inline-changer ( name -- quot' )
     [ "accessors" lookup-word 1quotation ] bi@
     '[ over [ [ @ ] dip call ] dip swap @ ] ;
 
-SYNTAX: change: scan-token '[ _ inline-changer ] append! ;
+SYNTAX: \change: scan-token '[ _ inline-changer ] append! ;

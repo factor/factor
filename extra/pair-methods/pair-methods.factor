@@ -39,7 +39,7 @@ ERROR: no-pair-method a b generic ;
 : (PAIR-GENERIC:) ( -- )
     scan-new-generic scan-effect define-pair-generic ;
 
-SYNTAX: PAIR-GENERIC: (PAIR-GENERIC:) ;
+SYNTAX: \PAIR-GENERIC: (PAIR-GENERIC:) ;
 
 : define-pair-method ( a b pair-generic definition -- )
     [ 2array ] 2dip swap
@@ -54,4 +54,4 @@ SYNTAX: PAIR-GENERIC: (PAIR-GENERIC:) ;
         ?swap scan-word parse-definition
     ] keep ?prefix-swap define-pair-method ;
 
-SYNTAX: PAIR-M: (PAIR-M:) ;
+SYNTAX: \PAIR-M: (PAIR-M:) ;

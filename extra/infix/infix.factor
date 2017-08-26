@@ -139,4 +139,4 @@ SYNTAX: [infix
 
 PRIVATE>
 
-SYNTAX: INFIX:: (INFIX::) define-declared ;
+SYNTAX: \INFIX:: (INFIX::) define-declared ;

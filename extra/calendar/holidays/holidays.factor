@@ -7,14 +7,14 @@ IN: calendar.holidays
 SINGLETONS: all world commonwealth-of-nations ;
 
 <<
-SYNTAX: HOLIDAY:
+SYNTAX: \HOLIDAY:
     scan-new-word
     dup "holiday" word-prop [
         dup H{ } clone "holiday" set-word-prop
     ] unless
     parse-definition ( timestamp/n -- timestamp ) define-declared ;
 
-SYNTAX: HOLIDAY-NAME:
+SYNTAX: \HOLIDAY-NAME:
     [let scan-word "holiday" word-prop :> holidays scan-word :> name scan-object :> value
     value name holidays set-at ] ;
 >>

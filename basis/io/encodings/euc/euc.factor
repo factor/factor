@@ -63,6 +63,6 @@ SYMBOL: euc-table
 
 PRIVATE>
 
-SYNTAX: EUC:
+SYNTAX: \EUC:
     ! EUC: euc-kr "vocab:io/encodings/korean/cp949.txt"
     scan-new-class scan-object define-euc ;

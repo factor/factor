@@ -79,7 +79,7 @@ M: game-world apply-world-attributes
 : define-attributes-word ( word tuple -- )
     [ name>> "-attributes" append create-word-in ] dip define-constant ;
 
-SYNTAX: GAME:
+SYNTAX: \GAME:
     scan-new-word
     game-attributes parse-window-attributes
     2dup define-attributes-word

@@ -21,7 +21,7 @@ M: tip set-where loc<< ;
 
 : add-tip ( tip -- ) tips get push ;
 
-SYNTAX: TIP:
+SYNTAX: \TIP:
     parse-array-def <tip>
     [ save-location ] [ add-tip ] bi ;
 

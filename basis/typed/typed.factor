@@ -160,9 +160,9 @@ PRIVATE>
     [ drop "typed-def" set-word-prop ]
     [ 2drop "typed-word" word-prop set-last-word ] 3tri ;
 
-SYNTAX: TYPED:
+SYNTAX: \TYPED:
     (:) define-typed ;
-SYNTAX: TYPED::
+SYNTAX: \TYPED::
     (::) define-typed ;
 
 USE: vocabs.loader

@@ -53,7 +53,7 @@ M: persistent-hash hashcode* nip assoc-size ;
 
 M: persistent-hash clone ;
 
-SYNTAX: PH{ \ } [ >persistent-hash ] parse-literal ;
+SYNTAX: \PH{ \ } [ >persistent-hash ] parse-literal ;
 
 M: persistent-hash pprint-delims drop \ PH{ \ } ;
 M: persistent-hash >pprint-sequence >alist ;

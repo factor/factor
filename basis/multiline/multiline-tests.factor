@@ -73,7 +73,7 @@ xyz
 
 /*
 <<
-SYNTAX: MULTILINE-LITERAL: parse-here suffix! ;
+SYNTAX: \MULTILINE-LITERAL: parse-here suffix! ;
 >>
 
 { { "bar" } }

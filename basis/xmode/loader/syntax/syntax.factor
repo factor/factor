@@ -10,7 +10,7 @@ IN: xmode.loader.syntax
 : (parse-rule-tag) ( rule-set tag specs class -- )
     new swap init-from-tag swap add-rule ; inline
 
-SYNTAX: RULE:
+SYNTAX: \RULE:
     scan-token scan-word scan-word [
         [ parse-definition call( -- ) ] { } make
         swap [ (parse-rule-tag) ] 2curry

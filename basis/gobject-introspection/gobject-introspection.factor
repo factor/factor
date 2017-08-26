@@ -53,17 +53,17 @@ M: gir-not-found summary
 
 PRIVATE>
 
-SYNTAX: GIR: scan-token define-gir-vocab ;
+SYNTAX: \GIR: scan-token define-gir-vocab ;
 
-SYNTAX: IMPLEMENT-STRUCTS:
+SYNTAX: \IMPLEMENT-STRUCTS:
     ";" parse-tokens
     implement-structs [ swap append! ] change-global ;
 
-SYNTAX: FOREIGN-ATOMIC-TYPE:
+SYNTAX: \FOREIGN-ATOMIC-TYPE:
     scan-token scan-object swap register-atomic-type ;
 
-SYNTAX: FOREIGN-ENUM-TYPE:
+SYNTAX: \FOREIGN-ENUM-TYPE:
     scan-token scan-object swap register-enum-type ;
 
-SYNTAX: FOREIGN-RECORD-TYPE:
+SYNTAX: \FOREIGN-RECORD-TYPE:
     scan-token scan-object swap register-record-type ;

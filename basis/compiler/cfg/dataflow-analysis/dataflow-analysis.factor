@@ -133,8 +133,8 @@ INSTANCE: name backward-analysis
 
 PRIVATE>
 
-SYNTAX: FORWARD-ANALYSIS:
+SYNTAX: \FORWARD-ANALYSIS:
     scan-token [ define-analysis ] [ define-forward-analysis ] bi ;
 
-SYNTAX: BACKWARD-ANALYSIS:
+SYNTAX: \BACKWARD-ANALYSIS:
     scan-token [ define-analysis ] [ define-backward-analysis ] bi ;

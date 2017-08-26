@@ -49,5 +49,5 @@ PRIVATE>
 : free-to-pool ( object -- )
     dup class-of class-pool pool-free ;
 
-SYNTAX: POOL:
+SYNTAX: \POOL:
     scan-word scan-word '[ _ swap <pool> ] [ swap set-class-pool ] bi ;

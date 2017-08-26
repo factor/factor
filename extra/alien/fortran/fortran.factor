@@ -440,15 +440,15 @@ MACRO: fortran-invoke ( return library function parameters -- quot )
     return library function parameters return [ c:void ] unless* parse-arglist
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
-SYNTAX: SUBROUTINE:
+SYNTAX: \SUBROUTINE:
     f current-library get scan-token ")" parse-tokens
     [ "()" subseq? ] reject define-fortran-function ;
 
-SYNTAX: FUNCTION:
+SYNTAX: \FUNCTION:
     scan-token current-library get scan-token ")" parse-tokens
     [ "()" subseq? ] reject define-fortran-function ;
 
-SYNTAX: LIBRARY:
+SYNTAX: \LIBRARY:
     scan-token
     [ current-library set ]
     [ set-fortran-abi ] bi ;

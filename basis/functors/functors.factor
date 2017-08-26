@@ -82,7 +82,7 @@ FUNCTOR-SYNTAX: \M:
     parse-definition*
     \ define* suffix! ;
 
-FUNCTOR-SYNTAX: C:
+FUNCTOR-SYNTAX: \C:
     scan-param suffix!
     scan-param [
         suffix!
@@ -90,31 +90,31 @@ FUNCTOR-SYNTAX: C:
     ] keep suffix! \ boa-effect suffix!
     \ define-declared* suffix! ;
 
-FUNCTOR-SYNTAX: :
+FUNCTOR-SYNTAX: \:
     scan-param suffix!
     parse-declared*
     \ define-declared* suffix! ;
 
-FUNCTOR-SYNTAX: SYMBOL:
+FUNCTOR-SYNTAX: \SYMBOL:
     scan-param suffix!
     \ define-symbol suffix! ;
 
-FUNCTOR-SYNTAX: SYNTAX:
+FUNCTOR-SYNTAX: \SYNTAX:
     scan-param suffix!
     parse-definition*
     \ define-syntax suffix! ;
 
-FUNCTOR-SYNTAX: INSTANCE:
+FUNCTOR-SYNTAX: \INSTANCE:
     scan-param suffix!
     scan-param suffix!
     \ add-mixin-instance suffix! ;
 
-FUNCTOR-SYNTAX: GENERIC:
+FUNCTOR-SYNTAX: \GENERIC:
     scan-param suffix!
     scan-effect suffix!
     \ define-simple-generic* suffix! ;
 
-FUNCTOR-SYNTAX: MACRO:
+FUNCTOR-SYNTAX: \MACRO:
     scan-param suffix!
     parse-declared*
     \ define-macro suffix! ;

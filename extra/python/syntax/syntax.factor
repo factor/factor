@@ -61,12 +61,12 @@ SYMBOL: current-context
 
 PRIVATE>
 
-SYNTAX: PY-FROM: [
+SYNTAX: \PY-FROM: [
     current-context get f add-function
 ] scan-definitions ; inline
 
-SYNTAX: PY-QUALIFIED-FROM: [
+SYNTAX: \PY-QUALIFIED-FROM: [
     current-context get t add-function
 ] scan-definitions ; inline
 
-SYNTAX: PY-METHODS: [ add-method ] scan-definitions ; inline
+SYNTAX: \PY-METHODS: [ add-method ] scan-definitions ; inline

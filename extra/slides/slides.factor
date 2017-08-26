@@ -113,7 +113,7 @@ TUPLE: slides < book ;
 : strip-tease ( data -- seq )
     first3 2 over length [a,b] [ head 3array ] with with with map ;
 
-SYNTAX: STRIP-TEASE:
+SYNTAX: \STRIP-TEASE:
     parse-definition strip-tease append! ;
 
 \ slides H{

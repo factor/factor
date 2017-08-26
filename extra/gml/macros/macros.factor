@@ -27,7 +27,7 @@ SYMBOL: current-macro
 MACRO:: log-euler-op ( class def inputs -- quot )
     class inputs def inputs '[ [ current-macro get [ _ boa save-euler-op ] [ _ ndrop ] if ] _ _ nbi ] ;
 
-SYNTAX: LOG-GML:
+SYNTAX: \LOG-GML:
     [let
         (GML:) :> ( word name effect def )
 

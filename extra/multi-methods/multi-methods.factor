@@ -224,7 +224,7 @@ M: no-method error.
     ] if ;
 
 ! Syntax
-SYNTAX: GENERIC: scan-new-word scan-effect define-generic ;
+SYNTAX: \GENERIC: scan-new-word scan-effect define-generic ;
 
 : parse-method ( -- quot classes generic )
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
@@ -237,10 +237,10 @@ SYNTAX: GENERIC: scan-new-word scan-effect define-generic ;
 
 : (METHOD:) ( -- method def ) scan-new-method parse-definition ;
 
-SYNTAX: METHOD: (METHOD:) define ;
+SYNTAX: \METHOD: (METHOD:) define ;
 
 ! For compatibility
-SYNTAX: M:
+SYNTAX: \M:
     scan-word 1array scan-word create-method-in
     parse-definition
     define ;

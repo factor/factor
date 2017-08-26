@@ -64,5 +64,5 @@ PREDICATE: role < mixin-class
     [ roles>slots define-tuple-class ]
     [ drop [ role? ] filter add-to-roles ] 3tri ;
 
-SYNTAX: ROLE: parse-role-definition define-role ;
-SYNTAX: ROLE-TUPLE: parse-role-definition define-tuple-class-with-roles ;
+SYNTAX: \ROLE: parse-role-definition define-role ;
+SYNTAX: \ROLE-TUPLE: parse-role-definition define-tuple-class-with-roles ;

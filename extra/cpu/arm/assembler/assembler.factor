@@ -11,7 +11,7 @@ SYMBOL: registers
 
 V{ } registers set-global
 
-SYNTAX: REGISTER:
+SYNTAX: \REGISTER:
     scan-new-word
     [ define-symbol ]
     [ registers get length "register" set-word-prop ]

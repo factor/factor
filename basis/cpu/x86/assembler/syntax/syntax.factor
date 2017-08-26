@@ -22,8 +22,8 @@ registers [ H{ } clone ] initialize
 : define-registers ( names size -- )
     [ [ 0 ] dip (define-registers) ] keep registers get set-at ;
 
-SYNTAX: REGISTERS:
+SYNTAX: \REGISTERS:
     scan-number [ ";" parse-tokens ] dip define-registers ;
 
-SYNTAX: HI-REGISTERS:
+SYNTAX: \HI-REGISTERS:
     scan-number [ ";" parse-tokens 4 ] dip (define-registers) drop ;

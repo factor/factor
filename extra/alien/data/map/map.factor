@@ -123,8 +123,8 @@ MACRO: data-map! ( ins outs -- quot )
 
 PRIVATE>
 
-SYNTAX: data-map(
+SYNTAX: \data-map(
     parse-data-map-effect \ data-map suffix! ;
 
-SYNTAX: data-map!(
+SYNTAX: \data-map!(
     parse-data-map-effect \ data-map! suffix! ;

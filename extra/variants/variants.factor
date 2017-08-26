@@ -42,12 +42,12 @@ M: variant-class initial-value*
     [ scan-token dup ";" = not ]
     [ parse-variant-member ] produce nip ;
 
-SYNTAX: VARIANT:
+SYNTAX: \VARIANT:
     scan-new-class
     parse-variant-members
     define-variant-class-members ;
 
-SYNTAX: VARIANT-MEMBER:
+SYNTAX: \VARIANT-MEMBER:
     scan-word
     scan-token parse-variant-member
     define-variant-class-member ";" expect ;

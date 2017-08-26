@@ -50,6 +50,6 @@ TUPLE: xkcd number image ;
 
 C: <xkcd> xkcd
 
-SYNTAX: XKCD: scan-number dup xkcd-image <xkcd> suffix! ;
+SYNTAX: \xkcd: scan-number dup xkcd-image <xkcd> suffix! ;
 
 M: xkcd pprint* image>> <image-section> add-section ;

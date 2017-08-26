@@ -137,7 +137,7 @@ PRIVATE>
     [ [ input-logging-quot ] 2keep drop error-logging-quot ]
     (define-logging) ;
 
-SYNTAX: LOG:
+SYNTAX: \LOG:
     ! Syntax: name level
     scan-new-word dup scan-word
     '[ 1array stack>message _ _ log-message ]

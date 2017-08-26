@@ -50,7 +50,7 @@ M: vlist like
 
 INSTANCE: vlist immutable-sequence
 
-SYNTAX: VL{ \ } [ >vlist ] parse-literal ;
+SYNTAX: \VL{ \ } [ >vlist ] parse-literal ;
 
 M: vlist pprint-delims drop \ VL{ \ } ;
 M: vlist >pprint-sequence ;

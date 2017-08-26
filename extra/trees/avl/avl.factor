@@ -161,7 +161,7 @@ PRIVATE>
 M: avl assoc-like
     drop dup avl? [ >avl ] unless ;
 
-SYNTAX: AVL{
+SYNTAX: \AVL{
     \ } [ >avl ] parse-literal ;
 
 M: avl pprint-delims drop \ AVL{ \ } ;

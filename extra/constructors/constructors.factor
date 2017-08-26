@@ -47,7 +47,7 @@ ERROR: unknown-constructor-parameters class effect unknown ;
     scan-constructor scan-effect ensure-constructor-parameters
     parse-definition ;
 
-SYNTAX: CONSTRUCTOR:
+SYNTAX: \CONSTRUCTOR:
     parse-constructor
     [ [ constructor-boa-quot ] dip compose ]
     [ drop ] 2bi define-declared ;
@@ -59,6 +59,6 @@ SYNTAX: CONSTRUCTOR:
 : scan-full-input-effect ( -- effect )
     "(" expect scan-rest-input-effect ;
 
-SYNTAX: SLOT-CONSTRUCTOR:
+SYNTAX: \SLOT-CONSTRUCTOR:
     scan-new-word [ name>> "(" append create-reset ] keep
     '[ scan-rest-input-effect in>> _ '[ _ _ slots>boa ] append! ] define-syntax ;

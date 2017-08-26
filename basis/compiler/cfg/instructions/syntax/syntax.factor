@@ -88,14 +88,14 @@ TUPLE: insn-slot-spec type name rep ;
         [ nip define-insn-ctor ]
     } 3cleave ;
 
-SYNTAX: INSN:
+SYNTAX: \INSN:
     scan-new-class insn-word ";" parse-tokens define-insn ;
 
-SYNTAX: VREG-INSN:
+SYNTAX: \VREG-INSN:
     scan-new-class vreg-insn-word ";" parse-tokens define-insn ;
 
-SYNTAX: FLUSHABLE-INSN:
+SYNTAX: \FLUSHABLE-INSN:
     scan-new-class flushable-insn-word ";" parse-tokens define-insn ;
 
-SYNTAX: FOLDABLE-INSN:
+SYNTAX: \FOLDABLE-INSN:
     scan-new-class foldable-insn-word ";" parse-tokens define-insn ;

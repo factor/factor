@@ -27,16 +27,16 @@ M: no-tag summary
 
 PRIVATE>
 
-SYNTAX: TAGS:
+SYNTAX: \TAGS:
     scan-new-word scan-effect
     [ drop H{ } clone "xtable" set-word-prop ]
     [ define-tags ]
     2bi ;
 
-SYNTAX: TAG:
+SYNTAX: \TAG:
     scan-token scan-word parse-definition define-tag ;
 
-SYNTAX: XML-NS:
+SYNTAX: \XML-NS:
     scan-new-word scan-token '[ f swap _ <name> ] ( string -- name ) define-memoized ;
 
 <PRIVATE
