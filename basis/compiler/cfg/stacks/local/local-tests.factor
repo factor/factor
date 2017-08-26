@@ -18,26 +18,26 @@ IN: compiler.cfg.stacks.local.tests
 ] cfg-unit-test
 
 {
-    HS{ d:  3 }
+    HS{ d: 3 }
 } [
     V{ } 137 insns>block
-    [ [ 3 d:  3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
+    [ [ 3 d: 3 replace-loc "eh" , end-local-analysis ] V{ } make drop ]
     [ replaces>> ] bi
 ] cfg-unit-test
 
 ! local-loc>global
-{ d:  6 } [
-    d:  3 3 0 0 0 height-state boa
+{ d: 6 } [
+    d: 3 3 0 0 0 height-state boa
     local-loc>global
 ] unit-test
 
 {
-    d:  4
-    r:  5
+    d: 4
+    r: 5
 } [
     3 4 0 0 height-state boa
-    [ d:  1 swap local-loc>global ]
-    [ r:  1 swap local-loc>global ] bi
+    [ d: 1 swap local-loc>global ]
+    [ r: 1 swap local-loc>global ] bi
 ] unit-test
 
 ! kill-locations
@@ -57,13 +57,13 @@ IN: compiler.cfg.stacks.local.tests
 
 ! loc>vreg
 { 1 } [
-    d:  0 loc>vreg
+    d: 0 loc>vreg
 ] cfg-unit-test
 
 ! replace-loc
 { 80 } [
-    80 d:  77 replace-loc
-    d:  77 peek-loc
+    80 d: 77 replace-loc
+    d: 77 peek-loc
 ] cfg-unit-test
 
 ! stack-changes
@@ -73,15 +73,15 @@ IN: compiler.cfg.stacks.local.tests
         T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
     }
 } [
-    { { d:  0 25 } { r:  0 26 } } replaces>copy-insns
+    { { d: 0 25 } { r: 0 26 } } replaces>copy-insns
 ] cfg-unit-test
 
 ! remove-redundant-replaces
 {
     H{ { T{ ds-loc { n 3 } } 7 } }
 } [
-    d:  0 loc>vreg d:  2 loc>vreg 2drop
-    2 d:  2 replace-loc 7 d:  3 replace-loc
+    d: 0 loc>vreg d: 2 loc>vreg 2drop
+    2 d: 2 replace-loc 7 d: 3 replace-loc
     replaces get remove-redundant-replaces
 ] cfg-unit-test
 
@@ -92,7 +92,7 @@ IN: compiler.cfg.stacks.local.tests
         "eh"
     }
 } [
-    3 d:  0 replace-loc [
+    3 d: 0 replace-loc [
         "eh" ,
         replaces get height-state get emit-insns
     ] V{ } make
@@ -103,41 +103,41 @@ IN: compiler.cfg.stacks.local.tests
     0 0 0 0 height-state boa compute-local-kill-set
 ] unit-test
 
-{ HS{ r:  -4 } } [
+{ HS{ r: -4 } } [
     0 4 0 -1 height-state boa compute-local-kill-set
 ] unit-test
 
-{ HS{ d:  -1 d:  -2 } } [
+{ HS{ d: -1 d: -2 } } [
     2 0 -2 0 height-state boa compute-local-kill-set
 ] unit-test
 
 ! global-loc>local
-{ d:  2 } [
-    d:  3 1 0 0 0 height-state boa global-loc>local
+{ d: 2 } [
+    d: 3 1 0 0 0 height-state boa global-loc>local
 ] unit-test
 
 ! height-state
 {
     T{ height-state f 0 0 3 0 }
 } [
-    d:  3 inc-stack height-state get
+    d: 3 inc-stack height-state get
 ] cfg-unit-test
 
 {
     T{ height-state f 2 0 3 0 }
 } [
     2 0 0 0 height-state boa height-state set
-    d:  3 inc-stack height-state get
+    d: 3 inc-stack height-state get
 ] cfg-unit-test
 
 {
-    { T{ ##inc { loc d:  4 } } T{ ##inc { loc r:  -2 } } }
+    { T{ ##inc { loc d: 4 } } T{ ##inc { loc r: -2 } } }
 } [
     0 0 4 -2 height-state boa height-state>insns
 ] unit-test
 
-{ H{ { d:  -1 40 } } } [
-    d:  1 inc-stack 40 d:  0 replace-loc replaces get
+{ H{ { d: -1 40 } } } [
+    d: 1 inc-stack 40 d: 0 replace-loc replaces get
 ] cfg-unit-test
 
 ! Compiling these words used to make the compiler hang due to a bug in

@@ -37,7 +37,7 @@ T{ basic-block
 CONSTANT: ex-make-input-map [[
 USING: compiler.cfg.builder prettyprint ;
 T{ #shuffle { in-d { 37 81 92 } } } make-input-map .
-{ { 37 d:  2 } { 81 d:  1 } { 92 d:  0 } }
+{ { 37 d: 2 } { 81 d: 1 } { 92 d: 0 } }
 ]]
 >>
 

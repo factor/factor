@@ -5,7 +5,7 @@ IN: compiler.cfg.stacks.tests
 
 ! store-vregs
 {
-    H{ { d:  1 4 } { d:  2 3 } { d:  0 5 } }
+    H{ { d: 1 4 } { d: 2 3 } { d: 0 5 } }
     T{ height-state f 0 0 0 0 }
 } [
     { 3 4 5 } ds-loc store-vregs
@@ -14,7 +14,7 @@ IN: compiler.cfg.stacks.tests
 ] cfg-unit-test
 
 ! stack-locs
-{ { d:  4 d:  3 d:  2 d:  1 d:  0 } } [
+{ { d: 4 d: 3 d: 2 d: 1 d: 0 } } [
     ds-loc 5 stack-locs >array
 ] unit-test
 
