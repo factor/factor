@@ -166,13 +166,13 @@ CONSTANT: selector>action H{
 
     METHOD: void prepareOpenGL [
 
-        self SEL: setWantsBestResolutionOpenGLSurface:
+        self selector\ setWantsBestResolutionOpenGLSurface:
         send\ respondsToSelector: c-bool> [
 
-            self SEL: setWantsBestResolutionOpenGLSurface: 1
+            self selector\ setWantsBestResolutionOpenGLSurface: 1
             void f "objc_msgSend" { id SEL char } f alien-invoke
 
-            self SEL: backingScaleFactor
+            self selector\ backingScaleFactor
             double f "objc_msgSend" { id SEL } f alien-invoke
 
             dup 1.0 > [
@@ -435,7 +435,7 @@ CONSTANT: selector>action H{
     METHOD: void windowDidChangeBackingProperties: id notification
     [
 
-        notification send\ object dup SEL: backingScaleFactor
+        notification send\ object dup selector\ backingScaleFactor
         send\ respondsToSelector: c-bool> [
             { double { id SEL } } ?send\ backingScaleFactor
 

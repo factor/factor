@@ -16,7 +16,7 @@ SYNTAX: \send\ scan-token dup remember-send suffix! \ send suffix! ;
 
 SYNTAX: \?send\ scan-token dup remember-send suffix! \ ?send suffix! ;
 
-SYNTAX: \SEL:
+SYNTAX: \selector\
     scan-token
     [ remember-send ]
     [ <selector> suffix! \ cocoa.messages:selector suffix! ] bi ;
