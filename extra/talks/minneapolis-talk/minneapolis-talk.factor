@@ -77,7 +77,7 @@ CONSTANT: minneapolis-slides
             "C: <rectangle> rectangle"
         }
     }
-    STRIP-TEASE:
+    strip-tease{
         $slide "An example"
         { $code
             "USE: math.constants"
@@ -88,7 +88,7 @@ CONSTANT: minneapolis-slides
             "    dup rectangle-width"
             "    swap rectangle-height * ;"
         }
-    ;
+    }
 
     { $slide "An example"
         { $code "10 <square> area ." }
@@ -110,10 +110,10 @@ CONSTANT: minneapolis-slides
         "Let's profile it!"
     }
     { $slide "Memoization"
-        { { $link postpone: : } " is just another word" }
+        { { $link postpone: \: } " is just another word" }
         "What if we could define a word which caches its results?"
         { "The " { $vocab-link "memoize" } " library provides such a feature" }
-        { "Just change " { $link postpone: : } " to " { $link postpone: MEMO: } }
+        { "Just change " { $link postpone: \: } " to " { $link postpone: \MEMO: } }
     }
     { $slide "Memoization"
         { $code

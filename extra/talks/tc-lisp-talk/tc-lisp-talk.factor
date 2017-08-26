@@ -78,7 +78,7 @@ CONSTANT: tc-lisp-slides
     }
     { $slide "Object system"
         "Based on CLOS"
-        { "We define generic words that operate on the top of the stack with " { $link postpone: GENERIC:  } " or on an implicit parameter with " { $link postpone: HOOK: } }
+        { "We define generic words that operate on the top of the stack with " { $link postpone: \GENERIC:  } " or on an implicit parameter with " { $link postpone: \HOOK: } }
     }
     { $slide "Object system example: shape protocol"
         "In ~/factor/work/shapes/shapes.factor"
@@ -433,11 +433,9 @@ end: return;
         { $code ": glue ( left right middle -- seq' )
     swap 3append ;"
         }
-        { $code HEREDOC: xyz
-"a" "b" "c" 3append
+        { $code [[ "a" "b" "c" 3append
 "a" """""""" surround
-"a" "b" ", " glue
-xyz
+"a" "b" ", " glue]]
         }
     }
     { $slide "C FFI demo"
