@@ -198,7 +198,15 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     dup { [ "!" sequence= ] [ "#!" sequence= ] } 1||
     [ take-comment ] [ merge-slice-til-whitespace ] if ;
 
-ERROR: backslash-expects-whitespace slice ;
+ERROR: no-backslash-payload n string slice ;
+: read-backslash ( n string slice -- n' string obj )
+    merge-slice-til-whitespace dup "\\" tail? [
+        ! \ foo, M\ foo
+        [
+            skip-blank-from slice-til-whitespace drop
+            dup [ no-backslash-payload ] unless
+        ] dip swap 2array
+    ] when ;
 
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
@@ -267,6 +275,7 @@ ERROR: mismatched-terminator n string slice ;
             [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
             over "\\" head? [
                 drop
+                dup "\\" sequence= [ read-backslash ] when
             ] [
                 (lex-factor)
             ] if

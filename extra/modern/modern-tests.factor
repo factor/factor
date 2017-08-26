@@ -62,7 +62,7 @@ IN: modern.tests
     { { "SYNTAX:" { "\\AVL{" } } }
 } [ "SYNTAX: \\AVL{" string>literals >strings ] unit-test
 
-{ { "\\" } } [ "\\" string>literals >strings ] unit-test
+[ "\\" string>literals >strings ] must-fail ! \ alone should be legal eventually (?)
 { { "\\FOO" } } [ "\\FOO" string>literals >strings ] unit-test
 
 {
@@ -81,4 +81,10 @@ IN: modern.tests
 [ "char: {" string>literals >strings ] must-fail
 [ "char: \"" string>literals >strings ] must-fail
 { { { "char:" "\\\\" } } } [ "char: \\\\" string>literals >strings ] unit-test
-{ { { "char:" "\\" } } } [ "char: \\" string>literals >strings ] unit-test
+
+[ "char: \\" string>literals >strings ] must-fail ! char: \ should be legal eventually
+
+! \ backslash going away someday
+
+{ { { "\\" "(" } } } [ "\\ (" string>literals >strings ] unit-test
+

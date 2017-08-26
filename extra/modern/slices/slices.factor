@@ -131,7 +131,9 @@ ERROR: unexpected-end n string ;
     ] if ; inline
 
 : merge-slice-til-whitespace ( n string slice --  n' string slice' )
-    [ slice-til-whitespace drop ] dip merge-slices ;
+    pick [
+        [ slice-til-whitespace drop ] dip merge-slices
+    ] when ;
 
 : merge-slice-til-eol ( n string slice --  n' string slice' )
     [ slice-til-eol drop ] dip merge-slices ;
