@@ -152,6 +152,9 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 : terminator? ( slice -- ? )
     {
         [ ";" sequence= ]
+        [ "]" sequence= ]
+        [ "}" sequence= ]
+        [ ")" sequence= ]
     } 1|| ;
 
 ERROR: token-expected n string obj ;
