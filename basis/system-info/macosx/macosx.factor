@@ -74,6 +74,7 @@ FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, voi
 : machine ( -- str ) { 6 1 } sysctl-query-string ;
 : model ( -- str ) { 6 2 } sysctl-query-string ;
 M: macosx cpus ( -- n ) { 6 3 } sysctl-query-uint ;
+M: macosx hyperthreads ( -- n ) { 6 3 } sysctl-query-uint ;
 : byte-order ( -- n ) { 6 4 } sysctl-query-uint ;
 
 ! Only an int, not large enough. Deprecated.

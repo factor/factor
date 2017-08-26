@@ -6,6 +6,7 @@ IN: system-info
 
 HOOK: os-version os ( -- version )
 HOOK: cpus os ( -- n )
+HOOK: hyperthreads os ( -- n )
 HOOK: cpu-mhz os ( -- n )
 HOOK: memory-load os ( -- n )
 HOOK: physical-mem os ( -- n )
