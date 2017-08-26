@@ -14,7 +14,7 @@ IN: html.streams.tests
 ] unit-test
 
 { "a" } [
-    [ CHAR: a write1 ] make-html-string
+    [ char: a write1 ] make-html-string
 ] unit-test
 
 { "&lt;" } [

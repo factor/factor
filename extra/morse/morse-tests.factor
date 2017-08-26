@@ -3,10 +3,10 @@
 USING: arrays morse strings tools.test ;
 IN: morse.tests
 
-{ "?" } [ CHAR: \\ ch>morse ] unit-test
-{ "..." } [ CHAR: s ch>morse ] unit-test
-{ CHAR: s } [ "..." morse>ch ] unit-test
-{ CHAR: \s } [ "..--..--.." morse>ch ] unit-test
+{ "?" } [ char: \\ ch>morse ] unit-test
+{ "..." } [ char: s ch>morse ] unit-test
+{ char: s } [ "..." morse>ch ] unit-test
+{ char: \s } [ "..--..--.." morse>ch ] unit-test
 { "-- --- .-. ... . / -.-. --- -.. ." } [ "morse code" >morse ] unit-test
 { "morse code" } [ "-- --- .-. ... . / -.-. --- -.. ." morse> ] unit-test
 { "hello, world!" } [ "Hello, World!" >morse morse> ] unit-test

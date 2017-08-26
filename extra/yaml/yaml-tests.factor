@@ -749,7 +749,7 @@ f value [
 ! misc
 
 ! Don't use aliases/anchors for equal fixnums
-{ f } [ CHAR: & { 0 0 } >yaml member? ] unit-test
+{ f } [ char: & { 0 0 } >yaml member? ] unit-test
 
 ! !!!!!!!!!!!!!!!
 ! Config

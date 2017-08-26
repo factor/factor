@@ -71,7 +71,7 @@ ARTICLE: "sequence-sets" "Sequences as sets"
 $nl
 "Care must be taken in writing efficient code using sequence sets. Testing for membership with " { $link in? } ", as well as the destructive set operations, take time proportional to the size of the sequence. Another representation, like " { $link "hash-sets" } ", would take constant time for membership tests. But binary operations like " { $link union } " are asymptotically optimal, taking time proportional to the sum of the size of the inputs."
 $nl
-"As one particular example, " { $link POSTPONE: f } " is a representation of the empty set, since it is an empty sequence." ;
+"As one particular example, " { $link postpone: f } " is a representation of the empty set, since it is an empty sequence." ;
 
 HELP: set
 { $class-description "The class of all sets. Custom implementations of the set protocol should be declared as instances of this mixin for all set implementation to work correctly." } ;

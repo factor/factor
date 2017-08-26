@@ -28,7 +28,7 @@ CONSTANT: galois-slides
     { $slide "Vocabularies"
         "Vocabularies: named sets of words"
         { $link "vocab-index" }
-        { { $link POSTPONE: USING: } " loads dependencies" }
+        { { $link postpone: USING: } " loads dependencies" }
         "Source, docs, tests in one place"
     }
     { $slide "Interactive development"
@@ -137,7 +137,7 @@ CONSTANT: galois-slides
         { $code "\"ababbc\" R/ [ab]+c/ matches? ." }
     }
     { $slide "Example: memoization"
-        { "Memoization with " { $link POSTPONE: MEMO: } }
+        { "Memoization with " { $link postpone: MEMO: } }
         { $code
             ": fib ( m -- n )"
             "    dup 1 > ["
@@ -147,7 +147,7 @@ CONSTANT: galois-slides
         "Very slow! Let's profile it..."
     }
     { $slide "Example: memoization"
-        { "Let's use " { $link POSTPONE: : } " instead of " { $link POSTPONE: MEMO: } }
+        { "Let's use " { $link postpone: : } " instead of " { $link postpone: MEMO: } }
         { $code
             "MEMO: fib ( m -- n )"
             "    dup 1 > ["
@@ -157,10 +157,10 @@ CONSTANT: galois-slides
         "Much faster"
     }
     { $slide "Meta-circularity"
-        { { $link POSTPONE: MEMO: } " is just a library word" }
-        { "But so is " { $link POSTPONE: : } }
+        { { $link postpone: MEMO: } " is just a library word" }
+        { "But so is " { $link postpone: : } }
         "Factor's parser is written in Factor"
-        { "All syntax is just parsing words: " { $link POSTPONE: [ } ", " { $link POSTPONE: " } }
+        { "All syntax is just parsing words: " { $link postpone: [ } ", " { $link postpone: " } }
     }
     { $slide "Extensible syntax, DSLs"
         "Most parsing words fall in one of two categories"
@@ -169,7 +169,7 @@ CONSTANT: galois-slides
         "Some parsing words are more complicated"
     }
     { $slide "Example: printf"
-        { { $link POSTPONE: EBNF: } ": a complex parsing word" }
+        { { $link postpone: EBNF: } ": a complex parsing word" }
         "Implements a custom syntax for expressing parsers: like OMeta!"
         { "Example: " { $vocab-link "printf-example" } }
         { $code "\"vegan\" \"cheese\" \"%s is not %s\\n\" printf" }
@@ -188,10 +188,10 @@ CONSTANT: galois-slides
         "Influenced by Scheme and Lisp"
     }
     { $slide "Locals and lexical scope"
-        { "Define lambda words with " { $link POSTPONE: :: } }
-        { "Establish bindings with " { $link POSTPONE: [let } " and " { $snippet "[let*" } }
+        { "Define lambda words with " { $link postpone: :: } }
+        { "Establish bindings with " { $link postpone: [let } " and " { $snippet "[let*" } }
         "Mutable bindings with correct semantics"
-        { "Named inputs for quotations with " { $link POSTPONE: [| } }
+        { "Named inputs for quotations with " { $link postpone: [| } }
         "Full closures"
     }
     { $slide "Locals and lexical scope"
@@ -219,7 +219,7 @@ CONSTANT: galois-slides
         "In the base image, only 59 words out of 13,000 use locals"
     }
     { $slide "More about partial application"
-        { { $link POSTPONE: '[ } " is \"fry syntax\"" }
+        { { $link postpone: '[ } " is \"fry syntax\"" }
         { $code "'[ _ + ] == [ + ] curry" }
         { $code "'[ @ t ] == [ t ] compose" }
         { $code "'[ _ nth @ ] == [ [ nth ] curry ] dip compose" }

@@ -133,20 +133,20 @@ ARTICLE: "booleans" "Booleans"
 }
 "Boolean values are most frequently used for " { $link "conditionals" } "."
 { $heading "The f object and f class" }
-"The " { $link f } " object is the unique instance of the " { $link f } " class; the two are distinct objects. The latter is also a parsing word which adds the " { $link f } " object to the parse tree at parse time. To refer to the class itself you must use " { $link POSTPONE: POSTPONE: } " or " { $link POSTPONE: \ } " to prevent the parsing word from executing."
+"The " { $link f } " object is the unique instance of the " { $link f } " class; the two are distinct objects. The latter is also a parsing word which adds the " { $link f } " object to the parse tree at parse time. To refer to the class itself you must use " { $link postpone: postpone: } " or " { $link postpone: \ } " to prevent the parsing word from executing."
 $nl
 "Here is the " { $link f } " object:"
 { $example "f ." "f" }
 "Here is the " { $link f } " class:"
-{ $example "\\ f ." "POSTPONE: f" }
+{ $example "\\ f ." "postpone: f" }
 "They are not equal:"
 { $example "f \\ f = ." "f" }
 "Here is an array containing the " { $link f } " object:"
 { $example "{ f } ." "{ f }" }
 "Here is an array containing the " { $link f } " class:"
-{ $example "{ POSTPONE: f } ." "{ POSTPONE: f }" }
+{ $example "{ postpone: f } ." "{ postpone: f }" }
 "The " { $link f } " object is an instance of the " { $link f } " class:"
-{ $example "USE: classes" "f class-of ." "POSTPONE: f" }
+{ $example "USE: classes" "f class-of ." "postpone: f" }
 "The " { $link f } " class is an instance of " { $link word } ":"
 { $example "USE: classes" "\\ f class-of ." "word" }
 "On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
@@ -203,7 +203,7 @@ $nl
 { $subsections call execute }
 { $heading "Run-time checked combinators" }
 "With these combinators, the stack effect of the expression is checked at run time."
-{ $subsections POSTPONE: call( POSTPONE: execute( }
+{ $subsections postpone: call( postpone: execute( }
 "Note that the opening parenthesis is actually part of the word name for " { $snippet "call(" } " and " { $snippet "execute(" } "; they are parsing words, and they read a stack effect until the corresponding closing parenthesis. The underlying words are a bit more verbose, but they can be given non-constant stack effects:"
 { $subsections call-effect execute-effect }
 { $heading "Unchecked combinators" }
@@ -253,7 +253,7 @@ HELP: execute-effect
 HELP: execute-effect-unsafe
 { $values { "word" word } { "effect" effect } }
 { $description "Given a word and a stack effect, executes the word, blindly declaring at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." }
-{ $warning "If the word being executed has an incorrect stack effect, undefined behavior will result. User code should use " { $link POSTPONE: execute( } " instead." } ;
+{ $warning "If the word being executed has an incorrect stack effect, undefined behavior will result. User code should use " { $link postpone: execute( } " instead." } ;
 
 { call-effect call-effect-unsafe execute-effect execute-effect-unsafe } related-words
 

@@ -356,7 +356,7 @@ ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
     }
 }
 "This parser when run with the string \"++--\" or the array "
-"{ CHAR: + CHAR: + CHAR: - CHAR: - } will succeed with an AST of { \"++\" \"--\" }. "
+"{ char: + char: + char: - char: - } will succeed with an AST of { \"++\" \"--\" }. "
 "If you want to add whitespace handling to the grammar you need to put it "
 "between the terminals:"
 { $examples
@@ -479,12 +479,12 @@ ARTICLE: "peg.ebnf" "EBNF"
 "EBNF syntax. It provides three parsing words described below. These words all "
 "accept the same EBNF syntax. The difference is in how they are used. "
 { $subsections
-    POSTPONE: EBNF:
-    POSTPONE: EBNF[[
-    POSTPONE: EBNF[=[
-    POSTPONE: EBNF[==[
-    POSTPONE: EBNF[===[
-    POSTPONE: EBNF[====[
+    postpone: EBNF:
+    postpone: EBNF[[
+    postpone: EBNF[=[
+    postpone: EBNF[==[
+    postpone: EBNF[===[
+    postpone: EBNF[====[
 }
 "The EBNF syntax is composed of a series of rules of the form:"
 { $code

@@ -27,7 +27,7 @@ ERROR: not-a-string-number string ;
 
 : change-string-number ( string quot -- string' )
     [ [ string>number ] dip call number>string ] 2keep drop
-    length CHAR: 0 pad-head ; inline
+    length char: 0 pad-head ; inline
 
 : next-vnode-name ( string -- string' )
     [
@@ -37,7 +37,7 @@ ERROR: not-a-string-number string ;
     ] "" append-outputs-as ;
 
 : trim-head-zeros ( string -- string' )
-    [ CHAR: 0 = ] trim-head 1 CHAR: 0 pad-head ;
+    [ char: 0 = ] trim-head 1 char: 0 pad-head ;
 
 : canonical-fdb-name ( string -- string' )
     ensure-fdb-filename

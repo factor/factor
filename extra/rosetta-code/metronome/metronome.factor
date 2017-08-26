@@ -12,7 +12,7 @@ IN: rosetta-code.metronome
     1.0 1.0 1.0 <hsva>  <solid> >>interior relayout-1 ;
 
 : blank-gadget ( gadget -- )
-    COLOR: white <solid> >>interior relayout-1 ;
+    color: white <solid> >>interior relayout-1 ;
 
 : play-note ( gadget freq -- )
     [ blink-gadget ] [ 0.3 play-sine blank-gadget ] 2bi ;

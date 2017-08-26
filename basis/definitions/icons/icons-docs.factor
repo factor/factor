@@ -7,6 +7,6 @@ ARTICLE: "definitions.icons" "Definition icons"
 "Looking up the icon associated with a definition:"
 { $subsections definition-icon }
 "Defining new icons:"
-{ $subsections POSTPONE: ICON: } ;
+{ $subsections postpone: ICON: } ;
 
 ABOUT: "definitions.icons"

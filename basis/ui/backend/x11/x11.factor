@@ -101,9 +101,9 @@ M: x11-ui-backend (free-pixel-format)
 : valid-input? ( string gesture -- ? )
     over empty? [ 2drop f ] [
         mods>> { f { S+ } } member? [
-            [ { [ 127 = not ] [ CHAR: \s >= ] } 1&& ] all?
+            [ { [ 127 = not ] [ char: \s >= ] } 1&& ] all?
         ] [
-            [ { [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] } 1&& ] all?
+            [ { [ 127 = not ] [ char: \s >= ] [ alpha? not ] } 1&& ] all?
         ] if
     ] if ;
 
@@ -327,7 +327,7 @@ M: x11-ui-backend beep ( -- )
 
 <PRIVATE
 : escape-' ( string -- string' )
-    [ dup CHAR: ' = [ drop "'\\''" ] [ 1string ] if ] { } map-as concat ;
+    [ dup char: ' = [ drop "'\\''" ] [ 1string ] if ] { } map-as concat ;
 
 : xmessage ( string -- )
     escape-' "/usr/bin/env xmessage '" "'" surround system drop ;

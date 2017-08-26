@@ -55,9 +55,9 @@ C-TYPE: cairo_snurface_t
 
 ! ! CHAR
 : stuff-with-chars ( -- K \n )
-    CHAR: K
-    CHAR: \n
-    CHAR: \"        ! <- \" should be highlighted
+    char: K
+    char: \n
+    char: \"        ! <- \" should be highlighted
     drop ;
 
 ! ! MAIN
@@ -96,7 +96,7 @@ FUNCTION: int futimes ( int id,
 FUNCTION: int booyah ( int x )
 FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
 
-HEXCOLOR: ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
+hexcolor: ffffff color: green nan: 1234 char: m ALIEN: 93
 2drop 2drop drop
 
 PRIMITIVE: one ( a -- b )

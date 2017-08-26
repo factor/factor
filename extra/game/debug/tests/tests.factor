@@ -18,24 +18,24 @@ IN: game.debug.tests
     { 0 0 0 } clear-screen
 
     [
-        { 0 0 0 } { 1 0 0 } COLOR: red   debug-line
-        { 0 0 0 } { 0 1 0 } COLOR: green debug-line
-        { 0 0 0 } { 0 0 1 } COLOR: blue  debug-line
+        { 0 0 0 } { 1 0 0 } color: red   debug-line
+        { 0 0 0 } { 0 1 0 } color: green debug-line
+        { 0 0 0 } { 0 0 1 } color: blue  debug-line
         { -1.2 0 0 } { 0 1 0 } 0 deg>rad rotation-matrix3 debug-axes
-        { 3 5 -2 } { 3 2 1 } COLOR: white debug-box
-        { 0 9 0 } 8 2 COLOR: blue debug-cylinder
+        { 3 5 -2 } { 3 2 1 } color: white debug-box
+        { 0 9 0 } 8 2 color: blue debug-cylinder
     ] float-array{ } make
     mvp-matrix draw-debug-lines
 
     [
-        { 0 4.0 0 } COLOR: red debug-point
-        { 0 4.1 0 } COLOR: green debug-point
-        { 0 4.2 0 } COLOR: blue debug-point
+        { 0 4.0 0 } color: red debug-point
+        { 0 4.1 0 } color: green debug-point
+        { 0 4.2 0 } color: blue debug-point
     ] float-array{ } make
     mvp-matrix draw-debug-points
 
     "Frame: " world frame#>> number>string append
-    COLOR: purple { 5 5 } world dim>> draw-text
+    color: purple { 5 5 } world dim>> draw-text
     world [ 1 + ] change-frame# drop ;
 
 TUPLE: tests-world < wasd-world frame# ;

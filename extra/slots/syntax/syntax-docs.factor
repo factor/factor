@@ -53,12 +53,12 @@ HELP: copy-slots{
 ARTICLE: "slots.syntax" "Slots syntax sugar"
 "The " { $vocab-link "slots.syntax" } " vocabulary provides an alternative syntax for getting and setting multiple values of a tuple." $nl
 "Syntax sugar for cleaving slots to the stack:"
-{ $subsections POSTPONE: slots[ POSTPONE: get[ }
+{ $subsections postpone: slots[ postpone: get[ }
 "Cleaving slots to an array:"
-{ $subsections POSTPONE: slots{ POSTPONE: get{ }
+{ $subsections postpone: slots{ postpone: get{ }
 "Setting slots from the stack:"
-{ $subsections POSTPONE: set-slots[ POSTPONE: set[ }
+{ $subsections postpone: set-slots[ postpone: set[ }
 "Setting slots from an array:"
-{ $subsections POSTPONE: set-slots{ POSTPONE: set{ } ;
+{ $subsections postpone: set-slots{ postpone: set{ } ;
 
 ABOUT: "slots.syntax"

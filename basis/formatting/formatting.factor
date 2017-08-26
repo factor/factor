@@ -15,12 +15,12 @@ IN: formatting
     [ ] [ compose ] reduce ; inline
 
 : fix-sign ( string -- string )
-    dup first CHAR: 0 = [
-        dup [ [ CHAR: 0 = not ] [ digit? ] bi and ] find
+    dup first char: 0 = [
+        dup [ [ char: 0 = not ] [ digit? ] bi and ] find
         [
             1 - swap 2dup nth {
-                { CHAR: - [ remove-nth "-" prepend ] }
-                { CHAR: + [ remove-nth "+" prepend ] }
+                { char: - [ remove-nth "-" prepend ] }
+                { char: + [ remove-nth "+" prepend ] }
                 [ drop nip ]
             } case
         ] [ drop ] if
@@ -33,9 +33,9 @@ IN: formatting
     [
         [ abs ] dip
         [ 10^ * round-to-even >integer number>string ]
-        [ 1 + CHAR: 0 pad-head ]
+        [ 1 + char: 0 pad-head ]
         [ cut* ] tri [ "." glue ] unless-empty
-    ] curry keep neg? [ CHAR: - prefix ] when ;
+    ] curry keep neg? [ char: - prefix ] when ;
 
 : format-scientific-mantissa ( x log10x digits -- string rounded-up? )
     [ swap - 10^ * round-to-even >integer number>string ] keep
@@ -45,15 +45,15 @@ IN: formatting
     ] keep ;
 
 : format-scientific-exponent ( rounded-up? log10x -- string )
-    swap [ 1 + ] when number>string 2 CHAR: 0 pad-head
-    dup CHAR: - swap index "e" "e+" ? prepend ;
+    swap [ 1 + ] when number>string 2 char: 0 pad-head
+    dup char: - swap index "e" "e+" ? prepend ;
 
 : format-scientific-simple ( x digits -- string )
     [
         [ abs dup integer-log10 ] dip
         [ format-scientific-mantissa ]
         [ drop nip format-scientific-exponent ] 3bi append
-    ] curry keep neg? [ CHAR: - prefix ] when ;
+    ] curry keep neg? [ char: - prefix ] when ;
 
 : format-float-fast ( x digits string -- string )
     [ "" -1 ] 2dip "C" format-float ;
@@ -95,15 +95,15 @@ ERROR: unknown-printf-directive ;
 
 EBNF: parse-printf [=[
 
-zero      = "0"                  => [[ CHAR: 0 ]]
+zero      = "0"                  => [[ char: 0 ]]
 char      = "'" (.)              => [[ second ]]
 
-pad-char  = (zero|char)?         => [[ CHAR: \s or ]]
+pad-char  = (zero|char)?         => [[ char: \s or ]]
 pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0 = [ drop [ ] ] when ]]
 
-sign_     = [+ ]                 => [[ '[ dup first CHAR: - = [ _ prefix ] unless ] ]]
+sign_     = [+ ]                 => [[ '[ dup first char: - = [ _ prefix ] unless ] ]]
 sign      = (sign_)?             => [[ [ ] or ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
@@ -179,10 +179,10 @@ MACRO: sprintf ( format-string -- quot )
 <PRIVATE
 
 : pad-00 ( n -- string )
-    number>string 2 CHAR: 0 pad-head ; inline
+    number>string 2 char: 0 pad-head ; inline
 
 : pad-000 ( n -- string )
-    number>string 3 CHAR: 0 pad-head ; inline
+    number>string 3 char: 0 pad-head ; inline
 
 : >time ( timestamp -- string )
     [ hour>> ] [ minute>> ] [ second>> floor ] tri

@@ -13,8 +13,8 @@ TUPLE: tabbed-gadget < track tabs book ;
 : <lip> ( -- gadget )
     "active-tab-lip" theme-image <icon> ;
 
-CONSTANT: button-background COLOR: FactorTan
-CONSTANT: active-tab-background COLOR: FactorDarkTan
+CONSTANT: button-background color: FactorTan
+CONSTANT: active-tab-background color: FactorDarkTan
 
 : <tab-pen> ( -- pen )
     "inactive-tab" button-background f <border-button-state-pen> dup dup

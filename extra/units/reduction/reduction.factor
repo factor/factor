@@ -7,9 +7,9 @@ IN: units.reduction
 CONSTANT: storage-suffixes { "B" "K" "M" "G" "T" "P" "E" "Z" "Y" }
 
 CONSTANT: unit-suffix-hash H{
-        { CHAR: B 0 } { CHAR: K 1 } { CHAR: M 2 } { CHAR: G 3 }
-        { CHAR: T 4 } { CHAR: P 5 } { CHAR: E 6 } { CHAR: Z 7 }
-        { CHAR: Y 8 }
+        { char: B 0 } { char: K 1 } { char: M 2 } { char: G 3 }
+        { char: T 4 } { char: P 5 } { char: E 6 } { char: Z 7 }
+        { char: Y 8 }
     }
 
 : threshhold ( n multiplier base -- x )

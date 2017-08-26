@@ -111,7 +111,7 @@ ERROR: no-vocab name ;
     swap [ drop t ] [
         2dup = [ 2drop t ] [
             2dup head? [
-                length swap ?nth CHAR: . =
+                length swap ?nth char: . =
             ] [ 2drop f ] if
         ] if
     ] if-empty ;

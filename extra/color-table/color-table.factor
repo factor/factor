@@ -11,7 +11,7 @@ SINGLETON: color-renderer
 
 <PRIVATE
 
-CONSTANT: full-block-string $[ 10 CHAR: full-block <string> ]
+CONSTANT: full-block-string $[ 10 char: full-block <string> ]
 
 PRIVATE>
 
@@ -43,7 +43,7 @@ M: color-renderer row-value
     color-renderer
     <table>
         5 >>gap
-        COLOR: dark-gray >>column-line-color
+        color: dark-gray >>column-line-color
         10 >>min-rows
         10 >>max-rows ;
 

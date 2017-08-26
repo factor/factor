@@ -19,44 +19,44 @@ ARTICLE: "reading-ahead" "Reading ahead"
     ?scan-token
     ?scan-datum
 }
-"A simple example is the " { $link POSTPONE: \ } " word:"
-{ $see POSTPONE: \ } ;
+"A simple example is the " { $link postpone: \ } " word:"
+{ $see postpone: \ } ;
 
 ARTICLE: "parsing-word-nest" "Nested structure"
 "Recall that the parser loop calls parsing words with an accumulator vector on the stack. The parser loop can be invoked recursively with a new, empty accumulator; the result can then be added to the original accumulator. This is how parsing words for object literals are implemented; object literals can nest arbitrarily deep."
 $nl
 "A simple example is the parsing word that reads a quotation:"
-{ $see POSTPONE: [ }
-"This word uses a utility word which recursively invokes the parser, reading objects into a new accumulator until an occurrence of " { $link POSTPONE: ] } ":"
+{ $see postpone: [ }
+"This word uses a utility word which recursively invokes the parser, reading objects into a new accumulator until an occurrence of " { $link postpone: ] } ":"
 { $subsections parse-literal }
 "There is another, lower-level word for reading nested structure, which is also useful when called directly:"
 { $subsections parse-until }
-"Words such as " { $link POSTPONE: ] } " use a declaration which causes them to throw an error when an unpaired occurrence is encountered:"
-{ $subsections POSTPONE: delimiter }
-{ $see-also POSTPONE: { POSTPONE: H{ POSTPONE: V{ POSTPONE: W{ POSTPONE: T{ POSTPONE: } } ;
+"Words such as " { $link postpone: ] } " use a declaration which causes them to throw an error when an unpaired occurrence is encountered:"
+{ $subsections postpone: delimiter }
+{ $see-also postpone: { postpone: H{ postpone: V{ postpone: W{ postpone: T{ postpone: } } ;
 
 ARTICLE: "defining-words" "Defining words"
-"Defining words add definitions to the dictionary without modifying the parse tree. The simplest example is the " { $link POSTPONE: SYMBOL: } " word."
-{ $see POSTPONE: SYMBOL: }
-"The key factor in the definition of " { $link POSTPONE: SYMBOL: } " is " { $link scan-new } ", which reads a token from the input and creates a word with that name. This word is then passed to " { $link define-symbol } "."
+"Defining words add definitions to the dictionary without modifying the parse tree. The simplest example is the " { $link postpone: SYMBOL: } " word."
+{ $see postpone: SYMBOL: }
+"The key factor in the definition of " { $link postpone: SYMBOL: } " is " { $link scan-new } ", which reads a token from the input and creates a word with that name. This word is then passed to " { $link define-symbol } "."
 { $subsections
     scan-new
     scan-new-word
 }
 "Colon definitions are defined in a more elaborate way:"
-{ $subsections POSTPONE: : }
-"The " { $link POSTPONE: : } " word first calls " { $link scan-new } ", and then reads input until reaching " { $link POSTPONE: ; } " using a utility word:"
+{ $subsections postpone: : }
+"The " { $link postpone: : } " word first calls " { $link scan-new } ", and then reads input until reaching " { $link postpone: ; } " using a utility word:"
 { $subsections parse-definition }
-"The " { $link POSTPONE: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
-{ $see POSTPONE: ; }
-"There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } " or " { $link parse-array-def } "." ;
+"The " { $link postpone: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
+{ $see postpone: ; }
+"There are additional parsing words whose syntax is delimited by " { $link postpone: ; } ", and they are all implemented by calling " { $link parse-definition } " or " { $link parse-array-def } "." ;
 
 ARTICLE: "parsing-tokens" "Parsing raw tokens"
 "So far we have seen how to read individual tokens, or read a sequence of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."
 $nl
-"One example is the " { $link POSTPONE: USING: } " parsing word."
-{ $see POSTPONE: USING: }
-"It reads a list of vocabularies terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so " { $link parse-until } " cannot be used here. Instead, a set of lower-level combinators can be used:"
+"One example is the " { $link postpone: USING: } " parsing word."
+{ $see postpone: USING: }
+"It reads a list of vocabularies terminated by " { $link postpone: ; } ". However, the vocabulary names do not name words, except by coincidence; so " { $link parse-until } " cannot be used here. Instead, a set of lower-level combinators can be used:"
 { $subsections
     each-token
     map-tokens
@@ -67,7 +67,7 @@ ARTICLE: "parsing-words" "Parsing words"
 "The Factor parser follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
 $nl
 "Parsing words are defined using the defining word:"
-{ $subsections POSTPONE: SYNTAX: }
+{ $subsections postpone: SYNTAX: }
 "Parsing words have uppercase names by convention. Here is the simplest possible parsing word; it prints a greeting at parse time:"
 { $code "SYNTAX: HELLO \"Hello world\" print ;" }
 "Parsing words must not pop or push items from the stack; however, they are permitted to access the accumulator vector supplied by the parser at the top of the stack. That is, parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser."
@@ -142,7 +142,7 @@ $parsing-note ;
 
 HELP: no-word-error
 { $error-description "Thrown if the parser encounters a token which does not name a word in the current vocabulary search path. If any words with this name exist in vocabularies not part of the search path, a number of restarts will offer to add those vocabularies to the search path and use the chosen word." }
-{ $notes "Apart from a missing " { $link POSTPONE: USE: } ", this error can also indicate an ordering issue. In Factor, words must be defined before they can be called. Mutual recursion can be implemented via " { $link POSTPONE: DEFER: } "." } ;
+{ $notes "Apart from a missing " { $link postpone: USE: } ", this error can also indicate an ordering issue. In Factor, words must be defined before they can be called. Mutual recursion can be implemented via " { $link postpone: DEFER: } "." } ;
 
 HELP: no-word
 { $values { "name" string } { "newword" word } }
@@ -204,7 +204,7 @@ $parsing-note ;
 HELP: parse-until
 { $values { "end" word } { "vec" "a new vector" } }
 { $description "Parses objects from parser input until " { $snippet "end" } ". Outputs a new vector with the results." }
-{ $examples "This word is used to implement " { $link POSTPONE: ARTICLE: } "." }
+{ $examples "This word is used to implement " { $link postpone: ARTICLE: } "." }
 $parsing-note ;
 
 { parse-tokens each-token map-tokens (parse-until) parse-until } related-words
@@ -222,13 +222,13 @@ HELP: parse-lines
 HELP: parse-literal
 { $values { "accum" vector } { "end" word } { "quot" { $quotation ( seq -- obj ) } } }
 { $description "Parses objects from parser input until " { $snippet "end" } ", applies the quotation to the resulting sequence, and adds the output value to the accumulator." }
-{ $examples "This word is used to implement " { $link POSTPONE: [ } "." }
+{ $examples "This word is used to implement " { $link postpone: [ } "." }
 $parsing-note ;
 
 HELP: parse-definition
 { $values { "quot" "a new " { $link quotation } } }
-{ $description "Parses objects from parser input until " { $link POSTPONE: ; } " and outputs a quotation with the results." }
-{ $examples "This word is used to implement " { $link POSTPONE: : } "." }
+{ $description "Parses objects from parser input until " { $link postpone: ; } " and outputs a quotation with the results." }
+{ $examples "This word is used to implement " { $link postpone: : } "." }
 $parsing-note ;
 
 HELP: parse-array-def
@@ -283,11 +283,11 @@ HELP: staging-violation
 { $values { "word" word } }
 { $description "Throws a " { $link staging-violation } " error." }
 { $error-description "Thrown by the parser if a parsing word is used in the same compilation unit as where it was defined; see " { $link "compilation-units" } "." }
-{ $notes "One possible workaround is to use the " { $link POSTPONE: << } " word to execute code at parse time. However, executing words defined in the same source file at parse time is still prohibited." } ;
+{ $notes "One possible workaround is to use the " { $link postpone: << } " word to execute code at parse time. However, executing words defined in the same source file at parse time is still prohibited." } ;
 
 HELP: auto-use?
 { $var-description "If set to a true value, the behavior of the parser when encountering an unknown word name is changed. If only one loaded vocabulary has a word with this name, instead of throwing an error, the parser adds the vocabulary to the search path and prints a parse note. Off by default." }
-{ $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "word-search-errors" } "." } ;
+{ $notes "This feature is intended to help during development. To generate a " { $link postpone: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link postpone: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "word-search-errors" } "." } ;
 
 HELP: use-first-word?
 { $values { "words" sequence } { "?" boolean } }

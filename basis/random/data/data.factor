@@ -10,11 +10,11 @@ CONSTANT: letters-count 26
 >>
 
 : random-digit ( -- ch )
-    digits-count random CHAR: 0 + ;
+    digits-count random char: 0 + ;
 
-: random-LETTER ( -- ch ) letters-count random CHAR: A + ;
+: random-LETTER ( -- ch ) letters-count random char: A + ;
 
-: random-letter ( -- ch ) letters-count random CHAR: a + ;
+: random-letter ( -- ch ) letters-count random char: a + ;
 
 : random-Letter ( -- ch )
     { random-LETTER  random-letter } execute-random ;

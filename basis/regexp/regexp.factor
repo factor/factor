@@ -200,9 +200,9 @@ PRIVATE>
 : take-until ( lexer -- string )
     dup skip-blank [
         dupd [
-            [ CHAR: / -rot index-from ] keep
+            [ char: / -rot index-from ] keep
             over [ "Unterminated regexp" throw ] unless
-            2dup [ 1 - ] dip nth CHAR: \\ =
+            2dup [ 1 - ] dip nth char: \\ =
             [ [ [ 1 + ] dip ] when ] keep
         ] loop over [ subseq ] dip 1 +
     ] change-lexer-column ;

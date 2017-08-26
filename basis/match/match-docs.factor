@@ -11,7 +11,7 @@ HELP: match
 { $examples
     { $unchecked-example "USE: match" "MATCH-VARS: ?a ?b ;\n{ ?a { 2 ?b } 5 } { 1 { 2 3 } _ } match ." "H{ { ?a 1 } { ?b 3 } }" }
 }
-{ $see-also match-cond POSTPONE: MATCH-VARS: replace-patterns match-replace } ;
+{ $see-also match-cond postpone: MATCH-VARS: replace-patterns match-replace } ;
 
 HELP: match-cond
 { $values { "assoc" "a sequence of pairs" } }
@@ -21,7 +21,7 @@ HELP: match-cond
     { $code
         "USE: match" "MATCH-VARS: ?value ;\n{ increment 346126 } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
 }
-{ $see-also match POSTPONE: MATCH-VARS: replace-patterns match-replace } ;
+{ $see-also match postpone: MATCH-VARS: replace-patterns match-replace } ;
 
 HELP: MATCH-VARS:
 { $syntax "MATCH-VARS: var ... ;" }
@@ -35,7 +35,7 @@ HELP: MATCH-VARS:
 HELP: replace-patterns
 { $values { "object" object } { "result" object } }
 { $description "Copy the object, replacing each occurrence of a pattern matching variable with the actual value of that variable." }
-{ $see-also match-cond POSTPONE: MATCH-VARS: match-replace } ;
+{ $see-also match-cond postpone: MATCH-VARS: match-replace } ;
 
 HELP: match-replace
 { $values { "object" object } { "pattern1" object } { "pattern2" object } { "result" object } }
@@ -49,13 +49,13 @@ HELP: match-replace
       "{ 2 1 }"
   }
 }
-{ $see-also match-cond POSTPONE: MATCH-VARS: } ;
+{ $see-also match-cond postpone: MATCH-VARS: } ;
 
 ARTICLE: "match" "Pattern matching"
 "The " { $vocab-link "match" } " vocabulary implements ML-style pattern matching."
 $nl
 "Variables used for pattern matching must be explicitly defined first:"
-{ $subsections POSTPONE: MATCH-VARS: }
+{ $subsections postpone: MATCH-VARS: }
 "A basic pattern match:"
 { $subsections match }
 "A conditional form analogous to " { $link cond } ":"

@@ -19,7 +19,7 @@ CONSTANT: number-of-requests 1000
 : server-loop ( server -- )
     dup accept drop [
         [
-            read1 CHAR: x = [
+            read1 char: x = [
                 server get dispose
             ] [
                 number-of-requests
@@ -35,16 +35,16 @@ CONSTANT: number-of-requests 1000
 : simple-client ( -- )
     [
         server-addr ascii [
-            CHAR: b write1 flush
+            char: b write1 flush
             number-of-requests
-            [ CHAR: a dup write1 flush read1 assert= ] times
+            [ char: a dup write1 flush read1 assert= ] times
         ] with-client
     ] try
     counter get count-down ;
 
 : stop-server ( -- )
     server-addr ascii [
-        CHAR: x write1
+        char: x write1
     ] with-client ;
 
 : clients ( n -- )

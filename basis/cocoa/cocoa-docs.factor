@@ -14,7 +14,7 @@ HELP: SUPER->
 { $description "A sugared form of the following:" }
 { $code "\"selector\" send-super" } ;
 
-{ send super-send POSTPONE: -> POSTPONE: SUPER-> } related-words
+{ send super-send postpone: -> postpone: SUPER-> } related-words
 
 HELP: IMPORT:
 { $syntax "IMPORT: name" }
@@ -25,13 +25,13 @@ HELP: IMPORT:
 
 ARTICLE: "objc-calling" "Calling Objective C code"
 "Before an Objective C class can be used, it must be imported; by default, a small set of common classes are imported automatically, but additional classes can be imported as needed."
-{ $subsections POSTPONE: IMPORT: }
+{ $subsections postpone: IMPORT: }
 "Every imported Objective C class has as corresponding class word in the " { $vocab-link "cocoa.classes" } " vocabulary. Class words push the class object in the stack, allowing class methods to be invoked."
 $nl
 "Messages can be sent to classes and instances using a pair of parsing words:"
 { $subsections
-    POSTPONE: ->
-    POSTPONE: SUPER->
+    postpone: ->
+    postpone: SUPER->
 }
 "These parsing words are actually syntax sugar for a pair of ordinary words; they can be used instead of the parsing words if the selector name is dynamically computed:"
 { $subsections

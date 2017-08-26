@@ -7,7 +7,7 @@ HELP: path-separator?
 { $description "Tests if the code point is a platform-specific path separator." }
 { $examples
     "On Unix:"
-    { $example "USING: io.pathnames prettyprint ;" "CHAR: / path-separator? ." "t" }
+    { $example "USING: io.pathnames prettyprint ;" "char: / path-separator? ." "t" }
 } ;
 
 HELP: parent-directory
@@ -142,7 +142,7 @@ ARTICLE: "io.pathnames.presentations" "Pathname presentations"
     <pathname>
 }
 "Literal pathname presentations:"
-{ $subsections POSTPONE: P" }
+{ $subsections postpone: P" }
 "Many words that accept pathname strings can also work on pathname presentations." ;
 
 ARTICLE: "io.pathnames" "Pathnames"

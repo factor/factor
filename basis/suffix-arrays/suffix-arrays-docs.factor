@@ -31,7 +31,7 @@ ARTICLE: "suffix-arrays" "Suffix arrays"
 "Creating new suffix arrays:"
 { $subsections >suffix-array }
 "Literal suffix arrays:"
-{ $subsections POSTPONE: SA{ }
+{ $subsections postpone: SA{ }
 "Querying suffix arrays:"
 { $subsections query } ;
 

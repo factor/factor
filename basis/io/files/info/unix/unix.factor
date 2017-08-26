@@ -242,26 +242,26 @@ M: string set-file-group ( path string -- )
 
 : ch>file-type ( ch -- type )
     {
-        { CHAR: b [ +block-device+ ] }
-        { CHAR: c [ +character-device+ ] }
-        { CHAR: d [ +directory+ ] }
-        { CHAR: l [ +symbolic-link+ ] }
-        { CHAR: s [ +socket+ ] }
-        { CHAR: p [ +fifo+ ] }
-        { CHAR: - [ +regular-file+ ] }
+        { char: b [ +block-device+ ] }
+        { char: c [ +character-device+ ] }
+        { char: d [ +directory+ ] }
+        { char: l [ +symbolic-link+ ] }
+        { char: s [ +socket+ ] }
+        { char: p [ +fifo+ ] }
+        { char: - [ +regular-file+ ] }
         [ drop +unknown+ ]
     } case ;
 
 : file-type>ch ( type -- ch )
     {
-        { +block-device+ [ CHAR: b ] }
-        { +character-device+ [ CHAR: c ] }
-        { +directory+ [ CHAR: d ] }
-        { +symbolic-link+ [ CHAR: l ] }
-        { +socket+ [ CHAR: s ] }
-        { +fifo+ [ CHAR: p ] }
-        { +regular-file+ [ CHAR: - ] }
-        [ drop CHAR: - ]
+        { +block-device+ [ char: b ] }
+        { +character-device+ [ char: c ] }
+        { +directory+ [ char: d ] }
+        { +symbolic-link+ [ char: l ] }
+        { +socket+ [ char: s ] }
+        { +fifo+ [ char: p ] }
+        { +regular-file+ [ char: - ] }
+        [ drop char: - ]
     } case ;
 
 <PRIVATE

@@ -34,10 +34,10 @@ ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
 }
 "Literal syntax:"
 { $subsections
-    POSTPONE: svector{
-    POSTPONE: dvector{
-    POSTPONE: cvector{
-    POSTPONE: zvector{
+    postpone: svector{
+    postpone: dvector{
+    postpone: cvector{
+    postpone: zvector{
 } ;
 
 ABOUT: "math.blas.vectors"
@@ -162,6 +162,6 @@ HELP: zvector{
 { $description "Construct a literal " { $link complex-double-blas-vector } "." } ;
 
 {
-    POSTPONE: svector{ POSTPONE: dvector{
-    POSTPONE: cvector{ POSTPONE: zvector{
+    postpone: svector{ postpone: dvector{
+    postpone: cvector{ postpone: zvector{
 } related-words

@@ -19,8 +19,8 @@ SPECIALIZED-ARRAY: int
 { B{ 1 2 3 4 5 6 } } [ binary [ B{ 1 2 3 } write B{ 4 5 6 } write ] with-byte-writer ] unit-test
 { B{ 1 2 3 } } [ { 1 2 3 } binary [ 3 read ] with-byte-reader ] unit-test
 
-{ B{ 0b11110101 0b10111111 0b10000000 0b10111111 0b11101111 0b10000000 0b10111111 0b11011111 0b10000000 CHAR: x } }
-[ { 0b101111111000000111111 0b1111000000111111 0b11111000000 CHAR: x } >string utf8 [ write ] with-byte-writer ] unit-test
+{ B{ 0b11110101 0b10111111 0b10000000 0b10111111 0b11101111 0b10000000 0b10111111 0b11011111 0b10000000 char: x } }
+[ { 0b101111111000000111111 0b1111000000111111 0b11111000000 char: x } >string utf8 [ write ] with-byte-writer ] unit-test
 { { 0b1111111000000111111 } t } [ { 0b11110001 0b10111111 0b10000000 0b10111111 } utf8 <byte-reader> stream-contents dup >array swap string? ] unit-test
 
 { B{ 121 120 } 0 } [

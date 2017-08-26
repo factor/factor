@@ -13,7 +13,7 @@ HELP: do-not-compile
 } ;
 
 HELP: unknown-macro-input
-{ $error-description "Thrown when inference encounters a combinator or macro being applied to an input parameter of a non-" { $link POSTPONE: inline } " word. The word needs to be declared " { $link POSTPONE: inline } " before its callers can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
+{ $error-description "Thrown when inference encounters a combinator or macro being applied to an input parameter of a non-" { $link postpone: inline } " word. The word needs to be declared " { $link postpone: inline } " before its callers can compile and run. See " { $link "inference-combinators" } " and " { $link "inference-escape" } " for details." }
 { $examples
     "In this example, the words being defined cannot be called, because they fail to compile with a " { $link unknown-macro-input } " error:"
     { $code
@@ -31,7 +31,7 @@ HELP: unknown-macro-input
         ": usage ( -- )"
         "    10 [ 2 * ] good-example . ;"
     }
-    "Another fix is to use " { $link POSTPONE: call( } ":"
+    "Another fix is to use " { $link postpone: call( } ":"
     { $code
         ": good-example ( quot -- )"
         "    [ call( x -- y ) ] [ call( x -- y ) ] bi ;"
@@ -103,7 +103,7 @@ HELP: recursive-quotation-error
 } ;
 
 HELP: undeclared-recursion-error
-{ $error-description "Thrown when an " { $link POSTPONE: inline } " word which is not declared " { $link POSTPONE: recursive } " calls itself, directly or indirectly. The " { $link POSTPONE: recursive } " declaration is mandatory for such words." } ;
+{ $error-description "Thrown when an " { $link postpone: inline } " word which is not declared " { $link postpone: recursive } " calls itself, directly or indirectly. The " { $link postpone: recursive } " declaration is mandatory for such words." } ;
 
 HELP: diverging-recursion-error
 { $error-description "Thrown when stack effect inference determines that a recursive word might take an arbitrary number of values from the stack." }

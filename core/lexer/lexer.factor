@@ -50,11 +50,11 @@ ERROR: not-a-lexer object ;
 ERROR: unexpected want got ;
 
 : forbid-tab ( c -- c )
-    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
+    [ char: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
 : skip ( i seq ? -- n )
     over length [
-        [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
+        [ swap forbid-tab char: \s eq? xor ] curry find-from drop
     ] dip or ; inline
 
 : change-lexer-column ( ..a lexer quot: ( ..a col line -- ..b newcol ) -- ..b )
@@ -85,7 +85,7 @@ GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word
     [
-        2dup nth CHAR: \" eq? [ drop 1 + ] [ f skip ] if
+        2dup nth char: \" eq? [ drop 1 + ] [ f skip ] if
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
@@ -163,14 +163,14 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     [ line>> number>string ": " append ]
     [ line-text>> ]
     [ column>> ] tri
-    pick length + CHAR: \s <string>
+    pick length + char: \s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
 
 : (parsing-word-lexer-dump) ( error parsing-word -- )
     [
         line>> number>string
         over line>> number>string length
-        CHAR: \s pad-head
+        char: \s pad-head
         ": " append write
     ] [ line-text>> print ] bi
     simple-lexer-dump ;

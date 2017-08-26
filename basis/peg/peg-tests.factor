@@ -18,19 +18,19 @@ IN: peg.tests
 ] unit-test
 
 [
-    "" CHAR: a CHAR: z range parse
+    "" char: a char: z range parse
 ] must-fail
 
 [
-    "1bcd" CHAR: a CHAR: z range parse
+    "1bcd" char: a char: z range parse
 ] must-fail
 
-{ CHAR: a } [
-    "abcd" CHAR: a CHAR: z range parse
+{ char: a } [
+    "abcd" char: a char: z range parse
 ] unit-test
 
-{ CHAR: z } [
-    "zbcd" CHAR: a CHAR: z range parse
+{ char: z } [
+    "zbcd" char: a char: z range parse
 ] unit-test
 
 [
@@ -93,12 +93,12 @@ IN: peg.tests
     "cb" "a" token optional "b" token 2array seq parse
 ] must-fail
 
-{ V{ CHAR: a CHAR: b } } [
-    "ab" "a" token ensure CHAR: a CHAR: z range dup 3array seq parse
+{ V{ char: a char: b } } [
+    "ab" "a" token ensure char: a char: z range dup 3array seq parse
 ] unit-test
 
 [
-    "bb" "a" token ensure CHAR: a CHAR: z range 2array seq parse
+    "bb" "a" token ensure char: a char: z range 2array seq parse
 ] must-fail
 
 { t } [
@@ -138,11 +138,11 @@ IN: peg.tests
 ] must-fail
 
 [
-    "b" [ CHAR: a = ] satisfy parse
+    "b" [ char: a = ] satisfy parse
 ] must-fail
 
-{ CHAR: a } [
-    "a" [ CHAR: a = ] satisfy parse
+{ char: a } [
+    "a" [ char: a = ] satisfy parse
 ] unit-test
 
 { "a" } [
@@ -191,7 +191,7 @@ IN: peg.tests
     "A" [ drop t ] satisfy [ 66 >= ] semantic parse
 ] must-fail
 
-{ CHAR: B } [
+{ char: B } [
     "B" [ drop t ] satisfy [ 66 >= ] semantic parse
 ] unit-test
 

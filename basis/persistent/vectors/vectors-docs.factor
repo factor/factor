@@ -20,7 +20,7 @@ $nl
 "Converting a sequence into a persistent vector:"
 { $subsections >persistent-vector }
 "Persistent vectors have a literal syntax:"
-{ $subsections POSTPONE: PV{ }
+{ $subsections postpone: PV{ }
 "The empty persistent vector, written " { $snippet "PV{ }" } ", is used for building up all other persistent vectors."
 $nl
 "This implementation of persistent vectors is based on the " { $snippet "clojure.lang.PersistentVector" } " class from Rich Hickey's Clojure language for the JVM (" { $url "http://clojure.org" } ")." ;

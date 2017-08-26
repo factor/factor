@@ -8,8 +8,8 @@ IN: processing.shapes
 SYMBOL: fill-color
 SYMBOL: stroke-color
 
-COLOR: black stroke-color set-global
-COLOR: white fill-color set-global
+color: black stroke-color set-global
+color: white fill-color set-global
 
 : fill-mode ( -- )
     GL_FRONT_AND_BACK GL_FILL glPolygonMode

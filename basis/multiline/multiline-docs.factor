@@ -19,7 +19,7 @@ HELP: /*
 HELP: HEREDOC:
 { $syntax "HEREDOC: marker\n...text...\nmarker" }
 { $values { "marker" "a word (token)" } { "text" "arbitrary text" } { "value" string } }
-{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link POSTPONE: HEREDOC: } " until the end of the line containing " { $link POSTPONE: HEREDOC: } ". Text is captured until a line is found containing exactly this delimiter string." }
+{ $description "Returns a string delimited by an arbitrary user-defined token. This delimiter must be exactly the text beginning at the first non-blank character after " { $link postpone: HEREDOC: } " until the end of the line containing " { $link postpone: HEREDOC: } ". Text is captured until a line is found containing exactly this delimiter string." }
 { $warning "Whitespace is significant." }
 { $examples
     { $example "USING: multiline prettyprint ;"
@@ -35,16 +35,16 @@ HELP: HEREDOC:
 HELP: parse-multiline-string
 { $values { "end-text" "a string delineating the end" } { "str" "the parsed string" } }
 { $description "Parses the input stream until the " { $snippet "end-text" } " is reached and returns the parsed text as a string." }
-{ $notes "Used to implement " { $link POSTPONE: /* } "." } ;
+{ $notes "Used to implement " { $link postpone: /* } "." } ;
 
 ARTICLE: "multiline" "Multiline"
 "Multiline strings:"
 { $subsections
-    POSTPONE: STRING:
-    POSTPONE: HEREDOC:
+    postpone: STRING:
+    postpone: HEREDOC:
 }
 "Multiline comments:"
-{ $subsections POSTPONE: /* }
+{ $subsections postpone: /* }
 "Writing new multiline parsing words:"
 { $subsections parse-multiline-string }
 ;

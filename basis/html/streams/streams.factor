@@ -36,7 +36,7 @@ TUPLE: html-sub-stream < html-writer style parent ;
 
 : hex-color, ( color -- )
     [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * >integer >hex 2 CHAR: 0 pad-head % ] tri@ ;
+    [ 255 * >integer >hex 2 char: 0 pad-head % ] tri@ ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;

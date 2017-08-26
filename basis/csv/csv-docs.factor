@@ -46,7 +46,7 @@ HELP: write-csv
 { $description "Writes a sequence of sequences of comma-separated-values to the output stream, escaping where necessary." } ;
 
 HELP: with-delimiter
-{ $values { "ch" "field delimiter (e.g. CHAR: \\t)" }
+{ $values { "ch" "field delimiter (e.g. char: \\t)" }
           { "quot" quotation } }
 { $description "Sets the field delimiter for read-csv, read-row, write-csv, or write-row words." } ;
 

@@ -6,9 +6,9 @@ HELP: :deprecations
 { $description "Prints all deprecation notes." } ;
 
 ARTICLE: "tools.deprecation" "Deprecation tracking"
-"Factor's core syntax defines a " { $link POSTPONE: deprecated } " word that can be applied to words to mark them as deprecated. Notes are collected and reported by the " { $link "tools.errors" } " mechanism when deprecated words are used to define other words."
+"Factor's core syntax defines a " { $link postpone: deprecated } " word that can be applied to words to mark them as deprecated. Notes are collected and reported by the " { $link "tools.errors" } " mechanism when deprecated words are used to define other words."
 { $subsections
-    POSTPONE: deprecated
+    postpone: deprecated
     :deprecations
 } ;
 

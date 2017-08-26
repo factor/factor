@@ -33,62 +33,62 @@ M: object >n-byte-array ( n string -- byte-array ) heap-size >n-byte-array ;
 : expand-pack-format ( str -- str' )
     f swap [
         dup digit?
-        [ [ 0 or 10 * ] [ CHAR: 0 - ] bi* + f ]
+        [ [ 0 or 10 * ] [ char: 0 - ] bi* + f ]
         [ [ 1 or ] [ <string> ] bi* f swap ] if
     ] { } map-as "" concat-as nip ; foldable
 
 CONSTANT: pack-table
     H{
-        { CHAR: c s8>byte-array }
-        { CHAR: C u8>byte-array }
-        { CHAR: s s16>byte-array }
-        { CHAR: S u16>byte-array }
-        { CHAR: t s24>byte-array }
-        { CHAR: T u24>byte-array }
-        { CHAR: i s32>byte-array }
-        { CHAR: I u32>byte-array }
-        { CHAR: q s64>byte-array }
-        { CHAR: Q u64>byte-array }
-        { CHAR: f write-float }
-        { CHAR: F write-float }
-        { CHAR: d write-double }
-        { CHAR: D write-double }
+        { char: c s8>byte-array }
+        { char: C u8>byte-array }
+        { char: s s16>byte-array }
+        { char: S u16>byte-array }
+        { char: t s24>byte-array }
+        { char: T u24>byte-array }
+        { char: i s32>byte-array }
+        { char: I u32>byte-array }
+        { char: q s64>byte-array }
+        { char: Q u64>byte-array }
+        { char: f write-float }
+        { char: F write-float }
+        { char: d write-double }
+        { char: D write-double }
     }
 
 CONSTANT: unpack-table
     H{
-        { CHAR: c [ 8 signed-endian> ] }
-        { CHAR: C [ unsigned-endian> ] }
-        { CHAR: s [ 16 signed-endian> ] }
-        { CHAR: S [ unsigned-endian> ] }
-        { CHAR: t [ 24 signed-endian> ] }
-        { CHAR: T [ unsigned-endian> ] }
-        { CHAR: i [ 32 signed-endian> ] }
-        { CHAR: I [ unsigned-endian> ] }
-        { CHAR: q [ 64 signed-endian> ] }
-        { CHAR: Q [ unsigned-endian> ] }
-        { CHAR: f [ unsigned-endian> bits>float ] }
-        { CHAR: F [ unsigned-endian> bits>float ] }
-        { CHAR: d [ unsigned-endian> bits>double ] }
-        { CHAR: D [ unsigned-endian> bits>double ] }
+        { char: c [ 8 signed-endian> ] }
+        { char: C [ unsigned-endian> ] }
+        { char: s [ 16 signed-endian> ] }
+        { char: S [ unsigned-endian> ] }
+        { char: t [ 24 signed-endian> ] }
+        { char: T [ unsigned-endian> ] }
+        { char: i [ 32 signed-endian> ] }
+        { char: I [ unsigned-endian> ] }
+        { char: q [ 64 signed-endian> ] }
+        { char: Q [ unsigned-endian> ] }
+        { char: f [ unsigned-endian> bits>float ] }
+        { char: F [ unsigned-endian> bits>float ] }
+        { char: d [ unsigned-endian> bits>double ] }
+        { char: D [ unsigned-endian> bits>double ] }
     }
 
 CONSTANT: packed-length-table
     H{
-        { CHAR: c 1 }
-        { CHAR: C 1 }
-        { CHAR: s 2 }
-        { CHAR: S 2 }
-        { CHAR: t 3 }
-        { CHAR: T 3 }
-        { CHAR: i 4 }
-        { CHAR: I 4 }
-        { CHAR: q 8 }
-        { CHAR: Q 8 }
-        { CHAR: f 4 }
-        { CHAR: F 4 }
-        { CHAR: d 8 }
-        { CHAR: D 8 }
+        { char: c 1 }
+        { char: C 1 }
+        { char: s 2 }
+        { char: S 2 }
+        { char: t 3 }
+        { char: T 3 }
+        { char: i 4 }
+        { char: I 4 }
+        { char: q 8 }
+        { char: Q 8 }
+        { char: f 4 }
+        { char: F 4 }
+        { char: d 8 }
+        { char: D 8 }
     }
 
 PRIVATE>

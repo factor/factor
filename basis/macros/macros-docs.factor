@@ -30,7 +30,7 @@ HELP: MACRO:
 } ;
 
 HELP: macro
-{ $class-description "Class of words defined with " { $link POSTPONE: MACRO: } "." } ;
+{ $class-description "Class of words defined with " { $link postpone: MACRO: } "." } ;
 
 ARTICLE: "macros" "Macros"
 "The " { $vocab-link "macros" } " vocabulary implements " { $emphasis "macros" } ", which are code transformations that may run at compile-time under the right circumstances."
@@ -42,7 +42,7 @@ $nl
 "Factor macros are similar to Lisp macros; they are not like C preprocessor macros."
 $nl
 "Defining new macros:"
-{ $subsections POSTPONE: MACRO: }
+{ $subsections postpone: MACRO: }
 "A slightly lower-level facility, " { $emphasis "compiler transforms" } ", allows an ordinary word definition to co-exist with a version that performs compile-time expansion. The ordinary definition is only used from code compiled with the non-optimizing compiler. Under normal circumstances, macros should be used instead of compiler transforms; compiler transforms are only used for words such as " { $link cond } " which are frequently invoked during the bootstrap process, and this having a performant non-optimized definition which does not generate code on the fly is important."
 { $subsections define-transform }
 { $see-also "generalizations" "fry" } ;

@@ -6,7 +6,7 @@ ABOUT: "prettyprint-extension"
 
 HELP: pprint-word
 { $values { "word" word } }
-{ $description "Adds a text section for the word. Unlike the " { $link word } " method of " { $link pprint* } ", this does not add a " { $link POSTPONE: POSTPONE: } " prefix to parsing words." }
+{ $description "Adds a text section for the word. Unlike the " { $link word } " method of " { $link pprint* } ", this does not add a " { $link postpone: postpone: } " prefix to parsing words." }
 $prettyprinting-note ;
 
 HELP: ch>ascii-escape

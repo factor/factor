@@ -1,9 +1,9 @@
 USING: arrays io.encodings.ascii io.encodings.string strings
 tools.test ;
 
-{ B{ CHAR: f CHAR: o CHAR: o } } [ "foo" ascii encode ] unit-test
+{ B{ char: f char: o char: o } } [ "foo" ascii encode ] unit-test
 [ { 128 } >string ascii encode ] must-fail
 { B{ 127 } } [ { 127 } >string ascii encode ] unit-test
 
 { "bar" } [ "bar" ascii decode ] unit-test
-{ { CHAR: b 0xfffd CHAR: r } } [ B{ CHAR: b 233 CHAR: r } ascii decode >array ] unit-test
+{ { char: b 0xfffd char: r } } [ B{ char: b 233 char: r } ascii decode >array ] unit-test

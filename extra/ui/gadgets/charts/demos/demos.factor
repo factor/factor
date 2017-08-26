@@ -22,8 +22,8 @@ CONSTANT: -pi $[ pi neg ]
 
 :: (chart-demo) ( n -- )
     chart new ${ ${ -pi pi } { -1 1 } } >>axes
-    line new COLOR: blue >>color n sine-wave >>data add-gadget
-    line new COLOR: red >>color n cosine-wave >>data add-gadget
+    line new color: blue >>color n sine-wave >>data add-gadget
+    line new color: red >>color n cosine-wave >>data add-gadget
     vertical-axis new add-gadget
     horizontal-axis new add-gadget
     "Chart" open-window ;
@@ -34,4 +34,4 @@ PRIVATE>
 
 MAIN: chart-demo
 
-! chart new line new COLOR: blue >>color { { 0 100 } { 100 0 } { 100 50 } { 150 50 } { 200 100 } } >>data add-gadget "Chart" open-window
+! chart new line new color: blue >>color { { 0 100 } { 100 0 } { 100 50 } { 150 50 } { 200 100 } } >>data add-gadget "Chart" open-window

@@ -6,4 +6,4 @@ IN: io.streams.plain
 MIXIN: plain-writer
 
 M: plain-writer stream-nl
-    CHAR: \n swap stream-write1 ;
+    char: \n swap stream-write1 ;

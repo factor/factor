@@ -7,7 +7,7 @@ HELP: define-enum
 { $values
     { "word" word } { "base-type" c-type } { "members" "sequence of word and value pairs" }
 }
-{ $description "Defines an enum. This is the run-time equivalent of " { $link POSTPONE: ENUM: } "." } ;
+{ $description "Defines an enum. This is the run-time equivalent of " { $link postpone: ENUM: } "." } ;
 
 HELP: enum>number
 { $values
@@ -23,6 +23,6 @@ HELP: number>enum
 }
 { $description "Convert a number to an enum." } ;
 
-{ POSTPONE: ENUM: define-enum enum>number number>enum } related-words
+{ postpone: ENUM: define-enum enum>number number>enum } related-words
 
 ABOUT: "alien.enums"

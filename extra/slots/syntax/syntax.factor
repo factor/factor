@@ -34,7 +34,7 @@ SYNTAX: copy-slots{
     ] map-tokens
     '[ swap _ cleave ] append! ;
 
-SYNTAX: get[ POSTPONE: slots[ ;
-SYNTAX: get{ POSTPONE: slots{ ;
-SYNTAX: set[ POSTPONE: set-slots[ ;
-SYNTAX: set{ POSTPONE: set-slots{ ;
+SYNTAX: get[ postpone: slots[ ;
+SYNTAX: get{ postpone: slots{ ;
+SYNTAX: set[ postpone: set-slots[ ;
+SYNTAX: set{ postpone: set-slots{ ;

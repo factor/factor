@@ -15,13 +15,13 @@ HELP: rgba>hex
 { $description "Converts a " { $link color } " into a hexadecimal string value." }
 ;
 
-HELP: HEXCOLOR:
-{ $syntax "HEXCOLOR: value" }
+HELP: hexcolor:
+{ $syntax "hexcolor: value" }
 { $description "Parses as a " { $link color } " object with the given hexadecimal value." }
 { $examples
   { $code
     "USING: colors.hex io.styles ;"
-    "\"Hello!\" { { foreground HEXCOLOR: 336699 } } format nl"
+    "\"Hello!\" { { foreground hexcolor: 336699 } } format nl"
   }
 } ;
 
@@ -31,7 +31,7 @@ ARTICLE: "colors.hex" "HEX colors"
 { $subsections
     hex>rgba
     rgba>hex
-    POSTPONE: HEXCOLOR:
+    postpone: hexcolor:
 }
 { $see-also "colors" } ;
 

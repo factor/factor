@@ -83,8 +83,8 @@ PRIVATE>
     (pprint-manifest pprint-manifest) ;
 
 CONSTANT: manifest-style H{
-    { page-color COLOR: FactorLightTan }
-    { border-color COLOR: FactorDarkTan }
+    { page-color color: FactorLightTan }
+    { border-color color: FactorDarkTan }
     { inset { 5 5 } }
 }
 

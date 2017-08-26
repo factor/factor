@@ -14,11 +14,11 @@ MACRO: formatted ( spec -- quot )
         } cond
     ] map [ cleave ] curry ;
 
-: pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
+: pad-00 ( n -- str ) number>string 2 char: 0 pad-head ;
 
-: pad-0000 ( n -- str ) number>string 4 CHAR: 0 pad-head ;
+: pad-0000 ( n -- str ) number>string 4 char: 0 pad-head ;
 
-: pad-00000 ( n -- str ) number>string 5 CHAR: 0 pad-head ;
+: pad-00000 ( n -- str ) number>string 5 char: 0 pad-head ;
 
 : write-00 ( n -- ) pad-00 write ;
 

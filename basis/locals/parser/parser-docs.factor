@@ -10,7 +10,7 @@ HELP: parse-def
   { "name/paren" string }
   { "def" "a " { $link def } " or a " { $link multi-def } }
 }
-{ $description "Parses the lexical variable bindings following a " { $link POSTPONE: :> } " token." } ;
+{ $description "Parses the lexical variable bindings following a " { $link postpone: :> } " token." } ;
 
 HELP: with-lambda-scope
 { $values { "assoc" "local variables" } { "reader-quot" quotation } { "quot" quotation } }

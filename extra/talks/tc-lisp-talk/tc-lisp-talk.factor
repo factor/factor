@@ -78,7 +78,7 @@ CONSTANT: tc-lisp-slides
     }
     { $slide "Object system"
         "Based on CLOS"
-        { "We define generic words that operate on the top of the stack with " { $link POSTPONE: GENERIC:  } " or on an implicit parameter with " { $link POSTPONE: HOOK: } }
+        { "We define generic words that operate on the top of the stack with " { $link postpone: GENERIC:  } " or on an implicit parameter with " { $link postpone: HOOK: } }
     }
     { $slide "Object system example: shape protocol"
         "In ~/factor/work/shapes/shapes.factor"

@@ -11,7 +11,7 @@ HELP: SPECIALIZED-ARRAYS:
 { $values { "type" "a C type" } }
 { $description "Brings a set of specialized arrays for holding values of each " { $snippet "type" } " into the vocabulary search path. The generated words are documented in " { $link "specialized-array-words" } "." } ;
 
-{ POSTPONE: SPECIALIZED-ARRAY: POSTPONE: SPECIALIZED-ARRAYS: } related-words
+{ postpone: SPECIALIZED-ARRAY: postpone: SPECIALIZED-ARRAYS: } related-words
 
 HELP: direct-slice
 { $values { "from" integer } { "to" integer } { "seq" "a specialized array" } { "seq'" "a new specialized array" } }
@@ -36,7 +36,7 @@ HELP: direct-tail*
 { direct-slice direct-head direct-tail direct-head* direct-tail* } related-words
 
 ARTICLE: "specialized-array-words" "Specialized array words"
-"The " { $link POSTPONE: SPECIALIZED-ARRAY: } " and " { $link POSTPONE: SPECIALIZED-ARRAYS: } " parsing words generate specialized array types if they haven't been generated already and add the following words to the vocabulary search path, where " { $snippet "T" } " is the C type in question:"
+"The " { $link postpone: SPECIALIZED-ARRAY: } " and " { $link postpone: SPECIALIZED-ARRAYS: } " parsing words generate specialized array types if they haven't been generated already and add the following words to the vocabulary search path, where " { $snippet "T" } " is the C type in question:"
 { $table
     { { $snippet "T-array" } { "The class of arrays with elements of type " { $snippet "T" } } }
     { { $snippet "<T-array>" } { "Constructor for arrays with elements of type " { $snippet "T" } "; stack effect " { $snippet "( len -- array )" } } }
@@ -44,7 +44,7 @@ ARTICLE: "specialized-array-words" "Specialized array words"
     { { $snippet "<direct-T-array>" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by raw memory; stack effect " { $snippet "( alien len -- array )" } } }
     { { $snippet "T-array{" } { "Literal syntax, consists of a series of values terminated by " { $snippet "}" } } }
 }
-"Behind the scenes, these words are placed in a vocabulary named " { $snippet "specialized-arrays.instances.T" } ", however this vocabulary should not be placed in a " { $link POSTPONE: USING: } " form directly. Instead, always use " { $link POSTPONE: SPECIALIZED-ARRAY: } " or " { $link POSTPONE: SPECIALIZED-ARRAYS: } ". This ensures that the vocabulary can get generated the first time it is needed."
+"Behind the scenes, these words are placed in a vocabulary named " { $snippet "specialized-arrays.instances.T" } ", however this vocabulary should not be placed in a " { $link postpone: USING: } " form directly. Instead, always use " { $link postpone: SPECIALIZED-ARRAY: } " or " { $link postpone: SPECIALIZED-ARRAYS: } ". This ensures that the vocabulary can get generated the first time it is needed."
 $nl
 "Additionally, special versions of the standard " { $link <slice> } ", " { $link head } ", and " { $link tail } " sequence operations are provided for specialized arrays to create a new specialized array object sharing storage with a subsequence of an existing array:"
 { $subsections
@@ -116,8 +116,8 @@ ARTICLE: "specialized-arrays" "Specialized arrays"
 $nl
 "A specialized array type needs to be generated for each element type. This is done with parsing words:"
 { $subsections
-    POSTPONE: SPECIALIZED-ARRAY:
-    POSTPONE: SPECIALIZED-ARRAYS:
+    postpone: SPECIALIZED-ARRAY:
+    postpone: SPECIALIZED-ARRAYS:
 }
 "This parsing word adds new words to the search path, documented in the next section."
 { $subsections

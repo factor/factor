@@ -54,17 +54,17 @@ $nl
     ( -- seq ) (eval)
 ] with-interactive-vocabs"
 }
-"Note that the search path in the outer code (set by the " { $link POSTPONE: USING: } " form) has no relation to the search path used when parsing the string parameter (this is determined by " { $link with-interactive-vocabs } " and " { $link use-vocab } ")." ;
+"Note that the search path in the outer code (set by the " { $link postpone: USING: } " form) has no relation to the search path used when parsing the string parameter (this is determined by " { $link with-interactive-vocabs } " and " { $link use-vocab } ")." ;
 
 ARTICLE: "eval" "Evaluating strings at run time"
 "The " { $vocab-link "eval" } " vocabulary implements support for evaluating strings of code dynamically."
 $nl
 "The main entry point is a parsing word, which wraps a library word:"
 { $subsections
-    POSTPONE: eval(
+    postpone: eval(
     eval
 }
-"This pairing is analogous to that of " { $link POSTPONE: call( } " with " { $link call-effect } "."
+"This pairing is analogous to that of " { $link postpone: call( } " with " { $link call-effect } "."
 $nl
 "Advanced features:"
 { $subsections "eval-vocabs" eval>string }

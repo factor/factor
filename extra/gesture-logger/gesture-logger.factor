@@ -10,7 +10,7 @@ TUPLE: gesture-logger < gadget stream ;
     \ gesture-logger new
     swap >>stream
     { 100 100 } >>dim
-    COLOR: black <solid> >>interior ;
+    color: black <solid> >>interior ;
 
 M: gesture-logger handle-gesture
     over T{ button-down } = [ dup request-focus ] when

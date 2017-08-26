@@ -551,7 +551,7 @@ MIXIN: foo-mix
                     { class
                       intersection{
                           not{
-                              POSTPONE: f
+                              postpone: f
                           }
                           not{ foo-mix }
                       }
@@ -564,7 +564,7 @@ MIXIN: foo-mix
              {
                  8815405
                  T{ value-info-state
-                    { class POSTPONE: f }
+                    { class postpone: f }
                     { interval
                       empty-interval
                     }

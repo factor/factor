@@ -42,12 +42,12 @@ IN: compiler.tests.intrinsics
 ! Write barrier hits on the wrong value were causing segfaults
 [ -3 ] [ -3 1 2 [ 2array [ 3 set-slot ] keep ] compile-call second ] unit-test
 
-[ CHAR: a ] [ 0 "abc" [ string-nth ] compile-call ] unit-test
-[ CHAR: a ] [ 0 [ "abc" string-nth ] compile-call ] unit-test
-[ CHAR: a ] [ [ 0 "abc" string-nth ] compile-call ] unit-test
-[ CHAR: b ] [ 1 "abc" [ string-nth ] compile-call ] unit-test
-[ CHAR: b ] [ 1 [ "abc" string-nth ] compile-call ] unit-test
-[ CHAR: b ] [ [ 1 "abc" string-nth ] compile-call ] unit-test
+[ char: a ] [ 0 "abc" [ string-nth ] compile-call ] unit-test
+[ char: a ] [ 0 [ "abc" string-nth ] compile-call ] unit-test
+[ char: a ] [ [ 0 "abc" string-nth ] compile-call ] unit-test
+[ char: b ] [ 1 "abc" [ string-nth ] compile-call ] unit-test
+[ char: b ] [ 1 [ "abc" string-nth ] compile-call ] unit-test
+[ char: b ] [ [ 1 "abc" string-nth ] compile-call ] unit-test
 
 [ 0x123456 ] [ 0 "\u123456bc" [ string-nth ] compile-call ] unit-test
 [ 0x123456 ] [ 0 [ "\u123456bc" string-nth ] compile-call ] unit-test
@@ -439,7 +439,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 [ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare void* <ref> ] compile-call void* deref ] unit-test
 [ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare void* <ref> ] compile-call void* deref ] unit-test
-[ f ] [ f [ { POSTPONE: f } declare void* <ref> ] compile-call void* deref ] unit-test
+[ f ] [ f [ { postpone: f } declare void* <ref> ] compile-call void* deref ] unit-test
 
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 [ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test

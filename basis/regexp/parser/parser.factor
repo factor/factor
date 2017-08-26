@@ -70,36 +70,36 @@ MEMO: simple-category-table ( -- table )
 
 : lookup-escape ( char -- ast )
     {
-        { CHAR: t [ CHAR: \t ] }
-        { CHAR: n [ CHAR: \n ] }
-        { CHAR: r [ CHAR: \r ] }
-        { CHAR: f [ 0xc ] }
-        { CHAR: a [ 0x7 ] }
-        { CHAR: e [ 0x1b ] }
-        { CHAR: \\ [ CHAR: \\ ] }
+        { char: t [ char: \t ] }
+        { char: n [ char: \n ] }
+        { char: r [ char: \r ] }
+        { char: f [ 0xc ] }
+        { char: a [ 0x7 ] }
+        { char: e [ 0x1b ] }
+        { char: \\ [ char: \\ ] }
 
-        { CHAR: w [ c-identifier-class <primitive-class> ] }
-        { CHAR: W [ c-identifier-class <primitive-class> <not-class> ] }
-        { CHAR: s [ java-blank-class <primitive-class> ] }
-        { CHAR: S [ java-blank-class <primitive-class> <not-class> ] }
-        { CHAR: d [ digit-class <primitive-class> ] }
-        { CHAR: D [ digit-class <primitive-class> <not-class> ] }
+        { char: w [ c-identifier-class <primitive-class> ] }
+        { char: W [ c-identifier-class <primitive-class> <not-class> ] }
+        { char: s [ java-blank-class <primitive-class> ] }
+        { char: S [ java-blank-class <primitive-class> <not-class> ] }
+        { char: d [ digit-class <primitive-class> ] }
+        { char: D [ digit-class <primitive-class> <not-class> ] }
 
-        { CHAR: z [ end-of-input <tagged-epsilon> ] }
-        { CHAR: Z [ end-of-file <tagged-epsilon> ] }
-        { CHAR: A [ beginning-of-input <tagged-epsilon> ] }
-        { CHAR: b [ word-break <tagged-epsilon> ] }
-        { CHAR: B [ word-break <not-class> <tagged-epsilon> ] }
+        { char: z [ end-of-input <tagged-epsilon> ] }
+        { char: Z [ end-of-file <tagged-epsilon> ] }
+        { char: A [ beginning-of-input <tagged-epsilon> ] }
+        { char: b [ word-break <tagged-epsilon> ] }
+        { char: B [ word-break <not-class> <tagged-epsilon> ] }
         [ ]
     } case ;
 
 : options-assoc ( -- assoc )
     H{
-        { CHAR: i case-insensitive }
-        { CHAR: d unix-lines }
-        { CHAR: m multiline }
-        { CHAR: r reversed-regexp }
-        { CHAR: s dotall }
+        { char: i case-insensitive }
+        { char: d unix-lines }
+        { char: m multiline }
+        { char: r reversed-regexp }
+        { char: s dotall }
     } ;
 
 ERROR: nonexistent-option name ;

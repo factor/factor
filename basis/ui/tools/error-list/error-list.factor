@@ -66,7 +66,7 @@ M: source-file-renderer filled-column drop 1 ;
     source-file-renderer
     <table>
         [ invoke-primary-operation ] >>action
-        COLOR: dark-gray >>column-line-color
+        color: dark-gray >>column-line-color
         6 >>gap
         4 >>min-rows
         4 >>max-rows
@@ -115,7 +115,7 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
     error-renderer
     <table>
         [ invoke-primary-operation ] >>action
-        COLOR: dark-gray >>column-line-color
+        color: dark-gray >>column-line-color
         6 >>gap
         4 >>min-rows
         4 >>max-rows

@@ -31,7 +31,7 @@ STRUCT: winsize
 { ws_xpixel c:short }
 { ws_ypixel c:short } ;
 
-MEMO: TIOCGWINSZ ( -- x ) CHAR: t 104 winsize heap-size _IOCR ;
+MEMO: TIOCGWINSZ ( -- x ) char: t 104 winsize heap-size _IOCR ;
 
 PRIVATE>
 

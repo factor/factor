@@ -128,11 +128,11 @@ ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
 } ;
 
 ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
-"Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link POSTPONE: NAN: } " literal with a string of on bits in its payload:"
+"Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link postpone: nan: } " literal with a string of on bits in its payload:"
 { $example
     "USING: math.vectors math.vectors.simd prettyprint ;"
     "float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."
-    "float-4{ NAN: fffffe0000000 0.0 NAN: fffffe0000000 0.0 }"
+    "float-4{ nan: fffffe0000000 0.0 nan: fffffe0000000 0.0 }"
 }
 "For an integer vector, false will manifest as " { $snippet "0" } " and true as " { $snippet "-1" } " (for signed vectors) or the largest representable value of the element type (for unsigned vectors):"
 { $example

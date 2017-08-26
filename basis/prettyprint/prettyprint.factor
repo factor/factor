@@ -57,7 +57,7 @@ IN: prettyprint
 SYMBOL: =>
 
 \ =>
-{ { foreground COLOR: white } { background COLOR: black } }
+{ { foreground color: white } { background color: black } }
 "word-style" set-word-prop
 
 : remove-step-into ( word -- )

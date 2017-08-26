@@ -39,7 +39,7 @@ IN: ui.theme.switching
     listener-word-style text-color foreground update-style
 
     ! prettyprint.stylesheet
-    { POSTPONE: USING: POSTPONE: USE: POSTPONE: IN: }
+    { postpone: USING: postpone: USE: postpone: IN: }
     [ "word-style" word-prop [ dim-color foreground  ] dip set-at ] each
     base-word-style text-color foreground update-style
     highlighted-word-style highlighted-word-color foreground update-style

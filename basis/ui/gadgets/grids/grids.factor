@@ -124,6 +124,6 @@ M: grid children-on ( rect gadget -- seq )
 M: grid gadget-text*
     grid>>
     [ [ gadget-text ] map ] map format-table
-    [ CHAR: \n , ] [ % ] interleave ;
+    [ char: \n , ] [ % ] interleave ;
 
 PRIVATE>

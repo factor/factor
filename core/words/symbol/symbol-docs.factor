@@ -2,11 +2,11 @@ USING: help.syntax help.markup words.symbol words compiler.units ;
 IN: words.symbol
 
 HELP: symbol
-{ $class-description "The class of symbols created by " { $link POSTPONE: SYMBOL: } "." } ;
+{ $class-description "The class of symbols created by " { $link postpone: SYMBOL: } "." } ;
 
 HELP: define-symbol
 { $values { "word" word } }
-{ $description "Defines the word to push itself on the stack when executed. This is the run time equivalent of " { $link POSTPONE: SYMBOL: } "." }
+{ $description "Defines the word to push itself on the stack when executed. This is the run time equivalent of " { $link postpone: SYMBOL: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
@@ -18,8 +18,8 @@ ARTICLE: "words.symbol" "Symbols"
 }
 "Defining symbols at parse time:"
 { $subsections
-    POSTPONE: SYMBOL:
-    POSTPONE: SYMBOLS:
+    postpone: SYMBOL:
+    postpone: SYMBOLS:
 }
 "Defining symbols at run time:"
 { $subsections define-symbol }

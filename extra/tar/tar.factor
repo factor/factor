@@ -178,27 +178,27 @@ C: <symbolic-link> symbolic-link
         dup typeflag>>
         {
             { 0 [ typeflag-0 ] }
-            { CHAR: 0 [ typeflag-0 ] }
-            ! { CHAR: 1 [ typeflag-1 ] }
-            { CHAR: 2 [ typeflag-2 ] }
-            ! { CHAR: 3 [ typeflag-3 ] }
-            ! { CHAR: 4 [ typeflag-4 ] }
-            { CHAR: 5 [ typeflag-5 ] }
-            ! { CHAR: 6 [ typeflag-6 ] }
-            ! { CHAR: 7 [ typeflag-7 ] }
-            { CHAR: g [ typeflag-g ] }
-            ! { CHAR: x [ typeflag-x ] }
-            ! { CHAR: A [ typeflag-A ] }
-            ! { CHAR: D [ typeflag-D ] }
-            ! { CHAR: E [ typeflag-E ] }
-            ! { CHAR: I [ typeflag-I ] }
-            ! { CHAR: K [ typeflag-K ] }
-            { CHAR: L [ typeflag-L ] }
-            ! { CHAR: M [ typeflag-M ] }
-            ! { CHAR: N [ typeflag-N ] }
-            ! { CHAR: S [ typeflag-S ] }
-            ! { CHAR: V [ typeflag-V ] }
-            ! { CHAR: X [ typeflag-X ] }
+            { char: 0 [ typeflag-0 ] }
+            ! { char: 1 [ typeflag-1 ] }
+            { char: 2 [ typeflag-2 ] }
+            ! { char: 3 [ typeflag-3 ] }
+            ! { char: 4 [ typeflag-4 ] }
+            { char: 5 [ typeflag-5 ] }
+            ! { char: 6 [ typeflag-6 ] }
+            ! { char: 7 [ typeflag-7 ] }
+            { char: g [ typeflag-g ] }
+            ! { char: x [ typeflag-x ] }
+            ! { char: A [ typeflag-A ] }
+            ! { char: D [ typeflag-D ] }
+            ! { char: E [ typeflag-E ] }
+            ! { char: I [ typeflag-I ] }
+            ! { char: K [ typeflag-K ] }
+            { char: L [ typeflag-L ] }
+            ! { char: M [ typeflag-M ] }
+            ! { char: N [ typeflag-N ] }
+            ! { char: S [ typeflag-S ] }
+            ! { char: V [ typeflag-V ] }
+            ! { char: X [ typeflag-X ] }
             { f [ drop ] }
         } case parse-tar
     ] [

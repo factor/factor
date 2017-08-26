@@ -8,14 +8,14 @@ IN: io.crlf
 
 : read-crlf ( -- seq )
     "\r" read-until
-    [ CHAR: \r assert= read1 CHAR: \n assert= ] [ f like ] if* ;
+    [ char: \r assert= read1 char: \n assert= ] [ f like ] if* ;
 
 : read-?crlf ( -- seq )
     "\r\n" read-until
-    [ CHAR: \r = [ read1 CHAR: \n assert= ] when ] [ f like ] if* ;
+    [ char: \r = [ read1 char: \n assert= ] when ] [ f like ] if* ;
 
 : crlf>lf ( str -- str' )
-    CHAR: \r swap remove ;
+    char: \r swap remove ;
 
 : lf>crlf ( str -- str' )
     "\n" split "\r\n" join ;

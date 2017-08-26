@@ -56,11 +56,11 @@ CONSTANT: pov-polygons
     z  gadget z-indicator>> loc<< ;
 
 : move-pov ( gadget pov -- )
-    swap pov>> [ interior>> -rot = COLOR: gray COLOR: white ? >>color drop ]
+    swap pov>> [ interior>> -rot = color: gray color: white ? >>color drop ]
     with assoc-each ;
 
 :: add-pov-gadget ( gadget direction polygon -- gadget direction gadget )
-    gadget COLOR: white polygon <polygon-gadget> [ add-gadget ] keep
+    gadget color: white polygon <polygon-gadget> [ add-gadget ] keep
     direction swap ;
 
 : add-pov-gadgets ( gadget -- gadget )
@@ -69,14 +69,14 @@ CONSTANT: pov-polygons
 : <axis-gadget> ( -- gadget )
     axis-gadget new
     add-pov-gadgets
-    COLOR: black <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
-    COLOR: red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
+    color: black <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
+    color: red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
     dup [ 0.0 0.0 0.0 move-axis ] [ f move-pov ] bi ;
 
 TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
 
 : add-gadget-with-border ( parent child -- parent )
-    { 2 2 } <border> COLOR: gray <solid> >>boundary add-gadget ;
+    { 2 2 } <border> color: gray <solid> >>boundary add-gadget ;
 
 : add-controller-label ( gadget controller -- gadget )
     [ >>controller ] [ product-string <label> add-gadget ] bi ;
@@ -107,7 +107,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
     [ >>selected? drop ] 2each ;
 
 : kill-update-axes ( gadget -- )
-    COLOR: gray <solid> >>interior
+    color: gray <solid> >>interior
     [ [ stop-timer ] when* f ] change-timer
     relayout-1 ;
 

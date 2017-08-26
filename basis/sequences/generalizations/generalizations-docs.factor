@@ -10,7 +10,7 @@ HELP: nsequence
 "that constructs a sequence from the top " { $snippet "n" } " elements of the stack."
 }
 { $examples
-    { $example "USING: prettyprint sequences.generalizations ;" "CHAR: f CHAR: i CHAR: s CHAR: h 4 \"\" nsequence ." "\"fish\"" }
+    { $example "USING: prettyprint sequences.generalizations ;" "char: f char: i char: s char: h 4 \"\" nsequence ." "\"fish\"" }
 } ;
 
 HELP: narray

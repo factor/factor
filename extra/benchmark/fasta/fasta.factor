@@ -19,30 +19,30 @@ CONSTANT: ALU "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACC
 
 CONSTANT: IUB
     {
-        { CHAR: a 0.27 }
-        { CHAR: c 0.12 }
-        { CHAR: g 0.12 }
-        { CHAR: t 0.27 }
+        { char: a 0.27 }
+        { char: c 0.12 }
+        { char: g 0.12 }
+        { char: t 0.27 }
 
-        { CHAR: B 0.02 }
-        { CHAR: D 0.02 }
-        { CHAR: H 0.02 }
-        { CHAR: K 0.02 }
-        { CHAR: M 0.02 }
-        { CHAR: N 0.02 }
-        { CHAR: R 0.02 }
-        { CHAR: S 0.02 }
-        { CHAR: V 0.02 }
-        { CHAR: W 0.02 }
-        { CHAR: Y 0.02 }
+        { char: B 0.02 }
+        { char: D 0.02 }
+        { char: H 0.02 }
+        { char: K 0.02 }
+        { char: M 0.02 }
+        { char: N 0.02 }
+        { char: R 0.02 }
+        { char: S 0.02 }
+        { char: V 0.02 }
+        { char: W 0.02 }
+        { char: Y 0.02 }
     }
 
 CONSTANT: homo-sapiens
     {
-        { CHAR: a 0.3029549426680 }
-        { CHAR: c 0.1979883004921 }
-        { CHAR: g 0.1975473066391 }
-        { CHAR: t 0.3015094502008 }
+        { char: a 0.3029549426680 }
+        { char: c 0.1979883004921 }
+        { char: g 0.1975473066391 }
+        { char: t 0.3015094502008 }
     }
 
 TYPED: make-cumulative ( freq -- chars: byte-array floats: double-array )

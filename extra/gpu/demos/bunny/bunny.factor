@@ -93,8 +93,8 @@ UNIFORM-TUPLE: loading-uniforms
     [ [ pick push ] unless-empty ]
     [
         {
-            { CHAR: \s [ (read-line-tokens) ] }
-            { CHAR: \n [ drop ] }
+            { char: \s [ (read-line-tokens) ] }
+            { char: \n [ drop ] }
             [ 2drop [ f ] when-empty ]
         } case
     ] bi* ; inline recursive

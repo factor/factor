@@ -141,10 +141,10 @@ ARTICLE: "alien.endian" "Alien endian-aware types"
 }
 "Syntax for making endian-aware structs out of native types:"
 { $subsections
-    POSTPONE: LE-STRUCT:
-    POSTPONE: BE-STRUCT:
-    POSTPONE: LE-PACKED-STRUCT:
-    POSTPONE: BE-PACKED-STRUCT:
+    postpone: LE-STRUCT:
+    postpone: BE-STRUCT:
+    postpone: LE-PACKED-STRUCT:
+    postpone: BE-PACKED-STRUCT:
 } ;
 
 ABOUT: "alien.endian"

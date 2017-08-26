@@ -21,7 +21,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
     } 2cleave :> ( openstr2 openstr1 closestr2 )
     [| n string tag! ch |
         ch {
-            { CHAR: = [
+            { char: = [
                 tag 1 cut-slice* drop tag! ! tag of (=( is ( here, fix it
                 n string openstr1 slice-til-separator-inclusive [ -1 modify-from ] dip :> ( n' string' opening ch )
                 ch open-ch = [ tag openstr2 n string ch long-opening-mismatch ] unless
@@ -41,9 +41,9 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
         } case
      ] ;
 
-: read-double-matched-paren ( n string tag ch -- n' string seq ) CHAR: \( read-double-matched ;
-: read-double-matched-bracket ( n string tag ch -- n' string seq ) CHAR: \[ read-double-matched ;
-: read-double-matched-brace ( n string tag ch -- n' string seq ) CHAR: \{ read-double-matched ;
+: read-double-matched-paren ( n string tag ch -- n' string seq ) char: \( read-double-matched ;
+: read-double-matched-bracket ( n string tag ch -- n' string seq ) char: \[ read-double-matched ;
+: read-double-matched-brace ( n string tag ch -- n' string seq ) char: \{ read-double-matched ;
 
 DEFER: lex-factor
 ERROR: lex-expected-but-got-eof n string expected ;
@@ -100,15 +100,15 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         } cond
     ] ;
 
-: read-bracket ( n string slice -- n' string slice' ) CHAR: \[ read-matched ;
-: read-brace ( n string slice -- n' string slice' ) CHAR: \{ read-matched ;
-: read-paren ( n string slice -- n' string slice' ) CHAR: \( read-matched ;
+: read-bracket ( n string slice -- n' string slice' ) char: \[ read-matched ;
+: read-brace ( n string slice -- n' string slice' ) char: \{ read-matched ;
+: read-paren ( n string slice -- n' string slice' ) char: \( read-matched ;
 : read-string-payload ( n string -- n' string )
     over [
-        { CHAR: \\ CHAR: \" } slice-til-separator-inclusive {
+        { char: \\ char: \" } slice-til-separator-inclusive {
             { f [ drop ] }
-            { CHAR: \" [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop read-string-payload ] }
+            { char: \" [ drop ] }
+            { char: \\ [ drop next-char-from drop read-string-payload ] }
         } case
     ] [
         string-expected-got-eof
@@ -123,7 +123,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     tag 1 cut-slice* 4array ;
 
 : take-comment ( n string slice -- n' string comment )
-    2over ?nth CHAR: \[ = [
+    2over ?nth char: \[ = [
         [ 1 + ] 2dip 2over ?nth read-double-matched-bracket
     ] [
         [ slice-til-eol drop ] dip swap 2array
@@ -163,7 +163,7 @@ ERROR: unexpected-terminator n string slice ;
     ] dip swap 2array ;
 
 : strict-upper? ( string -- ? )
-    [ { [ CHAR: A CHAR: Z between? ] [ ":-" member? ] } 1|| ] all? ;
+    [ { [ char: A char: Z between? ] [ ":-" member? ] } 1|| ] all? ;
 
 ! <a <a: but not <a>
 : section-open? ( string -- ? )
@@ -221,9 +221,9 @@ ERROR: mismatched-terminator n string slice ;
 : lex-factor ( n/f string -- n'/f string literal )
     over [
         skip-whitespace "\"!:[{(<>\s\r\n" slice-til-either {
-            { CHAR: \" [ read-string ] }
-            { CHAR: \! [ read-exclamation ] }
-            { CHAR: \: [
+            { char: \" [ read-string ] }
+            { char: \! [ read-exclamation ] }
+            { char: \: [
                 merge-slice-til-whitespace
                 dup strict-upper? strict-upper get and [
                     length swap [ - ] dip f
@@ -232,15 +232,15 @@ ERROR: mismatched-terminator n string slice ;
                     read-colon
                 ] if
             ] }
-            { CHAR: < [
+            { char: < [
                 ! FOO: a b <BAR: ;BAR>
                 ! FOO: a b <BAR BAR>
                 ! FOO: a b <asdf>
                 ! FOO: a b <asdf asdf>
-                [ slice-til-whitespace drop ] dip span-slices
 
                 ! if we are in a FOO: and we hit a <BAR or <BAR:
                 ! then end the FOO:
+                [ slice-til-whitespace drop ] dip span-slices
                 dup section-open? [
                     strict-upper get [
                         length swap [ - ] dip f strict-upper off
@@ -249,21 +249,20 @@ ERROR: mismatched-terminator n string slice ;
                     ] if
                 ] when
             ] }
-            { CHAR: > [
+            { char: > [
+                [ slice-til-whitespace drop ] dip span-slices
                 dup section-close? [
                     strict-upper get [
                         length swap [ - ] dip f strict-upper off
                     ] when
-                ] [
-                    [ slice-til-whitespace drop ] dip span-slices ! >= >> etc
-                ] if
+                ] when
             ] }
-            { CHAR: \[ [ read-bracket ] }
-            { CHAR: \{ [ read-brace ] }
-            { CHAR: \( [ read-paren ] }
-            { CHAR: \s [ read-token-or-whitespace ] }
-            { CHAR: \r [ read-token-or-whitespace ] }
-            { CHAR: \n [ read-token-or-whitespace ] }
+            { char: \[ [ read-bracket ] }
+            { char: \{ [ read-brace ] }
+            { char: \( [ read-paren ] }
+            { char: \s [ read-token-or-whitespace ] }
+            { char: \r [ read-token-or-whitespace ] }
+            { char: \n [ read-token-or-whitespace ] }
             { f [ f like ] }
         } case dup "\\" tail? [ read-backslash ] when
     ] [

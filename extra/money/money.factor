@@ -5,7 +5,7 @@ namespaces sequences splitting ;
 IN: money
 
 SYMBOL: currency-token
-CHAR: $ currency-token set-global
+char: $ currency-token set-global
 
 : dollars/cents ( dollars -- dollars cents )
     100 * 100 /mod round >integer ;
@@ -13,7 +13,7 @@ CHAR: $ currency-token set-global
 : format-money ( dollars cents -- string )
     [ number>string ] bi@
     [ <reversed> 3 group "," join <reversed> ]
-    [ 2 CHAR: 0 pad-head ] bi* "." glue ;
+    [ 2 char: 0 pad-head ] bi* "." glue ;
 
 : money>string ( number -- string )
     dollars/cents format-money currency-token get prefix ;
@@ -31,4 +31,4 @@ ERROR: not-an-integer x ;
         [ dup string>number [ ] [ not-an-integer ] ?if ] bi@
     ] keep length 10^ / + swap [ neg ] when ;
 
-SYNTAX: DECIMAL: scan-token parse-decimal suffix! ;
+SYNTAX: decimal: scan-token parse-decimal suffix! ;

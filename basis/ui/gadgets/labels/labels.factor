@@ -21,7 +21,7 @@ PREDICATE: string-array < array [ string? ] all? ;
 PRIVATE>
 
 : ?string-lines ( string -- string/array )
-    CHAR: \n over member-eq? [ string-lines ] when ;
+    char: \n over member-eq? [ string-lines ] when ;
 
 ERROR: not-a-string object ;
 

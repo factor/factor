@@ -11,7 +11,7 @@ M: real smalltalk>string number>string ;
 M: string smalltalk>string
     [
         "'" %
-        [ dup CHAR: ' = [ dup , , ] [ , ] if ] each
+        [ dup char: ' = [ dup , , ] [ , ] if ] each
         "'" %
     ] "" make ;
 

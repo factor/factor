@@ -12,7 +12,7 @@ IN: smalltalk.listener
     ] try ;
 
 : smalltalk-listener ( -- )
-    "Smalltalk>" { { background COLOR: light-blue } } format bl flush readln
+    "Smalltalk>" { { background color: light-blue } } format bl flush readln
     [ eval-interactively smalltalk-listener ] when* ;
 
 MAIN: smalltalk-listener

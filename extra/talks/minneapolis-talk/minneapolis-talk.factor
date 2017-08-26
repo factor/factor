@@ -110,10 +110,10 @@ CONSTANT: minneapolis-slides
         "Let's profile it!"
     }
     { $slide "Memoization"
-        { { $link POSTPONE: : } " is just another word" }
+        { { $link postpone: : } " is just another word" }
         "What if we could define a word which caches its results?"
         { "The " { $vocab-link "memoize" } " library provides such a feature" }
-        { "Just change " { $link POSTPONE: : } " to " { $link POSTPONE: MEMO: } }
+        { "Just change " { $link postpone: : } " to " { $link postpone: MEMO: } }
     }
     { $slide "Memoization"
         { $code

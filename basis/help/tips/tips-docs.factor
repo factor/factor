@@ -19,7 +19,7 @@ TIP: "You can write graphical applications using the " { $link "ui" } "." ;
 
 TIP: "Power tools: " { $links see edit help about apropos time infer. } ;
 
-TIP: "Tips of the day implement the " { $link "definition-protocol" } " and new tips of the day can be defined using the " { $link POSTPONE: TIP: } " parsing word." ;
+TIP: "Tips of the day implement the " { $link "definition-protocol" } " and new tips of the day can be defined using the " { $link postpone: TIP: } " parsing word." ;
 
 TIP: "Try some simple demo applications:" { $code "\"demos\" run" } "Then look at the source code in " { $snippet "extra/" } "." ;
 
@@ -42,7 +42,7 @@ ARTICLE: "all-tips-of-the-day" "All tips of the day"
 
 ARTICLE: "tips-of-the-day" "Tips of the day"
 "The " { $vocab-link "help.tips" } " vocabulary provides a facility for displaying tips of the day in the " { $link "ui-listener" } ". Tips are defined with a parsing word:"
-{ $subsections POSTPONE: TIP: }
+{ $subsections postpone: TIP: }
 "All tips defined so far:"
 { $subsections "all-tips-of-the-day" } ;
 

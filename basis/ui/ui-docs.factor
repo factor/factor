@@ -80,7 +80,7 @@ HELP: raise-window
 HELP: with-ui
 { $values { "quot" { $quotation ( -- ) } } }
 { $description "Calls the quotation, starting the UI if necessary. If starting the UI is necessary, this word does not return and the UI will start after the quotation returns." }
-{ $notes "This word should be used in the " { $link POSTPONE: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } ") and the command line (" { $snippet "./factor -run=my-app" } ")." }
+{ $notes "This word should be used in the " { $link postpone: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } ") and the command line (" { $snippet "./factor -run=my-app" } ")." }
 { $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this word." } ;
 
 HELP: beep
@@ -163,8 +163,8 @@ ARTICLE: "ui-windows" "Top-level windows"
 { $subsections world }
 "There is also syntax for defining window words, including a main window that is the entry point for a vocabulary:"
 { $subsections
-    POSTPONE: WINDOW:
-    POSTPONE: MAIN-WINDOW:
+    postpone: WINDOW:
+    postpone: MAIN-WINDOW:
 } ;
 
 ARTICLE: "ui-backend" "Developing UI backends"
@@ -360,7 +360,7 @@ WINDOW: hello { { title \"Hi\" } }
 HELP: MAIN-WINDOW:
 { $syntax "MAIN-WINDOW: window-word { attributes }
     attribute-code ;" }
-{ $description "Defines a " { $link POSTPONE: MAIN: } " word for the current vocabulary named " { $snippet "window-word" } " that opens a UI window when the vocabulary is " { $link run } ". The " { $snippet "attributes" } " specify the key-value pairs of the window's " { $link world-attributes } ". The " { $snippet "attribute-code" } " is run with the " { $snippet "world-attributes" } " on the stack; this allows the word to construct gadget objects to place in the " { $snippet "gadget" } " slot or set other runtime-dependent world attributes." }
+{ $description "Defines a " { $link postpone: MAIN: } " word for the current vocabulary named " { $snippet "window-word" } " that opens a UI window when the vocabulary is " { $link run } ". The " { $snippet "attributes" } " specify the key-value pairs of the window's " { $link world-attributes } ". The " { $snippet "attribute-code" } " is run with the " { $snippet "world-attributes" } " on the stack; this allows the word to construct gadget objects to place in the " { $snippet "gadget" } " slot or set other runtime-dependent world attributes." }
 { $examples
 "From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
 { $code
@@ -371,7 +371,7 @@ MAIN-WINDOW: hello { { title \"Hi\" } }
     \"Hello world\" <label> >>gadgets ;"
 } } ;
 
-{ POSTPONE: WINDOW: POSTPONE: MAIN-WINDOW: } related-words
+{ postpone: WINDOW: postpone: MAIN-WINDOW: } related-words
 
 ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
 "The following window controls can be placed in a " { $link world } " window:"

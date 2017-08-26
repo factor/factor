@@ -37,7 +37,7 @@ TUPLE: pendulum-gadget < gadget alarm ;
 : gadget-xy ( gadget -- xy ) [ O ] [ drop theta ] [ window-l ] tri theta-to-xy ;
 
 M: pendulum-gadget draw-gadget*
-    COLOR: black gl-color
+    color: black gl-color
     [ O ] [ gadget-xy ] bi gl-line ;
 
 M: pendulum-gadget graft* ( gadget -- )

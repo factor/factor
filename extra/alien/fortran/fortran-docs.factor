@@ -25,7 +25,7 @@ ARTICLE: "alien.fortran-types" "Fortran types"
     { { $snippet "DOUBLE-COMPLEX" } " specifies a double-precision floating-point complex value. The alias " { $snippet "COMPLEX*16" } " is also recognized." }
     { { $snippet "CHARACTER(n)" } " specifies a character string of length " { $snippet "n" } ". The Fortran 77 syntax " { $snippet "CHARACTER*n" } " is also recognized." }
     { "Fortran arrays can be specified by suffixing a comma-separated set of dimensions in parentheses, e.g. " { $snippet "REAL(2,3,4)" } ". Arrays of unspecified length can be specified using " { $snippet "*" } " as a dimension. Arrays are passed in as flat " { $link "specialized-arrays" } "." }
-    { "Struct classes defined by " { $link POSTPONE: STRUCT: } " are also supported as parameter and return types." }
+    { "Struct classes defined by " { $link postpone: STRUCT: } " are also supported as parameter and return types." }
 }
 "When declaring the parameters of Fortran functions, an output argument can be specified by prefixing an exclamation point to the type name. This will cause the function word to leave the final value of the parameter on the stack." ;
 
@@ -40,11 +40,11 @@ HELP: SUBROUTINE:
 HELP: LIBRARY:
 { $syntax "LIBRARY: name" }
 { $values { "name" "a logical library name" } }
-{ $description "Sets the logical library for subsequent " { $link POSTPONE: FUNCTION: } " and " { $link POSTPONE: SUBROUTINE: } " definitions. The given library name must have been opened with a previous call to " { $link add-fortran-library } "." } ;
+{ $description "Sets the logical library for subsequent " { $link postpone: FUNCTION: } " and " { $link postpone: SUBROUTINE: } " definitions. The given library name must have been opened with a previous call to " { $link add-fortran-library } "." } ;
 
 HELP: add-fortran-library
 { $values { "name" string } { "soname" string } { "fortran-abi" symbol } }
-{ $description "Opens the shared library in the file specified by " { $snippet "soname" } " under the logical name " { $snippet "name" } " so that it may be used in subsequent " { $link POSTPONE: LIBRARY: } " and " { $link fortran-invoke } " calls. Functions and subroutines from the library will be defined using the specified " { $snippet "fortran-abi" } ", which must be one of the supported " { $link "alien.fortran-abis" } "." }
+{ $description "Opens the shared library in the file specified by " { $snippet "soname" } " under the logical name " { $snippet "name" } " so that it may be used in subsequent " { $link postpone: LIBRARY: } " and " { $link fortran-invoke } " calls. Functions and subroutines from the library will be defined using the specified " { $snippet "fortran-abi" } ", which must be one of the supported " { $link "alien.fortran-abis" } "." }
 ;
 
 HELP: fortran-invoke
@@ -60,9 +60,9 @@ ARTICLE: "alien.fortran" "Fortran FFI"
     "alien.fortran-types"
     "alien.fortran-abis"
     add-fortran-library
-    POSTPONE: LIBRARY:
-    POSTPONE: FUNCTION:
-    POSTPONE: SUBROUTINE:
+    postpone: LIBRARY:
+    postpone: FUNCTION:
+    postpone: SUBROUTINE:
     fortran-invoke
 } ;
 

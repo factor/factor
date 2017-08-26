@@ -29,14 +29,14 @@ $nl
     bit-array>integer
 }
 "Bit array literal syntax:"
-{ $subsections POSTPONE: ?{ } ;
+{ $subsections postpone: ?{ } ;
 
 ABOUT: "bit-arrays"
 
 HELP: ?{
 { $syntax "?{ elements... }" }
 { $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." }
+{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link postpone: } } "." }
 { $examples { $code "?{ t f t }" } } ;
 
 HELP: bit-array

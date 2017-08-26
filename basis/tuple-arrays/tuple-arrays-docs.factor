@@ -11,11 +11,11 @@ ARTICLE: "tuple-arrays" "Tuple arrays"
 $nl
 "Calling " { $link nth } " copies an element into a new tuple, and calling " { $link set-nth } " copies an existing tuple's slots into an array."
 $nl
-"Since value semantics are incompatible with inheritance, the base type of a tuple array must be declared " { $link POSTPONE: final } ". A best practice that is not enforced is to have all slots in the tuple declared " { $link read-only } "."
+"Since value semantics are incompatible with inheritance, the base type of a tuple array must be declared " { $link postpone: final } ". A best practice that is not enforced is to have all slots in the tuple declared " { $link read-only } "."
 $nl
 "Tuple arrays do not get updated if tuples are redefined to add or remove slots, so caution should be exercised when doing interactive development on code that uses tuple arrays."
 $nl
-{ $subsections POSTPONE: TUPLE-ARRAY: }
+{ $subsections postpone: TUPLE-ARRAY: }
 "An example:"
 { $example
   "USE: tuple-arrays"

@@ -80,17 +80,17 @@ PRIVATE>
 : write-title ( title url -- )
     '[
         _ presented ,,
-        COLOR: blue foreground ,,
+        color: blue foreground ,,
     ] H{ } make format ;
 
 : write-link ( title url -- )
     '[
         _ presented ,,
-        HEXCOLOR: 888888 foreground ,,
+        hexcolor: 888888 foreground ,,
     ] H{ } make format ;
 
 : write-text ( str -- )
-    H{ { foreground HEXCOLOR: 888888 } } format ;
+    H{ { foreground hexcolor: 888888 } } format ;
 
 PRIVATE>
 

@@ -53,7 +53,7 @@ CONSTANT: otug-slides
     { $slide "Constructing quotations"
         { "Suppose we want a " { $snippet "remove-comments*" } " word" }
         { $code ": remove-comments* ( lines string -- lines' )" "    [ ??? head? ] reject ;" }
-        { "We use " { $link POSTPONE: '[ } " instead of " { $link POSTPONE: [ } }
+        { "We use " { $link postpone: '[ } " instead of " { $link postpone: [ } }
         { "Create “holes” with " { $link _ } }
         "Holes filled in left to right when quotation pushed on the stack"
     }

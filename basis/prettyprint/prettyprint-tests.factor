@@ -305,7 +305,7 @@ INTERSECTION: intersection-see-test sequence number ;
 { } [ \ compose see ] unit-test
 { } [ \ curry see ] unit-test
 
-{ "POSTPONE: [" } [ \ [ unparse ] unit-test
+{ "postpone: [" } [ \ [ unparse ] unit-test
 
 TUPLE: started-out-hustlin' ;
 
@@ -468,7 +468,7 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
 
 : margin-test ( number-of-'a's -- str )
     [
-        [ CHAR: a <string> text "b" text ] with-pprint
+        [ char: a <string> text "b" text ] with-pprint
     ] with-string-writer ;
 
 {

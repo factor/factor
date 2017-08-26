@@ -36,7 +36,7 @@ HELP: reset-cache
 { $description "Resets the compiled template cache. Chloe automatically recompiles templates when their file changes on disk, however other when redefining Chloe tags or words which they call, the cache may have to be reset manually for the changes to take effect." } ;
 
 HELP: tag-stack
-{ $var-description "During template compilation, holds the current nesting of XML element names. Can be used from " { $link POSTPONE: CHLOE: } " definitions to make a custom tag behave differently depending on how it is nested." } ;
+{ $var-description "During template compilation, holds the current nesting of XML element names. Can be used from " { $link postpone: CHLOE: } " definitions to make a custom tag behave differently depending on how it is nested." } ;
 
 HELP: [write]
 { $values { "string" string } }
@@ -194,8 +194,8 @@ $nl
 
 ARTICLE: "html.templates.chloe.extend.tags" "Extending Chloe with custom tags"
 "Syntax for defining custom tags:"
-{ $subsections POSTPONE: CHLOE: }
-"A number of compiler words can be used from the " { $link POSTPONE: CHLOE: } " body to emit compiled template code."
+{ $subsections postpone: CHLOE: }
+"A number of compiler words can be used from the " { $link postpone: CHLOE: } " body to emit compiled template code."
 $nl
 "Extracting attributes from the XML tag:"
 { $subsections
@@ -226,7 +226,7 @@ ARTICLE: "html.templates.chloe.extend.tags.example" "Examples of custom Chloe ta
 }
 "The " { $snippet "t:min" } " and " { $snippet "t:max" } " parameters are required, and " { $snippet "t:generator" } ", which can equal one of " { $snippet "default" } ", " { $snippet "system" } " or " { $snippet "secure" } ", is optional, with the default being " { $snippet "default" } "."
 $nl
-"Here is the " { $link POSTPONE: USING: } " form that we need for the below code to work:"
+"Here is the " { $link postpone: USING: } " form that we need for the below code to work:"
 { $code
     "USING: combinators kernel math.parser math.ranges random"
     "html.templates.chloe.compiler html.templates.chloe.syntax ;"
@@ -283,7 +283,7 @@ ARTICLE: "html.templates.chloe.extend.components.example" "An example of a custo
 ARTICLE: "html.templates.chloe.extend.components" "Extending Chloe with custom components"
 "Custom HTML components implementing the " { $link render* } " word can be wired up with Chloe using the following syntax from " { $vocab-link "html.templates.chloe.components" } ":"
 { $subsections
-    POSTPONE: COMPONENT:
+    postpone: COMPONENT:
     "html.templates.chloe.extend.components.example"
 } ;
 

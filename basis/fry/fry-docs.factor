@@ -12,7 +12,7 @@ HELP: @
 HELP: fry
 { $values { "quot" quotation } { "quot'" quotation } }
 { $description "Outputs a quotation that when called, fries " { $snippet "quot" } " by taking values from the stack and substituting them in." }
-{ $notes "This word is used to implement " { $link POSTPONE: '[ } "; the following two lines are equivalent:"
+{ $notes "This word is used to implement " { $link postpone: '[ } "; the following two lines are equivalent:"
     { $code "[ X ] fry call" "'[ X ]" }
 }
 { $examples "See " { $link "fry.examples" } "." } ;
@@ -23,12 +23,12 @@ HELP: '[
 { $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: >r/r>-in-fry-error
-{ $error-description "Thrown by " { $link POSTPONE: '[ } " if the fried quotation contains calls to retain stack manipulation primitives." } ;
+{ $error-description "Thrown by " { $link postpone: '[ } " if the fried quotation contains calls to retain stack manipulation primitives." } ;
 
 ARTICLE: "fry.examples" "Examples of fried quotations"
 "The easiest way to understand fried quotations is to look at some examples."
 $nl
-"If a quotation does not contain any fry specifiers, then " { $link POSTPONE: '[ } " behaves just like " { $link POSTPONE: [ } ":"
+"If a quotation does not contain any fry specifiers, then " { $link postpone: '[ } " behaves just like " { $link postpone: [ } ":"
 { $code "{ 10 20 30 } '[ . ] each" }
 "Occurrences of " { $link _ } " on the left map directly to " { $link curry } ". That is, the following three lines are equivalent:"
 { $code
@@ -80,7 +80,7 @@ ARTICLE: "fry" "Fried quotations"
 "The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with “holes” (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
 $nl
 "Fried quotations are started by a special parsing word:"
-{ $subsections POSTPONE: '[ }
+{ $subsections postpone: '[ }
 "There are two types of fry specifiers; the first can hold a value, and the second “splices” a quotation, as if it were inserted without surrounding brackets:"
 { $subsections
     _

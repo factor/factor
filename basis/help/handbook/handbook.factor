@@ -45,7 +45,7 @@ $nl
 $nl
 "Some generic words have " { $strong "Description" } " headings, and others have " { $strong "Contract" } " headings. A distinction is made between words which are not intended to be extended with user-defined methods, and those that are."
 { $heading "Vocabulary naming conventions" }
-"A vocabulary name ending in " { $snippet ".private" } " contains words which are either implementation details, unsafe, or both. For example, the " { $snippet "sequences.private" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } "). You should avoid using private words from the Factor library unless absolutely necessary. Similarly, your own code can place words in private vocabularies using " { $link POSTPONE: <PRIVATE } " if you do not want other people using them without good reason."
+"A vocabulary name ending in " { $snippet ".private" } " contains words which are either implementation details, unsafe, or both. For example, the " { $snippet "sequences.private" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } "). You should avoid using private words from the Factor library unless absolutely necessary. Similarly, your own code can place words in private vocabularies using " { $link postpone: <PRIVATE } " if you do not want other people using them without good reason."
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table
@@ -78,7 +78,7 @@ ARTICLE: "evaluator" "Stack machine model"
 { $link "quotations" } " are evaluated sequentially from beginning to end. When the end is reached, the quotation returns to its caller. As each object in the quotation is evaluated in turn, an action is taken based on its type:"
 { $list
     { "a " { $link word } " - the word's definition quotation is called. See " { $link "words" } }
-    { "a " { $link wrapper } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link POSTPONE: \ } " parsing word." }
+    { "a " { $link wrapper } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link postpone: \ } " parsing word." }
     { "All other types of objects are pushed on the data stack." }
 }
 { $subsections "tail-call-opt" }

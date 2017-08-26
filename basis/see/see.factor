@@ -116,12 +116,12 @@ M: object declarations. drop ;
 
 M: word declarations.
     {
-        POSTPONE: delimiter
-        POSTPONE: deprecated
-        POSTPONE: inline
-        POSTPONE: recursive
-        POSTPONE: foldable
-        POSTPONE: flushable
+        postpone: delimiter
+        postpone: deprecated
+        postpone: inline
+        postpone: recursive
+        postpone: foldable
+        postpone: flushable
     } [ declaration. ] with each ;
 
 : pprint-; ( -- ) \ ; pprint-word ;

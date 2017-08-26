@@ -24,13 +24,13 @@ IN: google.charts.tests
 ] unit-test
 
 { t } [
-    { 0 0 } <line> COLOR: red >>background
+    { 0 0 } <line> color: red >>background
     { 0 0 } <line>
     [ chart>url present length ] bi@ >
 ] unit-test
 
 { t } [
-    { 0 0 } <line> COLOR: red >>foreground
+    { 0 0 } <line> color: red >>foreground
     { 0 0 } <line>
     [ chart>url present length ] bi@ >
 ] unit-test

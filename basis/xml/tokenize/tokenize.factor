@@ -24,7 +24,7 @@ HINTS: assure-good-char { spot fixnum } ;
 
 : record ( spot char -- spot )
     over char>> [
-        CHAR: \n eq?
+        char: \n eq?
         [ [ 1 + ] change-line -1 ] [ dup column>> 1 + ] if
         >>column
     ] [ drop ] if ;
@@ -34,9 +34,9 @@ HINTS: record { spot fixnum } ;
 :: (next) ( spot -- spot char )
     spot next>> :> old-next
     spot stream>> stream-read1 :> new-next
-    old-next CHAR: \r eq? [
-        spot CHAR: \n >>char
-        new-next CHAR: \n eq?
+    old-next char: \r eq? [
+        spot char: \n >>char
+        new-next char: \n eq?
         [ spot stream>> stream-read1 >>next ]
         [ new-next >>next ] if
     ] [ spot old-next >>char new-next >>next ] if
@@ -134,11 +134,11 @@ HINTS: next* { spot } ;
     {
         { [ char not ] [ ] }
         { [ char quot call ] [ spot next* ] }
-        { [ char CHAR: & eq? ] [
+        { [ char char: & eq? ] [
             accum parse-entity
             quot accum spot (parse-char)
         ] }
-        { [ char CHAR: % eq? [ in-dtd? get ] [ f ] if ] [
+        { [ char char: % eq? [ in-dtd? get ] [ f ] if ] [
             accum parse-pe
             quot accum spot (parse-char)
         ] }
@@ -161,23 +161,23 @@ HINTS: next* { spot } ;
     [| char |
         pos char assure-no-]]> pos!
         no-text [
-            char blank? char CHAR: < eq? or [
+            char blank? char char: < eq? or [
                 char 1string t pre/post-content
             ] unless
         ] when
-        char CHAR: < eq?
+        char char: < eq?
     ] parse-char ;
 
 : close ( -- )
     pass-blank ">" expect ;
 
 : normalize-quote ( str -- str )
-    [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map! ;
+    [ dup "\t\r\n" member? [ drop char: \s ] when ] map! ;
 
 : (parse-quote) ( <-disallowed? ch -- string )
     swap '[
         dup _ eq? [ drop t ]
-        [ CHAR: < eq? _ and [ attr-w/< ] [ f ] if ] if
+        [ char: < eq? _ and [ attr-w/< ] [ f ] if ] if
     ] parse-char normalize-quote get-char
     [ unclosed-quote ] unless ; inline
 

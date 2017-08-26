@@ -271,10 +271,10 @@ CONSTANT: google-slides
         "Influenced by Scheme and Lisp"
     }
     { $slide "Locals and lexical scope"
-        { "Define lambda words with " { $link POSTPONE: :: } }
-        { "Establish bindings with " { $link POSTPONE: [let } " and " { $snippet "[let*" } }
+        { "Define lambda words with " { $link postpone: :: } }
+        { "Establish bindings with " { $link postpone: [let } " and " { $snippet "[let*" } }
         "Mutable bindings with correct semantics"
-        { "Named inputs for quotations with " { $link POSTPONE: [| } }
+        { "Named inputs for quotations with " { $link postpone: [| } }
         "Full closures"
     }
     { $slide "Locals and lexical scope"
@@ -296,11 +296,11 @@ CONSTANT: google-slides
         "Libraries can define new parsing words"
     }
     { $slide "The parser"
-        { "Example: URLs define a " { $link POSTPONE: URL" } " word" }
+        { "Example: URLs define a " { $link postpone: URL" } " word" }
         { $code "URL\" http://paste.factorcode.org/paste?id=81\"" }
     }
     { $slide "Example: memoization"
-        { "Memoization with " { $link POSTPONE: MEMO: } }
+        { "Memoization with " { $link postpone: MEMO: } }
         { $code
             ": fib ( m -- n )"
             "    dup 1 > ["
@@ -310,7 +310,7 @@ CONSTANT: google-slides
         "Very slow! Let's profile it..."
     }
     { $slide "Example: memoization"
-        { "Let's use " { $link POSTPONE: : } " instead of " { $link POSTPONE: MEMO: } }
+        { "Let's use " { $link postpone: : } " instead of " { $link postpone: MEMO: } }
         { $code
             "MEMO: fib ( m -- n )"
             "    dup 1 > ["
@@ -320,10 +320,10 @@ CONSTANT: google-slides
         "Much faster"
     }
     { $slide "Meta-circularity"
-        { { $link POSTPONE: MEMO: } " is just a library word" }
-        { "But so is " { $link POSTPONE: : } }
+        { { $link postpone: MEMO: } " is just a library word" }
+        { "But so is " { $link postpone: : } }
         "Factor's parser is written in Factor"
-        { "All syntax is just parsing words: " { $link POSTPONE: [ } ", " { $link POSTPONE: " } }
+        { "All syntax is just parsing words: " { $link postpone: [ } ", " { $link postpone: " } }
     }
     { $slide "Extensible syntax, DSLs"
         "Most parsing words fall in one of two categories"
@@ -332,7 +332,7 @@ CONSTANT: google-slides
         "Some parsing words are more complicated"
     }
     { $slide "Parser expression grammars"
-        { { $link POSTPONE: EBNF: } ": a complex parsing word" }
+        { { $link postpone: EBNF: } ": a complex parsing word" }
         "Implements a custom syntax for expressing parsers"
         { "Example: " { $vocab-link "printf-example" } }
         { $code "\"vegan\" \"cheese\" \"%s is not %s\\n\" printf" }
@@ -437,7 +437,7 @@ CONSTANT: google-slides
     }
     { $slide "Compiler: escape analysis"
         "We identify allocations for tuples which are never returned or passed to other words (except slot access)"
-        { "Partial application with " { $link POSTPONE: '[ } }
+        { "Partial application with " { $link postpone: '[ } }
         "Complex numbers"
     }
     { $slide "Compiler: escape analysis"

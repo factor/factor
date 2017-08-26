@@ -85,8 +85,8 @@ CONSTANT: debug-text-font
        { size       16           }
        { bold?      f            }
        { italic?    f            }
-       { foreground COLOR: white }
-       { background COLOR: black } }
+       { foreground color: white }
+       { background color: black } }
 
 CONSTANT: debug-text-texture-parameters
     T{ texture-parameters
@@ -179,9 +179,9 @@ PRIVATE>
     dup swapd [ debug-point ] 2bi@ ; inline
 
 : debug-axes ( pt mat -- )
-    [ 0 <column> normalize over v+ COLOR: red debug-line ]
-    [ 1 <column> normalize over v+ COLOR: green debug-line ]
-    [ 2 <column> normalize over v+ COLOR: blue debug-line ]
+    [ 0 <column> normalize over v+ color: red debug-line ]
+    [ 1 <column> normalize over v+ color: green debug-line ]
+    [ 2 <column> normalize over v+ color: blue debug-line ]
     2tri ; inline
 
 :: debug-box ( pt half-widths color -- )

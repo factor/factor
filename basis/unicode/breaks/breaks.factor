@@ -34,8 +34,8 @@ CONSTANT: graphemes 12
 CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : control-class ( ch -- class )
     {
-        { CHAR: \r [ CR ] }
-        { CHAR: \n [ LF ] }
+        { char: \r [ CR ] }
+        { char: \n [ LF ] }
         { 0x200C [ Extend ] }
         { 0x200D [ Extend ] }
         [ drop Control ]

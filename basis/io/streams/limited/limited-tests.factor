@@ -13,7 +13,7 @@ IN: io.streams.limited.tests
 
 { } [ "data" get 24 <limited-stream> "limited" set ] unit-test
 
-{ CHAR: h } [ "limited" get stream-read1 ] unit-test
+{ char: h } [ "limited" get stream-read1 ] unit-test
 
 { } [ "limited" get ascii <decoder> "decoded" set ] unit-test
 
@@ -33,13 +33,13 @@ IN: io.streams.limited.tests
 
 { } [ "data" get 4 <limited-stream> "limited" set ] unit-test
 
-{ "abc" CHAR: \n }
+{ "abc" char: \n }
 [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
 { "" f } [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
 
-{ CHAR: a }
+{ char: a }
 [ "a" <string-reader> 1 <limited-stream> stream-read1 ] unit-test
 
 { "abc" }

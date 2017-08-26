@@ -59,7 +59,7 @@ IN: math.functions.tests
 { -0.0 } [ -0.0 1 ldexp ] unit-test
 { 1/0. } [ 1/0. 1 ldexp ] unit-test
 { -1/0. } [ -1/0. 1 ldexp ] unit-test
-{ t } [ NAN: 90210 dup 1 ldexp [ fp-nan-payload ] same? ] unit-test
+{ t } [ nan: 90210 dup 1 ldexp [ fp-nan-payload ] same? ] unit-test
 { 49152.0 } [ 12.0 12 ldexp ] unit-test
 { 0x1.8p-9 } [ 12.0 -12 ldexp ] unit-test
 { 49152 } [ 12 12 ldexp ] unit-test
@@ -196,10 +196,10 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { t } [ 0.3 round double>bits 0.0 double>bits = ] unit-test
 
 ! A signaling NaN should raise an exception
-{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 truncate drop ] collect-fp-exceptions ] unit-test
-{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 round drop ] collect-fp-exceptions ] unit-test
-{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 ceiling drop ] collect-fp-exceptions ] unit-test
-{ { +fp-invalid-operation+ } } [ [ NAN: 4000000000000 floor drop ] collect-fp-exceptions ] unit-test
+{ { +fp-invalid-operation+ } } [ [ nan: 4000000000000 truncate drop ] collect-fp-exceptions ] unit-test
+{ { +fp-invalid-operation+ } } [ [ nan: 4000000000000 round drop ] collect-fp-exceptions ] unit-test
+{ { +fp-invalid-operation+ } } [ [ nan: 4000000000000 ceiling drop ] collect-fp-exceptions ] unit-test
+{ { +fp-invalid-operation+ } } [ [ nan: 4000000000000 floor drop ] collect-fp-exceptions ] unit-test
 
 { -5 } [ -4-3/5 round-to-even ] unit-test
 { -4 } [ -4-1/2 round-to-even ] unit-test

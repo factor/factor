@@ -577,7 +577,7 @@ TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
 { V{ number } } [ [ [ "Oops" throw ] [ 2 + ] if ] final-classes ] unit-test
 { V{ number } } [ [ [ 2 + ] [ "Oops" throw ] if ] final-classes ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ postpone: f } } [
     [ dup 1.0 <= [ drop f ] [ 0 number= ] if ] final-classes
 ] unit-test
 
@@ -720,7 +720,7 @@ M: array iterate first t ; inline
     [ { hashtable } declare hashtable instance? ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ postpone: f } } [
     [ { vector } declare hashtable instance? ] final-classes
 ] unit-test
 
@@ -728,7 +728,7 @@ M: array iterate first t ; inline
     [ { assoc } declare hashtable instance? ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ postpone: f } } [
     [ 3 string? ] final-classes
 ] unit-test
 
@@ -788,7 +788,7 @@ MIXIN: empty-mixin
     ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ postpone: f } } [
     [ { float } declare 0 eq? ] final-classes
 ] unit-test
 
@@ -872,7 +872,7 @@ MIXIN: empty-mixin
     [ { fixnum } declare log2 0 >= ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ postpone: f } } [
     [ { word object } declare equal? ] final-classes
 ] unit-test
 
@@ -1074,7 +1074,7 @@ M: tuple-with-read-only-slot clone
 ] unit-test
 
 { t } [
-    [ { POSTPONE: f } declare <displaced-alien> ] final-classes
+    [ { postpone: f } declare <displaced-alien> ] final-classes
     first \ f alien class-or class=
 ] unit-test
 

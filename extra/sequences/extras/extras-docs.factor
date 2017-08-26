@@ -6,7 +6,7 @@ HELP: ?supremum
     { "seq/f" { $maybe sequence } }
     { "elt/f" { $maybe object } }
 }
-{ $description "Outputs the greatest element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
+{ $description "Outputs the greatest element of " { $snippet "seq" } ", ignoring any " { $link postpone: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link postpone: f } ", returns " { $link postpone: f } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ;"
     "{ 1 f 3 2 } ?supremum ."
@@ -18,7 +18,7 @@ HELP: ?infimum
     { "seq/f" { $maybe sequence } }
     { "elt/f" { $maybe object } }
 }
-{ $description "Outputs the least element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
+{ $description "Outputs the least element of " { $snippet "seq" } ", ignoring any " { $link postpone: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link postpone: f } ", returns " { $link postpone: f } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ;"
     "{ 1 f 3 2 } ?infimum ."
@@ -81,7 +81,7 @@ HELP: collapse
 { $see-also compact }
 { $examples
     "Collapse multiple spaces in a string down to a single space"
-    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" collapse ." "\" Hello, crazy world \"" } } ;
+    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ char: \\s = ] \" \" collapse ." "\" Hello, crazy world \"" } } ;
 
 HELP: compact
 { $values
@@ -93,7 +93,7 @@ HELP: compact
 { $see-also collapse }
 { $examples
     "Collapse multiple spaces in a string down to a single space"
-    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ CHAR: \\s = ] \" \" compact ." "\"Hello, crazy world\"" } } ;
+    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ char: \\s = ] \" \" compact ." "\"Hello, crazy world\"" } } ;
 
 HELP: <evens>
 { $values { "seq" sequence } { "evens" evens } }

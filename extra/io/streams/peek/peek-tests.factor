@@ -6,16 +6,16 @@ io.streams.memory io.streams.peek io.streams.string kernel make
 namespaces sequences strings tools.test ;
 IN: io.streams.peek.tests
 
-{ CHAR: a }
+{ char: a }
 [ "abc" <string-reader> <peek-stream> stream-read1 ] unit-test
 
-{ CHAR: a }
+{ char: a }
 [ "abc" <string-reader> <peek-stream> stream-peek1 ] unit-test
 
 { f }
 [ "" <string-reader> <peek-stream> stream-peek1 ] unit-test
 
-{ CHAR: a }
+{ char: a }
 [ "abc" <string-reader> <peek-stream> stream-peek1 ] unit-test
 
 { "ab" 99 }
@@ -24,7 +24,7 @@ IN: io.streams.peek.tests
 { "ab" f }
 [ "ab" <string-reader> <peek-stream> "c" swap stream-read-until ] unit-test
 
-{ CHAR: a }
+{ char: a }
 [
     "abc" <string-reader> <peek-stream>
     [ stream-peek1 drop ]

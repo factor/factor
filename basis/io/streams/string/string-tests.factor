@@ -4,7 +4,7 @@ IN: io.streams.string.tests
 
 { "" } [ "" [ contents ] with-string-reader ] unit-test
 
-{ "line 1" CHAR: l }
+{ "line 1" char: l }
 [
     "line 1\nline 2\nline 3" [ readln read1 ] with-string-reader
 ]
@@ -29,8 +29,8 @@ unit-test
 { "abc" f } [ "abc" [ 3 read read1 ] with-string-reader ] unit-test
 
 {
-    { "It seems " CHAR: J }
-    { "obs has lost h" CHAR: i }
+    { "It seems " char: J }
+    { "obs has lost h" char: i }
     { "s grasp on reality again.\n" f }
 } [
     "It seems Jobs has lost his grasp on reality again.\n" [
@@ -40,7 +40,7 @@ unit-test
     ] with-string-reader
 ] unit-test
 
-{ "" CHAR: \r } [ "\r\n" [ "\r" read-until ] with-string-reader ] unit-test
+{ "" char: \r } [ "\r\n" [ "\r" read-until ] with-string-reader ] unit-test
 { f f } [ "" [ "\r" read-until ] with-string-reader ] unit-test
 
 { "hello" "hi" } [
