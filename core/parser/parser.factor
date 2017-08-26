@@ -4,7 +4,7 @@ USING: accessors arrays assocs classes combinators
 compiler.units continuations definitions effects io
 io.encodings.utf8 io.files kernel lexer math.parser namespaces
 parser.notes quotations sequences sets slots source-files
-vectors vocabs vocabs.parser words words.symbol ;
+splitting vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 : location ( -- loc )
@@ -86,6 +86,15 @@ ERROR: invalid-word-name string ;
 
 : scan-new-word ( -- word )
     scan-new dup reset-generic ;
+
+: scan-syntax-word-name ( -- string )
+    scan-word-name "\\" ?head drop ;
+
+: scan-new-syntax ( -- word )
+    scan-syntax-word-name create-word-in ;
+
+: scan-new-syntax-word ( -- word )
+    scan-new-syntax dup reset-generic ;
 
 ERROR: staging-violation word ;
 

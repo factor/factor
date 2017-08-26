@@ -120,7 +120,7 @@ IN: bootstrap.syntax
     "deprecated" [ last-word make-deprecated ] define-core-syntax
 
     "SYNTAX:" [
-        scan-new-word
+        scan-new-syntax-word
         mark-top-level-syntax
         parse-definition define-syntax
     ] define-core-syntax
