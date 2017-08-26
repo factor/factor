@@ -59,7 +59,7 @@ DEFER: expression-parser
     [
         {
             [ blank? not ]
-            [ CHAR: ) = not ]
+            [ CHAR: \) = not ]
             [ CHAR: - = not ]
         } 1&&
     ] satisfy repeat1 [ >string ] action ;

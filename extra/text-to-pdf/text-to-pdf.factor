@@ -17,8 +17,8 @@ IN: text-to-pdf
         { CHAR: \r   "\\r"  }
         { CHAR: \t   "\\t"  }
         { CHAR: \\   "\\\\" }
-        { CHAR: (    "\\("  }
-        { CHAR: )    "\\)"  }
+        { CHAR: \(    "\\("  }
+        { CHAR: \)    "\\)"  }
     } escape-string-by "(" ")" surround ;
 
 : pdf-object ( str n -- str' )

@@ -114,7 +114,7 @@ M: sequence stream-json-print
     CHAR: \[ over stream-write1 swap
     over '[ CHAR: , _ stream-write1 ]
     pick '[ _ stream-json-print ] interleave
-    CHAR: ] swap stream-write1 ;
+    CHAR: \] swap stream-write1 ;
 
 <PRIVATE
 
@@ -144,7 +144,7 @@ M: real json-coerce >float number>string ;
             stream stream-json-print
         ] bi*
     ] interleave
-    CHAR: } stream stream-write1 ;
+    CHAR: \} stream stream-write1 ;
 
 PRIVATE>
 

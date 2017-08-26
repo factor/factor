@@ -62,7 +62,7 @@ TUPLE: CreateProcess-args
 ! Find groups of \, groups of \ followed by ", or naked "
 : escape-double-quote ( str -- newstr )
     [
-        { [ drop CHAR: \ = ] [ nip "\\\"" member? ] } 2&&
+        { [ drop CHAR: \\ = ] [ nip "\\\"" member? ] } 2&&
     ] monotonic-split [
         dup last CHAR: \" = [
             dup length 1 > [

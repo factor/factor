@@ -108,7 +108,7 @@ SYMBOL: tagstack
 
 : read-< ( sequence-parser -- string/f )
     advance dup current [
-        CHAR: ! = [ read-bang f ] [ read-tag ] if
+        CHAR: \! = [ read-bang f ] [ read-tag ] if
     ] [
         drop f
     ] if* ;

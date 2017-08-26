@@ -13,7 +13,7 @@ IN: txon
     "\\`" "`" replace ;
 
 : `? ( ch1 ch2 -- ? )
-    [ CHAR: \ = not ] [ CHAR: ` = ] bi* and ;
+    [ CHAR: \\ = not ] [ CHAR: ` = ] bi* and ;
 
 : (find-`) ( string -- n/f )
     2 clump [ first2 `? ] find drop [ 1 + ] [ f ] if* ;

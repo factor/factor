@@ -44,7 +44,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
         } case
      ] ;
 
-: read-double-matched-paren ( n string tag ch -- n' string seq ) CHAR: ( read-double-matched ;
+: read-double-matched-paren ( n string tag ch -- n' string seq ) CHAR: \( read-double-matched ;
 : read-double-matched-bracket ( n string tag ch -- n' string seq ) CHAR: \[ read-double-matched ;
 : read-double-matched-brace ( n string tag ch -- n' string seq ) CHAR: \{ read-double-matched ;
 
@@ -105,13 +105,13 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 
 : read-bracket ( n string slice -- n' string slice' ) CHAR: \[ read-matched ;
 : read-brace ( n string slice -- n' string slice' ) CHAR: \{ read-matched ;
-: read-paren ( n string slice -- n' string slice' ) CHAR: ( read-matched ;
+: read-paren ( n string slice -- n' string slice' ) CHAR: \( read-matched ;
 : read-string-payload ( n string -- n' string )
     over [
-        { CHAR: \ CHAR: " } slice-til-separator-inclusive {
+        { CHAR: \\ CHAR: \" } slice-til-separator-inclusive {
             { f [ drop ] }
-            { CHAR: " [ drop ] }
-            { CHAR: \ [ drop next-char-from drop read-string-payload ] }
+            { CHAR: \" [ drop ] }
+            { CHAR: \\ [ drop next-char-from drop read-string-payload ] }
         } case
     ] [
         string-expected-got-eof
@@ -230,9 +230,9 @@ ERROR: mismatched-terminator n string slice ;
     over [
         skip-whitespace "\"\\!:[{(<>\s\r\n" slice-til-either {
             ! { CHAR: ` [ read-backtick ] }
-            { CHAR: " [ read-string ] }
-            { CHAR: \ [ read-backslash ] }
-            { CHAR: ! [ read-exclamation ] }
+            { CHAR: \" [ read-string ] }
+            { CHAR: \\ [ read-backslash ] }
+            { CHAR: \! [ read-exclamation ] }
             { CHAR: \: [
                 dup strict-upper? strict-upper get and [
                     length swap [ - ] dip f
@@ -269,7 +269,7 @@ ERROR: mismatched-terminator n string slice ;
             ] }
             { CHAR: \[ [ read-bracket ] }
             { CHAR: \{ [ read-brace ] }
-            { CHAR: ( [ read-paren ] }
+            { CHAR: \( [ read-paren ] }
             { CHAR: \s [ read-token-or-whitespace ] }
             { CHAR: \r [ read-token-or-whitespace ] }
             { CHAR: \n [ read-token-or-whitespace ] }

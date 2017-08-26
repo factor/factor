@@ -70,15 +70,15 @@ CONSTANT: CHARS H{
     ! { CHAR: 8   CHAR: 8 }
     { CHAR: 9   CHAR: 6   }
     { CHAR: &   0x214B }
-    { CHAR: !   0x00A1 }
+    { CHAR: \!   0x00A1 }
     { CHAR: \"   0x201E }
     { CHAR: .   0x02D9 }
     { CHAR: ;   0x061B }
-    { CHAR: \[   CHAR: ]   }
-    { CHAR: (   CHAR: )   }
-    { CHAR: \{   CHAR: }   }
+    { CHAR: \[   CHAR: \]   }
+    { CHAR: \(   CHAR: \)   }
+    { CHAR: \{   CHAR: \}   }
     { CHAR: ?   0x00BF }
-    { CHAR: !   0x00A1 }
+    { CHAR: \!   0x00A1 }
     { CHAR: '   CHAR: ,   }
     { CHAR: <   CHAR: >   }
     { CHAR: _   0x203E }

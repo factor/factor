@@ -18,8 +18,8 @@ IN: pdf.values
         { CHAR: \r   "\\r"  }
         { CHAR: \t   "\\t"  }
         { CHAR: \\   "\\\\" }
-        { CHAR: (    "\\("  }
-        { CHAR: )    "\\)"  }
+        { CHAR: \(    "\\("  }
+        { CHAR: \)    "\\)"  }
     } escape-string-by ;
 
 PRIVATE>

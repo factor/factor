@@ -44,7 +44,7 @@ name>char-hook [
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
-        CHAR: } over index cut-slice [
+        CHAR: \} over index cut-slice [
             dup hex> [
                 nip
             ] [
@@ -122,7 +122,7 @@ DEFER: (parse-string)
 : parse-found-token ( accum lexer i elt -- )
     { sbuf lexer fixnum fixnum } declare
     [ over lexer-subseq pick push-all ] dip
-    CHAR: \ = [
+    CHAR: \\ = [
         dup dup [ next-char ] bi@
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*

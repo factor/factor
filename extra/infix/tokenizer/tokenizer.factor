@@ -17,7 +17,7 @@ NameFirst         = Letter | "_" => [[ CHAR: _ ]]
 NameRest          = NameFirst | Digit
 Name              = NameFirst NameRest* => [[ first2 swap prefix >string ]]
 Special           =   [+*/%(),] | "-" => [[ CHAR: - ]]
-                    | "[" => [[ CHAR: \[ ]] | "]" => [[ CHAR: ] ]]
+                    | "[" => [[ CHAR: \[ ]] | "]" => [[ CHAR: \] ]]
                     | ":" => [[ CHAR: \: ]]
 Tok               = Spaces (Name | Number | String | Special )
 End               = !(.)

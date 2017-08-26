@@ -20,7 +20,7 @@ WhitespaceCharacter = [ \t\n\r]
 DecimalDigit = [0-9]
 Letter = [A-Za-z]
 
-CommentCharacter = [^"] | '""' => [[ CHAR: " ]]
+CommentCharacter = [^"] | '""' => [[ CHAR: \" ]]
 Comment = '"' (CommentCharacter)*:s '"' => [[ s >string ast-comment boa ]]
 
 OptionalWhiteSpace = (WhitespaceCharacter | Comment)*

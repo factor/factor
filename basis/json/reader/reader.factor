@@ -111,10 +111,10 @@ DEFER: (read-json-string)
         { CHAR: \" [ over read-json-string suffix! ] }
         { CHAR: \[  [ json-open-array ] }
         { CHAR: ,  [ v-over-push ] }
-        { CHAR: ]  [ json-close-array ] }
+        { CHAR: \]  [ json-close-array ] }
         { CHAR: \{  [ json-open-hash ] }
         { CHAR: \:  [ v-pick-push ] }
-        { CHAR: }  [ json-close-hash ] }
+        { CHAR: \}  [ json-close-hash ] }
         { CHAR: \s [ ] }
         { CHAR: \t [ ] }
         { CHAR: \r [ ] }

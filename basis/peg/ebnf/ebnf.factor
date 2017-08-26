@@ -112,7 +112,7 @@ C: <ebnf> ebnf
     ! between the quotes.
     [
         [
-            [ CHAR: \ = ] satisfy
+            [ CHAR: \\ = ] satisfy
             [ "\"\\" member? ] satisfy 2seq ,
             [ CHAR: \" = not ] satisfy ,
         ] choice* repeat1 "\"" "\"" surrounded-by ,
@@ -161,7 +161,7 @@ C: <ebnf> ebnf
     ! Match the syntax for declaring character ranges
     [
         [ "[" syntax , "[" token ensure-not , ] seq* hide ,
-        [ CHAR: ] = not ] satisfy repeat1 ,
+        [ CHAR: \] = not ] satisfy repeat1 ,
         "]" syntax ,
     ] seq* [ first >string unescape-string <ebnf-range> ] action ;
 

@@ -53,7 +53,7 @@ IN: xml.autoencoding
     get-next {
         { 0 [ next next start-utf16le ] }
         { CHAR: ? [ go-utf8 instruct dup instruct-encoding ] }
-        { CHAR: ! [ go-utf8 direct ] }
+        { CHAR: \! [ go-utf8 direct ] }
         [ check start<name ]
     } case ;
 

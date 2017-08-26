@@ -109,7 +109,7 @@ DEFER: make-tag ! Is this unavoidable?
 
 : dtd-loop ( -- )
     pass-blank get-char {
-        { CHAR: ] [ next ] }
+        { CHAR: \] [ next ] }
         { CHAR: % [ expand-pe ] }
         { CHAR: < [
             next make-tag dup dtd-acceptable?
@@ -166,7 +166,7 @@ DEFER: make-tag ! Is this unavoidable?
 
 : make-tag ( -- tag )
     get-char {
-        { CHAR: ! [ next direct ] }
+        { CHAR: \! [ next direct ] }
         { CHAR: ? [ next instruct ] }
         { CHAR: - [ next interpolate-tag ] }
         [ drop normal-tag ]

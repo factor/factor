@@ -45,9 +45,9 @@ DEFER: parse-tnetstring
     parse-payload {
         { CHAR: # [ string>number ] }
         { CHAR: \" [ ] }
-        { CHAR: } [ parse-dict ] }
-        { CHAR: ] [ parse-list ] }
-        { CHAR: ! [ parse-bool ] }
+        { CHAR: \} [ parse-dict ] }
+        { CHAR: \] [ parse-list ] }
+        { CHAR: \! [ parse-bool ] }
         { CHAR: ~ [ parse-null ] }
         { CHAR: , [ ] }
         [ "Invalid payload type: %c" sprintf throw ]

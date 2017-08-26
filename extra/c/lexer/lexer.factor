@@ -40,7 +40,7 @@ IN: c.lexer
 
 : take-define-identifier ( sequence-parser -- string )
     skip-whitespace/comments
-    [ current { [ blank? ] [ CHAR: ( = ] } 1|| ] take-until ;
+    [ current { [ blank? ] [ CHAR: \( = ] } 1|| ] take-until ;
 
 :: take-quoted-string ( sequence-parser escape-char quote-char -- string )
     sequence-parser n>> :> start-n
@@ -69,7 +69,7 @@ IN: c.lexer
     } case ;
 
 : take-token ( sequence-parser -- string/f )
-    CHAR: \ CHAR: \" take-token* ;
+    CHAR: \\ CHAR: \" take-token* ;
 
 : c-identifier-begin? ( ch -- ? )
     CHAR: a CHAR: z [a,b]
