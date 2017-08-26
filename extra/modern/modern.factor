@@ -186,18 +186,12 @@ ERROR: unexpected-terminator n string slice ;
 
 ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
 : read-colon ( n string slice -- n' string colon )
-    dup length 1 = [
-        dup prev-char-from-slice { CHAR: \s CHAR: \r CHAR: \n f } member? [
-            read-til-semicolon
-        ] [
-            read-lowercase-colon
-        ] if
-    ] [
-        {
-            { [ dup strict-upper? ] [ strict-upper on read-til-semicolon strict-upper off ] }
-            [ read-lowercase-colon ]
-        } cond
-    ] if ;
+    
+    {
+        { [ dup strict-upper? ] [ strict-upper on read-til-semicolon strict-upper off ] }
+        { [ dup ":" tail? ] [ dup ":" head? [ read-lowercase-colon ] unless ] } ! :foo: vs foo:
+        [ ]
+    } cond ;
 
 : read-acute ( n string slice -- n' string acute )
     [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
@@ -234,6 +228,7 @@ ERROR: mismatched-terminator n string slice ;
             { CHAR: \\ [ read-backslash ] }
             { CHAR: \! [ read-exclamation ] }
             { CHAR: \: [
+                merge-slice-til-whitespace
                 dup strict-upper? strict-upper get and [
                     length swap [ - ] dip f
                     strict-upper off
