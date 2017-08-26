@@ -59,7 +59,7 @@ HELP: ${
 
 { postpone: $ postpone: $[ postpone: ${ } related-words
 
-HELP: flags{
+HELP: \flags{
 { $values { "values" sequence } }
 { $description "Constructs a constant flag value from a sequence of integers or words that output integers. The resulting constant is computed at parse-time, which makes this word as efficient as using a literal integer." }
 { $examples

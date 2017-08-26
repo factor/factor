@@ -11,7 +11,7 @@ IN: game.debug
 
 <PRIVATE
 ! Vertex shader for debug shapes
-GLSL-SHADER: debug-shapes-vertex-shader vertex-shader
+GLSL-SHADER: debug-shapes-vertex-shader vertex-shader [[
 uniform   mat4 u_mvp_matrix;
 attribute vec3 a_position;
 attribute vec3 a_color;
@@ -22,15 +22,15 @@ void main()
     gl_PointSize = 5.0;
     v_color = a_color;
 }
-;
+]]
 
-GLSL-SHADER: debug-shapes-fragment-shader fragment-shader
+GLSL-SHADER: debug-shapes-fragment-shader fragment-shader [[
 varying vec3 v_color;
 void main()
 {
     gl_FragColor = vec4(v_color, 1.0);
 }
-;
+]]
 
 VERTEX-FORMAT: debug-shapes-vertex-format
     { "a_position" float-components 3 f }
@@ -43,7 +43,7 @@ GLSL-PROGRAM: debug-shapes-program debug-shapes-vertex-shader
 debug-shapes-fragment-shader debug-shapes-vertex-format ;
 
 ! Vertex shader for debug text
-GLSL-SHADER: debug-text-vertex-shader vertex-shader
+GLSL-SHADER: debug-text-vertex-shader vertex-shader [[
 attribute vec2 a_position;
 attribute vec2 a_texcoord;
 varying   vec2 v_texcoord;
@@ -52,9 +52,9 @@ void main()
     gl_Position = vec4(a_position, 0.0, 1.0);
     v_texcoord  = a_texcoord;
 }
-;
+]]
 
-GLSL-SHADER: debug-text-fragment-shader fragment-shader
+GLSL-SHADER: debug-text-fragment-shader fragment-shader [[
 uniform sampler2D u_text_map;
 uniform vec3 u_background_color;
 varying vec2 v_texcoord;
@@ -66,7 +66,7 @@ void main()
     else
         gl_FragColor = c;
 }
-;
+]]
 
 VERTEX-FORMAT: debug-text-vertex-format
     { "a_position" float-components 2 f }

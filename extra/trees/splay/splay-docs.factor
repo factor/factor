@@ -1,7 +1,7 @@
 USING: assocs help.markup help.syntax trees ;
 IN: trees.splay
 
-HELP: SPLAY{
+HELP: \SPLAY{
 { $syntax "SPLAY{ { key value }... }" }
 { $values { "key" "a key" } { "value" "a value" } }
 { $description "Literal syntax for an splay tree." } ;
@@ -23,7 +23,7 @@ ARTICLE: "trees.splay" "Splay trees"
     splay
     <splay>
     >splay
-    postpone: SPLAY{
+    postpone: \SPLAY{
 } ;
 
 ABOUT: "trees.splay"

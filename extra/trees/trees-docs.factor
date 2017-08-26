@@ -1,7 +1,7 @@
 USING: arrays assocs help.markup help.syntax kernel math ;
 IN: trees
 
-HELP: TREE{
+HELP: \TREE{
 { $syntax "TREE{ { key value }... }" }
 { $values { "key" "a key" } { "value" "a value" } }
 { $description "Literal syntax for an unbalanced tree." } ;
@@ -211,7 +211,7 @@ $nl
 { $subsections
     <tree>
     >tree
-    postpone: TREE{
+    postpone: \TREE{
 }
 "Operations on trees: "
 { $subsections

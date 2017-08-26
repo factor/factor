@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel math sequences ;
 IN: persistent.vectors
 
-HELP: PV{
+HELP: \PV{
 { $syntax "PV{ elements... }" }
 { $description "Parses a literal " { $link persistent-vector } "." } ;
 

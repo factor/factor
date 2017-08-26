@@ -1,7 +1,7 @@
 USING: assocs help.markup help.syntax trees ;
 IN: trees.avl
 
-HELP: AVL{
+HELP: \AVL{
 { $syntax "AVL{ { key value }... }" }
 { $values { "key" "a key" } { "value" "a value" } }
 { $description "Literal syntax for an AVL tree." } ;
@@ -23,7 +23,7 @@ ARTICLE: "trees.avl" "AVL trees"
     avl
     <avl>
     >avl
-    postpone: AVL{
+    postpone: \AVL{
 } ;
 
 ABOUT: "trees.avl"

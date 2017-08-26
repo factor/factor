@@ -16,7 +16,7 @@ SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
 IN: model-viewer
 
-GLSL-SHADER: obj-vertex-shader vertex-shader
+GLSL-SHADER: obj-vertex-shader vertex-shader [[
 uniform mat4 mv_matrix;
 uniform mat4 p_matrix;
 
@@ -36,9 +36,9 @@ void main()
     texcoord_fs   = TEXCOORD;
     normal_fs     = NORMAL;
 }
-;
+]]
 
-GLSL-SHADER: obj-fragment-shader fragment-shader
+GLSL-SHADER: obj-fragment-shader fragment-shader [[
 uniform mat4 mv_matrix, p_matrix;
 uniform sampler2D map_Ka;
 uniform sampler2D map_bump;
@@ -60,7 +60,7 @@ void main()
     gl_FragColor = d * cosTh
                  + d * 0.5 * cosTh * pow(saturate(dot(n, h)), 10.0) ;
 }
-;
+]]
 
 GLSL-PROGRAM: obj-program
     obj-vertex-shader obj-fragment-shader ;

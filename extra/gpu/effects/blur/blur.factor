@@ -5,7 +5,7 @@ gpu.state gpu.textures gpu.util images kernel locals math
 math.rectangles sequences ;
 IN: gpu.effects.blur
 
-GLSL-SHADER: blur-fragment-shader fragment-shader
+GLSL-SHADER: blur-fragment-shader fragment-shader [[
 uniform sampler2D texture;
 uniform bool horizontal;
 uniform float blurSize;
@@ -45,7 +45,7 @@ void main()
     }
     gl_FragColor = col;
 }
-;
+]]
 
 UNIFORM-TUPLE: blur-uniforms
     { "texture"    texture-uniform f }

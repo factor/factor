@@ -34,10 +34,10 @@ ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
 }
 "Literal syntax:"
 { $subsections
-    postpone: svector{
-    postpone: dvector{
-    postpone: cvector{
-    postpone: zvector{
+    postpone: \svector{
+    postpone: \dvector{
+    postpone: \cvector{
+    postpone: \zvector{
 } ;
 
 ABOUT: "math.blas.vectors"
@@ -145,23 +145,23 @@ HELP: Vsub
 { $values { "v" blas-vector-base } { "start" integer } { "length" integer } { "sub" blas-vector-base } }
 { $description "Slice a subvector out of " { $snippet "v" } " starting at " { $snippet "start" } " with the given " { $snippet "length" } ". The subvector will share storage with the parent vector." } ;
 
-HELP: svector{
+HELP: \svector{
 { $syntax "svector{ 1.0 -2.0 3.0 }" }
 { $description "Construct a literal " { $link float-blas-vector } "." } ;
 
-HELP: dvector{
+HELP: \dvector{
 { $syntax "dvector{ 1.0 -2.0 3.0 }" }
 { $description "Construct a literal " { $link double-blas-vector } "." } ;
 
-HELP: cvector{
+HELP: \cvector{
 { $syntax "cvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
 { $description "Construct a literal " { $link complex-float-blas-vector } "." } ;
 
-HELP: zvector{
+HELP: \zvector{
 { $syntax "dvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
 { $description "Construct a literal " { $link complex-double-blas-vector } "." } ;
 
 {
-    postpone: svector{ postpone: dvector{
-    postpone: cvector{ postpone: zvector{
+    postpone: \svector{ postpone: \dvector{
+    postpone: \cvector{ postpone: \zvector{
 } related-words

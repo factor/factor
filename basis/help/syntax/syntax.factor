@@ -5,7 +5,7 @@ help.topics kernel math parser sequences vocabs.parser words ;
 IN: help.syntax
 
 SYNTAX: \HELP:
-    scan-word bootstrap-word
+    scan-syntax-word bootstrap-word
     [ >link save-location ]
     [ [ parse-array-def ] dip set-word-help ]
     bi ;

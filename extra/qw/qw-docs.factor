@@ -2,7 +2,7 @@
 USING: help.markup help.syntax multiline ;
 IN: qw
 
-HELP: qw{
+HELP: \qw{
 { $syntax "qw{ lorem ipsum }" }
 { $description "Marks the beginning of a literal array of strings. Component strings are delimited by whitespace." }
 { $examples

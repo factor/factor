@@ -4,7 +4,7 @@ USING: destructors gpu.render gpu.shaders gpu.state gpu.textures
 gpu.util images kernel locals math.rectangles ;
 IN: gpu.effects.step
 
-GLSL-SHADER: step-fragment-shader fragment-shader
+GLSL-SHADER: step-fragment-shader fragment-shader [[
 const vec4 luminance = vec4(0.3, 0.59, 0.11, 0.0);
 uniform sampler2D texture;
 uniform sampler2D ramp;
@@ -15,7 +15,7 @@ void main()
     float l = dot(col, luminance);
     gl_FragColor = texture2D(ramp, vec2(l, 0.0));
 }
-;
+]]
 
 UNIFORM-TUPLE: step-uniforms
     { "texture" texture-uniform f }

@@ -10,7 +10,7 @@ HELP: >suffix-array
      { "array" array } }
 { $description "Creates a suffix array from the input sequence. Suffix arrays are arrays of slices." } ;
 
-HELP: SA{
+HELP: \SA{
 { $description "Creates a new literal suffix array at parse-time." } ;
 
 HELP: suffixes

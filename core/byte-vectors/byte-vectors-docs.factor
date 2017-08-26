@@ -33,7 +33,7 @@ HELP: >byte-vector
 { $description "Outputs a freshly-allocated byte vector with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;
 
-HELP: BV{
+HELP: \BV{
 { $syntax "BV{ elements... }" }
 { $values { "elements" "a list of bytes" } }
 { $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link postpone: } } "." }

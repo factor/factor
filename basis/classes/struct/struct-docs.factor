@@ -28,7 +28,7 @@ HELP: <struct>
 
 { <struct> <struct-boa> malloc-struct memory>struct } related-words
 
-HELP: STRUCT:
+HELP: \STRUCT:
 { $syntax "STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
 { $description "Defines a new " { $link struct } " type. The syntax is nearly identical to " { $link postpone: \TUPLE: } "; however, there are some additional restrictions on struct types:"
@@ -39,7 +39,7 @@ HELP: STRUCT:
 }
 "Additionally, structs may use bit fields. A slot specifier may use the syntax " { $snippet "bits: n" } " to specify that the bit width of the slot is " { $snippet "n" } ". Bit width may be specified on signed or unsigned integer slots. The layout of bit fields is not guaranteed to match that of any particular C compiler." } ;
 
-HELP: S{
+HELP: \S{
 { $syntax "S{ class slots... }" }
 { $values { "class" "a " { $link struct } " class word" } { "slots" "slot values" } }
 { $description "Marks the beginning of a literal struct. The syntax is identical to tuple literal syntax with " { $link postpone: \T{ } { $snippet " }" } "; either the assoc syntax (that is, " { $snippet "S{ class { slot value } { slot value } ... }" } ") or the simple syntax (" { $snippet "S{ class f value value ... }" } ") can be used." } ;
@@ -51,12 +51,12 @@ HELP: S@
 
 { postpone: \S{ postpone: S@ } related-words
 
-HELP: UNION-STRUCT:
+HELP: \UNION-STRUCT:
 { $syntax "UNION-STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
 { $description "Defines a new " { $link struct } " type where all of the slots share the same storage. See " { $link postpone: \STRUCT: } " for details on the syntax." } ;
 
-HELP: PACKED-STRUCT:
+HELP: \PACKED-STRUCT:
 { $syntax "PACKED-STRUCT: class { slot type } { slot type } ... ;" }
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
 { $description "Defines a new " { $link struct } " type with no alignment padding between slots or at the end. In all other respects, behaves like " { $link postpone: \STRUCT: } "." } ;

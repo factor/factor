@@ -96,10 +96,10 @@ ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
 }
 "Literal syntax:"
 { $subsections
-    postpone: smatrix{
-    postpone: dmatrix{
-    postpone: cmatrix{
-    postpone: zmatrix{
+    postpone: \smatrix{
+    postpone: \dmatrix{
+    postpone: \cmatrix{
+    postpone: \zmatrix{
 } ;
 
 
@@ -270,7 +270,7 @@ HELP: <empty-vector>
 { $values { "length" "The length of the new vector" } { "exemplar" blas-vector-base blas-matrix-base } { "vector" blas-vector-base } }
 { $description "Return a vector of zeros with the given " { $snippet "length" } " and the same element type as " { $snippet "v" } "." } ;
 
-HELP: smatrix{
+HELP: \smatrix{
 { $syntax "smatrix{
     { 1.0 0.0 0.0 1.0 }
     { 0.0 1.0 0.0 2.0 }
@@ -279,7 +279,7 @@ HELP: smatrix{
 }" }
 { $description "Construct a literal " { $link float-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
-HELP: dmatrix{
+HELP: \dmatrix{
 { $syntax "dmatrix{
     { 1.0 0.0 0.0 1.0 }
     { 0.0 1.0 0.0 2.0 }
@@ -288,7 +288,7 @@ HELP: dmatrix{
 }" }
 { $description "Construct a literal " { $link double-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
-HELP: cmatrix{
+HELP: \cmatrix{
 { $syntax "cmatrix{
     { 1.0 0.0           0.0 1.0           }
     { 0.0 C{ 0.0 1.0 }  0.0 2.0           }
@@ -297,7 +297,7 @@ HELP: cmatrix{
 }" }
 { $description "Construct a literal " { $link complex-float-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
-HELP: zmatrix{
+HELP: \zmatrix{
 { $syntax "zmatrix{
     { 1.0 0.0           0.0 1.0           }
     { 0.0 C{ 0.0 1.0 }  0.0 2.0           }
@@ -307,6 +307,6 @@ HELP: zmatrix{
 { $description "Construct a literal " { $link complex-double-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
 {
-    postpone: smatrix{ postpone: dmatrix{
-    postpone: cmatrix{ postpone: zmatrix{
+    postpone: \smatrix{ postpone: \dmatrix{
+    postpone: \cmatrix{ postpone: \zmatrix{
 } related-words
