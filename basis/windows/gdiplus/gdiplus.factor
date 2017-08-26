@@ -548,21 +548,21 @@ STRUCT: MetafileHeader
     { LogicalDpiX INT }
     { LogicalDpiY INT } ;
 
-CONSTANT: ImageFormatUndefined      GUID: {b96b3ca9-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatMemoryBMP      GUID: {b96b3caa-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatBMP            GUID: {b96b3cab-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatEMF            GUID: {b96b3cac-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatWMF            GUID: {b96b3cad-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatJPEG           GUID: {b96b3cae-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatPNG            GUID: {b96b3caf-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatGIF            GUID: {b96b3cb0-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatTIFF           GUID: {b96b3cb1-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatEXIF           GUID: {b96b3cb2-0728-11d3-9d7b-0000f81ef32e}
-CONSTANT: ImageFormatIcon           GUID: {b96b3cb5-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatUndefined      guid: {b96b3ca9-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatMemoryBMP      guid: {b96b3caa-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatBMP            guid: {b96b3cab-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatEMF            guid: {b96b3cac-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatWMF            guid: {b96b3cad-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatJPEG           guid: {b96b3cae-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatPNG            guid: {b96b3caf-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatGIF            guid: {b96b3cb0-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatTIFF           guid: {b96b3cb1-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatEXIF           guid: {b96b3cb2-0728-11d3-9d7b-0000f81ef32e}
+CONSTANT: ImageFormatIcon           guid: {b96b3cb5-0728-11d3-9d7b-0000f81ef32e}
 
-CONSTANT: FrameDimensionTime        GUID: {6aedbd6d-3fb5-418a-83a6-7f45229dc872}
-CONSTANT: FrameDimensionPage        GUID: {7462dc86-6180-4c7e-8e3f-ee7333a7a483}
-CONSTANT: FrameDimensionResolution  GUID: {84236f7b-3bd3-428f-8dab-4ea1439ca315}
+CONSTANT: FrameDimensionTime        guid: {6aedbd6d-3fb5-418a-83a6-7f45229dc872}
+CONSTANT: FrameDimensionPage        guid: {7462dc86-6180-4c7e-8e3f-ee7333a7a483}
+CONSTANT: FrameDimensionResolution  guid: {84236f7b-3bd3-428f-8dab-4ea1439ca315}
 
 ENUM: ImageLockMode
     { ImageLockModeRead           1 }

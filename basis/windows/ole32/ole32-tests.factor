@@ -23,7 +23,7 @@ IN: windows.ole32.tests
 ] unit-test
 
 [
-    GUID: 01234567-89ab-cdef-0123-456789abcdef}
+    guid: 01234567-89ab-cdef-0123-456789abcdef}
 ] [ "{01234567-89ab-cdef-0123-456789abcdef}" string>guid ] unit-test
 
 [ "{01234567-89ab-cdef-0123-456789abcdef}" ]

@@ -103,13 +103,13 @@ M: xinput-game-input-backend product-string
 
 M: xinput-game-input-backend product-id
     dup number?
-    [ drop GUID: {02a1045e-0000-0000-0000-504944564944} ]
+    [ drop guid: {02a1045e-0000-0000-0000-504944564944} ]
     [ handle>> device-info guidProduct>> ]
     if ;
 
 M: xinput-game-input-backend instance-id
     dup number?
-    [ drop GUID: {c6075b30-fbca-11de-8001-444553540000} ]
+    [ drop guid: {c6075b30-fbca-11de-8001-444553540000} ]
     [ handle>> device-guid ]
     if ;
 
