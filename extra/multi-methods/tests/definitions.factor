@@ -6,6 +6,7 @@ DEFER: fake
 \ fake H{ } clone "multi-methods" set-word-prop
 << ( -- ) \ fake set-stack-effect >>
 
+DEFER: testing
 [
     [ "fake-{ }" ] [ { } \ fake method-word-name ] unit-test
 
@@ -21,8 +22,6 @@ DEFER: fake
     [ t ] [ \ fake make-generic quotation? ] unit-test
 
     [ ] [ \ fake update-generic ] unit-test
-
-    DEFER: testing
 
     [ ] [ \ testing ( -- ) define-generic ] unit-test
 

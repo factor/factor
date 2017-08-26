@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators continuations io kernel
 kernel.private math math.parser namespaces sequences
-sequences.private source-files.errors strings vectors ;
+sequences.private source-files.errors splitting strings vectors ;
 IN: lexer
 
 TUPLE: lexer
@@ -142,6 +142,12 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : parse-tokens ( end -- seq )
     [ ] map-tokens ;
+
+: unescape-token ( string -- string' )
+    "\\" ?head drop ;
+
+: unescape-tokens ( seq -- seq' )
+    [ unescape-token ] map ;
 
 TUPLE: lexer-error line column line-text parsing-words error ;
 

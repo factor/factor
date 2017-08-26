@@ -89,6 +89,6 @@ MACRO: interpolate-locals ( str -- quot )
     parse-multiline-string
     interpolate-locals-quot append! ;
 
-SYNTAX: I[[ "]]" define-interpolate-syntax ;
-SYNTAX: I[=[ "]=]" define-interpolate-syntax ;
-SYNTAX: I[==[ "]==]" define-interpolate-syntax ;
+SYNTAX: \I[[ "]]" define-interpolate-syntax ;
+SYNTAX: \I[=[ "]=]" define-interpolate-syntax ;
+SYNTAX: \I[==[ "]==]" define-interpolate-syntax ;

@@ -19,7 +19,7 @@ M: literate-lexer skip-blank
         ] [ drop ] if*
     ] [ call-next-method ] if ;
 
-SYNTAX: \<LITERATE
-    "LITERATE>" parse-multiline-string string-lines [
+SYNTAX: \LITERATE[[
+    "]]" parse-multiline-string string-lines [
         <literate-lexer> (parse-lines) append!
     ] with-nested-compilation-unit ;

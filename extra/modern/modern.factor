@@ -163,7 +163,14 @@ ERROR: unexpected-terminator n string slice ;
     ] dip swap 2array ;
 
 : strict-upper? ( string -- ? )
-    [ { [ char: A char: Z between? ] [ ":-" member? ] } 1|| ] all? ;
+    {
+        [
+            [
+                { [ char: A char: Z between? ] [ ":-" member? ] } 1||
+            ] all?
+        ]
+        [ [ char: A char: Z between? ] any? ]
+    } 1&& ;
 
 ! <a <a: but not <a>
 : section-open? ( string -- ? )
@@ -310,3 +317,4 @@ ERROR: mismatched-terminator n string slice ;
 : lex-all ( -- assoc ) lex-core lex-basis lex-extra 3append ;
 
 : lex-docs ( -- assoc ) all-docs-paths lex-paths ;
+: lex-tests ( -- assoc ) all-tests-paths lex-paths ;

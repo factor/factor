@@ -6,14 +6,14 @@ IN: furnace.utilities.tests
 CONSTANT: dummy-vocab [[
 IN: dummy-vocab
 
-: dummy-word ( -- ) ;
-]]
+: dummy-word ( -- ) ;]]
 
 dummy-vocab "dummy.factor" temp-file [ utf8 set-file-contents ] keep run-file
 >>
 
+USE: dummy-vocab
+
 { t } [
-    USE: dummy-vocab
     { dummy-word "index" } resolve-template-path "index" temp-file =
 ] unit-test
 

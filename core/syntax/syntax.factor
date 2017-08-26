@@ -65,15 +65,19 @@ IN: bootstrap.syntax
     "QUALIFIED-WITH:" [ scan-token scan-token add-qualified ] define-core-syntax
 
     "FROM:" [
-        scan-token "=>" expect ";" parse-tokens add-words-from
+        scan-token unescape-token
+        "=>" expect ";" parse-tokens unescape-tokens add-words-from
     ] define-core-syntax
 
     "EXCLUDE:" [
-        scan-token "=>" expect ";" parse-tokens add-words-excluding
+        scan-token unescape-token
+        "=>" expect ";" parse-tokens unescape-tokens add-words-excluding
     ] define-core-syntax
 
     "RENAME:" [
-        scan-token scan-token "=>" expect scan-token add-renamed-word
+        scan-token unescape-token
+        scan-token
+        "=>" expect scan-token unescape-token add-renamed-word
     ] define-core-syntax
 
     "nan:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
@@ -149,7 +153,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "ALIAS:" [
-        scan-new-word scan-word define-alias
+        scan-new-syntax-word scan-syntax-word define-alias
     ] define-core-syntax
 
     "CONSTANT:" [

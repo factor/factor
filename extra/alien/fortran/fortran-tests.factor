@@ -4,7 +4,7 @@ alien.data alien.fortran alien.fortran.private alien.strings
 classes.struct arrays assocs byte-arrays combinators fry
 generalizations io.encodings.ascii kernel macros
 macros.expander namespaces sequences shuffle tools.test vocabs.parser ;
-FROM: alien.syntax => pointer: ;
+FROM: alien.syntax => \pointer: ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran.tests
 
