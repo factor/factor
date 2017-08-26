@@ -11,9 +11,6 @@ ERROR: string-expected-got-eof n string ;
 ERROR: long-opening-mismatch tag open n string ch ;
 
 SYMBOL: strict-upper
-SYMBOL: delimiter-stack
-: push-delimiter-stack ( obj -- ) delimiter-stack get push ;
-: pop-delimiter-stack ( -- obj ) delimiter-stack get pop ;
 
 ! (( )) [[ ]] {{ }}
 MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string seq ) )
@@ -275,9 +272,7 @@ ERROR: mismatched-terminator n string slice ;
     ] if ; inline
 
 : string>literals ( string -- sequence )
-    [ V{ } clone delimiter-stack ] dip '[
-        _ [ 0 ] dip [ lex-factor ] loop>array 2nip
-    ] with-variable ;
+    [ 0 ] dip [ lex-factor ] loop>array 2nip ;
 
 : vocab>literals ( vocab -- sequence )
     ".private" ?tail drop
