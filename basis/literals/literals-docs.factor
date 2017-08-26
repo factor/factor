@@ -26,7 +26,7 @@ HELP: $
     }
 } ;
 
-HELP: $[
+HELP: \$[
 { $syntax "$[ code ]" }
 { $description "Calls " { $snippet "code" } " at parse time and adds the result(s) to the parser accumulator." }
 { $notes "Since " { $snippet "code" } " is " { $link call } "ed at parse time, it cannot reference any words defined in the same compilation unit." }
@@ -41,7 +41,7 @@ HELP: $[
     }
 } ;
 
-HELP: ${
+HELP: \${
 { $syntax "${ code }" }
 { $description "Outputs an array containing the results of executing " { $snippet "code" } " at parse time." }
 { $notes { $snippet "code" } "'s definition is looked up and " { $link call } "ed at parse time, so words that reference words in the current compilation unit cannot be used with " { $snippet "$" } "." }
@@ -57,7 +57,7 @@ HELP: ${
     }
 } ;
 
-{ postpone: $ postpone: $[ postpone: ${ } related-words
+{ postpone: $ postpone: \$[ postpone: \${ } related-words
 
 HELP: \flags{
 { $values { "values" sequence } }
@@ -85,8 +85,8 @@ ARTICLE: "literals" "Interpolating code results into literal values"
 }
 { $subsections
     postpone: $
-    postpone: $[
-    postpone: ${
+    postpone: \$[
+    postpone: \${
 } ;
 
 ABOUT: "literals"

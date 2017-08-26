@@ -9,7 +9,7 @@ HELP: <pool>
 }
 { $description "Creates a " { $link pool } " of " { $snippet "size" } " objects of " { $snippet "class" } "." } ;
 
-HELP: POOL:
+HELP: \POOL:
 { $syntax "POOL: class size" }
 { $description "Creates a " { $link pool } " of " { $snippet "size" } " objects of " { $snippet "class" } ", and associates it with the class using " { $link set-class-pool } "." } ;
 
@@ -33,10 +33,10 @@ HELP: new-from-pool
 }
 { $description "Allocates an object from the " { $link pool } " associated with " { $snippet "class" } ". If the pool is exhausted, " { $link f } " is returned." } ;
 
-{ postpone: POOL: class-pool set-class-pool new-from-pool free-to-pool } related-words
+{ postpone: \POOL: class-pool set-class-pool new-from-pool free-to-pool } related-words
 
 HELP: pool
-{ $class-description "A " { $snippet "pool" } " contains a fixed-size set of preallocated tuple objects. Once the pool has been allocated, its objects can be allocated with " { $link pool-new } " and freed with " { $link pool-free } " in constant time. A pool can also be associated with its class with the " { $link postpone: POOL: } " syntax or the " { $link set-class-pool } " word, after which the words " { $link new-from-pool } " and " { $link free-to-pool } " can be used with the class name to allocate and free objects." } ;
+{ $class-description "A " { $snippet "pool" } " contains a fixed-size set of preallocated tuple objects. Once the pool has been allocated, its objects can be allocated with " { $link pool-new } " and freed with " { $link pool-free } " in constant time. A pool can also be associated with its class with the " { $link postpone: \POOL: } " syntax or the " { $link set-class-pool } " word, after which the words " { $link new-from-pool } " and " { $link free-to-pool } " can be used with the class name to allocate and free objects." } ;
 
 HELP: pool-free
 { $values
@@ -70,7 +70,7 @@ ARTICLE: "memory.pools" "Pools"
 "The " { $vocab-link "memory.pools" } " vocabulary provides " { $link pool } " objects which manage preallocated collections of objects."
 { $subsections
     pool
-    postpone: POOL:
+    postpone: \POOL:
     new-from-pool
     free-to-pool
 } ;

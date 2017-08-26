@@ -207,11 +207,11 @@ HELP: n*V(*)Vconj
 { $values { "alpha" number } { "x" blas-vector-base } { "y" blas-vector-base } { "alpha*x(*)yconj" blas-matrix-base } }
 { $description "Calculate the outer product " { $snippet "αx⊗y̅" } " and return a freshly allocated matrix containing the result. The returned matrix's height will match the length of " { $snippet "x" } ", and its width will match the length of " { $snippet "y" } ". Corresponds to the xGERC routines in BLAS." } ;
 
-HELP: V(*)
+HELP: \V(*)
 { $values { "x" blas-vector-base } { "y" blas-vector-base } { "x(*)y" blas-matrix-base } }
 { $description "Calculate the outer product " { $snippet "x⊗y" } " and return a freshly allocated matrix containing the result. The returned matrix's height will match the length of " { $snippet "x" } ", and its width will match the length of " { $snippet "y" } ". Corresponds to the xGER and xGERU routines in BLAS." } ;
 
-HELP: V(*)conj
+HELP: \V(*)conj
 { $values { "x" blas-vector-base } { "y" blas-vector-base } { "x(*)yconj" blas-matrix-base } }
 { $description "Calculate the conjugate outer product " { $snippet "x⊗y̅" } " and return a freshly allocated matrix containing the result. The returned matrix's height will match the length of " { $snippet "x" } ", and its width will match the length of " { $snippet "y" } ". Corresponds to the xGERC routines in BLAS." } ;
 

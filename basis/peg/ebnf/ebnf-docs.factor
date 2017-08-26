@@ -4,7 +4,7 @@ USING: help.syntax help.markup peg peg.search words
 multiline ;
 IN: peg.ebnf
 
-HELP: EBNF[[
+HELP: \EBNF[[
 { $syntax "EBNF[[ ...ebnf... ]]" }
 { $values { "...ebnf..." "EBNF DSL text" } }
 { $description
@@ -22,7 +22,7 @@ HELP: EBNF[[
     }
 } ;
 
-HELP: EBNF:
+HELP: \EBNF:
 { $syntax "EBNF: word [=[ ...ebnf... ]=]" }
 { $values { "word" word } { "...ebnf..." "EBNF DSL text" } }
 { $description
@@ -479,12 +479,12 @@ ARTICLE: "peg.ebnf" "EBNF"
 "EBNF syntax. It provides three parsing words described below. These words all "
 "accept the same EBNF syntax. The difference is in how they are used. "
 { $subsections
-    postpone: EBNF:
-    postpone: EBNF[[
-    postpone: EBNF[=[
-    postpone: EBNF[==[
-    postpone: EBNF[===[
-    postpone: EBNF[====[
+    postpone: \EBNF:
+    postpone: \EBNF[[
+    postpone: \EBNF[=[
+    postpone: \EBNF[==[
+    postpone: \EBNF[===[
+    postpone: \EBNF[====[
 }
 "The EBNF syntax is composed of a series of rules of the form:"
 { $code

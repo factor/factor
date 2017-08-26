@@ -24,7 +24,7 @@ HELP: breakpoint-if
 HELP: B
 { $description "An alias for " { $link break } ", defined in the " { $vocab-link "syntax" } " vocabulary so that it is always available." } ;
 
-HELP: b:
+HELP: \b:
 { $description "A breakpoint for parsing words. When this word is executed, it copies the definition of the following parsing word, prepends a " { $link break } " to it so that it is the first word to be executed when the definition is called, and calls this new definition.\n\nWhen the walker tool opens, execution will still be inside " { $link postpone: \b: } ". To step out of B: and into the parsing word, do just that: jump out with O, then into with I." } ;
 
 HELP: step-into

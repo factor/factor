@@ -3,7 +3,7 @@ sequences strings words ;
 IN: effects
 
 ARTICLE: "effects" "Stack effect declarations"
-"Word definition words such as " { $link postpone: : } " and " { $link postpone: GENERIC: } " have a " { $emphasis "stack effect declaration" } " as part of their syntax. A stack effect declaration takes the following form:"
+"Word definition words such as " { $link postpone: \: } " and " { $link postpone: \GENERIC: } " have a " { $emphasis "stack effect declaration" } " as part of their syntax. A stack effect declaration takes the following form:"
 { $code "( input1 input2 ... -- output1 ... )" }
 "Stack elements in a stack effect are ordered so that the top of the stack is on the right side. Here is an example:"
 { $synopsis + }
@@ -144,4 +144,4 @@ HELP: effect>string
 
 HELP: stack-effect
 { $values { "word" word } { "effect/f" { $maybe effect } } }
-{ $description "Outputs the stack effect of a word; either a stack effect declared with " { $link postpone: ( } ", or an inferred stack effect (see " { $link "inference" } ")." } ;
+{ $description "Outputs the stack effect of a word; either a stack effect declared with " { $link postpone: \( } ", or an inferred stack effect (see " { $link "inference" } ")." } ;

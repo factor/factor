@@ -1,11 +1,11 @@
 USING: help.markup help.syntax io kernel math quotations ;
 IN: windows.com.syntax
 
-HELP: guid:
+HELP: \guid:
 { $syntax "guid: {01234567-89ab-cdef-0123-456789abcdef}" }
 { $description "\nCreate a COM globally-unique identifier (GUID) literal at parse time, and push it onto the data stack." } ;
 
-HELP: COM-INTERFACE:
+HELP: \COM-INTERFACE:
 { $syntax "COM-INTERFACE: <interface> <parent> <iid>
     <function-1> ( <params1> )
     <function-2> ( <params2> )

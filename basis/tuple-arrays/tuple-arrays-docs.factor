@@ -1,7 +1,7 @@
 IN: tuple-arrays
 USING: help.markup help.syntax sequences ;
 
-HELP: TUPLE-ARRAY:
+HELP: \TUPLE-ARRAY:
 { $syntax "TUPLE-ARRAY: class" }
 { $values { "class" "a final tuple class" } }
 { $description "Generates a new data type in the current vocabulary named " { $snippet { $emphasis "class" } "-array" } " for holding instances of " { $snippet "class" } ", which must be a tuple class word. Together with the class itself, this also generates words named " { $snippet "<" { $emphasis "class" } "-array>" } " and " { $snippet ">" { $emphasis "class" } "-array" } ", for creating new instances of this tuple array type." } ;
@@ -15,7 +15,7 @@ $nl
 $nl
 "Tuple arrays do not get updated if tuples are redefined to add or remove slots, so caution should be exercised when doing interactive development on code that uses tuple arrays."
 $nl
-{ $subsections postpone: TUPLE-ARRAY: }
+{ $subsections postpone: \TUPLE-ARRAY: }
 "An example:"
 { $example
   "USE: tuple-arrays"

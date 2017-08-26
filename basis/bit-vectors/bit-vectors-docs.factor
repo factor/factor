@@ -15,7 +15,7 @@ $nl
     <bit-vector>
 }
 "Literal syntax:"
-{ $subsections postpone: ?V{ }
+{ $subsections postpone: \?V{ }
 "If you don't care about initial capacity, a more elegant way to create a new bit vector is to write:"
 { $code "?V{ } clone" } ;
 
@@ -32,8 +32,8 @@ HELP: >bit-vector
 { $values { "seq" sequence } { "vector" bit-vector } }
 { $description "Outputs a freshly-allocated bit vector with the same elements as a given sequence." } ;
 
-HELP: ?V{
+HELP: \?V{
 { $syntax "?V{ elements... }" }
 { $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link postpone: } } "." }
+{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link postpone: \} } "." }
 { $examples { $code "?V{ t f t }" } } ;

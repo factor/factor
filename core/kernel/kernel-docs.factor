@@ -231,7 +231,7 @@ HELP: execute
     { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
 
-{ execute postpone: execute( } related-words
+{ execute postpone: \execute( } related-words
 
 HELP: (execute)
 { $values { "word" word } }
@@ -246,7 +246,7 @@ HELP: call
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
 } ;
 
-{ call postpone: call( } related-words
+{ call postpone: \call( } related-words
 
 HELP: keep
 { $values { "x" object } { "quot" { $quotation ( ..a x -- ..b ) } } }

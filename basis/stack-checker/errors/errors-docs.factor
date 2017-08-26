@@ -31,7 +31,7 @@ HELP: unknown-macro-input
         ": usage ( -- )"
         "    10 [ 2 * ] good-example . ;"
     }
-    "Another fix is to use " { $link postpone: call( } ":"
+    "Another fix is to use " { $link postpone: \call( } ":"
     { $code
         ": good-example ( quot -- )"
         "    [ call( x -- y ) ] [ call( x -- y ) ] bi ;"

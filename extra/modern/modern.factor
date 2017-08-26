@@ -296,6 +296,9 @@ ERROR: mismatched-terminator n string slice ;
 : path>literals ( path -- sequence )
     utf8 file-contents string>literals ;
 
+: lex-paths ( vocabs -- assoc )
+    [ [ path>literals ] [ nip ] recover ] map-zip ;
+
 : lex-vocabs ( vocabs -- assoc )
     [ [ vocab>literals ] [ nip ] recover ] map-zip ;
 
@@ -305,3 +308,5 @@ ERROR: mismatched-terminator n string slice ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;
 : lex-extra ( -- assoc ) extra-vocabs lex-vocabs ;
 : lex-all ( -- assoc ) lex-core lex-basis lex-extra 3append ;
+
+: lex-docs ( -- assoc ) all-docs-paths lex-paths ;

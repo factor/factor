@@ -607,7 +607,7 @@ HELP: \char:
     }
 } ;
 
-HELP: "
+HELP: \"
 { $syntax "\"string...\"" }
 { $values { "string" "literal and escaped characters" } }
 { $description "Reads from the input string until the next occurrence of " { $snippet "\"" } ", and appends the resulting string to the parse tree. String literals can span multiple lines. Various special characters can be read by inserting " { $link "escape" } "." }
@@ -620,19 +620,19 @@ HELP: "
     { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
 } ;
 
-HELP: SBUF"
+HELP: \SBUF"
 { $syntax "SBUF\" string... \"" }
 { $values { "string" "literal and escaped characters" } }
 { $description "Reads from the input string until the next occurrence of " { $link postpone: \" } ", converts the string to a string buffer, and appends it to the parse tree." }
 { $examples { $example "USING: io strings ;" "SBUF\" Hello world\" >string print" "Hello world" } } ;
 
-HELP: P"
+HELP: \P"
 { $syntax "P\" pathname\"" }
 { $values { "pathname" "a pathname string" } }
 { $description "Reads from the input string until the next occurrence of " { $link postpone: \" } ", creates a new " { $link pathname } ", and appends it to the parse tree. Pathnames presented in the UI are clickable, which opens them in a text editor configured with " { $link "editor" } "." }
 { $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;
 
-HELP: (
+HELP: \(
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Literal stack effect syntax. Also used by syntax words (such as " { $link postpone: \: } "), typically declaring the stack effect of the word definition which follows." }
@@ -767,7 +767,7 @@ $nl
     { { $snippet "{ name attributes... }" } " - a slot which can hold any object, with optional attributes" }
     { { $snippet "{ name class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
 }
-"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link \ initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
 { $examples
     "A simple tuple class:"
     { $code "TUPLE: color red green blue ;" }
@@ -890,7 +890,7 @@ HELP: call-next-method
 
 { postpone: << postpone: >> } related-words
 
-HELP: call(
+HELP: \call(
 { $syntax "call( stack -- effect )" }
 { $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." }
 { $examples
@@ -901,7 +901,7 @@ HELP: call(
   }
 } ;
 
-HELP: execute(
+HELP: \execute(
 { $syntax "execute( stack -- effect )" }
 { $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." }
 { $examples

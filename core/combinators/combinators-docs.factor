@@ -203,7 +203,7 @@ $nl
 { $subsections call execute }
 { $heading "Run-time checked combinators" }
 "With these combinators, the stack effect of the expression is checked at run time."
-{ $subsections postpone: call( postpone: \execute( }
+{ $subsections postpone: \call( postpone: \execute( }
 "Note that the opening parenthesis is actually part of the word name for " { $snippet "call(" } " and " { $snippet "execute(" } "; they are parsing words, and they read a stack effect until the corresponding closing parenthesis. The underlying words are a bit more verbose, but they can be given non-constant stack effects:"
 { $subsections call-effect execute-effect }
 { $heading "Unchecked combinators" }

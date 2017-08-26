@@ -42,12 +42,12 @@ HELP: run-dataflow-analysis
 
 PRIVATE>
 
-HELP: FORWARD-ANALYSIS:
+HELP: \FORWARD-ANALYSIS:
 { $syntax "FORWARD-ANALYSIS: word" }
 { $values { "word" "name of the compiler pass" } }
 { $description "Syntax word for defining a forward analysis compiler pass." } ;
 
-HELP: BACKWARD-ANALYSIS:
+HELP: \BACKWARD-ANALYSIS:
 { $syntax "BACKWARD-ANALYSIS: word" }
 { $values { "word" "name of the compiler pass" } }
 { $description "Syntax word for defining a backward analysis compiler pass." } ;

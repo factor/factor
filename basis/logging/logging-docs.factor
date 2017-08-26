@@ -74,7 +74,7 @@ HELP: log-critical
 { $values { "error" "an error" } { "word" word } }
 { $description "Logs a critical error." } ;
 
-HELP: LOG:
+HELP: \LOG:
 { $syntax "LOG: name level" }
 { $values { "name" "a new word name" } { "level" "a log level" } }
 { $description "Creates a word with stack effect " { $snippet "( object -- )" } " which logs its input and does nothing else." } ;
@@ -87,7 +87,7 @@ ARTICLE: "logging.messages" "Logging messages"
     log-critical
 }
 "A utility for defining words which just log and do nothing else:"
-{ $subsections postpone: LOG: }
+{ $subsections postpone: \LOG: }
 "Annotating words to log; this uses the " { $link "tools.annotations" } " feature:"
 { $subsections
     add-input-logging

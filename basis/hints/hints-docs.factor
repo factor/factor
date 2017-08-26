@@ -11,7 +11,7 @@ $nl
 "In some cases, specialization will not help at all, and can make generated code slower from the increase in code size. The compiler is capable of inferring enough static type information to generate efficient code in many cases without explicit help from the programmer. Specializers should be used as a last resort, after profiling shows that a critical loop makes a lot of repeated calls to generic words which dispatch on the same class."
 $nl
 "Type hints are declared with a parsing word:"
-{ $subsections postpone: HINTS: }
+{ $subsections postpone: \HINTS: }
 "The specialized version of a word which will be compiled by the compiler can be inspected:"
 { $subsections specialized-def } ;
 
@@ -19,7 +19,7 @@ HELP: specialized-def
 { $values { "word" word } { "quot" quotation } }
 { $description "Outputs the definition of a word after it has been split into specialized branches. This is the definition which will actually be compiled by the compiler." } ;
 
-HELP: HINTS:
+HELP: \HINTS:
 { $values { "defspec" "a word or method" } { "hints..." "a list of sequences of classes or literals" } }
 { $description "Defines specialization hints for a word or a method."
 $nl

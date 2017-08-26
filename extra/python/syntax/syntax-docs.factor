@@ -1,7 +1,7 @@
 IN: python.syntax
 USING: hashtables python.syntax help.markup help.syntax ;
 
-HELP: PY-FROM:
+HELP: \PY-FROM:
 { $syntax "PY-FROM: module => name-effects ;" }
 { $values
   { "module" "fully qualified name of a python module" }
@@ -16,7 +16,7 @@ HELP: PY-FROM:
   }
 } ;
 
-HELP: PY-QUALIFIED-FROM:
+HELP: \PY-QUALIFIED-FROM:
 { $syntax "PY-QUALIFIED-FROM: module => name-effects ;" }
 { $values
   { "module" "fully qualified name of a python module" }
@@ -26,7 +26,7 @@ HELP: PY-QUALIFIED-FROM:
   "Like " { $link \ PY-FROM: } " except all words are created with module as the given prefix."
 } ;
 
-HELP: PY-METHODS:
+HELP: \PY-METHODS:
 { $syntax "PY-METHODS: class => name-effects ;" }
 { $values
   { "class" "name of a class to associate the bindings with" }

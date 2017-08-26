@@ -3,7 +3,7 @@ USING: arrays classes classes.singleton classes.tuple help.markup
 help.syntax kernel multiline slots quotations ;
 IN: variants
 
-HELP: VARIANT:
+HELP: \VARIANT:
 { $syntax "
 VARIANT: class-name
     singleton
@@ -13,7 +13,7 @@ VARIANT: class-name
     .
     .
     ; " }
-{ $description "Defines " { $snippet "class-name" } " as a union of the following " { $link singleton-class } " and " { $link tuple-class } " definitions. Each " { $snippet "singleton" } " word is defined as a " { $snippet "singleton-class" } ", and each " { $snippet "tuple" } " word is defined as a " { $snippet "tuple-class" } " with the given set of " { $snippet "slot" } "s, using the same syntax for slot specifiers as " { $link postpone: TUPLE: } ". Typed tuple slots can recursively reference the variant " { $snippet "class-name" } " being defined. For " { $snippet "tuple" } " types, a " { $link boa } " constructor word " { $snippet "<tuple>" } " is defined as well." }
+{ $description "Defines " { $snippet "class-name" } " as a union of the following " { $link singleton-class } " and " { $link tuple-class } " definitions. Each " { $snippet "singleton" } " word is defined as a " { $snippet "singleton-class" } ", and each " { $snippet "tuple" } " word is defined as a " { $snippet "tuple-class" } " with the given set of " { $snippet "slot" } "s, using the same syntax for slot specifiers as " { $link postpone: \TUPLE: } ". Typed tuple slots can recursively reference the variant " { $snippet "class-name" } " being defined. For " { $snippet "tuple" } " types, a " { $link boa } " constructor word " { $snippet "<tuple>" } " is defined as well." }
 { $examples { $code "
 USING: kernel variants ;
 IN: scratchpad
@@ -24,7 +24,7 @@ VARIANT: list
     ;
 " } } ;
 
-HELP: VARIANT-MEMBER:
+HELP: \VARIANT-MEMBER:
 { $description "Defines a new member of a variant class without restricting such definitions to a single statement or source file. The variant class should be listed first, and the class member should follow." }
 { $examples { $code "
 USING: kernel variants ;
@@ -62,15 +62,15 @@ HELP: unboa
 { $description "Decomposes a tuple of type " { $snippet "class" } " into its component slot values by order of arguments. The inverse of " { $link boa } "." } ;
 
 HELP: variant-class
-{ $class-description "This class comprises class names that have been defined with " { $link postpone: VARIANT: } ". When a " { $snippet "variant-class" } " is used as the type of a specialized " { $link tuple } " slot, the variant's first member type is used as the default " { $link initial-value } "." } ;
+{ $class-description "This class comprises class names that have been defined with " { $link postpone: \VARIANT: } ". When a " { $snippet "variant-class" } " is used as the type of a specialized " { $link tuple } " slot, the variant's first member type is used as the default " { $link initial-value } "." } ;
 
-{ postpone: VARIANT: variant-class match } related-words
+{ postpone: \VARIANT: variant-class match } related-words
 
 ARTICLE: "variants" "Algebraic data types"
 "The " { $vocab-link "variants" } " vocabulary provides syntax and combinators for defining and manipulating algebraic data types."
 { $subsections
-    postpone: VARIANT:
-    postpone: VARIANT-MEMBER:
+    postpone: \VARIANT:
+    postpone: \VARIANT-MEMBER:
     variant-class
     match
 } ;

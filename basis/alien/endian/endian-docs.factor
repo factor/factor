@@ -4,7 +4,7 @@ USING: help.markup help.syntax kernel math quotations
 classes.struct ;
 IN: alien.endian
 
-HELP: BE-PACKED-STRUCT:
+HELP: \BE-PACKED-STRUCT:
 { $description "Defines a packed " { $link struct } " where endian-unaware types become big-endian types. Note that endian-aware types will override the big-endianness of this " { $link struct } " declaration; little-endian types will stay little-endian. On big-endian platforms, the endian-unaware types will not change since they are the correct endianness already." }
 { $unchecked-example
     "! When run on a big-endian platform, this struct should prettyprint the same as defined"
@@ -17,7 +17,7 @@ IN: scratchpad
 STRUCT: s1 { a char[7] } { b be32 initial: 0 } ;"
 } ;
 
-HELP: BE-STRUCT:
+HELP: \BE-STRUCT:
 { $description "Defines a " { $link struct } " where endian-unaware types become big-endian types. Note that endian-aware types will override the big-endianness of this " { $link struct } " declaration; little-endian types will stay little-endian. On big-endian platforms, the endian-unaware types will not change since they are the correct endianness already." }
 { $unchecked-example
     "! When run on a big-endian platform, this struct should prettyprint the same as defined"
@@ -30,7 +30,7 @@ IN: scratchpad
 STRUCT: s1 { a be32 initial: 0 } { b le32 initial: 0 } ;"
 } ;
 
-HELP: LE-PACKED-STRUCT:
+HELP: \LE-PACKED-STRUCT:
 { $description "Defines a packed " { $link struct } " where endian-unaware types become little-endian types. Note that endian-aware types will override the little-endianness of this " { $link struct } " declaration; big-endian types will stay big-endian. On little-endian platforms, the endian-unaware types will not change since they are the correct endianness already." }
 { $unchecked-example
     "! When run on a little-endian platform, this struct should prettyprint the same as defined"
@@ -43,7 +43,7 @@ IN: scratchpad
 STRUCT: s1 { a char[7] } { b int initial: 0 } ;"
 } ;
 
-HELP: LE-STRUCT:
+HELP: \LE-STRUCT:
 { $description "Defines a " { $link struct } " where endian-unaware types become little-endian types. Note that endian-aware types will override the little-endianness of this " { $link struct } " declaration; big-endian types will stay big-endian. On little-endian platforms, the endian-unaware types will not change since they are the correct endianness already." }
 { $unchecked-example
     "! When run on a little-endian platform, this struct should prettyprint the same as defined"
@@ -141,10 +141,10 @@ ARTICLE: "alien.endian" "Alien endian-aware types"
 }
 "Syntax for making endian-aware structs out of native types:"
 { $subsections
-    postpone: LE-STRUCT:
-    postpone: BE-STRUCT:
-    postpone: LE-PACKED-STRUCT:
-    postpone: BE-PACKED-STRUCT:
+    postpone: \LE-STRUCT:
+    postpone: \BE-STRUCT:
+    postpone: \LE-PACKED-STRUCT:
+    postpone: \BE-PACKED-STRUCT:
 } ;
 
 ABOUT: "alien.endian"

@@ -92,7 +92,7 @@ HELP: roman/mod
 
 { roman* roman/i roman/mod } related-words
 
-HELP: ROMAN:
+HELP: \ROMAN:
 { $description "A parsing word that reads the next token and converts it to an integer." }
 { $examples
     { $example "USING: prettyprint roman ;"
@@ -104,7 +104,7 @@ HELP: ROMAN:
 ARTICLE: "roman" "Roman numerals"
 "The " { $vocab-link "roman" } " vocabulary can convert numbers to and from the Roman numeral system and can perform arithmetic given Roman numerals as input." $nl
 "A parsing word for literal Roman numerals:"
-{ $subsections postpone: ROMAN: }
+{ $subsections postpone: \ROMAN: }
 "Converting to Roman numerals:"
 { $subsections
     >roman

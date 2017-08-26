@@ -25,20 +25,20 @@ HELP: <multi-vertex-array>
 }
 { $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } ". The first element of each pair in " { $snippet "vertex-formats" } " can be either a " { $link buffer-ptr } " or a " { $link buffer } "; in the latter case, vertex data in the associated format is read from the beginning of the buffer." } ;
 
-HELP: feedback-format:
+HELP: \feedback-format:
 { $syntax "feedback-format: vertex-format" }
 { $description "When used as part of a " { $link postpone: \GLSL-PROGRAM: } " definition, this syntax specifies the " { $link vertex-format } " in which transform feedback output will be generated." } ;
 
-HELP: GLSL-PROGRAM:
+HELP: \GLSL-PROGRAM:
 { $syntax "GLSL-PROGRAM: program-name shader shader ... [vertex-format vertex-format ...] [feedback-format: vertex-format] ;" }
 { $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. If any " { $link vertex-format } "s are specified, their attributes will be pre-assigned attribute indexes at link time, to ensure that their indexes remain constant if the program is refreshed with " { $link refresh-program } ". A transform feedback vertex format may optionally be specified with " { $link postpone: \feedback-format: } "; if the program is used to collect transform feedback, the given vertex format will be used for the output." }
 { $notes "Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
-HELP: GLSL-SHADER-FILE:
+HELP: \GLSL-SHADER-FILE:
 { $syntax "GLSL-SHADER-FILE: shader-name shader-kind \"filename\"" }
 { $description "Defines a new " { $link shader } " of kind " { $link shader-kind } " named " { $snippet "shader-name" } ". The shader will read its source code from " { $snippet "filename" } " in the current Factor source file's directory." } ;
 
-HELP: GLSL-SHADER:
+HELP: \GLSL-SHADER:
 { $syntax "GLSL-SHADER: shader-name shader-kind [[
 
 shader source
@@ -46,7 +46,7 @@ shader source
 ]]" }
 { $description "Defines a new " { $link shader } " of kind " { $link shader-kind } " named " { $snippet "shader-name" } ". The shader will read its source code from the current Factor source file between the " { $snippet "GLSL-SHADER:" } " line and the first subsequent line with a single semicolon on it." } ;
 
-HELP: VERTEX-FORMAT:
+HELP: \VERTEX-FORMAT:
 { $syntax "VERTEX-FORMAT: format-name
     { \"attribute\"/f component-type dimension normalize? }
     { \"attribute\"/f component-type dimension normalize? }
@@ -54,7 +54,7 @@ HELP: VERTEX-FORMAT:
     { \"attribute\"/f component-type dimension normalize? } ;" }
 { $description "Defines a new binary " { $link vertex-format } " for structuring vertex data stored in " { $link buffer } "s. Each " { $snippet "attribute" } " name either corresponds to an input parameter of a vertex shader, or is " { $link f } " to include padding in the vertex format. The " { $link component-type } " determines the format of the components, and the " { $snippet "dimension" } " determines the number of components. If the " { $snippet "component-type" } " is an integer type and " { $snippet "normalize?" } " is true, the component values will be scaled to the range 0.0 to 1.0 when fed to the vertex shader; otherwise, they will be cast to floats retaining their integral values." } ;
 
-HELP: VERTEX-STRUCT:
+HELP: \VERTEX-STRUCT:
 { $syntax "VERTEX-STRUCT: struct-name format-name" }
 { $description "Defines a struct class (like " { $link postpone: \STRUCT: } ") with the same binary format and component types as the given " { $link vertex-format } "." } ;
 

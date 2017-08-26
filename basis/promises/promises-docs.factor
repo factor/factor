@@ -11,7 +11,7 @@ HELP: force
 { $values { "promise" "a promise object" } { "value" "a factor object" } }
 { $description "Calls the quotation associated with the promise if it has not been called before, and returns the value. If the promise has been forced previously, returns the value from the previous call." } ;
 
-HELP: LAZY:
+HELP: \LAZY:
 { $syntax "LAZY: word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
 { $description "Creates a lazy word in the current vocabulary. When executed the word will return a " { $link promise } " that when forced, executes the word definition. Any values on the stack that are required by the word definition are captured along with the promise." }

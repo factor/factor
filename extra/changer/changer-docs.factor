@@ -3,7 +3,7 @@
 USING: help.markup help.syntax kernel quotations strings ;
 IN: changer
 
-HELP: change:
+HELP: \change:
 { $description "Syntax word for applying a quotation to a tuple slot." }
 { $examples
     "Change a tuple slot:"
@@ -28,9 +28,9 @@ ARTICLE: "changer" "Changer syntax"
 $nl
 "Syntax word to change tuple slots:"
 { $subsections
-    postpone: change:
+    postpone: \change:
 }
-"Macro to implement " { $link postpone: change: } ":"
+"Macro to implement " { $link postpone: \change: } ":"
 { $subsections
     inline-changer
 } ;

@@ -15,7 +15,7 @@ HELP: rgba>hex
 { $description "Converts a " { $link color } " into a hexadecimal string value." }
 ;
 
-HELP: hexcolor:
+HELP: \hexcolor:
 { $syntax "hexcolor: value" }
 { $description "Parses as a " { $link color } " object with the given hexadecimal value." }
 { $examples
@@ -31,7 +31,7 @@ ARTICLE: "colors.hex" "HEX colors"
 { $subsections
     hex>rgba
     rgba>hex
-    postpone: hexcolor:
+    postpone: \hexcolor:
 }
 { $see-also "colors" } ;
 

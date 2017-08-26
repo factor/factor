@@ -20,7 +20,7 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
   { "The combinator must be called with a quotation that is either literal or built from literal quotations, " { $link curry } ", and " { $link compose } ". (Note that quotations that use " { $vocab-link "fry" } " or " { $vocab-link "locals" } " use " { $link curry } " and " { $link compose } " from the perspective of the stack checker.)" }
   { "If the word is declared " { $link postpone: inline } ", the combinator may additionally be called on one of the word's input parameters or with quotations built from the word's input parameters, literal quotations, " { $link curry } ", and " { $link compose } ". When inline, a word is itself considered to be a combinator, and its callers must in turn satisfy these conditions." }
 }
-"If neither condition holds, the stack checker throws a " { $link unknown-macro-input } " or " { $link bad-macro-input } " error. To make the code compile, a runtime checking combinator such as " { $link postpone: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by " { $link curry } "ing the quotation onto a literal quotation that uses " { $link postpone: call( } "."
+"If neither condition holds, the stack checker throws a " { $link unknown-macro-input } " or " { $link bad-macro-input } " error. To make the code compile, a runtime checking combinator such as " { $link postpone: \call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by " { $link curry } "ing the quotation onto a literal quotation that uses " { $link postpone: \call( } "."
 { $heading "Input stack effects" }
 "Inline combinators will verify the stack effect of their input quotations if they are declared in the combinator's stack effect. See " { $link "effects-variables" } " for details."
 { $heading "Examples" }
@@ -36,7 +36,7 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 "The following code now passes the stack checker; it would fail were " { $snippet "twice" } " not declared " { $link postpone: inline } ":"
 { $unchecked-example "USE: math.functions" "[ [ sqrt ] twice ] infer." "( x -- x )" }
 { $subheading "Defining a combinator for unknown quotations" }
-"In the next example, " { $link postpone: call( } " must be used because the quotation is the result of calling a runtime accessor, and the compiler cannot make any static assumptions about this quotation at all:"
+"In the next example, " { $link postpone: \call( } " must be used because the quotation is the result of calling a runtime accessor, and the compiler cannot make any static assumptions about this quotation at all:"
 { $code
   "TUPLE: action name quot ;"
   ": perform ( value action -- result ) quot>> call( value -- result ) ;"
@@ -116,7 +116,7 @@ ARTICLE: "tools.inference" "Stack effect tools"
 ARTICLE: "inference-escape" "Stack effect checking escape hatches"
 "In a static checking regime, sometimes it is necessary to step outside the boundaries and run some code which cannot be statically checked; perhaps this code is constructed at run-time. There are two ways to get around the static stack checker."
 $nl
-"If the stack effect of a word or quotation is known, but the word or quotation itself is not, " { $link postpone: execute( } " or " { $link postpone: call( } " can be used. See " { $link "call" } " for details."
+"If the stack effect of a word or quotation is known, but the word or quotation itself is not, " { $link postpone: \execute( } " or " { $link postpone: \call( } " can be used. See " { $link "call" } " for details."
 $nl
 "If the stack effect is not known, the code being called cannot manipulate the datastack directly. Instead, it must reflect the datastack into an array:"
 { $subsections with-datastack }

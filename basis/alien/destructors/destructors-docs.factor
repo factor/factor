@@ -1,7 +1,7 @@
 IN: alien.destructors
 USING: help.markup help.syntax alien destructors ;
 
-HELP: DESTRUCTOR:
+HELP: \DESTRUCTOR:
 { $syntax "DESTRUCTOR: word" }
 { $description "Defines four things:"
   { $list
@@ -25,6 +25,6 @@ HELP: DESTRUCTOR:
 
 ARTICLE: "alien.destructors" "Alien destructors"
 "The " { $vocab-link "alien.destructors" } " vocabulary defines a utility parsing word for defining new disposable classes."
-{ $subsections postpone: DESTRUCTOR: } ;
+{ $subsections postpone: \DESTRUCTOR: } ;
 
 ABOUT: "alien.destructors"
