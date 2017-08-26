@@ -8,10 +8,8 @@ sequences strings ;
 QUALIFIED: sets
 IN: forestdb.lib
 
-/*
 ! Issues
 ! Get byseq ignores seqnum and uses key instead if key is set
-*/
 
 ERROR: fdb-error error ;
 
@@ -221,7 +219,7 @@ CONSTRUCTOR: <fdb-doc> fdb-doc ( seqnum keylen key metalen meta bodylen body del
 TUPLE: fdb-info filename new-filename doc-count space-used file-size ;
 CONSTRUCTOR: <info> fdb-info ( filename new-filename doc-count space-used file-size -- obj ) ;
 
-/*
+![[
 ! Example fdb_doc and converted doc
 S{ fdb_doc
     { keylen 4 } { metalen 0 } { bodylen 4 } { size_ondisk 0 }
@@ -234,7 +232,7 @@ T{ doc
     { metalen 0 } { bodylen 4 }
     { offset 4256 } { size-ondisk 0 }
 }
-*/
+]]
 
 : alien/length>string ( alien n -- string/f )
     [ drop f ] [
@@ -395,7 +393,7 @@ PRIVATE>
         _ _ with-kvs-name
     ] with-forestdb-file-handle ; inline
 
-/*
+![[
 ! Do not try to commit here, as it will fail with FDB_RESULT_RONLY_VIOLATION
 ! fdb-current is weird, it gets replaced if you call fdb-rollback
 ! Therefore, only clean up fdb-current once, and clean it up at the end
@@ -443,4 +441,4 @@ PRIVATE>
 : with-forestdb-path ( path quot -- )
     [ absolute-path fdb-open-default-config ] dip with-forestdb-handles-commit-wal ; inline
     ! [ absolute-path fdb-open-default-config ] dip with-forestdb-handle-commit-normal ; inline
-*/
+]]
