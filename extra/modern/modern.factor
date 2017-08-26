@@ -288,5 +288,11 @@ ERROR: mismatched-terminator n string slice ;
 : path>literals ( path -- sequence )
     utf8 file-contents string>literals ;
 
-: lex-core ( -- assoc )
-    core-bootstrap-vocabs [ [ vocab>literals ] [ nip ] recover ] map-zip ;
+: lex-vocabs ( vocabs -- assoc )
+    [ [ vocab>literals ] [ nip ] recover ] map-zip ;
+
+: failing-vocabs ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
+
+: lex-core ( -- assoc ) core-bootstrap-vocabs lex-vocabs ;
+: lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;
+: lex-extra ( -- assoc ) extra-vocabs lex-vocabs ;
