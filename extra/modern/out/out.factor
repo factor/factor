@@ -11,26 +11,25 @@ SYMBOL: last-slice
 : trim-before-newline ( seq -- seq' )
     dup [ char: \s = not ] find
     { char: \r char: \n } member?
-    [ tail ] [ drop ] if ;
+    [ tail-slice ] [ drop ] if ;
 
-: write-whitespace ( obj -- )
-    [ last-slice get [ swap slice-between ] [ slice-before ] if* trim-before-newline >string io:write ]
-    [ last-slice namespaces:set ] bi ;
+: write-whitespace ( obj last -- )
+    [ swap slice-between ] [ slice-before ] if*
+    trim-before-newline io:write ;
 
-GENERIC: write-literal ( obj -- )
-M: string write-literal write ;
-M: slice write-literal [ write-whitespace ] [ >string write ] bi ;
-M: array write-literal [ write-literal ] each ;
+GENERIC#: write-literal* 1 ( obj last -- last' )
+! M: string write-literal* drop [ write ] keep ; ! for refactoring
+M: slice write-literal* [ write-whitespace ] [ drop write ] [ drop ] 2tri ;
+M: array write-literal* swap [ swap write-literal* ] each ;
 
-
-: write-modern-loop ( quot -- )
-    [ write-literal ] each ; inline
+! Start with no slice as ``last``
+: write-literal ( obj -- ) f write-literal* drop ;
 
 : write-modern-string ( seq -- string )
-    [ write-modern-loop ] with-string-writer ; inline
+    [ write-literal ] with-string-writer ; inline
 
 : write-modern-path ( seq path -- )
-    utf8 [ write-modern-loop nl ] with-file-writer ; inline
+    utf8 [ write-literal nl ] with-file-writer ; inline
 
 ![[
 : rewrite-path ( path quot -- )
