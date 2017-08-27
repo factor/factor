@@ -1,9 +1,48 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs io.encodings.utf8 io.files kernel modern
-modern.paths modern.slices prettyprint sequences
-sequences.extras splitting ;
+USING: arrays assocs io io.encodings.utf8 io.files
+io.streams.string kernel modern modern.paths modern.slices
+multiline namespaces prettyprint sequences sequences.extras
+splitting strings ;
 IN: modern.out
+
+SYMBOL: last-slice
+
+: write-whitespace ( obj -- )
+    [ last-slice get [ swap slice-between ] [ slice-before ] if* >string io:write ]
+    [ last-slice namespaces:set ] bi ;
+
+GENERIC: write-literal ( obj -- )
+M: string write-literal write ;
+M: slice write-literal [ write-whitespace ] [ >string write ] bi ;
+M: array write-literal [ write-literal ] each ;
+
+
+: write-modern-loop ( quot -- )
+    [ write-literal ] each ; inline
+
+: write-modern-string ( seq -- string )
+    [ write-modern-loop ] with-string-writer ; inline
+
+: write-modern-path ( seq path -- )
+    utf8 [ write-modern-loop nl ] with-file-writer ; inline
+
+![[
+: rewrite-path ( path quot -- )
+    ! dup print
+    '[ [ path>literals [ _ map-literals ] map ] [ ] bi write-modern-path ]
+    [ drop . ] recover ; inline
+
+: rewrite-string ( string quot -- )
+    ! dup print
+    [ string>literals ] dip '[ _ map-literals ] map write-modern-string ; inline
+
+: rewrite-paths ( seq quot -- ) '[ _ rewrite-path ] each ; inline
+]]
+: rewrite-vocab-exact ( name -- )
+    modern-source-path [ path>literals ] [ ] bi write-modern-path ;
+
+
 
 : strings-core-to-file ( -- )
     core-bootstrap-vocabs
