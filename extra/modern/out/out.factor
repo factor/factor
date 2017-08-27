@@ -6,8 +6,6 @@ multiline namespaces prettyprint sequences sequences.extras
 splitting strings ;
 IN: modern.out
 
-SYMBOL: last-slice
-
 : trim-before-newline ( seq -- seq' )
     dup [ char: \s = not ] find
     { char: \r char: \n } member?
@@ -18,9 +16,9 @@ SYMBOL: last-slice
     trim-before-newline io:write ;
 
 GENERIC#: write-literal* 1 ( obj last -- last' )
-! M: string write-literal* drop [ write ] keep ; ! for refactoring
 M: slice write-literal* [ write-whitespace ] [ drop write ] [ drop ] 2tri ;
 M: array write-literal* swap [ swap write-literal* ] each ;
+! M: string write-literal* drop [ write ] keep ; ! for refactoring
 
 ! Start with no slice as ``last``
 : write-literal ( obj -- ) f write-literal* drop ;
