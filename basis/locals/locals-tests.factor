@@ -361,7 +361,7 @@ ERROR: punned-class x ;
 { 4 } [ 12 littledan-cond-problem-1 ] unit-test
 { "howdy" } [ 0 littledan-cond-problem-1 ] unit-test
 
-/*
+![[
 :: littledan-case-problem-3 ( a quot -- b )
     a {
         { t [ a not ] }
@@ -377,7 +377,7 @@ ERROR: punned-class x ;
     [ 1 + ] littledan-case-problem-3 ;
 
 \ littledan-case-problem-4 def>> must-infer
-*/
+]]
 
 GENERIC: lambda-method-forget-test ( a -- b )
 

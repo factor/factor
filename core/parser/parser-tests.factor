@@ -1,6 +1,6 @@
 USING: accessors arrays assocs classes compiler.units effects
 eval generic grouping io.pathnames io.streams.string kernel
-lexer math multiline namespaces parser sequences sets
+lexer math namespaces parser sequences sets
 source-files source-files.errors strings tools.crossref
 tools.test vocabs vocabs.parser words words.symbol ;
 IN: parser.tests
@@ -540,7 +540,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ! Two similar bugs
 
 ! Replace : def with something in << >>
-/* { [ ] } [
+![[ { [ ] } [
     "IN: parser.tests : was-once-a-word-bug ( -- ) ;"
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
@@ -552,7 +552,7 @@ EXCLUDE: qualified.tests.bar => x ;
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
 
-{ t } [ "was-once-a-word-bug" "parser.tests" lookup-word >boolean ] unit-test */
+{ t } [ "was-once-a-word-bug" "parser.tests" lookup-word >boolean ] unit-test ]]
 
 ! Replace : def with DEFER:
 { [ ] } [

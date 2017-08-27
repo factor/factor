@@ -10,7 +10,7 @@ method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
 specialized-vectors fry sequences.deep destructors math.bitwise opengl.gl
 game.models game.models.obj game.models.loader game.models.collada
-prettyprint images.tga literals ;
+prettyprint images.tga literals multiline ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint

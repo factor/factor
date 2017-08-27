@@ -9,10 +9,10 @@ IN: c.preprocessor.tests
 { "yo\n\n\n\nyo4\n" }
 [ "vocab:c/tests/test2/test2.c" start-preprocess-file nip ] unit-test
 
-/*
+![[
 [ "vocab:c/tests/test3/test3.c" start-preprocess-file ]
 [ "\"BOO\"" = ] must-fail-with
-*/
+]]
 
 { V{ "\"omg\"" "\"lol\"" } }
 [ "vocab:c/tests/test4/test4.c" start-preprocess-file drop warnings>> ] unit-test

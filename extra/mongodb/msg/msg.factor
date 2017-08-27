@@ -12,9 +12,9 @@ CONSTANT: OP_GetMore 2005
 CONSTANT: OP_Delete  2006
 CONSTANT: OP_KillCursors 2007
 
-CONSTANT: ResultFlag_CursorNotFound  1 ! /* returned, with zero results, when getMore is called but the cursor id is not valid at the server. */
-CONSTANT: ResultFlag_ErrSet  2 ! /* { $err : ... } is being returned */
-CONSTANT: ResultFlag_ShardConfigStale 4 !  /* have to update config from the server,  usually $err is also set */
+CONSTANT: ResultFlag_CursorNotFound  1 ! returned, with zero results, when getMore is called but the cursor id is not valid at the server.
+CONSTANT: ResultFlag_ErrSet  2 ! { $err : ... } is being returned
+CONSTANT: ResultFlag_ShardConfigStale 4 !  have to update config from the server,  usually $err is also set
 
 TUPLE: mdb-msg
     { opcode integer }
