@@ -33,6 +33,30 @@ IN: modern.tests
     { "1" ":>" "one" }
 } [ "1 :> one" string>literals >strings ] unit-test
 
+{
+    { { ":" { "foo" } ";" } }
+} [ ": foo ;" string>literals >strings ] unit-test
+
+{
+    {
+        { "FOO:" { "a" } }
+        { "BAR:" { "b" } }
+    }
+} [ "FOO: a BAR: b" string>literals >strings ] unit-test
+
+{
+    {
+        { "FOO:" { "a" } ";" }
+    }
+} [ "FOO: a ;" string>literals >strings ] unit-test
+
+{
+    {
+        { "FOO:" { "a" } "FOO;" }
+    }
+} [ "FOO: a FOO;" string>literals >strings ] unit-test
+
+
 ! Acute
 {
     { { "<A" { } "A>" } }
@@ -91,3 +115,17 @@ IN: modern.tests
 { { "\\[[" } } [ "\\[[" string>literals >strings ] unit-test
 { { "\\[=[" } } [ "\\[=[" string>literals >strings ] unit-test
 { { "\\[==[" } } [ "\\[==[" string>literals >strings ] unit-test
+
+
+{ t } [ "FOO:" strict-upper? ] unit-test
+{ t } [ ":" strict-upper? ] unit-test
+{ f } [ "<FOO" strict-upper? ] unit-test
+{ f } [ "<FOO:" strict-upper? ] unit-test
+{ f } [ "->" strict-upper? ] unit-test
+{ f } [ "FOO>" strict-upper? ] unit-test
+{ f } [ ";FOO>" strict-upper? ] unit-test
+
+{ f } [ "FOO" section-open? ] unit-test
+{ f } [ "FOO:" section-open? ] unit-test
+{ f } [ ";FOO" section-close? ] unit-test
+{ f } [ "FOO" section-close? ] unit-test

@@ -133,7 +133,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     dup '[ but-last ";" append ";" 2array lex-colon-until ] dip
     swap
     ! Remove the ; from the paylaod if present
-    dup ?last ";" sequence= [
+    dup ?last ";" tail? [
         unclip-last 3array
     ] [
         2array
@@ -162,7 +162,7 @@ ERROR: unexpected-terminator n string slice ;
         dup terminator? [ unexpected-terminator ] when
     ] dip swap 2array ;
 
-: strict-upper? ( string -- ? )
+: (strict-upper?) ( string -- ? )
     {
         [
             [
@@ -171,6 +171,9 @@ ERROR: unexpected-terminator n string slice ;
         ]
         [ [ char: A char: Z between? ] any? ]
     } 1&& ;
+
+: strict-upper? ( string -- ? )
+    { [ ":" sequence= ] [ (strict-upper?) ] } 1|| ;
 
 ! <a <a: but not <a>
 : section-open? ( string -- ? )
