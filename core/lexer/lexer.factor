@@ -118,10 +118,16 @@ DEFER: parse-token
         nip
     ] if ;
 
+: unescape-token ( string -- string' )
+    dup length 1 = [ "\\" ?head drop ] unless ;
+
+: unescape-tokens ( seq -- seq' )
+    [ unescape-token ] map ;
+
 : parse-token ( lexer -- str/f )
     dup parse-raw [ skip-comments ] [ drop f ] if* ;
 
-: ?scan-token ( -- str/f ) lexer get parse-token ;
+: ?scan-token ( -- str/f ) lexer get parse-token unescape-token ;
 
 PREDICATE: unexpected-eof < unexpected got>> not ;
 
@@ -142,12 +148,6 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : parse-tokens ( end -- seq )
     [ ] map-tokens ;
-
-: unescape-token ( string -- string' )
-    "\\" ?head drop ;
-
-: unescape-tokens ( seq -- seq' )
-    [ unescape-token ] map ;
 
 TUPLE: lexer-error line column line-text parsing-words error ;
 

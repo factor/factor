@@ -17,8 +17,8 @@ SELECTOR: tab
 SELECTOR: nl
 
 M: object selector-print: [ present ] dip stream-print nil ;
-M: object selector-nextPutAll: selector-print: ;
-M: object selector-tab "    " swap selector-print: ;
+M: object selector-nextPutAll: \selector-print: ;
+M: object selector-tab "    " swap \selector-print: ;
 M: object selector-nl stream-nl nil ;
 
 SELECTOR: +

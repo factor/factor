@@ -26,14 +26,14 @@ M: ast-name compile-ast name>> swap lookup-reader ;
     [ compile-arguments ] 2bi
     [ new ] 3append ;
 
-: compile-ifTrue:ifFalse: ( lexenv ast -- quot )
+: \compile-ifTrue:ifFalse: ( lexenv ast -- quot )
     [ receiver>> compile-ast ]
     [ compile-arguments ] 2bi
     [ if ] 3append ;
 
 M: ast-message-send compile-ast
     dup selector>> {
-        { "ifTrue:ifFalse:" [ compile-ifTrue:ifFalse: ] }
+        { "ifTrue:ifFalse:" [ \compile-ifTrue:ifFalse: ] }
         { "new" [ compile-new ] }
         [
             drop
