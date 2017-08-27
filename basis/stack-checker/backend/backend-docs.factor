@@ -19,7 +19,7 @@ HELP: end-infer
 
 HELP: ensure-d
 { $values { "n" integer } { "values" sequence } }
-{ $description "Does something important.." } ;
+{ $description "Makes sure there is room for at least " { $snippet "n" } " items in " { $link meta-d } " starting from " { $link inner-d-index } ". Modifies " { $link meta-d } " and " { $link inner-d-index } ". Returns the last " { $snippet "n" } " items of " { $link meta-d } "." } ;
 
 HELP: infer-literal-quot
 { $values { "literal" literal-tuple } }
