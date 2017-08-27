@@ -273,7 +273,7 @@ test         = <foreign parse-smalltalk LocalVariableDeclarationList>
         }
     }
 }
-[ "class Test |[a|]" parse-smalltalk ] unit-test
+[ "class Test [|a|]" parse-smalltalk ] unit-test
 
 {
     T{ ast-sequence f { }
@@ -292,7 +292,7 @@ test         = <foreign parse-smalltalk LocalVariableDeclarationList>
         }
     }
 }
-[ "class Test1 |[a|]. class Test2 extends Test1 |[b|]" parse-smalltalk ] unit-test
+[ "class Test1 [|a|]. class Test2 extends Test1 [|b|]" parse-smalltalk ] unit-test
 
 { } [ "class Foo []. Tests blah " parse-smalltalk drop ] unit-test
 
