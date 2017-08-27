@@ -111,7 +111,10 @@ ERROR: not-a-source-path path ;
 : extra-docs-paths ( -- seq ) extra-vocabs modern-docs-paths ;
 
 : core-test-paths ( -- seq ) core-vocabs modern-tests-paths ;
-: basis-test-paths ( -- seq ) basis-vocabs modern-tests-paths ;
+: basis-test-paths ( -- seq )
+    basis-vocabs
+    modern-tests-paths
+    { "resource:basis/functors/functors-tests.factor" } diff ;
 : extra-test-paths ( -- seq ) extra-vocabs modern-tests-paths ;
 
 
