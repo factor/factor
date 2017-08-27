@@ -12,12 +12,12 @@ SYMBOL: sent-messages
 : remember-send ( selector -- )
     sent-messages (remember-send) ;
 
-SYNTAX: \send\ scan-token dup remember-send suffix! \ send suffix! ;
+SYNTAX: \send: scan-token unescape-token dup remember-send suffix! \ send suffix! ;
 
-SYNTAX: \?send\ scan-token dup remember-send suffix! \ ?send suffix! ;
+SYNTAX: \?send: scan-token unescape-token dup remember-send suffix! \ ?send suffix! ;
 
-SYNTAX: \selector\
-    scan-token
+SYNTAX: \selector:
+    scan-token unescape-token
     [ remember-send ]
     [ <selector> suffix! \ cocoa.messages:selector suffix! ] bi ;
 
@@ -26,7 +26,7 @@ SYMBOL: super-sent-messages
 : remember-super-send ( selector -- )
     super-sent-messages (remember-send) ;
 
-SYNTAX: \super\ scan-token dup remember-super-send suffix! \ super-send suffix! ;
+SYNTAX: \super: scan-token unescape-token dup remember-super-send suffix! \ super-send suffix! ;
 
 SYMBOL: frameworks
 

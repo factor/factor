@@ -10,9 +10,9 @@ IN: cocoa.tests
 ;CLASS>
 
 : test-foo ( -- )
-    Foo send\ alloc send\ init
-    dup 1.0 2.0 101.0 102.0 <CGRect> send\ foo:
-    send\ release ;
+    Foo send: alloc send: init
+    dup 1.0 2.0 101.0 102.0 <CGRect> send: \foo:
+    send: release ;
 
 { } [ test-foo ] unit-test
 
@@ -27,9 +27,9 @@ IN: cocoa.tests
 
 { } [
     Bar [
-        send\ alloc send\ init
-        dup send\ bar "x" set
-        send\ release
+        send: alloc send: init
+        dup send: bar "x" set
+        send: release
     ] compile-call
 ] unit-test
 
@@ -47,8 +47,8 @@ IN: cocoa.tests
 
 { 144 } [
     Bar [
-        send\ alloc send\ init
-        dup 12 send\ babb:
-        swap send\ release
+        send: alloc send: init
+        dup 12 send: \babb:
+        swap send: release
     ] compile-call
 ] unit-test

@@ -77,18 +77,18 @@ IMPORT: QTSampleBuffer
 IMPORT: QTTrack
 
 : <movie> ( filename -- movie )
-    QTMovie swap <NSString> f send\ movieWithFile:error: send\ retain ;
+    QTMovie swap <NSString> f send: \movieWithFile:error: send: retain ;
 
 : movie-attributes ( movie -- attributes )
-    send\ movieAttributes plist> ;
+    send: movieAttributes plist> ;
 
 : play ( movie -- )
-    send\ play ;
+    send: play ;
 : stop ( movie -- )
-    send\ stop ;
+    send: stop ;
 
 : movie-tracks ( movie -- tracks )
-    send\ tracks NSFastEnumeration>vector ;
+    send: tracks NSFastEnumeration>vector ;
 
 : track-attributes ( track -- attributes )
-    send\ trackAttributes plist> ;
+    send: trackAttributes plist> ;

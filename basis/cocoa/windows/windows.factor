@@ -22,19 +22,19 @@ CONSTANT: NSBackingStoreNonretained 1
 CONSTANT: NSBackingStoreBuffered    2
 
 : <NSWindow> ( rect style class -- window )
-    [ send\ alloc ] curry 2dip NSBackingStoreBuffered 1
-    send\ initWithContentRect:styleMask:backing:defer: ;
+    [ send: alloc ] curry 2dip NSBackingStoreBuffered 1
+    send: \initWithContentRect:styleMask:backing:defer: ;
 
 : class-for-style ( style -- NSWindow/NSPanel )
     0x1ef0 bitand zero? NSWindow NSPanel ? ;
 
 : <ViewWindow> ( view rect style -- window )
-    dup class-for-style <NSWindow> [ swap send\ setContentView: ] keep
-    dup dup send\ contentView send\ setInitialFirstResponder:
-    dup 1 send\ setAcceptsMouseMovedEvents:
-    dup 0 send\ setReleasedWhenClosed: ;
+    dup class-for-style <NSWindow> [ swap send: \setContentView: ] keep
+    dup dup send: contentView send: \setInitialFirstResponder:
+    dup 1 send: \setAcceptsMouseMovedEvents:
+    dup 0 send: \setReleasedWhenClosed: ;
 
 : window-content-rect ( window -- rect )
-    dup send\ class swap
-    [ send\ frame ] [ send\ styleMask ] bi
-    send\ contentRectForFrameRect:styleMask: ;
+    dup send: class swap
+    [ send: frame ] [ send: styleMask ] bi
+    send: \contentRectForFrameRect:styleMask: ;

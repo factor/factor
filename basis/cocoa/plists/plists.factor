@@ -8,10 +8,10 @@ core-foundation.utilities fry io.backend kernel macros math
 quotations sequences ;
 IN: cocoa.plists
 
-: >plist ( value -- plist ) >cf send\ autorelease ;
+: >plist ( value -- plist ) >cf send: autorelease ;
 
 : write-plist ( assoc path -- )
-    [ >plist ] [ normalize-path <NSString> ] bi* 0 send\ writeToFile:atomically:
+    [ >plist ] [ normalize-path <NSString> ] bi* 0 send: \writeToFile:atomically:
     [ "write-plist failed" throw ] unless ;
 
 DEFER: plist>
@@ -19,30 +19,30 @@ DEFER: plist>
 <PRIVATE
 
 : (plist-NSNumber>) ( NSNumber -- number )
-    dup send\ doubleValue dup >integer =
-    [ send\ longLongValue ] [ send\ doubleValue ] if ;
+    dup send: doubleValue dup >integer =
+    [ send: longLongValue ] [ send: doubleValue ] if ;
 
 : (plist-NSData>) ( NSData -- byte-array )
-    dup send\ length <byte-array> [ send\ getBytes: ] keep ;
+    dup send: length <byte-array> [ send: \getBytes: ] keep ;
 
 : (plist-NSArray>) ( NSArray -- vector )
     [ plist> ] NSFastEnumeration-map ;
 
 : (plist-NSDictionary>) ( NSDictionary -- hashtable )
-    dup [ [ nip ] [ send\ valueForKey: ] 2bi [ plist> ] bi@ ] with
+    dup [ [ nip ] [ send: \valueForKey: ] 2bi [ plist> ] bi@ ] with
     NSFastEnumeration>hashtable ;
 
 : (read-plist) ( NSData -- id )
     NSPropertyListSerialization swap kCFPropertyListImmutable f
     { void* }
-    [ send\ propertyListFromData:mutabilityOption:format:errorDescription: ]
+    [ send: \propertyListFromData:mutabilityOption:format:errorDescription: ]
     with-out-parameters
-    [ send\ release "read-plist failed" throw ] when* ;
+    [ send: release "read-plist failed" throw ] when* ;
 
 MACRO: objc-class-case ( alist -- quot )
     [
         dup callable?
-        [ first2 [ '[ dup _ execute send\ isKindOfClass: c-bool> ] ] dip 2array ]
+        [ first2 [ '[ dup _ execute send: \isKindOfClass: c-bool> ] ] dip 2array ]
         unless
     ] map '[ _ cond ] ;
 
@@ -63,5 +63,5 @@ ERROR: invalid-plist-object object ;
 
 : read-plist ( path -- assoc )
     normalize-path <NSString>
-    NSData swap send\ dataWithContentsOfFile:
+    NSData swap send: \dataWithContentsOfFile:
     [ (read-plist) plist> ] [ "read-plist failed" throw ] if* ;

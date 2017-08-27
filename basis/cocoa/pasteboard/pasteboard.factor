@@ -8,19 +8,19 @@ IN: cocoa.pasteboard
 CONSTANT: NSStringPboardType "NSStringPboardType"
 
 : pasteboard-string? ( pasteboard -- ? )
-    NSStringPboardType swap send\ types CF>string-array member? ;
+    NSStringPboardType swap send: types CF>string-array member? ;
 
 : pasteboard-string ( pasteboard -- str )
-    NSStringPboardType <NSString> send\ stringForType:
+    NSStringPboardType <NSString> send: \stringForType:
     dup [ CF>string ] when ;
 
 : set-pasteboard-types ( seq pasteboard -- )
-    swap <CFArray> send\ autorelease f send\ declareTypes:owner: drop ;
+    swap <CFArray> send: autorelease f send: \declareTypes:owner: drop ;
 
 : set-pasteboard-string ( str pasteboard -- )
     NSStringPboardType <NSString>
     dup 1array pick set-pasteboard-types
-    [ swap <NSString> ] dip send\ setString:forType: drop ;
+    [ swap <NSString> ] dip send: \setString:forType: drop ;
 
 : pasteboard-error ( error -- f )
     "Pasteboard does not hold a string" <NSString>

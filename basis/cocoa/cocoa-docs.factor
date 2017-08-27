@@ -2,25 +2,25 @@ USING: cocoa.messages help.markup help.syntax strings
 alien core-foundation ;
 IN: cocoa
 
-HELP: send\
-{ $syntax "-> selector" }
+HELP: \send:
+{ $syntax "send: selector" }
 { $values { "selector" "an Objective C method name" } }
 { $description "A sugared form of the following:" }
 { $code "\"selector\" send" } ;
 
-HELP: super\
-{ $syntax "-> selector" }
+HELP: \super:
+{ $syntax "super: selector" }
 { $values { "selector" "an Objective C method name" } }
 { $description "A sugared form of the following:" }
 { $code "\"selector\" send-super" } ;
 
-{ send super-send postpone: \send\ postpone: \super\ } related-words
+{ send super-send postpone: \send: postpone: \super: } related-words
 
 HELP: \IMPORT:
 { $syntax "IMPORT: name" }
 { $description "Makes an Objective C class available for use." }
 { $examples
-    { $code "IMPORT: QTMovie" "QTMovie \"My Movie.mov\" <NSString> f send\ movieWithFile:error:" }
+    { $code "IMPORT: QTMovie" "QTMovie \"My Movie.mov\" <NSString> f send: \\movieWithFile:error:" }
 } ;
 
 ARTICLE: "objc-calling" "Calling Objective C code"
@@ -30,8 +30,8 @@ ARTICLE: "objc-calling" "Calling Objective C code"
 $nl
 "Messages can be sent to classes and instances using a pair of parsing words:"
 { $subsections
-    postpone: \send\
-    postpone: \super\
+    postpone: \send:
+    postpone: \super:
 }
 "These parsing words are actually syntax sugar for a pair of ordinary words; they can be used instead of the parsing words if the selector name is dynamically computed:"
 { $subsections
