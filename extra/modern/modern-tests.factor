@@ -1,6 +1,6 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: modern modern.slices tools.test ;
+USING: modern modern.slices multiline tools.test ;
 IN: modern.tests
 
 ! Comment
@@ -129,3 +129,13 @@ IN: modern.tests
 { f } [ "FOO:" section-open? ] unit-test
 { f } [ ";FOO" section-close? ] unit-test
 { f } [ "FOO" section-close? ] unit-test
+
+
+! Strings
+{
+    { { "url\"" "google.com" "\"" } }
+} [ [[ url"google.com" ]] string>literals >strings ] unit-test
+
+{
+    { { "\"" "google.com" "\"" } }
+} [ [[ "google.com" ]] string>literals >strings ] unit-test

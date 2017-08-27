@@ -120,7 +120,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     n' [ n string string-expected-got-eof ] unless
     n n' 1 - string <slice>
     n' 1 - n' string <slice>
-    tag 1 cut-slice* 4array ;
+    tag -rot 3array ;
 
 : take-comment ( n string slice -- n' string comment )
     2over ?nth char: \[ = [
