@@ -23,4 +23,3 @@ CONSTANT: test-port 57234
         stop-node
     ] with-variable
 ] unit-test
-

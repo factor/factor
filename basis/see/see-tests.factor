@@ -19,4 +19,3 @@ ALIAS: test-alias +
 [ \ test-alias summary ] unit-test
 
 { } [ gensym see ] unit-test
-

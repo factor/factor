@@ -12,5 +12,3 @@ HELP: successor
     $nl
     "If the increment generates a carry, the character to the left of it is incremented. This process repeats until there is no carry, adding an additional character if necessary. "
 } ;
-
-
