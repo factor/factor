@@ -8,8 +8,13 @@ IN: modern.out
 
 SYMBOL: last-slice
 
+: trim-before-newline ( seq -- seq' )
+    dup [ char: \s = not ] find
+    { char: \r char: \n } member?
+    [ tail ] [ drop ] if ;
+
 : write-whitespace ( obj -- )
-    [ last-slice get [ swap slice-between ] [ slice-before ] if* >string io:write ]
+    [ last-slice get [ swap slice-between ] [ slice-before ] if* trim-before-newline >string io:write ]
     [ last-slice namespaces:set ] bi ;
 
 GENERIC: write-literal ( obj -- )
@@ -39,6 +44,11 @@ M: array write-literal [ write-literal ] each ;
 
 : rewrite-paths ( seq quot -- ) '[ _ rewrite-path ] each ; inline
 ]]
+
+: rewrite-string-exact ( string -- string' )
+    string>literals write-modern-string ;
+
+
 : rewrite-path-exact ( path -- )
     [ path>literals ] [ ] bi write-modern-path ;
 
