@@ -68,7 +68,7 @@ CONSTANT: next 1
 
 : add-help-header ( track -- track )
     dup <help-header> { 3 3 } <border>
-    help-header-background <solid> >>interior 
+    help-header-background <solid> >>interior
     { 1 0 } >>fill f track-add ;
 
 : <help-footer> ( browser-gadget direction -- gadget )

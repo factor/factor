@@ -106,7 +106,7 @@ M: cord vunordered?       [ vunordered?       ] [ call-next-method ] cord-2map ;
 M: cord vany?             [ vany?             ] cord-both or  ; inline
 M: cord vall?             [ vall?             ] cord-both and ; inline
 M: cord vnone?            [ vnone?            ] cord-both and ; inline
-M: cord vshuffle-elements 
+M: cord vshuffle-elements
     [ [ head>> ] [ tail>> ] bi ] [ split-shuffle ] bi*
     [ vshuffle2-elements ] bi-curry@ 2bi cord-append ; inline
 

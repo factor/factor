@@ -152,7 +152,7 @@ CONSTANT: functor-vocabs {
 
 : core-source-paths ( -- seq )
     core-vocabs modern-source-paths reject-some-paths ;
-: basis-source-paths ( -- seq )   
+: basis-source-paths ( -- seq )
     basis-vocabs functor-vocabs diff
     modern-source-paths reject-some-paths ;
 : extra-source-paths ( -- seq )

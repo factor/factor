@@ -54,7 +54,7 @@ IN: snake-game.sprites
     dup 1 { "body-right-up" "body-down-left" } assoc-with-value-like
     dup 2 { "body-down-right" "body-left-up" } assoc-with-value-like
     dup 3 { "body-right-right" "body-left-left" } assoc-with-value-like
-    dup 4 { "body-up-up" "body-down-down" } assoc-with-value-like    
+    dup 4 { "body-up-up" "body-down-down" } assoc-with-value-like
     dup 5 { "body-up-right" "body-left-down" } assoc-with-value-like
     dup 6 { "body-right-down" "body-up-left" } assoc-with-value-like
     dup [ { 1 2 3 4 5 6 } ] dip [ delete-at ] curry each ;

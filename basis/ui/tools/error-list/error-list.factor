@@ -130,7 +130,7 @@ TUPLE: error-display < track ;
     vertical error-display new-track with-lines
         swap error>> >>model
         dup model>> [ [ print-error ] when* ] <pane-control>
-        margins <scroller> white-interior 1 track-add 
+        margins <scroller> white-interior 1 track-add
         add-toolbar ;
 
 : com-inspect ( error-display -- )

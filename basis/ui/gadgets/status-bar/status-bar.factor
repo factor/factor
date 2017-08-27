@@ -22,7 +22,7 @@ IN: ui.gadgets.status-bar
 
 : open-status-window ( gadget title/attributes -- )
     ?attributes f <model> >>status <world>
-    dup status>> <status-bar> 
+    dup status>> <status-bar>
     { 7 2 } <filled-border> status-bar-background <solid> >>interior
     f track-add
     open-world-window ;
