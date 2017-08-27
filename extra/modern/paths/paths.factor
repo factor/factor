@@ -139,6 +139,22 @@ ERROR: not-a-source-path path ;
 : basis-syntax-paths ( -- seq ) basis-vocabs vocab-names>syntax reject-some-paths ;
 : extra-syntax-paths ( -- seq ) extra-vocabs vocab-names>syntax reject-some-paths ;
 
-: core-source-paths ( -- seq ) core-vocabs modern-source-paths reject-some-paths ;
-: basis-source-paths ( -- seq ) basis-vocabs modern-source-paths reject-some-paths ;
-: extra-source-paths ( -- seq ) extra-vocabs modern-source-paths reject-some-paths ;
+CONSTANT: functor-vocabs {
+    "specialized-arrays"
+    "specialized-vectors"
+    "tuple-arrays"
+    "math.vectors.simd"
+    "math.vectors.simd.cords"
+    "vectors.functor"
+    "math.blas.matrices"
+    "math.blas.vectors"
+}
+
+: core-source-paths ( -- seq )
+    core-vocabs modern-source-paths reject-some-paths ;
+: basis-source-paths ( -- seq )   
+    basis-vocabs functor-vocabs diff
+    modern-source-paths reject-some-paths ;
+: extra-source-paths ( -- seq )
+    extra-vocabs functor-vocabs diff
+    modern-source-paths reject-some-paths ;
