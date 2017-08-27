@@ -11,17 +11,18 @@ IN: modern.out
     { char: \r char: \n } member?
     [ tail-slice ] [ drop ] if ;
 
-: write-whitespace ( obj last -- )
+: write-whitespace ( last obj -- )
+    swap
     [ swap slice-between ] [ slice-before ] if*
     trim-before-newline io:write ;
 
-GENERIC#: write-literal* 1 ( obj last -- last' )
-M: slice write-literal* [ write-whitespace ] [ drop write ] [ drop ] 2tri ;
-M: array write-literal* swap [ swap write-literal* ] each ;
+GENERIC: write-literal* ( last obj -- last' )
+M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
+M: array write-literal* [ write-literal* ] each ;
 ! M: string write-literal* drop [ write ] keep ; ! for refactoring
 
 ! Start with no slice as ``last``
-: write-literal ( obj -- ) f write-literal* drop ;
+: write-literal ( obj -- ) f swap write-literal* drop ;
 
 : write-modern-string ( seq -- string )
     [ write-literal ] with-string-writer ; inline
