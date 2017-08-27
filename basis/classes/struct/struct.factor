@@ -330,7 +330,7 @@ M: struct-class reset-class
         [ call-next-method ]
     } cleave ;
 
-SYMBOL: bits:
+SYMBOL: \bits:
 
 <PRIVATE
 
