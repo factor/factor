@@ -15,4 +15,3 @@ IN: stream.extras
 : write1-flush ( str -- ) output-stream get stream-write1-flush ; inline
 : write-flush ( str -- ) output-stream get stream-write-flush ; inline
 : print-flush ( str -- ) output-stream get stream-print-flush ; inline
-

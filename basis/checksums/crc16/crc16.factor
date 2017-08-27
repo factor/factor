@@ -37,4 +37,4 @@ M: crc16 checksum-bytes
 M: crc16 checksum-lines
     init-crc16
     [ [ (crc16) ] each char: \n (crc16) ] each
-    finish-crc16 ; inline 
+    finish-crc16 ; inline

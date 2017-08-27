@@ -30,4 +30,3 @@ SYMBOL: github-token
     github-username get
     github-token get
     sync-organization-with-credentials ;
-
