@@ -106,6 +106,15 @@ ERROR: not-a-source-path path ;
 : all-source-paths ( -- seq )
     all-vocabs modern-source-paths ;
 
+: core-docs-paths ( -- seq ) core-vocabs modern-docs-paths ;
+: basis-docs-paths ( -- seq ) basis-vocabs modern-docs-paths ;
+: extra-docs-paths ( -- seq ) extra-vocabs modern-docs-paths ;
+
+: core-test-paths ( -- seq ) core-vocabs modern-tests-paths ;
+: basis-test-paths ( -- seq ) basis-vocabs modern-tests-paths ;
+: extra-test-paths ( -- seq ) extra-vocabs modern-tests-paths ;
+
+
 : all-docs-paths ( -- seq )
     all-vocabs modern-docs-paths ;
 

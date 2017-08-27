@@ -39,10 +39,14 @@ M: array write-literal [ write-literal ] each ;
 
 : rewrite-paths ( seq quot -- ) '[ _ rewrite-path ] each ; inline
 ]]
+: rewrite-path-exact ( path -- )
+    [ path>literals ] [ ] bi write-modern-path ;
+
 : rewrite-vocab-exact ( name -- )
-    modern-source-path [ path>literals ] [ ] bi write-modern-path ;
+    modern-source-path rewrite-path-exact ;
 
-
+: rewrite-paths ( paths -- )
+    [ rewrite-path-exact ] each ;
 
 : strings-core-to-file ( -- )
     core-bootstrap-vocabs
