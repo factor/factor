@@ -1,25 +1,10 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: accessors fry io io.directories io.pathnames
-io.streams.string kernel math math.parser namespaces
-prettyprint sequences splitting strings tools.annotations
-
-compiler.cfg
-compiler.cfg.builder
-compiler.cfg.debugger
-compiler.cfg.linearization
-compiler.cfg.finalization
-compiler.cfg.optimizer
-compiler.cfg.rpo
-
-compiler.cfg.value-numbering
-compiler.cfg.value-numbering.graph
-
-graphviz
-graphviz.notation
-graphviz.render
-;
+USING: accessors compiler.cfg compiler.cfg.builder
+compiler.cfg.debugger compiler.cfg.finalization compiler.cfg.rpo
+graphviz graphviz.notation graphviz.render io.directories
+io.pathnames io.streams.string kernel math math.parser
+namespaces sequences splitting ;
 FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.graphviz
 
@@ -48,8 +33,8 @@ IN: compiler.cfg.graphviz
 
 : cfgviz ( cfg -- graph )
     <digraph>
-        [graph "t" =labelloc ];
-        [node "box" =shape "Courier" =fontname 10 =fontsize ];
+        graph[ "t" =labelloc ]
+        node[ "box" =shape "Courier" =fontname 10 =fontsize ]
         swap [
             [ add-cfg-vertex ] [ add-cfg-edges ] bi
         ] each-basic-block ;

@@ -1,10 +1,8 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry generic generic.parser generic.standard
-kernel present quotations sequences slots words
-graphviz
-graphviz.attributes
-;
+graphviz graphviz.attributes kernel parser present quotations
+sequences slots words ;
 IN: graphviz.notation
 
 <<
@@ -74,16 +72,14 @@ ALIAS: -- add-edge
 ALIAS: ~-> add-path
 ALIAS: ~-- add-path
 
-ALIAS: [graph <graph-attributes>
-ALIAS: [node <node-attributes>
-ALIAS: [edge <edge-attributes>
+SYNTAX: \graph[ parse-quotation '[ <graph-attributes> @ add ] append! ;
+SYNTAX: \node[ parse-quotation '[ <node-attributes> @ add ] append! ;
+SYNTAX: \edge[ parse-quotation '[ <edge-attributes> @ add ] append! ;
 
-ALIAS: [add-node <node>
-ALIAS: [add-edge <edge>
-ALIAS: [-> <edge>
-ALIAS: [-- <edge>
-
-ALIAS: ]; add
+SYNTAX: \add-node[ parse-quotation '[ <node> @ add ] append! ;
+SYNTAX: \add-edge[ parse-quotation '[ <edge> @ add ] append! ;
+SYNTAX: \->[ parse-quotation '[ <edge> @ add ] append! ;
+SYNTAX: \--[ parse-quotation '[ <edge> @ add ] append! ;
 
 ! Can't really do add-path[ & add-nodes[ this way, since they
 ! involve multiple objects.
