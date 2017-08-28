@@ -30,7 +30,7 @@ HELP: parents-handle-gesture?
 
 HELP: propagate-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } }
-{ $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } "." } ;
+{ $description "Calls " { $link handle-gesture } " on every parent of the " { $snippet "gadget" } ", starting with the " { $snippet "gadget" } " itself." } ;
 
 HELP: motion
 { $class-description "Mouse motion gesture." }
