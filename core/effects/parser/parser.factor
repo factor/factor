@@ -81,7 +81,7 @@ ERROR: can't-nest-definitions word ;
 
 : (:) ( -- word def effect )
     [
-        scan-new-syntax-word
+        scan-new-word
         scan-effect
         parse-definition swap
     ] with-definition ;

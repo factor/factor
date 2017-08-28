@@ -124,7 +124,7 @@ IN: bootstrap.syntax
     "deprecated" [ last-word make-deprecated ] define-core-syntax
 
     "SYNTAX:" [
-        scan-new-syntax-word
+        scan-new-word
         mark-top-level-syntax
         parse-definition define-syntax
     ] define-core-syntax
@@ -153,7 +153,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "ALIAS:" [
-        scan-new-syntax-word scan-syntax-word define-alias
+        scan-new-word scan-word define-alias
     ] define-core-syntax
 
     "CONSTANT:" [

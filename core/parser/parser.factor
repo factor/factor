@@ -70,7 +70,7 @@ ERROR: number-expected ;
     ?scan-token parse-word ;
 
 : scan-syntax-word ( -- word )
-    ?scan-token "\\" ?head drop parse-word ;
+    ?scan-token parse-word ;
 
 : scan-number ( -- number )
     ?scan-token parse-number ;
@@ -89,15 +89,6 @@ ERROR: invalid-word-name string ;
 
 : scan-new-word ( -- word )
     scan-new dup reset-generic ;
-
-: scan-syntax-word-name ( -- string )
-    scan-word-name "\\" ?head drop ;
-
-: scan-new-syntax ( -- word )
-    scan-syntax-word-name create-word-in ;
-
-: scan-new-syntax-word ( -- word )
-    scan-new-syntax dup reset-generic ;
 
 ERROR: staging-violation word ;
 
