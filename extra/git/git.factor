@@ -169,8 +169,8 @@ ERROR: unexpected-text text ;
 
 : parse-commit-lines ( obj -- obj )
     " \n" read-until {
-        { CHAR: \s [ parse-commit-field parse-commit-lines ] }
-        { CHAR: \n [ drop contents >>message ] }
+        { char: \s [ parse-commit-field parse-commit-lines ] }
+        { char: \n [ drop contents >>message ] }
         [ unexpected-text ]
     } case ;
 
@@ -193,8 +193,8 @@ ERROR: unexpected-text text ;
 
 : parse-tree-lines ( obj -- obj )
     "\s\n" read-until {
-        { CHAR: \s [ parse-tree-field parse-tree-lines ] }
-        { CHAR: \n [ drop contents >>message ] }
+        { char: \s [ parse-tree-field parse-tree-lines ] }
+        { char: \n [ drop contents >>message ] }
         [ unexpected-text ]
     } case ;
 
@@ -205,8 +205,8 @@ ERROR: key-already-set value key assoc ;
 
 : parse-object-line>assoc ( hashtable -- hashtable )
     "\s\n" read-until {
-        { CHAR: \s [ [ "\r\n" read-until* ] dip pick over "parent" = [ push-at ] [ set-at-once ] if parse-object-line>assoc ] }
-        { CHAR: \n [ drop contents "message" pick set-at ] }
+        { char: \s [ [ "\r\n" read-until* ] dip pick over "parent" = [ push-at ] [ set-at-once ] if parse-object-line>assoc ] }
+        { char: \n [ drop contents "message" pick set-at ] }
     } case ;
 
 : assoc>commit ( assoc -- commit )
