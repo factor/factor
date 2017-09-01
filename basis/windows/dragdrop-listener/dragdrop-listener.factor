@@ -48,6 +48,9 @@ TUPLE: listener-dragdrop hWnd last-drop-effect ;
     DROPEFFECT_NONE listener-dragdrop boa ;
 
 SYMBOL: +listener-dragdrop-wrapper+
+
+<<
+
 {
     { IDropTarget {
         [ ! HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
@@ -77,6 +80,8 @@ SYMBOL: +listener-dragdrop-wrapper+
         ]
     } }
 } <com-wrapper> +listener-dragdrop-wrapper+ set-global
+
+>>
 
 : dragdrop-listener-window ( -- )
     world get handle>> hWnd>> dup <listener-dragdrop>
