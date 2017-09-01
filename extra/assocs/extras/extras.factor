@@ -1,8 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: arrays assocs assocs.private kernel math sequences ;
-
+USING: arrays assocs assocs.private generalizations kernel math
+sequences ;
 IN: assocs.extras
 
 : deep-at ( assoc seq -- value/f )
@@ -52,3 +51,29 @@ ERROR: key-exists value key assoc ;
     ] [
         drop set-at
     ] if ;
+
+<PRIVATE
+
+: (sequence>assoc) ( seq map-quot insert-quot assoc -- assoc )
+    [ swap curry compose each ] keep ; inline
+
+: (sequence-index>assoc) ( seq map-quot insert-quot assoc -- assoc )
+    [ swap curry compose each-index ] keep ; inline
+
+PRIVATE>
+
+: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- assoc )
+    4 nrot (sequence>assoc) ; inline
+
+: sequence>assoc ( seq map-quot insert-quot exemplar -- assoc )
+    clone (sequence>assoc) ; inline
+
+: sequence-index>assoc ( seq map-quot insert-quot exemplar -- assoc )
+    clone (sequence-index>assoc) ; inline
+
+: sequence-index>hashtable ( seq map-quot insert-quot -- hashtable )
+    H{ } sequence-index>assoc ; inline
+
+: sequence>hashtable ( seq map-quot insert-quot -- hashtable )
+    H{ } sequence>assoc ; inline
+

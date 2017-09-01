@@ -1,0 +1,146 @@
+CONSTANT: OBJ_COMMIT 1
+CONSTANT: OBJ_TREE 2
+CONSTANT: OBJ_BLOB 3
+CONSTANT: OBJ_TAG 4
+CONSTANT: OBJ_OFS_DELTA 6
+CONSTANT: OBJ_REF_DELTA 7
+
+"/Users/erg/factor" set-current-directory
+"3dff14e2f3d0c8db662a8c6aeb5dbd427f4258eb" git-read-pack
+
+"/Users/erg/factor" set-current-directory
+git-log
+
+"/Users/erg/factor" set-current-directory
+"401597a387add5b52111d1dd954d6250ee2b2688" git-object-from-pack
+
+git verify-pack -v .git/objects/pack/pack-816d07912ac9f9b463f89b7e663298e3c8fedda5.pack | grep a6e0867b
+a6e0867b2222f3b0976e9aac6539fe8f12a552e2 commit 51 63 12938 1 8000d6670e1abdbaeebc4452c6cccbec68069ca1
+! problem: a6e0867b2222f3b0976e9aac6539fe8f12a552e2
+
+! investigate:
+http://stackoverflow.com/questions/9478023/is-the-git-binary-diff-algorithm-delta-storage-standardized/9478566#9478566
+
+http://stackoverflow.com/questions/801577/how-to-recover-git-objects-damaged-by-hard-disk-failure
+git ls-tree
+
+! eh
+http://schacon.github.io/git/technical/pack-format.txt
+https://schacon.github.io/gitbook/7_the_packfile.html
+
+! most useful doc:
+http://git.rsbx.net/Documents/Git_Data_Formats.txt
+
+! git show:
+git show -s --pretty=raw 2ca509a8fe681d58f80d402ea9da2be20b9ab0a0
+
+! git add
+git add -p   # parts of files
+
+! git reset
+git merge --abort  is alias for  git reset --merge
+
+! Merge strategies:
+octopus: git merge fixes enhancements # two branches merging
+git merge --no-commit maint # merge maint into current branch, but do not make a commit yet
+http://git-scm.com/docs/git-merge
+http://stackoverflow.com/questions/161813/fix-merge-conflicts-in-git?rq=1
+
+# common base:
+git show :1:_widget.html.erb
+# 'ours'
+git show :2:_widget.html.erb
+# 'theirs'
+git show :3:_widget.html.erb
+
+git show :3:_widget.html.erb >_widget.html.erb
+git add _widget.html.erb
+aka
+git checkout --theirs _widget.html.erb
+
+
+
+Guys, "ours" and "theirs" is relative to whether or not you are merging or rebasing. If you're merging, then "ours" means the branch you're merging into, and "theirs" is the branch you're merging in. When you're rebasing, then "ours" means the commits you're rebasing onto, while "theirs" refers to the commits that you want to rebase. –  Cupcake May 26 '14 at 4:27
+
+
+! random
+https://github.com/libgit2/libgit2/blob/091165c53b2bcd5d41fb71d43ed5a23a3d96bf5d/docs/diff-internals.md
+https://github.com/schacon/git-server/blob/master/git-server.rb
+
+https://git-scm.com/blog
+
+https://github.com/gitchain/gitchain/blob/2baefefd1795b358c98335f120738b60966fa09d/git/delta.go
+https://www.kernel.org/pub/software/scm/git/docs/user-manual.html#git-concepts
+
+! graphs in terminal:
+http://stackoverflow.com/questions/1064361/unable-to-show-a-git-tree-in-terminal
+
+git-daemon:
+ git daemon --reuseaddr --verbose  --base-path=. --export-all
+$> export GIT_TRACE_PACKET=1
+   git ls-remote git://127.0.0.1/git-bottom-up
+
+
+
+raw git:
+https://schacon.github.io/gitbook/7_raw_git.html
+
+# write object
+git hash-object -w myfile.txt
+
+-----------------------------------
+Now lets say you want to create a tree from your new objects. The git mktree command makes it pretty simple to generate new tree objects from git ls-tree formatted output. For example, if you write the following to a file named '/tmp/tree.txt' :
+
+100644 blob 6ff87c4664981e4397625791c8ea3bbb5f2279a3    file1
+100644 blob 3bb0e8592a41ae3185ee32266c860714980dbed7    file2
+
+$ cat /tmp/tree.txt | git mk-tree
+f66a66ab6a7bfe86d52a66516ace212efa00fe1f
+
+100644 blob 6ff87c4664981e4397625791c8ea3bbb5f2279a3    file1-copy
+040000 tree f66a66ab6a7bfe86d52a66516ace212efa00fe1f    our_files
+
+$ cat /tmp/newtree.txt | git mk-tree
+5bac6559179bd543a024d6d187692343e2d8ae83
+
+
+.
+|-- file1-copy
+`-- our_files
+    |-- file1
+    `-- file2
+
+1 directory, 3 files
+
+---------------------------------------------
+
+
+
+$ export GIT_INDEX_FILE=/tmp/index
+$ git read-tree --prefix=copy1/  5bac6559
+$ git read-tree --prefix=copy2/  5bac6559
+$ git write-tree 
+bb2fa6de7625322322382215d9ea78cfe76508c1
+
+$>git ls-tree bb2fa
+040000 tree 5bac6559179bd543a024d6d187692343e2d8ae83    copy1
+040000 tree 5bac6559179bd543a024d6d187692343e2d8ae83    copy2
+
+-------------------------------
+
+
+GIT_AUTHOR_NAME
+GIT_AUTHOR_EMAIL
+GIT_AUTHOR_DATE
+GIT_COMMITTER_NAME
+GIT_COMMITTER_EMAIL
+GIT_COMMITTER_DATE
+$ git commit-tree bb2fa < /tmp/message
+a5f85ba5875917319471dfd98dfc636c1dc65650
+
+$ git update-ref refs/heads/master a5f85ba5875917319471dfd98dfc636c1dc65650
+
+
+https://github.com/magit/magit
+
+https://www.kernel.org/pub/software/scm/git/docs/user-manual.html
