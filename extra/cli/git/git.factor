@@ -1,12 +1,13 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays concurrency.combinators concurrency.semaphores fry
-io.directories io.files.info io.launcher io.pathnames kernel
-math namespaces sequences splitting system-info.linux ;
+io io.directories io.encodings.utf8 io.files.info io.launcher
+io.pathnames kernel math namespaces sequences splitting
+system-info unicode ;
 IN: cli.git
 
 SYMBOL: cli-git-num-parallel
-cli-git-num-parallel [ hyperthreads 2 * ] initialize
+cli-git-num-parallel [ cpus 2 * ] initialize
 
 : git-clone-as ( ssh-url path -- process )
     [ { "git" "clone" } ] 2dip 2array append run-process ;
@@ -20,6 +21,12 @@ cli-git-num-parallel [ hyperthreads 2 * ] initialize
 : git-repository? ( directory -- ? )
     ".git" append-path current-directory get prepend-path
     ?file-info dup [ directory? ] when ;
+
+: git-current-branch ( directory -- name )
+    [
+        { "git" "rev-parse" "--abbrev-ref" "HEAD" }
+        utf8 <process-reader> stream-contents
+    ] with-directory [ blank? ] trim-tail ;
 
 : repository-url>name ( string -- string' )
     file-name ".git" ?tail drop ;

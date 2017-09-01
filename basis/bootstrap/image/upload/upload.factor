@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image checksums checksums.openssl fry io
-io.directories io.encodings.ascii io.encodings.utf8 io.files
+USING: bootstrap.image checksums checksums.openssl cli.git fry
+io io.directories io.encodings.ascii io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.pathnames kernel
 make math.parser namespaces sequences splitting system ;
 IN: bootstrap.image.upload
@@ -19,6 +19,15 @@ SYMBOL: build-images-destination
     build-images-destination get
     "slava_pestov@downloads.factorcode.org:downloads.factorcode.org/images/build/"
     or ;
+
+: factor-git-branch ( -- name )
+    image-path parent-directory git-current-branch ;
+
+: git-branch-destination ( -- dest )
+    build-images-destination get
+    "slava_pestov@downloads.factorcode.org:downloads.factorcode.org/images/"
+    or
+    factor-git-branch "/" 3append ;
 
 : checksums-path ( -- temp ) "checksums.txt" temp-file ;
 
@@ -47,7 +56,8 @@ M: windows scp-name "pscp" ;
     [
         \ scp-name get-global scp-name or ,
         boot-image-names %
-        checksums-path , latest-destination ,
+        checksums-path ,
+        git-branch-destination [ print flush ] [ , ] bi
     ] { } make try-process ;
 
 : append-build ( path -- path' )
@@ -84,11 +94,20 @@ M: windows scp-name "pscp" ;
         ] { } make try-process
     ] with-build-images ;
 
+: create-remote-upload-directory ( -- )
+    '[
+        "ssh" ,
+        "slava_pestov@downloads.factorcode.org" ,
+        "mkdir -p downloads.factorcode.org/images/" factor-git-branch append ,
+    ] { } make try-process ;
+
 : upload-new-images ( -- )
     [
         make-images
         "Computing checksums..." print flush
         compute-checksums
+        "Creating remote directory..." print flush
+        create-remote-upload-directory
         "Uploading images..." print flush
         upload-images
         "Uploading build images..." print flush
