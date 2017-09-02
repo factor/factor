@@ -120,50 +120,50 @@ semver_into() {
         export "$4=${BASH_REMATCH[3]}"
         export "$5=${BASH_REMATCH[4]}"
     elif [[ $1 =~ $CLANG_RE_OLD ]] ; then
-	export "$2=${BASH_REMATCH[1]}"
-	export "$3=${BASH_REMATCH[2]}"
-	export "$4=0"
-	export "$5=${BASH_REMATCH[3]}"
+        export "$2=${BASH_REMATCH[1]}"
+        export "$3=${BASH_REMATCH[2]}"
+        export "$4=0"
+        export "$5=${BASH_REMATCH[3]}"
     else
-	echo "unsupported version number, please report a bug: $1"
-	exit 123
+        echo "unsupported version number, please report a bug: $1"
+        exit 123
     fi
 }
 
 # issue 1440
 gcc_version_ok() {
-	GCC_VERSION=`gcc -dumpversion`
-	local GCC_MAJOR local GCC_MINOR local GCC_PATCH local GCC_SPECIAL
-	semver_into $GCC_VERSION GCC_MAJOR GCC_MINOR GCC_PATCH GCC_SPECIAL
+    GCC_VERSION=`gcc -dumpversion`
+    local GCC_MAJOR local GCC_MINOR local GCC_PATCH local GCC_SPECIAL
+    semver_into $GCC_VERSION GCC_MAJOR GCC_MINOR GCC_PATCH GCC_SPECIAL
 
-	if [[ $GCC_MAJOR -lt 4
-		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -lt 7 )
-		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_PATCH -lt 3 )
-		|| ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 8 && $GCC_PATCH -eq 0 )
-		]] ; then
-		echo "gcc version required >= 4.7.3, != 4.8.0, >= 4.8.1, got $GCC_VERSION"
-		return 1
-	fi
-	return 0
+    if [[ $GCC_MAJOR -lt 4
+        || ( $GCC_MAJOR -eq 4 && $GCC_MINOR -lt 7 )
+        || ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_PATCH -lt 3 )
+        || ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 8 && $GCC_PATCH -eq 0 )
+        ]] ; then
+        echo "gcc version required >= 4.7.3, != 4.8.0, >= 4.8.1, got $GCC_VERSION"
+        return 1
+    fi
+    return 0
 }
 
 clang_version_ok() {
-	CLANG_VERSION=`clang --version | head -n1`
-	CLANG_VERSION_RE='^[a-zA-Z0-9 ]* version (.*)$' # 3.3-5
-	if [[ $CLANG_VERSION =~ $CLANG_VERSION_RE ]] ; then
-		export "CLANG_VERSION=${BASH_REMATCH[1]}"
-		local CLANG_MAJOR local CLANG_MINOR local CLANG_PATCH local CLANG_SPECIAL
-		semver_into "$CLANG_VERSION" CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
-		if [[ $CLANG_MAJOR -lt 3
-			|| ( $CLANG_MAJOR -eq 3 && $CLANG_MINOR -le 1 )
-			]] ; then
-			echo "clang version required >= 3.1, got $CLANG_VERSION"
-			return 1
-		fi
-	else
-		return 1
-	fi
-	return 0
+    CLANG_VERSION=`clang --version | head -n1`
+    CLANG_VERSION_RE='^[a-zA-Z0-9 ]* version (.*)$' # 3.3-5
+    if [[ $CLANG_VERSION =~ $CLANG_VERSION_RE ]] ; then
+        export "CLANG_VERSION=${BASH_REMATCH[1]}"
+        local CLANG_MAJOR local CLANG_MINOR local CLANG_PATCH local CLANG_SPECIAL
+        semver_into "$CLANG_VERSION" CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
+        if [[ $CLANG_MAJOR -lt 3
+            || ( $CLANG_MAJOR -eq 3 && $CLANG_MINOR -le 1 )
+            ]] ; then
+            echo "clang version required >= 3.1, got $CLANG_VERSION"
+            return 1
+        fi
+    else
+        return 1
+    fi
+    return 0
 }
 
 set_cc() {
@@ -187,14 +187,6 @@ set_cc() {
 
 set_make() {
     MAKE='make'
-}
-
-check_git_branch() {
-    BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
-    if [ "$BRANCH" != "master" ] ; then
-        $ECHO "git branch is $BRANCH, not master"
-        exit_script 3
-    fi
 }
 
 check_installed_programs() {
@@ -295,6 +287,17 @@ find_architecture() {
     esac
 }
 
+find_num_cores() {
+    $ECHO "Finding num cores..."
+    NUM_CORES=7ZZ
+    uname_s=`uname -s`
+    check_ret uname
+    case $uname_s in
+        CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
+        *darwin* | *Darwin* | *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN);;
+    esac
+}
+
 write_test_program() {
     #! Must be 'echo'
     echo "#include <stdio.h>" > $C_WORD.c
@@ -356,6 +359,7 @@ set_factor_image() {
 echo_build_info() {
     $ECHO OS=$OS
     $ECHO ARCH=$ARCH
+    $ECHO NUM_CORES=$NUM_CORES
     $ECHO WORD=$WORD
     $ECHO DEBUG=$DEBUG
     $ECHO FACTOR_BINARY=$FACTOR_BINARY
@@ -429,6 +433,7 @@ parse_build_info() {
 find_build_info() {
     find_os
     find_architecture
+    find_num_cores
     set_cc
     find_word_size
     set_factor_binary
@@ -536,12 +541,22 @@ make_clean() {
 }
 
 make_factor() {
-    invoke_make CC=$CC CXX=$CXX $MAKE_TARGET -j5
+    $ECHO "Building factor with $NUM_CORES cores"
+    invoke_make CC=$CC CXX=$CXX $MAKE_TARGET -j$NUM_CORES
 }
 
 make_clean_factor() {
     make_clean
     make_factor
+}
+
+current_git_branch() {
+    git rev-parse --abbrev-ref HEAD
+}
+
+checksum_url() {
+    branch=$(current_git_branch)
+    echo "http://downloads.factorcode.org/images/$branch/checksums.txt"
 }
 
 update_boot_images() {
@@ -551,7 +566,7 @@ update_boot_images() {
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
-        get_url http://downloads.factorcode.org/images/latest/checksums.txt
+        get_url $(checksum_url)
         factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
         set_md5sum
         disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`
@@ -568,9 +583,14 @@ update_boot_images() {
     fi
 }
 
+boot_image_url() {
+    branch=$(current_git_branch)
+    echo "http://downloads.factorcode.org/images/$branch/$BOOT_IMAGE"
+}
+
 get_boot_image() {
     $ECHO "Downloading boot image $BOOT_IMAGE."
-    get_url http://downloads.factorcode.org/images/latest/$BOOT_IMAGE
+    get_url $(boot_image_url)
 }
 
 get_url() {
@@ -610,7 +630,6 @@ install() {
 
 update() {
     get_config_info
-    check_git_branch
     git_fetch_factorcode
     backup_factor
     make_clean_factor
