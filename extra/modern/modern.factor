@@ -193,7 +193,6 @@ ERROR: unexpected-terminator n string slice ;
 
 ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
 : read-colon ( n string slice -- n' string colon )
-    
     {
         { [ dup strict-upper? ] [ strict-upper on read-til-semicolon strict-upper off ] }
         { [ dup ":" tail? ] [ dup ":" head? [ read-lowercase-colon ] unless ] } ! :foo: vs foo:
