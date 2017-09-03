@@ -90,31 +90,5 @@ VARIABLE-ARITY: \WORD: 2
 VARIABLE-ARITY: \<CLASS: 3
 VARIABLE-ARITY: \<FUNCTOR: 2
 
-: matched-literal? ( obj -- ? )
-    dup array? [
-        {
-            [ ?first "[" tail? ]
-            [ ?first "{" tail? ]
-            [ ?first "(" tail? ]
-            [ { [ ?first ":" tail? ] [ ?last ";" tail? ] } 1&& ]
-        } 1||
-    ] [
-        drop f
-    ] if ;
-
-DEFER: map-literals
-: (map-literals) ( obj quot: ( obj -- obj' ) -- seq )
-    over [ array? ] any? [
-        [ call drop ] [
-            map-literals
-        ] 2bi
-    ] [
-        over array? [ map-literals ] [ call ] if
-    ] if ; inline recursive
-
-: map-literals ( obj quot: ( obj -- obj' ) -- seq )
-    '[ _ (map-literals) ] map ; inline recursive
-
-
 
 

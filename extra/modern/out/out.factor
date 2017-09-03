@@ -3,7 +3,7 @@
 USING: arrays assocs io io.encodings.utf8 io.files
 io.streams.string kernel modern modern.paths modern.slices
 multiline namespaces prettyprint sequences sequences.extras
-splitting strings ;
+splitting strings continuations fry ;
 IN: modern.out
 
 : trim-before-newline ( seq -- seq' )
@@ -19,7 +19,22 @@ IN: modern.out
 GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
 M: array write-literal* [ write-literal* ] each ;
-! M: string write-literal* drop [ write ] keep ; ! for refactoring
+M: string write-literal* [ write-whitespace ] [ write ] [ ] tri ; ! for refactoring
+
+
+
+DEFER: map-literals
+: (map-literals) ( obj quot: ( obj -- obj' ) -- seq )
+    over [ array? ] any? [
+        [ call drop ] [ map-literals ] 2bi
+    ] [
+        over array? [ map-literals ] [ call ] if
+    ] if ; inline recursive
+
+: map-literals ( obj quot: ( obj -- obj' ) -- seq )
+    '[ _ (map-literals) ] map ; inline recursive
+
+
 
 ! Start with no slice as ``last``
 : write-literal ( obj -- ) f swap write-literal* drop ;
@@ -30,23 +45,27 @@ M: array write-literal* [ write-literal* ] each ;
 : write-modern-path ( seq path -- )
     utf8 [ write-literal nl ] with-file-writer ; inline
 
-![[
-: rewrite-path ( path quot -- )
-    ! dup print
-    '[ [ path>literals [ _ map-literals ] map ] [ ] bi write-modern-path ]
-    [ drop . ] recover ; inline
+: write-modern-vocab ( seq vocab -- )
+    modern-source-path write-modern-path ; inline
 
-: rewrite-string ( string quot -- )
+: rewrite-path ( path quot: ( obj -- obj' ) -- )
     ! dup print
-    [ string>literals ] dip '[ _ map-literals ] map write-modern-string ; inline
+    '[ [ path>literals _ map-literals ] [ ] bi write-modern-path ]
+    [ drop . ] recover ; inline recursive
 
-: rewrite-paths ( seq quot -- ) '[ _ rewrite-path ] each ; inline
-]]
+: rewrite-string ( string quot: ( obj -- obj' ) -- )
+    ! dup print
+    [ string>literals ] dip map-literals write-modern-string ; inline recursive
+
+: rewrite-paths ( seq quot: ( obj -- obj' ) -- ) '[ _ rewrite-path ] each ; inline recursive
+
+: rewrite-vocab ( vocab quot: ( obj -- obj' ) -- )
+    [ [ vocab>literals ] dip map-literals ] 2keep drop write-modern-vocab ; inline recursive
 
 : rewrite-string-exact ( string -- string' )
     string>literals write-modern-string ;
 
-
+![[
 : rewrite-path-exact ( path -- )
     [ path>literals ] [ ] bi write-modern-path ;
 
@@ -55,6 +74,7 @@ M: array write-literal* [ write-literal* ] each ;
 
 : rewrite-paths ( paths -- )
     [ rewrite-path-exact ] each ;
+]]
 
 : strings-core-to-file ( -- )
     core-bootstrap-vocabs
