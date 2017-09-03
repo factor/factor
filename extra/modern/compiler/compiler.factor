@@ -102,19 +102,18 @@ VARIABLE-ARITY: \<FUNCTOR: 2
         drop f
     ] if ;
 
+DEFER: map-literals
 : (map-literals) ( obj quot: ( obj -- obj' ) -- seq )
-    over matched-literal? [
+    over [ array? ] any? [
         [ call drop ] [
-            '[
-                first3 [ [ _ (map-literals) ] map ] dip 3array
-            ] call
+            map-literals
         ] 2bi
     ] [
-        call
+        over array? [ map-literals ] [ call ] if
     ] if ; inline recursive
 
 : map-literals ( obj quot: ( obj -- obj' ) -- seq )
-    '[ _ (map-literals) ] map ; inline
+    '[ _ (map-literals) ] map ; inline recursive
 
 
 
