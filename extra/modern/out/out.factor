@@ -1,10 +1,13 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs io io.encodings.utf8 io.files
-io.streams.string kernel modern modern.paths modern.slices
-multiline namespaces prettyprint sequences sequences.extras
-splitting strings continuations fry ;
+USING: accessors arrays assocs constructors continuations fry io
+io.encodings.utf8 io.files io.streams.string kernel modern
+modern.paths modern.slices multiline namespaces prettyprint
+sequences sequences.extras splitting strings ;
 IN: modern.out
+
+TUPLE: renamed slice string ;
+CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 
 : trim-before-newline ( seq -- seq' )
     dup [ char: \s = not ] find
@@ -19,7 +22,7 @@ IN: modern.out
 GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
 M: array write-literal* [ write-literal* ] each ;
-M: string write-literal* [ write-whitespace ] [ write ] [ ] tri ; ! for refactoring
+M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
 
 
 
