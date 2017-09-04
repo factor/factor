@@ -139,3 +139,28 @@ IN: modern.tests
 {
     { { "\"" "google.com" "\"" } }
 } [ [[ "google.com" ]] string>literals >strings ] unit-test
+
+! Concatenated syntax
+{
+    {
+        { "(" { "a" "b" } ")" }
+        { "[" { "a" "b" "+" } "]" }
+        { "(" { "c" } ")" }
+    }
+} [ "( a b )[ a b + ]( c )" string>literals >strings ] unit-test
+
+{
+    {
+        { "(" { "a" "b" } ")" }
+        { "[" { "a" "b" "+" } "]" }
+        { "(" { "c" } ")" }
+    }
+} [ "( a b ) [ a b + ] ( c )" string>literals >strings ] unit-test
+
+
+{
+    {
+        { "\"" "abc" "\"" }
+        { "[" { "0" } "]" }
+    }
+} [ "\"abc\"[ 0 ]" string>literals >strings ] unit-test

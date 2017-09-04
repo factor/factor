@@ -1,10 +1,14 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs constructors continuations fry io
-io.encodings.utf8 io.files io.streams.string kernel modern
-modern.paths modern.slices multiline namespaces prettyprint
-sequences sequences.extras splitting strings ;
+USING: accessors arrays assocs combinators.short-circuit
+constructors continuations fry io io.encodings.utf8 io.files
+io.streams.string kernel modern modern.paths modern.slices
+multiline namespaces prettyprint sequences sequences.extras
+splitting strings ;
 IN: modern.out
+
+: token? ( obj -- ? )
+    { [ slice? ] [ seq>> string? ] } 1&& ;
 
 TUPLE: renamed slice string ;
 CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;

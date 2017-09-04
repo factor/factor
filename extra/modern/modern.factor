@@ -267,6 +267,9 @@ ERROR: mismatched-terminator n string slice ;
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
         { char: \( [ read-paren ] }
+        { char: \] [  ] }
+        { char: \} [  ] }
+        { char: \) [  ] }
         { char: \s [ read-token-or-whitespace ] }
         { char: \r [ read-token-or-whitespace ] }
         { char: \n [ read-token-or-whitespace ] }
@@ -275,9 +278,11 @@ ERROR: mismatched-terminator n string slice ;
 
 : lex-factor ( n/f string -- n'/f string literal )
     over [
-        skip-whitespace "\"\\!:[{(<>\s\r\n" slice-til-either
+        ! skip-whitespace
+        "\"\\!:[{(]})<>\s\r\n" slice-til-either
+
         ! \foo foo\bar \foo{
-        dup char: \\ = [
+        dup char: \\ =  [
             drop
             ! foo\ so far, could be foo\bar{
             ! remove the \ and continue til delimiter/eof
