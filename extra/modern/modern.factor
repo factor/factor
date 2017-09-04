@@ -51,7 +51,7 @@ ERROR: lex-expected-but-got-eof n string expected ;
 : lex-until ( n string tag-sequence -- n' string payload )
     3dup '[
         [
-            lex-factor dup [ , ] when* [
+            lex-factor dup f like [ , ] when* [
                 dup [
                     ! } gets a chance, but then also full seq { } after recursion...
                     [ _ ] dip '[ _ sequence= ] any? not
@@ -67,7 +67,7 @@ ERROR: lex-expected-but-got-eof n string expected ;
 : lex-colon-until ( n string tag-sequence -- n' string payload )
     '[
         [
-            lex-factor dup [ , ] when* [
+            lex-factor dup f like [ , ] when* [
                 dup [
                     ! } gets a chance, but then also full seq { } after recursion...
                     [ _ ] dip '[ _ sequence= ] any? not
@@ -218,10 +218,9 @@ ERROR: no-backslash-payload n string slice ;
     ] when ;
 
 ! If the slice is 0 width, we stopped on whitespace.
-! Advance the index and read again!
-: read-token-or-whitespace ( n string slice -- n' string slice )
-    dup length 0 =
-    [ drop [ 1 + ] dip lex-factor ] when ;
+! Advance the index and read again somewhere else!
+: read-token-or-whitespace ( n string slice -- n' string slice/f )
+    dup length 0 = [ [ 1 + ] 2dip ] when ;
 
 ERROR: mismatched-terminator n string slice ;
 : read-terminator ( n string slice -- n' string slice ) ;
@@ -267,9 +266,9 @@ ERROR: mismatched-terminator n string slice ;
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
         { char: \( [ read-paren ] }
-        { char: \] [  ] }
-        { char: \} [  ] }
-        { char: \) [  ] }
+        { char: \] [ ] }
+        { char: \} [ ] }
+        { char: \) [ ] }
         { char: \s [ read-token-or-whitespace ] }
         { char: \r [ read-token-or-whitespace ] }
         { char: \n [ read-token-or-whitespace ] }
@@ -301,7 +300,7 @@ ERROR: mismatched-terminator n string slice ;
     ] if ; inline
 
 : string>literals ( string -- sequence )
-    [ 0 ] dip [ lex-factor ] loop>array 2nip ;
+    [ 0 ] dip [ [ lex-factor f like ] loop>array f like ] loop>array 2nip ;
 
 : vocab>literals ( vocab -- sequence )
     ".private" ?tail drop
