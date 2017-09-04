@@ -76,4 +76,3 @@ PRIVATE>
 
 : sequence>hashtable ( seq map-quot insert-quot -- hashtable )
     H{ } sequence>assoc ; inline
-
