@@ -214,7 +214,7 @@ ERROR: no-backslash-payload n string slice ;
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
 : read-token-or-whitespace ( n string slice -- n' string slice/f )
-    dup length 0 = [ [ 1 + ] 2dip ] when ;
+    dup length 0 = [ [ 1 + ] 2dip drop lex-factor ] when ;
 
 ERROR: mismatched-terminator n string slice ;
 : read-terminator ( n string slice -- n' string slice ) ;
