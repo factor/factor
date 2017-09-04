@@ -33,6 +33,9 @@ ERROR: unexpected-end n string ;
 : peek-from ( n/f string -- ch )
     over [ ?nth ] [ 2drop f ] if ;
 
+: previous-from ( n/f string -- ch )
+    over [ [ 1 - ] dip ?nth ] [ 2drop f ] if ;
+
 ! Allow eof
 : next-char-from ( n/f string -- n'/f string ch/f )
     over [

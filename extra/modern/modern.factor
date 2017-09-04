@@ -3,8 +3,9 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations fry io.encodings.utf8
 io.files kernel locals make math math.order modern.paths
-modern.slices namespaces sequences sequences.extras shuffle
-splitting strings unicode ;
+modern.slices namespaces sequences sequences.deep
+sequences.extras shuffle splitting splitting.monotonic strings
+unicode ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
@@ -75,7 +76,7 @@ ERROR: lex-expected-but-got-eof n string expected ;
                     drop t ! loop again?
                 ] if
             ] [
-                f ! need to error here if { } unmatched
+                f
             ] if*
         ] loop
     ] { } make ;
@@ -129,23 +130,6 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         [ slice-til-eol drop ] dip swap 2array
     ] if ;
 
-: read-til-semicolon ( n string slice -- n' string semi )
-    dup '[ but-last ";" append ";" 2array lex-colon-until ] dip
-    swap
-    ! Remove the ; from the paylaod if present
-    dup ?last ";" tail? [
-        unclip-last 3array
-    ] [
-        2array
-    ] if ;
-
-: read-word-or-til-semicolon ( n string slice -- n' string obj )
-    2over next-char-from* "\s\r\n" member? [
-        read-til-semicolon
-    ] [
-        merge-slice-til-whitespace
-    ] if ;
-
 : terminator? ( slice -- ? )
     {
         [ ";" sequence= ]
@@ -191,6 +175,16 @@ ERROR: unexpected-terminator n string slice ;
         [ ">" tail? ]
     } 1&& ;
 
+: read-til-semicolon ( n string slice -- n' string semi )
+    dup '[ but-last ";" append ";" 2array lex-colon-until ] dip
+    swap
+    ! Remove the ; from the paylaod if present
+    dup ?last ";" tail? [
+        unclip-last 3array
+    ] [
+        2array
+    ] if ;
+
 ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
 : read-colon ( n string slice -- n' string colon )
     {
@@ -220,9 +214,7 @@ ERROR: no-backslash-payload n string slice ;
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
 : read-token-or-whitespace ( n string slice -- n' string slice/f )
-    dup length 0 = [
-        [ 1 + ] 2dip drop lex-factor
-    ] when ;
+    dup length 0 = [ [ 1 + ] 2dip ] when ;
 
 ERROR: mismatched-terminator n string slice ;
 : read-terminator ( n string slice -- n' string slice ) ;
@@ -274,7 +266,7 @@ ERROR: mismatched-terminator n string slice ;
         { char: \s [ read-token-or-whitespace ] }
         { char: \r [ read-token-or-whitespace ] }
         { char: \n [ read-token-or-whitespace ] }
-        { f [ f like ] }
+        { f [ ] }
     } case ;
 
 : lex-factor ( n/f string -- n'/f string literal )
@@ -302,7 +294,19 @@ ERROR: mismatched-terminator n string slice ;
     ] if ; inline
 
 : string>literals ( string -- sequence )
-    [ 0 ] dip [ [ lex-factor f like ] loop>array f like ] loop>array 2nip ;
+    [ 0 ] dip [
+        [
+            [
+                [
+                    lex-factor f like [ , ] when*
+                    ! concatenated syntax ( a )[ a 1 + ]( b )
+                    [ ]
+                    [ peek-from blank? ]
+                    [ previous-from blank? or not ] 2tri pick and
+                ] loop
+            ] { } make f like [ , ] when* over
+        ] loop
+    ] { } make 2nip ;
 
 : vocab>literals ( vocab -- sequence )
     ".private" ?tail drop
