@@ -8,7 +8,7 @@ HELP: send
 { $values { "message" object }
           { "thread" thread }
 }
-{ $description "Send the message to the thread by placing it in the thread's mailbox. This is an asynchronous operation and will return immediately. The receiving thread will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word. The message can be any Factor object. For destinations that are instances of remote-thread the message must be a serializable Factor type." }
+{ $description "Send the message to the thread by placing it in the thread's mailbox. This is an asynchronous operation and will return immediately. The receiving thread will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word). The message can be any Factor object. For destinations that are instances of remote-thread the message must be a serializable Factor type." }
 { $see-also receive receive-if } ;
 
 HELP: receive
