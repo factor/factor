@@ -9,11 +9,9 @@ IN: git.tests
 
 : with-empty-test-git-repo ( quot -- )
     '[
-        [
-            { "git" "init" } run-process drop
-            @
-        ] cleanup-unique-directory
-    ] with-temp-directory ; inline
+        { "git" "init" } run-process drop
+        @
+    ] with-test-directory ; inline
 
 : with-zero-byte-file-repo ( quot -- )
     '[
