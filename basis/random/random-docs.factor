@@ -16,7 +16,7 @@ HELP: random-32*
 
 HELP: random-bytes*
 { $values { "n" integer } { "obj" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
-{ $description "Generates a byte-array of random bytes." } ;
+{ $description "Generates a byte-array of n random bytes." } ;
 
 HELP: random
 { $values { "obj" object } { "elt" "a random element" } }
@@ -37,8 +37,8 @@ HELP: random-32
 { $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
-{ $values { "n" integer } { "byte-array" "a random integer" } }
-{ $description "Outputs an integer with n bytes worth of bits." }
+{ $values { "n" integer } { "byte-array" "a sequence of random bytes" } }
+{ $description "Generates a byte-array of n random bytes." }
 { $examples
     { $unchecked-example "USING: prettyprint random ;"
                "5 random-bytes ."
