@@ -64,6 +64,9 @@ M: object infer-known* drop f ;
 : output>sequence ( quot exemplar -- seq )
     [ [ call ] [ outputs ] bi ] dip nsequence ; inline
 
+: output>assoc ( quot exemplar -- seq )
+    [ [ call ] [ outputs ] bi ] dip nassoc ; inline
+
 : output>array ( quot -- array )
     { } output>sequence ; inline
 

@@ -1,11 +1,14 @@
 ! (c)2009 Joe Groff bsd license
-USING: kernel sequences sequences.private math
-combinators macros math.order math.ranges quotations fry effects
-memoize.private generalizations ;
+USING: assocs combinators effects fry generalizations kernel
+macros math math.order math.ranges memoize.private quotations
+sequences sequences.private ;
 IN: sequences.generalizations
 
 MACRO: nsequence ( n seq -- quot )
     [ [nsequence] ] keep '[ @ _ like ] ;
+
+MACRO: nassoc ( n assoc -- quot )
+    [ [nsequence] ] keep '[ @ _ assoc-like ] ;
 
 MACRO: narray ( n -- quot )
     '[ _ { } nsequence ] ;
