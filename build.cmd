@@ -32,33 +32,29 @@ if not errorlevel 1 (
 : Fun syntax
 for /f %%x in ('git describe --all') do set GIT_DESCRIBE=%%x
 for /f %%y in ('git rev-parse HEAD') do set GIT_ID=%%y
+for /f %%z in ('git rev-parse --abbrev-ref HEAD') do set GIT_BRANCH=%%z
 
 set git_label=%GIT_DESCRIBE%-%GIT_ID%
 set version=0.98
 
-if %_bootimage_version%==clean (
-    set _git_branch=clean-windows-%_target%
-    set _bootimage_path=clean/windows-%_target%
-) else (
-    set _git_branch=master
-    set _bootimage_path=latest
-)
-
 echo Deleting staging images from temp/...
 del temp\staging.*.image
 
-echo Updating working copy from %_git_branch%...
-call git pull git://factorcode.org/git/factor.git %_git_branch%
+echo Updating working copy from %GIT_BRANCH%...
+call git pull git://factorcode.org/git/factor.git %GIT_BRANCH%
 if errorlevel 1 goto fail
 
 echo Building vm...
 nmake /nologo /f Nmakefile clean
 if errorlevel 1 goto fail
+
 nmake /nologo /f Nmakefile %_target%
 if errorlevel 1 goto fail
 
 echo Fetching %_bootimage_version% boot image...
-cscript /nologo misc\http-get.vbs http://downloads.factorcode.org/images/%_bootimage_path%/%_bootimage% %_bootimage%
+set boot_image_url=http://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage% %_bootimage%
+echo URL: %boot_image_url%
+cscript /nologo misc\http-get.vbs %boot_image_url% %_bootimage%
 if errorlevel 1 goto fail
 
 echo Bootstrapping...
@@ -86,13 +82,8 @@ echo Make sure you're running within the Visual Studio or Windows SDK environmen
 goto :EOF
 
 :usage
-echo Usage: build.cmd [latest/clean]
+echo Usage: build.cmd
 echo     Updates the working copy, cleans and builds the vm using nmake,
 echo     fetches a boot image, and bootstraps factor.
-echo     If latest is specified, then the working copy is updated to the
-echo     upstream "master" branch and the boot image corresponding to the
-echo     most recent factor build is downloaded. This is the default.
-echo     If clean is specified, then the working copy is updated to the
-echo     upstream "clean-windows-*" branch corresponding to the current
-echo     platform and the corresponding boot image is downloaded.
+echo     The branch that bootstraps is the one that is checked out locally.
 goto :EOF
