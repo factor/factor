@@ -345,7 +345,7 @@ STRUCT: GUID
     { Data3 WORD }
     { Data4 UCHAR[8] } ;
 
-/*
+![[
     fBinary  :1;
     fParity  :1;
     fOutxCtsFlow  :1;
@@ -360,7 +360,7 @@ STRUCT: GUID
     fRtsControl  :2;
     fAbortOnError  :1;
     fDummy2  :17;
-*/
+]]
 
 CONSTANT: SP_SERIALCOMM   0x1
 CONSTANT: BAUD_075        0x1
