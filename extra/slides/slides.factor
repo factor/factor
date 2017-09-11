@@ -3,7 +3,7 @@
 USING: accessors arrays colors fonts fry help.markup help.stylesheet
 io.styles kernel literals math math.ranges models namespaces parser
 sequences system ui ui.gadgets ui.gadgets.books ui.gadgets.panes
-ui.gestures ui.pens.gradient ui.pens.solid ;
+ui.gestures ui.pens.gradient ui.pens.solid combinators.smart.syntax ;
 IN: slides
 
 CONSTANT: stylesheet

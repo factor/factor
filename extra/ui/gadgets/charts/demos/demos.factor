@@ -6,7 +6,9 @@ math.constants math.functions sequences ui ui.gadgets
 ui.gadgets.charts ui.gadgets.charts.axes ui.gadgets.charts.lines ;
 IN: ui.gadgets.charts.demos
 
-CONSTANT: -pi $[ pi neg ]
+<<
+CONSTANT: -pi 1[ pi neg ]
+>>
 
 : sine-wave ( steps -- seq )
     [ <iota> ] keep

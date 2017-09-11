@@ -1,7 +1,8 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays formatting kernel literals math
-math.functions math.matrices math.ranges sequences ;
+USING: accessors arrays combinators.smart.syntax formatting
+kernel literals math math.functions math.matrices math.ranges
+sequences ;
 IN: rosetta-code.pythagorean-triples
 
 ! http://rosettacode.org/wiki/Pythagorean_triples

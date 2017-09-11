@@ -6,7 +6,8 @@ literals locals math math.functions math.trig models opengl
 opengl.demo-support opengl.gl sequences threads ui ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.frames
 ui.gadgets.grids ui.gadgets.labeled ui.gadgets.labels
-ui.gadgets.packs ui.gadgets.sliders ui.render ;
+ui.gadgets.packs ui.gadgets.sliders ui.render
+combinators.smart.syntax ;
 QUALIFIED-WITH: models.range mr
 IN: boids
 

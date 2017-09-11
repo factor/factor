@@ -4,7 +4,8 @@ USING: accessors alien.c-types alien.data arrays circular colors
 colors.constants columns destructors fonts gpu.buffers
 gpu.render gpu.shaders gpu.state gpu.textures images kernel
 literals locals make math math.constants math.functions
-math.vectors sequences specialized-arrays typed ui.text fry ;
+math.vectors sequences specialized-arrays typed ui.text fry
+multiline ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAYS: float uint ;
 IN: game.debug

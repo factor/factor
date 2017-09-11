@@ -87,7 +87,7 @@ CONSTANT: node-colors {
 
 : <heap-graph> ( -- graph )
     <digraph>
-    [graph "dot" =layout ];
+    graph[ "dot" =layout ]
     <graph-attributes> "false" >>overlap add ;
 
 : image>graph ( image -- graph )
