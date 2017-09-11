@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: calendar formatting kernel literals math math.functions
-sequences strings system tools.test ;
+USING: calendar combinators.smart.syntax formatting kernel math
+math.functions sequences strings system tools.test ;
 IN: formatting.tests
 
 [ "%s" printf ] must-infer
@@ -165,9 +165,9 @@ IN: formatting.tests
 { t } [ "PM" testtime "%p" strftime = ] unit-test
 
 ! Differences on Windows due to rounding mode (#1792).
-${ os windows? "1.3" "1.2" ? } [ 125/100 "%.1f" sprintf ] unit-test
-${ os windows? "3" "2" ? } [ 5/2 "%.0f" sprintf ] unit-test
+array[ os windows? "1.3" "1.2" ? ] [ 125/100 "%.1f" sprintf ] unit-test
+array[ os windows? "3" "2" ? ] [ 5/2 "%.0f" sprintf ] unit-test
 ! Differences on Windows due to setprecision(0)
-${ os windows? "2.500000e+00" "2e+00" ? } [ 5/2 "%.0e" sprintf ] unit-test
-${ os windows? "3.500000e+00" "4e+00" ? } [ 7/2 "%.0e" sprintf ] unit-test
-${ os windows? "1.000000e+00" "1e+00" ? } [ 1.0 "%.0e" sprintf ] unit-test
+array[ os windows? "2.500000e+00" "2e+00" ? ] [ 5/2 "%.0e" sprintf ] unit-test
+array[ os windows? "3.500000e+00" "4e+00" ? ] [ 7/2 "%.0e" sprintf ] unit-test
+array[ os windows? "1.000000e+00" "1e+00" ? ] [ 1.0 "%.0e" sprintf ] unit-test

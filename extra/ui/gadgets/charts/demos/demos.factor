@@ -1,9 +1,9 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors.constants kernel literals locals
-math math.constants math.functions sequences ui ui.gadgets
-ui.gadgets.charts ui.gadgets.charts.axes ui.gadgets.charts.lines
-;
+USING: accessors arrays colors.constants
+combinators.smart.syntax kernel literals locals math
+math.constants math.functions sequences ui ui.gadgets
+ui.gadgets.charts ui.gadgets.charts.axes ui.gadgets.charts.lines ;
 IN: ui.gadgets.charts.demos
 
 CONSTANT: -pi $[ pi neg ]
@@ -11,17 +11,17 @@ CONSTANT: -pi $[ pi neg ]
 : sine-wave ( steps -- seq )
     [ <iota> ] keep
     pi 2 * swap / [ * pi - dup sin 2array ] curry map
-    ${ pi $[ pi sin ] } suffix ;
+    array[ pi 1[ pi sin ] ] suffix ;
 
 : cosine-wave ( steps -- seq )
     [ <iota> ] keep
     pi 2 * swap / [ * pi - dup cos 2array ] curry map
-    ${ pi $[ pi cos ] } suffix ;
+    array[ pi 1[ pi cos ] ] suffix ;
 
 <PRIVATE
 
 :: (chart-demo) ( n -- )
-    chart new ${ ${ -pi pi } { -1 1 } } >>axes
+    chart new array[ array[ -pi pi ] { -1 1 } ] >>axes
     line new color: blue >>color n sine-wave >>data add-gadget
     line new color: red >>color n cosine-wave >>data add-gadget
     vertical-axis new add-gadget

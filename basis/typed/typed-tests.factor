@@ -18,7 +18,7 @@ TYPED: fix+ ( a: fixnum b: fixnum -- c: fixnum )
 ! [ most-positive-fixnum 1 fix+ ] unit-test
 
 ! XXX: Check that we throw an error. This used to underflow to the least-positive-fixnum.
-[ most-positive-fixnum 1 fix+ ] [ ${ KERNEL-ERROR 7 } head? ] must-fail-with
+[ most-positive-fixnum 1 fix+ ] [ array[ KERNEL-ERROR 7 ] head? ] must-fail-with
 
 TUPLE: tweedle-dee ; final
 TUPLE: tweedle-dum ; final

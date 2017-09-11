@@ -24,7 +24,7 @@ CONSTANT: initial-dt 5
 : <boids-gadget> ( -- gadget )
     boids-gadget new
         t >>clipped?
-        ${ width height } >>pref-dim
+        array[ width height ] >>pref-dim
         initial-population random-boids >>boids
         initial-behaviours >>behaviours
         initial-dt >>dt ;

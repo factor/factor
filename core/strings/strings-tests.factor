@@ -1,7 +1,7 @@
-USING: arrays continuations io.streams.null kernel
-kernel.private literals make math math.order memory namespaces
-prettyprint sbufs sequences strings strings.private tools.test
-vectors ;
+USING: arrays combinators.smart.syntax continuations
+io.streams.null kernel kernel.private make math math.order
+memory namespaces prettyprint sbufs sequences strings
+strings.private tools.test vectors ;
 
 { char: b } [ 1 >bignum "abc" nth ] unit-test
 
@@ -59,7 +59,7 @@ unit-test
 
 ! Random tester found this
 [ 2 -7 resize-string ]
-[ ${ KERNEL-ERROR ERROR-TYPE 11 -7 } = ] must-fail-with
+[ array[ KERNEL-ERROR ERROR-TYPE 11 -7 ] = ] must-fail-with
 
 ! Make sure 24-bit strings work
 "hello world" "s" set

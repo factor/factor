@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lexer macros memoize parser sequences vocabs
-vocabs.loader words kernel namespaces locals.parser locals.types
-locals.errors ;
+USING: fry kernel lexer locals.errors locals.parser locals.types
+macros memoize namespaces sequences vocabs vocabs.loader words ;
 IN: locals
 
 SYNTAX: :>
@@ -12,6 +11,7 @@ SYNTAX: :>
 SYNTAX: \|[ parse-lambda append! ;
 
 SYNTAX: \let[ parse-let append! ;
+SYNTAX: \'let[ H{ } clone (parse-lambda) [ fry call <let> ?rewrite-closures call ] curry append! ;
 
 SYNTAX: \:: (::) define-declared ;
 

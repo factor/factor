@@ -103,12 +103,12 @@ CONSTANT: events-mask
     [ width>> ] [ height>> ] bi 2array ;
 
 : scroll-direction ( event -- pair )
-    direction>> {
-        { $ GDK_SCROLL_UP { 0 -1 } }
-        { $ GDK_SCROLL_DOWN { 0 1 } }
-        { $ GDK_SCROLL_LEFT { -1 0 } }
-        { $ GDK_SCROLL_RIGHT { 1 0 } }
-    } at ;
+    direction>> array[
+        array[ GDK_SCROLL_UP { 0 -1 } ]
+        array[ GDK_SCROLL_DOWN { 0 1 } ]
+        array[ GDK_SCROLL_LEFT { -1 0 } ]
+        array[ GDK_SCROLL_RIGHT { 1 0 } ]
+    ] at ;
 
 : on-motion ( win event user-data -- ? )
     drop swap
@@ -362,25 +362,25 @@ CONSTANT: window-controls>func-flags
     ] 2tri ;
 
 ! OpenGL and Pixel formats
-CONSTANT: perm-attribs ${ GDK_GL_USE_GL GDK_GL_RGBA }
+CONSTANT: perm-attribs array[ GDK_GL_USE_GL GDK_GL_RGBA ]
 
 CONSTANT: attrib-table H{
-    { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
-    { stereo ${ GDK_GL_STEREO } }
-    { color-bits ${ GDK_GL_BUFFER_SIZE } }
-    { red-bits ${ GDK_GL_RED_SIZE } }
-    { green-bits ${ GDK_GL_GREEN_SIZE } }
-    { blue-bits ${ GDK_GL_BLUE_SIZE } }
-    { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
-    { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
-    { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
-    { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
-    { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
-    { depth-bits ${ GDK_GL_DEPTH_SIZE } }
-    { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
-    { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
-    { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
-    { samples ${ GDK_GL_SAMPLES } }
+    { double-buffered array[ GDK_GL_DOUBLEBUFFER ] }
+    { stereo array[ GDK_GL_STEREO ] }
+    { color-bits array[ GDK_GL_BUFFER_SIZE ] }
+    { red-bits array[ GDK_GL_RED_SIZE ] }
+    { green-bits array[ GDK_GL_GREEN_SIZE ] }
+    { blue-bits array[ GDK_GL_BLUE_SIZE ] }
+    { alpha-bits array[ GDK_GL_ALPHA_SIZE ] }
+    { accum-red-bits array[ GDK_GL_ACCUM_RED_SIZE ] }
+    { accum-green-bits array[ GDK_GL_ACCUM_GREEN_SIZE ] }
+    { accum-blue-bits array[ GDK_GL_ACCUM_BLUE_SIZE ] }
+    { accum-alpha-bits array[ GDK_GL_ACCUM_ALPHA_SIZE ] }
+    { depth-bits array[ GDK_GL_DEPTH_SIZE ] }
+    { stencil-bits array[ GDK_GL_STENCIL_SIZE ] }
+    { aux-buffers array[ GDK_GL_AUX_BUFFERS ] }
+    { sample-buffers array[ GDK_GL_SAMPLE_BUFFERS ] }
+    { samples array[ GDK_GL_SAMPLES ] }
 }
 
 M: gtk-ui-backend (make-pixel-format)

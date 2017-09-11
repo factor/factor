@@ -1,30 +1,30 @@
 ! (c)2009 Joe Groff, see BSD license
-USING: accessors literals math math.affine-transforms
-math.functions math.trig multiline sequences svg tools.test xml
-xml.traversal ;
+USING: accessors combinators.smart.syntax literals math
+math.affine-transforms math.functions math.trig multiline
+sequences svg tools.test xml xml.traversal ;
 IN: svg.tests
 
-${ { 1.0 2.25 } { -3.0 4.0 } { 5.5 0.5 } <affine-transform> } [
+array[ { 1.0 2.25 } { -3.0 4.0 } { 5.5 0.5 } <affine-transform> ] [
     "matrix ( 1 +2.25 -3  , 0.4e+1  ,5.5, 5e-1 )" svg-transform>affine-transform
 ] unit-test
 
-${ { 1.0 0.0 } { 0.0 1.0 } { 5.0 10.0 } <affine-transform> } [
+array[ { 1.0 0.0 } { 0.0 1.0 } { 5.0 10.0 } <affine-transform> ] [
     "translate(5.0, 1e1 )" svg-transform>affine-transform
 ] unit-test
 
-${ { 1.0 0.0 } { 0.0 1.0 } { 5.0 10.0 } <affine-transform> } [
+array[ { 1.0 0.0 } { 0.0 1.0 } { 5.0 10.0 } <affine-transform> ] [
     "translate( 5.0  1e+1)" svg-transform>affine-transform
 ] unit-test
 
-${ { 2.0 0.0 } { 0.0 2.0 } { 0.0 0.0 } <affine-transform> } [
+array[ { 2.0 0.0 } { 0.0 2.0 } { 0.0 0.0 } <affine-transform> ] [
     "scale(2.0)" svg-transform>affine-transform
 ] unit-test
 
-${ { 2.0 0.0 } { 0.0 4.0 } { 0.0 0.0 } <affine-transform> } [
+array[ { 2.0 0.0 } { 0.0 4.0 } { 0.0 0.0 } <affine-transform> ] [
     "scale(2.0 4.0)" svg-transform>affine-transform
 ] unit-test
 
-${ { 2.0 0.0 } { 0.0 4.0 } { 0.0 0.0 } <affine-transform> } [
+array[ { 2.0 0.0 } { 0.0 4.0 } { 0.0 0.0 } <affine-transform> ] [
     "scale(2.0 4.0)" svg-transform>affine-transform
 ] unit-test
 
@@ -55,11 +55,11 @@ ${ { 2.0 0.0 } { 0.0 4.0 } { 0.0 0.0 } <affine-transform> } [
     } <affine-transform> 0.001 a~
 ] unit-test
 
-${
+array[
     { $[  30 deg>rad cos ] $[ 30 deg>rad sin ] }
     { $[ -30 deg>rad sin ] $[ 30 deg>rad cos ] }
     { 1.0 2.0 } <affine-transform>
-} [
+] [
     "translate(1 2) rotate(30)" svg-transform>affine-transform
 ] unit-test
 

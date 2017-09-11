@@ -1,5 +1,5 @@
-USING: accessors arrays kernel kernel.private layouts literals math
-sequences tools.test vectors ;
+USING: accessors arrays combinators.smart.syntax kernel
+kernel.private layouts math sequences tools.test vectors ;
 
 [ -2 { "a" "b" "c" } nth ] must-fail
 [ 10 { "a" "b" "c" } nth ] must-fail
@@ -20,7 +20,7 @@ sequences tools.test vectors ;
 [ cell-bits cell log2 - 2^ f <array> ] must-fail
 ! To big for a fixnum #1045
 [ 67 2^ 3 <array> ] [
-    ${ KERNEL-ERROR ERROR-OUT-OF-FIXNUM-RANGE 147573952589676412928 f }
+    array[ KERNEL-ERROR ERROR-OUT-OF-FIXNUM-RANGE 147573952589676412928 f ]
     =
 ] must-fail-with
 

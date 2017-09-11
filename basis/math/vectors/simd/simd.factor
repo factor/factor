@@ -1,10 +1,11 @@
 USING: accessors alien arrays byte-arrays classes combinators
-cpu.architecture effects fry functors generalizations generic
-generic.parser kernel lexer literals locals macros math math.functions
-math.vectors math.vectors.private math.vectors.simd.intrinsics
-namespaces parser prettyprint.custom quotations sequences
+combinators.smart.syntax cpu.architecture effects fry functors
+generalizations generic generic.parser kernel lexer literals
+locals macros math math.bitwise math.functions math.vectors
+math.vectors.private math.vectors.simd.intrinsics namespaces
+parser prettyprint.custom quotations sequences
 sequences.generalizations sequences.private vocabs vocabs.loader
-words math.bitwise ;
+words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -46,7 +47,7 @@ PRIVATE>
 ! SIMD base type
 
 TUPLE: simd-128
-    { underlying byte-array read-only initial: $[ 16 <byte-array> ] } ;
+    { underlying byte-array read-only initial: 1[ 16 <byte-array> ] } ;
 
 GENERIC: simd-element-type ( obj -- c-type )
 GENERIC: simd-rep ( simd -- rep )

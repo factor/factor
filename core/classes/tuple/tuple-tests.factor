@@ -1,11 +1,3 @@
-USING: accessors arrays assocs calendar classes classes.algebra
-classes.private classes.tuple classes.tuple.private columns
-combinators.short-circuit compiler.errors compiler.units
-definitions eval generic generic.single io.streams.string kernel
-kernel.private literals math math.constants memory namespaces
-parser parser.notes see sequences sequences.private slots
-splitting strings threads tools.test vectors vocabs words
-words.symbol ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -546,12 +538,12 @@ must-fail-with
 
 [ 444444444444444444444444444444444444444444444444433333 >bignum "asdf" declared-types boa ]
 [
-    ${ KERNEL-ERROR ERROR-OUT-OF-FIXNUM-RANGE
-       444444444444444444444444444444444444444444444444433333 f } =
+    array[ KERNEL-ERROR ERROR-OUT-OF-FIXNUM-RANGE
+       444444444444444444444444444444444444444444444444433333 f ] =
 ] must-fail-with
 
 ! Check bignum coercer
-TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
+TUPLE: bignum-coercer { n bignum initial: 1[ 0 >bignum ] } ;
 
 { 13 bignum } [ 13.5 bignum-coercer boa n>> dup class-of ] unit-test
 

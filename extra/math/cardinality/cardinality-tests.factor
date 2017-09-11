@@ -1,7 +1,7 @@
 USING: kernel layouts literals math math.cardinality
 math.functions random sequences tools.test ;
 
-${ fixnum-bits } [ 0 trailing-zeros ] unit-test
+array[ fixnum-bits ] [ 0 trailing-zeros ] unit-test
 { 0 } [ 0b1 trailing-zeros ] unit-test
 { 1 } [ 0b10 trailing-zeros ] unit-test
 { 2 } [ 0b100 trailing-zeros ] unit-test
