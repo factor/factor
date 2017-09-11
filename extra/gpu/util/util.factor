@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays destructors gpu.buffers gpu.framebuffers gpu.render
 gpu.shaders gpu.state gpu.textures images kernel locals math
-math.rectangles opengl.gl sequences specialized-arrays ;
+math.rectangles opengl.gl sequences specialized-arrays
+multiline ;
 FROM: alien.c-types => float ;
 IN: gpu.util
 
