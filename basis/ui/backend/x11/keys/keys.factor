@@ -1,16 +1,15 @@
 ! Copyright (C) 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel literals ui.gestures x11.X
-x11.keysymdef ;
+x11.keysymdef combinators.smart.syntax ;
 IN: ui.backend.x11.keys
 
-CONSTANT: modifiers
-    {
+CONSTANT: modifiers {
         array[ ShiftMask ]
         array[ ControlMask ]
         array[ Mod1Mask ]
         array[ Mod4Mask ]
-    ]
+    }
 
 CONSTANT: codes
     H{
