@@ -5,10 +5,10 @@ x11.keysymdef combinators.smart.syntax ;
 IN: ui.backend.x11.keys
 
 CONSTANT: modifiers {
-        array[ ShiftMask ]
-        array[ ControlMask ]
-        array[ Mod1Mask ]
-        array[ Mod4Mask ]
+        array[ S+ ShiftMask ]
+        array[ C+ ControlMask ]
+        array[ A+ Mod1Mask ]
+        array[ M+ Mod4Mask ]
     }
 
 CONSTANT: codes
