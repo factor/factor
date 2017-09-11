@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: typed compiler.cfg.debugger compiler.tree.debugger
 tools.disassembler words ;
 IN: typed.debugger

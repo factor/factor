@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays byte-arrays
 combinators destructors gpu gpu.buffers gpu.private gpu.textures
 gpu.textures.private images kernel locals math math.rectangles

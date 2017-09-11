@@ -1,4 +1,5 @@
-! (c)2012 Joe Groff bsd license
+! Copyright (C) 2012 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.data alien.strings io.directories
 io.files.temp io.pathnames kernel math
 memoize specialized-arrays system windows.errors

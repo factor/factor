@@ -1,7 +1,8 @@
-! (c)2009 Joe Groff bsd license
-USING: assocs combinators effects fry generalizations kernel
-macros math math.order math.ranges memoize.private quotations
-sequences sequences.private ;
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
+USING: assocs kernel sequences sequences.private math
+combinators macros math.order math.ranges quotations fry effects
+memoize.private generalizations ;
 IN: sequences.generalizations
 
 MACRO: nsequence ( n seq -- quot )

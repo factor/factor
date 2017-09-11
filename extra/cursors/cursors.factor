@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit fry
 generalizations hash-sets hashtables kernel macros math
 math.functions math.order sequences sets ;

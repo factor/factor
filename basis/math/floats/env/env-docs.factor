@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: help help.markup help.syntax kernel quotations ;
 IN: math.floats.env
 

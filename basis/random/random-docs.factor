@@ -16,7 +16,7 @@ HELP: random-32*
 
 HELP: random-bytes*
 { $values { "n" integer } { "obj" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
-{ $description "Generates a byte-array of random bytes." } ;
+{ $description "Generates a byte-array of " { $snippet "n" } " random bytes." } ;
 
 HELP: random
 { $values { "obj" object } { "elt" "a random element" } }
@@ -37,8 +37,8 @@ HELP: random-32
 { $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
-{ $values { "n" integer } { "byte-array" "a random integer" } }
-{ $description "Outputs an integer with n bytes worth of bits." }
+{ $values { "n" integer } { "byte-array" "a sequence of random bytes" } }
+{ $description "Generates a byte-array of " { $snippet "n" } " random bytes." }
 { $examples
     { $unchecked-example "USING: prettyprint random ;"
                "5 random-bytes ."
@@ -80,11 +80,11 @@ HELP: random-units
 
 HELP: random-bits
 { $values { "numbits" integer } { "n" "a random integer" } }
-{ $description "Outputs an random integer n bits in length." } ;
+{ $description "Outputs a random integer " { $snippet "numbits" } " bits in length." } ;
 
 HELP: random-bits*
 { $values { "numbits" integer } { "n" "a random integer" } }
-{ $description "Returns an integer exactly " { $snippet "numbits" } " in length, with the topmost bit set to one." } ;
+{ $description "Returns an integer exactly " { $snippet "numbits" } " bits in length, with the topmost bit set to one." } ;
 
 HELP: with-random
 { $values { "obj" "a random number generator" } { "quot" quotation } }

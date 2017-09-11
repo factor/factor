@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.destructors alien.syntax
 classes.struct kernel math windows.com windows.com.syntax
 windows.kernel32 windows.ole32 windows.types ;

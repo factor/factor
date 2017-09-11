@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays classes classes.singleton classes.tuple help.markup
 help.syntax kernel multiline slots quotations ;
 IN: variants

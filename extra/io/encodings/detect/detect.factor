@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators continuations fry io
 io.encodings io.encodings.8-bit.latin1 io.encodings.ascii
 io.encodings.binary io.encodings.iana io.encodings.string

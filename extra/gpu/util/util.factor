@@ -1,8 +1,8 @@
-! (c)2009 Joe Groff bsd license
-USING: arrays destructors gpu.buffers gpu.framebuffers
-gpu.render gpu.shaders gpu.state gpu.textures images kernel
-locals math math.rectangles multiline opengl.gl sequences
-specialized-arrays ;
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays destructors gpu.buffers gpu.framebuffers gpu.render
+gpu.shaders gpu.state gpu.textures images kernel locals math
+math.rectangles opengl.gl sequences specialized-arrays ;
 FROM: alien.c-types => float ;
 IN: gpu.util
 

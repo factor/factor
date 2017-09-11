@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make sequences sequences.product tools.test ;
 IN: sequences.product.tests
 

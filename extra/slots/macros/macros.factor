@@ -1,4 +1,5 @@
-! (c) 2011 Joe Groff bsd license
+! Copyright (C) 2011 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators compiler.units fry generalizations kernel
 locals macros math quotations sequences sequences.generalizations
 slots vectors ;

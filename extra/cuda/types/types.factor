@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct kernel math ;
 FROM: alien.c-types => float ;
 IN: cuda.types
