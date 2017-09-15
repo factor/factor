@@ -30,6 +30,7 @@ IN: rosetta-code.pythagorean-triples
 ! your language is compared to others; you need a proper algorithm
 ! to solve them in a timely manner.
 
+<<
 CONSTANT: T1 {
   {  1  2  2 }
   { -2 -1 -2 }
@@ -45,6 +46,8 @@ CONSTANT: T3 {
   {  2  1  2 }
   {  2  2  3 }
 }
+>>
+
 
 CONSTANT: base { 3 4 5 }
 
