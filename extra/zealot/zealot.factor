@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cli.git fry io.directories io.pathnames kernel sequences
-web-services.github zealot.utils uuid ;
+web-services.github uuid ;
 IN: zealot
 
 : default-zealot-directory ( chunk -- path ) [ home ".zealot" ] dip 3append-path ;
