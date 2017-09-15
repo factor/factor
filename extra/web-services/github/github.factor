@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs cli.git concurrency.combinators
 concurrency.semaphores formatting fry http.client io
-io.directories json.reader kernel locals math namespaces
-sequences ;
+io.directories io.pathnames json.reader kernel locals math
+namespaces sequences ;
 IN: web-services.github
 
 SYMBOL: github-username
@@ -30,3 +30,10 @@ SYMBOL: github-token
     github-username get
     github-token get
     sync-organization-with-credentials ;
+
+: github-git-uri ( user project -- uri ) [ "git@github.com" ] 2dip "/" glue ":" glue ;
+: github-ssh-uri ( user project -- uri ) [ "https://github.com" ] 2dip 3append-path ;
+: github-git-clone-as ( user project name -- process ) [ github-git-uri ] dip git-clone-as ;
+: github-ssh-clone-as ( user project name -- process ) [ github-ssh-uri ] dip git-clone-as ;
+: github-git-clone ( user project -- process ) dup github-git-clone-as ;
+: github-ssh-clone ( user project -- process ) dup github-ssh-clone-as ;
