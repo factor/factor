@@ -14,7 +14,6 @@ Factor/factor
 *.image
 factor.image.fresh
 *.dylib
-factor
 factor.com
 *#*#
 .DS_Store
