@@ -54,6 +54,7 @@ M: windows factor-path "./factor.com" ;
 : with-child-options ( quot -- )
     f parser-quiet? set-global
     f restartable-tests? set-global
+    f long-unit-tests-enabled? set-global
     call ; inline
 
 : zealot-load-and-save ( vocabs path -- )
