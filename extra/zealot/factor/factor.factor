@@ -61,14 +61,13 @@ M: windows factor-path "./factor.com" ;
         [ load ] each _ save-image
     ] with-child-options ;
 
-: zealot-load-basis1 ( -- ) basis-vocabs "factor.image.basis" zealot-load-and-save ;
-: zealot-load-extra2 ( -- ) extra-vocabs "factor.image.extra" zealot-load-and-save ;
-: zealot-load-basis ( -- ) { "roman" } "factor.image.basis" zealot-load-and-save ;
-: zealot-load-extra ( -- ) { "roman" } "factor.image.extra" zealot-load-and-save ;
+: zealot-load-basis ( -- ) basis-vocabs "factor.image.basis" zealot-load-and-save ;
+: zealot-load-extra ( -- ) extra-vocabs "factor.image.extra" zealot-load-and-save ;
 
 ! like ``"" load`` -- only platform-friendly vocabs
-: zealot-all-vocabs ( -- seq )
-    vocab-roots get [ "" vocabs-to-load [ vocab-name ] map ] map ;
+: zealot-all-vocabs ( -- seq ) vocab-roots get [ "" vocabs-to-load [ vocab-name ] map ] map ;
+: zealot-basis-vocabs ( -- seq ) "resource:basis" "" vocabs-to-load [ vocab-name ] map ;
+: zealot-extra-vocabs ( -- seq ) "resource:extra" "" vocabs-to-load [ vocab-name ] map ;
 
 : zealot-load-all ( -- ) zealot-all-vocabs "factor.image.all" zealot-load-and-save ;
 
@@ -89,40 +88,6 @@ M: windows factor-path "./factor.com" ;
     factor-path "-e=USE: zealot.factor zealot-load-extra" 2array
     "./load-extra-log" zealot-load-command ;
 
-! Meant to run in the child process
-: zealot-test-all ( -- )
-    [ test-all ] with-child-options ;
-
-: zealot-test-command ( command log-path -- process )
-    <process>
-        swap >>stdout
-        swap >>command
-        +closed+ >>stdin
-        +stdout+ >>stderr
-        60 minutes >>timeout
-        +new-group+ >>group ;
-
-: zealot-test-basis-command ( -- process )
-    factor-path "-e=USE: zealot.factor zealot-test-basis" 2array
-    "./test-basis" zealot-test-command ;
-
-: zealot-test-extra-command ( -- process )
-    factor-path "-e=USE: zealot.factor zealot-test-extra" 2array
-    "./test-extra" zealot-test-command ;
-
-
-: zealot-test-all-command ( path -- )
-    [
-        <process>
-            factor-path "-run=\"mason.test\"" 2array >>command
-            +closed+ >>stdin
-            "./load-all-log" >>stdout
-            +stdout+ >>stderr
-            60 minutes >>timeout
-            +new-group+ >>group
-        try-process
-    ] with-directory ;
-
 : zealot-load-commands ( path -- )
     [
         zealot-load-basis-command
@@ -130,12 +95,24 @@ M: windows factor-path "./factor.com" ;
         [ try-process ] parallel-each
     ] with-directory ;
 
+! Meant to run in the child process
+: zealot-test-all ( -- )
+    [ test-all ] with-child-options ;
+
+: zealot-test-command ( log-path -- process )
+    <process>
+        factor-path "-e=USE: tools.test test-all" 2array >>command
+        +closed+ >>stdin
+        swap >>stdout
+        +stdout+ >>stderr
+        60 minutes >>timeout
+        +new-group+ >>group ;
+
 : zealot-test-commands ( path -- )
     [
-        f [
-            [ drop zealot-test-basis-command ]
-            [ drop zealot-test-extra-command ]
-        ] parallel-cleave 2drop
+        "./test-basis-log" zealot-test-command
+        "./test-extra-log" zealot-test-command 2array
+        [ try-process ] parallel-each
     ] with-directory ;
 
 : build-new-factor ( branch -- )
@@ -150,5 +127,5 @@ M: windows factor-path "./factor.com" ;
         [ drop compile-factor ]
         [ drop bootstrap-factor ]
         [ "ZEALOT LOAD" print flush yield drop zealot-load-commands ]
-        ! [ drop zealot-test-commands ]
+        [ drop zealot-test-commands ]
     } 2cleave ;
