@@ -43,3 +43,8 @@ M: sbuf stream-element-type drop +character+ ; inline
     <string-writer> [
         swap with-output-stream*
     ] keep >string ; inline
+
+: with-error-string-writer ( quot -- str )
+    <string-writer> [
+        swap with-error-stream*
+    ] keep >string ; inline
