@@ -694,6 +694,11 @@ ERROR: assert-sequence got expected ;
 : assert-sequence= ( a b -- )
     2dup sequence= [ 2drop ] [ assert-sequence ] if ;
 
+ERROR: assert-string got expected ;
+
+: assert-string= ( a b -- )
+    2dup sequence= [ 2drop ] [ assert-string ] if ;
+
 <PRIVATE
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
