@@ -43,8 +43,10 @@ SYMBOL: error-stream
 : read-until ( seps -- seq sep/f ) input-stream get stream-read-until ; inline
 : tell-input ( -- n ) input-stream get stream-tell ; inline
 : tell-output ( -- n ) output-stream get stream-tell ; inline
+: tell-error ( -- n ) error-stream get stream-tell ; inline
 : seek-input ( n seek-type -- ) input-stream get stream-seek ; inline
 : seek-output ( n seek-type -- ) output-stream get stream-seek ; inline
+: seek-error ( n seek-type -- ) error-stream get stream-seek ; inline
 
 : write1 ( elt -- ) output-stream get stream-write1 ; inline
 : write ( seq -- ) output-stream get stream-write ; inline
