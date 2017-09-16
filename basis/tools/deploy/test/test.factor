@@ -1,7 +1,7 @@
-USING: accessors arrays bootstrap.image io.backend
-io.directories io.files.info io.files.temp io.launcher kernel
-layouts math namespaces sequences system tools.deploy.backend
-tools.deploy.config.editor tools.test ;
+USING: accessors arrays bootstrap.image continuations
+io.directories io.files.info io.files.temp io.launcher
+io.backend kernel layouts math sequences system
+tools.deploy.backend tools.deploy.config.editor ;
 IN: tools.deploy.test
 
 : test-image ( -- str )
@@ -11,15 +11,11 @@ IN: tools.deploy.test
     test-image temp-file ;
 
 : shake-and-bake ( vocab -- )
-    long-unit-tests-enabled? get [
-        test-image-path ?delete-file
-        [
-            [ vm-path test-image temp-file ] dip
-            dup deploy-config make-deploy-image drop
-        ] with-resource-directory
-    ] [
-        drop
-    ] if ;
+    test-image-path ?delete-file
+    [
+        [ vm-path test-image temp-file ] dip
+        dup deploy-config make-deploy-image drop
+    ] with-resource-directory ;
 
 ERROR: image-too-big actual-size max-size ;
 
