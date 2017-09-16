@@ -99,10 +99,6 @@ M: windows factor-path "./factor.com" ;
         [ try-process ] parallel-each
     ] with-directory ;
 
-! Meant to run in the child process
-: zealot-test-all ( -- )
-    [ test-all ] with-child-options ;
-
 : zealot-test-command ( command log-path -- process )
     <process>
         swap >>stdout
@@ -114,13 +110,13 @@ M: windows factor-path "./factor.com" ;
 
 : zealot-test-commands ( path -- )
     [
-        factor-path "-i=factor.image" "-e=USE: tools.test test-all" 3array
+        factor-path "-i=factor.image" "-e=USE: zealot.factor USE: tools.test [ zealot-core-vocabs test-vocabs ] with-child-options" 3array
         "./test-core-log" zealot-test-command
 
-        factor-path "-i=factor.image.basis" "-e=USE: tools.test test-all" 3array
+        factor-path "-i=factor.image.basis" "-e=USE: zealot.factor USE: tools.test [ zealot-basis-vocabs test-vocabs ] with-child-options" 3array
         "./test-basis-log" zealot-test-command
 
-        factor-path "-i=factor.image.extra" "-e=USE: tools.test test-all" 3array
+        factor-path "-i=factor.image.extra" "-e=USE: zealot.factor USE: tools.test [ zealot-extra-vocabs test-vocabs ] with-child-options" 3array
         "./test-extra-log" zealot-test-command 3array
 
         [ try-process ] parallel-each

@@ -164,6 +164,8 @@ SYMBOL: forget-tests?
     forget-tests? get
     [ [ [ forget-source ] each ] with-compilation-unit ] [ drop ] if ;
 
+PRIVATE>
+
 : test-vocab ( vocab -- )
     lookup-vocab dup [
         dup source-loaded?>> [
@@ -175,8 +177,6 @@ SYMBOL: forget-tests?
     ] [ drop ] if ;
 
 : test-vocabs ( vocabs -- ) [ test-vocab ] each ;
-
-PRIVATE>
 
 : with-test-file ( ..a quot: ( ..a path -- ..b ) -- ..b )
     '[ "" "" _ cleanup-unique-file ] with-temp-directory ; inline
