@@ -106,9 +106,28 @@ MACRO: <experiment> ( word -- quot )
     [ name>> experiment-title ] bi
     '[ _ ndup _ narray _ prefix ] ;
 
-: experiment. ( seq -- )
+TUPLE: new-unit-test-failed error test expected path line# ;
+
+TUPLE: new-experiment test expected ;
+
+: <new-experiment> ( test expected -- new-experiment )
+    new-experiment new
+        swap >>expected
+        swap >>test ; inline
+
+: new-unit-test-failed>experiment ( new-unit-test-failed -- new-experiment )
+    [ test>> ] [ expected>> ] bi <new-experiment> ;
+
+GENERIC: experiment. ( obj -- )
+
+M: array experiment. ( seq -- )
     [ first write ": " write ]
     [ rest verbose-tests? get [ . ] [ short. ] if flush ] bi ;
+
+M: new-experiment experiment. ( seq -- )
+    "UNIT-TEST: " write
+    [ test>> verbose-tests? get [ pprint ] [ pprint-short ] if flush bl ]
+    [ expected>> verbose-tests? get [ pprint ] [ pprint-short ] if nl flush ] bi ;
 
 :: experiment ( word: ( -- error/f failed? tested? ) line# -- )
     word <experiment> :> e
@@ -193,6 +212,31 @@ TEST: must-infer-as
 TEST: must-infer
 TEST: must-fail-with
 TEST: must-fail
+
+: notify-new-test-failed ( new-unit-test-failed -- )
+    {
+        [ error>> ]
+        [ new-unit-test-failed>experiment ]
+        [ path>> ]
+        [ line#>> ]
+    } cleave notify-test-failed ;
+
+SYNTAX: \UNIT-TEST:
+    scan-object scan-object 2dup 2dup
+    current-test-file get
+    lexer get line>>
+    '[
+        _ _ <new-experiment> experiment.
+        [ { } _ with-datastack _ assert-sequence= ]
+        [
+            _ _ _ _ \ new-unit-test-failed boa
+            dup path>> [
+                notify-new-test-failed
+            ] [
+                error>> rethrow
+            ] if
+        ] recover
+    ] append! ;
 
 M: test-failure error. ( error -- )
     {
