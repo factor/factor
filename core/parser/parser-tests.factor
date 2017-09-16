@@ -1,6 +1,6 @@
 USING: accessors arrays assocs classes compiler.units effects
 eval generic grouping io.pathnames io.streams.string kernel
-lexer math namespaces parser sequences sets
+lexer math namespaces parser sequences sets multiline
 source-files source-files.errors strings tools.crossref
 tools.test vocabs vocabs.parser words words.symbol ;
 IN: parser.tests

@@ -3,7 +3,8 @@ http.client.private tools.test multiline fry io.streams.string io.crlf
 io.encodings.utf8 io.encodings.8-bit io.encodings.binary io.encodings.string
 io.encodings.ascii kernel arrays splitting sequences assocs io.sockets db
 db.sqlite make continuations urls hashtables accessors namespaces xml.data
-io.encodings.8-bit.latin1 random combinators.short-circuit literals ;
+io.encodings.8-bit.latin1 random combinators.short-circuit literals
+combinators.smart.syntax ;
 IN: http.tests
 
 { "text/plain" "UTF-8" } [ "text/plain" parse-content-type ] unit-test
@@ -25,8 +26,7 @@ IN: http.tests
 { "localhost:8080" } [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
 { "localhost:8443" } [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
 
-CONSTANT: read-request-test-1 [[
-POST /bar HTTP/1.1
+CONSTANT: read-request-test-1 [[ POST /bar HTTP/1.1
 Some-Header: 1
 Some-Header: 2
 Content-Length: 4
@@ -52,14 +52,12 @@ blah
     ] with-string-reader
 ] unit-test
 
-CONSTANT: read-request-test-1' [[
-POST /bar HTTP/1.1
+CONSTANT: read-request-test-1' [[ POST /bar HTTP/1.1
 content-length: 4
 content-type: application/octet-stream
 some-header: 1; 2
 
-blah
-]]
+blah]]
 
 array[ read-request-test-1' ] [
     read-request-test-1 lf>crlf
@@ -69,8 +67,7 @@ array[ read-request-test-1' ] [
     string-lines "\n" join
 ] unit-test
 
-CONSTANT: read-request-test-2 [[
-HEAD  /bar   HTTP/1.1
+CONSTANT: read-request-test-2 [[ HEAD  /bar   HTTP/1.1
 Host: www.sex.com
 
 ]]
@@ -91,8 +88,7 @@ Host: www.sex.com
     ] with-string-reader
 ] unit-test
 
-CONSTANT: read-request-test-2' [[
-HEAD  /bar   HTTP/1.1
+CONSTANT: read-request-test-2' [[ HEAD  /bar   HTTP/1.1
 Host: www.sex.com:101
 
 ]]
@@ -113,13 +109,11 @@ Host: www.sex.com:101
     ] with-string-reader
 ] unit-test
 
-CONSTANT: read-request-test-3 [[
-GET nested HTTP/1.0
+CONSTANT: read-request-test-3 [[ GET nested HTTP/1.0
 
 ]]
 
-CONSTANT: read-request-test-4 [[
-GET /blah HTTP/1.0
+CONSTANT: read-request-test-4 [[ GET /blah HTTP/1.0
 Host: "www.amazon.com"
 ]]
 
@@ -129,8 +123,7 @@ Host: "www.amazon.com"
     "host" header
 ] unit-test
 
-CONSTANT: read-response-test-1 [[
-HTTP/1.1 404 not found
+CONSTANT: read-response-test-1 [[ HTTP/1.1 404 not found
 Content-Type: text/html; charset=UTF-8
 
 blah
@@ -152,13 +145,11 @@ blah
     [ read-response ] with-string-reader
 ] unit-test
 
-
-CONSTANT: read-response-test-1' [[
-HTTP/1.1 404 not found
+<<
+CONSTANT: read-response-test-1' [[ HTTP/1.1 404 not found
 content-type: text/html; charset=UTF-8
-
 ]]
-
+>>
 array[ read-response-test-1' ] [
     URL" http://localhost/" url set
     read-response-test-1 lf>crlf
@@ -178,8 +169,7 @@ array[ read-response-test-1' ] [
     dup parse-set-cookie first unparse-set-cookie =
 ] unit-test
 
-CONSTANT: read-response-test-2 [[
-HTTP/1.1 200 Content follows
+CONSTANT: read-response-test-2 [[ HTTP/1.1 200 Content follows
 Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
 
 
@@ -191,8 +181,7 @@ Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
     cookies>> length
 ] unit-test
 
-CONSTANT: read-response-test-3 [[
-HTTP/1.1 200 Content follows
+CONSTANT: read-response-test-3 [[ HTTP/1.1 200 Content follows
 Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 
 

@@ -34,8 +34,7 @@ IN: http.server.requests.tests
 ] unit-test
 
 ! multipart/form-data
-CONSTANT: test-multipart/form-data [[
-POST / HTTP/1.1
+CONSTANT: test-multipart/form-data [[ POST / HTTP/1.1
 Accept: */*
 Accept-Encoding: gzip, deflate
 Connection: keep-alive
@@ -65,8 +64,7 @@ hello
 ! Error handling
 ! If the incoming request is not valid, read-request should throw an
 ! appropriate error.
-CONSTANT: test-multipart/form-data-missing-boundary [[
-POST / HTTP/1.1
+CONSTANT: test-multipart/form-data-missing-boundary [[ POST / HTTP/1.1
 Accept: */*
 Accept-Encoding: gzip, deflate
 Connection: keep-alive
