@@ -256,6 +256,12 @@ M: assert-sequence error.
         [ "=== Got:" print got>> stack. ] bi
     ] tabular-output ;
 
+M: assert-string error.
+    standard-table-style [
+        [ "=== Expected:" print expected>> . ]
+        [ "=== Got:" print got>> . ] bi
+    ] tabular-output ;
+
 M: immutable summary drop "Sequence is immutable" ;
 
 M: redefine-error error.
