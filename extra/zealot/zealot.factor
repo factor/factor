@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cli.git fry io.directories io.pathnames kernel sequences
-web-services.github uuid ;
+USING: cli.git combinators fry io.directories io.files.info
+io.pathnames kernel sequences uuid web-services.github ;
 IN: zealot
 
 : default-zealot-directory ( chunk -- path ) [ home ".zealot" ] dip 3append-path ;
@@ -48,6 +48,19 @@ IN: zealot
 : zealot-github-pull ( user project -- process )
     [ git-pull* ] with-zealot-github-project-directory ;
 
+: zealot-github-exists-locally? ( user project -- ? )
+    zealot-github-source-path ?file-info >boolean ;
+
+: zealot-github-ensure ( user project -- process )
+    2dup zealot-github-exists-locally? [
+        {
+            [ zealot-github-fetch-all drop ]
+            [ zealot-github-fetch-tags drop ]
+            [ zealot-github-pull ]
+        } 2cleave
+    ] [
+        zealot-github-clone
+    ] if ;
 
 : zealot-github-set-build-remote ( path user project -- process )
     '[ "origin" _ _ github-ssh-uri git-change-remote* ] with-directory ;

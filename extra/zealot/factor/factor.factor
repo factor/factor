@@ -123,6 +123,8 @@ M: windows factor-path "./factor.com" ;
     ] with-directory ;
 
 : build-new-factor ( branch -- )
+    "factor" "factor" zealot-github-ensure drop
+
     [ "factor" "factor" zealot-github-clone-paths nip ] dip
     over <pathname> . flush yield
     {
