@@ -4,8 +4,9 @@ USING: accessors arrays bootstrap.image calendar cli.git
 combinators concurrency.combinators formatting fry http.client
 io io.directories io.launcher io.pathnames kernel math.parser
 memory modern.paths namespaces parser.notes prettyprint
-sequences system system-info threads tools.test vocabs
-vocabs.hierarchy vocabs.hierarchy.private vocabs.loader zealot ;
+sequences sequences.extras system system-info threads tools.test
+vocabs vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
+zealot ;
 IN: zealot.factor
 
 : download-boot-checksums ( path branch -- )
@@ -65,9 +66,11 @@ M: windows factor-path "./factor.com" ;
 : zealot-load-extra ( -- ) extra-vocabs "factor.image.extra" zealot-load-and-save ;
 
 ! like ``"" load`` -- only platform-friendly vocabs
-: zealot-all-vocabs ( -- seq ) vocab-roots get [ "" vocabs-to-load [ vocab-name ] map ] map ;
-: zealot-basis-vocabs ( -- seq ) "resource:basis" "" vocabs-to-load [ vocab-name ] map ;
-: zealot-extra-vocabs ( -- seq ) "resource:extra" "" vocabs-to-load [ vocab-name ] map ;
+: zealot-vocabs-from-root ( root -- seq ) "" vocabs-to-load [ vocab-name ] map ;
+: zealot-all-vocabs ( -- seq ) vocab-roots get [ zealot-vocabs-from-root ] map-concat ;
+: zealot-core-vocabs ( -- seq ) "resource:core" zealot-vocabs-from-root ;
+: zealot-basis-vocabs ( -- seq ) "resource:basis" zealot-vocabs-from-root ;
+: zealot-extra-vocabs ( -- seq ) "resource:extra" zealot-vocabs-from-root ;
 
 : zealot-load-all ( -- ) zealot-all-vocabs "factor.image.all" zealot-load-and-save ;
 
@@ -99,19 +102,26 @@ M: windows factor-path "./factor.com" ;
 : zealot-test-all ( -- )
     [ test-all ] with-child-options ;
 
-: zealot-test-command ( log-path -- process )
+: zealot-test-command ( command log-path -- process )
     <process>
-        factor-path "-e=USE: tools.test test-all" 2array >>command
-        +closed+ >>stdin
         swap >>stdout
+        swap >>command
+        +closed+ >>stdin
         +stdout+ >>stderr
         60 minutes >>timeout
         +new-group+ >>group ;
 
 : zealot-test-commands ( path -- )
     [
+        factor-path "-i=factor.image" "-e=USE: tools.test test-all" 3array
+        "./test-core-log" zealot-test-command
+
+        factor-path "-i=factor.image.basis" "-e=USE: tools.test test-all" 3array
         "./test-basis-log" zealot-test-command
-        "./test-extra-log" zealot-test-command 2array
+
+        factor-path "-i=factor.image.extra" "-e=USE: tools.test test-all" 3array
+        "./test-extra-log" zealot-test-command 3array
+
         [ try-process ] parallel-each
     ] with-directory ;
 
