@@ -52,12 +52,14 @@ blah
     ] with-string-reader
 ] unit-test
 
+<<
 CONSTANT: read-request-test-1' [[ POST /bar HTTP/1.1
 content-length: 4
 content-type: application/octet-stream
 some-header: 1; 2
 
 blah]]
+>>
 
 array[ read-request-test-1' ] [
     read-request-test-1 lf>crlf

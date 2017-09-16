@@ -1,7 +1,7 @@
 USING: accessors compiler.units effects eval kernel kernel.private layouts
 literals math namespaces quotations tools.test typed words words.symbol
 combinators.short-circuit compiler.tree.debugger prettyprint definitions
-sequences classes.intersection strings classes.union ;
+sequences classes.intersection strings classes.union combinators.smart.syntax ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
