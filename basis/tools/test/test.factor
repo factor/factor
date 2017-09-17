@@ -1,13 +1,14 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
-compiler.units continuations debugger effects fry
-generalizations io io.files.temp io.files.unique kernel lexer
-locals macros math.functions math.vectors namespaces parser
-prettyprint quotations sequences sequences.generalizations
-source-files source-files.errors source-files.errors.debugger
-splitting stack-checker summary system tools.errors unicode
-vocabs vocabs.files vocabs.metadata vocabs.parser words ;
+compiler.units constructors continuations debugger effects fry
+generalizations io io.files.temp io.files.unique
+io.streams.string kernel lexer locals macros math.functions
+math.vectors namespaces parser prettyprint quotations sequences
+sequences.generalizations source-files source-files.errors
+source-files.errors.debugger splitting stack-checker summary
+system tools.errors unicode vocabs vocabs.files vocabs.metadata
+vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
@@ -237,6 +238,65 @@ SYNTAX: \UNIT-TEST:
             ] if
         ] recover
     ] append! ;
+
+TUPLE: unit-test-failed-section quot ;
+CONSTRUCTOR: <unit-test-failed-section> unit-test-failed-section ( quot -- obj ) ;
+SYMBOL: UNIT-TEST-FAILED>
+SYNTAX: \<UNIT-TEST-FAILED
+    \ UNIT-TEST-FAILED> parse-until <unit-test-failed-section> suffix! ;
+
+TUPLE: unit-test-code quot ;
+CONSTRUCTOR: <unit-test-code> unit-test-code ( quot -- obj ) ;
+SYNTAX: \UNIT-TEST-CODE: scan-object <unit-test-code> suffix! ;
+
+TUPLE: got-stack stack ;
+CONSTRUCTOR: <got-stack> got-stack ( stack -- obj ) ;
+SYNTAX: \GOT-STACK: scan-object <got-stack> suffix! ;
+
+TUPLE: expected-stack stack ;
+CONSTRUCTOR: <expected-stack> expected-stack ( stack -- obj ) ;
+SYNTAX: \EXPECTED-STACK: scan-object <expected-stack> suffix! ;
+
+TUPLE: got-stdout string ;
+CONSTRUCTOR: <got-stdout> got-stdout ( string -- obj ) ;
+SYNTAX: \GOT-STDOUT: scan-object <got-stdout> suffix! ;
+
+TUPLE: got-stderr string ;
+CONSTRUCTOR: <got-stderr> got-stderr ( string -- obj ) ;
+SYNTAX: \GOT-STDERR: scan-object <got-stderr> suffix! ;
+
+TUPLE: expected-stdout string ;
+CONSTRUCTOR: <expected-stdout> expected-stdout ( string -- obj ) ;
+SYNTAX: \EXPECTED-STDOUT: scan-object <expected-stdout> suffix! ;
+
+TUPLE: expected-stderr string ;
+CONSTRUCTOR: <expected-stderr> expected-stderr ( string -- obj ) ;
+SYNTAX: \EXPECTED-STDERR: scan-object <expected-stderr> suffix! ;
+
+TUPLE: named-unit-test name test stack ;
+CONSTRUCTOR: <named-unit-test> named-unit-test ( name test stack -- obj ) ;
+SYNTAX: \NAMED-UNIT-TEST:
+    scan-new-word scan-object scan-object <named-unit-test> suffix! ;
+
+TUPLE: stdout-unit-test test string ;
+CONSTRUCTOR: <stdout-unit-test> stdout-unit-test ( test string -- obj ) ;
+
+: run-stdout-unit-test ( obj -- )
+    [ test>> '[ _ with-string-writer ] call( -- string ) ]
+    [ string>> ] bi assert-string= ; inline
+
+SYNTAX: \STDOUT-UNIT-TEST:
+    scan-object scan-object <stdout-unit-test> '[ _ run-stdout-unit-test ] append! ;
+
+TUPLE: stderr-unit-test test string ;
+CONSTRUCTOR: <stderr-unit-test> stderr-unit-test ( test string -- obj ) ;
+
+: run-stderr-unit-test ( obj -- )
+    [ test>> '[ _ with-error-string-writer ] call( -- string ) ]
+    [ string>> ] bi assert-string= ; inline
+
+SYNTAX: \STDERR-UNIT-TEST:
+    scan-object scan-object <stderr-unit-test> '[ _ run-stderr-unit-test ] append! ;
 
 M: test-failure error. ( error -- )
     {
