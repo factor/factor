@@ -36,3 +36,9 @@ IN: grouping.extras
 [ 10 <iota> [ drop t ] group-by ] unit-test
 
 { V{ } } [ { } [ drop t ] group-by ] unit-test
+
+{ { { } { } { } } } [ { } 3 n-group ] unit-test
+{ { { 1 } { } { } } } [ { 1 } 3 n-group ] unit-test
+{ { { 1 } { 2 } { } } } [ { 1 2 } 3 n-group ] unit-test
+{ { { 1 } { 2 } { 3 } } } [ { 1 2 3 } 3 n-group ] unit-test
+{ { { 1 2 } { 3 } { 4 } } } [ { 1 2 3 4 } 3 n-group ] unit-test

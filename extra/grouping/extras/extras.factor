@@ -1,6 +1,6 @@
-USING: accessors arrays combinators fry grouping kernel macros math
-math.ranges sequences sequences.generalizations
-sequences.private vectors ;
+USING: accessors arrays combinators fry grouping
+grouping.private kernel locals macros math math.ranges sequences
+sequences.generalizations sequences.private vectors ;
 
 IN: grouping.extras
 
@@ -62,3 +62,16 @@ PRIVATE>
 
 : group-by ( seq quot: ( elt -- key ) -- groups )
     '[ dup _ call( x -- y ) (group-by) ] V{ } clone swap reduce ;
+
+:: <n-groups> ( seq n -- groups )
+    seq length :> len
+    len n /mod :> ( step rem! )
+    0 n [
+        dup len < [
+            dup step + rem zero? [ 1 + rem 1 - rem! ] unless
+            [ seq <slice> ] keep swap
+        ] [ f ] if
+    ] replicate nip ;
+
+: n-group ( seq n -- groups )
+    [ <n-groups> ] map-like ;
