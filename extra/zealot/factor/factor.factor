@@ -108,7 +108,37 @@ M: windows factor-path "./factor.com" ;
         60 minutes >>timeout
         +new-group+ >>group ;
 
+: zealot-load-and-test ( vocabs -- )
+    '[
+        _ [ [ load ] each ] [ test-vocabs ] bi
+    ] with-child-options ;
+
+: load-and-test-command ( i -- command )
+    [
+        factor-path
+        "-i=factor.image"
+    ] dip
+    [
+        "-e=USING: zealot.factor tools.test grouping.extras formatting ; [ %d all-zealot-vocabs 32 n-groups nth zealot-load-and-test ] with-child-options"
+        sprintf 3array
+    ] [ "./test-%d-log" sprintf ] bi
+
+    <process>
+        swap >>stdout
+        swap >>command
+        +closed+ >>stdin
+        +stdout+ >>stderr
+        60 minutes >>timeout
+        +new-group+ >>group ;
+
 : zealot-test-commands ( path -- )
+     [
+        32 <iota> [
+             load-and-test-command
+        ] map [ try-process ] parallel-each
+     ] with-directory ;
+
+: zealot-test-commands-old ( path -- )
     [
         factor-path "-i=factor.image" "-e=USE: zealot.factor USE: tools.test [ zealot-core-vocabs test-vocabs ] with-child-options" 3array
         "./test-core-log" zealot-test-command
