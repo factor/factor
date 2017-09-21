@@ -1,20 +1,25 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit kernel locals make math math.order
-math.parser namespaces sequences simple-flat-file splitting
-strings unicode.data ;
+combinators.short-circuit combinators.smart kernel locals make
+math math.order math.parser namespaces sequences
+simple-flat-file splitting strings unicode.data ;
 IN: unicode.collation
 
 <PRIVATE
 
 SYMBOL: ducet
 
-TUPLE: weight primary secondary tertiary ignorable? ;
+TUPLE: weight-levels primary secondary tertiary ignorable? ;
+: <weight-levels> ( primary secondary tertiary -- weight-levels> )
+    weight-levels new
+        swap >>tertiary
+        swap >>secondary
+        swap >>primary ; inline
 
 : parse-weight ( string -- weight )
     "]" split but-last [
-        weight new swap rest unclip char: * = swapd >>ignorable?
+        weight-levels new swap rest unclip char: * = swapd >>ignorable?
         swap "." split first3 [ hex> ] tri@
         [ >>primary ] [ >>secondary ] [ >>tertiary ] tri*
     ] map ;
@@ -23,10 +28,9 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     " " split [ hex> ] "" map-as ;
 
 : parse-ducet ( file -- ducet )
-    load-data-file
-    [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
+    load-data-file [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
-"vocab:unicode/collation/allkeys.txt" parse-ducet ducet set-global
+"vocab:unicode/UCA/allkeys.txt" parse-ducet ducet set-global
 
 ! Fix up table for long contractions
 : help-one ( assoc key -- )
@@ -37,32 +41,45 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     ] if ;
 
 : insert-helpers ( assoc -- )
-    dup keys [ length 3 >= ] filter
-    [ help-one ] with each ;
+    dup keys [ length 3 >= ] filter [ help-one ] with each ;
 
 ducet get-global insert-helpers
 
+: tangut-block? ( char -- ? )
+    ! Tangut Block, Tangut Components Block
+    { [ 0x17000 0x187FF between? ] [ 0x18800 0x18AFF between? ] } 1|| ; inline
+
+! Unicode TR10 - Computing Implicit Weights
 : base ( char -- base )
     {
         { [ dup 0x3400 0x4DB5 between? ] [ drop 0xFB80 ] } ! Extension A
         { [ dup 0x20000 0x2A6D6 between? ] [ drop 0xFB80 ] } ! Extension B
-        { [ dup 0x4E00 0x9FC3 between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x2A700 0x2B734 between? ] [ drop 0xFB80 ] } ! Extension C
+        { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
+        { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
+        { [ dup 0x4E00 0x9FD5 between? ] [ drop 0xFB40 ] } ! CJK
         [ drop 0xFBC0 ] ! Other
     } cond ;
 
-: AAAA ( char -- weight )
-    [ base ] [ -15 shift ] bi + 0x20 2 f weight boa ;
+: tangut-AAAA ( char -- weight-levels )
+    drop 0xfb00 0x0020 0x0002 <weight-levels> ; inline
 
-: BBBB ( char -- weight )
-    0x7FFF bitand 0x8000 bitor 0 0 f weight boa ;
+: tangut-BBBB ( char -- weight-levels )
+    0x17000 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
-: illegal? ( char -- ? )
-    { [ "Noncharacter_Code_Point" property? ] [ category "Cs" = ] } 1|| ;
+: AAAA ( char -- weight-levels )
+    [ base ] [ -15 shift ] bi + 0x0020 0x0002 <weight-levels> ; inline
 
-: derive-weight ( char -- weights )
-    first dup illegal?
-    [ drop { } ]
-    [ [ AAAA ] [ BBBB ] bi 2array ] if ;
+: BBBB ( char -- weight-levels )
+    0x7FFF bitand 0x8000 bitor 0 0 <weight-levels> ; inline
+
+: derive-weight ( 1string -- weight-levels-pair )
+    first
+    dup tangut-block? [
+        [ tangut-AAAA ] [ tangut-BBBB ] bi
+    ] [
+        [ AAAA ] [ BBBB ] bi
+    ] if 2array ;
 
 : building-last ( -- char )
     building get empty? [ 0 ] [ building get last last ] if ;
@@ -91,34 +108,37 @@ ducet get-global insert-helpers
 : string>graphemes ( string -- graphemes )
     [ [ add ] each ] { } make ;
 
+: char>weight-levels ( 1string -- weight-levels )
+    ducet get-global ?at [ derive-weight ] unless ; inline
+
 : graphemes>weights ( graphemes -- weights )
     [
-        dup weight? [ 1array ] ! From tailoring
-        [ dup ducet get-global at [ ] [ derive-weight ] ?if ] if
+        dup weight-levels?
+        [ 1array ] ! From tailoring
+        [ char>weight-levels ] if
     ] { } map-as concat ;
 
-: append-weights ( weights quot -- )
+: append-weights ( weight-levels quot -- seq )
     [ [ ignorable?>> ] reject ] dip
-    map [ zero? ] reject % 0 , ; inline
+    map [ zero? ] reject ; inline
 
-: variable-weight ( weight -- )
-    dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if , ;
+: variable-weight ( weight-levels -- obj )
+    dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if ;
 
-: weights>bytes ( weights -- byte-array )
+: weights>bytes ( weights -- array )
     [
         {
-            [ [ primary>> ] append-weights ]
-            [ [ secondary>> ] append-weights ]
-            [ [ tertiary>> ] append-weights ]
-            [ [ variable-weight ] each ]
+            [ [ primary>> ] append-weights { 0 } ]
+            [ [ secondary>> ] append-weights { 0 } ]
+            [ [ tertiary>> ] append-weights { 0 } ]
+            [ [ variable-weight ] map ]
         } cleave
-    ] { } make ;
+    ] { } append-outputs-as ;
 
 PRIVATE>
 
 : completely-ignorable? ( weight -- ? )
-    [ primary>> ] [ secondary>> ] [ tertiary>> ] tri
-    [ zero? ] tri@ and and ;
+    { [ primary>> zero? ] [ secondary>> zero? ] [ tertiary>> zero? ] } 1&& ;
 
 : filter-ignorable ( weights -- weights' )
     f swap [

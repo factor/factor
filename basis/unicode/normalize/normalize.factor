@@ -97,17 +97,17 @@ HINTS: (nfkd) string ;
 : --final? ( str i -- ? )
     2 + swap ?nth final? ;
 
-: imf, ( str i -- str i )
+: imf% ( str i -- str i )
     [ tail-slice first3 jamo>hangul , ]
     [ 3 + ] 2bi ;
 
-: im, ( str i -- str i )
+: im% ( str i -- str i )
     [ tail-slice first2 final-base jamo>hangul , ]
     [ 2 + ] 2bi ;
 
 : compose-jamo ( str i -- str i )
     2dup initial-medial? [
-        2dup --final? [ imf, ] [ im, ] if
+        2dup --final? [ imf% ] [ im% ] if
     ] [ 2dup swap nth , 1 + ] if ;
 
 : pass-combining ( str -- str i )

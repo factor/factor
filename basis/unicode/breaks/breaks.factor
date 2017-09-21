@@ -129,7 +129,7 @@ CONSTANT: word-break-classes H{
 }
 
 "word-break-table" create-word-in
-"vocab:unicode/data/WordBreakProperty.txt"
+"resource:basis/unicode/UCD/auxiliary/WordBreakProperty.txt"
 load-interval-file dup array>>
 [ 2 swap [ word-break-classes at ] change-nth ] each
 define-constant
