@@ -293,6 +293,12 @@ ERROR: mismatched-terminator n string slice ;
         f
     ] if ; inline
 
+ERROR: compound-syntax-disallowed seq i obj ;
+: check-for-compound-syntax ( seq -- seq' )
+    dup [ length 1 > ] find
+    [ compound-syntax-disallowed ] [ drop ] if*
+    concat ;
+
 : string>literals ( string -- sequence )
     [ 0 ] dip [
         [
@@ -306,7 +312,7 @@ ERROR: mismatched-terminator n string slice ;
                 ] loop
             ] { } make f like [ , ] when* over
         ] loop
-    ] { } make 2nip ;
+    ] { } make 2nip check-for-compound-syntax ;
 
 : vocab>literals ( vocab -- sequence )
     ".private" ?tail drop
