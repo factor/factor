@@ -92,7 +92,7 @@ XML-ERROR: quoteless-attr ;
 
 XML-ERROR: attr-w/< ;
 
-XML-ERROR: text-w/]]> ;
+XML-ERROR: text-with-double-close-bracket ;
 
 XML-ERROR: duplicate-attr key values ;
 

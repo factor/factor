@@ -152,14 +152,15 @@ HINTS: next* { spot } ;
 : parse-char ( quot: ( ch -- ? ) -- seq )
     512 <sbuf> [ spot get (parse-char) ] keep "" like ; inline
 
-: assure-no-]]> ( pos char -- pos' )
-    "]]>" next-matching dup 2 > [ text-w/]]> ] when ; inline
+: assure-no-double-bracket ( pos char -- pos' )
+    "]]>" next-matching
+    dup 2 > [ text-with-double-close-bracket ] when ; inline
 
 :: parse-text ( -- string )
     depth get zero? :> no-text
     0 :> pos!
     |[ char |
-        pos char assure-no-]]> pos!
+        pos char assure-no-double-bracket pos!
         no-text [
             char blank? char char: < eq? or [
                 char 1string t pre/post-content

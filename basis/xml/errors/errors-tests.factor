@@ -30,7 +30,7 @@ T{ bad-name f 1 3 "-" } "<-/>" xml-error-test
 T{ quoteless-attr f 1 12 } "<x value=<->/>" xml-error-test
 T{ quoteless-attr f 1 10 } "<x value=3/>" xml-error-test
 T{ attr-w/< f 1 11 } "<x value='<'/>" xml-error-test
-T{ text-w/]]> f 1 6 } "<x>]]></x>" xml-error-test
+T{ text-with-double-close-bracket f 1 6 } "<x>]]></x>" xml-error-test
 T{ duplicate-attr f 1 21 T{ name { space "" } { main "this" } } V{ "a" "b" } } "<x this='a' this='b'/>" xml-error-test
 T{ bad-cdata f 1 3 } "<![CDATA[]]><x/>" xml-error-test
 T{ bad-cdata f 1 7 } "<x/><![CDATA[]]>" xml-error-test
