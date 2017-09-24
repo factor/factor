@@ -8,7 +8,7 @@ IN: escape-strings
     [ f f f ] dip [
         {
             { char: = [ [ dup [ 1 + ] when ] bi@ ] }
-            { char: ] [ [ [ 0 or ] 2dip [ max ] curry dip ] when* 0 ] }
+            { char: \] [ [ [ 0 or ] 2dip [ max ] curry dip ] when* 0 ] }
             [ 2drop f ]
         } case
     ] each 2drop ;
