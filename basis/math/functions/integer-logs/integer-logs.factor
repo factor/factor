@@ -81,20 +81,20 @@ GENERIC: (integer-log2) ( x -- n ) foldable
 
 M: integer (integer-log2) ( x -- n ) (log2) ; inline
 
-: ((ratio-integer-log)) ( ratio quot -- log )
+: (ratio-integer-log) ( ratio quot -- log )
     [ >integer ] dip call ; inline
 
-: (ratio-integer-log) ( ratio quot base -- log )
+: ratio-integer-log ( ratio quot base -- log )
     pick 1 >=
-    [ drop ((ratio-integer-log)) ] [
+    [ drop (ratio-integer-log) ] [
         [ recip ] 2dip
-        [ drop ((ratio-integer-log)) ] [ nip pick ^ = ] 3bi
+        [ drop (ratio-integer-log) ] [ nip pick ^ = ] 3bi
         [ 1 + ] unless neg
     ] if ; inline
 
-M: ratio (integer-log2) ( r -- n ) [ (integer-log2) ] 2 (ratio-integer-log) ;
+M: ratio (integer-log2) ( r -- n ) [ (integer-log2) ] 2 ratio-integer-log ;
 
-M: ratio (integer-log10) ( r -- n )  [ (integer-log10) ] 10 (ratio-integer-log) ;
+M: ratio (integer-log10) ( r -- n )  [ (integer-log10) ] 10 ratio-integer-log ;
 
 : (integer-log) ( x quot -- n )
     [ dup 0 > ] dip [ log-expects-positive ] if ; inline
