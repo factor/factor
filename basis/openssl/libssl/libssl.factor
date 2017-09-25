@@ -319,42 +319,6 @@ STRUCT: ssl_method_st
     { ssl_ctx_callback_ctrl void* } ;
 TYPEDEF: ssl_method_st* ssl-method
 
-STRUCT: CRYPTO_EX_DATA
-    { dummy int } ;
-
-STRUCT: BIGNUM
-    { d void* }
-    { top int }
-    { dmax int }
-    { neg int }
-    { flags int } ;
-
-STRUCT: TLS_SESSION_TICKET_EXT
-    { length ushort }
-    { data void* } ;
-
-STRUCT: SRTP_PROTECTION_PROFILE
-    { name char* }
-    { id ulong } ;
-
-STRUCT: SRP_CTX
-    { SRP_cb_arg void* }
-    { TLS_ext_srp_username_callback void* }
-    { SRP_verify_param_callback void* }
-    { SRP_give_srp_client_pwd_callback void* }
-    { login char* }
-    { N BIGNUM* }
-    { g BIGNUM* }
-    { s BIGNUM* }
-    { B BIGNUM* }
-    { A BIGNUM* }
-    { a BIGNUM* }
-    { b BIGNUM* }
-    { v BIGNUM* }
-    { info char* }
-    { strength int }
-    { srp_Mask ulong } ;
-
 STRUCT: SSL
     { version int }
     { type int }
@@ -407,47 +371,7 @@ STRUCT: SSL
     { kssl_ctx void* }
     { psk_client_callback void* }
     { psk_server_callback void* }
-    { ctx SSL_CTX* }
-    { debug int }
-    { verify_result long }
-    { ex_data CRYPTO_EX_DATA }
-    { references int }
-    { options ulong }
-    { mode ulong }
-    { max_cert_list long }
-    { first_packet int }
-    { client_version int }
-    { max_send_fragment uint }
-    { tlsext_debug_cb void* }
-    { tlsext_debug_arg void* }
-    { tlsext_hostname char* }
-    { servername_done int }
-    { tlsext_status_type int }
-    { tlsext_status_expected int }
-    { tlsext_ocsp_exts X509_EXTENSION* } ! X509_EXTENSIONS
-    { tlsext_ocsp_resp uchar* }
-    { tlsext_ocsp_resplen int }
-    { tlsext_ticket_expected int }
-    { tlsext_ecpointformatlist_length size_t }
-    { tlsext_ecpointformatlist uchar* }
-    { tlsext_ellipticcurvelist_length size_t }
-    { tlsext_ellipticcurvelist uchar* }
-    { tlsext_opaque_prf_input void* }
-    { tlsext_opaque_prf_input_len size_t }
-    { tlsext_session_ticket TLS_SESSION_TICKET_EXT* }
-    { tls_session_ticket_ext_cb void* }
-    { tls_session_ticket_ext_cb_arg void* }
-    { tls_session_secret_cb void* }
-    { tls_session_secret_cb_arg void* }
-    { initial_ctx SSL_CTX* }
-    { next_proto_negotiated uchar* }
-    { next_proto_negotiated_len uchar }
-    { srtp_profile SRTP_PROTECTION_PROFILE* }
-    { tlsext_heartbeat uint }
-    { tlsext_hb_pending uint }
-    { tlsext_hb_seq uint }
-    { renegotiate int }
-    { srp_ctx SRP_CTX } ;
+    { ctx SSL_CTX* } ;
 
 ! ------------------------------------------------------------------------------
 ! API >= 1.1.0
