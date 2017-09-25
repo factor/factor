@@ -62,6 +62,7 @@ ARITY: \SLOT: 1
 ARITY: \SYMBOL: 1
 ARITY: \UNUSE: 1
 ARITY: \USE: 1
+! ARITY: \USING: 0
 
 : get-arity ( string -- n/f )
     arities get at ;
