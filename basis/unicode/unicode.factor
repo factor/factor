@@ -196,15 +196,12 @@ PRIVATE>
 : string<=> ( str1 str2 -- <=> )
     [ collation-key/nfd 2array ] compare ;
 
-: unicode-supported ( -- strs )
-    {
-        "collation"
-    } ;
+CONSTANT: unicode-supported {
+    "collation"
+}
 
-: unicode-unsupported ( -- strs )
-    {
-        "bidi"
-    } ;
+CONSTANT: unicode-unsupported {
+    "bidi"
+}
 
-: unicode-version ( -- str )
-    "9.0" ;
+CONSTANT: unicode-version "10.0"
