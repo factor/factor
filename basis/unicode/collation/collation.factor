@@ -131,7 +131,7 @@ ducet get-global insert-helpers
             [ [ primary>> ] append-weights { 0 } ]
             [ [ secondary>> ] append-weights { 0 } ]
             [ [ tertiary>> ] append-weights { 0 } ]
-            [ [ variable-weight ] map ]
+            [ [ [ secondary>> ] [ tertiary>> ] bi [ zero? ] bi@ and not ] filter [ variable-weight ] map ]
         } cleave
     ] { } append-outputs-as ;
 
