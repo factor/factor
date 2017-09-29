@@ -8,5 +8,18 @@ IN: escape-strings.tests
 { "[=[]]]=]" } [ "]]" escape-string ] unit-test
 
 { "[===[]]]==][=[=]=]]===]" } [ "]]]==][=[=]=]" escape-string ] unit-test
-{ "[[[=[=]=]]]" } [ "[=[=]=]" escape-string ] unit-test
+{ "[==[[=[=]=]]==]" } [ "[=[=]=]" escape-string ] unit-test
 { "[[[a[]]" } [ "[a[" escape-string ] unit-test
+
+{ "[=[ab]]=]" } [ "ab]" escape-string ] unit-test
+
+{ "[==[[=[abcd]]=]]==]" } [ { "abcd]" } escape-strings ] unit-test
+{ "[==[[=[abcd]]]=]]==]" } [ { "abcd]]" } escape-strings ] unit-test
+
+{ "[==[]]ab]=]==]" } [ "]]ab]=" escape-string ] unit-test
+{ "[=[]]ab]==]=]" } [ "]]ab]==" escape-string ] unit-test
+{ "[=[]]ab]===]=]" } [ "]]ab]===" escape-string ] unit-test
+
+{ "[[]ab]=]]" } [ "]ab]=" escape-string ] unit-test
+{ "[[]ab]==]]" } [ "]ab]==" escape-string ] unit-test
+{ "[[]ab]===]]" } [ "]ab]===" escape-string ] unit-test

@@ -1,22 +1,41 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math math.order sequences ;
+USING: combinators kernel math math.order math.statistics
+sequences sequences.extras sets ;
 IN: escape-strings
 
-! TODO: Move the "]]" subseq? check into the each loop logic
-: #escapes ( str -- n/f )
-    [ f f f ] dip [
+: find-escapes ( str -- set )
+    [ HS{ } clone 0 0 ] dip
+    [
         {
-            { char: = [ [ dup [ 1 + ] when ] bi@ ] }
-            { char: \] [ [ [ 0 or ] 2dip [ max ] curry dip ] when* 0 ] }
-            [ 2drop f ]
+            { char: \] [ 1 + dup 2 = [ drop over adjoin 0 1 ] when ] }
+            { char: = [ dup 1 = [ [ 1 + ] dip ] when ] }
+            [ 3drop 0 0 ]
         } case
-    ] each 2drop ;
+    ] each 0 > [ over adjoin ] [ drop ] if ;
+
+: lowest-missing ( set -- min )
+    members dup [ = not ] find-index
+    [ nip ] [ drop length ] if ;
+
+: escape-string* ( str n -- str' )
+    char: = <repetition>
+    [ "[" dup surround ] [ "]" dup surround ] bi surround ;
 
 : escape-string ( str -- str' )
-    "]]" over subseq? [
-        dup #escapes ?1+ char: = <repetition>
-        [ "[" dup surround ] [ "]" dup surround ] bi surround
+    dup find-escapes lowest-missing escape-string* ;
+
+: escape-strings ( strs -- str )
+    dup [ find-escapes ] map
+    [
+        [ lowest-missing ] map
+        [ escape-string* ] 2map concat
     ] [
-        "[[" "]]" surround
-    ] if ;
+        [ ] [ union ] map-reduce
+    ] bi
+    dup cardinality 0 = [
+        drop 1
+    ] [
+        members minmax nip 2 +
+    ] if
+    escape-string* ;
