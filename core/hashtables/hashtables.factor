@@ -154,8 +154,8 @@ M: hashtable set-at
 
 : collect-pairs ( hash quot: ( key value -- elt ) -- seq )
     [ [ array>> 0 swap ] [ assoc-size f <array> ] bi ] dip swap [
-        [ [ over ] dip set-nth-unsafe 1 + ] curry compose each-pair
-    ] keep nip ; inline
+        [ [ over ] dip set-nth-unsafe 1 + ] curry compose each-pair drop
+    ] keep ; inline
 
 PRIVATE>
 

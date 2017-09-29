@@ -125,8 +125,8 @@ M: hash-set ?adjoin
 
 M: hash-set members
     [ array>> 0 swap ] [ cardinality f <array> ] bi [
-        [ [ over ] dip set-nth-unsafe 1 + ] curry each-member
-    ] keep nip ;
+        [ [ over ] dip set-nth-unsafe 1 + ] curry each-member drop
+    ] keep ;
 
 M: hash-set clone
     (clone) [ clone ] change-array ; inline
