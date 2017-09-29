@@ -620,3 +620,10 @@ PRIVATE>
 : drop-while ( ... seq quot: ( ... elt -- ... ? ) -- tail-slice )
     [ '[ @ not ] find drop ] 2keep drop swap
     [ dup length ] unless* tail-slice ; inline
+
+: count-head ( seq quot -- n )
+    [ not ] compose find drop ; inline
+
+: count-tail ( seq quot -- n )
+    [ not ] compose [ find-last drop ] 2keep drop
+    length swap [ - 1 - ] when* ; inline
