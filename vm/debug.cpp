@@ -269,7 +269,7 @@ void dump_memory_range(ostream& out, const char* name, cell name_w,
   out << setw(name_w) << left << name << ": ";
 
   out << "[" << (void*)start << " -> " << (void*)end << "] ";
-  out << setw(10) << right << (end - start) << " bytes" << endl;
+  out << setw(14) << right << (end - start) << " bytes" << endl;
 }
 
 template <typename Generation>
