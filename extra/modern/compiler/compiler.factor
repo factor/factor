@@ -1,7 +1,8 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.short-circuit fry
-kernel lexer modern namespaces sequences sets strings ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit constructors fry kernel lexer modern
+namespaces sequences sets strings ;
 IN: modern.compiler
 
 <<
@@ -90,3 +91,23 @@ VARIABLE-ARITY: \WORD: 2
 
 VARIABLE-ARITY: \<CLASS: 3
 VARIABLE-ARITY: \<FUNCTOR: 2
+
+
+TUPLE: vocabulary-root uri path ;
+CONSTRUCTOR: <vocabulary-root> vocabulary-root ( uri path -- obj ) ;
+
+TUPLE: vocabulary name words main ;
+CONSTRUCTOR: <vocabulary> vocabulary ( name -- obj )
+    H{ } clone >>words ;
+
+CONSTANT: core-root T{ vocabulary-root f "git@github.com:factor/factor" "core/" }
+CONSTANT: basis-root T{ vocabulary-root f "git@github.com:factor/factor" "basis/" }
+CONSTANT: extra-root T{ vocabulary-root f "git@github.com:factor/factor" "extra/" }
+
+: syntax-vocabulary ( -- vocabulary )
+    "syntax" <vocabulary> ;
+
+TUPLE: word name effect quot ;
+
+: add-word ( word vocabulary -- )
+    [ dup name>> ] [ words>> ] bi* set-at ;
