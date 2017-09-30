@@ -1,8 +1,8 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit constructors fry kernel lexer modern
-namespaces sequences sets splitting strings ;
+combinators.short-circuit constructors fry kernel lexer math
+modern namespaces sequences sets splitting strings ;
 IN: modern.compiler
 
 <<
@@ -146,6 +146,9 @@ TUPLE: lexed tokens ;
 TUPLE: comment < lexed payload ;
 CONSTRUCTOR: <comment> comment ( tokens payload -- obj ) ;
 
+TUPLE: escaped-identifier < lexed name ;
+CONSTRUCTOR: <escaped-identifier> escaped-identifier ( tokens name -- obj ) ;
+
 TUPLE: section < lexed tag payload ;
 CONSTRUCTOR: <section> section ( tokens tag payload -- obj ) ;
 
@@ -161,28 +164,92 @@ CONSTRUCTOR: <lower-colon> lower-colon ( tokens tag payload -- obj ) ;
 TUPLE: matched < lexed tag payload ;
 CONSTRUCTOR: <matched> matched ( tokens tag payload -- obj ) ;
 
+TUPLE: single-bracket < matched ;
+CONSTRUCTOR: <single-bracket> single-bracket ( tokens tag payload -- obj ) ;
+
+TUPLE: double-bracket < matched ;
+CONSTRUCTOR: <double-bracket> double-bracket ( tokens tag payload -- obj ) ;
+
+
+TUPLE: single-brace < matched ;
+CONSTRUCTOR: <single-brace> single-brace ( tokens tag payload -- obj ) ;
+
+TUPLE: double-brace < matched ;
+CONSTRUCTOR: <double-brace> double-brace ( tokens tag payload -- obj ) ;
+
+
+TUPLE: single-paren < matched ;
+CONSTRUCTOR: <single-paren> single-paren ( tokens tag payload -- obj ) ;
+
+TUPLE: double-paren < matched ;
+CONSTRUCTOR: <double-paren> double-paren ( tokens tag payload -- obj ) ;
+
+
 TUPLE: identifier < lexed name ;
 CONSTRUCTOR: <identifier> identifier ( tokens name -- obj ) ;
 
-TUPLE: unknown < lexed ;
-CONSTRUCTOR: <unknown> unknown ( tokens -- obj ) ;
+ERROR: unknown-literal tokens ;
 
-
-: literal>tuple ( obj -- tuple )
+DEFER: literal>tuple
+: literal>tuple* ( obj -- tuple )
     {
-        { [ dup slice? ] [ [ ] [ >string ] bi <identifier> ] }
-        { [ dup ?first ?last "([{" member? ] [ { [ ] [ first >string ] [ rest but-last [ literal>tuple ] map ] } cleave <matched> ] }
+        ! Comment has to be first
+        { [ dup ?first "!" head? ] [
+            [ ] [ ?second >string ] bi <comment>
+        ] }
+
+        { [ dup ?first "\\" head? ] [
+            [ ] [ ?second >string ] bi <escaped-identifier>
+        ] }
+
         { [ dup ?first section-open? ] [
             dup first ":" tail? [
-                { [ ] [ first "<" ?head drop ] [ second >string ] [ rest but-last [ literal>tuple ] map ] } cleave <named-section>
+                { [ ] [ first "<" ?head drop ":" ?tail drop ] [ ?second ?first >string ] [ ?second dup length 0 > [ rest dup [ [ literal>tuple ] map ] when ] when ] } cleave <named-section>
             ] [
-                [ ] [ first "<" ?head drop ] [ rest but-last [ literal>tuple ] map ] tri <section>
+                [ ] [ first "<" ?head drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <section>
             ] if
         ] }
+        { [ dup { [ ?first ":" tail? ] [ ?first strict-upper? ] } 1&& ] [
+            ! : .. ;  FOO: ;
+            [ ] [ ?first ":" ?tail drop ] [ rest dup ?last ";" tail? [ but-last ] when ?first dup [ [ literal>tuple ] map ] when ] tri <upper-colon>
+        ] }
+        { [ dup ?first ":" tail? ] [
+            ! foo: 123
+            [ ] [ ?first >string ] [ second literal>tuple ] tri <lower-colon>
+        ] }
+        { [ dup ?first "[" tail? ] [
+            [ ] [ ?first "[" ?tail drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <single-bracket>
+        ] }
+        { [ dup ?first "{" tail? ] [
+            [ ] [ ?first "{" ?tail drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <single-brace>
+        ] }
+        { [ dup ?first "(" tail? ] [
+            [ ] [ ?first "(" ?tail drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <single-paren>
+        ] }
+        { [ dup ?second "[" head? ] [
+            [ ] [ ?first ] [ 2 tail but-last ] tri <double-bracket>
+        ] }
+        { [ dup ?second "{" head? ] [
+            [ ] [ ?first ] [ 2 tail but-last ] tri <double-brace>
+        ] }
+        { [ dup ?second "(" head? ] [
+            [ ] [ ?first ] [ 2 tail but-last ] tri <double-paren>
+        ] }
+
         { [ dup array? ] [ [ literal>tuple ] map ] }
 
-        [ <unknown> ]
+        [ unknown-literal ]
     } cond ;
+
+: literal>tuple ( obj -- tuple )
+    dup { [ slice? ] [ string? ] } 1|| [
+        [ ] [ >string ] bi <identifier>
+    ] [
+        literal>tuple*
+    ] if ;
+
+: literals>tuples ( seq -- seq' )
+    [ literal>tuple ] map ;
 
 
 : literals>vocabulary ( literals -- vocabulary )
