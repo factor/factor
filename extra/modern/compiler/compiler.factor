@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit constructors fry kernel lexer modern
-namespaces sequences sets strings ;
+namespaces sequences sets splitting strings ;
 IN: modern.compiler
 
 <<
@@ -111,3 +111,79 @@ TUPLE: word name effect quot ;
 
 : add-word ( word vocabulary -- )
     [ dup name>> ] [ words>> ] bi* set-at ;
+
+
+: find-sections ( literals -- sections )
+    [ ?first section-open? ] filter ;
+
+DEFER: map-literals
+: map-literal ( obj quot: ( obj -- obj' ) -- obj )
+    over { [ array? ] [ ?first section-open? ] } 1&& [
+        [ first3 swap ] dip map-literals swap 3array
+    ] [
+        call
+    ] if ; inline recursive
+
+: map-literals ( seq quot: ( obj -- obj' ) -- seq' )
+    '[ _ map-literal ] map ; inline recursive
+
+
+DEFER: map-literals!
+: map-literal! ( obj quot: ( obj -- obj' ) -- obj )
+    over { [ array? ] [ ?first section-open? ] } 1&& [
+        [ call drop ] [
+            map-literals!
+        ] 2bi
+    ] [
+        call
+    ] if ; inline recursive
+
+: map-literals! ( seq quot: ( obj -- obj' ) -- seq )
+    '[ _ map-literal! ] map! ; inline recursive
+
+TUPLE: lexed tokens ;
+
+TUPLE: comment < lexed payload ;
+CONSTRUCTOR: <comment> comment ( tokens payload -- obj ) ;
+
+TUPLE: section < lexed tag payload ;
+CONSTRUCTOR: <section> section ( tokens tag payload -- obj ) ;
+
+TUPLE: named-section < lexed tag name payload ;
+CONSTRUCTOR: <named-section> named-section ( tokens tag name payload -- obj ) ;
+
+TUPLE: upper-colon < lexed tag payload ;
+CONSTRUCTOR: <upper-colon> upper-colon ( tokens tag payload -- obj ) ;
+
+TUPLE: lower-colon < lexed tag payload ;
+CONSTRUCTOR: <lower-colon> lower-colon ( tokens tag payload -- obj ) ;
+
+TUPLE: matched < lexed tag payload ;
+CONSTRUCTOR: <matched> matched ( tokens tag payload -- obj ) ;
+
+TUPLE: identifier < lexed name ;
+CONSTRUCTOR: <identifier> identifier ( tokens name -- obj ) ;
+
+TUPLE: unknown < lexed ;
+CONSTRUCTOR: <unknown> unknown ( tokens -- obj ) ;
+
+
+: literal>tuple ( obj -- tuple )
+    {
+        { [ dup slice? ] [ [ ] [ >string ] bi <identifier> ] }
+        { [ dup ?first ?last "([{" member? ] [ { [ ] [ first >string ] [ rest but-last [ literal>tuple ] map ] } cleave <matched> ] }
+        { [ dup ?first section-open? ] [
+            dup first ":" tail? [
+                { [ ] [ first "<" ?head drop ] [ second >string ] [ rest but-last [ literal>tuple ] map ] } cleave <named-section>
+            ] [
+                [ ] [ first "<" ?head drop ] [ rest but-last [ literal>tuple ] map ] tri <section>
+            ] if
+        ] }
+        { [ dup array? ] [ [ literal>tuple ] map ] }
+
+        [ <unknown> ]
+    } cond ;
+
+
+: literals>vocabulary ( literals -- vocabulary )
+    ;
