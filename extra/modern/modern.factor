@@ -171,8 +171,13 @@ ERROR: unexpected-terminator n string slice ;
 : section-close? ( string -- ? )
     {
         [ length 2 >= ]
-        [ but-last strict-upper? ]
         [ ">" tail? ]
+        [
+            {
+                [ but-last strict-upper? ]
+                [ { [ ";" head? ] [ rest but-last strict-upper? ] } 1&& ]
+            } 1||
+        ]
     } 1&& ;
 
 : read-til-semicolon ( n string slice -- n' string semi )
@@ -219,6 +224,11 @@ ERROR: no-backslash-payload n string slice ;
 ERROR: mismatched-terminator n string slice ;
 : read-terminator ( n string slice -- n' string slice ) ;
 
+! If we are at the end of the string, we need to be at position len instead of f
+! after a read. Especially for "<FOO BAR: baz FOO>"
+: ?length-and-string ( length/f string -- length string )
+    over [ nip [ length ] [ ] bi ] unless ; inline
+
 : (lex-factor) ( n/f string slice/f ch/f -- n'/f string literal )
     {
         { char: \" [ read-string ] }
@@ -253,6 +263,7 @@ ERROR: mismatched-terminator n string slice ;
             [ slice-til-whitespace drop ] dip span-slices
             dup section-close? [
                 strict-upper get [
+                    [ ?length-and-string ] dip
                     length swap [ - ] dip f strict-upper off
                 ] when
             ] when

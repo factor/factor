@@ -164,3 +164,16 @@ IN: modern.tests
     }
 } [ "\"abc\"[ 0 ]" string>literals >strings ] unit-test
 ]]
+
+
+{
+    {
+        { "<FOO" { { "BAR:" { "bar" } } } "FOO>" }
+    }
+} [ "<FOO BAR: bar FOO>" string>literals >strings ] unit-test
+
+{
+    {
+        { "<FOO:" { "foo" { "BAR:" { "bar" } } } ";FOO>" }
+    }
+} [ "<FOO: foo BAR: bar ;FOO>" string>literals >strings ] unit-test
