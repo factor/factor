@@ -51,7 +51,7 @@ CONSTANT: key-locations H{
     { key-p             { { 105  25 } {  10  10 } } }
     { key-lbracket      { { 115  25 } {  10  10 } } }
     { key-rbracket      { { 125  25 } {  10  10 } } }
-    { key-\             { { 135  25 } {  15  10 } } }
+    { \key-\             { { 135  25 } {  15  10 } } }
 
     { key-caps-lock     { {   0  35 } {  20  10 } } }
     { key-a             { {  20  35 } {  10  10 } } }
