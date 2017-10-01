@@ -135,10 +135,10 @@ set-specializer
 
 \ base> { string fixnum } set-specializer
 
-M\ hashtable at*
+m: { hashtable at* }
 { { fixnum object } { word object } }
 set-specializer
 
-M\ hashtable set-at
+m: { hashtable set-at }
 { { object fixnum object } { object word object } }
 set-specializer

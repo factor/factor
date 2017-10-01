@@ -18,7 +18,7 @@ M: a x drop a ;
 { a } [ T{ a2 } x ] unit-test
 
 { t } [ T{ a3 } c? ] unit-test
-{ t } [ T{ a3 } \ x effective-method M\ c x eq? nip ] unit-test
+{ t } [ T{ a3 } \ x effective-method m: { c x } eq? nip ] unit-test
 { c } [ T{ a3 } x ] unit-test
 
 ! More complex case

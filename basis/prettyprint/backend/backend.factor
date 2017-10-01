@@ -61,8 +61,10 @@ M: word pprint*
 
 M: method pprint*
     <block
-    [ \ M\ pprint-word "method-class" word-prop pprint* ]
+    \ \m: pprint-word \ \{ pprint-word
+    [  "method-class" word-prop pprint* ]
     [ "method-generic" word-prop pprint-word ] bi
+    \ \} pprint-word
     block> ;
 
 : pprint-prefixed-number ( n quot: ( n -- n' ) pre -- )

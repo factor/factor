@@ -287,7 +287,7 @@ GENERIC: generic-see-test-with-f ( obj -- obj )
 M: f generic-see-test-with-f ;
 
 { "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" } [
-    [ M\ f generic-see-test-with-f see ] with-string-writer
+    [ m: { f generic-see-test-with-f } see ] with-string-writer
 ] unit-test
 
 PREDICATE: predicate-see-test < integer even? ;
@@ -314,7 +314,7 @@ GENERIC: ended-up-ballin' ( a -- b )
 M: started-out-hustlin' ended-up-ballin' ; inline
 
 { "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" } [
-    [ M\ started-out-hustlin' ended-up-ballin' see ] with-string-writer
+    [ m: { started-out-hustlin' ended-up-ballin' } see ] with-string-writer
 ] unit-test
 
 TUPLE: tuple-with-declared-slot { x integer } ;
@@ -400,13 +400,13 @@ TUPLE: bob a b ;
 TUPLE: har a ;
 GENERIC: harhar ( obj -- obj )
 M: maybe{ har } harhar ;
-M: integer harhar M\ integer harhar drop ;
+M: integer harhar m: { integer harhar } drop ;
 {
 "USING: prettyprint.tests ;
 M: maybe{ har } harhar ;
 
 USING: kernel math prettyprint.tests ;
-M: integer harhar M\\ integer harhar drop ;\n"
+M: integer harhar m: { integer harhar } drop ;\n"
 } [
     [ \ harhar see-methods ] with-string-writer
 ] unit-test

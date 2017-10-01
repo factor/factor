@@ -383,7 +383,7 @@ GENERIC: lambda-method-forget-test ( a -- b )
 
 M:: integer lambda-method-forget-test ( a -- b ) a ;
 
-{ } [ [ M\ integer lambda-method-forget-test forget ] with-compilation-unit ] unit-test
+{ } [ [ m: { integer lambda-method-forget-test } forget ] with-compilation-unit ] unit-test
 
 { 10 } [ 10 |[ A | { [ A ] } ] call first call ] unit-test
 

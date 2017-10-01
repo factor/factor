@@ -398,7 +398,7 @@ GENERIC: forget-test ( a -- b )
 
 M: integer forget-test 3 + ;
 
-{ } [ "IN: generic.standard.tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard.tests USE: math FORGET: m: { integer forget-test }" eval( -- ) ] unit-test
 
 { { } } [
     \ + all-dependencies-of keys [ method? ] filter
@@ -412,13 +412,13 @@ GENERIC: flushable-generic ( a -- b ) flushable
 M: integer flushable-generic ;
 
 { t } [ \ flushable-generic flushable? ] unit-test
-{ t } [ M\ integer flushable-generic flushable? ] unit-test
+{ t } [ m: { integer flushable-generic } flushable? ] unit-test
 
 GENERIC: non-flushable-generic ( a -- b )
 M: integer non-flushable-generic ; flushable
 
 { f } [ \ non-flushable-generic flushable? ] unit-test
-{ t } [ M\ integer non-flushable-generic flushable? ] unit-test
+{ t } [ m: { integer non-flushable-generic } flushable? ] unit-test
 
 ! method-for-object, method-for-class, effective-method
 GENERIC: foozul ( a -- b )
@@ -426,7 +426,7 @@ M: reversed foozul ;
 M: integer foozul ;
 M: slice foozul ;
 
-{ } [ reversed \ foozul method-for-class M\ reversed foozul assert= ] unit-test
+{ } [ reversed \ foozul method-for-class m: { reversed foozul } assert= ] unit-test
 { } [ { 1 2 3 } <reversed> \ foozul method-for-object M\ reversed foozul assert= ] unit-test
 { } [ { 1 2 3 } <reversed> \ foozul effective-method M\ reversed foozul assert= drop ] unit-test
 

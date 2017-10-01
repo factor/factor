@@ -49,7 +49,7 @@ $nl
 "Low-level method constructor:"
 { $subsections <method> }
 "Methods may be pushed on the stack with a literal syntax:"
-{ $subsections postpone: \M\ }
+{ $subsections postpone: \m: }
 { $see-also "see" } ;
 
 ARTICLE: "method-combination" "Custom method combination"
@@ -126,10 +126,10 @@ HELP: define-generic
 { $description "Defines a generic word. A method combination is an object which responds to the " { $link perform-combination } " generic word." }
 { $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." } ;
 
-HELP: M\
-{ $syntax "M\\ class generic" }
+HELP: \m:
+{ $syntax "m: { class generic }" }
 { $description "Pushes a method on the stack." }
-{ $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets.editors ui.render ;" "M\\ editor draw-gadget* edit" } } ;
+{ $examples { $code "m: { fixnum + } see" } { $code "USING: ui.gadgets.editors ui.render ;" "m: { editor draw-gadget* } edit" } } ;
 
 HELP: method
 { $class-description "The class of method bodies, which are words with special word properties set." } ;
@@ -177,7 +177,7 @@ HELP: (call-next-method)
     "The " { $link postpone: call-next-method } " word parses into this word. The following are equivalent:"
     { $code
         "M: class generic call-next-method ;"
-        "M: class generic M\\ class generic (call-next-method) ;"
+        "M: class generic m: { class generic } (call-next-method) ;"
     }
 } ;
 

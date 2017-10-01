@@ -116,6 +116,7 @@ IN: bootstrap.syntax
     "postpone:" [ scan-syntax-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
+    "m:" [ scan-object first2 lookup-method <wrapper> suffix! ] define-core-syntax
     "inline" [ last-word make-inline ] define-core-syntax
     "recursive" [ last-word make-recursive ] define-core-syntax
     "foldable" [ last-word make-foldable ] define-core-syntax
