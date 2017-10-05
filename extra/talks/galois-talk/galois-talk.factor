@@ -273,7 +273,7 @@ CONSTANT: galois-slides
     }
     { $slide "Compiler: low-level optimizer"
         "Redundant stack operations eliminated, intermediate floats unboxed..."
-        { $code "[ c pixel ] test-mr mr." }
+        { $code "[ c pixel ] regs." }
     }
     { $slide "Garbage collection"
         "All roots are identified precisely"
