@@ -147,7 +147,7 @@ CONSTANT: galois-slides
         "Very slow! Let's profile it..."
     }
     { $slide "Example: memoization"
-        { "Let's use " { $link POSTPONE: : } " instead of " { $link POSTPONE: MEMO: } }
+        { "Let's use " { $link POSTPONE: MEMO: } " instead of " { $link POSTPONE: : } }
         { $code
             "MEMO: fib ( m -- n )"
             "    dup 1 > ["
