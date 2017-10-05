@@ -192,8 +192,8 @@ CONSTANT: vpri-slides
         { { $link POSTPONE: EBNF: } ": a complex parsing word" }
         "Implements a custom syntax for expressing parsers: like OMeta!"
         { "Example: " { $vocab-link "printf-example" } }
-        { $code "\"vegan\" \"cheese\" \"%s is not %s\\n\" printf" }
-        { $code "5 \"Factor\" \"%s is %d years old\\n\" printf" }
+        { $code "\"cheese\" \"vegan\" \"%s is not %s\\n\" printf" }
+        { $code "\"Factor\" 5 \"%s is %d years old\\n\" printf" }
     }
     { $slide "Example: simple web browser"
         { $vocab-link "webkit-demo" }
