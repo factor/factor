@@ -75,7 +75,7 @@ HELP: bad-cdata
 { $class-description "Describes the error where CDATA is used outside of the main tag of an XML document." }
 { $xml-error "<x>y</x>\n<![CDATA[]]>" } ;
 
-HELP: text-w/]]>
+HELP: text-with-double-close-bracket
 { $class-description "Describes the error where a text node contains the literal string " { $snippet "]]>" } " which is disallowed." }
 { $xml-error "<x>Here's some text: ]]> there it was</x>" } ;
 
@@ -111,7 +111,7 @@ ARTICLE: "xml.errors" "XML parsing errors"
     unexpected-end
     duplicate-attr
     bad-cdata
-    text-w/]]>
+    text-with-double-close-bracket
     attr-w/<
     misplaced-directive
 }

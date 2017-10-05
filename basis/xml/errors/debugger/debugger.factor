@@ -128,7 +128,7 @@ M: attr-w/< error.
     call-next-method
     "Attribute value contains literal <" print ;
 
-M: text-w/]]> error.
+M: text-with-double-close-bracket error.
     call-next-method
     "Text node contains ']]>'" print ;
 

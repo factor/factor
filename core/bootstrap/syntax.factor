@@ -65,7 +65,7 @@ IN: bootstrap.syntax
         "W{"
         "["
         "\\"
-        "M\\"
+        "m:"
         "]"
         "delimiter"
         "deprecated"
@@ -89,12 +89,6 @@ IN: bootstrap.syntax
         "read-only"
         "call("
         "execute("
-        "<<<<<<"
-        "======"
-        ">>>>>>"
-        "<<<<<<<"
-        "======="
-        ">>>>>>>"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
