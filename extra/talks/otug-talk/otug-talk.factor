@@ -250,7 +250,7 @@ var price = (order == null ? null : order.price);" }
     1 >>fill
     \"Hello world!\" <label> add-gadget
     \"Click me!\" [ drop beep ]
-    <bevel-button> add-gadget
+    <border-button> add-gadget
     <editor> <scroller> add-gadget
 \"UI test\" open-window" }
     }
