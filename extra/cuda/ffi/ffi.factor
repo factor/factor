@@ -14,16 +14,25 @@ IN: cuda.ffi
 
 LIBRARY: cuda
 
-TYPEDEF: uint CUdeviceptr
-TYPEDEF: int CUdevice
-TYPEDEF: void* CUcontext
-TYPEDEF: void* CUmodule
-TYPEDEF: void* CUfunction
 TYPEDEF: void* CUarray
-TYPEDEF: void* CUtexref
+TYPEDEF: void* CUcontext
+TYPEDEF: int   CUdevice
+TYPEDEF: ulonglong  CUdeviceptr
+TYPEDEF: void* CUeglStreamConnection
 TYPEDEF: void* CUevent
-TYPEDEF: void* CUstream
+TYPEDEF: void* CUfunction
 TYPEDEF: void* CUgraphicsResource
+TYPEDEF: void* CUmipmappedArray
+TYPEDEF: void* CUmodule
+TYPEDEF: void* CUoccupancyB2DSize
+TYPEDEF: void* CUstream
+TYPEDEF: void* CUstreamCallback
+TYPEDEF: void* CUsurfObject
+TYPEDEF: void* CUsurfref
+TYPEDEF: void* CUtexObject
+TYPEDEF: void* CUtexref
+TYPEDEF: void* CUlinkState
+TYPEDEF: void* CUjitInputType
 
 ! versions of double and longlong that always 8-byte align
 
@@ -138,10 +147,122 @@ ENUM: CUfunc_cache
     { CU_FUNC_CACHE_PREFER_SHARED 0x01 }
     { CU_FUNC_CACHE_PREFER_L1     0x02 } ;
 
+ENUM: CUshared_carveout
+    { CU_SHAREDMEM_CARVEOUT_DEFAULT -1 }
+    { CU_SHAREDMEM_CARVEOUT_MAX_SHARED 100 }
+    { CU_SHAREDMEM_CARVEOUT_MAX_L1 0 } ;
+
+ENUM: CUsharedconfig
+    { CU_SHARED_MEM_CONFIG_DEFAULT_BANK_SIZE 0x00 }
+    { CU_SHARED_MEM_CONFIG_FOUR_BYTE_BANK_SIZE 0x01 }
+    { CU_SHARED_MEM_CONFIG_EIGHT_BYTE_BANK_SIZE 0x02 } ;
+
+ENUM: CUstreamBatchMemOpType
+    { CU_STREAM_MEM_OP_WAIT_VALUE_32 1 }
+    { CU_STREAM_MEM_OP_WRITE_VALUE_32 2 }
+    { CU_STREAM_MEM_OP_WAIT_VALUE_64 4 }
+    { CU_STREAM_MEM_OP_WRITE_VALUE_64 5 }
+    { CU_STREAM_MEM_OP_FLUSH_REMOTE_WRITES 3 } ;
+
+ENUM: CUstreamWaitValue_flags
+    { CU_STREAM_WAIT_VALUE_GEQ 0x0 }
+    { CU_STREAM_WAIT_VALUE_EQ 0x1 }
+    { CU_STREAM_WAIT_VALUE_AND 0x2 }
+    { CU_STREAM_WAIT_VALUE_NOR 0x3 }
+    { CU_STREAM_WAIT_VALUE_FLUSH 0x40000000 } ;
+
+ENUM: CUstreamWriteValue_flags
+    { CU_STREAM_WRITE_VALUE_DEFAULT 0x0 }
+    { CU_STREAM_WRITE_VALUE_NO_MEMORY_BARRIER 0x1 } ;
+
+ENUM: CUstream_flags
+    { CU_STREAM_DEFAULT 0x0 }
+    { CU_STREAM_NON_BLOCKING 0x1 } ;
+
+ENUM: CUlimit
+    { CU_LIMIT_STACK_SIZE 0x00 }
+    { CU_LIMIT_PRINTF_FIFO_SIZE 0x01 }
+    { CU_LIMIT_MALLOC_HEAP_SIZE 0x02 }
+    { CU_LIMIT_DEV_RUNTIME_SYNC_DEPTH 0x03 }
+    { CU_LIMIT_DEV_RUNTIME_PENDING_LAUNCH_COUNT 0x04 }
+    CU_LIMIT_MAX ;
+
+ENUM: CUmemAttach_flags
+    { CU_MEM_ATTACH_GLOBAL 0x1 }
+    { CU_MEM_ATTACH_HOST 0x2 }
+    { CU_MEM_ATTACH_SINGLE 0x4 } ;
+
+ENUM: CUmem_advise
+    { CU_MEM_ADVISE_SET_READ_MOSTLY 1 }
+    { CU_MEM_ADVISE_UNSET_READ_MOSTLY 2 }
+    { CU_MEM_ADVISE_SET_PREFERRED_LOCATION 3 }
+    { CU_MEM_ADVISE_UNSET_PREFERRED_LOCATION 4 }
+    { CU_MEM_ADVISE_SET_ACCESSED_BY 5 }
+    { CU_MEM_ADVISE_UNSET_ACCESSED_BY 6 } ;
+
 ENUM: CUmemorytype
     { CU_MEMORYTYPE_HOST   0x01 }
     { CU_MEMORYTYPE_DEVICE 0x02 }
-    { CU_MEMORYTYPE_ARRAY  0x03 } ;
+    { CU_MEMORYTYPE_ARRAY  0x03 }
+    { CU_MEMORYTYPE_UNIFIED 0x04 } ;
+
+ENUM: CUoccupancy_flags
+    { CU_OCCUPANCY_DEFAULT 0 }
+    { CU_OCCUPANCY_DISABLE_CACHING_OVERRIDE 1 } ;
+
+ENUM: CUpointer_attribute
+    { CU_POINTER_ATTRIBUTE_CONTEXT 1 }
+    { CU_POINTER_ATTRIBUTE_MEMORY_TYPE 2 }
+    { CU_POINTER_ATTRIBUTE_DEVICE_POINTER 3 }
+    { CU_POINTER_ATTRIBUTE_HOST_POINTER 4 }
+    { CU_POINTER_ATTRIBUTE_P2P_TOKENS 5 }
+    { CU_POINTER_ATTRIBUTE_SYNC_MEMOPS 6 }
+    { CU_POINTER_ATTRIBUTE_BUFFER_ID 7 }
+    { CU_POINTER_ATTRIBUTE_IS_MANAGED 8 } ;
+
+ENUM: CUresourceViewFormat
+    { CU_RES_VIEW_FORMAT_NONE 0x00 }
+    { CU_RES_VIEW_FORMAT_UINT_1X8 0x01 }
+    { CU_RES_VIEW_FORMAT_UINT_2X8 0x02 }
+    { CU_RES_VIEW_FORMAT_UINT_4X8 0x03 }
+    { CU_RES_VIEW_FORMAT_SINT_1X8 0x04 }
+    { CU_RES_VIEW_FORMAT_SINT_2X8 0x05 }
+    { CU_RES_VIEW_FORMAT_SINT_4X8 0x06 }
+    { CU_RES_VIEW_FORMAT_UINT_1X16 0x07 }
+    { CU_RES_VIEW_FORMAT_UINT_2X16 0x08 }
+    { CU_RES_VIEW_FORMAT_UINT_4X16 0x09 }
+    { CU_RES_VIEW_FORMAT_SINT_1X16 0x0a }
+    { CU_RES_VIEW_FORMAT_SINT_2X16 0x0b }
+    { CU_RES_VIEW_FORMAT_SINT_4X16 0x0c }
+    { CU_RES_VIEW_FORMAT_UINT_1X32 0x0d }
+    { CU_RES_VIEW_FORMAT_UINT_2X32 0x0e }
+    { CU_RES_VIEW_FORMAT_UINT_4X32 0x0f }
+    { CU_RES_VIEW_FORMAT_SINT_1X32 0x10 }
+    { CU_RES_VIEW_FORMAT_SINT_2X32 0x11 }
+    { CU_RES_VIEW_FORMAT_SINT_4X32 0x12 }
+    { CU_RES_VIEW_FORMAT_FLOAT_1X16 0x13 }
+    { CU_RES_VIEW_FORMAT_FLOAT_2X16 0x14 }
+    { CU_RES_VIEW_FORMAT_FLOAT_4X16 0x15 }
+    { CU_RES_VIEW_FORMAT_FLOAT_1X32 0x16 }
+    { CU_RES_VIEW_FORMAT_FLOAT_2X32 0x17 }
+    { CU_RES_VIEW_FORMAT_FLOAT_4X32 0x18 }
+    { CU_RES_VIEW_FORMAT_UNSIGNED_BC1 0x19 }
+    { CU_RES_VIEW_FORMAT_UNSIGNED_BC2 0x1a }
+    { CU_RES_VIEW_FORMAT_UNSIGNED_BC3 0x1b }
+    { CU_RES_VIEW_FORMAT_UNSIGNED_BC4 0x1c }
+    { CU_RES_VIEW_FORMAT_SIGNED_BC4 0x1d }
+    { CU_RES_VIEW_FORMAT_UNSIGNED_BC5 0x1e }
+    { CU_RES_VIEW_FORMAT_SIGNED_BC5 0x1f }
+    { CU_RES_VIEW_FORMAT_UNSIGNED_BC6H 0x20 }
+    { CU_RES_VIEW_FORMAT_SIGNED_BC6H 0x21 }
+    { CU_RES_VIEW_FORMAT_UNSIGNED_BC7 0x22 } ;
+
+
+ENUM: CUresourcetype
+    { CU_RESOURCE_TYPE_ARRAY 0x00 }
+    { CU_RESOURCE_TYPE_MIPMAPPED_ARRAY 0x01 }
+    { CU_RESOURCE_TYPE_LINEAR 0x02 }
+    { CU_RESOURCE_TYPE_PITCH2D 0x03 } ;
 
 ENUM: CUcomputemode
     { CU_COMPUTEMODE_DEFAULT    0 }
@@ -159,14 +280,33 @@ ENUM: CUjit_option
     CU_JIT_OPTIMIZATION_LEVEL
     CU_JIT_TARGET_FROM_CUCONTEXT
     CU_JIT_TARGET
-    CU_JIT_FALLBACK_STRATEGY ;
+    CU_JIT_FALLBACK_STRATEGY
+    CU_JIT_GENERATE_DEBUG_INFO
+    CU_JIT_LOG_VERBOSE
+    CU_JIT_GENERATE_LINE_INFO
+    CU_JIT_CACHE_MODE
+    CU_JIT_NEW_SM3X_OPT
+    CU_JIT_FAST_COMPILE
+    CU_JIT_NUM_OPTIONS ;
 
 ENUM: CUjit_target
     { CU_TARGET_COMPUTE_10 0 }
     CU_TARGET_COMPUTE_11
     CU_TARGET_COMPUTE_12
     CU_TARGET_COMPUTE_13
-    CU_TARGET_COMPUTE_20 ;
+    CU_TARGET_COMPUTE_20
+    { CU_TARGET_COMPUTE_21 21 }
+    { CU_TARGET_COMPUTE_30 30 }
+    { CU_TARGET_COMPUTE_32 32 }
+    { CU_TARGET_COMPUTE_35 35 }
+    { CU_TARGET_COMPUTE_37 37 }
+    { CU_TARGET_COMPUTE_50 50 }
+    { CU_TARGET_COMPUTE_52 52 }
+    { CU_TARGET_COMPUTE_53 53 }
+    { CU_TARGET_COMPUTE_60 60 }
+    { CU_TARGET_COMPUTE_61 61 }
+    { CU_TARGET_COMPUTE_62 62 }
+    { CU_TARGET_COMPUTE_70 70 } ;
 
 ENUM: CUjit_fallback
     { CU_PREFER_PTX 0 }
@@ -194,6 +334,10 @@ ENUM: CUresult
     { CUDA_ERROR_OUT_OF_MEMORY        2 }
     { CUDA_ERROR_NOT_INITIALIZED      3 }
     { CUDA_ERROR_DEINITIALIZED        4 }
+    { CUDA_ERROR_PROFILER_DISABLED    5 }
+    { CUDA_ERROR_PROFILER_NOT_INITIALIZED 6 }
+    { CUDA_ERROR_PROFILER_ALREADY_STARTED 7 }
+    { CUDA_ERROR_PROFILER_ALREADY_STOPPED 8 }
 
     { CUDA_ERROR_NO_DEVICE            100 }
     { CUDA_ERROR_INVALID_DEVICE       101 }
@@ -211,9 +355,19 @@ ENUM: CUresult
     { CUDA_ERROR_NOT_MAPPED_AS_ARRAY  212 }
     { CUDA_ERROR_NOT_MAPPED_AS_POINTER 213 }
     { CUDA_ERROR_ECC_UNCORRECTABLE    214 }
+    { CUDA_ERROR_UNSUPPORTED_LIMIT 215 }
+    { CUDA_ERROR_CONTEXT_ALREADY_IN_USE 216 }
+    { CUDA_ERROR_PEER_ACCESS_UNSUPPORTED 217 }
+    { CUDA_ERROR_INVALID_PTX 218 }
+    { CUDA_ERROR_INVALID_GRAPHICS_CONTEXT 219 }
+    { CUDA_ERROR_NVLINK_UNCORRECTABLE 220 }
+    { CUDA_ERROR_JIT_COMPILER_NOT_FOUND 221 }
 
     { CUDA_ERROR_INVALID_SOURCE       300 }
     { CUDA_ERROR_FILE_NOT_FOUND       301 }
+    { CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND 302 }
+    { CUDA_ERROR_SHARED_OBJECT_INIT_FAILED 303 }
+    { CUDA_ERROR_OPERATING_SYSTEM 304 }
 
     { CUDA_ERROR_INVALID_HANDLE       400 }
 
@@ -221,10 +375,25 @@ ENUM: CUresult
 
     { CUDA_ERROR_NOT_READY            600 }
 
-    { CUDA_ERROR_LAUNCH_FAILED        700 }
+    { CUDA_ERROR_ILLEGAL_ADDRESS        700 }
     { CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES 701 }
     { CUDA_ERROR_LAUNCH_TIMEOUT       702 }
     { CUDA_ERROR_LAUNCH_INCOMPATIBLE_TEXTURING 703 }
+    { CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED 704 }
+    { CUDA_ERROR_PEER_ACCESS_NOT_ENABLED 705 }
+    { CUDA_ERROR_PRIMARY_CONTEXT_ACTIVE 708 }
+    { CUDA_ERROR_CONTEXT_IS_DESTROYED 709 }
+    { CUDA_ERROR_ASSERT 710 }
+    { CUDA_ERROR_TOO_MANY_PEERS 711 }
+    { CUDA_ERROR_HOST_MEMORY_ALREADY_REGISTERED 712 }
+    { CUDA_ERROR_HOST_MEMORY_NOT_REGISTERED 713 }
+    { CUDA_ERROR_HARDWARE_STACK_ERROR 714 }
+    { CUDA_ERROR_ILLEGAL_INSTRUCTION 715 }
+    { CUDA_ERROR_MISALIGNED_ADDRESS 716 }
+    { CUDA_ERROR_INVALID_ADDRESS_SPACE 717 }
+    { CUDA_ERROR_INVALID_PC 718 }
+    { CUDA_ERROR_LAUNCH_FAILED 719 }
+    { CUDA_ERROR_COOPERATIVE_LAUNCH_TOO_LARGE 720 }
 
     { CUDA_ERROR_POINTER_IS_64BIT     800 }
     { CUDA_ERROR_SIZE_IS_64BIT        801 }
@@ -236,60 +405,60 @@ CONSTANT: CU_MEMHOSTALLOC_DEVICEMAP       0x02
 CONSTANT: CU_MEMHOSTALLOC_WRITECOMBINED   0x04
 
 STRUCT: CUDA_MEMCPY2D
-    { srcXInBytes uint }
-    { srcY        uint }
+    { srcXInBytes size_t }
+    { srcY        size_t }
     { srcMemoryType CUmemorytype }
     { srcHost void* }
     { srcDevice CUdeviceptr }
     { srcArray CUarray }
-    { srcPitch uint }
-    { dstXInBytes uint }
-    { dstY uint }
+    { srcPitch size_t }
+    { dstXInBytes size_t }
+    { dstY size_t }
     { dstMemoryType CUmemorytype }
     { dstHost void* }
     { dstDevice CUdeviceptr }
     { dstArray CUarray }
-    { dstPitch uint }
-    { WidthInBytes uint }
-    { Height uint } ;
+    { dstPitch size_t }
+    { WidthInBytes size_t }
+    { Height size_t } ;
 
 STRUCT: CUDA_MEMCPY3D
-    { srcXInBytes uint }
-    { srcY        uint }
-    { srcZ        uint }
-    { srcLOD      uint }
+    { srcXInBytes size_t }
+    { srcY        size_t }
+    { srcZ        size_t }
+    { srcLOD      size_t }
     { srcMemoryType CUmemorytype }
     { srcHost void* }
     { srcDevice CUdeviceptr }
     { srcArray CUarray }
     { reserved0 void* }
-    { srcPitch uint }
-    { srcHeight uint }
-    { dstXInBytes uint }
-    { dstY uint }
-    { dstZ uint }
-    { dstLOD uint }
+    { srcPitch size_t }
+    { srcHeight size_t }
+    { dstXInBytes size_t }
+    { dstY size_t }
+    { dstZ size_t }
+    { dstLOD size_t }
     { dstMemoryType CUmemorytype }
     { dstHost void* }
     { dstDevice CUdeviceptr }
     { dstArray CUarray }
     { reserved1 void* }
-    { dstPitch uint }
-    { dstHeight uint }
-    { WidthInBytes uint }
-    { Height uint }
-    { Depth uint } ;
+    { dstPitch size_t }
+    { dstHeight size_t }
+    { WidthInBytes size_t }
+    { Height size_t }
+    { Depth size_t } ;
 
 STRUCT: CUDA_ARRAY_DESCRIPTOR
-    { Width uint }
-    { Height uint }
+    { Width size_t }
+    { Height size_t }
     { Format CUarray_format }
     { NumChannels uint } ;
 
 STRUCT: CUDA_ARRAY3D_DESCRIPTOR
-    { Width uint }
-    { Height uint }
-    { Depth uint }
+    { Width size_t }
+    { Height size_t }
+    { Depth size_t }
     { Format CUarray_format }
     { NumChannels uint }
     { Flags uint } ;
@@ -308,126 +477,163 @@ FUNCTION: CUresult cuDeviceGet ( CUdevice* device, int ordinal )
 FUNCTION: CUresult cuDeviceGetCount ( int* count )
 FUNCTION: CUresult cuDeviceGetName ( char* name, int len, CUdevice dev )
 FUNCTION: CUresult cuDeviceComputeCapability ( int* major, int* minor, CUdevice dev )
-FUNCTION: CUresult cuDeviceTotalMem ( uint* bytes, CUdevice dev )
-FUNCTION: CUresult cuDeviceTotalMem_v2 ( ulonglong* bytes, CUdevice dev )
+FUNCTION-ALIAS: cuDeviceTotalMem CUresult cuDeviceTotalMem_v2 ( size_t* bytes, CUdevice dev )
 FUNCTION: CUresult cuDeviceGetProperties ( CUdevprop* prop, CUdevice dev )
 FUNCTION: CUresult cuDeviceGetAttribute ( int* pi, CUdevice_attribute attrib, CUdevice dev )
 
-FUNCTION: CUresult cuCtxCreate ( CUcontext* pctx, uint flags, CUdevice dev )
-FUNCTION: CUresult cuCtxDestroy ( CUcontext ctx )
-FUNCTION: CUresult cuCtxAttach ( CUcontext* pctx, uint flags )
-FUNCTION: CUresult cuCtxDetach ( CUcontext ctx )
-FUNCTION: CUresult cuCtxPushCurrent ( CUcontext ctx )
-FUNCTION: CUresult cuCtxPopCurrent ( CUcontext* pctx )
+! Deprecated
+! FUNCTION: CUresult cuCtxAttach ( CUcontext* pctx, uint flags )
+! FUNCTION: CUresult cuCtxDetach ( CUcontext ctx )
+
+FUNCTION-ALIAS: cuCtxCreate CUresult cuCtxCreate_v2 ( CUcontext* pctx, uint flags, CUdevice dev )
+FUNCTION-ALIAS: cuCtxDestroy CUresult cuCtxDestroy_v2 ( CUcontext ctx )
+FUNCTION: CUresult cuCtxGetApiVersion ( CUcontext ctx, uint* version )
+FUNCTION: CUresult cuCtxGetCacheConfig ( CUfunc_cache* pconfig )
+FUNCTION: CUresult cuCtxGetCurrent ( CUcontext* pctx )
 FUNCTION: CUresult cuCtxGetDevice ( CUdevice* device )
+FUNCTION: CUresult cuCtxGetFlags ( uint* flags )
+FUNCTION: CUresult cuCtxGetLimit ( size_t* pvalue, CUlimit limit )
+FUNCTION: CUresult cuCtxGetSharedMemConfig ( CUsharedconfig* pConfig )
+FUNCTION: CUresult cuCtxGetStreamPriorityRange ( int* leastPriority, int* greatestPriority )
+FUNCTION-ALIAS: cuCtxPopCurrent CUresult cuCtxPopCurrent_v2 ( CUcontext* pctx )
+FUNCTION-ALIAS: cuCtxPushCurrent CUresult cuCtxPushCurrent_v2 ( CUcontext ctx )
+FUNCTION: CUresult cuCtxSetCacheConfig ( CUfunc_cache config )
+FUNCTION: CUresult cuCtxSetCurrent ( CUcontext ctx )
+FUNCTION: CUresult cuCtxSetLimit ( CUlimit limit, size_t value )
+FUNCTION: CUresult cuCtxSetSharedMemConfig ( CUsharedconfig config )
 FUNCTION: CUresult cuCtxSynchronize ( )
 
+FUNCTION-ALIAS: cuLinkAddData CUresult cuLinkAddData_v2 ( CUlinkState state,
+        CUjitInputType type, void *data, size_t size, char *name,
+        uint numOptions, CUjit_option* options, void** optionValues )
+
+FUNCTION-ALIAS: cuLinkAddFile CUresult cuLinkAddFile_v2 ( CUlinkState state,
+        CUjitInputType type, char* path, uint numOptions,
+        CUjit_option* options, void** optionValues )
+
+FUNCTION: CUresult cuLinkComplete ( CUlinkState state, void** cubinOut, size_t* sizeOut )
+FUNCTION-ALIAS: cuLinkCreate CUresult cuLinkCreate_v2 ( uint numOptions,
+        CUjit_option* options, void** optionValues, CUlinkState* stateOut )
+FUNCTION: CUresult cuLinkDestroy ( CUlinkState state )
+FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, c-string name )
+FUNCTION-ALIAS: cuModuleGetGlobal CUresult cuModuleGetGlobal_v2 ( CUdeviceptr* dptr, size_t* bytes, CUmodule hmod, char* name )
+FUNCTION: CUresult cuModuleGetSurfRef ( CUsurfref* pSurfRef, CUmodule hmod, char* name )
+FUNCTION: CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, char* name )
 FUNCTION: CUresult cuModuleLoad ( CUmodule* module, c-string fname )
 FUNCTION: CUresult cuModuleLoadData ( CUmodule* module, void* image )
 FUNCTION: CUresult cuModuleLoadDataEx ( CUmodule* module, void* image, uint numOptions, CUjit_option* options, void** optionValues )
 FUNCTION: CUresult cuModuleLoadFatBinary ( CUmodule* module, void* fatCubin )
 FUNCTION: CUresult cuModuleUnload ( CUmodule hmod )
-FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, c-string name )
-FUNCTION: CUresult cuModuleGetGlobal ( CUdeviceptr* dptr, uint* bytes, CUmodule hmod, char* name )
-FUNCTION: CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, char* name )
 
-FUNCTION: CUresult cuMemGetInfo ( uint* free, uint* total )
+FUNCTION-ALIAS: cuMemGetInfo CUresult cuMemGetInfo_v2 ( size_t* free, size_t* total )
 
-FUNCTION: CUresult cuMemAlloc ( CUdeviceptr* dptr, uint bytesize )
-FUNCTION: CUresult cuMemAllocPitch ( CUdeviceptr* dptr,
-                                      uint* pPitch,
-                                      uint WidthInBytes,
-                                      uint Height,
+FUNCTION-ALIAS: cuMemAlloc CUresult cuMemAlloc_v2 ( CUdeviceptr* dptr, size_t bytesize )
+FUNCTION-ALIAS: cuMemAllocPitch CUresult cuMemAllocPitch_v2 ( CUdeviceptr* dptr,
+                                      size_t* pPitch,
+                                      size_t WidthInBytes,
+                                      size_t Height,
                                       uint ElementSizeBytes
                                      )
-FUNCTION: CUresult cuMemFree ( CUdeviceptr dptr )
-FUNCTION: CUresult cuMemGetAddressRange ( CUdeviceptr* pbase, uint* psize, CUdeviceptr dptr )
+FUNCTION-ALIAS: cuMemFree CUresult cuMemFree_v2 ( CUdeviceptr dptr )
+FUNCTION-ALIAS: cuMemGetAddressRange CUresult cuMemGetAddressRange_v2 ( CUdeviceptr* pbase, size_t* psize, CUdeviceptr dptr )
 
-FUNCTION: CUresult cuMemAllocHost ( void** pp, uint bytesize )
+FUNCTION-ALIAS: cuMemAllocHost CUresult cuMemAllocHost_v2 ( void** pp, size_t bytesize )
 FUNCTION: CUresult cuMemFreeHost ( void* p )
 
 FUNCTION: CUresult cuMemHostAlloc ( void** pp, size_t bytesize, uint Flags )
 
-FUNCTION: CUresult cuMemHostGetDevicePointer ( CUdeviceptr* pdptr, void* p, uint Flags )
+FUNCTION-ALIAS: cuMemHostGetDevicePointer CUresult cuMemHostGetDevicePointer_v2 ( CUdeviceptr* pdptr, void* p, uint Flags )
 FUNCTION: CUresult cuMemHostGetFlags ( uint* pFlags, void* p )
 
-FUNCTION: CUresult  cuMemcpyHtoD ( CUdeviceptr dstDevice, void* srcHost, uint ByteCount )
-FUNCTION: CUresult  cuMemcpyDtoH ( void* dstHost, CUdeviceptr srcDevice, uint ByteCount )
+FUNCTION-ALIAS: cuMemHostRegister CUresult cuMemHostRegister_v2_params ( void* p, size_t bytesize, uint Flags )
+FUNCTION: CUresult cuMemHostUnregister_params ( void* p )
 
-FUNCTION: CUresult  cuMemcpyDtoD ( CUdeviceptr dstDevice, CUdeviceptr srcDevice, uint ByteCount )
+FUNCTION-ALIAS: cuMemcpyHtoD CUresult cuMemcpyHtoD_v2 ( CUdeviceptr dstDevice, void* srcHost, size_t ByteCount )
+FUNCTION-ALIAS: cuMemcpyDtoH CUresult cuMemcpyDtoH_v2 ( void* dstHost, CUdeviceptr srcDevice, size_t ByteCount )
 
-FUNCTION: CUresult  cuMemcpyDtoA ( CUarray dstArray, uint dstIndex, CUdeviceptr srcDevice, uint ByteCount )
-FUNCTION: CUresult  cuMemcpyAtoD ( CUdeviceptr dstDevice, CUarray hSrc, uint SrcIndex, uint ByteCount )
+FUNCTION-ALIAS: cuMemcpyDtoD CUresult cuMemcpyDtoD_v2 ( CUdeviceptr dstDevice, CUdeviceptr srcDevice, size_t ByteCount )
 
-FUNCTION: CUresult  cuMemcpyHtoA ( CUarray dstArray, uint dstIndex, void* pSrc, uint ByteCount )
-FUNCTION: CUresult  cuMemcpyAtoH ( void* dstHost, CUarray srcArray, uint srcIndex, uint ByteCount )
+FUNCTION-ALIAS: cuMemcpyDtoA CUresult cuMemcpyDtoA_v2 ( CUarray dstArray, size_t dstIndex, CUdeviceptr srcDevice, size_t ByteCount )
+FUNCTION-ALIAS: cuMemcpyAtoD CUresult cuMemcpyAtoD_v2 ( CUdeviceptr dstDevice, CUarray hSrc, size_t SrcIndex, size_t ByteCount )
 
-FUNCTION: CUresult  cuMemcpyAtoA ( CUarray dstArray, uint dstIndex, CUarray srcArray, uint srcIndex, uint ByteCount )
+FUNCTION-ALIAS: cuMemcpyHtoA CUresult cuMemcpyHtoA_v2 ( CUarray dstArray, size_t dstIndex, void* pSrc, size_t ByteCount )
+FUNCTION-ALIAS: cuMemcpyAtoH CUresult cuMemcpyAtoH_v2 ( void* dstHost, CUarray srcArray, size_t srcIndex, size_t ByteCount )
 
-FUNCTION: CUresult  cuMemcpy2D ( CUDA_MEMCPY2D* pCopy )
-FUNCTION: CUresult  cuMemcpy2DUnaligned ( CUDA_MEMCPY2D* pCopy )
+FUNCTION-ALIAS: cuMemcpyAtoA CUresult cuMemcpyAtoA_v2 ( CUarray dstArray, size_t dstIndex, CUarray srcArray, size_t srcIndex, size_t ByteCount )
 
-FUNCTION: CUresult  cuMemcpy3D ( CUDA_MEMCPY3D* pCopy )
+FUNCTION: CUresult cuMemcpy ( CUdeviceptr dst, CUdeviceptr src, size_t ByteCount )
 
-FUNCTION: CUresult  cuMemcpyHtoDAsync ( CUdeviceptr dstDevice,
-            void* srcHost, uint ByteCount, CUstream hStream )
-FUNCTION: CUresult  cuMemcpyDtoHAsync ( void* dstHost,
-            CUdeviceptr srcDevice, uint ByteCount, CUstream hStream )
+FUNCTION-ALIAS: cuMemcpy2D CUresult cuMemcpy2D_v2 ( CUDA_MEMCPY2D* pCopy )
+FUNCTION-ALIAS: cuMemcpy2DUnaligned CUresult cuMemcpy2DUnaligned_v2 ( CUDA_MEMCPY2D* pCopy )
 
-FUNCTION: CUresult cuMemcpyDtoDAsync ( CUdeviceptr dstDevice,
-            CUdeviceptr srcDevice, uint ByteCount, CUstream hStream )
+FUNCTION-ALIAS: cuMemcpy3D CUresult cuMemcpy3D_v2 ( CUDA_MEMCPY3D* pCopy )
 
-FUNCTION: CUresult  cuMemcpyHtoAAsync ( CUarray dstArray, uint dstIndex,
-            void* pSrc, uint ByteCount, CUstream hStream )
-FUNCTION: CUresult  cuMemcpyAtoHAsync ( void* dstHost, CUarray srcArray, uint srcIndex,
-            uint ByteCount, CUstream hStream )
+FUNCTION-ALIAS: cuMemcpyHtoDAsync CUresult cuMemcpyHtoDAsync_v2 ( CUdeviceptr dstDevice,
+                                                void* srcHost,
+                                                size_t ByteCount,
+                                                CUstream hStream )
+FUNCTION-ALIAS: cuMemcpyDtoHAsync CUresult cuMemcpyDtoHAsync_v2 ( void* dstHost,
+                                                CUdeviceptr srcDevice,
+                                                size_t ByteCount,
+                                                CUstream hStream )
 
-FUNCTION: CUresult  cuMemcpy2DAsync ( CUDA_MEMCPY2D* pCopy, CUstream hStream )
-FUNCTION: CUresult  cuMemcpy3DAsync ( CUDA_MEMCPY3D* pCopy, CUstream hStream )
+FUNCTION-ALIAS: cuMemcpyDtoDAsync CUresult cuMemcpyDtoDAsync_v2 ( CUdeviceptr dstDevice,
+            CUdeviceptr srcDevice, size_t ByteCount, CUstream hStream )
 
-FUNCTION: CUresult  cuMemsetD8 ( CUdeviceptr dstDevice, uchar uc, uint N )
-FUNCTION: CUresult  cuMemsetD16 ( CUdeviceptr dstDevice, ushort us, uint N )
-FUNCTION: CUresult  cuMemsetD32 ( CUdeviceptr dstDevice, uint ui, uint N )
+FUNCTION-ALIAS: cuMemcpyHtoAAsync CUresult cuMemcpyHtoAAsync_v2 ( CUarray dstArray, size_t dstIndex,
+            void* pSrc, size_t ByteCount, CUstream hStream )
+FUNCTION-ALIAS: cuMemcpyAtoHAsync CUresult cuMemcpyAtoHAsync_v2 ( void* dstHost, CUarray srcArray, size_t srcIndex,
+            size_t ByteCount, CUstream hStream )
 
-FUNCTION: CUresult  cuMemsetD2D8 ( CUdeviceptr dstDevice, uint dstPitch, uchar uc, uint Width, uint Height )
-FUNCTION: CUresult  cuMemsetD2D16 ( CUdeviceptr dstDevice, uint dstPitch, ushort us, uint Width, uint Height )
-FUNCTION: CUresult  cuMemsetD2D32 ( CUdeviceptr dstDevice, uint dstPitch, uint ui, uint Width, uint Height )
+FUNCTION-ALIAS: cuMemcpy2DAsync CUresult cuMemcpy2DAsync_v2 ( CUDA_MEMCPY2D* pCopy, CUstream hStream )
+FUNCTION-ALIAS: cuMemcpy3DAsync CUresult cuMemcpy3DAsync_v2 ( CUDA_MEMCPY3D* pCopy, CUstream hStream )
+
+FUNCTION-ALIAS: cuMemsetD8 CUresult cuMemsetD8_v2 ( CUdeviceptr dstDevice, uchar uc, size_t N )
+FUNCTION-ALIAS: cuMemsetD16 CUresult cuMemsetD16_v2 ( CUdeviceptr dstDevice, ushort us, size_t N )
+FUNCTION-ALIAS: cuMemsetD32 CUresult cuMemsetD32_v2 ( CUdeviceptr dstDevice, uint ui, size_t N )
+
+FUNCTION-ALIAS: cuMemsetD2D8 CUresult cuMemsetD2D8_v2 ( CUdeviceptr dstDevice, size_t dstPitch, uchar uc, size_t Width, size_t Height )
+FUNCTION-ALIAS: cuMemsetD2D16 CUresult cuMemsetD2D16_v2 ( CUdeviceptr dstDevice, size_t dstPitch, ushort us, size_t Width, size_t Height )
+FUNCTION-ALIAS: cuMemsetD2D32 CUresult cuMemsetD2D32_v2 ( CUdeviceptr dstDevice, size_t dstPitch, uint ui, size_t Width, size_t Height )
 
 FUNCTION: CUresult cuFuncSetBlockShape ( CUfunction hfunc, int x, int y, int z )
 FUNCTION: CUresult cuFuncSetSharedSize ( CUfunction hfunc, uint bytes )
 FUNCTION: CUresult cuFuncGetAttribute ( int* pi, CUfunction_attribute attrib, CUfunction hfunc )
 FUNCTION: CUresult cuFuncSetCacheConfig ( CUfunction hfunc, CUfunc_cache config )
 
-FUNCTION: CUresult  cuArrayCreate ( CUarray* pHandle, CUDA_ARRAY_DESCRIPTOR* pAllocateArray )
-FUNCTION: CUresult  cuArrayGetDescriptor ( CUDA_ARRAY_DESCRIPTOR* pArrayDescriptor, CUarray hArray )
-FUNCTION: CUresult  cuArrayDestroy ( CUarray hArray )
+FUNCTION-ALIAS: cuArrayCreate CUresult cuArrayCreate_v2 ( CUarray* pHandle, CUDA_ARRAY_DESCRIPTOR* pAllocateArray )
+FUNCTION-ALIAS: cuArrayGetDescriptor CUresult cuArrayGetDescriptor_v2 ( CUDA_ARRAY_DESCRIPTOR* pArrayDescriptor, CUarray hArray )
+FUNCTION: CUresult cuArrayDestroy ( CUarray hArray )
 
-FUNCTION: CUresult  cuArray3DCreate ( CUarray* pHandle, CUDA_ARRAY3D_DESCRIPTOR* pAllocateArray )
-FUNCTION: CUresult  cuArray3DGetDescriptor ( CUDA_ARRAY3D_DESCRIPTOR* pArrayDescriptor, CUarray hArray )
+FUNCTION: CUresult cuArray3DCreate ( CUarray* pHandle, CUDA_ARRAY3D_DESCRIPTOR* pAllocateArray )
+FUNCTION: CUresult cuArray3DGetDescriptor ( CUDA_ARRAY3D_DESCRIPTOR* pArrayDescriptor, CUarray hArray )
 
-FUNCTION: CUresult  cuTexRefCreate ( CUtexref* pTexRef )
-FUNCTION: CUresult  cuTexRefDestroy ( CUtexref hTexRef )
+FUNCTION: CUresult cuTexRefCreate ( CUtexref* pTexRef )
+FUNCTION: CUresult cuTexRefDestroy ( CUtexref hTexRef )
 
-FUNCTION: CUresult  cuTexRefSetArray ( CUtexref hTexRef, CUarray hArray, uint Flags )
-FUNCTION: CUresult  cuTexRefSetAddress ( uint* ByteOffset, CUtexref hTexRef, CUdeviceptr dptr, uint bytes )
-FUNCTION: CUresult  cuTexRefSetAddress2D ( CUtexref hTexRef, CUDA_ARRAY_DESCRIPTOR* desc, CUdeviceptr dptr, uint Pitch )
-FUNCTION: CUresult  cuTexRefSetFormat ( CUtexref hTexRef, CUarray_format fmt, int NumPackedComponents )
-FUNCTION: CUresult  cuTexRefSetAddressMode ( CUtexref hTexRef, int dim, CUaddress_mode am )
-FUNCTION: CUresult  cuTexRefSetFilterMode ( CUtexref hTexRef, CUfilter_mode fm )
-FUNCTION: CUresult  cuTexRefSetFlags ( CUtexref hTexRef, uint Flags )
+FUNCTION: CUresult cuTexRefSetArray ( CUtexref hTexRef, CUarray hArray, uint Flags )
+FUNCTION-ALIAS: cuTexRefSetAddress CUresult cuTexRefSetAddress_v2 ( size_t* ByteOffset, CUtexref hTexRef, CUdeviceptr dptr, size_t bytes )
 
-FUNCTION: CUresult  cuTexRefGetAddress ( CUdeviceptr* pdptr, CUtexref hTexRef )
-FUNCTION: CUresult  cuTexRefGetArray ( CUarray* phArray, CUtexref hTexRef )
-FUNCTION: CUresult  cuTexRefGetAddressMode ( CUaddress_mode* pam, CUtexref hTexRef, int dim )
-FUNCTION: CUresult  cuTexRefGetFilterMode ( CUfilter_mode* pfm, CUtexref hTexRef )
-FUNCTION: CUresult  cuTexRefGetFormat ( CUarray_format* pFormat, int* pNumChannels, CUtexref hTexRef )
-FUNCTION: CUresult  cuTexRefGetFlags ( uint* pFlags, CUtexref hTexRef )
+FUNCTION-ALIAS: cuTexRefSetAddress2D CUresult cuTexRefSetAddress2D_v3 ( CUtexref hTexRef, CUDA_ARRAY_DESCRIPTOR* desc, CUdeviceptr dptr, size_t Pitch )
+! FUNCTION: CUresult  cuTexRefSetAddress2D_v2 ( CUtexref hTexRef, CUDA_ARRAY_DESCRIPTOR* desc, CUdeviceptr dptr, size_t Pitch )
 
-FUNCTION: CUresult  cuParamSetSize ( CUfunction hfunc, uint numbytes )
-FUNCTION: CUresult  cuParamSeti    ( CUfunction hfunc, int offset, uint value )
-FUNCTION: CUresult  cuParamSetf    ( CUfunction hfunc, int offset, float value )
-FUNCTION: CUresult  cuParamSetv    ( CUfunction hfunc, int offset, void* ptr, uint numbytes )
-FUNCTION: CUresult  cuParamSetTexRef ( CUfunction hfunc, int texunit, CUtexref hTexRef )
+FUNCTION: CUresult cuTexRefSetFormat ( CUtexref hTexRef, CUarray_format fmt, int NumPackedComponents )
+FUNCTION: CUresult cuTexRefSetAddressMode ( CUtexref hTexRef, int dim, CUaddress_mode am )
+FUNCTION: CUresult cuTexRefSetFilterMode ( CUtexref hTexRef, CUfilter_mode fm )
+FUNCTION: CUresult cuTexRefSetFlags ( CUtexref hTexRef, uint Flags )
+
+FUNCTION-ALIAS: cuTexRefGetAddress CUresult cuTexRefGetAddress_v2 ( CUdeviceptr* pdptr, CUtexref hTexRef )
+FUNCTION: CUresult cuTexRefGetArray ( CUarray* phArray, CUtexref hTexRef )
+FUNCTION: CUresult cuTexRefGetAddressMode ( CUaddress_mode* pam, CUtexref hTexRef, int dim )
+FUNCTION: CUresult cuTexRefGetFilterMode ( CUfilter_mode* pfm, CUtexref hTexRef )
+FUNCTION: CUresult cuTexRefGetFormat ( CUarray_format* pFormat, int* pNumChannels, CUtexref hTexRef )
+FUNCTION: CUresult cuTexRefGetFlags ( uint* pFlags, CUtexref hTexRef )
+
+FUNCTION: CUresult cuParamSetSize ( CUfunction hfunc, uint numbytes )
+FUNCTION: CUresult cuParamSeti    ( CUfunction hfunc, int offset, uint value )
+FUNCTION: CUresult cuParamSetf    ( CUfunction hfunc, int offset, float value )
+FUNCTION: CUresult cuParamSetv    ( CUfunction hfunc, int offset, void* ptr, uint numbytes )
+FUNCTION: CUresult cuParamSetTexRef ( CUfunction hfunc, int texunit, CUtexref hTexRef )
 
 FUNCTION: CUresult cuLaunch ( CUfunction f )
 FUNCTION: CUresult cuLaunchGrid ( CUfunction f, int grid_width, int grid_height )
@@ -437,19 +643,25 @@ FUNCTION: CUresult cuEventCreate ( CUevent* phEvent, uint Flags )
 FUNCTION: CUresult cuEventRecord ( CUevent hEvent, CUstream hStream )
 FUNCTION: CUresult cuEventQuery ( CUevent hEvent )
 FUNCTION: CUresult cuEventSynchronize ( CUevent hEvent )
-FUNCTION: CUresult cuEventDestroy ( CUevent hEvent )
+FUNCTION-ALIAS: cuEventDestroy CUresult cuEventDestroy_v2 ( CUevent hEvent )
 FUNCTION: CUresult cuEventElapsedTime ( float* pMilliseconds, CUevent hStart, CUevent hEnd )
 
-FUNCTION: CUresult  cuStreamCreate ( CUstream* phStream, uint Flags )
-FUNCTION: CUresult  cuStreamQuery ( CUstream hStream )
-FUNCTION: CUresult  cuStreamSynchronize ( CUstream hStream )
-FUNCTION: CUresult  cuStreamDestroy ( CUstream hStream )
+FUNCTION: CUresult cuStreamCreate ( CUstream* phStream, uint Flags )
+FUNCTION: CUresult cuStreamQuery ( CUstream hStream )
+FUNCTION: CUresult cuStreamSynchronize ( CUstream hStream )
+FUNCTION-ALIAS: cuStreamDestroy CUresult cuStreamDestroy_v2 ( CUstream hStream )
 
 FUNCTION: CUresult cuGraphicsUnregisterResource ( CUgraphicsResource resource )
 FUNCTION: CUresult cuGraphicsSubResourceGetMappedArray ( CUarray* pArray, CUgraphicsResource resource, uint arrayIndex, uint mipLevel )
-FUNCTION: CUresult cuGraphicsResourceGetMappedPointer ( CUdeviceptr* pDevPtr, uint* pSize, CUgraphicsResource resource )
-FUNCTION: CUresult cuGraphicsResourceSetMapFlags ( CUgraphicsResource resource, uint flags )
+FUNCTION-ALIAS: cuGraphicsResourceGetMappedPointer  CUresult cuGraphicsResourceGetMappedPointer_v2 ( CUdeviceptr* pDevPtr, size_t* pSize, CUgraphicsResource resource )
+FUNCTION-ALIAS: cuGraphicsResourceSetMapFlags CUresult cuGraphicsResourceSetMapFlags_v2 ( CUgraphicsResource resource, uint flags )
 FUNCTION: CUresult cuGraphicsMapResources ( uint count, CUgraphicsResource* resources, CUstream hStream )
 FUNCTION: CUresult cuGraphicsUnmapResources ( uint count, CUgraphicsResource* resources, CUstream hStream )
 
 FUNCTION: CUresult cuGetExportTable ( void** ppExportTable, CUuuid* pExportTableId )
+
+FUNCTION: CUresult cuDevicePrimaryCtxGetState ( CUdevice dev, uint* flags, int* active )
+FUNCTION: CUresult cuDevicePrimaryCtxRelease ( CUdevice dev )
+FUNCTION: CUresult cuDevicePrimaryCtxReset ( CUdevice dev )
+FUNCTION: CUresult cuDevicePrimaryCtxRetain ( CUcontext* pctx, CUdevice dev )
+FUNCTION: CUresult cuDevicePrimaryCtxSetFlags ( CUdevice dev, uint flags )
