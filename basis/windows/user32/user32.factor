@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax parser namespaces
-kernel math windows.types generalizations math.bitwise
-classes.struct literals windows.kernel32 system accessors ;
+USING: accessors alien alien.c-types alien.syntax classes.struct
+generalizations kernel literals math math.bitwise namespaces
+parser system windows.com.syntax windows.kernel32 windows.ole32
+windows.types ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -1879,6 +1880,70 @@ FUNCTION: BOOL UpdateWindow ( HWND hWnd )
 ! FUNCTION: wsprintfW
 ! FUNCTION: wvsprintfA
 ! FUNCTION: wvsprintfW
+
+TYPEDEF: HANDLE HPOWERNOTIFY
+
+FUNCTION: HPOWERNOTIFY RegisterPowerSettingNotification ( HANDLE  hRecipient, LPCGUID PowerSettingGuid, DWORD Flags )
+FUNCTION: BOOL UnregisterPowerSettingNotification ( HPOWERNOTIFY Handle )
+
+CONSTANT: GUID_ACDC_POWER_SOURCE
+    GUID: {5d3e9a59-e9D5-4b00-a6bd-ff34ff516548}
+
+CONSTANT: GUID_BATTERY_PERCENTAGE_REMAINING
+    GUID: {a7ad8041-b45a-4cae-87a3-eecbb468a9e1}
+
+CONSTANT: GUID_CONSOLE_DISPLAY_STATE
+    GUID: {6fe69556-704a-47a0-8f24-c28d936fda47}
+
+CONSTANT: GUID_GLOBAL_USER_PRESENCE
+    GUID: {786e8a1d-b427-4344-9207-09e70bdcbea9}
+
+CONSTANT: GUID_IDLE_BACKGROUND_TASK
+    GUID: {515c31d8-f734-163d-a0fd-11a0-8c91e8f1}
+
+CONSTANT: GUID_MONITOR_POWER_ON
+    GUID: {02731015-4510-4526-99e6-e5a17ebd1aea}
+
+CONSTANT: GUID_POWER_SAVING_STATUS
+    GUID: {e00958c0-c213-4ace-ac77-fecced2eeea5}
+
+CONSTANT: GUID_POWERSCHEME_PERSONALITY
+    GUID: {245d8541-3943-4422-b025-13a7-84f679b7}
+
+CONSTANT: GUID_MIN_POWER_SAVINGS
+    GUID: {8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c}
+
+CONSTANT: GUID_MAX_POWER_SAVINGS
+    GUID: {a1841308-3541-4fab-bc81-f71556f20b4a}
+
+CONSTANT: GUID_TYPICAL_POWER_SAVINGS
+    GUID: {381b4222-f694-41f0-9685-ff5bb260df2e}
+
+CONSTANT: GUID_SESSION_DISPLAY_STATUS
+    GUID: {2b84c20e-ad23-4ddf-93db-05ffbd7efca5}
+
+CONSTANT: GUID_SESSION_USER_PRESENCE
+    GUID: {3c0f4548-c03f-4c4d-b9f2-237ede686376}
+
+CONSTANT: GUID_SYSTEM_AWAYMODE
+    GUID: {98a7f580-01f7-48aa-9c0f-44352c29e5C0}
+
+! This notification fires when the Lid Close Action is
+! changed by user in the Power Manager (Control Panel).
+CONSTANT: GUID_LIDCLOSE_ACTION
+    GUID: {5ca83367-6e45-459f-a27b-476b1d01c936}
+
+! This notifies when the laptop lid is physically opened or closed.
+CONSTANT: GUID_LIDSWITCH_STATE_CHANGE
+    GUID: {ba3e0f4d-b817-4094-a2d1-d56379e6a0f3}
+
+CONSTANT: PBT_POWERSETTINGCHANGE 0x8013
+
+STRUCT: POWERBROADCAST_SETTING
+    { PowerSetting GUID  }
+    { DataLength   DWORD }
+    { Data         UCHAR }
+;
 
 : msgbox ( str -- )
     f swap "DebugMsg" MB_OK MessageBox drop ;
