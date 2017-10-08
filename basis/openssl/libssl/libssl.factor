@@ -355,6 +355,8 @@ STRUCT: SRP_CTX
     { strength int }
     { srp_Mask ulong } ;
 
+CONSTANT: SSL_MAX_SID_CTX_LENGTH 32
+
 STRUCT: SSL
     { version int }
     { type int }
@@ -396,7 +398,7 @@ STRUCT: SSL
     { compress void* }
     { cert void* }
     { sid_ctx_length uint }
-    { sid_ctx void* }
+    { sid_ctx char[SSL_MAX_SID_CTX_LENGTH] }
     { session SSL_SESSION* }
     { generate_session_id void* }
     { verify_mode int }
@@ -404,13 +406,14 @@ STRUCT: SSL
     { info_callback void* }
     { error int }
     { error_code int }
-    { kssl_ctx void* }
+    ! { kssl_ctx void* }
     { psk_client_callback void* }
     { psk_server_callback void* }
     { ctx SSL_CTX* }
     { debug int }
     { verify_result long }
     { ex_data CRYPTO_EX_DATA }
+    { client_CA void*[2] }
     { references int }
     { options ulong }
     { mode ulong }
@@ -424,6 +427,7 @@ STRUCT: SSL
     { servername_done int }
     { tlsext_status_type int }
     { tlsext_status_expected int }
+    { tlsext_ocsp_ids void* }
     { tlsext_ocsp_exts X509_EXTENSION* } ! X509_EXTENSIONS
     { tlsext_ocsp_resp uchar* }
     { tlsext_ocsp_resplen int }
@@ -442,12 +446,15 @@ STRUCT: SSL
     { initial_ctx SSL_CTX* }
     { next_proto_negotiated uchar* }
     { next_proto_negotiated_len uchar }
+    { srtp_profiles void* }
     { srtp_profile SRTP_PROTECTION_PROFILE* }
     { tlsext_heartbeat uint }
     { tlsext_hb_pending uint }
     { tlsext_hb_seq uint }
     { renegotiate int }
-    { srp_ctx SRP_CTX } ;
+    { srp_ctx SRP_CTX }
+    { alpn_client_proto_list char* }
+    { alpn_client_proto_list_len uint } ;
 
 ! ------------------------------------------------------------------------------
 ! API >= 1.1.0
