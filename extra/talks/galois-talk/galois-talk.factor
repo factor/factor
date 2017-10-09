@@ -147,7 +147,7 @@ CONSTANT: galois-slides
         "Very slow! Let's profile it..."
     }
     { $slide "Example: memoization"
-        { "Let's use " { $link POSTPONE: : } " instead of " { $link POSTPONE: MEMO: } }
+        { "Let's use " { $link POSTPONE: MEMO: } " instead of " { $link POSTPONE: : } }
         { $code
             "MEMO: fib ( m -- n )"
             "    dup 1 > ["
@@ -172,8 +172,8 @@ CONSTANT: galois-slides
         { { $link POSTPONE: EBNF: } ": a complex parsing word" }
         "Implements a custom syntax for expressing parsers: like OMeta!"
         { "Example: " { $vocab-link "printf-example" } }
-        { $code "\"vegan\" \"cheese\" \"%s is not %s\\n\" printf" }
-        { $code "5 \"Factor\" \"%s is %d years old\\n\" printf" }
+        { $code "\"cheese\" \"vegan\" \"%s is not %s\\n\" printf" }
+        { $code "\"Factor\" 5 \"%s is %d years old\\n\" printf" }
     }
     { $slide "Example: simple web browser"
         { $vocab-link "webkit-demo" }
@@ -273,7 +273,7 @@ CONSTANT: galois-slides
     }
     { $slide "Compiler: low-level optimizer"
         "Redundant stack operations eliminated, intermediate floats unboxed..."
-        { $code "[ c pixel ] test-mr mr." }
+        { $code "[ c pixel ] regs." }
     }
     { $slide "Garbage collection"
         "All roots are identified precisely"

@@ -335,8 +335,8 @@ CONSTANT: google-slides
         { { $link POSTPONE: EBNF: } ": a complex parsing word" }
         "Implements a custom syntax for expressing parsers"
         { "Example: " { $vocab-link "printf-example" } }
-        { $code "\"vegan\" \"cheese\" \"%s is not %s\\n\" printf" }
-        { $code "5 \"Factor\" \"%s is %d years old\\n\" printf" }
+        { $code "\"cheese\" \"vegan\" \"%s is not %s\\n\" printf" }
+        { $code "\"Factor\" 5 \"%s is %d years old\\n\" printf" }
     }
     { $slide "Input/output library"
         "One of Factor's strongest points: portable, full-featured, efficient"
@@ -455,9 +455,9 @@ CONSTANT: google-slides
     { $slide "Compiler: low level IR"
         "Register-based SSA"
         "Stack operations expand into low-level instructions"
-        { $code "[ 5 ] test-mr mr." }
-        { $code "[ swap ] test-mr mr." }
-        { $code "[ append reverse ] test-mr mr." }
+        { $code "[ 5 ] regs." }
+        { $code "[ swap ] regs." }
+        { $code "[ append reverse ] regs." }
     }
     { $slide "Compiler: low-level optimizer"
         "5 optimization passes"
@@ -469,7 +469,7 @@ CONSTANT: google-slides
         { "Example: " { $link 2array } }
         { { $link <array> } " fills array with initial value" }
         "What if we immediately store new values into the array?"
-        { $code "\\ 2array test-mr mr." }
+        { $code "\\ 2array regs." }
         "Mandelbrot: we optimize stack operations"
     }
     { $slide "Compiler: value numbering"
@@ -508,7 +508,7 @@ CONSTANT: google-slides
         "Simple IR rewrite step"
         "After register allocation, one vreg may have several live intervals, and different physical registers at different points in time"
         "Hence, \"second chance\""
-        { "Mandelbrot: " { $code "[ c pixel ] test-mr mr." } }
+        { "Mandelbrot: " { $code "[ c pixel ] regs." } }
     }
     { $slide "Compiler: code generation"
         "Iterate over list of instructions"

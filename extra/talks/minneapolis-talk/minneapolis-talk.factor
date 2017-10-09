@@ -105,7 +105,7 @@ CONSTANT: minneapolis-slides
         }
         "It is slow:"
         { $code
-            "35 [ fib ] map ."
+            "35 <iota> [ fib ] map ."
         }
         "Let's profile it!"
     }
@@ -126,7 +126,7 @@ CONSTANT: minneapolis-slides
         }
         "It is faster:"
         { $code
-            "35 [ fib ] map ."
+            "35 <iota> [ fib ] map ."
         }
     }
     { $slide "The Factor UI"

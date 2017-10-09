@@ -333,7 +333,7 @@ var price = (order == null ? null : order.price);" }
     }
     { $slide "Macro example"
         "Return the caaar of a sequence"
-        { "Return " { $snippet f } " on failure" }
+        { "Return " { $snippet "f" } " on failure" }
         { $code ": caaar ( seq/f -- x/f )
     {
         [ first ]
