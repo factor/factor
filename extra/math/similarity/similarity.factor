@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel math math.statistics math.vectors sequences ;
+USING: kernel math math.statistics math.vectors sequences sets ;
 
 IN: math.similarity
 
@@ -13,3 +13,8 @@ IN: math.similarity
 
 : cosine-similarity ( a b -- n )
     [ v* sum ] [ [ norm ] bi@ * ] 2bi / 0.5 * 0.5 + ;
+
+: jaccard-similarity ( a b -- n )
+    [ intersect cardinality dup ]
+    [ [ cardinality ] bi@ + swap - ] 2bi
+    [ drop 0 ] [ /f ] if-zero ;
