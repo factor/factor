@@ -13,11 +13,11 @@ IN: find.extras
 
 : matching-delimiter ( ch -- ch' )
     H{
-        { char: \( char: ) }
-        { char: \[ char: ] }
-        { char: \{ char: } }
+        { char: \( char: \) }
+        { char: \[ char: \] }
+        { char: \{ char: \} }
         { char: < char: > }
-        { char: \: char: ; }
+        { char: \: char: \; }
     } ?at drop ;
 
 : matching-delimiter-string ( string -- string' )
