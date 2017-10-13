@@ -63,7 +63,7 @@ ERROR: unexpected-end n string ;
     next-char-from 2nip ;
 
 : find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt ? )
-    [ find-from ] keep
+    [ find-from ] 2keep drop
     pick [ drop t ] [ length -rot nip f ] if ; inline
 
 : skip-blank-from ( n string -- n' string )

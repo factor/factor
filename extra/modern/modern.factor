@@ -138,12 +138,16 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         [ ")" sequence= ]
     } 1|| ;
 
+ERROR: expected-length-tokens n string length seq ;
+: ensure-no-false ( n string seq -- n string seq )
+    dup [ length 0 > ] all? [ [ length ] keep expected-length-tokens ] unless ;
+
 ERROR: token-expected n string obj ;
 ERROR: unexpected-terminator n string slice ;
 : read-lowercase-colon ( n string slice -- n' string lowercase-colon )
     dup [ char: \: = ] count-tail
     '[
-        _ [ lex-factor ] replicate dup [ token-expected ] unless
+        _ [ lex-factor ] replicate ensure-no-false dup [ token-expected ] unless
         dup terminator? [ unexpected-terminator ] when
     ] dip swap 2array ;
 
@@ -214,6 +218,7 @@ ERROR: no-backslash-payload n string slice ;
         dup [ char: \\ = ] count-tail
         '[
             _ [ skip-blank-from slice-til-whitespace drop ] replicate
+            ensure-no-false
             dup [ no-backslash-payload ] unless
         ] dip swap 2array
     ] when ;
