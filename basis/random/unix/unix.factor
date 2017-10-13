@@ -14,7 +14,7 @@ M: unix-random dispose reader>> dispose ;
 
 M: unix-random random-bytes* ( n tuple -- byte-array )
     reader>> stream-read ;
-HINTS: m: { unix-random random-bytes* } { fixnum unix-random } ;
+HINTS: M\\ unix-random random-bytes* { fixnum unix-random } ;
 
 [
     "/dev/random" <unix-random> &dispose secure-random-generator set-global

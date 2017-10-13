@@ -27,7 +27,7 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
 ] unit-test
 
 { t } [
-    { } \ nth effective-method nip m: { sequence nth } eq?
+    { } \ nth effective-method nip M\\ sequence nth eq?
 ] unit-test
 
 { t } [

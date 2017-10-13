@@ -47,7 +47,7 @@ GENERIC: blah-generic ( a -- b )
 
 M: string blah-generic ;
 
-{ } [ m: { string blah-generic } watch ] unit-test
+{ } [ M\\ string blah-generic watch ] unit-test
 
 { "hi" } [ "hi" blah-generic ] unit-test
 

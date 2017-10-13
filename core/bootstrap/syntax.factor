@@ -65,7 +65,7 @@ IN: bootstrap.syntax
         "W{"
         "["
         "\\"
-        "m:"
+        "M\\\\"
         "]"
         "delimiter"
         "deprecated"

@@ -51,7 +51,7 @@ M: sequence generic-forget-test-2 = ;
 ] unit-test
 
 { } [
-    [ m: { sequence generic-forget-test-2 } forget ] with-compilation-unit
+    [ M\\ sequence generic-forget-test-2 forget ] with-compilation-unit
 ] unit-test
 
 { f } [

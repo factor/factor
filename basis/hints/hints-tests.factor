@@ -7,6 +7,6 @@ GENERIC: blahblah ( a b c -- )
 
 M: hashtable blahblah 2nip [ 1 + ] change-count drop ;
 
-HINTS: m: { hashtable blahblah } { object fixnum object } { object word object } ;
+HINTS: M\\ hashtable blahblah { object fixnum object } { object word object } ;
 
-{ t } [ m: { hashtable blahblah } { count>> count<< } inlined? ] unit-test
+{ t } [ M\\ hashtable blahblah { count>> count<< } inlined? ] unit-test

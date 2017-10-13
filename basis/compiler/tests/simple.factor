@@ -252,7 +252,7 @@ M: quotation bad-effect-test call ; inline
 [ bad-effect-test* ] [ not-compiled? ] must-fail-with
 
 ! Don't want compiler error to stick around
-[ ] [ [ m: { quotation bad-effect-test } forget ] with-compilation-unit ] unit-test
+[ ] [ [ M\\ quotation bad-effect-test forget ] with-compilation-unit ] unit-test
 
 ! Make sure time bombs literalize
 [ [ \ + call ] compile-call ] [ no-method? ] must-fail-with
