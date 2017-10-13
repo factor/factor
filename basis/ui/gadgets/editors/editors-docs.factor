@@ -8,7 +8,7 @@ HELP: <multiline-editor>
 { $description "Creates a new multi-line editor gadget." } ;
 
 HELP: editor
-{ $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
+{ $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are created by calling " { $link <editor> } "."
 $nl
 "Editors have the following slots:"
 { $list
