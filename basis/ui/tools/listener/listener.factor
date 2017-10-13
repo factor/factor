@@ -1,19 +1,21 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators
-combinators.short-circuit concurrency.flags concurrency.mailboxes
-continuations destructors documents documents.elements fonts fry
-hashtables help help.markup help.tips io io.styles kernel lexer
-listener literals locals math math.vectors models models.arrow
-models.delay namespaces parser prettyprint sequences
-source-files.errors strings system threads tools.errors.model ui
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
-ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks ui.gestures
-ui.operations ui.pens.solid ui.theme ui.tools.browser ui.tools.common
-ui.tools.debugger ui.tools.error-list ui.tools.listener.completion
-ui.tools.listener.history ui.tools.listener.popups vocabs
-vocabs.loader vocabs.parser vocabs.refresh words ;
+combinators.short-circuit concurrency.flags
+concurrency.mailboxes continuations destructors documents
+documents.elements fonts fry hashtables help help.markup
+help.tips io io.styles kernel lexer listener literals locals
+math math.vectors models models.arrow models.delay namespaces
+parser prettyprint sequences source-files.errors strings system
+threads tools.errors.model ui ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
+ui.pens.solid ui.text ui.theme ui.tools.browser ui.tools.common
+ui.tools.debugger ui.tools.error-list
+ui.tools.listener.completion ui.tools.listener.history
+ui.tools.listener.popups vocabs vocabs.loader vocabs.parser
+vocabs.refresh words ;
 IN: ui.tools.listener
 
 TUPLE: interactor < source-editor
@@ -478,6 +480,9 @@ M: listener-gadget ungraft*
         family font-name pick set-at
         size font-size pick set-at ;
 
+: font-height ( font -- height )
+    font-metrics compute-height height>> ;
+
 PRIVATE>
 
 :: set-listener-font ( family size -- )
@@ -485,8 +490,10 @@ PRIVATE>
     family size make-font-style
     inter output>> make-span-stream :> ostream
     ostream inter output<<
-    inter font>> clone
+    inter [
+        clone
         family >>name
         size >>size
-    inter font<<
+    ] change-font
+    font>> font-height inter line-height<<
     ostream output-stream set ;
