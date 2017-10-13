@@ -141,8 +141,9 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 ERROR: token-expected n string obj ;
 ERROR: unexpected-terminator n string slice ;
 : read-lowercase-colon ( n string slice -- n' string lowercase-colon )
-    [
-        lex-factor dup [ token-expected ] unless
+    dup [ char: \: = ] count-tail
+    '[
+        _ [ lex-factor ] replicate dup [ token-expected ] unless
         dup terminator? [ unexpected-terminator ] when
     ] dip swap 2array ;
 
@@ -210,8 +211,9 @@ ERROR: no-backslash-payload n string slice ;
 : read-backslash ( n string slice -- n' string obj )
     merge-slice-til-whitespace dup "\\" tail? [
         ! \ foo, M\ foo
-        [
-            skip-blank-from slice-til-whitespace drop
+        dup [ char: \\ = ] count-tail
+        '[
+            _ [ skip-blank-from slice-til-whitespace drop ] replicate
             dup [ no-backslash-payload ] unless
         ] dip swap 2array
     ] when ;
