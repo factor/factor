@@ -23,5 +23,5 @@ M: random-stream dispose drop ;
 INSTANCE: random-stream input-stream
 
 : random-file ( n path -- )
-    [ <random-stream> swap limit-stream ]
+    [ <random-stream> limit-stream ]
     [ binary <file-writer> ] bi* stream-copy ;

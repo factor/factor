@@ -5,14 +5,14 @@ IN: io.streams.limited
 
 HELP: <limited-stream>
 { $values
-     { "stream" "an input stream" } { "limit" integer }
+     { "limit" integer } { "stream" "an input stream" }
      { "stream'" "an input stream" }
 }
 { $description "Constructs a new " { $link limited-stream } " from an existing stream. User code should use " { $link limit-stream } " or " { $link limited-input } "." } ;
 
 HELP: limit-stream
 { $values
-     { "stream" "an input stream" } { "limit" integer }
+     { "limit" integer } { "stream" "an input stream" }
      { "stream'" "a stream" }
 }
 { $description "Changes a decoder's stream to be a limited stream, or wraps " { $snippet "stream" } " in a " { $link limited-stream } "." }
@@ -21,7 +21,7 @@ HELP: limit-stream
     { $example
         "USING: accessors continuations io io.streams.limited"
         "io.streams.string kernel prettyprint ;"
-        "\"123456\" <string-reader> 3 limit-stream"
+        3 "\"123456\" <string-reader> limit-stream"
         "100 swap stream-read ."
         "\"123\""
     }

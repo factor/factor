@@ -9,34 +9,33 @@ IN: io.streams.limited
 TUPLE: limited-stream stream count limit current start stop ;
 INSTANCE: limited-stream input-stream
 
-: <limited-stream> ( stream limit -- stream' )
+: <limited-stream> ( limit stream -- stream' )
     limited-stream new
-        swap >>limit
         swap >>stream
+        swap >>limit
         0 >>count ;
 
 : <limited-file-reader> ( path encoding -- stream' )
-    [ <file-reader> ]
-    [ drop file-info size>> ] 2bi
+    [ drop file-info size>> ] [ <file-reader> ] 2bi
     <limited-stream> ;
 
-GENERIC#: limit-stream 1 ( stream limit -- stream' )
+GENERIC: limit-stream ( limit stream -- stream' )
 
-M: decoder limit-stream ( stream limit -- stream' )
-    '[ stream>> _ limit-stream ] [ code>> ] [ cr>> ] tri
+M: decoder limit-stream ( limit stream -- stream' )
+    [ stream>> limit-stream ] [ code>> ] [ cr>> ] tri
     decoder boa ; inline
 
-M: object limit-stream ( stream limit -- stream' )
+M: object limit-stream ( limit stream -- stream' )
     <limited-stream> ;
 
 : limited-input ( limit -- )
-    [ input-stream ] dip '[ _ limit-stream ] change ;
+    input-stream [ limit-stream ] change ;
 
-: with-limited-stream ( stream limit quot -- )
+: with-limited-stream ( limit stream quot -- )
     [ limit-stream ] dip call ; inline
 
 : with-limited-input ( limit quot -- )
-    [ [ input-stream get ] dip limit-stream input-stream ] dip
+    [ input-stream get limit-stream input-stream ] dip
     with-variable ; inline
 
 ERROR: limit-exceeded n stream ;
