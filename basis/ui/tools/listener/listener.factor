@@ -11,7 +11,7 @@ threads tools.errors.model ui ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
-ui.pens.solid ui.text ui.theme ui.tools.browser ui.tools.common
+ui.pens.solid ui.theme ui.tools.browser ui.tools.common
 ui.tools.debugger ui.tools.error-list
 ui.tools.listener.completion ui.tools.listener.history
 ui.tools.listener.popups vocabs vocabs.loader vocabs.parser
@@ -480,9 +480,6 @@ M: listener-gadget ungraft*
         family font-name pick set-at
         size font-size pick set-at ;
 
-: font-height ( font -- height )
-    font-metrics compute-height height>> ;
-
 PRIVATE>
 
 :: set-listener-font ( family size -- )
@@ -494,6 +491,5 @@ PRIVATE>
         clone
         family >>name
         size >>size
-    ] change-font
-    font>> font-height inter line-height<<
+    ] change-font f >>line-height drop
     ostream output-stream set ;
