@@ -116,8 +116,8 @@ FUNCTION: PyObject* PyObject_Str ( PyObject* o )
 FUNCTION: int PyObject_IsTrue ( PyObject* o )
 
 ! Strings
-FUNCTION: c-string PyString_AsString ( PyObject* string )
-FUNCTION: PyObject* PyString_FromString ( c-string v )
+FUNCTION: c-string PyBytes_AsString ( PyObject* string )
+FUNCTION: PyObject* PyBytes_FromString ( c-string v )
 
 ! Unicode
 FUNCTION: PyObject* PyUnicode_DecodeUTF8 ( c-string s,
