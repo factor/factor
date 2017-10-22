@@ -5,7 +5,7 @@ math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple help.vocabs math.parser
-accessors definitions sets ;
+accessors definitions sets lists ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
