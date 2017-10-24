@@ -32,8 +32,8 @@ TUPLE: search-field < track field ;
         0 >>fill
         { 5 5 } >>gap
         +baseline+ >>align
-        swap <model-field> 10 >>min-cols >>field
-        dup field>> "Search:" label-on-left 1 track-add
+        swap <model-field> 10 >>min-cols "Search" >>default-text
+        [ >>field ] keep 1 track-add
         dup <clear-button> f track-add ;
 
 M: search-field focusable-child* field>> ;
