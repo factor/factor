@@ -3,7 +3,7 @@
 USING: accessors colors.constants colors.hex combinators
 combinators.smart formatting kernel literals models
 sorting.human sorting.slots strings ui ui.gadgets.scrollers
-ui.gadgets.tables ;
+ui.gadgets.search-tables ui.gadgets.tables ;
 IN: color-table
 
 ! ui.gadgets.tables demo
@@ -41,11 +41,12 @@ M: color-renderer row-value
 : <color-table> ( -- table )
     named-colors { human<=> } sort-by <model>
     color-renderer
-    <table>
+    [ ] <search-table>
+        dup table>>
         5 >>gap
         COLOR: dark-gray >>column-line-color
         10 >>min-rows
-        10 >>max-rows ;
+        10 >>max-rows drop ;
 
 MAIN-WINDOW: color-table-demo { { title "Colors" } { pref-dim { 500 300 } } }
     <color-table> <scroller> >>gadgets ;
