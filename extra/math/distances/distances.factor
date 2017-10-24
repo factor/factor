@@ -1,8 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel math math.functions math.statistics math.vectors
-sequences sequences.extras ;
+USING: kernel math math.functions math.similarity
+math.statistics math.vectors sequences sequences.extras ;
 
 IN: math.distances
 
@@ -22,7 +22,7 @@ IN: math.distances
     v- vabs supremum ;
 
 : cosine-distance ( a b -- n )
-    [ v* sum ] [ [ norm ] bi@ * ] 2bi / 1 swap - ;
+    cosine-similarity 1 swap - ;
 
 : canberra-distance ( a b -- n )
     [ v- vabs ] [ [ vabs ] bi@ v+ ] 2bi v/ sum ;
@@ -31,4 +31,4 @@ IN: math.distances
     [ v- ] [ v+ ] 2bi [ vabs sum ] bi@ / ;
 
 : correlation-distance ( a b -- n )
-    [ demean ] bi@ [ v* sum ] [ [ norm ] bi@ * ] 2bi / 1 swap - ;
+    [ demean ] bi@ cosine-distance ;
