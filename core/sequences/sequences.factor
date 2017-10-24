@@ -1001,12 +1001,10 @@ PRIVATE>
     [ rest-slice ] [ first-unsafe ] bi ; inline
 
 : map-reduce ( ..a seq map-quot: ( ..a elt -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
-    [ [ dup first ] dip [ call ] keep ] dip compose
-    swapd 1 each-from ; inline
+    [ [ [ first ] keep ] dip [ dip ] keep ] dip compose 1 each-from ; inline
 
 : 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
-    [ [ 2dup [ first ] bi@ ] dip [ call ] keep ] dip compose
-    [ -rot ] dip 1 2each-from ; inline
+    [ [ [ [ first ] bi@ ] 2keep ] dip [ 2dip ] keep ] dip compose 1 2each-from ; inline
 
 <PRIVATE
 
