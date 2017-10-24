@@ -12,6 +12,7 @@ CONSTANT: b { 0 0 0 0 2 3 1 }
 { t } [ a b euclidian-similarity 0.1336766024001917 1e-10 ~ ] unit-test
 
 { t } [ a a pearson-similarity 1.0 1e-10 ~ ] unit-test
+{ t } [ a a vneg pearson-similarity 0.0 1e-10 ~ ] unit-test
 { t } [ a b pearson-similarity 0.2376861940759582 1e-10 ~ ] unit-test
 
 { t } [ a a cosine-similarity 1.0 1e-10 ~ ] unit-test
