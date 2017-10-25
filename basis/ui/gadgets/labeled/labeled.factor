@@ -60,7 +60,7 @@ PRIVATE>
     vertical <track>
     add-content
     { 5 5 } <border>
-    content-background <solid> >>interior
+    white-interior
     1 track-add
     labeled-border-color <solid> >>boundary
     { 3 3 } <border> ;
