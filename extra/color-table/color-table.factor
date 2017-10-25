@@ -41,8 +41,7 @@ M: color-renderer row-value
 : <color-table> ( -- table )
     named-colors { human<=> } sort-by <model>
     color-renderer
-    [ ] <search-table>
-        dup table>>
+    [ ] <search-table> dup table>>
         5 >>gap
         COLOR: dark-gray >>column-line-color
         10 >>min-rows
