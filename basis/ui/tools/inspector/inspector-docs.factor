@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ui.commands ui.gadgets.slots
-ui.gadgets.panes ui.gadgets.editors kernel ;
+USING: help.markup help.syntax ui.commands
+ui.gadgets.panes ui.gadgets.editors ui.tools.inspector.slots kernel ;
 IN: ui.tools.inspector
 
 ARTICLE: "ui-inspector-edit" "Editing slot values in the inspector"

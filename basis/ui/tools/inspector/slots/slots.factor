@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors eval kernel math.vectors parser prettyprint
 refs sequences ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.scrollers ui.gadgets.toolbar ui.gadgets.tracks
-ui.gestures ui.tools.common ;
-IN: ui.gadgets.slots
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
+ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.tools.common
+;
+IN: ui.tools.inspector.slots
 
 TUPLE: slot-editor < track ref close-hook update-hook text ;
 
@@ -75,3 +76,12 @@ slot-editor "toolbar" f {
     { f delete }
     { T{ key-down f f "ESC" } close }
 } define-command-map
+
+: slot-editor-window ( close-hook update-hook assoc key key-string -- )
+    [ <value-ref> <slot-editor> ]
+    [
+        <world-attributes>
+            swap "Slot editor: " prepend >>title
+            [ { dialog-window } append ] change-window-controls
+    ] bi*
+    open-status-window ;
