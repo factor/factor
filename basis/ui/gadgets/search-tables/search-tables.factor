@@ -46,26 +46,6 @@ M: search-field handle-gesture
         { [ pass-to-table ] [ call-next-method ] } 2&&
     ] [ call-next-method ] if ;
 
-! A protocol with customizable slots
-SLOT-PROTOCOL: table-protocol
-renderer
-action
-hook
-font
-selection-color
-focus-border-color
-mouse-color
-column-line-color
-selection-required?
-single-click?
-selection
-min-rows
-min-cols
-max-rows
-max-cols ;
-
-CONSULT: table-protocol search-table table>> ;
-
 :: <search-table> ( values renderer quot -- gadget )
     f <model> :> search
     vertical search-table new-track

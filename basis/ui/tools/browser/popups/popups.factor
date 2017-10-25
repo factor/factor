@@ -22,18 +22,18 @@ TUPLE: links-popup < wrapper ;
     '[
         @ sort-articles
         [ dup article-title ] { } map>assoc
-    ] <arrow> link-renderer [ second ] <search-table>
+    ] <arrow> link-renderer [ second ] <search-table> dup table>>
         [ invoke-primary-operation ] >>action
         [ hide-glass ] >>hook
         t >>selection-required?
         10 >>min-rows
         10 >>max-rows
         30 >>min-cols
-        30 >>max-cols ;
+        30 >>max-cols drop ;
 
 : <links-popup> ( model quot title -- gadget )
     [ <links-table> white-interior ] dip
-    popup-color <labeled-gadget> links-popup new-wrapper ;
+    popup-color <framed-labeled-gadget> links-popup new-wrapper ;
 
 links-popup H{
     { T{ key-down f f "ESC" } [ hide-glass ] }
