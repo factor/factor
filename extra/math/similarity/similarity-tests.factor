@@ -19,3 +19,9 @@ CONSTANT: b { 0 0 0 0 2 3 1 }
 { t } [ a a vneg cosine-similarity -1.0 1e-10 ~ ] unit-test
 { t } [ a b cosine-similarity 0.0944911182523068 1e-10 ~ ] unit-test
 
+
+{ 3/100 } [
+    { 0 0 0 10 10 } { 0 0 1 1 1 } { 0 0 0 1 2 }
+    weighted-cosine-similarity
+] unit-test
+
