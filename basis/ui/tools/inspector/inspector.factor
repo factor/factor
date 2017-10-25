@@ -100,8 +100,10 @@ M: inspector-table compute-column-widths
         add-toolbar
         swap >>model
         dup model>> <inspector-table> >>table
-        dup model>> <summary-gadget> margins white-interior "Object" object-color <labeled> f track-add
-        dup table>> <scroller> margins white-interior "Contents" contents-color <labeled> 1 track-add ;
+        dup model>> <summary-gadget> margins white-interior
+        "Object" object-color <labeled-gadget> f track-add
+        dup table>> <scroller> margins white-interior
+        "Contents" contents-color <labeled-gadget> 1 track-add ;
 
 M: inspector-gadget focusable-child*
     table>> ;

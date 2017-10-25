@@ -33,12 +33,12 @@ M: stack-entry-renderer row-value drop object>> ;
 
 : <stack-display> ( model quot title color -- gadget )
     [ '[ dup _ when ] <arrow> <stack-table> margins <scroller> white-interior ] 2dip
-    <labeled> ;
+    <labeled-gadget> ;
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
     <pane-control> t >>scrolls? margins <scroller> white-interior
-    "Call stack" call-stack-color <labeled> ;
+    "Call stack" call-stack-color <labeled-gadget> ;
 
 : <datastack-display> ( model -- gadget )
     [ data>> ] "Data stack" data-stack-color <stack-display> ;

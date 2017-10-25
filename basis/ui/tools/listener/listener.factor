@@ -348,7 +348,7 @@ M: object accept-completion-hook 2drop ;
     ] ;
 
 : frame-debugger ( debugger -- labeled )
-    "Error" debugger-color <framed-labeled> ;
+    "Error" debugger-color <framed-labeled-gadget> ;
 
 :: <debugger-popup> ( error continuation interactor -- popup )
     error
