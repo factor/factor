@@ -156,8 +156,8 @@ $nl
     "models-impl"
     "models.arrow"
     "models.product"
-    "models-range"
-    "models-delay"
+    "models.range"
+    "models.delay"
 } ;
 
 ARTICLE: "models-impl" "Implementing models"
