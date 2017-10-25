@@ -55,14 +55,14 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
 } define-command
 
 : <slot-editor> ( close-hook update-hook ref -- gadget )
-    vertical slot-editor new-track
+    vertical slot-editor new-track with-lines
         swap >>ref
         swap >>update-hook
         swap >>close-hook
         add-toolbar
         <source-editor> >>text
-        dup text>> margins <scroller> 1 track-add
-        dup revert white-interior ;
+        dup text>> margins <scroller> white-interior 1 track-add
+        dup revert ;
 
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
 
