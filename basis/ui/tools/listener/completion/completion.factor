@@ -150,7 +150,7 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
         dup '[ _ accept-completion ] >>action ;
 
 : <completion-scroller> ( completion-popup -- scroller )
-    table>> <scroller> content-background <solid> >>interior ;
+    table>> <scroller> white-interior ;
 
 : <completion-popup> ( interactor completion-mode -- popup )
     [ vertical completion-popup new-track ] 2dip

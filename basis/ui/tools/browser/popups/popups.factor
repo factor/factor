@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs colors.constants
-definitions.icons fry help help.topics kernel math.rectangles
-models.arrow namespaces sequences tools.crossref ui.gadgets
-ui.gadgets.glass ui.gadgets.labeled ui.gadgets.search-tables
-ui.gadgets.tables ui.gadgets.wrappers ui.gestures ui.images
-ui.operations ui.pens.solid ui.theme ui.theme.images ;
+USING: accessors arrays assocs definitions.icons fry help
+help.topics kernel math.rectangles models.arrow namespaces
+sequences tools.crossref ui.gadgets ui.gadgets.glass
+ui.gadgets.labeled ui.gadgets.search-tables ui.gadgets.tables
+ui.gadgets.wrappers ui.gestures ui.images ui.operations ui.theme
+ui.tools.common ;
 FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.tools.browser.popups
 
@@ -32,7 +32,7 @@ TUPLE: links-popup < wrapper ;
         30 >>max-cols ;
 
 : <links-popup> ( model quot title -- gadget )
-    [ <links-table> content-background <solid> >>interior ] dip
+    [ <links-table> white-interior ] dip
     popup-color <labeled> links-popup new-wrapper ;
 
 links-popup H{
