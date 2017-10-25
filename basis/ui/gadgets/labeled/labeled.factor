@@ -1,9 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov, 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants kernel system ui.gadgets
-ui.gadgets.borders ui.gadgets.labels ui.gadgets.packs
-ui.theme ui.gadgets.tracks ui.pens.gradient
-ui.pens.solid ui.tools.common ;
+USING: accessors kernel system ui.gadgets ui.gadgets.borders
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks
+ui.pens.gradient ui.pens.solid ui.theme ;
 IN: ui.gadgets.labeled
 
 TUPLE: labeled-gadget < track content color ;
@@ -44,7 +43,7 @@ M: labeled-gadget focusable-child* content>> ;
 PRIVATE>
 
 : <labeled-gadget> ( gadget title color -- labeled )
-    vertical labeled-gadget new-track with-lines
+    vertical labeled-gadget new-track
     swap >>color
     add-title-bar
     swap >>content
