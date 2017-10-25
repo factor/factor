@@ -39,10 +39,10 @@ T{ error-type-holder
 } define-error-type
 
 : <compiler-error> ( error word -- compiler-error )
-    \ compiler-error <definition-error> ;
+    compiler-error new-source-file-error ;
 
 : <linkage-error> ( error word -- linkage-error )
-    \ linkage-error <definition-error> ;
+    linkage-error new-source-file-error ;
 
 : set-linkage-error ( name message word class -- )
     '[ _ boa ] dip <linkage-error> dup asset>> linkage-errors get set-at ; inline

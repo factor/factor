@@ -32,11 +32,11 @@ HELP: error-file
 { $values { "error" "an error" } { "file" "a file path" } }
 { $description "File in which the error occurred." } ;
 
-HELP: <definition-error>
+HELP: new-source-file-error
 { $values
-  { "error" "an error." }
-  { "definition" "an asset that contains the error." }
-  { "class" "a tuple class deriving source-file-error." }
+  { "error" "an error" }
+  { "asset" "an asset that contains the error" }
+  { "class" "a tuple class deriving source-file-error" }
   { "source-file-error" source-file-error }
 }
 { $description "Creates a new " { $link source-file-error } " instance." } ;
