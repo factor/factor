@@ -33,7 +33,7 @@ HELP: :linkage
 { :errors :linkage } related-words
 
 HELP: errors.
-{ $values { "errors" "a sequence of " { $link source-file-error } " instances" } }
+{ $values { "errors" { $sequence source-file-error } } }
 { $description "Prints a list of errors, grouped by source file." } ;
 
 ARTICLE: "tools.errors" "Batch error reporting"

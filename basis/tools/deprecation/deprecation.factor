@@ -12,9 +12,9 @@ SYMBOL: deprecation-notes
 
 deprecation-notes [ H{ } clone ] initialize
 
-TUPLE: deprecation-note-error < source-file-error ;
+TUPLE: deprecation-note < source-file-error ;
 
-M: deprecation-note-error error-type drop +deprecation-note+ ;
+M: deprecation-note error-type drop +deprecation-note+ ;
 
 TUPLE: deprecated-usages asset usages ;
 
@@ -31,13 +31,13 @@ T{ error-type-holder
     { fatal? f }
 } define-error-type
 
-: <deprecation-note-error> ( error word -- deprecation-note )
-    \ deprecation-note-error <definition-error> ;
+: <deprecation-note> ( error word -- deprecation-note )
+    deprecation-note new-source-file-error ;
 
-: deprecation-note ( word usages -- )
-    [ deprecated-usages boa ]
-    [ drop <deprecation-note-error> ]
-    [ drop deprecation-notes get-global set-at ] 2tri ;
+: store-deprecation-note ( word usages -- )
+    over [ deprecated-usages boa ] dip
+    [ <deprecation-note> ]
+    [ deprecation-notes get-global set-at ] bi ;
 
 : clear-deprecation-note ( word -- )
     deprecation-notes get-global delete-at ;
@@ -47,7 +47,8 @@ T{ error-type-holder
         dup { [ "forgotten" word-prop ] [ deprecated? ] } 1||
         [ clear-deprecation-note ] [
             dup def>> uses [ deprecated? ] filter
-            [ clear-deprecation-note ] [ >array deprecation-note ] if-empty
+            [ clear-deprecation-note ]
+            [ store-deprecation-note ] if-empty
         ] if
     ] [ drop ] if ;
 
@@ -74,7 +75,7 @@ M: deprecation-observer definitions-changed
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;
 
-[ \ deprecation-observer add-definition-observer ]
+[ deprecation-observer add-definition-observer ]
 "tools.deprecation" add-startup-hook
 
 initialize-deprecation-notes
