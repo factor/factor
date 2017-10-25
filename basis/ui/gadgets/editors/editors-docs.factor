@@ -12,7 +12,6 @@ HELP: editor
 $nl
 "Editors have the following slots:"
 { $list
-    { { $snippet "caret-color" } " - a " { $link color } "." }
     { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
     { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
     { { $snippet "focused?" } " - a boolean." }
