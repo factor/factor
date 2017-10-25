@@ -1,8 +1,7 @@
 USING: help.markup help.syntax ;
 IN: snake-game
 
-ARTICLE: { "snake-game" "about" } "About Snake Game"
-{ $heading "About" }
+ARTICLE: "snake-game" "Snake Game"
 "A remake of the popular Snake game. To start the game:"
 { $code "play-snake-game" }
 { $heading "Keys" }
@@ -22,4 +21,4 @@ ARTICLE: { "snake-game" "about" } "About Snake Game"
 HELP: play-snake-game
 { $description "Starts the game!" } ;
 
-ABOUT: { "snake-game" "about" }
+ABOUT: "snake-game"

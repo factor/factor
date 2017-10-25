@@ -43,7 +43,7 @@ HELP: publish
 }
 { $see-also <remote-channel> unpublish } ;
 
-ARTICLE: { "remote-channels" "remote-channels" } "Remote Channels"
+ARTICLE: "channels.remote" "Remote Channels"
 "Remote channels are channels that can be accessed by other Factor instances. It uses distributed concurrency to serialize and send data between channels."
 $nl
 "To start a remote node, distributed concurrency must have been started. This can be done using " { $link start-server } "."
@@ -61,4 +61,4 @@ $nl
 { $snippet "\"myhost.com\" 9001 <node> 123456 <remote-channel>\n\"hello\" over to" }
 ;
 
-ABOUT: { "remote-channels" "remote-channels" }
+ABOUT: "channels.remote"
