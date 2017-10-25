@@ -1,17 +1,17 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays sequences sorting assocs colors.constants fry
-combinators combinators.smart combinators.short-circuit editors make
-memoize compiler.units fonts kernel io.pathnames prettyprint
-source-files.errors source-files.errors.debugger math.parser init math.order
-models models.arrow models.arrow.smart models.search models.mapping debugger
-namespaces summary locals ui ui.commands ui.gadgets ui.gadgets.panes
-ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
-ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
-ui.tools.inspector ui.gadgets.buttons ui.gadgets.borders ui.gadgets.labels
-ui.gadgets.packs ui.theme ui.gadgets.toolbar ui.gadgets.status-bar
-ui.baseline-alignment ui.images
-compiler.errors tools.errors tools.errors.model ;
+USING: accessors arrays assocs calendar colors.constants
+combinators combinators.smart compiler.errors debugger editors
+fry init io.pathnames kernel locals math.parser memoize models
+models.arrow models.arrow.smart models.delay models.mapping
+models.search namespaces prettyprint sequences sorting
+source-files.errors source-files.errors.debugger summary ui
+ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.labeled
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tables
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.images
+ui.operations ui.theme ui.tools.browser ui.tools.common
+ui.tools.inspector ;
 IN: ui.tools.error-list
 
 CONSTANT: source-file-icon
@@ -156,7 +156,7 @@ error-display "toolbar" f {
     [ swap '[ error-type _ at ] filter ] <smart-arrow> ;
 
 :: <error-list-gadget> ( model -- gadget )
-    vertical \ error-list-gadget new-track
+    vertical error-list-gadget new-track
         <error-toggle> [ >>error-toggle ] [ >>visible-errors ] bi*
         dup visible-errors>> model <error-model> >>model
         f <model> >>source-file
@@ -178,6 +178,13 @@ error-display "toolbar" f {
 M: error-list-gadget focusable-child*
     source-file-table>> ;
 
+SYMBOLS: error-list-model ;
+
+SINGLETON: error-list-updater
+
+M: error-list-updater errors-changed
+    drop f error-list-model get-global model>> set-model ;
+
 : error-list-help ( -- ) "ui.tools.error-list" com-browse ;
 
 \ error-list-help H{ { +nullary+ t } } define-command
@@ -186,14 +193,17 @@ M: error-list-gadget focusable-child*
     { T{ key-down f f "F1" } error-list-help }
 } define-command-map
 
-MEMO: get-error-list-gadget ( -- gadget )
+: error-list-window ( -- )
     error-list-model get-global [ drop all-errors ] <arrow>
-    <error-list-gadget> ;
-
-[ \ get-error-list-gadget reset-memoized ] "ui.tools.error-list" add-startup-hook
+    <error-list-gadget> "Errors" open-status-window ;
 
 : show-error-list ( -- )
-    [ get-error-list-gadget eq? ] find-window
-    [ raise-window ] [ get-error-list-gadget "Errors" open-status-window ] if* ;
+    [ error-list-gadget? ] find-window
+    [ raise-window ] [ error-list-window ] if* ;
 
 \ show-error-list H{ { +nullary+ t } } define-command
+
+[
+    f <model> 100 milliseconds <delay> error-list-model set-global
+    error-list-updater add-error-observer
+] "ui.tools.error-list" add-startup-hook
