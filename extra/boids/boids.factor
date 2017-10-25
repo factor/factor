@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! Copyright (C) 2011 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays boids.simulation calendar classes kernel
-literals locals math math.functions math.trig models opengl
-opengl.demo-support opengl.gl sequences threads ui ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.frames
-ui.gadgets.grids ui.gadgets.labeled ui.gadgets.labels
-ui.gadgets.packs ui.gadgets.sliders ui.render ;
+USING: accessors arrays boids.simulation calendar classes
+colors.constants kernel literals locals math math.functions
+math.trig models opengl opengl.demo-support opengl.gl sequences
+threads ui ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.frames ui.gadgets.grids ui.gadgets.labeled
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
+ui.gadgets.tracks ui.render ui.tools.common ;
 QUALIFIED-WITH: models.range mr
 IN: boids
 
@@ -75,7 +76,7 @@ M: range-observer model-changed
     range-observer boa swap add-connection ;
 
 :: behavior-panel ( behavior -- gadget )
-    2 3 <frame> { 2 4 } >>gap { 0 0 } >>filled-cell
+    2 3 <frame> white-interior { 2 4 } >>gap { 0 0 } >>filled-cell
 
     "weight" <label> { 0 0 } grid-add
     behavior weight>> 100 * >fixnum 0 0 200 1 mr:<range>
@@ -92,7 +93,9 @@ M: range-observer model-changed
     dup [ deg>rad cos behavior angle-cos<< ] connect
     horizontal <slider> { 1 2 } grid-add
 
-    behavior class-of name>> <labeled-gadget> ;
+    { 5 5 } <border> white-interior
+
+    behavior class-of name>> COLOR: gray <framed-labeled-gadget> ;
 
 :: set-population ( n boids-gadget -- )
     boids-gadget [
@@ -109,9 +112,9 @@ M: range-observer model-changed
     [ length random-boids ] change-boids drop ;
 
 :: simulation-panel ( boids-gadget -- gadget )
-    <pile> { 2 2 } >>gap
+    <pile> white-interior
 
-    2 2 <frame> { 4 4 } >>gap { 0 0 } >>filled-cell
+    2 2 <frame> { 2 4 } >>gap { 0 0 } >>filled-cell
 
     "population" <label> { 0 0 } grid-add
     initial-population 0 0 200 10 mr:<range>
@@ -123,7 +126,7 @@ M: range-observer model-changed
     dup [ boids-gadget dt<< ] connect
     horizontal <slider> { 1 1 } grid-add
 
-    add-gadget
+    { 5 5 } <border> add-gadget
 
     <shelf> { 2 2 } >>gap
     "pause" [ drop boids-gadget pause-toggle ]
@@ -131,9 +134,9 @@ M: range-observer model-changed
     "randomize" [ drop boids-gadget randomize-boids ]
     <border-button> add-gadget
 
-    add-gadget
+    { 5 5 } <border> add-gadget
 
-    "simulation" <labeled-gadget> ;
+    "simulation" COLOR: gray <framed-labeled-gadget> ;
 
 :: create-gadgets ( -- gadgets )
     <shelf>
@@ -141,7 +144,7 @@ M: range-observer model-changed
     boids-gadget [ start-boids-thread ] keep
     add-gadget
 
-    <pile> { 2 2 } >>gap 1.0 >>fill
+    <pile> { 5 5 } >>gap 1.0 >>fill
 
     boids-gadget simulation-panel
     add-gadget
@@ -149,8 +152,7 @@ M: range-observer model-changed
     boids-gadget behaviours>>
     [ behavior-panel add-gadget ] each
 
-    add-gadget
-    { 2 2 } <border> ;
+    { 5 5 } <border> add-gadget ;
 
 MAIN-WINDOW: boids { { title "Boids" } }
     create-gadgets

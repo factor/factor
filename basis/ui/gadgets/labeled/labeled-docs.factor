@@ -6,7 +6,7 @@ HELP: labeled-gadget
 { $class-description "A labeled gadget can be created by calling " { $link <labeled-gadget> } "." } ;
 
 HELP: <labeled-gadget>
-{ $values { "gadget" gadget } { "title" string } { "labeled" "a new " { $link <labeled-gadget> } } }
+{ $values { "gadget" gadget } { "title" string } { "color" "a color" } { "labeled" "a new " { $link <labeled-gadget> } } }
 { $description "Creates a new " { $link labeled-gadget } " display " { $snippet "gadget" } " with " { $snippet "title" } " on top." } ;
 
 ARTICLE: "ui.gadgets.labeled" "Labeled gadgets"
@@ -14,6 +14,7 @@ ARTICLE: "ui.gadgets.labeled" "Labeled gadgets"
 { $subsections
     labeled-gadget
     <labeled-gadget>
+    <framed-labeled-gadget>
 } ;
 
 ABOUT: "ui.gadgets.labeled"
