@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals math math.rectangles
 math.vectors memoize models namespaces opengl sequences sorting
-ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.glass
-ui.gadgets.packs ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
-ui.operations ui.pens ui.pens.solid ui.theme ui.tools.common ;
-
+ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.glass ui.gadgets.packs ui.gadgets.worlds
+ui.gadgets.wrappers ui.gestures ui.operations ui.pens
+ui.pens.solid ui.theme ;
 FROM: ui.gadgets.wrappers => wrapper ;
 
 IN: ui.gadgets.menus
@@ -140,7 +140,7 @@ menu H{
 : <menu> ( gadgets -- menu )
     <menu-items> [
         { 0 3 } >>gap
-        margins
+        { 5 5 } <filled-border>
         menu-border-color <solid> >>boundary
         menu-background <solid> >>interior
         menu new-wrapper
