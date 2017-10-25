@@ -83,6 +83,7 @@ HOOK: vocab-border-color theme ( -- color )
 
 HOOK: field-border-color theme ( -- color )
 
+HOOK: editor-caret-color theme ( -- color )
 HOOK: selection-color theme ( -- color )
 HOOK: panel-background-color theme ( -- color )
 HOOK: focus-border-color theme ( -- color )
@@ -172,6 +173,7 @@ M: light-theme vocab-border-color COLOR: FactorDarkTan ;
 
 M: light-theme field-border-color COLOR: gray ;
 
+M: light-theme editor-caret-color COLOR: red ;
 M: light-theme selection-color T{ rgba f 0.8 0.8 1.0 1.0 } ;
 M: light-theme panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 } ;
 M: light-theme focus-border-color COLOR: dark-gray ;
@@ -260,6 +262,7 @@ M: dark-theme vocab-border-color COLOR: solarized-base01 ;
 
 M: dark-theme field-border-color COLOR: solarized-base01 ;
 
+M: dark-theme editor-caret-color COLOR: red ;
 M: dark-theme selection-color COLOR: solarized-base01 ;
 M: dark-theme panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 } ;
 M: dark-theme focus-border-color COLOR: solarized-base01 ;
