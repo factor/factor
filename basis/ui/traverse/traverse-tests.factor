@@ -1,19 +1,17 @@
-USING: accessors ui.gadgets ui.gadgets.labels namespaces make
-sequences kernel math arrays tools.test io ui.gadgets.panes
-ui.traverse definitions compiler.units ;
+USING: accessors arrays compiler.units definitions kernel make
+sequences tools.test ui.traverse ;
 IN: ui.traverse.tests
 
 M: array children>> ;
 
-GENERIC: (flatten-tree) ( node -- )
+GENERIC: flatten-tree% ( node -- )
 
-M: node (flatten-tree)
-    children>> [ (flatten-tree) ] each ;
+M: node flatten-tree% children>> [ flatten-tree% ] each ;
 
-M: object (flatten-tree) , ;
+M: object flatten-tree% , ;
 
 : flatten-tree ( seq -- newseq )
-    [ [ (flatten-tree) ] each ] { } make ;
+    [ [ flatten-tree% ] each ] { } make ;
 
 : gadgets-in-range ( frompath topath gadget -- seq )
     gadget-subtree flatten-tree ;
