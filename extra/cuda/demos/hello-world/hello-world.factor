@@ -24,4 +24,3 @@ CUDA-FUNCTION: helloWorld ( char* string-ptr )
     ] with-each-cuda-device ;
 
 MAIN: cuda-hello-world
-

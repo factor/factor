@@ -146,7 +146,7 @@ CONSTANT: all-separators $[ whitespace-separators modern-separators append ]
     '[ _ head-from ] dip swap ;
 
 : opening-lua-bracket-from ( seq n -- seq n' slices )
-    { [ tag-from ] [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } 
+    { [ tag-from ] [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] }
     find-quots ;
 
 : opening-lua-brace-from ( seq n -- seq n' slices )
@@ -229,7 +229,7 @@ ERROR: unmatched-syntax seq n obj delimiter ;
     peek-delimiter :> peeked
     delim peeked sequence= [
         ! } }
-        delimiter-stack get pop* 
+        delimiter-stack get pop*
         delim f
     ] [
         delim peeked matching-delimiter-string sequence= [

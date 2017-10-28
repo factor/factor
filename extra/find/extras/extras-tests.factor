@@ -30,7 +30,7 @@ IN: find.extras.tests
         [
             { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
-        ] 
+        ]
     } find-quots slices-combine
 ] unit-test
 
@@ -39,7 +39,7 @@ IN: find.extras.tests
         [
             { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
-        ] 
+        ]
     } find-quots slices-combine
 ] unit-test
 
@@ -48,7 +48,7 @@ IN: find.extras.tests
         [
             { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
-        ] 
+        ]
     } find-quots slices-combine
 ] unit-test
 
@@ -57,7 +57,7 @@ IN: find.extras.tests
         [
             { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
-        ] 
+        ]
     } find-quots slices-combine
 ] unit-test
 
@@ -67,7 +67,7 @@ IN: find.extras.tests
         [
             { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
-        ] 
+        ]
     } find-quots slices-combine
 ] unit-test
 

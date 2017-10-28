@@ -74,4 +74,4 @@ IN: zealot
     [ git-clone-as ] keep ;
 
 : zealot-build-checkout-branch ( path branch -- process )
-    '[ _ git-checkout-existing-branch* ] with-directory ; 
+    '[ _ git-checkout-existing-branch* ] with-directory ;

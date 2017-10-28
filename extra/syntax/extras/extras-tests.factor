@@ -8,4 +8,3 @@ CONSTANT: nums2 <array 1 2 3 array>
 
 UNIT-TEST: [ nums1 ] { { 1 2 3 } }
 UNIT-TEST: [ nums2 ] { { 1 2 3 } }
-
