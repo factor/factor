@@ -46,13 +46,14 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
 : read-double-matched-bracket ( n string tag ch -- n' string seq ) char: \[ read-double-matched ;
 : read-double-matched-brace ( n string tag ch -- n' string seq ) char: \{ read-double-matched ;
 
+DEFER: (lex-factor)
 DEFER: lex-factor
 ERROR: lex-expected-but-got-eof n string expected ;
 ! For implementing [ { (
 : lex-until ( n string tag-sequence -- n' string payload )
     3dup '[
         [
-            lex-factor dup f like [ , ] when* [
+            (lex-factor) dup f like [ , ] when* [
                 dup [
                     ! } gets a chance, but then also full seq { } after recursion...
                     [ _ ] dip '[ _ sequence= ] any? not
@@ -68,7 +69,7 @@ ERROR: lex-expected-but-got-eof n string expected ;
 : lex-colon-until ( n string tag-sequence -- n' string payload )
     '[
         [
-            lex-factor dup f like [ , ] when* [
+            (lex-factor) dup f like [ , ] when* [
                 dup [
                     ! } gets a chance, but then also full seq { } after recursion...
                     [ _ ] dip '[ _ sequence= ] any? not
@@ -226,7 +227,7 @@ ERROR: no-backslash-payload n string slice ;
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
 : read-token-or-whitespace ( n string slice -- n' string slice/f )
-    dup length 0 = [ [ 1 + ] 2dip drop lex-factor ] when ;
+    dup length 0 = [ [ 1 + ] 2dip drop (lex-factor) ] when ;
 
 ERROR: mismatched-terminator n string slice ;
 : read-terminator ( n string slice -- n' string slice ) ;
@@ -236,7 +237,7 @@ ERROR: mismatched-terminator n string slice ;
 : ?length-and-string ( length/f string -- length string )
     over [ nip [ length ] [ ] bi ] unless ; inline
 
-: (lex-factor) ( n/f string slice/f ch/f -- n'/f string literal )
+: ((lex-factor)) ( n/f string slice/f ch/f -- n'/f string literal )
     {
         { char: \" [ read-string ] }
         { char: \! [ read-exclamation ] }
@@ -267,13 +268,15 @@ ERROR: mismatched-terminator n string slice ;
             ] when
         ] }
         { char: > [
-            [ slice-til-whitespace drop ] dip span-slices
+            [ [ char: > = not ] slice-until ] dip merge-slices
             dup section-close? [
                 strict-upper get [
                     [ ?length-and-string ] dip
                     length swap [ - ] dip f strict-upper off
                 ] when
-            ] when
+            ] [
+                [ slice-til-whitespace drop ] dip ?span-slices
+            ] if
         ] }
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
@@ -287,7 +290,7 @@ ERROR: mismatched-terminator n string slice ;
         { f [ ] }
     } case ;
 
-: lex-factor ( n/f string -- n'/f string literal )
+: (lex-factor) ( n/f string -- n'/f string literal )
     over [
         ! skip-whitespace
         "\"\\!:[{(]})<>\s\r\n" slice-til-either
@@ -302,10 +305,10 @@ ERROR: mismatched-terminator n string slice ;
                 drop
                 dup "\\" sequence= [ read-backslash ] [ merge-slice-til-whitespace ] if
             ] [
-                over "\\" tail? [ drop read-backslash ] [ (lex-factor) ] if
+                over "\\" tail? [ drop read-backslash ] [ ((lex-factor)) ] if
             ] if
         ] [
-            (lex-factor)
+            ((lex-factor))
         ] if
     ] [
         f
@@ -314,23 +317,27 @@ ERROR: mismatched-terminator n string slice ;
 ERROR: compound-syntax-disallowed seq i obj ;
 : check-for-compound-syntax ( seq -- seq' )
     dup [ length 1 > ] find
-    [ compound-syntax-disallowed ] [ drop ] if*
-    concat ;
+    [ compound-syntax-disallowed ] [ drop ] if* ;
+
+: lex-factor ( n/f string/f -- n'/f string literal/f )
+    [
+        ! Compound syntax loop
+        [
+            (lex-factor) f like [ , ] when*
+            ! concatenated syntax ( a )[ a 1 + ]( b )
+            [ ]
+            [ peek-from blank? ]
+            [ previous-from blank? or not ] 2tri pick and
+        ] loop
+    ] { } make
+    ! check-for-compound-syntax
+    ! concat
+    f like ;
 
 : string>literals ( string -- sequence )
     [ 0 ] dip [
-        [
-            [
-                [
-                    lex-factor f like [ , ] when*
-                    ! concatenated syntax ( a )[ a 1 + ]( b )
-                    [ ]
-                    [ peek-from blank? ]
-                    [ previous-from blank? or not ] 2tri pick and
-                ] loop
-            ] { } make f like [ , ] when* over
-        ] loop
-    ] { } make 2nip check-for-compound-syntax ;
+        [ lex-factor [ , ] when* over ] loop
+    ] { } make 2nip ;
 
 : vocab>literals ( vocab -- sequence )
     ".private" ?tail drop

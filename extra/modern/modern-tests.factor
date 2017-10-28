@@ -26,8 +26,12 @@ IN: modern.tests
 } [ ":asdf:" string>literals >strings ] unit-test
 
 {
-    { { "one:" "1" } }
+    { { "one:" { "1" } } }
 } [ "one: 1" string>literals >strings ] unit-test
+
+{
+    { { "two::" { "1" "2" } } }
+} [ "two:: 1 2" string>literals >strings ] unit-test
 
 {
     { "1" ":>" "one" }
@@ -96,16 +100,16 @@ IN: modern.tests
     { { "foo\\bar{" { "1" } "}" } }
 } [ "foo\\bar{ 1 }" string>literals >strings ] unit-test
 
-{ { { "char:" "\\{" } } } [ "char: \\{" string>literals >strings ] unit-test
+{ { { "char:" { "\\{" } } } } [ "char: \\{" string>literals >strings ] unit-test
 [ "char: {" string>literals >strings ] must-fail
 [ "char: [" string>literals >strings ] must-fail
 [ "char: {" string>literals >strings ] must-fail
 [ "char: \"" string>literals >strings ] must-fail
-{ { { "char:" "\\\\" } } } [ "char: \\\\" string>literals >strings ] unit-test
+{ { { "char:" { "\\\\" } } } } [ "char: \\\\" string>literals >strings ] unit-test
 
 [ "char: \\" string>literals >strings ] must-fail ! char: \ should be legal eventually
 
-{ { { "\\" "(" } } } [ "\\ (" string>literals >strings ] unit-test
+{ { { "\\" { "(" } } } } [ "\\ (" string>literals >strings ] unit-test
 
 { { "\\[[" } } [ "\\[[" string>literals >strings ] unit-test
 { { "\\[=[" } } [ "\\[=[" string>literals >strings ] unit-test
@@ -177,3 +181,24 @@ IN: modern.tests
         { "<FOO:" { "foo" { "BAR:" { "bar" } } } ";FOO>" }
     }
 } [ "<FOO: foo BAR: bar ;FOO>" string>literals >strings ] unit-test
+
+
+{
+    {
+        {
+            {
+                "foo::"
+                {
+                    {
+                        { "<FOO" { } "FOO>" }
+                        { "[" { "0" } "]" }
+                        { "[" { "1" } "]" }
+                        { "[" { "2" } "]" }
+                        { "[" { "3" } "]" }
+                    }
+                    { { "<BAR" { } "BAR>" } }
+                }
+            }
+        }
+    }
+} [ "foo:: <FOO FOO>[ 0 ][ 1 ][ 2 ][ 3 ] <BAR BAR>" string>literals >strings ] unit-test

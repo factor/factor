@@ -2,26 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.extras
 combinators.smart fry generalizations kernel literals locals
-macros make math math.private multiline namespaces quotations
-sequences sequences.deep sequences.extras
+macros make math math.private modern.slices multiline namespaces
+quotations sequences sequences.deep sequences.extras
 sequences.generalizations sequences.private shuffle
 stack-checker.transforms strings unicode words ;
 IN: find.extras
-
-: >strings ( seq -- str )
-    [ dup slice? [ >string ] when ] deep-map ;
-
-: matching-delimiter ( ch -- ch' )
-    H{
-        { char: \( char: \) }
-        { char: \[ char: \] }
-        { char: \{ char: \} }
-        { char: < char: > }
-        { char: \: char: \; }
-    } ?at drop ;
-
-: matching-delimiter-string ( string -- string' )
-    [ matching-delimiter ] map ;
 
 SYMBOL: delimiter-stack
 

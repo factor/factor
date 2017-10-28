@@ -59,9 +59,6 @@ ERROR: unexpected-end n string ;
 : char-after-slice ( slice -- ch/f )
     [ to>> ] [ seq>> ] bi ?nth ;
 
-: next-char-from* ( n/f string -- ch/f )
-    next-char-from 2nip ;
-
 : find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt ? )
     [ find-from ] 2keep drop
     pick [ drop t ] [ length -rot nip f ] if ; inline
@@ -180,6 +177,7 @@ ERROR: unexpected-end n string ;
         [ [ 1 - ] change-to ] dip
     ] when ;
 
+! Takes at least one character if not whitespace
 :: slice-til-either ( n string tokens -- n'/f string slice/f ch/f )
     n [
         n string '[ tokens member? ] find-from
