@@ -375,7 +375,7 @@ TYPEDEF: DWORD* LPCOLORREF
 
 : color>RGB ( color -- COLORREF )
     >rgba-components drop [ 255 * >integer ] tri@ RGB ;
-: RGB>color ( COLORREF -- color )
+: \RGB>color ( COLORREF -- color )
     >RGB< [ 1/255. * >float ] tri@ 1.0 <rgba> ;
 
 STRUCT: TEXTMETRICW

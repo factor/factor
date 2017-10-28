@@ -44,8 +44,8 @@ MEMO:: (cache-font) ( name size bold? italic? -- HFONT )
     \ windows-fonts reset-memoized
 ] "windows.fonts" add-startup-hook
 
-: TEXTMETRIC>metrics ( TEXTMETRIC -- metrics )
-    [ metrics new 0 >>width ] dip {
+: \TEXTMETRIC>metrics ( TEXTMETRIC -- metrics )
+   [ metrics new 0 >>width ] dip {
         [ tmHeight>> >>height ]
         [ tmAscent>> >>ascent ]
         [ tmDescent>> >>descent ]

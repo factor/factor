@@ -137,7 +137,7 @@ TUPLE: registry-enum-key ;
         max-value uint deref
         max-value-data uint deref
         security-descriptor uint deref
-        last-write-time FILETIME>timestamp
+        last-write-time \FILETIME>timestamp
         registry-info boa
     ] [
         ret n>win32-error-string

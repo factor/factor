@@ -10,7 +10,7 @@ IN: windows.time
 
 : windows-1601 ( -- timestamp ) 1601 <year-gmt> ;
 
-: FILETIME>windows-time ( FILETIME -- n )
+: \FILETIME>windows-time ( FILETIME -- n )
     [ dwLowDateTime>> ] [ dwHighDateTime>> ] bi >64bit ;
 
 : windows-time>timestamp ( n -- timestamp )
@@ -18,7 +18,7 @@ IN: windows.time
 
 : windows-time ( -- n )
     FILETIME <struct> [ GetSystemTimeAsFileTime ] keep
-    FILETIME>windows-time ;
+    \FILETIME>windows-time ;
 
 : timestamp>windows-time ( timestamp -- n )
     ! 64bit number representing # of nanoseconds since Jan 1, 1601 (UTC)
@@ -31,5 +31,5 @@ IN: windows.time
 : timestamp>FILETIME ( timestamp -- FILETIME/f )
     dup [ >gmt timestamp>windows-time windows-time>FILETIME ] when ;
 
-: FILETIME>timestamp ( FILETIME -- timestamp/f )
-    FILETIME>windows-time windows-time>timestamp ;
+: \FILETIME>timestamp ( FILETIME -- timestamp/f )
+    \FILETIME>windows-time windows-time>timestamp ;

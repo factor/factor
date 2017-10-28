@@ -83,7 +83,7 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 : dc-metrics ( dc -- metrics )
     TEXTMETRICW <struct>
     [ GetTextMetrics drop ] keep
-    TEXTMETRIC>metrics ;
+    \TEXTMETRIC>metrics ;
 
 ! DC limit is default soft-limited to 10,000 per process.
 : <script-string> ( font string -- script-string )
