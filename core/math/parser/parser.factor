@@ -480,7 +480,7 @@ M: integer >base
     } cond ;
 
 M: ratio >base
-    [ >fraction [ /mod ] keep ] [ [ >base ] curry tri@ ] bi*
+    [ fraction>parts [ /mod ] keep ] [ [ >base ] curry tri@ ] bi*
     "/" glue over first-unsafe {
         { char: 0 [ nip ] }
         { char: - [ append ] }

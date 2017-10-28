@@ -1,6 +1,6 @@
 USING: kernel math math.functions math.parser tools.test ;
 
-{ 1 2 } [ 1/2 >fraction ] unit-test
+{ 1 2 } [ 1/2 fraction>parts ] unit-test
 
 { 1/2 } [ 1 >bignum 2 >bignum / ] unit-test
 { t } [ 10 3 / ratio? ] unit-test

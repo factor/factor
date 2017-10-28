@@ -17,7 +17,7 @@ $nl
 { $subsections
     numerator
     denominator
-    >fraction
+    fraction>parts
 }
 { $see-also "syntax-ratios" } ;
 
@@ -37,14 +37,14 @@ HELP: denominator
 { $values { "a/b" rational } { "b" "a positive integer" } }
 { $description "Outputs the denominator of a rational number. Always outputs 1 with integers." } ;
 
-HELP: fraction>
+HELP: parts>fraction
 { $values { "a" integer } { "b" "a positive integer" } { "a/b" rational } }
 { $description "Creates a new ratio, or outputs the numerator if the denominator is 1. This word does not reduce the fraction to lowest terms, and should not be called directly; use " { $link / } " instead." } ;
 
-HELP: >fraction
+HELP: fraction>parts
 { $values { "a/b" rational } { "a" integer } { "b" "a positive integer" } }
 { $description "Extracts the numerator and denominator of a rational number." } ;
 
-HELP: 2>fraction
+HELP: 2fraction>parts
 { $values { "a/b" rational } { "c/d" rational } { "a" integer } { "c" integer } { "b" "a positive integer" } { "d" "a positive integer" } }
 { $description "Extracts the numerator and denominator of two rational numbers at once." } ;
