@@ -261,15 +261,15 @@ CONSTANT: sky H{
         tri* 3append
     ] unless ;
 
-: F>C ( F -- C ) 32 - 5/9 * ;
+: \F>C ( F -- C ) 32 - 5/9 * ;
 
-: C>F ( C -- F ) 9/5 * 32 + ;
+: \C>F ( C -- F ) 9/5 * 32 + ;
 
 : parse-temperature ( str -- temp dew-point )
     "/" split1 [
         [ f ] [
             "M" ?head [ string>number ] [ [ neg ] when ] bi*
-            dup C>F "%d °C (%.1f °F)" sprintf
+            dup \C>F "%d °C (%.1f °F)" sprintf
         ] if-empty
     ] bi@ ;
 
@@ -352,24 +352,24 @@ CONSTANT: re-altimeter R[[ [AQ]\d{4}]]
 : parse-1hr-temp ( str -- str' )
     "T" ?head drop dup length 4 > [
         double-value
-        [ dup C>F "%.1f °C (%.1f °F)" sprintf ] bi@
+        [ dup \C>F "%.1f °C (%.1f °F)" sprintf ] bi@
         "hourly temperature %s and dew point %s" sprintf
     ] [
-        single-value dup C>F
+        single-value dup \C>F
         "hourly temperature %.1f °C (%.1f °F)" sprintf
     ] if ;
 
 : parse-6hr-max-temp ( str -- str' )
-    "1" ?head drop single-value dup C>F
+    "1" ?head drop single-value dup \C>F
     "6-hour maximum temperature %.1f °C (%.1f °F)" sprintf ;
 
 : parse-6hr-min-temp ( str -- str' )
-    "2" ?head drop single-value dup C>F
+    "2" ?head drop single-value dup \C>F
     "6-hour minimum temperature %.1f °C (%.1f °F)" sprintf ;
 
 : parse-24hr-temp ( str -- str' )
     "4" ?head drop double-value
-    [ dup C>F "%.1f °C (%.1f °F)" sprintf ] bi@
+    [ dup \C>F "%.1f °C (%.1f °F)" sprintf ] bi@
     "24-hour maximum temperature %s minimum temperature %s"
     sprintf ;
 

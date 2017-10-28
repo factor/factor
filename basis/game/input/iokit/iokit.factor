@@ -276,7 +276,7 @@ M: iokit-game-input-backend reset-mouse
         [
             drop
             "input callback doesn't know how to deal with "
-            swap CF>description append throw
+            swap CFString>description append throw
         ]
     } cond ;
 

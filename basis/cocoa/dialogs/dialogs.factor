@@ -25,7 +25,7 @@ CONSTANT: NSCancelButton 0
 
 : (open-panel) ( panel -- paths )
     dup send: runModal NSOKButton =
-    [ send: filenames CF>string-array ] [ drop f ] if ;
+    [ send: filenames CFString>string-array ] [ drop f ] if ;
 
 : open-panel ( -- paths ) <NSOpenPanel> (open-panel) ;
 
@@ -37,4 +37,4 @@ CONSTANT: NSCancelButton 0
 : save-panel ( path -- path/f )
     [ <NSSavePanel> dup ] dip
     split-path send: \runModalForDirectory:file: NSOKButton =
-    [ send: filename CF>string ] [ drop f ] if ;
+    [ send: filename CFString>string ] [ drop f ] if ;

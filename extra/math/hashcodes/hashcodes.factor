@@ -35,7 +35,7 @@ PRIVATE>
 
 M: integer number-hashcode 1 hash-fraction ;
 
-M: ratio number-hashcode >fraction hash-fraction ;
+M: ratio number-hashcode fraction>parts hash-fraction ;
 
 M: float number-hashcode ( x -- h )
     {

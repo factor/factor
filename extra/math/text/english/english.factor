@@ -96,7 +96,7 @@ M: integer number>text
     [ "zero" ] [ [ (number>text) ] with-scope ] if-zero ;
 
 M: ratio number>text
-    >fraction [ number>text ] bi@ " divided by " glue ;
+    fraction>parts [ number>text ] bi@ " divided by " glue ;
 
 M: float number>text
     number>string "." split1 [

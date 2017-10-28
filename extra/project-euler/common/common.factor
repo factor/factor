@@ -69,7 +69,7 @@ PRIVATE>
     >lower [ char: a - 1 + ] map-sum ;
 
 : mediant ( a/c b/d -- (a+b)/(c+d) )
-    2>fraction [ + ] 2bi@ / ;
+    2fraction>parts [ + ] 2bi@ / ;
 
 : max-path ( triangle -- n )
     dup length 1 > [

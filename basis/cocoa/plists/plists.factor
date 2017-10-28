@@ -52,7 +52,7 @@ ERROR: invalid-plist-object object ;
 
 : plist> ( plist -- value )
     {
-        { NSString [ CF>string ] }
+        { NSString [ CFString>string ] }
         { NSNumber [ (plist-NSNumber>) ] }
         { NSData [ (plist-NSData>) ] }
         { NSArray [ (plist-NSArray>) ] }

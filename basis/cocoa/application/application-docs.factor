@@ -6,7 +6,7 @@ HELP: <NSString>
 { $values { "str" string } { "alien" alien } }
 { $description "Allocates an autoreleased " { $snippet "CFString" } "." } ;
 
-{ <NSString> <CFString> CF>string } related-words
+{ <NSString> <CFString> CFString>string } related-words
 
 HELP: with-autorelease-pool
 { $values { "quot" quotation } }

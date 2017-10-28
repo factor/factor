@@ -10,7 +10,7 @@ FROM: alien.c-types => int void ;
 IN: ui.backend.cocoa.tools
 
 : finder-run-files ( alien -- )
-    CF>string-array listener-run-files
+    CFString>string-array listener-run-files
     NSApp NSApplicationDelegateReplySuccess
     send: \replyToOpenOrPrint: ;
 

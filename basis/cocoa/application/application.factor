@@ -41,7 +41,7 @@ FUNCTION: void NSBeep ( )
 : running.app? ( -- ? )
     ! Test if we're running a .app.
     ".app"
-    NSBundle send: mainBundle send: bundlePath CF>string
+    NSBundle send: mainBundle send: bundlePath CFString>string
     subseq? ;
 
 : assert.app ( message -- )

@@ -1,7 +1,7 @@
 USING: help.syntax help.markup arrays alien ;
 IN: core-foundation.arrays
 
-HELP: CF>array
+HELP: CFArray>array
 { $values { "alien" "a " { $snippet "CFArray" } } { "array" "an array of " { $link alien } " instances" } }
 { $description "Creates a Factor array from a Core Foundation array." } ;
 

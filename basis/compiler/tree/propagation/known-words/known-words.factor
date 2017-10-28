@@ -286,7 +286,7 @@ generic-comparison-ops [
 { numerator denominator }
 [ [ drop integer <class-info> ] "outputs" set-word-prop ] each
 
-\ >fraction [
+\ fraction>parts [
     drop integer <class-info> dup
 ] "outputs" set-word-prop
 

@@ -33,7 +33,7 @@ IN: project-euler.057
 ! --------
 
 : longer-numerator? ( seq -- ? )
-    >fraction [ number>string length ] bi@ > ; inline
+    fraction>parts [ number>string length ] bi@ > ; inline
 
 : euler057 ( -- answer )
     0 1000 <iota> [ drop 2 + recip dup 1 + longer-numerator? ] count nip ;

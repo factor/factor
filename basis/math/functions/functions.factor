@@ -40,7 +40,7 @@ M: bignum ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;
 
 M: ratio ^n
-    [ >fraction ] dip '[ _ ^n ] bi@ / ;
+    [ fraction>parts ] dip '[ _ ^n ] bi@ / ;
 
 M: float ^n (^n) ;
 
@@ -397,7 +397,7 @@ M: integer round-to-odd ; inline
     [ >integer even? ] (round-tiebreak?) ; inline
 
 : (ratio-round) ( x round-quot -- y )
-    [ >fraction [ /mod dup swapd abs 2 * ] keep ] [ call ] bi*
+    [ fraction>parts [ /mod dup swapd abs 2 * ] keep ] [ call ] bi*
     [ swap 0 < -1 1 ? + ] [ nip ] if ; inline
 
 : (float-round) ( x round-quot -- y )

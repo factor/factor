@@ -18,7 +18,7 @@ IN: calendar.windows
         ]
     } cleave \ SYSTEMTIME <struct-boa> ;
 
-: SYSTEMTIME>timestamp ( SYSTEMTIME -- timestamp )
+: \SYSTEMTIME>timestamp ( SYSTEMTIME -- timestamp )
     {
         [ wYear>> ]
         [ wMonth>> ]
@@ -38,4 +38,4 @@ M: windows gmt-offset ( -- hours minutes seconds )
     } case neg 60 /mod 0 ;
 
 M: windows gmt
-    SYSTEMTIME <struct> [ GetSystemTime ] keep SYSTEMTIME>timestamp ;
+    SYSTEMTIME <struct> [ GetSystemTime ] keep \SYSTEMTIME>timestamp ;

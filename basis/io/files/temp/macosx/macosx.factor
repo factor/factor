@@ -33,7 +33,7 @@ CONSTANT: factor-bundle-name "org.factorcode.Factor"
 PRIVATE>
 
 M: macosx default-temp-directory
-    NSTemporaryDirectory CF>string factor-bundle-subdir ;
+    NSTemporaryDirectory CFString>string factor-bundle-subdir ;
 
 M: macosx default-cache-directory
     NSCachesDirectory NSUserDomainMask 1 NSSearchPathForDirectoriesInDomains

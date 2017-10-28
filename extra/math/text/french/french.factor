@@ -110,6 +110,6 @@ M: integer number>text
     dup abs 102 10^ >= [ number>string ] [ basic ] if ;
 
 M: ratio number>text
-    >fraction [ [ number>text ] keep ] [ divisor ] bi*
+    fraction>parts [ [ number>text ] keep ] [ divisor ] bi*
     swap abs 1 > [ pluralize ] when
     space-append ;

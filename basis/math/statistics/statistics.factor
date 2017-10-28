@@ -161,7 +161,7 @@ PRIVATE>
 
 ! 2+1/4 frac is 1/4
 : frac ( x -- x' )
-    >fraction [ /mod nip ] keep / ; inline
+    fraction>parts [ /mod nip ] keep / ; inline
 
 :: quantile-indices ( seq qs a b -- seq )
     qs [ [ a b seq length ] dip quantile-x ] map ;

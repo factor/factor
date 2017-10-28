@@ -14,7 +14,7 @@ IN: math.approx
         { [ r zero? ] [ q ] }
         { [ q q' = not ] [ q 1 + ] }
         [
-            d' r' d r (simplest) >fraction :> ( n'' d'' )
+            d' r' d r (simplest) fraction>parts :> ( n'' d'' )
             q n'' * d'' + n'' /
         ]
     } cond ;
@@ -23,8 +23,8 @@ IN: math.approx
     {
         { [ x y > ] [ y x simplest ] }
         { [ x y = ] [ x ] }
-        { [ x 0 > ] [ x y [ >fraction ] bi@ (simplest) ] }
-        { [ y 0 < ] [ y x [ neg >fraction ] bi@ (simplest) neg ] }
+        { [ x 0 > ] [ x y [ fraction>parts ] bi@ (simplest) ] }
+        { [ y 0 < ] [ y x [ neg fraction>parts ] bi@ (simplest) neg ] }
         [ 0 ]
     } cond ;
 

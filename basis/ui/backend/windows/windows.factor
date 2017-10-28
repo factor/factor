@@ -488,7 +488,7 @@ SYMBOL: nc-buttons
     4drop forget-rollover ;
 
 : system-background-color ( -- color )
-    COLOR_BTNFACE GetSysColor RGB>color ;
+    COLOR_BTNFACE GetSysColor \RGB>color ;
 
 : ?make-glass ( world hwnd -- )
     over window-controls>> textured-background swap member-eq? [

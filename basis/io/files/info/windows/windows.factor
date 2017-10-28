@@ -35,9 +35,9 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
         [ dwFileAttributes>> win32-file-attributes >>attributes ]
         [ [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit >>size ]
         [ dwFileAttributes>> >>permissions ]
-        [ ftCreationTime>> FILETIME>timestamp >>created ]
-        [ ftLastWriteTime>> FILETIME>timestamp >>modified ]
-        [ ftLastAccessTime>> FILETIME>timestamp >>accessed ]
+        [ ftCreationTime>> filetime>timestamp >>created ]
+        [ ftLastWriteTime>> filetime>timestamp >>modified ]
+        [ ftLastAccessTime>> filetime>timestamp >>accessed ]
     } cleave ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
@@ -57,9 +57,9 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
             [ nFileSizeHigh>> ] bi >64bit >>size
         ]
         [ dwFileAttributes>> >>permissions ]
-        [ ftCreationTime>> FILETIME>timestamp >>created ]
-        [ ftLastWriteTime>> FILETIME>timestamp >>modified ]
-        [ ftLastAccessTime>> FILETIME>timestamp >>accessed ]
+        [ ftCreationTime>> filetime>timestamp >>created ]
+        [ ftLastWriteTime>> filetime>timestamp >>modified ]
+        [ ftLastAccessTime>> filetime>timestamp >>accessed ]
         ! [ nNumberOfLinks>> ]
         ! [
           ! [ nFileIndexLow>> ]
@@ -228,7 +228,7 @@ M: windows file-systems ( -- array )
         { FILETIME FILETIME FILETIME }
         [ GetFileTime win32-error=0/f ]
         with-out-parameters
-        [ FILETIME>timestamp >local-time ] tri@
+        [ filetime>timestamp >local-time ] tri@
     ] with-destructors ;
 
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )

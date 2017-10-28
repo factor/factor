@@ -17,4 +17,4 @@ IN: cocoa.nibs
     f
     { void* } [ send: \instantiateNibWithOwner:topLevelObjects: ]
     with-out-parameters
-    swap [ CF>array ] [ drop f ] if ;
+    swap [ CFArray>array ] [ drop f ] if ;

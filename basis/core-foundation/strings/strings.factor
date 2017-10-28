@@ -79,7 +79,7 @@ FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id )
     CFStringCreateWithBytes
     [ "CFStringCreateWithBytes failed" throw ] unless* ;
 
-: CF>string ( alien -- string )
+: CFString>string ( alien -- string )
     dup CFStringGetLength
     [ 0 swap <CFRange> kCFStringEncodingUTF8 0 f ] keep
     4 * 1 + <byte-vector> [
@@ -87,16 +87,16 @@ FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id )
         { CFIndex } [ CFStringGetBytes drop ] with-out-parameters
     ] keep swap >>length utf8 decode ;
 
-: CF>string-array ( alien -- seq )
-    CF>array [ CF>string ] map ;
+: CFString>string-array ( alien -- seq )
+    CFArray>array [ CFString>string ] map ;
 
 : <CFStringArray> ( seq -- alien )
     [ [ <CFString> &CFRelease ] map <CFArray> ] with-destructors ;
 
-: CF>description ( cf -- description )
-    [ CFCopyDescription &CFRelease CF>string ] with-destructors ;
+: CFString>description ( cf -- description )
+    [ CFCopyDescription &CFRelease CFString>string ] with-destructors ;
 : CFType>description ( cf -- description )
-    CFGetTypeID [ CFCopyTypeIDDescription &CFRelease CF>string ] with-destructors ;
+    CFGetTypeID [ CFCopyTypeIDDescription &CFRelease CFString>string ] with-destructors ;
 
 SYNTAX: \CFSTRING:
     scan-new-word scan-object

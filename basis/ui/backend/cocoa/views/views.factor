@@ -70,7 +70,7 @@ CONSTANT: key-codes
 
 : key-code ( event -- string ? )
     dup send: keyCode key-codes at
-    [ t ] [ send: charactersIgnoringModifiers CF>string f ] ?if ;
+    [ t ] [ send: charactersIgnoringModifiers CFString>string f ] ?if ;
 
 : event-modifiers ( event -- modifiers )
     send: modifierFlags modifiers modifier ;
@@ -126,7 +126,7 @@ CONSTANT: key-codes
     ] dip add-observer ;
 
 : string-or-nil? ( NSString -- ? )
-    [ CF>string NSStringPboardType = ] [ t ] if* ;
+    [ CFString>string NSStringPboardType = ] [ t ] if* ;
 
 : valid-service? ( gadget send-type return-type -- ? )
     2dup [ string-or-nil? ] [ string-or-nil? ] bi* and
@@ -194,7 +194,7 @@ CONSTANT: selector>action H{
     METHOD: Class makeTouchBar [ default-touchbar self make-touchbar ] ;
 
     METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
-        string CF>string
+        string CFString>string
         {
             { "refresh-all-action" [
                 self "refresh-all-action" "refresh-all" "refreshAllAction" make-NSTouchBar-button
@@ -317,7 +317,7 @@ CONSTANT: selector>action H{
 
     METHOD: char writeSelectionToPasteboard: id pboard types: id types
     [
-        NSStringPboardType types CF>string-array member? [
+        NSStringPboardType types CFString>string-array member? [
             self window [
                 world-focus gadget-selection
                 [ pboard set-pasteboard-string 1 ] [ 0 ] if*
@@ -339,7 +339,7 @@ CONSTANT: selector>action H{
     [
         self window :> window
         window [
-            text CF>string window user-input
+            text CFString>string window user-input
         ] when
     ] ;
 

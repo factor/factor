@@ -13,6 +13,6 @@ IN: core-foundation.dictionaries.tests
         2array 1array <CFDictionary> &CFRelease
         "key" get
         CFDictionaryGetValue
-        dup [ CF>string ] when
+        dup [ CFString>string ] when
     ] with-destructors
 ] unit-test

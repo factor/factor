@@ -14,7 +14,7 @@ FUNCTION: void CFArraySetValueAtIndex ( CFArrayRef array, CFIndex index, void* v
 
 FUNCTION: CFIndex CFArrayGetCount ( CFArrayRef array )
 
-: CF>array ( alien -- array )
+: CFArray>array ( alien -- array )
     dup CFArrayGetCount
     [ CFArrayGetValueAtIndex ] with { } map-integers ;
 
