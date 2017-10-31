@@ -4,7 +4,6 @@ USING: accessors kernel math sequences sequences.private ;
 IN: arrays
 
 BUILTIN: array { length array-capacity read-only initial: 0 } ;
-
 PRIMITIVE: <array> ( n elt -- array )
 PRIMITIVE: resize-array ( n array -- new-array )
 
