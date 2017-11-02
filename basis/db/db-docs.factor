@@ -81,7 +81,7 @@ HELP: query-results
 { $values { "query" object }
     { "result-set" result-set }
 }
-{ $description "Returns a " { $link result-set } " object representing the results of a SQL query. See " { $link "db-result-sets" } "." } ;
+{ $description "Returns a " { $link result-set } " object representing the results of an SQL query. See " { $link "db-result-sets" } "." } ;
 
 HELP: #rows
 { $values { "result-set" result-set } { "n" integer } }
@@ -143,13 +143,13 @@ HELP: rollback-transaction
 HELP: sql-command
 { $values
      { "sql" string } }
-{ $description "Executes a SQL string using the database in the " { $link db-connection } " symbol." } ;
+{ $description "Executes an SQL string using the database in the " { $link db-connection } " symbol." } ;
 
 HELP: sql-query
 { $values
      { "sql" string }
      { "rows" "an array of arrays of strings" } }
-{ $description "Runs a SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
+{ $description "Runs an SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
 
 { sql-command sql-query } related-words
 
@@ -217,7 +217,7 @@ $nl
 } ;
 
 ARTICLE: "db-result-sets" "Result sets"
-"Result sets are the encapsulated, database-specific results from a SQL query."
+"Result sets are the encapsulated, database-specific results from an SQL query."
 $nl
 "Two possible protocols for iterating over result sets exist:"
 { $subsections
@@ -266,7 +266,7 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "." $nl
-"Executing a SQL command:"
+"Executing an SQL command:"
 { $subsections sql-command }
 "Executing a query directly:"
 { $subsections sql-query }
