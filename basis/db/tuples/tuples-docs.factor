@@ -64,7 +64,7 @@ HELP: <update-tuple-statement>
 HELP: define-persistent
 { $values
      { "class" class } { "table" string } { "columns" "an array of slot specifiers" } }
-{ $description "Defines a relation from a Factor " { $snippet "tuple class" } " to a SQL database table name. The format for the slot specifiers is as follows:"
+{ $description "Defines a relation from a Factor " { $snippet "tuple class" } " to an SQL database table name. The format for the slot specifiers is as follows:"
 { $list
     { "a slot name from the " { $snippet "tuple class" } }
     { "the name of a database column that maps to the slot" }
@@ -84,17 +84,17 @@ HELP: define-persistent
 HELP: create-table
 { $values
      { "class" class } }
-{ $description "Creates a SQL table from a mapping defined by " { $link define-persistent } ". If the table already exists, the database will likely throw an error." } ;
+{ $description "Creates an SQL table from a mapping defined by " { $link define-persistent } ". If the table already exists, the database will likely throw an error." } ;
 
 HELP: ensure-table
 { $values
      { "class" class } }
-{ $description "Creates a SQL table from a mapping defined by " { $link define-persistent } ". If the table already exists, the error is silently ignored." } ;
+{ $description "Creates an SQL table from a mapping defined by " { $link define-persistent } ". If the table already exists, the error is silently ignored." } ;
 
 HELP: ensure-tables
 { $values
      { "classes" "a sequence of classes" } }
-{ $description "Creates a SQL table from a mapping defined by " { $link define-persistent } ". If a table already exists, the error is silently ignored." } ;
+{ $description "Creates an SQL table from a mapping defined by " { $link define-persistent } ". If a table already exists, the error is silently ignored." } ;
 
 HELP: recreate-table
 { $values
@@ -125,7 +125,7 @@ HELP: update-tuple
 HELP: delete-tuples
 { $values
      { "tuple" tuple } }
-{ $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate a SQL statement that deletes tuples." }
+{ $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate an SQL statement that deletes tuples." }
 { $warning "This word will delete your data." } ;
 
 { insert-tuple update-tuple delete-tuples } related-words
