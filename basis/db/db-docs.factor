@@ -128,14 +128,14 @@ HELP: in-transaction?
 
 HELP: query-each
 { $values
-     { "statement" statement } { "quot" quotation } }
-{ $description "A combinator that calls a quotation on a sequence of SQL statements to their results query results." } ;
+     { "result-set" result-set } { "quot" quotation } }
+{ $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: query-map
 { $values
-     { "statement" statement } { "quot" quotation }
+     { "result-set" result-set } { "quot" quotation }
      { "seq" sequence } }
-{ $description "A combinator that maps a sequence of SQL statements to their results query results." } ;
+{ $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: rollback-transaction
 { $description "Rolls back a transaction; no data is committed to the database. User code should make use of the " { $link with-transaction } " combinator." } ;
