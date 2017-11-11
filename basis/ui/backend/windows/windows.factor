@@ -506,7 +506,7 @@ SYMBOL: wm-handlers
 
 H{ } clone wm-handlers set-global
 
-: add-wm-handler ( quot wm -- )
+: add-wm-handler ( quot: ( hWnd Msg wParam lParam -- LRESULT ) wm -- )
     dup array?
     [ [ execute( -- wm ) add-wm-handler ] with each ]
     [ wm-handlers get-global set-at ] if ;

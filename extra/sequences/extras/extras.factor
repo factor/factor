@@ -293,6 +293,14 @@ PRIVATE>
 : 2count ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... n )
     [ 1 0 ? ] compose 2map-sum ; inline
 
+: 3each-from
+    ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) i -- ... )
+    [ (3each) ] dip -rot (each-integer) ; inline
+
+: 3map-reduce
+    ( ..a seq1 seq2 seq3 map-quot: ( ..a elt1 elt2 elt3 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
+    [ [ [ [ first ] tri@ ] 3keep ] dip [ 3dip ] keep ] dip compose 1 3each-from ; inline
+
 : round-robin ( seq -- newseq )
     [ { } ] [
         [ longest length <iota> ] keep

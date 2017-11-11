@@ -19,6 +19,13 @@ M: source-file-error error-file [ error>> error-file ] [ path>> ] bi or ;
 M: source-file-error error-line [ error>> error-line ] [ line#>> ] bi or ;
 M: source-file-error compute-restarts error>> compute-restarts ;
 
+: new-source-file-error ( error asset class -- source-file-error )
+    new
+        swap
+        [ >>asset ]
+        [ where [ first2 [ >>path ] [ >>line# ] bi* ] when* ] bi
+        swap >>error ; inline
+
 : sort-errors ( errors -- alist )
     [ [ line#>> 0 or ] sort-with ] { } assoc-map-as sort-keys ;
 
@@ -28,13 +35,6 @@ M: source-file-error compute-restarts error>> compute-restarts ;
 TUPLE: error-type-holder type word plural icon quot forget-quot { fatal? initial: t } ;
 
 GENERIC: error-type ( error -- type )
-
-: <definition-error> ( error definition class -- source-file-error )
-    new
-        swap
-        [ >>asset ]
-        [ where [ first2 [ >>path ] [ >>line# ] bi* ] when* ] bi
-        swap >>error ; inline
 
 SYMBOL: error-types
 

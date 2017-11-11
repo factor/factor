@@ -5,7 +5,7 @@ IN: models.product
 HELP: product
 { $class-description "Product model values are computed by collecting the values from a sequence of underlying models into a new sequence. Product models are automatically updated when underlying models change. Product models are constructed by " { $link <product> } "."
 $nl
-"A product model whose children are all " { $link "models-range" } " conforms to the " { $link "range-model-protocol" } " and represents a point in n-dimensional space which is bounded by a rectangle." }
+"A product model whose children are all " { $link "models.range" } " conforms to the " { $link "range-model-protocol" } " and represents a point in n-dimensional space which is bounded by a rectangle." }
 { $examples
     "The following code displays a pair of sliders, and an updating label showing their current values:"
     { $code

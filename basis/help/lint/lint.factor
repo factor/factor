@@ -28,7 +28,7 @@ M: help-lint-error error-type drop +help-lint-failure+ ;
 <PRIVATE
 
 : <help-lint-error> ( error topic -- help-lint-error )
-    \ help-lint-error <definition-error> ;
+    help-lint-error new-source-file-error ;
 
 PRIVATE>
 

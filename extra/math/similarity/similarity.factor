@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel math math.statistics math.vectors sequences sets ;
+USING: kernel math math.functions math.statistics math.vectors
+sequences sequences.extras ;
 
 IN: math.similarity
 
@@ -18,3 +19,17 @@ IN: math.similarity
     [ intersect cardinality dup ]
     [ [ cardinality ] bi@ + swap - ] 2bi
     [ drop 0 ] [ /f ] if-zero ;
+
+<PRIVATE
+
+: weighted-v. ( w a b -- n )
+    [ * * ] [ + ] 3map-reduce ;
+
+: weighted-norm ( w a -- n )
+    [ absq * ] [ + ] 2map-reduce ;
+
+PRIVATE>
+
+: weighted-cosine-similarity ( w a b -- n )
+    [ weighted-v. ]
+    [ [ over ] dip [ weighted-norm ] 2bi@ * ] 3bi / ;

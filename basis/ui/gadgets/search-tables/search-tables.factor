@@ -32,8 +32,8 @@ TUPLE: search-field < track field ;
         0 >>fill
         { 5 5 } >>gap
         +baseline+ >>align
-        swap <model-field> 10 >>min-cols >>field
-        dup field>> "Search:" label-on-left 1 track-add
+        swap <model-field> 10 >>min-cols "Search" >>default-text
+        [ >>field ] keep 1 track-add
         dup <clear-button> f track-add ;
 
 M: search-field focusable-child* field>> ;
@@ -45,26 +45,6 @@ M: search-field handle-gesture
     over key-gesture? [
         { [ pass-to-table ] [ call-next-method ] } 2&&
     ] [ call-next-method ] if ;
-
-! A protocol with customizable slots
-SLOT-PROTOCOL: table-protocol
-renderer
-action
-hook
-font
-selection-color
-focus-border-color
-mouse-color
-column-line-color
-selection-required?
-single-click?
-selection
-min-rows
-min-cols
-max-rows
-max-cols ;
-
-CONSULT: table-protocol search-table table>> ;
 
 :: <search-table> ( values renderer quot -- gadget )
     f <model> :> search

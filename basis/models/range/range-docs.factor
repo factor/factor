@@ -40,7 +40,7 @@ HELP: move-by-page
 { $description "Adds a multiple of the page size to a range model's current value." }
 { $side-effects "range" } ;
 
-ARTICLE: "models-range" "Range models"
+ARTICLE: "models.range" "Range models"
 "Range models ensure their value is a real number within a fixed range."
 { $subsections
     range
@@ -63,4 +63,4 @@ ARTICLE: "range-model-protocol" "Range model protocol"
     set-range-max-value
 } ;
 
-ABOUT: "models-range"
+ABOUT: "models.range"

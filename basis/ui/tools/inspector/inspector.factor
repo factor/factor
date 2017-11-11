@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators fonts fry
 hashtables inspector io io.styles kernel math.vectors mirrors
-models models.arrow namespaces prettyprint refs sequences
-sorting ui ui.commands ui.gadgets ui.gadgets.labeled
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.slots
-ui.gadgets.status-bar ui.gadgets.tables
+models models.arrow namespaces prettyprint sequences sorting ui
+ui.commands ui.gadgets ui.gadgets.labeled ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tables
 ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
-ui.gadgets.worlds ui.gestures ui.operations ui.theme
-ui.tools.browser ui.tools.common ;
+ui.gestures ui.operations ui.theme ui.tools.browser
+ui.tools.common ui.tools.inspector.slots ;
+
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -100,8 +100,10 @@ M: inspector-table compute-column-widths
         add-toolbar
         swap >>model
         dup model>> <inspector-table> >>table
-        dup model>> <summary-gadget> margins white-interior "Object" object-color <labeled> f track-add
-        dup table>> <scroller> margins white-interior "Contents" contents-color <labeled> 1 track-add ;
+        dup model>> <summary-gadget> margins white-interior
+        "Object" object-color <labeled-gadget> f track-add
+        dup table>> <scroller> margins white-interior
+        "Contents" contents-color <labeled-gadget> 1 track-add ;
 
 M: inspector-gadget focusable-child*
     table>> ;
@@ -113,15 +115,6 @@ M: inspector-gadget focusable-child*
     control-value ;
 
 \ com-push H{ { +listener+ t } } define-command
-
-: slot-editor-window ( close-hook update-hook assoc key key-string -- )
-    [ <value-ref> <slot-editor> ]
-    [
-        <world-attributes>
-            swap "Slot editor: " prepend >>title
-            [ { dialog-window } append ] change-window-controls
-    ] bi*
-    open-status-window ;
 
 : com-edit-slot ( inspector -- )
     [ close-window ] swap

@@ -13,7 +13,8 @@ IN: ui.gadgets.editors
 TUPLE: editor < line-gadget
     caret-color
     caret mark
-    focused? blink blink-timer ;
+    focused? blink blink-timer
+    default-text ;
 
 <PRIVATE
 
@@ -199,6 +200,13 @@ TUPLE: selected-line start end first? last? ;
         ] 3bi
     ] if ;
 
+: draw-default-text? ( editor -- ? )
+    { [ default-text>> ] [ model>> doc-string empty? ] } 1&& ;
+
+: draw-default-text ( editor -- )
+    [ font>> clone line-color >>foreground ]
+    [ default-text>> ] bi draw-text ;
+
 PRIVATE>
 
 M: editor draw-line ( line index editor -- )
@@ -206,13 +214,19 @@ M: editor draw-line ( line index editor -- )
     [ draw-selected-line ] [ nip draw-unselected-line ] if ;
 
 M: editor draw-gadget*
-    dup compute-selection selected-lines [
-        [ draw-lines ] [ draw-caret ] bi
-    ] with-variable ;
+    dup draw-default-text? [
+        [ draw-default-text ] [ draw-caret ] bi
+    ] [
+        dup compute-selection selected-lines [
+            [ draw-lines ] [ draw-caret ] bi
+        ] with-variable
+    ] if ;
 
 M: editor pref-dim*
     ! Add some space for the caret.
-    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
+    [ font>> ] keep dup draw-default-text?
+    [ default-text>> ] [ control-value ] if
+    text-dim { 1 0 } v+ ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 
@@ -627,6 +641,10 @@ M: field pref-dim*
     [ [ line-gadget-width ] [ drop second ] 2bi 2array ]
     tri border-pref-dim ;
 
+M: field default-text>> editor>> default-text>> ;
+
+M: field default-text<< editor>> default-text<< ;
+
 TUPLE: model-field < field field-model ;
 
 : <model-field> ( model -- gadget )
@@ -644,47 +662,13 @@ M: model-field ungraft*
 M: model-field model-changed
     nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;
 
-TUPLE: action-editor < editor default-text ;
-
-: <action-editor> ( -- editor )
-    action-editor new-editor ;
-
-<PRIVATE
-
-: draw-default-text? ( editor -- ? )
-    { [ default-text>> ] [ model>> doc-string empty? ] } 1&& ;
-
-: draw-default-text ( editor -- )
-    [ font>> clone line-color >>foreground ]
-    [ default-text>> ] bi draw-text ;
-
-PRIVATE>
-
-M: action-editor draw-gadget*
-    dup draw-default-text? [
-        [ draw-default-text ] [ draw-caret ] bi
-    ] [
-        call-next-method
-    ] if ;
-
-M: action-editor pref-dim*
-    dup draw-default-text? [
-        [ font>> ] [ default-text>> ] bi text-dim { 1 0 } v+
-    ] [
-        call-next-method
-    ] if ;
-
 TUPLE: action-field < field quot ;
 
 : <action-field> ( quot: ( string -- ) -- gadget )
-    action-field [ <action-editor> ] dip new-border
+    action-field [ <editor> ] dip new-border
         dup gadget-child >>editor
         field-theme
         swap >>quot ;
-
-M: action-field default-text>> editor>> default-text>> ;
-
-M: action-field default-text<< editor>> default-text<< ;
 
 : invoke-action-field ( field -- )
     [ editor>> editor-string ]

@@ -150,13 +150,13 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
         dup '[ _ accept-completion ] >>action ;
 
 : <completion-scroller> ( completion-popup -- scroller )
-    table>> <scroller> content-background <solid> >>interior ;
+    table>> <scroller> white-interior ;
 
 : <completion-popup> ( interactor completion-mode -- popup )
     [ vertical completion-popup new-track ] 2dip
     [ [ >>interactor ] [ >>completion-mode ] bi* ] [ <completion-table> >>table ] 2bi
     dup [ <completion-scroller> ] [ completion-mode>> completion-banner ] bi
-    completion-color <framed-labeled> 1 track-add ;
+    completion-color <framed-labeled-gadget> 1 track-add ;
 
 completion-popup H{
     { T{ key-down f f "TAB" } [ table>> row-action ] }

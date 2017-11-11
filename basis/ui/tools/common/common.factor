@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes combinators.short-circuit kernel ui.gadgets
-ui.gadgets.borders ui.gadgets.scrollers ui.gadgets.tracks
-ui.pens.solid ui.theme words ;
+USING: accessors classes combinators.short-circuit kernel ui
+ui.gadgets ui.gadgets.borders ui.gadgets.scrollers
+ui.gadgets.tracks ui.pens.solid ui.theme words ;
+
 IN: ui.tools.common
 
 : set-tool-dim ( class dim -- )
@@ -18,8 +19,11 @@ M: tool pref-dim*
 
 M: tool layout*
     [ call-next-method ]
-    [ [ class-of ] [ dim>> ] bi set-tool-dim ]
-    bi ;
+    [
+        dup fullscreen? [ drop ] [
+            [ class-of ] [ dim>> ] bi set-tool-dim
+        ] if
+    ] bi ;
 
 SLOT: scroller
 

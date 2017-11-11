@@ -191,7 +191,7 @@ GML: aNormal ( x -- y )
     } cond ;
 
 : det2 ( x y -- z )
-    { 1 0 } vshuffle double-2{ 1 -1 } v* v* sum ; inline
+    { 1 0 } vshuffle double-2{ 1 -1 } v* v. ; inline
 
 : det3 ( x y z -- w )
     [ cross ] dip v. ; inline

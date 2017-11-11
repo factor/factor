@@ -39,10 +39,10 @@ HELP: version>=
     { "?" boolean }
 } ;
 
-ARTICLE: { "Versioning" "Semantic Versioning" } "Semantic Versioning"
+ARTICLE: "semantic-versioning" "Semantic Versioning"
 { $vocab-link "semantic-versioning" }
 $nl
 { "See " { $url "http://semver.org/" } " for a detailed description of semantic versioning." }
 ;
 
-ABOUT: { "Versioning" "Semantic Versioning" }
+ABOUT: "semantic-versioning"

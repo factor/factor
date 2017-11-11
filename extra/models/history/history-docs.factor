@@ -23,7 +23,7 @@ HELP: add-history
 { $values { "history" history } }
 { $description "Adds the current value to the history." } ;
 
-ARTICLE: "models-history" "History models"
+ARTICLE: "models.history" "History models"
 "History models record previous values."
 { $subsections
     history
@@ -37,4 +37,4 @@ ARTICLE: "models-history" "History models"
     go-forward
 } ;
 
-ABOUT: "models-history"
+ABOUT: "models.history"

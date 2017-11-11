@@ -66,7 +66,7 @@ CONSTANT: otug-slides
     { $slide "Combinators"
         { "A " { $emphasis "combinator" } " is a word taking quotations as input" }
         { "Used for control flow, data flow, iteration" }
-        { $code "100 [ 5 mod 3 = [ \"Fizz!\" print ] when ] each" }
+        { $code "100 <iota> [ 5 mod 3 = [ \"Fizz!\" print ] when ] each" }
         { "Control flow: " { $link if } ", " { $link when } ", " { $link unless } ", " { $link cond } }
         { "Iteration: " { $link map } ", " { $link filter } ", " { $link all? } ", ..." }
     }
@@ -250,7 +250,7 @@ var price = (order == null ? null : order.price);" }
     1 >>fill
     \"Hello world!\" <label> add-gadget
     \"Click me!\" [ drop beep ]
-    <bevel-button> add-gadget
+    <border-button> add-gadget
     <editor> <scroller> add-gadget
 \"UI test\" open-window" }
     }
