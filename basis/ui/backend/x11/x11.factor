@@ -28,12 +28,12 @@ CONSTANT: _NET_WM_STATE_TOGGLE 2
 : XA_NET_WM_STATE_FULLSCREEN ( -- atom ) "_NET_WM_STATE_FULLSCREEN" x-atom ;
 : XA_NET_ACTIVE_WINDOW ( -- atom ) "_NET_ACTIVE_WINDOW" x-atom ;
 
-: supported-net-wm-hints ( -- seq )
+:: get-atom-properties ( window name -- seq )
     { Atom int ulong ulong pointer: Atom }
     [| type format n-atoms bytes-after atoms |
         dpy get
-        root get
-        XA_NET_SUPPORTED
+        window
+        name
         0
         ulong c-type-interval nip
         0
@@ -51,6 +51,9 @@ CONSTANT: _NET_WM_STATE_TOGGLE 2
         atoms n-atoms ulong <c-direct-array> >array
         atoms XFree
     ] call ;
+
+: supported-net-wm-hints ( -- seq )
+    root get XA_NET_SUPPORTED get-atom-properties ;
 
 : net-wm-hint-supported? ( atom -- ? )
     supported-net-wm-hints member? ;
@@ -270,6 +273,10 @@ M: x11-ui-backend set-title ( string world -- )
 
 M: x11-ui-backend (set-fullscreen) ( world ? -- )
     [ handle>> window>> ] dip make-fullscreen-msg send-event ;
+
+M: x11-ui-backend (fullscreen?) ( world -- ? )
+    handle>> window>> XA_NET_WM_STATE get-atom-properties
+    XA_NET_WM_STATE_FULLSCREEN swap member? ;
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window handle>> window>>
