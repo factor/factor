@@ -33,13 +33,13 @@ SLOT: background-color
     check-extensions "1.0" require-gl-version
     GL_SMOOTH glShadeModel
     GL_BLEND glEnable
-    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_VERTEX_ARRAY glEnableClientState
     GL_PACK_ALIGNMENT 1 glPixelStorei
     GL_UNPACK_ALIGNMENT 1 glPixelStorei ;
 
 : gl-draw-init ( world -- )
     GL_SCISSOR_TEST glEnable
+    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     init-matrices
     [ init-clip ]
     [
