@@ -182,29 +182,6 @@ CONSTANT: selector>action H{
         ] when
     ] ;
 
-    METHOD: void refreshAllAction [
-        [ refresh-all ] \ refresh-all call-listener
-    ] ;
-
-    METHOD: void autoUseAction [
-        [ com-auto-use ] \ com-auto-use call-listener
-    ] ;
-
-    METHOD: Class makeTouchBar [ default-touchbar self make-touchbar ] ;
-
-    METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
-        string CFString>string
-        {
-            { "refresh-all-action" [
-                self "refresh-all-action" "refresh-all" "refreshAllAction" make-NSTouchBar-button
-            ] }
-            { "auto-use-action" [
-                self "auto-use-action" "auto-use" "autoUseAction" make-NSTouchBar-button
-            ] }
-            [ drop f ]
-        } case
-    ] ;
-
     ! Rendering
     METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ] ;
 
