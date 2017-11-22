@@ -6,7 +6,7 @@ kernel math.vectors models present sequences ui ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
 ui.gadgets.viewports ui.gestures ui.operations ui.tools.browser
-ui.tools.browser.history ui.tools.common urls ;
+ui.tools.browser.history ui.tools.common urls webbrowser ;
 
 IN: gopher.ui
 
@@ -29,12 +29,14 @@ M: gopher-gadget model-changed
 
 : show-gopher ( url gopher-gadget -- )
     [ [ >url ] [ f ] if* ] dip
-    [
-        2dup control-value =
-        [ 2drop ] [ nip history>> add-history ] if
-    ]
-    [ set-control-value ]
-    2bi ;
+    over [ protocol>> "gopher" = ] [ t ] if* [
+        [
+            2dup control-value =
+            [ 2drop ] [ nip history>> add-history ] if
+        ]
+        [ set-control-value ]
+        2bi
+    ] [ drop open-url ] if ;
 
 : <url-field> ( gopher-gadget -- field )
     '[ >url _ show-gopher ] <action-field>
