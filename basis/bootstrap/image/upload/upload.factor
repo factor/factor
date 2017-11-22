@@ -12,12 +12,12 @@ SYMBOL: build-images-destination
 
 : latest-destination ( -- dest )
     upload-images-destination get
-    "slava_pestov@downloads.factorcode.org:downloads.factorcode.org/images/latest/"
+    "sheeple@downloads.factorcode.org:downloads.factorcode.org/images/latest/"
     or ;
 
 : build-destination ( -- dest )
     build-images-destination get
-    "slava_pestov@downloads.factorcode.org:downloads.factorcode.org/images/build/"
+    "sheeple@downloads.factorcode.org:downloads.factorcode.org/images/build/"
     or ;
 
 : factor-git-branch ( -- name )
@@ -25,7 +25,7 @@ SYMBOL: build-images-destination
 
 : git-branch-destination ( -- dest )
     build-images-destination get
-    "slava_pestov@downloads.factorcode.org:downloads.factorcode.org/images/"
+    "sheeple@downloads.factorcode.org:downloads.factorcode.org/images/"
     or
     factor-git-branch "/" 3append ;
 
@@ -97,7 +97,7 @@ M: windows scp-name "pscp" ;
 : create-remote-upload-directory ( -- )
     '[
         "ssh" ,
-        "slava_pestov@downloads.factorcode.org" ,
+        "sheeple@downloads.factorcode.org" ,
         "mkdir -p downloads.factorcode.org/images/" factor-git-branch append ,
     ] { } make try-process ;
 
