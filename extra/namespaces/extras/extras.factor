@@ -50,7 +50,7 @@ ERROR: not-all-unique seq ;
         ! make FROM: vocab => word ; for each input argument
         nip in>> length
         [
-            dup '[ [ _ _ narray functor-instantiated-vocab-name ] _ nkeep ]
+            dup dup '[ [ [ _ ] _ ndip _ narray functor-instantiated-vocab-name ] _ nkeep ]
         ] [
             [
                 [
@@ -66,7 +66,7 @@ ERROR: not-all-unique seq ;
         ! append the IN: and the FROM: quot generator and the functor code
         [
             append
-            '[ @ '[ _ <string-reader> "functor" parse-stream drop ] generate-vocab drop ]
+            '[ @ over '[ _ <string-reader> _ parse-stream drop ] generate-vocab drop ]
         ] dip
     ] 3tri ;
 
