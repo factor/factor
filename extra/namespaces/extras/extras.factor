@@ -4,7 +4,8 @@ USING: accessors assocs assocs.extras combinators
 combinators.extras continuations effects.parser formatting fry
 generalizations interpolate io.streams.string kernel make
 math.parser namespaces parser quotations sequences
-sequences.generalizations unicode vocabs.parser words ;
+sequences.generalizations unicode vocabs.generated vocabs.parser
+words ;
 QUALIFIED: sets
 IN: namespaces.extras
 
@@ -49,7 +50,7 @@ ERROR: not-all-unique seq ;
         ! make FROM: vocab => word ; for each input argument
         nip in>> length
         [
-            dup '[ [ _ _ narray functor-instantiated-vocab-name "IN: " prepend ] _ nkeep ]
+            dup '[ [ _ _ narray functor-instantiated-vocab-name ] _ nkeep ]
         ] [
             [
                 [
@@ -59,13 +60,13 @@ ERROR: not-all-unique seq ;
             ] replicate
         ] [ ] tri dup
         ! Make the FROM: list and keep the input arguments
-        '[ [ @ _ spread _ narray "\n" join "\n" glue ] _ nkeep ]
+        '[ [ @ _ spread _ narray "\n" join dupd [ "IN: " prepend ] dip "\n" glue ] _ nkeep ]
     ] [
         [ drop ] 2dip
         ! append the IN: and the FROM: quot generator and the functor code
         [
             append
-            '[ @ <string-reader> "functor" parse-stream drop ]
+            '[ @ '[ _ <string-reader> "functor" parse-stream drop ] generate-vocab drop ]
         ] dip
     ] 3tri ;
 
@@ -83,6 +84,7 @@ ERROR: not-all-unique seq ;
     swap
     make-in-drop-variables
     prepend-input-vocabs
+    ! word quot effect
     [
         [ functor-definer-word-name create-new-word-in ] 2dip
         define-declared
