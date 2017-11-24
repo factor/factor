@@ -48,4 +48,4 @@ M: wrapped-hashtable equal?
 
 INSTANCE: wrapped-hashtable assoc
 
-{ "hashtables.wrapped" "prettyprint" } "hashtables.wrapped.prettyprint" require-when
+! { "hashtables.wrapped" "prettyprint" } "hashtables.wrapped.prettyprint" require-when

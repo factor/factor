@@ -75,6 +75,10 @@ CONSTANT: default-components
 
     (command-line) parse-command-line
 
+    { "hashtables.identity" "prettyprint" } "hashtables.identity.prettyprint" require-when
+    { "hashtables.identity" "mirrors" } "hashtables.identity.mirrors" require-when
+    { "hashtables.wrapped" "prettyprint" } "hashtables.wrapped.prettyprint" require-when
+
     ! Set dll paths
     os windows? [ "windows" require ] when
 

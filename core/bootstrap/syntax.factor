@@ -89,6 +89,7 @@ IN: bootstrap.syntax
         "read-only"
         "call("
         "execute("
+        "IH{"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol

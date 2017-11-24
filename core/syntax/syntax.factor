@@ -3,14 +3,15 @@
 USING: accessors arrays byte-arrays byte-vectors
 classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
-classes.predicate classes.singleton classes.tuple classes.tuple.parser
-classes.union combinators compiler.units definitions effects
-effects.parser generic generic.hook generic.math generic.parser
-generic.standard hash-sets hashtables io.pathnames kernel lexer
-math namespaces parser quotations sbufs sequences slots
-source-files splitting strings strings.parser
-strings.parser.private vectors vocabs vocabs.parser words
-words.alias words.constant words.symbol ;
+classes.predicate classes.singleton classes.tuple
+classes.tuple.parser classes.union combinators compiler.units
+definitions effects effects.parser generic generic.hook
+generic.math generic.parser generic.standard hash-sets
+hashtables hashtables.identity io.pathnames kernel lexer math
+namespaces parser quotations sbufs sequences slots source-files
+splitting strings strings.parser strings.parser.private vectors
+vocabs vocabs.parser words words.alias words.constant
+words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -289,4 +290,6 @@ IN: bootstrap.syntax
     "call(" [ \ call-effect parse-call-paren ] define-core-syntax
 
     "execute(" [ \ execute-effect parse-call-paren ] define-core-syntax
+
+    "IH{" [ \ } [ >identity-hashtable ] parse-literal ] define-core-syntax
 ] with-compilation-unit
