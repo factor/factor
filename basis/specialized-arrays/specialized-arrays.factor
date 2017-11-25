@@ -4,12 +4,14 @@ USING: accessors alien alien.c-types alien.data alien.parser
 byte-arrays classes combinators fry functors kernel lexer locals
 make math math.vectors parser prettyprint.custom sequences
 sequences.private vocabs.generated vocabs.loader vocabs.parser
-words ;
+words math.parser arrays ;
 IN: specialized-arrays
 
 MIXIN: specialized-array
+MIXIN: specialized-array2
 
 INSTANCE: specialized-array sequence
+INSTANCE: specialized-array2 sequence
 
 : (underlying) ( n c-type -- array )
     heap-size * (byte-array) ; inline
@@ -27,8 +29,7 @@ M: c-type-word underlying-type
         [ drop ]
     } cond ;
 
-M: pointer underlying-type
-    drop void* ;
+M: pointer underlying-type drop void* ;
 
 <PRIVATE
 
@@ -38,84 +39,89 @@ GENERIC: direct-like ( alien len exemplar -- seq )
 M: byte-array nth-c-ptr <displaced-alien> ; inline
 M: byte-array direct-like drop uchar <c-direct-array> ; inline
 
-<FUNCTOR: define-array ( T -- )
+PRIVATE>
 
-A          DEFINES-CLASS ${T}-array
-<A>        DEFINES <${A}>
-(A)        DEFINES (${A})
-<direct-A> DEFINES <direct-${A}>
-A{         DEFINES ${A}{
+VARIABLES-FUNCTOR: specialized-array ( T -- ) {
+    { "A" "${T}-array" }
+    { "<A>" "<${A}>" }
+    { "(A)" "(${A})" }
+    { "<direct-A>" "<direct-${A}>" }
+} [[
+USING: accessors alien alien.c-types alien.data byte-arrays
+classes kernel math math.vectors parser prettyprint.custom
+sequences sequences.private specialized-arrays
+specialized-arrays.private ;
 
-WHERE
-
-TUPLE: A
+<<
+TUPLE: ${A}
 { underlying c-ptr read-only }
 { length array-capacity read-only } ; final
 
-: <direct-A> ( alien len -- specialized-array ) A boa ; inline
+INSTANCE: ${A} specialized-array2
 
-M: A direct-like drop <direct-A> ; inline
+: ${<direct-A>} ( alien len -- specialized-array ) ${A} boa ; inline
 
-: <A> ( n -- specialized-array )
-    [ \ T <underlying> ] keep <direct-A> ; inline
+: ${<A>} ( n -- specialized-array )
+    [ \ ${T} <underlying> ] keep ${<direct-A>} ; inline
 
-: (A) ( n -- specialized-array )
-    [ \ T (underlying) ] keep <direct-A> ; inline
+: ${(A)} ( n -- specialized-array )
+    [ \ ${T} (underlying) ] keep ${<direct-A>} ; inline
+>>
 
-M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
+SYNTAX: ${A}{ \ } [ \ ${T} >c-array ] parse-literal ;
 
-M: A length length>> ; inline
+M: ${A} direct-like drop ${<direct-A>} ; inline
 
-M: A nth-unsafe underlying>> \ T alien-element ; inline
+M: ${A} clone [ underlying>> clone ] [ length>> ] bi ${<direct-A>} ; inline
 
-M: A nth-c-ptr underlying>> \ T array-accessor drop swap <displaced-alien> ; inline
+M: ${A} length length>> ; inline
 
-M: A set-nth-unsafe underlying>> \ T set-alien-element ; inline
+M: ${A} nth-unsafe underlying>> \ ${T} alien-element ; inline
 
-M: A like drop dup A instance? [ \ T >c-array ] unless ; inline
+M: ${A} nth-c-ptr underlying>> \ ${T} array-accessor drop swap <displaced-alien> ; inline
 
-M: A new-sequence drop (A) ; inline
+M: ${A} set-nth-unsafe underlying>> \ ${T} set-alien-element ; inline
 
-M: A equal? over A instance? [ sequence= ] [ 2drop f ] if ;
+M: ${A} like drop dup ${A} instance? [ \ ${T} >c-array ] unless ; inline
 
-M: A resize
+M: ${A} new-sequence drop ${(A)} ; inline
+
+M: ${A} equal? over ${A} instance? [ sequence= ] [ 2drop f ] if ;
+
+M: ${A} resize
     [
-        [ \ T heap-size * ] [ underlying>> ] bi*
+        [ \ ${T} heap-size * ] [ underlying>> ] bi*
         resize-byte-array
     ] [ drop ] 2bi
-    <direct-A> ; inline
+    ${<direct-A>} ; inline
 
-M: A element-size drop \ T heap-size ; inline
+M: ${A} element-size drop \ ${T} heap-size ; inline
 
-M: A underlying-type drop \ T ;
+M: ${A} underlying-type drop \ ${T} ;
 
-M: A pprint-delims drop \ A{ \ } ;
+M: ${A} pprint-delims drop \ ${A}{ \ } ;
 
-M: A >pprint-sequence ;
+M: ${A} >pprint-sequence ;
 
-SYNTAX: A{ \ } [ \ T >c-array ] parse-literal ;
+M: ${A} vs+ [ + \ ${T} c-type-clamp ] 2map ; inline
+M: ${A} vs- [ - \ ${T} c-type-clamp ] 2map ; inline
+M: ${A} vs* [ * \ ${T} c-type-clamp ] 2map ; inline
 
-INSTANCE: A specialized-array
+M: ${A} v*high [ * \ ${T} heap-size neg shift ] 2map ; inline
+]]
 
-M: A vs+ [ + \ T c-type-clamp ] 2map ; inline
-M: A vs- [ - \ T c-type-clamp ] 2map ; inline
-M: A vs* [ * \ T c-type-clamp ] 2map ; inline
-
-M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
-
-;FUNCTOR>
-
+<PRIVATE
 : specialized-array-vocab ( c-type -- vocab )
     [
-        "specialized-arrays.instances." %
-        [ vocabulary>> % "." % ]
-        [ name>> % ]
-        bi
+        "specialized-arrays:functors:specialized-array:" %
+        ! [ vocabulary>> % "." % ]
+        ! [ name>> % ":" % ]
+        [ drop ]
+        [ 1array hashcode number>string % ] bi
     ] "" make ;
 
 :: direct-slice-unsafe ( from to seq -- seq' )
     from seq nth-c-ptr to from - seq direct-like ; inline
-
 PRIVATE>
 
 : direct-slice ( from to seq -- seq' )
@@ -125,11 +131,6 @@ PRIVATE>
 : direct-tail ( seq n -- seq' ) (tail) direct-slice ; inline
 : direct-head* ( seq n -- seq' ) from-end direct-head ; inline
 : direct-tail* ( seq n -- seq' ) from-end direct-tail ; inline
-
-: define-array-vocab ( type -- vocab )
-    underlying-type
-    [ specialized-array-vocab ] [ '[ _ define-array ] ] bi
-    generate-vocab ;
 
 ERROR: specialized-array-vocab-not-loaded c-type ;
 
@@ -169,13 +170,10 @@ M: c-type-word c-array-type?
 M: pointer c-array-type? drop void* c-array-type? ;
 
 SYNTAX: \SPECIALIZED-ARRAYS:
-    ";" [ parse-c-type define-array-vocab use-vocab ] each-token ;
+    ";" [ parse-c-type define-specialized-array ] each-token ;
 
-SYNTAX: \SPECIALIZED-ARRAY:
-    scan-c-type define-array-vocab use-vocab ;
+! { "specialized-arrays" "prettyprint" } "specialized-arrays.prettyprint" require-when
 
-{ "specialized-arrays" "prettyprint" } "specialized-arrays.prettyprint" require-when
+! { "specialized-arrays" "mirrors" } "specialized-arrays.mirrors" require-when
 
-{ "specialized-arrays" "mirrors" } "specialized-arrays.mirrors" require-when
-
-uchar define-array-vocab drop
+! uchar define-specialized-array

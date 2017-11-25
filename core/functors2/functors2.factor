@@ -32,6 +32,9 @@ ERROR: not-all-unique seq ;
 : functor-syntax-word-name ( word -- string )
     name>> >upper ":" append ;
 
+: functor-word-name ( word -- string )
+    name>> "-functor" append ;
+
 : functor-instantiated-vocab-name ( functor-word parameters -- string )
     dupd
     '[
@@ -65,7 +68,7 @@ ERROR: not-all-unique seq ;
         ! append the IN: and the FROM: quot generator and the functor code
         [
             append
-            '[ @ over '[ _ <string-reader> _ parse-stream drop ] generate-vocab drop ]
+            '[ @ over '[ _ <string-reader> _ parse-stream drop ] generate-vocab use-vocab ]
         ] dip
     ] 3tri ;
 
@@ -100,7 +103,9 @@ ERROR: not-all-unique seq ;
     ] 3bi ; inline
 
 : make-functor-word ( word effect string -- )
-    nip 1quotation ( -- string ) define-declared ;
+    nip
+    ! [ functor-word-name ] dip
+    1quotation ( -- string ) define-declared ;
 
 : make-variable-functor ( word effect bindings string -- )
     [
