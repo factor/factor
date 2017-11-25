@@ -4,7 +4,7 @@ USING: accessors arrays assocs classes colors colors.constants
 combinators combinators.smart compiler.units definitions
 definitions.icons effects fry generic hash-sets hashtables
 help.stylesheet help.topics io io.styles kernel locals make math
-namespaces parser present prettyprint prettyprint.stylesheet
+math.parser namespaces parser present prettyprint prettyprint.stylesheet
 quotations see sequences sequences.private sets slots sorting
 splitting strings urls vectors vocabs vocabs.loader words
 words.symbol ;
@@ -38,10 +38,12 @@ SYMBOL: blank-line
 
 GENERIC: print-element ( element -- )
 
+M: quotation print-element unparse print-element ;
 M: simple-element print-element [ print-element ] each ;
 M: string print-element [ write ] ($span) ;
 M: array print-element unclip execute( arg -- ) ;
 M: word print-element { } swap execute( arg -- ) ;
+! M: number print-element number>string print-element ;
 M: effect print-element effect>string print-element ;
 M: f print-element drop ;
 

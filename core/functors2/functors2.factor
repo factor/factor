@@ -1,10 +1,9 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs combinators 
-generalizations interpolate io.streams.string kernel
-make math.parser namespaces parser quotations sequences
-sequences.generalizations vocabs.generated vocabs.parser
-words ;
+USING: accessors arrays ascii assocs combinators generalizations
+interpolate io.streams.string kernel make math.parser namespaces
+parser quotations sequences sequences.generalizations
+vocabs.generated vocabs.parser words ;
 QUALIFIED: sets
 IN: functors2
 
@@ -16,7 +15,7 @@ ERROR: not-all-unique seq ;
 
 : effect-in>drop-variables ( effect -- quot )
     in>> ensure-unique
-    [ '[ name>> _ set ] ] map
+    [ '[ name>> _ dup array? [ first ] when set ] ] map
     '[ _ spread ] ; inline
 
 : make-in-drop-variables ( def effect -- def effect )

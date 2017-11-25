@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators kernel make math
-math.order math.parser sequences sequences.private strings words ;
+math.order math.parser quotations sequences sequences.private
+strings words ;
 IN: effects
 
 TUPLE: effect
@@ -51,6 +52,7 @@ TUPLE: effect
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
+M: quotation effect>string [ effect>string ] map " " join "[ " " ]" surround ;
 M: object effect>string drop "object" ;
 M: word effect>string name>> ;
 M: integer effect>string number>string ;

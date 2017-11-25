@@ -25,52 +25,41 @@ MACRO: write-tuple ( class -- quot )
     [ tuple-arity <iota> <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
     bi '[ _ dip @ ] ;
 
-: check-final ( class -- )
+: check-final ( class -- class )
     {
         { [ dup tuple-class? not ] [ not-a-tuple ] }
         { [ dup final-class? not ] [ not-final ] }
-        [ drop ]
+        [ ]
     } cond ;
 
 PRIVATE>
 
-<FUNCTOR: define-tuple-array ( CLASS -- )
+FUNCTOR: tuple-array ( CLASS: [ check-final ] -- ) [[
 
-CLASS IS ${CLASS}
+USING: accessors arrays classes.tuple.private kernel sequences
+sequences.private tuple-arrays.private ;
 
-CLASS-array DEFINES-CLASS ${CLASS}-array
-CLASS-array? IS ${CLASS-array}?
-
-<CLASS-array> DEFINES <${CLASS}-array>
->CLASS-array DEFINES >${CLASS}-array
-
-WHERE
-
-CLASS check-final
-
-TUPLE: CLASS-array
+TUPLE: ${CLASS}-array
 { seq array read-only }
 { n array-capacity read-only }
 { length array-capacity read-only } ;
 
-: <CLASS-array> ( length -- tuple-array )
-    [ \ CLASS [ initial-values <repetition> concat ] [ tuple-arity ] bi ] keep
-    \ CLASS-array boa ; inline
+INSTANCE: ${CLASS}-array sequence
 
-M: CLASS-array length length>> ; inline
+: <${CLASS}-array> ( length -- tuple-array )
+    [ \ ${CLASS} [ initial-values <repetition> concat ] [ tuple-arity ] bi ] keep
+    \ ${CLASS}-array boa ; inline
 
-M: CLASS-array nth-unsafe tuple-slice \ CLASS read-tuple ; inline
+M: ${CLASS}-array length length>> ; inline
 
-M: CLASS-array set-nth-unsafe tuple-slice \ CLASS write-tuple ; inline
+M: ${CLASS}-array nth-unsafe tuple-slice \ ${CLASS} read-tuple ; inline
 
-M: CLASS-array new-sequence drop <CLASS-array> ; inline
+M: ${CLASS}-array set-nth-unsafe tuple-slice \ ${CLASS} write-tuple ; inline
 
-: >CLASS-array ( seq -- tuple-array ) 0 <CLASS-array> clone-like ;
+M: ${CLASS}-array new-sequence drop <${CLASS}-array> ; inline
 
-M: CLASS-array like drop dup CLASS-array? [ >CLASS-array ] unless ; inline
+: >${CLASS}-array ( seq -- tuple-array ) 0 <${CLASS}-array> clone-like ;
 
-INSTANCE: CLASS-array sequence
+M: ${CLASS}-array like drop dup ${CLASS}-array? [ >${CLASS}-array ] unless ; inline
 
-;FUNCTOR>
-
-SYNTAX: \TUPLE-ARRAY: scan-word define-tuple-array ;
+]]

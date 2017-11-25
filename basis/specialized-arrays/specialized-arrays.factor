@@ -7,10 +7,10 @@ sequences.private vocabs.generated vocabs.loader vocabs.parser
 words math.parser arrays ;
 IN: specialized-arrays
 
-MIXIN: specialized-array
+MIXIN: specialized-array-mixin
 MIXIN: specialized-array2
 
-INSTANCE: specialized-array sequence
+INSTANCE: specialized-array-mixin sequence
 INSTANCE: specialized-array2 sequence
 
 : (underlying) ( n c-type -- array )
@@ -57,7 +57,7 @@ TUPLE: ${A}
 { underlying c-ptr read-only }
 { length array-capacity read-only } ; final
 
-INSTANCE: ${A} specialized-array2
+INSTANCE: ${A} specialized-array-mixin
 
 : ${<direct-A>} ( alien len -- specialized-array ) ${A} boa ; inline
 
