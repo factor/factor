@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals locals.types prettyprint.backend
-prettyprint.custom prettyprint.sections sequences words ;
+USING: accessors effects kernel locals locals.definitions
+locals.types prettyprint.backend prettyprint.custom
+prettyprint.sections see sequences words ;
 IN: locals.prettyprint
 
 : pprint-var ( var -- )
@@ -38,3 +39,9 @@ M: multi-def pprint*
     dup locals>> [ word? ] all?
     [ <block \ :> pprint-word "(" text locals>> [ pprint-var ] each ")" text block> ]
     [ pprint-tuple ] if ;
+
+M: lambda-method synopsis*
+    dup dup dup definer.
+    "method-class" word-prop pprint-word
+    "method-generic" word-prop pprint-word
+    method-stack-effect effect>string comment. ;

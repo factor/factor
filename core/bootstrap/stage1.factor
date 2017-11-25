@@ -4,7 +4,7 @@ USING: arrays assocs continuations debugger destructors generic
 hash-sets hashtables hashtables.identity hashtables.wrapped init
 io io.files kernel kernel.private make math memory namespaces
 parser parser.notes prettyprint sequences splitting system
-vectors vocabs vocabs.loader words ;
+vectors vocabs vocabs.hierarchy vocabs.loader words ;
 QUALIFIED: bootstrap.image.private
 IN: bootstrap.stage1
 
@@ -39,6 +39,15 @@ load-help? off
 
     "syntax" require
     "bootstrap.layouts" require
+
+    ! need this
+    "locals" load
+    "alien.libraries" require
+    "alien.c-types" require
+    "delegate" require
+    "stack-checker" load
+    "generalizations" require
+    "combinators.short-circuit.smart" require
 
     [
         f parser-quiet? set-global

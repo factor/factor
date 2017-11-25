@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: command-line eval io io.pathnames kernel namespaces
-sequences system vocabs.loader ;
+system vocabs.loader ;
 IN: command-line.startup
 
 : cli-usage ( -- )

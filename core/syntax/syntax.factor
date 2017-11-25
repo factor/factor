@@ -5,13 +5,13 @@ classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple
 classes.tuple.parser classes.union combinators compiler.units
-definitions effects effects.parser generic generic.hook
-generic.math generic.parser generic.standard hash-sets
-hashtables hashtables.identity io.pathnames kernel lexer math
+definitions delegate delegate.private effects effects.parser fry
+generic generic.hook generic.math generic.parser
+generic.standard hash-sets hashtables hashtables.identity hints
+io.pathnames kernel lexer locals.parser macros math memoize
 namespaces parser quotations sbufs sequences slots source-files
-splitting strings strings.parser strings.parser.private vectors
-vocabs vocabs.parser words words.alias words.constant
-words.symbol ;
+splitting stack-checker strings strings.parser typed vectors
+vocabs.parser words words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -36,6 +36,18 @@ IN: bootstrap.syntax
         mark-top-level-syntax
     ] dip
     define-syntax ;
+
+: define-dummy-fry ( name -- word )
+    "syntax" lookup-word
+    [ "Only valid inside a fry" throw ] ( -- * )
+    [ define-declared ] 3keep 2drop ;
+
+: define-fry-specifier ( word words -- )
+    [ \ word ] dip [ member-eq? ] curry define-predicate-class ;
+
+: define-fry-specifiers ( names -- )
+    [ define-dummy-fry ] map
+    dup [ define-fry-specifier ] curry each ;
 
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
@@ -292,4 +304,47 @@ IN: bootstrap.syntax
     "execute(" [ \ execute-effect parse-call-paren ] define-core-syntax
 
     "IH{" [ \ } [ >identity-hashtable ] parse-literal ] define-core-syntax
+
+    "::" [ (::) define-declared ] define-core-syntax
+    "M::" [ (M::) define ] define-core-syntax
+    "MACRO:" [ (:) define-macro ] define-core-syntax
+    "MACRO::" [ (::) define-macro ] define-core-syntax
+    "TYPED:" [ (:) define-typed ] define-core-syntax
+    "TYPED::" [ (::) define-typed ] define-core-syntax
+    "MEMO:" [ (:) define-memoized ] define-core-syntax
+    "MEMO::" [ (::) define-memoized ] define-core-syntax
+    "MEMO[" [ parse-quotation dup infer memoize-quot suffix! ] define-core-syntax
+    "IDENTITY-MEMO:" [ (:) define-identity-memoized ] define-core-syntax
+    "IDENTITY-MEMO::" [ (::) define-identity-memoized ] define-core-syntax
+
+    "'[" [ parse-quotation fry append! ] define-core-syntax
+
+    "PROTOCOL:" [
+        scan-new-word parse-definition define-protocol
+    ] define-core-syntax
+
+    "CONSULT:" [
+        scan-word scan-word parse-definition <consultation>
+        [ save-location ] [ define-consult ] bi
+    ] define-core-syntax
+
+    "BROADCAST:" [
+        scan-word scan-word parse-definition <broadcast>
+        [ save-location ] [ define-consult ] bi
+    ] define-core-syntax
+
+    "SLOT-PROTOCOL:" [
+        scan-new-word ";"
+        [ [ reader-word ] [ writer-word ] bi 2array ]
+        map-tokens concat define-protocol
+    ] define-core-syntax
+
+    "HINTS:" [
+        scan-object dup wrapper? [ wrapped>> ] when
+        [ changed-definition ]
+        [ subwords [ changed-definition ] each ]
+        [ parse-definition { } like set-specializer ] tri
+    ] define-core-syntax
+
+    { "_" "@" } define-fry-specifiers
 ] with-compilation-unit

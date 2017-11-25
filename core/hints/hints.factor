@@ -73,11 +73,11 @@ ERROR: cannot-specialize word specializer ;
     over inline-recursive? [ cannot-specialize ] when
     "specializer" set-word-prop ;
 
-SYNTAX: \HINTS:
-    scan-object dup wrapper? [ wrapped>> ] when
-    [ changed-definition ]
-    [ subwords [ changed-definition ] each ]
-    [ parse-definition { } like set-specializer ] tri ;
+! SYNTAX: \HINTS:
+    ! scan-object dup wrapper? [ wrapped>> ] when
+    ! [ changed-definition ]
+    ! [ subwords [ changed-definition ] each ]
+    ! [ parse-definition { } like set-specializer ] tri ;
 
 ! Default specializers
 { pop* pop push last } [

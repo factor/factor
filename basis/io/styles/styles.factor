@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors colors.constants delegate
-delegate.protocols destructors fry hashtables io
-io.streams.plain io.streams.string kernel make math.order
+USING: accessors assocs colors delegate.protocols destructors
+hashtables io io.streams.plain io.streams.string kernel make
 namespaces present sequences splitting strings strings.tables
 summary ;
 IN: io.styles

@@ -4,8 +4,8 @@ USING: accessors combinators kernel locals.backend math parser
 quotations sequences sets splitting words ;
 IN: fry
 
-: _ ( -- * ) "Only valid inside a fry" throw ;
-: @ ( -- * ) "Only valid inside a fry" throw ;
+! : _ ( -- * ) "Only valid inside a fry" throw ;
+! : @ ( -- * ) "Only valid inside a fry" throw ;
 
 ERROR: >r/r>-in-fry-error ;
 
@@ -145,4 +145,4 @@ M: callable fry ( quot -- quot' )
         ] bi
     ] if-empty ;
 
-SYNTAX: \'[ parse-quotation fry append! ;
+! SYNTAX: \'[ parse-quotation fry append! ;

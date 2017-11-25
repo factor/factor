@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: command-line compiler.units continuations definitions io
+USING: combinators command-line compiler.units continuations definitions io
 io.pathnames kernel math math.parser memory namespaces parser
 parser.notes sequences sets splitting system
 vocabs vocabs.loader ;
@@ -75,9 +75,40 @@ CONSTANT: default-components
 
     (command-line) parse-command-line
 
+    "here0" print
+    {
+        { [ os windows? ] [ "alien.libraries.windows" ] }
+        { [ os unix? ] [ "alien.libraries.unix" ] }
+    } cond require
+    "here1" print
+
+    ! { "hashtables.identity" "prettyprint" } "hashtables.identity.prettyprint" require-when
+    ! { "hashtables.identity" "mirrors" } "hashtables.identity.mirrors" require-when
+    ! { "hashtables.wrapped" "prettyprint" } "hashtables.wrapped.prettyprint" require-when
+
+    ! { "typed" "prettyprint" } "typed.prettyprint" require-when
+    ! { "typed" "compiler.cfg.debugger" } "typed.debugger" require-when
+
     { "hashtables.identity" "prettyprint" } "hashtables.identity.prettyprint" require-when
+    "here2" print
     { "hashtables.identity" "mirrors" } "hashtables.identity.mirrors" require-when
+    "here3" print
     { "hashtables.wrapped" "prettyprint" } "hashtables.wrapped.prettyprint" require-when
+    "here3.1" print
+    "summary" require
+    "here3.2" print
+    "eval" require
+    ! "deques" require
+    ! "command-line.startup" require
+    ! "here5" print
+    { "locals" "prettyprint" } "locals.prettyprint" require-when
+    "here6" print
+    { "typed" "prettyprint" } "typed.prettyprint" require-when
+    "here7" print
+    { "typed" "compiler.cfg.debugger" } "typed.debugger" require-when
+    "here8" print
+    "stack-checker.row-polymorphism" reload
+    "here9" print
 
     ! Set dll paths
     os windows? [ "windows" require ] when
