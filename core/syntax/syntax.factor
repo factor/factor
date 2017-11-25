@@ -8,7 +8,8 @@ classes.tuple.parser classes.union combinators compiler.units
 definitions delegate delegate.private effects effects.parser fry
 generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables hashtables.identity hints
-io.pathnames kernel lexer locals.parser macros math memoize
+interpolate io.pathnames kernel lexer locals.errors
+locals.parser locals.types macros math memoize multiline
 namespaces parser quotations sbufs sequences slots source-files
 splitting stack-checker strings strings.parser typed vectors
 vocabs.parser words words.alias words.constant words.symbol ;
@@ -347,4 +348,40 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     { "_" "@" } define-fry-specifiers
+
+    "[[" [ "]]" parse-multiline-string suffix! ] define-core-syntax
+    "[=[" [ "]=]" parse-multiline-string suffix! ] define-core-syntax
+    "[==[" [ "]==]" parse-multiline-string suffix! ] define-core-syntax
+    "[===[" [ "]===]" parse-multiline-string suffix! ] define-core-syntax
+    "[====[" [ "]====]" parse-multiline-string suffix! ] define-core-syntax
+    "[=====[" [ "]=====]" parse-multiline-string suffix! ] define-core-syntax
+    "[======[" [ "]======]" parse-multiline-string suffix! ] define-core-syntax
+
+    "![[" [ "]]" parse-multiline-string drop ] define-core-syntax
+    "![=[" [ "]=]" parse-multiline-string drop ] define-core-syntax
+    "![==[" [ "]==]" parse-multiline-string drop ] define-core-syntax
+    "![===[" [ "]===]" parse-multiline-string drop ] define-core-syntax
+    "![====[" [ "]====]" parse-multiline-string drop ] define-core-syntax
+    "![=====[" [ "]=====]" parse-multiline-string drop ] define-core-syntax
+    "![======[" [ "]======]" parse-multiline-string drop ] define-core-syntax
+
+    "I[[" [ "]]" define-interpolate-syntax ] define-core-syntax
+    "I[=[" [ "]=]" define-interpolate-syntax ] define-core-syntax
+    "I[==[" [ "]==]" define-interpolate-syntax ] define-core-syntax
+    "I[===[" [ "]===]" define-interpolate-syntax ] define-core-syntax
+    "I[====[" [ "]====]" define-interpolate-syntax ] define-core-syntax
+    "I[=====[" [ "]=====]" define-interpolate-syntax ] define-core-syntax
+    "I[======[" [ "]======]" define-interpolate-syntax ] define-core-syntax
+
+    ":>" [
+        in-lambda? get [ :>-outside-lambda-error ] unless
+        scan-token parse-def suffix!
+    ] define-core-syntax
+
+    "|[" [ parse-lambda append! ] define-core-syntax
+
+    "let[" [ parse-let append! ] define-core-syntax
+    "'let[" [
+        H{ } clone (parse-lambda) [ fry call <let> ?rewrite-closures call ] curry append!
+    ] define-core-syntax
 ] with-compilation-unit
