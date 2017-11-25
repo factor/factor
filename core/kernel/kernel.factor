@@ -177,6 +177,27 @@ DEFER: if
 : 2tri@ ( u v w x y z quot -- )
     dup dup 2tri* ; inline
 
+: 3bi* ( u v w x y z p q -- )
+    [ 3dip ] dip call ; inline
+
+: 3bi@ ( u v w x y z quot -- )
+    dup 3bi* ; inline
+
+: 4bi ( w x y z p q -- )
+    [ 4keep ] dip call ; inline
+
+: 4bi* ( s t u v w x y z p q -- )
+    [ 4dip ] dip call ; inline
+
+: 4bi@ ( s t u v w x y z quot -- )
+    dup 4bi* ; inline
+
+: 4tri ( w x y z p q r -- )
+    [ [ 4keep ] dip 4keep ] dip call ; inline
+
+: keepd ( ..a x y quot: ( ..a x y -- ..b ) -- ..b x )
+    2keep drop ; inline
+
 ! Quotation building
 : 2curry ( obj1 obj2 quot -- curried )
     curry curry ; inline

@@ -6,7 +6,7 @@ classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple
 classes.tuple.parser classes.union combinators compiler.units
 definitions delegate delegate.private effects effects.parser fry
-generic generic.hook generic.math generic.parser
+functors2 generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables hashtables.identity hints
 interpolate io.pathnames kernel lexer locals.errors
 locals.parser locals.types macros math memoize multiline
@@ -383,5 +383,13 @@ IN: bootstrap.syntax
     "let[" [ parse-let append! ] define-core-syntax
     "'let[" [
         H{ } clone (parse-lambda) [ fry call <let> ?rewrite-closures call ] curry append!
+    ] define-core-syntax
+
+    "FUNCTOR:" [
+        scan-new-word scan-effect scan-object make-functor
+    ] define-core-syntax
+
+    "VARIABLES-FUNCTOR:" [
+        scan-new-word scan-effect scan-object scan-object make-variable-functor
     ] define-core-syntax
 ] with-compilation-unit

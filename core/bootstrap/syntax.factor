@@ -137,6 +137,8 @@ IN: bootstrap.syntax
         "|["
         "let["
         "'let["
+        "FUNCTOR:"
+        "VARIABLES-FUNCTOR:"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol

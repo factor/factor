@@ -244,6 +244,12 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
         [ push-at ] curry compose each
     ] keep ; inline
 
+: assoc-invert-as ( assoc exemplar -- newassoc )
+    [ swap ] swap assoc-map-as ;
+
+: assoc-invert ( assoc -- newassoc )
+    dup assoc-invert-as ;
+
 M: sequence at*
     search-alist [ second t ] [ f ] if ;
 

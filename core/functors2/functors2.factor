@@ -1,13 +1,12 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs assocs.extras combinators
-combinators.extras continuations effects.parser formatting fry
-generalizations interpolate io.streams.string kernel make
-math.parser namespaces parser quotations sequences
-sequences.generalizations unicode vocabs.generated vocabs.parser
+USING: accessors ascii assocs combinators 
+generalizations interpolate io.streams.string kernel
+make math.parser namespaces parser quotations sequences
+sequences.generalizations vocabs.generated vocabs.parser
 words ;
 QUALIFIED: sets
-IN: namespaces.extras
+IN: functors2
 
 <<
 ERROR: not-all-unique seq ;
@@ -55,7 +54,7 @@ ERROR: not-all-unique seq ;
             [
                 [
                     [ vocabulary>> ] [ name>> ] bi
-                    "FROM: %s => %s ;" sprintf
+                    " => " glue "FROM: " " ;\n" surround
                 ]
             ] replicate
         ] [ ] tri dup
@@ -116,8 +115,8 @@ ERROR: not-all-unique seq ;
     { } swap make-variable-functor ;
 
 ! FUNCTOR: foo, define-foo, and FOO: go into the vocabulary where the FUNCTOR: appears
-SYNTAX: \FUNCTOR:
-    scan-new-word scan-effect scan-object make-functor ;
+! SYNTAX: \FUNCTOR:
+    ! scan-new-word scan-effect scan-object make-functor ;
 
-SYNTAX: \VARIABLE-FUNCTOR:
-    scan-new-word scan-effect scan-object scan-object make-variable-functor ;
+! SYNTAX: \VARIABLE-FUNCTOR:
+    ! scan-new-word scan-effect scan-object scan-object make-variable-functor ;
