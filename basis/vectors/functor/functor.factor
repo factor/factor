@@ -1,35 +1,34 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes functors growable kernel math sequences
-sequences.private ;
+sequences.private functors2 ;
 IN: vectors.functor
 
-<FUNCTOR: define-vector ( V A <A> -- )
+FUNCTOR: special-vector ( T: existing-word -- ) [[
+USING: classes growable kernel math sequences sequences.private
+specialized-arrays ;
 
-<V> DEFINES <${V}>
->V  DEFINES >${V}
+SPECIALIZED-ARRAY: ${T}
 
-WHERE
+TUPLE: ${T}-vector { underlying ${T}-array } { length array-capacity } ;
 
-TUPLE: V { underlying A } { length array-capacity } ;
+: >${T}-vector ( seq -- vector ) ${T}-vector new clone-like ; inline
 
-: <V> ( capacity -- vector ) <A> 0 V boa ; inline
+: <${T}-vector> ( capacity -- vector ) <${T}-array> 0 ${T}-vector boa ; inline
 
-M: V like
-    drop dup V instance? [
-        dup A instance? [ dup length V boa ] [ >V ] if
+M: ${T}-vector like
+    drop dup ${T}-vector instance? [
+        dup ${T}-array instance? [ dup length ${T}-vector boa ] [ >${T}-vector ] if
     ] unless ; inline
 
-M: V new-sequence drop [ <A> ] [ >fixnum ] bi V boa ; inline
+M: ${T}-vector new-sequence drop [ <${T}-array> ] [ >fixnum ] bi ${T}-vector boa ; inline
 
-M: A new-resizable drop <V> ; inline
+M: ${T}-array new-resizable drop <${T}-vector> ; inline
 
-M: V new-resizable drop <V> ; inline
+M: ${T}-vector new-resizable drop <${T}-vector> ; inline
 
-M: V equal? over V instance? [ sequence= ] [ 2drop f ] if ;
+M: ${T}-vector equal? over ${T}-vector instance? [ sequence= ] [ 2drop f ] if ;
 
-: >V ( seq -- vector ) V new clone-like ; inline
+INSTANCE: ${T}-vector growable
 
-INSTANCE: V growable
-
-;FUNCTOR>
+]]

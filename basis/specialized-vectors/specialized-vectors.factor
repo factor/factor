@@ -1,69 +1,64 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.parser
-classes fry functors growable kernel lexer make math parser
-prettyprint.custom sequences specialized-arrays vocabs.generated
-vocabs.loader vocabs.parser ;
+USING: alien.parser arrays functors2 growable kernel lexer make
+math.parser sequences vocabs.loader ;
 FROM: sequences.private => nth-unsafe ;
-FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 QUALIFIED: vectors.functor
 IN: specialized-vectors
 
 MIXIN: specialized-vector
 
-<PRIVATE
+FUNCTOR: specialized-vector ( T: existing-word -- ) [[
 
-<FUNCTOR: define-vector ( T -- )
+USING: accessors alien alien.c-types alien.data classes growable
+kernel math parser prettyprint.custom sequences
+sequences.private specialized-arrays specialized-arrays.private
+specialized-vectors vectors.functor ;
+FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 
-V DEFINES-CLASS ${T}-vector
+SPECIALIZED-ARRAY: ${T}
 
-A          IS ${T}-array
-<A>        IS <${A}>
-<direct-A> IS <direct-${A}>
+SPECIAL-VECTOR: ${T}
 
->V DEFERS >${V}
-V{ DEFINES ${V}{
+SYNTAX: ${T}-vector{ \ } [ >${T}-vector ] parse-literal ;
 
-WHERE
+INSTANCE: ${T}-vector specialized-vector
+INSTANCE: ${T}-vector growable
 
-V A <A> vectors.functor:define-vector
+M: ${T}-vector contract 2drop ; inline
 
-M: V contract 2drop ; inline
+M: ${T}-vector element-size drop \ ${T} heap-size ; inline
 
-M: V element-size drop \ T heap-size ; inline
+M: ${T}-vector pprint-delims drop \ ${T}-vector{ \ } ;
 
-M: V pprint-delims drop \ V{ \ } ;
+M: ${T}-vector >pprint-sequence ;
 
-M: V >pprint-sequence ;
+M: ${T}-vector pprint* pprint-object ;
 
-M: V pprint* pprint-object ;
+M: ${T}-vector >c-ptr underlying>> underlying>> ; inline
+M: ${T}-vector byte-length [ length ] [ element-size ] bi * ; inline
 
-M: V >c-ptr underlying>> underlying>> ; inline
-M: V byte-length [ length ] [ element-size ] bi * ; inline
+M: ${T}-vector direct-like drop <direct-${T}-array> ; inline
+M: ${T}-vector nth-c-ptr underlying>> nth-c-ptr ; inline
 
-M: V direct-like drop <direct-A> ; inline
-M: V nth-c-ptr underlying>> nth-c-ptr ; inline
-
-M: A like
-    drop dup A instance? [
-        dup V instance? [
-            [ >c-ptr ] [ length>> ] bi <direct-A>
-        ] [ \ T >c-array ] if
+M: ${T}-array like
+    drop dup ${T}-array instance? [
+        dup ${T}-vector instance? [
+            [ >c-ptr ] [ length>> ] bi <direct-${T}-array>
+        ] [ \ ${T} >c-array ] if
     ] unless ; inline
 
-SYNTAX: V{ \ } [ >V ] parse-literal ;
+]]
 
-INSTANCE: V specialized-vector
-INSTANCE: V growable
-
-;FUNCTOR>
+<PRIVATE
 
 : specialized-vector-vocab ( c-type -- vocab )
     [
-        "specialized-vectors.instances." %
-        [ vocabulary>> % "." % ]
-        [ name>> % ]
-        bi
+        "specialized-vectors:functors:specialized-vector:" %
+        ! [ vocabulary>> % "." % ]
+        ! [ name>> % ":" % ]
+        [ drop ]
+        [ 1array hashcode number>string % ] bi
     ] "" make ;
 
 PRIVATE>
@@ -71,21 +66,7 @@ PRIVATE>
 : push-new ( vector -- new )
     [ length ] keep ensure nth-unsafe ; inline
 
-: define-vector-vocab ( type -- vocab )
-    underlying-type
-    [ specialized-vector-vocab ] [ '[ _ define-vector ] ] bi
-    generate-vocab ;
-
 SYNTAX: \SPECIALIZED-VECTORS:
-    ";" [
-        parse-c-type
-        [ define-specialized-array use-vocab ]
-        [ define-vector-vocab use-vocab ] bi
-    ] each-token ;
-
-SYNTAX: \SPECIALIZED-VECTOR:
-    scan-c-type
-    [ define-specialized-array use-vocab ]
-    [ define-vector-vocab use-vocab ] bi ;
+    ";" [ parse-c-type define-specialized-vector ] each-token ;
 
 { "specialized-vectors" "mirrors" } "specialized-vectors.mirrors" require-when

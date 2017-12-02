@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
-byte-arrays classes combinators fry functors kernel lexer locals
-make math math.vectors parser prettyprint.custom sequences
-sequences.private vocabs.generated vocabs.loader vocabs.parser
-words math.parser arrays functors2 ;
+arrays byte-arrays classes combinators fry functors2
+kernel lexer locals make math math.parser math.vectors parser
+prettyprint.custom sequences sequences.private vocabs.generated
+vocabs.loader vocabs.parser words ;
 IN: specialized-arrays
 
 MIXIN: specialized-array-mixin
@@ -176,4 +176,4 @@ SYNTAX: \SPECIALIZED-ARRAYS:
 
 ! { "specialized-arrays" "mirrors" } "specialized-arrays.mirrors" require-when
 
-! uchar define-specialized-array
+uchar define-specialized-array
