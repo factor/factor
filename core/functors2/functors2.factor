@@ -1,9 +1,10 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs combinators generalizations
-interpolate io.streams.string kernel make math.parser namespaces
-parser quotations sequences sequences.generalizations
-vocabs.generated vocabs.parser words ;
+USING: accessors arrays ascii assocs classes classes.parser
+combinators effects.parser generalizations interpolate
+io.streams.string kernel lexer make math.parser namespaces
+parser quotations sequences sequences.generalizations strings
+vocabs.generated vocabs.parser words random ;
 QUALIFIED: sets
 IN: functors2
 
@@ -15,7 +16,7 @@ ERROR: not-all-unique seq ;
 
 : effect-in>drop-variables ( effect -- quot )
     in>> ensure-unique
-    [ '[ name>> _ dup array? [ first ] when set ] ] map
+    [ '[ dup string? [ name>> ] unless _ dup array? [ first ] when set ] ] map
     '[ _ spread ] ; inline
 
 : make-in-drop-variables ( def effect -- def effect )
@@ -26,26 +27,33 @@ ERROR: not-all-unique seq ;
 >>
 
 : functor-definer-word-name ( word -- string )
-    name>> >lower "define-" prepend ;
+    dup string? [ name>> ] unless >lower "define-" prepend ;
 
 : functor-syntax-word-name ( word -- string )
-    name>> >upper ":" append ;
+    dup string? [ name>> ] unless >upper ":" append ;
 
 : functor-word-name ( word -- string )
-    name>> "-functor" append ;
+    dup string? [ name>> ] unless "-functor" append ;
 
 : functor-instantiated-vocab-name ( functor-word parameters -- string )
     dupd
     '[
         ! box-functor:functors:box:float:1827917291
-        _ vocabulary>> %
+        _ dup string? [ vocabulary>> ] unless %
         ":functors:" %
-        _ name>> % ! functor name, e.g. box
+        _ dup string? [ name>> ] unless % ! functor name, e.g. box
         ":" %
         _ hashcode number>string % ! narray for all the template parameters
     ] "" make ;
 
-: prepend-input-vocabs ( word def effect -- word def effect )
+: functor-same-vocab-name ( functor-word parameters -- string )
+    drop
+    '[
+        ! box-functor:functors:box:float:1827917291
+        _ dup string? [ vocabulary>> ] unless %
+    ] "" make ;
+
+: prepend-input-vocabs-generated ( word def effect -- word def effect )
     [ 2drop ]
     [
         ! make FROM: vocab => word ; for each input argument
@@ -55,7 +63,7 @@ ERROR: not-all-unique seq ;
         ] [
             [
                 [
-                    [ vocabulary>> ] [ name>> ] bi
+                    [ dup string? [ drop current-vocab name>> ] [ vocabulary>> ] if ] [ dup string? [ name>> ] unless ] bi
                     " => " glue "FROM: " " ;\n" surround
                 ]
             ] replicate
@@ -71,6 +79,39 @@ ERROR: not-all-unique seq ;
         ] dip
     ] 3tri ;
 
+: prepend-input-vocabs-same ( word def effect -- word def effect )
+    [ 2drop ]
+    [
+        ! make FROM: vocab => word ; for each input argument
+        nip in>> length
+        [
+            dup dup '[ [ [ _ ] _ ndip _ narray functor-same-vocab-name ] _ nkeep ]
+        ] [
+            [
+                [
+                    [ drop current-vocab name>> ] [ dup string? [ name>> ] unless ] bi
+                    " => " glue "FROM: " " ;\n" surround drop ""
+                ]
+            ] replicate
+        ] [ ] tri dup
+        ! Make the FROM: list and keep the input arguments
+        '[ [ @ _ spread _ narray "\n" join dupd [ "IN: " prepend ] dip "\n" glue ] _ nkeep ]
+    ] [
+        [ drop ] 2dip
+        ! append the IN: and the FROM: quot generator and the functor code
+        [
+            append
+            '[
+                ! parse-stream forgets the previous vocab if same name
+                @ over '[
+                    _ <string-reader> _ 128 random-bits number>string append
+                    parse-stream drop
+                ] nip call ! generate-vocab use-vocab
+            ]
+        ] dip
+    ] 3tri ;
+
+
 : interpolate-assoc ( assoc -- quot )
     assoc-invert
     [ '[ _ interpolate>string _ set ] ] { } assoc>map [ ] concat-as ; inline
@@ -81,10 +122,26 @@ ERROR: not-all-unique seq ;
 : lookup-word-in ( string -- word )
     current-vocab lookup-word ;
 
-: (make-functor) ( word effect quot -- )
+ERROR: no-type arg ;
+: argument>type ( argument -- type )
+    dup array? [ ?second ] [ no-type ] if ;
+
+SINGLETONS: new-class new-word existing-class existing-word string ;
+CONSTANT: scanner-table H{
+    { new-class [ scan-new-class ] }
+    { existing-class [ scan-class ] }
+    { new-word [ scan-new-word ] }
+    { existing-word [ scan-word ] }
+    ! { string [ scan-token ] }
+}
+
+: type>scanner ( obj -- quot )
+    scanner-table ?at [ no-type ] unless ;
+
+: (make-functor-vocab) ( word effect quot -- )
     swap
     make-in-drop-variables
-    prepend-input-vocabs
+    prepend-input-vocabs-generated
     ! word quot effect
     [
         [ functor-definer-word-name create-new-word-in ] 2dip
@@ -95,7 +152,33 @@ ERROR: not-all-unique seq ;
             [ functor-syntax-word-name create-new-word-in ]
             [ functor-definer-word-name lookup-word-in ] bi
         ] dip
-        in>> length [ [ scan-object ] ] replicate [ ] concat-as
+        in>> [
+            argument>type type>scanner
+            ! [ scan-object ]
+        ] { } map-as [ ] concat-as
+        swap
+        1quotation
+        '[ @ @ ] define-syntax
+    ] 3bi ; inline
+
+: (make-functor-same) ( word effect quot -- )
+    swap
+    make-in-drop-variables
+    prepend-input-vocabs-same
+    ! word quot effect
+    [
+        [ functor-definer-word-name create-new-word-in ] 2dip
+        define-declared
+    ] [
+        nip
+        [
+            [ functor-syntax-word-name create-new-word-in ]
+            [ functor-definer-word-name lookup-word-in ] bi
+        ] dip
+        in>> [
+            argument>type type>scanner
+            ! [ scan-object ]
+        ] { } map-as [ ] concat-as
         swap
         1quotation
         '[ @ @ ] define-syntax
@@ -112,11 +195,23 @@ ERROR: not-all-unique seq ;
     ] [
         [ interpolate-assoc ] dip ! do bindings in series
         '[ @ _ interpolate>string append ] ! append the interpolated string to the FROM:
-        (make-functor)
+        (make-functor-vocab)
+    ] 4bi ; inline
+
+: make-variable-functor-same ( word effect bindings string -- )
+    [
+        nip make-functor-word
+    ] [
+        [ interpolate-assoc ] dip ! do bindings in series
+        '[ @ _ interpolate>string append ] ! append the interpolated string to the FROM:
+        (make-functor-same)
     ] 4bi ; inline
 
 : make-functor ( word effect string -- )
     { } swap make-variable-functor ;
+
+: make-same-functor ( word effect string -- )
+    { } swap make-variable-functor-same ;
 
 ! FUNCTOR: foo, define-foo, and FOO: go into the vocabulary where the FUNCTOR: appears
 ! SYNTAX: \FUNCTOR:
@@ -124,3 +219,6 @@ ERROR: not-all-unique seq ;
 
 ! SYNTAX: \VARIABLE-FUNCTOR:
     ! scan-new-word scan-effect scan-object scan-object make-variable-functor ;
+
+SYNTAX: \SAME-FUNCTOR:
+    scan-new-word scan-effect scan-object make-same-functor ;
