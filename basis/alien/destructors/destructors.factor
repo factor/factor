@@ -1,32 +1,23 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors destructors effects functors generalizations
-kernel parser sequences ;
+USING: functors2 ;
 IN: alien.destructors
 
 TUPLE: alien-destructor alien ;
 
-<FUNCTOR: define-destructor ( F -- )
+SAME-FUNCTOR: destructor ( F: existing-word -- ) [[
+USING: accessors alien.destructors effects generalizations
+destructors kernel literals sequences ;
 
-F-destructor DEFINES-CLASS ${F}-destructor
-<F-destructor> DEFINES <${F}-destructor>
-&F DEFINES &${F}
-|F DEFINES |${F}
-N [ F stack-effect out>> length ]
+TUPLE: ${F}-destructor < alien-destructor ;
 
-WHERE
+: <${F}-destructor> ( alien -- destructor )
+    ${F}-destructor boa ; inline
 
-TUPLE: F-destructor < alien-destructor ;
+: &${F} ( alien -- alien ) dup <${F}-destructor> &dispose drop ; inline
 
-: <F-destructor> ( alien -- destructor )
-    F-destructor boa ; inline
+: |${F} ( alien -- alien ) dup <${F}-destructor> |dispose drop ; inline
 
-M: F-destructor dispose alien>> F N ndrop ;
+M: ${F}-destructor dispose alien>> ${F} $[ \ ${F} stack-effect out>> length ] ndrop ;
 
-: &F ( alien -- alien ) dup <F-destructor> &dispose drop ; inline
-
-: |F ( alien -- alien ) dup <F-destructor> |dispose drop ; inline
-
-;FUNCTOR>
-
-SYNTAX: \DESTRUCTOR: scan-word define-destructor ;
+]]

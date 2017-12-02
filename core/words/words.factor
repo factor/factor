@@ -119,25 +119,7 @@ M: word parent-word drop f ;
         2tri
     ] if ;
 
-![[
-: inline-quotation? ( obj -- ? )
-    { [ dup array? [ length>> 2 >= ] [ drop f ] if ] [ second quotation? ] } 1&& ;
-
-: effect>inline-quotations ( effect -- quot/f )
-    in>>
-    [ dup inline-quotation? [ last ] [ drop [ ] ] if ] map
-    dup [ length 0 > ] any? [ '[ _ spread ] ] [ drop f ] if ;
-
-: apply-inlined-effects ( def effect -- def effect )
-    dup effect>inline-quotations dup [
-        swap [ prepose ] dip
-    ] [
-        drop
-    ] if ;
-]]
-
 : define-declared ( word def effect -- )
-    ! apply-inlined-effects
     [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
 : make-deprecated ( word -- )
