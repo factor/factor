@@ -12,7 +12,8 @@ interpolate io.pathnames kernel lexer locals.errors
 locals.parser locals.types macros math memoize multiline
 namespaces parser quotations sbufs sequences slots source-files
 splitting stack-checker strings strings.parser typed vectors
-vocabs.parser words words.alias words.constant words.symbol ;
+vocabs.parser words words.alias words.constant words.symbol
+words.inlined ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -175,7 +176,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     ":" [
-        (:) define-declared
+        (:) apply-inlined-effects define-declared
     ] define-core-syntax
 
     "GENERIC:" [
@@ -306,17 +307,17 @@ IN: bootstrap.syntax
 
     "IH{" [ \ } [ >identity-hashtable ] parse-literal ] define-core-syntax
 
-    "::" [ (::) define-declared ] define-core-syntax
+    "::" [ (::) apply-inlined-effects define-declared ] define-core-syntax
     "M::" [ (M::) define ] define-core-syntax
-    "MACRO:" [ (:) define-macro ] define-core-syntax
-    "MACRO::" [ (::) define-macro ] define-core-syntax
-    "TYPED:" [ (:) define-typed ] define-core-syntax
-    "TYPED::" [ (::) define-typed ] define-core-syntax
-    "MEMO:" [ (:) define-memoized ] define-core-syntax
-    "MEMO::" [ (::) define-memoized ] define-core-syntax
+    "MACRO:" [ (:) apply-inlined-effects define-macro ] define-core-syntax
+    "MACRO::" [ (::) apply-inlined-effects define-macro ] define-core-syntax
+    "TYPED:" [ (:) apply-inlined-effects define-typed ] define-core-syntax
+    "TYPED::" [ (::) apply-inlined-effects define-typed ] define-core-syntax
+    "MEMO:" [ (:) apply-inlined-effects define-memoized ] define-core-syntax
+    "MEMO::" [ (::) apply-inlined-effects define-memoized ] define-core-syntax
     "MEMO[" [ parse-quotation dup infer memoize-quot suffix! ] define-core-syntax
-    "IDENTITY-MEMO:" [ (:) define-identity-memoized ] define-core-syntax
-    "IDENTITY-MEMO::" [ (::) define-identity-memoized ] define-core-syntax
+    "IDENTITY-MEMO:" [ (:) apply-inlined-effects define-identity-memoized ] define-core-syntax
+    "IDENTITY-MEMO::" [ (::) apply-inlined-effects define-identity-memoized ] define-core-syntax
 
     "'[" [ parse-quotation fry append! ] define-core-syntax
 
