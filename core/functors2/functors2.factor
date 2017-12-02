@@ -4,7 +4,7 @@ USING: accessors arrays ascii assocs classes classes.parser
 combinators effects.parser generalizations interpolate
 io.streams.string kernel lexer make math.parser namespaces
 parser quotations sequences sequences.generalizations strings
-vocabs.generated vocabs.parser words random ;
+vocabs.generated vocabs.parser words splitting ;
 QUALIFIED: sets
 IN: functors2
 
@@ -85,11 +85,11 @@ ERROR: not-all-unique seq ;
         ! make FROM: vocab => word ; for each input argument
         nip in>> length
         [
-            dup dup '[ [ [ _ ] _ ndip _ narray functor-same-vocab-name ] _ nkeep ]
+            dup dup '[ [ [ _ ] _ ndip _ narray 2drop current-vocab name>> ] _ nkeep ]
         ] [
             [
                 [
-                    [ drop current-vocab name>> ] [ dup string? [ name>> ] unless ] bi
+                    [ dup string? [ drop current-vocab name>> ] [ vocabulary>> ] if ] [ dup string? [ name>> ] unless ] bi
                     " => " glue "FROM: " " ;\n" surround drop ""
                 ]
             ] replicate
@@ -104,8 +104,7 @@ ERROR: not-all-unique seq ;
             '[
                 ! parse-stream forgets the previous vocab if same name
                 @ over '[
-                    _ <string-reader> _ 128 random-bits number>string append
-                    parse-stream drop
+                    _ _ drop string-lines parse-lines drop
                 ] nip call ! generate-vocab use-vocab
             ]
         ] dip
