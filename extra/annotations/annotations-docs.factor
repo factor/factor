@@ -3,6 +3,7 @@ help help.markup help.topics kernel sequences sorting vocabs
 words combinators.smart tools.crossref ;
 IN: annotations
 
+![=[
 <PRIVATE
 : comment-word ( base -- word ) "!" prepend "annotations" lookup-word ;
 : comment-usage-word ( base -- word ) "s" append "annotations" lookup-word ;
@@ -66,3 +67,5 @@ annotation-tags [
         [ [ comment-word ] [ comment-usage-word ] [ comment-usage.-word ] tri 3array related-words ]
     } cleave
 ] each
+
+]=]

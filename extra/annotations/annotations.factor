@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff, Doug Coleman. see BSD license
-USING: accessors combinators.short-circuit definitions functors
-kernel lexer namespaces parser prettyprint tools.crossref
-sequences words ;
+USING: accessors combinators.short-circuit kernel lexer
+namespaces sequences tools.crossref words ;
+FROM: functors2 => new-word SAME-FUNCTOR: ;
 IN: annotations
 
 <<
@@ -14,30 +14,31 @@ IN: annotations
     [ { [ word? ] [ vocabulary>> "annotations" = ] } 1&& not ]
     filter ;
 
-<FUNCTOR: define-annotation ( NAME -- )
+SAME-FUNCTOR: annotation ( NAME: new-word -- ) [[
 
-(NAME) DEFINES (${NAME})
-!NAME  DEFINES !${NAME}
-NAMEs  DEFINES ${NAME}s
-NAMEs. DEFINES ${NAME}s.
+USING: annotations kernel sequences tools.crossref ;
 
-WHERE
+: (${NAME}) ( str -- ) drop ; inline
 
-: (NAME) ( str -- ) drop ; inline
-SYNTAX: !NAME (parse-annotation) \ (NAME) suffix! ;
+SYNTAX: !${NAME} (parse-annotation) \ (${NAME}) suffix! ;
 
-: NAMEs ( -- usages )
-    \ (NAME) (non-annotation-usage) ;
-: NAMEs. ( -- )
-    NAMEs sorted-definitions. ;
+: ${NAME}s ( -- usages )
+    \ (${NAME}) (non-annotation-usage) ;
 
-;FUNCTOR>
+: ${NAME}s. ( -- )
+    ${NAME}s sorted-definitions. ;
 
-CONSTANT: annotation-tags {
-    "XXX" "TODO" "FIXME" "BUG" "REVIEW" "LICENSE"
-    "AUTHOR" "BROKEN" "HACK" "LOL" "NOTE"
-}
+]]
 
-annotation-tags [ define-annotation ] each
-
+SYNTAX: \ANNOTATIONS: ";" [ define-annotation ] each-token ;
 >>
+
+! SYMBOLS: XXX TODO FIXME BUG REVIEW LICENSE
+    ! AUTHOR BROKEN HACK LOL NOTE ;
+
+! CONSTANT: annotation-tags {
+    ! XXX TODO FIXME BUG REVIEW LICENSE
+    ! AUTHOR BROKEN HACK LOL NOTE
+! }
+
+ANNOTATIONS: XXX TODO FIXME BUG REVIEW LICENSE AUTHOR BROKEN HACK LOL NOTE ;
