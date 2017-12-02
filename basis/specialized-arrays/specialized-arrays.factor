@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.parser
 byte-arrays classes combinators fry functors kernel lexer locals
 make math math.vectors parser prettyprint.custom sequences
 sequences.private vocabs.generated vocabs.loader vocabs.parser
-words math.parser arrays ;
+words math.parser arrays functors2 ;
 IN: specialized-arrays
 
 MIXIN: specialized-array-mixin
@@ -41,7 +41,7 @@ M: byte-array direct-like drop uchar <c-direct-array> ; inline
 
 PRIVATE>
 
-VARIABLES-FUNCTOR: specialized-array ( T -- ) {
+VARIABLES-FUNCTOR: specialized-array ( T: existing-word -- ) {
     { "A" "${T}-array" }
     { "<A>" "<${A}>" }
     { "(A)" "(${A})" }
