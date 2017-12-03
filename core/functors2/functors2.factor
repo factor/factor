@@ -4,7 +4,7 @@ USING: accessors arrays ascii assocs classes classes.parser
 combinators effects.parser generalizations interpolate
 io.streams.string kernel lexer make math.parser namespaces
 parser quotations sequences sequences.generalizations strings
-vocabs.generated vocabs.parser words splitting ;
+vocabs.generated vocabs.parser words splitting combinators.short-circuit ;
 QUALIFIED: sets
 IN: functors2
 
@@ -16,7 +16,7 @@ ERROR: not-all-unique seq ;
 
 : effect-in>drop-variables ( effect -- quot )
     in>> ensure-unique
-    [ '[ dup string? [ name>> ] unless _ dup array? [ first ] when set ] ] map
+    [ '[ dup word? [ name>> ] when _ dup array? [ first ] when set ] ] map
     '[ _ spread ] ; inline
 
 : make-in-drop-variables ( def effect -- def effect )
@@ -27,21 +27,21 @@ ERROR: not-all-unique seq ;
 >>
 
 : functor-definer-word-name ( word -- string )
-    dup string? [ name>> ] unless >lower "define-" prepend ;
+    dup word? [ name>> ] when >lower "define-" prepend ;
 
 : functor-syntax-word-name ( word -- string )
-    dup string? [ name>> ] unless >upper ":" append ;
+    dup word? [ name>> ] when >upper ":" append ;
 
 : functor-word-name ( word -- string )
-    dup string? [ name>> ] unless "-functor" append ;
+    dup word? [ name>> ] when "-functor" append ;
 
 : functor-instantiated-vocab-name ( functor-word parameters -- string )
     dupd
     '[
         ! box-functor:functors:box:float:1827917291
-        _ dup string? [ vocabulary>> ] unless %
+        _ dup word? [ vocabulary>> ] when %
         ":functors:" %
-        _ dup string? [ name>> ] unless % ! functor name, e.g. box
+        _ dup word? [ name>> ] when % ! functor name, e.g. box
         ":" %
         _ hashcode number>string % ! narray for all the template parameters
     ] "" make ;
@@ -50,7 +50,7 @@ ERROR: not-all-unique seq ;
     drop
     '[
         ! box-functor:functors:box:float:1827917291
-        _ dup string? [ vocabulary>> ] unless %
+        _ dup word? [ vocabulary>> ] when %
     ] "" make ;
 
 : prepend-input-vocabs-generated ( word def effect -- word def effect )
@@ -63,7 +63,7 @@ ERROR: not-all-unique seq ;
         ] [
             [
                 [
-                    [ dup string? [ drop current-vocab name>> ] [ vocabulary>> ] if ] [ dup string? [ name>> ] unless ] bi
+                    [ dup word? [ vocabulary>> ] [ drop current-vocab name>> ] if ] [ dup word? [ name>> ] when ] bi
                     " => " glue "FROM: " " ;\n" surround
                 ]
             ] replicate
@@ -89,8 +89,12 @@ ERROR: not-all-unique seq ;
         ] [
             [
                 [
-                    [ dup string? [ drop current-vocab name>> ] [ vocabulary>> ] if ] [ dup string? [ name>> ] unless ] bi
-                    " => " glue "FROM: " " ;\n" surround drop ""
+                    dup { [ word? ] [ string? ] } 1|| [
+                        [ dup word? [ vocabulary>> ] [ drop current-vocab name>> ] if ] [ dup word? [ name>> ] when ] bi
+                        " => " glue "FROM: " " ;\n" surround drop ""
+                    ] [
+                        drop ""
+                    ] if
                 ]
             ] replicate
         ] [ ] tri dup
@@ -125,13 +129,15 @@ ERROR: no-type arg ;
 : argument>type ( argument -- type )
     dup array? [ ?second ] [ no-type ] if ;
 
-SINGLETONS: new-class new-word existing-class existing-word ;
+SINGLETONS: name new-class new-word existing-class existing-word ;
 CONSTANT: scanner-table H{
     { new-class [ scan-new-class ] }
     { existing-class [ scan-class ] }
     { new-word [ scan-new-word ] }
     { existing-word [ scan-word ] }
-    { string [ scan-token ] }
+    { name [ scan-token ] }
+    { string [ scan-object ] }
+    { quotation [ scan-object ] }
 }
 
 : type>scanner ( obj -- quot )
@@ -153,7 +159,6 @@ CONSTANT: scanner-table H{
         ] dip
         in>> [
             argument>type type>scanner
-            ! [ scan-object ]
         ] { } map-as [ ] concat-as
         swap
         1quotation
@@ -176,7 +181,6 @@ CONSTANT: scanner-table H{
         ] dip
         in>> [
             argument>type type>scanner
-            ! [ scan-object ]
         ] { } map-as [ ] concat-as
         swap
         1quotation

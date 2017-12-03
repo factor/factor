@@ -56,7 +56,7 @@ MIXIN: dataflow-analysis
 M: dataflow-analysis join-sets 2drop assoc-refine ;
 M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
-SAME-FUNCTOR: dataflow-analysis ( name: string -- ) [[
+SAME-FUNCTOR: dataflow-analysis ( name: name -- ) [[
 USING: assocs namespaces ;
 SINGLETON: ${name}
 SYMBOL: ${name}-ins
@@ -74,7 +74,7 @@ M: forward-analysis block-order  drop reverse-post-order ;
 M: forward-analysis successors   drop successors>> ;
 M: forward-analysis predecessors drop predecessors>> ;
 
-SAME-FUNCTOR: forward-analysis ( name: string -- ) [[
+SAME-FUNCTOR: forward-analysis ( name: name -- ) [[
 USING: assocs kernel namespaces ;
 QUALIFIED: namespaces
 
@@ -97,7 +97,7 @@ M: backward-analysis block-order  drop post-order ;
 M: backward-analysis successors   drop predecessors>> ;
 M: backward-analysis predecessors drop successors>> ;
 
-SAME-FUNCTOR: backward-analysis ( name: string -- ) [[
+SAME-FUNCTOR: backward-analysis ( name: name -- ) [[
 USING: assocs kernel namespaces ;
 QUALIFIED: namespaces
 
