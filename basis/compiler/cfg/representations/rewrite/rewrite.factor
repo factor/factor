@@ -1,10 +1,12 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs compiler.cfg.instructions
+USING: accessors arrays assocs compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.registers compiler.cfg.renaming.functor
 compiler.cfg.representations.conversion
-compiler.cfg.representations.preferred compiler.cfg.rpo kernel
-locals make namespaces sequences ;
+compiler.cfg.representations.preferred compiler.cfg.rpo
+generic.parser kernel make namespaces sequences sets words ;
+FROM: namespaces => set ;
 IN: compiler.cfg.representations.rewrite
 
 ! Insert conversions. This introduces new temporaries, so we need
@@ -65,7 +67,7 @@ SYMBOLS: renaming-set needs-renaming? ;
 : converted-value ( vreg -- vreg' )
     renaming-set get pop first2 [ assert= ] dip ;
 
-RENAMING: convert [ converted-value ] [ converted-value ] [ ]
+RENAMING: convert "[ converted-value ]" "[ converted-value ]" "[ ]"
 
 : perform-renaming ( insn -- )
     needs-renaming? get [

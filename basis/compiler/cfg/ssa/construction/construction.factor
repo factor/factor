@@ -1,11 +1,13 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg
+USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.def-use compiler.cfg.dominance
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.renaming.functor compiler.cfg.rpo
-compiler.cfg.ssa.construction.tdmsc deques dlists fry kernel
-math namespaces sequences sets ;
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.registers compiler.cfg.renaming.functor
+compiler.cfg.rpo compiler.cfg.ssa.construction.tdmsc deques
+dlists generic.parser kernel math namespaces sequences sets
+words ;
+FROM: namespaces => set ;
 IN: compiler.cfg.ssa.construction
 
 <PRIVATE
@@ -73,7 +75,7 @@ SYMBOLS: stacks pushed ;
     (top-name)
     dup [ dup used-vregs get push-front ] when ;
 
-RENAMING: ssa-rename [ gen-name ] [ top-name ] [ ]
+RENAMING: ssa-rename "[ gen-name ]" "[ top-name ]" "[ ]"
 
 GENERIC: rename-insn ( insn -- )
 

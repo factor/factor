@@ -1,14 +1,18 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
-compiler.cfg.linear-scan.live-intervals compiler.cfg.linearization
-compiler.cfg.liveness compiler.cfg.registers
-compiler.cfg.renaming.functor compiler.cfg.ssa.destruction.leaders
-compiler.cfg.utilities fry heaps kernel make math namespaces sequences
-;
-IN: compiler.cfg.linear-scan.assignment
+compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.instructions.syntax
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linearization compiler.cfg.liveness
+compiler.cfg.registers compiler.cfg.renaming.functor
+compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
+generic.parser heaps kernel make math namespaces sequences sets
+words ;
+FROM: namespaces => set ;
 QUALIFIED: sets
+IN: compiler.cfg.linear-scan.assignment
 
 ! This contains both active and inactive intervals; any interval
 ! such that start <= insn# <= end is in this set.
@@ -88,7 +92,7 @@ SYMBOL: machine-live-outs
     [ pending-interval-heap get expire-old-intervals ]
     [ unhandled-intervals get activate-new-intervals ] bi ;
 
-RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
+RENAMING: assign "[ vreg>reg ]" "[ vreg>reg ]" "[ vreg>reg ]"
 
 : assign-all-registers ( insn -- )
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;

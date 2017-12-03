@@ -1,9 +1,6 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.instructions.syntax fry
-functors generic.parser kernel lexer namespaces parser sequences
-sets slots words ;
+USING: functors2 kernel sequences slots strings ;
 IN: compiler.cfg.renaming.functor
 
 ! Like compiler.cfg.def-use, but for changing operands
@@ -12,77 +9,79 @@ IN: compiler.cfg.renaming.functor
     '[ [ _ ] dip changer-word [ ] 2sequence ] map [ ] join
     [ drop ] append ;
 
-<FUNCTOR: define-renaming ( NAME DEF-QUOT USE-QUOT TEMP-QUOT -- )
+SAME-FUNCTOR: renaming ( NAME: name DEF-QUOT: string USE-QUOT: string TEMP-QUOT: string -- ) [[
 
-rename-insn-defs DEFINES ${NAME}-insn-defs
-rename-insn-uses DEFINES ${NAME}-insn-uses
-rename-insn-temps DEFINES ${NAME}-insn-temps
+! rename-insn-defs DEFINES ${NAME}-insn-defs
+! rename-insn-uses DEFINES ${NAME}-insn-uses
+! rename-insn-temps DEFINES ${NAME}-insn-temps
 
-WHERE
+! WHERE
 
-GENERIC: rename-insn-defs ( insn -- )
-GENERIC: rename-insn-uses ( insn -- )
-GENERIC: rename-insn-temps ( insn -- )
+GENERIC: ${NAME}-insn-defs ( insn -- )
+GENERIC: ${NAME}-insn-uses ( insn -- )
+GENERIC: ${NAME}-insn-temps ( insn -- )
 
-M: insn rename-insn-defs drop ;
-M: insn rename-insn-uses drop ;
-M: insn rename-insn-temps drop ;
+M: insn ${NAME}-insn-defs drop ;
+M: insn ${NAME}-insn-uses drop ;
+M: insn ${NAME}-insn-temps drop ;
 
 ! Instructions with unusual operands
 
-! Special rename-insn-defs methods
-M: ##parallel-copy rename-insn-defs
-    [ [ first2 DEF-QUOT dip 2array ] map ] change-values drop ;
+! Special ${NAME}-insn-defs methods
+M: ##parallel-copy ${NAME}-insn-defs
+    [ [ first2 ${DEF-QUOT} dip 2array ] map ] change-values drop ;
 
-M: ##phi rename-insn-defs DEF-QUOT change-dst drop ;
+M: ##phi ${NAME}-insn-defs ${DEF-QUOT} change-dst drop ;
 
-M: alien-call-insn rename-insn-defs
-    [ [ first3 DEF-QUOT 2dip 3array ] map ] change-reg-outputs
+M: alien-call-insn ${NAME}-insn-defs
+    [ [ first3 ${DEF-QUOT} 2dip 3array ] map ] change-reg-outputs
     drop ;
 
-M: ##callback-inputs rename-insn-defs
-    [ [ first3 DEF-QUOT 2dip 3array ] map ] change-reg-outputs
-    [ [ first3 DEF-QUOT 2dip 3array ] map ] change-stack-outputs
+M: ##callback-inputs ${NAME}-insn-defs
+    [ [ first3 ${DEF-QUOT} 2dip 3array ] map ] change-reg-outputs
+    [ [ first3 ${DEF-QUOT} 2dip 3array ] map ] change-stack-outputs
     drop ;
 
-! Special rename-insn-uses methods
-M: ##parallel-copy rename-insn-uses
-    [ [ first2 USE-QUOT call 2array ] map ] change-values drop ;
+! Special ${NAME}-insn-uses methods
+M: ##parallel-copy ${NAME}-insn-uses
+    [ [ first2 ${USE-QUOT} call 2array ] map ] change-values drop ;
 
-M: ##phi rename-insn-uses
-    [ USE-QUOT assoc-map ] change-inputs drop ;
+M: ##phi ${NAME}-insn-uses
+    [ ${USE-QUOT} assoc-map ] change-inputs drop ;
 
-M: alien-call-insn rename-insn-uses
-    [ [ first3 USE-QUOT 2dip 3array ] map ] change-reg-inputs
-    [ [ first3 USE-QUOT 2dip 3array ] map ] change-stack-inputs
+M: alien-call-insn ${NAME}-insn-uses
+    [ [ first3 ${USE-QUOT} 2dip 3array ] map ] change-reg-inputs
+    [ [ first3 ${USE-QUOT} 2dip 3array ] map ] change-stack-inputs
     drop ;
 
-M: ##alien-indirect rename-insn-uses
-    USE-QUOT change-src call-next-method ;
+M: ##alien-indirect ${NAME}-insn-uses
+    ${USE-QUOT} change-src call-next-method ;
 
-M: ##callback-outputs rename-insn-uses
-    [ [ first3 USE-QUOT 2dip 3array ] map ] change-reg-inputs
+M: ##callback-outputs ${NAME}-insn-uses
+    [ [ first3 ${USE-QUOT} 2dip 3array ] map ] change-reg-inputs
     drop ;
 
+<<
 ! Generate methods for everything else
 insn-classes get special-vreg-insns diff [ insn-def-slots empty? ] reject [
-    [ \ rename-insn-defs create-method-in ]
-    [ insn-def-slots [ name>> ] map DEF-QUOT slot-change-quot ] bi
+    [ \ ${NAME}-insn-defs create-method-in ]
+    [ insn-def-slots [ name>> ] map ${DEF-QUOT} slot-change-quot ] bi
     define
 ] each
 
 insn-classes get special-vreg-insns diff [ insn-use-slots empty? ] reject [
-    [ \ rename-insn-uses create-method-in ]
-    [ insn-use-slots [ name>> ] map USE-QUOT slot-change-quot ] bi
+    [ \ ${NAME}-insn-uses create-method-in ]
+    [ insn-use-slots [ name>> ] map ${USE-QUOT} slot-change-quot ] bi
     define
 ] each
 
 insn-classes get [ insn-temp-slots empty? ] reject [
-    [ \ rename-insn-temps create-method-in ]
-    [ insn-temp-slots [ name>> ] map TEMP-QUOT slot-change-quot ] bi
+    [ \ ${NAME}-insn-temps create-method-in ]
+    [ insn-temp-slots [ name>> ] map ${TEMP-QUOT} slot-change-quot ] bi
     define
 ] each
+>>
 
-;FUNCTOR>
+]]
 
-SYNTAX: \RENAMING: scan-token scan-object scan-object scan-object define-renaming ;
+! SYNTAX: \RENAMING: scan-token scan-object scan-object scan-object define-renaming ;
