@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations fry io.encodings.utf8
 io.files kernel locals make math math.order modern.paths
-modern.slices namespaces sequences sequences.deep
+modern.slices namespaces sequences sequences.deep sets
 sequences.extras shuffle splitting splitting.monotonic strings
 unicode ;
 IN: modern
@@ -96,7 +96,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         2over nth-check-eof {
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
-                drop dup '[ _ matching-delimiter-string closestr1 2array lex-until ] dip
+                drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
                 swap unclip-last 3array ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
         } cond
