@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators.short-circuit compiler.cfg.predecessors
-compiler.cfg.rpo compiler.cfg.utilities deques dlists functors kernel lexer
-locals namespaces sequences ;
+USING: accessors assocs combinators.short-circuit
+compiler.cfg.predecessors compiler.cfg.rpo
+compiler.cfg.utilities deques dlists functors2 kernel namespaces
+sequences strings ;
 IN: compiler.cfg.dataflow-analysis
 
 GENERIC: join-sets ( sets bb dfa -- set )
@@ -11,8 +12,6 @@ GENERIC: block-order ( cfg dfa -- bbs )
 GENERIC: successors ( bb dfa -- seq )
 GENERIC: predecessors ( bb dfa -- seq )
 GENERIC: ignore-block? ( bb dfa -- ? )
-
-<PRIVATE
 
 MIXIN: dataflow-analysis
 
@@ -57,27 +56,14 @@ MIXIN: dataflow-analysis
 M: dataflow-analysis join-sets 2drop assoc-refine ;
 M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
-<FUNCTOR: define-analysis ( name -- )
-
-name DEFINES-CLASS ${name}
-name-ins DEFINES ${name}-ins
-name-outs DEFINES ${name}-outs
-name-in DEFINES ${name}-in
-name-out DEFINES ${name}-out
-
-WHERE
-
-SINGLETON: name
-
-SYMBOL: name-ins
-
-: name-in ( bb -- set ) name-ins get at ;
-
-SYMBOL: name-outs
-
-: name-out ( bb -- set ) name-outs get at ;
-
-;FUNCTOR>
+SAME-FUNCTOR: dataflow-analysis ( name: string -- ) [[
+USING: assocs namespaces ;
+SINGLETON: ${name}
+SYMBOL: ${name}-ins
+: ${name}-in ( bb -- set ) ${name}-ins get at ;
+SYMBOL: ${name}-outs
+: ${name}-out ( bb -- set ) ${name}-outs get at ;
+]]
 
 ! ! ! Forward dataflow analysis
 
@@ -88,22 +74,19 @@ M: forward-analysis block-order  drop reverse-post-order ;
 M: forward-analysis successors   drop successors>> ;
 M: forward-analysis predecessors drop predecessors>> ;
 
-<FUNCTOR: define-forward-analysis ( name -- )
+SAME-FUNCTOR: forward-analysis ( name: string -- ) [[
+USING: assocs kernel namespaces ;
+QUALIFIED: namespaces
 
-name IS ${name}
-name-ins IS ${name}-ins
-name-outs IS ${name}-outs
-compute-name-sets DEFINES compute-${name}-sets
+DATAFLOW-ANALYSIS: ${name}
 
-WHERE
+INSTANCE: ${name} forward-analysis
 
-INSTANCE: name forward-analysis
+: compute-${name}-sets ( cfg -- )
+    \ ${name} run-dataflow-analysis
+    [ ${name}-ins namespaces:set ] [ ${name}-outs namespaces:set ] bi* ;
 
-: compute-name-sets ( cfg -- )
-    name run-dataflow-analysis
-    [ name-ins set ] [ name-outs set ] bi* ;
-
-;FUNCTOR>
+]]
 
 ! ! ! Backward dataflow analysis
 
@@ -114,27 +97,17 @@ M: backward-analysis block-order  drop post-order ;
 M: backward-analysis successors   drop predecessors>> ;
 M: backward-analysis predecessors drop successors>> ;
 
-<FUNCTOR: define-backward-analysis ( name -- )
+SAME-FUNCTOR: backward-analysis ( name: string -- ) [[
+USING: assocs kernel namespaces ;
+QUALIFIED: namespaces
 
-name IS ${name}
-name-ins IS ${name}-ins
-name-outs IS ${name}-outs
-compute-name-sets DEFINES compute-${name}-sets
+DATAFLOW-ANALYSIS: ${name}
 
-WHERE
+INSTANCE: ${name} backward-analysis
 
-INSTANCE: name backward-analysis
+: compute-${name}-sets ( cfg -- )
+    \ ${name} run-dataflow-analysis
+    [ ${name}-outs namespaces:set ] [ ${name}-ins namespaces:set ] bi* ;
 
-: compute-name-sets ( cfg -- )
-    \ name run-dataflow-analysis
-    [ name-outs set ] [ name-ins set ] bi* ;
+]]
 
-;FUNCTOR>
-
-PRIVATE>
-
-SYNTAX: \FORWARD-ANALYSIS:
-    scan-token [ define-analysis ] [ define-forward-analysis ] bi ;
-
-SYNTAX: \BACKWARD-ANALYSIS:
-    scan-token [ define-analysis ] [ define-backward-analysis ] bi ;

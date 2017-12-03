@@ -125,13 +125,13 @@ ERROR: no-type arg ;
 : argument>type ( argument -- type )
     dup array? [ ?second ] [ no-type ] if ;
 
-SINGLETONS: new-class new-word existing-class existing-word string ;
+SINGLETONS: new-class new-word existing-class existing-word ;
 CONSTANT: scanner-table H{
     { new-class [ scan-new-class ] }
     { existing-class [ scan-class ] }
     { new-word [ scan-new-word ] }
     { existing-word [ scan-word ] }
-    ! { string [ scan-token ] }
+    { string [ scan-token ] }
 }
 
 : type>scanner ( obj -- quot )
