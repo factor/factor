@@ -340,12 +340,11 @@ DEFER: lex-factor-top*
     "\"\\!:[{(]})<>\s\r\n" slice-til-either
     lex-factor-top* ; inline
 
-ERROR: compound-syntax-disallowed seq i obj ;
-: check-for-compound-syntax ( seq -- seq' )
-    dup [ length 1 > ] find
-    [ compound-syntax-disallowed ] [ drop ] if* ;
+ERROR: compound-syntax-disallowed n seq obj ;
+: check-for-compound-syntax ( n/f seq obj -- n/f seq obj )
+    dup length 1 > [ compound-syntax-disallowed ] when ;
 
-: check-next-compound ( n/f string -- n/f string ? )
+: check-compound-loop ( n/f string -- n/f string ? )
     [ ] [ peek-from ] [ previous-from ] 2tri
     [ blank? ] bi@ or not ! no blanks between tokens
     pick and ; ! and a valid index
@@ -354,15 +353,13 @@ ERROR: compound-syntax-disallowed seq i obj ;
     [
         ! Compound syntax loop
         [
-            lex-factor-top
-            f like [ , ] when*
+            lex-factor-top f like [ , ] when*
             ! concatenated syntax ( a )[ a 1 + ]( b )
-            check-next-compound
+            check-compound-loop
         ] loop
     ] { } make
-    ! check-for-compound-syntax
-    ! concat
-    f like ;
+    check-for-compound-syntax
+    concat f like ;
 
 : string>literals ( string -- sequence )
     [ 0 ] dip [
