@@ -11,8 +11,6 @@ IN: modern
 ERROR: string-expected-got-eof n string ;
 ERROR: long-opening-mismatch tag open n string ch ;
 
-SYMBOL: strict-upper
-
 ! (( )) [[ ]] {{ }}
 MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string seq ) )
     open-ch dup matching-delimiter {
@@ -46,14 +44,14 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
 : read-double-matched-bracket ( n string tag ch -- n' string seq ) char: \[ read-double-matched ;
 : read-double-matched-brace ( n string tag ch -- n' string seq ) char: \{ read-double-matched ;
 
-DEFER: (lex-factor)
+DEFER: lex-factor-top
 DEFER: lex-factor
 ERROR: lex-expected-but-got-eof n string expected ;
 ! For implementing [ { (
 : lex-until ( n string tag-sequence -- n' string payload )
     3dup '[
         [
-            (lex-factor) dup f like [ , ] when* [
+            lex-factor-top dup f like [ , ] when* [
                 dup [
                     ! } gets a chance, but then also full seq { } after recursion...
                     [ _ ] dip '[ _ sequence= ] any? not
@@ -66,13 +64,19 @@ ERROR: lex-expected-but-got-eof n string expected ;
         ] loop
     ] { } make ;
 
+DEFER: section-close?
+DEFER: upper-colon?
 : lex-colon-until ( n string tag-sequence -- n' string payload )
     '[
         [
-            (lex-factor) dup f like [ , ] when* [
+            lex-factor-top dup f like [ , ] when* [
                 dup [
-                    ! } gets a chance, but then also full seq { } after recursion...
-                    [ _ ] dip '[ _ sequence= ] any? not
+                    dup { [ section-close? ] [ upper-colon? ] } 1|| [
+                        drop f
+                    ] [
+                        ! } gets a chance, but then also full seq { } after recursion...
+                        [ _ ] dip '[ _ sequence= ] any? not
+                    ] if
                 ] [
                     drop t ! loop again?
                 ] if
@@ -156,10 +160,10 @@ ERROR: unexpected-terminator n string slice ;
     {
         [
             [
-                { [ char: A char: Z between? ] [ ":-" member? ] } 1||
+                { [ char: A char: Z between? ] [ ":-\\" member? ] } 1||
             ] all?
         ]
-        [ [ char: A char: Z between? ] any? ]
+        [ [ char: A char: Z between? ] any? ] ! XXX: what?
     } 1&& ;
 
 : strict-upper? ( string -- ? )
@@ -172,6 +176,13 @@ ERROR: unexpected-terminator n string slice ;
         [ length 2 >= ]
         [ rest strict-upper? ]
         [ ">" tail? not ]
+    } 1&& ;
+
+: upper-colon? ( string -- ? )
+    {
+        [ length 2 >= ]
+        [ ":" tail? ]
+        [ dup [ char: : = ] find drop head strict-upper? ]
     } 1&& ;
 
 : section-close? ( string -- ? )
@@ -187,21 +198,26 @@ ERROR: unexpected-terminator n string slice ;
     } 1&& ;
 
 : read-til-semicolon ( n string slice -- n' string semi )
-    dup '[ but-last ";" append ";" 2array lex-colon-until ] dip
+    dup '[ but-last ";" append ";" 2array { "--" ")" } append lex-colon-until ] dip
     swap
-    ! Remove the ; from the paylaod if present
-    dup ?last ";" tail? [
-        unclip-last 3array
-    ] [
-        2array
-    ] if ;
+    ! What ended the FOO: .. ; form?
+    ! Remove the ; from the payload if present
+    ! Also in stack effects ( T: int -- ) can be ended by -- and )
+    dup ?last {
+        { [ dup ";" tail? ] [ drop unclip-last 3array ] }
+        { [ dup "--" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup ")" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup section-close? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup upper-colon? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        [ drop 2array ]
+    } cond ;
 
 ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
 : read-colon ( n string slice -- n' string colon )
     {
-        { [ dup strict-upper? ] [ strict-upper on read-til-semicolon strict-upper off ] }
+        { [ dup strict-upper? ] [ read-til-semicolon ] }
         { [ dup ":" tail? ] [ dup ":" head? [ read-lowercase-colon ] unless ] } ! :foo: vs foo:
-        [ ]
+        [ "here for some reason" throw ]
     } cond ;
 
 : read-acute ( n string slice -- n' string acute )
@@ -213,7 +229,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     [ take-comment ] [ merge-slice-til-whitespace ] if ;
 
 ERROR: no-backslash-payload n string slice ;
-: read-backslash ( n string slice -- n' string obj )
+: (read-backslash) ( n string slice -- n' string obj )
     merge-slice-til-whitespace dup "\\" tail? [
         ! \ foo, M\ foo
         dup [ char: \\ = ] count-tail
@@ -224,60 +240,29 @@ ERROR: no-backslash-payload n string slice ;
         ] dip swap 2array
     ] when ;
 
+DEFER: lex-factor-top*
+: read-backslash ( n string slice -- n' string obj )
+    ! foo\ so far, could be foo\bar{
+    ! remove the \ and continue til delimiter/eof
+    [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
+    over "\\" head? [
+        drop
+        ! \ foo
+        dup "\\" sequence= [ (read-backslash) ] [ merge-slice-til-whitespace ] if
+    ] [
+        ! foo\ or foo\bar (?)
+        over "\\" tail? [ drop (read-backslash) ] [ lex-factor-top* ] if
+    ] if ;
+
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
 : read-token-or-whitespace ( n string slice -- n' string slice/f )
-    dup length 0 = [ [ 1 + ] 2dip drop (lex-factor) ] when ;
+    dup length 0 = [ [ 1 + ] 2dip drop lex-factor-top ] when ;
 
-ERROR: mismatched-terminator n string slice ;
-: read-terminator ( n string slice -- n' string slice ) ;
-
-! If we are at the end of the string, we need to be at position len instead of f
-! after a read. Especially for "<FOO BAR: baz FOO>"
-: ?length-and-string ( length/f string -- length string )
-    over [ nip [ length ] [ ] bi ] unless ; inline
-
-: ((lex-factor)) ( n/f string slice/f ch/f -- n'/f string literal )
+! Inside a FOO: or a <FOO FOO>
+: lex-factor-nested ( n/f string slice/f ch/f -- n'/f string literal )
     {
-        { char: \" [ read-string ] }
-        { char: \! [ read-exclamation ] }
-        { char: \: [
-            merge-slice-til-whitespace
-            dup strict-upper? strict-upper get and [
-                length swap [ - ] dip f
-                strict-upper off
-            ] [
-                read-colon
-            ] if
-        ] }
-        { char: < [
-            ! FOO: a b <BAR: ;BAR>
-            ! FOO: a b <BAR BAR>
-            ! FOO: a b <asdf>
-            ! FOO: a b <asdf asdf>
-
-            ! if we are in a FOO: and we hit a <BAR or <BAR:
-            ! then end the FOO:
-            [ slice-til-whitespace drop ] dip span-slices
-            dup section-open? [
-                strict-upper get [
-                    length swap [ - ] dip f strict-upper off
-                ] [
-                    read-acute
-                ] if
-            ] when
-        ] }
-        { char: > [
-            [ [ char: > = not ] slice-until ] dip merge-slices
-            dup section-close? [
-                strict-upper get [
-                    [ ?length-and-string ] dip
-                    length swap [ - ] dip f strict-upper off
-                ] when
-            ] [
-                [ slice-til-whitespace drop ] dip ?span-slices
-            ] if
-        ] }
+        { char: \\ [ read-backslash ] }
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
         { char: \( [ read-paren ] }
@@ -287,32 +272,38 @@ ERROR: mismatched-terminator n string slice ;
         { char: \s [ read-token-or-whitespace ] }
         { char: \r [ read-token-or-whitespace ] }
         { char: \n [ read-token-or-whitespace ] }
+        { char: \" [ read-string ] }
+        { char: \! [ read-exclamation ] }
+        { char: > [
+            [ [ char: > = not ] slice-until ] dip merge-slices
+            dup section-close? [
+                [ slice-til-whitespace drop ] dip ?span-slices
+            ] unless
+        ] }
         { f [ ] }
     } case ;
 
-: (lex-factor) ( n/f string -- n'/f string literal )
-    over [
-        ! skip-whitespace
-        "\"\\!:[{(]})<>\s\r\n" slice-til-either
+: lex-factor-top* ( n/f string slice/f ch/f -- n'/f string literal )
+    {
+        { char: \: [ merge-slice-til-whitespace read-colon ] }
+        { char: < [
+            ! FOO: a b <BAR: ;BAR>
+            ! FOO: a b <BAR BAR>
+            ! FOO: a b <asdf>
+            ! FOO: a b <asdf asdf>
 
-        ! \foo foo\bar \foo{
-        dup char: \\ =  [
-            drop
-            ! foo\ so far, could be foo\bar{
-            ! remove the \ and continue til delimiter/eof
-            [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
-            over "\\" head? [
-                drop
-                dup "\\" sequence= [ read-backslash ] [ merge-slice-til-whitespace ] if
-            ] [
-                over "\\" tail? [ drop read-backslash ] [ ((lex-factor)) ] if
-            ] if
-        ] [
-            ((lex-factor))
-        ] if
-    ] [
-        f
-    ] if ; inline
+            ! if we are in a FOO: and we hit a <BAR or <BAR:
+            ! then end the FOO:
+            [ slice-til-whitespace drop ] dip span-slices
+            dup section-open? [ read-acute ] when
+        ] }
+        [ lex-factor-nested ]
+    } case ;
+
+: lex-factor-top ( n/f string -- n'/f string literal )
+    ! skip-whitespace
+    "\"\\!:[{(]})<>\s\r\n" slice-til-either
+    lex-factor-top* ; inline
 
 ERROR: compound-syntax-disallowed seq i obj ;
 : check-for-compound-syntax ( seq -- seq' )
@@ -323,7 +314,8 @@ ERROR: compound-syntax-disallowed seq i obj ;
     [
         ! Compound syntax loop
         [
-            (lex-factor) f like [ , ] when*
+            lex-factor-top
+            f like [ , ] when*
             ! concatenated syntax ( a )[ a 1 + ]( b )
             [ ]
             [ peek-from blank? ]
