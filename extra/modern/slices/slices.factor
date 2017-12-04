@@ -219,3 +219,10 @@ ERROR: subseq-expected-but-got-eof n string expected ;
     dup length 1 = [
         -1 modify-to [ 1 - ] 2dip
     ] unless ;
+
+: rewind-slice ( n string slice -- n' string )
+    pick [
+        length swap [ - ] dip
+    ] [
+        [ nip ] dip [ [ length ] bi@ - ] 2keep drop
+    ] if ; inline
