@@ -72,7 +72,8 @@ DEFER: lex-factor-nested
         [
             lex-factor-nested dup f like [ , ] when* [
                 dup [
-                    dup { [ section-close? ] [ upper-colon? ] } 1|| [
+                    ! This is for ending COLON: forms like ``A: PRIVATE>``
+                    dup section-close? [
                         drop f
                     ] [
                         ! } gets a chance, but then also full seq { } after recursion...
@@ -264,6 +265,26 @@ DEFER: lex-factor-top*
 : read-token-or-whitespace-nested ( n string slice -- n' string slice/f )
     dup length 0 = [ [ 1 + ] 2dip drop lex-factor-nested ] when ;
 
+: lex-factor-fallthrough ( n/f string slice/f ch/f -- n'/f string literal )
+    {
+        { char: \\ [ read-backslash ] }
+        { char: \[ [ read-bracket ] }
+        { char: \{ [ read-brace ] }
+        { char: \( [ read-paren ] }
+        { char: \] [ ] }
+        { char: \} [ ] }
+        { char: \) [ ] }
+        { char: \" [ read-string ] }
+        { char: \! [ read-exclamation ] }
+        { char: > [
+            [ [ char: > = not ] slice-until ] dip merge-slices
+            dup section-close? [
+                [ slice-til-whitespace drop ] dip ?span-slices
+            ] unless
+        ] }
+        { f [ ] }
+    } case ;
+
 ! Inside a FOO: or a <FOO FOO>
 : lex-factor-nested* ( n/f string slice/f ch/f -- n'/f string literal )
     {
@@ -280,33 +301,16 @@ DEFER: lex-factor-top*
             [ slice-til-whitespace drop ] dip span-slices
             dup section-open? [ rewind-slice f ] when
         ] }
-
-        { char: \\ [ read-backslash ] }
-        { char: \[ [ read-bracket ] }
-        { char: \{ [ read-brace ] }
-        { char: \( [ read-paren ] }
-        { char: \] [ ] }
-        { char: \} [ ] }
-        { char: \) [ ] }
         { char: \s [ read-token-or-whitespace-nested ] }
         { char: \r [ read-token-or-whitespace-nested ] }
         { char: \n [ read-token-or-whitespace-nested ] }
-        { char: \" [ read-string ] }
-        { char: \! [ read-exclamation ] }
-        { char: > [
-            [ [ char: > = not ] slice-until ] dip merge-slices
-            dup section-close? [
-                [ slice-til-whitespace drop ] dip ?span-slices
-            ] unless
-        ] }
-        { f [ ] }
+        [ lex-factor-fallthrough ]
     } case ;
 
 : lex-factor-nested ( n/f string -- n'/f string literal )
     ! skip-whitespace
     "\"\\!:[{(]})<>\s\r\n" slice-til-either
     lex-factor-nested* ; inline
-
 
 : lex-factor-top* ( n/f string slice/f ch/f -- n'/f string literal )
     {
@@ -323,25 +327,10 @@ DEFER: lex-factor-top*
             dup section-open? [ read-acute ] when
         ] }
 
-        { char: \\ [ read-backslash ] }
-        { char: \[ [ read-bracket ] }
-        { char: \{ [ read-brace ] }
-        { char: \( [ read-paren ] }
-        { char: \] [ ] }
-        { char: \} [ ] }
-        { char: \) [ ] }
         { char: \s [ read-token-or-whitespace-top ] }
         { char: \r [ read-token-or-whitespace-top ] }
         { char: \n [ read-token-or-whitespace-top ] }
-        { char: \" [ read-string ] }
-        { char: \! [ read-exclamation ] }
-        { char: > [
-            [ [ char: > = not ] slice-until ] dip merge-slices
-            dup section-close? [
-                [ slice-til-whitespace drop ] dip ?span-slices
-            ] unless
-        ] }
-        { f [ ] }
+        [ lex-factor-fallthrough ]
     } case ;
 
 : lex-factor-top ( n/f string -- n'/f string literal )
