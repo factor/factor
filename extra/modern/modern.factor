@@ -206,11 +206,11 @@ ERROR: unexpected-terminator n string slice ;
     ! Remove the ; from the payload if present
     ! Also in stack effects ( T: int -- ) can be ended by -- and )
     dup ?last {
-        { [ dup ";" tail? ] [ drop unclip-last 3array ] }
-        { [ dup "--" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        { [ dup "]" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        { [ dup "}" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        { [ dup ")" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup ";" sequence= ] [ drop unclip-last 3array ] }
+        { [ dup "--" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup "]" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup "}" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup ")" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] } ! (n*quot) breaks
         { [ dup section-close? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         { [ dup upper-colon? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         [ drop 2array ]
@@ -359,7 +359,8 @@ ERROR: compound-syntax-disallowed n seq obj ;
         ] loop
     ] { } make
     check-for-compound-syntax
-    concat f like ;
+    ! concat ! "ALIAS: n*quot (n*quot)" string>literals ... breaks here
+    ?first f like ;
 
 : string>literals ( string -- sequence )
     [ 0 ] dip [
