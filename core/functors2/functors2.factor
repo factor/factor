@@ -120,7 +120,7 @@ ERROR: not-all-unique seq ;
     [ '[ _ interpolate>string _ set ] ] { } assoc>map [ ] concat-as ; inline
 
 : create-new-word-in ( string -- word )
-    create-word-in dup reset-generic ; 
+    create-word-in dup reset-generic ;
 
 : lookup-word-in ( string -- word )
     current-vocab lookup-word ;

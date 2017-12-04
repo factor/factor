@@ -110,4 +110,3 @@ INSTANCE: ${name} backward-analysis
     [ ${name}-outs namespaces:set ] [ ${name}-ins namespaces:set ] bi* ;
 
 ]]
-
