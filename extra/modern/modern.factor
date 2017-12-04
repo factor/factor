@@ -208,6 +208,8 @@ ERROR: unexpected-terminator n string slice ;
     dup ?last {
         { [ dup ";" tail? ] [ drop unclip-last 3array ] }
         { [ dup "--" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup "]" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup "}" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         { [ dup ")" tail? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         { [ dup section-close? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         { [ dup upper-colon? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
@@ -343,6 +345,11 @@ ERROR: compound-syntax-disallowed seq i obj ;
     dup [ length 1 > ] find
     [ compound-syntax-disallowed ] [ drop ] if* ;
 
+: check-next-compound ( n/f string -- n/f string ? )
+    [ ] [ peek-from ] [ previous-from ] 2tri
+    [ blank? ] bi@ or not ! no blanks between tokens
+    pick and ; ! and a valid index
+
 : lex-factor ( n/f string/f -- n'/f string literal/f )
     [
         ! Compound syntax loop
@@ -350,9 +357,7 @@ ERROR: compound-syntax-disallowed seq i obj ;
             lex-factor-top
             f like [ , ] when*
             ! concatenated syntax ( a )[ a 1 + ]( b )
-            [ ]
-            [ peek-from blank? ]
-            [ previous-from blank? or not ] 2tri pick and
+            check-next-compound
         ] loop
     ] { } make
     ! check-for-compound-syntax
