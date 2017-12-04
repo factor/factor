@@ -66,10 +66,11 @@ ERROR: lex-expected-but-got-eof n string expected ;
 
 DEFER: section-close?
 DEFER: upper-colon?
+DEFER: lex-factor-nested
 : lex-colon-until ( n string tag-sequence -- n' string payload )
     '[
         [
-            lex-factor-top dup f like [ , ] when* [
+            lex-factor-nested dup f like [ , ] when* [
                 dup [
                     dup { [ section-close? ] [ upper-colon? ] } 1|| [
                         drop f
@@ -182,7 +183,7 @@ ERROR: unexpected-terminator n string slice ;
     {
         [ length 2 >= ]
         [ ":" tail? ]
-        [ dup [ char: : = ] find drop head strict-upper? ]
+        [ dup [ char: \: = ] find drop head strict-upper? ]
     } 1&& ;
 
 : section-close? ( string -- ? )
@@ -217,7 +218,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     {
         { [ dup strict-upper? ] [ read-til-semicolon ] }
         { [ dup ":" tail? ] [ dup ":" head? [ read-lowercase-colon ] unless ] } ! :foo: vs foo:
-        [ "here for some reason" throw ]
+        [ ]
     } cond ;
 
 : read-acute ( n string slice -- n' string acute )
@@ -256,12 +257,30 @@ DEFER: lex-factor-top*
 
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
-: read-token-or-whitespace ( n string slice -- n' string slice/f )
+
+: read-token-or-whitespace-top ( n string slice -- n' string slice/f )
     dup length 0 = [ [ 1 + ] 2dip drop lex-factor-top ] when ;
 
+: read-token-or-whitespace-nested ( n string slice -- n' string slice/f )
+    dup length 0 = [ [ 1 + ] 2dip drop lex-factor-nested ] when ;
+
 ! Inside a FOO: or a <FOO FOO>
-: lex-factor-nested ( n/f string slice/f ch/f -- n'/f string literal )
+: lex-factor-nested* ( n/f string slice/f ch/f -- n'/f string literal )
     {
+        ! Nested ``A: a B: b`` so rewind and let the parser get it top-level
+        { char: \: [ merge-slice-til-whitespace rewind-slice f ] }
+        { char: < [
+            ! FOO: a b <BAR: ;BAR>
+            ! FOO: a b <BAR BAR>
+            ! FOO: a b <asdf>
+            ! FOO: a b <asdf asdf>
+
+            ! if we are in a FOO: and we hit a <BAR or <BAR:
+            ! then end the FOO:
+            [ slice-til-whitespace drop ] dip span-slices
+            dup section-open? [ rewind-slice f ] when
+        ] }
+
         { char: \\ [ read-backslash ] }
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
@@ -269,9 +288,9 @@ DEFER: lex-factor-top*
         { char: \] [ ] }
         { char: \} [ ] }
         { char: \) [ ] }
-        { char: \s [ read-token-or-whitespace ] }
-        { char: \r [ read-token-or-whitespace ] }
-        { char: \n [ read-token-or-whitespace ] }
+        { char: \s [ read-token-or-whitespace-nested ] }
+        { char: \r [ read-token-or-whitespace-nested ] }
+        { char: \n [ read-token-or-whitespace-nested ] }
         { char: \" [ read-string ] }
         { char: \! [ read-exclamation ] }
         { char: > [
@@ -282,6 +301,12 @@ DEFER: lex-factor-top*
         ] }
         { f [ ] }
     } case ;
+
+: lex-factor-nested ( n/f string -- n'/f string literal )
+    ! skip-whitespace
+    "\"\\!:[{(]})<>\s\r\n" slice-til-either
+    lex-factor-nested* ; inline
+
 
 : lex-factor-top* ( n/f string slice/f ch/f -- n'/f string literal )
     {
@@ -297,7 +322,26 @@ DEFER: lex-factor-top*
             [ slice-til-whitespace drop ] dip span-slices
             dup section-open? [ read-acute ] when
         ] }
-        [ lex-factor-nested ]
+
+        { char: \\ [ read-backslash ] }
+        { char: \[ [ read-bracket ] }
+        { char: \{ [ read-brace ] }
+        { char: \( [ read-paren ] }
+        { char: \] [ ] }
+        { char: \} [ ] }
+        { char: \) [ ] }
+        { char: \s [ read-token-or-whitespace-top ] }
+        { char: \r [ read-token-or-whitespace-top ] }
+        { char: \n [ read-token-or-whitespace-top ] }
+        { char: \" [ read-string ] }
+        { char: \! [ read-exclamation ] }
+        { char: > [
+            [ [ char: > = not ] slice-until ] dip merge-slices
+            dup section-close? [
+                [ slice-til-whitespace drop ] dip ?span-slices
+            ] unless
+        ] }
+        { f [ ] }
     } case ;
 
 : lex-factor-top ( n/f string -- n'/f string literal )
