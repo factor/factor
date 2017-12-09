@@ -12,7 +12,7 @@ SYMBOL: build-images-destination
 
 : latest-destination ( -- dest )
     upload-images-destination get
-    "sheeple@downloads.factorcode.org:downloads.factorcode.org/images/latest/"
+    "sheeple@downloads.factorcode.org:downloads.factorcode.org/images/master/"
     or ;
 
 : build-destination ( -- dest )
