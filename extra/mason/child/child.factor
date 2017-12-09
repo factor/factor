@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators
 combinators.short-circuit continuations fry io.directories
-io.launcher io.pathnames kernel macros make mason.config
+io.launcher io.pathnames kernel layouts macros make mason.config
 mason.notify mason.platform mason.report math.parser namespaces
 quotations sequences splitting system system-info ;
 IN: mason.child
@@ -10,8 +10,10 @@ IN: mason.child
 HOOK: compile-factor-command os ( -- array )
 M: unix compile-factor-command ( -- array )
     { "make" "-j" } cpus number>string suffix ;
+! Windows has separate 32/64 bit shells, so assuming the cell bits here is fine
+! because it won't find the right toolchain otherwise.
 M: windows compile-factor-command ( -- array )
-    { "nmake" "/f" "NMakefile" "x86-64" } ;
+    { "nmake" "/f" "NMakefile" } cell-bits 64 = "x86-64" "x86-32" ? suffix ;
 
 HOOK: factor-path os ( -- path )
 M: unix factor-path "./factor" ;
