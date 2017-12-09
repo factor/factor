@@ -557,7 +557,11 @@ current_git_branch() {
 }
 
 find_branch() {
-    CURRENT_BRANCH=$(current_git_branch)
+    if [ -z ${TRAVIS_BRANCH} ]; then
+        CURRENT_BRANCH=$(current_git_branch)
+    else
+        CURRENT_BRANCH=${TRAVIS_BRANCH}
+    fi
 }
 
 checksum_url() {
