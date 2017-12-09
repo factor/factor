@@ -118,14 +118,14 @@ PY-METHODS: code =>
     100000 [
         [ [ 987 >py basename drop ] ignore-errors ] with-destructors
     ] times
-] unit-test
+] long-unit-test
 
 ! Another leaky test
 { } [
     1000000 [
         [ { 9 8 7 6 5 4 3 2 1 } >py ] with-destructors drop
     ] times
-] unit-test
+] long-unit-test
 
 ! Working with types
 PY-QUALIFIED-FROM: types => UnicodeType ( -- ) ;
