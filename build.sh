@@ -362,6 +362,7 @@ echo_build_info() {
     $ECHO NUM_CORES=$NUM_CORES
     $ECHO WORD=$WORD
     $ECHO DEBUG=$DEBUG
+    $ECHO CURRENT_BRANCH=$CURRENT_BRANCH
     $ECHO FACTOR_BINARY=$FACTOR_BINARY
     $ECHO FACTOR_LIBRARY=$FACTOR_LIBRARY
     $ECHO FACTOR_IMAGE=$FACTOR_IMAGE
@@ -436,6 +437,7 @@ find_build_info() {
     find_num_cores
     set_cc
     find_word_size
+    find_branch
     set_factor_binary
     set_factor_library
     set_factor_image
@@ -552,6 +554,10 @@ make_clean_factor() {
 
 current_git_branch() {
     git rev-parse --abbrev-ref HEAD
+}
+
+find_branch() {
+    CURRENT_BRANCH=$(current_git_branch)
 }
 
 checksum_url() {
@@ -734,3 +740,4 @@ case "$1" in
     full-report) find_build_info; check_installed_programs; check_libraries ;;
     *) usage ;;
 esac
+
