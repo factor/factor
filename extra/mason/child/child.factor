@@ -3,31 +3,24 @@
 USING: accessors arrays calendar combinators
 combinators.short-circuit continuations fry io.directories
 io.launcher io.pathnames kernel macros make mason.config
-mason.notify mason.platform mason.report namespaces quotations
-sequences splitting system ;
+mason.notify mason.platform mason.report math.parser namespaces
+quotations sequences splitting system system-info ;
 IN: mason.child
 
-! Make sure we call the build directory's factor.cmd
-: nmake-cmd ( -- args )
-    "./build.cmd" absolute-path
-    "latest"
-    target-cpu get name>> "." split "-" join 3array ;
+HOOK: compile-factor-command os ( -- array )
+M: unix compile-factor-command ( -- array )
+    { "make" "-j" } cpus number>string suffix ;
+M: windows compile-factor-command ( -- array )
+    { "nmake" "/f" "NMakefile" "x86-64" } ;
 
-: gnu-make-cmd ( -- args )
-    gnu-make
-    target-os get name>> target-cpu get name>> (platform)
-    2array ;
-
-: mason-child-make-cmd ( -- args )
-    {
-        { [ target-os get windows = ] [ nmake-cmd ] }
-        [ gnu-make-cmd ]
-    } cond ;
+HOOK: factor-path os ( -- path )
+M: unix factor-path "./factor" ;
+M: windows factor-path "./factor.com" ;
 
 : make-mason-child-vm ( -- )
     "factor" [
         <process>
-            mason-child-make-cmd >>command
+            compile-factor-command >>command
             "../compile-log" >>stdout
             +stdout+ >>stderr
             +new-group+ >>group
