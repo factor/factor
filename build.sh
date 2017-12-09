@@ -565,11 +565,12 @@ find_branch() {
 }
 
 checksum_url() {
-    branch=$(current_git_branch)
-    echo "http://downloads.factorcode.org/images/$branch/checksums.txt"
+    find_branch
+    echo "http://downloads.factorcode.org/images/$CURRENT_BRANCH/checksums.txt"
 }
 
 update_boot_images() {
+    find_branch
     $ECHO "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
     # delete boot images with one or two characters after the dot
@@ -594,8 +595,8 @@ update_boot_images() {
 }
 
 boot_image_url() {
-    branch=$(current_git_branch)
-    echo "http://downloads.factorcode.org/images/$branch/$BOOT_IMAGE"
+    find_branch
+    echo "http://downloads.factorcode.org/images/$CURRENT_BRANCH/$BOOT_IMAGE"
 }
 
 get_boot_image() {
