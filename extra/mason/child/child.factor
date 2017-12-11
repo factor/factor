@@ -7,9 +7,15 @@ mason.notify mason.platform mason.report math.parser namespaces
 quotations sequences splitting system system-info ;
 IN: mason.child
 
+: gnu-make-cmd ( -- args )
+    gnu-make
+    target-os get name>> target-cpu get name>> (platform)
+    2array ;
+
 HOOK: compile-factor-command os ( -- array )
 M: unix compile-factor-command ( -- array )
-    { "make" "-j" } cpus number>string suffix ;
+    gnu-make-cmd ;
+
 ! Windows has separate 32/64 bit shells, so assuming the cell bits here is fine
 ! because it won't find the right toolchain otherwise.
 M: windows compile-factor-command ( -- array )
