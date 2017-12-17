@@ -101,6 +101,8 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     user-init-errors get-global assoc-empty?
     [ f ] [ :user-init-errors t ] if ;
 
+SYMBOL: skip-mason-benchmarks
+
 : do-all ( -- )
     f parser-quiet? set-global
     f restartable-tests? set-global
@@ -112,7 +114,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
         [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file
         [ do-help-lint ] benchmark help-lint-time-file to-file
-        [ do-benchmarks ] benchmark benchmark-time-file to-file
+        skip-mason-benchmarks get [ [ do-benchmarks ] benchmark benchmark-time-file to-file ] unless
         do-compile-errors
     ] with-directory ;
 
