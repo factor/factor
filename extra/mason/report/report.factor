@@ -123,7 +123,7 @@ IN: mason.report
             help-lint-errors-file
             error-dump
 
-            skip-mason-benchmarks get [
+            skip-mason-benchmarks get-global [
                 "Benchmark errors"
                 benchmark-error-vocabs-file
                 benchmark-error-messages-file
