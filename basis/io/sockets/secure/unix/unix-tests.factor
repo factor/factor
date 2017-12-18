@@ -1,16 +1,16 @@
-USING: accessors calendar classes
-concurrency.promises destructors io io.backend.unix
-io.encodings.ascii io.sockets io.sockets.secure
-io.sockets.secure.debug io.streams.duplex io.timeouts kernel
-locals namespaces threads tools.test ;
-IN: io.sockets.secure.tests
+USING: accessors calendar classes concurrency.conditions
+concurrency.mailboxes concurrency.promises continuations
+destructors io io.backend.unix io.encodings.ascii io.sockets
+io.sockets.secure io.sockets.secure.debug io.streams.duplex
+io.timeouts kernel locals namespaces threads tools.test ;
 QUALIFIED-WITH: concurrency.messaging qm
+IN: io.sockets.secure.tests
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
 { } [ <promise> "port" set ] unit-test
 
-:: server-test ( quot -- obj/f )
+:: server-test ( quot -- )
     [
         [
             "127.0.0.1" 0 <inet4> f <secure> ascii <server> [
@@ -20,7 +20,12 @@ QUALIFIED-WITH: concurrency.messaging qm
                 ] curry with-stream
             ] with-disposal
         ] with-test-context
-    ] "SSL server test" qm:spawn-linked drop qm:receive ;
+    ] "SSL server test" qm:spawn-linked drop
+    ! This is hideous.
+    ! If we fail with a timeout, the test is passing.
+    ! If we fail with something besides a timeout, rethrow it and fail the test.
+    [ qm:my-mailbox 200 milliseconds mailbox-get-timeout drop ]
+    [ dup timed-out-error? [ drop ] [ rethrow ] if ] recover ;
 
 : ?promise-test ( mailbox -- obj )
     340 milliseconds ?promise-timeout ;
