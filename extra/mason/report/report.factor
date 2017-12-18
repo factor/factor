@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators.smart debugger fry io.encodings.utf8
 io.files io.streams.string kernel literals locals mason.common
-mason.config mason.disk math math.parser namespaces sequences
+mason.config mason.disk mason.test math namespaces sequences
 xml.syntax xml.writer ;
 IN: mason.report
 
@@ -123,10 +123,12 @@ IN: mason.report
             help-lint-errors-file
             error-dump
 
-            "Benchmark errors"
-            benchmark-error-vocabs-file
-            benchmark-error-messages-file
-            error-dump
+            skip-mason-benchmarks get [
+                "Benchmark errors"
+                benchmark-error-vocabs-file
+                benchmark-error-messages-file
+                error-dump
+            ] unless
 
             benchmarks-file eval-file benchmarks-table
         ] output>array
