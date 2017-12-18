@@ -73,7 +73,7 @@ M: windows factor-path "./factor.com" ;
             +closed+ >>stdin
             "../test-log" >>stdout
             +stdout+ >>stderr
-            4 hours >>timeout
+            5 hours >>timeout
             +new-group+ >>group
         try-process
     ] with-directory ;
