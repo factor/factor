@@ -130,7 +130,7 @@ IN: io.streams.peek.tests
 ] unit-test
 
 ! Issue #1317
-{ "Red" } [
+{ "Cop" } [
     "resource:LICENSE.txt" binary [
         input-stream [ <peek-stream> ] change
         peek1 drop
@@ -138,7 +138,7 @@ IN: io.streams.peek.tests
     ] with-file-reader
 ] unit-test
 
-{ "ist" } [
+{ "yri" } [
     "resource:LICENSE.txt" binary [
         input-stream [ <peek-stream> ] change
         peek1 drop
