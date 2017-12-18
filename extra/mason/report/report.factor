@@ -143,7 +143,7 @@ IN: mason.report
         test-all-vocabs-file
         help-lint-vocabs-file
         compiler-errors-file
-        benchmark-error-vocabs-file
+        skip-mason-benchmarks get [ t ] [ benchmark-error-vocabs-file ] if
     } [ eval-file empty? ] all? ;
 
 : success ( -- status )
