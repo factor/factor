@@ -114,7 +114,15 @@ SYMBOL: skip-mason-benchmarks
         [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file
         [ do-help-lint ] benchmark help-lint-time-file to-file
-        skip-mason-benchmarks get [ [ do-benchmarks ] benchmark benchmark-time-file to-file ] unless
+        ! Because of the way mason is written, it expects these files to exist.
+        ! So fake them.
+        skip-mason-benchmarks get [
+            { } benchmarks-file to-file
+            benchmark-error-messages-file touch-file
+            0 benchmark-time-file to-file
+        ] [
+            [ do-benchmarks ] benchmark benchmark-time-file to-file
+        ] if
         do-compile-errors
     ] with-directory ;
 
