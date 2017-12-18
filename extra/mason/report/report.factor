@@ -124,15 +124,17 @@ IN: mason.report
             error-dump
 
             skip-mason-benchmarks get-global [
+                f f
+            ] [
                 "Benchmark errors"
                 benchmark-error-vocabs-file
                 benchmark-error-messages-file
                 error-dump
 
                 benchmarks-file eval-file benchmarks-table
-            ] unless
+            ] if
 
-        ] output>array
+        ] output>array sift
     ] with-report ;
 
 : build-clean? ( -- ? )
