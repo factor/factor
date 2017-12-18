@@ -128,9 +128,10 @@ IN: mason.report
                 benchmark-error-vocabs-file
                 benchmark-error-messages-file
                 error-dump
+
+                benchmarks-file eval-file benchmarks-table
             ] unless
 
-            benchmarks-file eval-file benchmarks-table
         ] output>array
     ] with-report ;
 
