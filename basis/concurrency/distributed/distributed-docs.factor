@@ -28,8 +28,8 @@ $nl
 "The second Factor instance, the one associated with port 9001, can send "
 "messages to the 'logger' thread by name:"
 { $code
-    "USING: io.sockets ; FROM: concurrency.messaging => send ;"
-    "\"hello\" \"127.0.0.1\" 9000 <inet4> \"logger\" <remote-thread> send"
+    "USING: io.servers concurrency.distributed ; FROM: concurrency.messaging => send ;"
+    "\"hello\" 9000 local-server \"logger\" <remote-thread> send"
 }
 "The " { $link send } " word is used to send messages to threads. If an "
 "instance of " { $link remote-thread } " is provided, then "
