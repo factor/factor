@@ -25,7 +25,7 @@ ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
 "This spawns a thread that waits for the messages and prints them. It registers "
 "the thread as remotely accessible with " { $link register-remote-thread } "."
 $nl
-"The second Factor instance, the one associated with port 9001, can send "
+"The second Factor instance can send "
 "messages to the 'logger' thread by name:"
 { $code
     "USING: io.servers concurrency.distributed ; FROM: concurrency.messaging => send ;"
