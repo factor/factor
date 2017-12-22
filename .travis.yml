@@ -19,7 +19,6 @@ addons:
     packages:
       - links
       - libblas-dev
-      - libfftw3-dev
       - libmagic-dev
       - libsnappy-dev
       - libzmq-dev
@@ -36,7 +35,6 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions redis > /dev/null || brew install redis; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions zeromq > /dev/null || brew install zeromq; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions postgresql > /dev/null || brew install postgresql; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions fftw > /dev/null || brew install fftw; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start redis; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
